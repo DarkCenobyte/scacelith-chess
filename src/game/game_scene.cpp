@@ -600,7 +600,7 @@ void GameScene::updatePlaying(float dt) {
         int choice = ui::promotionPicker(humanColor_ == White);
         if (choice >= Knight && choice <= Queen) {
             PieceType t = PieceType(choice);
-            arbiter_.place(game_, placedTo_, t);
+            arbiter_.choosePromotion(game_, t);
             std::vector<anim::Task> tasks;
             planPromotionSwap(tasks, board_.idAt(placedTo_), placedTo_, t);
             anim_[humanSeat()].enqueue(tasks);
@@ -681,7 +681,7 @@ void GameScene::updateHumanInput() {
 void GameScene::humanTouch(int pieceId) {
     PieceObject* p = board_.byId(pieceId);
     if (!p || p->square == NoSquare) return;
-    if (!arbiter_.touch(p->square)) {
+    if (!arbiter_.touch(game_, p->square)) {
         Square committed = arbiter_.touchedSquare();
         ui::notify("Touch-move: you must move the piece on " + squareName(committed) + ".", 3.0f);
         return;
@@ -828,7 +828,7 @@ void GameScene::updateAi(float dt) {
         }
     }
 
-    arbiter_.touch(mv.from);
+    arbiter_.touch(game_, mv.from);
     arbiter_.place(game_, mv.to, mv.promotion);
     int moverId = board_.idAt(mv.from);
     int victimId = board_.idAt(mv.to);
@@ -993,10 +993,16 @@ void GameScene::onClockPressed(int seat) {
     if (state_ != State::Playing) return;
     Color mover = colorOfSeat(seat);
     if (!(turn_ == Turn::HumanPressing || turn_ == Turn::AiMoving) || game_.position().sideToMove() != mover) return;
-    clock_.press(mover);
     chess::Arbiter::Verdict v = arbiter_.clockPressed(game_, clock_.timeControl());
-    if (v.legal) {
+    if (v.legal || v.moveStands) {
+        clock_.press(mover);
+        if (v.moveStands) {
+            // Art. 7.5.2: pawn left unpromoted: penalised, the move stands with a queen.
+            ui::notify(v.message, 6.0f);
+            clock_.addTime(opposite(mover), v.opponentBonusMs);
+        }
         game_.play(v.move);
+        if (v.moveStands) board_.syncTo(game_.position());
         if (game_.status() != GameStatus::Ongoing) {
             endGame();
             return;
@@ -1014,9 +1020,10 @@ void GameScene::onClockPressed(int seat) {
         endGame();
         return;
     }
+    // The clock was not switched: the offender's time keeps running while the position is
+    // restored.
     clock_.addTime(opposite(mover), v.opponentBonusMs);
     board_.syncTo(game_.position());
-    clock_.start(mover);
     leverTarget_ = -leverTarget_;
     beginTurn();
 }
