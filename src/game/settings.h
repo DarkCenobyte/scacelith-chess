@@ -1,0 +1,56 @@
+// Persistent player settings (Scacelith.ini). Shared by the menus (ui/), the game and main.cpp.
+#pragma once
+#include "../render/renderer.h"
+#include <string>
+
+namespace game {
+
+struct Settings {
+    // [display]
+    int displayWidth = 1600;
+    int displayHeight = 900;
+    bool fullscreen = true;       // borderless fullscreen
+    bool vsync = true;
+    float renderScale = 1.0f;
+    // [graphics]
+    int quality = 2;              // 0 Low, 1 Medium, 2 High, 3 Ultra
+    bool motionBlur = true;
+    bool depthOfField = true;
+    float brightness = 0.0f;      // exposure compensation (EV)
+    // [audio]
+    float masterVolume = 0.9f;
+    float effectsVolume = 1.0f;
+    float ambienceVolume = 0.7f;
+    bool ambience = true;
+    // [gameplay]
+    bool showLegalMoves = true;   // highlight the legal destinations of the touched piece
+    bool showCoordinates = false; // board has no printed coordinates by default (tournament boards)
+    float mouseSensitivity = 1.0f;
+    bool invertLook = false;
+    int nextColor = -1;           // -1 = random (first game), 0 = white, 1 = black
+    // [newgame] last choices on the new game screen
+    int difficultyPreset = 3;     // index into ai::presets()
+    int timeControlPreset = 5;    // index into chess::timeControlPresets()
+    int customBaseSeconds = 600;
+    int customIncrementSeconds = 5;
+    int customDelaySeconds = 0;
+    // Custom engine settings (used when the "Custom" difficulty preset is selected)
+    int customSkillLevel = 10;
+    bool customLimitElo = false;
+    int customElo = 1800;
+    int customDepth = 0;
+    int customMoveTimeMs = 0;
+    int customNodes = 0;
+    int engineThreads = 1;
+    int engineHashMB = 64;
+    bool humanizeThinking = true; // spend realistic time before moving
+
+    render::RenderSettings renderSettings() const;
+    bool load(const std::string& path);  // missing file = defaults
+    bool save() const;                   // writes back to the loaded path (or user data dir)
+    std::string path;
+};
+
+Settings& settings();
+
+}  // namespace game

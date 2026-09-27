@@ -1,0 +1,186 @@
+#include "gpu.h"
+#include "../core/log.h"
+#include <algorithm>
+#include <cmath>
+
+namespace gpu {
+
+int mipCount(int w, int h, int d) {
+    int m = std::max(w, std::max(h, d));
+    int n = 1;
+    while (m > 1) { m >>= 1; ++n; }
+    return n;
+}
+
+static void defaultSampling(const Texture& t) {
+    bool mips = t.levels > 1;
+    bool isInt = t.format == GL_R32UI || t.format == GL_RG32UI || t.format == GL_RGBA32UI || t.format == GL_R8UI ||
+                 t.format == GL_R32I || t.format == GL_R16UI;
+    GLenum minF = isInt ? GL_NEAREST : (mips ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
+    glTextureParameteri(t.id, GL_TEXTURE_MIN_FILTER, minF);
+    glTextureParameteri(t.id, GL_TEXTURE_MAG_FILTER, isInt ? GL_NEAREST : GL_LINEAR);
+    glTextureParameteri(t.id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(t.id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(t.id, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+}
+
+Texture createTexture2D(int w, int h, GLenum fmt, int levels) {
+    Texture t;
+    t.target = GL_TEXTURE_2D;
+    t.format = fmt;
+    t.width = w;
+    t.height = h;
+    t.levels = levels <= 0 ? mipCount(w, h) : levels;
+    glCreateTextures(GL_TEXTURE_2D, 1, &t.id);
+    glTextureStorage2D(t.id, t.levels, fmt, w, h);
+    defaultSampling(t);
+    return t;
+}
+
+Texture createTexture2DArray(int w, int h, int layers, GLenum fmt, int levels) {
+    Texture t;
+    t.target = GL_TEXTURE_2D_ARRAY;
+    t.format = fmt;
+    t.width = w;
+    t.height = h;
+    t.depth = layers;
+    t.levels = levels <= 0 ? mipCount(w, h) : levels;
+    glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &t.id);
+    glTextureStorage3D(t.id, t.levels, fmt, w, h, layers);
+    defaultSampling(t);
+    return t;
+}
+
+Texture createTexture3D(int w, int h, int d, GLenum fmt, int levels) {
+    Texture t;
+    t.target = GL_TEXTURE_3D;
+    t.format = fmt;
+    t.width = w;
+    t.height = h;
+    t.depth = d;
+    t.levels = levels <= 0 ? mipCount(w, h, d) : levels;
+    glCreateTextures(GL_TEXTURE_3D, 1, &t.id);
+    glTextureStorage3D(t.id, t.levels, fmt, w, h, d);
+    defaultSampling(t);
+    return t;
+}
+
+Texture createCubemap(int size, GLenum fmt, int levels) {
+    Texture t;
+    t.target = GL_TEXTURE_CUBE_MAP;
+    t.format = fmt;
+    t.width = t.height = size;
+    t.depth = 6;
+    t.levels = levels <= 0 ? mipCount(size, size) : levels;
+    glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &t.id);
+    glTextureStorage2D(t.id, t.levels, fmt, size, size);
+    defaultSampling(t);
+    return t;
+}
+
+Texture createCubemapArray(int size, int cubes, GLenum fmt, int levels) {
+    Texture t;
+    t.target = GL_TEXTURE_CUBE_MAP_ARRAY;
+    t.format = fmt;
+    t.width = t.height = size;
+    t.depth = cubes * 6;
+    t.levels = levels <= 0 ? mipCount(size, size) : levels;
+    glCreateTextures(GL_TEXTURE_CUBE_MAP_ARRAY, 1, &t.id);
+    glTextureStorage3D(t.id, t.levels, fmt, size, size, cubes * 6);
+    defaultSampling(t);
+    return t;
+}
+
+void setFilter(const Texture& t, GLenum minF, GLenum magF) {
+    glTextureParameteri(t.id, GL_TEXTURE_MIN_FILTER, minF);
+    glTextureParameteri(t.id, GL_TEXTURE_MAG_FILTER, magF);
+}
+void setWrap(const Texture& t, GLenum wrap) {
+    glTextureParameteri(t.id, GL_TEXTURE_WRAP_S, wrap);
+    glTextureParameteri(t.id, GL_TEXTURE_WRAP_T, wrap);
+    glTextureParameteri(t.id, GL_TEXTURE_WRAP_R, wrap);
+}
+void setAnisotropy(const Texture& t, float a) {
+    float maxA = 1.0f;
+    glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxA);
+    glTextureParameterf(t.id, GL_TEXTURE_MAX_ANISOTROPY, std::min(a, maxA));
+}
+void setDepthCompare(const Texture& t, bool enable) {
+    glTextureParameteri(t.id, GL_TEXTURE_COMPARE_MODE, enable ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
+    glTextureParameteri(t.id, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+}
+
+Framebuffer createFramebuffer(std::initializer_list<const Texture*> colors, const Texture* depth, int level) {
+    Framebuffer fb;
+    glCreateFramebuffers(1, &fb.id);
+    GLenum bufs[8];
+    int n = 0;
+    for (const Texture* c : colors) {
+        glNamedFramebufferTexture(fb.id, GL_COLOR_ATTACHMENT0 + n, c->id, level);
+        bufs[n] = GL_COLOR_ATTACHMENT0 + n;
+        ++n;
+    }
+    if (depth) {
+        bool stencil = depth->format == GL_DEPTH24_STENCIL8 || depth->format == GL_DEPTH32F_STENCIL8;
+        glNamedFramebufferTexture(fb.id, stencil ? GL_DEPTH_STENCIL_ATTACHMENT : GL_DEPTH_ATTACHMENT, depth->id, level);
+    }
+    if (n) glNamedFramebufferDrawBuffers(fb.id, n, bufs);
+    else glNamedFramebufferDrawBuffer(fb.id, GL_NONE);
+    return fb;
+}
+
+Framebuffer createFramebufferLayer(const Texture* color, int colorLayer, const Texture* depth, int depthLayer, int level) {
+    Framebuffer fb;
+    glCreateFramebuffers(1, &fb.id);
+    if (color) {
+        glNamedFramebufferTextureLayer(fb.id, GL_COLOR_ATTACHMENT0, color->id, level, colorLayer);
+        glNamedFramebufferDrawBuffer(fb.id, GL_COLOR_ATTACHMENT0);
+    } else {
+        glNamedFramebufferDrawBuffer(fb.id, GL_NONE);
+    }
+    if (depth) glNamedFramebufferTextureLayer(fb.id, GL_DEPTH_ATTACHMENT, depth->id, level, depthLayer);
+    return fb;
+}
+
+bool checkFramebuffer(const Framebuffer& fb, const char* name) {
+    GLenum s = glCheckNamedFramebufferStatus(fb.id, GL_FRAMEBUFFER);
+    if (s != GL_FRAMEBUFFER_COMPLETE) {
+        LOGE("framebuffer '%s' incomplete: 0x%x", name, s);
+        return false;
+    }
+    return true;
+}
+
+void ensureBuffer(Buffer& b, size_t size, GLbitfield flags) {
+    if (b.id && b.size >= size) return;
+    b.destroy();
+    size_t cap = std::max<size_t>(size, 256);
+    cap = size_t(std::pow(2.0, std::ceil(std::log2(double(cap)))));
+    glCreateBuffers(1, &b.id);
+    glNamedBufferStorage(b.id, GLsizeiptr(cap), nullptr, flags);
+    b.size = cap;
+}
+
+Buffer createBuffer(size_t size, const void* data, GLbitfield flags) {
+    Buffer b;
+    glCreateBuffers(1, &b.id);
+    glNamedBufferStorage(b.id, GLsizeiptr(size), data, flags);
+    b.size = size;
+    return b;
+}
+
+void drawFullscreenTriangle() {
+    static GLuint vao = 0;
+    if (!vao) glCreateVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
+}
+
+void dispatch2D(int w, int h, int lx, int ly) {
+    glDispatchCompute(GLuint((w + lx - 1) / lx), GLuint((h + ly - 1) / ly), 1);
+}
+
+DebugGroup::DebugGroup(const char* name) { glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name); }
+DebugGroup::~DebugGroup() { glPopDebugGroup(); }
+
+}  // namespace gpu

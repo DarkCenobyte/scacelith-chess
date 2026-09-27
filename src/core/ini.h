@@ -1,0 +1,25 @@
+// Minimal INI file: [section] / key = value / ; comments. Keys are addressed as "section.key".
+#pragma once
+#include <string>
+#include <vector>
+#include <utility>
+
+class IniFile {
+public:
+    bool load(const std::string& path);
+    bool save(const std::string& path) const;
+
+    std::string getString(const std::string& key, const std::string& def = "") const;
+    int getInt(const std::string& key, int def = 0) const;
+    float getFloat(const std::string& key, float def = 0.0f) const;
+    bool getBool(const std::string& key, bool def = false) const;
+
+    void set(const std::string& key, const std::string& value);
+    void setInt(const std::string& key, int v) { set(key, std::to_string(v)); }
+    void setFloat(const std::string& key, float v);
+    void setBool(const std::string& key, bool v) { set(key, v ? "true" : "false"); }
+    bool has(const std::string& key) const;
+
+private:
+    std::vector<std::pair<std::string, std::string>> entries_;  // ordered "section.key" -> value
+};

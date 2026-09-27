@@ -1,0 +1,99 @@
+cmake_minimum_required(VERSION 3.20)
+project(Scacelith VERSION 0.1.0 LANGUAGES C CXX)
+
+# ---------------------------------------------------------------------------------------------
+# Build configuration
+#   Windows (shipping):  cmake -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake -DCMAKE_BUILD_TYPE=Release
+#   Linux (tests only):  cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+# ---------------------------------------------------------------------------------------------
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+option(SCACELITH_CONSOLE "Windows: build a console-subsystem exe (logs visible)" OFF)
+option(SCACELITH_STOCKFISH "Embed the Stockfish engine" ON)
+
+set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+if(WIN32)
+    enable_language(RC)
+    add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN UNICODE _UNICODE)
+endif()
+include(cmake/embed.cmake)
+
+set(COMMON_WARNINGS -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers $<$<CXX_COMPILER_ID:GNU>:-Wno-dangling-reference>)
+set(OPT_FLAGS $<$<CONFIG:Release>:-O2> $<$<CONFIG:RelWithDebInfo>:-O2 -g>)
+
+# ---------------------------------------------------------------------------------------------
+# Embedded data (shaders, fonts, ...) -> generated incbin table
+# ---------------------------------------------------------------------------------------------
+set(EMBED_CPP ${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cpp)
+scacelith_embed_files(${EMBED_CPP} ${ROOT} shaders assets)
+
+# ---------------------------------------------------------------------------------------------
+# Stockfish (GPL-3.0), compiled into the executable. See third_party/stockfish/README.scacelith.md
+# ---------------------------------------------------------------------------------------------
+if(SCACELITH_STOCKFISH AND EXISTS ${ROOT}/third_party/stockfish/CMakeLists.txt)
+    add_subdirectory(third_party/stockfish)
+endif()
+
+# ---------------------------------------------------------------------------------------------
+# Engine-free modules shared by the game and the unit tests
+# ---------------------------------------------------------------------------------------------
+file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
+    ${ROOT}/src/core/*.cpp ${ROOT}/src/math/*.cpp ${ROOT}/src/chess/*.cpp ${ROOT}/src/ai/*.cpp ${ROOT}/src/audio/*.cpp)
+add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
+target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party)
+target_compile_options(scacelith_core PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
+if(TARGET stockfish_embedded)
+    target_link_libraries(scacelith_core PUBLIC stockfish_embedded)
+    target_compile_definitions(scacelith_core PUBLIC SCACELITH_HAS_STOCKFISH=1)
+endif()
+if(WIN32)
+    target_link_libraries(scacelith_core PUBLIC ole32 uuid winmm avrt ksuser)
+else()
+    find_package(Threads REQUIRED)
+    target_link_libraries(scacelith_core PUBLIC Threads::Threads)
+endif()
+
+# ---------------------------------------------------------------------------------------------
+# Game executable. Every .cpp under src/ (except the core modules above) is compiled directly
+# into the exe so static registration (scenes) is never dropped by the linker.
+# ---------------------------------------------------------------------------------------------
+file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS
+    ${ROOT}/src/platform/*.cpp ${ROOT}/src/gl/*.cpp ${ROOT}/src/render/*.cpp ${ROOT}/src/scene/*.cpp
+    ${ROOT}/src/character/*.cpp ${ROOT}/src/anim/*.cpp ${ROOT}/src/ui/*.cpp ${ROOT}/src/game/*.cpp
+    ${ROOT}/src/app/*.cpp)
+set(GAME_EXTRA)
+if(WIN32)
+    list(APPEND GAME_EXTRA ${ROOT}/res/scacelith.rc)
+endif()
+add_executable(scacelith ${ROOT}/src/main.cpp ${GAME_SOURCES} ${GAME_EXTRA})
+target_compile_options(scacelith PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
+target_link_libraries(scacelith PRIVATE scacelith_core)
+if(WIN32)
+    target_link_libraries(scacelith PRIVATE opengl32 gdi32 user32 shell32 dwmapi)
+    target_link_options(scacelith PRIVATE -static -static-libgcc -static-libstdc++)
+    if(NOT SCACELITH_CONSOLE)
+        target_link_options(scacelith PRIVATE -mwindows)
+    endif()
+    set_target_properties(scacelith PROPERTIES OUTPUT_NAME "Scacelith")
+else()
+    find_package(X11 REQUIRED)
+    target_link_libraries(scacelith PRIVATE X11 GL dl)
+endif()
+
+# ---------------------------------------------------------------------------------------------
+# Unit tests (no GPU): tests/*.cpp linked against the core modules. Run: ./scacelith_tests
+# ---------------------------------------------------------------------------------------------
+file(GLOB TEST_SOURCES CONFIGURE_DEPENDS ${ROOT}/tests/*.cpp)
+if(TEST_SOURCES)
+    add_executable(scacelith_tests ${TEST_SOURCES})
+    target_compile_options(scacelith_tests PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
+    target_link_libraries(scacelith_tests PRIVATE scacelith_core)
+    if(WIN32)
+        target_link_options(scacelith_tests PRIVATE -static -static-libgcc -static-libstdc++)
+    endif()
+endif()
