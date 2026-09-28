@@ -1,0 +1,121 @@
+// Direct match: a friendly (never rated) game between two players without any server. One
+// player hosts (listens on a TCP port, opened on the home router with UPnP when possible), the
+// other joins with the host's address, port and a short code the host reads to them.
+//
+// The host's game is the authority, exactly like the dedicated server is for online games: it
+// validates the guest's move intents with chess::Position, runs the clocks and decides the
+// result. Both sides then speak the same binary protocol as online play (net::proto messages,
+// dedicated-server/src/protocol/schema.js) inside an encrypted channel, and DirectMatch emits
+// the same net::Event values as OnlineClient (GameSnapshot, MoveMade, MoveRejected, GameEvent,
+// GameEnd, ConnectionChanged, ServerError), so the 3D scene plays a direct match with the online
+// game code. The host's own moves go through the same authority (no special path).
+//
+// Secure channel (docs/DIRECT_MATCH.md has the full specification):
+//   - The join code: 12 characters from "23456789ABCDEFGHJKMNPQRSTUVWXYZ" (~60 bits), shown as
+//     XXXX-XXXX-XXXX, new for every hosted game, never reused.
+//   - Handshake: both sides exchange a magic "SCDM", a version byte, a 32-byte random nonce and an
+//     ephemeral ECDH P-256 public key. Keys = HKDF-SHA256(ikm = ECDH secret || code, salt = guest
+//     nonce || host nonce, info = "scacelith direct match v1") -> one AES-256-GCM key per
+//     direction. The GUEST proves knowledge of the code first (an encrypted confirmation over the
+//     transcript); the host answers only after checking it, so a stranger who connects to the
+//     open port learns nothing that depends on the code. A passive eavesdropper cannot attack the
+//     code offline (ECDH). The host accepts at most 10 failed handshakes per hosted game (then it
+//     stops listening) and one guest at a time.
+//   - Frames: u16 length | AES-256-GCM ciphertext | 16-byte tag; the nonce is a per-direction
+//     64-bit counter (no replay, no reordering); plaintext = one net::proto message (<= 1024 bytes).
+//   - Windows: BCrypt (ECDH P-256, AES-GCM, SHA-256, RNG) and Winsock; Linux dev builds: OpenSSL.
+//
+// UPnP (Internet Gateway Device, UPnP IGD v1/v2): SSDP discovery on 239.255.255.250:1900,
+// device description over HTTP, WANIPConnection (v2, v1) or WANPPPConnection control URL, SOAP
+// GetExternalIPAddress / AddPortMapping (TCP, lease 3600 s renewed every 30 min; falls back to a
+// permanent lease on error 725 and to the next port on 718) / DeletePortMapping when the match
+// ends or the game closes. When the router's external address is private or in 100.64.0.0/10
+// the host is probably behind carrier-grade NAT: the page says so and suggests IPv6 or a VPN.
+//
+// Engine-free (no GL, no UI); compiled into scacelith_core and unit-tested (tests/direct_tests.cpp).
+#pragma once
+#include "online_client.h"   // net::Event, net::OnlineGame, packMove...
+#include <cstdint>
+#include <memory>
+#include <string>
+#include <vector>
+
+namespace net {
+
+struct DirectHostOptions {
+    uint16_t port = 47100;            // TCP port to listen on (0 = any free port)
+    bool upnp = true;                 // ask the router to forward the port
+    int baseSec = 600, incSec = 5;    // time control (custom values allowed; never rated)
+    int hostColor = 0;                // net::proto::ColorPref: 0 random, 1 White, 2 Black
+    std::string playerName;           // written on the scoresheets
+};
+
+struct UpnpStatus {
+    enum class State { NotTried, Searching, Mapped, NoGateway, Failed } state = State::NotTried;
+    std::string gatewayName;          // friendlyName of the router, if known
+    std::string externalIp;           // from GetExternalIPAddress
+    uint16_t externalPort = 0;
+    bool cgnatSuspected = false;      // external address private / shared (100.64.0.0/10)
+    std::string error;                // UPnP error code/description when Failed
+};
+
+// What the host tells the guest.
+struct DirectInvite {
+    std::string publicAddress;        // external IPv4 (UPnP) or empty when unknown
+    std::vector<std::string> lanAddresses;  // the host's local IPv4/IPv6 addresses (same network, IPv6)
+    uint16_t port = 0;
+    std::string code;                 // "K7Q2-M9XH-3PTR"
+};
+
+class DirectMatch {
+public:
+    enum class State {
+        Idle,
+        OpeningPort,     // host: UPnP in progress
+        WaitingForGuest, // host: listening
+        Connecting,      // guest: TCP connect
+        Handshake,       // both: secure channel being established
+        Playing,         // game running (also after its end until close(), for rematch)
+        Failed           // see lastError()
+    };
+
+    DirectMatch();
+    ~DirectMatch();                   // closes the connection, removes the port mapping, joins threads
+    DirectMatch(const DirectMatch&) = delete;
+    DirectMatch& operator=(const DirectMatch&) = delete;
+
+    void host(const DirectHostOptions& opt);
+    // address: IPv4, IPv6 (without brackets) or a DNS name; code with or without dashes, any case.
+    void join(const std::string& address, uint16_t port, const std::string& code, const std::string& playerName);
+    void close();                     // leaves: resigns a running game first (like leaving online)
+
+    State state() const;
+    std::string lastError() const;    // "refused", "timeout", "wrong_code", "incompatible", "port_in_use", ...
+    DirectInvite invite() const;      // host, once WaitingForGuest
+    UpnpStatus upnp() const;
+    bool isHost() const;
+
+    // ---- the game: same meaning as the OnlineClient methods ----
+    void sendMove(int ply, uint16_t move, const std::string& fen, uint32_t thinkMs, bool drawOffer);
+    void resign();
+    void offerDraw();
+    void answerDraw(bool accept);
+    void claimDraw();
+    void abortGame();
+    void requestResync();
+    void rematch(bool accept);
+    const OnlineGame* currentGame() const;
+    int pingMs() const;
+    double serverNowMs() const;       // the host's clock (the host: its own)
+
+    bool poll(Event& out);            // drains one event (game thread, once per frame)
+
+    struct Impl;
+private:
+    std::unique_ptr<Impl> impl_;
+};
+
+// Process-wide instance used by the game (created on first use).
+DirectMatch& directMatch();
+
+}  // namespace net
