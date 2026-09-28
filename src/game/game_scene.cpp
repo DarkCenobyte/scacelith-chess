@@ -1291,7 +1291,44 @@ void GameScene::render(AppContext& ctx, float dt) {
             cam.lookAt(c);
         } else if (viewOverride_ == "player") {
             hideOwnHead = true;
+        } else if (viewOverride_ == "face" || viewOverride_ == "face-player") {
+            // Three-quarter portrait of a robot's head (the opponent's, or the player's own).
+            int seat = viewOverride_ == "face" ? aiSeat() : humanSeat();
+            vec3 eye = anim_[seat].eyeCameraTransform().c[3].xyz();
+            float f = seat == 0 ? -1.0f : 1.0f;  // White (seat 0) faces -Z
+            cam.position = eye + vec3(0.24f * f, 0.03f, 0.52f * f);
+            cam.fovY = 34.0f * DEG;
+            cam.lookAt(eye + vec3(0.0f, -0.06f, 0.0f));
+        } else if (viewOverride_ == "duel") {
+            // Both robots in profile across the table, at head height.
+            cam.position = vec3(1.75f, 1.32f, 0.0f);
+            cam.fovY = 42.0f * DEG;
+            cam.lookAt(vec3(0.0f, 1.02f, 0.0f));
+        } else if (viewOverride_ == "windows") {
+            // Wide shot of the table and players against the window wall.
+            cam.position = vec3(5.6f, 2.1f, 3.4f);
+            cam.fovY = 55.0f * DEG;
+            cam.lookAt(vec3(-2.0f, 2.2f, -0.4f));
+        } else if (viewOverride_ == "tapestries") {
+            // Wide shot from the window side towards the tapestry wall.
+            cam.position = vec3(-5.2f, 1.9f, -3.6f);
+            cam.fovY = 55.0f * DEG;
+            cam.lookAt(vec3(2.5f, 2.0f, 0.8f));
         }
+        // Free camera for screenshots: --cam x,y,z [--look x,y,z] [--fov degrees].
+        auto parseVec = [](const std::string& v, vec3& out) {
+            std::vector<std::string> c = split(v, ',');
+            if (c.size() != 3) return false;
+            out = vec3(float(std::atof(c[0].c_str())), float(std::atof(c[1].c_str())), float(std::atof(c[2].c_str())));
+            return true;
+        };
+        vec3 p, t;
+        if (parseVec(ctx.argValue("--cam"), p)) {
+            cam.position = p;
+            cam.lookAt(parseVec(ctx.argValue("--look"), t) ? t : vec3(0.0f, layout::BOARD_TOP_Y, 0.0f));
+        }
+        float fov = float(std::atof(ctx.argValue("--fov", "0").c_str()));
+        if (fov > 1.0f) cam.fovY = fov * DEG;
     }
     camera_ = firstPerson && viewOverride_.empty() ? camera_ : camera_;
     render::Environment env = world_.environment(time_);
@@ -1301,6 +1338,12 @@ void GameScene::render(AppContext& ctx, float dt) {
         float t = rayPlane(centre, vec3(0, layout::BOARD_TOP_Y, 0), vec3(0, 1, 0));
         float target = (t > 0.0f && t < 3.0f) ? t : 2.5f;
         if (!firstPerson) target = length(cam.position - vec3(0, 0.9f, 0));
+        if (viewOverride_ == "face" || viewOverride_ == "face-player") {
+            int seat = viewOverride_ == "face" ? aiSeat() : humanSeat();
+            target = length(anim_[seat].eyeCameraTransform().c[3].xyz() - cam.position);
+        } else if (!viewOverride_.empty() && viewOverride_ != "player") {
+            target = length(cam.position - vec3(0, 1.0f, 0));
+        }
         focusDistance_ = focusDistance_ <= 0.0f ? target : focusDistance_ + (target - focusDistance_) * (1.0f - std::exp(-dt * 6.0f));
         r.post().settings.dofFocusDistance = focusDistance_;
     }
