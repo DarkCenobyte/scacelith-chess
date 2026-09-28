@@ -13,6 +13,10 @@
 using namespace m;
 using namespace chess;
 
+#ifndef SCACELITH_VERSION_STRING
+#define SCACELITH_VERSION_STRING "Scacelith 0.1"
+#endif
+
 namespace game {
 
 namespace {
@@ -116,6 +120,15 @@ bool GameScene::init(AppContext& ctx) {
     std::vector<std::string> tcs;
     for (const TimeControl& tc : timeControlPresets()) tcs.push_back(tc.label());
     ui::setTimeControlList(tcs);
+    ui::setResolutionList({{1280, 720}, {1366, 768}, {1600, 900}, {1920, 1080}, {2560, 1440}, {3840, 2160}});
+    ui::setVersionString(SCACELITH_VERSION_STRING);
+    ui::setSoundCallback([](ui::Sound snd) {
+        switch (snd) {
+        case ui::Sound::Hover: audio::playUI(audio::Sfx::UIHover, 0.35f); break;
+        case ui::Sound::Tick: audio::playUI(audio::Sfx::UIHover, 0.25f); break;
+        default: audio::playUI(audio::Sfx::UIClick, 0.6f); break;
+        }
+    });
     applySettings(false);
 
     state_ = State::Loading;
@@ -410,17 +423,18 @@ bool GameScene::update(AppContext& ctx, float dt) {
         break;
     }
     case State::Playing: {
-        bool optionsOpen = ui::optionsOpen();
-        if (in.keyPressed[plat::KEY_ESCAPE] && !optionsOpen) {
-            paused_ = !paused_;
-            if (paused_ && dragging_) {
+        // Esc opens the pause menu; once open, the menu handles Esc itself (back / resume).
+        if (!paused_ && in.keyPressed[plat::KEY_ESCAPE] && turn_ != Turn::HumanPromotion) {
+            paused_ = true;
+            if (dragging_) {
                 dragging_ = false;
                 plat::setMouseCaptured(false);
             }
         }
         if (paused_) {
             bool canClaim = game_.canClaimThreefold() || game_.canClaimFiftyMove();
-            switch (ui::pauseMenu(canClaim)) {
+            bool canOffer = drawOfferPly_ != int(game_.moves().size());
+            switch (ui::pauseMenu(canClaim, canOffer)) {
             case ui::MenuAction::Resume: paused_ = false; break;
             case ui::MenuAction::Resign:
                 paused_ = false;
@@ -456,7 +470,7 @@ bool GameScene::update(AppContext& ctx, float dt) {
     case State::GameOver:
         if (stateTime_ > 1.2f && (endHandshakeDone_ || stateTime_ > 5.0f)) {
             gameOverShown_ = true;
-            ui::MenuAction a = ui::gameOver(resultText_, reasonText_, playerWon_, isDraw_);
+            ui::MenuAction a = ui::gameOver(resultText_, reasonText_, playerWon_, isDraw_, int(game_.moves().size() + 1) / 2);
             if (a == ui::MenuAction::Rematch) {
                 state_ = State::FadeToGame;
                 stateTime_ = 0.0f;
