@@ -1,0 +1,134 @@
+// Immediate-mode widget core: ids, hover/press/focus with mouse and keyboard (spatial arrow-key
+// navigation, Enter/Space to activate, Esc = back), small animations, input blocking for modal
+// layers, sound hooks, and the Scacelith-styled widgets used by the screens. Reference pixels.
+#pragma once
+#include "ui.h"
+#include "ui_draw.h"
+#include "../platform/platform.h"
+#include <cstdint>
+#include <functional>
+#include <string>
+#include <vector>
+
+namespace ui {
+namespace im {
+
+using gfx::Rect;
+using m::vec2;
+using m::vec4;
+typedef uint32_t Id;
+
+// ---- Frame / input ------------------------------------------------------------------------------
+void beginFrame(float dt);
+void endFrame();
+float dt();
+double time();
+uint64_t frame();
+vec2 mouse();
+bool keyboardMode();          // last navigation came from the keyboard (show focus highlight)
+bool keyPressed(int key);     // plat key pressed this frame and input not blocked
+float wheel();                // mouse wheel notches this frame (0 while blocked)
+bool consumeBack();           // Esc pressed this frame (returns true once)
+bool consumeActivate();       // Enter/Space not consumed by a widget (returns true once)
+bool consumeNavigation(int* dx, int* dy);  // arrow keys this frame, for custom handling
+bool mousePressedOutside(const Rect& r);
+
+// Input blocking: while the depth is > 0 items draw but do not react (content under a dialog).
+void pushBlock();
+void popBlock();
+bool blocked();
+// Marks the frame as using the mouse / keyboard (feeds ui::wantsMouse / wantsKeyboard).
+void captureMouseAll();
+void captureMouseRect(const Rect& r);
+void captureKeyboard();
+bool mouseCapturedLastFrame();
+bool keyboardCapturedLastFrame();
+void setKeyboardMode(bool on);  // debug / viewer: show the focus highlight
+void setMouseOverride(bool on, vec2 pos = vec2(0, 0));  // debug / viewer: fake mouse position (reference px)
+void setInputOverride(const plat::Input* in);           // debug / viewer: scripted input (nullptr = platform)
+
+// ---- Ids & animation state -----------------------------------------------------------------------
+Id makeId(const char* s);
+Id makeId(const std::string& s);
+Id makeId(int i);
+void pushId(const char* s);
+void pushId(int i);
+void popId();
+
+struct Anim {
+    float v[6] = {0, 0, 0, 0, 0, 0};
+    uint64_t lastFrame = 0;
+    uint64_t firstFrame = 0;
+};
+Anim& anim(Id id);
+bool appearing(Id id);  // true on the first frame an id is used after an absence
+float approach(float current, float target, float rate);  // frame-rate independent easing
+
+// ---- Focus ------------------------------------------------------------------------------------------
+Id focus();
+void setFocus(Id id);
+// Focus to give when the current focus is not among this frame's focusable items.
+void setDefaultFocus(Id id);
+
+// ---- Items ------------------------------------------------------------------------------------------
+enum ItemFlags : uint32_t {
+    ITEM_FOCUSABLE = 1u << 0,
+    ITEM_DISABLED = 1u << 1,
+    ITEM_HORIZONTAL = 1u << 2,  // consumes Left/Right while focused (sliders, steppers, selectors)
+    ITEM_SILENT = 1u << 3,      // no hover sound
+    ITEM_MOUSE_ONLY = 1u << 4,  // never takes keyboard focus (HUD buttons: Space/Enter belong to the game)
+};
+struct Item {
+    Id id = 0;
+    bool hovered = false;     // mouse over
+    bool held = false;        // mouse button held after pressing on it
+    bool pressed = false;     // mouse pressed on it this frame
+    bool clicked = false;     // mouse released on it
+    bool activated = false;   // clicked or Enter/Space while focused
+    bool focused = false;
+    bool highlight = false;   // hovered, or focused in keyboard mode
+    bool left = false, right = false;  // arrow keys while focused (ITEM_HORIZONTAL)
+    float hoverT = 0.0f;      // animated 0..1 highlight
+    float pressT = 0.0f;      // animated 0..1 press
+    float heldTime = 0.0f;
+};
+Item item(Id id, const Rect& r, uint32_t flags = ITEM_FOCUSABLE);
+void sound(Sound s);
+void setSoundCallback(std::function<void(Sound)> cb);
+
+// ---- Styled widgets -----------------------------------------------------------------------------
+enum class ButtonKind { Primary, Secondary, Quiet };
+// Large Cinzel entry of the title / pause menus (text only, gold rule on hover).
+bool menuEntry(const std::string& label, const Rect& r, bool enabled = true, gfx::HAlign align = gfx::HAlign::Left);
+bool button(const std::string& label, const Rect& r, ButtonKind kind = ButtonKind::Secondary, bool enabled = true,
+            uint32_t extraFlags = 0);
+// Form rows: label on the left, control on the right. Return true when the value changed.
+bool toggleRow(const std::string& label, bool& value, const Rect& r, bool enabled = true);
+bool sliderRow(const std::string& label, float& value, float lo, float hi, float step,
+               const std::function<std::string(float)>& format, const Rect& r, bool enabled = true);
+bool stepperRow(const std::string& label, int& index, int count, const std::function<std::string(int)>& format,
+                const Rect& r, bool enabled = true);
+bool selectorRow(const std::string& label, int& index, const std::vector<std::string>& options, const Rect& r,
+                 bool enabled = true);
+// Tab bar: Left/Right while focused, PageUp/PageDown anywhere. Returns true when changed.
+bool tabBar(const std::vector<std::string>& tabs, int& current, const Rect& r);
+// Hover/focus tooltip for the previous item.
+void tooltip(const std::string& text);
+// Between these calls tooltip() texts are not drawn as floating tips; endHelpSink() returns the
+// text of the highlighted item instead (pages with a fixed help line).
+void beginHelpSink();
+std::string endHelpSink();
+
+// Decorations.
+void panel(const Rect& r, float alpha = 1.0f);
+void ornamentRule(float cx, float y, float halfWidth, float alpha = 1.0f);
+void pageTitle(const std::string& title, float cx, float y);
+void sectionLabel(const std::string& text, float x, float y, float width);
+void rowHighlight(const Rect& r, float t);
+
+// Modal confirmation. Returns -1 while open, 1 = confirmed, 0 = cancelled (Esc / cancel button).
+int confirmDialog(const char* idStr, const std::string& title, const std::string& message, const std::string& confirmLabel,
+                  const std::string& cancelLabel, bool dangerous);
+
+}  // namespace im
+}  // namespace ui
