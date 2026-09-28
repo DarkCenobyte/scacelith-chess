@@ -94,10 +94,10 @@ bool World::loadStep() {
         w.markerQuad.upload(prim::plane(layout::SQUARE_SIZE, layout::SQUARE_SIZE, 1, 1, 1.0f), "marker");
         break;
     }
-    case 1: w.hall.upload(buildHall()); break;
+    case 1: w.hall.upload(hall::buildHall()); break;
     case 2:
-        w.table.upload(buildTable());
-        w.chair.upload(buildChair());
+        w.table.upload(furniture::buildTable());
+        w.chair.upload(furniture::buildChair());
         break;
     case 3: w.board.upload(buildBoard()); break;
     case 4:
@@ -182,7 +182,7 @@ bool World::rayHitsClock(const Ray& ray, float* t) const {
 render::Environment World::environment(float time) const {
     render::Environment env;
     // Late morning sun through the three windows of the -X wall.
-    env.sunDirection = normalize(vec3(-0.80f, 0.52f, 0.22f));
+    env.sunDirection = hall::recommendedSunDirection();
     env.time = time;
     return env;
 }
