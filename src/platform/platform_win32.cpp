@@ -49,6 +49,7 @@ bool g_captured = false;
 DisplayMode g_mode = DisplayMode::Windowed;
 int g_windowedW = 1600, g_windowedH = 900;
 Input g_input;
+wchar_t g_highSurrogate = 0;  // first half of a UTF-16 pair waiting for its second WM_CHAR
 LARGE_INTEGER g_freq, g_t0;
 PFN_wglSwapIntervalEXT g_swapInterval;
 POINT g_captureCenter;
@@ -121,9 +122,24 @@ LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
             setKey(mapVK(wp, lp), true);
             return 0;
         case WM_KEYUP: case WM_SYSKEYUP: setKey(mapVK(wp, lp), false); return 0;
-        case WM_CHAR:
-            if (wp >= 32 && g_input.textCount < 32) g_input.text[g_input.textCount++] = uint32_t(wp);
+        case WM_CHAR: {
+            // UTF-16 code units: typed characters, dead-key compositions and IME results (the
+            // default handling of WM_IME_CHAR posts them here). Characters outside the BMP (CJK
+            // extensions, emoji) arrive as two messages.
+            uint32_t cp = uint32_t(wp);
+            if (cp >= 0xD800 && cp <= 0xDBFF) {
+                g_highSurrogate = wchar_t(cp);
+                return 0;
+            }
+            if (cp >= 0xDC00 && cp <= 0xDFFF) {
+                if (!g_highSurrogate) return 0;
+                cp = 0x10000 + ((uint32_t(g_highSurrogate) - 0xD800) << 10) + (cp - 0xDC00);
+            }
+            g_highSurrogate = 0;
+            if (cp >= 32 && cp != 127 && g_input.textCount < int(sizeof(g_input.text) / sizeof(g_input.text[0])))
+                g_input.text[g_input.textCount++] = cp;
             return 0;
+        }
         case WM_MOUSEMOVE:
             g_input.mouseX = float(short(LOWORD(lp)));
             g_input.mouseY = float(short(HIWORD(lp)));
@@ -395,6 +411,65 @@ void messageBox(const char* title, const char* text) {
     MultiByteToWideChar(CP_UTF8, 0, title, -1, wt, 256);
     MultiByteToWideChar(CP_UTF8, 0, text, -1, wx, 2048);
     MessageBoxW(g_hwnd, wx, wt, MB_OK | MB_ICONERROR);
+}
+
+std::string clipboardText() {
+    std::string out;
+    if (!OpenClipboard(g_hwnd)) return out;
+    if (HANDLE h = GetClipboardData(CF_UNICODETEXT)) {
+        if (const wchar_t* w = static_cast<const wchar_t*>(GlobalLock(h))) {
+            int n = WideCharToMultiByte(CP_UTF8, 0, w, -1, nullptr, 0, nullptr, nullptr);
+            if (n > 1) {
+                out.resize(size_t(n));
+                WideCharToMultiByte(CP_UTF8, 0, w, -1, &out[0], n, nullptr, nullptr);
+                out.resize(size_t(n - 1));
+            }
+            GlobalUnlock(h);
+        }
+    }
+    CloseClipboard();
+    return out;
+}
+
+std::string systemLanguage() {
+    // The display language of Windows (not the regional format), mapped by hand to the tags the
+    // game understands (no dependency on LCIDToLocaleName).
+    LANGID id = GetUserDefaultUILanguage();
+    switch (PRIMARYLANGID(id)) {
+    case LANG_ENGLISH: return "en";
+    case LANG_FRENCH: return "fr";
+    case LANG_GERMAN: return "de";
+    case LANG_SPANISH: return "es";
+    case LANG_UKRAINIAN: return "uk";
+    case LANG_ARABIC: return "ar";
+    case LANG_RUSSIAN: return "ru";
+    case LANG_JAPANESE: return "ja";
+    case LANG_CHINESE: {
+        int sub = SUBLANGID(id);
+        bool traditional = sub == SUBLANG_CHINESE_TRADITIONAL || sub == SUBLANG_CHINESE_HONGKONG || sub == SUBLANG_CHINESE_MACAU;
+        return traditional ? "zh-TW" : "zh-CN";
+    }
+    default: return "";
+    }
+}
+
+std::vector<std::string> commandLine() {
+    std::vector<std::string> args;
+    int argc = 0;
+    LPWSTR* wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
+    if (!wargv) return args;
+    for (int i = 1; i < argc; ++i) {
+        int n = WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, nullptr, 0, nullptr, nullptr);
+        std::string a;
+        if (n > 1) {
+            a.resize(size_t(n));
+            WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, &a[0], n, nullptr, nullptr);
+            a.resize(size_t(n - 1));
+        }
+        args.push_back(a);
+    }
+    LocalFree(wargv);
+    return args;
 }
 
 uint64_t randomSeed() {
