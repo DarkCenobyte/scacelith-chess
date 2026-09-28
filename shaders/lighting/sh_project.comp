@@ -1,0 +1,70 @@
+// Projects a cubemap (sky cubemap or one probe of the capture cube array) onto L2 spherical
+// harmonics, convolved with the clamped cosine lobe and divided by PI (so that evaluating the SH
+// in direction n gives irradiance(n) / PI, ready to multiply by the diffuse albedo). A mild
+// Hanning window reduces ringing from the very bright window directions.
+#include "shaders/include/common.glsl"
+#include "shaders/lighting/cubemap.glsl"
+layout(local_size_x = 64) in;
+#ifdef SH_SKY
+layout(binding = 0) uniform samplerCube uSrc;
+#else
+layout(binding = 0) uniform samplerCubeArray uSrc;
+#endif
+layout(std430, binding = 5) buffer SHOut { vec4 shOut[]; };
+uniform int uLayer;
+uniform int uOutSlot;
+uniform float uLod;
+uniform int uFaceSize;
+
+shared vec3 sSH[64 * 9];
+shared float sW[64];
+
+void main() {
+    int tid = int(gl_LocalInvocationID.x);
+    vec3 c[9];
+    for (int k = 0; k < 9; ++k) c[k] = vec3(0.0);
+    float wsum = 0.0;
+    int n = uFaceSize;
+    int total = 6 * n * n;
+    float h = 1.0 / float(n);
+    for (int idx = tid; idx < total; idx += 64) {
+        int face = idx / (n * n);
+        int rem = idx - face * n * n;
+        int y = rem / n, x = rem - y * n;
+        vec2 uv = (vec2(x, y) + 0.5) * h;
+        vec3 d = cubeDir(face, uv);
+        float w = cubeTexelSolidAngle(uv * 2.0 - 1.0, h);
+#ifdef SH_SKY
+        vec3 L = textureLod(uSrc, d, uLod).rgb;
+#else
+        vec3 L = textureLod(uSrc, vec4(d, float(uLayer)), uLod).rgb;
+#endif
+        L = min(L, vec3(1000.0)) * w;
+        wsum += w;
+        c[0] += L * 0.282095;
+        c[1] += L * (0.488603 * d.y);
+        c[2] += L * (0.488603 * d.z);
+        c[3] += L * (0.488603 * d.x);
+        c[4] += L * (1.092548 * d.x * d.y);
+        c[5] += L * (1.092548 * d.y * d.z);
+        c[6] += L * (0.315392 * (3.0 * d.z * d.z - 1.0));
+        c[7] += L * (1.092548 * d.x * d.z);
+        c[8] += L * (0.546274 * (d.x * d.x - d.y * d.y));
+    }
+    for (int k = 0; k < 9; ++k) sSH[tid * 9 + k] = c[k];
+    sW[tid] = wsum;
+    barrier();
+    if (tid < 9) {
+        vec3 s = vec3(0.0);
+        float W = 0.0;
+        for (int i = 0; i < 64; ++i) {
+            s += sSH[i * 9 + tid];
+            W += sW[i];
+        }
+        s *= 4.0 * PI / max(W, 1e-6);
+        // Cosine lobe convolution / PI (A0 = PI, A1 = 2PI/3, A2 = PI/4) and Hanning window.
+        float band = tid == 0 ? 1.0 : (tid < 4 ? 2.0 / 3.0 : 0.25);
+        float win = tid == 0 ? 1.0 : (tid < 4 ? 0.93 : 0.72);
+        shOut[uOutSlot * 9 + tid] = vec4(s * band * win, 0.0);
+    }
+}

@@ -1,0 +1,49 @@
+// GGX prefiltered specular (split-sum, N = V = R) for one probe and one mip, from the capture
+// cube array to the specular cube array. Mip k stores perceptual roughness k / (mipCount - 1).
+// Filtered importance sampling (Krivanek & Colbert 2008) keeps the sample count low.
+#include "shaders/include/common.glsl"
+#include "shaders/include/brdf.glsl"
+#include "shaders/lighting/cubemap.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform samplerCubeArray uSrc;
+layout(rgba16f, binding = 0) uniform writeonly imageCubeArray uDst;
+uniform int uSrcLayer;
+uniform int uDstLayer;
+uniform int uMip;
+uniform int uMipCount;
+uniform int uSize;        // destination mip size
+uniform float uSrcSize;   // source base size
+uniform float uSrcMaxLod;
+uniform int uSamples;
+
+void main() {
+    ivec3 id = ivec3(gl_GlobalInvocationID);
+    if (id.x >= uSize || id.y >= uSize) return;
+    vec3 N = cubeDir(id.z, (vec2(id.xy) + 0.5) / float(uSize));
+    vec3 result;
+    if (uMip == 0) {
+        result = textureLod(uSrc, vec4(N, float(uSrcLayer)), 0.0).rgb;
+    } else {
+        float rough = float(uMip) / float(uMipCount - 1);
+        float a = max(rough * rough, 1e-3);
+        mat3 tbn = tangentFrame(N);
+        vec3 sum = vec3(0.0);
+        float wsum = 0.0;
+        float omegaP = 4.0 * PI / (6.0 * uSrcSize * uSrcSize);
+        uint ns = uint(uSamples);
+        for (uint i = 0u; i < ns; ++i) {
+            vec3 H = tbn * importanceSampleGGX(hammersley(i, ns), a);
+            float NoH = max(dot(N, H), 0.0);
+            vec3 L = 2.0 * NoH * H - N;
+            float NoL = dot(N, L);
+            if (NoL <= 0.0) continue;
+            float pdf = D_GGX(NoH, a) * 0.25 + 1e-6;
+            float omegaS = 1.0 / (float(ns) * pdf);
+            float lod = clamp(0.5 * log2(omegaS / omegaP) + 1.0, 0.0, uSrcMaxLod);
+            sum += min(textureLod(uSrc, vec4(L, float(uSrcLayer)), lod).rgb, vec3(2000.0)) * NoL;
+            wsum += NoL;
+        }
+        result = sum / max(wsum, 1e-6);
+    }
+    imageStore(uDst, ivec3(id.xy, uDstLayer * 6 + id.z), vec4(result, 1.0));
+}

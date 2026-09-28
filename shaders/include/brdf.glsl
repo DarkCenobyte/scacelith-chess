@@ -15,6 +15,7 @@ vec3 F_Schlick(vec3 f0, float VoH) {
     float f = pow(1.0 - VoH, 5.0);
     return f + f0 * (1.0 - f);
 }
+vec3 F_Schlick(vec3 f0, vec3 f90, float VoH) { return f0 + (f90 - f0) * pow(1.0 - VoH, 5.0); }
 float F_Schlick(float f0, float f90, float VoH) { return f0 + (f90 - f0) * pow(1.0 - VoH, 5.0); }
 float Fd_Burley(float NoV, float NoL, float LoH, float roughness) {
     float f90 = 0.5 + 2.0 * roughness * LoH * LoH;
@@ -50,4 +51,19 @@ vec2 envBRDFApprox(float NoV, float roughness) {
     vec4 r = roughness * c0 + c1;
     float a004 = min(r.x * r.x, exp2(-9.28 * NoV)) * r.x + r.y;
     return vec2(-1.04, 1.04) * a004 + r.zw;
+}
+// Base-layer F0 seen through a clear coat of IOR 1.5 (Filament).
+vec3 f0ClearCoatToSurface(vec3 f0) {
+    return clamp(f0 * (f0 * (0.941892 - 0.263008 * f0) + 0.346479) - 0.0285998, 0.0, 1.0);
+}
+// Multi-bounce ambient occlusion (Jimenez et al. 2016, GTAO).
+vec3 gtaoMultiBounce(float v, vec3 albedo) {
+    vec3 a = 2.0404 * albedo - 0.3324;
+    vec3 b = -4.7951 * albedo + 0.6417;
+    vec3 c = 2.7552 * albedo + 0.6903;
+    return max(vec3(v), ((v * a + b) * v + c) * v);
+}
+// Specular occlusion from ambient occlusion (Lagarde & de Rousiers 2014).
+float specularOcclusion(float NoV, float ao, float roughness) {
+    return clamp(pow(NoV + ao, exp2(-16.0 * roughness - 1.0)) - 1.0 + ao, 0.0, 1.0);
 }

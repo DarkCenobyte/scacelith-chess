@@ -1,7 +1,11 @@
 #include "gpu.h"
 #include "../core/log.h"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <string>
 
 namespace gpu {
 
@@ -182,5 +186,68 @@ void dispatch2D(int w, int h, int lx, int ly) {
 
 DebugGroup::DebugGroup(const char* name) { glPushDebugGroup(GL_DEBUG_SOURCE_APPLICATION, 0, -1, name); }
 DebugGroup::~DebugGroup() { glPopDebugGroup(); }
+
+int frustumPlanes(const m::mat4& vp, m::vec4 out[6], bool sidesOnly) {
+    auto row = [&](int i) { return m::vec4(vp.c[0][i], vp.c[1][i], vp.c[2][i], vp.c[3][i]); };
+    m::vec4 r0 = row(0), r1 = row(1), r2 = row(2), r3 = row(3);
+    m::vec4 cand[6] = {r3 + r0, r3 - r0, r3 + r1, r3 - r1, r2, r3 - r2};
+    int n = 0;
+    for (int i = 0; i < (sidesOnly ? 4 : 6); ++i) {
+        float l = std::sqrt(cand[i].x * cand[i].x + cand[i].y * cand[i].y + cand[i].z * cand[i].z);
+        if (l < 1e-6f) continue;
+        out[n++] = cand[i] / l;
+    }
+    return n;
+}
+
+namespace {
+struct ProfEntry { std::string name; double ms; };
+std::vector<ProfEntry> g_prof;
+int g_profFrame = 0;
+int profileMode() {
+    static int mode = [] {
+        const char* e = std::getenv("SCACELITH_GPU_PROFILE");
+        return e ? std::max(0, std::atoi(e)) : 0;
+    }();
+    return mode;
+}
+double nowMs() {
+    using namespace std::chrono;
+    return double(duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count()) * 1e-3;
+}
+}  // namespace
+
+bool profilingEnabled() { return profileMode() > 0; }
+
+ProfileScope::ProfileScope(const char* name) : name_(name) {
+    if (!profilingEnabled()) return;
+    glFinish();
+    start_ = nowMs();
+}
+ProfileScope::~ProfileScope() {
+    if (!profilingEnabled()) return;
+    glFinish();
+    double ms = nowMs() - start_;
+    for (auto& e : g_prof)
+        if (e.name == name_) { e.ms += ms; return; }
+    g_prof.push_back({name_, ms});
+}
+
+void profileEndFrame() {
+    if (!profilingEnabled()) return;
+    ++g_profFrame;
+    int every = profileMode() == 1 ? 1 : profileMode();
+    if (g_profFrame % every != 0) return;
+    std::string line;
+    double total = 0;
+    for (auto& e : g_prof) {
+        char buf[96];
+        std::snprintf(buf, sizeof(buf), " %s=%.2f", e.name.c_str(), e.ms / every);
+        line += buf;
+        total += e.ms / every;
+    }
+    LOGI("profile frame %d (ms, CPU+glFinish):%s | sum=%.2f", g_profFrame, line.c_str(), total);
+    g_prof.clear();
+}
 
 }  // namespace gpu

@@ -1,0 +1,30 @@
+// Planar reflection Gaussian mip chain (replaces box mips): each level is the previous level
+// downsampled (bilinear 2x2) then blurred with a separable binomial kernel, so level k
+// approximates a Gaussian of sigma ~ 2^k texels. Used for roughness-aware planar reflections.
+//   PASS_H: src = planar colour (sampler, level uLevel - 1) -> dst = temp level uLevel
+//   PASS_V: src = temp (sampler, level uLevel)               -> dst = planar colour level uLevel
+#include "shaders/include/common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2DArray uSrc;
+layout(rgba16f, binding = 0) uniform writeonly image2DArray uDst;
+uniform int uLevel;
+uniform int uLayer;
+uniform ivec2 uSize;   // destination level size
+
+const float W[5] = float[](0.0625, 0.25, 0.375, 0.25, 0.0625);
+
+void main() {
+    ivec2 px = ivec2(gl_GlobalInvocationID.xy);
+    if (px.x >= uSize.x || px.y >= uSize.y) return;
+    vec2 inv = 1.0 / vec2(uSize);
+    vec2 uv = (vec2(px) + 0.5) * inv;
+    vec4 sum = vec4(0.0);
+#ifdef PASS_H
+    float lod = float(uLevel - 1);
+    for (int k = -2; k <= 2; ++k) sum += W[k + 2] * textureLod(uSrc, vec3(uv + vec2(float(k) * inv.x, 0.0), float(uLayer)), lod);
+#else
+    float lod = float(uLevel);
+    for (int k = -2; k <= 2; ++k) sum += W[k + 2] * textureLod(uSrc, vec3(uv + vec2(0.0, float(k) * inv.y), float(uLayer)), lod);
+#endif
+    imageStore(uDst, ivec3(px, uLayer), sum);
+}
