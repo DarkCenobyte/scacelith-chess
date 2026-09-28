@@ -81,6 +81,8 @@ void Scorekeeper::newGame(anim::Animator* anim, bool clockOnPositiveX, const Pla
     round_ = round;
     date_ = date;
     recording_ = headerWritten_ = finished_ = false;
+    hasDetails_ = false;
+    details_ = Details();
     moves_.clear();
     sheet::PieceLetters letters = localizedPieceLetters();
     for (int s = 0; s < 2; ++s) {
@@ -118,6 +120,15 @@ Scoresheet::Header Scorekeeper::header() const {
     h.black = players_[1].name;
     h.whiteElo = players_[0].elo > 0 ? std::to_string(players_[0].elo) : "";
     h.blackElo = players_[1].elo > 0 ? std::to_string(players_[1].elo) : "";
+    if (!players_[0].rating.empty()) h.whiteElo = players_[0].rating;
+    if (!players_[1].rating.empty()) h.blackElo = players_[1].rating;
+    if (hasDetails_) {
+        if (!details_.event.empty()) h.event = details_.event;
+        if (!details_.round.empty()) h.round = details_.round;
+        if (details_.noBoard) h.board.clear();
+        h.note = details_.note;
+        h.reference = details_.reference;
+    }
     return h;
 }
 

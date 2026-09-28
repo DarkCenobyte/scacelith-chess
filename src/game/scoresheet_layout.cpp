@@ -38,6 +38,8 @@ const FieldSpec kFields[int(Field::Count)] = {
     {"scoresheet.elo", 116.0f, 48.5f, 124.0f, 140.0f, 3.4f},
     {"scoresheet.page", 111.0f, 15.5f, 121.0f, 140.0f, 3.4f},
     {"scoresheet.result", 8.0f, 193.5f, 23.0f, 62.0f, 3.9f},
+    {nullptr, 98.0f, 33.5f, 98.0f, 140.0f, 3.2f},    // Note: the free end of the Round / Board row
+    {nullptr, 96.0f, 193.5f, 96.0f, 140.0f, 2.5f},   // Reference: beside the result, small
 };
 constexpr float LINE_BELOW_BASELINE = 0.7f;  // the writing line sits just under the label baseline
 
@@ -95,6 +97,7 @@ Form printedForm(int page) {
     // Header fields: printed label and the line to write on.
     for (int i = 0; i < int(Field::Count); ++i) {
         const FieldSpec& s = kFields[i];
+        if (!s.labelKey) continue;  // unlabeled additions: no printed line either
         text(i18n::tr(s.labelKey), PRINT_TEXT, s.labelX, s.baseline, 2.05f, 0, s.lineX0 - s.labelX - 1.0f);
         hline(s.lineX0, s.lineX1, s.baseline + LINE_BELOW_BASELINE, RULE_THIN);
     }
@@ -129,12 +132,12 @@ Form printedForm(int page) {
 // ---- Fields and cells -------------------------------------------------------------------------
 const char* fieldName(Field f) {
     static const char* names[int(Field::Count)] = {"event", "date", "round", "board", "white", "white_elo",
-                                                   "black", "black_elo", "page", "result"};
+                                                   "black", "black_elo", "page", "result", "note", "reference"};
     int i = int(f);
     return i >= 0 && i < int(Field::Count) ? names[i] : "?";
 }
 
-bool isHeaderField(Field f) { return int(f) <= int(Field::BlackElo); }
+bool isHeaderField(Field f) { return int(f) <= int(Field::BlackElo) || f == Field::Note || f == Field::Reference; }
 
 WriteBox fieldBox(Field f) {
     const FieldSpec& s = kFields[std::clamp(int(f), 0, int(Field::Count) - 1)];

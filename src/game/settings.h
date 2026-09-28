@@ -57,6 +57,26 @@ struct Settings {
     int viewerCustomIncrementSeconds = 3;
     int viewerCustomDelaySeconds = 0;
     bool viewerShowControls = true; // the controls hint overlay (H)
+    // [online] the server of online play (Options > Online). Never any token: the network layer
+    // keeps the sessions itself, per server.
+    bool onlineCustomServer = false;  // false = the official server of this build (when it has one)
+    std::string onlineHost;
+    int onlineApiPort = 443;
+    int onlineWsPort = 0;             // 0 = the port announced by the server
+    std::string onlinePin;            // SHA-256 of a self-signed community server's certificate
+    // Last choices of the online pages
+    std::string onlineCategory = "5+3";
+    bool onlineRated = true;
+    int onlineColor = 0;              // challenges and private games: 0 random, 1 White, 2 Black
+    int onlineCustomBaseSeconds = 600, onlineCustomIncrementSeconds = 5;
+    // [direct] direct match (no server)
+    int directPort = 47100;
+    bool directUpnp = true;
+    int directTimeControl = 7;        // index into chess::timeControlPresets() (10+5), -1 = custom
+    int directBaseSeconds = 600, directIncrementSeconds = 5;
+    int directColor = 0;              // host's colour: 0 random, 1 White, 2 Black
+    std::string directAddress;        // last address joined
+    int directJoinPort = 47100;
     // [interface]
     std::string language;         // i18n code ("fr", "zh-Hant"...); "" = the OS language (first start)
     // [player] (written on the scoresheets)

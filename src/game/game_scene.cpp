@@ -7,6 +7,7 @@
 #include "../render/post/postfx.h"
 #include "elo.h"
 #include "../ui/ui_font.h"
+#include "../ui/ui_online.h"
 #include "layout.h"
 #include "settings.h"
 #include <algorithm>
@@ -172,6 +173,7 @@ bool GameScene::init(AppContext& ctx) {
     ui::setTimeControlList(tcs);
     ui::setResolutionList({{1280, 720}, {1366, 768}, {1600, 900}, {1920, 1080}, {2560, 1440}, {3840, 2160}});
     ui::setVersionString(SCACELITH_VERSION_STRING);
+    initOnline();
     ui::setSoundCallback([](ui::Sound snd) {
         switch (snd) {
         case ui::Sound::Hover: audio::playUI(audio::Sfx::UIHover, 0.35f); break;
@@ -200,6 +202,18 @@ void GameScene::finishLoading() {
     board_.reset(true);
     world_.setClockSide(true);
     clock_.setup(chosenTimeControl());
+    if (!startOnline_.empty()) {
+        // --start-online: straight to the table once an opponent is found (at once with the fakes).
+        onlineSession().quickStart(startOnline_, localPlayerName());
+        if (takeOnlineGame()) {
+            fade_ = skipIntro_ ? 0.0f : 1.0f;
+            state_ = State::Intro;
+            stateTime_ = skipIntro_ ? kFadeIn : 0.0f;
+        } else {
+            enterMenu();
+        }
+        return;
+    }
     if (ctx_->hasArg("--start") || startWatching_) {
         mode_ = startWatching_ ? GameMode::Watch : GameMode::Play;
         setupNewGame();
@@ -271,6 +285,10 @@ bool GameScene::pieceInHand(const PieceObject& p) const {
 }
 
 void GameScene::enterMenu() {
+    if (online()) {
+        mode_ = GameMode::Play;
+        link_ = nullptr;
+    }
     state_ = State::Menu;
     stateTime_ = 0.0f;
     turn_ = Turn::None;
@@ -295,6 +313,13 @@ void GameScene::enterMenu() {
 }
 
 TimeControl GameScene::chosenTimeControl() const {
+    if (online()) {
+        TimeControl tc;
+        tc.unlimited = false;
+        tc.baseMs = og_.baseMs;
+        tc.incrementMs = og_.incMs;
+        return tc;
+    }
     const auto& presets = timeControlPresets();
     // Watching uses the choice of the Watch a Game page ([viewer] in the .ini).
     int index = watching() ? watch_.timeControl : setup_.timeControl;
@@ -331,7 +356,9 @@ ai::EngineSettings GameScene::engineSettingsFor(int preset) const {
 void GameScene::setupNewGame() {
     Settings& s = settings();
     ++round_;
-    if (watching()) {
+    if (online()) {
+        setupOnlineGame();  // the game announced by the session: colours, link, server state
+    } else if (watching()) {
         humanColor_ = White;  // nobody: keeps the human-game helpers well defined
         LOGI("New game (watching): %s vs %s, %s", ai::presets()[size_t(watch_.whitePreset)].name,
              ai::presets()[size_t(watch_.blackPreset)].name, chosenTimeControl().label().c_str());
@@ -378,10 +405,11 @@ void GameScene::setupNewGame() {
     initAnimators();
     configureSeats();
     newScoresheets();
+    if (online()) scorekeeper_.setDetails(onlineSheetDetails());
     // The players filled in their header before sitting down at the board, as in a tournament
     // round: the pens only record the moves.
     scorekeeper_.writeHeaderInstantly();
-    if (engineOk_) {
+    if (engineOk_ && !online()) {
         engine_.newGame();
         engine_.configure(seats_[seats_[0].human() ? 1 : 0].engine);
     }
@@ -415,11 +443,19 @@ void GameScene::setupNewGame() {
         viewpointShown_ = -1;
     }
 
+    if (online()) {
+        rebuildOnline();  // moves already made (a fast opponent, a reconnection)
+        return;
+    }
     std::string moves = ctx_->argValue("--moves");
     if (!moves.empty()) applyMovesInstantly(split(moves, ','));
 }
 
 void GameScene::configureSeats() {
+    if (online()) {
+        configureOnlineSeats();
+        return;
+    }
     const Settings& s = settings();
     for (int i = 0; i < 2; ++i) {
         Seat& st = seats_[i];
@@ -464,6 +500,7 @@ void GameScene::newScoresheets() {
     for (int i = 0; i < 2; ++i) {
         p[i].name = seats_[i].name;
         p[i].elo = seats_[i].elo;
+        p[i].rating = seats_[i].ratingText;
         p[i].handStyle = handStyleOf(i);
         p[i].blueInk = seats_[i].human() || i == 0;  // Stockfish as Black writes in black
     }
@@ -483,16 +520,17 @@ int GameScene::handStyleOf(int seat) const {
 void GameScene::startPlaying() {
     state_ = State::Playing;
     stateTime_ = 0.0f;
-    if (!watching()) {
+    if (!watching() && !online()) {
         // Colours alternate from one game to the next.
         settings().nextColor = int(opposite(humanColor_));
         settings().save();
     }
-    if (game_.status() != GameStatus::Ongoing) {
+    if (game_.status() != GameStatus::Ongoing && !online()) {
         endGame();
         return;
     }
-    clock_.start(game_.position().sideToMove());
+    // Online, the server keeps the clocks (the display reads them).
+    if (!online()) clock_.start(game_.position().sideToMove());
     audio::playUI(audio::Sfx::GameStart, 0.6f);
     // Both players take their pen while White thinks.
     scorekeeper_.startRecording();
@@ -505,8 +543,13 @@ void GameScene::beginTurn() {
     touchedSq_ = placedTo_ = NoSquare;
     pressQueued_ = false;
     hoverId_ = -1;
-    if (isHumanSeat(seatOf(stm))) {
+    if (online() && game_.status() != GameStatus::Ongoing) {
+        turn_ = Turn::None;  // the server's GameEnd follows
+    } else if (isHumanSeat(seatOf(stm))) {
         turn_ = Turn::HumanIdle;
+    } else if (online()) {
+        turn_ = Turn::RemoteWaiting;
+        anim_[seatOf(stm)].setThinking(true);
     } else {
         turn_ = Turn::AiThinking;
         aiRequested_ = false;
@@ -530,22 +573,28 @@ void GameScene::endGame() {
     endHandshakeDone_ = false;
     paused_ = false;
     for (auto& a : anim_) a.setThinking(false);
-    GameStatus st = game_.status();
-    resultText_ = st == GameStatus::WhiteWins ? "1-0" : st == GameStatus::BlackWins ? "0-1" : "\xC2\xBD-\xC2\xBD";
-    reasonText_ = endReasonText(game_.endReason());
-    isDraw_ = st == GameStatus::Draw;
-    playerWon_ = (st == GameStatus::WhiteWins && humanColor_ == White) || (st == GameStatus::BlackWins && humanColor_ == Black);
+    if (online()) {
+        onlineResult();  // the server's result and reason
+    } else {
+        GameStatus st = game_.status();
+        resultText_ = st == GameStatus::WhiteWins ? "1-0" : st == GameStatus::BlackWins ? "0-1" : "\xC2\xBD-\xC2\xBD";
+        reasonText_ = endReasonText(game_.endReason());
+        isDraw_ = st == GameStatus::Draw;
+        playerWon_ = (st == GameStatus::WhiteWins && humanColor_ == White) || (st == GameStatus::BlackWins && humanColor_ == Black);
+    }
     LOGI("Game over: %s (%s)\n%s", resultText_.c_str(), reasonText_.c_str(), game_.pgn(seats_[0].name, seats_[1].name).c_str());
     pendingOffer_ = -1;
     clockFrozen_ = false;
     rateGame();
-    // Both players write the result and lay their pen down before shaking hands.
-    scorekeeper_.finishGame(resultText_);
+    // Both players write the result and lay their pen down before shaking hands (an aborted
+    // online game has no result).
+    endPending_ = false;
+    scorekeeper_.finishGame(online() && og_.status == 4 ? std::string() : resultText_);
     audio::playUI(audio::Sfx::GameEnd, 0.7f);
 }
 
 void GameScene::rateGame() {
-    if (rated_ || watching() || game_.status() == GameStatus::Ongoing) return;
+    if (rated_ || watching() || online() || game_.status() == GameStatus::Ongoing) return;
     rated_ = true;
     Settings& s = settings();
     eloBefore_ = eloAfter_ = s.playerElo;
@@ -581,6 +630,7 @@ void GameScene::rateGame() {
 }
 
 ui::GameOverExtras GameScene::gameOverExtras() const {
+    if (online()) return onlineGameOverExtras();
     ui::GameOverExtras x;
     if (watching()) {
         int moveNo = std::max(1, int(game_.moves().size() + 1) / 2);
@@ -630,10 +680,13 @@ void GameScene::applySettings(bool displayToo) {
 void GameScene::shutdown(AppContext& ctx) {
     // Closing the game in the middle of a rated game resigns it, like leaving to the menu
     // (screenshot runs excepted: they stop wherever the capture happens).
-    if (!ctx.screenshotMode && !watching() && state_ == State::Playing && game_.status() == GameStatus::Ongoing) {
+    if (!ctx.screenshotMode && online() && link_ && state_ == State::Playing && og_.status == 0) {
+        link_->resign();
+    } else if (!ctx.screenshotMode && !watching() && state_ == State::Playing && game_.status() == GameStatus::Ongoing) {
         game_.resign(humanColor_);
         rateGame();
     }
+    if (onlineSession().directActive()) onlineSession().closeDirect();
     engine_.shutdown();
     scorekeeper_.shutdown();
     ui::shutdown();
@@ -689,11 +742,21 @@ bool GameScene::update(AppContext& ctx, float dt) {
         } else if (a == ui::MenuAction::OptionsChanged) {
             applySettings(true);
         }
+        // An online game was found (matchmaking, challenge, direct match): to the table.
+        if (state_ == State::Menu && onlineSession().gameReady()) {
+            mode_ = GameMode::Online;
+            state_ = State::FadeToGame;
+            stateTime_ = 0.0f;
+        }
         break;
     }
     case State::Playing: {
         if (watching()) {
             updateWatchInput();
+            break;
+        }
+        if (online()) {
+            updateOnlineInput();
             break;
         }
         // Esc opens the pause menu; once open, the menu handles Esc itself (back / resume).
@@ -746,6 +809,10 @@ bool GameScene::update(AppContext& ctx, float dt) {
         if (watching()) updateWatchInput();
         break;
     case State::GameOver:
+        if (online()) {
+            updateOnlineGameOver();
+            break;
+        }
         if (watching()) updateWatchInput();
         if (stateTime_ > 1.2f && (endHandshakeDone_ || stateTime_ > 5.0f)) {
             gameOverShown_ = true;
@@ -763,6 +830,8 @@ bool GameScene::update(AppContext& ctx, float dt) {
         break;
     default: break;
     }
+    if (online() && (state_ == State::Intro || state_ == State::Handshake || state_ == State::Playing || state_ == State::GameOver))
+        drawOnlineHud();
 
     simulate(dt);
     return keepRunning;
@@ -785,11 +854,16 @@ void GameScene::simulate(float dt) {
     time_ += dt;
     stateTime_ += dt;
     board_.beginFrame();
+    updateOnline(dt);
 
     switch (state_) {
     case State::FadeToGame:
         fade_ = std::min(1.0f, fade_ + dt / kFadeOut);
         if (fade_ >= 1.0f && stateTime_ > kFadeOut + 0.25f) {
+            if (online() && !onlineSession().gameReady()) {
+                enterMenu();  // the online game went away while the lights were down
+                break;
+            }
             setupNewGame();
             state_ = skipIntro_ ? State::Handshake : State::Intro;
             stateTime_ = 0.0f;
@@ -798,6 +872,16 @@ void GameScene::simulate(float dt) {
         break;
     case State::Intro:
         fade_ = std::max(0.0f, 1.0f - stateTime_ / kFadeIn);
+        if (online() && stateTime_ >= kFadeIn * 0.3f) {
+            // Online the clock is the server's: the handshake happens while the game begins.
+            anim::Task h0 = task(anim::TaskType::Handshake), h1 = h0;
+            h0.partner = &anim_[1];
+            h1.partner = &anim_[0];
+            anim_[0].enqueue(h0);
+            anim_[1].enqueue(h1);
+            startPlaying();
+            break;
+        }
         if (stateTime_ >= kFadeIn * 0.75f) {
             // Handshake across the board before the first move.
             anim::Task h0 = task(anim::TaskType::Handshake), h1 = h0;
@@ -814,7 +898,7 @@ void GameScene::simulate(float dt) {
         if (stateTime_ > 0.3f && !anim_[0].busy() && !anim_[1].busy()) startPlaying();
         break;
     case State::Playing:
-        if (!paused_) updatePlaying(dt);
+        if (!paused_ || online()) updatePlaying(dt);  // an online game goes on behind the menu
         break;
     case State::GameOver:
         // The result is written and the pens laid down first (a writing hand may be the right one).
@@ -840,7 +924,7 @@ void GameScene::simulate(float dt) {
     leverSide_ += clamp(leverTarget_ - leverSide_, -leverSpeed * dt, leverSpeed * dt);
 
     // Characters (frozen while the game is paused).
-    bool frozen = paused_ && state_ == State::Playing;
+    bool frozen = paused_ && state_ == State::Playing && !online();
     bool firstPerson = state_ != State::Menu && state_ != State::Loading && state_ != State::FadeToGame;
     if (state_ == State::FadeToGame) firstPerson = false;
     updateCamera(dt, firstPerson);  // sets the player's head override before the animation update
@@ -891,8 +975,8 @@ void GameScene::updatePlaying(float dt) {
     // The handover between two players (hot-seat) freezes the clock between a clock press and the
     // moment the next player can act: nothing counts and nobody acts.
     if (clockFrozen_) return;
-    // Clock
-    if (clock_.isRunning()) {
+    // Clock (online: the server's, see onlineClockDisplay())
+    if (clock_.isRunning() && !online()) {
         clockAccumMs_ += double(dt) * 1000.0;
         int64_t ms = int64_t(clockAccumMs_);
         clockAccumMs_ -= double(ms);
@@ -922,7 +1006,26 @@ void GameScene::updatePlaying(float dt) {
         }
         break;
     case Turn::HumanPromotion: {
+        if (paused_) break;
         int choice = ui::promotionPicker(humanColor_ == White);
+        if (choice >= Knight && choice <= Queen && online() && promoTo_ != NoSquare) {
+            // Online the piece is chosen before the pawn moves: the move goes out complete.
+            Square to = promoTo_;
+            promoTo_ = NoSquare;
+            Move mv = game_.position().findLegal(touchedSq_, to, PieceType(choice));
+            if (!mv.valid()) break;
+            PieceObject* occupant = board_.at(to);
+            int moverId = touchedId_;
+            sendOnlineMove(mv);
+            std::vector<anim::Task> tasks;
+            planPlacement(tasks, moverId, to, occupant ? occupant->id : -1, NoSquare, NoSquare);
+            planPromotionSwap(tasks, moverId, to, PieceType(choice));
+            anim_[humanSeat()].enqueue(tasks);
+            placedTo_ = to;
+            pressQueued_ = true;
+            turn_ = Turn::HumanPlacing;
+            break;
+        }
         if (choice >= Knight && choice <= Queen) {
             PieceType t = PieceType(choice);
             arbiter_.choosePromotion(game_, t);
@@ -1037,11 +1140,17 @@ void GameScene::humanPlace(Square to) {
     if (occupant && occupant->color == humanColor_) return;
     bool promo = mover->type == Pawn && (rankOf(to) == 7 || rankOf(to) == 0);
     Move mv = pos.findLegal(touchedSq_, to, promo ? Queen : NoPiece);
-    if (!mv.valid() && settings().showLegalMoves) {
+    if (!mv.valid() && (settings().showLegalMoves || online())) {
+        // Online there is no arbiter penalty: the piece cannot be released on an illegal square.
         ui::notify(i18n::tr("notify.illegal"), 2.0f);
         return;
     }
-    if (!arbiter_.place(game_, to, NoPiece)) {
+    if (online() && promo) {
+        promoTo_ = to;  // the new piece is chosen first, then the move is sent and played
+        turn_ = Turn::HumanPromotion;
+        return;
+    }
+    if (!online() && !arbiter_.place(game_, to, NoPiece)) {
         ui::notify(i18n::tr("notify.cannot_move"), 2.0f);
         return;
     }
@@ -1056,11 +1165,15 @@ void GameScene::humanPlace(Square to) {
             rookTo = makeSquare(king ? 5 : 3, rank);
         }
     }
+    // Online the move goes to the server now, before the hand moves; the robot then places the
+    // piece and presses the clock by itself.
+    if (online()) sendOnlineMove(mv);
     std::vector<anim::Task> tasks;
     planPlacement(tasks, mover->id, to, victimId, rookFrom, rookTo);
     anim_[humanSeat()].enqueue(tasks);
     placedTo_ = to;
     turn_ = Turn::HumanPlacing;
+    if (online()) pressQueued_ = true;
 }
 
 void GameScene::humanPressClock() {
@@ -1351,6 +1464,17 @@ void GameScene::onClockPressed(int seat) {
     audio::play(audio::Sfx::ClockPress, world_.clockPressPoint(half), 1.0f);
     leverTarget_ = half == 1 ? 1.0f : -1.0f;
     if (state_ != State::Playing) return;
+    if (online()) {
+        // Animation only: the server has the move already.
+        if (seat == humanSeat() && turn_ == Turn::HumanPressing) {
+            pressedPly_ = int(game_.moves().size()) - 1;
+            if (pendingPly_ < 0) recordOnline(pressedPly_);  // else once confirmed
+            beginTurn();
+        } else if (seat != humanSeat() && remotePly_ >= 0) {
+            recordOnline(remotePly_);
+        }
+        return;
+    }
     Color mover = colorOfSeat(seat);
     if (!(turn_ == Turn::HumanPressing || turn_ == Turn::AiMoving) || game_.position().sideToMove() != mover) return;
     chess::Arbiter::Verdict v = arbiter_.clockPressed(game_, clock_.timeControl());
@@ -1540,11 +1664,11 @@ void GameScene::updateGaze(float dt) {
         if (state_ == State::Playing) {
             Color stm = game_.position().sideToMove();
             bool myTurn = seatOf(stm) == seat;
-            if (myTurn && turn_ == Turn::AiMoving && aiMoveTo_ != NoSquare) {
+            if (myTurn && opponentMoving() && aiMoveTo_ != NoSquare) {
                 target = board_.squareBase(aiMoveTo_);
             } else if (!myTurn && touchedSq_ != NoSquare) {
                 target = board_.squareBase(touchedSq_);
-            } else if (!myTurn && turn_ == Turn::AiMoving && aiMoveTo_ != NoSquare) {
+            } else if (!myTurn && opponentMoving() && aiMoveTo_ != NoSquare) {
                 target = board_.squareBase(aiMoveTo_);  // the other AI's move
             } else {
                 target = aiGazeTarget_;
@@ -1592,6 +1716,7 @@ std::vector<Marker> GameScene::markers() const {
 }
 
 ClockDisplay GameScene::clockDisplay() const {
+    if (online() && link_) return onlineClockDisplay();
     ClockDisplay d;
     int hw = world_.clockHalfForSeat(1.0f), hb = 1 - hw;
     d.ms[hw] = clock_.remainingMs(White);
