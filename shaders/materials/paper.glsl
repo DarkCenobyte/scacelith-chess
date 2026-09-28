@@ -170,7 +170,7 @@ void surface(in SurfaceInput i, inout Surface s) {
                 // Ballpoint ink: a paste laid in the groove the ball presses into the paper; thin
                 // where the ball skips over fibre ridges, glossy where it is thick.
                 float skip = saturate(fib.x * 0.8 + 0.2) * (1.0 - mat_subpixel(0.15, fpMm));
-                float density = hand * (0.72 + 0.28 * pressure) * (1.0 - 0.25 * skip);
+                float density = hand * (0.86 + 0.14 * pressure) * (1.0 - 0.15 * skip);
                 alb = mix(alb, P1.rgb, density);
                 rough = mix(rough, P1.a + 0.15 * (1.0 - pressure), hand);
                 spec = mix(spec, 0.55, hand);

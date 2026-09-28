@@ -151,10 +151,12 @@ float unit(uint32_t h) { return float(h & 0xFFFFFF) / 16777216.0f; }
 // Distance-field thickness correction of the handwriting faces towards a ballpoint line
 // (~0.35 mm): mm added to the glyph outline at the move size.
 float styleDilation(int style) {
+    // Brings each face to the line of a medium ballpoint (about 0.45 mm): thinner lines fell
+    // below a pixel at the player's reading distance and the writing turned pale grey.
     switch (style) {
-        case font::HAND_MARCK: return 0.02f;
-        case font::HAND_BADSCRIPT: return 0.0f;
-        default: return -0.03f;
+        case font::HAND_MARCK: return 0.06f;
+        case font::HAND_BADSCRIPT: return 0.04f;
+        default: return 0.01f;
     }
 }
 
