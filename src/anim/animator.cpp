@@ -407,100 +407,19 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
             break;
         }
         case TaskType::Handshake: {
-            partner = t.partner;
-            shakeStart = start;
-            // Clasp centre (world): above the board centre, between the two players.
-            vec3 cW = t.position;
-            if (length(cW) < 1e-6f) {
-                vec3 mid = pelvisWorld;
-                if (partner && partner->impl_) mid = (pelvisWorld + partner->impl_->pelvisWorld) * 0.5f;
-                cW = vec3(mid.x, layout::BOARD_TOP_Y + 0.225f, mid.z);
+            if (!mirrored) {
+                planHandshake(t, start, T, from, mo);
+            } else {
+                // Left-handed player: the real right hand (the solver's left one, the writing hand)
+                // shakes hands; the playing hand settles at its rest meanwhile.
+                Motion lm;
+                lm.start = start;
+                planHandshake(t, start, T, left().motion.sample(start), lm);
+                left().motion = lm;
+                const float Tr = std::min(T, 0.5f);
+                mo.segs.push_back(makeSeg(from, Tr, h.rest.p, vec3(0), h.rest.q, h.rest.f));
+                mo.segs.push_back(makeSeg(mo.segs.back().sample(Tr), std::max(1e-3f, T - Tr), h.rest.p, vec3(0), h.rest.q, h.rest.f));
             }
-            vec3 C = toChar(cW);
-            // Palm plane: vertical, through C, along the line joining both right shoulders.
-            vec3 S = shoulderRest(R);
-            vec3 dirH = safeNormalize(vec3(C.x - S.x, 0, C.z - S.z), vec3(0, 0, 1));
-            float yaw = std::atan2(dirH.x, dirH.z);
-            // Fingers towards the partner, pitched down; thumb up; palm facing the partner's palm.
-            quat qs = handRot(R, yaw, 0.28f, PI * 0.5f);
-            {
-                // Turn about the palm normal (keeps both palms in the same plane) for a comfortable wrist.
-                vec3 pn = rotate(qs, vec3(1, 0, 0));
-                vec3 palm0 = palmCenter(R) + vec3(0.0015f, 0, 0);
-                float best = 1e9f;
-                quat qb = qs;
-                for (int k = -6; k <= 6; ++k) {
-                    quat q = normalize(axisAngle(pn, 0.1f * float(k)) * qs);
-                    float c = armStrain(wristFor(C, q, palm0), q) + 0.03f * std::fabs(0.1f * float(k));
-                    if (c < best) {
-                        best = c;
-                        qb = q;
-                    }
-                }
-                qs = qb;
-            }
-            FingerPose fo = fpHumanize(poseShakeOpen(), 0.2f, 0.03f), fg = fpHumanize(poseShakeGrip(), 0.6f, 0.04f);
-            vec3 palm = palmCenter(R) + vec3(0.0015f, 0, 0);
-            vec3 pClasp = wristFor(C, qs, palm);
-            // Pre-contact: 7 cm back along the fingers, 1.5 cm off the palm plane.
-            vec3 fingerDir = rotate(qs, vec3(0, -1, 0));
-            vec3 palmN = rotate(qs, vec3(1, 0, 0));
-            vec3 pPre = pClasp - fingerDir * 0.07f - palmN * 0.015f + vec3(0, 0.01f, 0);
-            float tClasp = Timing::HandshakeClaspAt, tRel = Timing::HandshakeReleaseAt;
-            float scale = T / Timing::Handshake;
-            float t1 = 0.74f * scale, t2 = tClasp * scale, t3 = tRel * scale;
-            float t4 = t3 + 0.15f * scale;
-            HandSample s = from;
-            // 1. extend
-            Segment a = makeSeg(s, t1, pPre, (pClasp - pPre) * (0.8f / (t2 - t1)), qs, fo);
-            a.arcH = 0.05f;
-            a.arcPeak = 0.45f;
-            a.rot.keys.clear();
-            a.rot.add(0.0f, from.q);
-            a.rot.add(0.80f, qs);
-            a.fing.keys.clear();
-            a.fing.add(0.0f, from.f);
-            a.fing.add(0.60f, fo);
-            clearPath(a, from, fpLerp(from.f, fo, 0.5f), tableC);
-            mo.segs.push_back(a);
-            s = a.sample(a.T);
-            // 2. slide in and close the grip (clasp event at the end)
-            Segment b = makeSeg(s, t2 - t1, pClasp, vec3(0), qs, fg);
-            b.fing.keys.clear();
-            b.fing.add(0.0f, s.f);
-            b.fing.add(0.15f, s.f);
-            b.fing.add(1.0f, fg);
-            mo.segs.push_back(b);
-            s = b.sample(b.T);
-            // 3. two pumps (both animators compute the same vertical motion)
-            Segment c = makeSeg(s, t3 - t2, pClasp, vec3(0), qs, fg);
-            c.oscAmp = 0.032f;
-            c.oscCycles = 2.0f;
-            c.os = 0.04f;
-            c.oe = 0.92f;
-            mo.segs.push_back(c);
-            s = c.sample(c.T);
-            // 4. release: fingers open, hand slides back a little
-            Segment d = makeSeg(s, t4 - t3, pClasp - fingerDir * 0.02f - palmN * 0.006f, vec3(0), qs, fpLerp(fg, fo, 0.85f));
-            mo.segs.push_back(d);
-            s = d.sample(d.T);
-            // 5. back to rest
-            HandSample r = h.rest;
-            Segment e = makeSeg(s, T - t4, r.p, vec3(0), r.q, r.f);
-            e.arcH = 0.03f;
-            e.arcPeak = 0.35f;
-            e.rot.keys.clear();
-            e.rot.add(0.0f, s.q);
-            e.rot.add(0.80f, r.q);
-            clearPath(e, s, poseRelaxed(), tableC);
-            e.fing.keys.clear();
-            e.fing.add(0.0f, s.f);
-            e.fing.add(0.4f, poseRelaxed());
-            e.fing.add(1.0f, r.f);
-            mo.segs.push_back(e);
-            curEvents.push_back({start + t2, EventType::HandshakeClasp, ActNone, false});
-            curEvents.push_back({start + t3, EventType::HandshakeRelease, ActNone, false});
-            curTargetWorld = cW;
             break;
         }
         case TaskType::Wait: {
@@ -527,6 +446,128 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
     h.releasedId = -1;
 }
 
+// Handshake with the real right hand: the solver's right hand, or its left one (the writing hand)
+// for a left-handed player. Written for either side, so the left-handed handshake is the exact
+// mirror image of the right-handed one. A writing hand still holding the pen lays it down first.
+void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSample from, Motion& mo) {
+    const Side R = shakeSide();
+    Hand& h = shakeHand();
+    const float tableC = layout::TABLE_TOP_Y - pelvisWorld.y;
+    partner = t.partner;
+    shakeStart = start;
+    // Clasp centre (world): above the board centre, between the two players.
+    vec3 cW = t.position;
+    if (length(cW) < 1e-6f) {
+        vec3 mid = pelvisWorld;
+        if (partner && partner->impl_) mid = (pelvisWorld + partnerPoint(partner->impl_->pelvisWorld)) * 0.5f;
+        cW = vec3(mid.x, layout::BOARD_TOP_Y + 0.225f, mid.z);
+    }
+    vec3 C = toChar(cW);
+    // Palm plane: vertical, through C, along the line joining both right shoulders.
+    vec3 S = shoulderRest(R);
+    vec3 dirH = safeNormalize(vec3(C.x - S.x, 0, C.z - S.z), vec3(0, 0, 1));
+    float yaw = std::atan2(dirH.x, dirH.z);
+    // Fingers towards the partner, pitched down; thumb up; palm facing the partner's palm.
+    quat qs = handRot(R, yaw, 0.28f, PI * 0.5f);
+    const vec3 palm = handPoint(R, palmCenter(Side::Right) + vec3(0.0015f, 0, 0));
+    const vec3 palmLocalN(palmSign(R), 0, 0);
+    {
+        // Turn about the palm normal (keeps both palms in the same plane) for a comfortable wrist.
+        vec3 pn = rotate(qs, palmLocalN);
+        float best = 1e9f;
+        quat qb = qs;
+        for (int k = -6; k <= 6; ++k) {
+            quat q = normalize(axisAngle(pn, 0.1f * float(k)) * qs);
+            float c = armStrainSide(R, wristFor(C, q, palm), q) + 0.03f * std::fabs(0.1f * float(k));
+            if (c < best) {
+                best = c;
+                qb = q;
+            }
+        }
+        qs = qb;
+    }
+    FingerPose fo = fpHumanize(poseShakeOpen(), 0.2f, 0.03f), fg = fpHumanize(poseShakeGrip(), 0.6f, 0.04f);
+    vec3 pClasp = wristFor(C, qs, palm);
+    // Pre-contact: 7 cm back along the fingers, 1.5 cm off the palm plane.
+    vec3 fingerDir = rotate(qs, vec3(0, -1, 0));
+    vec3 palmN = rotate(qs, palmLocalN);
+    vec3 pPre = pClasp - fingerDir * 0.07f - palmN * 0.015f + vec3(0, 0.01f, 0);
+    float tClasp = Timing::HandshakeClaspAt, tRel = Timing::HandshakeReleaseAt;
+    float scale = T / Timing::Handshake;
+    float t1 = 0.74f * scale, t2 = tClasp * scale, t3 = tRel * scale;
+    float t4 = t3 + 0.15f * scale;
+    // 0. The pen first goes back onto the table (where the game wanted it, else where it was taken).
+    float t0 = 0.0f;
+    FingerPose letGo = from.f;
+    shakeTookPut = false;
+    if (R == Side::Left && wr.penHeld) {
+        shakePutFrame = wr.penTable;
+        for (auto it = wr.queue.begin(); it != wr.queue.end(); ++it)
+            if (it->type == WriteTaskType::PutPen) {
+                shakePutFrame = it->frame;
+                wr.queue.erase(it);
+                shakeTookPut = true;
+                break;
+            }
+        t0 = 0.30f * scale;
+        penPutSegments(toCharM(shakePutFrame), from, t0, mo, &letGo);
+        from = mo.segs.back().sample(t0);
+        curEvents.push_back({start + t0, EventType::PenPut, ActPutPen, false});
+    }
+    HandSample s = from;
+    // 1. extend
+    Segment a = makeSeg(s, t1 - t0, pPre, (pClasp - pPre) * (0.8f / (t2 - t1)), qs, fo);
+    a.arcH = 0.05f;
+    a.arcPeak = 0.45f;
+    a.rot.keys.clear();
+    a.rot.add(0.0f, from.q);
+    a.rot.add(0.80f, qs);
+    a.fing.keys.clear();
+    a.fing.add(0.0f, from.f);
+    if (t0 > 0.0f) a.fing.add(0.20f, letGo);   // off the pen
+    a.fing.add(0.60f, fo);
+    clearPath(a, from, fpLerp(from.f, fo, 0.5f), tableC, R);
+    mo.segs.push_back(a);
+    s = a.sample(a.T);
+    // 2. slide in and close the grip (clasp event at the end)
+    Segment b = makeSeg(s, t2 - t1, pClasp, vec3(0), qs, fg);
+    b.fing.keys.clear();
+    b.fing.add(0.0f, s.f);
+    b.fing.add(0.15f, s.f);
+    b.fing.add(1.0f, fg);
+    mo.segs.push_back(b);
+    s = b.sample(b.T);
+    // 3. two pumps (both animators compute the same vertical motion)
+    Segment c = makeSeg(s, t3 - t2, pClasp, vec3(0), qs, fg);
+    c.oscAmp = 0.032f;
+    c.oscCycles = 2.0f;
+    c.os = 0.04f;
+    c.oe = 0.92f;
+    mo.segs.push_back(c);
+    s = c.sample(c.T);
+    // 4. release: fingers open, hand slides back a little
+    Segment d = makeSeg(s, t4 - t3, pClasp - fingerDir * 0.02f - palmN * 0.006f, vec3(0), qs, fpLerp(fg, fo, 0.85f));
+    mo.segs.push_back(d);
+    s = d.sample(d.T);
+    // 5. back to rest
+    HandSample r = h.rest;
+    Segment e = makeSeg(s, T - t4, r.p, vec3(0), r.q, r.f);
+    e.arcH = 0.03f;
+    e.arcPeak = 0.35f;
+    e.rot.keys.clear();
+    e.rot.add(0.0f, s.q);
+    e.rot.add(0.80f, r.q);
+    clearPath(e, s, poseRelaxed(), tableC, R);
+    e.fing.keys.clear();
+    e.fing.add(0.0f, s.f);
+    e.fing.add(0.4f, poseRelaxed());
+    e.fing.add(1.0f, r.f);
+    mo.segs.push_back(e);
+    curEvents.push_back({start + t2, EventType::HandshakeClasp, ActNone, false});
+    curEvents.push_back({start + t3, EventType::HandshakeRelease, ActNone, false});
+    curTargetWorld = cW;
+}
+
 // Resting spots clear of the pieces on the table, including the one the current task is about to
 // set down there: the idle left hand makes room before the right hand arrives.
 void Animator::Impl::validateRests(const Task* t) {
@@ -540,7 +581,7 @@ void Animator::Impl::validateRests(const Task* t) {
         if (length(want.p - h.rest.p) < 0.004f) continue;
         h.rest = want;
         // The idle hands make room (the right one only between tasks: a task moves it anyway).
-        const bool slide = h.side == Side::Left ? !h.chinFollow && leftChin == 0
+        const bool slide = h.side == Side::Left ? !h.chinFollow && leftChin == 0 && writingHandFree()
                                                 : !t && rightIdle && h.heldId < 0 && h.capId < 0 && !h.chinFollow;
         if (slide) {
             HandSample from = h.motion.sample(time);
@@ -705,6 +746,20 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     float idleSide = sway * 0.012f * std::sin(t * 0.19f + seed * 2.0f);
 
     SpineParams sp = solveSpine(pose, hr.p, thinkLean, idleFlex, idleTwist, idleSide);
+    if (mirrored && running && cur.type == TaskType::Handshake) {
+        // Left-handed player shaking hands with the solver's left hand: the torso follows that
+        // hand the way it follows the right one (mirror image of the solve), blended in and out.
+        const float u = t - curStart, w = smoothstep(0.0f, 0.3f, u) * (1.0f - smoothstep(curT - 0.3f, curT, u));
+        if (w > 0.0f) {
+            SpineParams sl = solveSpine(pose, mirrorX(left().motion.sample(t).p), thinkLean, idleFlex, -idleTwist, -idleSide);
+            sp.flex = lerp(sp.flex, sl.flex, w);
+            sp.twist = lerp(sp.twist, -sl.twist, w);
+            sp.side = lerp(sp.side, -sl.side, w);
+        }
+    }
+    // The writing hand at work: lean/turn a little towards the sheet, and keep it within reach
+    // whatever the playing hand does.
+    writingSpine(sp, left().motion.sample(t));
     spineOut = sp;
     applySpine(pose, sp);
     fkChain(pose, Pelvis, Spine2);
@@ -767,8 +822,57 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
         LOGI("armtrace %s t=%.4f pron %.3f flex %.3f dev %.3f elbow %.3f clampP %.3f clampW %.3f p %.3f %.3f %.3f", facing > 0 ? "White" : "Black", t, lastPron, lastFlex, lastDev, hr.elbow,
              pronClamp, wristClamp, hr.p.x, hr.p.y, hr.p.z);
     applyFingers(*sk, pose, Side::Right, hr.f);
-    solveArm(pose, Side::Left, hl.p, hl.q);
+    // (Debug: the writing arm's joint-limit diagnostics, the playing arm's are kept.)
+    const float keepDiag[6] = {reachShort, wristClamp, pronClamp, lastFlex, lastDev, lastPron};
+    if (debugLog) {
+        diagSide = Side::Left;
+        reachShort = wristClamp = pronClamp = 0.0f;
+    }
+    solveArm(pose, Side::Left, hl.p, hl.q, hl.elbow);
+    if (hl.pinW > 0.0f) {
+        // Point lock (the page pinch): where the wrist clamps the hand's rotation, the whole hand
+        // shifts so the pinched point stays on its planned path (weighted in and out by pinW).
+        const vec3 planned = hl.p + rotate(hl.q, hl.pinLocal);
+        vec3 corr(0.0f);
+        for (int it = 0; it < 3; ++it) {
+            const vec3 e = planned - transformPoint(G[HandL], hl.pinLocal);
+            if (length2(e) < 1e-8f) break;
+            corr += e;
+            solveArm(pose, Side::Left, hl.p + corr, hl.q, hl.elbow);
+        }
+        if (hl.pinW < 1.0f && length2(corr) > 0.0f) solveArm(pose, Side::Left, hl.p + corr * hl.pinW, hl.q, hl.elbow);
+    }
+    const float leftDiag[6] = {reachShort, wristClamp, pronClamp, lastFlex, lastDev, lastPron};
+    if (debugLog) {
+        diagSide = Side::Right;
+        reachShort = keepDiag[0];
+        wristClamp = keepDiag[1];
+        pronClamp = keepDiag[2];
+        lastFlex = keepDiag[3];
+        lastDev = keepDiag[4];
+        lastPron = keepDiag[5];
+    }
     applyFingers(*sk, pose, Side::Left, hl.f);
+    // Pen in the writing hand. While a path is followed the tip must be exactly on it: the pen
+    // slides in the fingers by whatever the arm solve missed (sub-millimetre when within reach).
+    evalPen = hl.pen;
+    wr.follow = hl.tipLock;
+    if (debugLog && wr.running && wr.cur.type == WriteTaskType::TurnPage && (leftDiag[0] > 1e-3f || leftDiag[1] > 0.02f || leftDiag[2] > 0.02f))
+        LOGI("anim: t=%.3f page turn: writing arm short %.1f mm, wrist clamp %.1f deg (flex %.0f dev %.0f deg), pronation %.0f deg clamped by %.1f deg", t,
+             leftDiag[0] * 1000.0f, leftDiag[1] / DEG, leftDiag[3] / DEG, leftDiag[4] / DEG, leftDiag[5] / DEG, leftDiag[2] / DEG);
+    if (hl.tipLock) {
+        evalPen.p = transformPoint(inverseAffine(G[HandL]), hl.tip);
+        const float slide = length(evalPen.p - hl.pen.p);
+        if (debugLog && slide > 0.002f)
+            LOGI("anim: t=%.3f pen slides %.1f mm in the fingers (writing arm: short %.1f mm, wrist clamp %.1f deg, flex %.0f dev %.0f deg, "
+                 "pronation %.0f deg clamped by %.1f deg)",
+                 t, slide * 1000.0f, leftDiag[0] * 1000.0f, leftDiag[1] / DEG, leftDiag[3] / DEG, leftDiag[4] / DEG, leftDiag[5] / DEG, leftDiag[2] / DEG);
+    }
+    if (hl.lockW > 0.0f) {
+        // Taken from / laid on the table: exactly on its table frame (blended in or out).
+        PenPose onTable{normalize(conjugate(rotOf(G[HandL])) * hl.lockC.q), transformPoint(inverseAffine(G[HandL]), hl.lockC.p)};
+        evalPen = penLerp(evalPen, onTable, clamp(hl.lockW, 0.0f, 1.0f));
+    }
 
     if (worldOut) computeGlobal(*sk, pose, worldOut);
 }
@@ -788,13 +892,23 @@ void Animator::Impl::updateGaze(float dt) {
     bool taskLook = running && cur.type != TaskType::Handshake && cur.type != TaskType::Wait && cur.type != TaskType::Retract;
     taskGaze += ((taskLook ? 1.0f : 0.0f) - taskGaze) * (1.0f - std::exp(-dt * (taskLook ? 14.0f : 2.0f)));
     target = lerp(target, curTargetWorld, taskGaze);
+    // The eyes follow the pen (or the page corner) while the writing hand works and the playing
+    // hand has nothing to do.
+    if (wr.look > 1e-3f) {
+        vec3 wt = toWorld(left().motion.sample(time).p);
+        if (wr.penHeld) wt = transformPoint(worldI[HandL], evalPen.p);
+        else if (wr.running && (wr.cur.type == WriteTaskType::PickPen || wr.cur.type == WriteTaskType::PutPen)) wt = wr.cur.frame.translation();
+        if (wr.running && wr.cur.type == WriteTaskType::TurnPage && wr.corner && wr.turnT > 0.0f)
+            wt = wr.corner(pageTurnEase(clamp((time - wr.turnStart) / wr.turnT, 0.0f, 1.0f)));
+        target = lerp(target, wt, wr.look * (1.0f - taskGaze));
+    }
     float shakeT = time - shakeStart;
     if (partner && partner->impl_ && shakeT >= 0.0f && shakeT < Timing::Handshake) {
-        vec3 face = partner->impl_->headPointWorld();
+        vec3 face = partnerPoint(partner->impl_->headPointWorld());
         float w = smoothstep(0.0f, 0.25f, shakeT) * (1.0f - smoothstep(Timing::Handshake - 0.5f, Timing::Handshake - 0.1f, shakeT));
         // Glance at the hands right before the clasp.
         float gl = smoothstep(0.45f, 0.62f, shakeT) * (1.0f - smoothstep(0.82f, 1.02f, shakeT));
-        vec3 hands = toWorld(right().motion.sample(time).p);
+        vec3 hands = toWorld(shakeHand().motion.sample(time).p);
         target = lerp(target, lerp(face, hands, gl * 0.8f), w);
     }
     vec3 headW = toWorld(transformPoint(G[Neck], vec3(0, 0.12f, 0.05f)));
@@ -942,7 +1056,8 @@ void Animator::Impl::updateIdle(float dt) {
         hand.chinFollow = want;
         hand.chinPlanned = to;
     };
-    drive(L, desired == 1, leftChin);
+    // The writing hand only goes to the chin with nothing to do and no pen in it.
+    drive(L, desired == 1 && writingHandFree(), leftChin);
     if (rightFree) drive(R, desired == 2, rightChin);
 }
 
@@ -953,6 +1068,13 @@ void Animator::Impl::startTask(const Task& t, std::vector<Event>& ev) {
     Hand& h = right();
     bakeFollow(h);
     rightChin = 0;
+    if (mirrored && t.type == TaskType::Handshake) {
+        // The handshake takes the writing hand: whatever it does stops here, its queue waits.
+        bakeFollow(left());
+        leftChin = 0;
+        interruptWriting(ev);
+        wr.suspendUntil = time + taskDuration(t);
+    }
     cur = t;
     running = true;
     curStart = time;
@@ -998,6 +1120,23 @@ void Animator::Impl::fireDue(float upTo, std::vector<Event>& ev) {
         out.time = e.t;
         out.pieceId = cur.pieceId;
         out.position = cur.type == TaskType::Handshake ? curTargetWorld : cur.position;
+        if (e.action == ActPutPen) {
+            // The handshake laid the writing hand's pen down.
+            wr.penHeld = false;
+            wr.penTable = shakePutFrame;
+            wr.hasPenTable = true;
+            out.pieceId = -1;
+            out.transform = shakePutFrame;
+            out.position = shakePutFrame.translation();
+            ev.push_back(out);
+            if (shakeTookPut && wr.queue.empty() && !wr.running) {
+                Event q;
+                q.type = EventType::WritingQueueEmpty;
+                q.time = e.t;
+                ev.push_back(q);
+            }
+            continue;
+        }
         if (e.action != ActNone) {
             Pose tmp;
             mat4 W[BoneCount];
@@ -1072,12 +1211,12 @@ void Animator::Impl::finishTask(std::vector<Event>& ev) {
 Animator::Animator() : impl_(std::make_shared<Impl>()) {}
 
 void Animator::init(const Skeleton& sk, vec3 pelvisWorld, float facing, Side playHand) {
-    (void)playHand;  // TODO(anim): left-handed play
     impl_ = std::make_shared<Impl>();
     Impl& I = *impl_;
     I.owner = this;
     I.sk = &sk;
-    I.pelvisWorld = pelvisWorld;
+    I.mirrored = playHand == Side::Left;   // left-handed: the solver runs in the mirrored world
+    I.pelvisWorld = I.mw(pelvisWorld);
     I.facing = facing >= 0.0f ? 1.0f : -1.0f;
     I.rootQ = I.facing > 0 ? axisAngle(vec3(0, 1, 0), PI) : quat();
     I.root = toMat4(I.rootQ, pelvisWorld);
@@ -1108,23 +1247,25 @@ void Animator::init(const Skeleton& sk, vec3 pelvisWorld, float facing, Side pla
         h.carryQ = h.rest.q;
         h.capQ = h.rest.q;
     }
+    I.initWriting();
     vec3 look(0, layout::BOARD_TOP_Y, 0);
     I.gazeTarget = look;
     I.fixFrom = I.fixTo = look;
     I.time = 0.0f;
     // Head starts looking at the board.
-    I.evaluate(0.0f, pose_, globals_);
+    I.evaluate(0.0f, I.poseI, I.worldI);
     vec3 headW = I.toWorld(transformPoint(I.G[Neck], vec3(0, 0.12f, 0.05f)));
     vec3 dc = rotate(conjugate(I.rootQ), look - headW);
     I.headPitch = std::atan2(dc.y, length(vec3(dc.x, 0, dc.z))) * 0.62f;
-    I.evaluate(0.0f, pose_, globals_);
+    I.evaluate(0.0f, I.poseI, I.worldI);
+    I.exportPose(I.poseI, I.worldI, pose_, globals_);
 }
 
 void Animator::setRestHand(vec3 worldPos) {
     Impl& I = *impl_;
     if (!I.sk) return;
     Impl::Hand& h = I.right();
-    h.restContact = I.toChar(worldPos);
+    h.restContact = I.toChar(I.mw(worldPos));
     h.rest = I.safeRest(Side::Right, h.restContact);
     I.restsDirty = true;
     if (!I.running && I.queue.empty() && I.rightIdle && h.heldId < 0 && !h.chinFollow) {
@@ -1140,10 +1281,10 @@ void Animator::setLeftRestHand(vec3 worldPos) {
     Impl& I = *impl_;
     if (!I.sk) return;
     Impl::Hand& h = I.left();
-    h.restContact = I.toChar(worldPos);
+    h.restContact = I.toChar(I.mw(worldPos));
     h.rest = I.safeRest(Side::Left, h.restContact);
     I.restsDirty = true;
-    if (!h.chinFollow) {
+    if (!h.chinFollow && I.writingHandFree()) {
         HandSample from = h.motion.sample(I.time);
         Motion mo;
         mo.start = I.time;
@@ -1152,9 +1293,13 @@ void Animator::setLeftRestHand(vec3 worldPos) {
     }
 }
 
-void Animator::enqueue(const Task& t) { impl_->queue.push_back(t); }
+void Animator::enqueue(const Task& t) {
+    Task c = t;
+    c.position = impl_->mw(t.position);   // into the solver's world
+    impl_->queue.push_back(c);
+}
 void Animator::enqueue(const std::vector<Task>& tasks) {
-    for (auto& t : tasks) impl_->queue.push_back(t);
+    for (auto& t : tasks) enqueue(t);
 }
 bool Animator::busy() const { return impl_->running || !impl_->queue.empty(); }
 void Animator::clearQueue() { impl_->queue.clear(); }
@@ -1165,11 +1310,12 @@ float Animator::remainingTime() const {
     return r;
 }
 void Animator::lookAt(vec3 target, float weight) {
-    impl_->gazeTarget = target;
+    impl_->gazeTarget = impl_->mw(target);
     impl_->gazeWeightTarget = clamp(weight, 0.0f, 1.0f);
 }
 void Animator::setHeadOverride(bool enabled, float yaw, float pitch) {
     Impl& I = *impl_;
+    if (I.mirrored) yaw = -yaw;   // the solver's left is the character's right
     yaw = clamp(yaw, -70.0f * DEG, 70.0f * DEG);
     pitch = clamp(pitch, -45.0f * DEG, 30.0f * DEG);
     if (!enabled && I.headOverride) {   // hand over smoothly to the gaze controller
@@ -1199,27 +1345,47 @@ void Animator::update(float dt, std::vector<Event>& events) {
         I.validateRests(nullptr);
     }
     dt = std::max(0.0f, dt);
-    float tEnd = I.time + dt;
-    for (int guard = 0; guard < 256; ++guard) {
-        if (!I.running) {
-            if (I.queue.empty()) break;
-            Task t = I.queue.front();
-            I.queue.pop_front();
-            I.startTask(t, events);
+    const float tEnd = I.time + dt;
+    const size_t ev0 = events.size();
+    // Two task machines (playing hand, writing hand), stepped through their boundaries in time
+    // order so each task starts exactly when the previous one of its hand ends.
+    for (int guard = 0; guard < 512; ++guard) {
+        const float never = 1e30f;
+        float tm = never, tw = never;
+        if (I.running) tm = I.curStart + I.curT;
+        else if (!I.queue.empty()) tm = I.time;
+        if (!I.nextWriteBoundary(tw)) tw = never;
+        const float tn = std::min(tm, tw);
+        if (tn > tEnd) break;
+        I.time = std::max(I.time, tn);
+        if (tm <= tw) {
+            if (I.running) {
+                I.finishTask(events);
+            } else {
+                Task t = I.queue.front();
+                I.queue.pop_front();
+                I.startTask(t, events);
+            }
+        } else {
+            I.stepWriting(events);
         }
-        float end = I.curStart + I.curT;
-        if (end <= tEnd) {
-            I.time = end;
-            I.finishTask(events);
-            continue;
-        }
-        I.fireDue(tEnd, events);
-        break;
     }
+    if (I.running) I.fireDue(tEnd, events);
+    if (I.wr.running) I.fireWriteDue(tEnd, events);
     I.time = tEnd;
+    // Body lean towards the sheet and eyes on the pen while the writing hand works.
+    {
+        const bool writing = I.wr.running && (I.wr.cur.type == WriteTaskType::Write || I.wr.cur.type == WriteTaskType::TurnPage);
+        const bool penWork = I.wr.running && I.wr.cur.type != WriteTaskType::Wait;
+        const float leanT = writing ? 1.0f : (I.wr.penHeld ? 0.5f : 0.0f);
+        I.wr.lean += (leanT - I.wr.lean) * (1.0f - std::exp(-dt * 3.0f));
+        I.wr.look += ((penWork ? 1.0f : 0.0f) - I.wr.look) * (1.0f - std::exp(-dt * (penWork ? 8.0f : 3.0f)));
+    }
     I.updateIdle(dt);
     I.updateGaze(dt);
-    I.evaluate(I.time, pose_, globals_);
+    I.evaluate(I.time, I.poseI, I.worldI);
+    I.exportPose(I.poseI, I.worldI, pose_, globals_);
+    I.exportEvents(events, ev0);
 }
 
 mat4 Animator::eyeCameraTransform() const {
@@ -1235,9 +1401,9 @@ mat4 Animator::eyeCameraTransform() const {
 bool Animator::heldPieceTransform(int pieceId, mat4& out) const {
     const Impl& I = *impl_;
     if (pieceId < 0) return false;
-    const mat4& hand = globals_[HandR];
-    if (pieceId == I.hands[1].heldId) { out = hand * I.hands[1].heldAttach; return true; }
-    if (pieceId == I.hands[1].capId) { out = hand * I.hands[1].capAttach; return true; }
+    const mat4& hand = I.worldI[HandR];   // the playing hand in the solver's world
+    if (pieceId == I.hands[1].heldId) { out = I.mm(hand * I.hands[1].heldAttach); return true; }
+    if (pieceId == I.hands[1].capId) { out = I.mm(hand * I.hands[1].capAttach); return true; }
     return false;
 }
 bool Animator::holding(int pieceId) const {

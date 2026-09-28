@@ -15,6 +15,7 @@
 #include "../core/log.h"
 #include "../game/layout.h"
 #include <chrono>
+#include <cstdio>
 #include <cstdlib>
 #include <deque>
 #include <memory>
@@ -426,11 +427,37 @@ inline FingerPose evalTrack(const Track<FingerPose>& tr, float u) {
     return k.back().v;
 }
 
+// Pen frame (tip at the origin, +Y along the barrel to the back end) in the hand bone's frame.
+struct PenPose {
+    quat q;
+    vec3 p{0, 0, 0};
+};
+inline PenPose penLerp(const PenPose& a, const PenPose& b, float t) { return {qslerp(a.q, b.q, t), lerp(a.p, b.p, t)}; }
+inline PenPose evalTrack(const Track<PenPose>& tr, float u) {
+    const auto& k = tr.keys;
+    if (k.empty()) return PenPose();
+    if (u <= k.front().u) return k.front().v;
+    for (size_t i = 1; i < k.size(); ++i)
+        if (u <= k[i].u) {
+            float s = (u - k[i - 1].u) / std::max(1e-6f, k[i].u - k[i - 1].u);
+            return penLerp(k[i - 1].v, k[i].v, minJerk(s));
+        }
+    return k.back().v;
+}
+
 struct HandSample {
     vec3 p{0, 0, 0}, v{0, 0, 0}, a{0, 0, 0};   // wrist (character space)
     quat q;                                    // hand bone rotation (character space)
     FingerPose f;
     float elbow = 0.0f;                        // elbow raised about the shoulder-wrist axis (rad)
+    PenPose pen;                               // writing hand holding the pen: pen in the hand frame
+    bool tipLock = false;                      // path following: the pen tip must be exactly at 'tip'
+    vec3 tip{0, 0, 0};                         // (character space; the pen slides in the fingers by
+                                               // the tiny amount the arm solve cannot reach)
+    float lockW = 0.0f;                        // pen taken from / laid on the table: blend weight of
+    PenPose lockC;                             // its exact table frame (character space) over 'pen'
+    float pinW = 0.0f;                         // weight of the point lock: the hand point 'pinLocal'
+    vec3 pinLocal{0, 0, 0};                    // stays where p/q put it even where the wrist clamps
 };
 
 struct Segment {
@@ -449,6 +476,16 @@ struct Segment {
     float corrPeak = 0.5f;
     bool usePivot = false;         // rotate about rotPivot: that hand point follows the clean path
     vec3 rotPivot{0, 0, 0};
+    Track<PenPose> pen;            // pen in the hand (regrips); empty = keep the default PenPose
+    // Pen lock (see HandSample::lockW): weight lockFrom -> lockTo (min-jerk) over u in [lockU0, lockU1].
+    PenPose lockC;
+    float lockU0 = 0.0f, lockU1 = 1.0f, lockFrom = 0.0f, lockTo = 0.0f;
+    // Point lock (see HandSample::pinW), same weighting.
+    vec3 pinLocal{0, 0, 0};
+    float pinU0 = 0.0f, pinU1 = 1.0f, pinFrom = 0.0f, pinTo = 0.0f;
+    // Procedural segment (the writing hand following a pen path): when set, sample(t) is follow(t)
+    // (t from the segment start) and every field above except T is ignored.
+    std::function<HandSample(float t)> follow;
 
     // Vertical extras on top of the quintic: the arc bump and the handshake pumps. Both are zero
     // with zero slope and curvature outside the segment, so symmetric differences work anywhere.
@@ -483,6 +520,7 @@ struct Segment {
         return p;
     }
     HandSample sample(float t) const {
+        if (follow) return follow(clamp(t, 0.0f, T));
         HandSample s;
         float u = clamp(t / T, 0.0f, 1.0f);
         s.p = basePos(t, &s.v, &s.a);
@@ -499,6 +537,17 @@ struct Segment {
             s.q = normalize(qslerp(quat(), rotCorr, bump(u / uEnd, corrPeak)) * s.q);
         }
         s.f = evalTrack(fing, u);
+        if (!pen.keys.empty()) s.pen = evalTrack(pen, u);
+        if (lockFrom != 0.0f || lockTo != 0.0f) {
+            float w = clamp((u - lockU0) / std::max(1e-4f, lockU1 - lockU0), 0.0f, 1.0f);
+            s.lockW = lockFrom + (lockTo - lockFrom) * minJerk(w);
+            s.lockC = lockC;
+        }
+        if (pinFrom != 0.0f || pinTo != 0.0f) {
+            float w = clamp((u - pinU0) / std::max(1e-4f, pinU1 - pinU0), 0.0f, 1.0f);
+            s.pinW = pinFrom + (pinTo - pinFrom) * minJerk(w);
+            s.pinLocal = pinLocal;
+        }
         s.elbow = elbow0 + (elbow1 - elbow0) * minJerk(u);
         if (usePivot && !rot.keys.empty()) {
             auto prog = [&](float ws, float we) { return minJerk(clamp((u - ws) / std::max(1e-4f, we - ws), 0.0f, 1.0f)); };
@@ -610,7 +659,8 @@ struct Animator::Impl {
     float curStart = 0, curT = 0;
     struct TimedEvent { float t; EventType type; int action; bool done; };
     std::vector<TimedEvent> curEvents;
-    enum Action { ActNone, ActGripPrimary, ActReleasePrimary, ActGripCaptured, ActReleaseCaptured };
+    enum Action { ActNone, ActGripPrimary, ActReleasePrimary, ActGripCaptured, ActReleaseCaptured, ActPutPen };
+    mat4 shakePutFrame;                    // ActPutPen: where the handshake lays the pen (solver world)
     vec3 curTargetWorld{0, 0, 0};
     bool prevWasClock = false;             // the previous task ended with the clock tap
     TaskType prevType = TaskType::Wait;
@@ -753,7 +803,7 @@ struct Animator::Impl {
         float D = length(d);
         vec3 u = safeNormalize(d, vec3(0, -1, 0));
         float Dc = clamp(D, std::fabs(L1 - L2) + 1e-3f, (L1 + L2) * 0.9995f);
-        if (s == Side::Right) reachShort = std::max(reachShort, D - Dc);
+        if (s == diagSide) reachShort = std::max(reachShort, D - Dc);
         float cosA = clamp((L1 * L1 + Dc * Dc - L2 * L2) / (2.0f * L1 * Dc), -1.0f, 1.0f);
         float sinA = std::sqrt(std::max(0.0f, 1.0f - cosA * cosA));
         // Elbow pole: down and out, a little back; further out for cross-body reaches and for a
@@ -791,7 +841,7 @@ struct Animator::Impl {
         float tw = 2.0f * std::atan2(rel.y, rel.w);
         tw = wrapPi(tw);
         float pron = clamp(tw * ps, -1.75f, 1.95f);
-        if (s == Side::Right) pronClamp = std::max(pronClamp, std::fabs(pron - tw * ps));
+        if (s == diagSide) pronClamp = std::max(pronClamp, std::fabs(pron - tw * ps));
         tw = pron * ps;
         quat gF = normalize(gF0 * qy(tw));
         p.local[fore] = normalize(conjugate(gUpper) * gF);
@@ -801,12 +851,12 @@ struct Animator::Impl {
         vec3 fd = rotate(hl, vec3(0, -1, 0));
         float flex = std::atan2(fd.x * ps, -fd.y), dev = std::atan2(fd.z, -fd.y);
         float flexC = clamp(flex, -1.30f, 1.40f), devC = clamp(dev, -0.75f, 0.50f);
-        if (s == Side::Right) { lastFlex = flex; lastDev = dev; lastPron = pron; }
+        if (s == diagSide) { lastFlex = flex; lastDev = dev; lastPron = pron; }
         if (flexC != flex || devC != dev) {
             vec3 nd = normalize(vec3(std::tan(flexC) * ps, -1.0f, std::tan(devC)));
             if (-fd.y < 0.05f) nd = normalize(vec3(fd.x, std::max(-fd.y, 0.2f) * -1.0f, fd.z));
             hl = normalize(fromTo(fd, nd) * hl);
-            if (s == Side::Right) wristClamp = std::max(wristClamp, std::fabs(flex - flexC) + std::fabs(dev - devC));
+            if (s == diagSide) wristClamp = std::max(wristClamp, std::fabs(flex - flexC) + std::fabs(dev - devC));
         }
         p.local[hand] = hl;
         G[hand] = G[fore] * localMat(p, hand);
@@ -901,7 +951,7 @@ struct Animator::Impl {
         return gi;
     }
     mat4 pieceWorld(int id) const {
-        if (id >= 0 && owner && owner->pieceTransform) return owner->pieceTransform(id);
+        if (id >= 0 && owner && owner->pieceTransform) return mm(owner->pieceTransform(id));
         return mat4();
     }
     // Pieces this animator put down during the current update() call: the game only learns
@@ -962,7 +1012,7 @@ struct Animator::Impl {
         sceneKnown = false;
         if (!owner || !owner->pieceTransform || owner->obstacleTopNear || owner->pathObstacleTop) return;
         for (int id = 0, misses = 0; id < kMaxPieceIds && misses < 16; ++id) {
-            vec3 b = owner->pieceTransform(id).translation();
+            vec3 b = mw(owner->pieceTransform(id).translation());
             if (!(b.y > layout::TABLE_TOP_Y - 0.10f)) {   // no such piece (identity), or out of the game
                 ++misses;
                 continue;
@@ -974,7 +1024,7 @@ struct Animator::Impl {
         }
     }
     float obstacleTop(vec3 fromW, vec3 toW) const {
-        if (owner && owner->pathObstacleTop) return std::max(owner->pathObstacleTop(fromW, toW), freshTop(fromW, toW, 0.028f, -1));
+        if (owner && owner->pathObstacleTop) return std::max(owner->pathObstacleTop(mw(fromW), mw(toW)), freshTop(fromW, toW, 0.028f, -1));
         if (sceneKnown) return std::max(layout::BOARD_TOP_Y, freshTop(fromW, toW, 0.028f, -1));
         // No knowledge of the pieces: assume a king anywhere on the board (plus a margin).
         const float hb = layout::BOARD_SIZE * 0.5f + 0.03f;
@@ -1017,8 +1067,8 @@ struct Animator::Impl {
     bool knowsAnyPiece() const { return knowsPieces() || !tableLeft.empty() || !pending.empty(); }
     float topNear(vec3 pW, float radius, int ignoreId) const {
         float fr = freshTop(pW, pW, radius, ignoreId);
-        if (owner && owner->obstacleTopNear) return std::max(owner->obstacleTopNear(pW, radius, ignoreId), fr);
-        if (owner && owner->pathObstacleTop) return std::max(owner->pathObstacleTop(pW, pW), fr);
+        if (owner && owner->obstacleTopNear) return std::max(owner->obstacleTopNear(mw(pW), radius, ignoreId), fr);
+        if (owner && owner->pathObstacleTop) return std::max(owner->pathObstacleTop(mw(pW), mw(pW)), fr);
         return std::max(layout::BOARD_TOP_Y, fr);
     }
     // Natural azimuth of the fingers for a pinch at g: turned inwards, the thumb near-left of the piece.
@@ -1225,6 +1275,8 @@ struct Animator::Impl {
         sg.rot.add(1.0f, q1);
         sg.fing.add(0.0f, from.f);
         sg.fing.add(1.0f, f1);
+        sg.pen.add(0.0f, from.pen);   // a held pen stays where it is in the fingers
+        sg.pen.add(1.0f, from.pen);
         sg.elbow0 = from.elbow;
         sg.elbow1 = 0.0f;
         return sg;
@@ -1256,6 +1308,108 @@ struct Animator::Impl {
     HandSample chinTarget(Side s) const;
     HandSample handTarget(const Hand& h, float t) const;
     void bakeFollow(Hand& h);
+
+    // ==========================================================================================
+    // Left-handed play (animator_writing.cpp). The solver's world is the real one mirrored about
+    // X = 0 (S = diag(-1, 1, 1)): the playing hand is the solver's right hand, the writing hand its
+    // left one. Inputs are mirrored when they enter (task positions, callbacks, rests, gaze, head
+    // yaw), outputs when they leave (bone matrices with left/right swapped, events, held pieces,
+    // the pen). Identity when the player plays with the right hand.
+    // ==========================================================================================
+    bool mirrored = false;
+    vec3 mw(vec3 v) const { return mirrored ? vec3(-v.x, v.y, v.z) : v; }   // real <-> solver world
+    mat4 mm(const mat4& m) const;                                            // S m S
+    vec3 partnerPoint(vec3 partnerSolverWorld) const;                        // partner's solver world -> ours
+    void exportPose(const Pose& in, const mat4* worldIn, Pose& out, mat4* worldOut) const;
+    void exportEvents(std::vector<Event>& ev, size_t from) const;
+    Pose poseI;                    // last evaluated pose / world bone matrices (solver world)
+    mat4 worldI[BoneCount];
+    // Hand that shakes hands: always the real right hand (the solver's left one when mirrored).
+    Hand& shakeHand() { return mirrored ? left() : right(); }
+    Side shakeSide() const { return mirrored ? Side::Left : Side::Right; }
+    // Side-aware arm strain (armStrain() is the playing hand's).
+    float armStrainSide(Side s, vec3 wristC, quat q);
+    Side diagSide = Side::Right;   // arm whose solve updates the diagnostics (reachShort, clamps...)
+
+    // ==========================================================================================
+    // Writing hand (animator_writing.cpp): hands[0] in the solver, with its own task queue.
+    // ==========================================================================================
+    struct PenGrip {
+        // Everything in the hand-bone frame of the solver's LEFT hand.
+        PenPose tripod;             // writing grip (dynamic tripod), fingers at rest extension
+        vec3 axis{0, 1, 0};         // pen axis (tip -> back end) in the hand frame
+        vec3 heel{0, 0, 0};         // ulnar heel of the palm (support on the paper)
+        static constexpr int kSupports = 9;
+        vec3 support[kSupports];    // hand points that may rest on the paper (heel, curled ring/little
+        float supportR[kSupports];  // finger), with their radii
+        FingerPose fingers[3];      // tripod at extension -kExt, 0, +kExt (pen pushed out along -axis)
+        float ext = 0.005f;         // kExt (m)
+        PenPose tucked;             // pen tucked by middle/ring/pinky (page turn)
+        FingerPose tuckOpen, tuckPinch;   // thumb/index open / pinching a page, pen tucked
+        vec3 pagePinch{0, 0, 0};    // point between the thumb and index pads (page corner)
+        vec3 pageAxis{0, 0, 1};     // thumb pad -> index pad
+        float gripDist = 0.03f;     // tip -> index contact along the pen (where it is pinched on the table)
+        float err = 0.0f;           // worst pad miss of the finger solves (diagnostics)
+    } grip;
+    FingerPose tripodFingers(float ext) const;   // tripod with the pen pushed out by ext along -axis
+    // Pen lying on the table at a frame (character space), pinched from above.
+    struct TablePinch {
+        quat R;                     // hand rotation
+        vec3 wrist{0, 0, 0};
+        FingerPose closed, open;
+        PenPose pen;                // pen in the hand at that grip
+    };
+    TablePinch tablePinch(const mat4& frameC, float aperture);
+    // One segment laying the held pen on the table at frameC (character space), pinched at the end.
+    void penPutSegments(const mat4& frameC, const HandSample& from, float T, Motion& mo, FingerPose* openOut);
+    struct Writing {
+        std::deque<WriteTask> queue;
+        bool running = false;
+        WriteTask cur;              // running task (solver world)
+        float start = 0, T = 0;
+        std::vector<TimedEvent> events;
+        float pathStart = -1.0f, pathEnd = -1.0f;   // running path phase (absolute times)
+        float turnStart = -1.0f, turnT = 0.0f;      // running page turn
+        std::vector<PenKey> path;   // running path, character space
+        bool penHeld = false;
+        mat4 penTable;              // where the pen lies (solver world): initial / last pick / put frame
+        bool hasPenTable = false;
+        vec3 rest{0, 0, 0};         // writing rest point on the paper (character space)
+        float restYaw = 0.3f;       // pen azimuth there (see choosePenYaw)
+        float suspendUntil = -1.0f; // the writing hand is busy shaking hands (left-handed player)
+        bool follow = false;        // the hand followed a path (tip lock) at the last evaluate
+        std::function<vec3(float s)> corner;   // running page turn: corner (solver world)
+        float lean = 0.0f;          // 0..1: the body leans towards the sheet while writing
+        float look = 0.0f;          // 0..1: the eyes follow the pen
+    } wr;
+    enum WAction { WActNone, WActPick, WActPut, WActGripPage, WActTurned, WActDone, WActDown, WActUp };
+    void initWriting();
+    void solveGrip();               // fills 'grip' for the skeleton
+    bool writingHandFree() const;   // no writing task, no pen, no handshake: idle behaviours allowed
+    bool nextWriteBoundary(float& t) const;
+    void stepWriting(std::vector<Event>& ev);   // starts or finishes the writing task at 'time'
+    void startWriteTask(const WriteTask& t, std::vector<Event>& ev);
+    void finishWriteTask(std::vector<Event>& ev);
+    void fireWriteDue(float upTo, std::vector<Event>& ev);
+    void interruptWriting(std::vector<Event>& ev);   // the handshake takes the writing hand
+    void planPickPen(const WriteTask& t, float start, float T);
+    void planPutPen(const WriteTask& t, float start, float T);
+    void planWrite(const WriteTask& t, float start, float T);
+    void planTurnPage(const WriteTask& t, float start, float T);
+    // Pen-hand pose with the heel resting near the anchor (character space) and the tip at 'tip'
+    // (fingers, wrist yaw/pitch about the heel and a small slide share the offset).
+    HandSample penHandPose(vec3 anchor, vec3 tip, float yawIn) const;
+    quat penBase(vec3 anchor, float yawIn) const;
+    float choosePenYaw(vec3 anchor);
+    HandSample writingRestSample() const;
+    float paperY = 0.0f;            // last paper height seen (character space)
+    PenPose evalPen;                // pen in the writing hand at the last evaluate() (tip lock applied)
+    mat4 toCharM(const mat4& worldSolver) const { return toMat4(qToChar(rotOf(worldSolver)), toChar(worldSolver.translation())); }
+    // Handshake plan for the real right hand (the solver's left one when mirrored, which first lays
+    // the pen down if it holds it).
+    void planHandshake(const Task& t, float start, float T, HandSample from, Motion& mo);
+    bool shakeTookPut = false;      // the handshake took over a queued PutPen
+    void writingSpine(SpineParams& sp, const HandSample& hl);
 };
 
 }  // namespace anim
