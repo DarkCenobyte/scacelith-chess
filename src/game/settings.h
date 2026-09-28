@@ -1,6 +1,7 @@
 // Persistent player settings (Scacelith.ini). Shared by the menus (ui/), the game and main.cpp.
 #pragma once
 #include "../render/renderer.h"
+#include "../ui/ui_font.h"
 #include <string>
 
 namespace game {
@@ -44,6 +45,16 @@ struct Settings {
     int engineThreads = 1;
     int engineHashMB = 64;
     bool humanizeThinking = true; // spend realistic time before moving
+    // [interface]
+    std::string language;         // i18n code ("fr", "zh-Hant"...); "" = the OS language (first start)
+    // [player] (written on the scoresheets)
+    std::string playerName = "Human";
+    ui::font::HandStyle handStyle = ui::font::HAND_CAVEAT;  // Latin/Cyrillic handwriting
+
+    // Selects the UI language (i18n::setLanguage): "--lang <code>" on the command line for this
+    // session, else 'language', else the OS language when supported, else English. load() calls
+    // it; an empty 'language' receives the language chosen from the OS.
+    void applyLanguage();
 
     render::RenderSettings renderSettings() const;
     bool load(const std::string& path);  // missing file = defaults

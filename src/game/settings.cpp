@@ -1,6 +1,7 @@
 #include "settings.h"
 #include "../core/ini.h"
 #include "../core/log.h"
+#include "../i18n/i18n.h"
 #include "../platform/platform.h"
 #include <algorithm>
 #include <cstdio>
@@ -26,6 +27,7 @@ bool Settings::load(const std::string& p) {
     IniFile ini;
     if (!ini.load(p)) {
         LOGI("no settings file at %s, using defaults", p.c_str());
+        applyLanguage();
         return false;
     }
     displayWidth = ini.getInt("display.width", displayWidth);
@@ -60,7 +62,25 @@ bool Settings::load(const std::string& p) {
     engineThreads = ini.getInt("engine.threads", engineThreads);
     engineHashMB = ini.getInt("engine.hash_mb", engineHashMB);
     humanizeThinking = ini.getBool("engine.humanize", humanizeThinking);
+    language = ini.getString("interface.language", language);
+    playerName = ini.getString("player.name", playerName);
+    if (playerName.empty()) playerName = "Human";
+    handStyle = ui::font::HandStyle(std::clamp(ini.getInt("player.hand_style", int(handStyle)), 0, int(ui::font::HAND_STYLE_COUNT) - 1));
+    applyLanguage();
     return true;
+}
+
+void Settings::applyLanguage() {
+    if (language.empty() || i18n::languageIndex(language) < 0) {
+        std::string os = plat::systemLanguage();
+        language = i18n::matchLocale(os);
+        LOGI("language: %s from the system locale '%s'", language.c_str(), os.c_str());
+    }
+    std::string code = language;
+    const std::vector<std::string> args = plat::commandLine();
+    for (size_t i = 0; i + 1 < args.size(); ++i)
+        if (args[i] == "--lang") code = i18n::matchLocale(args[i + 1]);
+    i18n::setLanguage(code);
 }
 
 bool Settings::save() const {
@@ -97,6 +117,9 @@ bool Settings::save() const {
     ini.setInt("engine.threads", engineThreads);
     ini.setInt("engine.hash_mb", engineHashMB);
     ini.setBool("engine.humanize", humanizeThinking);
+    ini.set("interface.language", language);
+    ini.set("player.name", playerName);
+    ini.setInt("player.hand_style", int(handStyle));
     if (!path.empty() && ini.save(path)) return true;
     std::string alt = plat::userDataDirectory() + "Scacelith.ini";
     if (ini.save(alt)) return true;

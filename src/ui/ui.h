@@ -52,8 +52,15 @@ struct DifficultyInfo {
     std::string description;  // one line
     int elo = 0;              // shown as "~1500 Elo"; 0 = not shown
 };
-// Mirrors ai::presets(): the last entry is "Custom" (it opens the engine parameters).
+// Mirrors ai::presets(): the last entry is "Custom" (it opens the engine parameters). Pass the
+// English names and descriptions: the screens show them translated (presetName below).
 void setDifficultyList(const std::vector<DifficultyInfo>& list);
+// Translations of an ai::presets() entry, looked up by its English name ("Club Player" ->
+// preset.club_player.name / .desc in assets/i18n); unknown names are returned unchanged.
+std::string presetName(const std::string& englishName);
+std::string presetDescription(const std::string& englishName, const std::string& englishDescription);
+// A chess::TimeControl::label() for display ("Unlimited" translated, "3+2" unchanged).
+std::string timeControlLabel(const std::string& label);
 // Labels of chess::timeControlPresets() ("Unlimited", "1+0", "3+2", ...). The UI appends "Custom".
 void setTimeControlList(const std::vector<std::string>& labels);
 // Window sizes offered for windowed mode (defaults: common 16:9 sizes up to 3840x2160).

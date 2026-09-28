@@ -1,8 +1,11 @@
 #include "ui_widgets.h"
 #include "ui_theme.h"
+#include "../i18n/i18n.h"
+#include "../i18n/unicode.h"
 #include "../platform/platform.h"
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 #include <unordered_map>
 
 namespace ui {
@@ -59,6 +62,12 @@ struct Ctx {
     std::string helpText;
     const plat::Input* inputOverride = nullptr;
     float wheel = 0.0f;
+    // Text field being edited (textField): it owns the keyboard until the edit ends.
+    Id editId = 0;
+    int caret = 0;                 // logical character index
+    float caretTime = 0.0f;        // blink phase
+    std::string editOriginal;      // restored by Esc
+    bool editSeen = false;         // the edited field was drawn this frame
 };
 Ctx c;
 
@@ -131,7 +140,8 @@ void beginFrame(float dt) {
     c.kDown = in.keyPressed[plat::KEY_DOWN];
     c.kLeft = in.keyPressed[plat::KEY_LEFT];
     c.kRight = in.keyPressed[plat::KEY_RIGHT];
-    c.kActivate = in.keyPressed[plat::KEY_ENTER] || in.keyPressed[plat::KEY_SPACE];
+    // While a text field is edited Space types a space instead of activating.
+    c.kActivate = in.keyPressed[plat::KEY_ENTER] || (in.keyPressed[plat::KEY_SPACE] && !c.editId);
     c.kBack = in.keyPressed[plat::KEY_ESCAPE];
     c.kPgUp = in.keyPressed[plat::KEY_PAGEUP];
     c.kPgDn = in.keyPressed[plat::KEY_PAGEDOWN];
@@ -168,6 +178,8 @@ void endFrame() {
     c.curList.clear();
     if (c.defaultFocus && !findEntry(c.prevList, c.focus) && findEntry(c.prevList, c.defaultFocus)) c.focus = c.defaultFocus;
     c.defaultFocus = 0;
+    if (c.editId && !c.editSeen) c.editId = 0;  // the field left the screen
+    c.editSeen = false;
     c.hoveredPrev = c.hoveredNow;
     c.hoveredNow = 0;
     if (!c.mDown) c.active = 0;
@@ -230,8 +242,16 @@ void setMouseOverride(bool on, vec2 pos) {
 }
 
 // ---- Ids ------------------------------------------------------------------------------------------
-Id makeId(const char* s) { return fnv(s, std::char_traits<char>::length(s), seed()); }
-Id makeId(const std::string& s) { return fnv(s.data(), s.size(), seed()); }
+Id makeId(const char* s) {
+    const char* key = std::strstr(s, "##");
+    if (key) s = key + 2;
+    return fnv(s, std::char_traits<char>::length(s), seed());
+}
+Id makeId(const std::string& s) { return makeId(s.c_str()); }
+std::string displayText(const std::string& label) {
+    size_t p = label.find("##");
+    return p == std::string::npos ? label : label.substr(0, p);
+}
 Id makeId(int i) { return fnv(&i, sizeof(i), seed() ^ 0x9E3779B9u); }
 void pushId(const char* s) { c.idStack.push_back(makeId(s)); }
 void pushId(int i) { c.idStack.push_back(makeId(i)); }
@@ -275,7 +295,7 @@ Item item(Id id, const Rect& r, uint32_t flags) {
         it.hovered = c.mouseInWindow && r.contains(c.mouse) && gfx::clipContains(c.mouse);
         if (it.hovered) {
             c.hoveredNow = id;
-            if (focusable && c.mouseMoved) c.focus = id;
+            if (focusable && c.mouseMoved && !c.editId) c.focus = id;  // an edit keeps the focus
             if (c.hoveredPrev != id && c.mouseMoved && !(flags & ITEM_SILENT)) sound(Sound::Hover);
             if (c.mPressed) {
                 c.active = id;
@@ -313,6 +333,13 @@ Item item(Id id, const Rect& r, uint32_t flags) {
     c.last.highlightTime = a.v[2];
     return it;
 }
+
+// ---- Reading direction ----------------------------------------------------------------------------
+bool rtl() { return i18n::rtl(); }
+HAlign startAlign() { return rtl() ? HAlign::Right : HAlign::Left; }
+HAlign endAlign() { return rtl() ? HAlign::Left : HAlign::Right; }
+float flipX(const Rect& area, float x) { return rtl() ? area.x + area.r() - x : x; }
+Rect flip(const Rect& area, const Rect& r) { return rtl() ? Rect(area.x + area.r() - r.r(), r.y, r.w, r.h) : r; }
 
 // ---- Decorations ----------------------------------------------------------------------------------
 void panel(const Rect& r, float al) {
@@ -358,16 +385,24 @@ void sectionLabel(const std::string& text, float x, float y, float width) {
     st.size = kSection;
     st.color = gold;
     st.tracking = 0.2f;
-    float w = gfx::text(text, x, y, st);
+    st.align = startAlign();
+    st.size = gfx::fitSize(text, st, width - 30.0f);
+    Rect area(x, y, width, 0.0f);
+    float w = gfx::text(text, flipX(area, x), y, st);
     float lx = x + w + 16.0f;
-    if (x + width > lx + 10.0f) gfx::fillH(Rect(lx, gfx::snap(y - gfx::capHeight(st) * 0.5f), x + width - lx, gfx::px()),
-                                           withAlpha(gold, 0.35f), withAlpha(gold, 0.0f));
+    if (x + width > lx + 10.0f) {
+        Rect line = flip(area, Rect(lx, gfx::snap(y - gfx::capHeight(st) * 0.5f), x + width - lx, gfx::px()));
+        if (rtl()) gfx::fillH(line, withAlpha(gold, 0.0f), withAlpha(gold, 0.35f));
+        else gfx::fillH(line, withAlpha(gold, 0.35f), withAlpha(gold, 0.0f));
+    }
 }
 
 void rowHighlight(const Rect& r, float t) {
     if (t < 0.002f) return;
-    gfx::fillH(r, withAlpha(gold, 0.10f * t), withAlpha(gold, 0.015f * t), 2.0f);
-    gfx::fill(Rect(r.x, r.y + 6.0f, std::max(2.0f, 2.0f * gfx::px()), r.h - 12.0f), withAlpha(goldBright, 0.9f * t));
+    // Brightest at the start of the reading direction, with the gold bar on that side.
+    if (rtl()) gfx::fillH(r, withAlpha(gold, 0.015f * t), withAlpha(gold, 0.10f * t), 2.0f);
+    else gfx::fillH(r, withAlpha(gold, 0.10f * t), withAlpha(gold, 0.015f * t), 2.0f);
+    gfx::fill(flip(r, Rect(r.x, r.y + 6.0f, std::max(2.0f, 2.0f * gfx::px()), r.h - 12.0f)), withAlpha(goldBright, 0.9f * t));
 }
 
 // ---- Widgets --------------------------------------------------------------------------------------
@@ -387,10 +422,22 @@ TextStyle valueStyle(bool enabled, float hover) {
     return st;
 }
 float centerBaseline(const Rect& r, const TextStyle& st) { return r.cy() + gfx::capHeight(st) * 0.5f; }
+
+// Label of a form row on the start side, shrunk (down to 70 %) to leave 'reserved' units free for
+// the control at the end of the row (long German and Russian labels).
+void rowLabel(const std::string& label, const Rect& r, float reserved, bool enabled) {
+    TextStyle ls = labelStyle(enabled);
+    std::string shown = displayText(label);
+    ls.size = gfx::fitSize(shown, ls, std::max(40.0f, r.w - 44.0f - reserved));
+    ls.align = startAlign();
+    gfx::text(shown, flipX(r, r.x + 22.0f), centerBaseline(r, ls), ls);
+}
 }  // namespace
 
 bool menuEntry(const std::string& label, const Rect& r, bool enabled, HAlign align) {
     Item it = item(makeId(label), r, enabled ? ITEM_FOCUSABLE : ITEM_DISABLED);
+    const std::string shown = displayText(label);
+    if (align == HAlign::Left && rtl()) align = HAlign::Right;
     float t = it.hoverT;
     TextStyle st;
     st.face = font::FACE_TITLE;
@@ -398,27 +445,35 @@ bool menuEntry(const std::string& label, const Rect& r, bool enabled, HAlign ali
     st.tracking = kTrackTitle;
     st.align = align;
     st.color = enabled ? theme::mix(ivoryDim, goldBright, t) : withAlpha(faint, 0.75f);
-    float w = gfx::textWidth(label, st);
+    st.size = gfx::fitSize(shown, st, r.w - (align == HAlign::Center ? 90.0f : 10.0f));
+    float w = gfx::textWidth(shown, st);
     float base = centerBaseline(r, st) + it.pressT * 1.5f;
     float x = align == HAlign::Left ? r.x : align == HAlign::Center ? r.cx() : r.r();
     float x0 = align == HAlign::Left ? x : align == HAlign::Center ? x - w * 0.5f : x - w;
     if (t > 0.002f) {
-        // Soft glow behind the word and a gold rule drawn out from the left.
+        // Soft glow behind the word and a gold rule drawn out from the start of the line.
         TextStyle glow = st;
         glow.color = withAlpha(gold, 0.22f * t);
         glow.softness = 7.0f;
         glow.weight = 2.0f;
-        gfx::text(label, x, base, glow);
+        gfx::text(shown, x, base, glow);
         float ruleY = base + 12.0f;
-        gfx::fillH(Rect(x0, gfx::snap(ruleY), w * (0.35f + 0.65f * t), gfx::px()), withAlpha(gold, 0.85f * t), withAlpha(gold, 0.0f));
+        float ruleW = w * (0.35f + 0.65f * t);
+        if (align == HAlign::Right)
+            gfx::fillH(Rect(x0 + w - ruleW, gfx::snap(ruleY), ruleW, gfx::px()), withAlpha(gold, 0.0f), withAlpha(gold, 0.85f * t));
+        else
+            gfx::fillH(Rect(x0, gfx::snap(ruleY), ruleW, gfx::px()), withAlpha(gold, 0.85f * t), withAlpha(gold, 0.0f));
+        float dy = base - gfx::capHeight(st) * 0.5f;
         if (align == HAlign::Center) {
-            gfx::diamond(vec2(x0 - 26.0f, base - gfx::capHeight(st) * 0.5f), 4.5f * t, withAlpha(goldBright, t));
-            gfx::diamond(vec2(x0 + w + 26.0f, base - gfx::capHeight(st) * 0.5f), 4.5f * t, withAlpha(goldBright, t));
+            gfx::diamond(vec2(x0 - 26.0f, dy), 4.5f * t, withAlpha(goldBright, t));
+            gfx::diamond(vec2(x0 + w + 26.0f, dy), 4.5f * t, withAlpha(goldBright, t));
+        } else if (align == HAlign::Right) {
+            gfx::diamond(vec2(x0 + w + 24.0f + 6.0f * (1.0f - t), dy), 4.5f, withAlpha(goldBright, t));
         } else {
-            gfx::diamond(vec2(x0 - 24.0f - 6.0f * (1.0f - t), base - gfx::capHeight(st) * 0.5f), 4.5f, withAlpha(goldBright, t));
+            gfx::diamond(vec2(x0 - 24.0f - 6.0f * (1.0f - t), dy), 4.5f, withAlpha(goldBright, t));
         }
     }
-    gfx::text(label, x, base, st);
+    gfx::text(shown, x, base, st);
     if (it.activated) sound(Sound::Click);
     return it.activated;
 }
@@ -426,6 +481,7 @@ bool menuEntry(const std::string& label, const Rect& r, bool enabled, HAlign ali
 bool button(const std::string& label, const Rect& r, ButtonKind kind, bool enabled, uint32_t extraFlags) {
     uint32_t flags = (extraFlags & ITEM_MOUSE_ONLY) ? 0u : ITEM_FOCUSABLE;
     Item it = item(makeId(label), r, (enabled ? flags : ITEM_DISABLED) | extraFlags);
+    const std::string shown = displayText(label);
     float t = it.hoverT, p = it.pressT;
     gfx::pushAlpha(enabled ? 1.0f : 0.4f);
     TextStyle st;
@@ -453,11 +509,13 @@ bool button(const std::string& label, const Rect& r, ButtonKind kind, bool enabl
         st.size = kSmall;
         st.tracking = 0.0f;
         st.color = theme::mix(muted, goldBright, t);
-        float w = gfx::textWidth(label, st);
+        st.size = gfx::fitSize(shown, st, r.w - 12.0f, 0.75f);
+        float w = gfx::textWidth(shown, st);
         float base = centerBaseline(r, st);
         gfx::fillH(Rect(r.cx() - w * 0.5f, gfx::snap(base + 5.0f), w, gfx::px()), withAlpha(gold, 0.6f * t), withAlpha(gold, 0.1f * t));
     }
-    gfx::text(label, r.cx(), centerBaseline(r, st) + p, st);
+    if (kind != ButtonKind::Quiet) st.size = gfx::fitSize(shown, st, r.w - 28.0f, 0.62f);
+    gfx::text(shown, r.cx(), centerBaseline(r, st) + p, st);
     gfx::popAlpha();
     if (it.activated) sound(Sound::Click);
     return it.activated;
@@ -476,22 +534,23 @@ bool toggleRow(const std::string& label, bool& value, const Rect& r, bool enable
     a.v[3] = approach(a.v[3], value ? 1.0f : 0.0f, 18.0f);
     float k = a.v[3];
     rowHighlight(r, it.hoverT);
-    TextStyle ls = labelStyle(enabled);
-    gfx::text(label, r.x + 22.0f, centerBaseline(r, ls), ls);
-    gfx::pushAlpha(enabled ? 1.0f : 0.4f);
-    float pw = 54.0f, ph = 26.0f;
-    Rect pill(r.r() - 22.0f - pw, r.cy() - ph * 0.5f, pw, ph);
-    gfx::fill(pill, theme::mix(vec4(0, 0, 0, 0.45f), vec4(0.42f, 0.32f, 0.16f, 0.95f), k), ph * 0.5f);
-    gfx::stroke(pill, withAlpha(gold, 0.35f + 0.35f * std::max(k, it.hoverT)), 0.0f, ph * 0.5f);
-    float kx = pill.x + ph * 0.5f + k * (pw - ph);
-    gfx::shadow(Rect(kx - 9.0f, pill.cy() - 8.0f, 18.0f, 18.0f), 9.0f, 4.0f, withAlpha(black, 0.5f));
-    gfx::circle(vec2(kx, pill.cy()), 9.0f, theme::mix(ivoryDim, goldBright, k));
     TextStyle vs;
     vs.face = font::FACE_ITALIC;
     vs.size = kSmall;
-    vs.align = HAlign::Right;
+    vs.align = endAlign();
     vs.color = theme::mix(muted, ivoryDim, k);
-    gfx::text(value ? "On" : "Off", pill.x - 16.0f, centerBaseline(r, vs), vs);
+    const std::string on = i18n::tr("common.on"), off = i18n::tr("common.off");
+    float pw = 54.0f, ph = 26.0f;
+    rowLabel(label, r, pw + 16.0f + std::max(gfx::textWidth(on, vs), gfx::textWidth(off, vs)) + 24.0f, enabled);
+    gfx::pushAlpha(enabled ? 1.0f : 0.4f);
+    float pillX = r.r() - 22.0f - pw;
+    Rect pill = flip(r, Rect(pillX, r.cy() - ph * 0.5f, pw, ph));
+    gfx::fill(pill, theme::mix(vec4(0, 0, 0, 0.45f), vec4(0.42f, 0.32f, 0.16f, 0.95f), k), ph * 0.5f);
+    gfx::stroke(pill, withAlpha(gold, 0.35f + 0.35f * std::max(k, it.hoverT)), 0.0f, ph * 0.5f);
+    float kx = flipX(r, pillX + ph * 0.5f + k * (pw - ph));
+    gfx::shadow(Rect(kx - 9.0f, pill.cy() - 8.0f, 18.0f, 18.0f), 9.0f, 4.0f, withAlpha(black, 0.5f));
+    gfx::circle(vec2(kx, pill.cy()), 9.0f, theme::mix(ivoryDim, goldBright, k));
+    gfx::text(value ? on : off, flipX(r, pillX - 16.0f), centerBaseline(r, vs), vs);
     gfx::popAlpha();
     return changed;
 }
@@ -502,42 +561,49 @@ bool sliderRow(const std::string& label, float& value, float lo, float hi, float
     Anim& a = anim(it.id);
     float old = value;
     float valueW = 120.0f;
+    // Geometry in left-to-right terms, mirrored when drawn in a right-to-left UI (the low end of
+    // the track is then on the right).
     float tx0 = r.x + r.w * 0.47f, tx1 = r.r() - 22.0f - valueW - 18.0f;
-    Rect track(tx0 - 10.0f, r.y, tx1 - tx0 + 20.0f, r.h);
+    Rect track = flip(r, Rect(tx0 - 10.0f, r.y, tx1 - tx0 + 20.0f, r.h));
     if (it.pressed && track.contains(mouse())) a.v[3] = 1.0f;
     if (!it.held) a.v[3] = 0.0f;
     if (a.v[3] > 0.5f && enabled) {
-        float t = m::saturate((mouse().x - tx0) / std::max(1.0f, tx1 - tx0));
+        float t = m::saturate((flipX(r, mouse().x) - tx0) / std::max(1.0f, tx1 - tx0));
         value = lo + t * (hi - lo);
         if (step > 0.0f) value = lo + std::round((value - lo) / step) * step;
     }
     float kstep = step > 0.0f ? step : (hi - lo) / 20.0f;
-    if (it.left) value -= kstep;
-    if (it.right) value += kstep;
+    float dir = rtl() ? -1.0f : 1.0f;  // the arrow keys move the knob the way they point
+    if (it.left) value -= dir * kstep;
+    if (it.right) value += dir * kstep;
     value = m::clamp(value, lo, hi);
     bool changed = std::fabs(value - old) > 1e-6f;
     if (changed) sound(Sound::Tick);
 
     rowHighlight(r, it.hoverT);
-    TextStyle ls = labelStyle(enabled);
-    gfx::text(label, r.x + 22.0f, centerBaseline(r, ls), ls);
+    rowLabel(label, r, r.r() - tx0 + 10.0f, enabled);
     gfx::pushAlpha(enabled ? 1.0f : 0.4f);
     float t = hi > lo ? (value - lo) / (hi - lo) : 0.0f;
     float y = r.cy();
-    float kx = tx0 + t * (tx1 - tx0);
+    float kxl = tx0 + t * (tx1 - tx0);
+    float kx = flipX(r, kxl);
     float px = gfx::px();
-    gfx::fill(Rect(tx0, gfx::snap(y) - px, tx1 - tx0, 2.0f * px), withAlpha(gold, 0.22f));
-    gfx::fillH(Rect(tx0, gfx::snap(y) - px, kx - tx0, 2.0f * px), withAlpha(goldDeep, 0.9f), withAlpha(goldBright, 0.95f));
+    gfx::fill(flip(r, Rect(tx0, gfx::snap(y) - px, tx1 - tx0, 2.0f * px)), withAlpha(gold, 0.22f));
+    Rect done = flip(r, Rect(tx0, gfx::snap(y) - px, kxl - tx0, 2.0f * px));
+    if (rtl()) gfx::fillH(done, withAlpha(goldBright, 0.95f), withAlpha(goldDeep, 0.9f));
+    else gfx::fillH(done, withAlpha(goldDeep, 0.9f), withAlpha(goldBright, 0.95f));
     // Graduation ticks at both ends.
-    gfx::vline(tx0, y - 6.0f, y + 6.0f, withAlpha(gold, 0.45f));
-    gfx::vline(tx1, y - 6.0f, y + 6.0f, withAlpha(gold, 0.45f));
+    gfx::vline(flipX(r, tx0), y - 6.0f, y + 6.0f, withAlpha(gold, 0.45f));
+    gfx::vline(flipX(r, tx1), y - 6.0f, y + 6.0f, withAlpha(gold, 0.45f));
     float kr = 8.0f + 1.5f * it.hoverT + 1.5f * it.pressT;
     gfx::shadow(Rect(kx - 6, y - 4, 12, 12), 6, 8, withAlpha(black, 0.6f));
     gfx::diamond(vec2(kx, y), kr, theme::mix(gold, goldBright, it.hoverT));
     gfx::diamond(vec2(kx, y), kr * 0.4f, withAlpha(velvetDeep, 0.9f));
     TextStyle vs = valueStyle(enabled, it.hoverT);
-    vs.align = HAlign::Right;
-    gfx::text(format ? format(value) : std::to_string(value), r.r() - 22.0f, centerBaseline(r, vs), vs);
+    vs.align = endAlign();
+    std::string vt = format ? format(value) : std::to_string(value);
+    vs.size = gfx::fitSize(vt, vs, valueW + 12.0f);
+    gfx::text(vt, flipX(r, r.r() - 22.0f), centerBaseline(r, vs), vs);
     gfx::popAlpha();
     return changed;
 }
@@ -562,7 +628,8 @@ bool stepperRow(const std::string& label, int& index, int count, const std::func
     float valueW = 170.0f;
     float plusX = r.r() - 22.0f - 15.0f;
     float minusX = plusX - 30.0f - valueW;
-    vec2 cm(minusX, r.cy()), cp(plusX, r.cy());
+    // Right-to-left: minus on the right, plus on the left.
+    vec2 cm(flipX(r, minusX), r.cy()), cp(flipX(r, plusX), r.cy());
     Rect rm(cm.x - 22, r.y, 44, r.h), rp(cp.x - 22, r.y, 44, r.h);
     if (it.pressed) {
         a.v[3] = rm.contains(mouse()) ? -1.0f : rp.contains(mouse()) ? 1.0f : 0.0f;
@@ -581,21 +648,23 @@ bool stepperRow(const std::string& label, int& index, int count, const std::func
         }
     }
     if (!it.held) a.v[3] = 0.0f;
-    if (it.left) index--;
-    if (it.right) index++;
+    int dir = rtl() ? -1 : 1;
+    if (it.left) index -= dir;
+    if (it.right) index += dir;
     index = std::clamp(index, 0, std::max(0, count - 1));
     bool changed = index != old;
     if (changed) sound(Sound::Tick);
 
     rowHighlight(r, it.hoverT);
-    TextStyle ls = labelStyle(enabled);
-    gfx::text(label, r.x + 22.0f, centerBaseline(r, ls), ls);
+    rowLabel(label, r, r.r() - minusX + 32.0f, enabled);
     bool hm = it.hovered && rm.contains(mouse()), hp = it.hovered && rp.contains(mouse());
     drawStepGlyph(cm, false, hm ? 1.0f : 0.0f, enabled && index > 0);
     drawStepGlyph(cp, true, hp ? 1.0f : 0.0f, enabled && index < count - 1);
     TextStyle vs = valueStyle(enabled, it.hoverT);
     vs.align = HAlign::Center;
-    gfx::text(format ? format(index) : std::to_string(index), (minusX + plusX) * 0.5f, centerBaseline(r, vs), vs);
+    std::string vt = format ? format(index) : std::to_string(index);
+    vs.size = gfx::fitSize(vt, vs, valueW - 6.0f);
+    gfx::text(vt, flipX(r, (minusX + plusX) * 0.5f), centerBaseline(r, vs), vs);
     return changed;
 }
 
@@ -605,38 +674,170 @@ bool selectorRow(const std::string& label, int& index, const std::vector<std::st
     int n = int(options.size());
     int old = index;
     float valueW = 250.0f;
-    float rx = r.r() - 22.0f;
-    float lx = rx - valueW;
-    Rect rl(lx - 8, r.y, 40, r.h), rr(rx - 32, r.y, 40, r.h);
+    Rect box = flip(r, Rect(r.r() - 22.0f - valueW, r.y, valueW, r.h));
+    Rect rl(box.x - 8, r.y, 40, r.h), rr(box.r() - 32, r.y, 40, r.h);
+    // The options run in the reading direction: in a right-to-left UI the left arrow goes forward.
+    int step = rtl() ? -1 : 1;
     if (it.clicked) {
-        if (rl.contains(mouse())) index--;
-        else if (rr.contains(mouse())) index++;
-        else if (mouse().x > lx) index = n > 0 ? (index + 1) % n : 0;
+        if (rl.contains(mouse())) index -= step;
+        else if (rr.contains(mouse())) index += step;
+        else if (box.contains(mouse())) index = n > 0 ? (index + 1) % n : 0;
     }
-    if (it.left) index--;
-    if (it.right) index++;
+    if (it.left) index -= step;
+    if (it.right) index += step;
     index = std::clamp(index, 0, std::max(0, n - 1));
     bool changed = index != old;
     if (changed) sound(Sound::Tick);
 
     rowHighlight(r, it.hoverT);
-    TextStyle ls = labelStyle(enabled);
-    gfx::text(label, r.x + 22.0f, centerBaseline(r, ls), ls);
+    rowLabel(label, r, valueW + 24.0f, enabled);
     TextStyle as;
     as.face = font::FACE_TEXT;
     as.size = 34.0f;
     as.align = HAlign::Center;
-    bool canL = enabled && index > 0, canR = enabled && index < n - 1;
+    as.dir = 0;
+    bool canPrev = enabled && index > 0, canNext = enabled && index < n - 1;
+    bool canL = step > 0 ? canPrev : canNext, canR = step > 0 ? canNext : canPrev;
     bool hl = it.hovered && rl.contains(mouse()), hr = it.hovered && rr.contains(mouse());
     float ab = centerBaseline(r, as) - 3.0f;
     as.color = canL ? theme::mix(gold, goldBright, hl ? 1.0f : 0.0f) : withAlpha(faint, 0.5f);
-    gfx::text("\xE2\x80\xB9", lx + 12.0f, ab, as);
+    gfx::text("\xE2\x80\xB9", box.x + 12.0f, ab, as);
     as.color = canR ? theme::mix(gold, goldBright, hr ? 1.0f : 0.0f) : withAlpha(faint, 0.5f);
-    gfx::text("\xE2\x80\xBA", rx - 12.0f, ab, as);
+    gfx::text("\xE2\x80\xBA", box.r() - 12.0f, ab, as);
     TextStyle vs = valueStyle(enabled, it.hoverT);
     vs.align = HAlign::Center;
-    if (index >= 0 && index < n) gfx::text(options[size_t(index)], (lx + rx) * 0.5f, centerBaseline(r, vs), vs);
+    if (index >= 0 && index < n) {
+        const std::string& v = options[size_t(index)];
+        vs.size = gfx::fitSize(v, vs, valueW - 62.0f, 0.6f);
+        gfx::text(v, box.cx(), centerBaseline(r, vs), vs);
+    }
     return changed;
+}
+
+bool editingText() { return c.editId != 0; }
+
+bool textField(const std::string& label, std::string& text, const Rect& r, int maxChars, const TextStyle* textStyle,
+               bool enabled) {
+    Id id = makeId(label);
+    Item it = item(id, r, enabled ? (ITEM_FOCUSABLE | ITEM_HORIZONTAL) : ITEM_DISABLED);
+    const plat::Input& in = input();
+    const std::string before = text;
+    float boxW = std::min(480.0f, r.w * 0.5f);
+    Rect box = flip(r, Rect(r.r() - 22.0f - boxW, r.y + 5.0f, boxW, r.h - 10.0f));
+    float innerW = box.w - 30.0f;
+
+    // Text layout: the text's own direction decides its alignment in the box (an Arabic name in
+    // a French UI is right-aligned); an empty field follows the UI.
+    auto styleFor = [&](const std::string& s) {
+        TextStyle ts = textStyle ? *textStyle : valueStyle(enabled, 0.0f);
+        if (!textStyle) ts.color = enabled ? ivory : withAlpha(muted, 0.8f);
+        ts.align = HAlign::Left;
+        ts.dir = s.empty() ? (rtl() ? 1 : 0) : gfx::textDirection(s, ts);
+        ts.size = gfx::fitSize(s, ts, innerW, 0.55f);
+        return ts;
+    };
+    auto originX = [&](const TextStyle& ts, const std::string& s) {
+        return ts.dir == 1 ? box.r() - 15.0f - gfx::textWidth(s, ts) : box.x + 15.0f;
+    };
+
+    bool editing = c.editId == id;
+    bool started = false;
+    if (!editing && enabled && it.activated) {
+        c.editId = id;
+        c.editOriginal = text;
+        c.caret = int(uni::decode(text).size());
+        c.caretTime = 0.0f;
+        editing = started = true;
+        sound(Sound::Toggle);
+    }
+    if (editing) {
+        c.editSeen = true;
+        c.caretTime += c.dt;
+    }
+    if (editing && !started) {
+        bool end = false;
+        if (!it.focused || (c.mPressed && !r.contains(mouse())) || in.keyPressed[plat::KEY_TAB]) end = true;
+        if (it.activated && !it.clicked) end = true;  // Enter
+        if (c.kBack && !c.backConsumed && c.blockDepth == 0) {  // Esc: restore, keep the page open
+            c.backConsumed = true;
+            text = c.editOriginal;
+            end = true;
+        }
+        if (!end) {
+            std::u32string u = uni::decode(text);
+            int n = int(u.size());
+            c.caret = std::clamp(c.caret, 0, n);
+            bool modified = false, moved = false;
+            // Left/Right move the caret the way they point: backwards in a right-to-left name.
+            int visual = styleFor(text).dir == 1 ? -1 : 1;
+            if (in.keyPressed[plat::KEY_LEFT]) { c.caret -= visual; moved = true; }
+            if (in.keyPressed[plat::KEY_RIGHT]) { c.caret += visual; moved = true; }
+            if (in.keyPressed[plat::KEY_HOME]) { c.caret = 0; moved = true; }
+            if (in.keyPressed[plat::KEY_END]) { c.caret = n; moved = true; }
+            c.caret = std::clamp(c.caret, 0, n);
+            if (in.keyPressed[plat::KEY_BACKSPACE] && c.caret > 0) {
+                u.erase(size_t(c.caret - 1), 1);
+                --c.caret;
+                modified = true;
+            }
+            if (in.keyPressed[plat::KEY_DELETE] && c.caret < int(u.size())) {
+                u.erase(size_t(c.caret), 1);
+                modified = true;
+            }
+            std::u32string typed;
+            bool ctrl = in.keyDown[plat::KEY_LCTRL] || in.keyDown[plat::KEY_RCTRL];
+            if (ctrl && in.keyPressed['V']) {
+                for (char32_t ch : uni::decode(plat::clipboardText())) {
+                    if (ch == '\n' || ch == '\r' || ch == '\t') ch = ' ';
+                    if (ch >= 32 && ch != 127 && !(ch >= 0x80 && ch < 0xA0)) typed += ch;
+                }
+            } else {
+                for (int i = 0; i < in.textCount; ++i)
+                    if (in.text[i] >= 32 && in.text[i] != 127) typed += char32_t(in.text[i]);
+            }
+            int room = maxChars - int(u.size());
+            if (!typed.empty() && room > 0) {
+                if (int(typed.size()) > room) typed.resize(size_t(room));
+                u.insert(size_t(c.caret), typed);
+                c.caret += int(typed.size());
+                modified = true;
+            }
+            if (modified) text = uni::encode(u);
+            if (modified || moved) {
+                c.caretTime = 0.0f;
+                sound(Sound::Tick);
+            }
+        }
+        if (end) {
+            c.editId = 0;
+            editing = false;
+            sound(Sound::Confirm);
+        }
+    }
+    // A click in the box places the caret (and starts the edit, above).
+    if (editing && it.clicked && box.contains(mouse())) {
+        TextStyle ts = styleFor(text);
+        c.caret = gfx::caretAt(text, ts, mouse().x - originX(ts, text));
+        c.caretTime = 0.0f;
+    }
+
+    rowHighlight(r, editing ? 1.0f : it.hoverT);
+    rowLabel(label, r, boxW + 24.0f, enabled);
+    gfx::pushAlpha(enabled ? 1.0f : 0.4f);
+    gfx::fill(box, vec4(0, 0, 0, editing ? 0.45f : 0.3f), 2.0f);
+    gfx::stroke(box, withAlpha(gold, editing ? 0.85f : 0.25f + 0.4f * it.hoverT), 0.0f, 2.0f);
+    TextStyle ts = styleFor(text);
+    float ox = originX(ts, text);
+    float base = centerBaseline(box, ts);
+    gfx::pushClip(box.inset(3.0f));
+    gfx::text(text, ox, base, ts);
+    if (editing && std::fmod(c.caretTime, 1.0f) < 0.62f) {
+        float cx = ox + gfx::caretOffset(text, ts, c.caret);
+        gfx::fill(Rect(gfx::snap(cx) - gfx::px(), box.y + 9.0f, std::max(2.0f * gfx::px(), 2.0f), box.h - 18.0f), goldBright);
+    }
+    gfx::popClip();
+    gfx::popAlpha();
+    return text != before;
 }
 
 bool tabBar(const std::vector<std::string>& tabs, int& current, const Rect& r) {
@@ -652,18 +853,28 @@ bool tabBar(const std::vector<std::string>& tabs, int& current, const Rect& r) {
     float gap = 54.0f, total = 0.0f;
     for (int i = 0; i < n; ++i) total += (widths[size_t(i)] = gfx::textWidth(tabs[size_t(i)], st));
     total += gap * float(std::max(0, n - 1));
+    if (total > r.w - 20.0f && total > 0.0f) {  // long names (German, Russian): tighten, then shrink
+        float k = (r.w - 20.0f) / total;
+        gap *= std::max(k, 0.5f);
+        st.size *= std::min(1.0f, std::max(0.7f, k));
+        total = 0.0f;
+        for (int i = 0; i < n; ++i) total += (widths[size_t(i)] = gfx::textWidth(tabs[size_t(i)], st));
+        total += gap * float(std::max(0, n - 1));
+    }
     float x = r.cx() - total * 0.5f;
     int hoverTab = -1;
     std::vector<Rect> rects;
     for (int i = 0; i < n; ++i) {
-        Rect tr(x - gap * 0.5f, r.y, widths[size_t(i)] + gap, r.h);
+        // Right-to-left: the first tab is on the right.
+        Rect tr = flip(r, Rect(x - gap * 0.5f, r.y, widths[size_t(i)] + gap, r.h));
         rects.push_back(tr);
         if (it.hovered && tr.contains(mouse())) hoverTab = i;
         x += widths[size_t(i)] + gap;
     }
+    int step = rtl() ? -1 : 1;
     if (it.clicked && hoverTab >= 0) current = hoverTab;
-    if (it.left) current--;
-    if (it.right) current++;
+    if (it.left) current -= step;
+    if (it.right) current += step;
     if (!blocked() && c.kPgUp) current--;
     if (!blocked() && c.kPgDn) current++;
     current = std::clamp(current, 0, std::max(0, n - 1));
@@ -718,20 +929,22 @@ void tooltip(const std::string& text) {
     st.face = font::FACE_ITALIC;
     st.size = kCaption + 1.0f;
     st.color = withAlpha(ivory, fade);
+    st.align = startAlign();
     float maxW = 440.0f;
     int lines = gfx::wrapLineCount(text, maxW, st);
     float lh = st.size * 1.3f;
-    float w = std::min(maxW, gfx::textWidth(text, st)) + 36.0f;
+    float w = std::min(maxW, gfx::wrapWidth(text, maxW, st)) + 36.0f;
     float h = float(lines) * lh + 24.0f;
     vec2 view = gfx::viewSize();
-    vec2 p = c.last.hovered ? mouse() + vec2(18.0f, 26.0f) : vec2(c.last.r.r() - w, c.last.r.b() + 6.0f);
+    vec2 p = c.last.hovered ? mouse() + vec2(rtl() ? -18.0f - w : 18.0f, 26.0f)
+                            : vec2(rtl() ? c.last.r.x : c.last.r.r() - w, c.last.r.b() + 6.0f);
     p.x = m::clamp(p.x, 8.0f, view.x - w - 8.0f);
     if (p.y + h > view.y - 8.0f) p.y = (c.last.hovered ? mouse().y : c.last.r.y) - h - 10.0f;
     Rect r(p.x, p.y, w, h);
     gfx::shadow(r.offset(0, 6), 3, 24, withAlpha(black, 0.6f * fade));
     gfx::fillV(r, vec4(0.08f, 0.07f, 0.06f, 0.96f * fade), vec4(0.05f, 0.045f, 0.04f, 0.96f * fade), 2.0f);
     gfx::stroke(r, withAlpha(gold, 0.45f * fade), 0.0f, 2.0f);
-    gfx::textWrapped(text, r.x + 18.0f, r.y + 12.0f + st.size * 0.78f, maxW, st, lh);
+    gfx::textWrapped(text, rtl() ? r.r() - 18.0f : r.x + 18.0f, r.y + 12.0f + st.size * 0.78f, maxW, st, lh);
     gfx::setLayer(prev);
 }
 
@@ -767,7 +980,8 @@ int confirmDialog(const char* idStr, const std::string& title, const std::string
     float bw = 250.0f, bh = 56.0f, gap = 30.0f;
     float by = r.b() - 44.0f - bh;
     pushId(idStr);
-    Rect rc(r.cx() - gap * 0.5f - bw, by, bw, bh), ro(r.cx() + gap * 0.5f, by, bw, bh);
+    // Cancel first in the reading direction.
+    Rect rc = flip(r, Rect(r.cx() - gap * 0.5f - bw, by, bw, bh)), ro = flip(r, Rect(r.cx() + gap * 0.5f, by, bw, bh));
     Id cancelId = makeId(cancelLabel);
     if (first) setFocus(cancelId);
     setDefaultFocus(cancelId);

@@ -48,8 +48,11 @@ void setMouseOverride(bool on, vec2 pos = vec2(0, 0));  // debug / viewer: fake 
 void setInputOverride(const plat::Input* in);           // debug / viewer: scripted input (nullptr = platform)
 
 // ---- Ids & animation state -----------------------------------------------------------------------
+// A label may carry its id after "##": "Apply##apply" is drawn "Apply" and identified by "apply"
+// alone, so translated labels keep their id (focus, animations) across a language change.
 Id makeId(const char* s);
 Id makeId(const std::string& s);
+std::string displayText(const std::string& label);  // the part before "##"
 Id makeId(int i);
 void pushId(const char* s);
 void pushId(int i);
@@ -78,6 +81,15 @@ enum ItemFlags : uint32_t {
     ITEM_SILENT = 1u << 3,      // no hover sound
     ITEM_MOUSE_ONLY = 1u << 4,  // never takes keyboard focus (HUD buttons: Space/Enter belong to the game)
 };
+
+// ---- Reading direction ------------------------------------------------------------------------------
+// Right-to-left UI language (Arabic): rows are mirrored (label on the right, control on the left),
+// text blocks start on the right, horizontal keys follow the visual direction.
+bool rtl();
+gfx::HAlign startAlign();                       // Left, or Right in a right-to-left UI
+gfx::HAlign endAlign();
+float flipX(const Rect& area, float x);         // x mirrored inside 'area' in a right-to-left UI
+Rect flip(const Rect& area, const Rect& r);     // r mirrored inside 'area' in a right-to-left UI
 struct Item {
     Id id = 0;
     bool hovered = false;     // mouse over
@@ -110,6 +122,15 @@ bool stepperRow(const std::string& label, int& index, int count, const std::func
                 const Rect& r, bool enabled = true);
 bool selectorRow(const std::string& label, int& index, const std::vector<std::string>& options, const Rect& r,
                  bool enabled = true);
+// Single-line text input row (label, then an edit box). Click the box or press Enter on the row to
+// type; Enter or Tab keeps the text, Esc restores it, and moving the focus away ends the edit.
+// Editing: typed Unicode text (IME results included), caret by mouse, Left/Right (visual
+// order), Home/End, Backspace/Delete, Ctrl+V. maxChars counts characters (codepoints).
+// textStyle (optional) draws the text, e.g. in a handwriting; the box is sized from the row.
+// Returns true on the frame the text changed.
+bool textField(const std::string& label, std::string& text, const Rect& r, int maxChars = 24,
+               const gfx::TextStyle* textStyle = nullptr, bool enabled = true);
+bool editingText();  // a text field has the keyboard (Space and letters type text)
 // Tab bar: Left/Right while focused, PageUp/PageDown anywhere. Returns true when changed.
 bool tabBar(const std::vector<std::string>& tabs, int& current, const Rect& r);
 // Hover/focus tooltip for the previous item.
