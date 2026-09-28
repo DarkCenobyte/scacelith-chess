@@ -124,7 +124,7 @@ engine.thousand = {0} тыс.
 engine.million = {0} млн
 
 # Time controls
-tc.unlimited = Без ограничения
+tc.unlimited = Без лимита
 tc.no_clock = Без часов
 tc.bullet = Пуля
 tc.blitz = Блиц
@@ -288,3 +288,117 @@ arbiter.second_loses = Второй невозможный ход приведё
 arbiter.touched.white = Белые должны пойти тронутой фигурой.
 arbiter.touched.black = Чёрные должны пойти тронутой фигурой.
 arbiter.game_over = Партия окончена.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Смотреть партию
+
+viewer.title = ПРОСМОТР ПАРТИИ
+viewer.white = БЕЛЫЕ
+viewer.black = ЧЁРНЫЕ
+viewer.time_control = КОНТРОЛЬ ВРЕМЕНИ
+viewer.elo_approx = ~{0} Эло
+viewer.swap = Поменять цвета
+viewer.note = Оба игрока — Stockfish. Свободно летайте по залу, пока они играют: вас никто не увидит.
+viewer.summary = {0} против {1}
+viewer.custom = Свой
+viewer.tc.custom = На выбор
+viewer.tc.none = Без часов
+viewer.tc.bullet = Пуля
+viewer.tc.blitz = Блиц
+viewer.tc.rapid = Рапид
+viewer.tc.classical = Классика
+viewer.base_time = Основное время
+viewer.increment = Добавление
+viewer.delay = Задержка
+viewer.off = Нет
+viewer.minutes = {0} мин
+viewer.seconds = {0} с
+viewer.delay_summary = задержка {0} с
+viewer.back = Назад
+viewer.start = Начать
+
+viewer.paused = ПАУЗА
+viewer.resume = Продолжить
+viewer.options = Настройки
+viewer.main_menu = Главное меню
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = УПРАВЛЕНИЕ
+viewer.keys.move = W A S D  ·  Z Q S D  ·  стрелки
+viewer.controls.move = Перемещение
+viewer.keys.updown = E, Пробел  /  C, Ctrl
+viewer.controls.updown = Вверх / вниз
+viewer.keys.fast = Shift
+viewer.controls.fast = Быстрее
+viewer.keys.look = Правая кнопка мыши
+viewer.controls.look = Осмотреться
+viewer.keys.speed = Колёсико мыши
+viewer.controls.speed = Скорость
+viewer.keys.views = 1 – 9
+viewer.controls.views = Точки обзора
+viewer.keys.eyes = 0
+viewer.controls.eyes = Глазами игрока, чей ход
+viewer.keys.moves = Tab
+viewer.controls.moves = Список ходов
+viewer.keys.menu = Esc
+viewer.controls.menu = Меню
+viewer.keys.hide = H
+viewer.controls.hide = Скрыть эти подсказки
+viewer.speed = Скорость {0} м/с
+viewer.view.0 = Глазами игроков
+viewer.view.1 = У стола
+viewer.view.2 = Над доской
+viewer.view.3 = Зал
+viewer.view.4 = Часы
+viewer.view.5 = Лицо белых
+viewer.view.6 = Лицо чёрных
+viewer.view.7 = Поединок
+viewer.view.8 = Окна
+viewer.view.9 = Гобелены
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = белые
+viewer.side.black = чёрные
+viewer.flag.white = У белых упал флажок.
+viewer.flag.black = У чёрных упал флажок.
+viewer.claims_draw = Ничью требуют {0}.
+viewer.offer_accepted = Ничью предложили {0}, {1} согласились.
+viewer.offer_declined = Ничью предложили {0}, {1} отказались.
+viewer.gameover.white_wins = Победа белых после {0}-го хода.
+viewer.gameover.black_wins = Победа чёрных после {0}-го хода.
+viewer.gameover.draw = Ничья после {0}-го хода.
+viewer.gameover.players = {0} против {1}
+viewer.watch_again = Смотреть ещё
+
+# The player's rating
+elo.label = ЭЛО
+elo.no_games = Рейтинговых партий пока нет
+elo.provisional = Предварительный рейтинг
+elo.peak = Максимум {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Ваш рейтинг: {0}
+elo.expected = ожидаемый результат {0} %
+elo.change = Эло {0} → {1} ({2})
+elo.unrated = Эло {0} · эта партия не рейтинговая
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Бланк записи партии
+scoresheet.event = Турнир
+scoresheet.date = Дата
+scoresheet.round = Тур
+scoresheet.board = Доска
+scoresheet.page = Лист
+scoresheet.white = Белые
+scoresheet.black = Чёрные
+scoresheet.elo = Эло
+scoresheet.result = Результат
+scoresheet.move_no = №
+scoresheet.sign_white = Подпись белых
+scoresheet.sign_black = Подпись чёрных
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = Кр Ф Л С К
+scoresheet.date_format = {0}.{1}.{2}

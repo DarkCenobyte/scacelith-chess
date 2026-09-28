@@ -288,3 +288,117 @@ arbiter.second_loses = Un second coup illégal fait perdre la partie.
 arbiter.touched.white = Les Blancs doivent jouer la pièce touchée.
 arbiter.touched.black = Les Noirs doivent jouer la pièce touchée.
 arbiter.game_over = La partie est terminée.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Regarder une partie
+
+viewer.title = REGARDER UNE PARTIE
+viewer.white = BLANCS
+viewer.black = NOIRS
+viewer.time_control = CADENCE
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Inverser les couleurs
+viewer.note = Les deux joueurs sont Stockfish. Volez librement dans la salle pendant qu’ils jouent : personne ne vous verra.
+viewer.summary = {0} contre {1}
+viewer.custom = Libre
+viewer.tc.custom = À votre guise
+viewer.tc.none = Sans pendule
+viewer.tc.bullet = Bullet
+viewer.tc.blitz = Blitz
+viewer.tc.rapid = Rapide
+viewer.tc.classical = Classique
+viewer.base_time = Temps de base
+viewer.increment = Incrément
+viewer.delay = Délai
+viewer.off = Aucun
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = délai {0} s
+viewer.back = Retour
+viewer.start = Commencer
+
+viewer.paused = PAUSE
+viewer.resume = Reprendre
+viewer.options = Options
+viewer.main_menu = Menu principal
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = COMMANDES
+viewer.keys.move = Z Q S D  ·  W A S D  ·  flèches
+viewer.controls.move = Se déplacer
+viewer.keys.updown = E, Espace  /  C, Ctrl
+viewer.controls.updown = Monter / descendre
+viewer.keys.fast = Maj
+viewer.controls.fast = Plus vite
+viewer.keys.look = Bouton droit de la souris
+viewer.controls.look = Regarder autour de soi
+viewer.keys.speed = Molette
+viewer.controls.speed = Vitesse
+viewer.keys.views = 1 – 9
+viewer.controls.views = Points de vue
+viewer.keys.eyes = 0
+viewer.controls.eyes = Par les yeux du joueur au trait
+viewer.keys.moves = Tab
+viewer.controls.moves = Liste des coups
+viewer.keys.menu = Échap
+viewer.controls.menu = Menu
+viewer.keys.hide = H
+viewer.controls.hide = Masquer ces indications
+viewer.speed = Vitesse {0} m/s
+viewer.view.0 = Par les yeux des joueurs
+viewer.view.1 = À côté de la table
+viewer.view.2 = Au-dessus de l’échiquier
+viewer.view.3 = La salle
+viewer.view.4 = La pendule
+viewer.view.5 = Le visage des Blancs
+viewer.view.6 = Le visage des Noirs
+viewer.view.7 = Le duel
+viewer.view.8 = Les fenêtres
+viewer.view.9 = Les tapisseries
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = les Blancs
+viewer.side.black = les Noirs
+viewer.flag.white = Le drapeau des Blancs est tombé.
+viewer.flag.black = Le drapeau des Noirs est tombé.
+viewer.claims_draw = Nulle réclamée par {0}.
+viewer.offer_accepted = Nulle proposée par {0}, acceptée par {1}.
+viewer.offer_declined = Nulle proposée par {0}, refusée par {1}.
+viewer.gameover.white_wins = Victoire des Blancs au coup {0}.
+viewer.gameover.black_wins = Victoire des Noirs au coup {0}.
+viewer.gameover.draw = Partie nulle au coup {0}.
+viewer.gameover.players = {0} contre {1}
+viewer.watch_again = Regarder encore
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Aucune partie classée pour l’instant
+elo.provisional = Classement provisoire
+elo.peak = Maximum {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Votre Elo : {0}
+elo.expected = score attendu {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · cette partie ne compte pas pour le classement
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Feuille de partie
+scoresheet.event = Tournoi
+scoresheet.date = Date
+scoresheet.round = Ronde
+scoresheet.board = Table
+scoresheet.page = Page
+scoresheet.white = Blancs
+scoresheet.black = Noirs
+scoresheet.elo = Elo
+scoresheet.result = Résultat
+scoresheet.move_no = N°
+scoresheet.sign_white = Signature des Blancs
+scoresheet.sign_black = Signature des Noirs
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = R D T F C
+scoresheet.date_format = {0}/{1}/{2}

@@ -89,6 +89,42 @@ TEST(i18n_lang_files_match_english) {
     }
 }
 
+// Every language names the five pieces of its scoresheet notation with distinct letters that cannot be
+// read as a file (a-h), a capture (x) or castling (O), and writes the date with day, month and year once each.
+TEST(i18n_scoresheet_pieces_and_date) {
+    for (const i18n::Language& lang : i18n::languages()) {
+        std::string path = std::string("assets/i18n/") + lang.code + ".lang";
+        if (!embedded::find(path.c_str())) continue;  // reported by i18n_lang_files_match_english
+        std::vector<std::pair<std::string, std::string>> entries;
+        CHECK(i18n::parse(embedded::text(path.c_str()), entries, nullptr));
+        std::map<std::string, std::string> got(entries.begin(), entries.end());
+        std::vector<std::string> letters;
+        std::string cur;
+        for (char c : got["scoresheet.pieces"] + " ") {
+            if (c == ' ') {
+                if (!cur.empty()) letters.push_back(cur);
+                cur.clear();
+            } else {
+                cur += c;
+            }
+        }
+        if (letters.size() != 5) std::fprintf(stderr, "  %s: scoresheet.pieces needs 5 letters\n", lang.code);
+        CHECK_EQ(int(letters.size()), 5);
+        CHECK_EQ(int(std::set<std::string>(letters.begin(), letters.end()).size()), int(letters.size()));
+        for (const std::string& l : letters) {
+            bool clash = l.size() == 1 && std::string("abcdefghxO").find(l[0]) != std::string::npos;
+            if (clash) std::fprintf(stderr, "  %s: piece letter %s reads as a square or move\n", lang.code, l.c_str());
+            CHECK(!clash);
+        }
+        const std::string& date = got["scoresheet.date_format"];
+        for (const char* p : {"{0}", "{1}", "{2}"}) {
+            size_t first = date.find(p);
+            CHECK(first != std::string::npos);
+            CHECK(date.find(p, first + 1) == std::string::npos);
+        }
+    }
+}
+
 TEST(i18n_tr_fallback_and_format) {
     CHECK(i18n::setLanguage("fr"));
     CHECK_EQ(i18n::language(), std::string("fr"));

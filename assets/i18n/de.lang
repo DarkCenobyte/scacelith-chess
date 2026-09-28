@@ -287,3 +287,117 @@ arbiter.second_loses = Ein zweiter regelwidriger Zug verliert die Partie.
 arbiter.touched.white = Weiß muss die berührte Figur ziehen.
 arbiter.touched.black = Schwarz muss die berührte Figur ziehen.
 arbiter.game_over = Die Partie ist beendet.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Partie ansehen
+
+viewer.title = PARTIE ANSEHEN
+viewer.white = WEISS
+viewer.black = SCHWARZ
+viewer.time_control = BEDENKZEIT
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Farben tauschen
+viewer.note = Beide Spieler sind Stockfish. Fliegen Sie frei durch den Saal, während sie spielen: Niemand sieht Sie.
+viewer.summary = {0} gegen {1}
+viewer.custom = Eigene
+viewer.tc.custom = Nach Wahl
+viewer.tc.none = Ohne Uhr
+viewer.tc.bullet = Bullet
+viewer.tc.blitz = Blitz
+viewer.tc.rapid = Schnellschach
+viewer.tc.classical = Klassisch
+viewer.base_time = Grundzeit
+viewer.increment = Inkrement
+viewer.delay = Verzögerung
+viewer.off = Keine
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = Verzögerung {0} s
+viewer.back = Zurück
+viewer.start = Starten
+
+viewer.paused = PAUSE
+viewer.resume = Fortsetzen
+viewer.options = Optionen
+viewer.main_menu = Hauptmenü
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = STEUERUNG
+viewer.keys.move = W A S D  ·  Z Q S D  ·  Pfeiltasten
+viewer.controls.move = Bewegen
+viewer.keys.updown = E, Leertaste  /  C, Strg
+viewer.controls.updown = Hoch / runter
+viewer.keys.fast = Umschalt
+viewer.controls.fast = Schneller
+viewer.keys.look = Rechte Maustaste
+viewer.controls.look = Umsehen
+viewer.keys.speed = Mausrad
+viewer.controls.speed = Tempo
+viewer.keys.views = 1 – 9
+viewer.controls.views = Blickwinkel
+viewer.keys.eyes = 0
+viewer.controls.eyes = Mit den Augen des Spielers am Zug
+viewer.keys.moves = Tab
+viewer.controls.moves = Zugliste
+viewer.keys.menu = Esc
+viewer.controls.menu = Menü
+viewer.keys.hide = H
+viewer.controls.hide = Diese Hinweise ausblenden
+viewer.speed = Tempo {0} m/s
+viewer.view.0 = Mit den Augen der Spieler
+viewer.view.1 = Neben dem Tisch
+viewer.view.2 = Über dem Brett
+viewer.view.3 = Der Saal
+viewer.view.4 = Die Uhr
+viewer.view.5 = Das Gesicht von Weiß
+viewer.view.6 = Das Gesicht von Schwarz
+viewer.view.7 = Das Duell
+viewer.view.8 = Die Fenster
+viewer.view.9 = Die Wandteppiche
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Weiß
+viewer.side.black = Schwarz
+viewer.flag.white = Die Zeit von Weiß ist abgelaufen.
+viewer.flag.black = Die Zeit von Schwarz ist abgelaufen.
+viewer.claims_draw = {0} reklamiert Remis.
+viewer.offer_accepted = {0} bietet Remis an, {1} nimmt an.
+viewer.offer_declined = {0} bietet Remis an, {1} lehnt ab.
+viewer.gameover.white_wins = Weiß gewinnt nach dem {0}. Zug.
+viewer.gameover.black_wins = Schwarz gewinnt nach dem {0}. Zug.
+viewer.gameover.draw = Die Partie endet nach dem {0}. Zug remis.
+viewer.gameover.players = {0} gegen {1}
+viewer.watch_again = Noch einmal
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Noch keine gewertete Partie
+elo.provisional = Vorläufige Wertung
+elo.peak = Höchstwert {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Ihre Elo: {0}
+elo.expected = Erwartungswert {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · diese Partie wird nicht gewertet
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Partieformular
+scoresheet.event = Turnier
+scoresheet.date = Datum
+scoresheet.round = Runde
+scoresheet.board = Brett
+scoresheet.page = Blatt
+scoresheet.white = Weiß
+scoresheet.black = Schwarz
+scoresheet.elo = Elo
+scoresheet.result = Ergebnis
+scoresheet.move_no = Nr.
+scoresheet.sign_white = Unterschrift Weiß
+scoresheet.sign_black = Unterschrift Schwarz
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = K D T L S
+scoresheet.date_format = {0}.{1}.{2}
