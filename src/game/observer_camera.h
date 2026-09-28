@@ -34,8 +34,8 @@ public:
     void setBounds(m::vec3 lo, m::vec3 hi);
     void setPose(const CameraPose& p);                     // jump
     void flyTo(const CameraPose& p, float duration = 0.0f, const FlightShape& shape = {});
-    // A flight that is never cancelled by the controls and whose target may move (retarget each
-    // frame with retarget()); used to follow a player's eyes.
+    // Moves the end of the current flight, or the camera itself when not flying: called every
+    // frame to follow a player's eyes (a moving head).
     void retarget(const CameraPose& p);
     bool flying() const { return flight_.active(); }
     const CameraFlight& flight() const { return flight_; }
