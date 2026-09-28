@@ -13,6 +13,17 @@
 // token over. Tokens are encrypted at rest with DPAPI on Windows.
 //
 // Engine-free (no GL, no UI): compiled into scacelith_core and unit-tested (tests/net_tests.cpp).
+//
+// Changes to the original contract (client-net):
+//   - OnlineClient::setCredentialsFile(path) (additive): where the credential store lives. By
+//     default Scacelith.credentials is next to the executable (like Scacelith.ini), or in the
+//     user data directory when that directory is not writable; main.cpp may call it with the
+//     directory of the --ini file. Tests use it to work in a temporary file.
+//   - ServerEndpoint::origin() brackets IPv6 literals ("[::1]:8443") so an origin is unambiguous.
+//   - ServerEndpoint::pinnedSha256 accepts "AB:CD:..." too (setServer normalises it to 64 lower-case
+//     hex digits). When it is empty, the pin saved for the origin at the last login applies.
+//   - Commands that need the realtime connection while it is not Online produce a ServerError
+//     event with code 0 and error "offline" ("invalid_request" for out-of-range arguments).
 #pragma once
 #include <cstdint>
 #include <memory>
@@ -178,6 +189,7 @@ public:
     OnlineClient& operator=(const OnlineClient&) = delete;
 
     // ---- server and account (HTTPS) ----
+    void setCredentialsFile(const std::string& path);  // optional; see the note at the top
     void setServer(const ServerEndpoint& ep);    // disconnects if the origin changes
     const ServerEndpoint& server() const;
     void fetchServerInfo();
