@@ -55,23 +55,23 @@ int PhysicalBoard::idAt(Square sq) const {
 vec3 PhysicalBoard::squareBase(Square sq) const { return layout::squareCenter(sq); }
 
 vec3 PhysicalBoard::nextCaptureSlot(Color capturedColor) {
-    // Captured pieces stand on the table on the side without the clock, each colour on the side
-    // of the player who captured them (White captures black pieces -> White's side, +Z).
+    // Captured pieces stand on the table on the clock side (the playing hands' side; the
+    // scoresheets lie on the other side), each colour in the half of the player who captured them
+    // (White captures black pieces -> White's side, +Z), clear of the clock.
     int n = captureCount_[capturedColor]++;
-    float sideX = clockPosX_ ? -1.0f : 1.0f;
+    float sideX = clockPosX_ ? 1.0f : -1.0f;
     int row = n / 8, col = n % 8;
     float x = sideX * (layout::CAPTURE_ROW_X + float(row) * layout::CAPTURE_SPACING);
     float zSign = capturedColor == Black ? 1.0f : -1.0f;  // near the capturer
-    float z = zSign * (0.03f + float(col) * layout::CAPTURE_SPACING * 0.62f);
+    float z = zSign * (layout::CAPTURE_Z0 + float(col) * layout::CAPTURE_COL_SPACING);
     return {x, layout::TABLE_TOP_Y, z};
 }
 
 vec3 PhysicalBoard::reserveSlot(Color c) const {
-    // Spare queens stand on the clock-free side, beyond the captured pieces, near their owner
-    // (clear of the players' resting hands).
-    float sideX = clockPosX_ ? -1.0f : 1.0f;
-    float z = c == White ? 0.10f : -0.10f;
-    return {sideX * 0.41f, layout::TABLE_TOP_Y, z};
+    // Spare queens stand beyond the clock, near their owner (the playing hand's side).
+    float sideX = clockPosX_ ? 1.0f : -1.0f;
+    float z = c == White ? layout::RESERVE_Z : -layout::RESERVE_Z;
+    return {sideX * layout::RESERVE_X, layout::TABLE_TOP_Y, z};
 }
 
 void PhysicalBoard::setOnSquare(int id, Square sq) {

@@ -33,8 +33,8 @@ namespace ui {
 namespace font {
 namespace {
 
-constexpr int kAtlasW = 2048, kAtlasH = 2048;
-constexpr int kAtlasLevels = 4;
+constexpr int kAtlasW = 4096, kAtlasH = 4096;
+constexpr int kAtlasLevels = 5;
 constexpr int kOversample = 4;
 constexpr int kGutter = 2;  // empty texels between packed glyphs
 
@@ -48,6 +48,13 @@ const FaceDesc kFaces[FACE_COUNT] = {
     {"assets/fonts/EBGaramond12-Italic.ttf", 48.0f, 7},
     {"assets/fonts/Cinzel.ttf", 72.0f, 9},
     {"assets/fonts/FreeSerif-Chess.ttf", 112.0f, 12},
+    {"assets/fonts/hand/Caveat.ttf", 56.0f, 7},
+    {"assets/fonts/hand/MarckScript-Regular.ttf", 56.0f, 7},
+    {"assets/fonts/hand/BadScript-Regular.ttf", 56.0f, 7},
+    {"assets/fonts/hand/ArefRuqaa-Hand.ttf", 56.0f, 7},
+    {"assets/fonts/hand/KleeOne-Hand.ttf", 56.0f, 7},
+    {"assets/fonts/hand/LXGWWenKai-Hand.ttf", 56.0f, 7},
+    {"assets/fonts/hand/LXGWWenKaiTC-Hand.ttf", 56.0f, 7},
 };
 
 struct FaceData {
@@ -335,7 +342,8 @@ bool init() {
         fd = FaceData();
         const embedded::File* file = embedded::find(kFaces[f].path);
         if (!file) {
-            LOGE("ui: font %s not embedded", kFaces[f].path);
+            if (isHandwritingFace(f)) LOGW("ui: handwriting font %s not embedded", kFaces[f].path);
+            else LOGE("ui: font %s not embedded", kFaces[f].path);
             continue;
         }
         int off = stbtt_GetFontOffsetForIndex(file->data, 0);
@@ -425,6 +433,20 @@ void flushUploads() {
 
 const Glyph* glyph(int face, uint32_t cp, int* usedFace) {
     if (face < 0 || face >= FACE_COUNT) face = FACE_TEXT;
+    if (isHandwritingFace(face)) {
+        if (const Glyph* g = lookupOrBuild(face, cp)) {
+            if (usedFace) *usedFace = face;
+            return g;
+        }
+        for (int f = FACE_HAND_CAVEAT; f <= FACE_HAND_TC; ++f) {
+            if (f == face) continue;
+            if (const Glyph* g = lookupOrBuild(f, cp)) {
+                if (usedFace) *usedFace = f;
+                return g;
+            }
+        }
+        face = FACE_TEXT;
+    }
     int chain[3] = {face, FACE_TEXT, FACE_SYMBOL};
     if (face == FACE_SYMBOL) chain[1] = FACE_TEXT, chain[2] = FACE_TEXT;
     for (int f : chain) {
@@ -434,6 +456,56 @@ const Glyph* glyph(int face, uint32_t cp, int* usedFace) {
         }
     }
     return nullptr;
+}
+
+bool isHandwritingFace(int face) { return face >= FACE_HAND_CAVEAT && face <= FACE_HAND_TC; }
+
+const char* handStyleName(int style) {
+    switch (style) {
+    case HAND_MARCK: return "Marck Script";
+    case HAND_BADSCRIPT: return "Bad Script";
+    default: return "Caveat";
+    }
+}
+
+namespace {
+bool faceHas(int face, uint32_t cp) {
+    const FaceData& fd = g_faces[face];
+    return fd.ok && stbtt_FindGlyphIndex(&fd.info, int(cp)) != 0;
+}
+bool isKanaOrCjkSymbol(uint32_t cp) {
+    return (cp >= 0x3040 && cp <= 0x30FF) || (cp >= 0x31F0 && cp <= 0x31FF) || (cp >= 0xFF66 && cp <= 0xFF9F);
+}
+bool isArabic(uint32_t cp) {
+    return (cp >= 0x0600 && cp <= 0x06FF) || (cp >= 0x0750 && cp <= 0x077F) || (cp >= 0xFB50 && cp <= 0xFDFF) ||
+           (cp >= 0xFE70 && cp <= 0xFEFF);
+}
+bool isHan(uint32_t cp) {
+    return (cp >= 0x3400 && cp <= 0x4DBF) || (cp >= 0x4E00 && cp <= 0x9FFF) || (cp >= 0xF900 && cp <= 0xFAFF) ||
+           (cp >= 0x20000 && cp <= 0x3134F) || (cp >= 0x3000 && cp <= 0x303F) || (cp >= 0xFF00 && cp <= 0xFF65);
+}
+}  // namespace
+
+int handwritingFace(int style, uint32_t cp) {
+    int latin = FACE_HAND_CAVEAT + std::clamp(style, 0, HAND_STYLE_COUNT - 1);
+    int order[8];
+    int n = 0;
+    if (isArabic(cp)) {
+        order[n++] = FACE_HAND_ARABIC;
+    } else if (isKanaOrCjkSymbol(cp)) {
+        order[n++] = FACE_HAND_JA;
+    } else if (isHan(cp)) {
+        order[n++] = FACE_HAND_SC;
+        order[n++] = FACE_HAND_TC;
+        order[n++] = FACE_HAND_JA;
+    }
+    order[n++] = latin;
+    order[n++] = FACE_HAND_CAVEAT;
+    order[n++] = FACE_HAND_JA;
+    order[n++] = FACE_HAND_SC;
+    for (int i = 0; i < n; ++i)
+        if (faceHas(order[i], cp)) return order[i];
+    return faceHas(FACE_TEXT, cp) ? int(FACE_TEXT) : latin;
 }
 
 float kerning(int face, int a, int b) {

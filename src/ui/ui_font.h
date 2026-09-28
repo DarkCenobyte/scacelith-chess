@@ -13,8 +13,26 @@ enum Face : int {
     FACE_ITALIC = 1,  // EB Garamond 12 Italic: captions, descriptions
     FACE_TITLE = 2,   // Cinzel: inscriptional capitals for titles and menu entries
     FACE_SYMBOL = 3,  // FreeSerif subset: chess figures (U+2654..U+265F)
+    // Handwriting (scoresheets; assets/fonts/hand/). Loaded lazily: no glyph is baked until used.
+    FACE_HAND_CAVEAT = 4,     // Caveat: casual Latin + Cyrillic hand
+    FACE_HAND_MARCK = 5,      // Marck Script: cursive Latin + Cyrillic
+    FACE_HAND_BADSCRIPT = 6,  // Bad Script: slanted Latin + Cyrillic
+    FACE_HAND_ARABIC = 7,     // Arabic handwriting (Ruqaa)
+    FACE_HAND_JA = 8,         // Japanese handwriting (kana + kanji)
+    FACE_HAND_SC = 9,         // Simplified Chinese handwriting (Kai)
+    FACE_HAND_TC = 10,        // Traditional Chinese handwriting (Kai)
     FACE_COUNT
 };
+
+// A player's handwriting: the Latin/Cyrillic style is chosen per player; every other script is
+// written with the handwriting face of that script (Arabic, kana/kanji, hanzi). Two players can
+// have different styles on the same scoresheet.
+enum HandStyle : int { HAND_CAVEAT = 0, HAND_MARCK = 1, HAND_BADSCRIPT = 2, HAND_STYLE_COUNT };
+const char* handStyleName(int style);   // "Caveat", "Marck Script", ...
+// Face that writes 'cp' in the given hand: the style's face when it has the glyph, then the
+// script faces, then the UI text face. Never returns a face without the glyph unless none has it.
+int handwritingFace(int style, uint32_t cp);
+bool isHandwritingFace(int face);
 
 // Glyph quad and metrics. Geometry is in em units relative to the pen position on the baseline
 // (y grows downwards); multiply by the font size in pixels.
@@ -36,7 +54,8 @@ bool init();
 void shutdown();
 bool ready();
 
-// Resolves a codepoint with fallbacks (Title -> Text -> Symbol, Italic -> Text -> Symbol).
+// Resolves a codepoint with fallbacks (Title -> Text -> Symbol, Italic -> Text -> Symbol; a
+// handwriting face -> the other handwriting faces -> Text).
 // Returns nullptr when no face has it. usedFace receives the face that provided the glyph.
 const Glyph* glyph(int face, uint32_t codepoint, int* usedFace = nullptr);
 // Kerning between two glyph indices of the same face, in em.

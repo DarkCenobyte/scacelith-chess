@@ -39,10 +39,16 @@ constexpr float PIECE_GRIP_HEIGHT[7] = {0.0f, 0.62f, 0.60f, 0.62f, 0.72f, 0.62f,
 constexpr float PIECE_GRIP_RADIUS[7] = {0.0f, 0.0075f, 0.010f, 0.0085f, 0.013f, 0.0095f, 0.010f};
 constexpr float PIECE_LIFT_HEIGHT = 0.035f;  // clearance used when carrying pieces
 
-// Captured pieces are lined up on the table beside the board, on the capturing player's side:
-// two rows parallel to the board edge, starting near the clock-free side.
-constexpr float CAPTURE_ROW_X = 0.30f;       // |x| of the first row centre (side opposite the clock)
-constexpr float CAPTURE_SPACING = 0.045f;
+// Captured pieces are lined up on the table beside the board, on the CLOCK side (the playing
+// hand's side; the other side holds the scoresheets), in the capturing player's half: two rows
+// along Z, from |z| = CAPTURE_Z0 (clear of the clock) towards the capturer.
+constexpr float CAPTURE_ROW_X = 0.30f;       // |x| of the first row centre (clock side)
+constexpr float CAPTURE_SPACING = 0.045f;    // between the two rows (along X)
+constexpr float CAPTURE_Z0 = 0.12f;          // |z| of the first piece of a row
+constexpr float CAPTURE_COL_SPACING = 0.024f;  // between pieces of a row (along Z)
+// Spare queens for promotions stand beyond the clock, near their owner.
+constexpr float RESERVE_X = 0.505f;
+constexpr float RESERVE_Z = 0.15f;
 
 // ---- Clock -----------------------------------------------------------------------------------
 constexpr float CLOCK_OFFSET_X = 0.405f;     // |x| of the clock centre
@@ -50,6 +56,24 @@ constexpr float CLOCK_Z = 0.0f;              // centred between the players
 constexpr float CLOCK_WIDTH = 0.19f;         // along Z (faces the side), displays face each player
 constexpr float CLOCK_DEPTH = 0.085f;        // along X
 constexpr float CLOCK_HEIGHT = 0.065f;
+
+// ---- Scoresheets ----------------------------------------------------------------------------
+// Each player keeps a scoresheet pad (FIDE art. 8.1) on the side of the table WITHOUT the clock,
+// in front of its owner: x = -sign(clock x) * SCORESHEET_X, z = +-SCORESHEET_Z (White +Z). The
+// hand on that side writes; the hand on the clock side plays and presses the clock (art. 6.2.5:
+// the clock is pressed with the hand that moved). The pad is A5, portrait, bound along its top
+// edge (the edge towards the board): a full page is flipped over the top and lies beyond it, face
+// down, so the strip between the pad and the table centre (|z| < SCORESHEET_Z - LENGTH/2) on that
+// side stays free of pieces.
+constexpr float SCORESHEET_WIDTH = 0.148f;     // along X (A5)
+constexpr float SCORESHEET_LENGTH = 0.210f;    // along Z
+constexpr float SCORESHEET_THICKNESS = 0.005f; // back board + page stack
+constexpr float SCORESHEET_X = 0.45f;          // |x| of the pad centre
+constexpr float SCORESHEET_Z = 0.318f;         // |z| of the pad centre
+constexpr int SCORESHEET_ROWS = 20;            // move rows per column, 2 columns per page (40 moves)
+// Ballpoint pen (cap posted on the back while writing).
+constexpr float PEN_LENGTH = 0.142f;
+constexpr float PEN_RADIUS = 0.0045f;
 
 // ---- Players (seated robots) ----------------------------------------------------------------
 constexpr float SEAT_HEIGHT = 0.46f;

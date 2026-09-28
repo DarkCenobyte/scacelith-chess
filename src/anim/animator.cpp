@@ -2308,7 +2308,8 @@ void Animator::Impl::finishTask(std::vector<Event>& ev) {
 // =============================================================================================
 Animator::Animator() : impl_(std::make_shared<Impl>()) {}
 
-void Animator::init(const Skeleton& sk, vec3 pelvisWorld, float facing) {
+void Animator::init(const Skeleton& sk, vec3 pelvisWorld, float facing, Side playHand) {
+    (void)playHand;  // TODO(anim): left-handed play
     impl_ = std::make_shared<Impl>();
     Impl& I = *impl_;
     I.owner = this;

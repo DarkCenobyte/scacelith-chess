@@ -1,0 +1,6 @@
+# Scacelith - English (reference language)
+# One "key = value" per line, UTF-8. "\n" is a line break, {0} {1}... are placeholders.
+# Every other assets/i18n/<code>.lang file translates these keys; a key it lacks falls back to
+# English.
+
+language.name = English
