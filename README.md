@@ -35,7 +35,7 @@ with the hand on the pad side, while the other hand stays free to play and press
 keeping score never costs clock time. The player whose clock stands on the left therefore plays
 with the left hand and writes with the right. The header is filled in when the game starts (event
 "Scacelith", date, round, the players' names and ratings: your name from Options > Player,
-"Human" by default, and "Stockfish"), a full page of 40 moves is turned over the top of the pad,
+"Human" by default (translated with the interface), and "Stockfish"), a full page of 40 moves is turned over the top of the pad,
 and the result is written before the final handshake. You hear the pen on the paper and the page
 being turned.
 
