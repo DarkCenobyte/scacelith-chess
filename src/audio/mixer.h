@@ -30,6 +30,10 @@ struct PlayRequest {
     float gain = 1.0f, pitch = 1.0f;
     Bus bus = Bus::Effects;
     bool spatial = true;
+    // > 0: plays only a window of that many seconds of the sound (sustained textures such as the
+    // pen friction), starting 'offset' seconds into it (< 0: at a random place), with short fades.
+    float duration = 0.0f;
+    float offset = -1.0f;
 };
 
 class Mixer {

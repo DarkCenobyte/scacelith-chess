@@ -31,6 +31,12 @@ enum class Sfx {
     // Additive: the two halves of Capture, for callers that sync them with the animation.
     CaptureClick,    // marble-on-marble click as the captured piece is taken (bright stone modes)
     TablePlace,      // a (captured) piece set down on the waxed wooden table (woody knock)
+    // Additive: scoresheet and pen.
+    PenWrite,        // ballpoint rolling on paper over the pad: a sustained texture, played as a
+                     // window of the stroke's length (playFor / playPenStroke)
+    PenTap,          // ballpoint tip touching the paper (tiny tick through the pad)
+    PageTurn,        // page pinched at its corner, lifted and swung over the top edge (~1 s)
+    PageFlap,        // the turned page landing face down on the stack
     Count
 };
 
@@ -50,6 +56,12 @@ void setListener(m::vec3 position, m::vec3 forward, m::vec3 up);
 // pitch for pieces: heavier pieces slightly lower (king ~0.94, pawn ~1.05).
 void play(Sfx s, m::vec3 position, float gain = 1.0f, float pitch = 1.0f);
 void playUI(Sfx s, float gain = 1.0f);
+// Additive: plays only 'seconds' of a sustained sound (a window at a random place inside it,
+// with short fades), e.g. PenWrite for one pen-down stroke.
+void playFor(Sfx s, m::vec3 position, float seconds, float gain = 1.0f, float pitch = 1.0f);
+// One pen-down stroke at the pen tip: the touch-down tick and 'seconds' of ballpoint friction.
+// Call it on anim::Animator's PenDown event with the stroke length from the scoresheet.
+void playPenStroke(m::vec3 tip, float seconds, float gain = 1.0f);
 
 // Atmospheric hall ambience (air, distant birds and wind through the windows, faint room tone),
 // no music. Fades smoothly when toggled.
