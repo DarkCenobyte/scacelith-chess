@@ -591,6 +591,7 @@ void Renderer::endFrame() {
     pin.dt = dt_;
     pin.backbufferW = width_;
     pin.backbufferH = height_;
+    pin.quality = int(settings_.quality);  // render-post: sample-count preset (PostInputs::quality)
     post_->settings.ssao = settings_.ssao;
     post_->settings.ssr = settings_.ssr;
     post_->settings.volumetrics = settings_.volumetrics;

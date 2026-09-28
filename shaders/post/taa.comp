@@ -1,0 +1,71 @@
+// Temporal anti-aliasing. Current frame reconstructed at the unjittered pixel centre with a
+// Blackman-Harris-like kernel over the 3x3 neighbourhood; history fetched with 5-tap Catmull-Rom
+// at the reprojected position (velocity of the closest depth in 3x3); history clipped to the
+// YCoCg variance box (Salvi) in a reversible-tonemapped space; motion-adaptive feedback;
+// disocclusion rejection by comparing the history's stored depth with the expected depth.
+#include "shaders/post/post_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uCurrent;
+layout(binding = 1) uniform sampler2D uHistory;      // rgb colour, a = linear depth
+layout(binding = 2) uniform sampler2D uVelocity;
+layout(binding = 3) uniform sampler2D uLinearDepth;
+layout(binding = 0, rgba16f) uniform writeonly image2D oHistory;
+layout(binding = 1, rgba16f) uniform writeonly image2D oColor;
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = ivec2(post.renderSize.xy);
+    if (any(greaterThanEqual(p, size))) return;
+    vec2 jPx = frame.jitter.xy * 0.5 * post.renderSize.xy;
+    vec3 m1 = vec3(0.0), m2 = vec3(0.0), filt = vec3(0.0);
+    float wsum = 0.0;
+    float zOwn = texelFetch(uLinearDepth, p, 0).r;
+    float zMin = zOwn;
+    ivec2 closest = p;
+    for (int y = -1; y <= 1; ++y)
+        for (int x = -1; x <= 1; ++x) {
+            ivec2 q = clamp(p + ivec2(x, y), ivec2(0), size - 1);
+            vec3 t = tmForward(sanitize(texelFetch(uCurrent, q, 0).rgb));
+            vec3 yc = rgbToYCoCg(t);
+            m1 += yc;
+            m2 += yc * yc;
+            vec2 o = vec2(x, y) - jPx;
+            float w = exp(-2.29 * dot(o, o));
+            filt += t * w;
+            wsum += w;
+            float zq = texelFetch(uLinearDepth, q, 0).r;
+            if (zq < zMin) { zMin = zq; closest = q; }
+        }
+    vec3 cur = filt / wsum;
+    vec3 mean = m1 / 9.0;
+    vec3 sigma = sqrt(max(m2 / 9.0 - mean * mean, 0.0));
+    vec2 uv = (vec2(p) + 0.5) * post.renderSize.zw;
+    vec2 vel = texelFetch(uVelocity, closest, 0).xy;
+    if (badValue(vec3(vel, 0.0))) vel = vec2(0.0);
+    vec2 prevUV = uv - vel;
+    float speed = length(vel * post.renderSize.xy);
+    vec3 outT = cur;
+    if (post.taa.x > 0.5 && all(greaterThanEqual(prevUV, vec2(0.0))) && all(lessThan(prevUV, vec2(1.0)))) {
+        vec3 hist = max(sampleCatmullRom(uHistory, prevUV, post.renderSize.xy, post.renderSize.zw).rgb, vec3(0.0));
+        // History depths of the bilinear footprint: an edge pixel sees both sides of the edge
+        // there, a disoccluded pixel sees only the occluder that moved away.
+        vec4 hz = textureGather(uHistory, prevUV, 3);
+        float alpha = mix(0.075, 0.28, saturate(speed / 14.0));
+        if (zOwn < SKY_DEPTH * 0.5) {
+            vec3 pw = worldPosFromLinear(uv, zOwn);
+            float expected = (frame.prevViewProj * vec4(pw, 1.0)).w;
+            vec4 rel = abs(hz - expected) / max(expected, 1e-4);
+            float r = min(min(rel.x, rel.y), min(rel.z, rel.w));
+            alpha = mix(alpha, 1.0, smoothstep(0.03, 0.1, r));
+        } else if (max(max(hz.x, hz.y), max(hz.z, hz.w)) < SKY_DEPTH * 0.25) {
+            alpha = max(alpha, 0.5);  // sky revealed behind something that moved
+        }
+        if (badValue(hist)) alpha = 1.0;
+        float gamma = mix(1.25, 0.8, saturate(speed / 8.0));
+        vec3 hy = clipAABB(rgbToYCoCg(tmForward(hist)), mean - gamma * sigma, mean + gamma * sigma);
+        outT = mix(yCoCgToRgb(hy), cur, alpha);
+    }
+    vec3 outC = sanitize(tmInverse(max(outT, vec3(0.0))));
+    imageStore(oHistory, p, vec4(outC, zOwn));
+    imageStore(oColor, p, vec4(outC, 1.0));
+}

@@ -1,0 +1,24 @@
+// Motion blur neighbour max: largest tile vector in the 3x3 tile neighbourhood; diagonal tiles
+// only count when their motion points towards this tile (Jimenez 2014).
+#include "shaders/post/post_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uTiles;
+layout(binding = 0, rg16f) uniform writeonly image2D oNeighbor;
+
+void main() {
+    ivec2 t = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 tsize = textureSize(uTiles, 0);
+    if (any(greaterThanEqual(t, tsize))) return;
+    vec2 best = vec2(0.0);
+    float bestL = -1.0;
+    for (int y = -1; y <= 1; ++y)
+        for (int x = -1; x <= 1; ++x) {
+            ivec2 q = t + ivec2(x, y);
+            if (any(lessThan(q, ivec2(0))) || any(greaterThanEqual(q, tsize))) continue;
+            vec2 v = texelFetch(uTiles, q, 0).xy;
+            if (x != 0 && y != 0 && dot(v, -vec2(x, y)) <= 0.0) continue;
+            float l = dot(v, v);
+            if (l > bestL) { bestL = l; best = v; }
+        }
+    imageStore(oNeighbor, t, vec4(best, 0.0, 0.0));
+}

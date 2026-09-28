@@ -1,0 +1,57 @@
+// Motion blur reconstruction filter (McGuire et al. 2012 with the Jimenez 2014 refinements):
+// samples along the dominant neighbourhood velocity and, alternately, along the pixel's own
+// velocity; depth-aware foreground/background classification with cone/cylinder weights.
+#include "shaders/post/post_common.glsl"
+#include "shaders/post/mb_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uColor;
+layout(binding = 1) uniform sampler2D uVelocity;
+layout(binding = 2) uniform sampler2D uLinearDepth;
+layout(binding = 3) uniform sampler2D uNeighbor;
+layout(binding = 0, rgba16f) uniform writeonly image2D oColor;
+
+float cone(float d, float v) { return saturate(1.0 - d / v); }
+float cylinder(float d, float v) { return 1.0 - smoothstep(0.95 * v, 1.05 * v, d); }
+float softFront(float zY, float zX, float ext) { return saturate(1.0 - (zY - zX) / ext); }  // Y in front of X
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = ivec2(post.renderSize.xy);
+    if (any(greaterThanEqual(p, size))) return;
+    vec3 c = texelFetch(uColor, p, 0).rgb;
+    int K = int(post.mb.w);
+    // Jittered tile lookup hides the tile grid.
+    float j0 = blueNoise(p, 7), j1 = blueNoise(p, 8);
+    ivec2 tsize = textureSize(uNeighbor, 0);
+    ivec2 tp = clamp((p + ivec2((vec2(j0, j1) - 0.5) * float(K) * 0.5)) / K, ivec2(0), tsize - 1);
+    vec2 vn = texelFetch(uNeighbor, tp, 0).xy;
+    float lenN = length(vn);
+    if (lenN < 0.5) { imageStore(oColor, p, vec4(c, 1.0)); return; }
+    vec2 vc = blurVector(texelFetch(uVelocity, p, 0).xy);
+    float lenC = max(length(vc), 0.5);
+    float zc = texelFetch(uLinearDepth, p, 0).r;
+    float ext = 0.02 * min(zc, 1e3) + 0.01;
+    vec2 dirN = vn / lenN;
+    vec2 dirC = length(vc) > 0.5 ? vc / length(vc) : dirN;
+    int S = int(post.mb.z);
+    float jitter = blueNoise(p, 9) - 0.5;
+    float wc = float(S) / (2.0 * lenC * 4.0);
+    vec3 sum = c * wc;
+    float wsum = wc;
+    for (int i = 0; i < S; ++i) {
+        float t = mix(-1.0, 1.0, (float(i) + jitter + 0.5) / float(S));
+        // Alternate between the neighbourhood direction and the pixel's own direction.
+        vec2 dir = (i & 1) == 0 ? dirN : dirC;
+        float dist = abs(t) * lenN;
+        ivec2 q = clamp(ivec2(vec2(p) + 0.5 + dir * (t * lenN)), ivec2(0), size - 1);
+        vec3 cy = texelFetch(uColor, q, 0).rgb;
+        float zy = texelFetch(uLinearDepth, q, 0).r;
+        float lenY = max(length(blurVector(texelFetch(uVelocity, q, 0).xy)), 0.5);
+        float f = softFront(zy, zc, ext);
+        float b = softFront(zc, zy, ext);
+        float a = f * cone(dist, lenY) + b * cone(dist, lenC) + cylinder(dist, lenY) * cylinder(dist, lenC) * 2.0;
+        sum += cy * a;
+        wsum += a;
+    }
+    imageStore(oColor, p, vec4(sanitize(sum / max(wsum, 1e-5)), 1.0));
+}

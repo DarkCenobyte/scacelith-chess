@@ -1,0 +1,50 @@
+// Bokeh DOF gather at half resolution: golden-angle spiral whose radius is bounded by the
+// dilated tile max CoC; each sample spreads over the centre only if its own CoC reaches it
+// (scatter-as-gather), background samples are limited to twice the centre CoC so sharp
+// foreground never gets covered by the blurred background (Gustafsson's single-pass bokeh).
+// alpha = near-field coverage, used by the composite to let blurred foreground spill over
+// in-focus pixels.
+#include "shaders/post/post_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uHalf;   // rgb, a = signed CoC (half px)
+layout(binding = 1) uniform sampler2D uTiles;
+layout(binding = 0, rgba16f) uniform writeonly image2D oBlur;
+const float GOLDEN_ANGLE = 2.39996323;
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    if (any(greaterThanEqual(p, ivec2(post.halfSize.xy)))) return;
+    ivec2 tsize = textureSize(uTiles, 0);
+    ivec2 t = p / 8;
+    float maxR = 0.0;
+    for (int y = -1; y <= 1; ++y)
+        for (int x = -1; x <= 1; ++x) maxR = max(maxR, texelFetch(uTiles, clamp(t + ivec2(x, y), ivec2(0), tsize - 1), 0).r);
+    maxR = min(maxR, post.dof.z * 0.5);
+    vec4 center = texelFetch(uHalf, p, 0);
+    if (maxR < 0.5) { imageStore(oBlur, p, vec4(center.rgb, 0.0)); return; }
+    float centerCoC = center.a, centerSize = abs(centerCoC);
+    vec2 uv = (vec2(p) + 0.5) * post.halfSize.zw;
+    // Area-uniform golden-angle disc over the gather radius. The sample count follows the disc
+    // area (post.dof.w = sample spacing in half-res px, from the quality preset) with a floor, so
+    // small CoCs are still smooth instead of a 2-3 tap blur showing the half-res grid.
+    float rstep = post.dof.w;
+    int count = clamp(int(maxR * maxR / (2.0 * rstep)), 12, 160);
+    vec3 color = center.rgb;
+    float tot = 1.0, nearSum = 0.0;
+    float ang = blueNoiseStatic(p, 6) * TAU;
+    for (int i = 0; i < count; ++i) {
+        float radius = maxR * sqrt((float(i) + 0.5) / float(count));
+        vec2 tc = uv + vec2(cos(ang), sin(ang)) * radius * post.halfSize.zw;
+        vec4 s = textureLod(uHalf, tc, 0.0);
+        float sSize = abs(s.a);
+        if (s.a > centerCoC) sSize = min(sSize, centerSize * 2.0);  // behind the centre
+        float m = smoothstep(radius - 0.5, radius + 0.5, sSize);
+        color += mix(color / tot, s.rgb, m);
+        tot += 1.0;
+        if (s.a < centerCoC - 0.5) nearSum += m;
+        ang += GOLDEN_ANGLE;
+    }
+    float n = float(count);
+    float coverage = saturate(2.0 * nearSum / max(n, 1.0));
+    imageStore(oBlur, p, vec4(sanitize(color / tot), coverage));
+}

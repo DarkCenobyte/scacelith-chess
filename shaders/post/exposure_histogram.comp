@@ -1,0 +1,29 @@
+// Auto exposure, pass 1: centre-weighted log2-luminance histogram (256 bins) of a quarter
+// resolution level of the bloom pyramid. Bin 0 = black.
+#include "shaders/post/post_common.glsl"
+layout(local_size_x = 16, local_size_y = 16) in;
+layout(binding = 0) uniform sampler2D uSrc;
+layout(location = 1) uniform int uLod;
+layout(std430, binding = 5) buffer Histogram { uint bins[256]; };
+shared uint sBins[256];
+const float MIN_LOG = -14.0, RANGE_LOG = 20.0;
+
+void main() {
+    uint lid = gl_LocalInvocationIndex;
+    sBins[lid] = 0u;
+    barrier();
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = textureSize(uSrc, uLod);
+    if (all(lessThan(p, size))) {
+        vec3 c = texelFetch(uSrc, p, uLod).rgb;
+        float L = luminance(c);
+        uint bin = 0u;
+        if (L > 1e-7 && !isnan(L) && !isinf(L)) bin = 1u + uint(saturate((log2(L) - MIN_LOG) / RANGE_LOG) * 254.0 + 0.5);
+        vec2 d = (vec2(p) + 0.5) / vec2(size) - 0.5;
+        d.x *= float(size.x) / float(size.y);
+        float w = mix(0.25, 1.0, exp(-dot(d, d) * 6.0));
+        atomicAdd(sBins[bin], uint(w * 64.0 + 0.5));
+    }
+    barrier();
+    if (sBins[lid] != 0u) atomicAdd(bins[lid], sBins[lid]);
+}

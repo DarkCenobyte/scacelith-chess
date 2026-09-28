@@ -1,0 +1,66 @@
+// Combines the lit HDR target with the screen-space reflections (split-sum weighted, confidence
+// faded; probes remain the fallback) and the volumetric lighting (joint-bilateral upsample of the
+// half-resolution result: colour * transmittance + in-scattering). Guards against NaN/Inf.
+#include "shaders/post/post_common.glsl"
+#include "shaders/include/brdf.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uHDR;
+layout(binding = 1) uniform sampler2D uSSR;
+layout(binding = 2) uniform sampler2D uSpecular;
+layout(binding = 3) uniform sampler2D uNormalRough;
+layout(binding = 4) uniform sampler2D uLinearDepth;
+layout(binding = 5) uniform sampler2D uVolume;
+layout(binding = 6) uniform sampler2D uHalfDepth;
+layout(binding = 0, rgba16f) uniform writeonly image2D oColor;
+layout(location = 1) uniform int uFlags;  // 1 = SSR, 2 = volumetrics
+
+vec4 upsampleVolume(ivec2 p, float z) {
+    ivec2 hsize = ivec2(post.halfSize.xy);
+    vec2 hp = (vec2(p) + 0.5) * 0.5 - 0.5;
+    ivec2 b = ivec2(floor(hp));
+    vec2 f = hp - vec2(b);
+    float zc = min(z, 1e4);
+    float tol = 1.0 / (0.03 * zc + 0.01);
+    vec4 sum = vec4(0.0), best = vec4(0.0, 0.0, 0.0, 1.0);
+    float wsum = 0.0, bestDz = 1e30;
+    for (int k = 0; k < 4; ++k) {
+        ivec2 o = ivec2(k & 1, k >> 1);
+        ivec2 q = clamp(b + o, ivec2(0), hsize - 1);
+        float zq = min(texelFetch(uHalfDepth, q, 0).r, 1e4);
+        vec4 v = texelFetch(uVolume, q, 0);
+        float bil = (o.x == 1 ? f.x : 1.0 - f.x) * (o.y == 1 ? f.y : 1.0 - f.y);
+        float dz = abs(zq - zc);
+        float w = (bil + 1e-3) * exp(-dz * tol);
+        sum += v * w;
+        wsum += w;
+        if (dz < bestDz) { bestDz = dz; best = v; }
+    }
+    return wsum > 1e-4 ? sum / wsum : best;
+}
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    if (any(greaterThanEqual(p, ivec2(post.renderSize.xy)))) return;
+    vec3 c = sanitize(texelFetch(uHDR, p, 0).rgb);
+    if ((uFlags & 1) != 0) {
+        vec4 spec = texelFetch(uSpecular, p, 0);
+        if (spec.a > 0.5) {
+            vec4 s = texelFetch(uSSR, p, 0);
+            vec4 nr = texelFetch(uNormalRough, p, 0);
+            float z = texelFetch(uLinearDepth, p, 0).r;
+            vec2 uv = (vec2(p) + 0.5) * post.renderSize.zw;
+            vec3 pw = worldPosFromLinear(uv, z);
+            vec3 V = normalize(frame.cameraPos.xyz - pw);
+            vec3 N = dot(nr.xyz, nr.xyz) > 1e-4 ? normalize(nr.xyz) : V;
+            vec2 dfg = envBRDFApprox(max(dot(N, V), 1e-3), nr.w);
+            vec3 fg = spec.rgb * dfg.x + dfg.y;
+            c += sanitize(s.rgb) * fg * saturate(s.a) * post.ssr.z;
+        }
+    }
+    if ((uFlags & 2) != 0) {
+        float z = texelFetch(uLinearDepth, p, 0).r;
+        vec4 v = upsampleVolume(p, z);
+        if (!badValue(v.rgb) && !isnan(v.a)) c = c * saturate(v.a) + max(v.rgb, vec3(0.0));
+    }
+    imageStore(oColor, p, vec4(sanitize(c), 1.0));
+}
