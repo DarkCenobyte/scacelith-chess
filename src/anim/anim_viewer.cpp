@@ -1881,36 +1881,36 @@ void AnimViewer::writingSelfTest() {
             ev.clear();
             an.update(dt, ev);
             for (const Event& e : ev) {
-                auto near = [&](float want) {
+                auto expectAt = [&](float want) {
                     evErr = std::max(evErr, std::fabs(e.time - want));
                     if (std::getenv("SCACELITH_WRITE_TRACE")) LOGI("wtrace %s event %d at %.4f (expected %.4f)", a ? "B" : "W", int(e.type), e.time, want);
                 };
                 switch (e.type) {
                     case EventType::PieceGripped: ps[pawn].heldBy = 0; break;
                     case EventType::PieceReleased:
-                        near(tRelease);
+                        expectAt(tRelease);
                         ps[pawn].heldBy = -1;
                         ps[pawn].xf = e.transform;
                         break;
-                    case EventType::ClockPressed: near(tClock); break;
+                    case EventType::ClockPressed: expectAt(tClock); break;
                     case EventType::PenPicked:
-                        near(tPick);
+                        expectAt(tPick);
                         if (length(e.transform.translation() - pen0.translation()) > 1e-5f) ++bad;
                         picked = justPicked = true;
                         break;
                     case EventType::PenPut: {
-                        near(tPut);
+                        expectAt(tPut);
                         mat4 want = wt[4].frame;
                         if (length(e.transform.translation() - want.translation()) > 1e-5f) ++bad;
                         putErr = std::max(putErr, length(lastPen.translation() - want.translation()));
                         break;
                     }
-                    case EventType::PenDown: near(nDown < int(downs.size()) ? downs[size_t(nDown)] : -1.0f); ++nDown; break;
-                    case EventType::PenUp: near(nUp < int(ups.size()) ? ups[size_t(nUp)] : -1.0f); ++nUp; break;
-                    case EventType::WritingDone: near(nDone == 0 ? path1 + p1.back().t : path2 + p2.back().t); ++nDone; break;
-                    case EventType::PageGripped: near(turn + 0.33f * Timing::PageTurn); ++nGrip; break;
-                    case EventType::PageTurned: near(turn + 0.90f * Timing::PageTurn); ++nTurned; break;
-                    case EventType::WritingQueueEmpty: near(tEnd); ++nEmpty; break;
+                    case EventType::PenDown: expectAt(nDown < int(downs.size()) ? downs[size_t(nDown)] : -1.0f); ++nDown; break;
+                    case EventType::PenUp: expectAt(nUp < int(ups.size()) ? ups[size_t(nUp)] : -1.0f); ++nUp; break;
+                    case EventType::WritingDone: expectAt(nDone == 0 ? path1 + p1.back().t : path2 + p2.back().t); ++nDone; break;
+                    case EventType::PageGripped: expectAt(turn + 0.33f * Timing::PageTurn); ++nGrip; break;
+                    case EventType::PageTurned: expectAt(turn + 0.90f * Timing::PageTurn); ++nTurned; break;
+                    case EventType::WritingQueueEmpty: expectAt(tEnd); ++nEmpty; break;
                     default: break;
                 }
             }
