@@ -56,6 +56,7 @@ struct FormText {
     float x = 0, baseline = 0;  // anchor (mm)
     float capHeight = 2.0f;     // mm
     int align = 0;              // 0 left, 1 centre, 2 right (of the anchor)
+    float maxWidth = 0.0f;      // mm available; a longer translation is printed smaller (0 = no limit)
 };
 struct Form {
     std::vector<Rect> rules;    // filled rectangles (lines and box borders), printed ink

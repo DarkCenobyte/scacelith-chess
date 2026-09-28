@@ -85,6 +85,17 @@ std::string customClockSummary(const WatchSetup& s) {
     if (s.customDelaySeconds > 0) r += ", " + trf("viewer.delay_summary", {num(s.customDelaySeconds)});
     return r;
 }
+// A signed amount ("+5") keeps its sign in front inside right-to-left text.
+std::string signedSeconds(int s) { return trf("viewer.seconds", {i18n::ltr("+" + num(s))}); }
+// "%.2g" with the language's decimal separator.
+std::string decimal2(float v) {
+    char buf[32];
+    std::snprintf(buf, sizeof(buf), "%.2g", double(v));
+    std::string s = buf;
+    size_t p = s.find('.');
+    if (p != std::string::npos) s.replace(p, 1, tr("number.decimal"));
+    return s;
+}
 
 // ---- Presets --------------------------------------------------------------------------------------
 // The viewer offers the fixed presets (the last entry of the list, "Custom", is left out).
@@ -96,7 +107,8 @@ const DifficultyInfo* preset(int i) {
 std::string presetLabel(int i) {
     const DifficultyInfo* d = preset(i);
     if (!d) return "";
-    return d->elo > 0 ? d->name + " (" + num(d->elo) + ")" : d->name;
+    std::string name = presetName(d->name);
+    return d->elo > 0 ? name + " (" + num(d->elo) + ")" : name;
 }
 
 void loadWatch(WatchSetup& w) {
@@ -121,7 +133,8 @@ void storeWatch(const WatchSetup& w) {
     g.save();
 }
 
-// One side's list of presets: name and rating per row.
+// One side's list of presets: name and rating per row (name at the start of the reading
+// direction, rating at the end).
 void presetColumn(const char* idStr, int& selected, const Rect& area, float rowH) {
     int n = presetCount();
     im::pushId(idStr);
@@ -137,18 +150,24 @@ void presetColumn(const char* idStr, int& selected, const Rect& area, float rowH
             im::sound(Sound::Toggle);
         }
         if (sel) {
-            gfx::fillH(r, withAlpha(gold, 0.13f), withAlpha(gold, 0.04f), 2.0f);
+            if (im::rtl()) gfx::fillH(r, withAlpha(gold, 0.04f), withAlpha(gold, 0.13f), 2.0f);
+            else gfx::fillH(r, withAlpha(gold, 0.13f), withAlpha(gold, 0.04f), 2.0f);
             gfx::stroke(r, withAlpha(gold, 0.55f), 0.0f, 2.0f);
-            gfx::diamond(vec2(r.x, r.cy()), 4.5f, goldBright);
+            gfx::diamond(vec2(im::flipX(r, r.x), r.cy()), 4.5f, goldBright);
         } else {
             im::rowHighlight(r, it.hoverT);
         }
-        TextStyle ns = style(font::FACE_TEXT, 25.0f, sel ? goldBright : theme::mix(ivory, goldBright, it.hoverT * 0.5f));
-        gfx::text(d->name, r.x + 22.0f, baselineCentered(r, ns), ns);
+        float eloW = 0.0f;
         if (d->elo > 0) {
-            TextStyle es = style(font::FACE_ITALIC, 21.0f, sel ? gold : muted, HAlign::Right);
-            gfx::text(trf("viewer.elo_approx", {num(d->elo)}), r.r() - 16.0f, baselineCentered(r, es), es);
+            TextStyle es = style(font::FACE_ITALIC, 21.0f, sel ? gold : muted, im::endAlign());
+            std::string elo = trf("viewer.elo_approx", {num(d->elo)});
+            eloW = gfx::textWidth(elo, es) + 12.0f;
+            gfx::text(elo, im::flipX(r, r.r() - 16.0f), baselineCentered(r, es), es);
         }
+        TextStyle ns = style(font::FACE_TEXT, 25.0f, sel ? goldBright : theme::mix(ivory, goldBright, it.hoverT * 0.5f), im::startAlign());
+        std::string name = presetName(d->name);
+        ns.size = gfx::fitSize(name, ns, r.w - 38.0f - eloW);
+        gfx::text(name, im::flipX(r, r.x + 22.0f), baselineCentered(r, ns), ns);
     }
     im::popId();
 }
@@ -179,12 +198,16 @@ MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back) {
     im::pageTitle(tr("viewer.title"), p.cx(), p.y + 78.0f);
     im::pushId("watch");
 
+    // Laid out left to right, then mirrored inside the panel for a right-to-left language (White
+    // on the right, the time controls on the left).
     float pad = 64.0f, gap = 56.0f;
     float colW = (p.w - 2.0f * pad - 2.0f * gap) / 3.0f;
-    float x0 = p.x + pad, x1 = x0 + colW + gap, x2 = x1 + colW + gap;
+    float lx0 = p.x + pad, lx1 = lx0 + colW + gap, lx2 = lx1 + colW + gap;
+    auto colX = [&](float lx) { return im::flip(p, Rect(lx, 0.0f, colW, 0.0f)).x; };
+    float x0 = colX(lx0), x1 = colX(lx1), x2 = colX(lx2);
     float top = p.y + 150.0f;
     float footer = p.b() - 118.0f;
-    gfx::vline(x2 - gap * 0.5f, top, footer - 20.0f, withAlpha(gold, 0.12f));
+    gfx::vline(im::flipX(p, lx2 - gap * 0.5f), top, footer - 20.0f, withAlpha(gold, 0.12f));
 
     // The two players.
     float rowH = 52.0f;
@@ -194,18 +217,22 @@ MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back) {
     presetColumn("white", setup.whitePreset, wl, rowH);
     presetColumn("black", setup.blackPreset, bl, rowH);
     float dy = wl.b() + 30.0f;
-    TextStyle ds = style(font::FACE_ITALIC, 21.0f, ivoryDim);
-    if (const DifficultyInfo* d = preset(setup.whitePreset)) gfx::textWrapped(d->description, x0 + 4.0f, dy, colW - 8.0f, ds, 27.0f);
-    if (const DifficultyInfo* d = preset(setup.blackPreset)) gfx::textWrapped(d->description, x1 + 4.0f, dy, colW - 8.0f, ds, 27.0f);
+    TextStyle ds = style(font::FACE_ITALIC, 21.0f, ivoryDim, im::startAlign());
+    auto description = [&](int i, const Rect& col) {
+        if (const DifficultyInfo* d = preset(i))
+            gfx::textWrapped(presetDescription(d->name, d->description), im::flipX(col, col.x + 4.0f), dy, colW - 8.0f, ds, 27.0f);
+    };
+    description(setup.whitePreset, wl);
+    description(setup.blackPreset, bl);
     // The divider between the players ends on the swap button.
-    Rect swapR(x1 - gap * 0.5f - 130.0f, dy + 72.0f, 260.0f, 46.0f);
-    gfx::vline(x1 - gap * 0.5f, top, swapR.y - 10.0f, withAlpha(gold, 0.10f));
+    Rect swapR = im::flip(p, Rect(lx1 - gap * 0.5f - 130.0f, dy + 72.0f, 260.0f, 46.0f));
+    gfx::vline(im::flipX(p, lx1 - gap * 0.5f), top, swapR.y - 10.0f, withAlpha(gold, 0.10f));
     if (im::button(tr("viewer.swap"), swapR, im::ButtonKind::Quiet)) {
         std::swap(setup.whitePreset, setup.blackPreset);
         im::sound(Sound::Toggle);
     }
     TextStyle ns = style(font::FACE_ITALIC, 22.0f, muted, HAlign::Center);
-    gfx::textWrapped(tr("viewer.note"), x1 - gap * 0.5f, footer - 64.0f, 2.0f * colW, ns, 29.0f);
+    gfx::textWrapped(tr("viewer.note"), im::flipX(p, lx1 - gap * 0.5f), footer - 64.0f, 2.0f * colW, ns, 29.0f);
 
     // Time control.
     im::sectionLabel(tr("viewer.time_control"), x2, top + 8.0f, colW);
@@ -217,7 +244,7 @@ MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back) {
     im::pushId("tc");
     for (int i = 0; i < ntc; ++i) {
         bool isCustom = i == ntc - 1;
-        Rect r(x2 + float(i % cols) * (cw + cgap), gy + float(i / cols) * (ch + cgap), cw, ch);
+        Rect r = im::flip(p, Rect(lx2 + float(i % cols) * (cw + cgap), gy + float(i / cols) * (ch + cgap), cw, ch));
         bool sel = isCustom ? customTc : setup.timeControl == i;
         im::Item it = im::item(im::makeId(i), r);
         if (it.activated && !sel) {
@@ -234,19 +261,21 @@ MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back) {
             gfx::fill(r, withAlpha(gold, 0.08f * it.hoverT), 2.0f);
             gfx::stroke(r, withAlpha(gold, 0.18f + 0.4f * it.hoverT), 0.0f, 2.0f);
         }
-        std::string label = isCustom ? std::string(tr("viewer.custom")) : spacedPlus(tcs[size_t(i)]);
+        std::string label = isCustom ? std::string(tr("viewer.custom")) : spacedPlus(timeControlLabel(tcs[size_t(i)]));
         std::string cat = isCustom ? std::string(tr("viewer.tc.custom")) : std::string(tr(categoryKey(tcs[size_t(i)])));
         TextStyle ls = style(font::FACE_TEXT, 27.0f, sel ? goldBright : theme::mix(ivory, goldBright, it.hoverT * 0.6f), HAlign::Center);
         if (gfx::textWidth(label, ls) > cw - 12.0f) ls.size = 23.0f;
+        ls.size = gfx::fitSize(label, ls, cw - 12.0f);
         gfx::text(label, r.cx(), r.y + 32.0f, ls);
         TextStyle cs = style(font::FACE_ITALIC, 18.0f, sel ? gold : muted, HAlign::Center);
+        cs.size = gfx::fitSize(cat, cs, cw - 10.0f);
         gfx::text(cat, r.cx(), r.y + 54.0f, cs);
     }
     im::popId();
     float y = gy + float((ntc + cols - 1) / cols) * (ch + cgap) + 10.0f;
     if (customTc) {
         auto trow = [&]() {
-            Rect r(x2, y, colW, 42.0f);
+            Rect r(x2, y, colW, 42.0f);  // x2 is already the mirrored column
             y += 44.0f;
             return r;
         };
@@ -256,7 +285,7 @@ MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back) {
         if (im::stepperRow(tr("viewer.base_time"), bi, int(bv.size()), [&](int i) { return clockText(bv[size_t(i)]); }, trow()))
             setup.customBaseSeconds = bv[size_t(bi)];
         int inc = std::clamp(setup.customIncrementSeconds, 0, 60);
-        if (im::stepperRow(tr("viewer.increment"), inc, 61, [](int i) { return "+" + trf("viewer.seconds", {num(i)}); }, trow()))
+        if (im::stepperRow(tr("viewer.increment"), inc, 61, [](int i) { return signedSeconds(i); }, trow()))
             setup.customIncrementSeconds = inc;
         int del = std::clamp(setup.customDelaySeconds, 0, 60);
         if (im::stepperRow(tr("viewer.delay"), del, 61,
@@ -269,18 +298,20 @@ MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back) {
     float bw = 260.0f, bh = 58.0f;
     float by = p.b() - 52.0f - bh;
     gfx::hlineFade(p.x + 40.0f, p.r() - 40.0f, by - 26.0f, withAlpha(gold, 0.25f), 0.3f);
-    bool backPressed = im::button(tr("viewer.back"), Rect(p.x + pad, by, bw, bh), im::ButtonKind::Secondary);
-    std::string startLabel = tr("viewer.start");
-    im::Id startId = im::makeId(startLabel);
-    if (im::button(startLabel, Rect(p.r() - pad - bw, by, bw, bh), im::ButtonKind::Primary)) {
+    bool backPressed = im::button(std::string(tr("viewer.back")) + "##viewer.back", im::flip(p, Rect(p.x + pad, by, bw, bh)), im::ButtonKind::Secondary);
+    im::Id startId = im::makeId("##viewer.start");
+    if (im::button(std::string(tr("viewer.start")) + "##viewer.start", im::flip(p, Rect(p.r() - pad - bw, by, bw, bh)), im::ButtonKind::Primary)) {
         storeWatch(setup);
         act = MenuAction::StartWatching;
     }
     {
-        std::string tc = customTc ? customClockSummary(setup) : spacedPlus(tcs[size_t(setup.timeControl)]);
+        // "3 + 2" keeps its order inside an Arabic sentence.
+        std::string tc = i18n::ltr(customTc ? customClockSummary(setup) : spacedPlus(timeControlLabel(tcs[size_t(setup.timeControl)])));
         std::string who = trf("viewer.summary", {presetLabel(setup.whitePreset), presetLabel(setup.blackPreset)});
-        TextStyle ss = style(font::FACE_ITALIC, 22.0f, ivoryDim, HAlign::Right);
-        gfx::text(who + "  \xC2\xB7  " + tc, p.r() - pad - bw - 30.0f, by + bh * 0.5f + 7.0f, ss);
+        std::string summary = who + "  \xC2\xB7  " + tc;
+        TextStyle ss = style(font::FACE_ITALIC, 22.0f, ivoryDim, im::endAlign());
+        ss.size = gfx::fitSize(summary, ss, p.w - 2.0f * pad - 2.0f * bw - 60.0f);
+        gfx::text(summary, im::flipX(p, p.r() - pad - bw - 30.0f), by + bh * 0.5f + 7.0f, ss);
     }
     im::setDefaultFocus(startId);
     im::popId();
@@ -295,25 +326,32 @@ MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back) {
 // ==== Elo ===============================================================================================
 void titleRating(float x, float y) {
     const game::Settings& s = game::settings();
+    // x is the start edge: the line grows to the right, or to the left in a right-to-left UI.
+    const bool rtl = im::rtl();
+    const float dir = rtl ? -1.0f : 1.0f;
+    const HAlign align = im::startAlign();
     // A short gold hairline sets the rating apart from the menu entries.
-    gfx::fillH(Rect(x, y - 46.0f, 180.0f, 1.5f), withAlpha(gold, 0.55f), withAlpha(gold, 0.0f));
-    TextStyle ls = style(font::FACE_TITLE, 19.0f, gold, HAlign::Left, 0.22f);
+    Rect hair(rtl ? x - 180.0f : x, y - 46.0f, 180.0f, 1.5f);
+    if (rtl) gfx::fillH(hair, withAlpha(gold, 0.0f), withAlpha(gold, 0.55f));
+    else gfx::fillH(hair, withAlpha(gold, 0.55f), withAlpha(gold, 0.0f));
+    TextStyle ls = style(font::FACE_TITLE, 19.0f, gold, align, 0.22f);
     float lw = gfx::text(tr("elo.label"), x, y, ls);
-    TextStyle vs = style(font::FACE_TEXT, 34.0f, ivory);
-    float vw = gfx::text(num(s.playerElo), x + lw + 14.0f, y + 3.0f, vs);
+    TextStyle vs = style(font::FACE_TEXT, 34.0f, ivory, align);
+    float vw = gfx::text(num(s.playerElo), x + dir * (lw + 14.0f), y + 3.0f, vs);
     std::string line;
     if (s.playerGames <= 0) {
         line = tr("elo.no_games");
     } else {
         line = s.playerGames < elo::kProvisionalGames ? std::string(tr("elo.provisional"))
                                                       : trf("elo.peak", {num(std::max(s.playerPeakElo, s.playerElo))});
-        line += "  \xC2\xB7  " + trf("elo.record", {num(s.playerWins), num(s.playerDraws), num(s.playerLosses)});
+        // "+12 =4 -9" reads left to right in every language.
+        line += "  \xC2\xB7  " + i18n::ltr(trf("elo.record", {num(s.playerWins), num(s.playerDraws), num(s.playerLosses)}));
     }
-    TextStyle is = style(font::FACE_ITALIC, 21.0f, withAlpha(ivoryDim, 0.9f));
-    gfx::text(line, x + lw + 14.0f + vw + 18.0f, y, is);
+    TextStyle is = style(font::FACE_ITALIC, 21.0f, withAlpha(ivoryDim, 0.9f), align);
+    gfx::text(line, x + dir * (lw + 14.0f + vw + 18.0f), y, is);
 }
 
-void newGameRating(float rightX, float y, int difficulty) {
+void newGameRating(float x, float width, float y, int difficulty) {
     const game::Settings& s = game::settings();
     std::string text = trf("elo.yours", {num(s.playerElo)});
     const DifficultyInfo* d = preset(difficulty);
@@ -321,12 +359,20 @@ void newGameRating(float rightX, float y, int difficulty) {
         int pct = int(std::lround(100.0 * elo::expectedScore(s.playerElo, d->elo)));
         text += "  \xC2\xB7  " + trf("elo.expected", {num(pct)});
     }
-    TextStyle st = style(font::FACE_ITALIC, 21.0f, ivoryDim, HAlign::Right);
+    // At the end of the column's heading (its right end, the left one in a right-to-left UI),
+    // never over the heading itself.
+    Rect col(x, y - 20.0f, width, 26.0f);
+    TextStyle label = style(font::FACE_TITLE, kSection, gold, HAlign::Left, 0.2f);
+    TextStyle st = style(font::FACE_ITALIC, 21.0f, ivoryDim, im::endAlign());
+    st.size = gfx::fitSize(text, st, width - gfx::textWidth(tr("newgame.opponent"), label) - 60.0f);
     float tw = gfx::textWidth(text, st);
     // Mask the fading rule of the section label behind the text.
-    gfx::fillH(Rect(rightX - tw - 40.0f, y - 20.0f, 30.0f, 26.0f), vec4(0.05f, 0.043f, 0.039f, 0.0f), vec4(0.05f, 0.043f, 0.039f, 0.9f));
-    gfx::fill(Rect(rightX - tw - 10.0f, y - 20.0f, tw + 10.0f, 26.0f), vec4(0.05f, 0.043f, 0.039f, 0.9f));
-    gfx::text(text, rightX, y, st);
+    vec4 clear(0.05f, 0.043f, 0.039f, 0.0f), dark(0.05f, 0.043f, 0.039f, 0.9f);
+    Rect fade = im::flip(col, Rect(col.r() - tw - 40.0f, col.y, 30.0f, col.h));
+    if (im::rtl()) gfx::fillH(fade, dark, clear);
+    else gfx::fillH(fade, clear, dark);
+    gfx::fill(im::flip(col, Rect(col.r() - tw - 10.0f, col.y, tw + 10.0f, col.h)), dark);
+    gfx::text(text, im::flipX(col, col.r()), y, st);
 }
 
 void gameOverDetail(const std::string& text, float cx, float y) {
@@ -389,26 +435,28 @@ void viewerHud(const ViewerHud& hud) {
     gfx::Layer prev = gfx::layer();
     gfx::setLayer(gfx::LAYER_MAIN);
     float x = 56.0f;
+    // Laid out from the left edge, mirrored to the right edge for a right-to-left language.
+    const Rect screen(0.0f, 0.0f, v.x, v.y);
 
     // Players, top left (a diamond marks the player to move).
     {
-        TextStyle side = style(font::FACE_TITLE, 17.0f, gold, HAlign::Left, 0.22f);
-        TextStyle name = style(font::FACE_TEXT, 24.0f, ivory);
+        TextStyle side = style(font::FACE_TITLE, 17.0f, gold, im::startAlign(), 0.22f);
+        TextStyle name = style(font::FACE_TEXT, 24.0f, ivory, im::startAlign());
         const std::string* names[2] = {&hud.white, &hud.black};
         const char* sides[2] = {"viewer.white", "viewer.black"};
         float sw = std::max(gfx::textWidth(tr(sides[0]), side), gfx::textWidth(tr(sides[1]), side));
         float nw = std::max(gfx::textWidth(hud.white, name), gfx::textWidth(hud.black, name));
         Rect p(x - 16.0f, 40.0f, 48.0f + sw + 20.0f + nw + 34.0f, 124.0f);
-        im::panel(p, 0.82f);
+        im::panel(im::flip(screen, p), 0.82f);
         float tx = p.x + 48.0f;
         for (int i = 0; i < 2; ++i) {
             float y = p.y + 52.0f + float(i) * 38.0f;
             bool toMove = hud.sideToMove == i;
-            if (toMove) gfx::diamond(vec2(tx - 18.0f, y - 7.0f), 4.0f, goldBright);
+            if (toMove) gfx::diamond(vec2(im::flipX(screen, tx - 18.0f), y - 7.0f), 4.0f, goldBright);
             side.color = toMove ? goldBright : gold;
-            gfx::text(tr(sides[i]), tx, y, side);
+            gfx::text(tr(sides[i]), im::flipX(screen, tx), y, side);
             name.color = toMove ? ivory : ivoryDim;
-            gfx::text(*names[i], tx + sw + 20.0f, y + 1.0f, name);
+            gfx::text(*names[i], im::flipX(screen, tx + sw + 20.0f), y + 1.0f, name);
         }
     }
 
@@ -423,8 +471,8 @@ void viewerHud(const ViewerHud& hud) {
             {"viewer.keys.menu", "viewer.controls.menu"},     {"viewer.keys.hide", "viewer.controls.hide"},
         };
         const int count = int(sizeof(lines) / sizeof(lines[0]));
-        TextStyle ks = style(font::FACE_TEXT, 20.0f, goldBright, HAlign::Right);
-        TextStyle as = style(font::FACE_ITALIC, 20.0f, ivoryDim);
+        TextStyle ks = style(font::FACE_TEXT, 20.0f, goldBright, im::endAlign());
+        TextStyle as = style(font::FACE_ITALIC, 20.0f, ivoryDim, im::startAlign());
         float kw = 0.0f, aw = 0.0f;
         for (const Line& l : lines) {
             kw = std::max(kw, gfx::textWidth(tr(l.keys), ks));
@@ -433,15 +481,15 @@ void viewerHud(const ViewerHud& hud) {
         float lineH = 29.0f;
         float w = kw + aw + 110.0f, h = 76.0f + lineH * float(count);
         Rect p(x - 16.0f, v.y - h - 44.0f, w, h);
-        im::panel(p, 0.82f);
-        TextStyle ts = style(font::FACE_TITLE, 17.0f, gold, HAlign::Left, 0.24f);
-        gfx::text(tr("viewer.controls.title"), p.x + 30.0f, p.y + 40.0f, ts);
+        im::panel(im::flip(screen, p), 0.82f);
+        TextStyle ts = style(font::FACE_TITLE, 17.0f, gold, im::startAlign(), 0.24f);
+        gfx::text(tr("viewer.controls.title"), im::flipX(screen, p.x + 30.0f), p.y + 40.0f, ts);
         float mid = p.x + 30.0f + kw + 20.0f;
         for (int i = 0; i < count; ++i) {
             float y = p.y + 76.0f + float(i) * lineH;
-            gfx::text(tr(lines[i].keys), mid - 12.0f, y, ks);
-            gfx::diamond(vec2(mid, y - 6.0f), 2.5f, withAlpha(gold, 0.55f));
-            gfx::text(tr(lines[i].action), mid + 12.0f, y, as);
+            gfx::text(tr(lines[i].keys), im::flipX(screen, mid - 12.0f), y, ks);
+            gfx::diamond(vec2(im::flipX(screen, mid), y - 6.0f), 2.5f, withAlpha(gold, 0.55f));
+            gfx::text(tr(lines[i].action), im::flipX(screen, mid + 12.0f), y, as);
         }
     }
 
@@ -461,11 +509,9 @@ void viewerHud(const ViewerHud& hud) {
     }
     float sa = fading(hud.speedAge, 1.0f);
     if (sa > 0.001f) {
-        char buf[32];
-        std::snprintf(buf, sizeof(buf), "%.2g", double(hud.speed));
         TextStyle ss = style(font::FACE_ITALIC, 23.0f, withAlpha(ivoryDim, sa), HAlign::Center);
         gfx::radial(vec2(v.x * 0.5f, cy - 8.0f), vec2(200.0f, 34.0f), vec4(0, 0, 0, 0.4f * sa), 0.0f, 1.0f);
-        gfx::text(trf("viewer.speed", {buf}), v.x * 0.5f, cy, ss);
+        gfx::text(trf("viewer.speed", {decimal2(hud.speed)}), v.x * 0.5f, cy, ss);
     }
     gfx::setLayer(prev);
 }

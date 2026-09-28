@@ -226,6 +226,10 @@ void printedFormVertices(int page, std::vector<InkVertex>& out) {
         ui::text::Run run = ui::text::shapeLine(t.text, t.face);
         float sz = t.capHeight / std::max(font::metrics(t.face).capHeight, 0.2f);  // mm per em
         float w = run.advance * sz;
+        if (t.maxWidth > 0.0f && w > t.maxWidth) {
+            sz *= t.maxWidth / w;
+            w = t.maxWidth;
+        }
         float x0 = t.align == 1 ? t.x - 0.5f * w : (t.align == 2 ? t.x - w : t.x);
         for (const ui::text::PlacedGlyph& pg : run.glyphs) {
             const font::Glyph& G = *pg.glyph;

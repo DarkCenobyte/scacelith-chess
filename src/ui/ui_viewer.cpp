@@ -22,7 +22,6 @@
 #include "../i18n/i18n.h"
 #include "../i18n/unicode.h"
 #include "../gl/gl46.h"
-#include "../i18n/i18n.h"
 #include "../platform/platform.h"
 #include "../render/gpu.h"
 #include "../render/shader.h"
@@ -227,8 +226,8 @@ public:
             a = ui::viewerPauseMenu();
         } else if (s == "viewer-hud") {
             ui::ViewerHud hud;
-            hud.white = i18n::trf("viewer.player", {"Master", "2400"});
-            hud.black = i18n::trf("viewer.player", {"Expert", "2100"});
+            hud.white = i18n::trf("viewer.player", {ui::presetName("Master"), "2400"});
+            hud.black = i18n::trf("viewer.player", {ui::presetName("Expert"), "2100"});
             hud.sideToMove = 1;
             hud.viewpoint = i18n::tr("viewer.view.7");
             hud.viewpointAge = 0.5f;
@@ -237,12 +236,12 @@ public:
             ui::GameOverExtras x;
             if (s == "viewer-gameover") {
                 x.line = i18n::trf("viewer.gameover.white_wins", {"47"});
-                x.detail = i18n::trf("viewer.gameover.players", {"Master (2400)", "Expert (2100)"});
+                x.detail = i18n::trf("viewer.gameover.players", {ui::presetName("Master") + " (2400)", ui::presetName("Expert") + " (2100)"});
                 x.primaryLabel = i18n::tr("viewer.watch_again");
             } else {
-                x.detail = i18n::trf("elo.change", {"1500", "1524", "+24"});
+                x.detail = i18n::trf("elo.change", {"1500", "1524", i18n::ltr("+24")});
             }
-            a = ui::gameOver("1-0", "Checkmate", s == "gameover-elo", false, 47, x);
+            a = ui::gameOver("1-0", chess::endReasonText(chess::GameEndReason::Checkmate), s == "gameover-elo", false, 47, x);
         } else if (s == "pause" || s == "confirm") {
             a = ui::pauseMenu(true);
         } else if (s == "promotion") {

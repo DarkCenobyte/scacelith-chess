@@ -12,11 +12,12 @@ namespace detail {
 // "Watch a Game" page. t = page appearance (0..1), opened = first frame on the page. Sets 'back'
 // when the player leaves the page; returns StartWatching on Start.
 MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back);
-// The player's Elo under the title menu (left aligned at x, first baseline y).
+// The player's Elo under the title menu, from x (the start edge: left, or right in a right-to-left
+// UI) on the first baseline y.
 void titleRating(float x, float y);
-// The player's Elo, right aligned at rightX on the baseline y of the OPPONENT label, with the
-// expected score against the selected opponent (difficulty index).
-void newGameRating(float rightX, float y, int difficulty);
+// The player's Elo at the end of the OPPONENT heading of the column [x, x + width] (baseline y),
+// with the expected score against the selected opponent (difficulty index).
+void newGameRating(float x, float width, float y, int difficulty);
 // Extra line of the game over card (centred at cx, baseline y).
 void gameOverDetail(const std::string& text, float cx, float y);
 
