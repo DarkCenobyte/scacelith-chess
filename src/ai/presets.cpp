@@ -121,4 +121,10 @@ const std::vector<Preset>& presets() {
     return list;
 }
 
+int presetElo(int index, const EngineSettings& custom) {
+    const auto& list = presets();
+    if (index >= 0 && index + 1 < int(list.size())) return list[size_t(index)].approxElo;
+    return Engine::estimateElo(custom);
+}
+
 }  // namespace ai

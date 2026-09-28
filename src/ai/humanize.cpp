@@ -91,6 +91,23 @@ bool acceptsDrawOffer(int evalCp, int plyCount) {
     return std::abs(evalCp) <= 25 && plyCount >= 60;
 }
 
+// Draw offers (between two AIs; a human's offers are answered with acceptsDrawOffer):
+//   at most one offer every 20 half-moves, and only
+//   -120 <= eval <= -30 cp from move 20 on     slightly worse: half a point is welcome
+//   |eval| <= 15 cp from move 30 on            dead equal, nothing left to play for
+// A clearly lost side does not offer (the winner would decline), a better side never does.
+bool offersDraw(int evalCp, int plyCount, int pliesSinceOwnOffer) {
+    if (pliesSinceOwnOffer >= 0 && pliesSinceOwnOffer < 20) return false;
+    if (evalCp <= -30 && evalCp >= -120) return plyCount >= 40;
+    return std::abs(evalCp) <= 15 && plyCount >= 60;
+}
+
+bool sameStrength(const EngineSettings& a, const EngineSettings& b) {
+    return a.skillLevel == b.skillLevel && a.limitStrength == b.limitStrength && a.elo == b.elo && a.depth == b.depth &&
+           a.moveTimeMs == b.moveTimeMs && a.nodes == b.nodes && a.multiPV == b.multiPV && a.useNNUE == b.useNNUE &&
+           a.threads == b.threads && a.hashMB == b.hashMB && a.useClock == b.useClock;
+}
+
 namespace {
 
 // Just enough of a board to tell captures apart: piece letters (FEN case), '.' = empty.

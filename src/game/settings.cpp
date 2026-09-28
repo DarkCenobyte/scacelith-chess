@@ -60,6 +60,19 @@ bool Settings::load(const std::string& p) {
     engineThreads = ini.getInt("engine.threads", engineThreads);
     engineHashMB = ini.getInt("engine.hash_mb", engineHashMB);
     humanizeThinking = ini.getBool("engine.humanize", humanizeThinking);
+    playerElo = ini.getInt("player.elo", playerElo);
+    playerGames = ini.getInt("player.games", playerGames);
+    playerWins = ini.getInt("player.wins", playerWins);
+    playerDraws = ini.getInt("player.draws", playerDraws);
+    playerLosses = ini.getInt("player.losses", playerLosses);
+    playerPeakElo = std::max(playerElo, ini.getInt("player.peak", playerPeakElo));
+    viewerWhitePreset = ini.getInt("viewer.white_preset", viewerWhitePreset);
+    viewerBlackPreset = ini.getInt("viewer.black_preset", viewerBlackPreset);
+    viewerTimeControl = ini.getInt("viewer.time_control", viewerTimeControl);
+    viewerCustomBaseSeconds = ini.getInt("viewer.custom_base_seconds", viewerCustomBaseSeconds);
+    viewerCustomIncrementSeconds = ini.getInt("viewer.custom_increment_seconds", viewerCustomIncrementSeconds);
+    viewerCustomDelaySeconds = ini.getInt("viewer.custom_delay_seconds", viewerCustomDelaySeconds);
+    viewerShowControls = ini.getBool("viewer.show_controls", viewerShowControls);
     return true;
 }
 
@@ -97,6 +110,19 @@ bool Settings::save() const {
     ini.setInt("engine.threads", engineThreads);
     ini.setInt("engine.hash_mb", engineHashMB);
     ini.setBool("engine.humanize", humanizeThinking);
+    ini.setInt("player.elo", playerElo);
+    ini.setInt("player.games", playerGames);
+    ini.setInt("player.wins", playerWins);
+    ini.setInt("player.draws", playerDraws);
+    ini.setInt("player.losses", playerLosses);
+    ini.setInt("player.peak", playerPeakElo);
+    ini.setInt("viewer.white_preset", viewerWhitePreset);
+    ini.setInt("viewer.black_preset", viewerBlackPreset);
+    ini.setInt("viewer.time_control", viewerTimeControl);
+    ini.setInt("viewer.custom_base_seconds", viewerCustomBaseSeconds);
+    ini.setInt("viewer.custom_increment_seconds", viewerCustomIncrementSeconds);
+    ini.setInt("viewer.custom_delay_seconds", viewerCustomDelaySeconds);
+    ini.setBool("viewer.show_controls", viewerShowControls);
     if (!path.empty() && ini.save(path)) return true;
     std::string alt = plat::userDataDirectory() + "Scacelith.ini";
     if (ini.save(alt)) return true;

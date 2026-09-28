@@ -1,6 +1,7 @@
 // "ui" viewer scene: every UI screen over a dark marble backdrop (stand-in for the 3D hall).
 //   scacelith --scene ui --ui-screen main|newgame|custom|options|credits|pause|confirm|promotion|
-//                                     gameover|gameover-folded|loading|movelist|notify|hud
+//                                     gameover|gameover-folded|loading|movelist|notify|hud|
+//                                     watch|viewer-pause|viewer-hud|viewer-gameover|gameover-elo
 //   --ui-tab <0..4|display|graphics|audio|gameplay|controls>   options tab
 //   --ui-black      promotion picker for Black, --ui-draw   drawn game over card
 //   --ui-kb         show the keyboard focus highlight, --ui-mouse X,Y   fake mouse (reference px)
@@ -14,6 +15,7 @@
 #include "../core/log.h"
 #include "../game/settings.h"
 #include "../gl/gl46.h"
+#include "../i18n/i18n.h"
 #include "../platform/platform.h"
 #include "../render/gpu.h"
 #include "../render/shader.h"
@@ -105,6 +107,7 @@ public:
             ui::debug::setOptionsTab(tab_);
         }
         if (screen == "credits") ui::debug::openMenuPage(ui::debug::MenuPage::Credits);
+        if (screen == "watch") ui::debug::openMenuPage(ui::debug::MenuPage::Watch);
         if (screen == "confirm") ui::debug::openPauseConfirm(1);
         if (screen == "gameover-folded") ui::debug::foldGameOver(true);
         if (screen == "movelist") ui::notify("Touch-move: you must move the knight on g1.", 30.0f);
@@ -156,8 +159,28 @@ public:
         if (kb_) ui::im::setKeyboardMode(true);
         ui::MenuAction a = ui::MenuAction::None;
         const std::string& s = screen_;
-        if (s == "main" || s == "newgame" || s == "custom" || s == "options" || s == "credits") {
-            a = ui::mainMenu(setup_);
+        if (s == "main" || s == "newgame" || s == "custom" || s == "options" || s == "credits" || s == "watch") {
+            a = ui::mainMenu(setup_, watch_);
+        } else if (s == "viewer-pause") {
+            a = ui::viewerPauseMenu();
+        } else if (s == "viewer-hud") {
+            ui::ViewerHud hud;
+            hud.white = i18n::trf("viewer.player", {"Master", "2400"});
+            hud.black = i18n::trf("viewer.player", {"Expert", "2100"});
+            hud.sideToMove = 1;
+            hud.viewpoint = i18n::tr("viewer.view.7");
+            hud.viewpointAge = 0.5f;
+            ui::viewerHud(hud);
+        } else if (s == "viewer-gameover" || s == "gameover-elo") {
+            ui::GameOverExtras x;
+            if (s == "viewer-gameover") {
+                x.line = i18n::trf("viewer.gameover.white_wins", {"47"});
+                x.detail = i18n::trf("viewer.gameover.players", {"Master (2400)", "Expert (2100)"});
+                x.primaryLabel = i18n::tr("viewer.watch_again");
+            } else {
+                x.detail = i18n::trf("elo.change", {"1500", "1524", "+24"});
+            }
+            a = ui::gameOver("1-0", "Checkmate", s == "gameover-elo", false, 47, x);
         } else if (s == "pause" || s == "confirm") {
             a = ui::pauseMenu(true);
         } else if (s == "promotion") {
@@ -199,6 +222,7 @@ public:
 private:
     game::Settings saved_;
     ui::NewGameSetup setup_;
+    ui::WatchSetup watch_;
     std::string screen_;
     int tab_ = 0;
     bool black_ = false, drawn_ = false, kb_ = false, quit_ = false;
