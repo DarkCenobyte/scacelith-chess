@@ -93,6 +93,7 @@ void GameScene::initOnline() {
     if (ctx_->hasArg("--start-online")) {
         startOnline_ = ctx_->argValue("--start-online");
         if (startOnline_.empty() || startOnline_[0] == '-') startOnline_ = "5+3";
+        startTouch_ = ctx_->argValue("--touch");
     }
 }
 
@@ -188,6 +189,12 @@ void GameScene::updateOnline(float dt) {
     net::Event e;
     while (s.nextGameEvent(e)) onlineEvent(e);
     if (state_ != State::Playing) return;
+    // --touch with --start-online: the hand goes to that piece once the handshake is over.
+    if (!startTouch_.empty() && turn_ == Turn::HumanIdle && !anim_[humanSeat()].busy()) {
+        int id = board_.idAt(parseSquare(startTouch_));
+        startTouch_.clear();
+        if (id >= 0) humanTouch(id);
+    }
     if (fadeDip_ > 0.0f) {
         fade_ = std::max(fade_, fadeDip_);
         fadeDip_ = 0.0f;

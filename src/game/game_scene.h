@@ -24,7 +24,8 @@
 //   --no-intro --warp <s> --moves e2e4,e7e5,... --touch <square>
 //   --online-mock           online play against the in-process fake server (online_mock.h)
 //   --start-online [cat]    skip the menu: sign in and play the first opponent found in category
-//                           "cat" (default 5+3; with --online-mock the game starts at once)
+//                           "cat" (default 5+3; with --online-mock the game starts at once);
+//                           --touch <square> touches that piece once the handshake is over
 #pragma once
 #include "../ai/engine.h"
 #include "../anim/animator.h"
@@ -337,6 +338,7 @@ private:
     std::string reportComment_;
     bool onlinePauseLeave_ = false;
     std::string startOnline_;           // --start-online category
+    std::string startTouch_;            // --start-online with --touch <square>: touched once idle
     float fadeDip_ = 0.0f;              // short darkening while the board is rebuilt
 };
 

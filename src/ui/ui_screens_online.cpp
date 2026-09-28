@@ -258,8 +258,9 @@ void serverLine(const Rect& p, bool showConnection) {
     }
     TextStyle ts = style(font::FACE_ITALIC, kCaption, withAlpha(muted, 0.95f), im::startAlign());
     ts.size = gfx::fitSize(line, ts, p.w * 0.3f, 0.75f);
-    gfx::diamond(vec2(im::flipX(p, p.x + 40.0f), p.y + 42.0f), 3.5f, dot);
-    gfx::text(line, im::flipX(p, p.x + 54.0f), p.y + 48.0f, ts);
+    // Above the page title's height, so a long title never meets it.
+    gfx::diamond(vec2(im::flipX(p, p.x + 40.0f), p.y + 31.0f), 3.5f, dot);
+    gfx::text(line, im::flipX(p, p.x + 54.0f), p.y + 37.0f, ts);
 }
 
 // Error (red) or note (ivory) under a form, centered; returns the height used.
@@ -1120,10 +1121,10 @@ void pagePlay(float t) {
         std::string who = i18n::trf("online.play.signed_in", {s.account().username});
         TextStyle ws = style(font::FACE_ITALIC, kCaption, withAlpha(muted, 0.95f), im::endAlign());
         float bw = std::max(150.0f, gfx::textWidth(T("online.account.button"), style(font::FACE_ITALIC, kSmall, muted)) + 40.0f);
-        Rect ab = im::flip(p, Rect(p.r() - 30.0f - bw, p.y + 22.0f, bw, 42.0f));
+        Rect ab = im::flip(p, Rect(p.r() - 26.0f - bw, p.y + 12.0f, bw, 40.0f));
         if (im::button(L("online.account.button"), ab, im::ButtonKind::Quiet)) setSub(Sub::Account);
         ws.size = gfx::fitSize(who, ws, p.w * 0.25f, 0.7f);
-        gfx::text(who, im::flipX(p, p.r() - 44.0f - bw), p.y + 50.0f, ws);
+        gfx::text(who, im::flipX(p, p.r() - 40.0f - bw), p.y + 37.0f, ws);
     }
     float pad = 64.0f, gap = 72.0f;
     float colW = (p.w - 2.0f * pad - gap) * 0.5f;
@@ -1735,16 +1736,41 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
         y += h;
         return r;
     };
-    int srv = official && !s.onlineCustomServer ? 0 : 1;
-    std::vector<std::string> opts;
-    if (official) opts.push_back(i18n::trf("options.online.official", {i18n::ltr(hostPort(off.host, off.apiPort))}));
-    opts.push_back(T("options.online.community"));
-    int shown = official ? srv : 0;
-    if (im::selectorRow(L("options.online.server"), shown, opts, row(rh), !inGame && official)) {
-        s.onlineCustomServer = !official || shown == 1;
-        O.testShown = false;
+    // Server: two choices side by side (the official one first, with its address).
+    {
+        Rect r = row(64.0f);
+        bool customNow = !official || s.onlineCustomServer;
+        float w1 = official ? (rw - 14.0f) * 0.64f : 0.0f, w2 = official ? rw - 14.0f - w1 : rw;
+        struct Choice { std::string text; Rect r; bool sel, enabled; int id; };
+        Choice cs[2] = {
+            {official ? i18n::trf("options.online.official", {i18n::ltr(hostPort(off.host, off.apiPort))}) : std::string(),
+             im::flip(r, Rect(r.x, r.y, w1, 56.0f)), !customNow, official && !inGame, 0},
+            {T("options.online.community"), im::flip(r, Rect(r.x + (official ? w1 + 14.0f : 0.0f), r.y, w2, 56.0f)), customNow,
+             official && !inGame, 1},
+        };
+        for (const Choice& c : cs) {
+            if (c.text.empty()) continue;
+            im::Item it = im::item(im::makeId(std::string("##options.online.server") + char('0' + c.id)), c.r,
+                                   c.enabled ? im::ITEM_FOCUSABLE : im::ITEM_DISABLED);
+            im::tooltip(T("options.online.server.help"));
+            gfx::fill(c.r, vec4(0, 0, 0, 0.25f), 2.0f);
+            if (c.sel) {
+                gfx::fillV(c.r, withAlpha(gold, 0.16f), withAlpha(gold, 0.06f), 2.0f);
+                gfx::stroke(c.r, withAlpha(gold, 0.7f), 0.0f, 2.0f);
+            } else {
+                gfx::fill(c.r, withAlpha(gold, 0.08f * it.hoverT), 2.0f);
+                gfx::stroke(c.r, withAlpha(gold, 0.18f + 0.4f * it.hoverT), 0.0f, 2.0f);
+            }
+            TextStyle ts = style(font::FACE_TEXT, kBody, c.sel ? goldBright : theme::mix(ivory, goldBright, it.hoverT * 0.6f), HAlign::Center);
+            ts.size = gfx::fitSize(c.text, ts, c.r.w - 24.0f, 0.6f);
+            gfx::text(c.text, c.r.cx(), c.r.cy() + gfx::capHeight(ts) * 0.5f, ts);
+            if (it.activated && c.enabled && !c.sel) {
+                s.onlineCustomServer = c.id == 1;
+                O.testShown = false;
+                im::sound(Sound::Toggle);
+            }
+        }
     }
-    im::tooltip(T("options.online.server.help"));
     bool custom = !official || s.onlineCustomServer;
     TextStyle cs = style(font::FACE_ITALIC, kCaption, muted, im::startAlign());
     Rect area(rx, 0, rw, 0);

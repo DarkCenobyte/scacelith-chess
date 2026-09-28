@@ -71,6 +71,59 @@ remembered (`[viewer]` in the settings file).
 The players claim and offer draws like the opponent of a normal game (repetition, fifty moves, an
 equal position late in the game), and the game over card offers to watch another game.
 
+## Online play
+
+**Play Online** on the title page plays people through a Scacelith server, still in the first
+person: your opponent sits in the other chair as a robot that moves the pieces and presses the
+clock by itself, as soon as their move arrives.
+
+- **Server.** The official server is `caissa.scacelith.com` (port 44664, secure web API and
+  secure WebSocket on the same port). Options > Online server > Custom server takes a community
+  server instead: host (domain or IP), HTTPS/API port, WSS port (empty = the API port) and, for a
+  server with a self-signed certificate, its **Certificate fingerprint (SHA-256)** as its owner
+  gives it (64 hexadecimal characters, colons allowed; empty = the Windows certificate store).
+  **Test connection** shows the server's name, message and whether it runs a compatible
+  version. You sign in separately on each server: an account and its sign-in are never shared
+  between servers, and nothing secret is written to `Scacelith.ini`.
+- **Account.** Sign in with your user name or e-mail and password (and the code of your
+  authenticator app once two-factor authentication is on), or with Google. New accounts confirm
+  their e-mail address (the page can send the link again); a forgotten password is reset by
+  e-mail. The account page lists your rating in every time control (`1500?` while it is
+  provisional, with games and wins / draws / losses), changes the password, turns two-factor
+  authentication on (QR code or key, then ten recovery codes shown once) or off, makes new
+  recovery codes, and signs you out here or everywhere.
+- **Finding a game.** Pick a time control (your rating in each is under it), rated or casual, and
+  **Find opponent**: a card counts the waiting time and shows the rating range searched. You can
+  also challenge a player by name (any time control; only the official ones can be rated, with
+  the colour you want), or create a private game whose short code a friend enters to play you.
+  Challenges you receive appear as a card wherever you are in the menus, and at the table
+  between two games.
+- **At the table.** You can only let go of a piece on a legal square; the move is sent the
+  moment you choose it, and the robot hand then places the piece and presses the clock. The
+  clocks are the server's (they never stop, not even in the Esc menu). The ping to the server is
+  in the top right corner. Esc: offer or claim a draw, resign, abort before your first move,
+  report the opponent, leave (which resigns). If your opponent loses the connection a banner
+  counts down the time they have to come back; if yours drops, the game waits behind a
+  "Reconnecting…" veil and picks up where the server is. The scoresheets are headed with the
+  server's name, "Online", the time control, rated or casual, both players with their ratings and
+  the game's number; the game over card shows the rating change and offers a rematch.
+- **Direct match.** Two computers play each other directly, without a server or an account
+  (friendly games, never rated): one player **hosts** (time control, colour, port 47100 by
+  default, opened on the home router with UPnP when possible) and reads the address, the port and
+  a code (`XXXX-XXXX-XXXX`) to the other, who **joins** with them. The page says whether the
+  router opened the port, when to forward it by hand, and when the internet provider shares the
+  address (carrier-grade NAT: try IPv6 or a VPN).
+
+Development: `--online-mock` replaces the network with an in-process fake server and a fake
+direct-match friend (any password works; see `src/game/online_mock.h` for the inputs that try
+error paths), and `--start-online [category]` goes straight to a game (with `--online-mock` the
+opponent is a random mover). In a mock game F9 makes the opponent disconnect for a while and F10
+drops your own connection. `--scene ui --ui-screen online-play` (and the other `online-*` and
+`direct-*` screens listed in `src/ui/ui_viewer.cpp`) shows the pages on the fake server.
+[docs/ONLINE_CLIENT.md](docs/ONLINE_CLIENT.md) describes the client side. QR codes are drawn with
+Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-library) (MIT licence,
+`third_party/qrcodegen/`).
+
 ## Options
 
 Settings are stored in `Scacelith.ini` next to the executable when that folder is writable,
