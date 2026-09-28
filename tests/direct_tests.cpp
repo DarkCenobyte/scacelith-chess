@@ -1,11 +1,17 @@
 // Direct match: UPnP client against a fake gateway on 127.0.0.1, the secure channel (vectors
 // and failure cases) and full loopback matches between two DirectMatch instances.
 #include "test.h"
+#include "chess/chess.h"
+#include "net/direct_authority.h"
 #include "net/direct_crypto.h"
+#include "net/direct_match.h"
+#include "net/protocol_gen.h"
 #include "net/socket_util.h"
 #include "net/upnp.h"
 
 #include <atomic>
+#include <chrono>
+#include <cmath>
 #include <cstring>
 #include <deque>
 #include <functional>
@@ -774,5 +780,806 @@ TEST(direct_channel_frame_failures) {
         auto f = p.frame("ping");
         CHECK(!p.guest.receive(f.data(), f.size()));
         CHECK(p.guest.failure() == Chan::Failure::AuthFailed);
+    }
+}
+
+// ---- the host authority (deterministic time) ----------------------------------------------------
+
+namespace {
+
+namespace P = net::proto;
+using direct::Authority;
+using direct::GuestSide;
+using direct::HostSide;
+using direct::Side;
+
+// Drives an Authority with synthetic time and keeps a mirror chess::Game of the accepted moves.
+struct Room {
+    Authority a;
+    Authority::Output out;
+    double now = 1.7e12;
+    std::vector<std::vector<uint8_t>> msgs[2];   // everything received, by side
+    size_t mark[2] = {0, 0};                     // start of the messages since the last action
+    uint32_t seq[2] = {0, 0};
+    chess::Game mirror;
+
+    Room(const direct::AuthorityConfig& cfg, int hostColorPref) : a(cfg, "Alice", "Bob", hostColorPref) {}
+
+    void collect() {
+        mark[0] = msgs[0].size();
+        mark[1] = msgs[1].size();
+        for (auto& m : out.toHost) msgs[HostSide].push_back(m);
+        for (auto& m : out.toGuest) msgs[GuestSide].push_back(m);
+        out.clear();
+        // Moves confirmed by the authority are mirrored.
+        for (size_t i = mark[HostSide]; i < msgs[HostSide].size(); ++i) {
+            P::MoveMade mm;
+            if (P::decode(msgs[HostSide][i].data(), msgs[HostSide][i].size(), mm) && mm.ply == mirror.moves().size())
+                mirror.play(mirror.position().findLegal(chess::Square(moveFrom(mm.move)), chess::Square(moveTo(mm.move)),
+                                                        chess::PieceType(movePromo(mm.move))));
+        }
+    }
+    void start() { a.startGame(now, out); collect(); }
+    void tick() { a.tick(now, out); collect(); }
+    template <class T> void send(Side s, T m) {
+        m.seq = ++seq[s];
+        std::vector<uint8_t> buf;
+        P::encode(m, buf);
+        a.onMessage(s, buf.data(), buf.size(), now, out);
+        collect();
+    }
+    void move(Side s, const char* uci, uint32_t thinkMs = 0, bool offer = false, int ply = -1, uint32_t hash = 0) {
+        chess::Move mv = mirror.position().parseUCI(uci);
+        P::Move m;
+        m.game = a.gameId();
+        m.ply = uint16_t(ply >= 0 ? ply : int(mirror.moves().size()));
+        m.move = mv.valid() ? packMove(mv.from, mv.to, mv.promotion)
+                            : packMove(chess::parseSquare(std::string(uci, 2)), chess::parseSquare(std::string(uci + 2, 2)), 0);
+        m.posHash = hash ? hash : direct::fenDigest(mirror.position().fen());
+        m.thinkMs = thinkMs;
+        m.drawOffer = offer;
+        send(s, m);
+    }
+    template <class T> std::vector<T> recent(Side s) const {   // messages of type T since the last action
+        std::vector<T> v;
+        for (size_t i = mark[s]; i < msgs[s].size(); ++i) {
+            T t;
+            if (P::decode(msgs[s][i].data(), msgs[s][i].size(), t)) v.push_back(t);
+        }
+        return v;
+    }
+    template <class T> bool has(Side s) const { return !recent<T>(s).empty(); }
+};
+
+direct::AuthorityConfig tc(int baseSec, int incSec) {
+    direct::AuthorityConfig c;
+    c.baseMs = int64_t(baseSec) * 1000;
+    c.incMs = int64_t(incSec) * 1000;
+    return c;
+}
+
+}  // namespace
+
+TEST(direct_authority_snapshot_and_names) {
+    Room r(tc(300, 2), 2);   // host plays Black
+    r.start();
+    auto hs = r.recent<P::GameSnapshot>(HostSide);
+    auto gs = r.recent<P::GameSnapshot>(GuestSide);
+    CHECK(hs.size() == 1 && gs.size() == 1);
+    if (hs.size() == 1 && gs.size() == 1) {
+        CHECK(hs[0].you == P::Color::Black);
+        CHECK(gs[0].you == P::Color::White);
+        CHECK_EQ(hs[0].white.name, std::string("Bob"));
+        CHECK_EQ(hs[0].black.name, std::string("Alice"));
+        CHECK_EQ(hs[0].white.userId, 2u);
+        CHECK_EQ(hs[0].black.userId, 1u);
+        CHECK_EQ(hs[0].white.rating, 0);
+        CHECK_EQ(hs[0].category, std::string("custom"));
+        CHECK(!hs[0].rated);
+        CHECK_EQ(hs[0].baseMs, 300000u);
+        CHECK_EQ(hs[0].incMs, 2000u);
+        CHECK(hs[0].running == P::Color::None);
+        CHECK_EQ(hs[0].firstMoveMs, 60000u);
+        CHECK(hs[0].whiteConnected && hs[0].blackConnected);
+    }
+    CHECK_EQ(direct::sanitizeName("  \x01Zo\xC3\xA9  ", "X"), std::string("Zo\xC3\xA9"));
+    CHECK_EQ(direct::sanitizeName("", "Guest"), std::string("Guest"));
+    CHECK_EQ(direct::sanitizeName("\xFF\xFE", "Guest"), std::string("Guest"));
+    // 23 ASCII bytes + a 2-byte character would make 25: the character is dropped whole.
+    CHECK_EQ(direct::sanitizeName("abcdefghijklmnopqrstuvw\xC3\xA9", "X"), std::string("abcdefghijklmnopqrstuvw"));
+    // The digest covers the first four FEN fields only.
+    CHECK_EQ(direct::fenDigest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"),
+             direct::fenDigest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 5 9"));
+    CHECK(direct::fenDigest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1") !=
+          direct::fenDigest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1"));
+}
+
+TEST(direct_authority_move_validation) {
+    Room r(tc(300, 0), 1);   // host White
+    r.start();
+    // Black (guest) tries to move first: NotYourTurn.
+    r.move(GuestSide, "e7e5");
+    CHECK(r.has<P::MoveRejected>(GuestSide) && r.recent<P::MoveRejected>(GuestSide)[0].code == P::ErrorCode::NotYourTurn);
+    CHECK(!r.has<P::MoveRejected>(HostSide));   // never shown to the opponent
+    r.move(HostSide, "e2e5");
+    CHECK(r.has<P::MoveRejected>(HostSide) && r.recent<P::MoveRejected>(HostSide)[0].code == P::ErrorCode::IllegalMove);
+    // A promotion piece on a move that is not a promotion.
+    {
+        P::Move m;
+        m.game = r.a.gameId();
+        m.move = packMove(12, 28, 5);
+        m.posHash = direct::fenDigest(r.mirror.position().fen());
+        r.send(HostSide, m);
+        CHECK(r.has<P::MoveRejected>(HostSide) && r.recent<P::MoveRejected>(HostSide)[0].code == P::ErrorCode::IllegalMove);
+    }
+    // Wrong position digest: Desync and a snapshot.
+    r.move(HostSide, "e2e4", 0, false, -1, 12345);
+    CHECK(r.has<P::MoveRejected>(HostSide) && r.recent<P::MoveRejected>(HostSide)[0].code == P::ErrorCode::Desync);
+    CHECK(r.has<P::GameSnapshot>(HostSide));
+    r.move(HostSide, "e2e4");
+    auto mm = r.recent<P::MoveMade>(GuestSide);
+    CHECK(mm.size() == 1 && mm[0].ply == 0 && (mm[0].flags & P::MoveFlag::DoublePush));
+    CHECK_EQ(r.mirror.moves().size(), size_t(1));
+    // The same move again: the original confirmation, nothing new for the opponent.
+    r.move(HostSide, "e2e4", 0, false, 0, direct::fenDigest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"));
+    CHECK(r.has<P::MoveMade>(HostSide) && !r.has<P::MoveMade>(GuestSide));
+    // Another move for an old ply: StalePly.
+    r.move(HostSide, "d2d4", 0, false, 0);
+    CHECK(r.has<P::MoveRejected>(HostSide) && r.recent<P::MoveRejected>(HostSide)[0].code == P::ErrorCode::StalePly);
+    // Another game id.
+    {
+        P::Resign m;
+        m.game = 77;
+        r.send(GuestSide, m);
+        auto e = r.recent<P::Error>(GuestSide);
+        CHECK(e.size() == 1 && e[0].code == P::ErrorCode::NotInGame && e[0].ref == r.seq[GuestSide]);
+    }
+    // Garbage.
+    uint8_t junk[3] = {0x20, 1, 2};
+    r.a.onMessage(GuestSide, junk, sizeof junk, r.now, r.out);
+    r.collect();
+    CHECK(r.has<P::Error>(GuestSide) && r.recent<P::Error>(GuestSide)[0].code == P::ErrorCode::Malformed);
+}
+
+TEST(direct_authority_first_move_timeout) {
+    {
+        Room r(tc(60, 0), 1);
+        r.start();
+        CHECK_EQ(r.a.nextDeadline(), r.now + 60000);
+        r.now += 59999;
+        r.tick();
+        CHECK(!r.has<P::GameEnd>(HostSide));
+        r.now += 1;
+        r.tick();
+        auto e = r.recent<P::GameEnd>(GuestSide);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::Aborted && e[0].reason == P::EndReason::NoShow);
+    }
+    {
+        // Black's 60 s start with White's first move; no clock runs meanwhile.
+        Room r(tc(60, 0), 1);
+        r.start();
+        r.now += 30000;
+        r.move(HostSide, "e2e4");
+        auto mm = r.recent<P::MoveMade>(GuestSide);
+        CHECK(mm.size() == 1 && mm[0].firstMoveMs == 60000 && mm[0].spentMs == 0 && mm[0].whiteMs == 60000);
+        CHECK_EQ(r.a.nextDeadline(), r.now + 60000);
+        r.now += 59000;
+        r.move(GuestSide, "e7e5");
+        mm = r.recent<P::MoveMade>(HostSide);
+        CHECK(mm.size() == 1 && mm[0].firstMoveMs == 0 && mm[0].blackMs == 60000);
+        CHECK_EQ(r.a.nextDeadline(), r.now + 60000);   // White's clock now runs (host: no allowance)
+    }
+}
+
+TEST(direct_authority_clock_and_lag_compensation) {
+    Room r(tc(60, 2), 1);   // host White, guest Black
+    r.start();
+    r.a.onRtt(GuestSide, 100);   // compensation bound: min(100/2 + 30, 500) = 80 ms
+    r.move(HostSide, "e2e4");
+    r.now += 5000;
+    r.move(GuestSide, "e7e5");
+    r.now += 5000;
+    r.move(HostSide, "d2d4", 4000);   // the host gets no compensation
+    auto mm = r.recent<P::MoveMade>(GuestSide);
+    CHECK(mm.size() == 1 && mm[0].spentMs == 5000 && mm[0].whiteMs == 57000 && mm[0].blackMs == 60000);
+    r.now += 3000;
+    r.move(GuestSide, "d7d5", 2500);  // lag 500 ms, compensated 80
+    mm = r.recent<P::MoveMade>(HostSide);
+    CHECK(mm.size() == 1 && mm[0].spentMs == 2920 && mm[0].blackMs == 59080);
+    r.now += 1000;
+    r.move(HostSide, "g1f3");
+    r.now += 1000;
+    r.move(GuestSide, "g8f6", 5000);  // thinkMs above the elapsed time: no lag, no compensation
+    mm = r.recent<P::MoveMade>(HostSide);
+    CHECK(mm.size() == 1 && mm[0].spentMs == 1000);
+    // The snapshot shows the running clock at its time.
+    r.now += 500;
+    P::Resync rs;
+    rs.game = r.a.gameId();
+    r.send(HostSide, rs);
+    auto s = r.recent<P::GameSnapshot>(HostSide);
+    CHECK(s.size() == 1 && s[0].running == P::Color::White && s[0].whiteMs == 57000 + 2000 - 1000 - 500 && s[0].moves.size() == 6);
+}
+
+TEST(direct_authority_flag) {
+    {
+        // The host's flag falls exactly at its remaining time.
+        Room r(tc(1, 0), 1);
+        r.start();
+        r.move(HostSide, "e2e4");
+        r.move(GuestSide, "e7e5");
+        CHECK_EQ(r.a.nextDeadline(), r.now + 1000);
+        r.now += 999;
+        r.tick();
+        CHECK(!r.has<P::GameEnd>(HostSide));
+        r.now += 1;
+        r.tick();
+        auto e = r.recent<P::GameEnd>(GuestSide);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::BlackWins && e[0].reason == P::EndReason::Timeout && e[0].whiteMs == 0);
+    }
+    {
+        // The guest (White) may still be saved by its compensation; not beyond.
+        Room r(tc(1, 0), 2);
+        r.start();
+        r.move(GuestSide, "e2e4");
+        r.move(HostSide, "e7e5");
+        CHECK_EQ(r.a.nextDeadline(), r.now + 1030);   // unknown RTT: 30 ms of allowance
+        double t0 = r.now;
+        r.now = t0 + 1010;
+        r.move(GuestSide, "d2d4", 950);   // lag 60, compensated 30: charged 980
+        auto mm = r.recent<P::MoveMade>(HostSide);
+        CHECK(mm.size() == 1 && mm[0].whiteMs == 20);
+        r.move(HostSide, "d7d5");
+        r.now += 1040;
+        r.move(GuestSide, "c2c4", 1000);  // charged 1010 > 20: the flag fell
+        auto rej = r.recent<P::MoveRejected>(GuestSide);
+        CHECK(rej.size() == 1 && rej[0].code == P::ErrorCode::FlagFell);
+        auto e = r.recent<P::GameEnd>(HostSide);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::BlackWins && e[0].reason == P::EndReason::Timeout);
+        CHECK(!r.has<P::MoveMade>(HostSide));
+    }
+}
+
+TEST(direct_authority_draws) {
+    Room r(tc(300, 0), 1);
+    r.start();
+    // Offer alone, declined by a move.
+    P::DrawOffer off;
+    off.game = r.a.gameId();
+    r.send(HostSide, off);
+    auto ev = r.recent<P::GameEvent>(GuestSide);
+    CHECK(ev.size() == 1 && ev[0].kind == P::GameEventKind::DrawOffered && ev[0].color == P::Color::White);
+    r.move(HostSide, "g1f3");   // own offer stands
+    CHECK(!r.has<P::GameEvent>(GuestSide));
+    r.move(GuestSide, "g8f6");  // the opponent moves: declined
+    ev = r.recent<P::GameEvent>(HostSide);
+    CHECK(ev.size() == 1 && ev[0].kind == P::GameEventKind::DrawDeclined && ev[0].color == P::Color::Black);
+    // Not again within 10 plies of the decline.
+    r.send(HostSide, off);
+    auto er = r.recent<P::Error>(HostSide);
+    CHECK(er.size() == 1 && er[0].code == P::ErrorCode::DrawOfferLimit);
+    // No offer to answer.
+    P::DrawAnswer ans;
+    ans.game = r.a.gameId();
+    ans.accept = true;
+    r.send(GuestSide, ans);
+    er = r.recent<P::Error>(GuestSide);
+    CHECK(er.size() == 1 && er[0].code == P::ErrorCode::NoPendingOffer);
+    // Nothing to claim yet.
+    P::DrawClaim claim;
+    claim.game = r.a.gameId();
+    r.send(HostSide, claim);
+    er = r.recent<P::Error>(HostSide);
+    CHECK(er.size() == 1 && er[0].code == P::ErrorCode::NothingToClaim);
+    // A move with an offer (Black), then declined explicitly.
+    r.move(HostSide, "f3g1");
+    r.move(GuestSide, "f6g8", 0, true);
+    auto mm = r.recent<P::MoveMade>(HostSide);
+    CHECK(mm.size() == 1 && mm[0].drawOffer);
+    ans.accept = false;
+    r.send(HostSide, ans);
+    ev = r.recent<P::GameEvent>(GuestSide);
+    CHECK(ev.size() == 1 && ev[0].kind == P::GameEventKind::DrawDeclined && ev[0].color == P::Color::White);
+    // Threefold: the start position appears for the third time after 8 plies.
+    r.move(HostSide, "g1f3");
+    r.move(GuestSide, "g8f6");
+    r.move(HostSide, "f3g1");
+    r.move(GuestSide, "f6g8");
+    CHECK(r.mirror.canClaimThreefold());
+    r.send(GuestSide, claim);
+    auto e = r.recent<P::GameEnd>(HostSide);
+    CHECK(e.size() == 1 && e[0].status == P::GameStatus::Draw && e[0].reason == P::EndReason::ThreefoldClaim);
+    // Game over: moves and offers are refused.
+    r.move(HostSide, "e2e4");
+    CHECK(r.has<P::MoveRejected>(HostSide) && r.recent<P::MoveRejected>(HostSide)[0].code == P::ErrorCode::GameOver);
+}
+
+TEST(direct_authority_draw_agreement_and_abort) {
+    {
+        Room r(tc(300, 0), 1);
+        r.start();
+        r.move(HostSide, "e2e4");
+        P::DrawOffer off;
+        off.game = r.a.gameId();
+        r.send(GuestSide, off);
+        P::DrawAnswer ans;
+        ans.game = r.a.gameId();
+        ans.accept = true;
+        r.send(HostSide, ans);
+        auto e = r.recent<P::GameEnd>(GuestSide);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::Draw && e[0].reason == P::EndReason::Agreement);
+    }
+    {
+        // Crossing offers are an agreement.
+        Room r(tc(300, 0), 1);
+        r.start();
+        P::DrawOffer off;
+        off.game = r.a.gameId();
+        r.send(GuestSide, off);
+        r.send(HostSide, off);
+        auto e = r.recent<P::GameEnd>(GuestSide);
+        CHECK(e.size() == 1 && e[0].reason == P::EndReason::Agreement);
+    }
+    {
+        Room r(tc(300, 0), 1);
+        r.start();
+        r.move(HostSide, "e2e4");
+        P::Abort ab;
+        ab.game = r.a.gameId();
+        r.send(HostSide, ab);   // White already moved
+        auto er = r.recent<P::Error>(HostSide);
+        CHECK(er.size() == 1 && er[0].code == P::ErrorCode::AbortNotAllowed);
+        r.send(GuestSide, ab);  // Black has not
+        auto e = r.recent<P::GameEnd>(HostSide);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::Aborted && e[0].reason == P::EndReason::Aborted);
+    }
+}
+
+TEST(direct_authority_disconnection_grace) {
+    {
+        Room r(tc(300, 0), 1);
+        r.start();
+        r.move(HostSide, "e2e4");
+        r.move(GuestSide, "e7e5");
+        r.a.onDisconnect(GuestSide, r.now, r.out);
+        r.collect();
+        auto ev = r.recent<P::GameEvent>(HostSide);
+        CHECK(ev.size() == 1 && ev[0].kind == P::GameEventKind::PlayerDisconnected && ev[0].color == P::Color::Black &&
+              ev[0].arg == 60000);
+        // Back within the grace: a snapshot for the guest, the news for the host.
+        r.now += 30000;
+        r.a.onReconnect(GuestSide, r.now, r.out);
+        r.collect();
+        auto s = r.recent<P::GameSnapshot>(GuestSide);
+        CHECK(s.size() == 1 && s[0].moves.size() == 2 && s[0].blackConnected);
+        ev = r.recent<P::GameEvent>(HostSide);
+        CHECK(ev.size() == 1 && ev[0].kind == P::GameEventKind::PlayerReconnected);
+        // Gone again for the whole grace: the guest loses.
+        r.a.onDisconnect(GuestSide, r.now, r.out);
+        r.collect();
+        r.now += 60000;
+        r.tick();
+        auto e = r.recent<P::GameEnd>(HostSide);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::WhiteWins && e[0].reason == P::EndReason::Abandonment);
+    }
+    {
+        // Before two plies: aborted.
+        Room r(tc(300, 0), 1);
+        r.start();
+        r.move(HostSide, "e2e4");
+        r.a.onDisconnect(GuestSide, r.now, r.out);
+        r.collect();
+        r.now += 60000;
+        r.tick();
+        auto e = r.recent<P::GameEnd>(HostSide);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::Aborted && e[0].reason == P::EndReason::NoShow);
+    }
+}
+
+TEST(direct_authority_rematch) {
+    Room r(tc(300, 0), 1);
+    r.start();
+    uint64_t first = r.a.gameId();
+    P::Resign res;
+    res.game = first;
+    r.send(HostSide, res);
+    auto e = r.recent<P::GameEnd>(GuestSide);
+    CHECK(e.size() == 1 && e[0].status == P::GameStatus::BlackWins && e[0].reason == P::EndReason::Resignation);
+    P::Rematch rm;
+    rm.game = first;
+    rm.accept = true;
+    r.send(GuestSide, rm);
+    auto ev = r.recent<P::GameEvent>(HostSide);
+    CHECK(ev.size() == 1 && ev[0].kind == P::GameEventKind::RematchOffered && ev[0].color == P::Color::Black);
+    r.send(HostSide, rm);
+    auto s = r.recent<P::GameSnapshot>(HostSide);
+    CHECK(s.size() == 1 && s[0].game != first && s[0].you == P::Color::Black && s[0].white.name == "Bob");
+    CHECK(r.has<P::GameSnapshot>(GuestSide));
+    // The new game: the rematch window of the old one is gone.
+    rm.game = first;
+    r.send(GuestSide, rm);
+    CHECK(r.has<P::Error>(GuestSide) && r.recent<P::Error>(GuestSide)[0].code == P::ErrorCode::RematchUnavailable);
+    // End it; nobody asks within 60 s: the window closes.
+    res.game = r.a.gameId();
+    r.send(GuestSide, res);
+    r.now += 60000;
+    r.tick();
+    ev = r.recent<P::GameEvent>(HostSide);
+    CHECK(ev.size() == 1 && ev[0].kind == P::GameEventKind::RematchDeclined && ev[0].color == P::Color::None);
+    rm.game = r.a.gameId();
+    r.send(HostSide, rm);
+    CHECK(r.has<P::Error>(HostSide) && r.recent<P::Error>(HostSide)[0].code == P::ErrorCode::RematchUnavailable);
+}
+
+// ---- loopback matches: two DirectMatch in this process ------------------------------------------
+
+namespace {
+
+struct Peer {
+    DirectMatch dm;
+    std::vector<Event> events;
+    void drain() {
+        Event e;
+        while (dm.poll(e)) events.push_back(e);
+    }
+    int count(Event::Kind k) const {
+        int n = 0;
+        for (auto& e : events) n += e.kind == k;
+        return n;
+    }
+    const Event* last(Event::Kind k) const {
+        for (auto it = events.rbegin(); it != events.rend(); ++it)
+            if (it->kind == k) return &*it;
+        return nullptr;
+    }
+    bool hasMove(int ply) const {
+        for (auto& e : events)
+            if (e.kind == Event::Kind::MoveMade && e.ply == ply) return true;
+        return false;
+    }
+    bool hasConn(ConnState s) const {
+        for (auto& e : events)
+            if (e.kind == Event::Kind::ConnectionChanged && e.state == s) return true;
+        return false;
+    }
+};
+
+bool waitUntil(Peer& a, Peer& b, const std::function<bool()>& cond, int ms = 8000) {
+    auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
+    for (;;) {
+        a.drain();
+        b.drain();
+        if (cond()) return true;
+        if (std::chrono::steady_clock::now() > end) return false;
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+}
+
+// Plays 'uci' from 'mover', waits for both confirmations, mirrors it and returns the flags.
+int play(Peer& mover, Peer& other, chess::Game& g, const char* uci, bool drawOffer = false) {
+    chess::Move mv = g.position().parseUCI(uci);
+    CHECK(mv.valid());
+    int ply = int(g.moves().size());
+    mover.dm.sendMove(ply, packMove(mv.from, mv.to, mv.promotion), g.position().fen(), 40, drawOffer);
+    bool ok = waitUntil(mover, other, [&] { return mover.hasMove(ply) && other.hasMove(ply); });
+    CHECK(ok);
+    g.play(mv);
+    const Event* e = other.last(Event::Kind::MoveMade);
+    return e ? e->flags : -1;
+}
+
+DirectHostOptions hostOptions(int baseSec, int incSec, int color, const char* name) {
+    DirectHostOptions o;
+    o.port = 0;
+    o.upnp = false;
+    o.baseSec = baseSec;
+    o.incSec = incSec;
+    o.hostColor = color;
+    o.playerName = name;
+    return o;
+}
+
+// Starts a hosted game and joins it; host plays White.
+bool startMatch(Peer& host, Peer& guest, int baseSec, int incSec, uint16_t viaPort = 0) {
+    host.dm.host(hostOptions(baseSec, incSec, 1, "Alice"));
+    if (!waitUntil(host, guest, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; })) return false;
+    DirectInvite inv = host.dm.invite();
+    guest.dm.join("127.0.0.1", viaPort ? viaPort : inv.port, inv.code, "Bob");
+    return waitUntil(host, guest, [&] { return host.count(Event::Kind::GameSnapshot) >= 1 && guest.count(Event::Kind::GameSnapshot) >= 1; });
+}
+
+// A TCP relay on 127.0.0.1 that the test can cut (a network failure between the players) or
+// shut (the host's machine is gone: connections are refused).
+struct Relay {
+    sock::Handle listener = sock::kInvalid;
+    uint16_t port = 0, target = 0;
+    std::thread th;
+    std::atomic<bool> stop{false}, cutNow{false}, closed{false};
+
+    bool start(uint16_t targetPort) {
+        target = targetPort;
+        bool dual = false;
+        std::string err;
+        listener = sock::listenTcp(0, dual, err);
+        sock::Endpoint ep;
+        if (listener == sock::kInvalid || !sock::localEndpoint(listener, ep)) return false;
+        port = ep.port();
+        th = std::thread([this] { run(); });
+        return true;
+    }
+    void cut() { cutNow = true; }
+    void shut() { closed = true; }
+    ~Relay() {
+        stop = true;
+        if (th.joinable()) th.join();
+        sock::closeSocket(listener);
+    }
+    void run() {
+        struct Pair { sock::Handle a, b; };
+        std::vector<Pair> pairs;
+        while (!stop) {
+            if (closed && listener != sock::kInvalid) {
+                sock::closeSocket(listener);
+                listener = sock::kInvalid;
+            }
+            if (cutNow || closed) {
+                for (auto& p : pairs) { sock::closeSocket(p.a); sock::closeSocket(p.b); }
+                pairs.clear();
+                cutNow = false;
+            }
+            sock::PollSet ps;
+            if (listener != sock::kInvalid) ps.add(listener, true, false);
+            for (auto& p : pairs) { ps.add(p.a, true, false); ps.add(p.b, true, false); }
+            ps.wait(10);
+            if (listener != sock::kInvalid && ps.readable(listener)) {
+                sock::Handle a = sock::acceptOne(listener, nullptr);
+                if (a != sock::kInvalid) {
+                    sock::Endpoint to;
+                    sock::Endpoint::parse("127.0.0.1", target, to);
+                    std::string err;
+                    sock::Handle b = sock::connectWithTimeout(to, 2000, err);
+                    if (b == sock::kInvalid) sock::closeSocket(a);
+                    else pairs.push_back({a, b});
+                }
+            }
+            for (size_t i = 0; i < pairs.size();) {
+                bool dead = false;
+                auto pumpOne = [&](sock::Handle from, sock::Handle to) {
+                    if (!ps.readable(from)) return;
+                    uint8_t buf[16384];
+                    bool eof = false;
+                    int r = sock::recvSome(from, buf, sizeof buf, eof);
+                    if (r < 0) { dead = true; return; }
+                    for (int sent = 0; sent < r;) {
+                        int w = sock::sendSome(to, buf + sent, size_t(r - sent));
+                        if (w < 0) { dead = true; return; }
+                        if (w == 0) std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                        sent += w;
+                    }
+                };
+                pumpOne(pairs[i].a, pairs[i].b);
+                pumpOne(pairs[i].b, pairs[i].a);
+                if (dead) {
+                    sock::closeSocket(pairs[i].a);
+                    sock::closeSocket(pairs[i].b);
+                    pairs.erase(pairs.begin() + long(i));
+                } else {
+                    ++i;
+                }
+            }
+        }
+        for (auto& p : pairs) { sock::closeSocket(p.a); sock::closeSocket(p.b); }
+    }
+};
+
+}  // namespace
+
+TEST(direct_loopback_full_game) {
+    Peer host, guest;
+    host.dm.host(hostOptions(300, 2, 1, "Alice"));
+    CHECK(host.dm.isHost());
+    CHECK(waitUntil(host, guest, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
+    DirectInvite inv = host.dm.invite();
+    CHECK(inv.port != 0);
+    CHECK_EQ(inv.code.size(), size_t(14));
+    CHECK(inv.code[4] == '-' && inv.code[9] == '-');
+    CHECK(inv.publicAddress.empty());
+    CHECK(host.dm.upnp().state == UpnpStatus::State::NotTried);
+    // The guest types the code in lower case with spaces.
+    std::string typed = inv.code;
+    for (char& ch : typed) ch = ch == '-' ? ' ' : char(std::tolower((unsigned char)ch));
+    guest.dm.join("127.0.0.1", inv.port, typed, "Bob");
+    CHECK(!guest.dm.isHost());
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameSnapshot) && guest.count(Event::Kind::GameSnapshot); }));
+    CHECK(host.dm.state() == DirectMatch::State::Playing);
+    CHECK(guest.dm.state() == DirectMatch::State::Playing);
+    CHECK(host.hasConn(ConnState::Online));
+    CHECK(guest.hasConn(ConnState::Online));
+    const OnlineGame* hg = host.dm.currentGame();
+    const OnlineGame* gg = guest.dm.currentGame();
+    CHECK(hg && gg);
+    if (!hg || !gg) return;
+    CHECK_EQ(hg->you, 0);
+    CHECK_EQ(gg->you, 1);
+    CHECK_EQ(gg->white.name, std::string("Alice"));
+    CHECK_EQ(gg->black.name, std::string("Bob"));
+    CHECK_EQ(gg->category, std::string("custom"));
+    CHECK(!gg->rated);
+    CHECK_EQ(gg->baseMs, int64_t(300000));
+    CHECK_EQ(gg->incMs, int64_t(2000));
+    CHECK_EQ(hg->id, gg->id);
+
+    chess::Game g;
+    play(host, guest, g, "e2e4");
+    play(guest, host, g, "d7d5");
+    play(host, guest, g, "e4e5");
+    play(guest, host, g, "f7f5");
+    // Not the guest's turn: refused for the guest only.
+    guest.dm.sendMove(int(g.moves().size()), packMove(chess::parseSquare("a7"), chess::parseSquare("a6"), 0), g.position().fen(), 10, false);
+    CHECK(waitUntil(host, guest, [&] { return guest.count(Event::Kind::MoveRejected) == 1; }));
+    CHECK(guest.last(Event::Kind::MoveRejected)->code == int(P::ErrorCode::NotYourTurn));
+    CHECK_EQ(host.count(Event::Kind::MoveRejected), 0);
+    int flags = play(host, guest, g, "e5f6");   // en passant
+    CHECK((flags & P::MoveFlag::EnPassant) && (flags & P::MoveFlag::Capture));
+    play(guest, host, g, "b8c6");
+    play(host, guest, g, "f6g7");
+    play(guest, host, g, "c8f5");
+    flags = play(host, guest, g, "g7h8q");      // promotion with capture
+    CHECK((flags & P::MoveFlag::Promotion) && (flags & P::MoveFlag::Capture));
+    CHECK_EQ(movePromo(host.last(Event::Kind::MoveMade)->move), 5);
+    play(guest, host, g, "d8d7");
+    play(host, guest, g, "g1f3", true);         // with a draw offer
+    CHECK(host.dm.currentGame()->drawOfferBy == 0);
+    CHECK(guest.dm.currentGame()->drawOfferBy == 0);
+    flags = play(guest, host, g, "e8c8");       // castling queen side declines the offer
+    CHECK(flags & P::MoveFlag::CastleQueen);
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameEvent) >= 1 && guest.count(Event::Kind::GameEvent) >= 1; }));
+    const Event* de = host.last(Event::Kind::GameEvent);
+    CHECK(de && de->gameEventKind == int(P::GameEventKind::DrawDeclined) && de->color == 1);
+    CHECK(host.dm.currentGame()->drawOfferBy == 2);
+    CHECK_EQ(guest.dm.currentGame()->moves.size(), size_t(12));
+    // Both sides measured the round trip; the guest's clock estimate is the host's clock.
+    CHECK(waitUntil(host, guest, [&] { return host.dm.pingMs() >= 0 && guest.dm.pingMs() >= 0; }, 5000));
+    CHECK(std::fabs(guest.dm.serverNowMs() - host.dm.serverNowMs()) < 250);
+    // White (the host) resigns.
+    host.dm.resign();
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameEnd) && guest.count(Event::Kind::GameEnd); }));
+    CHECK(guest.last(Event::Kind::GameEnd)->game.status == int(P::GameStatus::BlackWins));
+    CHECK(guest.last(Event::Kind::GameEnd)->game.reason == int(P::EndReason::Resignation));
+    CHECK(host.dm.state() == DirectMatch::State::Playing);   // until close(), for a rematch
+    // Rematch with colours swapped.
+    uint64_t firstId = gg->id;
+    guest.dm.rematch(true);
+    CHECK(waitUntil(host, guest, [&] {
+        const Event* e = host.last(Event::Kind::GameEvent);
+        return e && e->gameEventKind == int(P::GameEventKind::RematchOffered);
+    }));
+    host.dm.rematch(true);
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameSnapshot) == 2 && guest.count(Event::Kind::GameSnapshot) == 2; }));
+    CHECK(host.dm.currentGame()->id != firstId);
+    CHECK_EQ(host.dm.currentGame()->you, 1);
+    CHECK_EQ(guest.dm.currentGame()->you, 0);
+    // The guest, now White, aborts before its first move.
+    guest.dm.abortGame();
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameEnd) == 2 && guest.count(Event::Kind::GameEnd) == 2; }));
+    CHECK(host.dm.currentGame()->status == int(P::GameStatus::Aborted));
+    CHECK(host.dm.currentGame()->reason == int(P::EndReason::Aborted));
+    guest.dm.close();
+    host.dm.close();
+    CHECK(host.dm.state() == DirectMatch::State::Idle);
+    CHECK(host.dm.currentGame() == nullptr);
+}
+
+TEST(direct_loopback_wrong_code) {
+    Peer host, guest, other;
+    host.dm.host(hostOptions(300, 0, 0, "Alice"));
+    CHECK(waitUntil(host, guest, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
+    DirectInvite inv = host.dm.invite();
+    std::string wrong = inv.code;
+    wrong[0] = wrong[0] == 'A' ? 'B' : 'A';
+    guest.dm.join("127.0.0.1", inv.port, wrong, "Mallory");
+    CHECK(waitUntil(host, guest, [&] { return guest.dm.state() == DirectMatch::State::Failed; }));
+    CHECK_EQ(guest.dm.lastError(), std::string("wrong_code"));
+    CHECK(guest.hasConn(ConnState::Offline));
+    CHECK_EQ(host.count(Event::Kind::GameSnapshot), 0);
+    CHECK(waitUntil(host, guest, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
+    // Malformed codes and closed ports fail at once.
+    other.dm.join("127.0.0.1", inv.port, "K7Q2-M9XH-3PT0", "Bob");
+    CHECK(other.dm.state() == DirectMatch::State::Failed);
+    CHECK_EQ(other.dm.lastError(), std::string("invalid_code"));
+    {
+        sock::Handle tmp = sock::openTcp(sock::Endpoint::anyV4(0).family());
+        sock::Endpoint lo, ep;
+        sock::Endpoint::parse("127.0.0.1", 0, lo);
+        CHECK(sock::bindTo(tmp, lo, false) && sock::localEndpoint(tmp, ep));
+        uint16_t closedPort = ep.port();
+        sock::closeSocket(tmp);   // bound then closed: nobody listens there
+        other.dm.join("127.0.0.1", closedPort, inv.code, "Bob");
+        CHECK(waitUntil(host, other, [&] { return other.dm.state() == DirectMatch::State::Failed; }));
+        CHECK_EQ(other.dm.lastError(), std::string("refused"));
+    }
+    // The real guest still gets in.
+    other.dm.join("127.0.0.1", inv.port, inv.code, "Bob");
+    CHECK(waitUntil(host, other, [&] { return other.count(Event::Kind::GameSnapshot) && host.count(Event::Kind::GameSnapshot); }));
+    // A second host on the same port: port_in_use.
+    Peer second;
+    DirectHostOptions o = hostOptions(300, 0, 0, "Eve");
+    o.port = inv.port;
+    second.dm.host(o);
+    CHECK(waitUntil(second, guest, [&] { return second.dm.state() == DirectMatch::State::Failed; }));
+    CHECK_EQ(second.dm.lastError(), std::string("port_in_use"));
+}
+
+TEST(direct_loopback_reconnection) {
+    Peer host, guest;
+    host.dm.host(hostOptions(300, 0, 1, "Alice"));
+    CHECK(waitUntil(host, guest, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
+    DirectInvite inv = host.dm.invite();
+    Relay relay;
+    CHECK(relay.start(inv.port));
+    guest.dm.join("127.0.0.1", relay.port, inv.code, "Bob");
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameSnapshot) && guest.count(Event::Kind::GameSnapshot); }));
+    chess::Game g;
+    play(host, guest, g, "e2e4");
+    play(guest, host, g, "c7c5");
+    relay.cut();   // the network fails between the two players
+    CHECK(waitUntil(host, guest, [&] {
+        const Event* e = host.last(Event::Kind::GameEvent);
+        return e && e->gameEventKind == int(P::GameEventKind::PlayerDisconnected);
+    }));
+    CHECK_EQ(host.last(Event::Kind::GameEvent)->color, 1);
+    CHECK(host.dm.currentGame() && !host.dm.currentGame()->blackConnected);
+    CHECK(waitUntil(host, guest, [&] { return guest.hasConn(ConnState::Reconnecting); }));
+    // The guest comes back by itself with the same code and gets the game again.
+    CHECK(waitUntil(host, guest, [&] { return guest.count(Event::Kind::GameSnapshot) == 2; }));
+    CHECK_EQ(guest.last(Event::Kind::GameSnapshot)->game.moves.size(), size_t(2));
+    CHECK(waitUntil(host, guest, [&] {
+        const Event* e = host.last(Event::Kind::GameEvent);
+        return e && e->gameEventKind == int(P::GameEventKind::PlayerReconnected);
+    }));
+    CHECK(host.dm.currentGame()->blackConnected);
+    CHECK(guest.dm.state() == DirectMatch::State::Playing);
+    play(host, guest, g, "g1f3");
+    play(guest, host, g, "d7d6");
+    // Now the host's machine vanishes: the guest gives up and the game ends as ServerAborted.
+    relay.shut();
+    CHECK(waitUntil(host, guest, [&] { return guest.count(Event::Kind::GameEnd) == 1; }, 15000));
+    const Event* end = guest.last(Event::Kind::GameEnd);
+    CHECK(end && end->game.status == int(P::GameStatus::Aborted) && end->game.reason == int(P::EndReason::ServerAborted));
+    CHECK_EQ(guest.dm.lastError(), std::string("host_left"));
+}
+
+TEST(direct_loopback_flag_and_host_leaving) {
+    {
+        // A tiny time control: White (the host) runs out of time after the two free plies.
+        Peer host, guest;
+        CHECK(startMatch(host, guest, 1, 0));
+        chess::Game g;
+        play(host, guest, g, "e2e4");
+        play(guest, host, g, "e7e5");
+        CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameEnd) && guest.count(Event::Kind::GameEnd); }, 5000));
+        const OnlineGame* og = guest.dm.currentGame();
+        CHECK(og && og->status == int(P::GameStatus::BlackWins) && og->reason == int(P::EndReason::Timeout) && og->whiteMs == 0);
+    }
+    {
+        // The host leaves a running game: it resigns, the guest is told, then the link closes.
+        Peer host, guest;
+        CHECK(startMatch(host, guest, 300, 0));
+        chess::Game g;
+        play(host, guest, g, "d2d4");
+        host.dm.close();
+        CHECK(waitUntil(host, guest, [&] { return guest.count(Event::Kind::GameEnd) == 1; }));
+        const OnlineGame* og = guest.dm.currentGame();
+        CHECK(og && og->status == int(P::GameStatus::BlackWins) && og->reason == int(P::EndReason::Resignation));
+        CHECK(waitUntil(host, guest, [&] { return guest.hasConn(ConnState::Offline); }));
+    }
+    {
+        // The guest leaves: it resigns too.
+        Peer host, guest;
+        CHECK(startMatch(host, guest, 300, 0));
+        guest.dm.close();
+        CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameEnd) == 1; }));
+        const OnlineGame* og = host.dm.currentGame();
+        CHECK(og && og->status == int(P::GameStatus::WhiteWins) && og->reason == int(P::EndReason::Resignation));
     }
 }
