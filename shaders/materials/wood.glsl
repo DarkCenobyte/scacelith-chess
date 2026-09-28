@@ -17,6 +17,7 @@
 //   [4] base roughness, clear coat, clear coat roughness, pore strength
 //   [5] wax smear amount, polish scratch amount, parcel gilding amount, edge wear amount
 //   [6] gold leaf colour.rgb (linear F0), gold roughness
+//   [7] x = curl (wavy grain) amount, 0 = default 1
 // inst (per draw): inst[0].xyz = grain axis override (object space, 0 = params[2]),
 //                  inst[0].w = wood seed (0 = objectSeed): each part cut from a different log.
 // Textures: 7 = polish.
@@ -44,8 +45,9 @@ void surface(in SurfaceInput i, inout Surface s) {
     vec2 pith = P3.xy + (hs.yz - 0.5) * 0.06;
     pith += 0.02 * vec2(mat_gnoise(vec3(sAx * 0.9, seed * 17.0, 1.0)), mat_gnoise(vec3(sAx * 0.9, seed * 17.0, 5.0)));
     vec2 rp = xy - pith;
-    // Wavy/curly grain: ripples of the rings along the axis.
-    rp += 0.0012 * vec2(mat_gnoise(vec3(sAx * 25.0, rp * 30.0)), mat_gnoise(vec3(sAx * 25.0 + 9.0, rp * 30.0)));
+    // Wavy/curly grain: ripples of the rings along the axis (params[7].x scales it, 0 = 1).
+    float curl = i.matParams[7].x > 0.0 ? i.matParams[7].x : 1.0;
+    rp += 0.0012 * curl * vec2(mat_gnoise(vec3(sAx * 25.0, rp * 30.0)), mat_gnoise(vec3(sAx * 25.0 + 9.0, rp * 30.0)));
     float rad = length(rp);
     // Year-to-year ring width variation + slow distortions (no angular term: seam free).
     float phase = rad * P2.w + 2.5 * mat_fbm(vec3(rad * 7.0, seed * 3.0, 0.5), 3) + 0.8 * mat_fbm(vec3(rp * 9.0, sAx * 0.4), 3);

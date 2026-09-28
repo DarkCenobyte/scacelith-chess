@@ -111,12 +111,13 @@ void defineMarbles() {
         Material& m = def(MaterialId::BoardFrame, "shaders/materials/marble.glsl", {"MARBLE_FRAME"});
         m.params[0] = vec4(srgb(20, 18, 17), 0.3f);
         m.params[1] = vec4(srgb(40, 34, 28), 0.5f);
-        m.params[2] = vec4(srgb(200, 160, 92), 0.9f);
-        m.params[3] = vec4(srgb(214, 190, 150), 0.6f);
-        m.params[4] = vec4(9.0f, 0.006f, 1.3f, 3.0f);
-        m.params[5] = vec4(0.9f, 0.8f, 0.6f, 0.08f);
-        m.params[6] = vec4(0.3f, 1.0f, 0.035f, 0.3f);
-        m.params[7] = vec4(0.5f, 0.004f, 1.0f, 0.5f);
+        // Muted ochre veins: real Portoro reads black first, the gold is a discreet accent.
+        m.params[2] = vec4(srgb(150, 118, 72), 0.65f);
+        m.params[3] = vec4(srgb(118, 100, 80), 0.3f);
+        m.params[4] = vec4(9.0f, 0.0042f, 1.3f, 3.0f);
+        m.params[5] = vec4(0.9f, 0.8f, 0.6f, 0.05f);
+        m.params[6] = vec4(0.3f, 1.0f, 0.035f, 0.15f);
+        m.params[7] = vec4(0.3f, 0.003f, 1.0f, 0.35f);
         polishTex(m);
     }
     // Floor: cream Calacatta tiles, 0.8 m, 1.5 mm joints, baked slab.
@@ -166,7 +167,12 @@ Material& walnut(MaterialId id, vec3 axis, float rings, float coat, float coatRo
 }
 
 void defineWoods() {
-    walnut(MaterialId::TableWood, vec3(1, 0, 0), 220.0f, 1.0f, 0.045f, 0.8f);
+    {
+        // Table top: a calm, straight-grained slab (little curl and ribbon under the gloss).
+        Material& m = walnut(MaterialId::TableWood, vec3(1, 0, 0), 170.0f, 1.0f, 0.045f, 0.8f);
+        m.params[3].w = 0.1f;
+        m.params[7].x = 0.2f;
+    }
     {
         Material& m = walnut(MaterialId::TableWoodCarved, vec3(0, 1, 0), 220.0f, 0.75f, 0.22f, 0.5f);
         m.params[5].w = 0.6f;
