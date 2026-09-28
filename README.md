@@ -27,6 +27,22 @@ Illegal moves are only possible when legal-move hints are turned off (Options > 
 tournaments, the arbiter then restores the position, gives the opponent extra time, and a second
 illegal move loses the game.
 
+### Scoresheets
+
+As in tournaments, both players record the game on their own scoresheet, a pad lying on the side
+of the table opposite the clock. Right after every clock press each player writes the move down
+with the hand on the pad side, while the other hand stays free to play and press the clock, so
+keeping score never costs clock time. The player whose clock stands on the left therefore plays
+with the left hand and writes with the right. The header is filled in when the game starts (event
+"Scacelith", date, round, the players' names and ratings: your name from Options > Player,
+"Human" by default, and "Stockfish"), a full page of 40 moves is turned over the top of the pad,
+and the result is written before the final handshake. You hear the pen on the paper and the page
+being turned.
+
+Each player has a handwriting of their own (Caveat, Marck Script or Bad Script for Latin and
+Cyrillic; names in other scripts are written in Aref Ruqaa, Klee One or LXGW WenKai), and moves use
+the piece letters of the interface language.
+
 ### Your Elo
 
 Your rating starts at 1500 and is updated after every game against Stockfish with the FIDE
