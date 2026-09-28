@@ -62,5 +62,6 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised
 
 Scacelith is free software under the GNU General Public License v3.0 (see `LICENSE`), because it
 embeds [Stockfish](https://stockfishchess.org) (GPL-3.0), whose source is in
-`third_party/stockfish/` with its own copyright notices. Fonts are distributed under the SIL Open
-Font License (see `assets/fonts/`).
+`third_party/stockfish/` with its own copyright notices. The Cinzel and EB Garamond fonts are
+under the SIL Open Font License; the chess figures of the promotion picker come from a subset of GNU
+FreeFont FreeSerif (GPL-3.0+ with the font exception). Their licence texts are in `assets/fonts/`.
