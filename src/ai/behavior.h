@@ -19,6 +19,10 @@ int humanThinkTimeMs(const EngineSettings& s, const ClockInfo& clock, int plyCou
                      bool inCheck, bool recapture, double z);
 
 bool acceptsDrawOffer(int evalCp, int plyCount);
+bool offersDraw(int evalCp, int plyCount, int pliesSinceOwnOffer);
+
+// Same strength settings (everything that changes the moves Stockfish plays).
+bool sameStrength(const EngineSettings& a, const EngineSettings& b);
 
 // True if `reply` (UCI) captures on the destination square of the last move of `moves` (played
 // from the standard start position) and that last move was itself a capture.
