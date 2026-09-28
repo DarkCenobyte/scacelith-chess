@@ -1,7 +1,13 @@
 #include "renderer.h"
+#include "lighting/atmosphere.h"
+#include "lighting/lighting_data.h"
+#include "lighting/planar.h"
+#include "lighting/probes.h"
+#include "lighting/shadows.h"
 #include "post/postfx.h"
 #include "shader.h"
 #include "../core/log.h"
+#include "../game/layout.h"
 #include <algorithm>
 #include <cstring>
 
@@ -39,21 +45,31 @@ void RenderSettings::applyPreset(Quality q) {
     switch (q) {
         case Quality::Low:
             shadowMapSize = 2048; planarReflections = false; ssao = true; ssr = false; volumetrics = false;
-            taa = true; motionBlur = false; dof = false; bloom = true; tessellation = false; break;
+            taa = true; motionBlur = false; dof = false; bloom = true; tessellation = false;
+            shadowCascades = 2; probeResolution = 64; probeBounces = 1; break;
         case Quality::Medium:
             shadowMapSize = 2048; planarReflections = true; ssao = true; ssr = false; volumetrics = true;
-            taa = true; motionBlur = true; dof = false; bloom = true; tessellation = false; break;
+            taa = true; motionBlur = true; dof = false; bloom = true; tessellation = false;
+            shadowCascades = 3; probeResolution = 64; probeBounces = 2; break;
         case Quality::High:
             shadowMapSize = 4096; planarReflections = true; ssao = true; ssr = true; volumetrics = true;
-            taa = true; motionBlur = true; dof = true; bloom = true; tessellation = true; break;
+            taa = true; motionBlur = true; dof = true; bloom = true; tessellation = true;
+            shadowCascades = 3; probeResolution = 128; probeBounces = 2; break;
         case Quality::Ultra:
             shadowMapSize = 4096; planarReflections = true; ssao = true; ssr = true; volumetrics = true;
-            taa = true; motionBlur = true; dof = true; bloom = true; tessellation = true; renderScale = 1.0f; break;
+            taa = true; motionBlur = true; dof = true; bloom = true; tessellation = true; renderScale = 1.0f;
+            shadowCascades = 3; probeResolution = 128; probeBounces = 3; break;
     }
 }
 
 // ---------------------------------------------------------------------------------------------
-Renderer::Renderer() : post_(new PostFX) {}
+Renderer::Renderer()
+    : lub_(new LightingUBOData()),
+      atmosphere_(new lighting::Atmosphere),
+      shadows_(new lighting::SunShadows),
+      probes_(new lighting::LightProbes),
+      planarRefl_(new lighting::PlanarReflections),
+      post_(new PostFX) {}
 Renderer::~Renderer() { shutdown(); }
 
 static GLuint g_samplerShadowCmp = 0, g_samplerShadowRaw = 0;
@@ -63,6 +79,9 @@ bool Renderer::init(const RenderSettings& s) {
     gpu::ensureBuffer(frameUbo_, sizeof(FrameUBOData));
     gpu::ensureBuffer(drawSsbo_, sizeof(DrawDataGPU) * 256);
     gpu::ensureBuffer(lightSsbo_, sizeof(PointLight) * 16);
+    gpu::ensureBuffer(lightingUbo_, sizeof(LightingUBOData));
+    *lub_ = LightingUBOData();
+    glNamedBufferSubData(lightingUbo_.id, 0, sizeof(LightingUBOData), lub_.get());
 
     auto fill = [](gpu::Texture& t, const void* px, GLenum fmt, GLenum type) {
         if (t.target == GL_TEXTURE_2D) glTextureSubImage2D(t.id, 0, 0, 0, 1, 1, fmt, type, px);
@@ -93,35 +112,132 @@ bool Renderer::init(const RenderSettings& s) {
     glSamplerParameteri(g_samplerShadowRaw, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glSamplerParameteri(g_samplerShadowRaw, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    shadowCascades_ = 2;
-    shadowArray_ = gpu::createTexture2DArray(settings_.shadowMapSize, settings_.shadowMapSize, shadowCascades_, GL_DEPTH_COMPONENT32F);
-    for (int i = 0; i < shadowCascades_; ++i) shadowFbs_.push_back(gpu::createFramebufferLayer(nullptr, 0, &shadowArray_, i));
+    // Split-sum DFG LUT (+ sheen albedo), computed once.
+    brdfLut_ = gpu::createTexture2D(128, 128, GL_RGBA16F);
+    glObjectLabel(GL_TEXTURE, brdfLut_.id, -1, "brdf.dfg");
+    {
+        const ShaderProgram& p = shaders::compute("shaders/lighting/dfg_lut.comp");
+        if (p.valid()) {
+            p.use();
+            p.set("uSize", 128);
+            glBindImageTexture(0, brdfLut_.id, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16F);
+            gpu::dispatch2D(128, 128);
+            glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT);
+        }
+    }
+
+    atmosphere_->init();
+    shadows_->init(settings_.shadowMapSize, settings_.shadowCascades, settings_.staticShadowCache);
+    probes_->init(settings_.probeResolution);
+    defaultLightingLayout();
 
     if (!post_->init()) return false;
     return true;
 }
 
+void Renderer::defaultLightingLayout() {
+    using namespace layout;
+    const float wt = WALL_THICKNESS + 0.1f;
+    sceneBounds_ = AABB();
+    sceneBounds_.add(vec3(HALL_MIN_X - wt, -0.2f, HALL_MIN_Z - wt));
+    sceneBounds_.add(vec3(HALL_MAX_X + wt, HALL_HEIGHT + 0.8f, HALL_MAX_Z + wt));
+    AABB regions[3];
+    regions[0].add(vec3(-0.85f, 0.0f, -1.15f));      // table + seated players
+    regions[0].add(vec3(0.85f, 1.70f, 1.15f));
+    regions[1].add(vec3(-3.2f, 0.0f, -3.4f));        // chairs, floor around the table
+    regions[1].add(vec3(3.2f, 2.6f, 3.4f));
+    regions[2] = sceneBounds_;                        // the whole hall and its thick walls
+    shadows_->setRegions(regions, 3);
+
+    AABB interior;
+    interior.add(vec3(HALL_MIN_X, 0.0f, HALL_MIN_Z));
+    interior.add(vec3(HALL_MAX_X, HALL_HEIGHT, HALL_MAX_Z));
+    std::vector<LightProbeDesc> probes;
+    LightProbeDesc table;
+    table.position = vec3(0.0f, TABLE_TOP_Y + 0.32f, 0.0f);
+    table.radius = 1.7f;
+    table.innerRadius = 0.95f;
+    table.priority = true;
+    table.box = interior;
+    probes.push_back(table);
+    const float xs[3] = {HALL_MIN_X + 2.4f, 0.0f, HALL_MAX_X - 2.4f};
+    for (int iz = 0; iz < 4; ++iz)
+        for (int ix = 0; ix < 3; ++ix) {
+            LightProbeDesc p;
+            float z = HALL_MIN_Z + (HALL_MAX_Z - HALL_MIN_Z) * (float(iz) + 0.5f) / 4.0f;
+            p.position = vec3(xs[ix], 1.8f, z);
+            p.radius = 7.5f;
+            p.box = interior;
+            probes.push_back(p);
+        }
+    for (int k = 0; k < 3; ++k) {   // upper row: ceiling, vaults, the top of the windows
+        LightProbeDesc p;
+        p.position = vec3(0.0f, HALL_HEIGHT - 2.4f, 7.0f * float(k - 1));
+        p.radius = 9.0f;
+        p.box = interior;
+        probes.push_back(p);
+    }
+    probes_->setProbes(probes);
+}
+
+void Renderer::setSceneBounds(const AABB& b) {
+    sceneBounds_ = b;
+    staticDirty_ = true;
+}
+
+void Renderer::setShadowRegions(const AABB* regions, int count) {
+    shadows_->setRegions(regions, count);
+    staticDirty_ = true;
+}
+
+void Renderer::setLightProbes(const std::vector<LightProbeDesc>& probes) {
+    std::vector<LightProbeDesc> p = probes;
+    for (auto& d : p)
+        if (!d.box.valid()) d.box = sceneBounds_;
+    probes_->setProbes(p);
+    staticDirty_ = true;
+}
+
+void Renderer::setGlobalTexture(int slot, GLuint texture) {
+    if (slot >= 0 && slot < 5) globalTex_[slot] = texture;
+}
+
+GLuint Renderer::skyCubemap() const { return atmosphere_->skyCube(); }
+GLuint Renderer::specularProbes() const { return probes_->baked() ? probes_->specularArray() : dummyCubeArray_.id; }
+
 void Renderer::shutdown() {
     if (!frameUbo_.id) return;
     post_->shutdown();
     destroyTargets();
-    for (auto& fb : shadowFbs_) fb.destroy();
-    shadowFbs_.clear();
-    shadowArray_.destroy();
-    for (auto& fb : planarFbs_) fb.destroy();
-    planarFbs_.clear();
-    planarColor_.destroy();
-    planarDepth_.destroy();
+    shadows_->shutdown();
+    probes_->shutdown();
+    planarRefl_->shutdown();
+    atmosphere_->shutdown();
+    brdfLut_.destroy();
     for (auto* t : {&dummy2D_, &dummyArray_, &dummyCube_, &dummyCubeArray_, &dummy3D_, &dummyShadow_}) t->destroy();
     frameUbo_.destroy();
     drawSsbo_.destroy();
     lightSsbo_.destroy();
+    lightingUbo_.destroy();
+    if (g_samplerShadowCmp) glDeleteSamplers(1, &g_samplerShadowCmp);
+    if (g_samplerShadowRaw) glDeleteSamplers(1, &g_samplerShadowRaw);
+    g_samplerShadowCmp = g_samplerShadowRaw = 0;
     shaders::shutdown();
 }
 
 void Renderer::setSettings(const RenderSettings& s) {
     bool resizeNeeded = s.renderScale != settings_.renderScale;
+    bool shadowsChanged = s.shadowMapSize != settings_.shadowMapSize || s.shadowCascades != settings_.shadowCascades ||
+                          s.staticShadowCache != settings_.staticShadowCache;
+    bool probesChanged = s.probeResolution != settings_.probeResolution || s.probeBounces != settings_.probeBounces ||
+                         s.lightProbes != settings_.lightProbes;
     settings_ = s;
+    if (shadowsChanged && frameUbo_.id) shadows_->init(settings_.shadowMapSize, settings_.shadowCascades, settings_.staticShadowCache);
+    if (probesChanged && frameUbo_.id) {
+        std::vector<LightProbeDesc> keep = probes_->probes();
+        probes_->init(settings_.probeResolution);
+        probes_->setProbes(keep);
+    }
     if (resizeNeeded && width_ > 0) { int w = width_, h = height_; width_ = 0; resize(w, h); }
 }
 
@@ -135,14 +251,17 @@ void Renderer::createTargets(int w, int h) {
     rt_.velocity = gpu::createTexture2D(w, h, GL_RG16F);
     rt_.fbMain = gpu::createFramebuffer({&rt_.hdr, &rt_.normalRough, &rt_.specular, &rt_.velocity}, &rt_.depth);
     rt_.fbPrepass = gpu::createFramebuffer({&rt_.normalRough, &rt_.velocity}, &rt_.depth);
+    rt_.fbTransparent = gpu::createFramebuffer({&rt_.hdr}, &rt_.depth);
     gpu::checkFramebuffer(rt_.fbMain, "main");
     gpu::checkFramebuffer(rt_.fbPrepass, "prepass");
+    gpu::checkFramebuffer(rt_.fbTransparent, "transparent");
 }
 
 void Renderer::destroyTargets() {
     for (auto* t : {&rt_.hdr, &rt_.depth, &rt_.normalRough, &rt_.specular, &rt_.velocity}) t->destroy();
     rt_.fbMain.destroy();
     rt_.fbPrepass.destroy();
+    rt_.fbTransparent.destroy();
 }
 
 void Renderer::resize(int w, int h) {
@@ -152,16 +271,8 @@ void Renderer::resize(int w, int h) {
     int rw = std::max(1, int(float(w) * settings_.renderScale)), rh = std::max(1, int(float(h) * settings_.renderScale));
     destroyTargets();
     createTargets(rw, rh);
-    // Planar reflections: one array layer per reflector, allocated for up to 4.
-    for (auto& fb : planarFbs_) fb.destroy();
-    planarFbs_.clear();
-    planarColor_.destroy();
-    planarDepth_.destroy();
-    planarW_ = std::max(1, rw / 2);
-    planarH_ = std::max(1, rh / 2);
-    planarColor_ = gpu::createTexture2DArray(planarW_, planarH_, 4, GL_RGBA16F, 0);
-    planarDepth_ = gpu::createTexture2DArray(planarW_, planarH_, 4, GL_DEPTH_COMPONENT32F);
-    for (int i = 0; i < 4; ++i) planarFbs_.push_back(gpu::createFramebufferLayer(&planarColor_, i, &planarDepth_, i));
+    // Planar reflections: half resolution, one array layer per reflector (up to 4).
+    planarRefl_->resize(std::max(1, rw / 2), std::max(1, rh / 2));
     post_->resize(rw, rh);
 }
 
@@ -171,6 +282,8 @@ static float halton(int i, int b) {
     while (i > 0) { f /= float(b); r += f * float(i % b); i /= b; }
     return r;
 }
+
+static float mieScaleOf(const Environment& env) { return std::max(0.2f, env.turbidity / 2.0f); }
 
 void Renderer::beginFrame(const Camera& cam, const Environment& env, float dt) {
     camera_ = cam;
@@ -209,12 +322,17 @@ void Renderer::beginFrame(const Camera& cam, const Environment& env, float dt) {
     f.jitter = vec4(jitter.x, jitter.y, prevJitter_.x, prevJitter_.y);
     float exposure = 1.0f / (1.2f * std::pow(2.0f, env.exposureEV100));
     f.exposure = vec4(exposure, 1.0f / exposure, cam.nearZ, aspect);
-    f.sunDirection = vec4(normalize(env.sunDirection), 0.00465f);
-    f.sunRadiance = vec4(env.sunColor * env.sunIlluminance * exposure, env.sunIlluminance);
-    f.skyParams = vec4(env.turbidity, env.skyIlluminance * exposure, env.exposureEV100, float(frameIndex_));
-    // Fallback hemisphere ambient (only used until probes exist): sky ~ bluish, ground ~ warm marble bounce.
-    f.ambientSky = vec4(vec3(0.55f, 0.65f, 0.85f) * (env.skyIlluminance * 0.12f / PI) * exposure, 0);
-    f.ambientGround = vec4(vec3(0.85f, 0.78f, 0.68f) * (env.sunIlluminance * 0.035f / PI) * exposure, 0);
+    vec3 sunDir = normalize(env.sunDirection);
+    vec3 sunLux = env.physicalSky ? atmosphere_->sunIlluminance(sunDir, mieScaleOf(env), env.altitudeKm) * env.sunIntensityScale
+                                  : env.sunColor * env.sunIlluminance;
+    float sunLum = 0.2126f * sunLux.x + 0.7152f * sunLux.y + 0.0722f * sunLux.z;
+    f.sunDirection = vec4(sunDir, 0.00465f);
+    f.sunRadiance = vec4(sunLux * exposure, sunLum);
+    float skyLux = env.physicalSky ? std::max(sunLum * 0.2f, 2000.0f) * env.skyIntensity : env.skyIlluminance;
+    f.skyParams = vec4(env.turbidity, skyLux * exposure, env.exposureEV100, float(frameIndex_));
+    // Fallback hemisphere ambient (only used when light probes are off / not baked yet).
+    f.ambientSky = vec4(vec3(0.55f, 0.65f, 0.85f) * (skyLux * 0.12f / PI) * exposure, 0);
+    f.ambientGround = vec4(vec3(0.85f, 0.78f, 0.68f) * (sunLum * 0.035f / PI) * exposure, 0);
     f.clipPlane = vec4(0, 0, 0, 1);
     f.passInfo = vec4(0, 0, 0, float(planar_.size()));
 
@@ -229,6 +347,9 @@ void Renderer::submit(const DrawItem& d) {
     it.drawIndex = uint32_t(drawData_.size());
     vec3 c = transformPoint(d.model, d.mesh->bounds.center());
     it.viewDepth = -transformPoint(frame_.view, c).z;
+    float sx = length(d.model.c[0].xyz()), sy = length(d.model.c[1].xyz()), sz = length(d.model.c[2].xyz());
+    it.center = c;
+    it.radius = length(d.mesh->bounds.extent()) * std::max(sx, std::max(sy, sz)) * 1.02f + 1e-3f;
     items_.push_back(it);
 
     DrawDataGPU g;
@@ -255,10 +376,10 @@ void Renderer::uploadFrameUBO(const FrameUBOData& d) {
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_FRAME, frameUbo_.id);
 }
 
-const ShaderProgram* Renderer::programFor(const Material& mat, PassId pass) {
+const ShaderProgram* Renderer::programFor(const Material& mat, PassId pass, bool allowTess) {
     ProgramDesc d;
     d.vs = "shaders/passes/mesh.vert";
-    bool tess = mat.tessellated && settings_.tessellation;
+    bool tess = mat.tessellated && settings_.tessellation && allowTess;
     if (tess) {
         d.tcs = "shaders/passes/mesh.tesc";
         d.tes = "shaders/passes/mesh.tese";
@@ -283,19 +404,29 @@ const ShaderProgram* Renderer::programFor(const Material& mat, PassId pass) {
 void Renderer::bindGlobalTextures() {
     // Keep every reserved unit complete with a dummy of the right type.
     for (int u = TEXUNIT_SHADOW; u < TEXUNIT_COUNT; ++u) glBindTextureUnit(GLuint(u), dummy2D_.id);
-    glBindTextureUnit(TEXUNIT_SHADOW, shadowArray_.id);
+    glBindTextureUnit(TEXUNIT_SHADOW, shadows_->depthArray());
     glBindSampler(TEXUNIT_SHADOW, g_samplerShadowCmp);
-    glBindTextureUnit(TEXUNIT_SHADOW_DEPTH, shadowArray_.id);
+    glBindTextureUnit(TEXUNIT_SHADOW_DEPTH, shadows_->depthArray());
     glBindSampler(TEXUNIT_SHADOW_DEPTH, g_samplerShadowRaw);
-    glBindTextureUnit(TEXUNIT_IRRADIANCE, dummy2D_.id);
-    glBindTextureUnit(TEXUNIT_SPECULAR, dummyCubeArray_.id);
-    glBindTextureUnit(TEXUNIT_PLANAR, planarColor_.id ? planarColor_.id : dummyArray_.id);
-    glBindTextureUnit(TEXUNIT_SKY, dummyCube_.id);
+    glBindTextureUnit(TEXUNIT_IRRADIANCE, dummy2D_.id);  // irradiance SH lives in the LightingUBO
+    glBindTextureUnit(TEXUNIT_SPECULAR, specularProbes());
+    glBindTextureUnit(TEXUNIT_PLANAR, planarRefl_->colorArray() ? planarRefl_->colorArray() : dummyArray_.id);
+    glBindTextureUnit(TEXUNIT_BRDF_LUT, brdfLut_.id);
+    glBindTextureUnit(TEXUNIT_SKY, atmosphere_->skyCube() ? atmosphere_->skyCube() : dummyCube_.id);
     glBindTextureUnit(TEXUNIT_VOLUMETRIC, dummy3D_.id);
     glBindTextureUnit(TEXUNIT_NOISE, dummyArray_.id);
+    for (int i = 0; i < 5; ++i)
+        if (globalTex_[i]) glBindTextureUnit(GLuint(TEXUNIT_GLOBAL0 + i), globalTex_[i]);
+    glBindBufferBase(GL_UNIFORM_BUFFER, UBO_LIGHTING, lightingUbo_.id);
 }
 
 void Renderer::drawScene(PassId pass, bool transparents, uint32_t skipFlags) {
+    DrawFilter f;
+    f.skipFlags = skipFlags;
+    drawScene(pass, transparents, f);
+}
+
+void Renderer::drawScene(PassId pass, bool transparents, const DrawFilter& flt) {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_DRAWS, drawSsbo_.id);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_LIGHTS, lightSsbo_.id);
     const ShaderProgram* current = nullptr;
@@ -303,10 +434,20 @@ void Renderer::drawScene(PassId pass, bool transparents, uint32_t skipFlags) {
     for (const Item& it : items_) {
         const Material& mat = *it.d.material;
         if (mat.transparent != transparents) continue;
-        if (it.d.flags & skipFlags) continue;
+        if (it.d.flags & flt.skipFlags) continue;
+        if ((it.d.flags & flt.requireFlags) != flt.requireFlags) continue;
         if (pass == PassId::Shadow && !(mat.castShadow && (it.d.flags & DRAW_CAST_SHADOW))) continue;
         if (pass == PassId::Planar && mat.planarReflector == planarLayer) continue;  // don't reflect the mirror itself
-        const ShaderProgram* p = programFor(mat, pass);
+        if (!(it.d.flags & DRAW_NO_CULL)) {
+            if (flt.planeCount > 0 && !gpu::sphereVisible(flt.planes, flt.planeCount, it.center, it.radius)) continue;
+            if (flt.minSize > 0.0f && it.radius < flt.minSize * distance(flt.eye, it.center)) continue;
+            if (flt.minRadius > 0.0f && it.radius < flt.minRadius) {
+                const AABB& b = flt.minRadiusRegion;
+                vec3 c = it.center;
+                if (c.x >= b.lo.x && c.y >= b.lo.y && c.z >= b.lo.z && c.x <= b.hi.x && c.y <= b.hi.y && c.z <= b.hi.z) continue;
+            }
+        }
+        const ShaderProgram* p = programFor(mat, pass, flt.allowTessellation);
         if (!p) continue;
         if (p != current) { p->use(); current = p; }
         glProgramUniform1i(p->id, 0, int(it.drawIndex));
@@ -315,120 +456,17 @@ void Renderer::drawScene(PassId pass, bool transparents, uint32_t skipFlags) {
         if (mat.doubleSided || pass == PassId::Shadow) glDisable(GL_CULL_FACE);
         else glEnable(GL_CULL_FACE);
         it.d.mesh->bind();
-        bool tess = mat.tessellated && settings_.tessellation;
+        bool tess = mat.tessellated && settings_.tessellation && flt.allowTessellation;
         if (tess) glPatchParameteri(GL_PATCH_VERTICES, 3);
         glDrawElements(tess ? GL_PATCHES : GL_TRIANGLES, GLsizei(it.d.mesh->indexCount), GL_UNSIGNED_INT, nullptr);
     }
     glEnable(GL_CULL_FACE);
 }
 
-// ---------------------------------------------------------------------------------------------
-void Renderer::renderShadows() {
-    gpu::DebugGroup g("shadows");
-    // Fixed cascades (the camera barely moves): 0 = table and players, 1 = the whole hall.
-    const vec3 centers[2] = {vec3(0, 0.95f, 0), vec3(0, 4.0f, 0)};
-    const float radii[2] = {1.15f, 17.0f};
-    vec3 L = normalize(env_.sunDirection);
-    vec3 up = std::fabs(L.y) > 0.95f ? vec3(1, 0, 0) : vec3(0, 1, 0);
-    FrameUBOData sf = frame_;
-    for (int c = 0; c < shadowCascades_; ++c) {
-        float R = radii[c];
-        vec3 eye = centers[c] + L * (R * 2.5f);
-        mat4 v = lookAt(eye, centers[c], up);
-        // Snap the light-space origin to texel increments for stability.
-        float texel = 2.0f * R / float(settings_.shadowMapSize);
-        vec3 o = transformPoint(v, vec3(0));
-        v.c[3].x -= std::fmod(o.x, texel);
-        v.c[3].y -= std::fmod(o.y, texel);
-        mat4 p = ortho01(-R, R, -R, R, 0.05f, R * 5.0f);
-        mat4 vp = p * v;
-        mat4 bias = translate(vec3(0.5f, 0.5f, 0.0f)) * scale(vec3(0.5f, 0.5f, 1.0f));
-        frame_.shadowMatrix[c] = bias * vp;
-        frame_.shadowCascade[c] = vec4(centers[c], R);
-        sf.shadowMatrix[c] = frame_.shadowMatrix[c];
-        sf.shadowCascade[c] = frame_.shadowCascade[c];
-    }
-    frame_.shadowParams = vec4(float(shadowCascades_), 0.0025f, 0.0f, 1.0f);
-    sf.shadowParams = frame_.shadowParams;
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glDepthMask(GL_TRUE);
-    glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(1.5f, 2.0f);
-    glViewport(0, 0, settings_.shadowMapSize, settings_.shadowMapSize);
-    for (int c = 0; c < shadowCascades_; ++c) {
-        glBindFramebuffer(GL_FRAMEBUFFER, shadowFbs_[size_t(c)].id);
-        float one = 1.0f;
-        glClearNamedFramebufferfv(shadowFbs_[size_t(c)].id, GL_DEPTH, 0, &one);
-        // The shadow pass uses viewProj = light matrix (without the uv bias).
-        FrameUBOData lf = sf;
-        mat4 unbias = scale(vec3(2.0f, 2.0f, 1.0f)) * translate(vec3(-0.5f, -0.5f, 0.0f));
-        lf.viewProj = unbias * frame_.shadowMatrix[c];
-        lf.viewProjNoJitter = lf.viewProj;
-        lf.prevViewProj = lf.viewProj;
-        lf.passInfo = vec4(float(PassId::Shadow), float(c), 0, 0);
-        lf.cameraPos = vec4(centers[c] + L * (radii[c] * 2.5f), frame_.cameraPos.w);
-        uploadFrameUBO(lf);
-        drawScene(PassId::Shadow, false, 0);
-    }
-    glDisable(GL_POLYGON_OFFSET_FILL);
-}
-
-void Renderer::renderPlanarReflections() {
-    if (!settings_.planarReflections || planar_.empty()) return;
-    gpu::DebugGroup g("planar");
-    glEnable(GL_CLIP_DISTANCE0);
-    for (size_t i = 0; i < planar_.size() && i < 4; ++i) {
-        const PlanarReflector& pr = planar_[i];
-        vec3 n = normalize(pr.normal);
-        float d = -dot(n, pr.point);
-        frame_.planarPlanes[i] = vec4(n, d);
-        if (!pr.enabled) continue;
-        // Reflection matrix about the plane.
-        mat4 R({1 - 2 * n.x * n.x, -2 * n.x * n.y, -2 * n.x * n.z, 0}, {-2 * n.y * n.x, 1 - 2 * n.y * n.y, -2 * n.y * n.z, 0},
-               {-2 * n.z * n.x, -2 * n.z * n.y, 1 - 2 * n.z * n.z, 0}, {-2 * d * n.x, -2 * d * n.y, -2 * d * n.z, 1});
-        FrameUBOData rf = frame_;
-        float aspect = float(planarW_) / float(planarH_);
-        mat4 proj = camera_.proj(aspect);
-        rf.view = frame_.view * R;
-        rf.proj = proj;
-        rf.viewProj = proj * rf.view;
-        rf.viewProjNoJitter = rf.viewProj;
-        rf.prevViewProj = rf.viewProj;
-        rf.invView = inverse(rf.view);
-        rf.invProj = inverse(proj);
-        rf.invViewProj = inverse(rf.viewProj);
-        rf.cameraPos = vec4(transformPoint(R, camera_.position), frame_.cameraPos.w);
-        rf.resolution = vec4(float(planarW_), float(planarH_), 1.0f / planarW_, 1.0f / planarH_);
-        rf.clipPlane = vec4(n, d + 0.0005f);
-        rf.passInfo = vec4(float(PassId::Planar), float(i), float(lights_.size()), float(planar_.size()));
-        frame_.planarViewProj[i] = rf.viewProj;
-        frame_.passInfo.y = float(i);
-        uploadFrameUBO(rf);
-        const gpu::Framebuffer& fb = planarFbs_[i];
-        glBindFramebuffer(GL_FRAMEBUFFER, fb.id);
-        glViewport(0, 0, planarW_, planarH_);
-        float zero = 0.0f;
-        const float clearC[4] = {0, 0, 0, 0};
-        glClearNamedFramebufferfv(fb.id, GL_COLOR, 0, clearC);
-        glClearNamedFramebufferfv(fb.id, GL_DEPTH, 0, &zero);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_GREATER);
-        glDepthMask(GL_TRUE);
-        glFrontFace(GL_CW);  // mirrored winding
-        drawScene(PassId::Planar, false, DRAW_NO_REFLECTION | DRAW_HIDDEN_MAIN);
-        glFrontFace(GL_CCW);
-        renderSky();
-    }
-    frame_.passInfo.y = 0;
-    glDisable(GL_CLIP_DISTANCE0);
-    glGenerateTextureMipmap(planarColor_.id);
-}
-
 void Renderer::renderSky() {
     const ShaderProgram& p = shaders::fullscreen("shaders/passes/sky.frag");
     if (!p.valid()) return;
+    atmosphere_->bindSkyTextures();
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_GEQUAL);  // only where nothing was drawn (depth == 0)
     glDepthMask(GL_FALSE);
@@ -437,6 +475,21 @@ void Renderer::renderSky() {
     gpu::drawFullscreenTriangle();
     glDepthMask(GL_TRUE);
     glEnable(GL_CULL_FACE);
+}
+
+void Renderer::updateLightingUBO() {
+    LightingUBOData& l = *lub_;
+    float exposure = frame_.exposure.x;
+    probes_->fillUBO(l, exposure, settings_.lightProbes);
+    float softness = std::max(env_.sunSoftness, 0.05f);
+    vec3 toa = lighting::Atmosphere::solarTOA() * env_.sunIntensityScale;
+    float toaLum = 0.2126f * toa.x + 0.7152f * toa.y + 0.0722f * toa.z;
+    l.sunParams = vec4(frame_.sunDirection.w, std::tan(frame_.sunDirection.w * softness), softness, toaLum * exposure);
+    l.sunTOA = vec4(toa * exposure, env_.altitudeKm);
+    l.skyParams2 = vec4(clamp(env_.cloudCoverage, 0.0f, 1.0f), env_.time, mieScaleOf(env_), env_.skyIntensity);
+    l.lightingMisc = vec4(settings_.specularAA, 0.06f, env_.ambientIntensity, 0.0f);
+    glNamedBufferSubData(lightingUbo_.id, 0, GLsizeiptr(LIGHTING_UBO_CPU_SIZE), lub_.get());
+    glBindBufferBase(GL_UNIFORM_BUFFER, UBO_LIGHTING, lightingUbo_.id);
 }
 
 void Renderer::endFrame() {
@@ -460,14 +513,61 @@ void Renderer::endFrame() {
     glFrontFace(GL_CCW);
     glDisable(GL_BLEND);
 
+    // ---- Lighting: atmosphere, sky capture, shadows, probes, planar reflections --------------
+    vec3 sunDir = frame_.sunDirection.xyz();
+    float mie = mieScaleOf(env_);
+    {
+        gpu::ProfileScope prof("sky");
+        atmosphere_->updateLuts(sunDir, mie, env_.altitudeKm);
+        updateLightingUBO();
+        uploadFrameUBO(frame_);
+        bindGlobalTextures();
+        // Sky cubemap + SH: when the sun / exposure / clouds changed (clouds drift: every 2 s).
+        const float key[9] = {sunDir.x, sunDir.y, sunDir.z, frame_.exposure.x, env_.cloudCoverage, std::floor(env_.time * 0.5f),
+                              mie, env_.skyIntensity * env_.sunIntensityScale, env_.altitudeKm};
+        if (!skyKeyValid_ || std::memcmp(key, skyKey_, sizeof(key)) != 0) {
+            atmosphere_->captureSky(probes_->shBuffer());
+            glCopyNamedBufferSubData(probes_->shBuffer(), lightingUbo_.id, GLintptr(sizeof(vec4) * 9 * SH_SLOT_SKY),
+                                     GLintptr(LIGHTING_UBO_SKY_SH_OFFSET), GLsizeiptr(sizeof(vec4) * 9));
+            std::memcpy(skyKey_, key, sizeof(key));
+            skyKeyValid_ = true;
+        }
+    }
+    shadows_->render(*this, sunDir, std::max(env_.sunSoftness, 0.05f), staticDirty_);
+    planarRefl_->prepare(*this);
+    updateLightingUBO();
+    uploadFrameUBO(frame_);
     bindGlobalTextures();
-    renderShadows();
+
+    // Light probes: bake at startup, on invalidateStatic() and when the sun / sky changed a lot.
+    if (settings_.lightProbes) {
+        const float key[6] = {sunDir.x, sunDir.y, sunDir.z, mie, env_.cloudCoverage, env_.skyIntensity * env_.sunIntensityScale};
+        const float* b = bakeKey_;
+        bool sunMoved = key[0] * b[0] + key[1] * b[1] + key[2] * b[2] < std::cos(1.0f * DEG);
+        bool skyChanged = std::fabs(key[3] - b[3]) > 0.05f || std::fabs(key[4] - b[4]) > 0.05f ||
+                          std::fabs(key[5] - b[5]) > 0.02f * std::max(b[5], 1e-3f);
+        if (staticDirty_ || !probes_->baked() || sunMoved || skyChanged) {
+            probes_->bake(*this, settings_.probeBounces);
+            std::memcpy(bakeKey_, key, sizeof(key));
+            updateLightingUBO();
+            bindGlobalTextures();
+        }
+    }
+    staticDirty_ = false;
+    planarRefl_->render(*this);
     bindGlobalTextures();
-    renderPlanarReflections();
+
+    // Culling planes of the main view.
+    vec4 viewPlanes[6];
+    DrawFilter mainFilter;
+    mainFilter.skipFlags = DRAW_HIDDEN_MAIN;
+    mainFilter.planes = viewPlanes;
+    mainFilter.planeCount = gpu::frustumPlanes(frame_.viewProjNoJitter, viewPlanes);
 
     // Prepass
     {
         gpu::DebugGroup pg("prepass");
+        gpu::ProfileScope prof("prepass");
         frame_.passInfo.x = float(PassId::Prepass);
         uploadFrameUBO(frame_);
         glBindFramebuffer(GL_FRAMEBUFFER, rt_.fbPrepass.id);
@@ -480,14 +580,14 @@ void Renderer::endFrame() {
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_GREATER);
         glDepthMask(GL_TRUE);
-        drawScene(PassId::Prepass, false, DRAW_HIDDEN_MAIN);
+        drawScene(PassId::Prepass, false, mainFilter);
     }
 
     PostInputs pin;
     pin.rt = &rt_;
     pin.frame = &frame_;
     pin.frameUbo = frameUbo_.id;
-    pin.shadowArray = shadowArray_.id;
+    pin.shadowArray = shadows_->depthArray();
     pin.dt = dt_;
     pin.backbufferW = width_;
     pin.backbufferH = height_;
@@ -499,11 +599,15 @@ void Renderer::endFrame() {
     post_->settings.dof = settings_.dof;
     post_->settings.bloom = settings_.bloom;
     post_->settings.fade = fade;
-    post_->computeAO(pin);
+    {
+        gpu::ProfileScope prof("post.ao");
+        post_->computeAO(pin);
+    }
 
     // Opaque forward pass
     {
         gpu::DebugGroup mg("opaque");
+        gpu::ProfileScope prof("opaque");
         frame_.passInfo.x = float(PassId::Main);
         uploadFrameUBO(frame_);
         glBindFramebuffer(GL_FRAMEBUFFER, rt_.fbMain.id);
@@ -514,32 +618,39 @@ void Renderer::endFrame() {
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_GEQUAL);
         glDepthMask(GL_FALSE);
-        drawScene(PassId::Main, false, DRAW_HIDDEN_MAIN);
+        drawScene(PassId::Main, false, mainFilter);
         glDepthMask(GL_TRUE);
+    }
+    {
+        gpu::DebugGroup sg("sky");
+        gpu::ProfileScope prof("sky.draw");
         renderSky();
     }
-    // Transparents
+    // Transparents: dst = src0 + dst * src1 (coloured transmittance, dual-source blending).
     {
         gpu::DebugGroup tg("transparent");
+        gpu::ProfileScope prof("transparent");
+        glBindFramebuffer(GL_FRAMEBUFFER, rt_.fbTransparent.id);
         glEnable(GL_BLEND);
-        glBlendFunci(0, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);  // premultiplied
-        glDisablei(GL_BLEND, 1);
-        glDisablei(GL_BLEND, 2);
-        glDisablei(GL_BLEND, 3);
+        glBlendEquation(GL_FUNC_ADD);
+        glBlendFunc(GL_ONE, GL_SRC1_COLOR);
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_GREATER);
         glDepthMask(GL_FALSE);
-        GLenum onlyColor[] = {GL_COLOR_ATTACHMENT0, GL_NONE, GL_NONE, GL_NONE};
-        glNamedFramebufferDrawBuffers(rt_.fbMain.id, 4, onlyColor);
-        drawScene(PassId::Main, true, DRAW_HIDDEN_MAIN);
-        GLenum all[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3};
-        glNamedFramebufferDrawBuffers(rt_.fbMain.id, 4, all);
+        drawScene(PassId::Main, true, mainFilter);
         glDepthMask(GL_TRUE);
         glDisable(GL_BLEND);
+        // Mesa validates dual-source factors against the draw buffer count even with blending
+        // disabled: restore a single-source function for the next MRT passes.
+        glBlendFunc(GL_ONE, GL_ZERO);
     }
-    post_->resolve(pin);
+    {
+        gpu::ProfileScope prof("post.resolve");
+        post_->resolve(pin);
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, 0, width_, height_);
+    gpu::profileEndFrame();
 }
 
 void Renderer::readBackbuffer(std::vector<uint8_t>& rgb, int& w, int& h) {

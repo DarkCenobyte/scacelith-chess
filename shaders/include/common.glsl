@@ -43,7 +43,13 @@ struct DrawData {
 };
 layout(std430, binding = 1) readonly buffer DrawSSBO { DrawData draws[]; };
 
-struct PointLightData { vec3 position; float radius; vec3 color; float intensity; };
+// Point / spot lights (render::PointLight, 64 bytes). Omni lights have spotCosOuter <= -1.
+struct PointLightData {
+    vec3 position; float radius;
+    vec3 color; float intensity;
+    vec3 direction; float spotCosOuter;   // spot axis (light -> scene), cos of the outer cone angle
+    float spotCosInner; float sourceRadius; float pad0; float pad1;
+};
 layout(std430, binding = 4) readonly buffer LightSSBO { PointLightData pointLights[]; };
 
 layout(location = 0) uniform int uDraw;
@@ -57,6 +63,8 @@ layout(location = 0) uniform int uDraw;
 float saturate(float x) { return clamp(x, 0.0, 1.0); }
 vec3 saturate(vec3 x) { return clamp(x, 0.0, 1.0); }
 float sq(float x) { return x * x; }
+vec2 sq(vec2 x) { return x * x; }
+vec3 sq(vec3 x) { return x * x; }
 float luminance(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
 float time() { return frame.cameraPos.w; }
 

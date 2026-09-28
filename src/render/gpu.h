@@ -58,4 +58,26 @@ struct DebugGroup {
     ~DebugGroup();
 };
 
+// Frustum planes (xyz normal pointing inside, w distance) of a clip-space [0,1]-depth projection
+// (reverse-Z or standard). Degenerate planes (infinite far plane) are dropped. Returns the count.
+int frustumPlanes(const m::mat4& viewProj, m::vec4 out[6], bool sidesOnly = false);
+// Sphere vs planes: false when the sphere is fully outside one plane.
+inline bool sphereVisible(const m::vec4* planes, int n, m::vec3 c, float r) {
+    for (int i = 0; i < n; ++i)
+        if (planes[i].x * c.x + planes[i].y * c.y + planes[i].z * c.z + planes[i].w < -r) return false;
+    return true;
+}
+
+// Opt-in pass profiler (SCACELITH_GPU_PROFILE=1): each scope is bracketed by glFinish and timed on
+// the CPU, which measures real execution time on any driver (including llvmpipe). Zero cost when
+// disabled. Results are logged by profileEndFrame() every 'every' frames.
+bool profilingEnabled();
+struct ProfileScope {
+    explicit ProfileScope(const char* name);
+    ~ProfileScope();
+    const char* name_;
+    double start_ = 0;
+};
+void profileEndFrame();
+
 }  // namespace gpu

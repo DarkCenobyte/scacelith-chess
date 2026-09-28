@@ -1,16 +1,17 @@
 // Scacelith renderer: forward+ PBR pipeline, HDR, reverse-Z, OpenGL 4.6 DSA.
 //
 // Frame outline (Renderer::endFrame):
-//   1. upload FrameUBO + DrawData SSBO
-//   2. sun shadow cascades                         (render-lighting)
-//   3. light probes / IBL refresh when dirty       (render-lighting)
-//   4. planar reflection passes                    (render-lighting)
-//   5. depth + normal + velocity prepass
-//   6. PostFX::computeAO                           (render-post)
-//   7. opaque forward pass -> HDR colour, normal/roughness, specular, velocity
-//   8. sky
-//   9. transparents (glass, eyes' cornea)
-//  10. PostFX::resolve -> SSR, volumetrics, TAA, DOF, motion blur, bloom, tonemap -> backbuffer
+//   1. upload FrameUBO, LightingUBO, DrawData SSBO, lights
+//   2. atmosphere: sky-view LUT when the sun moved, sky cubemap + sky SH   (render-lighting)
+//   3. sun shadow cascades (static cache + dynamic casters)                (render-lighting)
+//   4. light probes / IBL bake when dirty (2 bounces)                      (render-lighting)
+//   5. planar reflection passes + Gaussian mip chain                       (render-lighting)
+//   6. depth + normal + velocity prepass (frustum culled)
+//   7. PostFX::computeAO                                                   (render-post)
+//   8. opaque forward pass -> HDR colour, normal/roughness, specular, velocity
+//   9. sky (atmosphere, sun disk, clouds)
+//  10. transparents (glass, eyes' cornea), dual-source blended transmittance
+//  11. PostFX::resolve -> SSR, volumetrics, TAA, DOF, motion blur, bloom, tonemap -> backbuffer
 // The UI is drawn by the caller on the backbuffer after endFrame().
 #pragma once
 #include "../math/math.h"
@@ -24,6 +25,14 @@ class PostFX;
 class ShaderProgram;
 
 namespace render {
+
+namespace lighting {
+class Atmosphere;
+class SunShadows;
+class LightProbes;
+class PlanarReflections;
+}  // namespace lighting
+struct LightingUBOData;
 
 // View camera. Local frame: -Z forward, +Y up, +X right (OpenGL convention).
 struct Camera {
@@ -41,24 +50,41 @@ struct Camera {
     void lookAt(m::vec3 target, m::vec3 upHint = m::vec3(0, 1, 0));
 };
 
-// Lighting environment. Photometric-ish units: the sun in lux, emissive and sky in nits; the
+// Lighting environment. Photometric units: the sun in lux, emissive and sky in nits; the
 // exposure (EV100) maps them to display. Shaders receive values pre-multiplied by exposure.
+//
+// With physicalSky (default) the sun colour and illuminance are derived from sunDirection through
+// the atmosphere model (Hillaire 2020: ~128 klux at the top of the atmosphere, reddened and dimmed
+// near the horizon); sunColor / sunIlluminance / skyIlluminance are then ignored, and
+// sunIntensityScale / skyIntensity scale the physical values (artistic control).
 struct Environment {
-    m::vec3 sunDirection = m::normalize(m::vec3(-0.75f, 0.45f, 0.35f));  // towards the sun
-    m::vec3 sunColor{1.0f, 0.95f, 0.88f};                                  // chromaticity
-    float sunIlluminance = 80000.0f;                                       // lux (direct)
-    float skyIlluminance = 12000.0f;                                       // lux-ish scale for sky dome
-    float turbidity = 2.6f;
-    float exposureEV100 = 11.5f;  // manual exposure (render-post may add auto exposure on top)
-    float time = 0.0f;            // seconds, drives subtle animation (dust, flicker)
+    // Towards the sun. Default = hall::recommendedSunDirection() (elevation ~31 deg, azimuth ~35 deg
+    // towards +Z): through the +Z window of the -X wall onto the board.
+    m::vec3 sunDirection = m::normalize(m::vec3(-0.70f, 0.52f, 0.49f));
+    m::vec3 sunColor{1.0f, 0.95f, 0.88f};                                  // chromaticity (physicalSky = false)
+    float sunIlluminance = 80000.0f;                                       // lux (physicalSky = false)
+    float skyIlluminance = 12000.0f;                                       // lux-ish scale for the fallback ambient
+    float turbidity = 2.6f;                                                // haze: scales the Mie density (~2 clear, 6 hazy)
+    float exposureEV100 = 12.3f;  // manual exposure (render-post may add auto exposure on top); sunlit
+                                  // white marble ~2.5 after exposure, shaded walls ~0.1-0.2
+    float time = 0.0f;            // seconds, drives subtle animation (dust, flicker, clouds)
+    // --- render-lighting additions ---
+    bool physicalSky = true;      // derive sun colour/illuminance from the atmosphere
+    float sunIntensityScale = 1.0f;
+    float skyIntensity = 1.0f;    // scales sky radiance (and so the daylight entering the windows)
+    float cloudCoverage = 0.3f;   // 0 = clear sky, 1 = overcast-ish soft cumulus layer
+    float sunSoftness = 1.0f;     // multiplies the sun's angular radius for PCSS penumbrae (1 = physical 0.27 deg)
+    float ambientIntensity = 1.0f;  // scales all image based lighting (probes, planar, fallback)
+    float altitudeKm = 0.25f;     // viewer altitude in the atmosphere (the palace stands on a hill)
 };
 
 enum DrawFlags : uint32_t {
     DRAW_CAST_SHADOW = 1u << 0,
-    DRAW_STATIC = 1u << 1,          // never moves (shadow/probe caching may rely on it)
+    DRAW_STATIC = 1u << 1,          // never moves (shadow caches and light probes rely on it)
     DRAW_NO_REFLECTION = 1u << 2,   // skipped in planar reflection and probe passes
     DRAW_HIDDEN_MAIN = 1u << 3,     // skipped in the main camera pass (e.g. the player's own head)
     DRAW_NO_VELOCITY = 1u << 4,
+    DRAW_NO_CULL = 1u << 5,         // never frustum culled (e.g. displacement beyond mesh bounds)
 };
 
 struct DrawItem {
@@ -72,11 +98,22 @@ struct DrawItem {
     uint32_t objectId = 0;      // stable id: seeds per-object randomness (objectSeed)
 };
 
+// Point light; becomes a spot light after setSpot() (spotCosOuter > -1). 64 bytes, mirrors PointLightData.
 struct PointLight {
     m::vec3 position;
     float radius = 5.0f;        // influence range (m)
     m::vec3 color{1, 1, 1};
     float intensity = 100.0f;   // candela
+    m::vec3 direction{0, -1, 0};  // spot axis (from the light towards the scene)
+    float spotCosOuter = -2.0f;   // cos(outer half angle); <= -1 = omni. Use setSpot().
+    float spotCosInner = -2.0f;
+    float sourceRadius = 0.0f;    // emitter radius (m): widens highlights (candle flame ~0.01)
+    float pad0 = 0.0f, pad1 = 0.0f;
+    void setSpot(m::vec3 dir, float innerAngle, float outerAngle) {
+        direction = m::normalize(dir);
+        spotCosInner = std::cos(innerAngle);
+        spotCosOuter = std::cos(outerAngle);
+    }
 };
 
 // Planar reflector (floor, table top, board): renders the mirrored scene into a layer of the
@@ -86,6 +123,20 @@ struct PlanarReflector {
     m::vec3 normal{0, 1, 0};
     float resolutionScale = 0.5f;
     bool enabled = true;
+    // Optional world bounds of the reflecting surface. When valid, the reflection is skipped
+    // when off screen and rendered only inside the reflector's screen rectangle (scissor).
+    m::AABB bounds;
+    // Skip objects whose bounding radius / distance is below this in the reflection (0 = off).
+    float minObjectSize = 0.002f;
+};
+
+// Light probe placement (see Renderer::setLightProbes). Probes capture DRAW_STATIC geometry only.
+struct LightProbeDesc {
+    m::vec3 position;
+    float radius = 8.0f;        // outer influence radius (m)
+    float innerRadius = 0.0f;   // priority probes: full weight inside this radius
+    bool priority = false;      // local probe (e.g. above the table) overriding the grid probes
+    m::AABB box;                // parallax proxy box (invalid = scene bounds)
 };
 
 enum class Quality { Low, Medium, High, Ultra };
@@ -103,6 +154,13 @@ struct RenderSettings {
     bool dof = true;
     bool bloom = true;
     bool tessellation = true;
+    // --- render-lighting additions ---
+    int shadowCascades = 3;        // 2 (table + hall) or 3 (table + mid + hall)
+    bool staticShadowCache = true; // cache DRAW_STATIC casters per cascade
+    bool lightProbes = true;       // runtime light probes (else hemisphere fallback ambient)
+    int probeResolution = 128;     // capture / prefiltered cube size
+    int probeBounces = 2;
+    float specularAA = 1.0f;
     void applyPreset(Quality q);
 };
 
@@ -141,6 +199,19 @@ struct DrawDataGPU {
 
 enum class PassId { Main = 0, Prepass = 1, Shadow = 2, Planar = 3, Probe = 4 };
 
+// Item selection for Renderer::drawScene.
+struct DrawFilter {
+    uint32_t skipFlags = 0;
+    uint32_t requireFlags = 0;          // every one of these flags must be set
+    const m::vec4* planes = nullptr;    // culling planes (xyz n, w d); inside: dot(n,c)+d >= -radius
+    int planeCount = 0;
+    m::vec3 eye{0, 0, 0};
+    float minSize = 0.0f;               // skip items whose radius / distance(eye) is below this
+    float minRadius = 0.0f;             // skip items smaller than this (m) whose centre is inside
+    m::AABB minRadiusRegion;            //   this region (e.g. pieces in coarse shadow cascades)
+    bool allowTessellation = true;
+};
+
 class Renderer {
 public:
     Renderer();
@@ -161,6 +232,21 @@ public:
     // Marks the static environment as changed (re-bake probes / static shadows).
     void invalidateStatic() { staticDirty_ = true; }
 
+    // --- Lighting configuration (render-lighting). Defaults follow game/layout.h (the hall). ---
+    // World bounds of the scene: shadow casters range and default probe parallax box.
+    void setSceneBounds(const m::AABB& bounds);
+    // Receiver regions of the sun cascades, finest first (count <= 3). Default: table + players,
+    // the area around the table, the whole hall.
+    void setShadowRegions(const m::AABB* regions, int count);
+    // Light probe layout (<= 16). Default: one priority probe above the table + a 3x4 hall grid.
+    void setLightProbes(const std::vector<LightProbeDesc>& probes);
+    // Global textures shared by several materials (units TEXUNIT_GLOBAL0 + slot, slot 0..4).
+    void setGlobalTexture(int slot, GLuint texture);
+    GLuint skyCubemap() const;           // TEXUNIT_SKY: sky radiance (pre-exposed, no sun disk)
+    GLuint specularProbes() const;       // TEXUNIT_SPECULAR: prefiltered probe cube array
+    GLuint lightingUBO() const { return lightingUbo_.id; }
+    GLuint brdfLut() const { return brdfLut_.id; }
+
     // Fade to black overlay (0 = none, 1 = black) and HUD tint, forwarded to post.
     float fade = 0.0f;
 
@@ -169,6 +255,7 @@ public:
     int height() const { return height_; }
     const FrameUBOData& frameData() const { return frame_; }
     const Camera& camera() const { return camera_; }
+    const Environment& environment() const { return env_; }
 
     // Reads the backbuffer (after endFrame, before swap) as tightly packed RGB8, top row first.
     void readBackbuffer(std::vector<uint8_t>& rgb, int& w, int& h);
@@ -181,6 +268,7 @@ public:
         gpu::Texture specular;     // RGBA8: F0 rgb, a = reflection mask (1 = wants SSR)
         gpu::Texture velocity;     // RG16F: uv(current) - uv(previous)
         gpu::Framebuffer fbMain, fbPrepass;
+        gpu::Framebuffer fbTransparent;  // hdr + depth only (dual-source blended transparents)
         int w = 0, h = 0;
     };
     const Targets& targets() const { return rt_; }
@@ -188,23 +276,30 @@ public:
     // Draws the submitted items with one pass type into the currently bound framebuffer.
     // Used internally and by lighting code (probe capture, planar reflections).
     void drawScene(PassId pass, bool transparents, uint32_t skipFlags);
+    void drawScene(PassId pass, bool transparents, const DrawFilter& filter);
     // Uploads a modified copy of the frame UBO (e.g. reflected camera) for sub-passes.
     void uploadFrameUBO(const FrameUBOData& data);
     GLuint frameUBO() const { return frameUbo_.id; }
+    // Draws the sky with the currently uploaded frame UBO (depth test: only where depth == 0).
+    void renderSky();
 
 private:
+    friend class lighting::SunShadows;
+    friend class lighting::LightProbes;
+    friend class lighting::PlanarReflections;
     struct Item {
         DrawItem d;
         uint32_t drawIndex;
         float viewDepth;
+        m::vec3 center;   // world bounding sphere
+        float radius;
     };
-    const ::ShaderProgram* programFor(const Material& mat, PassId pass);
+    const ::ShaderProgram* programFor(const Material& mat, PassId pass, bool allowTess = true);
     void createTargets(int w, int h);
     void destroyTargets();
-    void renderShadows();
-    void renderPlanarReflections();
-    void renderSky();
     void bindGlobalTextures();
+    void updateLightingUBO();
+    void defaultLightingLayout();
 
     RenderSettings settings_;
     int width_ = 0, height_ = 0;
@@ -221,15 +316,19 @@ private:
     std::vector<DrawDataGPU> drawData_;
     std::vector<PointLight> lights_;
     std::vector<PlanarReflector> planar_;
-    gpu::Buffer frameUbo_, drawSsbo_, lightSsbo_;
-    // Sun shadows
-    gpu::Texture shadowArray_;
-    std::vector<gpu::Framebuffer> shadowFbs_;
-    int shadowCascades_ = 2;
-    // Planar reflections
-    gpu::Texture planarColor_, planarDepth_;
-    std::vector<gpu::Framebuffer> planarFbs_;
-    int planarW_ = 0, planarH_ = 0;
+    gpu::Buffer frameUbo_, drawSsbo_, lightSsbo_, lightingUbo_;
+    // Lighting sub-systems
+    std::unique_ptr<LightingUBOData> lub_;
+    std::unique_ptr<lighting::Atmosphere> atmosphere_;
+    std::unique_ptr<lighting::SunShadows> shadows_;
+    std::unique_ptr<lighting::LightProbes> probes_;
+    std::unique_ptr<lighting::PlanarReflections> planarRefl_;
+    gpu::Texture brdfLut_;
+    m::AABB sceneBounds_;
+    GLuint globalTex_[5] = {};
+    float skyKey_[9] = {};     // sky capture inputs of the last capture
+    float bakeKey_[6] = {};    // probe bake inputs of the last bake
+    bool skyKeyValid_ = false;
     // Default textures bound to unused units so samplers are always complete
     gpu::Texture dummy2D_, dummyArray_, dummyCube_, dummyCubeArray_, dummy3D_, dummyShadow_;
     std::unique_ptr<PostFX> post_;
