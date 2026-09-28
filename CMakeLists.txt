@@ -51,10 +51,6 @@ file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
 set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cpp ${ROOT}/src/game/observer_camera.cpp
     ${ROOT}/src/game/scoresheet_layout.cpp)
 list(APPEND CORE_SOURCES ${GAME_CORE_SOURCES})
-# Networking (src/net: protocol codec, direct match, UPnP). Minimal glob added by the direct-match
-# work; to be reconciled with the client-net version (same glob, more link libraries).
-file(GLOB NET_SOURCES CONFIGURE_DEPENDS ${ROOT}/src/net/*.cpp)
-list(APPEND CORE_SOURCES ${NET_SOURCES})
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
 target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party)
 target_compile_options(scacelith_core PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
@@ -64,31 +60,24 @@ if(TARGET stockfish_embedded)
 endif()
 if(WIN32)
     target_link_libraries(scacelith_core PUBLIC ole32 uuid winmm avrt ksuser)
-    # src/net direct match: Winsock, BCrypt (ECDH P-256, AES-GCM, SHA-256/HMAC, RNG), adapter list.
-    target_link_libraries(scacelith_core PUBLIC ws2_32 bcrypt iphlpapi)
 else()
     find_package(Threads REQUIRED)
     target_link_libraries(scacelith_core PUBLIC Threads::Threads)
-    # src/net direct match on the Linux dev/test build: OpenSSL libcrypto for the same primitives.
-    find_package(OpenSSL REQUIRED)
-    target_link_libraries(scacelith_core PUBLIC OpenSSL::Crypto)
 endif()
-# Online client (src/net): WinHTTP, DPAPI, BCrypt and the shell on Windows; OpenSSL on Linux
-# development builds (without it the Linux build compiles and online play reports "unavailable").
+# Networking (src/net): online client (WinHTTP, DPAPI, the shell for SSO), direct match (Winsock,
+# BCrypt ECDH P-256 / AES-GCM / SHA-256, adapter list for iphlpapi) and UPnP on Windows. Linux
+# development builds use OpenSSL: required by the direct match; the online client also builds
+# without it (online play then reports "unavailable").
 set_source_files_properties(${ROOT}/src/net/online_client.cpp PROPERTIES COMPILE_DEFINITIONS
     "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\";SCACELITH_VERSION_STRING=\"${PROJECT_VERSION}\"")
 set_source_files_properties(${ROOT}/tests/net_tests.cpp PROPERTIES COMPILE_DEFINITIONS
     "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\"")
 if(WIN32)
-    target_link_libraries(scacelith_core PUBLIC winhttp crypt32 bcrypt ws2_32 shell32)
+    target_link_libraries(scacelith_core PUBLIC winhttp crypt32 bcrypt ws2_32 iphlpapi shell32)
 else()
-    find_package(OpenSSL)
-    if(OPENSSL_FOUND)
-        target_link_libraries(scacelith_core PUBLIC OpenSSL::SSL OpenSSL::Crypto)
-        target_compile_definitions(scacelith_core PRIVATE SCACELITH_HAS_OPENSSL=1)
-    else()
-        message(STATUS "OpenSSL not found: online play is unavailable in this build")
-    endif()
+    find_package(OpenSSL REQUIRED)
+    target_link_libraries(scacelith_core PUBLIC OpenSSL::SSL OpenSSL::Crypto)
+    target_compile_definitions(scacelith_core PRIVATE SCACELITH_HAS_OPENSSL=1)
 endif()
 
 # ---------------------------------------------------------------------------------------------
