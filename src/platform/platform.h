@@ -4,6 +4,7 @@
 #pragma once
 #include <cstdint>
 #include <string>
+#include <vector>
 
 namespace plat {
 
@@ -60,7 +61,9 @@ struct Input {
     float mouseX = 0, mouseY = 0;        // pixels, origin top-left
     float mouseDX = 0, mouseDY = 0;      // raw motion this frame (pixels / mickeys)
     float wheel = 0;                     // notches this frame, + = away from user
-    uint32_t text[32] = {};              // UTF-32 characters typed this frame
+    // UTF-32 characters typed this frame (keyboard layouts, dead keys and IME results; control
+    // characters are left out: use the keys).
+    uint32_t text[64] = {};
     int textCount = 0;
     bool mouseInWindow = true;
 };
@@ -74,5 +77,13 @@ std::string exeDirectory();      // with trailing separator
 std::string userDataDirectory(); // writable (e.g. %APPDATA%/Scacelith/), with trailing separator
 void messageBox(const char* title, const char* text);
 uint64_t randomSeed();           // non-deterministic seed from the OS
+// Text on the system clipboard as UTF-8 ("" when there is none; the X11 layer always returns "").
+std::string clipboardText();
+// The user's interface language as a locale tag ("fr-FR", "zh-TW", "de_DE.UTF-8"), "" when
+// unknown. Windows: GetUserDefaultUILanguage; X11: LC_ALL, LC_MESSAGES, LANG.
+std::string systemLanguage();
+// Command line arguments after the program name, UTF-8 (for modules that read an option before
+// a scene exists, e.g. --lang).
+std::vector<std::string> commandLine();
 
 }  // namespace plat

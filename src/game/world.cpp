@@ -1,6 +1,7 @@
 #include "world.h"
 #include "../character/robot.h"
 #include "../core/log.h"
+#include "../i18n/i18n.h"
 #include "../platform/platform.h"
 #include "../render/materials/material_library.h"
 #include "../scene/board.h"
@@ -52,9 +53,10 @@ struct World::Impl {
     int reflFloor = -1, reflTable = -1, reflBoard = -1;
 };
 
+// Translation keys (assets/i18n, section "Loading").
 static const char* kStepLabels[] = {
-    "Preparing materials", "Raising the hall", "Carving the table and chairs", "Polishing the board",
-    "Turning the chess set", "Assembling the clock", "Firing the porcelain", "Ready"};
+    "loading.materials", "loading.hall", "loading.furniture", "loading.board",
+    "loading.pieces", "loading.clock", "loading.porcelain", "loading.ready"};
 static constexpr int kStepCount = int(sizeof(kStepLabels) / sizeof(kStepLabels[0])) - 1;
 
 World::World() : impl_(new Impl) {}
@@ -76,7 +78,7 @@ World::~World() {
 
 bool World::loaded() const { return impl_->step >= kStepCount; }
 float World::loadProgress() const { return float(impl_->step) / float(kStepCount); }
-const char* World::loadLabel() const { return kStepLabels[impl_->step < kStepCount ? impl_->step : kStepCount]; }
+const char* World::loadLabel() const { return i18n::tr(kStepLabels[impl_->step < kStepCount ? impl_->step : kStepCount]); }
 
 bool World::loadStep() {
     Impl& w = *impl_;
@@ -134,7 +136,7 @@ bool World::loadStep() {
     case 6: w.robot.upload(character::buildRobot()); break;
     default: break;
     }
-    LOGI("World: %s (%.0f ms)", kStepLabels[w.step], (plat::time() - t0) * 1000.0);
+    LOGI("World: %s (%.0f ms)", i18n::english(kStepLabels[w.step]), (plat::time() - t0) * 1000.0);
     ++w.step;
     return loaded();
 }

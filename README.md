@@ -62,6 +62,13 @@ otherwise in `%APPDATA%\Scacelith\`. All of them are editable from the Options p
 mode and resolution, V-sync, render scale, quality preset, motion blur, depth of field,
 brightness, volumes, ambience, legal-move hints, mouse sensitivity.
 
+The interface speaks English, French, German, Spanish, Ukrainian, Russian, Arabic (laid out right
+to left), Japanese, Simplified Chinese and Traditional Chinese. The first start follows the
+system language; Options > Display > Language changes it at once. Options > Player holds your
+name and the handwriting in which you fill in your scoresheet, with a preview. Translations live
+in `assets/i18n/<code>.lang` (one `key = text` per line, English is the reference and the
+fallback); `--lang <code>` overrides the language for one session.
+
 ## Building
 
 Requirements: CMake 3.20+, Ninja, a C++17 compiler. The Windows build is produced with
@@ -98,6 +105,10 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised
 
 Scacelith is free software under the GNU General Public License v3.0 (see `LICENSE`), because it
 embeds [Stockfish](https://stockfishchess.org) (GPL-3.0), whose source is in
-`third_party/stockfish/` with its own copyright notices. The Cinzel and EB Garamond fonts are
-under the SIL Open Font License; the chess figures of the promotion picker come from a subset of GNU
-FreeFont FreeSerif (GPL-3.0+ with the font exception). Their licence texts are in `assets/fonts/`.
+`third_party/stockfish/` with its own copyright notices. The Cinzel, EB Garamond and Amiri
+(Khaled Hosny) interface fonts and the handwriting fonts Caveat (Impallari Type), Marck Script
+(Denis Masharov), Bad Script (Gaslight), Aref Ruqaa (Abdullah Aref, Khaled Hosny), Klee One
+(Fontworks) and LXGW WenKai / WenKai TC (LXGW) are under the SIL Open Font License 1.1; the
+subsets shipped here are rebuilt from the upstream files by `tools/prepare_fonts.py`. The chess
+figures of the promotion picker come from a subset of GNU FreeFont FreeSerif (GPL-3.0+ with the
+font exception). All licence texts are in `assets/fonts/` and `assets/fonts/hand/`.

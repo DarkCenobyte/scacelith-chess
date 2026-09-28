@@ -1,0 +1,290 @@
+# Scacelith - Українська
+# Переклад assets/i18n/en.lang (ті самі ключі, ті самі {n}). Множина: один|кілька|багато
+# (1 хід | 2 ходи | 5 ходів).
+
+language.name = Українська
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Увімк.
+common.off = Вимк.
+common.back = Назад
+common.apply = Застосувати
+common.discard = Відкинути
+common.cancel = Скасувати
+common.white = Білі
+common.black = Чорні
+common.main_menu = Головне меню
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Королівська гра
+menu.new_game = Нова партія
+menu.options = Налаштування
+menu.credits = Автори
+menu.quit = Вихід
+menu.version = Версія {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = НАЛАШТУВАННЯ
+options.tab.display = Екран
+options.tab.graphics = Графіка
+options.tab.audio = Звук
+options.tab.gameplay = Гра
+options.tab.player = Гравець
+options.tab.controls = Керування
+options.pending = Зміни наберуть чинності після застосування.
+options.unsaved.title = НЕЗБЕРЕЖЕНІ ЗМІНИ
+options.unsaved.text = Деякі налаштування змінено. Застосувати їх перед виходом?
+
+options.language = Мова
+options.language.help = Мова меню та повідомлень. Змінюється одразу.
+options.display_mode = Режим екрана
+options.fullscreen = Повний екран
+options.windowed = У вікні
+options.window_size = Розмір вікна
+options.window_size.help = Розмір вікна у віконному режимі. Повноекранний режим завжди використовує роздільність робочого столу.
+options.vsync = Вертикальна синхр.
+options.vsync.help = Синхронізує кадри з екраном, щоб уникнути розривів зображення.
+options.render_scale = Масштаб рендерингу
+options.render_scale.help = Внутрішня роздільність 3D-зображення. Нижча — швидше, вища — чіткіше.
+
+options.quality = Якість
+options.quality.low = Низька
+options.quality.medium = Середня
+options.quality.high = Висока
+options.quality.ultra = Ультра
+options.quality.help = Тіні, відбиття, фонове затінення та об’ємне світло.
+options.motion_blur = Розмиття в русі
+options.depth_of_field = Глибина різкості
+options.brightness = Яскравість
+options.brightness.neutral = Нейтральна
+options.brightness.help = Корекція експозиції камери.
+
+options.master_volume = Загальна гучність
+options.effects = Ефекти
+options.ambience = Атмосфера
+options.ambience.help = Гомін зали: вогонь у каміні, далекі кроки, старий годинник.
+options.ambience_volume = Гучність атмосфери
+
+options.legal_moves = Показувати ходи
+options.legal_moves.help = Підсвічує поля, на які може піти торкнута фігура. Без підказки ніщо не вкаже, чи хід можливий: арбітр карає за неможливий хід, щойно ви натиснете на годинник.
+options.coordinates = Координати дошки
+options.thinking_time = Реалістичне обмірковування
+options.thinking_time.help = Суперник обмірковує хід, як жива людина, а не ходить миттєво.
+options.mouse_sensitivity = Чутливість миші
+options.invert_look = Інвертувати вісь Y
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Ім’я
+player.name.help = Ваше ім’я в шапці бланків запису — будь-якою абеткою.
+player.default_name = Людина
+player.handwriting = Почерк
+player.handwriting.help = Рука, що записує ваші ходи. Арабське, японське та китайське письмо мають власний почерк.
+player.preview = НА ВАШОМУ БЛАНКУ
+hand.caveat = Недбалий
+hand.marck = Каліграфічний
+hand.badscript = Похилий
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Лівий клік
+controls.touch = Узяти фігуру та зробити хід
+controls.clock.keys = Пробіл  або  клік по годиннику
+controls.clock = Натиснути на годинник
+controls.look.keys = Права кнопка, утримувати
+controls.look = Роззирнутися
+controls.moves.keys = Tab
+controls.moves = Показати або сховати ходи
+controls.menu.keys = Esc
+controls.menu = Меню
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = НОВА ПАРТІЯ
+newgame.opponent = СУПЕРНИК
+newgame.time_control = КОНТРОЛЬ ЧАСУ
+newgame.start = Почати
+newgame.elo = ~{0} Ело
+newgame.you_white = Ви граєте білими.
+newgame.you_black = Ви граєте чорними.
+newgame.colour_lot = Колір у першій партії визначає жереб.
+newgame.colour_alternate = Далі кольори чергуються від партії до партії.
+
+# Custom opponent: Stockfish parameters
+engine.skill = Рівень гри
+engine.skill.help = «Skill Level» Stockfish (0–20). Не враховується, поки сила обмежена за Ело.
+engine.limit_elo = Обмежити силу (Ело)
+engine.limit_elo.help = UCI_LimitStrength: рушій прагне рейтингу Ело нижче.
+engine.elo = Ело
+engine.depth = Глибина пошуку
+engine.plies = {0} напівхід|{0} напівходи|{0} напівходів
+engine.move_time = Час на хід
+engine.nodes = Ліміт вузлів
+engine.no_limit = Немає
+engine.thousand = {0} тис.
+engine.million = {0} млн
+
+# Time controls
+tc.unlimited = Без обмеження
+tc.no_clock = Без годинника
+tc.bullet = Кулі
+tc.blitz = Бліц
+tc.rapid = Рапід
+tc.classical = Класика
+tc.custom = Свій
+tc.your_own = На вибір
+tc.base_time = Основний час
+tc.base_time.help = Початковий час на кожному боці годинника (хвилини : секунди).
+tc.increment = Додавання
+tc.increment.help = Додавання Фішера після кожного ходу.
+tc.delay = Затримка
+tc.delay.help = Затримка Бронштейна: час, витрачений у межах затримки, повертається після кожного ходу.
+tc.no_delay = Немає
+tc.seconds = {0} с
+tc.minutes = {0} хв
+tc.summary_increment = {0} + {1} с
+tc.summary_delay = {0}, затримка {1} с
+
+# Opponent presets
+preset.novice.name = Новачок
+preset.novice.desc = Щойно вивчив ходи: позіхає фігури й не бачить простих загроз.
+preset.beginner.name = Початківець
+preset.beginner.desc = Знає основи, але все ще часто втрачає матеріал.
+preset.casual.name = Аматор
+preset.casual.desc = Спокійний суперник: розумні ходи, часті помилки.
+preset.club_player.name = Клубний гравець
+preset.club_player.desc = Міцний клубний гравець, карає за явні позіхи.
+preset.advanced.name = Розрядник
+preset.advanced.desc = Сильний клубний гравець із добрим тактичним зором.
+preset.expert.name = Експерт
+preset.expert.desc = Досвідчений турнірний гравець: рідко помиляється, реалізує перевагу.
+preset.master.name = Майстер
+preset.master.desc = Сила майстра: глибокий розрахунок і тонка позиційна гра.
+preset.grandmaster.name = Гросмейстер
+preset.grandmaster.desc = Рівень гросмейстера: перемогти вкрай важко.
+preset.stockfish_max.name = Stockfish Макс
+preset.stockfish_max.desc = Stockfish 16 на повну силу. Щасти.
+preset.custom.name = Свій
+preset.custom.desc = Ваші власні налаштування рушія.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = АВТОРИ
+credits.game.head = SCACELITH
+credits.game = Шахова партія в королівській залі на власному рушії OpenGL 4.6.
+credits.engine.head = ШАХОВИЙ РУШІЙ
+credits.engine = Stockfish 16, розробники Stockfish.
+credits.engine.licence = GNU General Public License v3.
+credits.fonts.head = ШРИФТИ
+credits.fonts = EB Garamond — Георг Даффнер, Cinzel — Натанаель Гама, Amiri — Халед Хосні.
+credits.fonts.hand = Рукописні: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Шахові фігури з GNU FreeFont (GPL v3 з винятком для шрифтів).
+credits.quote = «Шахи — це мистецтво аналізу».  — Михайло Ботвинник
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = ПАУЗА
+pause.resume = Продовжити
+pause.offer_draw = Запропонувати нічию
+pause.claim_draw = Вимагати нічию
+pause.claim_draw.help = Триразове повторення або правило 50 ходів.
+pause.resign = Здатися
+confirm.resign.title = ЗДАТИСЯ
+confirm.resign.text = Здати цю партію? Переможцем буде оголошено суперника.
+confirm.resign.ok = Здатися
+confirm.leave.title = ПОКИНУТИ ПАРТІЮ
+confirm.leave.text = Повернутися до головного меню? Поточну партію буде перервано.
+confirm.leave.ok = Вийти
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = ПЕРЕТВОРЕННЯ НА
+piece.queen = Ферзь
+piece.rook = Тура
+piece.bishop = Слон
+piece.knight = Кінь
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Партія завершилася нічиєю.
+gameover.draw_moves = Нічия після {0} ходу.|Нічия після {0} ходів.|Нічия після {0} ходів.
+gameover.win = Чудова гра — ви перемогли.
+gameover.win_moves = Чудова гра — перемога за {0} хід.|Чудова гра — перемога за {0} ходи.|Чудова гра — перемога за {0} ходів.
+gameover.loss = Суперник переміг.
+gameover.loss_moves = Суперник переміг за {0} хід.|Суперник переміг за {0} ходи.|Суперник переміг за {0} ходів.
+gameover.rematch = Реванш
+gameover.view_board = Подивитися на дошку
+gameover.show = Показати
+
+# Reasons
+reason.checkmate = Мат
+reason.resignation = Здача
+reason.timeout = Поразка за часом
+reason.illegal_moves = Другий неможливий хід (поразка)
+reason.stalemate = Пат
+reason.insufficient = Мертва позиція (недостатньо матеріалу)
+reason.timeout_vs_insufficient = Час вичерпано, але суперник не може поставити мат
+reason.fivefold = П’ятиразове повторення
+reason.75_moves = Правило 75 ходів
+reason.threefold_claim = Триразове повторення (на вимогу)
+reason.50_moves_claim = Правило 50 ходів (на вимогу)
+reason.agreement = Нічия за згодою
+reason.illegal_vs_insufficient = Другий неможливий хід, але суперник не може поставити мат
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = ХОДИ
+movelist.empty = Ходів поки немає.
+
+# ---- Loading -----------------------------------------------------------------------------------
+loading.materials = Підготовка матеріалів
+loading.hall = Зведення зали
+loading.furniture = Різьблення столу та стільців
+loading.board = Полірування дошки
+loading.pieces = Точіння фігур
+loading.clock = Складання годинника
+loading.porcelain = Випалювання порцеляни
+loading.ready = Готово
+
+# ---- Notifications during the game -------------------------------------------------------------
+notify.no_draw_claim = У цій позиції не можна вимагати нічию.
+notify.flag_you = Ваш час вичерпано.
+notify.flag_opponent = Час суперника вичерпано.
+notify.touched.pawn = Торкнувся — ходи: треба піти торкнутим пішаком.
+notify.touched.knight = Торкнувся — ходи: треба піти торкнутим конем.
+notify.touched.bishop = Торкнувся — ходи: треба піти торкнутим слоном.
+notify.touched.rook = Торкнувся — ходи: треба піти торкнутою турою.
+notify.touched.queen = Торкнувся — ходи: треба піти торкнутим ферзем.
+notify.touched.king = Торкнувся — ходи: треба піти торкнутим королем.
+notify.touched.piece = Торкнувся — ходи: треба піти торкнутою фігурою.
+notify.touched_square = Торкнувся — ходи: треба піти фігурою з поля {0}.
+notify.press_clock = Натисніть на годинник, щоб завершити хід (пробіл).
+notify.illegal = Неможливий хід.
+notify.cannot_move = Такий хід зробити не можна.
+notify.move_first = Зробіть хід, перш ніж натискати на годинник.
+notify.draw_already_offered = Ви вже пропонували нічию на цьому ході.
+notify.draw_accepted = Суперник погоджується на нічию.
+notify.draw_declined = Суперник відхиляє пропозицію нічиєї.
+notify.draw_claimed = Суперник вимагає нічию.
+
+# ---- Arbiter -----------------------------------------------------------------------------------
+arbiter.join = {0} {1}
+arbiter.no_move = Арбітр: годинник натиснуто без ходу — це вважається неможливим ходом.
+arbiter.unpromoted = Арбітр: неможливий хід, пішака не замінено новою фігурою до натискання на годинник.
+arbiter.illegal = Арбітр: неможливий хід.
+arbiter.second_loses.white = Це другий неможливий хід білих: білі програють партію.
+arbiter.second_loses.black = Це другий неможливий хід чорних: чорні програють партію.
+arbiter.second_draw.white = Це другий неможливий хід білих, але чорні не можуть поставити мат: нічия.
+arbiter.second_draw.black = Це другий неможливий хід чорних, але білі не можуть поставити мат: нічия.
+arbiter.queen = Пішак перетворюється на ферзя.
+arbiter.queen_one_minute.white = Пішак перетворюється на ферзя, білі отримують одну додаткову хвилину.
+arbiter.queen_one_minute.black = Пішак перетворюється на ферзя, чорні отримують одну додаткову хвилину.
+arbiter.queen_two_minutes.white = Пішак перетворюється на ферзя, білі отримують дві додаткові хвилини.
+arbiter.queen_two_minutes.black = Пішак перетворюється на ферзя, чорні отримують дві додаткові хвилини.
+arbiter.restored = Позицію відновлено.
+arbiter.restored_one_minute.white = Позицію відновлено, білі отримують одну додаткову хвилину.
+arbiter.restored_one_minute.black = Позицію відновлено, чорні отримують одну додаткову хвилину.
+arbiter.restored_two_minutes.white = Позицію відновлено, білі отримують дві додаткові хвилини.
+arbiter.restored_two_minutes.black = Позицію відновлено, чорні отримують дві додаткові хвилини.
+arbiter.one_minute.white = Білі отримують одну додаткову хвилину.
+arbiter.one_minute.black = Чорні отримують одну додаткову хвилину.
+arbiter.two_minutes.white = Білі отримують дві додаткові хвилини.
+arbiter.two_minutes.black = Чорні отримують дві додаткові хвилини.
+arbiter.second_loses = Другий неможливий хід призведе до поразки.
+arbiter.touched.white = Білі мають піти торкнутою фігурою.
+arbiter.touched.black = Чорні мають піти торкнутою фігурою.
+arbiter.game_over = Партію завершено.

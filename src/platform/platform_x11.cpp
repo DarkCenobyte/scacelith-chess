@@ -171,8 +171,15 @@ bool pumpEvents() {
                 KeySym ks = 0;
                 int len = XLookupString(&e.xkey, txt, sizeof(txt), &ks, nullptr);
                 setKey(mapKeysym(ks), down);
-                if (down && len == 1 && (unsigned char)txt[0] >= 32 && g_input.textCount < 32)
-                    g_input.text[g_input.textCount++] = (unsigned char)txt[0];
+                // Basic text input (no input method): Latin-1 keysyms are their codepoint and
+                // 0x01xxxxxx keysyms carry a Unicode codepoint (other layouts, xdotool type).
+                uint32_t cp = 0;
+                if ((ks >= 0x20 && ks <= 0x7E) || (ks >= 0xA0 && ks <= 0xFF)) cp = uint32_t(ks);
+                else if ((ks & 0xFF000000UL) == 0x01000000UL) cp = uint32_t(ks & 0x00FFFFFFUL);
+                if (len == 1 && (unsigned char)txt[0] >= 32 && (unsigned char)txt[0] < 127) cp = (unsigned char)txt[0];
+                if (e.xkey.state & (ControlMask | Mod1Mask)) cp = 0;  // shortcuts (Ctrl+V) type nothing
+                if (down && cp >= 32 && cp != 127 && g_input.textCount < int(sizeof(g_input.text) / sizeof(g_input.text[0])))
+                    g_input.text[g_input.textCount++] = cp;
                 break;
             }
             case MotionNotify: {
@@ -261,6 +268,31 @@ uint64_t randomSeed() {
     timespec t;
     clock_gettime(CLOCK_REALTIME, &t);
     return uint64_t(t.tv_nsec) * 2654435761ULL ^ uint64_t(t.tv_sec) ^ (uint64_t(getpid()) << 32);
+}
+std::string clipboardText() { return ""; }  // the X11 layer serves tests and screenshots only
+std::string systemLanguage() {
+    for (const char* var : {"LC_ALL", "LC_MESSAGES", "LANG"}) {
+        const char* v = getenv(var);
+        if (v && *v) return std::strcmp(v, "C") == 0 || std::strcmp(v, "POSIX") == 0 ? std::string() : std::string(v);
+    }
+    return "";
+}
+std::vector<std::string> commandLine() {
+    std::vector<std::string> args;
+    FILE* f = std::fopen("/proc/self/cmdline", "rb");
+    if (!f) return args;
+    std::string all;
+    char buf[4096];
+    size_t n;
+    while ((n = std::fread(buf, 1, sizeof(buf), f)) > 0) all.append(buf, n);
+    std::fclose(f);
+    size_t p = all.find('\0');  // skip the program name
+    while (p != std::string::npos && p + 1 < all.size()) {
+        size_t q = all.find('\0', p + 1);
+        args.push_back(all.substr(p + 1, q == std::string::npos ? std::string::npos : q - p - 1));
+        p = q;
+    }
+    return args;
 }
 }  // namespace plat
 #endif

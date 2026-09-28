@@ -136,7 +136,10 @@ enum class GameEndReason : uint8_t {
     FivefoldRepetition, SeventyFiveMoves, ThreefoldClaim, FiftyMoveClaim, Agreement,
     IllegalMovesVsInsufficient                                    // draw: 2nd illegal move but the opponent cannot mate (7.5.5)
 };
-const char* endReasonText(GameEndReason r);  // "Checkmate", "Threefold repetition (claimed)", ...
+// Translation key of a reason in assets/i18n/*.lang ("reason.checkmate"; "" for None).
+const char* endReasonKey(GameEndReason r);
+// The reason in the current UI language (i18n): "Checkmate", "Threefold repetition (claimed)", ...
+const char* endReasonText(GameEndReason r);
 
 // Optional PGN header values (the Seven Tag Roster is always written).
 struct PgnTags {

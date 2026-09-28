@@ -1,9 +1,23 @@
 // UI fonts: embedded TTF faces rasterised into a single-channel signed distance field atlas at
 // ui::init(). Glyphs outside the pre-built set are added lazily. Internal to src/ui.
+//
+// Scripts: EB Garamond / Cinzel cover Latin (Garamond also Cyrillic and Greek); Arabic comes from
+// Amiri (UI) or Aref Ruqaa (handwriting) through the presentation forms produced by the shaper;
+// kana, hanzi and kanji from Klee One (Japanese) and LXGW WenKai (Simplified / Traditional
+// Chinese), in the order preferred by the current language (Han unification: the same codepoint
+// is drawn with Japanese, Simplified or Traditional glyph shapes).
+//
+// Atlas: one 4096^2 R8 texture shared by every face. Each glyph's distance field is kept in memory
+// once built; when the atlas fills up (a session that switches between several CJK languages) it
+// is cleared at the start of the next frame and glyphs are packed again as they are used.
+// atlasGeneration() changes on every clear: code that caches Glyph texture coordinates across
+// frames must look its glyphs up again (text::shapeLine) when it changes.
 #pragma once
 #include "../gl/gl46.h"
 #include <cstdint>
 #include <string>
+#include <utility>
+#include <vector>
 
 namespace ui {
 namespace font {
@@ -18,9 +32,10 @@ enum Face : int {
     FACE_HAND_MARCK = 5,      // Marck Script: cursive Latin + Cyrillic
     FACE_HAND_BADSCRIPT = 6,  // Bad Script: slanted Latin + Cyrillic
     FACE_HAND_ARABIC = 7,     // Arabic handwriting (Ruqaa)
-    FACE_HAND_JA = 8,         // Japanese handwriting (kana + kanji)
-    FACE_HAND_SC = 9,         // Simplified Chinese handwriting (Kai)
-    FACE_HAND_TC = 10,        // Traditional Chinese handwriting (Kai)
+    FACE_HAND_JA = 8,         // Japanese handwriting (kana + kanji); also the Japanese UI face
+    FACE_HAND_SC = 9,         // Simplified Chinese handwriting (Kai); also the Simplified UI face
+    FACE_HAND_TC = 10,        // Traditional Chinese handwriting (Kai); also the Traditional UI face
+    FACE_ARABIC = 11,         // Amiri: Arabic UI text (fallback of the UI faces for Arabic)
     FACE_COUNT
 };
 
@@ -39,7 +54,7 @@ bool isHandwritingFace(int face);
 struct Glyph {
     int index = 0;           // glyph index in its face (0 = missing)
     float advance = 0.0f;    // em
-    bool hasQuad = false;    // false for blanks (space)
+    bool hasQuad = false;    // false for blanks (space) and while not packed in the atlas
     float x0 = 0, y0 = 0, x1 = 0, y1 = 0;  // em, quad bounds (includes the SDF padding)
     float u0 = 0, v0 = 0, u1 = 0, v1 = 0;  // atlas texture coordinates
     float pxRange = 0.0f;    // full distance range encoded in the atlas, in atlas texels
@@ -53,16 +68,28 @@ struct Metrics {
 bool init();
 void shutdown();
 bool ready();
+// Call once per frame before any text is laid out (ui::beginFrame does): clears a full atlas and
+// builds the glyphs of a newly selected language (i18n) in parallel.
+void beginFrame();
 
-// Resolves a codepoint with fallbacks (Title -> Text -> Symbol, Italic -> Text -> Symbol; a
-// handwriting face -> the other handwriting faces -> Text).
-// Returns nullptr when no face has it. usedFace receives the face that provided the glyph.
+// Resolves a codepoint with fallbacks: the face itself, then by script (Arabic -> Amiri / Ruqaa,
+// kana and Han -> Klee / WenKai in the language's order), then Text -> Symbol; a handwriting face
+// tries the other handwriting faces first. Returns nullptr when no face has it. usedFace receives
+// the face that provided the glyph.
 const Glyph* glyph(int face, uint32_t codepoint, int* usedFace = nullptr);
+// Face that glyph() would use, without building the glyph (-1 when none has it).
+int resolveFace(int face, uint32_t codepoint);
+// Size factor for a glyph drawn by a fallback face so scripts look balanced next to the
+// requested UI face (1 for the face itself and for handwriting).
+float fallbackScale(int requestedFace, int usedFace);
 // Kerning between two glyph indices of the same face, in em.
 float kerning(int face, int glyphA, int glyphB);
 const Metrics& metrics(int face);
 
 GLuint atlasTexture();
+int atlasGeneration();
+// Builds the given (face, codepoint) glyphs now, on worker threads (e.g. a language's UI strings).
+void prewarm(const std::vector<std::pair<int, uint32_t>>& glyphs);
 // Call once per frame before drawing: uploads glyphs added since the last call.
 void flushUploads();
 
