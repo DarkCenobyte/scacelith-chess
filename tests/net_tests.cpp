@@ -720,9 +720,31 @@ TEST(net_endpoint_validation) {
     CHECK_EQ(net::hostHeader("x.org", 443, true), std::string("x.org"));
     CHECK_EQ(net::hostHeader("x.org", 80, true), std::string("x.org:80"));
     CHECK_EQ(net::hostHeader("::1", 8080, false), std::string("[::1]:8080"));
-    // The build's official server (none in test builds unless configured).
+    // wsPort left empty = the API's port (HTTPS API and /ws share it).
+    net::ServerEndpoint custom;
+    custom.host = "chess.example.org";
+    custom.apiPort = 8443;
+    CHECK_EQ(custom.wsPort, uint16_t(0));
+    CHECK_EQ(custom.effectiveWsPort(), uint16_t(8443));
+    CHECK(!custom.insecureDev);
+    custom.wsPort = 9443;
+    CHECK_EQ(custom.effectiveWsPort(), uint16_t(9443));
+    // The official server: wss://caissa.scacelith.com:44664/ws, same port for the API.
     net::ServerEndpoint off = net::officialServer();
-    CHECK(off.host.empty() || off.valid());
+#ifndef SCACELITH_OFFICIAL_SERVER
+#define SCACELITH_OFFICIAL_SERVER ""
+#endif
+    if (std::string(SCACELITH_OFFICIAL_SERVER).empty()) {
+        CHECK_EQ(off.host, std::string("caissa.scacelith.com"));
+        CHECK_EQ(off.apiPort, uint16_t(44664));
+        CHECK_EQ(off.wsPort, uint16_t(44664));
+        CHECK(off.pinnedSha256.empty());
+        CHECK(!off.insecureDev);
+        CHECK(off.valid());
+        CHECK_EQ(off.origin(), std::string("caissa.scacelith.com:44664"));
+    } else {
+        CHECK(off.host.empty() || (off.valid() && off.wsPort != 0));   // configured build
+    }
 }
 
 TEST(net_transport_refuses_insecure) {
@@ -732,7 +754,8 @@ TEST(net_transport_refuses_insecure) {
     r.tls = false;
     net::HttpResponse resp;
     net::httpRequest(r, resp);
-    CHECK_EQ(resp.error, std::string("insecure"));
+    const std::string expect = net::transportAvailable() ? "insecure" : "unavailable";
+    CHECK_EQ(resp.error, expect);
     CHECK_EQ(resp.status, 0);
     net::WsParams p;
     p.host = "10.1.2.3";
@@ -740,7 +763,7 @@ TEST(net_transport_refuses_insecure) {
     std::string err;
     int status = 0;
     CHECK(net::wsConnect(p, err, status) == nullptr);
-    CHECK_EQ(err, std::string("insecure"));
+    CHECK_EQ(err, expect);
     // A cancelled token aborts before anything happens.
     net::CancelToken tok;
     tok.cancel();
@@ -1221,7 +1244,7 @@ TEST(net_online_client_loopback) {
         net::ServerEndpoint ep;
         ep.host = "127.0.0.1";
         ep.apiPort = srv.port;
-        ep.wsPort = 0;               // from /api/v1/info
+        ep.wsPort = 0;               // left empty: the WebSocket shares the API port
         ep.insecureDev = true;
         c.setServer(ep);
         CHECK_EQ(c.server().origin(), "127.0.0.1:" + std::to_string(srv.port));

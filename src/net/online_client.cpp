@@ -35,6 +35,9 @@
 #ifndef SCACELITH_OFFICIAL_SERVER
 #define SCACELITH_OFFICIAL_SERVER ""
 #endif
+// The official server when the build does not name another one: HTTPS API (/api/v1) and the
+// WebSocket (/ws) share port 44664.
+#define SCACELITH_DEFAULT_OFFICIAL_SERVER "caissa.scacelith.com:44664"
 
 namespace net {
 
@@ -123,7 +126,8 @@ ServerEndpoint officialServer() {
     ServerEndpoint ep;
     ep.host.clear();
     std::string s = SCACELITH_OFFICIAL_SERVER;
-    if (s.empty()) return ep;
+    if (s.empty()) s = SCACELITH_DEFAULT_OFFICIAL_SERVER;
+    if (s == "none") return ep;
     std::string rest;
     if (s[0] == '[') {                          // "[v6]:api:ws"
         size_t e = s.find(']');
@@ -136,14 +140,21 @@ ServerEndpoint officialServer() {
         rest = c == std::string::npos ? std::string() : s.substr(c);
     }
     ep.apiPort = 443;
-    ep.wsPort = 0;                              // announced by /api/v1/info unless given
+    ep.wsPort = 0;
     if (!rest.empty() && rest[0] == ':') {
         rest.erase(0, 1);
         size_t c = rest.find(':');
         ep.apiPort = uint16_t(std::atoi(rest.substr(0, c).c_str()));
         if (c != std::string::npos) ep.wsPort = uint16_t(std::atoi(rest.substr(c + 1).c_str()));
     }
+    ep.wsPort = ep.effectiveWsPort();           // one port for both unless given
     ep.host = lower(ep.host);
+    ep.pinnedSha256.clear();
+    ep.insecureDev = false;
+    if (!ep.valid()) {
+        LOGW("net: invalid official server '%s' in this build", s.c_str());
+        return ServerEndpoint();
+    }
     return ep;
 }
 
@@ -627,7 +638,7 @@ struct OnlineClient::Impl {
 
         WsParams p;
         p.host = e.host;                               // the WebSocket always goes to the API's host
-        p.port = e.wsPort ? e.wsPort : (info.wsPort ? info.wsPort : e.apiPort);
+        p.port = e.effectiveWsPort();                  // left empty: the API's port
         p.tls = !e.insecureDev;
         p.pinnedSha256 = p.tls ? effectivePin(e) : std::string();
         std::string path = a.body["wsPath"].asString("/ws");

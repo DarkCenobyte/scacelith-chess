@@ -15,7 +15,7 @@ endif()
 
 option(SCACELITH_CONSOLE "Windows: build a console-subsystem exe (logs visible)" OFF)
 option(SCACELITH_STOCKFISH "Embed the Stockfish engine" ON)
-set(SCACELITH_OFFICIAL_SERVER "" CACHE STRING "Official online server of this build: host[:apiPort[:wsPort]] (empty = none)")
+set(SCACELITH_OFFICIAL_SERVER "" CACHE STRING "Official online server: host[:apiPort[:wsPort]] (empty = caissa.scacelith.com:44664, none = no official server)")
 
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 if(WIN32)
@@ -68,6 +68,8 @@ endif()
 # development builds (without it the Linux build compiles and online play reports "unavailable").
 set_source_files_properties(${ROOT}/src/net/online_client.cpp PROPERTIES COMPILE_DEFINITIONS
     "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\";SCACELITH_VERSION_STRING=\"${PROJECT_VERSION}\"")
+set_source_files_properties(${ROOT}/tests/net_tests.cpp PROPERTIES COMPILE_DEFINITIONS
+    "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\"")
 if(WIN32)
     target_link_libraries(scacelith_core PUBLIC winhttp crypt32 bcrypt ws2_32 shell32)
 else()
