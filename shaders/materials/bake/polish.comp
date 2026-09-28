@@ -1,0 +1,92 @@
+// Bakes the shared "polish" texture used by every glossy material (marble, lacquer, varnished
+// wood, glass): the micro history of a polished surface, visible only in highlights.
+// Tileable, RGBA8, meant to cover 0.5 m:
+//   rg = surface slope of rotary swirl marks + straight hairline scratches (0.5 = flat)
+//   b  = coat roughness boost (scratch density + haze)
+//   a  = smudges / wax smears (low frequency blobs)
+#define MAT_BAKE
+#include "shaders/include/common.glsl"
+#include "shaders/include/noise.glsl"
+#include "shaders/materials/include/matlib.glsl"
+
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0, rgba8) uniform writeonly image2D uOut;
+uniform ivec2 uOffset;
+uniform int uSize;
+
+vec2 wrapDelta(vec2 d) { return d - round(d); }
+// Groove cross-section slope (derivative of a gaussian), x in groove half-widths.
+float groove(float x) { return x * exp(-x * x); }
+
+void main() {
+    ivec2 px = ivec2(gl_GlobalInvocationID.xy) + uOffset;
+    if (any(greaterThanEqual(px, ivec2(uSize)))) return;
+    float S = float(uSize);
+    vec2 uv = (vec2(px) + 0.5) / S;
+    vec2 slope = vec2(0.0);
+    float density = 0.0;
+
+    // Rotary swirls: pad centres on a 5x5 periodic grid, concentric arcs around them.
+    const float SC = 5.0;
+    vec2 cell = floor(uv * SC);
+    for (int j = -2; j <= 2; ++j)
+        for (int i = -2; i <= 2; ++i) {
+            vec2 c = mod(cell + vec2(i, j), SC);
+            vec4 h = mat_hash4(c.x * 13.0 + c.y * 71.0 + 3.0);
+            vec2 centre = (c + h.xy) / SC;
+            vec2 d = wrapDelta(uv - centre);
+            float r = length(d);
+            float rMax = (0.9 + 1.1 * h.z) / SC;
+            if (r > rMax || r < 1e-4) continue;
+            float rt = r * S;                           // texels
+            float band = floor(rt / 2.5);
+            vec4 hb = mat_hash4(band * 1.37 + h.w * 97.0 + c.x * 5.0 + c.y * 29.0);
+            if (hb.x > 0.22) continue;
+            float ringR = (band + 0.3 + 0.4 * hb.y) * 2.5;
+            float ang = atan(d.y, d.x);
+            float a0 = hb.z * TAU, len = 0.6 + 2.2 * hb.w;
+            float da = mod(ang - a0, TAU);
+            float vis = smoothstep(0.0, 0.25, da) * smoothstep(len, len - 0.35, da);
+            float fade = smoothstep(rMax, rMax * 0.6, r);
+            float g = groove((rt - ringR) / 0.8);
+            slope += (d / r) * g * vis * fade * (0.35 + 0.65 * hb.y);
+            density += exp(-sq((rt - ringR) / 1.2)) * vis * fade;
+        }
+
+    // Straight hairline scratches: segments in an 8x8 periodic grid.
+    const float LC = 8.0;
+    vec2 lcell = floor(uv * LC);
+    for (int j = -1; j <= 1; ++j)
+        for (int i = -1; i <= 1; ++i) {
+            vec2 c = mod(lcell + vec2(i, j), LC);
+            for (int k = 0; k < 2; ++k) {
+                vec4 h = mat_hash4(c.x * 7.0 + c.y * 131.0 + float(k) * 0.5 + 911.0);
+                if (h.w > 0.55) continue;
+                vec2 a = (c + h.xy) / LC;
+                float th = h.z * TAU;
+                vec2 dir = vec2(cos(th), sin(th));
+                float len = (0.2 + 0.8 * fract(h.w * 7.13)) / LC;
+                vec2 d = wrapDelta(uv - a);
+                float t = clamp(dot(d, dir), -len, len);
+                vec2 e = d - dir * t;
+                float dist = length(e) * S;
+                float along = 1.0 - smoothstep(0.6 * len, len, abs(t));
+                vec2 nrm = vec2(-dir.y, dir.x);
+                float sgn = dot(e, nrm);
+                slope += nrm * groove(sgn * S / 0.7) * along * (0.5 + fract(h.x * 5.3));
+                density += exp(-dist * dist) * along;
+            }
+        }
+
+    // Haze and smudges (periodic fbm).
+    vec3 q = vec3(uv * 4.0, 0.5);
+    float haze = mat_fbm(q, vec3(4.0, 4.0, 4096.0), 4, 0.5);
+    float smudge = mat_fbm(vec3(uv * 6.0, 2.5) + vec3(0.0, 0.0, 0.0), vec3(6.0, 6.0, 4096.0), 5, 0.55);
+    float sm = smoothstep(0.12, 0.45, smudge) * (0.5 + 0.5 * smoothstep(-0.2, 0.4, haze));
+
+    vec4 o;
+    o.rg = clamp(slope * 0.5, -1.0, 1.0) * 0.5 + 0.5;
+    o.b = saturate(density * 0.5 + 0.25 * (haze * 0.5 + 0.5));
+    o.a = sm;
+    imageStore(uOut, px, o);
+}
