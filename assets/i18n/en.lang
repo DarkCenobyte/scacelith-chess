@@ -4,3 +4,18 @@
 # English.
 
 language.name = English
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Scoresheet
+scoresheet.event = Event
+scoresheet.date = Date
+scoresheet.round = Round
+scoresheet.board = Board
+scoresheet.page = Page
+scoresheet.white = White
+scoresheet.black = Black
+scoresheet.elo = Elo
+scoresheet.result = Result
+scoresheet.move_no = No.
+scoresheet.sign_white = White's signature
+scoresheet.sign_black = Black's signature

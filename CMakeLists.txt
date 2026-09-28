@@ -45,6 +45,9 @@ endif()
 file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
     ${ROOT}/src/core/*.cpp ${ROOT}/src/math/*.cpp ${ROOT}/src/chess/*.cpp ${ROOT}/src/ai/*.cpp ${ROOT}/src/audio/*.cpp
     ${ROOT}/src/i18n/*.cpp)
+# Engine-free game logic that the unit tests exercise (kept out of the exe glob below).
+set(CORE_GAME_SOURCES ${ROOT}/src/game/scoresheet_layout.cpp)
+list(APPEND CORE_SOURCES ${CORE_GAME_SOURCES})
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
 target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party)
 target_compile_options(scacelith_core PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
@@ -67,6 +70,7 @@ file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS
     ${ROOT}/src/platform/*.cpp ${ROOT}/src/gl/*.cpp ${ROOT}/src/render/*.cpp ${ROOT}/src/scene/*.cpp
     ${ROOT}/src/character/*.cpp ${ROOT}/src/anim/*.cpp ${ROOT}/src/ui/*.cpp ${ROOT}/src/game/*.cpp
     ${ROOT}/src/app/*.cpp)
+list(REMOVE_ITEM GAME_SOURCES ${CORE_GAME_SOURCES})
 set(GAME_EXTRA)
 if(WIN32)
     list(APPEND GAME_EXTRA ${ROOT}/res/scacelith.rc)
