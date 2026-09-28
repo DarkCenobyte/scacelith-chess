@@ -7,7 +7,9 @@
 //
 //   --view N   0 overview towards the windows, 1 player view of the board, 2 ceiling / bounce,
 //              3 along the window wall, 4 low grazing view of the floor reflections
-//   --sun az,el  sun azimuth (deg, 0 = from -X, positive towards +Z) and elevation (deg)
+//   --sun az,el  sun azimuth (deg, 0 = from -X, positive towards +Z) and elevation (deg); default:
+//                render::Environment().sunDirection (the hall's recommended sun, az ~35, el ~31)
+//   --ev X       exposure EV100 override
 #include "orbit_camera.h"
 #include "scene.h"
 #include "../game/layout.h"
@@ -226,10 +228,12 @@ public:
         cam_.distance = length(d);
         cam_.pitch = std::asin(d.y / cam_.distance);
         cam_.yaw = std::atan2(d.x, d.z);
-        float az = 5.0f, el = 35.0f;
+        // Default: the renderer's default sun (= the hall's recommended direction, as in the game).
+        sunDir_ = render::Environment().sunDirection;
         std::string sun = ctx.argValue("--sun");
-        if (!sun.empty()) std::sscanf(sun.c_str(), "%f,%f", &az, &el);
-        sunDir_ = normalize(vec3(-std::cos(el * DEG) * std::cos(az * DEG), std::sin(el * DEG), std::cos(el * DEG) * std::sin(az * DEG)));
+        float az = 0.0f, el = 35.0f;
+        if (!sun.empty() && std::sscanf(sun.c_str(), "%f,%f", &az, &el) == 2)
+            sunDir_ = normalize(vec3(-std::cos(el * DEG) * std::cos(az * DEG), std::sin(el * DEG), std::cos(el * DEG) * std::sin(az * DEG)));
         ev_ = float(std::atof(ctx.argValue("--ev", "0").c_str()));
         return true;
     }

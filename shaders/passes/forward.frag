@@ -47,9 +47,18 @@ void main() {
     vec3 c = shadeSurface(i, s, planarLayer);
     c = min(c, vec3(60000.0));
 #ifdef MATERIAL_TRANSPARENT
-    float a = clamp(s.alpha, 0.0, 1.0);
-    outColor = vec4(c * a, a);
-    outTransmittance = vec4(vec3(1.0 - a) + a * transmittanceOf(i, s), 1.0);
+    if (s.transmission > 0.0) {
+        // Glass contract: the specular reflection is never scaled by alpha; the diffuse
+        // (scattering) part is already weighted by 1 - transmission, and the background is
+        // multiplied by transmission * (1 - F)^2 * albedo tint.
+        outColor = vec4(c, 1.0);
+        outTransmittance = vec4(transmittanceOf(i, s), 1.0);
+    } else {
+        // Plain coverage blending (fades, decals).
+        float a = clamp(s.alpha, 0.0, 1.0);
+        outColor = vec4(c * a, a);
+        outTransmittance = vec4(vec3(1.0 - a), 1.0);
+    }
 #else
 #ifdef PASS_PLANAR
     // Planar reflections keep the distance to the mirror plane in alpha (roughness-aware blur).

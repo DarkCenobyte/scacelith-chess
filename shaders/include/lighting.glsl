@@ -206,7 +206,7 @@ Shading prepareShading(SurfaceInput i, Surface s) {
     sh.sheenScale = 1.0;
     if (max(s.sheenColor.r, max(s.sheenColor.g, s.sheenColor.b)) > 0.0) {
         sh.sheenDG = sampleDFG(sh.NoV, sh.sheenRough).z;
-        sh.sheenScale = 1.0 - max(s.sheenColor.r, max(s.sheenColor.g, s.sheenColor.b)) * sh.sheenDG;
+        sh.sheenScale = max(1.0 - max(s.sheenColor.r, max(s.sheenColor.g, s.sheenColor.b)) * sh.sheenDG, 0.0);
     }
     sh.aniso = clamp(s.anisotropy, -1.0, 1.0);
     vec3 t = s.anisotropyDirWS - sh.N * dot(sh.N, s.anisotropyDirWS);
@@ -517,11 +517,12 @@ vec3 shadeSurface(SurfaceInput i, Surface s, float planarLayer) {
     return color;
 }
 
-// Transparent surfaces: multiplier applied to what is behind (dual-source blending).
+// Transparent surfaces with transmission > 0: multiplier applied to what is behind (dual-source
+// blending), two interfaces of a thin pane.
 vec3 transmittanceOf(SurfaceInput i, Surface s) {
     float NoV = max(abs(dot(s.normalWS, i.viewDirWS)), 1e-4);
     float f0 = sq((s.ior - 1.0) / (s.ior + 1.0));
     float F = F_Schlick(f0, 1.0, NoV);
-    vec3 tint = mix(vec3(1.0), s.albedo, clamp(s.transmission, 0.0, 1.0));
+    vec3 tint = clamp(s.albedo, 0.0, 1.0);   // glass contract: albedo = transmittance tint
     return clamp(s.transmission, 0.0, 1.0) * (1.0 - F) * (1.0 - F) * tint;
 }

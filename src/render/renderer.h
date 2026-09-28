@@ -58,14 +58,15 @@ struct Camera {
 // near the horizon); sunColor / sunIlluminance / skyIlluminance are then ignored, and
 // sunIntensityScale / skyIntensity scale the physical values (artistic control).
 struct Environment {
-    // Towards the sun. Default: through the middle -X window onto the board (elevation 35 deg,
-    // azimuth 5 deg towards +Z: the central mullion shadow falls beside the board, on Black's side).
-    m::vec3 sunDirection = m::normalize(m::vec3(-0.8160f, 0.5736f, 0.0714f));
+    // Towards the sun. Default = hall::recommendedSunDirection() (elevation ~31 deg, azimuth ~35 deg
+    // towards +Z): through the +Z window of the -X wall onto the board.
+    m::vec3 sunDirection = m::normalize(m::vec3(-0.70f, 0.52f, 0.49f));
     m::vec3 sunColor{1.0f, 0.95f, 0.88f};                                  // chromaticity (physicalSky = false)
     float sunIlluminance = 80000.0f;                                       // lux (physicalSky = false)
     float skyIlluminance = 12000.0f;                                       // lux-ish scale for the fallback ambient
     float turbidity = 2.6f;                                                // haze: scales the Mie density (~2 clear, 6 hazy)
-    float exposureEV100 = 11.7f;  // manual exposure (render-post may add auto exposure on top)
+    float exposureEV100 = 12.3f;  // manual exposure (render-post may add auto exposure on top); sunlit
+                                  // white marble ~2.5 after exposure, shaded walls ~0.1-0.2
     float time = 0.0f;            // seconds, drives subtle animation (dust, flicker, clouds)
     // --- render-lighting additions ---
     bool physicalSky = true;      // derive sun colour/illuminance from the atmosphere
