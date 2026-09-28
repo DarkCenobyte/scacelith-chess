@@ -9,6 +9,7 @@
 #include "../scene/hall.h"
 #include "../scene/pieces.h"
 #include "layout.h"
+#include <cmath>
 
 using namespace m;
 using namespace chess;
@@ -94,7 +95,25 @@ bool World::loadStep() {
         w.markerQuad.upload(prim::plane(layout::SQUARE_SIZE, layout::SQUARE_SIZE, 1, 1, 1.0f), "marker");
         break;
     }
-    case 1: w.hall.upload(hall::buildHall()); break;
+    case 1: {
+        Model hallModel = hall::buildHall();
+        for (ModelPart& p : hallModel.parts) {
+            if (p.material != MaterialId::Tapestry) continue;
+            // hall: inst[0] = (colour, seed, width, height); tapestry.glsl: inst[0] = (colour,
+            // pattern seed, extra seed), inst[1].xy = size.
+            vec4 h = p.inst[0];
+            p.inst[1] = vec4(h.z, h.w, 0.0f, 0.0f);
+            p.inst[0] = vec4(h.x, h.y, std::fmod(h.y * 7.31f, 1.0f), 0.0f);
+        }
+        w.hall.upload(hallModel);
+        // Floor tile grids aligned with the hall's layout (field tiles start at the field corner;
+        // the inlay grid is offset so its joints miss the cabochons at the tile corners).
+        materials::getMutable(MaterialId::FloorMarble).params[4] =
+            vec4(hall::FLOOR_TILE, 0.0015f, -hall::FLOOR_FIELD_HALF_X, -hall::FLOOR_FIELD_HALF_Z);
+        materials::getMutable(MaterialId::FloorMarbleInlay).params[4] =
+            vec4(hall::FLOOR_TILE * 0.5f, 0.0015f, -hall::FLOOR_FIELD_HALF_X + 0.2f, -hall::FLOOR_FIELD_HALF_Z + 0.2f);
+        break;
+    }
     case 2:
         w.table.upload(furniture::buildTable());
         w.chair.upload(furniture::buildChair());
@@ -210,6 +229,7 @@ void World::submitPieces(render::Renderer& r, const PhysicalBoard& board) {
         d.prevModel = p.prevTransform;
         d.hasPrevModel = true;
         d.objectId = OBJ_PIECE + uint32_t(p.id);
+        d.inst[0] = vec4(float(hash32(uint32_t(p.id) * 2654435761u) & 0xFFFFu) / 65536.0f, 0, 0, 0);  // vein seed
         d.flags = render::DRAW_CAST_SHADOW;
         r.submit(d);
         render::DrawItem f = d;
