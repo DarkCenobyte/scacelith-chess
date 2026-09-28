@@ -1,29 +1,35 @@
 // Game record: automatic endings, draw claims, resignation, flag fall, PGN export.
 #include "chess/chess.h"
+#include "i18n/i18n.h"
 
 #include <cstdio>
 #include <ctime>
 
 namespace chess {
 
-const char* endReasonText(GameEndReason r) {
+const char* endReasonKey(GameEndReason r) {
     switch (r) {
     case GameEndReason::None: return "";
-    case GameEndReason::Checkmate: return "Checkmate";
-    case GameEndReason::Resignation: return "Resignation";
-    case GameEndReason::Timeout: return "Loss on time";
-    case GameEndReason::IllegalMoves: return "Second illegal move (forfeit)";
-    case GameEndReason::Stalemate: return "Stalemate";
-    case GameEndReason::InsufficientMaterial: return "Dead position (insufficient material)";
-    case GameEndReason::TimeoutVsInsufficient: return "Flag fall, but the opponent cannot checkmate";
-    case GameEndReason::FivefoldRepetition: return "Fivefold repetition";
-    case GameEndReason::SeventyFiveMoves: return "75-move rule";
-    case GameEndReason::ThreefoldClaim: return "Threefold repetition (claimed)";
-    case GameEndReason::FiftyMoveClaim: return "50-move rule (claimed)";
-    case GameEndReason::Agreement: return "Draw by agreement";
-    case GameEndReason::IllegalMovesVsInsufficient: return "Second illegal move, but the opponent cannot checkmate";
+    case GameEndReason::Checkmate: return "reason.checkmate";
+    case GameEndReason::Resignation: return "reason.resignation";
+    case GameEndReason::Timeout: return "reason.timeout";
+    case GameEndReason::IllegalMoves: return "reason.illegal_moves";
+    case GameEndReason::Stalemate: return "reason.stalemate";
+    case GameEndReason::InsufficientMaterial: return "reason.insufficient";
+    case GameEndReason::TimeoutVsInsufficient: return "reason.timeout_vs_insufficient";
+    case GameEndReason::FivefoldRepetition: return "reason.fivefold";
+    case GameEndReason::SeventyFiveMoves: return "reason.75_moves";
+    case GameEndReason::ThreefoldClaim: return "reason.threefold_claim";
+    case GameEndReason::FiftyMoveClaim: return "reason.50_moves_claim";
+    case GameEndReason::Agreement: return "reason.agreement";
+    case GameEndReason::IllegalMovesVsInsufficient: return "reason.illegal_vs_insufficient";
     }
     return "";
+}
+
+const char* endReasonText(GameEndReason r) {
+    const char* key = endReasonKey(r);
+    return *key ? i18n::tr(key) : "";
 }
 
 Game::Game() { reset(); }
@@ -226,7 +232,8 @@ std::string Game::pgn(const std::string& whiteName, const std::string& blackName
         side = opposite(side);
     }
     if (status_ != GameStatus::Ongoing) {
-        const std::string words = std::string("{") + endReasonText(reason_) + "}";
+        // PGN is an interchange format: the comment stays in English whatever the UI language.
+        const std::string words = std::string("{") + i18n::english(endReasonKey(reason_)) + "}";
         // Comments may be wrapped anywhere: emit word by word.
         std::string word;
         for (char c : words) {

@@ -2,6 +2,7 @@
 #include "../audio/audio.h"
 #include "../character/skeleton.h"
 #include "../core/log.h"
+#include "../i18n/i18n.h"
 #include "../platform/platform.h"
 #include "../render/post/postfx.h"
 #include "layout.h"
@@ -64,6 +65,7 @@ float yawOf(const mat4& t) {
     return std::atan2(z.x, z.z);
 }
 
+// Also the suffix of the "notify.touched.*" translation keys.
 const char* pieceName(PieceType t) {
     switch (t) {
     case Pawn: return "pawn";
@@ -486,7 +488,7 @@ bool GameScene::update(AppContext& ctx, float dt) {
                 paused_ = false;
                 game_.claimDraw();
                 if (game_.status() != GameStatus::Ongoing) endGame();
-                else ui::notify("No draw can be claimed in this position.");
+                else ui::notify(i18n::tr("notify.no_draw_claim"));
                 break;
             case ui::MenuAction::BackToMainMenu:
                 paused_ = false;
@@ -631,7 +633,7 @@ void GameScene::updatePlaying(float dt) {
         Color r = clock_.running();
         if (!clock_.timeControl().unlimited && clock_.flagged(r)) {
             game_.flagFall(r);
-            ui::notify(r == humanColor_ ? "Your flag has fallen." : "Your opponent's flag has fallen.", 4.0f);
+            ui::notify(i18n::tr(r == humanColor_ ? "notify.flag_you" : "notify.flag_opponent"), 4.0f);
             endGame();
             return;
         }
@@ -701,7 +703,7 @@ void GameScene::updateHumanInput() {
             if (!arbiter_.touchedHasLegalMove(game_)) {
                 humanRelease();
             } else {
-                ui::notify(std::string("Touch-move: the ") + pieceName(touched->type) + " you touched must be moved.", 3.0f);
+                ui::notify(i18n::tr(std::string("notify.touched.") + pieceName(touched->type)), 3.0f);
             }
         } else if (p && p->color == humanColor_) {
             // Castling by pointing at the rook once the king is in hand.
@@ -717,14 +719,14 @@ void GameScene::updateHumanInput() {
                 humanRelease();
                 humanTouch(p->id);
             } else {
-                ui::notify(std::string("Touch-move: the ") + pieceName(touched->type) + " you touched must be moved.", 3.0f);
+                ui::notify(i18n::tr(std::string("notify.touched.") + pieceName(touched->type)), 3.0f);
             }
         } else if (sq != NoSquare) {
             humanPlace(sq);
         }
         break;
     }
-    case Turn::HumanPlaced: ui::notify("Press the clock to complete your move (Space).", 2.5f); break;
+    case Turn::HumanPlaced: ui::notify(i18n::tr("notify.press_clock"), 2.5f); break;
     default: break;
     }
 }
@@ -734,7 +736,7 @@ void GameScene::humanTouch(int pieceId) {
     if (!p || p->square == NoSquare) return;
     if (!arbiter_.touch(game_, p->square)) {
         Square committed = arbiter_.touchedSquare();
-        ui::notify("Touch-move: you must move the piece on " + squareName(committed) + ".", 3.0f);
+        ui::notify(i18n::trf("notify.touched_square", {squareName(committed)}), 3.0f);
         return;
     }
     anim_[humanSeat()].enqueue(task(anim::TaskType::Reach, pieceId));
@@ -764,11 +766,11 @@ void GameScene::humanPlace(Square to) {
     bool promo = mover->type == Pawn && (rankOf(to) == 7 || rankOf(to) == 0);
     Move mv = pos.findLegal(touchedSq_, to, promo ? Queen : NoPiece);
     if (!mv.valid() && settings().showLegalMoves) {
-        ui::notify("Illegal move.", 2.0f);
+        ui::notify(i18n::tr("notify.illegal"), 2.0f);
         return;
     }
     if (!arbiter_.place(game_, to, NoPiece)) {
-        ui::notify("That move cannot be made.", 2.0f);
+        ui::notify(i18n::tr("notify.cannot_move"), 2.0f);
         return;
     }
     int victimId = occupant ? occupant->id : -1;
@@ -795,7 +797,7 @@ void GameScene::humanPressClock() {
         return;
     }
     if (turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched) {
-        ui::notify("Make your move before pressing the clock.", 2.0f);
+        ui::notify(i18n::tr("notify.move_first"), 2.0f);
         return;
     }
     if (turn_ != Turn::HumanPlaced) return;
@@ -808,17 +810,17 @@ void GameScene::humanPressClock() {
 void GameScene::offerDraw() {
     int ply = int(game_.moves().size());
     if (drawOfferPly_ == ply) {
-        ui::notify("You have already offered a draw this move.", 2.5f);
+        ui::notify(i18n::tr("notify.draw_already_offered"), 2.5f);
         return;
     }
     drawOfferPly_ = ply;
     bool accept = engineOk_ ? engine_.acceptsDraw(lastAiEval_, ply) : false;
     if (accept) {
-        ui::notify("Your opponent accepts the draw.", 3.0f);
+        ui::notify(i18n::tr("notify.draw_accepted"), 3.0f);
         game_.agreeDraw();
         endGame();
     } else {
-        ui::notify("Your opponent declines the draw offer.", 3.0f);
+        ui::notify(i18n::tr("notify.draw_declined"), 3.0f);
     }
 }
 
@@ -878,7 +880,7 @@ void GameScene::updateAi(float dt) {
         engine_.acceptsDraw(evalCp, int(game_.moves().size()))) {
         game_.claimDraw();
         if (game_.status() != GameStatus::Ongoing) {
-            ui::notify("Your opponent claims a draw.", 3.0f);
+            ui::notify(i18n::tr("notify.draw_claimed"), 3.0f);
             endGame();
             return;
         }
@@ -1075,7 +1077,7 @@ void GameScene::onClockPressed(int seat) {
         return;
     }
     // Illegal move completed: the arbiter restores the position and applies the penalty.
-    ui::notify(v.message.empty() ? std::string("Illegal move.") : v.message, 6.0f);
+    ui::notify(v.message.empty() ? std::string(i18n::tr("notify.illegal")) : v.message, 6.0f);
     if (v.forfeit) {
         game_.forfeitIllegal(mover);
         endGame();
