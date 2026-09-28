@@ -50,6 +50,10 @@ file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
 set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cpp ${ROOT}/src/game/observer_camera.cpp
     ${ROOT}/src/game/scoresheet_layout.cpp)
 list(APPEND CORE_SOURCES ${GAME_CORE_SOURCES})
+# Networking (src/net: protocol codec, direct match, UPnP). Minimal glob added by the direct-match
+# work; to be reconciled with the client-net version (same glob, more link libraries).
+file(GLOB NET_SOURCES CONFIGURE_DEPENDS ${ROOT}/src/net/*.cpp)
+list(APPEND CORE_SOURCES ${NET_SOURCES})
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
 target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party)
 target_compile_options(scacelith_core PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
@@ -59,9 +63,14 @@ if(TARGET stockfish_embedded)
 endif()
 if(WIN32)
     target_link_libraries(scacelith_core PUBLIC ole32 uuid winmm avrt ksuser)
+    # src/net direct match: Winsock, BCrypt (ECDH P-256, AES-GCM, SHA-256/HMAC, RNG), adapter list.
+    target_link_libraries(scacelith_core PUBLIC ws2_32 bcrypt iphlpapi)
 else()
     find_package(Threads REQUIRED)
     target_link_libraries(scacelith_core PUBLIC Threads::Threads)
+    # src/net direct match on the Linux dev/test build: OpenSSL libcrypto for the same primitives.
+    find_package(OpenSSL REQUIRED)
+    target_link_libraries(scacelith_core PUBLIC OpenSSL::Crypto)
 endif()
 
 # ---------------------------------------------------------------------------------------------
