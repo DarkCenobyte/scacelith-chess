@@ -2,9 +2,9 @@
 """Prepares the Arabic and CJK fonts embedded in Scacelith (reproducible; needs fontTools and
 uharfbuzz).
 
-    tools/prepare_fonts.py [--src DIR] [--root REPO]
+    tools/prepare_fonts.py --src DIR [--root REPO]
 
-Sources (all SIL Open Font License 1.1), expected in --src (default /tmp/claude-0/fonts):
+Sources (all SIL Open Font License 1.1), downloaded into the --src directory:
     ArefRuqaa-Regular.ttf       google/fonts ofl/arefruqaa          -> Arabic handwriting
     Amiri-Regular.ttf           google/fonts ofl/amiri              -> Arabic UI text
     KleeOne-Regular.ttf         google/fonts ofl/kleeone            -> Japanese handwriting + UI
@@ -161,6 +161,8 @@ def subset_font(font, unicodes, keep_kern=True):
 
 
 def save(font, path):
+    # Keep the source's modification date: the same sources give byte-identical files.
+    font.recalcTimestamp = False
     font.save(path)
     return os.path.getsize(path)
 
@@ -258,7 +260,7 @@ def bake_arabic_forms(path_in, font):
 # ---------------------------------------------------------------------------------------------
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--src", default="/tmp/claude-0/fonts")
+    ap.add_argument("--src", required=True, help="directory holding the upstream fonts and OFL texts")
     ap.add_argument("--root", default=os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     ap.add_argument("--no-big5-level2", action="store_true", help="only Big5 level 1 hanzi for Traditional Chinese")
     args = ap.parse_args()

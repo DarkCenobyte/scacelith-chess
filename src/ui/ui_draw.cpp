@@ -1,10 +1,15 @@
 #include "ui_draw.h"
+#include "text_shape.h"
 #include "../core/log.h"
+#include "../i18n/i18n.h"
+#include "../i18n/unicode.h"
 #include "../render/gpu.h"
 #include "../render/shader.h"
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
 #include <cstring>
+#include <unordered_map>
 #include <vector>
 
 namespace ui {
@@ -170,6 +175,7 @@ void shutdown() {
 }
 
 void beginFrame(int w, int h) {
+    font::beginFrame();
     g.fbW = std::max(1, w);
     g.fbH = std::max(1, h);
     g.s = float(g.fbH) / 1080.0f;
@@ -374,41 +380,52 @@ void radial(vec2 center, vec2 radii, vec4 c, float t0, float t1) {
 
 // ---- Text ---------------------------------------------------------------------------------------
 namespace {
-template <class F>
-float layoutLine(const std::string& s, const TextStyle& st, float sizePx, F&& onGlyph) {
-    float pen = 0.0f;
-    int prevIdx = 0, prevFace = -1;
-    bool first = true;
-    size_t i = 0;
-    while (i < s.size()) {
-        uint32_t cp = font::decodeUtf8(s, i);
-        if (cp == '\n' || cp == '\r') continue;
-        int used = st.face;
-        const font::Glyph* gl = font::glyph(st.face, cp, &used);
-        if (!gl) gl = font::glyph(st.face, '?', &used);
-        if (!gl) continue;
-        if (!first) pen += st.tracking * sizePx;
-        if (prevFace == used) pen += font::kerning(used, prevIdx, gl->index) * sizePx;
-        onGlyph(*gl, pen);
-        pen += gl->advance * sizePx;
-        prevIdx = gl->index;
-        prevFace = used;
-        first = false;
-    }
-    return pen;
+text::Run shape(const std::string& s, const TextStyle& st) {
+    int dir = textDirection(s, st);
+    if (st.hand >= 0) return text::shapeHandwriting(s, st.hand, st.tracking, dir);
+    return text::shapeLine(s, st.face, st.tracking, dir);
 }
 }  // namespace
 
-float textWidth(const std::string& s, const TextStyle& st) {
+float caretOffset(const std::string& s, const TextStyle& st, int index) {
     if (!font::ready()) return 0.0f;
-    return layoutLine(s, st, st.size, [](const font::Glyph&, float) {});
+    return text::caretX(shape(s, st), index) * st.size;
 }
 
-float capHeight(const TextStyle& st) { return font::metrics(st.face).capHeight * st.size; }
+int caretAt(const std::string& s, const TextStyle& st, float offset) {
+    if (!font::ready() || st.size <= 0.0f) return 0;
+    return text::caretIndex(shape(s, st), offset / st.size);
+}
+
+int textDirection(const std::string& s, const TextStyle& st) {
+    if (st.dir >= 0) return st.dir & 1;
+    std::u32string u = uni::decode(s);
+    if (i18n::rtl() && uni::containsRtl(u)) return 1;
+    return uni::paragraphLevel(u, 0);
+}
+
+float textWidth(const std::string& s, const TextStyle& st) {
+    if (!font::ready() || s.empty()) return 0.0f;
+    return shape(s, st).advance * st.size;
+}
+
+float fitSize(const std::string& s, const TextStyle& st, float maxWidth, float minScale) {
+    float w = textWidth(s, st);
+    if (w <= maxWidth || w <= 0.0f) return st.size;
+    return st.size * std::max(minScale, maxWidth / w);
+}
+
+float capHeight(const TextStyle& st) {
+    // Scripts without capitals are centred on the height of their own ink.
+    int face = st.face;
+    if (st.hand >= 0) face = font::FACE_HAND_CAVEAT + st.hand;
+    return font::metrics(face).capHeight * st.size;
+}
 
 float text(const std::string& s, float x, float baseline, const TextStyle& st) {
     if (!font::ready() || s.empty()) return 0.0f;
-    float w = textWidth(s, st);
+    text::Run run = shape(s, st);
+    float w = run.advance * st.size;
     if (st.align == HAlign::Center) x -= w * 0.5f;
     else if (st.align == HAlign::Right) x -= w;
     float sc = g.s;
@@ -420,16 +437,19 @@ float text(const std::string& s, float x, float baseline, const TextStyle& st) {
     float soft = 1.0f + st.softness * sc;
     uint32_t cc = pack(st.color);
     uint32_t col[4] = {cc, cc, cc, cc};
-    layoutLine(s, st, sizePx, [&](const font::Glyph& gl, float pen) {
-        if (!gl.hasQuad) return;
-        float x0 = ox + pen + gl.x0 * sizePx, x1 = ox + pen + gl.x1 * sizePx;
-        float y0 = by + gl.y0 * sizePx, y1 = by + gl.y1 * sizePx;
+    for (const text::PlacedGlyph& pg : run.glyphs) {
+        const font::Glyph& gl = *pg.glyph;
+        if (!gl.hasQuad) continue;
+        float gs = sizePx * pg.scale;
+        float pen = pg.x * sizePx;
+        float x0 = ox + pen + gl.x0 * gs, x1 = ox + pen + gl.x1 * gs;
+        float y0 = by + gl.y0 * gs, y1 = by + gl.y1 * gs;
         vec2 pos[4] = {{x0, y0}, {x1, y0}, {x0, y1}, {x1, y1}};
         vec2 uv[4] = {{gl.u0, gl.v0}, {gl.u1, gl.v0}, {gl.u0, gl.v1}, {gl.u1, gl.v1}};
         float p0[4] = {soft, dil, gl.pxRange, 0.0f};
         float p1[4] = {float(MODE_TEXT), 0.0f, 0.0f, 0.0f};
         emit(pos, uv, col, p0, p1);
-    });
+    }
     return w;
 }
 
@@ -440,48 +460,109 @@ void textIn(const std::string& s, const Rect& r, const TextStyle& st) {
 }
 
 namespace {
-// Splits into wrapped lines.
-std::vector<std::string> wrap(const std::string& s, float maxWidth, const TextStyle& st) {
-    std::vector<std::string> lines;
+struct Line {
+    std::string text;
+    int dir = 0;      // base direction of its paragraph
+    float width = 0;  // reference pixels
+};
+
+// Splits into wrapped lines: at spaces (dropped at the break) and between CJK characters. Widths
+// are the sum of the shaped pieces (nothing joins across a break opportunity). Results are cached
+// per frame-independent key since paragraphs are drawn every frame.
+const std::vector<Line>& wrap(const std::string& s, float maxWidth, const TextStyle& st) {
+    struct Cache {
+        std::unordered_map<std::string, std::vector<Line>> map;
+        int lang = -1, gen = -1;
+    };
+    static Cache cache;
+    if (cache.lang != i18n::generation() || cache.gen != font::atlasGeneration() || cache.map.size() > 512) {
+        cache.map.clear();
+        cache.lang = i18n::generation();
+        cache.gen = font::atlasGeneration();
+    }
+    char keyBuf[96];
+    std::snprintf(keyBuf, sizeof(keyBuf), "%d|%d|%d|%.3f|%.3f|%.3f|", st.face, st.hand, st.dir, st.size, st.tracking, maxWidth);
+    std::string key = keyBuf + s;
+    auto hit = cache.map.find(key);
+    if (hit != cache.map.end()) return hit->second;
+
+    std::vector<Line> lines;
+    const float spaceW = textWidth(" ", st);
     size_t start = 0;
     while (start <= s.size()) {
         size_t nl = s.find('\n', start);
         std::string para = s.substr(start, nl == std::string::npos ? std::string::npos : nl - start);
-        std::string line;
-        size_t p = 0;
-        while (p < para.size()) {
-            size_t sp = para.find(' ', p);
-            std::string word = para.substr(p, sp == std::string::npos ? std::string::npos : sp - p);
-            std::string cand = line.empty() ? word : line + " " + word;
-            if (!line.empty() && textWidth(cand, st) > maxWidth) {
-                lines.push_back(line);
-                line = word;
-            } else {
-                line = cand;
+        TextStyle ps = st;
+        ps.dir = textDirection(para, st);
+        // Tokens: [a, b) byte ranges without spaces; spaceBefore = separated from the previous one.
+        struct Tok { size_t a, b; bool spaceBefore; float w; float join; };
+        std::vector<Tok> toks;
+        bool pendingSpace = false;
+        uint32_t prev = 0;
+        for (size_t i = 0; i < para.size();) {
+            size_t at = i;
+            uint32_t cp = font::decodeUtf8(para, i);
+            if (cp == ' ' || cp == 0x3000 || cp == '\t') {
+                pendingSpace = true;
+                prev = cp;
+                continue;
             }
-            if (sp == std::string::npos) break;
-            p = sp + 1;
+            if (toks.empty() || pendingSpace || uni::breakBetween(char32_t(prev), char32_t(cp)))
+                toks.push_back({at, i, pendingSpace && !toks.empty(), 0.0f,
+                                st.tracking * st.size * uni::trackingScale(char32_t(prev), char32_t(cp))});
+            else
+                toks.back().b = i;
+            pendingSpace = false;
+            prev = cp;
         }
-        lines.push_back(line);
+        Line cur;
+        cur.dir = ps.dir;
+        size_t lineA = 0, lineB = 0;
+        bool open = false;
+        for (Tok& t : toks) {
+            t.w = textWidth(para.substr(t.a, t.b - t.a), ps);
+            float add = (open ? (t.spaceBefore ? spaceW : t.join) : 0.0f) + t.w;
+            if (open && cur.width + add > maxWidth) {
+                cur.text = para.substr(lineA, lineB - lineA);
+                lines.push_back(cur);
+                cur.width = 0.0f;
+                open = false;
+                add = t.w;
+            }
+            if (!open) lineA = t.a;
+            lineB = t.b;
+            cur.width += add;
+            open = true;
+        }
+        cur.text = open ? para.substr(lineA, lineB - lineA) : std::string();
+        lines.push_back(cur);
         if (nl == std::string::npos) break;
         start = nl + 1;
     }
-    return lines;
+    return cache.map.emplace(key, std::move(lines)).first->second;
 }
 }  // namespace
 
 int textWrapped(const std::string& s, float x, float baseline, float maxWidth, const TextStyle& st, float lineHeight) {
     if (lineHeight <= 0.0f) lineHeight = st.size * 1.3f;
-    auto lines = wrap(s, maxWidth, st);
+    std::vector<Line> lines = wrap(s, maxWidth, st);  // copy: text() may clear the cache
     float y = baseline;
     for (auto& l : lines) {
-        text(l, x, y, st);
+        TextStyle ls = st;
+        ls.dir = l.dir;
+        text(l.text, x, y, ls);
         y += lineHeight;
     }
     return int(lines.size());
 }
 
 int wrapLineCount(const std::string& s, float maxWidth, const TextStyle& st) { return int(wrap(s, maxWidth, st).size()); }
+
+float wrapWidth(const std::string& s, float maxWidth, const TextStyle& st) {
+    float w = 0.0f;
+    for (const Line& l : wrap(s, maxWidth, st)) w = std::max(w, l.width);
+    return w;
+}
 
 }  // namespace gfx
 }  // namespace ui
