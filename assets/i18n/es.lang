@@ -1,0 +1,289 @@
+# Scacelith - Español
+# Traducción de assets/i18n/en.lang (mismas claves, mismos {n}). Plural: uno|varios.
+
+language.name = Español
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Sí
+common.off = No
+common.back = Volver
+common.apply = Aplicar
+common.discard = Descartar
+common.cancel = Cancelar
+common.white = Blancas
+common.black = Negras
+common.main_menu = Menú principal
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = El juego de los reyes
+menu.new_game = Nueva partida
+menu.options = Opciones
+menu.credits = Créditos
+menu.quit = Salir
+menu.version = Versión {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = OPCIONES
+options.tab.display = Pantalla
+options.tab.graphics = Gráficos
+options.tab.audio = Sonido
+options.tab.gameplay = Juego
+options.tab.player = Jugador
+options.tab.controls = Controles
+options.pending = Los cambios se aplican al pulsar Aplicar.
+options.unsaved.title = CAMBIOS SIN APLICAR
+options.unsaved.text = Se han cambiado algunas opciones. ¿Aplicarlas antes de salir?
+
+options.language = Idioma
+options.language.help = Idioma de los menús y mensajes. El cambio es inmediato.
+options.display_mode = Modo de pantalla
+options.fullscreen = Pantalla completa
+options.windowed = Ventana
+options.window_size = Tamaño de ventana
+options.window_size.help = Tamaño de la ventana en modo ventana. La pantalla completa usa siempre la resolución del escritorio.
+options.vsync = Sincronización vertical
+options.vsync.help = Sincroniza las imágenes con la pantalla para evitar cortes.
+options.render_scale = Escala de renderizado
+options.render_scale.help = Resolución interna de la imagen 3D. Más baja es más rápida, más alta es más nítida.
+
+options.quality = Calidad
+options.quality.low = Baja
+options.quality.medium = Media
+options.quality.high = Alta
+options.quality.ultra = Ultra
+options.quality.help = Sombras, reflejos, oclusión ambiental y luz volumétrica.
+options.motion_blur = Desenfoque de movimiento
+options.depth_of_field = Profundidad de campo
+options.brightness = Brillo
+options.brightness.neutral = Neutro
+options.brightness.help = Compensación de exposición de la cámara.
+
+options.master_volume = Volumen general
+options.effects = Efectos
+options.ambience = Ambiente
+options.ambience.help = El murmullo de la sala: el fuego, pasos lejanos, el viejo reloj.
+options.ambience_volume = Volumen del ambiente
+
+options.legal_moves = Mostrar jugadas legales
+options.legal_moves.help = Resalta las casillas que puede alcanzar una pieza tocada. Sin esta ayuda nada indica si una jugada es legal: el árbitro sanciona una jugada ilegal en cuanto pulsa el reloj.
+options.coordinates = Coordenadas del tablero
+options.thinking_time = Tiempo de reflexión realista
+options.thinking_time.help = Su rival se toma su tiempo como un jugador humano en lugar de mover al instante.
+options.mouse_sensitivity = Sensibilidad del ratón
+options.invert_look = Invertir eje vertical
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Nombre
+player.name.help = Su nombre tal como se escribe en la cabecera de las planillas, en cualquier alfabeto.
+player.default_name = Humano
+player.handwriting = Letra
+player.handwriting.help = La mano que anota sus jugadas. El árabe, el japonés y el chino tienen su propia letra.
+player.preview = EN SU PLANILLA
+hand.caveat = Informal
+hand.marck = Cursiva
+hand.badscript = Inclinada
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Clic izquierdo
+controls.touch = Tocar una pieza y moverla
+controls.clock.keys = Espacio  o  clic en el reloj
+controls.clock = Pulsar el reloj
+controls.look.keys = Botón derecho, mantener
+controls.look = Mirar alrededor
+controls.moves.keys = Tab
+controls.moves = Mostrar u ocultar las jugadas
+controls.menu.keys = Esc
+controls.menu = Menú
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NUEVA PARTIDA
+newgame.opponent = RIVAL
+newgame.time_control = RITMO DE JUEGO
+newgame.start = Empezar
+newgame.elo = ~{0} Elo
+newgame.you_white = Jugará con blancas.
+newgame.you_black = Jugará con negras.
+newgame.colour_lot = Los colores se sortean en la primera partida.
+newgame.colour_alternate = Después se alternan de una partida a otra.
+
+# Custom opponent: Stockfish parameters
+engine.skill = Nivel de juego
+engine.skill.help = «Skill Level» de Stockfish (0–20). Se ignora mientras la fuerza esté limitada por Elo.
+engine.limit_elo = Limitar fuerza (Elo)
+engine.limit_elo.help = UCI_LimitStrength: el motor apunta a la puntuación Elo de abajo.
+engine.elo = Elo
+engine.depth = Profundidad
+engine.plies = {0} semijugada|{0} semijugadas
+engine.move_time = Tiempo por jugada
+engine.nodes = Límite de nodos
+engine.no_limit = Sin límite
+engine.thousand = {0} mil
+engine.million = {0} millones
+
+# Time controls
+tc.unlimited = Sin límite
+tc.no_clock = Sin reloj
+tc.bullet = Bala
+tc.blitz = Blitz
+tc.rapid = Rápidas
+tc.classical = Clásicas
+tc.custom = Libre
+tc.your_own = A su gusto
+tc.base_time = Tiempo base
+tc.base_time.help = Tiempo inicial de cada lado del reloj (minutos : segundos).
+tc.increment = Incremento
+tc.increment.help = Incremento Fischer añadido tras cada jugada.
+tc.delay = Retardo
+tc.delay.help = Retardo Bronstein: el tiempo usado hasta ese retardo se devuelve tras cada jugada.
+tc.no_delay = Ninguno
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, retardo {1} s
+
+# Opponent presets
+preset.novice.name = Novato
+preset.novice.desc = Acaba de aprender a mover: deja piezas colgadas y no ve amenazas simples.
+preset.beginner.name = Principiante
+preset.beginner.desc = Conoce lo básico, pero aún pierde material a menudo.
+preset.casual.name = Aficionado
+preset.casual.desc = Un rival relajado: jugadas sensatas, errores frecuentes.
+preset.club_player.name = Jugador de club
+preset.club_player.desc = Sólido jugador de club que castiga los errores evidentes.
+preset.advanced.name = Avanzado
+preset.advanced.desc = Fuerte jugador de club con buena visión táctica.
+preset.expert.name = Experto
+preset.expert.desc = Experto de torneo: rara vez se equivoca, convierte sus ventajas.
+preset.master.name = Maestro
+preset.master.desc = Fuerza de maestro: cálculo profundo y juego posicional fino.
+preset.grandmaster.name = Gran maestro
+preset.grandmaster.desc = Nivel de gran maestro: dificilísimo de vencer.
+preset.stockfish_max.name = Stockfish Máx.
+preset.stockfish_max.desc = Stockfish 16 a plena potencia. Buena suerte.
+preset.custom.name = Personalizado
+preset.custom.desc = Sus propios ajustes del motor.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = CRÉDITOS
+credits.game.head = SCACELITH
+credits.game = Una partida de ajedrez en una sala real, sobre un motor OpenGL 4.6 propio.
+credits.engine.head = MOTOR DE AJEDREZ
+credits.engine = Stockfish 16, de los desarrolladores de Stockfish.
+credits.engine.licence = Licencia Pública General de GNU v3.
+credits.fonts.head = TIPOGRAFÍAS
+credits.fonts = EB Garamond de Georg Duffner y Cinzel de Natanael Gama; Amiri de Khaled Hosny.
+credits.fonts.hand = Caligrafías: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Figuras de ajedrez de GNU FreeFont (GPL v3 con excepción de fuentes).
+credits.quote = «El ajedrez es el arte del análisis».  — Mijaíl Botvínnik
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUSA
+pause.resume = Continuar
+pause.offer_draw = Ofrecer tablas
+pause.claim_draw = Reclamar tablas
+pause.claim_draw.help = Triple repetición o regla de los cincuenta movimientos.
+pause.resign = Abandonar
+confirm.resign.title = ABANDONAR
+confirm.resign.text = ¿Abandonar esta partida? Su rival será declarado ganador.
+confirm.resign.ok = Abandonar
+confirm.leave.title = SALIR DE LA PARTIDA
+confirm.leave.text = ¿Volver al menú principal? La partida en curso se perderá.
+confirm.leave.ok = Salir
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = CORONAR EN
+piece.queen = Dama
+piece.rook = Torre
+piece.bishop = Alfil
+piece.knight = Caballo
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = La partida termina en tablas.
+gameover.draw_moves = La partida termina en tablas tras {0} jugada.|La partida termina en tablas tras {0} jugadas.
+gameover.win = Bien jugado: usted gana.
+gameover.win_moves = Bien jugado: gana en {0} jugada.|Bien jugado: gana en {0} jugadas.
+gameover.loss = Su rival gana.
+gameover.loss_moves = Su rival gana en {0} jugada.|Su rival gana en {0} jugadas.
+gameover.rematch = Revancha
+gameover.view_board = Ver el tablero
+gameover.show = Mostrar
+
+# Reasons
+reason.checkmate = Jaque mate
+reason.resignation = Abandono
+reason.timeout = Derrota por tiempo
+reason.illegal_moves = Segunda jugada ilegal (partida perdida)
+reason.stalemate = Rey ahogado
+reason.insufficient = Posición muerta (material insuficiente)
+reason.timeout_vs_insufficient = Caída de bandera, pero el rival no puede dar mate
+reason.fivefold = Quíntuple repetición
+reason.75_moves = Regla de los 75 movimientos
+reason.threefold_claim = Triple repetición (reclamada)
+reason.50_moves_claim = Regla de los 50 movimientos (reclamada)
+reason.agreement = Tablas de mutuo acuerdo
+reason.illegal_vs_insufficient = Segunda jugada ilegal, pero el rival no puede dar mate
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = JUGADAS
+movelist.empty = Aún no hay jugadas.
+
+# ---- Loading -----------------------------------------------------------------------------------
+loading.materials = Preparando los materiales
+loading.hall = Levantando la sala
+loading.furniture = Tallando la mesa y las sillas
+loading.board = Puliendo el tablero
+loading.pieces = Torneando las piezas
+loading.clock = Montando el reloj
+loading.porcelain = Cociendo la porcelana
+loading.ready = Listo
+
+# ---- Notifications during the game -------------------------------------------------------------
+notify.no_draw_claim = En esta posición no se pueden reclamar tablas.
+notify.flag_you = Ha caído su bandera.
+notify.flag_opponent = Ha caído la bandera de su rival.
+notify.touched.pawn = Pieza tocada, pieza movida: debe mover el peón que ha tocado.
+notify.touched.knight = Pieza tocada, pieza movida: debe mover el caballo que ha tocado.
+notify.touched.bishop = Pieza tocada, pieza movida: debe mover el alfil que ha tocado.
+notify.touched.rook = Pieza tocada, pieza movida: debe mover la torre que ha tocado.
+notify.touched.queen = Pieza tocada, pieza movida: debe mover la dama que ha tocado.
+notify.touched.king = Pieza tocada, pieza movida: debe mover el rey que ha tocado.
+notify.touched.piece = Pieza tocada, pieza movida: debe mover la pieza que ha tocado.
+notify.touched_square = Pieza tocada, pieza movida: debe mover la pieza de {0}.
+notify.press_clock = Pulse el reloj para completar su jugada (Espacio).
+notify.illegal = Jugada ilegal.
+notify.cannot_move = Esa jugada no se puede hacer.
+notify.move_first = Haga su jugada antes de pulsar el reloj.
+notify.draw_already_offered = Ya ha ofrecido tablas en esta jugada.
+notify.draw_accepted = Su rival acepta las tablas.
+notify.draw_declined = Su rival rechaza la oferta de tablas.
+notify.draw_claimed = Su rival reclama tablas.
+
+# ---- Arbiter -----------------------------------------------------------------------------------
+arbiter.join = {0} {1}
+arbiter.no_move = Árbitro: se ha pulsado el reloj sin hacer ninguna jugada, lo que cuenta como jugada ilegal.
+arbiter.unpromoted = Árbitro: jugada ilegal, el peón no fue sustituido por una nueva pieza antes de pulsar el reloj.
+arbiter.illegal = Árbitro: jugada ilegal.
+arbiter.second_loses.white = Es la segunda jugada ilegal de las blancas: las blancas pierden la partida.
+arbiter.second_loses.black = Es la segunda jugada ilegal de las negras: las negras pierden la partida.
+arbiter.second_draw.white = Es la segunda jugada ilegal de las blancas, pero las negras no pueden dar mate: la partida es tablas.
+arbiter.second_draw.black = Es la segunda jugada ilegal de las negras, pero las blancas no pueden dar mate: la partida es tablas.
+arbiter.queen = El peón se convierte en dama.
+arbiter.queen_one_minute.white = El peón se convierte en dama y las blancas reciben un minuto adicional.
+arbiter.queen_one_minute.black = El peón se convierte en dama y las negras reciben un minuto adicional.
+arbiter.queen_two_minutes.white = El peón se convierte en dama y las blancas reciben dos minutos adicionales.
+arbiter.queen_two_minutes.black = El peón se convierte en dama y las negras reciben dos minutos adicionales.
+arbiter.restored = Se restablece la posición.
+arbiter.restored_one_minute.white = Se restablece la posición y las blancas reciben un minuto adicional.
+arbiter.restored_one_minute.black = Se restablece la posición y las negras reciben un minuto adicional.
+arbiter.restored_two_minutes.white = Se restablece la posición y las blancas reciben dos minutos adicionales.
+arbiter.restored_two_minutes.black = Se restablece la posición y las negras reciben dos minutos adicionales.
+arbiter.one_minute.white = Las blancas reciben un minuto adicional.
+arbiter.one_minute.black = Las negras reciben un minuto adicional.
+arbiter.two_minutes.white = Las blancas reciben dos minutos adicionales.
+arbiter.two_minutes.black = Las negras reciben dos minutos adicionales.
+arbiter.second_loses = Una segunda jugada ilegal pierde la partida.
+arbiter.touched.white = Las blancas deben mover la pieza tocada.
+arbiter.touched.black = Las negras deben mover la pieza tocada.
+arbiter.game_over = La partida ha terminado.

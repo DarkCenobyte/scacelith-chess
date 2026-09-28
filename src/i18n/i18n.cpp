@@ -1,6 +1,9 @@
 #include "i18n.h"
+#include "unicode.h"
 #include "../core/embedded.h"
 #include "../core/log.h"
+#include <algorithm>
+#include <cctype>
 #include <unordered_map>
 
 namespace i18n {
@@ -13,6 +16,7 @@ struct Table {
 
 Table g_english, g_current;
 bool g_loaded = false;
+int g_generation = 0;
 
 std::string trim(const std::string& s) {
     size_t a = 0, b = s.size();
@@ -83,6 +87,7 @@ int languageIndex(const std::string& code) {
 
 bool setLanguage(const std::string& code) {
     ensureEnglish();
+    ++g_generation;
     int idx = languageIndex(code);
     if (idx <= 0) {
         g_current = g_english;
@@ -110,6 +115,36 @@ bool rtl() {
     return idx >= 0 && languages()[size_t(idx)].rtl;
 }
 
+int generation() { return g_generation; }
+
+std::string matchLocale(const std::string& tag) {
+    // Normalise "zh_TW.UTF-8@x" -> subtags {"zh", "tw"}.
+    std::string t;
+    for (char c : tag) {
+        if (c == '.' || c == '@') break;
+        t += c == '_' ? '-' : char(std::tolower(static_cast<unsigned char>(c)));
+    }
+    std::vector<std::string> sub;
+    size_t p = 0;
+    while (p <= t.size()) {
+        size_t q = t.find('-', p);
+        sub.push_back(t.substr(p, q == std::string::npos ? std::string::npos : q - p));
+        if (q == std::string::npos) break;
+        p = q + 1;
+    }
+    const std::string& lang = sub.empty() ? t : sub[0];
+    if (lang == "zh") {
+        for (size_t i = 1; i < sub.size(); ++i) {
+            if (sub[i] == "hant" || sub[i] == "tw" || sub[i] == "hk" || sub[i] == "mo") return "zh-Hant";
+            if (sub[i] == "hans") return "zh-Hans";
+        }
+        return "zh-Hans";
+    }
+    for (const Language& l : languages())
+        if (lang == l.code) return l.code;
+    return "en";
+}
+
 const char* tr(const char* key) {
     ensureEnglish();
     auto it = g_current.map.find(key);
@@ -121,14 +156,97 @@ const char* tr(const char* key) {
 
 std::string tr(const std::string& key) { return tr(key.c_str()); }
 
+const char* english(const char* key) {
+    ensureEnglish();
+    auto en = g_english.map.find(key);
+    return en != g_english.map.end() ? en->second.c_str() : key;
+}
+
 std::string trf(const char* key, std::initializer_list<std::string> args) {
-    std::string s = tr(key);
+    return format(tr(key), std::vector<std::string>(args));
+}
+
+int pluralForms(const std::string& code) {
+    if (code == "ru" || code == "uk") return 3;
+    if (code == "ar") return 6;
+    if (code == "ja" || code == "zh-Hans" || code == "zh-Hant") return 1;
+    return 2;
+}
+
+int pluralIndex(const std::string& code, long long n) {
+    long long a = n < 0 ? -n : n;
+    if (code == "ru" || code == "uk") {
+        long long m10 = a % 10, m100 = a % 100;
+        if (m10 == 1 && m100 != 11) return 0;
+        if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 1;
+        return 2;
+    }
+    if (code == "ar") {
+        long long m100 = a % 100;
+        if (a == 0) return 0;
+        if (a == 1) return 1;
+        if (a == 2) return 2;
+        if (m100 >= 3 && m100 <= 10) return 3;
+        if (m100 >= 11) return 4;
+        return 5;
+    }
+    if (code == "ja" || code == "zh-Hans" || code == "zh-Hant") return 0;
+    if (code == "fr") return a <= 1 ? 0 : 1;
+    return a == 1 ? 0 : 1;
+}
+
+std::string trn(const char* key, long long n, std::initializer_list<std::string> args) {
+    ensureEnglish();
+    // The forms come from the table that provides the key (a missing translation falls back to
+    // English with the English rule).
+    auto it = g_current.map.find(key);
+    const std::string* value = nullptr;
+    std::string code = g_current.code;
+    if (it != g_current.map.end()) {
+        value = &it->second;
+    } else {
+        auto en = g_english.map.find(key);
+        if (en == g_english.map.end()) return key;
+        value = &en->second;
+        code = "en";
+    }
+    std::vector<std::string> forms;
+    size_t p = 0;
+    while (true) {
+        size_t q = value->find('|', p);
+        forms.push_back(value->substr(p, q == std::string::npos ? std::string::npos : q - p));
+        if (q == std::string::npos) break;
+        p = q + 1;
+    }
+    size_t idx = std::min(size_t(pluralIndex(code, n)), forms.size() - 1);
     std::vector<std::string> a(args);
+    if (a.empty()) a.push_back(std::to_string(n));
+    return format(forms[idx], a);
+}
+
+std::string trOr(const std::string& key, const std::string& fallback) {
+    return has(key.c_str()) ? std::string(tr(key.c_str())) : fallback;
+}
+
+std::vector<uint32_t> codepoints() {
+    ensureEnglish();
+    std::vector<uint32_t> out;
+    for (auto& kv : g_current.map) {
+        uni::Shaped sh = uni::shapeArabic(uni::decode(kv.second));
+        for (char32_t c : sh.text)
+            if (c > ' ' && c != '|') out.push_back(uint32_t(c));
+    }
+    std::sort(out.begin(), out.end());
+    out.erase(std::unique(out.begin(), out.end()), out.end());
+    return out;
+}
+
+std::string format(const std::string& s, const std::vector<std::string>& a) {
     std::string out;
     for (size_t i = 0; i < s.size(); ++i) {
         if (s[i] == '{') {
             size_t j = s.find('}', i);
-            if (j != std::string::npos && j > i + 1) {
+            if (j != std::string::npos && j > i + 1 && j < i + 5) {
                 bool digits = true;
                 for (size_t k = i + 1; k < j; ++k) digits = digits && s[k] >= '0' && s[k] <= '9';
                 if (digits) {
@@ -142,6 +260,11 @@ std::string trf(const char* key, std::initializer_list<std::string> args) {
         out += s[i];
     }
     return out;
+}
+
+std::string ltr(const std::string& s) {
+    if (!rtl() || s.empty()) return s;
+    return "\xE2\x80\x8E" + s + "\xE2\x80\x8E";  // U+200E LEFT-TO-RIGHT MARK
 }
 
 bool has(const char* key) {

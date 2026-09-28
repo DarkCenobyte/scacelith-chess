@@ -1,0 +1,292 @@
+# Scacelith - العربية
+# Translation of assets/i18n/en.lang (same keys, same {n}). Written right to left: the UI mirrors
+# its rows and aligns text to the right. Plurals have six forms:
+# zero|one|two|few (3-10)|many (11-99)|other (100, 101, 102...).
+# U+200F (right-to-left mark) keeps a parenthesis after a Latin word on the Arabic side.
+
+language.name = العربية
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = تشغيل
+common.off = إيقاف
+common.back = رجوع
+common.apply = تطبيق
+common.discard = تجاهل
+common.cancel = إلغاء
+common.white = الأبيض
+common.black = الأسود
+common.main_menu = القائمة الرئيسية
+number.decimal = .
+number.percent = {0}٪
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = لعبة الملوك
+menu.new_game = مباراة جديدة
+menu.options = الخيارات
+menu.credits = شكر وتقدير
+menu.quit = خروج
+menu.version = الإصدار {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = الخيارات
+options.tab.display = العرض
+options.tab.graphics = الرسوميات
+options.tab.audio = الصوت
+options.tab.gameplay = اللعب
+options.tab.player = اللاعب
+options.tab.controls = التحكم
+options.pending = تسري التغييرات بعد تطبيقها.
+options.unsaved.title = تغييرات غير مطبّقة
+options.unsaved.text = تغيّرت بعض الخيارات. هل تريد تطبيقها قبل المغادرة؟
+
+options.language = اللغة
+options.language.help = لغة القوائم والرسائل. يسري التغيير فورًا.
+options.display_mode = وضع العرض
+options.fullscreen = ملء الشاشة
+options.windowed = نافذة
+options.window_size = حجم النافذة
+options.window_size.help = حجم النافذة في وضع النافذة. يستخدم وضع ملء الشاشة دائمًا دقة سطح المكتب.
+options.vsync = المزامنة العمودية
+options.vsync.help = يزامن الإطارات مع الشاشة لتجنّب تمزّق الصورة.
+options.render_scale = مقياس العرض
+options.render_scale.help = الدقة الداخلية للصورة ثلاثية الأبعاد. الأدنى أسرع، والأعلى أوضح.
+
+options.quality = الجودة
+options.quality.low = منخفضة
+options.quality.medium = متوسطة
+options.quality.high = عالية
+options.quality.ultra = فائقة
+options.quality.help = الظلال والانعكاسات والإظلام المحيطي والضوء الحجمي.
+options.motion_blur = ضبابية الحركة
+options.depth_of_field = عمق الميدان
+options.brightness = السطوع
+options.brightness.neutral = محايد
+options.brightness.help = تعويض تعريض الكاميرا.
+
+options.master_volume = مستوى الصوت العام
+options.effects = المؤثرات
+options.ambience = الأجواء
+options.ambience.help = همهمة القاعة: النار، ووقع خطى بعيدة، والساعة القديمة.
+options.ambience_volume = صوت الأجواء
+
+options.legal_moves = إظهار النقلات القانونية
+options.legal_moves.help = يميّز المربعات التي تستطيع القطعة الملموسة بلوغها. عند إيقافه لا شيء يخبرك إن كانت النقلة قانونية: يعاقب الحكم على النقلة غير القانونية بمجرد ضغطك على الساعة.
+options.coordinates = إحداثيات الرقعة
+options.thinking_time = وقت تفكير واقعي
+options.thinking_time.help = يأخذ خصمك وقته كلاعب بشري بدلًا من اللعب فورًا.
+options.mouse_sensitivity = حساسية الفأرة
+options.invert_look = عكس المحور العمودي
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = الاسم
+player.name.help = اسمك كما يُكتب أعلى أوراق التسجيل، بأي أبجدية.
+player.default_name = إنسان
+player.handwriting = الخط
+player.handwriting.help = اليد التي تكتب نقلاتك. للعربية واليابانية والصينية خطّ خاص بها.
+player.preview = على ورقة تسجيلك
+hand.caveat = عفوي
+hand.marck = متّصل
+hand.badscript = مائل
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = النقر الأيسر
+controls.touch = المس قطعة ثم حرّكها
+controls.clock.keys = المسافة  أو  النقر على الساعة
+controls.clock = الضغط على الساعة
+controls.look.keys = الزر الأيمن مع الإمساك
+controls.look = النظر حولك
+controls.moves.keys = Tab
+controls.moves = إظهار قائمة النقلات أو إخفاؤها
+controls.menu.keys = Esc
+controls.menu = القائمة
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = مباراة جديدة
+newgame.opponent = الخصم
+newgame.time_control = نظام الوقت
+newgame.start = ابدأ
+newgame.elo = ~{0} إيلو
+newgame.you_white = ستلعب بالقطع البيضاء.
+newgame.you_black = ستلعب بالقطع السوداء.
+newgame.colour_lot = تُحدَّد الألوان بالقرعة في المباراة الأولى.
+newgame.colour_alternate = ثم تتناوب الألوان من مباراة إلى أخرى.
+
+# Custom opponent: Stockfish parameters
+engine.skill = مستوى المهارة
+engine.skill.help = «Skill Level» في Stockfish ‏(0–20). يُتجاهَل ما دامت القوة محدودة بتصنيف إيلو.
+engine.limit_elo = تحديد القوة (إيلو)
+engine.limit_elo.help = UCI_LimitStrength: يستهدف المحرّك تصنيف إيلو أدناه.
+engine.elo = إيلو
+engine.depth = عمق البحث
+engine.plies = {0} نصف نقلة|نصف نقلة واحدة|نصفا نقلة|{0} أنصاف نقلات|{0} نصف نقلة|{0} نصف نقلة
+engine.move_time = الوقت لكل نقلة
+engine.nodes = حدّ العُقد
+engine.no_limit = بلا حدّ
+engine.thousand = {0} ألف
+engine.million = {0} مليون
+
+# Time controls
+tc.unlimited = غير محدود
+tc.no_clock = بلا ساعة
+tc.bullet = رصاصي
+tc.blitz = خاطف
+tc.rapid = سريع
+tc.classical = كلاسيكي
+tc.custom = مخصّص
+tc.your_own = حسب رغبتك
+tc.base_time = الوقت الأساسي
+tc.base_time.help = الوقت الابتدائي على كل جانب من الساعة (دقائق : ثوانٍ).
+tc.increment = الزيادة
+tc.increment.help = زيادة فيشر تُضاف بعد كل نقلة.
+tc.delay = التأخير
+tc.delay.help = تأخير برونشتاين: يُعاد الوقت المستخدم حتى مدة التأخير بعد كل نقلة.
+tc.no_delay = بلا تأخير
+tc.seconds = {0} ث
+tc.minutes = {0} د
+tc.summary_increment = {0} + {1} ث
+tc.summary_delay = {0}، تأخير {1} ث
+
+# Opponent presets
+preset.novice.name = مبتدئ تمامًا
+preset.novice.desc = تعلّم النقلات للتو: يترك قطعه معرّضة ويغفل التهديدات البسيطة.
+preset.beginner.name = مبتدئ
+preset.beginner.desc = يعرف الأساسيات، لكنه ما زال يخسر القطع كثيرًا.
+preset.casual.name = هاوٍ
+preset.casual.desc = خصم مسترخٍ لسهرة هادئة: نقلات معقولة وأخطاء متكررة.
+preset.club_player.name = لاعب نادٍ
+preset.club_player.desc = لاعب نادٍ متمكّن يعاقب الأخطاء الواضحة.
+preset.advanced.name = متقدّم
+preset.advanced.desc = لاعب نادٍ قوي ذو رؤية تكتيكية جيدة.
+preset.expert.name = خبير
+preset.expert.desc = خبير بطولات: نادرًا ما يخطئ، ويحوّل أفضليته إلى فوز.
+preset.master.name = أستاذ
+preset.master.desc = قوة أستاذ: حساب عميق ولعب تموضعي دقيق.
+preset.grandmaster.name = أستاذ كبير
+preset.grandmaster.desc = مستوى أستاذ كبير: هزيمته صعبة للغاية.
+preset.stockfish_max.name = Stockfish الأقصى
+preset.stockfish_max.desc = Stockfish 16 بكامل قوته. حظًّا موفقًا.
+preset.custom.name = مخصّص
+preset.custom.desc = إعدادات المحرّك الخاصة بك.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = شكر وتقدير
+credits.game.head = SCACELITH
+credits.game = مباراة شطرنج في قاعة ملكية، على محرّك OpenGL 4.6 مطوَّر داخليًا.
+credits.engine.head = محرّك الشطرنج
+credits.engine = Stockfish 16، من تطوير فريق Stockfish.
+credits.engine.licence = رخصة جنو العمومية العامة، الإصدار 3.
+credits.fonts.head = الخطوط
+credits.fonts = EB Garamond لجورج دافنر، وCinzel لناتانايل غاما، وAmiri لخالد حسني.
+credits.fonts.hand = خطوط اليد: Caveat وMarck Script وBad Script وAref Ruqaa وKlee One وLXGW WenKai ‏(SIL Open Font License).
+credits.fonts.figures = رموز الشطرنج من GNU FreeFont ‏(GPL v3 مع استثناء الخطوط).
+credits.quote = «الشطرنج هو فن التحليل.»  — ميخائيل بوتفينيك
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = إيقاف مؤقت
+pause.resume = استئناف
+pause.offer_draw = عرض التعادل
+pause.claim_draw = المطالبة بالتعادل
+pause.claim_draw.help = التكرار الثلاثي أو قاعدة الخمسين نقلة.
+pause.resign = الاستسلام
+confirm.resign.title = الاستسلام
+confirm.resign.text = هل تستسلم في هذه المباراة؟ سيُعلَن خصمك فائزًا.
+confirm.resign.ok = استسلام
+confirm.leave.title = مغادرة المباراة
+confirm.leave.text = هل تعود إلى القائمة الرئيسية؟ ستُلغى المباراة الجارية.
+confirm.leave.ok = مغادرة
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = الترقية إلى
+piece.queen = الوزير
+piece.rook = الرخ
+piece.bishop = الفيل
+piece.knight = الحصان
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = انتهت المباراة بالتعادل.
+gameover.draw_moves = انتهت المباراة بالتعادل بعد {0} نقلة.|انتهت المباراة بالتعادل بعد نقلة واحدة.|انتهت المباراة بالتعادل بعد نقلتين.|انتهت المباراة بالتعادل بعد {0} نقلات.|انتهت المباراة بالتعادل بعد {0} نقلة.|انتهت المباراة بالتعادل بعد {0} نقلة.
+gameover.win = أحسنت — لقد فزت.
+gameover.win_moves = أحسنت — فزت في {0} نقلة.|أحسنت — فزت في نقلة واحدة.|أحسنت — فزت في نقلتين.|أحسنت — فزت في {0} نقلات.|أحسنت — فزت في {0} نقلة.|أحسنت — فزت في {0} نقلة.
+gameover.loss = فاز خصمك.
+gameover.loss_moves = فاز خصمك في {0} نقلة.|فاز خصمك في نقلة واحدة.|فاز خصمك في نقلتين.|فاز خصمك في {0} نقلات.|فاز خصمك في {0} نقلة.|فاز خصمك في {0} نقلة.
+gameover.rematch = مباراة أخرى
+gameover.view_board = عرض الرقعة
+gameover.show = إظهار
+
+# Reasons
+reason.checkmate = كش مات
+reason.resignation = استسلام
+reason.timeout = خسارة بالوقت
+reason.illegal_moves = نقلة غير قانونية ثانية (خسارة)
+reason.stalemate = جمود (باط)
+reason.insufficient = وضع ميت (مادة غير كافية)
+reason.timeout_vs_insufficient = انتهى الوقت، لكن الخصم لا يستطيع الإماتة
+reason.fivefold = التكرار الخماسي
+reason.75_moves = قاعدة الخمس والسبعين نقلة
+reason.threefold_claim = التكرار الثلاثي (بمطالبة)
+reason.50_moves_claim = قاعدة الخمسين نقلة (بمطالبة)
+reason.agreement = تعادل بالاتفاق
+reason.illegal_vs_insufficient = نقلة غير قانونية ثانية، لكن الخصم لا يستطيع الإماتة
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = النقلات
+movelist.empty = لا نقلات بعد.
+
+# ---- Loading -----------------------------------------------------------------------------------
+loading.materials = تحضير المواد
+loading.hall = تشييد القاعة
+loading.furniture = نحت الطاولة والكراسي
+loading.board = صقل الرقعة
+loading.pieces = خراطة القطع
+loading.clock = تركيب الساعة
+loading.porcelain = شيّ الخزف
+loading.ready = جاهز
+
+# ---- Notifications during the game -------------------------------------------------------------
+notify.no_draw_claim = لا يمكن المطالبة بالتعادل في هذا الوضع.
+notify.flag_you = انتهى وقتك.
+notify.flag_opponent = انتهى وقت خصمك.
+notify.touched.pawn = القطعة الملموسة تُلعب: عليك تحريك البيدق الذي لمسته.
+notify.touched.knight = القطعة الملموسة تُلعب: عليك تحريك الحصان الذي لمسته.
+notify.touched.bishop = القطعة الملموسة تُلعب: عليك تحريك الفيل الذي لمسته.
+notify.touched.rook = القطعة الملموسة تُلعب: عليك تحريك الرخ الذي لمسته.
+notify.touched.queen = القطعة الملموسة تُلعب: عليك تحريك الوزير الذي لمسته.
+notify.touched.king = القطعة الملموسة تُلعب: عليك تحريك الملك الذي لمسته.
+notify.touched.piece = القطعة الملموسة تُلعب: عليك تحريك القطعة التي لمستها.
+notify.touched_square = القطعة الملموسة تُلعب: عليك تحريك القطعة التي في {0}.
+notify.press_clock = اضغط على الساعة لإتمام نقلتك (المسافة).
+notify.illegal = نقلة غير قانونية.
+notify.cannot_move = لا يمكن لعب هذه النقلة.
+notify.move_first = العب نقلتك قبل الضغط على الساعة.
+notify.draw_already_offered = لقد عرضت التعادل في هذه النقلة من قبل.
+notify.draw_accepted = يقبل خصمك التعادل.
+notify.draw_declined = يرفض خصمك عرض التعادل.
+notify.draw_claimed = يطالب خصمك بالتعادل.
+
+# ---- Arbiter -----------------------------------------------------------------------------------
+arbiter.join = {0} {1}
+arbiter.no_move = الحكم: ضُغطت الساعة دون لعب أي نقلة، وهذا يُعدّ نقلة غير قانونية.
+arbiter.unpromoted = الحكم: نقلة غير قانونية، لم يُستبدَل البيدق بقطعة جديدة قبل الضغط على الساعة.
+arbiter.illegal = الحكم: نقلة غير قانونية.
+arbiter.second_loses.white = هذه النقلة غير القانونية الثانية للأبيض: يخسر الأبيض المباراة.
+arbiter.second_loses.black = هذه النقلة غير القانونية الثانية للأسود: يخسر الأسود المباراة.
+arbiter.second_draw.white = هذه النقلة غير القانونية الثانية للأبيض، لكن الأسود لا يستطيع الإماتة: المباراة تعادل.
+arbiter.second_draw.black = هذه النقلة غير القانونية الثانية للأسود، لكن الأبيض لا يستطيع الإماتة: المباراة تعادل.
+arbiter.queen = يصبح البيدق وزيرًا.
+arbiter.queen_one_minute.white = يصبح البيدق وزيرًا ويحصل الأبيض على دقيقة إضافية.
+arbiter.queen_one_minute.black = يصبح البيدق وزيرًا ويحصل الأسود على دقيقة إضافية.
+arbiter.queen_two_minutes.white = يصبح البيدق وزيرًا ويحصل الأبيض على دقيقتين إضافيتين.
+arbiter.queen_two_minutes.black = يصبح البيدق وزيرًا ويحصل الأسود على دقيقتين إضافيتين.
+arbiter.restored = يُعاد الوضع السابق.
+arbiter.restored_one_minute.white = يُعاد الوضع السابق ويحصل الأبيض على دقيقة إضافية.
+arbiter.restored_one_minute.black = يُعاد الوضع السابق ويحصل الأسود على دقيقة إضافية.
+arbiter.restored_two_minutes.white = يُعاد الوضع السابق ويحصل الأبيض على دقيقتين إضافيتين.
+arbiter.restored_two_minutes.black = يُعاد الوضع السابق ويحصل الأسود على دقيقتين إضافيتين.
+arbiter.one_minute.white = يحصل الأبيض على دقيقة إضافية.
+arbiter.one_minute.black = يحصل الأسود على دقيقة إضافية.
+arbiter.two_minutes.white = يحصل الأبيض على دقيقتين إضافيتين.
+arbiter.two_minutes.black = يحصل الأسود على دقيقتين إضافيتين.
+arbiter.second_loses = النقلة غير القانونية الثانية تعني خسارة المباراة.
+arbiter.touched.white = على الأبيض تحريك القطعة الملموسة.
+arbiter.touched.black = على الأسود تحريك القطعة الملموسة.
+arbiter.game_over = انتهت المباراة.

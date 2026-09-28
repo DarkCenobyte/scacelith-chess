@@ -1,0 +1,289 @@
+# Scacelith - 简体中文
+# assets/i18n/en.lang 的翻译（相同的键，相同的 {n}）。无复数形式（1 种形式）。
+
+language.name = 简体中文
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = 开
+common.off = 关
+common.back = 返回
+common.apply = 应用
+common.discard = 放弃
+common.cancel = 取消
+common.white = 白方
+common.black = 黑方
+common.main_menu = 主菜单
+number.decimal = .
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = 王者的游戏
+menu.new_game = 新对局
+menu.options = 选项
+menu.credits = 制作人员
+menu.quit = 退出
+menu.version = 版本 {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = 选项
+options.tab.display = 显示
+options.tab.graphics = 图形
+options.tab.audio = 声音
+options.tab.gameplay = 游戏
+options.tab.player = 棋手
+options.tab.controls = 操作
+options.pending = 更改在应用后生效。
+options.unsaved.title = 未应用的更改
+options.unsaved.text = 部分选项已更改。离开前要应用吗？
+
+options.language = 语言
+options.language.help = 菜单和消息的语言，立即生效。
+options.display_mode = 显示模式
+options.fullscreen = 全屏
+options.windowed = 窗口
+options.window_size = 窗口大小
+options.window_size.help = 窗口模式下的窗口大小。全屏始终使用桌面分辨率。
+options.vsync = 垂直同步
+options.vsync.help = 使画面与显示器同步，避免画面撕裂。
+options.render_scale = 渲染比例
+options.render_scale.help = 3D 画面的内部分辨率。越低越快，越高越清晰。
+
+options.quality = 画质
+options.quality.low = 低
+options.quality.medium = 中
+options.quality.high = 高
+options.quality.ultra = 极高
+options.quality.help = 阴影、反射、环境光遮蔽和体积光。
+options.motion_blur = 动态模糊
+options.depth_of_field = 景深
+options.brightness = 亮度
+options.brightness.neutral = 标准
+options.brightness.help = 相机的曝光补偿。
+
+options.master_volume = 总音量
+options.effects = 音效
+options.ambience = 环境音
+options.ambience.help = 大厅里的低语：炉火、远处的脚步声、古老的时钟。
+options.ambience_volume = 环境音音量
+
+options.legal_moves = 显示合法着法
+options.legal_moves.help = 高亮显示所摸棋子可以到达的格子。关闭后，没有任何提示告诉你着法是否合法：一旦按下棋钟，裁判就会处罚违例着法。
+options.coordinates = 棋盘坐标
+options.thinking_time = 真实的思考时间
+options.thinking_time.help = 对手像人类棋手一样思考一段时间，而不是立即走棋。
+options.mouse_sensitivity = 鼠标灵敏度
+options.invert_look = 反转垂直视角
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = 姓名
+player.name.help = 写在记录纸顶部的你的名字，可使用任何文字。
+player.default_name = 人类
+player.handwriting = 笔迹
+player.handwriting.help = 记录你着法的笔迹。阿拉伯文、日文和中文各有专用的手写体。
+player.preview = 你的记录纸
+hand.caveat = 随意
+hand.marck = 连笔
+hand.badscript = 斜体
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = 鼠标左键
+controls.touch = 摸一枚棋子，然后走动它
+controls.clock.keys = 空格键　或　点击棋钟
+controls.clock = 按棋钟
+controls.look.keys = 按住鼠标右键
+controls.look = 环顾四周
+controls.moves.keys = Tab
+controls.moves = 显示或隐藏着法列表
+controls.menu.keys = Esc
+controls.menu = 菜单
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = 新对局
+newgame.opponent = 对手
+newgame.time_control = 用时
+newgame.start = 开始
+newgame.elo = 约 {0} 等级分
+newgame.you_white = 你执白。
+newgame.you_black = 你执黑。
+newgame.colour_lot = 第一局通过抽签决定执白还是执黑。
+newgame.colour_alternate = 之后每局轮换先后手。
+
+# Custom opponent: Stockfish parameters
+engine.skill = 技能等级
+engine.skill.help = Stockfish 的“Skill Level”（0–20）。在按等级分限制棋力时不起作用。
+engine.limit_elo = 限制棋力（等级分）
+engine.limit_elo.help = UCI_LimitStrength：引擎以下方的等级分为目标。
+engine.elo = 等级分
+engine.depth = 搜索深度
+engine.plies = {0} 层
+engine.move_time = 每步用时
+engine.nodes = 节点上限
+engine.no_limit = 不限
+engine.thousand = {0} 千
+engine.million = {0} 百万
+
+# Time controls
+tc.unlimited = 不限时
+tc.no_clock = 不用棋钟
+tc.bullet = 子弹棋
+tc.blitz = 超快棋
+tc.rapid = 快棋
+tc.classical = 慢棋
+tc.custom = 自定义
+tc.your_own = 自行设定
+tc.base_time = 基本用时
+tc.base_time.help = 棋钟每一方的初始时间（分：秒）。
+tc.increment = 加秒
+tc.increment.help = 每走一步后增加的费舍尔加秒。
+tc.delay = 延时
+tc.delay.help = 布朗斯坦延时：每步在延时内用掉的时间会被返还。
+tc.no_delay = 无
+tc.seconds = {0} 秒
+tc.minutes = {0} 分钟
+tc.summary_increment = {0} + {1} 秒
+tc.summary_delay = {0}，延时 {1} 秒
+
+# Opponent presets
+preset.novice.name = 新手
+preset.novice.desc = 刚学会走子：常常白丢棋子，看不出简单的威胁。
+preset.beginner.name = 初学者
+preset.beginner.desc = 懂得基础，但仍经常丢子。
+preset.casual.name = 业余爱好者
+preset.casual.desc = 轻松的对手：着法合理，失误频繁。
+preset.club_player.name = 俱乐部棋手
+preset.club_player.desc = 扎实的俱乐部棋手，会惩罚明显的漏着。
+preset.advanced.name = 高级棋手
+preset.advanced.desc = 强大的俱乐部棋手，战术眼光出色。
+preset.expert.name = 专家
+preset.expert.desc = 比赛高手：很少出错，能把优势转化为胜利。
+preset.master.name = 大师
+preset.master.desc = 大师水平：计算深远，局面感细腻。
+preset.grandmaster.name = 特级大师
+preset.grandmaster.desc = 特级大师水平：极难战胜。
+preset.stockfish_max.name = Stockfish 满级
+preset.stockfish_max.desc = 全力以赴的 Stockfish 16。祝你好运。
+preset.custom.name = 自定义
+preset.custom.desc = 自己设置引擎参数。
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = 制作人员
+credits.game.head = SCACELITH
+credits.game = 在皇家大厅里下一盘国际象棋，运行于自主开发的 OpenGL 4.6 引擎。
+credits.engine.head = 国际象棋引擎
+credits.engine = Stockfish 16，由 Stockfish 开发者制作。
+credits.engine.licence = GNU 通用公共许可证第 3 版。
+credits.fonts.head = 字体
+credits.fonts = EB Garamond（Georg Duffner）、Cinzel（Natanael Gama）、Amiri（Khaled Hosny）。
+credits.fonts.hand = 手写字体：Caveat、Marck Script、Bad Script、Aref Ruqaa、Klee One、霞鹜文楷 LXGW WenKai（SIL Open Font License）。
+credits.fonts.figures = 棋子符号来自 GNU FreeFont（附字体例外条款的 GPL v3）。
+credits.quote = “国际象棋是分析的艺术。” —— 米哈伊尔·博特温尼克
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = 暂停
+pause.resume = 继续
+pause.offer_draw = 提议和棋
+pause.claim_draw = 要求判和
+pause.claim_draw.help = 三次重复局面或五十回合规则。
+pause.resign = 认输
+confirm.resign.title = 认输
+confirm.resign.text = 要认输这盘棋吗？对手将被判为胜方。
+confirm.resign.ok = 认输
+confirm.leave.title = 离开对局
+confirm.leave.text = 返回主菜单吗？当前对局将被放弃。
+confirm.leave.ok = 离开
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = 升变为
+piece.queen = 后
+piece.rook = 车
+piece.bishop = 象
+piece.knight = 马
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = 本局和棋。
+gameover.draw_moves = 第 {0} 回合后和棋。
+gameover.win = 下得好——你赢了。
+gameover.win_moves = 下得好——你在第 {0} 回合获胜。
+gameover.loss = 对手获胜。
+gameover.loss_moves = 对手在第 {0} 回合获胜。
+gameover.rematch = 再下一局
+gameover.view_board = 查看棋盘
+gameover.show = 显示
+
+# Reasons
+reason.checkmate = 将死
+reason.resignation = 认输
+reason.timeout = 超时判负
+reason.illegal_moves = 第二次违例着法（判负）
+reason.stalemate = 逼和
+reason.insufficient = 死局面（子力不足）
+reason.timeout_vs_insufficient = 超时，但对方无法将死
+reason.fivefold = 五次重复局面
+reason.75_moves = 七十五回合规则
+reason.threefold_claim = 三次重复局面（提出要求）
+reason.50_moves_claim = 五十回合规则（提出要求）
+reason.agreement = 协议和棋
+reason.illegal_vs_insufficient = 第二次违例着法，但对方无法将死
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = 着法
+movelist.empty = 尚未走棋。
+
+# ---- Loading -----------------------------------------------------------------------------------
+loading.materials = 准备材料
+loading.hall = 建造大厅
+loading.furniture = 雕刻桌椅
+loading.board = 打磨棋盘
+loading.pieces = 车削棋子
+loading.clock = 组装棋钟
+loading.porcelain = 烧制瓷器
+loading.ready = 就绪
+
+# ---- Notifications during the game -------------------------------------------------------------
+notify.no_draw_claim = 此局面下不能要求判和。
+notify.flag_you = 你的时间已用完。
+notify.flag_opponent = 对手的时间已用完。
+notify.touched.pawn = 摸子走子：你必须走动所摸的兵。
+notify.touched.knight = 摸子走子：你必须走动所摸的马。
+notify.touched.bishop = 摸子走子：你必须走动所摸的象。
+notify.touched.rook = 摸子走子：你必须走动所摸的车。
+notify.touched.queen = 摸子走子：你必须走动所摸的后。
+notify.touched.king = 摸子走子：你必须走动所摸的王。
+notify.touched.piece = 摸子走子：你必须走动所摸的棋子。
+notify.touched_square = 摸子走子：你必须走动 {0} 上的棋子。
+notify.press_clock = 按下棋钟以完成着法（空格键）。
+notify.illegal = 违例着法。
+notify.cannot_move = 不能这样走。
+notify.move_first = 请先走棋，再按棋钟。
+notify.draw_already_offered = 你在这一步已经提议过和棋。
+notify.draw_accepted = 对手同意和棋。
+notify.draw_declined = 对手拒绝了和棋提议。
+notify.draw_claimed = 对手要求判和。
+
+# ---- Arbiter -----------------------------------------------------------------------------------
+arbiter.join = {0}{1}
+arbiter.no_move = 裁判：未走棋就按下了棋钟，视为违例着法。
+arbiter.unpromoted = 裁判：违例着法，按棋钟前兵没有被换成新的棋子。
+arbiter.illegal = 裁判：违例着法。
+arbiter.second_loses.white = 这是白方第二次违例着法：白方输掉本局。
+arbiter.second_loses.black = 这是黑方第二次违例着法：黑方输掉本局。
+arbiter.second_draw.white = 这是白方第二次违例着法，但黑方无法将死：本局和棋。
+arbiter.second_draw.black = 这是黑方第二次违例着法，但白方无法将死：本局和棋。
+arbiter.queen = 兵升变为后。
+arbiter.queen_one_minute.white = 兵升变为后，白方获得一分钟补时。
+arbiter.queen_one_minute.black = 兵升变为后，黑方获得一分钟补时。
+arbiter.queen_two_minutes.white = 兵升变为后，白方获得两分钟补时。
+arbiter.queen_two_minutes.black = 兵升变为后，黑方获得两分钟补时。
+arbiter.restored = 局面已恢复。
+arbiter.restored_one_minute.white = 局面已恢复，白方获得一分钟补时。
+arbiter.restored_one_minute.black = 局面已恢复，黑方获得一分钟补时。
+arbiter.restored_two_minutes.white = 局面已恢复，白方获得两分钟补时。
+arbiter.restored_two_minutes.black = 局面已恢复，黑方获得两分钟补时。
+arbiter.one_minute.white = 白方获得一分钟补时。
+arbiter.one_minute.black = 黑方获得一分钟补时。
+arbiter.two_minutes.white = 白方获得两分钟补时。
+arbiter.two_minutes.black = 黑方获得两分钟补时。
+arbiter.second_loses = 第二次违例着法将判负。
+arbiter.touched.white = 白方必须走动所摸的棋子。
+arbiter.touched.black = 黑方必须走动所摸的棋子。
+arbiter.game_over = 对局已经结束。
