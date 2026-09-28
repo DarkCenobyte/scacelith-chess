@@ -1,12 +1,30 @@
 // Material library: every material of the game, identified by MaterialId. Geometry generators
 // (scene/, character/) tag their parts with a MaterialId; the library (render-materials work
 // package) provides the Material (surface shader + params + baked textures).
+// Surface shaders live in shaders/materials/ (each .glsl documents its params[] and inst[]);
+// procedural textures are baked by compute shaders (shaders/materials/bake/) in init().
 //
 // Per-object variation goes through DrawItem::inst[] (SurfaceInput.instParams) and objectId:
-//   * MarbleWhitePiece / MarbleBlackPiece: inst[0].x = piece seed (unique veins per piece)
+//   * MarbleWhitePiece / MarbleBlackPiece: inst[0].x = piece seed (unique veins per piece; the
+//     veins are volumetric in positionOS, so they stay on the piece when it moves)
 //   * BoardSquareLight / BoardSquareDark: one mesh for all squares of a colour; use uv and
-//     positionOS to vary each square (square index = floor(uv*8), see scene/board.h)
-//   * Tapestry: inst[0].x = 0 royal blue, 1 royal red; inst[0].y = pattern seed
+//     positionOS to vary each square (square index = floor(uv*8), see scene/board.h); every
+//     square is a different slab, hairline joints are drawn at the square edges (55 mm squares)
+//   * BoardFrame: positionOS + objectId (Nero Portoro)
+//   * FloorMarble / FloorMarbleInlay: world space (positionWS.xz, meters, uv ignored); tile grid
+//     in params[4] = (tile size, joint width, grid origin x, grid origin z), default 0.8 m tiles,
+//     1.5 mm joints, origin (0,0) (inlay: 0.4 m). Set planarReflector for mirror reflections.
+//   * WallStone: world-space ashlar (blocks on the dominant plane of the normal), params[5].xyz =
+//     grid origin
+//   * TableWood / TableWoodCarved / ChairWood / WallPanelWood / ClockCase: inst[0].xyz = grain
+//     (log) axis in object space (0 = material default), inst[0].w = seed (0 = objectId)
+//   * Tapestry: inst[0].x = 0 royal blue, 1 royal red; inst[0].y = pattern seed (< 0.5
+//     fleur-de-lis trellis, >= 0.5 damask pomegranate); inst[0].z = extra seed; inst[1].xy =
+//     hanging size in m (0 = 2.4 x 3.6); uv spans [0,1] over the whole hanging (v up)
+//   * CeilingPainted: one coffer per uv unit (fract(uv)); the border is painted in the panel
+//   * WindowGlass: inst[0].xy = panes across u / v (dust gathers at each pane bottom; 0 = 1 x 1)
+//   * CandleWax: params[3].x = top of the candle (object space y); params[2] = flame glow
+//     (rgb nits, falloff m), 0 = unlit
 //   * ClockDisplay: inst[0] = (white ms, black ms, flags, running side) see scene/clock_model.h
 //   * RobotEyeIris: inst[0].x = pupil dilation [0,1]
 #pragma once
