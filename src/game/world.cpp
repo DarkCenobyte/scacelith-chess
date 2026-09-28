@@ -224,7 +224,9 @@ void World::submitClock(render::Renderer& r, const ClockDisplay& cd) {
     Impl& w = *impl_;
     mat4 ct = clockTransform();
     vec4 inst[4] = {};
-    inst[0] = clockDisplayParams(cd.ms[0], cd.ms[1], cd.running, cd.flagged[0], cd.flagged[1], cd.unlimited, cd.paused);
+    uint32_t flags = (cd.unlimited ? CLOCK_FLAG_UNLIMITED : 0u) | (cd.flagged[0] ? CLOCK_FLAG_FALLEN_0 : 0u) |
+                     (cd.flagged[1] ? CLOCK_FLAG_FALLEN_1 : 0u) | (cd.paused ? CLOCK_FLAG_PAUSED : 0u);
+    inst[0] = clockDisplayState(cd.ms[0], cd.ms[1], flags, cd.running);
     for (auto& p : w.clockBody.parts) {
         render::DrawItem d;
         d.mesh = &p.mesh;
