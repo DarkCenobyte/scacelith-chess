@@ -116,6 +116,21 @@ struct Event {
 // ---- Writing hand ------------------------------------------------------------------------------
 // The hand that does not play (the one on the scoresheet side) runs its own task queue, at the same
 // time as the playing hand: writing never delays a move or a clock press.
+// Protocol (all positions in world space):
+//   game start : PickPen(frame of the pen lying beside the pad)
+//   each move  : setWritingRest(start of the next row), Write(path of the move's text)
+//   page full  : TurnPage(pageCorner), then write on the fresh page
+//   game end   : PutPen(frame), wait for WritingQueueEmpty, then the Handshake
+// Write and TurnPage expect the pen in the hand (PickPen first). Event instants: PenPicked 0.36 s
+// and PenPut 0.34 s after their task starts (scaled with a custom duration), PenDown / PenUp /
+// WritingDone at the path key times + WriteApproach, PageGripped / PageTurned at 0.33 / 0.90 of the
+// TurnPage duration. The pageCorner callback is called during the whole task, keep it valid.
+// Left-handed player (init with Side::Left): the right hand writes, and the handshake needs it: a
+// running writing task is cut short when the handshake starts (its remaining path / page events
+// fire at once), a held pen is laid down first (at the frame of the next queued PutPen, which is
+// then dropped, or where it was picked up; PenPut fires as usual) and the queued writing tasks
+// wait for the end of the handshake. Its rest (setRestHand) is on the clock side as well.
+// Idle: the writing hand never goes to the chin while it holds the pen or has work queued.
 struct PenKey {
     float t = 0.0f;           // seconds from the start of the path (increasing)
     m::vec3 tip{0, 0, 0};     // pen tip, world (on the paper surface while down)
@@ -144,6 +159,18 @@ struct WriteTask {
 
 // Duration the animator will use for a writing-hand task.
 float writeTaskDuration(const WriteTask& t);
+// Page flip progress s for a TurnPage task's time fraction u in [0,1] (what pageTurnProgress()
+// returns): 0 until the corner is pinched (u = 0.33, PageGripped), lifted briskly past the vertical
+// until the hand lets go (u = 0.70, s = 0.60), then the page falls over by itself and lies flipped
+// at u = 0.90 (PageTurned). Monotone, continuous, smooth apart from the pinch instant.
+float pageTurnEase(float u);
+// The pen tip curve through a path's keys at time t (seconds from the path start), exactly as the
+// hand follows it: Catmull-Rom through the keys in the paper plane; while down the height is
+// interpolated linearly between the keys, while up it leaves and reaches the paper with no
+// vertical speed and never dips below the lower key. Clamped to the first / last key. The
+// scoresheet can use it to lay the ink where the tip really went.
+m::vec3 penPathPoint(const std::vector<PenKey>& path, float t);
+bool penPathDown(const std::vector<PenKey>& path, float t);   // tip on the paper at time t
 
 class Animator {
 public:
@@ -198,6 +225,8 @@ public:
     void enqueueWriting(const WriteTask& t);
     void enqueueWriting(const std::vector<WriteTask>& tasks);
     bool writingBusy() const;                            // writing-hand tasks pending or running
+    void clearWritingQueue();                            // drops pending writing tasks (running one finishes)
+    float writingRemainingTime() const;                  // running writing task remainder + pending durations
     // Time along the running Write path in seconds (-1 when no path is being followed): the ink
     // is laid down wherever the tip has been with down = true up to this time.
     float writingPathTime() const;
