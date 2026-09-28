@@ -1,0 +1,73 @@
+// Volumetric sun shafts: half-resolution raymarch of the dusty air through the sun shadow
+// cascades. Henyey-Greenstein single scattering, energy-conserving step integration (Hillaire
+// 2015), slowly drifting tiling 3D dust density, blue-noise start offset (integrated by the
+// temporal pass). Output: rgb = pre-exposed in-scattered radiance, a = transmittance.
+#include "shaders/post/post_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uHalfDepth;
+layout(binding = 5) uniform sampler2DArrayShadow uShadow;  // compare sampler (LEQUAL), standard depth
+layout(binding = 6) uniform sampler3D uDust;
+layout(binding = 0, rgba16f) uniform writeonly image2D oVol;
+
+float sunVisibility(vec3 p) {
+    int n = int(frame.shadowParams.x);
+    for (int c = 0; c < n; ++c) {
+        vec3 s = (frame.shadowMatrix[c] * vec4(p, 1.0)).xyz;
+        if (all(greaterThan(s.xy, vec2(0.005))) && all(lessThan(s.xy, vec2(0.995))) && s.z > 0.0 && s.z < 1.0)
+            return texture(uShadow, vec4(s.xy, float(c), s.z - 0.0002));
+    }
+    return 1.0;
+}
+
+float dustDensity(vec3 p) {
+    float t = post.timing.z;
+    vec3 drift = post.volC.xyz * t;
+    float f = post.volC.w;
+    float a = textureLod(uDust, (p - drift) * f, 0.0).r;
+    float b = textureLod(uDust, (p - drift * 1.7) * (f * 3.7) + vec3(0.31, 0.77, 0.13), 0.0).r;
+    float n = a * 0.7 + b * 0.3;
+    float v = 1.0 + post.volB.y * (n - 0.5) * 2.4;
+    return max(v, 0.0) * exp(-max(p.y, 0.0) * 0.04);
+}
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    if (any(greaterThanEqual(p, ivec2(post.halfSize.xy)))) return;
+    vec2 uv = (vec2(p) + 0.5) * post.halfSize.zw;
+    float z = texelFetch(uHalfDepth, p, 0).r;
+    vec3 pv = viewPosFromLinear(uv, 1.0);
+    bool sky = z >= SKY_DEPTH * 0.5;
+    float rayLen = sky ? post.misc.z : min(z * length(pv), post.vol.w);
+    vec3 dir = normalize(mat3(frame.invView) * pv);
+    vec3 cam = frame.cameraPos.xyz;
+    int steps = int(post.volB.x);
+    float jitter = blueNoise(p, 5);
+    float sigmaS = post.vol.x;
+    float extRatio = 1.0 / 0.92;  // dust single-scattering albedo
+    float phase = phaseHG(dot(dir, frame.sunDirection.xyz), post.vol.y);
+    vec3 sunL = frame.sunRadiance.rgb * phase;
+    vec3 ambL = 0.5 * (frame.ambientSky.rgb + frame.ambientGround.rgb) * post.vol.z;
+    // Slightly denser sampling close to the camera (t = u^1.4).
+    vec3 L = vec3(0.0);
+    float T = 1.0;
+    float prevT = 0.0;
+    for (int i = 0; i < steps; ++i) {
+        float u = (float(i) + jitter) / float(steps);
+        float tt = rayLen * pow(u, 1.4);
+        float uNext = (float(i) + 1.0) / float(steps);
+        float segEnd = rayLen * pow(uNext, 1.4);
+        float dt = segEnd - prevT;
+        prevT = segEnd;
+        vec3 pos = cam + dir * tt;
+        float dens = sigmaS * dustDensity(pos);
+        if (dens <= 0.0) continue;
+        float vis = sunVisibility(pos);
+        vec3 S = dens * (sunL * vis + ambL);
+        float ext = dens * extRatio;
+        float tr = exp(-ext * dt);
+        L += T * S * (1.0 - tr) / ext;
+        T *= tr;
+    }
+    if (badValue(L) || isnan(T)) { L = vec3(0.0); T = 1.0; }
+    imageStore(oVol, p, vec4(L, T));
+}

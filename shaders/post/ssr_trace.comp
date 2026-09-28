@@ -1,0 +1,159 @@
+// Stochastic screen-space reflections, trace pass (half resolution, one ray per 2x2 quad; the
+// traced pixel of the quad rotates every frame). Directions are GGX VNDF samples (Heitz 2018)
+// with a BRDF bias; rays are marched in screen space (xy in pixels, reverse-Z depth, both linear
+// along the projected ray) through the min/max HiZ pyramid: cells entirely in front of the closest
+// surface or entirely behind the farthest (thick) surface are skipped at the coarsest level.
+#include "shaders/post/post_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uDepth;
+layout(binding = 1) uniform sampler2D uNormalRough;
+layout(binding = 2) uniform sampler2D uSpecular;
+layout(binding = 3) uniform sampler2D uHiZ;
+layout(binding = 0, rgba32f) uniform writeonly image2D oRay;  // xy hit uv, z pdf (-1 = not an SSR pixel), w confidence
+
+const ivec2 kQuad[4] = ivec2[](ivec2(0, 0), ivec2(1, 1), ivec2(1, 0), ivec2(0, 1));
+
+vec3 sampleGGXVNDF(vec3 Ve, float alpha, vec2 u) {
+    vec3 Vh = normalize(vec3(alpha * Ve.x, alpha * Ve.y, Ve.z));
+    float lensq = Vh.x * Vh.x + Vh.y * Vh.y;
+    vec3 T1 = lensq > 0.0 ? vec3(-Vh.y, Vh.x, 0.0) * inversesqrt(lensq) : vec3(1.0, 0.0, 0.0);
+    vec3 T2 = cross(Vh, T1);
+    float r = sqrt(u.x), phi = TAU * u.y;
+    float t1 = r * cos(phi), t2 = r * sin(phi);
+    float s = 0.5 * (1.0 + Vh.z);
+    t2 = (1.0 - s) * sqrt(max(1.0 - t1 * t1, 0.0)) + s * t2;
+    vec3 Nh = t1 * T1 + t2 * T2 + sqrt(max(0.0, 1.0 - t1 * t1 - t2 * t2)) * Vh;
+    return normalize(vec3(alpha * Nh.x, alpha * Nh.y, max(0.0, Nh.z)));
+}
+
+vec3 projectToScreen(vec3 pv) {
+    vec4 c = frame.proj * vec4(pv, 1.0);
+    vec3 ndc = c.xyz / c.w;
+    return vec3((ndc.xy * 0.5 + 0.5) * post.renderSize.xy, ndc.z);
+}
+
+void main() {
+    ivec2 hp = ivec2(gl_GlobalInvocationID.xy);
+    if (any(greaterThanEqual(hp, ivec2(post.halfSize.xy)))) return;
+    int idx = (int(post.timing.y) + (hp.x & 1) + 2 * (hp.y & 1)) & 3;
+    ivec2 fp = min(hp * 2 + kQuad[idx], ivec2(post.renderSize.xy) - 1);
+    vec4 spec = texelFetch(uSpecular, fp, 0);
+    float d = texelFetch(uDepth, fp, 0).r;
+    vec4 nr = texelFetch(uNormalRough, fp, 0);
+    float rough = nr.w;
+    if (spec.a < 0.5 || !(d > 0.0 && d <= 1.0) || rough > post.ssr.x || dot(nr.xyz, nr.xyz) < 1e-4) {
+        imageStore(oRay, hp, vec4(0.0, 0.0, -1.0, 0.0));
+        return;
+    }
+    vec2 uv = (vec2(fp) + 0.5) * post.renderSize.zw;
+    float z = linearFromRaw(d);
+    vec3 P = viewPosFromLinear(uv, z);
+    vec3 N = normalize(mat3(frame.view) * nr.xyz);
+    vec3 V = normalize(-P);
+    float NoV = dot(N, V);
+    if (NoV < 1e-3) { N = normalize(N + V * (1e-3 - NoV)); NoV = 1e-3; }
+
+    // Importance-sample the visible normals (tangent frame around N).
+    float alpha = max(rough * rough, 1e-3);
+    vec3 tx = normalize(abs(N.z) < 0.999 ? cross(vec3(0, 0, 1), N) : vec3(1, 0, 0));
+    vec3 ty = cross(N, tx);
+    vec3 Vt = vec3(dot(V, tx), dot(V, ty), NoV);
+    vec2 u = vec2(blueNoise(hp, 2), blueNoise(hp, 3));
+    u.x *= 1.0 - post.ssrB.w;  // BRDF bias: trim the long tail (less noise, slightly sharper)
+    vec3 Ht = rough < 0.03 ? vec3(0, 0, 1) : sampleGGXVNDF(Vt, alpha, u);
+    vec3 H = tx * Ht.x + ty * Ht.y + N * Ht.z;
+    vec3 L = reflect(-V, H);
+    if (dot(L, N) <= 0.02) { H = N; L = reflect(-V, N); }
+    float NoH = saturate(dot(N, H));
+    float a2 = alpha * alpha;
+    float dd = NoH * NoH * (a2 - 1.0) + 1.0;
+    float D = a2 / (PI * dd * dd);
+    float G1 = 2.0 * NoV / (NoV + sqrt(a2 + (1.0 - a2) * NoV * NoV));
+    float pdf = rough < 0.03 ? 1e4 : G1 * D / (4.0 * NoV);
+
+    // Ray setup in view space, clipped to the near plane.
+    vec3 P0 = P + N * (z * 0.0015);
+    float len = 30.0;
+    float nearZ = frame.exposure.z;
+    if (L.z > 1e-4) len = min(len, (-nearZ * 1.5 - P0.z) / L.z);
+    if (len <= 1e-3) { imageStore(oRay, hp, vec4(0.0, 0.0, pdf, 0.0)); return; }
+    vec3 S0 = projectToScreen(P0);
+    vec3 S1 = projectToScreen(P0 + L * len);
+    vec3 Dv = S1 - S0;
+    float lenPx = length(Dv.xy);
+    if (lenPx < 1.0) { imageStore(oRay, hp, vec4(0.0, 0.0, pdf, 0.0)); return; }
+    // Clip against the screen rectangle.
+    float tMax = 1.0;
+    vec2 wh = post.renderSize.xy;
+    if (Dv.x > 0.0) tMax = min(tMax, (wh.x - 0.5 - S0.x) / Dv.x); else if (Dv.x < 0.0) tMax = min(tMax, (0.5 - S0.x) / Dv.x);
+    if (Dv.y > 0.0) tMax = min(tMax, (wh.y - 0.5 - S0.y) / Dv.y); else if (Dv.y < 0.0) tMax = min(tMax, (0.5 - S0.y) / Dv.y);
+    bool clippedByScreen = tMax < 1.0;
+    vec2 invD = vec2(abs(Dv.x) > 1e-6 ? 1.0 / Dv.x : 1e12, abs(Dv.y) > 1e-6 ? 1.0 / Dv.y : 1e12);
+    float tEps = 0.02 / max(abs(Dv.x), abs(Dv.y));
+
+    float t = min(1.25 / max(abs(Dv.x), abs(Dv.y)) * (1.0 + blueNoise(hp, 4)), tMax);
+    int level = 0;
+    int maxLevel = int(post.ssrB.y);
+    int maxIter = int(post.ssr.w);
+    float thick = post.ssr.y;
+    ivec2 size0 = ivec2(post.renderSize.xy);
+    bool hit = false;
+    for (int i = 0; i < maxIter; ++i) {
+        vec3 S = S0 + Dv * t;
+        float cs = float(1 << level);
+        // Mip size computed arithmetically: textureSize() with a per-invocation lod is not reliable
+        // on every driver (llvmpipe returns the size of another lane's level). Rays over the extra
+        // column/row of odd-sized levels clamp onto the last texel, which hiz_build made cover it.
+        ivec2 lsize = max(size0 >> level, ivec2(1));
+        vec2 cell = floor(S.xy / cs);
+        vec2 hz = texelFetch(uHiZ, clamp(ivec2(cell), ivec2(0), lsize - 1), level).rg;
+        // Exit through the nearest cell boundary, nudged 0.002 px (per axis, not in t) into the
+        // next cell so the crossing is exact even for nearly axis-aligned rays.
+        vec2 bnd = (cell + step(vec2(0.0), Dv.xy)) * cs + sign(Dv.xy) * 0.002;
+        vec2 tb = (bnd - S0.xy) * invD;
+        tb = mix(tb, vec2(1e12), lessThan(abs(Dv.xy), vec2(1e-6)));
+        float tExit = min(max(min(tb.x, tb.y), t + tEps), tMax);
+        float dA = S.z, dB = S0.z + Dv.z * tExit;
+        float segFar = min(dA, dB), segClose = max(dA, dB);
+        bool skip = segFar > hz.r;  // whole segment in front of the closest surface
+        if (!skip && hz.g > 0.0) {
+            float behind = rawFromLinear(linearFromRaw(hz.g) * (1.0 + thick) + 0.01);
+            skip = segClose < behind;  // whole segment behind the thickened farthest surface
+        }
+        if (skip) {
+            t = tExit;
+            if (t >= tMax) break;
+            level = min(level + 1, maxLevel);
+            continue;
+        }
+        if (level == 0) {
+            if (abs(Dv.z) > 1e-12) {
+                float th = (hz.r - S0.z) / Dv.z;
+                if (th > t && th < tExit) t = th;
+            }
+            hit = true;
+            break;
+        }
+        // Descend; a ray moving away from the camera can first advance to the cell's closest plane.
+        if (Dv.z < 0.0) {
+            float th = (hz.r - S0.z) / Dv.z;
+            if (th > t) t = min(th, tExit);
+        }
+        --level;
+    }
+    if (!hit) { imageStore(oRay, hp, vec4(0.0, 0.0, pdf, 0.0)); return; }
+
+    vec3 S = S0 + Dv * t;
+    vec2 huv = S.xy * post.renderSize.zw;
+    ivec2 hpx = clamp(ivec2(S.xy), ivec2(0), ivec2(post.renderSize.xy) - 1);
+    vec3 hn = texelFetch(uNormalRough, hpx, 0).xyz;
+    vec3 Lw = mat3(frame.invView) * L;
+    float conf = 1.0;
+    if (dot(hn, hn) > 1e-4 && dot(normalize(hn), Lw) > 0.2) conf = 0.0;  // back face of something
+    vec2 edge = min(huv, 1.0 - huv) / post.ssrB.x;
+    conf *= smoothstep(0.0, 1.0, saturate(min(edge.x, edge.y)));
+    if (!clippedByScreen) conf *= 1.0 - smoothstep(0.75, 1.0, t);
+    conf *= 1.0 - smoothstep(0.55, 0.95, L.z);  // rays towards the camera mostly see unknown back sides
+    conf *= 1.0 - smoothstep(post.ssr.x * 0.65, post.ssr.x, rough);
+    imageStore(oRay, hp, vec4(huv, pdf, conf));
+}

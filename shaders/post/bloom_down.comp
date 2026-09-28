@@ -1,0 +1,35 @@
+// Bloom downsample (Jimenez 2014, CoD:AW): 13-tap filter made of five overlapping 2x2 box
+// groups. The first level uses the Karis average (each group weighted by 1/(1+luma)) so single
+// bright pixels cannot flicker into large bloom blobs.
+#include "shaders/post/post_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uSrc;
+layout(binding = 0, rgba16f) uniform writeonly image2D oDst;
+layout(location = 1) uniform int uSrcLod;
+layout(location = 2) uniform int uKaris;
+
+vec3 s(vec2 uv, vec2 o, vec2 texel) { return textureLod(uSrc, uv + o * texel, float(uSrcLod)).rgb; }
+float kw(vec3 c) { return 1.0 / (1.0 + luminance(c)); }
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 dsize = imageSize(oDst);
+    if (any(greaterThanEqual(p, dsize))) return;
+    vec2 uv = (vec2(p) + 0.5) / vec2(dsize);
+    vec2 texel = 1.0 / vec2(textureSize(uSrc, uSrcLod));
+    vec3 a = s(uv, vec2(-2, -2), texel), b = s(uv, vec2(0, -2), texel), c = s(uv, vec2(2, -2), texel);
+    vec3 d = s(uv, vec2(-1, -1), texel), e = s(uv, vec2(1, -1), texel);
+    vec3 f = s(uv, vec2(-2, 0), texel), g = s(uv, vec2(0, 0), texel), h = s(uv, vec2(2, 0), texel);
+    vec3 i = s(uv, vec2(-1, 1), texel), j = s(uv, vec2(1, 1), texel);
+    vec3 k = s(uv, vec2(-2, 2), texel), l = s(uv, vec2(0, 2), texel), m = s(uv, vec2(2, 2), texel);
+    vec3 g0 = (d + e + i + j) * 0.25;
+    vec3 g1 = (a + b + f + g) * 0.25, g2 = (b + c + g + h) * 0.25, g3 = (f + g + k + l) * 0.25, g4 = (g + h + l + m) * 0.25;
+    vec3 r;
+    if (uKaris != 0) {
+        float w0 = 0.5 * kw(g0), w1 = 0.125 * kw(g1), w2 = 0.125 * kw(g2), w3 = 0.125 * kw(g3), w4 = 0.125 * kw(g4);
+        r = (g0 * w0 + g1 * w1 + g2 * w2 + g3 * w3 + g4 * w4) / (w0 + w1 + w2 + w3 + w4);
+    } else {
+        r = g0 * 0.5 + (g1 + g2 + g3 + g4) * 0.125;
+    }
+    imageStore(oDst, p, vec4(sanitize(r), 1.0));
+}

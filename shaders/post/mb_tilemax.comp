@@ -1,0 +1,31 @@
+// Motion blur tile max: one work group per K x K tile, the blur vector of largest magnitude.
+#include "shaders/post/post_common.glsl"
+#include "shaders/post/mb_common.glsl"
+layout(local_size_x = 16, local_size_y = 16) in;
+layout(binding = 0) uniform sampler2D uVelocity;
+layout(binding = 0, rg16f) uniform writeonly image2D oTiles;
+shared vec3 sBest[256];
+
+void main() {
+    int K = int(post.mb.w);
+    ivec2 tile = ivec2(gl_WorkGroupID.xy);
+    ivec2 lid = ivec2(gl_LocalInvocationID.xy);
+    ivec2 size = ivec2(post.renderSize.xy);
+    vec3 best = vec3(0.0);
+    for (int j = lid.y; j < K; j += 16)
+        for (int i = lid.x; i < K; i += 16) {
+            ivec2 px = tile * K + ivec2(i, j);
+            if (any(greaterThanEqual(px, size))) continue;
+            vec2 v = blurVector(texelFetch(uVelocity, px, 0).xy);
+            float l = dot(v, v);
+            if (l > best.z) best = vec3(v, l);
+        }
+    uint idx = gl_LocalInvocationIndex;
+    sBest[idx] = best;
+    barrier();
+    for (uint s = 128u; s > 0u; s >>= 1u) {
+        if (idx < s && sBest[idx + s].z > sBest[idx].z) sBest[idx] = sBest[idx + s];
+        barrier();
+    }
+    if (idx == 0u) imageStore(oTiles, tile, vec4(sBest[0].xy, 0.0, 0.0));
+}

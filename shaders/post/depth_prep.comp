@@ -1,0 +1,16 @@
+// Full-resolution depth preparation: positive linear view depth (R32F, sky = SKY_DEPTH) and
+// level 0 of the HiZ pyramid (RG32F: r = closest raw depth (max, reverse-Z), g = farthest (min)).
+#include "shaders/post/post_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uDepth;
+layout(binding = 0, r32f) uniform writeonly image2D oLinear;
+layout(binding = 1, rg32f) uniform writeonly image2D oHiZ;
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    if (any(greaterThanEqual(p, ivec2(post.renderSize.xy)))) return;
+    float d = texelFetch(uDepth, p, 0).r;
+    if (!(d >= 0.0 && d <= 1.0)) d = 0.0;  // NaN guard
+    imageStore(oLinear, p, vec4(d > 0.0 ? linearFromRaw(d) : SKY_DEPTH));
+    imageStore(oHiZ, p, vec4(d, d, 0.0, 0.0));
+}

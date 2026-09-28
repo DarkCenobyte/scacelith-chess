@@ -1,0 +1,95 @@
+// Ground-truth ambient occlusion (Jimenez et al. 2016) at half resolution.
+// Per pixel: aoB.x slices, each marching aoB.y steps on both sides of the pixel to find the two
+// horizon angles, then the cosine-weighted visibility integral against the projected normal and
+// the per-slice bent normal. Slice angle and step offsets use animated blue noise; the temporal
+// pass integrates them over frames.
+#include "shaders/post/post_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uHalfDepth;
+layout(binding = 1) uniform sampler2D uHalfNormal;
+layout(binding = 0, rgba16f) uniform writeonly image2D oAO;  // r = visibility, gba = bent normal (world)
+
+float fastAcos(float x) {
+    float a = abs(x);
+    float r = (-0.156583 * a + PI * 0.5) * sqrt(max(1.0 - a, 0.0));
+    return x >= 0.0 ? r : PI - r;
+}
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 hsize = ivec2(post.halfSize.xy);
+    if (any(greaterThanEqual(p, hsize))) return;
+    float z = texelFetch(uHalfDepth, p, 0).r;
+    vec3 Nw = texelFetch(uHalfNormal, p, 0).xyz * 2.0 - 1.0;
+    if (z >= SKY_DEPTH * 0.5) { imageStore(oAO, p, vec4(1.0, Nw)); return; }
+    vec2 uv = (vec2(p) + 0.5) * post.halfSize.zw;
+    vec3 P = viewPosFromLinear(uv, z);
+    vec3 V = normalize(-P);
+    vec3 N = normalize(mat3(frame.view) * Nw);
+    // Nudge the origin along the normal to avoid self-occlusion from depth quantisation.
+    P += N * (z * 0.002);
+
+    float radius = post.ao.x;
+    float radiusPx = radius * frame.proj[1][1] / z * 0.5 * post.halfSize.y;
+    if (radiusPx < 1.5) { imageStore(oAO, p, vec4(1.0, Nw)); return; }
+    radiusPx = min(radiusPx, post.ao.z);
+    int slices = int(post.aoB.x), steps = int(post.aoB.y);
+    float falloffMul = 1.0 / max(radius * post.aoB.z, 1e-4);
+    float falloffAdd = 1.0 + (1.0 - post.aoB.z) * radius * falloffMul;  // weight = saturate(dist * -mul + add): 1 until (1-f)R, 0 at R
+
+    float n0 = blueNoise(p, 0), n1 = blueNoise(p, 1);
+    float visibility = 0.0;
+    vec3 bent = vec3(0.0);
+    for (int s = 0; s < slices; ++s) {
+        float phi = (float(s) + n0) / float(slices) * PI;
+        vec2 omega = vec2(cos(phi), sin(phi));
+        vec3 dir = vec3(omega, 0.0);
+        vec3 T = dir - V * dot(dir, V);
+        T = normalize(T);
+        vec3 axis = normalize(cross(T, V));
+        vec3 Np = N - axis * dot(N, axis);
+        float lenNp = max(length(Np), 1e-4);
+        float cosN = clamp(dot(Np, V) / lenNp, -1.0, 1.0);
+        float n = (dot(Np, T) >= 0.0 ? 1.0 : -1.0) * fastAcos(cosN);
+        float sinN = sin(n);
+        float lowPlus = -sinN;   // cos(n + pi/2)
+        float lowMinus = sinN;   // cos(n - pi/2)
+        float cPlus = lowPlus, cMinus = lowMinus;
+        for (int k = 0; k < steps; ++k) {
+            float t = (float(k) + fract(n1 + float(s) * 0.37)) / float(steps);
+            float spx = 1.0 + t * t * (radiusPx - 1.0);
+            vec2 off = omega * spx * post.halfSize.zw;
+            for (int side = 0; side < 2; ++side) {
+                vec2 suv = side == 0 ? uv + off : uv - off;
+                if (any(lessThan(suv, vec2(0.0))) || any(greaterThanEqual(suv, vec2(1.0)))) continue;
+                ivec2 sp = ivec2(suv * post.halfSize.xy);
+                float sz = texelFetch(uHalfDepth, sp, 0).r;
+                if (sz >= SKY_DEPTH * 0.5) continue;
+                vec3 S = viewPosFromLinear((vec2(sp) + 0.5) * post.halfSize.zw, sz);
+                vec3 d = S - P;
+                float len = length(d);
+                float c = dot(d, V) / max(len, 1e-5);
+                float w = saturate(len * -falloffMul + falloffAdd);
+                if (side == 0) cPlus = max(cPlus, mix(lowPlus, c, w));
+                else cMinus = max(cMinus, mix(lowMinus, c, w));
+            }
+        }
+        float h1 = fastAcos(clamp(cPlus, -1.0, 1.0));
+        float h0 = -fastAcos(clamp(cMinus, -1.0, 1.0));
+        h0 = n + max(h0 - n, -PI * 0.5);
+        h1 = n + min(h1 - n, PI * 0.5);
+        float iarc0 = (cosN + 2.0 * h0 * sinN - cos(2.0 * h0 - n)) * 0.25;
+        float iarc1 = (cosN + 2.0 * h1 * sinN - cos(2.0 * h1 - n)) * 0.25;
+        visibility += lenNp * (iarc0 + iarc1);
+        float t0 = (6.0 * sin(h0 - n) - sin(3.0 * h0 - n) + 6.0 * sin(h1 - n) - sin(3.0 * h1 - n) + 16.0 * sinN -
+                    3.0 * (sin(h0 + n) + sin(h1 + n))) / 12.0;
+        float t1 = (-cos(3.0 * h0 - n) - cos(3.0 * h1 - n) + 8.0 * cosN - 3.0 * (cos(h0 + n) + cos(h1 + n))) / 12.0;
+        bent += (T * t0 + V * t1) * lenNp;
+    }
+    visibility = saturate(visibility / float(slices));
+    vec3 bentW = mat3(frame.invView) * bent;
+    float lb = length(bentW);
+    bentW = lb > 1e-5 ? bentW / lb : Nw;
+    if (badValue(bentW) || isnan(visibility)) { visibility = 1.0; bentW = Nw; }
+    imageStore(oAO, p, vec4(visibility, bentW));
+}
