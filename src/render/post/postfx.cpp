@@ -53,7 +53,7 @@ struct PostFX::Impl {
     int w = 0, h = 0, hw = 0, hh = 0;
     int mbTile = 16;
     gpu::Buffer ubo, histogram;
-    gpu::Texture blueNoise, dust, aoWhite, exposure;
+    gpu::Texture blueNoise, dust, aoWhite, ssrNone, exposure;
     gpu::Texture linDepth[2], halfDepth[2], halfNormal, hiz;
     gpu::Texture aoRaw, aoHist[2], aoOut;
     gpu::Texture colorPyr, ssrRays, ssrResolved, ssrHist[2];
@@ -101,6 +101,10 @@ bool PostFX::init() {
     I.aoWhite = gpu::createTexture2D(1, 1, GL_RGBA8);
     const unsigned char white[4] = {255, 128, 128, 128};
     glTextureSubImage2D(I.aoWhite.id, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, white);
+    // Bound on TEXUNIT_SSR while no SSR history exists: zero confidence.
+    I.ssrNone = gpu::createTexture2D(1, 1, GL_RGBA16F);
+    const float none[4] = {0, 0, 0, 0};
+    glTextureSubImage2D(I.ssrNone.id, 0, 0, 0, 1, 1, GL_RGBA, GL_FLOAT, none);
 
     std::vector<uint16_t> bn = postnoise::blueNoise(64);
     I.blueNoise = gpu::createTexture2D(64, 64, GL_R16);
@@ -136,7 +140,7 @@ void PostFX::shutdown() {
     if (!impl_) return;
     Impl& I = *impl_;
     I.destroyTargets();
-    for (gpu::Texture* t : {&I.blueNoise, &I.dust, &I.aoWhite, &I.exposure}) t->destroy();
+    for (gpu::Texture* t : {&I.blueNoise, &I.dust, &I.aoWhite, &I.ssrNone, &I.exposure}) t->destroy();
     I.ubo.destroy();
     I.histogram.destroy();
     if (I.shadowSampler) glDeleteSamplers(1, &I.shadowSampler);
@@ -397,7 +401,7 @@ void PostFX::computeAO(const PostInputs& in) {
     // Units 0..7 are material units: leave them clean for the forward pass.
     for (int u = 0; u < 8; ++u) bindTex(u, 0);
     bindTex(TEXUNIT_AO, settings.ssao && I.aoValid ? I.aoOut.id : I.aoWhite.id);
-    if (I.ssrValid) bindTex(TEXUNIT_SSR, I.ssrHist[I.cur ^ 1].id);
+    bindTex(TEXUNIT_SSR, settings.ssr && I.ssrValid ? I.ssrHist[I.cur ^ 1].id : I.ssrNone.id);
     glUseProgram(0);
 }
 

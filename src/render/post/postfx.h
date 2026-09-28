@@ -59,7 +59,7 @@ struct PostSettings {
     float ssrIntensity = 1.0f;
     float ssrMaxRoughness = 0.6f;       // fades out towards this roughness
     float ssrThickness = 0.035f;        // assumed object thickness, relative to view depth
-    bool ssrCompositeInResolve = true;  // false when the forward pass consumes TEXUNIT_SSR itself
+    bool ssrCompositeInResolve = false; // the forward pass consumes TEXUNIT_SSR (lighting.glsl)
     // Volumetric sun shafts
     float volumetricDensity = 0.007f;    // scattering coefficient of the dusty air (1/m)
     float volumetricAnisotropy = 0.6f;  // Henyey-Greenstein g

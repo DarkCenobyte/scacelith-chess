@@ -21,6 +21,10 @@ layout(binding = 9) uniform sampler2DArray uShadowDepth;
 layout(binding = 11) uniform samplerCubeArray uSpecularProbes;
 layout(binding = 12) uniform sampler2D uAO;
 layout(binding = 13) uniform sampler2DArray uPlanar;
+#ifdef PASS_MAIN
+// Previous frame's filtered screen-space reflections (render-post): rgb radiance, a = confidence.
+layout(binding = 15) uniform sampler2D uSSRHistory;
+#endif
 layout(binding = 14) uniform sampler2D uBrdfLut;
 
 // ------------------------------------------------------------------------------------------------
@@ -432,6 +436,18 @@ vec3 indirectSpecular(ProbeBlend pb, SurfaceInput i, vec3 N, vec3 R, float rough
     if (planarLayer >= 0.0 && frame.passInfo.w > planarLayer) {
         vec4 pl = samplePlanarReflection(int(planarLayer), i.positionWS, N, i.viewDirWS, rough);
         probe = mix(probe, pl.rgb, pl.a);
+    }
+#endif
+#ifdef PASS_MAIN
+    // Screen-space reflections replace the probe where they found a hit (planar reflectors
+    // already have exact reflections). History is reprojected with last frame's camera.
+    if (planarLayer < 0.0 || frame.passInfo.w <= planarLayer) {
+        vec4 pc = frame.prevViewProj * vec4(i.positionWS, 1.0);
+        vec2 uvPrev = pc.xy / max(pc.w, 1e-6) * 0.5 + 0.5;
+        if (all(greaterThan(uvPrev, vec2(0.0))) && all(lessThan(uvPrev, vec2(1.0)))) {
+            vec4 ssr = textureLod(uSSRHistory, uvPrev, 0.0);
+            probe = mix(probe, ssr.rgb, clamp(ssr.a, 0.0, 1.0));
+        }
     }
 #endif
     return probe;
