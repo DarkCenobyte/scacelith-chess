@@ -34,8 +34,10 @@
 #include <cctype>
 #include <chrono>
 #include <cmath>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <map>
 #include <mutex>
 #include <thread>
@@ -1517,4 +1519,126 @@ TEST(net_tls_pinning_manual) {
     CHECK(net::wsConnect(w, err, status) == nullptr);
     std::fprintf(stderr, "  wss pinned -> error '%s' status %d\n", err.c_str(), status);
     CHECK_EQ(err, std::string("http_200"));
+}
+
+// =============================================================================================
+// Live check against a real dedicated server (opt-in). dedicated-server/tools/live-cpp-check.js
+// starts a server (self-signed certificate, HTTPS API and WSS on one port, proof of work for
+// registration), a Node bot queued in 3+2, then runs:
+//   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password> ./scacelith_tests net_live
+// This client registers, logs in, connects, queues rated 3+2, plays legal moves for 12 plies
+// (posHash from its own chess::Position FEN) and resigns; the result and the rating change must
+// come back from the server.
+// =============================================================================================
+TEST(net_live_server_game) {
+    const char* env = std::getenv("SCACELITH_NET_LIVE");
+    if (!env || !net::transportAvailable()) {
+        std::fprintf(stderr, "  (SCACELITH_NET_LIVE not set: skipped)\n");
+        return;
+    }
+    std::vector<std::string> f;
+    {
+        std::string s = env, cur;
+        for (char ch : s) { if (ch == ':') { f.push_back(cur); cur.clear(); } else cur += ch; }
+        f.push_back(cur);
+    }
+    CHECK_EQ(int(f.size()), 5);
+    if (f.size() != 5) return;
+    char credPath[256];
+    std::snprintf(credPath, sizeof credPath, "scacelith-live-%d.credentials", int(std::time(nullptr) % 100000));
+    net::OnlineClient c;
+    c.setCredentialsFile(credPath);
+    net::ServerEndpoint ep;
+    ep.host = f[0];
+    ep.apiPort = uint16_t(std::atoi(f[1].c_str()));
+    ep.wsPort = 0;                                  // same port as the API
+    ep.pinnedSha256 = f[2];
+    c.setServer(ep);
+    const std::string user = f[3], pass = f[4];
+    std::vector<net::Event> seen;
+    net::Event ev;
+
+    c.registerAccount(user, user + "@example.org", pass);
+    CHECK(waitEvent(c, net::Event::Kind::RegisterResult, ev, 30000, &seen));
+    std::fprintf(stderr, "  register: ok=%d error='%s'\n", int(ev.ok), ev.error.c_str());
+    CHECK(ev.ok);
+    c.login(user, pass);
+    CHECK(waitEvent(c, net::Event::Kind::LoginResult, ev, 15000, &seen));
+    std::fprintf(stderr, "  login: ok=%d error='%s' user=%s\n", int(ev.ok), ev.error.c_str(), ev.account.username.c_str());
+    CHECK(ev.ok);
+    if (!ev.ok) { std::remove(credPath); return; }
+    c.connect();
+    CHECK(waitEvent(c, net::Event::Kind::Welcome, ev, 15000, &seen));
+    std::fprintf(stderr, "  welcome from '%s' as %s\n", ev.serverName.c_str(), ev.account.username.c_str());
+    c.joinQueue("3+2", true);
+    CHECK(waitEvent(c, net::Event::Kind::GameSnapshot, ev, 20000, &seen));
+    const uint64_t gameId = ev.game.id;
+    const int you = ev.game.you;
+    std::fprintf(stderr, "  game %llu, playing %s against %s\n", (unsigned long long)gameId, you == 0 ? "White" : "Black",
+                 (you == 0 ? ev.game.black.name : ev.game.white.name).c_str());
+    CHECK(gameId != 0);
+
+    // Plays until 12 plies were made, then resigns on its turn.
+    chess::Game mirror;
+    size_t applied = 0;
+    auto sync = [&](const net::OnlineGame& g) {
+        for (; applied < g.moves.size(); ++applied) {
+            uint16_t m = g.moves[applied].move;
+            chess::Move mv = mirror.position().findLegal(chess::Square(net::moveFrom(m)), chess::Square(net::moveTo(m)),
+                                                          chess::PieceType(net::movePromo(m)));
+            CHECK(mirror.play(mv));
+        }
+    };
+    sync(ev.game);
+    int sent = -1, confirmed = 0;
+    bool ended = false, resigned = false;
+    net::Event end;
+    auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(60);
+    while (!ended && std::chrono::steady_clock::now() < deadline) {
+        net::Event e;
+        while (c.poll(e)) {
+            if (e.kind == net::Event::Kind::MoveMade || e.kind == net::Event::Kind::GameSnapshot) {
+                sync(e.game);
+                if (e.kind == net::Event::Kind::MoveMade && e.mine) ++confirmed;
+            } else if (e.kind == net::Event::Kind::MoveRejected) {
+                std::fprintf(stderr, "  move rejected: ply %d code %d\n", e.ply, e.code);
+                CHECK(false);
+            } else if (e.kind == net::Event::Kind::GameEnd) {
+                ended = true;
+                end = e;
+            } else if (e.kind == net::Event::Kind::ServerError) {
+                std::fprintf(stderr, "  server error %d '%s'\n", e.code, e.error.c_str());
+            }
+        }
+        int ply = int(mirror.moves().size());
+        if (!ended && ply % 2 == you && sent < ply) {
+            if (ply >= 12 && !resigned) {
+                c.resign(gameId);
+                resigned = true;
+                sent = ply;
+            } else if (ply < 12) {
+                std::vector<chess::Move> legal = mirror.position().legalMoves();
+                CHECK(!legal.empty());
+                if (legal.empty()) break;
+                const chess::Move& mv = legal[size_t(ply * 7) % legal.size()];
+                c.sendMove(gameId, ply, net::packMove(mv.from, mv.to, mv.promotion), mirror.position().fen(), 300, false);
+                sent = ply;
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+    std::fprintf(stderr, "  plies %zu, own moves confirmed %d, ended %d (status %d reason %d)\n", mirror.moves().size(), confirmed,
+                 int(ended), end.game.status, end.game.reason);
+    CHECK(ended);
+    CHECK(confirmed >= 6);
+    CHECK_EQ(end.game.reason, int(net::proto::EndReason::Resignation));
+    CHECK_EQ(end.game.status, you == 0 ? int(net::proto::GameStatus::BlackWins) : int(net::proto::GameStatus::WhiteWins));
+    CHECK(waitEvent(c, net::Event::Kind::RatingUpdate, ev, 10000, &seen));
+    const net::Event::Rating& mine = you == 0 ? ev.ratingWhite : ev.ratingBlack;
+    std::fprintf(stderr, "  rating %d -> %d (games %d)\n", mine.before, mine.after, mine.games);
+    CHECK(mine.after < mine.before);
+    c.logout();
+    waitEvent(c, net::Event::Kind::LogoutResult, ev, 5000, &seen);
+    c.disconnect();
+    std::remove(credPath);
 }
