@@ -6,6 +6,7 @@
 #include "../platform/platform.h"
 #include "../render/post/postfx.h"
 #include "elo.h"
+#include "../ui/ui_font.h"
 #include "layout.h"
 #include "settings.h"
 #include <algorithm>
@@ -108,6 +109,8 @@ character::Side playHandFor(int seat, bool clockPosX) {
 // The human's name on the scoresheets. The player's profile name (Settings::playerName, added
 // with the language options) replaces it; "Human" is its default.
 std::string localPlayerName() { return "Human"; }
+// The human's handwriting (Settings::handStyle once the player profile exists).
+int humanHandStyle() { return ui::font::HAND_CAVEAT; }
 
 const char* sideKey(Color c) { return c == White ? "viewer.side.white" : "viewer.side.black"; }
 
@@ -187,6 +190,7 @@ bool GameScene::init(AppContext& ctx) {
 
 void GameScene::finishLoading() {
     world_.setupRenderer(*ctx_->renderer);
+    if (!scorekeeper_.init(true)) LOGW("scoresheets unavailable");
     engineOk_ = engine_.start();
     if (!engineOk_) LOGW("Stockfish is unavailable: the opponent will play random legal moves");
     initAnimators();
@@ -276,6 +280,7 @@ void GameScene::enterMenu() {
     leverSide_ = leverTarget_ = -1.0f;
     dest_.clear();
     initAnimators();
+    newScoresheets();
     for (auto& a : anim_) a.setHeadOverride(false);
     menuAngle_ = 0.9f;
     cameraCut_ = true;
@@ -369,6 +374,7 @@ void GameScene::setupNewGame() {
 
     initAnimators();
     configureSeats();
+    newScoresheets();
     if (engineOk_) {
         engine_.newGame();
         engine_.configure(seats_[seats_[0].human() ? 1 : 0].engine);
@@ -443,6 +449,29 @@ void GameScene::applyMovesInstantly(const std::vector<std::string>& uci) {
     }
     board_.syncTo(game_.position());
     arbiter_.reset(game_);
+    // The moves are on the scoresheets already, as if the game had been adjourned and resumed.
+    if (!game_.sanMoves().empty()) scorekeeper_.writeMovesInstantly(game_.sanMoves());
+}
+
+void GameScene::newScoresheets() {
+    Scorekeeper::Player p[2];
+    for (int i = 0; i < 2; ++i) {
+        p[i].name = seats_[i].name;
+        p[i].elo = seats_[i].elo;
+        p[i].handStyle = handStyleOf(i);
+        p[i].blueInk = seats_[i].human() || i == 0;  // Stockfish as Black writes in black
+    }
+    scorekeeper_.newGame(anim_, world_.clockOnPositiveX(), p, std::max(1, round_), scoresheetDate(ctx_->screenshotMode));
+}
+
+int GameScene::handStyleOf(int seat) const {
+    // Every sheet is written in its owner's hand; the two players never share one.
+    int human = std::clamp(humanHandStyle(), 0, int(ui::font::HAND_STYLE_COUNT) - 1);
+    if (seats_[seat].human()) return human;
+    int other = seats_[1 - seat].human() ? human : -1;
+    int want = watching() ? (seat == 0 ? ui::font::HAND_MARCK : ui::font::HAND_BADSCRIPT) : ui::font::HAND_MARCK;
+    if (want == other) want = (want + 1) % ui::font::HAND_STYLE_COUNT;
+    return want;
 }
 
 void GameScene::startPlaying() {
@@ -459,6 +488,8 @@ void GameScene::startPlaying() {
     }
     clock_.start(game_.position().sideToMove());
     audio::playUI(audio::Sfx::GameStart, 0.6f);
+    // Both players take their pen and fill in the header while White thinks.
+    scorekeeper_.startRecording();
     beginTurn();
 }
 
@@ -502,6 +533,8 @@ void GameScene::endGame() {
     pendingOffer_ = -1;
     clockFrozen_ = false;
     rateGame();
+    // Both players write the result and lay their pen down before shaking hands.
+    scorekeeper_.finishGame(resultText_);
     audio::playUI(audio::Sfx::GameEnd, 0.7f);
 }
 
@@ -596,6 +629,7 @@ void GameScene::shutdown(AppContext& ctx) {
         rateGame();
     }
     engine_.shutdown();
+    scorekeeper_.shutdown();
     ui::shutdown();
     audio::shutdown();
 }
@@ -777,7 +811,9 @@ void GameScene::simulate(float dt) {
         if (!paused_) updatePlaying(dt);
         break;
     case State::GameOver:
-        if (!endHandshakeDone_ && stateTime_ > 0.8f && !anim_[0].busy() && !anim_[1].busy()) {
+        // The result is written and the pens laid down first (a writing hand may be the right one).
+        if (!endHandshakeDone_ && stateTime_ > 0.8f && !anim_[0].busy() && !anim_[1].busy() &&
+            !anim_[0].writingBusy() && !anim_[1].writingBusy()) {
             anim::Task h0 = task(anim::TaskType::Handshake), h1 = h0;
             h0.partner = &anim_[1];
             h1.partner = &anim_[0];
@@ -809,6 +845,7 @@ void GameScene::simulate(float dt) {
             anim_[seat].update(dt, events_);
             handleEvents(seat, events_);
         }
+        scorekeeper_.update();
     }
     // Pieces in a hand follow it; the others rest where they were put.
     for (PieceObject& p : board_.pieces()) {
@@ -1240,6 +1277,7 @@ void GameScene::planPromotionSwap(std::vector<anim::Task>& tasks, int pawnId, Sq
 
 void GameScene::handleEvents(int seat, std::vector<anim::Event>& events) {
     for (const anim::Event& e : events) {
+        scorekeeper_.onEvent(seat, e);
         switch (e.type) {
         case anim::EventType::PieceGripped:
         case anim::EventType::CapturedGripped: {
@@ -1312,6 +1350,8 @@ void GameScene::onClockPressed(int seat) {
             clock_.addTime(opposite(mover), v.opponentBonusMs);
         }
         game_.play(v.move);
+        // Both players record the move on their scoresheet (their writing hands, off the clock).
+        scorekeeper_.recordMove(int(game_.moves().size()) - 1, game_.sanMoves().back());
         LOGI("move %d: %s (%s, clocks %lld / %lld ms)", int(game_.moves().size()), game_.sanMoves().back().c_str(),
              mover == White ? "White" : "Black", (long long)clock_.remainingMs(White), (long long)clock_.remainingMs(Black));
         if (v.moveStands) board_.syncTo(game_.position());
@@ -1612,6 +1652,7 @@ void GameScene::render(AppContext& ctx, float dt) {
             hasPrevGlobals_[seat] = true;
         }
         world_.submitMarkers(r, markers());
+        scorekeeper_.submit(r);
     }
     r.endFrame();
     audio::setListener(cam.position, cam.forward(), cam.up());

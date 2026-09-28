@@ -30,6 +30,7 @@
 #include "camera_flight.h"
 #include "observer_camera.h"
 #include "physical_board.h"
+#include "scorekeeper.h"
 #include "world.h"
 #include <map>
 #include <string>
@@ -154,6 +155,9 @@ private:
     ClockDisplay clockDisplay() const;
     void runWarp(float seconds);
     void applyMovesInstantly(const std::vector<std::string>& uci);
+    // ---- scoresheets ----
+    void newScoresheets();                     // blank pads for the game just set up
+    int handStyleOf(int seat) const;           // the seat's handwriting (ui::font::HandStyle)
 
     // ---- viewer mode ----
     bool observerView() const;                // the observer camera is the view
@@ -177,6 +181,7 @@ private:
     ai::Engine engine_;
     bool engineOk_ = false;
     anim::Animator anim_[2];
+    Scorekeeper scorekeeper_;                  // both scoresheets and the writing hands' work
     std::vector<anim::Event> events_;
     std::map<int, std::vector<Destination>> dest_;  // FIFO per piece (a promoted pawn moves twice)
     m::mat4 prevGlobals_[2][character::BoneCount];

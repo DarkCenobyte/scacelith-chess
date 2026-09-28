@@ -113,3 +113,8 @@ scoresheet.result = Result
 scoresheet.move_no = No.
 scoresheet.sign_white = White's signature
 scoresheet.sign_black = Black's signature
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = K Q R B N
+scoresheet.date_format = {0}.{1}.{2}
