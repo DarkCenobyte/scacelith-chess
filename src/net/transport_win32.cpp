@@ -7,7 +7,10 @@
 //     with the pin in the WINHTTP_CALLBACK_STATUS_SENDING_REQUEST notification, after the TLS
 //     handshake and before the request is written; a mismatch closes the request handle there,
 //     which aborts the send (the approach of .NET's WinHttpHandler). The pin is checked again
-//     once the response has arrived.
+//     once the response has arrived. Wine's WinHTTP sends the request anyway after that close,
+//     so a pinned request that carries anything (Authorization header, body) is preceded by a
+//     "HEAD /" probe without either: a server that fails the pin never receives the secret, and
+//     the real request normally reuses the probe's verified keep-alive connection.
 //   - WebSocket: WinHttpWebSocketCompleteUpgrade / Send / Receive / Shutdown. A reader thread
 //     owned by the socket object blocks in WinHttpWebSocketReceive (WinHTTP allows one send and
 //     one receive in flight at the same time) and queues complete binary messages.
@@ -362,12 +365,10 @@ private:
 
 bool transportAvailable() { return session() != nullptr; }
 
-void httpRequest(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel) {
+namespace {
+
+void perform(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel) {
     resp = HttpResponse();
-    if (!r.tls && !isLoopbackHost(r.host)) {
-        resp.error = "insecure";
-        return;
-    }
     Handle conn, req;
     if (!openRequest(r.host, r.port, r.tls, r.method, r.path, r.tls ? r.pinnedSha256 : std::string(), r.timeoutMs, conn, req,
                      resp.error, resp.detail))
@@ -422,6 +423,30 @@ void httpRequest(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel) 
         resp.status = 0;
         resp.body.clear();
     }
+}
+
+}  // namespace
+
+void httpRequest(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel) {
+    resp = HttpResponse();
+    if (!r.tls && !isLoopbackHost(r.host)) {
+        resp.error = "insecure";
+        return;
+    }
+    if (r.tls && !r.pinnedSha256.empty() && (!r.body.empty() || !r.headers.empty())) {
+        HttpRequest probe;
+        probe.method = "HEAD";
+        probe.host = r.host;
+        probe.port = r.port;
+        probe.pinnedSha256 = r.pinnedSha256;
+        probe.path = "/";
+        probe.timeoutMs = r.timeoutMs;
+        probe.maxResponseBytes = 64 * 1024;
+        perform(probe, resp, cancel);
+        if (!resp.error.empty()) return;   // any HTTP status will do: the pin held
+        resp = HttpResponse();
+    }
+    perform(r, resp, cancel);
 }
 
 std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int& httpStatus, CancelToken* cancel) {

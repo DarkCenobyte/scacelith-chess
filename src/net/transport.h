@@ -9,7 +9,8 @@
 //   - TLS certificates are validated by the OS trust store (Linux: OpenSSL default paths),
 //     including the host name. With a pin (hex SHA-256 of the leaf certificate's DER), an
 //     unknown issuer is tolerated for that connection only and the leaf must match the pin;
-//     the pin is checked before any byte of the request (headers, token, body) is sent.
+//     no header or body given by the caller (token, password) reaches a server that fails the
+//     pin (OpenSSL: checked right after the handshake; WinHTTP: see transport_win32.cpp).
 //   - Plain HTTP / WS only for loopback hosts (localhost, 127.0.0.1, ::1).
 //   - HTTP redirects are never followed (a 3xx comes back as it is), cookies are not kept.
 //

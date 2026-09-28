@@ -50,6 +50,7 @@ public:
     // Arrays and objects. operator[] returns a shared null value when absent / out of range.
     size_t size() const { return type_ == Type::Array ? items_.size() : type_ == Type::Object ? members_.size() : 0; }
     const Value& operator[](size_t i) const;
+    const Value& operator[](int i) const { return (*this)[i < 0 ? size_t(-1) : size_t(i)]; }
     const Value& operator[](const std::string& key) const;
     const Value& operator[](const char* key) const { return (*this)[std::string(key)]; }
     bool has(const std::string& key) const;
