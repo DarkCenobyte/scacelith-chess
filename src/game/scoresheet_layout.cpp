@@ -70,7 +70,7 @@ Form printedForm(int page) {
         vline(x0, y0, y1, t);
         vline(x1, y0, y1, t);
     };
-    auto text = [&](const std::string& s, int face, float x, float baseline, float cap, int align) {
+    auto text = [&](const std::string& s, int face, float x, float baseline, float cap, int align, float maxWidth = 0.0f) {
         FormText t;
         t.text = s;
         t.face = face;
@@ -78,19 +78,24 @@ Form printedForm(int page) {
         t.baseline = baseline;
         t.capHeight = cap;
         t.align = align;
+        t.maxWidth = maxWidth;
         f.texts.push_back(t);
     };
 
     // Title: a knight figure and the form's name, double rule underneath.
     text(utf8(0x265E), PRINT_SYMBOL, BLOCK_X0, 16.1f, 4.4f, 0);
-    text(i18n::tr("scoresheet.title"), PRINT_TITLE, BLOCK_X0 + 6.3f, 15.5f, 3.3f, 0);
+    // Labels fit their room in every language: the title ends before "Page", a field label before
+    // its writing line, column titles inside their column.
+    const float titleX = BLOCK_X0 + 6.3f;
+    text(i18n::tr("scoresheet.title"), PRINT_TITLE, titleX, 15.5f, 3.3f, 0,
+         kFields[int(Field::Page)].labelX - titleX - 3.0f);
     hline(BLOCK_X0, PAGE_W - BLOCK_X0, 18.7f, 0.35f);
     hline(BLOCK_X0, PAGE_W - BLOCK_X0, 19.45f, RULE_THIN);
 
     // Header fields: printed label and the line to write on.
     for (int i = 0; i < int(Field::Count); ++i) {
         const FieldSpec& s = kFields[i];
-        text(i18n::tr(s.labelKey), PRINT_TEXT, s.labelX, s.baseline, 2.05f, 0);
+        text(i18n::tr(s.labelKey), PRINT_TEXT, s.labelX, s.baseline, 2.05f, 0, s.lineX0 - s.labelX - 1.0f);
         hline(s.lineX0, s.lineX1, s.baseline + LINE_BELOW_BASELINE, RULE_THIN);
     }
 
@@ -103,9 +108,9 @@ Form printedForm(int page) {
         vline(x0 + NO_W + MOVE_W, TABLE_Y0, TABLE_Y1, 0.15f);
         for (int r = 1; r < ROWS; ++r) hline(x0, x1, ROWS_Y0 + float(r) * ROW_H, r % 5 == 0 ? RULE_MID : RULE_THIN);
         float hb = TABLE_Y0 + HEAD_H - 1.45f;
-        text(i18n::tr("scoresheet.move_no"), PRINT_ITALIC, x0 + 0.5f * NO_W, hb, 1.6f, 1);
-        text(i18n::tr("scoresheet.white"), PRINT_TEXT, x0 + NO_W + 0.5f * MOVE_W, hb, 2.0f, 1);
-        text(i18n::tr("scoresheet.black"), PRINT_TEXT, x0 + NO_W + 1.5f * MOVE_W, hb, 2.0f, 1);
+        text(i18n::tr("scoresheet.move_no"), PRINT_ITALIC, x0 + 0.5f * NO_W, hb, 1.6f, 1, NO_W - 1.2f);
+        text(i18n::tr("scoresheet.white"), PRINT_TEXT, x0 + NO_W + 0.5f * MOVE_W, hb, 2.0f, 1, MOVE_W - 2.0f);
+        text(i18n::tr("scoresheet.black"), PRINT_TEXT, x0 + NO_W + 1.5f * MOVE_W, hb, 2.0f, 1, MOVE_W - 2.0f);
         for (int r = 0; r < ROWS; ++r) {
             int n = page * MOVES_PER_PAGE + b * ROWS + r + 1;
             text(std::to_string(n), PRINT_TEXT, x0 + 0.5f * NO_W, ROWS_Y0 + float(r + 1) * ROW_H - 2.05f, 2.05f, 1);
@@ -116,8 +121,8 @@ Form printedForm(int page) {
     const float sy0 = 197.0f, sy1 = 207.5f;
     box(blockX0(0), sy0, blockX0(0) + BLOCK_W, sy1, RULE_MID);
     box(blockX0(1), sy0, blockX0(1) + BLOCK_W, sy1, RULE_MID);
-    text(i18n::tr("scoresheet.sign_white"), PRINT_ITALIC, blockX0(0) + 1.5f, sy0 + 2.9f, 1.6f, 0);
-    text(i18n::tr("scoresheet.sign_black"), PRINT_ITALIC, blockX0(1) + 1.5f, sy0 + 2.9f, 1.6f, 0);
+    text(i18n::tr("scoresheet.sign_white"), PRINT_ITALIC, blockX0(0) + 1.5f, sy0 + 2.9f, 1.6f, 0, BLOCK_W - 3.0f);
+    text(i18n::tr("scoresheet.sign_black"), PRINT_ITALIC, blockX0(1) + 1.5f, sy0 + 2.9f, 1.6f, 0, BLOCK_W - 3.0f);
     return f;
 }
 

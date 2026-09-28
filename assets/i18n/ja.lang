@@ -287,3 +287,118 @@ arbiter.second_loses = 2回目の反則手で負けとなります。
 arbiter.touched.white = 白は触れた駒を動かさなければなりません。
 arbiter.touched.black = 黒は触れた駒を動かさなければなりません。
 arbiter.game_over = 対局は終了しています。
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = 対局を観戦
+
+viewer.title = 対局観戦
+viewer.white = 白
+viewer.black = 黒
+viewer.time_control = 持ち時間
+viewer.elo_approx = 約{0} Elo
+viewer.swap = 白黒を入れ替え
+viewer.note = 両者ともStockfishです。対局中はホールを自由に飛び回れます。誰にも気づかれません。
+viewer.summary = {0} 対 {1}
+viewer.custom = カスタム
+viewer.tc.custom = 自由設定
+viewer.tc.none = 時計なし
+viewer.tc.bullet = バレット
+viewer.tc.blitz = ブリッツ
+viewer.tc.rapid = ラピッド
+viewer.tc.classical = クラシカル
+viewer.base_time = 持ち時間
+viewer.increment = 加算
+viewer.delay = 遅延
+viewer.off = なし
+viewer.minutes = {0}分
+viewer.seconds = {0}秒
+viewer.delay_summary = 遅延{0}秒
+viewer.back = 戻る
+viewer.start = 開始
+
+viewer.paused = 一時停止
+viewer.resume = 再開
+viewer.options = 設定
+viewer.main_menu = メインメニュー
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = 操作
+viewer.keys.move = W A S D  ·  Z Q S D  ·  矢印キー
+viewer.controls.move = 移動
+viewer.keys.updown = E、スペース  /  C、Ctrl
+viewer.controls.updown = 上昇 / 下降
+viewer.keys.fast = Shift
+viewer.controls.fast = 加速
+viewer.keys.look = マウス右ボタン
+viewer.controls.look = 周りを見る
+viewer.keys.speed = マウスホイール
+viewer.controls.speed = 速度
+viewer.keys.views = 1 – 9
+viewer.controls.views = 視点
+viewer.keys.eyes = 0
+viewer.controls.eyes = 手番の対局者の目線
+viewer.keys.moves = Tab
+viewer.controls.moves = 棋譜
+viewer.keys.menu = Esc
+viewer.controls.menu = メニュー
+viewer.keys.hide = H
+viewer.controls.hide = この表示を隠す
+viewer.speed = 速度 {0} m/s
+viewer.view.0 = 対局者の目線
+viewer.view.1 = テーブルの横
+viewer.view.2 = 盤の真上
+viewer.view.3 = ホール
+viewer.view.4 = 対局時計
+viewer.view.5 = 白番の顔
+viewer.view.6 = 黒番の顔
+viewer.view.7 = 対決
+viewer.view.8 = 窓辺
+viewer.view.9 = タペストリー
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = 白
+viewer.side.black = 黒
+viewer.flag.white = 白の時間が切れました。
+viewer.flag.black = 黒の時間が切れました。
+viewer.claims_draw = {0}が引き分けを申告しました。
+viewer.offer_accepted = {0}の引き分け提案に{1}が応じました。
+viewer.offer_declined = {0}の引き分け提案を{1}が断りました。
+viewer.gameover.white_wins = {0}手目で白の勝ちです。
+viewer.gameover.black_wins = {0}手目で黒の勝ちです。
+viewer.gameover.draw = {0}手目で引き分けです。
+viewer.gameover.players = {0} 対 {1}
+viewer.watch_again = もう一局観る
+
+# The player's rating
+elo.label = レーティング
+elo.no_games = レーティング対象の対局はまだありません
+elo.provisional = 暫定レーティング
+elo.peak = 最高 {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = あなたのレーティング {0}
+elo.expected = 期待スコア {0}%
+elo.change = レーティング {0} → {1}（{2}）
+elo.unrated = レーティング {0} · この対局はレーティング対象外です
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = 棋譜用紙
+scoresheet.event = 大会
+scoresheet.date = 日付
+scoresheet.round = ラウンド
+scoresheet.board = 盤番号
+scoresheet.page = ページ
+scoresheet.white = 白
+scoresheet.black = 黒
+scoresheet.elo = Elo
+scoresheet.result = 結果
+scoresheet.move_no = 手
+scoresheet.sign_white = 白の署名
+scoresheet.sign_black = 黒の署名
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+# Japanese tournament scoresheets use the English letters of algebraic notation.
+scoresheet.pieces = K Q R B N
+scoresheet.date_format = {2}/{1}/{0}

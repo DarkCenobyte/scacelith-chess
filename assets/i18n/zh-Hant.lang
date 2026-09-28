@@ -287,3 +287,117 @@ arbiter.second_loses = 第二次違例著法將判負。
 arbiter.touched.white = 白方必須移動所摸的棋子。
 arbiter.touched.black = 黑方必須移動所摸的棋子。
 arbiter.game_over = 對局已經結束。
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = 觀看對局
+
+viewer.title = 觀看對局
+viewer.white = 白方
+viewer.black = 黑方
+viewer.time_control = 時限
+viewer.elo_approx = 約 {0} 等級分
+viewer.swap = 交換黑白
+viewer.note = 雙方棋手都是 Stockfish。對局期間可以在大廳裡自由飛行：沒有人會看見你。
+viewer.summary = {0} 對 {1}
+viewer.custom = 自訂
+viewer.tc.custom = 自行設定
+viewer.tc.none = 不用棋鐘
+viewer.tc.bullet = 子彈棋
+viewer.tc.blitz = 超快棋
+viewer.tc.rapid = 快棋
+viewer.tc.classical = 慢棋
+viewer.base_time = 基本時間
+viewer.increment = 加秒
+viewer.delay = 延時
+viewer.off = 無
+viewer.minutes = {0} 分鐘
+viewer.seconds = {0} 秒
+viewer.delay_summary = 延時 {0} 秒
+viewer.back = 返回
+viewer.start = 開始
+
+viewer.paused = 暫停
+viewer.resume = 繼續
+viewer.options = 選項
+viewer.main_menu = 主選單
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = 操作
+viewer.keys.move = W A S D  ·  Z Q S D  ·  方向鍵
+viewer.controls.move = 移動
+viewer.keys.updown = E、空白鍵  /  C、Ctrl
+viewer.controls.updown = 上升 / 下降
+viewer.keys.fast = Shift
+viewer.controls.fast = 加速
+viewer.keys.look = 滑鼠右鍵
+viewer.controls.look = 環顧四周
+viewer.keys.speed = 滑鼠滾輪
+viewer.controls.speed = 速度
+viewer.keys.views = 1 – 9
+viewer.controls.views = 視角
+viewer.keys.eyes = 0
+viewer.controls.eyes = 以輪到走棋一方的眼睛觀看
+viewer.keys.moves = Tab
+viewer.controls.moves = 著法列表
+viewer.keys.menu = Esc
+viewer.controls.menu = 選單
+viewer.keys.hide = H
+viewer.controls.hide = 隱藏此說明
+viewer.speed = 速度 {0} 公尺/秒
+viewer.view.0 = 棋手的視角
+viewer.view.1 = 桌旁
+viewer.view.2 = 棋盤正上方
+viewer.view.3 = 大廳
+viewer.view.4 = 棋鐘
+viewer.view.5 = 白方的臉
+viewer.view.6 = 黑方的臉
+viewer.view.7 = 對決
+viewer.view.8 = 窗邊
+viewer.view.9 = 掛毯
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = 白方
+viewer.side.black = 黑方
+viewer.flag.white = 白方的時間已用完。
+viewer.flag.black = 黑方的時間已用完。
+viewer.claims_draw = {0}要求判和。
+viewer.offer_accepted = {0}提議和棋，{1}接受。
+viewer.offer_declined = {0}提議和棋，{1}拒絕。
+viewer.gameover.white_wins = 白方在第 {0} 回合後獲勝。
+viewer.gameover.black_wins = 黑方在第 {0} 回合後獲勝。
+viewer.gameover.draw = 第 {0} 回合後和棋。
+viewer.gameover.players = {0} 對 {1}
+viewer.watch_again = 再看一局
+
+# The player's rating
+elo.label = 等級分
+elo.no_games = 尚無計分對局
+elo.provisional = 暫定等級分
+elo.peak = 最高 {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = 你的等級分 {0}
+elo.expected = 預期得分 {0}%
+elo.change = 等級分 {0} → {1}（{2}）
+elo.unrated = 等級分 {0} · 本局不計分
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = 對局記錄表
+scoresheet.event = 賽事
+scoresheet.date = 日期
+scoresheet.round = 輪次
+scoresheet.board = 桌次
+scoresheet.page = 頁碼
+scoresheet.white = 白方
+scoresheet.black = 黑方
+scoresheet.elo = 等級分
+scoresheet.result = 結果
+scoresheet.move_no = 回合
+scoresheet.sign_white = 白方簽名
+scoresheet.sign_black = 黑方簽名
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = 王 后 車 象 馬
+scoresheet.date_format = {2}/{1}/{0}

@@ -14,12 +14,13 @@
 //   --names latin|cyrillic|arabic|cjk|mixed   player names (default mixed: Latin + Cyrillic)
 //   --style0 N --style1 N              hand styles of White's / Black's sheet (0 Caveat, 1 Marck
 //                                      Script, 2 Bad Script; default 0 and 1)
-//   --lang CODE        language of the printed form
+//   --lang CODE        language of the printed form, the piece letters and the date
 //   --clock-left       the clock on -X (the pads move to +X)
 //   --sun x,y,z        direction towards the sun (default: the hall's late morning sun)
 //   --yaw Y --pitch P --dist D --fov F --target x,y,z   orbit camera overrides (radians / m / deg)
 #include "layout.h"
 #include "physical_board.h"
+#include "scorekeeper.h"
 #include "scoresheet.h"
 #include "world.h"
 #include "../app/orbit_camera.h"
@@ -68,7 +69,7 @@ public:
         baseMoves_ = std::max(0, std::min(baseMoves_, int(san_.size())));
 
         std::string names = ctx.argValue("--names", "mixed");
-        header_.date = "28.09.2026";
+        header_.date = game::scoresheetDate(true);  // 28 September 2026, written the language's way
         header_.round = "3";
         header_.whiteElo = "1850";
         header_.blackElo = "2410";
@@ -95,6 +96,7 @@ public:
             c.clockOnPositiveX = clockPosX_;
             c.handStyle = std::atoi(ctx.argValue(s == 0 ? "--style0" : "--style1", s == 0 ? "0" : "1").c_str());
             c.seed = 1234u + uint32_t(s) * 77u;
+            c.letters = game::localizedPieceLetters();
             if (s == 1) c.inkColor = vec3(0.018f, 0.018f, 0.024f);  // black ballpoint
             sheets_[s].init(c);
         }

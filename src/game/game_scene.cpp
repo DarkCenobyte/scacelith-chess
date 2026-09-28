@@ -107,8 +107,12 @@ character::Side playHandFor(int seat, bool clockPosX) {
     return clockOnRight ? character::Side::Right : character::Side::Left;
 }
 
-// The human's name and handwriting on the scoresheets (Options > Player; "Human" by default).
-std::string localPlayerName() { return settings().playerName.empty() ? std::string("Human") : settings().playerName; }
+// The human's name and handwriting on the scoresheets (Options > Player; "Human" by default, written
+// in the interface language).
+std::string localPlayerName() {
+    const std::string& n = settings().playerName;
+    return n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
+}
 int humanHandStyle() { return int(settings().handStyle); }
 
 const char* sideKey(Color c) { return c == White ? "viewer.side.white" : "viewer.side.black"; }
@@ -585,7 +589,7 @@ ui::GameOverExtras GameScene::gameOverExtras() const {
                           : st == GameStatus::BlackWins ? "viewer.gameover.black_wins"
                                                         : "viewer.gameover.draw";
         x.line = i18n::trf(key, {std::to_string(moveNo)});
-        auto label = [this](int i) { return seats_[i].presetName + " (" + std::to_string(seats_[i].elo) + ")"; };
+        auto label = [this](int i) { return ui::presetName(seats_[i].presetName) + " (" + std::to_string(seats_[i].elo) + ")"; };
         x.detail = i18n::trf("viewer.gameover.players", {label(0), label(1)});
         x.primaryLabel = i18n::tr("viewer.watch_again");
         return x;
@@ -593,7 +597,7 @@ ui::GameOverExtras GameScene::gameOverExtras() const {
     if (eloCounted_) {
         int d = eloAfter_ - eloBefore_;
         std::string delta = (d > 0 ? "+" : d < 0 ? "\xE2\x88\x92" : "\xC2\xB1") + std::to_string(std::abs(d));
-        x.detail = i18n::trf("elo.change", {std::to_string(eloBefore_), std::to_string(eloAfter_), delta});
+        x.detail = i18n::trf("elo.change", {std::to_string(eloBefore_), std::to_string(eloAfter_), i18n::ltr(delta)});
     } else if (rated_) {
         x.detail = i18n::trf("elo.unrated", {std::to_string(eloBefore_)});
     }
@@ -1673,7 +1677,7 @@ void GameScene::renderOverlay(AppContext&, float) {
         hud.visible = hudVisible_ && !(gameOverShown_ && !ui::gameOverFolded());
         for (int i = 0; i < 2; ++i) {
             std::string& name = i == 0 ? hud.white : hud.black;
-            name = i18n::trf("viewer.player", {seats_[i].presetName, std::to_string(seats_[i].elo)});
+            name = i18n::trf("viewer.player", {ui::presetName(seats_[i].presetName), std::to_string(seats_[i].elo)});
         }
         hud.sideToMove = state_ == State::Playing ? seatOf(game_.position().sideToMove()) : -1;
         if (viewpointShown_ >= 0) hud.viewpoint = i18n::tr("viewer.view." + std::to_string(viewpointShown_));

@@ -475,13 +475,16 @@ bool optionsPage(MenuAction& act) {
         }
         case 4: {
             // Player profile: the name and hand written on the scoresheets.
-            im::textField(L("player.name"), s.playerName, row(), kMaxNameLength);
+            // The untouched default name (stored as "Human") reads in the interface language.
+            std::string name = s.playerName == "Human" ? T("player.default_name") : s.playerName;
+            if (im::textField(L("player.name"), name, row(), kMaxNameLength)) s.playerName = name;
             im::tooltip(T("player.name.help"));
             int hs = std::clamp(int(s.handStyle), 0, int(font::HAND_STYLE_COUNT) - 1);
             if (im::selectorRow(L("player.handwriting"), hs, {T("hand.caveat"), T("hand.marck"), T("hand.badscript")}, row()))
                 s.handStyle = font::HandStyle(hs);
             im::tooltip(T("player.handwriting.help"));
-            handwritingPreview(cleanName(s.playerName), hs, Rect(rx, y + 18.0f, rw, 170.0f));
+            std::string written = cleanName(s.playerName);
+            handwritingPreview(written == "Human" ? T("player.default_name") : written, hs, Rect(rx, y + 18.0f, rw, 170.0f));
             break;
         }
         default: {
@@ -757,7 +760,7 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
 
     // Opponent column.
     im::sectionLabel(T("newgame.opponent"), lx, top + 8.0f, colW);
-    detail::newGameRating(lx + colW, top + 8.0f, setup.difficulty);
+    detail::newGameRating(lx, colW, top + 8.0f, setup.difficulty);
     float customH = custom ? 6.0f * 44.0f + 18.0f : 0.0f;
     float available = std::max(150.0f, footer - (top + 30.0f) - customH - 8.0f);
     Rect listArea(lx, top + 30.0f, colW, std::min(available, presetListHeight(nd, setup.difficulty, custom)));
@@ -851,7 +854,7 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
             setup.customBaseSeconds = bv[size_t(bi)];
         im::tooltip(T("tc.base_time.help"));
         int inc = std::clamp(setup.customIncrementSeconds, 0, 60);
-        if (im::stepperRow(L("tc.increment"), inc, 61, [](int i) { return "+" + i18n::trf("tc.seconds", {std::to_string(i)}); }, trow()))
+        if (im::stepperRow(L("tc.increment"), inc, 61, [](int i) { return i18n::trf("tc.seconds", {i18n::ltr("+" + std::to_string(i))}); }, trow()))
             setup.customIncrementSeconds = inc;
         im::tooltip(T("tc.increment.help"));
         int del = std::clamp(setup.customDelaySeconds, 0, 60);

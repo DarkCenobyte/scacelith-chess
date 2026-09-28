@@ -290,3 +290,119 @@ arbiter.second_loses = النقلة غير القانونية الثانية ت�
 arbiter.touched.white = على الأبيض تحريك القطعة الملموسة.
 arbiter.touched.black = على الأسود تحريك القطعة الملموسة.
 arbiter.game_over = انتهت المباراة.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = مشاهدة مباراة
+
+viewer.title = مشاهدة مباراة
+viewer.white = الأبيض
+viewer.black = الأسود
+viewer.time_control = نظام الوقت
+viewer.elo_approx = ~{0} إيلو
+viewer.swap = تبديل اللونين
+viewer.note = كلا اللاعبين هو Stockfish. تنقّل بحرية في القاعة أثناء اللعب: لن يراك أحد.
+viewer.summary = {0} ضد {1}
+viewer.custom = مخصّص
+viewer.tc.custom = حسب رغبتك
+viewer.tc.none = بلا ساعة
+viewer.tc.bullet = رصاصي
+viewer.tc.blitz = خاطف
+viewer.tc.rapid = سريع
+viewer.tc.classical = كلاسيكي
+viewer.base_time = الوقت الأساسي
+viewer.increment = الزيادة
+viewer.delay = التأخير
+viewer.off = بلا تأخير
+viewer.minutes = {0} د
+viewer.seconds = {0} ث
+viewer.delay_summary = تأخير {0} ث
+viewer.back = رجوع
+viewer.start = ابدأ
+
+viewer.paused = إيقاف مؤقت
+viewer.resume = استئناف
+viewer.options = الخيارات
+viewer.main_menu = القائمة الرئيسية
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = التحكم
+viewer.keys.move = W A S D  ·  Z Q S D  ·  الأسهم
+viewer.controls.move = التحرك
+viewer.keys.updown = E، المسافة  /  C، Ctrl
+viewer.controls.updown = صعود / نزول
+viewer.keys.fast = Shift
+viewer.controls.fast = أسرع
+viewer.keys.look = زر الفأرة الأيمن
+viewer.controls.look = النظر حولك
+viewer.keys.speed = عجلة الفأرة
+viewer.controls.speed = السرعة
+viewer.keys.views = 1 – 9
+viewer.controls.views = زوايا المشاهدة
+viewer.keys.eyes = 0
+viewer.controls.eyes = بعينَي اللاعب صاحب الدور
+viewer.keys.moves = Tab
+viewer.controls.moves = قائمة النقلات
+viewer.keys.menu = Esc
+viewer.controls.menu = القائمة
+viewer.keys.hide = H
+viewer.controls.hide = إخفاء هذه الإرشادات
+viewer.speed = السرعة {0} م/ث
+viewer.view.0 = بعيون اللاعبين
+viewer.view.1 = بجانب الطاولة
+viewer.view.2 = فوق الرقعة
+viewer.view.3 = القاعة
+viewer.view.4 = الساعة
+viewer.view.5 = وجه الأبيض
+viewer.view.6 = وجه الأسود
+viewer.view.7 = المبارزة
+viewer.view.8 = النوافذ
+viewer.view.9 = المنسوجات الجدارية
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = الأبيض
+viewer.side.black = الأسود
+viewer.flag.white = انتهى وقت الأبيض.
+viewer.flag.black = انتهى وقت الأسود.
+viewer.claims_draw = يطالب {0} بالتعادل.
+viewer.offer_accepted = يعرض {0} التعادل، ويقبله {1}.
+viewer.offer_declined = يعرض {0} التعادل، ويرفضه {1}.
+viewer.gameover.white_wins = فاز الأبيض بعد النقلة {0}.
+viewer.gameover.black_wins = فاز الأسود بعد النقلة {0}.
+viewer.gameover.draw = انتهت المباراة بالتعادل بعد النقلة {0}.
+viewer.gameover.players = {0} ضد {1}
+viewer.watch_again = مشاهدة أخرى
+
+# The player's rating
+elo.label = إيلو
+elo.no_games = لا توجد مباريات محتسبة بعد
+elo.provisional = تصنيف مؤقت
+elo.peak = الأعلى {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = تصنيفك {0}
+elo.expected = النتيجة المتوقعة {0}٪
+elo.change = إيلو {0} ← {1} ({2})
+elo.unrated = إيلو {0} · هذه المباراة غير محتسبة
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = ورقة تسجيل المباراة
+scoresheet.event = البطولة
+scoresheet.date = التاريخ
+scoresheet.round = الجولة
+scoresheet.board = الرقعة
+scoresheet.page = الصفحة
+scoresheet.white = الأبيض
+scoresheet.black = الأسود
+scoresheet.elo = إيلو
+scoresheet.result = النتيجة
+scoresheet.move_no = رقم
+scoresheet.sign_white = توقيع الأبيض
+scoresheet.sign_black = توقيع الأسود
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+# Arab federations score FIDE events in Latin algebraic notation, and Arabic letters inside a
+# left-to-right move would read badly: the piece letters stay K Q R B N.
+scoresheet.pieces = K Q R B N
+scoresheet.date_format = {0}/{1}/{2}
