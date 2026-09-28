@@ -5,6 +5,7 @@
 #include "ui.h"
 #include "ui_draw.h"
 #include "ui_internal.h"
+#include "ui_screens_game.h"
 #include "ui_theme.h"
 #include "ui_widgets.h"
 #include "../chess/chess.h"
@@ -26,7 +27,7 @@ using namespace theme;
 namespace {
 
 // ---- State ----------------------------------------------------------------------------------------
-enum class Page { Title, NewGame, Options, Credits };
+enum class Page { Title, NewGame, Options, Credits, Watch };
 
 struct OptionsState {
     game::Settings work;
@@ -60,6 +61,7 @@ struct State {
     // game over
     bool goFolded = false;
     int forcedFold = -1;
+    GameOverExtras goExtras;
     // toasts
     std::vector<Toast> toasts;
     // move list
@@ -497,6 +499,11 @@ MenuAction titlePage(float t) {
         setPage(Page::NewGame);
         im::sound(Sound::Open);
     }
+    if (im::menuEntry(i18n::tr("menu.watch"), Rect(x, ey + 76.0f, ew, eh))) {
+        setPage(Page::Watch);
+        im::sound(Sound::Open);
+    }
+    ey += 76.0f;  // the entries below move down one row
     if (im::menuEntry("Options", Rect(x, ey + 76.0f, ew, eh))) {
         setPage(Page::Options);
         openOptions();
@@ -509,6 +516,7 @@ MenuAction titlePage(float t) {
     im::setDefaultFocus(first);
     im::popId();
 
+    detail::titleRating(x, ey + 360.0f);
     TextStyle vs = style(font::FACE_ITALIC, 19.0f, withAlpha(muted, 0.85f));
     gfx::text("Version " + detail::data().version, x, v.y - 48.0f, vs);
     gfx::popAlpha();
@@ -630,6 +638,7 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
 
     // Opponent column.
     im::sectionLabel("OPPONENT", lx, top + 8.0f, colW);
+    detail::newGameRating(lx + colW, top + 8.0f, setup.difficulty);
     float customH = custom ? 6.0f * 44.0f + 18.0f : 0.0f;
     float available = std::max(150.0f, footer - (top + 30.0f) - customH - 8.0f);
     Rect listArea(lx, top + 30.0f, colW, std::min(available, presetListHeight(nd, setup.difficulty, custom)));
@@ -820,6 +829,11 @@ void creditsPage() {
 namespace detail {
 void screensReset() { S = State(); }
 
+// Hooks for the viewer mode's pages (ui_screens_game.cpp).
+bool runOptionsPage(MenuAction& act) { return optionsPage(act); }
+void openOptionsPage() { openOptions(); }
+void dimBackground(float a) { dimScene(a); }
+
 void screensBeginFrame(float dt) {
     for (auto& t : S.toasts) t.age += dt;
     S.toasts.erase(std::remove_if(S.toasts.begin(), S.toasts.end(), [](const Toast& t) { return t.age > t.duration + 0.6f; }),
@@ -840,6 +854,11 @@ void foldGameOver(bool folded) { S.forcedFold = folded ? 1 : 0; }
 bool optionsOpen() { return S.optionsVisible || S.optionsVisiblePrev; }
 
 MenuAction mainMenu(NewGameSetup& setup) {
+    static WatchSetup watch;
+    return mainMenu(setup, watch);
+}
+
+MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
     im::Id menuId = im::makeId("##mainmenu");
     bool appear = im::appearing(menuId);
     if (appear) {
@@ -860,8 +879,15 @@ MenuAction mainMenu(NewGameSetup& setup) {
             if (optionsPage(act)) setPage(Page::Title);
             break;
         case Page::Credits: creditsPage(); break;
+        case Page::Watch: {
+            bool back = false;
+            act = detail::watchPage(watch, ease(S.pageT), fresh, back);
+            if (back) setPage(Page::Title);
+            break;
+        }
     }
     if (act == MenuAction::StartGame || act == MenuAction::Quit) setPage(Page::Title);
+    if (act == MenuAction::StartWatching) setPage(Page::Title);
     return act;
 }
 
@@ -1053,6 +1079,14 @@ void drawNotifications() {
 }
 
 MenuAction gameOver(const std::string& result, const std::string& reason, bool playerWon, bool draw, int moveCount) {
+    return gameOver(result, reason, playerWon, draw, moveCount, GameOverExtras{});
+}
+
+bool gameOverFolded() { return S.goFolded; }
+
+MenuAction gameOver(const std::string& result, const std::string& reason, bool playerWon, bool draw, int moveCount,
+                    const GameOverExtras& extras) {
+    S.goExtras = extras;
     im::Id id = im::makeId("##gameover");
     im::Anim& a = im::anim(id);
     bool appear = a.firstFrame == im::frame();
@@ -1077,7 +1111,7 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
     }
     if (fold < 0.999f) {
         float ct = t * (1.0f - fold);
-        float w = 700.0f, h = 380.0f;
+        float w = 700.0f, h = 380.0f + (S.goExtras.detail.empty() ? 0.0f : 38.0f);
         Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + 60.0f + (1.0f - t) * 20.0f + fold * 40.0f, w, h);
         im::captureMouseRect(p);
         gfx::Layer prev = gfx::layer();
@@ -1103,14 +1137,17 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         if (draw) line = moves.empty() ? "The game is drawn." : "The game is drawn after " + moves + ".";
         else if (playerWon) line = moves.empty() ? "Well played \xE2\x80\x94 you win." : "Well played \xE2\x80\x94 you win in " + moves + ".";
         else line = moves.empty() ? "Your opponent wins." : "Your opponent wins in " + moves + ".";
+        if (!S.goExtras.line.empty()) line = S.goExtras.line;
         TextStyle ls = style(font::FACE_ITALIC, 25.0f, ivoryDim, HAlign::Center);
         gfx::text(line, p.cx(), p.y + 238.0f, ls);
+        if (!S.goExtras.detail.empty()) detail::gameOverDetail(S.goExtras.detail, p.cx(), p.y + 276.0f);
         float bw = 250.0f, bh = 56.0f, gap = 28.0f;
         float by = p.b() - 44.0f - bh;
         if (im::button("Main menu", Rect(p.cx() - gap * 0.5f - bw, by, bw, bh), im::ButtonKind::Secondary))
             act = MenuAction::BackToMainMenu;
-        im::Id rematchId = im::makeId("Rematch");
-        if (im::button("Rematch", Rect(p.cx() + gap * 0.5f, by, bw, bh), im::ButtonKind::Primary)) act = MenuAction::Rematch;
+        std::string primary = S.goExtras.primaryLabel.empty() ? std::string("Rematch") : S.goExtras.primaryLabel;
+        im::Id rematchId = im::makeId(primary);
+        if (im::button(primary, Rect(p.cx() + gap * 0.5f, by, bw, bh), im::ButtonKind::Primary)) act = MenuAction::Rematch;
         im::setDefaultFocus(rematchId);
         if (im::button("View the board", Rect(p.r() - 190.0f, p.y + 14.0f, 176.0f, 40.0f), im::ButtonKind::Quiet)) {
             S.goFolded = true;

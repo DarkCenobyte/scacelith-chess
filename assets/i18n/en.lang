@@ -4,3 +4,97 @@
 # English.
 
 language.name = English
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Watch a Game
+
+viewer.title = WATCH A GAME
+viewer.white = WHITE
+viewer.black = BLACK
+viewer.time_control = TIME CONTROL
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Swap colours
+viewer.note = Both players are Stockfish. Fly freely around the hall while they play: nobody will see you.
+viewer.summary = {0} vs {1}
+viewer.custom = Custom
+viewer.tc.custom = Your own
+viewer.tc.none = No clock
+viewer.tc.bullet = Bullet
+viewer.tc.blitz = Blitz
+viewer.tc.rapid = Rapid
+viewer.tc.classical = Classical
+viewer.base_time = Base time
+viewer.increment = Increment
+viewer.delay = Delay
+viewer.off = Off
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = delay {0} s
+viewer.back = Back
+viewer.start = Start
+
+viewer.paused = PAUSED
+viewer.resume = Resume
+viewer.options = Options
+viewer.main_menu = Main menu
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = CONTROLS
+viewer.keys.move = W A S D  ·  Z Q S D  ·  arrows
+viewer.controls.move = Move
+viewer.keys.updown = E, Space  /  C, Ctrl
+viewer.controls.updown = Up / down
+viewer.keys.fast = Shift
+viewer.controls.fast = Faster
+viewer.keys.look = Right mouse button
+viewer.controls.look = Look around
+viewer.keys.speed = Mouse wheel
+viewer.controls.speed = Speed
+viewer.keys.views = 1 – 9
+viewer.controls.views = Viewpoints
+viewer.keys.eyes = 0
+viewer.controls.eyes = Through the eyes of the player to move
+viewer.keys.moves = Tab
+viewer.controls.moves = Move list
+viewer.keys.menu = Esc
+viewer.controls.menu = Menu
+viewer.keys.hide = H
+viewer.controls.hide = Hide this overlay
+viewer.speed = Speed {0} m/s
+viewer.view.0 = Through the players' eyes
+viewer.view.1 = Beside the table
+viewer.view.2 = Above the board
+viewer.view.3 = The hall
+viewer.view.4 = The clock
+viewer.view.5 = White's face
+viewer.view.6 = Black's face
+viewer.view.7 = The duel
+viewer.view.8 = The windows
+viewer.view.9 = The tapestries
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = White
+viewer.side.black = Black
+viewer.flag.white = White's flag has fallen.
+viewer.flag.black = Black's flag has fallen.
+viewer.claims_draw = {0} claims a draw.
+viewer.offer_accepted = {0} offers a draw, {1} accepts.
+viewer.offer_declined = {0} offers a draw, {1} declines.
+viewer.gameover.white_wins = White wins after move {0}.
+viewer.gameover.black_wins = Black wins after move {0}.
+viewer.gameover.draw = The game is drawn after move {0}.
+viewer.gameover.players = {0} against {1}
+viewer.watch_again = Watch again
+
+# The player's rating
+elo.label = ELO
+elo.no_games = No rated game yet
+elo.provisional = Provisional rating
+elo.peak = Peak {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Your Elo {0}
+elo.expected = expected score {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · this game is not rated

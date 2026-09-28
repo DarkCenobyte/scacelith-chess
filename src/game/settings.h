@@ -44,6 +44,18 @@ struct Settings {
     int engineThreads = 1;
     int engineHashMB = 64;
     bool humanizeThinking = true; // spend realistic time before moving
+    // [player] the human's rating (elo.h), updated after every rated game against Stockfish
+    int playerElo = 1500;
+    int playerGames = 0, playerWins = 0, playerDraws = 0, playerLosses = 0;
+    int playerPeakElo = 1500;
+    // [viewer] last choices on the Watch a Game page (Stockfish vs Stockfish)
+    int viewerWhitePreset = 5;    // index into ai::presets() (Custom excluded)
+    int viewerBlackPreset = 4;
+    int viewerTimeControl = 5;    // index into chess::timeControlPresets(), -1 = custom
+    int viewerCustomBaseSeconds = 300;
+    int viewerCustomIncrementSeconds = 3;
+    int viewerCustomDelaySeconds = 0;
+    bool viewerShowControls = true; // the controls hint overlay (H)
 
     render::RenderSettings renderSettings() const;
     bool load(const std::string& path);  // missing file = defaults
