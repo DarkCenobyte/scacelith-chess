@@ -28,7 +28,7 @@ namespace proto {
 
 constexpr uint16_t kProtocolVersion = 1;
 constexpr uint16_t kProtocolMin = 1;
-constexpr uint32_t kSchemaHash = 0x992093ccu;
+constexpr uint32_t kSchemaHash = 0xf05042b2u;
 constexpr const char* kWsSubprotocol = "scacelith.v1";
 constexpr uint64_t kId53Limit = 1ull << 53;   // id53 values are below 2^53
 
@@ -55,10 +55,7 @@ enum class NoticeCode : uint8_t {
     ServerShutdown = 1, Banned = 2, SessionRevoked = 3, MatchmakingCooldown = 4,
     ReplacedByNewConnection = 5, Motd = 6,
 };
-// SCHEMA BUG: ErrorCode has values above 255 (ProtocolViolation=300, Flood=301, CheatDetected=302, SlowConsumer=303)
-// but enums are u8 on the wire: those values cannot be sent (the frame carries value & 0xFF,
-// which decode refuses). The C++ type is wider only so that this header compiles.
-enum class ErrorCode : uint16_t {
+enum class ErrorCode : uint8_t {
     Malformed = 1, UnsupportedProtocol = 2, Unauthorized = 3, Banned = 4, RateLimited = 5,
     ServerFull = 6, Replaced = 7, ShuttingDown = 8, Internal = 9, HelloRequired = 10,
     EmailUnverified = 11, NotInGame = 100, NotYourTurn = 101, IllegalMove = 102, StalePly = 103,
@@ -67,7 +64,7 @@ enum class ErrorCode : uint16_t {
     QueueNotAllowed = 200, ChallengeNotFound = 201, UserUnavailable = 202, ChallengeLimit = 203,
     CannotChallengeSelf = 204, CodeInvalid = 205, RatedRequiresOfficialTc = 206,
     MatchmakingCooldown = 207, InvalidTimeControl = 208, RematchUnavailable = 209,
-    ProtocolViolation = 300, Flood = 301, CheatDetected = 302, SlowConsumer = 303,
+    ProtocolViolation = 240, Flood = 241, CheatDetected = 242, SlowConsumer = 243,
 };
 
 // Membership of the schema enums, and their value names ("?" when not a member).
