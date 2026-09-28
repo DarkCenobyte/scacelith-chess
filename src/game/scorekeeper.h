@@ -30,7 +30,16 @@ public:
         int elo = 0;          // 0 = left blank
         int handStyle = 0;    // ui::font::HandStyle of the sheet's owner
         bool blueInk = true;  // blue or black ballpoint
+        std::string rating;   // written instead of 'elo' when set ("1500?" provisional online rating)
     };
+    // Header of an online game (set after newGame(), before the header is written): the event
+    // (server name / "Friendly match"), the round ("-"), and the free additions beside the
+    // printed fields: the note ("Online, 5+3 rated") and the reference (game number).
+    struct Details {
+        std::string event, round, note, reference;
+        bool noBoard = false;  // leave "Board" blank
+    };
+    void setDetails(const Details& d) { details_ = d; hasDetails_ = true; }
 
     bool init(bool clockOnPositiveX);   // GL context + ui::font ready
     void shutdown();
@@ -70,6 +79,8 @@ private:
     bool headerWritten_ = false;
     bool finished_ = false;
     Player players_[2];
+    Details details_;
+    bool hasDetails_ = false;
     int round_ = 1;
     std::string date_;
     int nextPly_[2] = {0, 0};                 // next ply each sheet will write

@@ -85,7 +85,9 @@ struct NewGameSetup {
 
 enum class MenuAction {
     None, StartGame, Quit, Resume, Resign, OfferDraw, ClaimDraw, BackToMainMenu, OptionsChanged, Rematch,
-    StartWatching  // "Watch a Game" page: Start (the WatchSetup holds the choice)
+    StartWatching,  // "Watch a Game" page: Start (the WatchSetup holds the choice)
+    Abort,          // online: abort the game (before your first move)
+    Report          // online: report the opponent (Esc menu, game over card)
 };
 
 // "Watch a Game" (viewer mode): two Stockfish players. The page starts from the last choices saved
@@ -122,6 +124,8 @@ struct GameOverExtras {
     std::string line;          // replaces the sentence under the reason (watched game: who won)
     std::string detail;        // extra line under it: Elo change ("Elo 1512 → 1524 (+12)"), players
     std::string primaryLabel;  // replaces "Rematch" (watched game: "Watch again")
+    bool primaryDisabled = false;  // online: rematch requested / declined
+    std::string reportLabel;   // online: quiet "Report opponent" button (returns Report), "" = none
 };
 MenuAction gameOver(const std::string& result, const std::string& reason, bool playerWon, bool draw, int moveCount,
                     const GameOverExtras& extras);

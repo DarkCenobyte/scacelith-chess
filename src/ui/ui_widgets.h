@@ -130,6 +130,15 @@ bool selectorRow(const std::string& label, int& index, const std::vector<std::st
 // Returns true on the frame the text changed.
 bool textField(const std::string& label, std::string& text, const Rect& r, int maxChars = 24,
                const gfx::TextStyle* textStyle = nullptr, bool enabled = true);
+// Form fields of the online pages: FIELD_SECRET shows the text as dots (passwords, codes that
+// must stay private), FIELD_LTR keeps it left to right whatever the UI (addresses, e-mails,
+// codes); the placeholder shows in an empty field that is not being edited.
+enum FieldFlags : uint32_t {
+    FIELD_SECRET = 1u << 0,
+    FIELD_LTR = 1u << 1,
+};
+bool formField(const std::string& label, std::string& text, const Rect& r, int maxChars, uint32_t fieldFlags,
+               const std::string& placeholder = "", bool enabled = true);
 bool editingText();  // a text field has the keyboard (Space and letters type text)
 // Tab bar: Left/Right while focused, PageUp/PageDown anywhere. Returns true when changed.
 bool tabBar(const std::vector<std::string>& tabs, int& current, const Rect& r);
