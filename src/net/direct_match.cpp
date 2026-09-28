@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <chrono>
 #include <cmath>
 #include <cstring>
 #include <deque>
@@ -423,10 +424,13 @@ protected:
 
 class HostSession : public Session {
 public:
-    explicit HostSession(const DirectHostOptions& o) : Session(true), opt_(o) {}
+    // previous: host sessions still closing (they may hold the port and its UPnP mapping).
+    HostSession(const DirectHostOptions& o, std::vector<std::shared_ptr<Session>> previous)
+        : Session(true), opt_(o), previous_(std::move(previous)) {}
 
 private:
     DirectHostOptions opt_;
+    std::vector<std::shared_ptr<Session>> previous_;
     std::string code_;
     sock::Handle listener_ = sock::kInvalid;
     uint16_t port_ = 0;
@@ -450,6 +454,13 @@ private:
 
     void run() override {
         sock::startup();
+        // A previous match that is still closing releases its port and deletes its mapping first
+        // (otherwise its DeletePortMapping could remove the mapping this match is about to make).
+        const int64_t waitEnd = sock::steadyMs() + 6000;
+        for (auto& p : previous_)
+            while (!p->finished && !stopFlag && sock::steadyMs() < waitEnd) std::this_thread::sleep_for(std::chrono::milliseconds(20));
+        previous_.clear();
+        if (stopFlag) return;
         code_ = direct::newJoinCode();
         if (code_.empty() || !waker.valid()) { fail("network"); return; }
         std::string err;
@@ -1232,7 +1243,10 @@ void DirectMatch::host(const DirectHostOptions& opt) {
     std::lock_guard<std::mutex> lk(impl_->m);
     impl_->retire();
     impl_->reap(false);
-    auto s = std::make_shared<HostSession>(opt);
+    std::vector<std::shared_ptr<Session>> closingHosts;
+    for (auto& r : impl_->retiring)
+        if (r->isHost) closingHosts.push_back(r);
+    auto s = std::make_shared<HostSession>(opt, std::move(closingHosts));
     s->state = State::OpeningPort;   // listening, then UPnP when enabled
     s->start();
     impl_->cur = s;

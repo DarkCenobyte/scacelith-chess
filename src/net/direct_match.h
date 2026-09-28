@@ -2,6 +2,26 @@
 // player hosts (listens on a TCP port, opened on the home router with UPnP when possible), the
 // other joins with the host's address, port and a short code the host reads to them.
 //
+// Implementation notes (the API below is unchanged; these points refine or amend the first draft):
+//   - Frame plaintext limit: 16 KiB, not 1024 bytes. A GameSnapshot carries 10 bytes per ply (up
+//     to 1200 plies, about 12.2 KB), so 1024 could not hold the snapshot of a long game.
+//   - The host runs up to 4 handshakes at a time (10 s each). A new connection that proves the
+//     code and sends a valid Hello replaces the current guest link: that is how a guest whose old
+//     connection is half-open gets back in. The 10-failure limit counts wrong codes only (garbage
+//     and timeouts do not, so a port scanner cannot close the game).
+//   - host() puts the state at OpeningPort at once (also with UPnP off, while the socket opens);
+//     WaitingForGuest follows when invite() is ready.
+//   - invite().publicAddress is the router's external IPv4 whenever UPnP learned it and it looks
+//     public, even if the mapping itself failed (a manual port forward may exist: upnp().state
+//     says whether the router agreed); empty when unknown or when carrier-grade NAT is suspected.
+//   - Time control: baseSec is clamped to 1..10800, incSec to 0..180.
+//   - Hello from the guest: token = "direct:" + player name, padded with spaces to the schema's
+//     16-byte minimum; the host strips both and sanitises the name (1..24 bytes of UTF-8).
+//   - lastError(): "port_in_use", "network", "too_many_attempts" (host); "invalid_code",
+//     "bad_address", "not_found" (DNS), "refused", "timeout", "unreachable", "reset", "closed",
+//     "wrong_code", "incompatible", "host_left" (guest). After ConnectionChanged(Offline) the
+//     commands have no effect; close() and start again.
+//
 // The host's game is the authority, exactly like the dedicated server is for online games: it
 // validates the guest's move intents with chess::Position, runs the clocks and decides the
 // result. Both sides then speak the same binary protocol as online play (net::proto messages,
@@ -22,7 +42,7 @@
 //     code offline (ECDH). The host accepts at most 10 failed handshakes per hosted game (then it
 //     stops listening) and one guest at a time.
 //   - Frames: u16 length | AES-256-GCM ciphertext | 16-byte tag; the nonce is a per-direction
-//     64-bit counter (no replay, no reordering); plaintext = one net::proto message (<= 1024 bytes).
+//     64-bit counter (no replay, no reordering); plaintext = one net::proto message (<= 16 KiB).
 //   - Windows: BCrypt (ECDH P-256, AES-GCM, SHA-256, RNG) and Winsock; Linux dev builds: OpenSSL.
 //
 // UPnP (Internet Gateway Device, UPnP IGD v1/v2): SSDP discovery on 239.255.255.250:1900,

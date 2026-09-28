@@ -252,10 +252,10 @@ Handle openUdpV4() {
 
 bool bindTo(Handle h, const Endpoint& ep, bool reuseAddr) {
 #ifdef _WIN32
-    // SO_REUSEADDR on Windows lets another process steal the port: ask for exclusivity instead.
+    // Windows: default semantics. SO_REUSEADDR would let another socket steal the port, and
+    // SO_EXCLUSIVEADDRUSE would keep it unusable while old connections sit in TIME_WAIT (hosting
+    // again right after a game would fail).
     (void)reuseAddr;
-    int on = 1;
-    setsockopt(S(h), SOL_SOCKET, SO_EXCLUSIVEADDRUSE, reinterpret_cast<const char*>(&on), sizeof on);
 #else
     if (reuseAddr) {
         int on = 1;

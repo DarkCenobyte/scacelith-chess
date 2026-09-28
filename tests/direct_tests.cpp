@@ -1510,6 +1510,25 @@ TEST(direct_loopback_wrong_code) {
     CHECK_EQ(second.dm.lastError(), std::string("port_in_use"));
 }
 
+TEST(direct_loopback_host_again_same_port) {
+    // Close a match with a connected guest and host again at once on the same port: the new
+    // match waits for the old one to release it.
+    Peer host, guest;
+    CHECK(startMatch(host, guest, 300, 0));
+    uint16_t port = host.dm.invite().port;
+    host.dm.close();
+    DirectHostOptions o = hostOptions(300, 0, 0, "Alice");
+    o.port = port;
+    host.dm.host(o);
+    CHECK(waitUntil(host, guest, [&] {
+        auto s = host.dm.state();
+        return s == DirectMatch::State::WaitingForGuest || s == DirectMatch::State::Failed;
+    }));
+    CHECK(host.dm.state() == DirectMatch::State::WaitingForGuest);
+    CHECK_EQ(host.dm.invite().port, port);
+    CHECK_EQ(host.dm.lastError(), std::string(""));
+}
+
 TEST(direct_loopback_reconnection) {
     Peer host, guest;
     host.dm.host(hostOptions(300, 0, 1, "Alice"));
