@@ -104,8 +104,7 @@ OnlineHudAction onlineHud(const OnlineHud& hud) {
     float by = v.y - 130.0f;
     im::Anim& ba = im::anim(im::makeId("##online.banner"));
     ba.v[0] = im::approach(ba.v[0], hud.banner.empty() ? 0.0f : 1.0f, 8.0f);
-    if (!hud.banner.empty()) ba.v[1] = 0.0f;  // (text kept below while fading)
-    static std::string lastBanner;
+    static std::string lastBanner;  // kept while the banner fades out
     if (!hud.banner.empty()) lastBanner = hud.banner;
     if (ba.v[0] > 0.01f && !lastBanner.empty()) {
         TextStyle ts = style(font::FACE_ITALIC, 26.0f, withAlpha(ivory, ba.v[0]), HAlign::Center);

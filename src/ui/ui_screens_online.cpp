@@ -1305,6 +1305,11 @@ void pageChallenge(float t, bool privateGame) {
         if (im::formField(L("online.field.private_code"), code, Rect(rx, y, colW, 56.0f), 12, im::FIELD_LTR, "ABC123")) O.joinCode = upperCode(code);
         y += 70.0f;
         if (im::button(L("online.private.join"), Rect(rx, y, colW, 56.0f), im::ButtonKind::Secondary, online && O.joinCode.size() >= 4)) join = true;
+        if (!O.note.empty()) {
+            TextStyle js = style(font::FACE_ITALIC, kSmall, ivoryDim, HAlign::Center);
+            gfx::text(O.note, rx + colW * 0.5f, y + 96.0f, js);
+            spinner(vec2(rx + colW * 0.5f - gfx::textWidth(O.note, js) * 0.5f - 28.0f, y + 88.0f));
+        }
     }
     footerRule(p);
     bool back = backButton(p);
