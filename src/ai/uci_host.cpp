@@ -1,0 +1,256 @@
+#include "ai/uci_host.h"
+
+#include "core/log.h"
+
+#include <chrono>
+#include <condition_variable>
+#include <cstdlib>
+#include <deque>
+#include <iostream>
+#include <mutex>
+#include <streambuf>
+#include <thread>
+
+#if defined(SCACELITH_HAS_STOCKFISH)
+#include "stockfish_embedded.h"
+#endif
+
+namespace ai::detail {
+namespace {
+
+// std::cin replacement: a blocking queue of command lines. underflow() hands the engine one line
+// (plus '\n') at a time and blocks until the client pushes the next one; close() makes it report
+// end of input, which Stockfish's UCI loop treats like "quit".
+class LineInputBuf final : public std::streambuf {
+public:
+    void push(std::string line) {
+        {
+            std::lock_guard<std::mutex> lk(m_);
+            q_.push_back(std::move(line));
+        }
+        cv_.notify_one();
+    }
+    void close() {
+        {
+            std::lock_guard<std::mutex> lk(m_);
+            closed_ = true;
+        }
+        cv_.notify_all();
+    }
+    void reset() {
+        std::lock_guard<std::mutex> lk(m_);
+        q_.clear();
+        closed_ = false;
+        cur_.clear();
+        setg(nullptr, nullptr, nullptr);
+    }
+
+protected:
+    int_type underflow() override {
+        if (gptr() < egptr()) return traits_type::to_int_type(*gptr());
+        std::unique_lock<std::mutex> lk(m_);
+        cv_.wait(lk, [this] { return !q_.empty() || closed_; });
+        if (q_.empty()) return traits_type::eof();
+        cur_ = std::move(q_.front());
+        q_.pop_front();
+        cur_ += '\n';
+        setg(cur_.data(), cur_.data(), cur_.data() + cur_.size());
+        return traits_type::to_int_type(*gptr());
+    }
+
+private:
+    std::mutex m_;
+    std::condition_variable cv_;
+    std::deque<std::string> q_;
+    std::string cur_;
+    bool closed_ = false;
+};
+
+// std::cout replacement: splits the byte stream into complete lines and queues them for the
+// client. Unbuffered (every write lands in overflow/xsputn) and internally locked, so it is safe
+// even for the few Stockfish writes that are not wrapped in its own sync_cout lock.
+class LineOutputBuf final : public std::streambuf {
+public:
+    bool pop(std::string& line, int timeoutMs) {
+        std::unique_lock<std::mutex> lk(m_);
+        if (timeoutMs > 0 && q_.empty())
+            cv_.wait_for(lk, std::chrono::milliseconds(timeoutMs), [this] { return !q_.empty(); });
+        if (q_.empty()) return false;
+        line = std::move(q_.front());
+        q_.pop_front();
+        return true;
+    }
+    void reset() {
+        std::lock_guard<std::mutex> lk(m_);
+        q_.clear();
+        partial_.clear();
+    }
+
+protected:
+    int_type overflow(int_type c) override {
+        if (traits_type::eq_int_type(c, traits_type::eof())) return traits_type::not_eof(c);
+        char ch = traits_type::to_char_type(c);
+        append(&ch, 1);
+        return c;
+    }
+    std::streamsize xsputn(const char* s, std::streamsize n) override {
+        append(s, n);
+        return n;
+    }
+
+private:
+    void append(const char* s, std::streamsize n) {
+        bool pushed = false;
+        {
+            std::lock_guard<std::mutex> lk(m_);
+            for (std::streamsize i = 0; i < n; ++i) {
+                char ch = s[i];
+                if (ch == '\n') {
+                    if (!partial_.empty() && partial_.back() == '\r') partial_.pop_back();
+                    q_.push_back(std::move(partial_));
+                    partial_.clear();
+                    pushed = true;
+                } else {
+                    partial_ += ch;
+                }
+            }
+        }
+        if (pushed) cv_.notify_all();
+    }
+
+    std::mutex m_;
+    std::condition_variable cv_;
+    std::deque<std::string> q_;
+    std::string partial_;
+};
+
+}  // namespace
+
+struct UciHost::State {
+    mutable std::mutex m;  // guards owner / thread lifecycle (game thread only in practice)
+    const void* owner = nullptr;
+    bool wedged = false;   // a previous session could not be joined: never start another one
+    std::thread thread;
+    LineInputBuf in;
+    LineOutputBuf out;
+    std::streambuf* oldCin = nullptr;
+    std::streambuf* oldCout = nullptr;
+    std::mutex doneM;      // engine thread finished (so join() will not block)
+    std::condition_variable doneCv;
+    bool done = false;
+};
+
+UciHost::UciHost() : s_(new State) {}
+UciHost::~UciHost() { delete s_; }
+
+UciHost& UciHost::instance() {
+    // Intentionally leaked: the engine thread may still use the stream buffers during process
+    // exit if the game never called Engine::shutdown().
+    static UciHost* host = new UciHost;
+    return *host;
+}
+
+#if defined(SCACELITH_HAS_STOCKFISH)
+namespace {
+// Engine left running at process exit: stop it before Stockfish's globals are destroyed. Registered
+// on the first acquire(), i.e. after static initialisation, so it runs before those destructors.
+// The wait is bounded: on Windows exit() holds the CRT's atexit lock while running handlers, and an
+// engine thread that is still initialising may block on that very lock (registering the destructor
+// of a function-local static); it is then left parked until the process ends.
+void stopEngineAtExit() {
+    UciHost& h = UciHost::instance();
+    h.releaseAny(2000);
+}
+}  // namespace
+#endif
+
+bool UciHost::acquire(const void* owner) {
+#if defined(SCACELITH_HAS_STOCKFISH)
+    std::lock_guard<std::mutex> lk(s_->m);
+    if (s_->owner) return s_->owner == owner;
+    if (s_->wedged) return false;
+    if (!stockfish_embedded_supported()) {
+        LOGW("ai: this CPU lacks SSE4.1/POPCNT, the embedded Stockfish cannot run");
+        return false;
+    }
+    static const bool atExitRegistered = std::atexit(stopEngineAtExit) == 0;
+    (void)atExitRegistered;
+    s_->in.reset();
+    s_->out.reset();
+    s_->oldCin = std::cin.rdbuf(&s_->in);
+    s_->oldCout = std::cout.rdbuf(&s_->out);
+    std::cin.clear();
+    std::cout.clear();
+    s_->owner = owner;
+    s_->done = false;
+    LOGI("ai: starting embedded Stockfish (%s)", stockfish_embedded_arch());
+    State* st = s_;
+    s_->thread = std::thread([st] {
+        stockfish_embedded_main();
+        {
+            std::lock_guard<std::mutex> dl(st->doneM);
+            st->done = true;
+        }
+        st->doneCv.notify_all();
+    });
+    return true;
+#else
+    (void)owner;
+    return false;
+#endif
+}
+
+void UciHost::release(const void* owner) {
+    {
+        std::lock_guard<std::mutex> lk(s_->m);
+        if (!s_->owner || s_->owner != owner) return;
+    }
+    releaseAny(15000);
+}
+
+void UciHost::releaseAny(int timeoutMs) {
+    std::lock_guard<std::mutex> lk(s_->m);
+    if (!s_->owner) return;
+    s_->in.push("stop");
+    s_->in.push("quit");
+    bool finished;
+    {
+        std::unique_lock<std::mutex> dl(s_->doneM);
+        finished = s_->doneCv.wait_for(dl, std::chrono::milliseconds(timeoutMs), [this] { return s_->done; });
+    }
+    s_->owner = nullptr;
+    if (!finished) {
+        // Leave the thread and the redirected streams alone; they stay valid (leaked host).
+        LOGW("ai: Stockfish did not stop within %d ms, leaving it behind", timeoutMs);
+        s_->thread.detach();
+        s_->wedged = true;
+        return;
+    }
+    s_->thread.join();
+    std::cin.rdbuf(s_->oldCin);
+    std::cout.rdbuf(s_->oldCout);
+    std::cin.clear();
+    s_->in.reset();
+    s_->out.reset();
+}
+
+bool UciHost::ownedBy(const void* owner) const {
+    std::lock_guard<std::mutex> lk(s_->m);
+    return owner && s_->owner == owner;
+}
+
+void UciHost::send(const std::string& line) { s_->in.push(line); }
+
+bool UciHost::poll(std::string& line) { return s_->out.pop(line, 0); }
+
+bool UciHost::waitLine(std::string& line, int timeoutMs) { return s_->out.pop(line, timeoutMs > 0 ? timeoutMs : 0); }
+
+const char* UciHost::arch() const {
+#if defined(SCACELITH_HAS_STOCKFISH)
+    return stockfish_embedded_arch();
+#else
+    return "none";
+#endif
+}
+
+}  // namespace ai::detail
