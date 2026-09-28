@@ -881,7 +881,7 @@ void FakeServer::fetchServerInfo() {
     s.protocolMin = 1;
     s.protocolMax = I.hostHas("old") ? 0 : 1;
     s.compatible = !I.hostHas("old");
-    s.wsPort = I.ep.wsPort ? I.ep.wsPort : 443;
+    s.wsPort = I.ep.wsPort ? I.ep.wsPort : I.ep.apiPort;
     s.registrationOpen = true;
     s.emailVerification = true;
     s.googleSso = true;
@@ -1324,7 +1324,8 @@ struct FakeDirect::Impl {
                 }
             }
             invite.port = opt.port ? opt.port : 47100;
-            invite.publicAddress = upnp.state == UpnpStatus::State::Mapped ? upnp.externalIp : std::string();
+            // Empty when carrier-grade NAT is suspected (as the real DirectMatch does).
+            invite.publicAddress = upnp.state == UpnpStatus::State::Mapped && !upnp.cgnatSuspected ? upnp.externalIp : std::string();
             invite.lanAddresses = {"192.168.1.23", "fd12:3456:789a::1c"};
             {
                 static const char* alpha = "23456789ABCDEFGHJKMNPQRSTUVWXYZ";
@@ -1385,11 +1386,13 @@ void FakeDirect::join(const std::string& address, uint16_t port, const std::stri
         if (ch != '-' && ch != ' ') c += ch;
     I.state = DirectMatch::State::Connecting;
     I.nextStepAt = I.lastNow + 1000.0;
+    if (address.empty() || port == 0) return I.fail("bad_address");
+    if (c.size() != 12) return I.fail("invalid_code");
     if (contains(address, "refused")) return I.fail("refused");
     if (contains(address, "timeout")) return I.fail("timeout");
+    if (contains(address, "unknown")) return I.fail("not_found");
     if (contains(address, "old")) return I.fail("incompatible");
-    if (address.empty() || port == 0) return I.fail("address");
-    if (c.size() != 12) return I.fail("wrong_code");
+    if (c.compare(0, 4, "2222") == 0) return I.fail("wrong_code");
 }
 void FakeDirect::close() {
     Impl& I = *impl_;

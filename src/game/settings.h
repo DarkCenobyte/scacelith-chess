@@ -61,8 +61,8 @@ struct Settings {
     // keeps the sessions itself, per server.
     bool onlineCustomServer = false;  // false = the official server of this build (when it has one)
     std::string onlineHost;
-    int onlineApiPort = 443;
-    int onlineWsPort = 0;             // 0 = the port announced by the server
+    int onlineApiPort = 44664;        // HTTPS API (Scacelith servers use 44664 for both)
+    int onlineWsPort = 0;             // WSS; 0 = the API port
     std::string onlinePin;            // SHA-256 of a self-signed community server's certificate
     // Last choices of the online pages
     std::string onlineCategory = "5+3";

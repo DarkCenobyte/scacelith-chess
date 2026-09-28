@@ -9,6 +9,9 @@
 //   --data-dir <path>     read shaders/assets from disk (live edit, F5 reloads shaders).
 //   --debug-gl            KHR_debug context + synchronous error logging.
 //   --ini <path>          settings file (default: Scacelith.ini next to the exe).
+//   --online-mock         online play and direct match against in-process fakes (no network).
+//   --start-online [cat]  game scene: skip the menu, sign in and play the first opponent found
+//                         in category "cat" (default 5+3). See src/game/game_scene.h.
 #include "app/scene.h"
 #include "core/embedded.h"
 #include "core/image.h"

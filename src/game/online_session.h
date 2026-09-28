@@ -243,9 +243,12 @@ OnlineSession& onlineSession();
 // Friendly texts (i18n) of the network layer's errors: an HTTPS error code ("invalid_credentials",
 // "rate_limited" with the retry delay, "banned" with its end, "network", "tls", "certificate",
 // "incompatible"...), a realtime net::proto ErrorCode, a direct match error ("refused",
-// "timeout", "wrong_code", "incompatible", "port_in_use").
+// "timeout", "wrong_code", "incompatible", "port_in_use"... see net::DirectMatch::lastError()).
 std::string onlineErrorText(const std::string& code, int retryAfterSec = 0, int64_t bannedUntilMs = 0);
 std::string serverErrorText(int code);
+// Text of a ServerError event: its ErrorCode, or its transport error ("offline": a command sent
+// while not connected, which the network layer drops).
+std::string eventErrorText(const net::Event& e);
 std::string directErrorText(const std::string& code);
 // "14:32" (local time of an epoch-ms instant) and "0:45" (a duration).
 std::string localTimeText(double epochMs);

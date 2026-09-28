@@ -234,7 +234,7 @@ net::ServerEndpoint OnlineSession::endpoint() const {
     net::ServerEndpoint ep;
     ep.host = s.onlineHost;
     ep.apiPort = uint16_t(std::clamp(s.onlineApiPort, 1, 65535));
-    ep.wsPort = uint16_t(std::clamp(s.onlineWsPort, 0, 65535));
+    ep.wsPort = s.onlineWsPort > 0 ? uint16_t(std::min(s.onlineWsPort, 65535)) : ep.apiPort;  // empty = the API port
     ep.pinnedSha256 = s.onlinePin;
     return ep;
 }
@@ -654,7 +654,11 @@ void OnlineSession::handleServer(const net::Event& e) {
         if (e.code == kErrMatchmakingCooldown && cooldownUntilMs_ < nowMs()) cooldownUntilMs_ = nowMs() + 60000.0;
         queue_.searching = queue_.searching && e.code != kErrMatchmakingCooldown;
         if (e.code >= 200 && e.code < 210) outgoing_ = Outgoing();
-        ui::notify(serverErrorText(e.code), 4.5f);
+        if (e.code == 0 && e.error == "offline") {  // a command sent while not connected: dropped
+            queue_.searching = false;
+            outgoing_ = Outgoing();
+        }
+        ui::notify(eventErrorText(e), 4.5f);
         break;
     default: store(); break;
     }
@@ -665,7 +669,7 @@ void OnlineSession::handleDirect(const net::Event& e) {
         routeGame(e, LinkKind::Direct);
         return;
     }
-    if (e.kind == Kind::ServerError) ui::notify(serverErrorText(e.code), 4.5f);
+    if (e.kind == Kind::ServerError) ui::notify(eventErrorText(e), 4.5f);
 }
 
 void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
@@ -726,7 +730,7 @@ std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t 
     static const char* known[] = {"invalid_credentials", "email_unverified", "network", "tls", "certificate", "incompatible",
                                   "unauthorized", "username_taken", "email_taken", "invalid_username", "invalid_email",
                                   "weak_password", "invalid_code", "expired", "registration_closed", "sso_cancelled",
-                                  "server_error", "timeout"};
+                                  "server_error", "timeout", "offline"};
     for (const char* k : known)
         if (code == k) return i18n::tr(std::string("online.err.") + k);
     return i18n::trf("online.err.other", {code});
@@ -756,8 +760,15 @@ std::string serverErrorText(int code) {
     return i18n::trf("online.err.code", {std::to_string(code)});
 }
 
+std::string eventErrorText(const net::Event& e) {
+    if (e.code == 0 && !e.error.empty()) return onlineErrorText(e.error, e.retryAfterSec);
+    return serverErrorText(e.code);
+}
+
 std::string directErrorText(const std::string& code) {
-    static const char* known[] = {"refused", "timeout", "wrong_code", "incompatible", "port_in_use", "address"};
+    static const char* known[] = {"refused",  "timeout",     "wrong_code", "incompatible", "port_in_use",
+                                  "network",  "too_many_attempts", "invalid_code", "bad_address", "not_found",
+                                  "unreachable", "reset",    "closed",     "host_left"};
     for (const char* k : known)
         if (code == k) return i18n::tr(std::string("direct.err.") + k);
     return i18n::trf("direct.err.other", {code});

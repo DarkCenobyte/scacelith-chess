@@ -7,10 +7,13 @@
 #include "ui.h"
 #include "ui_draw.h"
 #include "ui_internal.h"
+#include "ui_online.h"
 #include "ui_screens_game.h"
+#include "ui_screens_online.h"
 #include "ui_theme.h"
 #include "ui_widgets.h"
 #include "../chess/chess.h"
+#include "../game/online_session.h"
 #include "../game/settings.h"
 #include "../i18n/i18n.h"
 #include "../i18n/unicode.h"
@@ -32,7 +35,7 @@ using namespace theme;
 namespace {
 
 // ---- State ----------------------------------------------------------------------------------------
-enum class Page { Title, NewGame, Options, Credits, Watch };
+enum class Page { Title, NewGame, Options, Credits, Watch, Online };
 
 struct OptionsState {
     game::Settings work;
@@ -55,6 +58,8 @@ struct State {
     bool pageFresh = false;
     uint64_t menuFrame = 0;
     float presetScroll = 0.0f, presetScrollTarget = 0.0f;
+    bool resumeOnline = false;      // an online game started from the online page: back to it after
+    bool optionsToOnline = false;   // Options opened from the online page: back to it on close
     // options (shared by both menus)
     OptionsState opt;
     int forcedTab = -1;
@@ -255,6 +260,7 @@ void copyOptions(game::Settings& dst, const game::Settings& src) {
     dst.language = src.language;
     dst.playerName = cleanName(src.playerName);
     dst.handStyle = src.handStyle;
+    detail::copyOnlineOptions(dst, src);
 }
 bool sameOptions(const game::Settings& a, const game::Settings& b) {
     auto feq = [](float x, float y) { return std::fabs(x - y) < 1e-4f; };
@@ -264,7 +270,7 @@ bool sameOptions(const game::Settings& a, const game::Settings& b) {
            feq(a.effectsVolume, b.effectsVolume) && feq(a.ambienceVolume, b.ambienceVolume) && a.ambience == b.ambience &&
            a.showLegalMoves == b.showLegalMoves && a.showCoordinates == b.showCoordinates &&
            feq(a.mouseSensitivity, b.mouseSensitivity) && a.invertLook == b.invertLook && a.humanizeThinking == b.humanizeThinking &&
-           cleanName(a.playerName) == cleanName(b.playerName) && a.handStyle == b.handStyle;
+           cleanName(a.playerName) == cleanName(b.playerName) && a.handStyle == b.handStyle && detail::sameOnlineOptions(a, b);
 }
 
 void loadSetupFromSettings(NewGameSetup& s) {
@@ -381,7 +387,8 @@ bool optionsPage(MenuAction& act) {
     im::pageTitle(T("options.title"), p.cx(), p.y + 80.0f);
     im::pushId("options");
     const std::vector<std::string> tabs = {T("options.tab.display"), T("options.tab.graphics"), T("options.tab.audio"),
-                                           T("options.tab.gameplay"), T("options.tab.player"), T("options.tab.controls")};
+                                           T("options.tab.gameplay"), T("options.tab.player"), T("options.tab.online"),
+                                           T("options.tab.controls")};
     im::tabBar(tabs, o.tab, Rect(p.x + 60.0f, p.y + 124.0f, p.w - 120.0f, 50.0f));
 
     game::Settings& s = o.work;
@@ -487,6 +494,7 @@ bool optionsPage(MenuAction& act) {
             handwritingPreview(written == "Human" ? T("player.default_name") : written, hs, Rect(rx, y + 18.0f, rw, 170.0f));
             break;
         }
+        case detail::kOnlineOptionsTab: detail::onlineOptionsRows(s, rx, rw, y); break;
         default: {
             struct Line { const char* keys; const char* action; };
             static const Line lines[] = {
@@ -558,8 +566,11 @@ bool optionsPage(MenuAction& act) {
         if (r >= 0) o.confirmDiscard = false;
     }
     if (apply) {
+        game::Settings before = game::settings();
         copyOptions(game::settings(), o.work);
         game::settings().save();
+        // Another server: its own sign-in (credentials are kept per server by the network layer).
+        if (detail::onlineServerChanged(before, game::settings())) game::onlineSession().applyServer();
         act = MenuAction::OptionsChanged;
         o.work = game::settings();
         im::sound(Sound::Confirm);
@@ -607,32 +618,35 @@ MenuAction titlePage(float t) {
     TextStyle sub = style(font::FACE_ITALIC, 30.0f, ivoryDim, start);
     gfx::text(T("menu.subtitle"), im::flipX(sr, x + 4.0f), ruleY + 48.0f, sub);
 
-    float ey = 520.0f + slide;
-    float eh = 62.0f, ew = 440.0f;
+    float ey = 490.0f + slide;
+    float eh = 62.0f, ew = 440.0f, step = 70.0f;
     im::pushId("title");
     im::Id first = im::makeId("##menu.new_game");
     if (im::menuEntry(L("menu.new_game"), im::flip(sr, Rect(x, ey, ew, eh)))) {
         setPage(Page::NewGame);
         im::sound(Sound::Open);
     }
-    if (im::menuEntry(L("menu.watch"), im::flip(sr, Rect(x, ey + 76.0f, ew, eh)))) {
+    if (im::menuEntry(L("menu.online"), im::flip(sr, Rect(x, ey + step, ew, eh)))) {
+        setPage(Page::Online);
+        im::sound(Sound::Open);
+    }
+    if (im::menuEntry(L("menu.watch"), im::flip(sr, Rect(x, ey + 2.0f * step, ew, eh)))) {
         setPage(Page::Watch);
         im::sound(Sound::Open);
     }
-    ey += 76.0f;  // the entries below move down one row
-    if (im::menuEntry(L("menu.options"), im::flip(sr, Rect(x, ey + 76.0f, ew, eh)))) {
+    if (im::menuEntry(L("menu.options"), im::flip(sr, Rect(x, ey + 3.0f * step, ew, eh)))) {
         setPage(Page::Options);
         openOptions();
     }
-    if (im::menuEntry(L("menu.credits"), im::flip(sr, Rect(x, ey + 152.0f, ew, eh)))) {
+    if (im::menuEntry(L("menu.credits"), im::flip(sr, Rect(x, ey + 4.0f * step, ew, eh)))) {
         setPage(Page::Credits);
         im::sound(Sound::Open);
     }
-    if (im::menuEntry(L("menu.quit"), im::flip(sr, Rect(x, ey + 228.0f, ew, eh)))) act = MenuAction::Quit;
+    if (im::menuEntry(L("menu.quit"), im::flip(sr, Rect(x, ey + 5.0f * step, ew, eh)))) act = MenuAction::Quit;
     im::setDefaultFocus(first);
     im::popId();
 
-    detail::titleRating(im::flipX(sr, x), ey + 360.0f);
+    detail::titleRating(im::flipX(sr, x), ey + 5.0f * step + 132.0f);
     TextStyle vs = style(font::FACE_ITALIC, 19.0f, withAlpha(muted, 0.85f), start);
     gfx::text(i18n::trf("menu.version", {i18n::ltr(detail::data().version)}), im::flipX(sr, x), v.y - 48.0f, vs);
     gfx::popAlpha();
@@ -959,6 +973,13 @@ void screensReset() { S = State(); }
 
 // Hooks for the viewer mode's pages (ui_screens_game.cpp).
 bool runOptionsPage(MenuAction& act) { return optionsPage(act); }
+void openOptionsOnTab(int tab) {
+    S.opt.tab = tab;
+    S.forcedTab = tab;
+    S.optionsToOnline = S.page == Page::Online;
+    setPage(Page::Options);
+    openOptions();
+}
 void openOptionsPage() { openOptions(); }
 void dimBackground(float a) { dimScene(a); }
 
@@ -974,6 +995,10 @@ void screensEndFrame() {}
 
 namespace debug {
 void openMenuPage(MenuPage page) { S.forcedPage = int(page); }
+void openOnlineMenu(const std::string& sub) {
+    S.forcedPage = int(Page::Online);
+    openOnlinePage(sub);
+}
 void setOptionsTab(int tab) { S.forcedTab = tab; S.opt.tab = tab; }
 void openPauseConfirm(int which) { S.forcedPauseConfirm = which; }
 void foldGameOver(bool folded) { S.forcedFold = folded ? 1 : 0; }
@@ -990,9 +1015,10 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
     im::Id menuId = im::makeId("##mainmenu");
     bool appear = im::appearing(menuId);
     if (appear) {
-        setPage(S.forcedPage >= 0 ? Page(S.forcedPage) : Page::Title);
+        setPage(S.forcedPage >= 0 ? Page(S.forcedPage) : S.resumeOnline ? Page::Online : Page::Title);
         if (S.page == Page::Options) openOptions();
         S.forcedPage = -1;
+        S.resumeOnline = false;
     }
     im::captureMouseAll();
     im::captureKeyboard();
@@ -1004,7 +1030,10 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
         case Page::Title: act = titlePage(ease(S.pageT)); break;
         case Page::NewGame: act = newGamePage(setup, fresh); break;
         case Page::Options:
-            if (optionsPage(act)) setPage(Page::Title);
+            if (optionsPage(act)) {
+                setPage(S.optionsToOnline ? Page::Online : Page::Title);
+                S.optionsToOnline = false;
+            }
             break;
         case Page::Credits: creditsPage(); break;
         case Page::Watch: {
@@ -1013,7 +1042,17 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
             if (back) setPage(Page::Title);
             break;
         }
+        case Page::Online: {
+            bool back = false;
+            detail::onlinePage(ease(S.pageT), fresh, back);
+            if (back) setPage(Page::Title);
+            break;
+        }
     }
+    // Online: challenge cards on every page once signed in, the ping on the online page. A game
+    // that starts from the online page brings the menu back to it afterwards.
+    detail::onlineMenuOverlay(S.page == Page::Online);
+    if (detail::onlineGameStarting()) S.resumeOnline = S.page == Page::Online;
     if (act == MenuAction::StartGame || act == MenuAction::Quit) setPage(Page::Title);
     if (act == MenuAction::StartWatching) setPage(Page::Title);
     return act;
@@ -1277,9 +1316,16 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
             act = MenuAction::BackToMainMenu;
         std::string primary = S.goExtras.primaryLabel.empty() ? L("gameover.rematch") : S.goExtras.primaryLabel + "##gameover.rematch";
         im::Id rematchId = im::makeId("##gameover.rematch");
-        if (im::button(primary, im::flip(p, Rect(p.cx() + gap * 0.5f, by, bw, bh)), im::ButtonKind::Primary))
+        if (im::button(primary, im::flip(p, Rect(p.cx() + gap * 0.5f, by, bw, bh)), im::ButtonKind::Primary, !S.goExtras.primaryDisabled))
             act = MenuAction::Rematch;
-        im::setDefaultFocus(rematchId);
+        im::setDefaultFocus(S.goExtras.primaryDisabled ? im::makeId("##common.main_menu") : rematchId);
+        if (!S.goExtras.reportLabel.empty()) {  // online: report the opponent (start corner, quiet)
+            TextStyle rq = style(font::FACE_ITALIC, kSmall, muted);
+            float rw = std::max(176.0f, gfx::textWidth(S.goExtras.reportLabel, rq) + 24.0f);
+            if (im::button(S.goExtras.reportLabel + "##gameover.report", im::flip(p, Rect(p.x + 14.0f, p.y + 14.0f, rw, 40.0f)),
+                           im::ButtonKind::Quiet))
+                act = MenuAction::Report;
+        }
         TextStyle qs = style(font::FACE_ITALIC, kSmall, muted);
         float vw = std::max(176.0f, gfx::textWidth(T("gameover.view_board"), qs) + 24.0f);
         if (im::button(L("gameover.view_board"), im::flip(p, Rect(p.r() - 14.0f - vw, p.y + 14.0f, vw, 40.0f)), im::ButtonKind::Quiet)) {

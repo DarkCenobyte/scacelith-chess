@@ -12,7 +12,9 @@
 // Special inputs to try the error paths: user name "banned", "unverified" or "ratelimited",
 // password "wrong", a user name containing "mfa" (asks for a code), a custom server host
 // containing "offline", "badcert" or "old" (network, certificate, incompatible version); direct
-// match: address "refused.test" or "timeout.test", any code that is not 12 characters.
+// match: address "refused.test", "timeout.test" or "unknown.test", a code that is not 12
+// characters, a code starting with "2222" (wrong code), host port 47199 (no UPnP router) or
+// 47198 (carrier-grade NAT).
 //
 // Used by src/game/online_stub.cpp (the OnlineClient / DirectMatch implementation of builds
 // without the real network layer, i.e. without SCACELITH_NET_REAL) and meant to back a

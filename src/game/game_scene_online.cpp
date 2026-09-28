@@ -259,7 +259,7 @@ void GameScene::onlineEvent(const net::Event& e) {
         break;
     }
     case Kind::ServerError:
-        ui::notify(serverErrorText(e.code), 4.0f);
+        ui::notify(eventErrorText(e), 4.0f);
         if (e.code == kErrDrawOfferLimit) myDrawOffer_ = false;
         break;
     default: break;
