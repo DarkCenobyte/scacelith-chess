@@ -1,0 +1,54 @@
+// SSR temporal filter: reprojection with the surface velocity, YCoCg neighbourhood clipping of the
+// history (reflections have parallax the surface velocity does not describe), depth rejection.
+#include "shaders/post/post_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uCurrent;
+layout(binding = 1) uniform sampler2D uHistory;
+layout(binding = 2) uniform sampler2D uVelocity;
+layout(binding = 3) uniform sampler2D uLinearDepth;
+layout(binding = 4) uniform sampler2D uLinearDepthPrev;
+layout(binding = 0, rgba16f) uniform writeonly image2D oSSR;
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 size = ivec2(post.renderSize.xy);
+    if (any(greaterThanEqual(p, size))) return;
+    vec4 cur = texelFetch(uCurrent, p, 0);
+    float z = texelFetch(uLinearDepth, p, 0).r;
+    vec3 m1 = vec3(0.0), m2 = vec3(0.0);
+    float aMin = 1.0, aMax = 0.0;
+    for (int y = -1; y <= 1; ++y)
+        for (int x = -1; x <= 1; ++x) {
+            vec4 v = texelFetch(uCurrent, clamp(p + ivec2(x, y), ivec2(0), size - 1), 0);
+            vec3 c = rgbToYCoCg(tmForward(v.rgb));
+            m1 += c;
+            m2 += c * c;
+            aMin = min(aMin, v.a);
+            aMax = max(aMax, v.a);
+        }
+    m1 /= 9.0;
+    vec3 sigma = sqrt(max(m2 / 9.0 - m1 * m1, 0.0));
+    vec2 uv = (vec2(p) + 0.5) * post.renderSize.zw;
+    vec2 vel = texelFetch(uVelocity, p, 0).xy;
+    if (badValue(vec3(vel, 0.0))) vel = vec2(0.0);
+    vec2 prevUV = uv - vel;
+    vec4 result = cur;
+    if (post.ssrB.z > 0.5 && cur.a + aMax > 0.0 && all(greaterThanEqual(prevUV, vec2(0.0))) && all(lessThan(prevUV, vec2(1.0)))) {
+        vec3 pw = worldPosFromLinear(uv, z);
+        float expected = (frame.prevViewProj * vec4(pw, 1.0)).w;
+        float zPrev = texelFetch(uLinearDepthPrev, clamp(ivec2(prevUV * post.renderSize.xy), ivec2(0), size - 1), 0).r;
+        vec4 hist = textureLod(uHistory, prevUV, 0.0);
+        if (abs(zPrev - expected) < 0.05 * expected && !badValue(hist.rgb) && !isnan(hist.a)) {
+            float speed = length(vel * post.renderSize.xy);
+            vec3 hy = rgbToYCoCg(tmForward(hist.rgb));
+            hy = clipAABB(hy, m1 - sigma * 1.25, m1 + sigma * 1.25);
+            hist.rgb = tmInverse(yCoCgToRgb(hy));
+            hist.a = clamp(hist.a, aMin - 0.05, aMax + 0.05);
+            float alpha = mix(0.1, 0.4, saturate(speed / 10.0));
+            result = mix(hist, cur, alpha);
+        }
+    }
+    result.rgb = sanitize(result.rgb);
+    result.a = saturate(isnan(result.a) ? 0.0 : result.a);
+    imageStore(oSSR, p, result);
+}

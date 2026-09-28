@@ -1,0 +1,8 @@
+/build*/
+*.log
+Scacelith.ini
+*.png.tmp
+/out/
+.vscode/
+.idea/
+.claude/worktrees/

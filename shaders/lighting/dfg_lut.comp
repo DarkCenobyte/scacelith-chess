@@ -1,0 +1,39 @@
+// Split-sum DFG LUT (TEXUNIT_BRDF_LUT), u = NoV, v = perceptual roughness:
+//   r = A, g = B with  E_spec(f0) = f0 * A + B  (height-correlated Smith GGX, Schlick Fresnel)
+//   b = directional albedo of the Charlie sheen lobe (D_Charlie * V_Neubelt), for energy scaling.
+// Multiple-scattering compensation uses E(f0 = 1) = A + B (Fdez-Aguera 2019 / Filament).
+#include "shaders/include/common.glsl"
+#include "shaders/include/brdf.glsl"
+#include "shaders/lighting/cubemap.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(rgba16f, binding = 0) uniform writeonly image2D uOut;
+uniform int uSize;
+
+void main() {
+    ivec2 px = ivec2(gl_GlobalInvocationID.xy);
+    if (px.x >= uSize || px.y >= uSize) return;
+    float NoV = (float(px.x) + 0.5) / float(uSize);
+    float rough = (float(px.y) + 0.5) / float(uSize);
+    float a = rough * rough;
+    vec3 V = vec3(sqrt(1.0 - NoV * NoV), 0.0, NoV);
+    const uint N = 512u;
+    float A = 0.0, B = 0.0, S = 0.0;
+    for (uint i = 0u; i < N; ++i) {
+        vec2 xi = hammersley(i, N);
+        vec3 H = importanceSampleGGX(xi, a);
+        vec3 L = 2.0 * dot(V, H) * H - V;
+        float NoL = L.z, NoH = max(H.z, 0.0), VoH = max(dot(V, H), 0.0);
+        if (NoL > 0.0) {
+            float Gv = V_SmithGGXCorrelated(NoV, NoL, a) * 4.0 * NoL * VoH / max(NoH, 1e-5);
+            float Fc = pow(1.0 - VoH, 5.0);
+            A += (1.0 - Fc) * Gv;
+            B += Fc * Gv;
+        }
+        // Sheen: uniform hemisphere sampling (pdf = 1 / 2PI).
+        float cosT = xi.y, sinT = sqrt(1.0 - cosT * cosT), phi = TAU * xi.x;
+        vec3 Ls = vec3(sinT * cos(phi), sinT * sin(phi), cosT);
+        vec3 Hs = normalize(V + Ls);
+        S += D_Charlie(rough, max(Hs.z, 0.0)) * V_Neubelt(NoV, Ls.z) * Ls.z * TAU;
+    }
+    imageStore(uOut, px, vec4(A / float(N), B / float(N), S / float(N), 1.0));
+}

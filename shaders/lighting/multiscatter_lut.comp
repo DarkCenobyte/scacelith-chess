@@ -1,0 +1,35 @@
+// Multiple-scattering LUT (32x32): psi_ms(altitude, sun zenith) = L2 / (1 - f_ms) (Hillaire 2020).
+#include "shaders/include/common.glsl"
+#include "shaders/lighting/atmosphere.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uTransmittance;
+layout(rgba16f, binding = 0) uniform writeonly image2D uOut;
+uniform float uMieScale;
+
+void main() {
+    ivec2 px = ivec2(gl_GlobalInvocationID.xy);
+    if (any(greaterThanEqual(px, ivec2(MULTISCAT_LUT_SIZE)))) return;
+    vec2 uv = clamp(atmoUnSubUv((vec2(px) + 0.5) / MULTISCAT_LUT_SIZE, MULTISCAT_LUT_SIZE), 0.0, 1.0);
+    float muS = uv.x * 2.0 - 1.0;
+    float r = ATMO_BOTTOM + max(uv.y * (ATMO_TOP - ATMO_BOTTOM), 0.01);
+    vec3 ro = vec3(0.0, r, 0.0);
+    vec3 sunDir = vec3(sqrt(max(1.0 - muS * muS, 0.0)), muS, 0.0);
+    const int N = 8;
+    vec3 lSum = vec3(0.0), fSum = vec3(0.0);
+    for (int j = 0; j < N; ++j) {
+        for (int i = 0; i < N; ++i) {
+            float cosT = 1.0 - 2.0 * (float(j) + 0.5) / float(N);
+            float sinT = sqrt(max(1.0 - cosT * cosT, 0.0));
+            float phi = TAU * (float(i) + 0.5) / float(N);
+            vec3 rd = vec3(sinT * cos(phi), cosT, sinT * sin(phi));
+            vec3 thr, fms;
+            vec3 L = atmoIntegrate(ro, rd, sunDir, 20, uMieScale, true, true, uTransmittance, uTransmittance, false, thr, fms);
+            lSum += L;
+            fSum += fms;
+        }
+    }
+    lSum /= float(N * N);
+    fSum /= float(N * N);
+    vec3 psi = lSum / max(vec3(1.0) - fSum, vec3(1e-3));
+    imageStore(uOut, px, vec4(psi, 1.0));
+}

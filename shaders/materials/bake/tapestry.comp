@@ -1,0 +1,199 @@
+// Tapestry / brocade motif bake: three tileable 1024^2 layers of a texture array.
+//   layer 0: fleur-de-lis semé in a gold lozenge trellis with rosettes (French royal hangings)
+//   layer 1: damask: ogee lattice with pomegranates and leaves (Renaissance brocade)
+//   layer 2: border strip: gold fillets, a scrolling rinceau with fleurons (u tiles along the
+//            border, v runs across it from the outer edge (0) to the field (1))
+// Channels: r = gold thread coverage, g = tone-on-tone ground pattern (damask shading),
+//           b = ivory / light silk accents, a = relief (padded embroidery height, 0.5 = ground).
+// Everything is built from 2D signed distances, box-filtered over one texel.
+#define MAT_BAKE
+#include "shaders/include/common.glsl"
+#include "shaders/include/noise.glsl"
+#include "shaders/materials/include/matlib.glsl"
+
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0, rgba8) uniform writeonly image2D uOut;
+uniform ivec2 uOffset;
+uniform int uSize;
+uniform int uLayer;
+
+float gTexel;  // texel size in pattern units (AA width)
+
+// ---- 2D SDF toolkit ---------------------------------------------------------------------------
+float sdCircle(vec2 p, float r) { return length(p) - r; }
+float sdBox(vec2 p, vec2 b) { vec2 d = abs(p) - b; return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0); }
+float sdRoundBox(vec2 p, vec2 b, float r) { return sdBox(p, b - r) - r; }
+// Vesica (pointed lens) of circle radius r whose centres are d apart from the axis (IQ).
+float sdVesica(vec2 p, float r, float d) {
+    p = abs(p);
+    float b = sqrt(r * r - d * d);
+    return ((p.y - b) * d > p.x * b) ? length(p - vec2(0.0, b)) : length(p - vec2(-d, 0.0)) - r;
+}
+float sdSegment(vec2 p, vec2 a, vec2 b) {
+    vec2 pa = p - a, ba = b - a;
+    float h = clamp(dot(pa, ba) / dot(ba, ba), 0.0, 1.0);
+    return length(pa - ba * h);
+}
+// Arc of radius r centred at the origin, from angle a0 spanning 'span' (radians).
+float sdArc(vec2 p, float r, float a0, float span) {
+    float a = atan(p.y, p.x) - a0;
+    a = mod(a + PI, TAU) - PI;
+    float ac = clamp(a, 0.0, span);
+    return length(p - r * vec2(cos(a0 + ac), sin(a0 + ac)));
+}
+float opU(float a, float b) { return min(a, b); }
+float opS(float a, float b) { return max(a, -b); }
+float smin(float a, float b, float k) { float h = clamp(0.5 + 0.5 * (b - a) / k, 0.0, 1.0); return mix(b, a, h) - k * h * (1.0 - h); }
+float fill(float d) { return clamp(0.5 - d / gTexel, 0.0, 1.0); }
+float stroke(float d, float w) { return fill(abs(d) - w); }
+mat2 rot(float a) { float c = cos(a), s = sin(a); return mat2(c, s, -s, c); }
+
+// ---- Fleur-de-lis (height ~1, centred at the origin, symmetric in x) ---------------------------
+float fleurDeLis(vec2 p) {
+    p.x = abs(p.x);
+    // Central petal: tall pointed lens, fuller at the bottom.
+    float centre = sdVesica(p - vec2(0.0, 0.16), 0.24, 0.165);
+    centre = smin(centre, sdCircle(p - vec2(0.0, 0.02), 0.07), 0.04);
+    // Side petals: crescents rising from the band, curling outwards and down to a point.
+    vec2 q = p - vec2(0.13, 0.02);
+    float outer = sdCircle(q, 0.17);
+    float inner = sdCircle(q - vec2(0.065, -0.06), 0.15);
+    float side = opS(outer, inner);
+    side = max(side, -(p.y + 0.14));                    // cut below the tip
+    side = max(side, p.x - 0.30);
+    side = max(side, -(p.x - 0.03));
+    // Band (the tie) across the stems.
+    float band = sdRoundBox(p - vec2(0.0, -0.09), vec2(0.17, 0.035), 0.015);
+    // Foot: a small inverted trefoil below the band.
+    float foot = sdVesica((p - vec2(0.0, -0.22)) * vec2(1.0, -1.0), 0.1, 0.068);
+    vec2 f = p - vec2(0.07, -0.19);
+    float footSide = opS(sdCircle(f, 0.055), sdCircle(f - vec2(0.03, -0.035), 0.05));
+    float d = opU(opU(centre, side), opU(band, opU(foot, footSide)));
+    return d;
+}
+
+float rosette(vec2 p, float r) {
+    float a = atan(p.y, p.x);
+    float petals = length(p) - r * (0.72 + 0.28 * cos(a * 6.0));
+    return opU(petals, sdCircle(p, r * 0.3) - 0.0);
+}
+
+// ---- Layer 0: fleur-de-lis trellis -------------------------------------------------------------
+vec4 layerFleur(vec2 uv) {
+    float gold = 0.0, tone = 0.0, ivory = 0.0, h = 0.5;
+    // Fleurs at the centre and the corners (staggered), scale 0.42 of the repeat.
+    float df = 1e9;
+    const float fs = 0.52;
+    df = min(df, fleurDeLis((uv - vec2(0.5, 0.5)) / fs) * fs);
+    for (int j = 0; j <= 1; ++j)
+        for (int i = 0; i <= 1; ++i) df = min(df, fleurDeLis((uv - vec2(i, j)) / fs) * fs);
+    float fl = fill(df);
+    // Ivory outline inside the gold (couched cord).
+    float outline = stroke(df + 0.006, 0.0022);
+    // Lozenge trellis through the edge midpoints, doubled gold cord.
+    vec2 c = uv - 0.5;
+    float dl = abs(abs(c.x) + abs(c.y) - 0.5) * 0.7071;
+    float trellis = max(stroke(dl - 0.007, 0.0028), stroke(dl + 0.007, 0.0028));
+    // Rosettes where the trellis meets.
+    float dr = 1e9;
+    dr = min(dr, rosette(uv - vec2(0.5, 0.0), 0.045));
+    dr = min(dr, rosette(uv - vec2(0.5, 1.0), 0.045));
+    dr = min(dr, rosette(uv - vec2(0.0, 0.5), 0.045));
+    dr = min(dr, rosette(uv - vec2(1.0, 0.5), 0.045));
+    float ros = fill(dr);
+    gold = max(max(fl * (1.0 - outline), trellis), ros);
+    ivory = max(outline * fl, fill(sdCircle(mod(uv, 0.5) - 0.25, 0.0)) * 0.0);
+    ivory = max(ivory, fill(abs(dr + 0.012) - 0.003) * 0.8);
+    // Ground: tone-on-tone diaper (small diamonds) inside each lozenge.
+    vec2 g = fract(uv * 8.0) - 0.5;
+    float diaper = fill(abs(g.x) + abs(g.y) - 0.18);
+    tone = diaper * 0.6 * (1.0 - gold);
+    // Relief: padded motifs stand out, cords are round.
+    h = 0.5 + 0.35 * fl * (0.6 + 0.4 * clamp(-df / 0.02, 0.0, 1.0)) + 0.25 * trellis + 0.3 * ros;
+    return vec4(gold, tone, ivory, clamp(h, 0.0, 1.0));
+}
+
+// ---- Layer 1: damask pomegranate in an ogee lattice ---------------------------------------------
+float pomegranate(vec2 p) {
+    // Fruit body + crown + two leaves.
+    float fruit = sdCircle(p - vec2(0.0, -0.02), 0.11);
+    vec2 cp = vec2(abs(p.x), p.y);
+    float crown = sdVesica((cp - vec2(0.0, 0.12)), 0.06, 0.04);
+    crown = opU(crown, sdVesica(rot(-0.5) * (cp - vec2(0.05, 0.1)), 0.05, 0.035));
+    vec2 lp = rot(0.9) * (cp - vec2(0.13, -0.08));
+    float leaf = sdVesica(lp, 0.12, 0.09);
+    return opU(opU(fruit, crown), leaf);
+}
+vec4 layerDamask(vec2 uv) {
+    // Ogee lattice: sine curves x = 0.5 +- 0.22 sin(2 pi y) (and their period copies).
+    float best = 1e9;
+    for (int k = -1; k <= 1; ++k) {
+        float s1 = abs(uv.x - (float(k) + 0.5 + 0.22 * sin(TAU * uv.y)));
+        float s2 = abs(uv.x - (float(k) + 0.5 - 0.22 * sin(TAU * uv.y)));
+        best = min(best, min(s1, s2));
+    }
+    float slope = 0.22 * TAU;
+    float dLat = best / sqrt(1.0 + slope * slope * 0.5);
+    float lattice = stroke(dLat, 0.012);
+    float latticeGold = stroke(dLat, 0.004);
+    // Motifs at the ogee centres: (0,0.25),(0.5,0.75) and period copies.
+    float dp = 1e9;
+    vec2 centres[4] = vec2[](vec2(0.0, 0.25), vec2(1.0, 0.25), vec2(0.5, 0.75), vec2(0.5, -0.25));
+    const float ps = 1.55;
+    for (int k = 0; k < 4; ++k) dp = min(dp, pomegranate((uv - centres[k]) / ps) * ps);
+    for (int k = 0; k < 2; ++k) dp = min(dp, pomegranate((uv - vec2(float(k), 1.25)) / ps) * ps);
+    float motif = fill(dp);
+    // Seeds inside the fruit (ivory dots), gold outline.
+    vec2 sg = fract(uv * 36.0) - 0.5;
+    float seeds = fill(length(sg) - 0.22) * fill(dp + 0.03);
+    float goldEdge = stroke(dp, 0.0035);
+    float tone = max(motif * 0.9, lattice * 0.8);
+    float gold = max(goldEdge, latticeGold);
+    float ivory = seeds * 0.8;
+    float h = 0.5 + 0.25 * motif + 0.25 * gold;
+    return vec4(gold, tone, ivory, h);
+}
+
+// ---- Layer 2: border strip --------------------------------------------------------------------
+vec4 layerBorder(vec2 uv) {
+    float u = uv.x, v = uv.y;
+    // Fillets.
+    float f1 = stroke(v - 0.06, 0.012), f2 = stroke(v - 0.94, 0.012);
+    float f3 = stroke(v - 0.12, 0.004), f4 = stroke(v - 0.88, 0.004);
+    // Rinceau: a wave with scrolls, two periods per repeat.
+    float wy = 0.5 + 0.2 * sin(TAU * 2.0 * u);
+    float slope = 0.2 * TAU * 2.0 * cos(TAU * 2.0 * u);
+    float dWave = abs(v - wy) / sqrt(1.0 + slope * slope);
+    float wave = stroke(dWave, 0.014);
+    float scrolls = 0.0, leaves = 0.0, flowers = 0.0;
+    for (int k = 0; k < 5; ++k) {
+        float uc = (float(k) - 0.5) * 0.25;  // quarter periods: alternate up/down curls
+        float up = (k & 1) == 0 ? 1.0 : -1.0;
+        vec2 c = vec2(uc + 0.125, 0.5 + up * 0.08);
+        vec2 q = vec2(u, v) - c;
+        // Spiral scroll (two arcs).
+        float d = sdArc(q, 0.09, up > 0.0 ? -1.2 : 1.9, 3.6);
+        d = min(d, sdArc(q - vec2(0.0, up * 0.035), 0.05, up > 0.0 ? -0.6 : 2.5, 3.0));
+        scrolls = max(scrolls, stroke(d, 0.009));
+        // Leaf on the scroll.
+        vec2 lq = rot(up * 0.8) * (q - vec2(0.07, -up * 0.05));
+        leaves = max(leaves, fill(sdVesica(lq, 0.07, 0.052)));
+        // Fleuron at the scroll centre.
+        flowers = max(flowers, fill(rosette(q - vec2(0.0, up * 0.01), 0.03)));
+    }
+    float gold = max(max(f1, f2), max(max(wave, scrolls), flowers));
+    float ivory = max(max(f3, f4), flowers * fill(sdCircle(fract(vec2(u * 4.0, v) + vec2(0.5, 0.0)) - vec2(0.5, 0.5), 0.0)));
+    float tone = max(leaves * 0.9, 0.0);
+    ivory = max(ivory, leaves * 0.25);
+    float h = 0.5 + 0.3 * gold + 0.2 * leaves;
+    return vec4(gold, tone, ivory, clamp(h, 0.0, 1.0));
+}
+
+void main() {
+    ivec2 px = ivec2(gl_GlobalInvocationID.xy) + uOffset;
+    if (any(greaterThanEqual(px, ivec2(uSize)))) return;
+    vec2 uv = (vec2(px) + 0.5) / float(uSize);
+    gTexel = 1.0 / float(uSize);
+    vec4 o = uLayer == 0 ? layerFleur(uv) : (uLayer == 1 ? layerDamask(uv) : layerBorder(uv));
+    imageStore(uOut, px, clamp(o, 0.0, 1.0));
+}

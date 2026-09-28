@@ -1,0 +1,53 @@
+// Bakes a tileable marble slab (periodic 2D slice of the marble field of marble_field.glsl).
+// Output (RGBA8, wraps in both axes): r = vein cores (main + crossing + capillaries),
+// g = vein body, b = clouding (+ halo, mottle), a = fracture network.
+// Anti-aliasing: fields are shared through workgroup memory and differenced like fragment
+// derivatives (2x2 quads), then shaped with the same box-filtered bands as the live shaders.
+#define MAT_BAKE
+#include "shaders/include/common.glsl"
+#include "shaders/include/noise.glsl"
+#include "shaders/materials/include/matlib.glsl"
+#include "shaders/materials/include/marble_field.glsl"
+
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0, rgba8) uniform writeonly image2D uOut;
+uniform ivec2 uOffset;
+uniform int uSize;
+uniform vec2 uCells;     // lattice cells across the slab (even integers: periodic)
+uniform vec4 uStyle;     // x vein width, y network width, z fold warp, w seed
+uniform float uPresence; // global vein density [0,1]
+
+shared float sMain[64], sB1[64], sB2[64], sSec[64], sCap[64], sEdge[64];
+
+void main() {
+    ivec2 lid = ivec2(gl_LocalInvocationID.xy);
+    ivec2 px = ivec2(gl_GlobalInvocationID.xy) + uOffset;
+    vec2 uv = (vec2(px) + 0.5) / float(uSize);
+    vec3 per = vec3(uCells, 4096.0);
+    vec3 p = vec3(uv * uCells, uStyle.w);
+    MarbleRaw r = mf_raw(p, per, uStyle.z, true, 1);
+    int li = lid.y * 8 + lid.x;
+    sMain[li] = r.main;
+    sB1[li] = r.braid1;
+    sB2[li] = r.braid2;
+    sSec[li] = r.sec;
+    sCap[li] = r.cap;
+    sEdge[li] = r.edge;
+    barrier();
+    int nx = lid.y * 8 + (lid.x ^ 1), ny = (lid.y ^ 1) * 8 + lid.x;
+    MarbleFootprint fp;
+    fp.main = abs(sMain[nx] - r.main) + abs(sMain[ny] - r.main);
+    fp.braid1 = abs(sB1[nx] - r.braid1) + abs(sB1[ny] - r.braid1);
+    fp.braid2 = abs(sB2[nx] - r.braid2) + abs(sB2[ny] - r.braid2);
+    fp.sec = abs(sSec[nx] - r.sec) + abs(sSec[ny] - r.sec);
+    fp.cap = abs(sCap[nx] - r.cap) + abs(sCap[ny] - r.cap);
+    fp.edge = abs(sEdge[nx] - r.edge) + abs(sEdge[ny] - r.edge);
+    float fpP = length(uCells) / float(uSize);
+    MarbleMask m = mf_shape(r, fp, fpP, uStyle.x, uStyle.y, uPresence);
+    vec4 o;
+    o.r = max(max(m.vein, m.sec * 0.7), m.cap * 0.45);
+    o.g = saturate(m.body);
+    o.b = saturate(max(m.cloud * 0.85, m.halo * 0.7) + m.mottle * 0.08 + 0.05);
+    o.a = saturate(m.net);
+    if (all(lessThan(px, ivec2(uSize)))) imageStore(uOut, px, o);
+}

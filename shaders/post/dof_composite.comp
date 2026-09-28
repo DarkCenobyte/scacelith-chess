@@ -1,0 +1,36 @@
+// DOF composite at render resolution: CoC-aware upsampling of the half-resolution blur, blended
+// with the sharp image by the pixel's own CoC and the near-field coverage.
+#include "shaders/post/post_common.glsl"
+#include "shaders/post/dof_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uColor;
+layout(binding = 1) uniform sampler2D uBlur;
+layout(binding = 2) uniform sampler2D uHalf;
+layout(binding = 3) uniform sampler2D uLinearDepth;
+layout(binding = 0, rgba16f) uniform writeonly image2D oColor;
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    if (any(greaterThanEqual(p, ivec2(post.renderSize.xy)))) return;
+    vec3 sharp = texelFetch(uColor, p, 0).rgb;
+    float coc = cocRadius(texelFetch(uLinearDepth, p, 0).r);
+    ivec2 hsize = ivec2(post.halfSize.xy);
+    vec2 hp = (vec2(p) + 0.5) * 0.5 - 0.5;
+    ivec2 b = ivec2(floor(hp));
+    vec2 f = hp - vec2(b);
+    vec4 sum = vec4(0.0);
+    float wsum = 0.0;
+    for (int k = 0; k < 4; ++k) {
+        ivec2 o = ivec2(k & 1, k >> 1);
+        ivec2 q = clamp(b + o, ivec2(0), hsize - 1);
+        vec4 v = texelFetch(uBlur, q, 0);
+        float cq = texelFetch(uHalf, q, 0).a * 2.0;
+        float bil = (o.x == 1 ? f.x : 1.0 - f.x) * (o.y == 1 ? f.y : 1.0 - f.y);
+        float w = (bil + 1e-3) * (1.0 / (1.0 + abs(cq - coc)));
+        sum += v * w;
+        wsum += w;
+    }
+    vec4 blur = sum / max(wsum, 1e-5);
+    float k = max(smoothstep(0.35, 1.5, abs(coc)), blur.a);
+    imageStore(oColor, p, vec4(mix(sharp, blur.rgb, k), 1.0));
+}

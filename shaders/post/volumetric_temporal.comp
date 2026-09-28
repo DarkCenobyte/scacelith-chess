@@ -1,0 +1,64 @@
+// Temporal reprojection of the half-resolution volumetric lighting (static camera: exact; moving
+// camera: reprojected through the scene point), neighbourhood clamp and depth rejection.
+#include "shaders/post/post_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uCurrent;
+layout(binding = 1) uniform sampler2D uHistory;
+layout(binding = 2) uniform sampler2D uHalfDepth;
+layout(binding = 3) uniform sampler2D uHalfDepthPrev;
+layout(binding = 4) uniform sampler2D uVelocity;
+layout(binding = 0, rgba16f) uniform writeonly image2D oVol;
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 hsize = ivec2(post.halfSize.xy);
+    if (any(greaterThanEqual(p, hsize))) return;
+    vec4 cur = texelFetch(uCurrent, p, 0);
+    float z = texelFetch(uHalfDepth, p, 0).r;
+    vec4 mn = cur, mx = cur, avg = vec4(0.0);
+    float wsum = 0.0;
+    float tol = 1.0 / (0.05 * min(z, 1e4) + 0.01);
+    for (int y = -1; y <= 1; ++y)
+        for (int x = -1; x <= 1; ++x) {
+            ivec2 q = clamp(p + ivec2(x, y), ivec2(0), hsize - 1);
+            vec4 v = texelFetch(uCurrent, q, 0);
+            float zq = texelFetch(uHalfDepth, q, 0).r;
+            float w = exp(-abs(min(zq, 1e4) - min(z, 1e4)) * tol);
+            avg += v * w;
+            wsum += w;
+            mn = min(mn, v);
+            mx = max(mx, v);
+        }
+    avg /= max(wsum, 1e-5);
+    // Light spatial denoise of the current estimate (the raymarch is noisy by design).
+    cur = mix(cur, avg, 0.5);
+    vec2 uv = (vec2(p) + 0.5) * post.halfSize.zw;
+    vec2 prevUV;
+    float expected = -1.0;
+    if (z >= SKY_DEPTH * 0.5) {
+        vec3 dir = mat3(frame.invView) * viewPosFromLinear(uv, 1.0);
+        vec4 pc = frame.prevViewProj * vec4(dir, 0.0);
+        prevUV = pc.xy / pc.w * 0.5 + 0.5;
+    } else {
+        vec2 vel = texelFetch(uVelocity, min(p * 2, ivec2(post.renderSize.xy) - 1), 0).xy;
+        vec3 pw = worldPosFromLinear(uv, z);
+        vec4 pc = frame.prevViewProj * vec4(pw, 1.0);
+        prevUV = badValue(vec3(vel, 0.0)) ? pc.xy / pc.w * 0.5 + 0.5 : uv - vel;
+        expected = pc.w;
+    }
+    vec4 result = cur;
+    if (post.volB.z > 0.5 && all(greaterThanEqual(prevUV, vec2(0.0))) && all(lessThan(prevUV, vec2(1.0)))) {
+        vec4 hist = textureLod(uHistory, prevUV, 0.0);
+        bool ok = !badValue(hist.rgb) && !isnan(hist.a);
+        if (expected > 0.0) {
+            float zPrev = texelFetch(uHalfDepthPrev, ivec2(prevUV * post.halfSize.xy), 0).r;
+            ok = ok && abs(zPrev - expected) < 0.1 * expected;
+        }
+        if (ok) {
+            vec4 range = (mx - mn) * 0.25;
+            hist = clamp(hist, mn - range, mx + range);
+            result = mix(hist, cur, 0.1);
+        }
+    }
+    imageStore(oVol, p, result);
+}

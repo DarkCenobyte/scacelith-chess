@@ -1,0 +1,25 @@
+// One level of the min/max HiZ pyramid. Conservative for odd source sizes (the last row/column
+// of the destination also covers the extra source texel).
+#include "shaders/post/post_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uSrc;           // HiZ texture, source level via uLevel
+layout(binding = 0, rg32f) uniform writeonly image2D oDst;
+layout(location = 1) uniform int uLevel;              // source level
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    ivec2 dstSize = imageSize(oDst);
+    if (any(greaterThanEqual(p, dstSize))) return;
+    ivec2 srcSize = textureSize(uSrc, uLevel);
+    ivec2 base = p * 2;
+    // Extra texel when the source is odd and this is the last destination texel.
+    ivec2 extent = ivec2(2) + ivec2(equal(p, dstSize - 1)) * (srcSize & 1);
+    float closest = 0.0, farthest = 1.0;
+    for (int y = 0; y < extent.y; ++y)
+        for (int x = 0; x < extent.x; ++x) {
+            vec2 v = texelFetch(uSrc, min(base + ivec2(x, y), srcSize - 1), uLevel).rg;
+            closest = max(closest, v.r);
+            farthest = min(farthest, v.g);
+        }
+    imageStore(oDst, p, vec4(closest, farthest, 0.0, 0.0));
+}

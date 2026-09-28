@@ -1,0 +1,103 @@
+// SSR resolve at render resolution with ray reuse (Stachowiak 2015): every pixel re-weights the
+// hits of up to 4 neighbouring half-resolution rays by its own BRDF / the ray's pdf (ratio
+// estimator), fetching the hit radiance from the colour pyramid with a roughness cone footprint.
+#include "shaders/post/post_common.glsl"
+#include "shaders/include/brdf.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uDepth;
+layout(binding = 1) uniform sampler2D uNormalRough;
+layout(binding = 2) uniform sampler2D uSpecular;
+layout(binding = 3) uniform sampler2D uRays;
+layout(binding = 4) uniform sampler2D uColorPyramid;
+layout(binding = 0, rgba16f) uniform writeonly image2D oSSR;
+
+const ivec2 kReuse[8] = ivec2[](ivec2(1, 0), ivec2(0, 1), ivec2(-1, 0), ivec2(0, -1), ivec2(1, 1), ivec2(-1, 1), ivec2(1, -1), ivec2(-1, -1));
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    if (any(greaterThanEqual(p, ivec2(post.renderSize.xy)))) return;
+    vec4 spec = texelFetch(uSpecular, p, 0);
+    float d = texelFetch(uDepth, p, 0).r;
+    vec4 nr = texelFetch(uNormalRough, p, 0);
+    if (spec.a < 0.5 || !(d > 0.0 && d <= 1.0) || nr.w > post.ssr.x || dot(nr.xyz, nr.xyz) < 1e-4) {
+        imageStore(oSSR, p, vec4(0.0));
+        return;
+    }
+    vec2 uv = (vec2(p) + 0.5) * post.renderSize.zw;
+    vec3 Pw = worldFromDepth(uv, d);
+    vec3 N = normalize(nr.xyz);
+    vec3 V = normalize(frame.cameraPos.xyz - Pw);
+    float NoV = max(dot(N, V), 1e-3);
+    float rough = nr.w;
+    float alpha = max(rough * rough, 0.02);
+    ivec2 hsize = ivec2(post.halfSize.xy);
+    ivec2 hp = min(p / 2, hsize - 1);
+    int count = rough < 0.1 ? 1 : 4;
+    int rot = int(post.timing.y) & 7;
+    float maxMip = float(textureQueryLevels(uColorPyramid) - 1);
+
+    if (count == 1) {
+        // Mirror-like: a neighbouring ray only provides a hit distance. Re-project it along this
+        // pixel's own reflection vector and keep the candidate the depth buffer confirms best
+        // (own quad + 4 adjacent quads); reflected silhouettes resolve at full resolution instead
+        // of in 2x2 blocks, and a pixel whose own reflection passes beside the hit object fades out.
+        vec3 R = reflect(-V, N);
+        float bestErr = 1e30;
+        vec3 best = vec3(0.0);
+        for (int k = 0; k < 5; ++k) {
+            ivec2 q = k == 0 ? hp : clamp(hp + kReuse[k - 1], ivec2(0), hsize - 1);
+            vec4 r = texelFetch(uRays, q, 0);
+            if (r.z < 0.0 || r.w <= 0.0) continue;
+            float hd = texelFetch(uDepth, clamp(ivec2(r.xy * post.renderSize.xy), ivec2(0), ivec2(post.renderSize.xy) - 1), 0).r;
+            float t = dot(worldFromDepth(r.xy, hd) - Pw, R);
+            vec4 qc = frame.viewProj * vec4(Pw + R * t, 1.0);
+            if (!(t > 0.0) || qc.w < 1e-4) continue;
+            vec2 quv = qc.xy / qc.w * 0.5 + 0.5;
+            if (any(lessThanEqual(quv, vec2(0.0))) || any(greaterThanEqual(quv, vec2(1.0)))) continue;
+            float qd = texelFetch(uDepth, ivec2(quv * post.renderSize.xy), 0).r;
+            float err = abs(linearFromRaw(qd) - qc.w) / (0.03 * qc.w + 0.01);
+            if (err < bestErr) { bestErr = err; best = vec3(quv, r.w); }
+        }
+        if (best.z > 0.0) {
+            float conf = best.z * (1.0 - smoothstep(1.0, 3.0, bestErr));
+            imageStore(oSSR, p, vec4(sanitize(textureLod(uColorPyramid, best.xy, 0.0).rgb), saturate(conf)));
+            return;
+        }
+    }
+
+    vec3 sumC = vec3(0.0);
+    float sumW = 0.0, sumHitW = 0.0, misses = 0.0, used = 0.0;
+    for (int i = 0; i < count; ++i) {
+        ivec2 q = i == 0 ? hp : clamp(hp + kReuse[(rot + i * 3) & 7], ivec2(0), hsize - 1);
+        vec4 r = texelFetch(uRays, q, 0);
+        if (r.z < 0.0) continue;  // neighbour is not an SSR surface
+        used += 1.0;
+        if (r.w <= 0.0) { misses += 1.0; continue; }
+        float hd = texelFetch(uDepth, clamp(ivec2(r.xy * post.renderSize.xy), ivec2(0), ivec2(post.renderSize.xy) - 1), 0).r;
+        vec3 Hw = worldFromDepth(r.xy, hd);
+        vec3 toHit = Hw - Pw;
+        float dist = length(toHit);
+        if (dist < 1e-4) { misses += 1.0; continue; }
+        vec3 L = toHit / dist;
+        float NoL = dot(N, L);
+        if (NoL <= 0.0) { misses += 1.0; continue; }
+        vec3 H = normalize(V + L);
+        float w = count == 1 ? 1.0 : D_GGX(saturate(dot(N, H)), alpha) * V_SmithGGXCorrelated(NoV, NoL, alpha) * NoL / max(r.z, 1e-3);
+        if (!(w > 0.0) || isinf(w)) { misses += 1.0; continue; }
+        // Cone footprint: hit distance on screen times the lobe spread.
+        float distPx = length((r.xy - uv) * post.renderSize.xy);
+        float mip = clamp(log2(max(distPx * rough * rough * 1.5, 1.0)), 0.0, maxMip);
+        vec3 c = sanitize(textureLod(uColorPyramid, r.xy, mip).rgb);
+        sumC += c * (w * r.w);
+        sumW += w * r.w;
+        sumHitW += w;
+    }
+    vec4 result = vec4(0.0);
+    if (sumW > 1e-8) {
+        float hits = used - misses;
+        float avgW = sumHitW / max(hits, 1.0);
+        float conf = sumW / max(sumHitW + misses * avgW, 1e-8);
+        result = vec4(sumC / sumW, saturate(conf));
+    }
+    imageStore(oSSR, p, result);
+}

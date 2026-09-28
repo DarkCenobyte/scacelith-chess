@@ -1,0 +1,169 @@
+// Character animation: procedural posing of a seated robot (IK arms, finger poses, head/eye
+// look-at, blinks, idle life) driven by queued hand tasks with FIXED durations.
+// Implemented by the animation work package (src/anim/animator.cpp, viewer: --scene anim).
+//
+// Fairness rule (game design): every task type has a fixed duration that does not depend on
+// distance or on which player performs it, so both players spend exactly the same clock time on
+// the same physical action. Trajectories are fast and decisive, like a player short on time.
+// The game builds move animations as task sequences (see game/ for the composition) and gets
+// events at the exact physical instants (piece released on its square, clock lever pressed...).
+//
+// Typical sequences (right hand):
+//   quiet move : Reach(piece) Lift Carry(to) Place(to) PressClock(lever) Retract
+//   capture    : Reach(piece) Lift Carry(to) TakeCaptured(victim) Place(to) Discard(spot)
+//                PressClock(lever) Retract
+//                (TakeCaptured right after the Carry that brought the own piece above the victim:
+//                 the ring/pinky take it while thumb/index/middle keep the own piece.)
+//   castling   : Reach(king) Lift Carry Place, Reach(rook) Lift Carry Place, PressClock, Retract
+//   promotion  : ... Place(pawn on the last rank) is replaced by the game's own composition, e.g.
+//                Reach(pawn) Lift Carry(off-board spot) Place, Reach(new piece) Lift Carry Place
+// A task starts from whatever state the hand is in (even mid-air or at the chin) and still lasts
+// exactly its Timing duration. Consecutive tasks that are already queued blend into one fluid
+// motion (no stop between Lift and Carry, for example); queue a whole move at once.
+// The hand, fingers and forearm keep clear of the other pieces (grip orientation, pre-grasp
+// opening, arcs, elbow lift, resting spots). The animator learns where they stand from the
+// optional obstacle callbacks (pathObstacleTop, obstacleTopNear); without them it reads
+// pieceTransform for the ids 0, 1, 2... when a task starts (see pieceTransform). Diagnostics:
+// SCACELITH_ANIM_DEBUG=1 logs the planning, SCACELITH_ANIM_ARMTRACE=1 logs joint-limit clamps.
+#pragma once
+#include "../character/skeleton.h"
+#include "../math/math.h"
+#include <functional>
+#include <memory>
+#include <vector>
+
+namespace anim {
+
+// Durations in seconds (tuned by the animation package; the game only reads them).
+struct Timing {
+    static constexpr float Reach = 0.34f;         // rest/anywhere -> fingers closed on a piece
+    static constexpr float Lift = 0.10f;          // raise the gripped piece
+    static constexpr float Carry = 0.30f;         // move above the destination square
+    static constexpr float Place = 0.14f;         // lower + release on the square
+    static constexpr float TakeCaptured = 0.16f;  // grab the captured piece with the free fingers
+    static constexpr float Discard = 0.34f;       // carry the captured piece off-board + release
+    static constexpr float PressClock = 0.30f;    // anywhere -> lever pressed (event at contact)
+    static constexpr float Retract = 0.35f;       // back to the resting pose
+    static constexpr float Handshake = 2.60f;     // extend, clasp, 2 pumps, release, retract
+    // Instants inside the handshake (seconds from its start) of the two handshake events.
+    static constexpr float HandshakeClaspAt = 0.92f;
+    static constexpr float HandshakeReleaseAt = 1.96f;
+};
+
+enum class TaskType {
+    Reach,          // target = piece object id: grip it (attaches at the end)
+    Lift,           // raise the held piece by 'height' (0 = layout::PIECE_LIFT_HEIGHT)
+    Carry,          // move the held piece above 'position' (piece base position)
+    Place,          // lower the held piece to 'position' and release it (detaches)
+    TakeCaptured,   // grab piece 'pieceId' (secondary attachment, held under the palm)
+    Discard,        // put the secondary piece down at 'position' (piece base) and release it
+    PressClock,     // press the lever at 'position' with the index/middle fingers
+    Retract,        // return the hand to its resting pose
+    Handshake,      // shake hands with 'partner' (both characters must receive it together)
+    Wait            // hold for 'duration' (duration is the only parameter)
+};
+
+struct Task {
+    TaskType type = TaskType::Wait;
+    int pieceId = -1;
+    m::vec3 position{0, 0, 0};
+    float height = 0.0f;
+    float duration = 0.0f;           // 0 = use the Timing default for the type
+    class Animator* partner = nullptr;
+};
+
+// Duration the animator will use for this task (Timing default unless t.duration > 0).
+float taskDuration(const Task& t);
+
+enum class EventType {
+    PieceGripped,      // Reach finished: pieceId now follows the hand
+    PieceReleased,     // Place finished: pieceId rests at the position
+    CapturedGripped,
+    CapturedReleased,
+    ClockPressed,      // lever contact instant (the clock switches now)
+    HandshakeClasp,
+    HandshakeRelease,
+    TaskStarted,
+    QueueEmpty
+};
+struct Event {
+    EventType type;
+    int pieceId = -1;
+    m::vec3 position{0, 0, 0};
+    // Piece events: exact world transform of the piece at that instant (for PieceReleased /
+    // CapturedReleased this is where the piece now rests: upright, base on 'position', turned about
+    // the vertical by the small yaw the hand gave it while carrying; a game that wants knights to
+    // face straight can drop that yaw).
+    m::mat4 transform;
+    float time = 0.0f;               // animator clock (seconds since init) of the physical instant
+};
+
+class Animator {
+public:
+    Animator();
+    // pelvisWorld: hip joint centre in the world; facing: +1 = faces -Z (White, sitting at +Z),
+    // -1 = faces +Z (Black). The robot is right-handed.
+    void init(const character::Skeleton& sk, m::vec3 pelvisWorld, float facing);
+    // Where the right / left hand rests on the table (the left one has a default in front of the
+    // body). A spot next to pieces standing on the table (spare or captured pieces) is shifted
+    // back or outwards until the hand is clear of them.
+    void setRestHand(m::vec3 worldPos);
+    void setLeftRestHand(m::vec3 worldPos);              // optional
+    // Game callback: world transform of a piece object (base centre at the origin, +Y up).
+    // When neither obstacle callback is set, the animator also calls it (and pieceGripInfo) for
+    // the ids 0, 1, 2... when a task starts, to see which pieces stand on the board and the table,
+    // until 16 ids in a row do not exist: return the identity matrix (or any transform below the
+    // table) for an id that does not exist or whose piece is out of the game.
+    std::function<m::mat4(int pieceId)> pieceTransform;
+    // Game callback: piece dimensions: x = height (m), y = grip height (m above the base; a value
+    // larger than the height is read as a fraction of the height, e.g. layout::PIECE_GRIP_HEIGHT),
+    // z = radius at the grip height (m).
+    std::function<m::vec3(int pieceId)> pieceGripInfo;
+    // Optional game callback: world Y of the highest piece top near the segment from->to (board
+    // positions). Used to keep carried pieces PIECE_LIFT_HEIGHT above the pieces they pass over.
+    // When neither callback is set the animator looks at the pieces itself (see pieceTransform);
+    // when it cannot, it assumes a king may stand anywhere on the way.
+    // Both obstacle callbacks are called from inside update(), when a task starts, before the game
+    // has seen that call's events: skip the pieces for which holding(id) is true (on either
+    // animator: gripped pieces may still look free in the game's state) and pieces in the air.
+    // Pieces this animator put down earlier in the same update() call are added by the animator.
+    std::function<float(m::vec3 from, m::vec3 to)> pathObstacleTop;
+    // Optional game callback: world Y of the highest top among the standing pieces whose base
+    // comes within 'radius' (horizontally) of point p, ignoring piece 'ignoreId' and pieces being
+    // held; BOARD_TOP_Y when there is none. Lets the hand and the elbow keep clear of the
+    // neighbours of the piece it grabs or sets down. Without it pathObstacleTop is used.
+    std::function<float(m::vec3 p, float radius, int ignoreId)> obstacleTopNear;
+
+    void enqueue(const Task& t);
+    void enqueue(const std::vector<Task>& tasks);
+    bool busy() const;                                   // tasks pending or running
+    void clearQueue();                                   // drops pending tasks (running one finishes)
+    float remainingTime() const;                         // running task remainder + pending durations
+
+    // Gaze: world point to look at (head + eyes, with natural limits and saccades). weight 0..1.
+    void lookAt(m::vec3 target, float weight = 1.0f);
+    // First-person player: head orientation comes from the camera (yaw/pitch relative to the
+    // body forward, radians; yaw > 0 turns to the character's left, pitch > 0 looks up); the
+    // animator applies it to Neck/Head (30/70) so the body matches. Clamped to yaw +-70 deg,
+    // pitch -45..+30 deg. The torso lean of reaches is compensated, so the view does not tilt.
+    void setHeadOverride(bool enabled, float yaw = 0.0f, float pitch = 0.0f);
+    void setThinking(bool thinking);                     // idle variations (chin on hand, etc.)
+
+    void update(float dt, std::vector<Event>& events);   // advances tasks, IK, idle; appends events
+
+    const character::Pose& pose() const { return pose_; }
+    const m::mat4* globals() const { return globals_; }  // world matrix per bone (after update)
+    m::mat4 eyeCameraTransform() const;                  // midpoint between the eyes, -Z = gaze
+    // World transform of an attached piece (true while the hand holds it).
+    bool heldPieceTransform(int pieceId, m::mat4& out) const;
+    bool holding(int pieceId) const;                     // pieceId is attached to the hand
+    float time() const;                                  // animator clock (sum of update dt)
+
+private:
+    struct Impl;
+    std::shared_ptr<Impl> impl_;
+    character::Pose pose_;
+    m::mat4 globals_[character::BoneCount];
+};
+
+}  // namespace anim

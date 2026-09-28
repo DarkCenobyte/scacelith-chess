@@ -1,0 +1,37 @@
+// DOF setup: half-resolution colour + signed CoC (the CoC of the closest of the 2x2 samples, so
+// the foreground dominates), and per 8x8 tile the maximum |CoC| (bounds the gather radius).
+#include "shaders/post/post_common.glsl"
+#include "shaders/post/dof_common.glsl"
+layout(local_size_x = 8, local_size_y = 8) in;
+layout(binding = 0) uniform sampler2D uColor;
+layout(binding = 1) uniform sampler2D uLinearDepth;
+layout(binding = 0, rgba16f) uniform writeonly image2D oHalf;   // rgb colour, a = CoC (half-res px, signed)
+layout(binding = 1, r16f) uniform writeonly image2D oTiles;     // max |CoC| (half-res px)
+shared float sMax[64];
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    uint lid = gl_LocalInvocationIndex;
+    bool inside = all(lessThan(p, ivec2(post.halfSize.xy)));
+    float cocAbs = 0.0;
+    if (inside) {
+        ivec2 base = p * 2, maxP = ivec2(post.renderSize.xy) - 1;
+        vec3 c = vec3(0.0);
+        float zMin = 1e30;
+        for (int k = 0; k < 4; ++k) {
+            ivec2 q = min(base + ivec2(k & 1, k >> 1), maxP);
+            c += sanitize(texelFetch(uColor, q, 0).rgb);
+            zMin = min(zMin, texelFetch(uLinearDepth, q, 0).r);
+        }
+        float coc = cocRadius(zMin) * 0.5;
+        imageStore(oHalf, p, vec4(c * 0.25, coc));
+        cocAbs = abs(coc);
+    }
+    sMax[lid] = cocAbs;
+    barrier();
+    for (uint s = 32u; s > 0u; s >>= 1u) {
+        if (lid < s) sMax[lid] = max(sMax[lid], sMax[lid + s]);
+        barrier();
+    }
+    if (lid == 0u) imageStore(oTiles, ivec2(gl_WorkGroupID.xy), vec4(sMax[0]));
+}
