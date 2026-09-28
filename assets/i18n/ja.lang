@@ -1,0 +1,404 @@
+# Scacelith - 日本語
+# assets/i18n/en.lang の翻訳（同じキー、同じ {n}）。複数形なし（1形式）。
+
+language.name = 日本語
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = オン
+common.off = オフ
+common.back = 戻る
+common.apply = 適用
+common.discard = 破棄
+common.cancel = キャンセル
+common.white = 白
+common.black = 黒
+common.main_menu = メインメニュー
+number.decimal = .
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = 王者のゲーム
+menu.new_game = 新しい対局
+menu.options = 設定
+menu.credits = クレジット
+menu.quit = 終了
+menu.version = バージョン {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = 設定
+options.tab.display = 画面
+options.tab.graphics = グラフィック
+options.tab.audio = サウンド
+options.tab.gameplay = ゲーム
+options.tab.player = プレイヤー
+options.tab.controls = 操作
+options.pending = 変更は適用後に反映されます。
+options.unsaved.title = 未適用の変更
+options.unsaved.text = 一部の設定が変更されています。終了する前に適用しますか？
+
+options.language = 言語
+options.language.help = メニューとメッセージの言語。すぐに切り替わります。
+options.display_mode = 表示モード
+options.fullscreen = フルスクリーン
+options.windowed = ウィンドウ
+options.window_size = ウィンドウサイズ
+options.window_size.help = ウィンドウモードでのウィンドウの大きさ。フルスクリーンでは常にデスクトップの解像度を使います。
+options.vsync = 垂直同期
+options.vsync.help = フレームを画面と同期させ、ティアリングを防ぎます。
+options.render_scale = レンダリング倍率
+options.render_scale.help = 3D画像の内部解像度。低いほど速く、高いほど鮮明になります。
+
+options.quality = 画質
+options.quality.low = 低
+options.quality.medium = 中
+options.quality.high = 高
+options.quality.ultra = 最高
+options.quality.help = 影、反射、アンビエントオクルージョン、ボリュームライト。
+options.motion_blur = モーションブラー
+options.depth_of_field = 被写界深度
+options.brightness = 明るさ
+options.brightness.neutral = 標準
+options.brightness.help = カメラの露出補正。
+
+options.master_volume = 全体の音量
+options.effects = 効果音
+options.ambience = 環境音
+options.ambience.help = 広間のざわめき：暖炉の火、遠くの足音、古い時計。
+options.ambience_volume = 環境音の音量
+
+options.legal_moves = 合法手を表示
+options.legal_moves.help = 触れた駒が進めるマスを強調します。オフにすると手が合法かどうかは表示されません。反則手は時計を押した時点でアービターが罰します。
+options.coordinates = 盤の座標
+options.thinking_time = リアルな考慮時間
+options.thinking_time.help = 相手がすぐに指さず、人間のように時間をかけて考えます。
+options.mouse_sensitivity = マウス感度
+options.invert_look = 上下の視点を反転
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = 名前
+player.name.help = 棋譜用紙の上部に書かれるあなたの名前。どの文字でも使えます。
+player.default_name = 人間
+player.handwriting = 筆跡
+player.handwriting.help = あなたの指し手を書く手の書体。アラビア語・日本語・中国語はそれぞれ専用の手書き書体で書かれます。
+player.preview = あなたの棋譜用紙
+hand.caveat = くだけた字
+hand.marck = 筆記体
+hand.badscript = 斜体
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = 左クリック
+controls.touch = 駒に触れて動かす
+controls.clock.keys = スペース　または　時計をクリック
+controls.clock = 時計を押す
+controls.look.keys = 右ボタンを押したまま
+controls.look = 周りを見る
+controls.moves.keys = Tab
+controls.moves = 棋譜の表示・非表示
+controls.menu.keys = Esc
+controls.menu = メニュー
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = 新しい対局
+newgame.opponent = 対戦相手
+newgame.time_control = 持ち時間
+newgame.start = 開始
+newgame.elo = 約{0} Elo
+newgame.you_white = あなたは白番です。
+newgame.you_black = あなたは黒番です。
+newgame.colour_lot = 最初の対局の先後は抽選で決まります。
+newgame.colour_alternate = その後は対局ごとに先後が入れ替わります。
+
+# Custom opponent: Stockfish parameters
+engine.skill = スキルレベル
+engine.skill.help = Stockfish の「Skill Level」（0～20）。Elo で強さを制限している間は無視されます。
+engine.limit_elo = 強さを制限（Elo）
+engine.limit_elo.help = UCI_LimitStrength：エンジンは下の Elo レーティングを目指します。
+engine.elo = Elo
+engine.depth = 探索の深さ
+engine.plies = {0}手
+engine.move_time = 1手あたりの時間
+engine.nodes = ノード数の上限
+engine.no_limit = なし
+engine.thousand = {0}千
+engine.million = {0}百万
+
+# Time controls
+tc.unlimited = 無制限
+tc.no_clock = 時計なし
+tc.bullet = バレット
+tc.blitz = ブリッツ
+tc.rapid = ラピッド
+tc.classical = クラシカル
+tc.custom = カスタム
+tc.your_own = 自由設定
+tc.base_time = 持ち時間
+tc.base_time.help = 時計の各側の最初の持ち時間（分：秒）。
+tc.increment = 加算
+tc.increment.help = 1手ごとに加算されるフィッシャー方式の時間。
+tc.delay = 遅延
+tc.delay.help = ブロンスタイン方式：遅延時間までに使った時間は1手ごとに戻されます。
+tc.no_delay = なし
+tc.seconds = {0}秒
+tc.minutes = {0}分
+tc.summary_increment = {0}＋{1}秒
+tc.summary_delay = {0}、遅延{1}秒
+
+# Opponent presets
+preset.novice.name = 入門
+preset.novice.desc = 駒の動かし方を覚えたばかり。駒をただで取られ、簡単な狙いも見逃します。
+preset.beginner.name = 初心者
+preset.beginner.desc = 基本は知っていますが、まだよく駒損をします。
+preset.casual.name = 気軽な相手
+preset.casual.desc = 気楽な対局相手。筋の良い手も指しますが、ミスも多め。
+preset.club_player.name = クラブ会員
+preset.club_player.desc = 明らかな悪手を見逃さない堅実なクラブプレイヤー。
+preset.advanced.name = 上級者
+preset.advanced.desc = 戦術眼に優れた強いクラブプレイヤー。
+preset.expert.name = エキスパート
+preset.expert.desc = 大会の実力者。ミスはまれで、優勢を確実に勝ちにつなげます。
+preset.master.name = マスター
+preset.master.desc = マスター級。深い読みと繊細なポジショナルプレイ。
+preset.grandmaster.name = グランドマスター
+preset.grandmaster.desc = グランドマスター級。勝つのは極めて困難です。
+preset.stockfish_max.name = Stockfish 最強
+preset.stockfish_max.desc = 全力の Stockfish 16。健闘を祈ります。
+preset.custom.name = カスタム
+preset.custom.desc = エンジンを自分で設定します。
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = クレジット
+credits.game.head = SCACELITH
+credits.game = 王宮の広間でのチェスの一局。自社開発の OpenGL 4.6 エンジンで動作。
+credits.engine.head = チェスエンジン
+credits.engine = Stockfish 16（Stockfish 開発者による）。
+credits.engine.licence = GNU 一般公衆利用許諾書 第3版。
+credits.fonts.head = 書体
+credits.fonts = EB Garamond（Georg Duffner）、Cinzel（Natanael Gama）、Amiri（Khaled Hosny）。
+credits.fonts.hand = 手書き書体：Caveat、Marck Script、Bad Script、Aref Ruqaa、Klee One、LXGW WenKai（SIL Open Font License）。
+credits.fonts.figures = チェスの駒の記号は GNU FreeFont より（フォント例外付き GPL v3）。
+credits.quote = 「チェスとは分析の芸術である。」 — ミハイル・ボトヴィニク
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = 一時停止
+pause.resume = 再開
+pause.offer_draw = 引き分けを提案
+pause.claim_draw = 引き分けを申告
+pause.claim_draw.help = 3回同一局面、または50手ルール。
+pause.resign = 投了
+confirm.resign.title = 投了
+confirm.resign.text = この対局を投了しますか？相手の勝ちになります。
+confirm.resign.ok = 投了する
+confirm.leave.title = 対局を離れる
+confirm.leave.text = メインメニューに戻りますか？現在の対局は放棄されます。
+confirm.leave.ok = 離れる
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = 昇格先
+piece.queen = クイーン
+piece.rook = ルーク
+piece.bishop = ビショップ
+piece.knight = ナイト
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = 引き分けです。
+gameover.draw_moves = {0}手で引き分けです。
+gameover.win = お見事です。あなたの勝ちです。
+gameover.win_moves = お見事です。{0}手であなたの勝ちです。
+gameover.loss = 相手の勝ちです。
+gameover.loss_moves = {0}手で相手の勝ちです。
+gameover.rematch = 再戦
+gameover.view_board = 盤面を見る
+gameover.show = 表示
+
+# Reasons
+reason.checkmate = チェックメイト
+reason.resignation = 投了
+reason.timeout = 時間切れ負け
+reason.illegal_moves = 2回目の反則手（負け）
+reason.stalemate = ステイルメイト
+reason.insufficient = デッドポジション（駒不足）
+reason.timeout_vs_insufficient = 時間切れ、ただし相手はメイトできない
+reason.fivefold = 5回同一局面
+reason.75_moves = 75手ルール
+reason.threefold_claim = 3回同一局面（申告）
+reason.50_moves_claim = 50手ルール（申告）
+reason.agreement = 合意による引き分け
+reason.illegal_vs_insufficient = 2回目の反則手、ただし相手はメイトできない
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = 棋譜
+movelist.empty = まだ指し手はありません。
+
+# ---- Loading -----------------------------------------------------------------------------------
+loading.materials = 材料を準備しています
+loading.hall = 広間を建てています
+loading.furniture = テーブルと椅子を彫っています
+loading.board = 盤を磨いています
+loading.pieces = 駒を削り出しています
+loading.clock = 時計を組み立てています
+loading.porcelain = 磁器を焼いています
+loading.ready = 準備完了
+
+# ---- Notifications during the game -------------------------------------------------------------
+notify.no_draw_claim = この局面では引き分けを申告できません。
+notify.flag_you = あなたの時間が切れました。
+notify.flag_opponent = 相手の時間が切れました。
+notify.touched.pawn = タッチムーブ：触れたポーンを動かさなければなりません。
+notify.touched.knight = タッチムーブ：触れたナイトを動かさなければなりません。
+notify.touched.bishop = タッチムーブ：触れたビショップを動かさなければなりません。
+notify.touched.rook = タッチムーブ：触れたルークを動かさなければなりません。
+notify.touched.queen = タッチムーブ：触れたクイーンを動かさなければなりません。
+notify.touched.king = タッチムーブ：触れたキングを動かさなければなりません。
+notify.touched.piece = タッチムーブ：触れた駒を動かさなければなりません。
+notify.touched_square = タッチムーブ：{0}の駒を動かさなければなりません。
+notify.press_clock = 時計を押して指し手を完了してください（スペース）。
+notify.illegal = 反則手です。
+notify.cannot_move = その手は指せません。
+notify.move_first = 時計を押す前に指してください。
+notify.draw_already_offered = この手番ではすでに引き分けを提案しています。
+notify.draw_accepted = 相手が引き分けに応じました。
+notify.draw_declined = 相手は引き分けの提案を断りました。
+notify.draw_claimed = 相手が引き分けを申告しました。
+
+# ---- Arbiter -----------------------------------------------------------------------------------
+arbiter.join = {0}{1}
+arbiter.no_move = アービター：指さずに時計が押されました。これは反則手とみなされます。
+arbiter.unpromoted = アービター：反則手です。時計を押す前にポーンが新しい駒に置き換えられていません。
+arbiter.illegal = アービター：反則手です。
+arbiter.second_loses.white = 白の2回目の反則手です。白の負けとなります。
+arbiter.second_loses.black = 黒の2回目の反則手です。黒の負けとなります。
+arbiter.second_draw.white = 白の2回目の反則手ですが、黒はメイトできないため引き分けとなります。
+arbiter.second_draw.black = 黒の2回目の反則手ですが、白はメイトできないため引き分けとなります。
+arbiter.queen = ポーンはクイーンになります。
+arbiter.queen_one_minute.white = ポーンはクイーンになり、白に1分が加算されます。
+arbiter.queen_one_minute.black = ポーンはクイーンになり、黒に1分が加算されます。
+arbiter.queen_two_minutes.white = ポーンはクイーンになり、白に2分が加算されます。
+arbiter.queen_two_minutes.black = ポーンはクイーンになり、黒に2分が加算されます。
+arbiter.restored = 局面を元に戻します。
+arbiter.restored_one_minute.white = 局面を元に戻し、白に1分が加算されます。
+arbiter.restored_one_minute.black = 局面を元に戻し、黒に1分が加算されます。
+arbiter.restored_two_minutes.white = 局面を元に戻し、白に2分が加算されます。
+arbiter.restored_two_minutes.black = 局面を元に戻し、黒に2分が加算されます。
+arbiter.one_minute.white = 白に1分が加算されます。
+arbiter.one_minute.black = 黒に1分が加算されます。
+arbiter.two_minutes.white = 白に2分が加算されます。
+arbiter.two_minutes.black = 黒に2分が加算されます。
+arbiter.second_loses = 2回目の反則手で負けとなります。
+arbiter.touched.white = 白は触れた駒を動かさなければなりません。
+arbiter.touched.black = 黒は触れた駒を動かさなければなりません。
+arbiter.game_over = 対局は終了しています。
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = 対局を観戦
+
+viewer.title = 対局観戦
+viewer.white = 白
+viewer.black = 黒
+viewer.time_control = 持ち時間
+viewer.elo_approx = 約{0} Elo
+viewer.swap = 白黒を入れ替え
+viewer.note = 両者ともStockfishです。対局中はホールを自由に飛び回れます。誰にも気づかれません。
+viewer.summary = {0} 対 {1}
+viewer.custom = カスタム
+viewer.tc.custom = 自由設定
+viewer.tc.none = 時計なし
+viewer.tc.bullet = バレット
+viewer.tc.blitz = ブリッツ
+viewer.tc.rapid = ラピッド
+viewer.tc.classical = クラシカル
+viewer.base_time = 持ち時間
+viewer.increment = 加算
+viewer.delay = 遅延
+viewer.off = なし
+viewer.minutes = {0}分
+viewer.seconds = {0}秒
+viewer.delay_summary = 遅延{0}秒
+viewer.back = 戻る
+viewer.start = 開始
+
+viewer.paused = 一時停止
+viewer.resume = 再開
+viewer.options = 設定
+viewer.main_menu = メインメニュー
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = 操作
+viewer.keys.move = W A S D  ·  Z Q S D  ·  矢印キー
+viewer.controls.move = 移動
+viewer.keys.updown = E、スペース  /  C、Ctrl
+viewer.controls.updown = 上昇 / 下降
+viewer.keys.fast = Shift
+viewer.controls.fast = 加速
+viewer.keys.look = マウス右ボタン
+viewer.controls.look = 周りを見る
+viewer.keys.speed = マウスホイール
+viewer.controls.speed = 速度
+viewer.keys.views = 1 – 9
+viewer.controls.views = 視点
+viewer.keys.eyes = 0
+viewer.controls.eyes = 手番の対局者の目線
+viewer.keys.moves = Tab
+viewer.controls.moves = 棋譜
+viewer.keys.menu = Esc
+viewer.controls.menu = メニュー
+viewer.keys.hide = H
+viewer.controls.hide = この表示を隠す
+viewer.speed = 速度 {0} m/s
+viewer.view.0 = 対局者の目線
+viewer.view.1 = テーブルの横
+viewer.view.2 = 盤の真上
+viewer.view.3 = ホール
+viewer.view.4 = 対局時計
+viewer.view.5 = 白番の顔
+viewer.view.6 = 黒番の顔
+viewer.view.7 = 対決
+viewer.view.8 = 窓辺
+viewer.view.9 = タペストリー
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = 白
+viewer.side.black = 黒
+viewer.flag.white = 白の時間が切れました。
+viewer.flag.black = 黒の時間が切れました。
+viewer.claims_draw = {0}が引き分けを申告しました。
+viewer.offer_accepted = {0}の引き分け提案に{1}が応じました。
+viewer.offer_declined = {0}の引き分け提案を{1}が断りました。
+viewer.gameover.white_wins = {0}手目で白の勝ちです。
+viewer.gameover.black_wins = {0}手目で黒の勝ちです。
+viewer.gameover.draw = {0}手目で引き分けです。
+viewer.gameover.players = {0} 対 {1}
+viewer.watch_again = もう一局観る
+
+# The player's rating
+elo.label = レーティング
+elo.no_games = レーティング対象の対局はまだありません
+elo.provisional = 暫定レーティング
+elo.peak = 最高 {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = あなたのレーティング {0}
+elo.expected = 期待スコア {0}%
+elo.change = レーティング {0} → {1}（{2}）
+elo.unrated = レーティング {0} · この対局はレーティング対象外です
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = 棋譜用紙
+scoresheet.event = 大会
+scoresheet.date = 日付
+scoresheet.round = ラウンド
+scoresheet.board = 盤番号
+scoresheet.page = ページ
+scoresheet.white = 白
+scoresheet.black = 黒
+scoresheet.elo = Elo
+scoresheet.result = 結果
+scoresheet.move_no = 手
+scoresheet.sign_white = 白の署名
+scoresheet.sign_black = 黒の署名
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+# Japanese tournament scoresheets use the English letters of algebraic notation.
+scoresheet.pieces = K Q R B N
+scoresheet.date_format = {2}/{1}/{0}

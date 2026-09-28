@@ -35,6 +35,10 @@ struct Preset {
 };
 // Ordered from weakest to strongest; the last entry is "Custom" (settings come from the menu).
 const std::vector<Preset>& presets();
+// Rating of a Stockfish player using preset 'index': the preset's approxElo, or estimateElo(custom)
+// for "Custom" (the last entry) and out-of-range indices. The human's Elo is updated against it and
+// the scoresheets show it for the Stockfish players.
+int presetElo(int index, const EngineSettings& custom = EngineSettings{});
 
 struct ClockInfo {
     bool timed = false;
@@ -58,7 +62,20 @@ public:
     bool ready() const;                  // UCI handshake done (commands sent earlier are queued)
     bool waitReady(int timeoutMs);       // blocks until ready(); for loading screens and tests
     void newGame();             // ucinewgame + isready
+    // Settings used by the next requests. Two players may share the engine (AI vs AI in the
+    // viewer mode): configure it with the side to move's settings before each requestMove(). A
+    // move search whose strength settings differ from those of the previous move search starts
+    // with a cleared hash table and search history ("Clear Hash", the same as ucinewgame), so a
+    // side never plays with what the other one computed: the weak presets are calibrated with a
+    // hash table that only ever saw their own shallow searches (presets.cpp), and each side of an
+    // engine match has its own hash. Costs ~5-20 ms per switch at 64 MB (ai_engine_side_switch).
     void configure(const EngineSettings& s);
+    // Queues a hash / history clear before the next search.
+    void clearHash();
+    int hashClears() const;     // clears sent so far (switches between sides included)
+    // Blocks until the engine has processed every command sent or queued so far (isready /
+    // readyok, after a running search completes); false on timeout. For tests and measurements.
+    bool sync(int timeoutMs);
 
     // Asynchronous search from the standard start position + moves (UCI long algebraic). A new
     // request replaces a pending one; on an engine that is not running it fails at once
@@ -89,6 +106,10 @@ public:
     // Decides whether the AI accepts a draw offer / claims a draw given its evaluation (evalCp
     // from the AI's point of view, e.g. takeEval() with the AI to move). Thresholds in humanize.cpp.
     bool acceptsDraw(int evalCp, int plyCount) const;
+    // Whether the AI offers a draw along with the move it is about to play (evalCp from its own
+    // point of view, as for acceptsDraw; pliesSinceOwnOffer = half-moves since its last offer,
+    // -1 = never). Used between two AIs; the opponent answers with acceptsDraw().
+    bool offersDraw(int evalCp, int plyCount, int pliesSinceOwnOffer) const;
 
     const EngineSettings& settings() const;
     // Rough playing strength (Elo) of a settings block, as used for the presets and thinkTimeMs.

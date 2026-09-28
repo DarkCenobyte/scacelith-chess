@@ -1,0 +1,403 @@
+# Scacelith - 繁體中文
+# assets/i18n/en.lang 的翻譯（相同的鍵，相同的 {n}）。無複數形式（1 種形式）。
+
+language.name = 繁體中文
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = 開
+common.off = 關
+common.back = 返回
+common.apply = 套用
+common.discard = 捨棄
+common.cancel = 取消
+common.white = 白方
+common.black = 黑方
+common.main_menu = 主選單
+number.decimal = .
+number.percent = {0}%
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = 王者的遊戲
+menu.new_game = 新對局
+menu.options = 選項
+menu.credits = 製作群
+menu.quit = 離開
+menu.version = 版本 {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = 選項
+options.tab.display = 顯示
+options.tab.graphics = 圖形
+options.tab.audio = 聲音
+options.tab.gameplay = 遊戲
+options.tab.player = 棋手
+options.tab.controls = 操作
+options.pending = 變更會在套用後生效。
+options.unsaved.title = 未套用的變更
+options.unsaved.text = 部分選項已變更。離開前要套用嗎？
+
+options.language = 語言
+options.language.help = 選單與訊息的語言，立即生效。
+options.display_mode = 顯示模式
+options.fullscreen = 全螢幕
+options.windowed = 視窗
+options.window_size = 視窗大小
+options.window_size.help = 視窗模式下的視窗大小。全螢幕一律使用桌面解析度。
+options.vsync = 垂直同步
+options.vsync.help = 讓畫面與螢幕同步，避免畫面撕裂。
+options.render_scale = 算繪比例
+options.render_scale.help = 3D 畫面的內部解析度。越低越快，越高越清晰。
+
+options.quality = 畫質
+options.quality.low = 低
+options.quality.medium = 中
+options.quality.high = 高
+options.quality.ultra = 極高
+options.quality.help = 陰影、反射、環境光遮蔽與體積光。
+options.motion_blur = 動態模糊
+options.depth_of_field = 景深
+options.brightness = 亮度
+options.brightness.neutral = 標準
+options.brightness.help = 攝影機的曝光補償。
+
+options.master_volume = 主音量
+options.effects = 音效
+options.ambience = 環境音
+options.ambience.help = 大廳裡的低語：爐火、遠處的腳步聲、古老的時鐘。
+options.ambience_volume = 環境音音量
+
+options.legal_moves = 顯示合法著法
+options.legal_moves.help = 標示所摸棋子可以到達的格子。關閉後，不會有任何提示告訴你著法是否合法：一按下棋鐘，裁判就會處罰違例著法。
+options.coordinates = 棋盤座標
+options.thinking_time = 擬真的思考時間
+options.thinking_time.help = 對手會像真人棋手一樣思考一段時間，而不是立即走棋。
+options.mouse_sensitivity = 滑鼠靈敏度
+options.invert_look = 反轉垂直視角
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = 姓名
+player.name.help = 寫在記錄紙頂端的你的名字，可使用任何文字。
+player.default_name = 人類
+player.handwriting = 筆跡
+player.handwriting.help = 記錄你著法的筆跡。阿拉伯文、日文與中文各有專用的手寫體。
+player.preview = 你的記錄紙
+hand.caveat = 隨意
+hand.marck = 連筆
+hand.badscript = 斜體
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = 滑鼠左鍵
+controls.touch = 摸一枚棋子，然後移動它
+controls.clock.keys = 空白鍵　或　點擊棋鐘
+controls.clock = 按棋鐘
+controls.look.keys = 按住滑鼠右鍵
+controls.look = 環顧四周
+controls.moves.keys = Tab
+controls.moves = 顯示或隱藏著法列表
+controls.menu.keys = Esc
+controls.menu = 選單
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = 新對局
+newgame.opponent = 對手
+newgame.time_control = 時限
+newgame.start = 開始
+newgame.elo = 約 {0} 等級分
+newgame.you_white = 你執白。
+newgame.you_black = 你執黑。
+newgame.colour_lot = 第一局以抽籤決定執白或執黑。
+newgame.colour_alternate = 之後每局輪流交換先後手。
+
+# Custom opponent: Stockfish parameters
+engine.skill = 技能等級
+engine.skill.help = Stockfish 的「Skill Level」（0–20）。以等級分限制棋力時不起作用。
+engine.limit_elo = 限制棋力（等級分）
+engine.limit_elo.help = UCI_LimitStrength：引擎以下方的等級分為目標。
+engine.elo = 等級分
+engine.depth = 搜尋深度
+engine.plies = {0} 層
+engine.move_time = 每步用時
+engine.nodes = 節點上限
+engine.no_limit = 不限
+engine.thousand = {0} 千
+engine.million = {0} 百萬
+
+# Time controls
+tc.unlimited = 不限時
+tc.no_clock = 不用棋鐘
+tc.bullet = 子彈棋
+tc.blitz = 超快棋
+tc.rapid = 快棋
+tc.classical = 慢棋
+tc.custom = 自訂
+tc.your_own = 自行設定
+tc.base_time = 基本時間
+tc.base_time.help = 棋鐘每一方的初始時間（分：秒）。
+tc.increment = 加秒
+tc.increment.help = 每走一步後增加的費雪加秒。
+tc.delay = 延時
+tc.delay.help = 布朗斯坦延時：每步在延時內用掉的時間會被退還。
+tc.no_delay = 無
+tc.seconds = {0} 秒
+tc.minutes = {0} 分鐘
+tc.summary_increment = {0} + {1} 秒
+tc.summary_delay = {0}，延時 {1} 秒
+
+# Opponent presets
+preset.novice.name = 新手
+preset.novice.desc = 剛學會走子：常常白白丟子，看不出簡單的威脅。
+preset.beginner.name = 初學者
+preset.beginner.desc = 懂得基礎，但仍經常丟子。
+preset.casual.name = 業餘愛好者
+preset.casual.desc = 輕鬆的對手：著法合理，失誤頻繁。
+preset.club_player.name = 俱樂部棋手
+preset.club_player.desc = 紮實的俱樂部棋手，會懲罰明顯的漏著。
+preset.advanced.name = 進階棋手
+preset.advanced.desc = 強大的俱樂部棋手，戰術眼光出色。
+preset.expert.name = 專家
+preset.expert.desc = 比賽高手：很少出錯，能把優勢轉化為勝利。
+preset.master.name = 大師
+preset.master.desc = 大師水準：計算深遠，局面感細膩。
+preset.grandmaster.name = 特級大師
+preset.grandmaster.desc = 特級大師水準：極難戰勝。
+preset.stockfish_max.name = Stockfish 滿級
+preset.stockfish_max.desc = 全力以赴的 Stockfish 16。祝你好運。
+preset.custom.name = 自訂
+preset.custom.desc = 自行設定引擎參數。
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = 製作群
+credits.game.head = SCACELITH
+credits.game = 在皇家大廳裡下一盤西洋棋，執行於自行開發的 OpenGL 4.6 引擎。
+credits.engine.head = 西洋棋引擎
+credits.engine = Stockfish 16，由 Stockfish 開發者製作。
+credits.engine.licence = GNU 通用公共授權條款第 3 版。
+credits.fonts.head = 字型
+credits.fonts = EB Garamond（Georg Duffner）、Cinzel（Natanael Gama）、Amiri（Khaled Hosny）。
+credits.fonts.hand = 手寫字型：Caveat、Marck Script、Bad Script、Aref Ruqaa、Klee One、霞鶩文楷 LXGW WenKai（SIL Open Font License）。
+credits.fonts.figures = 棋子符號來自 GNU FreeFont（附字型例外條款的 GPL v3）。
+credits.quote = 「西洋棋是分析的藝術。」——米哈伊爾·鮑特溫尼克
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = 暫停
+pause.resume = 繼續
+pause.offer_draw = 提議和棋
+pause.claim_draw = 要求判和
+pause.claim_draw.help = 三次重複局面或五十回合規則。
+pause.resign = 認輸
+confirm.resign.title = 認輸
+confirm.resign.text = 要認輸這盤棋嗎？對手將被判為勝方。
+confirm.resign.ok = 認輸
+confirm.leave.title = 離開對局
+confirm.leave.text = 回到主選單嗎？目前的對局將被放棄。
+confirm.leave.ok = 離開
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = 升變為
+piece.queen = 后
+piece.rook = 車
+piece.bishop = 象
+piece.knight = 馬
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = 本局和棋。
+gameover.draw_moves = 第 {0} 回合後和棋。
+gameover.win = 下得好——你贏了。
+gameover.win_moves = 下得好——你在第 {0} 回合獲勝。
+gameover.loss = 對手獲勝。
+gameover.loss_moves = 對手在第 {0} 回合獲勝。
+gameover.rematch = 再下一局
+gameover.view_board = 檢視棋盤
+gameover.show = 顯示
+
+# Reasons
+reason.checkmate = 將死
+reason.resignation = 認輸
+reason.timeout = 超時判負
+reason.illegal_moves = 第二次違例著法（判負）
+reason.stalemate = 逼和
+reason.insufficient = 死局面（子力不足）
+reason.timeout_vs_insufficient = 超時，但對方無法將死
+reason.fivefold = 五次重複局面
+reason.75_moves = 七十五回合規則
+reason.threefold_claim = 三次重複局面（提出要求）
+reason.50_moves_claim = 五十回合規則（提出要求）
+reason.agreement = 協議和棋
+reason.illegal_vs_insufficient = 第二次違例著法，但對方無法將死
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = 著法
+movelist.empty = 尚未走棋。
+
+# ---- Loading -----------------------------------------------------------------------------------
+loading.materials = 準備材料
+loading.hall = 建造大廳
+loading.furniture = 雕刻桌椅
+loading.board = 打磨棋盤
+loading.pieces = 車削棋子
+loading.clock = 組裝棋鐘
+loading.porcelain = 燒製瓷器
+loading.ready = 就緒
+
+# ---- Notifications during the game -------------------------------------------------------------
+notify.no_draw_claim = 此局面下不能要求判和。
+notify.flag_you = 你的時間已用完。
+notify.flag_opponent = 對手的時間已用完。
+notify.touched.pawn = 摸子走子：你必須移動所摸的兵。
+notify.touched.knight = 摸子走子：你必須移動所摸的馬。
+notify.touched.bishop = 摸子走子：你必須移動所摸的象。
+notify.touched.rook = 摸子走子：你必須移動所摸的車。
+notify.touched.queen = 摸子走子：你必須移動所摸的后。
+notify.touched.king = 摸子走子：你必須移動所摸的王。
+notify.touched.piece = 摸子走子：你必須移動所摸的棋子。
+notify.touched_square = 摸子走子：你必須移動 {0} 上的棋子。
+notify.press_clock = 按下棋鐘以完成著法（空白鍵）。
+notify.illegal = 違例著法。
+notify.cannot_move = 不能這樣走。
+notify.move_first = 請先走棋，再按棋鐘。
+notify.draw_already_offered = 你在這一步已經提議過和棋。
+notify.draw_accepted = 對手同意和棋。
+notify.draw_declined = 對手拒絕了和棋提議。
+notify.draw_claimed = 對手要求判和。
+
+# ---- Arbiter -----------------------------------------------------------------------------------
+arbiter.join = {0}{1}
+arbiter.no_move = 裁判：未走棋就按下了棋鐘，視為違例著法。
+arbiter.unpromoted = 裁判：違例著法，按棋鐘前兵沒有被換成新的棋子。
+arbiter.illegal = 裁判：違例著法。
+arbiter.second_loses.white = 這是白方第二次違例著法：白方輸掉本局。
+arbiter.second_loses.black = 這是黑方第二次違例著法：黑方輸掉本局。
+arbiter.second_draw.white = 這是白方第二次違例著法，但黑方無法將死：本局和棋。
+arbiter.second_draw.black = 這是黑方第二次違例著法，但白方無法將死：本局和棋。
+arbiter.queen = 兵升變為后。
+arbiter.queen_one_minute.white = 兵升變為后，白方獲得一分鐘補時。
+arbiter.queen_one_minute.black = 兵升變為后，黑方獲得一分鐘補時。
+arbiter.queen_two_minutes.white = 兵升變為后，白方獲得兩分鐘補時。
+arbiter.queen_two_minutes.black = 兵升變為后，黑方獲得兩分鐘補時。
+arbiter.restored = 局面已恢復。
+arbiter.restored_one_minute.white = 局面已恢復，白方獲得一分鐘補時。
+arbiter.restored_one_minute.black = 局面已恢復，黑方獲得一分鐘補時。
+arbiter.restored_two_minutes.white = 局面已恢復，白方獲得兩分鐘補時。
+arbiter.restored_two_minutes.black = 局面已恢復，黑方獲得兩分鐘補時。
+arbiter.one_minute.white = 白方獲得一分鐘補時。
+arbiter.one_minute.black = 黑方獲得一分鐘補時。
+arbiter.two_minutes.white = 白方獲得兩分鐘補時。
+arbiter.two_minutes.black = 黑方獲得兩分鐘補時。
+arbiter.second_loses = 第二次違例著法將判負。
+arbiter.touched.white = 白方必須移動所摸的棋子。
+arbiter.touched.black = 黑方必須移動所摸的棋子。
+arbiter.game_over = 對局已經結束。
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = 觀看對局
+
+viewer.title = 觀看對局
+viewer.white = 白方
+viewer.black = 黑方
+viewer.time_control = 時限
+viewer.elo_approx = 約 {0} 等級分
+viewer.swap = 交換黑白
+viewer.note = 雙方棋手都是 Stockfish。對局期間可以在大廳裡自由飛行：沒有人會看見你。
+viewer.summary = {0} 對 {1}
+viewer.custom = 自訂
+viewer.tc.custom = 自行設定
+viewer.tc.none = 不用棋鐘
+viewer.tc.bullet = 子彈棋
+viewer.tc.blitz = 超快棋
+viewer.tc.rapid = 快棋
+viewer.tc.classical = 慢棋
+viewer.base_time = 基本時間
+viewer.increment = 加秒
+viewer.delay = 延時
+viewer.off = 無
+viewer.minutes = {0} 分鐘
+viewer.seconds = {0} 秒
+viewer.delay_summary = 延時 {0} 秒
+viewer.back = 返回
+viewer.start = 開始
+
+viewer.paused = 暫停
+viewer.resume = 繼續
+viewer.options = 選項
+viewer.main_menu = 主選單
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = 操作
+viewer.keys.move = W A S D  ·  Z Q S D  ·  方向鍵
+viewer.controls.move = 移動
+viewer.keys.updown = E、空白鍵  /  C、Ctrl
+viewer.controls.updown = 上升 / 下降
+viewer.keys.fast = Shift
+viewer.controls.fast = 加速
+viewer.keys.look = 滑鼠右鍵
+viewer.controls.look = 環顧四周
+viewer.keys.speed = 滑鼠滾輪
+viewer.controls.speed = 速度
+viewer.keys.views = 1 – 9
+viewer.controls.views = 視角
+viewer.keys.eyes = 0
+viewer.controls.eyes = 以輪到走棋一方的眼睛觀看
+viewer.keys.moves = Tab
+viewer.controls.moves = 著法列表
+viewer.keys.menu = Esc
+viewer.controls.menu = 選單
+viewer.keys.hide = H
+viewer.controls.hide = 隱藏此說明
+viewer.speed = 速度 {0} 公尺/秒
+viewer.view.0 = 棋手的視角
+viewer.view.1 = 桌旁
+viewer.view.2 = 棋盤正上方
+viewer.view.3 = 大廳
+viewer.view.4 = 棋鐘
+viewer.view.5 = 白方的臉
+viewer.view.6 = 黑方的臉
+viewer.view.7 = 對決
+viewer.view.8 = 窗邊
+viewer.view.9 = 掛毯
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = 白方
+viewer.side.black = 黑方
+viewer.flag.white = 白方的時間已用完。
+viewer.flag.black = 黑方的時間已用完。
+viewer.claims_draw = {0}要求判和。
+viewer.offer_accepted = {0}提議和棋，{1}接受。
+viewer.offer_declined = {0}提議和棋，{1}拒絕。
+viewer.gameover.white_wins = 白方在第 {0} 回合後獲勝。
+viewer.gameover.black_wins = 黑方在第 {0} 回合後獲勝。
+viewer.gameover.draw = 第 {0} 回合後和棋。
+viewer.gameover.players = {0} 對 {1}
+viewer.watch_again = 再看一局
+
+# The player's rating
+elo.label = 等級分
+elo.no_games = 尚無計分對局
+elo.provisional = 暫定等級分
+elo.peak = 最高 {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = 你的等級分 {0}
+elo.expected = 預期得分 {0}%
+elo.change = 等級分 {0} → {1}（{2}）
+elo.unrated = 等級分 {0} · 本局不計分
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = 對局記錄表
+scoresheet.event = 賽事
+scoresheet.date = 日期
+scoresheet.round = 輪次
+scoresheet.board = 桌次
+scoresheet.page = 頁碼
+scoresheet.white = 白方
+scoresheet.black = 黑方
+scoresheet.elo = 等級分
+scoresheet.result = 結果
+scoresheet.move_no = 回合
+scoresheet.sign_white = 白方簽名
+scoresheet.sign_black = 黑方簽名
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = 王 后 車 象 馬
+scoresheet.date_format = {2}/{1}/{0}

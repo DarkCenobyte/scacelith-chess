@@ -199,7 +199,12 @@ const Expect kExpect[] = {
     {audio::Sfx::GameEnd, 7.0f, 120.0f, 800.0f, 2.0f, 5.5f},
     {audio::Sfx::CaptureClick, 1.5f, 1500.0f, 7000.0f, 0.05f, 0.45f},
     {audio::Sfx::TablePlace, 1.5f, 300.0f, 1800.0f, 0.04f, 0.5f},
+    {audio::Sfx::PenWrite, 4.0f, 1500.0f, 7000.0f, 2.8f, 3.45f},
+    {audio::Sfx::PenTap, 0.8f, 500.0f, 6000.0f, 0.02f, 0.13f},
+    {audio::Sfx::PageTurn, 2.0f, 900.0f, 6000.0f, 0.8f, 1.35f},
+    {audio::Sfx::PageFlap, 1.2f, 200.0f, 3500.0f, 0.08f, 0.45f},
 };
+static_assert(sizeof(kExpect) / sizeof(kExpect[0]) == size_t(audio::Sfx::Count), "every sound has expectations");
 
 }  // namespace
 
@@ -465,6 +470,45 @@ TEST(audio_repeated_triggers_differ) {
             }
             CHECK(dotp / std::sqrt(e1 * e2 + 1e-30) < 0.99);
         }
+}
+
+// Windowed playback (pen strokes): only 'duration' seconds sound, with click-free edges, and the
+// voice is released at the end of the window.
+TEST(audio_windowed_play) {
+    using namespace audio;
+    Mixer m(7u);
+    m.prepare(kFs);
+    m.setAmbienceEnabled(false, true);
+    m.setRoomEnabled(false);
+    for (int v = 0; v < bankVariants(Sfx::PenWrite); ++v) {
+        SoundBuffer* b = new SoundBuffer();
+        b->samples = synthesize(Sfx::PenWrite, 300u + uint32_t(v));
+        b->sfx = int(Sfx::PenWrite);
+        b->variant = v;
+        m.install(b);
+    }
+    for (float dur : {0.05f, 0.18f, 0.6f}) {
+        PlayRequest r;
+        r.sfx = Sfx::PenWrite;
+        r.pos = defaultPosition(Sfx::PenWrite);
+        r.duration = dur;
+        CHECK(m.play(r));
+        std::vector<float> out(size_t(1.0f * kFs) * 2);
+        m.process(out.data(), int(out.size() / 2));
+        CHECK_EQ(m.activeVoices(), 0);
+        size_t lastLoud = 0;
+        float peak = 0.0f, first = std::fabs(out[0]) + std::fabs(out[1]);
+        for (size_t i = 0; i < out.size() / 2; ++i) {
+            float a = std::max(std::fabs(out[2 * i]), std::fabs(out[2 * i + 1]));
+            peak = std::max(peak, a);
+            if (a > 1e-5f) lastLoud = i;
+        }
+        float heard = float(lastLoud) / kFs;
+        std::fprintf(stderr, "  pen stroke %.2f s: heard %.3f s, peak %.1f dBFS\n", dur, heard, 20.0f * std::log10(peak + 1e-12f));
+        CHECK(peak > 1e-3f);
+        CHECK(first < 0.02f * peak);                                    // faded in
+        CHECK(heard > dur * 0.85f && heard < dur * 1.1f + 0.003f);    // pitch jitter +-4 %
+    }
 }
 
 TEST(audio_ambience_toggle_fades) {

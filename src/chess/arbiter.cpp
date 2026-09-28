@@ -1,6 +1,7 @@
 // Tournament arbiter for the physical board: touch-move (FIDE Laws Art. 4) and completed
 // illegal moves (Art. 7.5, Appendix A.4.2 / B for rapid and blitz).
 #include "chess/chess.h"
+#include "i18n/i18n.h"
 
 #include <cstdlib>
 
@@ -9,7 +10,12 @@ namespace chess {
 namespace {
 
 bool isPromotionPiece(PieceType t) { return t == Knight || t == Bishop || t == Rook || t == Queen; }
-const char* colorName(Color c) { return c == White ? "White" : "Black"; }
+// Arbiter messages are whole translated sentences (assets/i18n, section "Arbiter"), one key per
+// colour so that every language can inflect the colour names; join() chains them.
+std::string said(const std::string& key, Color c) { return i18n::tr(key + (c == White ? ".white" : ".black")); }
+void join(std::string& msg, const std::string& sentence) {
+    msg = msg.empty() ? sentence : i18n::trf("arbiter.join", {msg, sentence});
+}
 
 enum IllegalKind { kIllegalMove = 0, kNoMove = 1, kUnpromoted = 2 };
 
@@ -166,17 +172,14 @@ Arbiter::Verdict Arbiter::illegal(Color mover, const TimeControl& tc, int kind) 
     const Color opp = opposite(mover);
     std::string msg;
     switch (kind) {
-    case kNoMove: msg = "Arbiter: the clock was pressed without making a move, which counts as an illegal move."; break;
-    case kUnpromoted: msg = "Arbiter: illegal move, the pawn was not replaced by a new piece before the clock was pressed."; break;
-    default: msg = "Arbiter: illegal move."; break;
+    case kNoMove: msg = i18n::tr("arbiter.no_move"); break;
+    case kUnpromoted: msg = i18n::tr("arbiter.unpromoted"); break;
+    default: msg = i18n::tr("arbiter.illegal"); break;
     }
     if (illegal_[mover] >= 2) {
         v.forfeit = true;
-        if (pos_.canColorMate(opp))
-            msg += std::string(" This is ") + colorName(mover) + "'s second illegal move: " + colorName(mover) + " loses the game.";
-        else
-            msg += std::string(" This is ") + colorName(mover) + "'s second illegal move, but " + colorName(opp) +
-                   " cannot checkmate: the game is drawn.";
+        if (pos_.canColorMate(opp)) join(msg, said("arbiter.second_loses", mover));
+        else join(msg, said("arbiter.second_draw", mover));
         v.message = msg;
         return v;
     }
@@ -186,19 +189,17 @@ Arbiter::Verdict Arbiter::illegal(Color mover, const TimeControl& tc, int kind) 
     case TimeControl::Category::Blitz: v.opponentBonusMs = 60000; break;         // Appendix A.4.2 / B
     case TimeControl::Category::Unlimited: v.opponentBonusMs = 0; break;
     }
-    const std::string bonus = v.opponentBonusMs == 120000 ? "two extra minutes" : "one extra minute";
-    const std::string opponent = colorName(opp);
+    const std::string bonus = v.opponentBonusMs == 120000 ? "two_minutes" : "one_minute";
     if (kind == kUnpromoted) {
-        msg += " The pawn becomes a queen";
-        msg += v.opponentBonusMs ? " and " + opponent + " receives " + bonus + "." : std::string(".");
-    } else {
-        if (kind == kIllegalMove) msg += " The position is restored";
-        if (v.opponentBonusMs) msg += (kind == kIllegalMove ? " and " : " ") + opponent + " receives " + bonus + ".";
-        else msg += kind == kIllegalMove ? "." : "";
+        join(msg, v.opponentBonusMs ? said("arbiter.queen_" + bonus, opp) : std::string(i18n::tr("arbiter.queen")));
+    } else if (kind == kIllegalMove) {
+        join(msg, v.opponentBonusMs ? said("arbiter.restored_" + bonus, opp) : std::string(i18n::tr("arbiter.restored")));
+    } else if (v.opponentBonusMs) {
+        join(msg, said("arbiter." + bonus, opp));
     }
-    if (!v.opponentBonusMs) msg += " A second illegal move loses the game.";
+    if (!v.opponentBonusMs) join(msg, i18n::tr("arbiter.second_loses"));
     if (kind == kIllegalMove && touched_ != NoSquare && !pos_.legalMovesFrom(touched_).empty())
-        msg += std::string(" ") + colorName(mover) + " must move the touched piece.";
+        join(msg, said("arbiter.touched", mover));
     v.message = msg;
     return v;
 }
@@ -207,7 +208,7 @@ Arbiter::Verdict Arbiter::clockPressed(const Game& game, const TimeControl& tc) 
     sync(game);
     if (over_) {
         Verdict v;
-        v.message = "The game is over.";
+        v.message = i18n::tr("arbiter.game_over");
         return v;
     }
     const Color mover = pos_.sideToMove();

@@ -52,8 +52,15 @@ struct DifficultyInfo {
     std::string description;  // one line
     int elo = 0;              // shown as "~1500 Elo"; 0 = not shown
 };
-// Mirrors ai::presets(): the last entry is "Custom" (it opens the engine parameters).
+// Mirrors ai::presets(): the last entry is "Custom" (it opens the engine parameters). Pass the
+// English names and descriptions: the screens show them translated (presetName below).
 void setDifficultyList(const std::vector<DifficultyInfo>& list);
+// Translations of an ai::presets() entry, looked up by its English name ("Club Player" ->
+// preset.club_player.name / .desc in assets/i18n); unknown names are returned unchanged.
+std::string presetName(const std::string& englishName);
+std::string presetDescription(const std::string& englishName, const std::string& englishDescription);
+// A chess::TimeControl::label() for display ("Unlimited" translated, "3+2" unchanged).
+std::string timeControlLabel(const std::string& label);
 // Labels of chess::timeControlPresets() ("Unlimited", "1+0", "3+2", ...). The UI appends "Custom".
 void setTimeControlList(const std::vector<std::string>& labels);
 // Window sizes offered for windowed mode (defaults: common 16:9 sizes up to 3840x2160).
@@ -77,7 +84,16 @@ struct NewGameSetup {
 };
 
 enum class MenuAction {
-    None, StartGame, Quit, Resume, Resign, OfferDraw, ClaimDraw, BackToMainMenu, OptionsChanged, Rematch
+    None, StartGame, Quit, Resume, Resign, OfferDraw, ClaimDraw, BackToMainMenu, OptionsChanged, Rematch,
+    StartWatching  // "Watch a Game" page: Start (the WatchSetup holds the choice)
+};
+
+// "Watch a Game" (viewer mode): two Stockfish players. The page starts from the last choices saved
+// in game::settings() ([viewer]) and writes them back (and saves the .ini) on Start.
+struct WatchSetup {
+    int whitePreset = 5, blackPreset = 4;  // indices into the difficulty list ("Custom" excluded)
+    int timeControl = 5;                   // as NewGameSetup::timeControl (-1 = custom)
+    int customBaseSeconds = 300, customIncrementSeconds = 3, customDelaySeconds = 0;
 };
 
 // Title screen over the 3D hall. Handles its sub-pages (New Game, Options, Credits) itself.
@@ -85,7 +101,11 @@ enum class MenuAction {
 // (and saves the .ini) when the player presses Start; 'setup' then holds the choice.
 // OptionsChanged is returned on the frame the player applies new options (already stored in
 // game::settings() and saved); the game re-applies display/graphics/audio settings.
+// The title page also shows the player's Elo (game::settings() [player]) and the New Game page
+// shows it next to the opponent list.
 MenuAction mainMenu(NewGameSetup& setup);
+// Same, with the "Watch a Game" entry filling 'watch' (returns StartWatching on its Start).
+MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch);
 // In-game pause menu (Esc). canClaimDraw enables the claim entry; canOfferDraw = false greys out
 // "Offer draw" (e.g. an offer is already pending). Esc resumes.
 MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw = true);
@@ -97,11 +117,36 @@ void drawNotifications();
 // End of game card: result line ("1-0", "½-½"), reason, move count. Returns Rematch or BackToMainMenu.
 // The card can be folded away by the player to look at the final position.
 MenuAction gameOver(const std::string& result, const std::string& reason, bool playerWon, bool draw, int moveCount = -1);
+// Additions to the end of game card.
+struct GameOverExtras {
+    std::string line;          // replaces the sentence under the reason (watched game: who won)
+    std::string detail;        // extra line under it: Elo change ("Elo 1512 → 1524 (+12)"), players
+    std::string primaryLabel;  // replaces "Rematch" (watched game: "Watch again")
+};
+MenuAction gameOver(const std::string& result, const std::string& reason, bool playerWon, bool draw, int moveCount,
+                    const GameOverExtras& extras);
+bool gameOverFolded();  // the card is folded away ("View the board")
 // Options page is reachable from both menus; changes go to game::settings() when applied.
 bool optionsOpen();
 // Optional small move list (toggled by the player with Tab).
 void moveList(const std::vector<std::string>& san, bool visible);
 // Loading screen while shaders/probes/textures are prepared (progress 0..1).
 void loadingScreen(float progress, const std::string& label);
+
+// ---- Viewer mode (ui_screens_game.cpp) ---------------------------------------------------------
+// Pause menu while watching: Resume, Options, Main menu (no draw offer, no resignation). Esc resumes.
+MenuAction viewerPauseMenu();
+// Overlay of the viewer mode: the players (top left), the controls hint (bottom left, the game
+// toggles it with H) and the name of a viewpoint just selected.
+struct ViewerHud {
+    bool visible = true;         // everything (H)
+    std::string white, black;    // "Stockfish · Expert · 2100"
+    int sideToMove = 0;          // 0 White, 1 Black, -1 none (marks the player to move)
+    std::string viewpoint;       // viewpoint just selected ("" = none)
+    float viewpointAge = 0.0f;   // seconds since it was selected (the label fades out)
+    float speed = 1.2f;          // observer speed (m/s), shown for a moment after a change
+    float speedAge = 1e9f;       // seconds since the speed changed
+};
+void viewerHud(const ViewerHud& hud);
 
 }  // namespace ui

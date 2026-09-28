@@ -1,18 +1,26 @@
 // "ui" viewer scene: every UI screen over a dark marble backdrop (stand-in for the 3D hall).
 //   scacelith --scene ui --ui-screen main|newgame|custom|options|credits|pause|confirm|promotion|
-//                                     gameover|gameover-folded|loading|movelist|notify|hud
-//   --ui-tab <0..4|display|graphics|audio|gameplay|controls>   options tab
+//                                     gameover|gameover-folded|loading|movelist|notify|hud|hand|
+//                                     watch|viewer-pause|viewer-hud|viewer-gameover|gameover-elo
+//   --ui-tab <0..5|display|graphics|audio|gameplay|player|controls>   options tab
+//   --lang <code>   interface language (en fr de es uk ar ru ja zh-Hant zh-Hans; read by game::Settings)
+//   --ui-name <name>, --ui-hand <0..2>   player name / handwriting shown by Options > Player
+//   "hand": sample names in every script, written in each handwriting style
 //   --ui-black      promotion picker for Black, --ui-draw   drawn game over card
 //   --ui-kb         show the keyboard focus highlight, --ui-mouse X,Y   fake mouse (reference px)
 //   --ui-keys a,b,.. scripted input, one token per frame: up down left right enter space esc tab
-//                   pgup pgdn wait <letter> click@X:Y (reference px, press + release)
+//                   pgup pgdn home end bksp del wait <letter> click@X:Y (reference px, press +
+//                   release) type:<text> (typed characters)
 // Interactive: keys 1..9 / 0 switch screens.
 #include "ui.h"
 #include "ui_internal.h"
 #include "ui_widgets.h"
 #include "../app/scene.h"
 #include "../core/log.h"
+#include "../chess/chess.h"
 #include "../game/settings.h"
+#include "../i18n/i18n.h"
+#include "../i18n/unicode.h"
 #include "../gl/gl46.h"
 #include "../platform/platform.h"
 #include "../render/gpu.h"
@@ -32,10 +40,13 @@ public:
         ui::setSoundCallback([](ui::Sound s) { LOGD("ui sound %d", int(s)); });
         if (!ui::init()) LOGW("ui viewer: ui::init reported a problem");
         std::string tab = ctx.argValue("--ui-tab", "0");
-        static const char* tabs[] = {"display", "graphics", "audio", "gameplay", "controls"};
+        static const char* tabs[] = {"display", "graphics", "audio", "gameplay", "player", "controls"};
         tab_ = std::atoi(tab.c_str());
-        for (int i = 0; i < 5; ++i)
+        for (int i = 0; i < 6; ++i)
             if (tab == tabs[i]) tab_ = i;
+        if (ctx.hasArg("--ui-name")) game::settings().playerName = ctx.argValue("--ui-name");
+        if (ctx.hasArg("--ui-hand"))
+            game::settings().handStyle = ui::font::HandStyle(std::atoi(ctx.argValue("--ui-hand").c_str()) % ui::font::HAND_STYLE_COUNT);
         black_ = ctx.hasArg("--ui-black");
         drawn_ = ctx.hasArg("--ui-draw");
         kb_ = ctx.hasArg("--ui-kb");
@@ -65,12 +76,20 @@ public:
         for (int k = 0; k < plat::KEY_COUNT; ++k) fake_.keyPressed[k] = fake_.keyReleased[k] = false;
         for (int b = 0; b < plat::MOUSE_BUTTON_COUNT; ++b) fake_.mousePressed[b] = fake_.mouseReleased[b] = false;
         fake_.wheel = 0;
+        fake_.textCount = 0;
         if (step_ >= script_.size()) return;
         const std::string tok = script_[step_++];
+        if (tok.compare(0, 5, "type:") == 0) {  // typed characters, as WM_CHAR / XLookupString deliver them
+            for (char32_t c : uni::decode(tok.substr(5)))
+                if (fake_.textCount < int(sizeof(fake_.text) / sizeof(fake_.text[0]))) fake_.text[fake_.textCount++] = uint32_t(c);
+            LOGI("ui viewer: script frame %d '%s'", int(step_), tok.c_str());
+            return;
+        }
         static const struct { const char* name; int key; } names[] = {
             {"up", plat::KEY_UP}, {"down", plat::KEY_DOWN}, {"left", plat::KEY_LEFT}, {"right", plat::KEY_RIGHT},
             {"enter", plat::KEY_ENTER}, {"space", plat::KEY_SPACE}, {"esc", plat::KEY_ESCAPE}, {"tab", plat::KEY_TAB},
-            {"pgup", plat::KEY_PAGEUP}, {"pgdn", plat::KEY_PAGEDOWN}};
+            {"pgup", plat::KEY_PAGEUP}, {"pgdn", plat::KEY_PAGEDOWN}, {"home", plat::KEY_HOME}, {"end", plat::KEY_END},
+            {"bksp", plat::KEY_BACKSPACE}, {"del", plat::KEY_DELETE}};
         for (auto& n : names)
             if (tok == n.name) fake_.keyPressed[n.key] = true;
         if (tok.size() == 1 && std::isalpha(static_cast<unsigned char>(tok[0])))
@@ -105,14 +124,59 @@ public:
             ui::debug::setOptionsTab(tab_);
         }
         if (screen == "credits") ui::debug::openMenuPage(ui::debug::MenuPage::Credits);
+        if (screen == "watch") ui::debug::openMenuPage(ui::debug::MenuPage::Watch);
         if (screen == "confirm") ui::debug::openPauseConfirm(1);
         if (screen == "gameover-folded") ui::debug::foldGameOver(true);
-        if (screen == "movelist") ui::notify("Touch-move: you must move the knight on g1.", 30.0f);
+        if (screen == "movelist") ui::notify(i18n::trf("notify.touched_square", {"g1"}), 30.0f);
         if (screen == "notify") {
-            ui::notify("Your opponent offers a draw.", 30.0f);
-            ui::notify("Illegal move \xE2\x80\x94 two minutes are added to your opponent\xE2\x80\x99s clock.", 30.0f);
+            ui::notify(i18n::tr("notify.draw_declined"), 30.0f);
+            ui::notify(i18n::tr("arbiter.illegal") + std::string(" ") + i18n::tr("arbiter.restored_two_minutes.black"), 30.0f);
         }
         frames_ = 0;
+    }
+
+    // Names in every script the game supports, each written in the three handwriting styles: the
+    // Latin and Cyrillic rows change with the style, the others keep the hand of their script.
+    void handSheet() {
+        namespace gfx = ui::gfx;
+        m::vec2 v = gfx::viewSize();
+        static const char* names[] = {
+            "\xC3\x89lodie Lef\xC3\xA8vre",                                              // Latin
+            "\xD0\x9E\xD0\xBB\xD0\xB5\xD0\xBA\xD1\x81\xD0\xB0\xD0\xBD\xD0\xB4\xD1\x80 \xD0\x86\xD0\xB2\xD0\xB0\xD0\xBD\xD0\xB5\xD0\xBD\xD0\xBA\xD0\xBE",  // Ukrainian
+            "\xD0\x94\xD0\xBC\xD0\xB8\xD1\x82\xD1\x80\xD0\xB8\xD0\xB9 \xD0\x92\xD0\xBE\xD0\xBB\xD0\xBA\xD0\xBE\xD0\xB2",  // Russian
+            "\xD9\x85\xD8\xAD\xD9\x85\xD8\xAF \xD8\xB9\xD8\xA8\xD8\xAF \xD8\xA7\xD9\x84\xD9\x84\xD9\x87",  // Arabic
+            "\xD9\x81\xD8\xA7\xD8\xB7\xD9\x85\xD8\xA9 \xD8\xA7\xD9\x84\xD8\xB2\xD9\x87\xD8\xB1\xD8\xA7\xD8\xA1",  // Arabic
+            "\xE4\xBD\x90\xE8\x97\xA4 \xE3\x81\x95\xE3\x81\x8F\xE3\x82\x89",  // Japanese
+            "\xE7\x8E\x8B\xE5\xB0\x8F\xE6\x98\x8E",                                  // Simplified Chinese
+            "\xE9\x99\xB3\xE5\xA4\xA7\xE6\x96\x87",                                  // Traditional Chinese
+        };
+        const int rows = int(sizeof(names) / sizeof(names[0]));
+        float w = std::min(1700.0f, v.x - 80.0f), h = 150.0f + 92.0f * float(rows);
+        gfx::Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f, w, h);
+        gfx::shadow(p.offset(0, 10), 3, 40, m::vec4(0, 0, 0, 0.6f));
+        gfx::fillV(p, m::vec4(0.95f, 0.93f, 0.86f, 1.0f), m::vec4(0.89f, 0.86f, 0.78f, 1.0f), 3.0f);
+        float colW = (w - 80.0f) / float(ui::font::HAND_STYLE_COUNT);
+        gfx::TextStyle hs;
+        hs.face = ui::font::FACE_TITLE;
+        hs.size = 20.0f;
+        hs.tracking = 0.2f;
+        hs.align = gfx::HAlign::Center;
+        hs.color = m::vec4(0.45f, 0.30f, 0.15f, 1.0f);
+        for (int c = 0; c < ui::font::HAND_STYLE_COUNT; ++c)
+            gfx::text(ui::font::handStyleName(c), p.x + 40.0f + colW * (float(c) + 0.5f), p.y + 70.0f, hs);
+        for (int r = 0; r < rows; ++r) {
+            float base = p.y + 170.0f + 92.0f * float(r);
+            gfx::hline(p.x + 30.0f, p.r() - 30.0f, base + 14.0f, m::vec4(0.32f, 0.42f, 0.58f, 0.35f));
+            for (int c = 0; c < ui::font::HAND_STYLE_COUNT; ++c) {
+                gfx::TextStyle ts;
+                ts.hand = c;
+                ts.size = 52.0f;
+                ts.color = m::vec4(0.10f, 0.13f, 0.30f, 0.95f);
+                ts.align = gfx::HAlign::Center;
+                ts.size = gfx::fitSize(names[r], ts, colW - 30.0f, 0.5f);
+                gfx::text(names[r], p.x + 40.0f + colW * (float(c) + 0.5f), base, ts);
+            }
+        }
     }
 
     bool update(AppContext& ctx, float dt) override {
@@ -156,18 +220,38 @@ public:
         if (kb_) ui::im::setKeyboardMode(true);
         ui::MenuAction a = ui::MenuAction::None;
         const std::string& s = screen_;
-        if (s == "main" || s == "newgame" || s == "custom" || s == "options" || s == "credits") {
-            a = ui::mainMenu(setup_);
+        if (s == "main" || s == "newgame" || s == "custom" || s == "options" || s == "credits" || s == "watch") {
+            a = ui::mainMenu(setup_, watch_);
+        } else if (s == "viewer-pause") {
+            a = ui::viewerPauseMenu();
+        } else if (s == "viewer-hud") {
+            ui::ViewerHud hud;
+            hud.white = i18n::trf("viewer.player", {ui::presetName("Master"), "2400"});
+            hud.black = i18n::trf("viewer.player", {ui::presetName("Expert"), "2100"});
+            hud.sideToMove = 1;
+            hud.viewpoint = i18n::tr("viewer.view.7");
+            hud.viewpointAge = 0.5f;
+            ui::viewerHud(hud);
+        } else if (s == "viewer-gameover" || s == "gameover-elo") {
+            ui::GameOverExtras x;
+            if (s == "viewer-gameover") {
+                x.line = i18n::trf("viewer.gameover.white_wins", {"47"});
+                x.detail = i18n::trf("viewer.gameover.players", {ui::presetName("Master") + " (2400)", ui::presetName("Expert") + " (2100)"});
+                x.primaryLabel = i18n::tr("viewer.watch_again");
+            } else {
+                x.detail = i18n::trf("elo.change", {"1500", "1524", i18n::ltr("+24")});
+            }
+            a = ui::gameOver("1-0", chess::endReasonText(chess::GameEndReason::Checkmate), s == "gameover-elo", false, 47, x);
         } else if (s == "pause" || s == "confirm") {
             a = ui::pauseMenu(true);
         } else if (s == "promotion") {
             int piece = ui::promotionPicker(!black_);
             if (piece) LOGI("ui viewer: promotion -> %d", piece);
         } else if (s == "gameover" || s == "gameover-folded") {
-            a = drawn_ ? ui::gameOver("½-½", "Threefold repetition", false, true, 41)
-                       : ui::gameOver("1-0", "Checkmate", true, false, 34);
+            a = drawn_ ? ui::gameOver("\xC2\xBD-\xC2\xBD", chess::endReasonText(chess::GameEndReason::ThreefoldClaim), false, true, 41)
+                       : ui::gameOver("1-0", chess::endReasonText(chess::GameEndReason::Checkmate), true, false, 34);
         } else if (s == "loading") {
-            ui::loadingScreen(0.62f, "Baking the light of the hall\xE2\x80\xA6");
+            ui::loadingScreen(0.62f, i18n::tr("loading.porcelain"));
         } else if (s == "movelist" || s == "notify") {
             static const std::vector<std::string> opera = {
                 "e4", "e5", "Nf3", "d6", "d4", "Bg4", "dxe5", "Bxf3", "Qxf3", "dxe5", "Bc4", "Nf6", "Qb3", "Qe7", "Nc3", "c6", "Bg5",
@@ -176,10 +260,12 @@ public:
         } else if (s == "hud") {
             m::vec2 v = ui::viewSize();
             ui::panel(m::vec2(v.x - 420.0f, 60.0f), m::vec2(360.0f, 150.0f));
-            ui::text("WHITE", m::vec2(v.x - 390.0f, 84.0f), 20.0f, m::vec4(0.79f, 0.66f, 0.42f, 1.0f), ui::Align::Left, ui::FontStyle::Title, 0.2f);
+            ui::text(uni::toUpper(i18n::tr("common.white")), m::vec2(v.x - 390.0f, 84.0f), 20.0f, m::vec4(0.79f, 0.66f, 0.42f, 1.0f), ui::Align::Left, ui::FontStyle::Title, 0.2f);
             ui::text("4:59", m::vec2(v.x - 90.0f, 74.0f), 64.0f, m::vec4(0.93f, 0.9f, 0.83f, 1.0f), ui::Align::Right);
-            ui::text("Your move", m::vec2(v.x - 390.0f, 150.0f), 24.0f, m::vec4(0.76f, 0.72f, 0.65f, 1.0f), ui::Align::Left, ui::FontStyle::Italic);
-            if (ui::button("Offer draw", m::vec2(60.0f, v.y - 120.0f), m::vec2(240.0f, 56.0f))) LOGI("ui viewer: hud button");
+            ui::text(i18n::tr("notify.press_clock"), m::vec2(v.x - 390.0f, 150.0f), 24.0f, m::vec4(0.76f, 0.72f, 0.65f, 1.0f), ui::Align::Left, ui::FontStyle::Italic);
+            if (ui::button(i18n::tr("pause.offer_draw"), m::vec2(60.0f, v.y - 120.0f), m::vec2(240.0f, 56.0f))) LOGI("ui viewer: hud button");
+        } else if (s == "hand") {
+            handSheet();
         }
         ui::drawNotifications();
         if (a != ui::MenuAction::None) {
@@ -199,6 +285,7 @@ public:
 private:
     game::Settings saved_;
     ui::NewGameSetup setup_;
+    ui::WatchSetup watch_;
     std::string screen_;
     int tab_ = 0;
     bool black_ = false, drawn_ = false, kb_ = false, quit_ = false;

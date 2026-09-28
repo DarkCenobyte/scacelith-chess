@@ -8,6 +8,8 @@
 //    bestmove discarded); the same for evaluation requests. Move and eval requests queue behind
 //    each other.
 //  * UCI options are sent lazily before each "go", only when they differ from what the engine has.
+//  * Two sides may share the engine (AI vs AI): a move search with other strength settings than
+//    the previous one clears the hash and the search history first (see Engine::configure).
 #include "ai/engine.h"
 
 #include "ai/behavior.h"
@@ -89,13 +91,20 @@ struct Engine::Impl {
     int evalCp = 0;
 
     bool hashWarmedByEval = false;       // an eval search ran since the last move search
+    bool haveLastMoveSettings = false;   // settings of the last move search (side switches)
+    EngineSettings lastMoveSettings;
+    int hashClears = 0;
+    int readySent = 0, readyOks = 0;     // isready / readyok count (sync)
 
     std::vector<std::string> lastMoves;  // position of the last completed move search
     std::string lastBest;                // and its result (recapture detection)
     std::mt19937 rng{std::random_device{}() ^ unsigned(SteadyClock::now().time_since_epoch().count())};
 
     detail::UciHost& host() { return detail::UciHost::instance(); }
-    void send(const std::string& line) { host().send(line); }
+    void send(const std::string& line) {
+        if (line == "isready") ++readySent;
+        host().send(line);
+    }
 
     void pump() {
         if (!started) return;
@@ -126,6 +135,7 @@ struct Engine::Impl {
         } else if (line == "uciok") {
             uciOk = true;
         } else if (line == "readyok") {
+            ++readyOks;
             if (!handshakeDone && uciOk) {
                 handshakeDone = true;
                 LOGI("ai: Stockfish ready in %d ms", msSince(startedAt));
@@ -255,9 +265,16 @@ struct Engine::Impl {
         } else {
             // Depth-capped handicaps were calibrated with a hash table that only ever saw their own
             // shallow searches; a deep evaluation in between would make the next move stronger.
-            if (hashWarmedByEval && settings.depth > 0 && detail::skillLevel(settings) >= 0.0)
+            bool clear = hashWarmedByEval && settings.depth > 0 && detail::skillLevel(settings) >= 0.0;
+            // The other side of an AI vs AI game searched last: start from a clean table.
+            if (haveLastMoveSettings && !detail::sameStrength(lastMoveSettings, settings)) clear = true;
+            if (clear) {
                 send("setoption name Clear Hash");
+                ++hashClears;
+            }
             hashWarmedByEval = false;
+            haveLastMoveSettings = true;
+            lastMoveSettings = settings;
         }
         std::string pos = "position startpos";
         if (!job->moves.empty()) {
@@ -301,6 +318,8 @@ struct Engine::Impl {
         inFlight.reset();
         moveReady = evalReady = false;
         hashWarmedByEval = false;
+        haveLastMoveSettings = false;
+        readySent = readyOks = 0;
         move.clear();
         lastMoves.clear();
         lastBest.clear();
@@ -356,6 +375,8 @@ void Engine::newGame() {
     d.moveReady = d.evalReady = false;
     d.lastMoves.clear();
     d.lastBest.clear();
+    d.haveLastMoveSettings = false;  // ucinewgame clears the hash anyway
+    d.hashWarmedByEval = false;
     Task task;
     task.lines = {"ucinewgame", "isready"};
     d.outbox.push_back(std::move(task));
@@ -363,6 +384,27 @@ void Engine::newGame() {
 }
 
 void Engine::configure(const EngineSettings& s) { impl_->settings = s; }
+
+void Engine::clearHash() {
+    Impl& d = *impl_;
+    if (!d.started) return;
+    Task task;
+    task.lines = {"setoption name Clear Hash"};
+    d.outbox.push_back(std::move(task));
+    ++d.hashClears;
+    d.pump();
+}
+
+int Engine::hashClears() const { return impl_->hashClears; }
+
+bool Engine::sync(int timeoutMs) {
+    Impl& d = *impl_;
+    if (!d.started) return false;
+    Task task;
+    task.lines = {"isready"};
+    d.outbox.push_back(std::move(task));
+    return d.pumpUntil([&d] { return d.outbox.empty() && !d.inFlight && d.readyOks >= d.readySent; }, timeoutMs);
+}
 
 const EngineSettings& Engine::settings() const { return impl_->settings; }
 
@@ -448,5 +490,9 @@ int Engine::thinkTimeMs(const ClockInfo& clock, int plyCount, int legalMoveCount
 }
 
 bool Engine::acceptsDraw(int evalCp, int plyCount) const { return detail::acceptsDrawOffer(evalCp, plyCount); }
+
+bool Engine::offersDraw(int evalCp, int plyCount, int pliesSinceOwnOffer) const {
+    return detail::offersDraw(evalCp, plyCount, pliesSinceOwnOffer);
+}
 
 }  // namespace ai

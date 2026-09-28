@@ -25,7 +25,8 @@ struct PieceObject {
 
 class PhysicalBoard {
 public:
-    // clockOnPositiveX: side of the table holding the clock (captured pieces go to the other).
+    // clockOnPositiveX: side of the table holding the clock (captured and spare pieces go there too;
+    // the scoresheets lie on the other side).
     void reset(bool clockOnPositiveX);
     std::vector<PieceObject>& pieces() { return pieces_; }
     const std::vector<PieceObject>& pieces() const { return pieces_; }

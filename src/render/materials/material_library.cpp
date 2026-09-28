@@ -18,7 +18,8 @@ const char* g_names[int(MaterialId::Count)] = {
     "TableWood", "TableWoodCarved", "ChairWood", "ChairVelvet", "FloorMarble", "FloorMarbleInlay", "WallStone",
     "WallPanelWood", "GildedTrim", "Tapestry", "CeilingPainted", "WindowGlass", "WindowFrame", "Curtain", "Brass",
     "Crystal", "CandleWax", "ClockCase", "ClockDisplay", "ClockLever", "ClockPanel", "RobotPorcelain", "RobotJoint",
-    "RobotEyeSclera", "RobotEyeIris", "RobotEyeCornea", "RobotLid", "Default"};
+    "RobotEyeSclera", "RobotEyeIris", "RobotEyeCornea", "RobotLid", "ScoresheetPaper", "ScoresheetCard", "PenBody",
+    "PenMetal", "Default"};
 
 // sRGB authoring colour (0..255) -> linear.
 vec3 srgb(float r, float g, float b) {
@@ -312,6 +313,56 @@ void defineHall() {
     }
 }
 
+// ---------------------------------------------------------------------------------------------
+// Scoresheet pad and ballpoint pen. The paper samples page textures that every game::Scoresheet
+// renders for itself (it draws with a copy of this material): the library version gets blank
+// 1x1 textures so that it never samples an unbound unit.
+GLuint g_blankPage = 0, g_blankEntry = 0;
+
+void defineScoresheet() {
+    if (!g_blankPage) {
+        glCreateTextures(GL_TEXTURE_2D_ARRAY, 1, &g_blankPage);
+        glTextureStorage3D(g_blankPage, 1, GL_RGBA8, 1, 1, 1);
+        const uint8_t zero[4] = {0, 0, 0, 0};
+        glTextureSubImage3D(g_blankPage, 0, 0, 0, 0, 1, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, zero);
+        glCreateTextures(GL_TEXTURE_2D, 1, &g_blankEntry);
+        glTextureStorage2D(g_blankEntry, 1, GL_RGBA8, 1, 1);
+        glTextureSubImage2D(g_blankEntry, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, zero);
+    }
+    {
+        Material& m = def(MaterialId::ScoresheetPaper, "shaders/materials/paper.glsl");
+        m.params[0] = vec4(srgb(241, 238, 229), 0.72f);   // slightly warm white offset paper
+        m.params[1] = vec4(srgb(28, 42, 118), 0.38f);     // blue ballpoint ink
+        m.params[2] = vec4(srgb(34, 34, 38), 0.6f);       // black offset print
+        m.params[3] = vec4(1.0f, 1.0f, 4.0f, 1.0f);
+        m.params[4] = vec4(1.0f, 1.0f, 148.0f, 210.0f);
+        m.textures[0] = g_blankPage;
+        m.textureTargets[0] = GL_TEXTURE_2D_ARRAY;
+        m.textures[1] = g_blankEntry;
+    }
+    {
+        Material& m = def(MaterialId::ScoresheetCard, "shaders/materials/paper.glsl", {"PAPER_CARD"});
+        m.params[0] = vec4(srgb(128, 122, 112), 0.88f);   // grey chipboard
+        m.params[1] = vec4(srgb(26, 30, 34), 0.72f);      // near-black cloth tape
+    }
+    {
+        // Lacquered barrel: deep blue-black under a thick polished clear coat.
+        Material& m = def(MaterialId::PenBody, "shaders/materials/lacquer.glsl");
+        m.params[0] = vec4(srgb(14, 18, 36), 0.3f);
+        m.params[1] = vec4(0.0f, 1.0f, 0.03f, 0.0f);
+        m.params[2] = vec4(0.0f, 1.0f, 0.0f, 0.5f);
+        polishTex(m);
+    }
+    {
+        // Chrome plating, a faint polishing grain along the barrel.
+        Material& m = def(MaterialId::PenMetal, "shaders/materials/lacquer.glsl");
+        m.params[0] = vec4(0.62f, 0.63f, 0.64f, 0.1f);
+        m.params[1] = vec4(1.0f, 0.0f, 0.05f, 0.15f);
+        m.params[2] = vec4(0.0f, 1.0f, 0.0f, 0.4f);
+        polishTex(m);
+    }
+}
+
 }  // namespace
 
 bool init() {
@@ -324,6 +375,7 @@ bool init() {
     defineWoods();
     defineFabrics();
     defineHall();
+    defineScoresheet();
 
     // Owned by other packages: placeholders kept as before.
     std(MaterialId::ClockDisplay, vec3(0.45f, 0.48f, 0.40f), 0.2f, 0, 1, 0.02f);
@@ -341,6 +393,9 @@ bool init() {
 
 void shutdown() {
     destroy(g_tex);
+    if (g_blankPage) glDeleteTextures(1, &g_blankPage);
+    if (g_blankEntry) glDeleteTextures(1, &g_blankEntry);
+    g_blankPage = g_blankEntry = 0;
     g_initialized = false;
 }
 const Material& get(MaterialId id) { return g_mats[int(id)]; }

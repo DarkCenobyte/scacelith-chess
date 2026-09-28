@@ -2,8 +2,11 @@
 #include "../audio/audio.h"
 #include "../character/skeleton.h"
 #include "../core/log.h"
+#include "../i18n/i18n.h"
 #include "../platform/platform.h"
 #include "../render/post/postfx.h"
+#include "elo.h"
+#include "../ui/ui_font.h"
 #include "layout.h"
 #include "settings.h"
 #include <algorithm>
@@ -64,6 +67,7 @@ float yawOf(const mat4& t) {
     return std::atan2(z.x, z.z);
 }
 
+// Also the suffix of the "notify.touched.*" translation keys.
 const char* pieceName(PieceType t) {
     switch (t) {
     case Pawn: return "pawn";
@@ -89,6 +93,30 @@ float distPointSegment2D(vec2 p, vec2 a, vec2 b) {
     return length(p - (a + ab * t));
 }
 
+bool parseVec3(const std::string& v, vec3& out) {
+    std::vector<std::string> c = split(v, ',');
+    if (c.size() != 3) return false;
+    out = vec3(float(std::atof(c[0].c_str())), float(std::atof(c[1].c_str())), float(std::atof(c[2].c_str())));
+    return true;
+}
+
+// The seat whose clock stands on its left plays (and presses the clock) with its left hand.
+// White (+Z, facing -Z) has +X on its right, Black the opposite.
+character::Side playHandFor(int seat, bool clockPosX) {
+    bool clockOnRight = (seat == 0) == clockPosX;
+    return clockOnRight ? character::Side::Right : character::Side::Left;
+}
+
+// The human's name and handwriting on the scoresheets (Options > Player; "Human" by default, written
+// in the interface language).
+std::string localPlayerName() {
+    const std::string& n = settings().playerName;
+    return n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
+}
+int humanHandStyle() { return int(settings().handStyle); }
+
+const char* sideKey(Color c) { return c == White ? "viewer.side.white" : "viewer.side.black"; }
+
 }  // namespace
 
 // =============================================================================================
@@ -98,9 +126,10 @@ float distPointSegment2D(vec2 p, vec2 a, vec2 b) {
 bool GameScene::init(AppContext& ctx) {
     ctx_ = &ctx;
     rng_.seedWith(ctx.screenshotMode ? 20260927u : plat::randomSeed());
-    demo_ = ctx.hasArg("--demo");
+    startWatching_ = ctx.hasArg("--viewer") || ctx.hasArg("--demo");
     skipIntro_ = ctx.hasArg("--no-intro");
-    viewOverride_ = ctx.argValue("--view");
+    handoverPreview_ = ctx.hasArg("--handover-preview");
+    debugCamera_ = ctx.hasArg("--cam");
 
     Settings& s = settings();
     setup_.difficulty = s.difficultyPreset;
@@ -114,6 +143,21 @@ bool GameScene::init(AppContext& ctx) {
     setup_.depth = s.customDepth;
     setup_.moveTimeMs = s.customMoveTimeMs;
     setup_.nodes = s.customNodes;
+    int presetCount = int(ai::presets().size());
+    watch_.whitePreset = std::clamp(s.viewerWhitePreset, 0, presetCount - 1);
+    watch_.blackPreset = std::clamp(s.viewerBlackPreset, 0, presetCount - 1);
+    watch_.timeControl = s.viewerTimeControl;
+    watch_.customBaseSeconds = s.viewerCustomBaseSeconds;
+    watch_.customIncrementSeconds = s.viewerCustomIncrementSeconds;
+    watch_.customDelaySeconds = s.viewerCustomDelaySeconds;
+    hudVisible_ = s.viewerShowControls;
+    // Command-line games (screenshots, tests).
+    if (ctx.hasArg("--white-preset")) watch_.whitePreset = std::clamp(std::atoi(ctx.argValue("--white-preset").c_str()), 0, presetCount - 1);
+    if (ctx.hasArg("--black-preset")) watch_.blackPreset = std::clamp(std::atoi(ctx.argValue("--black-preset").c_str()), 0, presetCount - 1);
+    if (ctx.hasArg("--tc")) {
+        int tc = std::atoi(ctx.argValue("--tc").c_str());
+        setup_.timeControl = watch_.timeControl = std::clamp(tc, 0, int(timeControlPresets().size()) - 1);
+    }
 
     if (!audio::init()) LOGW("audio unavailable, continuing silently");
     if (!ui::init()) {
@@ -149,13 +193,15 @@ bool GameScene::init(AppContext& ctx) {
 
 void GameScene::finishLoading() {
     world_.setupRenderer(*ctx_->renderer);
+    if (!scorekeeper_.init(true)) LOGW("scoresheets unavailable");
     engineOk_ = engine_.start();
     if (!engineOk_) LOGW("Stockfish is unavailable: the opponent will play random legal moves");
     initAnimators();
     board_.reset(true);
     world_.setClockSide(true);
     clock_.setup(chosenTimeControl());
-    if (ctx_->hasArg("--start") || demo_) {
+    if (ctx_->hasArg("--start") || startWatching_) {
+        mode_ = startWatching_ ? GameMode::Watch : GameMode::Play;
         setupNewGame();
         if (skipIntro_) {
             fade_ = 0.0f;
@@ -178,10 +224,14 @@ void GameScene::initAnimators() {
     const character::Skeleton& sk = character::robotSkeleton();
     for (int seat = 0; seat < 2; ++seat) {
         float zs = seat == 0 ? 1.0f : -1.0f;  // White at +Z faces -Z
+        // The hand on the clock side plays and presses the clock; the other one writes.
+        seats_[seat].playHand = playHandFor(seat, world_.clockOnPositiveX());
         anim_[seat] = anim::Animator();
-        anim_[seat].init(sk, vec3(0, layout::PLAYER_PELVIS_Y, zs * layout::PLAYER_PELVIS_Z), zs);
-        // Right hand rests on the table beside the board (White's right is +X, Black's is -X).
-        anim_[seat].setRestHand(vec3(zs * 0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
+        anim_[seat].init(sk, vec3(0, layout::PLAYER_PELVIS_Y, zs * layout::PLAYER_PELVIS_Z), zs, seats_[seat].playHand);
+        // The playing hand rests on the table beside the board, on the clock side (White's right
+        // is +X, Black's is -X).
+        float side = anim_[seat].playHand() == character::Side::Right ? zs : -zs;
+        anim_[seat].setRestHand(vec3(side * 0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
         anim_[seat].pieceTransform = [this](int id) {
             const PieceObject* p = board_.byId(id);
             return p ? p->transform : mat4();
@@ -233,27 +283,36 @@ void GameScene::enterMenu() {
     leverSide_ = leverTarget_ = -1.0f;
     dest_.clear();
     initAnimators();
+    newScoresheets();
     for (auto& a : anim_) a.setHeadOverride(false);
     menuAngle_ = 0.9f;
     cameraCut_ = true;
     plat::setMouseCaptured(false);
     dragging_ = false;
+    observerPlaced_ = false;
+    followEyes_ = false;
+    clockFrozen_ = false;
 }
 
 TimeControl GameScene::chosenTimeControl() const {
     const auto& presets = timeControlPresets();
-    if (setup_.timeControl >= 0 && setup_.timeControl < int(presets.size())) return presets[size_t(setup_.timeControl)];
+    // Watching uses the choice of the Watch a Game page ([viewer] in the .ini).
+    int index = watching() ? watch_.timeControl : setup_.timeControl;
+    int base = watching() ? watch_.customBaseSeconds : setup_.customBaseSeconds;
+    int inc = watching() ? watch_.customIncrementSeconds : setup_.customIncrementSeconds;
+    int delay = watching() ? watch_.customDelaySeconds : setup_.customDelaySeconds;
+    if (index >= 0 && index < int(presets.size())) return presets[size_t(index)];
     TimeControl tc;
     tc.unlimited = false;
-    tc.baseMs = int64_t(std::max(10, setup_.customBaseSeconds)) * 1000;
-    tc.incrementMs = int64_t(std::max(0, setup_.customIncrementSeconds)) * 1000;
-    tc.delayMs = int64_t(std::max(0, setup_.customDelaySeconds)) * 1000;
+    tc.baseMs = int64_t(std::max(10, base)) * 1000;
+    tc.incrementMs = int64_t(std::max(0, inc)) * 1000;
+    tc.delayMs = int64_t(std::max(0, delay)) * 1000;
     return tc;
 }
 
-ai::EngineSettings GameScene::chosenEngineSettings() const {
+ai::EngineSettings GameScene::engineSettingsFor(int preset) const {
     const auto& presets = ai::presets();
-    int idx = std::clamp(setup_.difficulty, 0, int(presets.size()) - 1);
+    int idx = std::clamp(preset, 0, int(presets.size()) - 1);
     ai::EngineSettings es = presets[size_t(idx)].settings;
     if (idx == int(presets.size()) - 1) {  // "Custom"
         es.skillLevel = setup_.skillLevel;
@@ -271,16 +330,24 @@ ai::EngineSettings GameScene::chosenEngineSettings() const {
 
 void GameScene::setupNewGame() {
     Settings& s = settings();
-    humanColor_ = s.nextColor < 0 ? (rng_.uniform() < 0.5f ? White : Black) : Color(s.nextColor & 1);
-    std::string forced = ctx_->argValue("--human");
-    if (forced == "white") humanColor_ = White;
-    if (forced == "black") humanColor_ = Black;
-    LOGI("New game: human plays %s, %s, difficulty %d", humanColor_ == White ? "White" : "Black",
-         chosenTimeControl().label().c_str(), setup_.difficulty);
+    ++round_;
+    if (watching()) {
+        humanColor_ = White;  // nobody: keeps the human-game helpers well defined
+        LOGI("New game (watching): %s vs %s, %s", ai::presets()[size_t(watch_.whitePreset)].name,
+             ai::presets()[size_t(watch_.blackPreset)].name, chosenTimeControl().label().c_str());
+    } else {
+        humanColor_ = s.nextColor < 0 ? (rng_.uniform() < 0.5f ? White : Black) : Color(s.nextColor & 1);
+        std::string forced = ctx_->argValue("--human");
+        if (forced == "white") humanColor_ = White;
+        if (forced == "black") humanColor_ = Black;
+        LOGI("New game: human plays %s, %s, difficulty %d", humanColor_ == White ? "White" : "Black",
+             chosenTimeControl().label().c_str(), setup_.difficulty);
+    }
 
     game_.reset();
     arbiter_.reset(game_);
-    bool clockPosX = humanColor_ == White;  // at the human player's right hand
+    // At the human player's right hand; at White's right when watching.
+    bool clockPosX = watching() || humanColor_ == White;
     world_.setClockSide(clockPosX);
     board_.reset(clockPosX);
     clock_.setup(chosenTimeControl());
@@ -296,24 +363,85 @@ void GameScene::setupNewGame() {
     pressQueued_ = false;
     drawOfferPly_ = -1;
     lastAiEval_ = 0;
+    for (int i = 0; i < 2; ++i) {
+        lastEval_[i] = 0;
+        hasEval_[i] = false;
+        lastOfferPly_[i] = -1;
+    }
+    pendingOffer_ = -1;
+    clockFrozen_ = false;
     gameOverShown_ = false;
     showMoveList_ = false;
+    rated_ = eloCounted_ = false;
+    eloBefore_ = eloAfter_ = s.playerElo;
 
+    initAnimators();
+    configureSeats();
+    newScoresheets();
+    // The players filled in their header before sitting down at the board, as in a tournament
+    // round: the pens only record the moves.
+    scorekeeper_.writeHeaderInstantly();
     if (engineOk_) {
         engine_.newGame();
-        engine_.configure(chosenEngineSettings());
+        engine_.configure(seats_[seats_[0].human() ? 1 : 0].engine);
     }
-    initAnimators();
-    anim_[humanSeat()].setHeadOverride(true, 0.0f, kBaseGazePitch);
-    anim_[aiSeat()].setHeadOverride(false);
+    if (watching()) {
+        anim_[0].setHeadOverride(false);
+        anim_[1].setHeadOverride(false);
+    } else {
+        anim_[humanSeat()].setHeadOverride(true, 0.0f, kBaseGazePitch);
+        anim_[aiSeat()].setHeadOverride(false);
+    }
     lookYaw_ = lookPitch_ = 0.0f;
     gazeYaw_ = 0.0f;
     gazePitch_ = kBaseGazePitch;
     lean_ = leanSmooth_ = 0.0f;
     cameraCut_ = true;
 
+    if (watching()) {
+        // Observer: --cam / --look / --fov, else --viewpoint N, else beside the table. The jump
+        // happens once the robots are posed (face viewpoints need their heads).
+        if (!followEyes_) eyesSeat_ = -1;
+        // "Watch again" keeps the observer where it is.
+        if (observerPlaced_) {
+            if (followEyes_) pendingViewpoint_ = 0;  // into the eyes of White, who moves first
+        } else {
+            observerPlaced_ = true;
+            pendingCamArg_ = ctx_->hasArg("--cam") && round_ == 1;
+            pendingViewpoint_ = handoverPreview_ ? 0 : 1;
+            if (ctx_->hasArg("--viewpoint") && round_ == 1)
+                pendingViewpoint_ = std::clamp(std::atoi(ctx_->argValue("--viewpoint").c_str()), 0, 9);
+        }
+        viewpointShown_ = -1;
+    }
+
     std::string moves = ctx_->argValue("--moves");
     if (!moves.empty()) applyMovesInstantly(split(moves, ','));
+}
+
+void GameScene::configureSeats() {
+    const Settings& s = settings();
+    for (int i = 0; i < 2; ++i) {
+        Seat& st = seats_[i];
+        character::Side hand = st.playHand;  // set by initAnimators()
+        st = Seat();
+        st.color = colorOfSeat(i);
+        st.playHand = hand;
+        if (!watching() && st.color == humanColor_) {
+            st.controller = Controller::Human;
+            st.name = localPlayerName();
+            st.elo = s.playerElo;
+            st.provisional = s.playerGames < elo::kProvisionalGames;
+        } else {
+            st.controller = Controller::Stockfish;
+            st.name = "Stockfish";
+            st.preset = watching() ? (i == 0 ? watch_.whitePreset : watch_.blackPreset) : setup_.difficulty;
+            st.preset = std::clamp(st.preset, 0, int(ai::presets().size()) - 1);
+            st.engine = engineSettingsFor(st.preset);
+            st.elo = ai::presetElo(st.preset, st.engine);
+            st.presetName = ai::presets()[size_t(st.preset)].name;
+        }
+    }
 }
 
 void GameScene::applyMovesInstantly(const std::vector<std::string>& uci) {
@@ -327,20 +455,47 @@ void GameScene::applyMovesInstantly(const std::vector<std::string>& uci) {
     }
     board_.syncTo(game_.position());
     arbiter_.reset(game_);
+    // The moves are on the scoresheets already, as if the game had been adjourned and resumed.
+    if (!game_.sanMoves().empty()) scorekeeper_.writeMovesInstantly(game_.sanMoves());
+}
+
+void GameScene::newScoresheets() {
+    Scorekeeper::Player p[2];
+    for (int i = 0; i < 2; ++i) {
+        p[i].name = seats_[i].name;
+        p[i].elo = seats_[i].elo;
+        p[i].handStyle = handStyleOf(i);
+        p[i].blueInk = seats_[i].human() || i == 0;  // Stockfish as Black writes in black
+    }
+    scorekeeper_.newGame(anim_, world_.clockOnPositiveX(), p, std::max(1, round_), scoresheetDate(ctx_->screenshotMode));
+}
+
+int GameScene::handStyleOf(int seat) const {
+    // Every sheet is written in its owner's hand; the two players never share one.
+    int human = std::clamp(humanHandStyle(), 0, int(ui::font::HAND_STYLE_COUNT) - 1);
+    if (seats_[seat].human()) return human;
+    int other = seats_[1 - seat].human() ? human : -1;
+    int want = watching() ? (seat == 0 ? ui::font::HAND_MARCK : ui::font::HAND_BADSCRIPT) : ui::font::HAND_MARCK;
+    if (want == other) want = (want + 1) % ui::font::HAND_STYLE_COUNT;
+    return want;
 }
 
 void GameScene::startPlaying() {
     state_ = State::Playing;
     stateTime_ = 0.0f;
-    // Colours alternate from one game to the next.
-    settings().nextColor = int(opposite(humanColor_));
-    settings().save();
+    if (!watching()) {
+        // Colours alternate from one game to the next.
+        settings().nextColor = int(opposite(humanColor_));
+        settings().save();
+    }
     if (game_.status() != GameStatus::Ongoing) {
         endGame();
         return;
     }
     clock_.start(game_.position().sideToMove());
     audio::playUI(audio::Sfx::GameStart, 0.6f);
+    // Both players take their pen while White thinks.
+    scorekeeper_.startRecording();
     beginTurn();
 }
 
@@ -350,7 +505,7 @@ void GameScene::beginTurn() {
     touchedSq_ = placedTo_ = NoSquare;
     pressQueued_ = false;
     hoverId_ = -1;
-    if (!demo_ && stm == humanColor_) {
+    if (isHumanSeat(seatOf(stm))) {
         turn_ = Turn::HumanIdle;
     } else {
         turn_ = Turn::AiThinking;
@@ -380,9 +535,73 @@ void GameScene::endGame() {
     reasonText_ = endReasonText(game_.endReason());
     isDraw_ = st == GameStatus::Draw;
     playerWon_ = (st == GameStatus::WhiteWins && humanColor_ == White) || (st == GameStatus::BlackWins && humanColor_ == Black);
-    LOGI("Game over: %s (%s)\n%s", resultText_.c_str(), reasonText_.c_str(),
-         game_.pgn(humanColor_ == White ? "Player" : "Scacelith", humanColor_ == White ? "Scacelith" : "Player").c_str());
+    LOGI("Game over: %s (%s)\n%s", resultText_.c_str(), reasonText_.c_str(), game_.pgn(seats_[0].name, seats_[1].name).c_str());
+    pendingOffer_ = -1;
+    clockFrozen_ = false;
+    rateGame();
+    // Both players write the result and lay their pen down before shaking hands.
+    scorekeeper_.finishGame(resultText_);
     audio::playUI(audio::Sfx::GameEnd, 0.7f);
+}
+
+void GameScene::rateGame() {
+    if (rated_ || watching() || game_.status() == GameStatus::Ongoing) return;
+    rated_ = true;
+    Settings& s = settings();
+    eloBefore_ = eloAfter_ = s.playerElo;
+    // As in FIDE rating, a game counts once both players have made a move (a game abandoned or
+    // lost on time before that is not rated). Without Stockfish the opponent plays random moves.
+    if (game_.moves().size() < 2 || !engineOk_) {
+        LOGI("Elo: game not rated (%d plies%s)", int(game_.moves().size()), engineOk_ ? "" : ", no engine");
+        return;
+    }
+    GameStatus st = game_.status();
+    double score = st == GameStatus::Draw ? 0.5 : ((st == GameStatus::WhiteWins) == (humanColor_ == White) ? 1.0 : 0.0);
+    elo::Record r;
+    r.rating = s.playerElo;
+    r.games = s.playerGames;
+    r.wins = s.playerWins;
+    r.draws = s.playerDraws;
+    r.losses = s.playerLosses;
+    r.peak = std::max(s.playerPeakElo, s.playerElo);
+    int opponent = seats_[aiSeat()].elo;
+    elo::Change c = elo::applyResult(r, opponent, score);
+    s.playerElo = r.rating;
+    s.playerGames = r.games;
+    s.playerWins = r.wins;
+    s.playerDraws = r.draws;
+    s.playerLosses = r.losses;
+    s.playerPeakElo = r.peak;
+    s.save();
+    eloCounted_ = true;
+    eloBefore_ = c.before;
+    eloAfter_ = c.after;
+    LOGI("Elo: %d -> %d (%+d; score %.1f against %d, expected %.2f, K %d)", c.before, c.after, c.delta(), score, opponent,
+         c.expected, c.k);
+}
+
+ui::GameOverExtras GameScene::gameOverExtras() const {
+    ui::GameOverExtras x;
+    if (watching()) {
+        int moveNo = std::max(1, int(game_.moves().size() + 1) / 2);
+        GameStatus st = game_.status();
+        const char* key = st == GameStatus::WhiteWins   ? "viewer.gameover.white_wins"
+                          : st == GameStatus::BlackWins ? "viewer.gameover.black_wins"
+                                                        : "viewer.gameover.draw";
+        x.line = i18n::trf(key, {std::to_string(moveNo)});
+        auto label = [this](int i) { return ui::presetName(seats_[i].presetName) + " (" + std::to_string(seats_[i].elo) + ")"; };
+        x.detail = i18n::trf("viewer.gameover.players", {label(0), label(1)});
+        x.primaryLabel = i18n::tr("viewer.watch_again");
+        return x;
+    }
+    if (eloCounted_) {
+        int d = eloAfter_ - eloBefore_;
+        std::string delta = (d > 0 ? "+" : d < 0 ? "\xE2\x88\x92" : "\xC2\xB1") + std::to_string(std::abs(d));
+        x.detail = i18n::trf("elo.change", {std::to_string(eloBefore_), std::to_string(eloAfter_), i18n::ltr(delta)});
+    } else if (rated_) {
+        x.detail = i18n::trf("elo.unrated", {std::to_string(eloBefore_)});
+    }
+    return x;
 }
 
 void GameScene::applySettings(bool displayToo) {
@@ -408,8 +627,15 @@ void GameScene::applySettings(bool displayToo) {
     }
 }
 
-void GameScene::shutdown(AppContext&) {
+void GameScene::shutdown(AppContext& ctx) {
+    // Closing the game in the middle of a rated game resigns it, like leaving to the menu
+    // (screenshot runs excepted: they stop wherever the capture happens).
+    if (!ctx.screenshotMode && !watching() && state_ == State::Playing && game_.status() == GameStatus::Ongoing) {
+        game_.resign(humanColor_);
+        rateGame();
+    }
     engine_.shutdown();
+    scorekeeper_.shutdown();
     ui::shutdown();
     audio::shutdown();
 }
@@ -435,8 +661,14 @@ bool GameScene::update(AppContext& ctx, float dt) {
         break;
     case State::Menu: {
         fade_ = std::max(0.0f, fade_ - dt / kFadeIn);
-        ui::MenuAction a = ui::mainMenu(setup_);
-        if (a == ui::MenuAction::StartGame) {
+        ui::MenuAction a = ui::mainMenu(setup_, watch_);
+        if (a == ui::MenuAction::StartWatching) {
+            // The page saved the choice in the .ini ([viewer]); watch_ holds it.
+            mode_ = GameMode::Watch;
+            state_ = State::FadeToGame;
+            stateTime_ = 0.0f;
+        } else if (a == ui::MenuAction::StartGame) {
+            mode_ = GameMode::Play;
             Settings& s = settings();
             s.difficultyPreset = setup_.difficulty;
             s.timeControlPreset = setup_.timeControl;
@@ -460,6 +692,10 @@ bool GameScene::update(AppContext& ctx, float dt) {
         break;
     }
     case State::Playing: {
+        if (watching()) {
+            updateWatchInput();
+            break;
+        }
         // Esc opens the pause menu; once open, the menu handles Esc itself (back / resume).
         if (!paused_ && in.keyPressed[plat::KEY_ESCAPE] && turn_ != Turn::HumanPromotion) {
             paused_ = true;
@@ -486,11 +722,12 @@ bool GameScene::update(AppContext& ctx, float dt) {
                 paused_ = false;
                 game_.claimDraw();
                 if (game_.status() != GameStatus::Ongoing) endGame();
-                else ui::notify("No draw can be claimed in this position.");
+                else ui::notify(i18n::tr("notify.no_draw_claim"));
                 break;
             case ui::MenuAction::BackToMainMenu:
                 paused_ = false;
                 if (game_.status() == GameStatus::Ongoing) game_.resign(humanColor_);
+                rateGame();  // leaving resigns: the game is rated as a loss
                 clock_.stop();
                 state_ = State::FadeToMenu;
                 stateTime_ = 0.0f;
@@ -500,14 +737,20 @@ bool GameScene::update(AppContext& ctx, float dt) {
             }
         } else {
             if (in.keyPressed[plat::KEY_TAB] && !ui::wantsKeyboard()) showMoveList_ = !showMoveList_;
-            if (!demo_ && isHumanTurn()) updateHumanInput();
+            if (isHumanTurn()) updateHumanInput();
         }
         break;
     }
+    case State::Intro:
+    case State::Handshake:
+        if (watching()) updateWatchInput();
+        break;
     case State::GameOver:
+        if (watching()) updateWatchInput();
         if (stateTime_ > 1.2f && (endHandshakeDone_ || stateTime_ > 5.0f)) {
             gameOverShown_ = true;
-            ui::MenuAction a = ui::gameOver(resultText_, reasonText_, playerWon_, isDraw_, int(game_.moves().size() + 1) / 2);
+            ui::MenuAction a = ui::gameOver(resultText_, reasonText_, playerWon_, isDraw_, int(game_.moves().size() + 1) / 2,
+                                            gameOverExtras());
             if (a == ui::MenuAction::Rematch) {
                 state_ = State::FadeToGame;
                 stateTime_ = 0.0f;
@@ -574,7 +817,9 @@ void GameScene::simulate(float dt) {
         if (!paused_) updatePlaying(dt);
         break;
     case State::GameOver:
-        if (!endHandshakeDone_ && stateTime_ > 0.8f && !anim_[0].busy() && !anim_[1].busy()) {
+        // The result is written and the pens laid down first (a writing hand may be the right one).
+        if (!endHandshakeDone_ && stateTime_ > 0.8f && !anim_[0].busy() && !anim_[1].busy() &&
+            !anim_[0].writingBusy() && !anim_[1].writingBusy()) {
             anim::Task h0 = task(anim::TaskType::Handshake), h1 = h0;
             h0.partner = &anim_[1];
             h1.partner = &anim_[0];
@@ -606,6 +851,7 @@ void GameScene::simulate(float dt) {
             anim_[seat].update(dt, events_);
             handleEvents(seat, events_);
         }
+        scorekeeper_.update();
     }
     // Pieces in a hand follow it; the others rest where they were put.
     for (PieceObject& p : board_.pieces()) {
@@ -614,6 +860,26 @@ void GameScene::simulate(float dt) {
         if (anim_[0].heldPieceTransform(p.id, t) || anim_[1].heldPieceTransform(p.id, t)) p.transform = t;
     }
     board_.updateRestingTransforms();
+
+    // Viewer: initial camera, once the robots are posed (face viewpoints need their heads), then
+    // the observer's frame.
+    if (observerView()) {
+        if (pendingCamArg_) {
+            pendingCamArg_ = false;
+            pendingViewpoint_ = -1;
+            vec3 p, t;
+            parseVec3(ctx_->argValue("--cam"), p);
+            if (!parseVec3(ctx_->argValue("--look"), t)) t = vec3(0.0f, layout::BOARD_TOP_Y, 0.0f);
+            float fov = float(std::atof(ctx_->argValue("--fov", "0").c_str()));
+            observer_.setPose(CameraPose::looking(p, t, fov > 1.0f ? fov * DEG : kFov));
+            cameraCut_ = true;
+        }
+        if (pendingViewpoint_ >= 0) {
+            selectViewpoint(pendingViewpoint_, true);
+            pendingViewpoint_ = -1;
+        }
+        updateObserver(dt);
+    }
 }
 
 bool GameScene::isHumanTurn() const {
@@ -622,6 +888,9 @@ bool GameScene::isHumanTurn() const {
 }
 
 void GameScene::updatePlaying(float dt) {
+    // The handover between two players (hot-seat) freezes the clock between a clock press and the
+    // moment the next player can act: nothing counts and nobody acts.
+    if (clockFrozen_) return;
     // Clock
     if (clock_.isRunning()) {
         clockAccumMs_ += double(dt) * 1000.0;
@@ -631,7 +900,12 @@ void GameScene::updatePlaying(float dt) {
         Color r = clock_.running();
         if (!clock_.timeControl().unlimited && clock_.flagged(r)) {
             game_.flagFall(r);
-            ui::notify(r == humanColor_ ? "Your flag has fallen." : "Your opponent's flag has fallen.", 4.0f);
+            if (watching()) {
+                ui::notify(i18n::tr(r == White ? "viewer.flag.white" : "viewer.flag.black"), 4.0f);
+                endGame();
+                return;
+            }
+            ui::notify(i18n::tr(r == humanColor_ ? "notify.flag_you" : "notify.flag_opponent"), 4.0f);
             endGame();
             return;
         }
@@ -701,7 +975,7 @@ void GameScene::updateHumanInput() {
             if (!arbiter_.touchedHasLegalMove(game_)) {
                 humanRelease();
             } else {
-                ui::notify(std::string("Touch-move: the ") + pieceName(touched->type) + " you touched must be moved.", 3.0f);
+                ui::notify(i18n::tr(std::string("notify.touched.") + pieceName(touched->type)), 3.0f);
             }
         } else if (p && p->color == humanColor_) {
             // Castling by pointing at the rook once the king is in hand.
@@ -717,14 +991,14 @@ void GameScene::updateHumanInput() {
                 humanRelease();
                 humanTouch(p->id);
             } else {
-                ui::notify(std::string("Touch-move: the ") + pieceName(touched->type) + " you touched must be moved.", 3.0f);
+                ui::notify(i18n::tr(std::string("notify.touched.") + pieceName(touched->type)), 3.0f);
             }
         } else if (sq != NoSquare) {
             humanPlace(sq);
         }
         break;
     }
-    case Turn::HumanPlaced: ui::notify("Press the clock to complete your move (Space).", 2.5f); break;
+    case Turn::HumanPlaced: ui::notify(i18n::tr("notify.press_clock"), 2.5f); break;
     default: break;
     }
 }
@@ -734,7 +1008,7 @@ void GameScene::humanTouch(int pieceId) {
     if (!p || p->square == NoSquare) return;
     if (!arbiter_.touch(game_, p->square)) {
         Square committed = arbiter_.touchedSquare();
-        ui::notify("Touch-move: you must move the piece on " + squareName(committed) + ".", 3.0f);
+        ui::notify(i18n::trf("notify.touched_square", {squareName(committed)}), 3.0f);
         return;
     }
     anim_[humanSeat()].enqueue(task(anim::TaskType::Reach, pieceId));
@@ -764,11 +1038,11 @@ void GameScene::humanPlace(Square to) {
     bool promo = mover->type == Pawn && (rankOf(to) == 7 || rankOf(to) == 0);
     Move mv = pos.findLegal(touchedSq_, to, promo ? Queen : NoPiece);
     if (!mv.valid() && settings().showLegalMoves) {
-        ui::notify("Illegal move.", 2.0f);
+        ui::notify(i18n::tr("notify.illegal"), 2.0f);
         return;
     }
     if (!arbiter_.place(game_, to, NoPiece)) {
-        ui::notify("That move cannot be made.", 2.0f);
+        ui::notify(i18n::tr("notify.cannot_move"), 2.0f);
         return;
     }
     int victimId = occupant ? occupant->id : -1;
@@ -795,7 +1069,7 @@ void GameScene::humanPressClock() {
         return;
     }
     if (turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched) {
-        ui::notify("Make your move before pressing the clock.", 2.0f);
+        ui::notify(i18n::tr("notify.move_first"), 2.0f);
         return;
     }
     if (turn_ != Turn::HumanPlaced) return;
@@ -808,17 +1082,17 @@ void GameScene::humanPressClock() {
 void GameScene::offerDraw() {
     int ply = int(game_.moves().size());
     if (drawOfferPly_ == ply) {
-        ui::notify("You have already offered a draw this move.", 2.5f);
+        ui::notify(i18n::tr("notify.draw_already_offered"), 2.5f);
         return;
     }
     drawOfferPly_ = ply;
     bool accept = engineOk_ ? engine_.acceptsDraw(lastAiEval_, ply) : false;
     if (accept) {
-        ui::notify("Your opponent accepts the draw.", 3.0f);
+        ui::notify(i18n::tr("notify.draw_accepted"), 3.0f);
         game_.agreeDraw();
         endGame();
     } else {
-        ui::notify("Your opponent declines the draw offer.", 3.0f);
+        ui::notify(i18n::tr("notify.draw_declined"), 3.0f);
     }
 }
 
@@ -834,7 +1108,12 @@ ai::ClockInfo GameScene::clockInfo() const {
     ci.blackMs = clock_.remainingMs(Black);
     ci.whiteIncMs = ci.blackIncMs = tc.incrementMs;
     // Arm movement + clock press of a typical move (anim::Timing), spent on the AI's clock.
-    ci.moveOverheadMs = 1500;
+    // Stockfish deducts the overhead of its next 52 moves from the time left (timeman.cpp), which
+    // left it no time at all below 78 s (depth-1 moves in bullet and time trouble): scaled down
+    // so that about half of the time stays for the search. The clock itself is charged the
+    // humanised thinking time, not the search time.
+    int64_t budget = clock_.remainingMs(game_.position().sideToMove()) + int64_t(tc.incrementMs) * 49;
+    ci.moveOverheadMs = int(std::clamp<int64_t>(budget / 104, 10, 1500));
     return ci;
 }
 
@@ -843,7 +1122,12 @@ void GameScene::updateAi(float dt) {
     int seat = seatOf(side);
     const Position& pos = game_.position();
     if (!aiRequested_) {
-        if (engineOk_) engine_.requestMove(game_.uciMoves(), clockInfo());
+        if (engineOk_) {
+            // One Stockfish for both sides when watching: each search uses its side's settings
+            // (the engine clears its hash when they differ from the previous search's).
+            engine_.configure(seats_[seat].engine);
+            engine_.requestMove(game_.uciMoves(), clockInfo());
+        }
         aiElapsed_ = 0.0f;
         aiThinkMs_ = -1;
         aiRequested_ = true;
@@ -857,6 +1141,8 @@ void GameScene::updateAi(float dt) {
         int evalCp = 0;
         std::string uci = engineOk_ ? engine_.takeMove(&evalCp) : std::string();
         lastAiEval_ = evalCp;
+        lastEval_[seat] = evalCp;
+        hasEval_[seat] = engineOk_;
         aiMove_ = pos.parseUCI(uci);
         if (!aiMove_.valid()) {
             std::vector<Move> legal = pos.legalMoves();
@@ -878,10 +1164,23 @@ void GameScene::updateAi(float dt) {
         engine_.acceptsDraw(evalCp, int(game_.moves().size()))) {
         game_.claimDraw();
         if (game_.status() != GameStatus::Ongoing) {
-            ui::notify("Your opponent claims a draw.", 3.0f);
+            if (watching()) {
+                ui::notify(i18n::trf("viewer.claims_draw", {i18n::tr(sideKey(side))}), 3.0f);
+                endGame();
+                return;
+            }
+            ui::notify(i18n::tr("notify.draw_claimed"), 3.0f);
             endGame();
             return;
         }
+    }
+    // Between two AIs, a draw may be offered along with the move (FIDE 9.1.2: make the move, offer,
+    // press the clock); the opponent answers once the clock is pressed.
+    int ply = int(game_.moves().size());
+    if (watching() && engineOk_ &&
+        engine_.offersDraw(evalCp, ply, lastOfferPly_[seat] < 0 ? -1 : ply - lastOfferPly_[seat])) {
+        lastOfferPly_[seat] = ply;
+        pendingOffer_ = seat;
     }
 
     arbiter_.touch(game_, mv.from);
@@ -965,8 +1264,9 @@ void GameScene::planPromotionSwap(std::vector<anim::Task>& tasks, int pawnId, Sq
     if (!pawn) return;
     Color c = pawn->color;
     // The pawn leaves the board, then the new piece (a captured one, or the spare queen) takes
-    // its place.
-    vec3 slot = board_.nextCaptureSlot(c);
+    // its place. The player sets their own pawn down in their half, in the row of the pieces
+    // they captured (nextCaptureSlot places a colour near the player who captures it).
+    vec3 slot = board_.nextCaptureSlot(c == White ? Black : White);
     vec3 sqPos = board_.squareBase(sq);
     tasks.push_back(task(anim::TaskType::Reach, pawnId));
     tasks.push_back(task(anim::TaskType::Lift, pawnId, vec3(0), 0.03f));
@@ -989,6 +1289,7 @@ void GameScene::planPromotionSwap(std::vector<anim::Task>& tasks, int pawnId, Sq
 
 void GameScene::handleEvents(int seat, std::vector<anim::Event>& events) {
     for (const anim::Event& e : events) {
+        scorekeeper_.onEvent(seat, e);
         switch (e.type) {
         case anim::EventType::PieceGripped:
         case anim::EventType::CapturedGripped: {
@@ -1061,6 +1362,8 @@ void GameScene::onClockPressed(int seat) {
             clock_.addTime(opposite(mover), v.opponentBonusMs);
         }
         game_.play(v.move);
+        // Both players record the move on their scoresheet (their writing hands, off the clock).
+        scorekeeper_.recordMove(int(game_.moves().size()) - 1, game_.sanMoves().back());
         LOGI("move %d: %s (%s, clocks %lld / %lld ms)", int(game_.moves().size()), game_.sanMoves().back().c_str(),
              mover == White ? "White" : "Black", (long long)clock_.remainingMs(White), (long long)clock_.remainingMs(Black));
         if (v.moveStands) board_.syncTo(game_.position());
@@ -1068,14 +1371,29 @@ void GameScene::onClockPressed(int seat) {
             endGame();
             return;
         }
-        if (game_.position().inCheck() && mover != humanColor_ && !demo_) {
-            // No announcement: players don't say "check" in tournaments. The arbiter stays quiet.
+        // No announcement of checks: players don't say "check" in tournaments, the arbiter stays
+        // quiet.
+        if (pendingOffer_ == seat) {
+            pendingOffer_ = -1;
+            answerAiDrawOffer(seat);
+            if (game_.status() != GameStatus::Ongoing) return;
         }
         beginTurn();
+        // Watching through the players' eyes: the view flies to the next player (the hot-seat
+        // handover; --handover-preview also freezes the clock until the camera has landed).
+        if (watching() && followEyes_) {
+            int next = 1 - seat;
+            CameraPose to = eyePose(next);
+            observer_.flyTo(to, CameraFlight::kHandoverDuration,
+                            CameraFlight::handoverShape(observer_.pose(), to, vec3(0, layout::BOARD_TOP_Y, 0)));
+            eyesSeat_ = next;
+            eyesSmooth_ = to;
+            if (handoverPreview_) setClockFrozen(true);
+        }
         return;
     }
     // Illegal move completed: the arbiter restores the position and applies the penalty.
-    ui::notify(v.message.empty() ? std::string("Illegal move.") : v.message, 6.0f);
+    ui::notify(v.message.empty() ? std::string(i18n::tr("notify.illegal")) : v.message, 6.0f);
     if (v.forfeit) {
         game_.forfeitIllegal(mover);
         endGame();
@@ -1087,6 +1405,24 @@ void GameScene::onClockPressed(int seat) {
     board_.syncTo(game_.position());
     leverTarget_ = -leverTarget_;
     beginTurn();
+}
+
+void GameScene::answerAiDrawOffer(int offeringSeat) {
+    // The other AI judges the offer on its own last evaluation (its point of view).
+    int other = 1 - offeringSeat;
+    int ply = int(game_.moves().size());
+    bool accept = engineOk_ && hasEval_[other] && engine_.acceptsDraw(lastEval_[other], ply);
+    std::string offering = i18n::tr(sideKey(colorOfSeat(offeringSeat)));
+    std::string answering = i18n::tr(sideKey(colorOfSeat(other)));
+    LOGI("%s offers a draw (%d cp), %s %s (%d cp)", offering.c_str(), lastEval_[offeringSeat], answering.c_str(),
+         accept ? "accepts" : "declines", lastEval_[other]);
+    if (accept) {
+        ui::notify(i18n::trf("viewer.offer_accepted", {offering, answering}), 4.0f);
+        game_.agreeDraw();
+        endGame();
+    } else {
+        ui::notify(i18n::trf("viewer.offer_declined", {offering, answering}), 3.0f);
+    }
 }
 
 // =============================================================================================
@@ -1124,6 +1460,9 @@ Square GameScene::pickSquare(const Ray& ray) const {
 }
 
 void GameScene::updateCamera(float dt, bool firstPerson) {
+    // The viewer's observer camera moves after the animation (simulate()): it can look through a
+    // robot's eyes.
+    if (observerView()) return;
     const plat::Input& in = plat::input();
     Settings& s = settings();
     camera_.fovY = kFov;
@@ -1190,10 +1529,11 @@ void GameScene::placeFirstPersonCamera() {
 void GameScene::updateGaze(float dt) {
     if (state_ == State::Loading) return;
     gazeTimer_ -= dt;
-    int seats[2] = {aiSeat(), humanSeat()};
-    int count = (demo_ || state_ == State::Menu || state_ == State::FadeToGame) ? 2 : 1;
-    for (int i = 0; i < count; ++i) {
-        int seat = seats[i];
+    // Every robot not driven by a first-person player looks around by itself: the AI in a human
+    // game, both players when watching and on the title screen.
+    bool menu = state_ == State::Menu || state_ == State::FadeToGame;
+    for (int seat = 0; seat < 2; ++seat) {
+        if (!menu && isHumanSeat(seat)) continue;
         int other = 1 - seat;
         vec3 face = anim_[other].eyeCameraTransform().c[3].xyz();
         vec3 target = vec3(0, layout::BOARD_TOP_Y, 0);
@@ -1204,6 +1544,8 @@ void GameScene::updateGaze(float dt) {
                 target = board_.squareBase(aiMoveTo_);
             } else if (!myTurn && touchedSq_ != NoSquare) {
                 target = board_.squareBase(touchedSq_);
+            } else if (!myTurn && turn_ == Turn::AiMoving && aiMoveTo_ != NoSquare) {
+                target = board_.squareBase(aiMoveTo_);  // the other AI's move
             } else {
                 target = aiGazeTarget_;
             }
@@ -1270,79 +1612,36 @@ ClockDisplay GameScene::clockDisplay() const {
 void GameScene::render(AppContext& ctx, float dt) {
     render::Renderer& r = *ctx.renderer;
     bool firstPerson = !(state_ == State::Menu || state_ == State::Loading || state_ == State::FadeToGame);
-    if (firstPerson) placeFirstPersonCamera();
+    bool observer = observerView();
+    if (firstPerson && !observer) placeFirstPersonCamera();
 
     render::Camera cam = camera_;
-    bool hideOwnHead = firstPerson;
-    if (!viewOverride_.empty()) {
-        hideOwnHead = false;
-        if (viewOverride_ == "side") {
-            cam.position = vec3(1.35f, 1.28f, 0.05f);
-            cam.lookAt(vec3(0.0f, 0.86f, 0.0f));
-        } else if (viewOverride_ == "board") {
-            cam.position = vec3(0.0f, 1.55f, 0.35f);
-            cam.lookAt(vec3(0.0f, layout::BOARD_TOP_Y, 0.0f));
-        } else if (viewOverride_ == "hall") {
-            cam.position = vec3(4.5f, 2.2f, 8.5f);
-            cam.lookAt(vec3(-2.0f, 1.8f, 0.0f));
-        } else if (viewOverride_ == "clock") {
-            vec3 c = transformPoint(world_.clockTransform(), vec3(0, layout::CLOCK_HEIGHT * 0.5f, 0));
-            cam.position = c + vec3(c.x > 0 ? -0.28f : 0.28f, 0.14f, 0.22f);
-            cam.lookAt(c);
-        } else if (viewOverride_ == "player") {
-            hideOwnHead = true;
-        } else if (viewOverride_ == "face" || viewOverride_ == "face-player") {
-            // Three-quarter portrait of a robot's head (the opponent's, or the player's own).
-            int seat = viewOverride_ == "face" ? aiSeat() : humanSeat();
-            vec3 eye = anim_[seat].eyeCameraTransform().c[3].xyz();
-            float f = seat == 0 ? -1.0f : 1.0f;  // White (seat 0) faces -Z
-            cam.position = eye + vec3(0.24f * f, 0.03f, 0.52f * f);
-            cam.fovY = 34.0f * DEG;
-            cam.lookAt(eye + vec3(0.0f, -0.06f, 0.0f));
-        } else if (viewOverride_ == "duel") {
-            // Both robots in profile across the table, at head height.
-            cam.position = vec3(1.75f, 1.32f, 0.0f);
-            cam.fovY = 42.0f * DEG;
-            cam.lookAt(vec3(0.0f, 1.02f, 0.0f));
-        } else if (viewOverride_ == "windows") {
-            // Wide shot of the table and players against the window wall.
-            cam.position = vec3(5.6f, 2.1f, 3.4f);
-            cam.fovY = 55.0f * DEG;
-            cam.lookAt(vec3(-2.0f, 2.2f, -0.4f));
-        } else if (viewOverride_ == "tapestries") {
-            // Wide shot from the window side towards the tapestry wall.
-            cam.position = vec3(-5.2f, 1.9f, -3.6f);
-            cam.fovY = 55.0f * DEG;
-            cam.lookAt(vec3(2.5f, 2.0f, 0.8f));
-        }
-        // Free camera for screenshots: --cam x,y,z [--look x,y,z] [--fov degrees].
-        auto parseVec = [](const std::string& v, vec3& out) {
-            std::vector<std::string> c = split(v, ',');
-            if (c.size() != 3) return false;
-            out = vec3(float(std::atof(c[0].c_str())), float(std::atof(c[1].c_str())), float(std::atof(c[2].c_str())));
-            return true;
-        };
+    int headless = -1;  // the robot the camera is in: drawn without its head
+    if (observer) {
+        headless = headNearCamera(cam.position);
+    } else if (firstPerson) {
+        headless = humanSeat();
         vec3 p, t;
-        if (parseVec(ctx.argValue("--cam"), p)) {
+        if (debugCamera_ && parseVec3(ctx.argValue("--cam"), p)) {
+            // Detached camera in a human game (screenshots): --cam x,y,z [--look x,y,z] [--fov deg].
             cam.position = p;
-            cam.lookAt(parseVec(ctx.argValue("--look"), t) ? t : vec3(0.0f, layout::BOARD_TOP_Y, 0.0f));
+            cam.lookAt(parseVec3(ctx.argValue("--look"), t) ? t : vec3(0.0f, layout::BOARD_TOP_Y, 0.0f));
+            float fov = float(std::atof(ctx.argValue("--fov", "0").c_str()));
+            if (fov > 1.0f) cam.fovY = fov * DEG;
+            headless = headNearCamera(cam.position);
         }
-        float fov = float(std::atof(ctx.argValue("--fov", "0").c_str()));
-        if (fov > 1.0f) cam.fovY = fov * DEG;
     }
-    camera_ = firstPerson && viewOverride_.empty() ? camera_ : camera_;
     render::Environment env = world_.environment(time_);
     // Eyes focus where the player looks: the board / table under the centre of the view.
     {
-        Ray centre{cam.position, cam.forward()};
-        float t = rayPlane(centre, vec3(0, layout::BOARD_TOP_Y, 0), vec3(0, 1, 0));
-        float target = (t > 0.0f && t < 3.0f) ? t : 2.5f;
-        if (!firstPerson) target = length(cam.position - vec3(0, 0.9f, 0));
-        if (viewOverride_ == "face" || viewOverride_ == "face-player") {
-            int seat = viewOverride_ == "face" ? aiSeat() : humanSeat();
-            target = length(anim_[seat].eyeCameraTransform().c[3].xyz() - cam.position);
-        } else if (!viewOverride_.empty() && viewOverride_ != "player") {
-            target = length(cam.position - vec3(0, 1.0f, 0));
+        float target;
+        if (observer || (firstPerson && headless != humanSeat())) {
+            target = observerFocus(cam);
+        } else {
+            Ray centre{cam.position, cam.forward()};
+            float t = rayPlane(centre, vec3(0, layout::BOARD_TOP_Y, 0), vec3(0, 1, 0));
+            target = (t > 0.0f && t < 3.0f) ? t : 2.5f;
+            if (!firstPerson) target = length(cam.position - vec3(0, 0.9f, 0));
         }
         focusDistance_ = focusDistance_ <= 0.0f ? target : focusDistance_ + (target - focusDistance_) * (1.0f - std::exp(-dt * 6.0f));
         r.post().settings.dofFocusDistance = focusDistance_;
@@ -1360,12 +1659,12 @@ void GameScene::render(AppContext& ctx, float dt) {
         world_.submitClock(r, clockDisplay());
         for (int seat = 0; seat < 2; ++seat) {
             const mat4* g = anim_[seat].globals();
-            world_.submitRobot(r, seat, g, hasPrevGlobals_[seat] ? prevGlobals_[seat] : nullptr,
-                               hideOwnHead && seat == humanSeat());
+            world_.submitRobot(r, seat, g, hasPrevGlobals_[seat] ? prevGlobals_[seat] : nullptr, seat == headless);
             for (int b = 0; b < character::BoneCount; ++b) prevGlobals_[seat][b] = g[b];
             hasPrevGlobals_[seat] = true;
         }
         world_.submitMarkers(r, markers());
+        scorekeeper_.submit(r);
     }
     r.endFrame();
     audio::setListener(cam.position, cam.forward(), cam.up());
@@ -1373,9 +1672,198 @@ void GameScene::render(AppContext& ctx, float dt) {
 
 void GameScene::renderOverlay(AppContext&, float) {
     bool inGame = state_ == State::Playing || state_ == State::GameOver;
+    if (observerView() && !paused_ && state_ != State::FadeToGame && state_ != State::FadeToMenu) {
+        ui::ViewerHud hud;
+        hud.visible = hudVisible_ && !(gameOverShown_ && !ui::gameOverFolded());
+        for (int i = 0; i < 2; ++i) {
+            std::string& name = i == 0 ? hud.white : hud.black;
+            name = i18n::trf("viewer.player", {ui::presetName(seats_[i].presetName), std::to_string(seats_[i].elo)});
+        }
+        hud.sideToMove = state_ == State::Playing ? seatOf(game_.position().sideToMove()) : -1;
+        if (viewpointShown_ >= 0) hud.viewpoint = i18n::tr("viewer.view." + std::to_string(viewpointShown_));
+        hud.viewpointAge = viewpointAge_;
+        hud.speed = observer_.speed();
+        hud.speedAge = speedAge_;
+        ui::viewerHud(hud);
+    }
     ui::moveList(game_.sanMoves(), inGame && showMoveList_);
     ui::drawNotifications();
     ui::endFrame();
+}
+
+// =============================================================================================
+// Viewer mode: the observer camera
+// =============================================================================================
+
+bool GameScene::observerView() const {
+    // From the setup of a watched game until the menu (a "Watch again" fade keeps it).
+    return watching() && observerPlaced_ && state_ != State::Loading && state_ != State::Menu;
+}
+
+void GameScene::updateWatchInput() {
+    const plat::Input& in = plat::input();
+    observerControls_ = ObserverCamera::Controls();
+    // Esc: the viewer's pause menu (the game stops, the camera can still land).
+    if (state_ == State::Playing && !paused_ && in.keyPressed[plat::KEY_ESCAPE] && !ui::wantsKeyboard()) paused_ = true;
+    if (paused_) {
+        if (dragging_) {
+            dragging_ = false;
+            plat::setMouseCaptured(false);
+        }
+        switch (ui::viewerPauseMenu()) {
+        case ui::MenuAction::Resume: paused_ = false; break;
+        case ui::MenuAction::BackToMainMenu:
+            paused_ = false;
+            clock_.stop();
+            state_ = State::FadeToMenu;
+            stateTime_ = 0.0f;
+            break;
+        case ui::MenuAction::OptionsChanged: applySettings(true); break;
+        default: break;
+        }
+        return;
+    }
+    // The game over card has the keyboard until it is folded ("View the board").
+    bool cardUp = state_ == State::GameOver && gameOverShown_ && !ui::gameOverFolded();
+    bool keys = !cardUp && (state_ == State::GameOver || !ui::wantsKeyboard());
+    // Right mouse button held: look around.
+    if (in.mouseDown[plat::MOUSE_RIGHT] && !dragging_ && !ui::wantsMouse()) {
+        dragging_ = true;
+        plat::setMouseCaptured(true);
+    }
+    if (dragging_ && !in.mouseDown[plat::MOUSE_RIGHT]) {
+        dragging_ = false;
+        plat::setMouseCaptured(false);
+    }
+    observerControls_ = ObserverCamera::read(in, keys, dragging_);
+    if (ui::wantsMouse() && !dragging_) observerControls_.wheel = 0.0f;
+    if (!keys) return;
+    for (int n = 0; n <= 9; ++n) {
+        if (in.keyPressed[plat::KEY_0 + n]) selectViewpoint(n, false);
+    }
+    if (in.keyPressed['H']) {
+        hudVisible_ = !hudVisible_;
+        settings().viewerShowControls = hudVisible_;
+        settings().save();
+    }
+    // (Tab is handled by the game over state itself.)
+    if (state_ != State::GameOver && in.keyPressed[plat::KEY_TAB]) showMoveList_ = !showMoveList_;
+}
+
+void GameScene::updateObserver(float dt) {
+    const Settings& s = settings();
+    ObserverCamera::Controls c = observerControls_;
+    observerControls_ = ObserverCamera::Controls();  // once per frame (warps simulate many steps)
+    viewpointAge_ += dt;
+    speedAge_ += dt;
+    if (c.wheel != 0.0f) speedAge_ = 0.0f;
+    if (followEyes_ && c.any()) {
+        // The observer leaves the player's eyes and flies on from there.
+        followEyes_ = false;
+        if (clockFrozen_) setClockFrozen(false);
+    }
+    if (followEyes_) {
+        // Steadied eyes: the robots' saccades and small head motions are smoothed out.
+        CameraPose e = eyePose(eyesSeat_);
+        float k = 1.0f - std::exp(-dt * 5.0f);
+        eyesSmooth_.position = e.position;
+        eyesSmooth_.yaw += angleDelta(eyesSmooth_.yaw, e.yaw) * k;
+        eyesSmooth_.pitch += (e.pitch - eyesSmooth_.pitch) * k;
+        eyesSmooth_.roll += angleDelta(eyesSmooth_.roll, e.roll) * k;
+        eyesSmooth_.fovY = e.fovY;
+        observer_.retarget(eyesSmooth_);
+    }
+    bool wasFlying = observer_.flying();
+    observer_.update(dt, c, s.mouseSensitivity, s.invertLook);
+    // Handover preview: the next player's clock starts when the camera is in its eyes.
+    if (wasFlying && !observer_.flying() && clockFrozen_) setClockFrozen(false);
+    const CameraPose& p = observer_.pose();
+    camera_.position = p.position;
+    camera_.orientation = p.orientation();
+    camera_.fovY = p.fovY;
+    camera_.nearZ = 0.02f;
+}
+
+CameraPose GameScene::viewpoint(int n) const {
+    // The development viewpoints of the former --view option.
+    const vec3 board(0.0f, layout::BOARD_TOP_Y, 0.0f);
+    switch (n) {
+    case 1: return CameraPose::looking(vec3(1.35f, 1.28f, 0.05f), vec3(0.0f, 0.86f, 0.0f), kFov);  // beside the table
+    case 2: return CameraPose::looking(vec3(0.0f, 1.55f, 0.35f), board, kFov);                  // above the board
+    case 3: return CameraPose::looking(vec3(4.5f, 2.2f, 8.5f), vec3(-2.0f, 1.8f, 0.0f), kFov);    // the hall
+    case 4: {                                                                                    // the clock
+        vec3 c = transformPoint(world_.clockTransform(), vec3(0, layout::CLOCK_HEIGHT * 0.5f, 0));
+        return CameraPose::looking(c + vec3(c.x > 0 ? -0.28f : 0.28f, 0.14f, 0.22f), c, kFov);
+    }
+    case 5:
+    case 6: {  // three-quarter portrait of White's / Black's head
+        int seat = n - 5;
+        vec3 eye = anim_[seat].eyeCameraTransform().c[3].xyz();
+        float f = seat == 0 ? -1.0f : 1.0f;  // White (seat 0) faces -Z
+        return CameraPose::looking(eye + vec3(0.24f * f, 0.03f, 0.52f * f), eye + vec3(0.0f, -0.06f, 0.0f), 34.0f * DEG);
+    }
+    case 7: return CameraPose::looking(vec3(1.75f, 1.32f, 0.0f), vec3(0.0f, 1.02f, 0.0f), 42.0f * DEG);  // the duel
+    case 8: return CameraPose::looking(vec3(5.6f, 2.1f, 3.4f), vec3(-2.0f, 2.2f, -0.4f), 55.0f * DEG);   // windows
+    case 9: return CameraPose::looking(vec3(-5.2f, 1.9f, -3.6f), vec3(2.5f, 2.0f, 0.8f), 55.0f * DEG);  // tapestries
+    default: return eyePose(eyesSeat_ < 0 ? 0 : eyesSeat_);
+    }
+}
+
+CameraPose GameScene::eyePose(int seat) const {
+    mat4 e = anim_[seat & 1].eyeCameraTransform();
+    quat q = fromMat3(mat3(normalize(e.c[0].xyz()), normalize(e.c[1].xyz()), normalize(e.c[2].xyz())));
+    return CameraPose::fromOrientation(e.c[3].xyz(), q, kFov);
+}
+
+void GameScene::selectViewpoint(int n, bool jump) {
+    n = std::clamp(n, 0, 9);
+    viewpointShown_ = n;
+    viewpointAge_ = 0.0f;
+    CameraPose to;
+    if (n == 0) {
+        // Through the eyes of the player to move, following them from one player to the other.
+        followEyes_ = true;
+        eyesSeat_ = seatOf(game_.position().sideToMove());
+        to = eyePose(eyesSeat_);
+        eyesSmooth_ = to;
+    } else {
+        followEyes_ = false;
+        if (clockFrozen_) setClockFrozen(false);
+        to = viewpoint(n);
+    }
+    if (jump) {
+        observer_.setPose(to);
+        cameraCut_ = true;
+    } else {
+        observer_.flyTo(to);
+    }
+}
+
+int GameScene::headNearCamera(vec3 p) const {
+    for (int seat = 0; seat < 2; ++seat) {
+        mat4 e = anim_[seat].eyeCameraTransform();
+        vec3 centre = e.c[3].xyz() + normalize(e.c[2].xyz()) * 0.06f;  // +Z: behind the eyes
+        if (length(p - centre) < 0.16f) return seat;
+    }
+    return -1;
+}
+
+float GameScene::observerFocus(const render::Camera& cam) const {
+    // A head in the middle of the view (portraits), else the board under the centre of the view,
+    // else the table.
+    vec3 fwd = cam.forward();
+    for (int seat = 0; seat < 2; ++seat) {
+        vec3 d = anim_[seat].eyeCameraTransform().c[3].xyz() - cam.position;
+        float dist = length(d);
+        if (dist > 0.2f && dist < 2.5f && dot(d / dist, fwd) > std::cos(10.0f * DEG)) return dist;
+    }
+    Ray centre{cam.position, fwd};
+    float t = rayPlane(centre, vec3(0, layout::BOARD_TOP_Y, 0), vec3(0, 1, 0));
+    if (t > 0.0f && t < 3.0f) {
+        vec3 hit = cam.position + fwd * t;
+        if (std::abs(hit.x) < 0.9f && std::abs(hit.z) < 0.9f) return t;
+    }
+    return std::max(0.3f, length(cam.position - vec3(0, 1.0f, 0)));
 }
 
 SCACELITH_SCENE("game", "Scacelith: the chess game", GameScene);

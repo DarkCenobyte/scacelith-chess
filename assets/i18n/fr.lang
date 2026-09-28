@@ -1,0 +1,404 @@
+# Scacelith - Français
+# Traduction de assets/i18n/en.lang (mêmes clés, mêmes {n}). Pluriel : un|plusieurs (0 et 1 au
+# singulier).
+
+language.name = Français
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Activé
+common.off = Désactivé
+common.back = Retour
+common.apply = Appliquer
+common.discard = Abandonner
+common.cancel = Annuler
+common.white = Blancs
+common.black = Noirs
+common.main_menu = Menu principal
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Le jeu des rois
+menu.new_game = Nouvelle partie
+menu.options = Options
+menu.credits = Crédits
+menu.quit = Quitter
+menu.version = Version {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = OPTIONS
+options.tab.display = Affichage
+options.tab.graphics = Graphismes
+options.tab.audio = Son
+options.tab.gameplay = Jeu
+options.tab.player = Joueur
+options.tab.controls = Commandes
+options.pending = Les changements prennent effet une fois appliqués.
+options.unsaved.title = MODIFICATIONS NON APPLIQUÉES
+options.unsaved.text = Des options ont été modifiées. Les appliquer avant de quitter ?
+
+options.language = Langue
+options.language.help = Langue des menus et des messages. Le changement est immédiat.
+options.display_mode = Mode d’affichage
+options.fullscreen = Plein écran
+options.windowed = Fenêtré
+options.window_size = Taille de la fenêtre
+options.window_size.help = Taille de la fenêtre en mode fenêtré. Le plein écran utilise toujours la résolution du bureau.
+options.vsync = Synchro verticale
+options.vsync.help = Synchronise les images avec l’écran pour éviter les déchirures.
+options.render_scale = Échelle de rendu
+options.render_scale.help = Résolution interne de l’image 3D. Plus bas est plus rapide, plus haut est plus net.
+
+options.quality = Qualité
+options.quality.low = Basse
+options.quality.medium = Moyenne
+options.quality.high = Haute
+options.quality.ultra = Ultra
+options.quality.help = Ombres, reflets, occlusion ambiante et lumière volumétrique.
+options.motion_blur = Flou de mouvement
+options.depth_of_field = Profondeur de champ
+options.brightness = Luminosité
+options.brightness.neutral = Neutre
+options.brightness.help = Correction d’exposition de la caméra.
+
+options.master_volume = Volume général
+options.effects = Effets
+options.ambience = Ambiance
+options.ambience.help = La rumeur de la salle : le feu, des pas lointains, la vieille horloge.
+options.ambience_volume = Volume de l’ambiance
+
+options.legal_moves = Afficher les coups légaux
+options.legal_moves.help = Met en évidence les cases qu’une pièce touchée peut atteindre. Sans cette aide, rien ne vous dit si un coup est légal : l’arbitre sanctionne un coup illégal dès que vous appuyez sur la pendule.
+options.coordinates = Coordonnées de l’échiquier
+options.thinking_time = Temps de réflexion réaliste
+options.thinking_time.help = Votre adversaire prend son temps comme un joueur humain au lieu de jouer instantanément.
+options.mouse_sensitivity = Sensibilité de la souris
+options.invert_look = Inverser l’axe vertical
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Nom
+player.name.help = Votre nom, tel qu’il est écrit en tête des feuilles de partie, dans n’importe quel alphabet.
+player.default_name = Humain
+player.handwriting = Écriture
+player.handwriting.help = La main qui note vos coups. L’arabe, le japonais et le chinois ont leur propre écriture.
+player.preview = SUR VOTRE FEUILLE DE PARTIE
+hand.caveat = Naturelle
+hand.marck = Cursive
+hand.badscript = Penchée
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Clic gauche
+controls.touch = Toucher une pièce, puis la jouer
+controls.clock.keys = Espace  ou  clic sur la pendule
+controls.clock = Appuyer sur la pendule
+controls.look.keys = Clic droit maintenu
+controls.look = Regarder autour de soi
+controls.moves.keys = Tab
+controls.moves = Afficher ou masquer les coups
+controls.menu.keys = Échap
+controls.menu = Menu
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NOUVELLE PARTIE
+newgame.opponent = ADVERSAIRE
+newgame.time_control = CADENCE
+newgame.start = Commencer
+newgame.elo = ~{0} Elo
+newgame.you_white = Vous jouerez les Blancs.
+newgame.you_black = Vous jouerez les Noirs.
+newgame.colour_lot = Les couleurs sont tirées au sort pour la première partie.
+newgame.colour_alternate = Elles alternent ensuite d’une partie à l’autre.
+
+# Custom opponent: Stockfish parameters
+engine.skill = Niveau de jeu
+engine.skill.help = « Skill Level » de Stockfish (0–20). Ignoré quand la force est limitée par l’Elo.
+engine.limit_elo = Limiter la force (Elo)
+engine.limit_elo.help = UCI_LimitStrength : le moteur vise le classement Elo ci-dessous.
+engine.elo = Elo
+engine.depth = Profondeur
+engine.plies = {0} demi-coup|{0} demi-coups
+engine.move_time = Temps par coup
+engine.nodes = Limite de nœuds
+engine.no_limit = Sans limite
+engine.thousand = {0} mille
+engine.million = {0} millions
+
+# Time controls
+tc.unlimited = Illimitée
+tc.no_clock = Sans pendule
+tc.bullet = Bullet
+tc.blitz = Blitz
+tc.rapid = Rapide
+tc.classical = Classique
+tc.custom = Libre
+tc.your_own = À votre guise
+tc.base_time = Temps de base
+tc.base_time.help = Temps initial de chaque côté de la pendule (minutes : secondes).
+tc.increment = Incrément
+tc.increment.help = Incrément Fischer ajouté après chaque coup.
+tc.delay = Délai
+tc.delay.help = Délai Bronstein : le temps utilisé jusqu’à ce délai est rendu après chaque coup.
+tc.no_delay = Aucun
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, délai {1} s
+
+# Opponent presets
+preset.novice.name = Novice
+preset.novice.desc = Vient d’apprendre la marche des pièces : laisse du matériel en prise.
+preset.beginner.name = Débutant
+preset.beginner.desc = Connaît les bases, mais perd encore souvent du matériel.
+preset.casual.name = Amateur
+preset.casual.desc = Un adversaire détendu : des coups sensés, des erreurs fréquentes.
+preset.club_player.name = Joueur de club
+preset.club_player.desc = Solide joueur de club qui punit les gaffes évidentes.
+preset.advanced.name = Confirmé
+preset.advanced.desc = Fort joueur de club, bonne vision tactique.
+preset.expert.name = Expert
+preset.expert.desc = Expert des tournois : se trompe rarement, concrétise ses avantages.
+preset.master.name = Maître
+preset.master.desc = Force de maître : calcul profond et jeu positionnel fin.
+preset.grandmaster.name = Grand maître
+preset.grandmaster.desc = Niveau grand maître : extrêmement difficile à battre.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 16 à pleine puissance. Bonne chance.
+preset.custom.name = Personnalisé
+preset.custom.desc = Vos propres réglages du moteur.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = CRÉDITS
+credits.game.head = SCACELITH
+credits.game = Une partie d’échecs dans une salle royale, sur un moteur OpenGL 4.6 maison.
+credits.engine.head = MOTEUR D’ÉCHECS
+credits.engine = Stockfish 16, par les développeurs de Stockfish.
+credits.engine.licence = Licence publique générale GNU v3.
+credits.fonts.head = POLICES
+credits.fonts = EB Garamond par Georg Duffner et Cinzel par Natanael Gama ; Amiri par Khaled Hosny.
+credits.fonts.hand = Écritures : Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Figurines d’échecs de GNU FreeFont (GPL v3 avec exception pour les polices).
+credits.quote = « Les échecs sont l’art de l’analyse. »  — Mikhaïl Botvinnik
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUSE
+pause.resume = Reprendre
+pause.offer_draw = Proposer nulle
+pause.claim_draw = Réclamer la nulle
+pause.claim_draw.help = Triple répétition ou règle des cinquante coups.
+pause.resign = Abandonner
+confirm.resign.title = ABANDON
+confirm.resign.text = Abandonner cette partie ? Votre adversaire sera déclaré vainqueur.
+confirm.resign.ok = Abandonner
+confirm.leave.title = QUITTER LA PARTIE
+confirm.leave.text = Revenir au menu principal ? La partie en cours sera abandonnée.
+confirm.leave.ok = Quitter
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PROMOTION EN
+piece.queen = Dame
+piece.rook = Tour
+piece.bishop = Fou
+piece.knight = Cavalier
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = La partie est nulle.
+gameover.draw_moves = La partie est nulle après {0} coup.|La partie est nulle après {0} coups.
+gameover.win = Bien joué — vous gagnez.
+gameover.win_moves = Bien joué — vous gagnez en {0} coup.|Bien joué — vous gagnez en {0} coups.
+gameover.loss = Votre adversaire gagne.
+gameover.loss_moves = Votre adversaire gagne en {0} coup.|Votre adversaire gagne en {0} coups.
+gameover.rematch = Revanche
+gameover.view_board = Voir l’échiquier
+gameover.show = Afficher
+
+# Reasons
+reason.checkmate = Échec et mat
+reason.resignation = Abandon
+reason.timeout = Perte au temps
+reason.illegal_moves = Second coup illégal (partie perdue)
+reason.stalemate = Pat
+reason.insufficient = Position morte (matériel insuffisant)
+reason.timeout_vs_insufficient = Drapeau tombé, mais l’adversaire ne peut pas mater
+reason.fivefold = Quintuple répétition
+reason.75_moves = Règle des 75 coups
+reason.threefold_claim = Triple répétition (réclamée)
+reason.50_moves_claim = Règle des 50 coups (réclamée)
+reason.agreement = Nulle par accord mutuel
+reason.illegal_vs_insufficient = Second coup illégal, mais l’adversaire ne peut pas mater
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = COUPS
+movelist.empty = Aucun coup joué.
+
+# ---- Loading -----------------------------------------------------------------------------------
+loading.materials = Préparation des matériaux
+loading.hall = Élévation de la salle
+loading.furniture = Sculpture de la table et des chaises
+loading.board = Polissage de l’échiquier
+loading.pieces = Tournage des pièces
+loading.clock = Assemblage de la pendule
+loading.porcelain = Cuisson de la porcelaine
+loading.ready = Prêt
+
+# ---- Notifications during the game -------------------------------------------------------------
+notify.no_draw_claim = Aucune nulle ne peut être réclamée dans cette position.
+notify.flag_you = Votre drapeau est tombé.
+notify.flag_opponent = Le drapeau de votre adversaire est tombé.
+notify.touched.pawn = Pièce touchée, pièce jouée : vous devez jouer ce pion.
+notify.touched.knight = Pièce touchée, pièce jouée : vous devez jouer ce cavalier.
+notify.touched.bishop = Pièce touchée, pièce jouée : vous devez jouer ce fou.
+notify.touched.rook = Pièce touchée, pièce jouée : vous devez jouer cette tour.
+notify.touched.queen = Pièce touchée, pièce jouée : vous devez jouer cette dame.
+notify.touched.king = Pièce touchée, pièce jouée : vous devez jouer ce roi.
+notify.touched.piece = Pièce touchée, pièce jouée : vous devez jouer cette pièce.
+notify.touched_square = Pièce touchée, pièce jouée : vous devez jouer la pièce en {0}.
+notify.press_clock = Appuyez sur la pendule pour terminer votre coup (Espace).
+notify.illegal = Coup illégal.
+notify.cannot_move = Ce coup est impossible.
+notify.move_first = Jouez votre coup avant d’appuyer sur la pendule.
+notify.draw_already_offered = Vous avez déjà proposé nulle à ce coup.
+notify.draw_accepted = Votre adversaire accepte la nulle.
+notify.draw_declined = Votre adversaire refuse la proposition de nulle.
+notify.draw_claimed = Votre adversaire réclame la nulle.
+
+# ---- Arbiter -----------------------------------------------------------------------------------
+arbiter.join = {0} {1}
+arbiter.no_move = Arbitre : la pendule a été enclenchée sans qu’un coup soit joué, ce qui compte comme un coup illégal.
+arbiter.unpromoted = Arbitre : coup illégal, le pion n’a pas été remplacé par une nouvelle pièce avant l’appui sur la pendule.
+arbiter.illegal = Arbitre : coup illégal.
+arbiter.second_loses.white = C’est le second coup illégal des Blancs : les Blancs perdent la partie.
+arbiter.second_loses.black = C’est le second coup illégal des Noirs : les Noirs perdent la partie.
+arbiter.second_draw.white = C’est le second coup illégal des Blancs, mais les Noirs ne peuvent pas mater : la partie est nulle.
+arbiter.second_draw.black = C’est le second coup illégal des Noirs, mais les Blancs ne peuvent pas mater : la partie est nulle.
+arbiter.queen = Le pion devient une dame.
+arbiter.queen_one_minute.white = Le pion devient une dame et les Blancs reçoivent une minute supplémentaire.
+arbiter.queen_one_minute.black = Le pion devient une dame et les Noirs reçoivent une minute supplémentaire.
+arbiter.queen_two_minutes.white = Le pion devient une dame et les Blancs reçoivent deux minutes supplémentaires.
+arbiter.queen_two_minutes.black = Le pion devient une dame et les Noirs reçoivent deux minutes supplémentaires.
+arbiter.restored = La position est rétablie.
+arbiter.restored_one_minute.white = La position est rétablie et les Blancs reçoivent une minute supplémentaire.
+arbiter.restored_one_minute.black = La position est rétablie et les Noirs reçoivent une minute supplémentaire.
+arbiter.restored_two_minutes.white = La position est rétablie et les Blancs reçoivent deux minutes supplémentaires.
+arbiter.restored_two_minutes.black = La position est rétablie et les Noirs reçoivent deux minutes supplémentaires.
+arbiter.one_minute.white = Les Blancs reçoivent une minute supplémentaire.
+arbiter.one_minute.black = Les Noirs reçoivent une minute supplémentaire.
+arbiter.two_minutes.white = Les Blancs reçoivent deux minutes supplémentaires.
+arbiter.two_minutes.black = Les Noirs reçoivent deux minutes supplémentaires.
+arbiter.second_loses = Un second coup illégal fait perdre la partie.
+arbiter.touched.white = Les Blancs doivent jouer la pièce touchée.
+arbiter.touched.black = Les Noirs doivent jouer la pièce touchée.
+arbiter.game_over = La partie est terminée.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Regarder une partie
+
+viewer.title = REGARDER UNE PARTIE
+viewer.white = BLANCS
+viewer.black = NOIRS
+viewer.time_control = CADENCE
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Inverser les couleurs
+viewer.note = Les deux joueurs sont Stockfish. Volez librement dans la salle pendant qu’ils jouent : personne ne vous verra.
+viewer.summary = {0} contre {1}
+viewer.custom = Libre
+viewer.tc.custom = À votre guise
+viewer.tc.none = Sans pendule
+viewer.tc.bullet = Bullet
+viewer.tc.blitz = Blitz
+viewer.tc.rapid = Rapide
+viewer.tc.classical = Classique
+viewer.base_time = Temps de base
+viewer.increment = Incrément
+viewer.delay = Délai
+viewer.off = Aucun
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = délai {0} s
+viewer.back = Retour
+viewer.start = Commencer
+
+viewer.paused = PAUSE
+viewer.resume = Reprendre
+viewer.options = Options
+viewer.main_menu = Menu principal
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = COMMANDES
+viewer.keys.move = Z Q S D  ·  W A S D  ·  flèches
+viewer.controls.move = Se déplacer
+viewer.keys.updown = E, Espace  /  C, Ctrl
+viewer.controls.updown = Monter / descendre
+viewer.keys.fast = Maj
+viewer.controls.fast = Plus vite
+viewer.keys.look = Bouton droit de la souris
+viewer.controls.look = Regarder autour de soi
+viewer.keys.speed = Molette
+viewer.controls.speed = Vitesse
+viewer.keys.views = 1 – 9
+viewer.controls.views = Points de vue
+viewer.keys.eyes = 0
+viewer.controls.eyes = Par les yeux du joueur au trait
+viewer.keys.moves = Tab
+viewer.controls.moves = Liste des coups
+viewer.keys.menu = Échap
+viewer.controls.menu = Menu
+viewer.keys.hide = H
+viewer.controls.hide = Masquer ces indications
+viewer.speed = Vitesse {0} m/s
+viewer.view.0 = Par les yeux des joueurs
+viewer.view.1 = À côté de la table
+viewer.view.2 = Au-dessus de l’échiquier
+viewer.view.3 = La salle
+viewer.view.4 = La pendule
+viewer.view.5 = Le visage des Blancs
+viewer.view.6 = Le visage des Noirs
+viewer.view.7 = Le duel
+viewer.view.8 = Les fenêtres
+viewer.view.9 = Les tapisseries
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = les Blancs
+viewer.side.black = les Noirs
+viewer.flag.white = Le drapeau des Blancs est tombé.
+viewer.flag.black = Le drapeau des Noirs est tombé.
+viewer.claims_draw = Nulle réclamée par {0}.
+viewer.offer_accepted = Nulle proposée par {0}, acceptée par {1}.
+viewer.offer_declined = Nulle proposée par {0}, refusée par {1}.
+viewer.gameover.white_wins = Victoire des Blancs au coup {0}.
+viewer.gameover.black_wins = Victoire des Noirs au coup {0}.
+viewer.gameover.draw = Partie nulle au coup {0}.
+viewer.gameover.players = {0} contre {1}
+viewer.watch_again = Regarder encore
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Aucune partie classée pour l’instant
+elo.provisional = Classement provisoire
+elo.peak = Maximum {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Votre Elo : {0}
+elo.expected = score attendu {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · cette partie ne compte pas pour le classement
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Feuille de partie
+scoresheet.event = Tournoi
+scoresheet.date = Date
+scoresheet.round = Ronde
+scoresheet.board = Table
+scoresheet.page = Page
+scoresheet.white = Blancs
+scoresheet.black = Noirs
+scoresheet.elo = Elo
+scoresheet.result = Résultat
+scoresheet.move_no = N°
+scoresheet.sign_white = Signature des Blancs
+scoresheet.sign_black = Signature des Noirs
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = R D T F C
+scoresheet.date_format = {0}/{1}/{2}

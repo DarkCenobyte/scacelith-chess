@@ -2,17 +2,23 @@
 // notifications, game over card, loading screen and move list. Layout is in reference pixels
 // (1080 tall); the look is a film title card: ivory Garamond, Cinzel capitals, gold hairlines on
 // black velvet, never covering more of the hall than necessary.
+// Every player-visible text comes from assets/i18n (i18n::tr); in a right-to-left language
+// (Arabic) the layouts are mirrored with im::flip / im::flipX.
 #include "ui.h"
 #include "ui_draw.h"
 #include "ui_internal.h"
+#include "ui_screens_game.h"
 #include "ui_theme.h"
 #include "ui_widgets.h"
 #include "../chess/chess.h"
 #include "../game/settings.h"
+#include "../i18n/i18n.h"
+#include "../i18n/unicode.h"
 #include "../platform/platform.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <cstring>
 
 namespace ui {
 
@@ -26,7 +32,7 @@ using namespace theme;
 namespace {
 
 // ---- State ----------------------------------------------------------------------------------------
-enum class Page { Title, NewGame, Options, Credits };
+enum class Page { Title, NewGame, Options, Credits, Watch };
 
 struct OptionsState {
     game::Settings work;
@@ -60,6 +66,7 @@ struct State {
     // game over
     bool goFolded = false;
     int forcedFold = -1;
+    GameOverExtras goExtras;
     // toasts
     std::vector<Toast> toasts;
     // move list
@@ -98,6 +105,29 @@ std::string format(const char* fmt, double v) {
     return buf;
 }
 
+// Translation of a key, and a translated widget label that keeps the key as its id
+// ("Apply##common.apply"), so focus and animations survive a language change.
+std::string T(const char* key) { return i18n::tr(key); }
+std::string L(const char* key) { return std::string(i18n::tr(key)) + "##" + key; }
+
+// Number with 'digits' decimals and the language's decimal separator ("2,5" in French).
+std::string decimal(double v, int digits) {
+    char buf[64];
+    std::snprintf(buf, sizeof(buf), "%.*f", digits, v);
+    std::string s = buf;
+    const char* sep = i18n::tr("number.decimal");
+    size_t dot = s.find('.');
+    if (dot != std::string::npos && std::strcmp(sep, ".") != 0) s.replace(dot, 1, sep);
+    return s;
+}
+std::string percent(float x) { return i18n::trf("number.percent", {decimal(x * 100.0, 0)}); }
+
+// Whole screen, for mirroring page layouts in a right-to-left language.
+Rect screenRect() {
+    vec2 v = gfx::viewSize();
+    return Rect(0, 0, v.x, v.y);
+}
+
 // Replaces '-' by an en dash for result lines ("1-0" -> "1–0").
 std::string typographicResult(const std::string& s) {
     std::string out;
@@ -108,11 +138,7 @@ std::string typographicResult(const std::string& s) {
     return out;
 }
 
-std::string upper(std::string s) {
-    for (char& ch : s)
-        if (ch >= 'a' && ch <= 'z') ch = char(ch - 'a' + 'A');
-    return s;
-}
+std::string upper(const std::string& s) { return uni::toUpper(s); }
 
 // Glyph drawn centred on its ink box (used for chess figures).
 void glyphCentered(uint32_t cp, vec2 c, float size, const TextStyle& base) {
@@ -169,32 +195,30 @@ std::string clockText(int seconds) {
     return buf;
 }
 std::string moveTimeText(int ms) {
-    if (ms <= 0) return "Off";
-    if (ms < 1000) return format("%.1f s", ms / 1000.0);
-    if (ms % 1000) return format("%.1f s", ms / 1000.0);
-    return format("%.0f s", ms / 1000.0);
+    if (ms <= 0) return T("engine.no_limit");
+    return i18n::trf("tc.seconds", {decimal(ms / 1000.0, ms % 1000 ? 1 : 0)});
 }
 std::string nodesText(int n) {
-    if (n <= 0) return "Off";
-    if (n >= 1000000) return format("%.0f million", n / 1e6);
-    return format("%.0f thousand", n / 1e3);
+    if (n <= 0) return T("engine.no_limit");
+    if (n >= 1000000) return i18n::trf("engine.million", {decimal(n / 1e6, 0)});
+    return i18n::trf("engine.thousand", {decimal(n / 1e3, 0)});
 }
 
 // "3+2" -> category name (Lichess-style estimate: base + 40 x increment).
 std::string timeCategory(const std::string& label) {
     int base = 0, inc = 0;
-    if (std::sscanf(label.c_str(), "%d+%d", &base, &inc) != 2) return "No clock";
+    if (std::sscanf(label.c_str(), "%d+%d", &base, &inc) != 2) return T("tc.no_clock");
     int est = base * 60 + 40 * inc;
-    if (est < 180) return "Bullet";
-    if (est < 480) return "Blitz";
-    if (est < 1500) return "Rapid";
-    return "Classical";
+    if (est < 180) return T("tc.bullet");
+    if (est < 480) return T("tc.blitz");
+    if (est < 1500) return T("tc.rapid");
+    return T("tc.classical");
 }
 std::string customClockSummary(const NewGameSetup& s) {
     int b = s.customBaseSeconds;
-    std::string r = b % 60 ? clockText(b) : std::to_string(b / 60) + " min";
-    if (s.customIncrementSeconds > 0) r += " + " + std::to_string(s.customIncrementSeconds) + " s";
-    if (s.customDelaySeconds > 0) r += ", delay " + std::to_string(s.customDelaySeconds) + " s";
+    std::string r = b % 60 ? clockText(b) : i18n::trf("tc.minutes", {std::to_string(b / 60)});
+    if (s.customIncrementSeconds > 0) r = i18n::trf("tc.summary_increment", {r, std::to_string(s.customIncrementSeconds)});
+    if (s.customDelaySeconds > 0) r = i18n::trf("tc.summary_delay", {r, std::to_string(s.customDelaySeconds)});
     return r;
 }
 std::string spacedPlus(const std::string& label) {
@@ -204,6 +228,11 @@ std::string spacedPlus(const std::string& label) {
 }
 
 // ---- Settings helpers -------------------------------------------------------------------------------
+// Player name as stored: surrounding spaces removed, never empty (the scoresheets need a name).
+std::string cleanName(const std::string& name) {
+    size_t a = name.find_first_not_of(' '), b = name.find_last_not_of(' ');
+    return a == std::string::npos ? std::string("Human") : name.substr(a, b - a + 1);
+}
 void copyOptions(game::Settings& dst, const game::Settings& src) {
     dst.displayWidth = src.displayWidth;
     dst.displayHeight = src.displayHeight;
@@ -223,6 +252,9 @@ void copyOptions(game::Settings& dst, const game::Settings& src) {
     dst.mouseSensitivity = src.mouseSensitivity;
     dst.invertLook = src.invertLook;
     dst.humanizeThinking = src.humanizeThinking;
+    dst.language = src.language;
+    dst.playerName = cleanName(src.playerName);
+    dst.handStyle = src.handStyle;
 }
 bool sameOptions(const game::Settings& a, const game::Settings& b) {
     auto feq = [](float x, float y) { return std::fabs(x - y) < 1e-4f; };
@@ -231,7 +263,8 @@ bool sameOptions(const game::Settings& a, const game::Settings& b) {
            a.depthOfField == b.depthOfField && feq(a.brightness, b.brightness) && feq(a.masterVolume, b.masterVolume) &&
            feq(a.effectsVolume, b.effectsVolume) && feq(a.ambienceVolume, b.ambienceVolume) && a.ambience == b.ambience &&
            a.showLegalMoves == b.showLegalMoves && a.showCoordinates == b.showCoordinates &&
-           feq(a.mouseSensitivity, b.mouseSensitivity) && a.invertLook == b.invertLook && a.humanizeThinking == b.humanizeThinking;
+           feq(a.mouseSensitivity, b.mouseSensitivity) && a.invertLook == b.invertLook && a.humanizeThinking == b.humanizeThinking &&
+           cleanName(a.playerName) == cleanName(b.playerName) && a.handStyle == b.handStyle;
 }
 
 void loadSetupFromSettings(NewGameSetup& s) {
@@ -275,6 +308,46 @@ void dimScene(float a) {
     gfx::setLayer(prev);
 }
 
+// ---- Player profile ---------------------------------------------------------------------------------
+constexpr int kMaxNameLength = 24;  // characters; fits the name field of the scoresheet
+
+// A strip of scoresheet paper with the name and a few moves in the player's handwriting: the
+// live preview of Options > Player, and the proof that names in any script are handwritten
+// (Latin and Cyrillic in the chosen style, Arabic, kana, kanji and hanzi in their own hands).
+void handwritingPreview(const std::string& name, int hand, const Rect& area) {
+    TextStyle cap = style(font::FACE_TITLE, 17.0f, withAlpha(gold, 0.85f), im::startAlign(), 0.2f);
+    gfx::text(T("player.preview"), im::flipX(area, area.x + 4.0f), area.y + 12.0f, cap);
+    Rect paper(area.x, area.y + 28.0f, area.w, area.h - 28.0f);
+    gfx::shadow(paper.offset(0, 6), 2, 18, withAlpha(black, 0.55f));
+    gfx::fillV(paper, vec4(0.95f, 0.93f, 0.86f, 1.0f), vec4(0.89f, 0.86f, 0.78f, 1.0f), 2.0f);
+    // Ruled lines and the margin rule of a scoresheet.
+    const float lineGap = paper.h * 0.5f;
+    for (int i = 1; i <= 2; ++i)
+        gfx::hline(paper.x + 14.0f, paper.r() - 14.0f, paper.y + lineGap * float(i) - 12.0f, vec4(0.32f, 0.42f, 0.58f, 0.38f));
+    float margin = 76.0f;
+    gfx::vline(im::flipX(paper, paper.x + margin), paper.y + 4.0f, paper.b() - 4.0f, vec4(0.72f, 0.24f, 0.22f, 0.45f));
+    // The name sits on the first rule, aligned the way its own script runs.
+    TextStyle ns;
+    ns.hand = hand;
+    ns.size = 58.0f;
+    ns.color = vec4(0.10f, 0.13f, 0.30f, 0.95f);
+    float avail = paper.w - margin - 40.0f;
+    ns.size = gfx::fitSize(name, ns, avail, 0.5f);
+    bool nameRtl = gfx::textDirection(name, ns) == 1;
+    ns.align = nameRtl ? HAlign::Right : HAlign::Left;
+    ns.dir = nameRtl ? 1 : 0;
+    float left = im::rtl() ? paper.x + 24.0f : paper.x + margin + 20.0f;
+    float right = im::rtl() ? paper.r() - margin - 20.0f : paper.r() - 24.0f;
+    gfx::text(name, nameRtl ? right : left, paper.y + lineGap - 20.0f, ns);
+    // A line of moves as they will be written (figurine-free algebraic notation).
+    TextStyle ms = ns;
+    ms.size = 38.0f;
+    ms.align = HAlign::Left;
+    ms.dir = 0;
+    ms.color = vec4(0.10f, 0.13f, 0.30f, 0.85f);
+    gfx::text("1. e4  e5   2. Nf3  Nc6   3. Bb5  a6", left, paper.y + 2.0f * lineGap - 20.0f, ms);
+}
+
 // ---- Options page -----------------------------------------------------------------------------------
 void openOptions() {
     S.opt.work = game::settings();
@@ -305,9 +378,10 @@ bool optionsPage(MenuAction& act) {
     if (o.confirmDiscard) im::pushBlock();
     gfx::pushAlpha(t);
     im::panel(p);
-    im::pageTitle("OPTIONS", p.cx(), p.y + 80.0f);
+    im::pageTitle(T("options.title"), p.cx(), p.y + 80.0f);
     im::pushId("options");
-    static const std::vector<std::string> tabs = {"Display", "Graphics", "Audio", "Gameplay", "Controls"};
+    const std::vector<std::string> tabs = {T("options.tab.display"), T("options.tab.graphics"), T("options.tab.audio"),
+                                           T("options.tab.gameplay"), T("options.tab.player"), T("options.tab.controls")};
     im::tabBar(tabs, o.tab, Rect(p.x + 60.0f, p.y + 124.0f, p.w - 120.0f, 50.0f));
 
     game::Settings& s = o.work;
@@ -318,13 +392,27 @@ bool optionsPage(MenuAction& act) {
         y += rh;
         return r;
     };
-    auto pct = [](float x) { return format("%.0f %%", x * 100.0); };
+    auto pct = [](float x) { return percent(x); };
     im::pushId(o.tab);
     im::beginHelpSink();
     switch (o.tab) {
         case 0: {
+            // Language: applied and saved at once (the page itself changes language).
+            const std::vector<i18n::Language>& langs = i18n::languages();
+            std::vector<std::string> names;
+            for (const i18n::Language& l : langs) names.push_back(l.nativeName);
+            int li = std::max(0, i18n::languageIndex(i18n::language()));
+            if (im::selectorRow(L("options.language"), li, names, row())) {
+                const char* code = langs[size_t(li)].code;
+                i18n::setLanguage(code);
+                game::settings().language = code;
+                s.language = code;
+                game::settings().save();
+            }
+            im::tooltip(T("options.language.help"));
             int mode = s.fullscreen ? 0 : 1;
-            if (im::selectorRow("Display mode", mode, {"Fullscreen", "Windowed"}, row())) s.fullscreen = mode == 0;
+            if (im::selectorRow(L("options.display_mode"), mode, {T("options.fullscreen"), T("options.windowed")}, row()))
+                s.fullscreen = mode == 0;
             auto& res = detail::data().resolutions;
             std::vector<std::string> labels;
             int cur = -1;
@@ -337,65 +425,88 @@ bool optionsPage(MenuAction& act) {
                 cur = int(labels.size()) - 1;
             }
             int sel = cur;
-            if (im::selectorRow("Window size", sel, labels, row(), !s.fullscreen) && sel < int(res.size())) {
+            if (im::selectorRow(L("options.window_size"), sel, labels, row(), !s.fullscreen) && sel < int(res.size())) {
                 s.displayWidth = res[size_t(sel)].x;
                 s.displayHeight = res[size_t(sel)].y;
             }
-            im::tooltip("Size of the window in windowed mode. Fullscreen always uses the desktop resolution.");
-            im::toggleRow("Vertical sync", s.vsync, row());
-            im::tooltip("Synchronise frames with the display to avoid tearing.");
-            im::sliderRow("Render scale", s.renderScale, 0.5f, 2.0f, 0.05f, pct, row());
-            im::tooltip("Internal resolution of the 3D image. Lower is faster, higher is sharper.");
+            im::tooltip(T("options.window_size.help"));
+            im::toggleRow(L("options.vsync"), s.vsync, row());
+            im::tooltip(T("options.vsync.help"));
+            im::sliderRow(L("options.render_scale"), s.renderScale, 0.5f, 2.0f, 0.05f, pct, row());
+            im::tooltip(T("options.render_scale.help"));
             break;
         }
         case 1: {
             int q = std::clamp(s.quality, 0, 3);
-            if (im::selectorRow("Quality", q, {"Low", "Medium", "High", "Ultra"}, row())) s.quality = q;
-            im::tooltip("Shadows, reflections, ambient occlusion and volumetric light.");
-            im::toggleRow("Motion blur", s.motionBlur, row());
-            im::toggleRow("Depth of field", s.depthOfField, row());
-            im::sliderRow("Brightness", s.brightness, -2.0f, 2.0f, 0.1f,
-                          [](float x) { return std::fabs(x) < 0.05f ? std::string("Neutral") : format("%+.1f EV", x); }, row());
-            im::tooltip("Exposure compensation of the camera.");
+            if (im::selectorRow(L("options.quality"), q,
+                                {T("options.quality.low"), T("options.quality.medium"), T("options.quality.high"), T("options.quality.ultra")},
+                                row()))
+                s.quality = q;
+            im::tooltip(T("options.quality.help"));
+            im::toggleRow(L("options.motion_blur"), s.motionBlur, row());
+            im::toggleRow(L("options.depth_of_field"), s.depthOfField, row());
+            im::sliderRow(L("options.brightness"), s.brightness, -2.0f, 2.0f, 0.1f,
+                          [](float x) {
+                              if (std::fabs(x) < 0.05f) return T("options.brightness.neutral");
+                              return std::string(x > 0.0f ? "+" : "\xE2\x88\x92") + decimal(std::fabs(x), 1) + " EV";
+                          },
+                          row());
+            im::tooltip(T("options.brightness.help"));
             break;
         }
         case 2: {
-            im::sliderRow("Master volume", s.masterVolume, 0.0f, 1.0f, 0.05f, pct, row());
-            im::sliderRow("Effects", s.effectsVolume, 0.0f, 1.0f, 0.05f, pct, row());
-            im::toggleRow("Ambience", s.ambience, row());
-            im::tooltip("The murmur of the hall: fire, distant footsteps, the old clock.");
-            im::sliderRow("Ambience volume", s.ambienceVolume, 0.0f, 1.0f, 0.05f, pct, row(), s.ambience);
+            im::sliderRow(L("options.master_volume"), s.masterVolume, 0.0f, 1.0f, 0.05f, pct, row());
+            im::sliderRow(L("options.effects"), s.effectsVolume, 0.0f, 1.0f, 0.05f, pct, row());
+            im::toggleRow(L("options.ambience"), s.ambience, row());
+            im::tooltip(T("options.ambience.help"));
+            im::sliderRow(L("options.ambience_volume"), s.ambienceVolume, 0.0f, 1.0f, 0.05f, pct, row(), s.ambience);
             break;
         }
         case 3: {
-            im::toggleRow("Show legal moves", s.showLegalMoves, row());
-            im::tooltip("Highlight the squares a touched piece may reach. When off, nothing tells you whether a move "
-                        "is legal: an illegal move is penalised by the arbiter once you press the clock.");
-            im::toggleRow("Board coordinates", s.showCoordinates, row());
-            im::toggleRow("Realistic thinking time", s.humanizeThinking, row());
-            im::tooltip("Your opponent takes its time like a human player instead of moving instantly.");
-            im::sliderRow("Mouse sensitivity", s.mouseSensitivity, 0.25f, 3.0f, 0.05f,
-                          [](float x) { return format("%.2f \xC3\x97", x); }, row());
-            im::toggleRow("Invert vertical look", s.invertLook, row());
+            im::toggleRow(L("options.legal_moves"), s.showLegalMoves, row());
+            im::tooltip(T("options.legal_moves.help"));
+            im::toggleRow(L("options.coordinates"), s.showCoordinates, row());
+            im::toggleRow(L("options.thinking_time"), s.humanizeThinking, row());
+            im::tooltip(T("options.thinking_time.help"));
+            im::sliderRow(L("options.mouse_sensitivity"), s.mouseSensitivity, 0.25f, 3.0f, 0.05f,
+                          [](float x) { return decimal(x, 2) + " \xC3\x97"; }, row());
+            im::toggleRow(L("options.invert_look"), s.invertLook, row());
+            break;
+        }
+        case 4: {
+            // Player profile: the name and hand written on the scoresheets.
+            // The untouched default name (stored as "Human") reads in the interface language.
+            std::string name = s.playerName == "Human" ? T("player.default_name") : s.playerName;
+            if (im::textField(L("player.name"), name, row(), kMaxNameLength)) s.playerName = name;
+            im::tooltip(T("player.name.help"));
+            int hs = std::clamp(int(s.handStyle), 0, int(font::HAND_STYLE_COUNT) - 1);
+            if (im::selectorRow(L("player.handwriting"), hs, {T("hand.caveat"), T("hand.marck"), T("hand.badscript")}, row()))
+                s.handStyle = font::HandStyle(hs);
+            im::tooltip(T("player.handwriting.help"));
+            std::string written = cleanName(s.playerName);
+            handwritingPreview(written == "Human" ? T("player.default_name") : written, hs, Rect(rx, y + 18.0f, rw, 170.0f));
             break;
         }
         default: {
             struct Line { const char* keys; const char* action; };
             static const Line lines[] = {
-                {"Left click", "Touch a piece, then move it"},
-                {"Space  or  click the clock", "Press the clock"},
-                {"Right mouse, hold", "Look around"},
-                {"Tab", "Show or hide the move list"},
-                {"Esc", "Menu"},
+                {"controls.touch.keys", "controls.touch"},
+                {"controls.clock.keys", "controls.clock"},
+                {"controls.look.keys", "controls.look"},
+                {"controls.moves.keys", "controls.moves"},
+                {"controls.menu.keys", "controls.menu"},
             };
-            TextStyle ks = style(font::FACE_TITLE, 19.0f, gold, HAlign::Right, 0.14f);
-            TextStyle as = style(font::FACE_TEXT, kBody, ivory);
+            TextStyle ks = style(font::FACE_TITLE, 19.0f, gold, im::endAlign(), 0.14f);
+            TextStyle as = style(font::FACE_TEXT, kBody, ivory, im::startAlign());
             float mid = p.cx() - 10.0f;
             for (const Line& l : lines) {
                 Rect r = row();
-                gfx::text(l.keys, mid - 24.0f, baselineCentered(r, ks), ks);
-                gfx::diamond(vec2(mid, r.cy()), 3.0f, withAlpha(gold, 0.6f));
-                gfx::text(l.action, mid + 24.0f, baselineCentered(r, as), as);
+                TextStyle k = ks, a = as;
+                k.size = gfx::fitSize(T(l.keys), ks, mid - 24.0f - rx - 10.0f);
+                a.size = gfx::fitSize(T(l.action), as, rx + rw - mid - 34.0f);
+                gfx::text(T(l.keys), im::flipX(p, mid - 24.0f), baselineCentered(r, k), k);
+                gfx::diamond(vec2(im::flipX(p, mid), r.cy()), 3.0f, withAlpha(gold, 0.6f));
+                gfx::text(T(l.action), im::flipX(p, mid + 24.0f), baselineCentered(r, a), a);
                 gfx::hlineFade(rx + 60.0f, rx + rw - 60.0f, r.b() + 2.0f, withAlpha(gold, 0.10f), 0.3f);
             }
             break;
@@ -420,10 +531,12 @@ bool optionsPage(MenuAction& act) {
     }
     // Footer.
     TextStyle hs = style(font::FACE_ITALIC, kCaption, withAlpha(muted, dirty ? 1.0f : 0.0f), HAlign::Center);
-    gfx::text("Changes take effect once applied.", p.cx(), by + bh * 0.5f + 7.0f, hs);
-    if (im::button("Back", Rect(p.x + 60.0f, by, bw, bh), im::ButtonKind::Secondary)) closing = true;
-    im::Id applyId = im::makeId("Apply");
-    if (im::button("Apply", Rect(p.r() - 60.0f - bw, by, bw, bh), im::ButtonKind::Primary, dirty)) apply = true;
+    hs.size = gfx::fitSize(T("options.pending"), hs, p.w - 120.0f - 2.0f * bw - 40.0f);
+    gfx::text(T("options.pending"), p.cx(), by + bh * 0.5f + 7.0f, hs);
+    if (im::button(L("common.back"), im::flip(p, Rect(p.x + 60.0f, by, bw, bh)), im::ButtonKind::Secondary)) closing = true;
+    im::Id applyId = im::makeId("##common.apply");
+    if (im::button(L("common.apply"), im::flip(p, Rect(p.r() - 60.0f - bw, by, bw, bh)), im::ButtonKind::Primary, dirty))
+        apply = true;
     im::setDefaultFocus(applyId);
     if (!dirty) im::setDefaultFocus(im::makeId("##tabs"));
     im::popId();
@@ -438,8 +551,8 @@ bool optionsPage(MenuAction& act) {
         closing = false;
     }
     if (o.confirmDiscard) {
-        int r = im::confirmDialog("##discard", "UNSAVED CHANGES", "Some options were changed. Apply them before leaving?", "Apply",
-                                  "Discard", false);
+        int r = im::confirmDialog("##discard", T("options.unsaved.title"), T("options.unsaved.text"), T("common.apply"),
+                                  T("common.discard"), false);
         if (r == 1) { apply = true; closing = true; }
         if (r == 0) closing = true;
         if (r >= 0) o.confirmDiscard = false;
@@ -459,58 +572,69 @@ bool optionsPage(MenuAction& act) {
 MenuAction titlePage(float t) {
     vec2 v = view();
     MenuAction act = MenuAction::None;
+    const Rect sr = screenRect();  // the page is mirrored in a right-to-left language
+    const HAlign start = im::startAlign();
     float x = std::max(110.0f, v.x * 0.085f);
-    // Legibility gradient on the left, fading into the hall.
+    // Legibility gradient on the start side, fading into the hall.
     gfx::Layer prev = gfx::layer();
     gfx::setLayer(gfx::LAYER_BACK);
-    gfx::fillH(Rect(0, 0, v.x * 0.62f, v.y), vec4(0, 0, 0, 0.66f * t), vec4(0, 0, 0, 0.0f));
+    if (im::rtl()) gfx::fillH(im::flip(sr, Rect(0, 0, v.x * 0.62f, v.y)), vec4(0, 0, 0, 0.0f), vec4(0, 0, 0, 0.66f * t));
+    else gfx::fillH(Rect(0, 0, v.x * 0.62f, v.y), vec4(0, 0, 0, 0.66f * t), vec4(0, 0, 0, 0.0f));
     gfx::fillV(Rect(0, v.y - 200.0f, v.x, 200.0f), vec4(0, 0, 0, 0.0f), vec4(0, 0, 0, 0.45f * t));
     gfx::setLayer(prev);
     gfx::pushAlpha(t);
     float slide = (1.0f - t) * 10.0f;
 
-    TextStyle wm = style(font::FACE_TITLE, kWordmark, ivory, HAlign::Left, kTrackWordmark);
+    TextStyle wm = style(font::FACE_TITLE, kWordmark, ivory, start, kTrackWordmark);
     float wmBase = 330.0f + slide;
     float wmW = gfx::textWidth("SCACELITH", wm);
     TextStyle sh = wm;
     sh.color = vec4(0, 0, 0, 0.55f);
     sh.softness = 10.0f;
     sh.weight = 3.0f;
-    gfx::text("SCACELITH", x + 2.0f, wmBase + 5.0f, sh);
+    gfx::text("SCACELITH", im::flipX(sr, x) + 2.0f, wmBase + 5.0f, sh);
     TextStyle gl = wm;
     gl.color = withAlpha(gold, 0.16f);
     gl.softness = 16.0f;
     gl.weight = 4.0f;
-    gfx::text("SCACELITH", x, wmBase, gl);
-    gfx::text("SCACELITH", x, wmBase, wm);
+    gfx::text("SCACELITH", im::flipX(sr, x), wmBase, gl);
+    gfx::text("SCACELITH", im::flipX(sr, x), wmBase, wm);
     float ruleY = wmBase + 38.0f;
-    gfx::fillH(Rect(x, gfx::snap(ruleY), wmW, gfx::px()), withAlpha(gold, 0.9f), withAlpha(gold, 0.0f));
-    gfx::diamond(vec2(x, ruleY + gfx::px() * 0.5f), 4.0f, goldBright);
-    TextStyle sub = style(font::FACE_ITALIC, 30.0f, ivoryDim, HAlign::Left);
-    gfx::text("The Royal Game", x + 4.0f, ruleY + 48.0f, sub);
+    Rect rule = im::flip(sr, Rect(x, gfx::snap(ruleY), wmW, gfx::px()));
+    if (im::rtl()) gfx::fillH(rule, withAlpha(gold, 0.0f), withAlpha(gold, 0.9f));
+    else gfx::fillH(rule, withAlpha(gold, 0.9f), withAlpha(gold, 0.0f));
+    gfx::diamond(vec2(im::flipX(sr, x), ruleY + gfx::px() * 0.5f), 4.0f, goldBright);
+    TextStyle sub = style(font::FACE_ITALIC, 30.0f, ivoryDim, start);
+    gfx::text(T("menu.subtitle"), im::flipX(sr, x + 4.0f), ruleY + 48.0f, sub);
 
     float ey = 520.0f + slide;
     float eh = 62.0f, ew = 440.0f;
     im::pushId("title");
-    im::Id first = im::makeId("New Game");
-    if (im::menuEntry("New Game", Rect(x, ey, ew, eh))) {
+    im::Id first = im::makeId("##menu.new_game");
+    if (im::menuEntry(L("menu.new_game"), im::flip(sr, Rect(x, ey, ew, eh)))) {
         setPage(Page::NewGame);
         im::sound(Sound::Open);
     }
-    if (im::menuEntry("Options", Rect(x, ey + 76.0f, ew, eh))) {
+    if (im::menuEntry(L("menu.watch"), im::flip(sr, Rect(x, ey + 76.0f, ew, eh)))) {
+        setPage(Page::Watch);
+        im::sound(Sound::Open);
+    }
+    ey += 76.0f;  // the entries below move down one row
+    if (im::menuEntry(L("menu.options"), im::flip(sr, Rect(x, ey + 76.0f, ew, eh)))) {
         setPage(Page::Options);
         openOptions();
     }
-    if (im::menuEntry("Credits", Rect(x, ey + 152.0f, ew, eh))) {
+    if (im::menuEntry(L("menu.credits"), im::flip(sr, Rect(x, ey + 152.0f, ew, eh)))) {
         setPage(Page::Credits);
         im::sound(Sound::Open);
     }
-    if (im::menuEntry("Quit", Rect(x, ey + 228.0f, ew, eh))) act = MenuAction::Quit;
+    if (im::menuEntry(L("menu.quit"), im::flip(sr, Rect(x, ey + 228.0f, ew, eh)))) act = MenuAction::Quit;
     im::setDefaultFocus(first);
     im::popId();
 
-    TextStyle vs = style(font::FACE_ITALIC, 19.0f, withAlpha(muted, 0.85f));
-    gfx::text("Version " + detail::data().version, x, v.y - 48.0f, vs);
+    detail::titleRating(im::flipX(sr, x), ey + 360.0f);
+    TextStyle vs = style(font::FACE_ITALIC, 19.0f, withAlpha(muted, 0.85f), start);
+    gfx::text(i18n::trf("menu.version", {i18n::ltr(detail::data().version)}), im::flipX(sr, x), v.y - 48.0f, vs);
     gfx::popAlpha();
     return act;
 }
@@ -559,22 +683,27 @@ bool difficultyList(NewGameSetup& setup, const Rect& area, bool opened) {
         }
         if (r.b() < area.y || r.y > area.b()) continue;
         if (sel) {
-            gfx::fillH(r, withAlpha(gold, 0.13f), withAlpha(gold, 0.04f), 2.0f);
+            if (im::rtl()) gfx::fillH(r, withAlpha(gold, 0.04f), withAlpha(gold, 0.13f), 2.0f);
+            else gfx::fillH(r, withAlpha(gold, 0.13f), withAlpha(gold, 0.04f), 2.0f);
             gfx::stroke(r, withAlpha(gold, 0.55f), 0.0f, 2.0f);
-            gfx::diamond(vec2(r.x, r.cy()), 4.5f, goldBright);
+            gfx::diamond(vec2(im::flipX(r, r.x), r.cy()), 4.5f, goldBright);
         } else {
             im::rowHighlight(r, it.hoverT);
         }
         float nameBase = r.y + m::lerp(26.0f, 25.0f, full);
-        TextStyle ns = style(font::FACE_TEXT, 27.0f, sel ? goldBright : theme::mix(ivory, goldBright, it.hoverT * 0.5f));
-        gfx::text(d.name, r.x + 22.0f, nameBase, ns);
-        if (d.elo > 0) {
-            TextStyle es = style(font::FACE_ITALIC, 22.0f, sel ? gold : muted, HAlign::Right);
-            gfx::text("~" + std::to_string(d.elo) + " Elo", r.r() - 18.0f, nameBase, es);
-        }
+        std::string elo = d.elo > 0 ? i18n::trf("newgame.elo", {std::to_string(d.elo)}) : std::string();
+        TextStyle es = style(font::FACE_ITALIC, 22.0f, sel ? gold : muted, im::endAlign());
+        float eloW = elo.empty() ? 0.0f : gfx::textWidth(elo, es) + 24.0f;
+        TextStyle ns = style(font::FACE_TEXT, 27.0f, sel ? goldBright : theme::mix(ivory, goldBright, it.hoverT * 0.5f), im::startAlign());
+        std::string name = presetName(d.name);
+        ns.size = gfx::fitSize(name, ns, r.w - 40.0f - eloW);
+        gfx::text(name, im::flipX(r, r.x + 22.0f), nameBase, ns);
+        if (!elo.empty()) gfx::text(elo, im::flipX(r, r.r() - 18.0f), nameBase, es);
         if (full > 0.02f) {
-            TextStyle ds = style(font::FACE_ITALIC, 20.0f, withAlpha(sel ? ivoryDim : muted, full * full));
-            gfx::text(d.description, r.x + 22.0f, r.y + 47.0f, ds);
+            TextStyle ds = style(font::FACE_ITALIC, 20.0f, withAlpha(sel ? ivoryDim : muted, full * full), im::startAlign());
+            std::string desc = presetDescription(d.name, d.description);
+            ds.size = gfx::fitSize(desc, ds, r.w - 40.0f, 0.75f);
+            gfx::text(desc, im::flipX(r, r.x + 22.0f), r.y + 47.0f, ds);
         }
     }
     im::popId();
@@ -617,19 +746,21 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
     Rect p(v.x * 0.5f - w * 0.5f, 40.0f + (1.0f - t) * 14.0f, w, h);
     gfx::pushAlpha(t);
     im::panel(p);
-    im::pageTitle("NEW GAME", p.cx(), p.y + 78.0f);
+    im::pageTitle(T("newgame.title"), p.cx(), p.y + 78.0f);
     im::pushId("newgame");
 
     float pad = 64.0f, gap = 72.0f;
     float colW = (p.w - 2.0f * pad - gap) * 0.5f;
-    float lx = p.x + pad, rx = lx + colW + gap;
+    // Opponent column first in the reading direction (on the right in a right-to-left language).
+    float lx = im::flip(p, Rect(p.x + pad, 0, colW, 0)).x, rx = im::flip(p, Rect(p.x + pad + colW + gap, 0, colW, 0)).x;
     float top = p.y + 150.0f;
     float footer = p.b() - 118.0f;
     // Column divider.
     gfx::vline(p.cx(), top, footer - 20.0f, withAlpha(gold, 0.12f));
 
     // Opponent column.
-    im::sectionLabel("OPPONENT", lx, top + 8.0f, colW);
+    im::sectionLabel(T("newgame.opponent"), lx, top + 8.0f, colW);
+    detail::newGameRating(lx, colW, top + 8.0f, setup.difficulty);
     float customH = custom ? 6.0f * 44.0f + 18.0f : 0.0f;
     float available = std::max(150.0f, footer - (top + 30.0f) - customH - 8.0f);
     Rect listArea(lx, top + 30.0f, colW, std::min(available, presetListHeight(nd, setup.difficulty, custom)));
@@ -646,32 +777,33 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
         };
         im::pushId("engine");
         float skill = float(setup.skillLevel);
-        if (im::sliderRow("Skill level", skill, 0.0f, 20.0f, 1.0f, [](float x) { return format("%.0f", x); }, crow(),
+        if (im::sliderRow(L("engine.skill"), skill, 0.0f, 20.0f, 1.0f, [](float x) { return format("%.0f", x); }, crow(),
                           !setup.limitElo))
             setup.skillLevel = int(std::lround(skill));
-        im::tooltip("Stockfish \xE2\x80\x9CSkill Level\xE2\x80\x9D (0\xE2\x80\x93" "20). Ignored while the strength is limited by Elo.");
-        im::toggleRow("Limit strength (Elo)", setup.limitElo, crow());
-        im::tooltip("UCI_LimitStrength: the engine aims at the Elo rating below.");
+        im::tooltip(T("engine.skill.help"));
+        im::toggleRow(L("engine.limit_elo"), setup.limitElo, crow());
+        im::tooltip(T("engine.limit_elo.help"));
         float elo = float(setup.elo);
-        if (im::sliderRow("Elo", elo, 1320.0f, 3190.0f, 10.0f, [](float x) { return format("%.0f", x); }, crow(), setup.limitElo))
+        if (im::sliderRow(L("engine.elo"), elo, 1320.0f, 3190.0f, 10.0f, [](float x) { return format("%.0f", x); }, crow(),
+                          setup.limitElo))
             setup.elo = int(std::lround(elo));
         int depth = std::clamp(setup.depth, 0, 30);
-        if (im::stepperRow("Search depth", depth, 31, [](int i) { return i == 0 ? std::string("Off") : format("%.0f plies", i); },
+        if (im::stepperRow(L("engine.depth"), depth, 31, [](int i) { return i == 0 ? T("engine.no_limit") : i18n::trn("engine.plies", i); },
                            crow()))
             setup.depth = depth;
         auto& mt = moveTimeValues();
         int mti = nearestIndex(mt, setup.moveTimeMs);
-        if (im::stepperRow("Time per move", mti, int(mt.size()), [&](int i) { return moveTimeText(mt[size_t(i)]); }, crow()))
+        if (im::stepperRow(L("engine.move_time"), mti, int(mt.size()), [&](int i) { return moveTimeText(mt[size_t(i)]); }, crow()))
             setup.moveTimeMs = mt[size_t(mti)];
         auto& nv = nodeValues();
         int ni = nearestIndex(nv, setup.nodes);
-        if (im::stepperRow("Node limit", ni, int(nv.size()), [&](int i) { return nodesText(nv[size_t(i)]); }, crow()))
+        if (im::stepperRow(L("engine.nodes"), ni, int(nv.size()), [&](int i) { return nodesText(nv[size_t(i)]); }, crow()))
             setup.nodes = nv[size_t(ni)];
         im::popId();
     }
 
     // Time control column.
-    im::sectionLabel("TIME CONTROL", rx, top + 8.0f, colW);
+    im::sectionLabel(T("newgame.time_control"), rx, top + 8.0f, colW);
     int ntc = int(tcs.size()) + 1;
     int cols = 4;
     float cgap = 12.0f;
@@ -680,7 +812,7 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
     im::pushId("tc");
     for (int i = 0; i < ntc; ++i) {
         bool isCustom = i == ntc - 1;
-        Rect r(rx + float(i % cols) * (cw + cgap), gy + float(i / cols) * (ch + cgap), cw, ch);
+        Rect r = im::flip(Rect(rx, gy, colW, 0), Rect(rx + float(i % cols) * (cw + cgap), gy + float(i / cols) * (ch + cgap), cw, ch));
         bool sel = isCustom ? customTc : setup.timeControl == i;
         im::Item it = im::item(im::makeId(i), r);
         if (it.activated && !sel) {
@@ -697,12 +829,14 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
             gfx::fill(r, withAlpha(gold, 0.08f * it.hoverT), 2.0f);
             gfx::stroke(r, withAlpha(gold, 0.18f + 0.4f * it.hoverT), 0.0f, 2.0f);
         }
-        std::string label = isCustom ? "Custom" : spacedPlus(tcs[size_t(i)]);
-        std::string cat = isCustom ? "Your own" : timeCategory(tcs[size_t(i)]);
+        std::string label = isCustom ? T("tc.custom") : spacedPlus(timeControlLabel(tcs[size_t(i)]));
+        std::string cat = isCustom ? T("tc.your_own") : timeCategory(tcs[size_t(i)]);
         TextStyle ls = style(font::FACE_TEXT, 28.0f, sel ? goldBright : theme::mix(ivory, goldBright, it.hoverT * 0.6f), HAlign::Center);
         if (label.size() > 8) ls.size = 25.0f;
+        ls.size = gfx::fitSize(label, ls, cw - 12.0f);
         gfx::text(label, r.cx(), r.y + 33.0f, ls);
         TextStyle cs = style(font::FACE_ITALIC, 18.0f, sel ? gold : muted, HAlign::Center);
+        cs.size = gfx::fitSize(cat, cs, cw - 10.0f);
         gfx::text(cat, r.cx(), r.y + 55.0f, cs);
     }
     im::popId();
@@ -716,49 +850,53 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
         im::pushId("customtc");
         auto& bv = baseTimeValues();
         int bi = nearestIndex(bv, setup.customBaseSeconds);
-        if (im::stepperRow("Base time", bi, int(bv.size()), [&](int i) { return clockText(bv[size_t(i)]); }, trow()))
+        if (im::stepperRow(L("tc.base_time"), bi, int(bv.size()), [&](int i) { return clockText(bv[size_t(i)]); }, trow()))
             setup.customBaseSeconds = bv[size_t(bi)];
-        im::tooltip("Initial time on each clock (minutes : seconds).");
+        im::tooltip(T("tc.base_time.help"));
         int inc = std::clamp(setup.customIncrementSeconds, 0, 60);
-        if (im::stepperRow("Increment", inc, 61, [](int i) { return format("+%.0f s", i); }, trow()))
+        if (im::stepperRow(L("tc.increment"), inc, 61, [](int i) { return i18n::trf("tc.seconds", {i18n::ltr("+" + std::to_string(i))}); }, trow()))
             setup.customIncrementSeconds = inc;
-        im::tooltip("Fischer increment added after each move.");
+        im::tooltip(T("tc.increment.help"));
         int del = std::clamp(setup.customDelaySeconds, 0, 60);
-        if (im::stepperRow("Delay", del, 61, [](int i) { return i == 0 ? std::string("Off") : format("%.0f s", i); }, trow()))
+        if (im::stepperRow(L("tc.delay"), del, 61,
+                           [](int i) { return i == 0 ? T("tc.no_delay") : i18n::trf("tc.seconds", {std::to_string(i)}); }, trow()))
             setup.customDelaySeconds = del;
-        im::tooltip("Bronstein delay: time used up to this delay is given back after each move.");
+        im::tooltip(T("tc.delay.help"));
         im::popId();
         y += 6.0f;
     }
 
     // Colour note.
     int next = game::settings().nextColor;
-    std::string colourLine = next == 0   ? "You will play White."
-                             : next == 1 ? "You will play Black."
-                                         : "Colours are drawn by lot for the first game.";
-    TextStyle cs = style(font::FACE_ITALIC, 22.0f, ivoryDim);
+    std::string colourLine = T(next == 0 ? "newgame.you_white" : next == 1 ? "newgame.you_black" : "newgame.colour_lot");
+    const Rect col(rx, 0, colW, 0);
+    TextStyle cs = style(font::FACE_ITALIC, 22.0f, ivoryDim, im::startAlign());
     float noteY = std::max(y + 26.0f, footer - 70.0f);
-    gfx::diamond(vec2(rx + 6.0f, noteY - 7.0f), 3.5f, withAlpha(gold, 0.8f));
-    gfx::text(colourLine, rx + 22.0f, noteY, cs);
+    gfx::diamond(vec2(im::flipX(col, rx + 6.0f), noteY - 7.0f), 3.5f, withAlpha(gold, 0.8f));
+    cs.size = gfx::fitSize(colourLine, cs, colW - 26.0f);
+    gfx::text(colourLine, im::flipX(col, rx + 22.0f), noteY, cs);
     cs.color = muted;
-    gfx::text("Colours then alternate from one game to the next.", rx + 22.0f, noteY + 28.0f, cs);
+    cs.size = gfx::fitSize(T("newgame.colour_alternate"), style(font::FACE_ITALIC, 22.0f, muted), colW - 26.0f);
+    gfx::text(T("newgame.colour_alternate"), im::flipX(col, rx + 22.0f), noteY + 28.0f, cs);
 
     // Footer.
     float bw = 260.0f, bh = 58.0f;
     float by = p.b() - 52.0f - bh;
     gfx::hlineFade(p.x + 40.0f, p.r() - 40.0f, by - 26.0f, withAlpha(gold, 0.25f), 0.3f);
-    bool back = im::button("Back", Rect(p.x + pad, by, bw, bh), im::ButtonKind::Secondary);
-    im::Id startId = im::makeId("Start");
-    if (im::button("Start", Rect(p.r() - pad - bw, by, bw, bh), im::ButtonKind::Primary)) {
+    bool back = im::button(L("common.back"), im::flip(p, Rect(p.x + pad, by, bw, bh)), im::ButtonKind::Secondary);
+    im::Id startId = im::makeId("##newgame.start");
+    if (im::button(L("newgame.start"), im::flip(p, Rect(p.r() - pad - bw, by, bw, bh)), im::ButtonKind::Primary)) {
         storeSetupToSettings(setup);
         act = MenuAction::StartGame;
     }
     // Summary of the choice next to the Start button.
     {
-        std::string opp = nd > 0 ? diffs[size_t(setup.difficulty)].name : "";
-        std::string tc = customTc ? customClockSummary(setup) : spacedPlus(tcs[size_t(setup.timeControl)]);
-        TextStyle ss = style(font::FACE_ITALIC, 22.0f, ivoryDim, HAlign::Right);
-        gfx::text(opp + "  \xC2\xB7  " + tc, p.r() - pad - bw - 30.0f, by + bh * 0.5f + 7.0f, ss);
+        std::string opp = nd > 0 ? presetName(diffs[size_t(setup.difficulty)].name) : "";
+        std::string tc = customTc ? customClockSummary(setup) : spacedPlus(timeControlLabel(tcs[size_t(setup.timeControl)]));
+        TextStyle ss = style(font::FACE_ITALIC, 22.0f, ivoryDim, im::endAlign());
+        std::string summary = opp + "  \xC2\xB7  " + i18n::ltr(tc);
+        ss.size = gfx::fitSize(summary, ss, p.w - 2.0f * pad - 2.0f * bw - 60.0f);
+        gfx::text(summary, im::flipX(p, p.r() - pad - bw - 30.0f), by + bh * 0.5f + 7.0f, ss);
     }
     im::setDefaultFocus(startId);
     im::popId();
@@ -775,36 +913,35 @@ void creditsPage() {
     vec2 v = view();
     float t = ease(S.pageT);
     dimScene(t);
-    float w = std::min(1060.0f, v.x - 80.0f), h = 820.0f;
+    float w = std::min(1100.0f, v.x - 80.0f), h = 880.0f;
     Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 14.0f, w, h);
     gfx::pushAlpha(t);
     im::panel(p);
-    im::pageTitle("CREDITS", p.cx(), p.y + 80.0f);
+    im::pageTitle(T("credits.title"), p.cx(), p.y + 80.0f);
     struct Entry { const char* head; const char* lines[3]; };
     static const Entry entries[] = {
-        {"SCACELITH", {"A game of chess in a royal hall, on an in-house OpenGL 4.6 engine.", nullptr, nullptr}},
-        {"CHESS ENGINE", {"Stockfish 16, by the Stockfish developers.", "GNU General Public License v3.", nullptr}},
-        {"TYPEFACES",
-         {"EB Garamond by Georg Duffner and Cinzel by Natanael Gama (SIL Open Font License).",
-          "Chess figures from GNU FreeFont (GPL v3 with font exception).", nullptr}},
+        {"credits.game.head", {"credits.game", nullptr, nullptr}},
+        {"credits.engine.head", {"credits.engine", "credits.engine.licence", nullptr}},
+        {"credits.fonts.head", {"credits.fonts", "credits.fonts.hand", "credits.fonts.figures"}},
     };
-    float y = p.y + 170.0f;
+    float y = p.y + 160.0f;
     TextStyle hs = style(font::FACE_TITLE, kSection, gold, HAlign::Center, 0.22f);
-    TextStyle ls = style(font::FACE_TEXT, 25.0f, ivoryDim, HAlign::Center);
+    TextStyle ls = style(font::FACE_TEXT, 24.0f, ivoryDim, HAlign::Center);
     for (const Entry& e : entries) {
-        gfx::text(e.head, p.cx(), y, hs);
+        gfx::text(T(e.head), p.cx(), y, hs);
         y += 40.0f;
         for (const char* l : e.lines) {
             if (!l) break;
-            y += 34.0f * float(gfx::textWrapped(l, p.cx(), y, w - 160.0f, ls, 34.0f));
+            y += 32.0f * float(gfx::textWrapped(T(l), p.cx(), y, w - 160.0f, ls, 32.0f));
         }
-        y += 36.0f;
+        y += 30.0f;
     }
     TextStyle qs = style(font::FACE_ITALIC, 24.0f, muted, HAlign::Center);
-    gfx::text("\xE2\x80\x9C" "Chess is the art of analysis.\xE2\x80\x9D  \xE2\x80\x94 Mikhail Botvinnik", p.cx(), p.b() - 150.0f, qs);
+    qs.size = gfx::fitSize(T("credits.quote"), qs, w - 120.0f);
+    gfx::text(T("credits.quote"), p.cx(), p.b() - 140.0f, qs);
     im::pushId("credits");
-    im::Id backId = im::makeId("Back");
-    bool back = im::button("Back", Rect(p.cx() - 130.0f, p.b() - 110.0f, 260.0f, 56.0f), im::ButtonKind::Secondary);
+    im::Id backId = im::makeId("##common.back");
+    bool back = im::button(L("common.back"), Rect(p.cx() - 130.0f, p.b() - 110.0f, 260.0f, 56.0f), im::ButtonKind::Secondary);
     im::setDefaultFocus(backId);
     im::popId();
     gfx::popAlpha();
@@ -819,6 +956,11 @@ void creditsPage() {
 // ==== Public screens ==================================================================================
 namespace detail {
 void screensReset() { S = State(); }
+
+// Hooks for the viewer mode's pages (ui_screens_game.cpp).
+bool runOptionsPage(MenuAction& act) { return optionsPage(act); }
+void openOptionsPage() { openOptions(); }
+void dimBackground(float a) { dimScene(a); }
 
 void screensBeginFrame(float dt) {
     for (auto& t : S.toasts) t.age += dt;
@@ -840,6 +982,11 @@ void foldGameOver(bool folded) { S.forcedFold = folded ? 1 : 0; }
 bool optionsOpen() { return S.optionsVisible || S.optionsVisiblePrev; }
 
 MenuAction mainMenu(NewGameSetup& setup) {
+    static WatchSetup watch;
+    return mainMenu(setup, watch);
+}
+
+MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
     im::Id menuId = im::makeId("##mainmenu");
     bool appear = im::appearing(menuId);
     if (appear) {
@@ -860,8 +1007,15 @@ MenuAction mainMenu(NewGameSetup& setup) {
             if (optionsPage(act)) setPage(Page::Title);
             break;
         case Page::Credits: creditsPage(); break;
+        case Page::Watch: {
+            bool back = false;
+            act = detail::watchPage(watch, ease(S.pageT), fresh, back);
+            if (back) setPage(Page::Title);
+            break;
+        }
     }
     if (act == MenuAction::StartGame || act == MenuAction::Quit) setPage(Page::Title);
+    if (act == MenuAction::StartWatching) setPage(Page::Title);
     return act;
 }
 
@@ -892,21 +1046,21 @@ MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw) {
     if (S.pauseConfirm) im::pushBlock();
     gfx::pushAlpha(t);
     im::panel(p);
-    im::pageTitle("PAUSED", p.cx(), p.y + 80.0f);
+    im::pageTitle(T("pause.title"), p.cx(), p.y + 80.0f);
     im::pushId("pause");
     float y = p.y + 150.0f, eh = 58.0f, step = 70.0f;
     Rect er(p.x + 40.0f, y, p.w - 80.0f, eh);
-    im::Id resumeId = im::makeId("Resume");
-    if (im::menuEntry("Resume", er, true, HAlign::Center)) act = MenuAction::Resume;
-    if (im::menuEntry("Offer draw", er.offset(0, step), canOfferDraw, HAlign::Center)) act = MenuAction::OfferDraw;
-    if (im::menuEntry("Claim draw", er.offset(0, 2 * step), canClaimDraw, HAlign::Center)) act = MenuAction::ClaimDraw;
-    im::tooltip("Threefold repetition or fifty-move rule.");
-    if (im::menuEntry("Resign", er.offset(0, 3 * step), true, HAlign::Center)) S.pauseConfirm = 1;
-    if (im::menuEntry("Options", er.offset(0, 4 * step), true, HAlign::Center)) {
+    im::Id resumeId = im::makeId("##pause.resume");
+    if (im::menuEntry(L("pause.resume"), er, true, HAlign::Center)) act = MenuAction::Resume;
+    if (im::menuEntry(L("pause.offer_draw"), er.offset(0, step), canOfferDraw, HAlign::Center)) act = MenuAction::OfferDraw;
+    if (im::menuEntry(L("pause.claim_draw"), er.offset(0, 2 * step), canClaimDraw, HAlign::Center)) act = MenuAction::ClaimDraw;
+    im::tooltip(T("pause.claim_draw.help"));
+    if (im::menuEntry(L("pause.resign"), er.offset(0, 3 * step), true, HAlign::Center)) S.pauseConfirm = 1;
+    if (im::menuEntry(L("menu.options"), er.offset(0, 4 * step), true, HAlign::Center)) {
         S.pauseOptions = true;
         openOptions();
     }
-    if (im::menuEntry("Main menu", er.offset(0, 5 * step), true, HAlign::Center)) S.pauseConfirm = 2;
+    if (im::menuEntry(L("common.main_menu"), er.offset(0, 5 * step), true, HAlign::Center)) S.pauseConfirm = 2;
     im::setDefaultFocus(resumeId);
     im::popId();
     gfx::popAlpha();
@@ -916,13 +1070,13 @@ MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw) {
         im::sound(Sound::Close);
     }
     if (S.pauseConfirm == 1) {
-        int r = im::confirmDialog("##resign", "RESIGN", "Resign this game? Your opponent will be declared the winner.", "Resign",
-                                  "Cancel", true);
+        int r = im::confirmDialog("##resign", T("confirm.resign.title"), T("confirm.resign.text"), T("confirm.resign.ok"),
+                                  T("common.cancel"), true);
         if (r == 1) act = MenuAction::Resign;
         if (r >= 0) S.pauseConfirm = 0;
     } else if (S.pauseConfirm == 2) {
-        int r = im::confirmDialog("##leave", "LEAVE THE GAME", "Return to the main menu? The current game will be abandoned.",
-                                  "Leave", "Cancel", true);
+        int r = im::confirmDialog("##leave", T("confirm.leave.title"), T("confirm.leave.text"), T("confirm.leave.ok"),
+                                  T("common.cancel"), true);
         if (r == 1) act = MenuAction::BackToMainMenu;
         if (r >= 0) S.pauseConfirm = 0;
     }
@@ -946,10 +1100,10 @@ int promotionPicker(bool playerIsWhite) {
 
     struct Choice { const char* name; char key; uint32_t filled, outline; int piece; };
     static const Choice choices[4] = {
-        {"Queen", 'Q', 0x265B, 0x2655, chess::Queen},
-        {"Rook", 'R', 0x265C, 0x2656, chess::Rook},
-        {"Bishop", 'B', 0x265D, 0x2657, chess::Bishop},
-        {"Knight", 'N', 0x265E, 0x2658, chess::Knight},
+        {"piece.queen", 'Q', 0x265B, 0x2655, chess::Queen},
+        {"piece.rook", 'R', 0x265C, 0x2656, chess::Rook},
+        {"piece.bishop", 'B', 0x265D, 0x2657, chess::Bishop},
+        {"piece.knight", 'N', 0x265E, 0x2658, chess::Knight},
     };
     float tile = 168.0f, gap = 22.0f;
     float w = 4.0f * tile + 3.0f * gap + 2.0f * 56.0f, h = 330.0f;
@@ -957,13 +1111,13 @@ int promotionPicker(bool playerIsWhite) {
     gfx::pushAlpha(t);
     im::panel(p);
     TextStyle ts = style(font::FACE_TITLE, 22.0f, gold, HAlign::Center, 0.24f);
-    gfx::text("PROMOTE TO", p.cx(), p.y + 58.0f, ts);
+    gfx::text(T("promotion.title"), p.cx(), p.y + 58.0f, ts);
     im::ornamentRule(p.cx(), p.y + 76.0f, 150.0f);
     int result = 0;
     im::pushId("promo");
     for (int i = 0; i < 4; ++i) {
         const Choice& c = choices[i];
-        Rect r(p.x + 56.0f + float(i) * (tile + gap), p.y + 100.0f, tile, tile + 36.0f);
+        Rect r = im::flip(p, Rect(p.x + 56.0f + float(i) * (tile + gap), p.y + 100.0f, tile, tile + 36.0f));
         im::Item it = im::item(im::makeId(i), r);
         if (i == 0) im::setDefaultFocus(it.id);
         float hv = it.hoverT;
@@ -999,7 +1153,8 @@ int promotionPicker(bool playerIsWhite) {
             glyphCentered(c.outline, gc, 128.0f, rim);
         }
         TextStyle ns = style(font::FACE_TITLE, 19.0f, theme::mix(ivoryDim, goldBright, hv), HAlign::Center, 0.18f);
-        gfx::text(c.name, r.cx(), r.b() - 34.0f, ns);
+        ns.size = gfx::fitSize(T(c.name), ns, tile - 12.0f);
+        gfx::text(T(c.name), r.cx(), r.b() - 34.0f, ns);
         TextStyle ks = style(font::FACE_ITALIC, 18.0f, muted, HAlign::Center);
         gfx::text(std::string(1, c.key), r.cx(), r.b() - 11.0f, ks);
         if (it.activated || im::keyPressed(c.key)) result = c.piece;
@@ -1053,6 +1208,14 @@ void drawNotifications() {
 }
 
 MenuAction gameOver(const std::string& result, const std::string& reason, bool playerWon, bool draw, int moveCount) {
+    return gameOver(result, reason, playerWon, draw, moveCount, GameOverExtras{});
+}
+
+bool gameOverFolded() { return S.goFolded; }
+
+MenuAction gameOver(const std::string& result, const std::string& reason, bool playerWon, bool draw, int moveCount,
+                    const GameOverExtras& extras) {
+    S.goExtras = extras;
     im::Id id = im::makeId("##gameover");
     im::Anim& a = im::anim(id);
     bool appear = a.firstFrame == im::frame();
@@ -1077,7 +1240,7 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
     }
     if (fold < 0.999f) {
         float ct = t * (1.0f - fold);
-        float w = 700.0f, h = 380.0f;
+        float w = 700.0f, h = 380.0f + (S.goExtras.detail.empty() ? 0.0f : 38.0f);
         Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + 60.0f + (1.0f - t) * 20.0f + fold * 40.0f, w, h);
         im::captureMouseRect(p);
         gfx::Layer prev = gfx::layer();
@@ -1097,22 +1260,29 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         gfx::text(res, p.cx(), p.y + 118.0f, rs);
         im::ornamentRule(p.cx(), p.y + 146.0f, 190.0f);
         TextStyle why = style(font::FACE_TITLE, 24.0f, ivory, HAlign::Center, 0.2f);
+        why.size = gfx::fitSize(upper(reason), why, w - 60.0f);
         gfx::text(upper(reason), p.cx(), p.y + 196.0f, why);
         std::string line;
-        std::string moves = moveCount > 0 ? std::to_string(moveCount) + (moveCount == 1 ? " move" : " moves") : "";
-        if (draw) line = moves.empty() ? "The game is drawn." : "The game is drawn after " + moves + ".";
-        else if (playerWon) line = moves.empty() ? "Well played \xE2\x80\x94 you win." : "Well played \xE2\x80\x94 you win in " + moves + ".";
-        else line = moves.empty() ? "Your opponent wins." : "Your opponent wins in " + moves + ".";
+        if (draw) line = moveCount > 0 ? i18n::trn("gameover.draw_moves", moveCount) : T("gameover.draw");
+        else if (playerWon) line = moveCount > 0 ? i18n::trn("gameover.win_moves", moveCount) : T("gameover.win");
+        else line = moveCount > 0 ? i18n::trn("gameover.loss_moves", moveCount) : T("gameover.loss");
+        if (!S.goExtras.line.empty()) line = S.goExtras.line;
         TextStyle ls = style(font::FACE_ITALIC, 25.0f, ivoryDim, HAlign::Center);
+        ls.size = gfx::fitSize(line, ls, w - 60.0f);
         gfx::text(line, p.cx(), p.y + 238.0f, ls);
+        if (!S.goExtras.detail.empty()) detail::gameOverDetail(S.goExtras.detail, p.cx(), p.y + 276.0f);
         float bw = 250.0f, bh = 56.0f, gap = 28.0f;
         float by = p.b() - 44.0f - bh;
-        if (im::button("Main menu", Rect(p.cx() - gap * 0.5f - bw, by, bw, bh), im::ButtonKind::Secondary))
+        if (im::button(L("common.main_menu"), im::flip(p, Rect(p.cx() - gap * 0.5f - bw, by, bw, bh)), im::ButtonKind::Secondary))
             act = MenuAction::BackToMainMenu;
-        im::Id rematchId = im::makeId("Rematch");
-        if (im::button("Rematch", Rect(p.cx() + gap * 0.5f, by, bw, bh), im::ButtonKind::Primary)) act = MenuAction::Rematch;
+        std::string primary = S.goExtras.primaryLabel.empty() ? L("gameover.rematch") : S.goExtras.primaryLabel + "##gameover.rematch";
+        im::Id rematchId = im::makeId("##gameover.rematch");
+        if (im::button(primary, im::flip(p, Rect(p.cx() + gap * 0.5f, by, bw, bh)), im::ButtonKind::Primary))
+            act = MenuAction::Rematch;
         im::setDefaultFocus(rematchId);
-        if (im::button("View the board", Rect(p.r() - 190.0f, p.y + 14.0f, 176.0f, 40.0f), im::ButtonKind::Quiet)) {
+        TextStyle qs = style(font::FACE_ITALIC, kSmall, muted);
+        float vw = std::max(176.0f, gfx::textWidth(T("gameover.view_board"), qs) + 24.0f);
+        if (im::button(L("gameover.view_board"), im::flip(p, Rect(p.r() - 14.0f - vw, p.y + 14.0f, vw, 40.0f)), im::ButtonKind::Quiet)) {
             S.goFolded = true;
             im::sound(Sound::Close);
         }
@@ -1121,7 +1291,7 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
     }
     if (fold > 0.001f) {
         float bt = t * fold;
-        TextStyle bs = style(font::FACE_TITLE, 22.0f, ivory, HAlign::Left, 0.14f);
+        TextStyle bs = style(font::FACE_TITLE, 22.0f, ivory, im::startAlign(), 0.14f);
         std::string summary = res + "  \xC2\xB7  " + upper(reason);
         float sw = gfx::textWidth(summary, bs);
         float w = sw + 300.0f, h = 64.0f;
@@ -1131,8 +1301,8 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         bool blockBar = fold <= 0.5f;
         if (blockBar) im::pushBlock();
         im::panel(bar);
-        gfx::text(summary, bar.x + 40.0f, baselineCentered(bar, bs), bs);
-        if (im::button("Show", Rect(bar.r() - 150.0f, bar.y + 12.0f, 120.0f, 40.0f), im::ButtonKind::Quiet)) {
+        gfx::text(summary, im::flipX(bar, bar.x + 40.0f), baselineCentered(bar, bs), bs);
+        if (im::button(L("gameover.show"), im::flip(bar, Rect(bar.r() - 150.0f, bar.y + 12.0f, 120.0f, 40.0f)), im::ButtonKind::Quiet)) {
             S.goFolded = false;
             im::sound(Sound::Open);
         }
@@ -1160,7 +1330,7 @@ void moveList(const std::vector<std::string>& san, bool visible) {
     gfx::setLayer(gfx::LAYER_MAIN);
     im::panel(p, 0.92f);
     TextStyle hs = style(font::FACE_TITLE, 21.0f, gold, HAlign::Center, 0.24f);
-    gfx::text("MOVES", p.cx(), p.y + 50.0f, hs);
+    gfx::text(T("movelist.title"), p.cx(), p.y + 50.0f, hs);
     im::ornamentRule(p.cx(), p.y + 68.0f, 110.0f);
     Rect area(p.x + 20.0f, p.y + 90.0f, p.w - 40.0f, p.h - 110.0f);
     float rowH = 38.0f;
@@ -1195,7 +1365,7 @@ void moveList(const std::vector<std::string>& san, bool visible) {
     }
     if (san.empty()) {
         TextStyle es = style(font::FACE_ITALIC, 22.0f, muted, HAlign::Center);
-        gfx::text("No moves yet.", area.cx(), area.y + 40.0f, es);
+        gfx::text(T("movelist.empty"), area.cx(), area.y + 40.0f, es);
     }
     gfx::popClip();
     if (maxScroll > 0.0f) {
@@ -1226,9 +1396,12 @@ void loadingScreen(float progress, const std::string& label) {
     float x0 = v.x * 0.5f - bw * 0.5f, y = v.y * 0.5f + 16.0f;
     float px = gfx::px();
     gfx::fill(Rect(x0, gfx::snap(y), bw, px), withAlpha(gold, 0.18f));
+    // The bar fills in the reading direction.
+    Rect bar(x0, gfx::snap(y), bw, px);
     float fx = x0 + bw * S.loadShown;
-    gfx::fillH(Rect(x0, gfx::snap(y), fx - x0, px), withAlpha(goldDeep, 0.8f), goldBright);
-    gfx::radial(vec2(fx, y), vec2(26.0f, 7.0f), withAlpha(goldBright, 0.5f), 0.0f, 1.0f);
+    if (im::rtl()) gfx::fillH(im::flip(bar, Rect(x0, bar.y, fx - x0, px)), goldBright, withAlpha(goldDeep, 0.8f));
+    else gfx::fillH(Rect(x0, bar.y, fx - x0, px), withAlpha(goldDeep, 0.8f), goldBright);
+    gfx::radial(vec2(im::flipX(bar, fx), y), vec2(26.0f, 7.0f), withAlpha(goldBright, 0.5f), 0.0f, 1.0f);
     gfx::diamond(vec2(x0 - 14.0f, y), 3.0f, withAlpha(gold, 0.7f));
     gfx::diamond(vec2(x0 + bw + 14.0f, y), 3.0f, withAlpha(gold, 0.7f));
     TextStyle ls = style(font::FACE_ITALIC, 23.0f, muted, HAlign::Center);

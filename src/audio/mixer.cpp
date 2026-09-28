@@ -25,6 +25,9 @@ struct Mixer::Voice {
     float ring[64];
     uint32_t w = 0;
     uint32_t start = 0;
+    // Windowed playback (PlayRequest::duration): source positions of the window, fade lengths.
+    double winStart = 0.0, winEnd = 0.0;  // winEnd 0 = whole sound
+    float fadeIn = 1.0f, fadeOut = 1.0f;
 };
 
 Mixer::Mixer(uint32_t seed) : rng_(seed, 99u), seed_(seed) {
@@ -221,6 +224,18 @@ bool Mixer::play(const PlayRequest& r) {
     v->pos = 0.0;
     float j = 0.5f * (rng_.bi() + rng_.bi());  // triangular in [-1, 1]
     v->rate = std::max(0.25f, r.pitch) * (1.0f + info.pitchJitter * j);
+    v->winStart = v->winEnd = 0.0;
+    if (r.duration > 0.0f) {
+        // The window is measured in source samples: the voice plays it at 'rate'.
+        const double len = double(v->length), win = double(r.duration) * double(v->rate) * double(kBankRate);
+        v->fadeIn = 0.004f * v->rate * float(kBankRate);
+        v->fadeOut = std::min(0.012f * v->rate * float(kBankRate), float(0.4 * win));
+        double room = len - win - 0.002 * kBankRate;
+        double start = 0.0;
+        if (room > 0.0) start = r.offset >= 0.0f ? std::min(room, double(r.offset) * kBankRate) : double(rng_.uni()) * room;
+        v->pos = v->winStart = start;
+        v->winEnd = std::min(len, start + win);
+    }
     v->gain = info.level * std::max(0.0f, r.gain) * dbToGain(info.levelJitterDb * rng_.bi());
     v->send = info.roomSend;
     v->position = r.pos;
@@ -231,7 +246,9 @@ bool Mixer::play(const PlayRequest& r) {
     v->start = clock_;
     ++slot.users;
     lastVariant_[si] = var;
-    if (refreshFn_) refreshFn_(refreshUser_, si, var);  // re-synthesise this slot with a new seed
+    // Re-synthesise this slot with a new seed. Windowed plays (many short strokes per second) take
+    // their variety from the random window position instead.
+    if (refreshFn_ && r.duration <= 0.0f) refreshFn_(refreshUser_, si, var);
     return true;
 }
 
@@ -262,9 +279,10 @@ void Mixer::renderVoice(Voice& v, int n, float bg) {
     const float tiltA = OnePole::coefFor(2500.0f, fs_);
     const float* d = v.data;
     const int len = v.length;
+    const bool windowed = v.winEnd > 0.0;
     for (int i = 0; i < n; ++i) {
         int ip = int(v.pos);
-        if (ip >= len) {
+        if (ip >= len || (windowed && v.pos >= v.winEnd)) {
             releaseVoice(v);
             return;
         }
@@ -275,6 +293,11 @@ void Mixer::renderVoice(Voice& v, int n, float bg) {
         } else {
             auto at = [&](int k) { return (k >= 0 && k < len) ? d[k] : 0.0f; };
             s = hermite(at(ip - 1), at(ip), at(ip + 1), at(ip + 2), f);
+        }
+        if (windowed) {
+            float a = std::min(1.0f, float(v.pos - v.winStart) / v.fadeIn);
+            float b = std::min(1.0f, float(v.winEnd - v.pos) / v.fadeOut);
+            s *= a * a * (3.0f - 2.0f * a) * b * b * (3.0f - 2.0f * b);
         }
         v.pos += step;
         v.tiltZ = s + tiltA * (v.tiltZ - s);

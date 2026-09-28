@@ -1,0 +1,403 @@
+# Scacelith - Deutsch
+# Übersetzung von assets/i18n/en.lang (gleiche Schlüssel, gleiche {n}). Plural: eins|mehrere.
+
+language.name = Deutsch
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = Ein
+common.off = Aus
+common.back = Zurück
+common.apply = Übernehmen
+common.discard = Verwerfen
+common.cancel = Abbrechen
+common.white = Weiß
+common.black = Schwarz
+common.main_menu = Hauptmenü
+number.decimal = ,
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = Das königliche Spiel
+menu.new_game = Neue Partie
+menu.options = Optionen
+menu.credits = Mitwirkende
+menu.quit = Beenden
+menu.version = Version {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = OPTIONEN
+options.tab.display = Anzeige
+options.tab.graphics = Grafik
+options.tab.audio = Ton
+options.tab.gameplay = Spiel
+options.tab.player = Spieler
+options.tab.controls = Steuerung
+options.pending = Änderungen gelten erst nach dem Übernehmen.
+options.unsaved.title = NICHT ÜBERNOMMENE ÄNDERUNGEN
+options.unsaved.text = Einige Optionen wurden geändert. Vor dem Verlassen übernehmen?
+
+options.language = Sprache
+options.language.help = Sprache der Menüs und Meldungen. Die Änderung gilt sofort.
+options.display_mode = Anzeigemodus
+options.fullscreen = Vollbild
+options.windowed = Fenster
+options.window_size = Fenstergröße
+options.window_size.help = Größe des Fensters im Fenstermodus. Das Vollbild nutzt immer die Desktop-Auflösung.
+options.vsync = V-Sync
+options.vsync.help = Synchronisiert die Bilder mit dem Monitor, um Bildrisse zu vermeiden.
+options.render_scale = Renderskalierung
+options.render_scale.help = Interne Auflösung des 3D-Bildes. Niedriger ist schneller, höher ist schärfer.
+
+options.quality = Qualität
+options.quality.low = Niedrig
+options.quality.medium = Mittel
+options.quality.high = Hoch
+options.quality.ultra = Ultra
+options.quality.help = Schatten, Spiegelungen, Umgebungsverdeckung und volumetrisches Licht.
+options.motion_blur = Bewegungsunschärfe
+options.depth_of_field = Tiefenschärfe
+options.brightness = Helligkeit
+options.brightness.neutral = Neutral
+options.brightness.help = Belichtungskorrektur der Kamera.
+
+options.master_volume = Gesamtlautstärke
+options.effects = Effekte
+options.ambience = Atmosphäre
+options.ambience.help = Das Murmeln des Saals: Kaminfeuer, ferne Schritte, die alte Uhr.
+options.ambience_volume = Lautstärke der Atmosphäre
+
+options.legal_moves = Legale Züge zeigen
+options.legal_moves.help = Hebt die Felder hervor, die eine berührte Figur erreichen kann. Ohne diese Hilfe zeigt nichts an, ob ein Zug regelgemäß ist: Der Schiedsrichter ahndet einen regelwidrigen Zug, sobald Sie die Uhr drücken.
+options.coordinates = Brettkoordinaten
+options.thinking_time = Realistische Bedenkzeit
+options.thinking_time.help = Ihr Gegner lässt sich Zeit wie ein menschlicher Spieler, statt sofort zu ziehen.
+options.mouse_sensitivity = Mausempfindlichkeit
+options.invert_look = Vertikale Achse umkehren
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Name
+player.name.help = Ihr Name, wie er oben auf den Partieformularen steht, in jeder Schrift.
+player.default_name = Mensch
+player.handwriting = Handschrift
+player.handwriting.help = Die Hand, die Ihre Züge notiert. Arabisch, Japanisch und Chinesisch haben eine eigene Handschrift.
+player.preview = AUF IHREM PARTIEFORMULAR
+hand.caveat = Locker
+hand.marck = Schreibschrift
+hand.badscript = Schräg
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Linksklick
+controls.touch = Figur berühren, dann ziehen
+controls.clock.keys = Leertaste  oder  Klick auf die Uhr
+controls.clock = Uhr drücken
+controls.look.keys = Rechte Maustaste halten
+controls.look = Umsehen
+controls.moves.keys = Tab
+controls.moves = Zugliste ein- oder ausblenden
+controls.menu.keys = Esc
+controls.menu = Menü
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NEUE PARTIE
+newgame.opponent = GEGNER
+newgame.time_control = BEDENKZEIT
+newgame.start = Starten
+newgame.elo = ~{0} Elo
+newgame.you_white = Sie spielen mit Weiß.
+newgame.you_black = Sie spielen mit Schwarz.
+newgame.colour_lot = Die Farben werden für die erste Partie ausgelost.
+newgame.colour_alternate = Danach wechseln die Farben von Partie zu Partie.
+
+# Custom opponent: Stockfish parameters
+engine.skill = Spielstärke
+engine.skill.help = „Skill Level“ von Stockfish (0–20). Wird ignoriert, solange die Stärke per Elo begrenzt ist.
+engine.limit_elo = Stärke begrenzen (Elo)
+engine.limit_elo.help = UCI_LimitStrength: Die Engine zielt auf die Elo-Zahl unten.
+engine.elo = Elo
+engine.depth = Suchtiefe
+engine.plies = {0} Halbzug|{0} Halbzüge
+engine.move_time = Zeit pro Zug
+engine.nodes = Knotenlimit
+engine.no_limit = Aus
+engine.thousand = {0} Tausend
+engine.million = {0} Millionen
+
+# Time controls
+tc.unlimited = Unbegrenzt
+tc.no_clock = Ohne Uhr
+tc.bullet = Bullet
+tc.blitz = Blitz
+tc.rapid = Schnellschach
+tc.classical = Klassisch
+tc.custom = Eigene
+tc.your_own = Nach Wahl
+tc.base_time = Grundzeit
+tc.base_time.help = Anfangszeit auf jeder Uhrseite (Minuten : Sekunden).
+tc.increment = Inkrement
+tc.increment.help = Fischer-Bonus, der nach jedem Zug gutgeschrieben wird.
+tc.delay = Verzögerung
+tc.delay.help = Bronstein-Modus: Bis zu dieser Dauer verbrauchte Zeit wird nach jedem Zug zurückgegeben.
+tc.no_delay = Keine
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, Verzögerung {1} s
+
+# Opponent presets
+preset.novice.name = Neuling
+preset.novice.desc = Kennt gerade die Gangart der Figuren: lässt Material hängen.
+preset.beginner.name = Anfänger
+preset.beginner.desc = Kennt die Grundlagen, verliert aber noch oft Material.
+preset.casual.name = Gelegenheitsspieler
+preset.casual.desc = Ein entspannter Gegner: vernünftige Züge, häufige Fehler.
+preset.club_player.name = Vereinsspieler
+preset.club_player.desc = Solider Vereinsspieler, der grobe Fehler bestraft.
+preset.advanced.name = Fortgeschritten
+preset.advanced.desc = Starker Vereinsspieler mit gutem taktischem Blick.
+preset.expert.name = Experte
+preset.expert.desc = Turnierexperte: irrt selten, verwertet Vorteile.
+preset.master.name = Meister
+preset.master.desc = Meisterstärke: tiefe Berechnung und feines Positionsspiel.
+preset.grandmaster.name = Großmeister
+preset.grandmaster.desc = Großmeisterniveau: äußerst schwer zu schlagen.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 16 mit voller Stärke. Viel Glück.
+preset.custom.name = Benutzerdefiniert
+preset.custom.desc = Ihre eigenen Engine-Einstellungen.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = MITWIRKENDE
+credits.game.head = SCACELITH
+credits.game = Eine Schachpartie in einem königlichen Saal, auf einer eigenen OpenGL-4.6-Engine.
+credits.engine.head = SCHACH-ENGINE
+credits.engine = Stockfish 16, von den Stockfish-Entwicklern.
+credits.engine.licence = GNU General Public License v3.
+credits.fonts.head = SCHRIFTEN
+credits.fonts = EB Garamond von Georg Duffner und Cinzel von Natanael Gama; Amiri von Khaled Hosny.
+credits.fonts.hand = Handschriften: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Schachfiguren aus GNU FreeFont (GPL v3 mit Font-Ausnahme).
+credits.quote = „Schach ist die Kunst der Analyse.“  — Michail Botwinnik
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUSE
+pause.resume = Fortsetzen
+pause.offer_draw = Remis anbieten
+pause.claim_draw = Remis reklamieren
+pause.claim_draw.help = Dreifache Stellungswiederholung oder 50-Züge-Regel.
+pause.resign = Aufgeben
+confirm.resign.title = AUFGEBEN
+confirm.resign.text = Diese Partie aufgeben? Ihr Gegner wird zum Sieger erklärt.
+confirm.resign.ok = Aufgeben
+confirm.leave.title = PARTIE VERLASSEN
+confirm.leave.text = Zurück zum Hauptmenü? Die laufende Partie wird abgebrochen.
+confirm.leave.ok = Verlassen
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = UMWANDLUNG IN
+piece.queen = Dame
+piece.rook = Turm
+piece.bishop = Läufer
+piece.knight = Springer
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = Die Partie endet remis.
+gameover.draw_moves = Die Partie endet nach {0} Zug remis.|Die Partie endet nach {0} Zügen remis.
+gameover.win = Gut gespielt — Sie gewinnen.
+gameover.win_moves = Gut gespielt — Sie gewinnen in {0} Zug.|Gut gespielt — Sie gewinnen in {0} Zügen.
+gameover.loss = Ihr Gegner gewinnt.
+gameover.loss_moves = Ihr Gegner gewinnt in {0} Zug.|Ihr Gegner gewinnt in {0} Zügen.
+gameover.rematch = Revanche
+gameover.view_board = Brett ansehen
+gameover.show = Zeigen
+
+# Reasons
+reason.checkmate = Schachmatt
+reason.resignation = Aufgabe
+reason.timeout = Zeitüberschreitung
+reason.illegal_moves = Zweiter regelwidriger Zug (verloren)
+reason.stalemate = Patt
+reason.insufficient = Tote Stellung (ungenügendes Material)
+reason.timeout_vs_insufficient = Zeit überschritten, aber der Gegner kann nicht mattsetzen
+reason.fivefold = Fünffache Stellungswiederholung
+reason.75_moves = 75-Züge-Regel
+reason.threefold_claim = Dreifache Stellungswiederholung (reklamiert)
+reason.50_moves_claim = 50-Züge-Regel (reklamiert)
+reason.agreement = Remis durch Vereinbarung
+reason.illegal_vs_insufficient = Zweiter regelwidriger Zug, aber der Gegner kann nicht mattsetzen
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = ZÜGE
+movelist.empty = Noch keine Züge.
+
+# ---- Loading -----------------------------------------------------------------------------------
+loading.materials = Materialien vorbereiten
+loading.hall = Den Saal errichten
+loading.furniture = Tisch und Stühle schnitzen
+loading.board = Das Brett polieren
+loading.pieces = Die Figuren drechseln
+loading.clock = Die Uhr zusammenbauen
+loading.porcelain = Das Porzellan brennen
+loading.ready = Bereit
+
+# ---- Notifications during the game -------------------------------------------------------------
+notify.no_draw_claim = In dieser Stellung kann kein Remis reklamiert werden.
+notify.flag_you = Ihre Zeit ist abgelaufen.
+notify.flag_opponent = Die Zeit Ihres Gegners ist abgelaufen.
+notify.touched.pawn = Berührt – geführt: Sie müssen den berührten Bauern ziehen.
+notify.touched.knight = Berührt – geführt: Sie müssen den berührten Springer ziehen.
+notify.touched.bishop = Berührt – geführt: Sie müssen den berührten Läufer ziehen.
+notify.touched.rook = Berührt – geführt: Sie müssen den berührten Turm ziehen.
+notify.touched.queen = Berührt – geführt: Sie müssen die berührte Dame ziehen.
+notify.touched.king = Berührt – geführt: Sie müssen den berührten König ziehen.
+notify.touched.piece = Berührt – geführt: Sie müssen die berührte Figur ziehen.
+notify.touched_square = Berührt – geführt: Sie müssen die Figur auf {0} ziehen.
+notify.press_clock = Drücken Sie die Uhr, um Ihren Zug abzuschließen (Leertaste).
+notify.illegal = Regelwidriger Zug.
+notify.cannot_move = Dieser Zug ist nicht möglich.
+notify.move_first = Ziehen Sie, bevor Sie die Uhr drücken.
+notify.draw_already_offered = Sie haben in diesem Zug bereits Remis angeboten.
+notify.draw_accepted = Ihr Gegner nimmt das Remis an.
+notify.draw_declined = Ihr Gegner lehnt das Remisangebot ab.
+notify.draw_claimed = Ihr Gegner reklamiert Remis.
+
+# ---- Arbiter -----------------------------------------------------------------------------------
+arbiter.join = {0} {1}
+arbiter.no_move = Schiedsrichter: Die Uhr wurde gedrückt, ohne einen Zug auszuführen; das gilt als regelwidriger Zug.
+arbiter.unpromoted = Schiedsrichter: regelwidriger Zug, der Bauer wurde vor dem Drücken der Uhr nicht durch eine neue Figur ersetzt.
+arbiter.illegal = Schiedsrichter: regelwidriger Zug.
+arbiter.second_loses.white = Dies ist der zweite regelwidrige Zug von Weiß: Weiß verliert die Partie.
+arbiter.second_loses.black = Dies ist der zweite regelwidrige Zug von Schwarz: Schwarz verliert die Partie.
+arbiter.second_draw.white = Dies ist der zweite regelwidrige Zug von Weiß, aber Schwarz kann nicht mattsetzen: Die Partie endet remis.
+arbiter.second_draw.black = Dies ist der zweite regelwidrige Zug von Schwarz, aber Weiß kann nicht mattsetzen: Die Partie endet remis.
+arbiter.queen = Der Bauer wird zur Dame.
+arbiter.queen_one_minute.white = Der Bauer wird zur Dame und Weiß erhält eine zusätzliche Minute.
+arbiter.queen_one_minute.black = Der Bauer wird zur Dame und Schwarz erhält eine zusätzliche Minute.
+arbiter.queen_two_minutes.white = Der Bauer wird zur Dame und Weiß erhält zwei zusätzliche Minuten.
+arbiter.queen_two_minutes.black = Der Bauer wird zur Dame und Schwarz erhält zwei zusätzliche Minuten.
+arbiter.restored = Die Stellung wird wiederhergestellt.
+arbiter.restored_one_minute.white = Die Stellung wird wiederhergestellt und Weiß erhält eine zusätzliche Minute.
+arbiter.restored_one_minute.black = Die Stellung wird wiederhergestellt und Schwarz erhält eine zusätzliche Minute.
+arbiter.restored_two_minutes.white = Die Stellung wird wiederhergestellt und Weiß erhält zwei zusätzliche Minuten.
+arbiter.restored_two_minutes.black = Die Stellung wird wiederhergestellt und Schwarz erhält zwei zusätzliche Minuten.
+arbiter.one_minute.white = Weiß erhält eine zusätzliche Minute.
+arbiter.one_minute.black = Schwarz erhält eine zusätzliche Minute.
+arbiter.two_minutes.white = Weiß erhält zwei zusätzliche Minuten.
+arbiter.two_minutes.black = Schwarz erhält zwei zusätzliche Minuten.
+arbiter.second_loses = Ein zweiter regelwidriger Zug verliert die Partie.
+arbiter.touched.white = Weiß muss die berührte Figur ziehen.
+arbiter.touched.black = Schwarz muss die berührte Figur ziehen.
+arbiter.game_over = Die Partie ist beendet.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Partie ansehen
+
+viewer.title = PARTIE ANSEHEN
+viewer.white = WEISS
+viewer.black = SCHWARZ
+viewer.time_control = BEDENKZEIT
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Farben tauschen
+viewer.note = Beide Spieler sind Stockfish. Fliegen Sie frei durch den Saal, während sie spielen: Niemand sieht Sie.
+viewer.summary = {0} gegen {1}
+viewer.custom = Eigene
+viewer.tc.custom = Nach Wahl
+viewer.tc.none = Ohne Uhr
+viewer.tc.bullet = Bullet
+viewer.tc.blitz = Blitz
+viewer.tc.rapid = Schnellschach
+viewer.tc.classical = Klassisch
+viewer.base_time = Grundzeit
+viewer.increment = Inkrement
+viewer.delay = Verzögerung
+viewer.off = Keine
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = Verzögerung {0} s
+viewer.back = Zurück
+viewer.start = Starten
+
+viewer.paused = PAUSE
+viewer.resume = Fortsetzen
+viewer.options = Optionen
+viewer.main_menu = Hauptmenü
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = STEUERUNG
+viewer.keys.move = W A S D  ·  Z Q S D  ·  Pfeiltasten
+viewer.controls.move = Bewegen
+viewer.keys.updown = E, Leertaste  /  C, Strg
+viewer.controls.updown = Hoch / runter
+viewer.keys.fast = Umschalt
+viewer.controls.fast = Schneller
+viewer.keys.look = Rechte Maustaste
+viewer.controls.look = Umsehen
+viewer.keys.speed = Mausrad
+viewer.controls.speed = Tempo
+viewer.keys.views = 1 – 9
+viewer.controls.views = Blickwinkel
+viewer.keys.eyes = 0
+viewer.controls.eyes = Mit den Augen des Spielers am Zug
+viewer.keys.moves = Tab
+viewer.controls.moves = Zugliste
+viewer.keys.menu = Esc
+viewer.controls.menu = Menü
+viewer.keys.hide = H
+viewer.controls.hide = Diese Hinweise ausblenden
+viewer.speed = Tempo {0} m/s
+viewer.view.0 = Mit den Augen der Spieler
+viewer.view.1 = Neben dem Tisch
+viewer.view.2 = Über dem Brett
+viewer.view.3 = Der Saal
+viewer.view.4 = Die Uhr
+viewer.view.5 = Das Gesicht von Weiß
+viewer.view.6 = Das Gesicht von Schwarz
+viewer.view.7 = Das Duell
+viewer.view.8 = Die Fenster
+viewer.view.9 = Die Wandteppiche
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = Weiß
+viewer.side.black = Schwarz
+viewer.flag.white = Die Zeit von Weiß ist abgelaufen.
+viewer.flag.black = Die Zeit von Schwarz ist abgelaufen.
+viewer.claims_draw = {0} reklamiert Remis.
+viewer.offer_accepted = {0} bietet Remis an, {1} nimmt an.
+viewer.offer_declined = {0} bietet Remis an, {1} lehnt ab.
+viewer.gameover.white_wins = Weiß gewinnt nach dem {0}. Zug.
+viewer.gameover.black_wins = Schwarz gewinnt nach dem {0}. Zug.
+viewer.gameover.draw = Die Partie endet nach dem {0}. Zug remis.
+viewer.gameover.players = {0} gegen {1}
+viewer.watch_again = Noch einmal
+
+# The player's rating
+elo.label = ELO
+elo.no_games = Noch keine gewertete Partie
+elo.provisional = Vorläufige Wertung
+elo.peak = Höchstwert {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Ihre Elo: {0}
+elo.expected = Erwartungswert {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · diese Partie wird nicht gewertet
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Partieformular
+scoresheet.event = Turnier
+scoresheet.date = Datum
+scoresheet.round = Runde
+scoresheet.board = Brett
+scoresheet.page = Blatt
+scoresheet.white = Weiß
+scoresheet.black = Schwarz
+scoresheet.elo = Elo
+scoresheet.result = Ergebnis
+scoresheet.move_no = Nr.
+scoresheet.sign_white = Unterschrift Weiß
+scoresheet.sign_black = Unterschrift Schwarz
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = K D T L S
+scoresheet.date_format = {0}.{1}.{2}

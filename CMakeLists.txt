@@ -43,7 +43,13 @@ endif()
 # Engine-free modules shared by the game and the unit tests
 # ---------------------------------------------------------------------------------------------
 file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
-    ${ROOT}/src/core/*.cpp ${ROOT}/src/math/*.cpp ${ROOT}/src/chess/*.cpp ${ROOT}/src/ai/*.cpp ${ROOT}/src/audio/*.cpp)
+    ${ROOT}/src/core/*.cpp ${ROOT}/src/math/*.cpp ${ROOT}/src/chess/*.cpp ${ROOT}/src/ai/*.cpp ${ROOT}/src/audio/*.cpp
+    ${ROOT}/src/i18n/*.cpp)
+# Engine-free parts of src/game (Elo, observer camera, camera flights, scoresheet layout): in the
+# core library so the unit tests can use them, and left out of the game sources below.
+set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cpp ${ROOT}/src/game/observer_camera.cpp
+    ${ROOT}/src/game/scoresheet_layout.cpp)
+list(APPEND CORE_SOURCES ${GAME_CORE_SOURCES})
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
 target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party)
 target_compile_options(scacelith_core PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
@@ -66,6 +72,7 @@ file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS
     ${ROOT}/src/platform/*.cpp ${ROOT}/src/gl/*.cpp ${ROOT}/src/render/*.cpp ${ROOT}/src/scene/*.cpp
     ${ROOT}/src/character/*.cpp ${ROOT}/src/anim/*.cpp ${ROOT}/src/ui/*.cpp ${ROOT}/src/game/*.cpp
     ${ROOT}/src/app/*.cpp)
+list(REMOVE_ITEM GAME_SOURCES ${GAME_CORE_SOURCES})
 set(GAME_EXTRA)
 if(WIN32)
     list(APPEND GAME_EXTRA ${ROOT}/res/scacelith.rc)

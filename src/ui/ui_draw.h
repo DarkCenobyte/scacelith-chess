@@ -71,6 +71,8 @@ void circle(vec2 center, float radius, vec4 c, float strokeWidth = 0.0f);
 void radial(vec2 center, vec2 radii, vec4 c, float t0 = 0.0f, float t1 = 1.0f);
 
 // ---- Text ---------------------------------------------------------------------------------------
+// Every text is shaped (text_shape.h): per-script font fallback, Arabic joining, bidirectional
+// reordering. Alignment is the caller's choice (right-to-left layouts pass HAlign::Right).
 enum class HAlign { Left, Center, Right };
 struct TextStyle {
     int face = font::FACE_TEXT;
@@ -80,16 +82,32 @@ struct TextStyle {
     float tracking = 0.0f;     // extra letter spacing, em
     float weight = 0.0f;       // SDF dilation, in reference pixels (+ = bolder)
     float softness = 0.0f;     // extra edge blur in reference pixels (glows / shadows)
+    int hand = -1;             // >= 0: a player's handwriting (font::HandStyle), 'face' is ignored
+    int dir = -1;              // base direction: -1 auto (right-to-left when the UI language is and
+                               // the text contains right-to-left script, else first strong
+                               // character), 0 LTR, 1 RTL
 };
 float textWidth(const std::string& s, const TextStyle& st);
+// Font size that fits s in maxWidth (never below minScale * st.size).
+float fitSize(const std::string& s, const TextStyle& st, float maxWidth, float minScale = 0.7f);
+// Base direction text() uses for s (0 LTR, 1 RTL).
+int textDirection(const std::string& s, const TextStyle& st);
+// Carets of text fields, on the line text() draws for s with Left alignment: offset (reference
+// pixels from x) of the caret before the logical character 'index', and the index nearest to an
+// offset. (ui.h's ui::text() hides the text:: shaping namespace from UI code, hence these.)
+float caretOffset(const std::string& s, const TextStyle& st, int index);
+int caretAt(const std::string& s, const TextStyle& st, float offset);
 // Draws a single line; y is the baseline. Returns the advance width.
 float text(const std::string& s, float x, float baseline, const TextStyle& st);
 // Draws text vertically centred on cy (capital height), horizontally per st.align within [x0,x1].
 void textIn(const std::string& s, const Rect& r, const TextStyle& st);
 // Word-wrapped paragraph starting with its first baseline at 'baseline'. Returns the number of
-// lines. lineHeight in reference pixels (0 = 1.3 * size). Explicit '\n' breaks lines.
+// lines. lineHeight in reference pixels (0 = 1.3 * size). Explicit '\n' breaks lines. Lines break
+// at spaces, and between CJK characters (with the usual line start / end prohibitions).
 int textWrapped(const std::string& s, float x, float baseline, float maxWidth, const TextStyle& st, float lineHeight = 0.0f);
 int wrapLineCount(const std::string& s, float maxWidth, const TextStyle& st);
+// Width of the widest wrapped line.
+float wrapWidth(const std::string& s, float maxWidth, const TextStyle& st);
 float capHeight(const TextStyle& st);
 
 }  // namespace gfx

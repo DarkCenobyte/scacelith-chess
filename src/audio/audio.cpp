@@ -239,6 +239,27 @@ void play(Sfx s, m::vec3 position, float gain, float pitch) {
     pushPlay(r);
 }
 
+void playFor(Sfx s, m::vec3 position, float seconds, float gain, float pitch) {
+    if (int(s) < 0 || int(s) >= int(Sfx::Count) || !finiteVec(position) || !std::isfinite(gain) || !std::isfinite(pitch) ||
+        !(seconds > 0.0f) || !std::isfinite(seconds))
+        return;
+    PlayRequest r;
+    r.sfx = s;
+    r.pos = position;
+    r.gain = gain;
+    r.pitch = pitch;
+    r.bus = sfxInfo(s).ui ? Bus::UI : Bus::Effects;
+    r.spatial = true;
+    r.duration = seconds;
+    pushPlay(r);
+}
+
+void playPenStroke(m::vec3 tip, float seconds, float gain) {
+    play(Sfx::PenTap, tip, gain);
+    // Very short strokes (dots) are mostly the tick; the friction needs a few milliseconds to sound.
+    if (seconds > 0.015f) playFor(Sfx::PenWrite, tip, seconds, gain);
+}
+
 void playUI(Sfx s, float gain) {
     if (int(s) < 0 || int(s) >= int(Sfx::Count) || !std::isfinite(gain)) return;
     PlayRequest r;
@@ -296,6 +317,11 @@ m::vec3 defaultPosition(Sfx s) {
         case Sfx::Handshake: return m::vec3(0.0f, 1.0f, 0.0f);
         case Sfx::ServoShort: return m::vec3(0.2f, 1.1f, -0.55f);   // opponent's right shoulder
         case Sfx::ChairCreak: return m::vec3(0.0f, layout::SEAT_HEIGHT, -layout::CHAIR_Z);
+        case Sfx::PenWrite:
+        case Sfx::PenTap:
+        case Sfx::PageTurn:
+        case Sfx::PageFlap:  // White's scoresheet (clock on +X)
+            return m::vec3(-layout::SCORESHEET_X, layout::TABLE_TOP_Y + layout::SCORESHEET_THICKNESS, layout::SCORESHEET_Z);
         default: return whiteSeatListener().pos;
     }
 }

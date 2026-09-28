@@ -585,6 +585,166 @@ std::vector<float> bowl(Rng& r, float f0, float seconds, float bright, float dec
     return finish(out, 0.0f, 0.4f * seconds);  // long natural-sounding release, no truncation
 }
 
+// ---------------------------------------------------------------------------------------------
+// Scoresheet and pen. The pad is a 5 mm stack of paper on a grey card board lying on the table:
+// a soft, heavily damped support (card + paper modes at a few hundred Hz to ~3 kHz, Q ~ 6-12)
+// that colours everything the pen and the pages do.
+Modes padModes(Rng& r) {
+    return jittered(r, {380.0f, 690.0f, 1120.0f, 1650.0f, 2400.0f, 3300.0f}, {0.7f, 1.0f, 0.9f, 0.7f, 0.5f, 0.3f}, 6.0f,
+                    12.0f, 0.08f);
+}
+
+// Ballpoint writing: the ball rolls in its socket over the paper fibres. The friction noise is
+// broadband with a stick-slip grain whose density and brightness follow the tip speed; handwriting
+// moves the tip in quick strokes (~5-8 per second) with speed minima at the direction reversals,
+// where the ball ticks faintly as it changes direction. A sustained ~3 s texture: the mixer plays
+// a window of it per pen-down stroke.
+std::vector<float> penWrite(Rng& r) {
+    const float T = r.range(2.9f, 3.3f);
+    Buf out(T + 0.1f);
+    // Stroke speed profile: a chain of strokes of random length and peak speed.
+    std::vector<float> speed(size_t(out.n()), 0.0f);
+    std::vector<int> reversals;
+    float t = 0.0f;
+    while (t < T) {
+        float d = r.range(0.06f, 0.17f), peak = r.range(0.45f, 1.0f);
+        int i0 = idx(t), i1 = std::min(out.n(), idx(t + d));
+        for (int i = i0; i < i1; ++i) {
+            float x = float(i - i0) / float(std::max(1, i1 - i0));
+            float s = std::sin(kPi * x);
+            speed[size_t(i)] = 0.12f + 0.88f * peak * std::pow(s, 0.8f);  // the ball never quite stops
+        }
+        reversals.push_back(i1);
+        t += d;
+    }
+    // Fade in/out over the first/last 60 ms so the whole buffer is a clean one-shot too.
+    const int edge = idx(0.06f), stop = out.n() - idx(0.02f);
+    for (int i = 0; i < out.n(); ++i) {
+        float a = std::max(0.0f, std::min(1.0f, float(std::min(i, stop - i)) / float(edge)));
+        speed[size_t(i)] *= a * a * (3.0f - 2.0f * a);
+    }
+    FastNoise n(r.next());
+    Svf hp, lp, body;
+    hp.set(r.range(900.0f, 1300.0f), 0.6f, FS);
+    body.set(r.range(2600.0f, 3400.0f), 1.4f, FS);
+    Excitation drive(out.n());
+    const float grainDepth = r.range(0.45f, 0.65f);
+    float ge = 0.0f;
+    const float gdec = std::exp(-1.0f / (0.0004f * FS));
+    for (int i = 0; i < out.n(); ++i) {
+        float s = speed[size_t(i)];
+        if ((i & 31) == 0) lp.set(2500.0f + 5500.0f * s, 0.6f, FS);  // brighter when faster
+        float w = n.next();
+        // Stick-slip grain: 250-1100 micro-slips per second, denser with speed.
+        ge *= gdec;
+        if (r.uni() < (250.0f + 850.0f * s) / FS) ge += r.range(0.4f, 1.6f);
+        float v = lp.lp(hp.hp(w)) * ((1.0f - grainDepth) + grainDepth * ge);
+        v += 0.35f * body.bpNorm(w) * s;  // the ball's own ring in its socket
+        float amp = s * s * (1.4f - 0.4f * s);
+        out.x[size_t(i)] += 0.2f * v * amp;
+        drive.add(i, 0.02f * v * amp);
+    }
+    // The pad picks up the friction (its low modes give the writing its "on a pad" body).
+    renderModes(out, drive, padModes(r), 1.0f);
+    // Faint ticks at the direction reversals.
+    Excitation ticks(out.n());
+    for (int i : reversals)
+        if (i > edge && i < stop - edge && r.chance(0.6f)) ticks.pulse(float(i) / FS, 0.08e-3f, r.range(0.01f, 0.03f));
+    renderModes(out, ticks, padModes(r), 1.0f);
+    renderModes(out, ticks, jittered(r, {5200.0f, 7900.0f}, {1.0f, 0.6f}, 20.0f, 40.0f), 0.5f);
+    return finish(out, 400.0f, 0.03f);
+}
+
+// The ballpoint touching down: the tip's steel ball and plastic cone tick against the paper, the
+// pad under it thumps very softly.
+std::vector<float> penTap(Rng& r) {
+    Buf out(0.12f);
+    const float t0 = 0.002f;
+    Excitation e(out.n());
+    e.pulse(t0, r.range(0.10e-3f, 0.2e-3f), 1.0f);
+    renderModes(out, e, padModes(r), 1.0f);
+    renderModes(out, e, jittered(r, {3900.0f, 6100.0f, 8700.0f}, {1.0f, 0.6f, 0.35f}, 25.0f, 45.0f, 0.08f), 0.35f);
+    Excitation soft(out.n());
+    soft.pulse(t0, r.range(0.8e-3f, 1.4e-3f), 0.6f);
+    renderModes(out, soft, Modes{{r.range(160.0f, 220.0f), 0.004f, 0.3f}}, 1.0f);
+    noiseBurst(out, r, {t0, 0.0002f, 0.0015f, 0.012f, 0.05f, 2000.0f, 9000.0f});
+    return finish(out, 120.0f);
+}
+
+// Crackle of a bending sheet: sparse micro-buckling events (Poisson, rate(t) per second), each a
+// short band-passed noise grain at a random pitch, amplitudes spread over ~20 dB.
+void paperCrackle(Buf& out, Rng& r, float t0, float dur, float amp, const std::function<float(float)>& rate) {
+    FastNoise n(r.next());
+    float t = t0;
+    while (t < t0 + dur) {
+        float lambda = std::max(1.0f, rate(t - t0));
+        t += r.expo(1.0f / lambda);
+        if (t >= t0 + dur) break;
+        Svf bp;
+        bp.set(r.logRange(1800.0f, 9000.0f), r.range(1.0f, 3.0f), FS);
+        float a = amp * std::pow(10.0f, -r.uni()), len = r.range(0.0004f, 0.003f);
+        int i0 = idx(t), nl = std::max(4, idx(len));
+        for (int k = 0; k < nl && i0 + k < out.n(); ++k) {
+            float e = std::exp(-4.0f * float(k) / float(nl));
+            out.x[size_t(i0 + k)] += bp.bpNorm(n.next()) * a * e;
+        }
+    }
+}
+
+// Page turn: the fingertip slides under the corner and pinches it (fingernail scratch on paper,
+// a light tap on the stack), the sheet bends and lifts (crackles, the page unsticking from the one
+// below), then swings over the binding (air whoosh: low-passed noise following the swing speed,
+// with a little flutter). The landing is PageFlap.
+std::vector<float> pageTurn(Rng& r) {
+    const float T = r.range(1.0f, 1.15f);
+    Buf out(T + 0.15f);
+    const float t0 = 0.004f;
+    noiseBurst(out, r, {t0, 0.01f, 0.03f, 0.1f, r.range(0.10f, 0.16f), 1800.0f, 8000.0f, 0.6f, r.range(500.0f, 900.0f)});
+    Excitation tap(out.n());
+    tap.pulse(t0 + r.range(0.04f, 0.08f), 0.4e-3f, 0.3f);
+    renderModes(out, tap, padModes(r), 1.0f);
+    // Lift and bend: crackles densest while the curl forms.
+    const float tb = t0 + r.range(0.1f, 0.14f);
+    paperCrackle(out, r, tb, 0.55f, r.range(0.25f, 0.35f), [](float t) {
+        float x = t / 0.55f;
+        return 40.0f + 260.0f * std::sin(kPi * std::min(1.0f, x)) * std::exp(-1.5f * x);
+    });
+    noiseBurst(out, r, {tb, 0.04f, 0.12f, 0.35f, r.range(0.08f, 0.12f), 600.0f, 5000.0f, 0.3f, 300.0f});
+    // Swing: whoosh through the air, speed peaking past the middle of the turn.
+    FastNoise n(r.next());
+    Svf lp, hp;
+    hp.set(180.0f, 0.6f, FS);
+    const float ts = t0 + 0.2f, te = T - 0.02f;
+    const float fl = r.range(9.0f, 14.0f), flPh = r.range(0.0f, kTau), wAmp = r.range(0.35f, 0.5f);
+    for (int i = idx(ts); i < idx(te) && i < out.n(); ++i) {
+        float x = (float(i) / FS - ts) / (te - ts);
+        float s = std::sin(kPi * x);
+        s = s * s * (0.6f + 0.4f * x);
+        if ((i & 31) == 0) lp.set(500.0f + 1800.0f * s, 0.7f, FS);
+        float flutter = 1.0f + 0.25f * fastSin(kTau * fl * float(i) / FS + flPh);
+        out.x[size_t(i)] += lp.lp(hp.hp(n.next())) * s * flutter * wAmp;
+    }
+    // A few crackles as the sheet straightens over the top.
+    paperCrackle(out, r, t0 + 0.55f, 0.35f, 0.12f, [](float) { return 45.0f; });
+    return finish(out, 120.0f, 0.06f);
+}
+
+// Page landing face down: the air cushion under the falling sheet escapes (a soft low puff), the
+// sheet slaps the stack (pad thump) and settles with a couple of paper ticks.
+std::vector<float> pageFlap(Rng& r) {
+    Buf out(0.4f);
+    const float t0 = 0.004f;
+    noiseBurst(out, r, {t0, 0.012f, 0.035f, 0.15f, r.range(0.5f, 0.7f), 90.0f, r.range(700.0f, 1000.0f)});
+    Excitation slap(out.n());
+    float ts = t0 + r.range(0.018f, 0.03f);
+    slap.pulse(ts, r.range(2.0e-3f, 3.5e-3f), 1.0f);
+    renderModes(out, slap, padModes(r), 0.8f);
+    renderModes(out, slap, tableModes(r, 0.2f, r.range(0.2f, 0.8f)), 0.35f);
+    noiseBurst(out, r, {ts, 0.001f, 0.01f, 0.05f, r.range(0.15f, 0.25f), 1200.0f, 7000.0f});
+    paperCrackle(out, r, ts + 0.01f, 0.12f, 0.08f, [](float t) { return 60.0f * std::exp(-t / 0.05f); });
+    return finish(out, 60.0f);
+}
+
 }  // namespace
 
 const SfxInfo& sfxInfo(Sfx s) {
@@ -603,6 +763,10 @@ const SfxInfo& sfxInfo(Sfx s) {
         {"game_end", dbToGain(-21.0f), 0.4f, 0.004f, 0.5f, true},
         {"capture_click", dbToGain(-10.0f), 0.22f, 0.03f, 1.5f, false},
         {"table_place", dbToGain(-10.0f), 0.22f, 0.03f, 1.5f, false},
+        {"pen_write", dbToGain(-24.0f), 0.18f, 0.04f, 1.5f, false},
+        {"pen_tap", dbToGain(-30.0f), 0.18f, 0.05f, 2.0f, false},
+        {"page_turn", dbToGain(-20.0f), 0.25f, 0.04f, 1.5f, false},
+        {"page_flap", dbToGain(-19.0f), 0.25f, 0.04f, 1.5f, false},
     };
     int i = int(s);
     if (i < 0 || i >= int(Sfx::Count)) i = 0;
@@ -626,6 +790,10 @@ std::vector<float> synthesize(Sfx s, uint32_t seed) {
         case Sfx::GameEnd: return bowl(r, 146.8f, 5.5f, 0.7f, 1.2f);
         case Sfx::CaptureClick: return captureClick(r);
         case Sfx::TablePlace: return tablePlace(r);
+        case Sfx::PenWrite: return penWrite(r);
+        case Sfx::PenTap: return penTap(r);
+        case Sfx::PageTurn: return pageTurn(r);
+        case Sfx::PageFlap: return pageFlap(r);
         default: return std::vector<float>(64, 0.0f);
     }
 }
@@ -633,8 +801,11 @@ std::vector<float> synthesize(Sfx s, uint32_t seed) {
 const char* sfxName(Sfx s) { return sfxInfo(s).name; }
 
 int bankVariants(Sfx s) {
-    // The long, rarely played tones keep fewer variants (memory); everything else kBankVariants.
-    return (s == Sfx::GameStart || s == Sfx::GameEnd) ? 3 : kBankVariants;
+    // The long, rarely played tones keep fewer variants (memory); the pen friction texture is
+    // played in random windows, so a few long variants are plenty; everything else kBankVariants.
+    if (s == Sfx::GameStart || s == Sfx::GameEnd) return 3;
+    if (s == Sfx::PenWrite) return 4;
+    return kBankVariants;
 }
 
 }  // namespace audio

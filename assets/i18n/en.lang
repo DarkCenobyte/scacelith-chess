@@ -1,0 +1,413 @@
+# Scacelith - English (reference language)
+#
+# One "key = value" per line, UTF-8; lines starting with '#' are comments. "\n" is a line break,
+# {0} {1}... are placeholders. A value with forms separated by '|' is a plural chosen by the count
+# (English: one|other; see src/i18n/i18n.h for the forms of each language).
+# Every other assets/i18n/<code>.lang file translates exactly these keys (tests/i18n_tests.cpp
+# checks it); a key it lacks falls back to English. Titles are written in capitals here because
+# the title face (Cinzel) is an inscriptional capital face.
+# Keep the sections: other parts of the game add their keys in sections of their own.
+
+language.name = English
+
+# ---- Common words ------------------------------------------------------------------------------
+common.on = On
+common.off = Off
+common.back = Back
+common.apply = Apply
+common.discard = Discard
+common.cancel = Cancel
+common.white = White
+common.black = Black
+common.main_menu = Main menu
+# Decimal separator of numbers ("2.5 s").
+number.decimal = .
+number.percent = {0} %
+
+# ---- Title menu --------------------------------------------------------------------------------
+menu.subtitle = The Royal Game
+menu.new_game = New Game
+menu.options = Options
+menu.credits = Credits
+menu.quit = Quit
+menu.version = Version {0}
+
+# ---- Options -----------------------------------------------------------------------------------
+options.title = OPTIONS
+options.tab.display = Display
+options.tab.graphics = Graphics
+options.tab.audio = Audio
+options.tab.gameplay = Gameplay
+options.tab.player = Player
+options.tab.controls = Controls
+options.pending = Changes take effect once applied.
+options.unsaved.title = UNSAVED CHANGES
+options.unsaved.text = Some options were changed. Apply them before leaving?
+
+options.language = Language
+options.language.help = Language of the menus and messages. It changes at once.
+options.display_mode = Display mode
+options.fullscreen = Fullscreen
+options.windowed = Windowed
+options.window_size = Window size
+options.window_size.help = Size of the window in windowed mode. Fullscreen always uses the desktop resolution.
+options.vsync = Vertical sync
+options.vsync.help = Synchronise frames with the display to avoid tearing.
+options.render_scale = Render scale
+options.render_scale.help = Internal resolution of the 3D image. Lower is faster, higher is sharper.
+
+options.quality = Quality
+options.quality.low = Low
+options.quality.medium = Medium
+options.quality.high = High
+options.quality.ultra = Ultra
+options.quality.help = Shadows, reflections, ambient occlusion and volumetric light.
+options.motion_blur = Motion blur
+options.depth_of_field = Depth of field
+options.brightness = Brightness
+options.brightness.neutral = Neutral
+options.brightness.help = Exposure compensation of the camera.
+
+options.master_volume = Master volume
+options.effects = Effects
+options.ambience = Ambience
+options.ambience.help = The murmur of the hall: fire, distant footsteps, the old clock.
+options.ambience_volume = Ambience volume
+
+options.legal_moves = Show legal moves
+options.legal_moves.help = Highlight the squares a touched piece may reach. When off, nothing tells you whether a move is legal: an illegal move is penalised by the arbiter once you press the clock.
+options.coordinates = Board coordinates
+options.thinking_time = Realistic thinking time
+options.thinking_time.help = Your opponent takes its time like a human player instead of moving instantly.
+options.mouse_sensitivity = Mouse sensitivity
+options.invert_look = Invert vertical look
+
+# ---- Player profile (Options > Player) ---------------------------------------------------------
+player.name = Name
+player.name.help = Your name as it is written at the top of the scoresheets, in any alphabet.
+player.default_name = Human
+player.handwriting = Handwriting
+player.handwriting.help = The hand that writes your moves. Arabic, Japanese and Chinese are written in a hand of their own.
+player.preview = ON YOUR SCORESHEET
+hand.caveat = Casual
+hand.marck = Cursive
+hand.badscript = Slanted
+
+# ---- Controls (Options > Controls) -------------------------------------------------------------
+controls.touch.keys = Left click
+controls.touch = Touch a piece, then move it
+controls.clock.keys = Space  or  click the clock
+controls.clock = Press the clock
+controls.look.keys = Right mouse, hold
+controls.look = Look around
+controls.moves.keys = Tab
+controls.moves = Show or hide the move list
+controls.menu.keys = Esc
+controls.menu = Menu
+
+# ---- New game ----------------------------------------------------------------------------------
+newgame.title = NEW GAME
+newgame.opponent = OPPONENT
+newgame.time_control = TIME CONTROL
+newgame.start = Start
+newgame.elo = ~{0} Elo
+newgame.you_white = You will play White.
+newgame.you_black = You will play Black.
+newgame.colour_lot = Colours are drawn by lot for the first game.
+newgame.colour_alternate = Colours then alternate from one game to the next.
+
+# Custom opponent: Stockfish parameters
+engine.skill = Skill level
+engine.skill.help = Stockfish “Skill Level” (0–20). Ignored while the strength is limited by Elo.
+engine.limit_elo = Limit strength (Elo)
+engine.limit_elo.help = UCI_LimitStrength: the engine aims at the Elo rating below.
+engine.elo = Elo
+engine.depth = Search depth
+engine.plies = {0} ply|{0} plies
+engine.move_time = Time per move
+engine.nodes = Node limit
+engine.no_limit = Off
+engine.thousand = {0} thousand
+engine.million = {0} million
+
+# Time controls ("3+2": minutes + increment in seconds)
+tc.unlimited = Unlimited
+tc.no_clock = No clock
+tc.bullet = Bullet
+tc.blitz = Blitz
+tc.rapid = Rapid
+tc.classical = Classical
+tc.custom = Custom
+tc.your_own = Your own
+tc.base_time = Base time
+tc.base_time.help = Initial time on each clock (minutes : seconds).
+tc.increment = Increment
+tc.increment.help = Fischer increment added after each move.
+tc.delay = Delay
+tc.delay.help = Bronstein delay: time used up to this delay is given back after each move.
+tc.no_delay = Off
+tc.seconds = {0} s
+tc.minutes = {0} min
+tc.summary_increment = {0} + {1} s
+tc.summary_delay = {0}, delay {1} s
+
+# Opponent presets (names and one-line descriptions of src/ai/presets.cpp)
+preset.novice.name = Novice
+preset.novice.desc = Just learned the moves: hangs pieces and misses simple threats.
+preset.beginner.name = Beginner
+preset.beginner.desc = Knows the basics, but still blunders material regularly.
+preset.casual.name = Casual
+preset.casual.desc = A relaxed evening opponent: sensible moves, frequent mistakes.
+preset.club_player.name = Club Player
+preset.club_player.desc = Solid club player who punishes obvious blunders.
+preset.advanced.name = Advanced
+preset.advanced.desc = Strong club player with good tactical vision.
+preset.expert.name = Expert
+preset.expert.desc = Tournament expert: rarely errs, converts advantages.
+preset.master.name = Master
+preset.master.desc = Master strength: deep calculation and fine positional play.
+preset.grandmaster.name = Grandmaster
+preset.grandmaster.desc = Grandmaster level: extremely hard to beat.
+preset.stockfish_max.name = Stockfish Max
+preset.stockfish_max.desc = Stockfish 16 at full strength. Good luck.
+preset.custom.name = Custom
+preset.custom.desc = Your own engine settings.
+
+# ---- Credits -----------------------------------------------------------------------------------
+credits.title = CREDITS
+credits.game.head = SCACELITH
+credits.game = A game of chess in a royal hall, on an in-house OpenGL 4.6 engine.
+credits.engine.head = CHESS ENGINE
+credits.engine = Stockfish 16, by the Stockfish developers.
+credits.engine.licence = GNU General Public License v3.
+credits.fonts.head = TYPEFACES
+credits.fonts = EB Garamond by Georg Duffner and Cinzel by Natanael Gama; Amiri by Khaled Hosny.
+credits.fonts.hand = Handwriting: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
+credits.fonts.figures = Chess figures from GNU FreeFont (GPL v3 with font exception).
+credits.quote = “Chess is the art of analysis.”  — Mikhail Botvinnik
+
+# ---- Pause menu --------------------------------------------------------------------------------
+pause.title = PAUSED
+pause.resume = Resume
+pause.offer_draw = Offer draw
+pause.claim_draw = Claim draw
+pause.claim_draw.help = Threefold repetition or fifty-move rule.
+pause.resign = Resign
+confirm.resign.title = RESIGN
+confirm.resign.text = Resign this game? Your opponent will be declared the winner.
+confirm.resign.ok = Resign
+confirm.leave.title = LEAVE THE GAME
+confirm.leave.text = Return to the main menu? The current game will be abandoned.
+confirm.leave.ok = Leave
+
+# ---- Promotion ---------------------------------------------------------------------------------
+promotion.title = PROMOTE TO
+piece.queen = Queen
+piece.rook = Rook
+piece.bishop = Bishop
+piece.knight = Knight
+
+# ---- Game over ---------------------------------------------------------------------------------
+gameover.draw = The game is drawn.
+gameover.draw_moves = The game is drawn after {0} move.|The game is drawn after {0} moves.
+gameover.win = Well played — you win.
+gameover.win_moves = Well played — you win in {0} move.|Well played — you win in {0} moves.
+gameover.loss = Your opponent wins.
+gameover.loss_moves = Your opponent wins in {0} move.|Your opponent wins in {0} moves.
+gameover.rematch = Rematch
+gameover.view_board = View the board
+gameover.show = Show
+
+# Reasons (chess::endReasonText)
+reason.checkmate = Checkmate
+reason.resignation = Resignation
+reason.timeout = Loss on time
+reason.illegal_moves = Second illegal move (forfeit)
+reason.stalemate = Stalemate
+reason.insufficient = Dead position (insufficient material)
+reason.timeout_vs_insufficient = Flag fall, but the opponent cannot checkmate
+reason.fivefold = Fivefold repetition
+reason.75_moves = 75-move rule
+reason.threefold_claim = Threefold repetition (claimed)
+reason.50_moves_claim = 50-move rule (claimed)
+reason.agreement = Draw by agreement
+reason.illegal_vs_insufficient = Second illegal move, but the opponent cannot checkmate
+
+# ---- Move list ---------------------------------------------------------------------------------
+movelist.title = MOVES
+movelist.empty = No moves yet.
+
+# ---- Loading (src/game/world.cpp) --------------------------------------------------------------
+loading.materials = Preparing materials
+loading.hall = Raising the hall
+loading.furniture = Carving the table and chairs
+loading.board = Polishing the board
+loading.pieces = Turning the chess set
+loading.clock = Assembling the clock
+loading.porcelain = Firing the porcelain
+loading.ready = Ready
+
+# ---- Notifications during the game (src/game/game_scene.cpp) -----------------------------------
+notify.no_draw_claim = No draw can be claimed in this position.
+notify.flag_you = Your flag has fallen.
+notify.flag_opponent = Your opponent's flag has fallen.
+notify.touched.pawn = Touch-move: the pawn you touched must be moved.
+notify.touched.knight = Touch-move: the knight you touched must be moved.
+notify.touched.bishop = Touch-move: the bishop you touched must be moved.
+notify.touched.rook = Touch-move: the rook you touched must be moved.
+notify.touched.queen = Touch-move: the queen you touched must be moved.
+notify.touched.king = Touch-move: the king you touched must be moved.
+notify.touched.piece = Touch-move: the piece you touched must be moved.
+notify.touched_square = Touch-move: you must move the piece on {0}.
+notify.press_clock = Press the clock to complete your move (Space).
+notify.illegal = Illegal move.
+notify.cannot_move = That move cannot be made.
+notify.move_first = Make your move before pressing the clock.
+notify.draw_already_offered = You have already offered a draw this move.
+notify.draw_accepted = Your opponent accepts the draw.
+notify.draw_declined = Your opponent declines the draw offer.
+notify.draw_claimed = Your opponent claims a draw.
+
+# ---- Arbiter (src/chess/arbiter.cpp) -----------------------------------------------------------
+# A verdict is made of sentences joined with arbiter.join ({0} = the text so far, {1} = the next
+# sentence). The colour named in a key is the player the sentence is about.
+arbiter.join = {0} {1}
+arbiter.no_move = Arbiter: the clock was pressed without making a move, which counts as an illegal move.
+arbiter.unpromoted = Arbiter: illegal move, the pawn was not replaced by a new piece before the clock was pressed.
+arbiter.illegal = Arbiter: illegal move.
+arbiter.second_loses.white = This is White's second illegal move: White loses the game.
+arbiter.second_loses.black = This is Black's second illegal move: Black loses the game.
+arbiter.second_draw.white = This is White's second illegal move, but Black cannot checkmate: the game is drawn.
+arbiter.second_draw.black = This is Black's second illegal move, but White cannot checkmate: the game is drawn.
+arbiter.queen = The pawn becomes a queen.
+arbiter.queen_one_minute.white = The pawn becomes a queen and White receives one extra minute.
+arbiter.queen_one_minute.black = The pawn becomes a queen and Black receives one extra minute.
+arbiter.queen_two_minutes.white = The pawn becomes a queen and White receives two extra minutes.
+arbiter.queen_two_minutes.black = The pawn becomes a queen and Black receives two extra minutes.
+arbiter.restored = The position is restored.
+arbiter.restored_one_minute.white = The position is restored and White receives one extra minute.
+arbiter.restored_one_minute.black = The position is restored and Black receives one extra minute.
+arbiter.restored_two_minutes.white = The position is restored and White receives two extra minutes.
+arbiter.restored_two_minutes.black = The position is restored and Black receives two extra minutes.
+arbiter.one_minute.white = White receives one extra minute.
+arbiter.one_minute.black = Black receives one extra minute.
+arbiter.two_minutes.white = White receives two extra minutes.
+arbiter.two_minutes.black = Black receives two extra minutes.
+arbiter.second_loses = A second illegal move loses the game.
+arbiter.touched.white = White must move the touched piece.
+arbiter.touched.black = Black must move the touched piece.
+arbiter.game_over = The game is over.
+
+# ---- Game modes: Watch a Game (viewer mode), the player's Elo --------------------------------
+menu.watch = Watch a Game
+
+viewer.title = WATCH A GAME
+viewer.white = WHITE
+viewer.black = BLACK
+viewer.time_control = TIME CONTROL
+viewer.elo_approx = ~{0} Elo
+viewer.swap = Swap colours
+viewer.note = Both players are Stockfish. Fly freely around the hall while they play: nobody will see you.
+viewer.summary = {0} vs {1}
+viewer.custom = Custom
+viewer.tc.custom = Your own
+viewer.tc.none = No clock
+viewer.tc.bullet = Bullet
+viewer.tc.blitz = Blitz
+viewer.tc.rapid = Rapid
+viewer.tc.classical = Classical
+viewer.base_time = Base time
+viewer.increment = Increment
+viewer.delay = Delay
+viewer.off = Off
+viewer.minutes = {0} min
+viewer.seconds = {0} s
+viewer.delay_summary = delay {0} s
+viewer.back = Back
+viewer.start = Start
+
+viewer.paused = PAUSED
+viewer.resume = Resume
+viewer.options = Options
+viewer.main_menu = Main menu
+
+# Overlay while watching ({0} = preset name, {1} = its rating)
+viewer.player = Stockfish · {0} · {1}
+viewer.controls.title = CONTROLS
+viewer.keys.move = W A S D  ·  Z Q S D  ·  arrows
+viewer.controls.move = Move
+viewer.keys.updown = E, Space  /  C, Ctrl
+viewer.controls.updown = Up / down
+viewer.keys.fast = Shift
+viewer.controls.fast = Faster
+viewer.keys.look = Right mouse button
+viewer.controls.look = Look around
+viewer.keys.speed = Mouse wheel
+viewer.controls.speed = Speed
+viewer.keys.views = 1 – 9
+viewer.controls.views = Viewpoints
+viewer.keys.eyes = 0
+viewer.controls.eyes = Through the eyes of the player to move
+viewer.keys.moves = Tab
+viewer.controls.moves = Move list
+viewer.keys.menu = Esc
+viewer.controls.menu = Menu
+viewer.keys.hide = H
+viewer.controls.hide = Hide this overlay
+viewer.speed = Speed {0} m/s
+viewer.view.0 = Through the players' eyes
+viewer.view.1 = Beside the table
+viewer.view.2 = Above the board
+viewer.view.3 = The hall
+viewer.view.4 = The clock
+viewer.view.5 = White's face
+viewer.view.6 = Black's face
+viewer.view.7 = The duel
+viewer.view.8 = The windows
+viewer.view.9 = The tapestries
+
+# Events of a watched game ({0}, {1} = viewer.side.white / viewer.side.black)
+viewer.side.white = White
+viewer.side.black = Black
+viewer.flag.white = White's flag has fallen.
+viewer.flag.black = Black's flag has fallen.
+viewer.claims_draw = {0} claims a draw.
+viewer.offer_accepted = {0} offers a draw, {1} accepts.
+viewer.offer_declined = {0} offers a draw, {1} declines.
+viewer.gameover.white_wins = White wins after move {0}.
+viewer.gameover.black_wins = Black wins after move {0}.
+viewer.gameover.draw = The game is drawn after move {0}.
+viewer.gameover.players = {0} against {1}
+viewer.watch_again = Watch again
+
+# The player's rating
+elo.label = ELO
+elo.no_games = No rated game yet
+elo.provisional = Provisional rating
+elo.peak = Peak {0}
+# Wins, draws, losses in chess notation: +12 =4 −9
+elo.record = +{0} ={1} −{2}
+elo.yours = Your Elo {0}
+elo.expected = expected score {0} %
+elo.change = Elo {0} → {1} ({2})
+elo.unrated = Elo {0} · this game is not rated
+
+# Scoresheet (printed labels of the FIDE form; the values are handwritten)
+scoresheet.title = Scoresheet
+scoresheet.event = Event
+scoresheet.date = Date
+scoresheet.round = Round
+scoresheet.board = Board
+scoresheet.page = Page
+scoresheet.white = White
+scoresheet.black = Black
+scoresheet.elo = Elo
+scoresheet.result = Result
+scoresheet.move_no = No.
+scoresheet.sign_white = White's signature
+scoresheet.sign_black = Black's signature
+
+# Scoresheet values written by the players: piece letters of the notation (king queen rook bishop
+# knight, space separated, FIDE practice of the language) and the date ({0} day, {1} month, {2} year)
+scoresheet.pieces = K Q R B N
+scoresheet.date_format = {0}.{1}.{2}

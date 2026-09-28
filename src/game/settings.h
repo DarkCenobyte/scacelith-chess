@@ -1,6 +1,7 @@
 // Persistent player settings (Scacelith.ini). Shared by the menus (ui/), the game and main.cpp.
 #pragma once
 #include "../render/renderer.h"
+#include "../ui/ui_font.h"
 #include <string>
 
 namespace game {
@@ -44,6 +45,28 @@ struct Settings {
     int engineThreads = 1;
     int engineHashMB = 64;
     bool humanizeThinking = true; // spend realistic time before moving
+    // [player] the human's rating (elo.h), updated after every rated game against Stockfish
+    int playerElo = 1500;
+    int playerGames = 0, playerWins = 0, playerDraws = 0, playerLosses = 0;
+    int playerPeakElo = 1500;
+    // [viewer] last choices on the Watch a Game page (Stockfish vs Stockfish)
+    int viewerWhitePreset = 5;    // index into ai::presets() (Custom excluded)
+    int viewerBlackPreset = 4;
+    int viewerTimeControl = 5;    // index into chess::timeControlPresets(), -1 = custom
+    int viewerCustomBaseSeconds = 300;
+    int viewerCustomIncrementSeconds = 3;
+    int viewerCustomDelaySeconds = 0;
+    bool viewerShowControls = true; // the controls hint overlay (H)
+    // [interface]
+    std::string language;         // i18n code ("fr", "zh-Hant"...); "" = the OS language (first start)
+    // [player] (written on the scoresheets)
+    std::string playerName = "Human";
+    ui::font::HandStyle handStyle = ui::font::HAND_CAVEAT;  // Latin/Cyrillic handwriting
+
+    // Selects the UI language (i18n::setLanguage): "--lang <code>" on the command line for this
+    // session, else 'language', else the OS language when supported, else English. load() calls
+    // it; an empty 'language' receives the language chosen from the OS.
+    void applyLanguage();
 
     render::RenderSettings renderSettings() const;
     bool load(const std::string& path);  // missing file = defaults
