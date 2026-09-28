@@ -5,21 +5,38 @@
 //          Black d7-d5 0.7 s after White's clock press (the AI 'thinks' in between)
 //          White exd5 0.7 s after Black's clock press (Reach Lift Carry TakeCaptured Place
 //          Discard PressClock Retract)
+// Other timelines (--demo), with the game's table layout (clock at +X, so Black plays with its
+// LEFT hand and both scoresheets lie at -X):
+//   lefty    handshake (Black's right hand = its writing hand), pens picked up, 1.e4 d5 2.exd5 Qxd5
+//            played with White's right / Black's left hand while the other hand writes each move
+//            (Black presses the clock with its left hand while its right hand writes), both players
+//            turn a page, White lays its pen down, final handshake while Black still holds its pen
+//            (it lays it down first)
+//   lcastle  Black (left hand) castles short
+//   lpromo   Black (left hand) promotes b2-b1=Q (pawn to the capture row, spare queen to b1)
 // Command line (after --scene anim):
+//   --demo d        default | lefty | lcastle | lpromo
 //   --time t        simulate 0..t with fixed 1/120 s steps, then (in --shot mode) freeze
 //   --view v        side | sidel | front | back | top | white | black | hand | handb | handl | shake | orbit |
-//                   pinch | pinchs | pinchb | pinchbs (close-ups of White's / Black's right fingers from the
-//                   front and from the right side)
-//   --selftest      numeric checks of the IK/grasp/timing (results in the log)
+//                   pinch | pinchs | pinchb | pinchbs (close-ups of White's / Black's playing fingers from the
+//                   front and from the side) | pen | pens | penb | penbs (White's / Black's writing hand,
+//                   from the front and from the thumb side) | page | pageb (page corner) | lhand (Black's
+//                   playing hand from its left) | pad | padb (the scoresheet from above) | clock
+//   --robot         draw the real porcelain robot instead of the capsule robots (slower start)
+//   --selftest      numeric checks of the IK/grasp/timing/writing/mirroring (results in the log)
 // Keys: Space pause, R restart, V next view, S slow motion, arrows = player's head (White).
 #include "../app/orbit_camera.h"
 #include "../app/scene.h"
+#include "../character/robot.h"
 #include "../core/log.h"
 #include "../game/layout.h"
+#include "../render/materials/material_library.h"
 #include "../render/mesh.h"
 #include "animator.h"
 #include <cstdlib>
 #include <cstring>
+#include <deque>
+#include <functional>
 #include <string>
 
 using namespace m;
@@ -195,14 +212,14 @@ constexpr int kPieces = 34;
 
 // Starting position: ids 0-7 White pawns a-h, 8-15 White back rank, 16-23 Black pawns, 24-31
 // Black back rank, 32/33 the White/Black spare queens where the game keeps them (clock at +X:
-// beside the board at -X, near their owner).
+// beyond the clock, near their owner, see PhysicalBoard::reserveSlot).
 void initialPieces(Piece out[kPieces]) {
     static const int back[8] = {4, 2, 3, 5, 6, 3, 2, 4};
     for (int i = 32; i < kPieces; ++i) {
         out[i].type = 5;
         out[i].color = i - 32;
         out[i].heldBy = -1;
-        out[i].xf = translate(vec3(-(layout::BOARD_SIZE * 0.5f + 0.05f), layout::TABLE_TOP_Y, i == 32 ? 0.33f : -0.33f)) * rotateY(i == 32 ? 0.0f : PI);
+        out[i].xf = translate(vec3(layout::RESERVE_X, layout::TABLE_TOP_Y, i == 32 ? layout::RESERVE_Z : -layout::RESERVE_Z)) * rotateY(i == 32 ? 0.0f : PI);
     }
     for (int i = 0; i < 32; ++i) {
         Piece& p = out[i];
@@ -214,6 +231,17 @@ void initialPieces(Piece out[kPieces]) {
         p.xf = translate(layout::squareCenter(file, rank)) * rotateY(color ? PI : 0.0f);
     }
 }
+
+// Capture slot n of the pieces of 'capturedColor' (PhysicalBoard::nextCaptureSlot with the clock
+// at +X): two rows on the clock side, in the half of the player who captured them.
+vec3 captureSlot(int n, int capturedColor) {
+    int row = n / 8, col = n % 8;
+    float zSign = capturedColor == 1 ? 1.0f : -1.0f;
+    return vec3(layout::CAPTURE_ROW_X + float(row) * layout::CAPTURE_SPACING, layout::TABLE_TOP_Y,
+                zSign * (layout::CAPTURE_Z0 + float(col) * layout::CAPTURE_COL_SPACING));
+}
+// A bone of the right arm moved to 'side' (the playing hand of a left-handed player).
+Bone onSide(Bone rightBone, Side s) { return s == Side::Right ? rightBone : Bone(rightBone - (ClavicleR - ClavicleL)); }
 
 // Obstacle queries run while an animator plans a task inside update(), before the game has seen
 // that call's events: a piece the animator has just gripped still looks free here, so ask the
@@ -295,8 +323,183 @@ Overlap pieceOverlap(const Skeleton& sk, const mat4* g, const Piece* ps, int ski
     return pieceOverlapIf(sk, g, ps, [&](int i, bool) { return i == skipA || i == skipB; });
 }
 
+// ---------------------------------------------------------------------------------------------
+// Demo handwriting (the game has its own handwriting model): a small single-stroke font turned
+// into pen-tip keys every 1/60 s, strokes with minimum-jerk speed, pen lifted between strokes.
+// ---------------------------------------------------------------------------------------------
+struct Glyph {
+    char c;
+    float w;                                   // advance (cap heights)
+    std::vector<std::vector<vec2>> strokes;    // x right, y up; 1 = cap height, 0.62 = x-height
+};
+const Glyph* glyphFor(char c) {
+    static const std::vector<Glyph> font = {
+        {'a', 0.72f, {{{0.55f, 0.50f}, {0.40f, 0.62f}, {0.18f, 0.56f}, {0.04f, 0.32f}, {0.10f, 0.06f}, {0.30f, 0.00f}, {0.50f, 0.12f}, {0.56f, 0.40f},
+                       {0.57f, 0.62f}, {0.56f, 0.20f}, {0.60f, 0.02f}, {0.68f, 0.00f}}}},
+        {'b', 0.70f, {{{0.08f, 1.00f}, {0.05f, 0.50f}, {0.04f, 0.00f}, {0.06f, 0.30f}, {0.25f, 0.58f}, {0.47f, 0.56f}, {0.60f, 0.32f}, {0.50f, 0.07f},
+                       {0.28f, 0.00f}, {0.06f, 0.06f}}}},
+        {'c', 0.62f, {{{0.52f, 0.50f}, {0.36f, 0.62f}, {0.14f, 0.54f}, {0.03f, 0.30f}, {0.12f, 0.06f}, {0.32f, 0.00f}, {0.54f, 0.10f}}}},
+        {'d', 0.72f, {{{0.52f, 0.48f}, {0.36f, 0.62f}, {0.14f, 0.54f}, {0.03f, 0.30f}, {0.12f, 0.06f}, {0.32f, 0.00f}, {0.50f, 0.12f}, {0.56f, 0.45f},
+                       {0.58f, 1.00f}, {0.57f, 0.40f}, {0.58f, 0.08f}, {0.66f, 0.00f}}}},
+        {'e', 0.62f, {{{0.06f, 0.30f}, {0.52f, 0.34f}, {0.50f, 0.52f}, {0.32f, 0.62f}, {0.12f, 0.54f}, {0.03f, 0.30f}, {0.12f, 0.06f}, {0.32f, 0.00f},
+                       {0.54f, 0.10f}}}},
+        {'f', 0.50f, {{{0.50f, 0.95f}, {0.38f, 1.00f}, {0.24f, 0.92f}, {0.20f, 0.60f}, {0.20f, 0.00f}}, {{0.02f, 0.60f}, {0.44f, 0.60f}}}},
+        {'g', 0.68f, {{{0.52f, 0.48f}, {0.36f, 0.62f}, {0.14f, 0.54f}, {0.04f, 0.32f}, {0.14f, 0.10f}, {0.34f, 0.06f}, {0.52f, 0.20f}, {0.56f, 0.45f},
+                       {0.57f, 0.62f}, {0.56f, 0.00f}, {0.50f, -0.28f}, {0.30f, -0.36f}, {0.08f, -0.28f}}}},
+        {'h', 0.66f, {{{0.06f, 1.00f}, {0.05f, 0.50f}, {0.04f, 0.00f}, {0.07f, 0.32f}, {0.22f, 0.56f}, {0.42f, 0.60f}, {0.54f, 0.44f}, {0.56f, 0.00f}}}},
+        {'x', 0.58f, {{{0.02f, 0.62f}, {0.52f, 0.00f}}, {{0.52f, 0.62f}, {0.02f, 0.00f}}}},
+        {'1', 0.50f, {{{0.10f, 0.78f}, {0.32f, 1.00f}, {0.32f, 0.00f}}}},
+        {'2', 0.66f, {{{0.06f, 0.78f}, {0.18f, 0.96f}, {0.38f, 1.00f}, {0.54f, 0.86f}, {0.52f, 0.62f}, {0.30f, 0.36f}, {0.04f, 0.00f}, {0.58f, 0.00f}}}},
+        {'3', 0.64f, {{{0.06f, 0.90f}, {0.28f, 1.00f}, {0.50f, 0.90f}, {0.50f, 0.66f}, {0.28f, 0.54f}, {0.52f, 0.42f}, {0.56f, 0.18f}, {0.40f, 0.02f},
+                       {0.18f, 0.00f}, {0.02f, 0.10f}}}},
+        {'4', 0.66f, {{{0.44f, 0.00f}, {0.44f, 1.00f}, {0.02f, 0.30f}, {0.60f, 0.30f}}}},
+        {'5', 0.64f, {{{0.52f, 1.00f}, {0.12f, 1.00f}, {0.08f, 0.56f}, {0.30f, 0.62f}, {0.50f, 0.52f}, {0.56f, 0.28f}, {0.44f, 0.06f}, {0.22f, 0.00f},
+                       {0.02f, 0.10f}}}},
+        {'6', 0.62f, {{{0.50f, 0.94f}, {0.30f, 1.00f}, {0.12f, 0.84f}, {0.03f, 0.50f}, {0.06f, 0.16f}, {0.24f, 0.00f}, {0.46f, 0.06f}, {0.54f, 0.28f},
+                       {0.44f, 0.52f}, {0.24f, 0.56f}, {0.06f, 0.40f}}}},
+        {'7', 0.62f, {{{0.04f, 1.00f}, {0.56f, 1.00f}, {0.30f, 0.40f}, {0.22f, 0.00f}}}},
+        {'8', 0.60f, {{{0.46f, 0.86f}, {0.28f, 1.00f}, {0.10f, 0.88f}, {0.14f, 0.66f}, {0.30f, 0.54f}, {0.52f, 0.36f}, {0.50f, 0.10f}, {0.28f, 0.00f},
+                       {0.06f, 0.12f}, {0.08f, 0.36f}, {0.30f, 0.54f}, {0.44f, 0.70f}, {0.46f, 0.86f}}}},
+        {'N', 0.66f, {{{0.04f, 0.00f}, {0.06f, 1.00f}, {0.56f, 0.00f}, {0.58f, 1.00f}}}},
+        {'B', 0.64f, {{{0.05f, 0.00f}, {0.05f, 1.00f}, {0.38f, 0.98f}, {0.52f, 0.84f}, {0.46f, 0.60f}, {0.10f, 0.54f}, {0.46f, 0.50f}, {0.58f, 0.30f},
+                       {0.50f, 0.08f}, {0.30f, 0.00f}, {0.05f, 0.00f}}}},
+        {'R', 0.64f, {{{0.05f, 0.00f}, {0.05f, 1.00f}, {0.40f, 0.98f}, {0.54f, 0.82f}, {0.46f, 0.60f}, {0.10f, 0.54f}, {0.30f, 0.52f}, {0.56f, 0.00f}}}},
+        {'Q', 0.78f, {{{0.36f, 1.00f}, {0.10f, 0.86f}, {0.02f, 0.50f}, {0.10f, 0.14f}, {0.36f, 0.00f}, {0.60f, 0.14f}, {0.68f, 0.50f}, {0.60f, 0.86f},
+                       {0.36f, 1.00f}},
+                      {{0.40f, 0.26f}, {0.72f, -0.06f}}}},
+        {'K', 0.64f, {{{0.05f, 1.00f}, {0.05f, 0.00f}}, {{0.56f, 1.00f}, {0.08f, 0.42f}, {0.58f, 0.00f}}}},
+        {'O', 0.76f, {{{0.36f, 1.00f}, {0.10f, 0.86f}, {0.02f, 0.50f}, {0.10f, 0.14f}, {0.36f, 0.00f}, {0.60f, 0.14f}, {0.68f, 0.50f}, {0.60f, 0.86f},
+                       {0.36f, 1.00f}}}},
+        {'-', 0.46f, {{{0.04f, 0.48f}, {0.40f, 0.48f}}}},
+        {'=', 0.50f, {{{0.04f, 0.62f}, {0.44f, 0.62f}}, {{0.04f, 0.34f}, {0.44f, 0.34f}}}},
+        {'+', 0.54f, {{{0.04f, 0.48f}, {0.48f, 0.48f}}, {{0.26f, 0.72f}, {0.26f, 0.24f}}}},
+        {'.', 0.25f, {{{0.08f, 0.02f}, {0.10f, 0.00f}}}},
+        {' ', 0.40f, {}},
+    };
+    for (const Glyph& g : font)
+        if (g.c == c) return &g;
+    return nullptr;
+}
+vec2 catmull(vec2 p0, vec2 p1, vec2 p2, vec2 p3, float u) {
+    float u2 = u * u, u3 = u2 * u;
+    return (p1 * 2.0f + (p2 - p0) * u + (p0 * 2.0f - p1 * 5.0f + p2 * 4.0f - p3) * u2 + (p1 * 3.0f - p0 - p2 * 3.0f + p3) * u3) * 0.5f;
+}
+// Pen-tip keys writing 'text' on the paper plane: baseline starting at 'base' (world, on the
+// paper), 'right' and 'up' = the writer's right and forward on the page. capH: capital height.
+std::vector<anim::PenKey> handwriting(const std::string& text, vec3 base, vec3 right, vec3 up, float capH = 0.0045f) {
+    std::vector<anim::PenKey> keys;
+    // Slanted a little to the right, like most hands.
+    auto world = [&](vec2 p, float h) { return base + right * (p.x + 0.18f * p.y) * capH + up * (p.y * capH) + vec3(0, 1, 0) * h; };
+    float x = 0.0f, t = 0.0f;
+    const float step = 1.0f / 60.0f;
+    bool first = true;
+    vec2 last(0, 0);
+    for (char c : text) {
+        const Glyph* g = glyphFor(c);
+        if (!g) continue;
+        for (const auto& st : g->strokes) {
+            // Dense polyline through the stroke points.
+            std::vector<vec2> pts;
+            for (size_t i = 0; i + 1 < st.size(); ++i) {
+                vec2 p0 = st[i > 0 ? i - 1 : i], p1 = st[i], p2 = st[i + 1], p3 = st[i + 2 < st.size() ? i + 2 : i + 1];
+                for (int k = 0; k < 8; ++k) pts.push_back(catmull(p0, p1, p2, p3, float(k) / 8.0f) + vec2(x, 0));
+            }
+            pts.push_back(st.back() + vec2(x, 0));
+            std::vector<float> acc(1, 0.0f);
+            for (size_t i = 1; i < pts.size(); ++i) acc.push_back(acc.back() + length(pts[i] - pts[i - 1]) * capH);
+            const float L = acc.back();
+            auto at = [&](float s) {
+                size_t i = 1;
+                while (i + 1 < acc.size() && acc[i] < s) ++i;
+                float u = acc[i] > acc[i - 1] ? clamp((s - acc[i - 1]) / (acc[i] - acc[i - 1]), 0.0f, 1.0f) : 0.0f;
+                return lerp(pts[i - 1], pts[i], u);
+            };
+            // Travel to the stroke with the pen lifted (or hover down onto the paper at the start).
+            if (first) {
+                keys.push_back({0.0f, world(pts.front(), 0.0025f), false});
+                t = 0.09f;
+                first = false;
+            } else {
+                vec3 a = world(last, 0.0f), b = world(pts.front(), 0.0f);
+                float d = length(b - a), T = std::max(0.07f, d / 0.07f);
+                keys.back().down = false;
+                keys.push_back({t + T * 0.5f, (a + b) * 0.5f + vec3(0, 0.0015f + 0.10f * d, 0), false});
+                t += T;
+            }
+            // The stroke: minimum-jerk speed profile.
+            const float T = 0.05f + L / 0.040f;
+            const int n = std::max(2, int(std::ceil(T / step)));
+            for (int i = 0; i <= n; ++i) {
+                float u = float(i) / float(n);
+                keys.push_back({t + u * T, world(at(L * smootherstep(u)), 0.0f), true});
+            }
+            t += T;
+            last = pts.back();
+        }
+        x += g->w + 0.12f;
+    }
+    if (!keys.empty()) {
+        keys.back().down = false;
+        keys.push_back({t + 0.09f, keys.back().tip + vec3(0, 0.003f, 0), false});
+    }
+    return keys;
+}
+
+// Scoresheet pad of player a (0 White, 1 Black) with the clock at +X: on the other side, in front
+// of its owner. Writer's right / forward (towards the board) on the page.
+struct PadFrame {
+    vec3 centre, right, up;
+    float top;                 // paper height
+};
+PadFrame padFrame(int a) {
+    const float zs = a == 0 ? 1.0f : -1.0f;
+    PadFrame f;
+    f.top = layout::TABLE_TOP_Y + layout::SCORESHEET_THICKNESS;
+    f.centre = vec3(-layout::SCORESHEET_X, f.top, zs * layout::SCORESHEET_Z);
+    f.right = vec3(zs, 0, 0);      // White (facing -Z): its right is +X
+    f.up = vec3(0, 0, -zs);        // towards the board
+    return f;
+}
+// Baseline start of row r (0 = first under the header), column c (0 White's move, 1 Black's).
+vec3 rowBase(int a, int r, int c) {
+    PadFrame f = padFrame(a);
+    const float W = layout::SCORESHEET_WIDTH, L = layout::SCORESHEET_LENGTH;
+    float y = L * 0.5f - 0.032f - float(r + 1) * 0.007f + 0.0014f;
+    float x = -W * 0.5f + 0.017f + float(c) * 0.026f;
+    return f.centre + f.right * x + f.up * y;
+}
+// Pen lying beside the pad's outer edge, parallel to Z, tip towards the board.
+mat4 penRestFrame(int a) {
+    PadFrame f = padFrame(a);
+    const float zs = a == 0 ? 1.0f : -1.0f;
+    vec3 tip = f.centre + vec3(-(layout::SCORESHEET_WIDTH * 0.5f + 0.030f), 0, 0) + f.up * (layout::PEN_LENGTH * 0.5f);
+    tip.y = layout::TABLE_TOP_Y + layout::PEN_RADIUS;
+    return translate(tip) * toMat4(fromTo(vec3(0, 1, 0), vec3(0, 0, zs)), vec3(0));
+}
+// Page flip geometry (shared by the page mesh and the TurnPage corner): the page hinges on the
+// top edge; flip angle A(s) with a bend B(s) (the corner leads while it is lifted). v in [0,1]
+// from the binding; returns the page point on its outer edge (xOff = 0) or anywhere across.
+vec3 pagePoint(int a, float s, float v, float xOff) {
+    PadFrame f = padFrame(a);
+    const float L = layout::SCORESHEET_LENGTH;
+    const float A = s * (PI + 0.024f), B = 0.9f * std::sin(PI * clamp(s, 0.0f, 1.0f));
+    vec3 bind = f.centre + f.up * (L * 0.5f) + vec3(0, 0.0003f, 0);
+    vec3 toWriter = -f.up;
+    vec3 p = bind;
+    const int n = 24;
+    for (int i = 0; i < n && float(i) / n < v; ++i) {
+        float v0 = float(i) / n, dv = std::min(1.0f / n, v - v0);
+        float th = clamp(A + B * (v0 + 0.5f * dv - 0.5f), 0.0f, PI + 0.024f);
+        p = p + (toWriter * std::cos(th) + vec3(0, 1, 0) * std::sin(th)) * (L * dv);
+    }
+    return p + f.right * xOff;
+}
+vec3 pageCorner(int a, float s) {   // the outer corner of the bottom edge (the writing hand's side)
+    return pagePoint(a, s, 1.0f, -layout::SCORESHEET_WIDTH * 0.5f * padFrame(a).right.x);
+}
+
 const char* kViews[] = {"side", "sidel", "front", "back", "top", "white", "black", "hand", "handb", "handl", "shake", "orbit",
-                        "pinch", "pinchs", "pinchb", "pinchbs"};
+                        "pinch", "pinchs", "pinchb", "pinchbs", "pen", "pens", "penb", "penbs", "page", "pageb", "lhand", "pad", "padb", "clock"};
 constexpr int kViewCount = int(sizeof(kViews) / sizeof(kViews[0]));
 constexpr int kOrbitView = 11;
 
@@ -309,7 +512,22 @@ public:
         std::string v = ctx.argValue("--view", "side");
         for (int i = 0; i < kViewCount; ++i)
             if (v == kViews[i]) view_ = i;
-        if (ctx.hasArg("--selftest")) { selfTest(); timelineCheck(); }
+        demo_ = ctx.argValue("--demo", "default");
+        if (demo_ != "lefty" && demo_ != "lcastle" && demo_ != "lpromo") demo_ = "default";
+        if (ctx.hasArg("--robot")) {
+            robot_ = true;
+            materials::init();
+            character::setupRobotMaterials();
+            gpuRobot_.upload(character::buildRobot());
+        }
+        if (ctx.hasArg("--selftest")) {
+            selfTest();
+            writingSelfTest();
+            const std::string keep = demo_;
+            demo_ = "default";
+            timelineCheck();
+            demo_ = keep;
+        }
         solo_ = ctx.hasArg("--solo");
         reset();
         float t0 = ctx.fixedTime >= 0 ? ctx.fixedTime : 0.0f;
@@ -364,8 +582,14 @@ public:
             if (solo_ && !nearHand(i)) continue;
             draw(pieceMesh_[pieces_[i].type], pieces_[i].color ? pieceBlackMat_ : pieceWhiteMat_, pieces_[i].xf, 100 + uint32_t(i));
         }
-        body_.submit(r, anim_[0].globals(), robotMat_[0], eyeMat_, darkMat_, 1000, view_ == 5);
-        body_.submit(r, anim_[1].globals(), robotMat_[1], eyeMat_, darkMat_, 2000, view_ == 6);
+        if (sheets_) renderSheets(draw);
+        if (robot_) {
+            character::submitRobot(r, gpuRobot_, anim_[0].globals(), view_ == 5, 1000);
+            character::submitRobot(r, gpuRobot_, anim_[1].globals(), view_ == 6, 2000);
+        } else {
+            body_.submit(r, anim_[0].globals(), robotMat_[0], eyeMat_, darkMat_, 1000, view_ == 5);
+            body_.submit(r, anim_[1].globals(), robotMat_[1], eyeMat_, darkMat_, 2000, view_ == 6);
+        }
         r.endFrame();
     }
 
@@ -416,14 +640,206 @@ private:
         eyeMat_ = mat(vec3(0.95f, 0.95f, 0.95f), 0.1f, 0.0f, 1.0f);
         darkMat_ = mat(vec3(0.02f, 0.03f, 0.05f), 0.15f, 0.0f, 1.0f);
         for (auto* mm : {&robotMat_[0], &robotMat_[1]}) mm->doubleSided = true;
+        // Scoresheet pads with their row lines, the pens, a page lying flipped beyond each pad.
+        const float W = layout::SCORESHEET_WIDTH, L = layout::SCORESHEET_LENGTH, T = layout::SCORESHEET_THICKNESS;
+        MeshData pads, lines;
+        for (int a = 0; a < 2; ++a) {
+            PadFrame f = padFrame(a);
+            pads.append(rbox(f.centre - vec3(0, T * 0.5f, 0), {W * 0.5f, T * 0.5f, L * 0.5f}, 0.0015f));
+            for (int r = -1; r < layout::SCORESHEET_ROWS; ++r) {
+                float y = L * 0.5f - 0.032f - float(r + 1) * 0.007f;
+                vec3 c = f.centre + f.up * y + vec3(0, 0.00025f, 0);
+                flatSeg(lines, c - f.right * (W * 0.5f - 0.006f), c + f.right * (W * 0.5f - 0.006f), 0.0003f);
+            }
+            MeshData flipped = pageMesh(a, 1.0f);
+            pageFlat_[a].upload(flipped, "page-flipped");
+        }
+        padMesh_.upload(pads, "pads");
+        lineMesh_.upload(lines, "pad-lines");
+        const float pr = layout::PEN_RADIUS, pl = layout::PEN_LENGTH;
+        std::vector<vec2> pen = {{0, 0}, {0.0005f, 0.0f}, {0.0009f, 0.0012f}, {0.0021f, 0.009f}, {pr * 0.8f, 0.017f}, {pr, 0.023f},
+                                 {pr, pl - 0.004f}, {pr * 0.8f, pl}, {0, pl}};
+        penMesh_.upload(prim::lathe(pen, 24), "pen");
+        paperMat_ = mat(vec3(0.93f, 0.92f, 0.88f), 0.85f);
+        paperMat_.doubleSided = true;
+        lineMat_ = mat(vec3(0.55f, 0.64f, 0.80f), 0.8f);
+        lineMat_.doubleSided = true;
+        inkMat_ = mat(vec3(0.03f, 0.05f, 0.30f), 0.45f);
+        inkMat_.doubleSided = true;
+        penMat_ = mat(vec3(0.07f, 0.09f, 0.20f), 0.25f, 0.0f, 0.8f);
+    }
+    // Flat quad from a to b, w wide, facing up (ink strokes, ruled lines).
+    static void flatSeg(MeshData& md, vec3 a, vec3 b, float w) {
+        vec3 d(b.x - a.x, 0, b.z - a.z);
+        float len = length(d);
+        if (len < 1e-7f) return;
+        d = d / len;
+        vec3 n = cross(vec3(0, 1, 0), d) * (w * 0.5f), e = d * (w * 0.35f);
+        uint32_t base = uint32_t(md.vertices.size());
+        for (vec3 p : {a - e - n, a - e + n, b + e + n, b + e - n}) {
+            Vertex v;
+            v.pos = p;
+            v.normal = vec3(0, 1, 0);
+            v.tangent = vec4(1, 0, 0, 1);
+            v.uv = vec2(0, 0);
+            md.vertices.push_back(v);
+        }
+        for (uint32_t k : {0u, 2u, 1u, 0u, 3u, 2u}) md.indices.push_back(base + k);   // counter-clockwise from above
+    }
+    // The page being turned (flip progress s), as a bent strip.
+    static MeshData pageMesh(int a, float s) {
+        MeshData md;
+        const int n = 24;
+        const float W = layout::SCORESHEET_WIDTH;
+        for (int i = 0; i <= n; ++i) {
+            float v = float(i) / n;
+            vec3 pa = pagePoint(a, s, v, -W * 0.5f), pb = pagePoint(a, s, v, W * 0.5f);
+            vec3 dv = pagePoint(a, s, std::min(1.0f, v + 0.02f), 0.0f) - pagePoint(a, s, std::max(0.0f, v - 0.02f), 0.0f);
+            vec3 nrm = safeNormal(cross(dv, padFrame(a).right));
+            for (vec3 p : {pa, pb}) {
+                Vertex vx;
+                vx.pos = p;
+                vx.normal = nrm;
+                vx.tangent = vec4(1, 0, 0, 1);
+                vx.uv = vec2(p == pa ? 0.0f : 1.0f, v);
+                md.vertices.push_back(vx);
+            }
+        }
+        for (int i = 0; i < n; ++i) {
+            uint32_t k = uint32_t(2 * i);
+            for (uint32_t q : {k, k + 3, k + 1, k, k + 2, k + 3}) md.indices.push_back(q);   // front = the side 'nrm' is on
+        }
+        return md;
+    }
+    static vec3 safeNormal(vec3 v) {
+        float l = length(v);
+        return l > 1e-8f ? v / l : vec3(0, 1, 0);
+    }
+    // Ink of player a: the finished strokes of the current page and the running path up to the
+    // tip, laid on the page (following it while it turns).
+    MeshData inkMesh(int a) const {
+        const SheetState& s = sheet_[a];
+        MeshData md;
+        auto poly = [&](const std::vector<vec3>& p) {
+            for (size_t i = 1; i < p.size(); ++i) flatSeg(md, p[i - 1], p[i], 0.00045f);
+        };
+        for (const auto& p : s.ink) poly(p);
+        const float tNow = anim_[a].writingPathTime();
+        if (tNow >= 0.0f && !s.paths.empty()) {
+            std::vector<std::vector<vec3>> run;
+            inkOf(s.paths.front(), tNow, run);
+            for (const auto& p : run) poly(p);
+        }
+        const float turn = anim_[a].pageTurnProgress();
+        if (turn > 0.0f) {
+            // Onto the bent page: page coordinates of each vertex, then the page point there.
+            PadFrame f = padFrame(a);
+            const float L = layout::SCORESHEET_LENGTH;
+            for (Vertex& v : md.vertices) {
+                vec3 rel = v.pos - f.centre;
+                float pv = (L * 0.5f - dot(rel, f.up)) / L, x = dot(rel, f.right);
+                vec3 p = pagePoint(a, turn, pv, x);
+                vec3 dv = pagePoint(a, turn, std::min(1.0f, pv + 0.01f), x) - pagePoint(a, turn, std::max(0.0f, pv - 0.01f), x);
+                vec3 nrm = safeNormal(cross(dv, f.right));
+                v.pos = p + nrm * 0.0002f;
+                v.normal = nrm;
+            }
+        }
+        return md;
+    }
+    // Ink polylines of a path up to time t (the tip curve itself, sampled every 4 ms).
+    static void inkOf(const std::vector<anim::PenKey>& path, float t, std::vector<std::vector<vec3>>& out) {
+        if (path.empty()) return;
+        t = std::min(t, path.back().t);
+        bool was = false;
+        for (float u = 0.0f;; u += 0.004f) {
+            float uu = std::min(u, t);
+            bool down = anim::penPathDown(path, uu) || (uu > 0.0f && anim::penPathDown(path, uu - 1e-4f));
+            if (down) {
+                if (!was) out.emplace_back();
+                vec3 p = anim::penPathPoint(path, uu);
+                p.y = std::max(p.y, layout::TABLE_TOP_Y + layout::SCORESHEET_THICKNESS) + 0.0003f;
+                out.back().push_back(p);
+            }
+            was = down;
+            if (uu >= t) break;
+        }
+    }
+    template <class Draw>
+    void renderSheets(Draw& draw) {
+        draw(padMesh_, paperMat_, mat4(), 50);
+        draw(lineMesh_, lineMat_, mat4(), 51, 0u);
+        for (int a = 0; a < 2; ++a) {
+            mat4 px;
+            if (!anim_[a].penTransform(px)) px = sheet_[a].penTable;
+            draw(penMesh_, penMat_, px, 52 + uint32_t(a));
+            const float turn = anim_[a].pageTurnProgress();
+            if (turn > 0.0f && turn < 1.0f) {
+                pageMesh_[a].upload(pageMesh(a, turn), "page");
+                draw(pageMesh_[a], paperMat_, mat4(), 56 + uint32_t(a));
+            }
+            if (sheet_[a].pagesTurned > 0) draw(pageFlat_[a], paperMat_, mat4(), 58 + uint32_t(a));
+            MeshData ink = inkMesh(a);
+            if (!ink.indices.empty()) {
+                inkMesh_[a].upload(ink, "ink");
+                draw(inkMesh_[a], inkMat_, mat4(), 60 + uint32_t(a), 0u);
+            }
+        }
     }
 
     // ---- simulation
     void reset() {
         initialPieces(pieces_);
+        const bool lefty = demo_ != "default";   // the game's layout: Black's clock is on its left
+        sheets_ = demo_ == "lefty";
         const float pz = layout::PLAYER_PELVIS_Z, py = layout::PLAYER_PELVIS_Y;
         anim_[0].init(*sk_, vec3(0, py, pz), 1.0f);
-        anim_[1].init(*sk_, vec3(0, py, -pz), -1.0f);
+        anim_[1].init(*sk_, vec3(0, py, -pz), -1.0f, lefty ? Side::Left : Side::Right);
+        if (lefty) {
+            // As the game does: the playing hands rest on the clock side, in front of the body.
+            anim_[0].setRestHand(vec3(0.24f, layout::TABLE_TOP_Y, 0.34f));
+            anim_[1].setRestHand(vec3(0.24f, layout::TABLE_TOP_Y, -0.34f));
+        }
+        captures_[0] = captures_[1] = 0;
+        for (int a = 0; a < 2; ++a) {
+            sheet_[a] = SheetState();
+            sheet_[a].penTable = penRestFrame(a);
+        }
+        actions_.clear();
+        if (demo_ == "lefty") scriptLefty();
+        if (demo_ == "lcastle") {
+            pieces_[29].xf = pieces_[30].xf = translate(vec3(3.0f, 0.0f, 0.0f));   // f8, g8 gone
+            at(0.5f, [this] {
+                std::vector<anim::Task> ts;
+                movePiece(ts, 1, 28, "g8");
+                movePiece(ts, 1, 31, "f8");
+                finishMove(ts, 1);
+                anim_[1].enqueue(ts);
+                LOGI("anim viewer: Black O-O (left hand) at t=%.3f", simTime_);
+            });
+        }
+        if (demo_ == "lpromo") {
+            pieces_[17].xf = translate(layout::squareCenter(1, 1)) * rotateY(PI);   // Black pawn on b2
+            pieces_[1].xf = pieces_[9].xf = translate(vec3(3.0f, 0.0f, 0.0f));     // b2, b1 gone
+            at(0.5f, [this] {
+                using namespace anim;
+                std::vector<Task> ts;
+                movePiece(ts, 1, 17, "b1");
+                vec3 slot = captureSlot(captures_[1]++, 1);
+                ts.push_back(mkTask(TaskType::Reach, 17));
+                ts.push_back(mkTask(TaskType::Lift, 17, vec3(0), 0.03f));
+                ts.push_back(mkTask(TaskType::Carry, 17, slot));
+                ts.push_back(mkTask(TaskType::Place, 17, slot));
+                vec3 b1 = layout::squareCenter(1, 0);
+                ts.push_back(mkTask(TaskType::Reach, 33));   // the spare Black queen
+                ts.push_back(mkTask(TaskType::Lift, 33, vec3(0), 0.07f));
+                ts.push_back(mkTask(TaskType::Carry, 33, b1));
+                ts.push_back(mkTask(TaskType::Place, 33, b1));
+                finishMove(ts, 1);
+                anim_[1].enqueue(ts);
+                LOGI("anim viewer: Black b2-b1=Q (left hand) at t=%.3f", simTime_);
+            });
+        }
         for (int a = 0; a < 2; ++a) {
             anim_[a].pieceTransform = [this](int id) { return id >= 0 && id < kPieces ? pieces_[id].xf : mat4(); };
             anim_[a].pieceGripInfo = [this](int id) {
@@ -441,12 +857,12 @@ private:
         headYaw_ = 0.0f;
         headPitch_ = -0.55f;
     }
-    // --solo: only pieces held or within 6 cm of a right index fingertip are drawn.
+    // --solo: only pieces held or within 6 cm of a playing index fingertip are drawn.
     bool nearHand(int i) const {
         if (pieces_[i].heldBy >= 0) return true;
         vec3 p = pieces_[i].xf.translation();
         for (int a = 0; a < 2; ++a) {
-            vec3 f = anim_[a].globals()[IndexR3].translation();
+            vec3 f = anim_[a].globals()[onSide(IndexR3, anim_[a].playHand())].translation();
             if (length(vec3(p.x - f.x, 0, p.z - f.z)) < 0.06f) return true;
         }
         return false;
@@ -482,8 +898,8 @@ private:
         using namespace anim;
         int id = pieceAt(sq(from)), victim = pieceAt(sq(to));
         vec3 dst = layout::squareCenter(sq(to));
-        float sideSign = player == 0 ? -1.0f : 1.0f;   // captured pieces on the clock-free side
-        vec3 spot(sideSign * layout::CAPTURE_ROW_X, layout::TABLE_TOP_Y, (player == 0 ? 1.0f : -1.0f) * 0.22f);
+        const int victimColor = 1 - player;
+        vec3 spot = captureSlot(captures_[victimColor]++, victimColor);   // clock side, capturer's half
         std::vector<Task> ts;
         Task t;
         t.type = TaskType::Reach; t.pieceId = id; ts.push_back(t);
@@ -497,8 +913,92 @@ private:
         anim_[player].enqueue(ts);
         LOGI("anim viewer: %s %sx%s (piece %d takes %d) at t=%.3f", player ? "Black" : "White", from, to, id, victim, simTime_);
     }
+    // ---- demo timelines other than the default one: actions at fixed instants
+    void at(float t, std::function<void()> f) { actions_.push_back({t, std::move(f), false}); }
+    static anim::Task mkTask(anim::TaskType ty, int id = -1, vec3 pos = vec3(0), float h = 0.0f) {
+        anim::Task t;
+        t.type = ty;
+        t.pieceId = id;
+        t.position = pos;
+        t.height = h;
+        return t;
+    }
+    void movePiece(std::vector<anim::Task>& ts, int player, int id, const char* to) {
+        using namespace anim;
+        (void)player;
+        vec3 dst = layout::squareCenter(sq(to));
+        ts.push_back(mkTask(TaskType::Reach, id));
+        ts.push_back(mkTask(TaskType::Lift, id));
+        ts.push_back(mkTask(TaskType::Carry, id, dst));
+        ts.push_back(mkTask(TaskType::Place, id, dst));
+    }
+    void finishMove(std::vector<anim::Task>& ts, int player) {
+        ts.push_back(mkTask(anim::TaskType::PressClock, -1, pressPoint(player)));
+        ts.push_back(mkTask(anim::TaskType::Retract));
+    }
+    void handshake() {
+        anim::Task h;
+        h.type = anim::TaskType::Handshake;
+        h.partner = &anim_[1];
+        anim_[0].enqueue(h);
+        h.partner = &anim_[0];
+        anim_[1].enqueue(h);
+        LOGI("anim viewer: handshake at t=%.3f (Black %s its pen)", simTime_, anim_[1].holdsPen() ? "holds" : "does not hold");
+    }
+    void pickPen(int a) {
+        anim::WriteTask w;
+        w.type = anim::WriteTaskType::PickPen;
+        w.frame = sheet_[a].penTable;
+        anim_[a].enqueueWriting(w);
+    }
+    void putPen(int a) {
+        anim::WriteTask w;
+        w.type = anim::WriteTaskType::PutPen;
+        w.frame = penRestFrame(a);
+        anim_[a].enqueueWriting(w);
+    }
+    // Writes 'text' in row r, column c (0 White's move, 1 Black's) of player a's scoresheet.
+    void write(int a, int r, int c, const char* text) {
+        PadFrame f = padFrame(a);
+        anim::WriteTask w;
+        w.type = anim::WriteTaskType::Write;
+        w.path = handwriting(text, rowBase(a, r, c), f.right, f.up);
+        sheet_[a].paths.push_back(w.path);
+        anim_[a].setWritingRest(rowBase(a, r + 1, 0) + f.up * 0.004f - f.right * 0.006f);
+        anim_[a].enqueueWriting(w);
+    }
+    void turnPage(int a) {
+        anim::WriteTask w;
+        w.type = anim::WriteTaskType::TurnPage;
+        w.pageCorner = [a](float s) { return pageCorner(a, s); };
+        anim_[a].setWritingRest(rowBase(a, 0, 0) + padFrame(a).up * 0.004f);
+        anim_[a].enqueueWriting(w);
+    }
+    // The game's layout: White right-handed, Black left-handed, both write with the other hand.
+    void scriptLefty() {
+        at(0.5f, [this] { handshake(); });
+        at(3.2f, [this] { pickPen(0); pickPen(1); });
+        at(3.6f, [this] { quietMove(0, "e2", "e4"); write(0, 0, 0, "e4"); });
+        at(5.2f, [this] { quietMove(1, "d7", "d5"); });
+        at(5.35f, [this] { write(1, 0, 0, "e4"); write(1, 0, 1, "d5"); });
+        at(6.6f, [this] { write(0, 0, 1, "d5"); });
+        at(7.2f, [this] { captureMove(0, "e4", "d5"); write(0, 1, 0, "exd5"); });
+        at(9.3f, [this] { captureMove(1, "d8", "d5"); write(1, 1, 0, "exd5"); write(1, 1, 1, "Qxd5"); });
+        at(11.2f, [this] { write(0, 1, 1, "Qxd5"); });
+        at(13.3f, [this] { turnPage(0); turnPage(1); });
+        at(14.9f, [this] { putPen(0); });
+        at(15.7f, [this] { handshake(); });
+    }
     void script() {
         using namespace anim;
+        if (demo_ != "default") {
+            for (auto& ac : actions_)
+                if (!ac.done && simTime_ >= ac.t) {
+                    ac.done = true;
+                    ac.fn();
+                }
+            return;
+        }
         if (stage_ == 0 && simTime_ >= nextAt_) {
             Task h;
             h.type = TaskType::Handshake;
@@ -547,6 +1047,24 @@ private:
                 case EventType::HandshakeClasp:
                     LOGI("anim viewer: handshake clasp (%d) at t=%.4f", a, e.time);
                     break;
+                case EventType::PenPicked:
+                case EventType::PenPut:
+                    if (e.type == EventType::PenPut) sheet_[a].penTable = e.transform;
+                    LOGI("anim viewer: %s %s its pen at t=%.4f", a ? "Black" : "White", e.type == EventType::PenPut ? "put down" : "picked up", e.time);
+                    break;
+                case EventType::WritingDone:
+                    if (!sheet_[a].paths.empty()) {
+                        std::vector<std::vector<vec3>> ink;
+                        inkOf(sheet_[a].paths.front(), 1e9f, ink);
+                        for (auto& p : ink) sheet_[a].ink.push_back(p);
+                        sheet_[a].paths.pop_front();
+                    }
+                    break;
+                case EventType::PageTurned:
+                    sheet_[a].ink.clear();   // on the flipped page (face down)
+                    ++sheet_[a].pagesTurned;
+                    LOGI("anim viewer: %s turned a page at t=%.4f", a ? "Black" : "White", e.time);
+                    break;
                 default: break;
             }
         }
@@ -554,6 +1072,26 @@ private:
     void step(float dt) {
         simTime_ += dt;
         script();
+        if (demo_ != "default") {
+            // Both robots are driven by their own gaze (the writing look included).
+            for (int a = 0; a < 2; ++a) {
+                const int o = 1 - a;
+                bool watch = anim_[o].busy() && !anim_[a].busy();
+                anim_[a].lookAt(anim_[o].globals()[onSide(HandR, anim_[o].playHand())].translation(), watch ? 0.8f : 0.0f);
+            }
+            for (int a = 0; a < 2; ++a) {
+                std::vector<anim::Event> ev;
+                anim_[a].update(dt, ev);
+                handleEvents(a, ev);
+            }
+            for (int a = 0; a < 2; ++a)
+                for (int i = 0; i < kPieces; ++i) {
+                    mat4 x;
+                    if (anim_[a].heldPieceTransform(i, x)) pieces_[i].xf = x;
+                }
+            if (collect_) collectStats(dt);
+            return;
+        }
         // Black is the AI: watches White's hand while White plays, thinks otherwise.
         const mat4* wg = anim_[0].globals();
         if (anim_[0].busy() && stage_ >= 2) anim_[1].lookAt(wg[HandR].translation(), 1.0f);
@@ -693,10 +1231,11 @@ private:
             case 7:
             case 8:
             case 9: {
-                // Close-up of a right hand: from its right-front (hand, handb) or left-front (handl).
+                // Close-up of a playing hand: from its right-front (hand, handb) or left-front (handl).
                 int a = view_ == 8 ? 1 : 0;
                 const mat4* g = anim_[a].globals();
-                vec3 hp = (g[IndexR3].translation() + g[ThumbR3].translation()) * 0.5f;
+                const Side ps = anim_[a].playHand();
+                vec3 hp = (g[onSide(IndexR3, ps)].translation() + g[onSide(ThumbR3, ps)].translation()) * 0.5f;
                 float s = a == 0 ? 1.0f : -1.0f;   // world X of the character's right, -Z = its front
                 vec3 right(s, 0, 0), front(0, 0, -s);
                 vec3 off = view_ == 9 ? (-right * 0.30f + front * 0.02f) : (right * 0.30f + front * 0.02f);
@@ -710,13 +1249,56 @@ private:
             case 15: {
                 int a = view_ >= 14 ? 1 : 0;
                 const mat4* g = anim_[a].globals();
-                vec3 hp = (g[IndexR3].translation() + g[ThumbR3].translation()) * 0.5f;
+                const Side ps = anim_[a].playHand();
+                vec3 hp = (g[onSide(IndexR3, ps)].translation() + g[onSide(ThumbR3, ps)].translation()) * 0.5f;
                 float s = a == 0 ? 1.0f : -1.0f;
-                vec3 right(s, 0, 0), front(0, 0, -s);
+                if (ps == Side::Left) s = -s;   // the outside of a left hand is the character's left
+                vec3 right(s, 0, 0), front(0, 0, a == 0 ? -1.0f : 1.0f);
                 vec3 off = (view_ & 1) ? (right * 0.34f + front * 0.06f) : (front * 0.34f - right * 0.08f);
                 look(hp + off + vec3(0, 0.09f, 0), hp + vec3(0, 0.02f, 0), 32);
                 break;
             }
+            case 16:
+            case 17:
+            case 18:
+            case 19: {
+                // Writing hand: pen tip (or wrist) from the front and above (pen, penb), or from
+                // the thumb side, i.e. from the body's middle line (pens, penbs).
+                int a = view_ >= 18 ? 1 : 0;
+                const mat4* g = anim_[a].globals();
+                const Side ws = anim_[a].writingHand();
+                mat4 px;
+                vec3 tgt = anim_[a].penTransform(px) ? transformPoint(px, vec3(0, 0.03f, 0)) : g[onSide(MiddleR1, ws)].translation();
+                vec3 front(0, 0, a == 0 ? -1.0f : 1.0f), out(-1, 0, 0);   // the scoresheets lie at -X
+                vec3 off = (view_ & 1) ? (-out * 0.21f + front * 0.07f + vec3(0, 0.10f, 0)) : (front * 0.21f + out * 0.06f + vec3(0, 0.15f, 0));
+                look(tgt + off, tgt, 34);
+                break;
+            }
+            case 20:
+            case 21: {   // page corner
+                int a = view_ - 20;
+                PadFrame f = padFrame(a);
+                vec3 c = pageCorner(a, 0.0f) + vec3(0, 0.03f, 0) + f.up * 0.05f;
+                look(c + vec3(-0.30f, 0.22f, 0) - f.up * 0.22f, c, 40);
+                break;
+            }
+            case 22: {   // Black's playing hand from its outside
+                const mat4* g = anim_[1].globals();
+                const Side ps = anim_[1].playHand();
+                vec3 hp = (g[onSide(IndexR3, ps)].translation() + g[onSide(ThumbR3, ps)].translation()) * 0.5f;
+                vec3 out(ps == Side::Left ? 1.0f : -1.0f, 0, 0);
+                look(hp + out * 0.30f + vec3(0, 0.06f, 0.03f), hp + vec3(0, 0.01f, 0), 34);
+                break;
+            }
+            case 23:
+            case 24: {   // the scoresheet from above, as its writer reads it
+                int a = view_ - 23;
+                PadFrame f = padFrame(a);
+                vec3 c = f.centre + f.up * 0.045f;
+                look(c + vec3(0, 0.30f, 0) - f.up * 0.10f, c, 34);
+                break;
+            }
+            case 25: look({1.05f, 1.05f, -0.35f}, {0.36f, 0.82f, -0.10f}, 36); break;
             default: return orbit_.camera();
         }
         return c;
@@ -724,6 +1306,28 @@ private:
 
     // ---- self test (numbers in the log)
     void selfTest();
+    void writingSelfTest();
+
+    // ---- scoresheets
+    struct SheetState {
+        mat4 penTable;                                   // where the pen lies when not held
+        std::deque<std::vector<anim::PenKey>> paths;     // queued Write paths (front = running / next)
+        std::vector<std::vector<vec3>> ink;              // finished strokes on the current page
+        int pagesTurned = 0;
+    } sheet_[2];
+    bool sheets_ = false;
+    int captures_[2] = {0, 0};                           // pieces captured, per colour
+    struct Action {
+        float t;
+        std::function<void()> fn;
+        bool done;
+    };
+    std::vector<Action> actions_;
+    std::string demo_ = "default";
+    bool robot_ = false;
+    character::GpuRobot gpuRobot_;
+    Mesh padMesh_, lineMesh_, penMesh_, inkMesh_[2], pageMesh_[2], pageFlat_[2];
+    Material paperMat_, lineMat_, inkMat_, penMat_;
 
     const Skeleton* sk_ = nullptr;
     DebugBody body_;
@@ -962,12 +1566,8 @@ void AnimViewer::selfTest() {
             return t;
         };
         auto sqPos = [](const char* s) { return layout::squareCenter(s[0] - 'a', s[1] - '1'); };
-        // Game capture slot n for a capturer sitting at zSign (clock at +X: slots at -X).
-        auto slot = [](int n, float zSign) {
-            int row = n / 8, col = n % 8;
-            return vec3(-(layout::CAPTURE_ROW_X + float(row) * layout::CAPTURE_SPACING), layout::TABLE_TOP_Y,
-                        zSign * (0.03f + float(col) * layout::CAPTURE_SPACING * 0.62f));
-        };
+        // Game capture slot n for a capturer sitting at zSign (clock at +X: slots on the clock side).
+        auto slot = [](int n, float zSign) { return captureSlot(n, zSign > 0.0f ? 1 : 0); };
         auto off = [](Piece& p) { p.xf = translate(vec3(3.0f, 0.0f, 0.0f)); };   // not in the game any more
         struct Comp {
             const char* name;
@@ -1064,10 +1664,11 @@ void AnimViewer::selfTest() {
                 bool touched[kPieces] = {};
                 for (const Task& t : c0.tasks)
                     if (t.pieceId >= 0) touched[t.pieceId] = true;
+                // Clock at +X: Black plays with its left hand (its clock side), as in the game.
                 const float facing = c0.player == 0 ? 1.0f : -1.0f;
                 Animator a;
-                a.init(sk, vec3(0, layout::PLAYER_PELVIS_Y, facing * layout::PLAYER_PELVIS_Z), facing);
-                a.setRestHand(vec3(facing * 0.265f, layout::TABLE_TOP_Y, facing * 0.305f));   // as the game does
+                a.init(sk, vec3(0, layout::PLAYER_PELVIS_Y, facing * layout::PLAYER_PELVIS_Z), facing, c0.player == 0 ? Side::Right : Side::Left);
+                a.setRestHand(vec3(0.265f, layout::TABLE_TOP_Y, facing * 0.305f));   // the playing hand, clock side
                 a.pieceTransform = [&](int i) { return i >= 0 && i < kPieces ? ps[i].xf : mat4(); };
                 a.pieceGripInfo = [&](int i) {
                     int t = i >= 0 && i < kPieces ? ps[i].type : 1;
@@ -1136,10 +1737,10 @@ void AnimViewer::selfTest() {
                     }
                     Overlap o = pieceOverlapIf(sk, a.globals(), ps, [&](int i, bool arm) { return !arm && touched[i]; });
                     if (o.depth > worst.depth) { worst = o; worstT = t; }
-                    float hy = a.globals()[HandR].translation().y - layout::BOARD_TOP_Y;
+                    float hy = a.globals()[onSide(HandR, a.playHand())].translation().y - layout::BOARD_TOP_Y;
                     if (hy > handTop) { handTop = hy; handTopT = t; }
                     if (traceComp && int(t * 120.0f + 0.5f) % 6 == 0) {
-                        vec3 w = a.globals()[HandR].translation(), e = a.globals()[ForeArmR].translation();
+                        vec3 w = a.globals()[onSide(HandR, a.playHand())].translation(), e = a.globals()[onSide(ForeArmR, a.playHand())].translation();
                         LOGI("comp t=%.3f wrist %.3f %.3f %.3f elbow %.3f %.3f %.3f contact %.1f mm (%s, piece %d)", t, w.x, w.y, w.z, e.x, e.y, e.z,
                              o.depth * 1000.0f, boneName(Bone(o.bone)), o.piece);
                     }
@@ -1176,6 +1777,352 @@ void AnimViewer::selfTest() {
         float gotYaw = std::atan2(fc.x, fc.z), gotPitch = std::asin(clamp(fc.y, -1.0f, 1.0f));
         LOGI("selftest: head override yaw %.2f/%.2f pitch %.2f/%.2f deg, drift %.3f deg, eye motion %.2f mm", gotYaw / DEG, yaw / DEG,
              gotPitch / DEG, pitch / DEG, maxAng / DEG, maxMove * 1000.0f);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Writing hand and left-handed play: White (right-handed) and Black (left-handed) each pick the
+// pen up, write, turn a page, write again and put the pen down while the playing hand makes a
+// move; then the mirror image check and a handshake with the pen still in hand.
+// ---------------------------------------------------------------------------------------------
+void AnimViewer::writingSelfTest() {
+    using namespace anim;
+    const Skeleton& sk = robotSkeleton();
+    const float paper = layout::TABLE_TOP_Y + layout::SCORESHEET_THICKNESS;
+    auto setup = [&](Animator& an, int a, Piece* ps, bool lefty) {
+        const float zs = a == 0 ? 1.0f : -1.0f;
+        an.init(sk, vec3(0, layout::PLAYER_PELVIS_Y, zs * layout::PLAYER_PELVIS_Z), zs, lefty ? Side::Left : Side::Right);
+        an.setRestHand(vec3(0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
+        an.pieceTransform = [ps](int i) { return i >= 0 && i < kPieces ? ps[i].xf : mat4(); };
+        an.pieceGripInfo = [ps](int i) {
+            int t = i >= 0 && i < kPieces ? ps[i].type : 1;
+            return vec3(layout::PIECE_HEIGHT[t], layout::PIECE_GRIP_HEIGHT[t], layout::PIECE_GRIP_RADIUS[t]);
+        };
+    };
+    // Pinch point of the writing hand (between the thumb and index pads, world).
+    auto pinchOf = [&](const mat4* g, Side s) {
+        // Midpoint of the thumb and index pads (skin surface: the pad side of the distal phalanx).
+        auto pad = [&](Bone b, bool thumb) {
+            vec3 d = normalize(sk.restOffset[b]);
+            vec3 side = thumb ? normalize(cross(vec3(1, 0, 0), d)) : vec3(s == Side::Right ? 1.0f : -1.0f, 0, 0);
+            return transformPoint(g[b], d * (sk.boneLength[b] * 0.72f) + side * 0.0068f);
+        };
+        return (pad(onSide(ThumbR3, s), true) + pad(onSide(IndexR3, s), false)) * 0.5f;
+    };
+    for (int a = 0; a < 2; ++a) {
+        Piece ps[kPieces];
+        initialPieces(ps);
+        Animator an;
+        setup(an, a, ps, a == 1);
+        PadFrame f = padFrame(a);
+        const mat4 pen0 = penRestFrame(a);
+        std::vector<PenKey> p1 = handwriting("Qxd5", rowBase(a, 3, 0), f.right, f.up), p2 = handwriting("e4", rowBase(a, 0, 1), f.right, f.up);
+        std::vector<WriteTask> wt(6);
+        wt[0].type = WriteTaskType::PickPen;
+        wt[0].frame = pen0;
+        wt[1].type = WriteTaskType::Write;
+        wt[1].path = p1;
+        wt[2].type = WriteTaskType::TurnPage;
+        wt[2].pageCorner = [a](float s) { return pageCorner(a, s); };
+        wt[3].type = WriteTaskType::Write;
+        wt[3].path = p2;
+        wt[4].type = WriteTaskType::PutPen;
+        wt[4].frame = pen0 * translate(vec3(0, 0.004f, 0));   // a little further back than it was
+        wt[5].type = WriteTaskType::Wait;
+        wt[5].duration = 0.2f;
+        an.enqueueWriting(wt);
+        // The playing hand makes a move meanwhile (its instants must not move): e2-e4 / d7-d5.
+        const int pawn = a == 0 ? 4 : 19;
+        vec3 dst = layout::squareCenter(a == 0 ? sq("e4") : sq("d5"));
+        std::vector<Task> ts(6);
+        ts[0].type = TaskType::Reach; ts[0].pieceId = pawn;
+        ts[1].type = TaskType::Lift;
+        ts[2].type = TaskType::Carry; ts[2].position = dst;
+        ts[3].type = TaskType::Place; ts[3].position = dst;
+        ts[4].type = TaskType::PressClock; ts[4].position = vec3(layout::CLOCK_OFFSET_X, layout::TABLE_TOP_Y + layout::CLOCK_HEIGHT + 0.005f, a == 0 ? 0.045f : -0.045f);
+        ts[5].type = TaskType::Retract;
+        Task wait;
+        wait.type = TaskType::Wait;
+        wait.duration = 0.9f;   // the move starts while the pen is being written with
+        an.enqueue(wait);
+        an.enqueue(ts);
+        float tRelease = 0.9f + Timing::Reach + Timing::Lift + Timing::Carry + Timing::Place, tClock = tRelease + Timing::PressClock;
+        // Expected writing instants.
+        float t0 = 0.0f;
+        float tPick = t0 + 0.36f;   // seconds (PickPen at its nominal duration)
+        t0 += Timing::PickPen;
+        float path1 = t0 + Timing::WriteApproach;
+        t0 += writeTaskDuration(wt[1]);
+        float turn = t0;
+        t0 += writeTaskDuration(wt[2]);
+        float path2 = t0 + Timing::WriteApproach;
+        t0 += writeTaskDuration(wt[3]);
+        float tPut = t0 + 0.34f;
+        t0 += Timing::PutPen + 0.2f;
+        const float tEnd = t0;
+        std::vector<float> downs, ups;   // expected PenDown / PenUp instants
+        for (const auto* pp : {&p1, &p2}) {
+            float base = pp == &p1 ? path1 : path2;
+            for (size_t i = 0; i < pp->size(); ++i) {
+                bool dn = i + 1 < pp->size() && (*pp)[i].down, db = i > 0 && (*pp)[i - 1].down;
+                if (dn && !db) downs.push_back(base + (*pp)[i].t);
+                if (!dn && db) ups.push_back(base + (*pp)[i].t);
+            }
+        }
+        float tipErr = 0, belowPaper = 0, pinchErr = 0, pickJump = 0, putErr = 0, evErr = 0, fingerLow = 1e9f, lastS = -1, sBack = 0;
+        float slidePerp = 0, axMin = 0, axMax = 0, lastTp = -1;
+        vec3 lt0(0, 0, 0);
+        int nDown = 0, nUp = 0, nDone = 0, nGrip = 0, nTurned = 0, nEmpty = 0, bad = 0;
+        bool picked = false, justPicked = false;
+        mat4 lastPen;
+        const float dt = 1.0f / 120.0f;
+        std::vector<Event> ev;
+        for (float t = 0; t < tEnd + 0.3f; t += dt) {
+            ev.clear();
+            an.update(dt, ev);
+            for (const Event& e : ev) {
+                auto near = [&](float want) {
+                    evErr = std::max(evErr, std::fabs(e.time - want));
+                    if (std::getenv("SCACELITH_WRITE_TRACE")) LOGI("wtrace %s event %d at %.4f (expected %.4f)", a ? "B" : "W", int(e.type), e.time, want);
+                };
+                switch (e.type) {
+                    case EventType::PieceGripped: ps[pawn].heldBy = 0; break;
+                    case EventType::PieceReleased:
+                        near(tRelease);
+                        ps[pawn].heldBy = -1;
+                        ps[pawn].xf = e.transform;
+                        break;
+                    case EventType::ClockPressed: near(tClock); break;
+                    case EventType::PenPicked:
+                        near(tPick);
+                        if (length(e.transform.translation() - pen0.translation()) > 1e-5f) ++bad;
+                        picked = justPicked = true;
+                        break;
+                    case EventType::PenPut: {
+                        near(tPut);
+                        mat4 want = wt[4].frame;
+                        if (length(e.transform.translation() - want.translation()) > 1e-5f) ++bad;
+                        putErr = std::max(putErr, length(lastPen.translation() - want.translation()));
+                        break;
+                    }
+                    case EventType::PenDown: near(nDown < int(downs.size()) ? downs[size_t(nDown)] : -1.0f); ++nDown; break;
+                    case EventType::PenUp: near(nUp < int(ups.size()) ? ups[size_t(nUp)] : -1.0f); ++nUp; break;
+                    case EventType::WritingDone: near(nDone == 0 ? path1 + p1.back().t : path2 + p2.back().t); ++nDone; break;
+                    case EventType::PageGripped: near(turn + 0.33f * Timing::PageTurn); ++nGrip; break;
+                    case EventType::PageTurned: near(turn + 0.90f * Timing::PageTurn); ++nTurned; break;
+                    case EventType::WritingQueueEmpty: near(tEnd); ++nEmpty; break;
+                    default: break;
+                }
+            }
+            mat4 held;
+            if (an.heldPieceTransform(pawn, held)) ps[pawn].xf = held;
+            const mat4* g = an.globals();
+            mat4 px;
+            const bool hasPen = an.penTransform(px);
+            if (hasPen) {
+                if (justPicked) pickJump = std::max(pickJump, length(px.translation() - pen0.translation()));
+                justPicked = false;
+                lastPen = px;
+                vec3 tip = px.translation();
+                const float tp = an.writingPathTime();
+                if (tp >= 0.0f) {
+                    const auto& path = t < turn ? p1 : p2;
+                    tipErr = std::max(tipErr, length(tip - penPathPoint(path, tp)));
+                    if (std::getenv("SCACELITH_WRITE_TRACE")) {
+                        vec3 w = penPathPoint(path, tp);
+                        LOGI("wtrace %s t=%.3f tp=%.3f tip %.4f %.4f %.4f want %.4f %.4f %.4f", a ? "B" : "W", t + dt, tp, tip.x, tip.y, tip.z, w.x, w.y, w.z);
+                    }
+                }
+                vec3 rel = tip - f.centre;
+                if (std::fabs(dot(rel, f.right)) < layout::SCORESHEET_WIDTH * 0.5f && std::fabs(dot(rel, f.up)) < layout::SCORESHEET_LENGTH * 0.5f)
+                    belowPaper = std::max(belowPaper, paper - tip.y);
+                if (tp >= 0.0f) {
+                    // The pen in the hand: it may move along its axis (the fingers push / draw it),
+                    // anything else is the pen sliding through the fingers.
+                    const Side ws = an.writingHand();
+                    const mat4 inv = inverseAffine(g[onSide(HandR, ws)]);
+                    vec3 lt = transformPoint(inv, tip), la = normalize(transformDir(inv, transformDir(px, vec3(0, 1, 0))));
+                    if (tp < lastTp || lastTp < 0.0f) lt0 = lt;
+                    lastTp = tp;
+                    slidePerp = std::max(slidePerp, length((lt - lt0) - la * dot(lt - lt0, la)));
+                    axMin = std::min(axMin, dot(lt - lt0, la));
+                    axMax = std::max(axMax, dot(lt - lt0, la));
+                    // Fingers of the writing hand above the paper (their pads may touch it, not sink in).
+                    for (int fi = 0; fi < 5; ++fi) {
+                        Bone b3 = onSide(Bone(ThumbR3 + fi * 3), ws);
+                        vec3 ft = transformPoint(g[b3], normalize(sk.restOffset[b3]) * sk.boneLength[b3]);
+                        fingerLow = std::min(fingerLow, ft.y - 0.0065f - paper);
+                    }
+                }
+            }
+            const float s = an.pageTurnProgress();
+            if (s >= 0.0f) {
+                if (s < lastS - 1e-6f) sBack = std::max(sBack, lastS - s);
+                lastS = s;
+                const float u = (t + dt - turn) / Timing::PageTurn;
+                if (u > 0.34f && u < 0.69f) {
+                    pinchErr = std::max(pinchErr, length(pinchOf(g, an.writingHand()) - pageCorner(a, s)));
+                    if (std::getenv("SCACELITH_WRITE_TRACE")) {
+                        vec3 pc = pinchOf(g, an.writingHand()), cc = pageCorner(a, s);
+                        LOGI("wtrace %s turn u=%.3f s=%.3f pinch %.4f %.4f %.4f corner %.4f %.4f %.4f", a ? "B" : "W", u, s, pc.x, pc.y, pc.z, cc.x, cc.y, cc.z);
+                    }
+                }
+            }
+        }
+        (void)picked;
+        if (nDown != int(downs.size()) || nUp != int(ups.size()) || nDone != 2 || nGrip != 1 || nTurned != 1 || nEmpty != 1) ++bad;
+        const bool fail = bad > 0 || evErr > 1e-4f || tipErr > 2e-4f || belowPaper > 3e-4f || putErr > 5e-4f || sBack > 0.0f || slidePerp > 0.002f ||
+                          fingerLow < -0.001f || pinchErr > 0.002f;
+        ::logx::write(fail ? ::logx::Level::Warn : ::logx::Level::Info,
+                      "selftest writing %s (%s-handed): %d wrong, event err %.1e s, tip err %.3f mm, tip below paper %.2f mm, pen slide in the fingers "
+                      "%.1f mm (along the pen %.1f..%.1f mm), pen jump at pick %.2f mm, put err %.2f mm, lowest writing fingertip pad %.1f mm over "
+                      "the paper, page pinch off the corner %.1f mm",
+                      a ? "Black" : "White", a ? "left" : "right", bad, evErr, tipErr * 1000.0f, belowPaper * 1000.0f, slidePerp * 1000.0f,
+                      axMin * 1000.0f, axMax * 1000.0f, pickJump * 1000.0f, putErr * 1000.0f, fingerLow * 1000.0f, pinchErr * 1000.0f);
+    }
+
+    // Mirror image: Black left-handed with the clock at +X against Black right-handed in the
+    // mirrored world (clock at -X, everything at -x): the same motion, bone for bone.
+    {
+        Piece psL[kPieces], psR[kPieces];
+        initialPieces(psL);
+        initialPieces(psR);
+        const mat4 S = scale(vec3(-1, 1, 1));
+        for (int i = 0; i < kPieces; ++i) psR[i].xf = S * psL[i].xf * S;
+        Animator L, R;
+        setup(L, 1, psL, true);
+        setup(R, 1, psR, false);
+        R.setRestHand(vec3(-0.24f, layout::TABLE_TOP_Y, -0.34f));
+        auto mirrorV = [](vec3 v) { return vec3(-v.x, v.y, v.z); };
+        PadFrame f = padFrame(1);
+        std::vector<PenKey> path = handwriting("Nf6", rowBase(1, 2, 1), f.right, f.up), pathR = path;
+        for (PenKey& k : pathR) k.tip = mirrorV(k.tip);
+        auto writing = [&](Animator& an, const mat4& penF, const std::vector<PenKey>& p, bool mir) {
+            std::vector<WriteTask> w(4);
+            w[0].type = WriteTaskType::PickPen;
+            w[0].frame = penF;
+            w[1].type = WriteTaskType::Write;
+            w[1].path = p;
+            w[2].type = WriteTaskType::TurnPage;
+            w[2].pageCorner = [mir](float s) {
+                vec3 c = pageCorner(1, s);
+                return mir ? vec3(-c.x, c.y, c.z) : c;
+            };
+            w[3].type = WriteTaskType::PutPen;
+            w[3].frame = penF;
+            an.enqueueWriting(w);
+        };
+        writing(L, penRestFrame(1), path, false);
+        writing(R, S * penRestFrame(1) * S, pathR, true);
+        auto moves = [&](Animator& an, bool mir) {
+            auto P = [&](vec3 v) { return mir ? mirrorV(v) : v; };
+            std::vector<Task> ts(8);
+            ts[0].type = TaskType::Reach; ts[0].pieceId = 30;   // g8 knight
+            ts[1].type = TaskType::Lift;
+            ts[2].type = TaskType::Carry; ts[2].position = P(layout::squareCenter(sq("f6")));
+            ts[3].type = TaskType::Place; ts[3].position = P(layout::squareCenter(sq("f6")));
+            ts[4].type = TaskType::PressClock; ts[4].position = P(vec3(layout::CLOCK_OFFSET_X, layout::TABLE_TOP_Y + layout::CLOCK_HEIGHT + 0.005f, -0.045f));
+            ts[5].type = TaskType::Retract;
+            ts[6].type = TaskType::Wait; ts[6].duration = 0.3f;
+            ts[7].type = TaskType::Retract;
+            an.enqueue(ts);
+        };
+        moves(L, false);
+        moves(R, true);
+        float worst = 0.0f, worstT = 0.0f, penDiff = 0.0f;
+        int worstBone = 0;
+        std::vector<Event> evL, evR;
+        int evBad = 0;
+        for (float t = 0; t < 4.5f; t += 1.0f / 120.0f) {
+            evL.clear();
+            evR.clear();
+            L.update(1.0f / 120.0f, evL);
+            R.update(1.0f / 120.0f, evR);
+            if (evL.size() != evR.size()) ++evBad;
+            for (size_t i = 0; i < std::min(evL.size(), evR.size()); ++i)
+                if (evL[i].type != evR[i].type || std::fabs(evL[i].time - evR[i].time) > 1e-6f || length(evL[i].position - mirrorV(evR[i].position)) > 1e-4f) ++evBad;
+            for (int i = 0; i < kPieces; ++i) {
+                mat4 x;
+                if (L.heldPieceTransform(i, x)) psL[i].xf = x;
+                if (R.heldPieceTransform(i, x)) psR[i].xf = x;
+            }
+            for (const Event& e : evL)
+                if (e.type == EventType::PieceReleased) psL[e.pieceId].xf = e.transform;
+            for (const Event& e : evR)
+                if (e.type == EventType::PieceReleased) psR[e.pieceId].xf = e.transform;
+            for (int b = 0; b < BoneCount; ++b) {
+                Bone m = Bone(b);
+                if (b >= ClavicleL && b <= PinkyL3) m = Bone(b + (ClavicleR - ClavicleL));
+                else if (b >= ClavicleR && b <= PinkyR3) m = Bone(b - (ClavicleR - ClavicleL));
+                else if (b >= ThighL && b <= FootL) m = Bone(b + (ThighR - ThighL));
+                else if (b >= ThighR && b <= FootR) m = Bone(b - (ThighR - ThighL));
+                if (b == EyeL) m = EyeR;
+                if (b == EyeR) m = EyeL;
+                if (b == LidUpperL) m = LidUpperR;
+                if (b == LidUpperR) m = LidUpperL;
+                if (b == LidLowerL) m = LidLowerR;
+                if (b == LidLowerR) m = LidLowerL;
+                mat4 want = S * R.globals()[m] * S;
+                const mat4& got = L.globals()[b];
+                float d = length(got.translation() - want.translation());
+                for (int c = 0; c < 3; ++c) d = std::max(d, 0.1f * length(vec3(got.c[c].x - want.c[c].x, got.c[c].y - want.c[c].y, got.c[c].z - want.c[c].z)));
+                if (d > worst) { worst = d; worstT = t; worstBone = b; }
+            }
+            mat4 pl, pr;
+            if (L.penTransform(pl) && R.penTransform(pr)) penDiff = std::max(penDiff, length(pl.translation() - mirrorV(pr.translation())));
+        }
+        const bool fail = worst > 1e-4f || evBad > 0 || penDiff > 1e-4f;
+        ::logx::write(fail ? ::logx::Level::Warn : ::logx::Level::Info,
+                      "selftest mirror: left-handed Black vs mirrored right-handed Black: worst bone %.4f mm (%s at t=%.2f), pen %.4f mm, %d event mismatches",
+                      worst * 1000.0f, boneName(Bone(worstBone)), worstT, penDiff * 1000.0f, evBad);
+    }
+
+    // Handshake with a left-handed player still holding the pen: it lays the pen down first.
+    {
+        Piece ps[kPieces];
+        initialPieces(ps);
+        Animator W, B;
+        setup(W, 0, ps, false);
+        setup(B, 1, ps, true);
+        WriteTask pick;
+        pick.type = WriteTaskType::PickPen;
+        pick.frame = penRestFrame(1);
+        B.enqueueWriting(pick);
+        Task h;
+        h.type = TaskType::Handshake;
+        Task wait;
+        wait.type = TaskType::Wait;
+        wait.duration = 1.0f;
+        W.enqueue(wait);
+        B.enqueue(wait);
+        h.partner = &B;
+        W.enqueue(h);
+        h.partner = &W;
+        B.enqueue(h);
+        std::vector<Event> ev;
+        float putAt = -1, claspW = -1, claspB = -1, palmGap = 0;
+        bool heldAtClasp = true;
+        for (float t = 0; t < 4.0f; t += 1.0f / 120.0f) {
+            ev.clear();
+            W.update(1.0f / 120.0f, ev);
+            for (const Event& e : ev)
+                if (e.type == EventType::HandshakeClasp) claspW = e.time;
+            ev.clear();
+            B.update(1.0f / 120.0f, ev);
+            for (const Event& e : ev) {
+                if (e.type == EventType::PenPut) putAt = e.time;
+                if (e.type == EventType::HandshakeClasp) {
+                    claspB = e.time;
+                    heldAtClasp = B.holdsPen();
+                    auto palm = [&](const mat4* g, Bone hand, float side) { return transformPoint(g[hand], vec3(side * 0.0135f, -0.052f, 0.003f)); };
+                    palmGap = length(palm(W.globals(), HandR, 1.0f) - palm(B.globals(), HandR, 1.0f));
+                }
+            }
+        }
+        const bool fail = putAt < 0.0f || heldAtClasp || std::fabs(claspW - claspB) > 1e-5f || palmGap > 0.05f;
+        ::logx::write(fail ? ::logx::Level::Warn : ::logx::Level::Info,
+                      "selftest handshake with a left-handed player holding the pen: pen put down at t=%.3f, clasp %.3f / %.3f, right palms %.1f mm apart",
+                      putAt, claspW, claspB, palmGap * 1000.0f);
     }
 }
 
