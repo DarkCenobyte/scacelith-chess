@@ -134,6 +134,8 @@ private:
     int aiThinkMs_ = 0;
     bool aiRequested_ = false;
     int lastAiEval_ = 0;
+    bool aiHasMove_ = false;
+    chess::Move aiMove_;
     chess::Square aiMoveTo_ = chess::NoSquare;
 
     // Clock

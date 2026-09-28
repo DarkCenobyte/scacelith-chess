@@ -802,41 +802,46 @@ ai::ClockInfo GameScene::clockInfo() const {
     ci.whiteMs = clock_.remainingMs(White);
     ci.blackMs = clock_.remainingMs(Black);
     ci.whiteIncMs = ci.blackIncMs = tc.incrementMs;
+    // Arm movement + clock press of a typical move (anim::Timing), spent on the AI's clock.
+    ci.moveOverheadMs = 1500;
     return ci;
 }
 
 void GameScene::updateAi(float dt) {
     Color side = game_.position().sideToMove();
     int seat = seatOf(side);
+    const Position& pos = game_.position();
     if (!aiRequested_) {
-        const Position& pos = game_.position();
-        int legal = int(pos.legalMoves().size());
-        if (engineOk_) {
-            engine_.requestMove(game_.uciMoves(), clockInfo());
-            aiThinkMs_ = engine_.thinkTimeMs(clockInfo(), int(game_.moves().size()), legal, pos.inCheck());
-        } else {
-            aiThinkMs_ = 900;
-        }
-        if (ctx_->screenshotMode) aiThinkMs_ = std::min(aiThinkMs_, 400);
+        if (engineOk_) engine_.requestMove(game_.uciMoves(), clockInfo());
         aiElapsed_ = 0.0f;
+        aiThinkMs_ = -1;
         aiRequested_ = true;
+        aiHasMove_ = false;
         anim_[seat].setThinking(true);
         return;
     }
     aiElapsed_ += dt;
-    if (engineOk_ && !engine_.moveReady()) return;
-    if (aiElapsed_ * 1000.0f < float(aiThinkMs_)) return;
-
-    int evalCp = 0;
-    std::string uci = engineOk_ ? engine_.takeMove(&evalCp) : std::string();
-    lastAiEval_ = evalCp;
-    Move mv = game_.position().parseUCI(uci);
-    if (!mv.valid()) {
-        std::vector<Move> legal = game_.position().legalMoves();
-        if (legal.empty()) return;  // game end is detected when the previous move was played
-        if (engineOk_) LOGW("engine returned '%s', playing a random move", uci.c_str());
-        mv = legal[size_t(rng_.rangeInt(0, int(legal.size()) - 1))];
+    if (!aiHasMove_) {
+        if (engineOk_ && !engine_.moveReady()) return;
+        int evalCp = 0;
+        std::string uci = engineOk_ ? engine_.takeMove(&evalCp) : std::string();
+        lastAiEval_ = evalCp;
+        aiMove_ = pos.parseUCI(uci);
+        if (!aiMove_.valid()) {
+            std::vector<Move> legal = pos.legalMoves();
+            if (legal.empty()) return;  // game end is detected when the previous move was played
+            if (engineOk_) LOGW("engine returned '%s', playing a random move", uci.c_str());
+            aiMove_ = legal[size_t(rng_.rangeInt(0, int(legal.size()) - 1))];
+        }
+        // Human-like thinking time, counted from the request (the search ran concurrently).
+        int legalCount = int(pos.legalMoves().size());
+        aiThinkMs_ = engineOk_ ? engine_.thinkTimeMs(clockInfo(), int(game_.moves().size()), legalCount, pos.inCheck()) : 900;
+        aiHasMove_ = true;
     }
+    if (aiElapsed_ * 1000.0f < float(aiThinkMs_)) return;
+    Move mv = aiMove_;
+    int evalCp = lastAiEval_;
+
     // The opponent claims a draw by repetition / fifty moves when it is not better.
     if ((game_.canClaimThreefold() || game_.canClaimFiftyMove()) && engineOk_ &&
         engine_.acceptsDraw(evalCp, int(game_.moves().size()))) {
