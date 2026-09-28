@@ -76,6 +76,12 @@ const char* pieceName(PieceType t) {
     }
 }
 
+// Heavier pieces sound slightly lower.
+float piecePitch(PieceType t) {
+    static const float kPitch[7] = {1.0f, 1.05f, 1.0f, 1.0f, 0.98f, 0.96f, 0.94f};
+    return kPitch[t];
+}
+
 float distPointSegment2D(vec2 p, vec2 a, vec2 b) {
     vec2 ab = b - a;
     float l2 = dot(ab, ab);
@@ -954,7 +960,10 @@ void GameScene::handleEvents(int seat, std::vector<anim::Event>& events) {
             if (!p) break;
             p->held = true;
             if (e.type == anim::EventType::CapturedGripped) p->square = NoSquare;
-            audio::play(audio::Sfx::PiecePickup, p->transform.c[3].xyz(), e.type == anim::EventType::PieceGripped ? 0.8f : 0.5f);
+            if (e.type == anim::EventType::PieceGripped)
+                audio::play(audio::Sfx::PiecePickup, p->transform.c[3].xyz(), 0.8f, piecePitch(p->type));
+            else
+                audio::play(audio::Sfx::CaptureClick, p->transform.c[3].xyz(), 0.9f, piecePitch(p->type));
             break;
         }
         case anim::EventType::PieceReleased:
@@ -987,8 +996,8 @@ void GameScene::handleEvents(int seat, std::vector<anim::Event>& events) {
                 p->yaw = heldYaw;
             }
             p->transform = translate(p->basePos) * rotateY(p->yaw);
-            audio::play(e.type == anim::EventType::CapturedReleased ? audio::Sfx::Capture : audio::Sfx::PiecePlace, p->basePos,
-                        0.9f);
+            bool onTable = d.captured || d.square == NoSquare;
+            audio::play(onTable ? audio::Sfx::TablePlace : audio::Sfx::PiecePlace, p->basePos, 0.9f, piecePitch(p->type));
             break;
         }
         case anim::EventType::ClockPressed: onClockPressed(seat); break;
