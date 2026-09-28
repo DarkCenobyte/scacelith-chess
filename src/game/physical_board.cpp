@@ -67,10 +67,11 @@ vec3 PhysicalBoard::nextCaptureSlot(Color capturedColor) {
 }
 
 vec3 PhysicalBoard::reserveSlot(Color c) const {
-    // Spare queens wait at the far corner of the clock-free side, near their owner.
+    // Spare queens stand on the clock-free side, beyond the captured pieces, near their owner
+    // (clear of the players' resting hands).
     float sideX = clockPosX_ ? -1.0f : 1.0f;
-    float z = c == White ? 0.33f : -0.33f;
-    return {sideX * (layout::BOARD_SIZE * 0.5f + 0.05f), layout::TABLE_TOP_Y, z};
+    float z = c == White ? 0.10f : -0.10f;
+    return {sideX * 0.41f, layout::TABLE_TOP_Y, z};
 }
 
 void PhysicalBoard::setOnSquare(int id, Square sq) {

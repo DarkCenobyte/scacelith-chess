@@ -75,6 +75,7 @@ private:
     m::vec3 jitteredSquare(chess::Square sq);
 
     // ---- helpers ----
+    bool pieceInHand(const PieceObject& p) const;
     int seatOf(chess::Color c) const { return c == chess::White ? 0 : 1; }
     chess::Color colorOfSeat(int seat) const { return seat == 0 ? chess::White : chess::Black; }
     int humanSeat() const { return seatOf(humanColor_); }
@@ -151,6 +152,8 @@ private:
     bool dragging_ = false;
     float menuAngle_ = 0.9f;
     float fade_ = 1.0f;
+    float focusDistance_ = -1.0f;
+    bool cameraCut_ = true;
     float gazeTimer_ = 0.0f;
     float glanceTime_ = 0.0f;
     m::vec3 aiGazeTarget_{0, 0.8f, 0};

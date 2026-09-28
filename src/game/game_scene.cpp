@@ -181,7 +181,7 @@ void GameScene::initAnimators() {
         anim_[seat] = anim::Animator();
         anim_[seat].init(sk, vec3(0, layout::PLAYER_PELVIS_Y, zs * layout::PLAYER_PELVIS_Z), zs);
         // Right hand rests on the table beside the board (White's right is +X, Black's is -X).
-        anim_[seat].setRestHand(vec3(zs * 0.265f, layout::TABLE_TOP_Y, zs * 0.305f));
+        anim_[seat].setRestHand(vec3(zs * 0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
         anim_[seat].pieceTransform = [this](int id) {
             const PieceObject* p = board_.byId(id);
             return p ? p->transform : mat4();
@@ -192,8 +192,32 @@ void GameScene::initAnimators() {
             // (height, grip height above the base, grip radius), metres
             return vec3(layout::PIECE_HEIGHT[t], layout::PIECE_HEIGHT[t] * layout::PIECE_GRIP_HEIGHT[t], layout::PIECE_GRIP_RADIUS[t]);
         };
+        // Exact obstacle heights for the hand paths: standing pieces only (not those in a hand).
+        anim_[seat].pathObstacleTop = [this](vec3 from, vec3 to) {
+            float top = layout::BOARD_TOP_Y;
+            vec2 a(from.x, from.z), b(to.x, to.z);
+            for (const PieceObject& p : board_.pieces()) {
+                if (pieceInHand(p)) continue;
+                float d = distPointSegment2D(vec2(p.basePos.x, p.basePos.z), a, b);
+                if (d < layout::PIECE_BASE_RADIUS[p.type] + 0.02f) top = std::max(top, p.basePos.y + layout::PIECE_HEIGHT[p.type]);
+            }
+            return top;
+        };
+        anim_[seat].obstacleTopNear = [this](vec3 pt, float radius, int ignoreId) {
+            float top = layout::BOARD_TOP_Y;
+            for (const PieceObject& p : board_.pieces()) {
+                if (p.id == ignoreId || pieceInHand(p)) continue;
+                float d = length(vec2(p.basePos.x - pt.x, p.basePos.z - pt.z));
+                if (d < radius + layout::PIECE_BASE_RADIUS[p.type]) top = std::max(top, p.basePos.y + layout::PIECE_HEIGHT[p.type]);
+            }
+            return top;
+        };
         hasPrevGlobals_[seat] = false;
     }
+}
+
+bool GameScene::pieceInHand(const PieceObject& p) const {
+    return p.held || anim_[0].holding(p.id) || anim_[1].holding(p.id);
 }
 
 void GameScene::enterMenu() {
@@ -211,6 +235,7 @@ void GameScene::enterMenu() {
     initAnimators();
     for (auto& a : anim_) a.setHeadOverride(false);
     menuAngle_ = 0.9f;
+    cameraCut_ = true;
     plat::setMouseCaptured(false);
     dragging_ = false;
 }
@@ -285,6 +310,7 @@ void GameScene::setupNewGame() {
     gazeYaw_ = 0.0f;
     gazePitch_ = kBaseGazePitch;
     lean_ = leanSmooth_ = 0.0f;
+    cameraCut_ = true;
 
     std::string moves = ctx_->argValue("--moves");
     if (!moves.empty()) applyMovesInstantly(split(moves, ','));
@@ -363,7 +389,12 @@ void GameScene::applySettings(bool displayToo) {
     Settings& s = settings();
     if (ctx_ && ctx_->renderer) {
         ctx_->renderer->setSettings(s.renderSettings());
-        ctx_->renderer->post().settings.exposureCompensation = s.brightness;
+        PostSettings& ps = ctx_->renderer->post().settings;
+        ps.exposureCompensation = s.brightness;
+        // A seated player's eyes: gentle depth of field, only far objects soften.
+        applyDofPreset(ps, s.depthOfField ? DofPreset::Subtle : DofPreset::Off);
+        ps.dofFStop = 8.0f;
+        ps.dofMaxRadius = 8.0f;
     }
     audio::setMasterVolume(s.masterVolume);
     audio::setEffectsVolume(s.effectsVolume);
@@ -1030,6 +1061,8 @@ void GameScene::onClockPressed(int seat) {
             clock_.addTime(opposite(mover), v.opponentBonusMs);
         }
         game_.play(v.move);
+        LOGI("move %d: %s (%s, clocks %lld / %lld ms)", int(game_.moves().size()), game_.sanMoves().back().c_str(),
+             mover == White ? "White" : "Black", (long long)clock_.remainingMs(White), (long long)clock_.remainingMs(Black));
         if (v.moveStands) board_.syncTo(game_.position());
         if (game_.status() != GameStatus::Ongoing) {
             endGame();
@@ -1262,6 +1295,20 @@ void GameScene::render(AppContext& ctx, float dt) {
     }
     camera_ = firstPerson && viewOverride_.empty() ? camera_ : camera_;
     render::Environment env = world_.environment(time_);
+    // Eyes focus where the player looks: the board / table under the centre of the view.
+    {
+        Ray centre{cam.position, cam.forward()};
+        float t = rayPlane(centre, vec3(0, layout::BOARD_TOP_Y, 0), vec3(0, 1, 0));
+        float target = (t > 0.0f && t < 3.0f) ? t : 2.5f;
+        if (!firstPerson) target = length(cam.position - vec3(0, 0.9f, 0));
+        focusDistance_ = focusDistance_ <= 0.0f ? target : focusDistance_ + (target - focusDistance_) * (1.0f - std::exp(-dt * 6.0f));
+        r.post().settings.dofFocusDistance = focusDistance_;
+    }
+    if (cameraCut_) {
+        r.post().settings.resetHistory = true;
+        cameraCut_ = false;
+        for (auto& h : hasPrevGlobals_) h = false;
+    }
     r.fade = fade_;
     r.beginFrame(cam, env, dt);
     if (state_ != State::Loading) {
