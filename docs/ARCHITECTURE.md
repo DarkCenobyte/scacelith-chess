@@ -37,7 +37,7 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 | `src/ai` | Stockfish 16 in-process (UCI over in-memory streams), presets |
 | `src/audio` | Procedural sound synthesis, mixer, reverb, WASAPI |
 | `src/ui` | SDF text, widgets, menus |
-| `src/game` | Game state machine, settings, world layout (`layout.h`) |
+| `src/game` | Game state machine, settings, world layout (`layout.h`); seats and game modes (play / watch), Elo (`elo.h`), camera flights and the viewer's observer camera (engine-free, in the core library and unit-tested) |
 | `src/app` | Scene registry (`--scene`), test scenes |
 
 ## Rendering contracts
