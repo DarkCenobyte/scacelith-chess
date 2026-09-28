@@ -1,0 +1,54 @@
+// Mip chain of the scoresheet ink fields (game/scoresheet.cpp). A plain average of distance
+// values would thin or thicken the ink and make blank paper grey far away; instead every level
+// stores the ink coverage of its texels, encoded so that the paper shader decodes any level with
+// one formula (shaders/materials/paper.glsl, paper_cov):
+//   coverage c = clamp((v - 0.5) / k + 0.5),   k(level n) = min(2^n, 2 S) / (2 S)
+// (level 0: the signed distance itself; from 2^n >= 2 S on: the coverage). Pressure is averaged.
+// ENTRY (RGBA16F entry texture): r = ink field, g = reveal time (coverage-weighted average), b =
+// pressure.
+layout(local_size_x = 8, local_size_y = 8) in;
+#ifdef ENTRY
+layout(binding = 0, rgba16f) uniform readonly image2D uSrc;
+layout(binding = 1, rgba16f) uniform writeonly image2D uDst;
+#else
+layout(binding = 0, rgba8) uniform readonly image2D uSrc;
+layout(binding = 1, rgba8) uniform writeonly image2D uDst;
+#endif
+uniform float uKSrc, uKDst;
+uniform ivec2 uDstSize;
+
+void main() {
+    ivec2 p = ivec2(gl_GlobalInvocationID.xy);
+    if (any(greaterThanEqual(p, uDstSize))) return;
+    ivec2 last = imageSize(uSrc) - 1;
+    vec2 c = vec2(0.0);
+    float b = 0.0, a = 0.0;
+#ifdef ENTRY
+    float tw = 0.0, tMax = 0.0;
+#endif
+    for (int dy = 0; dy < 2; ++dy)
+        for (int dx = 0; dx < 2; ++dx) {
+            vec4 v = imageLoad(uSrc, min(p * 2 + ivec2(dx, dy), last));
+#ifdef ENTRY
+            float cr = clamp((v.r - 0.5) / uKSrc + 0.5, 0.0, 1.0);
+            c.x += cr;
+            tw += cr * v.g;
+            tMax = max(tMax, v.g);
+#else
+            c += clamp((v.rg - 0.5) / uKSrc + 0.5, 0.0, 1.0);
+#endif
+            b += v.b;
+            a += v.a;
+        }
+    c *= 0.25;
+    vec4 o;
+#ifdef ENTRY
+    o.r = 0.5 + (c.x - 0.5) * uKDst;
+    o.g = c.x > 1e-4 ? tw / (4.0 * c.x) : tMax;
+    o.ba = vec2(b, a) * 0.25;
+#else
+    o.rg = 0.5 + (c - 0.5) * uKDst;
+    o.ba = vec2(b, a) * 0.25;
+#endif
+    imageStore(uDst, p, o);
+}

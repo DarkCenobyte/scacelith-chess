@@ -27,6 +27,8 @@
 //     (rgb nits, falloff m), 0 = unlit
 //   * ClockDisplay: inst[0] = (white ms, black ms, flags, running side) see scene/clock_model.h
 //   * RobotEyeIris: inst[0].x = pupil dilation [0,1]
+//   * ScoresheetPaper: uv / inst[0] / textures 0-1 documented in shaders/materials/paper.glsl;
+//     every game::Scoresheet draws its pages with its own copy of this material (its textures)
 #pragma once
 #include "../material.h"
 
@@ -69,6 +71,11 @@ enum class MaterialId : int {
     RobotEyeIris,         // iris with depth (parallax/refraction), pupil
     RobotEyeCornea,       // transparent cornea bulge (specular highlight)
     RobotLid,             // eyelid shells (porcelain, same as body)
+    // Scoresheet and pen (scoresheet package; see shaders/materials/paper.glsl)
+    ScoresheetPaper,      // pad pages: fibres, printed form and ballpoint ink from the page textures
+    ScoresheetCard,       // grey card back board (inst[0].x = 0) and cloth binding tape (1)
+    PenBody,              // ballpoint barrel and cap: deep blue-black lacquer, clear coat
+    PenMetal,             // chrome trim, clip, cone and tip
     // Generic
     Default,              // standard.glsl, neutral grey
     Count

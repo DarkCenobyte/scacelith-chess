@@ -712,8 +712,9 @@ vec3 toPad(float xMm, vec2 zy) {
 }  // namespace
 
 m::vec3 flipPoint(float xMm, float yMm, float s, const FlipParams& p) {
+    if (yMm < HINGE_Y) return toPad(xMm, vec2(yMm - HINGE_Y, 0.0f));  // glued under the tape
     FlipState st = flipState(s, p.turnedBelow);
-    float v = std::max(0.0f, yMm - HINGE_Y);
+    float v = yMm - HINGE_Y;
     vec2 zy;
     integrateColumn(st, leadOf(xMm, p), &v, 1, &zy);
     return toPad(xMm, zy);
@@ -728,7 +729,8 @@ void flipGrid(const std::vector<float>& xs, const std::vector<float>& ys, float 
     out.resize(xs.size() * ys.size());
     for (size_t i = 0; i < xs.size(); ++i) {
         integrateColumn(st, leadOf(xs[i], p), vs.data(), vs.size(), col.data());
-        for (size_t j = 0; j < ys.size(); ++j) out[j * xs.size() + i] = toPad(xs[i], col[j]);
+        for (size_t j = 0; j < ys.size(); ++j)
+            out[j * xs.size() + i] = toPad(xs[i], ys[j] < HINGE_Y ? vec2(ys[j] - HINGE_Y, 0.0f) : col[j]);
     }
 }
 

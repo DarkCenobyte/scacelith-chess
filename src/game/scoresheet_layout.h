@@ -215,7 +215,8 @@ struct FlipParams {
     int turnedBelow = 0;
     float outerSign = 1.0f;      // pinched side (PadFrame::outerSign)
 };
-// Pad-local position (m) of the page point (xMm, yMm), yMm >= HINGE_Y, at progress s.
+// Pad-local position (m) of the page point (xMm, yMm) at progress s (the strip above HINGE_Y stays
+// glued flat under the tape).
 m::vec3 flipPoint(float xMm, float yMm, float s, const FlipParams& p);
 // Same for a grid: out[j * xs.size() + i] = flipPoint(xs[i], ys[j]); ys must be increasing.
 void flipGrid(const std::vector<float>& xs, const std::vector<float>& ys, float s, const FlipParams& p,
