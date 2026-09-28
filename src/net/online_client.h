@@ -13,6 +13,20 @@
 // token over. Tokens are encrypted at rest with DPAPI on Windows.
 //
 // Engine-free (no GL, no UI): compiled into scacelith_core and unit-tested (tests/net_tests.cpp).
+//
+// Changes to the original contract (client-net):
+//   - OnlineClient::setCredentialsFile(path) (additive): where the credential store lives. By
+//     default Scacelith.credentials is next to the executable (like Scacelith.ini), or in the
+//     user data directory when that directory is not writable; main.cpp may call it with the
+//     directory of the --ini file. Tests use it to work in a temporary file.
+//   - ServerEndpoint::origin() brackets IPv6 literals ("[::1]:8443") so an origin is unambiguous.
+//   - ServerEndpoint::pinnedSha256 accepts "AB:CD:..." too (setServer normalises it to 64 lower-case
+//     hex digits). When it is empty, the pin saved for the origin at the last login applies.
+//   - Commands that need the realtime connection while it is not Online produce a ServerError
+//     event with code 0 and error "offline" ("invalid_request" for out-of-range arguments).
+//   - ServerEndpoint::wsPort defaults to 0 = the API port (one port for HTTPS and /ws, as on the
+//     official server); effectiveWsPort() resolves it. /api/v1/info's wsPort is informative only.
+//     TLS is always used unless insecureDev is set (and insecureDev is refused off loopback).
 #pragma once
 #include <cstdint>
 #include <memory>
@@ -26,17 +40,20 @@ namespace net {
 struct ServerEndpoint {
     std::string host;                 // DNS name or IP literal (IPv6 without brackets)
     uint16_t apiPort = 443;           // HTTPS API
-    uint16_t wsPort = 443;            // WSS; 0 = the value announced by the server's /api/v1/info
+    uint16_t wsPort = 0;              // WSS; 0 (left empty) = apiPort (API and /ws on one port)
     std::string pinnedSha256;         // optional: hex SHA-256 of the server's leaf certificate
                                       // (self-signed community servers); empty = OS trust store
     bool insecureDev = false;         // plain HTTP/WS for local development servers only
                                       // (refused for anything but localhost / 127.0.0.1 / ::1)
     std::string origin() const;       // "host:apiPort" (lower-case host) - the credential scope
     bool valid() const;
+    uint16_t effectiveWsPort() const { return wsPort ? wsPort : apiPort; }
 };
 
-// The official server of this build ("" when none): CMake option SCACELITH_OFFICIAL_SERVER
-// ("host[:apiPort[:wsPort]]").
+// The official server of this build: caissa.scacelith.com, HTTPS API and WSS on port 44664
+// (wss://caissa.scacelith.com:44664/ws), trust store, no pin. The CMake option
+// SCACELITH_OFFICIAL_SERVER ("host[:apiPort[:wsPort]]", wsPort = apiPort when omitted) replaces
+// it; "none" builds without one (host "").
 ServerEndpoint officialServer();
 
 struct Category {                     // an official (rated) time control
@@ -178,6 +195,7 @@ public:
     OnlineClient& operator=(const OnlineClient&) = delete;
 
     // ---- server and account (HTTPS) ----
+    void setCredentialsFile(const std::string& path);  // optional; see the note at the top
     void setServer(const ServerEndpoint& ep);    // disconnects if the origin changes
     const ServerEndpoint& server() const;
     void fetchServerInfo();

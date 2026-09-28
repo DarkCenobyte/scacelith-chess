@@ -15,6 +15,7 @@ endif()
 
 option(SCACELITH_CONSOLE "Windows: build a console-subsystem exe (logs visible)" OFF)
 option(SCACELITH_STOCKFISH "Embed the Stockfish engine" ON)
+set(SCACELITH_OFFICIAL_SERVER "" CACHE STRING "Official online server: host[:apiPort[:wsPort]] (empty = caissa.scacelith.com:44664, none = no official server)")
 
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 if(WIN32)
@@ -44,7 +45,7 @@ endif()
 # ---------------------------------------------------------------------------------------------
 file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
     ${ROOT}/src/core/*.cpp ${ROOT}/src/math/*.cpp ${ROOT}/src/chess/*.cpp ${ROOT}/src/ai/*.cpp ${ROOT}/src/audio/*.cpp
-    ${ROOT}/src/i18n/*.cpp)
+    ${ROOT}/src/i18n/*.cpp ${ROOT}/src/net/*.cpp)
 # Engine-free parts of src/game (Elo, observer camera, camera flights, scoresheet layout): in the
 # core library so the unit tests can use them, and left out of the game sources below.
 set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cpp ${ROOT}/src/game/observer_camera.cpp
@@ -71,6 +72,23 @@ else()
     # src/net direct match on the Linux dev/test build: OpenSSL libcrypto for the same primitives.
     find_package(OpenSSL REQUIRED)
     target_link_libraries(scacelith_core PUBLIC OpenSSL::Crypto)
+endif()
+# Online client (src/net): WinHTTP, DPAPI, BCrypt and the shell on Windows; OpenSSL on Linux
+# development builds (without it the Linux build compiles and online play reports "unavailable").
+set_source_files_properties(${ROOT}/src/net/online_client.cpp PROPERTIES COMPILE_DEFINITIONS
+    "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\";SCACELITH_VERSION_STRING=\"${PROJECT_VERSION}\"")
+set_source_files_properties(${ROOT}/tests/net_tests.cpp PROPERTIES COMPILE_DEFINITIONS
+    "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\"")
+if(WIN32)
+    target_link_libraries(scacelith_core PUBLIC winhttp crypt32 bcrypt ws2_32 shell32)
+else()
+    find_package(OpenSSL)
+    if(OPENSSL_FOUND)
+        target_link_libraries(scacelith_core PUBLIC OpenSSL::SSL OpenSSL::Crypto)
+        target_compile_definitions(scacelith_core PRIVATE SCACELITH_HAS_OPENSSL=1)
+    else()
+        message(STATUS "OpenSSL not found: online play is unavailable in this build")
+    endif()
 endif()
 
 # ---------------------------------------------------------------------------------------------
