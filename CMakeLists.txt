@@ -45,9 +45,10 @@ endif()
 file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
     ${ROOT}/src/core/*.cpp ${ROOT}/src/math/*.cpp ${ROOT}/src/chess/*.cpp ${ROOT}/src/ai/*.cpp ${ROOT}/src/audio/*.cpp
     ${ROOT}/src/i18n/*.cpp)
-# Engine-free parts of src/game (Elo, observer camera, camera flights): in the core library so
-# the unit tests can use them, and left out of the game sources below.
-set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cpp ${ROOT}/src/game/observer_camera.cpp)
+# Engine-free parts of src/game (Elo, observer camera, camera flights, scoresheet layout): in the
+# core library so the unit tests can use them, and left out of the game sources below.
+set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cpp ${ROOT}/src/game/observer_camera.cpp
+    ${ROOT}/src/game/scoresheet_layout.cpp)
 list(APPEND CORE_SOURCES ${GAME_CORE_SOURCES})
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
 target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party)
