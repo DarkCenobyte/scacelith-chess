@@ -22,6 +22,7 @@
 #include "render/renderer.h"
 #include "render/shader.h"
 #include "game/settings.h"
+#include "net/online_client.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -56,6 +57,12 @@ static int runApp(std::vector<std::string> args) {
     std::string iniPath = ctx.argValue("--ini", exeDir + "Scacelith.ini");
     game::Settings& settings = game::settings();
     settings.load(iniPath);
+    // Online logins (one per server, DPAPI-protected) live next to an explicit --ini file;
+    // otherwise next to the exe, or in the user data dir (net::OnlineClient's default).
+    if (!ctx.argValue("--ini").empty()) {
+        size_t slash = iniPath.find_last_of("/\\");
+        net::onlineClient().setCredentialsFile((slash == std::string::npos ? std::string() : iniPath.substr(0, slash + 1)) + "Scacelith.credentials");
+    }
 
     std::string shotPath = ctx.argValue("--shot");
     int shotFrames = std::atoi(ctx.argValue("--frames", "30").c_str());

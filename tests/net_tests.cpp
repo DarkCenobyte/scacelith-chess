@@ -217,9 +217,14 @@ bool checkValidVector(const std::string& name, const Value* msg, const std::vect
 }
 
 // A malformed frame must be refused by every typed decoder.
-bool checkMalformed(const std::string& name, const std::vector<uint8_t>& bytes) {
+// dir: "c2s" (bytes received by a server or a direct-match host: only client message decoders
+// apply), "s2c" (received by a client: only server message decoders), "" (every decoder). A
+// "wrong direction" vector is a valid message of the other direction, refused by dispatch.
+bool checkMalformed(const std::string& name, const std::vector<uint8_t>& bytes, const std::string& dir = "") {
     bool ok = true;
     for (pr::MsgType t : allTypes()) {
+        bool s2c = int(t) >= 0x80;
+        if ((dir == "c2s" && s2c) || (dir == "s2c" && !s2c)) continue;
         pr::withMessage(t, [&](auto& m) {
             if (pr::decode(bytes.data(), bytes.size(), m)) {
                 std::fprintf(stderr, "  malformed vector accepted as %s: %s\n", pr::messageName(t), name.c_str());
@@ -332,7 +337,7 @@ TEST(net_protocol_shared_fixture) {
         for (const Value& e : list.items()) {
             std::string h = e.isString() ? e.asString() : hexOf(e);
             if (e.isObject() && h.empty()) continue;
-            CHECK(checkMalformed("shared:" + e["name"].asString(), unhex(h)));
+            CHECK(checkMalformed("shared:" + e["name"].asString(), unhex(h), e["dir"].isString() ? e["dir"].asString() : ""));
             ++malformed;
         }
     };
