@@ -123,14 +123,19 @@ void surface(in SurfaceInput i, inout Surface s) {
         float sheet = floor(hMm / 0.1);
         float f = fract(hMm / 0.1);
         float fw = fpMm / 0.1;
-        float gap = mat_band(f - 0.5, 0.5 - 0.12, fw);  // 1 inside the sheet body
+        float gap = mat_band(f - 0.5, 0.5 - 0.16, fw);  // 1 inside the sheet body
         float vis = 1.0 - mat_subpixel(0.1, fpMm);
-        float tone = 0.88 + 0.1 * mat_hash1(sheet + I0.w * 17.0);
-        float body = mix(0.82, gap * tone + (1.0 - gap) * 0.45, vis);
+        float hs = mat_hash1(sheet + I0.w * 17.0);
+        float tone = 0.84 + 0.16 * hs;
+        float body = mix(0.8, gap * tone + (1.0 - gap) * 0.38, vis);
         paper *= body * (1.0 + 0.03 * mat_gnoise(vec3(along * 0.05, hMm * 0.3, 1.0)));
         rough = 0.85;
         spec = 0.3;
         s.occlusion = 0.85;
+        // The sheets are not cut perfectly flush: each edge faces slightly up or down.
+        heightUm = 0.0;
+        vec3 up = normalize(mat3(draws[uDraw].model) * vec3(0.0, 1.0, 0.0));
+        s.normalWS = normalize(i.normalWS + up * (hs - 0.5) * 0.5 * vis);
     } else {
         bool back = uv.x >= 1.5;
         vec2 u = back ? uv - vec2(2.0, 0.0) : uv;
