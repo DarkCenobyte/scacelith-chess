@@ -6,7 +6,9 @@
 //
 // Sequence of a game, driven by GameScene:
 //   newGame()        blank pads, pens on the table (before the opening handshake)
-//   startRecording() both players pick up their pen and fill in the header
+//   writeHeaderInstantly()  the header, filled in before the round as in tournaments (otherwise
+//                    startRecording() has the players write it, a dozen seconds of writing)
+//   startRecording() both players pick up their pen
 //   recordMove()     on every completed move: both players write it (turning the page first
 //                    when the move starts a new page)
 //   finishGame()     both players write the result and lay the pen down (before the final
@@ -37,6 +39,8 @@ public:
     // (re)initialised: their pens are on the table.
     void newGame(anim::Animator* anim, bool clockOnPositiveX, const Player players[2], int round,
                  const std::string& date);
+    // Header already filled in (event, date, round, names, ratings).
+    void writeHeaderInstantly();
     // Position set up without animation (--moves): the moves are already on the sheets.
     void writeMovesInstantly(const std::vector<std::string>& san);
     void startRecording();
@@ -55,6 +59,7 @@ public:
     int backlog(int seat) const;              // entries begun and not finished yet
 
 private:
+    Scoresheet::Header header() const;
     void beginMoveEntry(int seat, int ply, const std::string& san);
     void refreshRest(int seat);
 

@@ -110,8 +110,7 @@ void Scorekeeper::clear() {
     }
 }
 
-void Scorekeeper::writeMovesInstantly(const std::vector<std::string>& san) {
-    if (!ready_) return;
+Scoresheet::Header Scorekeeper::header() const {
     Scoresheet::Header h;
     h.date = date_;
     h.round = std::to_string(round_);
@@ -119,26 +118,31 @@ void Scorekeeper::writeMovesInstantly(const std::vector<std::string>& san) {
     h.black = players_[1].name;
     h.whiteElo = players_[0].elo > 0 ? std::to_string(players_[0].elo) : "";
     h.blackElo = players_[1].elo > 0 ? std::to_string(players_[1].elo) : "";
+    return h;
+}
+
+void Scorekeeper::writeHeaderInstantly() {
+    if (!ready_ || headerWritten_) return;
+    Scoresheet::Header h = header();
+    for (auto& sh : sheets_) sh.writeHeaderInstant(h);
+    headerWritten_ = true;
+}
+
+void Scorekeeper::writeMovesInstantly(const std::vector<std::string>& san) {
+    if (!ready_) return;
+    writeHeaderInstantly();
     for (int s = 0; s < 2; ++s) {
-        if (!headerWritten_) sheets_[s].writeHeaderInstant(h);
         for (size_t i = size_t(nextPly_[s]); i < san.size(); ++i) sheets_[s].writeMoveInstant(int(i), san[i]);
         nextPly_[s] = std::max(nextPly_[s], int(san.size()));
         refreshRest(s);
     }
-    headerWritten_ = true;
     moves_ = san;
 }
 
 void Scorekeeper::startRecording() {
     if (recording_ || !ready_ || !anim_) return;
     recording_ = true;
-    Scoresheet::Header h;
-    h.date = date_;
-    h.round = std::to_string(round_);
-    h.white = players_[0].name;
-    h.black = players_[1].name;
-    h.whiteElo = players_[0].elo > 0 ? std::to_string(players_[0].elo) : "";
-    h.blackElo = players_[1].elo > 0 ? std::to_string(players_[1].elo) : "";
+    Scoresheet::Header h = header();
     for (int s = 0; s < 2; ++s) {
         anim::WriteTask pick = writeTask(anim::WriteTaskType::PickPen);
         pick.frame = sheets_[s].penRestTransform();
@@ -161,6 +165,8 @@ void Scorekeeper::recordMove(int ply, const std::string& san) {
         // Moves completed before this sheet caught up (never happens in normal play) come first.
         for (int p = nextPly_[s]; p <= ply; ++p) beginMoveEntry(s, p, moves_[size_t(p)]);
     }
+    LOGD("scoresheet: move %d queued, writing backlog %.1f s / %.1f s", ply + 1,
+         anim_[0].writingRemainingTime(), anim_[1].writingRemainingTime());
 }
 
 void Scorekeeper::beginMoveEntry(int seat, int ply, const std::string& san) {
@@ -230,6 +236,7 @@ void Scorekeeper::onEvent(int seat, const anim::Event& e) {
     case anim::EventType::PageTurned:
         audio::play(audio::Sfx::PageFlap, sh.pageCorner(1.0f), 0.8f);
         sh.finishPageTurn();
+        LOGD("scoresheet %d: page turned", seat);
         break;
     case anim::EventType::PenPut: audio::play(audio::Sfx::PenTap, e.transform.c[3].xyz(), 0.5f, 0.8f); break;
     default: break;

@@ -224,8 +224,8 @@ void GameScene::initAnimators() {
         seats_[seat].playHand = playHandFor(seat, world_.clockOnPositiveX());
         anim_[seat] = anim::Animator();
         anim_[seat].init(sk, vec3(0, layout::PLAYER_PELVIS_Y, zs * layout::PLAYER_PELVIS_Z), zs, seats_[seat].playHand);
-        // The playing hand rests on the table beside the board, on its side (White's right is +X,
-        // Black's is -X). Asked from the animator: it plays right-handed until it supports the left.
+        // The playing hand rests on the table beside the board, on the clock side (White's right
+        // is +X, Black's is -X).
         float side = anim_[seat].playHand() == character::Side::Right ? zs : -zs;
         anim_[seat].setRestHand(vec3(side * 0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
         anim_[seat].pieceTransform = [this](int id) {
@@ -374,6 +374,9 @@ void GameScene::setupNewGame() {
     initAnimators();
     configureSeats();
     newScoresheets();
+    // The players filled in their header before sitting down at the board, as in a tournament
+    // round: the pens only record the moves.
+    scorekeeper_.writeHeaderInstantly();
     if (engineOk_) {
         engine_.newGame();
         engine_.configure(seats_[seats_[0].human() ? 1 : 0].engine);
@@ -487,7 +490,7 @@ void GameScene::startPlaying() {
     }
     clock_.start(game_.position().sideToMove());
     audio::playUI(audio::Sfx::GameStart, 0.6f);
-    // Both players take their pen and fill in the header while White thinks.
+    // Both players take their pen while White thinks.
     scorekeeper_.startRecording();
     beginTurn();
 }
@@ -1101,7 +1104,12 @@ ai::ClockInfo GameScene::clockInfo() const {
     ci.blackMs = clock_.remainingMs(Black);
     ci.whiteIncMs = ci.blackIncMs = tc.incrementMs;
     // Arm movement + clock press of a typical move (anim::Timing), spent on the AI's clock.
-    ci.moveOverheadMs = 1500;
+    // Stockfish deducts the overhead of its next 52 moves from the time left (timeman.cpp), which
+    // left it no time at all below 78 s (depth-1 moves in bullet and time trouble): scaled down
+    // so that about half of the time stays for the search. The clock itself is charged the
+    // humanised thinking time, not the search time.
+    int64_t budget = clock_.remainingMs(game_.position().sideToMove()) + int64_t(tc.incrementMs) * 49;
+    ci.moveOverheadMs = int(std::clamp<int64_t>(budget / 104, 10, 1500));
     return ci;
 }
 
@@ -1252,8 +1260,9 @@ void GameScene::planPromotionSwap(std::vector<anim::Task>& tasks, int pawnId, Sq
     if (!pawn) return;
     Color c = pawn->color;
     // The pawn leaves the board, then the new piece (a captured one, or the spare queen) takes
-    // its place.
-    vec3 slot = board_.nextCaptureSlot(c);
+    // its place. The player sets their own pawn down in their half, in the row of the pieces
+    // they captured (nextCaptureSlot places a colour near the player who captures it).
+    vec3 slot = board_.nextCaptureSlot(c == White ? Black : White);
     vec3 sqPos = board_.squareBase(sq);
     tasks.push_back(task(anim::TaskType::Reach, pawnId));
     tasks.push_back(task(anim::TaskType::Lift, pawnId, vec3(0), 0.03f));
