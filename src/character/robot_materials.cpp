@@ -18,6 +18,7 @@ void setupRobotMaterials() {
     por.params[4] = vec4(1.0f, 0.00045f, 0.35f, 0.02f);     // seam darkening, bevel width, smudges, albedo variation
     por.tessellated = true;
     por.tessLevel = 8.0f;
+    por.defines = {"MATERIAL_SCREEN_DOOR"};   // see-through playing arm (submitRobot armOpacity)
 
     // Eyelids: same glaze, a touch warmer and smoother.
     Material& lid = materials::getMutable(MaterialId::RobotLid);
@@ -38,6 +39,7 @@ void setupRobotMaterials() {
     jt.params[3] = vec4(1.0f, 9000.0f, 0, 0);
     jt.tessellated = true;
     jt.tessLevel = 4.0f;
+    jt.defines = {"MATERIAL_SCREEN_DOOR"};
 
     // Eyes: one surface file, three variants.
     const float lz = eye::limbusZ(), cz = eye::corneaCenterZ();

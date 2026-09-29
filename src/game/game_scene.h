@@ -262,6 +262,7 @@ private:
     float glanceTime_ = 0.0f;
     m::vec3 aiGazeTarget_{0, 0.8f, 0};
     m::Rng rng_{1};
+    float armSeeThrough_ = 0.0f;   // player's playing arm: 0 opaque .. 1 see-through (piece in hand)
 
     // Viewer mode
     ObserverCamera observer_;

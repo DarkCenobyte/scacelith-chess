@@ -47,3 +47,32 @@ vec2 motionVector() {
     vec2 prev = vin.prevClip.xy / vin.prevClip.w;
     return (cur - prev) * 0.5;
 }
+
+// Screen-door transparency (DrawItem::opacity, materials with MATERIAL_SCREEN_DOOR): true when
+// this pixel of a see-through draw is left out. It only depends on the pixel and the frame, so
+// the prepass and the main pass leave out exactly the same pixels (the main pass tests GEQUAL
+// against the prepass depth). Threshold = 4x4 ordered dither: 4 x fine rank (2x2 phase) + coarse
+// rank. Without TAA the pattern stays still (a fine, steady mesh rather than a shimmer). With TAA
+// the fine ranks are permuted every frame: at an opacity of k/4 every 2x2 block keeps exactly k
+// pixels in every frame and every pixel is kept 2k frames out of 8, so any history footprint
+// holds both layers (no disocclusion rejection) and TAA blends them. The 8 permutations follow
+// the renderer's 8-frame Halton jitter: a plain rotation lines up with it (taa.comp's
+// reconstruction filter then favours some pixel phases: stripes); this schedule was searched so
+// that every phase gets the same average and the smallest ripple through that filter and the
+// history feedback. Entry n: 2 bits per phase (fx + 2 fy) = its rank in frame n.
+const uint kScreenDoorRanks[8] = uint[](147u, 198u, 108u, 147u, 57u, 108u, 57u, 198u);
+
+bool screenDoorHidden() {
+    vec4 fade = draws[vin.draw].fade;
+    if (fade.x >= 1.0) return false;
+    uvec2 q = uvec2(gl_FragCoord.xy);
+    uvec2 f = q & 1u, c = (q >> 1u) & 1u;
+    uint fine = ((f.x ^ f.y) << 1u) | f.y;   // 2x2 Bayer: 0 2 / 3 1
+    uint coarse = ((c.x ^ c.y) << 1u) | c.y;
+    if (fade.y > 0.5) {
+        uint n = uint(frame.skyParams.w);
+        fine = (kScreenDoorRanks[n & 7u] >> (2u * (f.x + 2u * f.y))) & 3u;
+        coarse = (coarse + (n >> 3u)) & 3u;
+    }
+    return (float(fine * 4u + coarse) + 0.5) * (1.0 / 16.0) >= fade.x;
+}

@@ -1840,9 +1840,15 @@ void GameScene::render(AppContext& ctx, float dt) {
         world_.submitStatic(r);
         world_.submitPieces(r, board_);
         world_.submitClock(r, clockDisplay());
+        // Through the player's eyes, the playing arm fades to a see-through ghost while a piece is
+        // in hand, so the squares under it stay readable (the piece itself stays opaque).
+        bool ghostArm = !watching() && state_ == State::Playing && headless == humanSeat() &&
+                        (turn_ == Turn::HumanTouched || turn_ == Turn::HumanPlacing || turn_ == Turn::HumanPromotion);
+        armSeeThrough_ = clamp(armSeeThrough_ + (ghostArm ? dt : -dt) / 0.2f, 0.0f, 1.0f);
         for (int seat = 0; seat < 2; ++seat) {
             const mat4* g = anim_[seat].globals();
-            world_.submitRobot(r, seat, g, hasPrevGlobals_[seat] ? prevGlobals_[seat] : nullptr, seat == headless);
+            world_.submitRobot(r, seat, g, hasPrevGlobals_[seat] ? prevGlobals_[seat] : nullptr, seat == headless,
+                               !watching() && seat == humanSeat() ? armSeeThrough_ : 0.0f, seats_[seat].playHand);
             for (int b = 0; b < character::BoneCount; ++b) prevGlobals_[seat][b] = g[b];
             hasPrevGlobals_[seat] = true;
         }

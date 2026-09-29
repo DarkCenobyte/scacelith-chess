@@ -129,6 +129,16 @@ output is the full shading (specular reflection never scaled by alpha; diffuse w
 1 − transmission), the background is multiplied by `transmission × (1 − F)² × albedo`
 (`transmittanceOf()`). Without transmission, plain coverage blending by `s.alpha`.
 
+**Screen-door fade.** `DrawItem::opacity` < 1 (`DrawData.fade.x`) makes an opaque draw
+see-through in the main view and the planar reflections: `screenDoorHidden()`
+(`shaders/passes/fragment_input.glsl`) leaves out pixels by a 4×4 ordered dither that depends only
+on the pixel and the frame, so the prepass and the main pass (`GL_GEQUAL` on the prepass depth)
+discard the same ones. With TAA the pattern turns every frame (at k/4 every 2×2 block keeps exactly
+k pixels, so the history footprint always holds both layers) and resolves to an even blend;
+without TAA it stays still. Shadows are unchanged. Only materials with the `MATERIAL_SCREEN_DOOR`
+define honour it (the robot's porcelain and joints: the player's playing arm fades to a ghost
+while a piece is in hand).
+
 **Lights.** `PointLight` (64 bytes, mirrors `PointLightData`) gains `direction`, `spotCosOuter`,
 `spotCosInner` (spot when `spotCosOuter > -1`, use `setSpot(dir, inner, outer)`), and
 `sourceRadius` (sphere light highlight widening). Omni lights keep the old defaults. No point light

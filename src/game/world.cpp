@@ -280,8 +280,18 @@ void World::submitClock(render::Renderer& r, const ClockDisplay& cd) {
     submitModel(r, w.clockLever, lever, OBJ_LEVER, 0, &prevLever);
 }
 
-void World::submitRobot(render::Renderer& r, int seat, const mat4* globals, const mat4* prevGlobals, bool firstPerson) {
-    character::submitRobot(r, impl_->robot, globals, firstPerson, OBJ_ROBOT + uint32_t(seat) * 200u, prevGlobals);
+void World::submitRobot(render::Renderer& r, int seat, const mat4* globals, const mat4* prevGlobals, bool firstPerson,
+                        float armSeeThrough, character::Side armSide) {
+    // The see-through arm keeps this share of its pixels: a ghost that still shows the hand and its
+    // grip while the squares, markers and pieces under it read clearly. The blend is linear (HDR),
+    // so a white arm at 25 % over dark squares already looks half-way; multiples of 1/4 are also
+    // the dither's most even patterns under TAA (see screenDoorHidden()).
+    constexpr float kGhostOpacity = 0.25f;
+    float s = clamp(armSeeThrough, 0.0f, 1.0f);
+    s = s * s * (3.0f - 2.0f * s);
+    float opacity = 1.0f - (1.0f - kGhostOpacity) * s;
+    character::submitRobot(r, impl_->robot, globals, firstPerson, OBJ_ROBOT + uint32_t(seat) * 200u, prevGlobals,
+                           /*pupilDilation=*/0.35f, opacity, armSide);
 }
 
 void World::submitMarkers(render::Renderer& r, const std::vector<Marker>& markers) {
