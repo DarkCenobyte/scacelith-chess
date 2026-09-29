@@ -73,6 +73,8 @@ options.thinking_time = Realistische Bedenkzeit
 options.thinking_time.help = Ihr Gegner lässt sich Zeit wie ein menschlicher Spieler, statt sofort zu ziehen.
 options.mouse_sensitivity = Mausempfindlichkeit
 options.invert_look = Vertikale Achse umkehren
+options.game_cursor = Spielzeiger
+options.game_cursor.help = Am Tisch zeichnet das Spiel einen eigenen Zeiger, der zeigt, was ein Klick bewirkt. Aus: der gewohnte Systempfeil.
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = Name
@@ -92,6 +94,8 @@ controls.clock.keys = Leertaste  oder  Klick auf die Uhr
 controls.clock = Uhr drücken
 controls.look.keys = Rechte Maustaste halten
 controls.look = Umsehen
+controls.sheet.keys = S
+controls.sheet = Auf Ihr Partieformular schauen und zurück
 controls.moves.keys = Tab
 controls.moves = Zugliste ein- oder ausblenden
 controls.menu.keys = Esc

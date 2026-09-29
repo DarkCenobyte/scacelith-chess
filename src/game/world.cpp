@@ -93,8 +93,13 @@ bool World::loadStep() {
         w.markerMat.surface = "shaders/materials/game_marker.glsl";
         w.markerMat.transparent = true;
         w.markerMat.castShadow = false;
-        w.markerMat.params[0] = vec4(1.0f, 0.86f, 0.55f, 5200.0f);
-        w.markerQuad.upload(prim::plane(layout::SQUARE_SIZE, layout::SQUARE_SIZE, 1, 1, 1.0f), "marker");
+        // Gold and ivory lines at about the level of sunlit white marble (game_marker.glsl).
+        w.markerMat.params[0] = vec4(1.0f, 0.78f, 0.42f, 2.2f);
+        w.markerMat.params[1] = vec4(0.95f, 0.93f, 0.88f, 0.0f);
+        // uv spans [0,1] over the square (plane() gives uv in metres times uvScale): with metres,
+        // the marker shapes saw only the corner of their [-1,1] space, which lit the whole touched
+        // square and left the legal-move dots and rings out.
+        w.markerQuad.upload(prim::plane(layout::SQUARE_SIZE, layout::SQUARE_SIZE, 1, 1, 1.0f / layout::SQUARE_SIZE), "marker");
         break;
     }
     case 1: {

@@ -149,4 +149,18 @@ struct ViewerHud {
 };
 void viewerHud(const ViewerHud& hud);
 
+// ---- In-game pointer (ui_screens_game.cpp) -------------------------------------------------------
+// Drawn by the game during first-person play in place of the system arrow (hidden meanwhile), on
+// top of everything, at 'pixelPos' (physical pixels, as plat::Input). Its shape says what a click
+// would do there.
+enum class GameCursor {
+    Idle,      // nothing to click here
+    Waiting,   // the opponent's turn (dimmed)
+    Piece,     // over one of your pieces that can be touched
+    Holding,   // a piece in hand, the pointer off the board
+    Square,    // a piece in hand, over a square it can go to (a legal one when hints are shown)
+    Clock      // the clock can be pressed
+};
+void gameCursor(m::vec2 pixelPos, GameCursor kind);
+
 }  // namespace ui

@@ -2,6 +2,7 @@
 #include "../audio/audio.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
+#include "layout.h"
 #include <algorithm>
 #include <cstdio>
 #include <ctime>
@@ -87,6 +88,7 @@ void Scorekeeper::newGame(anim::Animator* anim, bool clockOnPositiveX, const Pla
         players_[s] = players[s];
         nextPly_[s] = 0;
         movesQueued_[s] = 0;
+        handAside_[s] = false;
         hasPrevPen_[s] = false;
         if (!ready_) continue;
         Scoresheet& sh = sheets_[s];
@@ -215,7 +217,25 @@ void Scorekeeper::finishGame(const std::string& result) {
 }
 
 void Scorekeeper::refreshRest(int seat) {
-    if (anim_ && ready_) anim_[seat].setWritingRest(sheets_[seat].writingRest(nextPly_[seat]));
+    if (!anim_ || !ready_) return;
+    vec3 rest = sheets_[seat].writingRest(nextPly_[seat]);
+    if (handAside_[seat]) {
+        // Beside the pad's outer long edge (where the rest point already lies), near the bottom
+        // of the page: the page stays in sight.
+        mat4 pad = sheets_[seat].padTransform();
+        vec3 c = pad.c[3].xyz(), right = pad.c[0].xyz(), down = pad.c[2].xyz();
+        float side = dot(rest - c, right) >= 0.0f ? 1.0f : -1.0f;
+        vec3 aside = c + right * (side * (0.5f * layout::SCORESHEET_WIDTH + 0.045f)) + down * (0.5f * layout::SCORESHEET_LENGTH - 0.035f);
+        rest = vec3(aside.x, rest.y, aside.z);
+    }
+    anim_[seat].setWritingRest(rest);
+}
+
+void Scorekeeper::setHandAside(int seat, bool aside) {
+    seat &= 1;
+    if (handAside_[seat] == aside) return;
+    handAside_[seat] = aside;
+    refreshRest(seat);
 }
 
 void Scorekeeper::onEvent(int seat, const anim::Event& e) {

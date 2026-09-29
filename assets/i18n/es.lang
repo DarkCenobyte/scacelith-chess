@@ -73,6 +73,8 @@ options.thinking_time = Tiempo de reflexión realista
 options.thinking_time.help = Su rival se toma su tiempo como un jugador humano en lugar de mover al instante.
 options.mouse_sensitivity = Sensibilidad del ratón
 options.invert_look = Invertir eje vertical
+options.game_cursor = Puntero del juego
+options.game_cursor.help = En la mesa, el juego dibuja su propio puntero, que indica lo que hará un clic. Desactivado: la flecha habitual del sistema.
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = Nombre
@@ -92,6 +94,8 @@ controls.clock.keys = Espacio  o  clic en el reloj
 controls.clock = Pulsar el reloj
 controls.look.keys = Botón derecho, mantener
 controls.look = Mirar alrededor
+controls.sheet.keys = S
+controls.sheet = Mirar su planilla y volver
 controls.moves.keys = Tab
 controls.moves = Mostrar u ocultar las jugadas
 controls.menu.keys = Esc

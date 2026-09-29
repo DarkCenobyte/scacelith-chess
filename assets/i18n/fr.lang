@@ -74,6 +74,8 @@ options.thinking_time = Temps de réflexion réaliste
 options.thinking_time.help = Votre adversaire prend son temps comme un joueur humain au lieu de jouer instantanément.
 options.mouse_sensitivity = Sensibilité de la souris
 options.invert_look = Inverser l’axe vertical
+options.game_cursor = Curseur du jeu
+options.game_cursor.help = À la table, le jeu dessine son propre curseur, qui montre ce que fera un clic. Désactivé : la flèche habituelle du système.
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = Nom
@@ -93,6 +95,8 @@ controls.clock.keys = Espace  ou  clic sur la pendule
 controls.clock = Appuyer sur la pendule
 controls.look.keys = Clic droit maintenu
 controls.look = Regarder autour de soi
+controls.sheet.keys = S
+controls.sheet = Regarder votre feuille de partie, et revenir
 controls.moves.keys = Tab
 controls.moves = Afficher ou masquer les coups
 controls.menu.keys = Échap

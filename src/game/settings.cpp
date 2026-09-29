@@ -47,6 +47,7 @@ bool Settings::load(const std::string& p) {
     showCoordinates = ini.getBool("gameplay.show_coordinates", showCoordinates);
     mouseSensitivity = ini.getFloat("gameplay.mouse_sensitivity", mouseSensitivity);
     invertLook = ini.getBool("gameplay.invert_look", invertLook);
+    gameCursor = ini.getBool("gameplay.game_cursor", gameCursor);
     nextColor = ini.getInt("gameplay.next_color", nextColor);
     difficultyPreset = ini.getInt("newgame.difficulty", difficultyPreset);
     timeControlPreset = ini.getInt("newgame.time_control", timeControlPreset);
@@ -115,6 +116,7 @@ bool Settings::save() const {
     ini.setBool("gameplay.show_coordinates", showCoordinates);
     ini.setFloat("gameplay.mouse_sensitivity", mouseSensitivity);
     ini.setBool("gameplay.invert_look", invertLook);
+    ini.setBool("gameplay.game_cursor", gameCursor);
     ini.setInt("gameplay.next_color", nextColor);
     ini.setInt("newgame.difficulty", difficultyPreset);
     ini.setInt("newgame.time_control", timeControlPreset);

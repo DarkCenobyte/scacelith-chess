@@ -74,6 +74,8 @@ options.thinking_time = Реалістичне обмірковування
 options.thinking_time.help = Суперник обмірковує хід, як жива людина, а не ходить миттєво.
 options.mouse_sensitivity = Чутливість миші
 options.invert_look = Інвертувати вісь Y
+options.game_cursor = Ігровий курсор
+options.game_cursor.help = За столом гра малює власний курсор, який показує, що зробить клік. Вимкнено: звичайна системна стрілка.
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = Ім’я
@@ -93,6 +95,8 @@ controls.clock.keys = Пробіл  або  клік по годиннику
 controls.clock = Натиснути на годинник
 controls.look.keys = Права кнопка, утримувати
 controls.look = Роззирнутися
+controls.sheet.keys = S
+controls.sheet = Подивитися на свій бланк і назад
 controls.moves.keys = Tab
 controls.moves = Показати або сховати ходи
 controls.menu.keys = Esc
