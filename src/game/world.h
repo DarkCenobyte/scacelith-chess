@@ -2,6 +2,7 @@
 // Builds every procedural model (incrementally, so a loading screen can be shown), uploads it,
 // and submits draw items each frame. Game logic lives in game_scene.cpp.
 #pragma once
+#include "../character/skeleton.h"
 #include "../chess/chess.h"
 #include "../render/renderer.h"
 #include "../scene/model.h"
@@ -56,8 +57,10 @@ public:
     void submitStatic(render::Renderer& r);
     void submitPieces(render::Renderer& r, const PhysicalBoard& board);
     void submitClock(render::Renderer& r, const ClockDisplay& d);
-    // seat: 0 = White's chair (+Z), 1 = Black's chair (-Z).
-    void submitRobot(render::Renderer& r, int seat, const m::mat4* globals, const m::mat4* prevGlobals, bool firstPerson);
+    // seat: 0 = White's chair (+Z), 1 = Black's chair (-Z). armSeeThrough in [0,1] fades the arm
+    // on armSide to a see-through ghost in the main view (0 = opaque; its shadow stays).
+    void submitRobot(render::Renderer& r, int seat, const m::mat4* globals, const m::mat4* prevGlobals, bool firstPerson,
+                     float armSeeThrough = 0.0f, character::Side armSide = character::Side::Right);
     void submitMarkers(render::Renderer& r, const std::vector<Marker>& markers);
 
     // Piece geometry helpers for picking and grasping.

@@ -26,4 +26,7 @@ void main() {
 #endif
     outNormalRough = vec4(n, 1.0);
     outVelocity = motionVector();
+#ifdef MATERIAL_SCREEN_DOOR
+    if (screenDoorHidden()) discard;   // the main pass leaves out the same pixels
+#endif
 }

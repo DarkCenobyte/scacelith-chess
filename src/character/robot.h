@@ -78,8 +78,11 @@ struct GpuRobot {
 
 // Submits every part with its bone's world matrix. firstPerson = this robot is the viewer: parts
 // flagged firstPersonHidden get DRAW_HIDDEN_MAIN (still cast shadows). objectIdBase + part index is
-// used as the stable object id. pupilDilation in [0,1] goes to the iris (inst[0].x).
+// used as the stable object id. pupilDilation in [0,1] goes to the iris (inst[0].x). armOpacity < 1
+// makes the arm on armSide (upper arm, forearm, hand, fingers) see-through in the main view
+// (DrawItem::opacity; its shadow stays).
 void submitRobot(render::Renderer& r, const GpuRobot& robot, const m::mat4 boneWorld[BoneCount], bool firstPerson,
-                 uint32_t objectIdBase, const m::mat4* prevBoneWorld = nullptr, float pupilDilation = 0.35f);
+                 uint32_t objectIdBase, const m::mat4* prevBoneWorld = nullptr, float pupilDilation = 0.35f,
+                 float armOpacity = 1.0f, Side armSide = Side::Right);
 
 }  // namespace character

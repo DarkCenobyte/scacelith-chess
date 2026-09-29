@@ -360,6 +360,7 @@ void Renderer::submit(const DrawItem& d) {
     for (int i = 0; i < 4; ++i) g.instParams[i] = d.inst[i];
     g.info = vec4(float(hash32(d.objectId * 747796405u + 2891336453u) & 0xFFFFFF) / 16777216.0f,
                   float(d.material->planarReflector), float(d.flags), float(d.objectId));
+    g.fade = vec4(clamp(d.opacity, 0.0f, 1.0f), settings_.taa ? 1.0f : 0.0f, 0.0f, 0.0f);
     drawData_.push_back(g);
 }
 

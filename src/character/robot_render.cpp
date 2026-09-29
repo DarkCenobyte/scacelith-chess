@@ -28,7 +28,8 @@ void GpuRobot::destroy() {
 }
 
 void submitRobot(render::Renderer& r, const GpuRobot& robot, const mat4 boneWorld[BoneCount], bool firstPerson,
-                 uint32_t objectIdBase, const mat4* prevBoneWorld, float pupilDilation) {
+                 uint32_t objectIdBase, const mat4* prevBoneWorld, float pupilDilation, float armOpacity, Side armSide) {
+    const Bone armFirst = sideBone(UpperArmL, armSide), armLast = sideBone(PinkyL3, armSide);
     for (size_t i = 0; i < robot.parts.size(); ++i) {
         const GpuRobot::Part& p = robot.parts[i];
         render::DrawItem d;
@@ -44,6 +45,7 @@ void submitRobot(render::Renderer& r, const GpuRobot& robot, const mat4 boneWorl
         d.flags = render::DRAW_CAST_SHADOW;
         if (firstPerson && p.firstPersonHidden) d.flags |= render::DRAW_HIDDEN_MAIN;
         d.objectId = objectIdBase + uint32_t(i);
+        if (p.bone >= armFirst && p.bone <= armLast) d.opacity = armOpacity;
         r.submit(d);
     }
 }

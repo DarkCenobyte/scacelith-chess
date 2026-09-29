@@ -96,6 +96,11 @@ struct DrawItem {
     m::vec4 inst[4] = {};       // per-instance parameters (SurfaceInput.instParams)
     uint32_t flags = DRAW_CAST_SHADOW;
     uint32_t objectId = 0;      // stable id: seeds per-object randomness (objectSeed)
+    // Screen-door opacity in the main view and the planar reflections (1 = opaque): an ordered
+    // dither leaves out 1 - opacity of the pixels, the same ones in the prepass and the main pass,
+    // and TAA blends them into a see-through surface. Shadows and probes are unaffected. Only
+    // honoured by materials with the MATERIAL_SCREEN_DOOR define (others stay opaque).
+    float opacity = 1.0f;
 };
 
 // Point light; becomes a spot light after setSpot() (spotCosOuter > -1). 64 bytes, mirrors PointLightData.
@@ -195,6 +200,7 @@ struct DrawDataGPU {
     m::vec4 matParams[8];
     m::vec4 instParams[4];
     m::vec4 info;           // x = objectSeed, y = planarReflector index (-1 none), z = flags, w = objectId
+    m::vec4 fade;           // x = screen-door opacity, y = 1 when the dither changes every frame (TAA), zw unused
 };
 
 enum class PassId { Main = 0, Prepass = 1, Shadow = 2, Planar = 3, Probe = 4 };
