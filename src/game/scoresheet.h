@@ -23,7 +23,9 @@
 // then beginMove() for that ply as usual (the move goes on the new page).
 //
 // Sounds (the scoresheet plays none; the integrator calls, on the animator's writing events):
-//     PenDown:     audio::playPenStroke(event.position, sheet.strokeDurationAt(animator.writingPathTime()));
+//     PenDown:     s = sheet::penStrokeSound(sheet.writingPath(), animator.writingPathTime() - late, late,
+//                                              event.position, writer's eyes, audio::listenerPosition());
+//                  audio::playPenStroke(s.position, s.seconds, s.gain);   (late = animator.time() - event.time)
 //     PageGripped: audio::play(audio::Sfx::PageTurn, sheet.pageCorner(0.0f));
 //     PageTurned:  audio::play(audio::Sfx::PageFlap, sheet.pageCorner(1.0f));
 //
@@ -87,9 +89,10 @@ public:
     void setWritingTime(float t);
     void finishEntry();                   // completes the oldest unfinished entry
     int pendingEntries() const;
-    // Remaining pen-down time of the stroke running at path time t of the entry being written
-    // (0 when the pen is up): the length to give the writing sound on PenDown.
-    float strokeDurationAt(float t) const;
+    // Pen path of the entry being written (the oldest unfinished one; page mm and path seconds, as
+    // setWritingTime() counts them), nullptr when none: sizes the writing sound on PenDown
+    // (sheet::penStrokeSound).
+    const sheet::PenPath* writingPath() const;
     // Instantly written values (a game loaded or resumed): no path, the ink is there at once.
     void writeHeaderInstant(const Header& h);
     void writeMoveInstant(int ply, const std::string& san);
