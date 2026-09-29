@@ -644,9 +644,12 @@ std::vector<anim::PenKey> Scoresheet::beginHeader(const Header& h) {
         {fieldBox(Field::WhiteName), h.white},     {fieldBox(Field::WhiteElo), h.whiteElo},
         {fieldBox(Field::BlackName), h.black},     {fieldBox(Field::BlackElo), h.blackElo},
     };
+    if (!h.note.empty()) parts.push_back({fieldBox(Field::Note), h.note});
+    if (!h.reference.empty()) parts.push_back({fieldBox(Field::Reference), h.reference});
     if (!I.taken(0, Field::Page)) parts.push_back({fieldBox(Field::Page), pageLabel(0)});
     if (!composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x4EADu))) return {};
     for (int f = 0; f <= int(Field::Page); ++f) I.taken(0, Field(f)) = true;
+    I.taken(0, Field::Note) = I.taken(0, Field::Reference) = true;
     I.entries.push_back(std::move(e));
     return worldPath(frame_, I.entries.back().path);
 }
@@ -715,9 +718,12 @@ void Scoresheet::writeHeaderInstant(const Header& h) {
         {fieldBox(Field::WhiteName), h.white}, {fieldBox(Field::WhiteElo), h.whiteElo},
         {fieldBox(Field::BlackName), h.black}, {fieldBox(Field::BlackElo), h.blackElo},
     };
+    if (!h.note.empty()) parts.push_back({fieldBox(Field::Note), h.note});
+    if (!h.reference.empty()) parts.push_back({fieldBox(Field::Reference), h.reference});
     if (!I.taken(0, Field::Page)) parts.push_back({fieldBox(Field::Page), pageLabel(0)});
     if (composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x4EADu))) I.addInk(0, e.glyphs);
     for (int f = 0; f <= int(Field::Page); ++f) I.taken(0, Field(f)) = true;
+    I.taken(0, Field::Note) = I.taken(0, Field::Reference) = true;
 }
 
 void Scoresheet::writeMoveInstant(int ply, const std::string& san) {

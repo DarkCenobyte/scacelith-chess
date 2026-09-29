@@ -2,7 +2,15 @@
 //   scacelith --scene ui --ui-screen main|newgame|custom|options|credits|pause|confirm|promotion|
 //                                     gameover|gameover-folded|loading|movelist|notify|hud|hand|
 //                                     watch|viewer-pause|viewer-hud|viewer-gameover|gameover-elo
-//   --ui-tab <0..5|display|graphics|audio|gameplay|player|controls>   options tab
+//   hot-seat (two players on one PC): newgame-hotseat (New Game with "Human, same PC"),
+//     hotseat-hud (players, caption, draw offer card), hotseat-confirm (named resignation),
+//     hotseat-gameover (both names and ratings)
+//   online pages (in-process mock server, frozen clock): online (sign in), online-register,
+//     online-mfa (code step), online-play, online-search, online-account, online-mfa-setup,
+//     online-recovery, online-challenge, online-private, online-noserver, direct, direct-host,
+//     direct-wait, direct-join; at the table: online-hud, online-pause, online-report,
+//     online-gameover
+//   --ui-tab <0..6|display|graphics|audio|gameplay|player|online|controls>   options tab
 //   --lang <code>   interface language (en fr de es uk ar ru ja zh-Hant zh-Hans; read by game::Settings)
 //   --ui-name <name>, --ui-hand <0..2>   player name / handwriting shown by Options > Player
 //   "hand": sample names in every script, written in each handwriting style
@@ -14,10 +22,13 @@
 // Interactive: keys 1..9 / 0 switch screens.
 #include "ui.h"
 #include "ui_internal.h"
+#include "ui_online.h"
+#include "ui_screens_online.h"
 #include "ui_widgets.h"
 #include "../app/scene.h"
 #include "../core/log.h"
 #include "../chess/chess.h"
+#include "../game/online_session.h"
 #include "../game/settings.h"
 #include "../i18n/i18n.h"
 #include "../i18n/unicode.h"
@@ -40,9 +51,9 @@ public:
         ui::setSoundCallback([](ui::Sound s) { LOGD("ui sound %d", int(s)); });
         if (!ui::init()) LOGW("ui viewer: ui::init reported a problem");
         std::string tab = ctx.argValue("--ui-tab", "0");
-        static const char* tabs[] = {"display", "graphics", "audio", "gameplay", "player", "controls"};
+        static const char* tabs[] = {"display", "graphics", "audio", "gameplay", "player", "online", "controls"};
         tab_ = std::atoi(tab.c_str());
-        for (int i = 0; i < 6; ++i)
+        for (int i = 0; i < 7; ++i)
             if (tab == tabs[i]) tab_ = i;
         if (ctx.hasArg("--ui-name")) game::settings().playerName = ctx.argValue("--ui-name");
         if (ctx.hasArg("--ui-hand"))
@@ -113,7 +124,13 @@ public:
         game::Settings& s = game::settings();
         s.difficultyPreset = saved_.difficultyPreset;
         s.timeControlPreset = saved_.timeControlPreset;
+        s.opponent = saved_.opponent;
         if (screen == "newgame") ui::debug::openMenuPage(ui::debug::MenuPage::NewGame);
+        if (screen == "newgame-hotseat") {
+            s.opponent = 1;
+            ui::debug::openMenuPage(ui::debug::MenuPage::NewGame);
+        }
+        if (screen == "hotseat-confirm") ui::debug::openPauseConfirm(1);
         if (screen == "custom") {
             s.difficultyPreset = 1 << 20;  // clamped to the last entry = Custom
             s.timeControlPreset = -1;
@@ -127,12 +144,47 @@ public:
         if (screen == "watch") ui::debug::openMenuPage(ui::debug::MenuPage::Watch);
         if (screen == "confirm") ui::debug::openPauseConfirm(1);
         if (screen == "gameover-folded") ui::debug::foldGameOver(true);
+        if (screen.compare(0, 6, "online") == 0 || screen.compare(0, 6, "direct") == 0) openOnline(screen);
         if (screen == "movelist") ui::notify(i18n::trf("notify.touched_square", {"g1"}), 30.0f);
         if (screen == "notify") {
             ui::notify(i18n::tr("notify.draw_declined"), 30.0f);
             ui::notify(i18n::tr("arbiter.illegal") + std::string(" ") + i18n::tr("arbiter.restored_two_minutes.black"), 30.0f);
         }
         frames_ = 0;
+    }
+
+    // Online screens: the in-process mock server with a virtual clock that only moves here (the
+    // pages are drawn as they are, not while the fake answers).
+    void openOnline(const std::string& screen) {
+        game::OnlineSession& s = game::onlineSession();
+        s.init(true, true);
+        online_ = true;
+        if (!s.infoKnown()) {
+            s.refreshInfo();
+            s.runMock(1000.0);
+        }
+        bool account = screen != "online" && screen != "online-register" && screen != "online-mfa" && screen != "online-noserver" &&
+                       screen.compare(0, 6, "direct") != 0;
+        if (account && !s.signedIn()) {
+            s.api().login("Magnus_T", "viewer-password");
+            s.expect(net::Event::Kind::LoginResult);
+            s.runMock(3000.0);
+            net::Event e;
+            s.take(net::Event::Kind::LoginResult, e);
+        }
+        if (screen == "online-hud" || screen == "online-play") s.runMock(26000.0);  // a challenge received
+        static const struct { const char* screen; const char* sub; } pages[] = {
+            {"online", "signin"}, {"online-register", "register"}, {"online-mfa", "mfa"}, {"online-play", "play"},
+            {"online-search", "search"}, {"online-account", "account"}, {"online-mfa-setup", "mfa-setup"},
+            {"online-recovery", "recovery"}, {"online-challenge", "challenge"}, {"online-private", "private"},
+            {"online-noserver", "noserver"}, {"direct", "direct"}, {"direct-host", "direct-host"}, {"direct-wait", "direct-wait"},
+            {"direct-join", "direct-join"},
+        };
+        for (const auto& p : pages)
+            if (screen == p.screen) {
+                ui::debug::openOnlineMenu(p.sub);
+                menu_ = true;
+            }
     }
 
     // Names in every script the game supports, each written in the three handwriting styles: the
@@ -220,8 +272,53 @@ public:
         if (kb_) ui::im::setKeyboardMode(true);
         ui::MenuAction a = ui::MenuAction::None;
         const std::string& s = screen_;
-        if (s == "main" || s == "newgame" || s == "custom" || s == "options" || s == "credits" || s == "watch") {
+        if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
+        if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "credits" ||
+            s == "watch" || menu_) {
             a = ui::mainMenu(setup_, watch_);
+        } else if (s == "hotseat-hud") {
+            ui::HotSeatHud hud;
+            hud.names[0] = "Alice";
+            hud.names[1] = "Bob";
+            hud.ratings[0] = "1512";
+            hud.ratings[1] = "1488";
+            hud.toMove = 1;
+            hud.caption = i18n::trf("hotseat.your_move", {hud.names[1]});
+            hud.captionAge = 1.0f;
+            hud.drawOffer = true;
+            hud.drawOfferText = i18n::trf("hotseat.draw.offered", {hud.names[0]});
+            ui::hotSeatHud(hud);
+        } else if (s == "hotseat-confirm") {
+            a = ui::pauseMenu(true, true, i18n::trf("hotseat.confirm.resign", {"Alice", "Bob"}));
+        } else if (s == "hotseat-gameover") {
+            ui::GameOverExtras x;
+            x.line = i18n::trn("hotseat.gameover.wins", 34, {"Alice", "34"});
+            x.detail = i18n::trf("hotseat.elo.change", {"Alice", "1500", "1520", i18n::ltr("+20")}) + "  \xC2\xB7  " +
+                       i18n::trf("hotseat.elo.change", {"Bob", "1500", "1480", i18n::ltr("\xE2\x88\x92" "20")});
+            a = ui::gameOver("1-0", chess::endReasonText(chess::GameEndReason::Checkmate), true, false, 34, x);
+        } else if (s == "online-hud") {
+            ui::OnlineHud hud;
+            hud.pingMs = 34;
+            hud.countdown.clear();
+            hud.banner = i18n::trf("online.opponent_away", {game::durationText(45000.0)});
+            hud.drawOffer = true;
+            ui::onlineHud(hud);
+            ui::onlineChallenges();
+        } else if (s == "online-pause") {
+            ui::OnlinePause p;
+            p.canClaimDraw = false;
+            a = ui::onlinePauseMenu(p);
+        } else if (s == "online-report") {
+            static int cat = 0;
+            static std::string comment = "Moves at a steady 2 s all game";
+            ui::pingIndicator(41, false);
+            if (ui::reportDialog(cat, comment) >= 0) LOGI("ui viewer: report closed");
+        } else if (s == "online-gameover") {
+            ui::GameOverExtras x;
+            x.detail = i18n::trf("online.rating.change", {"1500", "1512", i18n::ltr("+12")});
+            x.reportLabel = i18n::tr("online.report.button");
+            ui::pingIndicator(33, false);
+            a = ui::gameOver("1-0", i18n::tr("reason.online.abandonment"), true, false, 31, x);
         } else if (s == "viewer-pause") {
             a = ui::viewerPauseMenu();
         } else if (s == "viewer-hud") {
@@ -289,6 +386,7 @@ private:
     std::string screen_;
     int tab_ = 0;
     bool black_ = false, drawn_ = false, kb_ = false, quit_ = false;
+    bool online_ = false, menu_ = false;
     float time_ = 0.0f;
     int frames_ = 0;
     std::vector<std::string> script_;

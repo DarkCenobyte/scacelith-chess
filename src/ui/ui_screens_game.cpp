@@ -377,6 +377,7 @@ void newGameRating(float x, float width, float y, int difficulty) {
 
 void gameOverDetail(const std::string& text, float cx, float y) {
     TextStyle st = style(font::FACE_TEXT, 23.0f, gold, HAlign::Center);
+    st.size = gfx::fitSize(text, st, 640.0f);  // a hot-seat game names both players' ratings
     gfx::text(text, cx, y, st);
 }
 

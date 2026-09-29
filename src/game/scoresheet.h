@@ -58,6 +58,7 @@ public:
         std::string round = "1";
         std::string board = "1";
         std::string white, whiteElo, black, blackElo;
+        std::string note, reference;      // unlabeled additions (sheet::Field::Note / Reference), "" = none
     };
 
     Scoresheet();

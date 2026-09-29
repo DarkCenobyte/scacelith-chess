@@ -1,16 +1,30 @@
 // The game: main menu over the live hall, new game setup, first-person play against Stockfish
-// with tournament rules (touch-move, clock pressed by hand, arbiter), the viewer mode (two
-// Stockfish players watched from a free, invisible camera), the player's Elo, animations, audio
-// and UI.
+// with tournament rules (touch-move, clock pressed by hand, arbiter), hot-seat play (two people on
+// one PC, each from their own robot's eyes, see docs/MULTIPLAYER_PLAN.md), online play (a player
+// of the Scacelith server or of a direct match sits in the other chair, see
+// game_scene_online.cpp), the viewer mode (two Stockfish players watched from a free, invisible
+// camera), the player's Elo, animations, audio and UI.
 //
-// Seats: seat 0 is White's chair (+Z), seat 1 Black's (-Z). Each seat has a controller (Human or
-// Stockfish; the planned hot-seat mode has two Humans, see docs/MULTIPLAYER_PLAN.md), the name and
-// Elo written on the scoresheets, its engine settings and its playing hand: the hand on the clock
-// side plays and presses the clock, the other one writes. The clock stands at the human's right in
-// a human game, at White's right (+X) when watching.
+// Seats: seat 0 is White's chair (+Z), seat 1 Black's (-Z). Each seat has a controller (Human,
+// Stockfish or Remote; a hot-seat game has two Humans), the name and Elo written on the
+// scoresheets, its engine settings and its playing hand: the hand on the clock side plays and
+// presses the clock, the other one writes. The clock stands at the human's right in a game against
+// Stockfish, where the New Game page puts it in a hot-seat game (the other player then plays
+// left-handed), at White's right (+X) when watching.
+//
+// Hot-seat: the seat to move has the mouse and keyboard and the view from its robot's eyes. After
+// the clock press the view flies to the other player's eyes (or cuts through black, Options >
+// Gameplay) with the clock frozen; buttons still held by the previous player are ignored until
+// released. Each seat keeps its own look (yaw, pitch, lean). The in-game pointer, the square
+// aimed at, the clock hover, the see-through arm and the look at the scoresheet (S) belong to the
+// player to move; there is no pointer or aiming while the view goes over.
 //
 // Command line (development and screenshots):
 //   --start                 skip the menu: a game against Stockfish (--human white|black)
+//   --start --hotseat       skip the menu: a hot-seat game (--white-name N --black-name N,
+//                           --clock-right white|black, --rated, --handover <s> with 0 = a cut)
+//   --play e2e4,e7e5,...    the human player(s) make these moves by hand, one per turn (touch,
+//                           carry, clock press; the promotion piece as a fifth letter)
 //   --viewer                skip the menu: watch Stockfish vs Stockfish (--white-preset N
 //                           --black-preset N, indices into ai::presets(); --demo is an alias)
 //   --viewpoint N           viewer: start at viewpoint N (0 eyes, 1 side, 2 board, 3 hall, 4 clock,
@@ -21,6 +35,10 @@
 //                           other after each move with the clock frozen (hot-seat preview)
 //   --tc N                  time control preset index for a game started from the command line
 //   --no-intro --warp <s> --moves e2e4,e7e5,... --touch <square>
+//   --online-mock           online play against the in-process fake server (online_mock.h)
+//   --start-online [cat]    skip the menu: sign in and play the first opponent found in category
+//                           "cat" (default 5+3; with --online-mock the game starts at once);
+//                           --touch <square> touches that piece once the handshake is over
 //   --mouse fx,fy           pointer position as fractions of the window (screenshots)
 //   --glance                a human game starts looking at the player's scoresheet (S)
 #pragma once
@@ -30,7 +48,9 @@
 #include "../chess/chess.h"
 #include "../ui/ui.h"
 #include "camera_flight.h"
+#include "hotseat.h"
 #include "observer_camera.h"
+#include "online_session.h"
 #include "physical_board.h"
 #include "scorekeeper.h"
 #include "world.h"
@@ -40,10 +60,16 @@
 
 namespace game {
 
-enum class Controller { Human, Stockfish };
+enum class Controller {
+    Human,
+    Stockfish,
+    Remote   // an online opponent: its robot plays the moves the server (or direct peer) reports
+};
 enum class GameMode {
-    Play,   // the human against Stockfish, first person
-    Watch   // viewer mode: Stockfish against Stockfish, free observer camera
+    Play,    // the human against Stockfish, first person
+    Watch,   // viewer mode: Stockfish against Stockfish, free observer camera
+    Online,  // the human against a player of the server or of a direct match, first person
+    HotSeat  // two humans on this PC, in turn, each from their own robot's eyes
 };
 
 struct Seat {
@@ -52,6 +78,7 @@ struct Seat {
     std::string name;             // scoresheet name: the player's name / "Stockfish"
     int elo = 0;                  // human: rating when the game started; Stockfish: ai::presetElo()
     bool provisional = false;     // human with fewer than elo::kProvisionalGames rated games
+    std::string ratingText;       // online: the server rating as written ("1500?"), "" = none
     int preset = -1;              // Stockfish: index into ai::presets() (the last one is Custom)
     std::string presetName;       // Stockfish: "Expert", ...
     ai::EngineSettings engine;    // Stockfish: settings of this seat's searches
@@ -70,7 +97,7 @@ public:
     void renderOverlay(AppContext& ctx, float dt) override;
     void shutdown(AppContext& ctx) override;
 
-    // ---- For the scoresheets and the planned hot-seat mode ----
+    // ---- For the scoresheets and the hot-seat mode ----
     const Seat& seat(int index) const { return seats_[index & 1]; }
     GameMode mode() const { return mode_; }
     int round() const { return round_; }   // games started this session (scoresheet "Round")
@@ -80,6 +107,15 @@ public:
     bool clockFrozen() const { return clockFrozen_; }
 
 private:
+    static constexpr float kBaseGazePitch = -0.62f;  // looking down at the board from the chair
+    static constexpr float kHeadYawLimit = 70.0f * m::DEG;
+    static constexpr float kHeadPitchDown = -45.0f * m::DEG, kHeadPitchUp = 30.0f * m::DEG;
+    // Hot-seat: after the landing, a piece touched within this time defers the player's recording
+    // of the opponent's move until after their own move (FIDE 8.1.2).
+    static constexpr float kWriteGrace = 0.5f;
+    // --play: the scripted player looks at the position this long before each move.
+    static constexpr float kScriptThink = 0.5f;
+
     enum class State { Loading, Menu, FadeToGame, Intro, Handshake, Playing, GameOver, FadeToMenu };
     enum class Turn {
         None,
@@ -90,7 +126,9 @@ private:
         HumanPlaced,     // move made on the board, waiting for the clock press
         HumanPressing,   // hand on its way to the clock
         AiThinking,
-        AiMoving
+        AiMoving,
+        RemoteWaiting,   // online: waiting for the opponent's move
+        RemoteMoving     // online: the opponent's robot is placing the move
     };
 
     // Where a piece ends up when the hand releases it.
@@ -143,6 +181,17 @@ private:
     int aiSeat() const { return 1 - humanSeat(); }
     bool isHumanSeat(int seat) const { return seats_[seat & 1].human(); }
     bool watching() const { return mode_ == GameMode::Watch; }
+    bool online() const { return mode_ == GameMode::Online; }
+    bool hotSeat() const { return mode_ == GameMode::HotSeat; }
+    // The seat whose player has the mouse and keyboard: the human, or in a hot-seat game the seat
+    // to move (hotseat::inputSeat).
+    int inputSeat() const;
+    chess::Color inputColor() const { return colorOfSeat(inputSeat()); }
+    // The seat whose eyes hold the first-person camera (-1 during a hot-seat flight) and the seat
+    // whose head follows the first-person look (during a flight: the next player's).
+    int viewSeat() const;
+    int firstPersonSeat() const;
+    bool opponentMoving() const { return turn_ == Turn::AiMoving || turn_ == Turn::RemoteMoving; }
     ai::ClockInfo clockInfo() const;
     chess::TimeControl chosenTimeControl() const;
     ai::EngineSettings chosenEngineSettings() const { return engineSettingsFor(setup_.difficulty); }
@@ -160,6 +209,9 @@ private:
     m::vec3 glanceTarget() const;             // where the player looks at their scoresheet (S)
     void updateCamera(float dt, bool firstPerson);
     void placeFirstPersonCamera();
+    // The first-person view from 'seat''s eyes with its own look (gaze beyond the head, lean).
+    void firstPersonView(int seat, m::vec3& position, m::quat& orientation) const;
+    CameraPose firstPersonPose(int seat) const;
     void updateGaze(float dt);
     std::vector<Marker> markers() const;
     ClockDisplay clockDisplay() const;
@@ -168,6 +220,48 @@ private:
     // ---- scoresheets ----
     void newScoresheets();                     // blank pads for the game just set up
     int handStyleOf(int seat) const;           // the seat's handwriting (ui::font::HandStyle)
+
+    // ---- hot-seat (two players on one PC) ----
+    void initHotSeatArgs();                    // command line: --hotseat and its options
+    void configureHotSeatSeats();
+    void startHandover(int mover);             // after a clock press: the view goes to the other player
+    void updateHandover(float dt);             // inside simulate, after the animation update
+    void landHandover();
+    void beginLook(int seat, bool snap);       // the seat's first-person look takes its head over
+    void updateHotSeatTurn(float dt);          // writing grace, draw offer card, scripted moves (Playing)
+    void drawHotSeatHud();                     // players, caption, draw offer card (answers it)
+    void offerDrawHotSeat();
+    void answerHotSeatDraw(bool accept);
+    void rateHotSeat();                        // rated games: both local ratings (idempotent via rated_)
+    ui::GameOverExtras hotSeatGameOverExtras() const;
+    void swapHotSeatColours();                 // rematch
+    bool anyInputHeld() const;
+    void updateScript(float dt);               // --play: the next scripted move, when idle
+
+    // ---- online play (game_scene_online.cpp) ----
+    struct RemoteMove { int ply = 0; uint16_t move = 0; };
+    void initOnline();                        // command line: --online-mock, --start-online
+    bool takeOnlineGame();                    // a game announced by the session: set up and play it
+    void setupOnlineGame();                   // part of setupNewGame() for an online game
+    void configureOnlineSeats();
+    Scorekeeper::Details onlineSheetDetails() const;
+    void updateOnline(float dt);              // once per frame (inside simulate): events, remote moves
+    void onlineEvent(const net::Event& e);
+    void onlineSnapshot(const net::OnlineGame& g);
+    void onlineGameEvent(const net::Event& e);
+    void rebuildOnline();                     // board, game and sheets from og_ (no animation)
+    void startRemoteMove();
+    void sendOnlineMove(const chess::Move& mv);
+    void recordOnline(int ply);               // scoresheets: every move up to 'ply'
+    void onlineResult();                      // result texts of og_ (endGame)
+    void updateOnlineInput();                 // Esc menu, draw offer, report dialog (Playing)
+    void updateOnlineGameOver();              // game over card, rematch, report, challenges
+    void leaveOnlineGame();                   // back to the menu
+    void drawOnlineHud();                     // ping, banners, first-move countdown
+    ClockDisplay onlineClockDisplay() const;
+    ui::GameOverExtras onlineGameOverExtras() const;
+    int64_t onlineClockMs(int color) const;   // server time, extrapolated
+    bool myFirstMoveMade() const;
 
     // ---- viewer mode ----
     bool observerView() const;                // the observer camera is the view
@@ -246,13 +340,18 @@ private:
     double clockAccumMs_ = 0.0;
     float leverSide_ = -1.0f, leverTarget_ = -1.0f;
 
-    // Camera / look
+    // Camera / look: one first-person look per seat (hot-seat: each player keeps theirs)
     render::Camera camera_;
-    float lookYaw_ = 0.0f, lookPitch_ = 0.0f;       // user offset (radians)
-    float gazeYaw_ = 0.0f, gazePitch_ = 0.0f;       // smoothed total
-    float headYaw_ = 0.0f, headPitch_ = 0.0f;       // part taken by the neck/head (rest = eyes)
-    float lean_ = 0.0f, leanSmooth_ = 0.0f;
-    bool glance_ = false;                     // S: looking at the player's own scoresheet
+    struct Look {
+        float yaw = 0.0f, pitch = 0.0f;             // user offset (radians)
+        float gazeYaw = 0.0f, gazePitch = kBaseGazePitch;  // smoothed total
+        float headYaw = 0.0f, headPitch = 0.0f;     // part taken by the neck/head (rest = eyes)
+        float lean = 0.0f, leanSmooth = 0.0f;
+    };
+    Look look_[2];
+    // S: the player whose eyes are the view looks at their own scoresheet. One state for the
+    // view, not per seat: in a hot-seat game a turn's look ends at the clock press (startHandover).
+    bool glance_ = false;
     float glanceBlend_ = 0.0f;
     bool dragging_ = false;
     float menuAngle_ = 0.9f;
@@ -264,6 +363,7 @@ private:
     m::vec3 aiGazeTarget_{0, 0.8f, 0};
     m::Rng rng_{1};
     float armSeeThrough_ = 0.0f;   // player's playing arm: 0 opaque .. 1 see-through (piece in hand)
+    int armSeeThroughSeat_ = 0;    // whose arm it is (the player who carried the piece)
 
     // Viewer mode
     ObserverCamera observer_;
@@ -279,6 +379,24 @@ private:
     float viewpointAge_ = 1e9f, speedAge_ = 1e9f;
     bool hudVisible_ = true;
 
+    // Hot-seat
+    hotseat::Players hsPlayers_;        // the two players of the game being played
+    hotseat::Handover handover_;
+    hotseat::InputGate inputGate_;      // buttons held by the previous player
+    bool inputBlocked_ = false;         // this frame: the gate holds the input back
+    int viewSeat_ = 0;                  // the seat whose eyes the view is in (outside a handover)
+    float writeGrace_ = 0.0f;           // after the landing: a piece touched before it ends defers the writing
+    int drawOfferBy_ = -1;              // seat whose draw offer goes with its next clock press
+    int drawCardFor_ = -1;              // seat asked to accept a draw (card)
+    float captionAge_ = 1e9f;           // "Bob, your move" (since the handover began)
+    float handoverArg_ = -1.0f;         // --handover <s> (this session only); -1 = Options > Gameplay
+    float scriptWait_ = 0.0f;           // --play: a short pause before each scripted move
+    int hsEloBefore_[2] = {0, 0}, hsEloAfter_[2] = {0, 0};
+    // --play: moves made by hand by the human player(s), one per turn
+    std::vector<std::string> script_;
+    size_t scriptPos_ = 0;
+    chess::PieceType scriptPromo_ = chess::NoPiece;
+
     // UI
     bool showMoveList_ = false;
     bool gameOverShown_ = false;
@@ -290,6 +408,37 @@ private:
     bool rated_ = false;                // rateGame() ran for this game
     bool eloCounted_ = false;           // the game changed the rating
     int eloBefore_ = 0, eloAfter_ = 0;
+
+    // Online game
+    GameLink* link_ = nullptr;          // owned by onlineSession()
+    net::OnlineGame og_;                // authoritative state as last reported
+    std::vector<RemoteMove> remoteQueue_;  // opponent moves waiting for the robot
+    int pendingPly_ = -1;               // my move sent, not confirmed yet
+    uint16_t pendingMove_ = 0;
+    int64_t frozenMs_ = 0;              // my clock as shown while my move is on its way
+    int recordedPly_ = 0;               // moves handed to the scoresheets
+    int pressedPly_ = -1;               // my last move whose clock press was animated
+    int remotePly_ = -1;                // the move the opponent's robot is playing
+    float endWait_ = 0.0f;              // time the end has waited for the robots
+    chess::Square promoTo_ = chess::NoSquare;  // pawn move waiting for the promotion choice
+    double turnStartMs_ = 0;            // server clock when my turn began (thinkMs)
+    bool resync_ = false;               // rebuild once the robots are idle
+    bool rebuildFade_ = false;
+    bool endPending_ = false;           // GameEnd received, shown once the moves are played
+    bool drawOffered_ = false;          // the opponent offers a draw (card)
+    bool myDrawOffer_ = false;          // my offer is pending
+    bool opponentAway_ = false;
+    double opponentBackBy_ = 0;         // server clock: end of the opponent's grace period
+    bool ratingKnown_ = false;
+    int ratingBefore_ = 0, ratingAfter_ = 0;
+    bool rematchAsked_ = false, rematchOffered_ = false, rematchGone_ = false;
+    bool reportOpen_ = false, reported_ = false;
+    int reportCategory_ = 0;
+    std::string reportComment_;
+    bool onlinePauseLeave_ = false;
+    std::string startOnline_;           // --start-online category
+    std::string startTouch_;            // --start-online with --touch <square>: touched once idle
+    float fadeDip_ = 0.0f;              // short darkening while the board is rebuilt
 };
 
 }  // namespace game

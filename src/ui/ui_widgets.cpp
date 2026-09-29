@@ -716,8 +716,33 @@ bool selectorRow(const std::string& label, int& index, const std::vector<std::st
 
 bool editingText() { return c.editId != 0; }
 
+namespace {
+bool editField(const std::string& label, std::string& text, const Rect& r, int maxChars, const TextStyle* textStyle,
+               bool enabled, uint32_t fieldFlags, const std::string& placeholder);
+}  // namespace
+
 bool textField(const std::string& label, std::string& text, const Rect& r, int maxChars, const TextStyle* textStyle,
                bool enabled) {
+    return editField(label, text, r, maxChars, textStyle, enabled, 0u, std::string());
+}
+
+bool formField(const std::string& label, std::string& text, const Rect& r, int maxChars, uint32_t fieldFlags,
+               const std::string& placeholder, bool enabled) {
+    return editField(label, text, r, maxChars, nullptr, enabled, fieldFlags, placeholder);
+}
+
+namespace {
+// The text as drawn: dots for a secret field.
+std::string shownText(const std::string& text, bool secret) {
+    if (!secret) return text;
+    std::string dots;
+    for (size_t i = 0, n = uni::decode(text).size(); i < n; ++i) dots += "\xE2\x80\xA2";
+    return dots;
+}
+
+bool editField(const std::string& label, std::string& text, const Rect& r, int maxChars, const TextStyle* textStyle,
+               bool enabled, uint32_t fieldFlags, const std::string& placeholder) {
+    const bool secret = (fieldFlags & FIELD_SECRET) != 0, ltr = (fieldFlags & (FIELD_LTR | FIELD_SECRET)) != 0;
     Id id = makeId(label);
     Item it = item(id, r, enabled ? (ITEM_FOCUSABLE | ITEM_HORIZONTAL) : ITEM_DISABLED);
     const plat::Input& in = input();
@@ -732,7 +757,7 @@ bool textField(const std::string& label, std::string& text, const Rect& r, int m
         TextStyle ts = textStyle ? *textStyle : valueStyle(enabled, 0.0f);
         if (!textStyle) ts.color = enabled ? ivory : withAlpha(muted, 0.8f);
         ts.align = HAlign::Left;
-        ts.dir = s.empty() ? (rtl() ? 1 : 0) : gfx::textDirection(s, ts);
+        ts.dir = ltr ? 0 : s.empty() ? (rtl() ? 1 : 0) : gfx::textDirection(s, ts);
         ts.size = gfx::fitSize(s, ts, innerW, 0.55f);
         return ts;
     };
@@ -769,7 +794,7 @@ bool textField(const std::string& label, std::string& text, const Rect& r, int m
             c.caret = std::clamp(c.caret, 0, n);
             bool modified = false, moved = false;
             // Left/Right move the caret the way they point: backwards in a right-to-left name.
-            int visual = styleFor(text).dir == 1 ? -1 : 1;
+            int visual = styleFor(shownText(text, secret)).dir == 1 ? -1 : 1;
             if (in.keyPressed[plat::KEY_LEFT]) { c.caret -= visual; moved = true; }
             if (in.keyPressed[plat::KEY_RIGHT]) { c.caret += visual; moved = true; }
             if (in.keyPressed[plat::KEY_HOME]) { c.caret = 0; moved = true; }
@@ -815,9 +840,10 @@ bool textField(const std::string& label, std::string& text, const Rect& r, int m
         }
     }
     // A click in the box places the caret (and starts the edit, above).
+    const std::string shown = shownText(text, secret);
     if (editing && it.clicked && box.contains(mouse())) {
-        TextStyle ts = styleFor(text);
-        c.caret = gfx::caretAt(text, ts, mouse().x - originX(ts, text));
+        TextStyle ts = styleFor(shown);
+        c.caret = gfx::caretAt(shown, ts, mouse().x - originX(ts, shown));
         c.caretTime = 0.0f;
     }
 
@@ -826,19 +852,29 @@ bool textField(const std::string& label, std::string& text, const Rect& r, int m
     gfx::pushAlpha(enabled ? 1.0f : 0.4f);
     gfx::fill(box, vec4(0, 0, 0, editing ? 0.45f : 0.3f), 2.0f);
     gfx::stroke(box, withAlpha(gold, editing ? 0.85f : 0.25f + 0.4f * it.hoverT), 0.0f, 2.0f);
-    TextStyle ts = styleFor(text);
-    float ox = originX(ts, text);
+    TextStyle ts = styleFor(shown);
+    float ox = originX(ts, shown);
     float base = centerBaseline(box, ts);
     gfx::pushClip(box.inset(3.0f));
-    gfx::text(text, ox, base, ts);
+    gfx::text(shown, ox, base, ts);
+    if (text.empty() && !editing && !placeholder.empty()) {
+        TextStyle ps = labelStyle(enabled);
+        ps.face = font::FACE_ITALIC;
+        ps.size = kSmall;
+        ps.color = withAlpha(muted, enabled ? 0.9f : 0.5f);
+        ps.align = rtl() && !ltr ? HAlign::Right : HAlign::Left;
+        ps.size = gfx::fitSize(placeholder, ps, innerW, 0.6f);
+        gfx::text(placeholder, ps.align == HAlign::Right ? box.r() - 15.0f : box.x + 15.0f, centerBaseline(box, ps), ps);
+    }
     if (editing && std::fmod(c.caretTime, 1.0f) < 0.62f) {
-        float cx = ox + gfx::caretOffset(text, ts, c.caret);
+        float cx = ox + gfx::caretOffset(shown, ts, c.caret);
         gfx::fill(Rect(gfx::snap(cx) - gfx::px(), box.y + 9.0f, std::max(2.0f * gfx::px(), 2.0f), box.h - 18.0f), goldBright);
     }
     gfx::popClip();
     gfx::popAlpha();
     return text != before;
 }
+}  // namespace
 
 bool tabBar(const std::vector<std::string>& tabs, int& current, const Rect& r) {
     Item it = item(makeId("##tabs"), r, ITEM_FOCUSABLE | ITEM_HORIZONTAL);

@@ -34,4 +34,13 @@ Change applyResult(Record& r, int opponent, double score) {
     return c;
 }
 
+PairChange applyPair(Record& white, Record& black, double whiteScore) {
+    int whiteBefore = white.rating, blackBefore = black.rating;
+    double s = std::clamp(whiteScore, 0.0, 1.0);
+    PairChange c;
+    c.white = applyResult(white, blackBefore, s);
+    c.black = applyResult(black, whiteBefore, 1.0 - s);
+    return c;
+}
+
 }  // namespace elo

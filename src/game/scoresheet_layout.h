@@ -67,10 +67,12 @@ struct Form {
 Form printedForm(int page);
 
 // ---- Handwritten fields ------------------------------------------------------------------------
-enum class Field { Event, Date, Round, Board, WhiteName, WhiteElo, BlackName, BlackElo, Page, Result, Count };
+// Note and Reference have no printed label: a player's own additions to the header (online
+// games: "Online, 5+3 rated" beside Round and Board, the game number beside the result).
+enum class Field { Event, Date, Round, Board, WhiteName, WhiteElo, BlackName, BlackElo, Page, Result, Note, Reference, Count };
 const char* fieldName(Field f);   // "event", "date", ... (logs, tests)
-// Header fields (Event .. BlackElo) are written on the first page only; Page on every page;
-// Result on the page that is on top when the game ends.
+// Header fields (Event .. BlackElo, Note, Reference) are written on the first page only; Page on
+// every page; Result on the page that is on top when the game ends.
 bool isHeaderField(Field f);
 
 // Where a handwritten value goes: text starts after x0 (right-aligned before x1 for right-to-left

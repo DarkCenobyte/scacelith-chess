@@ -82,12 +82,15 @@ void Scorekeeper::newGame(anim::Animator* anim, bool clockOnPositiveX, const Pla
     round_ = round;
     date_ = date;
     recording_ = headerWritten_ = finished_ = false;
+    hasDetails_ = false;
+    details_ = Details();
     moves_.clear();
     sheet::PieceLetters letters = localizedPieceLetters();
     for (int s = 0; s < 2; ++s) {
         players_[s] = players[s];
         nextPly_[s] = 0;
         movesQueued_[s] = 0;
+        hold_[s] = false;
         handAside_[s] = false;
         hasPrevPen_[s] = false;
         if (!ready_) continue;
@@ -107,6 +110,7 @@ void Scorekeeper::clear() {
     moves_.clear();
     for (int s = 0; s < 2; ++s) {
         nextPly_[s] = movesQueued_[s] = 0;
+        hold_[s] = false;
         hasPrevPen_[s] = false;
         if (ready_) sheets_[s].reset();
     }
@@ -120,6 +124,15 @@ Scoresheet::Header Scorekeeper::header() const {
     h.black = players_[1].name;
     h.whiteElo = players_[0].elo > 0 ? std::to_string(players_[0].elo) : "";
     h.blackElo = players_[1].elo > 0 ? std::to_string(players_[1].elo) : "";
+    if (!players_[0].rating.empty()) h.whiteElo = players_[0].rating;
+    if (!players_[1].rating.empty()) h.blackElo = players_[1].rating;
+    if (hasDetails_) {
+        if (!details_.event.empty()) h.event = details_.event;
+        if (!details_.round.empty()) h.round = details_.round;
+        if (details_.noBoard) h.board.clear();
+        h.note = details_.note;
+        h.reference = details_.reference;
+    }
     return h;
 }
 
@@ -164,7 +177,8 @@ void Scorekeeper::recordMove(int ply, const std::string& san) {
     if (!ready_ || !anim_ || finished_) return;
     if (!recording_) startRecording();
     for (int s = 0; s < 2; ++s) {
-        // Moves completed before this sheet caught up (never happens in normal play) come first.
+        if (hold_[s]) continue;  // written once released (hot-seat)
+        // Moves completed before this sheet caught up (a hold, else never in normal play) come first.
         for (int p = nextPly_[s]; p <= ply; ++p) beginMoveEntry(s, p, moves_[size_t(p)]);
     }
     LOGD("scoresheet: move %d queued, writing backlog %.1f s / %.1f s", ply + 1,
@@ -193,8 +207,25 @@ void Scorekeeper::beginMoveEntry(int seat, int ply, const std::string& san) {
     ++movesQueued_[seat];
 }
 
+void Scorekeeper::setHold(int seat, bool hold) {
+    seat &= 1;
+    if (hold_[seat] == hold) return;
+    hold_[seat] = hold;
+    if (!hold) catchUp(seat);
+}
+
+void Scorekeeper::catchUp(int seat) {
+    if (!ready_ || !anim_ || finished_ || !recording_) return;
+    for (int p = nextPly_[seat]; p < int(moves_.size()); ++p) beginMoveEntry(seat, p, moves_[size_t(p)]);
+}
+
 void Scorekeeper::finishGame(const std::string& result) {
     if (finished_) return;
+    // The moves a held sheet still owes come before the result.
+    for (int s = 0; s < 2; ++s) {
+        hold_[s] = false;
+        catchUp(s);
+    }
     finished_ = true;
     if (!ready_ || !anim_) return;
     for (int s = 0; s < 2; ++s) {

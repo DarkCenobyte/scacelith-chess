@@ -7,10 +7,13 @@
 #include "ui.h"
 #include "ui_draw.h"
 #include "ui_internal.h"
+#include "ui_online.h"
 #include "ui_screens_game.h"
+#include "ui_screens_online.h"
 #include "ui_theme.h"
 #include "ui_widgets.h"
 #include "../chess/chess.h"
+#include "../game/online_session.h"
 #include "../game/settings.h"
 #include "../i18n/i18n.h"
 #include "../i18n/unicode.h"
@@ -32,7 +35,7 @@ using namespace theme;
 namespace {
 
 // ---- State ----------------------------------------------------------------------------------------
-enum class Page { Title, NewGame, Options, Credits, Watch };
+enum class Page { Title, NewGame, Options, Credits, Watch, Online };
 
 struct OptionsState {
     game::Settings work;
@@ -55,6 +58,8 @@ struct State {
     bool pageFresh = false;
     uint64_t menuFrame = 0;
     float presetScroll = 0.0f, presetScrollTarget = 0.0f;
+    bool resumeOnline = false;      // an online game started from the online page: back to it after
+    bool optionsToOnline = false;   // Options opened from the online page: back to it on close
     // options (shared by both menus)
     OptionsState opt;
     int forcedTab = -1;
@@ -252,10 +257,12 @@ void copyOptions(game::Settings& dst, const game::Settings& src) {
     dst.mouseSensitivity = src.mouseSensitivity;
     dst.invertLook = src.invertLook;
     dst.gameCursor = src.gameCursor;
+    dst.handoverSeconds = src.handoverSeconds;
     dst.humanizeThinking = src.humanizeThinking;
     dst.language = src.language;
     dst.playerName = cleanName(src.playerName);
     dst.handStyle = src.handStyle;
+    detail::copyOnlineOptions(dst, src);
 }
 bool sameOptions(const game::Settings& a, const game::Settings& b) {
     auto feq = [](float x, float y) { return std::fabs(x - y) < 1e-4f; };
@@ -264,8 +271,28 @@ bool sameOptions(const game::Settings& a, const game::Settings& b) {
            a.depthOfField == b.depthOfField && feq(a.brightness, b.brightness) && feq(a.masterVolume, b.masterVolume) &&
            feq(a.effectsVolume, b.effectsVolume) && feq(a.ambienceVolume, b.ambienceVolume) && a.ambience == b.ambience &&
            a.showLegalMoves == b.showLegalMoves && a.showCoordinates == b.showCoordinates &&
-           feq(a.mouseSensitivity, b.mouseSensitivity) && a.invertLook == b.invertLook && a.gameCursor == b.gameCursor && a.humanizeThinking == b.humanizeThinking &&
-           cleanName(a.playerName) == cleanName(b.playerName) && a.handStyle == b.handStyle;
+           feq(a.mouseSensitivity, b.mouseSensitivity) && a.invertLook == b.invertLook && a.gameCursor == b.gameCursor &&
+           a.humanizeThinking == b.humanizeThinking && feq(a.handoverSeconds, b.handoverSeconds) &&
+           cleanName(a.playerName) == cleanName(b.playerName) && a.handStyle == b.handStyle && detail::sameOnlineOptions(a, b);
+}
+
+// Hot-seat defaults: White is the player of Options > Player, Black "Player 2" in another hand.
+std::string hotSeatDefaultName(int colour) {
+    if (colour == 0) {
+        std::string n = cleanName(game::settings().playerName);
+        return n == "Human" ? T("player.default_name") : n;
+    }
+    return T("hotseat.player2");
+}
+int hotSeatDefaultHand(int colour) {
+    int mine = std::clamp(int(game::settings().handStyle), 0, int(font::HAND_STYLE_COUNT) - 1);
+    return colour == 0 ? mine : (mine + 1) % int(font::HAND_STYLE_COUNT);
+}
+// A hot-seat name as played: trimmed, never empty.
+std::string hotSeatName(const NewGameSetup& s, int colour) {
+    std::string n = s.names[colour & 1];
+    size_t a = n.find_first_not_of(' '), b = n.find_last_not_of(' ');
+    return a == std::string::npos ? hotSeatDefaultName(colour) : n.substr(a, b - a + 1);
 }
 
 void loadSetupFromSettings(NewGameSetup& s) {
@@ -283,6 +310,15 @@ void loadSetupFromSettings(NewGameSetup& s) {
     s.depth = std::clamp(g.customDepth, 0, 30);
     s.moveTimeMs = std::max(0, g.customMoveTimeMs);
     s.nodes = std::max(0, g.customNodes);
+    // Hot-seat: the names and hands of the last two-player game, else Options > Player for White
+    // and "Player 2" in another hand for Black.
+    s.opponent = std::clamp(g.opponent, 0, 1);
+    for (int i = 0; i < 2; ++i) {
+        s.names[i] = g.hotseatNames[i].empty() ? hotSeatDefaultName(i) : g.hotseatNames[i];
+        s.hands[i] = g.hotseatHands[i] >= 0 ? g.hotseatHands[i] : hotSeatDefaultHand(i);
+    }
+    s.clockRightOf = std::clamp(g.hotseatClockRightOf, 0, 1);
+    s.rated = g.hotseatRated;
 }
 void storeSetupToSettings(const NewGameSetup& s) {
     game::Settings& g = game::settings();
@@ -297,6 +333,14 @@ void storeSetupToSettings(const NewGameSetup& s) {
     g.customDepth = s.depth;
     g.customMoveTimeMs = s.moveTimeMs;
     g.customNodes = s.nodes;
+    g.opponent = s.opponent;
+    // A default name or hand is stored as "" / -1: it follows Options > Player and the language.
+    for (int i = 0; i < 2; ++i) {
+        g.hotseatNames[i] = s.names[i] == hotSeatDefaultName(i) ? std::string() : s.names[i];
+        g.hotseatHands[i] = s.hands[i] == hotSeatDefaultHand(i) ? -1 : s.hands[i];
+    }
+    g.hotseatClockRightOf = s.clockRightOf;
+    g.hotseatRated = s.rated;
     g.save();
 }
 
@@ -382,7 +426,8 @@ bool optionsPage(MenuAction& act) {
     im::pageTitle(T("options.title"), p.cx(), p.y + 80.0f);
     im::pushId("options");
     const std::vector<std::string> tabs = {T("options.tab.display"), T("options.tab.graphics"), T("options.tab.audio"),
-                                           T("options.tab.gameplay"), T("options.tab.player"), T("options.tab.controls")};
+                                           T("options.tab.gameplay"), T("options.tab.player"), T("options.tab.online"),
+                                           T("options.tab.controls")};
     im::tabBar(tabs, o.tab, Rect(p.x + 60.0f, p.y + 124.0f, p.w - 120.0f, 50.0f));
 
     game::Settings& s = o.work;
@@ -474,6 +519,21 @@ bool optionsPage(MenuAction& act) {
             im::toggleRow(L("options.invert_look"), s.invertLook, row());
             im::toggleRow(L("options.game_cursor"), s.gameCursor, row());
             im::tooltip(T("options.game_cursor.help"));
+            {
+                // Hot-seat handover: an instant cut, or a flight of 0.8 to 2 s.
+                static const float kHandover[] = {0.0f, 0.8f, 1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f};
+                int n = int(sizeof(kHandover) / sizeof(kHandover[0])), hi = 0;
+                for (int i = 0; i < n; ++i)
+                    if (std::fabs(kHandover[i] - s.handoverSeconds) < std::fabs(kHandover[hi] - s.handoverSeconds)) hi = i;
+                if (im::stepperRow(L("options.handover"), hi, n,
+                                   [](int i) {
+                                       return i == 0 ? T("options.handover.cut")
+                                                     : i18n::trf("options.handover.flight", {decimal(kHandover[i], 1)});
+                                   },
+                                   row()))
+                    s.handoverSeconds = kHandover[hi];
+                im::tooltip(T("options.handover.help"));
+            }
             break;
         }
         case 4: {
@@ -490,6 +550,7 @@ bool optionsPage(MenuAction& act) {
             handwritingPreview(written == "Human" ? T("player.default_name") : written, hs, Rect(rx, y + 18.0f, rw, 170.0f));
             break;
         }
+        case detail::kOnlineOptionsTab: detail::onlineOptionsRows(s, rx, rw, y); break;
         default: {
             struct Line { const char* keys; const char* action; };
             static const Line lines[] = {
@@ -562,8 +623,11 @@ bool optionsPage(MenuAction& act) {
         if (r >= 0) o.confirmDiscard = false;
     }
     if (apply) {
+        game::Settings before = game::settings();
         copyOptions(game::settings(), o.work);
         game::settings().save();
+        // Another server: its own sign-in (credentials are kept per server by the network layer).
+        if (detail::onlineServerChanged(before, game::settings())) game::onlineSession().applyServer();
         act = MenuAction::OptionsChanged;
         o.work = game::settings();
         im::sound(Sound::Confirm);
@@ -611,32 +675,35 @@ MenuAction titlePage(float t) {
     TextStyle sub = style(font::FACE_ITALIC, 30.0f, ivoryDim, start);
     gfx::text(T("menu.subtitle"), im::flipX(sr, x + 4.0f), ruleY + 48.0f, sub);
 
-    float ey = 520.0f + slide;
-    float eh = 62.0f, ew = 440.0f;
+    float ey = 490.0f + slide;
+    float eh = 62.0f, ew = 440.0f, step = 70.0f;
     im::pushId("title");
     im::Id first = im::makeId("##menu.new_game");
     if (im::menuEntry(L("menu.new_game"), im::flip(sr, Rect(x, ey, ew, eh)))) {
         setPage(Page::NewGame);
         im::sound(Sound::Open);
     }
-    if (im::menuEntry(L("menu.watch"), im::flip(sr, Rect(x, ey + 76.0f, ew, eh)))) {
+    if (im::menuEntry(L("menu.online"), im::flip(sr, Rect(x, ey + step, ew, eh)))) {
+        setPage(Page::Online);
+        im::sound(Sound::Open);
+    }
+    if (im::menuEntry(L("menu.watch"), im::flip(sr, Rect(x, ey + 2.0f * step, ew, eh)))) {
         setPage(Page::Watch);
         im::sound(Sound::Open);
     }
-    ey += 76.0f;  // the entries below move down one row
-    if (im::menuEntry(L("menu.options"), im::flip(sr, Rect(x, ey + 76.0f, ew, eh)))) {
+    if (im::menuEntry(L("menu.options"), im::flip(sr, Rect(x, ey + 3.0f * step, ew, eh)))) {
         setPage(Page::Options);
         openOptions();
     }
-    if (im::menuEntry(L("menu.credits"), im::flip(sr, Rect(x, ey + 152.0f, ew, eh)))) {
+    if (im::menuEntry(L("menu.credits"), im::flip(sr, Rect(x, ey + 4.0f * step, ew, eh)))) {
         setPage(Page::Credits);
         im::sound(Sound::Open);
     }
-    if (im::menuEntry(L("menu.quit"), im::flip(sr, Rect(x, ey + 228.0f, ew, eh)))) act = MenuAction::Quit;
+    if (im::menuEntry(L("menu.quit"), im::flip(sr, Rect(x, ey + 5.0f * step, ew, eh)))) act = MenuAction::Quit;
     im::setDefaultFocus(first);
     im::popId();
 
-    detail::titleRating(im::flipX(sr, x), ey + 360.0f);
+    detail::titleRating(im::flipX(sr, x), ey + 5.0f * step + 132.0f);
     TextStyle vs = style(font::FACE_ITALIC, 19.0f, withAlpha(muted, 0.85f), start);
     gfx::text(i18n::trf("menu.version", {i18n::ltr(detail::data().version)}), im::flipX(sr, x), v.y - 48.0f, vs);
     gfx::popAlpha();
@@ -729,6 +796,79 @@ bool difficultyList(NewGameSetup& setup, const Rect& area, bool opened) {
     return changed;
 }
 
+// The opponent column of a two-player game (hot-seat): both names in their handwriting, the clock
+// side (the player with the clock on the left plays left-handed), rated or friendly.
+void hotSeatColumn(NewGameSetup& setup, float x, float w, float y) {
+    const Rect col(x, 0, w, 0);
+    const float rh = 54.0f;
+    auto row = [&]() {
+        Rect r(x, y, w, rh - 6.0f);
+        y += rh;
+        return r;
+    };
+    const std::vector<std::string> hands = {T("hand.caveat"), T("hand.marck"), T("hand.badscript")};
+    im::pushId("hotseat");
+    for (int c = 0; c < 2; ++c) {
+        im::pushId(c);
+        TextStyle ns;
+        ns.hand = std::clamp(setup.hands[c], 0, int(font::HAND_STYLE_COUNT) - 1);
+        ns.size = 36.0f;
+        ns.color = ivory;
+        std::string name = setup.names[c];
+        if (im::textField(c == 0 ? L("hotseat.white_player") : L("hotseat.black_player"), name, row(), kMaxNameLength, &ns))
+            setup.names[c] = name;
+        im::tooltip(T("hotseat.name.help"));
+        int hs = ns.hand;
+        if (im::selectorRow(L("player.handwriting"), hs, hands, row())) setup.hands[c] = hs;
+        im::tooltip(T("player.handwriting.help"));
+        im::popId();
+        if (c == 0) {
+            // Swap colours: between the two players.
+            TextStyle qs = style(font::FACE_ITALIC, kSmall, muted);
+            float bw = std::max(200.0f, gfx::textWidth(T("hotseat.swap"), qs) + 40.0f);
+            if (im::button(L("hotseat.swap"), im::flip(col, Rect(x + w - bw, y - 2.0f, bw, 40.0f)), im::ButtonKind::Quiet)) {
+                std::swap(setup.names[0], setup.names[1]);
+                std::swap(setup.hands[0], setup.hands[1]);
+                setup.clockRightOf = 1 - setup.clockRightOf;  // each keeps the hand they play with
+                im::sound(Sound::Toggle);
+            }
+            y += 46.0f;
+        }
+    }
+    gfx::hlineFade(x, x + w, y + 4.0f, withAlpha(gold, 0.25f), 0.25f);
+    y += 18.0f;
+    std::string white = hotSeatName(setup, 0), black = hotSeatName(setup, 1);
+    int side = std::clamp(setup.clockRightOf, 0, 1);
+    if (im::selectorRow(L("hotseat.clock"), side,
+                        {i18n::trf("hotseat.clock_right_of", {white}), i18n::trf("hotseat.clock_right_of", {black})}, row()))
+        setup.clockRightOf = side;
+    im::tooltip(T("hotseat.clock.help"));
+    TextStyle note = style(font::FACE_ITALIC, 21.0f, ivoryDim, im::startAlign());
+    std::string lefty = i18n::trf("hotseat.left_hand", {side == 0 ? black : white});
+    note.size = gfx::fitSize(lefty, note, w - 30.0f);
+    gfx::diamond(vec2(im::flipX(col, x + 6.0f), y + 4.0f), 3.0f, withAlpha(gold, 0.7f));
+    gfx::text(lefty, im::flipX(col, x + 22.0f), y + 11.0f, note);
+    y += 40.0f;
+    im::toggleRow(L("hotseat.rated"), setup.rated, row());
+    im::tooltip(T("hotseat.rated.help"));
+    std::string line;
+    if (setup.rated) {
+        const game::Settings& g = game::settings();
+        auto rating = [&](const std::string& n) {
+            const game::LocalPlayer* lp = g.findLocalPlayer(n);
+            return lp && lp->record.games > 0 ? std::to_string(lp->record.rating) : T("hotseat.new_rating");
+        };
+        line = i18n::trf("hotseat.ratings", {white, rating(white), black, rating(black)});
+    } else {
+        line = T("hotseat.friendly_note");
+    }
+    note.color = muted;
+    note.size = gfx::fitSize(line, style(font::FACE_ITALIC, 21.0f, muted), w - 30.0f);
+    gfx::diamond(vec2(im::flipX(col, x + 6.0f), y + 4.0f), 3.0f, withAlpha(gold, 0.5f));
+    gfx::text(line, im::flipX(col, x + 22.0f), y + 11.0f, note);
+    im::popId();
+}
+
 MenuAction newGamePage(NewGameSetup& setup, bool opened) {
     vec2 v = view();
     MenuAction act = MenuAction::None;
@@ -762,13 +902,30 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
     // Column divider.
     gfx::vline(p.cx(), top, footer - 20.0f, withAlpha(gold, 0.12f));
 
-    // Opponent column.
+    // Opponent column: Stockfish (a preset, or custom engine parameters), or a second player on
+    // this PC (hot-seat).
     im::sectionLabel(T("newgame.opponent"), lx, top + 8.0f, colW);
-    detail::newGameRating(lx, colW, top + 8.0f, setup.difficulty);
+    bool hotSeat = setup.opponent == 1;
+    if (!hotSeat) detail::newGameRating(lx, colW, top + 8.0f, setup.difficulty);
+    {
+        int kind = hotSeat ? 1 : 0;
+        if (im::selectorRow(L("newgame.opponent_kind"), kind, {T("newgame.vs_stockfish"), T("newgame.vs_human")},
+                            Rect(lx, top + 30.0f, colW, 50.0f))) {
+            setup.opponent = kind;
+            hotSeat = kind == 1;
+            custom = !hotSeat && nd > 0 && setup.difficulty == nd - 1;
+        }
+        im::tooltip(T("newgame.opponent_kind.help"));
+    }
+    const float listTop = top + 92.0f;
+    if (hotSeat) {
+        custom = false;
+        hotSeatColumn(setup, lx, colW, listTop);
+    }
     float customH = custom ? 6.0f * 44.0f + 18.0f : 0.0f;
-    float available = std::max(150.0f, footer - (top + 30.0f) - customH - 8.0f);
-    Rect listArea(lx, top + 30.0f, colW, std::min(available, presetListHeight(nd, setup.difficulty, custom)));
-    if (difficultyList(setup, listArea, opened)) {
+    float available = std::max(150.0f, footer - listTop - customH - 8.0f);
+    Rect listArea(lx, listTop, colW, std::min(available, presetListHeight(nd, setup.difficulty, custom)));
+    if (!hotSeat && difficultyList(setup, listArea, opened)) {
         custom = setup.difficulty == nd - 1;
     }
     if (custom) {
@@ -873,6 +1030,11 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
     // Colour note.
     int next = game::settings().nextColor;
     std::string colourLine = T(next == 0 ? "newgame.you_white" : next == 1 ? "newgame.you_black" : "newgame.colour_lot");
+    std::string colourNext = T("newgame.colour_alternate");
+    if (hotSeat) {
+        colourLine = i18n::trf("hotseat.colours", {hotSeatName(setup, 0), hotSeatName(setup, 1)});
+        colourNext = T("hotseat.colours_swap");
+    }
     const Rect col(rx, 0, colW, 0);
     TextStyle cs = style(font::FACE_ITALIC, 22.0f, ivoryDim, im::startAlign());
     float noteY = std::max(y + 26.0f, footer - 70.0f);
@@ -880,8 +1042,8 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
     cs.size = gfx::fitSize(colourLine, cs, colW - 26.0f);
     gfx::text(colourLine, im::flipX(col, rx + 22.0f), noteY, cs);
     cs.color = muted;
-    cs.size = gfx::fitSize(T("newgame.colour_alternate"), style(font::FACE_ITALIC, 22.0f, muted), colW - 26.0f);
-    gfx::text(T("newgame.colour_alternate"), im::flipX(col, rx + 22.0f), noteY + 28.0f, cs);
+    cs.size = gfx::fitSize(colourNext, style(font::FACE_ITALIC, 22.0f, muted), colW - 26.0f);
+    gfx::text(colourNext, im::flipX(col, rx + 22.0f), noteY + 28.0f, cs);
 
     // Footer.
     float bw = 260.0f, bh = 58.0f;
@@ -890,12 +1052,14 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
     bool back = im::button(L("common.back"), im::flip(p, Rect(p.x + pad, by, bw, bh)), im::ButtonKind::Secondary);
     im::Id startId = im::makeId("##newgame.start");
     if (im::button(L("newgame.start"), im::flip(p, Rect(p.r() - pad - bw, by, bw, bh)), im::ButtonKind::Primary)) {
+        for (int c = 0; c < 2; ++c) setup.names[c] = hotSeatName(setup, c);
         storeSetupToSettings(setup);
         act = MenuAction::StartGame;
     }
     // Summary of the choice next to the Start button.
     {
         std::string opp = nd > 0 ? presetName(diffs[size_t(setup.difficulty)].name) : "";
+        if (hotSeat) opp = i18n::trf("hotseat.summary", {hotSeatName(setup, 0), hotSeatName(setup, 1)});
         std::string tc = customTc ? customClockSummary(setup) : spacedPlus(timeControlLabel(tcs[size_t(setup.timeControl)]));
         TextStyle ss = style(font::FACE_ITALIC, 22.0f, ivoryDim, im::endAlign());
         std::string summary = opp + "  \xC2\xB7  " + i18n::ltr(tc);
@@ -963,6 +1127,13 @@ void screensReset() { S = State(); }
 
 // Hooks for the viewer mode's pages (ui_screens_game.cpp).
 bool runOptionsPage(MenuAction& act) { return optionsPage(act); }
+void openOptionsOnTab(int tab) {
+    S.opt.tab = tab;
+    S.forcedTab = tab;
+    S.optionsToOnline = S.page == Page::Online;
+    setPage(Page::Options);
+    openOptions();
+}
 void openOptionsPage() { openOptions(); }
 void dimBackground(float a) { dimScene(a); }
 
@@ -978,6 +1149,10 @@ void screensEndFrame() {}
 
 namespace debug {
 void openMenuPage(MenuPage page) { S.forcedPage = int(page); }
+void openOnlineMenu(const std::string& sub) {
+    S.forcedPage = int(Page::Online);
+    openOnlinePage(sub);
+}
 void setOptionsTab(int tab) { S.forcedTab = tab; S.opt.tab = tab; }
 void openPauseConfirm(int which) { S.forcedPauseConfirm = which; }
 void foldGameOver(bool folded) { S.forcedFold = folded ? 1 : 0; }
@@ -994,9 +1169,10 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
     im::Id menuId = im::makeId("##mainmenu");
     bool appear = im::appearing(menuId);
     if (appear) {
-        setPage(S.forcedPage >= 0 ? Page(S.forcedPage) : Page::Title);
+        setPage(S.forcedPage >= 0 ? Page(S.forcedPage) : S.resumeOnline ? Page::Online : Page::Title);
         if (S.page == Page::Options) openOptions();
         S.forcedPage = -1;
+        S.resumeOnline = false;
     }
     im::captureMouseAll();
     im::captureKeyboard();
@@ -1008,7 +1184,10 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
         case Page::Title: act = titlePage(ease(S.pageT)); break;
         case Page::NewGame: act = newGamePage(setup, fresh); break;
         case Page::Options:
-            if (optionsPage(act)) setPage(Page::Title);
+            if (optionsPage(act)) {
+                setPage(S.optionsToOnline ? Page::Online : Page::Title);
+                S.optionsToOnline = false;
+            }
             break;
         case Page::Credits: creditsPage(); break;
         case Page::Watch: {
@@ -1017,13 +1196,25 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
             if (back) setPage(Page::Title);
             break;
         }
+        case Page::Online: {
+            bool back = false;
+            detail::onlinePage(ease(S.pageT), fresh, back);
+            if (back) setPage(Page::Title);
+            break;
+        }
     }
+    // Online: challenge cards on every page once signed in, the ping on the online page. A game
+    // that starts from the online page brings the menu back to it afterwards.
+    detail::onlineMenuOverlay(S.page == Page::Online);
+    if (detail::onlineGameStarting()) S.resumeOnline = S.page == Page::Online;
     if (act == MenuAction::StartGame || act == MenuAction::Quit) setPage(Page::Title);
     if (act == MenuAction::StartWatching) setPage(Page::Title);
     return act;
 }
 
-MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw) {
+MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw) { return pauseMenu(canClaimDraw, canOfferDraw, std::string()); }
+
+MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& resignQuestion) {
     im::Id id = im::makeId("##pause");
     im::Anim& a = im::anim(id);
     bool appear = a.firstFrame == im::frame();
@@ -1074,7 +1265,8 @@ MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw) {
         im::sound(Sound::Close);
     }
     if (S.pauseConfirm == 1) {
-        int r = im::confirmDialog("##resign", T("confirm.resign.title"), T("confirm.resign.text"), T("confirm.resign.ok"),
+        int r = im::confirmDialog("##resign", T("confirm.resign.title"),
+                                  resignQuestion.empty() ? T("confirm.resign.text") : resignQuestion, T("confirm.resign.ok"),
                                   T("common.cancel"), true);
         if (r == 1) act = MenuAction::Resign;
         if (r >= 0) S.pauseConfirm = 0;
@@ -1281,9 +1473,16 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
             act = MenuAction::BackToMainMenu;
         std::string primary = S.goExtras.primaryLabel.empty() ? L("gameover.rematch") : S.goExtras.primaryLabel + "##gameover.rematch";
         im::Id rematchId = im::makeId("##gameover.rematch");
-        if (im::button(primary, im::flip(p, Rect(p.cx() + gap * 0.5f, by, bw, bh)), im::ButtonKind::Primary))
+        if (im::button(primary, im::flip(p, Rect(p.cx() + gap * 0.5f, by, bw, bh)), im::ButtonKind::Primary, !S.goExtras.primaryDisabled))
             act = MenuAction::Rematch;
-        im::setDefaultFocus(rematchId);
+        im::setDefaultFocus(S.goExtras.primaryDisabled ? im::makeId("##common.main_menu") : rematchId);
+        if (!S.goExtras.reportLabel.empty()) {  // online: report the opponent (start corner, quiet)
+            TextStyle rq = style(font::FACE_ITALIC, kSmall, muted);
+            float rw = std::max(176.0f, gfx::textWidth(S.goExtras.reportLabel, rq) + 24.0f);
+            if (im::button(S.goExtras.reportLabel + "##gameover.report", im::flip(p, Rect(p.x + 14.0f, p.y + 14.0f, rw, 40.0f)),
+                           im::ButtonKind::Quiet))
+                act = MenuAction::Report;
+        }
         TextStyle qs = style(font::FACE_ITALIC, kSmall, muted);
         float vw = std::max(176.0f, gfx::textWidth(T("gameover.view_board"), qs) + 24.0f);
         if (im::button(L("gameover.view_board"), im::flip(p, Rect(p.r() - 14.0f - vw, p.y + 14.0f, vw, 40.0f)), im::ButtonKind::Quiet)) {

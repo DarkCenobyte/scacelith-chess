@@ -9,7 +9,8 @@
 //                   player has reached 2400 (for good, as FIDE does with the published rating)
 //
 // Stockfish seats are rated with ai::presetElo() (the preset's approxElo, or the estimate of the
-// custom settings), which is also what a human game is rated against.
+// custom settings), which is also what a human game is rated against. Rated hot-seat games (two
+// people on one PC) use applyPair() on separate local records ([local_player_N] in the .ini).
 #pragma once
 
 namespace elo {
@@ -44,5 +45,14 @@ Change applyResult(Record& r, int opponent, double score);
 
 // Rating change without applying it (e.g. to preview a result).
 int ratingDelta(const Record& r, int opponent, double score);
+
+// A rated game between two local players (hot-seat, docs/MULTIPLAYER_PLAN.md): each record is
+// updated against the other's rating before the game, with its own K factor (the two changes
+// cancel out only when both K factors are equal). whiteScore: 1 White wins, 0.5 draw, 0 Black wins.
+// These records are the local two-player ratings, never the rating against Stockfish ([player]).
+struct PairChange {
+    Change white, black;
+};
+PairChange applyPair(Record& white, Record& black, double whiteScore);
 
 }  // namespace elo

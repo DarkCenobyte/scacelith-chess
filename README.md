@@ -63,6 +63,35 @@ resigns it. The title page shows your rating, record and peak, the new game page
 can expect against the selected opponent, and the game over card the change
 (`Elo 1512 → 1524 (+12)`). Watched games are never rated.
 
+### Two players on one PC
+
+Set **Opponent** to **Human, same PC** on the new game page to play a friend at the same computer,
+each from their own robot's eyes. The page asks for both names (White defaults to your name from
+Options > Player, Black to "Player 2"), each player's handwriting, the time control, the side of
+the clock (at White's or at Black's right: the player whose clock is on their left plays with the
+left hand), and whether the game is rated. **Swap colours** exchanges the two players.
+
+- The player to move has the mouse and the keyboard, with the same rules as against Stockfish
+  (touch-move, pressing the clock by hand, the arbiter, the claims in the Esc menu).
+- Once the clock is pressed, the camera flies over the table into the other player's eyes, and
+  both clocks stand still until it lands. Options > Gameplay > Hot-seat handover sets the flight
+  length (0.8 to 2 s) or an instant cut through black. Buttons still held when the view leaves
+  are ignored until released, and each player keeps their own look (right drag, wheel).
+- Each player fills in their own scoresheet in their own handwriting. The mover writes the move at
+  once; the next player writes it when the view reaches them, or after their own move if they
+  touch a piece first.
+- **Esc** offers a draw (it goes with your next move, as in FIDE 9.1.2: the opponent sees an
+  accept / decline card when the view reaches them, and touching a piece declines it), claims a
+  draw, or resigns for the player to move, confirmed with their name.
+- The top left corner shows both names (and ratings); a caption names the player whose turn begins.
+  The game over card names the winner, and the rematch swaps the colours (the clock follows its
+  player, so each keeps the same hand).
+
+A two-player game is friendly by default and never changes your rating against Stockfish. A rated
+one keeps a separate rating per name (`[local_player_N]` in the settings file, 1500 for a new
+name, the same FIDE formula), updated for both players against each other's rating before the
+game; leaving a game early rates nothing.
+
 ## Watch a Game
 
 **Watch a Game** on the title page lets two Stockfish players (one preset per side, and a time
@@ -80,12 +109,66 @@ remembered (`[viewer]` in the settings file).
 The players claim and offer draws like the opponent of a normal game (repetition, fifty moves, an
 equal position late in the game), and the game over card offers to watch another game.
 
+## Online play
+
+**Play Online** on the title page plays people through a Scacelith server, still in the first
+person: your opponent sits in the other chair as a robot that moves the pieces and presses the
+clock by itself, as soon as their move arrives.
+
+- **Server.** The official server is `caissa.scacelith.com` (port 44664, secure web API and
+  secure WebSocket on the same port). Options > Online server > Custom server takes a community
+  server instead: host (domain or IP), HTTPS/API port, WSS port (empty = the API port) and, for a
+  server with a self-signed certificate, its **Certificate fingerprint (SHA-256)** as its owner
+  gives it (64 hexadecimal characters, colons allowed; empty = the Windows certificate store).
+  **Test connection** shows the server's name, message and whether it runs a compatible
+  version. You sign in separately on each server: an account and its sign-in are never shared
+  between servers, and nothing secret is written to `Scacelith.ini`.
+- **Account.** Sign in with your user name or e-mail and password (and the code of your
+  authenticator app once two-factor authentication is on), or with Google. New accounts confirm
+  their e-mail address (the page can send the link again); a forgotten password is reset by
+  e-mail. The account page lists your rating in every time control (`1500?` while it is
+  provisional, with games and wins / draws / losses), changes the password, turns two-factor
+  authentication on (QR code or key, then ten recovery codes shown once) or off, makes new
+  recovery codes, and signs you out here or everywhere.
+- **Finding a game.** Pick a time control (your rating in each is under it), rated or casual, and
+  **Find opponent**: a card counts the waiting time and shows the rating range searched. You can
+  also challenge a player by name (any time control; only the official ones can be rated, with
+  the colour you want), or create a private game whose short code a friend enters to play you.
+  Challenges you receive appear as a card wherever you are in the menus, and at the table
+  between two games.
+- **At the table.** You can only let go of a piece on a legal square; the move is sent the
+  moment you choose it, and the robot hand then places the piece and presses the clock. The
+  clocks are the server's (they never stop, not even in the Esc menu). The ping to the server is
+  in the top right corner. Esc: offer or claim a draw, resign, abort before your first move,
+  report the opponent, leave (which resigns). If your opponent loses the connection a banner
+  counts down the time they have to come back; if yours drops, the game waits behind a
+  "Reconnecting…" veil and picks up where the server is. The scoresheets are headed with the
+  server's name, "Online", the time control, rated or casual, both players with their ratings and
+  the game's number; the game over card shows the rating change and offers a rematch.
+- **Direct match.** Two computers play each other directly, without a server or an account
+  (friendly games, never rated): one player **hosts** (time control, colour, port 47100 by
+  default, opened on the home router with UPnP when possible) and reads the address, the port and
+  a code (`XXXX-XXXX-XXXX`) to the other, who **joins** with them. The page says whether the
+  router opened the port, when to forward it by hand, and when the internet provider shares the
+  address (carrier-grade NAT: try IPv6 or a VPN).
+
+Development: `--online-mock` replaces the network with an in-process fake server and a fake
+direct-match friend (any password works; see `src/game/online_mock.h` for the inputs that try
+error paths), and `--start-online [category]` goes straight to a game (with `--online-mock` the
+opponent is a random mover). In a mock game F9 makes the opponent disconnect for a while and F10
+drops your own connection. `--scene ui --ui-screen online-play` (and the other `online-*` and
+`direct-*` screens listed in `src/ui/ui_viewer.cpp`) shows the pages on the fake server.
+[docs/ONLINE_CLIENT.md](docs/ONLINE_CLIENT.md) describes the client side. QR codes are drawn with
+Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-library) (MIT licence,
+`third_party/qrcodegen/`).
+
 ## Options
 
 Settings are stored in `Scacelith.ini` next to the executable when that folder is writable,
 otherwise in `%APPDATA%\Scacelith\`. All of them are editable from the Options page: display
 mode and resolution, V-sync, render scale, quality preset, motion blur, depth of field,
-brightness, volumes, ambience, legal-move hints, mouse sensitivity.
+brightness, volumes, ambience, legal-move hints, mouse sensitivity, the game pointer, and the
+hand-over between the two players of a game on one PC (a camera flight, or an instant cut).
 
 The interface speaks English, French, German, Spanish, Ukrainian, Russian, Arabic (laid out right
 to left), Japanese, Simplified Chinese and Traditional Chinese. The first start follows the
@@ -121,10 +204,18 @@ The game itself (`--scene game`, the default) takes `--start` (a game against St
 with N an index of the preset list, `--viewpoint 0..9`), `--tc N` (time control index), `--cam
 x,y,z [--look x,y,z] [--fov deg]` (initial observer camera when watching; a detached camera in a
 normal game), `--handover-preview` (watching through the players' eyes with the clock frozen during
-each camera handover, as planned for [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`, `--warp
-<seconds>` (simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`, `--mouse
-fx,fy` (pointer position as fractions of the window), `--glance` (start looking at the scoresheet)
-and `--ini <file>`.
+each camera handover, the same hand-over as [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`,
+`--warp <seconds>` (simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
+`--mouse fx,fy` (pointer position as fractions of the window), `--glance` (start looking at the
+scoresheet) and `--ini <file>`.
+
+Two players on one PC: `--start --hotseat` starts one at once, with `--white-name N`, `--black-name
+N`, `--clock-right white|black`, `--rated` and `--handover <seconds>` (0 = instant cut). `--play
+e2e4,e7e5,...` plays the human moves by hand, the way a player would (touch, carry, press the
+clock): both sides on one PC, the human's side against Stockfish; with `--warp` it takes
+screenshots of a game in progress, for instance the hand-over halfway (`--start --hotseat
+--no-intro --play e2e4 --warp 2.35`). The UI viewer has the hot-seat screens (`--scene ui
+--ui-screen newgame-hotseat|hotseat-hud|hotseat-confirm|hotseat-gameover`).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised.
 

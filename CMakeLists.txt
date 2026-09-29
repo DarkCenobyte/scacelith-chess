@@ -15,6 +15,7 @@ endif()
 
 option(SCACELITH_CONSOLE "Windows: build a console-subsystem exe (logs visible)" OFF)
 option(SCACELITH_STOCKFISH "Embed the Stockfish engine" ON)
+set(SCACELITH_OFFICIAL_SERVER "" CACHE STRING "Official online server: host[:apiPort[:wsPort]] (empty = caissa.scacelith.com:44664, none = no official server)")
 
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 if(WIN32)
@@ -44,11 +45,11 @@ endif()
 # ---------------------------------------------------------------------------------------------
 file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
     ${ROOT}/src/core/*.cpp ${ROOT}/src/math/*.cpp ${ROOT}/src/chess/*.cpp ${ROOT}/src/ai/*.cpp ${ROOT}/src/audio/*.cpp
-    ${ROOT}/src/i18n/*.cpp)
-# Engine-free parts of src/game (Elo, observer camera, camera flights, scoresheet layout): in the
-# core library so the unit tests can use them, and left out of the game sources below.
+    ${ROOT}/src/i18n/*.cpp ${ROOT}/src/net/*.cpp)
+# Engine-free parts of src/game (Elo, observer camera, camera flights, hot-seat handover, scoresheet
+# layout): in the core library so the unit tests can use them, and left out of the game sources below.
 set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cpp ${ROOT}/src/game/observer_camera.cpp
-    ${ROOT}/src/game/scoresheet_layout.cpp)
+    ${ROOT}/src/game/hotseat.cpp ${ROOT}/src/game/scoresheet_layout.cpp)
 list(APPEND CORE_SOURCES ${GAME_CORE_SOURCES})
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
 target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party)
@@ -63,6 +64,24 @@ else()
     find_package(Threads REQUIRED)
     target_link_libraries(scacelith_core PUBLIC Threads::Threads)
 endif()
+# Networking (src/net): online client (WinHTTP, DPAPI, the shell for SSO), direct match (Winsock,
+# BCrypt ECDH P-256 / AES-GCM / SHA-256, adapter list for iphlpapi) and UPnP on Windows. Linux
+# development builds use OpenSSL: required by the direct match; the online client also builds
+# without it (online play then reports "unavailable").
+set_source_files_properties(${ROOT}/src/net/online_client.cpp PROPERTIES COMPILE_DEFINITIONS
+    "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\";SCACELITH_VERSION_STRING=\"${PROJECT_VERSION}\"")
+set_source_files_properties(${ROOT}/tests/net_tests.cpp PROPERTIES COMPILE_DEFINITIONS
+    "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\"")
+if(WIN32)
+    target_link_libraries(scacelith_core PUBLIC winhttp crypt32 bcrypt ws2_32 iphlpapi shell32)
+else()
+    find_package(OpenSSL REQUIRED)
+    target_link_libraries(scacelith_core PUBLIC OpenSSL::SSL OpenSSL::Crypto)
+    target_compile_definitions(scacelith_core PRIVATE SCACELITH_HAS_OPENSSL=1)
+endif()
+# The real network layer replaces the game's offline stand-in (src/game/online_stub.cpp); the
+# in-process fakes stay available with --online-mock.
+target_compile_definitions(scacelith_core PUBLIC SCACELITH_NET_REAL=1)
 
 # ---------------------------------------------------------------------------------------------
 # Game executable. Every .cpp under src/ (except the core modules above) is compiled directly
