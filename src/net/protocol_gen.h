@@ -404,8 +404,9 @@ struct ChallengeStatus {
     bool rated = false;
 };
 // Complete authoritative state of a game: sent when it starts, after a (re)connection and on
-// Resync. Clocks are the remaining times at serverTime; the `running` side keeps counting from
-// there.
+// Resync, and also to the opponent when the held clock of a game restored after a restart starts
+// (lifecycle step 6). Clocks are the remaining times at serverTime; the `running` side keeps
+// counting from there (`running` is None while such a clock is held).
 struct GameSnapshot {
     static constexpr MsgType kType = MsgType::GameSnapshot;
     static constexpr bool kClientToServer = false;

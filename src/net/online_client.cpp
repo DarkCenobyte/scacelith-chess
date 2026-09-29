@@ -18,9 +18,12 @@
 //     server's reconnection grace is short, at least RECONNECT_GRACE_MIN_MS (15 s by default),
 //     and RECOVERY_GRACE_MS (90 s by default) for the games it restores after a restart. For 10
 //     minutes after losing a connection that had reached Welcome they reuse the /api/v1/info
-//     answer it was made with (one TLS handshake instead of two), except after a shutdown; the
-//     server id of the 101 answer is checked against the saved session either way. A connect()
-//     asked by the player always reads /info again and never waits for the backoff.
+//     answer it was made with (one TLS handshake instead of two), after a shutdown as after a
+//     crash, so the reconnection wave of a restart costs one handshake per player; the server id
+//     of the 101 answer is checked against the saved session before Hello (a reinstall), and a
+//     refused upgrade (404, 426: another path or subprotocol) makes the next attempt read /info
+//     again. A connect() asked by the player always reads /info again and never waits for the
+//     backoff.
 //
 // Keeping the realtime connection on its own thread means a slow HTTPS call (or a proof of
 // work) never delays the answer to a server Ping or the sending of a move. The game thread only
@@ -300,7 +303,7 @@ struct OnlineClient::Impl {
         bool haveOffset = false;
         int lastFatal = 0;                                // ErrorCode of the last fatal Error
         bool shutdownNotice = false;                      // Notice{ServerShutdown} on this connection
-        bool restarting = false;                          // lost to a shutdown, no Welcome since
+        bool restarting = false;                          // lost to a shutdown, no Welcome or 503 since
         // The /api/v1/info answer the last connection attempt used. proven: a connection built on
         // it reached Welcome; at: when it was read, or when such a connection last ended.
         struct Info {
@@ -698,10 +701,14 @@ struct OnlineClient::Impl {
 
     // The last /info answer serves an automatic attempt when a connection built on it reached
     // Welcome, for the same endpoint, and it was read or last in use less than 10 minutes ago
-    // (a Hello accepted since then proved the protocol, a working upgrade the path). Not after a
-    // shutdown: a restart is when a server is updated or reinstalled.
+    // (a Hello accepted since then proved the protocol, a working upgrade the path). After a
+    // shutdown too, so that the reconnection wave of a restart costs one TLS handshake per player,
+    // as after a crash. What a restart can change is caught without it: another server (a
+    // reinstall) by the server id of the 101 answer, before Hello (tryConnect); another path or
+    // subprotocol by the upgrade's 404 or 426, after which /info is read again; another protocol
+    // by Hello (close 4002, Incompatible).
     bool infoReusable(const ServerEndpoint& e) const {
-        return rt.info.valid && rt.info.proven && !rt.restarting && rt.info.origin == e.origin() &&
+        return rt.info.valid && rt.info.proven && rt.info.origin == e.origin() &&
                rt.info.insecure == e.insecureDev && Clock::now() - rt.info.at < kInfoReuse;
     }
 

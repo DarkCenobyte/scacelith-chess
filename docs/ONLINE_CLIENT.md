@@ -75,7 +75,14 @@ same as against Stockfish, with these differences:
   client comes back by itself after a random delay, longer when the server is full or restarting
   but 8 s at most during a game unless the server asked to wait longer (a `Retry-After`): the
   server keeps the game for the reconnection grace, at least 15 s by default and 90 s after a
-  restart (`dedicated-server/docs/PROTOCOL.md`, lifecycle step 6).
+  restart (`dedicated-server/docs/PROTOCOL.md`, lifecycle step 6). After a restart the server
+  also holds the clock of the side to move until that player is back, 20 s at most by default:
+  its snapshots then name no running clock, so both clocks stay frozen, and the snapshot that
+  follows when the held clock starts (sent to the opponent too) sets them running again. The
+  automatic reconnections after a restart reuse the server's `/api/v1/info` answer, as after a
+  network failure; a restart that brought another server to the same address (a reinstall,
+  another server id in the WebSocket's `101` answer) ends the session as "unauthorized" instead,
+  and the saved sign-in is dropped without being sent.
 - **Esc menu.** Resume, offer draw, claim draw, abort (before my first move, in place of
   resign), resign, report opponent (server games), options, leave (confirmed: resigns, or aborts
   before my first move). The clock keeps running behind it.
