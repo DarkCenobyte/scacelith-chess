@@ -34,6 +34,7 @@ constexpr float kHeadPitchDown = -45.0f * DEG, kHeadPitchUp = 30.0f * DEG;
 constexpr float kEyeLimit = 18.0f * DEG;
 constexpr float kGlanceFov = 24.0f * DEG;  // looking at one's own scoresheet (S): a closer look
 constexpr float kGlanceTime = 0.45f;       // seconds to turn to the scoresheet and back
+constexpr float kEyeFStop = 11.0f;         // the player's eyes at kFov: a 2.2 mm pupil in a bright hall
 
 anim::Task task(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0), float height = 0.0f) {
     anim::Task k;
@@ -629,7 +630,7 @@ void GameScene::applySettings(bool displayToo) {
         ps.exposureCompensation = s.brightness;
         // A seated player's eyes: gentle depth of field, only far objects soften.
         applyDofPreset(ps, s.depthOfField ? DofPreset::Subtle : DofPreset::Off);
-        ps.dofFStop = 8.0f;
+        ps.dofFStop = kEyeFStop;
         ps.dofMaxRadius = 8.0f;
     }
     audio::setMasterVolume(s.masterVolume);
@@ -1810,21 +1811,27 @@ void GameScene::render(AppContext& ctx, float dt) {
         }
     }
     render::Environment env = world_.environment(time_);
-    // Eyes focus where the player looks: the board / table under the centre of the view.
+    // Eyes focus on what the player looks at: whatever lies under the centre of the view.
     {
         float target;
         if (observer || (firstPerson && headless != humanSeat())) {
             target = observerFocus(cam);
+        } else if (firstPerson) {
+            // The eyes follow the pointer (they are on the piece or the square being aimed at, or
+            // on the scoresheet the pointer rests on); while the player reads his sheet (S) or
+            // turns his head, they look straight ahead.
+            bool pointer = glanceBlend_ < 0.5f && !dragging_ && !paused_ && !ui::wantsMouse() && state_ == State::Playing;
+            target = firstPersonFocus(pointer ? mouseRay() : Ray{cam.position, cam.forward()});
         } else {
-            Ray centre{cam.position, cam.forward()};
-            // The board, or the scoresheet on the table while the player looks at it (S).
-            float planeY = lerp(layout::BOARD_TOP_Y, layout::TABLE_TOP_Y + layout::SCORESHEET_THICKNESS, glanceBlend_);
-            float t = rayPlane(centre, vec3(0, planeY, 0), vec3(0, 1, 0));
-            target = (t > 0.0f && t < 3.0f) ? t : 2.5f;
-            if (!firstPerson) target = length(cam.position - vec3(0, 0.9f, 0));
+            target = length(cam.position - vec3(0, 0.9f, 0));
         }
         focusDistance_ = focusDistance_ <= 0.0f ? target : focusDistance_ + (target - focusDistance_) * (1.0f - std::exp(-dt * 6.0f));
         r.post().settings.dofFocusDistance = focusDistance_;
+        // The player's view narrows to read the scoresheet (S), but eyes do not zoom: the depth of
+        // field keeps the blur of the normal view instead of a telephoto's (the same f-number at 24
+        // degrees would blur 5.5 times more than at 52).
+        float zoom = std::tan(kFov * 0.5f) / std::tan(std::max(cam.fovY, 1.0f * DEG) * 0.5f);
+        r.post().settings.dofFStop = firstPerson && !observer ? kEyeFStop * zoom * zoom : kEyeFStop;
     }
     if (cameraCut_) {
         r.post().settings.resetHistory = true;
@@ -2037,6 +2044,41 @@ int GameScene::headNearCamera(vec3 p) const {
         if (length(p - centre) < 0.16f) return seat;
     }
     return -1;
+}
+
+float GameScene::firstPersonFocus(const Ray& ray) const {
+    // The nearest of what the table holds along the gaze (the opponent's face, a piece, the clock,
+    // the board, a scoresheet, the table), else the floor of the hall. A plane through the board
+    // alone focused far beyond the table whenever the player looked aside.
+    float best = 1e30f;
+    auto consider = [&](float t) {
+        if (t > 0.05f && t < best) best = t;
+    };
+    int opponent = 1 - humanSeat();
+    vec3 face = anim_[opponent].eyeCameraTransform().c[3].xyz() - ray.o;
+    float faceDist = length(face);
+    if (faceDist > 0.2f && dot(face / faceDist, ray.d) > std::cos(8.0f * DEG)) consider(faceDist);
+    float tPiece = 1e30f;
+    if (pickPiece(ray, &tPiece) >= 0) consider(tPiece);
+    float tClock = 1e30f;
+    if (world_.rayHitsClock(ray, &tClock)) consider(tClock);
+    auto rect = [&](float y, float halfX, float halfZ, vec3 centre, vec3 axisX, vec3 axisZ) {
+        float t = rayPlane(ray, vec3(0, y, 0), vec3(0, 1, 0));
+        if (t <= 0.0f) return;
+        vec3 d = ray.o + ray.d * t - centre;
+        if (std::abs(dot(d, axisX)) <= halfX && std::abs(dot(d, axisZ)) <= halfZ) consider(t);
+    };
+    const vec3 X(1, 0, 0), Z(0, 0, 1);
+    rect(layout::BOARD_TOP_Y, 0.5f * layout::BOARD_SIZE, 0.5f * layout::BOARD_SIZE, vec3(0), X, Z);
+    for (int seat = 0; seat < 2; ++seat) {
+        sheet::PadFrame f = sheet::padFrame(seat, world_.clockOnPositiveX());
+        rect(layout::TABLE_TOP_Y + layout::SCORESHEET_THICKNESS, 0.5f * layout::SCORESHEET_WIDTH, 0.5f * layout::SCORESHEET_LENGTH,
+             f.center, f.right, f.down);
+    }
+    rect(layout::TABLE_TOP_Y, 0.5f * layout::TABLE_WIDTH, 0.5f * layout::TABLE_DEPTH, vec3(0), X, Z);
+    if (best < 1e29f) return best;
+    float tFloor = rayPlane(ray, vec3(0), vec3(0, 1, 0));
+    return tFloor > 0.0f ? std::min(tFloor, 8.0f) : 4.0f;
 }
 
 float GameScene::observerFocus(const render::Camera& cam) const {

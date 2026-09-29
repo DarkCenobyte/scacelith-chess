@@ -178,6 +178,7 @@ private:
     void selectViewpoint(int n, bool jump);
     int headNearCamera(m::vec3 p) const;      // seat whose head contains p (drawn headless), or -1
     float observerFocus(const render::Camera& cam) const;
+    float firstPersonFocus(const m::Ray& gaze) const;  // distance the player's eyes focus at
 
     AppContext* ctx_ = nullptr;
     GameMode mode_ = GameMode::Play;
