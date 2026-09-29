@@ -48,6 +48,9 @@ bool Settings::load(const std::string& p) {
     mouseSensitivity = ini.getFloat("gameplay.mouse_sensitivity", mouseSensitivity);
     invertLook = ini.getBool("gameplay.invert_look", invertLook);
     nextColor = ini.getInt("gameplay.next_color", nextColor);
+    handoverSeconds = std::clamp(ini.getFloat("gameplay.handover_seconds", handoverSeconds), 0.0f, 2.0f);
+    if (handoverSeconds > 0.0f && handoverSeconds < 0.8f) handoverSeconds = 0.8f;
+    opponent = std::clamp(ini.getInt("newgame.opponent", opponent), 0, 1);
     difficultyPreset = ini.getInt("newgame.difficulty", difficultyPreset);
     timeControlPreset = ini.getInt("newgame.time_control", timeControlPreset);
     customBaseSeconds = ini.getInt("newgame.custom_base_seconds", customBaseSeconds);
@@ -68,6 +71,28 @@ bool Settings::load(const std::string& p) {
     playerDraws = ini.getInt("player.draws", playerDraws);
     playerLosses = ini.getInt("player.losses", playerLosses);
     playerPeakElo = std::max(playerElo, ini.getInt("player.peak", playerPeakElo));
+    for (int i = 0; i < 2; ++i) {
+        const char* side = i == 0 ? "white" : "black";
+        hotseatNames[i] = ini.getString(std::string("hotseat.") + side + "_name", hotseatNames[i]);
+        hotseatHands[i] = std::clamp(ini.getInt(std::string("hotseat.") + side + "_hand", hotseatHands[i]), -1,
+                                     int(ui::font::HAND_STYLE_COUNT) - 1);
+    }
+    hotseatClockRightOf = std::clamp(ini.getInt("hotseat.clock_right_of", hotseatClockRightOf), 0, 1);
+    hotseatRated = ini.getBool("hotseat.rated", hotseatRated);
+    localPlayers.clear();
+    for (int n = 1; n <= 256; ++n) {
+        std::string sec = "local_player_" + std::to_string(n) + ".";
+        if (!ini.has(sec + "name")) break;
+        LocalPlayer p;
+        p.name = ini.getString(sec + "name");
+        p.record.rating = std::max(elo::kFloor, ini.getInt(sec + "elo", elo::kInitialRating));
+        p.record.games = std::max(0, ini.getInt(sec + "games", 0));
+        p.record.wins = std::max(0, ini.getInt(sec + "wins", 0));
+        p.record.draws = std::max(0, ini.getInt(sec + "draws", 0));
+        p.record.losses = std::max(0, ini.getInt(sec + "losses", 0));
+        p.record.peak = std::max(p.record.rating, ini.getInt(sec + "peak", p.record.rating));
+        if (!p.name.empty() && !findLocalPlayer(p.name)) localPlayers.push_back(p);
+    }
     viewerWhitePreset = ini.getInt("viewer.white_preset", viewerWhitePreset);
     viewerBlackPreset = ini.getInt("viewer.black_preset", viewerBlackPreset);
     viewerTimeControl = ini.getInt("viewer.time_control", viewerTimeControl);
@@ -99,6 +124,26 @@ bool Settings::load(const std::string& p) {
     handStyle = ui::font::HandStyle(std::clamp(ini.getInt("player.hand_style", int(handStyle)), 0, int(ui::font::HAND_STYLE_COUNT) - 1));
     applyLanguage();
     return true;
+}
+
+LocalPlayer* Settings::findLocalPlayer(const std::string& name) {
+    for (LocalPlayer& p : localPlayers)
+        if (p.name == name) return &p;
+    return nullptr;
+}
+
+const LocalPlayer* Settings::findLocalPlayer(const std::string& name) const {
+    for (const LocalPlayer& p : localPlayers)
+        if (p.name == name) return &p;
+    return nullptr;
+}
+
+LocalPlayer& Settings::localPlayer(const std::string& name) {
+    if (LocalPlayer* p = findLocalPlayer(name)) return *p;
+    LocalPlayer p;
+    p.name = name;
+    localPlayers.push_back(p);
+    return localPlayers.back();
 }
 
 void Settings::applyLanguage() {
@@ -134,6 +179,8 @@ bool Settings::save() const {
     ini.setFloat("gameplay.mouse_sensitivity", mouseSensitivity);
     ini.setBool("gameplay.invert_look", invertLook);
     ini.setInt("gameplay.next_color", nextColor);
+    ini.setFloat("gameplay.handover_seconds", handoverSeconds);
+    ini.setInt("newgame.opponent", opponent);
     ini.setInt("newgame.difficulty", difficultyPreset);
     ini.setInt("newgame.time_control", timeControlPreset);
     ini.setInt("newgame.custom_base_seconds", customBaseSeconds);
@@ -154,6 +201,23 @@ bool Settings::save() const {
     ini.setInt("player.draws", playerDraws);
     ini.setInt("player.losses", playerLosses);
     ini.setInt("player.peak", playerPeakElo);
+    ini.set("hotseat.white_name", hotseatNames[0]);
+    ini.set("hotseat.black_name", hotseatNames[1]);
+    ini.setInt("hotseat.white_hand", hotseatHands[0]);
+    ini.setInt("hotseat.black_hand", hotseatHands[1]);
+    ini.setInt("hotseat.clock_right_of", hotseatClockRightOf);
+    ini.setBool("hotseat.rated", hotseatRated);
+    for (size_t i = 0; i < localPlayers.size(); ++i) {
+        const LocalPlayer& p = localPlayers[i];
+        std::string sec = "local_player_" + std::to_string(i + 1) + ".";
+        ini.set(sec + "name", p.name);
+        ini.setInt(sec + "elo", p.record.rating);
+        ini.setInt(sec + "games", p.record.games);
+        ini.setInt(sec + "wins", p.record.wins);
+        ini.setInt(sec + "draws", p.record.draws);
+        ini.setInt(sec + "losses", p.record.losses);
+        ini.setInt(sec + "peak", p.record.peak);
+    }
     ini.setInt("viewer.white_preset", viewerWhitePreset);
     ini.setInt("viewer.black_preset", viewerBlackPreset);
     ini.setInt("viewer.time_control", viewerTimeControl);

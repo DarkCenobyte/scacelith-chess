@@ -2,6 +2,9 @@
 //   scacelith --scene ui --ui-screen main|newgame|custom|options|credits|pause|confirm|promotion|
 //                                     gameover|gameover-folded|loading|movelist|notify|hud|hand|
 //                                     watch|viewer-pause|viewer-hud|viewer-gameover|gameover-elo
+//   hot-seat (two players on one PC): newgame-hotseat (New Game with "Human, same PC"),
+//     hotseat-hud (players, caption, draw offer card), hotseat-confirm (named resignation),
+//     hotseat-gameover (both names and ratings)
 //   online pages (in-process mock server, frozen clock): online (sign in), online-register,
 //     online-mfa (code step), online-play, online-search, online-account, online-mfa-setup,
 //     online-recovery, online-challenge, online-private, online-noserver, direct, direct-host,
@@ -121,7 +124,13 @@ public:
         game::Settings& s = game::settings();
         s.difficultyPreset = saved_.difficultyPreset;
         s.timeControlPreset = saved_.timeControlPreset;
+        s.opponent = saved_.opponent;
         if (screen == "newgame") ui::debug::openMenuPage(ui::debug::MenuPage::NewGame);
+        if (screen == "newgame-hotseat") {
+            s.opponent = 1;
+            ui::debug::openMenuPage(ui::debug::MenuPage::NewGame);
+        }
+        if (screen == "hotseat-confirm") ui::debug::openPauseConfirm(1);
         if (screen == "custom") {
             s.difficultyPreset = 1 << 20;  // clamped to the last entry = Custom
             s.timeControlPreset = -1;
@@ -264,8 +273,29 @@ public:
         ui::MenuAction a = ui::MenuAction::None;
         const std::string& s = screen_;
         if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
-        if (s == "main" || s == "newgame" || s == "custom" || s == "options" || s == "credits" || s == "watch" || menu_) {
+        if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "credits" ||
+            s == "watch" || menu_) {
             a = ui::mainMenu(setup_, watch_);
+        } else if (s == "hotseat-hud") {
+            ui::HotSeatHud hud;
+            hud.names[0] = "Alice";
+            hud.names[1] = "Bob";
+            hud.ratings[0] = "1512";
+            hud.ratings[1] = "1488";
+            hud.toMove = 1;
+            hud.caption = i18n::trf("hotseat.your_move", {hud.names[1]});
+            hud.captionAge = 1.0f;
+            hud.drawOffer = true;
+            hud.drawOfferText = i18n::trf("hotseat.draw.offered", {hud.names[0]});
+            ui::hotSeatHud(hud);
+        } else if (s == "hotseat-confirm") {
+            a = ui::pauseMenu(true, true, i18n::trf("hotseat.confirm.resign", {"Alice", "Bob"}));
+        } else if (s == "hotseat-gameover") {
+            ui::GameOverExtras x;
+            x.line = i18n::trn("hotseat.gameover.wins", 34, {"Alice", "34"});
+            x.detail = i18n::trf("hotseat.elo.change", {"Alice", "1500", "1520", i18n::ltr("+20")}) + "  \xC2\xB7  " +
+                       i18n::trf("hotseat.elo.change", {"Bob", "1500", "1480", i18n::ltr("\xE2\x88\x92" "20")});
+            a = ui::gameOver("1-0", chess::endReasonText(chess::GameEndReason::Checkmate), true, false, 34, x);
         } else if (s == "online-hud") {
             ui::OnlineHud hud;
             hud.pingMs = 34;

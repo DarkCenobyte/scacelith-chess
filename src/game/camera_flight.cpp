@@ -117,6 +117,22 @@ FlightShape CameraFlight::handoverShape(const CameraPose& from, const CameraPose
     s.arrival = flatDir(centre - to.position) * reach + vec3(0, rise, 0);
     s.pitchDip = 28.0f * DEG;
     s.yawTurn = 1;
+    // Keep the board in the middle of the view: at mid-flight the camera has turned a quarter of
+    // a turn and looks across the table, so the arc swings out to the other side and orbits the
+    // board (without it the view would look at the table beside the board). The Bezier midpoint
+    // moves by 3/4 of an offset added to both inner control points.
+    float span = angleDelta(from.yaw, to.yaw);
+    if (span < 0.0f) span += 2.0f * PI;
+    float midYaw = from.yaw + span * 0.5f;
+    float midPitch = 0.5f * (from.pitch + to.pitch) - s.pitchDip;
+    vec3 mid = (from.position + to.position) * 0.5f + (s.departure + s.arrival) * 0.375f;
+    vec3 fwd(-std::sin(midYaw) * std::cos(midPitch), std::sin(midPitch), -std::cos(midYaw) * std::cos(midPitch));
+    if (fwd.y < -0.1f && mid.y > centre.y) {
+        vec3 hit = mid + fwd * ((centre.y - mid.y) / fwd.y);
+        vec3 miss(centre.x - hit.x, 0.0f, centre.z - hit.z);
+        s.departure = s.departure + miss / 0.75f;
+        s.arrival = s.arrival + miss / 0.75f;
+    }
     return s;
 }
 

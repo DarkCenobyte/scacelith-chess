@@ -2,9 +2,19 @@
 #pragma once
 #include "../render/renderer.h"
 #include "../ui/ui_font.h"
+#include "elo.h"
 #include <string>
+#include <vector>
 
 namespace game {
+
+// A player of rated hot-seat games on this PC, by name (New Game > Human, same PC > Rated game):
+// one [local_player_N] section each (name, elo, games, wins, draws, losses, peak). Separate from
+// the [player] rating, which only games against Stockfish change.
+struct LocalPlayer {
+    std::string name;
+    elo::Record record;
+};
 
 struct Settings {
     // [display]
@@ -29,7 +39,11 @@ struct Settings {
     float mouseSensitivity = 1.0f;
     bool invertLook = false;
     int nextColor = -1;           // -1 = random (first game), 0 = white, 1 = black
+    // Hot-seat: the view goes from one player's eyes to the other's after each move, in a camera
+    // flight of this length (0.8 to 2 s), or 0 = an instant cut through black (motion sickness).
+    float handoverSeconds = 1.6f;
     // [newgame] last choices on the new game screen
+    int opponent = 0;             // 0 Stockfish, 1 a second human on this PC (hot-seat)
     int difficultyPreset = 3;     // index into ai::presets()
     int timeControlPreset = 5;    // index into chess::timeControlPresets()
     int customBaseSeconds = 600;
@@ -49,6 +63,16 @@ struct Settings {
     int playerElo = 1500;
     int playerGames = 0, playerWins = 0, playerDraws = 0, playerLosses = 0;
     int playerPeakElo = 1500;
+    // [hotseat] last choices of the two-player game (New Game > Human, same PC), by colour
+    std::string hotseatNames[2];  // "" = the Options > Player name for White, "Player 2" (translated) for Black
+    int hotseatHands[2] = {-1, -1};  // ui::font::HandStyle; -1 = the Options > Player hand / another one
+    int hotseatClockRightOf = 0;  // the clock stands at White's (0) or Black's (1) right
+    bool hotseatRated = false;    // rated between the two names (localPlayers), friendly by default
+    // [local_player_N] ratings of the rated hot-seat games, by name
+    std::vector<LocalPlayer> localPlayers;
+    LocalPlayer* findLocalPlayer(const std::string& name);          // nullptr when unknown
+    const LocalPlayer* findLocalPlayer(const std::string& name) const;
+    LocalPlayer& localPlayer(const std::string& name);              // found, or added (1500, no games)
     // [viewer] last choices on the Watch a Game page (Stockfish vs Stockfish)
     int viewerWhitePreset = 5;    // index into ai::presets() (Custom excluded)
     int viewerBlackPreset = 4;

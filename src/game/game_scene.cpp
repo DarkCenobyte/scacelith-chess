@@ -27,10 +27,7 @@ namespace {
 
 constexpr float kFadeOut = 0.8f;          // menu -> black
 constexpr float kFadeIn = 1.6f;           // black -> seated at the table
-constexpr float kBaseGazePitch = -0.62f;  // looking down at the board from the chair
 constexpr float kFov = 52.0f * DEG;
-constexpr float kHeadYawLimit = 70.0f * DEG;
-constexpr float kHeadPitchDown = -45.0f * DEG, kHeadPitchUp = 30.0f * DEG;
 constexpr float kEyeLimit = 18.0f * DEG;
 
 anim::Task task(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0), float height = 0.0f) {
@@ -104,8 +101,12 @@ bool parseVec3(const std::string& v, vec3& out) {
 // The seat whose clock stands on its left plays (and presses the clock) with its left hand.
 // White (+Z, facing -Z) has +X on its right, Black the opposite.
 character::Side playHandFor(int seat, bool clockPosX) {
-    bool clockOnRight = (seat == 0) == clockPosX;
-    return clockOnRight ? character::Side::Right : character::Side::Left;
+    return hotseat::playsLeftHanded(seat, clockPosX) ? character::Side::Left : character::Side::Right;
+}
+
+std::string trimmed(const std::string& s) {
+    size_t a = s.find_first_not_of(" \t"), b = s.find_last_not_of(" \t");
+    return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
 }
 
 // The human's name and handwriting on the scoresheets (Options > Player; "Human" by default, written
@@ -159,6 +160,7 @@ bool GameScene::init(AppContext& ctx) {
         int tc = std::atoi(ctx.argValue("--tc").c_str());
         setup_.timeControl = watch_.timeControl = std::clamp(tc, 0, int(timeControlPresets().size()) - 1);
     }
+    initHotSeatArgs();
 
     if (!audio::init()) LOGW("audio unavailable, continuing silently");
     if (!ui::init()) {
@@ -215,7 +217,7 @@ void GameScene::finishLoading() {
         return;
     }
     if (ctx_->hasArg("--start") || startWatching_) {
-        mode_ = startWatching_ ? GameMode::Watch : GameMode::Play;
+        mode_ = startWatching_ ? GameMode::Watch : ctx_->hasArg("--hotseat") ? GameMode::HotSeat : GameMode::Play;
         setupNewGame();
         if (skipIntro_) {
             fade_ = 0.0f;
@@ -289,6 +291,10 @@ void GameScene::enterMenu() {
         mode_ = GameMode::Play;
         link_ = nullptr;
     }
+    if (hotSeat()) mode_ = GameMode::Play;  // the New Game page chooses again
+    handover_.cancel();
+    inputGate_.reset();
+    inputBlocked_ = false;
     state_ = State::Menu;
     stateTime_ = 0.0f;
     turn_ = Turn::None;
@@ -362,6 +368,23 @@ void GameScene::setupNewGame() {
         humanColor_ = White;  // nobody: keeps the human-game helpers well defined
         LOGI("New game (watching): %s vs %s, %s", ai::presets()[size_t(watch_.whitePreset)].name,
              ai::presets()[size_t(watch_.blackPreset)].name, chosenTimeControl().label().c_str());
+    } else if (hotSeat()) {
+        humanColor_ = White;  // both seats are human: the helpers of the one-human game see White
+        // The players as set up on the New Game page (an empty name or a hand < 0: the defaults,
+        // Options > Player for White, "Player 2" in another hand for Black).
+        int mine = std::clamp(humanHandStyle(), 0, int(ui::font::HAND_STYLE_COUNT) - 1);
+        for (int i = 0; i < 2; ++i) {
+            std::string n = trimmed(setup_.names[i]);
+            hsPlayers_.names[i] = !n.empty() ? n : i == 0 ? localPlayerName() : std::string(i18n::tr("hotseat.player2"));
+            int hand = setup_.hands[i];
+            hsPlayers_.hands[i] = hand >= 0 ? std::clamp(hand, 0, int(ui::font::HAND_STYLE_COUNT) - 1)
+                                            : i == 0 ? mine : (mine + 1) % int(ui::font::HAND_STYLE_COUNT);
+        }
+        hsPlayers_.clockRightOf = std::clamp(setup_.clockRightOf, 0, 1);
+        hsPlayers_.rated = setup_.rated;
+        LOGI("New game (hot-seat): %s (White) vs %s (Black), %s, clock at %s's right, %s", hsPlayers_.names[0].c_str(),
+             hsPlayers_.names[1].c_str(), chosenTimeControl().label().c_str(), hsPlayers_.names[hsPlayers_.clockRightOf].c_str(),
+             hsPlayers_.rated ? "rated" : "friendly");
     } else {
         humanColor_ = s.nextColor < 0 ? (rng_.uniform() < 0.5f ? White : Black) : Color(s.nextColor & 1);
         std::string forced = ctx_->argValue("--human");
@@ -373,8 +396,9 @@ void GameScene::setupNewGame() {
 
     game_.reset();
     arbiter_.reset(game_);
-    // At the human player's right hand; at White's right when watching.
-    bool clockPosX = watching() || humanColor_ == White;
+    // At the human player's right hand; at White's right when watching; where the New Game page
+    // put it in a hot-seat game.
+    bool clockPosX = hotSeat() ? hotseat::clockOnPositiveX(hsPlayers_.clockRightOf) : (watching() || humanColor_ == White);
     world_.setClockSide(clockPosX);
     board_.reset(clockPosX);
     clock_.setup(chosenTimeControl());
@@ -406,25 +430,39 @@ void GameScene::setupNewGame() {
     configureSeats();
     newScoresheets();
     if (online()) scorekeeper_.setDetails(onlineSheetDetails());
+    if (hotSeat()) {
+        Scorekeeper::Details d;
+        d.note = i18n::tr(hsPlayers_.rated ? "hotseat.sheet.rated" : "hotseat.sheet.friendly");
+        scorekeeper_.setDetails(d);
+    }
     // The players filled in their header before sitting down at the board, as in a tournament
     // round: the pens only record the moves.
     scorekeeper_.writeHeaderInstantly();
-    if (engineOk_ && !online()) {
+    if (engineOk_ && !online() && !hotSeat()) {
         engine_.newGame();
         engine_.configure(seats_[seats_[0].human() ? 1 : 0].engine);
     }
     if (watching()) {
         anim_[0].setHeadOverride(false);
         anim_[1].setHeadOverride(false);
-    } else {
+    } else if (!hotSeat()) {  // hot-seat: below, once the side to move is known
         anim_[humanSeat()].setHeadOverride(true, 0.0f, kBaseGazePitch);
         anim_[aiSeat()].setHeadOverride(false);
     }
-    lookYaw_ = lookPitch_ = 0.0f;
-    gazeYaw_ = 0.0f;
-    gazePitch_ = kBaseGazePitch;
-    lean_ = leanSmooth_ = 0.0f;
+    for (Look& l : look_) {
+        l = Look();
+        l.gazePitch = kBaseGazePitch;
+    }
     cameraCut_ = true;
+    handover_.cancel();
+    inputGate_.reset();
+    inputBlocked_ = false;
+    drawOfferBy_ = drawCardFor_ = -1;
+    writeGrace_ = 0.0f;
+    captionAge_ = 0.0f;
+    scriptPos_ = 0;
+    scriptPromo_ = NoPiece;
+    for (int i = 0; i < 2; ++i) hsEloBefore_[i] = hsEloAfter_[i] = seats_[i].elo;
 
     if (watching()) {
         // Observer: --cam / --look / --fov, else --viewpoint N, else beside the table. The jump
@@ -449,11 +487,21 @@ void GameScene::setupNewGame() {
     }
     std::string moves = ctx_->argValue("--moves");
     if (!moves.empty()) applyMovesInstantly(split(moves, ','));
+    if (hotSeat()) {
+        // The view starts in the eyes of the player to move.
+        viewSeat_ = seatOf(game_.position().sideToMove());
+        anim_[viewSeat_].setHeadOverride(true, 0.0f, kBaseGazePitch);
+        anim_[1 - viewSeat_].setHeadOverride(false);
+    }
 }
 
 void GameScene::configureSeats() {
     if (online()) {
         configureOnlineSeats();
+        return;
+    }
+    if (hotSeat()) {
+        configureHotSeatSeats();
         return;
     }
     const Settings& s = settings();
@@ -508,6 +556,8 @@ void GameScene::newScoresheets() {
 }
 
 int GameScene::handStyleOf(int seat) const {
+    // Hot-seat: each player writes their own sheet in the hand chosen on the New Game page.
+    if (hotSeat()) return std::clamp(hsPlayers_.hands[seat & 1], 0, int(ui::font::HAND_STYLE_COUNT) - 1);
     // Every sheet is written in its owner's hand; the two players never share one.
     int human = std::clamp(humanHandStyle(), 0, int(ui::font::HAND_STYLE_COUNT) - 1);
     if (seats_[seat].human()) return human;
@@ -520,7 +570,7 @@ int GameScene::handStyleOf(int seat) const {
 void GameScene::startPlaying() {
     state_ = State::Playing;
     stateTime_ = 0.0f;
-    if (!watching() && !online()) {
+    if (!watching() && !online() && !hotSeat()) {
         // Colours alternate from one game to the next.
         settings().nextColor = int(opposite(humanColor_));
         settings().save();
@@ -531,6 +581,7 @@ void GameScene::startPlaying() {
     }
     // Online, the server keeps the clocks (the display reads them).
     if (!online()) clock_.start(game_.position().sideToMove());
+    captionAge_ = 0.0f;  // hot-seat: "Alice, your move"
     audio::playUI(audio::Sfx::GameStart, 0.6f);
     // Both players take their pen while White thinks.
     scorekeeper_.startRecording();
@@ -543,6 +594,7 @@ void GameScene::beginTurn() {
     touchedSq_ = placedTo_ = NoSquare;
     pressQueued_ = false;
     hoverId_ = -1;
+    scriptWait_ = kScriptThink;
     if (online() && game_.status() != GameStatus::Ongoing) {
         turn_ = Turn::None;  // the server's GameEnd follows
     } else if (isHumanSeat(seatOf(stm))) {
@@ -562,7 +614,7 @@ void GameScene::endGame() {
         PieceObject* p = board_.byId(touchedId_);
         if (p) {
             dest_[p->id].push_back({touchedSq_, p->basePos, false});
-            anim_[humanSeat()].enqueue({task(anim::TaskType::Place, p->id, p->basePos), task(anim::TaskType::Retract)});
+            anim_[inputSeat()].enqueue({task(anim::TaskType::Place, p->id, p->basePos), task(anim::TaskType::Retract)});
         }
     }
     clock_.stop();
@@ -585,6 +637,8 @@ void GameScene::endGame() {
     LOGI("Game over: %s (%s)\n%s", resultText_.c_str(), reasonText_.c_str(), game_.pgn(seats_[0].name, seats_[1].name).c_str());
     pendingOffer_ = -1;
     clockFrozen_ = false;
+    drawOfferBy_ = drawCardFor_ = -1;
+    writeGrace_ = 0.0f;
     rateGame();
     // Both players write the result and lay their pen down before shaking hands (an aborted
     // online game has no result).
@@ -596,6 +650,10 @@ void GameScene::endGame() {
 void GameScene::rateGame() {
     if (rated_ || watching() || online() || game_.status() == GameStatus::Ongoing) return;
     rated_ = true;
+    if (hotSeat()) {
+        rateHotSeat();  // never the rating against Stockfish
+        return;
+    }
     Settings& s = settings();
     eloBefore_ = eloAfter_ = s.playerElo;
     // As in FIDE rating, a game counts once both players have made a move (a game abandoned or
@@ -631,6 +689,7 @@ void GameScene::rateGame() {
 
 ui::GameOverExtras GameScene::gameOverExtras() const {
     if (online()) return onlineGameOverExtras();
+    if (hotSeat()) return hotSeatGameOverExtras();
     ui::GameOverExtras x;
     if (watching()) {
         int moveNo = std::max(1, int(game_.moves().size() + 1) / 2);
@@ -682,7 +741,8 @@ void GameScene::shutdown(AppContext& ctx) {
     // (screenshot runs excepted: they stop wherever the capture happens).
     if (!ctx.screenshotMode && online() && link_ && state_ == State::Playing && og_.status == 0) {
         link_->resign();
-    } else if (!ctx.screenshotMode && !watching() && state_ == State::Playing && game_.status() == GameStatus::Ongoing) {
+    } else if (!ctx.screenshotMode && !watching() && !hotSeat() && state_ == State::Playing &&
+               game_.status() == GameStatus::Ongoing) {
         game_.resign(humanColor_);
         rateGame();
     }
@@ -721,7 +781,8 @@ bool GameScene::update(AppContext& ctx, float dt) {
             state_ = State::FadeToGame;
             stateTime_ = 0.0f;
         } else if (a == ui::MenuAction::StartGame) {
-            mode_ = GameMode::Play;
+            // Against Stockfish, or two players on this PC (the page saved its choices).
+            mode_ = setup_.opponent == 1 ? GameMode::HotSeat : GameMode::Play;
             Settings& s = settings();
             s.difficultyPreset = setup_.difficulty;
             s.timeControlPreset = setup_.timeControl;
@@ -759,6 +820,9 @@ bool GameScene::update(AppContext& ctx, float dt) {
             updateOnlineInput();
             break;
         }
+        // Hot-seat: nobody acts during the handover, and buttons still held by the previous player
+        // are ignored until released.
+        if (hotSeat()) inputBlocked_ = handover_.active() ? true : inputGate_.blocked(anyInputHeld());
         // Esc opens the pause menu; once open, the menu handles Esc itself (back / resume).
         if (!paused_ && in.keyPressed[plat::KEY_ESCAPE] && turn_ != Turn::HumanPromotion) {
             paused_ = true;
@@ -770,16 +834,23 @@ bool GameScene::update(AppContext& ctx, float dt) {
         if (paused_) {
             bool canClaim = game_.canClaimThreefold() || game_.canClaimFiftyMove();
             bool canOffer = drawOfferPly_ != int(game_.moves().size());
-            switch (ui::pauseMenu(canClaim, canOffer)) {
+            // Hot-seat: the menu belongs to the player to move (resignation named, offer with the move).
+            std::string resignQuestion;
+            if (hotSeat()) {
+                canOffer = canOffer && drawOfferBy_ < 0 && drawCardFor_ < 0;
+                resignQuestion = i18n::trf("hotseat.confirm.resign", {seats_[inputSeat()].name, seats_[1 - inputSeat()].name});
+            }
+            switch (ui::pauseMenu(canClaim, canOffer, resignQuestion)) {
             case ui::MenuAction::Resume: paused_ = false; break;
             case ui::MenuAction::Resign:
                 paused_ = false;
-                game_.resign(humanColor_);
+                game_.resign(inputColor());
                 endGame();
                 break;
             case ui::MenuAction::OfferDraw:
                 paused_ = false;
-                offerDraw();
+                if (hotSeat()) offerDrawHotSeat();
+                else offerDraw();
                 break;
             case ui::MenuAction::ClaimDraw:
                 paused_ = false;
@@ -789,8 +860,12 @@ bool GameScene::update(AppContext& ctx, float dt) {
                 break;
             case ui::MenuAction::BackToMainMenu:
                 paused_ = false;
-                if (game_.status() == GameStatus::Ongoing) game_.resign(humanColor_);
-                rateGame();  // leaving resigns: the game is rated as a loss
+                // Leaving resigns: the game is rated as a loss. A hot-seat game is abandoned
+                // without a result (and never rated).
+                if (!hotSeat()) {
+                    if (game_.status() == GameStatus::Ongoing) game_.resign(humanColor_);
+                    rateGame();
+                }
                 clock_.stop();
                 state_ = State::FadeToMenu;
                 stateTime_ = 0.0f;
@@ -800,7 +875,7 @@ bool GameScene::update(AppContext& ctx, float dt) {
             }
         } else {
             if (in.keyPressed[plat::KEY_TAB] && !ui::wantsKeyboard()) showMoveList_ = !showMoveList_;
-            if (isHumanTurn()) updateHumanInput();
+            if (isHumanTurn() && !(hotSeat() && inputBlocked_)) updateHumanInput();
         }
         break;
     }
@@ -819,6 +894,7 @@ bool GameScene::update(AppContext& ctx, float dt) {
             ui::MenuAction a = ui::gameOver(resultText_, reasonText_, playerWon_, isDraw_, int(game_.moves().size() + 1) / 2,
                                             gameOverExtras());
             if (a == ui::MenuAction::Rematch) {
+                if (hotSeat()) swapHotSeatColours();  // the rematch swaps colours
                 state_ = State::FadeToGame;
                 stateTime_ = 0.0f;
             } else if (a == ui::MenuAction::BackToMainMenu) {
@@ -832,6 +908,8 @@ bool GameScene::update(AppContext& ctx, float dt) {
     }
     if (online() && (state_ == State::Intro || state_ == State::Handshake || state_ == State::Playing || state_ == State::GameOver))
         drawOnlineHud();
+    if (hotSeat() && (state_ == State::Intro || state_ == State::Handshake || state_ == State::Playing || state_ == State::GameOver))
+        drawHotSeatHud();
 
     simulate(dt);
     return keepRunning;
@@ -944,6 +1022,8 @@ void GameScene::simulate(float dt) {
         if (anim_[0].heldPieceTransform(p.id, t) || anim_[1].heldPieceTransform(p.id, t)) p.transform = t;
     }
     board_.updateRestingTransforms();
+    // Hot-seat: the view going over to the next player (their eyes are posed now).
+    if (hotSeat()) updateHandover(dt);
 
     // Viewer: initial camera, once the robots are posed (face viewpoints need their heads), then
     // the observer's frame.
@@ -977,10 +1057,7 @@ void GameScene::updatePlaying(float dt) {
     if (clockFrozen_) return;
     // Clock (online: the server's, see onlineClockDisplay())
     if (clock_.isRunning() && !online()) {
-        clockAccumMs_ += double(dt) * 1000.0;
-        int64_t ms = int64_t(clockAccumMs_);
-        clockAccumMs_ -= double(ms);
-        clock_.update(ms);
+        hotseat::advanceClock(clock_, clockAccumMs_, dt, clockFrozen_);
         Color r = clock_.running();
         if (!clock_.timeControl().unlimited && clock_.flagged(r)) {
             game_.flagFall(r);
@@ -989,14 +1066,17 @@ void GameScene::updatePlaying(float dt) {
                 endGame();
                 return;
             }
-            ui::notify(i18n::tr(r == humanColor_ ? "notify.flag_you" : "notify.flag_opponent"), 4.0f);
+            if (hotSeat()) ui::notify(i18n::trf("hotseat.flag", {seats_[seatOf(r)].name}), 4.0f);
+            else ui::notify(i18n::tr(r == humanColor_ ? "notify.flag_you" : "notify.flag_opponent"), 4.0f);
             endGame();
             return;
         }
     }
+    if (hotSeat()) updateHotSeatTurn(dt);
+    if (!online() && !watching()) updateScript(dt);
     switch (turn_) {
     case Turn::HumanPlacing:
-        if (dest_.empty() && !anim_[humanSeat()].busy()) {
+        if (dest_.empty() && !anim_[inputSeat()].busy()) {
             if (arbiter_.pendingNeedsPromotion(game_)) {
                 turn_ = Turn::HumanPromotion;
             } else {
@@ -1007,7 +1087,9 @@ void GameScene::updatePlaying(float dt) {
         break;
     case Turn::HumanPromotion: {
         if (paused_) break;
-        int choice = ui::promotionPicker(humanColor_ == White);
+        // The piece of a scripted promotion (--play e7e8n), else the picker of the player to move.
+        int choice = scriptPromo_ != NoPiece ? int(scriptPromo_) : ui::promotionPicker(inputColor() == White);
+        scriptPromo_ = NoPiece;
         if (choice >= Knight && choice <= Queen && online() && promoTo_ != NoSquare) {
             // Online the piece is chosen before the pawn moves: the move goes out complete.
             Square to = promoTo_;
@@ -1020,7 +1102,7 @@ void GameScene::updatePlaying(float dt) {
             std::vector<anim::Task> tasks;
             planPlacement(tasks, moverId, to, occupant ? occupant->id : -1, NoSquare, NoSquare);
             planPromotionSwap(tasks, moverId, to, PieceType(choice));
-            anim_[humanSeat()].enqueue(tasks);
+            anim_[inputSeat()].enqueue(tasks);
             placedTo_ = to;
             pressQueued_ = true;
             turn_ = Turn::HumanPlacing;
@@ -1031,7 +1113,7 @@ void GameScene::updatePlaying(float dt) {
             arbiter_.choosePromotion(game_, t);
             std::vector<anim::Task> tasks;
             planPromotionSwap(tasks, board_.idAt(placedTo_), placedTo_, t);
-            anim_[humanSeat()].enqueue(tasks);
+            anim_[inputSeat()].enqueue(tasks);
             turn_ = Turn::HumanPlacing;
         }
         break;
@@ -1051,7 +1133,8 @@ void GameScene::updateHumanInput() {
     float tPiece = 1e30f;
     int pid = pickPiece(ray, &tPiece);
     const PieceObject* hovered = pid >= 0 ? board_.byId(pid) : nullptr;
-    hoverId_ = (hovered && hovered->color == humanColor_ && (turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched)) ? pid : -1;
+    const Color me = inputColor();  // the human, or in a hot-seat game the player to move
+    hoverId_ = (hovered && hovered->color == me && (turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched)) ? pid : -1;
 
     if (in.keyPressed[plat::KEY_SPACE] && !ui::wantsKeyboard()) {
         humanPressClock();
@@ -1069,7 +1152,7 @@ void GameScene::updateHumanInput() {
 
     switch (turn_) {
     case Turn::HumanIdle:
-        if (p && p->color == humanColor_) humanTouch(p->id);
+        if (p && p->color == me) humanTouch(p->id);
         break;
     case Turn::HumanTouched: {
         PieceObject* touched = board_.byId(touchedId_);
@@ -1080,7 +1163,7 @@ void GameScene::updateHumanInput() {
             } else {
                 ui::notify(i18n::tr(std::string("notify.touched.") + pieceName(touched->type)), 3.0f);
             }
-        } else if (p && p->color == humanColor_) {
+        } else if (p && p->color == me) {
             // Castling by pointing at the rook once the king is in hand.
             if (touched && touched->type == King && p->type == Rook && rankOf(p->square) == rankOf(touchedSq_)) {
                 int file = fileOf(p->square) > fileOf(touchedSq_) ? 6 : 2;
@@ -1114,10 +1197,13 @@ void GameScene::humanTouch(int pieceId) {
         ui::notify(i18n::trf("notify.touched_square", {squareName(committed)}), 3.0f);
         return;
     }
-    anim_[humanSeat()].enqueue(task(anim::TaskType::Reach, pieceId));
+    anim_[inputSeat()].enqueue(task(anim::TaskType::Reach, pieceId));
     touchedId_ = pieceId;
     touchedSq_ = p->square;
     turn_ = Turn::HumanTouched;
+    // Hot-seat: touching a piece declines a draw offer, and the recording of the opponent's move
+    // waits until after this move (updateHotSeatTurn).
+    if (hotSeat() && drawCardFor_ == inputSeat()) answerHotSeatDraw(false);
 }
 
 void GameScene::humanRelease() {
@@ -1125,7 +1211,7 @@ void GameScene::humanRelease() {
     if (!p) return;
     vec3 pos = board_.squareBase(touchedSq_);
     dest_[p->id].push_back({touchedSq_, pos, false});
-    anim_[humanSeat()].enqueue({task(anim::TaskType::Place, p->id, pos), task(anim::TaskType::Retract)});
+    anim_[inputSeat()].enqueue({task(anim::TaskType::Place, p->id, pos), task(anim::TaskType::Retract)});
     arbiter_.cancelTouch();
     touchedId_ = -1;
     touchedSq_ = NoSquare;
@@ -1137,7 +1223,7 @@ void GameScene::humanPlace(Square to) {
     PieceObject* mover = board_.byId(touchedId_);
     if (!mover) return;
     PieceObject* occupant = board_.at(to);
-    if (occupant && occupant->color == humanColor_) return;
+    if (occupant && occupant->color == inputColor()) return;
     bool promo = mover->type == Pawn && (rankOf(to) == 7 || rankOf(to) == 0);
     Move mv = pos.findLegal(touchedSq_, to, promo ? Queen : NoPiece);
     if (!mv.valid() && (settings().showLegalMoves || online())) {
@@ -1157,7 +1243,7 @@ void GameScene::humanPlace(Square to) {
     int victimId = occupant ? occupant->id : -1;
     Square rookFrom = NoSquare, rookTo = NoSquare;
     if (mv.valid()) {
-        if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(to + (humanColor_ == White ? -8 : 8)));
+        if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(to + (inputColor() == White ? -8 : 8)));
         if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
             int rank = rankOf(touchedSq_);
             bool king = (mv.flags & MoveCastleKing) != 0;
@@ -1170,7 +1256,7 @@ void GameScene::humanPlace(Square to) {
     if (online()) sendOnlineMove(mv);
     std::vector<anim::Task> tasks;
     planPlacement(tasks, mover->id, to, victimId, rookFrom, rookTo);
-    anim_[humanSeat()].enqueue(tasks);
+    anim_[inputSeat()].enqueue(tasks);
     placedTo_ = to;
     turn_ = Turn::HumanPlacing;
     if (online()) pressQueued_ = true;
@@ -1186,8 +1272,9 @@ void GameScene::humanPressClock() {
         return;
     }
     if (turn_ != Turn::HumanPlaced) return;
-    int half = world_.clockHalfForSeat(humanSeat() == 0 ? 1.0f : -1.0f);
-    anim_[humanSeat()].enqueue({task(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)), task(anim::TaskType::Retract)});
+    int seat = inputSeat();
+    int half = world_.clockHalfForSeat(seat == 0 ? 1.0f : -1.0f);
+    anim_[seat].enqueue({task(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)), task(anim::TaskType::Retract)});
     pressQueued_ = false;
     turn_ = Turn::HumanPressing;
 }
@@ -1486,6 +1573,12 @@ void GameScene::onClockPressed(int seat) {
             clock_.addTime(opposite(mover), v.opponentBonusMs);
         }
         game_.play(v.move);
+        if (hotSeat()) {
+            // The mover records their move at once (after the opponent's, if that one waited);
+            // the next player records it once the view has reached them (updateHotSeatTurn).
+            scorekeeper_.setHold(seat, false);
+            scorekeeper_.setHold(1 - seat, true);
+        }
         // Both players record the move on their scoresheet (their writing hands, off the clock).
         scorekeeper_.recordMove(int(game_.moves().size()) - 1, game_.sanMoves().back());
         LOGI("move %d: %s (%s, clocks %lld / %lld ms)", int(game_.moves().size()), game_.sanMoves().back().c_str(),
@@ -1502,7 +1595,17 @@ void GameScene::onClockPressed(int seat) {
             answerAiDrawOffer(seat);
             if (game_.status() != GameStatus::Ongoing) return;
         }
+        // Hot-seat: a draw offered with this move (FIDE 9.1.2) is put to the opponent once the view
+        // has reached them.
+        if (hotSeat() && drawOfferBy_ == seat) {
+            drawCardFor_ = 1 - seat;
+            drawOfferBy_ = -1;
+        }
         beginTurn();
+        if (hotSeat()) {
+            startHandover(seat);
+            return;
+        }
         // Watching through the players' eyes: the view flies to the next player (the hot-seat
         // handover; --handover-preview also freezes the clock until the camera has landed).
         if (watching() && followEyes_) {
@@ -1600,15 +1703,23 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
         camera_.lookAt(vec3(0.0f, 0.92f, 0.0f));
         return;
     }
-    bool canLook = state_ == State::Playing || state_ == State::Intro || state_ == State::Handshake || state_ == State::GameOver;
+    // The seat whose head follows the first-person look: the human, or in a hot-seat game the
+    // player at the table (during a flight, the next player's head turns to their view).
+    int seat = firstPersonSeat();
+    if (seat < 0) return;
+    Look& L = look_[seat];
+    // Hot-seat: nobody looks around during the handover or with a button held from the previous turn.
+    bool handingOver = hotSeat() && handover_.active();
+    bool canLook = (state_ == State::Playing || state_ == State::Intro || state_ == State::Handshake || state_ == State::GameOver) &&
+                   !handingOver && !(hotSeat() && inputBlocked_);
     bool uiBlocks = paused_ || gameOverShown_ || turn_ == Turn::HumanPromotion;
     if (canLook && !uiBlocks) {
         if (in.mouseDown[plat::MOUSE_RIGHT] && !dragging_ && !ui::wantsMouse()) {
             dragging_ = true;
             plat::setMouseCaptured(true);
         }
-        if (in.mousePressed[plat::MOUSE_MIDDLE] || (in.keyPressed['C'] && !ui::wantsKeyboard())) lookYaw_ = lookPitch_ = 0.0f;
-        if (!ui::wantsMouse()) lean_ = clamp(lean_ + in.wheel * 0.2f, 0.0f, 1.0f);
+        if (in.mousePressed[plat::MOUSE_MIDDLE] || (in.keyPressed['C'] && !ui::wantsKeyboard())) L.yaw = L.pitch = 0.0f;
+        if (!ui::wantsMouse()) L.lean = clamp(L.lean + in.wheel * 0.2f, 0.0f, 1.0f);
     }
     if (dragging_ && !in.mouseDown[plat::MOUSE_RIGHT]) {
         dragging_ = false;
@@ -1616,38 +1727,60 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     }
     if (dragging_) {
         float k = 0.0022f * s.mouseSensitivity;
-        lookYaw_ -= in.mouseDX * k;
-        lookPitch_ -= in.mouseDY * k * (s.invertLook ? -1.0f : 1.0f);
+        L.yaw -= in.mouseDX * k;
+        L.pitch -= in.mouseDY * k * (s.invertLook ? -1.0f : 1.0f);
     }
-    lookYaw_ = clamp(lookYaw_, -1.45f, 1.45f);
-    lookPitch_ = clamp(lookPitch_, -1.1f - kBaseGazePitch, 0.75f - kBaseGazePitch);
+    L.yaw = clamp(L.yaw, -1.45f, 1.45f);
+    L.pitch = clamp(L.pitch, -1.1f - kBaseGazePitch, 0.75f - kBaseGazePitch);
     // The gaze drifts a little towards the cursor, like eyes following the hand.
     float cx = 0.0f, cy = 0.0f;
-    if (!dragging_ && in.mouseInWindow && plat::width() > 0 && !ctx_->screenshotMode) {
+    if (!dragging_ && !handingOver && in.mouseInWindow && plat::width() > 0 && !ctx_->screenshotMode) {
         cx = clamp(in.mouseX / float(plat::width()) - 0.5f, -0.5f, 0.5f);
         cy = clamp(in.mouseY / float(plat::height()) - 0.5f, -0.5f, 0.5f);
     }
-    float targetYaw = lookYaw_ - cx * 0.11f;
-    float targetPitch = kBaseGazePitch + lookPitch_ - cy * 0.08f;
+    float targetYaw = L.yaw - cx * 0.11f;
+    float targetPitch = kBaseGazePitch + L.pitch - cy * 0.08f;
     float k = 1.0f - std::exp(-dt * 7.0f);
-    gazeYaw_ += (targetYaw - gazeYaw_) * k;
-    gazePitch_ += (targetPitch - gazePitch_) * k;
-    leanSmooth_ += (lean_ - leanSmooth_) * (1.0f - std::exp(-dt * 5.0f));
-    headYaw_ = clamp(gazeYaw_, -kHeadYawLimit, kHeadYawLimit);
-    headPitch_ = clamp(gazePitch_, kHeadPitchDown, kHeadPitchUp);
-    anim_[humanSeat()].setHeadOverride(true, headYaw_, headPitch_);
+    L.gazeYaw += (targetYaw - L.gazeYaw) * k;
+    L.gazePitch += (targetPitch - L.gazePitch) * k;
+    L.leanSmooth += (L.lean - L.leanSmooth) * (1.0f - std::exp(-dt * 5.0f));
+    L.headYaw = clamp(L.gazeYaw, -kHeadYawLimit, kHeadYawLimit);
+    L.headPitch = clamp(L.gazePitch, kHeadPitchDown, kHeadPitchUp);
+    anim_[seat].setHeadOverride(true, L.headYaw, L.headPitch);
 }
 
-void GameScene::placeFirstPersonCamera() {
-    mat4 e = anim_[humanSeat()].eyeCameraTransform();
+void GameScene::firstPersonView(int seat, vec3& position, quat& orientation) const {
+    const Look& L = look_[seat & 1];
+    mat4 e = anim_[seat & 1].eyeCameraTransform();
     quat q = fromMat3(mat3(normalize(e.c[0].xyz()), normalize(e.c[1].xyz()), normalize(e.c[2].xyz())));
-    float eyeYaw = clamp(gazeYaw_ - headYaw_, -kEyeLimit, kEyeLimit);
-    float eyePitch = clamp(gazePitch_ - headPitch_, -kEyeLimit, kEyeLimit);
+    float eyeYaw = clamp(L.gazeYaw - L.headYaw, -kEyeLimit, kEyeLimit);
+    float eyePitch = clamp(L.gazePitch - L.headPitch, -kEyeLimit, kEyeLimit);
     q = normalize(q * axisAngle(vec3(0, 1, 0), eyeYaw) * axisAngle(vec3(1, 0, 0), eyePitch));
     vec3 fwd = rotate(q, vec3(0, 0, -1));
     vec3 flat = normalize(vec3(fwd.x, 0.0f, fwd.z) + vec3(1e-4f, 0, 0));
-    camera_.position = e.c[3].xyz() + flat * (0.11f * leanSmooth_) + vec3(0, -0.05f * leanSmooth_, 0);
-    camera_.orientation = q;
+    position = e.c[3].xyz() + flat * (0.11f * L.leanSmooth) + vec3(0, -0.05f * L.leanSmooth, 0);
+    orientation = q;
+}
+
+CameraPose GameScene::firstPersonPose(int seat) const {
+    vec3 p;
+    quat q;
+    firstPersonView(seat, p, q);
+    return CameraPose::fromOrientation(p, q, kFov);
+}
+
+void GameScene::placeFirstPersonCamera() {
+    if (hotSeat() && handover_.flying()) {
+        // Between the two players' eyes.
+        const CameraPose& p = handover_.pose();
+        camera_.position = p.position;
+        camera_.orientation = p.orientation();
+        camera_.fovY = p.fovY;
+        return;
+    }
+    int seat = viewSeat();
+    if (seat < 0) return;
+    firstPersonView(seat, camera_.position, camera_.orientation);
 }
 
 void GameScene::updateGaze(float dt) {
@@ -1656,8 +1789,9 @@ void GameScene::updateGaze(float dt) {
     // Every robot not driven by a first-person player looks around by itself: the AI in a human
     // game, both players when watching and on the title screen.
     bool menu = state_ == State::Menu || state_ == State::FadeToGame;
+    int firstPerson = menu ? -1 : firstPersonSeat();  // that head follows the player's look
     for (int seat = 0; seat < 2; ++seat) {
-        if (!menu && isHumanSeat(seat)) continue;
+        if (seat == firstPerson) continue;
         int other = 1 - seat;
         vec3 face = anim_[other].eyeCameraTransform().c[3].xyz();
         vec3 target = vec3(0, layout::BOARD_TOP_Y, 0);
@@ -1694,7 +1828,7 @@ void GameScene::updateGaze(float dt) {
 
 std::vector<Marker> GameScene::markers() const {
     std::vector<Marker> out;
-    if (state_ != State::Playing || paused_) return out;
+    if (state_ != State::Playing || paused_ || (hotSeat() && handover_.active())) return out;
     if (turn_ == Turn::HumanIdle && hoverId_ >= 0) {
         const PieceObject* p = board_.pieces().size() > size_t(hoverId_) ? &board_.pieces()[size_t(hoverId_)] : nullptr;
         if (p && p->square != NoSquare) out.push_back({p->square, 0, 1.0f});
@@ -1745,7 +1879,9 @@ void GameScene::render(AppContext& ctx, float dt) {
     if (observer) {
         headless = headNearCamera(cam.position);
     } else if (firstPerson) {
-        headless = humanSeat();
+        // In the eyes of the player (hot-seat: of the player at the table); during a hot-seat
+        // flight, whichever head the camera passes through.
+        headless = hotSeat() && handover_.flying() ? headNearCamera(cam.position) : viewSeat();
         vec3 p, t;
         if (debugCamera_ && parseVec3(ctx.argValue("--cam"), p)) {
             // Detached camera in a human game (screenshots): --cam x,y,z [--look x,y,z] [--fov deg].
@@ -1760,7 +1896,8 @@ void GameScene::render(AppContext& ctx, float dt) {
     // Eyes focus where the player looks: the board / table under the centre of the view.
     {
         float target;
-        if (observer || (firstPerson && headless != humanSeat())) {
+        bool inEyes = firstPerson && !(hotSeat() && handover_.flying()) && headless == viewSeat();
+        if (observer || (firstPerson && !inEyes)) {
             target = observerFocus(cam);
         } else {
             Ray centre{cam.position, cam.forward()};
@@ -1776,7 +1913,7 @@ void GameScene::render(AppContext& ctx, float dt) {
         cameraCut_ = false;
         for (auto& h : hasPrevGlobals_) h = false;
     }
-    r.fade = fade_;
+    r.fade = hotSeat() ? std::max(fade_, handover_.fade()) : fade_;  // a hot-seat cut goes through black
     r.beginFrame(cam, env, dt);
     if (state_ != State::Loading) {
         world_.submitStatic(r);

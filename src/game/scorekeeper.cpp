@@ -89,6 +89,7 @@ void Scorekeeper::newGame(anim::Animator* anim, bool clockOnPositiveX, const Pla
         players_[s] = players[s];
         nextPly_[s] = 0;
         movesQueued_[s] = 0;
+        hold_[s] = false;
         hasPrevPen_[s] = false;
         if (!ready_) continue;
         Scoresheet& sh = sheets_[s];
@@ -107,6 +108,7 @@ void Scorekeeper::clear() {
     moves_.clear();
     for (int s = 0; s < 2; ++s) {
         nextPly_[s] = movesQueued_[s] = 0;
+        hold_[s] = false;
         hasPrevPen_[s] = false;
         if (ready_) sheets_[s].reset();
     }
@@ -173,7 +175,8 @@ void Scorekeeper::recordMove(int ply, const std::string& san) {
     if (!ready_ || !anim_ || finished_) return;
     if (!recording_) startRecording();
     for (int s = 0; s < 2; ++s) {
-        // Moves completed before this sheet caught up (never happens in normal play) come first.
+        if (hold_[s]) continue;  // written once released (hot-seat)
+        // Moves completed before this sheet caught up (a hold, else never in normal play) come first.
         for (int p = nextPly_[s]; p <= ply; ++p) beginMoveEntry(s, p, moves_[size_t(p)]);
     }
     LOGD("scoresheet: move %d queued, writing backlog %.1f s / %.1f s", ply + 1,
@@ -202,8 +205,25 @@ void Scorekeeper::beginMoveEntry(int seat, int ply, const std::string& san) {
     ++movesQueued_[seat];
 }
 
+void Scorekeeper::setHold(int seat, bool hold) {
+    seat &= 1;
+    if (hold_[seat] == hold) return;
+    hold_[seat] = hold;
+    if (!hold) catchUp(seat);
+}
+
+void Scorekeeper::catchUp(int seat) {
+    if (!ready_ || !anim_ || finished_ || !recording_) return;
+    for (int p = nextPly_[seat]; p < int(moves_.size()); ++p) beginMoveEntry(seat, p, moves_[size_t(p)]);
+}
+
 void Scorekeeper::finishGame(const std::string& result) {
     if (finished_) return;
+    // The moves a held sheet still owes come before the result.
+    for (int s = 0; s < 2; ++s) {
+        hold_[s] = false;
+        catchUp(s);
+    }
     finished_ = true;
     if (!ready_ || !anim_) return;
     for (int s = 0; s < 2; ++s) {

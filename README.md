@@ -54,6 +54,35 @@ resigns it. The title page shows your rating, record and peak, the new game page
 can expect against the selected opponent, and the game over card the change
 (`Elo 1512 → 1524 (+12)`). Watched games are never rated.
 
+### Two players on one PC
+
+Set **Opponent** to **Human, same PC** on the new game page to play a friend at the same computer,
+each from their own robot's eyes. The page asks for both names (White defaults to your name from
+Options > Player, Black to "Player 2"), each player's handwriting, the time control, the side of
+the clock (at White's or at Black's right: the player whose clock is on their left plays with the
+left hand), and whether the game is rated. **Swap colours** exchanges the two players.
+
+- The player to move has the mouse and the keyboard, with the same rules as against Stockfish
+  (touch-move, pressing the clock by hand, the arbiter, the claims in the Esc menu).
+- Once the clock is pressed, the camera flies over the table into the other player's eyes, and
+  both clocks stand still until it lands. Options > Gameplay > Hot-seat handover sets the flight
+  length (0.8 to 2 s) or an instant cut through black. Buttons still held when the view leaves
+  are ignored until released, and each player keeps their own look (right drag, wheel).
+- Each player fills in their own scoresheet in their own handwriting. The mover writes the move at
+  once; the next player writes it when the view reaches them, or after their own move if they
+  touch a piece first.
+- **Esc** offers a draw (it goes with your next move, as in FIDE 9.1.2: the opponent sees an
+  accept / decline card when the view reaches them, and touching a piece declines it), claims a
+  draw, or resigns for the player to move, confirmed with their name.
+- The top left corner shows both names (and ratings); a caption names the player whose turn begins.
+  The game over card names the winner, and the rematch swaps the colours (the clock follows its
+  player, so each keeps the same hand).
+
+A two-player game is friendly by default and never changes your rating against Stockfish. A rated
+one keeps a separate rating per name (`[local_player_N]` in the settings file, 1500 for a new
+name, the same FIDE formula), updated for both players against each other's rating before the
+game; leaving a game early rates nothing.
+
 ## Watch a Game
 
 **Watch a Game** on the title page lets two Stockfish players (one preset per side, and a time
@@ -129,7 +158,8 @@ Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-librar
 Settings are stored in `Scacelith.ini` next to the executable when that folder is writable,
 otherwise in `%APPDATA%\Scacelith\`. All of them are editable from the Options page: display
 mode and resolution, V-sync, render scale, quality preset, motion blur, depth of field,
-brightness, volumes, ambience, legal-move hints, mouse sensitivity.
+brightness, volumes, ambience, legal-move hints, mouse sensitivity, and the hand-over between the
+two players of a game on one PC (a camera flight, or an instant cut).
 
 The interface speaks English, French, German, Spanish, Ukrainian, Russian, Arabic (laid out right
 to left), Japanese, Simplified Chinese and Traditional Chinese. The first start follows the
@@ -165,8 +195,16 @@ The game itself (`--scene game`, the default) takes `--start` (a game against St
 with N an index of the preset list, `--viewpoint 0..9`), `--tc N` (time control index), `--cam
 x,y,z [--look x,y,z] [--fov deg]` (initial observer camera when watching; a detached camera in a
 normal game), `--handover-preview` (watching through the players' eyes with the clock frozen during
-each camera handover, as planned for [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`, `--warp
-<seconds>` (simulate before the first frame), `--moves e2e4,e7e5,...` and `--ini <file>`.
+each camera handover, the same hand-over as [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`,
+`--warp <seconds>` (simulate before the first frame), `--moves e2e4,e7e5,...` and `--ini <file>`.
+
+Two players on one PC: `--start --hotseat` starts one at once, with `--white-name N`, `--black-name
+N`, `--clock-right white|black`, `--rated` and `--handover <seconds>` (0 = instant cut). `--play
+e2e4,e7e5,...` plays the human moves by hand, the way a player would (touch, carry, press the
+clock): both sides on one PC, the human's side against Stockfish; with `--warp` it takes
+screenshots of a game in progress, for instance the hand-over halfway (`--start --hotseat
+--no-intro --play e2e4 --warp 2.35`). The UI viewer has the hot-seat screens (`--scene ui
+--ui-screen newgame-hotseat|hotseat-hud|hotseat-confirm|hotseat-gameover`).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised.
 

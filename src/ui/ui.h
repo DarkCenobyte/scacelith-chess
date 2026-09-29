@@ -74,6 +74,7 @@ void setSoundCallback(std::function<void(Sound)> callback);
 // ---- Screens ----------------------------------------------------------------------------------
 // The game owns the data; screens edit it and return an action.
 struct NewGameSetup {
+    int opponent = 0;             // 0 Stockfish, 1 a second human on this PC (hot-seat)
     int difficulty = 3;           // index into ai::presets()
     int timeControl = 5;          // index into chess::timeControlPresets(), or -1 = custom
     int customBaseSeconds = 600, customIncrementSeconds = 5, customDelaySeconds = 0;
@@ -81,6 +82,13 @@ struct NewGameSetup {
     int skillLevel = 10;
     bool limitElo = false;
     int elo = 1800, depth = 0, moveTimeMs = 0, nodes = 0;
+    // Hot-seat (opponent 1), by colour (0 White, 1 Black): the players' names as written on the
+    // scoresheets (never empty once the page has run), their handwriting (font::HandStyle), the
+    // colour at whose right the clock stands (the other player plays left-handed), rated or friendly.
+    std::string names[2];
+    int hands[2] = {0, 1};
+    int clockRightOf = 0;
+    bool rated = false;
 };
 
 enum class MenuAction {
@@ -111,6 +119,9 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch);
 // In-game pause menu (Esc). canClaimDraw enables the claim entry; canOfferDraw = false greys out
 // "Offer draw" (e.g. an offer is already pending). Esc resumes.
 MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw = true);
+// Same, for a hot-seat game: 'resignQuestion' replaces the text of the resignation confirmation
+// (it names the player to move).
+MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& resignQuestion);
 // Pawn promotion: returns 0 while choosing, else chess::PieceType (Queen, Rook, Bishop, Knight).
 int promotionPicker(bool playerIsWhite);
 // Transient message (arbiter, "Draw offer declined", ...), shown for 'seconds'.
@@ -152,5 +163,22 @@ struct ViewerHud {
     float speedAge = 1e9f;       // seconds since the speed changed
 };
 void viewerHud(const ViewerHud& hud);
+
+// ---- Hot-seat: two players on one PC (ui_hotseat.cpp) ------------------------------------------
+// Overlay of a hot-seat game: the two players (top left, the one to move marked), a caption naming
+// the player whose turn begins (bottom centre, while the view goes over to them and a moment
+// after), and the draw offer card of the player to move (Accept / Decline, mouse only: Space
+// belongs to the clock).
+struct HotSeatHud {
+    std::string names[2];        // White, Black
+    std::string ratings[2];      // local ratings of a rated game ("1512"), "" = none
+    int toMove = -1;             // 0 White, 1 Black, -1 none (game over)
+    std::string caption;         // "Bob, your move" ("" = none)
+    float captionAge = 1e9f;     // seconds since the caption appeared (it fades out)
+    bool drawOffer = false;      // the player to move is offered a draw
+    std::string drawOfferText;   // "Alice offers a draw."
+};
+enum class HotSeatAction { None, AcceptDraw, DeclineDraw };
+HotSeatAction hotSeatHud(const HotSeatHud& hud);
 
 }  // namespace ui

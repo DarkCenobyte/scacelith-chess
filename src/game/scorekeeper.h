@@ -10,7 +10,7 @@
 //                    startRecording() has the players write it, a dozen seconds of writing)
 //   startRecording() both players pick up their pen
 //   recordMove()     on every completed move: both players write it (turning the page first
-//                    when the move starts a new page)
+//                    when the move starts a new page); a held sheet (setHold, hot-seat) waits
 //   finishGame()     both players write the result and lay the pen down (before the final
 //                    handshake: it is made with the right hand, which may be a writing hand)
 // update() once per frame after the animators, onEvent() for their events, submit() when drawing.
@@ -59,6 +59,12 @@ public:
     void finishGame(const std::string& result);
     // Pads back to blank, pens on the table, nothing queued (menu, abandoned game).
     void clear();
+    // Hot-seat: while a seat is held, its writing hand starts no new entry; the moves completed
+    // meanwhile wait and are written in order once it is released. The player to move records the
+    // opponent's move at the start of their turn, unless they touch a piece first: it is then
+    // written after their own move (FIDE 8.1.2). finishGame() releases every hold.
+    void setHold(int seat, bool hold);
+    bool held(int seat) const { return hold_[seat & 1]; }
 
     // Writing-hand events of 'seat' (sounds, entry and page bookkeeping).
     void onEvent(int seat, const anim::Event& e);
@@ -71,6 +77,7 @@ private:
     Scoresheet::Header header() const;
     void beginMoveEntry(int seat, int ply, const std::string& san);
     void refreshRest(int seat);
+    void catchUp(int seat);                   // queues the moves this sheet has not begun yet
 
     Scoresheet sheets_[2];
     anim::Animator* anim_ = nullptr;
@@ -86,6 +93,7 @@ private:
     int nextPly_[2] = {0, 0};                 // next ply each sheet will write
     std::vector<std::string> moves_;          // SAN of every recorded move (for late starts)
     int movesQueued_[2] = {0, 0};             // moves handed to each writing hand
+    bool hold_[2] = {false, false};           // setHold()
     m::mat4 prevPen_[2];
     bool hasPrevPen_[2] = {false, false};
 };
