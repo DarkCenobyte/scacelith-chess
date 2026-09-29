@@ -48,6 +48,8 @@ bool Settings::load(const std::string& p) {
     mouseSensitivity = ini.getFloat("gameplay.mouse_sensitivity", mouseSensitivity);
     invertLook = ini.getBool("gameplay.invert_look", invertLook);
     gameCursor = ini.getBool("gameplay.game_cursor", gameCursor);
+    autoPressClock = ini.getBool("gameplay.auto_press_clock", autoPressClock);
+    ignoreOpponentHead = ini.getBool("gameplay.ignore_opponent_head", ignoreOpponentHead);
     nextColor = ini.getInt("gameplay.next_color", nextColor);
     handoverSeconds = std::clamp(ini.getFloat("gameplay.handover_seconds", handoverSeconds), 0.0f, 2.0f);
     if (handoverSeconds > 0.0f && handoverSeconds < 0.8f) handoverSeconds = 0.8f;
@@ -117,6 +119,7 @@ bool Settings::load(const std::string& p) {
     directBaseSeconds = ini.getInt("direct.base_seconds", directBaseSeconds);
     directIncrementSeconds = ini.getInt("direct.increment_seconds", directIncrementSeconds);
     directColor = std::clamp(ini.getInt("direct.color", directColor), 0, 2);
+    directAutoPress = ini.getBool("direct.auto_press_clock", directAutoPress);
     directAddress = ini.getString("direct.address", directAddress);
     directJoinPort = std::clamp(ini.getInt("direct.join_port", directJoinPort), 1, 65535);
     language = ini.getString("interface.language", language);
@@ -180,6 +183,8 @@ bool Settings::save() const {
     ini.setFloat("gameplay.mouse_sensitivity", mouseSensitivity);
     ini.setBool("gameplay.invert_look", invertLook);
     ini.setBool("gameplay.game_cursor", gameCursor);
+    ini.setBool("gameplay.auto_press_clock", autoPressClock);
+    ini.setBool("gameplay.ignore_opponent_head", ignoreOpponentHead);
     ini.setInt("gameplay.next_color", nextColor);
     ini.setFloat("gameplay.handover_seconds", handoverSeconds);
     ini.setInt("newgame.opponent", opponent);
@@ -243,6 +248,7 @@ bool Settings::save() const {
     ini.setInt("direct.base_seconds", directBaseSeconds);
     ini.setInt("direct.increment_seconds", directIncrementSeconds);
     ini.setInt("direct.color", directColor);
+    ini.setBool("direct.auto_press_clock", directAutoPress);
     ini.set("direct.address", directAddress);
     ini.setInt("direct.join_port", directJoinPort);
     ini.set("interface.language", language);

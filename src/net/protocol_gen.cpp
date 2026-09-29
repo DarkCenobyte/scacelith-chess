@@ -192,6 +192,7 @@ bool isValid(NoticeCode v) {
     case NoticeCode::MatchmakingCooldown:
     case NoticeCode::ReplacedByNewConnection:
     case NoticeCode::Motd:
+    case NoticeCode::RatingRestored:
         return true;
     }
     return false;
@@ -204,6 +205,7 @@ const char* enumName(NoticeCode v) {
     case NoticeCode::MatchmakingCooldown: return "MatchmakingCooldown";
     case NoticeCode::ReplacedByNewConnection: return "ReplacedByNewConnection";
     case NoticeCode::Motd: return "Motd";
+    case NoticeCode::RatingRestored: return "RatingRestored";
     }
     return "?";
 }
@@ -315,6 +317,7 @@ const char* messageName(MsgType t) {
     case MsgType::Abort: return "Abort";
     case MsgType::Resync: return "Resync";
     case MsgType::Rematch: return "Rematch";
+    case MsgType::C_Gesture: return "C_Gesture";
     case MsgType::Welcome: return "Welcome";
     case MsgType::Error: return "Error";
     case MsgType::S_Ping: return "S_Ping";
@@ -330,6 +333,7 @@ const char* messageName(MsgType t) {
     case MsgType::GameEvent: return "GameEvent";
     case MsgType::GameEnd: return "GameEnd";
     case MsgType::RatingUpdate: return "RatingUpdate";
+    case MsgType::S_Gesture: return "S_Gesture";
     }
     return nullptr;
 }
@@ -880,6 +884,46 @@ bool decode(const uint8_t* p, size_t n, Rematch& out) {
 bool valid(const Rematch& m) {
     return m.game < kId53Limit;
 }
+void encode(const C_Gesture& m, std::vector<uint8_t>& out) {
+    Writer w(out);
+    w.u8(uint8_t(MsgType::C_Gesture));
+    w.u32(m.seq);
+    w.u64(m.game);
+    w.u16(m.ply);
+    w.u8(m.touch);
+    w.u8(m.aim);
+    w.u16(m.placed);
+    w.u8(m.flags);
+    w.u32(uint32_t(m.yaw));
+    w.u32(uint32_t(m.pitch));
+    w.u8(m.lean);
+}
+bool decode(const uint8_t* p, size_t n, C_Gesture& out) {
+    Reader r(p, n);
+    return r.type(MsgType::C_Gesture) &&
+           r.u32(out.seq, 0u, 0xffffffffu) &&
+           r.id53(out.game) &&
+           r.u16(out.ply, 0u, 1199u) &&
+           r.u8(out.touch, 0u, 64u) &&
+           r.u8(out.aim, 0u, 64u) &&
+           r.u16(out.placed, 0u, 32767u) &&
+           r.u8(out.flags, 0u, 7u) &&
+           r.i32(out.yaw, -3142, 3142) &&
+           r.i32(out.pitch, -1571, 1571) &&
+           r.u8(out.lean, 0u, 100u) &&
+           r.end();
+}
+bool valid(const C_Gesture& m) {
+    return m.game < kId53Limit &&
+           m.ply <= 1199u &&
+           m.touch <= 64u &&
+           m.aim <= 64u &&
+           m.placed <= 32767u &&
+           m.flags <= 7u &&
+           m.yaw >= -3142 && m.yaw <= 3142 &&
+           m.pitch >= -1571 && m.pitch <= 1571 &&
+           m.lean <= 100u;
+}
 void encode(const Welcome& m, std::vector<uint8_t>& out) {
     Writer w(out);
     w.u8(uint8_t(MsgType::Welcome));
@@ -892,6 +936,8 @@ void encode(const Welcome& m, std::vector<uint8_t>& out) {
     w.u32(m.clientPingMs);
     w.u16(m.maxMsgPerSec);
     w.u64(m.activeGame);
+    w.u16(m.gestureRate);
+    w.u16(m.gestureBurst);
 }
 bool decode(const uint8_t* p, size_t n, Welcome& out) {
     Reader r(p, n);
@@ -905,13 +951,17 @@ bool decode(const uint8_t* p, size_t n, Welcome& out) {
            r.u32(out.clientPingMs, 0u, 0xffffffffu) &&
            r.u16(out.maxMsgPerSec, 0u, 65535u) &&
            r.id53(out.activeGame) &&
+           r.u16(out.gestureRate, 0u, 60u) &&
+           r.u16(out.gestureBurst, 0u, 120u) &&
            r.end();
 }
 bool valid(const Welcome& m) {
     return std::isfinite(m.serverTime) &&
            validStr(m.username, 0, 24) &&
            validStr(m.serverName, 0, 64) &&
-           m.activeGame < kId53Limit;
+           m.activeGame < kId53Limit &&
+           m.gestureRate <= 60u &&
+           m.gestureBurst <= 120u;
 }
 void encode(const Error& m, std::vector<uint8_t>& out) {
     Writer w(out);
@@ -1110,6 +1160,7 @@ void encode(const GameSnapshot& m, std::vector<uint8_t>& out) {
     w.u32(m.firstMoveMs);
     w.f64(m.startedAt);
     w.u8(uint8_t(m.rematch));
+    w.u8(m.autoPress ? 1 : 0);
 }
 bool decode(const uint8_t* p, size_t n, GameSnapshot& out) {
     Reader r(p, n);
@@ -1137,6 +1188,7 @@ bool decode(const uint8_t* p, size_t n, GameSnapshot& out) {
            r.u32(out.firstMoveMs, 0u, 0xffffffffu) &&
            r.f64(out.startedAt) &&
            r.enumeration(out.rematch) &&
+           r.boolean(out.autoPress) &&
            r.end();
 }
 bool valid(const GameSnapshot& m) {
@@ -1285,6 +1337,44 @@ bool valid(const RatingUpdate& m) {
            validStr(m.category, 0, 7) &&
            valid(m.white) &&
            valid(m.black);
+}
+void encode(const S_Gesture& m, std::vector<uint8_t>& out) {
+    Writer w(out);
+    w.u8(uint8_t(MsgType::S_Gesture));
+    w.u64(m.game);
+    w.u16(m.ply);
+    w.u8(m.touch);
+    w.u8(m.aim);
+    w.u16(m.placed);
+    w.u8(m.flags);
+    w.u32(uint32_t(m.yaw));
+    w.u32(uint32_t(m.pitch));
+    w.u8(m.lean);
+}
+bool decode(const uint8_t* p, size_t n, S_Gesture& out) {
+    Reader r(p, n);
+    return r.type(MsgType::S_Gesture) &&
+           r.id53(out.game) &&
+           r.u16(out.ply, 0u, 1199u) &&
+           r.u8(out.touch, 0u, 64u) &&
+           r.u8(out.aim, 0u, 64u) &&
+           r.u16(out.placed, 0u, 32767u) &&
+           r.u8(out.flags, 0u, 7u) &&
+           r.i32(out.yaw, -3142, 3142) &&
+           r.i32(out.pitch, -1571, 1571) &&
+           r.u8(out.lean, 0u, 100u) &&
+           r.end();
+}
+bool valid(const S_Gesture& m) {
+    return m.game < kId53Limit &&
+           m.ply <= 1199u &&
+           m.touch <= 64u &&
+           m.aim <= 64u &&
+           m.placed <= 32767u &&
+           m.flags <= 7u &&
+           m.yaw >= -3142 && m.yaw <= 3142 &&
+           m.pitch >= -1571 && m.pitch <= 1571 &&
+           m.lean <= 100u;
 }
 
 }  // namespace proto

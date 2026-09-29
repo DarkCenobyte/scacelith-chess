@@ -39,6 +39,11 @@ struct Settings {
     float mouseSensitivity = 1.0f;
     bool invertLook = false;
     bool gameCursor = true;       // the game's own pointer at the table instead of the system arrow
+    // The player's robot presses the clock by itself once the move is on the board (games on
+    // this PC: against Stockfish and two players; online, the server or the host decides).
+    bool autoPressClock = false;
+    // Online: the opponent's robot ignores the opponent's head movements (automatic gaze instead).
+    bool ignoreOpponentHead = false;
     int nextColor = -1;           // -1 = random (first game), 0 = white, 1 = black
     // Hot-seat: the view goes from one player's eyes to the other's after each move, in a camera
     // flight of this length (0.8 to 2 s), or 0 = an instant cut through black (motion sickness).
@@ -100,6 +105,7 @@ struct Settings {
     int directTimeControl = 7;        // index into chess::timeControlPresets() (10+5), -1 = custom
     int directBaseSeconds = 600, directIncrementSeconds = 5;
     int directColor = 0;              // host's colour: 0 random, 1 White, 2 Black
+    bool directAutoPress = true;      // host: the robots press the clock by themselves
     std::string directAddress;        // last address joined
     int directJoinPort = 47100;
     // [interface]
@@ -117,6 +123,9 @@ struct Settings {
     bool load(const std::string& path);  // missing file = defaults
     bool save() const;                   // writes back to the loaded path (or user data dir)
     std::string path;
+    // Not saved: no settings file was found at start (first launch): the game shows the
+    // brightness calibration before the title page.
+    bool firstLaunch = false;
 };
 
 Settings& settings();

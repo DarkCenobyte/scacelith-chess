@@ -68,6 +68,7 @@ struct DirectHostOptions {
     int baseSec = 600, incSec = 5;    // time control (custom values allowed; never rated)
     int hostColor = 0;                // net::proto::ColorPref: 0 random, 1 White, 2 Black
     std::string playerName;           // written on the scoresheets
+    bool autoPress = true;            // the robots press the clock by themselves (OnlineGame::autoPress)
 };
 
 struct UpnpStatus {
@@ -124,6 +125,9 @@ public:
     void abortGame();
     void requestResync();
     void rematch(bool accept);
+    // Live gestures, straight to the other player over the encrypted link (cosmetic; the latest
+    // state only, dropped while the link is down).
+    void sendGesture(const Gesture& g);
     const OnlineGame* currentGame() const;
     int pingMs() const;
     double serverNowMs() const;       // the host's clock (the host: its own)

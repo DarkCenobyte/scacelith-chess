@@ -4,6 +4,7 @@
 // code path; GameLink hides the few differences (a game id, the report button, the scoresheet
 // event). OnlineSession (online_session.h) creates the link of each game it announces.
 #pragma once
+#include "../net/gesture.h"
 #include <cstdint>
 #include <string>
 
@@ -26,6 +27,8 @@ public:
     virtual void abortGame() = 0;
     virtual void requestResync() = 0;
     virtual void rematch(bool accept) = 0;
+    // Live gestures for the opponent's robot (cosmetic, rate-limited by the network layer).
+    virtual void sendGesture(const net::Gesture& g) { (void)g; }
     // Report the opponent (server games only): category "cheating", "abuse" or "other".
     virtual bool canReport() const = 0;
     virtual void report(const std::string& username, const std::string& category, const std::string& comment) = 0;
