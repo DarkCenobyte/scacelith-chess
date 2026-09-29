@@ -664,6 +664,8 @@ online.notice.replaced = Ihr Konto hat sich aus einem anderen Fenster verbunden;
 # Errors
 online.err.rate_limited_for = Zu viele Versuche. Versuchen Sie es in {0} erneut.
 online.err.rate_limited = Zu viele Versuche. Versuchen Sie es gleich erneut.
+online.err.server_busy_for = Der Server ist ausgelastet. Versuchen Sie es in {0} erneut.
+online.err.server_busy = Der Server ist ausgelastet. Versuchen Sie es gleich erneut.
 online.err.banned_until = Dieses Konto ist bis {0} gesperrt.
 online.err.banned = Dieses Konto ist gesperrt.
 online.err.invalid_credentials = Falscher Benutzername oder falsches Passwort.

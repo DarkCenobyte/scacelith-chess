@@ -665,6 +665,8 @@ online.notice.replaced = Ваш аккаунт подключился из др�
 # Errors
 online.err.rate_limited_for = Слишком много попыток. Повторите через {0}.
 online.err.rate_limited = Слишком много попыток. Повторите чуть позже.
+online.err.server_busy_for = Сервер перегружен. Повторите через {0}.
+online.err.server_busy = Сервер перегружен. Повторите чуть позже.
 online.err.banned_until = Аккаунт заблокирован до {0}.
 online.err.banned = Аккаунт заблокирован.
 online.err.invalid_credentials = Неверное имя пользователя или пароль.

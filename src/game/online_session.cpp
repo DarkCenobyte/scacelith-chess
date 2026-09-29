@@ -723,6 +723,11 @@ std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t 
         if (retryAfterSec > 0) return i18n::trf("online.err.rate_limited_for", {durationText(retryAfterSec * 1000.0)});
         return i18n::tr("online.err.rate_limited");
     }
+    if (code == "server_busy") {
+        // Too many password checks at once on the server (its hash queue is full): not the player's fault.
+        if (retryAfterSec > 0) return i18n::trf("online.err.server_busy_for", {durationText(retryAfterSec * 1000.0)});
+        return i18n::tr("online.err.server_busy");
+    }
     if (code == "banned") {
         if (bannedUntilMs > 0) return i18n::trf("online.err.banned_until", {localTimeText(double(bannedUntilMs))});
         return i18n::tr("online.err.banned");

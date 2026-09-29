@@ -664,6 +664,8 @@ online.notice.replaced = 你的账号已从另一个窗口连接；此窗口现�
 # Errors
 online.err.rate_limited_for = 尝试次数过多。请在 {0} 后重试。
 online.err.rate_limited = 尝试次数过多。请稍后重试。
+online.err.server_busy_for = 服务器繁忙。请在 {0} 后重试。
+online.err.server_busy = 服务器繁忙。请稍后重试。
 online.err.banned_until = 此账号已被暂停使用，直至 {0}。
 online.err.banned = 此账号已被暂停使用。
 online.err.invalid_credentials = 用户名或密码错误。

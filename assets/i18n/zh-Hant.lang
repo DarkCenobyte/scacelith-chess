@@ -664,6 +664,8 @@ online.notice.replaced = 你的帳號已從另一個視窗連線；此視窗現�
 # Errors
 online.err.rate_limited_for = 嘗試次數過多。請在 {0} 後再試一次。
 online.err.rate_limited = 嘗試次數過多。請稍後再試一次。
+online.err.server_busy_for = 伺服器忙碌中。請在 {0} 後再試一次。
+online.err.server_busy = 伺服器忙碌中。請稍後再試一次。
 online.err.banned_until = 此帳號已被停權，直到 {0}。
 online.err.banned = 此帳號已被停權。
 online.err.invalid_credentials = 使用者名稱或密碼錯誤。

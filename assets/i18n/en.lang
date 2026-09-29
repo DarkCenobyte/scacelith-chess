@@ -674,6 +674,8 @@ online.notice.replaced = Your account connected from another window; this one is
 # Errors
 online.err.rate_limited_for = Too many attempts. Try again in {0}.
 online.err.rate_limited = Too many attempts. Try again in a moment.
+online.err.server_busy_for = The server is busy. Try again in {0}.
+online.err.server_busy = The server is busy. Try again in a moment.
 online.err.banned_until = This account is suspended until {0}.
 online.err.banned = This account is suspended.
 online.err.invalid_credentials = Wrong user name or password.

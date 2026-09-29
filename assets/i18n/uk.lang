@@ -665,6 +665,8 @@ online.notice.replaced = Ваш обліковий запис підключив
 # Errors
 online.err.rate_limited_for = Забагато спроб. Повторіть через {0}.
 online.err.rate_limited = Забагато спроб. Повторіть трохи згодом.
+online.err.server_busy_for = Сервер перевантажений. Повторіть через {0}.
+online.err.server_busy = Сервер перевантажений. Повторіть трохи згодом.
 online.err.banned_until = Обліковий запис заблоковано до {0}.
 online.err.banned = Обліковий запис заблоковано.
 online.err.invalid_credentials = Неправильне ім’я користувача або пароль.

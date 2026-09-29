@@ -665,6 +665,8 @@ online.notice.replaced = Votre compte s’est connecté depuis une autre fenêtr
 # Errors
 online.err.rate_limited_for = Trop de tentatives. Réessayez dans {0}.
 online.err.rate_limited = Trop de tentatives. Réessayez dans un instant.
+online.err.server_busy_for = Le serveur est occupé. Réessayez dans {0}.
+online.err.server_busy = Le serveur est occupé. Réessayez dans un instant.
 online.err.banned_until = Ce compte est suspendu jusqu’à {0}.
 online.err.banned = Ce compte est suspendu.
 online.err.invalid_credentials = Nom d’utilisateur ou mot de passe incorrect.

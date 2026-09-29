@@ -669,6 +669,8 @@ online.notice.replaced = اتصل حسابك من نافذة أخرى؛ هذه �
 # Errors
 online.err.rate_limited_for = محاولات كثيرة جدًا. حاول مجددًا بعد {0}.
 online.err.rate_limited = محاولات كثيرة جدًا. حاول مجددًا بعد لحظات.
+online.err.server_busy_for = الخادم مشغول. حاول مجددًا بعد {0}.
+online.err.server_busy = الخادم مشغول. حاول مجددًا بعد لحظات.
 online.err.banned_until = هذا الحساب موقوف حتى {0}.
 online.err.banned = هذا الحساب موقوف.
 online.err.invalid_credentials = اسم المستخدم أو كلمة المرور غير صحيحة.

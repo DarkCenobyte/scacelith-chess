@@ -665,6 +665,8 @@ online.notice.replaced = あなたのアカウントが別のウィンドウか�
 # Errors
 online.err.rate_limited_for = 試行回数が多すぎます。{0}後にもう一度お試しください。
 online.err.rate_limited = 試行回数が多すぎます。しばらくしてからもう一度お試しください。
+online.err.server_busy_for = サーバーが混み合っています。{0}後にもう一度お試しください。
+online.err.server_busy = サーバーが混み合っています。しばらくしてからもう一度お試しください。
 online.err.banned_until = このアカウントは{0}まで利用停止中です。
 online.err.banned = このアカウントは利用停止中です。
 online.err.invalid_credentials = ユーザー名またはパスワードが違います。
