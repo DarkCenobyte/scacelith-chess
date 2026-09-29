@@ -81,6 +81,10 @@ options.thinking_time = Realistic thinking time
 options.thinking_time.help = Your opponent takes its time like a human player instead of moving instantly.
 options.mouse_sensitivity = Mouse sensitivity
 options.invert_look = Invert vertical look
+options.handover = Hot-seat handover
+options.handover.cut = Instant cut
+options.handover.flight = Flight, {0} s
+options.handover.help = Two players on one PC: how the view goes from one player's eyes to the other's after each move. The instant cut avoids the camera motion.
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = Name
@@ -115,6 +119,10 @@ newgame.you_white = You will play White.
 newgame.you_black = You will play Black.
 newgame.colour_lot = Colours are drawn by lot for the first game.
 newgame.colour_alternate = Colours then alternate from one game to the next.
+newgame.opponent_kind = Opponent
+newgame.opponent_kind.help = Play Stockfish, or a friend sitting at this computer: you take turns, each from your own side of the board.
+newgame.vs_stockfish = Stockfish
+newgame.vs_human = Human, same PC
 
 # Custom opponent: Stockfish parameters
 engine.skill = Skill level
@@ -772,3 +780,46 @@ direct.err.reset = The connection was cut.
 direct.err.closed = The connection was closed.
 direct.err.host_left = Your friend stopped hosting.
 direct.err.other = The connection failed ({0}).
+
+# ---- Hot-seat: two players on one PC (src/ui/ui_screens.cpp, ui_hotseat.cpp, src/game/game_scene_hotseat.cpp)
+# New Game page, opponent "Human, same PC"
+hotseat.player2 = Player 2
+hotseat.white_player = White
+hotseat.black_player = Black
+hotseat.name.help = The name written on both scoresheets, in any alphabet.
+hotseat.swap = Swap colours
+hotseat.clock = Clock
+hotseat.clock_right_of = At {0}'s right
+hotseat.clock.help = The side of the table where the clock stands for the whole game. The player with the clock on their left plays and presses it with the left hand.
+hotseat.left_hand = {0} plays with the left hand: the clock stands on their left.
+hotseat.rated = Rated game
+hotseat.rated.help = Each name keeps its own two-player rating on this computer. Your rating against Stockfish never changes.
+# {0} {2} = the players' names, {1} {3} = their ratings (or hotseat.new_rating)
+hotseat.ratings = Two-player ratings: {0} {1} · {2} {3}
+hotseat.new_rating = (new)
+hotseat.friendly_note = A friendly game: no rating changes.
+hotseat.colours = {0} plays White, {1} plays Black.
+hotseat.colours_swap = Colours swap at every rematch.
+hotseat.summary = {0} – {1}
+# At the table ({0}, {1} = the players' names)
+hotseat.your_move = {0}, your move
+hotseat.flag = {0}'s flag has fallen.
+hotseat.confirm.resign = Resign for {0}? {1} will be declared the winner.
+hotseat.draw.offer_noted = Your draw offer goes with your move: {0} will see it after your clock press.
+hotseat.draw.card_title = DRAW OFFER
+hotseat.draw.offered = {0} offers a draw.
+hotseat.draw.card_hint = Touching a piece declines it.
+hotseat.draw.accept = Accept
+hotseat.draw.decline = Decline
+hotseat.draw.accepted = {0} accepts the draw offered by {1}.
+hotseat.draw.declined = {0} declines the draw offered by {1}.
+# Scoresheet header note
+hotseat.sheet.rated = Rated game
+hotseat.sheet.friendly = Friendly game
+# Game over card
+hotseat.gameover.wins = {0} wins in {1} move.|{0} wins in {1} moves.
+hotseat.gameover.wins_now = {0} wins.
+hotseat.gameover.friendly = {0} against {1} · friendly game
+# {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
+hotseat.elo.change = {0} {1} → {2} ({3})
+hotseat.elo.unrated = This game is not rated.
