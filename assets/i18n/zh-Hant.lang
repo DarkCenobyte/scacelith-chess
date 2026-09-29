@@ -73,6 +73,8 @@ options.thinking_time = 擬真的思考時間
 options.thinking_time.help = 對手會像真人棋手一樣思考一段時間，而不是立即走棋。
 options.mouse_sensitivity = 滑鼠靈敏度
 options.invert_look = 反轉垂直視角
+options.game_cursor = 遊戲指標
+options.game_cursor.help = 在棋桌前，遊戲會繪製自己的指標，提示點擊將會做什麼。關閉時使用系統箭頭。
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = 姓名
@@ -92,6 +94,8 @@ controls.clock.keys = 空白鍵　或　點擊棋鐘
 controls.clock = 按棋鐘
 controls.look.keys = 按住滑鼠右鍵
 controls.look = 環顧四周
+controls.sheet.keys = S
+controls.sheet = 查看你的記錄紙，再回到棋盤
 controls.moves.keys = Tab
 controls.moves = 顯示或隱藏著法列表
 controls.menu.keys = Esc

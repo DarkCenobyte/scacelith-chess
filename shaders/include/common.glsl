@@ -40,6 +40,7 @@ struct DrawData {
     vec4 matParams[8];
     vec4 instParams[4];
     vec4 info;               // x objectSeed, y planar reflector (-1 none), z flags, w objectId
+    vec4 fade;               // x screen-door opacity (DrawItem::opacity), y 1 = dither animated (TAA)
 };
 layout(std430, binding = 1) readonly buffer DrawSSBO { DrawData draws[]; };
 

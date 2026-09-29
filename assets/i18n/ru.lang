@@ -74,6 +74,8 @@ options.thinking_time = Реалистичное обдумывание
 options.thinking_time.help = Соперник думает над ходом, как живой игрок, а не ходит мгновенно.
 options.mouse_sensitivity = Чувствительность мыши
 options.invert_look = Инвертировать ось Y
+options.game_cursor = Игровой курсор
+options.game_cursor.help = За столом игра рисует собственный курсор, который показывает, что сделает щелчок. Выключено: обычная системная стрелка.
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = Имя
@@ -93,6 +95,8 @@ controls.clock.keys = Пробел  или  щелчок по часам
 controls.clock = Нажать на часы
 controls.look.keys = Правая кнопка, удерживать
 controls.look = Осмотреться
+controls.sheet.keys = S
+controls.sheet = Взглянуть на свой бланк и обратно
 controls.moves.keys = Tab
 controls.moves = Показать или скрыть ходы
 controls.menu.keys = Esc

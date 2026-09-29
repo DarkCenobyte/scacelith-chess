@@ -73,6 +73,8 @@ options.thinking_time = リアルな考慮時間
 options.thinking_time.help = 相手がすぐに指さず、人間のように時間をかけて考えます。
 options.mouse_sensitivity = マウス感度
 options.invert_look = 上下の視点を反転
+options.game_cursor = ゲーム内ポインター
+options.game_cursor.help = テーブルではゲーム独自のポインターを表示し、クリックで何が起きるかを示します。オフ：通常のシステム矢印。
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = 名前
@@ -92,6 +94,8 @@ controls.clock.keys = スペース　または　時計をクリック
 controls.clock = 時計を押す
 controls.look.keys = 右ボタンを押したまま
 controls.look = 周りを見る
+controls.sheet.keys = S
+controls.sheet = 自分の棋譜用紙を見る／戻る
 controls.moves.keys = Tab
 controls.moves = 棋譜の表示・非表示
 controls.menu.keys = Esc

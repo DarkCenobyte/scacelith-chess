@@ -28,6 +28,7 @@ struct Settings {
     bool showCoordinates = false; // board has no printed coordinates by default (tournament boards)
     float mouseSensitivity = 1.0f;
     bool invertLook = false;
+    bool gameCursor = true;       // the game's own pointer at the table instead of the system arrow
     int nextColor = -1;           // -1 = random (first game), 0 = white, 1 = black
     // [newgame] last choices on the new game screen
     int difficultyPreset = 3;     // index into ai::presets()

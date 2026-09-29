@@ -93,8 +93,13 @@ bool World::loadStep() {
         w.markerMat.surface = "shaders/materials/game_marker.glsl";
         w.markerMat.transparent = true;
         w.markerMat.castShadow = false;
-        w.markerMat.params[0] = vec4(1.0f, 0.86f, 0.55f, 5200.0f);
-        w.markerQuad.upload(prim::plane(layout::SQUARE_SIZE, layout::SQUARE_SIZE, 1, 1, 1.0f), "marker");
+        // Gold and ivory lines at about the level of sunlit white marble (game_marker.glsl).
+        w.markerMat.params[0] = vec4(1.0f, 0.78f, 0.42f, 2.2f);
+        w.markerMat.params[1] = vec4(0.95f, 0.93f, 0.88f, 0.0f);
+        // uv spans [0,1] over the square (plane() gives uv in metres times uvScale): with metres,
+        // the marker shapes saw only the corner of their [-1,1] space, which lit the whole touched
+        // square and left the legal-move dots and rings out.
+        w.markerQuad.upload(prim::plane(layout::SQUARE_SIZE, layout::SQUARE_SIZE, 1, 1, 1.0f / layout::SQUARE_SIZE), "marker");
         break;
     }
     case 1: {
@@ -275,8 +280,18 @@ void World::submitClock(render::Renderer& r, const ClockDisplay& cd) {
     submitModel(r, w.clockLever, lever, OBJ_LEVER, 0, &prevLever);
 }
 
-void World::submitRobot(render::Renderer& r, int seat, const mat4* globals, const mat4* prevGlobals, bool firstPerson) {
-    character::submitRobot(r, impl_->robot, globals, firstPerson, OBJ_ROBOT + uint32_t(seat) * 200u, prevGlobals);
+void World::submitRobot(render::Renderer& r, int seat, const mat4* globals, const mat4* prevGlobals, bool firstPerson,
+                        float armSeeThrough, character::Side armSide) {
+    // The see-through arm keeps this share of its pixels: a ghost that still shows the hand and its
+    // grip while the squares, markers and pieces under it read clearly. The blend is linear (HDR),
+    // so a white arm at 25 % over dark squares already looks half-way; multiples of 1/4 are also
+    // the dither's most even patterns under TAA (see screenDoorHidden()).
+    constexpr float kGhostOpacity = 0.25f;
+    float s = clamp(armSeeThrough, 0.0f, 1.0f);
+    s = s * s * (3.0f - 2.0f * s);
+    float opacity = 1.0f - (1.0f - kGhostOpacity) * s;
+    character::submitRobot(r, impl_->robot, globals, firstPerson, OBJ_ROBOT + uint32_t(seat) * 200u, prevGlobals,
+                           /*pupilDilation=*/0.35f, opacity, armSide);
 }
 
 void World::submitMarkers(render::Renderer& r, const std::vector<Marker>& markers) {

@@ -582,6 +582,24 @@ float strokeDurationAt(const PenPath& path, float t) {
     return 0.0f;
 }
 
+// ---- Writing sound -------------------------------------------------------------------------------
+PenStrokeSound penStrokeSound(const PenPath* path, float downTime, float late, vec3 tip, vec3 writerEyes, vec3 listener) {
+    PenStrokeSound s;
+    s.position = tip;
+    if (path && downTime >= 0.0f) {
+        // Looked up just after the pen-down key: an update that ends exactly on the key (fixed 60 Hz
+        // steps: every entry starts on a frame) may give a downTime that falls short of it.
+        constexpr float kAfterKey = 1e-3f;
+        const float left = strokeDurationAt(*path, downTime + kAfterKey);
+        if (left > 0.0f) s.seconds = std::max(0.0f, left + kAfterKey - std::max(0.0f, late));
+    }
+    s.writersOwn = length(listener - writerEyes) < FIRST_PERSON_RADIUS;
+    const vec3 d = tip - listener;
+    const float dist = length(d);
+    if (s.writersOwn && dist > WRITER_EAR_DISTANCE) s.position = listener + d * (WRITER_EAR_DISTANCE / dist);
+    return s;
+}
+
 // ---- Pad placement ---------------------------------------------------------------------------------
 PadFrame padFrame(int owner, bool clockOnPositiveX) {
     PadFrame f;

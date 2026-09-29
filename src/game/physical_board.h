@@ -31,7 +31,9 @@ public:
     std::vector<PieceObject>& pieces() { return pieces_; }
     const std::vector<PieceObject>& pieces() const { return pieces_; }
     PieceObject* at(chess::Square sq);
+    const PieceObject* at(chess::Square sq) const;
     PieceObject* byId(int id);
+    const PieceObject* byId(int id) const;
     int idAt(chess::Square sq) const;
 
     // Resting positions.

@@ -81,6 +81,8 @@ options.thinking_time = Realistic thinking time
 options.thinking_time.help = Your opponent takes its time like a human player instead of moving instantly.
 options.mouse_sensitivity = Mouse sensitivity
 options.invert_look = Invert vertical look
+options.game_cursor = Game pointer
+options.game_cursor.help = At the table, the game draws its own pointer, which shows what a click will do. Off: the usual system arrow.
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = Name
@@ -100,6 +102,8 @@ controls.clock.keys = Space  or  click the clock
 controls.clock = Press the clock
 controls.look.keys = Right mouse, hold
 controls.look = Look around
+controls.sheet.keys = S
+controls.sheet = Look at your scoresheet, and back
 controls.moves.keys = Tab
 controls.moves = Show or hide the move list
 controls.menu.keys = Esc

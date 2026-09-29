@@ -51,6 +51,9 @@ void shutdown();
 
 // Listener = the player's head (camera). forward/up unit vectors.
 void setListener(m::vec3 position, m::vec3 forward, m::vec3 up);
+// Additive: the listener's position as last set (White's seat before the first setListener()).
+// Works without init(), like setListener().
+m::vec3 listenerPosition();
 // Plays a one-shot at a world position. gain in [0,1+], pitch multiplier (small random
 // variation is added internally so repeated sounds never sound identical). Suggested use of
 // pitch for pieces: heavier pieces slightly lower (king ~0.94, pawn ~1.05).
@@ -60,7 +63,8 @@ void playUI(Sfx s, float gain = 1.0f);
 // with short fades), e.g. PenWrite for one pen-down stroke.
 void playFor(Sfx s, m::vec3 position, float seconds, float gain = 1.0f, float pitch = 1.0f);
 // One pen-down stroke at the pen tip: the touch-down tick and 'seconds' of ballpoint friction.
-// Call it on anim::Animator's PenDown event with the stroke length from the scoresheet.
+// Call it on anim::Animator's PenDown event with game::sheet::penStrokeSound()'s position,
+// length and gain (the writer's own pen is heard from his posture, not at the tip).
 void playPenStroke(m::vec3 tip, float seconds, float gain = 1.0f);
 
 // Atmospheric hall ambience (air, distant birds and wind through the windows, faint room tone),
