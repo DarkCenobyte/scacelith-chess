@@ -15,17 +15,20 @@ Prebuilt Windows binaries. This branch only holds binaries; the source code is o
 
 ## windows/Scacelith-2026-09-29-online.exe
 
-- Source: branch `claude/online-multiplayer-p0bhrp` at commit `fd204d6` (pull request #3, not merged
-  yet), which includes `master` up to pull request #4 (play comfort).
+- Source: branch `claude/online-multiplayer-p0bhrp` at commit `8e9207f` (pull request #3, not merged
+  yet), which includes `master` up to pull request #4 (play comfort). This file replaces the earlier
+  build of commit `fd204d6`; that one is still in this branch's history.
 - Contents: everything above, plus online play on a Scacelith server (the official
   `caissa.scacelith.com:44664` by default, or a community server chosen in Options > Online server),
   direct matches by IP address with UPnP, two players on one PC (hot-seat), the game pointer and
-  square targeting of pull request #4.
+  square targeting of pull request #4. Since `fd204d6`: the ping interval comes from the server,
+  reconnections after a restart are spread out and reuse the server's answer, a server whose
+  identity changed never receives the saved login, and a busy or full server gets a clear message.
 - Windows x64, self-contained (Stockfish 16 and its NNUE network are embedded). Needs a GPU with
   OpenGL 4.6.
-- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (157 tests), and it
-  played a rated game against a local dedicated server under Wine; it has not been run on real
-  Windows hardware by the build.
-- SHA-256: `1ca34f4de41a141a8f476d5631f90f8d23bd382cbe456831a3fdcb44d49048be`
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (160 tests), and it
+  played a rated game against a local dedicated server of the same commit under Wine; it has not
+  been run on real Windows hardware by the build.
+- SHA-256: `183543a6718c9c43786c54b8d564727210a1874b13a38f39a57b9b09ee7bdf2f`
 
 Licence: GPL-3.0 (see `LICENSE` on `master`); the source of each build is the commit named above.
