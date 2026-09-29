@@ -71,7 +71,9 @@ same as against Stockfish, with these differences:
   a game after a reconnection.
 - **Events.** Draw offers (card with Accept / Decline), draw declined, opponent disconnected
   (banner "Opponent disconnected — 0:45 to return") and back, first-move timer, rematch offers.
-  Our own connection loss shows a "Reconnecting…" veil; the game goes on on the server.
+  Our own connection loss shows a "Reconnecting…" veil; the game goes on on the server. The
+  client comes back by itself after a random delay, longer when the server is full or restarting
+  but never more than 8 s during a game (`dedicated-server/docs/PROTOCOL.md`, lifecycle step 6).
 - **Esc menu.** Resume, offer draw, claim draw, abort (before my first move, in place of
   resign), resign, report opponent (server games), options, leave (confirmed: resigns, or aborts
   before my first move). The clock keeps running behind it.
@@ -84,7 +86,10 @@ same as against Stockfish, with these differences:
   "-", no board number, both players' names with their ratings (`1500?` when provisional; no
   rating in a direct match), and the game's number in the reference field.
 - **Ping.** Top right in online menus and games: green under 80 ms, amber under 200, red above,
-  a grey dash while reconnecting. In a direct match it is the latency to the friend.
+  a grey dash while reconnecting. In a direct match it is the latency to the friend. Against a
+  server it is the smoothed round trip of the client's own `Ping`: four quick ones after each
+  connection, then one every `Welcome.clientPingMs` (the server's `CLIENT_PING_INTERVAL_MS`, 10 s
+  by default), which also keeps the estimate of the server clock fresh.
 
 There is no camera handover online: each player sees the game from their own chair.
 

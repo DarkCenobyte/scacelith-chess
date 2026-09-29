@@ -2,7 +2,8 @@
 // JSON, crypto (hash / base64 / PKCE / proof of work), credential store isolation, endpoint
 // validation, and OnlineClient end to end against a fake server on the loopback interface
 // (plain HTTP + WebSocket, the insecureDev mode): login with a proof of work, account, Hello /
-// Welcome, ping and clock offset, queue, moves, reconnection, 4003 and logout.
+// Welcome, ping and clock offset, queue, moves, reconnection, 4003 and logout; the pacing of the
+// client Ping (Welcome.clientPingMs) and of the reconnections (full server, shutdown, /info reuse).
 //
 // Vectors: tests/data/net-protocol-vectors.json (dedicated-server/tools/gen-cpp-test-vectors.js)
 // and, when present, dedicated-server/test/fixtures/protocol-vectors.json. The files are looked
@@ -835,6 +836,9 @@ public:
     const std::string powChallenge = "fake-challenge-0123456789abcdef";
     static constexpr double kSkewMs = 5000;         // the server clock runs 5 s ahead
     std::atomic<int> loginAttempts{0}, powAccepted{0}, hellos{0}, pings{0}, moves{0}, logouts{0};
+    std::atomic<int> infos{0}, upgrades{0};         // GET /api/v1/info, WebSocket upgrade requests
+    std::atomic<int> upgradeStatus{0};              // != 0: upgrades are refused with this HTTP status
+    std::atomic<uint32_t> clientPingMs{0};          // Welcome.clientPingMs
     std::atomic<bool> helloTokenOk{false};
     std::atomic<uint64_t> activeGame{0};
 
@@ -886,6 +890,17 @@ public:
             }
             uint8_t payload[2] = {uint8_t(code >> 8), uint8_t(code)};
             sendFrame(s, 0x8, payload, 2);
+        }
+    }
+
+    // Notice{ServerShutdown} on every WebSocket (a restart is coming).
+    void noticeShutdown() {
+        std::lock_guard<std::mutex> lk(mu_);
+        for (Sock s : ws_) {
+            pr::Notice n;
+            n.code = pr::NoticeCode::ServerShutdown;
+            n.arg = 3000;
+            sendMsg(s, n);
         }
     }
 
@@ -988,6 +1003,7 @@ private:
         std::string auth = h["authorization"];
         bool authed = auth == "Bearer " + token;
         if (method == "GET" && path == "/api/v1/info") {
+            ++infos;
             char info[512];
             std::snprintf(info, sizeof(info),
                           "{\"name\":\"Fake\",\"serverId\":\"srv-1\",\"motd\":\"hi\",\"protocol\":{\"min\":1,\"max\":1,\"schema\":%u,"
@@ -1026,6 +1042,11 @@ private:
     }
 
     void websocket(Sock s, std::map<std::string, std::string>& h, std::string in) {
+        ++upgrades;
+        if (int status = upgradeStatus.load()) {
+            respond(s, status, "{\"error\":\"server_full\"}");
+            return;
+        }
         std::string key = h["sec-websocket-key"];
         std::string proto = h["sec-websocket-protocol"];
         if (proto.find(pr::kWsSubprotocol) == std::string::npos || !h.count("sec-websocket-version")) {
@@ -1083,6 +1104,7 @@ private:
                 w.username = "alice";
                 w.serverName = "Fake";
                 w.heartbeatMs = 15000;
+                w.clientPingMs = clientPingMs.load();
                 w.maxMsgPerSec = 20;
                 w.activeGame = activeGame.load();
                 sendMsg(s, w);
@@ -1339,14 +1361,16 @@ TEST(net_online_client_loopback) {
         CHECK(waitEvent(c, K::MoveRejected, ev, 5000));
         CHECK_EQ(ev.code, int(pr::ErrorCode::Desync));
 
-        // Network failure: reconnects by itself, the game stays until a new snapshot.
-        int hellosBefore = srv.hellos.load();
+        // Network failure: reconnects by itself, the game stays until a new snapshot. The automatic
+        // reconnection reuses the /info answer of the connection that reached Welcome.
+        int hellosBefore = srv.hellos.load(), infosBefore = srv.infos.load();
         srv.dropWebSockets();
         CHECK(waitState(c, net::ConnState::Reconnecting, 5000));
         CHECK(c.currentGame() && c.currentGame()->id == 77);
         CHECK(waitEvent(c, K::GameSnapshot, ev, 10000));   // Welcome.activeGame, then the snapshot
         CHECK(c.state() == net::ConnState::Online);
         CHECK_EQ(srv.hellos.load(), hellosBefore + 1);
+        CHECK_EQ(srv.infos.load(), infosBefore);
         CHECK_EQ(ev.game.moves.size(), size_t(2));
         CHECK_EQ(ev.game.running, 0);
         CHECK_EQ(c.currentGame()->drawOfferBy, 2);
@@ -1364,9 +1388,12 @@ TEST(net_online_client_loopback) {
         std::this_thread::sleep_for(std::chrono::milliseconds(800));
         CHECK(c.state() == net::ConnState::Banned);
 
-        // Token refused (4003): Unauthorized, the saved session is dropped.
+        // Token refused (4003): Unauthorized, the saved session is dropped. (A connect() asked by the
+        // player reads /info again.)
+        infosBefore = srv.infos.load();
         c.connect();
         CHECK(waitState(c, net::ConnState::Online, 10000));
+        CHECK_EQ(srv.infos.load(), infosBefore + 1);
         srv.kick(pr::CloseCode::Unauthorized);
         CHECK(waitState(c, net::ConnState::Unauthorized, 5000));
         CHECK(!c.hasSavedSession());
@@ -1429,6 +1456,258 @@ TEST(net_online_client_unreachable) {
         CHECK_EQ(ev.error, std::string("invalid_server"));
     }
     net::sys::removeFile(credPath);
+}
+
+// ---- pacing: reconnection delays and the client Ping interval ----
+
+TEST(net_reconnect_delay_policy) {
+    using net::RetryCause;
+    // No game in progress, no Retry-After unless given.
+    auto idle = [](int attempt, RetryCause c, double u, uint32_t retryAfterMs = 0) {
+        return net::reconnectDelayMs(attempt, c, u, false, retryAfterMs);
+    };
+    auto inGame = [](int attempt, RetryCause c, double u) { return net::reconnectDelayMs(attempt, c, u, true, 0); };
+    const double top = std::nextafter(1.0, 0.0);
+    // Failure: full jitter, uniform in [0.5 s, min(30 s, 2 s x 2^attempt)].
+    CHECK_EQ(idle(0, RetryCause::Failure, 0.0), 500u);
+    CHECK_EQ(idle(0, RetryCause::Failure, 0.5), 1250u);
+    CHECK(idle(0, RetryCause::Failure, top) >= 1999u);
+    CHECK_EQ(idle(0, RetryCause::Failure, 1.0), 2000u);
+    CHECK_EQ(idle(1, RetryCause::Failure, 1.0), 4000u);
+    CHECK_EQ(idle(2, RetryCause::Failure, 1.0), 8000u);
+    CHECK_EQ(idle(3, RetryCause::Failure, 1.0), 16000u);
+    CHECK_EQ(idle(4, RetryCause::Failure, 1.0), 30000u);
+    CHECK_EQ(idle(1000000, RetryCause::Failure, 1.0), 30000u);
+    CHECK_EQ(idle(1000000, RetryCause::Failure, 0.0), 500u);
+    CHECK_EQ(idle(-3, RetryCause::Failure, 1.0), 2000u);
+    CHECK_EQ(idle(0, RetryCause::Failure, std::nan("")), 500u);
+    CHECK_EQ(idle(0, RetryCause::Failure, -2.0), 500u);
+    CHECK_EQ(idle(0, RetryCause::Failure, 7.0), 2000u);
+    // A full server: 60 s to 120 s, whatever the attempt.
+    for (int attempt : {0, 1, 5, 40}) {
+        CHECK_EQ(idle(attempt, RetryCause::ServerFull, 0.0), 60000u);
+        CHECK_EQ(idle(attempt, RetryCause::ServerFull, 0.25), 75000u);
+        CHECK_EQ(idle(attempt, RetryCause::ServerFull, 1.0), 120000u);
+    }
+    // A shutdown: the first attempt is spread over 5 s to 35 s, later ones are full jitter.
+    CHECK_EQ(idle(0, RetryCause::Shutdown, 0.0), 5000u);
+    CHECK_EQ(idle(0, RetryCause::Shutdown, 0.5), 20000u);
+    CHECK_EQ(idle(0, RetryCause::Shutdown, 1.0), 35000u);
+    CHECK_EQ(idle(1, RetryCause::Shutdown, 0.0), 500u);
+    CHECK_EQ(idle(1, RetryCause::Shutdown, 1.0), 4000u);
+    CHECK_EQ(idle(9, RetryCause::Shutdown, 1.0), 30000u);
+    // A game in progress (15 s of reconnection grace by default): 8 s at most between attempts,
+    // whatever the cause; a shutdown's first attempt is spread over 1 s to 8 s.
+    CHECK_EQ(inGame(0, RetryCause::Failure, 1.0), 2000u);
+    CHECK_EQ(inGame(2, RetryCause::Failure, 1.0), 8000u);
+    CHECK_EQ(inGame(3, RetryCause::Failure, 1.0), 8000u);
+    CHECK_EQ(inGame(50, RetryCause::Failure, 1.0), 8000u);
+    CHECK_EQ(inGame(50, RetryCause::Failure, 0.0), 500u);
+    CHECK_EQ(inGame(0, RetryCause::ServerFull, 1.0), 2000u);
+    CHECK_EQ(inGame(7, RetryCause::ServerFull, 1.0), 8000u);
+    CHECK_EQ(inGame(0, RetryCause::Shutdown, 0.0), 1000u);
+    CHECK_EQ(inGame(0, RetryCause::Shutdown, 1.0), 8000u);
+    CHECK_EQ(inGame(1, RetryCause::Shutdown, 1.0), 4000u);
+    // Retry-After: at least that long, spread over up to half more, 10 minutes at most.
+    CHECK_EQ(idle(0, RetryCause::Failure, 0.0, 30000), 30000u);
+    CHECK_EQ(idle(0, RetryCause::Failure, 1.0, 30000), 45000u);
+    CHECK_EQ(idle(0, RetryCause::ServerFull, 0.0, 1000), 60000u);   // already longer
+    CHECK_EQ(idle(0, RetryCause::Failure, 1.0, 3600000), 600000u);
+    CHECK_EQ(idle(0, RetryCause::Failure, 0.0, 0xFFFFFFFFu), 600000u);
+    CHECK_EQ(net::reconnectDelayMs(0, RetryCause::Failure, 0.0, true, 20000), 20000u);
+    // Every u in [0, 1) stays inside the bounds; the spread really is uniform (no clustering).
+    for (int attempt = 0; attempt < 12; ++attempt) {
+        uint32_t cap = uint32_t(std::min(30000.0, 2000.0 * std::pow(2.0, attempt)));
+        uint32_t capInGame = std::min(cap, 8000u);
+        int low = 0;
+        for (int i = 0; i < 1000; ++i) {
+            double u = i / 1000.0;
+            uint32_t f = idle(attempt, RetryCause::Failure, u);
+            CHECK(f >= 500u && f <= cap);
+            if (f < 500u + (cap - 500u) / 2) ++low;
+            uint32_t full = idle(attempt, RetryCause::ServerFull, u);
+            CHECK(full >= 60000u && full <= 120000u);
+            for (RetryCause c : {RetryCause::Failure, RetryCause::ServerFull, RetryCause::Shutdown}) {
+                uint32_t g = inGame(attempt, c, u);
+                CHECK(g >= 500u && g <= 8000u);
+                if (c != RetryCause::Shutdown || attempt > 0) CHECK(g <= capInGame);
+            }
+        }
+        CHECK(low >= 490 && low <= 510);
+    }
+}
+
+TEST(net_client_ping_interval) {
+    CHECK_EQ(net::clientPingIntervalMs(0), 10000u);            // not announced: the default
+    CHECK_EQ(net::clientPingIntervalMs(1), 1000u);
+    CHECK_EQ(net::clientPingIntervalMs(999), 1000u);
+    CHECK_EQ(net::clientPingIntervalMs(1000), 1000u);
+    CHECK_EQ(net::clientPingIntervalMs(2000), 2000u);
+    CHECK_EQ(net::clientPingIntervalMs(25000), 25000u);
+    CHECK_EQ(net::clientPingIntervalMs(60000), 60000u);
+    CHECK_EQ(net::clientPingIntervalMs(60001), 60000u);
+    CHECK_EQ(net::clientPingIntervalMs(0xFFFFFFFFu), 60000u);
+}
+
+namespace {
+
+// One OnlineClient signed in on its own fake server. The pacing scenarios below wait for seconds
+// each, so they run side by side on their own threads; each collects its failures, which the
+// test then checks on its own thread.
+struct PacingRig {
+    FakeServer srv;
+    std::string credPath;
+    std::unique_ptr<net::OnlineClient> c;
+    std::vector<std::string> fails;
+
+    void expect(bool ok, const std::string& what) {
+        if (!ok) fails.push_back(what);
+    }
+    bool until(const std::function<bool()>& pred, int timeoutMs) {
+        auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(timeoutMs);
+        while (!pred()) {
+            if (std::chrono::steady_clock::now() > end) return false;
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        }
+        return true;
+    }
+    bool stateIs(net::ConnState s, int timeoutMs) {
+        return until([&] { return c->state() == s; }, timeoutMs);
+    }
+    static void sleepMs(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
+
+    // Server, login, connect, Welcome.
+    bool start(const char* tag) {
+        if (!srv.start()) return false;
+        credPath = tempCredentialPath(tag);
+        c = std::make_unique<net::OnlineClient>();
+        c->setCredentialsFile(credPath);
+        net::ServerEndpoint ep;
+        ep.host = "127.0.0.1";
+        ep.apiPort = srv.port;
+        ep.insecureDev = true;
+        c->setServer(ep);
+        c->login("alice", "pw");
+        net::Event ev;
+        if (!waitEvent(*c, net::Event::Kind::LoginResult, ev, 20000) || !ev.ok) return false;
+        c->connect();
+        return waitEvent(*c, net::Event::Kind::Welcome, ev, 10000);
+    }
+
+    ~PacingRig() {
+        c.reset();
+        if (!credPath.empty()) net::sys::removeFile(credPath);
+    }
+};
+
+// The client Ping after Welcome: one at once and three about a second apart, then one per
+// Welcome.clientPingMs (60 s here: no fifth one during the test).
+void pingPacingScenario(PacingRig& r) {
+    auto t0 = std::chrono::steady_clock::now();
+    r.expect(r.until([&] { return r.srv.pings.load() >= 1; }, 1000), "a Ping at once after Welcome");
+    r.expect(r.until([&] { return r.srv.pings.load() >= 4; }, 6000), "three more quick pings");
+    double t4 = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    r.expect(t4 >= 3000 && t4 < 5500, "the quick pings about a second apart (4th after " + std::to_string(int(t4)) + " ms)");
+    r.sleepMs(1500);
+    r.expect(r.srv.pings.load() == 4, "then Welcome.clientPingMs: " + std::to_string(r.srv.pings.load()) + " pings");
+    r.expect(r.c->pingMs() >= 0 && r.c->pingMs() < 500, "the ping indicator is known");
+    r.expect(std::fabs(r.c->serverNowMs() - epochMs() - FakeServer::kSkewMs) < 250, "the server clock offset is known");
+}
+
+// A full server (close 4006, then HTTP 503 at the upgrade): no attempt for a minute; a connect()
+// asked by the player goes at once and reads /info again.
+void serverFullScenario(PacingRig& r) {
+    int ups = r.srv.upgrades.load(), infos = r.srv.infos.load();
+    r.srv.kick(4006);
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "4006: reconnecting");
+    r.sleepMs(2200);
+    r.expect(r.srv.upgrades.load() == ups, "4006: no attempt within 2 s");
+    r.expect(r.c->state() == net::ConnState::Reconnecting, "4006: still reconnecting");
+    auto t0 = std::chrono::steady_clock::now();
+    r.c->connect();
+    r.expect(r.stateIs(net::ConnState::Online, 5000), "connect() after 4006: online");
+    r.expect(std::chrono::steady_clock::now() - t0 < std::chrono::seconds(3), "connect() is not delayed by the backoff");
+    r.expect(r.srv.infos.load() == infos + 1, "connect() reads /info");
+
+    r.c->disconnect();
+    r.expect(r.stateIs(net::ConnState::Offline, 3000), "disconnect: offline");
+    r.srv.upgradeStatus.store(503);
+    ups = r.srv.upgrades.load();
+    r.c->connect();
+    r.expect(r.until([&] { return r.srv.upgrades.load() == ups + 1; }, 3000), "503: the upgrade was tried");
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "503: reconnecting");
+    r.sleepMs(2200);
+    r.expect(r.srv.upgrades.load() == ups + 1, "503: no attempt within 2 s");
+    r.srv.upgradeStatus.store(0);
+    r.c->connect();
+    r.expect(r.stateIs(net::ConnState::Online, 5000), "connect() after 503: online");
+}
+
+// A shutdown (close 4008): the first attempt waits 5 s at least. While the server restarts, a 503
+// at the upgrade is the restart, not a full server: the next attempt follows quickly.
+void shutdownScenario(PacingRig& r) {
+    int ups = r.srv.upgrades.load();
+    r.srv.kick(pr::CloseCode::ShuttingDown);
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "4008: reconnecting");
+    r.sleepMs(2200);
+    r.expect(r.srv.upgrades.load() == ups, "4008: no attempt within 2 s");
+    r.srv.upgradeStatus.store(503);
+    r.c->connect();
+    r.expect(r.until([&] { return r.srv.upgrades.load() >= ups + 2; }, 5000), "503 while restarting: tried again soon");
+    r.srv.upgradeStatus.store(0);
+    r.c->connect();
+    r.expect(r.stateIs(net::ConnState::Online, 5000), "online after the restart");
+}
+
+// Notice{ServerShutdown}, then the connection drops without a close code: a shutdown too.
+void shutdownNoticeScenario(PacingRig& r) {
+    int ups = r.srv.upgrades.load();
+    r.srv.noticeShutdown();
+    r.sleepMs(200);
+    r.srv.dropWebSockets();
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "notice + drop: reconnecting");
+    r.sleepMs(2200);
+    r.expect(r.srv.upgrades.load() == ups, "notice + drop: no attempt within 2 s");
+}
+
+// With a game in progress the reconnection grace is short: even a full server is tried again
+// within seconds (8 s at most between attempts), not after a minute.
+void inGameScenario(PacingRig& r) {
+    r.c->joinQueue("3+2", true);
+    net::Event ev;
+    r.expect(waitEvent(*r.c, net::Event::Kind::GameSnapshot, ev, 5000) && ev.game.id == 77, "in game: snapshot");
+    int hellos = r.srv.hellos.load();
+    r.srv.kick(4006);
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "in game, 4006: reconnecting");
+    r.expect(r.until([&] { return r.srv.hellos.load() > hellos; }, 4000), "in game, 4006: tried again within 2 s");
+    r.expect(r.stateIs(net::ConnState::Online, 3000), "in game: online again");
+}
+
+}  // namespace
+
+TEST(net_online_client_pacing) {
+    if (!net::transportAvailable()) return;
+    constexpr int kRigs = 5;
+    PacingRig rigs[kRigs];
+    rigs[0].srv.clientPingMs.store(60000);
+    const char* tags[kRigs] = {"pace-ping", "pace-full", "pace-shutdown", "pace-notice", "pace-ingame"};
+    void (*scenarios[kRigs])(PacingRig&) = {pingPacingScenario, serverFullScenario, shutdownScenario, shutdownNoticeScenario,
+                                            inGameScenario};
+    std::vector<std::thread> threads;
+    for (int i = 0; i < kRigs; ++i) {
+        threads.emplace_back([&, i] {
+            if (!rigs[i].start(tags[i])) {
+                rigs[i].fails.push_back("setup (server, login, Welcome)");
+                return;
+            }
+            scenarios[i](rigs[i]);
+        });
+    }
+    for (auto& t : threads) t.join();
+    for (int i = 0; i < kRigs; ++i) {
+        for (const std::string& f : rigs[i].fails) std::fprintf(stderr, "  %s: %s\n", tags[i], f.c_str());
+        CHECK(rigs[i].fails.empty());
+    }
 }
 
 // TLS certificate rules against a real TLS server, opt-in because the test cannot start one on

@@ -27,6 +27,8 @@
 //   - ServerEndpoint::wsPort defaults to 0 = the API port (one port for HTTPS and /ws, as on the
 //     official server); effectiveWsPort() resolves it. /api/v1/info's wsPort is informative only.
 //     TLS is always used unless insecureDev is set (and insecureDev is refused off loopback).
+//   - RetryCause, reconnectDelayMs() and clientPingIntervalMs() (additive): the reconnection and
+//     client Ping pacing rules as pure functions, so the tests can check them.
 #pragma once
 #include <cstdint>
 #include <memory>
@@ -130,6 +132,34 @@ enum class ConnState {
     Unauthorized,   // token refused: log in again
     Banned
 };
+
+// ---- Reconnection and ping pacing (pure; the network thread uses them, the tests check them) ----
+
+// Why the realtime connection is being established again.
+enum class RetryCause {
+    Failure,        // network error, timeout, dropped connection, upgrade refused (not 503)
+    ServerFull,     // HTTP 503 at the WebSocket upgrade, close 4006 or a fatal Error{ServerFull}
+    Shutdown        // close 4008, a fatal Error{ShuttingDown} or a Notice{ServerShutdown} before the drop
+};
+
+// Delay before automatic reconnection attempt number `attempt` (0 = the first one since the last
+// Welcome). u is a uniform random number in [0, 1).
+//   Failure     full jitter: uniform in [0.5 s, min(30 s, 2 s x 2^attempt)]
+//   ServerFull  uniform in [60 s, 120 s]
+//   Shutdown    attempt 0: uniform in [5 s, 35 s], which spreads the reconnection wave of a
+//               restart; later attempts as Failure
+// gameInProgress: the player has a game running on the server, which gives them only
+// RECONNECT_GRACE_MIN_MS (15 s by default, counted again from its restart) to come back before
+// they lose by abandonment. Every cause then waits uniform in [0.5 s, min(8 s, 2 s x 2^attempt)],
+// and a shutdown's first attempt uniform in [1 s, 8 s].
+// retryAfterMs is a Retry-After the server gave (0 = none): the delay is then at least that, plus
+// up to half of it so that the clients it was given to do not come back together (10 minutes at
+// most). User-initiated connections (connect(), a server change) never wait for any of this.
+uint32_t reconnectDelayMs(int attempt, RetryCause cause, double u, bool gameInProgress, uint32_t retryAfterMs);
+
+// Interval of the client's own Ping for Welcome.clientPingMs (the server's
+// CLIENT_PING_INTERVAL_MS): 0 (not announced) = 10 s, otherwise clamped to 1 s .. 60 s.
+uint32_t clientPingIntervalMs(uint32_t announced);
 
 struct Event {
     enum class Kind {

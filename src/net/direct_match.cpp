@@ -704,6 +704,7 @@ private:
         w.username = auth_->guestName();
         w.serverName = direct::sanitizeName(opt_.playerName, "Host");
         w.heartbeatMs = kPingEveryMs;
+        w.clientPingMs = kPingEveryMs;
         w.maxMsgPerSec = kMaxMsgPerSec;
         w.activeGame = auth_->gameId();
         std::vector<uint8_t> buf;
