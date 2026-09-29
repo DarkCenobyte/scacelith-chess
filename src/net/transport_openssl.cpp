@@ -386,8 +386,9 @@ constexpr char kWsGuid[] = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
 class OpenSslWebSocket final : public WebSocket {
 public:
-    OpenSslWebSocket(std::unique_ptr<Stream> s, const WsParams& p, std::string initial)
+    OpenSslWebSocket(std::unique_ptr<Stream> s, const WsParams& p, std::string initial, std::string serverId)
         : s_(std::move(s)), maxBytes_(p.maxMessageBytes), onActivity_(p.onActivity), in_(std::move(initial)) {
+        serverId_ = std::move(serverId);
         if (::pipe2(wake_, O_NONBLOCK | O_CLOEXEC) != 0) wake_[0] = wake_[1] = -1;
         io_ = std::thread([this] { run(); });
     }
@@ -809,7 +810,7 @@ std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int&
     }
     if (ph.get("sec-websocket-protocol") != p.subprotocol) { error = "subprotocol"; return nullptr; }
     if (!ph.get("sec-websocket-extensions").empty()) { error = "network"; return nullptr; }   // none was offered
-    return std::make_unique<OpenSslWebSocket>(std::move(s), p, raw.substr(end + 4));
+    return std::make_unique<OpenSslWebSocket>(std::move(s), p, raw.substr(end + 4), ph.get("scacelith-server-id"));
 }
 
 }  // namespace net

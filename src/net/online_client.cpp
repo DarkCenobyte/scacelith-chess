@@ -8,15 +8,19 @@
 //   - The client's own Ping (ping indicator, server clock offset) follows Welcome.clientPingMs
 //     (the server's CLIENT_PING_INTERVAL_MS, 10 s by default): one at once after Welcome and
 //     kPingBurst more about a second apart, so both values are right quickly, then one per
-//     interval. Liveness never depends on it: the connection is dead when the server's own
-//     heartbeat (Welcome.heartbeatMs) has been silent for two periods.
+//     interval. Liveness does not wait for it: the server's own Ping comes about every
+//     Welcome.heartbeatMs (a quarter second later at worst), and when nothing at all came for 1.5
+//     heartbeats (7.5 s at least) the client sends one Ping at once as a probe; the connection is
+//     dead after two heartbeats (10 s at least) with nothing received.
 //   - Automatic reconnections follow reconnectDelayMs() (online_client.h): full jitter, a long
-//     wait when the server is full, a spread first attempt after a shutdown, and never more than
-//     8 s between attempts while a game is in progress (the server's reconnection grace is short:
-//     15 s by default, also after a restart). For 10 minutes after losing a connection that had
-//     reached Welcome they reuse the /api/v1/info answer it was made with (one TLS handshake
-//     instead of two). A connect() asked by the player always reads /info again and never waits
-//     for the backoff.
+//     wait when the server is full, a spread first attempt after a shutdown, and 8 s at most
+//     between attempts while a game is in progress (unless the server gave a Retry-After): the
+//     server's reconnection grace is short, at least RECONNECT_GRACE_MIN_MS (15 s by default),
+//     and RECOVERY_GRACE_MS (90 s by default) for the games it restores after a restart. For 10
+//     minutes after losing a connection that had reached Welcome they reuse the /api/v1/info
+//     answer it was made with (one TLS handshake instead of two), except after a shutdown; the
+//     server id of the 101 answer is checked against the saved session either way. A connect()
+//     asked by the player always reads /info again and never waits for the backoff.
 //
 // Keeping the realtime connection on its own thread means a slow HTTPS call (or a proof of
 // work) never delays the answer to a server Ping or the sending of a move. The game thread only
@@ -280,6 +284,7 @@ struct OnlineClient::Impl {
         ServerEndpoint ep;
         int attempt = 0;
         Clock::time_point nextAttempt{}, connectedAt{}, lastRecv{}, nextPing{};
+        Clock::time_point probedAt{};                     // lastRecv when the silence probe went
         std::unique_ptr<WebSocket> ws;
         bool welcomed = false;
         uint32_t seq = 0;
@@ -693,10 +698,11 @@ struct OnlineClient::Impl {
 
     // The last /info answer serves an automatic attempt when a connection built on it reached
     // Welcome, for the same endpoint, and it was read or last in use less than 10 minutes ago
-    // (a Hello accepted since then proved the protocol, a working upgrade the path).
+    // (a Hello accepted since then proved the protocol, a working upgrade the path). Not after a
+    // shutdown: a restart is when a server is updated or reinstalled.
     bool infoReusable(const ServerEndpoint& e) const {
-        return rt.info.valid && rt.info.proven && rt.info.origin == e.origin() && rt.info.insecure == e.insecureDev &&
-               Clock::now() - rt.info.at < kInfoReuse;
+        return rt.info.valid && rt.info.proven && !rt.restarting && rt.info.origin == e.origin() &&
+               rt.info.insecure == e.insecureDev && Clock::now() - rt.info.at < kInfoReuse;
     }
 
     void tryConnect() {
@@ -755,7 +761,10 @@ struct OnlineClient::Impl {
         }
         if (!ws) {
             LOGW("net: websocket %s:%u failed: %s", p.host.c_str(), p.port, err.c_str());
-            const bool refused = httpStatus != 0 && httpStatus != 503 && httpStatus != 429;
+            // A 4xx other than 429 (404, 426...) is this server refusing the request as made. A 5xx
+            // is a server (or its reverse proxy: 502, 504) that cannot answer now: retried like a
+            // network failure, with the same /info answer.
+            const bool refused = httpStatus >= 400 && httpStatus < 500 && httpStatus != 429;
             if (err == "certificate" || err == "insecure" || err == "unavailable") {
                 stopWanting(ConnState::Offline, err);
             } else if (reused && (err == "subprotocol" || refused)) {
@@ -765,11 +774,23 @@ struct OnlineClient::Impl {
             } else if (err == "subprotocol") {
                 stopWanting(ConnState::Offline, err);
             } else if (httpStatus == 503) {
-                // Full, unless the server is restarting (a draining server refuses upgrades with 503).
-                scheduleRetry(rt.restarting ? RetryCause::Failure : RetryCause::ServerFull);
+                // Full, unless it is the first 503 since a shutdown (a draining server refuses
+                // upgrades with 503): later ones mean that the server came back full.
+                const bool restart = rt.restarting;
+                rt.restarting = false;
+                scheduleRetry(restart ? RetryCause::Failure : RetryCause::ServerFull);
             } else {
                 scheduleRetry(RetryCause::Failure);
             }
+            return;
+        }
+        // The per-origin identity rule of fetchInfo, for the server that answered this upgrade (a
+        // reused /info answer was read from the server that was there before).
+        if (!ws->serverId().empty() && !c.serverId.empty() && ws->serverId() != c.serverId) {
+            LOGW("net: %s announces another server id; its saved session is discarded", e.origin().c_str());
+            ws->close(1000);
+            creds.clearToken(e.origin());
+            stopWanting(ConnState::Unauthorized, "server_changed");
             return;
         }
         rt.ws = std::move(ws);
@@ -778,6 +799,7 @@ struct OnlineClient::Impl {
         rt.lastFatal = 0;
         rt.shutdownNotice = false;
         rt.connectedAt = rt.lastRecv = Clock::now();
+        rt.probedAt = Clock::time_point{};
         pr::Hello h;
         h.proto = pr::kProtocolVersion;
         h.schema = pr::kSchemaHash;
@@ -1130,6 +1152,9 @@ struct OnlineClient::Impl {
         } else if (code == pr::CloseCode::Replaced || fatal == int(pr::ErrorCode::Replaced)) {
             // Another client of this account took over: fighting back would loop forever.
             stopWanting(ConnState::Offline, "replaced");
+        } else if (code == pr::CloseCode::CheatDetected || fatal == int(pr::ErrorCode::CheatDetected)) {
+            // The server's fair-play checks stopped this client: the player decides what comes next.
+            stopWanting(ConnState::Offline, "cheat_detected");
         } else if (rt.wanted) {
             RetryCause why = RetryCause::Failure;
             if (code == kCloseServerFull || fatal == int(pr::ErrorCode::ServerFull)) {
@@ -1176,14 +1201,20 @@ struct OnlineClient::Impl {
             }
             Clock::time_point now = Clock::now();
             if (rt.ws) {
-                // Liveness from the server's heartbeat only (never from our own, rarer, pings).
+                // Liveness: the server pings about every heartbeatMs. When nothing came for 1.5
+                // heartbeats, one Ping of ours asks for an answer at once (a heartbeat the server
+                // sent late, or skipped, then costs nothing); the connection is dead at two.
                 uint32_t silence = std::max<uint32_t>(10000, std::min<uint32_t>(rt.heartbeatMs, 60000) * 2);
+                auto quiet = now - rt.lastRecv;
                 if (!rt.welcomed && now - rt.connectedAt > std::chrono::seconds(10)) {
                     LOGW("net: no Welcome within 10 s");
                     onClosed(1006, "hello timeout");
-                } else if (now - rt.lastRecv > std::chrono::milliseconds(silence)) {
+                } else if (quiet > std::chrono::milliseconds(silence)) {
                     LOGW("net: the server has been silent for %u ms", silence);
                     onClosed(1006, "heartbeat timeout");
+                } else if (rt.welcomed && quiet > std::chrono::milliseconds(silence / 4 * 3) && rt.probedAt != rt.lastRecv) {
+                    rt.probedAt = rt.lastRecv;
+                    sendPing();
                 } else if (rt.welcomed && now >= rt.nextPing) {
                     sendPing();
                 }
@@ -1532,10 +1563,12 @@ void OnlineClient::connect() {
         d->rt.ep = e;
         d->rt.wanted = true;
         if (!d->rt.ws) {
-            // Asked by the player: at once (never behind the backoff), with a fresh /info.
+            // Asked by the player: at once (never behind the backoff), with a fresh /info. A 503
+            // now means a full server, whatever happened before.
             d->rt.attempt = 0;
             d->rt.nextAttempt = Clock::now();
             d->rt.info = Impl::Rt::Info();
+            d->rt.restarting = false;
         }
     });
 }
