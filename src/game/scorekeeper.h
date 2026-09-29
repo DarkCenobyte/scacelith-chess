@@ -71,6 +71,9 @@ public:
     void update();                            // after the animators' update (GL: page textures)
     void submit(render::Renderer& r);         // pads, pages and pens
     bool writing(int seat) const;             // entries or page turns still pending
+    // The sheet's owner is reading it (GameScene, key S): between entries the writing hand waits
+    // off the page, beside it towards its owner, instead of resting on the next row.
+    void setHandAside(int seat, bool aside);
     int backlog(int seat) const;              // entries begun and not finished yet
 
 private:
@@ -94,6 +97,7 @@ private:
     std::vector<std::string> moves_;          // SAN of every recorded move (for late starts)
     int movesQueued_[2] = {0, 0};             // moves handed to each writing hand
     bool hold_[2] = {false, false};           // setHold()
+    bool handAside_[2] = {false, false};
     m::mat4 prevPen_[2];
     bool hasPrevPen_[2] = {false, false};
 };

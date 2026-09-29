@@ -44,7 +44,10 @@ PieceObject* PhysicalBoard::at(Square sq) {
     return nullptr;
 }
 
+const PieceObject* PhysicalBoard::at(Square sq) const { return const_cast<PhysicalBoard*>(this)->at(sq); }
+
 PieceObject* PhysicalBoard::byId(int id) { return id >= 0 && id < int(pieces_.size()) ? &pieces_[size_t(id)] : nullptr; }
+const PieceObject* PhysicalBoard::byId(int id) const { return const_cast<PhysicalBoard*>(this)->byId(id); }
 
 int PhysicalBoard::idAt(Square sq) const {
     for (auto& p : pieces_)

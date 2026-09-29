@@ -517,4 +517,32 @@ void viewerHud(const ViewerHud& hud) {
     gfx::setLayer(prev);
 }
 
+void gameCursor(vec2 pixelPos, GameCursor kind) {
+    gfx::Layer prev = gfx::layer();
+    gfx::setLayer(gfx::LAYER_TOP);
+    vec2 c = pixelPos * (1.0f / std::max(1e-3f, gfx::scale()));
+    c = vec2(gfx::snap(c.x), gfx::snap(c.y));
+    bool accent = kind == GameCursor::Piece || kind == GameCursor::Square || kind == GameCursor::Clock;
+    bool ticks = kind == GameCursor::Holding || kind == GameCursor::Square;
+    float a = kind == GameCursor::Waiting ? 0.5f : 1.0f;
+    float r = kind == GameCursor::Piece || kind == GameCursor::Clock ? 13.0f : ticks ? 11.0f : 10.0f;
+    vec4 ink = withAlpha(accent ? goldBright : ivory, 0.95f * a);
+    vec4 shade = vec4(0.0f, 0.0f, 0.0f, 0.5f * a);
+    // A dark rim under every stroke keeps the pointer readable on white marble and on the sun.
+    gfx::radial(c, vec2(r + 12.0f, r + 12.0f), vec4(0.0f, 0.0f, 0.0f, 0.16f * a), 0.0f, 1.0f);
+    gfx::circle(c, r + 1.2f, shade, 4.6f);
+    gfx::circle(c, r, ink, 2.2f);
+    if (ticks) {
+        for (int i = 0; i < 4; ++i) {
+            vec2 d = i == 0 ? vec2(1, 0) : i == 1 ? vec2(-1, 0) : i == 2 ? vec2(0, 1) : vec2(0, -1);
+            gfx::line(c + d * (r + 3.0f), c + d * (r + 11.0f), shade, 4.4f);
+            gfx::line(c + d * (r + 3.8f), c + d * (r + 10.2f), ink, 2.2f);
+        }
+    }
+    float dot = kind == GameCursor::Square ? 2.6f : 1.8f;
+    gfx::circle(c, dot + 1.2f, shade);
+    gfx::circle(c, dot, ink);
+    gfx::setLayer(prev);
+}
+
 }  // namespace ui

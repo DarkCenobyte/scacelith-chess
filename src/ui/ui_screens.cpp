@@ -256,6 +256,7 @@ void copyOptions(game::Settings& dst, const game::Settings& src) {
     dst.showCoordinates = src.showCoordinates;
     dst.mouseSensitivity = src.mouseSensitivity;
     dst.invertLook = src.invertLook;
+    dst.gameCursor = src.gameCursor;
     dst.handoverSeconds = src.handoverSeconds;
     dst.humanizeThinking = src.humanizeThinking;
     dst.language = src.language;
@@ -270,8 +271,8 @@ bool sameOptions(const game::Settings& a, const game::Settings& b) {
            a.depthOfField == b.depthOfField && feq(a.brightness, b.brightness) && feq(a.masterVolume, b.masterVolume) &&
            feq(a.effectsVolume, b.effectsVolume) && feq(a.ambienceVolume, b.ambienceVolume) && a.ambience == b.ambience &&
            a.showLegalMoves == b.showLegalMoves && a.showCoordinates == b.showCoordinates &&
-           feq(a.mouseSensitivity, b.mouseSensitivity) && a.invertLook == b.invertLook && a.humanizeThinking == b.humanizeThinking &&
-           feq(a.handoverSeconds, b.handoverSeconds) &&
+           feq(a.mouseSensitivity, b.mouseSensitivity) && a.invertLook == b.invertLook && a.gameCursor == b.gameCursor &&
+           a.humanizeThinking == b.humanizeThinking && feq(a.handoverSeconds, b.handoverSeconds) &&
            cleanName(a.playerName) == cleanName(b.playerName) && a.handStyle == b.handStyle && detail::sameOnlineOptions(a, b);
 }
 
@@ -516,6 +517,8 @@ bool optionsPage(MenuAction& act) {
             im::sliderRow(L("options.mouse_sensitivity"), s.mouseSensitivity, 0.25f, 3.0f, 0.05f,
                           [](float x) { return decimal(x, 2) + " \xC3\x97"; }, row());
             im::toggleRow(L("options.invert_look"), s.invertLook, row());
+            im::toggleRow(L("options.game_cursor"), s.gameCursor, row());
+            im::tooltip(T("options.game_cursor.help"));
             {
                 // Hot-seat handover: an instant cut, or a flight of 0.8 to 2 s.
                 static const float kHandover[] = {0.0f, 0.8f, 1.0f, 1.2f, 1.4f, 1.6f, 1.8f, 2.0f};
@@ -554,6 +557,7 @@ bool optionsPage(MenuAction& act) {
                 {"controls.touch.keys", "controls.touch"},
                 {"controls.clock.keys", "controls.clock"},
                 {"controls.look.keys", "controls.look"},
+                {"controls.sheet.keys", "controls.sheet"},
                 {"controls.moves.keys", "controls.moves"},
                 {"controls.menu.keys", "controls.menu"},
             };

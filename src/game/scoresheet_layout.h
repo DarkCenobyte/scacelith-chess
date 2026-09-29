@@ -180,6 +180,31 @@ float strokeDurationAt(const PenPath& path, float t);
 bool isCjk(uint32_t cp);
 bool hasMarkAbove(uint32_t cp);   // i, j, accented Latin, Cyrillic й ё ї...
 
+// ---- Writing sound ------------------------------------------------------------------------------
+// The sound of one pen-down stroke (audio::playPenStroke), for the animator's PenDown event.
+//   path:     the entry being written (nullptr: none, the touch-down tick alone).
+//   downTime: path time at which the tip touched the paper (< 0: unknown, the tick alone). Events
+//             come out at the end of an animator update, 'late' seconds after the instant itself
+//             (downTime = Animator::writingPathTime() - late): the friction plays what is left of
+//             the stroke. downTime may fall a rounding error short of its pen-down key.
+//   The writer's own pen: a listener in the writer's head (the first-person player, within
+//   FIRST_PERSON_RADIUS of his eyes) hears the stroke as a writer does, head bent over his sheet:
+//   from WRITER_EAR_DISTANCE, in the direction of the tip (near field: a louder, slightly wider
+//   direct sound; the hall's diffuse reverb is unchanged). His camera keeps watching the board and
+//   the pad lies out of view beside him: this is how he knows that he writes. Any other listener
+//   hears the pen at the tip (the opponent's pen, an observer).
+constexpr float PEN_STROKE_GAIN = 0.9f;
+constexpr float WRITER_EAR_DISTANCE = 0.35f;   // m, ear to pen tip while writing
+constexpr float FIRST_PERSON_RADIUS = 0.3f;    // m, listener to the writer's eyes
+struct PenStrokeSound {
+    m::vec3 position;         // where to play it
+    float seconds = 0.0f;     // friction window (0: the touch-down tick alone)
+    float gain = PEN_STROKE_GAIN;
+    bool writersOwn = false;  // heard by the writer himself
+};
+PenStrokeSound penStrokeSound(const PenPath* path, float downTime, float late, m::vec3 tip, m::vec3 writerEyes,
+                              m::vec3 listener);
+
 // ---- Pad placement ------------------------------------------------------------------------------------
 // owner: 0 = White (seat at +Z), 1 = Black. The pad lies on the side without the clock, in front of
 // its owner, turned by PAD_YAW_DEG so its top leans towards the board (the natural tilt for the

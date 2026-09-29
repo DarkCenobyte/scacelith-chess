@@ -31,6 +31,8 @@ void main() {
         wsum += w;
     }
     vec4 blur = sum / max(wsum, 1e-5);
-    float k = max(smoothstep(0.35, 1.5, abs(coc)), blur.a);
+    // Below about a pixel of CoC the half-resolution blur would only lose detail (handwriting,
+    // the board's lines) without a blur one could see: the sharp image stays.
+    float k = max(smoothstep(0.6, 2.0, abs(coc)), blur.a);
     imageStore(oColor, p, vec4(mix(sharp, blur.rgb, k), 1.0));
 }

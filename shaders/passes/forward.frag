@@ -6,6 +6,12 @@
 #include "shaders/include/lighting.glsl"
 #include "shaders/passes/fragment_input.glsl"
 
+#if defined(MATERIAL_SCREEN_DOOR) && defined(PASS_MAIN) && !defined(MATERIAL_TRANSPARENT)
+// The opaque main pass does not write depth, so the screen-door discard below does not need late
+// depth tests: keep hidden fragments from being shaded.
+layout(early_fragment_tests) in;
+#endif
+
 #ifdef MATERIAL_TRANSPARENT
 // Dual-source blending: dst = src0 + dst * src1 (src1 = coloured transmittance).
 layout(location = 0, index = 0) out vec4 outColor;
@@ -74,5 +80,9 @@ void main() {
     bool planar = planarLayer >= 0.0 && frame.passInfo.w > planarLayer && lighting.planarInfo[int(planarLayer)].x > 0.5;
     outSpecular = vec4(f0, planar ? 0.0 : (rough < 0.6 ? 1.0 : 0.0));
     outVelocity = motionVector();
+#endif
+#if defined(MATERIAL_SCREEN_DOOR) && !defined(MATERIAL_TRANSPARENT) && (defined(PASS_MAIN) || defined(PASS_PLANAR))
+    // Same pixels as the prepass. Last, so the derivatives above still see whole quads.
+    if (screenDoorHidden()) discard;
 #endif
 }

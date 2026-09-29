@@ -151,12 +151,18 @@ void GameScene::startHandover(int mover) {
     }
     hoverId_ = -1;
     inputGate_.arm();
+    // A look at the scoresheet (S) ends with the turn. The flight leaves from the view as it is
+    // (the sheet's narrower field of view widens during the flight); a cut lets the look end
+    // while the view darkens.
     CameraPose from = firstPersonPose(mover);
+    from.fovY = camera_.fovY;
+    glance_ = false;
     float seconds = handoverArg_ >= 0.0f ? handoverArg_ : settings().handoverSeconds;
     if (seconds > 0.0f) {
         // A flight: the mover's head is its robot's again (the gaze controller takes over
         // smoothly), and the next player's head turns to their own look while the camera flies.
         anim_[mover].setHeadOverride(false);
+        glanceBlend_ = 0.0f;  // before posing the next player's view
         beginLook(next, false);
     }
     handover_.start(mover, next, seconds, from, firstPersonPose(next), vec3(0.0f, layout::BOARD_TOP_Y, 0.0f));
@@ -176,6 +182,7 @@ void GameScene::updateHandover(float dt) {
     if (st.cut) {
         // At black: the view changes seats, the next player's look is theirs at once.
         anim_[handover_.fromSeat()].setHeadOverride(false);
+        glanceBlend_ = 0.0f;
         beginLook(to, true);
         cameraCut_ = true;
     }

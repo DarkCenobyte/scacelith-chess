@@ -47,6 +47,7 @@ bool Settings::load(const std::string& p) {
     showCoordinates = ini.getBool("gameplay.show_coordinates", showCoordinates);
     mouseSensitivity = ini.getFloat("gameplay.mouse_sensitivity", mouseSensitivity);
     invertLook = ini.getBool("gameplay.invert_look", invertLook);
+    gameCursor = ini.getBool("gameplay.game_cursor", gameCursor);
     nextColor = ini.getInt("gameplay.next_color", nextColor);
     handoverSeconds = std::clamp(ini.getFloat("gameplay.handover_seconds", handoverSeconds), 0.0f, 2.0f);
     if (handoverSeconds > 0.0f && handoverSeconds < 0.8f) handoverSeconds = 0.8f;
@@ -178,6 +179,7 @@ bool Settings::save() const {
     ini.setBool("gameplay.show_coordinates", showCoordinates);
     ini.setFloat("gameplay.mouse_sensitivity", mouseSensitivity);
     ini.setBool("gameplay.invert_look", invertLook);
+    ini.setBool("gameplay.game_cursor", gameCursor);
     ini.setInt("gameplay.next_color", nextColor);
     ini.setFloat("gameplay.handover_seconds", handoverSeconds);
     ini.setInt("newgame.opponent", opponent);

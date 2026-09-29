@@ -80,6 +80,8 @@ options.handover = تبديل اللاعب
 options.handover.cut = انتقال فوري
 options.handover.flight = تحليق، {0} ث
 options.handover.help = لاعبان على حاسوب واحد: كيف ينتقل المشهد من عيني لاعب إلى عيني الآخر بعد كل نقلة. الانتقال الفوري يتجنّب حركة الكاميرا.
+options.game_cursor = مؤشر اللعبة
+options.game_cursor.help = على الطاولة، ترسم اللعبة مؤشرها الخاص الذي يبيّن ما ستفعله النقرة. عند الإيقاف: سهم النظام المعتاد.
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = الاسم
@@ -99,6 +101,8 @@ controls.clock.keys = المسافة  أو  النقر على الساعة
 controls.clock = الضغط على الساعة
 controls.look.keys = الزر الأيمن مع الإمساك
 controls.look = النظر حولك
+controls.sheet.keys = S
+controls.sheet = النظر إلى ورقة تسجيلك ثم العودة
 controls.moves.keys = Tab
 controls.moves = إظهار قائمة النقلات أو إخفاؤها
 controls.menu.keys = Esc

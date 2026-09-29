@@ -15,7 +15,9 @@
 // Hot-seat: the seat to move has the mouse and keyboard and the view from its robot's eyes. After
 // the clock press the view flies to the other player's eyes (or cuts through black, Options >
 // Gameplay) with the clock frozen; buttons still held by the previous player are ignored until
-// released. Each seat keeps its own look (yaw, pitch, lean).
+// released. Each seat keeps its own look (yaw, pitch, lean). The in-game pointer, the square
+// aimed at, the clock hover, the see-through arm and the look at the scoresheet (S) belong to the
+// player to move; there is no pointer or aiming while the view goes over.
 //
 // Command line (development and screenshots):
 //   --start                 skip the menu: a game against Stockfish (--human white|black)
@@ -37,6 +39,8 @@
 //   --start-online [cat]    skip the menu: sign in and play the first opponent found in category
 //                           "cat" (default 5+3; with --online-mock the game starts at once);
 //                           --touch <square> touches that piece once the handshake is over
+//   --mouse fx,fy           pointer position as fractions of the window (screenshots)
+//   --glance                a human game starts looking at the player's scoresheet (S)
 #pragma once
 #include "../ai/engine.h"
 #include "../anim/animator.h"
@@ -192,9 +196,17 @@ private:
     chess::TimeControl chosenTimeControl() const;
     ai::EngineSettings chosenEngineSettings() const { return engineSettingsFor(setup_.difficulty); }
     ai::EngineSettings engineSettingsFor(int preset) const;
+    m::vec2 cursorPixels() const;             // the pointer (physical pixels), or --mouse
     m::Ray mouseRay() const;
     int pickPiece(const m::Ray& ray, float* tOut = nullptr) const;
     chess::Square pickSquare(const m::Ray& ray) const;
+    // The square a click designates while a piece is in hand (NoSquare: none). 'castling' is set
+    // when it is the king's castling square designated by pointing at the rook.
+    chess::Square aimSquare(const m::Ray& ray, bool* castling = nullptr) const;
+    bool legalDestination(chess::Square to) const;  // for the touched piece
+    bool gameCursorShown() const;             // the game's pointer replaces the system arrow
+    ui::GameCursor gameCursorKind() const;
+    m::vec3 glanceTarget() const;             // where the player looks at their scoresheet (S)
     void updateCamera(float dt, bool firstPerson);
     void placeFirstPersonCamera();
     // The first-person view from 'seat''s eyes with its own look (gaze beyond the head, lean).
@@ -260,6 +272,7 @@ private:
     void selectViewpoint(int n, bool jump);
     int headNearCamera(m::vec3 p) const;      // seat whose head contains p (drawn headless), or -1
     float observerFocus(const render::Camera& cam) const;
+    float firstPersonFocus(const m::Ray& gaze) const;  // distance the player's eyes focus at
 
     AppContext* ctx_ = nullptr;
     GameMode mode_ = GameMode::Play;
@@ -300,6 +313,14 @@ private:
     bool drawOfferPending_ = false;
     int drawOfferPly_ = -1;
     int hoverId_ = -1;
+    chess::Square aimSq_ = chess::NoSquare;   // square under the pointer while a piece is in hand
+    bool aimLegal_ = false;                   // aimSq_ is a legal destination
+    bool clockHover_ = false;                 // the pointer is on the clock
+    bool pressTouched_ = false;               // this left press touched a piece: releasing it on
+    m::vec2 pressPos_{0, 0};                  // another square moves the piece there (drag)
+    bool osCursorHidden_ = false;
+    bool mouseOverride_ = false;              // --mouse
+    m::vec2 mouseOverridePos_{0.5f, 0.5f};
 
     // AI
     float aiElapsed_ = 0.0f;
@@ -328,6 +349,10 @@ private:
         float lean = 0.0f, leanSmooth = 0.0f;
     };
     Look look_[2];
+    // S: the player whose eyes are the view looks at their own scoresheet. One state for the
+    // view, not per seat: in a hot-seat game a turn's look ends at the clock press (startHandover).
+    bool glance_ = false;
+    float glanceBlend_ = 0.0f;
     bool dragging_ = false;
     float menuAngle_ = 0.9f;
     float fade_ = 1.0f;
@@ -337,6 +362,8 @@ private:
     float glanceTime_ = 0.0f;
     m::vec3 aiGazeTarget_{0, 0.8f, 0};
     m::Rng rng_{1};
+    float armSeeThrough_ = 0.0f;   // player's playing arm: 0 opaque .. 1 see-through (piece in hand)
+    int armSeeThroughSeat_ = 0;    // whose arm it is (the player who carried the piece)
 
     // Viewer mode
     ObserverCamera observer_;

@@ -10,11 +10,20 @@ real-time material shaders, physically based lighting.
 - **Left click** on one of your pieces: your hand reaches for it. Tournament rules apply: a piece
   you touch must be moved if it has a legal move (touch-move).
 - **Left click** on a square: the piece is played there. Captured pieces are put beside the board.
+  You can also drag: press on the piece, release on the square. While a piece is in hand, the
+  square under the pointer is outlined on the board, your own pieces never get in the way of the
+  pointer (it looks through them at the square behind), and your arm turns see-through.
 - **Space**, or a click on the chess clock: your hand presses the clock. A move is only completed
   once the clock is pressed, and after a promotion the new piece must be on the board first.
 - **Right mouse button** (hold and drag): look around from your chair. **Mouse wheel**: lean
   towards the board. **Middle click** or **C**: look at the board again.
+- **S**: look at your own scoresheet, lying out of sight beside you, and back (**S** again,
+  **C** or a look around).
 - **Tab**: move list. **Esc**: menu (offer or claim a draw, resign, options).
+
+At the table the game draws its own pointer, which shows what a click will do: a gold ring over a
+piece you can touch or over the clock, a sight with a gold centre over a square the piece in hand
+can go to (Options > Gameplay > Game pointer switches back to the system arrow).
 
 A new game asks for the opponent's strength (Stockfish presets, or custom Skill Level / Elo /
 depth / move time / nodes) and the time control (unlimited, 1+0, 3+0, 3+2, 5+0, 5+3, 10+0, 10+5,
@@ -158,8 +167,8 @@ Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-librar
 Settings are stored in `Scacelith.ini` next to the executable when that folder is writable,
 otherwise in `%APPDATA%\Scacelith\`. All of them are editable from the Options page: display
 mode and resolution, V-sync, render scale, quality preset, motion blur, depth of field,
-brightness, volumes, ambience, legal-move hints, mouse sensitivity, and the hand-over between the
-two players of a game on one PC (a camera flight, or an instant cut).
+brightness, volumes, ambience, legal-move hints, mouse sensitivity, the game pointer, and the
+hand-over between the two players of a game on one PC (a camera flight, or an instant cut).
 
 The interface speaks English, French, German, Spanish, Ukrainian, Russian, Arabic (laid out right
 to left), Japanese, Simplified Chinese and Traditional Chinese. The first start follows the
@@ -196,7 +205,9 @@ with N an index of the preset list, `--viewpoint 0..9`), `--tc N` (time control 
 x,y,z [--look x,y,z] [--fov deg]` (initial observer camera when watching; a detached camera in a
 normal game), `--handover-preview` (watching through the players' eyes with the clock frozen during
 each camera handover, the same hand-over as [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`,
-`--warp <seconds>` (simulate before the first frame), `--moves e2e4,e7e5,...` and `--ini <file>`.
+`--warp <seconds>` (simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
+`--mouse fx,fy` (pointer position as fractions of the window), `--glance` (start looking at the
+scoresheet) and `--ini <file>`.
 
 Two players on one PC: `--start --hotseat` starts one at once, with `--white-name N`, `--black-name
 N`, `--clock-right white|black`, `--rated` and `--handover <seconds>` (0 = instant cut). `--play

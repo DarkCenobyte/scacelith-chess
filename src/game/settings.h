@@ -38,6 +38,7 @@ struct Settings {
     bool showCoordinates = false; // board has no printed coordinates by default (tournament boards)
     float mouseSensitivity = 1.0f;
     bool invertLook = false;
+    bool gameCursor = true;       // the game's own pointer at the table instead of the system arrow
     int nextColor = -1;           // -1 = random (first game), 0 = white, 1 = black
     // Hot-seat: the view goes from one player's eyes to the other's after each move, in a camera
     // flight of this length (0.8 to 2 s), or 0 = an instant cut through black (motion sickness).

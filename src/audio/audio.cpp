@@ -227,6 +227,11 @@ void setListener(m::vec3 position, m::vec3 forward, m::vec3 up) {
     g_listenerVersion.fetch_add(1, std::memory_order_release);
 }
 
+m::vec3 listenerPosition() {
+    std::lock_guard<std::mutex> lk(g_listenerMutex);
+    return g_listener.pos;
+}
+
 void play(Sfx s, m::vec3 position, float gain, float pitch) {
     if (int(s) < 0 || int(s) >= int(Sfx::Count) || !finiteVec(position) || !std::isfinite(gain) || !std::isfinite(pitch)) return;
     PlayRequest r;
@@ -254,10 +259,27 @@ void playFor(Sfx s, m::vec3 position, float seconds, float gain, float pitch) {
     pushPlay(r);
 }
 
-void playPenStroke(m::vec3 tip, float seconds, float gain) {
-    play(Sfx::PenTap, tip, gain);
+int penStrokeRequests(m::vec3 tip, float seconds, float gain, PlayRequest out[2]) {
+    PlayRequest r;
+    r.sfx = Sfx::PenTap;
+    r.pos = tip;
+    r.gain = gain;
+    r.bus = Bus::Effects;
+    r.spatial = true;
+    out[0] = r;
     // Very short strokes (dots) are mostly the tick; the friction needs a few milliseconds to sound.
-    if (seconds > 0.015f) playFor(Sfx::PenWrite, tip, seconds, gain);
+    if (!(seconds > 0.015f) || !std::isfinite(seconds)) return 1;
+    r.sfx = Sfx::PenWrite;
+    r.duration = seconds;
+    out[1] = r;
+    return 2;
+}
+
+void playPenStroke(m::vec3 tip, float seconds, float gain) {
+    if (!finiteVec(tip) || !std::isfinite(gain)) return;
+    PlayRequest r[2];
+    const int n = penStrokeRequests(tip, seconds, gain, r);
+    for (int i = 0; i < n; ++i) pushPlay(r[i]);
 }
 
 void playUI(Sfx s, float gain) {

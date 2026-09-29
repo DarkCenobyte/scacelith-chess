@@ -9,6 +9,7 @@
 #include "../ui/ui_font.h"
 #include "../ui/ui_online.h"
 #include "layout.h"
+#include "scoresheet_layout.h"
 #include "settings.h"
 #include <algorithm>
 #include <cmath>
@@ -29,6 +30,9 @@ constexpr float kFadeOut = 0.8f;          // menu -> black
 constexpr float kFadeIn = 1.6f;           // black -> seated at the table
 constexpr float kFov = 52.0f * DEG;
 constexpr float kEyeLimit = 18.0f * DEG;
+constexpr float kGlanceFov = 24.0f * DEG;  // looking at one's own scoresheet (S): a closer look
+constexpr float kGlanceTime = 0.45f;       // seconds to turn to the scoresheet and back
+constexpr float kEyeFStop = 11.0f;         // the player's eyes at kFov: a 2.2 mm pupil in a bright hall
 
 anim::Task task(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0), float height = 0.0f) {
     anim::Task k;
@@ -132,6 +136,13 @@ bool GameScene::init(AppContext& ctx) {
     skipIntro_ = ctx.hasArg("--no-intro");
     handoverPreview_ = ctx.hasArg("--handover-preview");
     debugCamera_ = ctx.hasArg("--cam");
+    if (ctx.hasArg("--mouse")) {
+        std::vector<std::string> c = split(ctx.argValue("--mouse"), ',');
+        if (c.size() == 2) {
+            mouseOverride_ = true;
+            mouseOverridePos_ = vec2(float(std::atof(c[0].c_str())), float(std::atof(c[1].c_str())));
+        }
+    }
 
     Settings& s = settings();
     setup_.difficulty = s.difficultyPreset;
@@ -231,6 +242,7 @@ void GameScene::finishLoading() {
             int id = board_.idAt(parseSquare(touch));
             if (id >= 0) humanTouch(id);
         }
+        glance_ = !watching() && ctx_->hasArg("--glance");
     } else {
         enterMenu();
     }
@@ -313,6 +325,9 @@ void GameScene::enterMenu() {
     cameraCut_ = true;
     plat::setMouseCaptured(false);
     dragging_ = false;
+    glance_ = false;
+    glanceBlend_ = 0.0f;
+    pressTouched_ = false;
     observerPlaced_ = false;
     followEyes_ = false;
     clockFrozen_ = false;
@@ -594,6 +609,9 @@ void GameScene::beginTurn() {
     touchedSq_ = placedTo_ = NoSquare;
     pressQueued_ = false;
     hoverId_ = -1;
+    aimSq_ = NoSquare;
+    aimLegal_ = false;
+    pressTouched_ = false;
     scriptWait_ = kScriptThink;
     if (online() && game_.status() != GameStatus::Ongoing) {
         turn_ = Turn::None;  // the server's GameEnd follows
@@ -721,7 +739,7 @@ void GameScene::applySettings(bool displayToo) {
         ps.exposureCompensation = s.brightness;
         // A seated player's eyes: gentle depth of field, only far objects soften.
         applyDofPreset(ps, s.depthOfField ? DofPreset::Subtle : DofPreset::Off);
-        ps.dofFStop = 8.0f;
+        ps.dofFStop = kEyeFStop;
         ps.dofMaxRadius = 8.0f;
     }
     audio::setMasterVolume(s.masterVolume);
@@ -747,6 +765,8 @@ void GameScene::shutdown(AppContext& ctx) {
         rateGame();
     }
     if (onlineSession().directActive()) onlineSession().closeDirect();
+    if (osCursorHidden_) plat::setCursorVisible(true);
+    osCursorHidden_ = false;
     engine_.shutdown();
     scorekeeper_.shutdown();
     ui::shutdown();
@@ -910,6 +930,19 @@ bool GameScene::update(AppContext& ctx, float dt) {
         drawOnlineHud();
     if (hotSeat() && (state_ == State::Intro || state_ == State::Handshake || state_ == State::Playing || state_ == State::GameOver))
         drawHotSeatHud();
+    if (!isHumanTurn() || (hotSeat() && inputBlocked_)) {
+        // Nobody aims: the opponent's turn, or (hot-seat) the view going over to the next player
+        // and the buttons still held by the previous one.
+        hoverId_ = -1;
+        aimSq_ = NoSquare;
+        clockHover_ = false;
+    }
+    // The game's pointer replaces the system arrow at the table (not over menus and cards).
+    bool hideArrow = gameCursorShown() && !ui::wantsMouse();
+    if (hideArrow != osCursorHidden_) {
+        plat::setCursorVisible(!hideArrow);
+        osCursorHidden_ = hideArrow;
+    }
 
     simulate(dt);
     return keepRunning;
@@ -1007,6 +1040,11 @@ void GameScene::simulate(float dt) {
     if (state_ == State::FadeToGame) firstPerson = false;
     updateCamera(dt, firstPerson);  // sets the player's head override before the animation update
     updateGaze(dt);
+    // Reading one's own scoresheet (S): the writing hand waits off the page meanwhile (the sheet
+    // of the player whose eyes are the view).
+    int reader = firstPersonSeat();
+    for (int seat = 0; seat < 2; ++seat)
+        scorekeeper_.setHandAside(seat, glance_ && !watching() && firstPerson && seat == reader);
     if (!frozen && state_ != State::Loading) {
         for (int seat = 0; seat < 2; ++seat) {
             events_.clear();
@@ -1132,61 +1170,129 @@ void GameScene::updateHumanInput() {
     Ray ray = mouseRay();
     float tPiece = 1e30f;
     int pid = pickPiece(ray, &tPiece);
-    const PieceObject* hovered = pid >= 0 ? board_.byId(pid) : nullptr;
+    PieceObject* p = pid >= 0 ? board_.byId(pid) : nullptr;
     const Color me = inputColor();  // the human, or in a hot-seat game the player to move
-    hoverId_ = (hovered && hovered->color == me && (turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched)) ? pid : -1;
+    bool ownPiece = p && p->color == me;
+    hoverId_ = ownPiece && turn_ == Turn::HumanIdle ? pid : -1;
+    float tClock = 1e30f;
+    clockHover_ = world_.rayHitsClock(ray, &tClock) && tClock < tPiece;
+    // While a piece is in hand the pointer designates a square (shown on the board, see markers()).
+    bool castling = false;
+    aimSq_ = turn_ == Turn::HumanTouched && !clockHover_ ? aimSquare(ray, &castling) : NoSquare;
+    aimLegal_ = aimSq_ != NoSquare && legalDestination(aimSq_);
+    // A touched piece without a legal move may be let go: pointing at another of your pieces then
+    // offers it instead of a square.
+    bool canSwitch = turn_ == Turn::HumanTouched && ownPiece && pid != touchedId_ && !castling &&
+                     !arbiter_.touchedHasLegalMove(game_);
+    if (canSwitch) {
+        aimSq_ = NoSquare;
+        hoverId_ = pid;
+    }
 
     if (in.keyPressed[plat::KEY_SPACE] && !ui::wantsKeyboard()) {
         humanPressClock();
         return;
     }
+    // Drag and drop: the piece touched by this press goes to the square where the button is
+    // released (a release on its own square keeps it in hand, a click then chooses the square).
+    if (pressTouched_ && !in.mouseDown[plat::MOUSE_LEFT]) {
+        pressTouched_ = false;
+        float moved = length(cursorPixels() - pressPos_);
+        if (in.mouseReleased[plat::MOUSE_LEFT] && turn_ == Turn::HumanTouched && !dragging_ && !ui::wantsMouse() &&
+            moved > 0.012f * float(std::max(1, plat::height())) && aimSq_ != NoSquare && aimSq_ != touchedSq_) {
+            const PieceObject* occupant = board_.at(aimSq_);
+            if (castling || !occupant || occupant->color != me) humanPlace(aimSq_);
+        }
+        return;
+    }
     if (!in.mousePressed[plat::MOUSE_LEFT] || ui::wantsMouse() || dragging_) return;
 
-    float tClock = 1e30f;
-    if (world_.rayHitsClock(ray, &tClock) && tClock < tPiece) {
+    if (clockHover_) {
         humanPressClock();
         return;
     }
-    PieceObject* p = pid >= 0 ? board_.byId(pid) : nullptr;
-    Square sq = p ? p->square : pickSquare(ray);
 
     switch (turn_) {
     case Turn::HumanIdle:
-        if (p && p->color == me) humanTouch(p->id);
+        if (ownPiece) {
+            humanTouch(p->id);
+            if (turn_ == Turn::HumanTouched) {
+                pressTouched_ = true;
+                pressPos_ = cursorPixels();
+            }
+        }
         break;
     case Turn::HumanTouched: {
         PieceObject* touched = board_.byId(touchedId_);
-        bool sameSquare = (p && p->id == touchedId_) || (!p && sq == touchedSq_);
-        if (sameSquare) {
+        if (canSwitch) {
+            humanRelease();
+            humanTouch(p->id);
+            break;
+        }
+        if (castling) {
+            humanPlace(aimSq_);
+            break;
+        }
+        const PieceObject* occupant = aimSq_ != NoSquare ? board_.at(aimSq_) : nullptr;
+        bool ownSquare = occupant && occupant->color == me && occupant->id != touchedId_;
+        if (aimSq_ == touchedSq_) {
             if (!arbiter_.touchedHasLegalMove(game_)) {
                 humanRelease();
-            } else {
+            } else if (touched) {
                 ui::notify(i18n::tr(std::string("notify.touched.") + pieceName(touched->type)), 3.0f);
             }
-        } else if (p && p->color == me) {
-            // Castling by pointing at the rook once the king is in hand.
-            if (touched && touched->type == King && p->type == Rook && rankOf(p->square) == rankOf(touchedSq_)) {
-                int file = fileOf(p->square) > fileOf(touchedSq_) ? 6 : 2;
-                Square to = makeSquare(file, rankOf(touchedSq_));
-                if (game_.position().findLegal(touchedSq_, to).valid()) {
-                    humanPlace(to);
-                    break;
-                }
-            }
-            if (!arbiter_.touchedHasLegalMove(game_)) {
-                humanRelease();
-                humanTouch(p->id);
-            } else {
-                ui::notify(i18n::tr(std::string("notify.touched.") + pieceName(touched->type)), 3.0f);
-            }
-        } else if (sq != NoSquare) {
-            humanPlace(sq);
+        } else if (ownSquare || (aimSq_ == NoSquare && ownPiece)) {
+            if (touched) ui::notify(i18n::tr(std::string("notify.touched.") + pieceName(touched->type)), 3.0f);
+        } else if (aimSq_ != NoSquare) {
+            humanPlace(aimSq_);
         }
         break;
     }
     case Turn::HumanPlaced: ui::notify(i18n::tr("notify.press_clock"), 2.5f); break;
     default: break;
     }
+}
+
+bool GameScene::legalDestination(Square to) const {
+    const PieceObject* mover = board_.byId(touchedId_);
+    if (!mover || touchedSq_ == NoSquare || to == NoSquare) return false;
+    bool promo = mover->type == Pawn && (rankOf(to) == 7 || rankOf(to) == 0);
+    return game_.position().findLegal(touchedSq_, to, promo ? Queen : NoPiece).valid();
+}
+
+Square GameScene::aimSquare(const Ray& ray, bool* castling) const {
+    if (castling) *castling = false;
+    if (touchedSq_ == NoSquare) return NoSquare;
+    const PieceObject* touched = board_.byId(touchedId_);
+    Square under = pickSquare(ray);
+    float tPiece = 1e30f;
+    int pid = pickPiece(ray, &tPiece);
+    const PieceObject* p = pid >= 0 && pid != touchedId_ ? board_.byId(pid) : nullptr;
+    if (touched) {
+        // Pointing at the piece in hand (gripped on its square) designates its own square.
+        float t = rayCylinderY(ray, touched->basePos, layout::PIECE_BASE_RADIUS[touched->type] * 1.12f,
+                               layout::PIECE_HEIGHT[touched->type]);
+        if (t >= 0.0f && (!p || t < tPiece)) return touchedSq_;
+    }
+    if (p && p->color == inputColor()) {
+        // Castling by pointing at the rook once the king is in hand.
+        if (touched && touched->type == King && p->type == Rook && rankOf(p->square) == rankOf(touchedSq_)) {
+            Square to = makeSquare(fileOf(p->square) > fileOf(touchedSq_) ? 6 : 2, rankOf(touchedSq_));
+            if (game_.position().findLegal(touchedSq_, to).valid()) {
+                if (castling) *castling = true;
+                return to;
+            }
+        }
+        // A piece never goes onto one of its own side: look through them at the square behind,
+        // which they often hide from a seated player.
+        return under;
+    }
+    if (p && under != NoSquare && under != p->square && settings().showLegalMoves) {
+        // An opposing piece stands in front of the square under the pointer: take whichever of
+        // the two the touched piece can go to (hints shown only, else this would tell).
+        if (!legalDestination(p->square) && legalDestination(under)) return under;
+    }
+    return p ? p->square : under;
 }
 
 void GameScene::humanTouch(int pieceId) {
@@ -1656,9 +1762,16 @@ void GameScene::answerAiDrawOffer(int offeringSeat) {
 // Camera, gaze, picking
 // =============================================================================================
 
-Ray GameScene::mouseRay() const {
+vec2 GameScene::cursorPixels() const {
+    if (mouseOverride_)
+        return vec2(mouseOverridePos_.x * float(std::max(1, plat::width())), mouseOverridePos_.y * float(std::max(1, plat::height())));
     const plat::Input& in = plat::input();
-    return camera_.screenRay(in.mouseX, in.mouseY, std::max(1, plat::width()), std::max(1, plat::height()));
+    return vec2(in.mouseX, in.mouseY);
+}
+
+Ray GameScene::mouseRay() const {
+    vec2 c = cursorPixels();
+    return camera_.screenRay(c.x, c.y, std::max(1, plat::width()), std::max(1, plat::height()));
 }
 
 int GameScene::pickPiece(const Ray& ray, float* tOut) const {
@@ -1694,6 +1807,7 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     Settings& s = settings();
     camera_.fovY = kFov;
     camera_.nearZ = 0.02f;
+    if (!firstPerson) glance_ = false;
     if (!firstPerson) {
         // Title screen: slow cinematic drift around the table.
         menuAngle_ += dt * 0.035f;
@@ -1718,8 +1832,20 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
             dragging_ = true;
             plat::setMouseCaptured(true);
         }
-        if (in.mousePressed[plat::MOUSE_MIDDLE] || (in.keyPressed['C'] && !ui::wantsKeyboard())) L.yaw = L.pitch = 0.0f;
+        if (in.mousePressed[plat::MOUSE_MIDDLE] || (in.keyPressed['C'] && !ui::wantsKeyboard())) {
+            L.yaw = L.pitch = 0.0f;
+            glance_ = false;
+        }
         if (!ui::wantsMouse()) L.lean = clamp(L.lean + in.wheel * 0.2f, 0.0f, 1.0f);
+        // S: a look at your own scoresheet, out of sight on the table beside you, and back.
+        if (!watching() && in.keyPressed['S'] && !ui::wantsKeyboard()) glance_ = !glance_;
+    }
+    if (dragging_ && glanceBlend_ > 0.0f) {
+        // Looking around from the scoresheet starts from where the eyes are.
+        L.yaw = L.gazeYaw;
+        L.pitch = L.gazePitch - kBaseGazePitch;
+        glance_ = false;
+        glanceBlend_ = 0.0f;
     }
     if (dragging_ && !in.mouseDown[plat::MOUSE_RIGHT]) {
         dragging_ = false;
@@ -1732,14 +1858,31 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     }
     L.yaw = clamp(L.yaw, -1.45f, 1.45f);
     L.pitch = clamp(L.pitch, -1.1f - kBaseGazePitch, 0.75f - kBaseGazePitch);
-    // The gaze drifts a little towards the cursor, like eyes following the hand.
+    // The gaze drifts a little towards the cursor, like eyes following the hand; not while a piece
+    // is in hand, when the board must stay still under the pointer that aims at a square, nor
+    // during a hot-seat handover.
     float cx = 0.0f, cy = 0.0f;
-    if (!dragging_ && !handingOver && in.mouseInWindow && plat::width() > 0 && !ctx_->screenshotMode) {
-        cx = clamp(in.mouseX / float(plat::width()) - 0.5f, -0.5f, 0.5f);
-        cy = clamp(in.mouseY / float(plat::height()) - 0.5f, -0.5f, 0.5f);
+    bool aiming = turn_ == Turn::HumanTouched || turn_ == Turn::HumanPlacing;
+    if (!dragging_ && !aiming && !handingOver && in.mouseInWindow && plat::width() > 0 && !ctx_->screenshotMode) {
+        vec2 c = cursorPixels();
+        cx = clamp(c.x / float(plat::width()) - 0.5f, -0.5f, 0.5f);
+        cy = clamp(c.y / float(plat::height()) - 0.5f, -0.5f, 0.5f);
     }
     float targetYaw = L.yaw - cx * 0.11f;
     float targetPitch = kBaseGazePitch + L.pitch - cy * 0.08f;
+    glanceBlend_ = clamp(glanceBlend_ + (glance_ ? dt : -dt) / kGlanceTime, 0.0f, 1.0f);
+    if (glanceBlend_ > 0.0f) {
+        // Eyes on the middle of the scoresheet, from where they are now (the head turns them).
+        vec3 eye = anim_[seat].eyeCameraTransform().c[3].xyz();
+        vec3 d = glanceTarget() - eye;
+        float zs = seat == 0 ? 1.0f : -1.0f;  // the seat faces -Z * zs
+        float yaw = std::atan2(-zs * d.x, -zs * d.z);
+        float pitch = std::atan2(d.y, length(vec2(d.x, d.z)));
+        float b = smootherstep(glanceBlend_);
+        targetYaw = lerp(targetYaw, yaw, b);
+        targetPitch = lerp(targetPitch, pitch, b);
+        camera_.fovY = lerp(kFov, kGlanceFov, b);
+    }
     float k = 1.0f - std::exp(-dt * 7.0f);
     L.gazeYaw += (targetYaw - L.gazeYaw) * k;
     L.gazePitch += (targetPitch - L.gazePitch) * k;
@@ -1756,6 +1899,15 @@ void GameScene::firstPersonView(int seat, vec3& position, quat& orientation) con
     float eyeYaw = clamp(L.gazeYaw - L.headYaw, -kEyeLimit, kEyeLimit);
     float eyePitch = clamp(L.gazePitch - L.headPitch, -kEyeLimit, kEyeLimit);
     q = normalize(q * axisAngle(vec3(0, 1, 0), eyeYaw) * axisAngle(vec3(1, 0, 0), eyePitch));
+    if (glanceBlend_ > 0.0f && (seat & 1) == firstPersonSeat()) {
+        // Reading the scoresheet beside you, the head tilts a little towards the lines.
+        sheet::PadFrame f = sheet::padFrame(seat & 1, world_.clockOnPositiveX());
+        vec3 fw = rotate(q, vec3(0, 0, -1)), up = rotate(q, vec3(0, 1, 0)), rt = rotate(q, vec3(1, 0, 0));
+        vec3 pageUp = -f.down - fw * dot(-f.down, fw);
+        float roll = std::atan2(dot(pageUp, rt), std::max(1e-4f, dot(pageUp, up)));
+        roll = clamp(roll * 0.45f, -28.0f * DEG, 28.0f * DEG) * smootherstep(glanceBlend_);
+        q = normalize(q * axisAngle(vec3(0, 0, 1), -roll));
+    }
     vec3 fwd = rotate(q, vec3(0, 0, -1));
     vec3 flat = normalize(vec3(fwd.x, 0.0f, fwd.z) + vec3(1e-4f, 0, 0));
     position = e.c[3].xyz() + flat * (0.11f * L.leanSmooth) + vec3(0, -0.05f * L.leanSmooth, 0);
@@ -1829,24 +1981,59 @@ void GameScene::updateGaze(float dt) {
 std::vector<Marker> GameScene::markers() const {
     std::vector<Marker> out;
     if (state_ != State::Playing || paused_ || (hotSeat() && handover_.active())) return out;
-    if (turn_ == Turn::HumanIdle && hoverId_ >= 0) {
-        const PieceObject* p = board_.pieces().size() > size_t(hoverId_) ? &board_.pieces()[size_t(hoverId_)] : nullptr;
+    // The piece under the pointer that a click would take (Idle, or a switch when the touched
+    // piece cannot move).
+    if ((turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched) && hoverId_ >= 0) {
+        const PieceObject* p = board_.byId(hoverId_);
         if (p && p->square != NoSquare) out.push_back({p->square, 0, 1.0f});
     }
     if (turn_ == Turn::HumanTouched && touchedSq_ != NoSquare) {
         out.push_back({touchedSq_, 1, 1.0f});
-        if (settings().showLegalMoves) {
+        bool hints = settings().showLegalMoves;
+        if (hints) {
             const Position& pos = game_.position();
             bool seen[64] = {};
             for (const Move& mv : pos.legalMovesFrom(touchedSq_)) {
-                if (seen[mv.to]) continue;
+                if (seen[mv.to] || mv.to == aimSq_) continue;
                 seen[mv.to] = true;
                 bool capture = !pos.at(mv.to).empty() || (mv.flags & MoveEnPassant);
                 out.push_back({mv.to, capture ? 3 : 2, 1.0f});
             }
         }
+        // Where a click would put the piece. With hints, a square it cannot reach stays neutral;
+        // without them every square looks the same (nothing tells a legal move).
+        if (aimSq_ != NoSquare && aimSq_ != touchedSq_) out.push_back({aimSq_, hints && !aimLegal_ ? 5 : 4, 1.0f});
     }
     return out;
+}
+
+bool GameScene::gameCursorShown() const {
+    if (!settings().gameCursor || watching() || paused_ || dragging_ || ui::optionsOpen()) return false;
+    if (state_ != State::Playing && state_ != State::Intro && state_ != State::Handshake && state_ != State::GameOver) return false;
+    if (turn_ == Turn::HumanPromotion) return false;
+    return !(state_ == State::GameOver && gameOverShown_ && !ui::gameOverFolded());
+}
+
+ui::GameCursor GameScene::gameCursorKind() const {
+    // Hot-seat: dimmed until the buttons held by the previous player are released.
+    if (state_ != State::Playing || !isHumanTurn() || (hotSeat() && inputBlocked_)) return ui::GameCursor::Waiting;
+    switch (turn_) {
+    case Turn::HumanIdle: return hoverId_ >= 0 ? ui::GameCursor::Piece : ui::GameCursor::Idle;
+    case Turn::HumanTouched:
+        if (hoverId_ >= 0) return ui::GameCursor::Piece;
+        if (aimSq_ == NoSquare || aimSq_ == touchedSq_) return ui::GameCursor::Holding;
+        return settings().showLegalMoves && !aimLegal_ ? ui::GameCursor::Holding : ui::GameCursor::Square;
+    case Turn::HumanPlacing:
+    case Turn::HumanPlaced: return clockHover_ ? ui::GameCursor::Clock : ui::GameCursor::Idle;
+    default: return ui::GameCursor::Idle;
+    }
+}
+
+vec3 GameScene::glanceTarget() const {
+    // The sheet of the player whose eyes are the view (hot-seat: the player at the table).
+    int seat = firstPersonSeat();
+    sheet::PadFrame f = sheet::padFrame(seat < 0 ? humanSeat() : seat, world_.clockOnPositiveX());
+    return f.center + vec3(0.0f, layout::SCORESHEET_THICKNESS, 0.0f);
 }
 
 ClockDisplay GameScene::clockDisplay() const {
@@ -1893,35 +2080,54 @@ void GameScene::render(AppContext& ctx, float dt) {
         }
     }
     render::Environment env = world_.environment(time_);
-    // Eyes focus where the player looks: the board / table under the centre of the view.
+    // Eyes focus on what the player looks at: whatever lies under the centre of the view.
     {
         float target;
         bool inEyes = firstPerson && !(hotSeat() && handover_.flying()) && headless == viewSeat();
         if (observer || (firstPerson && !inEyes)) {
             target = observerFocus(cam);
+        } else if (firstPerson) {
+            // The eyes follow the pointer (they are on the piece or the square being aimed at, or
+            // on the scoresheet the pointer rests on); while the player reads his sheet (S) or
+            // turns his head, they look straight ahead.
+            bool pointer = glanceBlend_ < 0.5f && !dragging_ && !paused_ && !ui::wantsMouse() && state_ == State::Playing;
+            target = firstPersonFocus(pointer ? mouseRay() : Ray{cam.position, cam.forward()});
         } else {
-            Ray centre{cam.position, cam.forward()};
-            float t = rayPlane(centre, vec3(0, layout::BOARD_TOP_Y, 0), vec3(0, 1, 0));
-            target = (t > 0.0f && t < 3.0f) ? t : 2.5f;
-            if (!firstPerson) target = length(cam.position - vec3(0, 0.9f, 0));
+            target = length(cam.position - vec3(0, 0.9f, 0));
         }
         focusDistance_ = focusDistance_ <= 0.0f ? target : focusDistance_ + (target - focusDistance_) * (1.0f - std::exp(-dt * 6.0f));
         r.post().settings.dofFocusDistance = focusDistance_;
+        // The player's view narrows to read the scoresheet (S), but eyes do not zoom: the depth of
+        // field keeps the blur of the normal view instead of a telephoto's (the same f-number at 24
+        // degrees would blur 5.5 times more than at 52).
+        float zoom = std::tan(kFov * 0.5f) / std::tan(std::max(cam.fovY, 1.0f * DEG) * 0.5f);
+        r.post().settings.dofFStop = firstPerson && !observer ? kEyeFStop * zoom * zoom : kEyeFStop;
     }
     if (cameraCut_) {
         r.post().settings.resetHistory = true;
         cameraCut_ = false;
         for (auto& h : hasPrevGlobals_) h = false;
     }
+    // Eyes adapt to the page when the player looks at their scoresheet (it lies in the body's
+    // shadow, and the sunlit floor around it would keep the exposure low).
+    r.post().settings.exposureCompensation = settings().brightness + 0.6f * smootherstep(glanceBlend_);
     r.fade = hotSeat() ? std::max(fade_, handover_.fade()) : fade_;  // a hot-seat cut goes through black
     r.beginFrame(cam, env, dt);
     if (state_ != State::Loading) {
         world_.submitStatic(r);
         world_.submitPieces(r, board_);
         world_.submitClock(r, clockDisplay());
+        // Through the player's eyes, the playing arm fades to a see-through ghost while a piece is
+        // in hand, so the squares under it stay readable (the piece itself stays opaque). The arm
+        // is the carrying player's (hot-seat: the player to move); it fades back on that arm.
+        bool ghostArm = !watching() && state_ == State::Playing && headless == inputSeat() &&
+                        (turn_ == Turn::HumanTouched || turn_ == Turn::HumanPlacing || turn_ == Turn::HumanPromotion);
+        if (ghostArm) armSeeThroughSeat_ = inputSeat();
+        armSeeThrough_ = clamp(armSeeThrough_ + (ghostArm ? dt : -dt) / 0.2f, 0.0f, 1.0f);
         for (int seat = 0; seat < 2; ++seat) {
             const mat4* g = anim_[seat].globals();
-            world_.submitRobot(r, seat, g, hasPrevGlobals_[seat] ? prevGlobals_[seat] : nullptr, seat == headless);
+            world_.submitRobot(r, seat, g, hasPrevGlobals_[seat] ? prevGlobals_[seat] : nullptr, seat == headless,
+                               !watching() && seat == armSeeThroughSeat_ ? armSeeThrough_ : 0.0f, seats_[seat].playHand);
             for (int b = 0; b < character::BoneCount; ++b) prevGlobals_[seat][b] = g[b];
             hasPrevGlobals_[seat] = true;
         }
@@ -1950,6 +2156,10 @@ void GameScene::renderOverlay(AppContext&, float) {
     }
     ui::moveList(game_.sanMoves(), inGame && showMoveList_);
     ui::drawNotifications();
+    // No pointer while the view goes over to the other player (hot-seat): the arrow stays hidden.
+    if (osCursorHidden_ && !(hotSeat() && handover_.active()) &&
+        (mouseOverride_ || (plat::input().mouseInWindow && !ctx_->screenshotMode)))
+        ui::gameCursor(cursorPixels(), gameCursorKind());
     ui::endFrame();
 }
 
@@ -2108,6 +2318,42 @@ int GameScene::headNearCamera(vec3 p) const {
         if (length(p - centre) < 0.16f) return seat;
     }
     return -1;
+}
+
+float GameScene::firstPersonFocus(const Ray& ray) const {
+    // The nearest of what the table holds along the gaze (the opponent's face, a piece, the clock,
+    // the board, a scoresheet, the table), else the floor of the hall. A plane through the board
+    // alone focused far beyond the table whenever the player looked aside.
+    float best = 1e30f;
+    auto consider = [&](float t) {
+        if (t > 0.05f && t < best) best = t;
+    };
+    int me = viewSeat();
+    int opponent = 1 - (me < 0 ? humanSeat() : me);
+    vec3 face = anim_[opponent].eyeCameraTransform().c[3].xyz() - ray.o;
+    float faceDist = length(face);
+    if (faceDist > 0.2f && dot(face / faceDist, ray.d) > std::cos(8.0f * DEG)) consider(faceDist);
+    float tPiece = 1e30f;
+    if (pickPiece(ray, &tPiece) >= 0) consider(tPiece);
+    float tClock = 1e30f;
+    if (world_.rayHitsClock(ray, &tClock)) consider(tClock);
+    auto rect = [&](float y, float halfX, float halfZ, vec3 centre, vec3 axisX, vec3 axisZ) {
+        float t = rayPlane(ray, vec3(0, y, 0), vec3(0, 1, 0));
+        if (t <= 0.0f) return;
+        vec3 d = ray.o + ray.d * t - centre;
+        if (std::abs(dot(d, axisX)) <= halfX && std::abs(dot(d, axisZ)) <= halfZ) consider(t);
+    };
+    const vec3 X(1, 0, 0), Z(0, 0, 1);
+    rect(layout::BOARD_TOP_Y, 0.5f * layout::BOARD_SIZE, 0.5f * layout::BOARD_SIZE, vec3(0), X, Z);
+    for (int seat = 0; seat < 2; ++seat) {
+        sheet::PadFrame f = sheet::padFrame(seat, world_.clockOnPositiveX());
+        rect(layout::TABLE_TOP_Y + layout::SCORESHEET_THICKNESS, 0.5f * layout::SCORESHEET_WIDTH, 0.5f * layout::SCORESHEET_LENGTH,
+             f.center, f.right, f.down);
+    }
+    rect(layout::TABLE_TOP_Y, 0.5f * layout::TABLE_WIDTH, 0.5f * layout::TABLE_DEPTH, vec3(0), X, Z);
+    if (best < 1e29f) return best;
+    float tFloor = rayPlane(ray, vec3(0), vec3(0, 1, 0));
+    return tFloor > 0.0f ? std::min(tFloor, 8.0f) : 4.0f;
 }
 
 float GameScene::observerFocus(const render::Camera& cam) const {

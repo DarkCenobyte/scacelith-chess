@@ -78,6 +78,8 @@ options.handover = Смена игрока
 options.handover.cut = Мгновенно
 options.handover.flight = Полёт, {0} с
 options.handover.help = Два игрока за одним компьютером: как после каждого хода вид переходит от глаз одного игрока к глазам другого. Мгновенная смена обходится без движения камеры.
+options.game_cursor = Игровой курсор
+options.game_cursor.help = За столом игра рисует собственный курсор, который показывает, что сделает щелчок. Выключено: обычная системная стрелка.
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = Имя
@@ -97,6 +99,8 @@ controls.clock.keys = Пробел  или  щелчок по часам
 controls.clock = Нажать на часы
 controls.look.keys = Правая кнопка, удерживать
 controls.look = Осмотреться
+controls.sheet.keys = S
+controls.sheet = Взглянуть на свой бланк и обратно
 controls.moves.keys = Tab
 controls.moves = Показать или скрыть ходы
 controls.menu.keys = Esc

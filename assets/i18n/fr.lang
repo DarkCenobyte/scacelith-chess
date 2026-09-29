@@ -78,6 +78,8 @@ options.handover = Changement de joueur
 options.handover.cut = Coupe instantanée
 options.handover.flight = Vol, {0} s
 options.handover.help = Deux joueurs sur un même PC : comment la vue passe des yeux d’un joueur à ceux de l’autre après chaque coup. La coupe instantanée évite le mouvement de caméra.
+options.game_cursor = Curseur du jeu
+options.game_cursor.help = À la table, le jeu dessine son propre curseur, qui montre ce que fera un clic. Désactivé : la flèche habituelle du système.
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = Nom
@@ -97,6 +99,8 @@ controls.clock.keys = Espace  ou  clic sur la pendule
 controls.clock = Appuyer sur la pendule
 controls.look.keys = Clic droit maintenu
 controls.look = Regarder autour de soi
+controls.sheet.keys = S
+controls.sheet = Regarder votre feuille de partie, et revenir
 controls.moves.keys = Tab
 controls.moves = Afficher ou masquer les coups
 controls.menu.keys = Échap

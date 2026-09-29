@@ -205,6 +205,15 @@ and `hotseat::InputGate` ignores every button (and Space) held since then until 
 Markers and the legal-move hints are hidden during the handover. A players panel (top left) shows
 both names (and ratings when rated) and a caption names the player whose turn begins.
 
+The play comfort features follow the player to move as well: the in-game pointer (Options >
+Gameplay > Game pointer), the square aimed at while a piece is in hand, drag and drop, the clock
+hover and the see-through playing arm (the arm of the player who carries the piece). During the
+handover there is no pointer, no aiming and no hover (the system arrow stays hidden), and the
+pointer stays dimmed until the buttons held by the previous player are released. The look at
+one's own scoresheet (S) is one state of the view, not per seat: it reads the sheet of the player
+at the table and ends at their clock press (the flight starts from the sheet's narrower view and
+widens; a cut lets it end while the view darkens).
+
 ## What the seat refactor already provides
 
 - `Seat` (`game_scene.h`): colour, `Controller` (Human / Stockfish), name, Elo, provisional flag,

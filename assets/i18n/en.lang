@@ -85,6 +85,8 @@ options.handover = Hot-seat handover
 options.handover.cut = Instant cut
 options.handover.flight = Flight, {0} s
 options.handover.help = Two players on one PC: how the view goes from one player's eyes to the other's after each move. The instant cut avoids the camera motion.
+options.game_cursor = Game pointer
+options.game_cursor.help = At the table, the game draws its own pointer, which shows what a click will do. Off: the usual system arrow.
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = Name
@@ -104,6 +106,8 @@ controls.clock.keys = Space  or  click the clock
 controls.clock = Press the clock
 controls.look.keys = Right mouse, hold
 controls.look = Look around
+controls.sheet.keys = S
+controls.sheet = Look at your scoresheet, and back
 controls.moves.keys = Tab
 controls.moves = Show or hide the move list
 controls.menu.keys = Esc

@@ -77,6 +77,8 @@ options.handover = 换人视角
 options.handover.cut = 直接切换
 options.handover.flight = 飞行，{0} 秒
 options.handover.help = 两人在同一台电脑上对弈时，每步棋后视角如何从一方棋手的眼中转到另一方。直接切换可避免镜头移动。
+options.game_cursor = 游戏指针
+options.game_cursor.help = 在棋桌前，游戏会绘制自己的指针，提示点击将会做什么。关闭时使用系统箭头。
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = 姓名
@@ -96,6 +98,8 @@ controls.clock.keys = 空格键　或　点击棋钟
 controls.clock = 按棋钟
 controls.look.keys = 按住鼠标右键
 controls.look = 环顾四周
+controls.sheet.keys = S
+controls.sheet = 查看你的记录纸，再回到棋盘
 controls.moves.keys = Tab
 controls.moves = 显示或隐藏着法列表
 controls.menu.keys = Esc

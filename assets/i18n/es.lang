@@ -77,6 +77,8 @@ options.handover = Cambio de jugador
 options.handover.cut = Corte directo
 options.handover.flight = Vuelo, {0} s
 options.handover.help = Dos jugadores en un mismo PC: cómo pasa la vista de los ojos de un jugador a los del otro tras cada jugada. El corte directo evita el movimiento de cámara.
+options.game_cursor = Puntero del juego
+options.game_cursor.help = En la mesa, el juego dibuja su propio puntero, que indica lo que hará un clic. Desactivado: la flecha habitual del sistema.
 
 # ---- Player profile (Options > Player) ---------------------------------------------------------
 player.name = Nombre
@@ -96,6 +98,8 @@ controls.clock.keys = Espacio  o  clic en el reloj
 controls.clock = Pulsar el reloj
 controls.look.keys = Botón derecho, mantener
 controls.look = Mirar alrededor
+controls.sheet.keys = S
+controls.sheet = Mirar su planilla y volver
 controls.moves.keys = Tab
 controls.moves = Mostrar u ocultar las jugadas
 controls.menu.keys = Esc

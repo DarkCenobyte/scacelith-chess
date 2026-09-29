@@ -1,11 +1,15 @@
 // Animation tests (no GPU): the writing-hand helpers, the writing queue's event instants and pen
-// tip, writing never delaying the playing hand, and the left-handed player as the exact mirror
-// image of a right-handed one. The animator is not part of scacelith_core, so its sources are
-// compiled into this file.
+// tip, writing never delaying the playing hand, the left-handed player as the exact mirror image
+// of a right-handed one, and the first-person player writing on his own scoresheet as the game
+// wires it (pen, ink, PenDown sounds heard from his head). The animator is not part of
+// scacelith_core, so its sources are compiled into this file.
 #include "test.h"
 #include "../src/anim/animator.cpp"
 #include "../src/anim/animator_writing.cpp"
 #include "../src/character/skeleton.cpp"
+#include "audio/mixer.h"
+#include "audio/synth.h"
+#include "game/scoresheet_layout.h"
 
 namespace {
 
@@ -300,4 +304,267 @@ TEST(anim_left_handed_mirror) {
     CHECK_EQ(evBad, 0);
     CHECK(worst < 1e-4f);
     CHECK(penDiff < 1e-4f);
+}
+
+// ---- The first-person player's own scoresheet ----------------------------------------------------
+namespace {
+
+namespace sh = game::sheet;
+
+// A synthetic handwriting run (as in tests/scoresheet_tests.cpp): 0.5 em per glyph.
+sh::Run moveRun(const std::string& text) {
+    sh::Run r;
+    float pen = 0.0f;
+    for (size_t i = 0; i < text.size(); ++i) {
+        sh::RunGlyph g;
+        g.cp = uint32_t(uint8_t(text[i]));
+        g.penX = pen;
+        const bool tall = (text[i] >= 'A' && text[i] <= 'Z') || (text[i] >= '0' && text[i] <= '9');
+        g.x0 = 0.05f;
+        g.x1 = 0.45f;
+        g.y0 = tall ? -0.68f : -0.45f;
+        g.source = int(i);
+        r.glyphs.push_back(g);
+        pen += 0.5f;
+    }
+    r.advance = pen;
+    return r;
+}
+
+// One move on a pad as game::Scoresheet::beginMove builds it: the path (page mm) and its world keys.
+struct SheetEntry {
+    sh::PenPath path;
+    std::vector<PenKey> keys;
+};
+SheetEntry sheetEntry(const sh::PadFrame& f, int ply, const std::string& san, uint32_t seed) {
+    SheetEntry e;
+    e.path = sh::buildPenPath(sh::placeHandwriting(moveRun(san), sh::moveBox(ply), seed), seed);
+    for (const sh::PathKey& k : e.path.keys) {
+        PenKey pk;
+        pk.t = k.t;
+        pk.tip = f.padToWorld(sh::pageToPad(k.x, k.y, sh::PAD_TOP + 0.04f + k.lift));
+        pk.down = k.down;
+        e.keys.push_back(pk);
+    }
+    return e;
+}
+
+double frameEnergy(const std::vector<float>& s, size_t i) { return 0.5 * (double(s[2 * i]) * s[2 * i] + double(s[2 * i + 1]) * s[2 * i + 1]); }
+float toDb(double energy) { return float(10.0 * std::log10(std::max(energy, 1e-20))); }
+
+// Mean level (dBFS, unweighted) of a stereo buffer over frame ranges.
+float levelDb(const std::vector<float>& s, const std::vector<std::pair<size_t, size_t>>& ranges) {
+    double e = 0.0;
+    size_t n = 0;
+    for (const auto& r : ranges)
+        for (size_t i = r.first; i < r.second && i < s.size() / 2; ++i, ++n) e += frameEnergy(s, i);
+    return toDb(e / double(std::max<size_t>(n, 1)));
+}
+
+// Level (dBFS) of the loudest 50 ms.
+float loudest50msDb(const std::vector<float>& s) {
+    const size_t W = 2400, n = s.size() / 2;
+    double e = 0.0, best = 0.0;
+    for (size_t i = 0; i < n; ++i) {
+        e += frameEnergy(s, i);
+        if (i >= W) e -= frameEnergy(s, i - W);
+        if (i + 1 >= W) best = std::max(best, e / double(W));
+    }
+    return toDb(best);
+}
+
+}  // namespace
+
+// A human game as GameScene sets it up, for both colours of the human: the clock at his right, his
+// head driven by the first-person camera, both players recording 1. e4 Nf6 on their own pad while
+// his playing hand presses the clock, updated with the fixed 60 Hz step of --shot / --warp. On his
+// pad the pen is picked up and follows the path, the ink comes where the tip has passed, every
+// stroke puts the pen down on time, and its PenDown sound (what Scorekeeper::onEvent hands to
+// audio::playPenStroke) lasts the whole stroke. From his head (the listener at his eyes, default
+// volumes) his own pen is heard clearly: louder than his opponent's, below a piece being placed.
+TEST(anim_own_scoresheet_writing_heard_first_person) {
+    using anim::EventType;
+    const float dt = 1.0f / 60.0f;
+    const float kHumanGazePitch = -0.62f;   // GameScene: looking down at the board from the chair
+    const int spf = 800;                    // 48 kHz frames per update
+    for (int human = 0; human < 2; ++human) {
+        const bool clockPosX = human == 0;  // the clock stands at the human player's right
+        anim::Animator an[2];
+        sh::PadFrame pad[2];
+        std::vector<SheetEntry> entries[2];
+        std::vector<float> downsDue[2], strokeLen[2];   // pen-down instants and stroke lengths owed
+        for (int seat = 0; seat < 2; ++seat) {
+            const float zs = seat == 0 ? 1.0f : -1.0f;
+            // GameScene::initAnimators: the hand on the clock side plays, the other one writes.
+            const bool clockOnRight = (seat == 0) == clockPosX;
+            an[seat].init(character::robotSkeleton(), m::vec3(0, layout::PLAYER_PELVIS_Y, zs * layout::PLAYER_PELVIS_Z), zs,
+                          clockOnRight ? character::Side::Right : character::Side::Left);
+            const float side = an[seat].playHand() == character::Side::Right ? zs : -zs;
+            an[seat].setRestHand(m::vec3(side * 0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
+            // Scorekeeper: pads, pen on the table, the writing rest beside the first row, 1. e4 Nf6.
+            pad[seat] = sh::padFrame(seat, clockPosX);
+            const float restX = pad[seat].outerSign > 0.0f ? sh::PAGE_W - 4.0f : 4.0f;
+            an[seat].setWritingRest(pad[seat].padToWorld(sh::pageToPad(restX, sh::cellRect(sh::cellOf(0)).cy(), sh::PAD_TOP)));
+            WriteTask pick;
+            pick.type = WriteTaskType::PickPen;
+            pick.frame = sh::penRestTransform(pad[seat]);
+            an[seat].enqueueWriting(pick);
+            const uint32_t seed = 1u + uint32_t(seat) * 7919u;
+            entries[seat].push_back(sheetEntry(pad[seat], 0, "e4", seed * 31u));
+            entries[seat].push_back(sheetEntry(pad[seat], 1, "Nf6", seed * 37u));
+            float start = anim::Timing::PickPen;
+            for (const SheetEntry& en : entries[seat]) {
+                WriteTask w;
+                w.type = WriteTaskType::Write;
+                w.path = en.keys;
+                an[seat].enqueueWriting(w);
+                const auto& K = en.keys;
+                for (size_t i = 0; i + 1 < K.size(); ++i) {
+                    if (!K[i].down || (i > 0 && K[i - 1].down)) continue;
+                    size_t e = i + 1;
+                    while (e + 1 < K.size() && K[e].down) ++e;
+                    downsDue[seat].push_back(start + anim::Timing::WriteApproach + K[i].t);
+                    strokeLen[seat].push_back(K[e].t - K[i].t);
+                }
+                start += anim::writeTaskDuration(w);
+            }
+        }
+        CHECK(an[human].writingHand() == character::Side::Left);   // his pad lies at his left
+        an[human].setHeadOverride(true, 0.0f, kHumanGazePitch);
+        an[1 - human].lookAt(m::vec3(0, layout::BOARD_TOP_Y, 0));
+        // His playing hand is busy meanwhile: it presses the clock while he writes.
+        anim::Task wait;
+        wait.type = anim::TaskType::Wait;
+        wait.duration = 1.2f;
+        an[human].enqueue(wait);
+        an[human].enqueue(pressClock(clockPosX ? 1.0f : -1.0f, clockPosX ? 1.0f : -1.0f));
+
+        // Offline mixers (default volumes): his own pen, the opponent's pen (the same random draws:
+        // both players write the same number of strokes), a piece being placed.
+        audio::Mixer mix[3] = {audio::Mixer(21u), audio::Mixer(21u), audio::Mixer(23u)};
+        for (audio::Mixer& mx : mix) {
+            mx.prepare(48000.0f);
+            mx.setVolumes(0.9f, 1.0f, 0.7f);
+            mx.setAmbienceEnabled(false, true);
+            for (audio::Sfx sfx : {audio::Sfx::PenTap, audio::Sfx::PenWrite, audio::Sfx::PiecePlace})
+                for (int v = 0; v < audio::bankVariants(sfx); ++v) {
+                    audio::SoundBuffer* b = new audio::SoundBuffer();
+                    b->samples = audio::synthesize(sfx, 700u + uint32_t(int(sfx) * 13 + v));
+                    b->sfx = int(sfx);
+                    b->variant = v;
+                    mx.install(b);
+                }
+        }
+        std::vector<float> out[3];
+        std::vector<std::pair<size_t, size_t>> heard[2];   // frames of the strokes: his, the opponent's
+        size_t entry[2] = {0, 0}, strokes[2] = {0, 0}, revealed[2] = {0, 0};
+        int offPad = 0, lateDown = 0, shortSound = 0, wrongEars = 0, inkBack = 0, inkMissing = 0, clockPressed = 0;
+        float tipErr = 0.0f;
+        bool picked = false, heldWhileWriting = true;
+        for (int step = 0; step < int(4.2f / dt); ++step) {
+            // GameScene::render: the camera, and so the listener, is at the human player's eyes.
+            const m::mat4 eyes = an[human].eyeCameraTransform();
+            audio::ListenerPose lis;
+            lis.pos = eyes.translation();
+            lis.fwd = -m::normalize(eyes.c[2].xyz());
+            lis.up = m::normalize(eyes.c[1].xyz());
+            for (int seat = 0; seat < 2; ++seat) {
+                std::vector<anim::Event> ev;
+                an[seat].update(dt, ev);
+                for (const anim::Event& e : ev) {
+                    if (e.type == EventType::ClockPressed) ++clockPressed;
+                    if (e.type == EventType::PenPicked && seat == human) picked = true;
+                    if (e.type == EventType::WritingDone && entry[seat] < entries[seat].size()) {
+                        if (revealed[seat] != entries[seat][entry[seat]].path.bands.size()) ++inkMissing;
+                        ++entry[seat];
+                        revealed[seat] = 0;
+                    }
+                    if (e.type != EventType::PenDown || entry[seat] >= entries[seat].size()) continue;
+                    // On this seat's own pad, on the paper, at the instant of the path.
+                    const size_t k = strokes[seat]++;
+                    const m::vec3 rel = e.position - pad[seat].center;
+                    if (std::fabs(m::dot(rel, pad[seat].right)) > 0.5f * layout::SCORESHEET_WIDTH ||
+                        std::fabs(m::dot(rel, pad[seat].down)) > 0.5f * layout::SCORESHEET_LENGTH ||
+                        std::fabs(rel.y - layout::SCORESHEET_THICKNESS) > 0.001f)
+                        ++offPad;
+                    if (k >= downsDue[seat].size() || std::fabs(e.time - downsDue[seat][k]) > 1e-4f) {
+                        ++lateDown;
+                        continue;
+                    }
+                    // Scorekeeper::onEvent.
+                    const float late = std::max(0.0f, an[seat].time() - e.time), now = an[seat].writingPathTime();
+                    const sh::PenStrokeSound snd =
+                        sh::penStrokeSound(&entries[seat][entry[seat]].path, now >= 0.0f ? now - late : -1.0f, late, e.position,
+                                           an[seat].eyeCameraTransform().translation(), lis.pos);
+                    // The friction lasts what is left of the stroke (all of them are long here).
+                    if (!(snd.seconds > 0.03f) || std::fabs(snd.seconds - (strokeLen[seat][k] - late)) > 2e-3f) ++shortSound;
+                    // Heard from the writer's posture by the writer only.
+                    if (snd.writersOwn != (seat == human)) ++wrongEars;
+                    if (seat != human && m::length(snd.position - e.position) > 1e-6f) ++wrongEars;
+                    if (seat == human && std::fabs(m::length(snd.position - lis.pos) - sh::WRITER_EAR_DISTANCE) > 1e-4f) ++wrongEars;
+                    audio::PlayRequest req[2];
+                    const int n = audio::penStrokeRequests(snd.position, snd.seconds, snd.gain, req);
+                    const int stem = seat == human ? 0 : 1;
+                    CHECK_EQ(n, 2);
+                    for (int i = 0; i < n; ++i) CHECK(mix[stem].play(req[i]));
+                    const size_t at = out[stem].size() / 2;   // plays from the next block on
+                    heard[stem].push_back({at, at + size_t(snd.seconds * 48000.0f)});
+                }
+                // The pen follows the path; the ink appears where the tip has passed (Scorekeeper::update).
+                const float tp = an[seat].writingPathTime();
+                if (tp >= 0.0f && entry[seat] < entries[seat].size()) {
+                    const SheetEntry& en = entries[seat][entry[seat]];
+                    m::mat4 pen;
+                    if (!an[seat].penTransform(pen)) heldWhileWriting = false;
+                    else tipErr = std::max(tipErr, m::length(pen.translation() - anim::penPathPoint(en.keys, tp)));
+                    size_t r = 0;
+                    for (const sh::InkBand& b : en.path.bands) {
+                        const sh::PathKey& mid = en.path.keys[size_t((b.k0 + b.k1) / 2)];
+                        const float rt = sh::revealTime(en.path, b, mid.x, mid.y);
+                        if (rt >= 0.0f && rt <= tp) ++r;
+                    }
+                    if (r < revealed[seat]) ++inkBack;
+                    revealed[seat] = r;
+                }
+            }
+            if (step == 12) {   // a piece put down on e4, for comparison
+                audio::PlayRequest r;
+                r.sfx = audio::Sfx::PiecePlace;
+                r.pos = layout::squareCenter(4, 3);
+                r.gain = 0.9f;
+                r.pitch = 1.05f;
+                CHECK(mix[2].play(r));
+            }
+            for (int k = 0; k < 3; ++k) {
+                mix[k].setListener(lis);
+                const size_t o = out[k].size();
+                out[k].resize(o + 2 * size_t(spf));
+                mix[k].process(out[k].data() + o, spf);
+            }
+        }
+        const float own = levelDb(out[0], heard[0]), opp = levelDb(out[1], heard[1]), piece = loudest50msDb(out[2]);
+        std::fprintf(stderr, "  human %s: %zu / %zu strokes on his pad, pen tip error %.2f mm; from his head: his pen %.1f dBFS, "
+                     "the opponent's %.1f dBFS (mean while writing), a piece placed %.1f dBFS (loudest 50 ms)\n",
+                     human == 0 ? "White" : "Black", strokes[human], downsDue[human].size(), tipErr * 1000.0f, own, opp, piece);
+        CHECK(picked);
+        CHECK(heldWhileWriting);
+        CHECK(tipErr < 5e-4f);
+        CHECK_EQ(clockPressed, 1);
+        for (int seat = 0; seat < 2; ++seat) {
+            CHECK_EQ(entry[seat], entries[seat].size());
+            CHECK_EQ(strokes[seat], downsDue[seat].size());
+            CHECK(!an[seat].writingBusy());
+        }
+        CHECK(strokes[human] >= 5);
+        CHECK_EQ(offPad, 0);
+        CHECK_EQ(lateDown, 0);
+        CHECK_EQ(shortSound, 0);
+        CHECK_EQ(wrongEars, 0);
+        CHECK_EQ(inkBack, 0);
+        CHECK_EQ(inkMissing, 0);
+        // Clearly audible and nearer than the opponent's pen, well below a piece being placed.
+        CHECK(own > -55.0f);
+        CHECK(own - opp > 6.0f);
+        CHECK(piece - own > 6.0f && piece - own < 22.0f);
+    }
 }

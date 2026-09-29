@@ -705,9 +705,8 @@ void Scoresheet::finishEntry() {
 
 int Scoresheet::pendingEntries() const { return int(impl_->entries.size()); }
 
-float Scoresheet::strokeDurationAt(float t) const {
-    if (impl_->entries.empty() || t < 0.0f) return 0.0f;
-    return sheet::strokeDurationAt(impl_->entries.front().path, t);
+const sheet::PenPath* Scoresheet::writingPath() const {
+    return impl_->entries.empty() ? nullptr : &impl_->entries.front().path;
 }
 
 void Scoresheet::writeHeaderInstant(const Header& h) {
