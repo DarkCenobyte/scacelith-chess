@@ -4,6 +4,20 @@
 //   net-rt    the realtime WebSocket: connection, Hello/Welcome, heartbeats, reconnection with
 //             backoff, decoding of the server's messages into Events and the OnlineGame copy.
 //
+// Pacing, chosen for a server that may hold thousands of idle players on a small machine:
+//   - The client's own Ping (ping indicator, server clock offset) follows Welcome.clientPingMs
+//     (the server's CLIENT_PING_INTERVAL_MS, 10 s by default): one at once after Welcome and
+//     kPingBurst more about a second apart, so both values are right quickly, then one per
+//     interval. Liveness never depends on it: the connection is dead when the server's own
+//     heartbeat (Welcome.heartbeatMs) has been silent for two periods.
+//   - Automatic reconnections follow reconnectDelayMs() (online_client.h): full jitter, a long
+//     wait when the server is full, a spread first attempt after a shutdown, and never more than
+//     8 s between attempts while a game is in progress (the server's reconnection grace is short:
+//     15 s by default, also after a restart). For 10 minutes after losing a connection that had
+//     reached Welcome they reuse the /api/v1/info answer it was made with (one TLS handshake
+//     instead of two). A connect() asked by the player always reads /info again and never waits
+//     for the backoff.
+//
 // Keeping the realtime connection on its own thread means a slow HTTPS call (or a proof of
 // work) never delays the answer to a server Ping or the sending of a move. The game thread only
 // pushes commands (lambdas) and drains Events with poll(); the credential store has its own
@@ -107,6 +121,28 @@ bool plausibleToken(const std::string& t) {
     return true;
 }
 
+constexpr int kPingBurst = 3;                   // quick pings after the one sent at Welcome
+constexpr int kPingBurstGapMs = 1100;           // the server answers one Ping per 950 ms at most
+constexpr size_t kOffsetSamples = 8;            // clock offset: lowest round trip of the last 8
+constexpr auto kOffsetMaxAge = std::chrono::minutes(5);   // ...taken in the last 5 minutes
+constexpr auto kInfoReuse = std::chrono::minutes(10);     // /info answer reused on reconnection
+constexpr uint16_t kCloseServerFull = 4006;     // 4000 + ErrorCode::ServerFull (no CloseCode entry)
+
+// Random numbers for the reconnection jitter, seeded from the OS generator so that clients never
+// share a sequence (they would come back together).
+double jitterUniform() {
+    static thread_local std::mt19937_64 rng = [] {
+        uint64_t seed[2] = {0, 0};
+        if (!crypto::randomBytes(seed, sizeof seed)) {
+            seed[0] = uint64_t(std::random_device{}()) << 32 ^ std::random_device{}();
+            seed[1] = uint64_t(std::chrono::steady_clock::now().time_since_epoch().count());
+        }
+        std::seed_seq seq{uint32_t(seed[0]), uint32_t(seed[0] >> 32), uint32_t(seed[1]), uint32_t(seed[1] >> 32)};
+        return std::mt19937_64(seq);
+    }();
+    return std::uniform_real_distribution<double>(0.0, 1.0)(rng);
+}
+
 }  // namespace
 
 std::string ServerEndpoint::origin() const {
@@ -176,6 +212,32 @@ uint32_t positionDigest(const std::string& fen) {
     return h;
 }
 
+uint32_t reconnectDelayMs(int attempt, RetryCause cause, double u, bool gameInProgress, uint32_t retryAfterMs) {
+    if (!(u >= 0.0)) u = 0.0;                   // NaN too
+    if (u > 1.0) u = 1.0;
+    attempt = std::max(attempt, 0);
+    auto uniform = [u](double lo, double hi) { return lo + u * (hi - lo); };
+    // A game in progress must not be lost on the reconnection grace: 8 s at most between attempts.
+    const double cap = gameInProgress ? 8000.0 : 30000.0;
+    double ms;
+    if (cause == RetryCause::Shutdown && attempt == 0) {
+        ms = gameInProgress ? uniform(1000.0, 8000.0) : uniform(5000.0, 35000.0);
+    } else if (cause == RetryCause::ServerFull && !gameInProgress) {
+        ms = uniform(60000.0, 120000.0);
+    } else {
+        ms = uniform(500.0, std::min(cap, 2000.0 * std::pow(2.0, std::min(attempt, 16))));
+    }
+    if (retryAfterMs > 0) {
+        double ra = std::min(double(retryAfterMs), 600000.0);
+        ms = std::max(ms, std::min(ra * (1.0 + 0.5 * u), 600000.0));
+    }
+    return uint32_t(ms);
+}
+
+uint32_t clientPingIntervalMs(uint32_t announced) {
+    return announced == 0 ? 10000u : std::clamp<uint32_t>(announced, 1000u, 60000u);
+}
+
 // ---------------------------------------------------------------------------------------------
 // Impl
 // ---------------------------------------------------------------------------------------------
@@ -222,12 +284,25 @@ struct OnlineClient::Impl {
         bool welcomed = false;
         uint32_t seq = 0;
         uint32_t heartbeatMs = 0;
+        uint32_t pingEveryMs = 10000;                     // clientPingIntervalMs(Welcome.clientPingMs)
+        int pingBurst = 0;                                // quick pings still to send after Welcome
         uint32_t pingNonce = 0;
         struct Sent { uint32_t nonce = 0; Clock::time_point at{}; } sent[8];
-        std::deque<std::pair<double, double>> samples;   // (rtt, offset)
+        struct Sample { double rtt = 0, offset = 0; Clock::time_point at{}; };
+        std::deque<Sample> samples;
         double rttEma = -1;
+        Clock::time_point lastPong{};
         bool haveOffset = false;
         int lastFatal = 0;                                // ErrorCode of the last fatal Error
+        bool shutdownNotice = false;                      // Notice{ServerShutdown} on this connection
+        bool restarting = false;                          // lost to a shutdown, no Welcome since
+        // The /api/v1/info answer the last connection attempt used. proven: a connection built on
+        // it reached Welcome; at: when it was read, or when such a connection last ended.
+        struct Info {
+            bool valid = false, proven = false, insecure = false;
+            std::string origin, wsPath;
+            Clock::time_point at{};
+        } info;
         double banUntil = 0;
         OnlineGame game;
         uint32_t lastGseq = 0;
@@ -598,18 +673,30 @@ struct OnlineClient::Impl {
         ping.store(-1);
     }
 
-    void scheduleRetry() {
-        double base = std::min(15.0, 0.5 * std::pow(2.0, std::min(rt.attempt, 10)));
-        static thread_local std::mt19937 rng{std::random_device{}()};
-        double delay = std::clamp(base * std::uniform_real_distribution<double>(0.75, 1.25)(rng), 0.5, 15.0);
+    void scheduleRetry(RetryCause why, uint32_t retryAfterMs = 0) {
+        const bool inGame = rt.game.id != 0 && rt.game.status == int(pr::GameStatus::Ongoing);
+        uint32_t delay = reconnectDelayMs(rt.attempt, why, jitterUniform(), inGame, retryAfterMs);
         ++rt.attempt;
-        rt.nextAttempt = Clock::now() + std::chrono::milliseconds(int(delay * 1000));
+        rt.nextAttempt = Clock::now() + std::chrono::milliseconds(delay);
+        LOGI("net: next connection attempt in %.1f s", delay / 1000.0);
         setState(ConnState::Reconnecting);
     }
 
+    // Every outcome that stops the automatic reconnection (incompatible, unauthorized, certificate,
+    // banned, replaced...) also forgets the /info answer: the next connect() reads it again.
     void stopWanting(ConnState s, const std::string& error) {
         rt.wanted = false;
+        rt.info = Rt::Info();
+        rt.restarting = false;
         setState(s, error);
+    }
+
+    // The last /info answer serves an automatic attempt when a connection built on it reached
+    // Welcome, for the same endpoint, and it was read or last in use less than 10 minutes ago
+    // (a Hello accepted since then proved the protocol, a working upgrade the path).
+    bool infoReusable(const ServerEndpoint& e) const {
+        return rt.info.valid && rt.info.proven && rt.info.origin == e.origin() && rt.info.insecure == e.insecureDev &&
+               Clock::now() - rt.info.at < kInfoReuse;
     }
 
     void tryConnect() {
@@ -622,29 +709,40 @@ struct OnlineClient::Impl {
         if (!creds.get(e.origin(), c) || c.token.empty()) { stopWanting(ConnState::Unauthorized, "not_logged_in"); return; }
         if (!plausibleToken(c.token)) { creds.clearToken(e.origin()); stopWanting(ConnState::Unauthorized, "not_logged_in"); return; }
 
-        ServerInfo info;
-        Api a = fetchInfo(e, info, rtCancel);
-        if (gen != connectGen.load() || stopFlag.load()) return;
-        if (!a.ok()) {
-            if (a.error == "certificate" || a.error == "insecure" || a.error == "unavailable" || a.error == "invalid_server") {
-                stopWanting(ConnState::Offline, a.error);
-            } else {
-                scheduleRetry();
+        // /api/v1/info (compatibility, wsPath): read again, unless an automatic reconnection can
+        // reuse the answer a connection reached Welcome with (infoReusable).
+        const bool reused = infoReusable(e);
+        if (!reused) {
+            rt.info = Rt::Info();
+            ServerInfo info;
+            Api a = fetchInfo(e, info, rtCancel);
+            if (gen != connectGen.load() || stopFlag.load()) return;
+            if (!a.ok()) {
+                if (a.error == "certificate" || a.error == "insecure" || a.error == "unavailable" || a.error == "invalid_server") {
+                    stopWanting(ConnState::Offline, a.error);
+                } else {
+                    scheduleRetry(RetryCause::Failure, uint32_t(std::clamp(a.retryAfter, 0, 600)) * 1000u);
+                }
+                return;
             }
-            return;
+            if (!info.compatible) { stopWanting(ConnState::Incompatible, "incompatible"); return; }
+            if (!creds.get(e.origin(), c) || c.token.empty()) { stopWanting(ConnState::Unauthorized, "server_changed"); return; }
+            std::string path = a.body["wsPath"].asString("/ws");
+            bool pathOk = !path.empty() && path[0] == '/' && path.size() < 128;
+            for (char ch : path) pathOk = pathOk && ch > ' ' && ch <= '~';
+            rt.info.valid = true;
+            rt.info.origin = e.origin();
+            rt.info.insecure = e.insecureDev;
+            rt.info.wsPath = pathOk ? path : "/ws";
+            rt.info.at = Clock::now();
         }
-        if (!info.compatible) { stopWanting(ConnState::Incompatible, "incompatible"); return; }
-        if (!creds.get(e.origin(), c) || c.token.empty()) { stopWanting(ConnState::Unauthorized, "server_changed"); return; }
 
         WsParams p;
         p.host = e.host;                               // the WebSocket always goes to the API's host
         p.port = e.effectiveWsPort();                  // left empty: the API's port
         p.tls = !e.insecureDev;
         p.pinnedSha256 = p.tls ? effectivePin(e) : std::string();
-        std::string path = a.body["wsPath"].asString("/ws");
-        bool pathOk = !path.empty() && path[0] == '/' && path.size() < 128;
-        for (char ch : path) pathOk = pathOk && ch > ' ' && ch <= '~';
-        p.path = pathOk ? path : "/ws";
+        p.path = rt.info.wsPath;
         p.subprotocol = pr::kWsSubprotocol;
         p.maxMessageBytes = 256 * 1024;
         p.onActivity = [this] { wakeRt(); };
@@ -657,14 +755,28 @@ struct OnlineClient::Impl {
         }
         if (!ws) {
             LOGW("net: websocket %s:%u failed: %s", p.host.c_str(), p.port, err.c_str());
-            if (err == "certificate" || err == "insecure" || err == "unavailable" || err == "subprotocol") stopWanting(ConnState::Offline, err);
-            else scheduleRetry();
+            const bool refused = httpStatus != 0 && httpStatus != 503 && httpStatus != 429;
+            if (err == "certificate" || err == "insecure" || err == "unavailable") {
+                stopWanting(ConnState::Offline, err);
+            } else if (reused && (err == "subprotocol" || refused)) {
+                // The server may have changed since its /info was read: read it again next time.
+                rt.info = Rt::Info();
+                scheduleRetry(RetryCause::Failure);
+            } else if (err == "subprotocol") {
+                stopWanting(ConnState::Offline, err);
+            } else if (httpStatus == 503) {
+                // Full, unless the server is restarting (a draining server refuses upgrades with 503).
+                scheduleRetry(rt.restarting ? RetryCause::Failure : RetryCause::ServerFull);
+            } else {
+                scheduleRetry(RetryCause::Failure);
+            }
             return;
         }
         rt.ws = std::move(ws);
         rt.seq = 0;
         rt.welcomed = false;
         rt.lastFatal = 0;
+        rt.shutdownNotice = false;
         rt.connectedAt = rt.lastRecv = Clock::now();
         pr::Hello h;
         h.proto = pr::kProtocolVersion;
@@ -674,28 +786,41 @@ struct OnlineClient::Impl {
         send(h);
     }
 
+    // One client Ping; the next one follows the burst after Welcome, then Welcome.clientPingMs.
     void sendPing() {
         pr::C_Ping m;
         m.nonce = ++rt.pingNonce;
         rt.sent[m.nonce % 8] = {m.nonce, Clock::now()};
         send(m);
-        rt.nextPing = Clock::now() + std::chrono::seconds(2);
+        uint32_t next = rt.pingBurst > 0 ? uint32_t(kPingBurstGapMs) : rt.pingEveryMs;
+        if (rt.pingBurst > 0) --rt.pingBurst;
+        rt.nextPing = Clock::now() + std::chrono::milliseconds(next);
     }
 
     void onPong(const pr::S_Pong& m) {
         const Rt::Sent& s = rt.sent[m.nonce % 8];
         if (s.nonce != m.nonce || s.nonce == 0) return;
-        double rtt = std::chrono::duration<double, std::milli>(Clock::now() - s.at).count();
+        Clock::time_point now = Clock::now();
+        double rtt = std::chrono::duration<double, std::milli>(now - s.at).count();
         if (rtt < 0 || rtt > 60000) return;
-        rt.rttEma = rt.rttEma < 0 ? rtt : rt.rttEma + 0.25 * (rtt - rt.rttEma);
+        // Smoothed round trip: a quarter per sample at the burst's pace, half once samples are 10 s
+        // or more apart, so the indicator follows a lasting change within a sample or two whatever
+        // the interval (the weight grows with the time since the previous sample).
+        double gap = std::chrono::duration<double, std::milli>(now - rt.lastPong).count();
+        double w = std::clamp(gap / 20000.0, 0.25, 0.5);
+        rt.rttEma = rt.rttEma < 0 ? rtt : rt.rttEma + w * (rtt - rt.rttEma);
+        rt.lastPong = now;
         ping.store(int(std::lround(rt.rttEma)));
         // Clock offset: the server stamped its clock about rtt/2 before we received the Pong.
-        // Keep the sample with the lowest round trip of the last 8 (least queueing noise).
+        // Keep the sample with the lowest round trip (least queueing noise) among the last 8 of the
+        // last 5 minutes (with pings a minute apart, older ones would carry the clocks' drift).
         double offset = m.serverTime + rtt * 0.5 - localEpochMs();
-        rt.samples.emplace_back(rtt, offset);
-        if (rt.samples.size() > 8) rt.samples.pop_front();
-        auto best = std::min_element(rt.samples.begin(), rt.samples.end());
-        clockOffset.store(best->second);
+        rt.samples.push_back({rtt, offset, now});
+        while (rt.samples.size() > kOffsetSamples || (rt.samples.size() > 1 && now - rt.samples.front().at > kOffsetMaxAge))
+            rt.samples.pop_front();
+        auto best = std::min_element(rt.samples.begin(), rt.samples.end(),
+                                     [](const Rt::Sample& a, const Rt::Sample& b) { return a.rtt < b.rtt; });
+        clockOffset.store(best->offset);
         rt.haveOffset = true;
     }
 
@@ -758,6 +883,10 @@ struct OnlineClient::Impl {
             rt.welcomed = true;
             rt.attempt = 0;
             rt.heartbeatMs = m.heartbeatMs;
+            rt.pingEveryMs = clientPingIntervalMs(m.clientPingMs);
+            rt.pingBurst = kPingBurst;
+            rt.restarting = false;
+            if (rt.info.valid) rt.info.proven = true;
             if (!rt.haveOffset) clockOffset.store(m.serverTime - localEpochMs());
             setState(ConnState::Online);
             Event ev;
@@ -806,6 +935,7 @@ struct OnlineClient::Impl {
             pr::Notice m;
             if (!pr::decode(p, n, m)) return bad();
             if (m.code == pr::NoticeCode::Banned) rt.banUntil = m.arg;
+            if (m.code == pr::NoticeCode::ServerShutdown) rt.shutdownNotice = true;
             if (m.code == pr::NoticeCode::SessionRevoked) creds.clearToken(rt.ep.origin());
             if (m.code == pr::NoticeCode::ReplacedByNewConnection) rt.lastFatal = int(pr::ErrorCode::Replaced);
             Event ev;
@@ -984,7 +1114,9 @@ struct OnlineClient::Impl {
 
     void onClosed(uint16_t code, const std::string& reason) {
         LOGI("net: realtime connection closed (%u %s)", code, reason.c_str());
+        const bool wasOnline = rt.welcomed;
         dropSocket(1000);
+        if (wasOnline && rt.info.proven) rt.info.at = Clock::now();   // the /info answer worked until now
         int fatal = rt.lastFatal;
         if (code == pr::CloseCode::UnsupportedProtocol || fatal == int(pr::ErrorCode::UnsupportedProtocol)) {
             stopWanting(ConnState::Incompatible, "incompatible");
@@ -999,7 +1131,14 @@ struct OnlineClient::Impl {
             // Another client of this account took over: fighting back would loop forever.
             stopWanting(ConnState::Offline, "replaced");
         } else if (rt.wanted) {
-            scheduleRetry();
+            RetryCause why = RetryCause::Failure;
+            if (code == kCloseServerFull || fatal == int(pr::ErrorCode::ServerFull)) {
+                why = RetryCause::ServerFull;
+            } else if (code == pr::CloseCode::ShuttingDown || fatal == int(pr::ErrorCode::ShuttingDown) || rt.shutdownNotice) {
+                why = RetryCause::Shutdown;
+                rt.restarting = true;
+            }
+            scheduleRetry(why);
         } else {
             setState(ConnState::Offline);
         }
@@ -1037,6 +1176,7 @@ struct OnlineClient::Impl {
             }
             Clock::time_point now = Clock::now();
             if (rt.ws) {
+                // Liveness from the server's heartbeat only (never from our own, rarer, pings).
                 uint32_t silence = std::max<uint32_t>(10000, std::min<uint32_t>(rt.heartbeatMs, 60000) * 2);
                 if (!rt.welcomed && now - rt.connectedAt > std::chrono::seconds(10)) {
                     LOGW("net: no Welcome within 10 s");
@@ -1087,6 +1227,8 @@ void OnlineClient::setServer(const ServerEndpoint& ep) {
             d->rt.wanted = false;
             d->dropSocket(1000);
             d->rt.ep = e;
+            d->rt.info = Impl::Rt::Info();
+            d->rt.restarting = false;
             d->rt.game = OnlineGame();
             d->rt.pending = Impl::Rt::Pending();
             d->rt.banUntil = 0;
@@ -1390,8 +1532,10 @@ void OnlineClient::connect() {
         d->rt.ep = e;
         d->rt.wanted = true;
         if (!d->rt.ws) {
+            // Asked by the player: at once (never behind the backoff), with a fresh /info.
             d->rt.attempt = 0;
             d->rt.nextAttempt = Clock::now();
+            d->rt.info = Impl::Rt::Info();
         }
     });
 }

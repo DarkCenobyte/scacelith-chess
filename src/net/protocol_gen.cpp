@@ -889,6 +889,7 @@ void encode(const Welcome& m, std::vector<uint8_t>& out) {
     w.str8(m.username, 24);
     w.str8(m.serverName, 64);
     w.u32(m.heartbeatMs);
+    w.u32(m.clientPingMs);
     w.u16(m.maxMsgPerSec);
     w.u64(m.activeGame);
 }
@@ -901,6 +902,7 @@ bool decode(const uint8_t* p, size_t n, Welcome& out) {
            r.str8(out.username, 0, 24) &&
            r.str8(out.serverName, 0, 64) &&
            r.u32(out.heartbeatMs, 0u, 0xffffffffu) &&
+           r.u32(out.clientPingMs, 0u, 0xffffffffu) &&
            r.u16(out.maxMsgPerSec, 0u, 65535u) &&
            r.id53(out.activeGame) &&
            r.end();

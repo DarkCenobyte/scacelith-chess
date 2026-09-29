@@ -28,7 +28,7 @@ namespace proto {
 
 constexpr uint16_t kProtocolVersion = 1;
 constexpr uint16_t kProtocolMin = 1;
-constexpr uint32_t kSchemaHash = 0xf05042b2u;
+constexpr uint32_t kSchemaHash = 0x7b5d5600u;
 constexpr const char* kWsSubprotocol = "scacelith.v1";
 constexpr uint64_t kId53Limit = 1ull << 53;   // id53 values are below 2^53
 
@@ -317,7 +317,9 @@ struct Rematch {
     uint64_t game = 0;
     bool accept = false;
 };
-// Hello accepted. When activeGame != 0 a GameSnapshot follows.
+// Hello accepted. When activeGame != 0 a GameSnapshot follows. heartbeatMs: interval of the server
+// Ping; clientPingMs: interval the client should use for its own Ping (CLIENT_PING_INTERVAL_MS; 0
+// = the client's default).
 struct Welcome {
     static constexpr MsgType kType = MsgType::Welcome;
     static constexpr bool kClientToServer = false;
@@ -327,6 +329,7 @@ struct Welcome {
     std::string username;  // max 24
     std::string serverName;  // max 64
     uint32_t heartbeatMs = 0;
+    uint32_t clientPingMs = 0;
     uint16_t maxMsgPerSec = 0;
     uint64_t activeGame = 0;
 };
@@ -807,6 +810,7 @@ template <class V> void visitFields(Welcome& m, V&& v) {
     v("username", m.username);
     v("serverName", m.serverName);
     v("heartbeatMs", m.heartbeatMs);
+    v("clientPingMs", m.clientPingMs);
     v("maxMsgPerSec", m.maxMsgPerSec);
     v("activeGame", m.activeGame);
 }
@@ -817,6 +821,7 @@ template <class V> void visitFields(const Welcome& m, V&& v) {
     v("username", m.username);
     v("serverName", m.serverName);
     v("heartbeatMs", m.heartbeatMs);
+    v("clientPingMs", m.clientPingMs);
     v("maxMsgPerSec", m.maxMsgPerSec);
     v("activeGame", m.activeGame);
 }
