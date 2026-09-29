@@ -36,6 +36,10 @@ struct PlayRequest {
     float offset = -1.0f;
 };
 
+// The voices of one pen-down stroke (audio::playPenStroke): the touch-down tick at the tip and, when
+// the stroke is long enough to sound, a 'seconds' window of the ballpoint friction. Returns how many.
+int penStrokeRequests(m::vec3 tip, float seconds, float gain, PlayRequest out[2]);
+
 class Mixer {
 public:
     using RefreshFn = void (*)(void* user, int sfx, int variant);

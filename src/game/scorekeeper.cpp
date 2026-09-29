@@ -223,9 +223,12 @@ void Scorekeeper::onEvent(int seat, const anim::Event& e) {
     Scoresheet& sh = sheets_[seat];
     switch (e.type) {
     case anim::EventType::PenDown: {
-        float t = anim_[seat].writingPathTime();
-        float len = t >= 0.0f ? sh.strokeDurationAt(t) : 0.0f;
-        audio::playPenStroke(e.position, len, 0.9f);
+        // The event comes out at the end of the animator's update, 'late' after the tip touched.
+        const float late = std::max(0.0f, anim_[seat].time() - e.time), now = anim_[seat].writingPathTime();
+        const sheet::PenStrokeSound s =
+            sheet::penStrokeSound(sh.writingPath(), now >= 0.0f ? now - late : -1.0f, late, e.position,
+                                  anim_[seat].eyeCameraTransform().translation(), audio::listenerPosition());
+        audio::playPenStroke(s.position, s.seconds, s.gain);
         break;
     }
     case anim::EventType::WritingDone:
