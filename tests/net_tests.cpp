@@ -1777,7 +1777,9 @@ void shutdownNoticeScenario(PacingRig& r) {
 
 // With a game in progress the reconnection grace is short: even a full server is tried again
 // within seconds (8 s at most between attempts), not after a minute. After a shutdown too (1 s to
-// 8 s), and then the /info answer is read again (a restart may bring another server).
+// 8 s), with the /info answer of the connection that reached Welcome: a restart's reconnection
+// wave costs one TLS handshake per player, as a crash's (another server is caught at the 101
+// answer, below).
 void inGameScenario(PacingRig& r) {
     r.c->joinQueue("3+2", true);
     net::Event ev;
@@ -1792,8 +1794,35 @@ void inGameScenario(PacingRig& r) {
     r.srv.kick(pr::CloseCode::ShuttingDown);
     r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "in game, 4008: reconnecting");
     r.expect(r.until([&] { return r.srv.hellos.load() > hellos; }, 9500), "in game, 4008: tried again within 8 s");
-    r.expect(r.srv.infos.load() == infos + 1, "in game, 4008: /info read again after a shutdown");
+    r.expect(r.srv.infos.load() == infos,
+             "in game, 4008: the /info answer is reused after a shutdown (" + std::to_string(r.srv.infos.load() - infos) + " reads)");
     r.expect(r.stateIs(net::ConnState::Online, 3000), "in game: online after the restart");
+    r.expect(r.srv.infos.load() == infos, "in game: online after the restart without an /info read");
+}
+
+// A restart that brings another server at the same origin (a reinstall: another server id). The
+// client reuses the /info answer of the previous server after the shutdown, so the new server id
+// is seen in the 101 answer: the saved session is dropped instead of being sent in Hello.
+void restartServerChangedScenario(PacingRig& r) {
+    r.c->joinQueue("3+2", true);
+    net::Event ev;
+    r.expect(waitEvent(*r.c, net::Event::Kind::GameSnapshot, ev, 5000) && ev.game.id == 77, "in game: snapshot");
+    int hellos = r.srv.hellos.load(), infos = r.srv.infos.load(), ups = r.srv.upgrades.load();
+    r.srv.serverNo.store(2);
+    r.srv.kick(pr::CloseCode::ShuttingDown);
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "4008: reconnecting");
+    r.expect(waitEvent(*r.c, net::Event::Kind::ConnectionChanged, ev, 11000, nullptr,
+                       [](const net::Event& e) { return e.state == net::ConnState::Unauthorized; }) &&
+                 ev.error == "server_changed",
+             "4008, another server id: unauthorized (server_changed)");
+    r.expect(r.srv.upgrades.load() == ups + 1 && r.srv.infos.load() == infos,
+             "4008, another server id: seen at the upgrade, no /info read (" + std::to_string(r.srv.infos.load() - infos) +
+                 " reads, " + std::to_string(r.srv.upgrades.load() - ups) + " upgrades)");
+    r.expect(r.srv.hellos.load() == hellos, "4008, another server id: no Hello, the token was not sent");
+    r.expect(!r.c->hasSavedSession(), "4008, another server id: the saved session is dropped");
+    r.sleepMs(1500);
+    r.expect(r.srv.upgrades.load() == ups + 1 && r.c->state() == net::ConnState::Unauthorized,
+             "4008, another server id: no further attempt");
 }
 
 // A reverse proxy answering 502 at the upgrade (its backend restarts): retried like a network
@@ -1849,7 +1878,7 @@ void cheatScenario(PacingRig& r) {
 
 TEST(net_online_client_pacing) {
     if (!net::transportAvailable()) return;
-    constexpr int kRigs = 13;
+    constexpr int kRigs = 14;
     PacingRig rigs[kRigs];
     rigs[0].srv.clientPingMs.store(60000);
     rigs[5].srv.clientPingMs.store(3500);
@@ -1859,11 +1888,11 @@ TEST(net_online_client_pacing) {
     }
     const char* tags[kRigs] = {"pace-ping",     "pace-full",  "pace-shutdown", "pace-notice", "pace-ingame",
                                "pace-interval", "pace-probe", "pace-probe2",   "pace-502",    "pace-404",
-                               "pace-srvid",    "pace-cheat", "pace-restart-full"};
+                               "pace-srvid",    "pace-cheat", "pace-restart-full", "pace-srvid-restart"};
     void (*scenarios[kRigs])(PacingRig&) = {
         pingPacingScenario,   serverFullScenario, shutdownScenario,        shutdownNoticeScenario, inGameScenario,
         pingIntervalScenario, probeScenario,      probeUnansweredScenario, badGatewayScenario,     notFoundScenario,
-        serverChangedScenario, cheatScenario,     restartFullScenario};
+        serverChangedScenario, cheatScenario,     restartFullScenario,     restartServerChangedScenario};
     std::vector<std::thread> threads;
     for (int i = 0; i < kRigs; ++i) {
         threads.emplace_back([&, i] {
