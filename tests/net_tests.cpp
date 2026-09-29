@@ -39,6 +39,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <deque>
 #include <map>
 #include <mutex>
 #include <thread>
@@ -839,8 +840,21 @@ public:
     std::atomic<int> infos{0}, upgrades{0};         // GET /api/v1/info, WebSocket upgrade requests
     std::atomic<int> upgradeStatus{0};              // != 0: upgrades are refused with this HTTP status
     std::atomic<uint32_t> clientPingMs{0};          // Welcome.clientPingMs
+    std::atomic<uint32_t> heartbeatMs{15000};       // Welcome.heartbeatMs (no S_Ping follows the first one)
+    std::atomic<bool> answerPings{true};            // false: C_Ping gets no S_Pong
+    std::atomic<int> serverNo{1};                   // serverId "srv-<n>" in /info and in the 101 answer
     std::atomic<bool> helloTokenOk{false};
     std::atomic<uint64_t> activeGame{0};
+
+    // What the next upgrades get, in order, before upgradeStatus applies again: an HTTP status
+    // that refuses the upgrade, kUpgradeOk, or kShutdownAtHello (101, then Error{ShuttingDown} +
+    // close 4008 in answer to Hello, like a draining server).
+    static constexpr int kUpgradeOk = 0, kShutdownAtHello = -1;
+    void scriptUpgrades(std::initializer_list<int> steps) {
+        std::lock_guard<std::mutex> lk(scriptMu_);
+        script_.assign(steps.begin(), steps.end());
+    }
+    std::string serverId() const { return "srv-" + std::to_string(serverNo.load()); }
 
     bool start() {
 #ifdef _WIN32
@@ -912,6 +926,8 @@ private:
     std::vector<Sock> open_, ws_;
     std::atomic<bool> stop_{false};
     std::mutex gameMu_;
+    std::mutex scriptMu_;
+    std::deque<int> script_;
     std::atomic<uint32_t> gseq_{1};
     std::vector<pr::MoveRec> gameMoves_;
     std::string gameCategory_;
@@ -1006,11 +1022,11 @@ private:
             ++infos;
             char info[512];
             std::snprintf(info, sizeof(info),
-                          "{\"name\":\"Fake\",\"serverId\":\"srv-1\",\"motd\":\"hi\",\"protocol\":{\"min\":1,\"max\":1,\"schema\":%u,"
+                          "{\"name\":\"Fake\",\"serverId\":\"%s\",\"motd\":\"hi\",\"protocol\":{\"min\":1,\"max\":1,\"schema\":%u,"
                           "\"subprotocol\":\"scacelith.v1\"},\"wsPort\":%u,\"wsPath\":\"/ws\",\"registration\":\"open\","
                           "\"emailVerification\":true,\"sso\":{\"google\":false},\"mfa\":true,\"pow\":{\"register\":10},"
                           "\"categories\":[{\"id\":\"3+2\",\"baseSec\":180,\"incSec\":2}]}",
-                          unsigned(pr::kSchemaHash), unsigned(port));
+                          serverId().c_str(), unsigned(pr::kSchemaHash), unsigned(port));
             respond(s, 200, info);
         } else if (method == "POST" && path == "/api/v1/auth/login") {
             ++loginAttempts;
@@ -1043,8 +1059,16 @@ private:
 
     void websocket(Sock s, std::map<std::string, std::string>& h, std::string in) {
         ++upgrades;
-        if (int status = upgradeStatus.load()) {
-            respond(s, status, "{\"error\":\"server_full\"}");
+        int step = upgradeStatus.load();
+        {
+            std::lock_guard<std::mutex> lk(scriptMu_);
+            if (!script_.empty()) {
+                step = script_.front();
+                script_.pop_front();
+            }
+        }
+        if (step > 0) {
+            respond(s, step, "{\"error\":\"server_full\"}");
             return;
         }
         std::string key = h["sec-websocket-key"];
@@ -1056,7 +1080,8 @@ private:
         std::string k = key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
         net::crypto::Sha1 d = net::crypto::sha1(k.data(), k.size());
         std::string r = "HTTP/1.1 101 Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: " +
-                        net::crypto::base64(d.data(), d.size()) + "\r\nSec-WebSocket-Protocol: " + pr::kWsSubprotocol + "\r\n\r\n";
+                        net::crypto::base64(d.data(), d.size()) + "\r\nSec-WebSocket-Protocol: " + pr::kWsSubprotocol +
+                        "\r\nScacelith-Server-Id: " + serverId() + "\r\n\r\n";
         sendAll(s, r.data(), r.size());
         {
             std::lock_guard<std::mutex> lk(mu_);
@@ -1097,13 +1122,22 @@ private:
                 ++hellos;
                 helloTokenOk.store(m.seq == 1 && m.token == token && m.schema == pr::kSchemaHash && m.proto == 1 &&
                                    m.client.compare(0, 10, "Scacelith/") == 0);
+                if (step == kShutdownAtHello) {
+                    pr::Error e;
+                    e.code = pr::ErrorCode::ShuttingDown;
+                    e.fatal = true;
+                    sendMsg(s, e);
+                    uint8_t payload[2] = {uint8_t(pr::CloseCode::ShuttingDown >> 8), uint8_t(pr::CloseCode::ShuttingDown & 0xFF)};
+                    sendFrame(s, 0x8, payload, 2);
+                    continue;
+                }
                 pr::Welcome w;
                 w.proto = 1;
                 w.serverTime = epochMs() + kSkewMs;
                 w.userId = 7;
                 w.username = "alice";
                 w.serverName = "Fake";
-                w.heartbeatMs = 15000;
+                w.heartbeatMs = heartbeatMs.load();
                 w.clientPingMs = clientPingMs.load();
                 w.maxMsgPerSec = 20;
                 w.activeGame = activeGame.load();
@@ -1117,6 +1151,7 @@ private:
                 pr::C_Ping m;
                 if (!pr::decode(p, n, m)) return;
                 ++pings;
+                if (!answerPings.load()) continue;
                 pr::S_Pong r2;
                 r2.nonce = m.nonce;
                 r2.serverTime = epochMs() + kSkewMs;
@@ -1496,8 +1531,9 @@ TEST(net_reconnect_delay_policy) {
     CHECK_EQ(idle(1, RetryCause::Shutdown, 0.0), 500u);
     CHECK_EQ(idle(1, RetryCause::Shutdown, 1.0), 4000u);
     CHECK_EQ(idle(9, RetryCause::Shutdown, 1.0), 30000u);
-    // A game in progress (15 s of reconnection grace by default): 8 s at most between attempts,
-    // whatever the cause; a shutdown's first attempt is spread over 1 s to 8 s.
+    // A game in progress (15 s of reconnection grace by default, 90 s for a game restored after a
+    // restart): 8 s at most between attempts, whatever the cause, unless the server gave a
+    // Retry-After (below); a shutdown's first attempt is spread over 1 s to 8 s.
     CHECK_EQ(inGame(0, RetryCause::Failure, 1.0), 2000u);
     CHECK_EQ(inGame(2, RetryCause::Failure, 1.0), 8000u);
     CHECK_EQ(inGame(3, RetryCause::Failure, 1.0), 8000u);
@@ -1514,7 +1550,7 @@ TEST(net_reconnect_delay_policy) {
     CHECK_EQ(idle(0, RetryCause::ServerFull, 0.0, 1000), 60000u);   // already longer
     CHECK_EQ(idle(0, RetryCause::Failure, 1.0, 3600000), 600000u);
     CHECK_EQ(idle(0, RetryCause::Failure, 0.0, 0xFFFFFFFFu), 600000u);
-    CHECK_EQ(net::reconnectDelayMs(0, RetryCause::Failure, 0.0, true, 20000), 20000u);
+    CHECK_EQ(net::reconnectDelayMs(0, RetryCause::Failure, 0.0, true, 20000), 20000u);   // even in game
     // Every u in [0, 1) stays inside the bounds; the spread really is uniform (no clustering).
     for (int attempt = 0; attempt < 12; ++attempt) {
         uint32_t cap = uint32_t(std::min(30000.0, 2000.0 * std::pow(2.0, attempt)));
@@ -1574,7 +1610,14 @@ struct PacingRig {
     bool stateIs(net::ConnState s, int timeoutMs) {
         return until([&] { return c->state() == s; }, timeoutMs);
     }
+    // True when pred held at every check for that long.
+    bool always(const std::function<bool()>& pred, int forMs) {
+        return !until([&] { return !pred(); }, forMs);
+    }
     static void sleepMs(int ms) { std::this_thread::sleep_for(std::chrono::milliseconds(ms)); }
+    static double msSince(std::chrono::steady_clock::time_point t) {
+        return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t).count();
+    }
 
     // Server, login, connect, Welcome.
     bool start(const char* tag) {
@@ -1606,12 +1649,50 @@ void pingPacingScenario(PacingRig& r) {
     auto t0 = std::chrono::steady_clock::now();
     r.expect(r.until([&] { return r.srv.pings.load() >= 1; }, 1000), "a Ping at once after Welcome");
     r.expect(r.until([&] { return r.srv.pings.load() >= 4; }, 6000), "three more quick pings");
-    double t4 = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    double t4 = r.msSince(t0);
     r.expect(t4 >= 3000 && t4 < 5500, "the quick pings about a second apart (4th after " + std::to_string(int(t4)) + " ms)");
-    r.sleepMs(1500);
+    r.sleepMs(4000);
     r.expect(r.srv.pings.load() == 4, "then Welcome.clientPingMs: " + std::to_string(r.srv.pings.load()) + " pings");
     r.expect(r.c->pingMs() >= 0 && r.c->pingMs() < 500, "the ping indicator is known");
     r.expect(std::fabs(r.c->serverNowMs() - epochMs() - FakeServer::kSkewMs) < 250, "the server clock offset is known");
+}
+
+// Welcome.clientPingMs = 3.5 s: the fifth ping comes 3.5 s after the fourth (neither a fixed
+// interval of the client's own, nor its 10 s default).
+void pingIntervalScenario(PacingRig& r) {
+    r.expect(r.until([&] { return r.srv.pings.load() >= 4; }, 6000), "four quick pings");
+    auto t4 = std::chrono::steady_clock::now();
+    r.expect(r.until([&] { return r.srv.pings.load() >= 5; }, 6000), "a fifth ping");
+    double gap = r.msSince(t4);
+    r.expect(gap >= 3000 && gap <= 4200, "the fifth ping after Welcome.clientPingMs (" + std::to_string(int(gap)) + " ms)");
+}
+
+// Welcome.heartbeatMs = 1 s and a server that sends no heartbeat (the client's own pings are a
+// minute apart): nothing arrives after the quick pings. At 1.5 heartbeats (7.5 s at least) the
+// client sends one Ping to ask; its answer keeps the connection, which otherwise ends at two
+// heartbeats (10 s at least).
+void probeScenario(PacingRig& r) {
+    r.expect(r.until([&] { return r.srv.pings.load() >= 4; }, 6000), "four quick pings");
+    auto t4 = std::chrono::steady_clock::now();
+    int hellos = r.srv.hellos.load();
+    r.expect(r.until([&] { return r.srv.pings.load() >= 5; }, 9000), "a probe after 7.5 s of silence");
+    double at = r.msSince(t4);
+    r.expect(at >= 7000 && at <= 8600, "the probe after 7.5 s of silence (" + std::to_string(int(at)) + " ms)");
+    r.expect(r.always([&] { return r.c->state() == net::ConnState::Online; }, int(11500 - r.msSince(t4))),
+             "answered: still online after 11.5 s of server silence");
+    r.expect(r.srv.hellos.load() == hellos, "answered: no reconnection");
+}
+
+// The same with a probe that gets no answer: the connection ends at two heartbeats, not before.
+void probeUnansweredScenario(PacingRig& r) {
+    r.expect(r.until([&] { return r.srv.pings.load() >= 4; }, 6000), "four quick pings");
+    auto t4 = std::chrono::steady_clock::now();
+    r.sleepMs(200);                          // the fourth Pong is on its way; later pings get none
+    r.srv.answerPings.store(false);
+    r.expect(r.until([&] { return r.srv.pings.load() >= 5; }, 9000), "unanswered: a probe");
+    r.expect(r.always([&] { return r.c->state() == net::ConnState::Online; }, int(9400 - r.msSince(t4))),
+             "unanswered: online until two heartbeats");
+    r.expect(r.stateIs(net::ConnState::Reconnecting, int(11500 - r.msSince(t4))), "unanswered: dropped at two heartbeats");
 }
 
 // A full server (close 4006, then HTTP 503 at the upgrade): no attempt for a minute; a connect()
@@ -1643,8 +1724,9 @@ void serverFullScenario(PacingRig& r) {
     r.expect(r.stateIs(net::ConnState::Online, 5000), "connect() after 503: online");
 }
 
-// A shutdown (close 4008): the first attempt waits 5 s at least. While the server restarts, a 503
-// at the upgrade is the restart, not a full server: the next attempt follows quickly.
+// A shutdown (close 4008): the first attempt waits 5 s at least. The first 503 at the upgrade
+// after a shutdown is the restart, not a full server: the next attempt follows quickly. A
+// connect() asked by the player starts afresh: a 503 then means a full server.
 void shutdownScenario(PacingRig& r) {
     int ups = r.srv.upgrades.load();
     r.srv.kick(pr::CloseCode::ShuttingDown);
@@ -1653,10 +1735,33 @@ void shutdownScenario(PacingRig& r) {
     r.expect(r.srv.upgrades.load() == ups, "4008: no attempt within 2 s");
     r.srv.upgradeStatus.store(503);
     r.c->connect();
-    r.expect(r.until([&] { return r.srv.upgrades.load() >= ups + 2; }, 5000), "503 while restarting: tried again soon");
+    r.expect(r.until([&] { return r.srv.upgrades.load() == ups + 1; }, 3000), "connect() after 4008: tried at once");
+    r.sleepMs(2200);
+    r.expect(r.srv.upgrades.load() == ups + 1, "connect() after 4008, then 503: a full server (no attempt within 2 s)");
     r.srv.upgradeStatus.store(0);
+    // 502 (attempt 1 follows), Error{ShuttingDown} + 4008 at Hello (a shutdown after a failed
+    // attempt: the next one follows as a failure's), then 503 (the restart: tried again soon).
+    ups = r.srv.upgrades.load();
+    int hellos = r.srv.hellos.load();
+    r.srv.scriptUpgrades({502, FakeServer::kShutdownAtHello, 503});
     r.c->connect();
-    r.expect(r.stateIs(net::ConnState::Online, 5000), "online after the restart");
+    r.expect(r.stateIs(net::ConnState::Online, 16000), "online after the restart");
+    r.expect(r.srv.upgrades.load() == ups + 4, "the restart: four upgrades (" + std::to_string(r.srv.upgrades.load() - ups) + ")");
+    r.expect(r.srv.hellos.load() == hellos + 2, "the restart: two Hellos");
+}
+
+// A server that comes back full after a restart: only the first 503 after the shutdown is the
+// restart; the next one is a full server (no attempt for a minute, where a failure's fourth
+// attempt would come within 16 s).
+void restartFullScenario(PacingRig& r) {
+    r.c->disconnect();
+    r.expect(r.stateIs(net::ConnState::Offline, 3000), "disconnect: offline");
+    int ups = r.srv.upgrades.load();
+    r.srv.scriptUpgrades({502, FakeServer::kShutdownAtHello, 503, 503});
+    r.c->connect();
+    r.expect(r.until([&] { return r.srv.upgrades.load() == ups + 4; }, 16000), "the restart, then 503 twice");
+    r.expect(r.always([&] { return r.srv.upgrades.load() == ups + 4; }, 16500), "back full: no attempt within 16.5 s");
+    r.expect(r.c->state() == net::ConnState::Reconnecting, "back full: still reconnecting");
 }
 
 // Notice{ServerShutdown}, then the connection drops without a close code: a shutdown too.
@@ -1671,7 +1776,8 @@ void shutdownNoticeScenario(PacingRig& r) {
 }
 
 // With a game in progress the reconnection grace is short: even a full server is tried again
-// within seconds (8 s at most between attempts), not after a minute.
+// within seconds (8 s at most between attempts), not after a minute. After a shutdown too (1 s to
+// 8 s), and then the /info answer is read again (a restart may bring another server).
 void inGameScenario(PacingRig& r) {
     r.c->joinQueue("3+2", true);
     net::Event ev;
@@ -1681,18 +1787,83 @@ void inGameScenario(PacingRig& r) {
     r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "in game, 4006: reconnecting");
     r.expect(r.until([&] { return r.srv.hellos.load() > hellos; }, 4000), "in game, 4006: tried again within 2 s");
     r.expect(r.stateIs(net::ConnState::Online, 3000), "in game: online again");
+    hellos = r.srv.hellos.load();
+    int infos = r.srv.infos.load();
+    r.srv.kick(pr::CloseCode::ShuttingDown);
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "in game, 4008: reconnecting");
+    r.expect(r.until([&] { return r.srv.hellos.load() > hellos; }, 9500), "in game, 4008: tried again within 8 s");
+    r.expect(r.srv.infos.load() == infos + 1, "in game, 4008: /info read again after a shutdown");
+    r.expect(r.stateIs(net::ConnState::Online, 3000), "in game: online after the restart");
+}
+
+// A reverse proxy answering 502 at the upgrade (its backend restarts): retried like a network
+// failure, with the same /info answer.
+void badGatewayScenario(PacingRig& r) {
+    int ups = r.srv.upgrades.load(), infos = r.srv.infos.load();
+    r.srv.upgradeStatus.store(502);
+    r.srv.dropWebSockets();
+    r.expect(r.until([&] { return r.srv.upgrades.load() >= ups + 2; }, 8000), "502: tried twice");
+    r.expect(r.srv.infos.load() == infos, "502: the /info answer is kept (" + std::to_string(r.srv.infos.load() - infos) + " reads)");
+    r.srv.upgradeStatus.store(0);
+    r.expect(r.stateIs(net::ConnState::Online, 10000), "502: online again");
+    r.expect(r.srv.infos.load() == infos, "502: online again without an /info read");
+}
+
+// 404 at the upgrade: the server may have changed since /info was read, which is read again.
+void notFoundScenario(PacingRig& r) {
+    int infos = r.srv.infos.load();
+    r.srv.upgradeStatus.store(404);
+    r.srv.dropWebSockets();
+    r.expect(r.until([&] { return r.srv.infos.load() == infos + 1; }, 8000), "404: /info read again");
+    r.srv.upgradeStatus.store(0);
+    r.expect(r.stateIs(net::ConnState::Online, 10000), "404: online again");
+}
+
+// Another server at the same origin (a reinstall: another server id) while the client reuses the
+// /info answer of the previous one: the 101 answer names it, and the saved session is dropped
+// instead of being sent in Hello.
+void serverChangedScenario(PacingRig& r) {
+    int hellos = r.srv.hellos.load(), infos = r.srv.infos.load(), ups = r.srv.upgrades.load();
+    r.srv.serverNo.store(2);
+    r.srv.dropWebSockets();
+    net::Event ev;
+    r.expect(waitEvent(*r.c, net::Event::Kind::ConnectionChanged, ev, 5000, nullptr,
+                       [](const net::Event& e) { return e.state == net::ConnState::Unauthorized; }) &&
+                 ev.error == "server_changed",
+             "another server id: unauthorized (server_changed)");
+    r.expect(r.srv.upgrades.load() == ups + 1 && r.srv.infos.load() == infos, "another server id: seen at the upgrade");
+    r.expect(r.srv.hellos.load() == hellos, "another server id: no Hello, the token was not sent");
+    r.expect(!r.c->hasSavedSession(), "another server id: the saved session is dropped");
+}
+
+// Error{CheatDetected} + close 4302: no automatic reconnection.
+void cheatScenario(PacingRig& r) {
+    int ups = r.srv.upgrades.load();
+    r.srv.kick(pr::CloseCode::CheatDetected);
+    r.expect(r.stateIs(net::ConnState::Offline, 3000), "4302: offline");
+    r.sleepMs(2200);
+    r.expect(r.srv.upgrades.load() == ups && r.c->state() == net::ConnState::Offline, "4302: no reconnection");
 }
 
 }  // namespace
 
 TEST(net_online_client_pacing) {
     if (!net::transportAvailable()) return;
-    constexpr int kRigs = 5;
+    constexpr int kRigs = 13;
     PacingRig rigs[kRigs];
     rigs[0].srv.clientPingMs.store(60000);
-    const char* tags[kRigs] = {"pace-ping", "pace-full", "pace-shutdown", "pace-notice", "pace-ingame"};
-    void (*scenarios[kRigs])(PacingRig&) = {pingPacingScenario, serverFullScenario, shutdownScenario, shutdownNoticeScenario,
-                                            inGameScenario};
+    rigs[5].srv.clientPingMs.store(3500);
+    for (int i : {6, 7}) {
+        rigs[i].srv.heartbeatMs.store(1000);
+        rigs[i].srv.clientPingMs.store(60000);
+    }
+    const char* tags[kRigs] = {"pace-ping",     "pace-full",  "pace-shutdown", "pace-notice", "pace-ingame",
+                               "pace-interval", "pace-probe", "pace-probe2",   "pace-502",    "pace-404",
+                               "pace-srvid",    "pace-cheat", "pace-restart-full"};
+    void (*scenarios[kRigs])(PacingRig&) = {
+        pingPacingScenario,   serverFullScenario, shutdownScenario,        shutdownNoticeScenario, inGameScenario,
+        pingIntervalScenario, probeScenario,      probeUnansweredScenario, badGatewayScenario,     notFoundScenario,
+        serverChangedScenario, cheatScenario,     restartFullScenario};
     std::vector<std::thread> threads;
     for (int i = 0; i < kRigs; ++i) {
         threads.emplace_back([&, i] {

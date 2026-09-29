@@ -73,7 +73,9 @@ same as against Stockfish, with these differences:
   (banner "Opponent disconnected — 0:45 to return") and back, first-move timer, rematch offers.
   Our own connection loss shows a "Reconnecting…" veil; the game goes on on the server. The
   client comes back by itself after a random delay, longer when the server is full or restarting
-  but never more than 8 s during a game (`dedicated-server/docs/PROTOCOL.md`, lifecycle step 6).
+  but 8 s at most during a game unless the server asked to wait longer (a `Retry-After`): the
+  server keeps the game for the reconnection grace, at least 15 s by default and 90 s after a
+  restart (`dedicated-server/docs/PROTOCOL.md`, lifecycle step 6).
 - **Esc menu.** Resume, offer draw, claim draw, abort (before my first move, in place of
   resign), resign, report opponent (server games), options, leave (confirmed: resigns, or aborts
   before my first move). The clock keeps running behind it.

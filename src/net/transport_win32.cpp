@@ -222,8 +222,9 @@ std::string queryHeader(HINTERNET req, DWORD info, const wchar_t* name) {
 
 class WinHttpWebSocket final : public WebSocket {
 public:
-    WinHttpWebSocket(HINTERNET conn, HINTERNET ws, const WsParams& p)
+    WinHttpWebSocket(HINTERNET conn, HINTERNET ws, const WsParams& p, std::string serverId)
         : conn_(conn), ws_(ws), maxBytes_(p.maxMessageBytes), onActivity_(p.onActivity) {
+        serverId_ = std::move(serverId);
         reader_ = std::thread([this] { run(); });
     }
     ~WinHttpWebSocket() override { close(1001); }
@@ -487,6 +488,8 @@ std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int&
         error = "subprotocol";
         return nullptr;
     }
+    // Read before WinHttpWebSocketCompleteUpgrade: the request handle is closed afterwards.
+    std::string serverId = queryHeader(req.get(), WINHTTP_QUERY_CUSTOM, L"Scacelith-Server-Id");
     // Idle periods are normal on a WebSocket: no receive timeout (the client's own heartbeat
     // watchdog detects a dead connection).
     DWORD infinite = 0;
@@ -500,7 +503,7 @@ std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int&
     WinHttpSetOption(ws, WINHTTP_OPTION_RECEIVE_TIMEOUT, &infinite, sizeof(infinite));
     req.close();
     // The socket object owns the connect handle from now on.
-    return std::make_unique<WinHttpWebSocket>(conn.release(), ws, p);
+    return std::make_unique<WinHttpWebSocket>(conn.release(), ws, p, std::move(serverId));
 }
 
 }  // namespace net

@@ -137,7 +137,8 @@ enum class ConnState {
 
 // Why the realtime connection is being established again.
 enum class RetryCause {
-    Failure,        // network error, timeout, dropped connection, upgrade refused (not 503)
+    Failure,        // network error, timeout, dropped connection, upgrade refused (not 503), the
+                    // first 503 at the upgrade after a shutdown (the server is restarting)
     ServerFull,     // HTTP 503 at the WebSocket upgrade, close 4006 or a fatal Error{ServerFull}
     Shutdown        // close 4008, a fatal Error{ShuttingDown} or a Notice{ServerShutdown} before the drop
 };
@@ -148,13 +149,16 @@ enum class RetryCause {
 //   ServerFull  uniform in [60 s, 120 s]
 //   Shutdown    attempt 0: uniform in [5 s, 35 s], which spreads the reconnection wave of a
 //               restart; later attempts as Failure
-// gameInProgress: the player has a game running on the server, which gives them only
-// RECONNECT_GRACE_MIN_MS (15 s by default, counted again from its restart) to come back before
-// they lose by abandonment. Every cause then waits uniform in [0.5 s, min(8 s, 2 s x 2^attempt)],
-// and a shutdown's first attempt uniform in [1 s, 8 s].
+// gameInProgress: the player has a game running on the server, which gives them only its
+// reconnection grace to come back before they lose by abandonment: 10 % of the base time within
+// RECONNECT_GRACE_MIN_MS and RECONNECT_GRACE_MAX_MS (15 s to 60 s by default, so 15 s for the fast
+// games), and RECOVERY_GRACE_MS (90 s by default) for a game the server restored after a restart.
+// Every cause then waits uniform in [0.5 s, min(8 s, 2 s x 2^attempt)], and a shutdown's first
+// attempt uniform in [1 s, 8 s].
 // retryAfterMs is a Retry-After the server gave (0 = none): the delay is then at least that, plus
 // up to half of it so that the clients it was given to do not come back together (10 minutes at
-// most). User-initiated connections (connect(), a server change) never wait for any of this.
+// most), even during a game (the 8 s bound above does not apply then). User-initiated
+// connections (connect(), a server change) never wait for any of this.
 uint32_t reconnectDelayMs(int attempt, RetryCause cause, double u, bool gameInProgress, uint32_t retryAfterMs);
 
 // Interval of the client's own Ping for Welcome.clientPingMs (the server's

@@ -92,6 +92,12 @@ public:
     virtual bool closed(uint16_t& code, std::string& reason) const = 0;
     // Closing handshake (bounded wait, about one second at most), then frees everything.
     virtual void close(uint16_t code = 1000) = 0;
+    // The Scacelith-Server-Id header of the server's 101 answer ("" when there was none): the
+    // client compares it with the server its saved session belongs to before sending Hello.
+    const std::string& serverId() const { return serverId_; }
+
+protected:
+    std::string serverId_;
 };
 
 // Connects (TCP, TLS, HTTP upgrade). nullptr on failure with error as for HttpResponse, or
