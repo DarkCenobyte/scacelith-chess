@@ -1,6 +1,9 @@
 #include "tensor.h"
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
+#include <map>
+#include <mutex>
 #include <new>
 
 namespace tts {
@@ -32,12 +35,78 @@ int64_t elementCount(const Dims& d) {
     return n;
 }
 
-Buffer::Buffer(size_t n) : bytes(n) {
-    // 64-byte aligned, rounded up so SIMD tails may read a full register past the end.
-    data = ::operator new(n + 64, std::align_val_t(64));
+namespace {
+
+constexpr size_t kCacheMin = size_t(64) << 10;
+constexpr size_t kCacheMax = size_t(128) << 20;
+
+struct BlockCache {
+    std::mutex mutex;
+    std::multimap<size_t, void*> blocks;   // capacity -> block
+    size_t bytes = 0;
+};
+
+// Never destroyed: buffers owned by static objects may be freed after it would be.
+BlockCache& cache() {
+    static BlockCache* c = new BlockCache;
+    return *c;
 }
 
-Buffer::~Buffer() { ::operator delete(data, std::align_val_t(64)); }
+// Size classes of cached blocks: eight per power of two (at most 12.5 % unused).
+size_t sizeClass(size_t n) {
+    size_t top = size_t(1) << (63 - __builtin_clzll(static_cast<unsigned long long>(n)));
+    size_t step = std::max<size_t>(top / 8, 4096);
+    return (n + step - 1) / step * step;
+}
+
+}  // namespace
+
+Buffer::Buffer(size_t n) : bytes(n), capacity(n + 64) {
+    // 64-byte aligned, rounded up so SIMD tails may read a full register past the end.
+    if (capacity >= kCacheMin) {
+        capacity = sizeClass(capacity);
+        BlockCache& c = cache();
+        std::lock_guard<std::mutex> lock(c.mutex);
+        auto it = c.blocks.find(capacity);
+        if (it != c.blocks.end()) {
+            data = it->second;
+            c.bytes -= capacity;
+            c.blocks.erase(it);
+            return;
+        }
+    }
+    data = ::operator new(capacity, std::align_val_t(64));
+}
+
+Buffer::~Buffer() {
+    if (capacity >= kCacheMin) {
+        BlockCache& c = cache();
+        std::lock_guard<std::mutex> lock(c.mutex);
+        if (c.bytes + capacity <= kCacheMax) {
+            c.blocks.emplace(capacity, data);
+            c.bytes += capacity;
+            return;
+        }
+    }
+    ::operator delete(data, std::align_val_t(64));
+}
+
+void trimBufferCache() {
+    std::multimap<size_t, void*> blocks;
+    {
+        BlockCache& c = cache();
+        std::lock_guard<std::mutex> lock(c.mutex);
+        blocks.swap(c.blocks);
+        c.bytes = 0;
+    }
+    for (auto& b : blocks) ::operator delete(b.second, std::align_val_t(64));
+}
+
+size_t bufferCacheBytes() {
+    BlockCache& c = cache();
+    std::lock_guard<std::mutex> lock(c.mutex);
+    return c.bytes;
+}
 
 Tensor Tensor::alloc(DType t, const Dims& d) {
     Tensor r;

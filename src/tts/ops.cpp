@@ -709,8 +709,8 @@ bool opTile(const Tensor& x0, const Tensor& repeats, Tensor& out, std::string* e
     return true;
 }
 
-bool opPad(const Node& nd, const Tensor& x0, const Tensor& padsT, const Tensor* valueT, const Tensor* axesT, Tensor& out,
-           std::string* err) {
+bool opPad(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tensor& padsT, const Tensor* valueT,
+           const Tensor* axesT, Tensor& out, std::string* err) {
     Tensor x = materialize(x0);
     int64_t r = x.rank();
     std::vector<int64_t> p = padsT.toInts();
@@ -742,40 +742,47 @@ bool opPad(const Node& nd, const Tensor& x0, const Tensor& padsT, const Tensor* 
     Dims is = stridesOf(x.dims);
     int64_t inner = od[size_t(r - 1)];
     int64_t outer = n / inner;
-    std::vector<int64_t> idx(size_t(r), 0);
     const uint8_t* src = x.as<uint8_t>();
     uint8_t* dst = out.mut<uint8_t>();
     int64_t lastLo = lo[size_t(r - 1)], lastDim = x.dims[size_t(r - 1)];
-    for (int64_t o = 0; o < outer; ++o) {
-        uint8_t* row = dst + o * inner * int64_t(es);
-        bool inside = true;
-        int64_t off = 0;
-        for (int64_t d = 0; d + 1 < r; ++d) {
-            int64_t c = idx[size_t(d)] - lo[size_t(d)];
-            if (c < 0 || c >= x.dims[size_t(d)]) {
-                if (!edge) inside = false;
-                c = std::clamp<int64_t>(c, 0, x.dims[size_t(d)] - 1);
+    // Output rows [o0, o1) (rows of the last dimension), split over the pool.
+    parallelRange(&ctx, outer, std::max<int64_t>(1, kGrain / std::max<int64_t>(1, inner)), [&](int64_t o0, int64_t o1) {
+        std::vector<int64_t> idx(size_t(r), 0);
+        for (int64_t d = r - 1, rem = o0; d-- > 0;) {
+            idx[size_t(d)] = rem % od[size_t(d)];
+            rem /= od[size_t(d)];
+        }
+        for (int64_t o = o0; o < o1; ++o) {
+            uint8_t* row = dst + o * inner * int64_t(es);
+            bool inside = true;
+            int64_t off = 0;
+            for (int64_t d = 0; d + 1 < r; ++d) {
+                int64_t c = idx[size_t(d)] - lo[size_t(d)];
+                if (c < 0 || c >= x.dims[size_t(d)]) {
+                    if (!edge) inside = false;
+                    c = std::clamp<int64_t>(c, 0, x.dims[size_t(d)] - 1);
+                }
+                off += c * is[size_t(d)];
             }
-            off += c * is[size_t(d)];
-        }
-        if (!inside || lastDim == 0) {
-            for (int64_t i = 0; i < inner; ++i) std::memcpy(row + i * int64_t(es), fill, es);
-        } else {
-            const uint8_t* s = src + off * int64_t(es);
-            int64_t i0 = std::max<int64_t>(0, lastLo), i1 = std::min<int64_t>(inner, lastLo + lastDim);
-            for (int64_t i = 0; i < inner; ++i) {
-                if (i >= i0 && i < i1) continue;
-                int64_t c = i - lastLo;
-                if (edge) std::memcpy(row + i * int64_t(es), s + std::clamp<int64_t>(c, 0, lastDim - 1) * int64_t(es), es);
-                else std::memcpy(row + i * int64_t(es), fill, es);
+            if (!inside || lastDim == 0) {
+                for (int64_t i = 0; i < inner; ++i) std::memcpy(row + i * int64_t(es), fill, es);
+            } else {
+                const uint8_t* s = src + off * int64_t(es);
+                int64_t i0 = std::max<int64_t>(0, lastLo), i1 = std::min<int64_t>(inner, lastLo + lastDim);
+                for (int64_t i = 0; i < inner; ++i) {
+                    if (i >= i0 && i < i1) continue;
+                    int64_t c = i - lastLo;
+                    const uint8_t* v = edge ? s + std::clamp<int64_t>(c, 0, lastDim - 1) * int64_t(es) : fill;
+                    std::memcpy(row + i * int64_t(es), v, es);
+                }
+                if (i1 > i0) std::memcpy(row + i0 * int64_t(es), s + (i0 - lastLo) * int64_t(es), size_t(i1 - i0) * es);
             }
-            if (i1 > i0) std::memcpy(row + i0 * int64_t(es), s + (i0 - lastLo) * int64_t(es), size_t(i1 - i0) * es);
+            for (int64_t d = r - 1; d-- > 0;) {
+                if (++idx[size_t(d)] < od[size_t(d)]) break;
+                idx[size_t(d)] = 0;
+            }
         }
-        for (int64_t d = r - 1; d-- > 0;) {
-            if (++idx[size_t(d)] < od[size_t(d)]) break;
-            idx[size_t(d)] = 0;
-        }
-    }
+    });
     return true;
 }
 
@@ -1173,11 +1180,13 @@ bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin
     out = Tensor::alloc(DType::F32, od);
     const int32_t* pa = acc.as<int32_t>();
     float* po = out.mut<float>();
-    for (int64_t i = 0; i < M; ++i)
-        for (int64_t j = 0; j < N; ++j) {
-            float v = float(pa[i * N + j]) * s;
-            po[i * N + j] = bias ? bias[j] + v : v;
-        }
+    parallelRange(&ctx, M, std::max<int64_t>(1, kGrain / std::max<int64_t>(1, N)), [&](int64_t i0, int64_t i1) {
+        for (int64_t i = i0; i < i1; ++i)
+            for (int64_t j = 0; j < N; ++j) {
+                float v = float(pa[i * N + j]) * s;
+                po[i * N + j] = bias ? bias[j] + v : v;
+            }
+    });
     return true;
 }
 
@@ -1402,7 +1411,7 @@ bool execNode(const Node& n, const Tensor* const* in, Tensor* out, const ExecCon
     }
     case Op::Expand: return need(2) && opExpand(*in[0], *in[1], out[0], error);
     case Op::Tile: return need(2) && opTile(*in[0], *in[1], out[0], error);
-    case Op::Pad: return need(2) && opPad(n, *in[0], *in[1], opt(2), opt(3), out[0], error);
+    case Op::Pad: return need(2) && opPad(ctx, n, *in[0], *in[1], opt(2), opt(3), out[0], error);
     case Op::Softmax: return need(1) && opSoftmax(ctx, *in[0], n.axis, out[0], error);
     case Op::LayerNorm: return need(2) && opLayerNorm(ctx, n, *in[0], *in[1], opt(2), out[0], error);
     case Op::LayerNormChannels: return need(2) && opLayerNormChannels(ctx, n, *in[0], *in[1], opt(2), out[0], error);

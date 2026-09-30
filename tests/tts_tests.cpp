@@ -770,30 +770,68 @@ TEST(tts_ops_parallel_equals_serial) {
     Tensor perChannel = F({1, 64, 1}, randomVec(64, rng));
     Tensor perTime = F({2, 1, 1001}, randomVec(2 * 1001, rng));
     Tensor gamma = F({64}, randomVec(64, rng)), beta = F({64}, randomVec(64, rng));
+    // Pad (constant and edge, rows outside on the channel axis too) and the quantized MatMul.
+    Tensor pads = I({6}, {0, 1, 3, 0, 2, 5});
+    std::vector<uint8_t> qa(300 * 64);
+    std::vector<int8_t> qb(64 * 128);
+    for (auto& v : qa) v = uint8_t(rng() % 256);
+    for (auto& v : qb) v = int8_t(int(rng() % 256) - 128);
+    Tensor ta = typed<uint8_t>(DType::U8, {300, 64}, qa), tb = typed<int8_t>(DType::I8, {64, 128}, qb);
+    Tensor azp = typed<uint8_t>(DType::U8, {}, {97}), qscale = F({}, {0.0125f}), qbias = F({128}, randomVec(128, rng));
     struct Case {
-        tts::Op op;
+        tts::Node n;
         std::vector<const Tensor*> in;
         size_t outputs;
     };
-    tts::Node ln = node(tts::Op::LayerNormChannels);
-    ln.f0 = 1e-6f;
+    auto with = [](tts::Op op, float f0, const char* mode) {
+        tts::Node n = node(op);
+        n.f0 = f0;
+        n.mode = mode;
+        return n;
+    };
     std::vector<Case> cases = {
-        {tts::Op::Add, {&big, &big2}, 1},        {tts::Op::Mul, {&big, &perChannel}, 1},
-        {tts::Op::Sub, {&perTime, &big}, 1},     {tts::Op::Div, {&big, &perChannel}, 1},
-        {tts::Op::Gelu, {&big}, 1},              {tts::Op::Tanh, {&big}, 1},
-        {tts::Op::LayerNormChannels, {&big, &gamma, &beta}, 1},
-        {tts::Op::DynamicQuantize, {&big}, 3},
+        {node(tts::Op::Add), {&big, &big2}, 1},
+        {node(tts::Op::Mul), {&big, &perChannel}, 1},
+        {node(tts::Op::Sub), {&perTime, &big}, 1},
+        {node(tts::Op::Div), {&big, &perChannel}, 1},
+        {node(tts::Op::Gelu), {&big}, 1},
+        {node(tts::Op::Tanh), {&big}, 1},
+        {with(tts::Op::LayerNormChannels, 1e-6f, ""), {&big, &gamma, &beta}, 1},
+        {node(tts::Op::DynamicQuantize), {&big}, 3},
+        {with(tts::Op::Pad, 0.0f, "constant"), {&big, &pads}, 1},
+        {with(tts::Op::Pad, 0.0f, "edge"), {&big, &pads}, 1},
+        {node(tts::Op::MatMulIntegerScaled), {&ta, &tb, &azp, nullptr, &qscale, &qbias}, 1},
     };
     for (const Case& c : cases) {
-        tts::Node n = c.op == tts::Op::LayerNormChannels ? ln : node(c.op);
         std::vector<Tensor> serial, parallel;
-        CHECK(runOp(n, c.in, serial, c.outputs));
-        CHECK(runOp(n, c.in, parallel, c.outputs, nullptr, &pool));
+        CHECK(runOp(c.n, c.in, serial, c.outputs));
+        CHECK(runOp(c.n, c.in, parallel, c.outputs, nullptr, &pool));
         bool ok = serial.size() == parallel.size();
         for (size_t i = 0; ok && i < serial.size(); ++i) ok = same(serial[i], parallel[i]);
-        if (!ok) std::fprintf(stderr, "  %s differs on threads\n", tts::opName(c.op));
+        if (!ok) std::fprintf(stderr, "  %s %s differs on threads\n", tts::opName(c.n.op), c.n.mode.c_str());
         CHECK(ok);
     }
+}
+
+// Large tensor blocks are reused after they are freed, until the cache is trimmed.
+TEST(tts_buffer_cache) {
+    tts::trimBufferCache();
+    const void* first;
+    {
+        Tensor a = Tensor::alloc(DType::F32, {3, 10000});
+        first = a.data;
+        Tensor small = Tensor::alloc(DType::F32, {100});
+    }
+    CHECK(tts::bufferCacheBytes() >= 120000 && tts::bufferCacheBytes() < 140000);   // the small one is not kept
+    {
+        Tensor b = Tensor::alloc(DType::U8, {119000});   // same size class, other type
+        CHECK(b.data == first);
+        CHECK_EQ(int(tts::bufferCacheBytes()), 0);
+        Tensor c = Tensor::alloc(DType::F32, {3, 10000});
+        CHECK(c.data != first);
+    }
+    tts::trimBufferCache();
+    CHECK_EQ(int(tts::bufferCacheBytes()), 0);
 }
 
 TEST(tts_ops_quantization) {
@@ -1456,10 +1494,20 @@ TEST(tts_perf) {
     if (!s) return;
     const char* text = "Good move, well played. Now the knight goes to f3.";
     // The best kernel set of this CPU, and AVX2 (the common desktop case) when it is not the best.
-    std::vector<const char*> arches = {"auto"};
+    // SCACELITH_TTS_PERF_ARCH=sse2,avx2 measures the given sets instead.
+    std::vector<std::string> arches = {"auto"};
     if (tts::kern::active().level > tts::kern::kAvx2 && tts::kern::cpuRuns(tts::kern::kAvx2)) arches.push_back("avx2");
-    for (const char* arch : arches) {
-        tts::setArchCap(arch);
+    if (const char* list = std::getenv("SCACELITH_TTS_PERF_ARCH")) {
+        arches.clear();
+        std::string l = list;
+        for (size_t p = 0; p <= l.size();) {
+            size_t e = std::min(l.find(',', p), l.size());
+            if (e > p) arches.push_back(l.substr(p, e - p));
+            p = e + 1;
+        }
+    }
+    for (const std::string& arch : arches) {
+        if (!tts::setArchCap(arch.c_str())) continue;
         for (int threads : {1, 2}) {
             tts::Options o;
             o.threads = threads;
@@ -1486,8 +1534,9 @@ TEST(tts_perf) {
         }
     }
     tts::setArchCap("auto");
-    std::fprintf(stderr, "  memory: VmRSS %ld kB, VmHWM %ld kB (mapped model files count in RSS)\n", statusKb("VmRSS:"),
-                 statusKb("VmHWM:"));
+    std::fprintf(stderr,
+                 "  memory: VmRSS %ld kB (RssAnon %ld kB, RssFile %ld kB: the mapped model files), VmHWM %ld kB\n",
+                 statusKb("VmRSS:"), statusKb("RssAnon:"), statusKb("RssFile:"), statusKb("VmHWM:"));
     // GEMM throughput on the shapes of the vector estimator (pointwise convolutions at L = 61, batch 2)
     // and of the vocoder (T = 366).
     {

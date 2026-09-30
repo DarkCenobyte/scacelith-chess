@@ -21,11 +21,19 @@ int64_t elementCount(const Dims& d);
 struct Buffer {
     void* data = nullptr;
     size_t bytes = 0;
+    size_t capacity = 0;   // allocated bytes (bytes + 64, rounded up to a size class when cached)
     explicit Buffer(size_t n);
     ~Buffer();
     Buffer(const Buffer&) = delete;
     Buffer& operator=(const Buffer&) = delete;
 };
+
+// Blocks of 64 KiB and more are not returned to the system allocator when freed but kept for
+// reuse (up to 128 MiB) until trimBufferCache(): a synthesis allocates and frees the same large
+// activations hundreds of times, and the Windows heap hands such blocks back to the OS on every
+// free (a page fault per 4 KiB page on every reuse). Synthesizer::synthesize() trims at its end.
+void trimBufferCache();
+size_t bufferCacheBytes();
 
 // DequantizeLinear(q, scale, zero_point) of a constant 8-bit tensor, kept quantized.
 struct QuantWeight {

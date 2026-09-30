@@ -191,6 +191,10 @@ ThreadPool* Synthesizer::pool(int threads) {
 std::vector<float> Synthesizer::synthesize(const std::string& textIn, const std::string& lang, const Options& o,
                                            const std::atomic<bool>* cancel) {
     FpGuard fp;
+    // The activations of this synthesis are reused through the buffer cache, then released.
+    struct TrimAtEnd {
+        ~TrimAtEnd() { trimBufferCache(); }
+    } trim;
     auto t0 = Clock::now();
     stats_ = Stats();
     std::vector<float> out;
