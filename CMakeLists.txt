@@ -83,6 +83,32 @@ set_source_files_properties(${ROOT}/src/tts/kernels_sse2.cpp PROPERTIES COMPILE_
 set_source_files_properties(${ROOT}/src/tts/kernels_avx2.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVX2_FLAGS}")
 set_source_files_properties(${ROOT}/src/tts/kernels_avxvnni.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVXVNNI_FLAGS}")
 set_source_files_properties(${ROOT}/src/tts/kernels_avx512.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVX512_FLAGS}")
+# Audit of those units (Stockfish's tools/isa_audit.py, part of the build when Python is available):
+# a small program links the TTS runtime like the game does, and the build fails if its disassembly
+# shows an instruction above baseline outside the kernel units, one above a unit's level inside it,
+# or a reference into a unit other than from the dispatcher (src/tts/cpu.cpp).
+find_package(Python3 COMPONENTS Interpreter)
+if(Python3_Interpreter_FOUND AND EXISTS ${ROOT}/third_party/stockfish/tools/isa_audit.py)
+    add_executable(tts_isa_probe ${ROOT}/tools/tts_isa_probe.cpp)
+    target_link_libraries(tts_isa_probe PRIVATE scacelith_core)
+    target_link_options(tts_isa_probe PRIVATE -Wl,-Map,${CMAKE_CURRENT_BINARY_DIR}/tts_isa_probe.map)
+    if(WIN32)
+        target_link_options(tts_isa_probe PRIVATE -static -static-libgcc -static-libstdc++)
+    endif()
+    set(stamp ${CMAKE_CURRENT_BINARY_DIR}/tts_isa_audit.ok)
+    add_custom_command(OUTPUT ${stamp}
+        COMMAND ${Python3_EXECUTABLE} ${ROOT}/third_party/stockfish/tools/isa_audit.py
+                $<TARGET_FILE:tts_isa_probe> ${CMAKE_CURRENT_BINARY_DIR}/tts_isa_probe.map ${CMAKE_OBJDUMP}
+                "\\(kernels_avx2\\.cpp\\.o(bj)?\\)=2" "\\(kernels_avxvnni\\.cpp\\.o(bj)?\\)=2"
+                "\\(kernels_avx512\\.cpp\\.o(bj)?\\)=3" --allow "scacelith_core\\.a\\(cpu\\.cpp\\.o(bj)?\\)"
+                --report ${CMAKE_CURRENT_BINARY_DIR}/tts_isa_audit.txt
+        COMMAND ${CMAKE_COMMAND} -E touch ${stamp}
+        DEPENDS tts_isa_probe ${ROOT}/third_party/stockfish/tools/isa_audit.py
+        COMMENT "Auditing the instruction sets of the TTS kernels" VERBATIM)
+    add_custom_target(tts_isa_audit ALL DEPENDS ${stamp})
+else()
+    message(STATUS "Python 3 not found: the TTS instruction-set audit is skipped")
+endif()
 include(third_party/supertonic3/supertonic3.cmake)
 # Networking (src/net): online client (WinHTTP, DPAPI, the shell for SSO), direct match (Winsock,
 # BCrypt ECDH P-256 / AES-GCM / SHA-256, adapter list for iphlpapi) and UPnP on Windows. Linux
