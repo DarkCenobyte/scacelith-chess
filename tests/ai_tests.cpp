@@ -113,6 +113,40 @@ TEST(ai_presets_ordered) {
     }
 }
 
+TEST(ai_coach_levels) {
+    // The coach plays a little below the top of the student's band (coach levels 1..6), on the
+    // presets' scale; level 0 (the scripted rules lesson) is weaker still.
+    const int bandLow[ai::kCoachLevels] = {0, 600, 900, 1200, 1500, 1800, 2100};
+    const int bandTop[ai::kCoachLevels] = {900, 900, 1200, 1500, 1800, 2100, 3500};
+    for (int level = 0; level < ai::kCoachLevels; ++level) {
+        const ai::EngineSettings s = ai::coachLevelSettings(level);
+        const int elo = ai::coachLevelElo(level), estimate = ai::Engine::estimateElo(s);
+        CHECK(std::abs(estimate - elo) <= 150);
+        CHECK(elo >= bandLow[level] && elo < bandTop[level]);
+        CHECK(ai::detail::skillLevel(s) >= 0.0);  // always handicapped
+        if (level > 0) {
+            CHECK(elo > ai::coachLevelElo(level - 1));
+            CHECK(estimate > ai::Engine::estimateElo(ai::coachLevelSettings(level - 1)));
+        }
+        if (level >= 3) {  // UCI_Elo levels: never depth-capped (that would silently weaken them)
+            CHECK(s.limitStrength);
+            CHECK(s.elo >= 1320 && s.elo <= 3190);
+            CHECK_EQ(s.depth, 0);
+            CHECK_EQ(s.nodes, int64_t(0));
+        } else {           // below Stockfish's floor: the depth-capped knobs of the weak presets
+            CHECK(!s.limitStrength);
+            CHECK_EQ(s.depth, 1);
+            CHECK(s.multiPV > 4);
+        }
+        CHECK_EQ(s.threads, 1);
+    }
+    CHECK(ai::detail::sameStrength(ai::coachLevelSettings(2), ai::presets()[1].settings));  // the Beginner
+    CHECK(ai::detail::sameStrength(ai::coachLevelSettings(-3), ai::coachLevelSettings(0)));
+    CHECK(ai::detail::sameStrength(ai::coachLevelSettings(99), ai::coachLevelSettings(ai::kCoachLevels - 1)));
+    CHECK_EQ(ai::coachLevelElo(-1), ai::coachLevelElo(0));
+    CHECK_EQ(ai::coachLevelElo(ai::kCoachLevels), ai::coachLevelElo(ai::kCoachLevels - 1));
+}
+
 TEST(ai_skill_mapping) {
     ai::EngineSettings s;
     CHECK(ai::detail::skillLevel(s) < 0.0);  // full strength
@@ -563,6 +597,15 @@ TEST(ai_engine_unavailable) {
     e.requestMove({}, ai::ClockInfo{});
     CHECK(e.moveReady());
     CHECK_EQ(e.takeMove(), std::string());
+    e.requestMoveFrom("6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1", {}, ai::ClockInfo{});
+    CHECK(e.moveReady());
+    CHECK_EQ(e.takeMove(), std::string());
+    const uint32_t id = e.requestAnalysis(ai::AnalysisRequest{});
+    CHECK(e.analysisReady(id));
+    ai::Analysis a;
+    CHECK(e.takeAnalysis(id, a));
+    CHECK(!a.ok);
+    CHECK(e.idle());
 }
 
 #endif
