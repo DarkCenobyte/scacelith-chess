@@ -154,6 +154,7 @@ elo::Record Settings::playerRecord() const {
     r.losses = playerLosses;
     r.peak = std::max(playerPeakElo, playerElo);
     r.rated = playerRated;
+    r.countedGames = playerCountedGames;
     r.unratedGames = playerUnratedGames;
     r.unratedOpponents = playerUnratedOpponents;
     r.unratedHalfPoints = playerUnratedHalfPoints;
@@ -168,6 +169,7 @@ void Settings::setPlayerRecord(const elo::Record& r) {
     playerLosses = r.losses;
     playerPeakElo = r.peak;
     playerRated = r.rated;
+    playerCountedGames = r.countedGames;
     playerUnratedGames = r.unratedGames;
     playerUnratedOpponents = r.unratedOpponents;
     playerUnratedHalfPoints = r.unratedHalfPoints;

@@ -69,8 +69,10 @@ struct Settings {
     int playerElo = 1500;
     int playerGames = 0, playerWins = 0, playerDraws = 0, playerLosses = 0;
     int playerPeakElo = 1500;
-    // Its FIDE unrated phase (elo::Record): false until the first rating, the sums of those games.
+    // Its FIDE unrated phase (elo::Record): false until the first rating, the sums of those games;
+    // the games counted in the rating.
     bool playerRated = false;
+    int playerCountedGames = 0;
     int playerUnratedGames = 0, playerUnratedOpponents = 0, playerUnratedHalfPoints = 0;
     elo::Record playerRecord() const;  // the [player] fields above as one record
     void setPlayerRecord(const elo::Record& r);

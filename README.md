@@ -69,8 +69,9 @@ Your rating is computed after every game against Stockfish as FIDE computes tour
   or win do not count towards it.
 - **Then** each game changes your rating by K × (score − expected score), where the expected
   score comes from FIDE's table for the rating difference (counted as 400 points at most): K = 40
-  for your first 30 games (those before your first rating included; the rating is provisional
-  until then), 20 afterwards, 10 once you have reached 2400. A rating never drops below 100.
+  for your first 30 counted games (those of your first rating included, not the losses before
+  your first draw or win; the rating is provisional until then), 20 afterwards, 10 once you have
+  reached 2400. A rating never drops below 100.
 
 The opponent's rating is the preset's (Novice 800 up to Stockfish Max 3500; a custom opponent is
 rated from its Skill Level or UCI Elo). A game counts once both players have moved; leaving a
@@ -106,7 +107,8 @@ left hand), and whether the game is rated. **Swap colours** exchanges the two pl
 A two-player game is friendly by default and never changes your rating against Stockfish. A rated
 one keeps a separate rating per name (`[local_player_N]` in the settings file; a new name starts
 unrated at 1500, with the same FIDE rules), updated for both players against each other's rating
-before the game (a game between two unrated names counts for both); leaving a game early rates
+before the game (a game between two unrated names counts for both, unless it is lost by a name
+that has not drawn or won yet: FIDE then ignores it for both); leaving a game early rates
 nothing.
 
 ## Watch a Game

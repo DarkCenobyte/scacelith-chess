@@ -79,7 +79,7 @@ struct Seat {
     Controller controller = Controller::Stockfish;
     std::string name;             // scoresheet name: the player's name / "Stockfish"
     int elo = 0;                  // human: rating when the game started; Stockfish: ai::presetElo()
-    bool provisional = false;     // human with fewer than elo::kProvisionalGames rated games
+    bool provisional = false;     // human whose rating is provisional (elo::Record::provisional())
     std::string ratingText;       // online: the server rating as written ("1500?"), "" = none
     int preset = -1;              // Stockfish: index into ai::presets() (the last one is Custom)
     std::string presetName;       // Stockfish: "Expert", ...

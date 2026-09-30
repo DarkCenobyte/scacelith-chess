@@ -266,7 +266,7 @@ TEST(hotseat_held_buttons_are_ignored_until_released) {
 TEST(hotseat_elo_pair) {
     // Two new names: unrated, each game counts for both at the other's working rating (1500), and
     // the ratings do not move until the fifth game gives both their first rating.
-    // (A first game lost would stay out of the loser's unrated phase: the zero-score rule.)
+    // (A first game lost would count for neither: the zero-score rule.)
     elo::Record w, b;
     elo::PairChange c = elo::applyPair(w, b, 0.5);
     CHECK_EQ(c.white.before, 1500);
@@ -299,8 +299,8 @@ TEST(hotseat_elo_pair) {
     // Different K factors: the changes do not cancel out.
     elo::Record est, fresh;
     est.rated = fresh.rated = true;
-    est.games = 50;
-    fresh.games = 5;
+    est.games = est.countedGames = 50;
+    fresh.games = fresh.countedGames = 5;
     est.rating = est.peak = 1600;
     fresh.rating = fresh.peak = 1600;
     c = elo::applyPair(est, fresh, 0.0);

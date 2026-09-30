@@ -1,5 +1,6 @@
 // Elo rating (src/game/elo.h): FIDE's tables 8.1.1 and 8.1.2, the K formula, the unrated phase and
-// the first rating (with the zero-score rule), games against unrated players, the .ini records,
+// the first rating (with the zero-score rule for both players), games against unrated players, the
+// counted games (K, provisional), the .ini records,
 // and the vectors of the dedicated server's rating (dedicated-server/test/fixtures/elo-vectors.json,
 // written by dedicated-server/tools/gen-elo-vectors.js from src/match/elo.js): the game and the
 // server must give the same numbers to the last point. The vectors file is looked up from the
@@ -42,7 +43,7 @@ elo::Record rated(int rating, int games, int peak = 0) {
     elo::Record r;
     r.rated = true;
     r.rating = rating;
-    r.games = games;
+    r.games = r.countedGames = games;
     r.peak = std::max(rating, peak);
     return r;
 }
@@ -56,6 +57,7 @@ elo::Record recordOf(const Value& v) {
     r.losses = int(v["losses"].asInt());
     r.peak = int(v["peak"].asInt());
     r.rated = v["rated"].asBool();
+    r.countedGames = int(v["countedGames"].asInt());
     r.unratedGames = int(v["unratedGames"].asInt());
     r.unratedOpponents = int(v["unratedOpponents"].asInt());
     r.unratedHalfPoints = int(v["unratedHalfPoints"].asInt());
@@ -64,8 +66,8 @@ elo::Record recordOf(const Value& v) {
 
 bool sameRecord(const elo::Record& a, const elo::Record& b) {
     return a.rating == b.rating && a.games == b.games && a.wins == b.wins && a.draws == b.draws && a.losses == b.losses &&
-           a.peak == b.peak && a.rated == b.rated && a.unratedGames == b.unratedGames && a.unratedOpponents == b.unratedOpponents &&
-           a.unratedHalfPoints == b.unratedHalfPoints;
+           a.peak == b.peak && a.rated == b.rated && a.countedGames == b.countedGames && a.unratedGames == b.unratedGames &&
+           a.unratedOpponents == b.unratedOpponents && a.unratedHalfPoints == b.unratedHalfPoints;
 }
 
 }  // namespace
@@ -128,10 +130,17 @@ TEST(elo_expected_score) {
 TEST(elo_k_factor) {
     elo::Record r = rated(1500, 5);
     CHECK_EQ(elo::kFactor(r), 40);
-    r.games = 29;
+    r.games = r.countedGames = 29;
     CHECK_EQ(elo::kFactor(r), 40);
-    r.games = 30;
+    r.games = r.countedGames = 30;
     CHECK_EQ(elo::kFactor(r), 20);
+    // The counted games set K, not the games played (some against unrated opponents, zero scores).
+    r.games = 80;
+    r.countedGames = 29;
+    CHECK_EQ(elo::kFactor(r), 40);
+    CHECK(r.provisional());
+    r.countedGames = 30;
+    CHECK(!r.provisional());
     r.peak = 2400;
     CHECK_EQ(elo::kFactor(r), 10);
     r.rating = 2300;  // stays 10 once 2400 has been reached
@@ -197,6 +206,7 @@ TEST(elo_unrated_phase) {
     }
     CHECK(r.unrated());
     CHECK_EQ(r.unratedGames, 4);
+    CHECK_EQ(r.countedGames, 4);
     CHECK_EQ(r.unratedOpponents, 3200);
     CHECK_EQ(r.unratedHalfPoints, 5);
     CHECK_EQ(r.games, 4);
@@ -206,15 +216,18 @@ TEST(elo_unrated_phase) {
     CHECK_EQ(c.after, 1188);
     CHECK(r.rated);
     CHECK_EQ(r.peak, 1188);
+    CHECK_EQ(r.countedGames, 5);
     CHECK_EQ(r.unratedGames, 0);
     CHECK_EQ(r.unratedOpponents, 0);
     CHECK_EQ(r.wins, 3);
     CHECK_EQ(r.draws, 1);
     CHECK_EQ(r.losses, 1);
-    // Then K = 40 until 30 games, the unrated ones included: D 388, PD 0.91, 40 x 0.09 = 3.6 -> +4.
+    // Then K = 40 until 30 counted games, the unrated ones included: D 388, PD 0.91, 40 x 0.09 =
+    // 3.6 -> +4.
     c = elo::applyResult(r, 800, 1.0);
     CHECK_EQ(c.k, 40);
     CHECK_EQ(c.after, 1192);
+    CHECK_EQ(r.countedGames, 6);
     CHECK(r.provisional());
 }
 
@@ -229,8 +242,10 @@ TEST(elo_zero_score_rule) {
     CHECK(r.unrated());
     CHECK_EQ(r.games, 5);
     CHECK_EQ(r.losses, 5);
+    CHECK_EQ(r.countedGames, 0);
     CHECK_EQ(r.unratedGames, 0);
     CHECK_EQ(r.unratedOpponents, 0);
+    CHECK(r.provisional());
     // Once the player has scored, the losses count: a draw and four losses against 1500:
     // Ra = 11100 / 7 = 1585.7, p = 1.5 / 7 = 0.21 (dp -230) -> 1356, the peak too.
     elo::Record s;
@@ -246,13 +261,60 @@ TEST(elo_zero_score_rule) {
     CHECK_EQ(s.games, 6);
 }
 
+TEST(elo_zero_score_rule_disregards_the_winner_too) {
+    // FIDE 8.2.1 also disregards the opponents' results against a zero score. A name that only
+    // loses stays unrated and gives nothing to the names that beat it, however many: without the
+    // rule, five wins against it gave a first rating of 1895 and the loser never moved.
+    elo::Record booster;
+    for (int n = 0; n < 3; ++n) {
+        elo::Record fresh;
+        for (int i = 0; i < 30; ++i) {
+            elo::PairChange c = elo::applyPair(fresh, booster, 1.0);
+            CHECK_EQ(c.white.after, 1500);
+            CHECK_EQ(c.black.after, 1500);
+        }
+        CHECK(fresh.unrated());
+        CHECK_EQ(fresh.games, 30);
+        CHECK_EQ(fresh.wins, 30);
+        CHECK_EQ(fresh.countedGames, 0);
+        CHECK_EQ(fresh.unratedOpponents, 0);
+    }
+    CHECK(booster.unrated());
+    CHECK_EQ(booster.games, 90);
+    CHECK_EQ(booster.countedGames, 0);
+    // Once the loser has scored (a draw), its losses count for both: it is rated after five
+    // counted games and then loses points like anyone. A draw and four wins against 1500:
+    // p = 11 / 14 = 0.79 (dp 230) -> 1816 for the winner, 1356 for the loser.
+    elo::Record a, b;
+    elo::applyPair(a, b, 0.5);
+    for (int i = 0; i < 4; ++i) elo::applyPair(a, b, 1.0);
+    CHECK(a.rated && b.rated);
+    CHECK_EQ(a.rating, 1816);
+    CHECK_EQ(b.rating, 1356);
+    elo::PairChange c = elo::applyPair(a, b, 1.0);
+    CHECK_EQ(c.black.delta(), -3);  // D 460 counted as 400: PD 0.92, 40 x -0.08 = -3.2
+    CHECK_EQ(c.white.k, 40);
+    // A player who has scored only against zero scores has scored: their loss counts, and so does
+    // the win against them.
+    elo::Record scorer, beginner, winner;
+    elo::applyPair(scorer, beginner, 1.0);
+    CHECK_EQ(scorer.countedGames, 0);
+    elo::applyPair(winner, scorer, 1.0);
+    CHECK_EQ(scorer.countedGames, 1);
+    CHECK_EQ(scorer.unratedHalfPoints, 0);
+    CHECK_EQ(winner.countedGames, 1);
+    CHECK_EQ(winner.unratedOpponents, 1500);
+}
+
 TEST(elo_unrated_opponents) {
-    // A rated player against an unrated one: no change, the game still counts.
+    // A rated player against an unrated one: no change, the game counts in the games and results,
+    // not in the counted games.
     elo::Record est = rated(1700, 45), fresh;
     elo::PairChange c = elo::applyPair(est, fresh, 0.0);
     CHECK_EQ(c.white.delta(), 0);
     CHECK_EQ(c.white.k, 0);
     CHECK_EQ(est.games, 46);
+    CHECK_EQ(est.countedGames, 45);
     CHECK_EQ(est.losses, 1);
     CHECK_EQ(fresh.unratedOpponents, 1700);
     CHECK_EQ(fresh.unratedHalfPoints, 2);
@@ -276,8 +338,15 @@ TEST(elo_ini_records) {
     CHECK(r.rated);
     CHECK_EQ(r.rating, 1623);
     CHECK_EQ(r.games, 12);
+    CHECK_EQ(r.countedGames, 12);  // all its games were rated
     CHECK_EQ(r.peak, 1650);
     CHECK_EQ(elo::applyResult(r, 1623, 1.0).k, 40);
+    // A file written before the counted games existed: a rated record counts all its games.
+    IniFile noCount;
+    noCount.setInt("player.games", 40);
+    noCount.setBool("player.rated", true);
+    CHECK_EQ(elo::readRecord(noCount, "player").countedGames, 40);
+    CHECK(!elo::readRecord(noCount, "player").provisional());
     // No record at all, or one without games: unrated at the initial rating.
     IniFile none;
     elo::Record n = elo::readRecord(none, "local_player_1");
@@ -294,6 +363,11 @@ TEST(elo_ini_records) {
     CHECK(sameRecord(elo::readRecord(f, "local_player_2"), u));
     elo::writeRecord(f, "player", r);
     CHECK(sameRecord(elo::readRecord(f, "player"), r));
+    elo::Record fewer = rated(1600, 50);
+    fewer.countedGames = 22;
+    elo::writeRecord(f, "local_player_3", fewer);
+    CHECK_EQ(f.getInt("local_player_3.counted_games", 0), 22);
+    CHECK(sameRecord(elo::readRecord(f, "local_player_3"), fewer));
     // Inconsistent values are made consistent.
     IniFile bad;
     bad.setInt("player.elo", 20);
@@ -312,7 +386,15 @@ TEST(elo_ini_records) {
     sums.setInt("player.games", 40);
     sums.setBool("player.rated", true);
     sums.setInt("player.unrated_games", 3);
+    sums.setInt("player.counted_games", 45);
     CHECK_EQ(elo::readRecord(sums, "player").unratedGames, 0);
+    CHECK_EQ(elo::readRecord(sums, "player").countedGames, 40);  // at most the games
+    IniFile phase;
+    phase.setInt("player.games", 6);
+    phase.setBool("player.rated", false);
+    phase.setInt("player.unrated_games", 2);
+    phase.setInt("player.counted_games", 6);
+    CHECK_EQ(elo::readRecord(phase, "player").countedGames, 2);  // those of the unrated phase
 }
 
 TEST(elo_matches_server_vectors) {

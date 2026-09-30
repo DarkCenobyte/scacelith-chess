@@ -48,6 +48,12 @@ int halfPoints(double score) {
     return int(std::lround(std::clamp(score, 0.0, 1.0) * 2.0));
 }
 
+// Whether a record scoring 'half' half points in a game makes it a zero score (FIDE 8.2.1): an
+// unrated record that has not scored yet (no win, no draw) loses.
+bool zeroScore(const Record& r, int half) {
+    return !r.rated && half == 0 && r.wins + r.draws == 0;
+}
+
 }  // namespace
 
 int scoringProbability(int d) {
@@ -68,7 +74,7 @@ double expectedScore(int rating, int opponent) {
 
 int kFactor(const Record& r) {
     if (r.peak >= kSeniorRating || r.rating >= kSeniorRating) return 10;
-    return r.games < kProvisionalGames ? 40 : 20;
+    return r.countedGames < kProvisionalGames ? 40 : 20;
 }
 
 int initialRating(const Record& r) {
@@ -89,8 +95,10 @@ Change applyResult(Record& r, const Record& opponent, double score) {
     c.expected = expectedScore(r.rating, opponent.rating);
     int half = halfPoints(score);
     if (!r.rated) {
-        // The zero-score rule: the losses before the first half point are disregarded.
-        if (half > 0 || r.unratedHalfPoints > 0) {
+        // The zero-score rule: a zero score is disregarded, and so are the opponent's results
+        // against it (a rated opponent's rating does not move against an unrated player anyway).
+        if (!zeroScore(r, half) && !zeroScore(opponent, 2 - half)) {
+            ++r.countedGames;
             ++r.unratedGames;
             r.unratedOpponents += opponent.rating;
             r.unratedHalfPoints += half;
@@ -104,6 +112,7 @@ Change applyResult(Record& r, const Record& opponent, double score) {
         c.k = kFactor(r);
         r.rating = std::max(kFloor, r.rating + ratingDelta(r, opponent.rating, score));
         r.peak = std::max(r.peak, r.rating);
+        ++r.countedGames;
     }
     ++r.games;
     if (half == 2) ++r.wins;
@@ -139,11 +148,14 @@ Record readRecord(const IniFile& ini, const std::string& section) {
     r.losses = std::max(0, ini.getInt(k + "losses", 0));
     r.peak = std::max(r.rating, ini.getInt(k + "peak", r.rating));
     r.rated = ini.getBool(k + "rated", r.games > 0);
-    if (!r.rated) {
+    if (r.rated) {
+        r.countedGames = std::clamp(ini.getInt(k + "counted_games", r.games), 0, r.games);
+    } else {
         // The phase ends at its kUnratedGames-th game: a record never waits with that many.
         r.unratedGames = std::clamp(ini.getInt(k + "unrated_games", 0), 0, kUnratedGames - 1);
         r.unratedOpponents = std::max(0, ini.getInt(k + "unrated_opponents", 0));
         r.unratedHalfPoints = std::clamp(ini.getInt(k + "unrated_half_points", 0), 0, 2 * r.unratedGames);
+        r.countedGames = r.unratedGames;
     }
     return r;
 }
@@ -157,6 +169,7 @@ void writeRecord(IniFile& ini, const std::string& section, const Record& r) {
     ini.setInt(k + "losses", r.losses);
     ini.setInt(k + "peak", r.peak);
     ini.setBool(k + "rated", r.rated);
+    ini.setInt(k + "counted_games", r.countedGames);
     ini.setInt(k + "unrated_games", r.unratedGames);
     ini.setInt(k + "unrated_opponents", r.unratedOpponents);
     ini.setInt(k + "unrated_half_points", r.unratedHalfPoints);

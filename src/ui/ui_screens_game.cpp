@@ -342,8 +342,8 @@ void titleRating(float x, float y) {
     if (s.playerGames <= 0) {
         line = tr("elo.no_games");
     } else {
-        line = s.playerGames < elo::kProvisionalGames ? std::string(tr("elo.provisional"))
-                                                      : trf("elo.peak", {num(std::max(s.playerPeakElo, s.playerElo))});
+        line = s.playerRecord().provisional() ? std::string(tr("elo.provisional"))
+                                              : trf("elo.peak", {num(std::max(s.playerPeakElo, s.playerElo))});
         // "+12 =4 -9" reads left to right in every language.
         line += "  \xC2\xB7  " + i18n::ltr(trf("elo.record", {num(s.playerWins), num(s.playerDraws), num(s.playerLosses)}));
     }

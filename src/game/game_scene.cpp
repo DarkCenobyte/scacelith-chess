@@ -534,7 +534,7 @@ void GameScene::configureSeats() {
             st.controller = Controller::Human;
             st.name = localPlayerName();
             st.elo = s.playerElo;
-            st.provisional = s.playerGames < elo::kProvisionalGames;
+            st.provisional = s.playerRecord().provisional();
         } else {
             st.controller = Controller::Stockfish;
             st.name = "Stockfish";
