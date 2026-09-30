@@ -67,6 +67,23 @@ else()
     find_package(Threads REQUIRED)
     target_link_libraries(scacelith_core PUBLIC Threads::Threads)
 endif()
+# Text-to-speech (src/tts): the compute kernels are compiled once per instruction set and chosen at
+# run time (src/tts/kernels.h); everything else is baseline x86-64. MinGW does not align the stack
+# to 32 bytes for AVX spills (GCC bug 54412): the assembler turns aligned vector moves into
+# unaligned ones in those units. The model files are prepared by third_party/supertonic3.
+set(TTS_AVX2_FLAGS -O3 -mavx2 -mfma)
+set(TTS_AVXVNNI_FLAGS ${TTS_AVX2_FLAGS} -mavxvnni)
+set(TTS_AVX512_FLAGS ${TTS_AVX2_FLAGS} -mavx512f -mavx512bw -mavx512vl -mavx512dq -mavx512vnni)
+if(WIN32)
+    foreach(v TTS_AVX2_FLAGS TTS_AVXVNNI_FLAGS TTS_AVX512_FLAGS)
+        list(APPEND ${v} -Wa,-muse-unaligned-vector-move)
+    endforeach()
+endif()
+set_source_files_properties(${ROOT}/src/tts/kernels_sse2.cpp PROPERTIES COMPILE_OPTIONS "-O3")
+set_source_files_properties(${ROOT}/src/tts/kernels_avx2.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVX2_FLAGS}")
+set_source_files_properties(${ROOT}/src/tts/kernels_avxvnni.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVXVNNI_FLAGS}")
+set_source_files_properties(${ROOT}/src/tts/kernels_avx512.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVX512_FLAGS}")
+include(third_party/supertonic3/supertonic3.cmake)
 # Networking (src/net): online client (WinHTTP, DPAPI, the shell for SSO), direct match (Winsock,
 # BCrypt ECDH P-256 / AES-GCM / SHA-256, adapter list for iphlpapi) and UPnP on Windows. Linux
 # development builds use OpenSSL: required by the direct match; the online client also builds
