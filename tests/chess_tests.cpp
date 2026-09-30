@@ -1485,3 +1485,77 @@ TEST(chess_arbiter_misc) {
     CHECK(!a.place(d, 64, NoPiece));
     CHECK(!a.place(d, NoSquare, NoPiece));
 }
+
+// ---- Board queries for the coach's explanations -------------------------------------------------
+
+TEST(chess_board_queries) {
+    // Italian after 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nd4 4.Nxe5 Qg5 (the coach's worked fork example).
+    Position p = fromFEN("r1b1kbnr/pppp1ppp/8/4N1q1/2BnP3/8/PPPP1PPP/RNBQK2R w KQkq - 1 5");
+    CHECK_EQ(p.pieces(White, Knight), squareBit(sq("b1")) | squareBit(sq("e5")));
+    CHECK_EQ(squareCount(p.pieces(Pawn)), 15);
+    CHECK_EQ(p.occupancy(), p.pieces(White) | p.pieces(Black));
+    // g2 and e5 are attacked by the queen on g5 and not defended.
+    CHECK_EQ(p.attackersTo(sq("e5"), Black), squareBit(sq("g5")));
+    CHECK_EQ(p.attackersTo(sq("e5"), White), uint64_t(0));
+    CHECK_EQ(p.attackersTo(sq("g2"), Black), squareBit(sq("g5")));
+    CHECK_EQ(p.attackersTo(sq("g2"), White), uint64_t(0));  // the king on e1 is too far
+    // Attacks from a square; a pawn attacks its two capture squares.
+    CHECK(p.attacksFrom(sq("g5")) & squareBit(sq("g2")));
+    CHECK(p.attacksFrom(sq("g5")) & squareBit(sq("e5")));
+    CHECK_EQ(p.attacksFrom(sq("e4")), squareBit(sq("d5")) | squareBit(sq("f5")));
+    CHECK_EQ(p.attacksFrom(sq("e3")), uint64_t(0));
+    CHECK_EQ(attacksOf(Pawn, Black, sq("e5"), 0), squareBit(sq("d4")) | squareBit(sq("f4")));
+    // X-rays: the rook a8 and the queen d8 line up on the 8th rank; with the queen out of the
+    // occupancy, the rook reaches e8's neighbour d8.
+    Position x = fromFEN("r2qk3/8/8/8/8/8/8/4K3 w - - 0 1");
+    CHECK_EQ(x.attackersTo(sq("c8"), Black), squareBit(sq("a8")) | squareBit(sq("d8")));
+    CHECK_EQ(x.attackersTo(sq("e8"), x.occupancy()) & x.pieces(Black, Rook), uint64_t(0));
+    CHECK_EQ(x.attackersTo(sq("e8"), x.occupancy() & ~squareBit(sq("d8"))) & x.pieces(Black, Rook), squareBit(sq("a8")));
+    const std::vector<Square> knights = squaresOf(p.pieces(White, Knight));
+    CHECK_EQ(knights.size(), size_t(2));
+    CHECK_EQ(knights[0], sq("b1"));
+    CHECK_EQ(knights[1], sq("e5"));
+    CHECK_EQ(squaresBetween(sq("a1"), sq("d4")), squareBit(sq("b2")) | squareBit(sq("c3")));
+    CHECK_EQ(squaresBetween(sq("a1"), sq("b3")), uint64_t(0));
+    CHECK_EQ(squaresBetween(sq("e1"), sq("e2")), uint64_t(0));
+    CHECK_EQ(squareCount(squaresBetween(sq("h8"), sq("h1"))), 6);
+}
+
+TEST(chess_checkers_pins_pass_turn) {
+    // Double check: rook e1 and bishop b5 against the king on e8.
+    Position d = fromFEN("4k3/8/8/1B6/8/8/8/4RK2 b - - 0 1");
+    CHECK_EQ(d.checkers(), squareBit(sq("e1")) | squareBit(sq("b5")));
+    Position quiet = fromFEN("4k3/8/8/8/8/8/8/4K3 w - - 0 1");
+    CHECK_EQ(quiet.checkers(), uint64_t(0));
+    // Absolute pin: Bb5 pins the knight c6 to the king e8.
+    Position pin = fromFEN("r1bqkbnr/ppp2ppp/2np4/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4");
+    CHECK_EQ(pin.pinned(Black), squareBit(sq("c6")));
+    CHECK_EQ(pin.pinned(White), uint64_t(0));
+    // Pass the turn: White to move afterwards, en passant cleared, same pieces.
+    Position ep = fromFEN("4k3/8/8/8/3pP3/8/8/4K3 b - e3 0 1");
+    CHECK_EQ(ep.epSquare(), sq("e3"));
+    Position q = ep;
+    CHECK(q.passTurn());
+    CHECK_EQ(q.sideToMove(), White);
+    CHECK_EQ(q.epSquare(), NoSquare);
+    CHECK_EQ(q.halfmoveClock(), 1);
+    CHECK(q.pieces(White) == ep.pieces(White) && q.pieces(Black) == ep.pieces(Black));
+    // The hash equals the one of the same position set up with White to move.
+    Position same = fromFEN("4k3/8/8/8/3pP3/8/8/4K3 w - - 1 1");
+    CHECK_EQ(q.hash(), same.hash());
+    CHECK(q.samePosition(same));
+    // In check: no pass, nothing changes.
+    Position c = d;
+    CHECK(!c.passTurn());
+    CHECK_EQ(c.sideToMove(), Black);
+}
+
+TEST(chess_game_position_at) {
+    Game g;
+    CHECK(playLine(g, {"e4", "e5", "Nf3"}));
+    CHECK(g.positionAt(0).samePosition(g.startPosition()));
+    CHECK_EQ(g.positionAt(1).at(sq("e4")).type, Pawn);
+    CHECK_EQ(g.positionAt(1).sideToMove(), Black);
+    CHECK(g.positionAt(3).samePosition(g.position()));
+    CHECK(g.positionAt(99).samePosition(g.position()));  // clamped
+}

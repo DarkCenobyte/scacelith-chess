@@ -1,0 +1,434 @@
+# Coach speech: the appraisal after the game (src/coach/appraisal.cpp).
+# English is the reference language. Same syntax as assets/i18n: "key = value", '#' comments.
+#
+# Translators, read this first:
+# - "key", "key.2", "key.3" are alternative phrasings of the same message; keep the same number.
+# - ".b1" ... ".b6" at the end of a key is the coach level (1 = beginner, warm and simple; 6 =
+#   expert, terse). The appraisal is always positive and never blames: keep that tone.
+# - Placeholders are filled by the program; keep every placeholder of the English line (word order
+#   is free). The coach points at the board on {move} when the piece is still there.
+#     {moves}            full moves the game lasted
+#     {move}             one of the player's moves; {n} its move number (or a count, see the line)
+#     {my}               a piece of the coach's that the player captured: "my knight"
+#     {n} {m} {k}        counts; "{n:move}" says "3 moves", see count.<noun> in common.lang
+#     {pts}              points of material
+#     {acc} {acc_coach} {acc_phase}  accuracy in percent, whole numbers
+#     {text}             a name from this file: appraisal.phase.*, appraisal.reason.*
+#     {theme}            a phrase from this file: theme.*
+#     {crit_no}          the move number of the critical moment; {crit_move} the move played there,
+#                        {crit_best} the better move
+#     {eval}             an evaluation from the player's side: "+1.3", "mate in 4"
+#     {opening}          the name of the opening
+#     {level}            a level name: appraisal.level.*
+#   Never write "your" or "my" before {my}: the possessive is already in it.
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+appraisal.phase.opening = the opening
+appraisal.phase.middlegame = the middlegame
+appraisal.phase.endgame = the endgame
+appraisal.reason.stalemate = by stalemate
+appraisal.reason.material = because nobody could mate
+appraisal.reason.repetition = by repetition
+appraisal.reason.fifty = by the fifty-move rule
+appraisal.reason.agreement = by agreement
+appraisal.reason.other = as a draw
+appraisal.level.l1 = First steps
+appraisal.level.l2 = Beginner
+appraisal.level.l3 = Improver
+appraisal.level.l4 = Club player
+appraisal.level.l5 = Strong club player
+appraisal.level.l6 = Expert
+# What to practise, after "One thing to practise:" and similar (a phrase, no full stop).
+theme.general = looking at the whole board before you move
+theme.mate_allowed = checking your king's safety before every move
+theme.mate_missed = looking for checkmates, starting with checks
+theme.stalemate = leaving my king a square when you are winning
+theme.fork = watching for double attacks
+theme.discovered = watching for hidden attacks behind my pieces
+theme.skewer = keeping valuable pieces off the same line
+theme.pin = spotting pins before they happen
+theme.trapped = keeping an escape route for your pieces
+theme.back_rank = giving your king a little window
+theme.hanging = keeping your pieces protected
+theme.exchange = counting attackers and defenders before trading
+theme.missed_capture = looking for free pieces first
+theme.missed_fork = looking for your own double attacks
+theme.promotion = racing pawns, and the square of the pawn
+theme.king_safety = keeping your king safe behind its pawns
+theme.bad_trade = choosing which pieces to trade
+theme.opening = developing your pieces and castling early
+theme.endgame = using your king and pushing passed pawns
+theme.positional = improving your worst piece
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = Checkmate! You won. Well played!
+appraisal.open.win.b1.2 = You won! Great job finishing the game.
+appraisal.open.win.b1.3 = You beat me! That was a really good game.
+appraisal.open.win.b2 = Well played! You won in {moves} moves.
+appraisal.open.win.b2.2 = Congratulations, you won!
+appraisal.open.win.b2.3 = A win in {moves} moves. Nicely done!
+appraisal.open.win.b3 = Congratulations, a well-earned win.
+appraisal.open.win.b3.2 = Well played. You deserved that win.
+appraisal.open.win.b3.3 = A good win. Congratulations.
+appraisal.open.win.b4 = Nice win.
+appraisal.open.win.b4.2 = Well played, a deserved win.
+appraisal.open.win.b4.3 = Good win.
+appraisal.open.win.b5 = Well played.
+appraisal.open.win.b5.2 = Nicely won.
+appraisal.open.win.b5.3 = Good game, well won.
+appraisal.open.win.b6 = Well played.
+appraisal.open.win.b6.2 = Well won.
+appraisal.open.win.b6.3 = Good game.
+appraisal.open.draw.b1 = A draw! Nobody could win this one.
+appraisal.open.draw.b1.2 = It's a draw. That was a close game!
+appraisal.open.draw.b1.3 = A draw: we share the point. Well played!
+appraisal.open.draw.b2 = A draw: a fair result.
+appraisal.open.draw.b2.2 = We drew. Good fight!
+appraisal.open.draw.b2.3 = A draw, and a good game.
+appraisal.open.draw.b3 = A draw. Both sides had chances.
+appraisal.open.draw.b3.2 = A fair draw.
+appraisal.open.draw.b3.3 = Drawn, {text}. A good fight.
+appraisal.open.draw.b4 = Draw, {text}.
+appraisal.open.draw.b4.2 = A draw, {text}.
+appraisal.open.draw.b4.3 = Drawn, {text}.
+appraisal.open.draw.b5 = Draw.
+appraisal.open.draw.b5.2 = Drawn, {text}.
+appraisal.open.draw.b5.3 = A draw.
+appraisal.open.draw.b6 = Draw.
+appraisal.open.draw.b6.2 = Drawn, {text}.
+appraisal.open.draw.b6.3 = A draw.
+appraisal.open.stalemate.b1 = A draw by stalemate: so close! Next time, leave my king a square.
+appraisal.open.stalemate.b1.2 = Stalemate, so it's a draw. You were nearly there!
+appraisal.open.stalemate.b2 = A draw by stalemate. You were so close to winning!
+appraisal.open.stalemate.b2.2 = Stalemate: a draw, though you were winning.
+appraisal.open.stalemate.b3 = A draw by stalemate, from a winning position.
+appraisal.open.stalemate.b3.2 = Stalemate. The win slipped away at the very end.
+appraisal.open.stalemate.b4 = Draw by stalemate.
+appraisal.open.stalemate.b4.2 = Stalemate: a draw.
+appraisal.open.stalemate.b5 = Stalemate.
+appraisal.open.stalemate.b5.2 = Draw, by stalemate.
+appraisal.open.stalemate.b6 = Stalemate.
+appraisal.open.stalemate.b6.2 = Draw, stalemate.
+appraisal.open.loss.b1 = I won this time, but you played some really good moves.
+appraisal.open.loss.b1.2 = Good game! You made me work for it.
+appraisal.open.loss.b1.3 = That was fun! I won this one, but you're learning fast.
+appraisal.open.loss.b2 = Good game! Let's look at what went well, and one thing to try.
+appraisal.open.loss.b2.2 = Thanks for the game! You had some good ideas.
+appraisal.open.loss.b2.3 = Good game. Let's see what we can learn from it.
+appraisal.open.loss.b3 = Good game.
+appraisal.open.loss.b3.2 = Thanks for the game.
+appraisal.open.loss.b3.3 = Good game. Let's have a look.
+appraisal.open.loss_close.b3 = Good fight. The game was close for a long time.
+appraisal.open.loss_close.b3.2 = Good fight: it was balanced for a long time.
+appraisal.open.loss.b4 = Good game. Here's what decided it.
+appraisal.open.loss.b4.2 = Good game. One moment decided it.
+appraisal.open.loss.b4.3 = Thanks for the game. Let's see where it turned.
+appraisal.open.loss_close.b4 = A close fight for a long time. Here's what decided it.
+appraisal.open.loss_close.b4.2 = Good game, balanced for a long while.
+appraisal.open.loss.b5 = Good game.
+appraisal.open.loss.b5.2 = Thanks for the game.
+appraisal.open.loss.b5.3 = Good fight.
+appraisal.open.loss.b6 = Good game.
+appraisal.open.loss.b6.2 = Thanks for the game.
+appraisal.open.loss.b6.3 = Good fight.
+appraisal.open.resigned.b1 = Resigning is part of chess; it takes courage. Good game!
+appraisal.open.resigned.b1.2 = That's all right. Knowing when to resign is part of chess.
+appraisal.open.resigned.b2 = Resigning is part of chess; it takes courage.
+appraisal.open.resigned.b2.2 = Fair enough. Resigning takes courage too.
+appraisal.open.resigned.b3 = Resigning is part of chess. Good game.
+appraisal.open.resigned.b3.2 = Fair enough. Thanks for the game.
+appraisal.open.resigned.b4 = Good game.
+appraisal.open.resigned.b4.2 = Thanks for the game.
+appraisal.open.resigned.b5 = Good game.
+appraisal.open.resigned.b5.2 = Thanks for the game.
+appraisal.open.resigned.b6 = Good game.
+appraisal.open.resigned.b6.2 = Thanks.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = It wasn't over yet, you know: about {eval}.
+appraisal.resign_early.b3.2 = Actually, you still had chances: about {eval}.
+appraisal.resign_early.b4 = It wasn't over yet: about {eval}.
+appraisal.resign_early.b4.2 = There was still play: about {eval}.
+appraisal.resign_early.b5 = It wasn't over: {eval}.
+appraisal.resign_early.b5.2 = Still playable, about {eval}.
+appraisal.resign_early.b6 = Not over: {eval}.
+appraisal.resign_early.b6.2 = It was {eval}.
+# The opening played (levels 3-6).
+appraisal.opening.b3 = We played the {opening}.
+appraisal.opening.b3.2 = The opening was the {opening}.
+appraisal.opening.b4 = We had the {opening}.
+appraisal.opening.b4.2 = The opening: the {opening}.
+appraisal.opening.b5 = The {opening}.
+appraisal.opening.b5.2 = Opening: the {opening}.
+appraisal.opening.b6 = The {opening}.
+appraisal.opening.b6.2 = Opening: the {opening}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+appraisal.best.brilliant.b1 = What a sacrifice at move {n}: {move}!
+appraisal.best.brilliant.b1.2 = My favourite moment: {move}. You gave up a piece, and it worked!
+appraisal.best.brilliant.b2 = Your best moment: the sacrifice {move} at move {n}.
+appraisal.best.brilliant.b2.2 = {move} at move {n} was a brave sacrifice. Well done!
+appraisal.best.brilliant.b3 = Brilliant sacrifice with {move}.
+appraisal.best.brilliant.b3.2 = The highlight: {move}, a real sacrifice, at move {n}.
+appraisal.best.brilliant.b4 = Best moment: {move}, move {n}. A brilliant sacrifice.
+appraisal.best.brilliant.b4.2 = {move} at move {n} was brilliant.
+appraisal.best.brilliant.b5 = {move} at move {n} was brilliant.
+appraisal.best.brilliant.b5.2 = Move {n}, {move}: brilliant.
+appraisal.best.brilliant.b6 = {move}!! at move {n}.
+appraisal.best.brilliant.b6.2 = Move {n}: {move}, brilliant.
+appraisal.best.great.b1 = My favourite moment: {move}. That was a great move!
+appraisal.best.great.b1.2 = Remember {move}? That was a great find.
+appraisal.best.great.b2 = Your best moment: {move} at move {n}. It turned the game around.
+appraisal.best.great.b2.2 = {move} at move {n} was a great move.
+appraisal.best.great.b3 = The key move was {move} at move {n}: it turned things around.
+appraisal.best.great.b3.2 = Great find: {move}, at move {n}.
+appraisal.best.great.b4 = You punished my mistake immediately with {move}.
+appraisal.best.great.b4.2 = Best moment: {move}, move {n}.
+appraisal.best.great.b5 = {move} at move {n}. Well found.
+appraisal.best.great.b5.2 = Move {n}, {move}: a great find.
+appraisal.best.great.b6 = {move} at move {n}. Well found.
+appraisal.best.great.b6.2 = Move {n}: {move}!
+appraisal.best.only.b1 = My favourite moment: {move}. It was the only good move!
+appraisal.best.only.b1.2 = At move {n}, you found {move}, the only good move. Excellent!
+appraisal.best.only.b2 = Your best moment: {move}, the only good move there.
+appraisal.best.only.b2.2 = {move} at move {n} was the only move, and you found it.
+appraisal.best.only.b3 = The key move was {move} at move {n}: the only move that kept the balance.
+appraisal.best.only.b3.2 = At move {n}, only {move} held, and you found it.
+appraisal.best.only.b4 = Best moment: {move}, move {n}. Only move.
+appraisal.best.only.b4.2 = Move {n}: {move}, the only move.
+appraisal.best.only.b5 = {move} at move {n} was the only move. Well found.
+appraisal.best.only.b5.2 = Only move at move {n}: {move}.
+appraisal.best.only.b6 = {move} at move {n} was the only move. Well found.
+appraisal.best.only.b6.2 = Move {n}: {move}, only move.
+appraisal.best.won.b1 = My favourite moment: {move}. It won {pts:point}!
+appraisal.best.won.b1.2 = Remember {move}? That won you {pts:point}. Well done!
+appraisal.best.won.b2 = Your best moment: {move} at move {n}, winning {pts:point}.
+appraisal.best.won.b2.2 = {move} at move {n} won material. Nice!
+appraisal.best.won.b3 = The key move was {move} at move {n}: it won {pts:point}.
+appraisal.best.won.b3.2 = {move} at move {n} won material cleanly.
+appraisal.best.won.b4 = Best moment: {move}, move {n}, winning material.
+appraisal.best.won.b4.2 = {move} at move {n} won {pts:point}.
+appraisal.best.won.b5 = {move} at move {n} won material.
+appraisal.best.won.b5.2 = Move {n}: {move}, winning material.
+appraisal.best.won.b6 = {move} at move {n} won material.
+appraisal.best.won.b6.2 = Move {n}: {move}, +{pts}.
+appraisal.best.streak.b1 = You found the best move {n:time} in a row. Excellent!
+appraisal.best.streak.b1.2 = {n} best moves in a row! That's great chess.
+appraisal.best.streak.b2 = You found the best move {n:time} in a row.
+appraisal.best.streak.b2.2 = {n} best moves in a row. Very good!
+appraisal.best.streak.b3 = A run of {n} best moves in a row. Very solid.
+appraisal.best.streak.b3.2 = {n} top moves in a row. Well played.
+appraisal.best.streak.b4 = {n} best moves in a row.
+appraisal.best.streak.b4.2 = A streak of {n} top moves.
+appraisal.best.streak.b5 = {n} top moves in a row.
+appraisal.best.streak.b5.2 = A run of {n} best moves.
+appraisal.best.streak.b6 = {n} top moves in a row.
+appraisal.best.streak.b6.2 = Streak: {n} best moves.
+appraisal.best.capture.b1 = My favourite moment: {move}. You took {my} for free!
+appraisal.best.capture.b1.2 = Remember {move}? You spotted that {my} was free!
+appraisal.best.capture.b2 = Your best moment: {move}, winning {my}.
+appraisal.best.capture.b2.2 = Nice capture at move {n}: {move}.
+appraisal.best.capture.b3 = Good eye at move {n}: {move} won {my}.
+appraisal.best.capture.b3.2 = {move} at move {n} picked up {my}.
+appraisal.best.capture.b4 = Best moment: {move}, move {n}, winning {my}.
+appraisal.best.capture.b4.2 = {move} at move {n} won material.
+appraisal.best.capture.b5 = {move} at move {n} won {my}.
+appraisal.best.capture.b5.2 = Move {n}: {move}.
+appraisal.best.capture.b6 = {move} at move {n}.
+appraisal.best.capture.b6.2 = Move {n}: {move}, winning material.
+appraisal.best.phase.b1 = You played very well in {text}.
+appraisal.best.phase.b1.2 = {text} was your best part of the game.
+appraisal.best.phase.b2 = Your strongest part was {text}.
+appraisal.best.phase.b2.2 = You played {text} very well.
+appraisal.best.phase.b3 = Your best phase was {text}: {acc} percent.
+appraisal.best.phase.b3.2 = {text} went best: {acc} percent accuracy.
+appraisal.best.phase.b4 = Strongest phase: {text}, {acc} percent.
+appraisal.best.phase.b4.2 = {text} was your best phase, at {acc}.
+appraisal.best.phase.b5 = Best phase: {text}, {acc}.
+appraisal.best.phase.b5.2 = {text}: {acc}.
+appraisal.best.phase.b6 = {text}: {acc}.
+appraisal.best.phase.b6.2 = Best phase: {text}, {acc}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns ("{n:piece}" = "1 piece" / "3 pieces") come from count.<noun> in common.lang.
+# Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
+appraisal.num.material.b1 = You took {n:piece} of mine and gave check {m:time}.
+appraisal.num.material.b1.2 = You captured {n:piece} and checked my king {m:time}.
+appraisal.num.material.b2 = You captured {n:piece} and gave check {m:time}.
+appraisal.num.material.b2.2 = You took {n:piece} and checked me {m:time}.
+appraisal.num.material.b3 = You captured {n:piece} and gave check {m:time}.
+appraisal.num.material.b3.2 = {n:piece} captured, check given {m:time}.
+appraisal.num.material.b4 = {n:piece} captured, check given {m:time}.
+appraisal.num.material.b4.2 = You took {n:piece} and gave check {m:time}.
+appraisal.num.material.b5 = {n:piece} captured; check given {m:time}.
+appraisal.num.material.b5.2 = Captured {n:piece}; checked {m:time}.
+appraisal.num.material.b6 = {n:piece} captured, {m:time} check.
+appraisal.num.material.b6.2 = Captured {n:piece}; checked {m:time}.
+appraisal.num.material_nochecks.b1 = You took {n:piece} of mine.
+appraisal.num.material_nochecks.b1.2 = You captured {n:piece} this game.
+appraisal.num.material_nochecks.b2 = You captured {n:piece}.
+appraisal.num.material_nochecks.b2.2 = You took {n:piece} this game.
+appraisal.num.material_nochecks.b3 = You captured {n:piece}.
+appraisal.num.material_nochecks.b3.2 = {n:piece} captured.
+appraisal.num.material_nochecks.b4 = {n:piece} captured.
+appraisal.num.material_nochecks.b4.2 = You took {n:piece}.
+appraisal.num.material_nochecks.b5 = {n:piece} captured.
+appraisal.num.material_nochecks.b5.2 = Captured: {n:piece}.
+appraisal.num.material_nochecks.b6 = {n:piece} captured.
+appraisal.num.material_nochecks.b6.2 = Captured {n:piece}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well.
+appraisal.num.takebacks.b1 = You took back {n:move} and fixed {m} of them. That's how we learn!
+appraisal.num.takebacks.b1.2 = You took back {n:move}, and {m:time} you found a better one. Great!
+appraisal.num.takebacks.b2 = You took back {n:move} and fixed {m} of them. That's how we learn.
+appraisal.num.takebacks.b2.2 = Of the {n:move} you took back, you fixed {m}. Good learning!
+appraisal.num.takebacks.b3 = You took back {n:move} and fixed {m} of them.
+appraisal.num.takebacks.b3.2 = {n:move} taken back, {m} of them fixed. Good.
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+appraisal.num.clean.b2 = No big mistakes at all: great!
+appraisal.num.clean.b2.2 = Not a single big mistake this game. Excellent!
+appraisal.num.clean.b2.3 = You made no big mistakes. Very good!
+appraisal.num.few.b2 = Only {n:mistake} this game.
+appraisal.num.few.b2.2 = Just {n:mistake} in the whole game. Good!
+appraisal.num.few.b2.3 = Only {n:mistake} worth mentioning. Well done.
+appraisal.num.best.b2 = You found the best move {n:time}.
+appraisal.num.best.b2.2 = You played the very best move {n:time}.
+appraisal.num.best.b2.3 = {n:time}, you found the best move.
+appraisal.num.acc.b3 = Your accuracy was {acc} percent, with {n:mistake} and {m:blunder}.
+appraisal.num.acc.b3.2 = {acc} percent accuracy: {n:mistake}, {m:blunder}.
+appraisal.num.acc.b3.3 = You played at {acc} percent accuracy, with {n:mistake} and {m:blunder}.
+appraisal.num.acc_explain.b3 = Accuracy compares your moves with the engine's best: one hundred is perfect.
+appraisal.num.acc_explain.b3.2 = Accuracy measures how close your moves were to the best ones. One hundred is perfect.
+appraisal.num.acc.b4 = Accuracy {acc} percent.
+appraisal.num.acc.b4.2 = You played at {acc} percent.
+appraisal.num.acc.b4.3 = {acc} percent accuracy.
+appraisal.num.acc_phase.b4 = Accuracy {acc}: {acc_phase} in {text}, your strongest phase.
+appraisal.num.acc_phase.b4.2 = {acc} percent overall, {acc_phase} in {text}.
+appraisal.num.acc_phase.b4.3 = You played at {acc}; best in {text}, at {acc_phase}.
+appraisal.num.coach.b4 = I played at {acc_coach}.
+appraisal.num.coach.b4.2 = My accuracy was {acc_coach}.
+appraisal.num.acc.b5 = {acc} accuracy; {n:inaccuracy}, {m:mistake}.
+appraisal.num.acc.b5.2 = Accuracy {acc}, with {n:inaccuracy} and {m:mistake}.
+appraisal.num.acc.b5.3 = {acc} percent: {n:inaccuracy}, {m:mistake}.
+appraisal.num.book.b5 = Out of book at move {k}.
+appraisal.num.book.b5.2 = We left the book at move {k}.
+appraisal.num.acc.b6 = {acc} against my {acc_coach}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.2 = {acc} to {acc_coach}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc.b6.3 = Accuracy {acc}, mine {acc_coach}. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6 = {acc} accuracy. {n:inaccuracy}, {m:mistake}, {k:blunder}.
+appraisal.num.acc_solo.b6.2 = Accuracy {acc}; {n:inaccuracy}, {m:mistake}, {k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = One thing to practise: {theme}.
+appraisal.improve.theme.b1.2 = One tip for next time: {theme}.
+appraisal.improve.theme.b1.3 = Something to work on: {theme}.
+appraisal.improve.theme.b2 = Something to practise: {theme}.
+appraisal.improve.theme.b2.2 = One idea for next time: {theme}.
+appraisal.improve.theme.b2.3 = A good thing to work on: {theme}.
+appraisal.improve.theme.b3 = A theme this game: {theme}.
+appraisal.improve.theme.b3.2 = Worth practising: {theme}.
+appraisal.improve.theme.b4 = A recurring theme: {theme}.
+appraisal.improve.theme.b4.2 = It came up more than once: {theme}.
+appraisal.improve.theme.b5 = Recurring: {theme}.
+appraisal.improve.theme.b5.2 = Theme of the game: {theme}.
+appraisal.improve.theme.b6 = Recurring: {theme}.
+appraisal.improve.theme.b6.2 = Theme: {theme}.
+# The critical moment (levels 2-6).
+appraisal.improve.critical.b2 = The game turned at move {crit_no}. Next time, work on {theme}.
+appraisal.improve.critical.b2.2 = The key moment was move {crit_no}, {crit_move}. Something to practise: {theme}.
+appraisal.improve.critical.b3 = The critical moment was move {crit_no}. Instead of {crit_move}, {crit_best} was better.
+appraisal.improve.critical.b3.2 = At move {crit_no}, {crit_best} was better than {crit_move}. Check my forcing moves first.
+appraisal.improve.critical.b4 = Critical moment: move {crit_no}, {crit_move}. {crit_best} kept the balance.
+appraisal.improve.critical.b4.2 = Move {crit_no} decided it: {crit_best} instead of {crit_move}.
+appraisal.improve.critical.b5 = Move {crit_no}: {crit_best} instead of {crit_move}, {eval}.
+appraisal.improve.critical.b5.2 = The critical move was {crit_no}: {crit_best}, {eval}.
+appraisal.improve.critical.b6 = Move {crit_no}: {crit_best} instead of {crit_move}, {eval}.
+appraisal.improve.critical.b6.2 = {crit_no}. {crit_best}, not {crit_move}: {eval}.
+# A winning game lost to one mistake: no blame words.
+appraisal.improve.was_winning.b1 = You were winning until move {crit_no}. One tip: {theme}.
+appraisal.improve.was_winning.b1.2 = You were doing great until move {crit_no}. Remember: {theme}.
+appraisal.improve.was_winning.b2 = You were winning until move {crit_no}. Next time: {theme}.
+appraisal.improve.was_winning.b2.2 = Up to move {crit_no} you were winning. Something to practise: {theme}.
+appraisal.improve.was_winning.b3 = You were winning until move {crit_no}. {crit_best} kept your advantage.
+appraisal.improve.was_winning.b3.2 = Up to move {crit_no}, you were winning; {crit_best} would have kept it.
+appraisal.improve.was_winning.b4 = You were winning until move {crit_no}. {crit_best} kept your advantage.
+appraisal.improve.was_winning.b4.2 = Winning until move {crit_no}; {crit_best} kept it.
+appraisal.improve.was_winning.b5 = Winning until move {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b5.2 = Move {crit_no}: {crit_best} kept the win, {eval}.
+appraisal.improve.was_winning.b6 = Move {crit_no}: {crit_best}, {eval}.
+appraisal.improve.was_winning.b6.2 = {crit_best} at move {crit_no} kept it: {eval}.
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = One tip: when you are winning, always leave my king a square to move to.
+appraisal.improve.stalemate.b1.2 = Remember: before each move near the end, check that my king can still move.
+appraisal.improve.stalemate.b2 = When you're winning, always leave my king a square, or it's stalemate.
+appraisal.improve.stalemate.b2.2 = Next time, check that my king can still move before you play.
+appraisal.improve.stalemate.b3 = When winning, check every move that my king still has a square.
+appraisal.improve.stalemate.b3.2 = Watch out for stalemate in won endings: give my king air.
+appraisal.improve.stalemate.b4 = In won endings, always check for stalemate.
+appraisal.improve.stalemate.b4.2 = Stalemate awareness: it cost the win here.
+appraisal.improve.stalemate.b5 = Check for stalemate in won endings.
+appraisal.improve.stalemate.b5.2 = The stalemate cost the win.
+appraisal.improve.stalemate.b6 = Mind stalemate.
+appraisal.improve.stalemate.b6.2 = Stalemate cost the win.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+appraisal.improve.coach_hung.b1 = I left {my} hanging at move {n}. Did you see it?
+appraisal.improve.coach_hung.b1.2 = At move {n}, {my} was free for you. Always look for free pieces!
+appraisal.improve.coach_hung.b2 = I left {my} hanging at move {n}. Did you see it?
+appraisal.improve.coach_hung.b2.2 = At move {n}, you could have taken {my} for free.
+appraisal.improve.coach_hung.b3 = At move {n} I left {my} loose. Did you spot it?
+appraisal.improve.coach_hung.b3.2 = {my} was hanging at move {n}. Look for loose pieces every move.
+# A clean game: keep doing it.
+appraisal.improve.clean.b1 = Keep checking that your pieces are safe, like today.
+appraisal.improve.clean.b1.2 = Keep looking at what I attack before each move. It works!
+appraisal.improve.clean.b1.3 = Keep up the careful play!
+appraisal.improve.clean.b2 = A clean game. Keep checking my threats like that.
+appraisal.improve.clean.b2.2 = Keep doing what you did today: safe pieces, good moves.
+appraisal.improve.clean.b3 = A clean game. Keep checking forcing moves first.
+appraisal.improve.clean.b3.2 = No big errors: keep it up.
+appraisal.improve.clean.b4 = A clean game. Nothing major to fix.
+appraisal.improve.clean.b4.2 = No critical mistakes.
+appraisal.improve.clean.b5 = No critical mistakes.
+appraisal.improve.clean.b5.2 = Clean game.
+appraisal.improve.clean.b6 = Clean game.
+appraisal.improve.clean.b6.2 = No critical errors.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+appraisal.end.b1 = You're getting better every game. Another one?
+appraisal.end.b1.2 = That was fun! Shall we play again?
+appraisal.end.b1.3 = Great effort. Want to play another game?
+appraisal.end.b2 = You're getting better every game. Another one?
+appraisal.end.b2.2 = Good game. Shall we play again?
+appraisal.end.b2.3 = Well played. Another game?
+appraisal.end.b3 = Solid game. Ready for the next one?
+appraisal.end.b3.2 = Good game. Another one?
+appraisal.end.b3.3 = Well played. Shall we go again?
+appraisal.end.b4 = Solid game. Ready for the next one?
+appraisal.end.b4.2 = Another game?
+appraisal.end.b4.3 = Good game. Next one?
+appraisal.end.b5 = Another?
+appraisal.end.b5.2 = Next game?
+appraisal.end.b5.3 = Again?
+appraisal.end.b6 = Another?
+appraisal.end.b6.2 = Next game?
+appraisal.end.b6.3 = Again?
+appraisal.end.up.b1 = You're ready for {level}. Want to try it?
+appraisal.end.up.b1.2 = I think you're ready for {level}. Shall we try it?
+appraisal.end.up.b2 = You're ready for {level}. Want to try it?
+appraisal.end.up.b2.2 = How about {level} next? I think you're ready.
+appraisal.end.up.b3 = You've outgrown this level: try {level}.
+appraisal.end.up.b3.2 = Ready for {level}? I think so.
+appraisal.end.up.b4 = You've outgrown this level: try {level}.
+appraisal.end.up.b4.2 = Time for {level}?
+appraisal.end.up.b5 = Try {level} next.
+appraisal.end.up.b5.2 = {level} next?
+appraisal.end.up.b6 = Try {level} next.
+appraisal.end.up.b6.2 = {level} next?
+appraisal.end.down.b2 = Let's play one at {level}, to practise the ideas.
+appraisal.end.down.b2.2 = How about a game at {level}, to practise?
+appraisal.end.down.b3 = Want to play one at {level}, to practise the ideas?
+appraisal.end.down.b3.2 = A game at {level} could help practise these ideas.
+appraisal.end.down.b4 = A game at {level} might help practise these ideas.
+appraisal.end.down.b4.2 = Maybe one at {level}, to practise?
+appraisal.end.down.b5 = Maybe one at {level}?
+appraisal.end.down.b5.2 = {level}, to practise?
+appraisal.end.down.b6 = Maybe one at {level}?
+appraisal.end.down.b6.2 = {level}, to practise?
