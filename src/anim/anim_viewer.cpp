@@ -15,16 +15,28 @@
 //   lcastle  Black (left hand) castles short
 //   lpromo   Black (left hand) promotes b2-b1=Q (pawn to the capture slots on its side, spare queen
 //            to b1)
+//   coach    Black is the coach (left hand; position after 1.e4 d5 2.Nc3), speaking (a synthetic
+//            voice envelope: head bobs, nods, a head shake, blinks) while it gestures:
+//             0.6 s  open hand towards the player (queued at 0.4 s with notBefore), two beats
+//             2.8 s  points at b1 (a square on the far rank; its eyes come back to the player
+//                    while the finger stays), then at the knight on c3 (with emphasis)
+//             6.0 s  traces the knight's L g1-g3-f3 and the bishop's diagonal f1-b5, presents the
+//                    board with the open hand, beats, retracts
+//            then demonstrates 2...dxe4 3.Nxe4 Nf6 with both colours (every captured piece to the
+//            coach's own capture slots) and takes the three moves back, one move at a time
 // Command line (after --scene anim):
-//   --demo d        default | lefty | lcastle | lpromo
+//   --demo d        default | lefty | lcastle | lpromo | coach
 //   --time t        simulate 0..t with fixed 1/120 s steps, then (in --shot mode) freeze
 //   --view v        side | sidel | front | back | top | white | black | hand | handb | handl | shake | orbit |
 //                   pinch | pinchs | pinchb | pinchbs (close-ups of White's / Black's playing fingers from the
 //                   front and from the side) | pen | pens | penb | penbs (White's / Black's writing hand,
 //                   from the front and from the thumb side) | page | pageb (page corner) | lhand (Black's
-//                   playing hand from its left) | pad | padb (the scoresheet from above) | clock
+//                   playing hand from its left) | pad | padb (the scoresheet from above) | clock |
+//                   coachhand | coachhands | coachhandt (Black's playing hand close up, from the front /
+//                   from its outside / from its thumb side)
 //   --robot         draw the real porcelain robot instead of the capsule robots (slower start)
-//   --selftest      numeric checks of the IK/grasp/timing/writing/mirroring (results in the log)
+//   --selftest      numeric checks of the IK/grasp/timing/writing/mirroring and of the coach demo (results in
+//                   the log)
 // Keys: Space pause, R restart, V next view, S slow motion, arrows = player's head (White).
 #include "../app/orbit_camera.h"
 #include "../app/scene.h"
@@ -498,7 +510,8 @@ vec3 pageCorner(int a, float s) {   // the outer corner of the bottom edge (the 
 }
 
 const char* kViews[] = {"side", "sidel", "front", "back", "top", "white", "black", "hand", "handb", "handl", "shake", "orbit",
-                        "pinch", "pinchs", "pinchb", "pinchbs", "pen", "pens", "penb", "penbs", "page", "pageb", "lhand", "pad", "padb", "clock"};
+                        "pinch", "pinchs", "pinchb", "pinchbs", "pen", "pens", "penb", "penbs", "page", "pageb", "lhand", "pad", "padb", "clock",
+                        "coachhand", "coachhands", "coachhandt"};
 constexpr int kViewCount = int(sizeof(kViews) / sizeof(kViews[0]));
 constexpr int kOrbitView = 11;
 
@@ -512,7 +525,7 @@ public:
         for (int i = 0; i < kViewCount; ++i)
             if (v == kViews[i]) view_ = i;
         demo_ = ctx.argValue("--demo", "default");
-        if (demo_ != "lefty" && demo_ != "lcastle" && demo_ != "lpromo") demo_ = "default";
+        if (demo_ != "lefty" && demo_ != "lcastle" && demo_ != "lpromo" && demo_ != "coach") demo_ = "default";
         if (ctx.hasArg("--robot")) {
             robot_ = true;
             materials::init();
@@ -525,6 +538,8 @@ public:
             const std::string keep = demo_;
             demo_ = "default";
             timelineCheck();
+            demo_ = "coach";
+            coachTimelineCheck();
             demo_ = keep;
         }
         solo_ = ctx.hasArg("--solo");
@@ -805,7 +820,13 @@ private:
             sheet_[a].penTable = penRestFrame(a);
         }
         actions_.clear();
+        chain_.clear();
+        demoSteps_.clear();
+        demoTouch_[0] = demoTouch_[1] = demoTouch_[2] = demoTouch_[3] = -1;
+        phrases_.clear();
+        chainArmed_ = false;
         if (demo_ == "lefty") scriptLefty();
+        if (demo_ == "coach") scriptCoach();
         if (demo_ == "lcastle") {
             pieces_[29].xf = pieces_[30].xf = translate(vec3(3.0f, 0.0f, 0.0f));   // f8, g8 gone
             at(0.5f, [this] {
@@ -988,14 +1009,185 @@ private:
         at(14.9f, [this] { putPen(0); });
         at(15.7f, [this] { handshake(); });
     }
+
+    // ---- the coach demo (Black, left hand): gestures while speaking, then a demonstration line
+    // played with both colours and taken back, one move at a time (each move is planned once the
+    // previous one has been released, so the obstacle queries see the pieces where they are).
+    struct DemoStep {
+        int mover = -1, victim = -1;
+        int from = -1, to = -1;
+        vec3 slot{0, 0, 0};
+    };
+    std::vector<DemoStep> demoSteps_;                    // played so far (the rewind pops them)
+    // Pieces the hand may touch (self test): the mover / victim of the move being played or undone,
+    // and for a moment the previous move's (the fingers open around a piece they have just set down).
+    int demoTouch_[4] = {-1, -1, -1, -1};
+    float demoTouchAt_ = 0.0f;
+    void touchDemo(int mover, int victim) {
+        demoTouch_[2] = demoTouch_[0];
+        demoTouch_[3] = demoTouch_[1];
+        demoTouch_[0] = mover;
+        demoTouch_[1] = victim;
+        demoTouchAt_ = simTime_;
+    }
+    bool demoTouches(int piece) const {
+        return piece >= 0 && (piece == demoTouch_[0] || piece == demoTouch_[1] ||
+                              (simTime_ < demoTouchAt_ + 0.3f && (piece == demoTouch_[2] || piece == demoTouch_[3])));
+    }
+    std::deque<std::function<void()>> chain_;            // coach hand batches, run one after the other
+    bool chainArmed_ = false;
+    float chainAt_ = 0.0f;
+    struct Phrase {
+        float t0, t1;
+    };
+    std::vector<Phrase> phrases_;                        // when the coach "speaks"
+    // Synthetic voice envelope: syllables at about 4.5 per second, a stressed one every 0.8 s,
+    // short fades at the phrase ends.
+    float speechLevel(float t) const {
+        for (const Phrase& p : phrases_) {
+            if (t < p.t0 || t > p.t1) continue;
+            const float u = t - p.t0, fade = std::min(1.0f, std::min(u, p.t1 - t) / 0.08f);
+            const float syl = std::fabs(std::sin(PI * 4.5f * u + 0.4f * std::sin(1.7f * u)));
+            const float stress = std::pow(std::max(0.0f, std::sin(TAU * u / 0.8f + 0.6f)), 6.0f);
+            return fade * clamp(0.18f + 0.50f * std::sqrt(syl) + 0.35f * stress, 0.0f, 1.0f);
+        }
+        return 0.0f;
+    }
+    static anim::Task gesture(anim::HandShape shape, float duration, int tag) {
+        anim::Task t = mkTask(anim::TaskType::Gesture);
+        t.shape = shape;
+        t.duration = duration;
+        t.tag = tag;
+        return t;
+    }
+    // A demonstration move by the coach (either colour, slower than in play), its victim to the
+    // coach's own capture slots: the human's half is out of the coach's reach.
+    void demoMove(const char* from, const char* to) {
+        using namespace anim;
+        DemoStep s;
+        s.from = sq(from);
+        s.to = sq(to);
+        s.mover = pieceAt(s.from);
+        s.victim = pieceAt(s.to);
+        const vec3 dst = layout::squareCenter(s.to);
+        std::vector<Task> ts;
+        auto add = [&](TaskType ty, int id, vec3 pos, float dur, float h = 0.0f) {
+            Task t = mkTask(ty, id, pos, h);
+            t.duration = dur;
+            ts.push_back(t);
+        };
+        add(TaskType::Reach, s.mover, vec3(0), 0.55f);
+        add(TaskType::Lift, s.mover, vec3(0), 0.20f);
+        add(TaskType::Carry, s.mover, dst, 0.60f);
+        if (s.victim >= 0) add(TaskType::TakeCaptured, s.victim, vec3(0), 0.25f);
+        add(TaskType::Place, s.mover, dst, 0.30f);
+        if (s.victim >= 0) {
+            s.slot = captureSlot(captures_[0]++, 0);   // beside the coach
+            add(TaskType::Discard, s.victim, s.slot, 0.50f);
+        }
+        anim_[1].enqueue(ts);
+        demoSteps_.push_back(s);
+        touchDemo(s.mover, s.victim);
+        LOGI("anim viewer: coach demonstrates %s-%s (piece %d%s) at t=%.3f", from, to, s.mover, s.victim >= 0 ? ", a capture" : "", simTime_);
+    }
+    // Takes the last demonstration move back: the mover home, then the victim from its slot.
+    void demoUndo() {
+        using namespace anim;
+        if (demoSteps_.empty()) return;
+        const DemoStep s = demoSteps_.back();
+        demoSteps_.pop_back();
+        const vec3 from = layout::squareCenter(s.from), to = layout::squareCenter(s.to);
+        std::vector<Task> ts;
+        auto add = [&](TaskType ty, int id, vec3 pos, float dur, float h = 0.0f) {
+            Task t = mkTask(ty, id, pos, h);
+            t.duration = dur;
+            ts.push_back(t);
+        };
+        add(TaskType::Reach, s.mover, vec3(0), 0.50f);
+        add(TaskType::Lift, s.mover, vec3(0), 0.18f);
+        add(TaskType::Carry, s.mover, from, 0.55f);
+        add(TaskType::Place, s.mover, from, 0.28f);
+        if (s.victim >= 0) {
+            add(TaskType::Reach, s.victim, vec3(0), 0.55f);
+            add(TaskType::Lift, s.victim, vec3(0), 0.22f, 0.06f);
+            add(TaskType::Carry, s.victim, to, 0.60f);
+            add(TaskType::Place, s.victim, to, 0.30f);
+            --captures_[0];
+        }
+        anim_[1].enqueue(ts);
+        touchDemo(s.mover, s.victim);
+        LOGI("anim viewer: coach takes back its demonstration move (piece %d) at t=%.3f", s.mover, simTime_);
+    }
+    void scriptCoach() {
+        using namespace anim;
+        // The position after 1.e4 d5 2.Nc3.
+        pieces_[4].xf = translate(layout::squareCenter(sq("e4")));
+        pieces_[19].xf = translate(layout::squareCenter(sq("d5"))) * rotateY(PI);
+        pieces_[9].xf = translate(layout::squareCenter(sq("c3")));
+        phrases_ = {{0.45f, 2.55f}, {2.85f, 4.35f}, {4.55f, 6.05f}, {6.25f, 8.1f}, {8.4f, 10.2f}, {10.4f, 12.9f}};
+        // "Let's look at this position together." An open hand towards the player, two beats.
+        at(0.4f, [this] {
+            Task open = gesture(HandShape::Open, 1.2f, 1);
+            open.notBefore = 0.6f;
+            anim_[1].enqueue({open, gesture(HandShape::Beat, 0.9f, 2)});
+        });
+        at(1.9f, [this] { anim_[1].nod(); });
+        at(2.6f, [this] { anim_[1].blink(); });
+        // "This square, b1, is now free... and this knight on c3 controls e4."
+        at(2.8f, [this] {
+            Task p1 = mkTask(TaskType::Point, -1, layout::squareCenter(sq("b1")));
+            p1.duration = 1.7f;
+            p1.gazeHold = 0.9f;   // then back to the player while the finger stays
+            p1.tag = 3;
+            Task p2 = mkTask(TaskType::Point, 9);
+            p2.duration = 1.6f;
+            p2.emphasis = true;
+            p2.tag = 4;
+            anim_[1].enqueue({p1, p2});
+        });
+        at(4.4f, [this] { anim_[1].blink(); });
+        // "Your other knight goes to f3 like this, and the bishop can come out to b5."
+        at(6.0f, [this] {
+            Task k = mkTask(TaskType::Trace);
+            k.path = moveTracePath(sq("g1"), sq("f3"));
+            k.tag = 5;
+            Task b = mkTask(TaskType::Trace);
+            b.path = moveTracePath(sq("f1"), sq("b5"));
+            b.gazeHold = 0.3f;
+            b.tag = 6;
+            anim_[1].enqueue({k, b, gesture(HandShape::Present, 1.4f, 7), gesture(HandShape::Beat, 0.9f, 8), mkTask(TaskType::Retract)});
+            // Then the demonstration: 2...dxe4 3.Nxe4 Nf6, taken back move by move.
+            chain_ = {[this] { demoMove("d5", "e4"); }, [this] { demoMove("c3", "e4"); }, [this] { demoMove("g8", "f6"); },
+                      [this] { demoUndo(); },          [this] { demoUndo(); },          [this] { demoUndo(); },
+                      [this] {
+                          anim_[1].enqueue(mkTask(TaskType::Retract));
+                          phrases_.push_back({simTime_ + 0.4f, simTime_ + 2.6f});   // "Not like that..."
+                          at(simTime_ + 0.7f, [this] { anim_[1].shakeHead(); });
+                          at(simTime_ + 2.0f, [this] { anim_[1].nod(0.09f, 0.5f); });
+                          at(simTime_ + 2.7f, [this] { anim_[1].blink(); });
+                      }};
+            chainArmed_ = true;
+            chainAt_ = simTime_ + 0.5f;
+        });
+        at(8.2f, [this] { anim_[1].nod(0.05f, 0.4f); });
+    }
+
     void script() {
         using namespace anim;
         if (demo_ != "default") {
-            for (auto& ac : actions_)
-                if (!ac.done && simTime_ >= ac.t) {
-                    ac.done = true;
-                    ac.fn();
-                }
+            for (size_t i = 0; i < actions_.size(); ++i) {   // (an action may schedule more)
+                if (actions_[i].done || simTime_ < actions_[i].t) continue;
+                actions_[i].done = true;
+                std::function<void()> fn = actions_[i].fn;
+                fn();
+            }
+            // The coach's hand batches: the next one once the hand is done with the previous one.
+            if (chainArmed_ && !chain_.empty() && !anim_[1].busy() && simTime_ >= chainAt_) {
+                std::function<void()> fn = chain_.front();
+                chain_.pop_front();
+                fn();
+                chainAt_ = simTime_ + 0.35f;
+            }
             return;
         }
         if (stage_ == 0 && simTime_ >= nextAt_) {
@@ -1071,13 +1263,22 @@ private:
     void step(float dt) {
         simTime_ += dt;
         script();
-        if (demo_ != "default") {
+        if (demo_ == "coach") {
+            // The coach looks at the player (its gestures take its eyes to their targets), speaks
+            // with the synthetic envelope; the player watches the coach's hand, else its face.
+            anim_[1].lookAt(anim_[0].eyeCameraTransform().translation(), 1.0f);
+            anim_[1].setSpeechLevel(speechLevel(simTime_));
+            const bool watch = anim_[1].busy();
+            anim_[0].lookAt(watch ? anim_[1].globals()[onSide(IndexR3, anim_[1].playHand())].translation() : anim_[1].eyeCameraTransform().translation(), 1.0f);
+        } else if (demo_ != "default") {
             // Both robots are driven by their own gaze (the writing look included).
             for (int a = 0; a < 2; ++a) {
                 const int o = 1 - a;
                 bool watch = anim_[o].busy() && !anim_[a].busy();
                 anim_[a].lookAt(anim_[o].globals()[onSide(HandR, anim_[o].playHand())].translation(), watch ? 0.8f : 0.0f);
             }
+        }
+        if (demo_ != "default") {
             for (int a = 0; a < 2; ++a) {
                 std::vector<anim::Event> ev;
                 anim_[a].update(dt, ev);
@@ -1197,6 +1398,62 @@ private:
         LOGI("selftest timeline: max bone angular speed %.0f deg/s (%s of %s at t=%.3f), max camera roll %.3f deg", st_.maxSpeed / DEG,
              boneName(Bone(st_.maxSpeedBone)), st_.maxSpeedA ? "Black" : "White", st_.maxSpeedT, st_.maxRoll / DEG);
     }
+    // The coach demo end to end: the coach's hand and forearm against the standing pieces during
+    // the gestures and during the demonstration (the pieces of the move under way excepted for the
+    // hand, which grips them), its lowest fingertip above the board while gesturing, and the board
+    // after the rewind against the board before the demonstration.
+    void coachTimelineCheck() {
+        using namespace anim;
+        const Skeleton& sk = *sk_;
+        reset();
+        vec3 start[kPieces];
+        for (int i = 0; i < kPieces; ++i) start[i] = pieces_[i].xf.translation();
+        Overlap worst[2];
+        float worstT[2] = {0, 0}, minTip = 1e9f, minTipT = 0;
+        int worstTask[2] = {-1, -1};   // TaskType running then
+        const float hb = layout::BOARD_SIZE * 0.5f, h = 1.0f / 120.0f;
+        while (simTime_ < 90.0f && !(chainArmed_ && chain_.empty() && !anim_[1].busy() && simTime_ > chainAt_ + 0.5f)) {
+            step(h);
+            const mat4* g = anim_[1].globals();
+            const int k = demoTouch_[0] < 0 ? 0 : 1;   // 0 gestures, 1 demonstration
+            Overlap o = pieceOverlapIf(sk, g, pieces_, [&](int i, bool arm) { return !arm && demoTouches(i); });
+            if (o.depth > worst[k].depth) {
+                worst[k] = o;
+                worstT[k] = simTime_;
+                worstTask[k] = -1;
+                for (int ty = 0; ty <= int(TaskType::Gesture); ++ty)
+                    if (anim_[1].runningTask(TaskType(ty))) worstTask[k] = ty;
+            }
+            if (k != 0) continue;
+            const Side ps = anim_[1].playHand();
+            for (int f = 0; f < 5; ++f)
+                for (int j = 0; j < 3; ++j) {
+                    const Bone b = onSide(Bone(ThumbR1 + f * 3 + j), ps);
+                    const vec3 p = transformPoint(g[b], normalize(sk.restOffset[j < 2 ? b + 1 : b]) * sk.boneLength[b]);
+                    if (std::fabs(p.x) > hb || std::fabs(p.z) > hb) continue;
+                    const float above = p.y - layout::BOARD_TOP_Y - 0.0065f;
+                    if (above < minTip) {
+                        minTip = above;
+                        minTipT = simTime_;
+                    }
+                }
+        }
+        float moved = 0;
+        int movedId = -1;
+        for (int i = 0; i < kPieces; ++i) {
+            const float d = length(pieces_[i].xf.translation() - start[i]);
+            if (d > moved) {
+                moved = d;
+                movedId = i;
+            }
+        }
+        LOGI("selftest coach: done at t=%.2f; gestures: deepest hand/piece overlap %.1f mm (%s, piece %d, t=%.2f, task %d), lowest fingertip "
+             "%.1f mm above the board (t=%.2f)",
+             simTime_, worst[0].depth * 1000.0f, boneName(Bone(worst[0].bone)), worst[0].piece, worstT[0], worstTask[0], minTip * 1000.0f, minTipT);
+        LOGI("selftest coach: demonstration: deepest hand/piece overlap %.1f mm (%s, piece %d, t=%.2f, task %d); after the rewind the farthest "
+             "piece is %.2f mm from its start (piece %d)",
+             worst[1].depth * 1000.0f, boneName(Bone(worst[1].bone)), worst[1].piece, worstT[1], worstTask[1], moved * 1000.0f, movedId);
+    }
     void simulateTo(float t) {
         const float h = 1.0f / 120.0f;
         while (simTime_ + h <= t + 1e-6f) step(h);
@@ -1298,6 +1555,21 @@ private:
                 break;
             }
             case 25: look({1.05f, 1.05f, -0.35f}, {0.36f, 0.82f, -0.10f}, 36); break;
+            case 26:
+            case 27:
+            case 28: {
+                // Black's playing hand close up: from the front (the player's side, a little above),
+                // from its outside, or from its thumb side.
+                const mat4* g = anim_[1].globals();
+                const Side ps = anim_[1].playHand();
+                const vec3 hp = (g[onSide(HandR, ps)].translation() + g[onSide(IndexR3, ps)].translation()) * 0.5f;
+                const vec3 out(ps == Side::Left ? 1.0f : -1.0f, 0, 0);
+                const vec3 off = view_ == 26   ? vec3(0.04f, 0.13f, 0.30f)
+                                 : view_ == 27 ? out * 0.30f + vec3(0, 0.08f, 0.05f)
+                                               : out * -0.26f + vec3(0, 0.06f, 0.06f);
+                look(hp + off, hp, 34);
+                break;
+            }
             default: return orbit_.camera();
         }
         return c;

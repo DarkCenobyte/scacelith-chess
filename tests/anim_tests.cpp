@@ -1,10 +1,12 @@
 // Animation tests (no GPU): the writing-hand helpers, the writing queue's event instants and pen
 // tip, writing never delaying the playing hand, the left-handed player as the exact mirror image
-// of a right-handed one, and the first-person player writing on his own scoresheet as the game
-// wires it (pen, ink, PenDown sounds heard from his head). The animator is not part of
-// scacelith_core, so its sources are compiled into this file.
+// of a right-handed one, the first-person player writing on his own scoresheet as the game
+// wires it (pen, ink, PenDown sounds heard from his head), and the coach's gestures (pointing,
+// tracing a move, speaking gestures, their timing, and a demonstration taken back). The animator
+// is not part of scacelith_core, so its sources are compiled into this file.
 #include "test.h"
 #include "../src/anim/animator.cpp"
+#include "../src/anim/animator_gesture.cpp"
 #include "../src/anim/animator_writing.cpp"
 #include "../src/character/skeleton.cpp"
 #include "audio/mixer.h"
@@ -621,4 +623,553 @@ TEST(anim_own_scoresheet_writing_heard_first_person) {
         CHECK(own - opp > 6.0f);
         CHECK(piece - own > 6.0f && piece - own < 22.0f);
     }
+}
+
+// =============================================================================================
+// Coach gestures: the coach is Black and always left-handed (clock at +X).
+// =============================================================================================
+namespace {
+
+using character::Side;
+
+// Pieces standing on the board and the table (ids are indices), with obstacle callbacks as the
+// game wires them: pieces the animator holds are skipped.
+struct CoachBoard {
+    std::vector<m::mat4> xf;
+    std::vector<int> type;
+    const anim::Animator* an = nullptr;
+    float mirror = 1.0f;   // -1: the whole layout mirrored about X = 0
+
+    int add(m::vec3 base, int t, float yaw = 0.0f) {
+        xf.push_back(m::translate(m::vec3(mirror * base.x, base.y, base.z)) * m::rotateY(yaw));
+        type.push_back(t);
+        return int(xf.size()) - 1;
+    }
+    // The starting position (ids as in the anim viewer: 0-7 White pawns a-h, 8-15 White's back
+    // rank, 16-23 Black pawns, 24-31 Black's back rank), then the given pawn moves.
+    void startPosition() {
+        static const int back[8] = {4, 2, 3, 5, 6, 3, 2, 4};
+        for (int i = 0; i < 32; ++i) {
+            const int color = i >= 16 ? 1 : 0, k = i & 15, file = k & 7;
+            const int rank = color == 0 ? (k < 8 ? 1 : 0) : (k < 8 ? 6 : 7);
+            add(layout::squareCenter(file, rank), k < 8 ? 1 : back[file], color ? 3.1415927f : 0.0f);
+        }
+    }
+    void moveTo(int id, int sq) {
+        const m::vec3 c = layout::squareCenter(sq);
+        xf[id] = m::translate(m::vec3(mirror * c.x, c.y, c.z)) * m::rotateY(id >= 16 ? 3.1415927f : 0.0f);
+    }
+    bool standing(int i) const { return !(an && an->holding(i)) && xf[i].translation().y < layout::BOARD_TOP_Y + 0.01f; }
+    int at(int sq) const {
+        const m::vec3 c = layout::squareCenter(sq);
+        for (int i = 0; i < int(xf.size()); ++i) {
+            const m::vec3 p = xf[i].translation();
+            if (std::fabs(p.x - mirror * c.x) < 0.005f && std::fabs(p.z - c.z) < 0.005f && std::fabs(p.y - c.y) < 0.005f) return i;
+        }
+        return -1;
+    }
+    float topAt(m::vec3 p, float radius, int ignore) const {
+        float top = layout::BOARD_TOP_Y;
+        for (int i = 0; i < int(xf.size()); ++i) {
+            if (i == ignore || !standing(i)) continue;
+            const m::vec3 c = xf[i].translation();
+            if (m::length(m::vec3(p.x - c.x, 0, p.z - c.z)) < layout::PIECE_BASE_RADIUS[type[i]] + radius)
+                top = std::max(top, c.y + layout::PIECE_HEIGHT[type[i]]);
+        }
+        return top;
+    }
+    float topNear(m::vec3 from, m::vec3 to) const {
+        float top = layout::BOARD_TOP_Y;
+        const m::vec3 d(to.x - from.x, 0, to.z - from.z);
+        const float len2 = std::max(1e-8f, m::length2(d));
+        for (int i = 0; i < int(xf.size()); ++i) {
+            if (!standing(i)) continue;
+            const m::vec3 p = xf[i].translation();
+            const float s = m::clamp(m::dot(m::vec3(p.x - from.x, 0, p.z - from.z), d) / len2, 0.0f, 1.0f);
+            const m::vec3 c = from + d * s;
+            if (m::length(m::vec3(p.x - c.x, 0, p.z - c.z)) < layout::PIECE_BASE_RADIUS[type[i]] + 0.028f)
+                top = std::max(top, p.y + layout::PIECE_HEIGHT[type[i]]);
+        }
+        return top;
+    }
+    void wire(anim::Animator& a) {
+        an = &a;
+        a.pieceTransform = [this](int id) { return id >= 0 && id < int(xf.size()) ? xf[id] : m::mat4(); };
+        a.pieceGripInfo = [this](int id) {
+            const int t = id >= 0 && id < int(type.size()) ? type[id] : 1;
+            return m::vec3(layout::PIECE_HEIGHT[t], layout::PIECE_GRIP_HEIGHT[t], layout::PIECE_GRIP_RADIUS[t]);
+        };
+        a.pathObstacleTop = [this](m::vec3 f, m::vec3 t) { return topNear(f, t); };
+        a.obstacleTopNear = [this](m::vec3 p, float r, int ignore) { return topAt(p, r, ignore); };
+    }
+    // Deepest overlap of the hand and fingers of 'side' (joints and bone ends, 7 mm) with the
+    // standing pieces (Staunton-like profile: the full base up to 12% of the height, then a body
+    // of about 60% of the base radius), pieces skip / skip2 excepted.
+    float handOverlap(const m::mat4* g, Side side, int skip = -1, int skip2 = -1) const {
+        using namespace character;
+        const Skeleton& sk = robotSkeleton();
+        float worst = 0.0f;
+        auto test = [&](m::vec3 p) {
+            const float rad = 0.007f;
+            for (int i = 0; i < int(xf.size()); ++i) {
+                if (i == skip || i == skip2 || !standing(i)) continue;
+                const m::vec3 c = xf[i].translation();
+                const float H = layout::PIECE_HEIGHT[type[i]], rb = layout::PIECE_BASE_RADIUS[type[i]];
+                const float r = (p.y - c.y < 0.12f * H + rad ? rb * 0.95f : rb * 0.62f) + rad;
+                worst = std::max(worst, std::min(r - m::length(m::vec3(p.x - c.x, 0, p.z - c.z)), c.y + H + rad - p.y));
+            }
+        };
+        const int hand = sideBone(HandL, side);
+        for (int b = hand; b <= hand + (PinkyL3 - HandL); ++b) {
+            const bool distal = b != hand && (b - hand) % 3 == 0;
+            const m::vec3 dir = b == hand ? sk.restOffset[b + 7] : distal ? sk.restOffset[b] : sk.restOffset[b + 1];
+            test(g[b].translation());
+            test(m::transformPoint(g[b], m::normalize(dir) * sk.boneLength[b]));
+        }
+        return worst;
+    }
+};
+
+// The coach: Black, playing with the left hand (mirror = -1: the right-handed mirror image).
+void initCoach(anim::Animator& an, float mirror = 1.0f) {
+    an.init(character::robotSkeleton(), m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f,
+            mirror > 0.0f ? Side::Left : Side::Right);
+    an.setRestHand(m::vec3(mirror * 0.24f, layout::TABLE_TOP_Y, -0.34f));
+}
+
+anim::Task coachTask(anim::TaskType type, int pieceId = -1, m::vec3 pos = m::vec3(0), int tag = 0) {
+    anim::Task t;
+    t.type = type;
+    t.pieceId = pieceId;
+    t.position = pos;
+    t.tag = tag;
+    return t;
+}
+
+m::vec3 mirrorX(m::vec3 p, float mirror) { return m::vec3(mirror * p.x, p.y, p.z); }
+
+// Distance from p to the horizontal polyline 'path' (board plane).
+float polylineDistXZ(const std::vector<m::vec3>& path, m::vec3 p) {
+    float best = 1e9f;
+    for (size_t i = 0; i + 1 < path.size(); ++i) {
+        const m::vec3 a(path[i].x, 0, path[i].z), b(path[i + 1].x, 0, path[i + 1].z), q(p.x, 0, p.z);
+        const m::vec3 d = b - a;
+        const float s = m::clamp(m::dot(q - a, d) / std::max(1e-9f, m::length2(d)), 0.0f, 1.0f);
+        best = std::min(best, m::length(q - (a + d * s)));
+    }
+    return best;
+}
+
+}  // namespace
+
+// The coach points at every square of the starting position (a piece when there is one, else the
+// square centre): PointReached after PointApproach, the index aimed at the target, its tip
+// 'height' above the piece tops around the target, still during the hold, and no finger in a piece.
+TEST(anim_point_reaches_every_square_left_handed) {
+    using anim::EventType;
+    const float dt = 1.0f / 120.0f;
+    float worstAim = 0.0f, worstAbove = 1e9f, worstHold = 0.0f, worstOverlap = 0.0f, worstReached = 0.0f, worstReleased = 0.0f;
+    int badEvents = 0, behind = 0;
+    for (int sq = 0; sq < 64; ++sq) {
+        anim::Animator an;
+        initCoach(an);
+        CoachBoard b;
+        b.startPosition();
+        b.wire(an);
+        const int id = b.at(sq);
+        m::vec3 aim = layout::squareCenter(sq);
+        float top = layout::BOARD_TOP_Y;
+        if (id >= 0) {
+            aim.y += 0.8f * layout::PIECE_HEIGHT[b.type[id]];
+            top += layout::PIECE_HEIGHT[b.type[id]];
+        }
+        top = std::max(top, b.topAt(aim, 0.035f, -1));
+        an.enqueue(coachTask(anim::TaskType::Point, id, id >= 0 ? m::vec3(0) : aim, 100 + sq));
+        float reached = -1.0f, released = -1.0f;
+        m::vec3 tip0;
+        std::vector<anim::Event> ev;
+        while (an.time() < anim::Timing::PointApproach + anim::Timing::PointHold + 0.05f) {
+            ev.clear();
+            an.update(dt, ev);
+            for (const anim::Event& e : ev) {
+                if (e.type == EventType::PointReached) reached = e.time;
+                if (e.type == EventType::PointReleased) released = e.time;
+                if ((e.type == EventType::PointReached || e.type == EventType::PointReleased) && (e.tag != 100 + sq || m::length(e.position - aim) > 1e-4f))
+                    ++badEvents;
+            }
+            worstOverlap = std::max(worstOverlap, b.handOverlap(an.globals(), Side::Left));
+            m::vec3 tip;
+            CHECK(an.pointerTip(tip));
+            if (reached < 0.0f || released >= 0.0f) continue;
+            if (an.time() - reached < dt) {   // just arrived: the aim, the height
+                tip0 = tip;
+                const m::vec3 mcp = an.globals()[character::IndexL1].translation(), dir = m::normalize(tip - mcp);
+                worstAim = std::max(worstAim, m::length(m::cross(aim - tip, dir)));
+                if (m::dot(aim - tip, dir) <= 0.0f) ++behind;
+                worstAbove = std::min(worstAbove, tip.y - (top + 0.045f));
+            } else {
+                worstHold = std::max(worstHold, m::length(tip - tip0));
+            }
+        }
+        worstReached = std::max(worstReached, std::fabs(reached - anim::Timing::PointApproach));
+        worstReleased = std::max(worstReleased, std::fabs(released - (anim::Timing::PointApproach + anim::Timing::PointHold)));
+    }
+    std::fprintf(stderr, "  coach points at 64 squares: aim off the finger line %.2f mm, tip above the tops + height %.2f mm, tip drift "
+                 "while holding %.3f mm, deepest finger in a piece %.2f mm\n",
+                 worstAim * 1000.0f, worstAbove * 1000.0f, worstHold * 1000.0f, worstOverlap * 1000.0f);
+    CHECK(worstReached < 1e-4f);
+    CHECK(worstReleased < 1e-4f);
+    CHECK_EQ(badEvents, 0);
+    CHECK_EQ(behind, 0);
+    CHECK(worstAim < 0.004f);
+    CHECK(worstAbove > -0.001f);
+    CHECK(worstHold < 0.0005f);
+    CHECK(worstOverlap < 0.001f);
+}
+
+// Point, Trace and the three gesture shapes, a nod, a head shake and speech on the left-handed
+// coach against a right-handed coach in the mirrored world: the same motion bone for bone, the
+// same events (with their tags) at the same instants, the fingertip mirrored.
+TEST(anim_gestures_left_handed_mirror) {
+    using namespace character;
+    anim::Animator L, R;
+    initCoach(L, 1.0f);
+    initCoach(R, -1.0f);
+    CoachBoard bl, br;
+    br.mirror = -1.0f;
+    for (CoachBoard* b : {&bl, &br}) {
+        b->startPosition();
+        b->moveTo(4, 28);    // 1.e4
+        b->moveTo(19, 35);   // 1...d5
+        b->moveTo(9, 18);    // 2.Nc3
+    }
+    bl.wire(L);
+    br.wire(R);
+    for (int k = 0; k < 2; ++k) {
+        anim::Animator& a = k == 0 ? L : R;
+        const float mx = k == 0 ? 1.0f : -1.0f;
+        std::vector<anim::Task> ts;
+        ts.push_back(coachTask(anim::TaskType::Gesture, -1, m::vec3(0), 1));
+        ts.back().shape = anim::HandShape::Open;
+        ts.back().duration = 1.0f;
+        ts.push_back(coachTask(anim::TaskType::Gesture, -1, m::vec3(0), 2));
+        ts.back().shape = anim::HandShape::Beat;
+        ts.back().duration = 0.9f;
+        ts.push_back(coachTask(anim::TaskType::Point, -1, mirrorX(layout::squareCenter(1), mx), 3));   // b1
+        ts.back().duration = 1.2f;
+        ts.back().gazeHold = 0.5f;
+        ts.push_back(coachTask(anim::TaskType::Point, 9, m::vec3(0), 4));                              // the knight on c3
+        ts.back().duration = 1.2f;
+        ts.back().emphasis = true;
+        ts.push_back(coachTask(anim::TaskType::Trace, -1, m::vec3(0), 5));
+        for (const m::vec3& p : anim::moveTracePath(6, 21)) ts.back().path.push_back(mirrorX(p, mx));   // g1-f3
+        ts.push_back(coachTask(anim::TaskType::Gesture, -1, mirrorX(layout::squareCenter(28), mx), 6));
+        ts.back().shape = anim::HandShape::Present;
+        ts.back().duration = 1.0f;
+        ts.push_back(coachTask(anim::TaskType::Retract, -1, m::vec3(0), 7));
+        a.enqueue(ts);
+    }
+    auto mirrorBone = [](int b) {
+        if (b >= ClavicleL && b <= PinkyL3) return b + (ClavicleR - ClavicleL);
+        if (b >= ClavicleR && b <= PinkyR3) return b - (ClavicleR - ClavicleL);
+        if (b >= ThighL && b <= FootL) return b + (ThighR - ThighL);
+        if (b >= ThighR && b <= FootR) return b - (ThighR - ThighL);
+        if (b == EyeL) return int(EyeR);
+        if (b == EyeR) return int(EyeL);
+        if (b == LidUpperL) return int(LidUpperR);
+        if (b == LidUpperR) return int(LidUpperL);
+        if (b == LidLowerL) return int(LidLowerR);
+        if (b == LidLowerR) return int(LidLowerL);
+        return b;
+    };
+    const m::mat4 S = m::scale(m::vec3(-1, 1, 1));
+    float worst = 0.0f, tipDiff = 0.0f;
+    int evBad = 0, nGesture = 0;
+    std::vector<anim::Event> evL, evR;
+    const float dt = 1.0f / 120.0f;
+    for (int step = 0; step < int(12.0f / dt); ++step) {
+        const float t = float(step) * dt;
+        for (anim::Animator* a : {&L, &R}) {
+            a->setSpeechLevel(t > 0.5f && t < 4.0f ? 0.5f + 0.5f * std::sin(t * 28.0f) : 0.0f);
+            if (step == int(1.0f / dt)) a->nod();
+            if (step == int(3.0f / dt)) a->shakeHead();
+            if (step == int(4.0f / dt)) a->blink();
+            a->lookAt(m::vec3(0, layout::EYE_HEIGHT, layout::PLAYER_PELVIS_Z));
+        }
+        evL.clear();
+        evR.clear();
+        L.update(dt, evL);
+        R.update(dt, evR);
+        if (evL.size() != evR.size()) ++evBad;
+        for (size_t i = 0; i < std::min(evL.size(), evR.size()); ++i) {
+            const m::vec3 pr = evR[i].position;
+            if (evL[i].type >= anim::EventType::PointReached) ++nGesture;
+            if (evL[i].type != evR[i].type || evL[i].tag != evR[i].tag || std::fabs(evL[i].time - evR[i].time) > 1e-6f ||
+                m::length(evL[i].position - m::vec3(-pr.x, pr.y, pr.z)) > 1e-4f)
+                ++evBad;
+        }
+        for (int b = 0; b < BoneCount; ++b) {
+            const m::mat4 want = S * R.globals()[mirrorBone(b)] * S;
+            worst = std::max(worst, m::length(L.globals()[b].translation() - want.translation()));
+        }
+        m::vec3 tl, tr;
+        CHECK(L.pointerTip(tl) && R.pointerTip(tr));
+        tipDiff = std::max(tipDiff, m::length(tl - m::vec3(-tr.x, tr.y, tr.z)));
+    }
+    CHECK(nGesture >= 12);
+    CHECK_EQ(evBad, 0);
+    CHECK(worst < 1e-4f);
+    CHECK(tipDiff < 1e-4f);
+    CHECK(!L.busy() && !R.busy());
+}
+
+// A knight's move traced by the coach: the L through the corner square, PointReached, TraceCorner
+// and TraceDone at the scheduled instants, the fingertip on the L at one height all the way.
+TEST(anim_trace_knight_path) {
+    using anim::EventType;
+    const std::vector<m::vec3> path = anim::moveTracePath(6, 21);   // g1-f3
+    CHECK_EQ(path.size(), size_t(3));
+    CHECK(m::length(path[0] - layout::squareCenter(6)) < 1e-6f);
+    CHECK(m::length(path[1] - layout::squareCenter(22)) < 1e-6f);    // g3
+    CHECK(m::length(path[2] - layout::squareCenter(21)) < 1e-6f);
+    const std::vector<m::vec3> across = anim::moveTracePath(1, 18);  // b1-c3: the long leg up the b-file
+    CHECK(across.size() == 3 && m::length(across[1] - layout::squareCenter(17)) < 1e-6f);   // b3
+    const std::vector<m::vec3> side = anim::moveTracePath(57, 51);   // b8-d7: the long leg along the 8th rank
+    CHECK(side.size() == 3 && m::length(side[1] - layout::squareCenter(59)) < 1e-6f);        // d8
+    CHECK_EQ(anim::moveTracePath(5, 33).size(), size_t(2));          // f1-b5, a straight line
+
+    anim::Animator an;
+    initCoach(an);
+    CoachBoard b;
+    b.startPosition();
+    b.wire(an);
+    anim::Task t = coachTask(anim::TaskType::Trace, -1, m::vec3(0), 5);
+    t.path = path;
+    an.enqueue(t);
+    const float T = anim::taskDuration(t);
+    const float S = anim::Timing::TraceSpeed, leg0 = 2.0f * layout::SQUARE_SIZE / S, leg1 = layout::SQUARE_SIZE / S;
+    const float tReach = anim::Timing::PointApproach, tCorner = tReach + anim::Timing::TraceDwell + leg0;
+    const float tDone = tCorner + anim::Timing::TraceCornerPause + leg1;
+    CHECK(std::fabs(T - (tDone + anim::Timing::TraceSettle)) < 1e-5f);
+    float reached = -1, corner = -1, done = -1, released = -1;
+    int corners = 0, badPos = 0;
+    float offPath = 0.0f, yMin = 1e9f, yMax = -1e9f, overlap = 0.0f;
+    std::vector<anim::Event> ev;
+    const float dt = 1.0f / 240.0f;
+    while (an.time() < T + 0.1f) {
+        ev.clear();
+        an.update(dt, ev);
+        for (const anim::Event& e : ev) {
+            if (e.tag != 5 && e.type != EventType::TaskStarted && e.type != EventType::QueueEmpty) ++badPos;
+            switch (e.type) {
+                case EventType::PointReached: reached = e.time; badPos += m::length(e.position - path[0]) > 1e-4f; break;
+                case EventType::TraceCorner:
+                    corner = e.time;
+                    ++corners;
+                    badPos += m::length(e.position - path[1]) > 1e-4f;
+                    break;
+                case EventType::TraceDone: done = e.time; badPos += m::length(e.position - path[2]) > 1e-4f; break;
+                case EventType::PointReleased: released = e.time; break;
+                default: break;
+            }
+        }
+        overlap = std::max(overlap, b.handOverlap(an.globals(), Side::Left));
+        m::vec3 tip;
+        an.pointerTip(tip);
+        if (reached >= 0.0f && (done < 0.0f || an.time() <= done + 1e-6f)) {
+            offPath = std::max(offPath, polylineDistXZ(path, tip));
+            yMin = std::min(yMin, tip.y);
+            yMax = std::max(yMax, tip.y);
+        }
+    }
+    const float topPath = std::max(b.topNear(path[0], path[1]), b.topNear(path[1], path[2]));
+    std::fprintf(stderr, "  knight trace: tip off the L %.2f mm, height %.1f..%.1f mm above the board (tops %.1f mm), deepest finger in a "
+                 "piece %.2f mm\n",
+                 offPath * 1000.0f, (yMin - layout::BOARD_TOP_Y) * 1000.0f, (yMax - layout::BOARD_TOP_Y) * 1000.0f,
+                 (topPath - layout::BOARD_TOP_Y) * 1000.0f, overlap * 1000.0f);
+    CHECK(std::fabs(reached - tReach) < 1e-4f);
+    CHECK(std::fabs(corner - tCorner) < 1e-4f);
+    CHECK(std::fabs(done - tDone) < 1e-4f);
+    CHECK(std::fabs(released - T) < 1e-4f);
+    CHECK_EQ(corners, 1);
+    CHECK_EQ(badPos, 0);
+    CHECK(offPath < 0.002f);
+    CHECK(yMax - yMin < 0.001f);
+    CHECK(yMin > topPath + 0.030f);
+    CHECK(overlap < 0.001f);
+}
+
+// endHold cuts a hold short (PointReleased then, the next task starts at once) but never an
+// approach; notBefore delays a task (the hand holds meanwhile) and counts in remainingTime.
+TEST(anim_end_hold_and_not_before) {
+    using anim::EventType;
+    const float dt = 1.0f / 120.0f;
+    const m::vec3 e4 = layout::squareCenter(28);
+    std::vector<anim::Event> ev;
+    auto run = [&](anim::Animator& an, float until, std::vector<anim::Event>& all) {
+        while (an.time() < until - 1e-6f) {
+            ev.clear();
+            an.update(dt, ev);
+            all.insert(all.end(), ev.begin(), ev.end());
+        }
+    };
+    auto find = [](const std::vector<anim::Event>& all, EventType type, int tag) {
+        for (const anim::Event& e : all)
+            if (e.type == type && e.tag == tag) return e.time;
+        return -1.0f;
+    };
+    {   // Cut during the hold.
+        anim::Animator an;
+        initCoach(an);
+        anim::Task p = coachTask(anim::TaskType::Point, -1, e4, 1);
+        p.duration = 3.0f;
+        an.enqueue({p, coachTask(anim::TaskType::Retract, -1, m::vec3(0), 2)});
+        std::vector<anim::Event> all;
+        run(an, 1.0f, all);
+        const float cut = an.time();
+        an.endHold();
+        run(an, 2.5f, all);
+        CHECK(std::fabs(find(all, EventType::PointReached, 1) - anim::Timing::PointApproach) < 1e-4f);
+        CHECK(std::fabs(find(all, EventType::PointReleased, 1) - cut) < 1e-4f);
+        CHECK(std::fabs(find(all, EventType::TaskStarted, 2) - cut) < dt + 1e-4f);
+        CHECK(std::fabs(find(all, EventType::QueueEmpty, 2) - (find(all, EventType::TaskStarted, 2) + anim::Timing::Retract)) < 1e-4f);
+    }
+    {   // endHold during the approach: released when it arrives.
+        anim::Animator an;
+        initCoach(an);
+        anim::Task p = coachTask(anim::TaskType::Point, -1, e4, 1);
+        p.duration = 3.0f;
+        an.enqueue(p);
+        std::vector<anim::Event> all;
+        run(an, 0.2f, all);
+        an.endHold();
+        run(an, 1.0f, all);
+        const float reached = find(all, EventType::PointReached, 1);
+        CHECK(std::fabs(reached - anim::Timing::PointApproach) < 1e-4f);
+        CHECK(std::fabs(find(all, EventType::PointReleased, 1) - reached) < 1e-4f);
+        CHECK(!an.runningTask(anim::TaskType::Point));
+    }
+    {   // endHold does not touch a move.
+        anim::Animator an;
+        initCoach(an);
+        anim::Task w = coachTask(anim::TaskType::Wait, -1, m::vec3(0), 1);
+        w.duration = 1.0f;
+        an.enqueue(w);
+        std::vector<anim::Event> all;
+        run(an, 0.1f, all);
+        const float before = an.remainingTime();
+        an.endHold();
+        CHECK(std::fabs(an.remainingTime() - before) < 1e-6f);
+    }
+    {   // notBefore.
+        anim::Animator an;
+        initCoach(an);
+        std::vector<anim::Event> all;
+        run(an, 0.5f, all);
+        anim::Task p = coachTask(anim::TaskType::Point, -1, e4, 7);
+        p.duration = 1.0f;
+        p.notBefore = an.time() + 1.25f;
+        an.enqueue(p);
+        CHECK(an.busy());
+        CHECK(std::fabs(an.remainingTime() - 2.25f) < 1e-4f);
+        run(an, 1.0f, all);
+        CHECK(std::fabs(an.remainingTime() - 1.75f) < 1e-4f);
+        CHECK(find(all, EventType::TaskStarted, 7) < 0.0f);
+        run(an, 3.0f, all);
+        const float started = find(all, EventType::TaskStarted, 7);
+        CHECK(std::fabs(started - p.notBefore) < 1e-4f);
+        CHECK(std::fabs(find(all, EventType::PointReached, 7) - (p.notBefore + std::min(anim::Timing::PointApproach, 0.6f))) < 1e-4f);
+        CHECK(std::fabs(find(all, EventType::PointReleased, 7) - (p.notBefore + 1.0f)) < 1e-4f);
+        CHECK(std::fabs(find(all, EventType::QueueEmpty, 7) - (p.notBefore + 1.0f)) < 1e-4f);
+    }
+}
+
+// A demonstration on the real position (1.e4 d5): the coach plays 1...dxe4 itself, the captured
+// White pawn to the coach's own capture slots, then takes the move back (its pawn home, the White
+// pawn back on e4), one move per batch as the game does. Every piece is released within 2 mm of
+// where it was asked to go, and the board ends exactly as it was.
+TEST(anim_demo_rewind_restores_board) {
+    using anim::EventType;
+    using anim::TaskType;
+    anim::Animator an;
+    initCoach(an);
+    CoachBoard b;
+    b.startPosition();
+    b.moveTo(4, 28);    // e4
+    b.moveTo(19, 35);   // d5
+    b.wire(an);
+    const std::vector<m::mat4> start = b.xf;
+    const int pawnB = 19, pawnW = 4;
+    const m::vec3 d5 = layout::squareCenter(35), e4 = layout::squareCenter(28);
+    const m::vec2 s0 = layout::captureSlot(0);
+    const m::vec3 slot(s0.x, layout::TABLE_TOP_Y, -s0.y);   // the coach's half, clock side
+    auto task = [](TaskType type, int id, m::vec3 pos, float dur, float h = 0.0f) {
+        anim::Task t = coachTask(type, id, pos);
+        t.duration = dur;
+        t.height = h;
+        return t;
+    };
+    std::vector<std::vector<anim::Task>> batches = {
+        {task(TaskType::Reach, pawnB, m::vec3(0), 0.55f), task(TaskType::Lift, pawnB, m::vec3(0), 0.20f), task(TaskType::Carry, pawnB, e4, 0.60f),
+         task(TaskType::TakeCaptured, pawnW, m::vec3(0), 0.25f), task(TaskType::Place, pawnB, e4, 0.30f),
+         task(TaskType::Discard, pawnW, slot, 0.50f), task(TaskType::Retract, -1, m::vec3(0), 0.0f)},
+        {task(TaskType::Reach, pawnB, m::vec3(0), 0.50f), task(TaskType::Lift, pawnB, m::vec3(0), 0.18f), task(TaskType::Carry, pawnB, d5, 0.55f),
+         task(TaskType::Place, pawnB, d5, 0.28f), task(TaskType::Reach, pawnW, m::vec3(0), 0.55f),
+         task(TaskType::Lift, pawnW, m::vec3(0), 0.22f, 0.06f), task(TaskType::Carry, pawnW, e4, 0.60f), task(TaskType::Place, pawnW, e4, 0.30f),
+         task(TaskType::Retract, -1, m::vec3(0), 0.0f)}};
+    const float dt = 1.0f / 480.0f;
+    std::vector<anim::Event> ev;
+    std::vector<std::pair<int, m::vec3>> wanted;   // releases asked for, in order
+    int releases = 0, gone = 0;
+    float worstRelease = 0.0f, worstEvent = 0.0f, overlap = 0.0f;
+    bool slotUsed = false;
+    m::mat4 lastHeld[32];
+    for (size_t k = 0; k < batches.size(); ++k) {
+        wanted.clear();
+        for (const anim::Task& t : batches[k])
+            if (t.type == TaskType::Place || t.type == TaskType::Discard) wanted.push_back({t.pieceId, t.position});
+        an.enqueue(batches[k]);
+        size_t next = 0;
+        for (int step = 0; step < int(8.0f / dt) && an.busy(); ++step) {
+            ev.clear();
+            an.update(dt, ev);
+            for (const anim::Event& e : ev) {
+                if (e.type != EventType::PieceReleased && e.type != EventType::CapturedReleased) continue;
+                ++releases;
+                if (next >= wanted.size() || wanted[next].first != e.pieceId) {
+                    ++gone;
+                    continue;
+                }
+                const m::vec3 want = wanted[next++].second;
+                // Where the hand really had the piece a moment before letting go, and where it rests.
+                worstRelease = std::max(worstRelease, m::length(lastHeld[e.pieceId].translation() - want));
+                worstEvent = std::max(worstEvent, m::length(e.transform.translation() - want));
+                b.xf[e.pieceId] = e.transform;
+                if (e.pieceId == pawnW && k == 0) slotUsed = m::length(e.transform.translation() - slot) < 0.002f;
+            }
+            for (int i = 0; i < 32; ++i) {
+                m::mat4 x;
+                if (an.heldPieceTransform(i, x)) {
+                    lastHeld[i] = x;
+                    b.xf[i] = x;
+                }
+            }
+            // The two pawns are gripped: the hand touches nothing else.
+            overlap = std::max(overlap, b.handOverlap(an.globals(), Side::Left, pawnB, pawnW));
+        }
+        CHECK(!an.busy());
+        CHECK_EQ(next, wanted.size());
+    }
+    float moved = 0.0f;
+    for (int i = 0; i < 32; ++i) moved = std::max(moved, m::length(b.xf[i].translation() - start[i].translation()));
+    std::fprintf(stderr, "  coach demo dxe4 and back: %d releases, worst %.2f mm off before letting go (%.3f mm at rest), board %.3f mm "
+                 "from the start after the rewind, deepest finger in another piece %.2f mm\n",
+                 releases, worstRelease * 1000.0f, worstEvent * 1000.0f, moved * 1000.0f, overlap * 1000.0f);
+    CHECK_EQ(releases, 4);
+    CHECK_EQ(gone, 0);
+    CHECK(slotUsed);
+    CHECK(worstRelease < 0.002f);
+    CHECK(worstEvent < 0.002f);
+    CHECK(moved < 0.002f);
+    CHECK(overlap < 0.004f);
 }

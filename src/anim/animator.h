@@ -5,6 +5,10 @@
 // Fairness rule (game design): every task type has a fixed duration that does not depend on
 // distance or on which player performs it, so both players spend exactly the same clock time on
 // the same physical action. Trajectories are fast and decisive, like a player short on time.
+// The coach's gestures (Point, Trace, Gesture) are exempt: they never take part in a timed game
+// (the Coach clock is unlimited), a Trace lasts as long as its path, and the caller times every
+// gesture freely (duration, notBefore, endHold) to follow the speech. Demonstration moves may use
+// the move tasks with custom (slower) durations for the same reason.
 // The game builds move animations as task sequences (see game/ for the composition) and gets
 // events at the exact physical instants (piece released on its square, clock lever pressed...).
 //
@@ -28,6 +32,7 @@
 #pragma once
 #include "../character/skeleton.h"
 #include "../math/math.h"
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <vector>
@@ -54,6 +59,14 @@ struct Timing {
     static constexpr float WriteApproach = 0.30f; // rest -> pen tip on the first path key
     static constexpr float WriteRetract = 0.30f;  // last key -> rest (pen kept in hand)
     static constexpr float PageTurn = 1.40f;      // pinch the page corner, flip it over the top edge
+    // Coach gestures (exempt from the fairness rule, see above).
+    static constexpr float PointApproach = 0.45f;     // anywhere -> index tip on its spot (PointReached)
+    static constexpr float PointHold = 1.00f;         // default hold: a Point lasts PointApproach + PointHold
+    static constexpr float TraceSpeed = 0.18f;        // m/s of the fingertip along an indicated path
+    static constexpr float TraceDwell = 0.12f;        // pause on the first waypoint before moving off
+    static constexpr float TraceCornerPause = 0.08f;  // pause on each inner waypoint (a crisp corner)
+    static constexpr float TraceSettle = 0.35f;       // hold on the last waypoint (PointReleased at the end)
+    static constexpr float GestureDefault = 0.90f;    // speaking gestures (Present / Beat / Open)
 };
 
 enum class TaskType {
@@ -66,7 +79,35 @@ enum class TaskType {
     PressClock,     // press the lever at 'position' with the index/middle fingers
     Retract,        // return the hand to its resting pose
     Handshake,      // shake hands with 'partner' (both characters must receive it together)
-    Wait            // hold for 'duration' (duration is the only parameter)
+    Wait,           // hold for 'duration' (duration is the only parameter)
+    // Coach gestures (the playing hand, nothing gripped). They end holding their last pose: queue
+    // the next gesture before the hold ends for a fluid chain (or cut the hold with endHold()), and
+    // finish a chain with a Retract (the hand only goes idle again after a Retract). A hand that
+    // holds a piece does not gesture: the task then only holds, its events still fire on time.
+    Point,          // point at piece 'pieceId' (>= 0) or at the world point 'position' (a square
+                    // centre...) with the index extended: the tip stops 'height' (0 = 0.045 m) above
+                    // the highest piece top around the target and around itself, the finger aimed at
+                    // the target (a piece: at 0.8 of its height). PointReached when it gets there
+                    // (after PointApproach, or 0.6 * duration if shorter), PointReleased at the end.
+    Trace,          // indicate a path: the index tip goes over 'path'[0] and follows the waypoints
+                    // (world board points; a knight's L as from, corner, to: see moveTracePath) at a
+                    // constant height, 'height' (0 = 0.035 m) above the highest piece top along the
+                    // way, pausing on each. PointReached on the first waypoint, TraceCorner on each
+                    // inner one, TraceDone on the last, PointReleased at the end.
+    Gesture         // speaking gesture of shape 'shape' (see HandShape); GestureBeat at each stroke
+};
+
+// Gesture shapes (Task::shape).
+enum class HandShape : uint8_t {
+    Present,   // the open hand, palm up, held out towards 'position' (0 = the board centre): "look
+               // at this". GestureBeat when it arrives. The eyes go to 'position' (see gazeHold).
+    Beat,      // baton beats of the loosely open hand in front of the body (where a Present / Open
+               // hand already is, else beside the board edge): n = max(1, round(duration / 0.45))
+               // down-strokes, stroke k at (k + 0.6) * duration / n; GestureBeat at each. The gaze
+               // is left to lookAt().
+    Open       // the open hand, palm up, turned towards the listener at 'position' (0 = straight
+               // ahead at face height): a question, an offer. GestureBeat when it arrives. The eyes
+               // go to the listener.
 };
 
 struct Task {
@@ -76,10 +117,30 @@ struct Task {
     float height = 0.0f;
     float duration = 0.0f;           // 0 = use the Timing default for the type
     class Animator* partner = nullptr;
+    // ---- Coach gestures
+    std::vector<m::vec3> path;       // Trace: world waypoints (board points), at least one
+    // Any task: it does not start before this instant of the animator clock (time()); meanwhile the
+    // hand holds where the previous task left it. -1 = as soon as the previous task ends.
+    float notBefore = -1.0f;
+    int tag = 0;                     // echoed in every event of this task (e.g. a speech cue id)
+    bool emphasis = false;           // Point: two small jabs along the finger when it arrives
+    // Point / Trace / Present: seconds the eyes stay on the target once it is reached (a Trace:
+    // once its path is done); then they go back to the lookAt() target (the listener's face) while
+    // the hand keeps pointing. -1 = the whole task.
+    float gazeHold = -1.0f;
+    HandShape shape = HandShape::Present;   // Gesture
 };
 
-// Duration the animator will use for this task (Timing default unless t.duration > 0).
+// Duration the animator will use for this task (Timing default unless t.duration > 0). A Trace
+// lasts PointApproach + TraceDwell + its path length / TraceSpeed + TraceCornerPause per inner
+// waypoint + TraceSettle; with a custom duration shorter than that, the approach, the pauses and
+// the path are compressed in proportion (a longer one holds longer at the end).
 float taskDuration(const Task& t);
+
+// World waypoints for a Trace of the move from square 'from' to square 'to' (0..63, a1 = 0): the
+// two square centres, or for a knight's jump the L through the corner square two steps along the
+// long leg (g1-f3: g1, g3, f3).
+std::vector<m::vec3> moveTracePath(int from, int to);
 
 enum class EventType {
     PieceGripped,      // Reach finished: pieceId now follows the hand
@@ -99,7 +160,14 @@ enum class EventType {
     WritingDone,       // a Write task's path is finished (the hand retracts)
     PageGripped,       // the page corner is pinched (the page starts turning)
     PageTurned,        // the page lies flipped over the top edge
-    WritingQueueEmpty
+    WritingQueueEmpty,
+    // Coach gestures ('position' = the target: the aimed point of a Point, the waypoint of a Trace,
+    // the presented point / the listener of a Gesture)
+    PointReached,      // the finger points at the target (a Trace: its tip is over the first waypoint)
+    PointReleased,     // the gesture ends (at the task's end, or when endHold() cuts it short)
+    TraceCorner,       // the tip is over an inner waypoint of the path
+    TraceDone,         // the tip is over the last waypoint
+    GestureBeat        // the stroke of a Gesture (arrival of Present / Open, each Beat down-stroke)
 };
 struct Event {
     EventType type;
@@ -111,6 +179,7 @@ struct Event {
     // face straight can drop that yaw).
     m::mat4 transform;
     float time = 0.0f;               // animator clock (seconds since init) of the physical instant
+    int tag = 0;                     // Task::tag of the task (playing hand; QueueEmpty: the last task)
 };
 
 // ---- Writing hand ------------------------------------------------------------------------------
@@ -242,7 +311,28 @@ public:
     // holds where it is, and the game puts those pieces back itself. The next task starts from
     // wherever the hand is (queue one, a Retract at least).
     void cancelTasks();
-    float remainingTime() const;                         // running task remainder + pending durations
+    // Running task remainder + pending durations, including the waits for their notBefore.
+    float remainingTime() const;
+
+    // ---- Coach gestures and speech (see TaskType::Point / Trace / Gesture)
+    // Cuts the hold of the running Point / Trace / Gesture short: it ends now, but never before it
+    // has arrived (a Trace: before its path is done; a Beat: before its last stroke is over).
+    // PointReleased fires then, and the next queued task starts from the held pose. No effect on
+    // other tasks.
+    void endHold();
+    // World position of the playing hand's index fingertip (after the last update); false before
+    // init. A highlight can follow it during a Trace.
+    bool pointerTip(m::vec3& out) const;
+    // Head gestures on top of the gaze (the eyes keep their target): a nod (down and back up) and
+    // a head shake (two turns each way). amplitude in radians, duration in seconds.
+    void nod(float amplitude = 0.07f, float duration = 0.45f);
+    void shakeHead(float amplitude = 0.06f, float duration = 0.6f);
+    // Voice envelope 0..1, every frame while speaking (e.g. the speech output level; 0 when
+    // silent; smoothed inside): the head bobs with the syllables and dips on the stressed ones, the
+    // torso leans in a little, the eyes widen slightly. The robot has no jaw: head, eyes, torso and
+    // the playing hand's gestures show the speech.
+    void setSpeechLevel(float level);
+    void blink();                                        // a blink now (e.g. at the end of a phrase)
 
     // Gaze: world point to look at (head + eyes, with natural limits and saccades). weight 0..1.
     void lookAt(m::vec3 target, float weight = 1.0f);

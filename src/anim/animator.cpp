@@ -33,6 +33,9 @@ float taskDuration(const Task& t) {
         case TaskType::Retract: return Timing::Retract;
         case TaskType::Handshake: return Timing::Handshake;
         case TaskType::Wait: return 0.0f;
+        case TaskType::Point: return Timing::PointApproach + Timing::PointHold;
+        case TaskType::Trace: return detail::traceSchedule(t.path, 0.0f).total();
+        case TaskType::Gesture: return Timing::GestureDefault;
     }
     return 0.0f;
 }
@@ -428,6 +431,10 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
             mo.segs.push_back(sg);
             break;
         }
+        // Coach gestures (animator_gesture.cpp).
+        case TaskType::Point: planPoint(t, start, T, from, mo); break;
+        case TaskType::Trace: planTrace(t, start, T, from, mo); break;
+        case TaskType::Gesture: planGesture(t, start, T, from, mo); break;
     }
     (void)tableC;
     (void)passVelocity;
@@ -440,9 +447,10 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
                  c.x, c.y, c.z);
         }
     if (t.type == TaskType::Reach || t.type == TaskType::PressClock || t.type == TaskType::Retract || t.type == TaskType::Discard ||
-        t.type == TaskType::Handshake)
+        t.type == TaskType::Handshake || isGesture(t.type))
         relaxWrist(h);
     if (t.type != TaskType::Wait) liftForearm(h);
+    if (t.type == TaskType::Trace) finishTracePlan(h);
     h.releasedId = -1;
 }
 
@@ -602,7 +610,9 @@ void Animator::Impl::validateRests(const Task* t) {
 // what the forearm naturally gives.
 void Animator::Impl::relaxWrist(Hand& h) {
     for (auto& sg : h.motion.segs) {
-        if (sg.T < 0.12f || sg.usePivot) continue;
+        // (A procedural segment ignores rotCorr; a hold with the fingertip pinned must keep its
+        // rotation, or the pinned tip would move with it.)
+        if (sg.T < 0.12f || sg.usePivot || sg.follow || sg.pinFrom >= 1.0f) continue;
         auto worst = [&](float& atU) {
             float w = 0.0f;
             atU = -1.0f;
@@ -672,6 +682,10 @@ void Animator::Impl::liftForearm(Hand& h) {
     };
     for (size_t i = 0; i < h.motion.segs.size(); ++i) {
         Segment& sg = h.motion.segs[i];
+        if (sg.follow) {   // procedural (a Trace): its plan keeps its own clearance (finishTracePlan)
+            segStart += sg.T;
+            continue;
+        }
         // Where the segment ends (hand on a piece, on the clock...): raise the elbow.
         float d = deficit(segStart + sg.T, false);
         const float clamp0 = wristClamp + pronClamp;
@@ -745,8 +759,9 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     float idleTwist = sway * 0.018f * (std::sin(t * 0.23f + seed * 7.0f) * 0.7f + std::sin(t * 0.41f) * 0.3f);
     float idleSide = sway * 0.012f * std::sin(t * 0.19f + seed * 2.0f);
 
-    // Forward bend of the thinking poses and of setLean (at most 0.2 rad from the hips).
-    const float flex = thinkLean + 0.2f * lean;
+    // Forward bend of the thinking poses and of setLean (at most 0.2 rad from the hips); speaking
+    // leans in a little more, a touch further on the stressed syllables.
+    const float flex = thinkLean + 0.2f * lean + 0.022f * speechEnv + 0.02f * speechStress;
     SpineParams sp = solveSpine(pose, hr.p, flex, idleFlex, idleTwist, idleSide);
     if (mirrored && running && cur.type == TaskType::Handshake) {
         // Left-handed player shaking hands with the solver's left hand: the torso follows that
@@ -772,7 +787,8 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     if (headOverride) {
         desired = qy(ovYaw) * qx(-ovPitch);
     } else {
-        desired = qy(headYaw) * qx(-headPitch);
+        // (Nods and head shakes on top of the smoothed gaze angles.)
+        desired = qy(headYaw + gestYaw) * qx(-(headPitch + gestPitch));
     }
     quat Q = normalize(conjugate(chest) * desired);
     quat neck = qslerp(quat(), Q, 0.30f);
@@ -810,7 +826,9 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
         blink = b < 0.38f ? minJerk(b / 0.38f) : 1.0f - minJerk((b - 0.38f) / 0.62f);
     }
     const float upperClosed = 0.95f, lowerClosed = -0.28f;
-    float upOpen = clamp(-eyePitch * 0.80f, -0.30f, 0.55f), loOpen = clamp(-eyePitch * 0.35f, -0.25f, 0.20f);
+    // (Speaking: the upper lids open a little wider, more on the stressed syllables.)
+    float upOpen = clamp(-eyePitch * 0.80f - 0.05f * speechEnv - 0.30f * speechStress, -0.30f, 0.55f),
+          loOpen = clamp(-eyePitch * 0.35f, -0.25f, 0.20f);
     float up = lerp(upOpen, upperClosed, blink), lo = lerp(loOpen, lowerClosed, blink * 0.6f);
     pose.local[LidUpperL] = pose.local[LidUpperR] = qx(up);
     pose.local[LidLowerL] = pose.local[LidLowerR] = qx(lo);
@@ -819,6 +837,19 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     hr = handTarget(right(), t);
     HandSample hl = handTarget(left(), t);
     solveArm(pose, Side::Right, hr.p, hr.q, hr.elbow);
+    if (hr.pinW > 0.0f) {
+        // Point lock (the pointing fingertip): where the wrist clamps the hand's rotation, the whole
+        // hand shifts so the index tip stays on its planned point (weighted in and out by pinW).
+        const vec3 planned = hr.p + rotate(hr.q, hr.pinLocal);
+        vec3 corr(0.0f);
+        for (int it = 0; it < 3; ++it) {
+            const vec3 e = planned - transformPoint(G[HandR], hr.pinLocal);
+            if (length2(e) < 1e-8f) break;
+            corr += e;
+            solveArm(pose, Side::Right, hr.p + corr, hr.q, hr.elbow);
+        }
+        if (hr.pinW < 1.0f && length2(corr) > 0.0f) solveArm(pose, Side::Right, hr.p + corr * hr.pinW, hr.q, hr.elbow);
+    }
     static const bool armTrace = std::getenv("SCACELITH_ANIM_ARMTRACE") != nullptr;   // joint-limit diagnostics
     if (armTrace && (wristClamp > 0.05f || pronClamp > 0.05f))
         LOGI("armtrace %s t=%.4f pron %.3f flex %.3f dev %.3f elbow %.3f clampP %.3f clampW %.3f p %.3f %.3f %.3f", facing > 0 ? "White" : "Black", t, lastPron, lastFlex, lastDev, hr.elbow,
@@ -892,6 +923,13 @@ void Animator::Impl::updateGaze(float dt) {
     vec3 target = lerp(idleTarget, gazeTarget, gazeWeight);
     // While the hand works, the eyes (and head) lead it to the task target.
     bool taskLook = running && cur.type != TaskType::Handshake && cur.type != TaskType::Wait && cur.type != TaskType::Retract;
+    if (running && isGesture(cur.type)) {
+        // Gestures: on the target (a Trace: the eyes pursue the fingertip) until gazeHold has run
+        // out after the arrival, then back to the lookAt target while the hand keeps pointing. A
+        // Beat leaves the eyes to lookAt.
+        if (!curLook || (cur.gazeHold >= 0.0f && time > curStart + curArrive + cur.gazeHold)) taskLook = false;
+        if (cur.type == TaskType::Trace && trace) curTargetWorld = toWorld(trace->tipAt(time - traceStart));
+    }
     taskGaze += ((taskLook ? 1.0f : 0.0f) - taskGaze) * (1.0f - std::exp(-dt * (taskLook ? 14.0f : 2.0f)));
     target = lerp(target, curTargetWorld, taskGaze);
     // The eyes follow the pen (or the page corner) while the writing hand works and the playing
@@ -925,6 +963,9 @@ void Animator::Impl::updateGaze(float dt) {
     hp += 0.007f * std::sin(t * 0.7f + seed * 2.0f) + 0.003f * std::sin(t * 1.9f);
     // Nod at the clasp.
     if (shakeT > 0.85f && shakeT < 1.6f) hp -= 0.10f * std::sin(PI * (shakeT - 0.85f) / 0.75f);
+    // Speaking: the head bobs with the syllables and dips on the stressed ones (nods and head
+    // shakes are added after the spring, see gestYaw).
+    updateSpeech(dt, hy, hp);
     hy = clamp(hy, -70.0f * DEG, 70.0f * DEG);
     hp = clamp(hp, -45.0f * DEG, 30.0f * DEG);
     // Critically damped spring towards the target angles (sub-stepped).
@@ -1082,6 +1123,9 @@ void Animator::Impl::startTask(const Task& t, std::vector<Event>& ev) {
     running = true;
     curStart = time;
     curT = taskDuration(t);
+    curArrive = curT;   // (gestures: set by their plan)
+    curLook = true;
+    trace.reset();
     auto c0 = std::chrono::steady_clock::now();
     planTask(t, time, curT);
     float ms = std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - c0).count();
@@ -1092,6 +1136,7 @@ void Animator::Impl::startTask(const Task& t, std::vector<Event>& ev) {
     e.pieceId = t.pieceId;
     e.position = t.position;
     e.time = time;
+    e.tag = t.tag;
     ev.push_back(e);
 }
 
@@ -1122,7 +1167,9 @@ void Animator::Impl::fireDue(float upTo, std::vector<Event>& ev) {
         out.type = e.type;
         out.time = e.t;
         out.pieceId = cur.pieceId;
-        out.position = cur.type == TaskType::Handshake ? curTargetWorld : cur.position;
+        out.tag = cur.tag;
+        out.position = cur.type == TaskType::Handshake || isGesture(cur.type) ? curTargetWorld : cur.position;
+        if (e.hasPos) out.position = e.pos;
         if (e.action == ActPutPen) {
             // The handshake laid the writing hand's pen down.
             wr.penHeld = false;
@@ -1204,6 +1251,7 @@ void Animator::Impl::finishTask(std::vector<Event>& ev) {
         Event e;
         e.type = EventType::QueueEmpty;
         e.time = time;
+        e.tag = cur.tag;
         ev.push_back(e);
     }
 }
@@ -1299,6 +1347,7 @@ void Animator::setLeftRestHand(vec3 worldPos) {
 void Animator::enqueue(const Task& t) {
     Task c = t;
     c.position = impl_->mw(t.position);   // into the solver's world
+    for (vec3& p : c.path) p = impl_->mw(p);
     impl_->queue.push_back(c);
 }
 void Animator::enqueue(const std::vector<Task>& tasks) {
@@ -1313,13 +1362,19 @@ void Animator::cancelTasks() {
     I.running = false;
     I.curEvents.clear();
     I.prevWasClock = false;
+    I.trace.reset();
     Impl::Hand& h = I.right();
     h.heldId = h.capId = h.releasedId = -1;
 }
 float Animator::remainingTime() const {
     const Impl& I = *impl_;
     float r = I.running ? std::max(0.0f, I.curStart + I.curT - I.time) : 0.0f;
-    for (auto& t : I.queue) r += taskDuration(t);
+    float end = I.time + r;
+    for (auto& t : I.queue) {
+        const float wait = std::max(0.0f, t.notBefore - end), d = taskDuration(t);
+        r += wait + d;
+        end += wait + d;
+    }
     return r;
 }
 void Animator::lookAt(vec3 target, float weight) {
@@ -1342,8 +1397,8 @@ void Animator::setHeadOverride(bool enabled, float yaw, float pitch) {
 }
 void Animator::headAngles(float& yaw, float& pitch) const {
     const Impl& I = *impl_;
-    yaw = I.headOverride ? I.ovYaw : I.headYaw;
-    pitch = I.headOverride ? I.ovPitch : I.headPitch;
+    yaw = I.headOverride ? I.ovYaw : I.headYaw + I.gestYaw;
+    pitch = I.headOverride ? I.ovPitch : I.headPitch + I.gestPitch;
     if (I.mirrored) yaw = -yaw;   // back from the solver's side to the character's
 }
 void Animator::setLean(float lean) { impl_->leanTarget = clamp(lean, 0.0f, 1.0f); }
@@ -1373,7 +1428,7 @@ void Animator::update(float dt, std::vector<Event>& events) {
         const float never = 1e30f;
         float tm = never, tw = never;
         if (I.running) tm = I.curStart + I.curT;
-        else if (!I.queue.empty()) tm = I.time;
+        else if (!I.queue.empty()) tm = std::max(I.time, I.queue.front().notBefore);   // (the hand holds meanwhile)
         if (!I.nextWriteBoundary(tw)) tw = never;
         const float tn = std::min(tm, tw);
         if (tn > tEnd) break;
