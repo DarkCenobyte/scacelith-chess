@@ -13,18 +13,24 @@
 // left-handed), at White's right (+X) when watching.
 //
 // Hot-seat: the seat to move has the mouse and keyboard and the view from its robot's eyes. After
-// the clock press the view flies to the other player's eyes (or cuts through black, Options >
-// Gameplay) with the clock frozen; buttons still held by the previous player are ignored until
-// released. Each seat keeps its own look (yaw, pitch, lean). The in-game pointer, the square
-// aimed at, the clock hover, the see-through arm and the look at the scoresheet (S) belong to the
-// player to move; there is no pointer or aiming while the view goes over.
+// the clock press (untimed: once the move is made) the view flies to the other player's eyes (or
+// cuts through black, Options > Gameplay) with the clock frozen; buttons still held by the
+// previous player are ignored until released. Each seat keeps its own look (yaw, pitch, lean).
+// The in-game pointer, the square aimed at, the clock hover, the see-through arm and the look at
+// the scoresheet (S) belong to the player to move; there is no pointer or aiming while the view
+// goes over.
+//
+// Untimed games (no time control; Play, hot-seat and Watch can be, online never is, see
+// clock_rules.h) have no clock press: a move is completed as its last piece is released and the
+// turn passes at once (completeMove). The clock shows dashes, its lever stays still.
 //
 // Command line (development and screenshots):
 //   --start                 skip the menu: a game against Stockfish (--human white|black)
 //   --start --hotseat       skip the menu: a hot-seat game (--white-name N --black-name N,
 //                           --clock-right white|black, --rated, --handover <s> with 0 = a cut)
 //   --play e2e4,e7e5,...    the human player(s) make these moves by hand, one per turn (touch,
-//                           carry, clock press; the promotion piece as a fifth letter), online too
+//                           carry, clock press unless untimed; the promotion piece as a fifth
+//                           letter), online too
 //   --viewer                skip the menu: watch Stockfish vs Stockfish (--white-preset N
 //                           --black-preset N, indices into ai::presets(); --demo is an alias)
 //   --viewpoint N           viewer: start at viewpoint N (0 eyes, 1 side, 2 board, 3 hall, 4 clock,
@@ -34,6 +40,7 @@
 //   --handover-preview      viewer: follow the eyes of the player to move, flying from one to the
 //                           other after each move with the clock frozen (hot-seat preview)
 //   --tc N                  time control preset index for a game started from the command line
+//                           (0 = no clock: an untimed game)
 //   --no-intro --warp <s> --moves e2e4,e7e5,... --touch <square>
 //   --online-mock           online play against the in-process fake server (online_mock.h)
 //   --start-online [cat]    skip the menu: sign in and play the first opponent found in category
@@ -49,6 +56,7 @@
 #include "../chess/chess.h"
 #include "../ui/ui.h"
 #include "camera_flight.h"
+#include "clock_rules.h"
 #include "hotseat.h"
 #include "observer_camera.h"
 #include "online_live.h"
@@ -125,7 +133,7 @@ private:
         HumanTouched,    // a piece is gripped on its square (touch-move applies)
         HumanPlacing,    // the hand is moving the piece (and any capture / castling rook)
         HumanPromotion,  // pawn on the last rank: choosing the new piece
-        HumanPlaced,     // move made on the board, waiting for the clock press
+        HumanPlaced,     // move made on the board, waiting for the clock press (untimed: completed at once)
         HumanPressing,   // hand on its way to the clock
         AiThinking,
         AiMoving,
@@ -159,6 +167,12 @@ private:
     void offerDraw();
     void updateAi(float dt);
     void onClockPressed(int seat);
+    // The move on the board is completed (FIDE 6.2.1; untimed: 4.7): the arbiter's verdict, the
+    // move into game_, the scoresheets, the end of the game, then the turn passes (hot-seat: the
+    // handover). The one entry point for every completed offline move: the clock press
+    // (onClockPressed) of a timed game, the last piece released (updatePlaying) of an untimed one.
+    // Ignored unless a move by 'seat' waits for its completion.
+    void completeMove(int seat);
     void answerAiDrawOffer(int offeringSeat);
     void handleEvents(int seat, std::vector<anim::Event>& events);
 
@@ -186,6 +200,9 @@ private:
     bool watching() const { return mode_ == GameMode::Watch; }
     bool online() const { return mode_ == GameMode::Online; }
     bool hotSeat() const { return mode_ == GameMode::HotSeat; }
+    // No time control: no clock press, the move is completed as its last piece is released
+    // (clock_rules.h). Never online.
+    bool untimed() const { return untimedGame(online(), clock_.timeControl()); }
     // The seat whose player has the mouse and keyboard: the human, or in a hot-seat game the seat
     // to move (hotseat::inputSeat).
     int inputSeat() const;
@@ -196,7 +213,8 @@ private:
     int firstPersonSeat() const;
     bool opponentMoving() const { return turn_ == Turn::AiMoving || turn_ == Turn::RemoteMoving; }
     // The player's robot presses the clock by itself once the move is on the board: online the
-    // authority decides (og_.autoPress), on this PC Options > Gameplay (off by default).
+    // authority decides (og_.autoPress), on this PC Options > Gameplay (off by default). Untimed
+    // games have no press at all (untimed()).
     bool autoPressClock() const;
     ai::ClockInfo clockInfo() const;
     chess::TimeControl chosenTimeControl() const;
@@ -231,7 +249,7 @@ private:
     // ---- hot-seat (two players on one PC) ----
     void initHotSeatArgs();                    // command line: --hotseat and its options
     void configureHotSeatSeats();
-    void startHandover(int mover);             // after a clock press: the view goes to the other player
+    void startHandover(int mover);             // move completed (completeMove): the view goes to the other player
     void updateHandover(float dt);             // inside simulate, after the animation update
     void landHandover();
     void beginLook(int seat, bool snap);       // the seat's first-person look takes its head over
@@ -387,7 +405,7 @@ private:
     };
     Look look_[2];
     // S: the player whose eyes are the view looks at their own scoresheet. One state for the
-    // view, not per seat: in a hot-seat game a turn's look ends at the clock press (startHandover).
+    // view, not per seat: in a hot-seat game a turn's look ends with the move (startHandover).
     bool glance_ = false;
     float glanceBlend_ = 0.0f;
     bool dragging_ = false;
@@ -423,7 +441,7 @@ private:
     bool inputBlocked_ = false;         // this frame: the gate holds the input back
     int viewSeat_ = 0;                  // the seat whose eyes the view is in (outside a handover)
     float writeGrace_ = 0.0f;           // after the landing: a piece touched before it ends defers the writing
-    int drawOfferBy_ = -1;              // seat whose draw offer goes with its next clock press
+    int drawOfferBy_ = -1;              // seat whose draw offer goes with its next move (completeMove)
     int drawCardFor_ = -1;              // seat asked to accept a draw (card)
     float captionAge_ = 1e9f;           // "Bob, your move" (since the handover began)
     float handoverArg_ = -1.0f;         // --handover <s> (this session only); -1 = Options > Gameplay

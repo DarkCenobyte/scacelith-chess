@@ -17,7 +17,9 @@ real-time material shaders, physically based lighting.
   once the clock is pressed, and after a promotion the new piece must be on the board first.
   With Options > Gameplay > Auto-press clock your hand presses it by itself once the move is on
   the board (capture, castling rook and promotion piece included); online, the server (or the
-  host of a direct match) decides for each game.
+  host of a direct match) decides for each game. A game without a time limit ("No clock") has no
+  clock press at all, for both sides and in every mode: the move is completed as its last piece
+  is released (FIDE 4.7), the turn passes at once, and the clock shows dashes.
 - **Right mouse button** (hold and drag): look around from your chair. The pointer at the top of
   the window: look up at your opponent. **Mouse wheel**: lean towards the board. **Middle click**
   or **C**: look at the board again.
@@ -90,10 +92,11 @@ left hand), and whether the game is rated. **Swap colours** exchanges the two pl
 
 - The player to move has the mouse and the keyboard, with the same rules as against Stockfish
   (touch-move, pressing the clock by hand, the arbiter, the claims in the Esc menu).
-- Once the clock is pressed, the camera flies over the table into the other player's eyes, and
-  both clocks stand still until it lands. Options > Gameplay > Hot-seat handover sets the flight
-  length (0.8 to 2 s) or an instant cut through black. Buttons still held when the view leaves
-  are ignored until released, and each player keeps their own look (right drag, wheel).
+- Once the clock is pressed (without a clock: once the move is made), the camera flies over the
+  table into the other player's eyes, and both clocks stand still until it lands. Options >
+  Gameplay > Hot-seat handover sets the flight length (0.8 to 2 s) or an instant cut through
+  black. Buttons still held when the view leaves are ignored until released, and each player
+  keeps their own look (right drag, wheel).
 - Each player fills in their own scoresheet in their own handwriting. The mover writes the move at
   once; the next player writes it when the view reaches them, or after their own move if they
   touch a piece first.

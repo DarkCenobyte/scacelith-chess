@@ -19,6 +19,7 @@ struct ClockDisplay {
     int running = -1;             // half whose time runs, -1 = none
     bool flagged[2] = {false, false};
     bool unlimited = false;
+    bool dashes = false;          // "--:--" on both halves: a clock nobody presses (an untimed game)
     bool paused = false;
     float leverSide = 0.0f;       // -1..+1: +1 = half 1 pressed down, -1 = half 0 pressed down
 };
