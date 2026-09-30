@@ -51,6 +51,26 @@ void main() {
 #endif
     float planarLayer = draws[vin.draw].info.y;
     vec3 c = shadeSurface(i, s, planarLayer);
+#if (defined(PASS_MAIN) || defined(PASS_PLANAR)) && !defined(MATERIAL_TRANSPARENT)
+    {
+        // Designation highlight (DrawItem::highlight), as if a cool light picked the object out:
+        // towards the silhouette (Fresnel on the interpolated normal, so polish or bump detail
+        // does not speckle it) the lit colour takes on the highlight's hue at its own luminance,
+        // a little brighter, so a white piece in the sun and a black one in the shade change
+        // alike: a hue a white surface shows well, without a neon line on a dark one. A thin
+        // absolute rim on the silhouette keeps it visible on black; a faint lift on the whole
+        // object. Breathes slowly.
+        vec4 hl = draws[vin.draw].highlight;
+        if (hl.a > 0.0) {  // uniform per draw
+            float NoV = saturate(dot(i.normalWS, i.viewDirWS));
+            float broad = pow(1.0 - NoV, 1.5), narrow = pow(1.0 - NoV, 3.5);
+            float k = hl.a * (0.80 + 0.20 * sin(i.time * 3.4));
+            vec3 hue = hl.rgb / max(luminance(hl.rgb), 1e-4);
+            c = mix(c, hue * (1.25 * luminance(c)), 0.65 * k * broad) * (1.0 + 0.12 * k);
+            c += hl.rgb * (0.25 * k * narrow);
+        }
+    }
+#endif
     c = min(c, vec3(60000.0));
 #ifdef MATERIAL_TRANSPARENT
     if (s.transmission > 0.0) {

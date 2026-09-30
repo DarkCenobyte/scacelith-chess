@@ -6,11 +6,23 @@
 //   [2] subsurface tint rgb, orange-peel strength
 //   [3] soft-touch pad albedo rgb, pad roughness
 //   [4] x = seam darkening, y = seam bevel width (m), z = smudge amount, w = albedo variation
+//   [5..7] ROBOT_MARKING only (see robotMarking below)
 // instParams (per part, see src/character/robot_build.h):
 //   [0] x = variant (0 shell, 1 pad region on the positive side of seam 0), y = clearcoat scale,
 //       z = roughness offset, w = seam half width (m)
 //   [1..3] seam planes in bone space: xyz unit normal, w offset (dot(n,p) + w = 0), 0 = unused
 // Positions are bone-local (positionOS), so every pattern is glued to the part while it moves.
+//
+// ROBOT_MARKING (the coach's chest, character::ChestMarking): a word printed in the glaze, like
+// the cobalt under-glaze marks of porcelain makers. Its distance field is projected along the
+// bone's +Z onto the front of the part. The pigment lies under the clear glaze, so only the body
+// colour and the translucency change: the coat, its orange peel and smudges, the seams and their
+// rolled edges stay on top of the letters.
+//   textures[0]  R8, mipmapped: 0.5 + signed distance (texels, inside > 0) / range, row 0 = top
+//   [5] marking rectangle in bone space (m): centre x, centre y, width, height
+//   [6] rgb = pigment albedo (linear), w = distance range (2 * spread, texels)
+//   [7] x = dilation (texels: weight of the letters), y = translucency kept under the pigment,
+//       z = minimum normal z (bone space) of the printed front, w = pigment bleed (texels)
 
 // Distance (m, along the surface) from the seam where a plane cuts the shell.
 float robotSeamDistance(vec4 pl, vec3 p, vec3 nOS, out vec3 dirOS) {
@@ -20,6 +32,26 @@ float robotSeamDistance(vec4 pl, vec3 p, vec3 nOS, out vec3 dirOS) {
     dirOS = tg / l;
     return d / l;
 }
+
+#ifdef ROBOT_MARKING
+layout(binding = 0) uniform sampler2D uMarking;
+
+// Pigment coverage of the marking at bone-space p. Called in uniform control flow (texture
+// derivatives). Screen-space anti-aliasing from the distance field, widened by the bleed.
+float robotMarking(vec3 p, vec3 nOS, vec4 rect, float range, vec4 opt) {
+    vec2 uv = vec2((p.x - rect.x) / rect.z + 0.5, 0.5 - (p.y - rect.y) / rect.w);
+    vec2 texSize = vec2(textureSize(uMarking, 0));
+    // One level sharper than the footprint: the thin strokes keep their weight in the mips.
+    float v = texture(uMarking, uv, -1.0).r;
+    float sd = (v - 0.5) * range + opt.x;
+    vec2 fw = fwidth(uv) * texSize;
+    float footprint = max(0.5 * (fw.x + fw.y), 1e-4);
+    float soft = max(footprint, opt.w);
+    float cov = clamp(sd / soft + 0.5, 0.0, 1.0);
+    vec2 inside = step(vec2(0.0), uv) * step(uv, vec2(1.0));
+    return cov * inside.x * inside.y * smoothstep(opt.z, opt.z + 0.15, nOS.z) * step(0.0, p.z);
+}
+#endif
 
 void surface(in SurfaceInput i, inout Surface s) {
     vec3 p = i.positionOS;
@@ -96,6 +128,14 @@ void surface(in SurfaceInput i, inout Surface s) {
         coat *= 1.0 - fade;
     }
 
+#ifdef ROBOT_MARKING
+    // Printed in the glaze: a slightly uneven layer of pigment (thinner in places, as fired
+    // cobalt is) that no light scatters through; the seam gaps interrupt it.
+    float ink = robotMarking(p, nOS, i.matParams[5], i.matParams[6].w, i.matParams[7]) * (1.0 - gap);
+    ink *= 0.90 + 0.10 * smoothstep(-0.6, 0.6, fbm(p * 260.0 + seed * 3.0, 2));
+    albedo = mix(albedo, i.matParams[6].rgb * (1.0 + 0.6 * i.matParams[4].w * lowF), ink);
+#endif
+
     // Micro surface: orange peel of the glaze (very low amplitude).
     vec3 nGeom = i.normalWS;
     float peel = gnoise(p * 900.0) * 0.6 + gnoise(p * 2300.0) * 0.4;
@@ -121,6 +161,9 @@ void surface(in SurfaceInput i, inout Surface s) {
     s.clearcoatNormalWS = nCoat;
     s.occlusion = mix(1.0, 0.25, gap) * (1.0 - 0.10 * near);
     s.subsurface = i.matParams[1].w * (1.0 - gap);
+#ifdef ROBOT_MARKING
+    s.subsurface *= mix(1.0, i.matParams[7].y, ink);
+#endif
     s.subsurfaceColor = i.matParams[2].rgb;
     s.subsurfaceRadius = 0.004;
 }

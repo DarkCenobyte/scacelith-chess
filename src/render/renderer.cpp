@@ -361,6 +361,7 @@ void Renderer::submit(const DrawItem& d) {
     g.info = vec4(float(hash32(d.objectId * 747796405u + 2891336453u) & 0xFFFFFF) / 16777216.0f,
                   float(d.material->planarReflector), float(d.flags), float(d.objectId));
     g.fade = vec4(clamp(d.opacity, 0.0f, 1.0f), settings_.taa ? 1.0f : 0.0f, 0.0f, 0.0f);
+    g.highlight = vec4(d.highlight.xyz(), clamp(d.highlight.w, 0.0f, 1.0f));
     drawData_.push_back(g);
 }
 
