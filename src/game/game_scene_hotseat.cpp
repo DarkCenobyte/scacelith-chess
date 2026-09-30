@@ -2,12 +2,13 @@
 // (docs/MULTIPLAYER_PLAN.md).
 //   - The seat to move has the mouse and keyboard (inputSeat()) and the view (viewSeat()); every
 //     rule of the game against Stockfish applies to it: touch-move, the arbiter's penalties when
-//     the legal-move hints are off, the clock pressed by hand, the claims.
-//   - After the clock press the view goes over to the other player: a camera flight
-//     (CameraFlight::handoverShape) or, with Options > Gameplay > Handover on "Instant cut", a cut
-//     through black. The clock is frozen meanwhile (nothing counts, the delay window waits), drags
-//     are cancelled at the press, and buttons still held from the previous turn are ignored until
-//     released. During a flight the mover's head is its robot's again and the next player's head
+//     the legal-move hints are off, the clock pressed by hand (none in an untimed game: the move is
+//     completed as its last piece is released, clock_rules.h), the claims.
+//   - Once the move is completed (completeMove) the view goes over to the other player: a camera
+//     flight (CameraFlight::handoverShape) or, with Options > Gameplay > Handover on "Instant cut",
+//     a cut through black. The clock is frozen meanwhile (nothing counts, the delay window waits),
+//     drags are cancelled at the completion, and buttons still held from the previous turn are
+//     ignored until released. During a flight the mover's head is its robot's again and the next player's head
 //     turns to that player's own look (each seat keeps its yaw, pitch and lean).
 //   - Scoresheets: each player writes their own sheet in their own hand. The mover records the
 //     move at once; the next player records it once the view has reached them, unless they touch
@@ -173,7 +174,7 @@ void GameScene::startHandover(int mover) {
 }
 
 void GameScene::updateHandover(float dt) {
-    // The caption ("Bob, your move") fades in at the press and stays up while the view goes over
+    // The caption ("Bob, your move") fades in at the completion and stays up while the view goes over
     // (ui::hotSeatHud); updatePlaying() does not run meanwhile (the clock is frozen).
     if (!paused_) captionAge_ = handover_.active() ? std::min(captionAge_ + dt, 0.3f) : captionAge_ + dt;
     if (!handover_.active()) return;
@@ -229,7 +230,7 @@ void GameScene::updateHotSeatTurn(float dt) {
         writeGrace_ -= dt;
         if (turn_ != Turn::HumanIdle) {
             // A piece touched first: the opponent's move is recorded after this one (the hold is
-            // released at this player's clock press, onClockPressed).
+            // released when this player's move is completed, completeMove).
             writeGrace_ = 0.0f;
         } else if (writeGrace_ <= 0.0f) {
             scorekeeper_.setHold(inputSeat(), false);  // records the opponent's move now
@@ -250,7 +251,8 @@ void GameScene::updateScript(float dt) {
         scriptPos_ = script_.size();
         return;
     }
-    // By hand, as a player would: touch, carry, press the clock (queued until the piece is down).
+    // By hand, as a player would: touch, carry, press the clock (queued until the piece is down;
+    // untimed, there is no press: humanPressClock ignores it).
     humanTouch(p->id);
     if (turn_ != Turn::HumanTouched) return;
     scriptPromo_ = mv.promotion;
@@ -267,7 +269,8 @@ void GameScene::offerDrawHotSeat() {
     int seat = inputSeat();
     drawOfferPly_ = ply;
     drawOfferBy_ = seat;
-    // FIDE 9.1.2: make the move, offer, press the clock; the opponent sees it when the view reaches them.
+    // FIDE 9.1.2: make the move, offer, press the clock (untimed: the offer goes with the move made);
+    // the opponent sees it when the view reaches them.
     ui::notify(i18n::trf("hotseat.draw.offer_noted", {seats_[1 - seat].name}), 4.0f);
 }
 

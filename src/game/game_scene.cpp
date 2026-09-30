@@ -1120,7 +1120,16 @@ void GameScene::updatePlaying(float dt) {
                 turn_ = Turn::HumanPromotion;
             } else {
                 turn_ = Turn::HumanPlaced;
-                if (pressQueued_) humanPressClock();
+                if (untimed()) {
+                    // No clock to press: the move is made now that its last piece is released
+                    // (the promotion's new piece included) and the hand goes back meanwhile.
+                    // The seat is taken first: in a hot-seat game the turn passes in completeMove.
+                    int seat = inputSeat();
+                    anim_[seat].enqueue(task(anim::TaskType::Retract));
+                    completeMove(seat);
+                } else if (pressQueued_) {
+                    humanPressClock();
+                }
             }
         }
         break;
@@ -1158,6 +1167,11 @@ void GameScene::updatePlaying(float dt) {
         break;
     }
     case Turn::AiThinking: updateAi(dt); break;
+    case Turn::AiMoving:
+        // Untimed: the robot's move is completed once its last piece is released (dest_ holds only
+        // its pieces now); its hand goes back meanwhile. Timed: at its clock press.
+        if (untimed() && dest_.empty()) completeMove(seatOf(game_.position().sideToMove()));
+        break;
     default: break;
     }
 }
@@ -1176,7 +1190,7 @@ void GameScene::updateHumanInput() {
     bool ownPiece = p && p->color == me;
     hoverId_ = ownPiece && turn_ == Turn::HumanIdle ? pid : -1;
     float tClock = 1e30f;
-    clockHover_ = world_.rayHitsClock(ray, &tClock) && tClock < tPiece;
+    clockHover_ = !untimed() && world_.rayHitsClock(ray, &tClock) && tClock < tPiece;  // untimed: no press
     // While a piece is in hand the pointer designates a square (shown on the board, see markers()).
     bool castling = false;
     aimSq_ = turn_ == Turn::HumanTouched && !clockHover_ ? aimSquare(ray, &castling) : NoSquare;
@@ -1249,7 +1263,9 @@ void GameScene::updateHumanInput() {
         }
         break;
     }
-    case Turn::HumanPlaced: ui::notify(i18n::tr("notify.press_clock"), 2.5f); break;
+    case Turn::HumanPlaced:
+        if (!untimed()) ui::notify(i18n::tr("notify.press_clock"), 2.5f);
+        break;
     default: break;
     }
 }
@@ -1375,6 +1391,8 @@ void GameScene::humanPlace(Square to) {
 bool GameScene::autoPressClock() const { return online() ? og_.autoPress : settings().autoPressClock; }
 
 void GameScene::humanPressClock() {
+    // Untimed: nothing to press (Space, a click on the clock, --play); the move completes itself.
+    if (untimed()) return;
     if (turn_ == Turn::HumanPlacing || turn_ == Turn::HumanPromotion) {
         // Pressed as soon as the pieces are down: after the promotion swap, and online, where the
         // new piece is chosen before the pawn moves, once the move it completes is placed.
@@ -1513,8 +1531,10 @@ void GameScene::updateAi(float dt) {
     tasks.push_back(task(anim::TaskType::Reach, moverId));
     planPlacement(tasks, moverId, mv.to, victimId, rookFrom, rookTo);
     if (mv.promotion != NoPiece) planPromotionSwap(tasks, moverId, mv.to, mv.promotion);
-    int half = world_.clockHalfForSeat(seat == 0 ? 1.0f : -1.0f);
-    tasks.push_back(task(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)));
+    if (!untimed()) {  // untimed: completed as the last piece is released (updatePlaying)
+        int half = world_.clockHalfForSeat(seat == 0 ? 1.0f : -1.0f);
+        tasks.push_back(task(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)));
+    }
     tasks.push_back(task(anim::TaskType::Retract));
     anim_[seat].setThinking(false);
     anim_[seat].enqueue(tasks);
@@ -1679,10 +1699,23 @@ void GameScene::onClockPressed(int seat) {
         }
         return;
     }
+    completeMove(seat);
+}
+
+void GameScene::completeMove(int seat) {
+    // Online the authority completes the moves (onClockPressed above, game_scene_online.cpp).
+    if (state_ != State::Playing || online()) return;
     Color mover = colorOfSeat(seat);
-    if (!(turn_ == Turn::HumanPressing || turn_ == Turn::AiMoving) || game_.position().sideToMove() != mover) return;
+    // A move waits for its completion: pressing the clock (by hand or the robot's hand), or in an
+    // untimed game put down by the human (HumanPlaced) or by the robot (AiMoving, its last piece
+    // released).
+    bool waiting = turn_ == Turn::HumanPressing || turn_ == Turn::AiMoving || (untimed() && turn_ == Turn::HumanPlaced);
+    if (!waiting || game_.position().sideToMove() != mover) return;
+    // The arbiter's verdict: an illegal move is completed too (FIDE 7.5.1), in an untimed game as
+    // soon as it is made.
     chess::Arbiter::Verdict v = arbiter_.clockPressed(game_, clock_.timeControl());
     if (v.legal || v.moveStands) {
+        // Untimed: nobody sees this clock, it only switches the side whose used time it counts.
         clock_.press(mover);
         if (v.moveStands) {
             // Art. 7.5.2: pawn left unpromoted: penalised, the move stands with a queen.
@@ -1701,6 +1734,10 @@ void GameScene::onClockPressed(int seat) {
         LOGI("move %d: %s (%s, clocks %lld / %lld ms)", int(game_.moves().size()), game_.sanMoves().back().c_str(),
              mover == White ? "White" : "Black", (long long)clock_.remainingMs(White), (long long)clock_.remainingMs(Black));
         if (v.moveStands) board_.syncTo(game_.position());
+        // ---- Coach hook (move completed) ----
+        // game_ holds the move and the scoresheets have it; the game may be over. A coach reacts
+        // here (check, mate, opening, review of the move), before the end of the game and before
+        // the turn passes.
         if (game_.status() != GameStatus::Ongoing) {
             endGame();
             return;
@@ -1744,10 +1781,10 @@ void GameScene::onClockPressed(int seat) {
         return;
     }
     // The clock was not switched: the offender's time keeps running while the position is
-    // restored.
+    // restored, and the lever goes back (untimed: it never moved).
     clock_.addTime(opposite(mover), v.opponentBonusMs);
     board_.syncTo(game_.position());
-    leverTarget_ = -leverTarget_;
+    if (!untimed()) leverTarget_ = -leverTarget_;
     beginTurn();
 }
 
@@ -2054,8 +2091,8 @@ ui::GameCursor GameScene::gameCursorKind() const {
         if (aimSq_ == NoSquare || aimSq_ == touchedSq_) return ui::GameCursor::Holding;
         return settings().showLegalMoves && !aimLegal_ ? ui::GameCursor::Holding : ui::GameCursor::Square;
     case Turn::HumanPlacing:
-    case Turn::HumanPlaced:  // no clock pointer while the press is queued (auto-press)
-        return clockHover_ && !pressQueued_ ? ui::GameCursor::Clock : ui::GameCursor::Idle;
+    case Turn::HumanPlaced:  // no clock pointer while the press is queued (auto-press), nor untimed
+        return clockHover_ && !pressQueued_ && !untimed() ? ui::GameCursor::Clock : ui::GameCursor::Idle;
     default: return ui::GameCursor::Idle;
     }
 }
@@ -2083,6 +2120,12 @@ ClockDisplay GameScene::clockDisplay() const {
     d.unlimited = clock_.timeControl().unlimited;
     d.paused = paused_ && state_ == State::Playing;
     d.leverSide = leverSide_;
+    if (untimed()) {
+        // Nobody presses this clock: it shows no time and no side running by itself (clock_ still
+        // counts each side's used time, unseen).
+        d.dashes = true;
+        d.running = -1;
+    }
     return d;
 }
 
