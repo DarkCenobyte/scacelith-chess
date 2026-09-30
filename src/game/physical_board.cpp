@@ -258,15 +258,17 @@ void PhysicalBoard::syncTo(const Position& pos) {
     }
     // The pieces left over leave the board. Pawns that were promoted stand beside their owner
     // (GameScene::planPromotionSwap): as many as the position proves, less those already set down
-    // there (a demonstration's victim waiting in its owner's half is not one of them). Each promotion on the table set such a pawn down and took a spare out of the reserve:
-    // while more spares are out than pawns stand beside their owner, a spare left over is the new
-    // piece of a promotion taken back. It goes back where it was taken from, else to a free slot
-    // beside its owner (where the arbiter brings pieces). The other pieces were captured and
-    // stand beside the opponent, a promoted piece among them. The slots of the pieces that came
-    // back stay free: a hand setting these pieces down one at a time finds them still taken.
+    // there (a demonstration's victim waiting in its owner's half is not one of them). Each
+    // promotion on the table set such a pawn down and took a spare out of the reserve: while more
+    // spares are out than pawns stand beside their owner, a spare left over is the new piece of a
+    // promotion taken back. It goes back where it was taken from, else to a free slot beside its
+    // owner (where the arbiter brings pieces). The other pieces were captured and stand beside
+    // the opponent, a promoted piece among them. The slots of the pieces that came back stay
+    // free: a hand setting these pieces down one at a time finds them still taken.
     int beside[2] = {}, sparesOut[2] = {}, pawnsLeft[2] = {}, promote[2] = {};
     for (const PieceObject& p : pieces_) {
-        if (p.captured && p.type == Pawn && !p.capturedBesideOwner && towards(p.color) * p.basePos.z > 0.0f) ++beside[p.color];
+        if (p.captured && p.type == Pawn && !p.capturedBesideOwner && towards(p.color) * p.basePos.z > 0.0f)
+            ++beside[p.color];
         if (p.spare && !p.inReserve) ++sparesOut[p.color];
     }
     for (int id : free)
