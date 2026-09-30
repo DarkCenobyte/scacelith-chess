@@ -237,6 +237,11 @@ public:
     bool penTransform(m::mat4& out) const;
     bool holdsPen() const;
     void clearQueue();                                   // drops pending tasks (running one finishes)
+    // Drops the pending tasks and cuts the running one short, without its remaining events (a
+    // handshake cut short leaves its partner to finish alone): the playing hand lets go of what it
+    // holds where it is, and the game puts those pieces back itself. The next task starts from
+    // wherever the hand is (queue one, a Retract at least).
+    void cancelTasks();
     float remainingTime() const;                         // running task remainder + pending durations
 
     // Gaze: world point to look at (head + eyes, with natural limits and saccades). weight 0..1.

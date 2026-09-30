@@ -1307,6 +1307,15 @@ void Animator::enqueue(const std::vector<Task>& tasks) {
 bool Animator::busy() const { return impl_->running || !impl_->queue.empty(); }
 bool Animator::runningTask(TaskType type) const { return impl_->running && impl_->cur.type == type; }
 void Animator::clearQueue() { impl_->queue.clear(); }
+void Animator::cancelTasks() {
+    Impl& I = *impl_;
+    I.queue.clear();
+    I.running = false;
+    I.curEvents.clear();
+    I.prevWasClock = false;
+    Impl::Hand& h = I.right();
+    h.heldId = h.capId = h.releasedId = -1;
+}
 float Animator::remainingTime() const {
     const Impl& I = *impl_;
     float r = I.running ? std::max(0.0f, I.curStart + I.curT - I.time) : 0.0f;

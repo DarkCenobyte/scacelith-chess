@@ -275,6 +275,7 @@ private:
     // put down before their clock press (updateRemoteLive, once per frame while playing), their
     // head and lean (driveRemoteHead, from updateGaze: true while it drives the head).
     void updateRemoteLive(float dt);
+    void enqueueRemoteLive(const std::vector<anim::Task>& tasks);  // on their robot, as live work
     void gripRemoteLive(chess::Square from, int ply);
     void followRemoteAim(int aim, float dt);
     void placeRemoteLive(uint16_t move);
@@ -451,7 +452,6 @@ private:
     std::vector<RemoteMove> remoteQueue_;  // opponent moves waiting for the robot
     int pendingPly_ = -1;               // my move sent, not confirmed yet
     uint16_t pendingMove_ = 0;
-    int64_t frozenMs_ = 0;              // my clock as shown while my move is on its way
     int recordedPly_ = 0;               // moves handed to the scoresheets
     int pressedPly_ = -1;               // my last move whose clock press was animated
     int remotePly_ = -1;                // the move the opponent's robot is playing
@@ -461,7 +461,7 @@ private:
     // My move on its way, kept as sent (sent again when the connection dropped meanwhile).
     std::string pendingFen_;            // the position before it (the authority checks its digest)
     uint32_t pendingThinkMs_ = 0;
-    double pendingSentMs_ = 0;          // localMs() of the send (my clock display's freeze)
+    live::ClockFreeze clockFreeze_;     // my clock display while my move is on its way
     bool virtualTime_ = false;          // screenshots, --warp: localMs() follows the simulated time
     // Manual clock press (og_.autoPress off): my move stands on the board until my press.
     bool moveStaged_ = false;
@@ -483,8 +483,10 @@ private:
         bool takeBack = false;                     // put the board back from game_ once the hands are idle
         float noAim = 0.0f;                        // time without an aim (then back over its square)
         float placedAway = 0.0f;                   // time the gestures no longer show 'placed'
+        float reachAt = 0.0f;                      // animator clock: the hand starts reaching for it
     };
     RemoteLive remoteLive_;
+    float remoteLiveEnd_ = 0.0f;        // animator clock: their robot is done with its live tasks
     net::Gesture remoteGesture_;        // the latest one
     float remoteAge_ = 1e9f;            // seconds since it arrived
     bool remoteFresh_ = false;          // it came after the last snapshot and our last reconnection

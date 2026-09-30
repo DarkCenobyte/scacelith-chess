@@ -1142,7 +1142,7 @@ void GameScene::updatePlaying(float dt) {
             planPromotionSwap(tasks, moverId, to, PieceType(choice));
             anim_[inputSeat()].enqueue(tasks);
             placedTo_ = to;
-            pressQueued_ = autoPressClock();
+            pressQueued_ = pressQueued_ || autoPressClock();
             turn_ = Turn::HumanPlacing;
             break;
         }
@@ -1374,8 +1374,10 @@ void GameScene::humanPlace(Square to) {
 bool GameScene::autoPressClock() const { return online() ? og_.autoPress : settings().autoPressClock; }
 
 void GameScene::humanPressClock() {
-    if (turn_ == Turn::HumanPlacing) {
-        pressQueued_ = true;  // pressed as soon as the piece is down (not before a promotion)
+    if (turn_ == Turn::HumanPlacing || turn_ == Turn::HumanPromotion) {
+        // Pressed as soon as the pieces are down: after the promotion swap, and online, where the
+        // new piece is chosen before the pawn moves, once the move it completes is placed.
+        pressQueued_ = true;
         return;
     }
     if (turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched) {

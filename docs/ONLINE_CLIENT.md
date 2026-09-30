@@ -103,12 +103,17 @@ same as against Stockfish, with these differences:
   just as the connection dropped (or pressed while it was being restored) is sent again, same
   ply and move, when the snapshot after the reconnection holds every local move but that one
   and it is still my turn there (the authority answers a duplicate with the original
-  `MoveMade`), instead of the board being rebuilt without it. Moves are written on the
-  scoresheet in ply order once confirmed and pressed.
+  `MoveMade`), instead of the board being rebuilt without it; my clock display then stands still
+  again, at the authority's time of the snapshot (the outage was charged to my clock). Moves are
+  written on the scoresheet in ply order once confirmed and pressed.
 - **The opponent's move.** `MoveMade` queues the move; the robot plays it without thinking
   time (reach, lift, carry, capture, castling rook, promotion swap, clock), from where their live
   gestures left it: the piece already in its hand is carried on, and a move already put down
-  only gets the clock press. I may touch my pieces as soon as its pieces are down.
+  only gets the clock press. It starts at once: anything else their gestures left to the robot
+  (another piece in hand or on its way back, another move put down) is dropped and the board set
+  back from the game, behind a short dip when a piece had moved, so the move takes its usual
+  time whatever came before it and gestures never hold my turn back while my clock runs. I may
+  touch my pieces as soon as its pieces are down.
 - **Live gestures** (the rules and their tests: `src/game/online_live.h`,
   `tests/online_live_tests.cpp`). Hot-seat and Stockfish games send and receive none.
   - Mine (`sendOnlineGesture`): built every frame while the game is played (intro, handshake,
@@ -118,7 +123,8 @@ same as against Stockfish, with these differences:
     the hand is idle again once the move is sent), the look of my robot's eyes and the wheel
     lean, `Glance` while I read my scoresheet (S) and `Side` when the look falls on the table
     beside the board (clock, captured pieces, scoresheets). `ply` is the number of plies played
-    when the hand's state began. It goes to `GameLink::sendGesture` when that state changes, when
+    when the hand's state began (at most the plies played now: a board rebuilt after a refused
+    move starts it again). It goes to `GameLink::sendGesture` when that state changes, when
     the head turns by about a degree or the lean by 0.05, and once a second at least; after the
     end of the game, one last idle gesture and nothing more.
   - The opponent's (`OpponentGesture`) are cosmetic and untrusted: they never touch the game,
@@ -131,9 +137,13 @@ same as against Stockfish, with these differences:
     150 ms (back over its own square after 0.6 s without one), puts a `placed` move down (the
     placement without the press; the game is not changed), and puts the piece back when their
     hand is empty again, when their gestures stop for 5 s (our own connection lost included),
-    when they disconnect and at the end of the game. A move put down that its `MoveMade` does not confirm (another move, a
-    rebuild, the end, or 5 s of gestures showing something else) is taken back: once the hands
-    are idle the board is set up from the game again, behind a short dip.
+    when they disconnect and at the end of the game. Its hand takes one step at a time: a carry
+    or a change of piece (taking one, going on to another, letting go) waits until it has at
+    most 50 ms left of the previous one, then follows their latest gesture, so gestures that
+    come faster than it can play them (a modified client may send any) never pile up. A move put
+    down that its `MoveMade` does not confirm (another move, at once as above; a rebuild, the
+    end, or 5 s of gestures showing something else) is taken back: once the hands are idle the
+    board is set up from the game again, behind a short dip.
   - Their head: while their last gesture is under 2.5 s old and both players are connected,
     the robot's head follows their look with a critically damped spring and leans with them. A
     `Side` look turns the other way here (each client puts the clock at its own player's

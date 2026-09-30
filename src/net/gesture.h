@@ -16,7 +16,8 @@
 //   - once the move is confirmed (or pressed, when the robots do not press the clock by
 //     themselves): idle again.
 //   ply is the number of plies played when the current one of these states began: while a move
-//   is being prepared it is the ply of that move. A change of the head alone keeps it.
+//   is being prepared it is the ply of that move. A change of the head alone keeps it, and it is
+//   never more than the plies played (a game set back by a refused move starts it again).
 //   The head, in every state: yaw and pitch of the look relative to the seat (0 = straight
 //   ahead and level, yaw > 0 to the left, pitch < 0 down), lean 0..1 (the mouse wheel lean
 //   towards the board). flags: Glance while the player looks at their own scoresheet; Side when

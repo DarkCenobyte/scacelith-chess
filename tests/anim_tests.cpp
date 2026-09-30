@@ -306,6 +306,60 @@ TEST(anim_left_handed_mirror) {
     CHECK(penDiff < 1e-4f);
 }
 
+// Tasks cut short (cancelTasks: the online opponent's move comes while its robot still plays their
+// live gestures): the piece in hand is let go without its release, and the next task starts at once
+// from where the hand is, with its usual duration.
+TEST(anim_cancel_tasks_lets_go_and_goes_on_from_the_hand) {
+    using anim::EventType;
+    using anim::TaskType;
+    anim::Animator an;
+    initWhite(an);
+    const m::vec3 d2 = layout::squareCenter(11), e2 = layout::squareCenter(12), e4 = layout::squareCenter(28);
+    // Two pawns, ids 0 (e2) and 1 (d2); no other piece.
+    an.pieceTransform = [&](int id) { return id == 0 ? m::translate(e2) : id == 1 ? m::translate(d2) : m::mat4(); };
+    an.pieceGripInfo = [](int) { return m::vec3(layout::PIECE_HEIGHT[1], layout::PIECE_GRIP_HEIGHT[1], layout::PIECE_GRIP_RADIUS[1]); };
+    auto task = [](TaskType type, int id, m::vec3 pos = m::vec3(0)) {
+        anim::Task t;
+        t.type = type;
+        t.pieceId = id;
+        t.position = pos;
+        return t;
+    };
+    an.enqueue({task(TaskType::Reach, 0), task(TaskType::Lift, 0), task(TaskType::Carry, 0, e4), task(TaskType::Place, 0, e4),
+                task(TaskType::Retract, -1)});
+    const float dt = 1.0f / 120.0f;
+    std::vector<anim::Event> ev;
+    while (an.time() < anim::Timing::Reach + anim::Timing::Lift + 0.1f) an.update(dt, ev);
+    CHECK(an.holding(0));  // halfway to e4
+    const m::vec3 hand = an.globals()[character::HandR].translation();
+    const float t0 = an.time();
+    an.cancelTasks();
+    CHECK(!an.holding(0));
+    CHECK(!an.busy());
+    CHECK(an.remainingTime() == 0.0f);
+    an.enqueue({task(TaskType::Reach, 1), task(TaskType::Lift, 1), task(TaskType::Place, 1, d2), task(TaskType::Retract, -1)});
+    float gripped = -1.0f, released = -1.0f, empty = -1.0f, jump = -1.0f;
+    int cutEvents = 0;
+    for (int step = 0; step < int(2.0f / dt); ++step) {
+        ev.clear();
+        an.update(dt, ev);
+        if (jump < 0.0f) jump = m::length(an.globals()[character::HandR].translation() - hand);
+        for (const anim::Event& e : ev) {
+            if (e.pieceId == 0) ++cutEvents;
+            if (e.type == EventType::PieceGripped && e.pieceId == 1) gripped = e.time - t0;
+            if (e.type == EventType::PieceReleased && e.pieceId == 1) released = e.time - t0;
+            if (e.type == EventType::QueueEmpty) empty = e.time - t0;
+        }
+    }
+    CHECK_EQ(cutEvents, 0);  // no release of the pawn let go
+    CHECK(jump >= 0.0f && jump < 0.01f);
+    CHECK(std::fabs(gripped - anim::Timing::Reach) < 1e-4f);
+    CHECK(std::fabs(released - (anim::Timing::Reach + anim::Timing::Lift + anim::Timing::Place)) < 1e-4f);
+    CHECK(std::fabs(empty - (anim::Timing::Reach + anim::Timing::Lift + anim::Timing::Place + anim::Timing::Retract)) < 1e-4f);
+    CHECK(!an.holding(1));
+    CHECK(!an.busy());
+}
+
 // ---- The first-person player's own scoresheet ----------------------------------------------------
 namespace {
 

@@ -1,12 +1,15 @@
 // The live side of online play (src/game/online_live.h): my gesture (the aim's dwell, the ply of
 // the state's start, the flags, when a gesture is worth sending, the Side test of the look), the
-// opponent's gestures (when their piece fields apply, which squares and moves are valid, the
+// opponent's gestures (when their piece fields apply, which squares and moves are valid, the pace
+// of their robot's hand and its live work at their move, even under a flood of gestures, the
 // timeouts, the head's spring), my clock's freeze and the resend of my move after a
 // reconnection, and the RatingRestored notice held back during a game.
 #include "test.h"
+#include "anim/animator.h"
 #include "chess/chess.h"
 #include "game/layout.h"
 #include "game/online_live.h"
+#include <algorithm>
 #include <cmath>
 #include <vector>
 
@@ -90,6 +93,25 @@ TEST(live_gesture_ply_is_the_start_of_the_hand_state) {
     g = live::buildGesture(h, 6, 0.0f, 0.0f, 0.0f, false, false, &head);
     CHECK_EQ(g.ply, 6);
     CHECK_EQ(g.aim, E4);
+}
+
+TEST(live_gesture_ply_follows_a_game_set_back) {
+    // My knight in hand at ply 8, the move sent (the game plays it: 9 plies, my hand idle again),
+    // then refused: the board is rebuilt with 8 plies and my hand stays idle.
+    live::Hand h;
+    h.touch = G1;
+    net::Gesture g = live::buildGesture(h, 8, 0.0f, 0.0f, 0.0f, false, false, nullptr);
+    CHECK_EQ(g.ply, 8);
+    g = live::buildGesture(live::Hand(), 9, 0.0f, 0.0f, 0.0f, false, false, &g);
+    CHECK_EQ(g.ply, 9);
+    g = live::buildGesture(live::Hand(), 8, 0.0f, 0.0f, 0.0f, false, false, &g);
+    CHECK_EQ(g.ply, 8);  // not 9: the opponent's client would keep the knight in the air
+    // Head changes and keepalives keep the corrected ply.
+    g = live::buildGesture(live::Hand(), 8, 0.4f, -0.1f, 0.3f, true, false, &g);
+    CHECK_EQ(g.ply, 8);
+    // Once their move comes, the idle state still began at ply 8.
+    g = live::buildGesture(live::Hand(), 9, 0.0f, 0.0f, 0.0f, false, false, &g);
+    CHECK_EQ(g.ply, 8);
 }
 
 TEST(live_gesture_flags_and_head) {
@@ -252,6 +274,154 @@ TEST(live_piece_intent_castling_and_promotion) {
     CHECK_EQ(in.aim, E8);
 }
 
+TEST(live_robot_hand_takes_one_step_at_a_time) {
+    live::PieceIntent none, e2, e2aim, d2, placed;
+    e2.touch = e2aim.touch = placed.touch = E2;
+    e2aim.aim = placed.aim = E4;
+    placed.placed = net::packMove(E2, E4, 0);
+    d2.touch = 11;
+    // Nothing held: the piece is taken once the hand is free.
+    live::HandStep s = live::handStep(live::kNoSquare, e2, 0.0f);
+    CHECK(s.take && !s.letGo && s.follow && !s.place);
+    s = live::handStep(live::kNoSquare, e2, live::kHandSlack);
+    CHECK(s.take);
+    s = live::handStep(live::kNoSquare, e2, 0.3f);
+    CHECK(!s.take && !s.letGo && !s.follow && !s.place);
+    // The piece in hand follows the aim (followRemoteAim paces the carries) or is put down, busy
+    // or not.
+    s = live::handStep(E2, e2aim, 0.3f);
+    CHECK(!s.take && !s.letGo && s.follow && !s.place);
+    s = live::handStep(E2, placed, 0.3f);
+    CHECK(!s.take && s.place && !s.follow);
+    // Another piece: back on its square and on to the next one, once the hand is free.
+    s = live::handStep(E2, d2, 0.3f);
+    CHECK(!s.take && !s.letGo && !s.follow);
+    s = live::handStep(E2, d2, 0.04f);
+    CHECK(s.letGo && s.take && s.follow);
+    // Nothing in their hand: the piece goes back once the hand is free.
+    s = live::handStep(E2, none, 0.3f);
+    CHECK(!s.letGo);
+    s = live::handStep(E2, none, 0.0f);
+    CHECK(s.letGo && !s.take && !s.follow);
+    s = live::handStep(live::kNoSquare, none, 0.0f);
+    CHECK(!s.letGo && !s.take && !s.follow && !s.place);
+}
+
+TEST(live_move_made_keeps_only_what_prepared_it) {
+    const uint16_t e2e4 = net::packMove(E2, E4, 0), d7d5 = net::packMove(D7, D5, 0);
+    live::LiveWork w;
+    CHECK(live::liveStart(w, 6, e2e4) == live::LiveStart::Fresh);
+    // Their piece in hand, taken for this ply: the hand goes on.
+    w.held = E2;
+    w.ply = 6;
+    CHECK(live::liveStart(w, 6, e2e4) == live::LiveStart::Held);
+    w.busy = true;  // still reaching for it
+    CHECK(live::liveStart(w, 6, e2e4) == live::LiveStart::Held);
+    // ... but not while another piece is still going back first, nor for another piece or ply.
+    w.before = true;
+    CHECK(live::liveStart(w, 6, e2e4) == live::LiveStart::Cut);
+    w.before = false;
+    CHECK(live::liveStart(w, 6, d7d5) == live::LiveStart::Cut);
+    CHECK(live::liveStart(w, 8, e2e4) == live::LiveStart::Cut);
+    // The move put down: only the press is left; another move put down is dropped.
+    w.placed = e2e4;
+    CHECK(live::liveStart(w, 6, e2e4) == live::LiveStart::Placed);
+    CHECK(live::liveStart(w, 6, net::packMove(E2, 20, 0)) == live::LiveStart::Cut);
+    w.takeBack = true;  // their gestures had left it: it was being taken back
+    CHECK(live::liveStart(w, 6, e2e4) == live::LiveStart::Cut);
+    // Nothing held any more, but a piece is still going back.
+    live::LiveWork back;
+    back.busy = true;
+    CHECK(live::liveStart(back, 6, e2e4) == live::LiveStart::Cut);
+}
+
+namespace {
+// The opponent's robot as GameScene drives it (updateRemoteLive, startRemoteMove), with the task
+// durations of the animator: the queue of its hand and the piece it holds live.
+struct RobotHand {
+    float t = 0.0f, busy = 0.0f, liveEnd = 0.0f, reachAt = 0.0f, worst = 0.0f;
+    int held = live::kNoSquare, ply = -1;
+    void enqueue(float seconds) {
+        busy += seconds;
+        worst = std::max(worst, busy);
+    }
+    void enqueueLive(float seconds) {
+        enqueue(seconds);
+        liveEnd = t + busy;
+    }
+    // One frame with their latest gesture (no aim: no carry).
+    void frame(const live::PieceIntent& in, int plies, float dt) {
+        live::HandStep s = live::handStep(held, in, busy);
+        if (s.letGo) {
+            enqueueLive(anim::Timing::Place + (s.take ? 0.0f : anim::Timing::Retract));
+            held = live::kNoSquare;
+        }
+        if (s.take) {
+            reachAt = t + busy;
+            enqueueLive(anim::Timing::Reach + anim::Timing::Lift);
+            held = in.touch;
+            ply = plies;
+        }
+        t += dt;
+        busy = std::max(0.0f, busy - dt);
+    }
+    // Their MoveMade: the seconds until its pieces are down (my turn begins).
+    float moveMade(int plies, uint16_t move) {
+        live::LiveWork w;
+        w.held = held;
+        w.ply = ply;
+        w.before = held != live::kNoSquare && reachAt > t + live::kHandSlack;
+        w.busy = liveEnd > t;
+        live::LiveStart start = live::liveStart(w, plies, move);
+        if (start == live::LiveStart::Cut) busy = 0.0f;
+        if (start != live::LiveStart::Held) enqueue(anim::Timing::Reach + anim::Timing::Lift);
+        enqueue(anim::Timing::Carry + anim::Timing::Place);
+        return busy;
+    }
+};
+
+// Their gestures at 'rate' per second for 20 s, touching their pieces one after the other (a
+// modified client), then 'settle' seconds touching the piece they move, then their MoveMade.
+float floodedMove(float rate, float settle, float* worst) {
+    chess::Position pos;
+    std::vector<int> theirs;
+    for (int sq = 0; sq < 16; ++sq) theirs.push_back(sq);
+    const uint16_t move = net::packMove(6, 21, 0);  // Ng1-f3
+    RobotHand robot;
+    net::Gesture latest = handGesture(0, live::kNoSquare);
+    const float dt = 1.0f / 60.0f, flood = 20.0f;
+    int sent = 0;
+    while (robot.t < flood + settle) {
+        if (robot.t >= float(sent) / rate) {
+            int touch = robot.t < flood ? theirs[size_t(sent) % theirs.size()] : int(net::moveFrom(move));
+            latest = handGesture(0, touch);
+            ++sent;
+        }
+        robot.frame(live::pieceIntent(latest, pos, White), 0, dt);
+    }
+    *worst = robot.worst;
+    return robot.moveMade(0, move);
+}
+}  // namespace
+
+TEST(live_gesture_flood_never_delays_the_opponents_move) {
+    // The time a move normally takes from their MoveMade to its pieces being down.
+    const float normal = anim::Timing::Reach + anim::Timing::Lift + anim::Timing::Carry + anim::Timing::Place;
+    // The longest step: a piece put back on its way to another (or retracting), then the next one
+    // taken.
+    const float step = anim::Timing::Place + anim::Timing::Retract + anim::Timing::Reach + anim::Timing::Lift + live::kHandSlack;
+    // The server relays 4 gestures a second, a direct match 10; the move comes at once, or once
+    // the robot had time to take the piece they move.
+    for (float rate : {4.0f, 10.0f}) {
+        for (float settle : {0.0f, 0.2f, 0.45f, 0.7f, 1.5f}) {
+            float worst = 0.0f;
+            float delay = floodedMove(rate, settle, &worst);
+            CHECK(worst <= step + 1e-4f);
+            CHECK(delay <= normal + 1e-4f);
+        }
+    }
+}
+
 TEST(live_head_and_hold_timeouts) {
     CHECK(live::headActive(0.0f, true, false, false, false));
     CHECK(live::headActive(2.4f, true, false, false, false));
@@ -303,6 +473,21 @@ TEST(live_clock_freeze_lasts_until_a_timeout) {
     CHECK(live::clockFreezeHolds(1400.0, 500, false));   // 3 pings: 1.5 s
     CHECK(!live::clockFreezeHolds(1500.0, 500, false));
     CHECK(!live::clockFreezeHolds(10.0, 50, true));  // reconnecting: the authority's clock runs
+}
+
+TEST(live_clock_freeze_starts_again_with_a_resend) {
+    live::ClockFreeze f;
+    // My move at 4:58.967, the connection lost right after: the authority's running clock shows.
+    f.start(11267.0, 298967);
+    CHECK(f.holds(11500.0, 40, false));
+    CHECK_EQ(f.shownMs, int64_t(298967));
+    CHECK(!f.holds(11500.0, 40, true));
+    // Back 7.5 s later, the move sent again: the display stands still at the authority's time
+    // then, which counted the outage, not at the time it showed before it.
+    f.start(18817.0, 291417);
+    CHECK(f.holds(18900.0, 40, false));
+    CHECK_EQ(f.shownMs, int64_t(291417));
+    CHECK(!f.holds(18817.0 + 1000.0, 40, false));
 }
 
 TEST(live_pending_move_resent_after_a_reconnection) {

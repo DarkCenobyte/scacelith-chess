@@ -6,7 +6,9 @@
 //     moved noticeably, and once a second at least.
 //   - The opponent's gestures: when their piece fields may move the opponent's robot, which of
 //     their squares and moves are valid here (gestures are untrusted and cosmetic), how long they
-//     stay valid, and the spring the robot's head follows them with.
+//     stay valid, the pace of the robot's hand (one step at a time, whatever their rate), what
+//     becomes of its live work when their move comes, and the spring the robot's head follows
+//     them with.
 //   - My clock display while my move is on its way, and the resend of a move the authority never
 //     got (a connection lost at the wrong moment).
 //   - The RatingRestored notice, held back while a game is being played.
@@ -79,7 +81,9 @@ inline bool sameHand(const net::Gesture& a, const net::Gesture& b) {
 
 // My gesture this frame. 'plies' is the number of plies played; 'previous' the gesture built last
 // time (nullptr: none yet): ply is the number of plies played when the hand's current state began,
-// so a change of the head alone (Glance and Side included) keeps it.
+// so a change of the head alone (Glance and Side included) keeps it. A game set back to fewer plies
+// (a move refused, the board rebuilt from the authority's) starts the state again at 'plies': a
+// ply ahead of the game would make the opponent's client wait for a MoveMade that never comes.
 inline net::Gesture buildGesture(const Hand& hand, int plies, float yaw, float pitch, float lean, bool glance, bool side,
                                  const net::Gesture* previous) {
     net::Gesture g;
@@ -93,7 +97,7 @@ inline net::Gesture buildGesture(const Hand& hand, int plies, float yaw, float p
     g.yaw = yaw;
     g.pitch = pitch;
     g.lean = m::clamp(lean, 0.0f, 1.0f);
-    g.ply = previous && sameHand(*previous, g) ? previous->ply : plies;
+    g.ply = previous && sameHand(*previous, g) && previous->ply <= plies ? previous->ply : plies;
     return g;
 }
 
@@ -125,6 +129,7 @@ constexpr float kHoldTimeout = 5.0f;    // s without a gesture: a piece held liv
 constexpr float kPlacedTimeout = 5.0f;  // s a move put down waits for its MoveMade once the gestures left it
 constexpr float kFollowDwell = 0.15f;   // s an aim holds before the robot carries the piece over it
 constexpr float kAimLost = 0.6f;        // s without an aim before the piece goes back over its square
+constexpr float kHandSlack = 0.05f;     // s of work left to the robot's hand when it may take its next step
 
 // The local state that decides whether the piece fields of the opponent's latest gesture apply
 // (touch, aim, placed): only to the move being prepared, never to one already known.
@@ -177,6 +182,67 @@ inline PieceIntent pieceIntent(const net::Gesture& g, const chess::Position& pos
     return in;
 }
 
+// The robot's hand follows their gestures one step at a time: it takes a new step (a carry, or a
+// change of piece) only once it has at most kHandSlack left of the previous one, and then from
+// their latest gesture. Gestures may come faster than the robot plays them (a modified client can
+// send whatever it likes at the relay's rate): its work never piles up.
+inline bool handReady(float busy) { return busy <= kHandSlack; }
+
+// What the robot's hand does this frame with the piece fields of their latest gesture ('in',
+// pieceIntent), holding live the piece of square 'held' (kNoSquare: none), with 'busy' seconds
+// left of what it does (Animator::remainingTime).
+struct HandStep {
+    bool letGo = false;   // the piece held goes back on its square
+    bool take = false;    // then the hand takes the piece of in.touch
+    bool place = false;   // the piece in hand is put down as in.placed
+    bool follow = false;  // it is carried over in.aim (one carry at a time, see handReady)
+};
+
+inline HandStep handStep(int held, const PieceIntent& in, float busy) {
+    HandStep s;
+    const bool ready = handReady(busy);
+    if (in.touch == kNoSquare) {
+        s.letGo = held != kNoSquare && ready;
+        return s;
+    }
+    if (held != in.touch) {
+        // Another piece: once the hand is free (their latest gesture then decides).
+        if (!ready) return s;
+        s.letGo = held != kNoSquare;
+        s.take = true;
+    }
+    s.place = in.placed != 0;
+    s.follow = !s.place;
+    return s;
+}
+
+// The live work of the opponent's robot when their MoveMade is played (startRemoteMove).
+struct LiveWork {
+    int held = kNoSquare;   // square of the piece held live (kNoSquare: none)
+    int ply = -1;           // the ply it was taken for
+    uint16_t placed = 0;    // the move put down live (0: none)
+    bool takeBack = false;  // a move put down waits to be taken back
+    bool before = false;    // the hand has not finished what it did before it went for that piece
+    bool busy = false;      // the hand still plays live tasks (a piece going back included)
+};
+
+// What becomes of it for their move 'move' of ply 'ply'.
+enum class LiveStart {
+    Fresh,   // nothing live: the move is played from the start (the hand reaches for the piece)
+    Held,    // the hand holds the moving piece, or is on its way to it: it goes on from there
+    Placed,  // the move stands on the board, or is being put down: only the clock press is left
+    Cut      // anything else: the live work is dropped at once and the board set back from the
+             // game, then the move is played from the start, in the usual time
+};
+
+inline LiveStart liveStart(const LiveWork& w, int ply, uint16_t move) {
+    const bool clean = !w.takeBack && !w.before && w.ply == ply;
+    if (clean && w.placed != 0 && w.placed == move) return LiveStart::Placed;
+    if (clean && w.placed == 0 && w.held != kNoSquare && w.held == net::moveFrom(move)) return LiveStart::Held;
+    if (w.held != kNoSquare || w.placed != 0 || w.takeBack || w.busy) return LiveStart::Cut;
+    return LiveStart::Fresh;
+}
+
 // The opponent's head drives their robot: the option to ignore it is off, the last gesture is
 // recent and fresh, the opponent is connected and so are we.
 inline bool headActive(float gestureAge, bool fresh, bool ignored, bool opponentAway, bool reconnecting) {
@@ -224,6 +290,19 @@ inline bool clockFreezeHolds(double sinceSendMs, int pingMs, bool reconnecting) 
     double window = std::max(1000.0, 3.0 * double(std::max(0, pingMs)));
     return !reconnecting && sinceSendMs < window;
 }
+
+// That freeze: when my move went and the time my clock showed then, set together. A move sent
+// again after a reconnection starts it again at the authority's time of that moment (the outage
+// was charged to my clock), not at the time it showed before the outage.
+struct ClockFreeze {
+    double sentMs = 0.0;   // localMs() of the send
+    int64_t shownMs = 0;   // my clock then
+    void start(double nowMs, int64_t clockMs) {
+        sentMs = nowMs;
+        shownMs = clockMs;
+    }
+    bool holds(double nowMs, int pingMs, bool reconnecting) const { return clockFreezeHolds(nowMs - sentMs, pingMs, reconnecting); }
+};
 
 // After a snapshot (typically at a reconnection): true when the authority has every move of the
 // local game but my pending one, the game goes on and it is still my turn there. The same {ply,
