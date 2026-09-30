@@ -49,10 +49,11 @@ file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
     ${ROOT}/src/core/*.cpp ${ROOT}/src/math/*.cpp ${ROOT}/src/chess/*.cpp ${ROOT}/src/ai/*.cpp ${ROOT}/src/audio/*.cpp
     ${ROOT}/src/i18n/*.cpp ${ROOT}/src/net/*.cpp ${ROOT}/src/coach/*.cpp ${ROOT}/src/tts/*.cpp)
 # Engine-free parts of src/game (Elo, observer camera, camera flights, hot-seat handover, scoresheet
-# layout, physical board): in the core library so the unit tests can use them, and left out of the
-# game sources below.
+# layout, physical board, the [coach] and [tts] settings): in the core library so the unit tests
+# can use them, and left out of the game sources below.
 set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cpp ${ROOT}/src/game/observer_camera.cpp
-    ${ROOT}/src/game/hotseat.cpp ${ROOT}/src/game/scoresheet_layout.cpp ${ROOT}/src/game/physical_board.cpp)
+    ${ROOT}/src/game/hotseat.cpp ${ROOT}/src/game/scoresheet_layout.cpp ${ROOT}/src/game/physical_board.cpp
+    ${ROOT}/src/game/settings_coach.cpp)
 list(APPEND CORE_SOURCES ${GAME_CORE_SOURCES})
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
 target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party)
