@@ -11,6 +11,7 @@ struct Data {
     std::vector<DifficultyInfo> difficulties;
     std::vector<std::string> timeControls;
     std::vector<m::ivec2> resolutions;
+    std::vector<CoachLevelInfo> coachLevels;
     std::string version = "0.1.0";
 };
 Data& data();
@@ -24,7 +25,10 @@ void screensReset();
 
 // Hooks used by the "ui" viewer scene to open a given state directly.
 namespace debug {
-enum class MenuPage { Title = 0, NewGame = 1, Options = 2, Credits = 3, Watch = 4, Online = 5, Calibration = 6 };
+// Same order as the menu's own page list (cast by value): new pages go at the end.
+enum class MenuPage {
+    Title = 0, NewGame = 1, Options = 2, Credits = 3, Watch = 4, Online = 5, Calibration = 6, Coach = 7, Licences = 8
+};
 void openMenuPage(MenuPage page);   // next mainMenu() call starts on this page
 // Next mainMenu() call starts on the online page's sub-page 'sub' (see debug::openOnlinePage).
 void openOnlineMenu(const std::string& sub);

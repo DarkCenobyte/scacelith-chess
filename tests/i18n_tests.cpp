@@ -125,6 +125,45 @@ TEST(i18n_scoresheet_pieces_and_date) {
     }
 }
 
+// Coach mode: every level has its texts, the voice credit names Supertonic 3 (never translated)
+// and its licence, the openings credit its source and licence, and the keys that skip the coach
+// and accept its takeback differ.
+TEST(i18n_coach_texts) {
+    for (const i18n::Language& lang : i18n::languages()) {
+        std::string path = std::string("assets/i18n/") + lang.code + ".lang";
+        if (!embedded::find(path.c_str())) continue;  // reported by i18n_lang_files_match_english
+        std::vector<std::pair<std::string, std::string>> entries;
+        CHECK(i18n::parse(embedded::text(path.c_str()), entries, nullptr));
+        std::map<std::string, std::string> got(entries.begin(), entries.end());
+        auto has = [&](const std::string& key, const char* part) {
+            auto it = got.find(key);
+            bool ok = it != got.end() && it->second.find(part) != std::string::npos;
+            if (!ok) std::fprintf(stderr, "  %s: %s should contain \"%s\"\n", lang.code, key.c_str(), part);
+            return ok;
+        };
+        for (int level = 0; level <= 6; ++level)
+            for (const char* field : {"name", "desc", "detail"}) {
+                std::string key = "coach.level." + std::to_string(level) + "." + field;
+                CHECK(got.count(key) == 1 && !got[key].empty());
+            }
+        CHECK(has("menu.coach", ""));
+        CHECK(has("menu.tts_credit", "{0}"));  // "Supertonic 3" is passed in, untranslated
+        CHECK(has("credits.voice", "Supertonic 3"));
+        CHECK(has("credits.voice.licence", "OpenRAIL-M"));
+        CHECK(has("credits.voice.licence", "Supertone"));
+        CHECK(has("credits.openings", "lichess"));
+        CHECK(has("credits.openings", "CC0"));
+        CHECK(got["controls.coach_skip.keys"] != got["controls.coach_takeback.keys"]);
+        // No "natural language" option: the coach speaks from its own sentences only.
+        for (auto& kv : entries) CHECK(kv.first.find("natural") == std::string::npos);
+    }
+    CHECK(i18n::setLanguage("de"));
+    std::string credit = i18n::trf("menu.tts_credit", {"Supertonic 3"});
+    CHECK(credit.find("Supertonic 3") != std::string::npos);
+    CHECK(credit.find("{0}") == std::string::npos);
+    i18n::setLanguage("en");
+}
+
 TEST(i18n_tr_fallback_and_format) {
     CHECK(i18n::setLanguage("fr"));
     CHECK_EQ(i18n::language(), std::string("fr"));

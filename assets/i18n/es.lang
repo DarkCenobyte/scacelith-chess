@@ -68,6 +68,11 @@ options.effects = Efectos
 options.ambience = Ambiente
 options.ambience.help = El murmullo de la sala: el fuego, pasos lejanos, el viejo reloj.
 options.ambience_volume = Volumen del ambiente
+options.voice_volume = Voz del entrenador
+options.voice_volume.help = Volumen de la voz del entrenador en el modo Entrenador.
+options.subtitles = Subtítulos
+options.subtitles.auto = Automático
+options.subtitles.help = Las palabras del entrenador, escritas en la parte inferior de la pantalla. Automático: se muestran cuando el entrenador no habla el idioma de los menús (con los menús en chino habla inglés). Se muestran siempre si su voz no está instalada.
 
 options.legal_moves = Mostrar jugadas legales
 options.legal_moves.help = Resalta las casillas que puede alcanzar una pieza tocada. Sin esta ayuda nada indica si una jugada es legal: el árbitro sanciona una jugada ilegal en cuanto pulsa el reloj.
@@ -111,6 +116,10 @@ controls.moves.keys = Tab
 controls.moves = Mostrar u ocultar las jugadas
 controls.menu.keys = Esc
 controls.menu = Menú
+controls.coach_skip.keys = Espacio
+controls.coach_skip = Entrenador: saltar lo que dice
+controls.coach_takeback.keys = Retroceso
+controls.coach_takeback = Entrenador: deshacer la jugada cuando lo ofrece
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = BRILLO
@@ -198,11 +207,20 @@ credits.engine.head = MOTOR DE AJEDREZ
 credits.engine = Stockfish 19, de los desarrolladores de Stockfish.
 credits.engine.licence = Licencia Pública General de GNU v3.
 credits.engine.data = Su red neuronal se entrenó con datos proporcionados por el proyecto Leela Chess Zero, disponibles bajo la Open Database License (ODbL).
+credits.voice.head = VOZ DEL ENTRENADOR
+credits.voice = Voz sintética generada con Supertonic 3 para el modo Entrenador.
+credits.voice.licence = Supertonic 3 es un modelo de Supertone, usado bajo la licencia OpenRAIL-M, cuyas restricciones de uso se aplican a todos sus usuarios (véase Licencias).
+credits.openings.head = APERTURAS
+credits.openings = Nombres de aperturas de la base de datos chess-openings de lichess.org, cedida al dominio público (CC0).
 credits.fonts.head = TIPOGRAFÍAS
 credits.fonts = EB Garamond de Georg Duffner y Cinzel de Natanael Gama; Amiri de Khaled Hosny.
 credits.fonts.hand = Caligrafías: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
 credits.fonts.figures = Figuras de ajedrez de GNU FreeFont (GPL v3 con excepción de fuentes).
 credits.quote = «El ajedrez es el arte del análisis».  — Mijaíl Botvínnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licencias
+licences.title = LICENCIAS
+licences.note = Las licencias se reproducen en su texto original en inglés.
 
 # ---- Pause menu --------------------------------------------------------------------------------
 pause.title = PAUSA
@@ -833,3 +851,67 @@ hotseat.gameover.friendly = {0} contra {1} · partida amistosa
 # {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
 hotseat.elo.change = {0} {1} → {2} ({3})
 hotseat.elo.unrated = Esta partida no puntúa.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Entrenador
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Voz sintética generada con {0} para el modo Entrenador
+# Coach page
+coach.title = ENTRENADOR
+coach.section.level = NIVEL
+coach.section.lesson = CON EL ENTRENADOR
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Para jugadores de {0}
+coach.completed = Completada
+coach.recommended = Recomendado
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Las reglas del ajedrez
+coach.level.0.desc = Una lección interactiva, regla a regla.
+coach.level.0.detail = El entrenador prepara pequeñas posiciones y muestra cómo mueve y captura cada pieza, luego el enroque, la promoción, el jaque y el jaque mate. Usted prueba cada idea en el tablero.
+coach.level.1.name = Primeros pasos
+coach.level.1.desc = Qué está atacado, qué queda sin defensa.
+coach.level.1.detail = El entrenador juega con suavidad y habla con sencillez: qué piezas suyas están atacadas, cuáles quedan sin defensa y cómo conservarlas.
+coach.level.2.name = Principiante
+coach.level.2.desc = Táctica sencilla, desarrollo, seguridad del rey.
+coach.level.2.detail = Las horquillas y las clavadas se llaman por su nombre. El entrenador habla de desarrollar sus piezas y de poner a salvo a su rey.
+coach.level.3.name = En progreso
+coach.level.3.desc = Planes, estructura de peones, jugadas únicas.
+coach.level.3.detail = El entrenador explica planes y estructuras de peones, y le avisa cuando una sola jugada sostiene la posición.
+coach.level.4.name = Jugador de club
+coach.level.4.desc = Jugadas candidatas, evaluación en peones.
+coach.level.4.detail = El entrenador sopesa las jugadas candidatas y da la evaluación en peones, como lo haría un entrenador de club.
+coach.level.5.name = Jugador de club fuerte
+coach.level.5.desc = Variantes concisas, términos posicionales.
+coach.level.5.detail = Comentarios breves, variantes concretas y el vocabulario del juego posicional.
+coach.level.6.name = Experto
+coach.level.6.desc = Comentarios escuetos, variantes profundas, cifras de evaluación.
+coach.level.6.detail = Pocas palabras, como entre jugadores fuertes: variantes de varias jugadas y cifras de evaluación.
+coach.note.clock = Sin reloj: tómese todo el tiempo que necesite.
+coach.note.takeback = Tras un error grave, el entrenador muestra qué falló y le ofrece deshacer la jugada.
+coach.note.lesson = Usted juega con blancas; el entrenador prepara cada ejercicio en el tablero.
+coach.note.unrated = Las partidas con el entrenador no puntúan.
+coach.colour = Su color
+coach.colour.help = El color con el que juega contra el entrenador. Alterno: blancas y luego negras, de una partida a otra. La lección sobre las reglas se juega siempre con blancas.
+coach.colour.alternate = Alterno
+# Shown when the voice files (the coach folder next to the game) are missing.
+coach.no_voice = No se encuentra la voz del entrenador (carpeta coach): hablará solo con subtítulos.
+# At the table
+coach.speaker = ENTRENADOR
+coach.skip = Saltar
+coach.offer.title = ¿DESHACER LA JUGADA?
+coach.offer.text = El entrenador le ofrece deshacer su última jugada para que busque una mejor.
+coach.offer.hint = Retroceso la deshace. Tocar una pieza es seguir jugando.
+coach.offer.accept = Deshacer
+coach.offer.decline = Seguir
+coach.pause.take_back = Deshacer mi jugada
+coach.pause.take_back.help = Deshace su última jugada, y la respuesta del entrenador si ya ha jugado.
+coach.confirm.resign = ¿Abandonar esta partida? El entrenador será declarado ganador.
+coach.confirm.leave = ¿Volver al menú principal? Esta partida con el entrenador se perderá.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Jugar otra vez
+coach.gameover.unrated = Esta partida con el entrenador no puntúa.
+coach.lesson.done = ¡BIEN HECHO!
+coach.lesson.done.line = Ya conoce las reglas del ajedrez.
+coach.lesson.next = Primera partida

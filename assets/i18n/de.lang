@@ -68,6 +68,11 @@ options.effects = Effekte
 options.ambience = Atmosphäre
 options.ambience.help = Das Murmeln des Saals: Kaminfeuer, ferne Schritte, die alte Uhr.
 options.ambience_volume = Lautstärke der Atmosphäre
+options.voice_volume = Stimme des Trainers
+options.voice_volume.help = Lautstärke der Stimme des Trainers im Trainer-Modus.
+options.subtitles = Untertitel
+options.subtitles.auto = Automatisch
+options.subtitles.help = Die Worte des Trainers, unten im Bild eingeblendet. Automatisch: angezeigt, wenn der Trainer nicht die Sprache der Menüs spricht (bei chinesischen Menüs spricht er Englisch). Immer angezeigt, wenn seine Stimme nicht installiert ist.
 
 options.legal_moves = Legale Züge zeigen
 options.legal_moves.help = Hebt die Felder hervor, die eine berührte Figur erreichen kann. Ohne diese Hilfe zeigt nichts an, ob ein Zug regelgemäß ist: Der Schiedsrichter ahndet einen regelwidrigen Zug, sobald Sie die Uhr drücken.
@@ -111,6 +116,10 @@ controls.moves.keys = Tab
 controls.moves = Zugliste ein- oder ausblenden
 controls.menu.keys = Esc
 controls.menu = Menü
+controls.coach_skip.keys = Leertaste
+controls.coach_skip = Trainer: seine Erklärung überspringen
+controls.coach_takeback.keys = Rücktaste
+controls.coach_takeback = Trainer: Zug zurücknehmen, wenn er es anbietet
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = HELLIGKEIT
@@ -198,11 +207,20 @@ credits.engine.head = SCHACH-ENGINE
 credits.engine = Stockfish 19, von den Stockfish-Entwicklern.
 credits.engine.licence = GNU General Public License v3.
 credits.engine.data = Sein neuronales Netz wurde mit Daten des Projekts Leela Chess Zero trainiert, die unter der Open Database License (ODbL) bereitgestellt werden.
+credits.voice.head = STIMME DES TRAINERS
+credits.voice = Synthetische Sprache, erzeugt mit Supertonic 3 für den Trainer-Modus.
+credits.voice.licence = Supertonic 3 ist ein Modell von Supertone und wird unter der OpenRAIL-M-Lizenz verwendet, deren Nutzungsbeschränkungen für alle gelten, die es nutzen (siehe Lizenzen).
+credits.openings.head = ERÖFFNUNGEN
+credits.openings = Eröffnungsnamen aus der Datenbank chess-openings von lichess.org, gemeinfrei gestellt (CC0).
 credits.fonts.head = SCHRIFTEN
 credits.fonts = EB Garamond von Georg Duffner und Cinzel von Natanael Gama; Amiri von Khaled Hosny.
 credits.fonts.hand = Handschriften: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
 credits.fonts.figures = Schachfiguren aus GNU FreeFont (GPL v3 mit Font-Ausnahme).
 credits.quote = „Schach ist die Kunst der Analyse.“  — Michail Botwinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Lizenzen
+licences.title = LIZENZEN
+licences.note = Die Lizenzen werden in ihrem englischen Originalwortlaut wiedergegeben.
 
 # ---- Pause menu --------------------------------------------------------------------------------
 pause.title = PAUSE
@@ -833,3 +851,67 @@ hotseat.gameover.friendly = {0} gegen {1} · Freundschaftspartie
 # {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
 hotseat.elo.change = {0} {1} → {2} ({3})
 hotseat.elo.unrated = Diese Partie wird nicht gewertet.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Trainer
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Synthetische Sprache, erzeugt mit {0} für den Trainer-Modus
+# Coach page
+coach.title = TRAINER
+coach.section.level = STUFE
+coach.section.lesson = MIT DEM TRAINER
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Für Spieler mit {0}
+coach.completed = Abgeschlossen
+coach.recommended = Empfohlen
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Die Schachregeln
+coach.level.0.desc = Eine interaktive Lektion, eine Regel nach der anderen.
+coach.level.0.detail = Der Trainer baut kleine Stellungen auf und zeigt, wie jede Figur zieht und schlägt, dann Rochade, Umwandlung, Schach und Matt. Sie probieren jede Idee selbst auf dem Brett aus.
+coach.level.1.name = Erste Schritte
+coach.level.1.desc = Was angegriffen ist, was ungedeckt bleibt.
+coach.level.1.detail = Der Trainer spielt behutsam und spricht einfach: welche Ihrer Figuren angegriffen sind, welche ungedeckt bleiben und wie Sie sie behalten.
+coach.level.2.name = Anfänger
+coach.level.2.desc = Einfache Taktik, Entwicklung, Königssicherheit.
+coach.level.2.detail = Gabeln und Fesselungen werden beim Namen genannt. Der Trainer spricht über die Entwicklung Ihrer Figuren und die Sicherheit Ihres Königs.
+coach.level.3.name = Hobbyspieler
+coach.level.3.desc = Pläne, Bauernstruktur, einzige Züge.
+coach.level.3.detail = Der Trainer erklärt Pläne und Bauernstrukturen und warnt Sie, wenn nur ein einziger Zug die Stellung hält.
+coach.level.4.name = Vereinsspieler
+coach.level.4.desc = Kandidatenzüge, Bewertung in Bauerneinheiten.
+coach.level.4.detail = Der Trainer wägt die Kandidatenzüge ab und gibt die Bewertung in Bauerneinheiten an, wie ein Vereinstrainer.
+coach.level.5.name = Starker Vereinsspieler
+coach.level.5.desc = Knappe Varianten, positionelle Begriffe.
+coach.level.5.detail = Kurze Bemerkungen, konkrete Varianten und das Vokabular des Positionsspiels.
+coach.level.6.name = Experte
+coach.level.6.desc = Knappe Hinweise, tiefe Varianten, Bewertungszahlen.
+coach.level.6.detail = Wenige Worte, wie unter starken Spielern: Varianten über mehrere Züge und Bewertungszahlen.
+coach.note.clock = Keine Uhr: Nehmen Sie sich alle Zeit, die Sie brauchen.
+coach.note.takeback = Nach einem groben Fehler zeigt der Trainer, was schiefging, und bietet an, den Zug zurückzunehmen.
+coach.note.lesson = Sie spielen Weiß; der Trainer baut jede Übung auf dem Brett auf.
+coach.note.unrated = Partien mit dem Trainer werden nicht gewertet.
+coach.colour = Ihre Farbe
+coach.colour.help = Die Farbe, mit der Sie gegen den Trainer spielen. Abwechselnd: erst Weiß, dann Schwarz, von Partie zu Partie. Die Lektion über die Regeln wird immer mit Weiß gespielt.
+coach.colour.alternate = Abwechselnd
+# Shown when the voice files (the coach folder next to the game) are missing.
+coach.no_voice = Die Stimme des Trainers wurde nicht gefunden (Ordner coach): Er spricht nur über Untertitel.
+# At the table
+coach.speaker = TRAINER
+coach.skip = Überspringen
+coach.offer.title = ZUG ZURÜCKNEHMEN?
+coach.offer.text = Der Trainer bietet an, Ihren letzten Zug zurückzunehmen, damit Sie einen besseren suchen können.
+coach.offer.hint = Die Rücktaste nimmt ihn zurück. Wer eine Figur berührt, spielt weiter.
+coach.offer.accept = Zurücknehmen
+coach.offer.decline = Weiterspielen
+coach.pause.take_back = Meinen Zug zurücknehmen
+coach.pause.take_back.help = Nimmt Ihren letzten Zug zurück, und die Antwort des Trainers, falls er schon gezogen hat.
+coach.confirm.resign = Diese Partie aufgeben? Der Trainer wird zum Sieger erklärt.
+coach.confirm.leave = Zurück zum Hauptmenü? Diese Partie mit dem Trainer wird abgebrochen.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Noch eine Partie
+coach.gameover.unrated = Diese Partie mit dem Trainer wird nicht gewertet.
+coach.lesson.done = GUT GEMACHT
+coach.lesson.done.line = Jetzt kennen Sie die Schachregeln.
+coach.lesson.next = Erste Partie

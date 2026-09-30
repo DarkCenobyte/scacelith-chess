@@ -69,6 +69,11 @@ options.effects = Effets
 options.ambience = Ambiance
 options.ambience.help = La rumeur de la salle : le feu, des pas lointains, la vieille horloge.
 options.ambience_volume = Volume de l’ambiance
+options.voice_volume = Voix du coach
+options.voice_volume.help = Volume de la voix du coach en mode Coach.
+options.subtitles = Sous-titres
+options.subtitles.auto = Automatique
+options.subtitles.help = Les paroles du coach, écrites en bas de l’écran. Automatique : affichés quand le coach ne parle pas la langue des menus (avec les menus en chinois, il parle anglais). Toujours affichés quand sa voix n’est pas installée.
 
 options.legal_moves = Afficher les coups légaux
 options.legal_moves.help = Met en évidence les cases qu’une pièce touchée peut atteindre. Sans cette aide, rien ne vous dit si un coup est légal : l’arbitre sanctionne un coup illégal dès que vous appuyez sur la pendule.
@@ -112,6 +117,10 @@ controls.moves.keys = Tab
 controls.moves = Afficher ou masquer les coups
 controls.menu.keys = Échap
 controls.menu = Menu
+controls.coach_skip.keys = Espace
+controls.coach_skip = Coach : passer ce que dit le coach
+controls.coach_takeback.keys = Retour arrière
+controls.coach_takeback = Coach : reprendre le coup quand il le propose
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = LUMINOSITÉ
@@ -199,11 +208,20 @@ credits.engine.head = MOTEUR D’ÉCHECS
 credits.engine = Stockfish 19, par les développeurs de Stockfish.
 credits.engine.licence = Licence publique générale GNU v3.
 credits.engine.data = Son réseau neuronal a été entraîné sur des données fournies par le projet Leela Chess Zero, mises à disposition sous l’Open Database License (ODbL).
+credits.voice.head = VOIX DU COACH
+credits.voice = Synthèse vocale générée par Supertonic 3 pour le mode Coach.
+credits.voice.licence = Supertonic 3 est un modèle de Supertone, utilisé sous la licence OpenRAIL-M, dont les restrictions d’usage s’appliquent à tous ses utilisateurs (voir Licences).
+credits.openings.head = OUVERTURES
+credits.openings = Noms des ouvertures tirés de la base chess-openings de lichess.org, versée dans le domaine public (CC0).
 credits.fonts.head = POLICES
 credits.fonts = EB Garamond par Georg Duffner et Cinzel par Natanael Gama ; Amiri par Khaled Hosny.
 credits.fonts.hand = Écritures : Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
 credits.fonts.figures = Figurines d’échecs de GNU FreeFont (GPL v3 avec exception pour les polices).
 credits.quote = « Les échecs sont l’art de l’analyse. »  — Mikhaïl Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licences
+licences.title = LICENCES
+licences.note = Les licences sont reproduites dans leur texte original, en anglais.
 
 # ---- Pause menu --------------------------------------------------------------------------------
 pause.title = PAUSE
@@ -834,3 +852,67 @@ hotseat.gameover.friendly = {0} contre {1} · partie amicale
 # {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
 hotseat.elo.change = {0} {1} → {2} ({3})
 hotseat.elo.unrated = Cette partie ne compte pas pour le classement.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Coach
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Synthèse vocale générée par {0} pour le mode Coach
+# Coach page
+coach.title = COACH
+coach.section.level = NIVEAU
+coach.section.lesson = AVEC LE COACH
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Pour les joueurs classés {0}
+coach.completed = Terminée
+coach.recommended = Conseillé
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Les règles des échecs
+coach.level.0.desc = Une leçon interactive, une règle à la fois.
+coach.level.0.detail = Le coach installe de petites positions et montre comment chaque pièce se déplace et prend, puis le roque, la promotion, l’échec et le mat. Vous essayez chaque idée vous-même sur l’échiquier.
+coach.level.1.name = Premiers pas
+coach.level.1.desc = Ce qui est attaqué, ce qui reste sans protection.
+coach.level.1.detail = Le coach joue en douceur et parle simplement : quelles pièces sont attaquées, lesquelles restent sans protection, et comment les garder.
+coach.level.2.name = Débutant
+coach.level.2.desc = Tactiques simples, développement, sécurité du roi.
+coach.level.2.detail = Les fourchettes et les clouages sont appelés par leur nom. Le coach parle de sortir vos pièces et de mettre votre roi à l’abri.
+coach.level.3.name = En progrès
+coach.level.3.desc = Plans, structure de pions, coups uniques.
+coach.level.3.detail = Le coach explique les plans et les structures de pions, et vous prévient quand un seul coup tient la position.
+coach.level.4.name = Joueur de club
+coach.level.4.desc = Coups candidats, évaluation en pions.
+coach.level.4.detail = Le coach pèse les coups candidats et donne l’évaluation en pions, comme le ferait un entraîneur de club.
+coach.level.5.name = Bon joueur de club
+coach.level.5.desc = Variantes concises, termes positionnels.
+coach.level.5.detail = Des remarques courtes, des variantes concrètes et le vocabulaire du jeu positionnel.
+coach.level.6.name = Expert
+coach.level.6.desc = Remarques brèves, variantes profondes, évaluations chiffrées.
+coach.level.6.detail = Peu de mots, comme entre joueurs forts : des variantes de plusieurs coups et des évaluations chiffrées.
+coach.note.clock = Pas de pendule : prenez tout le temps qu’il vous faut.
+coach.note.takeback = Après une gaffe, le coach montre ce qui n’allait pas et propose de reprendre le coup.
+coach.note.lesson = Vous jouez les Blancs ; le coach installe chaque exercice sur l’échiquier.
+coach.note.unrated = Les parties avec le coach ne sont pas classées.
+coach.colour = Votre couleur
+coach.colour.help = La couleur que vous jouez contre le coach. Alternée : les Blancs, puis les Noirs, d’une partie à l’autre. La leçon sur les règles se joue toujours avec les Blancs.
+coach.colour.alternate = Alternée
+# Shown when the voice files (the coach folder next to the game) are missing.
+coach.no_voice = La voix du coach est introuvable (dossier coach) : il s’exprimera par sous-titres uniquement.
+# At the table
+coach.speaker = COACH
+coach.skip = Passer
+coach.offer.title = REPRENDRE LE COUP ?
+coach.offer.text = Le coach vous propose de reprendre votre dernier coup, pour en chercher un meilleur.
+coach.offer.hint = Retour arrière pour le reprendre. Toucher une pièce, c’est continuer.
+coach.offer.accept = Reprendre
+coach.offer.decline = Continuer
+coach.pause.take_back = Reprendre mon coup
+coach.pause.take_back.help = Reprend votre dernier coup, et la réponse du coach s’il l’a déjà jouée.
+coach.confirm.resign = Abandonner cette partie ? Le coach sera déclaré vainqueur.
+coach.confirm.leave = Revenir au menu principal ? Cette partie avec le coach sera abandonnée.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Rejouer
+coach.gameover.unrated = Cette partie avec le coach n’est pas classée.
+coach.lesson.done = BRAVO
+coach.lesson.done.line = Vous connaissez maintenant les règles des échecs.
+coach.lesson.next = Première partie
