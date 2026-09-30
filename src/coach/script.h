@@ -67,8 +67,13 @@ enum class GestureKind : uint8_t {
     Beat,         // rhythmic down-strokes that stress the words
     Open,         // open palm towards the listener: a question, an invitation
     Nod,          // head: yes, well done
-    ShakeHead     // head: no, careful
+    ShakeHead,    // head: no, careful
+    PointObject   // index finger at 'object', a thing on the table that is no square (the rules
+                  // lesson's closing talk: the clock, a scoresheet)
 };
+
+// What PointObject points at.
+enum class TableObject : uint8_t { None, Clock, CoachSheet, PlayerSheet, CaptureArea, Reserve };
 
 // A gesture lands on the spoken word it refers to: 'anchor' names a placeholder of the line ("sq",
 // "your", or a zero-width "{@}" / "{@2}" marker of static lines, named "@" / "@2"); the director
@@ -81,6 +86,7 @@ struct Gesture {
     std::string anchor;
     float at = 0.0f;
     bool emphasis = false;                     // Point: two small jabs on arrival
+    TableObject object = TableObject::None;    // PointObject
 };
 
 // A highlight on the board while the beat runs: switched on with the gesture it belongs to (or at
@@ -106,7 +112,9 @@ enum class BeatKind : uint8_t {
                     // answer (the beats after it are dropped when the player takes back)
     Pause,          // silence for 'seconds'
     WaitMove,       // lesson: wait until the player plays a move satisfying expectation 'expect'
-    SetPosition     // lesson: set up 'fen' for the next exercise (behind a short fade)
+    SetPosition,    // lesson: set up 'fen' for the next exercise (behind a short fade)
+    PlayMove        // lesson: the coach plays 'uci' as a real move of the lesson game, written on no
+                    // scoresheet (the player answers it: en passant is legal only right after it)
 };
 
 // Turn-taking (research-pedagogy §6.5): Urgent may cut a running Normal/Low line at its next sentence
@@ -119,7 +127,7 @@ struct Beat {
     std::vector<Gesture> gestures;
     std::vector<Mark> marks;
     Look look = Look::Player;
-    std::string uci;           // DemoMove
+    std::string uci;           // DemoMove, PlayMove
     int count = 0;             // Rewind
     float seconds = 0.0f;      // Pause
     std::string fen;           // SetPosition
