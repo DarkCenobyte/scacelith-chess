@@ -1,0 +1,260 @@
+# Coach speech: the rules lesson (level 0, src/coach/lesson.cpp; research-pedagogy §3).
+# English is the reference; every language has exactly these keys (and the same variants).
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("your rook", "my knight");
+# {sq}, {sq2}, {to}, {esc} = squares ({to} = the square the player just moved to, {esc} = where the
+# coach's king escapes); {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach points at
+# something while saying the word right after the mark, so keep each mark in front of the word
+# that means the same thing in your sentence. A ".spoken" key is what the voice says instead
+# (here: file letters spelled for the voice).
+
+# ---- Chapter titles (said inside "Let's continue with {chapter}.") ------------------------------------
+lesson.title.welcome = the board
+lesson.title.pieces = how the pieces move
+lesson.title.safety = safe and unsafe captures
+lesson.title.check = check
+lesson.title.mate = checkmate
+lesson.title.castling = castling
+lesson.title.en_passant = en passant
+lesson.title.promotion = promotion
+lesson.title.draws = stalemate and draws
+lesson.title.etiquette = real games: rating, clock and manners
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Now you try.
+lesson.now_you.2 = Your turn now.
+lesson.now_you.3 = Now you.
+# Another wrong move after the demonstration.
+lesson.almost = Almost! Play the move I showed you.
+lesson.almost.2 = Not quite. Try the move from my demonstration.
+lesson.almost.3 = Close. Remember what I just showed you.
+# A wrong move without a line of its own.
+lesson.try_again = That's not it. Try again.
+lesson.try_again.2 = Not this one. Have another go.
+lesson.try_again.3 = Let's try once more.
+lesson.use_your = Use {your}.
+lesson.use_your.2 = Try it with {your}.
+lesson.watch = Watch.
+lesson.like_this = Like this.
+lesson.and_back = And back.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Check, but my king escapes to {esc}.
+lesson.check_takes = Check, but my king simply takes {your}.
+lesson.check_block = Check, but I can put a piece in the way.
+lesson.stalemate = Stalemate! My king can't move, and it's not in check. A draw, though you were winning!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Not {sq}: {my} attacks it. A king never steps into danger.
+why.PathBlocked = Something is in the {@}way: pieces can't jump, except the knight.
+why.WrongGeometry = {your} doesn't move like that.
+why.MustAnswerCheck = You're in {@}check: you must deal with it first.
+why.CastlingThroughCheck = Your king would cross {sq}, and {my} attacks it.
+why.CastlingNoRights = That king or rook has already moved: no castling.
+why.CastlingBlocked = Castling needs empty squares between the king and the rook.
+why.CastlingOutOfCheck = You can't castle while in check.
+why.PawnForwardBlocked = Pawns can't capture straight ahead: that square is {@}blocked.
+why.LeavesKingInCheck = {your} is pinned: moving it would expose your king to {my}.
+why.OwnPieceOnTarget = You can't land on your own piece.
+why.PawnCaptureNeedsVictim = A pawn moves diagonally only to capture.
+why.EnPassantExpired = En passant is only allowed right after the pawn's double step.
+why.NotYourTurn = Wait: it's my turn.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Hello! I'm your coach. Let's learn the rules of chess together, one small step at a time.
+lesson.welcome.board = This is the chessboard: sixty-four squares, light and dark, eight rows of eight.
+lesson.welcome.light = The corner square on your {@}right is always a light square. Remember: light on the right.
+lesson.welcome.files = Columns are called files. They have letters, from {@}a to {@2}h.
+lesson.welcome.files.spoken = Columns are called files. They have letters, from {@}ay to {@2}aitch.
+lesson.welcome.ranks = Rows are called ranks. They have numbers, from {@}one to {@2}eight, starting on your side.
+lesson.welcome.square = Each square is named by its letter, then its number. This square is {sq}.
+lesson.welcome.square2 = And this one is {sq}.
+lesson.welcome.kings = These are the two kings. Yours is on {sq}, mine is on {sq2}.
+lesson.welcome.ask = Your turn: move your king one square forward, to {sq}.
+lesson.welcome.wrong = That's {to}. We want {sq}: letter e, number two.
+lesson.welcome.wrong.spoken = That's {to}. We want {sq}: letter ee, number two.
+lesson.welcome.ok = Perfect. Your king is on {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = This is {your}. It moves in straight lines, along files and ranks, as far as it likes.
+lesson.rook.lines = Up the file, {@}or along the rank.
+lesson.rook.capture = To capture, a piece lands on an {@}enemy piece, which then leaves the board.
+lesson.rook.ask = Capture {my} with your rook!
+lesson.rook.short = Right direction! Keep going up the file, all the way to {my}.
+lesson.rook.rank = That's along the rank. {my} is up the file.
+lesson.rook.king = That's your king. Use {your}, in the corner.
+lesson.rook.ok = Captured! {my} leaves the board.
+# Pieces don't jump
+lesson.jump.blocked = Pieces can't jump over others. Your pawn on {sq} blocks the rook's path.
+lesson.jump.knight = Only the knight can jump. We'll meet it soon.
+# Bishop
+lesson.bishop.intro = This is {your}. It moves diagonally, as far as it likes.
+lesson.bishop.colour = A bishop always stays on squares of the same colour.
+lesson.bishop.ask = {my} stands on its diagonal. Capture it!
+lesson.bishop.short = Right diagonal! Go further, until you reach {my}.
+lesson.bishop.other = That's the other diagonal. Look toward {my}.
+lesson.bishop.ok = Excellent. Bishops love long diagonals.
+# Queen
+lesson.queen.intro = This is {your}, the strongest piece. She moves like a rook and a bishop together.
+lesson.queen.ask = Find {my} and capture it with your queen.
+lesson.queen.wrong = Your queen can reach {my} in one move, along a diagonal.
+lesson.queen.ok = Well done! Keep your queen safe: she's worth a lot.
+# King
+lesson.king.intro = The king moves just one square, in any direction.
+lesson.king.important = The king is the most important piece. If it's trapped, the game is lost.
+lesson.king.ask = The king can capture too. Take {my}!
+lesson.king.wrong = Your king is right next to {my}. Step onto its square to capture it.
+lesson.king.ok = Good! The king is slow, but strong up close.
+# Knight
+lesson.knight.intro = This is {your}. It moves in an L: two squares straight, then one to the side.
+lesson.knight.l = Like {@}this. It always lands on a square of the other colour.
+lesson.knight.jump = The knight is the only piece that can jump over others.
+lesson.knight.ask = Capture {my} with your knight!
+lesson.knight.wrong = That's a real knight move, but it doesn't reach {my}. Try another L.
+lesson.knight.ok = Great jump!
+# Pawn: moving
+lesson.pawn.intro = Now {your}. It moves straight forward, one square at a time, and never backward.
+lesson.pawn.first = On its first move, a pawn may go one or two squares.
+lesson.pawn.ask = Move your pawn two squares forward.
+lesson.pawn.one = That's one square: legal, but this time go two.
+lesson.pawn.use = Use the pawn.
+lesson.pawn.ok = Good.
+# Pawn: capturing
+lesson.pawncap.blocked = My pawn blocks yours. Pawns can't capture straight ahead.
+lesson.pawncap.diagonal = But a pawn captures diagonally, one square forward.
+lesson.pawncap.ask = Capture {my} with your pawn.
+lesson.pawncap.use = Use {your}: it captures diagonally forward.
+lesson.pawncap.ok = Yes! Straight to move, diagonal to capture.
+# Values, set-up and the first moves
+lesson.values.pawn = Each piece has a value in points. A pawn is worth one.
+lesson.values.pieces = A knight or a {@}bishop, three. A {@2}rook, five. The {@3}queen, nine.
+lesson.values.king = The king is priceless: you can never give it away.
+lesson.values.trade = Try never to give away a piece for less than it's worth.
+lesson.setup.corners = Every game starts like this: rooks in the {@}corners, then {@2}knights, then {@3}bishops.
+lesson.setup.queen = The queen stands on her own colour: your queen is on a light square.
+lesson.setup.king = The king stands next to her. White always moves first.
+lesson.first.ask = Start the game: move the pawn in front of your king two squares, to {sq}.
+lesson.first.wrong = That's a legal move too! For now, please play your king's pawn to {sq}.
+lesson.first.ok = A great first move: it opens lines for your queen and bishop.
+lesson.first.reply = I answer the same way. Now bring out a knight: jump from {sq} to {sq2}.
+lesson.first.knight_wrong = Knights jump over the pawns. Try from {sq} to {sq2}.
+lesson.first.knight_ok = Perfect. Knights and bishops come out early.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = A piece is defended when a friend can capture back.
+lesson.safety.pawn = My {@}pawn defends {my}.
+lesson.safety.free = But {my} has no defender. Your queen attacks both pieces.
+lesson.safety.ask = Capture the free piece!
+lesson.safety.watch = Watch what happens.
+lesson.safety.gave = You gave your queen, worth nine, for my knight, worth three.
+lesson.safety.other = Try the other piece.
+lesson.safety.look = Look for the piece that nothing defends.
+lesson.safety.ok = Excellent! Always ask: is that piece defended?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = My rook controls the whole second rank.
+lesson.danger.rule = A king may never move to a square where it could be captured.
+lesson.danger.ask = Move your king to a safe square.
+lesson.danger.ok = Right. Your king is safe there.
+lesson.check.what = My rook attacks your king. That's called check.
+lesson.check.must = When you're in check, you must get out of it right away.
+lesson.check.ways = There are three ways: {@}move the king, {@2}block the attack, or {@3}capture the attacker.
+lesson.check.ask = Here, move your king out of check.
+lesson.check.file = {to} is still on {@}my rook's file. Step off the line.
+lesson.check.ok = Good: you're out of check.
+lesson.block.again = Check again! This time your king has no free square.
+lesson.block.ask = So block the attack: put a piece in the way.
+lesson.block.queen = That blocks! But my rook could take your queen. Block with a cheaper piece.
+lesson.block.queen_ok = It works. Remember: block with your cheapest piece.
+lesson.block.ok = Perfect. Block with your least valuable piece.
+lesson.capture.check = My queen gives check, right next to your king.
+lesson.capture.ask = Capture the attacker!
+lesson.capture.king_ok = Yes! My queen had no defender, so your king could take it.
+lesson.capture.knight_ok = Yes! Your knight removed the attacker.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Checkmate: the king is in check, and it has no way out. That wins the game.
+lesson.mate1.stuck = My king is stuck behind its {@}own pawns.
+lesson.mate1.ask = Checkmate me in one move!
+lesson.mate1.wrong = Close! Give check on my back rank, where my king can't escape.
+lesson.mate1.ok = Checkmate! That's the back-rank mate. Remember it!
+lesson.mate2.ask = Your king and queen work as a team. Checkmate me in one move.
+lesson.mate2.wrong = Find a check that leaves my king no square at all.
+lesson.mate2.ok = Checkmate! Your king protects the queen, so mine can't take her.
+lesson.mate2.ok_rank = Checkmate on the back rank! Your king guards every square in front of mine.
+lesson.mate3.edge = Your rook on the seventh rank keeps my king on the edge.
+lesson.mate3.ask = Now use {your} to checkmate.
+lesson.mate3.free = Check, but the seventh rank is free now, and my king escapes.
+lesson.mate3.takes = My king simply takes your rook.
+lesson.mate3.hint = Give check on the back rank with the rook that isn't guarding the seventh.
+lesson.mate3.ok = Checkmate! The two rooks worked like a ladder.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Castling is a special move that keeps your king safe. King and rook move together.
+lesson.castle.how = The {@}king moves two squares toward a rook, and the {@2}rook jumps to its other side.
+lesson.castle.ask = Always touch the king first. Now you: castle on your king's side.
+lesson.castle.rook = That only moves the rook. To castle, move your king two squares toward it.
+lesson.castle.long = That's queen-side castling, also legal! This time, castle toward the nearer rook.
+lesson.castle.one = One square is a normal king move. For castling, the king moves two.
+lesson.castle.other = To castle, move your king two squares toward the rook on {sq}.
+lesson.castle.ok = Castled! Your king is tucked away, and your rook is ready to play.
+lesson.castle2.moved = You can't castle if your king or that rook has already moved.
+lesson.castle2.attacked = Nor while in check, or if your king would cross or land on an attacked square.
+lesson.castle2.bishop = My bishop attacks {sq}. So castling on this side is forbidden now.
+lesson.castle2.ask = Castle on the other side.
+lesson.castle2.other = Castle toward your other rook, on the queen's side.
+lesson.castle2.ok = Correct! Queen-side castling puts your king on {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = One special pawn capture is called en passant. It means "in passing".
+lesson.ep.watch = Watch my pawn: it moves two squares and lands right beside yours.
+lesson.ep.how = Your pawn may capture it as if it had moved only one square: to {sq}.
+lesson.ep.now = But only right now, on this move. Capture en passant!
+lesson.ep.gone = The chance is gone: en passant only works right away. Let's try again.
+lesson.ep.ok = En passant! My pawn on {sq} is removed.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = When a pawn reaches the last rank, it's promoted: it becomes a queen, rook, bishop or knight.
+lesson.promo.ask = Almost always, choose a queen. Promote your pawn now!
+lesson.promo.under = Allowed! But a queen is stronger. Let's pick the queen.
+lesson.promo.under_ok = Fine. Most players choose the queen, though.
+lesson.promo.push = Push your pawn to the last rank, to {sq}.
+lesson.promo.ok = A new queen! You can even have two queens at once.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = It's my turn. My king is not in check, but {@}every square around it is attacked.
+lesson.stale.draw = I have no legal move. That's stalemate, and the game is a draw.
+lesson.stale2.ask = When you're winning, beware of stalemate. Checkmate me in one move, without stalemate!
+lesson.stale2.wrong = Give check on my back rank, where my king can't escape.
+lesson.stale2.ok = Checkmate! Always leave the enemy king a move, unless you're giving mate.
+lesson.draws.kings = Other draws: when nobody can checkmate, like two kings alone, the game is a draw.
+lesson.draws.agree = Players can also agree to a draw.
+lesson.draws.repeat = Repeating a position three times, or fifty moves without a capture or pawn move, allows a draw too.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = You now know every rule of chess. Well done!
+lesson.talk.real = Let me tell you how real games are played.
+lesson.talk.elo = Players have a rating, called Elo. It goes up when you win and down when you lose.
+lesson.talk.elo_gap = Beating a stronger player earns more points; losing to a weaker one costs more.
+lesson.talk.elo_start = Your rating appears after five rated games. Coach games are practice, so they're not rated.
+lesson.talk.clock = This is a {@}chess clock. Each player has their own time, running only during their turn.
+lesson.talk.press = After your move, you press the clock with the same hand. That starts my time.
+lesson.talk.flag = If your time runs out, you lose, unless I can't possibly checkmate you.
+lesson.talk.increment = Five plus three means five minutes each, plus three seconds after every move.
+lesson.talk.speeds = Short games are called blitz, longer ones rapid, and the longest classical.
+lesson.talk.no_clock = With me, the clock is off. Take all the time you need to think.
+lesson.talk.touch = In a real game, if you touch one of your pieces, you must move it.
+lesson.talk.touch_mine = If you touch one of my pieces, you must capture it, if you can.
+lesson.talk.adjust = To straighten a piece without moving it, say "I adjust" first.
+lesson.talk.release = Once you let go of a piece on a new square, the move is made.
+lesson.talk.sheet = In tournaments, both players write every move on a {@}scoresheet.
+lesson.talk.notation = We write the piece's letter and the square, like {move}. Pawns just use the square.
+lesson.talk.robot = Your robot writes your moves for you. In fast games, writing is not required.
+lesson.talk.handshake = Games start and end with a handshake. It means: good game, and thank you.
+lesson.talk.polite = Win or lose, stay polite, and never disturb your opponent while they think.
+lesson.talk.tips = Three tips for your games: {@}control the centre, {@2}bring out your knights and bishops, and {@3}castle early.
+lesson.talk.next = When you're ready, choose First steps. I'll play gently and help you after every mistake.
+lesson.talk.welcome = Welcome to chess! Let's shake hands.
