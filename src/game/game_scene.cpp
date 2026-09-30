@@ -9,6 +9,7 @@
 #include "../ui/ui_font.h"
 #include "../ui/ui_online.h"
 #include "layout.h"
+#include "look_up.h"
 #include "scoresheet_layout.h"
 #include "settings.h"
 #include <algorithm>
@@ -1563,7 +1564,7 @@ void GameScene::planPlacement(std::vector<anim::Task>& tasks, int moverId, Squar
     tasks.push_back(task(anim::TaskType::Place, moverId, toPos));
     dest_[moverId].push_back({to, toPos, false});
     if (victim) {
-        vec3 slot = board_.nextCaptureSlot(victim->color);
+        vec3 slot = board_.nextCaptureSlot(opposite(victim->color), victimId);
         tasks.push_back(task(anim::TaskType::Discard, victimId, slot));
         dest_[victimId].push_back({NoSquare, slot, true});
     }
@@ -1586,9 +1587,9 @@ void GameScene::planPromotionSwap(std::vector<anim::Task>& tasks, int pawnId, Sq
     if (!pawn) return;
     Color c = pawn->color;
     // The pawn leaves the board, then the new piece (a captured one, or the spare queen) takes
-    // its place. The player sets their own pawn down in their half, in the row of the pieces
-    // they captured (nextCaptureSlot places a colour near the player who captures it).
-    vec3 slot = board_.nextCaptureSlot(c == White ? Black : White);
+    // its place. The player sets their own pawn down in their half, among the pieces they
+    // captured (PhysicalBoard::syncTo follows the same rule).
+    vec3 slot = board_.nextCaptureSlot(c, pawnId);
     vec3 sqPos = board_.squareBase(sq);
     tasks.push_back(task(anim::TaskType::Reach, pawnId));
     tasks.push_back(task(anim::TaskType::Lift, pawnId, vec3(0), 0.03f));
@@ -1849,9 +1850,14 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
         if (in.mouseDown[plat::MOUSE_RIGHT] && !dragging_ && !ui::wantsMouse()) {
             dragging_ = true;
             plat::setMouseCaptured(true);
+            // The look goes on from the height the pointer at the top of the window gave it.
+            L.pitch += L.lookUpLift;
+            L.lookUpLift = 0.0f;
+            L.lookUpArmed = false;
         }
         if (in.mousePressed[plat::MOUSE_MIDDLE] || (in.keyPressed['C'] && !ui::wantsKeyboard())) {
             L.yaw = L.pitch = 0.0f;
+            L.lookUpArmed = false;
             glance_ = false;
         }
         if (!ui::wantsMouse()) L.lean = clamp(L.lean + in.wheel * 0.2f, 0.0f, 1.0f);
@@ -1868,6 +1874,7 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     if (dragging_ && !in.mouseDown[plat::MOUSE_RIGHT]) {
         dragging_ = false;
         plat::setMouseCaptured(false);
+        L.lookUpArmed = false;  // the pointer comes back where the press was, maybe at the top
     }
     if (dragging_) {
         float k = 0.0022f * s.mouseSensitivity;
@@ -1878,16 +1885,25 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     L.pitch = clamp(L.pitch, -1.1f - kBaseGazePitch, 0.75f - kBaseGazePitch);
     // The gaze drifts a little towards the cursor, like eyes following the hand; not while a piece
     // is in hand, when the board must stay still under the pointer that aims at a square, nor
-    // during a hot-seat handover.
-    float cx = 0.0f, cy = 0.0f;
+    // during a hot-seat handover. At the top of the window it rises to the opponent's face
+    // (look_up.h): once the pointer has been below the band since the look was last reset (a new
+    // game, a turn, a look with the right button, C), so that a pointer left there does not lift
+    // the view, and not with a menu or a card under the pointer. --mouse (screenshots) arms it.
+    float cx = 0.0f, cy = 0.0f, up = 0.0f;
     bool aiming = turn_ == Turn::HumanTouched || turn_ == Turn::HumanPlacing;
-    if (!dragging_ && !aiming && !handingOver && in.mouseInWindow && plat::width() > 0 && !ctx_->screenshotMode) {
+    bool pointer = mouseOverride_ || (in.mouseInWindow && !ctx_->screenshotMode);
+    if (!dragging_ && !aiming && !handingOver && pointer && plat::width() > 0) {
         vec2 c = cursorPixels();
+        float v = c.y / float(std::max(1, plat::height()));
         cx = clamp(c.x / float(plat::width()) - 0.5f, -0.5f, 0.5f);
-        cy = clamp(c.y / float(plat::height()) - 0.5f, -0.5f, 0.5f);
+        cy = clamp(v - 0.5f, -0.5f, 0.5f);
+        if (v > lookUpBandStart(L.pitch) || mouseOverride_) L.lookUpArmed = true;
+        if (L.lookUpArmed && canLook && !uiBlocks && !ui::wantsMouse()) up = lookUpWeight(v, L.pitch);
     }
     float targetYaw = L.yaw - cx * 0.11f;
-    float targetPitch = kBaseGazePitch + L.pitch - cy * 0.08f;
+    float basePitch = kBaseGazePitch + L.pitch - cy * 0.08f;
+    L.lookUpLift = lookUpLift(up, basePitch, L.leanSmooth);
+    float targetPitch = basePitch + L.lookUpLift;
     glanceBlend_ = clamp(glanceBlend_ + (glance_ ? dt : -dt) / kGlanceTime, 0.0f, 1.0f);
     if (glanceBlend_ > 0.0f) {
         // Eyes on the middle of the scoresheet, from where they are now (the head turns them).
@@ -2359,7 +2375,9 @@ float GameScene::firstPersonFocus(const Ray& ray) const {
     int opponent = 1 - (me < 0 ? humanSeat() : me);
     vec3 face = anim_[opponent].eyeCameraTransform().c[3].xyz() - ray.o;
     float faceDist = length(face);
-    if (faceDist > 0.2f && dot(face / faceDist, ray.d) > std::cos(8.0f * DEG)) consider(faceDist);
+    // Within 12 degrees: the pointer at the top of the window lifts the view to the face and rests
+    // just above the head.
+    if (faceDist > 0.2f && dot(face / faceDist, ray.d) > std::cos(12.0f * DEG)) consider(faceDist);
     float tPiece = 1e30f;
     if (pickPiece(ray, &tPiece) >= 0) consider(tPiece);
     float tClock = 1e30f;

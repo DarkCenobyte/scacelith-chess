@@ -379,6 +379,10 @@ private:
         float gazeYaw = 0.0f, gazePitch = kBaseGazePitch;  // smoothed total
         float headYaw = 0.0f, headPitch = 0.0f;     // part taken by the neck/head (rest = eyes)
         float lean = 0.0f, leanSmooth = 0.0f;
+        // Pointer at the top of the window (look_up.h): the band lifts the gaze once the pointer
+        // has been below it since the last reset, and the lift goes into pitch when a drag starts.
+        bool lookUpArmed = false;
+        float lookUpLift = 0.0f;
     };
     Look look_[2];
     // S: the player whose eyes are the view looks at their own scoresheet. One state for the

@@ -200,6 +200,9 @@ void GameScene::landHandover() {
 void GameScene::beginLook(int seat, bool snap) {
     seat &= 1;
     Look& L = look_[seat];
+    // A pointer the previous player left at the top of the window does not lift the new view.
+    L.lookUpArmed = false;
+    L.lookUpLift = 0.0f;
     if (snap) {
         L.gazeYaw = L.yaw;
         L.gazePitch = kBaseGazePitch + L.pitch;

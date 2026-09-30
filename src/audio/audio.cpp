@@ -333,7 +333,7 @@ m::vec3 defaultPosition(Sfx s) {
         case Sfx::PiecePlace: return layout::squareCenter(4, 3);  // e4
         case Sfx::Capture:
         case Sfx::CaptureClick: return layout::squareCenter(3, 4);  // d5
-        case Sfx::TablePlace: return m::vec3(-layout::CAPTURE_ROW_X, layout::TABLE_TOP_Y, 0.25f);
+        case Sfx::TablePlace: return m::vec3(-layout::CAPTURE_X0, layout::TABLE_TOP_Y, 0.25f);
         case Sfx::ClockPress:
             return m::vec3(layout::CLOCK_OFFSET_X, layout::TABLE_TOP_Y + layout::CLOCK_HEIGHT, layout::CLOCK_Z);
         case Sfx::Handshake: return m::vec3(0.0f, 1.0f, 0.0f);

@@ -18,8 +18,9 @@ real-time material shaders, physically based lighting.
   With Options > Gameplay > Auto-press clock your hand presses it by itself once the move is on
   the board (capture, castling rook and promotion piece included); online, the server (or the
   host of a direct match) decides for each game.
-- **Right mouse button** (hold and drag): look around from your chair. **Mouse wheel**: lean
-  towards the board. **Middle click** or **C**: look at the board again.
+- **Right mouse button** (hold and drag): look around from your chair. The pointer at the top of
+  the window: look up at your opponent. **Mouse wheel**: lean towards the board. **Middle click**
+  or **C**: look at the board again.
 - **S**: look at your own scoresheet, lying out of sight beside you, and back (**S** again,
   **C** or a look around).
 - **Tab**: move list. **Esc**: menu (offer or claim a draw, resign, options).
@@ -234,9 +235,9 @@ x,y,z [--look x,y,z] [--fov deg]` (initial observer camera when watching; a deta
 normal game), `--handover-preview` (watching through the players' eyes with the clock frozen during
 each camera handover, the same hand-over as [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`,
 `--warp <seconds>` (simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
-`--mouse fx,fy` (pointer position as fractions of the window), `--glance` (start looking at the
-scoresheet), `--calibrate` (the brightness calibration before the title page, as on a first
-start) and `--ini <file>`.
+`--mouse fx,fy` (pointer position as fractions of the window; the view follows it, `0.5,0.03` looks
+up at the opponent), `--glance` (start looking at the scoresheet), `--calibrate` (the brightness
+calibration before the title page, as on a first start) and `--ini <file>`.
 
 Two players on one PC: `--start --hotseat` starts one at once, with `--white-name N`, `--black-name
 N`, `--clock-right white|black`, `--rated` and `--handover <seconds>` (0 = instant cut). `--play
