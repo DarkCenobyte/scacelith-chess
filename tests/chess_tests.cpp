@@ -2,6 +2,7 @@
 #include "test.h"
 #include "chess/chess.h"
 
+#include <algorithm>
 #include <chrono>
 #include <set>
 #include <string>
@@ -646,6 +647,225 @@ TEST(chess_game_resign_agree_forfeit) {
     g.forfeitIllegal(White);  // Black cannot checkmate
     CHECK(g.status() == GameStatus::Draw);
     CHECK(g.endReason() == GameEndReason::IllegalMovesVsInsufficient);
+}
+
+// ---- Taking moves back --------------------------------------------------------------------------
+
+namespace {
+
+// The whole record of two games agrees: positions (FEN, repetition identity), moves, notation,
+// status, repetitions, PGN.
+bool sameRecord(const Game& a, const Game& b) {
+    if (a.moves().size() != b.moves().size() || a.sanMoves() != b.sanMoves() || a.uciMoves() != b.uciMoves()) return false;
+    for (size_t i = 0; i < a.moves().size(); ++i)
+        if (a.moves()[i] != b.moves()[i] || a.moves()[i].flags != b.moves()[i].flags) return false;
+    const PgnTags tags{"Test", "Here", "2026.09.30", "1", "-"};
+    return a.position().fen() == b.position().fen() && a.position().samePosition(b.position()) &&
+           a.position().hash() == b.position().hash() && a.startPosition().fen() == b.startPosition().fen() &&
+           a.status() == b.status() && a.endReason() == b.endReason() && a.repetitionCount() == b.repetitionCount() &&
+           a.canClaimThreefold() == b.canClaimThreefold() && a.canClaimFiftyMove() == b.canClaimFiftyMove() &&
+           a.pgn("W", "B", tags) == b.pgn("W", "B", tags);
+}
+
+// A game started from 'fen' (the standard position when null) with the first 'n' moves of 'g'.
+Game prefixOf(const Game& g, size_t n, const char* fen = nullptr) {
+    Game p;
+    if (fen) CHECK(p.resetFromFEN(fen));
+    for (size_t i = 0; i < n; ++i) CHECK(p.play(g.moves()[i]));
+    return p;
+}
+
+}  // namespace
+
+TEST(chess_game_undo_record) {
+    Game g;
+    CHECK(!g.undo());      // nothing to take back
+    CHECK(!g.undo(0));
+    CHECK(playLine(g, {"e4", "d5", "exd5", "Qxd5", "Nc3"}));
+    const Game full = g;
+    CHECK(!g.undo(-1));
+    CHECK(!g.undo(0));
+    CHECK(!g.undo(6));     // more than were played: nothing changes
+    CHECK(sameRecord(g, full));
+    // One move, then the capture and its recapture.
+    CHECK(g.undo());
+    CHECK(sameRecord(g, prefixOf(full, 4)));
+    CHECK_EQ(g.position().fen(), std::string("rnb1kbnr/ppp1pppp/8/3q4/8/8/PPPP1PPP/RNBQKBNR w KQkq - 0 3"));
+    CHECK(g.undo(2));
+    CHECK(sameRecord(g, prefixOf(full, 2)));
+    CHECK(g.position().at(sq("d5")) == (Piece{Pawn, Black}));
+    CHECK_EQ(g.sanMoves().back(), std::string("d5"));
+    // Another move in their place.
+    CHECK(playSAN(g, "Nf3"));
+    CHECK_EQ(g.sanMoves().size(), size_t(3));
+    CHECK_EQ(g.uciMoves()[2], std::string("g1f3"));
+    // Everything, back to the start.
+    CHECK(g.undo(3));
+    CHECK(sameRecord(g, Game()));
+    CHECK(!g.undo());
+    // The arbiter follows a game that went back (reset, as GameScene does, or its own sync).
+    Arbiter arb;
+    Game h;
+    CHECK(playLine(h, {"e4", "e5"}));
+    arb.reset(h);
+    CHECK(h.undo());
+    CHECK(!arb.touch(h, sq("g1")));    // Black to move again
+    CHECK(arb.touch(h, sq("e7")));
+    CHECK(arb.place(h, sq("e6"), NoPiece));
+    CHECK(arb.clockPressed(h, TimeControl{}).legal);
+}
+
+TEST(chess_game_undo_special_moves) {
+    struct Case {
+        const char* fen;
+        const char* san;
+    };
+    const Case cases[] = {
+        {"r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1", "O-O"},        // the castling rights come back
+        {"r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1", "O-O-O"},
+        {"r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1", "O-O"},
+        {"r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1", "O-O-O"},
+        {"r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1", "Rxa8+"},      // a rook capture takes rights from both
+        {"4k3/8/8/3pP3/8/8/8/4K3 w - d6 0 2", "exd6"},         // en passant: the ep square comes back
+        {"4k3/8/8/8/3Pp3/8/8/4K3 b - d3 0 2", "exd3"},
+        {"4k3/1P6/8/8/8/8/8/4K3 w - - 0 1", "b8=Q+"},           // promotions
+        {"4k3/1P6/8/8/8/8/8/4K3 w - - 0 1", "b8=N"},
+        {"r3k3/1P6/8/8/8/8/8/4K3 w q - 0 1", "bxa8=R+"},        // a capturing under-promotion, rights lost
+        {"4k3/8/8/8/8/8/6p1/4K2R b K - 0 1", "gxh1=B"},
+        {"4k3/8/8/8/8/8/6p1/4K2R b K - 7 30", "Kd7"},          // the move counters come back too
+    };
+    for (const Case& c : cases) {
+        Game g;
+        CHECK(g.resetFromFEN(c.fen));
+        const Game before = g;
+        CHECK(playSAN(g, c.san));
+        CHECK(!g.position().samePosition(before.position()));
+        CHECK(g.undo());
+        CHECK(sameRecord(g, before));
+        // The same move again gives the same record.
+        Game again = before;
+        CHECK(playSAN(g, c.san));
+        CHECK(playSAN(again, c.san));
+        CHECK(sameRecord(g, again));
+    }
+    // A double push and the en passant capture after it, both taken back: the capture is possible
+    // again, then no more.
+    Game e;
+    CHECK(playLine(e, {"e4", "a6", "e5", "d5", "exd6"}));
+    CHECK(e.undo());
+    CHECK_EQ(e.position().epSquare(), sq("d6"));
+    CHECK((e.position().findLegal(sq("e5"), sq("d6")).flags & MoveEnPassant) != 0);
+    CHECK(e.undo());
+    CHECK_EQ(e.position().epSquare(), NoSquare);
+    CHECK(playSAN(e, "d6"));
+    CHECK_EQ(e.position().epSquare(), NoSquare);
+}
+
+TEST(chess_game_undo_endings) {
+    // Checkmate taken back: the game goes on and the mating side may play another move.
+    Game m;
+    CHECK(playLine(m, {"f3", "e5", "g4", "Qh4#"}));
+    CHECK(m.isOver());
+    CHECK(m.undo());
+    CHECK(m.status() == GameStatus::Ongoing);
+    CHECK(m.endReason() == GameEndReason::None);
+    CHECK_EQ(std::string(m.resultString()), std::string("*"));
+    CHECK(playSAN(m, "Qg5"));
+    CHECK(!m.isOver());
+    // Stalemate, dead position.
+    Game s;
+    CHECK(s.resetFromFEN("7k/8/6K1/8/8/8/8/5Q2 w - - 0 1"));
+    CHECK(playUCI(s, "f1f7"));
+    CHECK(s.endReason() == GameEndReason::Stalemate);
+    CHECK(s.undo());
+    CHECK(!s.isOver());
+    CHECK(s.resetFromFEN("4k3/8/8/8/8/8/3q4/4K3 w - - 0 1"));
+    CHECK(playSAN(s, "Kxd2"));
+    CHECK(s.endReason() == GameEndReason::InsufficientMaterial);
+    CHECK(s.undo());
+    CHECK(!s.isOver());
+    CHECK(s.position().at(sq("d2")) == (Piece{Queen, Black}));
+    // Fivefold repetition: the occurrences are counted again from the positions left.
+    Game r;
+    const std::vector<const char*> cycle = {"Nf3", "Nf6", "Ng1", "Ng8"};
+    for (int i = 0; i < 4; ++i) CHECK(playLine(r, cycle));
+    CHECK(r.endReason() == GameEndReason::FivefoldRepetition);
+    CHECK(r.undo());
+    CHECK(!r.isOver());
+    CHECK_EQ(r.repetitionCount(), 4);  // the position after ...Ng1 (Nf3 Nf6 Ng1), seen four times
+    CHECK(r.undo(3));
+    CHECK_EQ(r.repetitionCount(), 4);  // the start position, four times
+    CHECK(r.canClaimThreefold());
+    CHECK(r.undo(4));
+    CHECK_EQ(r.repetitionCount(), 3);
+    CHECK(r.undo(4));
+    CHECK_EQ(r.repetitionCount(), 2);
+    CHECK(!r.canClaimThreefold());
+    CHECK(playLine(r, cycle));
+    CHECK_EQ(r.repetitionCount(), 3);
+    r.claimDraw();
+    CHECK(r.endReason() == GameEndReason::ThreefoldClaim);
+    // A claimed draw, a resignation or a flag fall is lifted as well: the game is where the
+    // position puts it.
+    CHECK(r.undo());
+    CHECK(!r.isOver());
+    Game q;
+    CHECK(playLine(q, {"e4", "e5"}));
+    q.resign(White);
+    CHECK(q.isOver());
+    CHECK(q.undo());
+    CHECK(!q.isOver());
+    q.flagFall(Black);
+    CHECK(q.isOver());
+    CHECK(q.undo());
+    CHECK(!q.isOver());
+    CHECK(q.moves().empty());
+    // The 75-move rule, and the fifty-move claim that follows the counter.
+    Game f;
+    CHECK(f.resetFromFEN("7k/8/6K1/8/8/8/8/R7 w - - 148 100"));
+    CHECK(playLine(f, {"Ra2", "Kg8"}));
+    CHECK(f.endReason() == GameEndReason::SeventyFiveMoves);
+    CHECK(f.undo());
+    CHECK(!f.isOver());
+    CHECK(f.canClaimFiftyMove());
+    CHECK_EQ(f.position().halfmoveClock(), 149);
+    // A game over from its start position (no move to take back) stays over.
+    Game d;
+    CHECK(d.resetFromFEN("4k3/8/8/8/8/8/8/4K3 w - - 0 1"));
+    CHECK(!d.undo());
+    CHECK(d.isOver());
+}
+
+TEST(chess_game_undo_random_games) {
+    // Random games from several start positions: taking k moves back gives the record of the game
+    // replayed to that point, and the game goes on from there.
+    const char* starts[] = {nullptr, kKiwipete, kPos3, kPos4, kPos5, "8/P1k5/K7/8/8/8/8/8 w - - 0 1",
+                            "r3k2r/1b4bq/8/8/8/8/7B/R3K2R w KQkq - 0 1"};
+    Rng rng{0xD1B54A32D192ED03ULL};
+    int undone = 0, endingsLifted = 0;
+    for (int round = 0; round < 8; ++round) {
+        for (const char* start : starts) {
+            Game g;
+            if (start) CHECK(g.resetFromFEN(start));
+            for (int step = 0; step < 200; ++step) {
+                if (!g.moves().empty() && (g.isOver() || rng.next() % 6 == 0)) {
+                    const size_t n = g.moves().size();
+                    const int k = 1 + int(rng.next() % std::min<size_t>(n, 6));
+                    if (g.isOver()) ++endingsLifted;
+                    const Game full = g;
+                    CHECK(g.undo(k));
+                    CHECK(sameRecord(g, prefixOf(full, n - size_t(k), start)));
+                    undone += k;
+                    continue;
+                }
+                const std::vector<Move> moves = g.position().legalMoves();
+                if (moves.empty()) break;
+                CHECK(g.play(moves[size_t(rng.next() % moves.size())]));
+            }
+        }
+    }
+    CHECK(undone > 1000);
+    CHECK(endingsLifted > 3);
 }
 
 TEST(chess_game_pgn) {

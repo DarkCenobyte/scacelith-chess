@@ -76,6 +76,19 @@ bool Game::play(const Move& m) {
     return true;
 }
 
+bool Game::undo(int plies) {
+    if (plies <= 0 || size_t(plies) > moves_.size()) return false;
+    // positions_ holds the start position and one position per move: repetitions are counted from
+    // it alone, so truncating the three records together keeps them consistent.
+    positions_.resize(positions_.size() - size_t(plies));
+    moves_.resize(moves_.size() - size_t(plies));
+    san_.resize(san_.size() - size_t(plies));
+    status_ = GameStatus::Ongoing;
+    reason_ = GameEndReason::None;
+    updateStatus();
+    return true;
+}
+
 void Game::finish(GameStatus s, GameEndReason r) {
     if (status_ != GameStatus::Ongoing) return;
     status_ = s;
