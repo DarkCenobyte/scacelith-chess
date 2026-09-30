@@ -1,11 +1,13 @@
 // The rules lesson (src/coach/lesson.*): every chapter replays on a real chess::Position, every
 // line exists in the English catalog with its placeholders and anchors, every exercise accepts
 // its solution and answers a wrong move, reactions stay legal on the board, and the reasons given
-// for illegal moves on the classic cases.
+// for illegal moves on the classic cases. Also the event helpers (src/coach/events.*).
 #include "test.h"
 #include "coach/catalog.h"
+#include "coach/events.h"
 #include "coach/lesson.h"
 #include <algorithm>
+#include <cctype>
 #include <regex>
 #include <set>
 
@@ -507,4 +509,48 @@ TEST(coach_lesson_explains_illegal_moves) {
     // Nothing to say about a missing promotion piece.
     int promo = find("8/4P2k/8/8/8/8/8/4K3 w");
     CHECK(explain(promo, "e7", "e8").empty());
+}
+
+// The event helpers (src/coach/events.*): every key exists, lines render, the gaze rule holds.
+TEST(coach_events_scripts) {
+    Lesson lesson;
+    for (const std::string& k : eventKeys()) {
+        CHECK(catalog().has(k));
+        if (!catalog().has(k)) std::fprintf(stderr, "  missing %s\n", k.c_str());
+    }
+    // Every events.lang key is one a helper says.
+    std::vector<std::string> keys = eventKeys();
+    for (const std::string& k : catalog().keys("en", "events")) {
+        std::string base = k;
+        if (base.size() > 7 && base.compare(base.size() - 7, 7, ".spoken") == 0) base = base.substr(0, base.size() - 7);
+        size_t dot = base.find_last_of('.');
+        if (dot != std::string::npos && dot + 1 < base.size() && std::isdigit((unsigned char)base[dot + 1]))
+            base = base.substr(0, dot);
+        bool known = std::find(keys.begin(), keys.end(), base) != keys.end();
+        if (!known) std::fprintf(stderr, "  unused %s\n", k.c_str());
+        CHECK(known);
+    }
+    std::vector<Script> all = {greetingScript(1, chess::White, true), greetingScript(6, chess::Black, false),
+                               levelIntroScript(0), yourMoveScript(12), takeYourTimeScript(12), fillerScript(12),
+                               takebackScript(true), takebackScript(false), playOnScript(), drawAnswerScript(true),
+                               drawAnswerScript(false), gameEndScript(GameEnd::Win), gameEndScript(GameEnd::Resigned),
+                               encouragementScript(Encouragement::AfterMistake), encouragementScript(Encouragement::Behind),
+                               encouragementScript(Encouragement::PlayingWell), lessonResumeScript(lesson, 3),
+                               lessonNextScript(lesson, 4), lessonSkipScript()};
+    for (const Script& s : all) {
+        CHECK(!s.empty());
+        for (const Beat& b : s) {
+            checkLine(b.line, "events", {}, b.gestures, b.marks);
+            CHECK(b.look == (b.line.key == "event.filler" ? Look::Board : Look::Player));
+        }
+    }
+    CHECK_EQ(greetingScript(1, chess::White, true).size(), size_t(3));
+    CHECK_EQ(greetingScript(3, chess::Black, false).size(), size_t(2));
+    CHECK_EQ(greetingScript(3, chess::Black, false)[1].line.key, std::string("event.colour.black"));
+    CHECK(takeYourTimeScript(5)[0].priority == Priority::Low);
+    CHECK_EQ(takeYourTimeScript(5)[0].ply, 5);
+    CHECK_EQ(gameEndScript(GameEnd::Draw).back().line.key, std::string("event.end.handshake"));
+    CHECK_EQ(renderEn(lessonResumeScript(lesson, 3)[0].line),
+             "Welcome back! Let's continue with " + renderEn(lesson.chapters()[3].title) + ".");
+    CHECK(lessonResumeScript(lesson, 99).empty());
 }
