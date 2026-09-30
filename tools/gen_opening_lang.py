@@ -236,6 +236,19 @@ def spoken(lang, text, respell):
     return t
 
 
+def typography(lang, text):
+    """The typography of the game's own translations (assets/i18n): French non-breaking spaces before : ; ? ! and
+    inside guillemets, typographic apostrophes in French and Ukrainian. Sources use plain spaces and straight
+    apostrophes. The voice reads both forms the same way."""
+    t = text
+    if lang in ('fr', 'uk'):
+        t = t.replace("'", '\u2019')
+    if lang == 'fr':
+        t = re.sub(r' ([:;?!])', '\u00a0\\1', t)
+        t = t.replace('\u00ab ', '\u00ab\u00a0').replace(' \u00bb', '\u00a0\u00bb')
+    return t
+
+
 # ---- Main --------------------------------------------------------------------------------------------------------
 def build():
     with open(os.path.join(SRC, 'families.json'), encoding='utf-8') as f:
@@ -393,9 +406,9 @@ def build():
             if sec != section:
                 lines += ['', '# ---- ' + sec]
                 section = sec
-            lines.append('%s = %s' % (k, v))
+            lines.append('%s = %s' % (k, typography(l, v)))
             if k in spoken_keys:
-                lines.append('%s.spoken = %s' % (k, spoken_keys[k][l]))
+                lines.append('%s.spoken = %s' % (k, typography(l, spoken_keys[k][l])))
         outputs[os.path.join(OUT_LANG, l + '.lang')] = '\n'.join(lines) + '\n'
 
     # Metadata for the C++ side (no text).
