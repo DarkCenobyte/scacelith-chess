@@ -88,23 +88,25 @@ vec3 PhysicalBoard::captureSlot(Color beside, int k) const {
     return {sideX * s.x, layout::TABLE_TOP_Y, towards(beside) * s.y};
 }
 
-float PhysicalBoard::clearance(vec3 at) const {
+float PhysicalBoard::clearance(vec3 at, const std::vector<vec3>* alsoTaken) const {
     float gap = 1e9f;
     for (const PieceObject& p : pieces_) {
         if ((p.captured || p.inReserve) && !p.held) gap = std::min(gap, length(vec2(p.basePos.x - at.x, p.basePos.z - at.z)));
         if (p.slotReserved) gap = std::min(gap, length(vec2(p.reservedSlot.x - at.x, p.reservedSlot.z - at.z)));
     }
+    if (alsoTaken)
+        for (vec3 s : *alsoTaken) gap = std::min(gap, length(vec2(s.x - at.x, s.z - at.z)));
     return gap;
 }
 
-vec3 PhysicalBoard::freeCaptureSlot(Color beside) const {
+vec3 PhysicalBoard::freeCaptureSlot(Color beside, const std::vector<vec3>* alsoTaken) const {
     // The first slot clear of what stands beside the board and of the slots kept for pieces on
     // their way there: holes left by pieces brought back are filled again.
     int n = layout::captureSlotCount(), roomiest = 0;
     float roomiestGap = -1.0f;
     for (int k = 0; k < n; ++k) {
         vec3 s = captureSlot(beside, k);
-        float gap = clearance(s);
+        float gap = clearance(s, alsoTaken);
         if (gap >= kClear) return s;
         if (gap > roomiestGap) {
             roomiestGap = gap;
@@ -119,7 +121,7 @@ vec3 PhysicalBoard::freeCaptureSlot(Color beside) const {
 
 vec3 PhysicalBoard::nextCaptureSlot(Color beside, int pieceId) {
     PieceObject* p = byId(pieceId);
-    if (p) p->slotReserved = false;  // a new plan replaces its earlier one
+    if (p) p->slotReserved = p->capturedBesideOwner = false;  // a new plan replaces its earlier one
     vec3 slot = freeCaptureSlot(beside);
     if (p) {
         p->slotReserved = true;
@@ -142,6 +144,7 @@ void PhysicalBoard::setOnSquare(int id, Square sq) {
     p->captured = false;
     p->inReserve = false;
     p->held = false;
+    p->capturedBesideOwner = false;
     p->slotReserved = false;
     p->basePos = squareBase(sq);
 }
@@ -158,6 +161,28 @@ void PhysicalBoard::setCaptured(int id, vec3 pos) {
     p->captureOrder = ++captures_;
 }
 
+void PhysicalBoard::setInReserve(int id, vec3 pos) {
+    PieceObject* p = byId(id);
+    if (!p) return;
+    p->square = NoSquare;
+    p->captured = false;
+    p->inReserve = true;
+    p->held = false;
+    p->capturedBesideOwner = false;
+    p->slotReserved = false;
+    p->basePos = p->reserveSpot = pos;
+}
+
+int PhysicalBoard::addSpare(PieceType t, Color c, vec3 spot) {
+    int id = newPiece(t, c);
+    PieceObject* p = byId(id);
+    p->inReserve = p->spare = true;
+    p->basePos = p->reserveSpot = spot;
+    p->transform = translate(p->basePos) * rotateY(p->yaw);
+    p->prevTransform = p->transform;
+    return id;
+}
+
 void PhysicalBoard::removeFromBoard(int id) {
     PieceObject* p = byId(id);
     if (!p) return;
@@ -172,11 +197,14 @@ int PhysicalBoard::offBoardPiece(PieceType t, Color c, bool inReach) {
     // arbiter taking a move back brings back the piece that move took off the board (its victim,
     // the pawn of a promotion), not one captured earlier. The hand only takes one standing in the
     // player's half (a pawn set down there at a promotion): the player's pieces the opponent
-    // captured stand beside the opponent, out of reach. Then a spare piece. The piece keeps its
-    // current place until it is put on a square (setOnSquare).
+    // captured stand beside the opponent, out of reach. A victim of a demonstration waiting in
+    // its owner's half is not one to take: it must come back to its square when the line is
+    // taken back. Then a spare piece. The piece keeps its current place until it is put on a
+    // square (setOnSquare).
     const PieceObject* last = nullptr;
     for (const PieceObject& p : pieces_)
-        if (p.captured && !p.held && p.type == t && p.color == c && (!inReach || towards(c) * p.basePos.z > 0.0f) &&
+        if (p.captured && !p.held && p.type == t && p.color == c &&
+            (!inReach || (towards(c) * p.basePos.z > 0.0f && !p.capturedBesideOwner)) &&
             (!last || p.captureOrder > last->captureOrder))
             last = &p;
     if (last) return last->id;
@@ -184,14 +212,7 @@ int PhysicalBoard::offBoardPiece(PieceType t, Color c, bool inReach) {
         if (p.inReserve && !p.held && p.type == t && p.color == c) return p.id;
     // The arbiter brings another one: it stands in a free slot beside the player (not on the
     // spare queen's spot, which may still be taken).
-    vec3 pos = freeCaptureSlot(c);
-    int id = newPiece(t, c);
-    PieceObject* p = byId(id);
-    p->inReserve = p->spare = true;
-    p->basePos = p->reserveSpot = pos;
-    p->transform = translate(p->basePos) * rotateY(p->yaw);
-    p->prevTransform = p->transform;
-    return id;
+    return addSpare(t, c, freeCaptureSlot(c));
 }
 
 void PhysicalBoard::syncTo(const Position& pos) {
@@ -213,6 +234,7 @@ void PhysicalBoard::syncTo(const Position& pos) {
         }
         free.push_back(p.id);
     }
+    std::vector<vec3> vacated;   // spots of the pieces coming back from beside the board
     for (int sq = 0; sq < 64; ++sq) {
         if (used[sq]) continue;
         Piece want = pos.at(Square(sq));
@@ -228,20 +250,25 @@ void PhysicalBoard::syncTo(const Position& pos) {
             free.erase(free.begin() + found);
         } else {
             id = offBoardPiece(want.type, want.color, false);  // a snap: any piece off the board will do
+            const PieceObject* p = byId(id);
+            if (p->captured || p->inReserve) vacated.push_back(p->basePos);
         }
         setOnSquare(id, Square(sq));
         used[sq] = true;
     }
     // The pieces left over leave the board. Pawns that were promoted stand beside their owner
     // (GameScene::planPromotionSwap): as many as the position proves, less those already set down
-    // there. Each promotion on the table set such a pawn down and took a spare out of the reserve:
-    // while more spares are out than pawns stand beside their owner, a spare left over is the new
-    // piece of a promotion taken back. It goes back where it was taken from, else to a free slot
-    // beside its owner (where the arbiter brings pieces). The other pieces were captured and
-    // stand beside the opponent, a promoted piece among them.
+    // there (a demonstration's victim waiting in its owner's half is not one of them). Each
+    // promotion on the table set such a pawn down and took a spare out of the reserve: while more
+    // spares are out than pawns stand beside their owner, a spare left over is the new piece of a
+    // promotion taken back. It goes back where it was taken from, else to a free slot beside its
+    // owner (where the arbiter brings pieces). The other pieces were captured and stand beside
+    // the opponent, a promoted piece among them. The slots of the pieces that came back stay
+    // free: a hand setting these pieces down one at a time finds them still taken.
     int beside[2] = {}, sparesOut[2] = {}, pawnsLeft[2] = {}, promote[2] = {};
     for (const PieceObject& p : pieces_) {
-        if (p.captured && p.type == Pawn && towards(p.color) * p.basePos.z > 0.0f) ++beside[p.color];
+        if (p.captured && p.type == Pawn && !p.capturedBesideOwner && towards(p.color) * p.basePos.z > 0.0f)
+            ++beside[p.color];
         if (p.spare && !p.inReserve) ++sparesOut[p.color];
     }
     for (int id : free)
@@ -253,17 +280,15 @@ void PhysicalBoard::syncTo(const Position& pos) {
     for (int id : free) {
         PieceObject* p = byId(id);
         Color c = p->color;
+        p->capturedBesideOwner = false;
         if (p->type == Pawn && promote[c] > 0) {
             --promote[c];
-            setCaptured(id, nextCaptureSlot(c, id));
+            setCaptured(id, freeCaptureSlot(c, &vacated));
         } else if (p->spare && sparesOut[c] > beside[c]) {
             --sparesOut[c];
-            vec3 spot = clearance(p->reserveSpot) >= kClear ? p->reserveSpot : freeCaptureSlot(c);
-            p->square = NoSquare;
-            p->inReserve = true;
-            p->basePos = p->reserveSpot = spot;
+            setInReserve(id, clearance(p->reserveSpot) >= kClear ? p->reserveSpot : freeCaptureSlot(c, &vacated));
         } else {
-            setCaptured(id, nextCaptureSlot(opposite(c), id));
+            setCaptured(id, freeCaptureSlot(opposite(c), &vacated));
         }
     }
     updateRestingTransforms();

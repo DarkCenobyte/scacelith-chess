@@ -162,6 +162,12 @@ public:
     const std::vector<std::string>& sanMoves() const { return san_; }
     std::vector<std::string> uciMoves() const;
     bool play(const Move& m);                     // legal move; updates status (mate, stalemate, 5-fold, 75, material)
+    // Takes the last 'plies' moves back (a takeback, a demonstration line undone): the record is as
+    // if they had never been played. The status is derived again from the position reached, so an
+    // ending the moves brought (mate, stalemate, repetition) is lifted, and so is any other ending
+    // (resignation, agreement, flag fall, claim, forfeit): taking moves back reopens the game.
+    // False (nothing changes) unless 1 <= plies <= moves().size().
+    bool undo(int plies = 1);
     GameStatus status() const { return status_; }
     GameEndReason endReason() const { return reason_; }
     bool isOver() const { return status_ != GameStatus::Ongoing; }
