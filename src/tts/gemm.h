@@ -30,9 +30,11 @@ struct GemmB {
     ptrdiff_t blockStride = 0;
 };
 
-// C (M x N, row stride ldc) = A * B.
+// C (M x N, row stride ldc) = A * B. With cBlockStride > 0 the columns of C come in the blocks of
+// B instead: column c of block j is at C + j * cBlockStride + c (a 1x1 convolution of several batch
+// items writes each item's [Cout x L] output in place).
 void sgemm(const kern::Table& k, ThreadPool* pool, int M, int N, int K, const GemmA& a, const GemmB& b, float* C,
-           ptrdiff_t ldc);
+           ptrdiff_t ldc, ptrdiff_t cBlockStride = 0);
 
 // Integer GEMM: C (int32, M x N) = sum_k (A[m,k] - azp) * (B[k,n] - bzp), exact. A and B are 8-bit
 // row-major; exactly one of them is unsigned and only the unsigned one may have a zero point.

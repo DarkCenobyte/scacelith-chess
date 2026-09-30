@@ -7,16 +7,17 @@ No speech recogniser is available offline, so the reading of each written form (
 "O-O", ...) is identified acoustically: the form and several spelled-out candidates ("e four",
 "four", ...) are synthesised with the same voice and several noise seeds, turned into
 mean-normalised log-mel spectrograms, and compared with dynamic time warping (the template
-matching of isolated-word recognisers, reliable here because the speaker is the same). For each
-form the script prints the candidates from the closest to the farthest, with:
+matching of isolated-word recognisers, usable here because the speaker is the same). For each
+form the script prints its 'self' distance (mean DTW distance between its own renditions, i.e. the
+spread due to the noise seed) and the candidates from the closest to the farthest, each with
 
-    dist   mean DTW distance between renditions of the form and of the candidate;
-    self   mean DTW distance between renditions of the form itself (different seeds): the floor
-           that a candidate read exactly like the form reaches.
+    excess = mean distance(form, candidate) - (self(form) + self(candidate)) / 2
 
-A candidate close to 'self' is how the model reads the form; when even the best one stays far from
-it, the form is read in a way none of the candidates describes (often a mumble), and the catalog
-must spell it out. The spelled-out candidates also show which spellings the model reads cleanly.
+which is about 0 when the candidate is read like the form and grows with the difference. A clear
+winner (excess near 0, well below the next candidate) is how the model reads the form; when even
+the best candidate stays well above 0, the form is read in a way none of the candidates describes
+(often a mumble), and the catalog must spell it out. This is a heuristic: listen to the --wav
+files before relying on a close call.
 --wav writes every rendition (seed 0) for listening. Needs numpy and onnxruntime.
 """
 import argparse
@@ -151,7 +152,7 @@ def main():
     ap.add_argument("--model", required=True)
     ap.add_argument("--voice", type=int, default=6)
     ap.add_argument("--steps", type=int, default=5)
-    ap.add_argument("--seeds", type=int, default=3)
+    ap.add_argument("--seeds", type=int, default=4)
     ap.add_argument("--wav", default="")
     ap.add_argument("--lang", nargs="*", default=list(PROBES))
     ap.add_argument("--threads", type=int, default=1)
@@ -166,6 +167,9 @@ def main():
             cache[key] = (wavs, [features(w) for w in wavs])
         return cache[key]
 
+    def spread(f):
+        return float(np.mean([dtw(f[i], f[j]) for i in range(len(f)) for j in range(i + 1, len(f))]))
+
     def mean_cross(fa, fb):
         return float(np.mean([dtw(x, y) for x in fa for y in fb]))
 
@@ -173,14 +177,13 @@ def main():
         print("== %s" % lang)
         for form, cands in PROBES[lang].items():
             wf, ff = renditions(form, lang)
-            self_d = float(np.mean([dtw(ff[i], ff[j]) for i in range(len(ff)) for j in range(i + 1, len(ff))]))
+            self_d = spread(ff)
             rows = []
             for c in cands:
                 wc, fc = renditions(c, lang)
-                rows.append((mean_cross(ff, fc), c, len(wc[0]) / SAMPLE_RATE))
+                rows.append((mean_cross(ff, fc) - 0.5 * (self_d + spread(fc)), c))
             rows.sort()
-            print("  %-5s (%.2f s) self %.2f | %s" % (form, len(wf[0]) / SAMPLE_RATE, self_d,
-                                                      "  ".join("%s %.2f" % (c, d) for d, c, _ in rows)))
+            print("  %-5s self %5.2f | %s" % (form, self_d, "  ".join("%s %+.2f" % (c, d) for d, c in rows)))
             if a.wav:
                 os.makedirs(a.wav, exist_ok=True)
                 idx = list(PROBES[lang]).index(form)

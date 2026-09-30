@@ -61,6 +61,20 @@ Tensor materialize(const Tensor& t) {
     return r;
 }
 
+// Runs fn(begin, end) over [0, n) in chunks of at least 'grain' spread over the pool (the caller
+// takes part); element-wise work that is not worth a thread hand-off runs inline.
+void parallelRange(const ExecContext* ctx, int64_t n, int64_t grain, const std::function<void(int64_t, int64_t)>& fn) {
+    int threads = ctx && ctx->pool ? ctx->pool->size() : 1;
+    int64_t chunks = std::min<int64_t>(int64_t(threads) * 4, n / std::max<int64_t>(1, grain));
+    if (threads <= 1 || chunks <= 1) {
+        if (n > 0) fn(0, n);
+        return;
+    }
+    ctx->pool->run(int(chunks), [&](int c) { fn(n * c / chunks, n * (c + 1) / chunks); });
+}
+
+constexpr int64_t kGrain = 16384;   // elements per chunk of parallel element-wise work
+
 // ------------------------------------------------------------------------------------------------
 // Broadcasting: collapsed output shape and per-input strides (0 on broadcast dimensions).
 // ------------------------------------------------------------------------------------------------
@@ -123,16 +137,32 @@ struct Bcast {
         return true;
     }
 
+    int64_t outerCount() const {
+        int64_t outer = 1;
+        for (size_t d = 0; d + 1 < shape.size(); ++d) outer *= shape[d];
+        return outer;
+    }
+
     // fn(count, off[3], stride[3], outOffset) for every innermost run.
     template <class F>
     void forRuns(F fn) const {
+        forRunsRange(0, outerCount(), fn);
+    }
+
+    // The same for the runs [o0, o1).
+    template <class F>
+    void forRunsRange(int64_t o0, int64_t o1, F fn) const {
         size_t r = shape.size();
         int64_t inner = shape[r - 1];
-        int64_t outer = 1;
-        for (size_t d = 0; d + 1 < r; ++d) outer *= shape[d];
         std::vector<int64_t> idx(r, 0);
         std::array<int64_t, 3> off = {0, 0, 0};
-        for (int64_t o = 0; o < outer; ++o) {
+        int64_t rem = o0;
+        for (size_t d = r - 1; d-- > 0;) {
+            idx[d] = rem % shape[d];
+            rem /= shape[d];
+            for (int i = 0; i < nin; ++i) off[size_t(i)] += idx[d] * st[d][size_t(i)];
+        }
+        for (int64_t o = o0; o < o1; ++o) {
             fn(inner, off, st[r - 1], o * inner);
             for (size_t d = r - 1; d-- > 0;) {
                 ++idx[d];
@@ -146,7 +176,8 @@ struct Bcast {
 };
 
 template <class T, class R, class F>
-bool binaryT(const Tensor& a, const Tensor& b, Tensor& out, DType outType, F f, std::string* err) {
+bool binaryT(const Tensor& a, const Tensor& b, Tensor& out, DType outType, F f, std::string* err,
+             const ExecContext* ctx = nullptr) {
     const Dims* ins[2] = {&a.dims, &b.dims};
     Bcast bc;
     if (!bc.init(ins, 2, err)) return false;
@@ -155,7 +186,7 @@ bool binaryT(const Tensor& a, const Tensor& b, Tensor& out, DType outType, F f, 
     const T* pa = a.as<T>();
     const T* pb = b.as<T>();
     R* po = out.mut<R>();
-    bc.forRuns([&](int64_t n, const std::array<int64_t, 3>& off, const std::array<int64_t, 3>& s, int64_t o) {
+    auto run = [&](int64_t n, const std::array<int64_t, 3>& off, const std::array<int64_t, 3>& s, int64_t o) {
         const T* x = pa + off[0];
         const T* y = pb + off[1];
         R* z = po + o;
@@ -170,20 +201,36 @@ bool binaryT(const Tensor& a, const Tensor& b, Tensor& out, DType outType, F f, 
         } else {
             for (int64_t i = 0; i < n; ++i) z[i] = f(x[i * s[0]], y[i * s[1]]);
         }
-    });
+    };
+    int64_t outer = bc.outerCount(), inner = bc.shape.back();
+    if (!ctx || !ctx->pool || out.count() < 2 * kGrain) {
+        bc.forRuns(run);
+    } else if (outer == 1) {   // one contiguous run: split it
+        parallelRange(ctx, inner, kGrain, [&](int64_t i0, int64_t i1) {
+            const std::array<int64_t, 3>& s = bc.st.back();
+            run(i1 - i0, {i0 * s[0], i0 * s[1], 0}, s, i0);
+        });
+    } else {
+        parallelRange(ctx, outer, std::max<int64_t>(1, kGrain / std::max<int64_t>(1, inner)),
+                      [&](int64_t o0, int64_t o1) { bc.forRunsRange(o0, o1, run); });
+    }
     return true;
 }
 
-bool arith(Op op, const Tensor& a0, const Tensor& b0, Tensor& out, std::string* err) {
+bool arith(const ExecContext& ctx, Op op, const Tensor& a0, const Tensor& b0, Tensor& out, std::string* err) {
     Tensor a = materialize(a0), b = materialize(b0);
     if (a.type != b.type) return fail(err, std::string("type mismatch ") + dtypeName(a.type) + "/" + dtypeName(b.type));
     switch (a.type) {
     case DType::F32:
         switch (op) {
-        case Op::Add: return binaryT<float, float>(a, b, out, DType::F32, [](float x, float y) { return x + y; }, err);
-        case Op::Sub: return binaryT<float, float>(a, b, out, DType::F32, [](float x, float y) { return x - y; }, err);
-        case Op::Mul: return binaryT<float, float>(a, b, out, DType::F32, [](float x, float y) { return x * y; }, err);
-        case Op::Div: return binaryT<float, float>(a, b, out, DType::F32, [](float x, float y) { return x / y; }, err);
+        case Op::Add:
+            return binaryT<float, float>(a, b, out, DType::F32, [](float x, float y) { return x + y; }, err, &ctx);
+        case Op::Sub:
+            return binaryT<float, float>(a, b, out, DType::F32, [](float x, float y) { return x - y; }, err, &ctx);
+        case Op::Mul:
+            return binaryT<float, float>(a, b, out, DType::F32, [](float x, float y) { return x * y; }, err, &ctx);
+        case Op::Div:
+            return binaryT<float, float>(a, b, out, DType::F32, [](float x, float y) { return x / y; }, err, &ctx);
         default: break;
         }
         break;
@@ -302,11 +349,13 @@ bool unaryF(const Tensor& x0, Tensor& out, F f, std::string* err) {
 }
 
 template <class K>
-bool unaryKernel(const Tensor& x0, Tensor& out, K kfn, std::string* err) {
+bool unaryKernel(const ExecContext& ctx, const Tensor& x0, Tensor& out, K kfn, std::string* err) {
     Tensor x = materialize(x0);
     if (x.type != DType::F32) return fail(err, "expects float");
     out = Tensor::alloc(DType::F32, x.dims);
-    kfn(x.as<float>(), out.mut<float>(), size_t(x.count()));
+    const float* src = x.as<float>();
+    float* dst = out.mut<float>();
+    parallelRange(&ctx, x.count(), kGrain, [&](int64_t i0, int64_t i1) { kfn(src + i0, dst + i0, size_t(i1 - i0)); });
     return true;
 }
 
@@ -803,36 +852,44 @@ bool opLayerNorm(const ExecContext& ctx, const Node& nd, const Tensor& x, const 
 }
 
 // LayerNorm over the channel axis of [B, C, L] without the transposes: statistics per (b, t).
-bool opLayerNormChannels(const Node& nd, const Tensor& x, const Tensor& g0, const Tensor* b0, Tensor& out,
-                         std::string* err) {
+bool opLayerNormChannels(const ExecContext& ctx, const Node& nd, const Tensor& x, const Tensor& g0, const Tensor* b0,
+                         Tensor& out, std::string* err) {
     Tensor g = materialize(g0);
     Tensor b = b0 && b0->valid() ? materialize(*b0) : Tensor();
     if (x.rank() != 3 || g.count() != x.dims[1]) return fail(err, "LayerNormChannels shape");
     int64_t B = x.dims[0], C = x.dims[1], L = x.dims[2];
     out = Tensor::alloc(DType::F32, x.dims);
-    std::vector<float> mean(static_cast<size_t>(L)), var(static_cast<size_t>(L));
     const float* gp = g.as<float>();
     const float* bp = b.valid() ? b.as<float>() : nullptr;
     float eps = nd.f0;
-    for (int64_t bi = 0; bi < B; ++bi) {
-        const float* xs = x.as<float>() + bi * C * L;
-        float* ys = out.mut<float>() + bi * C * L;
-        std::fill(mean.begin(), mean.end(), 0.0f);
-        std::fill(var.begin(), var.end(), 0.0f);
-        for (int64_t c = 0; c < C; ++c)
-            for (int64_t t = 0; t < L; ++t) mean[size_t(t)] += xs[c * L + t];
-        for (int64_t t = 0; t < L; ++t) mean[size_t(t)] /= float(C);
-        for (int64_t c = 0; c < C; ++c)
-            for (int64_t t = 0; t < L; ++t) {
-                float d = xs[c * L + t] - mean[size_t(t)];
-                var[size_t(t)] += d * d;
+    // The columns (b, t) are independent: split the time axis of every batch item into pieces.
+    constexpr int64_t kCols = 32;
+    const int64_t perItem = (L + kCols - 1) / kCols;
+    const float* xp = x.as<float>();
+    float* yp = out.mut<float>();
+    parallelRange(&ctx, B * perItem, std::max<int64_t>(1, kGrain / std::max<int64_t>(1, C * kCols)),
+                  [&](int64_t j0, int64_t j1) {
+        float mean[kCols], var[kCols];
+        for (int64_t j = j0; j < j1; ++j) {
+            int64_t bi = j / perItem, t0 = (j % perItem) * kCols, n = std::min(kCols, L - t0);
+            const float* xs = xp + bi * C * L + t0;
+            float* ys = yp + bi * C * L + t0;
+            for (int64_t t = 0; t < n; ++t) mean[t] = var[t] = 0.0f;
+            for (int64_t c = 0; c < C; ++c)
+                for (int64_t t = 0; t < n; ++t) mean[t] += xs[c * L + t];
+            for (int64_t t = 0; t < n; ++t) mean[t] /= float(C);
+            for (int64_t c = 0; c < C; ++c)
+                for (int64_t t = 0; t < n; ++t) {
+                    float d = xs[c * L + t] - mean[t];
+                    var[t] += d * d;
+                }
+            for (int64_t t = 0; t < n; ++t) var[t] = 1.0f / std::sqrt(var[t] / float(C) + eps);
+            for (int64_t c = 0; c < C; ++c) {
+                float gc = gp[c], bc = bp ? bp[c] : 0.0f;
+                for (int64_t t = 0; t < n; ++t) ys[c * L + t] = (xs[c * L + t] - mean[t]) * var[t] * gc + bc;
             }
-        for (int64_t t = 0; t < L; ++t) var[size_t(t)] = 1.0f / std::sqrt(var[size_t(t)] / float(C) + eps);
-        for (int64_t c = 0; c < C; ++c) {
-            float gc = gp[c], bc = bp ? bp[c] : 0.0f;
-            for (int64_t t = 0; t < L; ++t) ys[c * L + t] = (xs[c * L + t] - mean[size_t(t)]) * var[size_t(t)] * gc + bc;
         }
-    }
+    });
     return true;
 }
 
@@ -1049,16 +1106,12 @@ bool opConv(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tens
         if (Nb == 1) {
             sgemm(*ctx.k, ctx.pool, int(Cout), int(L), int(Cin), ga, gb, po, L);
         } else {
-            // All batch items in one GEMM (the vector estimator runs at batch 2 for guidance).
+            // All batch items in one GEMM (the vector estimator runs at batch 2 for guidance), each
+            // item's output written in place.
             gb.blocks = int(Nb);
             gb.blockCols = int(L);
             gb.blockStride = Cin * L;
-            Buffer tmp(size_t(Cout) * size_t(Nb * L) * 4);
-            float* c = static_cast<float*>(tmp.data);
-            sgemm(*ctx.k, ctx.pool, int(Cout), int(Nb * L), int(Cin), ga, gb, c, Nb * L);
-            for (int64_t n = 0; n < Nb; ++n)
-                for (int64_t co = 0; co < Cout; ++co)
-                    std::memcpy(po + (n * Cout + co) * L, c + co * Nb * L + n * L, size_t(L) * 4);
+            sgemm(*ctx.k, ctx.pool, int(Cout), int(Nb * L), int(Cin), ga, gb, po, L, Cout * L);
         }
     } else {
         // im2col: rows (ci, j), columns t.
@@ -1133,7 +1186,7 @@ bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin
 // ------------------------------------------------------------------------------------------------
 inline float roundEven(float x) { return std::nearbyint(x); }
 
-bool opDynamicQuantize(const Tensor& x, Tensor* out, std::string* err) {
+bool opDynamicQuantize(const ExecContext& ctx, const Tensor& x, Tensor* out, std::string* err) {
     if (x.type != DType::F32) return fail(err, "DynamicQuantizeLinear expects float");
     const float* p = x.as<float>();
     int64_t n = x.count();
@@ -1148,7 +1201,7 @@ bool opDynamicQuantize(const Tensor& x, Tensor* out, std::string* err) {
     int zp = int(roundEven(zpf));
     out[0] = Tensor::alloc(DType::U8, x.dims);
     uint8_t* q = out[0].mut<uint8_t>();
-    for (int64_t i = 0; i < n; ++i) q[i] = uint8_t(std::clamp(roundEven(p[i] / scale) + float(zp), 0.0f, 255.0f));
+    parallelRange(&ctx, n, kGrain, [&](int64_t i0, int64_t i1) { ctx.k->quantizeU8(p + i0, size_t(i1 - i0), scale, zp, q + i0); });
     out[1] = Tensor::scalarF32(scale);
     out[2] = Tensor::alloc(DType::U8, {});
     *out[2].mut<uint8_t>() = uint8_t(zp);
@@ -1188,17 +1241,26 @@ bool qparams(const Node& nd, const Tensor& x, const Tensor& s0, const Tensor* z,
     return true;
 }
 
-bool opQuantize(const Node& nd, const Tensor* const* in, size_t nin, Tensor& out, std::string* err) {
+bool opQuantize(const ExecContext& ctx, const Node& nd, const Tensor* const* in, size_t nin, Tensor& out,
+                std::string* err) {
     const Tensor& x = *in[0];
     const Tensor* z = nin > 2 ? in[2] : nullptr;
     QParams q;
     if (!qparams(nd, x, *in[1], z, q, err)) return false;
     DType t = z && z->valid() ? z->type : DType::U8;
     if (t != DType::U8 && t != DType::I8) return fail(err, "QuantizeLinear output type");
+    if (x.type != DType::F32) return fail(err, "QuantizeLinear expects float");
     float lo = t == DType::U8 ? 0.0f : -128.0f, hi = t == DType::U8 ? 255.0f : 127.0f;
     out = Tensor::alloc(t, x.dims);
     const float* p = x.as<float>();
     int64_t n = x.count();
+    if (t == DType::U8 && q.channels == 1) {   // per tensor: the vocoder's activations
+        uint8_t* o = out.mut<uint8_t>();
+        parallelRange(&ctx, n, kGrain, [&](int64_t i0, int64_t i1) {
+            ctx.k->quantizeU8(p + i0, size_t(i1 - i0), q.scale[0], q.zp[0], o + i0);
+        });
+        return true;
+    }
     for (int64_t i = 0; i < n; ++i) {
         size_t c = q.channels > 1 ? size_t((i / q.inner) % q.channels) : 0;
         float v = std::clamp(roundEven(p[i] / q.scale[c]) + float(q.zp[c]), lo, hi);
@@ -1208,7 +1270,8 @@ bool opQuantize(const Node& nd, const Tensor* const* in, size_t nin, Tensor& out
     return true;
 }
 
-bool opDequantize(const Node& nd, const Tensor* const* in, size_t nin, Tensor& out, std::string* err) {
+bool opDequantize(const ExecContext& ctx, const Node& nd, const Tensor* const* in, size_t nin, Tensor& out,
+                  std::string* err) {
     const Tensor& x = *in[0];
     const Tensor* z = nin > 2 ? in[2] : nullptr;
     QParams q;
@@ -1216,6 +1279,13 @@ bool opDequantize(const Node& nd, const Tensor* const* in, size_t nin, Tensor& o
     out = Tensor::alloc(DType::F32, x.dims);
     int64_t n = x.count();
     float* o = out.mut<float>();
+    if (x.type == DType::U8 && q.channels == 1) {
+        const uint8_t* src = x.as<uint8_t>();
+        parallelRange(&ctx, n, kGrain, [&](int64_t i0, int64_t i1) {
+            ctx.k->dequantizeU8(src + i0, size_t(i1 - i0), q.scale[0], q.zp[0], o + i0);
+        });
+        return true;
+    }
     for (int64_t i = 0; i < n; ++i) {
         size_t c = q.channels > 1 ? size_t((i / q.inner) % q.channels) : 0;
         int32_t v;
@@ -1227,6 +1297,29 @@ bool opDequantize(const Node& nd, const Tensor* const* in, size_t nin, Tensor& o
         }
         o[i] = float(v - q.zp[c]) * q.scale[c];
     }
+    return true;
+}
+
+// DequantizeLinear(QuantizeLinear(x)) with one per-tensor uint8 scale and zero point: the same
+// arithmetic as the two operators, float to float, in pieces that stay in the first-level cache
+// instead of an 8-bit tensor in memory.
+bool opQuantDequant(const ExecContext& ctx, const Tensor& x, const Tensor& s, const Tensor* z, Tensor& out,
+                    std::string* err) {
+    if (x.type != DType::F32 || s.count() != 1 || (z && (z->type != DType::U8 || z->count() != 1)))
+        return fail(err, "QuantDequant expects float and a per-tensor uint8 quantization");
+    float scale = s.scalarFloat();
+    int zp = z ? int(*z->as<uint8_t>()) : 0;
+    out = Tensor::alloc(DType::F32, x.dims);
+    const float* p = x.as<float>();
+    float* o = out.mut<float>();
+    parallelRange(&ctx, x.count(), kGrain, [&](int64_t i0, int64_t i1) {
+        alignas(64) uint8_t q[1024];
+        for (int64_t i = i0; i < i1; i += 1024) {
+            size_t m = size_t(std::min<int64_t>(1024, i1 - i));
+            ctx.k->quantizeU8(p + i, m, scale, zp, q);
+            ctx.k->dequantizeU8(q, m, scale, zp, o + i);
+        }
+    });
     return true;
 }
 
@@ -1244,7 +1337,7 @@ bool execNode(const Node& n, const Tensor* const* in, Tensor* out, const ExecCon
     const kern::Table& k = *ctx.k;
     switch (n.op) {
     case Op::Add: case Op::Sub: case Op::Mul: case Op::Div:
-        return need(2) && arith(n.op, *in[0], *in[1], out[0], error);
+        return need(2) && arith(ctx, n.op, *in[0], *in[1], out[0], error);
     case Op::Pow: return need(2) && opPow(materialize(*in[0]), materialize(*in[1]), out[0], error);
     case Op::Equal: return need(2) && opEqual(materialize(*in[0]), materialize(*in[1]), out[0], error);
     case Op::Where: return need(3) && opWhere(*in[0], *in[1], *in[2], out[0], error);
@@ -1266,10 +1359,10 @@ bool execNode(const Node& n, const Tensor* const* in, Tensor* out, const ExecCon
     }
     case Op::Relu: return need(1) && unaryF(*in[0], out[0], [](float v) { return v > 0.0f ? v : 0.0f; }, error);
     case Op::PRelu: return need(2) && opPRelu(materialize(*in[0]), *in[1], out[0], error);
-    case Op::Erf: return need(1) && unaryKernel(*in[0], out[0], k.erf, error);
-    case Op::Exp: return need(1) && unaryKernel(*in[0], out[0], k.exp, error);
-    case Op::Tanh: return need(1) && unaryKernel(*in[0], out[0], k.tanh, error);
-    case Op::Gelu: return need(1) && unaryKernel(*in[0], out[0], k.gelu, error);
+    case Op::Erf: return need(1) && unaryKernel(ctx, *in[0], out[0], k.erf, error);
+    case Op::Exp: return need(1) && unaryKernel(ctx, *in[0], out[0], k.exp, error);
+    case Op::Tanh: return need(1) && unaryKernel(ctx, *in[0], out[0], k.tanh, error);
+    case Op::Gelu: return need(1) && unaryKernel(ctx, *in[0], out[0], k.gelu, error);
     case Op::Sin: return need(1) && unaryF(*in[0], out[0], [](float v) { return std::sin(v); }, error);
     case Op::Cos: return need(1) && unaryF(*in[0], out[0], [](float v) { return std::cos(v); }, error);
     case Op::Softplus:
@@ -1312,7 +1405,7 @@ bool execNode(const Node& n, const Tensor* const* in, Tensor* out, const ExecCon
     case Op::Pad: return need(2) && opPad(n, *in[0], *in[1], opt(2), opt(3), out[0], error);
     case Op::Softmax: return need(1) && opSoftmax(ctx, *in[0], n.axis, out[0], error);
     case Op::LayerNorm: return need(2) && opLayerNorm(ctx, n, *in[0], *in[1], opt(2), out[0], error);
-    case Op::LayerNormChannels: return need(2) && opLayerNormChannels(n, *in[0], *in[1], opt(2), out[0], error);
+    case Op::LayerNormChannels: return need(2) && opLayerNormChannels(ctx, n, *in[0], *in[1], opt(2), out[0], error);
     case Op::BatchNorm: return need(5) && opBatchNorm(n, in, out[0], error);
     case Op::ReduceSum: return need(1) && opReduceSum(n, *in[0], opt(1), out[0], error);
     case Op::MatMul: return need(2) && opMatMul(ctx, *in[0], *in[1], out[0], error);
@@ -1320,12 +1413,13 @@ bool execNode(const Node& n, const Tensor* const* in, Tensor* out, const ExecCon
     case Op::Conv: return need(2) && opConv(ctx, n, *in[0], *in[1], opt(2), out[0], error);
     case Op::MatMulInteger: return need(2) && opMatMulInteger(ctx, in, nin, false, out[0], error);
     case Op::MatMulIntegerScaled: return need(2) && opMatMulInteger(ctx, in, nin, true, out[0], error);
-    case Op::DynamicQuantize: return need(1) && opDynamicQuantize(*in[0], out, error);
-    case Op::Quantize: return need(2) && opQuantize(n, in, nin, out[0], error);
+    case Op::DynamicQuantize: return need(1) && opDynamicQuantize(ctx, *in[0], out, error);
+    case Op::Quantize: return need(2) && opQuantize(ctx, n, in, nin, out[0], error);
     case Op::Dequantize:
         if (!need(2)) return false;
         if (in[0]->qweight && !in[0]->data) return fail(error, "DequantizeLinear of a quantized weight");
-        return opDequantize(n, in, nin, out[0], error);
+        return opDequantize(ctx, n, in, nin, out[0], error);
+    case Op::QuantDequant: return need(2) && opQuantDequant(ctx, *in[0], *in[1], opt(2), out[0], error);
     case Op::Constant: out[0] = n.value; return true;
     default: return fail(error, "operator not implemented");
     }

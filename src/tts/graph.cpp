@@ -1,9 +1,12 @@
 #include "graph.h"
 #include "core/log.h"
+#include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdio>
 #include <cstring>
 #include <limits>
+#include <map>
 #include <unordered_map>
 
 namespace tts {
@@ -61,6 +64,7 @@ float constScalar(const Value& v, bool* ok) {
 
 std::atomic<bool> g_profiling{false};
 double g_profile[int(Op::Count)] = {};
+std::map<std::string, double> g_profileNodes;
 
 }  // namespace
 
@@ -68,6 +72,20 @@ void setProfiling(bool on) { g_profiling = on; }
 const double* profileSeconds() { return g_profile; }
 void resetProfile() {
     for (double& d : g_profile) d = 0.0;
+    g_profileNodes.clear();
+}
+
+std::string profileReport(size_t maxLines) {
+    std::vector<std::pair<double, std::string>> v;
+    for (const auto& e : g_profileNodes) v.push_back({e.second, e.first});
+    std::sort(v.rbegin(), v.rend());
+    std::string r;
+    for (size_t i = 0; i < v.size() && i < maxLines; ++i) {
+        char ms[32];
+        std::snprintf(ms, sizeof ms, ": %.2f ms\n", v[i].first * 1e3);
+        r += v[i].second + ms;
+    }
+    return r;
 }
 
 const char* opName(Op op) {
@@ -77,6 +95,7 @@ const char* opName(Op op) {
     case Op::Gelu: return "Gelu";
     case Op::LayerNormChannels: return "LayerNormChannels";
     case Op::MatMulIntegerScaled: return "MatMulIntegerScaled";
+    case Op::QuantDequant: return "QuantDequant";
     default: return "?";
     }
 }
@@ -471,6 +490,32 @@ void Graph::fusePatterns() {
             ++fused_;
             continue;
         }
+        // Fake-quantized activation (the vocoder's static QDQ): QuantizeLinear -> DequantizeLinear
+        // with the same per-tensor scale and uint8 zero point.
+        if (n.op == Op::Quantize && n.in.size() == 3 && n.out.size() == 1) {
+            int d = single(n.out[0]);
+            if (d < 0 || nodes_[size_t(d)].op != Op::Dequantize) continue;
+            const Node& dq = nodes_[size_t(d)];
+            if (dq.in.size() != 3 || dq.in[0] != n.out[0]) continue;
+            auto scalarConst = [&](int v, DType t) -> const Tensor* {
+                if (v < 0 || !values_[size_t(v)].isConst) return nullptr;
+                const Tensor& c = values_[size_t(v)].constant;
+                return c.type == t && c.count() == 1 && !c.qweight ? &c : nullptr;
+            };
+            const Tensor *s1 = scalarConst(n.in[1], DType::F32), *s2 = scalarConst(dq.in[1], DType::F32);
+            const Tensor *z1 = scalarConst(n.in[2], DType::U8), *z2 = scalarConst(dq.in[2], DType::U8);
+            if (!s1 || !s2 || !z1 || !z2) continue;
+            if (std::memcmp(s1->data, s2->data, 4) != 0 || *z1->as<uint8_t>() != *z2->as<uint8_t>()) continue;
+            Node f;
+            f.op = Op::QuantDequant;
+            f.name = n.name + "+dq";
+            f.in = {n.in[0], n.in[1], n.in[2]};
+            f.out = {dq.out[0]};
+            dead[i] = true;
+            nodes_[size_t(d)] = std::move(f);
+            ++fused_;
+            continue;
+        }
     }
     std::vector<Node> kept;
     kept.reserve(nodes_.size());
@@ -564,8 +609,14 @@ bool Session::run(const ExecContext& ctx, std::string* error, const std::atomic<
             if (error) *error = g_.label() + ": " + opName(n.op) + " " + n.name + ": " + err;
             return false;
         }
-        if (profiling)
-            g_profile[int(n.op)] += std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+        if (profiling) {
+            double sec = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+            g_profile[int(n.op)] += sec;
+            std::string key = g_.label() + " " + opName(n.op) + " " + n.name + " [";
+            if (!outs.empty())
+                for (size_t d = 0; d < outs[0].dims.size(); ++d) key += (d ? "," : "") + std::to_string(outs[0].dims[d]);
+            g_profileNodes[key + "]"] += sec;
+        }
         for (size_t o = 0; o < n.out.size(); ++o) slots_[size_t(n.out[o])] = std::move(outs[o]);
         if (keepAll_) continue;
         for (int v : n.in) {

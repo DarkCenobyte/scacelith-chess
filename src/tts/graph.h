@@ -1,6 +1,6 @@
 // ONNX graph interpreter of the TTS runtime: loads a model (in place), folds the constant
 // subgraphs, fuses a few hot patterns (exact-erf GELU, channel LayerNorm, quantized MatMul
-// epilogues) and runs the nodes in the exported topological order with dynamic shapes.
+// epilogues, fake-quantized activations) and runs the nodes in the exported topological order with dynamic shapes.
 //
 // Supported operators (opset 19, the set used by the Supertonic 3 graphs, see
 // research-supertonic.md 5.3): Add Sub Mul Div Pow Equal Where Cast Clip Relu PRelu Erf Exp Sin
@@ -29,8 +29,7 @@ enum class Op : uint8_t {
     Gelu,               // Div(x, sqrt 2) -> Erf -> Add 1 -> Mul x -> Mul 0.5
     LayerNormChannels,  // Transpose(0,2,1) -> LayerNormalization(-1) -> Transpose(0,2,1) on [B, C, L]
     MatMulIntegerScaled,// MatMulInteger -> Cast(float) -> Mul(scale) [-> Add(bias)]
-    QConv,              // QuantizeLinear -> DequantizeLinear -> Conv(int8 weight) -> QuantizeLinear, run in
-                        // integers as onnxruntime's QLinearConv (u8 in, u8 out)
+    QuantDequant,       // QuantizeLinear -> DequantizeLinear with the same per-tensor uint8 parameters
     Count
 };
 const char* opName(Op op);
@@ -40,6 +39,8 @@ const char* opName(Op op);
 void setProfiling(bool on);
 const double* profileSeconds();
 void resetProfile();
+// The same per node ("graph operator name [output dims]: ms"), slowest first.
+std::string profileReport(size_t maxLines);
 
 struct Node {
     Op op = Op::Identity;
@@ -51,7 +52,6 @@ struct Node {
     std::vector<int64_t> ints, ints2, ints3;
     std::string mode;
     Tensor value;                      // Constant / ConstantOfShape
-    std::vector<Tensor> extra;         // data precomputed by the loader for fused operators
     // Set by the loader.
     bool invariant = false;            // depends only on constants and invariant inputs
 };
@@ -108,8 +108,6 @@ private:
     std::vector<int> inputs_, outputs_;
     size_t inPlaceBytes_ = 0, copiedBytes_ = 0;
     int fused_ = 0;
-    // Int32 initializers behind a folded DequantizeLinear (quantized biases), by folded value.
-    std::vector<std::pair<int, Tensor>> int32Sources_;
 };
 
 // Execution state of one graph. Values computed only from constants and the invariant inputs

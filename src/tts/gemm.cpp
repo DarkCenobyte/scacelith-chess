@@ -30,17 +30,28 @@ int taskCount(ThreadPool* pool, int units) {
 }  // namespace
 
 void sgemm(const kern::Table& k, ThreadPool* pool, int M, int N, int K, const GemmA& a, const GemmB& b, float* C,
-           ptrdiff_t ldc) {
+           ptrdiff_t ldc, ptrdiff_t cBlockStride) {
     if (M <= 0 || N <= 0) return;
+    const int blockCols = b.blocks > 1 ? b.blockCols : N;
+    const bool cBlocked = cBlockStride > 0 && b.blocks > 1;
+    // Row i of the result (N columns) to its place in C.
+    auto storeRow = [&](int i, const float* row) {
+        if (!cBlocked) {
+            std::memcpy(C + i * ldc, row, size_t(N) * 4);
+            return;
+        }
+        for (int blk = 0; blk < b.blocks; ++blk)
+            std::memcpy(C + blk * cBlockStride + i * ldc, row + blk * blockCols, size_t(blockCols) * 4);
+    };
     if (K <= 0) {
-        for (int i = 0; i < M; ++i) std::memset(C + i * ldc, 0, size_t(N) * 4);
+        std::vector<float> zero(size_t(N), 0.0f);
+        for (int i = 0; i < M; ++i) storeRow(i, zero.data());
         return;
     }
     const int nr = k.nr, mr = k.mr;
     const int panels = (N + nr - 1) / nr;
     Buffer bbuf(size_t(panels) * size_t(K) * size_t(nr) * 4);
     float* Bp = static_cast<float*>(bbuf.data);
-    const int blockCols = b.blocks > 1 ? b.blockCols : N;
     auto packPanel = [&](int p) {
         int j0 = p * nr, cols = std::min(nr, N - j0);
         float* dst = Bp + size_t(p) * size_t(K) * size_t(nr);
@@ -67,8 +78,12 @@ void sgemm(const kern::Table& k, ThreadPool* pool, int M, int N, int K, const Ge
         const int kcMax = std::min(K, kKc);
         Buffer abuf(size_t(mr) * size_t(kcMax) * 4);
         float* Ap = static_cast<float*>(abuf.data);
+        // Blocked output: each row panel is computed into a small buffer, then scattered.
+        std::vector<float> rowBuf(cBlocked ? size_t(mr) * size_t(N) : 0);
         for (int rp = rp0; rp < rp1; ++rp) {
             int i0 = rp * mr, rows = std::min(mr, M - i0);
+            float* Cp = cBlocked ? rowBuf.data() : C + i0 * ldc;
+            ptrdiff_t ldcp = cBlocked ? N : ldc;
             for (int kb = 0; kb < K; kb += kKc) {
                 int kc = std::min(kKc, K - kb);
                 if (a.i8)
@@ -78,10 +93,12 @@ void sgemm(const kern::Table& k, ThreadPool* pool, int M, int N, int K, const Ge
                 if (rows < mr) std::memset(Ap + rows * kc, 0, size_t(mr - rows) * size_t(kc) * 4);
                 for (int p = 0; p < panels; ++p) {
                     int j0 = p * nr, cols = std::min(nr, N - j0);
-                    k.sgemmTile(kc, Ap, Bp + (size_t(p) * size_t(K) + size_t(kb)) * size_t(nr), C + i0 * ldc + j0,
-                                ldc, rows, cols, kb > 0);
+                    k.sgemmTile(kc, Ap, Bp + (size_t(p) * size_t(K) + size_t(kb)) * size_t(nr), Cp + j0, ldcp, rows,
+                                cols, kb > 0);
                 }
             }
+            if (cBlocked)
+                for (int i = 0; i < rows; ++i) storeRow(i0 + i, rowBuf.data() + size_t(i) * size_t(N));
         }
     });
 }

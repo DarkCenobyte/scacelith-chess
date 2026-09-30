@@ -758,6 +758,44 @@ TEST(tts_ops_matmul_gemm) {
     CHECK(runOp(gm, {&ga, &gb, &gc}, o) && equalF(o[0], {2, 2}, {1, 18, 1, 36}));
 }
 
+// The element-wise operators split over threads compute exactly what they compute on one thread.
+TEST(tts_ops_parallel_equals_serial) {
+    std::mt19937 rng(11);
+    tts::ThreadPool pool(3);
+    auto same = [](const Tensor& a, const Tensor& b) {
+        return a.type == b.type && a.dims == b.dims && std::memcmp(a.data, b.data, a.bytes()) == 0;
+    };
+    Tensor big = F({2, 64, 1001}, randomVec(2 * 64 * 1001, rng, 4.0f));
+    Tensor big2 = F({2, 64, 1001}, randomVec(2 * 64 * 1001, rng, 4.0f));
+    Tensor perChannel = F({1, 64, 1}, randomVec(64, rng));
+    Tensor perTime = F({2, 1, 1001}, randomVec(2 * 1001, rng));
+    Tensor gamma = F({64}, randomVec(64, rng)), beta = F({64}, randomVec(64, rng));
+    struct Case {
+        tts::Op op;
+        std::vector<const Tensor*> in;
+        size_t outputs;
+    };
+    tts::Node ln = node(tts::Op::LayerNormChannels);
+    ln.f0 = 1e-6f;
+    std::vector<Case> cases = {
+        {tts::Op::Add, {&big, &big2}, 1},        {tts::Op::Mul, {&big, &perChannel}, 1},
+        {tts::Op::Sub, {&perTime, &big}, 1},     {tts::Op::Div, {&big, &perChannel}, 1},
+        {tts::Op::Gelu, {&big}, 1},              {tts::Op::Tanh, {&big}, 1},
+        {tts::Op::LayerNormChannels, {&big, &gamma, &beta}, 1},
+        {tts::Op::DynamicQuantize, {&big}, 3},
+    };
+    for (const Case& c : cases) {
+        tts::Node n = c.op == tts::Op::LayerNormChannels ? ln : node(c.op);
+        std::vector<Tensor> serial, parallel;
+        CHECK(runOp(n, c.in, serial, c.outputs));
+        CHECK(runOp(n, c.in, parallel, c.outputs, nullptr, &pool));
+        bool ok = serial.size() == parallel.size();
+        for (size_t i = 0; ok && i < serial.size(); ++i) ok = same(serial[i], parallel[i]);
+        if (!ok) std::fprintf(stderr, "  %s differs on threads\n", tts::opName(c.op));
+        CHECK(ok);
+    }
+}
+
 TEST(tts_ops_quantization) {
     std::vector<Tensor> o;
     // DynamicQuantizeLinear, the example of the ONNX operator documentation.
@@ -786,6 +824,26 @@ TEST(tts_ops_quantization) {
     Tensor u8 = typed<uint8_t>(DType::U8, {3}, {0, 128, 255});
     dq.axis = 1;
     CHECK(runOp(dq, {&u8, &s, &zp}, o) && equalF(o[0], {3}, {-128, 0, 127}));
+    // The fused QuantizeLinear -> DequantizeLinear equals the two operators, bit for bit, also
+    // split over threads and with a tail that is not a whole vector.
+    {
+        std::mt19937 rq(5);
+        std::vector<float> big(70001);
+        for (float& v : big) v = std::normal_distribution<float>(0.0f, 3.0f)(rq);
+        Tensor xb = F({70001}, big), sq = F({}, {0.0371f}), zq = typed<uint8_t>(DType::U8, {}, {117});
+        std::vector<Tensor> q1, q2, fused;
+        tts::ThreadPool pool(2);
+        CHECK(runOp(node(tts::Op::Quantize), {&xb, &sq, &zq}, q1, 1, nullptr, &pool));
+        CHECK(runOp(node(tts::Op::Dequantize), {&q1[0], &sq, &zq}, q2));
+        CHECK(runOp(node(tts::Op::QuantDequant), {&xb, &sq, &zq}, fused, 1, nullptr, &pool));
+        CHECK(fused[0].count() == 70001 && std::memcmp(fused[0].data, q2[0].data, 70001 * 4) == 0);
+        bool same = true;
+        for (int i = 0; i < 70001; i += 997) {
+            float r = std::nearbyint(big[size_t(i)] / 0.0371f) + 117.0f;
+            same = same && q1[0].as<uint8_t>()[i] == uint8_t(std::min(255.0f, std::max(0.0f, r)));
+        }
+        CHECK(same);
+    }
     // MatMulInteger (u8 activations with a zero point, s8 weights) and the fused scaled form.
     std::mt19937 rng(9);
     const int M = 5, Kd = 37, N = 11;
@@ -1489,6 +1547,9 @@ TEST(tts_perf) {
         line += buf;
     }
     std::fprintf(stderr, "  ms per operator:%s\n", line.c_str());
+    // SCACELITH_TTS_PERF_NODES=<n>: also the n slowest nodes.
+    if (const char* nodes = std::getenv("SCACELITH_TTS_PERF_NODES"))
+        std::fprintf(stderr, "%s", tts::profileReport(size_t(std::atoi(nodes))).c_str());
 }
 
 TEST(tts_samples) {
