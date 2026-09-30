@@ -90,6 +90,8 @@ struct PlyVerdict {
     double accuracy = 100.0;         // moveAccuracy(wBest, wPlayed)
     int cpWhiteAfter = 0;            // evaluation after the move, White's view, mates +-1000
     bool hasEvalAfter = false;
+    int cpWhiteBefore = 0;           // evaluation of the position before the move (best line), same scale
+    bool hasEvalBefore = false;
     std::string bestSan, bestUci;    // the engine's move
     uint8_t phase = 0;               // 0 opening, 1 middlegame, 2 endgame
     ExType exType = ExType::None;    // the explanation chosen (voiced or not)

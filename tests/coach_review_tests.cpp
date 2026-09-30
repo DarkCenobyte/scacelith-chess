@@ -911,7 +911,10 @@ TEST(coach_review_every_key_exists) {
     }
     // Often-said messages have 3 phrasings, the others at least 2.
     for (const auto& kv : en.variants) {
-        if (startsWith(kv.first, "name.")) continue;
+        // Names said inside other lines have one form.
+        if (startsWith(kv.first, "name.") || startsWith(kv.first, "theme.") || startsWith(kv.first, "appraisal.phase.") ||
+            startsWith(kv.first, "appraisal.reason.") || startsWith(kv.first, "appraisal.level."))
+            continue;
         if (kv.second.size() < 2) std::fprintf(stderr, "  %s has one phrasing\n", kv.first.c_str());
         CHECK(kv.second.size() >= 2);
     }

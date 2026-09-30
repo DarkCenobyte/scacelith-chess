@@ -513,10 +513,14 @@ Review Reviewer::review(const ReviewInput& in) {
     v.delta = c.j.delta;
     v.accuracy = moveAccuracy(c.j.wBest, c.j.wPlayed);
     {
-        const ai::Score& sc = c.lp->score;
-        const int cp = mates(sc) ? 1000 : mated(sc) ? -1000 : std::clamp(sc.cp, -1000, 1000);
-        v.cpWhiteAfter = c.p0.sideToMove() == White ? cp : -cp;
+        auto whiteCp = [&](const ai::Score& sc) {
+            const int cp = mates(sc) ? 1000 : mated(sc) ? -1000 : std::clamp(sc.cp, -1000, 1000);
+            return c.p0.sideToMove() == White ? cp : -cp;
+        };
+        v.cpWhiteAfter = whiteCp(c.lp->score);
         v.hasEvalAfter = true;
+        v.cpWhiteBefore = whiteCp(c.l1->score);
+        v.hasEvalBefore = true;
     }
     v.bestUci = c.l1->pv[0];
     {
