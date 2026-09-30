@@ -527,6 +527,87 @@ TEST(net_gesture_wire) {
     CHECK_EQ(net::gestureSendCapacity(0), 1);
 }
 
+namespace {
+
+// A sender paced at gestureSendCapacity(burst) against the receiver's bucket (rate, burst), both
+// full at time 0. The sender has a new Gesture in every 16 ms frame where moving(t) holds and
+// sends the latest one when its bucket allows; delayMs(t) is the network delay of a message sent
+// at t, and the order is kept (TCP): a message never arrives before the one sent before it.
+// Returns every message sent: its send time and whether the receiver kept it.
+template <class Moving, class Delay>
+std::vector<std::pair<double, bool>> paceAgainstReceiver(int rate, int burst, double spanMs, Moving moving, Delay delayMs) {
+    net::GestureBucket out, in;
+    out.reset(0.0, rate, net::gestureSendCapacity(burst));
+    in.reset(0.0, rate, burst);
+    std::vector<std::pair<double, bool>> sent;
+    bool pending = false;
+    double arrival = 0.0;
+    for (double t = 0.0; t < spanMs; t += 16.0) {
+        pending = pending || moving(t);
+        if (!pending || !out.take(t)) continue;
+        pending = false;
+        arrival = std::max(arrival, t + delayMs(t));
+        sent.push_back({t, in.take(arrival)});
+    }
+    return sent;
+}
+
+}  // namespace
+
+TEST(net_gesture_pacing_against_the_receiver_bucket) {
+    // What the spare token of gestureSendCapacity() covers: delays that vary by up to one
+    // interval (1000 / rate ms) never make the receiver drop a Gesture, whatever the moves.
+    uint32_t seed = 12345;
+    auto rnd = [&seed] {   // xorshift32, 0..1
+        seed ^= seed << 13;
+        seed ^= seed >> 17;
+        seed ^= seed << 5;
+        return double(seed) / 4294967296.0;
+    };
+    const int buckets[][2] = {{4, 8}, {10, 20}, {2, 4}, {1, 2}};
+    for (auto& b : buckets) {
+        const double interval = 1000.0 / b[0];
+        double phaseEnd = 0.0;
+        bool movingNow = false;
+        auto moving = [&](double t) {   // moves and rests of 0 to 3 s each
+            if (t >= phaseEnd) {
+                movingNow = !movingNow;
+                phaseEnd = t + 3000.0 * rnd();
+            }
+            return movingNow;
+        };
+        auto jitter = [&](double) { return 20.0 + 0.95 * interval * rnd(); };
+        auto sent = paceAgainstReceiver(b[0], b[1], 120000.0, moving, jitter);
+        int dropped = 0;
+        for (auto& m : sent) dropped += !m.second;
+        CHECK(sent.size() > size_t(20 * b[0]));
+        CHECK_EQ(dropped, 0);
+    }
+    // A 1 s stall of the link at the server's defaults (4, 8) while the player moves: what was
+    // sent meanwhile arrives at once, and the receiver drops the part beyond its burst, the latest
+    // state of the bunch included. The Gestures after it get through again.
+    auto always = [](double) { return true; };
+    auto stall = [](double t) { return t < 1000.0 ? 1000.0 - t + 20.0 : 20.0; };
+    auto sent = paceAgainstReceiver(4, 8, 3000.0, always, stall);
+    int inBunch = 0, droppedInBunch = 0;
+    bool latestDropped = false, keptAfter = true;
+    double lastDrop = 0.0;
+    for (auto& m : sent) {
+        if (m.first < 1000.0) {
+            ++inBunch;
+            droppedInBunch += !m.second;
+            latestDropped = !m.second;
+        }
+        if (!m.second) lastDrop = m.first;
+    }
+    for (auto& m : sent)
+        if (m.first > lastDrop) keptAfter = keptAfter && m.second;
+    CHECK(inBunch > 8);
+    CHECK_EQ(droppedInBunch, inBunch - 8);
+    CHECK(latestDropped);
+    CHECK(lastDrop < 1500.0 && keptAfter && sent.back().first > 2500.0);
+}
+
 // =============================================================================================
 // JSON
 // =============================================================================================

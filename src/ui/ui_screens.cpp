@@ -1191,7 +1191,7 @@ bool calibrationPage(float t) {
         im::sound(Sound::Back);
     }
     if (done) {
-        game::settings().firstLaunch = false;
+        game::settings().brightnessCalibrated = true;  // no longer opened at every start
         game::settings().save();
     }
     return done;

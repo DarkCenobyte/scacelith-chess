@@ -143,14 +143,15 @@ bool editingText();  // a text field has the keyboard (Space and letters type te
 // Tab bar: Left/Right while focused, PageUp/PageDown anywhere. Returns true when changed.
 bool tabBar(const std::vector<std::string>& tabs, int& current, const Rect& r);
 // Hover/focus tooltip for the previous item (a floating tip; an info mark between
-// beginInfoMarks() and endInfoMarks()).
+// beginInfoMarks() and endInfoMarks()). One tip shows at a time: the focused item's while the
+// keyboard leads (arrows pressed since the mouse last moved), else the hovered item's.
 void tooltip(const std::string& text);
 // Info marks (settings pages: Options, hosting a direct match). Between these calls, a tooltip()
 // that follows a form row (or a formLabel()) puts a small circled "i" after the row's label, and
 // its text shows while the mouse rests on the label or on the mark, or once the row has had the
-// keyboard focus for a moment; a click on the mark does not operate the row. A tooltip() that
-// follows any other item shows for the keyboard focus only. Form row labels leave room for the
-// mark.
+// keyboard focus for a moment (then no tip follows the resting mouse); a click on the mark does
+// not operate the row. A tooltip() that follows any other item shows for the keyboard focus only.
+// Form row labels leave room for the mark.
 void beginInfoMarks();
 void endInfoMarks();
 // Label of a custom form row, drawn at the start of r like the labels of the form rows (shrunk to

@@ -13,8 +13,10 @@
 //
 // Policies:
 //   - Plies 0 and 1 run no clock: each player has firstMoveMs (60 s) for their first move, else
-//     the game is aborted (NoShow). The clocks start with White's second move; no increment for
-//     the first moves.
+//     the game is aborted (NoShow). As on the server, the guest's first move may arrive later by
+//     the most its flag would allow (min(rtt/2 + 30 ms, 500 ms, quota), below); the firstMoveMs
+//     sent to the players has no such margin. The clocks start with White's second move; no
+//     increment for the first moves.
 //   - Clocks on the host: elapsed = arrival - turn start. The guest's move gets a lag
 //     compensation of at most min(lag, rtt/2 + 30 ms, 500 ms, quota) where lag = elapsed -
 //     thinkMs and the quota starts at 2 s (+100 ms per move, capped at 2 s); the host's moves
@@ -130,6 +132,7 @@ private:
     int64_t clockAt(int color, double now) const;
     double compBound() const;
     double flagTime() const;
+    double firstMoveTime() const;   // the latest arrival of the first move of the side to move
     bool canOffer(int color) const;
     void finish(int status, int reason, double now, Output& out);
     void finishFromChess(double now, Output& out);

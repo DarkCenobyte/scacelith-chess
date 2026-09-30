@@ -1,6 +1,7 @@
 // Direct match: UPnP client against a fake gateway on 127.0.0.1, the secure channel (vectors
 // and failure cases) and full loopback matches between two DirectMatch instances, gestures
-// included (both ways, paced, never replayed, outside the flood limit).
+// included (both ways, paced, never replayed, the first one after a reconnection never dropped,
+// outside the flood limit).
 #include "test.h"
 #include "chess/chess.h"
 #include "net/direct_authority.h"
@@ -13,6 +14,7 @@
 #include <atomic>
 #include <chrono>
 #include <cmath>
+#include <cstdio>
 #include <cstring>
 #include <deque>
 #include <functional>
@@ -964,12 +966,52 @@ TEST(direct_authority_first_move_timeout) {
         r.move(HostSide, "e2e4");
         auto mm = r.recent<P::MoveMade>(GuestSide);
         CHECK(mm.size() == 1 && mm[0].firstMoveMs == 60000 && mm[0].spentMs == 0 && mm[0].whiteMs == 60000);
-        CHECK_EQ(r.a.nextDeadline(), r.now + 60000);
+        CHECK_EQ(r.a.nextDeadline(), r.now + 60000 + 30);   // the guest's margin, no round trip known yet
         r.now += 59000;
         r.move(GuestSide, "e7e5");
         mm = r.recent<P::MoveMade>(HostSide);
         CHECK(mm.size() == 1 && mm[0].firstMoveMs == 0 && mm[0].blackMs == 60000);
         CHECK_EQ(r.a.nextDeadline(), r.now + 60000);   // White's clock now runs (host: no allowance)
+    }
+    {
+        // The guest's first move has the margin of its flag (DESIGN 6.1): with a 100 ms round
+        // trip, min(100 / 2 + 30, 500, quota) = 80 ms after its 60 s, which the countdown it is
+        // sent does not show. A move made at the countdown's last instant still counts.
+        Room r(tc(60, 0), 2);   // host Black, guest White
+        r.a.onRtt(GuestSide, 100);
+        r.start();
+        const double start = r.now;
+        CHECK_EQ(r.a.nextDeadline(), start + 60080);
+        r.now = start + 60050;
+        r.tick();
+        CHECK(!r.has<P::GameEnd>(GuestSide));
+        P::Resync rs;
+        rs.game = r.a.gameId();
+        r.send(GuestSide, rs);
+        auto s = r.recent<P::GameSnapshot>(GuestSide);
+        CHECK(s.size() == 1 && s[0].firstMoveMs == 0);
+        r.move(GuestSide, "e2e4");
+        auto mm = r.recent<P::MoveMade>(HostSide);
+        CHECK(mm.size() == 1 && mm[0].ply == 0 && mm[0].firstMoveMs == 60000);
+        // The host's first move has none.
+        CHECK_EQ(r.a.nextDeadline(), r.now + 60000);
+        r.now += 60000;
+        r.tick();
+        auto e = r.recent<P::GameEnd>(GuestSide);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::Aborted && e[0].reason == P::EndReason::NoShow);
+    }
+    {
+        // Past the margin the game is aborted.
+        Room r(tc(60, 0), 2);
+        r.a.onRtt(GuestSide, 100);
+        r.start();
+        r.now += 60079;
+        r.tick();
+        CHECK(!r.has<P::GameEnd>(GuestSide));
+        r.now += 1;
+        r.tick();
+        auto e = r.recent<P::GameEnd>(HostSide);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::Aborted && e[0].reason == P::EndReason::NoShow);
     }
 }
 
@@ -1805,33 +1847,15 @@ TEST(direct_loopback_gestures_not_replayed) {
 
 namespace {
 
-// A guest written by hand over the secure channel, to send exactly the messages a test chooses.
-struct RawGuest {
+// One end of the secure channel driven by hand from the test's thread.
+struct RawChannel {
     sock::Handle h = sock::kInvalid;
     std::unique_ptr<direct::SecureChannel> ch;
-    uint32_t seq = 0;
     int errors = 0;   // Error messages received
 
-    ~RawGuest() { sock::closeSocket(h); }
+    ~RawChannel() { sock::closeSocket(h); }
 
-    bool connect(uint16_t port, const std::string& code) {
-        sock::Endpoint ep;
-        std::string norm, err;
-        if (!sock::Endpoint::parse("127.0.0.1", port, ep) || !direct::normalizeJoinCode(code, norm)) return false;
-        h = sock::connectWithTimeout(ep, 2000, err);
-        ch = std::make_unique<direct::SecureChannel>(direct::SecureChannel::Role::Guest, norm);
-        if (h == sock::kInvalid || !ch->start() || !flush()) return false;
-        auto end = std::chrono::steady_clock::now() + std::chrono::seconds(5);
-        while (!ch->established())
-            if (!pumpOnce() || std::chrono::steady_clock::now() > end) return false;
-        return true;
-    }
-    template <class T> bool send(T m) {
-        m.seq = ++seq;
-        std::vector<uint8_t> buf;
-        P::encode(m, buf);
-        return ch->send(buf.data(), buf.size()) && flush();
-    }
+    bool sendBytes(const std::vector<uint8_t>& buf) { return ch->send(buf.data(), buf.size()) && flush(); }
     // The next message of type T (others are skipped), within ms.
     template <class T> bool waitFor(T& out, int ms) {
         auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
@@ -1846,7 +1870,15 @@ struct RawGuest {
         }
     }
 
-private:
+protected:
+    // The channel's handshake over the connected socket 'h', within 5 s.
+    bool handshake() {
+        if (h == sock::kInvalid || !ch->start() || !flush()) return false;
+        auto end = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (!ch->established())
+            if (!pumpOnce() || std::chrono::steady_clock::now() > end) return false;
+        return true;
+    }
     bool flush() {
         std::vector<uint8_t>& o = ch->outbox();
         auto end = std::chrono::steady_clock::now() + std::chrono::seconds(5);
@@ -1875,7 +1907,140 @@ private:
     }
 };
 
+// A guest written by hand over the secure channel, to send exactly the messages a test chooses.
+struct RawGuest : RawChannel {
+    uint32_t seq = 0;
+
+    bool connect(uint16_t port, const std::string& code) {
+        sock::Endpoint ep;
+        std::string norm, err;
+        if (!sock::Endpoint::parse("127.0.0.1", port, ep) || !direct::normalizeJoinCode(code, norm)) return false;
+        h = sock::connectWithTimeout(ep, 2000, err);
+        ch = std::make_unique<direct::SecureChannel>(direct::SecureChannel::Role::Guest, norm);
+        return handshake();
+    }
+    template <class T> bool send(T m) {
+        m.seq = ++seq;
+        std::vector<uint8_t> buf;
+        P::encode(m, buf);
+        return sendBytes(buf);
+    }
+};
+
+// A host written by hand: it accepts the guest's connections one at a time and sends exactly the
+// messages a test chooses, when it chooses.
+struct RawHost : RawChannel {
+    sock::Handle listener = sock::kInvalid;
+    uint16_t port = 0;
+    std::string code = direct::newJoinCode();
+
+    ~RawHost() { sock::closeSocket(listener); }
+
+    bool listen() {
+        bool dual = false;
+        std::string err;
+        listener = sock::listenTcp(0, dual, err);
+        sock::Endpoint ep;
+        if (listener == sock::kInvalid || !sock::localEndpoint(listener, ep) || code.empty()) return false;
+        port = ep.port();
+        return true;
+    }
+    // The guest's next connection, through the channel's handshake, within ms.
+    bool accept(int ms) {
+        drop();
+        auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
+        while (h == sock::kInvalid) {
+            if (std::chrono::steady_clock::now() > end) return false;
+            sock::PollSet ps;
+            ps.add(listener, true, false);
+            ps.wait(10);
+            if (ps.readable(listener)) h = sock::acceptOne(listener, nullptr);
+        }
+        ch = std::make_unique<direct::SecureChannel>(direct::SecureChannel::Role::Host, code);
+        return handshake();
+    }
+    void drop() {
+        sock::closeSocket(h);
+        h = sock::kInvalid;
+    }
+    template <class T> bool send(const T& m) {
+        std::vector<uint8_t> buf;
+        P::encode(m, buf);
+        return sendBytes(buf);
+    }
+};
+
+// Holds the stdio lock of stderr while it lives: a thread that logs meanwhile (logx writes every
+// line to stderr) stops at that log line until the hold ends.
+struct StderrHold {
+#ifdef _WIN32
+    StderrHold() { _lock_file(stderr); }
+    ~StderrHold() { _unlock_file(stderr); }
+#else
+    StderrHold() { flockfile(stderr); }
+    ~StderrHold() { funlockfile(stderr); }
+#endif
+    StderrHold(const StderrHold&) = delete;
+    StderrHold& operator=(const StderrHold&) = delete;
+};
+
 }  // namespace
+
+TEST(direct_guest_gesture_at_once_after_reconnecting) {
+    // The guest's game thread sends a Gesture the moment it sees Online again after a
+    // reconnection (the scene does: the host waits for one sent after the return). The link is up
+    // for Gestures before that event, so the Gesture reaches the host. The guest's worker is held
+    // at the log line that follows the event, so a link brought up only after it would still be
+    // down when the Gesture is sent.
+    RawHost raw;
+    CHECK(raw.listen());
+    direct::Authority auth(direct::AuthorityConfig(), "Alice", "Bob", 1);
+    direct::Authority::Output out;
+    auth.startGame(sock::epochMs(), out);
+    CHECK(out.toGuest.size() == 1);
+    if (out.toGuest.size() != 1) return;
+    auto welcome = [&] {
+        P::Welcome w;
+        w.proto = P::kProtocolVersion;
+        w.serverTime = sock::epochMs();
+        w.userId = 2;
+        w.username = "Bob";
+        w.serverName = "Alice";
+        w.heartbeatMs = 2000;
+        w.clientPingMs = 2000;
+        w.maxMsgPerSec = 40;
+        w.activeGame = auth.gameId();
+        w.gestureRate = 10;
+        w.gestureBurst = 20;
+        return raw.send(w);
+    };
+    Peer guest, nobody;
+    guest.dm.join("127.0.0.1", raw.port, raw.code, "Bob");
+    P::Hello hello;
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    CHECK(welcome() && raw.sendBytes(out.toGuest[0]));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(Event::Kind::GameSnapshot) == 1; }));
+    raw.drop();   // the network fails: the guest comes back by itself
+    CHECK(waitUntil(guest, nobody, [&] { return guest.hasConn(ConnState::Reconnecting); }));
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    Gesture g;
+    g.touch = 12;
+    bool online = false;
+    {
+        StderrHold hold;
+        CHECK(welcome());
+        auto end = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (!online && std::chrono::steady_clock::now() < end) {
+            Event e;
+            while (!online && guest.dm.poll(e)) online = e.kind == Event::Kind::ConnectionChanged && e.state == ConnState::Online;
+        }
+        if (online) guest.dm.sendGesture(g);
+    }
+    CHECK(online);
+    P::C_Gesture got;
+    CHECK(raw.waitFor(got, 3000));
+    CHECK(got.game == auth.gameId() && got.touch == 12);
+}
 
 TEST(direct_gestures_outside_flood_limit) {
     // The host announces its Gesture bucket in Welcome. 100 Gestures at once (five times the

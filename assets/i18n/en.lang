@@ -682,7 +682,7 @@ reason.online.both_disconnected = Both players disconnected
 online.notice.shutdown = The server restarts in {0}. Games in progress are saved.
 online.notice.revoked = You were signed out of this server.
 online.notice.replaced = Your account connected from another window; this one is now offline.
-online.notice.rating_restored = Your rating was restored by {0} points: an opponent was banned for cheating.
+online.notice.rating_restored = Your rating was restored by {0} point: an opponent was banned for cheating.|Your rating was restored by {0} points: an opponent was banned for cheating.
 # Errors
 online.err.rate_limited_for = Too many attempts. Try again in {0}.
 online.err.rate_limited = Too many attempts. Try again in a moment.

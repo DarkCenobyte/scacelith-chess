@@ -673,7 +673,7 @@ reason.online.both_disconnected = Les deux joueurs se sont déconnectés
 online.notice.shutdown = Le serveur redémarre dans {0}. Les parties en cours sont sauvegardées.
 online.notice.revoked = Vous avez été déconnecté de ce serveur.
 online.notice.replaced = Votre compte s’est connecté depuis une autre fenêtre ; celle-ci est maintenant hors ligne.
-online.notice.rating_restored = Votre classement a été rétabli de {0} points : un adversaire a été banni pour triche.
+online.notice.rating_restored = Votre classement a été rétabli de {0} point : un adversaire a été banni pour triche.|Votre classement a été rétabli de {0} points : un adversaire a été banni pour triche.
 # Errors
 online.err.rate_limited_for = Trop de tentatives. Réessayez dans {0}.
 online.err.rate_limited = Trop de tentatives. Réessayez dans un instant.

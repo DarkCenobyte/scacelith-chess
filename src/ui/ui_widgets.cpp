@@ -1011,7 +1011,8 @@ void drawTip(const std::string& text, float fade, bool atMouse, const Rect& belo
 // The circled "i" after the label of the last form row (before it in a right-to-left layout), and
 // its tip while the mouse rests on the label or the mark (sooner on the mark), or after a moment
 // of keyboard focus. The mark and the label hover also work on a disabled row (they say why it
-// is off).
+// is off). One tip at a time: while the keyboard moves the focus (the mouse has not moved since),
+// only the focused row's; otherwise only the one under the mouse.
 void infoMark(const std::string& text) {
     const LastItem& li = c.last;
     const Rect& lb = li.label;
@@ -1023,8 +1024,9 @@ void infoMark(const std::string& text) {
     bool canHover = c.blockDepth == 0 && c.mouseInWindow && !c.mDown && gfx::clipContains(c.mouse);
     bool onMark = canHover && mark.contains(c.mouse);
     bool hot = canHover && (onMark || zone.contains(c.mouse));
+    bool hoverTip = hot && !c.kbMode;
     Anim& a = anim(li.id);
-    a.v[5] = hot ? a.v[5] + c.dt : 0.0f;
+    a.v[5] = hoverTip ? a.v[5] + c.dt : 0.0f;
     bool keyboard = c.kbMode && c.blockDepth == 0 && li.id == c.focus && li.highlight;
 
     float h = hot ? 1.0f : keyboard ? 0.6f : 0.0f;
@@ -1042,9 +1044,9 @@ void infoMark(const std::string& text) {
     }
     gfx::popAlpha();
 
-    float shown = hot ? a.v[5] - (onMark ? 0.1f : 0.35f) : keyboard ? li.highlightTime - 0.7f : -1.0f;
+    float shown = hoverTip ? a.v[5] - (onMark ? 0.1f : 0.35f) : keyboard ? li.highlightTime - 0.7f : -1.0f;
     if (shown < 0.0f) return;
-    drawTip(text, m::saturate(shown / 0.15f), hot, lb, true);
+    drawTip(text, m::saturate(shown / 0.15f), hoverTip, lb, true);
 }
 }  // namespace
 
@@ -1058,8 +1060,11 @@ void tooltip(const std::string& text) {
         }
         return;
     }
-    if (!c.last.highlight || c.last.highlightTime < 0.55f) return;
-    drawTip(text, m::saturate((c.last.highlightTime - 0.55f) / 0.15f), c.last.hovered, c.last.r, false);
+    // One tip at a time, as for the info marks: the focused item's while the keyboard leads, else
+    // the hovered one's.
+    bool owner = c.kbMode ? c.last.id == c.focus : c.last.hovered;
+    if (!owner || !c.last.highlight || c.last.highlightTime < 0.55f) return;
+    drawTip(text, m::saturate((c.last.highlightTime - 0.55f) / 0.15f), !c.kbMode, c.last.r, false);
 }
 
 int confirmDialog(const char* idStr, const std::string& title, const std::string& message, const std::string& confirmLabel,

@@ -139,8 +139,12 @@ private:
 };
 
 // The capacity a sender paces its Gestures with, for a receiver whose bucket is (gestureRate,
-// gestureBurst) (Welcome): one message less than the burst, so that a message the network delayed
-// after a full burst still finds a token at the receiver, which then never has to drop one.
+// gestureBurst) (Welcome): one message less than the burst. The sender's bucket counts departures
+// and the receiver's arrivals; the spare token covers network delays that vary by up to one
+// interval (1000 / gestureRate ms), within which the receiver never has to drop a Gesture. A
+// longer stall of the link delivers what was sent meanwhile in one bunch, and the receiver drops
+// the part beyond its burst, the latest state included: the next Gesture, at the latest the
+// scene's keepalive a second later (game/online_live.h), brings the whole state again.
 inline int gestureSendCapacity(int burst) { return burst > 1 ? burst - 1 : 1; }
 
 }  // namespace net

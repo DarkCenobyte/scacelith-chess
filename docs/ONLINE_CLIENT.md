@@ -50,11 +50,14 @@ frame is fine): the network layer keeps only the latest one and paces them.
 
 - Server games (`OnlineClient::sendGesture(gameId, g)`): the rate is the server's, from `Welcome`
   (`gestureRate` per second, bursts of `gestureBurst`; the server's `GESTURE_RATE` and
-  `GESTURE_BURST`). The client's own bucket holds one message less than the burst, so a message
-  the network delayed never finds the server's bucket empty. Nothing is sent when the rate is 0
-  (a server without the relay), while not `Online` (connecting, reconnecting, offline: a gesture
-  is never kept for the reconnection), or for another game than the one of the last
-  `GameSnapshot`. `C_Gesture` shares the message numbering of the other commands.
+  `GESTURE_BURST`). The client's own bucket holds one message less than the burst: the server
+  takes every gesture while the network delays vary by less than one interval (250 ms at the
+  defaults); after a longer stall it drops what arrives at once beyond its burst, the latest state
+  included, which the next gesture (at the latest the keepalive, a second later) brings back
+  (`net/gesture.h`). Nothing is sent when the rate is 0 (a server without the relay), while not
+  `Online` (connecting, reconnecting, offline: a gesture is never kept for the reconnection), or
+  for another game than the one of the last `GameSnapshot`. `C_Gesture` shares the message
+  numbering of the other commands.
 - Direct matches (`DirectMatch::sendGesture(g)`): the same, at the host's 10 per second, bursts of
   20 (`docs/DIRECT_MATCH.md`).
 - The opponent's gestures arrive as `OpponentGesture` events with `gesture` and `gameId` (`game`

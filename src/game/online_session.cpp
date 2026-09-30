@@ -507,7 +507,7 @@ void OnlineSession::update(float dt) {
         for (int guard = 0; guard < 256 && direct_->poll(e); ++guard) handleDirect(e);
     double restored = 0.0;
     if (ratingRestored_.take(inGame_, restored))
-        ui::notify(i18n::trf("online.notice.rating_restored", {std::to_string(std::lround(restored))}), 8.0f);
+        ui::notify(i18n::trn("online.notice.rating_restored", std::lround(restored)), 8.0f);
     // --start-online: queue as soon as the connection is up.
     if (!autoQueue_.empty() && signedIn_ && conn_ == net::ConnState::Online) {
         findOpponent(autoQueue_, true);

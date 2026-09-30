@@ -28,6 +28,10 @@ struct Settings {
     bool motionBlur = true;
     bool depthOfField = true;
     float brightness = 0.0f;      // exposure compensation (EV)
+    // The brightness calibration was completed (Continue or Esc on its page). Until then every
+    // start opens on it (screenshot runs excepted), however the previous runs ended. A settings
+    // file from before the calibration existed counts as completed.
+    bool brightnessCalibrated = false;
     // [audio]
     float masterVolume = 0.9f;
     float effectsVolume = 1.0f;
@@ -127,12 +131,13 @@ struct Settings {
     void applyLanguage();
 
     render::RenderSettings renderSettings() const;
-    bool load(const std::string& path);  // missing file = defaults
-    bool save() const;                   // writes back to the loaded path (or user data dir)
+    // The settings of 'path' (a missing file = defaults). For the default file next to the
+    // executable, save() falls back to the user data directory when that folder cannot be written
+    // (a read-only install), and load() reads the settings back from there when the file is
+    // missing. An explicit --ini file has no fallback: it is read and written there or not at all.
+    bool load(const std::string& path);
+    bool save() const;
     std::string path;
-    // Not saved: no settings file was found at start (first launch): the game shows the
-    // brightness calibration before the title page.
-    bool firstLaunch = false;
 };
 
 Settings& settings();

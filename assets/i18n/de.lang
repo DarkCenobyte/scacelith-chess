@@ -672,7 +672,7 @@ reason.online.both_disconnected = Beide Spieler getrennt
 online.notice.shutdown = Der Server startet in {0} neu. Laufende Partien werden gespeichert.
 online.notice.revoked = Sie wurden von diesem Server abgemeldet.
 online.notice.replaced = Ihr Konto hat sich aus einem anderen Fenster verbunden; dieses ist jetzt offline.
-online.notice.rating_restored = Ihre Wertung wurde um {0} Punkte wiederhergestellt: Ein Gegner wurde wegen Betrugs gesperrt.
+online.notice.rating_restored = Ihre Wertung wurde um {0} Punkt wiederhergestellt: Ein Gegner wurde wegen Betrugs gesperrt.|Ihre Wertung wurde um {0} Punkte wiederhergestellt: Ein Gegner wurde wegen Betrugs gesperrt.
 # Errors
 online.err.rate_limited_for = Zu viele Versuche. Versuchen Sie es in {0} erneut.
 online.err.rate_limited = Zu viele Versuche. Versuchen Sie es gleich erneut.

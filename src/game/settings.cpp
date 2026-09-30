@@ -22,23 +22,28 @@ render::RenderSettings Settings::renderSettings() const {
     return r;
 }
 
+namespace {
+// The fallback of a settings file, "" when it has none: the default file next to the executable
+// falls back to the user data directory (a read-only install); an explicit --ini file has none,
+// so its reads and writes never go to two different files.
+std::string fallbackFor(const std::string& p) {
+    if (!p.empty() && p != plat::exeDirectory() + "Scacelith.ini") return std::string();
+    std::string alt = plat::userDataDirectory() + "Scacelith.ini";
+    return alt != p ? alt : std::string();
+}
+}  // namespace
+
 bool Settings::load(const std::string& p) {
     path = p;
-    firstLaunch = false;
     IniFile ini;
     if (!ini.load(p)) {
-        // save() falls back to the user data directory when the executable's folder cannot be
-        // written (a read-only install): the settings are read back from there. 'path' stays the
-        // first choice of save(). An explicit --ini file has no fallback.
-        bool fallback = false;
-        if (p == plat::exeDirectory() + "Scacelith.ini") {
-            std::string alt = plat::userDataDirectory() + "Scacelith.ini";
-            fallback = alt != p && ini.load(alt);
-            if (fallback) LOGI("settings read from %s", alt.c_str());
-        }
-        if (!fallback) {
+        // Where save() wrote when p could not be written; 'path' stays its first choice.
+        std::string alt = fallbackFor(p);
+        if (!alt.empty() && ini.load(alt)) {
+            LOGI("settings read from %s", alt.c_str());
+        } else {
             LOGI("no settings file at %s, using defaults", p.c_str());
-            firstLaunch = true;  // the brightness calibration comes first
+            brightnessCalibrated = false;  // a first start: the brightness calibration comes first
             applyLanguage();
             return false;
         }
@@ -52,6 +57,8 @@ bool Settings::load(const std::string& p) {
     motionBlur = ini.getBool("graphics.motion_blur", motionBlur);
     depthOfField = ini.getBool("graphics.depth_of_field", depthOfField);
     brightness = ini.getFloat("graphics.brightness", brightness);
+    // Absent from a file written before the calibration existed: its player has chosen already.
+    brightnessCalibrated = ini.getBool("graphics.brightness_calibrated", true);
     masterVolume = ini.getFloat("audio.master_volume", masterVolume);
     effectsVolume = ini.getFloat("audio.effects_volume", effectsVolume);
     ambienceVolume = ini.getFloat("audio.ambience_volume", ambienceVolume);
@@ -207,6 +214,7 @@ bool Settings::save() const {
     ini.setBool("graphics.motion_blur", motionBlur);
     ini.setBool("graphics.depth_of_field", depthOfField);
     ini.setFloat("graphics.brightness", brightness);
+    ini.setBool("graphics.brightness_calibrated", brightnessCalibrated);
     ini.setFloat("audio.master_volume", masterVolume);
     ini.setFloat("audio.effects_volume", effectsVolume);
     ini.setFloat("audio.ambience_volume", ambienceVolume);
@@ -278,9 +286,9 @@ bool Settings::save() const {
     ini.set("player.name", playerName);
     ini.setInt("player.hand_style", int(handStyle));
     if (!path.empty() && ini.save(path)) return true;
-    std::string alt = plat::userDataDirectory() + "Scacelith.ini";
-    if (ini.save(alt)) return true;
-    LOGW("could not save settings");
+    std::string alt = fallbackFor(path);
+    if (!alt.empty() && ini.save(alt)) return true;
+    LOGW("could not save settings to %s", path.empty() ? alt.c_str() : path.c_str());
     return false;
 }
 

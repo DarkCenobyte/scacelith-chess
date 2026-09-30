@@ -672,7 +672,7 @@ reason.online.both_disconnected = Ambos jugadores se desconectaron
 online.notice.shutdown = El servidor se reinicia en {0}. Las partidas en curso se guardan.
 online.notice.revoked = Se ha cerrado su sesión en este servidor.
 online.notice.replaced = Su cuenta se ha conectado desde otra ventana; esta queda desconectada.
-online.notice.rating_restored = Su puntuación se ha restablecido en {0} puntos: un rival fue expulsado por hacer trampas.
+online.notice.rating_restored = Su puntuación se ha restablecido en {0} punto: un rival fue expulsado por hacer trampas.|Su puntuación se ha restablecido en {0} puntos: un rival fue expulsado por hacer trampas.
 # Errors
 online.err.rate_limited_for = Demasiados intentos. Vuelva a intentarlo en {0}.
 online.err.rate_limited = Demasiados intentos. Vuelva a intentarlo en un momento.

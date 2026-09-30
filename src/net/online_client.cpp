@@ -26,9 +26,10 @@
 //     backoff.
 //   - Gestures (sendGesture, net/gesture.h) follow Welcome.gestureRate / gestureBurst, the
 //     server's relay bucket: only the latest one waits, and it goes when a token of a bucket one
-//     message smaller than the server's allows (none when the rate is 0), so the server never has
-//     to drop one. A Gesture made while the connection is down, or for another game than the one
-//     of the last GameSnapshot, is dropped: the next one carries the whole state again.
+//     message smaller than the server's allows (none when the rate is 0): the server then drops
+//     none unless a stall of the link delivers more than its burst at once (gestureSendCapacity).
+//     A Gesture made while the connection is down, or for another game than the one of the last
+//     GameSnapshot, is dropped: the next one carries the whole state again.
 //
 // Keeping the realtime connection on its own thread means a slow HTTPS call (or a proof of
 // work) never delays the answer to a server Ping or the sending of a move. The game thread only

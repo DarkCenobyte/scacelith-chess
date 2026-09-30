@@ -80,11 +80,15 @@ then, whatever the router does. What works instead:
 
 ## The game
 
-The host's game applies the same rules as the dedicated server (`dedicated-server/docs/DESIGN.md`
-6.1 to 6.4), unrated:
+The host's game applies the rules of the dedicated server (`dedicated-server/docs/DESIGN.md`
+6.1 to 6.4) in a simplified, unrated form, with its own values below and no credit for stalls of
+the host itself:
 
 - Each player has 60 s for their first move (no clock runs for plies 0 and 1); otherwise the game
-  is aborted. The clocks start with White's second move; Fischer increment afterwards.
+  is aborted. As on the server, the guest's first move has the margin of its flag (the lag
+  compensation bound of the next point, beyond the 60 s its countdown shows), so a move made at
+  the countdown's last instant still counts. The clocks start with White's second move; Fischer
+  increment afterwards.
 - The host measures time. The guest's moves get a small network lag compensation: at most
   min(round trip / 2 + 30 ms, 500 ms) per move, from a 2 s budget (+100 ms per move). A move
   arriving after the flag is refused and the game is lost on time (drawn when the opponent cannot
@@ -116,13 +120,18 @@ before the clock press, the head; `src/net/gesture.h`) are cosmetic and go strai
 player, never through the authority nor the command queue: the host sends `S_Gesture`, the guest
 `C_Gesture` (numbered with its other messages). The host's `Welcome` announces the bucket each
 side receives with: `gestureRate` 10 per second, `gestureBurst` 20. `DirectMatch::sendGesture()`
-keeps only the latest gesture and sends it when a bucket one smaller than that (19) allows, so
-the receiver never has to drop one; nothing is kept while the link is down and nothing made then
-is sent after the reconnection. The host checks the guest's gestures with a bucket of its own
-(one beyond the rate, or for another game than the current one, is dropped) and they never count
-towards the flood limit (more than 40 other messages within a second close the guest's link). A gesture
-received becomes an `OpponentGesture` event of that game (the latest one replaces one still
-waiting to be polled); neither side ever echoes its own.
+keeps only the latest gesture and sends it when a bucket one smaller than that (19) allows;
+nothing is kept while the link is down and nothing made then is sent after the reconnection. The
+link takes gestures again before the game hears that the other player is there (the snapshot,
+`Online` after a reconnection), so the first gesture sent on that news is never dropped. The host
+checks the guest's gestures with a bucket of its own (one beyond the rate, or for another game
+than the current one, is dropped) and they never count towards the flood limit (more than 40
+other messages within a second close the guest's link). The guest's spare token covers network
+delays that vary by up to 100 ms; a longer stall of the link can deliver more at once than the
+host's bucket holds, and the host drops the excess, the latest state included, until the next
+gesture (at the latest the keepalive, a second later) brings it back. A gesture received becomes
+an `OpponentGesture` event of that game (the latest one replaces one still waiting to be polled);
+neither side ever echoes its own.
 
 ## Security design
 
@@ -206,10 +215,13 @@ limit).
 URLs, chunked HTTP, 718 and 725 policies, errors, foreign control URLs refused), crypto vectors
 (SHA-256, HMAC RFC 4231, HKDF RFC 5869, AES-GCM, ECDH RFC 5903), channel failures (wrong code, bad
 hello, tampered, replayed, reordered, truncated and oversize frames), the authority with synthetic
-time (clocks, lag compensation, flags, first-move timeout, draws, claims, abort, grace, rematch,
-`autoPress` in every snapshot), and full matches between two `DirectMatch` on 127.0.0.1
+time (clocks, lag compensation, flags, first-move timeout and its margin for the guest, draws,
+claims, abort, grace, rematch, `autoPress` in every snapshot), and full matches between two
+`DirectMatch` on 127.0.0.1
 (castling, en passant, promotion, a draw offer declined by a move, resignation, rematch, wrong
 code, reconnection through a relay that cuts the connection, the host vanishing, a flag with a
 1 s clock, leaving; `autoPress` off through a rematch, gestures both ways and their pacing, none
-replayed after a reconnection) and a guest written by hand (`Welcome`'s gesture values, 100
-gestures at once without tripping the flood limit, the host keeping its bucket's worth).
+replayed after a reconnection), a guest written by hand (`Welcome`'s gesture values, 100
+gestures at once without tripping the flood limit, the host keeping its bucket's worth) and a host
+written by hand (a guest's gesture sent the moment it is back online after a reconnection
+arrives).

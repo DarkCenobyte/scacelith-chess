@@ -133,6 +133,14 @@ double Authority::flagTime() const {
     return turnStart_ + double(remaining_[running_]) + allowance;
 }
 
+double Authority::firstMoveTime() const {
+    // The same margin as a flag (DESIGN 6.1), so that a first move the guest sent in time counts;
+    // firstMoveDeadline_ itself, which the clients count down to, has none.
+    const int c = plies() & 1;
+    double allowance = c == colorOf(GuestSide) ? std::min(quota_[c], compBound()) : 0.0;
+    return firstMoveDeadline_ + allowance;
+}
+
 bool Authority::canOffer(int color) const {
     return drawOffers_[color] < cfg_.drawOffersPerGame && plies() - declinedAtPly_[color] >= cfg_.drawOfferCooldownPlies;
 }
@@ -496,7 +504,7 @@ void Authority::tick(double now, Output& out) {
     if (!started_) return;
     if (!isOver()) {
         const int n = plies();
-        if (n < 2 && now >= firstMoveDeadline_) {
+        if (n < 2 && now >= firstMoveTime()) {
             finish(int(P::GameStatus::Aborted), int(P::EndReason::NoShow), now, out);
             return;
         }
@@ -522,7 +530,7 @@ double Authority::nextDeadline() const {
     if (!started_) return kInf;
     if (isOver()) return rematchOpen_ ? rematchDeadline_ : kInf;
     double d = graceDeadline_;
-    if (plies() < 2) d = std::min(d, firstMoveDeadline_);
+    if (plies() < 2) d = std::min(d, firstMoveTime());
     return std::min(d, flagTime());
 }
 

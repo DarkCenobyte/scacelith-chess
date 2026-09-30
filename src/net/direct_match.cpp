@@ -429,7 +429,9 @@ protected:
         events.push_back(std::move(ev));
     }
     // The link to the other player came up (paced for the receiver's bucket of rate / burst) or
-    // went down (the Gesture waiting is dropped: none is kept for the reconnection).
+    // went down (the Gesture waiting is dropped: none is kept for the reconnection). It comes up
+    // before any event that tells the game thread the other player is there (the snapshot,
+    // Online), so the first Gesture the game thread sends on that news is never dropped.
     void gestureLinkUp(int rate, int burst) {
         std::lock_guard<std::mutex> lk(m);
         gestureBucket_.reset(double(sock::steadyMs()), rate, gestureSendCapacity(burst));
@@ -787,8 +789,8 @@ private:
         std::vector<uint8_t> buf;
         P::encode(w, buf);
         guest_->send(buf);   // before the snapshot in 'out'
+        gestureLinkUp(kGestureRate, kGestureBurst);   // the host's Gestures still go after the snapshot
         dispatch(out);
-        gestureLinkUp(kGestureRate, kGestureBurst);
         LOGI("direct: guest \"%s\" %s", auth_->guestName().c_str(), first ? "joined" : "reconnected");
         if (first) {
             setState(DirectMatch::State::Playing);
@@ -1214,13 +1216,13 @@ private:
             clockOffset = offset_;
         }
         nextPing_ = now;
+        gestureLinkUp(w.gestureRate, w.gestureBurst);
         if (first) setState(DirectMatch::State::Playing);
         connectionEvent(ConnState::Online);
         LOGI("direct: %s the match of \"%s\"", first ? "joined" : "rejoined", w.serverName.c_str());
         // Actions made while the link was down go now (the host answers them after the snapshot).
         for (auto& c : queued_) sendCommand(c);
         queued_.clear();
-        gestureLinkUp(w.gestureRate, w.gestureBurst);
     }
 
     void sendCommand(const Command& c) {
