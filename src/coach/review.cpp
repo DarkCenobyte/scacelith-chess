@@ -403,6 +403,14 @@ ai::AnalysisRequest Reviewer::afterRequest(const Game& g) const {
     return r;
 }
 
+ai::AnalysisRequest Reviewer::shallowRequest(const Game& g) const {
+    ai::AnalysisRequest r = requestAt(g, g.moves().size());
+    r.multiPV = 1;
+    r.depth = 6;
+    r.moveTimeMs = 0;
+    return r;
+}
+
 Script Reviewer::announce(const Game& g) {
     Script s;
     if (g.moves().empty()) return s;

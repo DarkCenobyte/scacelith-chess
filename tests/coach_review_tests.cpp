@@ -669,6 +669,25 @@ TEST(coach_review_praise_only_top_moves) {
         CHECK(!r.verdict.praised);
         for (const std::string& k : keysOf(r.script)) CHECK(!startsWith(k, "praise."));
     }
+    // Level 3: a quiet best move is praised only when a shallow search (A3) would have missed it.
+    {
+        const ai::Analysis a0 = analysisOf({pvl(30, "e2e4 e7e5"), pvl(25, "d2d4 d7d5")});
+        ai::Analysis shallow = analysisOf({pvl(40, "g1f3 d7d5")});
+        for (bool tricky : {false, true}) {
+            Game g = gameOf(nullptr, {"e4"});
+            Reviewer rv;
+            rv.reset(3, White);
+            ReviewInput in;
+            in.game = &g;
+            in.before = &a0;
+            if (tricky) in.shallow = &shallow;
+            Review r = rv.review(in);
+            CHECK_EQ(r.verdict.cls, MoveClass::Best);
+            CHECK_EQ(r.verdict.praised, tricky);
+            if (tricky) CHECK(hasKey(r.script, "praise.excellent.b3"));
+            checkScript(r.script, "praise excellent");
+        }
+    }
     // Across every level and every scenario of this file, praise comes only with top classes.
     for (int level = 1; level <= 6; ++level) {
         Reviewer rv;
@@ -858,6 +877,10 @@ TEST(coach_review_requests) {
     CHECK_EQ(a1.depth, before.depth);
     ai::AnalysisRequest a2 = rv.afterRequest(g);
     CHECK_EQ(a2.moves.size(), size_t(4));
+    ai::AnalysisRequest a3 = rv.shallowRequest(g);
+    CHECK_EQ(a3.moves.size(), size_t(4));
+    CHECK_EQ(a3.depth, 6);
+    CHECK_EQ(a3.multiPV, 1);
     // A custom start position is sent as a FEN.
     Game c = gameOf(kHangFen, {"Nd5"});
     CHECK_EQ(rv.beforeRequest(c).startFen, std::string(kHangFen));

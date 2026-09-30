@@ -164,6 +164,9 @@ public:
     ai::AnalysisRequest playedRequest(const chess::Game& g, const ai::Analysis& before) const;
     // ...and A2 (optional) on the position after the move, for a refutation longer than A0's PV.
     ai::AnalysisRequest afterRequest(const chess::Game& g) const;
+    // A3 (optional, levels 3-4): a shallow search (depth 6) of A0's root, requested with A0. When its
+    // move differs from the engine's best, the best move is "not easy to see" (praise at levels 3-4).
+    ai::AnalysisRequest shallowRequest(const chess::Game& g) const;
 
     // Right after any move is completed (either side): "Check!", "Checkmate!" (Urgent beats).
     Script announce(const chess::Game& g);
