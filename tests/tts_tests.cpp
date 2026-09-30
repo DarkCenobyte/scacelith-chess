@@ -1386,6 +1386,12 @@ TEST(tts_synthesizer_output) {
     // Deterministic for a seed; another seed gives another rendition.
     std::vector<float> b = s->synthesize("Good move. Now the knight goes to f3.", "en", o);
     CHECK(a == b);
+    // The same samples for any thread count (the work is split without changing any sum).
+    for (int threads : {1, 3}) {
+        tts::Options ot = o;
+        ot.threads = threads;
+        CHECK(s->synthesize("Good move. Now the knight goes to f3.", "en", ot) == a);
+    }
     o.seed = 99;
     std::vector<float> c = s->synthesize("Good move. Now the knight goes to f3.", "en", o);
     CHECK(c != a);
