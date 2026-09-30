@@ -3,6 +3,8 @@
 #include "../chess/chess.h"
 #include "../core/log.h"
 #include "../math/math.h"
+#include "../net/protocol_gen.h"
+#include "layout.h"
 #include <algorithm>
 #include <cctype>
 #include <chrono>
@@ -20,6 +22,7 @@ namespace {
 bool g_virtual = false;
 double g_virtualMs = 1790596800000.0;  // 2026-09-28 12:00 UTC
 int g_opponentDrop = 0, g_connectionDrop = 0;  // pending developer requests (seconds)
+bool g_manualClock = false;                    // --online-manual-clock: games with autoPress off
 
 double wallMs() {
     using namespace std::chrono;
@@ -127,6 +130,24 @@ struct Room {
     std::function<void(Room&)> onEnd;        // ratings, bookkeeping
     std::function<void(Room&)> onRematch;    // both players want a rematch
 
+    // The fake's next move, chosen when its turn begins, and the way its hand goes there.
+    struct Plan {
+        uint16_t move = 0;
+        double touchAt = -1, hesitateAt = -1, aimAt = -1, promoAt = -1;  // oppMoveAt = on the board
+        int hesitateSq = Gesture::kNoSquare;  // aimed at first, sometimes
+        double pressMs = 0;                   // autoPress off: from the board to the clock press
+    } plan;
+    double pressAt = -1;              // autoPress off: the move is on the board, pressed then
+    // Its live gestures (net/gesture.h), from a random stream of their own so that they never
+    // change the game's.
+    m::Rng looks;
+    Gesture sent;                     // the last one emitted
+    bool sentAny = false;
+    int idlePly = 0;                  // plies played when its hand became empty
+    double nextLookAt = 0, nextFocusAt = 0, clockLookUntil = 0, glanceUntil = 0;
+    int focus = 27;                   // the square its eyes rest on
+    float headYaw = 0.0f, headPitch = -0.6f, headLean = 0.0f;
+
     int opp() const { return 1 - me; }
     int toMove() const { return int(chess.position().sideToMove()); }
     int64_t& ms(int c) { return c == 0 ? g.whiteMs : g.blackMs; }
@@ -176,12 +197,14 @@ struct Room {
         g.rematchBy = 2;
         firstDeadline = now + kFirstMoveMs;
         chess.reset();
+        looks.seedWith(g.id);
         sendSnapshot();
         schedule(now);
     }
 
     void schedule(double now) {
-        oppMoveAt = -1;
+        oppMoveAt = pressAt = -1;
+        plan = Plan();
         if (over || toMove() != opp()) return;
         int ply = int(g.moves.size());
         double t;
@@ -196,6 +219,134 @@ struct Room {
             t = std::min(t, std::max(150.0, left * 0.5));
         }
         oppMoveAt = now + t;
+        planMove(now, t);
+    }
+
+    // The move of the fake's turn and its gestures: the piece touched 0.4-1.3 s before the move
+    // reaches the board, in 35% of the moves aimed at another square first, aimed at its own
+    // 250-400 ms before (the promotion picker just before a promotion); autoPress off: the clock
+    // is pressed 0.6-1.0 s after the move (never so late that the flag falls for it).
+    void planMove(double now, double t) {
+        plan.move = chooseMove();
+        if (!plan.move) return;
+        const int from = moveFrom(plan.move), to = moveTo(plan.move);
+        const double touchLead = std::min(double(looks.range(400.0f, 1300.0f)), std::max(0.0, t - 100.0));
+        const double aimLead = std::min(double(looks.range(250.0f, 400.0f)), touchLead * 0.5);
+        plan.touchAt = oppMoveAt - touchLead;
+        plan.aimAt = oppMoveAt - aimLead;
+        if (movePromo(plan.move) != 0) plan.promoAt = oppMoveAt - aimLead * 0.4;
+        if (touchLead - aimLead >= 250.0 && looks.uniform() < 0.35f) {
+            std::vector<int> others;
+            for (const chess::Move& mv : chess.position().legalMoves())
+                if (int(mv.from) == from && int(mv.to) != to) others.push_back(int(mv.to));
+            if (!others.empty()) {
+                plan.hesitateSq = others[size_t(looks.rangeInt(0, int(others.size()) - 1))];
+                plan.hesitateAt = plan.touchAt + (plan.aimAt - plan.touchAt) * double(looks.range(0.15f, 0.45f));
+            }
+        }
+        plan.pressMs = looks.range(600.0f, 1000.0f);
+        if (g.moves.size() >= 2) {
+            const double left = double(ms(opp())) - std::max(0.0, now - g.serverTimeMs) - t;
+            plan.pressMs = std::min(plan.pressMs, std::max(0.0, left * 0.5));
+        }
+    }
+
+    // The planned move reaches the board (autoPress) or the clock is pressed (autoPress off).
+    void oppMoves(double now) {
+        const bool pressed = pressAt >= 0;
+        pressAt = -1;
+        play(opp(), int(g.moves.size()), plan.move, 0, false, now);
+        idlePly = int(g.moves.size());
+        clockLookUntil = pressed ? now + double(looks.range(450.0f, 750.0f)) : now;
+        glanceUntil = clockLookUntil + double(looks.range(1800.0f, 2200.0f));
+        nextLookAt = now;
+    }
+
+    // What the fake has in hand at 'now' (touch, aim, placed, Promoting) and the ply of that state.
+    Gesture hand(double now) const {
+        Gesture h;
+        h.ply = idlePly;
+        if (toMove() != opp() || plan.move == 0 || now < plan.touchAt) return h;
+        h.ply = int(g.moves.size());
+        h.touch = moveFrom(plan.move);
+        if (pressAt >= 0) {
+            h.aim = moveTo(plan.move);
+            h.placed = plan.move;
+            return h;
+        }
+        if (now >= plan.aimAt) h.aim = moveTo(plan.move);
+        else if (plan.hesitateAt >= 0 && now >= plan.hesitateAt) h.aim = plan.hesitateSq;
+        if (plan.promoAt >= 0 && now >= plan.promoAt) h.flags = proto::GestureFlag::Promoting;
+        return h;
+    }
+
+    // A point of the table as the fake sees it from its seat: every player sees the table as
+    // White does (seated at +Z, facing -Z), with its clock on its right (+X).
+    m::vec3 seatSquare(int sq) const {
+        m::vec3 p = layout::squareCenter(sq);
+        return opp() == 0 ? p : m::vec3(-p.x, p.y, -p.z);
+    }
+    static void lookAt(const m::vec3& p, float& yaw, float& pitch) {
+        const float dx = p.x, dy = p.y - layout::EYE_HEIGHT, dz = p.z - layout::PLAYER_PELVIS_Z;
+        yaw = std::atan2(-dx, -dz);   // > 0 to the left
+        pitch = std::atan2(dy, std::sqrt(dx * dx + dz * dz));
+    }
+    // A square its eyes rest on for a while: a piece that can move, or where it could go (its own
+    // while it thinks, the local player's while it waits), now and then its planned move.
+    int pickFocus() {
+        if (plan.move && looks.uniform() < 0.25f) return looks.uniform() < 0.5f ? moveFrom(plan.move) : moveTo(plan.move);
+        const std::vector<chess::Move> legal = chess.position().legalMoves();
+        if (legal.empty()) return focus;
+        const chess::Move& mv = legal[size_t(looks.rangeInt(0, int(legal.size()) - 1))];
+        return looks.uniform() < 0.6f ? int(mv.from) : int(mv.to);
+    }
+
+    // The fake's gesture: at once when its hand changes, otherwise at 4-6 Hz for its head, which
+    // turns towards the piece in hand (then where it is aimed), its clock after pressing it, its
+    // scoresheet after a move, or wanders over the board; it leans in while it thinks.
+    void gestures(double now) {
+        if (oppAway) return;
+        Gesture h = hand(now);
+        const bool changed = !sentAny || h.ply != sent.ply || h.touch != sent.touch || h.aim != sent.aim || h.placed != sent.placed ||
+                             (h.flags & proto::GestureFlag::Promoting) != (sent.flags & proto::GestureFlag::Promoting);
+        if (!changed && now < nextLookAt) return;
+        const bool thinking = toMove() == opp();
+        m::vec3 target;
+        float leanTo = 0.2f;
+        if (h.touch != Gesture::kNoSquare) {
+            target = seatSquare(h.aim != Gesture::kNoSquare ? h.aim : h.touch);
+            leanTo = 0.6f;
+        } else if (now < clockLookUntil) {
+            target = m::vec3(layout::CLOCK_OFFSET_X, layout::TABLE_TOP_Y + layout::CLOCK_HEIGHT, layout::CLOCK_Z);
+            h.flags |= proto::GestureFlag::Side;
+        } else if (now < glanceUntil) {
+            target = m::vec3(-layout::SCORESHEET_X, layout::TABLE_TOP_Y, layout::SCORESHEET_Z);
+            h.flags |= proto::GestureFlag::Glance | proto::GestureFlag::Side;
+        } else {
+            if (now >= nextFocusAt) {
+                focus = pickFocus();
+                nextFocusAt = now + double(looks.range(700.0f, 1600.0f));
+            }
+            target = seatSquare(focus);
+            leanTo = thinking ? 0.6f : 0.25f;
+        }
+        float yaw, pitch;
+        lookAt(target, yaw, pitch);
+        headYaw += (yaw - headYaw) * 0.6f + looks.range(-0.015f, 0.015f);
+        headPitch += (pitch - headPitch) * 0.6f + looks.range(-0.01f, 0.01f);
+        headLean += (leanTo - headLean) * 0.12f;
+        h.yaw = headYaw;
+        h.pitch = headPitch;
+        h.lean = headLean;
+        Event e;
+        e.kind = Event::Kind::OpponentGesture;
+        e.ok = true;
+        e.gameId = g.id;
+        e.gesture = h;
+        emit(e, kOneWay);
+        sent = h;
+        sentAny = true;
+        nextLookAt = now + double(looks.range(167.0f, 250.0f));
     }
 
     uint16_t chooseMove() {
@@ -367,7 +518,15 @@ struct Room {
             }
             if (!oppAway && oppMoveAt >= 0 && now >= oppMoveAt && toMove() == opp()) {
                 oppMoveAt = -1;
-                play(opp(), int(g.moves.size()), chooseMove(), 0, false, now);
+                if (g.autoPress) {
+                    oppMoves(now);
+                    if (over) return;
+                } else {
+                    pressAt = now + plan.pressMs;
+                }
+            }
+            if (!oppAway && pressAt >= 0 && now >= pressAt && toMove() == opp()) {
+                oppMoves(now);
                 if (over) return;
             }
             if (drawAnswerAt >= 0 && now >= drawAnswerAt) {
@@ -389,6 +548,7 @@ struct Room {
                     event(DrawDeclined, opp(), 0);
                 }
             }
+            gestures(now);
             return;
         }
         if (now > rematchExpires) {
@@ -520,6 +680,8 @@ uint32_t digest(const std::string& fen) {
 
 void opponentDrop(int seconds) { g_opponentDrop = std::max(1, seconds); }
 void connectionDrop(int seconds) { g_connectionDrop = std::max(1, seconds); }
+void useManualClock(bool on) { g_manualClock = on; }
+bool manualClock() { return g_manualClock; }
 
 // =============================================================================================
 // FakeServer
@@ -662,6 +824,7 @@ struct FakeServer::Impl {
         r.g.white = me == 0 ? you : them;
         r.g.black = me == 0 ? them : you;
         r.g.you = me;
+        r.g.autoPress = !g_manualClock;
         r.start(lastNow);
         LOGI("mock server: game %llu, %s %s, you play %s against %s", (unsigned long long)r.g.id, cat.c_str(), rated ? "rated" : "casual",
              me == 0 ? "White" : "Black", oppName.c_str());
@@ -878,8 +1041,8 @@ void FakeServer::fetchServerInfo() {
     s.name = contains(I.ep.host, "official") ? "Scacelith" : "Scacelith (mock server)";
     s.serverId = "mock-" + lower(I.ep.host);
     s.motd = "A local stand-in for the real server: every password works, and your opponents play at random.";
-    s.protocolMin = 1;
-    s.protocolMax = I.hostHas("old") ? 0 : 1;
+    s.protocolMin = proto::kProtocolMin;
+    s.protocolMax = I.hostHas("old") ? proto::kProtocolMin - 1 : proto::kProtocolVersion;
     s.compatible = !I.hostHas("old");
     s.wsPort = I.ep.wsPort ? I.ep.wsPort : I.ep.apiPort;
     s.registrationOpen = true;
@@ -1218,6 +1381,7 @@ void FakeServer::rematch(uint64_t id, bool accept) {
     I.lastNow = nowMs();
     if (I.room && I.room->g.id == id) I.room->rematch(accept, I.lastNow);
 }
+void FakeServer::sendGesture(uint64_t, const Gesture&) {}   // the fake opponent does not watch
 const OnlineGame* FakeServer::currentGame() const { return impl_->hasDelivered ? &impl_->delivered : nullptr; }
 
 bool FakeServer::poll(Event& out) {
@@ -1297,6 +1461,7 @@ struct FakeDirect::Impl {
         r.g.white = me == 0 ? you : them;
         r.g.black = me == 0 ? them : you;
         r.g.you = me;
+        r.g.autoPress = !g_manualClock && (!host || opt.autoPress);   // the host's choice
         r.start(lastNow);
     }
     void tick(double now) {
@@ -1421,6 +1586,7 @@ void FakeDirect::claimDraw() { if (impl_->room) impl_->room->claimDraw(nowMs());
 void FakeDirect::abortGame() { if (impl_->room) impl_->room->abort(nowMs()); }
 void FakeDirect::requestResync() { if (impl_->room) impl_->room->sendSnapshot(); }
 void FakeDirect::rematch(bool accept) { if (impl_->room) impl_->room->rematch(accept, nowMs()); }
+void FakeDirect::sendGesture(const Gesture&) {}   // the fake friend does not watch
 const OnlineGame* FakeDirect::currentGame() const { return impl_->hasDelivered ? &impl_->delivered : nullptr; }
 int FakeDirect::pingMs() const { return impl_->state == DirectMatch::State::Playing ? 12 : -1; }
 double FakeDirect::serverNowMs() const { return nowMs(); }

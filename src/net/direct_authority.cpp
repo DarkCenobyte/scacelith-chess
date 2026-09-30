@@ -205,6 +205,7 @@ void Authority::sendSnapshot(Side side, double now, Output& out) {
     s.firstMoveMs = !over && plies() < 2 ? u32ms(int64_t(firstMoveDeadline_ - now)) : 0;
     s.startedAt = startedAt_;
     s.rematch = P::Color(rematchBy_);
+    s.autoPress = cfg_.autoPress;
     emit(out, side, s);
 }
 

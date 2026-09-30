@@ -4,9 +4,11 @@
 //   - the menus (ui/ui_screens_online*.cpp) read its state (server info, account, connection,
 //     matchmaking, challenges) and send commands through api() / direct();
 //   - the 3D scene plays the games it announces (gameReady() / takeGame()) through a GameLink and
-//     drains their events with nextGameEvent().
+//     drains their events with nextGameEvent(), the opponent's live gestures (OpponentGesture)
+//     included: only those of the game being played, the latest one replacing one still queued.
 // With --online-mock the in-process fakes of online_mock.h replace the network layer (builds
-// without it use them anyway, see online_stub.cpp). Tokens never pass through here: the
+// without it use them anyway, see online_stub.cpp); --online-manual-clock then makes their games
+// autoPress = false (the moves wait for a clock press). Tokens never pass through here: the
 // network layer stores them per server.
 #pragma once
 #include "../net/direct_match.h"
@@ -65,6 +67,7 @@ public:
     virtual void abortGame(uint64_t gameId) = 0;
     virtual void requestResync(uint64_t gameId) = 0;
     virtual void rematch(uint64_t gameId, bool accept) = 0;
+    virtual void sendGesture(uint64_t gameId, const net::Gesture& g) = 0;
     virtual bool poll(net::Event& out) = 0;
 };
 
@@ -88,6 +91,7 @@ public:
     virtual void abortGame() = 0;
     virtual void requestResync() = 0;
     virtual void rematch(bool accept) = 0;
+    virtual void sendGesture(const net::Gesture& g) = 0;
     virtual int pingMs() const = 0;
     virtual double serverNowMs() const = 0;
     virtual bool poll(net::Event& out) = 0;
@@ -211,6 +215,7 @@ private:
     std::unique_ptr<ServerApi> api_;
     std::unique_ptr<DirectApi> direct_;
     bool directUsed_ = false;
+    net::ConnState directConn_ = net::ConnState::Offline;   // of the direct match (a guest reconnects)
 
     bool infoKnown_ = false;
     bool testing_ = false, testSwitched_ = false, testDone_ = false;

@@ -27,8 +27,10 @@ public:
     virtual void abortGame() = 0;
     virtual void requestResync() = 0;
     virtual void rematch(bool accept) = 0;
-    // Live gestures for the opponent's robot (cosmetic, rate-limited by the network layer).
-    virtual void sendGesture(const net::Gesture& g) { (void)g; }
+    // Live gestures of the local player for the opponent's robot (net/gesture.h): cosmetic, only
+    // the latest one is kept and the network layer paces them, so it may be called every frame.
+    // The opponent's come back as OpponentGesture events of this game.
+    virtual void sendGesture(const net::Gesture& g) = 0;
     // Report the opponent (server games only): category "cheating", "abuse" or "other".
     virtual bool canReport() const = 0;
     virtual void report(const std::string& username, const std::string& category, const std::string& comment) = 0;

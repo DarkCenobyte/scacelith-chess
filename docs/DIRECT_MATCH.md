@@ -102,9 +102,27 @@ The host's game applies the same rules as the dedicated server (`dedicated-serve
   ends as *aborted by the server* on the guest's side.
 - **Leaving** a running game (either side) resigns it, as online.
 - **Rematch** within 60 s after the end, colours swapped, when both accept.
+- **Clock presses**: whether the robots press the clock by themselves is the host's choice
+  (`DirectHostOptions::autoPress`, on by default). It is in every `GameSnapshot`
+  (`OnlineGame::autoPress`), the first one, after a reconnection or a resync, and in every
+  rematch, for both players. When it is off, each player's move is sent when they press the
+  clock, so their clock runs until then.
 
 Players appear as user 1 (host) and 2 (guest) with the names they chose, no rating, category
 "custom".
+
+**Gestures.** The players' live gestures (the piece in hand, where it is aimed, the move put down
+before the clock press, the head; `src/net/gesture.h`) are cosmetic and go straight to the other
+player, never through the authority nor the command queue: the host sends `S_Gesture`, the guest
+`C_Gesture` (numbered with its other messages). The host's `Welcome` announces the bucket each
+side receives with: `gestureRate` 10 per second, `gestureBurst` 20. `DirectMatch::sendGesture()`
+keeps only the latest gesture and sends it when a bucket one smaller than that (19) allows, so
+the receiver never has to drop one; nothing is kept while the link is down and nothing made then
+is sent after the reconnection. The host checks the guest's gestures with a bucket of its own
+(one beyond the rate, or for another game than the current one, is dropped) and they never count
+towards the flood limit (more than 40 other messages within a second close the guest's link). A gesture
+received becomes an `OpponentGesture` event of that game (the latest one replaces one still
+waiting to be polled); neither side ever echoes its own.
 
 ## Security design
 
@@ -167,6 +185,7 @@ Limits, accepted for a friendly unrated game:
 | connect (per resolved address) | 5 s |
 | handshake, then Hello -> Welcome | 10 s each |
 | ping (both directions, measures the round trip and the host clock) | every 2 s |
+| gestures, each way | 10 per second, bursts of 20 (the sender paces for 19) |
 | link considered dead without any data | 10 s |
 | first move of each player | 60 s |
 | guest disconnection grace | 60 s |
@@ -187,7 +206,10 @@ limit).
 URLs, chunked HTTP, 718 and 725 policies, errors, foreign control URLs refused), crypto vectors
 (SHA-256, HMAC RFC 4231, HKDF RFC 5869, AES-GCM, ECDH RFC 5903), channel failures (wrong code, bad
 hello, tampered, replayed, reordered, truncated and oversize frames), the authority with synthetic
-time (clocks, lag compensation, flags, first-move timeout, draws, claims, abort, grace, rematch),
-and full matches between two `DirectMatch` on 127.0.0.1 (castling, en passant, promotion, a draw
-offer declined by a move, resignation, rematch, wrong code, reconnection through a relay that cuts
-the connection, the host vanishing, a flag with a 1 s clock, leaving).
+time (clocks, lag compensation, flags, first-move timeout, draws, claims, abort, grace, rematch,
+`autoPress` in every snapshot), and full matches between two `DirectMatch` on 127.0.0.1
+(castling, en passant, promotion, a draw offer declined by a move, resignation, rematch, wrong
+code, reconnection through a relay that cuts the connection, the host vanishing, a flag with a
+1 s clock, leaving; `autoPress` off through a rematch, gestures both ways and their pacing, none
+replayed after a reconnection) and a guest written by hand (`Welcome`'s gesture values, 100
+gestures at once without tripping the flood limit, the host keeping its bucket's worth).

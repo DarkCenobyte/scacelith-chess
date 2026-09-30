@@ -1,6 +1,7 @@
 #include "online_session.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
+#include "../platform/platform.h"
 #include "../ui/ui.h"
 #include "online_mock.h"
 #include "settings.h"
@@ -67,6 +68,7 @@ public:
     void abortGame(uint64_t id) override { c_->abortGame(id); }
     void requestResync(uint64_t id) override { c_->requestResync(id); }
     void rematch(uint64_t id, bool accept) override { c_->rematch(id, accept); }
+    void sendGesture(uint64_t id, const net::Gesture& g) override { c_->sendGesture(id, g); }
     bool poll(net::Event& out) override { return c_->poll(out); }
 
 private:
@@ -99,6 +101,7 @@ public:
     void abortGame() override { d_->abortGame(); }
     void requestResync() override { d_->requestResync(); }
     void rematch(bool accept) override { d_->rematch(accept); }
+    void sendGesture(const net::Gesture& g) override { d_->sendGesture(g); }
     int pingMs() const override { return d_->pingMs(); }
     double serverNowMs() const override { return d_->serverNowMs(); }
     bool poll(net::Event& out) override { return d_->poll(out); }
@@ -124,6 +127,7 @@ public:
     void abortGame() override { api_.abortGame(id_); }
     void requestResync() override { api_.requestResync(id_); }
     void rematch(bool accept) override { api_.rematch(id_, accept); }
+    void sendGesture(const net::Gesture& g) override { api_.sendGesture(id_, g); }
     bool canReport() const override { return true; }
     void report(const std::string& u, const std::string& cat, const std::string& comment) override {
         api_.report(id_, u, cat, comment);
@@ -141,7 +145,9 @@ private:
 
 class DirectLink final : public GameLink {
 public:
-    DirectLink(DirectApi& d, uint64_t id) : d_(d), id_(id) {}
+    // conn: the direct match's connection as OnlineSession last saw it (Reconnecting while a
+    // guest restores its link: the match stays Playing meanwhile).
+    DirectLink(DirectApi& d, uint64_t id, const net::ConnState& conn) : d_(d), id_(id), conn_(conn) {}
     LinkKind kind() const override { return LinkKind::Direct; }
     uint64_t gameId() const override { return id_; }
     void sendMove(int ply, uint16_t mv, const std::string& fen, uint32_t think, bool offer) override {
@@ -154,21 +160,25 @@ public:
     void abortGame() override { d_.abortGame(); }
     void requestResync() override { d_.requestResync(); }
     void rematch(bool accept) override { d_.rematch(accept); }
+    void sendGesture(const net::Gesture& g) override { d_.sendGesture(g); }
     bool canReport() const override { return false; }
     void report(const std::string&, const std::string&, const std::string&) override {}
     int pingMs() const override { return d_.pingMs(); }
     double serverNowMs() const override { return d_.serverNowMs(); }
-    bool reconnecting() const override { return d_.state() != net::DirectMatch::State::Playing; }
+    bool reconnecting() const override {
+        return d_.state() != net::DirectMatch::State::Playing || conn_ == net::ConnState::Reconnecting;
+    }
     std::string eventName() const override { return i18n::tr("direct.event"); }
 
 private:
     DirectApi& d_;
     uint64_t id_;
+    const net::ConnState& conn_;
 };
 
 bool isGameEvent(Kind k) {
     return k == Kind::GameSnapshot || k == Kind::MoveMade || k == Kind::MoveRejected || k == Kind::GameEvent ||
-           k == Kind::GameEnd || k == Kind::RatingUpdate;
+           k == Kind::GameEnd || k == Kind::RatingUpdate || k == Kind::OpponentGesture;
 }
 
 // Realtime error codes that belong to a game (net::proto ErrorCode 100..112).
@@ -177,7 +187,7 @@ bool isGameError(int code) { return code >= 100 && code <= 112; }
 // Protocol values (dedicated-server/src/protocol/schema.js).
 enum ChallengeState { ChPending = 0, ChAccepted = 1, ChDeclined = 2, ChCancelled = 3, ChExpired = 4, ChUnavailable = 5 };
 enum QueueState { QLeft = 0, QSearching = 1, QMatched = 2 };
-enum NoticeCode { NShutdown = 1, NBanned = 2, NRevoked = 3, NCooldown = 4, NReplaced = 5 };
+enum NoticeCode { NShutdown = 1, NBanned = 2, NRevoked = 3, NCooldown = 4, NReplaced = 5, NRatingRestored = 7 };
 constexpr int kErrMatchmakingCooldown = 207;
 
 }  // namespace
@@ -201,6 +211,8 @@ void OnlineSession::init(bool mock, bool virtualClock) {
     virtual_ = virtualClock;
     net::mock::useVirtualClock(virtualClock);
     if (mock) {
+        const std::vector<std::string> args = plat::commandLine();
+        net::mock::useManualClock(std::find(args.begin(), args.end(), "--online-manual-clock") != args.end());
         api_.reset(new ServerApiOf<net::mock::FakeServer>(std::unique_ptr<net::mock::FakeServer>(new net::mock::FakeServer())));
         direct_.reset(new DirectApiOf<net::mock::FakeDirect>(std::unique_ptr<net::mock::FakeDirect>(new net::mock::FakeDirect())));
         LOGI("online: in-process mock server (--online-mock)");
@@ -404,6 +416,7 @@ void OnlineSession::answerChallenge(uint32_t id, bool accept) {
 void OnlineSession::hostDirect(const net::DirectHostOptions& opt) {
     cancelSearch();
     direct().host(opt);
+    directConn_ = net::ConnState::Offline;
 }
 
 void OnlineSession::joinDirect(const std::string& address, uint16_t port, const std::string& code) {
@@ -411,11 +424,13 @@ void OnlineSession::joinDirect(const std::string& address, uint16_t port, const 
     const std::string& n = settings().playerName;
     std::string name = n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
     direct().join(address, port, code, name);
+    directConn_ = net::ConnState::Offline;
 }
 
 void OnlineSession::closeDirect() {
     if (!directUsed_) return;
     direct_->close();
+    directConn_ = net::ConnState::Offline;
     if (gameKind_ == LinkKind::Direct) {
         link_.reset();
         gameReady_ = false;
@@ -427,7 +442,7 @@ void OnlineSession::closeDirect() {
 // ---- Games ----------------------------------------------------------------------------------------
 
 std::unique_ptr<GameLink> OnlineSession::makeLink(LinkKind kind, uint64_t id) {
-    if (kind == LinkKind::Direct) return std::unique_ptr<GameLink>(new DirectLink(*direct_, id));
+    if (kind == LinkKind::Direct) return std::unique_ptr<GameLink>(new DirectLink(*direct_, id, directConn_));
     return std::unique_ptr<GameLink>(new ServerLink(*api_, id, serverName()));
 }
 
@@ -643,6 +658,14 @@ void OnlineSession::handleServer(const net::Event& e) {
             break;
         case NCooldown: cooldownUntilMs_ = e.noticeArg; break;
         case NReplaced: ui::notify(i18n::tr("online.notice.replaced"), 6.0f); break;
+        case NRatingRestored:
+            // An opponent of rated games was banned for cheating: the points come back.
+            ui::notify(i18n::trf("online.notice.rating_restored", {std::to_string(std::lround(e.noticeArg))}), 8.0f);
+            if (signedIn_) {
+                api_->fetchAccount();
+                expect(Kind::AccountResult);
+            }
+            break;
         default: break;
         }
         break;
@@ -669,6 +692,7 @@ void OnlineSession::handleDirect(const net::Event& e) {
         routeGame(e, LinkKind::Direct);
         return;
     }
+    if (e.kind == Kind::ConnectionChanged) directConn_ = e.state;
     if (e.kind == Kind::ServerError) ui::notify(eventErrorText(e), 4.5f);
 }
 
@@ -688,6 +712,12 @@ void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
     }
     if (from != gameKind_ || (id != 0 && id != gameId_)) return;
     if (e.kind == Kind::GameSnapshot) snapshot_ = e.game;
+    if (e.kind == Kind::OpponentGesture) {
+        // Only the latest state matters: it replaces the one the scene has not taken yet.
+        auto old = std::find_if(gameEvents_.begin(), gameEvents_.end(),
+                                [](const net::Event& q) { return q.kind == Kind::OpponentGesture; });
+        if (old != gameEvents_.end()) gameEvents_.erase(old);
+    }
     gameEvents_.push_back(e);
 }
 

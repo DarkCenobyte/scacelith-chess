@@ -9,6 +9,14 @@
 // authoritative clocks (first-move timers, increments, flags) and the result like the server.
 // FakeDirect does the same for net::DirectMatch (a fake UPnP router and a fake friend).
 //
+// The fake opponent also sends its live gestures (OpponentGesture, the rules of net/gesture.h):
+// its head at 4-6 Hz (towards the piece in hand or its square, wandering over the board and
+// leaning in while it thinks, a look at its clock after pressing it, a glance at its scoresheet
+// after each move), the piece it touches 0.4-1.3 s before moving, sometimes aimed elsewhere
+// first, aimed at its square 250-400 ms before; when its game has autoPress off, the move is
+// placed first and pressed 0.6-1.0 s later. Silent while it is away and once the game is over.
+// The local player's gestures are accepted and ignored.
+//
 // Special inputs to try the error paths: user name "banned", "unverified" or "ratelimited",
 // password "wrong", a user name containing "mfa" (asks for a code), a custom server host
 // containing "offline", "badcert" or "old" (network, certificate, incompatible version); direct
@@ -44,6 +52,10 @@ uint32_t digest(const std::string& fen);
 // 'seconds', or our own realtime connection drops for 'seconds'.
 void opponentDrop(int seconds);
 void connectionDrop(int seconds);
+// --online-manual-clock (with --online-mock): the games of the fakes, direct matches included,
+// have autoPress = false, so a move goes only when its player presses the clock. Off by default.
+void useManualClock(bool on);
+bool manualClock();
 
 class FakeServer {
 public:
@@ -95,6 +107,7 @@ public:
     void abortGame(uint64_t gameId);
     void requestResync(uint64_t gameId);
     void rematch(uint64_t gameId, bool accept);
+    void sendGesture(uint64_t gameId, const Gesture& g);
     const OnlineGame* currentGame() const;
     bool poll(Event& out);
 
@@ -127,6 +140,7 @@ public:
     void abortGame();
     void requestResync();
     void rematch(bool accept);
+    void sendGesture(const Gesture& g);
     const OnlineGame* currentGame() const;
     int pingMs() const;
     double serverNowMs() const;

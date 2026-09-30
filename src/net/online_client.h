@@ -29,6 +29,9 @@
 //     TLS is always used unless insecureDev is set (and insecureDev is refused off loopback).
 //   - RetryCause, reconnectDelayMs() and clientPingIntervalMs() (additive): the reconnection and
 //     client Ping pacing rules as pure functions, so the tests can check them.
+//   - Protocol v2 (additive): sendGesture() and Event::Kind::OpponentGesture relay the live
+//     gestures of the two players (net/gesture.h), and OnlineGame::autoPress tells whether the
+//     robots press the clock by themselves in the game.
 #pragma once
 #include "gesture.h"
 #include <cstdint>
@@ -200,8 +203,9 @@ struct Event {
         RatingUpdate,         // ratingWhite/ratingBlack before/after
         Notice,               // noticeCode, arg (shutdown, ban, cooldown...)
         ServerError,          // code (net::proto::ErrorCode), fatal, gameId
-        OpponentGesture       // gesture, gameId: the opponent's live gestures (cosmetic; 'game' is
-                              // not filled in, a newer one replaces one still queued)
+        OpponentGesture       // gesture, gameId: the opponent's live gestures in the current game
+                              // (cosmetic; 'game' is not filled in, a newer one replaces one still
+                              // queued)
     };
     Kind kind = Kind::ServerInfoResult;
     bool ok = false;
@@ -284,9 +288,10 @@ public:
     void abortGame(uint64_t gameId);
     void requestResync(uint64_t gameId);
     void rematch(uint64_t gameId, bool accept);
-    // Live gestures (cosmetic): only the latest state is kept, and it is sent at the rate the
-    // server announced in Welcome (gestureRate / gestureBurst; nothing when 0). Dropped while not
-    // connected, never queued for a reconnection.
+    // Live gestures (cosmetic, net/gesture.h): only the latest state is kept, and it is sent at
+    // the rate the server announced in Welcome (gestureRate / gestureBurst; nothing when 0).
+    // Dropped while not Online (never queued for a reconnection) and when gameId is not the game
+    // of the last GameSnapshot. Cheap enough to call every frame.
     void sendGesture(uint64_t gameId, const Gesture& g);
     const OnlineGame* currentGame() const;       // game thread view (updated by poll())
 

@@ -100,6 +100,7 @@ void OnlineClient::claimDraw(uint64_t id) { impl_->fake.claimDraw(id); }
 void OnlineClient::abortGame(uint64_t id) { impl_->fake.abortGame(id); }
 void OnlineClient::requestResync(uint64_t id) { impl_->fake.requestResync(id); }
 void OnlineClient::rematch(uint64_t id, bool accept) { impl_->fake.rematch(id, accept); }
+void OnlineClient::sendGesture(uint64_t id, const Gesture& g) { impl_->fake.sendGesture(id, g); }
 const OnlineGame* OnlineClient::currentGame() const { return impl_->fake.currentGame(); }
 bool OnlineClient::poll(Event& out) { return impl_->fake.poll(out); }
 
@@ -137,6 +138,7 @@ void DirectMatch::claimDraw() { impl_->fake.claimDraw(); }
 void DirectMatch::abortGame() { impl_->fake.abortGame(); }
 void DirectMatch::requestResync() { impl_->fake.requestResync(); }
 void DirectMatch::rematch(bool accept) { impl_->fake.rematch(accept); }
+void DirectMatch::sendGesture(const Gesture& g) { impl_->fake.sendGesture(g); }
 const OnlineGame* DirectMatch::currentGame() const { return impl_->fake.currentGame(); }
 int DirectMatch::pingMs() const { return impl_->fake.pingMs(); }
 double DirectMatch::serverNowMs() const { return impl_->fake.serverNowMs(); }

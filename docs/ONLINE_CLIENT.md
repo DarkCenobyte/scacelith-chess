@@ -10,7 +10,7 @@ of them in `src/game/` and `src/ui/`.
 | File | Role |
 |---|---|
 | `src/game/online_session.h/.cpp` | `game::OnlineSession` (one per process, `onlineSession()`): the only code that polls `net::OnlineClient` and `net::DirectMatch`. Keeps what the menus show (server info, account, connection, matchmaking, challenges, cooldown and ban) and hands a started game to the scene. |
-| `src/game/game_link.h` | `GameLink`: the commands of one game (move, resign, draw, abort, resync, rematch, report, ping, server clock), for a server game or a direct match alike. |
+| `src/game/game_link.h` | `GameLink`: the commands of one game (move, resign, draw, abort, resync, rematch, live gestures, report, ping, server clock), for a server game or a direct match alike. |
 | `src/game/game_scene_online.cpp` | `GameMode::Online` in the 3D scene: the remote player's robot, move sending, server clocks, resync, end of game. |
 | `src/game/online_mock.h/.cpp` | In-process fakes of the server and of a direct-match friend (`--online-mock`). |
 | `src/game/online_stub.cpp` | `net::OnlineClient` / `net::DirectMatch` backed by the fakes, compiled only without `SCACELITH_NET_REAL` (builds without the real network layer). |
@@ -30,12 +30,34 @@ games). It drains both network objects and sorts the events:
 - **Realtime state** is kept: `conn()` (`ConnState`), `queue()` (searching, category, rated, time
   searched, rating window, players waiting), `outgoing()` (our challenge or private game and its
   code), `incoming()` (challenges received, with their expiry), cooldown and ban ends. Notices
-  (server shutdown, session revoked, replaced by another window) and errors become toasts.
+  (server shutdown, session revoked, replaced by another window) and errors become toasts. The
+  `RatingRestored` notice (an opponent of our rated games was banned for cheating; its argument is
+  the points given back) shows `online.notice.rating_restored` and fetches the account again, so
+  the ratings shown are the restored ones.
 - **Game events** go to a queue. A `GameSnapshot` of an unknown game id with status Ongoing is a
   new game (matchmaking, challenge, private game, rematch, direct match): `gameReady()` becomes
   true, the menu (or the game over card) fades to the table, and the scene calls
   `takeGame(snapshot)`, which returns the `GameLink`. Later events of that game come out of
-  `nextGameEvent()`.
+  `nextGameEvent()`, the opponent's live gestures (`OpponentGesture`, below) included; events of
+  another game are dropped.
+
+**Live gestures** (`src/net/gesture.h` has the full rules). The scene describes its player's hand
+and head with a `net::Gesture` and calls `GameLink::sendGesture()` as often as it likes (every
+frame is fine): the network layer keeps only the latest one and paces them.
+
+- Server games (`OnlineClient::sendGesture(gameId, g)`): the rate is the server's, from `Welcome`
+  (`gestureRate` per second, bursts of `gestureBurst`; the server's `GESTURE_RATE` and
+  `GESTURE_BURST`). The client's own bucket holds one message less than the burst, so a message
+  the network delayed never finds the server's bucket empty. Nothing is sent when the rate is 0
+  (a server without the relay), while not `Online` (connecting, reconnecting, offline: a gesture
+  is never kept for the reconnection), or for another game than the one of the last
+  `GameSnapshot`. `C_Gesture` shares the message numbering of the other commands.
+- Direct matches (`DirectMatch::sendGesture(g)`): the same, at the host's 10 per second, bursts of
+  20 (`docs/DIRECT_MATCH.md`).
+- The opponent's gestures arrive as `OpponentGesture` events with `gesture` and `gameId` (`game`
+  is not filled in: a gesture never changes the game state). Only those of the current game are
+  kept, and a newer one replaces one the scene has not taken yet, in the network layer and in the
+  session's queue alike.
 
 `ServerError` events that name the current game (or carry a game error code 100-112) go to the
 game; the others become toasts. An error with code 0 and `error == "offline"` (a command sent
@@ -108,8 +130,9 @@ There is no camera handover online: each player sees the game from their own cha
 show its state (opening the port, the invitation with address, port and code, the router's
 answer, connecting). When the host's game starts, the session announces it like a server game
 and the scene plays it through a `GameLink` of kind `Direct`: never rated, names only on the
-scoresheets, no report, rematch allowed. Leaving the game (or the page) closes the match, which
-removes the port mapping.
+scoresheets, no report, rematch allowed. A guest whose link to the host is being restored shows
+the "Reconnecting…" veil (`GameLink::reconnecting()`), as in a server game. Leaving the game (or
+the page) closes the match, which removes the port mapping.
 
 ## Development
 
@@ -118,6 +141,16 @@ removes the port mapping.
   code), password `wrong`, a custom host containing `offline`, `badcert` or `old`; direct match:
   address `refused.test`, `timeout.test` or `unknown.test`, a code that is not 12 characters or
   starts with `2222`, host port 47199 (no UPnP router) or 47198 (carrier-grade NAT).
+- `--online-manual-clock` (with `--online-mock`): the fakes' games, direct matches included, have
+  `autoPress` off, so a move goes when its player presses the clock. Without it they have it on
+  (a fake direct host then follows `DirectHostOptions::autoPress`).
+- The fake opponent sends its live gestures like a real client (`src/game/online_mock.h`): its
+  head at 4-6 Hz (over the board while it thinks, leaning in to about 0.6, towards the piece in
+  hand, at its clock after pressing it, a glance at its scoresheet for about 2 s after each
+  move), the piece touched 0.4-1.3 s before the move, aimed at another square first in about a
+  third of the moves, then at its own 250-400 ms before; with `autoPress` off the move is put
+  down first (`placed`) and its `MoveMade` comes 0.6-1.0 s later. It is silent while away (F9)
+  and once the game is over.
 - `--start-online [category]` signs in and plays the first opponent found (at once with the
   fakes); `--touch <square>` then touches that piece once the handshake is over.
 - In a mock game, F9 makes the opponent disconnect for 20 s, F10 drops our connection for 8 s.

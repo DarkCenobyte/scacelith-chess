@@ -31,6 +31,9 @@
 //     Abandonment (draw when the host cannot mate; aborted NoShow before 2 plies).
 //   - Rematch within 60 s after the end, both must accept, colours swapped; a decline, the
 //     guest's disconnection or the window's end closes it.
+//   - autoPress (the host's choice) only travels in every GameSnapshot, rematches included: the
+//     clients then send a move when the robot presses the clock by itself, or when the player
+//     presses it. The rules above do not depend on it.
 #pragma once
 #include "chess/chess.h"
 #include <cstdint>
@@ -53,6 +56,7 @@ struct AuthorityConfig {
     int drawOffersPerGame = 3;
     int drawOfferCooldownPlies = 10;
     int64_t rematchWindowMs = 60000;
+    bool autoPress = true;            // GameSnapshot.autoPress (DirectHostOptions::autoPress)
 };
 
 // FNV-1a 32 of the first four FEN fields (the Move.posHash of schema.js).
