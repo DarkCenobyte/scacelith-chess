@@ -532,6 +532,64 @@ TEST(rewind_demonstration_lines) {
     CHECK(coachPromotions > 20 && humanSpares > 20);
 }
 
+TEST(rewind_demonstration_six_moves) {
+    // Two six-move lines the coach shows on the table, then takes back one move at a time.
+    // Coach Black after 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6: 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7 Kxf7, four
+    // captures, two of Black's pawns set down in Black's half. Coach White in an endgame: both
+    // sides castle, Black promotes (the human's side: its spare comes from Black's reserve and goes
+    // back there), a rook takes the new queen, a capture promotes and White's new queen is taken,
+    // set down in White's half.
+    struct Line {
+        const char* fen;
+        std::vector<const char*> game, demo;
+        Color coach;
+        int besideOwner;   // the coach's pieces the line captures
+    };
+    const Line lines[] = {
+        {nullptr, {"e4", "e5", "Nf3", "Nc6", "Bc4", "Nf6"}, {"Ng5", "d5", "exd5", "Nxd5", "Nxf7", "Kxf7"}, Black, 2},
+        {"r3k2r/1P6/8/8/8/8/2p5/R3K2R w KQkq - 0 1", {}, {"O-O", "c1=Q", "Rfxc1", "O-O", "bxa8=Q", "Rxa8"}, White, 1},
+    };
+    for (bool clockPosX : {true, false}) {
+        for (const Line& line : lines) {
+            Position pos;
+            if (line.fen) CHECK(pos.setFEN(line.fen));
+            PhysicalBoard b;
+            b.reset(clockPosX);
+            b.syncTo(pos);
+            std::vector<Position> seen;
+            CHECK(playSANs(pos, b, seen, line.game));
+            const Position real = pos;
+            const std::vector<Spot> spots = spotsOf(b);
+            seen.clear();
+            CHECK(playSANs(pos, b, seen, line.demo, line.coach));
+            CHECK_EQ(seen.size(), size_t(6));
+            int besideOwner = 0;
+            for (const PieceObject& p : b.pieces()) {
+                if (!p.captured) continue;
+                besideOwner += p.capturedBesideOwner;
+                if (p.capturedBesideOwner) CHECK(p.color == line.coach);
+            }
+            CHECK_EQ(besideOwner, line.besideOwner);
+            Tally tally;
+            for (size_t k = seen.size(); k-- > 0;) {
+                std::vector<PieceTrip> trips;
+                CHECK(rewindTo(b, seen[k], tally, &trips));
+                CHECK(!trips.empty() && trips.size() <= 3);
+                CHECK(inStageOrder(trips));
+                const float side = line.coach == White ? 1.0f : -1.0f;
+                for (const PieceTrip& t : trips)
+                    for (const coach::Rest* r : {&t.from, &t.to})
+                        if (r->kind == RestKind::Captured || (r->kind == RestKind::Reserve && t.color == line.coach))
+                            CHECK(side * r->pos.z > 0.0f);
+            }
+            CHECK_EQ(tally.bad, 0);
+            CHECK_EQ(tally.parks, 0);
+            CHECK(coach::tableMatches(b, real));
+            CHECK(standsAsBefore(b, spots));
+        }
+    }
+}
+
 TEST(rewind_demonstration_victim_and_promotion) {
     // Coach Black shows 1.Bxc5 b1=Q+ (Black's pawn set down in Black's half, then Black's pawn
     // promoted): taking b1=Q back sends the queen to Black's reserve, not beside White, and the
