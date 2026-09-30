@@ -20,6 +20,12 @@ struct PieceObject {
     m::vec3 reserveSpot{0, 0, 0};              // spare: where it stands while in the reserve
     int captureOrder = 0;                      // when it was last set down as captured: later is larger
     bool held = false;                         // following a hand
+    // Captured, but set down in its owner's half rather than beside the capturer: a demonstration
+    // keeps its victims within the coach's reach (coach::demoCaptureSlot). syncTo then does not
+    // count it among the pawns set down at promotions, and takeSpare does not bring it back for a
+    // promotion. Kept by setCaptured, cleared by nextCaptureSlot and whenever the piece goes back
+    // on a square or into the reserve.
+    bool capturedBesideOwner = false;
     bool slotReserved = false;                 // a capture slot waits for it (nextCaptureSlot)
     m::vec3 reservedSlot{0, 0, 0};
     m::vec3 basePos{0, 0, 0};                  // resting base centre (world)
@@ -52,14 +58,22 @@ public:
     m::vec3 reserveSlot(chess::Color c) const;
     float defaultYaw(chess::Color c) const { return c == chess::White ? m::PI : 0.0f; }
 
-    // Physical operations (instantaneous; animations move the transforms in between).
+    // Physical operations (instantaneous; animations move the transforms in between). Together
+    // they reach every state syncTo leaves a piece in: on a square, captured at a spot, back in
+    // the reserve at a spot, and a new spare brought for a promotion.
     void setOnSquare(int id, chess::Square sq);
     void setCaptured(int id, m::vec3 pos);
+    // A spare piece set back in the reserve, standing at 'pos' (its reserve spot from then on):
+    // the new piece of a promotion taken back.
+    void setInReserve(int id, m::vec3 pos);
     void removeFromBoard(int id);                 // picked up (square cleared)
     // Piece to bring in for a promotion: a captured one of that type/colour within the player's
     // reach, else a spare from the reserve (one queen per colour at start; created on demand in a
     // free capture slot beside the player). It stays where it is until setOnSquare().
     int takeSpare(chess::PieceType t, chess::Color c);
+    // A new spare piece waiting in the reserve at 'spot' (the arbiter brings one when no piece of
+    // that type is left: takeSpare, syncTo). Returns its id, the next one.
+    int addSpare(chess::PieceType t, chess::Color c, m::vec3 spot);
     // Snap every piece to the given logical position (arbiter restoring the position, new game).
     // Pieces missing from the board come back from the captured ones, the last set down first, so
     // that taking a move back restores the table as it was: its victim, the pawn of a promotion.
