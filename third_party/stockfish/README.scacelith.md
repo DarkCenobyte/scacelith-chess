@@ -111,13 +111,13 @@ instruction set (SSE4.1, below; its network is 2.5 times larger), and newer inst
 part of that. The library therefore holds five builds of the engine and runs the best one the CPU
 supports:
 
-| Variant | CPUs | Checked at run time (all of the previous row's, plus) | `bench` nodes/s, 1 thread |
+| Variant | CPUs | Checked at run time | `bench` nodes/s, 1 thread |
 |---|---|---|---:|
 | `x86-64` | every x86-64 CPU (Core 2, Phenom II, some virtual machines) | nothing: SSE2 is part of x86-64 | 357 k (-37 %) |
 | `x86-64-sse41-popcnt` | Nehalem to Ivy Bridge, AMD Bulldozer to Steamroller, Jaguar | SSE3, SSSE3, SSE4.1, POPCNT | 563 k |
-| `x86-64-avx2` | Haswell to Comet Lake, Zen 1 to 3 | AVX2 (and OS support), BMI1 | 658 k (+17 %) |
-| `x86-64-avxvnni` | Alder Lake and later Intel client CPUs | BMI2, AVX-VNNI | 770 k (+37 %) |
-| `x86-64-avx512icl` | Ice Lake, Tiger Lake, Rocket Lake, Sapphire Rapids and later, Zen 4 and 5 | BMI2, AVX-512 F, BW, VL, DQ, CD, VNNI, IFMA, VBMI, VBMI2, VPOPCNTDQ, BITALG, VPCLMULQDQ, GFNI, VAES (and OS support) | 833 k (+48 %) |
+| `x86-64-avx2` | Haswell to Comet Lake, Zen 1 to 3 | everything `x86-64-sse41-popcnt` checks, plus AVX2 (and OS support), BMI1 | 658 k (+17 %) |
+| `x86-64-avxvnni` | Alder Lake and later Intel client CPUs | everything `x86-64-avx2` checks, plus BMI2, AVX-VNNI | 770 k (+37 %) |
+| `x86-64-avx512icl` | Ice Lake, Tiger Lake, Rocket Lake, Sapphire Rapids and later, Zen 4 and 5 | everything `x86-64-avx2` checks, plus BMI2, AVX-512 F, BW, VL, DQ, CD, VNNI, IFMA, VBMI, VBMI2, VPOPCNTDQ, BITALG, VPCLMULQDQ, GFNI, VAES (and OS support); not AVX-VNNI, which Ice Lake, Tiger Lake, Rocket Lake and Zen 4 lack | 833 k (+48 %) |
 
 The speeds are `bench 16 1 13` (upstream's benchmark positions, 16 MB hash, 1 thread, depth 13) run
 by the game's library with the variant forced, on the build machine's Intel CPU (AVX-512 and
