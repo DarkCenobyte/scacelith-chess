@@ -75,8 +75,12 @@ public:
     virtual void setPosition(const std::string& fen) = 0;
     // Rules lesson: the coach plays 'uci' by hand as a real move of the lesson game (no scoresheet).
     virtual void playLessonMove(const std::string& uci) = 0;
-    // A demonstration, rewind, takeback, set-up or lesson move is still running.
+    // A demonstration, rewind, takeback, set-up or lesson move is still running. True from the
+    // call that starts it on (the director polls it on the following frames).
     virtual bool tableBusy() const = 0;
+    // Space during a rewind: the rewind already running goes on briskly (as rewindDemo(.., true)).
+    // Default: nothing (the rewind keeps its pace).
+    virtual void hurryTable() {}
     // The coach's hand is still moving (gestures included).
     virtual bool bodyBusy() const = 0;
 

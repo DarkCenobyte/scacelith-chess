@@ -14,6 +14,7 @@
 #include "script.h"
 #include "stage.h"
 #include <cstdint>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -77,6 +78,21 @@ public:
     void closeOffer();               // answered: hide the card, go on (the session drops beats if taken back)
 
     const std::vector<ShownMark>& marks() const;
+
+    // ---- For the session and the tests ------------------------------------------------------------
+    // Id of the script the last non-empty play() / playNext() queued (0 before any). pending(id)
+    // stays true while a beat of that script runs or is queued (said, skipped or dropped: false).
+    uint64_t lastScript() const;
+    bool pending(uint64_t script) const;
+    // Something runs or is queued, a WaitMove waiting for the player aside (lines said meanwhile
+    // count).
+    bool busy() const;
+    // The player moved before the lesson reached its WaitMove: when only skippable lines and
+    // pauses stand before the next queued WaitMove, drop them (cutting the running line) and wait
+    // at once. False (nothing changes) otherwise.
+    bool jumpToWait();
+    // Called with every beat play() / playNext() queue, in order (tests, logs).
+    void setObserver(std::function<void(const Beat&)> observer);
 
 private:
     struct Impl;

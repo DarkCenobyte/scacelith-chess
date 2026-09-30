@@ -53,7 +53,9 @@ public:
 
     // ---- Events from the scene --------------------------------------------------------------------
     void onMove(const chess::Game& game);          // a move was completed (either side; lesson moves too)
-    void onPlayerActive();                         // the player touched a piece (idle timers, stale lines)
+    // The player touched a piece (idle timers, stale lines). While the takeback card is shown it
+    // answers it: the player plays on (as onOfferAnswer(false), with "Let's play on").
+    void onPlayerActive();
     // A placement refused as illegal (legal-move hints on): the rules lesson explains why.
     void onIllegalAttempt(const chess::Game& game, chess::Square from, chess::Square to);
     void onOfferAnswer(const chess::Game& game, bool accept);   // the takeback card's answer
@@ -67,11 +69,18 @@ public:
     // The game is over (Game::isOver(): mate, stalemate, a draw, a resignation recorded on the Game).
     void onGameOver(const chess::Game& game, bool humanResigned);
     void skip();                                   // Space
+    // Every frame while the engine searches the coach's move: seconds since that search began
+    // (0 when none runs). Once the move is held by the engine alone (coachMayMove() true) for 6 s,
+    // the coach says a short filler (once per move).
+    void onCoachThinking(float seconds);
 
     // ---- What the scene asks -----------------------------------------------------------------------
     // The coach may play its move now (computed or not): no review, offer, demonstration or rewind is
     // running or pending for the human's last move.
     bool coachMayMove() const;
+    // The player may pick up a piece: levels 1-6, the human's turn (no takeback card shown); the
+    // lesson, while an exercise waits for the move. A lesson move made otherwise is taken back.
+    bool playerMayMove(const chess::Game& game) const;
     bool handshakeWanted() const;                  // the closing words are said: play the handshake
     void onHandshakeDone(const chess::Game& game); // then the appraisal (level 0: the lesson ends)
     bool finished() const;                         // everything is said: show the end-of-game menu
