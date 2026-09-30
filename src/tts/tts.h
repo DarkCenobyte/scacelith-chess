@@ -45,6 +45,14 @@ bool setArchCap(const char* arch);
 // Name of the kernel set the next load would use ("avx2", ...).
 const char* activeArch();
 
+// Folder Synthesizer::load() reads the model files from: <exe dir>/coach/ by default, or 'dir' (a
+// command-line switch of the game, "" = the default again). Applies to later loads.
+void setModelDirectory(const std::string& dir);
+std::string modelDirectory();
+// Whether load() can find the model files without loading them: all present in modelDirectory(),
+// or embedded in the executable. False means the coach will speak through subtitles only.
+bool modelFilesPresent();
+
 class Engine;
 class ThreadPool;
 
@@ -57,7 +65,8 @@ public:
     Synthesizer(const Synthesizer&) = delete;
     Synthesizer& operator=(const Synthesizer&) = delete;
 
-    // From <exe dir>/coach/, else the embedded copy (when built with SCACELITH_TTS_EMBED).
+    // From modelDirectory() (<exe dir>/coach/), else the embedded copy (when built with
+    // SCACELITH_TTS_EMBED).
     bool load(std::string* error = nullptr);
     // From a given folder (tests, tools).
     bool loadFrom(const std::string& dir, std::string* error = nullptr);
