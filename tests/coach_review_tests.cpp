@@ -938,6 +938,8 @@ TEST(coach_review_every_key_exists) {
         if (startsWith(kv.first, "name.") || startsWith(kv.first, "theme.") || startsWith(kv.first, "appraisal.phase.") ||
             startsWith(kv.first, "appraisal.reason.") || startsWith(kv.first, "appraisal.level."))
             continue;
+        // "key.spoken" is the spoken form of the phrasing "key", not a message of its own.
+        if (kv.first.size() > 7 && kv.first.compare(kv.first.size() - 7, 7, ".spoken") == 0) continue;
         if (kv.second.size() < 2) std::fprintf(stderr, "  %s has one phrasing\n", kv.first.c_str());
         CHECK(kv.second.size() >= 2);
     }
