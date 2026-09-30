@@ -6,6 +6,9 @@
 #include "game/physical_board.h"
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
+#include <string>
+#include <vector>
 
 using namespace m;
 using namespace chess;
@@ -50,6 +53,56 @@ bool anyReserved(const PhysicalBoard& b) {
     for (const PieceObject& p : b.pieces())
         if (p.slotReserved) return true;
     return false;
+}
+
+// Where each piece stands (by id).
+struct Spot {
+    Square square;
+    bool captured, inReserve;
+    vec3 basePos;
+};
+
+std::vector<Spot> spotsOf(const PhysicalBoard& b) {
+    std::vector<Spot> s;
+    for (const PieceObject& p : b.pieces()) s.push_back({p.square, p.captured, p.inReserve, p.basePos});
+    return s;
+}
+
+// Every piece of 'before' stands as it stood then; pieces added since wait in the reserve.
+bool standsAsBefore(const PhysicalBoard& b, const std::vector<Spot>& before) {
+    const auto& ps = b.pieces();
+    if (ps.size() < before.size()) return false;
+    for (size_t i = 0; i < ps.size(); ++i) {
+        const PieceObject& p = ps[i];
+        if (i >= before.size()) {
+            if (!p.inReserve || !p.spare) return false;
+            continue;
+        }
+        const Spot& s = before[i];
+        if (p.square != s.square || p.captured != s.captured || p.inReserve != s.inReserve || length(p.basePos - s.basePos) > 1e-6f)
+            return false;
+    }
+    return true;
+}
+
+// What the table shows, whichever piece is which: type, colour, state and place of every piece.
+std::vector<std::string> layoutOf(const PhysicalBoard& b) {
+    std::vector<std::string> out;
+    for (const PieceObject& p : b.pieces()) {
+        char buf[96];
+        std::snprintf(buf, sizeof(buf), "%d %d %d %d %d %.4f %.4f", int(p.type), int(p.color), int(p.square), int(p.captured),
+                      int(p.inReserve), p.basePos.x, p.basePos.z);
+        out.push_back(buf);
+    }
+    std::sort(out.begin(), out.end());
+    return out;
+}
+
+// Pawns of colour c standing off the board: [0] beside Black, [1] beside White.
+void pawnsBeside(const PhysicalBoard& b, Color c, int out[2]) {
+    out[0] = out[1] = 0;
+    for (const PieceObject& p : b.pieces())
+        if (p.captured && p.type == Pawn && p.color == c) ++out[p.basePos.z > 0.0f ? 1 : 0];
 }
 
 // A move as GameScene plays it on the physical board: the slots are handed out when the move is
@@ -306,6 +359,123 @@ TEST(capture_slots_arbiter_restore_brings_the_victim_back) {
     CHECK_EQ(offBoardOverlaps(b), 0);
 }
 
+TEST(capture_slots_promotion_taken_back_returns_the_spare) {
+    // A promotion completed on the board, then taken back (syncTo the position before it: an
+    // illegal move under hints off, an online move never confirmed): the new piece goes back to
+    // the reserve, the pawn to its square, a victim to the board, and the table is as it was. The
+    // promotion played again takes the same spare: no piece is added.
+    struct Case {
+        const char* fen;
+        int from, to;
+        PieceType promotion;
+    };
+    const Case cases[] = {
+        {"k7/4P3/8/8/8/8/8/3QK3 w - - 0 1", 52, 60, Queen},    // e8=Q: the spare queen
+        {"k2r4/4P3/8/8/8/8/8/3QK3 w - - 0 1", 52, 59, Queen},  // exd8=Q
+        {"k7/4P3/8/8/8/8/8/3QK3 w - - 0 1", 52, 60, Knight},   // e8=N: a knight the arbiter brings
+        {"4k3/8/8/8/8/8/4p3/K7 b - - 0 1", 12, 4, Queen},      // e1=Q
+    };
+    for (bool clockPosX : {true, false}) {
+        for (const Case& c : cases) {
+            Position pos;
+            CHECK(pos.setFEN(c.fen));
+            Move mv = pos.findLegal(Square(c.from), Square(c.to), c.promotion);
+            CHECK(mv.valid());
+            PhysicalBoard b;
+            b.reset(clockPosX);
+            b.syncTo(pos);
+            std::vector<Spot> before = spotsOf(b);
+            int pawn = b.idAt(mv.from);
+            playOnBoard(b, pos, mv);
+            size_t played = b.pieces().size();
+            int spare = b.idAt(mv.to);
+            b.syncTo(pos);
+            CHECK(boardMatches(b, pos));
+            CHECK_EQ(b.idAt(mv.from), pawn);
+            CHECK(standsAsBefore(b, before));
+            CHECK(b.byId(spare)->inReserve && !b.byId(spare)->captured);
+            CHECK_EQ(offBoardOverlaps(b), 0);
+            CHECK(!anyReserved(b));
+            for (int again = 0; again < 2; ++again) {
+                playOnBoard(b, pos, mv);
+                CHECK_EQ(b.idAt(mv.to), spare);
+                CHECK_EQ(b.pieces().size(), played);
+                b.syncTo(pos);
+                CHECK(standsAsBefore(b, before));
+            }
+        }
+    }
+}
+
+TEST(capture_slots_promotion_taken_back_brings_its_pawn_back) {
+    // White's a-pawn was captured earlier and stands beside Black. Taking back e8=Q brings back
+    // the e-pawn set down beside White, not the a-pawn: the table then shows what a fresh
+    // synchronisation of the position shows, with no promoted pawn beside White.
+    Position start, pos;
+    CHECK(start.setFEN("k7/8/8/8/8/8/1PPPPPPP/3QK3 w - - 0 1"));
+    CHECK(pos.setFEN("k7/4P3/8/8/8/8/1PPP1PPP/3QK3 w - - 0 1"));
+    PhysicalBoard b;
+    b.reset(true);
+    b.syncTo(start);
+    b.syncTo(pos);   // the e-pawn goes to e7
+    std::vector<Spot> before = spotsOf(b);
+    int pawn = b.idAt(Square(52));
+    Move mv = pos.findLegal(Square(52), Square(60), Queen);
+    CHECK(mv.valid());
+    playOnBoard(b, pos, mv);
+    b.syncTo(pos);
+    CHECK_EQ(b.idAt(Square(52)), pawn);
+    CHECK(standsAsBefore(b, before));
+    int beside[2];
+    pawnsBeside(b, White, beside);
+    CHECK_EQ(beside[0], 1);
+    CHECK_EQ(beside[1], 0);
+    PhysicalBoard fresh;
+    fresh.reset(true);
+    fresh.syncTo(pos);
+    CHECK(layoutOf(b) == layoutOf(fresh));
+}
+
+TEST(capture_slots_promoted_piece_captured_in_a_resync) {
+    // b8=Q played on the board, then a resync to the position after Rxb8 (an online reconnection):
+    // the promoted queen stands beside Black as if the capture had been played, not back in the
+    // reserve, and the pawn stays beside White.
+    Position pos;
+    CHECK(pos.setFEN("4k3/1P6/8/8/8/8/8/1r1QK3 w - - 0 1"));
+    Move promo = pos.findLegal(Square(49), Square(57), Queen);
+    CHECK(promo.valid());
+    Position after = pos;
+    after.makeMove(promo);
+    Move rxb8 = after.findLegal(Square(1), Square(57));
+    CHECK(rxb8.valid());
+    Position end = after;
+    end.makeMove(rxb8);
+    PhysicalBoard synced, played;
+    for (PhysicalBoard* b : {&synced, &played}) {
+        b->reset(true);
+        b->syncTo(pos);
+        playOnBoard(*b, pos, promo);
+    }
+    int queen = synced.idAt(Square(57));
+    synced.syncTo(end);
+    playOnBoard(played, after, rxb8);
+    CHECK(boardMatches(synced, end));
+    CHECK(synced.byId(queen)->captured && !synced.byId(queen)->inReserve && synced.byId(queen)->basePos.z < 0.0f);
+    CHECK(layoutOf(synced) == layoutOf(played));
+    int beside[2];
+    pawnsBeside(synced, White, beside);
+    CHECK_EQ(beside[1], 1);
+    // Taking the capture back brings the queen back on b8, and the promotion too: the queen back
+    // in the reserve.
+    synced.syncTo(after);
+    CHECK(boardMatches(synced, after));
+    CHECK_EQ(synced.idAt(Square(57)), queen);
+    synced.syncTo(pos);
+    CHECK(synced.byId(queen)->inReserve && length(synced.byId(queen)->basePos - synced.reserveSlot(White)) < 1e-6f);
+    pawnsBeside(synced, White, beside);
+    CHECK_EQ(beside[1], 0);
+}
+
 TEST(capture_slots_simulated_games) {
     // Capture-hungry random games played on the physical board as the game does, with online
     // resyncs (syncTo without a reset) now and then: no two pieces off the board ever overlap,
@@ -351,6 +521,45 @@ TEST(capture_slots_simulated_games) {
     CHECK(promotions > 20);
     CHECK(resyncs > 100);
     CHECK(mostInAHalf >= 14);
+}
+
+TEST(capture_slots_moves_taken_back) {
+    // Capture-hungry random games in which the arbiter takes moves back (syncTo the position
+    // before), every promotion and one move in five, before they are played again: each time the
+    // table is exactly as it was (a piece the arbiter brought waits in the reserve), and playing
+    // the move again adds no piece.
+    int takenBack = 0, promotions = 0, captures = 0;
+    for (uint64_t seed = 1; seed <= 60; ++seed) {
+        Rng rng(seed * 7919);
+        Game g;
+        PhysicalBoard b;
+        b.reset(seed % 2 == 1);
+        bool ok = true;
+        for (int ply = 0; ply < 300 && !g.isOver() && ok; ++ply) {
+            Position before = g.position();
+            Move mv = pickMove(before, rng);
+            if (mv.promotion != NoPiece || rng.next() % 5 == 0) {
+                std::vector<Spot> spots = spotsOf(b);
+                playOnBoard(b, before, mv);
+                size_t played = b.pieces().size();
+                b.syncTo(before);
+                ok = boardMatches(b, before) && standsAsBefore(b, spots) && offBoardOverlaps(b) == 0 && !anyReserved(b);
+                ++takenBack;
+                if (mv.promotion != NoPiece) ++promotions;
+                if (!before.at(mv.to).empty() || (mv.flags & MoveEnPassant)) ++captures;
+                playOnBoard(b, before, mv);
+                ok = ok && b.pieces().size() == played;
+            } else {
+                playOnBoard(b, before, mv);
+            }
+            g.play(mv);
+            ok = ok && boardMatches(b, g.position()) && offBoardOverlaps(b) == 0;
+        }
+        CHECK(ok);
+    }
+    CHECK(takenBack > 1500);
+    CHECK(promotions > 40);
+    CHECK(captures > 250);
 }
 
 TEST(capture_slots_hole_reuse_keeps_the_grid_compact) {

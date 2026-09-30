@@ -65,6 +65,8 @@ struct Input {
     // characters are left out: use the keys).
     uint32_t text[64] = {};
     int textCount = 0;
+    // The pointer is over the client area. False once it has left (mouseX/Y keep its last position
+    // inside, maybe at an edge), and while a held button drags it outside (mouseX/Y follow it).
     bool mouseInWindow = true;
 };
 const Input& input();
