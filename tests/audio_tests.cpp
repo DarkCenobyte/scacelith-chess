@@ -1,7 +1,9 @@
 // Audio package tests: every sound is rendered through the full chain and checked numerically
 // (no clipping, no DC, no NaN/denormals, durations, spectral centroids), the hall reverb RT60
 // and pre-delay are measured, the 3D stage is probed, the lock-free queue is stressed, the
-// mixer CPU cost is measured and the live engine is started/stopped.
+// mixer CPU cost is measured and the live engine is started/stopped. The speech voices (coach)
+// are checked for timing, seamless phrase joins, level, directivity, ducking, fades, ownership of
+// their chunks and the live API (tests at the end of the file).
 // WAV files for listening are written to /tmp/audio_out/ (Windows: %TEMP%\scacelith_audio_out).
 #include "test.h"
 #include "audio/audio.h"
@@ -16,6 +18,8 @@
 #include <cmath>
 #include <complex>
 #include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <string>
 #include <sys/stat.h>
 #include <thread>
@@ -592,7 +596,25 @@ TEST(audio_mixer_cpu_cost) {
         b->variant = v;
         m.install(b);
     }
-    // Typical load: ambience + a burst of game sounds every 0.5 s; plus a stress phase with 32 voices.
+    // The coach talking all along (44.1 kHz phrases, resampled): 21 s in 2 s chunks, queued up front
+    // (the content does not change the cost).
+    {
+        VoiceParams vp;
+        vp.position = coachMouthDefault();
+        vp.facing = m::vec3(0.0f, -0.5f, 0.87f);
+        m.speechOpen(0, speechParams(vp));
+        for (int c = 0; c < 11; ++c) {
+            SoundBuffer* b = new SoundBuffer();
+            b->samples.resize(88200);
+            for (size_t i = 0; i < b->samples.size(); ++i)
+                b->samples[i] = 0.1f * std::sin(0.0427f * float(i)) * std::sin(0.00031f * float(i));
+            b->sfx = -1;
+            m.speechAppend(0, b);
+        }
+        m.speechClose(0);
+    }
+    // Typical load: ambience + speech + a burst of game sounds every 0.5 s; plus a stress phase with
+    // 32 voices (and the speech).
     const float seconds = 20.0f;
     const int block = 480;
     std::vector<float> out(size_t(block) * 2);
@@ -628,8 +650,9 @@ TEST(audio_mixer_cpu_cost) {
     double scpu = threadCpuSeconds() - s0;
     if (scpu <= 0.0) scpu = std::chrono::duration<double>(std::chrono::steady_clock::now() - sw0).count();
     float stress = float(scpu / (stressBlocks * block / kFs));
-    std::fprintf(stderr, "  mixer CPU: typical %.3f %% of one core (ambience + game sounds, max %d voices), 32 voices %.2f %%\n",
+    std::fprintf(stderr, "  mixer CPU: typical %.3f %% of one core (ambience + speech + game sounds, max %d voices), 32 voices %.2f %%\n",
                  typical * 100.0f, maxVoices, stress * 100.0f);
+    CHECK_EQ(m.activeSpeech(), 1);  // the speech sounded through both phases
     CHECK(typical < 0.02f);
     CHECK(stress < 0.10f);
 }
@@ -750,4 +773,891 @@ TEST(audio_scene_demo_wav) {
     CHECK(a.peak <= kMinus1dB);
     std::string path = outDir() + "/scene_demo_26s.wav";
     CHECK(writeWav16(path.c_str(), out.data(), out.size() / 2, 2, 48000));
+}
+
+// ---- Speech (coach voice) ------------------------------------------------------------------------
+// The speech voices are tested offline on a Mixer (deterministic), then through the live engine
+// (null backend on Linux). Test speech follows the TTS contract: mono 44.1 kHz, -20 dBFS RMS over
+// the voiced frames, peak <= -1 dBFS, 10 ms fades.
+
+namespace {
+
+constexpr int kSrcRate = 44100;
+
+// Speech-shaped signal: syllables of a glottal pulse train (Rosenberg-like flow derivative, with
+// intonation) through three formant resonators, short gaps between syllables and longer ones
+// between words; normalised like the TTS output.
+std::vector<float> speechLike(float seconds, int rate, uint32_t seed) {
+    using namespace audio::dsp;
+    Rng rng(seed);
+    const float fs = float(rate);
+    const size_t n = size_t(seconds * fs);
+    std::vector<float> x(n, 0.0f);
+    Svf f1, f2, f3;
+    float phase = 0.0f, prevGlot = 0.0f;
+    size_t i = size_t(0.03f * fs);
+    while (i < n) {
+        const size_t len = size_t(rng.range(0.12f, 0.26f) * fs);
+        const float F1 = rng.range(350.0f, 800.0f), F2 = rng.range(900.0f, 2200.0f), F3 = rng.range(2400.0f, 3100.0f);
+        f1.set(F1, F1 / 90.0f, fs);
+        f2.set(F2, F2 / 110.0f, fs);
+        f3.set(F3, F3 / 160.0f, fs);
+        const float f0a = rng.range(95.0f, 135.0f), f0b = f0a * rng.range(0.85f, 1.12f);
+        for (size_t k = 0; k < len && i + k < n; ++k) {
+            const float t = float(k) / float(len);
+            const float env = 0.5f - 0.5f * std::cos(kTau * t);
+            phase += (f0a + (f0b - f0a) * t) / fs;
+            if (phase >= 1.0f) phase -= 1.0f;
+            const float sp = std::sin(kPi * std::min(phase / 0.45f, 1.0f));
+            const float glot = phase < 0.45f ? sp * sp : 0.0f;
+            const float src = (glot - prevGlot) * 20.0f + 0.01f * rng.bi();
+            prevGlot = glot;
+            x[i + k] = (f1.bpNorm(src) + 0.5f * f2.bpNorm(src) + 0.25f * f3.bpNorm(src)) * env;
+        }
+        i += len + size_t((rng.chance(0.3f) ? rng.range(0.12f, 0.3f) : rng.range(0.02f, 0.06f)) * fs);
+    }
+    const size_t win = size_t(0.01f * fs);
+    double mx = 0.0, sum = 0.0;
+    size_t cnt = 0;
+    std::vector<double> fr;
+    for (size_t a = 0; a + win <= n; a += win) {
+        double e = 0.0;
+        for (size_t k = 0; k < win; ++k) e += double(x[a + k]) * x[a + k];
+        fr.push_back(e / double(win));
+        mx = std::max(mx, fr.back());
+    }
+    for (double e : fr)
+        if (e > mx * 1e-4) { sum += e; ++cnt; }
+    float g = 0.1f / float(std::sqrt(sum / double(std::max<size_t>(cnt, 1))));
+    float peak = 0.0f;
+    for (float& v : x) { v *= g; peak = std::max(peak, std::fabs(v)); }
+    if (peak > kMinus1dB)
+        for (float& v : x) v *= kMinus1dB / peak;
+    const size_t fade = std::min(n / 2, size_t(0.01f * fs));
+    for (size_t k = 0; k < fade; ++k) {
+        const float w = 0.5f - 0.5f * std::cos(kPi * float(k) / float(fade));
+        x[k] *= w;
+        x[n - 1 - k] *= w;
+    }
+    return x;
+}
+
+// Voiced 10 ms frames of a source (within 40 dB of the loudest frame).
+std::vector<bool> voicedFrames(const std::vector<float>& x, int rate) {
+    const size_t win = size_t(rate / 100);
+    std::vector<double> fr;
+    double mx = 0.0;
+    for (size_t a = 0; a + win <= x.size(); a += win) {
+        double e = 0.0;
+        for (size_t k = 0; k < win; ++k) e += double(x[a + k]) * x[a + k];
+        fr.push_back(e / double(win));
+        mx = std::max(mx, fr.back());
+    }
+    std::vector<bool> v(fr.size());
+    for (size_t i = 0; i < fr.size(); ++i) v[i] = fr[i] > mx * 1e-4;
+    return v;
+}
+
+// RMS (dBFS, both channels) of a 48 kHz stereo render over the 10 ms frames voiced in its source.
+float activeLevelDb(const std::vector<float>& out, const std::vector<bool>& voiced) {
+    double e = 0.0;
+    size_t cnt = 0;
+    for (size_t j = 0; j < voiced.size() && (j + 1) * 960 <= out.size(); ++j) {
+        if (!voiced[j]) continue;
+        for (size_t k = j * 960; k < (j + 1) * 960; ++k) e += double(out[k]) * out[k];
+        cnt += 960;
+    }
+    return db(float(std::sqrt(e / double(std::max<size_t>(cnt, 1)))));
+}
+
+std::vector<float> sineWave(float hz, size_t n, int rate, float amp) {
+    std::vector<float> v(n);
+    for (size_t i = 0; i < n; ++i) v[i] = amp * float(std::sin(6.283185307179586 * hz * double(i) / rate));
+    return v;
+}
+
+audio::SoundBuffer* speechChunk(const std::vector<float>& v, size_t from, size_t to) {
+    audio::SoundBuffer* b = new audio::SoundBuffer();
+    b->samples.assign(v.begin() + long(from), v.begin() + long(std::min(to, v.size())));
+    b->sfx = -1;
+    return b;
+}
+
+void setupSpeechMixer(audio::Mixer& m, float fs, bool room, bool ambience) {
+    m.prepare(fs);
+    m.setVolumes(1.0f, 1.0f, 1.0f);
+    m.setVoiceVolume(1.0f);
+    m.setAmbienceEnabled(ambience, true);
+    m.setRoomEnabled(room);
+    m.setListener(audio::whiteSeatListener());
+}
+
+audio::SpeechParams coachParams(m::vec3 facing = m::vec3(0.0f)) {
+    audio::VoiceParams vp;
+    vp.position = audio::coachMouthDefault();
+    vp.facing = facing;
+    vp.sampleRate = kSrcRate;
+    return audio::speechParams(vp);
+}
+
+// Renders 'frames' more frames (blocks of 'block') and appends them to 'out'.
+void renderInto(audio::Mixer& m, std::vector<float>& out, size_t frames, int block = 480) {
+    size_t at = out.size();
+    out.resize(at + frames * 2);
+    for (size_t done = 0; done < frames;) {
+        int n = int(std::min<size_t>(size_t(block), frames - done));
+        m.process(out.data() + at + 2 * done, n);
+        done += size_t(n);
+    }
+}
+
+// Frees the mixer's retired buffers; returns how many were speech chunks.
+int freeRetired(audio::Mixer& m) {
+    int n = 0;
+    while (audio::SoundBuffer* b = m.peekRetired()) {
+        n += b->sfx < 0 ? 1 : 0;
+        delete b;
+        m.dropRetired();
+    }
+    return n;
+}
+
+double channelEnergy(const std::vector<float>& b, size_t fromFrame, size_t toFrame, int ch) {
+    double e = 0.0;
+    for (size_t i = fromFrame; i < toFrame && 2 * i + 1 < b.size(); ++i) e += double(b[2 * i + size_t(ch)]) * b[2 * i + size_t(ch)];
+    return e;
+}
+
+// RMS level (dBFS, both channels) of frames [fromFrame, toFrame).
+float rangeDb(const std::vector<float>& b, size_t fromFrame, size_t toFrame) {
+    const double e = channelEnergy(b, fromFrame, toFrame, 0) + channelEnergy(b, fromFrame, toFrame, 1);
+    return db(float(std::sqrt(e / double(2 * std::max<size_t>(1, toFrame - fromFrame)))));
+}
+
+// Residual of a least-squares fit of a sine at 'hz' (plus DC) over frames [from, to) of one
+// channel, relative to the fitted RMS: ~0 for a clean tone at exactly that frequency.
+double sineFitResidual(const std::vector<float>& b, int ch, float hz, float fs, size_t from, size_t to) {
+    double ss = 0, sc = 0, cc = 0, s1 = 0, c1 = 0, n = 0, ys = 0, yc = 0, y1 = 0;
+    for (size_t i = from; i < to; ++i) {
+        double t = 6.283185307179586 * hz * double(i) / fs, s = std::sin(t), c = std::cos(t), y = b[2 * i + size_t(ch)];
+        ss += s * s; sc += s * c; cc += c * c; s1 += s; c1 += c; n += 1; ys += y * s; yc += y * c; y1 += y;
+    }
+    auto det3 = [](double a, double b_, double c, double d, double e, double f, double g, double h, double k) {
+        return a * (e * k - f * h) - b_ * (d * k - f * g) + c * (d * h - e * g);
+    };
+    double D = det3(ss, sc, s1, sc, cc, c1, s1, c1, n);
+    double A = det3(ys, sc, s1, yc, cc, c1, y1, c1, n) / D;
+    double B = det3(ss, ys, s1, sc, yc, c1, s1, y1, n) / D;
+    double C = det3(ss, sc, ys, sc, cc, yc, s1, c1, y1) / D;
+    double e = 0;
+    for (size_t i = from; i < to; ++i) {
+        double t = 6.283185307179586 * hz * double(i) / fs;
+        double r = b[2 * i + size_t(ch)] - (A * std::sin(t) + B * std::cos(t) + C);
+        e += r * r;
+    }
+    return std::sqrt(e / n) / std::max(1e-12, std::sqrt(0.5 * (A * A + B * B)));
+}
+
+}  // namespace
+
+// Speech plays at its own source rate: 1 s at 44.1 kHz lasts 1 s at 48 kHz and at 44.1 kHz, at the
+// right pitch, cleanly interpolated (and untouched at 44.1 kHz: step 1).
+TEST(audio_voice_resample_duration) {
+    using namespace audio;
+    const int N = kSrcRate;
+    const std::vector<float> src = sineWave(440.0f, size_t(N), kSrcRate, 0.25f);
+    for (float fs : {48000.0f, 44100.0f}) {
+        Mixer m(3u);
+        setupSpeechMixer(m, fs, false, false);
+        CHECK(m.speechOpen(0, coachParams()));
+        CHECK(m.speechAppend(0, speechChunk(src, 0, src.size())));
+        m.speechClose(0);
+        std::vector<float> out;
+        size_t frames = 0;
+        while (m.speechInfo(0).state != VoiceState::Finished && frames < size_t(3 * fs)) {
+            renderInto(m, out, 1, 1);
+            ++frames;
+        }
+        const size_t expect = size_t(std::ceil(double(N) * fs / kSrcRate)) + 1;  // + the frame that ends it
+        const double res = sineFitResidual(out, 0, 440.0f, fs, size_t(0.1f * fs), size_t(0.9f * fs));
+        std::fprintf(stderr, "  %.0f Hz: finished after %zu frames (expected %zu), played %lld / %d, 440 Hz fit residual %.2e\n", fs,
+                     frames, expect, (long long)m.speechInfo(0).played, N, res);
+        CHECK(frames + 3 >= expect && frames <= expect + 3);
+        CHECK_EQ(m.speechInfo(0).played, int64_t(N));
+        CHECK(res < (fs == 44100.0f ? 1e-5 : 1e-3));
+        CHECK_EQ(m.activeSpeech(), 0);
+        CHECK_EQ(freeRetired(m), 1);
+    }
+}
+
+// Phrase joins: a stream split into chunks (odd lengths, 1- and 2-sample chunks included) renders
+// exactly like the whole buffer; neither has clicks.
+TEST(audio_voice_seamless_join) {
+    using namespace audio;
+    // Faded ends (the TTS contract): the last sample's timing may differ by one output frame between
+    // the renders (the read position is accumulated from a different origin), which must not show.
+    std::vector<float> tone = sineWave(300.0f, size_t(1.2f * kSrcRate), kSrcRate, 0.3f);
+    for (size_t k = 0; k < 441; ++k) {
+        const float w = 0.5f - 0.5f * std::cos(3.14159265f * float(k) / 441.0f);
+        tone[k] *= w;
+        tone[tone.size() - 1 - k] *= w;
+    }
+    const std::vector<float> talk = speechLike(3.0f, kSrcRate, 11u);
+    const std::vector<float>* sources[] = {&tone, &talk};
+    for (const std::vector<float>* src : sources) {
+        std::vector<float> whole, split;
+        const size_t frames = src->size() * 48000 / kSrcRate + 4800;
+        {
+            Mixer m(5u);
+            setupSpeechMixer(m, kFs, true, false);
+            m.speechOpen(0, coachParams());
+            m.speechAppend(0, speechChunk(*src, 0, src->size()));
+            m.speechClose(0);
+            renderInto(m, whole, frames);
+        }
+        const size_t cuts[] = {0, 10007, 10008, 10010, 23333, 23334, src->size()};
+        {
+            Mixer m(5u);
+            setupSpeechMixer(m, kFs, true, false);
+            m.speechOpen(0, coachParams());
+            for (size_t c = 0; c + 1 < sizeof(cuts) / sizeof(cuts[0]); ++c)
+                CHECK(m.speechAppend(0, speechChunk(*src, cuts[c], cuts[c + 1])));
+            m.speechClose(0);
+            renderInto(m, split, frames);
+            CHECK_EQ(m.speechInfo(0).state, VoiceState::Finished);
+            CHECK_EQ(m.speechInfo(0).chunksDone, 6u);
+            CHECK_EQ(freeRetired(m), 6);
+        }
+        float maxDiff = 0.0f;
+        for (size_t i = 0; i < whole.size(); ++i) maxDiff = std::max(maxDiff, std::fabs(whole[i] - split[i]));
+        const float cw = clickRatio(whole), cs = clickRatio(split);
+        std::fprintf(stderr, "  %s: split vs whole max diff %.1e, click ratio %.3f (whole %.3f)\n",
+                     src == &tone ? "tone" : "speech", maxDiff, cs, cw);
+        CHECK(maxDiff < 1e-6f);
+        CHECK(cs < (src == &tone ? 0.02f : 1.0f));
+    }
+}
+
+// Between phrases the voice starves (silent, clock = everything queued) and resumes on the next
+// append; a non-silent phrase end (worst case) is declicked.
+TEST(audio_voice_starve_resume) {
+    using namespace audio;
+    for (int worst = 0; worst < 2; ++worst) {
+        // worst: a tone cut mid-wave on both sides of the gap; otherwise TTS-like phrases.
+        const std::vector<float> a = worst ? sineWave(300.0f, 13337, kSrcRate, 0.3f) : speechLike(0.6f, kSrcRate, 21u);
+        const std::vector<float> b = worst ? sineWave(300.0f, 13337, kSrcRate, 0.3f) : speechLike(0.5f, kSrcRate, 22u);
+        Mixer m(6u);
+        setupSpeechMixer(m, kFs, false, false);
+        m.speechOpen(0, coachParams());
+        CHECK_EQ(m.speechInfo(0).state, VoiceState::Starved);  // open, nothing yet
+        m.speechAppend(0, speechChunk(a, 0, a.size()));
+        std::vector<float> out;
+        renderInto(m, out, size_t(0.1f * kFs));
+        CHECK_EQ(m.speechInfo(0).state, VoiceState::Playing);
+        renderInto(m, out, size_t(0.9f * kFs));
+        CHECK_EQ(m.speechInfo(0).state, VoiceState::Starved);
+        CHECK_EQ(m.speechInfo(0).played, int64_t(a.size()));
+        const size_t gapFrom = out.size() / 2 - size_t(0.2f * kFs), gapTo = out.size() / 2;
+        const double gapE = channelEnergy(out, gapFrom, gapTo, 0) + channelEnergy(out, gapFrom, gapTo, 1);
+        CHECK(gapE < 1e-12);  // silent while starved (dry render)
+        m.speechAppend(0, speechChunk(b, 0, b.size()));
+        renderInto(m, out, size_t(0.1f * kFs));
+        CHECK_EQ(m.speechInfo(0).state, VoiceState::Playing);
+        CHECK(m.speechInfo(0).played > int64_t(a.size()));
+        m.speechClose(0);
+        renderInto(m, out, size_t(0.8f * kFs));
+        CHECK_EQ(m.speechInfo(0).state, VoiceState::Finished);
+        CHECK_EQ(m.speechInfo(0).played, int64_t(a.size() + b.size()));
+        CHECK_EQ(freeRetired(m), 2);
+        const float clicks = clickRatio(out);
+        std::fprintf(stderr, "  starve/resume (%s): click ratio %.3f\n", worst ? "tone cut mid-wave" : "speech phrases", clicks);
+        CHECK(clicks < (worst ? 0.35f : 1.0f));
+        CHECK(analyzeStereo(out).peak <= kMinus1dB);
+    }
+}
+
+// The designed level: TTS-level speech at the coach's mouth, heard from White's seat.
+TEST(audio_voice_level_from_coach) {
+    using namespace audio;
+    const std::vector<float> src = speechLike(4.0f, kSrcRate, 7u);
+    const std::vector<bool> voiced = voicedFrames(src, kSrcRate);
+    const ListenerPose lis = whiteSeatListener();
+    const m::vec3 mouth = coachMouthDefault();
+    const m::vec3 toPlayer = m::normalize(lis.pos - mouth);
+    OfflineStats st;
+    std::vector<float> wet = renderVoiceOffline(src, kSrcRate, 6.0f, mouth, lis, false, &st, toPlayer, true);
+    std::vector<float> dry = renderVoiceOffline(src, kSrcRate, 6.0f, mouth, lis, false, nullptr, toPlayer, false);
+    Analysis a = analyzeStereo(wet);
+    const float level = activeLevelDb(wet, voiced), dryLevel = activeLevelDb(dry, voiced);
+    const double eW = channelEnergy(wet, 0, wet.size() / 2, 0) + channelEnergy(wet, 0, wet.size() / 2, 1);
+    const double eD = channelEnergy(dry, 0, dry.size() / 2, 0) + channelEnergy(dry, 0, dry.size() / 2, 1);
+    const double drr = 10.0 * std::log10(eD / std::max(1e-30, eW - eD));
+    const double lr = 10.0 * std::log10(channelEnergy(wet, 0, wet.size() / 2, 0) / channelEnergy(wet, 0, wet.size() / 2, 1));
+    double se = 0.0;
+    size_t sc = 0;
+    for (size_t j = 0; j < voiced.size(); ++j)
+        if (voiced[j]) {
+            for (size_t k = j * 441; k < (j + 1) * 441; ++k) se += double(src[k]) * src[k];
+            sc += 441;
+        }
+    const float srcLevel = db(float(std::sqrt(se / double(sc))));
+    const Analysis place = analyzeStereo(renderSfxOffline(Sfx::PiecePlace, 1.5f, 1u));
+    std::fprintf(stderr,
+                 "  coach voice at White's seat: source %.1f dBFS RMS -> %.1f dBFS RMS (dry %.1f), peak %.1f dBFS, DRR %+.1f dB, "
+                 "L/R %+.2f dB, limiter %.2f dB; piece_place peak %.1f dBFS\n",
+                 srcLevel, level, dryLevel, db(a.peak), drr, lr, db(st.limiterMinGain), db(place.peak));
+    CHECK(a.finite);
+    CHECK_EQ(a.denormals, 0);
+    CHECK(level > -29.0f && level < -23.0f);
+    CHECK(a.peak <= kMinus1dB);
+    CHECK(db(a.peak) > db(place.peak) - 6.0f && db(a.peak) < db(place.peak) + 8.0f);  // level with the board
+    CHECK(st.limiterMinGain > 0.9f);
+    CHECK(std::fabs(lr) < 0.5);
+    CHECK(drr > 0.0 && drr < 6.0);
+    CHECK(std::fabs(a.dcL) < 2e-4f && std::fabs(a.dcR) < 2e-4f);
+    CHECK(writeWav16((outDir() + "/coach_voice.wav").c_str(), wet.data(), wet.size() / 2, 2, 48000));
+}
+
+// Talker directivity: facing the player = omnidirectional level; turned to the board a little
+// softer; aside and away softer and darker.
+TEST(audio_voice_directivity) {
+    using namespace audio;
+    const std::vector<float> src = speechLike(2.0f, kSrcRate, 9u);
+    const ListenerPose lis = whiteSeatListener();
+    const m::vec3 mouth = coachMouthDefault();
+    const m::vec3 toPlayer = m::normalize(lis.pos - mouth);
+    const m::vec3 toBoard = m::normalize(m::vec3(0.0f, 0.78f, 0.0f) - mouth);
+    struct R {
+        const char* name;
+        m::vec3 facing;
+        double level;
+        float centroid;
+    };
+    R rs[] = {{"omni", m::vec3(0.0f), 0, 0}, {"player", toPlayer, 0, 0}, {"board", toBoard, 0, 0},
+              {"aside", m::vec3(1, 0, 0), 0, 0}, {"away", toPlayer * -1.0f, 0, 0}};
+    for (R& r : rs) {
+        std::vector<float> out = renderVoiceOffline(src, kSrcRate, 2.2f, mouth, lis, false, nullptr, r.facing, false);
+        r.level = 10.0 * std::log10(channelEnergy(out, 0, out.size() / 2, 0) + channelEnergy(out, 0, out.size() / 2, 1));
+        std::vector<float> mono(out.size() / 2);
+        for (size_t i = 0; i < mono.size(); ++i) mono[i] = 0.5f * (out[2 * i] + out[2 * i + 1]);
+        r.centroid = spectralCentroid(mono);
+        std::fprintf(stderr, "  facing %-6s: %+.2f dB, centroid %.0f Hz\n", r.name, r.level - rs[0].level, r.centroid);
+    }
+    CHECK(std::fabs(rs[1].level - rs[0].level) < 0.05);
+    CHECK(rs[2].level < rs[1].level && rs[2].level > rs[1].level - 1.0);
+    CHECK(rs[3].level < rs[1].level - 1.5 && rs[3].level > rs[1].level - 4.0);
+    CHECK(rs[4].level < rs[1].level - 4.5);
+    CHECK(rs[4].centroid < rs[1].centroid * 0.9f);
+    CHECK(rs[3].centroid < rs[1].centroid);
+}
+
+// Ducking: the ambience drops ~6 dB under speech (attack 0.15 s), holds 0.5 s after it, then
+// recovers (release 0.7 s). Effects are not ducked. A zero-gain voice isolates the duck: the
+// renders with and without it differ only by the ducking.
+TEST(audio_voice_ducks_ambience) {
+    using namespace audio;
+    const std::vector<float> talk = sineWave(200.0f, size_t(2.0f * kSrcRate), kSrcRate, 0.3f);
+    auto render = [&](bool voice, bool ambience, std::vector<float>* duckCurve) {
+        Mixer m(77u);
+        setupSpeechMixer(m, kFs, true, ambience);
+        installAllSounds(m, 3u);
+        std::vector<float> out;
+        renderInto(m, out, size_t(1.0f * kFs));
+        if (voice) {
+            SpeechParams p = coachParams();
+            p.gain = 0.0f;
+            m.speechOpen(0, p);
+            m.speechAppend(0, speechChunk(talk, 0, talk.size()));
+            m.speechClose(0);
+        }
+        for (int b = 0; b < int(6.0f * kFs) / 480; ++b) {
+            if (b == 100 && !ambience) {  // a piece placed while the coach talks
+                PlayRequest r;
+                r.sfx = Sfx::PiecePlace;
+                r.pos = defaultPosition(Sfx::PiecePlace);
+                m.play(r);
+            }
+            renderInto(m, out, 480);
+            if (duckCurve) duckCurve->push_back(m.duckGain());
+        }
+        return out;
+    };
+    std::vector<float> curve;
+    const std::vector<float> ducked = render(true, true, &curve), plain = render(false, true, nullptr);
+    auto ratioDb = [&](float t0, float t1) {
+        size_t a = size_t(t0 * kFs), b = size_t(t1 * kFs);
+        double e1 = channelEnergy(ducked, a, b, 0) + channelEnergy(ducked, a, b, 1);
+        double e0 = channelEnergy(plain, a, b, 0) + channelEnergy(plain, a, b, 1);
+        return 10.0 * std::log10(e1 / e0);
+    };
+    // The voice starts at 1.0 s and ends at ~3.0 s (render time); the curve has one value per 10 ms.
+    const double before = ratioDb(0.5f, 1.0f), mid = ratioDb(1.8f, 2.9f), hold = ratioDb(3.1f, 3.45f), after = ratioDb(6.0f, 7.0f);
+    const float at300 = curve[30];
+    float lo = 1.0f;
+    for (float g : curve) lo = std::min(lo, g);
+    std::fprintf(stderr,
+                 "  ducking: before %+.2f dB, speaking %+.2f dB, hold %+.2f dB, 3 s after %+.2f dB; gain after 0.3 s %.3f, min %.3f\n",
+                 before, mid, hold, after, at300, lo);
+    CHECK(std::fabs(before) < 0.01);
+    CHECK(mid < -5.0 && mid > -7.0);
+    CHECK(hold < -4.5);
+    CHECK(after > -0.5);
+    CHECK(at300 < 0.62f && at300 > 0.52f);
+    CHECK(std::fabs(lo - 0.5012f) < 0.01f);
+    // Effects: the same piece placement with and without speech, no ambience: identical.
+    const std::vector<float> fxV = render(true, false, nullptr), fx0 = render(false, false, nullptr);
+    float diff = 0.0f, peak = 0.0f;
+    for (size_t i = 0; i < fxV.size(); ++i) {
+        diff = std::max(diff, std::fabs(fxV[i] - fx0[i]));
+        peak = std::max(peak, std::fabs(fx0[i]));
+    }
+    std::fprintf(stderr, "  effects under speech: max difference %.1e (piece peak %.1f dBFS)\n", diff, db(peak));
+    CHECK(peak > 0.01f);
+    CHECK(diff < 1e-7f);
+}
+
+// Pause holds the position with 15 ms fades; stop fades out (or cuts, declicked) and ends Stopped.
+TEST(audio_voice_pause_resume_stop_fades) {
+    using namespace audio;
+    const std::vector<float> tone = sineWave(300.0f, size_t(3.0f * kSrcRate), kSrcRate, 0.3f);
+    {
+        Mixer m(8u);
+        setupSpeechMixer(m, kFs, false, false);
+        m.speechOpen(0, coachParams());
+        m.speechAppend(0, speechChunk(tone, 0, tone.size()));
+        m.speechClose(0);
+        std::vector<float> out;
+        renderInto(m, out, size_t(0.5f * kFs), 64);
+        m.speechPause(0, true);
+        CHECK_EQ(m.speechInfo(0).state, VoiceState::Paused);
+        renderInto(m, out, size_t(0.05f * kFs), 64);
+        const int64_t p1 = m.speechInfo(0).played;
+        renderInto(m, out, size_t(0.3f * kFs), 64);
+        const int64_t p2 = m.speechInfo(0).played;
+        const size_t q0 = out.size() / 2 - size_t(0.25f * kFs), q1 = out.size() / 2;
+        const float pausedDb = rangeDb(out, q0, q1);
+        const double fadeSec = double(p1) / kSrcRate - 0.5;
+        m.speechPause(0, false);
+        renderInto(m, out, size_t(0.3f * kFs), 64);
+        const int64_t p3 = m.speechInfo(0).played;
+        CHECK_EQ(m.speechInfo(0).state, VoiceState::Playing);
+        const float pauseClicks = clickRatio(out);
+        std::fprintf(stderr,
+                     "  pause: clock ran %.1f ms into the pause, frozen %s, paused output %.0f dBFS, resumed +%.3f s, click ratio %.3f\n",
+                     fadeSec * 1000.0, p1 == p2 ? "yes" : "NO", pausedDb, double(p3 - p2) / kSrcRate, pauseClicks);
+        CHECK(fadeSec > 0.010 && fadeSec < 0.020);
+        CHECK_EQ(p1, p2);
+        CHECK(pausedDb < -80.0f);  // silent but for the master DC blocker settling
+        CHECK(p3 > p2 + int64_t(0.25f * kSrcRate));
+        CHECK(pauseClicks < 0.02f);
+        // Stop with a 60 ms fade.
+        m.speechStop(0, 0.06f);
+        renderInto(m, out, size_t(0.03f * kFs), 64);
+        CHECK_EQ(m.speechInfo(0).state, VoiceState::Playing);  // still fading
+        renderInto(m, out, size_t(0.04f * kFs), 64);
+        CHECK_EQ(m.speechInfo(0).state, VoiceState::Stopped);
+        const int64_t ps = m.speechInfo(0).played;
+        renderInto(m, out, size_t(0.2f * kFs), 64);
+        const size_t s0 = out.size() / 2 - size_t(0.15f * kFs), s1 = out.size() / 2;
+        CHECK(rangeDb(out, s0, s1) < -80.0f);
+        CHECK_EQ(m.speechInfo(0).played, ps);
+        CHECK_EQ(m.activeSpeech(), 0);
+        const float stopClicks = clickRatio(out);
+        std::fprintf(stderr, "  stop (60 ms fade): click ratio %.3f\n", stopClicks);
+        CHECK(stopClicks < 0.02f);
+        CHECK_EQ(freeRetired(m), 1);
+    }
+    {  // Immediate stop mid-wave: declicked by the tail.
+        Mixer m(8u);
+        setupSpeechMixer(m, kFs, false, false);
+        m.speechOpen(0, coachParams());
+        m.speechAppend(0, speechChunk(tone, 0, tone.size()));
+        std::vector<float> out;
+        renderInto(m, out, size_t(0.3f * kFs) + 37, 64);
+        m.speechStop(0, 0.0f);
+        CHECK_EQ(m.speechInfo(0).state, VoiceState::Stopped);
+        renderInto(m, out, size_t(0.1f * kFs), 64);
+        const float clicks = clickRatio(out);
+        std::fprintf(stderr, "  stop (immediate, mid-wave): click ratio %.3f\n", clicks);
+        CHECK(clicks < 0.35f);
+        CHECK_EQ(freeRetired(m), 1);
+    }
+}
+
+// The speech pool is separate: 40 effects at once never steal or cut the coach.
+TEST(audio_voice_not_stolen_by_effects) {
+    using namespace audio;
+    const std::vector<float> talk = speechLike(1.5f, kSrcRate, 31u);
+    Mixer m(10u);
+    setupSpeechMixer(m, kFs, true, false);
+    installAllSounds(m, 4u);
+    m.speechOpen(1, coachParams());
+    m.speechAppend(1, speechChunk(talk, 0, talk.size()));
+    m.speechClose(1);
+    std::vector<float> out;
+    renderInto(m, out, size_t(0.2f * kFs));
+    for (int k = 0; k < 40; ++k) {
+        PlayRequest r;
+        r.sfx = Sfx::Capture;
+        r.pos = m::vec3(0.01f * float(k), 0.8f, 0.0f);
+        CHECK(m.play(r));
+    }
+    CHECK_EQ(m.activeVoices(), kMaxVoices);
+    CHECK_EQ(m.activeSpeech(), 1);
+    renderInto(m, out, size_t(2.0f * kFs));
+    CHECK_EQ(m.speechInfo(1).state, VoiceState::Finished);
+    CHECK_EQ(m.speechInfo(1).played, int64_t(talk.size()));
+    CHECK(analyzeStereo(out).peak <= kMinus1dB);
+}
+
+// The emitter follows the pose: at the coach's right, then its left, with ramped gains.
+TEST(audio_voice_follows_pose) {
+    using namespace audio;
+    const std::vector<float> tone = sineWave(300.0f, size_t(1.5f * kSrcRate), kSrcRate, 0.3f);
+    Mixer m(12u);
+    setupSpeechMixer(m, kFs, false, false);
+    SpeechParams p = coachParams();
+    p.pos = m::vec3(0.6f, 1.17f, -0.3f);
+    m.speechOpen(0, p);
+    m.speechAppend(0, speechChunk(tone, 0, tone.size()));
+    m.speechClose(0);
+    std::vector<float> out;
+    renderInto(m, out, size_t(0.5f * kFs));
+    m.speechPose(0, m::vec3(-0.6f, 1.17f, -0.3f), m::vec3(0.0f));
+    renderInto(m, out, size_t(0.6f * kFs));
+    const size_t a0 = size_t(0.1f * kFs), a1 = size_t(0.5f * kFs), b0 = size_t(0.6f * kFs), b1 = size_t(1.0f * kFs);
+    const double first = 10.0 * std::log10(channelEnergy(out, a0, a1, 1) / channelEnergy(out, a0, a1, 0));
+    const double second = 10.0 * std::log10(channelEnergy(out, b0, b1, 1) / channelEnergy(out, b0, b1, 0));
+    const float clicks = clickRatio(out);
+    std::fprintf(stderr, "  pose: R/L %+.1f dB at the right, %+.1f dB after moving left, click ratio %.3f\n", first, second, clicks);
+    CHECK(first > 4.0);
+    CHECK(second < -4.0);
+    CHECK(clicks < 0.05f);
+}
+
+// Voice bus volume, chunk ownership (every chunk comes back through the retired list, whatever
+// ends the voice) and refusals.
+TEST(audio_voice_volume_and_chunk_ownership) {
+    using namespace audio;
+    const std::vector<float> tone = sineWave(300.0f, size_t(0.5f * kSrcRate), kSrcRate, 0.3f);
+    auto energyAt = [&](float vol) {
+        Mixer m(13u);
+        setupSpeechMixer(m, kFs, false, false);
+        m.setVoiceVolume(vol);
+        m.speechOpen(0, coachParams());
+        m.speechAppend(0, speechChunk(tone, 0, tone.size()));
+        m.speechClose(0);
+        std::vector<float> out;
+        renderInto(m, out, size_t(0.6f * kFs));
+        return channelEnergy(out, 0, out.size() / 2, 0) + channelEnergy(out, 0, out.size() / 2, 1);
+    };
+    const double e1 = energyAt(1.0f), eHalf = energyAt(0.5f), e0 = energyAt(0.0f), e2 = energyAt(2.0f), eBig = energyAt(9.0f);
+    std::fprintf(stderr, "  voice volume 0.5: %+.2f dB, 2: %+.2f dB (9 clamps to 2: %+.2f dB), 0: %s\n", 10.0 * std::log10(eHalf / e1),
+                 10.0 * std::log10(e2 / e1), 10.0 * std::log10(eBig / e1), e0 == 0.0 ? "silent" : "NOT SILENT");
+    CHECK(std::fabs(10.0 * std::log10(eHalf / e1) + 6.02) < 0.05);
+    CHECK(std::fabs(10.0 * std::log10(e2 / e1) - 6.02) < 0.05);
+    CHECK(std::fabs(10.0 * std::log10(eBig / e2)) < 0.01);
+    CHECK(e0 == 0.0);
+
+    Mixer m(14u);
+    setupSpeechMixer(m, kFs, false, false);
+    std::vector<float> out;
+    // Played to the end: 5 chunks back (+ 1 refused after the close).
+    m.speechOpen(0, coachParams());
+    for (int k = 0; k < 5; ++k) CHECK(m.speechAppend(0, speechChunk(tone, size_t(k) * 1000, size_t(k + 1) * 1000)));
+    m.speechClose(0);
+    CHECK(!m.speechAppend(0, speechChunk(tone, 0, 100)));
+    renderInto(m, out, size_t(0.2f * kFs));
+    CHECK_EQ(m.speechInfo(0).state, VoiceState::Finished);
+    CHECK_EQ(freeRetired(m), 6);
+    // Stopped with audio queued: every chunk back at once.
+    m.speechOpen(1, coachParams());
+    for (int k = 0; k < 7; ++k) m.speechAppend(1, speechChunk(tone, 0, tone.size()));
+    renderInto(m, out, size_t(0.05f * kFs));
+    m.speechStop(1, 0.0f);
+    CHECK_EQ(m.speechInfo(1).state, VoiceState::Stopped);
+    CHECK_EQ(m.speechInfo(1).chunksDone, 7u);
+    CHECK_EQ(freeRetired(m), 7);
+    // Reopened while talking: the old voice's chunks come back; the FIFO capacity is enforced.
+    m.speechOpen(0, coachParams());
+    for (int k = 0; k < 3; ++k) m.speechAppend(0, speechChunk(tone, 0, tone.size()));
+    renderInto(m, out, size_t(0.05f * kFs));
+    m.speechOpen(0, coachParams());
+    CHECK_EQ(freeRetired(m), 3);
+    int accepted = 0;
+    for (int k = 0; k < kSpeechChunks + 5; ++k) accepted += m.speechAppend(0, speechChunk(tone, 0, 10)) ? 1 : 0;
+    CHECK_EQ(accepted, kSpeechChunks);
+    CHECK_EQ(freeRetired(m), 5);
+    m.speechStop(0, 0.0f);
+    CHECK_EQ(freeRetired(m), kSpeechChunks);
+    // Invalid slots are refused without leaking.
+    CHECK(!m.speechOpen(2, coachParams()));
+    CHECK(!m.speechAppend(-1, speechChunk(tone, 0, 10)));
+    CHECK_EQ(freeRetired(m), 1);
+    renderInto(m, out, size_t(0.05f * kFs));
+    CHECK(analyzeStereo(out).finite);
+}
+
+namespace {
+// Polls voiceStatus() every 5 ms until 'done' holds or 'seconds' pass; returns the last status.
+template <class Pred>
+audio::VoiceStatus waitVoice(audio::VoiceId id, float seconds, Pred done, bool* sawPlaying = nullptr, int* maxSpeech = nullptr) {
+    auto t0 = std::chrono::steady_clock::now();
+    audio::VoiceStatus s = audio::voiceStatus(id);
+    while (!done(s) && std::chrono::duration<float>(std::chrono::steady_clock::now() - t0).count() < seconds) {
+        if (sawPlaying && s.state == audio::VoiceState::Playing) *sawPlaying = true;
+        if (maxSpeech) *maxSpeech = std::max(*maxSpeech, audio::stats().activeSpeech);
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        s = audio::voiceStatus(id);
+    }
+    return s;
+}
+bool isState(const audio::VoiceStatus& s, audio::VoiceState st) { return s.state == st; }
+}  // namespace
+
+// A coaching moment at the default settings, for listening and as a level regression: the coach
+// speaks three phrases over the ambience (ducked), plays a demonstration move in the gap between
+// two phrases (the voice starves meanwhile) and a capture lands in the middle of a sentence.
+TEST(audio_voice_scene_demo_wav) {
+    using namespace audio;
+    Mixer m(2025u);
+    m.prepare(kFs);
+    m.setVolumes(0.9f, 1.0f, 0.7f);
+    m.setVoiceVolume(1.0f);
+    m.setAmbienceEnabled(true, true);
+    m.setListener(whiteSeatListener());
+    installAllSounds(m, 6u);
+    auto sq = [](int f, int r) { return m::vec3((float(f) - 3.5f) * 0.055f, 0.782f, (3.5f - float(r)) * 0.055f); };
+    const std::vector<float> p1 = speechLike(1.8f, kSrcRate, 61u), p2 = speechLike(2.2f, kSrcRate, 62u),
+                             p3 = speechLike(1.5f, kSrcRate, 63u);
+    const m::vec3 toPlayer = m::normalize(whiteSeatListener().pos - coachMouthDefault());
+    const m::vec3 toBoard = m::normalize(m::vec3(0.0f, 0.78f, 0.0f) - coachMouthDefault());
+    std::vector<float> out;
+    renderInto(m, out, size_t(1.0f * kFs));
+    m.speechOpen(0, coachParams(toPlayer));
+    m.speechAppend(0, speechChunk(p1, 0, p1.size()));
+    renderInto(m, out, size_t(2.2f * kFs));
+    m.speechPose(0, coachMouthDefault(), toBoard);  // looks at the board for the demonstration
+    PlayRequest r;
+    r.sfx = Sfx::PiecePickup;
+    r.pos = sq(6, 7);  // Ng8
+    r.pitch = 0.98f;
+    m.play(r);
+    renderInto(m, out, size_t(0.8f * kFs));
+    r.sfx = Sfx::PiecePlace;
+    r.pos = sq(5, 5);  // -f6
+    m.play(r);
+    renderInto(m, out, size_t(0.4f * kFs));
+    m.speechAppend(0, speechChunk(p2, 0, p2.size()));
+    renderInto(m, out, size_t(1.0f * kFs));
+    r.sfx = Sfx::CaptureClick;  // mid-sentence
+    r.pos = sq(4, 4);
+    r.pitch = 1.0f;
+    m.play(r);
+    renderInto(m, out, size_t(0.9f * kFs));
+    r.sfx = Sfx::TablePlace;
+    r.pos = m::vec3(-0.30f, 0.76f, -0.30f);
+    m.play(r);
+    renderInto(m, out, size_t(0.6f * kFs));
+    m.speechPose(0, coachMouthDefault(), toPlayer);
+    m.speechAppend(0, speechChunk(p3, 0, p3.size()));
+    m.speechClose(0);
+    renderInto(m, out, size_t(3.5f * kFs));
+    CHECK_EQ(m.speechInfo(0).state, VoiceState::Finished);
+    CHECK_EQ(m.speechInfo(0).played, int64_t(p1.size() + p2.size() + p3.size()));
+    Analysis a = analyzeStereo(out);
+    const float lim = m.takeLimiterMinGain();
+    std::fprintf(stderr, "  coach scene: peak %.2f dBFS, rms %.2f dBFS, limiter min gain %.2f dB, ambience duck %.2f at the end\n",
+                 db(a.peak), db(a.rms), db(lim), m.duckGain());
+    CHECK(a.finite);
+    CHECK_EQ(a.denormals, 0);
+    CHECK(a.peak <= kMinus1dB);
+    CHECK(lim > 0.9f);
+    CHECK(writeWav16((outDir() + "/coach_scene.wav").c_str(), out.data(), out.size() / 2, 2, 48000));
+}
+
+// The live engine (null backend on Linux, real time): the public voice API end to end, the output
+// WAV dump, and no leak whatever ends the voices.
+TEST(audio_voice_live_engine) {
+    using namespace audio;
+    using namespace std::chrono_literals;
+    auto finished = [](const VoiceStatus& s) { return isState(s, VoiceState::Finished); };
+    VoiceParams vp;
+    vp.position = coachMouthDefault();
+    vp.facing = m::normalize(whiteSeatListener().pos - vp.position);
+    vp.sampleRate = kSrcRate;
+    // Before init(): nothing opens and refused audio stays with the caller.
+    CHECK(!openVoice(vp));
+    std::vector<float> keep = speechLike(0.2f, kSrcRate, 3u);
+    const size_t keepN = keep.size();
+    CHECK(appendVoice(VoiceId{0xfffffffeu}, std::move(keep)) < 0.0);
+    CHECK_EQ(keep.size(), keepN);
+    CHECK_EQ(voiceStatus(VoiceId{0xfffffffeu}).state, VoiceState::None);
+    CHECK_EQ(voiceStatus(VoiceId{}).state, VoiceState::None);
+
+#ifndef _WIN32
+    const std::string dump = outDir() + "/live_voice_dump.wav";
+    std::remove(dump.c_str());
+    setenv("SCACELITH_AUDIO_DUMP", dump.c_str(), 1);
+#endif
+    setAmbienceEnabled(false);
+    setVoiceVolume(0.0f);  // set before init(): applies from the first block
+    const bool ok = init();
+#ifndef _WIN32
+    unsetenv("SCACELITH_AUDIO_DUMP");
+#endif
+    if (!ok) {  // Windows without a device: voices stay Pending; nothing else to check here
+        shutdown();
+        setAmbienceEnabled(true);
+        setVoiceVolume(1.0f);
+        return;
+    }
+    const ListenerPose lis = whiteSeatListener();
+    setListener(lis.pos, lis.fwd, lis.up);
+    std::this_thread::sleep_for(30ms);
+    debugTakeOutputPeak();
+
+    // Voice volume 0: the whole voice plays, silently.
+    VoiceId v0 = playVoice(speechLike(0.3f, kSrcRate, 40u), vp);
+    CHECK(bool(v0));
+    CHECK_EQ(waitVoice(v0, 2.0f, finished).state, VoiceState::Finished);
+    const float peak0 = debugTakeOutputPeak();
+    setVoiceVolume(1.0f);
+    std::this_thread::sleep_for(250ms);
+    debugTakeOutputPeak();
+
+    // A two-phrase utterance: phrase starts on the speech clock, states, activeSpeech, duration.
+    std::vector<float> a = speechLike(0.5f, kSrcRate, 41u), b = speechLike(0.3f, kSrcRate, 42u);
+    const size_t na = a.size(), nb = b.size();
+    const double total = double(na + nb) / kSrcRate;
+    VoiceId v1 = openVoice(vp);
+    CHECK(bool(v1));
+    const VoiceState s0 = voiceStatus(v1).state;
+    CHECK(s0 == VoiceState::Pending || s0 == VoiceState::Starved);
+    const auto t1 = std::chrono::steady_clock::now();
+    CHECK_EQ(appendVoice(v1, std::move(a)), 0.0);
+    CHECK(std::fabs(appendVoice(v1, std::move(b)) - double(na) / kSrcRate) < 1e-12);
+    closeVoice(v1);
+    CHECK(appendVoice(v1, std::vector<float>(100, 0.0f)) < 0.0);  // closed
+    bool sawPlaying = false;
+    int maxSpeech = 0;
+    VoiceStatus st = waitVoice(v1, 3.0f, finished, &sawPlaying, &maxSpeech);
+    const double took = std::chrono::duration<double>(std::chrono::steady_clock::now() - t1).count();
+    const float peak1 = debugTakeOutputPeak();
+    std::fprintf(stderr, "  live: %.3f s utterance finished after %.3f s, played %.3f s, peak %.1f dBFS (volume 0: %.1f dBFS)\n",
+                 total, took, st.played, db(peak1), db(peak0));
+    CHECK_EQ(st.state, VoiceState::Finished);
+    CHECK(sawPlaying);
+    CHECK_EQ(maxSpeech, 1);
+    CHECK(st.closed);
+    CHECK(std::fabs(st.played - total) < 1e-9 && std::fabs(st.queued - total) < 1e-9);
+    CHECK(took > total - 0.05 && took < total + 0.4);
+    CHECK(peak1 > 0.02f && peak1 <= kMinus1dB);
+    CHECK(peak0 < 1e-4f);
+    std::this_thread::sleep_for(30ms);
+    CHECK_EQ(stats().activeSpeech, 0);
+
+    // Starved between phrases, then resumed; the finished voice's slot is reused (v1 goes stale).
+    VoiceId v2 = openVoice(vp);
+    CHECK(bool(v2) && v2 != v1);
+    CHECK_EQ(voiceStatus(v1).state, VoiceState::None);
+    CHECK_EQ(appendVoice(v2, speechLike(0.15f, kSrcRate, 43u)), 0.0);
+    st = waitVoice(v2, 1.0f, [](const VoiceStatus& s) { return isState(s, VoiceState::Starved) && s.played > 0.0; });
+    CHECK_EQ(st.state, VoiceState::Starved);
+    CHECK(std::fabs(st.played - st.queued) < 1e-9);
+    CHECK(std::fabs(appendVoice(v2, speechLike(0.6f, kSrcRate, 44u)) - st.queued) < 1e-12);
+    st = waitVoice(v2, 0.5f, [](const VoiceStatus& s) { return isState(s, VoiceState::Playing); });
+    CHECK_EQ(st.state, VoiceState::Playing);
+    std::this_thread::sleep_for(100ms);
+    setVoicePaused(v2, true);
+    std::this_thread::sleep_for(60ms);
+    const VoiceStatus p1 = voiceStatus(v2);
+    std::this_thread::sleep_for(100ms);
+    const VoiceStatus p2 = voiceStatus(v2);
+    CHECK_EQ(p1.state, VoiceState::Paused);
+    CHECK_EQ(p1.played, p2.played);
+    setVoicePaused(v2, false);
+    closeVoice(v2);
+    st = waitVoice(v2, 2.0f, finished);
+    CHECK_EQ(st.state, VoiceState::Finished);
+    CHECK(std::fabs(st.played - st.queued) < 1e-9);
+
+    // Stopped mid-phrase and replaced at once: one successor takes the free slot, the next one the
+    // slot being stopped (the stopped handle goes stale); a third open finds no slot.
+    VoiceId v3 = playVoice(speechLike(2.0f, kSrcRate, 45u), vp);
+    st = waitVoice(v3, 1.0f, [](const VoiceStatus& s) { return s.played > 0.2; });
+    setVoicePose(v3, vp.position + m::vec3(0.1f, 0.0f, 0.0f), m::vec3(0.0f, 0.0f, 1.0f));
+    stopVoice(v3, 0.06f);
+    VoiceId v4 = openVoice(vp), v5 = openVoice(vp);
+    CHECK(bool(v4) && bool(v5));
+    CHECK_EQ(voiceStatus(v3).state, VoiceState::None);
+    CHECK(!openVoice(vp));
+    CHECK_EQ(appendVoice(v5, speechLike(0.2f, kSrcRate, 46u)), 0.0);
+    closeVoice(v5);
+    stopVoice(v4, 0.0f);
+    CHECK_EQ(waitVoice(v5, 1.5f, finished).state, VoiceState::Finished);
+    CHECK_EQ(waitVoice(v4, 0.5f, [](const VoiceStatus& s) { return isState(s, VoiceState::Stopped); }).state, VoiceState::Stopped);
+
+    // Appends from another thread while this thread stops the voice.
+    VoiceId v6 = openVoice(vp);
+    std::atomic<int> accepted{0}, refused{0};
+    std::thread producer([&] {
+        for (int k = 0; k < 400 && refused.load() < 20; ++k) {
+            if (appendVoice(v6, sineWave(200.0f, 441, kSrcRate, 0.1f)) < 0.0) ++refused;
+            else ++accepted;
+            std::this_thread::sleep_for(1ms);
+        }
+    });
+    std::this_thread::sleep_for(80ms);
+    stopVoice(v6, 0.02f);
+    producer.join();
+    st = waitVoice(v6, 0.5f, [](const VoiceStatus& s) { return isState(s, VoiceState::Stopped); });
+    std::fprintf(stderr, "  live: second-thread appends: %d accepted before the stop, %d refused after\n", accepted.load(), refused.load());
+    CHECK(accepted.load() > 0 && refused.load() > 0);
+    CHECK_EQ(st.state, VoiceState::Stopped);
+    CHECK(st.played < st.queued + 1e-9);
+
+    // Shutdown with a voice talking: it ends Stopped, later calls refuse cleanly, nothing leaks.
+    VoiceId v7 = openVoice(vp);
+    CHECK(appendVoice(v7, speechLike(1.0f, kSrcRate, 47u)) == 0.0);
+    std::this_thread::sleep_for(50ms);
+    shutdown();
+    CHECK_EQ(voiceStatus(v7).state, VoiceState::Stopped);
+    std::vector<float> late = speechLike(0.1f, kSrcRate, 48u);
+    const size_t lateN = late.size();
+    CHECK(appendVoice(v7, std::move(late)) < 0.0);
+    CHECK_EQ(late.size(), lateN);
+    CHECK(!openVoice(vp));
+    stopVoice(v7);
+    setVoicePose(v7, vp.position);
+    CHECK_EQ(debugSpeechChunksAlive(), 0);
+    setAmbienceEnabled(true);
+
+#ifndef _WIN32
+    // The dump holds the session's output: a valid 48 kHz stereo WAV with the speech in it.
+    FILE* f = std::fopen(dump.c_str(), "rb");
+    CHECK(f != nullptr);
+    if (f) {
+        std::vector<uint8_t> bytes;
+        uint8_t chunkBuf[65536];
+        size_t n;
+        while ((n = std::fread(chunkBuf, 1, sizeof(chunkBuf), f)) > 0) bytes.insert(bytes.end(), chunkBuf, chunkBuf + n);
+        std::fclose(f);
+        auto u32 = [&](size_t at) {
+            return uint32_t(bytes[at]) | uint32_t(bytes[at + 1]) << 8 | uint32_t(bytes[at + 2]) << 16 | uint32_t(bytes[at + 3]) << 24;
+        };
+        CHECK(bytes.size() > 44 && std::memcmp(bytes.data(), "RIFF", 4) == 0 && std::memcmp(bytes.data() + 8, "WAVE", 4) == 0);
+        if (bytes.size() > 44) {
+            CHECK_EQ(size_t(u32(40)), bytes.size() - 44);
+            CHECK_EQ(u32(24), 48000u);
+            int peak = 0;
+            for (size_t i = 44; i + 1 < bytes.size(); i += 2)
+                peak = std::max(peak, std::abs(int(int16_t(uint16_t(bytes[i] | bytes[i + 1] << 8)))));
+            const double secs = double(bytes.size() - 44) / (48000.0 * 4.0);
+            std::fprintf(stderr, "  live: output dump %.2f s, peak %.1f dBFS (%s)\n", secs, db(float(peak) / 32768.0f), dump.c_str());
+            CHECK(secs > 2.0);
+            CHECK(peak > 600);
+        }
+    }
+#endif
 }
