@@ -2,9 +2,11 @@
 
 #include "core/log.h"
 
+#include <algorithm>
 #include <chrono>
 #include <condition_variable>
 #include <cstdlib>
+#include <cstring>
 #include <deque>
 #include <iostream>
 #include <mutex>
@@ -138,6 +140,8 @@ struct UciHost::State {
     std::mutex doneM;      // engine thread finished (so join() will not block)
     std::condition_variable doneCv;
     bool done = false;
+    std::string archLimit = "auto";          // engine.arch, as accepted by the dispatcher
+    std::vector<std::string> stopAtExitFor;  // variants whose initialisers preceded a stopEngineAtExit
 };
 
 UciHost::UciHost() : s_(new State) {}
@@ -152,11 +156,13 @@ UciHost& UciHost::instance() {
 
 #if defined(SCACELITH_HAS_STOCKFISH)
 namespace {
-// Engine left running at process exit: stop it before Stockfish's globals are destroyed. Registered
-// on the first acquire(), i.e. after static initialisation, so it runs before those destructors.
-// The wait is bounded: on Windows exit() holds the CRT's atexit lock while running handlers, and an
-// engine thread that is still initialising may block on that very lock (registering the destructor
-// of a function-local static); it is then left parked until the process ends.
+// Engine left running at process exit: stop it before Stockfish's globals are destroyed. A
+// variant's static initialisers register those destructors with atexit when the variant is first
+// chosen (stockfish_embedded_supported()), so this is registered after them, once per variant, and
+// runs before them. The wait is bounded: on Windows exit() holds the CRT's atexit lock while
+// running handlers, and an engine thread that is still initialising may block on that very lock
+// (registering the destructor of a function-local static); it is then left parked until the
+// process ends.
 void stopEngineAtExit() {
     UciHost& h = UciHost::instance();
     h.releaseAny(2000);
@@ -169,12 +175,26 @@ bool UciHost::acquire(const void* owner) {
     std::lock_guard<std::mutex> lk(s_->m);
     if (s_->owner) return s_->owner == owner;
     if (s_->wedged) return false;
+    // Chooses the variant and, the first time it is chosen, runs its static initialisers.
     if (!stockfish_embedded_supported()) {
-        LOGW("ai: this CPU lacks SSE4.1/POPCNT, the embedded Stockfish cannot run");
+        std::string built;
+        for (const std::string& v : variants()) built += (built.empty() ? "" : ", ") + v;
+        const char* best = stockfish_embedded_best_arch();
+        if (std::strcmp(best, "none") == 0)
+            LOGW("ai: this CPU runs none of the Stockfish variants of this build (%s): the engine is unavailable",
+                 built.c_str());
+        else
+            LOGW("ai: engine.arch = %s excludes every Stockfish variant this CPU runs (built: %s; best: %s): "
+                 "the engine is unavailable",
+                 s_->archLimit.c_str(), built.c_str(), best);
         return false;
     }
-    static const bool atExitRegistered = std::atexit(stopEngineAtExit) == 0;
-    (void)atExitRegistered;
+    const std::string arch = stockfish_embedded_arch();
+    // After the variant's initialisers, once per variant (see stopEngineAtExit).
+    if (std::find(s_->stopAtExitFor.begin(), s_->stopAtExitFor.end(), arch) == s_->stopAtExitFor.end()) {
+        s_->stopAtExitFor.push_back(arch);
+        std::atexit(stopEngineAtExit);
+    }
     s_->in.reset();
     s_->out.reset();
     s_->oldCin = std::cin.rdbuf(&s_->in);
@@ -183,7 +203,12 @@ bool UciHost::acquire(const void* owner) {
     std::cout.clear();
     s_->owner = owner;
     s_->done = false;
-    LOGI("ai: starting embedded Stockfish (%s)", stockfish_embedded_arch());
+    const char* best = stockfish_embedded_best_arch();
+    if (arch == best)
+        LOGI("ai: starting embedded Stockfish (%s)", arch.c_str());
+    else
+        LOGI("ai: starting embedded Stockfish (%s, limited by engine.arch = %s; this CPU runs %s)", arch.c_str(),
+             s_->archLimit.c_str(), best);
     State* st = s_;
     s_->thread = std::thread([st] {
         stockfish_embedded_main();
@@ -245,12 +270,37 @@ bool UciHost::poll(std::string& line) { return s_->out.pop(line, 0); }
 
 bool UciHost::waitLine(std::string& line, int timeoutMs) { return s_->out.pop(line, timeoutMs > 0 ? timeoutMs : 0); }
 
+void UciHost::setArchLimit(const std::string& arch) {
+#if defined(SCACELITH_HAS_STOCKFISH)
+    std::lock_guard<std::mutex> lk(s_->m);
+    if (arch == s_->archLimit) return;
+    // Takes effect at the next acquire(); a running session keeps its variant.
+    if (!stockfish_embedded_limit_arch(arch.c_str())) {
+        LOGW("ai: unknown engine.arch \"%s\" (auto or one of x86-64, x86-64-sse41-popcnt, x86-64-avx2, "
+             "x86-64-avxvnni, x86-64-avx512icl), keeping %s",
+             arch.c_str(), s_->archLimit.c_str());
+        return;
+    }
+    s_->archLimit = arch;
+#else
+    (void)arch;
+#endif
+}
+
 const char* UciHost::arch() const {
 #if defined(SCACELITH_HAS_STOCKFISH)
     return stockfish_embedded_arch();
 #else
     return "none";
 #endif
+}
+
+std::vector<std::string> UciHost::variants() const {
+    std::vector<std::string> out;
+#if defined(SCACELITH_HAS_STOCKFISH)
+    for (int i = 0; i < stockfish_embedded_variant_count(); ++i) out.push_back(stockfish_embedded_variant(i));
+#endif
+    return out;
 }
 
 }  // namespace ai::detail

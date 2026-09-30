@@ -68,6 +68,9 @@ struct Settings {
     int customNodes = 0;
     int engineThreads = 1;
     int engineHashMB = 64;
+    // Stockfish instruction-set variant: "auto" = the best this CPU runs, or a variant name capping
+    // it, e.g. "x86-64-sse41-popcnt" (troubleshooting; ai::Engine::setArchLimit)
+    std::string engineArch = "auto";
     bool humanizeThinking = true; // spend realistic time before moving
     // [player] the human's rating (elo.h), updated after every rated game against Stockfish
     int playerElo = 1500;

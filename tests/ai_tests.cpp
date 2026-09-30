@@ -1,9 +1,10 @@
 // Tests for src/ai: presets, humanised timing, draw decisions and the embedded Stockfish 19
-// (start-up, moves, evaluation, stop, new games, shutdown/restart).
+// (start-up, moves, evaluation, stop, new games, shutdown/restart, instruction-set variants).
 #include "test.h"
 
 #include "ai/behavior.h"
 #include "ai/engine.h"
+#include "ai/uci_host.h"
 
 #include <chrono>
 #include <cstring>
@@ -436,6 +437,94 @@ TEST(ai_shutdown_restart) {
         CHECK(plausibleMove({"e2e4"}, waitMove(a, 20000)));
         a.shutdown();
     }
+}
+
+namespace {
+
+// Reads engine output until a line starting with `prefix`, keeping the lines; false on timeout.
+bool readUntil(ai::detail::UciHost& host, const std::string& prefix, std::vector<std::string>& lines,
+               int timeoutMs) {
+    auto t0 = SteadyClock::now();
+    std::string line;
+    while (msSince(t0) < timeoutMs) {
+        if (!host.waitLine(line, 100)) continue;
+        lines.push_back(line);
+        if (line.compare(0, prefix.size(), prefix) == 0) return true;
+    }
+    return false;
+}
+
+// Fixed-depth searches in a raw session: "<nodes>/<best move>" per position, as Stockfish reports
+// them in its last "info depth" line and "bestmove".
+std::string searchSignature(ai::detail::UciHost& host) {
+    static const char* const positions[] = {
+        "startpos",
+        "startpos moves e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 c2c3 g8f6 d2d4 e5d4",
+        "fen r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+        "fen 8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1",
+    };
+    std::vector<std::string> lines;
+    host.send("uci");
+    host.send("setoption name Threads value 1");
+    host.send("setoption name Hash value 16");
+    host.send("isready");
+    if (!readUntil(host, "readyok", lines, 30000)) return "no readyok";
+    std::string signature;
+    for (const char* position : positions) {
+        host.send("ucinewgame");
+        host.send(std::string("position ") + position);
+        host.send("go depth 11");
+        lines.clear();
+        if (!readUntil(host, "bestmove", lines, 60000)) return signature + "timeout";
+        std::string nodes = "?";
+        for (const std::string& l : lines) {
+            const std::vector<std::string> w = words(l);
+            for (size_t i = 0; i + 1 < w.size(); ++i)
+                if (w[0] == "info" && w[1] == "depth" && w[i] == "nodes") nodes = w[i + 1];
+        }
+        signature += nodes + "/" + words(lines.back()).at(1) + " ";
+    }
+    return signature;
+}
+
+}  // namespace
+
+TEST(ai_variants_play_identically) {
+    // Each variant of this build that the CPU runs, forced in turn through the arch limit, must
+    // search exactly the same trees: same node counts, same moves.
+    ai::detail::UciHost& host = ai::detail::UciHost::instance();
+    const std::vector<std::string> variants = host.variants();
+    CHECK(!variants.empty());
+    int owner = 0;
+    std::string reference, bestRun;
+    for (const std::string& v : variants) {
+        ai::Engine::setArchLimit(v);
+        CHECK(host.acquire(&owner));
+        if (v != host.arch()) {  // this CPU does not run it: the limit chose a lower variant
+            std::fprintf(stderr, "  %s: not run by this CPU (%s chosen)\n", v.c_str(), host.arch());
+            host.release(&owner);
+            continue;
+        }
+        auto t0 = SteadyClock::now();
+        const std::string signature = searchSignature(host);
+        std::fprintf(stderr, "  %s: %s in %d ms\n", v.c_str(), signature.c_str(), msSince(t0));
+        host.release(&owner);
+        if (reference.empty()) reference = signature;
+        CHECK_EQ(signature, reference);
+        bestRun = v;
+    }
+    CHECK(!bestRun.empty());
+
+    // An unknown name leaves the limit alone; "auto" chooses the best variant this CPU runs.
+    ai::Engine::setArchLimit(variants.front());
+    ai::Engine::setArchLimit("x86-64-no-such-variant");
+    CHECK(host.acquire(&owner));
+    CHECK_EQ(std::string(host.arch()), variants.front());
+    host.release(&owner);
+    ai::Engine::setArchLimit("auto");
+    CHECK(host.acquire(&owner));
+    CHECK_EQ(std::string(host.arch()), bestRun);
+    host.release(&owner);
 }
 
 #else

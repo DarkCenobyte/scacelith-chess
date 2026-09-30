@@ -210,6 +210,7 @@ bool GameScene::init(AppContext& ctx) {
 void GameScene::finishLoading() {
     world_.setupRenderer(*ctx_->renderer);
     if (!scorekeeper_.init(true)) LOGW("scoresheets unavailable");
+    ai::Engine::setArchLimit(settings().engineArch);
     engineOk_ = engine_.start();
     if (!engineOk_) LOGW("Stockfish is unavailable: the opponent will play random legal moves");
     initAnimators();

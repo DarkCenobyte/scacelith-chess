@@ -87,6 +87,7 @@ bool Settings::load(const std::string& p) {
     customNodes = ini.getInt("engine.nodes", customNodes);
     engineThreads = ini.getInt("engine.threads", engineThreads);
     engineHashMB = ini.getInt("engine.hash_mb", engineHashMB);
+    engineArch = ini.getString("engine.arch", engineArch);
     humanizeThinking = ini.getBool("engine.humanize", humanizeThinking);
     setPlayerRecord(elo::readRecord(ini, "player"));
     for (int i = 0; i < 2; ++i) {
@@ -242,6 +243,7 @@ bool Settings::save() const {
     ini.setInt("engine.nodes", customNodes);
     ini.setInt("engine.threads", engineThreads);
     ini.setInt("engine.hash_mb", engineHashMB);
+    ini.set("engine.arch", engineArch);
     ini.setBool("engine.humanize", humanizeThinking);
     elo::writeRecord(ini, "player", playerRecord());
     ini.set("hotseat.white_name", hotseatNames[0]);

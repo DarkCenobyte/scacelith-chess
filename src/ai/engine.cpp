@@ -401,6 +401,8 @@ void Engine::shutdown() {
 
 bool Engine::available() const { return impl_->started && impl_->host().ownedBy(impl_->owner); }
 
+void Engine::setArchLimit(const std::string& arch) { detail::UciHost::instance().setArchLimit(arch); }
+
 bool Engine::ready() const {
     impl_->pump();
     return impl_->handshakeDone;

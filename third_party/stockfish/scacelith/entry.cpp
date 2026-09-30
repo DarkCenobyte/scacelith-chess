@@ -1,7 +1,9 @@
 // Scacelith glue (not part of upstream Stockfish): the body of Stockfish 19's src/main.cpp as a
-// callable function, compiled with the Stockfish sources and flags.
-#include "stockfish_embedded.h"
-
+// callable function, compiled with the Stockfish sources once per instruction-set variant. The
+// command line renames namespace Stockfish to Stockfish_<tag> and defines SCACELITH_SF_TAG (e.g.
+// x86_64_avx2); the entry point is exported as the C function scacelith_sf_main_<tag>, one of the
+// three symbols the variant's isolated object keeps global (cmake/isolate.cmake). The dispatcher
+// (cpu.cpp) calls it.
 #include <memory>
 #include <utility>
 
@@ -41,4 +43,7 @@ int scacelithMain() {
 }  // namespace
 }  // namespace Stockfish
 
-int stockfish_embedded_main() { return Stockfish::scacelithMain(); }
+#define SCACELITH_SF_CAT2(a, b) a##b
+#define SCACELITH_SF_CAT(a, b) SCACELITH_SF_CAT2(a, b)
+
+extern "C" int SCACELITH_SF_CAT(scacelith_sf_main_, SCACELITH_SF_TAG)() { return Stockfish::scacelithMain(); }
