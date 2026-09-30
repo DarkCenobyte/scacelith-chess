@@ -89,7 +89,8 @@ public:
     int variationIndex(const std::string& id) const;
 
     // Lines through a position that suit the teaching repertoire: curated family of tier <= maxTier (1 or 2),
-    // not a gambit, no trap or dubious sideline in the name. 0 when out of book.
+    // not a gambit, no trap or dubious sideline in the name. 0 when out of book, and 0 when the position itself
+    // carries a name that is not a teaching line.
     int teachingLines(uint64_t hash, int maxTier) const;
 
     // Statistics (tests): rows read, named rows, distinct names, book positions, named leaves, SAN tokens that did

@@ -299,6 +299,13 @@ bool OpeningBook::build(const std::vector<std::string>& tsvFiles, const std::str
                 if (t >= 1 && t <= 2) ++teach2;
             }
         }
+        // A position whose own name is not a teaching line (a gambit named inside a sound family, such as the
+        // Greco Gambit of the Giuoco Piano) is not one either, whatever sound lines pass through it.
+        if (e.name >= 0) {
+            const uint8_t t = teachTier[e.name];
+            if (t == 0 || t > 1) teach1 = 0;
+            if (t == 0 || t > 2) teach2 = 0;
+        }
         e.teach[0] = uint16_t(std::min(teach1, 65535));
         e.teach[1] = uint16_t(std::min(teach2, 65535));
         if (e.name >= 0) {
@@ -757,7 +764,11 @@ std::vector<OpeningLine> OpeningAnnouncer::lines(const Plan& p, const OpeningSta
         if (!p.both.empty()) {
             line("opening.say.both").args.push_back({"both", openingArg(p.both)});
         } else if (!p.white.empty() && !p.black.empty()) {
-            OpeningLine& l = line(pv + (p.relation.empty() ? "both" : p.relation));
+            // White's label may be a variation of Black's defence (the Advance French): the defence comes first,
+            // so the variation name ("the Advance Variation") is heard in its context.
+            const bool whiteVariation = p.white.rfind("variation:", 0) == 0;
+            OpeningLine& l =
+                line(pv + (!p.relation.empty() ? p.relation : whiteVariation ? std::string("var_white") : "both"));
             l.args.push_back({"white", openingArg(p.white)});
             if (p.relation.empty()) l.args.push_back({"black", openingArg(p.black)});
         } else if (!p.white.empty()) {

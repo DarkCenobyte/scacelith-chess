@@ -38,6 +38,8 @@ const std::vector<Preference>& preferences() {
         {0, "e4 e5 Nf3 Nc6 Bc4", {{"Bc5", 3}, {"Nf6", 1}}},
         {0, "e4 e5 Nf3 Nc6 Bc4 Bc5", {{"c3", 1}, {"d3", 2}, {"O-O", 1}}},
         {0, "e4 e5 Nf3 Nc6 Bc4 Nf6", {{"d3", 3}, {"Nc3", 1}}},
+        {0, "e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5", {{"d5", 1}}},
+        {0, "e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5", {{"Na5", 1}}},   // not 5...Nxd5?, the Fried Liver
         {0, "e4 e5 Nf3 Nc6 Bb5", {{"a6", 2}, {"Nf6", 1}}},
         {0, "e4 e5 Nf3 Nc6 d4", {{"exd4", 1}}},
         {0, "e4 e5 Nf3 Nc6 d4 exd4", {{"Nxd4", 1}}},
@@ -73,6 +75,8 @@ const std::vector<Preference>& preferences() {
         {1, "e4 e5 Nf3 Nc6", {{"Bb5", 2}, {"Bc4", 2}, {"d4", 1}}},
         {1, "e4 e5 Nf3 Nc6 Bb5", {{"a6", 3}, {"Nf6", 1}}},
         {1, "e4 e5 Nf3 Nc6 Bc4", {{"Bc5", 1}, {"Nf6", 1}}},
+        {1, "e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5", {{"d5", 1}}},
+        {1, "e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5", {{"Na5", 1}}},
         {1, "e4 c5", {{"Nf3", 3}, {"c3", 1}}},
         {1, "e4 c5 Nf3", {{"d6", 2}, {"Nc6", 1}, {"e6", 1}}},
         {1, "e4 c5 Nf3 d6", {{"d4", 1}}},
@@ -106,6 +110,11 @@ const std::vector<Preference>& preferences() {
         {2, "d4 d5 c4", {{"e6", 2}, {"c6", 2}, {"dxc4", 1}}},
         {2, "d4 Nf6", {{"c4", 3}, {"Nf3", 1}}},
         {2, "d4 Nf6 c4", {{"e6", 2}, {"g6", 2}}},
+        {2, "d4 Nf6 c4 e6 Nc3", {{"Bb4", 2}, {"d5", 1}}},
+        {2, "d4 Nf6 c4 e6 Nf3", {{"b6", 1}, {"d5", 1}, {"Bb4+", 1}}},
+        {2, "d4 Nf6 c4 g6 Nc3", {{"Bg7", 1}, {"d5", 1}}},
+        {2, "e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5", {{"d5", 1}}},
+        {2, "e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5", {{"Na5", 1}}},
     };
     return prefs;
 }
@@ -168,7 +177,7 @@ chess::Move repertoireMove(const chess::Game& game, int level, uint64_t seed, co
     const int ply = int(game.moves().size());
     if (ply >= kRepertoireMaxPly) return {};
     const chess::Position& pos = game.position();
-    if (!book.lookup(pos.hash())) return {};
+    if (ply > 0 && !book.lookup(pos.hash())) return {};   // the start position is not a book entry itself
     const int band = bandOf(std::min(level, 6));
     uint64_t rng = seed ^ (pos.hash() * 0xD1B54A32D192ED03ull) ^ uint64_t(ply);
 
@@ -189,14 +198,15 @@ chess::Move repertoireMove(const chess::Game& game, int level, uint64_t seed, co
     }
 
     // Otherwise the book moves that lead to teaching lines (tier 1 families only at levels 1-2), weighted by how
-    // many such lines go through them: strongly towards the main lines at low levels, flatter above.
+    // many such lines go through them (n^2, n^1.5, n by band): strongly towards the main lines at low levels,
+    // flatter above.
     const int maxTier = band == 0 ? 1 : 2;
     for (const chess::Move& m : pos.legalMoves()) {
         chess::Position next = pos;
         next.makeMove(m);
         const int n = book.teachingLines(next.hash(), maxTier);
         if (n <= 0) continue;
-        const double w = band == 0 ? double(n) * double(n) : band == 1 ? double(n) : std::sqrt(double(n));
+        const double w = band == 0 ? double(n) * double(n) : band == 1 ? double(n) * std::sqrt(double(n)) : double(n);
         cands.push_back({m, w});
     }
     return pick(cands, rng);

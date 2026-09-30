@@ -9,6 +9,8 @@
 # ---- Sentences. "pw" = the player (the listener) has White, "pb" = the player has Black; the coach is the
 # other side. {white}, {black}, {both}, {variation}, {opening}: opening names ("def" = the form used inside a
 # sentence, with its article); {line}: a composed lichess variation name (citation form); {n}: a move number.
+# "var_white": White's opening is a variation of Black's defence (the Advance Variation of the French), so the
+# defence is named first.
 opening.say.pw.both = You opened with {white:def}, and I answered with {black:def}.
 opening.say.pw.both.2 = Your opening is {white:def}, and my answer is {black:def}.
 opening.say.pb.both = I opened with {white:def}, and you answered with {black:def}.
@@ -21,6 +23,8 @@ opening.say.pw.white = You opened with {white:def}.
 opening.say.pw.white.2 = Your opening is {white:def}.
 opening.say.pb.white = I opened with {white:def}.
 opening.say.pb.white.2 = My opening is {white:def}.
+opening.say.pw.var_white = I answered with {black:def}, and you went for {white:def}.
+opening.say.pb.var_white = You answered with {black:def}, and I went for {white:def}.
 opening.say.pw.black = I answered with {black:def}.
 opening.say.pb.black = You answered with {black:def}.
 opening.say.both = We are playing {both:def}.
