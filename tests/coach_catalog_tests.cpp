@@ -434,6 +434,10 @@ TEST(coach_catalog_language_parity) {
     CHECK(c.load());
     for (const std::string& lang : c.languages()) {
         if (lang == "en") continue;
+        // A language with only its openings file (W10) has no speech lines yet: it falls back to
+        // English as a whole, which is consistent. Once it has one speech file it needs them all.
+        std::vector<std::string> topics = c.topics(lang);
+        if (std::all_of(topics.begin(), topics.end(), [](const std::string& t) { return t == "openings"; })) continue;
         for (auto& p : parityProblems(c, lang)) {
             std::fprintf(stderr, "  %s\n", p.c_str());
             CHECK(false);
