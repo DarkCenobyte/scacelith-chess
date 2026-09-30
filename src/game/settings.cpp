@@ -81,12 +81,7 @@ bool Settings::load(const std::string& p) {
     engineThreads = ini.getInt("engine.threads", engineThreads);
     engineHashMB = ini.getInt("engine.hash_mb", engineHashMB);
     humanizeThinking = ini.getBool("engine.humanize", humanizeThinking);
-    playerElo = ini.getInt("player.elo", playerElo);
-    playerGames = ini.getInt("player.games", playerGames);
-    playerWins = ini.getInt("player.wins", playerWins);
-    playerDraws = ini.getInt("player.draws", playerDraws);
-    playerLosses = ini.getInt("player.losses", playerLosses);
-    playerPeakElo = std::max(playerElo, ini.getInt("player.peak", playerPeakElo));
+    setPlayerRecord(elo::readRecord(ini, "player"));
     for (int i = 0; i < 2; ++i) {
         const char* side = i == 0 ? "white" : "black";
         hotseatNames[i] = ini.getString(std::string("hotseat.") + side + "_name", hotseatNames[i]);
@@ -101,12 +96,7 @@ bool Settings::load(const std::string& p) {
         if (!ini.has(sec + "name")) break;
         LocalPlayer p;
         p.name = ini.getString(sec + "name");
-        p.record.rating = std::max(elo::kFloor, ini.getInt(sec + "elo", elo::kInitialRating));
-        p.record.games = std::max(0, ini.getInt(sec + "games", 0));
-        p.record.wins = std::max(0, ini.getInt(sec + "wins", 0));
-        p.record.draws = std::max(0, ini.getInt(sec + "draws", 0));
-        p.record.losses = std::max(0, ini.getInt(sec + "losses", 0));
-        p.record.peak = std::max(p.record.rating, ini.getInt(sec + "peak", p.record.rating));
+        p.record = elo::readRecord(ini, "local_player_" + std::to_string(n));
         if (!p.name.empty() && !findLocalPlayer(p.name)) localPlayers.push_back(p);
     }
     viewerWhitePreset = ini.getInt("viewer.white_preset", viewerWhitePreset);
@@ -153,6 +143,34 @@ const LocalPlayer* Settings::findLocalPlayer(const std::string& name) const {
     for (const LocalPlayer& p : localPlayers)
         if (p.name == name) return &p;
     return nullptr;
+}
+
+elo::Record Settings::playerRecord() const {
+    elo::Record r;
+    r.rating = playerElo;
+    r.games = playerGames;
+    r.wins = playerWins;
+    r.draws = playerDraws;
+    r.losses = playerLosses;
+    r.peak = std::max(playerPeakElo, playerElo);
+    r.rated = playerRated;
+    r.unratedGames = playerUnratedGames;
+    r.unratedOpponents = playerUnratedOpponents;
+    r.unratedHalfPoints = playerUnratedHalfPoints;
+    return r;
+}
+
+void Settings::setPlayerRecord(const elo::Record& r) {
+    playerElo = r.rating;
+    playerGames = r.games;
+    playerWins = r.wins;
+    playerDraws = r.draws;
+    playerLosses = r.losses;
+    playerPeakElo = r.peak;
+    playerRated = r.rated;
+    playerUnratedGames = r.unratedGames;
+    playerUnratedOpponents = r.unratedOpponents;
+    playerUnratedHalfPoints = r.unratedHalfPoints;
 }
 
 LocalPlayer& Settings::localPlayer(const std::string& name) {
@@ -215,12 +233,7 @@ bool Settings::save() const {
     ini.setInt("engine.threads", engineThreads);
     ini.setInt("engine.hash_mb", engineHashMB);
     ini.setBool("engine.humanize", humanizeThinking);
-    ini.setInt("player.elo", playerElo);
-    ini.setInt("player.games", playerGames);
-    ini.setInt("player.wins", playerWins);
-    ini.setInt("player.draws", playerDraws);
-    ini.setInt("player.losses", playerLosses);
-    ini.setInt("player.peak", playerPeakElo);
+    elo::writeRecord(ini, "player", playerRecord());
     ini.set("hotseat.white_name", hotseatNames[0]);
     ini.set("hotseat.black_name", hotseatNames[1]);
     ini.setInt("hotseat.white_hand", hotseatHands[0]);
@@ -229,14 +242,9 @@ bool Settings::save() const {
     ini.setBool("hotseat.rated", hotseatRated);
     for (size_t i = 0; i < localPlayers.size(); ++i) {
         const LocalPlayer& p = localPlayers[i];
-        std::string sec = "local_player_" + std::to_string(i + 1) + ".";
-        ini.set(sec + "name", p.name);
-        ini.setInt(sec + "elo", p.record.rating);
-        ini.setInt(sec + "games", p.record.games);
-        ini.setInt(sec + "wins", p.record.wins);
-        ini.setInt(sec + "draws", p.record.draws);
-        ini.setInt(sec + "losses", p.record.losses);
-        ini.setInt(sec + "peak", p.record.peak);
+        std::string sec = "local_player_" + std::to_string(i + 1);
+        ini.set(sec + ".name", p.name);
+        elo::writeRecord(ini, sec, p.record);
     }
     ini.setInt("viewer.white_preset", viewerWhitePreset);
     ini.setInt("viewer.black_preset", viewerBlackPreset);

@@ -264,25 +264,43 @@ TEST(hotseat_held_buttons_are_ignored_until_released) {
 // ---- Two-player Elo -----------------------------------------------------------------------------------
 
 TEST(hotseat_elo_pair) {
-    // Two new players at 1500: +20 / -20 (K 40 each).
+    // Two new names: unrated, each game counts for both at the other's working rating (1500), and
+    // the ratings do not move until the fifth game gives both their first rating.
+    // (A first game lost would stay out of the loser's unrated phase: the zero-score rule.)
     elo::Record w, b;
-    elo::PairChange c = elo::applyPair(w, b, 1.0);
+    elo::PairChange c = elo::applyPair(w, b, 0.5);
     CHECK_EQ(c.white.before, 1500);
-    CHECK_EQ(c.white.after, 1520);
-    CHECK_EQ(c.black.after, 1480);
-    CHECK_EQ(w.wins, 1);
-    CHECK_EQ(b.losses, 1);
-    CHECK_EQ(w.games, 1);
-    CHECK_EQ(b.games, 1);
-    // Both are rated against the other's rating BEFORE the game: a draw between 1520 and 1480.
-    c = elo::applyPair(w, b, 0.5);
-    CHECK_EQ(c.white.delta(), -c.black.delta());
-    CHECK(c.white.delta() < 0);
+    CHECK_EQ(c.white.after, 1500);
+    CHECK_EQ(c.black.after, 1500);
+    CHECK_EQ(c.white.k, 0);
     CHECK_EQ(w.draws, 1);
     CHECK_EQ(b.draws, 1);
+    CHECK_EQ(w.games, 1);
+    CHECK_EQ(b.games, 1);
+    CHECK_EQ(w.unratedOpponents, 1500);
+    CHECK_EQ(b.unratedOpponents, 1500);
+    CHECK(w.unrated());
+    for (double s : {1.0, 1.0, 1.0}) elo::applyPair(w, b, s);
+    CHECK(w.unrated());
+    // Fifth game, a draw: White 4 / 5 (p = 5 / 7 = 0.71, dp 158), Black 1 / 5 (dp -158), around
+    // Ra = (5 x 1500 + 2 x 1800) / 7 = 1585.7.
+    c = elo::applyPair(w, b, 0.5);
+    CHECK_EQ(c.white.after, 1744);
+    CHECK_EQ(c.black.after, 1428);
+    CHECK(w.rated && b.rated);
+    CHECK_EQ(w.draws, 2);
+    CHECK_EQ(b.draws, 2);
+    // From then on each is rated against the other's rating BEFORE the game: D 316, PD 0.87 for
+    // White, so Black's win moves both by 40 x 0.87 = 34.8.
+    c = elo::applyPair(w, b, 0.0);
+    CHECK_EQ(c.white.delta(), -35);
+    CHECK_EQ(c.black.delta(), 35);
+    CHECK_EQ(c.white.k, 40);
     // Different K factors: the changes do not cancel out.
     elo::Record est, fresh;
+    est.rated = fresh.rated = true;
     est.games = 50;
+    fresh.games = 5;
     est.rating = est.peak = 1600;
     fresh.rating = fresh.peak = 1600;
     c = elo::applyPair(est, fresh, 0.0);
@@ -290,4 +308,10 @@ TEST(hotseat_elo_pair) {
     CHECK_EQ(c.black.delta(), 20);   // K 40
     CHECK_EQ(c.white.k, 20);
     CHECK_EQ(c.black.k, 40);
+    // A rated name losing to a new one: only the new name's record moves (its unrated phase).
+    elo::Record newcomer;
+    c = elo::applyPair(est, newcomer, 0.0);
+    CHECK_EQ(c.white.delta(), 0);
+    CHECK_EQ(c.white.k, 0);
+    CHECK_EQ(newcomer.unratedOpponents, est.rating);
 }

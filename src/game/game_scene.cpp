@@ -692,27 +692,16 @@ void GameScene::rateGame() {
     }
     GameStatus st = game_.status();
     double score = st == GameStatus::Draw ? 0.5 : ((st == GameStatus::WhiteWins) == (humanColor_ == White) ? 1.0 : 0.0);
-    elo::Record r;
-    r.rating = s.playerElo;
-    r.games = s.playerGames;
-    r.wins = s.playerWins;
-    r.draws = s.playerDraws;
-    r.losses = s.playerLosses;
-    r.peak = std::max(s.playerPeakElo, s.playerElo);
+    elo::Record r = s.playerRecord();
     int opponent = seats_[aiSeat()].elo;
     elo::Change c = elo::applyResult(r, opponent, score);
-    s.playerElo = r.rating;
-    s.playerGames = r.games;
-    s.playerWins = r.wins;
-    s.playerDraws = r.draws;
-    s.playerLosses = r.losses;
-    s.playerPeakElo = r.peak;
+    s.setPlayerRecord(r);
     s.save();
     eloCounted_ = true;
     eloBefore_ = c.before;
     eloAfter_ = c.after;
-    LOGI("Elo: %d -> %d (%+d; score %.1f against %d, expected %.2f, K %d)", c.before, c.after, c.delta(), score, opponent,
-         c.expected, c.k);
+    LOGI("Elo: %d -> %d (%+d; score %.1f against %d, expected %.2f, K %d%s)", c.before, c.after, c.delta(), score, opponent,
+         c.expected, c.k, r.rated ? "" : ", unrated phase");
 }
 
 ui::GameOverExtras GameScene::gameOverExtras() const {

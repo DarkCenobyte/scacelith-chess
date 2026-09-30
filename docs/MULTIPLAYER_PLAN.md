@@ -153,12 +153,13 @@ so skipping it in time trouble brings nothing; the sheets stay complete.
 and two handwritings (White defaults to Options > Player's name and hand, Black to "Player 2" and
 the next hand); the last choices are remembered (`[hotseat]`). A game is **friendly by default**.
 A rated game keys the ratings by name: `Settings::localPlayers`, one `[local_player_N]` section
-each (`name, elo, games, wins, draws, losses, peak`), created at 1500 the first time a name plays a
-rated game. `elo::applyPair()` rates each against the other's rating before the game (unit test
-`hotseat_elo_pair`). The single-player `[player]` record (the rating against Stockfish) is never
-read nor changed by a hot-seat game, and does not become a profile. A game with fewer than two
-plies, or the same name on both sides, is not rated; leaving a game early (Main menu, closing the
-window) rates nothing. The game over card shows both changes (or "friendly game").
+each (`name, elo, games, wins, draws, losses, peak` and the FIDE unrated phase `rated,
+unrated_games, unrated_opponents, unrated_half_points`, `elo::readRecord`), created unrated at 1500
+the first time a name plays a rated game. `elo::applyPair()` rates each against the other's rating
+before the game (unit test `hotseat_elo_pair`). The single-player `[player]` record (the rating
+against Stockfish) is never read nor changed by a hot-seat game, and does not become a profile. A
+game with fewer than two plies, or the same name on both sides, is not rated; leaving a game early
+(Main menu, closing the window) rates nothing. The game over card shows both changes (or "friendly game").
 
 ## The left-handed player in first person
 

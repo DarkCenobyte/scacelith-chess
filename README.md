@@ -58,14 +58,26 @@ the piece letters of the interface language.
 
 ### Your Elo
 
-Your rating starts at 1500 and is updated after every game against Stockfish with the FIDE
-formula: K = 40 for your first 30 games (the rating is provisional until then), 20 afterwards, 10
-once you have reached 2400; a rating gap is counted as 400 points at most. The opponent's rating is
-the preset's (Novice 800 up to Stockfish Max 3500; a custom opponent is rated from its Skill Level
-or UCI Elo). A game counts once both players have moved; leaving a game, or closing the game,
-resigns it. The title page shows your rating, record and peak, the new game page the score you
-can expect against the selected opponent, and the game over card the change
-(`Elo 1512 → 1524 (+12)`). Watched games are never rated.
+Your rating is computed after every game against Stockfish as FIDE computes tournament ratings
+(FIDE Rating Regulations, 2024), with the same rules as the online server's:
+
+- **First rating.** You start unrated, shown at 1500. Your first five games give your first
+  rating, FIDE's way: the average of your opponents' ratings, counting two extra draws against
+  1800-rated players, plus FIDE's rating difference for your score (for example five draws against
+  1500-rated opponents give 1586, five wins 1895). A first rating is at most 2200. As FIDE
+  ignores a newcomer's first event without a point, the games you lose before your first draw
+  or win do not count towards it.
+- **Then** each game changes your rating by K × (score − expected score), where the expected
+  score comes from FIDE's table for the rating difference (counted as 400 points at most): K = 40
+  for your first 30 games (those before your first rating included; the rating is provisional
+  until then), 20 afterwards, 10 once you have reached 2400. A rating never drops below 100.
+
+The opponent's rating is the preset's (Novice 800 up to Stockfish Max 3500; a custom opponent is
+rated from its Skill Level or UCI Elo). A game counts once both players have moved; leaving a
+game, or closing the game, resigns it. The title page shows your rating, record and peak, the new
+game page the score you can expect against the selected opponent, and the game over card the
+change (`Elo 1512 → 1524 (+12)`). Watched games are never rated. Games are rated one by one, where
+FIDE rates a month's games together.
 
 ### Two players on one PC
 
@@ -92,9 +104,10 @@ left hand), and whether the game is rated. **Swap colours** exchanges the two pl
   player, so each keeps the same hand).
 
 A two-player game is friendly by default and never changes your rating against Stockfish. A rated
-one keeps a separate rating per name (`[local_player_N]` in the settings file, 1500 for a new
-name, the same FIDE formula), updated for both players against each other's rating before the
-game; leaving a game early rates nothing.
+one keeps a separate rating per name (`[local_player_N]` in the settings file; a new name starts
+unrated at 1500, with the same FIDE rules), updated for both players against each other's rating
+before the game (a game between two unrated names counts for both); leaving a game early rates
+nothing.
 
 ## Watch a Game
 

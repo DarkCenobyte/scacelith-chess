@@ -9,7 +9,7 @@
 namespace game {
 
 // A player of rated hot-seat games on this PC, by name (New Game > Human, same PC > Rated game):
-// one [local_player_N] section each (name, elo, games, wins, draws, losses, peak). Separate from
+// one [local_player_N] section each (name and the record's keys, elo::readRecord). Separate from
 // the [player] rating, which only games against Stockfish change.
 struct LocalPlayer {
     std::string name;
@@ -69,6 +69,11 @@ struct Settings {
     int playerElo = 1500;
     int playerGames = 0, playerWins = 0, playerDraws = 0, playerLosses = 0;
     int playerPeakElo = 1500;
+    // Its FIDE unrated phase (elo::Record): false until the first rating, the sums of those games.
+    bool playerRated = false;
+    int playerUnratedGames = 0, playerUnratedOpponents = 0, playerUnratedHalfPoints = 0;
+    elo::Record playerRecord() const;  // the [player] fields above as one record
+    void setPlayerRecord(const elo::Record& r);
     // [hotseat] last choices of the two-player game (New Game > Human, same PC), by colour
     std::string hotseatNames[2];  // "" = the Options > Player name for White, "Player 2" (translated) for Black
     int hotseatHands[2] = {-1, -1};  // ui::font::HandStyle; -1 = the Options > Player hand / another one
