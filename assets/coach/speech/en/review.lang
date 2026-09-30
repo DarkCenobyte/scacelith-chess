@@ -1,0 +1,830 @@
+# Coach speech: the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# English is the reference language. Same syntax as assets/i18n: "key = value", '#' comments.
+#
+# Translators, read this first:
+# - "key", "key.2", "key.3" are alternative phrasings of the same message; keep the same number.
+# - ".b1" ... ".b6" at the end of a key is the coach level the line is for (1 = beginner, gentle
+#   and simple; 6 = expert, terse). Keep the tone of each level.
+# - Placeholders are filled by the program. The coach points at the board while it says them, so
+#   every placeholder of the English line must stay in your line (word order is free):
+#     {your} {your2}   one of the listener's pieces, WITH its possessive: "your knight"
+#     {my} {my2}       one of the coach's pieces, with its possessive: "my bishop"
+#     {t1} {t2}        pieces under attack (anyone's), with their possessive: "your queen"
+#     {sq}             a square: "e4"
+#     {move}           the player's move; {best} a better move; {reply} the coach's answer
+#     {line}           a few moves in a row: "Nxe5 dxe5 Qg4"
+#     {n} {n2} {pts} {m}  numbers; "{pts:point}" says "3 points", "{m:move}" says "2 moves"
+#                     (the counted nouns are in common.lang, count.<noun>)
+#     {eval}           an evaluation from the player's side: "+1.3", "mate in 4"
+#     {text}           a name from this file (name.pattern.*)
+#   Never write "your" or "my" before {your}, {my}, {t1}, {t2}: the possessive is already in them.
+# - Lines at levels 1-2 must stay short (at most about 15 words per sentence).
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Check! My king is attacked.
+ann.check.human.b1.2 = Check! You are attacking my king.
+ann.check.human.b1.3 = That's check! My king has to get out of it.
+ann.check.human = Check.
+ann.check.human.2 = Check!
+ann.check.human.3 = And that's check.
+# The coach gives check.
+ann.check.coach = Check!
+ann.check.coach.2 = Check.
+ann.check.coach.3 = And check!
+# Once per game at levels 1-2, right after the coach's first check.
+ann.check.coach.first = That means {your} is attacked. You must get it out of check.
+ann.check.coach.first.2 = Check means {your} is under attack. Move it, block, or capture my piece.
+ann.double_check = Double check! Two of my pieces attack at once, so the king must move.
+ann.double_check.2 = That's a double check: only a king move helps.
+# The player checkmates the coach.
+ann.mate.human.b1 = Checkmate! You won! My king can't escape.
+ann.mate.human.b1.2 = That's checkmate! Well done, you won the game!
+ann.mate.human.b1.3 = Checkmate! My king is trapped. Congratulations!
+ann.mate.human = Checkmate. Well played.
+ann.mate.human.2 = That's mate. Congratulations.
+ann.mate.human.3 = Checkmate! Nicely done.
+# The coach checkmates the player.
+ann.mate.coach.b1 = That's checkmate. Your king has no way out.
+ann.mate.coach.b1.2 = Checkmate. Your king is attacked and cannot escape.
+ann.mate.coach.b1.3 = I'm afraid that's checkmate. Your king can't get away.
+ann.mate.coach = Checkmate.
+ann.mate.coach.2 = And that's mate.
+ann.mate.coach.3 = Checkmate, I'm afraid.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Oops! That move gives something away.
+ex.verdict.blunder.b1.2 = Careful! Let me show you what can happen now.
+ex.verdict.blunder.b1.3 = Oh, wait. That move has a problem.
+ex.verdict.blunder.b2 = Hmm, that move has a problem. Look.
+ex.verdict.blunder.b2.2 = That's a mistake. Watch.
+ex.verdict.blunder.b2.3 = Careful, that move costs you something. Look.
+ex.verdict.blunder.b3 = That's a blunder.
+ex.verdict.blunder.b3.2 = {move} is a mistake. Here's why.
+ex.verdict.blunder.b3.3 = Ouch, {move} is a big mistake.
+ex.verdict.blunder.b4 = {move} is a blunder.
+ex.verdict.blunder.b4.2 = {move} is a serious mistake.
+ex.verdict.blunder.b4.3 = That's a blunder, I'm afraid.
+ex.verdict.blunder.b5 = {move} is a serious mistake.
+ex.verdict.blunder.b5.2 = {move} is a blunder.
+ex.verdict.blunder.b5.3 = {move} throws it away.
+ex.verdict.blunder.b6 = {move} loses.
+ex.verdict.blunder.b6.2 = {move} is a blunder.
+ex.verdict.blunder.b6.3 = {move}? That loses.
+ex.verdict.mistake.b3 = Not the best. Here's why.
+ex.verdict.mistake.b3.2 = Hmm, {move} has a problem.
+ex.verdict.mistake.b3.3 = That's a mistake. Let me show you.
+ex.verdict.mistake.b4 = {move} is a mistake.
+ex.verdict.mistake.b4.2 = {move} isn't good. Here's why.
+ex.verdict.mistake.b4.3 = That's a mistake.
+ex.verdict.mistake.b5 = {move} is imprecise.
+ex.verdict.mistake.b5.2 = {move} is a mistake.
+ex.verdict.mistake.b5.3 = {move} lets it slip.
+ex.verdict.mistake.b6 = {move} is a mistake.
+ex.verdict.mistake.b6.2 = {move} is inaccurate.
+ex.verdict.mistake.b6.3 = Not {move}.
+# An inaccuracy with no concrete cause: the line names the better move ({best} is pointed at).
+ex.verdict.inaccuracy.b4 = Inaccurate: {best} was more precise.
+ex.verdict.inaccuracy.b4.2 = A small inaccuracy. {best} was a bit better.
+ex.verdict.inaccuracy.b4.3 = Not quite the best: {best} was more accurate.
+ex.verdict.inaccuracy.b5 = {move} is imprecise; {best} was stronger.
+ex.verdict.inaccuracy.b5.2 = Slightly inaccurate. I'd have played {best}.
+ex.verdict.inaccuracy.b5.3 = {best} was more precise than {move}.
+ex.verdict.inaccuracy.b6 = {move} is inaccurate; {best}.
+ex.verdict.inaccuracy.b6.2 = Inaccurate. {best}.
+ex.verdict.inaccuracy.b6.3 = {best} was better.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Oh, wait! You missed something good.
+ex.verdict.missed.b1.2 = Look again! There was something better.
+ex.verdict.missed.b1.3 = Hold on, you had a chance there!
+ex.verdict.missed.b2 = You missed a chance there.
+ex.verdict.missed.b2.2 = Hmm, there was something better.
+ex.verdict.missed.b2.3 = Wait, you had a great move there.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+ex.better.b3 = Better was {best}.
+ex.better.b3.2 = {best} was the better move.
+ex.better.b3.3 = Instead, {best} was good.
+ex.better.b4 = {best} keeps everything safe.
+ex.better.b4.2 = {best} was the right move.
+ex.better.b4.3 = Better was {best}.
+ex.better.b5 = {best}, with the idea {line}.
+ex.better.b5.2 = {best} was the move: {line}.
+ex.better.b5.3 = Better was {best}, and after {line} you're fine.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = {best} instead, {eval}.
+ex.better.b6.3 = {best} was {eval}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Let's put the pieces back.
+ex.rewind.b1.2 = Now I'll put everything back where it was.
+ex.rewind.b1.3 = Let me set the pieces back.
+ex.rewind.b2 = Let's put everything back.
+ex.rewind.b2.2 = Back to where we were.
+ex.rewind.b2.3 = I'll put the pieces back.
+ex.rewind.b3 = Back to the game.
+ex.rewind.b3.2 = Let's go back.
+ex.rewind.b3.3 = Back to the position.
+ex.rewind.b4 = Back to the game.
+ex.rewind.b4.2 = Back.
+ex.rewind.b4.3 = Let's go back.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Do you want to try another move?
+ex.offer.b1.2 = Would you like to take that move back and try again?
+ex.offer.b1.3 = Shall we try a different move?
+ex.offer.b2 = Would you like to try another move?
+ex.offer.b2.2 = Do you want to take it back?
+ex.offer.b2.3 = Want to try again?
+ex.offer.b3 = Would you like to take it back?
+ex.offer.b3.2 = Do you want to try again?
+ex.offer.b3.3 = Take it back?
+ex.offer.b4 = Take it back?
+ex.offer.b4.2 = Do you want to take it back?
+ex.offer.b4.3 = Want to try another move?
+ex.offer.b5 = Take back?
+ex.offer.b5.2 = Want to take it back?
+ex.offer.b5.3 = Take it back?
+ex.offer.b6 = Take back?
+ex.offer.b6.2 = Take it back?
+ex.offer.b6.3 = Retry?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Then {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} goes to {sq}.
+demo.my.move.2 = I play {my} to {sq}.
+demo.my.move.3 = Then {my} goes to {sq}.
+demo.my.take = I take {your}.
+demo.my.take.2 = {my} takes {your}.
+demo.my.take.3 = And I capture {your}.
+demo.my.check = {my} goes to {sq}. Check.
+demo.my.check.2 = Check, with {my} on {sq}.
+demo.my.check.3 = {my} to {sq}, check!
+demo.my.mate = {my} goes to {sq}. Checkmate.
+demo.my.mate.2 = And {my} to {sq} is checkmate.
+demo.my.mate.3 = {my} to {sq}. That's checkmate.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = You would move {your} to {sq}.
+demo.your.move.2 = Say you play {your} to {sq}.
+demo.your.move.3 = Then {your} goes to {sq}.
+demo.your.take = You would take {my}.
+demo.your.take.2 = You take {my} with {your}.
+demo.your.take.3 = Then you capture {my}.
+demo.your.back = You take back.
+demo.your.back.2 = You take back on {sq}.
+demo.your.back.3 = And you recapture.
+demo.your.king = Your king has to move.
+demo.your.king.2 = The king must step away, to {sq}.
+demo.your.king.3 = Your king runs to {sq}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = And here, on {sq}, you would get a new queen.
+demo.promote.2 = Then {your} reaches {sq} and becomes a queen.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Watch out: {my} can go to {sq}, and that is checkmate.
+ex.mate_allowed.b1.2 = Now {my} can move to {sq}. That would be checkmate!
+ex.mate_allowed.b1.3 = Careful! If {my} goes to {sq}, it's checkmate.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = This move lets me checkmate {your} in {m:move}.
+ex.mate_allowed.b2.2 = Now I can checkmate {your} in {m:move}. Look.
+ex.mate_allowed.b2.3 = Careful! {your} is in danger: mate in {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = This allows mate in {m:move}: {line}.
+ex.mate_allowed.b3.2 = After this I have a mate in {m:move}: {line}.
+ex.mate_allowed.b3.3 = Your king gets mated: {line}.
+ex.mate_allowed.b4 = {move} allows a forced mate: {line}.
+ex.mate_allowed.b4.2 = This walks into mate in {m:move}: {line}.
+ex.mate_allowed.b4.3 = After {move}, {line} is mate.
+ex.mate_allowed.b5 = {move} allows a forced mate in {m:move}.
+ex.mate_allowed.b5.2 = That walks into a mate in {m:move}.
+ex.mate_allowed.b5.3 = Now there's a forced mate in {m:move}.
+ex.mate_allowed.b6 = Mate in {m}: {line}.
+ex.mate_allowed.b6.2 = {line}, mate.
+ex.mate_allowed.b6.3 = It's mate after {line}.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Look: {your} has no square left to escape to.
+ex.mate_allowed.tail.b1.2 = See? {your} is attacked and cannot run away.
+ex.mate_allowed.tail.b1.3 = {your} has nowhere to go. That's checkmate.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = That pattern is called {text}.
+ex.mate_allowed.pattern.2 = Remember this one: it's {text}.
+ex.mate_allowed.tip.b3 = Before each move, check whether your king is still safe.
+ex.mate_allowed.tip.b3.2 = Always ask: after my move, can my king be checkmated?
+
+name.pattern.back_rank = a back-rank mate
+name.pattern.smothered = a smothered mate
+name.pattern.support = a supported queen mate
+name.pattern.ladder = a ladder mate
+name.pattern.epaulette = an epaulette mate
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = With {best} you could have checkmated {my}!
+ex.mate_missed.b1.2 = {best} was checkmate! {my} could not have escaped.
+ex.mate_missed.b1.3 = Look! {best} would have checkmated {my}.
+ex.mate_missed.b2 = You had mate in {m:move}, starting with {best}.
+ex.mate_missed.b2.2 = {best} was checkmate in {m:move}!
+ex.mate_missed.b2.3 = You could have mated me with {best}.
+ex.mate_missed.b3 = You missed mate in {m:move}: {best}.
+ex.mate_missed.b3.2 = {best} mates in {m:move}: {line}.
+ex.mate_missed.b3.3 = There was a mate in {m:move}, starting with {best}.
+ex.mate_missed.b4 = Missed mate: {line}, starting with {best}.
+ex.mate_missed.b4.2 = {best} forced mate in {m:move}.
+ex.mate_missed.b4.3 = You had mate in {m:move} with {best}.
+ex.mate_missed.b5 = {best} mates in {m:move}: {line}.
+ex.mate_missed.b5.2 = Missed mate in {m:move}, starting with {best}.
+ex.mate_missed.b5.3 = There was a forced mate: {best}.
+ex.mate_missed.b6 = {best} mates: {line}.
+ex.mate_missed.b6.2 = Mate in {m} with {best}.
+ex.mate_missed.b6.3 = {best}, mate in {m}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Faster was {best}: mate in {m:move}.
+ex.mate_delayed.b5.2 = {best} mated sooner, in {m:move}.
+ex.mate_delayed.b6 = {best} mates in {m}.
+ex.mate_delayed.b6.2 = Faster: {best}, mate in {m}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Oh no! {my} cannot move and is not in check. That's stalemate: a draw.
+ex.stalemate.b1.2 = Look: {my} has no safe square, but it is not in check. It's a draw!
+ex.stalemate.b1.3 = That's stalemate. {my} can't move, so the game is a draw.
+ex.stalemate.b2 = Stalemate! {my} has no legal move, and it's not check. A draw.
+ex.stalemate.b2.2 = Oh no, stalemate: {my} is stuck but not in check.
+ex.stalemate.b2.3 = That's a draw by stalemate. {my} cannot move.
+ex.stalemate.b3 = That's stalemate: {my} has no legal move. You were winning!
+ex.stalemate.b3.2 = Stalemate! {my} is stuck, and a won game becomes a draw.
+ex.stalemate.b3.3 = {my} has no moves and no check: stalemate.
+ex.stalemate.b4 = Stalemate: {my} has no legal move. That throws away the win.
+ex.stalemate.b4.2 = {move} stalemates {my}. A draw from a winning position.
+ex.stalemate.b4.3 = That's stalemate; {my} is boxed in.
+ex.stalemate.b5 = {move} stalemates {my}. The win is gone.
+ex.stalemate.b5.2 = Stalemate: {my} has no squares.
+ex.stalemate.b5.3 = That's stalemate, {my} is stuck.
+ex.stalemate.b6 = Stalemate. {my} has no moves.
+ex.stalemate.b6.2 = {move}, stalemate: {my} is boxed in.
+ex.stalemate.b6.3 = Stalemate; {my} can't move.
+ex.stalemate.tip.b1 = When you are winning, always leave my king a square to move to.
+ex.stalemate.tip.b1.2 = Remember: when you are ahead, give my king some room.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Careful! I can give away my pieces, and then {my} has no moves: stalemate.
+ex.stalemate_trick.b1.2 = Watch out: {my} is almost stuck. I can make it a draw.
+ex.stalemate_trick.b2 = Careful: I can sacrifice, and {my} would be stalemated.
+ex.stalemate_trick.b2.2 = {my} has almost no squares. I can force a stalemate!
+ex.stalemate_trick.b3 = This lets me escape with stalemate: {my} runs out of moves.
+ex.stalemate_trick.b3.2 = Careful: after {line}, {my} is stalemated.
+ex.stalemate_trick.b4 = {move} allows a stalemate trick: {line}, and {my} can't move.
+ex.stalemate_trick.b4.2 = Now {my} can hide in a stalemate: {line}.
+ex.stalemate_trick.b5 = {move} allows stalemate: {line}; {my} is boxed in.
+ex.stalemate_trick.b5.2 = Stalemate trick: {line}, and {my} has no moves.
+ex.stalemate_trick.b6 = {line}, stalemate: {my} is boxed in.
+ex.stalemate_trick.b6.2 = Stalemate after {line}; {my} is stuck.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} can jump to {sq} and attack {t1} and {t2}.
+ex.fork.b1.2 = {my} goes to {sq} and attacks two things: {t1} and {t2}.
+ex.fork.b1.3 = Watch {my}: from {sq} it attacks {t1} and {t2} together.
+ex.fork.b2 = Fork! {my} on {sq} attacks {t1} and {t2} together.
+ex.fork.b2.2 = After your move, {my} can fork {t1} and {t2} from {sq}.
+ex.fork.b2.3 = {my} goes to {sq}: a double attack on {t1} and {t2}.
+ex.fork.b3 = {move} allows {reply}, forking {t1} and {t2}.
+ex.fork.b3.2 = After {reply}, I attack {t1} and {t2} at the same time.
+ex.fork.b3.3 = {reply} is a fork: {t1} and {t2} are both attacked.
+ex.fork.b4 = {reply} forks {t1} and {t2}; after {line} you're {pts:point} down.
+ex.fork.b4.2 = {reply} hits {t1} and {t2} at once.
+ex.fork.b4.3 = {move} allows the fork {reply} against {t1} and {t2}.
+ex.fork.b5 = {move} walks into the fork {reply}, on {t1} and {t2}.
+ex.fork.b5.2 = {reply} forks {t1} and {t2}.
+ex.fork.b5.3 = After {reply}, {t1} and {t2} are both hanging.
+ex.fork.b6 = {reply} forks.
+ex.fork.b6.2 = {move} allows {reply}, a fork.
+ex.fork.b6.3 = {reply}, forking.
+# After the one-move demonstration (level 1).
+ex.fork.tail.b1 = You can only save one of them: {t1} or {t2}.
+ex.fork.tail.b1.2 = Now I attack two things at once: {t1} and {t2}. That's a fork!
+ex.fork.tail.b1.3 = See? {t1} and {t2} are both attacked. One of them will fall.
+ex.fork.more.b3 = Before moving, check {sq}: it's a fork square for {my}.
+ex.fork.more.b3.2 = Keep an eye on {sq}. {my} forks from there.
+ex.fork.tip.knight = Watch out for knight jumps near your king and queen!
+ex.fork.tip.knight.2 = Knights love to attack two pieces at once. Look where they can jump.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = When {my} moves away, {my2} attacks {t1}!
+ex.discovered.b1.2 = Look: {my} is in the way. If it moves, {my2} hits {t1}.
+ex.discovered.b1.3 = {my} can step aside, and then {my2} attacks {t1}.
+ex.discovered.b2 = A hidden attack: {my} moves, and {my2} attacks {t1}.
+ex.discovered.b2.2 = Careful: {my} can move with a threat, and {my2} hits {t1}.
+ex.discovered.b2.3 = {my} steps away and uncovers {my2} against {t1}.
+ex.discovered.b3 = After {reply}, a discovered attack hits {t1}.
+ex.discovered.b3.2 = {reply} uncovers an attack on {t1}.
+ex.discovered.b3.3 = {move} allows {reply}, a discovered attack on {t1}.
+ex.discovered.b4 = {reply} opens a line onto {t1}: a discovered attack.
+ex.discovered.b4.2 = {move} allows the discovery {reply}, winning {t1}.
+ex.discovered.b4.3 = After {reply}, {t1} falls to a discovered attack.
+ex.discovered.b5 = {move} allows the discovered attack {reply}.
+ex.discovered.b5.2 = {reply} is a discovered attack.
+ex.discovered.b5.3 = {reply} uncovers a double threat.
+ex.discovered.b6 = {reply}, discovering on {t1}.
+ex.discovered.b6.2 = {reply} and {t1} falls.
+ex.discovered.b6.3 = Discovered attack: {reply}, hitting {t1}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} attacks {t1}. When it moves, I take {t2} behind it.
+ex.skewer.b1.2 = Look: {my} hits {t1}, and {t2} is right behind it.
+ex.skewer.b1.3 = {my} goes after {t1}. It must move, and then {t2} falls.
+ex.skewer.b2 = A skewer: {my} attacks {t1}, and {t2} is behind it.
+ex.skewer.b2.2 = {my} lines up {t1} and {t2}. When the first moves, I take the second.
+ex.skewer.b2.3 = Careful: {t1} and {t2} are on one line. {my} can skewer them.
+ex.skewer.b3 = {reply} skewers {t1} and {t2}.
+ex.skewer.b3.2 = After {reply}, {t1} must move and {t2} falls.
+ex.skewer.b3.3 = {move} allows {reply}, a skewer of {t1} and {t2}.
+ex.skewer.b4 = {reply} skewers {t1}; {t2} behind it is lost.
+ex.skewer.b4.2 = {move} lines up {t1} and {t2} for {reply}.
+ex.skewer.b4.3 = After {reply}, {t1} moves and {t2} drops.
+ex.skewer.b5 = {reply} skewers {t1} and {t2}.
+ex.skewer.b5.2 = {move} allows the skewer {reply} through {t1} to {t2}.
+ex.skewer.b6 = {reply} skewers.
+ex.skewer.b6.2 = {reply}, a skewer.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} can go to {sq}. Then {your} is stuck in front of {t1}.
+ex.pin.b1.2 = Watch {my} on {sq}: {your} gets stuck in front of {t1}.
+ex.pin.b1.3 = {my} can pin {your} to {t1}. Then I win it.
+ex.pin.b2 = A pin: {your} cannot move, because {t1} is behind it.
+ex.pin.b2.2 = {your} is pinned to {t1}. Then I can win it.
+ex.pin.b2.3 = Now {your} is stuck in front of {t1}. That's a pin.
+ex.pin.b3 = {your} gets pinned to {t1}, and I win it.
+ex.pin.b3.2 = After this, {your} is pinned against {t1}.
+ex.pin.b3.3 = The pin on {your} costs material: {t1} is behind it.
+ex.pin.b4 = {reply} pins and wins material.
+ex.pin.b4.2 = {move} walks into the pin {reply}.
+ex.pin.b4.3 = After {reply}, the pinned piece falls.
+ex.pin.b5 = {move} allows the pin {reply}.
+ex.pin.b5.2 = {reply} pins, and the piece is lost.
+ex.pin.b6 = {reply} pins.
+ex.pin.b6.2 = {reply}, pinning.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} is pinned, so it cannot protect {sq}. {t1} is behind it.
+ex.pin_defender.b1.2 = Look: {your} can't defend {sq}, because {t1} would be lost.
+ex.pin_defender.b2 = {your} is pinned to {t1}, so {sq} has no real defender.
+ex.pin_defender.b2.2 = A pinned piece is a bad defender. {your} can't guard {sq}: {t1} is behind it.
+ex.pin_defender.b3 = {your} is pinned to {t1}; it doesn't really defend {sq}.
+ex.pin_defender.b3.2 = {sq} looks defended, but {your} is pinned in front of {t1}.
+ex.pin_defender.b4 = {your} is pinned, so {sq} is not really defended.
+ex.pin_defender.b4.2 = The pinned {your} can't guard {sq}.
+ex.pin_defender.b5 = {your} is pinned; {sq} is loose.
+ex.pin_defender.b5.2 = {sq} falls: {your} is pinned.
+ex.pin_defender.b6 = {your} is pinned; {sq} falls.
+ex.pin_defender.b6.2 = Pinned {your}, loose {sq}.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} is trapped. Every square it can go to is attacked.
+ex.trapped.b1.2 = Look at {your}: it has no safe square to run to.
+ex.trapped.b1.3 = {your} is stuck. I can attack it, and it can't escape.
+ex.trapped.b2 = {your} has no safe squares. I can win it.
+ex.trapped.b2.2 = {your} is trapped: wherever it goes, I take it.
+ex.trapped.b2.3 = Careful, {your} is running out of squares.
+ex.trapped.b3 = {your} gets trapped: no safe square left.
+ex.trapped.b3.2 = After this, {your} is trapped and lost.
+ex.trapped.b3.3 = {your} has walked into a trap: it can't get out.
+ex.trapped.b4 = {move} leaves {your} trapped.
+ex.trapped.b4.2 = {your} has no retreat; I win it.
+ex.trapped.b4.3 = {your} is trapped after {reply}.
+ex.trapped.b5 = {your} ends up trapped: {line}.
+ex.trapped.b5.2 = {move} strands {your}.
+ex.trapped.b6 = {your} is trapped.
+ex.trapped.b6.2 = {line} traps {your}.
+ex.trapped.tip.b1 = Before you move a piece, check that it can get back out.
+ex.trapped.tip.b1.2 = Pieces deep in my camp can get stuck. Keep a way out.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your} is stuck behind its pawns. {my} can check it on the back row.
+ex.back_rank.b1.2 = Careful: {your} has no escape square, and {my} can reach {sq}.
+ex.back_rank.b1.3 = {my} can go to {sq}. {your} is locked in by its pawns.
+ex.back_rank.b2 = Back-rank danger: {your} has no air. {my} can check on {sq}.
+ex.back_rank.b2.2 = {your} is locked in. {my} goes to {sq} and wins material.
+ex.back_rank.b2.3 = Your back row is weak: {my} can check {your} on {sq}.
+ex.back_rank.b3 = Your back rank is weak: {line}. {your} has no escape square.
+ex.back_rank.b3.2 = {your} has no air, so {line} wins material.
+ex.back_rank.b3.3 = After {line}, the back rank decides: {your} is boxed in.
+ex.back_rank.b4 = The back rank: {line}, and {your} has no luft.
+ex.back_rank.b4.2 = {line} exploits the weak back rank around {your}.
+ex.back_rank.b4.3 = {your} lacks an escape square: {line}.
+ex.back_rank.b5 = Back-rank weakness around {your}: {line}.
+ex.back_rank.b5.2 = {line}; {your} has no luft.
+ex.back_rank.b6 = {line}, back rank; {your} is boxed in.
+ex.back_rank.b6.2 = Back rank: {line} ({your}).
+ex.back_rank.tip.b1 = Give your king a little window: move one pawn in front of it.
+ex.back_rank.tip.b1.2 = A king behind three pawns can be mated on the back row. Make it some room.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} on {sq} has no protector. {my} can take it for free.
+ex.hanging.b1.2 = Look at {your}: nothing defends it, and {my} attacks it.
+ex.hanging.b1.3 = {your} is not protected. {my} can just take it.
+ex.hanging.b2 = {your} on {sq} is hanging. {my} takes it, and you can't take back.
+ex.hanging.b2.2 = {my} can capture {your} for free. Nothing protects it.
+ex.hanging.b2.3 = {your} is left alone on {sq}, and {my} takes it.
+ex.hanging.b3 = {move} leaves {your} unprotected: {reply}, and nothing recaptures.
+ex.hanging.b3.2 = {your} on {sq} hangs to {reply}.
+ex.hanging.b3.3 = After {reply}, {your} is gone for nothing.
+ex.hanging.b4 = {move} hangs {your}: {reply} wins {pts:point}.
+ex.hanging.b4.2 = {reply} picks up {your} for free.
+ex.hanging.b4.3 = {your} is loose; {reply} takes it.
+ex.hanging.b5 = {move} leaves {your} loose; {reply} wins it.
+ex.hanging.b5.2 = {your} on {sq} drops to {reply}.
+ex.hanging.b5.3 = {reply} wins {your}.
+ex.hanging.b6 = {move}? {reply} and {your} falls.
+ex.hanging.b6.2 = {reply} wins {your}.
+ex.hanging.b6.3 = {your} hangs: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} was protecting {your}. Now {my} can take it.
+ex.hanging_guard.b1.2 = {your2} moved away, and now {your} is alone. {my} takes it.
+ex.hanging_guard.b2 = {your2} used to protect {your}. Now it's alone, and {my} takes it.
+ex.hanging_guard.b2.2 = By moving {your2}, you left {your} unguarded for {my}.
+ex.hanging_guard.b3 = {your2} was guarding {your}. Moving it drops it to {reply}.
+ex.hanging_guard.b3.2 = Without {your2}, {your} is loose: {reply}.
+ex.hanging_guard.b4 = {move} removes the guard: {your2} left {your}, and {reply} collects it.
+ex.hanging_guard.b4.2 = {your2} was the only defender of {your}; {reply} wins it.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} was already attacking {your}. Always check what my move threatens.
+ex.hanging_threat.b1.2 = You didn't see my threat: {my} attacks {your}.
+ex.hanging_threat.b2 = My last move attacked {your} with {my}. Always look at my threats.
+ex.hanging_threat.b2.2 = {my} was threatening {your}, and now I can take it.
+ex.hanging_threat.b3 = You missed my threat: {my} was attacking {your}.
+ex.hanging_threat.b3.2 = {my} had {your} in its sights all along.
+ex.hanging.tip.b1 = Before each move, ask yourself: are all my pieces safe?
+ex.hanging.tip.b1.2 = A good habit: after every move, check which of your pieces are protected.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured.
+ex.exchange_capture.b1 = {your} took a piece, but {my} takes back. That trade loses points.
+ex.exchange_capture.b1.2 = {my} takes back. {your} is worth {n}, but you only got {n2}.
+ex.exchange_capture.b1.3 = Careful: {my} can take {your} back. That's a bad trade.
+ex.exchange_capture.b2 = Careful with trades: {your} is worth {n}. {my} takes back, and you got only {n2}.
+ex.exchange_capture.b2.2 = {my} recaptures {your}. You lose {n} and win only {n2}.
+ex.exchange_capture.b3 = The capture doesn't work on {sq}: {your} is lost after {line}.
+ex.exchange_capture.b3.2 = {your} takes on {sq}, but you're {pts:point} down after {line}.
+ex.exchange_capture.b4 = {move} miscounts on {sq}: {line} leaves {your} lost.
+ex.exchange_capture.b4.2 = Taking on {sq} costs {your}: {line}.
+ex.exchange_capture.b5 = {move} loses {your} in the sequence on {sq}: {line}.
+ex.exchange_capture.b5.2 = On {sq}, {your} is overloaded: {line}.
+ex.exchange_capture.b6 = {move} drops {your} on {sq} after {line}.
+ex.exchange_capture.b6.2 = {line} on {sq}, and {your} is gone.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Count them: I attack {sq} {n} times, you defend it {n2} times.
+ex.exchange_count.b1.2 = On {sq} I have {n} attackers and you have {n2} defenders. I win that.
+ex.exchange_count.b2 = {sq} is attacked {n} times and defended {n2} times. You'll lose material there.
+ex.exchange_count.b2.2 = Count on {sq}: {n} attackers against {n2} defenders.
+ex.exchange_count.b3 = Count attackers and defenders on {sq}: I have more.
+ex.exchange_count.b3.2 = The exchange on {sq} doesn't work: after {line}, you're {pts:point} down.
+ex.exchange_count.b4 = {move} miscounts on {sq}: {line} leaves you {pts:point} down.
+ex.exchange_count.b4.2 = {sq} is attacked more often than it is defended: {line}.
+ex.exchange_count.b5 = On {sq}, {n} attackers beat {n2} defenders: {line}.
+ex.exchange_count.b5.2 = {move} loses the count on {sq}.
+ex.exchange_count.b6 = {line} on {sq}, and I'm {pts:point} up.
+ex.exchange_count.b6.2 = {sq}: {n} against {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} is worth less than {your}. If I take, you lose points.
+ex.exchange_cheap.b1.2 = {my} attacks {your}. Trading them is bad for you.
+ex.exchange_cheap.b2 = {your} is worth {n}, and {my} only {n2}. That trade costs you.
+ex.exchange_cheap.b2.2 = {my} is cheaper than {your}, so the attack wins material.
+ex.exchange_cheap.b3 = {your} on {sq} is attacked by a cheaper piece.
+ex.exchange_cheap.b3.2 = A {n2}-point piece attacks {your} on {sq}: {line}.
+ex.exchange_cheap.b4 = {your} on {sq} is attacked by a cheaper piece; {reply} wins material.
+ex.exchange_cheap.b4.2 = {reply} hits {your} on {sq} with a cheaper piece.
+ex.exchange_cheap.b5 = {your} on {sq} is exposed to a cheaper attacker: {line}.
+ex.exchange_cheap.b5.2 = {reply} wins material on {sq} against {your}.
+ex.exchange_cheap.b6 = {reply} wins {your} on {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} on {sq} is lost.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Did you see? {my} on {sq} was free. {your} could have taken it.
+ex.missed_capture.b1.2 = Look: {my} had no defender. {your} could have captured it.
+ex.missed_capture.b1.3 = {my} on {sq} was not protected. {your} could have grabbed it!
+ex.missed_capture.b2 = You missed a free piece: {best} wins {my}.
+ex.missed_capture.b2.2 = {my} was hanging on {sq}. {best} takes it. Next time, grab it!
+ex.missed_capture.b2.3 = {best} would have won {my} for free.
+ex.missed_capture.b3 = {best} would have won {my} for nothing.
+ex.missed_capture.b3.2 = {my} on {sq} was unprotected: {best}. Check for loose pieces every move.
+ex.missed_capture.b3.3 = You could have taken {my} with {best}.
+ex.missed_capture.b4 = Missed: {best} picks up {my} on {sq}.
+ex.missed_capture.b4.2 = {best} wins {my}, which was loose.
+ex.missed_capture.b4.3 = {my} was hanging: {best}.
+ex.missed_capture.b5 = {best} wins {my}; {move} lets it escape.
+ex.missed_capture.b5.2 = {my} on {sq} was loose: {best}.
+ex.missed_capture.b6 = {best}! {my} on {sq} was loose.
+ex.missed_capture.b6.2 = {best} won {my}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = You had a double attack: {best} attacks {t1} and {t2}!
+ex.missed_fork.b1.2 = Look! {best} would hit {t1} and {t2} at the same time.
+ex.missed_fork.b1.3 = {best} was a fork: {t1} and {t2} both attacked.
+ex.missed_fork.b2 = {best} was a fork: {t1} and {t2}.
+ex.missed_fork.b2.2 = You missed a double attack: {best}, hitting {t1} and {t2}.
+ex.missed_fork.b2.3 = {best} attacks {t1} and {t2} together. A fork!
+ex.missed_fork.b3 = {best} was a fork: {t1} and {t2}.
+ex.missed_fork.b3.2 = You had {best}, forking {t1} and {t2}.
+ex.missed_fork.b3.3 = {best} would have forked {t1} and {t2}.
+ex.missed_fork.b4 = {best} forked {t1} and {t2}.
+ex.missed_fork.b4.2 = Missed fork: {best} on {t1} and {t2}.
+ex.missed_fork.b5 = {best} forked {t1} and {t2}.
+ex.missed_fork.b5.2 = {best} hit {t1} and {t2}.
+ex.missed_fork.b6 = {best} forked {t1} and {t2}.
+ex.missed_fork.b6.2 = {best}: fork on {t1} and {t2}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my} can run to {sq} and become a queen. {your} is too far away.
+ex.promotion.b1.2 = Look: nothing stops {my} from reaching {sq}. {your} can't catch it.
+ex.promotion.b1.3 = {my} is {n} squares from {sq}, and {your} is too slow.
+ex.promotion.b2 = {my} runs to {sq}, and {your} can't catch it.
+ex.promotion.b2.2 = {my} needs {n} moves to reach {sq}; {your} needs {n2}. Too slow.
+ex.promotion.b2.3 = Careful: {my} queens on {sq}, and {your} is too far.
+ex.promotion.b3 = {my} is outside the square: {your} can't catch it before {sq}.
+ex.promotion.b3.2 = The race is lost: {my} reaches {sq} before {your}.
+ex.promotion.b4 = {your} is outside the square of the pawn; it queens on {sq}.
+ex.promotion.b4.2 = {my} promotes on {sq}; {your} is a move short.
+ex.promotion.b5 = The pawn race is lost: {your} is outside the square, {sq}.
+ex.promotion.b5.2 = {line}: I queen on {sq} and {your} is too late.
+ex.promotion.b6 = {your} is out of the square; I queen on {sq}.
+ex.promotion.b6.2 = {line}, queening on {sq} ({your} too late).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Your pawn could have run to {sq} and become a queen!
+ex.promotion_missed.b1.2 = Look at {sq}! Your pawn could have raced there.
+ex.promotion_missed.b2 = Your pawn could have run to {sq}. Push passed pawns!
+ex.promotion_missed.b2.2 = Nothing stopped your pawn on its way to {sq}.
+ex.promotion_missed.b3 = {best} wins the race to {sq}.
+ex.promotion_missed.b3.2 = Your pawn was faster: {best}, and it queens on {sq}.
+ex.promotion_missed.b4 = {best} wins the pawn race to {sq}.
+ex.promotion_missed.b4.2 = {best}! The pawn queens on {sq}.
+ex.promotion_missed.b5 = {best} queens first on {sq}.
+ex.promotion_missed.b5.2 = {best}, and {sq} is yours.
+ex.promotion_missed.b6 = {best} wins the race to {sq}.
+ex.promotion_missed.b6.2 = {best}; {sq} first.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = That pawn protected {your}. Now {your} has less cover.
+ex.king_shield.b1.2 = The pawn from {sq} was a shield for {your}. Now my pieces can get in.
+ex.king_shield.b2 = Moving the pawn from {sq} weakens {your}. My pieces can attack it now.
+ex.king_shield.b2.2 = {your} lost a guard: the pawn on {sq} was its shield.
+ex.king_shield.b3 = That pawn move opens {your} to my attack.
+ex.king_shield.b3.2 = {your} loses its pawn cover, and my pieces come in.
+ex.king_shield.b4 = {move} weakens the pawns around {your}; my attack gets in.
+ex.king_shield.b4.2 = The shield around {your} is broken after {move}.
+ex.king_shield.b5 = {move} loosens the cover of {your}: {line}.
+ex.king_shield.b5.2 = After {move}, {your} is exposed: {line}.
+ex.king_shield.b6 = {move} weakens {your}: {line}.
+ex.king_shield.b6.2 = {line}; {your} is too open.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} is in danger. My pieces are coming for it.
+ex.king_exposed.b1.2 = Look how open {your} is. Keep it safe behind its pawns.
+ex.king_exposed.b2 = {your} is too open. I can give many checks now.
+ex.king_exposed.b2.2 = Careful: {your} has no shelter, and my pieces attack it.
+ex.king_exposed.b3 = {your} is exposed; my pieces can attack it with checks.
+ex.king_exposed.b3.2 = After this, {your} has no shelter.
+ex.king_exposed.b4 = {your} gets exposed: {line}.
+ex.king_exposed.b4.2 = {move} leaves {your} open to attack.
+ex.king_exposed.b5 = {your} is too exposed: {line}.
+ex.king_exposed.b5.2 = {move} leaves {your} in the open.
+ex.king_exposed.b6 = {line}; {your} is exposed.
+ex.king_exposed.b6.2 = {your} is too open: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = This trade leads to a pawn ending that I win.
+ex.bad_trade.b3.2 = After {line}, only pawns are left, and my king is better.
+ex.bad_trade.b4 = The trades lead to a lost pawn ending: {line}.
+ex.bad_trade.b4.2 = Trading into this pawn ending loses.
+ex.bad_trade.b5 = Wrong trade: the pawn ending after {line} is lost.
+ex.bad_trade.b5.2 = The pawn ending is lost; keep pieces on.
+ex.bad_trade.b6 = The pawn ending after {line} is lost.
+ex.bad_trade.b6.2 = Lost pawn ending: {line}.
+ex.bishop_pair.b5 = Giving up the bishop pair for nothing.
+ex.bishop_pair.b5.2 = That trade gives up your bishop pair; mine stays.
+ex.bishop_pair.b6 = The bishop pair goes.
+ex.bishop_pair.b6.2 = Bishop pair given away.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} takes the opposition: kings face each other with one square between.
+ex.opposition.b3.2 = The kings! {best} would have taken the opposition.
+ex.opposition.b4 = {best} takes the opposition and wins.
+ex.opposition.b4.2 = The opposition decides: {best}.
+ex.opposition.b5 = {best}, taking the opposition.
+ex.opposition.b5.2 = Opposition: {best}.
+ex.opposition.b6 = {best}, opposition.
+ex.opposition.b6.2 = {best}: the opposition.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Your pawn could run to {sq}. Passed pawns want to move forward!
+ex.push_passed.b1.2 = Push your free pawn! It wants to reach {sq}.
+ex.push_passed.b1.3 = Nothing can stop your pawn from marching to {sq}. Push it!
+ex.push_passed.b2 = {best}: push the passed pawn toward {sq}.
+ex.push_passed.b2.2 = Your passed pawn is strong. {best} pushes it.
+ex.push_passed.b2.3 = Push it! {best} brings the pawn closer to {sq}.
+ex.push_passed.b3 = {best} pushes the passed pawn.
+ex.push_passed.b3.2 = Passed pawns must be pushed: {best}.
+ex.push_passed.b3.3 = {best} was the way: the pawn runs to {sq}.
+ex.push_passed.b4 = {best}: the passed pawn decides.
+ex.push_passed.b4.2 = Push: {best}.
+ex.push_passed.b5 = {best}, pushing the passer: {eval}.
+ex.push_passed.b5.2 = The passed pawn: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, the passer.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Bring {your} forward! In the endgame, the king is a strong piece.
+ex.king_active.b1.2 = Now {your} can join the fight. Walk it to the middle.
+ex.king_active.b1.3 = With few pieces left, {your} should come out and help.
+ex.king_active.b2 = In the endgame, use {your}: bring it to the centre.
+ex.king_active.b2.2 = {your} should be active now. March it forward.
+ex.king_active.b3 = {best} activates the king. In endings, the king fights.
+ex.king_active.b3.2 = {best}: the king belongs in the centre now.
+ex.king_active.b4 = {best} centralises the king.
+ex.king_active.b4.2 = The king should come forward: {best}.
+ex.king_active.b5 = {best}, activating the king: {line}.
+ex.king_active.b5.2 = King activity: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, king forward.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best} keeps a better position.
+ex.positional.b4.2 = {best} was stronger here.
+ex.positional.b4.3 = I'd have preferred {best}.
+ex.positional.b5 = {best} was stronger: {line}.
+ex.positional.b5.2 = {best}, with the idea {line}.
+ex.positional.b5.3 = Consider {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} came out very early. Bring out your knights and bishops first.
+tip.early_queen.b1.2 = Careful with {your} this early: my pieces can chase it around.
+tip.early_queen.b1.3 = It's fun to move {your}, but develop the small pieces first.
+tip.early_queen.b2 = Moving {your} this early lets me attack it and gain time.
+tip.early_queen.b2.2 = {your} out so soon? Knights and bishops first!
+tip.early_queen.b3 = An early outing for {your} gives me tempo moves against it.
+tip.early_queen.b3.2 = {your} is easy to chase this early. Develop first.
+tip.queen_grab.b1 = {your} took a far-away pawn, and now it can get into trouble.
+tip.queen_grab.b1.2 = Grabbing pawns with {your} costs time. Develop first!
+tip.queen_grab.b2 = {your} went pawn-grabbing on the side. That costs a lot of time.
+tip.queen_grab.b2.2 = Be careful sending {your} after far pawns.
+tip.queen_grab.b3 = Pawn-grabbing with {your} this early loses time.
+tip.queen_grab.b3.2 = {your} is far from home now; my development will count.
+tip.queen_grab.b4 = {your} grabs a pawn but loses too much time.
+tip.queen_grab.b4.2 = The pawn grab offside with {your} costs tempo.
+tip.same_piece.b1 = You moved {your} twice. Try to bring out a new piece each move.
+tip.same_piece.b1.2 = {your} again? Get your other pieces out too.
+tip.same_piece.b1.3 = Each move, try to develop a new piece, not {your} again.
+tip.same_piece.b2 = Moving {your} twice in the opening loses time.
+tip.same_piece.b2.2 = {your} has moved again; your other pieces are still at home.
+tip.same_piece.b3 = Moving {your} twice costs development.
+tip.same_piece.b3.2 = Another move with {your}; the rest of your army waits.
+tip.castle.b1 = {your} is still in the middle. Castling would keep it safe.
+tip.castle.b1.2 = Time to castle! {your} is safer in the corner.
+tip.castle.b1.3 = Think about castling soon. {your} is in the open.
+tip.castle.b2 = {your} is still in the centre. Castle soon!
+tip.castle.b2.2 = Castling would tuck {your} away safely.
+tip.castle.b3 = With the centre opening, {your} should castle.
+tip.castle.b3.2 = {your} is still in the centre; castling was due.
+tip.knight_rim.b1 = {your} on the edge doesn't do much. Knights like the middle.
+tip.knight_rim.b1.2 = A knight on the rim is dim! {your} controls fewer squares there.
+tip.knight_rim.b2 = {your} on the rim controls few squares. Aim for the centre.
+tip.knight_rim.b2.2 = A knight on the rim is dim: {your} wants the centre.
+tip.knight_rim.b3 = {your} is offside on the rim.
+tip.knight_rim.b3.2 = The rim is a poor home for {your}.
+tip.flank.b1 = Try to move the middle pawns first. Edge pawns don't help much.
+tip.flank.b1.2 = Pawns on the side don't help your pieces come out. Use the middle ones.
+tip.flank.b2 = Edge pawn moves don't develop anything. Use the centre pawns.
+tip.flank.b2.2 = Too many side pawn moves. Develop your pieces!
+tip.flank.b3 = Flank pawn moves in the opening cost development.
+tip.flank.b3.2 = The edge pawns can wait; develop and fight for the centre.
+tip.centre.b1 = Try to control the middle of the board, like {sq}.
+tip.centre.b1.2 = The centre is important. Put a pawn or a piece near {sq}.
+tip.centre.b1.3 = Pieces in the middle are strong. Aim for squares like {sq}.
+tip.centre.b2 = Fight for the centre: squares like {sq} matter.
+tip.centre.b2.2 = You're giving me the centre. Look at {sq}.
+tip.centre.b3 = You're not contesting the centre; {sq} is mine.
+tip.centre.b3.2 = Challenge the centre, around {sq}.
+# Endgame technique tips.
+tip.mate_technique.b1 = With a lone king left, push it to the edge, then checkmate.
+tip.mate_technique.b1.2 = Tip: squeeze my king toward the edge. Keep your king close too.
+tip.fifty.b1 = Careful: after fifty moves without a capture or a pawn move, it's a draw.
+tip.fifty.b1.2 = Time is running out: fifty moves without captures or pawn moves is a draw.
+tip.repetition.b1 = Careful! If the same position comes a third time, it's a draw.
+tip.repetition.b1.2 = Avoid repeating moves: a third repetition is a draw, and you're winning.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Wow, you gave up a piece, and it works!
+praise.sacrifice.2 = A clever sacrifice! Very well played.
+praise.brilliant.b3 = Brilliant! A real sacrifice.
+praise.brilliant.b3.2 = Wow, {move} is a great sacrifice!
+praise.brilliant.b4 = {move}! A brilliant sacrifice.
+praise.brilliant.b4.2 = Brilliant. I didn't expect that.
+praise.brilliant.b5 = {move}!! Brilliant.
+praise.brilliant.b5.2 = A brilliant sacrifice.
+praise.brilliant.b6 = {move}!! Excellent.
+praise.brilliant.b6.2 = Brilliant.
+praise.great.b2 = Great move! You found the way to fight back.
+praise.great.b2.2 = That's a great move. Well found!
+praise.great.b3 = Great move! You found the only good idea.
+praise.great.b3.2 = Excellent, {move} turns things around.
+praise.great.b4 = {move}! A great find.
+praise.great.b4.2 = Great move.
+praise.great.b5 = {move}! Well found.
+praise.great.b5.2 = Strong: {move}.
+praise.great.b6 = {move}! Great.
+praise.great.b6.2 = Great find.
+praise.only.b2 = Good! That was the only good move.
+praise.only.b2.2 = Well done, you found the one move that works.
+praise.only.b3 = The only move, and you found it.
+praise.only.b3.2 = Exactly! Nothing else worked here.
+praise.only.b4 = The only move. Well done.
+praise.only.b4.2 = Only move, found.
+praise.only.b5 = Only move. Good.
+praise.only.b5.2 = {move}, the only move.
+praise.only.b6 = Only move.
+praise.only.b6.2 = Accurate: the only move.
+praise.fork.b2 = A double attack! Well done.
+praise.fork.b2.2 = You attack two pieces at once! Great.
+praise.fork.b2.3 = Nice! That's a fork.
+praise.fork.b3 = Nice fork.
+praise.fork.b3.2 = Good fork!
+praise.fork.b3.3 = A fork. Well played.
+praise.capture.b1 = Well done! You took {my} for free.
+praise.capture.b1.2 = Good eye! {my} was not protected.
+praise.capture.b1.3 = Yes! You won {my}.
+praise.capture.b2 = Good capture! {my} was loose.
+praise.capture.b2.2 = Nice, you picked up {my}.
+praise.capture.b2.3 = Well spotted: {my} was hanging.
+praise.best.b1 = Good move!
+praise.best.b1.2 = Very good!
+praise.best.b1.3 = Well played!
+praise.best.b2 = Good move.
+praise.best.b2.2 = Very nice.
+praise.best.b2.3 = Well played.
+praise.best.b3 = Good move: not easy to find.
+praise.best.b3.2 = Nicely found.
+praise.best.b3.3 = {move} is the best move here. Good.
+praise.trade.b1 = Good! When you're ahead, trading pieces helps you.
+praise.trade.b1.2 = Nice trade. You're ahead, so fewer pieces is good for you.
+praise.trade.b2 = Good trade: you're ahead, so swap pieces.
+praise.trade.b2.2 = Trading {my} when you're ahead is smart.
+praise.trade.b3 = Good: trade when ahead.
+praise.trade.b3.2 = Sensible trade.
+praise.excellent.b3 = Excellent move.
+praise.excellent.b3.2 = That's a strong move.
+praise.excellent.b3.3 = Very precise.
+praise.excellent.b4 = Precise.
+praise.excellent.b4.2 = Excellent.
+praise.excellent.b4.3 = Good, {move} is accurate.
+praise.castle.b1 = Good! You castled. Your king is safer now.
+praise.castle.b1.2 = Nice castling! Your king is tucked away.
+praise.saved.b1 = Good! You saved your piece.
+praise.saved.b1.2 = Well done, you moved it to safety.
+praise.book.b1 = Good, that's a well-known opening move.
+praise.book.b1.2 = Nice, that's how strong players start too.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Careful! I'm threatening checkmate on {sq}.
+threat.mate.b1.2 = Watch out: {my} wants to go to {sq}. That would be checkmate.
+threat.mate.b1.3 = Look at {sq}. If I get there, it's checkmate!
+threat.mate.b2 = Careful, I threaten mate.
+threat.mate.b2.2 = Watch out: there's a mate threat on {sq}.
+threat.mate.b2.3 = Look closely: I'm threatening checkmate.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Look: {my} is attacking {your}.
+threat.piece.b1.2 = Careful! {your} is attacked by {my}.
+threat.piece.b1.3 = Watch out, {my} wants to take {your}.
+threat.piece.b2 = Careful with {your}.
+threat.piece.b2.2 = {your} is under attack.
+threat.piece.b2.3 = Watch {your}.
+threat.punish.b1 = My last move was a mistake. Can you punish it?
+threat.punish.b1.2 = Hmm, I think I made a mistake. Can you find it?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = Think about {your} this time.
+tb.hint.b1.2 = Keep an eye on {your}.
+tb.hint.king.b1 = Think about the safety of {your}.
+tb.hint.king.b1.2 = Look at {your} first. Is it safe?
+tb.hint.missed.b1 = Look for pieces you can take for free.
+tb.hint.missed.b1.2 = Look carefully: is there something you can capture?
+tb.hint.mate_missed.b1 = Look at my king. Can you checkmate it?
+tb.hint.mate_missed.b1.2 = Try the checks first. Maybe there's a checkmate!
+tb.hint.general.b1 = Take your time and look at the whole board.
+tb.hint.general.b1.2 = Try to find a safer move.
+# The retry.
+tb.fixed.b1 = Much better!
+tb.fixed.b1.2 = Yes, that's better!
+tb.fixed.b1.3 = Good, that works much better.
+tb.fixed = That's better.
+tb.fixed.2 = Better.
+tb.fixed.3 = Good correction.
+tb.same = The same move again? All right, let's see.
+tb.same.2 = You like that move. Let's play it out.

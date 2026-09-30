@@ -58,7 +58,15 @@ const char* replyAnchor(const Ctx& c) { return c.level <= 2 ? "my" : "reply"; }
 // Where a human piece of the table (p1) stood before the move under review.
 Square squareOnP0(const Ctx& c, Square onP1) { return onP1 == c.played.to ? c.played.from : onP1; }
 
-bool materialLost(const Ctx& c) { return c.gain > 0 && c.gain <= c.b.lookahead; }
+// Motifs 4-9 of the §2.0 table: "R wins material with R[0]". A motif pays off after the threat, the
+// escape and the capture (3 plies at least, more with an intermediate check), so the gain is not
+// bounded by the band's lookahead: the motif itself stands on the board after R[0] (that is what
+// the lines show), the engine's loss confirms it works, and the PV must capture one of its targets
+// within motifReach() plies.
+int motifReach(const Ctx& c) { return std::max(6, c.b.lookahead + 2); }
+bool materialLost(const Ctx& c) {
+    return c.j.delta >= 10.0 || (c.gain > 0 && c.gain <= c.b.lookahead + 4);
+}
 
 // Squares next to a king that are empty (the "escape squares" a mate or a stalemate takes away).
 std::vector<Square> kingNeighbours(const Position& p, Square k) {
@@ -221,7 +229,7 @@ bool fork(const Ctx& c, Explanation& out) {
     if (squareCount(targets) < 2) return false;
     bool taken = false;
     for (Square t : squaresOf(targets))
-        if (coachTakesOn(c, t, std::max(4, c.b.lookahead))) taken = true;
+        if (coachTakesOn(c, t, motifReach(c))) taken = true;
     if (!taken) return false;
     const std::vector<Square> ts = byValue(p2, targets);
     Explanation ex;
@@ -230,7 +238,7 @@ bool fork(const Ctx& c, Explanation& out) {
     ex.includesBest = c.level == 6;
     ex.demoPlies = c.level == 1 ? 1 : std::min(3, c.b.demoPlies);
     for (Square t : ts)
-        if (coachTakesOn(c, t, std::max(4, c.b.lookahead))) {
+        if (coachTakesOn(c, t, motifReach(c))) {
             ex.hintSquare = squareOnP0(c, t);
             break;
         }
@@ -271,7 +279,7 @@ bool discovered(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
     const LineStep& r0 = c.r[0];
     for (const Discovery& d : discoveredAttacks(c.p1, r0.move)) {
-        if (!d.check && !coachTakesOn(c, d.target, std::max(4, c.b.lookahead))) continue;
+        if (!d.check && !coachTakesOn(c, d.target, motifReach(c))) continue;
         Explanation ex;
         ex.type = ExType::Discovered;
         ex.concrete = true;
@@ -305,7 +313,7 @@ bool skewer(const Ctx& c, Explanation& out) {
     p2.makeMove(r0.move);
     for (const Skewer& sk : skewers(p2, c.human)) {
         if (sk.attacker != r0.move.to) continue;
-        if (!coachTakesOn(c, sk.behind, 4)) continue;
+        if (!coachTakesOn(c, sk.behind, motifReach(c))) continue;
         Explanation ex;
         ex.type = ExType::Skewer;
         ex.concrete = true;
@@ -334,7 +342,7 @@ bool pin(const Ctx& c, Explanation& out) {
     Position p2 = c.p1;
     p2.makeMove(r0.move);
     const std::vector<Pin> before = pins(c.p1, c.human);
-    const int reach = std::max(4, c.b.lookahead);
+    const int reach = motifReach(c);
     // (a) The reply pins a piece that is then won; (c) the moved piece walked into a pin.
     for (const Pin& pn : pins(p2, c.human)) {
         const bool fresh = pn.pinner == r0.move.to &&
@@ -402,7 +410,7 @@ bool trapped(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
     Position p2 = c.p1;
     p2.makeMove(c.r[0].move);
-    const int reach = std::max(4, c.b.lookahead);
+    const int reach = motifReach(c);
     auto lostLater = [&](PieceType t) {
         for (int i = 2; i < int(c.r.size()) && i <= reach; i += 2)
             if (c.r[size_t(i)].captured == t) return true;
@@ -414,6 +422,17 @@ bool trapped(const Ctx& c, Explanation& out) {
             x = s;
             break;
         }
+    // The special pattern of §2.12: a bishop grabs a rim pawn (Bxa7? b6, Bxh7? g6) and a pawn push
+    // closes its retreat. Nothing attacks it yet (the king comes later), so isTrapped() does not see it.
+    const bool rimGrab = c.f.piece == Bishop && c.f.captured == Pawn &&
+                         (fileOf(c.played.to) == 0 || fileOf(c.played.to) == 7) && c.r[0].piece == Pawn;
+    if (x == NoSquare && rimGrab && p2.at(c.played.to).type == Bishop && lostLater(Bishop)) {
+        bool boxed = !p2.inCheck() && p2.sideToMove() == c.human;
+        if (boxed)
+            for (const Move& m : p2.legalMovesFrom(c.played.to))
+                if (see(p2, m) >= 0) boxed = false;
+        if (boxed) x = c.played.to;
+    }
     if (x == NoSquare) return false;
     Explanation ex;
     ex.type = ExType::Trapped;
@@ -710,7 +729,10 @@ bool kingSafety(const Ctx& c, Explanation& out) {
 // ---- 15. Bad trade (§2.15): into a lost pawn ending; the bishop pair ----
 bool badTrade(const Ctx& c, Explanation& out) {
     if (c.level < 3 || c.j.delta < 5.0) return false;
-    if (c.j.wBest >= 45.0 && c.j.wPlayed <= 30.0 && majorsAndMinors(c.p0) > 0) {
+    // A trade needs pieces on both sides (a piece simply lost is another explanation).
+    const uint64_t kingsPawns = c.p0.pieces(Pawn) | c.p0.pieces(King);
+    const bool bothHavePieces = (c.p0.pieces(c.human) & ~kingsPawns) && (c.p0.pieces(c.coach) & ~kingsPawns);
+    if (c.j.wBest >= 45.0 && c.j.wPlayed <= 30.0 && bothHavePieces) {
         Position q = c.p1;
         bool pawnEnding = majorsAndMinors(q) == 0;
         int plies = 0;
@@ -824,6 +846,9 @@ Beat tipBeat(const Ctx& c, const char* name) { return line(c, bandKey(std::strin
 }  // namespace
 
 bool findExplanation(const Ctx& c, Explanation& out) {
+    // A move that stalemates ends the game: that is what the player must hear, even when it also
+    // missed a mate (§2.14 before §2.10 in this one case).
+    if (c.f.stalemate && stalemate(c, out)) return true;
     if (mateAllowed(c, out) || mateMissed(c, out) || stalemate(c, out)) return true;
     if (materialLost(c) && (fork(c, out) || discovered(c, out) || skewer(c, out) || pin(c, out) || trapped(c, out) ||
                             backRank(c, out)))

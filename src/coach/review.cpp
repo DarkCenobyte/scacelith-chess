@@ -630,8 +630,10 @@ Review Reviewer::review(const ReviewInput& in) {
                                 ex.type != ExType::MissedFork;
         std::string verdictKey;
         bool shake = false;
+        // No verdict for a move that is not a fault (a slower mate at levels 5-6, a free piece
+        // missed with a small loss at levels 1-2 gets the "missed" one): the cause says it all.
         if (ex.missed && level_ <= 2) verdictKey = bandKey("ex.verdict.missed", level_);
-        else if (cls == MoveClass::Blunder || (cls != MoveClass::Mistake && cls != MoveClass::Inaccuracy)) {
+        else if (cls == MoveClass::Blunder) {
             verdictKey = bandKey("ex.verdict.blunder", level_);
             shake = true;
         } else if (cls == MoveClass::Mistake) {
