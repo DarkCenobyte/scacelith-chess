@@ -1,0 +1,7703 @@
+{
+ "meta": {
+  "source": "lichess-org/chess-openings (CC0), a.tsv..e.tsv fetched 2026-09-30: 3,815 rows, 3,174 distinct names, 149 families",
+  "languages": [
+   "en",
+   "fr",
+   "de",
+   "es",
+   "ru",
+   "uk",
+   "ar",
+   "ja",
+   "zh-Hans",
+   "zh-Hant"
+  ],
+  "fields": {
+   "families[].lichess": "lichess name prefixes; a lichess name belongs to the family/variation with the LONGEST matching prefix, matched at a component boundary (end of string, \": \" or \", \")",
+   "families[].side": "who chooses it: white | black | both (curated; overrides move-parity attribution)",
+   "families[].tier": "1 very common at club level on lichess, 2 common, 3 occasional (estimated; explorer.lichess.ovh was not reachable from the sandbox)",
+   "families[].generic": "placeholder name (1.e4 / 1.d4 / 1.Nf3 / 1.d4 Nf6 / 2.Nf3): never announce as a choice, wait for a specific family",
+   "families[].umbrella": "family this one answers (QGD/QGA/Slav/Semi-Slav/Tarrasch/Chigorin/Albin -> queens_gambit; KGA/KGD -> kings_gambit): White's opening is the umbrella, Black's defence this family",
+   "names.<lang>.name": "citation form (subtitles, title case where the language uses it)",
+   "names.<lang>.def": "form with the definite article, for sentence templates (en/fr/de/es; ar, ru, uk, ja, zh need none)",
+   "names.<lang>.gender": "grammatical gender (fr/de/es: m f n; ru/uk: m f n) for agreement in templates",
+   "comment": "English source text, beginner and advanced; translators render it; <=2 sentences each",
+   "review": "languages whose name should be checked by a native chess player before shipping",
+   "glossary": "generic words of lichess components with per-language composition patterns ({X} proper name, {Xgen} genitive for ru/uk)",
+   "eponyms": "proper names that appear in many variation names, transliterated (ru/uk nominative + genitive)",
+   "ignore_components": "lichess components never spoken (uninformative); also ignore any component that starts with \"with \" or contains a move (regex [KQRBN]?[a-h]?x?[a-h][1-8]|O-O)"
+  },
+  "tts_en_respell": {
+   "Giuoco Piano": "Jwoko Piano",
+   "Giuoco Pianissimo": "Jwoko Pianissimo",
+   "Grünfeld": "Groonfeld",
+   "Réti": "Retty",
+   "Najdorf": "Nigh-dorf",
+   "Winawer": "Vinaver",
+   "Sämisch": "Zaymish",
+   "Nimzowitsch": "Nimzovitch",
+   "Nimzo-Indian": "Nimzo Indian",
+   "Alekhine": "Alyekhin",
+   "Pirc": "Peerts",
+   "Maróczy": "Marotsy",
+   "Trompowsky": "Trompovsky",
+   "Scheveningen": "Skhayveningen",
+   "Caro-Kann": "Caro Kann",
+   "Bogo-Indian": "Bogo Indian"
+  }
+ },
+ "families": [
+  {
+   "id": "kings_pawn",
+   "lichess": [
+    "King's Pawn Game",
+    "King's Pawn Opening"
+   ],
+   "side": "white",
+   "tier": 1,
+   "structure": "open",
+   "character": "balanced",
+   "generic": true,
+   "umbrella": null,
+   "root": "1.e4",
+   "eco": "B00, C20",
+   "names": {
+    "en": {
+     "name": "King's Pawn Opening",
+     "def": "the King's Pawn Opening"
+    },
+    "fr": {
+     "name": "Ouverture du pion roi",
+     "def": "l'ouverture du pion roi",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Königsbauernspiel",
+     "def": "das Königsbauernspiel",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Apertura de peón de rey",
+     "def": "la apertura de peón de rey",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют королевской пешки",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют королівського пішака",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح بيدق الملك"
+    },
+    "ja": {
+     "name": "キングズ・ポーン・オープニング"
+    },
+    "zh-Hans": {
+     "name": "王兵开局"
+    },
+    "zh-Hant": {
+     "name": "王兵開局"
+    }
+   },
+   "comment": {
+    "beginner": "1.e4 grabs the centre and opens lines for the queen and the king's bishop at once; it is the most popular first move at every level.",
+    "advanced": "1.e4 leads to open, tactical play after 1...e5 and to sharp, unbalanced fights against the Sicilian, French or Caro-Kann; everything revolves around the e4 pawn and fast development."
+   },
+   "review": [
+    "de"
+   ],
+   "lichess_rows": 41
+  },
+  {
+   "id": "queens_pawn",
+   "lichess": [
+    "Queen's Pawn Game"
+   ],
+   "side": "white",
+   "tier": 1,
+   "structure": "closed",
+   "character": "balanced",
+   "generic": true,
+   "umbrella": null,
+   "root": "1.d4",
+   "eco": "A40, A45, D00-D05",
+   "names": {
+    "en": {
+     "name": "Queen's Pawn Opening",
+     "def": "the Queen's Pawn Opening"
+    },
+    "fr": {
+     "name": "Ouverture du pion dame",
+     "def": "l'ouverture du pion dame",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Damenbauernspiel",
+     "def": "das Damenbauernspiel",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Apertura de peón de dama",
+     "def": "la apertura de peón de dama",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют ферзевой пешки",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют ферзевого пішака",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح بيدق الوزير"
+    },
+    "ja": {
+     "name": "クイーンズ・ポーン・オープニング"
+    },
+    "zh-Hans": {
+     "name": "后兵开局"
+    },
+    "zh-Hant": {
+     "name": "后兵開局"
+    }
+   },
+   "comment": {
+    "beginner": "1.d4 takes the centre with a pawn that the queen already protects; the games are usually slower and more strategic than after 1.e4.",
+    "advanced": "Queen's pawn openings lead to closed or semi-closed positions where piece placement, pawn structure and the c4 and e4 levers matter more than early tactics."
+   },
+   "lichess_rows": 41
+  },
+  {
+   "id": "kings_knight",
+   "lichess": [
+    "King's Knight Opening"
+   ],
+   "side": "white",
+   "tier": 1,
+   "structure": "open",
+   "character": "balanced",
+   "generic": true,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Nf3",
+   "eco": "C40, C44",
+   "names": {
+    "en": {
+     "name": "King's Knight Opening",
+     "def": "the King's Knight Opening"
+    },
+    "fr": {
+     "name": "Ouverture du cavalier roi",
+     "def": "l'ouverture du cavalier roi",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Königsspringerspiel",
+     "def": "das Königsspringerspiel",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Apertura del caballo de rey",
+     "def": "la apertura del caballo de rey",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют королевского коня",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют королівського коня",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح حصان الملك"
+    },
+    "ja": {
+     "name": "キングズ・ナイト・オープニング"
+    },
+    "zh-Hans": {
+     "name": "王马开局"
+    },
+    "zh-Hant": {
+     "name": "王馬開局"
+    }
+   },
+   "comment": {
+    "beginner": "The knight comes out while attacking the e5 pawn: the most natural move in the open games, and Black usually defends with 2...Nc6.",
+    "advanced": "2.Nf3 keeps every classical option (Ruy Lopez, Italian, Scotch, Four Knights) and makes Black commit to a defence of e5: ...Nc6, ...d6 or the ...Nf6 counterattack."
+   },
+   "review": [
+    "de"
+   ],
+   "lichess_rows": 3
+  },
+  {
+   "id": "sicilian",
+   "lichess": [
+    "Sicilian Defense"
+   ],
+   "side": "black",
+   "tier": 1,
+   "structure": "semi-open",
+   "character": "sharp",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 c5",
+   "eco": "B20-B99",
+   "names": {
+    "en": {
+     "name": "Sicilian Defense",
+     "def": "the Sicilian Defense"
+    },
+    "fr": {
+     "name": "Défense sicilienne",
+     "def": "la défense sicilienne",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Sizilianische Verteidigung",
+     "def": "die Sizilianische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa siciliana",
+     "def": "la defensa siciliana",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Сицилианская защита",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Сицилійський захист",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الدفاع الصقلي"
+    },
+    "ja": {
+     "name": "シシリアン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "西西里防御"
+    },
+    "zh-Hant": {
+     "name": "西西里防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black answers 1.e4 with the c-pawn instead of the e-pawn and creates an unbalanced position: expect a sharp game where each side attacks on its own wing.",
+    "advanced": "After d4 and cxd4 Black trades a wing pawn for a centre pawn, gaining the half-open c-file and a central majority, while White gets a lead in development and kingside attacking chances, often with castling on opposite sides."
+   },
+   "lichess_rows": 391
+  },
+  {
+   "id": "french",
+   "lichess": [
+    "French Defense"
+   ],
+   "side": "black",
+   "tier": 1,
+   "structure": "semi-open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e6",
+   "eco": "C00-C19",
+   "names": {
+    "en": {
+     "name": "French Defense",
+     "def": "the French Defense"
+    },
+    "fr": {
+     "name": "Défense française",
+     "def": "la défense française",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Französische Verteidigung",
+     "def": "die Französische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa francesa",
+     "def": "la defensa francesa",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Французская защита",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Французький захист",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الدفاع الفرنسي"
+    },
+    "ja": {
+     "name": "フレンチ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "法兰西防御"
+    },
+    "zh-Hant": {
+     "name": "法蘭西防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black prepares ...d5 with ...e6: a solid defence, but the bishop on c8 is often shut in behind its own pawns.",
+    "advanced": "When White plays e5 a locked pawn chain appears: White attacks on the kingside, Black undermines the chain with ...c5 and ...f6, and the light-squared bishop remains Black's problem piece."
+   },
+   "lichess_rows": 212
+  },
+  {
+   "id": "caro_kann",
+   "lichess": [
+    "Caro-Kann Defense"
+   ],
+   "side": "black",
+   "tier": 1,
+   "structure": "semi-open",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 c6",
+   "eco": "B10-B19",
+   "names": {
+    "en": {
+     "name": "Caro-Kann Defense",
+     "def": "the Caro-Kann Defense"
+    },
+    "fr": {
+     "name": "Défense Caro-Kann",
+     "def": "la défense Caro-Kann",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Caro-Kann-Verteidigung",
+     "def": "die Caro-Kann-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Caro-Kann",
+     "def": "la defensa Caro-Kann",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Каро — Канн",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Каро — Канн",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع كارو-كان"
+    },
+    "ja": {
+     "name": "カロ・カン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "卡罗-卡恩防御"
+    },
+    "zh-Hant": {
+     "name": "卡羅-卡恩防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black prepares ...d5 with ...c6 and keeps the c8 bishop free: a very solid defence with few weaknesses.",
+    "advanced": "The Caro-Kann gives Black a healthy structure and an active light-squared bishop (...Bf5 or ...Bg4); White usually takes space (Advance) or a small lead in development, while Black aims for a timely ...c5 or a good endgame."
+   },
+   "lichess_rows": 110
+  },
+  {
+   "id": "scandinavian",
+   "lichess": [
+    "Scandinavian Defense"
+   ],
+   "side": "black",
+   "tier": 1,
+   "structure": "semi-open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 d5",
+   "eco": "B01",
+   "names": {
+    "en": {
+     "name": "Scandinavian Defense",
+     "def": "the Scandinavian Defense"
+    },
+    "fr": {
+     "name": "Défense scandinave",
+     "def": "la défense scandinave",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Skandinavische Verteidigung",
+     "def": "die Skandinavische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa escandinava",
+     "def": "la defensa escandinava",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Скандинавская защита",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Скандинавський захист",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الدفاع الإسكندنافي"
+    },
+    "ja": {
+     "name": "スカンジナビアン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "斯堪的纳维亚防御"
+    },
+    "zh-Hant": {
+     "name": "斯堪地那維亞防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black hits the e4 pawn at once with ...d5; when the queen recaptures, White gains time by attacking her, so Black must know where she belongs (a5 or d6).",
+    "advanced": "The Scandinavian reaches a Caro-Kann-like structure with the light bishop outside the pawn chain; White keeps a small edge in space and development, Black gets a solid, easy-to-learn setup."
+   },
+   "lichess_rows": 45
+  },
+  {
+   "id": "italian",
+   "lichess": [
+    "Italian Game"
+   ],
+   "side": "white",
+   "tier": 1,
+   "structure": "open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Nf3 Nc6 3.Bc4",
+   "eco": "C50-C59",
+   "names": {
+    "en": {
+     "name": "Italian Game",
+     "def": "the Italian Game"
+    },
+    "fr": {
+     "name": "Partie italienne",
+     "def": "la partie italienne",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Italienische Partie",
+     "def": "die Italienische Partie",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura italiana",
+     "def": "la apertura italiana",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Итальянская партия",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Італійська партія",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "الافتتاح الإيطالي"
+    },
+    "ja": {
+     "name": "イタリアン・ゲーム"
+    },
+    "zh-Hans": {
+     "name": "意大利开局"
+    },
+    "zh-Hant": {
+     "name": "義大利開局"
+    }
+   },
+   "comment": {
+    "beginner": "White develops the bishop to c4, aiming at the weak f7 square: a classical opening where both sides develop quickly and castle.",
+    "advanced": "Modern Italian games are slow manoeuvring battles with c3 and d3 that prepare d4 later; sharper tries are the Evans Gambit and the Two Knights lines with Ng5."
+   },
+   "lichess_rows": 187
+  },
+  {
+   "id": "ruy_lopez",
+   "lichess": [
+    "Ruy Lopez"
+   ],
+   "side": "white",
+   "tier": 1,
+   "structure": "open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Nf3 Nc6 3.Bb5",
+   "eco": "C60-C99",
+   "names": {
+    "en": {
+     "name": "Ruy Lopez",
+     "def": "the Ruy Lopez"
+    },
+    "fr": {
+     "name": "Partie espagnole",
+     "def": "la partie espagnole",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Spanische Partie",
+     "def": "die Spanische Partie",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura española",
+     "def": "la apertura española",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Испанская партия",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Іспанська партія",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "افتتاح روي لوبيز"
+    },
+    "ja": {
+     "name": "ルイ・ロペス"
+    },
+    "zh-Hans": {
+     "name": "西班牙开局"
+    },
+    "zh-Hant": {
+     "name": "西班牙開局"
+    }
+   },
+   "comment": {
+    "beginner": "White's bishop attacks the knight that defends e5: one of the oldest and deepest openings, rich in slow strategic play.",
+    "advanced": "The Ruy Lopez builds long-term pressure on e5 and the centre: the c3-d4 centre, the knight tour Nbd2-f1-g3 and Black's queenside expansion with ...a6 and ...b5, with sharp sidelines such as the Marshall Attack."
+   },
+   "lichess_rows": 235
+  },
+  {
+   "id": "scotch",
+   "lichess": [
+    "Scotch Game"
+   ],
+   "side": "white",
+   "tier": 1,
+   "structure": "open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Nf3 Nc6 3.d4",
+   "eco": "C44-C45",
+   "names": {
+    "en": {
+     "name": "Scotch Game",
+     "def": "the Scotch Game"
+    },
+    "fr": {
+     "name": "Partie écossaise",
+     "def": "la partie écossaise",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Schottische Partie",
+     "def": "die Schottische Partie",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura escocesa",
+     "def": "la apertura escocesa",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Шотландская партия",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Шотландська партія",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "الافتتاح الاسكتلندي"
+    },
+    "ja": {
+     "name": "スコッチ・ゲーム"
+    },
+    "zh-Hans": {
+     "name": "苏格兰开局"
+    },
+    "zh-Hant": {
+     "name": "蘇格蘭開局"
+    }
+   },
+   "comment": {
+    "beginner": "White opens the centre at once with d4: the pieces come out fast and the position becomes open early.",
+    "advanced": "The Scotch releases the central tension immediately; after 4.Nxd4 the play turns on Black's active development (...Bc5 or ...Nf6) and on structures such as the doubled c-pawns after Nxc6."
+   },
+   "lichess_rows": 53
+  },
+  {
+   "id": "philidor",
+   "lichess": [
+    "Philidor Defense"
+   ],
+   "side": "black",
+   "tier": 1,
+   "structure": "open",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Nf3 d6",
+   "eco": "C41",
+   "names": {
+    "en": {
+     "name": "Philidor Defense",
+     "def": "the Philidor Defense"
+    },
+    "fr": {
+     "name": "Défense Philidor",
+     "def": "la défense Philidor",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Philidor-Verteidigung",
+     "def": "die Philidor-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Philidor",
+     "def": "la defensa Philidor",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Филидора",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Філідора",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع فيليدور"
+    },
+    "ja": {
+     "name": "フィリドール・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "菲利多尔防御"
+    },
+    "zh-Hant": {
+     "name": "菲利多爾防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black defends e5 with a pawn (...d6): solid but a little passive, because the f8 bishop is shut in.",
+    "advanced": "The Philidor concedes space for a firm grip on e5 (the Hanham setup ...Nd7, ...Be7, ...c6); White gets comfortable central pressure, and tricks against f7 are common at club level."
+   },
+   "lichess_rows": 44
+  },
+  {
+   "id": "petrov",
+   "lichess": [
+    "Petrov's Defense"
+   ],
+   "side": "black",
+   "tier": 1,
+   "structure": "open",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Nf3 Nf6",
+   "eco": "C42-C43",
+   "names": {
+    "en": {
+     "name": "Petrov's Defense",
+     "def": "the Petrov Defense"
+    },
+    "fr": {
+     "name": "Défense Petrov",
+     "def": "la défense Petrov",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Russische Verteidigung",
+     "def": "die Russische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Petrov",
+     "def": "la defensa Petrov",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Русская партия",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Петрова",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع بتروف"
+    },
+    "ja": {
+     "name": "ペトロフ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "彼得罗夫防御"
+    },
+    "zh-Hant": {
+     "name": "彼得羅夫防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black does not defend e5 but counterattacks e4 with the knight: a solid, symmetrical defence; just don't copy White's moves for too long.",
+    "advanced": "The Petrov leads to symmetrical and often drawish structures; White keeps a small initiative, Black develops quickly and aims for equalising exchanges. The trappy Stafford Gambit is an offshoot."
+   },
+   "note": "Russian usage prefers \"Русская партия\"; Ukrainian text uses \"Захист Петрова\" on purpose.",
+   "lichess_rows": 50
+  },
+  {
+   "id": "four_knights",
+   "lichess": [
+    "Four Knights Game"
+   ],
+   "side": "both",
+   "tier": 1,
+   "structure": "open",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Nf3 Nc6 3.Nc3 Nf6",
+   "eco": "C46-C49",
+   "names": {
+    "en": {
+     "name": "Four Knights Game",
+     "def": "the Four Knights Game"
+    },
+    "fr": {
+     "name": "Partie des quatre cavaliers",
+     "def": "la partie des quatre cavaliers",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Vierspringerspiel",
+     "def": "das Vierspringerspiel",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Apertura de los cuatro caballos",
+     "def": "la apertura de los cuatro caballos",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Партия четырёх коней",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Партія чотирьох коней",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "افتتاح الأحصنة الأربعة"
+    },
+    "ja": {
+     "name": "フォー・ナイツ・ゲーム"
+    },
+    "zh-Hans": {
+     "name": "四马开局"
+    },
+    "zh-Hant": {
+     "name": "四馬開局"
+    }
+   },
+   "comment": {
+    "beginner": "Both sides bring out their knights first: a sound, quiet opening that follows the rules of development.",
+    "advanced": "The Four Knights is symmetrical and balanced; White chooses a Spanish (Bb5), Scotch (d4) or Italian (Bc4) treatment, and Black should know the Rubinstein counter-gambit and the Halloween Gambit."
+   },
+   "lichess_rows": 49
+  },
+  {
+   "id": "english",
+   "lichess": [
+    "English Opening",
+    "English Orangutan"
+   ],
+   "side": "white",
+   "tier": 1,
+   "structure": "flank",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.c4",
+   "eco": "A10-A39",
+   "names": {
+    "en": {
+     "name": "English Opening",
+     "def": "the English Opening"
+    },
+    "fr": {
+     "name": "Ouverture anglaise",
+     "def": "l'ouverture anglaise",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Englische Eröffnung",
+     "def": "die Englische Eröffnung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura inglesa",
+     "def": "la apertura inglesa",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Английское начало",
+     "gender": "n"
+    },
+    "uk": {
+     "name": "Англійський початок",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الافتتاح الإنجليزي"
+    },
+    "ja": {
+     "name": "イングリッシュ・オープニング"
+    },
+    "zh-Hans": {
+     "name": "英国式开局"
+    },
+    "zh-Hant": {
+     "name": "英國式開局"
+    }
+   },
+   "comment": {
+    "beginner": "White starts with the c-pawn instead of a centre pawn and controls d5 from the side: a flexible opening where the centre is fought for with pieces.",
+    "advanced": "The English often transposes to 1.d4 openings; its own lines (Symmetrical, Reversed Sicilian with ...e5) lead to fianchetto manoeuvring, pressure on d5 and queenside play."
+   },
+   "lichess_rows": 177
+  },
+  {
+   "id": "zukertort",
+   "lichess": [
+    "Zukertort Opening"
+   ],
+   "side": "white",
+   "tier": 1,
+   "structure": "flank",
+   "character": "balanced",
+   "generic": true,
+   "umbrella": null,
+   "root": "1.Nf3",
+   "eco": "A04-A06",
+   "names": {
+    "en": {
+     "name": "Zukertort Opening",
+     "def": "the Zukertort Opening"
+    },
+    "fr": {
+     "name": "Ouverture Zukertort",
+     "def": "l'ouverture Zukertort",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Zukertort-Eröffnung",
+     "def": "die Zukertort-Eröffnung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura Zukertort",
+     "def": "la apertura Zukertort",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют Цукерторта",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют Цукерторта",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح تسوكرتورت"
+    },
+    "ja": {
+     "name": "ツケルトート・オープニング"
+    },
+    "zh-Hans": {
+     "name": "祖克托特开局"
+    },
+    "zh-Hant": {
+     "name": "祖克托特開局"
+    }
+   },
+   "comment": {
+    "beginner": "1.Nf3 develops a piece and watches the centre without committing a pawn yet.",
+    "advanced": "1.Nf3 is a move-order tool: it can become a Réti, English, Catalan or Queen's Gambit while avoiding some Black systems such as the Budapest or early Dutch lines."
+   },
+   "review": [
+    "ja",
+    "zh-Hans",
+    "zh-Hant"
+   ],
+   "lichess_rows": 47
+  },
+  {
+   "id": "queens_gambit",
+   "lichess": [
+    "Queen's Gambit"
+   ],
+   "side": "white",
+   "tier": 1,
+   "structure": "closed",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 d5 2.c4",
+   "eco": "D06",
+   "names": {
+    "en": {
+     "name": "Queen's Gambit",
+     "def": "the Queen's Gambit"
+    },
+    "fr": {
+     "name": "Gambit dame",
+     "def": "le gambit dame",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Damengambit",
+     "def": "das Damengambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito de dama",
+     "def": "el gambito de dama",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Ферзевый гамбит",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Ферзевий гамбіт",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "جامبيت الوزير"
+    },
+    "ja": {
+     "name": "クイーンズ・ギャンビット"
+    },
+    "zh-Hans": {
+     "name": "后翼弃兵"
+    },
+    "zh-Hant": {
+     "name": "后翼棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "White offers the c-pawn to pull Black's d-pawn away from the centre; it is not a real sacrifice, because White can usually win the pawn back.",
+    "advanced": "c4 attacks the d5 strongpoint; Black chooses between holding it (Declined, Slav) and giving it up for free development (Accepted), with minority attacks and isolated d-pawn middlegames as typical themes."
+   },
+   "lichess_rows": 1
+  },
+  {
+   "id": "qgd",
+   "lichess": [
+    "Queen's Gambit Declined"
+   ],
+   "side": "black",
+   "tier": 1,
+   "structure": "closed",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": "queens_gambit",
+   "root": "1.d4 d5 2.c4 e6",
+   "eco": "D30-D69",
+   "names": {
+    "en": {
+     "name": "Queen's Gambit Declined",
+     "def": "the Queen's Gambit Declined"
+    },
+    "fr": {
+     "name": "Gambit dame refusé",
+     "def": "le gambit dame refusé",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Abgelehntes Damengambit",
+     "def": "das Abgelehnte Damengambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito de dama rehusado",
+     "def": "el gambito de dama rehusado",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Отказанный ферзевый гамбит",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Відмовлений ферзевий гамбіт",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "جامبيت الوزير المرفوض"
+    },
+    "ja": {
+     "name": "クイーンズ・ギャンビット・ディクラインド"
+    },
+    "zh-Hans": {
+     "name": "拒后翼弃兵"
+    },
+    "zh-Hant": {
+     "name": "拒后翼棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "Black keeps a pawn on d5 and supports it with ...e6: very solid, but the light-squared bishop on c8 needs care.",
+    "advanced": "Classical structures: the Carlsbad after cxd5 exd5 with White's minority attack, Black freeing the game with ...c5 or ...e5, and the eternal question of the c8 bishop; the Orthodox, Tartakower and Lasker defences are the main lines."
+   },
+   "lichess_rows": 174
+  },
+  {
+   "id": "qga",
+   "lichess": [
+    "Queen's Gambit Accepted"
+   ],
+   "side": "black",
+   "tier": 1,
+   "structure": "closed",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": "queens_gambit",
+   "root": "1.d4 d5 2.c4 dxc4",
+   "eco": "D20-D29",
+   "names": {
+    "en": {
+     "name": "Queen's Gambit Accepted",
+     "def": "the Queen's Gambit Accepted"
+    },
+    "fr": {
+     "name": "Gambit dame accepté",
+     "def": "le gambit dame accepté",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Angenommenes Damengambit",
+     "def": "das Angenommene Damengambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito de dama aceptado",
+     "def": "el gambito de dama aceptado",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Принятый ферзевый гамбит",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Прийнятий ферзевий гамбіт",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "جامبيت الوزير المقبول"
+    },
+    "ja": {
+     "name": "クイーンズ・ギャンビット・アクセプテッド"
+    },
+    "zh-Hans": {
+     "name": "接受后翼弃兵"
+    },
+    "zh-Hant": {
+     "name": "接受后翼棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "Black takes the offered pawn but does not try to keep it: the point is to develop freely and hit White's centre with ...c5.",
+    "advanced": "White regains c4 and often ends up with an isolated d-pawn after ...c5 and exchanges on d4; the game is about piece activity against a long-term structural weakness."
+   },
+   "lichess_rows": 58
+  },
+  {
+   "id": "slav",
+   "lichess": [
+    "Slav Defense",
+    "Slav Indian"
+   ],
+   "side": "black",
+   "tier": 1,
+   "structure": "closed",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": "queens_gambit",
+   "root": "1.d4 d5 2.c4 c6",
+   "eco": "D10-D19",
+   "names": {
+    "en": {
+     "name": "Slav Defense",
+     "def": "the Slav Defense"
+    },
+    "fr": {
+     "name": "Défense slave",
+     "def": "la défense slave",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Slawische Verteidigung",
+     "def": "die Slawische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa eslava",
+     "def": "la defensa eslava",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Славянская защита",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Слов'янський захист",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الدفاع السلافي"
+    },
+    "ja": {
+     "name": "スラヴ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "斯拉夫防御"
+    },
+    "zh-Hant": {
+     "name": "斯拉夫防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black supports d5 with ...c6 and keeps the c8 bishop free to come out: a very solid defence.",
+    "advanced": "The Slav holds d5 without locking in the light bishop; main lines revolve around ...dxc4 with ...Bf5 or ...Bg4 against White's a4 and e4 plans, or the symmetrical Exchange Slav."
+   },
+   "lichess_rows": 54
+  },
+  {
+   "id": "semi_slav",
+   "lichess": [
+    "Semi-Slav Defense",
+    "Semi-Slav Defense Accepted"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "closed",
+   "character": "sharp",
+   "generic": false,
+   "umbrella": "queens_gambit",
+   "root": "1.d4 d5 2.c4 c6 3.Nf3 Nf6 4.Nc3 e6",
+   "eco": "D43-D49",
+   "names": {
+    "en": {
+     "name": "Semi-Slav Defense",
+     "def": "the Semi-Slav Defense"
+    },
+    "fr": {
+     "name": "Défense semi-slave",
+     "def": "la défense semi-slave",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Halbslawische Verteidigung",
+     "def": "die Halbslawische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa semieslava",
+     "def": "la defensa semieslava",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Полуславянская защита",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Напівслов'янський захист",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الدفاع شبه السلافي"
+    },
+    "ja": {
+     "name": "セミスラヴ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "半斯拉夫防御"
+    },
+    "zh-Hant": {
+     "name": "半斯拉夫防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black combines the Slav pawn (...c6) with the Queen's Gambit Declined pawn (...e6): it looks quiet but leads to very sharp lines.",
+    "advanced": "The Semi-Slav branches into the Meran (...dxc4 and ...b5 queenside expansion) and the ultra-sharp Botvinnik and Moscow gambits; Black's c8 bishop often finds b7 after ...b5."
+   },
+   "lichess_rows": 70
+  },
+  {
+   "id": "indian",
+   "lichess": [
+    "Indian Defense",
+    "East Indian Defense"
+   ],
+   "side": "black",
+   "tier": 1,
+   "structure": "indian",
+   "character": "balanced",
+   "generic": true,
+   "umbrella": null,
+   "root": "1.d4 Nf6",
+   "eco": "A45-A50",
+   "names": {
+    "en": {
+     "name": "Indian Defense",
+     "def": "the Indian Defense"
+    },
+    "fr": {
+     "name": "Défense indienne",
+     "def": "la défense indienne",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Indische Verteidigung",
+     "def": "die Indische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa india",
+     "def": "la defensa india",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Индийская защита",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Індійський захист",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الدفاع الهندي"
+    },
+    "ja": {
+     "name": "インディアン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "印度防御"
+    },
+    "zh-Hant": {
+     "name": "印度防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black answers 1.d4 with the knight instead of a pawn and keeps options open: the gateway to all the \"Indian\" defences.",
+    "advanced": "1...Nf6 stops e4 for now and delays Black's pawn commitment; the next move (...g6, ...e6 or ...c5) chooses between King's Indian or Grünfeld, Nimzo or Queen's Indian, and Benoni or Benko structures."
+   },
+   "lichess_rows": 40
+  },
+  {
+   "id": "kings_indian",
+   "lichess": [
+    "King's Indian Defense"
+   ],
+   "side": "black",
+   "tier": 1,
+   "structure": "indian",
+   "character": "sharp",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.c4 g6 3.Nc3 Bg7 4.e4 d6",
+   "eco": "E60-E99",
+   "names": {
+    "en": {
+     "name": "King's Indian Defense",
+     "def": "the King's Indian Defense"
+    },
+    "fr": {
+     "name": "Défense est-indienne",
+     "def": "la défense est-indienne",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Königsindische Verteidigung",
+     "def": "die Königsindische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa india de rey",
+     "def": "la defensa india de rey",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Староиндийская защита",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Староіндійський захист",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الدفاع الهندي الملكي"
+    },
+    "ja": {
+     "name": "キングズ・インディアン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "古印度防御"
+    },
+    "zh-Hant": {
+     "name": "古印度防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black lets White build a big centre, puts the bishop on g7, then strikes back: a dynamic fighting defence.",
+    "advanced": "Black concedes space and then hits the centre with ...e5 or ...c5; once the centre is closed with d5, White attacks on the queenside with c5 while Black storms the kingside with ...f5, ...f4 and ...g5."
+   },
+   "note": "lichess names the position after 3.Nc3 \"King's Indian Defense\" (parity would give it to White): the curated side is authoritative.",
+   "lichess_rows": 119
+  },
+  {
+   "id": "london",
+   "lichess": [
+    "London System",
+    "Queen's Pawn Game: London System",
+    "Indian Defense: London System",
+    "Queen's Pawn Game: Accelerated London System",
+    "Indian Defense: Accelerated London System"
+   ],
+   "side": "white",
+   "tier": 1,
+   "structure": "closed",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 d5 2.Nf3 Nf6 3.Bf4 (or 2.Bf4)",
+   "eco": "A46, A48, D00, D02",
+   "names": {
+    "en": {
+     "name": "London System",
+     "def": "the London System"
+    },
+    "fr": {
+     "name": "Système de Londres",
+     "def": "le système de Londres",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Londoner System",
+     "def": "das Londoner System",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Sistema Londres",
+     "def": "el sistema Londres",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Лондонская система",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Лондонська система",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "نظام لندن"
+    },
+    "ja": {
+     "name": "ロンドン・システム"
+    },
+    "zh-Hans": {
+     "name": "伦敦体系"
+    },
+    "zh-Hant": {
+     "name": "倫敦體系"
+    }
+   },
+   "comment": {
+    "beginner": "White sets up d4, Bf4, e3, Nf3 and c3 against almost anything: easy to learn, solid, with a clear plan.",
+    "advanced": "A stable pyramid (d4-e3-c3) with the bishop outside the chain; White plays for a kingside initiative with Ne5 and h4 or for a slow squeeze, and Black's most testing replies are an early ...c5 and ...Qb6 against b2."
+   },
+   "lichess_rows": 22
+  },
+  {
+   "id": "modern",
+   "lichess": [
+    "Modern Defense",
+    "Queen's Pawn Game: Modern Defense",
+    "Robatsch Defense"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "semi-open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 g6",
+   "eco": "B06, A40, A41",
+   "names": {
+    "en": {
+     "name": "Modern Defense",
+     "def": "the Modern Defense"
+    },
+    "fr": {
+     "name": "Défense moderne",
+     "def": "la défense moderne",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Moderne Verteidigung",
+     "def": "die Moderne Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa moderna",
+     "def": "la defensa moderna",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Современная защита",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Сучасний захист",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الدفاع الحديث"
+    },
+    "ja": {
+     "name": "モダン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "现代防御"
+    },
+    "zh-Hant": {
+     "name": "現代防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black puts the king's bishop on g7 with ...g6 and lets White take the centre, planning to attack it later.",
+    "advanced": "The Modern (Robatsch) is hypermodern and flexible: Black delays ...Nf6 and keeps ...c6, ...a6-b5 or ...e5 in reserve; White can build a big centre or go for f4 or a Be3-Qd2 attack."
+   },
+   "lichess_rows": 41
+  },
+  {
+   "id": "pirc",
+   "lichess": [
+    "Pirc Defense",
+    "Lion Defense",
+    "Czech Defense"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "semi-open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 d6 2.d4 Nf6 3.Nc3 g6",
+   "eco": "B07-B09",
+   "names": {
+    "en": {
+     "name": "Pirc Defense",
+     "def": "the Pirc Defense"
+    },
+    "fr": {
+     "name": "Défense Pirc",
+     "def": "la défense Pirc",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Pirc-Verteidigung",
+     "def": "die Pirc-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Pirc",
+     "def": "la defensa Pirc",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Пирца",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Пірца",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع بيرتس"
+    },
+    "ja": {
+     "name": "ピルツ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "皮尔茨防御"
+    },
+    "zh-Hant": {
+     "name": "皮爾茨防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black plays ...d6, ...Nf6 and ...g6 and lets White build a centre, then counters it: a flexible fighting defence.",
+    "advanced": "White gets a broad centre; the main battles are the Austrian Attack (f4) and the Be3-Qd2 attacks, while Black strikes with ...c5 or ...e5 and relies on the g7 bishop."
+   },
+   "lichess_rows": 35
+  },
+  {
+   "id": "vienna",
+   "lichess": [
+    "Vienna Game",
+    "Vienna Gambit"
+   ],
+   "side": "white",
+   "tier": 1,
+   "structure": "open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Nc3",
+   "eco": "C25-C29",
+   "names": {
+    "en": {
+     "name": "Vienna Game",
+     "def": "the Vienna Game"
+    },
+    "fr": {
+     "name": "Partie viennoise",
+     "def": "la partie viennoise",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Wiener Partie",
+     "def": "die Wiener Partie",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura vienesa",
+     "def": "la apertura vienesa",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Венская партия",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Віденська партія",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "افتتاح فيينا"
+    },
+    "ja": {
+     "name": "ウィーン・ゲーム"
+    },
+    "zh-Hans": {
+     "name": "维也纳开局"
+    },
+    "zh-Hant": {
+     "name": "維也納開局"
+    }
+   },
+   "comment": {
+    "beginner": "White develops the queen's knight first and often follows with f4: a lively opening with quick attacking chances.",
+    "advanced": "The Vienna prepares f4 (the Vienna Gambit) or a quiet g3 or Bc4 setup; Black's main answer is ...Nf6 with ...d5 counterplay, and the Frankenstein-Dracula line is famous for its complications."
+   },
+   "lichess_rows": 56
+  },
+  {
+   "id": "bishops_opening",
+   "lichess": [
+    "Bishop's Opening"
+   ],
+   "side": "white",
+   "tier": 2,
+   "structure": "open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Bc4",
+   "eco": "C23-C24",
+   "names": {
+    "en": {
+     "name": "Bishop's Opening",
+     "def": "the Bishop's Opening"
+    },
+    "fr": {
+     "name": "Ouverture du fou",
+     "def": "l'ouverture du fou",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Läuferspiel",
+     "def": "das Läuferspiel",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Apertura de alfil",
+     "def": "la apertura de alfil",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют слона",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют слона",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح الفيل"
+    },
+    "ja": {
+     "name": "ビショップス・オープニング"
+    },
+    "zh-Hans": {
+     "name": "象开局"
+    },
+    "zh-Hant": {
+     "name": "象開局"
+    }
+   },
+   "comment": {
+    "beginner": "White develops the bishop to c4 before the knight, aiming at f7 and keeping the f-pawn free.",
+    "advanced": "A flexible move order that often transposes to the Italian or the Vienna; independent lines include the Urusov Gambit (d4) and quiet d3 setups."
+   },
+   "lichess_rows": 41
+  },
+  {
+   "id": "alekhine",
+   "lichess": [
+    "Alekhine Defense"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "semi-open",
+   "character": "sharp",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 Nf6",
+   "eco": "B02-B05",
+   "names": {
+    "en": {
+     "name": "Alekhine Defense",
+     "def": "the Alekhine Defense"
+    },
+    "fr": {
+     "name": "Défense Alekhine",
+     "def": "la défense Alekhine",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Aljechin-Verteidigung",
+     "def": "die Aljechin-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Alekhine",
+     "def": "la defensa Alekhine",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Алехина",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Альохіна",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع أليخين"
+    },
+    "ja": {
+     "name": "アレヒン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "阿廖欣防御"
+    },
+    "zh-Hant": {
+     "name": "阿廖欣防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black attacks e4 with the knight to lure White's pawns forward: they gain space but can become targets.",
+    "advanced": "The Alekhine invites e5 and pawn chases (the Four Pawns Attack), then undermines the overextended centre with ...d6, ...c5 or ...Bg4; the Modern Variation with 4.Nf3 is the calm main line."
+   },
+   "lichess_rows": 56
+  },
+  {
+   "id": "kings_gambit",
+   "lichess": [
+    "King's Gambit"
+   ],
+   "side": "white",
+   "tier": 2,
+   "structure": "open",
+   "character": "gambit",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.f4",
+   "eco": "C30-C39",
+   "names": {
+    "en": {
+     "name": "King's Gambit",
+     "def": "the King's Gambit"
+    },
+    "fr": {
+     "name": "Gambit roi",
+     "def": "le gambit roi",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Königsgambit",
+     "def": "das Königsgambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito de rey",
+     "def": "el gambito de rey",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Королевский гамбит",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Королівський гамбіт",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "جامبيت الملك"
+    },
+    "ja": {
+     "name": "キングズ・ギャンビット"
+    },
+    "zh-Hans": {
+     "name": "王翼弃兵"
+    },
+    "zh-Hant": {
+     "name": "王翼棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "White sacrifices the f-pawn to open the f-file and take the centre: a romantic attacking opening from the nineteenth century.",
+    "advanced": "White trades a pawn for central control and the f-file; Black can keep the pawn with ...g5 (very sharp), return it with ...d5, or decline with ...Bc5 or the Falkbeer ...d5."
+   },
+   "lichess_rows": 1
+  },
+  {
+   "id": "kga",
+   "lichess": [
+    "King's Gambit Accepted"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "open",
+   "character": "gambit",
+   "generic": false,
+   "umbrella": "kings_gambit",
+   "root": "1.e4 e5 2.f4 exf4",
+   "eco": "C33-C39",
+   "names": {
+    "en": {
+     "name": "King's Gambit Accepted",
+     "def": "the King's Gambit Accepted"
+    },
+    "fr": {
+     "name": "Gambit roi accepté",
+     "def": "le gambit roi accepté",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Angenommenes Königsgambit",
+     "def": "das Angenommene Königsgambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito de rey aceptado",
+     "def": "el gambito de rey aceptado",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Принятый королевский гамбит",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Прийнятий королівський гамбіт",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "جامبيت الملك المقبول"
+    },
+    "ja": {
+     "name": "キングズ・ギャンビット・アクセプテッド"
+    },
+    "zh-Hans": {
+     "name": "接受王翼弃兵"
+    },
+    "zh-Hant": {
+     "name": "接受王翼棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "Black takes the f-pawn: the game becomes very sharp, and both kings are a little exposed.",
+    "advanced": "Black either tries to hold the pawn with ...g5 (Kieseritzky and Muzio territory) or gives it back for quick development with ...d5 or ...Nf6; White relies on the f-file and a lead in development."
+   },
+   "lichess_rows": 137
+  },
+  {
+   "id": "kgd",
+   "lichess": [
+    "King's Gambit Declined"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": "kings_gambit",
+   "root": "1.e4 e5 2.f4 Bc5",
+   "eco": "C30-C32",
+   "names": {
+    "en": {
+     "name": "King's Gambit Declined",
+     "def": "the King's Gambit Declined"
+    },
+    "fr": {
+     "name": "Gambit roi refusé",
+     "def": "le gambit roi refusé",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Abgelehntes Königsgambit",
+     "def": "das Abgelehnte Königsgambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito de rey rehusado",
+     "def": "el gambito de rey rehusado",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Отказанный королевский гамбит",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Відмовлений королівський гамбіт",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "جامبيت الملك المرفوض"
+    },
+    "ja": {
+     "name": "キングズ・ギャンビット・ディクラインド"
+    },
+    "zh-Hans": {
+     "name": "拒王翼弃兵"
+    },
+    "zh-Hant": {
+     "name": "拒王翼棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "Black refuses the pawn and develops instead, often with ...Bc5, which stops White from castling short for a while.",
+    "advanced": "...Bc5 keeps the g1-a7 diagonal under pressure and the Falkbeer (...d5) strikes back in the centre; both avoid the long forcing theory of the accepted lines."
+   },
+   "lichess_rows": 53
+  },
+  {
+   "id": "nimzowitsch_def",
+   "lichess": [
+    "Nimzowitsch Defense"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "semi-open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 Nc6",
+   "eco": "B00",
+   "names": {
+    "en": {
+     "name": "Nimzowitsch Defense",
+     "def": "the Nimzowitsch Defense"
+    },
+    "fr": {
+     "name": "Défense Nimzowitsch",
+     "def": "la défense Nimzowitsch",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Nimzowitsch-Verteidigung",
+     "def": "die Nimzowitsch-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Nimzowitsch",
+     "def": "la defensa Nimzowitsch",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Нимцовича",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Німцовича",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع نيمزوفيتش"
+    },
+    "ja": {
+     "name": "ニムゾヴィッチ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "尼姆佐维奇防御"
+    },
+    "zh-Hant": {
+     "name": "尼姆佐維奇防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black answers 1.e4 with the queen's knight: an unusual but playable defence that often transposes to other openings.",
+    "advanced": "1...Nc6 invites 2.d4 d5 or ...e5 structures, or transposes to open games after 2.Nf3 e5; its independent value lies in surprise and flexible piece play."
+   },
+   "review": [
+    "ru",
+    "uk"
+   ],
+   "note": "ru/uk \"Защита Нимцовича\" is also the usual name of the Nimzo-Indian; say \"1...Кc6\" in subtitles when both could be meant.",
+   "lichess_rows": 43
+  },
+  {
+   "id": "owen",
+   "lichess": [
+    "Owen Defense"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "semi-open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 b6",
+   "eco": "B00",
+   "names": {
+    "en": {
+     "name": "Owen Defense",
+     "def": "the Owen Defense"
+    },
+    "fr": {
+     "name": "Défense Owen",
+     "def": "la défense Owen",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Owen-Verteidigung",
+     "def": "die Owen-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Owen",
+     "def": "la defensa Owen",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Оуэна",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Оуена",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع أوين"
+    },
+    "ja": {
+     "name": "オーウェン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "欧文防御"
+    },
+    "zh-Hant": {
+     "name": "歐文防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black puts the queen's bishop on b7 to hit e4 from afar; White should simply take the centre.",
+    "advanced": "A hypermodern setup (...b6, ...Bb7, ...e6) that concedes the centre early; White gains space and must watch the long diagonal."
+   },
+   "lichess_rows": 8
+  },
+  {
+   "id": "horwitz",
+   "lichess": [
+    "Horwitz Defense",
+    "Kangaroo Defense"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "indian",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 e6",
+   "eco": "A40",
+   "names": {
+    "en": {
+     "name": "Horwitz Defense",
+     "def": "the Horwitz Defense"
+    },
+    "fr": {
+     "name": "Défense Horwitz",
+     "def": "la défense Horwitz",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Horwitz-Verteidigung",
+     "def": "die Horwitz-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Horwitz",
+     "def": "la defensa Horwitz",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Горвица",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Горвіца",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع هورفيتز"
+    },
+    "ja": {
+     "name": "ホロヴィッツ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "霍维茨防御"
+    },
+    "zh-Hant": {
+     "name": "霍維茨防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black plays ...e6 against 1.d4 and keeps options open: it usually turns into a French, a Queen's Gambit Declined or a Dutch.",
+    "advanced": "1...e6 is a transpositional move order; its own lines are the Kangaroo (...Bb4+) and English Defence setups with ...b6."
+   },
+   "lichess_rows": 4
+  },
+  {
+   "id": "vant_kruijs",
+   "lichess": [
+    "Van't Kruijs Opening"
+   ],
+   "side": "white",
+   "tier": 2,
+   "structure": "flank",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e3",
+   "eco": "A00",
+   "names": {
+    "en": {
+     "name": "Van't Kruijs Opening",
+     "def": "the Van't Kruijs Opening"
+    },
+    "fr": {
+     "name": "Ouverture Van't Kruijs",
+     "def": "l'ouverture Van't Kruijs",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Van-’t-Kruijs-Eröffnung",
+     "def": "die Van-’t-Kruijs-Eröffnung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura Van't Kruijs",
+     "def": "la apertura Van't Kruijs",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют ван Круйса",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют ван Круйса",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح فان كرويس"
+    },
+    "ja": {
+     "name": "ファント・クライス・オープニング"
+    },
+    "zh-Hans": {
+     "name": "范克鲁伊斯开局"
+    },
+    "zh-Hant": {
+     "name": "范克魯伊斯開局"
+    }
+   },
+   "comment": {
+    "beginner": "1.e3 opens the bishop's diagonal but takes little of the centre: a quiet start, usually followed by d4 or c4.",
+    "advanced": "1.e3 usually transposes into reversed French, Colle or Stonewall setups; it hands Black the fight for the centre at no real risk."
+   },
+   "lichess_rows": 5
+  },
+  {
+   "id": "center_game",
+   "lichess": [
+    "Center Game",
+    "Center Game Accepted"
+   ],
+   "side": "white",
+   "tier": 2,
+   "structure": "open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.d4",
+   "eco": "C21-C22",
+   "names": {
+    "en": {
+     "name": "Center Game",
+     "def": "the Center Game"
+    },
+    "fr": {
+     "name": "Partie du centre",
+     "def": "la partie du centre",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Mittelgambit",
+     "def": "das Mittelgambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Apertura del centro",
+     "def": "la apertura del centro",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Центральный дебют",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Центральний дебют",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح المركز"
+    },
+    "ja": {
+     "name": "センター・ゲーム"
+    },
+    "zh-Hans": {
+     "name": "中心开局"
+    },
+    "zh-Hant": {
+     "name": "中心開局"
+    }
+   },
+   "comment": {
+    "beginner": "White opens the centre with d4 on move two, but after the exchange the queen recaptures early and can be chased.",
+    "advanced": "Black develops with tempo against the queen (...Nc6); White usually plays Qe3, Nc3, Bd2 and castles long for an attack."
+   },
+   "lichess_rows": 19
+  },
+  {
+   "id": "englund",
+   "lichess": [
+    "Englund Gambit",
+    "Englund Gambit Declined"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "indian",
+   "character": "gambit",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 e5",
+   "eco": "A40",
+   "names": {
+    "en": {
+     "name": "Englund Gambit",
+     "def": "the Englund Gambit"
+    },
+    "fr": {
+     "name": "Gambit Englund",
+     "def": "le gambit Englund",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Englund-Gambit",
+     "def": "das Englund-Gambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito Englund",
+     "def": "el gambito Englund",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Гамбит Энглунда",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Гамбіт Енглунда",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "جامبيت إنغلوند"
+    },
+    "ja": {
+     "name": "エングルンド・ギャンビット"
+    },
+    "zh-Hans": {
+     "name": "英格伦弃兵"
+    },
+    "zh-Hant": {
+     "name": "英格倫棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "Black offers the e-pawn against 1.d4 and hopes for traps; objectively dubious, but dangerous if White does not know it.",
+    "advanced": "The Englund (1...e5 2.dxe5 Nc6) relies on tricks such as ...Qe7 and ...Qb4+; White keeps a sound extra pawn with Nf3, Bf4 and careful development."
+   },
+   "lichess_rows": 16
+  },
+  {
+   "id": "dutch",
+   "lichess": [
+    "Dutch Defense"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "indian",
+   "character": "sharp",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 f5",
+   "eco": "A80-A99",
+   "names": {
+    "en": {
+     "name": "Dutch Defense",
+     "def": "the Dutch Defense"
+    },
+    "fr": {
+     "name": "Défense hollandaise",
+     "def": "la défense hollandaise",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Holländische Verteidigung",
+     "def": "die Holländische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa holandesa",
+     "def": "la defensa holandesa",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Голландская защита",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Голландський захист",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الدفاع الهولندي"
+    },
+    "ja": {
+     "name": "ダッチ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "荷兰防御"
+    },
+    "zh-Hant": {
+     "name": "荷蘭防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black plays ...f5 against 1.d4 to control e4 and aim at the kingside: ambitious, but it loosens Black's king a little.",
+    "advanced": "The Dutch leads to Leningrad (...g6), Stonewall (...d5, ...e6, ...c6) or Classical (...e6, ...d6) setups; Black fights for e4 and a kingside attack, White aims at e4 and the weakened e6 square."
+   },
+   "lichess_rows": 69
+  },
+  {
+   "id": "nimzo_indian",
+   "lichess": [
+    "Nimzo-Indian Defense"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "indian",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.c4 e6 3.Nc3 Bb4",
+   "eco": "E20-E59",
+   "names": {
+    "en": {
+     "name": "Nimzo-Indian Defense",
+     "def": "the Nimzo-Indian Defense"
+    },
+    "fr": {
+     "name": "Défense nimzo-indienne",
+     "def": "la défense nimzo-indienne",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Nimzowitsch-Indische Verteidigung",
+     "def": "die Nimzowitsch-Indische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa nimzoindia",
+     "def": "la defensa nimzoindia",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Нимцовича",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Німцовича",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع نيمزو الهندي"
+    },
+    "ja": {
+     "name": "ニムゾ・インディアン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "尼姆佐-印度防御"
+    },
+    "zh-Hant": {
+     "name": "尼姆佐-印度防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black pins the c3 knight with the bishop to stop e4: a highly respected defence that often leaves White with doubled pawns.",
+    "advanced": "Black gives bishop for knight to control e4 and damage White's structure; White gets the bishop pair and central potential (Rubinstein e3, Classical Qc2, Sämisch a3)."
+   },
+   "lichess_rows": 99
+  },
+  {
+   "id": "queens_indian",
+   "lichess": [
+    "Queen's Indian Defense",
+    "Queen's Indian Accelerated",
+    "Pseudo Queen's Indian Defense"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "indian",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.c4 e6 3.Nf3 b6",
+   "eco": "E12-E19",
+   "names": {
+    "en": {
+     "name": "Queen's Indian Defense",
+     "def": "the Queen's Indian Defense"
+    },
+    "fr": {
+     "name": "Défense ouest-indienne",
+     "def": "la défense ouest-indienne",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Damenindische Verteidigung",
+     "def": "die Damenindische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa india de dama",
+     "def": "la defensa india de dama",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Новоиндийская защита",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Новоіндійський захист",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع الوزير الهندي"
+    },
+    "ja": {
+     "name": "クイーンズ・インディアン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "新印度防御"
+    },
+    "zh-Hant": {
+     "name": "新印度防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black puts the queen's bishop on b7 to control the central light squares: solid and flexible.",
+    "advanced": "Black fights for e4 and d5 with pieces; typical ideas are ...Ba6 against c4, Hedgehog setups and the ...c5 or ...d5 breaks, against White's g3 or a3 systems."
+   },
+   "lichess_rows": 76
+  },
+  {
+   "id": "grunfeld",
+   "lichess": [
+    "Grünfeld Defense",
+    "Neo-Grünfeld Defense"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "indian",
+   "character": "sharp",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.c4 g6 3.Nc3 d5",
+   "eco": "D70-D99",
+   "names": {
+    "en": {
+     "name": "Grünfeld Defense",
+     "def": "the Grünfeld Defense"
+    },
+    "fr": {
+     "name": "Défense Grünfeld",
+     "def": "la défense Grünfeld",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Grünfeld-Indische Verteidigung",
+     "def": "die Grünfeld-Indische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Grünfeld",
+     "def": "la defensa Grünfeld",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Грюнфельда",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Грюнфельда",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع غرونفيلد"
+    },
+    "ja": {
+     "name": "グリュンフェルト・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "格林菲尔德防御"
+    },
+    "zh-Hant": {
+     "name": "格林菲爾德防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black lets White build a big pawn centre, then attacks it with pieces and the g7 bishop: a dynamic, modern defence.",
+    "advanced": "In the Exchange lines White gets a c3-d4-e4 centre and Black hits d4 with ...Bg7, ...c5 and ...Nc6; very concrete theory, with White's centre and attack against Black's queenside majority."
+   },
+   "lichess_rows": 75
+  },
+  {
+   "id": "catalan",
+   "lichess": [
+    "Catalan Opening"
+   ],
+   "side": "white",
+   "tier": 2,
+   "structure": "closed",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.c4 e6 3.g3",
+   "eco": "E00-E09",
+   "names": {
+    "en": {
+     "name": "Catalan Opening",
+     "def": "the Catalan Opening"
+    },
+    "fr": {
+     "name": "Ouverture catalane",
+     "def": "l'ouverture catalane",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Katalanische Eröffnung",
+     "def": "die Katalanische Eröffnung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura catalana",
+     "def": "la apertura catalana",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Каталонское начало",
+     "gender": "n"
+    },
+    "uk": {
+     "name": "Каталонський початок",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الافتتاح الكتالوني"
+    },
+    "ja": {
+     "name": "カタラン・オープニング"
+    },
+    "zh-Hans": {
+     "name": "卡塔兰开局"
+    },
+    "zh-Hant": {
+     "name": "卡塔蘭開局"
+    }
+   },
+   "comment": {
+    "beginner": "White combines the Queen's Gambit with a bishop on g2 that presses on Black's queenside along the long diagonal.",
+    "advanced": "White gives up or delays the c4 pawn for long-diagonal pressure; Black chooses between the Open (...dxc4) and Closed (...Be7, ...c6) systems, and the endgames often favour White's bishop."
+   },
+   "lichess_rows": 32
+  },
+  {
+   "id": "benoni",
+   "lichess": [
+    "Benoni Defense"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "indian",
+   "character": "sharp",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.c4 c5 3.d5",
+   "eco": "A43-A44, A56-A79",
+   "names": {
+    "en": {
+     "name": "Benoni Defense",
+     "def": "the Benoni Defense"
+    },
+    "fr": {
+     "name": "Défense Benoni",
+     "def": "la défense Benoni",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Benoni-Verteidigung",
+     "def": "die Benoni-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Benoni",
+     "def": "la defensa Benoni",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Бенони",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Беноні",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع بينوني"
+    },
+    "ja": {
+     "name": "ベノニ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "别诺尼防御"
+    },
+    "zh-Hant": {
+     "name": "別諾尼防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black plays ...c5 and accepts a blocked centre in exchange for a queenside pawn majority: an ambitious, unbalanced defence.",
+    "advanced": "The Modern Benoni is asymmetrical (White's d5 pawn against ...c5 and ...d6): Black has the queenside majority and the g7 bishop, White the central majority and the e5 break."
+   },
+   "lichess_rows": 61
+  },
+  {
+   "id": "benko",
+   "lichess": [
+    "Benko Gambit",
+    "Benko Gambit Accepted",
+    "Benko Gambit Declined"
+   ],
+   "side": "black",
+   "tier": 2,
+   "structure": "indian",
+   "character": "gambit",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.c4 c5 3.d5 b5",
+   "eco": "A57-A59",
+   "names": {
+    "en": {
+     "name": "Benko Gambit",
+     "def": "the Benko Gambit"
+    },
+    "fr": {
+     "name": "Gambit Benko",
+     "def": "le gambit Benko",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Wolga-Gambit",
+     "def": "das Wolga-Gambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito Benko",
+     "def": "el gambito Benko",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Волжский гамбит",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Гамбіт Бенко",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "جامبيت بنكو"
+    },
+    "ja": {
+     "name": "ベンコー・ギャンビット"
+    },
+    "zh-Hans": {
+     "name": "本科弃兵"
+    },
+    "zh-Hant": {
+     "name": "本科棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "Black gives a queenside pawn to open the a- and b-files for the rooks: long-lasting pressure rather than quick tactics.",
+    "advanced": "The Benko (Volga) Gambit trades a pawn for permanent queenside pressure (rooks on a8 and b8, bishop on g7), and Black is often happy in an endgame a pawn down."
+   },
+   "lichess_rows": 24
+  },
+  {
+   "id": "reti",
+   "lichess": [
+    "Réti Opening"
+   ],
+   "side": "white",
+   "tier": 2,
+   "structure": "flank",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.Nf3 d5 2.c4",
+   "eco": "A09, A11-A14",
+   "names": {
+    "en": {
+     "name": "Réti Opening",
+     "def": "the Réti Opening"
+    },
+    "fr": {
+     "name": "Ouverture Réti",
+     "def": "l'ouverture Réti",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Réti-Eröffnung",
+     "def": "die Réti-Eröffnung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura Réti",
+     "def": "la apertura Réti",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют Рети",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют Реті",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح ريتي"
+    },
+    "ja": {
+     "name": "レティ・オープニング"
+    },
+    "zh-Hans": {
+     "name": "列蒂开局"
+    },
+    "zh-Hant": {
+     "name": "列蒂開局"
+    }
+   },
+   "comment": {
+    "beginner": "White develops the knight, then attacks Black's centre from the side with c4: a flexible, hypermodern opening.",
+    "advanced": "The Réti presses on d5 with c4 and a g2 fianchetto, often transposing to Catalan, English or QGD structures, while the double-fianchetto lines stay independent."
+   },
+   "lichess_rows": 43
+  },
+  {
+   "id": "kings_indian_attack",
+   "lichess": [
+    "King's Indian Attack"
+   ],
+   "side": "white",
+   "tier": 2,
+   "structure": "flank",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.Nf3 d5 2.g3",
+   "eco": "A07-A08",
+   "names": {
+    "en": {
+     "name": "King's Indian Attack",
+     "def": "the King's Indian Attack"
+    },
+    "fr": {
+     "name": "Attaque est-indienne",
+     "def": "l'attaque est-indienne",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Königsindischer Angriff",
+     "def": "der Königsindische Angriff",
+     "gender": "m"
+    },
+    "es": {
+     "name": "Ataque indio de rey",
+     "def": "el ataque indio de rey",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Староиндийская атака",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Староіндійська атака",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "الهجوم الهندي الملكي"
+    },
+    "ja": {
+     "name": "キングズ・インディアン・アタック"
+    },
+    "zh-Hans": {
+     "name": "古印度攻击"
+    },
+    "zh-Hant": {
+     "name": "古印度攻擊"
+    }
+   },
+   "comment": {
+    "beginner": "White sets up Nf3, g3, Bg2, castling, d3 and e4 against almost anything: a system with a clear kingside plan.",
+    "advanced": "A King's Indian with colours reversed and an extra tempo; against French or Sicilian setups White plays e5 and attacks the king (h4, Nf1-h2-g4) while Black expands on the queenside."
+   },
+   "review": [
+    "ru",
+    "uk"
+   ],
+   "lichess_rows": 27
+  },
+  {
+   "id": "bird",
+   "lichess": [
+    "Bird Opening"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "flank",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.f4",
+   "eco": "A02-A03",
+   "names": {
+    "en": {
+     "name": "Bird Opening",
+     "def": "the Bird Opening"
+    },
+    "fr": {
+     "name": "Ouverture Bird",
+     "def": "l'ouverture Bird",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Bird-Eröffnung",
+     "def": "die Bird-Eröffnung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura Bird",
+     "def": "la apertura Bird",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют Бёрда",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют Берда",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح بيرد"
+    },
+    "ja": {
+     "name": "バード・オープニング"
+    },
+    "zh-Hans": {
+     "name": "伯德开局"
+    },
+    "zh-Hant": {
+     "name": "伯德開局"
+    }
+   },
+   "comment": {
+    "beginner": "White starts with the f-pawn to control e5: an unusual opening that leads to Dutch positions with the colours reversed.",
+    "advanced": "White aims for a kingside setup (Nf3, e3, b3 and Bb2, or g3); Black's sharpest answer is From's Gambit, 1...e5."
+   },
+   "lichess_rows": 28
+  },
+  {
+   "id": "ponziani",
+   "lichess": [
+    "Ponziani Opening"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Nf3 Nc6 3.c3",
+   "eco": "C44",
+   "names": {
+    "en": {
+     "name": "Ponziani Opening",
+     "def": "the Ponziani Opening"
+    },
+    "fr": {
+     "name": "Ouverture Ponziani",
+     "def": "l'ouverture Ponziani",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Ponziani-Eröffnung",
+     "def": "die Ponziani-Eröffnung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura Ponziani",
+     "def": "la apertura Ponziani",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют Понциани",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют Понціані",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح بونزياني"
+    },
+    "ja": {
+     "name": "ポンツィアーニ・オープニング"
+    },
+    "zh-Hans": {
+     "name": "庞齐亚尼开局"
+    },
+    "zh-Hant": {
+     "name": "龐齊亞尼開局"
+    }
+   },
+   "comment": {
+    "beginner": "White prepares d4 with c3 to build a pawn centre: an old and fairly rare opening.",
+    "advanced": "c3 prepares d4 but takes the knight's best square; Black equalises with the ...Nf6 or ...d5 counterattacks."
+   },
+   "lichess_rows": 16
+  },
+  {
+   "id": "three_knights",
+   "lichess": [
+    "Three Knights Opening"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "open",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Nf3 Nc6 3.Nc3",
+   "eco": "C46",
+   "names": {
+    "en": {
+     "name": "Three Knights Opening",
+     "def": "the Three Knights Opening"
+    },
+    "fr": {
+     "name": "Partie des trois cavaliers",
+     "def": "la partie des trois cavaliers",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Dreispringerspiel",
+     "def": "das Dreispringerspiel",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Apertura de los tres caballos",
+     "def": "la apertura de los tres caballos",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Партия трёх коней",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Партія трьох коней",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "افتتاح الأحصنة الثلاثة"
+    },
+    "ja": {
+     "name": "スリー・ナイツ・ゲーム"
+    },
+    "zh-Hans": {
+     "name": "三马开局"
+    },
+    "zh-Hant": {
+     "name": "三馬開局"
+    }
+   },
+   "comment": {
+    "beginner": "White brings out a third knight early; if Black adds the fourth knight, it becomes the Four Knights Game.",
+    "advanced": "A transpositional move order; Black's independent tries are ...Bb4 and ...g6."
+   },
+   "lichess_rows": 6
+  },
+  {
+   "id": "danish",
+   "lichess": [
+    "Danish Gambit",
+    "Danish Gambit Accepted",
+    "Danish Gambit Declined"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "open",
+   "character": "gambit",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.d4 exd4 3.c3",
+   "eco": "C21",
+   "names": {
+    "en": {
+     "name": "Danish Gambit",
+     "def": "the Danish Gambit"
+    },
+    "fr": {
+     "name": "Gambit danois",
+     "def": "le gambit danois",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Nordisches Gambit",
+     "def": "das Nordische Gambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito danés",
+     "def": "el gambito danés",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Датский гамбит",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Данський гамбіт",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الجامبيت الدنماركي"
+    },
+    "ja": {
+     "name": "デニッシュ・ギャンビット"
+    },
+    "zh-Hans": {
+     "name": "丹麦弃兵"
+    },
+    "zh-Hant": {
+     "name": "丹麥棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "White gives one or even two pawns for a big lead in development and two bishops aiming at Black's king.",
+    "advanced": "Pawns are traded for open lines and bishops on c4 and b2; giving material back with ...d5 is Black's safest way to neutralise it."
+   },
+   "lichess_rows": 8
+  },
+  {
+   "id": "blackmar_diemer",
+   "lichess": [
+    "Blackmar-Diemer Gambit",
+    "Blackmar-Diemer Gambit Accepted",
+    "Blackmar-Diemer Gambit Declined"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "closed",
+   "character": "gambit",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 d5 2.e4",
+   "eco": "D00",
+   "names": {
+    "en": {
+     "name": "Blackmar-Diemer Gambit",
+     "def": "the Blackmar-Diemer Gambit"
+    },
+    "fr": {
+     "name": "Gambit Blackmar-Diemer",
+     "def": "le gambit Blackmar-Diemer",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Blackmar-Diemer-Gambit",
+     "def": "das Blackmar-Diemer-Gambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito Blackmar-Diemer",
+     "def": "el gambito Blackmar-Diemer",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Гамбит Блэкмара — Димера",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Гамбіт Блекмара — Дімера",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "جامبيت بلاكمار-ديمر"
+    },
+    "ja": {
+     "name": "ブラックマー・ディーマー・ギャンビット"
+    },
+    "zh-Hans": {
+     "name": "布莱克默-迪默弃兵"
+    },
+    "zh-Hant": {
+     "name": "布萊克默-迪默棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "White sacrifices a pawn with e4 and f3 to open the f-file and attack quickly.",
+    "advanced": "A pawn for development and the half-open f-file; Black may accept or decline, and theory favours Black if the development is sound."
+   },
+   "lichess_rows": 49
+  },
+  {
+   "id": "trompowsky",
+   "lichess": [
+    "Trompowsky Attack"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "indian",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.Bg5",
+   "eco": "A45",
+   "names": {
+    "en": {
+     "name": "Trompowsky Attack",
+     "def": "the Trompowsky Attack"
+    },
+    "fr": {
+     "name": "Attaque Trompowsky",
+     "def": "l'attaque Trompowsky",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Trompowsky-Angriff",
+     "def": "der Trompowsky-Angriff",
+     "gender": "m"
+    },
+    "es": {
+     "name": "Ataque Trompowsky",
+     "def": "el ataque Trompowsky",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Атака Тромповского",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Атака Тромповського",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "هجوم ترومبوفسكي"
+    },
+    "ja": {
+     "name": "トロンポウスキー・アタック"
+    },
+    "zh-Hans": {
+     "name": "特罗姆波夫斯基攻击"
+    },
+    "zh-Hant": {
+     "name": "特羅姆波夫斯基攻擊"
+    }
+   },
+   "comment": {
+    "beginner": "White attacks the f6 knight at once with the bishop: an early surprise that takes Black out of the usual paths.",
+    "advanced": "2.Bg5 threatens to double Black's pawns; Black answers with ...Ne4, ...e6 or ...c5, leading to unbalanced minor-piece play."
+   },
+   "lichess_rows": 10
+  },
+  {
+   "id": "torre",
+   "lichess": [
+    "Torre Attack",
+    "Queen's Pawn Game: Torre Attack"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "indian",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.Nf3 e6 3.Bg5",
+   "eco": "A46, A48, D03",
+   "names": {
+    "en": {
+     "name": "Torre Attack",
+     "def": "the Torre Attack"
+    },
+    "fr": {
+     "name": "Attaque Torre",
+     "def": "l'attaque Torre",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Torre-Angriff",
+     "def": "der Torre-Angriff",
+     "gender": "m"
+    },
+    "es": {
+     "name": "Ataque Torre",
+     "def": "el ataque Torre",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Атака Торре",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Атака Торре",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "هجوم توري"
+    },
+    "ja": {
+     "name": "トーレ・アタック"
+    },
+    "zh-Hans": {
+     "name": "托雷攻击"
+    },
+    "zh-Hant": {
+     "name": "托雷攻擊"
+    }
+   },
+   "comment": {
+    "beginner": "After Nf3 White develops the bishop to g5 to pin the knight and builds a solid centre with e3 and c3.",
+    "advanced": "A system (d4, Nf3, Bg5, e3, Nbd2, c3) aiming for e4; Black usually replies with ...c5 or an early ...h6."
+   },
+   "lichess_rows": 22
+  },
+  {
+   "id": "colle",
+   "lichess": [
+    "Colle System",
+    "Queen's Pawn Game: Colle System",
+    "Indian Defense: Colle System"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "closed",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 d5 2.Nf3 Nf6 3.e3",
+   "eco": "A46, D04-D05",
+   "names": {
+    "en": {
+     "name": "Colle System",
+     "def": "the Colle System"
+    },
+    "fr": {
+     "name": "Système Colle",
+     "def": "le système Colle",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Colle-System",
+     "def": "das Colle-System",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Sistema Colle",
+     "def": "el sistema Colle",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Система Колле",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Система Колле",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "نظام كولي"
+    },
+    "ja": {
+     "name": "コール・システム"
+    },
+    "zh-Hans": {
+     "name": "科勒体系"
+    },
+    "zh-Hant": {
+     "name": "科勒體系"
+    }
+   },
+   "comment": {
+    "beginner": "White builds the pawn triangle d4-e3-c3 with the bishop on d3 and prepares e4: a simple, solid attacking system.",
+    "advanced": "White prepares e4 for a kingside attack (Colle-Koltanowski) or plays b3 and Bb2 (Colle-Zukertort); the drawback is the passive c1 bishop."
+   },
+   "lichess_rows": 15
+  },
+  {
+   "id": "tarrasch_def",
+   "lichess": [
+    "Tarrasch Defense"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "closed",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": "queens_gambit",
+   "root": "1.d4 d5 2.c4 e6 3.Nc3 c5",
+   "eco": "D32-D34",
+   "names": {
+    "en": {
+     "name": "Tarrasch Defense",
+     "def": "the Tarrasch Defense"
+    },
+    "fr": {
+     "name": "Défense Tarrasch",
+     "def": "la défense Tarrasch",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Tarrasch-Verteidigung",
+     "def": "die Tarrasch-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Tarrasch",
+     "def": "la defensa Tarrasch",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Тарраша",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Тарраша",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع تاراش"
+    },
+    "ja": {
+     "name": "タラッシュ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "塔拉什防御"
+    },
+    "zh-Hant": {
+     "name": "塔拉什防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black plays ...c5 against the Queen's Gambit and accepts an isolated d-pawn in exchange for free piece play.",
+    "advanced": "Black deliberately takes an isolated queen's pawn for activity; White blockades d5 and fianchettoes with g3, while Black looks for piece play and the ...d4 advance."
+   },
+   "lichess_rows": 27
+  },
+  {
+   "id": "budapest",
+   "lichess": [
+    "Indian Defense: Budapest Gambit",
+    "Indian Defense: Budapest Gambit Accepted"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "indian",
+   "character": "gambit",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.c4 e5",
+   "eco": "A51-A52",
+   "names": {
+    "en": {
+     "name": "Budapest Gambit",
+     "def": "the Budapest Gambit"
+    },
+    "fr": {
+     "name": "Gambit de Budapest",
+     "def": "le gambit de Budapest",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Budapester Gambit",
+     "def": "das Budapester Gambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito Budapest",
+     "def": "el gambito Budapest",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Будапештский гамбит",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Будапештський гамбіт",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "جامبيت بودابست"
+    },
+    "ja": {
+     "name": "ブダペスト・ギャンビット"
+    },
+    "zh-Hans": {
+     "name": "布达佩斯弃兵"
+    },
+    "zh-Hant": {
+     "name": "布達佩斯棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "Black gives the e-pawn against 1.d4 and 2.c4 to develop quickly; the pawn is usually won back.",
+    "advanced": "After ...e5 and ...Ng4 Black regains the pawn in most lines; White keeps a small edge with Bf4 or e4 setups, and the Fajarowicz (...Ne4) is a trickier sideline."
+   },
+   "lichess_rows": 11
+  },
+  {
+   "id": "bogo_indian",
+   "lichess": [
+    "Bogo-Indian Defense"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "indian",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.c4 e6 3.Nf3 Bb4+",
+   "eco": "E11",
+   "names": {
+    "en": {
+     "name": "Bogo-Indian Defense",
+     "def": "the Bogo-Indian Defense"
+    },
+    "fr": {
+     "name": "Défense bogo-indienne",
+     "def": "la défense bogo-indienne",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Bogoljubow-Indische Verteidigung",
+     "def": "die Bogoljubow-Indische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa bogoindia",
+     "def": "la defensa bogoindia",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Боголюбова",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Боголюбова",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع بوغو الهندي"
+    },
+    "ja": {
+     "name": "ボゴ・インディアン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "博戈-印度防御"
+    },
+    "zh-Hant": {
+     "name": "博戈-印度防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black checks with the bishop on b4 to disturb White's development: a solid, simple defence.",
+    "advanced": "Usually a bishop trade on d2 or a Nimzo-like structure without the knight pin; Black aims for a solid ...d5 or ...d6 and ...e5 setup."
+   },
+   "lichess_rows": 21
+  },
+  {
+   "id": "old_indian",
+   "lichess": [
+    "Old Indian Defense"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "indian",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.c4 d6",
+   "eco": "A53-A55",
+   "names": {
+    "en": {
+     "name": "Old Indian Defense",
+     "def": "the Old Indian Defense"
+    },
+    "fr": {
+     "name": "Défense vieille-indienne",
+     "def": "la défense vieille-indienne",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Altindische Verteidigung",
+     "def": "die Altindische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa india antigua",
+     "def": "la defensa india antigua",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Старая индийская защита",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Старий індійський захист",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الدفاع الهندي القديم"
+    },
+    "ja": {
+     "name": "オールド・インディアン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "老印度防御"
+    },
+    "zh-Hant": {
+     "name": "老印度防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black plays ...d6 and ...e5 without a fianchetto: a solid, slightly passive defence.",
+    "advanced": "A King's Indian with the bishop on e7: solid but cramped, with ...e5 and ...Nbd7 central play."
+   },
+   "review": [
+    "ru",
+    "uk"
+   ],
+   "note": "lichess puts the root at 1.d4 d6 2.c4 (parity would give it to White): the curated side is authoritative.",
+   "lichess_rows": 14
+  },
+  {
+   "id": "chigorin",
+   "lichess": [
+    "Queen's Gambit Declined: Chigorin Defense"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "closed",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": "queens_gambit",
+   "root": "1.d4 d5 2.c4 Nc6",
+   "eco": "D07",
+   "names": {
+    "en": {
+     "name": "Chigorin Defense",
+     "def": "the Chigorin Defense"
+    },
+    "fr": {
+     "name": "Défense Tchigorine",
+     "def": "la défense Tchigorine",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Tschigorin-Verteidigung",
+     "def": "die Tschigorin-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Chigorin",
+     "def": "la defensa Chigorin",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Чигорина",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Чигоріна",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع تشيغورين"
+    },
+    "ja": {
+     "name": "チゴリン・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "奇戈林防御"
+    },
+    "zh-Hant": {
+     "name": "奇戈林防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black develops the queen's knight to c6 against the Queen's Gambit and plays for active pieces.",
+    "advanced": "Black gives up central pawn solidity for piece activity, often trading the light bishop for the f3 knight to press on d4."
+   },
+   "lichess_rows": 11
+  },
+  {
+   "id": "albin",
+   "lichess": [
+    "Queen's Gambit Declined: Albin Countergambit"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "closed",
+   "character": "gambit",
+   "generic": false,
+   "umbrella": "queens_gambit",
+   "root": "1.d4 d5 2.c4 e5",
+   "eco": "D08-D09",
+   "names": {
+    "en": {
+     "name": "Albin Countergambit",
+     "def": "the Albin Countergambit"
+    },
+    "fr": {
+     "name": "Contre-gambit Albin",
+     "def": "le contre-gambit Albin",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Albin-Gegengambit",
+     "def": "das Albin-Gegengambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Contragambito Albin",
+     "def": "el contragambito Albin",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Контргамбит Альбина",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Контргамбіт Альбіна",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "جامبيت ألبين المضاد"
+    },
+    "ja": {
+     "name": "アルビン・カウンターギャンビット"
+    },
+    "zh-Hans": {
+     "name": "阿尔宾反弃兵"
+    },
+    "zh-Hant": {
+     "name": "阿爾賓反棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "Black counter-sacrifices the e-pawn to push ...d4 and cramp White: sharp and full of traps.",
+    "advanced": "Black relies on the d4 wedge and fast development (the Lasker Trap is the classic danger); White's best is quiet development with g3 and returning material when needed."
+   },
+   "lichess_rows": 13
+  },
+  {
+   "id": "latvian",
+   "lichess": [
+    "Latvian Gambit",
+    "Latvian Gambit Accepted"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "open",
+   "character": "gambit",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Nf3 f5",
+   "eco": "C40",
+   "names": {
+    "en": {
+     "name": "Latvian Gambit",
+     "def": "the Latvian Gambit"
+    },
+    "fr": {
+     "name": "Gambit letton",
+     "def": "le gambit letton",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Lettisches Gambit",
+     "def": "das Lettische Gambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito letón",
+     "def": "el gambito letón",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Латышский гамбит",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Латиський гамбіт",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الجامبيت اللاتفي"
+    },
+    "ja": {
+     "name": "ラトビアン・ギャンビット"
+    },
+    "zh-Hans": {
+     "name": "拉脱维亚弃兵"
+    },
+    "zh-Hant": {
+     "name": "拉脫維亞棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "Black plays ...f5 on move two: a very risky gambit that weakens Black's own king.",
+    "advanced": "Objectively dubious: White gets a strong initiative with Nxe5 and Qh5+ ideas or with Bc4."
+   },
+   "lichess_rows": 26
+  },
+  {
+   "id": "elephant",
+   "lichess": [
+    "Elephant Gambit"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "open",
+   "character": "gambit",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Nf3 d5",
+   "eco": "C40",
+   "names": {
+    "en": {
+     "name": "Elephant Gambit",
+     "def": "the Elephant Gambit"
+    },
+    "fr": {
+     "name": "Gambit de l'éléphant",
+     "def": "le gambit de l'éléphant",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Elefantengambit",
+     "def": "das Elefantengambit",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Gambito del elefante",
+     "def": "el gambito del elefante",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Гамбит «Элефант»",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Гамбіт «Елефант»",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "جامبيت إليفانت"
+    },
+    "ja": {
+     "name": "エレファント・ギャンビット"
+    },
+    "zh-Hans": {
+     "name": "大象弃兵"
+    },
+    "zh-Hant": {
+     "name": "大象棄兵"
+    }
+   },
+   "comment": {
+    "beginner": "Black strikes back with ...d5 at once and offers a pawn to open lines: risky but tricky.",
+    "advanced": "Objectively unsound; after exd5 White keeps a good game with careful development."
+   },
+   "review": [
+    "ru",
+    "uk"
+   ],
+   "note": "Arabic avoids الفيل (= bishop in Arabic chess) and transliterates.",
+   "lichess_rows": 4
+  },
+  {
+   "id": "nimzo_larsen",
+   "lichess": [
+    "Nimzo-Larsen Attack"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "flank",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.b3",
+   "eco": "A01",
+   "names": {
+    "en": {
+     "name": "Nimzo-Larsen Attack",
+     "def": "the Nimzo-Larsen Attack"
+    },
+    "fr": {
+     "name": "Attaque Nimzowitsch-Larsen",
+     "def": "l'attaque Nimzowitsch-Larsen",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Nimzowitsch-Larsen-Angriff",
+     "def": "der Nimzowitsch-Larsen-Angriff",
+     "gender": "m"
+    },
+    "es": {
+     "name": "Ataque Nimzowitsch-Larsen",
+     "def": "el ataque Nimzowitsch-Larsen",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Дебют Нимцовича — Ларсена",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют Німцовича — Ларсена",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "هجوم نيمزو-لارسن"
+    },
+    "ja": {
+     "name": "ニムゾ・ラーセン・アタック"
+    },
+    "zh-Hans": {
+     "name": "尼姆佐-拉尔森攻击"
+    },
+    "zh-Hant": {
+     "name": "尼姆佐-拉爾森攻擊"
+    }
+   },
+   "comment": {
+    "beginner": "White puts the queen's bishop on the long diagonal with b3 and Bb2 to control e5 and the centre from afar.",
+    "advanced": "A hypermodern flank setup; Black occupies the centre with ...e5 or ...d5 and White presses on it with Bb2, e3 and f4 or c4."
+   },
+   "lichess_rows": 18
+  },
+  {
+   "id": "polish",
+   "lichess": [
+    "Polish Opening"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "flank",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.b4",
+   "eco": "A00",
+   "names": {
+    "en": {
+     "name": "Polish Opening",
+     "def": "the Polish Opening"
+    },
+    "fr": {
+     "name": "Ouverture polonaise",
+     "def": "l'ouverture polonaise",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Polnische Eröffnung",
+     "def": "die Polnische Eröffnung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura polaca",
+     "def": "la apertura polaca",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют Сокольского",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют Сокольського",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الافتتاح البولندي"
+    },
+    "ja": {
+     "name": "ポーリッシュ・オープニング"
+    },
+    "zh-Hans": {
+     "name": "波兰开局"
+    },
+    "zh-Hant": {
+     "name": "波蘭開局"
+    }
+   },
+   "comment": {
+    "beginner": "White starts with b4, an unusual wing move that gains space on the queenside.",
+    "advanced": "The Polish (Sokolsky) puts the bishop on b2 after b4; the b4 pawn can become a target, but the opening is playable and surprising."
+   },
+   "lichess_rows": 27
+  },
+  {
+   "id": "grob",
+   "lichess": [
+    "Grob Opening"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "flank",
+   "character": "gambit",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.g4",
+   "eco": "A00",
+   "names": {
+    "en": {
+     "name": "Grob Opening",
+     "def": "the Grob Opening"
+    },
+    "fr": {
+     "name": "Ouverture Grob",
+     "def": "l'ouverture Grob",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Grob-Angriff",
+     "def": "der Grob-Angriff",
+     "gender": "m"
+    },
+    "es": {
+     "name": "Apertura Grob",
+     "def": "la apertura Grob",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют Гроба",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют Гроба",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح غروب"
+    },
+    "ja": {
+     "name": "グロブ・オープニング"
+    },
+    "zh-Hans": {
+     "name": "格罗布开局"
+    },
+    "zh-Hant": {
+     "name": "格羅布開局"
+    }
+   },
+   "comment": {
+    "beginner": "White pushes the g-pawn two squares on move one: a provocative opening that weakens White's own king.",
+    "advanced": "White aims at the long diagonal with Bg2 and pressure on b7; Black answers with ...d5 and ...e5 and should punish the loosened kingside."
+   },
+   "lichess_rows": 20
+  },
+  {
+   "id": "hungarian",
+   "lichess": [
+    "Hungarian Opening"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "flank",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.g3",
+   "eco": "A00",
+   "names": {
+    "en": {
+     "name": "Hungarian Opening",
+     "def": "the Hungarian Opening"
+    },
+    "fr": {
+     "name": "Ouverture hongroise",
+     "def": "l'ouverture hongroise",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Ungarische Eröffnung",
+     "def": "die Ungarische Eröffnung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura húngara",
+     "def": "la apertura húngara",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Венгерское начало",
+     "gender": "n"
+    },
+    "uk": {
+     "name": "Угорський початок",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الافتتاح المجري"
+    },
+    "ja": {
+     "name": "ハンガリアン・オープニング"
+    },
+    "zh-Hans": {
+     "name": "匈牙利开局"
+    },
+    "zh-Hant": {
+     "name": "匈牙利開局"
+    }
+   },
+   "comment": {
+    "beginner": "White prepares a fianchetto with g3 and Bg2: a flexible start that often becomes a King's Indian Attack or an English.",
+    "advanced": "1.g3 (Benko's Opening) is highly transpositional: Réti, English and King's Indian Attack setups, or a reversed Modern Defence."
+   },
+   "lichess_rows": 20
+  },
+  {
+   "id": "mieses",
+   "lichess": [
+    "Mieses Opening",
+    "Valencia Opening"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "flank",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d3",
+   "eco": "A00",
+   "names": {
+    "en": {
+     "name": "Mieses Opening",
+     "def": "the Mieses Opening"
+    },
+    "fr": {
+     "name": "Ouverture Mieses",
+     "def": "l'ouverture Mieses",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Mieses-Eröffnung",
+     "def": "die Mieses-Eröffnung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura Mieses",
+     "def": "la apertura Mieses",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют Мизеса",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют Мізеса",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح ميزس"
+    },
+    "ja": {
+     "name": "ミーゼス・オープニング"
+    },
+    "zh-Hans": {
+     "name": "米泽斯开局"
+    },
+    "zh-Hant": {
+     "name": "米澤斯開局"
+    }
+   },
+   "comment": {
+    "beginner": "White starts very modestly with d3, opening the c1 bishop without taking the centre.",
+    "advanced": "1.d3 often leads to reversed Pirc or King's Indian Attack setups; Black may take the centre freely."
+   },
+   "lichess_rows": 5
+  },
+  {
+   "id": "saragossa",
+   "lichess": [
+    "Saragossa Opening"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "flank",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.c3",
+   "eco": "A00",
+   "names": {
+    "en": {
+     "name": "Saragossa Opening",
+     "def": "the Saragossa Opening"
+    },
+    "fr": {
+     "name": "Ouverture de Saragosse",
+     "def": "l'ouverture de Saragosse",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Saragossa-Eröffnung",
+     "def": "die Saragossa-Eröffnung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura Zaragoza",
+     "def": "la apertura Zaragoza",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют Сарагоса",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют Сарагоса",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح سرقسطة"
+    },
+    "ja": {
+     "name": "サラゴサ・オープニング"
+    },
+    "zh-Hans": {
+     "name": "萨拉戈萨开局"
+    },
+    "zh-Hant": {
+     "name": "薩拉戈薩開局"
+    }
+   },
+   "comment": {
+    "beginner": "White starts with c3, a very rare and quiet first move.",
+    "advanced": "1.c3 prepares a supported d4 and can transpose to reversed Caro-Kann or Slav structures."
+   },
+   "lichess_rows": 1
+  },
+  {
+   "id": "van_geet",
+   "lichess": [
+    "Van Geet Opening"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "flank",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.Nc3",
+   "eco": "A00",
+   "names": {
+    "en": {
+     "name": "Van Geet Opening",
+     "def": "the Van Geet Opening"
+    },
+    "fr": {
+     "name": "Ouverture Van Geet",
+     "def": "l'ouverture Van Geet",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Van-Geet-Eröffnung",
+     "def": "die Van-Geet-Eröffnung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Apertura Van Geet",
+     "def": "la apertura Van Geet",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Дебют ван Гета",
+     "gender": "m"
+    },
+    "uk": {
+     "name": "Дебют ван Гета",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "افتتاح فان خيت"
+    },
+    "ja": {
+     "name": "ファン・ヘート・オープニング"
+    },
+    "zh-Hans": {
+     "name": "范吉特开局"
+    },
+    "zh-Hant": {
+     "name": "范吉特開局"
+    }
+   },
+   "comment": {
+    "beginner": "White develops the queen's knight first, an unusual move that keeps e4 or d4 in reserve.",
+    "advanced": "The Van Geet (Dunst) often transposes to Vienna, reversed Sicilian or Pirc-type positions."
+   },
+   "lichess_rows": 33
+  },
+  {
+   "id": "jobava_london",
+   "lichess": [
+    "Rapport-Jobava System"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "closed",
+   "character": "sharp",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 d5 2.Nc3 Nf6 3.Bf4",
+   "eco": "D01",
+   "names": {
+    "en": {
+     "name": "Jobava London System",
+     "def": "the Jobava London System"
+    },
+    "fr": {
+     "name": "Système Rapport-Jobava",
+     "def": "le système Rapport-Jobava",
+     "gender": "m"
+    },
+    "de": {
+     "name": "Rapport-Jobava-System",
+     "def": "das Rapport-Jobava-System",
+     "gender": "n"
+    },
+    "es": {
+     "name": "Sistema Rapport-Jobava",
+     "def": "el sistema Rapport-Jobava",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Система Рапорта — Джобавы",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Система Рапорта — Джобави",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "نظام رابورت-جوبافا"
+    },
+    "ja": {
+     "name": "ラポート・ジョバヴァ・システム"
+    },
+    "zh-Hans": {
+     "name": "拉波特-乔巴瓦体系"
+    },
+    "zh-Hant": {
+     "name": "拉波特-喬巴瓦體系"
+    }
+   },
+   "comment": {
+    "beginner": "White combines Nc3 and Bf4 against 1...d5: an aggressive system that aims at the c7 square with Nb5.",
+    "advanced": "White develops Nc3 and Bf4 with ideas of Nb5, e3 and often long castling with an h4 or g4 attack; Black must watch c7 and the e4 advance."
+   },
+   "lichess_rows": 4
+  },
+  {
+   "id": "stonewall_attack",
+   "lichess": [
+    "Queen's Pawn Game: Stonewall Attack"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "closed",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 d5 2.e3 Nf6 3.Bd3",
+   "eco": "D00",
+   "names": {
+    "en": {
+     "name": "Stonewall Attack",
+     "def": "the Stonewall Attack"
+    },
+    "fr": {
+     "name": "Attaque Stonewall",
+     "def": "l'attaque Stonewall",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Stonewall-Angriff",
+     "def": "der Stonewall-Angriff",
+     "gender": "m"
+    },
+    "es": {
+     "name": "Ataque Stonewall",
+     "def": "el ataque Stonewall",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Атака «Каменная стена»",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Атака «Кам'яна стіна»",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "هجوم الجدار الحجري"
+    },
+    "ja": {
+     "name": "ストーンウォール・アタック"
+    },
+    "zh-Hans": {
+     "name": "石墙攻击"
+    },
+    "zh-Hant": {
+     "name": "石牆攻擊"
+    }
+   },
+   "comment": {
+    "beginner": "White puts pawns on d4, e3 and f4 and the bishop on d3, aiming for a kingside attack with a knight on e5.",
+    "advanced": "e5 is firmly controlled and White attacks with Ne5 and Rf3-h3, but e4 and c4 become weak; Black's best is a quick ...c5 or trading the d3 bishop with ...Bf5."
+   },
+   "lichess_rows": 1
+  },
+  {
+   "id": "richter_veresov",
+   "lichess": [
+    "Richter-Veresov Attack"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "closed",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 Nf6 2.Nc3 d5 3.Bg5",
+   "eco": "D01",
+   "names": {
+    "en": {
+     "name": "Richter-Veresov Attack",
+     "def": "the Richter-Veresov Attack"
+    },
+    "fr": {
+     "name": "Attaque Richter-Veressov",
+     "def": "l'attaque Richter-Veressov",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Richter-Weressow-Angriff",
+     "def": "der Richter-Weressow-Angriff",
+     "gender": "m"
+    },
+    "es": {
+     "name": "Ataque Richter-Veresov",
+     "def": "el ataque Richter-Veresov",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Атака Рихтера — Вересова",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Атака Ріхтера — Вересова",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "هجوم ريختر-فيريسوف"
+    },
+    "ja": {
+     "name": "リヒター・ヴェレソフ・アタック"
+    },
+    "zh-Hans": {
+     "name": "里希特-韦列索夫攻击"
+    },
+    "zh-Hant": {
+     "name": "里希特-韋列索夫攻擊"
+    }
+   },
+   "comment": {
+    "beginner": "White develops the queen's knight to c3 and the bishop to g5 early, aiming for e4.",
+    "advanced": "Nc3 blocks the c-pawn but prepares f3 and e4; Black does well with ...Nbd7 and ...c5, or ...Bf5 setups."
+   },
+   "lichess_rows": 8
+  },
+  {
+   "id": "st_george",
+   "lichess": [
+    "St. George Defense"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "semi-open",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 a6",
+   "eco": "B00",
+   "names": {
+    "en": {
+     "name": "St. George Defense",
+     "def": "the St. George Defense"
+    },
+    "fr": {
+     "name": "Défense Saint-Georges",
+     "def": "la défense Saint-Georges",
+     "gender": "f"
+    },
+    "de": {
+     "name": "St.-Georgs-Verteidigung",
+     "def": "die St.-Georgs-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa San Jorge",
+     "def": "la defensa San Jorge",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Святого Георгия",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Святого Георгія",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع القديس جورج"
+    },
+    "ja": {
+     "name": "セント・ジョージ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "圣乔治防御"
+    },
+    "zh-Hant": {
+     "name": "聖喬治防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black starts with ...a6 and ...b5, a rare wing setup made famous by Miles's win over Karpov in 1980.",
+    "advanced": "Black aims for ...Bb7 and queenside expansion and gives up the centre; White keeps an edge with simple central development."
+   },
+   "lichess_rows": 4
+  },
+  {
+   "id": "borg",
+   "lichess": [
+    "Borg Defense"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "semi-open",
+   "character": "gambit",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 g5",
+   "eco": "B00",
+   "names": {
+    "en": {
+     "name": "Borg Defense",
+     "def": "the Borg Defense"
+    },
+    "fr": {
+     "name": "Défense Borg",
+     "def": "la défense Borg",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Borg-Verteidigung",
+     "def": "die Borg-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa Borg",
+     "def": "la defensa Borg",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита Борга",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист Борга",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع بورغ"
+    },
+    "ja": {
+     "name": "ボルグ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "博格防御"
+    },
+    "zh-Hant": {
+     "name": "博格防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black pushes the g-pawn two squares: a provocative opening that weakens Black's own king.",
+    "advanced": "The Grob with colours reversed; White gains space and time with d4 and ideas of Bxg5."
+   },
+   "lichess_rows": 5
+  },
+  {
+   "id": "hippopotamus",
+   "lichess": [
+    "Hippopotamus Defense"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "semi-open",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 Nh6 (typically ...g6, ...b6, ...e6, ...d6)",
+   "eco": "B00",
+   "names": {
+    "en": {
+     "name": "Hippopotamus Defense",
+     "def": "the Hippopotamus Defense"
+    },
+    "fr": {
+     "name": "Défense hippopotame",
+     "def": "la défense hippopotame",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Hippopotamus-Verteidigung",
+     "def": "die Hippopotamus-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa hipopótamo",
+     "def": "la defensa hipopótamo",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита «Гиппопотам»",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист «Гіпопотам»",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع فرس النهر"
+    },
+    "ja": {
+     "name": "ヒポポタマス・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "河马防御"
+    },
+    "zh-Hant": {
+     "name": "河馬防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black puts the pawns on the sixth rank and fianchettoes both bishops, waiting for White to overextend.",
+    "advanced": "A flexible waiting setup (...g6, ...b6, ...e6, ...d6, ...Nd7, ...Ne7): sound against slow play, cramped against a broad centre."
+   },
+   "note": "lichess only names the rare 1...Nh6 move order; the setup itself is usually reached through Modern or Owen move orders.",
+   "lichess_rows": 2
+  },
+  {
+   "id": "english_defense",
+   "lichess": [
+    "English Defense"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "indian",
+   "character": "balanced",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.d4 b6 (1.d4 e6 2.c4 b6)",
+   "eco": "A40",
+   "names": {
+    "en": {
+     "name": "English Defense",
+     "def": "the English Defense"
+    },
+    "fr": {
+     "name": "Défense anglaise",
+     "def": "la défense anglaise",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Englische Verteidigung",
+     "def": "die Englische Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa inglesa",
+     "def": "la defensa inglesa",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Английская защита",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Англійський захист",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "الدفاع الإنجليزي"
+    },
+    "ja": {
+     "name": "イングリッシュ・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "英国式防御"
+    },
+    "zh-Hant": {
+     "name": "英國式防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black answers with ...b6 and ...Bb7 to fight for e4 with pieces.",
+    "advanced": "The English Defence (...e6, ...b6) invites a big centre, then attacks it with ...Bb4, ...f5 and pressure on e4."
+   },
+   "lichess_rows": 7
+  },
+  {
+   "id": "pterodactyl",
+   "lichess": [
+    "Pterodactyl Defense"
+   ],
+   "side": "black",
+   "tier": 3,
+   "structure": "semi-open",
+   "character": "sharp",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 g6 ... c5 and ...Qa5",
+   "eco": "A42, B06, B27",
+   "names": {
+    "en": {
+     "name": "Pterodactyl Defense",
+     "def": "the Pterodactyl Defense"
+    },
+    "fr": {
+     "name": "Défense ptérodactyle",
+     "def": "la défense ptérodactyle",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Pterodaktylus-Verteidigung",
+     "def": "die Pterodaktylus-Verteidigung",
+     "gender": "f"
+    },
+    "es": {
+     "name": "Defensa pterodáctilo",
+     "def": "la defensa pterodáctilo",
+     "gender": "f"
+    },
+    "ru": {
+     "name": "Защита «Птеродактиль»",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Захист «Птеродактиль»",
+     "gender": "m"
+    },
+    "ar": {
+     "name": "دفاع التيروداكتيل"
+    },
+    "ja": {
+     "name": "プテロダクティル・ディフェンス"
+    },
+    "zh-Hans": {
+     "name": "翼手龙防御"
+    },
+    "zh-Hant": {
+     "name": "翼手龍防禦"
+    }
+   },
+   "comment": {
+    "beginner": "Black fianchettoes the king's bishop and plays ...c5 and ...Qa5 early: an offbeat, aggressive system.",
+    "advanced": "A mix of Modern and Sicilian ideas: ...g6, ...Bg7, ...c5 and ...Qa5, hitting the c3 knight along the a5-e1 diagonal."
+   },
+   "lichess_rows": 33
+  },
+  {
+   "id": "bongcloud",
+   "lichess": [
+    "Bongcloud Attack"
+   ],
+   "side": "white",
+   "tier": 3,
+   "structure": "open",
+   "character": "quiet",
+   "generic": false,
+   "umbrella": null,
+   "root": "1.e4 e5 2.Ke2",
+   "eco": "C20",
+   "names": {
+    "en": {
+     "name": "Bongcloud Attack",
+     "def": "the Bongcloud Attack"
+    },
+    "fr": {
+     "name": "Attaque Bongcloud",
+     "def": "l'attaque Bongcloud",
+     "gender": "f"
+    },
+    "de": {
+     "name": "Bongcloud-Angriff",
+     "def": "der Bongcloud-Angriff",
+     "gender": "m"
+    },
+    "es": {
+     "name": "Ataque Bongcloud",
+     "def": "el ataque Bongcloud",
+     "gender": "m"
+    },
+    "ru": {
+     "name": "Атака Бонгклауд",
+     "gender": "f"
+    },
+    "uk": {
+     "name": "Атака Бонгклауд",
+     "gender": "f"
+    },
+    "ar": {
+     "name": "هجوم بونغكلاود"
+    },
+    "ja": {
+     "name": "ボングクラウド・アタック"
+    },
+    "zh-Hans": {
+     "name": "邦克劳德攻击"
+    },
+    "zh-Hant": {
+     "name": "邦克勞德攻擊"
+    }
+   },
+   "comment": {
+    "beginner": "White moves the king on move two: a joke opening that breaks the basic rules, since the king should stay safe and castle.",
+    "advanced": "2.Ke2 blocks the bishop and the queen and gives up castling; it is played as a meme and should not be imitated."
+   },
+   "review": [
+    "zh-Hans",
+    "zh-Hant"
+   ],
+   "lichess_rows": 1
+  }
+ ],
+ "notable_variations": [
+  {
+   "id": "open_sicilian",
+   "family": "sicilian",
+   "side": "white",
+   "lichess": [
+    "Sicilian Defense: Open",
+    "Sicilian Defense: Modern Variations, Main Line"
+   ],
+   "names": {
+    "en": "Open Sicilian",
+    "fr": "Sicilienne ouverte",
+    "de": "Offener Sizilianer",
+    "es": "Siciliana abierta",
+    "ru": "Открытый вариант",
+    "uk": "Відкритий варіант",
+    "ar": "المتغير المفتوح",
+    "ja": "オープン・シシリアン",
+    "zh-Hans": "开放西西里",
+    "zh-Hant": "開放西西里"
+   },
+   "comment": {
+    "advanced": "White opens the centre with d4 and recaptures with the knight: the main battleground of the Sicilian, sharp and heavy with theory."
+   },
+   "lichess_rows": 4
+  },
+  {
+   "id": "closed_sicilian",
+   "family": "sicilian",
+   "side": "white",
+   "lichess": [
+    "Sicilian Defense: Closed"
+   ],
+   "names": {
+    "en": "Closed Sicilian",
+    "fr": "Sicilienne fermée",
+    "de": "Geschlossener Sizilianer",
+    "es": "Siciliana cerrada",
+    "ru": "Закрытый вариант",
+    "uk": "Закритий варіант",
+    "ar": "المتغير المغلق",
+    "ja": "クローズド・シシリアン",
+    "zh-Hans": "封闭西西里",
+    "zh-Hant": "封閉西西里"
+   },
+   "comment": {
+    "advanced": "White avoids d4 and plays Nc3, g3, Bg2 and often f4, aiming for a slow kingside attack."
+   },
+   "lichess_rows": 23
+  },
+  {
+   "id": "alapin",
+   "family": "sicilian",
+   "side": "white",
+   "lichess": [
+    "Sicilian Defense: Alapin Variation"
+   ],
+   "names": {
+    "en": "Alapin Variation",
+    "fr": "Variante Alapin",
+    "de": "Alapin-Variante",
+    "es": "Variante Alapin",
+    "ru": "Вариант Алапина",
+    "uk": "Варіант Алапіна",
+    "ar": "متغير ألابين",
+    "ja": "アラピン・バリエーション",
+    "zh-Hans": "阿拉平变例",
+    "zh-Hant": "阿拉平變例"
+   },
+   "comment": {
+    "advanced": "2.c3 prepares d4 to build a full pawn centre and sidestep the main Sicilian theory; Black answers with ...d5 or ...Nf6."
+   },
+   "lichess_rows": 13
+  },
+  {
+   "id": "smith_morra",
+   "family": "sicilian",
+   "side": "white",
+   "lichess": [
+    "Sicilian Defense: Smith-Morra Gambit",
+    "Sicilian Defense: Smith-Morra Gambit Accepted",
+    "Sicilian Defense: Smith-Morra Gambit Declined"
+   ],
+   "names": {
+    "en": "Smith-Morra Gambit",
+    "fr": "Gambit Smith-Morra",
+    "de": "Morra-Gambit",
+    "es": "Gambito Smith-Morra",
+    "ru": "Гамбит Морра",
+    "uk": "Гамбіт Морра",
+    "ar": "جامبيت سميث-مورا",
+    "ja": "スミス・モラ・ギャンビット",
+    "zh-Hans": "史密斯-莫拉弃兵",
+    "zh-Hant": "史密斯-莫拉棄兵"
+   },
+   "comment": {
+    "advanced": "A pawn for rapid development and the open c- and d-files; Black develops soundly and often returns the pawn at the right moment.",
+    "beginner": "White gives a pawn to develop quickly and open lines against Black's king: Black must develop carefully."
+   },
+   "lichess_rows": 29
+  },
+  {
+   "id": "grand_prix",
+   "family": "sicilian",
+   "side": "white",
+   "lichess": [
+    "Sicilian Defense: Grand Prix Attack"
+   ],
+   "names": {
+    "en": "Grand Prix Attack",
+    "fr": "Attaque Grand Prix",
+    "de": "Grand-Prix-Angriff",
+    "es": "Ataque Grand Prix",
+    "ru": "Атака Гран-при",
+    "uk": "Атака Гран-прі",
+    "ar": "هجوم الجائزة الكبرى",
+    "ja": "グランプリ・アタック",
+    "zh-Hans": "大奖赛攻击",
+    "zh-Hant": "大獎賽攻擊"
+   },
+   "comment": {
+    "advanced": "White plays Nc3 and f4 for a quick kingside attack with f5, avoiding the Open Sicilian."
+   },
+   "lichess_rows": 2
+  },
+  {
+   "id": "rossolimo",
+   "family": "sicilian",
+   "side": "white",
+   "lichess": [
+    "Sicilian Defense: Nyezhmetdinov-Rossolimo Attack"
+   ],
+   "names": {
+    "en": "Rossolimo Variation",
+    "fr": "Variante Rossolimo",
+    "de": "Rossolimo-Variante",
+    "es": "Variante Rossolimo",
+    "ru": "Вариант Россолимо",
+    "uk": "Варіант Россолімо",
+    "ar": "متغير روسوليمو",
+    "ja": "ロッソリモ・バリエーション",
+    "zh-Hans": "罗索利莫变例",
+    "zh-Hant": "羅索利莫變例"
+   },
+   "comment": {
+    "advanced": "3.Bb5 pins or trades the c6 knight to give Black doubled pawns and keep the game positional."
+   },
+   "lichess_rows": 8
+  },
+  {
+   "id": "najdorf",
+   "family": "sicilian",
+   "side": "black",
+   "lichess": [
+    "Sicilian Defense: Najdorf Variation"
+   ],
+   "names": {
+    "en": "Najdorf Variation",
+    "fr": "Variante Najdorf",
+    "de": "Najdorf-Variante",
+    "es": "Variante Najdorf",
+    "ru": "Вариант Найдорфа",
+    "uk": "Варіант Найдорфа",
+    "ar": "متغير نايدورف",
+    "ja": "ナイドルフ・バリエーション",
+    "zh-Hans": "纳道尔夫变例",
+    "zh-Hant": "納道爾夫變例"
+   },
+   "comment": {
+    "advanced": "5...a6 is the most famous Sicilian: flexible and deep, with ...e5 or ...e6 structures against sharp attacks such as the English Attack or 6.Bg5."
+   },
+   "lichess_rows": 33
+  },
+  {
+   "id": "dragon",
+   "family": "sicilian",
+   "side": "black",
+   "lichess": [
+    "Sicilian Defense: Dragon Variation"
+   ],
+   "names": {
+    "en": "Dragon Variation",
+    "fr": "Variante du dragon",
+    "de": "Drachenvariante",
+    "es": "Variante del dragón",
+    "ru": "Вариант дракона",
+    "uk": "Варіант дракона",
+    "ar": "متغير التنين",
+    "ja": "ドラゴン・バリエーション",
+    "zh-Hans": "龙式变例",
+    "zh-Hant": "龍式變例"
+   },
+   "comment": {
+    "advanced": "Black fianchettoes to g7 (the pawn chain looks like a dragon); the Yugoslav Attack leads to famous races of attacks on opposite wings."
+   },
+   "lichess_rows": 42
+  },
+  {
+   "id": "accelerated_dragon",
+   "family": "sicilian",
+   "side": "black",
+   "lichess": [
+    "Sicilian Defense: Accelerated Dragon",
+    "Sicilian Defense: Dragon Variation, Accelerated Dragon",
+    "Sicilian Defense: Hyperaccelerated Dragon"
+   ],
+   "names": {
+    "en": "Accelerated Dragon",
+    "fr": "Dragon accéléré",
+    "de": "Beschleunigter Drache",
+    "es": "Dragón acelerado",
+    "ru": "Ускоренный дракон",
+    "uk": "Прискорений дракон",
+    "ar": "التنين المعجّل",
+    "ja": "アクセラレーテッド・ドラゴン",
+    "zh-Hans": "加速龙式",
+    "zh-Hant": "加速龍式"
+   },
+   "comment": {
+    "advanced": "Black fianchettoes before ...d6 to play ...d5 in one go; the Maróczy Bind with c4 is White's positional antidote."
+   },
+   "lichess_rows": 13
+  },
+  {
+   "id": "scheveningen",
+   "family": "sicilian",
+   "side": "black",
+   "lichess": [
+    "Sicilian Defense: Scheveningen Variation"
+   ],
+   "names": {
+    "en": "Scheveningen Variation",
+    "fr": "Variante Scheveningue",
+    "de": "Scheveninger Variante",
+    "es": "Variante Scheveningen",
+    "ru": "Схевенингенский вариант",
+    "uk": "Схевенінгенський варіант",
+    "ar": "متغير شيفينينغن",
+    "ja": "シェベニンゲン・バリエーション",
+    "zh-Hans": "舍维宁根变例",
+    "zh-Hant": "舍維寧根變例"
+   },
+   "comment": {
+    "advanced": "Black builds the small centre e6-d6, a flexible defensive shell; White often attacks with g4 (the Keres Attack)."
+   },
+   "lichess_rows": 20
+  },
+  {
+   "id": "sveshnikov",
+   "family": "sicilian",
+   "side": "black",
+   "lichess": [
+    "Sicilian Defense: Lasker-Pelikan Variation"
+   ],
+   "names": {
+    "en": "Sveshnikov Variation",
+    "fr": "Variante Svechnikov",
+    "de": "Sweschnikow-Variante",
+    "es": "Variante Sveshnikov",
+    "ru": "Вариант Свешникова",
+    "uk": "Варіант Свєшнікова",
+    "ar": "متغير سفيشنيكوف",
+    "ja": "スヴェシニコフ・バリエーション",
+    "zh-Hans": "斯维什尼科夫变例",
+    "zh-Hant": "斯維什尼科夫變例"
+   },
+   "comment": {
+    "advanced": "Black plays ...e5, accepting a hole on d5 and a backward d-pawn for activity and the bishop pair: very dynamic."
+   },
+   "note": "lichess calls the whole 5...e5 system \"Lasker-Pelikan Variation\" and only the 7.Bg5 a6 8.Na3 b5 main line \"Sveshnikov Variation\".",
+   "lichess_rows": 10
+  },
+  {
+   "id": "taimanov",
+   "family": "sicilian",
+   "side": "black",
+   "lichess": [
+    "Sicilian Defense: Taimanov Variation"
+   ],
+   "names": {
+    "en": "Taimanov Variation",
+    "fr": "Variante Taïmanov",
+    "de": "Taimanow-Variante",
+    "es": "Variante Taimánov",
+    "ru": "Вариант Тайманова",
+    "uk": "Варіант Тайманова",
+    "ar": "متغير تايمانوف",
+    "ja": "タイマノフ・バリエーション",
+    "zh-Hans": "泰曼诺夫变例",
+    "zh-Hant": "泰曼諾夫變例"
+   },
+   "comment": {
+    "advanced": "Black combines ...e6 and ...Nc6 with a flexible ...a6 and ...Qc7, keeping ...d6 or ...Bb4 in reserve."
+   },
+   "lichess_rows": 10
+  },
+  {
+   "id": "kan",
+   "family": "sicilian",
+   "side": "black",
+   "lichess": [
+    "Sicilian Defense: Kan Variation"
+   ],
+   "names": {
+    "en": "Kan Variation",
+    "fr": "Variante Kan",
+    "de": "Kan-Variante",
+    "es": "Variante Kan",
+    "ru": "Вариант Кана",
+    "uk": "Варіант Кана",
+    "ar": "متغير كان",
+    "ja": "カン・バリエーション",
+    "zh-Hans": "坎恩变例",
+    "zh-Hant": "坎恩變例"
+   },
+   "comment": {
+    "advanced": "Black plays ...e6 and ...a6, keeps the knights at home and often aims for a Hedgehog setup."
+   },
+   "lichess_rows": 14
+  },
+  {
+   "id": "classical_sicilian",
+   "family": "sicilian",
+   "side": "black",
+   "lichess": [
+    "Sicilian Defense: Classical Variation"
+   ],
+   "names": {
+    "en": "Classical Variation",
+    "fr": "Variante classique",
+    "de": "Klassische Variante",
+    "es": "Variante clásica",
+    "ru": "Классический вариант",
+    "uk": "Класичний варіант",
+    "ar": "المتغير الكلاسيكي",
+    "ja": "クラシカル・バリエーション",
+    "zh-Hans": "古典变例",
+    "zh-Hant": "古典變例"
+   },
+   "comment": {
+    "advanced": "Black develops both knights (...Nc6, ...Nf6, ...d6); White's main answers are the Richter-Rauzer (Bg5) and the Sozin (Bc4)."
+   },
+   "lichess_rows": 6
+  },
+  {
+   "id": "french_advance",
+   "family": "french",
+   "side": "white",
+   "lichess": [
+    "French Defense: Advance Variation"
+   ],
+   "names": {
+    "en": "Advance Variation",
+    "fr": "Variante d'avance",
+    "de": "Vorstoßvariante",
+    "es": "Variante del avance",
+    "ru": "Вариант продвижения",
+    "uk": "Варіант просування",
+    "ar": "متغير التقدم",
+    "ja": "アドバンス・バリエーション",
+    "zh-Hans": "推进变例",
+    "zh-Hant": "推進變例"
+   },
+   "comment": {
+    "advanced": "White locks the centre with e5 and gains space; Black attacks d4, the base of the chain, with ...c5, ...Nc6 and ...Qb6."
+   },
+   "lichess_rows": 22
+  },
+  {
+   "id": "french_exchange",
+   "family": "french",
+   "side": "white",
+   "lichess": [
+    "French Defense: Exchange Variation"
+   ],
+   "names": {
+    "en": "Exchange Variation",
+    "fr": "Variante d'échange",
+    "de": "Abtauschvariante",
+    "es": "Variante del cambio",
+    "ru": "Разменный вариант",
+    "uk": "Розмінний варіант",
+    "ar": "متغير التبادل",
+    "ja": "エクスチェンジ・バリエーション",
+    "zh-Hans": "兑换变例",
+    "zh-Hant": "兌換變例"
+   },
+   "comment": {
+    "advanced": "exd5 releases the tension: a symmetrical, quiet structure in which Black's light bishop is freed."
+   },
+   "lichess_rows": 6
+  },
+  {
+   "id": "french_tarrasch",
+   "family": "french",
+   "side": "white",
+   "lichess": [
+    "French Defense: Tarrasch Variation"
+   ],
+   "names": {
+    "en": "Tarrasch Variation",
+    "fr": "Variante Tarrasch",
+    "de": "Tarrasch-Variante",
+    "es": "Variante Tarrasch",
+    "ru": "Вариант Тарраша",
+    "uk": "Варіант Тарраша",
+    "ar": "متغير تاراش",
+    "ja": "タラッシュ・バリエーション",
+    "zh-Hans": "塔拉什变例",
+    "zh-Hant": "塔拉什變例"
+   },
+   "comment": {
+    "advanced": "3.Nd2 avoids the Winawer pin; Black often accepts an isolated d-pawn after ...c5 or plays ...Nf6 for a locked centre."
+   },
+   "lichess_rows": 24
+  },
+  {
+   "id": "winawer",
+   "family": "french",
+   "side": "black",
+   "lichess": [
+    "French Defense: Winawer Variation"
+   ],
+   "names": {
+    "en": "Winawer Variation",
+    "fr": "Variante Winawer",
+    "de": "Winawer-Variante",
+    "es": "Variante Winawer",
+    "ru": "Вариант Винавера",
+    "uk": "Варіант Винавера",
+    "ar": "متغير فيناور",
+    "ja": "ウィナワー・バリエーション",
+    "zh-Hans": "维纳维尔变例",
+    "zh-Hant": "維納維爾變例"
+   },
+   "comment": {
+    "advanced": "3...Bb4 pins the knight; after e5 and a3 Black usually gives bishop for knight, leaving White doubled c-pawns but the bishop pair and kingside chances."
+   },
+   "lichess_rows": 54
+  },
+  {
+   "id": "french_classical",
+   "family": "french",
+   "side": "black",
+   "lichess": [
+    "French Defense: Classical Variation"
+   ],
+   "names": {
+    "en": "Classical Variation",
+    "fr": "Variante classique",
+    "de": "Klassische Variante",
+    "es": "Variante clásica",
+    "ru": "Классический вариант",
+    "uk": "Класичний варіант",
+    "ar": "المتغير الكلاسيكي",
+    "ja": "クラシカル・バリエーション",
+    "zh-Hans": "古典变例",
+    "zh-Hant": "古典變例"
+   },
+   "comment": {
+    "advanced": "3...Nf6 invites 4.Bg5 or 4.e5; the play turns on the e5 chain and the f6 knight."
+   },
+   "lichess_rows": 24
+  },
+  {
+   "id": "french_rubinstein",
+   "family": "french",
+   "side": "black",
+   "lichess": [
+    "French Defense: Rubinstein Variation"
+   ],
+   "names": {
+    "en": "Rubinstein Variation",
+    "fr": "Variante Rubinstein",
+    "de": "Rubinstein-Variante",
+    "es": "Variante Rubinstein",
+    "ru": "Вариант Рубинштейна",
+    "uk": "Варіант Рубінштейна",
+    "ar": "متغير روبنشتاين",
+    "ja": "ルビンシュタイン・バリエーション",
+    "zh-Hans": "鲁宾斯坦变例",
+    "zh-Hant": "魯賓斯坦變例"
+   },
+   "comment": {
+    "advanced": "3...dxe4 gives up the centre for a solid, compact position; Black aims for ...Nd7, ...Ngf6 and ...c5."
+   },
+   "lichess_rows": 7
+  },
+  {
+   "id": "ck_advance",
+   "family": "caro_kann",
+   "side": "white",
+   "lichess": [
+    "Caro-Kann Defense: Advance Variation"
+   ],
+   "names": {
+    "en": "Advance Variation",
+    "fr": "Variante d'avance",
+    "de": "Vorstoßvariante",
+    "es": "Variante del avance",
+    "ru": "Вариант продвижения",
+    "uk": "Варіант просування",
+    "ar": "متغير التقدم",
+    "ja": "アドバンス・バリエーション",
+    "zh-Hans": "推进变例",
+    "zh-Hant": "推進變例"
+   },
+   "comment": {
+    "advanced": "White gains space with e5; Black develops the bishop to f5 before ...e6 and fights back with ...c5."
+   },
+   "lichess_rows": 10
+  },
+  {
+   "id": "ck_exchange",
+   "family": "caro_kann",
+   "side": "white",
+   "lichess": [
+    "Caro-Kann Defense: Exchange Variation"
+   ],
+   "names": {
+    "en": "Exchange Variation",
+    "fr": "Variante d'échange",
+    "de": "Abtauschvariante",
+    "es": "Variante del cambio",
+    "ru": "Разменный вариант",
+    "uk": "Розмінний варіант",
+    "ar": "متغير التبادل",
+    "ja": "エクスチェンジ・バリエーション",
+    "zh-Hans": "兑换变例",
+    "zh-Hant": "兌換變例"
+   },
+   "comment": {
+    "advanced": "A Carlsbad structure with colours reversed: White usually plays Bd3, c3 and a kingside setup, Black a minority attack with ...b5-b4."
+   },
+   "lichess_rows": 6
+  },
+  {
+   "id": "ck_panov",
+   "family": "caro_kann",
+   "side": "white",
+   "lichess": [
+    "Caro-Kann Defense: Panov Attack",
+    "Caro-Kann Defense: Panov-Botvinnik",
+    "Caro-Kann Defense: Accelerated Panov Attack"
+   ],
+   "names": {
+    "en": "Panov Attack",
+    "fr": "Attaque Panov",
+    "de": "Panow-Angriff",
+    "es": "Ataque Panov",
+    "ru": "Атака Панова",
+    "uk": "Атака Панова",
+    "ar": "هجوم بانوف",
+    "ja": "パノフ・アタック",
+    "zh-Hans": "潘诺夫攻击",
+    "zh-Hant": "潘諾夫攻擊"
+   },
+   "comment": {
+    "advanced": "White plays c4 and accepts an isolated d-pawn in exchange for active pieces and attacking chances."
+   },
+   "lichess_rows": 22
+  },
+  {
+   "id": "ck_classical",
+   "family": "caro_kann",
+   "side": "black",
+   "lichess": [
+    "Caro-Kann Defense: Classical Variation"
+   ],
+   "names": {
+    "en": "Classical Variation",
+    "fr": "Variante classique",
+    "de": "Klassische Variante",
+    "es": "Variante clásica",
+    "ru": "Классический вариант",
+    "uk": "Класичний варіант",
+    "ar": "المتغير الكلاسيكي",
+    "ja": "クラシカル・バリエーション",
+    "zh-Hans": "古典变例",
+    "zh-Hant": "古典變例"
+   },
+   "comment": {
+    "advanced": "4...Bf5 develops the bishop with tempo on the e4 knight; White gains space with h4-h5 and castling on opposite sides is common."
+   },
+   "lichess_rows": 8
+  },
+  {
+   "id": "ck_two_knights",
+   "family": "caro_kann",
+   "side": "white",
+   "lichess": [
+    "Caro-Kann Defense: Two Knights Attack"
+   ],
+   "names": {
+    "en": "Two Knights Attack",
+    "fr": "Attaque des deux cavaliers",
+    "de": "Zweispringerangriff",
+    "es": "Ataque de los dos caballos",
+    "ru": "Атака двух коней",
+    "uk": "Атака двох коней",
+    "ar": "هجوم الحصانين",
+    "ja": "ツー・ナイツ・アタック",
+    "zh-Hans": "双马攻击",
+    "zh-Hant": "雙馬攻擊"
+   },
+   "comment": {
+    "advanced": "White develops Nc3 and Nf3 before d4, staying flexible and avoiding main-line theory."
+   },
+   "lichess_rows": 4
+  },
+  {
+   "id": "two_knights",
+   "family": "italian",
+   "side": "black",
+   "lichess": [
+    "Italian Game: Two Knights Defense"
+   ],
+   "names": {
+    "en": "Two Knights Defense",
+    "fr": "Défense des deux cavaliers",
+    "de": "Zweispringerspiel im Nachzuge",
+    "es": "Defensa de los dos caballos",
+    "ru": "Защита двух коней",
+    "uk": "Захист двох коней",
+    "ar": "دفاع الحصانين",
+    "ja": "ツー・ナイツ・ディフェンス",
+    "zh-Hans": "双马防御",
+    "zh-Hant": "雙馬防禦"
+   },
+   "comment": {
+    "advanced": "3...Nf6 invites the sharp 4.Ng5 (answered by ...d5 and ...Na5) or the quiet 4.d3; it is Black's most active reply to the Italian.",
+    "beginner": "Black counterattacks e4 with the knight instead of copying White; watch out for Ng5, which hits f7."
+   },
+   "lichess_rows": 40
+  },
+  {
+   "id": "giuoco_piano",
+   "family": "italian",
+   "side": "black",
+   "lichess": [
+    "Italian Game: Giuoco Piano",
+    "Italian Game: Classical Variation"
+   ],
+   "names": {
+    "en": "Giuoco Piano",
+    "fr": "Giuoco piano",
+    "de": "Giuoco Piano",
+    "es": "Giuoco piano",
+    "ru": "Джуоко пиано",
+    "uk": "Джуоко піано",
+    "ar": "جوكو بيانو",
+    "ja": "ジュオッコ・ピアノ",
+    "zh-Hans": "意大利慢棋",
+    "zh-Hant": "義大利慢棋"
+   },
+   "comment": {
+    "advanced": "3...Bc5 mirrors White's bishop; White chooses between c3 and d4 central play, the slow d3 (Pianissimo) or the Evans Gambit.",
+    "beginner": "\"The quiet game\" in Italian: both bishops aim at the opponent's f-pawn and the game develops calmly."
+   },
+   "review": [
+    "zh-Hans",
+    "zh-Hant"
+   ],
+   "lichess_rows": 31
+  },
+  {
+   "id": "giuoco_pianissimo",
+   "family": "italian",
+   "side": "white",
+   "lichess": [
+    "Italian Game: Giuoco Pianissimo",
+    "Italian Game: Classical Variation, Giuoco Pianissimo"
+   ],
+   "names": {
+    "en": "Giuoco Pianissimo",
+    "fr": "Giuoco pianissimo",
+    "de": "Giuoco Pianissimo",
+    "es": "Giuoco pianissimo",
+    "ru": "Джуоко пианиссимо",
+    "uk": "Джуоко піаніссімо",
+    "ar": "جوكو بيانيسيمو",
+    "ja": "ジュオッコ・ピアニッシモ",
+    "zh-Hans": "意大利极慢棋",
+    "zh-Hant": "義大利極慢棋"
+   },
+   "comment": {
+    "advanced": "The modern slow Italian (d3, c3, castling, Re1, a4, h3): long manoeuvres like Nbd2-f1-g3 and a delayed d4 break."
+   },
+   "review": [
+    "zh-Hans",
+    "zh-Hant"
+   ],
+   "lichess_rows": 33
+  },
+  {
+   "id": "evans",
+   "family": "italian",
+   "side": "white",
+   "lichess": [
+    "Italian Game: Evans Gambit"
+   ],
+   "names": {
+    "en": "Evans Gambit",
+    "fr": "Gambit Evans",
+    "de": "Evans-Gambit",
+    "es": "Gambito Evans",
+    "ru": "Гамбит Эванса",
+    "uk": "Гамбіт Еванса",
+    "ar": "جامبيت إيفانز",
+    "ja": "エバンス・ギャンビット",
+    "zh-Hans": "埃文斯弃兵",
+    "zh-Hant": "埃文斯棄兵"
+   },
+   "comment": {
+    "advanced": "4.b4 gives a pawn to deflect the c5 bishop and build a fast centre with c3 and d4: very sharp, a favourite of the romantic era."
+   },
+   "lichess_rows": 41
+  },
+  {
+   "id": "fried_liver",
+   "family": "italian",
+   "side": "white",
+   "lichess": [
+    "Italian Game: Two Knights Defense, Fried Liver Attack"
+   ],
+   "names": {
+    "en": "Fried Liver Attack",
+    "fr": "Attaque Fegatello",
+    "de": "Fegatello-Angriff",
+    "es": "Ataque Fegatello",
+    "ru": "Атака Фегателло",
+    "uk": "Атака Фегателло",
+    "ar": "هجوم الكبد المقلي",
+    "ja": "フライド・リバー・アタック",
+    "zh-Hans": "炸肝攻击",
+    "zh-Hant": "炸肝攻擊"
+   },
+   "comment": {
+    "advanced": "After 4.Ng5 d5 5.exd5 Nxd5?! 6.Nxf7 Kxf7 White gets a fierce attack; the main line 5...Na5 avoids it.",
+    "beginner": "White sacrifices the knight on f7 to drag Black's king into the open: very dangerous if Black recaptured on d5 with the knight."
+   },
+   "review": [
+    "zh-Hans",
+    "zh-Hant"
+   ],
+   "lichess_rows": 1
+  },
+  {
+   "id": "traxler",
+   "family": "italian",
+   "side": "black",
+   "lichess": [
+    "Italian Game: Two Knights Defense, Traxler Counterattack",
+    "Italian Game: Two Knights Defense, Traxler Variation"
+   ],
+   "names": {
+    "en": "Traxler Counterattack",
+    "fr": "Contre-attaque Traxler",
+    "de": "Traxler-Gegenangriff",
+    "es": "Contraataque Traxler",
+    "ru": "Контратака Тракслера",
+    "uk": "Контратака Тракслера",
+    "ar": "هجوم تراكسلر المضاد",
+    "ja": "トラクスラー・カウンターアタック",
+    "zh-Hans": "特拉克斯勒反击",
+    "zh-Hant": "特拉克斯勒反擊"
+   },
+   "comment": {
+    "advanced": "4...Bc5 ignores the threat to f7 and hits f2 instead: wild tactics where exact knowledge decides."
+   },
+   "lichess_rows": 5
+  },
+  {
+   "id": "berlin",
+   "family": "ruy_lopez",
+   "side": "black",
+   "lichess": [
+    "Ruy Lopez: Berlin Defense"
+   ],
+   "names": {
+    "en": "Berlin Defense",
+    "fr": "Défense berlinoise",
+    "de": "Berliner Verteidigung",
+    "es": "Defensa Berlín",
+    "ru": "Берлинская защита",
+    "uk": "Берлінський захист",
+    "ar": "الدفاع البرليني",
+    "ja": "ベルリン・ディフェンス",
+    "zh-Hans": "柏林防御",
+    "zh-Hant": "柏林防禦"
+   },
+   "comment": {
+    "advanced": "3...Nf6 counterattacks e4; the famous Berlin endgame (queens off early, Black's king in the centre) is extremely solid."
+   },
+   "lichess_rows": 31
+  },
+  {
+   "id": "morphy",
+   "family": "ruy_lopez",
+   "side": "black",
+   "lichess": [
+    "Ruy Lopez: Morphy Defense"
+   ],
+   "names": {
+    "en": "Morphy Defense",
+    "fr": "Défense Morphy",
+    "de": "Morphy-Verteidigung",
+    "es": "Defensa Morphy",
+    "ru": "Защита Морфи",
+    "uk": "Захист Морфі",
+    "ar": "دفاع مورفي",
+    "ja": "モーフィー・ディフェンス",
+    "zh-Hans": "莫菲防御",
+    "zh-Hant": "莫菲防禦"
+   },
+   "comment": {
+    "advanced": "3...a6 questions the bishop at once: the gateway to the main lines (Closed, Open, Marshall)."
+   },
+   "lichess_rows": 39
+  },
+  {
+   "id": "closed_ruy",
+   "family": "ruy_lopez",
+   "side": "black",
+   "lichess": [
+    "Ruy Lopez: Closed"
+   ],
+   "names": {
+    "en": "Closed Ruy Lopez",
+    "fr": "Espagnole fermée",
+    "de": "Geschlossene Spanische Partie",
+    "es": "Española cerrada",
+    "ru": "Закрытый вариант",
+    "uk": "Закритий варіант",
+    "ar": "روي لوبيز المغلق",
+    "ja": "クローズド・ルイ・ロペス",
+    "zh-Hans": "封闭西班牙",
+    "zh-Hant": "封閉西班牙"
+   },
+   "comment": {
+    "advanced": "5...Be7 with ...b5, ...d6 and castling: the classical main line, with slow manoeuvres (Nbd2-f1-g3) against Black's queenside plans (Breyer, Zaitsev, Chigorin)."
+   },
+   "lichess_rows": 53
+  },
+  {
+   "id": "marshall",
+   "family": "ruy_lopez",
+   "side": "black",
+   "lichess": [
+    "Ruy Lopez: Marshall Attack"
+   ],
+   "names": {
+    "en": "Marshall Attack",
+    "fr": "Attaque Marshall",
+    "de": "Marshall-Angriff",
+    "es": "Ataque Marshall",
+    "ru": "Атака Маршалла",
+    "uk": "Атака Маршалла",
+    "ar": "هجوم مارشال",
+    "ja": "マーシャル・アタック",
+    "zh-Hans": "马歇尔攻击",
+    "zh-Hant": "馬歇爾攻擊"
+   },
+   "comment": {
+    "advanced": "8...d5 sacrifices a pawn for a lasting kingside attack; deeply analysed, it is a respected drawing weapon at the top level."
+   },
+   "lichess_rows": 9
+  },
+  {
+   "id": "ruy_exchange",
+   "family": "ruy_lopez",
+   "side": "white",
+   "lichess": [
+    "Ruy Lopez: Exchange Variation"
+   ],
+   "names": {
+    "en": "Exchange Variation",
+    "fr": "Variante d'échange",
+    "de": "Abtauschvariante",
+    "es": "Variante del cambio",
+    "ru": "Разменный вариант",
+    "uk": "Розмінний варіант",
+    "ar": "متغير التبادل",
+    "ja": "エクスチェンジ・バリエーション",
+    "zh-Hans": "兑换变例",
+    "zh-Hant": "兌換變例"
+   },
+   "comment": {
+    "advanced": "4.Bxc6 gives Black the bishop pair but doubled c-pawns; White aims for an endgame with a healthy kingside majority."
+   },
+   "lichess_rows": 10
+  },
+  {
+   "id": "ruy_open",
+   "family": "ruy_lopez",
+   "side": "black",
+   "lichess": [
+    "Ruy Lopez: Open"
+   ],
+   "names": {
+    "en": "Open Variation",
+    "fr": "Variante ouverte",
+    "de": "Offene Variante",
+    "es": "Variante abierta",
+    "ru": "Открытый вариант",
+    "uk": "Відкритий варіант",
+    "ar": "المتغير المفتوح",
+    "ja": "オープン・バリエーション",
+    "zh-Hans": "开放变例",
+    "zh-Hant": "開放變例"
+   },
+   "comment": {
+    "advanced": "5...Nxe4 takes the centre pawn for active piece play; Black's pieces are lively but the e-file and the d5 pawn need care."
+   },
+   "lichess_rows": 33
+  },
+  {
+   "id": "schliemann",
+   "family": "ruy_lopez",
+   "side": "black",
+   "lichess": [
+    "Ruy Lopez: Schliemann Defense"
+   ],
+   "names": {
+    "en": "Schliemann Defense",
+    "fr": "Défense Schliemann",
+    "de": "Schliemann-Verteidigung",
+    "es": "Defensa Schliemann",
+    "ru": "Защита Шлимана",
+    "uk": "Захист Шлімана",
+    "ar": "دفاع شليمان",
+    "ja": "シュリーマン・ディフェンス",
+    "zh-Hans": "施利曼防御",
+    "zh-Hant": "施利曼防禦"
+   },
+   "comment": {
+    "advanced": "3...f5 is a King's Gambit with the colours reversed: sharp and risky for both sides."
+   },
+   "lichess_rows": 9
+  },
+  {
+   "id": "scotch_gambit",
+   "family": "scotch",
+   "side": "white",
+   "lichess": [
+    "Scotch Game: Scotch Gambit"
+   ],
+   "names": {
+    "en": "Scotch Gambit",
+    "fr": "Gambit écossais",
+    "de": "Schottisches Gambit",
+    "es": "Gambito escocés",
+    "ru": "Шотландский гамбит",
+    "uk": "Шотландський гамбіт",
+    "ar": "الجامبيت الاسكتلندي",
+    "ja": "スコッチ・ギャンビット",
+    "zh-Hans": "苏格兰弃兵",
+    "zh-Hant": "蘇格蘭棄兵"
+   },
+   "comment": {
+    "advanced": "White plays Bc4 instead of recapturing on d4 and offers a pawn for fast development; it often transposes to the Two Knights."
+   },
+   "lichess_rows": 8
+  },
+  {
+   "id": "vienna_gambit",
+   "family": "vienna",
+   "side": "white",
+   "lichess": [
+    "Vienna Game: Vienna Gambit",
+    "Vienna Gambit"
+   ],
+   "names": {
+    "en": "Vienna Gambit",
+    "fr": "Gambit viennois",
+    "de": "Wiener Gambit",
+    "es": "Gambito vienés",
+    "ru": "Венский гамбит",
+    "uk": "Віденський гамбіт",
+    "ar": "جامبيت فيينا",
+    "ja": "ウィーン・ギャンビット",
+    "zh-Hans": "维也纳弃兵",
+    "zh-Hant": "維也納棄兵"
+   },
+   "comment": {
+    "advanced": "f4 in the Vienna, a King's Gambit with Nc3 already played; Black's best answer is the central strike ...d5."
+   },
+   "lichess_rows": 24
+  },
+  {
+   "id": "stafford",
+   "family": "petrov",
+   "side": "black",
+   "lichess": [
+    "Petrov's Defense: Stafford Gambit",
+    "Petrov's Defense: Stafford Gambit Accepted"
+   ],
+   "names": {
+    "en": "Stafford Gambit",
+    "fr": "Gambit Stafford",
+    "de": "Stafford-Gambit",
+    "es": "Gambito Stafford",
+    "ru": "Гамбит Стаффорда",
+    "uk": "Гамбіт Стаффорда",
+    "ar": "جامبيت ستافورد",
+    "ja": "スタッフォード・ギャンビット",
+    "zh-Hans": "斯塔福德弃兵",
+    "zh-Hant": "斯塔福德棄兵"
+   },
+   "comment": {
+    "advanced": "After 3.Nxe5 Nc6 4.Nxc6 dxc6 Black gets quick development and traps with ...Bc5 and ...Ng4; with calm moves (d3, Be2, castling) White stays a clean pawn up.",
+    "beginner": "A trap-filled gambit popular online: Black gives a pawn and hopes White falls for tricks against f2 and e4."
+   },
+   "lichess_rows": 4
+  },
+  {
+   "id": "wayward_queen",
+   "family": "kings_pawn",
+   "side": "white",
+   "lichess": [
+    "King's Pawn Game: Wayward Queen Attack",
+    "King's Pawn Game: Napoleon Attack"
+   ],
+   "names": {
+    "en": "Wayward Queen Attack",
+    "fr": "Attaque Parham",
+    "de": "Parham-Angriff",
+    "es": "Ataque Parham",
+    "ru": "Атака Пархема",
+    "uk": "Атака Пархема",
+    "ar": "هجوم الوزير المتجول",
+    "ja": "ウェイワード・クイーン・アタック",
+    "zh-Hans": "早出后攻击",
+    "zh-Hant": "早出后攻擊"
+   },
+   "comment": {
+    "advanced": "2.Qh5 (or 2.Qf3) breaks the rule of early development; Black gains time by harassing the queen (...Nc6, ...g6, ...Nf6) and should come out better.",
+    "beginner": "An early queen raid aiming at f7, the idea of Scholar's Mate: defend with ...Nc6 and ...g6 or ...Qe7, then chase the queen with your pieces."
+   },
+   "review": [
+    "fr",
+    "de",
+    "es",
+    "ru",
+    "uk"
+   ],
+   "note": "\"Wayward Queen Attack\" has no settled translation; the proposal uses the alternative English name \"Parham Attack\" in fr/de/es/ru/uk.",
+   "lichess_rows": 4
+  },
+  {
+   "id": "halloween",
+   "family": "four_knights",
+   "side": "white",
+   "lichess": [
+    "Four Knights Game: Halloween Gambit"
+   ],
+   "names": {
+    "en": "Halloween Gambit",
+    "fr": "Gambit Halloween",
+    "de": "Halloween-Gambit",
+    "es": "Gambito Halloween",
+    "ru": "Гамбит Хэллоуин",
+    "uk": "Гамбіт Гелловін",
+    "ar": "جامبيت الهالوين",
+    "ja": "ハロウィン・ギャンビット",
+    "zh-Hans": "万圣节弃兵",
+    "zh-Hant": "萬聖節棄兵"
+   },
+   "comment": {
+    "advanced": "4.Nxe5 gives a knight for two pawns and a big centre: objectively unsound but dangerous in fast games."
+   },
+   "lichess_rows": 3
+  },
+  {
+   "id": "qgd_orthodox",
+   "family": "qgd",
+   "side": "black",
+   "lichess": [
+    "Queen's Gambit Declined: Orthodox Defense"
+   ],
+   "names": {
+    "en": "Orthodox Defense",
+    "fr": "Défense orthodoxe",
+    "de": "Orthodoxe Verteidigung",
+    "es": "Defensa ortodoxa",
+    "ru": "Ортодоксальная защита",
+    "uk": "Ортодоксальний захист",
+    "ar": "الدفاع الأرثوذكسي",
+    "ja": "オーソドックス・ディフェンス",
+    "zh-Hans": "正统防御",
+    "zh-Hant": "正統防禦"
+   },
+   "comment": {
+    "advanced": "The classical setup (...Be7, castling, ...Nbd7): solid but passive, freed by ...dxc4 with ...e5 or ...c5 (Capablanca's freeing manoeuvre)."
+   },
+   "lichess_rows": 39
+  },
+  {
+   "id": "qgd_exchange",
+   "family": "qgd",
+   "side": "white",
+   "lichess": [
+    "Queen's Gambit Declined: Exchange Variation"
+   ],
+   "names": {
+    "en": "Exchange Variation",
+    "fr": "Variante d'échange",
+    "de": "Abtauschvariante",
+    "es": "Variante del cambio",
+    "ru": "Разменный вариант",
+    "uk": "Розмінний варіант",
+    "ar": "متغير التبادل",
+    "ja": "エクスチェンジ・バリエーション",
+    "zh-Hans": "兑换变例",
+    "zh-Hant": "兌換變例"
+   },
+   "comment": {
+    "advanced": "cxd5 exd5 creates the Carlsbad structure; White's classic plan is the minority attack b4-b5 against Black's c6 pawn."
+   },
+   "lichess_rows": 12
+  },
+  {
+   "id": "semi_tarrasch",
+   "family": "qgd",
+   "side": "black",
+   "lichess": [
+    "Queen's Gambit Declined: Semi-Tarrasch Defense"
+   ],
+   "names": {
+    "en": "Semi-Tarrasch Defense",
+    "fr": "Défense semi-Tarrasch",
+    "de": "Halb-Tarrasch-Verteidigung",
+    "es": "Defensa semi-Tarrasch",
+    "ru": "Полутарраш",
+    "uk": "Напівтарраш",
+    "ar": "دفاع شبه تاراش",
+    "ja": "セミタラッシュ・ディフェンス",
+    "zh-Hans": "半塔拉什防御",
+    "zh-Hant": "半塔拉什防禦"
+   },
+   "comment": {
+    "advanced": "...c5 with the knight on f6 recaptures on d5 with a piece and avoids the isolated pawn of the Tarrasch; White gets a mobile centre."
+   },
+   "review": [
+    "ru",
+    "uk"
+   ],
+   "lichess_rows": 18
+  },
+  {
+   "id": "meran",
+   "family": "semi_slav",
+   "side": "black",
+   "lichess": [
+    "Semi-Slav Defense: Meran Variation"
+   ],
+   "names": {
+    "en": "Meran Variation",
+    "fr": "Variante Meran",
+    "de": "Meraner Variante",
+    "es": "Variante Merano",
+    "ru": "Меранский вариант",
+    "uk": "Меранський варіант",
+    "ar": "متغير ميران",
+    "ja": "メラン・バリエーション",
+    "zh-Hans": "梅兰变例",
+    "zh-Hant": "梅蘭變例"
+   },
+   "comment": {
+    "advanced": "...dxc4 and ...b5 gain queenside space with tempo; the play turns on the ...c5 break and White's e4-e5 push."
+   },
+   "lichess_rows": 16
+  },
+  {
+   "id": "kid_classical",
+   "family": "kings_indian",
+   "side": "white",
+   "lichess": [
+    "King's Indian Defense: Orthodox Variation"
+   ],
+   "names": {
+    "en": "Classical Variation",
+    "fr": "Variante classique",
+    "de": "Klassische Variante",
+    "es": "Variante clásica",
+    "ru": "Классический вариант",
+    "uk": "Класичний варіант",
+    "ar": "المتغير الكلاسيكي",
+    "ja": "クラシカル・バリエーション",
+    "zh-Hans": "古典变例",
+    "zh-Hant": "古典變例"
+   },
+   "comment": {
+    "advanced": "Nf3, Be2 and castling: after ...e5 and d5 the famous race begins, White on the queenside (c5), Black on the kingside (...f5, ...f4, ...g5)."
+   },
+   "note": "lichess calls it \"Orthodox Variation\".",
+   "lichess_rows": 22
+  },
+  {
+   "id": "kid_samisch",
+   "family": "kings_indian",
+   "side": "white",
+   "lichess": [
+    "King's Indian Defense: Sämisch Variation"
+   ],
+   "names": {
+    "en": "Sämisch Variation",
+    "fr": "Variante Sämisch",
+    "de": "Sämisch-Variante",
+    "es": "Variante Sämisch",
+    "ru": "Вариант Земиша",
+    "uk": "Варіант Земіша",
+    "ar": "متغير زيميش",
+    "ja": "ゼーミッシュ・バリエーション",
+    "zh-Hans": "塞米施变例",
+    "zh-Hant": "塞米施變例"
+   },
+   "comment": {
+    "advanced": "f3 supports e4 and prepares Be3, Qd2 and a kingside pawn storm; Black answers with ...c5, ...e5 or the ...Nc6, ...a6, ...b5 plan."
+   },
+   "lichess_rows": 18
+  },
+  {
+   "id": "kid_four_pawns",
+   "family": "kings_indian",
+   "side": "white",
+   "lichess": [
+    "King's Indian Defense: Four Pawns Attack"
+   ],
+   "names": {
+    "en": "Four Pawns Attack",
+    "fr": "Attaque des quatre pions",
+    "de": "Vierbauernangriff",
+    "es": "Ataque de los cuatro peones",
+    "ru": "Атака четырёх пешек",
+    "uk": "Атака чотирьох пішаків",
+    "ar": "هجوم البيادق الأربعة",
+    "ja": "フォー・ポーンズ・アタック",
+    "zh-Hans": "四兵攻击",
+    "zh-Hant": "四兵攻擊"
+   },
+   "comment": {
+    "advanced": "White builds a c4-d4-e4-f4 wall; Black undermines it at once with ...c5 and ...e6, leading to Benoni-like tactics."
+   },
+   "lichess_rows": 8
+  },
+  {
+   "id": "kid_fianchetto",
+   "family": "kings_indian",
+   "side": "white",
+   "lichess": [
+    "King's Indian Defense: Fianchetto Variation"
+   ],
+   "names": {
+    "en": "Fianchetto Variation",
+    "fr": "Variante du fianchetto",
+    "de": "Fianchetto-Variante",
+    "es": "Variante del fianchetto",
+    "ru": "Вариант с фианкетто",
+    "uk": "Варіант з фіанкето",
+    "ar": "متغير الفيانكيتو",
+    "ja": "フィアンケット・バリエーション",
+    "zh-Hans": "侧翼出象变例",
+    "zh-Hant": "側翼出象變例"
+   },
+   "comment": {
+    "advanced": "g3 and Bg2 blunt the g7 bishop; the game is more positional, with ...Nc6 and ...a6 or ...c6 and ...Qb6 plans for Black."
+   },
+   "lichess_rows": 27
+  },
+  {
+   "id": "nimzo_rubinstein",
+   "family": "nimzo_indian",
+   "side": "white",
+   "lichess": [
+    "Nimzo-Indian Defense: Rubinstein System",
+    "Nimzo-Indian Defense: Normal Variation"
+   ],
+   "names": {
+    "en": "Rubinstein Variation",
+    "fr": "Variante Rubinstein",
+    "de": "Rubinstein-Variante",
+    "es": "Variante Rubinstein",
+    "ru": "Вариант Рубинштейна",
+    "uk": "Варіант Рубінштейна",
+    "ar": "متغير روبنشتاين",
+    "ja": "ルビンシュタイン・バリエーション",
+    "zh-Hans": "鲁宾斯坦变例",
+    "zh-Hant": "魯賓斯坦變例"
+   },
+   "comment": {
+    "advanced": "4.e3 develops calmly and keeps Bd3, Ne2 or a3 in reserve: the most popular way to meet the Nimzo."
+   },
+   "lichess_rows": 28
+  },
+  {
+   "id": "nimzo_classical",
+   "family": "nimzo_indian",
+   "side": "white",
+   "lichess": [
+    "Nimzo-Indian Defense: Classical Variation"
+   ],
+   "names": {
+    "en": "Classical Variation",
+    "fr": "Variante classique",
+    "de": "Klassische Variante",
+    "es": "Variante clásica",
+    "ru": "Классический вариант",
+    "uk": "Класичний варіант",
+    "ar": "المتغير الكلاسيكي",
+    "ja": "クラシカル・バリエーション",
+    "zh-Hans": "古典变例",
+    "zh-Hant": "古典變例"
+   },
+   "comment": {
+    "advanced": "4.Qc2 avoids doubled pawns by recapturing on c3 with the queen; White gets the bishop pair, Black fast development."
+   },
+   "lichess_rows": 20
+  },
+  {
+   "id": "nimzo_samisch",
+   "family": "nimzo_indian",
+   "side": "white",
+   "lichess": [
+    "Nimzo-Indian Defense: Sämisch Variation"
+   ],
+   "names": {
+    "en": "Sämisch Variation",
+    "fr": "Variante Sämisch",
+    "de": "Sämisch-Variante",
+    "es": "Variante Sämisch",
+    "ru": "Вариант Земиша",
+    "uk": "Варіант Земіша",
+    "ar": "متغير زيميش",
+    "ja": "ゼーミッシュ・バリエーション",
+    "zh-Hans": "塞米施变例",
+    "zh-Hant": "塞米施變例"
+   },
+   "comment": {
+    "advanced": "4.a3 forces ...Bxc3+ at once; White accepts doubled c-pawns for the bishop pair and a big centre."
+   },
+   "lichess_rows": 11
+  },
+  {
+   "id": "grunfeld_exchange",
+   "family": "grunfeld",
+   "side": "white",
+   "lichess": [
+    "Grünfeld Defense: Exchange Variation"
+   ],
+   "names": {
+    "en": "Exchange Variation",
+    "fr": "Variante d'échange",
+    "de": "Abtauschvariante",
+    "es": "Variante del cambio",
+    "ru": "Разменный вариант",
+    "uk": "Розмінний варіант",
+    "ar": "متغير التبادل",
+    "ja": "エクスチェンジ・バリエーション",
+    "zh-Hans": "兑换变例",
+    "zh-Hant": "兌換變例"
+   },
+   "comment": {
+    "advanced": "cxd5 and e4 build the big centre; Black attacks d4 with ...c5, ...Nc6 and ...Bg4, and the endgames often favour Black's queenside majority."
+   },
+   "note": "lichess's shortest line ends with 4...Nxd5, so plain parity would credit Black: the curated side (White) is authoritative.",
+   "lichess_rows": 17
+  },
+  {
+   "id": "leningrad",
+   "family": "dutch",
+   "side": "black",
+   "lichess": [
+    "Dutch Defense: Leningrad Variation"
+   ],
+   "names": {
+    "en": "Leningrad Variation",
+    "fr": "Variante Leningrad",
+    "de": "Leningrader Variante",
+    "es": "Variante Leningrado",
+    "ru": "Ленинградский вариант",
+    "uk": "Ленінградський варіант",
+    "ar": "متغير لينينغراد",
+    "ja": "レニングラード・バリエーション",
+    "zh-Hans": "列宁格勒变例",
+    "zh-Hant": "列寧格勒變例"
+   },
+   "comment": {
+    "advanced": "...g6 and ...Bg7: a King's Indian-style Dutch in which Black plays for ...e5 and kingside play."
+   },
+   "lichess_rows": 5
+  },
+  {
+   "id": "stonewall_dutch",
+   "family": "dutch",
+   "side": "black",
+   "lichess": [
+    "Dutch Defense: Stonewall Variation"
+   ],
+   "names": {
+    "en": "Stonewall Variation",
+    "fr": "Variante Stonewall",
+    "de": "Stonewall-Variante",
+    "es": "Variante Stonewall",
+    "ru": "Вариант «Каменная стена»",
+    "uk": "Варіант «Кам'яна стіна»",
+    "ar": "متغير الجدار الحجري",
+    "ja": "ストーンウォール・バリエーション",
+    "zh-Hans": "石墙变例",
+    "zh-Hant": "石牆變例"
+   },
+   "comment": {
+    "advanced": "Pawns on c6, d5, e6 and f5 give Black a rock-solid grip on e4, at the cost of a hole on e5 and a passive light bishop."
+   },
+   "lichess_rows": 7
+  },
+  {
+   "id": "modern_benoni",
+   "family": "benoni",
+   "side": "black",
+   "lichess": [
+    "Benoni Defense: Modern Variation"
+   ],
+   "names": {
+    "en": "Modern Benoni",
+    "fr": "Benoni moderne",
+    "de": "Moderne Benoni",
+    "es": "Benoni moderna",
+    "ru": "Современная защита Бенони",
+    "uk": "Сучасний захист Беноні",
+    "ar": "بينوني الحديث",
+    "ja": "モダン・ベノニ",
+    "zh-Hans": "现代别诺尼",
+    "zh-Hant": "現代別諾尼"
+   },
+   "comment": {
+    "advanced": "...e6 and ...exd5 give Black a queenside majority against White's central majority; tactics around e5 and the g7 bishop dominate."
+   },
+   "lichess_rows": 2
+  },
+  {
+   "id": "catalan_open",
+   "family": "catalan",
+   "side": "black",
+   "lichess": [
+    "Catalan Opening: Open Defense"
+   ],
+   "names": {
+    "en": "Open Catalan",
+    "fr": "Catalane ouverte",
+    "de": "Offener Katalane",
+    "es": "Catalana abierta",
+    "ru": "Открытый каталон",
+    "uk": "Відкритий каталон",
+    "ar": "الكتالوني المفتوح",
+    "ja": "オープン・カタラン",
+    "zh-Hans": "开放卡塔兰",
+    "zh-Hant": "開放卡塔蘭"
+   },
+   "comment": {
+    "advanced": "...dxc4 takes the pawn; White wins it back with Qc2 or Qa4 and keeps long-diagonal pressure, Black aims for ...c5 or ...b5 and ...Bb7."
+   },
+   "note": "lichess's shortest line ends with 4.Bg2 (parity: White); the choice of ...dxc4 is Black's.",
+   "lichess_rows": 9
+  },
+  {
+   "id": "catalan_closed",
+   "family": "catalan",
+   "side": "black",
+   "lichess": [
+    "Catalan Opening: Closed"
+   ],
+   "names": {
+    "en": "Closed Catalan",
+    "fr": "Catalane fermée",
+    "de": "Geschlossener Katalane",
+    "es": "Catalana cerrada",
+    "ru": "Закрытый каталон",
+    "uk": "Закритий каталон",
+    "ar": "الكتالوني المغلق",
+    "ja": "クローズド・カタラン",
+    "zh-Hans": "封闭卡塔兰",
+    "zh-Hant": "封閉卡塔蘭"
+   },
+   "comment": {
+    "advanced": "Black keeps d5 with ...Be7, ...c6 and ...Nbd7: a slow positional fight around the ...e5 or ...b6 and ...Bb7 freeing plans."
+   },
+   "lichess_rows": 17
+  },
+  {
+   "id": "english_symmetrical",
+   "family": "english",
+   "side": "black",
+   "lichess": [
+    "English Opening: Symmetrical Variation"
+   ],
+   "names": {
+    "en": "Symmetrical Variation",
+    "fr": "Variante symétrique",
+    "de": "Symmetrische Variante",
+    "es": "Variante simétrica",
+    "ru": "Симметричный вариант",
+    "uk": "Симетричний варіант",
+    "ar": "المتغير المتماثل",
+    "ja": "シンメトリカル・バリエーション",
+    "zh-Hans": "对称变例",
+    "zh-Hant": "對稱變例"
+   },
+   "comment": {
+    "advanced": "1...c5 copies White: slow manoeuvring with fianchettoes, pressure on d4 and d5, and Hedgehog or Maróczy-type structures."
+   },
+   "lichess_rows": 35
+  },
+  {
+   "id": "kings_english",
+   "family": "english",
+   "side": "black",
+   "lichess": [
+    "English Opening: King's English Variation"
+   ],
+   "names": {
+    "en": "Reversed Sicilian",
+    "fr": "Sicilienne inversée",
+    "de": "Sizilianisch im Anzuge",
+    "es": "Siciliana invertida",
+    "ru": "Сицилианская с переменой цвета",
+    "uk": "Сицилійський з переміною кольорів",
+    "ar": "الصقلي المعكوس",
+    "ja": "リバースド・シシリアン",
+    "zh-Hans": "反西西里",
+    "zh-Hant": "反西西里"
+   },
+   "comment": {
+    "advanced": "1...e5 turns the English into a Sicilian with an extra tempo for White; typical plans are g3 and Bg2 with d3 and a queenside push."
+   },
+   "review": [
+    "ru",
+    "uk"
+   ],
+   "lichess_rows": 53
+  },
+  {
+   "id": "alekhine_four_pawns",
+   "family": "alekhine",
+   "side": "white",
+   "lichess": [
+    "Alekhine Defense: Four Pawns Attack"
+   ],
+   "names": {
+    "en": "Four Pawns Attack",
+    "fr": "Attaque des quatre pions",
+    "de": "Vierbauernangriff",
+    "es": "Ataque de los cuatro peones",
+    "ru": "Атака четырёх пешек",
+    "uk": "Атака чотирьох пішаків",
+    "ar": "هجوم البيادق الأربعة",
+    "ja": "フォー・ポーンズ・アタック",
+    "zh-Hans": "四兵攻击",
+    "zh-Hant": "四兵攻擊"
+   },
+   "comment": {
+    "advanced": "White chases the knight with c4, e5 and f4 and builds a huge but overextended centre; Black counters with ...dxe5, ...c5 and ...Bf5."
+   },
+   "lichess_rows": 8
+  },
+  {
+   "id": "alekhine_modern",
+   "family": "alekhine",
+   "side": "white",
+   "lichess": [
+    "Alekhine Defense: Modern Variation"
+   ],
+   "names": {
+    "en": "Modern Variation",
+    "fr": "Variante moderne",
+    "de": "Moderne Variante",
+    "es": "Variante moderna",
+    "ru": "Современный вариант",
+    "uk": "Сучасний варіант",
+    "ar": "المتغير الحديث",
+    "ja": "モダン・バリエーション",
+    "zh-Hans": "现代变例",
+    "zh-Hant": "現代變例"
+   },
+   "comment": {
+    "advanced": "4.Nf3 keeps a solid space advantage without overextending; Black pins with ...Bg4 or fianchettoes with ...g6."
+   },
+   "lichess_rows": 12
+  },
+  {
+   "id": "pirc_austrian",
+   "family": "pirc",
+   "side": "white",
+   "lichess": [
+    "Pirc Defense: Austrian Attack"
+   ],
+   "names": {
+    "en": "Austrian Attack",
+    "fr": "Attaque autrichienne",
+    "de": "Österreichischer Angriff",
+    "es": "Ataque austriaco",
+    "ru": "Австрийская атака",
+    "uk": "Австрійська атака",
+    "ar": "الهجوم النمساوي",
+    "ja": "オーストリアン・アタック",
+    "zh-Hans": "奥地利攻击",
+    "zh-Hant": "奧地利攻擊"
+   },
+   "comment": {
+    "advanced": "f4 builds a big centre for e5 or a kingside attack; Black strikes with ...c5, or castles and plays ...c5 or ...e5."
+   },
+   "lichess_rows": 8
+  },
+  {
+   "id": "falkbeer",
+   "family": "kgd",
+   "side": "black",
+   "lichess": [
+    "King's Gambit Declined: Falkbeer Countergambit"
+   ],
+   "names": {
+    "en": "Falkbeer Countergambit",
+    "fr": "Contre-gambit Falkbeer",
+    "de": "Falkbeer-Gegengambit",
+    "es": "Contragambito Falkbeer",
+    "ru": "Контргамбит Фалькбеера",
+    "uk": "Контргамбіт Фалькбеєра",
+    "ar": "جامبيت فالكبير المضاد",
+    "ja": "ファルクビア・カウンターギャンビット",
+    "zh-Hans": "法尔克比尔反弃兵",
+    "zh-Hant": "法爾克比爾反棄兵"
+   },
+   "comment": {
+    "advanced": "2...d5 strikes back in the centre instead of taking on f4; modern practice favours 3.exd5 with ...exf4 or ...e4 lines."
+   },
+   "lichess_rows": 21
+  }
+ ],
+ "glossary": {
+  "Variation": {
+   "en": "Variation",
+   "fr": "variante",
+   "de": "Variante",
+   "es": "variante",
+   "ru": "вариант",
+   "uk": "варіант",
+   "ar": "متغير",
+   "ja": "バリエーション",
+   "zh-Hans": "变例",
+   "zh-Hant": "變例",
+   "compose": {
+    "fr": "variante {X}",
+    "de": "{X}-Variante",
+    "es": "variante {X}",
+    "ru": "вариант {Xgen}",
+    "uk": "варіант {Xgen}",
+    "ar": "متغير {X}",
+    "ja": "{X}・バリエーション",
+    "zh-Hans": "{X}变例",
+    "zh-Hant": "{X}變例"
+   }
+  },
+  "Attack": {
+   "en": "Attack",
+   "fr": "attaque",
+   "de": "Angriff",
+   "es": "ataque",
+   "ru": "атака",
+   "uk": "атака",
+   "ar": "هجوم",
+   "ja": "アタック",
+   "zh-Hans": "攻击",
+   "zh-Hant": "攻擊",
+   "compose": {
+    "fr": "attaque {X}",
+    "de": "{X}-Angriff",
+    "es": "ataque {X}",
+    "ru": "атака {Xgen}",
+    "uk": "атака {Xgen}",
+    "ar": "هجوم {X}",
+    "ja": "{X}・アタック",
+    "zh-Hans": "{X}攻击",
+    "zh-Hant": "{X}攻擊"
+   }
+  },
+  "Gambit": {
+   "en": "Gambit",
+   "fr": "gambit",
+   "de": "Gambit",
+   "es": "gambito",
+   "ru": "гамбит",
+   "uk": "гамбіт",
+   "ar": "جامبيت",
+   "ja": "ギャンビット",
+   "zh-Hans": "弃兵",
+   "zh-Hant": "棄兵",
+   "compose": {
+    "fr": "gambit {X}",
+    "de": "{X}-Gambit",
+    "es": "gambito {X}",
+    "ru": "гамбит {Xgen}",
+    "uk": "гамбіт {Xgen}",
+    "ar": "جامبيت {X}",
+    "ja": "{X}・ギャンビット",
+    "zh-Hans": "{X}弃兵",
+    "zh-Hant": "{X}棄兵"
+   }
+  },
+  "Defense": {
+   "en": "Defense",
+   "fr": "défense",
+   "de": "Verteidigung",
+   "es": "defensa",
+   "ru": "защита",
+   "uk": "захист",
+   "ar": "دفاع",
+   "ja": "ディフェンス",
+   "zh-Hans": "防御",
+   "zh-Hant": "防禦",
+   "compose": {
+    "fr": "défense {X}",
+    "de": "{X}-Verteidigung",
+    "es": "defensa {X}",
+    "ru": "защита {Xgen}",
+    "uk": "захист {Xgen}",
+    "ar": "دفاع {X}",
+    "ja": "{X}・ディフェンス",
+    "zh-Hans": "{X}防御",
+    "zh-Hant": "{X}防禦"
+   }
+  },
+  "System": {
+   "en": "System",
+   "fr": "système",
+   "de": "System",
+   "es": "sistema",
+   "ru": "система",
+   "uk": "система",
+   "ar": "نظام",
+   "ja": "システム",
+   "zh-Hans": "体系",
+   "zh-Hant": "體系",
+   "compose": {
+    "fr": "système {X}",
+    "de": "{X}-System",
+    "es": "sistema {X}",
+    "ru": "система {Xgen}",
+    "uk": "система {Xgen}",
+    "ar": "نظام {X}",
+    "ja": "{X}・システム",
+    "zh-Hans": "{X}体系",
+    "zh-Hant": "{X}體系"
+   }
+  },
+  "Countergambit": {
+   "en": "Countergambit",
+   "fr": "contre-gambit",
+   "de": "Gegengambit",
+   "es": "contragambito",
+   "ru": "контргамбит",
+   "uk": "контргамбіт",
+   "ar": "جامبيت مضاد",
+   "ja": "カウンターギャンビット",
+   "zh-Hans": "反弃兵",
+   "zh-Hant": "反棄兵",
+   "compose": {
+    "fr": "contre-gambit {X}",
+    "de": "{X}-Gegengambit",
+    "es": "contragambito {X}",
+    "ru": "контргамбит {Xgen}",
+    "uk": "контргамбіт {Xgen}",
+    "ar": "جامبيت {X} المضاد",
+    "ja": "{X}・カウンターギャンビット",
+    "zh-Hans": "{X}反弃兵",
+    "zh-Hant": "{X}反棄兵"
+   }
+  },
+  "Counterattack": {
+   "en": "Counterattack",
+   "fr": "contre-attaque",
+   "de": "Gegenangriff",
+   "es": "contraataque",
+   "ru": "контратака",
+   "uk": "контратака",
+   "ar": "هجوم مضاد",
+   "ja": "カウンターアタック",
+   "zh-Hans": "反击",
+   "zh-Hant": "反擊",
+   "compose": {
+    "fr": "contre-attaque {X}",
+    "de": "{X}-Gegenangriff",
+    "es": "contraataque {X}",
+    "ru": "контратака {Xgen}",
+    "uk": "контратака {Xgen}",
+    "ar": "هجوم {X} المضاد",
+    "ja": "{X}・カウンターアタック",
+    "zh-Hans": "{X}反击",
+    "zh-Hant": "{X}反擊"
+   }
+  },
+  "Opening": {
+   "en": "Opening",
+   "fr": "ouverture",
+   "de": "Eröffnung",
+   "es": "apertura",
+   "ru": "дебют",
+   "uk": "дебют",
+   "ar": "افتتاح",
+   "ja": "オープニング",
+   "zh-Hans": "开局",
+   "zh-Hant": "開局",
+   "compose": {
+    "fr": "ouverture {X}",
+    "de": "{X}-Eröffnung",
+    "es": "apertura {X}",
+    "ru": "дебют {Xgen}",
+    "uk": "дебют {Xgen}",
+    "ar": "افتتاح {X}",
+    "ja": "{X}・オープニング",
+    "zh-Hans": "{X}开局",
+    "zh-Hant": "{X}開局"
+   }
+  },
+  "Game": {
+   "en": "Game",
+   "fr": "partie",
+   "de": "Partie",
+   "es": "partida",
+   "ru": "партия",
+   "uk": "партія",
+   "ar": "افتتاح",
+   "ja": "ゲーム",
+   "zh-Hans": "开局",
+   "zh-Hant": "開局"
+  },
+  "Line": {
+   "en": "Line",
+   "fr": "ligne",
+   "de": "Abspiel",
+   "es": "línea",
+   "ru": "продолжение",
+   "uk": "продовження",
+   "ar": "خط",
+   "ja": "ライン",
+   "zh-Hans": "变着",
+   "zh-Hant": "變著",
+   "compose": {
+    "fr": "ligne {X}",
+    "de": "{X}-Abspiel",
+    "es": "línea {X}",
+    "ru": "продолжение {Xgen}",
+    "uk": "продовження {Xgen}",
+    "ar": "خط {X}",
+    "ja": "{X}・ライン",
+    "zh-Hans": "{X}变着",
+    "zh-Hant": "{X}變著"
+   }
+  },
+  "Formation": {
+   "en": "Formation",
+   "fr": "formation",
+   "de": "Aufstellung",
+   "es": "formación",
+   "ru": "построение",
+   "uk": "побудова",
+   "ar": "تشكيل",
+   "ja": "フォーメーション",
+   "zh-Hans": "阵型",
+   "zh-Hant": "陣型"
+  },
+  "Trap": {
+   "en": "Trap",
+   "fr": "piège",
+   "de": "Falle",
+   "es": "trampa",
+   "ru": "ловушка",
+   "uk": "пастка",
+   "ar": "فخ",
+   "ja": "トラップ",
+   "zh-Hans": "陷阱",
+   "zh-Hant": "陷阱",
+   "compose": {
+    "fr": "piège {X}",
+    "de": "{X}-Falle",
+    "es": "trampa {X}",
+    "ru": "ловушка {Xgen}",
+    "uk": "пастка {Xgen}",
+    "ar": "فخ {X}",
+    "ja": "{X}・トラップ",
+    "zh-Hans": "{X}陷阱",
+    "zh-Hant": "{X}陷阱"
+   }
+  },
+  "Accepted": {
+   "en": "Accepted",
+   "fr": "accepté",
+   "de": "angenommen",
+   "es": "aceptado",
+   "ru": "принятый",
+   "uk": "прийнятий",
+   "ar": "المقبول",
+   "ja": "アクセプテッド",
+   "zh-Hans": "接受",
+   "zh-Hant": "接受"
+  },
+  "Declined": {
+   "en": "Declined",
+   "fr": "refusé",
+   "de": "abgelehnt",
+   "es": "rehusado",
+   "ru": "отказанный",
+   "uk": "відмовлений",
+   "ar": "المرفوض",
+   "ja": "ディクラインド",
+   "zh-Hans": "拒",
+   "zh-Hant": "拒"
+  },
+  "Exchange Variation": {
+   "en": "Exchange Variation",
+   "fr": "variante d'échange",
+   "de": "Abtauschvariante",
+   "es": "variante del cambio",
+   "ru": "разменный вариант",
+   "uk": "розмінний варіант",
+   "ar": "متغير التبادل",
+   "ja": "エクスチェンジ・バリエーション",
+   "zh-Hans": "兑换变例",
+   "zh-Hant": "兌換變例"
+  },
+  "Advance Variation": {
+   "en": "Advance Variation",
+   "fr": "variante d'avance",
+   "de": "Vorstoßvariante",
+   "es": "variante del avance",
+   "ru": "вариант продвижения",
+   "uk": "варіант просування",
+   "ar": "متغير التقدم",
+   "ja": "アドバンス・バリエーション",
+   "zh-Hans": "推进变例",
+   "zh-Hant": "推進變例"
+  },
+  "Classical Variation": {
+   "en": "Classical Variation",
+   "fr": "variante classique",
+   "de": "Klassische Variante",
+   "es": "variante clásica",
+   "ru": "классический вариант",
+   "uk": "класичний варіант",
+   "ar": "المتغير الكلاسيكي",
+   "ja": "クラシカル・バリエーション",
+   "zh-Hans": "古典变例",
+   "zh-Hant": "古典變例"
+  },
+  "Modern Variation": {
+   "en": "Modern Variation",
+   "fr": "variante moderne",
+   "de": "Moderne Variante",
+   "es": "variante moderna",
+   "ru": "современный вариант",
+   "uk": "сучасний варіант",
+   "ar": "المتغير الحديث",
+   "ja": "モダン・バリエーション",
+   "zh-Hans": "现代变例",
+   "zh-Hant": "現代變例"
+  },
+  "Open Variation": {
+   "en": "Open Variation",
+   "fr": "variante ouverte",
+   "de": "Offene Variante",
+   "es": "variante abierta",
+   "ru": "открытый вариант",
+   "uk": "відкритий варіант",
+   "ar": "المتغير المفتوح",
+   "ja": "オープン・バリエーション",
+   "zh-Hans": "开放变例",
+   "zh-Hant": "開放變例"
+  },
+  "Closed Variation": {
+   "en": "Closed Variation",
+   "fr": "variante fermée",
+   "de": "Geschlossene Variante",
+   "es": "variante cerrada",
+   "ru": "закрытый вариант",
+   "uk": "закритий варіант",
+   "ar": "المتغير المغلق",
+   "ja": "クローズド・バリエーション",
+   "zh-Hans": "封闭变例",
+   "zh-Hant": "封閉變例"
+  },
+  "Fianchetto Variation": {
+   "en": "Fianchetto Variation",
+   "fr": "variante du fianchetto",
+   "de": "Fianchetto-Variante",
+   "es": "variante del fianchetto",
+   "ru": "вариант с фианкетто",
+   "uk": "варіант з фіанкето",
+   "ar": "متغير الفيانكيتو",
+   "ja": "フィアンケット・バリエーション",
+   "zh-Hans": "侧翼出象变例",
+   "zh-Hant": "側翼出象變例"
+  },
+  "Symmetrical Variation": {
+   "en": "Symmetrical Variation",
+   "fr": "variante symétrique",
+   "de": "Symmetrische Variante",
+   "es": "variante simétrica",
+   "ru": "симметричный вариант",
+   "uk": "симетричний варіант",
+   "ar": "المتغير المتماثل",
+   "ja": "シンメトリカル・バリエーション",
+   "zh-Hans": "对称变例",
+   "zh-Hant": "對稱變例"
+  },
+  "Main Line": {
+   "en": "Main Line",
+   "fr": "ligne principale",
+   "de": "Hauptvariante",
+   "es": "línea principal",
+   "ru": "главная линия",
+   "uk": "головна лінія",
+   "ar": "الخط الرئيسي",
+   "ja": "メインライン",
+   "zh-Hans": "主线",
+   "zh-Hant": "主線"
+  },
+  "Accelerated": {
+   "en": "Accelerated",
+   "fr": "accéléré",
+   "de": "beschleunigt",
+   "es": "acelerado",
+   "ru": "ускоренный",
+   "uk": "прискорений",
+   "ar": "المعجّل",
+   "ja": "アクセラレーテッド",
+   "zh-Hans": "加速",
+   "zh-Hant": "加速"
+  },
+  "Deferred": {
+   "en": "Deferred",
+   "fr": "différé",
+   "de": "verzögert",
+   "es": "diferido",
+   "ru": "отложенный",
+   "uk": "відкладений",
+   "ar": "المؤجل",
+   "ja": "ディファード",
+   "zh-Hans": "延迟",
+   "zh-Hant": "延遲"
+  },
+  "Reversed": {
+   "en": "Reversed",
+   "fr": "inversé",
+   "de": "mit vertauschten Farben",
+   "es": "invertido",
+   "ru": "с переменой цвета",
+   "uk": "з переміною кольорів",
+   "ar": "المعكوس",
+   "ja": "リバースド",
+   "zh-Hans": "反",
+   "zh-Hant": "反"
+  }
+ },
+ "eponyms": {
+  "Steinitz": {
+   "ru": {
+    "nom": "Стейниц",
+    "gen": "Стейница"
+   },
+   "uk": {
+    "nom": "Стейніц",
+    "gen": "Стейніца"
+   },
+   "ar": "شتاينيتز",
+   "ja": "シュタイニッツ",
+   "zh-Hans": "斯坦尼茨",
+   "zh-Hant": "斯坦尼茨"
+  },
+  "Rubinstein": {
+   "ru": {
+    "nom": "Рубинштейн",
+    "gen": "Рубинштейна"
+   },
+   "uk": {
+    "nom": "Рубінштейн",
+    "gen": "Рубінштейна"
+   },
+   "ar": "روبنشتاين",
+   "ja": "ルビンシュタイン",
+   "zh-Hans": "鲁宾斯坦",
+   "zh-Hant": "魯賓斯坦"
+  },
+  "Winawer": {
+   "ru": {
+    "nom": "Винавер",
+    "gen": "Винавера"
+   },
+   "uk": {
+    "nom": "Винавер",
+    "gen": "Винавера"
+   },
+   "ar": "فيناور",
+   "ja": "ウィナワー",
+   "zh-Hans": "维纳维尔",
+   "zh-Hant": "維納維爾"
+  },
+  "Evans": {
+   "ru": {
+    "nom": "Эванс",
+    "gen": "Эванса"
+   },
+   "uk": {
+    "nom": "Еванс",
+    "gen": "Еванса"
+   },
+   "ar": "إيفانز",
+   "ja": "エバンス",
+   "zh-Hans": "埃文斯",
+   "zh-Hant": "埃文斯"
+  },
+  "Chigorin": {
+   "ru": {
+    "nom": "Чигорин",
+    "gen": "Чигорина"
+   },
+   "uk": {
+    "nom": "Чигорін",
+    "gen": "Чигоріна"
+   },
+   "ar": "تشيغورين",
+   "ja": "チゴリン",
+   "zh-Hans": "奇戈林",
+   "zh-Hant": "奇戈林"
+  },
+  "Morphy": {
+   "ru": {
+    "nom": "Морфи",
+    "gen": "Морфи"
+   },
+   "uk": {
+    "nom": "Морфі",
+    "gen": "Морфі"
+   },
+   "ar": "مورفي",
+   "ja": "モーフィー",
+   "zh-Hans": "莫菲",
+   "zh-Hant": "莫菲"
+  },
+  "Tarrasch": {
+   "ru": {
+    "nom": "Тарраш",
+    "gen": "Тарраша"
+   },
+   "uk": {
+    "nom": "Тарраш",
+    "gen": "Тарраша"
+   },
+   "ar": "تاراش",
+   "ja": "タラッシュ",
+   "zh-Hans": "塔拉什",
+   "zh-Hant": "塔拉什"
+  },
+  "Alekhine": {
+   "ru": {
+    "nom": "Алехин",
+    "gen": "Алехина"
+   },
+   "uk": {
+    "nom": "Альохін",
+    "gen": "Альохіна"
+   },
+   "ar": "أليخين",
+   "ja": "アレヒン",
+   "zh-Hans": "阿廖欣",
+   "zh-Hant": "阿廖欣"
+  },
+  "Sämisch": {
+   "ru": {
+    "nom": "Земиш",
+    "gen": "Земиша"
+   },
+   "uk": {
+    "nom": "Земіш",
+    "gen": "Земіша"
+   },
+   "ar": "زيميش",
+   "ja": "ゼーミッシュ",
+   "zh-Hans": "塞米施",
+   "zh-Hant": "塞米施"
+  },
+  "Nimzowitsch": {
+   "ru": {
+    "nom": "Нимцович",
+    "gen": "Нимцовича"
+   },
+   "uk": {
+    "nom": "Німцович",
+    "gen": "Німцовича"
+   },
+   "ar": "نيمزوفيتش",
+   "ja": "ニムゾヴィッチ",
+   "zh-Hans": "尼姆佐维奇",
+   "zh-Hant": "尼姆佐維奇"
+  },
+  "Najdorf": {
+   "ru": {
+    "nom": "Найдорф",
+    "gen": "Найдорфа"
+   },
+   "uk": {
+    "nom": "Найдорф",
+    "gen": "Найдорфа"
+   },
+   "ar": "نايدورف",
+   "ja": "ナイドルフ",
+   "zh-Hans": "纳道尔夫",
+   "zh-Hant": "納道爾夫"
+  },
+  "Bogoljubow": {
+   "ru": {
+    "nom": "Боголюбов",
+    "gen": "Боголюбова"
+   },
+   "uk": {
+    "nom": "Боголюбов",
+    "gen": "Боголюбова"
+   },
+   "ar": "بوغوليوبوف",
+   "ja": "ボゴリュボフ",
+   "zh-Hans": "博戈柳博夫",
+   "zh-Hant": "博戈柳博夫"
+  },
+  "Alapin": {
+   "ru": {
+    "nom": "Алапин",
+    "gen": "Алапина"
+   },
+   "uk": {
+    "nom": "Алапін",
+    "gen": "Алапіна"
+   },
+   "ar": "ألابين",
+   "ja": "アラピン",
+   "zh-Hans": "阿拉平",
+   "zh-Hant": "阿拉平"
+  },
+  "Botvinnik": {
+   "ru": {
+    "nom": "Ботвинник",
+    "gen": "Ботвинника"
+   },
+   "uk": {
+    "nom": "Ботвинник",
+    "gen": "Ботвинника"
+   },
+   "ar": "بوتفينيك",
+   "ja": "ボトヴィニク",
+   "zh-Hans": "鲍特温尼克",
+   "zh-Hant": "鮑特溫尼克"
+  },
+  "Paulsen": {
+   "ru": {
+    "nom": "Паульсен",
+    "gen": "Паульсена"
+   },
+   "uk": {
+    "nom": "Паульсен",
+    "gen": "Паульсена"
+   },
+   "ar": "باولسن",
+   "ja": "パウルセン",
+   "zh-Hans": "保尔森",
+   "zh-Hant": "保爾森"
+  },
+  "Marshall": {
+   "ru": {
+    "nom": "Маршалл",
+    "gen": "Маршалла"
+   },
+   "uk": {
+    "nom": "Маршалл",
+    "gen": "Маршалла"
+   },
+   "ar": "مارشال",
+   "ja": "マーシャル",
+   "zh-Hans": "马歇尔",
+   "zh-Hant": "馬歇爾"
+  },
+  "Kieseritzky": {
+   "ru": {
+    "nom": "Кизерицкий",
+    "gen": "Кизерицкого"
+   },
+   "uk": {
+    "nom": "Кізерицький",
+    "gen": "Кізерицького"
+   },
+   "ar": "كيزيريتسكي",
+   "ja": "キーゼリツキー",
+   "zh-Hans": "基塞利茨基",
+   "zh-Hant": "基塞利茨基"
+  },
+  "Panov": {
+   "ru": {
+    "nom": "Панов",
+    "gen": "Панова"
+   },
+   "uk": {
+    "nom": "Панов",
+    "gen": "Панова"
+   },
+   "ar": "بانوف",
+   "ja": "パノフ",
+   "zh-Hans": "潘诺夫",
+   "zh-Hant": "潘諾夫"
+  },
+  "Keres": {
+   "ru": {
+    "nom": "Керес",
+    "gen": "Кереса"
+   },
+   "uk": {
+    "nom": "Керес",
+    "gen": "Кереса"
+   },
+   "ar": "كيريس",
+   "ja": "ケレス",
+   "zh-Hans": "凯列斯",
+   "zh-Hant": "凱列斯"
+  },
+  "Tartakower": {
+   "ru": {
+    "nom": "Тартаковер",
+    "gen": "Тартаковера"
+   },
+   "uk": {
+    "nom": "Тартаковер",
+    "gen": "Тартаковера"
+   },
+   "ar": "تارتاكوفر",
+   "ja": "タルタコワ",
+   "zh-Hans": "塔塔科维",
+   "zh-Hant": "塔塔科維"
+  },
+  "Maróczy": {
+   "ru": {
+    "nom": "Мароци",
+    "gen": "Мароци"
+   },
+   "uk": {
+    "nom": "Мароці",
+    "gen": "Мароці"
+   },
+   "ar": "ماروتشي",
+   "ja": "マロッツィ",
+   "zh-Hans": "马罗齐",
+   "zh-Hant": "馬羅齊"
+  },
+  "Falkbeer": {
+   "ru": {
+    "nom": "Фалькбеер",
+    "gen": "Фалькбеера"
+   },
+   "uk": {
+    "nom": "Фалькбеєр",
+    "gen": "Фалькбеєра"
+   },
+   "ar": "فالكبير",
+   "ja": "ファルクビア",
+   "zh-Hans": "法尔克比尔",
+   "zh-Hant": "法爾克比爾"
+  },
+  "Scheveningen": {
+   "ru": {
+    "nom": "Схевенинген",
+    "gen": "Схевенингена"
+   },
+   "uk": {
+    "nom": "Схевенінген",
+    "gen": "Схевенінгена"
+   },
+   "ar": "شيفينينغن",
+   "ja": "シェベニンゲン",
+   "zh-Hans": "舍维宁根",
+   "zh-Hant": "舍維寧根"
+  },
+  "Richter-Rauzer": {
+   "ru": {
+    "nom": "Рихтер — Раузер",
+    "gen": "Рихтера — Раузера"
+   },
+   "uk": {
+    "nom": "Ріхтер — Раузер",
+    "gen": "Ріхтера — Раузера"
+   },
+   "ar": "ريختر-راوزر",
+   "ja": "リヒター・ラウザー",
+   "zh-Hans": "里希特-劳泽",
+   "zh-Hant": "里希特-勞澤"
+  },
+  "Lasker": {
+   "ru": {
+    "nom": "Ласкер",
+    "gen": "Ласкера"
+   },
+   "uk": {
+    "nom": "Ласкер",
+    "gen": "Ласкера"
+   },
+   "ar": "لاسكر",
+   "ja": "ラスカー",
+   "zh-Hans": "拉斯克",
+   "zh-Hant": "拉斯克"
+  },
+  "Taimanov": {
+   "ru": {
+    "nom": "Тайманов",
+    "gen": "Тайманова"
+   },
+   "uk": {
+    "nom": "Тайманов",
+    "gen": "Тайманова"
+   },
+   "ar": "تايمانوف",
+   "ja": "タイマノフ",
+   "zh-Hans": "泰曼诺夫",
+   "zh-Hant": "泰曼諾夫"
+  },
+  "Smyslov": {
+   "ru": {
+    "nom": "Смыслов",
+    "gen": "Смыслова"
+   },
+   "uk": {
+    "nom": "Смислов",
+    "gen": "Смислова"
+   },
+   "ar": "سميسلوف",
+   "ja": "スミスロフ",
+   "zh-Hans": "斯梅斯洛夫",
+   "zh-Hant": "斯梅斯洛夫"
+  },
+  "Spassky": {
+   "ru": {
+    "nom": "Спасский",
+    "gen": "Спасского"
+   },
+   "uk": {
+    "nom": "Спаський",
+    "gen": "Спаського"
+   },
+   "ar": "سباسكي",
+   "ja": "スパスキー",
+   "zh-Hans": "斯帕斯基",
+   "zh-Hant": "斯帕斯基"
+  },
+  "Spielmann": {
+   "ru": {
+    "nom": "Шпильман",
+    "gen": "Шпильмана"
+   },
+   "uk": {
+    "nom": "Шпільман",
+    "gen": "Шпільмана"
+   },
+   "ar": "شبيلمان",
+   "ja": "シュピールマン",
+   "zh-Hans": "施皮尔曼",
+   "zh-Hant": "施皮爾曼"
+  },
+  "Averbakh": {
+   "ru": {
+    "nom": "Авербах",
+    "gen": "Авербаха"
+   },
+   "uk": {
+    "nom": "Авербах",
+    "gen": "Авербаха"
+   },
+   "ar": "أفرباخ",
+   "ja": "アヴェルバッハ",
+   "zh-Hans": "阿韦尔巴赫",
+   "zh-Hant": "阿韋爾巴赫"
+  },
+  "Greco": {
+   "ru": {
+    "nom": "Греко",
+    "gen": "Греко"
+   },
+   "uk": {
+    "nom": "Греко",
+    "gen": "Греко"
+   },
+   "ar": "غريكو",
+   "ja": "グレコ",
+   "zh-Hans": "格雷科",
+   "zh-Hant": "格雷科"
+  },
+  "Capablanca": {
+   "ru": {
+    "nom": "Капабланка",
+    "gen": "Капабланки"
+   },
+   "uk": {
+    "nom": "Капабланка",
+    "gen": "Капабланки"
+   },
+   "ar": "كابابلانكا",
+   "ja": "カパブランカ",
+   "zh-Hans": "卡帕布兰卡",
+   "zh-Hant": "卡帕布蘭卡"
+  },
+  "Kan": {
+   "ru": {
+    "nom": "Кан",
+    "gen": "Кана"
+   },
+   "uk": {
+    "nom": "Кан",
+    "gen": "Кана"
+   },
+   "ar": "كان",
+   "ja": "カン",
+   "zh-Hans": "坎恩",
+   "zh-Hant": "坎恩"
+  },
+  "Albin": {
+   "ru": {
+    "nom": "Альбин",
+    "gen": "Альбина"
+   },
+   "uk": {
+    "nom": "Альбін",
+    "gen": "Альбіна"
+   },
+   "ar": "ألبين",
+   "ja": "アルビン",
+   "zh-Hans": "阿尔宾",
+   "zh-Hant": "阿爾賓"
+  },
+  "Breyer": {
+   "ru": {
+    "nom": "Брейер",
+    "gen": "Брейера"
+   },
+   "uk": {
+    "nom": "Брейєр",
+    "gen": "Брейєра"
+   },
+   "ar": "براير",
+   "ja": "ブレイヤー",
+   "zh-Hans": "布雷耶",
+   "zh-Hant": "布雷耶"
+  },
+  "Schlechter": {
+   "ru": {
+    "nom": "Шлехтер",
+    "gen": "Шлехтера"
+   },
+   "uk": {
+    "nom": "Шлехтер",
+    "gen": "Шлехтера"
+   },
+   "ar": "شليختر",
+   "ja": "シュレヒター",
+   "zh-Hans": "施莱希特",
+   "zh-Hant": "施萊希特"
+  },
+  "Jaenisch": {
+   "ru": {
+    "nom": "Яниш",
+    "gen": "Яниша"
+   },
+   "uk": {
+    "nom": "Яніш",
+    "gen": "Яніша"
+   },
+   "ar": "يانيش",
+   "ja": "ヤーニッシュ",
+   "zh-Hans": "雅尼施",
+   "zh-Hant": "雅尼施"
+  },
+  "Karpov": {
+   "ru": {
+    "nom": "Карпов",
+    "gen": "Карпова"
+   },
+   "uk": {
+    "nom": "Карпов",
+    "gen": "Карпова"
+   },
+   "ar": "كاربوف",
+   "ja": "カルポフ",
+   "zh-Hans": "卡尔波夫",
+   "zh-Hant": "卡爾波夫"
+  },
+  "Petrosian": {
+   "ru": {
+    "nom": "Петросян",
+    "gen": "Петросяна"
+   },
+   "uk": {
+    "nom": "Петросян",
+    "gen": "Петросяна"
+   },
+   "ar": "بتروسيان",
+   "ja": "ペトロシアン",
+   "zh-Hans": "彼得罗相",
+   "zh-Hant": "彼得羅相"
+  },
+  "Euwe": {
+   "ru": {
+    "nom": "Эйве",
+    "gen": "Эйве"
+   },
+   "uk": {
+    "nom": "Ейве",
+    "gen": "Ейве"
+   },
+   "ar": "أويفه",
+   "ja": "ユーウェ",
+   "zh-Hans": "尤伟",
+   "zh-Hant": "尤偉"
+  },
+  "Sozin": {
+   "ru": {
+    "nom": "Созин",
+    "gen": "Созина"
+   },
+   "uk": {
+    "nom": "Созін",
+    "gen": "Созіна"
+   },
+   "ar": "سوزين",
+   "ja": "ソージン",
+   "zh-Hans": "索津",
+   "zh-Hant": "索津"
+  },
+  "Schliemann": {
+   "ru": {
+    "nom": "Шлиман",
+    "gen": "Шлимана"
+   },
+   "uk": {
+    "nom": "Шліман",
+    "gen": "Шлімана"
+   },
+   "ar": "شليمان",
+   "ja": "シュリーマン",
+   "zh-Hans": "施利曼",
+   "zh-Hant": "施利曼"
+  },
+  "Anderssen": {
+   "ru": {
+    "nom": "Андерсен",
+    "gen": "Андерсена"
+   },
+   "uk": {
+    "nom": "Андерсен",
+    "gen": "Андерсена"
+   },
+   "ar": "أندرسن",
+   "ja": "アンデルセン",
+   "zh-Hans": "安德森",
+   "zh-Hant": "安德森"
+  },
+  "Philidor": {
+   "ru": {
+    "nom": "Филидор",
+    "gen": "Филидора"
+   },
+   "uk": {
+    "nom": "Філідор",
+    "gen": "Філідора"
+   },
+   "ar": "فيليدور",
+   "ja": "フィリドール",
+   "zh-Hans": "菲利多尔",
+   "zh-Hant": "菲利多爾"
+  },
+  "Zaitsev": {
+   "ru": {
+    "nom": "Зайцев",
+    "gen": "Зайцева"
+   },
+   "uk": {
+    "nom": "Зайцев",
+    "gen": "Зайцева"
+   },
+   "ar": "زايتسيف",
+   "ja": "ザイツェフ",
+   "zh-Hans": "扎伊采夫",
+   "zh-Hant": "扎伊采夫"
+  },
+  "Sveshnikov": {
+   "ru": {
+    "nom": "Свешников",
+    "gen": "Свешникова"
+   },
+   "uk": {
+    "nom": "Свєшніков",
+    "gen": "Свєшнікова"
+   },
+   "ar": "سفيشنيكوف",
+   "ja": "スヴェシニコフ",
+   "zh-Hans": "斯维什尼科夫",
+   "zh-Hant": "斯維什尼科夫"
+  },
+  "Kasparov": {
+   "ru": {
+    "nom": "Каспаров",
+    "gen": "Каспарова"
+   },
+   "uk": {
+    "nom": "Каспаров",
+    "gen": "Каспарова"
+   },
+   "ar": "كاسباروف",
+   "ja": "カスパロフ",
+   "zh-Hans": "卡斯帕罗夫",
+   "zh-Hant": "卡斯帕羅夫"
+  },
+  "Fischer": {
+   "ru": {
+    "nom": "Фишер",
+    "gen": "Фишера"
+   },
+   "uk": {
+    "nom": "Фішер",
+    "gen": "Фішера"
+   },
+   "ar": "فيشر",
+   "ja": "フィッシャー",
+   "zh-Hans": "菲舍尔",
+   "zh-Hant": "菲舍爾"
+  },
+  "Tal": {
+   "ru": {
+    "nom": "Таль",
+    "gen": "Таля"
+   },
+   "uk": {
+    "nom": "Таль",
+    "gen": "Таля"
+   },
+   "ar": "تال",
+   "ja": "タリ",
+   "zh-Hans": "塔尔",
+   "zh-Hant": "塔爾"
+  },
+  "McCutcheon": {
+   "ru": {
+    "nom": "Мак-Катчен",
+    "gen": "Мак-Катчена"
+   },
+   "uk": {
+    "nom": "Мак-Катчен",
+    "gen": "Мак-Катчена"
+   },
+   "ar": "ماكاتشين",
+   "ja": "マカッチョン",
+   "zh-Hans": "麦卡琴",
+   "zh-Hant": "麥卡琴"
+  },
+  "Bronstein": {
+   "ru": {
+    "nom": "Бронштейн",
+    "gen": "Бронштейна"
+   },
+   "uk": {
+    "nom": "Бронштейн",
+    "gen": "Бронштейна"
+   },
+   "ar": "برونشتاين",
+   "ja": "ブロンシュタイン",
+   "zh-Hans": "布龙斯坦",
+   "zh-Hant": "布龍斯坦"
+  },
+  "Janowski": {
+   "ru": {
+    "nom": "Яновский",
+    "gen": "Яновского"
+   },
+   "uk": {
+    "nom": "Яновський",
+    "gen": "Яновського"
+   },
+   "ar": "يانوفسكي",
+   "ja": "ヤノフスキー",
+   "zh-Hans": "亚诺夫斯基",
+   "zh-Hant": "亞諾夫斯基"
+  },
+  "Staunton": {
+   "ru": {
+    "nom": "Стаунтон",
+    "gen": "Стаунтона"
+   },
+   "uk": {
+    "nom": "Стаунтон",
+    "gen": "Стаунтона"
+   },
+   "ar": "ستونتون",
+   "ja": "スタントン",
+   "zh-Hans": "斯汤顿",
+   "zh-Hant": "斯湯頓"
+  },
+  "Max Lange": {
+   "ru": {
+    "nom": "Макс Ланге",
+    "gen": "Макса Ланге"
+   },
+   "uk": {
+    "nom": "Макс Ланге",
+    "gen": "Макса Ланге"
+   },
+   "ar": "ماكس لانغه",
+   "ja": "マックス・ランゲ",
+   "zh-Hans": "马克斯·朗格",
+   "zh-Hant": "馬克斯·朗格"
+  },
+  "Petrov": {
+   "ru": {
+    "nom": "Петров",
+    "gen": "Петрова"
+   },
+   "uk": {
+    "nom": "Петров",
+    "gen": "Петрова"
+   },
+   "ar": "بتروف",
+   "ja": "ペトロフ",
+   "zh-Hans": "彼得罗夫",
+   "zh-Hant": "彼得羅夫"
+  },
+  "Grünfeld": {
+   "ru": {
+    "nom": "Грюнфельд",
+    "gen": "Грюнфельда"
+   },
+   "uk": {
+    "nom": "Грюнфельд",
+    "gen": "Грюнфельда"
+   },
+   "ar": "غرونفيلد",
+   "ja": "グリュンフェルト",
+   "zh-Hans": "格林菲尔德",
+   "zh-Hant": "格林菲爾德"
+  },
+  "Colle": {
+   "ru": {
+    "nom": "Колле",
+    "gen": "Колле"
+   },
+   "uk": {
+    "nom": "Колле",
+    "gen": "Колле"
+   },
+   "ar": "كولي",
+   "ja": "コール",
+   "zh-Hans": "科勒",
+   "zh-Hant": "科勒"
+  },
+  "Torre": {
+   "ru": {
+    "nom": "Торре",
+    "gen": "Торре"
+   },
+   "uk": {
+    "nom": "Торре",
+    "gen": "Торре"
+   },
+   "ar": "توري",
+   "ja": "トーレ",
+   "zh-Hans": "托雷",
+   "zh-Hant": "托雷"
+  },
+  "Réti": {
+   "ru": {
+    "nom": "Рети",
+    "gen": "Рети"
+   },
+   "uk": {
+    "nom": "Реті",
+    "gen": "Реті"
+   },
+   "ar": "ريتي",
+   "ja": "レティ",
+   "zh-Hans": "列蒂",
+   "zh-Hant": "列蒂"
+  }
+ },
+ "ignore_components": [
+  "Main Line",
+  "Normal",
+  "Normal Variation",
+  "Normal Line",
+  "Normal Defense",
+  "Normal System",
+  "Modern Variations",
+  "Rare Defenses",
+  "Traditional Line",
+  "Old Variation"
+ ]
+}
