@@ -1366,7 +1366,7 @@ TEST(tts_synthesizer_output) {
     if (!s) return;
     CHECK_EQ(s->sampleRate(), 44100);
     CHECK_EQ(s->voiceCount(), 10);
-    CHECK_EQ(s->voiceName(tts::defaultVoice()), std::string("M2"));
+    CHECK_EQ(s->voiceName(tts::defaultVoice()), std::string("M3"));
     tts::Options o;
     o.seed = 1234;
     std::vector<float> a = s->synthesize("Good move. Now the knight goes to f3.", "en", o);

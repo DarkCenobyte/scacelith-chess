@@ -25,7 +25,7 @@ struct Options {
     int threads = 2;            // threads of one synthesis (the caller plus helpers)
     int steps = 5;              // flow-matching steps (quality/speed: 3 is usable, 5 the default)
     float speed = 1.0f;         // speaking rate (the duration is divided by it)
-    int voice = -1;             // -1 = the default teacher voice (M2); see Synthesizer::voiceName
+    int voice = -1;             // -1 = the default teacher voice (M3); see Synthesizer::voiceName
     uint32_t seed = 0;          // noise seed; 0 = derived from the text, language and voice, so the
                                 // same line always sounds the same
 };
@@ -34,7 +34,8 @@ struct Options {
 // anything else the coach does not speak).
 bool languageSupported(const std::string& uiCode);
 
-// Voice used when Options::voice is -1 (M2, the male "teacher" voice; M3 is the alternative).
+// Voice used when Options::voice is -1 (M3, the male "teacher" voice chosen by listening; M2, deeper, is
+// the alternative).
 int defaultVoice();
 
 // Caps the instruction set of the compute kernels ("auto", "avx512", "avxvnni", "avx2", "sse2",

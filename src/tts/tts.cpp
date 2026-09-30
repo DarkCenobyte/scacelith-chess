@@ -19,7 +19,7 @@ bool embeddedModelFile(int index, const uint8_t** data, size_t* size);
 namespace tts {
 namespace {
 
-constexpr int kDefaultVoice = 6;              // M2 in voice.bin (F1..F5, M1..M5)
+constexpr int kDefaultVoice = 7;              // M3 in voice.bin (F1..F5, M1..M5), chosen by listening
 constexpr int kSilenceSamples = 13230;        // 0.3 s between chunks (official helper)
 constexpr float kMinChunkSeconds = 0.1f;      // shortest chunk (sherpa-onnx kMinDuration)
 constexpr int64_t kMaxLatentFrames = 10000;   // longest chunk (sherpa-onnx kMaxLatentLen)

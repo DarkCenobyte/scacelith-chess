@@ -152,7 +152,7 @@ def dtw(a, b):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
-    ap.add_argument("--voice", type=int, default=6)
+    ap.add_argument("--voice", type=int, default=7)  # M3, the game's default voice
     ap.add_argument("--steps", type=int, default=5)
     ap.add_argument("--seeds", type=int, default=4)
     ap.add_argument("--wav", default="")
