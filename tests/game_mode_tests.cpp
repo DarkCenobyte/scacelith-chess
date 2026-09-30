@@ -1,7 +1,6 @@
-// Game modes: Elo rating, camera flights, the viewer's observer camera.
+// Game modes: camera flights, the viewer's observer camera (the Elo rating: elo_tests.cpp).
 #include "test.h"
 #include "game/camera_flight.h"
-#include "game/elo.h"
 #include "game/layout.h"
 #include "game/observer_camera.h"
 #include <cmath>
@@ -15,80 +14,6 @@ namespace {
 bool near(float a, float b, float eps = 1e-3f) { return std::fabs(a - b) <= eps; }
 bool near(vec3 a, vec3 b, float eps = 1e-3f) { return length(a - b) <= eps; }
 }  // namespace
-
-// ---- Elo ----------------------------------------------------------------------------------------
-
-TEST(elo_expected_score) {
-    CHECK(near(float(elo::expectedScore(1500, 1500)), 0.5f, 1e-6f));
-    // 1 / (1 + 10^(200/400)) = 0.2403
-    CHECK(near(float(elo::expectedScore(1500, 1700)), 0.2403f, 1e-4f));
-    CHECK(near(float(elo::expectedScore(1700, 1500)), 0.7597f, 1e-4f));
-    // FIDE: a gap above 400 points counts as 400.
-    CHECK(near(float(elo::expectedScore(1500, 3500)), float(elo::expectedScore(1500, 1900)), 1e-6f));
-    CHECK(near(float(elo::expectedScore(2400, 800)), 0.9091f, 1e-4f));
-}
-
-TEST(elo_k_factor) {
-    elo::Record r;
-    CHECK_EQ(elo::kFactor(r), 40);
-    r.games = 29;
-    CHECK_EQ(elo::kFactor(r), 40);
-    r.games = 30;
-    CHECK_EQ(elo::kFactor(r), 20);
-    r.peak = 2400;
-    CHECK_EQ(elo::kFactor(r), 10);
-    r.rating = 2300;  // stays 10 once 2400 has been reached
-    CHECK_EQ(elo::kFactor(r), 10);
-    elo::Record fresh;
-    fresh.rating = fresh.peak = 2450;  // a new player rated above 2400 at once
-    CHECK_EQ(elo::kFactor(fresh), 10);
-}
-
-TEST(elo_apply_results) {
-    elo::Record r;
-    CHECK(r.provisional());
-    // Win against an equal opponent: +40 * 0.5 = +20.
-    elo::Change c = elo::applyResult(r, 1500, 1.0);
-    CHECK_EQ(c.before, 1500);
-    CHECK_EQ(c.after, 1520);
-    CHECK_EQ(c.delta(), 20);
-    CHECK_EQ(c.k, 40);
-    CHECK_EQ(r.games, 1);
-    CHECK_EQ(r.wins, 1);
-    CHECK_EQ(r.peak, 1520);
-    // Draw against 1700 (E = 0.2619 from 1520): +40 * 0.2381 = +9.5 -> +10.
-    c = elo::applyResult(r, 1700, 0.5);
-    CHECK_EQ(c.delta(), 10);
-    CHECK_EQ(r.draws, 1);
-    // Loss against Stockfish at full strength: the gap counts as 400, E = 0.0909 -> -4.
-    c = elo::applyResult(r, 3500, 0.0);
-    CHECK_EQ(c.delta(), -4);
-    CHECK_EQ(r.losses, 1);
-    CHECK_EQ(r.games, 3);
-    CHECK_EQ(r.peak, 1530);
-    CHECK_EQ(r.rating, 1526);
-    // Established player: K = 20.
-    elo::Record s;
-    s.games = 50;
-    CHECK_EQ(elo::applyResult(s, 1500, 1.0).delta(), 10);
-    CHECK_EQ(elo::ratingDelta(s, 1510, 0.5), 0);
-    // Floor.
-    elo::Record low;
-    low.rating = elo::kFloor + 5;
-    elo::applyResult(low, 150, 0.0);
-    CHECK_EQ(low.rating, elo::kFloor);
-}
-
-TEST(elo_zero_sum_between_equals) {
-    // Two established players at the same K exchange the same number of points.
-    elo::Record a, b;
-    a.games = b.games = 40;
-    a.rating = a.peak = 1620;
-    b.rating = b.peak = 1480;
-    int da = elo::applyResult(a, 1480, 0.0).delta();
-    int db = elo::applyResult(b, 1620, 1.0).delta();
-    CHECK_EQ(da, -db);
-}
 
 // ---- Camera flights -----------------------------------------------------------------------------
 

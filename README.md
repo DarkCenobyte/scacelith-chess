@@ -15,8 +15,12 @@ real-time material shaders, physically based lighting.
   pointer (it looks through them at the square behind), and your arm turns see-through.
 - **Space**, or a click on the chess clock: your hand presses the clock. A move is only completed
   once the clock is pressed, and after a promotion the new piece must be on the board first.
-- **Right mouse button** (hold and drag): look around from your chair. **Mouse wheel**: lean
-  towards the board. **Middle click** or **C**: look at the board again.
+  With Options > Gameplay > Auto-press clock your hand presses it by itself once the move is on
+  the board (capture, castling rook and promotion piece included); online, the server (or the
+  host of a direct match) decides for each game.
+- **Right mouse button** (hold and drag): look around from your chair. The pointer at the top of
+  the window: look up at your opponent. **Mouse wheel**: lean towards the board. **Middle click**
+  or **C**: look at the board again.
 - **S**: look at your own scoresheet, lying out of sight beside you, and back (**S** again,
   **C** or a look around).
 - **Tab**: move list. **Esc**: menu (offer or claim a draw, resign, options).
@@ -54,14 +58,27 @@ the piece letters of the interface language.
 
 ### Your Elo
 
-Your rating starts at 1500 and is updated after every game against Stockfish with the FIDE
-formula: K = 40 for your first 30 games (the rating is provisional until then), 20 afterwards, 10
-once you have reached 2400; a rating gap is counted as 400 points at most. The opponent's rating is
-the preset's (Novice 800 up to Stockfish Max 3500; a custom opponent is rated from its Skill Level
-or UCI Elo). A game counts once both players have moved; leaving a game, or closing the game,
-resigns it. The title page shows your rating, record and peak, the new game page the score you
-can expect against the selected opponent, and the game over card the change
-(`Elo 1512 → 1524 (+12)`). Watched games are never rated.
+Your rating is computed after every game against Stockfish as FIDE computes tournament ratings
+(FIDE Rating Regulations, 2024), with the same rules as the online server's:
+
+- **First rating.** You start unrated, shown at 1500. Your first five games give your first
+  rating, FIDE's way: the average of your opponents' ratings, counting two extra draws against
+  1800-rated players, plus FIDE's rating difference for your score (for example five draws against
+  1500-rated opponents give 1586, five wins 1895). A first rating is at most 2200. As FIDE
+  ignores a newcomer's first event without a point, the games you lose before your first draw
+  or win do not count towards it.
+- **Then** each game changes your rating by K × (score − expected score), where the expected
+  score comes from FIDE's table for the rating difference (counted as 400 points at most): K = 40
+  for your first 30 counted games (those of your first rating included, not the losses before
+  your first draw or win; the rating is provisional until then), 20 afterwards, 10 once you have
+  reached 2400. A rating never drops below 100.
+
+The opponent's rating is the preset's (Novice 800 up to Stockfish Max 3500; a custom opponent is
+rated from its Skill Level or UCI Elo). A game counts once both players have moved; leaving a
+game, or closing the game, resigns it. The title page shows your rating, record and peak, the new
+game page the score you can expect against the selected opponent, and the game over card the
+change (`Elo 1512 → 1524 (+12)`). Watched games are never rated. Games are rated one by one, where
+FIDE rates a month's games together.
 
 ### Two players on one PC
 
@@ -88,9 +105,11 @@ left hand), and whether the game is rated. **Swap colours** exchanges the two pl
   player, so each keeps the same hand).
 
 A two-player game is friendly by default and never changes your rating against Stockfish. A rated
-one keeps a separate rating per name (`[local_player_N]` in the settings file, 1500 for a new
-name, the same FIDE formula), updated for both players against each other's rating before the
-game; leaving a game early rates nothing.
+one keeps a separate rating per name (`[local_player_N]` in the settings file; a new name starts
+unrated at 1500, with the same FIDE rules), updated for both players against each other's rating
+before the game (a game between two unrated names counts for both, unless it is lost by a name
+that has not drawn or won yet: FIDE then ignores it for both); leaving a game early rates
+nothing.
 
 ## Watch a Game
 
@@ -112,8 +131,9 @@ equal position late in the game), and the game over card offers to watch another
 ## Online play
 
 **Play Online** on the title page plays people through a Scacelith server, still in the first
-person: your opponent sits in the other chair as a robot that moves the pieces and presses the
-clock by itself, as soon as their move arrives.
+person: your opponent sits in the other chair as a robot that moves with them, live: it takes the
+piece they touch, holds it over the square they aim at, looks where they look and leans in when
+they do.
 
 - **Server.** The official server is `caissa.scacelith.com` (port 44664, secure web API and
   secure WebSocket on the same port). Options > Online server > Custom server takes a community
@@ -136,15 +156,20 @@ clock by itself, as soon as their move arrives.
   the colour you want), or create a private game whose short code a friend enters to play you.
   Challenges you receive appear as a card wherever you are in the menus, and at the table
   between two games.
-- **At the table.** You can only let go of a piece on a legal square; the move is sent the
-  moment you choose it, and the robot hand then places the piece and presses the clock. The
-  clocks are the server's (they never stop, not even in the Esc menu). The ping to the server is
-  in the top right corner. Esc: offer or claim a draw, resign, abort before your first move,
-  report the opponent, leave (which resigns). If your opponent loses the connection a banner
-  counts down the time they have to come back; if yours drops, the game waits behind a
-  "Reconnecting…" veil and picks up where the server is. The scoresheets are headed with the
-  server's name, "Online", the time control, rated or casual, both players with their ratings and
-  the game's number; the game over card shows the rating change and offers a rematch.
+- **At the table.** You can only let go of a piece on a legal square. When the server lets the
+  robots press the clock (its default; in a direct match, the host's choice), the move is sent the
+  moment you choose it, and the robot hand then places the piece and presses the clock. Otherwise
+  a notice says so at the start of the game: the robot places the piece, you press the clock
+  (Space or a click), and the move goes at the press. The opponent's robot plays their move from
+  where their hand is, and its head follows theirs unless Options > Gameplay > Ignore opponent's
+  head movements is on (the robot then looks around by itself, as against Stockfish; it still
+  moves the pieces with them). The clocks are the server's (they never stop, not even in the Esc
+  menu). The ping to the server is in the top right corner. Esc: offer or claim a draw, resign,
+  abort before your first move, report the opponent, leave (which resigns). If your opponent loses
+  the connection a banner counts down the time they have to come back; if yours drops, the game
+  waits behind a "Reconnecting…" veil and picks up where the server is. The scoresheets are headed
+  with the server's name, "Online", the time control, rated or casual, both players with their
+  ratings and the game's number; the game over card shows the rating change and offers a rematch.
 - **Direct match.** Two computers play each other directly, without a server or an account
   (friendly games, never rated): one player **hosts** (time control, colour, port 47100 by
   default, opened on the home router with UPnP when possible) and reads the address, the port and
@@ -155,9 +180,11 @@ clock by itself, as soon as their move arrives.
 Development: `--online-mock` replaces the network with an in-process fake server and a fake
 direct-match friend (any password works; see `src/game/online_mock.h` for the inputs that try
 error paths), and `--start-online [category]` goes straight to a game (with `--online-mock` the
-opponent is a random mover). In a mock game F9 makes the opponent disconnect for a while and F10
-drops your own connection. `--scene ui --ui-screen online-play` (and the other `online-*` and
-`direct-*` screens listed in `src/ui/ui_viewer.cpp`) shows the pages on the fake server.
+opponent is a random mover whose hands and head move like a player's; `--online-manual-clock`
+leaves the clock press to the players, and `--play e2e4,...` makes your moves). In a mock game F9
+makes the opponent disconnect for a while and F10 drops your own connection. `--scene ui
+--ui-screen online-play` (and the other `online-*` and `direct-*` screens listed in
+`src/ui/ui_viewer.cpp`) shows the pages on the fake server.
 [docs/ONLINE_CLIENT.md](docs/ONLINE_CLIENT.md) describes the client side. QR codes are drawn with
 Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-library) (MIT licence,
 `third_party/qrcodegen/`).
@@ -165,10 +192,30 @@ Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-librar
 ## Options
 
 Settings are stored in `Scacelith.ini` next to the executable when that folder is writable,
-otherwise in `%APPDATA%\Scacelith\`. All of them are editable from the Options page: display
-mode and resolution, V-sync, render scale, quality preset, motion blur, depth of field,
-brightness, volumes, ambience, legal-move hints, mouse sensitivity, the game pointer, and the
-hand-over between the two players of a game on one PC (a camera flight, or an instant cut).
+otherwise in `%APPDATA%\Scacelith\` (and read back from there); a file given with `--ini <file>`
+is read and written there only (the log warns when it cannot be written). All of them are
+editable from the Options page: display mode and resolution, V-sync, render scale, quality
+preset, motion blur, depth of field, brightness, volumes, ambience, legal-move hints, auto-press
+clock, the opponent's head movements, mouse sensitivity, the game pointer, and the hand-over
+between the two players of a game on one PC (a camera flight, or an instant cut). An option
+marked with a small circled **i** after its name has a definition: rest the pointer on the name
+or on the mark, or keep the keyboard focus on the row for a moment, to read it.
+
+- **Auto-press clock** (Options > Gameplay, off by default): your robot presses the clock by
+  itself once your move is on the board. In online games the server decides, and in a direct
+  match the player who hosts it (**Auto-press clock** on the Host a game page, on by default).
+- **Ignore opponent's head movements** (Options > Gameplay, off by default): in online games and
+  direct matches the opponent's robot looks where its player looks; with this option it moves
+  its head by itself, as against Stockfish.
+
+The first start opens on a brightness calibration: three squares, black on the left, mid grey and
+white on the right, each with a black knight, drawn exactly as the 3D hall would show them at the
+brightness of the slider. Move the slider until the knight on the black square is barely visible,
+or no longer visible, and **Continue** (Esc keeps the current value); Options > Graphics >
+Brightness changes it later. Until Continue or Esc, every start opens on it: a first start closed
+during the loading, or a first run straight into a game, shows it the next time (screenshot runs
+never do). `--calibrate` opens the page again, and the UI viewer shows it with
+`--scene ui --ui-screen calibration`.
 
 The interface speaks English, French, German, Spanish, Ukrainian, Russian, Arabic (laid out right
 to left), Japanese, Simplified Chinese and Traditional Chinese. The first start follows the
@@ -181,7 +228,10 @@ fallback); `--lang <code>` overrides the language for one session.
 
 Requirements: CMake 3.20+, Ninja, a C++17 compiler. The Windows build is produced with
 MinGW-w64 (native or cross-compiled from Linux) and is a single self-contained executable
-(Stockfish and its neural network are embedded).
+(Stockfish 19 and its neural network are embedded). Stockfish is compiled once per x86-64
+instruction set, from plain x86-64 to AVX-512, and the game runs the best one the CPU supports;
+`-DSCACELITH_SF_VARIANTS=x86-64-avx2` (or another variant the CPU runs) builds a single one, for
+quicker local builds (see `third_party/stockfish/README.scacelith.md`).
 
 ```sh
 # Windows x64 (cross-compiled from Linux)
@@ -206,8 +256,9 @@ x,y,z [--look x,y,z] [--fov deg]` (initial observer camera when watching; a deta
 normal game), `--handover-preview` (watching through the players' eyes with the clock frozen during
 each camera handover, the same hand-over as [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`,
 `--warp <seconds>` (simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
-`--mouse fx,fy` (pointer position as fractions of the window), `--glance` (start looking at the
-scoresheet) and `--ini <file>`.
+`--mouse fx,fy` (pointer position as fractions of the window; the view follows it, `0.5,0.03` looks
+up at the opponent), `--glance` (start looking at the scoresheet), `--calibrate` (the brightness
+calibration before the title page, as on a first start) and `--ini <file>`.
 
 Two players on one PC: `--start --hotseat` starts one at once, with `--white-name N`, `--black-name
 N`, `--clock-right white|black`, `--rated` and `--handover <seconds>` (0 = instant cut). `--play
@@ -223,10 +274,12 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised
 
 Scacelith is free software under the GNU General Public License v3.0 (see `LICENSE`), because it
 embeds [Stockfish](https://stockfishchess.org) (GPL-3.0), whose source is in
-`third_party/stockfish/` with its own copyright notices. The Cinzel, EB Garamond and Amiri
-(Khaled Hosny) interface fonts and the handwriting fonts Caveat (Impallari Type), Marck Script
-(Denis Masharov), Bad Script (Gaslight), Aref Ruqaa (Abdullah Aref, Khaled Hosny), Klee One
-(Fontworks) and LXGW WenKai / WenKai TC (LXGW) are under the SIL Open Font License 1.1; the
-subsets shipped here are rebuilt from the upstream files by `tools/prepare_fonts.py`. The chess
-figures of the promotion picker come from a subset of GNU FreeFont FreeSerif (GPL-3.0+ with the
-font exception). All licence texts are in `assets/fonts/` and `assets/fonts/hand/`.
+`third_party/stockfish/` with its own copyright notices. Stockfish's neural network was trained on
+data provided by the Leela Chess Zero project, which is made available under the Open Database
+License (ODbL). The Cinzel, EB Garamond and Amiri (Khaled Hosny) interface fonts and the handwriting
+fonts Caveat (Impallari Type), Marck Script (Denis Masharov), Bad Script (Gaslight), Aref Ruqaa
+(Abdullah Aref, Khaled Hosny), Klee One (Fontworks) and LXGW WenKai / WenKai TC (LXGW) are under the
+SIL Open Font License 1.1; the subsets shipped here are rebuilt from the upstream files by
+`tools/prepare_fonts.py`. The chess figures of the promotion picker come from a subset of GNU
+FreeFont FreeSerif (GPL-3.0+ with the font exception). All licence texts are in `assets/fonts/` and
+`assets/fonts/hand/`.

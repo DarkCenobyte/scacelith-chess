@@ -10,10 +10,14 @@
 //  * UCI options are sent lazily before each "go", only when they differ from what the engine has.
 //  * Two sides may share the engine (AI vs AI): a move search with other strength settings than
 //    the previous one clears the hash and the search history first (see Engine::configure).
+//  * Stockfish 19 ends the whole process on an illegal move in "position", so every move list is
+//    replayed with the game's own rules first; a list that fails never reaches the engine and the
+//    request fails like one on a stopped engine.
 #include "ai/engine.h"
 
 #include "ai/behavior.h"
 #include "ai/uci_host.h"
+#include "chess/chess.h"
 #include "core/log.h"
 
 #include <algorithm>
@@ -50,6 +54,20 @@ std::vector<std::string> split(const std::string& s) {
     std::string t;
     while (is >> t) out.push_back(t);
     return out;
+}
+
+// Index of the first move of `moves` (UCI, from the standard start position) that is not legal
+// where it is played, or -1 when the whole line is legal. The game's parser is at least as strict
+// as Stockfish's (castling as the king's two-square move, a promotion letter on promotions only),
+// so Stockfish accepts every line that passes.
+int firstIllegalMove(const std::vector<std::string>& moves) {
+    chess::Position pos;
+    for (size_t i = 0; i < moves.size(); ++i) {
+        const chess::Move m = pos.parseUCI(moves[i]);
+        if (!m.valid()) return int(i);
+        pos.makeMove(m);
+    }
+    return -1;
 }
 
 struct Job {
@@ -209,20 +227,24 @@ struct Engine::Impl {
 
     void syncOptions(const Job& job) {
         const EngineSettings& s = settings;
-        setOption("Threads", std::to_string(std::clamp(s.threads, 1, 256)));
+        const int threads = std::clamp(s.threads, 1, 256);
+        // Several search threads (engine.threads): one NUMA node with every CPU, set before the
+        // thread pool grows. On a machine with several nodes Stockfish would otherwise bind the
+        // threads to nodes and copy the network (115 MB) to each. It never does either with one
+        // thread, where the option would only cost a copy of the network (~0.2 s) per session.
+        if (threads > 1) setOption("NumaPolicy", "none");
+        setOption("Threads", std::to_string(threads));
         setOption("Hash", std::to_string(std::clamp(s.hashMB, 1, 4096)));
         if (job.kind == Job::Eval) {  // honest, full-strength evaluation
             setOption("Skill Level", "20");
             setOption("UCI_LimitStrength", "false");
             setOption("MultiPV", "1");
-            setOption("Use NNUE", "true");
             return;
         }
         setOption("Skill Level", std::to_string(std::clamp(s.skillLevel, 0, 20)));
         setOption("UCI_LimitStrength", s.limitStrength ? "true" : "false");
         setOption("UCI_Elo", std::to_string(std::clamp(s.elo, 1320, 3190)));
         setOption("MultiPV", std::to_string(std::clamp(s.multiPV, 1, 64)));
-        setOption("Use NNUE", s.useNNUE ? "true" : "false");
         setOption("Move Overhead", std::to_string(std::clamp(job.clock.moveOverheadMs, 0, 5000)));
     }
 
@@ -258,7 +280,30 @@ struct Engine::Impl {
         return go.str();
     }
 
+    // A request whose move list is not legal: Stockfish would end the process on its "position"
+    // command, so nothing is sent and the request fails as on an engine that is not running (empty
+    // move, neutral evaluation).
+    void fail(const Job& job, int illegalAt) {
+        LOGW("ai: move %d (%s) of the requested line is illegal, the request is not sent to Stockfish",
+             illegalAt + 1, job.moves[size_t(illegalAt)].c_str());
+        if (job.kind == Job::Move) {
+            moveReady = true;
+            move.clear();
+            moveEval = 0;
+            lastSearchMs = 0;
+            lastMoves = job.moves;
+            lastBest.clear();
+        } else {
+            evalReady = true;
+            evalCp = 0;
+        }
+    }
+
     void startJob(std::unique_ptr<Job> job) {
+        if (int illegalAt = firstIllegalMove(job->moves); illegalAt >= 0) {
+            fail(*job, illegalAt);
+            return;
+        }
         syncOptions(*job);
         if (job->kind == Job::Eval) {
             hashWarmedByEval = true;
@@ -349,13 +394,14 @@ void Engine::shutdown() {
     Impl& d = *impl_;
     if (!d.started) return;
     d.send("stop");
-    d.send("setoption name Hash value 1");  // give the hash table back; Stockfish's globals outlive the session
-    d.host().release(d.owner);             // "quit" + join
+    d.host().release(d.owner);  // "quit" + join; the session frees its hash table and network
     d.started = false;
     d.resetSession();
 }
 
 bool Engine::available() const { return impl_->started && impl_->host().ownedBy(impl_->owner); }
+
+void Engine::setArchLimit(const std::string& arch) { detail::UciHost::instance().setArchLimit(arch); }
 
 bool Engine::ready() const {
     impl_->pump();

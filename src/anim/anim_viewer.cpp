@@ -13,7 +13,8 @@
 //            turn a page, White lays its pen down, final handshake while Black still holds its pen
 //            (it lays it down first)
 //   lcastle  Black (left hand) castles short
-//   lpromo   Black (left hand) promotes b2-b1=Q (pawn to the capture row, spare queen to b1)
+//   lpromo   Black (left hand) promotes b2-b1=Q (pawn to the capture slots on its side, spare queen
+//            to b1)
 // Command line (after --scene anim):
 //   --demo d        default | lefty | lcastle | lpromo
 //   --time t        simulate 0..t with fixed 1/120 s steps, then (in --shot mode) freeze
@@ -232,13 +233,11 @@ void initialPieces(Piece out[kPieces]) {
     }
 }
 
-// Capture slot n of the pieces of 'capturedColor' (PhysicalBoard::nextCaptureSlot with the clock
-// at +X): two rows on the clock side, in the half of the player who captured them.
+// Capture slot n of the pieces of 'capturedColor' (PhysicalBoard::captureSlot with the clock at
+// +X): on the clock side, in the half of the player who captured them.
 vec3 captureSlot(int n, int capturedColor) {
-    int row = n / 8, col = n % 8;
-    float zSign = capturedColor == 1 ? 1.0f : -1.0f;
-    return vec3(layout::CAPTURE_ROW_X + float(row) * layout::CAPTURE_SPACING, layout::TABLE_TOP_Y,
-                zSign * (layout::CAPTURE_Z0 + float(col) * layout::CAPTURE_COL_SPACING));
+    vec2 s = layout::captureSlot(n);
+    return vec3(s.x, layout::TABLE_TOP_Y, capturedColor == 1 ? s.y : -s.y);
 }
 // A bone of the right arm moved to 'side' (the playing hand of a left-handed player).
 Bone onSide(Bone rightBone, Side s) { return s == Side::Right ? rightBone : Bone(rightBone - (ClavicleR - ClavicleL)); }
@@ -825,7 +824,7 @@ private:
                 using namespace anim;
                 std::vector<Task> ts;
                 movePiece(ts, 1, 17, "b1");
-                vec3 slot = captureSlot(captures_[1]++, 1);
+                vec3 slot = captureSlot(captures_[0]++, 0);   // beside Black, among the pieces it captured
                 ts.push_back(mkTask(TaskType::Reach, 17));
                 ts.push_back(mkTask(TaskType::Lift, 17, vec3(0), 0.03f));
                 ts.push_back(mkTask(TaskType::Carry, 17, slot));
@@ -1570,13 +1569,13 @@ void AnimViewer::selfTest() {
         auto slot = [](int n, float zSign) { return captureSlot(n, zSign > 0.0f ? 1 : 0); };
         auto off = [](Piece& p) { p.xf = translate(vec3(3.0f, 0.0f, 0.0f)); };   // not in the game any more
         struct Comp {
-            const char* name;
+            std::string name;
             int player;
             Piece ps[kPieces];
             std::vector<Task> tasks;
         };
         std::vector<Comp> comps;
-        auto add = [&](const char* name, int player) -> Comp& {
+        auto add = [&](const std::string& name, int player) -> Comp& {
             comps.emplace_back();
             Comp& c = comps.back();
             c.name = name;
@@ -1604,20 +1603,47 @@ void AnimViewer::selfTest() {
             move(c, 4, sqPos("d3"), 19, 1.0f, 0);
             finish(c);
         }
-        {   // Nxe5 into the middle, eighth slot (at the player's edge)
-            Comp& c = add("capture Nf3xe5, slot 7", 0);
+        {   // Nxe5 into the middle, last slot of the first row (at the player's edge, by the resting hand)
+            Comp& c = add("capture Nf3xe5, slot 4", 0);
             c.ps[14].xf = translate(sqPos("f3"));
             c.ps[20].xf = translate(sqPos("e5")) * rotateY(PI);
-            move(c, 14, sqPos("e5"), 20, 1.0f, 7);
+            move(c, 14, sqPos("e5"), 20, 1.0f, 4);
             finish(c);
         }
         {   // Black: ...Qxh4 on White's side, second row of the capture slots
-            Comp& c = add("black capture Qd8xh4, slot 9", 1);
+            Comp& c = add("black capture Qd8xh4, slot 5", 1);
             c.ps[7].xf = translate(sqPos("h4"));
             c.ps[20].xf = translate(sqPos("e6")) * rotateY(PI);   // opens the diagonal d8-h4
-            move(c, 27, sqPos("h4"), 7, -1.0f, 9);
+            move(c, 27, sqPos("h4"), 7, -1.0f, 5);
             finish(c);
         }
+        // A capture into slot n with the slots before it taken by queens (the widest pieces, facing
+        // any way): every other piece of the set but the mover and its victim stands there, and
+        // the board is empty besides them.
+        auto crowded = [&](const std::string& name, int player, int n) {
+            Comp& c = add(name, player);
+            const float zSign = player == 0 ? 1.0f : -1.0f;
+            const int mover = player == 0 ? 4 : 20, victim = player == 0 ? 19 : 3;   // exd4 / ...exd5
+            int k = 0;
+            for (int i = 0; i < 32; ++i) {
+                if (i == mover || i == victim) continue;
+                if (k < n) {
+                    c.ps[i].type = 5;
+                    c.ps[i].xf = translate(slot(k, zSign)) * rotateY(0.9f * float(k));
+                    ++k;
+                } else {
+                    off(c.ps[i]);
+                }
+            }
+            c.ps[mover].xf = translate(sqPos(player == 0 ? "e3" : "e6")) * rotateY(player ? PI : 0.0f);
+            c.ps[victim].xf = translate(sqPos(player == 0 ? "d4" : "d5")) * rotateY(player ? 0.0f : PI);
+            move(c, mover, c.ps[victim].xf.translation(), victim, zSign, n);
+            finish(c);
+        };
+        // Every slot a game fills before the late ones (see layout.h), for White, and the last of
+        // them for Black (its left hand, the mirror image).
+        for (int n = 1; n < layout::captureSlotEarlyCount(); ++n) crowded("capture into slot " + std::to_string(n), 0, n);
+        crowded("black capture into slot " + std::to_string(layout::captureSlotEarlyCount() - 1), 1, layout::captureSlotEarlyCount() - 1);
         {   // O-O: king e1-g1 then rook h1-f1
             Comp& c = add("castling O-O", 0);
             off(c.ps[13]);
@@ -1657,6 +1683,50 @@ void AnimViewer::selfTest() {
             c.tasks.push_back(mk(TaskType::Place, 32, sqPos("b8")));
             finish(c);
         }
+        // Promotions that fill capture slots and take pieces from them. The promotion square's
+        // neighbours are cleared: these check the slots, not a placement between two pieces.
+        {   // g7xh8=Q: the rook to slot 0 and the pawn to slot 1 beside the player (both kept when the
+            // move is planned), then the spare queen to h8
+            Comp& c = add("promotion with capture gxh8=Q", 0);
+            off(c.ps[22]);
+            off(c.ps[30]);
+            c.ps[6].xf = translate(sqPos("g7"));
+            move(c, 6, sqPos("h8"), 31, 1.0f, 0);
+            c.tasks.push_back(mk(TaskType::Reach, 6));
+            c.tasks.push_back(mk(TaskType::Lift, 6, vec3(0), 0.03f));
+            c.tasks.push_back(mk(TaskType::Carry, 6, slot(1, 1.0f)));
+            c.tasks.push_back(mk(TaskType::Place, 6, slot(1, 1.0f)));
+            c.tasks.push_back(mk(TaskType::Reach, 32));   // the spare White queen
+            c.ps[6].xf = translate(slot(1, 1.0f));   // (where the pawn and the rook are by then)
+            c.ps[31].xf = translate(slot(0, 1.0f));
+            c.tasks.push_back(mk(TaskType::Lift, 32, vec3(0), carryH(c.ps, c.ps[32].xf.translation(), sqPos("h8"), 32, 6)));
+            c.ps[6].xf = translate(sqPos("g7"));
+            c.ps[31].xf = translate(sqPos("h8")) * rotateY(PI);
+            c.tasks.push_back(mk(TaskType::Carry, 32, sqPos("h8")));
+            c.tasks.push_back(mk(TaskType::Place, 32, sqPos("h8")));
+            finish(c);
+        }
+        {   // b7-b8=N: the pawn to slot 0, a new knight (PhysicalBoard::takeSpare: none captured
+            // beside the player) from the next free slot to b8
+            Comp& c = add("under-promotion b8=N, new knight", 0);
+            off(c.ps[17]);
+            off(c.ps[25]);
+            off(c.ps[26]);
+            c.ps[1].xf = translate(sqPos("b7"));
+            c.ps[9].xf = translate(slot(1, 1.0f));   // White's b1 knight stands in for the new one
+            move(c, 1, sqPos("b8"), -1, 1.0f, 0);
+            c.tasks.push_back(mk(TaskType::Reach, 1));
+            c.tasks.push_back(mk(TaskType::Lift, 1, vec3(0), 0.03f));
+            c.tasks.push_back(mk(TaskType::Carry, 1, slot(0, 1.0f)));
+            c.tasks.push_back(mk(TaskType::Place, 1, slot(0, 1.0f)));
+            c.tasks.push_back(mk(TaskType::Reach, 9));
+            c.ps[1].xf = translate(slot(0, 1.0f));
+            c.tasks.push_back(mk(TaskType::Lift, 9, vec3(0), carryH(c.ps, c.ps[9].xf.translation(), sqPos("b8"), 9, 1)));
+            c.ps[1].xf = translate(sqPos("b7"));
+            c.tasks.push_back(mk(TaskType::Carry, 9, sqPos("b8")));
+            c.tasks.push_back(mk(TaskType::Place, 9, sqPos("b8")));
+            finish(c);
+        }
         for (int withCb = 1; withCb >= 0; --withCb)
             for (Comp& c0 : comps) {
                 Piece ps[kPieces];
@@ -1668,7 +1738,7 @@ void AnimViewer::selfTest() {
                 const float facing = c0.player == 0 ? 1.0f : -1.0f;
                 Animator a;
                 a.init(sk, vec3(0, layout::PLAYER_PELVIS_Y, facing * layout::PLAYER_PELVIS_Z), facing, c0.player == 0 ? Side::Right : Side::Left);
-                a.setRestHand(vec3(0.265f, layout::TABLE_TOP_Y, facing * 0.305f));   // the playing hand, clock side
+                a.setRestHand(vec3(0.24f, layout::TABLE_TOP_Y, facing * 0.34f));   // the playing hand, clock side (as in the game)
                 a.pieceTransform = [&](int i) { return i >= 0 && i < kPieces ? ps[i].xf : mat4(); };
                 a.pieceGripInfo = [&](int i) {
                     int t = i >= 0 && i < kPieces ? ps[i].type : 1;
@@ -1703,7 +1773,7 @@ void AnimViewer::selfTest() {
                 int bad = 0;
                 float timeErr = 0.0f, place = 0.0f, handTop = 0.0f, handTopT = 0.0f;
                 const char* onlyComp = std::getenv("SCACELITH_COMP_ONLY");   // trace one composition: "name-prefix"
-                const bool traceComp = onlyComp && std::strncmp(c0.name, onlyComp, std::strlen(onlyComp)) == 0;
+                const bool traceComp = onlyComp && c0.name.compare(0, std::strlen(onlyComp), onlyComp) == 0;
                 if (onlyComp && !traceComp) continue;
                 Overlap worst;
                 float worstT = 0.0f;
@@ -1749,7 +1819,7 @@ void AnimViewer::selfTest() {
                 bool fail = bad > 0 || timeErr > 1e-4f || place > 0.004f || worst.depth > 0.006f || handTop > 0.35f;
                 ::logx::write(fail ? ::logx::Level::Warn : ::logx::Level::Info, "selftest composition %-30s %s: %d events, %d wrong, timing err %.1e s, placement %.2f mm, deepest contact %.1f mm "
                                      "(%s, piece %d, t=%.2f), hand up to %.0f mm (t=%.2f)",
-                                     c0.name, withCb ? "cb" : "--", int(want.size()), bad, timeErr, place * 1000.0f, worst.depth * 1000.0f,
+                                     c0.name.c_str(), withCb ? "cb" : "--", int(want.size()), bad, timeErr, place * 1000.0f, worst.depth * 1000.0f,
                                      boneName(Bone(worst.bone)), worst.piece, worstT, handTop * 1000.0f, handTopT);
             }
     }

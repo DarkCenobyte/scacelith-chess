@@ -28,6 +28,8 @@ vec3 agxContrast(vec3 x) {
     return 15.5 * x4 * x2 - 40.14 * x4 * x + 31.96 * x4 - 6.868 * x2 * x + 0.4298 * x2 + 0.1191 * x - 0.00232;
 }
 
+// displayTransform() and srgbEncode() have a CPU port in src/render/post/display_transform.h (the
+// brightness calibration draws its patches with it): change both together.
 vec3 displayTransform(vec3 c) {
     c = SRGB_TO_REC2020 * c;
     c = AGX_INSET * c;

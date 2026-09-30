@@ -26,9 +26,9 @@
 namespace net {
 namespace proto {
 
-constexpr uint16_t kProtocolVersion = 1;
-constexpr uint16_t kProtocolMin = 1;
-constexpr uint32_t kSchemaHash = 0x7b5d5600u;
+constexpr uint16_t kProtocolVersion = 2;
+constexpr uint16_t kProtocolMin = 2;
+constexpr uint32_t kSchemaHash = 0x77977684u;
 constexpr const char* kWsSubprotocol = "scacelith.v1";
 constexpr uint64_t kId53Limit = 1ull << 53;   // id53 values are below 2^53
 
@@ -53,7 +53,7 @@ enum class ChallengeState : uint8_t {
 };
 enum class NoticeCode : uint8_t {
     ServerShutdown = 1, Banned = 2, SessionRevoked = 3, MatchmakingCooldown = 4,
-    ReplacedByNewConnection = 5, Motd = 6,
+    ReplacedByNewConnection = 5, Motd = 6, RatingRestored = 7,
 };
 enum class ErrorCode : uint8_t {
     Malformed = 1, UnsupportedProtocol = 2, Unauthorized = 3, Banned = 4, RateLimited = 5,
@@ -99,6 +99,13 @@ constexpr uint8_t Check = 64;
 constexpr uint8_t Mate = 128;
 }  // namespace MoveFlag
 
+// Gesture flags (Gesture.flags, bit set).
+namespace GestureFlag {
+constexpr uint8_t Glance = 1;
+constexpr uint8_t Promoting = 2;
+constexpr uint8_t Side = 4;
+}  // namespace GestureFlag
+
 // WebSocket close codes used by the server (4000 + ErrorCode where one applies).
 namespace CloseCode {
 constexpr uint16_t Normal = 1000;
@@ -140,6 +147,7 @@ enum class MsgType : uint8_t {
     Abort = 0x25,
     Resync = 0x26,
     Rematch = 0x27,
+    C_Gesture = 0x28,
     Welcome = 0x80,
     Error = 0x81,
     S_Ping = 0x82,
@@ -155,6 +163,7 @@ enum class MsgType : uint8_t {
     GameEvent = 0xA3,
     GameEnd = 0xA4,
     RatingUpdate = 0xA5,
+    S_Gesture = 0xA6,
 };
 const char* messageName(MsgType t);     // "Move", "S_Ping"...; nullptr when unknown
 inline bool isClientType(uint8_t t) { return t >= 0x01 && t <= 0x7F; }
@@ -317,9 +326,34 @@ struct Rematch {
     uint64_t game = 0;
     bool accept = false;
 };
+// The player's current gestures in game `game`, sent when they change and at least once a second
+// (at most gestureRate per second, see Welcome): the head (yaw and pitch of the look in
+// milliradians, seat-relative: 0 = straight ahead, level, yaw > 0 to the left, pitch < 0 down;
+// lean 0..100), the piece in hand and where it is aimed, the move placed on the board before the
+// clock press. The whole state travels every time, so a lost one heals with the next. ply: plies
+// played when the current state of the hand (touch, aim, placed, Promoting) began, which a change
+// of the head alone keeps; touch / aim: squares (64 = none); placed: the move placed, packed as in
+// Move (0 = none); flags: GestureFlag bits. The server forwards it to the opponent as a Gesture
+// without looking at it: it never counts as a move.
+struct C_Gesture {
+    static constexpr MsgType kType = MsgType::C_Gesture;
+    static constexpr bool kClientToServer = true;
+    uint32_t seq = 0;
+    uint64_t game = 0;
+    uint16_t ply = 0;  // max 1199
+    uint8_t touch = 0;  // max 64
+    uint8_t aim = 0;  // max 64
+    uint16_t placed = 0;  // max 32767
+    uint8_t flags = 0;  // max 7
+    int32_t yaw = 0;  // min -3142, max 3142
+    int32_t pitch = 0;  // min -1571, max 1571
+    uint8_t lean = 0;  // max 100
+};
 // Hello accepted. When activeGame != 0 a GameSnapshot follows. heartbeatMs: interval of the server
 // Ping; clientPingMs: interval the client should use for its own Ping (CLIENT_PING_INTERVAL_MS; 0
-// = the client's default).
+// = the client's default). gestureRate / gestureBurst: the Gesture relay of this server
+// (GESTURE_RATE, GESTURE_BURST): sustained messages per second and bucket size; 0 = no relay, send
+// no Gesture.
 struct Welcome {
     static constexpr MsgType kType = MsgType::Welcome;
     static constexpr bool kClientToServer = false;
@@ -332,6 +366,8 @@ struct Welcome {
     uint32_t clientPingMs = 0;
     uint16_t maxMsgPerSec = 0;
     uint64_t activeGame = 0;
+    uint16_t gestureRate = 0;  // max 60
+    uint16_t gestureBurst = 0;  // max 120
 };
 // A request was refused. fatal: the server closes the connection after it.
 struct Error {
@@ -406,7 +442,10 @@ struct ChallengeStatus {
 // Complete authoritative state of a game: sent when it starts, after a (re)connection and on
 // Resync, and also to the opponent when the held clock of a game restored after a restart starts
 // (lifecycle step 6). Clocks are the remaining times at serverTime; the `running` side keeps
-// counting from there (`running` is None while such a clock is held).
+// counting from there (`running` is None while such a clock is held). autoPress: the robots press
+// the clock by themselves once a move is on the board (AUTO_PRESS_CLOCK when the game was
+// created); when false a client sends its Move only when its player presses the clock, so the
+// clock runs until then.
 struct GameSnapshot {
     static constexpr MsgType kType = MsgType::GameSnapshot;
     static constexpr bool kClientToServer = false;
@@ -433,6 +472,7 @@ struct GameSnapshot {
     uint32_t firstMoveMs = 0;
     double startedAt = 0.0;
     Color rematch = Color::White;
+    bool autoPress = false;
 };
 // A move accepted by the server, sent to both players (for the mover it is the confirmation).
 // Clocks as in GameSnapshot; firstMoveMs: time the next player has for their first move (0 when
@@ -491,6 +531,21 @@ struct RatingUpdate {
     std::string category;  // max 7
     RatingChange white;
     RatingChange black;
+};
+// The opponent's gestures (the client Gesture minus seq, byte for byte). Cosmetic: never
+// authoritative.
+struct S_Gesture {
+    static constexpr MsgType kType = MsgType::S_Gesture;
+    static constexpr bool kClientToServer = false;
+    uint64_t game = 0;
+    uint16_t ply = 0;  // max 1199
+    uint8_t touch = 0;  // max 64
+    uint8_t aim = 0;  // max 64
+    uint16_t placed = 0;  // max 32767
+    uint8_t flags = 0;  // max 7
+    int32_t yaw = 0;  // min -3142, max 3142
+    int32_t pitch = 0;  // min -1571, max 1571
+    uint8_t lean = 0;  // max 100
 };
 
 // ---- codec ----
@@ -551,6 +606,9 @@ bool valid(const Resync& m);
 void encode(const Rematch& m, std::vector<uint8_t>& out);
 bool decode(const uint8_t* p, size_t n, Rematch& out);
 bool valid(const Rematch& m);
+void encode(const C_Gesture& m, std::vector<uint8_t>& out);
+bool decode(const uint8_t* p, size_t n, C_Gesture& out);
+bool valid(const C_Gesture& m);
 void encode(const Welcome& m, std::vector<uint8_t>& out);
 bool decode(const uint8_t* p, size_t n, Welcome& out);
 bool valid(const Welcome& m);
@@ -596,6 +654,9 @@ bool valid(const GameEnd& m);
 void encode(const RatingUpdate& m, std::vector<uint8_t>& out);
 bool decode(const uint8_t* p, size_t n, RatingUpdate& out);
 bool valid(const RatingUpdate& m);
+void encode(const S_Gesture& m, std::vector<uint8_t>& out);
+bool decode(const uint8_t* p, size_t n, S_Gesture& out);
+bool valid(const S_Gesture& m);
 
 // ---- reflection (tests, logs): v(name, field) for every field, in wire order ----
 template <class V> void visitFields(PlayerInfo& m, V&& v) {
@@ -804,6 +865,30 @@ template <class V> void visitFields(const Rematch& m, V&& v) {
     v("game", m.game);
     v("accept", m.accept);
 }
+template <class V> void visitFields(C_Gesture& m, V&& v) {
+    v("seq", m.seq);
+    v("game", m.game);
+    v("ply", m.ply);
+    v("touch", m.touch);
+    v("aim", m.aim);
+    v("placed", m.placed);
+    v("flags", m.flags);
+    v("yaw", m.yaw);
+    v("pitch", m.pitch);
+    v("lean", m.lean);
+}
+template <class V> void visitFields(const C_Gesture& m, V&& v) {
+    v("seq", m.seq);
+    v("game", m.game);
+    v("ply", m.ply);
+    v("touch", m.touch);
+    v("aim", m.aim);
+    v("placed", m.placed);
+    v("flags", m.flags);
+    v("yaw", m.yaw);
+    v("pitch", m.pitch);
+    v("lean", m.lean);
+}
 template <class V> void visitFields(Welcome& m, V&& v) {
     v("proto", m.proto);
     v("serverTime", m.serverTime);
@@ -814,6 +899,8 @@ template <class V> void visitFields(Welcome& m, V&& v) {
     v("clientPingMs", m.clientPingMs);
     v("maxMsgPerSec", m.maxMsgPerSec);
     v("activeGame", m.activeGame);
+    v("gestureRate", m.gestureRate);
+    v("gestureBurst", m.gestureBurst);
 }
 template <class V> void visitFields(const Welcome& m, V&& v) {
     v("proto", m.proto);
@@ -825,6 +912,8 @@ template <class V> void visitFields(const Welcome& m, V&& v) {
     v("clientPingMs", m.clientPingMs);
     v("maxMsgPerSec", m.maxMsgPerSec);
     v("activeGame", m.activeGame);
+    v("gestureRate", m.gestureRate);
+    v("gestureBurst", m.gestureBurst);
 }
 template <class V> void visitFields(Error& m, V&& v) {
     v("ref", m.ref);
@@ -944,6 +1033,7 @@ template <class V> void visitFields(GameSnapshot& m, V&& v) {
     v("firstMoveMs", m.firstMoveMs);
     v("startedAt", m.startedAt);
     v("rematch", m.rematch);
+    v("autoPress", m.autoPress);
 }
 template <class V> void visitFields(const GameSnapshot& m, V&& v) {
     v("game", m.game);
@@ -969,6 +1059,7 @@ template <class V> void visitFields(const GameSnapshot& m, V&& v) {
     v("firstMoveMs", m.firstMoveMs);
     v("startedAt", m.startedAt);
     v("rematch", m.rematch);
+    v("autoPress", m.autoPress);
 }
 template <class V> void visitFields(MoveMade& m, V&& v) {
     v("game", m.game);
@@ -1052,6 +1143,28 @@ template <class V> void visitFields(const RatingUpdate& m, V&& v) {
     v("white", m.white);
     v("black", m.black);
 }
+template <class V> void visitFields(S_Gesture& m, V&& v) {
+    v("game", m.game);
+    v("ply", m.ply);
+    v("touch", m.touch);
+    v("aim", m.aim);
+    v("placed", m.placed);
+    v("flags", m.flags);
+    v("yaw", m.yaw);
+    v("pitch", m.pitch);
+    v("lean", m.lean);
+}
+template <class V> void visitFields(const S_Gesture& m, V&& v) {
+    v("game", m.game);
+    v("ply", m.ply);
+    v("touch", m.touch);
+    v("aim", m.aim);
+    v("placed", m.placed);
+    v("flags", m.flags);
+    v("yaw", m.yaw);
+    v("pitch", m.pitch);
+    v("lean", m.lean);
+}
 
 // Calls f(msg) with a default-constructed message of type t; false when t is unknown.
 template <class F> bool withMessage(MsgType t, F&& f) {
@@ -1074,6 +1187,7 @@ template <class F> bool withMessage(MsgType t, F&& f) {
     case MsgType::Abort: { Abort m; f(m); return true; }
     case MsgType::Resync: { Resync m; f(m); return true; }
     case MsgType::Rematch: { Rematch m; f(m); return true; }
+    case MsgType::C_Gesture: { C_Gesture m; f(m); return true; }
     case MsgType::Welcome: { Welcome m; f(m); return true; }
     case MsgType::Error: { Error m; f(m); return true; }
     case MsgType::S_Ping: { S_Ping m; f(m); return true; }
@@ -1089,6 +1203,7 @@ template <class F> bool withMessage(MsgType t, F&& f) {
     case MsgType::GameEvent: { GameEvent m; f(m); return true; }
     case MsgType::GameEnd: { GameEnd m; f(m); return true; }
     case MsgType::RatingUpdate: { RatingUpdate m; f(m); return true; }
+    case MsgType::S_Gesture: { S_Gesture m; f(m); return true; }
     }
     return false;
 }

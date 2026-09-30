@@ -21,14 +21,24 @@
 //     "bad_address", "not_found" (DNS), "refused", "timeout", "unreachable", "reset", "closed",
 //     "wrong_code", "incompatible", "host_left" (guest). After ConnectionChanged(Offline) the
 //     commands have no effect; close() and start again.
+//   - DirectHostOptions::autoPress reaches both players in every GameSnapshot (OnlineGame::
+//     autoPress): at the start, after a reconnection and in every rematch.
+//   - Gestures (sendGesture, net/gesture.h) go straight to the other player, never through the
+//     authority nor the command queue: the host sends S_Gesture, the guest C_Gesture (numbered
+//     with its other messages). Each side keeps only the latest one and paces them at 10 per
+//     second, bursts of 20 (the host's Welcome.gestureRate / gestureBurst; the sender's bucket
+//     is one smaller, see gestureSendCapacity); nothing is kept while the link is down. The host
+//     drops a guest's Gesture beyond that rate or for another game; Gestures never count towards
+//     the flood limit. A received one becomes an OpponentGesture event (the latest replaces one
+//     still queued).
 //
 // The host's game is the authority, exactly like the dedicated server is for online games: it
 // validates the guest's move intents with chess::Position, runs the clocks and decides the
 // result. Both sides then speak the same binary protocol as online play (net::proto messages,
 // dedicated-server/src/protocol/schema.js) inside an encrypted channel, and DirectMatch emits
 // the same net::Event values as OnlineClient (GameSnapshot, MoveMade, MoveRejected, GameEvent,
-// GameEnd, ConnectionChanged, ServerError), so the 3D scene plays a direct match with the online
-// game code. The host's own moves go through the same authority (no special path).
+// GameEnd, ConnectionChanged, ServerError, OpponentGesture), so the 3D scene plays a direct match
+// with the online game code. The host's own moves go through the same authority (no special path).
 //
 // Secure channel (docs/DIRECT_MATCH.md has the full specification):
 //   - The join code: 12 characters from "23456789ABCDEFGHJKMNPQRSTUVWXYZ" (~60 bits), shown as
@@ -68,6 +78,7 @@ struct DirectHostOptions {
     int baseSec = 600, incSec = 5;    // time control (custom values allowed; never rated)
     int hostColor = 0;                // net::proto::ColorPref: 0 random, 1 White, 2 Black
     std::string playerName;           // written on the scoresheets
+    bool autoPress = true;            // the robots press the clock by themselves (OnlineGame::autoPress)
 };
 
 struct UpnpStatus {
@@ -124,6 +135,10 @@ public:
     void abortGame();
     void requestResync();
     void rematch(bool accept);
+    // Live gestures in the current game, straight to the other player over the encrypted link
+    // (cosmetic; the latest state only, paced, dropped while the link is down). Cheap enough to
+    // call every frame.
+    void sendGesture(const Gesture& g);
     const OnlineGame* currentGame() const;
     int pingMs() const;
     double serverNowMs() const;       // the host's clock (the host: its own)

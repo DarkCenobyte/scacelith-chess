@@ -217,6 +217,7 @@ public:
     void enqueue(const Task& t);
     void enqueue(const std::vector<Task>& tasks);
     bool busy() const;                                   // tasks pending or running
+    bool runningTask(TaskType type) const;               // a task of that type is under way
 
     // Writing hand. setWritingRest: where the writing hand waits while it holds the pen, e.g.
     // resting on the scoresheet beside the next row (world point on the paper). Its events come
@@ -236,6 +237,11 @@ public:
     bool penTransform(m::mat4& out) const;
     bool holdsPen() const;
     void clearQueue();                                   // drops pending tasks (running one finishes)
+    // Drops the pending tasks and cuts the running one short, without its remaining events (a
+    // handshake cut short leaves its partner to finish alone): the playing hand lets go of what it
+    // holds where it is, and the game puts those pieces back itself. The next task starts from
+    // wherever the hand is (queue one, a Retract at least).
+    void cancelTasks();
     float remainingTime() const;                         // running task remainder + pending durations
 
     // Gaze: world point to look at (head + eyes, with natural limits and saccades). weight 0..1.
@@ -245,6 +251,14 @@ public:
     // animator applies it to Neck/Head (30/70) so the body matches. Clamped to yaw +-70 deg,
     // pitch -45..+30 deg. The torso lean of reaches is compensated, so the view does not tilt.
     void setHeadOverride(bool enabled, float yaw = 0.0f, float pitch = 0.0f);
+    // The head's orientation now, in setHeadOverride's terms (the override's angles, or where the
+    // gaze controller has turned it): an override driven from outside can start there, without a
+    // jump.
+    void headAngles(float& yaw, float& pitch) const;
+    // Leaning towards the board, 0 (upright) .. 1 (about 11 degrees forward from the hips), reached
+    // smoothly: the online opponent's lean (mouse wheel). The head keeps its orientation (an
+    // override is in character space); the eyes move forward and down with the chest.
+    void setLean(float lean);
     void setThinking(bool thinking);                     // idle variations (chin on hand, etc.)
 
     void update(float dt, std::vector<Event>& events);   // advances tasks, IK, idle; appends events

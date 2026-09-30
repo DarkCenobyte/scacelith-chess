@@ -22,13 +22,31 @@ render::RenderSettings Settings::renderSettings() const {
     return r;
 }
 
+namespace {
+// The fallback of a settings file, "" when it has none: the default file next to the executable
+// falls back to the user data directory (a read-only install); an explicit --ini file has none,
+// so its reads and writes never go to two different files.
+std::string fallbackFor(const std::string& p) {
+    if (!p.empty() && p != plat::exeDirectory() + "Scacelith.ini") return std::string();
+    std::string alt = plat::userDataDirectory() + "Scacelith.ini";
+    return alt != p ? alt : std::string();
+}
+}  // namespace
+
 bool Settings::load(const std::string& p) {
     path = p;
     IniFile ini;
     if (!ini.load(p)) {
-        LOGI("no settings file at %s, using defaults", p.c_str());
-        applyLanguage();
-        return false;
+        // Where save() wrote when p could not be written; 'path' stays its first choice.
+        std::string alt = fallbackFor(p);
+        if (!alt.empty() && ini.load(alt)) {
+            LOGI("settings read from %s", alt.c_str());
+        } else {
+            LOGI("no settings file at %s, using defaults", p.c_str());
+            brightnessCalibrated = false;  // a first start: the brightness calibration comes first
+            applyLanguage();
+            return false;
+        }
     }
     displayWidth = ini.getInt("display.width", displayWidth);
     displayHeight = ini.getInt("display.height", displayHeight);
@@ -39,6 +57,8 @@ bool Settings::load(const std::string& p) {
     motionBlur = ini.getBool("graphics.motion_blur", motionBlur);
     depthOfField = ini.getBool("graphics.depth_of_field", depthOfField);
     brightness = ini.getFloat("graphics.brightness", brightness);
+    // Absent from a file written before the calibration existed: its player has chosen already.
+    brightnessCalibrated = ini.getBool("graphics.brightness_calibrated", true);
     masterVolume = ini.getFloat("audio.master_volume", masterVolume);
     effectsVolume = ini.getFloat("audio.effects_volume", effectsVolume);
     ambienceVolume = ini.getFloat("audio.ambience_volume", ambienceVolume);
@@ -48,6 +68,8 @@ bool Settings::load(const std::string& p) {
     mouseSensitivity = ini.getFloat("gameplay.mouse_sensitivity", mouseSensitivity);
     invertLook = ini.getBool("gameplay.invert_look", invertLook);
     gameCursor = ini.getBool("gameplay.game_cursor", gameCursor);
+    autoPressClock = ini.getBool("gameplay.auto_press_clock", autoPressClock);
+    ignoreOpponentHead = ini.getBool("gameplay.ignore_opponent_head", ignoreOpponentHead);
     nextColor = ini.getInt("gameplay.next_color", nextColor);
     handoverSeconds = std::clamp(ini.getFloat("gameplay.handover_seconds", handoverSeconds), 0.0f, 2.0f);
     if (handoverSeconds > 0.0f && handoverSeconds < 0.8f) handoverSeconds = 0.8f;
@@ -65,13 +87,9 @@ bool Settings::load(const std::string& p) {
     customNodes = ini.getInt("engine.nodes", customNodes);
     engineThreads = ini.getInt("engine.threads", engineThreads);
     engineHashMB = ini.getInt("engine.hash_mb", engineHashMB);
+    engineArch = ini.getString("engine.arch", engineArch);
     humanizeThinking = ini.getBool("engine.humanize", humanizeThinking);
-    playerElo = ini.getInt("player.elo", playerElo);
-    playerGames = ini.getInt("player.games", playerGames);
-    playerWins = ini.getInt("player.wins", playerWins);
-    playerDraws = ini.getInt("player.draws", playerDraws);
-    playerLosses = ini.getInt("player.losses", playerLosses);
-    playerPeakElo = std::max(playerElo, ini.getInt("player.peak", playerPeakElo));
+    setPlayerRecord(elo::readRecord(ini, "player"));
     for (int i = 0; i < 2; ++i) {
         const char* side = i == 0 ? "white" : "black";
         hotseatNames[i] = ini.getString(std::string("hotseat.") + side + "_name", hotseatNames[i]);
@@ -86,12 +104,7 @@ bool Settings::load(const std::string& p) {
         if (!ini.has(sec + "name")) break;
         LocalPlayer p;
         p.name = ini.getString(sec + "name");
-        p.record.rating = std::max(elo::kFloor, ini.getInt(sec + "elo", elo::kInitialRating));
-        p.record.games = std::max(0, ini.getInt(sec + "games", 0));
-        p.record.wins = std::max(0, ini.getInt(sec + "wins", 0));
-        p.record.draws = std::max(0, ini.getInt(sec + "draws", 0));
-        p.record.losses = std::max(0, ini.getInt(sec + "losses", 0));
-        p.record.peak = std::max(p.record.rating, ini.getInt(sec + "peak", p.record.rating));
+        p.record = elo::readRecord(ini, "local_player_" + std::to_string(n));
         if (!p.name.empty() && !findLocalPlayer(p.name)) localPlayers.push_back(p);
     }
     viewerWhitePreset = ini.getInt("viewer.white_preset", viewerWhitePreset);
@@ -117,6 +130,7 @@ bool Settings::load(const std::string& p) {
     directBaseSeconds = ini.getInt("direct.base_seconds", directBaseSeconds);
     directIncrementSeconds = ini.getInt("direct.increment_seconds", directIncrementSeconds);
     directColor = std::clamp(ini.getInt("direct.color", directColor), 0, 2);
+    directAutoPress = ini.getBool("direct.auto_press_clock", directAutoPress);
     directAddress = ini.getString("direct.address", directAddress);
     directJoinPort = std::clamp(ini.getInt("direct.join_port", directJoinPort), 1, 65535);
     language = ini.getString("interface.language", language);
@@ -137,6 +151,36 @@ const LocalPlayer* Settings::findLocalPlayer(const std::string& name) const {
     for (const LocalPlayer& p : localPlayers)
         if (p.name == name) return &p;
     return nullptr;
+}
+
+elo::Record Settings::playerRecord() const {
+    elo::Record r;
+    r.rating = playerElo;
+    r.games = playerGames;
+    r.wins = playerWins;
+    r.draws = playerDraws;
+    r.losses = playerLosses;
+    r.peak = std::max(playerPeakElo, playerElo);
+    r.rated = playerRated;
+    r.countedGames = playerCountedGames;
+    r.unratedGames = playerUnratedGames;
+    r.unratedOpponents = playerUnratedOpponents;
+    r.unratedHalfPoints = playerUnratedHalfPoints;
+    return r;
+}
+
+void Settings::setPlayerRecord(const elo::Record& r) {
+    playerElo = r.rating;
+    playerGames = r.games;
+    playerWins = r.wins;
+    playerDraws = r.draws;
+    playerLosses = r.losses;
+    playerPeakElo = r.peak;
+    playerRated = r.rated;
+    playerCountedGames = r.countedGames;
+    playerUnratedGames = r.unratedGames;
+    playerUnratedOpponents = r.unratedOpponents;
+    playerUnratedHalfPoints = r.unratedHalfPoints;
 }
 
 LocalPlayer& Settings::localPlayer(const std::string& name) {
@@ -171,6 +215,7 @@ bool Settings::save() const {
     ini.setBool("graphics.motion_blur", motionBlur);
     ini.setBool("graphics.depth_of_field", depthOfField);
     ini.setFloat("graphics.brightness", brightness);
+    ini.setBool("graphics.brightness_calibrated", brightnessCalibrated);
     ini.setFloat("audio.master_volume", masterVolume);
     ini.setFloat("audio.effects_volume", effectsVolume);
     ini.setFloat("audio.ambience_volume", ambienceVolume);
@@ -180,6 +225,8 @@ bool Settings::save() const {
     ini.setFloat("gameplay.mouse_sensitivity", mouseSensitivity);
     ini.setBool("gameplay.invert_look", invertLook);
     ini.setBool("gameplay.game_cursor", gameCursor);
+    ini.setBool("gameplay.auto_press_clock", autoPressClock);
+    ini.setBool("gameplay.ignore_opponent_head", ignoreOpponentHead);
     ini.setInt("gameplay.next_color", nextColor);
     ini.setFloat("gameplay.handover_seconds", handoverSeconds);
     ini.setInt("newgame.opponent", opponent);
@@ -196,13 +243,9 @@ bool Settings::save() const {
     ini.setInt("engine.nodes", customNodes);
     ini.setInt("engine.threads", engineThreads);
     ini.setInt("engine.hash_mb", engineHashMB);
+    ini.set("engine.arch", engineArch);
     ini.setBool("engine.humanize", humanizeThinking);
-    ini.setInt("player.elo", playerElo);
-    ini.setInt("player.games", playerGames);
-    ini.setInt("player.wins", playerWins);
-    ini.setInt("player.draws", playerDraws);
-    ini.setInt("player.losses", playerLosses);
-    ini.setInt("player.peak", playerPeakElo);
+    elo::writeRecord(ini, "player", playerRecord());
     ini.set("hotseat.white_name", hotseatNames[0]);
     ini.set("hotseat.black_name", hotseatNames[1]);
     ini.setInt("hotseat.white_hand", hotseatHands[0]);
@@ -211,14 +254,9 @@ bool Settings::save() const {
     ini.setBool("hotseat.rated", hotseatRated);
     for (size_t i = 0; i < localPlayers.size(); ++i) {
         const LocalPlayer& p = localPlayers[i];
-        std::string sec = "local_player_" + std::to_string(i + 1) + ".";
-        ini.set(sec + "name", p.name);
-        ini.setInt(sec + "elo", p.record.rating);
-        ini.setInt(sec + "games", p.record.games);
-        ini.setInt(sec + "wins", p.record.wins);
-        ini.setInt(sec + "draws", p.record.draws);
-        ini.setInt(sec + "losses", p.record.losses);
-        ini.setInt(sec + "peak", p.record.peak);
+        std::string sec = "local_player_" + std::to_string(i + 1);
+        ini.set(sec + ".name", p.name);
+        elo::writeRecord(ini, sec, p.record);
     }
     ini.setInt("viewer.white_preset", viewerWhitePreset);
     ini.setInt("viewer.black_preset", viewerBlackPreset);
@@ -243,15 +281,16 @@ bool Settings::save() const {
     ini.setInt("direct.base_seconds", directBaseSeconds);
     ini.setInt("direct.increment_seconds", directIncrementSeconds);
     ini.setInt("direct.color", directColor);
+    ini.setBool("direct.auto_press_clock", directAutoPress);
     ini.set("direct.address", directAddress);
     ini.setInt("direct.join_port", directJoinPort);
     ini.set("interface.language", language);
     ini.set("player.name", playerName);
     ini.setInt("player.hand_style", int(handStyle));
     if (!path.empty() && ini.save(path)) return true;
-    std::string alt = plat::userDataDirectory() + "Scacelith.ini";
-    if (ini.save(alt)) return true;
-    LOGW("could not save settings");
+    std::string alt = fallbackFor(path);
+    if (!alt.empty() && ini.save(alt)) return true;
+    LOGW("could not save settings to %s", path.empty() ? alt.c_str() : path.c_str());
     return false;
 }
 

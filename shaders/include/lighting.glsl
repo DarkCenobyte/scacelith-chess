@@ -10,9 +10,9 @@
 // scaling from the DFG LUT), anisotropic GGX (+ bent reflection vector for IBL), subsurface
 // (energy-conserving coloured wrap + transmittance through the thickness read back from the shadow
 // map), glass transmission, multiple-scattering GGX energy compensation, light probes (blended L2
-// SH irradiance + box-projected GGX-prefiltered specular), planar reflections (roughness- and
-// distance-aware Gaussian mip lookup, normal distortion, border fade), multi-bounce AO, specular
-// occlusion and horizon fading.
+// SH irradiance + box-projected GGX-prefiltered specular), planar reflections (on the mirror plane
+// only; roughness- and distance-aware Gaussian mip lookup, normal distortion, border fade),
+// multi-bounce AO, specular occlusion and horizon fading.
 #include "shaders/include/brdf.glsl"
 #include "shaders/lighting/lighting_ubo.glsl"
 
@@ -399,9 +399,20 @@ vec3 probeSpecular(ProbeBlend pb, vec3 p, vec3 R, float rough) {
 }
 
 // Planar reflection lookup. Returns rgb radiance and a = confidence (0 = use probes).
-vec4 samplePlanarReflection(int layer, vec3 posWS, vec3 N, vec3 V, float rough) {
+// Ng is the geometric normal, N the shading normal (its tilt distorts the lookup).
+vec4 samplePlanarReflection(int layer, vec3 posWS, vec3 Ng, vec3 N, vec3 V, float rough) {
     if (lighting.planarInfo[layer].x < 0.5) return vec4(0.0);
-    vec3 pn = frame.planarPlanes[layer].xyz;
+    vec4 plane = frame.planarPlanes[layer];
+    vec3 pn = plane.xyz;
+    // The reflection is only valid on surfaces that lie on the mirror plane, facing like it. A
+    // reflector material also covers mouldings, bevels, chamfers and sides (the table top's rounded
+    // edge and underside rim, the board frame): there the lookup would fetch unrelated mirrored
+    // content, or the cleared texels outside the rendered region, and a clear coat's grazing
+    // Fresnel would show it at full strength, like a hole in the edge. They use the probes. Full
+    // weight within ~4 degrees and 2 mm of the plane, none beyond ~10 degrees or 6 mm.
+    float offPlane = abs(dot(pn, posWS) + plane.w);
+    float onPlane = smoothstep(0.985, 0.998, dot(Ng, pn)) * (1.0 - smoothstep(0.002, 0.006, offPlane));
+    if (onPlane <= 0.0) return vec4(0.0);
     vec4 clip0 = frame.planarViewProj[layer] * vec4(posWS, 1.0);
     vec2 uv0 = clip0.xy / clip0.w * 0.5 + 0.5;
     // Distance (m) from the plane to what is reflected here (alpha of the reflection, level 0).
@@ -414,6 +425,10 @@ vec4 samplePlanarReflection(int layer, vec3 posWS, vec3 N, vec3 V, float rough) 
     vec3 q = posWS + nt * (2.0 * min(path, 4.0));
     vec4 clip = frame.planarViewProj[layer] * vec4(q, 1.0);
     vec2 uv = clip.xy / clip.w * 0.5 + 0.5;
+    // Texels the reflection pass did not render (outside its scissor rectangle) are cleared to zero,
+    // distance included. When the distorted lookup lands there, keep the undistorted one: the
+    // reflector's bounds keep it inside the rendered region (its distance was read above).
+    if (textureLod(uPlanar, vec3(uv, float(layer)), 0.0).a <= 0.0) uv = uv0;
     // Roughness-aware blur: reflected GGX lobe footprint at the hit, in reflection-texture pixels.
     float viewDist = distance(frame.cameraPos.xyz, posWS);
     float coneTan = rough * rough * 0.9;
@@ -423,7 +438,7 @@ vec4 samplePlanarReflection(int layer, vec3 posWS, vec3 N, vec3 V, float rough) 
     vec3 col = textureLod(uPlanar, vec3(uv, float(layer)), lod).rgb;
     vec2 e = min(uv, 1.0 - uv);
     float fade = clamp(min(e.x, e.y) / 0.06, 0.0, 1.0);
-    return vec4(col, fade * fade * (3.0 - 2.0 * fade));
+    return vec4(col, fade * fade * (3.0 - 2.0 * fade) * onPlane);
 }
 
 // Pre-exposed specular radiance arriving along R (planar reflection or probes).
@@ -434,7 +449,7 @@ vec3 indirectSpecular(ProbeBlend pb, SurfaceInput i, vec3 N, vec3 R, float rough
     else probe = vec3(0.0);
 #if !defined(PASS_PLANAR) && !defined(PASS_PROBE)
     if (planarLayer >= 0.0 && frame.passInfo.w > planarLayer) {
-        vec4 pl = samplePlanarReflection(int(planarLayer), i.positionWS, N, i.viewDirWS, rough);
+        vec4 pl = samplePlanarReflection(int(planarLayer), i.positionWS, i.normalWS, N, i.viewDirWS, rough);
         probe = mix(probe, pl.rgb, pl.a);
     }
 #endif

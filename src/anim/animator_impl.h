@@ -691,6 +691,7 @@ struct Animator::Impl {
     float taskGaze = 0.0f;                    // 0..1: gaze follows the running task's target
     SpineParams spineOut;
     float thinkLean = 0, thinkLeanTarget = 0;
+    float lean = 0, leanTarget = 0;           // setLean (0..1), smoothed in updateIdle
 
     bool debugLog = std::getenv("SCACELITH_ANIM_DEBUG") != nullptr;
 

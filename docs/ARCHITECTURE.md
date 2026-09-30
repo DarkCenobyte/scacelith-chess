@@ -34,7 +34,7 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 | `src/character` | Robot model + skeleton |
 | `src/anim` | IK, hand tasks with fixed durations, gaze, idle |
 | `src/chess` | Rules, clock, tournament arbiter (touch-move, illegal moves) |
-| `src/ai` | Stockfish 16 in-process (UCI over in-memory streams), presets |
+| `src/ai` | Stockfish 19 in-process (UCI over in-memory streams), presets |
 | `src/audio` | Procedural sound synthesis, mixer, reverb, WASAPI |
 | `src/ui` | SDF text (lazy atlas, font fallback, Arabic joining + bidi via `text_shape.h`), widgets (mirrored for RTL), menus |
 | `src/i18n` + `assets/i18n` | Translations (`tr`, `trf`, `trn` with CLDR plurals), language choice, Unicode helpers (`unicode.h`: joining, bidi, line breaks) |

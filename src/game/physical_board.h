@@ -16,7 +16,12 @@ struct PieceObject {
     chess::Square square = chess::NoSquare;  // on-board square, NoSquare when off-board
     bool captured = false;                     // standing among the captured pieces
     bool inReserve = false;                    // spare piece not yet used
+    bool spare = false;                        // not of the initial set: a reserve queen, one brought later
+    m::vec3 reserveSpot{0, 0, 0};              // spare: where it stands while in the reserve
+    int captureOrder = 0;                      // when it was last set down as captured: later is larger
     bool held = false;                         // following a hand
+    bool slotReserved = false;                 // a capture slot waits for it (nextCaptureSlot)
+    m::vec3 reservedSlot{0, 0, 0};
     m::vec3 basePos{0, 0, 0};                  // resting base centre (world)
     float yaw = 0.0f;                          // rotation about +Y (radians)
     m::mat4 transform;                         // current world transform (base centre origin)
@@ -38,7 +43,12 @@ public:
 
     // Resting positions.
     m::vec3 squareBase(chess::Square sq) const;
-    m::vec3 nextCaptureSlot(chess::Color capturedColor);  // reserves and returns a slot
+    // Captured pieces and promoted pawns stand beside the board on the clock side, in the half of
+    // the player 'beside' (who captured them, or who promoted the pawn). Returns the first free
+    // capture slot of that half (layout::captureSlot) and keeps it for 'pieceId' until the piece
+    // is set down (setCaptured, setOnSquare), the board is reset or synchronised (syncTo).
+    m::vec3 nextCaptureSlot(chess::Color beside, int pieceId);
+    m::vec3 captureSlot(chess::Color beside, int k) const;  // slot k of that half (world)
     m::vec3 reserveSlot(chess::Color c) const;
     float defaultYaw(chess::Color c) const { return c == chess::White ? m::PI : 0.0f; }
 
@@ -46,11 +56,15 @@ public:
     void setOnSquare(int id, chess::Square sq);
     void setCaptured(int id, m::vec3 pos);
     void removeFromBoard(int id);                 // picked up (square cleared)
-    // Piece to bring in for a promotion: a captured one of that type/colour, else a spare from
-    // the reserve (one queen per colour at start; created on demand). It stays where it is
-    // until setOnSquare().
+    // Piece to bring in for a promotion: a captured one of that type/colour within the player's
+    // reach, else a spare from the reserve (one queen per colour at start; created on demand in a
+    // free capture slot beside the player). It stays where it is until setOnSquare().
     int takeSpare(chess::PieceType t, chess::Color c);
     // Snap every piece to the given logical position (arbiter restoring the position, new game).
+    // Pieces missing from the board come back from the captured ones, the last set down first, so
+    // that taking a move back restores the table as it was: its victim, the pawn of a promotion.
+    // The spare of a promotion taken back goes back to the reserve; the other pieces left over
+    // are captured (syncTo in physical_board.cpp).
     void syncTo(const chess::Position& pos);
 
     void beginFrame();                            // prevTransform = transform
@@ -59,8 +73,15 @@ public:
 private:
     std::vector<PieceObject> pieces_;
     bool clockPosX_ = true;
-    int captureCount_[2] = {0, 0};
+    int captures_ = 0;                            // pieces set down as captured (captureOrder)
     int newPiece(chess::PieceType t, chess::Color c);
+    // Distance from 'at' to the nearest piece standing beside the board (captured, spare; not in a
+    // hand) or slot kept for one.
+    float clearance(m::vec3 at) const;
+    m::vec3 freeCaptureSlot(chess::Color beside) const;
+    // takeSpare; inReach = false (syncTo snaps pieces into place) also takes captured pieces
+    // standing beside the opponent.
+    int offBoardPiece(chess::PieceType t, chess::Color c, bool inReach);
 };
 
 }  // namespace game

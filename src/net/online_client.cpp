@@ -24,6 +24,12 @@
 //     refused upgrade (404, 426: another path or subprotocol) makes the next attempt read /info
 //     again. A connect() asked by the player always reads /info again and never waits for the
 //     backoff.
+//   - Gestures (sendGesture, net/gesture.h) follow Welcome.gestureRate / gestureBurst, the
+//     server's relay bucket: only the latest one waits, and it goes when a token of a bucket one
+//     message smaller than the server's allows (none when the rate is 0): the server then drops
+//     none unless a stall of the link delivers more than its burst at once (gestureSendCapacity).
+//     A Gesture made while the connection is down, or for another game than the one of the last
+//     GameSnapshot, is dropped: the next one carries the whole state again.
 //
 // Keeping the realtime connection on its own thread means a slow HTTPS call (or a proof of
 // work) never delays the answer to a server Ping or the sending of a move. The game thread only
@@ -134,6 +140,9 @@ constexpr size_t kOffsetSamples = 8;            // clock offset: lowest round tr
 constexpr auto kOffsetMaxAge = std::chrono::minutes(5);   // ...taken in the last 5 minutes
 constexpr auto kInfoReuse = std::chrono::minutes(10);     // /info answer reused on reconnection
 constexpr uint16_t kCloseServerFull = 4006;     // 4000 + ErrorCode::ServerFull (no CloseCode entry)
+
+// Milliseconds of the monotonic clock (the Gesture bucket's time).
+double steadyMs() { return std::chrono::duration<double, std::milli>(Clock::now().time_since_epoch()).count(); }
 
 // Random numbers for the reconnection jitter, seeded from the OS generator so that clients never
 // share a sequence (they would come back together).
@@ -261,6 +270,8 @@ struct OnlineClient::Impl {
     std::deque<std::function<void()>> httpQ, rtQ;
     std::deque<Event> events;
     bool stopping = false, rtWake = false;
+    // The latest Gesture of the game thread, until net-rt sends or drops it (flushGesture).
+    struct GestureOut { bool pending = false; uint64_t game = 0; Gesture g; } gestureOut;
     std::atomic<bool> stopFlag{false};
     std::atomic<int> connState{int(ConnState::Offline)};
     std::atomic<int> ping{-1};
@@ -315,6 +326,7 @@ struct OnlineClient::Impl {
         OnlineGame game;
         uint32_t lastGseq = 0;
         struct Pending { uint64_t game = 0; int ply = -1; uint16_t move = 0; } pending;
+        GestureBucket gestures;                           // Welcome.gestureRate / gestureBurst
     } rt;
 
     Impl() {
@@ -338,6 +350,18 @@ struct OnlineClient::Impl {
 
     void post(Event ev) {
         std::lock_guard<std::mutex> lk(mu);
+        events.push_back(std::move(ev));
+    }
+    // An OpponentGesture replaces the one of the same game still waiting to be polled (only the
+    // latest state matters), so the queue holds at most one per game.
+    void postGesture(Event ev) {
+        std::lock_guard<std::mutex> lk(mu);
+        for (auto it = events.begin(); it != events.end(); ++it) {
+            if (it->kind == Event::Kind::OpponentGesture && it->gameId == ev.gameId) {
+                events.erase(it);
+                break;
+            }
+        }
         events.push_back(std::move(ev));
     }
     void http(std::function<void()> fn) {
@@ -876,6 +900,7 @@ struct OnlineClient::Impl {
         g.graceMs = s.graceMs;
         g.firstMoveMs = s.firstMoveMs;
         g.rematchBy = int(s.rematch);
+        g.autoPress = s.autoPress;
         return g;
     }
 
@@ -915,6 +940,7 @@ struct OnlineClient::Impl {
             rt.pingEveryMs = clientPingIntervalMs(m.clientPingMs);
             rt.pingBurst = kPingBurst;
             rt.restarting = false;
+            rt.gestures.reset(steadyMs(), m.gestureRate, gestureSendCapacity(m.gestureBurst));
             if (rt.info.valid) rt.info.proven = true;
             if (!rt.haveOffset) clockOffset.store(m.serverTime - localEpochMs());
             setState(ConnState::Online);
@@ -1136,9 +1162,41 @@ struct OnlineClient::Impl {
             post(ev);
             break;
         }
+        case pr::MsgType::S_Gesture: {
+            pr::S_Gesture m;
+            if (!pr::decode(p, n, m)) return bad();
+            if (m.game == 0 || m.game != rt.game.id) break;   // not the game shown
+            Event ev;
+            ev.kind = Event::Kind::OpponentGesture;
+            ev.ok = true;
+            ev.gameId = m.game;
+            ev.gesture = gestureFromWire(m);
+            postGesture(std::move(ev));
+            break;
+        }
         default:
             break;
         }
+    }
+
+    // The game thread's latest Gesture: sent when its bucket has a token, otherwise left for
+    // later (nextRtDeadline wakes the loop then). Dropped when it cannot go: not Online (it is
+    // never kept for a reconnection), no relay on this server, or not the current game.
+    void flushGesture() {
+        GestureOut out;
+        {
+            std::lock_guard<std::mutex> lk(mu);
+            if (!gestureOut.pending) return;
+            const bool usable = rt.ws && rt.welcomed && rt.gestures.enabled() && gestureOut.game != 0 && gestureOut.game == rt.game.id;
+            if (usable && !rt.gestures.take(steadyMs())) return;
+            out = gestureOut;
+            gestureOut.pending = false;
+            if (!usable) return;
+        }
+        pr::C_Gesture m;
+        m.game = out.game;
+        gestureToWire(out.g, m);
+        send(m);
     }
 
     void onClosed(uint16_t code, const std::string& reason) {
@@ -1181,6 +1239,11 @@ struct OnlineClient::Impl {
         if (rt.wanted && !rt.ws) t = std::min(t, rt.nextAttempt);
         if (rt.ws && rt.welcomed) t = std::min(t, rt.nextPing);
         if (rt.ws) t = std::min(t, Clock::now() + std::chrono::milliseconds(500));
+        if (rt.ws && rt.welcomed && gestureOut.pending) {   // called with mu held
+            double now = steadyMs();
+            double wait = std::ceil(rt.gestures.readyAtMs(now) - now);
+            t = std::min(t, Clock::now() + std::chrono::milliseconds(int64_t(wait)));
+        }
         return t;
     }
 
@@ -1195,6 +1258,9 @@ struct OnlineClient::Impl {
                 rtWake = false;
             }
             for (auto& c : cmds) c();
+            // Before reading: a Gesture made while the connection was down never goes after the
+            // Welcome that may be waiting.
+            flushGesture();
             if (rt.ws) {
                 std::vector<uint8_t> msg;
                 while (rt.ws && rt.ws->receive(msg)) handleMessage(msg);
@@ -1735,6 +1801,22 @@ void OnlineClient::rematch(uint64_t gameId, bool accept) {
         m.accept = accept;
         d->sendGame(m);
     });
+}
+
+void OnlineClient::sendGesture(uint64_t gameId, const Gesture& g) {
+    Impl* d = impl_.get();
+    if (d->connState.load() != int(ConnState::Online)) return;   // nothing kept for a reconnection
+    bool wake;
+    {
+        std::lock_guard<std::mutex> lk(d->mu);
+        // One already waiting has woken net-rt, which looks again when its bucket allows.
+        wake = !d->gestureOut.pending;
+        d->gestureOut.pending = true;
+        d->gestureOut.game = gameId;
+        d->gestureOut.g = g;
+        if (wake) d->rtWake = true;
+    }
+    if (wake) d->rtCv.notify_one();
 }
 
 const OnlineGame* OnlineClient::currentGame() const { return impl_->hasView ? &impl_->view : nullptr; }

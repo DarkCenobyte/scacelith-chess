@@ -29,7 +29,11 @@
 //     TLS is always used unless insecureDev is set (and insecureDev is refused off loopback).
 //   - RetryCause, reconnectDelayMs() and clientPingIntervalMs() (additive): the reconnection and
 //     client Ping pacing rules as pure functions, so the tests can check them.
+//   - Protocol v2 (additive): sendGesture() and Event::Kind::OpponentGesture relay the live
+//     gestures of the two players (net/gesture.h), and OnlineGame::autoPress tells whether the
+//     robots press the clock by themselves in the game.
 #pragma once
+#include "gesture.h"
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -113,6 +117,10 @@ struct OnlineGame {
     bool whiteConnected = true, blackConnected = true;
     uint32_t graceMs = 0, firstMoveMs = 0;
     int rematchBy = 2;
+    // The robots press the clock by themselves once a move is on the board (the server's
+    // AUTO_PRESS_CLOCK, or the host's choice in a direct match). When false, the move is sent
+    // only when the player presses the clock, so their clock runs until then.
+    bool autoPress = true;
 };
 
 // Move as sent on the wire: from | to << 6 | promo << 12 (chess::PieceType promo numbering).
@@ -194,7 +202,10 @@ struct Event {
         GameEnd,              // game (status, reason, clocks)
         RatingUpdate,         // ratingWhite/ratingBlack before/after
         Notice,               // noticeCode, arg (shutdown, ban, cooldown...)
-        ServerError           // code (net::proto::ErrorCode), fatal, gameId
+        ServerError,          // code (net::proto::ErrorCode), fatal, gameId
+        OpponentGesture       // gesture, gameId: the opponent's live gestures in the current game
+                              // (cosmetic; 'game' is not filled in, a newer one replaces one still
+                              // queued)
     };
     Kind kind = Kind::ServerInfoResult;
     bool ok = false;
@@ -219,6 +230,7 @@ struct Event {
     int gameEventKind = 0, color = 2; uint32_t arg = 0;
     struct Rating { int before = 0, after = 0, games = 0; bool provisional = false; } ratingWhite, ratingBlack;
     int noticeCode = 0; double noticeArg = 0;
+    Gesture gesture;
 };
 
 class OnlineClient {
@@ -276,6 +288,11 @@ public:
     void abortGame(uint64_t gameId);
     void requestResync(uint64_t gameId);
     void rematch(uint64_t gameId, bool accept);
+    // Live gestures (cosmetic, net/gesture.h): only the latest state is kept, and it is sent at
+    // the rate the server announced in Welcome (gestureRate / gestureBurst; nothing when 0).
+    // Dropped while not Online (never queued for a reconnection) and when gameId is not the game
+    // of the last GameSnapshot. Cheap enough to call every frame.
+    void sendGesture(uint64_t gameId, const Gesture& g);
     const OnlineGame* currentGame() const;       // game thread view (updated by poll())
 
     // Drains one event; call until it returns false, once per frame.

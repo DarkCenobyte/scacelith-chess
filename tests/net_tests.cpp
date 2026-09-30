@@ -3,7 +3,8 @@
 // validation, and OnlineClient end to end against a fake server on the loopback interface
 // (plain HTTP + WebSocket, the insecureDev mode): login with a proof of work, account, Hello /
 // Welcome, ping and clock offset, queue, moves, reconnection, 4003 and logout; the pacing of the
-// client Ping (Welcome.clientPingMs) and of the reconnections (full server, shutdown, /info reuse).
+// client Ping (Welcome.clientPingMs) and of the reconnections (full server, shutdown, /info reuse);
+// live gestures (wire units, pacing, the opponent's).
 //
 // Vectors: tests/data/net-protocol-vectors.json (dedicated-server/tools/gen-cpp-test-vectors.js)
 // and, when present, dedicated-server/test/fixtures/protocol-vectors.json. The files are looked
@@ -142,6 +143,8 @@ template <class T> Value toJson(const T& v) {
         return Value(v);
     } else if constexpr (std::is_enum_v<T>) {
         return Value(int64_t(v));
+    } else if constexpr (std::is_integral_v<T> && std::is_signed_v<T>) {
+        return Value(int64_t(v));
     } else if constexpr (std::is_integral_v<T>) {
         return Value(uint64_t(v));
     } else if constexpr (IsVector<T>::value) {
@@ -246,11 +249,18 @@ bool checkMalformed(const std::string& name, const std::vector<uint8_t>& bytes, 
 // =============================================================================================
 
 TEST(net_protocol_constants) {
-    CHECK_EQ(pr::kProtocolVersion, 1);
+    CHECK_EQ(pr::kProtocolVersion, 2);
+    CHECK_EQ(pr::kProtocolMin, 2);
     CHECK_EQ(std::string(pr::kWsSubprotocol), std::string("scacelith.v1"));
     CHECK_EQ(int(pr::MsgType::Move), 0x20);
     CHECK_EQ(int(pr::MsgType::C_Ping), 0x02);
     CHECK_EQ(int(pr::MsgType::S_Ping), 0x82);
+    CHECK_EQ(int(pr::MsgType::C_Gesture), 0x28);
+    CHECK_EQ(int(pr::MsgType::S_Gesture), 0xA6);
+    CHECK_EQ(int(pr::GestureFlag::Glance), 1);
+    CHECK_EQ(int(pr::GestureFlag::Promoting), 2);
+    CHECK_EQ(int(pr::GestureFlag::Side), 4);
+    CHECK_EQ(int(pr::NoticeCode::RatingRestored), 7);
     CHECK_EQ(std::string(pr::messageName(pr::MsgType::S_Pong)), std::string("S_Pong"));
     CHECK(pr::messageName(pr::MsgType(0x7F)) == nullptr);
     CHECK(pr::isValid(pr::EndReason::BothDisconnected));
@@ -421,6 +431,181 @@ TEST(net_pack_move) {
     CHECK_EQ(net::moveTo(m), 0);
     CHECK_EQ(net::movePromo(m), 4);
     CHECK((net::packMove(63, 63, 7) & 0x8000) == 0);
+}
+
+// Gesture wire units and bounds (net/gesture.h), and the token bucket that paces them.
+TEST(net_gesture_wire) {
+    // Out-of-range values are brought within the schema's bounds.
+    net::Gesture g;
+    g.ply = 1500;
+    g.touch = -3;
+    g.aim = 70;
+    g.placed = 0xffff;
+    g.flags = 0xff;
+    g.yaw = 4.0f;
+    g.pitch = -2.0f;
+    g.lean = 1.7f;
+    pr::C_Gesture c;
+    c.seq = 1;
+    c.game = 5;
+    net::gestureToWire(g, c);
+    CHECK(pr::valid(c));
+    CHECK_EQ(int(c.ply), 1199);
+    CHECK_EQ(int(c.touch), 64);
+    CHECK_EQ(int(c.aim), 64);
+    CHECK_EQ(int(c.placed), 0x7fff);
+    CHECK_EQ(int(c.flags), 7);
+    CHECK_EQ(c.yaw, 3142);
+    CHECK_EQ(c.pitch, -1571);
+    CHECK_EQ(int(c.lean), 100);
+    g.yaw = -9.0f;
+    g.pitch = 2.0f;
+    g.lean = -0.5f;
+    g.ply = -1;
+    net::gestureToWire(g, c);
+    CHECK_EQ(c.yaw, -3142);
+    CHECK_EQ(c.pitch, 1571);
+    CHECK_EQ(int(c.lean), 0);
+    CHECK_EQ(int(c.ply), 0);
+    g.yaw = std::nanf("");
+    g.pitch = INFINITY;
+    g.lean = std::nanf("");
+    net::gestureToWire(g, c);
+    CHECK(c.yaw == 0 && c.pitch == 0 && c.lean == 0);
+
+    // Round trip through an encoded S_Gesture: milliradians and percent.
+    net::Gesture h;
+    h.ply = 42;
+    h.touch = 12;
+    h.aim = 28;
+    h.placed = net::packMove(12, 28, 0);
+    h.flags = uint8_t(pr::GestureFlag::Glance | pr::GestureFlag::Side);
+    h.yaw = -0.5f;
+    h.pitch = -0.3141f;
+    h.lean = 0.42f;
+    pr::S_Gesture s;
+    s.game = 77;
+    net::gestureToWire(h, s);
+    std::vector<uint8_t> buf;
+    pr::encode(s, buf);
+    pr::S_Gesture d;
+    CHECK(pr::decode(buf.data(), buf.size(), d));
+    CHECK_EQ(d.game, uint64_t(77));
+    CHECK_EQ(d.pitch, -314);
+    net::Gesture r = net::gestureFromWire(d);
+    CHECK(r.sameState(h));
+    CHECK(std::fabs(r.yaw - h.yaw) < 1e-6f);
+    CHECK(std::fabs(r.pitch + 0.314f) < 1e-6f);
+    CHECK(std::fabs(r.lean - h.lean) < 1e-6f);
+    net::Gesture moved = r;
+    moved.yaw += 0.1f;
+    CHECK(moved.sameState(r));
+    moved.aim = 36;
+    CHECK(!moved.sameState(r));
+
+    // The bucket: full after reset, then 'rate' per second; rate 0 lets nothing through.
+    net::GestureBucket b;
+    b.reset(1000.0, 10, 3);
+    CHECK(b.enabled());
+    CHECK(b.take(1000.0) && b.take(1000.0) && b.take(1000.0));
+    CHECK(!b.take(1000.0));
+    CHECK_EQ(b.readyAtMs(1000.0), 1100.0);
+    CHECK(!b.take(1050.0));
+    CHECK_EQ(b.readyAtMs(1050.0), 1100.0);
+    CHECK(b.take(1100.0));
+    CHECK(!b.take(1100.0));
+    CHECK_EQ(b.readyAtMs(10000.0), 10000.0);
+    CHECK(b.take(10000.0) && b.take(10000.0) && b.take(10000.0));   // never more than the capacity
+    CHECK(!b.take(10000.0));
+    CHECK(!b.take(9000.0));                                           // time never goes back
+    b.reset(0.0, 0, 20);
+    CHECK(!b.enabled());
+    CHECK(!b.take(0.0) && !b.take(60000.0));
+    CHECK_EQ(b.readyAtMs(5.0), 5.0);
+    CHECK_EQ(net::gestureSendCapacity(8), 7);
+    CHECK_EQ(net::gestureSendCapacity(1), 1);
+    CHECK_EQ(net::gestureSendCapacity(0), 1);
+}
+
+namespace {
+
+// A sender paced at gestureSendCapacity(burst) against the receiver's bucket (rate, burst), both
+// full at time 0. The sender has a new Gesture in every 16 ms frame where moving(t) holds and
+// sends the latest one when its bucket allows; delayMs(t) is the network delay of a message sent
+// at t, and the order is kept (TCP): a message never arrives before the one sent before it.
+// Returns every message sent: its send time and whether the receiver kept it.
+template <class Moving, class Delay>
+std::vector<std::pair<double, bool>> paceAgainstReceiver(int rate, int burst, double spanMs, Moving moving, Delay delayMs) {
+    net::GestureBucket out, in;
+    out.reset(0.0, rate, net::gestureSendCapacity(burst));
+    in.reset(0.0, rate, burst);
+    std::vector<std::pair<double, bool>> sent;
+    bool pending = false;
+    double arrival = 0.0;
+    for (double t = 0.0; t < spanMs; t += 16.0) {
+        pending = pending || moving(t);
+        if (!pending || !out.take(t)) continue;
+        pending = false;
+        arrival = std::max(arrival, t + delayMs(t));
+        sent.push_back({t, in.take(arrival)});
+    }
+    return sent;
+}
+
+}  // namespace
+
+TEST(net_gesture_pacing_against_the_receiver_bucket) {
+    // What the spare token of gestureSendCapacity() covers: delays that vary by up to one
+    // interval (1000 / rate ms) never make the receiver drop a Gesture, whatever the moves.
+    uint32_t seed = 12345;
+    auto rnd = [&seed] {   // xorshift32, 0..1
+        seed ^= seed << 13;
+        seed ^= seed >> 17;
+        seed ^= seed << 5;
+        return double(seed) / 4294967296.0;
+    };
+    const int buckets[][2] = {{4, 8}, {10, 20}, {2, 4}, {1, 2}};
+    for (auto& b : buckets) {
+        const double interval = 1000.0 / b[0];
+        double phaseEnd = 0.0;
+        bool movingNow = false;
+        auto moving = [&](double t) {   // moves and rests of 0 to 3 s each
+            if (t >= phaseEnd) {
+                movingNow = !movingNow;
+                phaseEnd = t + 3000.0 * rnd();
+            }
+            return movingNow;
+        };
+        auto jitter = [&](double) { return 20.0 + 0.95 * interval * rnd(); };
+        auto sent = paceAgainstReceiver(b[0], b[1], 120000.0, moving, jitter);
+        int dropped = 0;
+        for (auto& m : sent) dropped += !m.second;
+        CHECK(sent.size() > size_t(20 * b[0]));
+        CHECK_EQ(dropped, 0);
+    }
+    // A 1 s stall of the link at the server's defaults (4, 8) while the player moves: what was
+    // sent meanwhile arrives at once, and the receiver drops the part beyond its burst, the latest
+    // state of the bunch included. The Gestures after it get through again.
+    auto always = [](double) { return true; };
+    auto stall = [](double t) { return t < 1000.0 ? 1000.0 - t + 20.0 : 20.0; };
+    auto sent = paceAgainstReceiver(4, 8, 3000.0, always, stall);
+    int inBunch = 0, droppedInBunch = 0;
+    bool latestDropped = false, keptAfter = true;
+    double lastDrop = 0.0;
+    for (auto& m : sent) {
+        if (m.first < 1000.0) {
+            ++inBunch;
+            droppedInBunch += !m.second;
+            latestDropped = !m.second;
+        }
+        if (!m.second) lastDrop = m.first;
+    }
+    for (auto& m : sent)
+        if (m.first > lastDrop) keptAfter = keptAfter && m.second;
+    CHECK(inBunch > 8);
+    CHECK_EQ(droppedInBunch, inBunch - 8);
+    CHECK(latestDropped);
+    CHECK(lastDrop < 1500.0 && keptAfter && sent.back().first > 2500.0);
 }
 
 // =============================================================================================
@@ -845,6 +1030,19 @@ public:
     std::atomic<int> serverNo{1};                   // serverId "srv-<n>" in /info and in the 101 answer
     std::atomic<bool> helloTokenOk{false};
     std::atomic<uint64_t> activeGame{0};
+    std::atomic<uint16_t> gestureRate{0}, gestureBurst{0};   // Welcome.gestureRate / gestureBurst
+    std::atomic<bool> autoPress{true};                        // GameSnapshot.autoPress
+    std::atomic<bool> seqOk{true};                            // every client message came numbered in order
+
+    // The C_Gesture frames received, with their arrival time.
+    struct GestureIn {
+        pr::C_Gesture m;
+        std::chrono::steady_clock::time_point at;
+    };
+    std::vector<GestureIn> gestures() {
+        std::lock_guard<std::mutex> lk(gestureMu_);
+        return gestures_;
+    }
 
     // What the next upgrades get, in order, before upgradeStatus applies again: an HTTP status
     // that refuses the upgrade, kUpgradeOk, or kShutdownAtHello (101, then Error{ShuttingDown} +
@@ -918,6 +1116,12 @@ public:
         }
     }
 
+    // The opponent's gesture (S_Gesture) on every WebSocket.
+    void sendGesture(const pr::S_Gesture& g) {
+        std::lock_guard<std::mutex> lk(mu_);
+        for (Sock s : ws_) sendMsg(s, g);
+    }
+
 private:
     Sock ls_ = kBadSock;
     std::thread acceptor_;
@@ -926,6 +1130,8 @@ private:
     std::vector<Sock> open_, ws_;
     std::atomic<bool> stop_{false};
     std::mutex gameMu_;
+    std::mutex gestureMu_;
+    std::vector<GestureIn> gestures_;
     std::mutex scriptMu_;
     std::deque<int> script_;
     std::atomic<uint32_t> gseq_{1};
@@ -953,7 +1159,10 @@ private:
         }
     }
 
+    // Frames go out whole: the test thread (kick, sendGesture...) and the connection's worker may
+    // send on the same socket at once.
     static void sendFrame(Sock s, int opcode, const uint8_t* data, size_t n) {
+        static std::mutex sendMu;
         std::string f;
         f += char(0x80 | opcode);
         if (n < 126) {
@@ -964,6 +1173,7 @@ private:
             f += char(n);
         }
         f.append(reinterpret_cast<const char*>(data), n);
+        std::lock_guard<std::mutex> lk(sendMu);
         sendAll(s, f.data(), f.size());
     }
 
@@ -1022,11 +1232,12 @@ private:
             ++infos;
             char info[512];
             std::snprintf(info, sizeof(info),
-                          "{\"name\":\"Fake\",\"serverId\":\"%s\",\"motd\":\"hi\",\"protocol\":{\"min\":1,\"max\":1,\"schema\":%u,"
+                          "{\"name\":\"Fake\",\"serverId\":\"%s\",\"motd\":\"hi\",\"protocol\":{\"min\":%u,\"max\":%u,\"schema\":%u,"
                           "\"subprotocol\":\"scacelith.v1\"},\"wsPort\":%u,\"wsPath\":\"/ws\",\"registration\":\"open\","
                           "\"emailVerification\":true,\"sso\":{\"google\":false},\"mfa\":true,\"pow\":{\"register\":10},"
                           "\"categories\":[{\"id\":\"3+2\",\"baseSec\":180,\"incSec\":2}]}",
-                          serverId().c_str(), unsigned(pr::kSchemaHash), unsigned(port));
+                          serverId().c_str(), unsigned(pr::kProtocolMin), unsigned(pr::kProtocolVersion), unsigned(pr::kSchemaHash),
+                          unsigned(port));
             respond(s, 200, info);
         } else if (method == "POST" && path == "/api/v1/auth/login") {
             ++loginAttempts;
@@ -1088,6 +1299,7 @@ private:
             ws_.push_back(s);
         }
         std::atomic<uint32_t>& gseq = gseq_;   // game sequence, kept across connections
+        uint32_t lastSeq = 0;                   // the client numbers its messages from Hello = 1
         char tmp[8192];
         for (;;) {
             // One frame (client frames are masked).
@@ -1116,11 +1328,16 @@ private:
             if (!pr::peekType(payload.data(), payload.size(), t)) return;
             const uint8_t* p = payload.data();
             size_t n = payload.size();
+            if (n >= 5) {
+                uint32_t seq = uint32_t(p[1]) | uint32_t(p[2]) << 8 | uint32_t(p[3]) << 16 | uint32_t(p[4]) << 24;
+                if (seq != lastSeq + 1) seqOk.store(false);
+                lastSeq = seq;
+            }
             if (t == pr::MsgType::Hello) {
                 pr::Hello m;
                 if (!pr::decode(p, n, m)) return;
                 ++hellos;
-                helloTokenOk.store(m.seq == 1 && m.token == token && m.schema == pr::kSchemaHash && m.proto == 1 &&
+                helloTokenOk.store(m.seq == 1 && m.token == token && m.schema == pr::kSchemaHash && m.proto == pr::kProtocolVersion &&
                                    m.client.compare(0, 10, "Scacelith/") == 0);
                 if (step == kShutdownAtHello) {
                     pr::Error e;
@@ -1132,7 +1349,7 @@ private:
                     continue;
                 }
                 pr::Welcome w;
-                w.proto = 1;
+                w.proto = pr::kProtocolVersion;
                 w.serverTime = epochMs() + kSkewMs;
                 w.userId = 7;
                 w.username = "alice";
@@ -1141,6 +1358,8 @@ private:
                 w.clientPingMs = clientPingMs.load();
                 w.maxMsgPerSec = 20;
                 w.activeGame = activeGame.load();
+                w.gestureRate = gestureRate.load();
+                w.gestureBurst = gestureBurst.load();
                 sendMsg(s, w);
                 if (w.activeGame) sendSnapshot(s, gseq);
                 pr::S_Ping sp;
@@ -1212,6 +1431,11 @@ private:
                 ge.kind = pr::GameEventKind::DrawOffered;
                 ge.color = pr::Color::Black;
                 sendMsg(s, ge);
+            } else if (t == pr::MsgType::C_Gesture) {
+                pr::C_Gesture m;
+                if (!pr::decode(p, n, m)) return;
+                std::lock_guard<std::mutex> lk(gestureMu_);
+                gestures_.push_back({m, std::chrono::steady_clock::now()});
             } else if (t == pr::MsgType::Resign) {
                 pr::Resign m;
                 if (!pr::decode(p, n, m)) return;
@@ -1251,6 +1475,7 @@ private:
         g.rematch = pr::Color::None;
         g.whiteConnected = g.blackConnected = true;
         g.firstMoveMs = g.moves.empty() ? 30000 : 0;
+        g.autoPress = autoPress.load();
         sendMsg(s, g);
     }
 
@@ -1874,6 +2099,190 @@ void cheatScenario(PacingRig& r) {
     r.expect(r.srv.upgrades.load() == ups && r.c->state() == net::ConnState::Offline, "4302: no reconnection");
 }
 
+// Joins the fake server's queue: game 77, the client plays White.
+bool enterGame(PacingRig& r, net::Event& snapshot) {
+    r.c->joinQueue("3+2", true);
+    return waitEvent(*r.c, net::Event::Kind::GameSnapshot, snapshot, 5000) && snapshot.game.id == 77;
+}
+
+// Welcome.gestureRate 10, gestureBurst 6, GameSnapshot.autoPress false. A call every 2 ms for
+// 1.5 s: only the latest Gesture waits and they go at the pace of a bucket one smaller than the
+// server's, the very latest last; the numbering stays shared with the other messages. Nothing
+// goes for another game. The opponent's S_Gesture become one OpponentGesture (the latest; 'game'
+// not filled in), for the current game only.
+void gestureScenario(PacingRig& r) {
+    using K = net::Event::Kind;
+    net::Event ev;
+    if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    r.expect(!ev.game.autoPress && r.c->currentGame() && !r.c->currentGame()->autoPress, "GameSnapshot.autoPress reaches OnlineGame");
+
+    const int kRate = 10, kCapacity = net::gestureSendCapacity(6);
+    auto t0 = std::chrono::steady_clock::now();
+    net::Gesture g;
+    g.touch = 12;
+    while (r.msSince(t0) < 1500) {
+        ++g.ply;
+        g.yaw = 0.001f * float(g.ply);
+        r.c->sendGesture(77, g);
+        r.sleepMs(2);
+    }
+    const int last = g.ply;
+    r.expect(r.until([&] {
+                 auto v = r.srv.gestures();
+                 return !v.empty() && v.back().m.ply == last;
+             }, 1000),
+             "the latest Gesture goes");
+    r.sleepMs(300);
+    auto in = r.srv.gestures();
+    const int n = int(in.size());
+    double span = in.empty() ? 0.0 : std::chrono::duration<double, std::milli>(in.back().at - t0).count();
+    r.expect(n >= 12, "gestures go all along (" + std::to_string(n) + ")");
+    r.expect(n <= kCapacity + int(kRate * span / 1000.0) + 1,
+             "at most the bucket's worth (" + std::to_string(n) + " in " + std::to_string(int(span)) + " ms)");
+    bool paced = true, newer = true, current = true;
+    for (size_t i = 0; i < in.size(); ++i) {
+        current = current && in[i].m.game == 77 && in[i].m.touch == 12;
+        if (i > 0) newer = newer && in[i].m.ply > in[i - 1].m.ply;
+        for (size_t j = i; j < in.size(); ++j) {
+            double w = std::chrono::duration<double, std::milli>(in[j].at - in[i].at).count();
+            paced = paced && double(j - i + 1) <= kCapacity + kRate * w / 1000.0 + 3.0;   // + network jitter
+        }
+    }
+    r.expect(paced, "paced in every window");
+    r.expect(newer, "never an older state after a newer one");
+    r.expect(current, "all for game 77, whole");
+    r.expect(!in.empty() && in.back().m.yaw == net::gestureYawToWire(0.001f * float(last)), "the latest head angle");
+
+    // A move after them: the numbering is shared, the server sees no gap.
+    chess::Position pos;
+    r.c->sendMove(77, 0, net::packMove(12, 28, 0), pos.fen(), 1500, false);
+    r.expect(waitEvent(*r.c, K::MoveMade, ev, 5000, nullptr, [](const net::Event& e) { return e.mine; }), "the move after the gestures");
+    r.expect(waitEvent(*r.c, K::GameEvent, ev, 5000), "the opponent's answer");
+    r.expect(r.srv.seqOk.load(), "one numbering for every message");
+
+    // Another game: dropped (and the next one of the current game still goes).
+    size_t before = r.srv.gestures().size();
+    g.ply = 2;
+    r.c->sendGesture(78, g);
+    r.sleepMs(400);
+    r.expect(r.srv.gestures().size() == before, "no Gesture for another game");
+    g.aim = 28;
+    r.c->sendGesture(77, g);
+    r.expect(r.until([&] { return r.srv.gestures().size() == before + 1; }, 1000), "the current game's goes");
+
+    // The opponent's: five for this game and one for another, none polled in between.
+    while (r.c->poll(ev)) {
+    }
+    pr::S_Gesture s;
+    for (int i = 1; i <= 5; ++i) {
+        net::Gesture o;
+        o.ply = 2;
+        o.touch = 52;
+        o.aim = i == 5 ? 36 : 44;
+        o.flags = i == 5 ? pr::GestureFlag::Side : 0;
+        o.yaw = -0.1f * float(i);
+        o.pitch = -0.2f;
+        o.lean = 0.1f * float(i);
+        s.game = 77;
+        net::gestureToWire(o, s);
+        r.srv.sendGesture(s);
+    }
+    s.game = 99;
+    s.ply = 9;
+    r.srv.sendGesture(s);
+    r.sleepMs(800);
+    int count = 0;
+    net::Event got;
+    while (r.c->poll(ev)) {
+        if (ev.kind != K::OpponentGesture) continue;
+        ++count;
+        got = ev;
+    }
+    r.expect(count == 1, "one OpponentGesture, the latest (" + std::to_string(count) + ")");
+    r.expect(got.gameId == 77 && got.game.id == 0, "for game 77, without a copy of the game");
+    r.expect(got.gesture.ply == 2 && got.gesture.touch == 52 && got.gesture.aim == 36 && got.gesture.flags == pr::GestureFlag::Side,
+             "the latest state");
+    r.expect(std::fabs(got.gesture.yaw + 0.5f) < 1e-3f && std::fabs(got.gesture.pitch + 0.2f) < 1e-3f &&
+                 std::fabs(got.gesture.lean - 0.5f) < 1e-3f,
+             "the latest head");
+}
+
+// Welcome.gestureRate 0 (no relay on this server): no Gesture ever goes.
+void gestureOffScenario(PacingRig& r) {
+    net::Event ev;
+    if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    r.expect(ev.game.autoPress, "GameSnapshot.autoPress true by default");
+    net::Gesture g;
+    for (int i = 0; i < 60; ++i) {
+        g.ply = i;
+        r.c->sendGesture(77, g);
+        r.sleepMs(5);
+    }
+    r.sleepMs(500);
+    r.expect(r.srv.gestures().empty(), "no Gesture at rate 0");
+    r.expect(r.c->state() == net::ConnState::Online, "still online");
+}
+
+// A Gesture made while Reconnecting or Offline is never sent after the next Welcome.
+void gestureDownScenario(PacingRig& r) {
+    using K = net::Event::Kind;
+    net::Event ev;
+    if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    net::Gesture g;
+    g.touch = 12;
+    r.c->sendGesture(77, g);
+    r.expect(r.until([&] { return r.srv.gestures().size() == 1; }, 1000), "online: it goes");
+
+    r.srv.upgradeStatus.store(502);                  // no way back until the test says so
+    r.srv.dropWebSockets();
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "reconnecting");
+    g.touch = 13;
+    for (int i = 0; i < 20; ++i) {
+        r.c->sendGesture(77, g);
+        r.sleepMs(10);
+    }
+    r.srv.upgradeStatus.store(0);
+    r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 15000), "back in the game");
+    r.sleepMs(500);
+    r.expect(r.srv.gestures().size() == 1, "nothing of the reconnection sent");
+
+    r.c->disconnect();
+    r.expect(r.stateIs(net::ConnState::Offline, 3000), "offline");
+    g.touch = 14;
+    r.c->sendGesture(77, g);
+    r.c->connect();
+    r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 10000), "back in the game after connect()");
+    r.sleepMs(500);
+    r.expect(r.srv.gestures().size() == 1, "nothing of the offline time sent");
+
+    g.touch = 15;
+    r.c->sendGesture(77, g);
+    r.expect(r.until([&] {
+                 auto v = r.srv.gestures();
+                 return v.size() == 2 && v.back().m.touch == 15;
+             }, 1000),
+             "online again: the next one goes");
+}
+
+// Starts each rig and runs its scenario on a thread of its own, then reports every failure.
+void runRigs(PacingRig* rigs, const char* const* tags, void (*const* scenarios)(PacingRig&), int n) {
+    std::vector<std::thread> threads;
+    for (int i = 0; i < n; ++i) {
+        threads.emplace_back([=] {
+            if (!rigs[i].start(tags[i])) {
+                rigs[i].fails.push_back("setup (server, login, Welcome)");
+                return;
+            }
+            scenarios[i](rigs[i]);
+        });
+    }
+    for (auto& t : threads) t.join();
+    for (int i = 0; i < n; ++i) {
+        for (const std::string& f : rigs[i].fails) std::fprintf(stderr, "  %s: %s\n", tags[i], f.c_str());
+        CHECK(rigs[i].fails.empty());
+    }
+}
+
 }  // namespace
 
 TEST(net_online_client_pacing) {
@@ -1893,21 +2302,23 @@ TEST(net_online_client_pacing) {
         pingPacingScenario,   serverFullScenario, shutdownScenario,        shutdownNoticeScenario, inGameScenario,
         pingIntervalScenario, probeScenario,      probeUnansweredScenario, badGatewayScenario,     notFoundScenario,
         serverChangedScenario, cheatScenario,     restartFullScenario,     restartServerChangedScenario};
-    std::vector<std::thread> threads;
-    for (int i = 0; i < kRigs; ++i) {
-        threads.emplace_back([&, i] {
-            if (!rigs[i].start(tags[i])) {
-                rigs[i].fails.push_back("setup (server, login, Welcome)");
-                return;
-            }
-            scenarios[i](rigs[i]);
-        });
-    }
-    for (auto& t : threads) t.join();
-    for (int i = 0; i < kRigs; ++i) {
-        for (const std::string& f : rigs[i].fails) std::fprintf(stderr, "  %s: %s\n", tags[i], f.c_str());
-        CHECK(rigs[i].fails.empty());
-    }
+    runRigs(rigs, tags, scenarios, kRigs);
+}
+
+// Live gestures through OnlineClient: paced and coalesced at Welcome's rate, for the current game
+// only, none without a relay (rate 0) or while the connection is down; the opponent's.
+TEST(net_online_client_gestures) {
+    if (!net::transportAvailable()) return;
+    constexpr int kRigs = 3;
+    PacingRig rigs[kRigs];
+    rigs[0].srv.gestureRate.store(10);
+    rigs[0].srv.gestureBurst.store(6);
+    rigs[0].srv.autoPress.store(false);
+    rigs[2].srv.gestureRate.store(10);
+    rigs[2].srv.gestureBurst.store(20);
+    const char* tags[kRigs] = {"gesture", "gesture-off", "gesture-down"};
+    void (*scenarios[kRigs])(PacingRig&) = {gestureScenario, gestureOffScenario, gestureDownScenario};
+    runRigs(rigs, tags, scenarios, kRigs);
 }
 
 // TLS certificate rules against a real TLS server, opt-in because the test cannot start one on

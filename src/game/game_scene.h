@@ -24,7 +24,7 @@
 //   --start --hotseat       skip the menu: a hot-seat game (--white-name N --black-name N,
 //                           --clock-right white|black, --rated, --handover <s> with 0 = a cut)
 //   --play e2e4,e7e5,...    the human player(s) make these moves by hand, one per turn (touch,
-//                           carry, clock press; the promotion piece as a fifth letter)
+//                           carry, clock press; the promotion piece as a fifth letter), online too
 //   --viewer                skip the menu: watch Stockfish vs Stockfish (--white-preset N
 //                           --black-preset N, indices into ai::presets(); --demo is an alias)
 //   --viewpoint N           viewer: start at viewpoint N (0 eyes, 1 side, 2 board, 3 hall, 4 clock,
@@ -41,6 +41,7 @@
 //                           --touch <square> touches that piece once the handshake is over
 //   --mouse fx,fy           pointer position as fractions of the window (screenshots)
 //   --glance                a human game starts looking at the player's scoresheet (S)
+//   --calibrate             the brightness calibration before the title page, as on a first start
 #pragma once
 #include "../ai/engine.h"
 #include "../anim/animator.h"
@@ -50,6 +51,7 @@
 #include "camera_flight.h"
 #include "hotseat.h"
 #include "observer_camera.h"
+#include "online_live.h"
 #include "online_session.h"
 #include "physical_board.h"
 #include "scorekeeper.h"
@@ -77,7 +79,7 @@ struct Seat {
     Controller controller = Controller::Stockfish;
     std::string name;             // scoresheet name: the player's name / "Stockfish"
     int elo = 0;                  // human: rating when the game started; Stockfish: ai::presetElo()
-    bool provisional = false;     // human with fewer than elo::kProvisionalGames rated games
+    bool provisional = false;     // human whose rating is provisional (elo::Record::provisional())
     std::string ratingText;       // online: the server rating as written ("1500?"), "" = none
     int preset = -1;              // Stockfish: index into ai::presets() (the last one is Custom)
     std::string presetName;       // Stockfish: "Expert", ...
@@ -166,9 +168,10 @@ private:
     void humanPlace(chess::Square to);
     void humanPressClock();
     // Appends the tasks moving 'moverId' (already gripped) to 'to', including the capture of
-    // 'victimId' (or -1) and the castling rook. Registers destinations.
+    // 'victimId' (or -1) and the castling rook. Registers destinations. 'lifted': the piece is
+    // already in the air (an online opponent's piece held live), no Lift.
     void planPlacement(std::vector<anim::Task>& tasks, int moverId, chess::Square to, int victimId,
-                       chess::Square rookFrom, chess::Square rookTo);
+                       chess::Square rookFrom, chess::Square rookTo, bool lifted = false);
     void planPromotionSwap(std::vector<anim::Task>& tasks, int pawnId, chess::Square sq, chess::PieceType newType);
     float carryHeight(m::vec3 from, m::vec3 to, int ignoreA, int ignoreB) const;
     m::vec3 jitteredSquare(chess::Square sq);
@@ -192,6 +195,9 @@ private:
     int viewSeat() const;
     int firstPersonSeat() const;
     bool opponentMoving() const { return turn_ == Turn::AiMoving || turn_ == Turn::RemoteMoving; }
+    // The player's robot presses the clock by itself once the move is on the board: online the
+    // authority decides (og_.autoPress), on this PC Options > Gameplay (off by default).
+    bool autoPressClock() const;
     ai::ClockInfo clockInfo() const;
     chess::TimeControl chosenTimeControl() const;
     ai::EngineSettings chosenEngineSettings() const { return engineSettingsFor(setup_.difficulty); }
@@ -207,6 +213,7 @@ private:
     bool gameCursorShown() const;             // the game's pointer replaces the system arrow
     ui::GameCursor gameCursorKind() const;
     m::vec3 glanceTarget() const;             // where the player looks at their scoresheet (S)
+    m::vec3 glanceTarget(int seat) const;     // the middle of that seat's scoresheet
     void updateCamera(float dt, bool firstPerson);
     void placeFirstPersonCamera();
     // The first-person view from 'seat''s eyes with its own look (gaze beyond the head, lean).
@@ -251,7 +258,33 @@ private:
     void onlineGameEvent(const net::Event& e);
     void rebuildOnline();                     // board, game and sheets from og_ (no animation)
     void startRemoteMove();
+    // The opponent's move 'mv' from the piece in hand to the board (placement, capture, castling
+    // rook, promotion swap), without the clock press; 'lifted': the piece is already in the air.
+    void planRemoteMove(std::vector<anim::Task>& tasks, const chess::Move& mv, bool lifted);
+    // My move chosen: sent at once when the robots press the clock by themselves, otherwise staged
+    // on the board until my clock press sends it (pressOnlineClock, at the lever contact).
+    void placeOnlineMove(const chess::Move& mv);
+    void pressOnlineClock();
+    void dropStagedMove();                    // the game ended meanwhile: the staged move never goes
     void sendOnlineMove(const chess::Move& mv);
+    double localMs() const;                   // steady local clock (thinking time, clock display)
+    // My hand and head for the opponent's robot (net/gesture.h), once per frame.
+    live::Hand onlineHand(float dt);
+    void sendOnlineGesture(float dt);
+    // The opponent's robot mirrors their gestures: the piece in hand, where it is aimed and the move
+    // put down before their clock press (updateRemoteLive, once per frame while playing), their
+    // head and lean (driveRemoteHead, from updateGaze: true while it drives the head).
+    void updateRemoteLive(float dt);
+    void enqueueRemoteLive(const std::vector<anim::Task>& tasks);  // on their robot, as live work
+    void gripRemoteLive(chess::Square from, int ply);
+    void followRemoteAim(int aim, float dt);
+    void placeRemoteLive(uint16_t move);
+    // Lets go of the piece held live: back on its square (then the hand retracts, unless another
+    // task follows). A move put down is taken back instead (settleRemoteTakeBack).
+    void cancelRemoteLive(bool retract = true);
+    bool remoteMoveQueued(int ply) const;     // the opponent's MoveMade of that ply waits for the robot
+    void settleRemoteTakeBack();
+    bool driveRemoteHead(float dt);
     void recordOnline(int ply);               // scoresheets: every move up to 'ply'
     void onlineResult();                      // result texts of og_ (endGame)
     void updateOnlineInput();                 // Esc menu, draw offer, report dialog (Playing)
@@ -347,6 +380,10 @@ private:
         float gazeYaw = 0.0f, gazePitch = kBaseGazePitch;  // smoothed total
         float headYaw = 0.0f, headPitch = 0.0f;     // part taken by the neck/head (rest = eyes)
         float lean = 0.0f, leanSmooth = 0.0f;
+        // Pointer at the top of the window (look_up.h): the band lifts the gaze once the pointer
+        // has been below it since the last reset, and the lift goes into pitch when a drag starts.
+        bool lookUpArmed = false;
+        float lookUpLift = 0.0f;
     };
     Look look_[2];
     // S: the player whose eyes are the view looks at their own scoresheet. One state for the
@@ -415,13 +452,49 @@ private:
     std::vector<RemoteMove> remoteQueue_;  // opponent moves waiting for the robot
     int pendingPly_ = -1;               // my move sent, not confirmed yet
     uint16_t pendingMove_ = 0;
-    int64_t frozenMs_ = 0;              // my clock as shown while my move is on its way
     int recordedPly_ = 0;               // moves handed to the scoresheets
     int pressedPly_ = -1;               // my last move whose clock press was animated
     int remotePly_ = -1;                // the move the opponent's robot is playing
     float endWait_ = 0.0f;              // time the end has waited for the robots
     chess::Square promoTo_ = chess::NoSquare;  // pawn move waiting for the promotion choice
-    double turnStartMs_ = 0;            // server clock when my turn began (thinkMs)
+    double turnStartMs_ = 0;            // localMs() when my turn began (thinkMs)
+    // My move on its way, kept as sent (sent again when the connection dropped meanwhile).
+    std::string pendingFen_;            // the position before it (the authority checks its digest)
+    uint32_t pendingThinkMs_ = 0;
+    live::ClockFreeze clockFreeze_;     // my clock display while my move is on its way
+    bool virtualTime_ = false;          // screenshots, --warp: localMs() follows the simulated time
+    // Manual clock press (og_.autoPress off): my move stands on the board until my press.
+    bool moveStaged_ = false;
+    chess::Move stagedMove_;
+    // My gestures (sendOnlineGesture): the last one built and the last one sent.
+    net::Gesture gestureBuilt_, gestureSent_;
+    bool gestureBuiltAny_ = false, gestureSentAny_ = false;
+    bool gestureFinal_ = false;         // the game is over and its last gesture went
+    double gestureSinceMs_ = 0;         // since the last send
+    live::Dwell aimDwell_{live::kAimDwell};
+    chess::Square aimDwellFor_ = chess::NoSquare;  // the touched square the dwell belongs to
+    // The opponent's gestures and what their robot's hand does with them.
+    struct RemoteLive {
+        int pieceId = -1;                          // their piece held live (touched, lifted, carried)
+        chess::Square from = chess::NoSquare;      // its square
+        chess::Square hover = chess::NoSquare;     // the square the hand was last sent over
+        int ply = -1;                              // the ply of the move being prepared
+        uint16_t placed = 0;                       // the move put down on the board, before its MoveMade
+        bool takeBack = false;                     // put the board back from game_ once the hands are idle
+        float noAim = 0.0f;                        // time without an aim (then back over its square)
+        float placedAway = 0.0f;                   // time the gestures no longer show 'placed'
+        float reachAt = 0.0f;                      // animator clock: the hand starts reaching for it
+    };
+    RemoteLive remoteLive_;
+    float remoteLiveEnd_ = 0.0f;        // animator clock: their robot is done with its live tasks
+    net::Gesture remoteGesture_;        // the latest one
+    float remoteAge_ = 1e9f;            // seconds since it arrived
+    bool remoteFresh_ = false;          // it came after the last snapshot and our last reconnection
+    live::Dwell remoteAim_{live::kFollowDwell};
+    live::HeadSpring remoteHead_;
+    bool remoteHeadOn_ = false;         // the opponent's head drives their robot's (head override)
+    bool remoteGlancing_ = false;       // they look at their scoresheet: their writing hand waits aside
+    float remoteGlanceBlend_ = 0.0f;
     bool resync_ = false;               // rebuild once the robots are idle
     bool rebuildFade_ = false;
     bool endPending_ = false;           // GameEnd received, shown once the moves are played

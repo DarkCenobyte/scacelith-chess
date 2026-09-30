@@ -9,7 +9,7 @@
 namespace game {
 
 // A player of rated hot-seat games on this PC, by name (New Game > Human, same PC > Rated game):
-// one [local_player_N] section each (name, elo, games, wins, draws, losses, peak). Separate from
+// one [local_player_N] section each (name and the record's keys, elo::readRecord). Separate from
 // the [player] rating, which only games against Stockfish change.
 struct LocalPlayer {
     std::string name;
@@ -28,6 +28,10 @@ struct Settings {
     bool motionBlur = true;
     bool depthOfField = true;
     float brightness = 0.0f;      // exposure compensation (EV)
+    // The brightness calibration was completed (Continue or Esc on its page). Until then every
+    // start opens on it (screenshot runs excepted), however the previous runs ended. A settings
+    // file from before the calibration existed counts as completed.
+    bool brightnessCalibrated = false;
     // [audio]
     float masterVolume = 0.9f;
     float effectsVolume = 1.0f;
@@ -39,6 +43,11 @@ struct Settings {
     float mouseSensitivity = 1.0f;
     bool invertLook = false;
     bool gameCursor = true;       // the game's own pointer at the table instead of the system arrow
+    // The player's robot presses the clock by itself once the move is on the board (games on
+    // this PC: against Stockfish and two players; online, the server or the host decides).
+    bool autoPressClock = false;
+    // Online: the opponent's robot ignores the opponent's head movements (automatic gaze instead).
+    bool ignoreOpponentHead = false;
     int nextColor = -1;           // -1 = random (first game), 0 = white, 1 = black
     // Hot-seat: the view goes from one player's eyes to the other's after each move, in a camera
     // flight of this length (0.8 to 2 s), or 0 = an instant cut through black (motion sickness).
@@ -59,11 +68,21 @@ struct Settings {
     int customNodes = 0;
     int engineThreads = 1;
     int engineHashMB = 64;
+    // Stockfish instruction-set variant: "auto" = the best this CPU runs, or a variant name capping
+    // it, e.g. "x86-64-sse41-popcnt" (troubleshooting; ai::Engine::setArchLimit)
+    std::string engineArch = "auto";
     bool humanizeThinking = true; // spend realistic time before moving
     // [player] the human's rating (elo.h), updated after every rated game against Stockfish
     int playerElo = 1500;
     int playerGames = 0, playerWins = 0, playerDraws = 0, playerLosses = 0;
     int playerPeakElo = 1500;
+    // Its FIDE unrated phase (elo::Record): false until the first rating, the sums of those games;
+    // the games counted in the rating.
+    bool playerRated = false;
+    int playerCountedGames = 0;
+    int playerUnratedGames = 0, playerUnratedOpponents = 0, playerUnratedHalfPoints = 0;
+    elo::Record playerRecord() const;  // the [player] fields above as one record
+    void setPlayerRecord(const elo::Record& r);
     // [hotseat] last choices of the two-player game (New Game > Human, same PC), by colour
     std::string hotseatNames[2];  // "" = the Options > Player name for White, "Player 2" (translated) for Black
     int hotseatHands[2] = {-1, -1};  // ui::font::HandStyle; -1 = the Options > Player hand / another one
@@ -100,6 +119,7 @@ struct Settings {
     int directTimeControl = 7;        // index into chess::timeControlPresets() (10+5), -1 = custom
     int directBaseSeconds = 600, directIncrementSeconds = 5;
     int directColor = 0;              // host's colour: 0 random, 1 White, 2 Black
+    bool directAutoPress = true;      // host: the robots press the clock by themselves
     std::string directAddress;        // last address joined
     int directJoinPort = 47100;
     // [interface]
@@ -114,8 +134,12 @@ struct Settings {
     void applyLanguage();
 
     render::RenderSettings renderSettings() const;
-    bool load(const std::string& path);  // missing file = defaults
-    bool save() const;                   // writes back to the loaded path (or user data dir)
+    // The settings of 'path' (a missing file = defaults). For the default file next to the
+    // executable, save() falls back to the user data directory when that folder cannot be written
+    // (a read-only install), and load() reads the settings back from there when the file is
+    // missing. An explicit --ini file has no fallback: it is read and written there or not at all.
+    bool load(const std::string& path);
+    bool save() const;
     std::string path;
 };
 

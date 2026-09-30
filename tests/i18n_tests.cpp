@@ -158,6 +158,38 @@ TEST(i18n_plural_rules) {
     CHECK_EQ(i18n::pluralForms("zh-Hant"), 1);
 }
 
+// The toast of the points given back after a cheater's ban: a refund of 1 point is common (a
+// draw, a loss at K 10), and every language words the count by its own plural rule.
+TEST(i18n_rating_restored_plural) {
+    auto has = [](const std::string& text, const char* part) {
+        bool ok = text.find(part) != std::string::npos;
+        if (!ok) std::fprintf(stderr, "  %s: \"%s\" not in \"%s\"\n", i18n::language().c_str(), part, text.c_str());
+        return ok;
+    };
+    const char* key = "online.notice.rating_restored";
+    i18n::setLanguage("en");
+    CHECK_EQ(i18n::trn(key, 1), std::string("Your rating was restored by 1 point: an opponent was banned for cheating."));
+    CHECK_EQ(i18n::trn(key, 12), std::string("Your rating was restored by 12 points: an opponent was banned for cheating."));
+    i18n::setLanguage("de");
+    CHECK(has(i18n::trn(key, 1), "um 1 Punkt ") && has(i18n::trn(key, 3), "um 3 Punkte "));
+    i18n::setLanguage("fr");
+    CHECK(has(i18n::trn(key, 1), "de 1 point :") && has(i18n::trn(key, 2), "de 2 points :"));
+    i18n::setLanguage("es");
+    CHECK(has(i18n::trn(key, 1), "en 1 punto:") && has(i18n::trn(key, 7), "en 7 puntos:"));
+    i18n::setLanguage("ru");
+    CHECK(has(i18n::trn(key, 1), " 1 пункт:") && has(i18n::trn(key, 21), " 21 пункт:") && has(i18n::trn(key, 3), " 3 пункта:"));
+    CHECK(has(i18n::trn(key, 5), " 5 пунктов:") && has(i18n::trn(key, 11), " 11 пунктов:"));
+    i18n::setLanguage("uk");
+    CHECK(has(i18n::trn(key, 1), " 1 пункт:") && has(i18n::trn(key, 21), " 21 пункт:") && has(i18n::trn(key, 3), " 3 пункти:"));
+    CHECK(has(i18n::trn(key, 5), " 5 пунктів:") && has(i18n::trn(key, 11), " 11 пунктів:"));
+    i18n::setLanguage("ar");
+    CHECK(has(i18n::trn(key, 1), "نقطة واحدة") && has(i18n::trn(key, 2), "نقطتين"));
+    CHECK(has(i18n::trn(key, 4), "4 نقاط") && has(i18n::trn(key, 15), "15 نقطة") && has(i18n::trn(key, 100), "100 نقطة"));
+    i18n::setLanguage("ja");
+    CHECK(has(i18n::trn(key, 1), "1ポイント"));
+    i18n::setLanguage("en");
+}
+
 TEST(i18n_match_locale) {
     CHECK_EQ(i18n::matchLocale("fr_FR.UTF-8"), std::string("fr"));
     CHECK_EQ(i18n::matchLocale("de-AT"), std::string("de"));

@@ -4,12 +4,31 @@
 // The authority (server or direct-match host) owns the game: its clocks, the legality of the
 // moves and the result. The scene keeps the physical experience of a game against Stockfish:
 //   - My move: the piece is touched and carried as usual, but it can only be released on a legal
-//     square (no arbiter penalty online). The move is sent the moment its destination (and
-//     promotion) is chosen, before the hand moves; the robot then places it and presses the
-//     clock by itself (animation only). My clock display freezes until the server confirms.
+//     square (no arbiter penalty online). When the authority lets the robots press the clock
+//     (og_.autoPress: the server's rule, on by default, or the host's choice in a direct match),
+//     the move is sent the moment its destination (and promotion) is chosen, before the hand
+//     moves; the robot then places it and presses the clock by itself (animation only).
+//     Otherwise the move is staged: the robot places it, the player presses the clock (Space or a
+//     click, as against Stockfish) and the move goes at the lever contact, so that its thinking
+//     time covers the placement and the press. The thinking time is measured on a steady local
+//     clock. My clock display stands still from the send until the authority confirms, at most
+//     max(1 s, 3 pings) and never while reconnecting; a move the authority never got (the
+//     connection dropped) is sent again when the snapshot after the reconnection lacks only it.
 //   - The opponent's move (MoveMade) is played by its robot like a Stockfish move but without
-//     thinking time: touch, carry, capture, castling rook, promotion swap, clock. I may touch my
+//     thinking time: touch, carry, capture, castling rook, promotion swap, clock, at once and from
+//     where their gestures left it (the piece in hand, the move already put down). I may touch my
 //     pieces as soon as its pieces are down.
+//   - Live gestures (net/gesture.h; the rules are in online_live.h). Mine: the piece in hand, the
+//     square it is aimed at (after a short dwell), the promotion picker, a staged move, and my
+//     head (look, lean, the glance at my scoresheet, a look beside the board) go to the opponent
+//     when they change, once a second at least, while the game is played. The opponent's drive
+//     their robot: it takes the piece they touch, carries it over the square they aim at, puts a
+//     staged move down before their press, lets go of the piece when they do, and its head and
+//     lean follow theirs (unless Options > Gameplay ignores the opponent's head). Gestures are
+//     cosmetic and come from the other client: their squares are checked, they apply only to the
+//     move being prepared, and they never touch the game, the arbiter, the clocks or og_. Nor my
+//     turn: the robot's hand takes one step at a time from their latest gesture however fast they
+//     come, and their MoveMade drops at once whatever it has left that is not that move.
 //   - The clock shows the server's times (extrapolated with serverNowMs()), never flags locally
 //     (it stops at 0.0 until the server's GameEnd).
 //   - MoveRejected / a snapshot that disagrees: once the robots are idle the board, the game and
@@ -42,11 +61,14 @@ enum Status { StOngoing = 0, StWhiteWins = 1, StBlackWins = 2, StDraw = 3, StAbo
 enum GameEventKind { EvDrawOffered = 1, EvDrawDeclined = 2, EvDisconnected = 3, EvReconnected = 4, EvRematchOffered = 5, EvRematchDeclined = 6 };
 constexpr int kErrDrawOfferLimit = 108;
 
-anim::Task makeTask(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0)) {
+constexpr float kGlanceTime = 0.45f;  // seconds to turn to the scoresheet and back (as game_scene.cpp)
+
+anim::Task makeTask(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0), float height = 0.0f) {
     anim::Task k;
     k.type = t;
     k.pieceId = pieceId;
     k.position = pos;
+    k.height = height;
     return k;
 }
 
@@ -89,6 +111,7 @@ std::string playerName() {
 
 void GameScene::initOnline() {
     bool virtualClock = ctx_->screenshotMode || ctx_->hasArg("--warp");
+    virtualTime_ = virtualClock;
     onlineSession().init(ctx_->hasArg("--online-mock"), virtualClock);
     if (ctx_->hasArg("--start-online")) {
         startOnline_ = ctx_->argValue("--start-online");
@@ -124,7 +147,22 @@ void GameScene::setupOnlineGame() {
     reportCategory_ = 0;
     reportComment_.clear();
     fadeDip_ = 0.0f;
-    turnStartMs_ = link_ ? link_->serverNowMs() : 0.0;
+    turnStartMs_ = localMs();
+    pendingFen_.clear();
+    pendingThinkMs_ = 0;
+    moveStaged_ = false;
+    gestureBuiltAny_ = gestureSentAny_ = gestureFinal_ = false;
+    gestureSinceMs_ = 0.0;
+    aimDwell_.reset();
+    aimDwellFor_ = NoSquare;
+    remoteLive_ = RemoteLive();
+    remoteLiveEnd_ = 0.0f;
+    remoteGesture_ = net::Gesture();
+    remoteAge_ = 1e9f;
+    remoteFresh_ = false;
+    remoteAim_.reset();
+    remoteHeadOn_ = remoteGlancing_ = false;
+    remoteGlanceBlend_ = 0.0f;
     LOGI("New online game %llu: you play %s against %s, %s%s", (unsigned long long)og_.id, humanColor_ == White ? "White" : "Black",
          (humanColor_ == White ? og_.black : og_.white).name.c_str(), og_.category.c_str(), og_.rated ? " rated" : "");
 }
@@ -183,11 +221,20 @@ void GameScene::updateOnline(float dt) {
         if (in.keyPressed[plat::KEY_F9]) net::mock::opponentDrop(20);
         if (in.keyPressed[plat::KEY_F10]) net::mock::connectionDrop(8);
     }
+    // Notices that must not interrupt a game wait until none is being played (any mode but the
+    // viewer's; the game over card is fine).
+    bool inGame = !watching() && (state_ == State::FadeToGame || state_ == State::Intro || state_ == State::Handshake ||
+                                  state_ == State::Playing);
+    s.setInGame(inGame);
     s.update(dt);
     if (!online() || !link_) return;
     if (state_ != State::Intro && state_ != State::Handshake && state_ != State::Playing && state_ != State::GameOver) return;
     net::Event e;
     while (s.nextGameEvent(e)) onlineEvent(e);
+    remoteAge_ += dt;
+    if (link_->reconnecting()) remoteFresh_ = false;  // a gesture from before our reconnection is stale
+    sendOnlineGesture(dt);
+    settleRemoteTakeBack();
     if (state_ != State::Playing) return;
     // --touch with --start-online: the hand goes to that piece once the handshake is over.
     if (!startTouch_.empty() && turn_ == Turn::HumanIdle && !anim_[humanSeat()].busy()) {
@@ -208,17 +255,20 @@ void GameScene::updateOnline(float dt) {
             promoTo_ = NoSquare;
             humanRelease();
         }
+        cancelRemoteLive();
         if (!anim_[0].busy() && !anim_[1].busy() && dest_.empty()) rebuildOnline();
         return;
     }
+    // The opponent's move: their robot plays it at once, from where their gestures left it.
     if (turn_ == Turn::RemoteWaiting && !remoteQueue_.empty()) startRemoteMove();
     // The opponent's pieces are down: my turn begins while its hand goes to the clock.
     if (turn_ == Turn::RemoteMoving && dest_.empty()) beginTurn();
+    updateRemoteLive(dt);
 
     if (endPending_) {
         endWait_ += dt;
         bool settled = remoteQueue_.empty() && turn_ != Turn::RemoteMoving && turn_ != Turn::HumanPromotion && dest_.empty() &&
-                       !anim_[0].busy() && !anim_[1].busy();
+                       !anim_[0].busy() && !anim_[1].busy() && !remoteLive_.takeBack;
         if (turn_ == Turn::RemoteWaiting && !remoteQueue_.empty()) settled = false;
         if (settled || endWait_ > 6.0f) endGame();
     }
@@ -238,8 +288,15 @@ void GameScene::onlineEvent(const net::Event& e) {
         }
         // The opponent moved: my thinking time starts now, whatever the robot still has to do.
         remoteQueue_.push_back({e.ply, e.move});
-        turnStartMs_ = link_->serverNowMs();
+        turnStartMs_ = localMs();
         myDrawOffer_ = myDrawOffer_ && og_.drawOfferBy == int(humanColor_);
+        break;
+    case Kind::OpponentGesture:
+        // Cosmetic: their hand and head for their robot (updateRemoteLive, driveRemoteHead). It
+        // never changes og_, the game or the clocks.
+        remoteGesture_ = e.gesture;
+        remoteAge_ = 0.0f;
+        remoteFresh_ = true;
         break;
     case Kind::MoveRejected:
         LOGW("online: move %d refused (code %d)", e.ply, e.code);
@@ -255,6 +312,9 @@ void GameScene::onlineEvent(const net::Event& e) {
         if (state_ == State::Playing || state_ == State::Intro || state_ == State::Handshake) {
             endPending_ = true;
             endWait_ = 0.0f;
+            dropStagedMove();
+            // The opponent's hand lets go, unless their last move is on its way to the robot.
+            if (!remoteMoveQueued(remoteLive_.ply)) cancelRemoteLive();
         }
         break;
     case Kind::RatingUpdate: {
@@ -275,9 +335,12 @@ void GameScene::onlineEvent(const net::Event& e) {
 
 void GameScene::onlineSnapshot(const net::OnlineGame& g) {
     og_ = g;
+    remoteFresh_ = false;  // only a gesture sent after it moves pieces again
     if (g.status != StOngoing && state_ != State::GameOver) {
         endPending_ = true;
         endWait_ = 0.0f;
+        dropStagedMove();
+        if (!remoteMoveQueued(remoteLive_.ply)) cancelRemoteLive();
     }
     const std::vector<Move>& local = game_.moves();
     size_t n = std::min(local.size(), g.moves.size());
@@ -299,6 +362,17 @@ void GameScene::onlineSnapshot(const net::OnlineGame& g) {
         }
         if (queued) return;
         resync_ = true;  // missed while reconnecting: set up without animation
+        return;
+    }
+    std::vector<uint16_t> mine, theirs;
+    for (const Move& m : local) mine.push_back(packed(m));
+    for (const net::OnlineGame::MoveRec& rec : g.moves) theirs.push_back(rec.move);
+    if (live::resendPendingMove(mine, theirs, pendingPly_, int(humanColor_), g.status == StOngoing)) {
+        // My move never reached the authority (the connection dropped): the same move again,
+        // instead of making me play it once more.
+        link_->sendMove(pendingPly_, pendingMove_, pendingFen_, pendingThinkMs_, false);
+        clockFreeze_.start(localMs(), onlineClockMs(int(humanColor_)));
+        LOGI("online: move %d sent again after the reconnection", pendingPly_ + 1);
         return;
     }
     resync_ = rebuildFade_ = true;  // my move was refused
@@ -329,9 +403,13 @@ void GameScene::onlineGameEvent(const net::Event& e) {
         if (e.color == opp) {
             opponentAway_ = true;
             opponentBackBy_ = link_->serverNowMs() + double(e.arg);
+            // Their robot lets go of what it held for them; their next gestures take it again.
+            remoteFresh_ = false;
+            if (!remoteMoveQueued(remoteLive_.ply)) cancelRemoteLive();
         }
         break;
     case EvReconnected:
+        if (e.color == opp) remoteFresh_ = false;  // wait for a gesture sent after their return
         if (e.color == opp && opponentAway_) {
             opponentAway_ = false;
             ui::notify(i18n::tr("online.opponent_back"), 3.0f);
@@ -374,6 +452,11 @@ void GameScene::rebuildOnline() {
                        remoteQueue_.end());
     pendingPly_ = -1;
     promoTo_ = NoSquare;
+    moveStaged_ = false;
+    // The opponent's robot holds nothing any more (the hands were idle): their latest gesture is
+    // applied again from this position.
+    remoteLive_ = RemoteLive();
+    remoteAim_.reset();
     if (recordedPly_ < n) {
         scorekeeper_.writeMovesInstantly(game_.sanMoves());
         recordedPly_ = n;
@@ -385,24 +468,76 @@ void GameScene::rebuildOnline() {
     leverTarget_ = half == 1 ? 1.0f : -1.0f;
     if (rebuildFade_) fadeDip_ = 0.6f;
     rebuildFade_ = false;
-    turnStartMs_ = link_ ? link_->serverNowMs() : 0.0;
+    turnStartMs_ = localMs();
     LOGI("online: board rebuilt from the server (%d moves)", n);
     if (state_ == State::Playing) beginTurn();
+}
+
+double GameScene::localMs() const { return virtualTime_ ? double(time_) * 1000.0 : plat::time() * 1000.0; }
+
+void GameScene::placeOnlineMove(const Move& mv) {
+    if (autoPressClock()) {
+        sendOnlineMove(mv);
+        return;
+    }
+    stagedMove_ = mv;
+    moveStaged_ = true;
+}
+
+void GameScene::pressOnlineClock() {
+    if (!moveStaged_) return;
+    // My clock press: the staged move goes, unless the game ended or is being rebuilt meanwhile.
+    if (endPending_ || resync_ || og_.status != StOngoing) {
+        dropStagedMove();
+        return;
+    }
+    moveStaged_ = false;
+    sendOnlineMove(stagedMove_);
+}
+
+void GameScene::dropStagedMove() {
+    if (!moveStaged_) return;
+    // The move stands on the board but never went: the board is set up again from the
+    // authority's moves once the hands are idle, behind a short fade.
+    moveStaged_ = false;
+    pressQueued_ = false;
+    resync_ = rebuildFade_ = true;
 }
 
 void GameScene::sendOnlineMove(const Move& mv) {
     int ply = int(game_.moves().size());
     uint16_t pm = packed(mv);
-    double now = link_->serverNowMs();
-    uint32_t thinkMs = uint32_t(std::max(0.0, now - turnStartMs_));
-    frozenMs_ = onlineClockMs(int(humanColor_));
-    link_->sendMove(ply, pm, game_.position().fen(), thinkMs, false);
+    // The thinking time on a steady clock: the estimate of the authority's clock may be corrected
+    // between two readings, which would make an honest time look implausible.
+    double now = localMs();
+    pendingThinkMs_ = uint32_t(std::max(0.0, now - turnStartMs_));
+    pendingFen_ = game_.position().fen();
+    clockFreeze_.start(now, onlineClockMs(int(humanColor_)));
+    // While the connection is being restored the move waits: the snapshot that follows the
+    // reconnection sends it (onlineSnapshot).
+    if (!link_->reconnecting()) link_->sendMove(ply, pm, pendingFen_, pendingThinkMs_, false);
     pendingPly_ = ply;
     pendingMove_ = pm;
     game_.play(mv);
     arbiter_.reset(game_);
     drawOffered_ = false;  // moving declines the opponent's offer
-    LOGI("online: move %d %s sent (%u ms)", ply + 1, game_.sanMoves().back().c_str(), thinkMs);
+    LOGI("online: move %d %s sent (%u ms)", ply + 1, game_.sanMoves().back().c_str(), pendingThinkMs_);
+}
+
+void GameScene::planRemoteMove(std::vector<anim::Task>& tasks, const Move& mv, bool lifted) {
+    Color side = game_.position().sideToMove();
+    int moverId = board_.idAt(mv.from);
+    int victimId = board_.idAt(mv.to);
+    if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
+    Square rookFrom = NoSquare, rookTo = NoSquare;
+    if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
+        int rank = rankOf(mv.from);
+        bool king = (mv.flags & MoveCastleKing) != 0;
+        rookFrom = makeSquare(king ? 7 : 0, rank);
+        rookTo = makeSquare(king ? 5 : 3, rank);
+    }
+    planPlacement(tasks, moverId, mv.to, victimId, rookFrom, rookTo, lifted);
+    if (mv.promotion != NoPiece) planPromotionSwap(tasks, moverId, mv.to, mv.promotion);
 }
 
 void GameScene::startRemoteMove() {
@@ -419,20 +554,38 @@ void GameScene::startRemoteMove() {
     }
     Color side = game_.position().sideToMove();
     int seat = seatOf(side);
-    int moverId = board_.idAt(mv.from);
-    int victimId = board_.idAt(mv.to);
-    if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
-    Square rookFrom = NoSquare, rookTo = NoSquare;
-    if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
-        int rank = rankOf(mv.from);
-        bool king = (mv.flags & MoveCastleKing) != 0;
-        rookFrom = makeSquare(king ? 7 : 0, rank);
-        rookTo = makeSquare(king ? 5 : 3, rank);
+    // What their gestures already did: the move put down (only the clock press is left), or the
+    // piece in hand (the hand goes on from where it is).
+    const RemoteLive& L = remoteLive_;
+    live::LiveWork work;
+    work.held = L.pieceId >= 0 ? int(L.from) : live::kNoSquare;
+    work.ply = L.ply;
+    work.placed = L.placed;
+    work.takeBack = L.takeBack;
+    work.before = L.pieceId >= 0 && L.reachAt > anim_[seat].time() + live::kHandSlack;
+    work.busy = remoteLiveEnd_ > anim_[seat].time();
+    live::LiveStart start = live::liveStart(work, r.ply, r.move);
+    if (start == live::LiveStart::Cut) {
+        // Anything else their gestures left to the robot (another piece in hand or going back, a
+        // move put down that is not this one) is dropped at once and the board set back from the
+        // game, behind a short dip when a piece had moved: the move takes its usual time whatever
+        // came before it, so that gestures never hold my turn back while my clock runs.
+        bool moved = L.placed != 0 || L.takeBack ||
+                     std::any_of(board_.pieces().begin(), board_.pieces().end(), [](const PieceObject& p) { return p.held; });
+        anim_[seat].cancelTasks();
+        remoteLiveEnd_ = anim_[seat].time();
+        dest_.clear();
+        board_.syncTo(game_.position());
+        if (moved) fadeDip_ = std::max(fadeDip_, 0.4f);
+        LOGI("online: what the opponent's gestures left to their robot is dropped for their move %d", r.ply + 1);
     }
     std::vector<anim::Task> tasks;
-    tasks.push_back(makeTask(anim::TaskType::Reach, moverId));
-    planPlacement(tasks, moverId, mv.to, victimId, rookFrom, rookTo);
-    if (mv.promotion != NoPiece) planPromotionSwap(tasks, moverId, mv.to, mv.promotion);
+    if (start != live::LiveStart::Placed) {
+        if (start != live::LiveStart::Held) tasks.push_back(makeTask(anim::TaskType::Reach, board_.idAt(mv.from)));
+        planRemoteMove(tasks, mv, start == live::LiveStart::Held);
+    }
+    remoteLive_ = RemoteLive();
+    remoteAim_.reset();
     int half = world_.clockHalfForSeat(seat == 0 ? 1.0f : -1.0f);
     tasks.push_back(makeTask(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)));
     tasks.push_back(makeTask(anim::TaskType::Retract));
@@ -454,6 +607,271 @@ void GameScene::recordOnline(int ply) {
 bool GameScene::myFirstMoveMade() const { return int(og_.moves.size()) > int(humanColor_); }
 
 // =============================================================================================
+// Live gestures: mine to the opponent
+// =============================================================================================
+
+live::Hand GameScene::onlineHand(float dt) {
+    live::Hand h;
+    // The aimed square counts once the pointer rests on it (kAimDwell), for the piece in hand.
+    int aim = live::kNoSquare;
+    if (turn_ == Turn::HumanTouched && touchedSq_ != NoSquare) {
+        if (aimDwellFor_ != touchedSq_) {
+            aimDwell_.reset();
+            aimDwellFor_ = touchedSq_;
+        }
+        aim = aimDwell_.update(aimLegal_ && aimSq_ != touchedSq_ ? int(aimSq_) : live::kNoSquare, dt);
+    } else {
+        aimDwellFor_ = NoSquare;
+    }
+    auto wire = [](Square s) { return s == NoSquare ? live::kNoSquare : int(s); };
+    switch (turn_) {
+    case Turn::HumanTouched:
+        h.touch = wire(touchedSq_);
+        h.aim = aim;
+        break;
+    case Turn::HumanPromotion:
+        h.touch = wire(touchedSq_);
+        h.aim = wire(promoTo_);
+        h.promoting = true;
+        break;
+    case Turn::HumanPlacing:
+    case Turn::HumanPlaced:
+    case Turn::HumanPressing:
+        // A staged move stands on the board until my press; a move already sent is the
+        // opponent's MoveMade to play, my hand is idle again.
+        if (moveStaged_) {
+            h.touch = stagedMove_.from;
+            h.aim = stagedMove_.to;
+            h.placed = packed(stagedMove_);
+        }
+        break;
+    default: break;
+    }
+    if (h.touch == live::kNoSquare) h = live::Hand();
+    return h;
+}
+
+void GameScene::sendOnlineGesture(float dt) {
+    live::Hand hand = onlineHand(dt);
+    // While the game is played; once it is over, one last idle state, then nothing.
+    bool over = !(state_ == State::Intro || state_ == State::Handshake || state_ == State::Playing) || endPending_ ||
+                og_.status != StOngoing;
+    if (over) {
+        if (gestureFinal_) return;
+        hand = live::Hand();
+    }
+    if (link_->reconnecting()) {
+        // Nothing is kept for the reconnection; the first gesture after it goes at once (the
+        // opponent's client waits for one sent after our return).
+        gestureSentAny_ = false;
+        return;
+    }
+    int seat = humanSeat();
+    const Look& L = look_[seat];
+    vec3 eye;
+    quat q;
+    firstPersonView(seat, eye, q);
+    bool side = live::lookBesideBoard(eye, rotate(q, vec3(0, 0, -1)));
+    net::Gesture g = live::buildGesture(hand, int(game_.moves().size()), L.gazeYaw, L.gazePitch, L.leanSmooth, glance_, side,
+                                        gestureBuiltAny_ ? &gestureBuilt_ : nullptr);
+    gestureBuilt_ = g;
+    gestureBuiltAny_ = true;
+    gestureSinceMs_ += double(dt) * 1000.0;
+    if (over) {
+        gestureFinal_ = true;
+        if (gestureSentAny_ && live::sameHand(gestureSent_, g)) return;  // idle already
+    } else if (gestureSentAny_ && !live::gestureDue(gestureSent_, g, gestureSinceMs_)) {
+        return;
+    }
+    link_->sendGesture(g);
+    gestureSent_ = g;
+    gestureSentAny_ = true;
+    gestureSinceMs_ = 0.0;
+}
+
+// =============================================================================================
+// Live gestures: the opponent's robot
+// =============================================================================================
+
+bool GameScene::remoteMoveQueued(int ply) const {
+    return std::any_of(remoteQueue_.begin(), remoteQueue_.end(), [ply](const RemoteMove& r) { return r.ply == ply; });
+}
+
+void GameScene::updateRemoteLive(float dt) {
+    RemoteLive& L = remoteLive_;
+    if (L.takeBack) return;
+    // Their gestures stopped coming (the keepalive is once a second): the piece goes back (a move
+    // put down is taken back), and their next gesture takes it again.
+    if (L.pieceId >= 0 && live::holdExpired(remoteAge_)) {
+        cancelRemoteLive();
+        remoteFresh_ = false;
+        return;
+    }
+    int r = aiSeat();
+    Color remote = colorOfSeat(r);
+    live::PieceGate gate;
+    gate.plies = int(game_.moves().size());
+    gate.remoteToMove = game_.position().sideToMove() == remote;
+    gate.waiting = turn_ == Turn::RemoteWaiting;
+    gate.moveQueued = remoteMoveQueued(gate.plies);
+    gate.playing = state_ == State::Playing && og_.status == StOngoing && !endPending_;
+    gate.resync = resync_;
+    gate.fresh = remoteFresh_;
+    if (!live::piecesApply(remoteGesture_, gate)) return;
+    live::PieceIntent in = live::pieceIntent(remoteGesture_, game_.position(), remote);
+    if (L.placed != 0) {
+        // The move put down stays until its MoveMade, or until the gestures have shown something
+        // else for a while (the move then never came: the board is set back).
+        L.placedAway = in.placed == L.placed ? 0.0f : L.placedAway + dt;
+        if (L.placedAway >= live::kPlacedTimeout) L.takeBack = true;
+        return;
+    }
+    // One step at a time, from their latest gesture (live::handStep).
+    live::HandStep step = live::handStep(L.pieceId >= 0 ? int(L.from) : live::kNoSquare, in, anim_[r].remainingTime());
+    if (step.letGo) {
+        // For another piece the hand goes straight on to it, or retracts while it is still in a
+        // hand; with nothing to take it retracts.
+        const PieceObject* next = step.take ? board_.byId(board_.idAt(Square(in.touch))) : nullptr;
+        cancelRemoteLive(!next || pieceInHand(*next));
+    }
+    if (step.take) gripRemoteLive(Square(in.touch), gate.plies);
+    if (L.pieceId < 0) return;
+    if (step.place) placeRemoteLive(in.placed);
+    else if (step.follow) followRemoteAim(in.aim, dt);
+}
+
+void GameScene::enqueueRemoteLive(const std::vector<anim::Task>& tasks) {
+    anim::Animator& a = anim_[aiSeat()];
+    a.enqueue(tasks);
+    remoteLiveEnd_ = a.time() + a.remainingTime();
+}
+
+void GameScene::gripRemoteLive(Square from, int ply) {
+    int id = board_.idAt(from);
+    const PieceObject* p = board_.byId(id);
+    // A piece still in a hand (being put back) is taken again once it is down.
+    if (!p || pieceInHand(*p)) return;
+    int r = aiSeat();
+    anim_[r].setThinking(false);
+    float reachAt = anim_[r].time() + anim_[r].remainingTime();  // after a piece going back, if any
+    enqueueRemoteLive({makeTask(anim::TaskType::Reach, id), makeTask(anim::TaskType::Lift, id)});
+    remoteLive_ = RemoteLive();
+    remoteLive_.pieceId = id;
+    remoteLive_.from = remoteLive_.hover = from;
+    remoteLive_.ply = ply;
+    remoteLive_.reachAt = reachAt;
+    remoteAim_.reset();
+}
+
+void GameScene::followRemoteAim(int aim, float dt) {
+    RemoteLive& L = remoteLive_;
+    int r = aiSeat();
+    // The piece goes over the square they aim at once the aim holds, back over its own square when
+    // they aim nowhere for a while; one carry at a time.
+    int target = remoteAim_.update(aim, dt);
+    L.noAim = target == live::kNoSquare ? L.noAim + dt : 0.0f;
+    Square want = target != live::kNoSquare ? Square(target) : L.noAim >= live::kAimLost ? L.from : L.hover;
+    if (want == L.hover || !live::handReady(anim_[r].remainingTime())) return;
+    const PieceObject* p = board_.byId(L.pieceId);
+    if (!p) return;
+    // Over a piece it would capture, the held piece stays clear of its top.
+    const PieceObject* victim = want != L.from ? board_.at(want) : nullptr;
+    float height = victim ? layout::PIECE_HEIGHT[victim->type] + 0.012f : 0.0f;
+    vec3 pos = want == L.from ? p->basePos : board_.squareBase(want);
+    enqueueRemoteLive({makeTask(anim::TaskType::Carry, L.pieceId, pos, height)});
+    L.hover = want;
+}
+
+void GameScene::placeRemoteLive(uint16_t move) {
+    RemoteLive& L = remoteLive_;
+    Move mv = unpack(game_.position(), move);
+    if (!mv.valid() || board_.idAt(mv.from) != L.pieceId) return;
+    // Their move stands on the board before their clock press: the placement, not the press, and
+    // not in game_ (their MoveMade confirms it, startRemoteMove).
+    std::vector<anim::Task> tasks;
+    planRemoteMove(tasks, mv, true);
+    tasks.push_back(makeTask(anim::TaskType::Retract));
+    enqueueRemoteLive(tasks);
+    L.placed = move;
+    L.hover = mv.to;
+    L.placedAway = 0.0f;
+    aiMoveTo_ = mv.to;
+}
+
+void GameScene::cancelRemoteLive(bool retract) {
+    RemoteLive& L = remoteLive_;
+    if (L.placed != 0) {
+        L.takeBack = true;
+        return;
+    }
+    if (L.pieceId < 0) return;
+    int r = aiSeat();
+    if (PieceObject* p = board_.byId(L.pieceId)) {
+        // Back over its square first (Place comes straight down), then down on it.
+        std::vector<anim::Task> tasks;
+        if (L.hover != L.from) tasks.push_back(makeTask(anim::TaskType::Carry, p->id, p->basePos));
+        tasks.push_back(makeTask(anim::TaskType::Place, p->id, p->basePos));
+        if (retract) tasks.push_back(makeTask(anim::TaskType::Retract));
+        dest_[p->id].push_back({L.from, p->basePos, false});
+        enqueueRemoteLive(tasks);
+    }
+    remoteLive_ = RemoteLive();
+    remoteAim_.reset();
+    if (retract && turn_ == Turn::RemoteWaiting) anim_[r].setThinking(true);
+}
+
+void GameScene::settleRemoteTakeBack() {
+    // A move the opponent's robot put down and that never came: once the hands have let go, the
+    // board is set back from the game (as a rebuild does, behind a short dip).
+    if (!remoteLive_.takeBack || anim_[0].busy() || anim_[1].busy() || !dest_.empty()) return;
+    board_.syncTo(game_.position());
+    remoteLive_ = RemoteLive();
+    remoteAim_.reset();
+    fadeDip_ = std::max(fadeDip_, 0.4f);
+    if (turn_ == Turn::RemoteWaiting) anim_[aiSeat()].setThinking(true);
+    LOGI("online: the opponent's unconfirmed move is taken back");
+}
+
+bool GameScene::driveRemoteHead(float dt) {
+    int r = aiSeat();
+    const net::Gesture& g = remoteGesture_;
+    bool following = (state_ == State::Intro || state_ == State::Handshake || state_ == State::Playing || state_ == State::GameOver) &&
+                     link_ && live::headActive(remoteAge_, remoteFresh_, settings().ignoreOpponentHead, opponentAway_, link_->reconnecting());
+    // Their clock stands at their right on their screen, not here: the robot's own look follows its
+    // hand to this clock.
+    bool active = following && !anim_[r].runningTask(anim::TaskType::PressClock);
+    remoteGlancing_ = following && (g.flags & net::proto::GestureFlag::Glance) != 0;
+    remoteGlanceBlend_ = clamp(remoteGlanceBlend_ + (remoteGlancing_ ? dt : -dt) / kGlanceTime, 0.0f, 1.0f);
+    anim_[r].setLean(following ? g.lean : 0.0f);
+    if (!active) {
+        if (remoteHeadOn_) anim_[r].setHeadOverride(false);  // the gaze controller takes over smoothly
+        remoteHeadOn_ = false;
+        return false;
+    }
+    if (!remoteHeadOn_) {
+        float yaw, pitch;
+        anim_[r].headAngles(yaw, pitch);
+        remoteHead_.snap(yaw, pitch);
+        remoteHeadOn_ = true;
+    }
+    // What lies beside the board is mirrored between the two clients: a look there turns the
+    // other way here.
+    float yaw = (g.flags & net::proto::GestureFlag::Side) ? -g.yaw : g.yaw;
+    float pitch = g.pitch;
+    if (remoteGlanceBlend_ > 0.0f) {
+        // Their scoresheet: this robot looks at its own pad here, as the local glance does.
+        vec3 d = glanceTarget(r) - anim_[r].eyeCameraTransform().c[3].xyz();
+        float zs = r == 0 ? 1.0f : -1.0f;  // the seat faces -Z * zs
+        float b = smootherstep(remoteGlanceBlend_);
+        yaw = lerp(yaw, std::atan2(-zs * d.x, -zs * d.z), b);
+        pitch = lerp(pitch, std::atan2(d.y, length(vec2(d.x, d.z))), b);
+    }
+    remoteHead_.update(clamp(yaw, -kHeadYawLimit, kHeadYawLimit), clamp(pitch, kHeadPitchDown, kHeadPitchUp), dt);
+    anim_[r].setHeadOverride(true, remoteHead_.yaw(), remoteHead_.pitch());
+    return true;
+}
+
+// =============================================================================================
 // Clock, end, overlay
 // =============================================================================================
 
@@ -468,9 +886,10 @@ ClockDisplay GameScene::onlineClockDisplay() const {
     int hw = world_.clockHalfForSeat(1.0f), hb = 1 - hw;
     int64_t ms[2] = {onlineClockMs(0), onlineClockMs(1)};
     int running = og_.status == StOngoing && state_ == State::Playing ? og_.running : 2;
-    if (pendingPly_ >= 0) {
-        // My move is on its way: my time stands still until the server has it.
-        ms[int(humanColor_)] = frozenMs_;
+    if (pendingPly_ >= 0 && clockFreeze_.holds(localMs(), link_->pingMs(), link_->reconnecting())) {
+        // My move is on its way: my time stands still until the server has it (a confirmation
+        // that takes too long, or a lost connection, shows the authority's running clock again).
+        ms[int(humanColor_)] = clockFreeze_.shownMs;
         running = 2;
     }
     d.ms[hw] = ms[0];

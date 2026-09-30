@@ -53,6 +53,7 @@ wchar_t g_highSurrogate = 0;  // first half of a UTF-16 pair waiting for its sec
 LARGE_INTEGER g_freq, g_t0;
 PFN_wglSwapIntervalEXT g_swapInterval;
 POINT g_captureCenter;
+bool g_leaveTracked = false;  // a WM_MOUSELEAVE is asked for (TrackMouseEvent)
 
 int mapVK(WPARAM vk, LPARAM lp) {
     if (vk >= 'A' && vk <= 'Z') return int(vk);
@@ -104,6 +105,15 @@ void applyCursor() {
     if (!want && shown) while (ShowCursor(FALSE) >= 0) {}
 }
 
+bool inClientArea(int x, int y) { return x >= 0 && y >= 0 && x < g_width && y < g_height; }
+
+// The pointer stands over the client area, and no other window is in front of it there.
+bool pointerOverClient() {
+    POINT p;
+    if (!GetCursorPos(&p) || WindowFromPoint(p) != g_hwnd || !ScreenToClient(g_hwnd, &p)) return false;
+    return inClientArea(p.x, p.y);
+}
+
 LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
     switch (msg) {
         case WM_CLOSE: g_quit = true; return 0;
@@ -140,10 +150,26 @@ LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
                 g_input.text[g_input.textCount++] = cp;
             return 0;
         }
-        case WM_MOUSEMOVE:
-            g_input.mouseX = float(short(LOWORD(lp)));
-            g_input.mouseY = float(short(HIWORD(lp)));
-            g_input.mouseInWindow = true;
+        case WM_MOUSEMOVE: {
+            int x = short(LOWORD(lp)), y = short(HIWORD(lp));
+            g_input.mouseX = float(x);
+            g_input.mouseY = float(y);
+            // With a button down the window keeps the pointer (SetCapture): moves go on outside.
+            g_input.mouseInWindow = inClientArea(x, y);
+            if (!g_leaveTracked) {
+                // The last move inside can be anywhere near the edge the pointer leaves by (at the
+                // top, in the look-up band): only WM_MOUSELEAVE says it has gone.
+                TRACKMOUSEEVENT tme{sizeof(tme), TME_LEAVE, h, 0};
+                g_leaveTracked = TrackMouseEvent(&tme) != FALSE;
+            }
+            return 0;
+        }
+        case WM_MOUSELEAVE:
+            // The pointer has left the client area: for the frame, another window or the desktop.
+            // One that comes while it is still over the client area changes nothing; the next
+            // move asks again.
+            g_leaveTracked = false;
+            g_input.mouseInWindow = pointerOverClient();
             return 0;
         case WM_LBUTTONDOWN: SetCapture(h); setButton(MOUSE_LEFT, true); return 0;
         case WM_LBUTTONUP: ReleaseCapture(); setButton(MOUSE_LEFT, false); return 0;

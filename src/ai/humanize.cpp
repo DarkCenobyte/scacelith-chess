@@ -47,7 +47,7 @@ int humanThinkTimeMs(const EngineSettings& s, const ClockInfo& clock, int plyCou
     auto spread = [&](double target) { return floorMs + std::max(target - floorMs, 250.0) * jitter; };
 
     if (!clock.timed) {
-        // Untimed: a normal middlegame move takes a pleasant few seconds, median ~2.7 s for the
+        // Untimed: a normal middlegame move takes a pleasant few seconds, median ~2.8 s for the
         // Novice up to ~7 s at full strength (typically 2..12 s); less in the opening and for
         // forced moves.
         double t = spread((2500.0 + 4000.0 * strength) * phaseFactor(moveNo) * forced);
@@ -104,7 +104,7 @@ bool offersDraw(int evalCp, int plyCount, int pliesSinceOwnOffer) {
 
 bool sameStrength(const EngineSettings& a, const EngineSettings& b) {
     return a.skillLevel == b.skillLevel && a.limitStrength == b.limitStrength && a.elo == b.elo && a.depth == b.depth &&
-           a.moveTimeMs == b.moveTimeMs && a.nodes == b.nodes && a.multiPV == b.multiPV && a.useNNUE == b.useNNUE &&
+           a.moveTimeMs == b.moveTimeMs && a.nodes == b.nodes && a.multiPV == b.multiPV &&
            a.threads == b.threads && a.hashMB == b.hashMB && a.useClock == b.useClock;
 }
 

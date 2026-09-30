@@ -4,14 +4,17 @@
 //   - the menus (ui/ui_screens_online*.cpp) read its state (server info, account, connection,
 //     matchmaking, challenges) and send commands through api() / direct();
 //   - the 3D scene plays the games it announces (gameReady() / takeGame()) through a GameLink and
-//     drains their events with nextGameEvent().
+//     drains their events with nextGameEvent(), the opponent's live gestures (OpponentGesture)
+//     included: only those of the game being played, the latest one replacing one still queued.
 // With --online-mock the in-process fakes of online_mock.h replace the network layer (builds
-// without it use them anyway, see online_stub.cpp). Tokens never pass through here: the
+// without it use them anyway, see online_stub.cpp); --online-manual-clock then makes their games
+// autoPress = false (the moves wait for a clock press). Tokens never pass through here: the
 // network layer stores them per server.
 #pragma once
 #include "../net/direct_match.h"
 #include "../net/online_client.h"
 #include "game_link.h"
+#include "online_live.h"
 #include <deque>
 #include <map>
 #include <memory>
@@ -65,6 +68,7 @@ public:
     virtual void abortGame(uint64_t gameId) = 0;
     virtual void requestResync(uint64_t gameId) = 0;
     virtual void rematch(uint64_t gameId, bool accept) = 0;
+    virtual void sendGesture(uint64_t gameId, const net::Gesture& g) = 0;
     virtual bool poll(net::Event& out) = 0;
 };
 
@@ -88,6 +92,7 @@ public:
     virtual void abortGame() = 0;
     virtual void requestResync() = 0;
     virtual void rematch(bool accept) = 0;
+    virtual void sendGesture(const net::Gesture& g) = 0;
     virtual int pingMs() const = 0;
     virtual double serverNowMs() const = 0;
     virtual bool poll(net::Event& out) = 0;
@@ -105,6 +110,10 @@ public:
     // Once per frame (menus and games alike): polls the network layer, advances the virtual
     // clock. Game events wait in a queue for the scene.
     void update(float dt);
+    // The scene says, before update(), whether a game is being played (any kind: online, direct,
+    // or on this PC while connected). Some toasts wait until none is: the RatingRestored notice
+    // shows in the menus, on the game over card, or at once when no game is going on.
+    void setInGame(bool inGame) { inGame_ = inGame; }
 
     ServerApi& api();
     DirectApi& direct();
@@ -211,6 +220,7 @@ private:
     std::unique_ptr<ServerApi> api_;
     std::unique_ptr<DirectApi> direct_;
     bool directUsed_ = false;
+    net::ConnState directConn_ = net::ConnState::Offline;   // of the direct match (a guest reconnects)
 
     bool infoKnown_ = false;
     bool testing_ = false, testSwitched_ = false, testDone_ = false;
@@ -229,6 +239,8 @@ private:
     std::vector<Incoming> incoming_;
     double cooldownUntilMs_ = 0, bannedUntilMs_ = 0;
     std::string autoQueue_;                     // --start-online
+    bool inGame_ = false;
+    live::HeldNotice ratingRestored_;           // RatingRestored points waiting for the end of the game
 
     bool gameReady_ = false;
     uint64_t gameId_ = 0;

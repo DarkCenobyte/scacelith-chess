@@ -33,7 +33,9 @@ constexpr int kPingEveryMs = 2000;         // both sides measure the round trip
 constexpr int kSilenceMs = 10000;          // nothing received for this long: the link is dead
 constexpr int kMaxPendingHandshakes = 4;
 constexpr int kMaxFailedHandshakes = 10;   // wrong codes per hosted game, then the host stops listening
-constexpr int kMaxMsgPerSec = 20;          // announced in Welcome; twice as many closes the link
+constexpr int kMaxMsgPerSec = 20;          // announced in Welcome; twice as many closes the link (Gestures aside)
+constexpr int kGestureRate = 10;           // Gestures per second each way (Welcome.gestureRate)...
+constexpr int kGestureBurst = 20;          // ...with bursts up to this many (Welcome.gestureBurst)
 constexpr int64_t kRenewEveryMs = 30 * 60 * 1000;
 constexpr size_t kMaxOutbox = 1 << 20;
 constexpr int64_t kDefaultGraceMs = 60000;
@@ -91,6 +93,7 @@ struct ClientView {
             g.graceMs = s.graceMs;
             g.firstMoveMs = s.firstMoveMs;
             g.rematchBy = int(s.rematch);
+            g.autoPress = s.autoPress;
             game = g;
             have = true;
             needResync = false;
@@ -365,6 +368,20 @@ public:
         events.pop_front();
         return true;
     }
+    // The game thread's latest Gesture replaces the one not sent yet; nothing is kept while the
+    // link to the other player is down.
+    void postGesture(uint64_t game, const Gesture& g) {
+        bool wake;
+        {
+            std::lock_guard<std::mutex> lk(m);
+            if (!gestureLink) return;
+            wake = !gestureOut.pending;   // one already waiting has woken the worker
+            gestureOut.pending = true;
+            gestureOut.game = game;
+            gestureOut.g = g;
+        }
+        if (wake) waker.wake();
+    }
 
     // Shared with the game thread (under m).
     mutable std::mutex m;
@@ -374,6 +391,8 @@ public:
     UpnpStatus upnpStatus;
     std::deque<Event> events;
     std::deque<Command> commands;
+    struct GestureOut { bool pending = false; uint64_t game = 0; Gesture g; } gestureOut;
+    bool gestureLink = false;   // the other player is connected (the worker sets it)
     int pingMs = -1;
     double clockOffset = 0;   // guest: host clock - local clock
     const bool isHost;
@@ -391,6 +410,56 @@ protected:
     void pushEvent(Event ev) {
         std::lock_guard<std::mutex> lk(m);
         events.push_back(std::move(ev));
+    }
+    // The other player's Gesture: it replaces the one of the same game still waiting to be
+    // polled (only the latest state matters), so the queue holds at most one per game.
+    void pushGesture(uint64_t game, const Gesture& g) {
+        Event ev;
+        ev.kind = Event::Kind::OpponentGesture;
+        ev.ok = true;
+        ev.gameId = game;
+        ev.gesture = g;
+        std::lock_guard<std::mutex> lk(m);
+        for (auto it = events.begin(); it != events.end(); ++it) {
+            if (it->kind == Event::Kind::OpponentGesture && it->gameId == game) {
+                events.erase(it);
+                break;
+            }
+        }
+        events.push_back(std::move(ev));
+    }
+    // The link to the other player came up (paced for the receiver's bucket of rate / burst) or
+    // went down (the Gesture waiting is dropped: none is kept for the reconnection). It comes up
+    // before any event that tells the game thread the other player is there (the snapshot,
+    // Online), so the first Gesture the game thread sends on that news is never dropped.
+    void gestureLinkUp(int rate, int burst) {
+        std::lock_guard<std::mutex> lk(m);
+        gestureBucket_.reset(double(sock::steadyMs()), rate, gestureSendCapacity(burst));
+        gestureOut.pending = false;
+        gestureLink = true;
+    }
+    void gestureLinkDown() {
+        std::lock_guard<std::mutex> lk(m);
+        gestureOut.pending = false;
+        gestureLink = false;
+    }
+    // The Gesture to send now, if one waits and the bucket allows it; one that cannot go at all
+    // (link down, no relay) is dropped.
+    bool nextGesture(int64_t now, uint64_t& game, Gesture& g) {
+        std::lock_guard<std::mutex> lk(m);
+        if (!gestureOut.pending) return false;
+        const bool usable = gestureLink && gestureBucket_.enabled();
+        if (usable && !gestureBucket_.take(double(now))) return false;
+        gestureOut.pending = false;
+        game = gestureOut.game;
+        g = gestureOut.g;
+        return usable;
+    }
+    // When the Gesture waiting may go (now + 1 s when none waits).
+    int64_t gestureDeadline(int64_t now) const {
+        std::lock_guard<std::mutex> lk(m);
+        if (!gestureOut.pending) return now + 1000;
+        return int64_t(std::ceil(gestureBucket_.readyAtMs(double(now))));
     }
     void connectionEvent(ConnState st, const std::string& err = std::string()) {
         Event ev;
@@ -418,6 +487,9 @@ protected:
         std::lock_guard<std::mutex> lk(m);
         pingMs = rtt < 0 ? -1 : int(std::lround(rtt));
     }
+
+private:
+    GestureBucket gestureBucket_;   // pacing of the Gestures sent (under m)
 };
 
 // ---- host ---------------------------------------------------------------------------------------
@@ -446,6 +518,7 @@ private:
     double rtt_ = -1;
     int64_t rateWindow_ = 0;
     int rateCount_ = 0;
+    GestureBucket guestGestures_;   // the guest's Gestures, at most kGestureRate (kGestureBurst at once)
     bool mapped_ = false;
     upnp::Gateway gw_;
     upnp::Mapping mapping_;
@@ -564,6 +637,7 @@ private:
             if (guest_) {
                 until(nextPing_);
                 until(guest_->lastRecv + kSilenceMs + 1);
+                until(gestureDeadline(now));
             }
             if (mapped_ && mapping_.leaseSec) until(renewAt_);
             sock::PollSet ps;
@@ -592,6 +666,7 @@ private:
                 dispatch(out);
             }
             if (guest_ && now >= nextPing_) sendPing(now);
+            sendGesture(now);
             if (mapped_ && mapping_.leaseSec && now >= renewAt_) renew(now);
             if (guest_ && !guest_->write()) dropGuest(out, "write failed");
             if (!auth_) {
@@ -686,12 +761,14 @@ private:
         nextPing_ = now;
         rateWindow_ = now;
         rateCount_ = 0;
+        guestGestures_.reset(double(now), kGestureRate, kGestureBurst);
         const double enow = sock::epochMs();
         const bool first = !auth_;
         if (first) {
             direct::AuthorityConfig cfg;
             cfg.baseMs = int64_t(std::min(std::max(opt_.baseSec, 1), 10800)) * 1000;
             cfg.incMs = int64_t(std::min(std::max(opt_.incSec, 0), 180)) * 1000;
+            cfg.autoPress = opt_.autoPress;
             auth_ = std::make_unique<direct::Authority>(cfg, opt_.playerName, nameFromToken(h.token), opt_.hostColor);
             auth_->startGame(enow, out);
         } else {
@@ -707,9 +784,12 @@ private:
         w.clientPingMs = kPingEveryMs;
         w.maxMsgPerSec = kMaxMsgPerSec;
         w.activeGame = auth_->gameId();
+        w.gestureRate = kGestureRate;
+        w.gestureBurst = kGestureBurst;
         std::vector<uint8_t> buf;
         P::encode(w, buf);
         guest_->send(buf);   // before the snapshot in 'out'
+        gestureLinkUp(kGestureRate, kGestureBurst);   // the host's Gestures still go after the snapshot
         dispatch(out);
         LOGI("direct: guest \"%s\" %s", auth_->guestName().c_str(), first ? "joined" : "reconnected");
         if (first) {
@@ -736,6 +816,16 @@ private:
             return;
         }
         guest_->lastSeq = seq;
+        P::MsgType t;
+        P::peekType(msg.data(), msg.size(), t);
+        // Gestures have their own bucket and never count towards the flood limit: one beyond the
+        // announced rate is dropped (the next one carries the whole state again).
+        if (t == P::MsgType::C_Gesture) {
+            P::C_Gesture g;
+            if (!P::decode(msg.data(), msg.size(), g) || !auth_ || g.game != auth_->gameId()) return;
+            if (guestGestures_.take(double(now))) pushGesture(g.game, gestureFromWire(g));
+            return;
+        }
         if (now - rateWindow_ >= 1000) {
             rateWindow_ = now;
             rateCount_ = 0;
@@ -752,8 +842,6 @@ private:
             dropGuest(out, "flood");
             return;
         }
-        P::MsgType t;
-        P::peekType(msg.data(), msg.size(), t);
         switch (t) {
         case P::MsgType::C_Ping: {
             P::C_Ping p;
@@ -807,8 +895,22 @@ private:
         nextPing_ = now + kPingEveryMs;
     }
 
+    // The host's own Gesture, straight to the guest (the authority never sees Gestures).
+    void sendGesture(int64_t now) {
+        uint64_t game = 0;
+        Gesture g;
+        if (!nextGesture(now, game, g) || !guest_ || !auth_ || game != auth_->gameId()) return;
+        P::S_Gesture m;
+        m.game = game;
+        gestureToWire(g, m);
+        std::vector<uint8_t> buf;
+        P::encode(m, buf);
+        guest_->send(buf);
+    }
+
     void dropGuest(direct::Authority::Output& out, const char* why) {
         LOGI("direct: guest connection lost (%s)", why);
+        gestureLinkDown();
         guest_.reset();
         pingSent_.clear();
         rtt_ = -1;
@@ -841,6 +943,7 @@ private:
             auth_->hostLeaves(sock::epochMs(), out);   // leaving = resigning (like online)
             dispatch(out);
         }
+        gestureLinkDown();
         if (guest_) guest_->flushAndClose(1000);
         guest_.reset();
         pending_.clear();
@@ -911,6 +1014,7 @@ private:
             if (phase_ == Phase::Online && conn_) {
                 until(nextPing_);
                 until(conn_->lastRecv + kSilenceMs + 1);
+                until(gestureDeadline(now));
             }
             sock::PollSet ps;
             ps.add(waker.handle(), true, false);
@@ -1031,6 +1135,7 @@ private:
         if (phase_ == Phase::Online) {
             if (now - conn_->lastRecv > kSilenceMs) { lost(now); return; }
             if (now >= nextPing_) sendPing(now);
+            sendGesture(now);
             if (view_.needResync && view_.have) {
                 P::Resync r;
                 r.game = view_.game.id;
@@ -1085,6 +1190,12 @@ private:
             clockOffset = offset_;
             return;
         }
+        case P::MsgType::S_Gesture: {
+            P::S_Gesture g;
+            if (!P::decode(msg.data(), msg.size(), g) || !view_.have || g.game != view_.game.id) return;
+            pushGesture(g.game, gestureFromWire(g));
+            return;
+        }
         default: {
             Event ev;
             if (view_.apply(msg.data(), msg.size(), ev)) pushEvent(std::move(ev));
@@ -1105,6 +1216,7 @@ private:
             clockOffset = offset_;
         }
         nextPing_ = now;
+        gestureLinkUp(w.gestureRate, w.gestureBurst);
         if (first) setState(DirectMatch::State::Playing);
         connectionEvent(ConnState::Online);
         LOGI("direct: %s the match of \"%s\"", first ? "joined" : "rejoined", w.serverName.c_str());
@@ -1119,6 +1231,17 @@ private:
         conn_->send(buf);
     }
 
+    // The guest's own Gesture, for the game the host's messages describe.
+    void sendGesture(int64_t now) {
+        uint64_t game = 0;
+        Gesture g;
+        if (!nextGesture(now, game, g) || !conn_ || !view_.have || game != view_.game.id) return;
+        P::C_Gesture m;
+        m.game = game;
+        gestureToWire(g, m);
+        sendMsg(m);
+    }
+
     void sendPing(int64_t now) {
         P::C_Ping p;
         p.nonce = ++pingNonce_;
@@ -1130,6 +1253,7 @@ private:
 
     // The established link broke.
     void lost(int64_t now) {
+        gestureLinkDown();
         conn_.reset();
         pingSent_.clear();
         setPing(-1);
@@ -1185,6 +1309,7 @@ private:
 
     // close(): resign a running game (like leaving online), then close gracefully.
     void leave() {
+        gestureLinkDown();
         if (phase_ == Phase::Online && conn_ && view_.have && view_.game.status == int(P::GameStatus::Ongoing)) {
             P::Resign r;
             r.game = view_.game.id;
@@ -1341,6 +1466,11 @@ void DirectMatch::claimDraw() { postSimple(*impl_, impl_->m, int(Command::Kind::
 void DirectMatch::abortGame() { postSimple(*impl_, impl_->m, int(Command::Kind::Abort), false); }
 void DirectMatch::requestResync() { postSimple(*impl_, impl_->m, int(Command::Kind::Resync), false); }
 void DirectMatch::rematch(bool accept) { postSimple(*impl_, impl_->m, int(Command::Kind::Rematch), accept); }
+
+void DirectMatch::sendGesture(const Gesture& g) {
+    std::lock_guard<std::mutex> lk(impl_->m);
+    if (impl_->cur && impl_->haveView) impl_->cur->postGesture(impl_->view.id, g);
+}
 
 const OnlineGame* DirectMatch::currentGame() const {
     std::lock_guard<std::mutex> lk(impl_->m);

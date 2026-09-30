@@ -1,9 +1,10 @@
-// Tests for src/ai: presets, humanised timing, draw decisions and the embedded Stockfish 16
-// (start-up, moves, evaluation, stop, new games, shutdown/restart).
+// Tests for src/ai: presets, humanised timing, draw decisions and the embedded Stockfish 19
+// (start-up, moves, evaluation, stop, new games, shutdown/restart, instruction-set variants).
 #include "test.h"
 
 #include "ai/behavior.h"
 #include "ai/engine.h"
+#include "ai/uci_host.h"
 
 #include <chrono>
 #include <cstring>
@@ -70,6 +71,17 @@ bool plausibleMove(const std::vector<std::string>& moves, const std::string& m) 
 
 const std::vector<std::string> kItalian = {"e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5", "c2c3", "g8f6", "d2d4", "e5d4"};
 
+std::vector<std::string> words(const std::string& s) {
+    std::vector<std::string> out;
+    for (size_t i = 0; i < s.size();) {
+        size_t j = s.find(' ', i);
+        if (j == std::string::npos) j = s.size();
+        if (j > i) out.push_back(s.substr(i, j - i));
+        i = j + 1;
+    }
+    return out;
+}
+
 ai::EngineSettings fast() {
     ai::EngineSettings s;
     s.depth = 6;
@@ -120,6 +132,33 @@ TEST(ai_skill_mapping) {
     sk.skillLevel = 5;
     s.elo = ai::Engine::estimateElo(sk);  // inverse mapping round-trips
     CHECK(std::abs(ai::detail::skillLevel(s) - 5.0) < 0.05);
+}
+
+TEST(ai_handicap_estimates) {
+    // A depth cap costs strength at or below the pick iteration (1 + level), more for every ply it
+    // stops short of it, and nothing above it.
+    ai::EngineSettings s;
+    s.skillLevel = 1;
+    const int uncapped = ai::Engine::estimateElo(s);
+    s.depth = 3;
+    CHECK_EQ(ai::Engine::estimateElo(s), uncapped);
+    s.depth = 2;
+    const int atPick = ai::Engine::estimateElo(s);
+    CHECK(atPick < uncapped);
+    s.depth = 1;
+    CHECK(ai::Engine::estimateElo(s) < atPick);
+    // Every MultiPV line above Stockfish's minimum of 4 costs strength, up to 20.
+    s.depth = 0;
+    for (int multiPV = 4; multiPV < 20; ++multiPV) {
+        s.multiPV = multiPV;
+        const int narrower = ai::Engine::estimateElo(s);
+        s.multiPV = multiPV + 1;
+        CHECK(ai::Engine::estimateElo(s) < narrower);
+    }
+    s.multiPV = 1;
+    const int single = ai::Engine::estimateElo(s);
+    s.multiPV = 4;
+    CHECK_EQ(ai::Engine::estimateElo(s), single);
 }
 
 TEST(ai_think_time) {
@@ -290,23 +329,58 @@ TEST(ai_every_preset_moves) {
     e.shutdown();
 }
 
-TEST(ai_classical_eval_toggle) {
-    // "Use NNUE" false/true switches between Stockfish's evaluations without reloading anything;
-    // evaluations always use the network, moves use the configured one.
+TEST(ai_special_moves) {
+    // Stockfish 19 ends the whole process on a "position" command it cannot replay, so every kind of
+    // move must reach it in the notation it expects: the four castlings, en passant by both sides
+    // and the four promotions, each as the last move of a request.
+    const std::string promotion = "e2e4 d7d5 e4d5 c7c6 d5c6 g8f6 c6b7 c8d7 b7a8";
+    const std::vector<std::vector<std::string>> lines = {
+        words("d2d4 d7d5 g1f3 b8c6 e2e3 c8f5 f1e2 d8d7 e1g1"),       // White castles kingside
+        words("d2d4 d7d5 g1f3 b8c6 e2e3 c8f5 f1e2 d8d7 e1g1 e8c8"),  // Black castles queenside
+        words("d2d4 g8f6 b1c3 g7g6 c1f4 f8g7 d1d2 e8g8"),            // Black castles kingside
+        words("d2d4 g8f6 b1c3 g7g6 c1f4 f8g7 d1d2 e8g8 e1c1"),       // White castles queenside
+        words("e2e4 a7a6 e4e5 d7d5 e5d6"),                           // White takes en passant
+        words("g1f3 d7d5 b1c3 d5d4 e2e4 d4e3"),                      // Black takes en passant
+        words(promotion + "q"), words(promotion + "r"), words(promotion + "b"), words(promotion + "n"),
+    };
     ai::Engine e;
     CHECK(e.start());
-    ai::EngineSettings s;
-    s.skillLevel = 0;
-    s.depth = 1;
-    s.useNNUE = false;
-    e.configure(s);
-    for (int i = 0; i < 3; ++i) {
-        e.requestMove(kItalian, ai::ClockInfo{});
-        CHECK(plausibleMove(kItalian, waitMove(e, 20000)));
-        e.requestEval({"e2e4", "e7e5", "g1f3", "d8h4", "f3h4"});
-        CHECK(waitEval(e, 20000));
-        CHECK(e.takeEval() < -500);
+    e.configure(fast());
+    for (const auto& line : lines) {
+        e.requestMove(line, ai::ClockInfo{});
+        std::string m = waitMove(e, 20000);
+        CHECK(plausibleMove(line, m));
+        if (!plausibleMove(line, m)) std::fprintf(stderr, "  after %s: '%s'\n", line.back().c_str(), m.c_str());
     }
+    e.requestEval(lines.back());  // evaluations send the same "position" command
+    CHECK(waitEval(e, 20000));
+    e.shutdown();
+}
+
+TEST(ai_illegal_line_not_sent) {
+    // A move list the game's rules reject never reaches Stockfish, which would end the process: the
+    // request fails (empty move, neutral evaluation) and the engine keeps working.
+    const std::vector<std::vector<std::string>> bad = {
+        {"e2e5"},                     // not a legal move
+        {"e2e4", "e7e5", "e1g1"},     // castling through pieces
+        {"e2e4", "d7d5", "e4e5", "f7f5", "h2h3", "b8c6", "e5f6"},  // en passant one move too late
+        {"e2e4", "e7e5", "e4e5"},     // blocked pawn
+        {"e2e4q"},                    // promotion letter on a quiet move
+        {"e2e4", ""},                 // empty move
+        {"e2e4", "e7e5 g1f3"},        // two moves in one
+    };
+    ai::Engine e;
+    CHECK(e.start());
+    e.configure(fast());
+    for (const auto& line : bad) {
+        e.requestMove(line, ai::ClockInfo{});
+        CHECK_EQ(waitMove(e, 5000), std::string());
+        e.requestEval(line);
+        CHECK(waitEval(e, 5000));
+        CHECK_EQ(e.takeEval(), 0);
+    }
+    e.requestMove(kItalian, ai::ClockInfo{});
+    CHECK(plausibleMove(kItalian, waitMove(e, 20000)));
     e.shutdown();
 }
 
@@ -366,7 +440,7 @@ TEST(ai_supersede_and_new_games) {
 TEST(ai_shutdown_restart) {
     ai::Engine a, b;
     CHECK(a.start());
-    CHECK(!b.start());  // Stockfish's state is global: one session at a time
+    CHECK(!b.start());  // the engine uses the process's standard streams: one session at a time
     CHECK(!b.available());
     b.requestMove({}, ai::ClockInfo{});  // requests on an engine that is not running fail at once
     CHECK(b.moveReady());
@@ -390,6 +464,94 @@ TEST(ai_shutdown_restart) {
         CHECK(plausibleMove({"e2e4"}, waitMove(a, 20000)));
         a.shutdown();
     }
+}
+
+namespace {
+
+// Reads engine output until a line starting with `prefix`, keeping the lines; false on timeout.
+bool readUntil(ai::detail::UciHost& host, const std::string& prefix, std::vector<std::string>& lines,
+               int timeoutMs) {
+    auto t0 = SteadyClock::now();
+    std::string line;
+    while (msSince(t0) < timeoutMs) {
+        if (!host.waitLine(line, 100)) continue;
+        lines.push_back(line);
+        if (line.compare(0, prefix.size(), prefix) == 0) return true;
+    }
+    return false;
+}
+
+// Fixed-depth searches in a raw session: "<nodes>/<best move>" per position, as Stockfish reports
+// them in its last "info depth" line and "bestmove".
+std::string searchSignature(ai::detail::UciHost& host) {
+    static const char* const positions[] = {
+        "startpos",
+        "startpos moves e2e4 e7e5 g1f3 b8c6 f1c4 f8c5 c2c3 g8f6 d2d4 e5d4",
+        "fen r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - 0 1",
+        "fen 8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - - 0 1",
+    };
+    std::vector<std::string> lines;
+    host.send("uci");
+    host.send("setoption name Threads value 1");
+    host.send("setoption name Hash value 16");
+    host.send("isready");
+    if (!readUntil(host, "readyok", lines, 30000)) return "no readyok";
+    std::string signature;
+    for (const char* position : positions) {
+        host.send("ucinewgame");
+        host.send(std::string("position ") + position);
+        host.send("go depth 11");
+        lines.clear();
+        if (!readUntil(host, "bestmove", lines, 60000)) return signature + "timeout";
+        std::string nodes = "?";
+        for (const std::string& l : lines) {
+            const std::vector<std::string> w = words(l);
+            for (size_t i = 0; i + 1 < w.size(); ++i)
+                if (w[0] == "info" && w[1] == "depth" && w[i] == "nodes") nodes = w[i + 1];
+        }
+        signature += nodes + "/" + words(lines.back()).at(1) + " ";
+    }
+    return signature;
+}
+
+}  // namespace
+
+TEST(ai_variants_play_identically) {
+    // Each variant of this build that the CPU runs, forced in turn through the arch limit, must
+    // search exactly the same trees: same node counts, same moves.
+    ai::detail::UciHost& host = ai::detail::UciHost::instance();
+    const std::vector<std::string> variants = host.variants();
+    CHECK(!variants.empty());
+    int owner = 0;
+    std::string reference, bestRun;
+    for (const std::string& v : variants) {
+        ai::Engine::setArchLimit(v);
+        CHECK(host.acquire(&owner));
+        if (v != host.arch()) {  // this CPU does not run it: the limit chose a lower variant
+            std::fprintf(stderr, "  %s: not run by this CPU (%s chosen)\n", v.c_str(), host.arch());
+            host.release(&owner);
+            continue;
+        }
+        auto t0 = SteadyClock::now();
+        const std::string signature = searchSignature(host);
+        std::fprintf(stderr, "  %s: %s in %d ms\n", v.c_str(), signature.c_str(), msSince(t0));
+        host.release(&owner);
+        if (reference.empty()) reference = signature;
+        CHECK_EQ(signature, reference);
+        bestRun = v;
+    }
+    CHECK(!bestRun.empty());
+
+    // An unknown name leaves the limit alone; "auto" chooses the best variant this CPU runs.
+    ai::Engine::setArchLimit(variants.front());
+    ai::Engine::setArchLimit("x86-64-no-such-variant");
+    CHECK(host.acquire(&owner));
+    CHECK_EQ(std::string(host.arch()), variants.front());
+    host.release(&owner);
+    ai::Engine::setArchLimit("auto");
+    CHECK(host.acquire(&owner));
+    CHECK_EQ(std::string(host.arch()), bestRun);
+    host.release(&owner);
 }
 
 #else

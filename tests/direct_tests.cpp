@@ -1,5 +1,7 @@
 // Direct match: UPnP client against a fake gateway on 127.0.0.1, the secure channel (vectors
-// and failure cases) and full loopback matches between two DirectMatch instances.
+// and failure cases) and full loopback matches between two DirectMatch instances, gestures
+// included (both ways, paced, never replayed, the first one after a reconnection never dropped,
+// outside the flood limit).
 #include "test.h"
 #include "chess/chess.h"
 #include "net/direct_authority.h"
@@ -12,9 +14,11 @@
 #include <atomic>
 #include <chrono>
 #include <cmath>
+#include <cstdio>
 #include <cstring>
 #include <deque>
 #include <functional>
+#include <memory>
 #include <mutex>
 #include <thread>
 
@@ -962,12 +966,52 @@ TEST(direct_authority_first_move_timeout) {
         r.move(HostSide, "e2e4");
         auto mm = r.recent<P::MoveMade>(GuestSide);
         CHECK(mm.size() == 1 && mm[0].firstMoveMs == 60000 && mm[0].spentMs == 0 && mm[0].whiteMs == 60000);
-        CHECK_EQ(r.a.nextDeadline(), r.now + 60000);
+        CHECK_EQ(r.a.nextDeadline(), r.now + 60000 + 30);   // the guest's margin, no round trip known yet
         r.now += 59000;
         r.move(GuestSide, "e7e5");
         mm = r.recent<P::MoveMade>(HostSide);
         CHECK(mm.size() == 1 && mm[0].firstMoveMs == 0 && mm[0].blackMs == 60000);
         CHECK_EQ(r.a.nextDeadline(), r.now + 60000);   // White's clock now runs (host: no allowance)
+    }
+    {
+        // The guest's first move has the margin of its flag (DESIGN 6.1): with a 100 ms round
+        // trip, min(100 / 2 + 30, 500, quota) = 80 ms after its 60 s, which the countdown it is
+        // sent does not show. A move made at the countdown's last instant still counts.
+        Room r(tc(60, 0), 2);   // host Black, guest White
+        r.a.onRtt(GuestSide, 100);
+        r.start();
+        const double start = r.now;
+        CHECK_EQ(r.a.nextDeadline(), start + 60080);
+        r.now = start + 60050;
+        r.tick();
+        CHECK(!r.has<P::GameEnd>(GuestSide));
+        P::Resync rs;
+        rs.game = r.a.gameId();
+        r.send(GuestSide, rs);
+        auto s = r.recent<P::GameSnapshot>(GuestSide);
+        CHECK(s.size() == 1 && s[0].firstMoveMs == 0);
+        r.move(GuestSide, "e2e4");
+        auto mm = r.recent<P::MoveMade>(HostSide);
+        CHECK(mm.size() == 1 && mm[0].ply == 0 && mm[0].firstMoveMs == 60000);
+        // The host's first move has none.
+        CHECK_EQ(r.a.nextDeadline(), r.now + 60000);
+        r.now += 60000;
+        r.tick();
+        auto e = r.recent<P::GameEnd>(GuestSide);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::Aborted && e[0].reason == P::EndReason::NoShow);
+    }
+    {
+        // Past the margin the game is aborted.
+        Room r(tc(60, 0), 2);
+        r.a.onRtt(GuestSide, 100);
+        r.start();
+        r.now += 60079;
+        r.tick();
+        CHECK(!r.has<P::GameEnd>(GuestSide));
+        r.now += 1;
+        r.tick();
+        auto e = r.recent<P::GameEnd>(HostSide);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::Aborted && e[0].reason == P::EndReason::NoShow);
     }
 }
 
@@ -1211,6 +1255,49 @@ TEST(direct_authority_rematch) {
     CHECK(r.has<P::Error>(HostSide) && r.recent<P::Error>(HostSide)[0].code == P::ErrorCode::RematchUnavailable);
 }
 
+TEST(direct_authority_auto_press) {
+    {
+        Room r(tc(300, 0), 1);
+        r.start();
+        auto s = r.recent<P::GameSnapshot>(GuestSide);
+        CHECK(s.size() == 1 && s[0].autoPress);   // the default
+    }
+    // The host's choice goes in every snapshot: the start, a reconnection, a resync, a rematch.
+    direct::AuthorityConfig cfg = tc(300, 0);
+    cfg.autoPress = false;
+    Room r(cfg, 1);
+    r.start();
+    for (Side s : {HostSide, GuestSide}) {
+        auto v = r.recent<P::GameSnapshot>(s);
+        CHECK(v.size() == 1 && !v[0].autoPress);
+    }
+    r.a.onDisconnect(GuestSide, r.now, r.out);
+    r.collect();
+    r.now += 2000;
+    r.a.onReconnect(GuestSide, r.now, r.out);
+    r.collect();
+    auto back = r.recent<P::GameSnapshot>(GuestSide);
+    CHECK(back.size() == 1 && !back[0].autoPress);
+    P::Resync rs;
+    rs.game = r.a.gameId();
+    r.send(GuestSide, rs);
+    auto again = r.recent<P::GameSnapshot>(GuestSide);
+    CHECK(again.size() == 1 && !again[0].autoPress);
+    const uint64_t first = r.a.gameId();
+    P::Resign res;
+    res.game = first;
+    r.send(HostSide, res);
+    P::Rematch rm;
+    rm.game = first;
+    rm.accept = true;
+    r.send(GuestSide, rm);
+    r.send(HostSide, rm);
+    for (Side s : {HostSide, GuestSide}) {
+        auto v = r.recent<P::GameSnapshot>(s);
+        CHECK(v.size() == 1 && v[0].game != first && !v[0].autoPress);
+    }
+}
+
 // ---- loopback matches: two DirectMatch in this process ------------------------------------------
 
 namespace {
@@ -1288,13 +1375,14 @@ bool startMatch(Peer& host, Peer& guest, int baseSec, int incSec, uint16_t viaPo
     return waitUntil(host, guest, [&] { return host.count(Event::Kind::GameSnapshot) >= 1 && guest.count(Event::Kind::GameSnapshot) >= 1; });
 }
 
-// A TCP relay on 127.0.0.1 that the test can cut (a network failure between the players) or
-// shut (the host's machine is gone: connections are refused).
+// A TCP relay on 127.0.0.1 that the test can cut (a network failure between the players), hold
+// (the connections it gets are closed at once: the host is out of reach for a while) or shut
+// (the host's machine is gone: connections are refused).
 struct Relay {
     sock::Handle listener = sock::kInvalid;
     uint16_t port = 0, target = 0;
     std::thread th;
-    std::atomic<bool> stop{false}, cutNow{false}, closed{false};
+    std::atomic<bool> stop{false}, cutNow{false}, closed{false}, hold{false};
 
     bool start(uint16_t targetPort) {
         target = targetPort;
@@ -1333,7 +1421,9 @@ struct Relay {
             ps.wait(10);
             if (listener != sock::kInvalid && ps.readable(listener)) {
                 sock::Handle a = sock::acceptOne(listener, nullptr);
-                if (a != sock::kInvalid) {
+                if (a != sock::kInvalid && hold) {
+                    sock::closeSocket(a);
+                } else if (a != sock::kInvalid) {
                     sock::Endpoint to;
                     sock::Endpoint::parse("127.0.0.1", target, to);
                     std::string err;
@@ -1601,4 +1691,404 @@ TEST(direct_loopback_flag_and_host_leaving) {
         const OnlineGame* og = host.dm.currentGame();
         CHECK(og && og->status == int(P::GameStatus::WhiteWins) && og->reason == int(P::EndReason::Resignation));
     }
+}
+
+// ---- gestures -----------------------------------------------------------------------------------
+
+TEST(direct_loopback_gestures) {
+    // The host's autoPress reaches both players, in the rematch too; Gestures go both ways, paced
+    // for the receiver's bucket, the latest one last.
+    Peer host, guest;
+    DirectHostOptions o = hostOptions(300, 0, 1, "Alice");
+    o.autoPress = false;
+    host.dm.host(o);
+    CHECK(waitUntil(host, guest, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
+    DirectInvite inv = host.dm.invite();
+    guest.dm.join("127.0.0.1", inv.port, inv.code, "Bob");
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameSnapshot) && guest.count(Event::Kind::GameSnapshot); }));
+    const OnlineGame* hg = host.dm.currentGame();
+    const OnlineGame* gg = guest.dm.currentGame();
+    CHECK(hg && gg);
+    if (!hg || !gg) return;
+    CHECK(!hg->autoPress && !gg->autoPress);
+    const uint64_t first = gg->id;
+
+    // Host to guest, every field.
+    Gesture a;
+    a.touch = 12;
+    a.aim = 28;
+    a.placed = packMove(12, 28, 0);
+    a.flags = P::GestureFlag::Side;
+    a.yaw = 0.25f;
+    a.pitch = -0.4f;
+    a.lean = 0.6f;
+    host.dm.sendGesture(a);
+    CHECK(waitUntil(host, guest, [&] { return guest.count(Event::Kind::OpponentGesture) == 1; }));
+    const Event* e = guest.last(Event::Kind::OpponentGesture);
+    CHECK(e && e->gameId == first && e->game.id == 0 && e->gesture.sameState(a));
+    CHECK(e && std::fabs(e->gesture.yaw - 0.25f) < 1e-3f && std::fabs(e->gesture.pitch + 0.4f) < 1e-3f &&
+          std::fabs(e->gesture.lean - 0.6f) < 1e-3f);
+    // Guest to host.
+    Gesture b;
+    b.ply = 1;
+    b.touch = 52;
+    b.aim = 36;
+    b.flags = uint8_t(P::GestureFlag::Glance | P::GestureFlag::Side);
+    b.yaw = -0.3f;
+    b.pitch = -0.2f;
+    b.lean = 0.1f;
+    guest.dm.sendGesture(b);
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::OpponentGesture) == 1; }));
+    e = host.last(Event::Kind::OpponentGesture);
+    CHECK(e && e->gameId == first && e->gesture.sameState(b));
+    CHECK(e && std::fabs(e->gesture.yaw + 0.3f) < 1e-3f && std::fabs(e->gesture.lean - 0.1f) < 1e-3f);
+    CHECK_EQ(guest.count(Event::Kind::OpponentGesture), 1);   // nobody gets their own
+
+    // A call every 2 ms for 1.5 s from the guest: at most the host's bucket less one at once
+    // (19), then 10 per second; the very latest arrives, never an older one after a newer one.
+    const size_t mark = host.events.size();
+    auto t0 = std::chrono::steady_clock::now();
+    auto msSince = [](std::chrono::steady_clock::time_point t) {
+        return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t).count();
+    };
+    while (msSince(t0) < 1500) {
+        ++b.ply;
+        guest.dm.sendGesture(b);
+        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        host.drain();
+    }
+    const int last = b.ply;
+    CHECK(waitUntil(host, guest, [&] {
+        const Event* x = host.last(Event::Kind::OpponentGesture);
+        return x && x->gesture.ply == last;
+    }, 3000));
+    const double span = msSince(t0);
+    int n = 0, prev = 1;
+    bool newer = true;
+    for (size_t i = mark; i < host.events.size(); ++i) {
+        if (host.events[i].kind != Event::Kind::OpponentGesture) continue;
+        ++n;
+        newer = newer && host.events[i].gesture.ply > prev;
+        prev = host.events[i].gesture.ply;
+    }
+    CHECK(newer);
+    CHECK(n >= 20);
+    CHECK(n <= gestureSendCapacity(20) + int(10 * span / 1000.0) + 1);
+
+    // The rematch keeps the host's choice; its Gestures carry the new game.
+    host.dm.resign();
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameEnd) && guest.count(Event::Kind::GameEnd); }));
+    guest.dm.rematch(true);
+    CHECK(waitUntil(host, guest, [&] {
+        const Event* x = host.last(Event::Kind::GameEvent);
+        return x && x->gameEventKind == int(P::GameEventKind::RematchOffered);
+    }));
+    host.dm.rematch(true);
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameSnapshot) == 2 && guest.count(Event::Kind::GameSnapshot) == 2; }));
+    hg = host.dm.currentGame();
+    gg = guest.dm.currentGame();
+    CHECK(hg && gg && hg->id != first && gg->id == hg->id);
+    if (!hg || !gg) return;
+    CHECK(!hg->autoPress && !gg->autoPress);
+    a.touch = 6;
+    host.dm.sendGesture(a);
+    CHECK(waitUntil(host, guest, [&] {
+        const Event* x = guest.last(Event::Kind::OpponentGesture);
+        return x && x->gesture.touch == 6;
+    }));
+    CHECK(guest.last(Event::Kind::OpponentGesture)->gameId == gg->id);
+}
+
+TEST(direct_loopback_gestures_not_replayed) {
+    // Gestures made while the link is down are dropped, both ways: none arrives after the
+    // reconnection; the next ones do.
+    Peer host, guest;
+    host.dm.host(hostOptions(300, 0, 1, "Alice"));
+    CHECK(waitUntil(host, guest, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
+    DirectInvite inv = host.dm.invite();
+    Relay relay;
+    CHECK(relay.start(inv.port));
+    guest.dm.join("127.0.0.1", relay.port, inv.code, "Bob");
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameSnapshot) && guest.count(Event::Kind::GameSnapshot); }));
+    relay.hold = true;
+    relay.cut();
+    CHECK(waitUntil(host, guest, [&] {
+        const Event* x = host.last(Event::Kind::GameEvent);
+        return guest.hasConn(ConnState::Reconnecting) && x && x->gameEventKind == int(P::GameEventKind::PlayerDisconnected);
+    }));
+    Gesture g;
+    g.touch = 12;
+    for (int i = 0; i < 10; ++i) {
+        host.dm.sendGesture(g);
+        guest.dm.sendGesture(g);
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+    relay.hold = false;
+    CHECK(waitUntil(host, guest, [&] {
+        const Event* x = host.last(Event::Kind::GameEvent);
+        return guest.count(Event::Kind::GameSnapshot) == 2 && x && x->gameEventKind == int(P::GameEventKind::PlayerReconnected);
+    }, 15000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    host.drain();
+    guest.drain();
+    CHECK_EQ(host.count(Event::Kind::OpponentGesture), 0);
+    CHECK_EQ(guest.count(Event::Kind::OpponentGesture), 0);
+    g.touch = 13;
+    host.dm.sendGesture(g);
+    guest.dm.sendGesture(g);
+    CHECK(waitUntil(host, guest, [&] {
+        const Event* x = host.last(Event::Kind::OpponentGesture);
+        const Event* y = guest.last(Event::Kind::OpponentGesture);
+        return x && y && x->gesture.touch == 13 && y->gesture.touch == 13;
+    }));
+    CHECK_EQ(host.count(Event::Kind::OpponentGesture), 1);
+    CHECK_EQ(guest.count(Event::Kind::OpponentGesture), 1);
+}
+
+namespace {
+
+// One end of the secure channel driven by hand from the test's thread.
+struct RawChannel {
+    sock::Handle h = sock::kInvalid;
+    std::unique_ptr<direct::SecureChannel> ch;
+    int errors = 0;   // Error messages received
+
+    ~RawChannel() { sock::closeSocket(h); }
+
+    bool sendBytes(const std::vector<uint8_t>& buf) { return ch->send(buf.data(), buf.size()) && flush(); }
+    // The next message of type T (others are skipped), within ms.
+    template <class T> bool waitFor(T& out, int ms) {
+        auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
+        std::vector<uint8_t> msg;
+        for (;;) {
+            while (ch->popMessage(msg)) {
+                P::Error e;
+                if (P::decode(msg.data(), msg.size(), e)) ++errors;
+                if (P::decode(msg.data(), msg.size(), out)) return true;
+            }
+            if (!pumpOnce() || std::chrono::steady_clock::now() > end) return false;
+        }
+    }
+
+protected:
+    // The channel's handshake over the connected socket 'h', within 5 s.
+    bool handshake() {
+        if (h == sock::kInvalid || !ch->start() || !flush()) return false;
+        auto end = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (!ch->established())
+            if (!pumpOnce() || std::chrono::steady_clock::now() > end) return false;
+        return true;
+    }
+    bool flush() {
+        std::vector<uint8_t>& o = ch->outbox();
+        auto end = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        size_t done = 0;
+        while (done < o.size()) {
+            int w = sock::sendSome(h, o.data() + done, o.size() - done);
+            if (w < 0 || std::chrono::steady_clock::now() > end) return false;
+            if (w == 0) std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            done += size_t(w);
+        }
+        o.clear();
+        return true;
+    }
+    // One read from the socket into the channel, then its answers out.
+    bool pumpOnce() {
+        sock::PollSet ps;
+        ps.add(h, true, false);
+        ps.wait(10);
+        if (ps.readable(h)) {
+            uint8_t buf[4096];
+            bool closed = false;
+            int r = sock::recvSome(h, buf, sizeof buf, closed);
+            if (r < 0 || (r > 0 && !ch->receive(buf, size_t(r)))) return false;
+        }
+        return !ch->failed() && flush();
+    }
+};
+
+// A guest written by hand over the secure channel, to send exactly the messages a test chooses.
+struct RawGuest : RawChannel {
+    uint32_t seq = 0;
+
+    bool connect(uint16_t port, const std::string& code) {
+        sock::Endpoint ep;
+        std::string norm, err;
+        if (!sock::Endpoint::parse("127.0.0.1", port, ep) || !direct::normalizeJoinCode(code, norm)) return false;
+        h = sock::connectWithTimeout(ep, 2000, err);
+        ch = std::make_unique<direct::SecureChannel>(direct::SecureChannel::Role::Guest, norm);
+        return handshake();
+    }
+    template <class T> bool send(T m) {
+        m.seq = ++seq;
+        std::vector<uint8_t> buf;
+        P::encode(m, buf);
+        return sendBytes(buf);
+    }
+};
+
+// A host written by hand: it accepts the guest's connections one at a time and sends exactly the
+// messages a test chooses, when it chooses.
+struct RawHost : RawChannel {
+    sock::Handle listener = sock::kInvalid;
+    uint16_t port = 0;
+    std::string code = direct::newJoinCode();
+
+    ~RawHost() { sock::closeSocket(listener); }
+
+    bool listen() {
+        bool dual = false;
+        std::string err;
+        listener = sock::listenTcp(0, dual, err);
+        sock::Endpoint ep;
+        if (listener == sock::kInvalid || !sock::localEndpoint(listener, ep) || code.empty()) return false;
+        port = ep.port();
+        return true;
+    }
+    // The guest's next connection, through the channel's handshake, within ms.
+    bool accept(int ms) {
+        drop();
+        auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
+        while (h == sock::kInvalid) {
+            if (std::chrono::steady_clock::now() > end) return false;
+            sock::PollSet ps;
+            ps.add(listener, true, false);
+            ps.wait(10);
+            if (ps.readable(listener)) h = sock::acceptOne(listener, nullptr);
+        }
+        ch = std::make_unique<direct::SecureChannel>(direct::SecureChannel::Role::Host, code);
+        return handshake();
+    }
+    void drop() {
+        sock::closeSocket(h);
+        h = sock::kInvalid;
+    }
+    template <class T> bool send(const T& m) {
+        std::vector<uint8_t> buf;
+        P::encode(m, buf);
+        return sendBytes(buf);
+    }
+};
+
+// Holds the stdio lock of stderr while it lives: a thread that logs meanwhile (logx writes every
+// line to stderr) stops at that log line until the hold ends.
+struct StderrHold {
+#ifdef _WIN32
+    StderrHold() { _lock_file(stderr); }
+    ~StderrHold() { _unlock_file(stderr); }
+#else
+    StderrHold() { flockfile(stderr); }
+    ~StderrHold() { funlockfile(stderr); }
+#endif
+    StderrHold(const StderrHold&) = delete;
+    StderrHold& operator=(const StderrHold&) = delete;
+};
+
+}  // namespace
+
+TEST(direct_guest_gesture_at_once_after_reconnecting) {
+    // The guest's game thread sends a Gesture the moment it sees Online again after a
+    // reconnection (the scene does: the host waits for one sent after the return). The link is up
+    // for Gestures before that event, so the Gesture reaches the host. The guest's worker is held
+    // at the log line that follows the event, so a link brought up only after it would still be
+    // down when the Gesture is sent.
+    RawHost raw;
+    CHECK(raw.listen());
+    direct::Authority auth(direct::AuthorityConfig(), "Alice", "Bob", 1);
+    direct::Authority::Output out;
+    auth.startGame(sock::epochMs(), out);
+    CHECK(out.toGuest.size() == 1);
+    if (out.toGuest.size() != 1) return;
+    auto welcome = [&] {
+        P::Welcome w;
+        w.proto = P::kProtocolVersion;
+        w.serverTime = sock::epochMs();
+        w.userId = 2;
+        w.username = "Bob";
+        w.serverName = "Alice";
+        w.heartbeatMs = 2000;
+        w.clientPingMs = 2000;
+        w.maxMsgPerSec = 40;
+        w.activeGame = auth.gameId();
+        w.gestureRate = 10;
+        w.gestureBurst = 20;
+        return raw.send(w);
+    };
+    Peer guest, nobody;
+    guest.dm.join("127.0.0.1", raw.port, raw.code, "Bob");
+    P::Hello hello;
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    CHECK(welcome() && raw.sendBytes(out.toGuest[0]));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(Event::Kind::GameSnapshot) == 1; }));
+    raw.drop();   // the network fails: the guest comes back by itself
+    CHECK(waitUntil(guest, nobody, [&] { return guest.hasConn(ConnState::Reconnecting); }));
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    Gesture g;
+    g.touch = 12;
+    bool online = false;
+    {
+        StderrHold hold;
+        CHECK(welcome());
+        auto end = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (!online && std::chrono::steady_clock::now() < end) {
+            Event e;
+            while (!online && guest.dm.poll(e)) online = e.kind == Event::Kind::ConnectionChanged && e.state == ConnState::Online;
+        }
+        if (online) guest.dm.sendGesture(g);
+    }
+    CHECK(online);
+    P::C_Gesture got;
+    CHECK(raw.waitFor(got, 3000));
+    CHECK(got.game == auth.gameId() && got.touch == 12);
+}
+
+TEST(direct_gestures_outside_flood_limit) {
+    // The host announces its Gesture bucket in Welcome. 100 Gestures at once (five times the
+    // flood limit) leave the link open: Gestures never count towards it. The host keeps those
+    // its bucket allows (20 at once) for the current game only, and shows the latest of them.
+    Peer host, nobody;
+    host.dm.host(hostOptions(300, 0, 1, "Alice"));
+    CHECK(waitUntil(host, nobody, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
+    DirectInvite inv = host.dm.invite();
+    RawGuest raw;
+    CHECK(raw.connect(inv.port, inv.code));
+    P::Hello hello;
+    hello.proto = P::kProtocolVersion;
+    hello.schema = P::kSchemaHash;
+    hello.client = "Scacelith test";
+    hello.token = "direct:Raw      ";
+    CHECK(raw.send(hello));
+    P::Welcome w;
+    CHECK(raw.waitFor(w, 5000));
+    CHECK_EQ(int(w.gestureRate), 10);
+    CHECK_EQ(int(w.gestureBurst), 20);
+    P::GameSnapshot s;
+    CHECK(raw.waitFor(s, 5000));
+    CHECK(s.game != 0 && s.game == w.activeGame && s.autoPress);
+    P::C_Gesture g;
+    g.game = s.game;
+    g.touch = 52;
+    g.aim = 64;
+    bool sent = true;
+    for (int i = 1; i <= 100; ++i) {
+        g.ply = uint16_t(i);
+        sent = raw.send(g) && sent;
+    }
+    g.game = s.game + 1;   // another game
+    g.ply = 999;
+    sent = raw.send(g) && sent;
+    CHECK(sent);
+    P::C_Ping ping;
+    ping.nonce = 4242;
+    CHECK(raw.send(ping));
+    P::S_Pong pong;
+    CHECK(raw.waitFor(pong, 5000));   // the link is still open, and the Gestures were handled first
+    CHECK_EQ(pong.nonce, 4242u);
+    CHECK_EQ(raw.errors, 0);
+    host.drain();
+    CHECK_EQ(host.count(Event::Kind::OpponentGesture), 1);
+    const Event* e = host.last(Event::Kind::OpponentGesture);
+    CHECK(e && e->gameId == s.game && e->gesture.touch == 52);
+    CHECK(e && e->gesture.ply >= 20 && e->gesture.ply <= 25);   // + what refilled meanwhile
+    CHECK(host.dm.currentGame() && host.dm.currentGame()->blackConnected);
 }
