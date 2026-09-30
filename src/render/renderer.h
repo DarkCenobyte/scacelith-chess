@@ -102,10 +102,11 @@ struct DrawItem {
     // honoured by materials with the MATERIAL_SCREEN_DOOR define (others stay opaque).
     float opacity = 1.0f;
     // Designation highlight of opaque draws in the main view and the planar reflections (Coach
-    // mode: the pieces the coach talks about): a soft Fresnel rim and a faint lift, breathing
-    // slowly (forward.frag): the lit colour takes on the hue of rgb towards the silhouette, and a
-    // thin rim of rgb (as a level after exposure, sunlit white marble ~2.5) keeps it visible on
-    // dark objects. a = strength in [0,1] (0 = off). No new program variant: any material.
+    // mode: the pieces the coach talks about), as if a cool light of hue rgb picked the object
+    // out, breathing slowly (forward.frag): a pale object turns a cooler white, and towards the
+    // silhouette every object takes on the hue, with a thin rim of rgb (as a level after
+    // exposure, sunlit white marble ~2.5) that keeps it visible on dark ones. a = strength in
+    // [0,1] (0 = off). No new program variant: any material.
     m::vec4 highlight{0.0f, 0.0f, 0.0f, 0.0f};
 };
 
