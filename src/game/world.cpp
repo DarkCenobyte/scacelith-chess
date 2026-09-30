@@ -35,7 +35,7 @@ const vec3 kCoachLight(0.25f, 0.50f, 1.0f);
 // small capitals, set a little smaller than the figures.
 constexpr int kCoordCell = 64, kCoordSpread = 6;
 constexpr float kCoordDigitPx = 36.0f;          // cap height of the figures, texels
-constexpr float kCoordDigitHeight = 0.0075f;    // ... in metres: ~13 px at 1080p from the player's chair
+constexpr float kCoordDigitHeight = 0.008f;     // ... in metres: ~13 px tall at 1080p (~9 at 720p) on the player's edge
 constexpr float kCoordLetterScale = 0.86f;      // ink height of the letters / the figures'
 constexpr float kCoordDilation = 0.00016f;      // bolder than the face (m on each side of the strokes)
 const vec3 kCoordInlay(0.43f, 0.31f, 0.155f);  // pale gold stone (linear albedo)
