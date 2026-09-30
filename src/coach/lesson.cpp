@@ -125,7 +125,9 @@ IllegalInfo whyIllegal(const Position& p, Square from, Square to, PieceType prom
     }
     if (p.findLegal(from, to, promo).valid()) return info;   // legal
     Piece target = p.at(to);
-    if (!target.empty() && target.color == us) {
+    Square home = makeSquare(4, us == White ? 0 : 7);
+    bool castling = pc.type == King && from == home && rankOf(to) == rankOf(from) && std::abs(fileOf(to) - fileOf(from)) == 2;
+    if (!target.empty() && target.color == us && !castling) {   // castling onto a piece: "blocked" says more
         info.reason = IllegalReason::OwnPieceOnTarget;
         info.culprit = to;
         return info;
@@ -140,8 +142,7 @@ IllegalInfo whyIllegal(const Position& p, Square from, Square to, PieceType prom
     std::vector<Square> checkers = attackersOf(b, ksq, them);
 
     // Castling: the king two files along its first rank from its initial square.
-    Square home = makeSquare(4, us == White ? 0 : 7);
-    if (pc.type == King && from == home && rankOf(to) == rankOf(from) && std::abs(fileOf(to) - fileOf(from)) == 2) {
+    if (castling) {
         bool kingSide = fileOf(to) > fileOf(from);
         uint8_t right = us == White ? (kingSide ? WhiteKingSide : WhiteQueenSide) : (kingSide ? BlackKingSide : BlackQueenSide);
         Square rookSq = makeSquare(kingSide ? 7 : 0, rankOf(from));
@@ -208,10 +209,26 @@ IllegalInfo whyIllegal(const Position& p, Square from, Square to, PieceType prom
                     Square beside = makeSquare(fileOf(to), rankOf(from));
                     Piece pb = b.sq[beside];
                     bool epRank = rankOf(from) == (us == White ? 4 : 3);
-                    info.reason = pb.type == Pawn && pb.color == them && epRank ? IllegalReason::EnPassantExpired
-                                                                                  : IllegalReason::PawnCaptureNeedsVictim;
-                    info.culprit = info.reason == IllegalReason::EnPassantExpired ? beside : NoSquare;
+                    bool enemyBeside = pb.type == Pawn && pb.color == them && epRank;
+                    info.reason = enemyBeside ? IllegalReason::EnPassantExpired : IllegalReason::PawnCaptureNeedsVictim;
+                    info.culprit = enemyBeside ? beside : NoSquare;
                     info.square = to;
+                    // Position keeps the en passant square only when the capture is legal: a pawn
+                    // that may just have made its double step (the squares it crossed are empty)
+                    // and whose capture would expose the king is a pin, not a missed chance.
+                    Square origin = makeSquare(fileOf(to), rankOf(from) + 2 * dir);
+                    if (enemyBeside && target.empty() && b.sq[origin].empty()) {
+                        Board ep = b;
+                        ep.sq[from] = Piece();
+                        ep.sq[beside] = Piece();
+                        ep.sq[to] = pc;
+                        std::vector<Square> a = attackersOf(ep, ksq, them);
+                        if (!a.empty() && checkers.empty()) {
+                            info.reason = IllegalReason::LeavesKingInCheck;
+                            info.culprit = a.front();
+                            info.square = NoSquare;
+                        }
+                    }
                     return info;
                 }
             }
@@ -1082,11 +1099,12 @@ Script Lesson::explainIllegal(int expect, const Position& pos, Square from, Squa
     IllegalInfo info = whyIllegal(pos, from, to, promo);
     Piece moved = from >= 0 && from < 64 ? pos.at(from) : Piece();
     Line l;
+    bool own = false;   // the exercise's own line: gestures anchor at its "{@}" marker
     // The exercise's own line for this attempt.
     if (expect >= 0 && size_t(expect) < expectations_.size()) {
         std::string uci = squareName(from) + squareName(to);
         for (const LessonReply& rp : expectations_[size_t(expect)].illegal)
-            if (rp.when == LessonReply::When::Any || contains(rp.moves, uci)) { l = rp.line; break; }
+            if (rp.when == LessonReply::When::Any || contains(rp.moves, uci)) { l = rp.line; own = true; break; }
     }
     if (l.empty()) {
         switch (info.reason) {
@@ -1121,6 +1139,7 @@ Script Lesson::explainIllegal(int expect, const Position& pos, Square from, Squa
     case IllegalReason::PawnForwardBlocked: anchor = "@"; break;
     default: break;
     }
+    if (own && *anchor) anchor = "@";
     if (info.culprit != NoSquare) {
         Gesture p;
         p.kind = pos.at(info.culprit).empty() ? GestureKind::PointSquare : GestureKind::PointPiece;

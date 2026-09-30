@@ -95,7 +95,8 @@ struct Expectation {
     std::vector<std::pair<std::string, Line>> successFor;   // ... for one accepted UCI move
     std::vector<LessonReply> replies;                   // wrong legal moves: the first match answers
     std::vector<LessonRetry> acceptOnRetry;
-    std::vector<LessonReply> illegal;                   // own lines for some illegal attempts (Moves: "e1e2")
+    std::vector<LessonReply> illegal;                   // own lines for some illegal attempts (Moves: "e1e2");
+                                                        // the pointing at the culprit lands on their "{@}"
     Line hint1, hint2;                                  // idle hints (empty: the ask; the ask with pointing)
     std::vector<Gesture> hint2Gestures;
     std::vector<Mark> hint2Marks;
