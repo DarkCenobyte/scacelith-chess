@@ -1091,7 +1091,7 @@ void creditsPage() {
     struct Entry { const char* head; const char* lines[3]; };
     static const Entry entries[] = {
         {"credits.game.head", {"credits.game", nullptr, nullptr}},
-        {"credits.engine.head", {"credits.engine", "credits.engine.licence", nullptr}},
+        {"credits.engine.head", {"credits.engine", "credits.engine.licence", "credits.engine.data"}},
         {"credits.fonts.head", {"credits.fonts", "credits.fonts.hand", "credits.fonts.figures"}},
     };
     float y = p.y + 160.0f;

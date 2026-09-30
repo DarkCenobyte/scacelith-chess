@@ -100,9 +100,9 @@ so upstream code is compiled as is but sees them first:
 * Clean build of the Stockfish part (`ninja -j2 stockfish_embedded`, no ccache, on the shared
   4-core build machine): Linux 6 min 13 s wall, 4 min 58 s user and 26 s system CPU; MinGW 11 min
   53 s wall, 9 min 16 s user and 53 s system CPU. The machine was busy (load average 6 to 10), so
-  the wall times are long; the user CPU time is about six times that of the single SSE4.1 build
-  Stockfish 19 was first embedded with (Linux 52 s, MinGW 92 s). The audit below adds 7 s (Linux)
-  and 10 s (MinGW).
+  the wall times are long; the user CPU time is five to six times that of the single SSE4.1 build
+  Stockfish 19 was first embedded with (Linux 52-56 s, MinGW 92-105 s). The audit below adds 7 s
+  (Linux) and 10 s (MinGW).
 
 ## Instruction-set variants
 
@@ -236,11 +236,12 @@ Checked properties:
   affinity read by the initialisers, the output mutex, ...). Only one session can run at a time
   (the standard streams are shared).
 * **Restart cost.** Every session parses the network again: `uci` + `isready` until `readyok`
-  takes 0.38-0.55 s on Linux (up to 1.1 s under load) and 0.45-0.58 s under Wine on the busy build
-  machine with the `x86-64-avx512icl` variant (0.45-1.25 s and 0.5-0.75 s with the former single
-  `x86-64-sse41-popcnt` build), against 0.4-0.75 s for the first and 40-110 ms for later sessions
-  with Stockfish 16, whose network stayed in globals. The game starts the engine once per process,
-  asynchronously.
+  takes 0.38-0.55 s on Linux and 0.45-0.7 s under Wine on the build machine with the
+  `x86-64-avx512icl` variant, up to 1.3 s for the first session of a process (the network's pages
+  of the executable are read) and up to 2.7 s when the machine is overloaded (load average 9 on 4
+  cores). The former single `x86-64-sse41-popcnt` build took 0.45-1.25 s on Linux and 0.5-0.75 s
+  under Wine; Stockfish 16, whose network stayed in globals, 0.4-0.75 s for the first session and
+  40-110 ms for later ones. The game starts the engine once per process, asynchronously.
 * **Illegal input ends the process.** Stockfish 19 calls `std::exit(1)` on a `position` command
   with an illegal move or FEN, a malformed `go` argument or a failed `flip`. That exit would run on
   the engine thread, so the host's `atexit` handler (below) would wait for itself and the game
@@ -259,9 +260,10 @@ Checked properties:
   under Wine.
 * **Threads, hash, NUMA.** `engine.threads` and `engine.hash_mb` (`Scacelith.ini`) reach `Threads`
   and `Hash` as before. With more than one thread the client first sends `NumaPolicy none` (one
-  node with every CPU): on a machine with several NUMA nodes Stockfish would otherwise bind its
-  threads to nodes and copy the network to each. With one thread (the default) it does neither,
-  and the option is not sent: it would cost a copy of the network (~0.2 s) per session.
+  node with every CPU): on a machine with several NUMA nodes (for Stockfish 19, also several
+  groups of L3 caches on large CPUs) Stockfish would otherwise bind its threads to nodes and copy
+  the network to each. With one thread (the default) it does neither, and the option is not sent:
+  it would cost a copy of the network per session (0.16-0.19 s and 50 MB more peak memory).
 * **Wine and Proton.** The Windows build runs under Wine (unit tests and `tools/shot_win.sh` on a
   game against Stockfish) thanks to `win_shims.h`. Check it again at every Stockfish update.
 * Remaining `exit()` calls in Stockfish are failure paths only: allocation failures (hash table,
@@ -285,56 +287,132 @@ the former single one (about 0.8 MB of code each; Linux: +3.6 MB). Each variant 
 ## Strength presets
 
 See `src/ai/presets.cpp`. Stockfish's handicap (`Skill Level`, or `UCI_LimitStrength` +
-`UCI_Elo` 1320..3190, which maps onto a fractional skill level with the same fit in Stockfish 16
-and 19) searches at least 4 principal variations and, after iteration `1 + int(level)`, picks one
-of them at random, biased towards the better ones. `UCI_Elo 1320 == Skill Level 0` is its floor.
+`UCI_Elo` 1320..3190, which maps onto a fractional skill level) searches at least 4 principal
+variations and, after iteration `1 + int(level)` (or after the last one, if a depth cap stops the
+search earlier), picks one of them at random, biased towards the better ones. `UCI_Elo 1320 ==
+Skill Level 0` is its floor. Stockfish 19 kept Stockfish 16's Elo-to-level fit and its pick, with
+one difference that matters here: the random term is scaled by the spread of the candidates'
+scores capped at `PawnValue` (208 internal units, 0.6-0.7 pawn) instead of Stockfish 16's
+`PawnValueMg` (126, about 0.4 pawn), so every handicapped setting is noisier than before.
+Stockfish 16.1 also removed the classical evaluation (`Use NNUE`), which the weakest preset used.
 
 ### Calibration of the weak presets
 
 Stockfish offers nothing below `UCI_Elo 1320` (= Skill Level 0), so the three presets under it
-combine Stockfish's own knobs. The measurements below were made with Stockfish 16 self-play (a
-standalone build of its sources; 200-600 games per pairing, colours alternating, a referee engine
-detects the end of the game and adjudicates at 300 plies with a depth-12 evaluation, |eval| > 3
-pawns = win). Stockfish 19 has no classical evaluation any more, so the presets now use interim
-settings, each measured directly against the Stockfish 16 preset it replaces (400 games).
-Results are Elo(A) - Elo(B) with 95% intervals; "S0" = Skill Level 0, "d1" = `go depth 1`.
+combine Stockfish's own knobs. They were first calibrated with Stockfish 16 self-play (the labels'
+scale, below); for Stockfish 19 each new setting was matched directly against the Stockfish 16
+preset it replaces (target 0 Elo), so the presets keep the strengths their labels were chosen for.
+All matches use standalone `x86-64-sse41-popcnt` builds of the two tags and `tools/sf_match.py`
+(which documents the protocol): games from the start position, colours alternating, Threads 1 and
+Hash 64 (as in the game), python-chess applies the rules, and a Stockfish 19 referee adjudicates
+games still running at 300 plies with a depth-12 evaluation (|eval| > 3 pawns = win). Results are
+Elo(A) - Elo(B) with 95% intervals; "S0"/"S1" = Skill Level 0/1, "d1" = `go depth 1`, "MPV" =
+MultiPV.
+
+Stockfish 19 against Stockfish 16:
+
+| A (Stockfish 19) | B (Stockfish 16) | games | Elo A-B |
+|---|---|---:|---:|
+| S0 d1 | Casual: S0 d1 | 400 | -53 [-88, -20] |
+| S0 d1, MPV 6 | Beginner: S0 d1, MPV 6 | 400 | -109 [-146, -76] |
+| S0 d1, MPV 9 | Novice: S0 d1, MPV 7, classical eval | 1000 | -2 [-23, +19] |
+| S0 d1, MPV 5 | Beginner | 1000 | -31 [-53, -10] |
+| S1 d1, MPV 5 / S2 d1, MPV 5 | Beginner | 1000 each | +63 [+41, +84] / +113 [+91, +136] |
+| S1 d2, MPV 7 | Beginner | 1000 | +41 [+20, +63] |
+| S1 d1, MPV 6 | Beginner | 2 x 1000 | -6 [-21, +8] (-6, -7) |
+| S1 d2, MPV 5 | Casual | 1000 | +13 [-8, +34] |
+| S0, movetime 250 ms | S0, movetime 250 ms | 160 | -120 [-180, -65] |
+| UCI_Elo 1500 / 1800 / 2100, movetime 250 ms | the same | 420 / 300 / 300 | -22 [-55, +11] / +12 [-27, +50] / +22 [-16, +61] |
+
+Stockfish 19 alone:
+
+| A | B | games | Elo A-B |
+|---|---|---:|---:|
+| S0, movetime 30 ms / 250 ms | S0 d1 | 400 / 200 | +116 [+82, +153] / +102 [+54, +154] |
+| S1, movetime 30 ms | S1 d2 | 400 | +85 [+51, +121] |
+| S1 d2 | S1 d1 | 600 | +97 [+69, +126] |
+| S0 d1, MPV 5 / 6 / 7 | S0 d1 | 400 each | -85 / -152 / -209 |
+| S0 d1, MPV 8 / 9 / 10 / 12 / 14 / 16 / 20 | S0 d1 | 400 each | -310 / -315 / -317 / -389 / -405 / -407 / -449 |
+| S0 d1, MPV 8 / 9 / 10 / 12 / 14 / 16 / 20 | S0 d1, MPV 7 | 400 each | -63 / -70 / -99 / -142 / -167 / -212 / -245 |
+| Novice (S0 d1, MPV 9) | Beginner (S1 d1, MPV 6) | 600 | -186 [-219, -157] |
+| Beginner | Casual (S1 d2, MPV 5) | 600 | -217 [-251, -185] |
+| Casual | Club Player (UCI_Elo 1500, movetime 100 ms) | 400 | -298 [-349, -255] |
+
+Findings:
+
+* **Stockfish 16's settings are weaker with Stockfish 19**, because of the larger random term:
+  S0 d1 loses 53 against its Stockfish 16 self, S0 d1 MPV 6 loses 109. The old settings could not
+  simply be kept.
+* **Depth caps weaken the handicap, but indirectly.** The level picks after iteration
+  `1 + int(level)`, yet with a normal search budget the deeper iterations (of this and earlier
+  moves) fill the hash table that the shallow multi-PV scores then use: capping the search at the
+  pick iteration costs ~105 (Stockfish 16: ~156), the same at 30 and 250 ms. A cap one ply short of
+  the pick iteration (Skill Level 1 at depth 1) makes the pick after the last iteration, on
+  shallower scores: another ~100. So the UCI_Elo presets are never depth-capped (that would
+  silently weaken them), and the weak ones use `depth 1` or `depth 2` on purpose. A node cap is no
+  alternative: one that interrupts an iteration leaves unsearched root moves and yields arbitrary,
+  not human-like, moves.
+* **The level still counts at a capped depth**: the pick keeps (8 + 2 x level) / 128 of the score
+  differences against its random term (1/16 at level 0, 1/13 at level 1), so Skill Level 1 at
+  depth 1 is ~95 stronger than Skill Level 0 at depth 1 with the same MultiPV. That is what makes
+  the Beginner possible: at level 0 it would fall between MultiPV 4 (the same as 1 under the
+  handicap, 50-100 stronger than the Stockfish 16 Beginner) and MultiPV 5 (-31).
+* **MultiPV** widens the list the random pick is made from: 5 costs ~85, 6 ~150, 7 ~230 (about as
+  with Stockfish 16), and it no longer saturates near 10: 9 ~300, 10 ~330, 14 ~410, 20 ~470
+  (weighted least squares over all the MultiPV pairings, +-20-40). `estimateElo` uses these
+  values, interpolated in between.
+* **Stockfish 19's lowest levels are weaker than Stockfish 16's at the same level; the higher
+  ones are not.** Against its Stockfish 16 self at 250 ms per move, Skill Level 0 scores -120
+  (about 1200 on the labels' scale), UCI_Elo 1500 -22, UCI_Elo 1800 and 2100 +12 and +22
+  (+-35-40). So the UCI_Elo presets keep `UCI_Elo` = label (Stockfish's calibration). For
+  depth-capped settings at level 0-1, `estimateElo` subtracts 185 instead of the ~105 the cap
+  itself costs, so that its estimates stay on the labels' scale; an uncapped custom setting at
+  level 0 or 1 is rated ~65-120 too high.
+* The game plays the UCI_Elo presets at 1 s per move untimed, or on the clock; 250 ms stands for
+  that because the pick iteration does not depend on the budget and the hash-table effect is
+  already saturated (above). Stockfish 19 searched ~37 % fewer nodes per move than Stockfish 16 in
+  these games, so a longer budget can only favour it relatively. Those matches depend on the
+  machine's load (a shared build machine, load average 2-12); splits by load and colour showed no
+  systematic effect.
+* Chains of these measurements are not perfectly transitive (the players are very random), so
+  derived numbers are good to roughly +-50; the presets' own strengths rest on the direct matches
+  against the Stockfish 16 presets (+-15-21).
+
+#### Stockfish 16 (the labels' scale)
+
+Stockfish 16 self-play (a standalone build of its sources; 200-600 games per pairing, colours
+alternating, adjudicated at 300 plies by a depth-12 referee as above):
 
 | A | B | games | Elo A-B |
 |---|---|---:|---:|
 | S0, movetime 30 ms | S0 d1 | 200 | +156 [+106, +212] |
 | UCI_Elo 1500, movetime 30 ms | S0, movetime 30 ms | 200 | +109 [+61, +163] |
-| S0 d1, MultiPV 5 | S0 d1 | 300 | -72 [-112, -33] |
-| S0 d1, MultiPV 6 | S0 d1 | 300 + 600 | -111, -167 |
-| S0 d1, MultiPV 7 | S0 d1 | 300 + 600 | -235, -216 |
-| S0 d1, MultiPV 8 / 9 / 10 / 12 | S0 d1, MultiPV 7 | 300 each | -21 / -64 / -99 / -101 |
-| S0 d1, MultiPV 10 | S0 d1 | 600 | -304 [-345, -268] |
-| S0 d1, MultiPV 10 | S0 d1, MultiPV 6 | 600 | -135 [-165, -106] |
+| S0 d1, MPV 5 | S0 d1 | 300 | -72 [-112, -33] |
+| S0 d1, MPV 6 | S0 d1 | 300 + 600 | -111, -167 |
+| S0 d1, MPV 7 | S0 d1 | 300 + 600 | -235, -216 |
+| S0 d1, MPV 8 / 9 / 10 / 12 | S0 d1, MPV 7 | 300 each | -21 / -64 / -99 / -101 |
+| S0 d1, MPV 10 | S0 d1 | 600 | -304 [-345, -268] |
+| S0 d1, MPV 10 | S0 d1, MPV 6 | 600 | -135 [-165, -106] |
+| S0 d1, classical eval (`Use NNUE` false) | S0 d1 | 600 | -207 [-241, -176] |
+| S0 d1, MPV 6, classical | S0 d1, MPV 6 | 2 x 600 | -179, -189 |
+| S0 d1, MPV 7, classical | S0 d1, MPV 7 | 600 | -192 [-226, -162] |
+| S0 d1, MPV 7, classical | S0 d1, MPV 6 | 600 | -179 [-212, -150] |
 | S0, movetime 100 ms | S0, movetime 30 ms | 150 | +40 [-15, +96] |
 
-Findings:
+With Stockfish 16's Skill Level 0 at normal time as 1320 (Stockfish's anchor), these gave its
+presets their estimates: Novice (S0 d1, MPV 7, classical eval) 750-840, Beginner (S0 d1, MPV 6)
+~1015, Casual (S0 d1) ~1165. The hash-table effect is mostly saturated at 30 ms per move (+40 at
+100 ms), so taking "S0 at 30 ms" as Stockfish's 1320 may put them up to ~40 Elo too high.
 
-* **Depth caps do weaken Skill Level 0, but indirectly.** Level 0 always commits after
-  iteration 1, yet with a normal search budget the deeper iterations (of this and earlier moves)
-  fill the hash table that the shallow multi-PV scores then use: `depth 1` costs ~156 Elo. So the
-  UCI_Elo presets are never depth-capped (that would silently weaken them), and the weak ones use
-  `depth 1` on purpose. A node cap is no alternative: one that interrupts iteration 1 leaves
-  unsearched root moves and yields arbitrary, not human-like, moves.
-* **MultiPV** widens the list the random pick is made from (6: ~-150, 7: ~-220, saturating near
-  10: ~-300).
-* Chains of these measurements are not perfectly transitive (the players are very random), so the
-  numbers are good to roughly +-50. The hash-table effect is mostly saturated at 30 ms per move
-  (+40 at 100 ms), so taking "S0 at 30 ms" as Stockfish's 1320 may put the estimates below
-  ~40 Elo too high.
+#### Resulting presets
 
-With Skill Level 0 at normal time as 1320 (Stockfish's anchor):
-
-| Preset | Stockfish 19 settings | Against the Stockfish 16 preset | Estimate |
-|---|---|---:|---|
-| Novice (~800) | Skill 0, depth 1, MultiPV 9 | -11 [-45, +22] | ~785 |
-| Beginner (~1000) | Skill 0, depth 1, MultiPV 5 | -27 [-61, +6] | ~990 |
-| Casual (~1200) | Skill 1, depth 2, MultiPV 5 | +20 [-14, +54] | ~1185 |
-| Club Player ... Grandmaster | UCI_Elo 1500 / 1800 / 2100 / 2400 / 2700 | | Stockfish's calibration |
-| Stockfish Max | full strength | | ~3500 (1 thread) |
+| Preset | Settings | Estimate |
+|---|---|---|
+| Novice (~800) | Skill 0, depth 1, MultiPV 9 | 750-840 |
+| Beginner (~1000) | Skill 1, depth 1, MultiPV 6 | ~1010 |
+| Casual (~1200) | Skill 1, depth 2, MultiPV 5 | ~1175 |
+| Club Player ... Grandmaster | UCI_Elo 1500 / 1800 / 2100 / 2400 / 2700 | Stockfish's calibration (as with Stockfish 16 within ~40, measured from 1500 to 2100) |
+| Stockfish Max | full strength | ~3500 (1 thread) |
 
 These are engine ratings on Stockfish's CCRL-anchored scale; human (FIDE or online) ratings are
 not the same scale, so the labels are approximate by nature.

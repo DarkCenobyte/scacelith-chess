@@ -228,7 +228,10 @@ fallback); `--lang <code>` overrides the language for one session.
 
 Requirements: CMake 3.20+, Ninja, a C++17 compiler. The Windows build is produced with
 MinGW-w64 (native or cross-compiled from Linux) and is a single self-contained executable
-(Stockfish and its neural network are embedded).
+(Stockfish 19 and its neural network are embedded). Stockfish is compiled once per x86-64
+instruction set, from plain x86-64 to AVX-512, and the game runs the best one the CPU supports;
+`-DSCACELITH_SF_VARIANTS=x86-64-avx2` (or another variant the CPU runs) builds a single one, for
+quicker local builds (see `third_party/stockfish/README.scacelith.md`).
 
 ```sh
 # Windows x64 (cross-compiled from Linux)
@@ -271,10 +274,12 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised
 
 Scacelith is free software under the GNU General Public License v3.0 (see `LICENSE`), because it
 embeds [Stockfish](https://stockfishchess.org) (GPL-3.0), whose source is in
-`third_party/stockfish/` with its own copyright notices. The Cinzel, EB Garamond and Amiri
-(Khaled Hosny) interface fonts and the handwriting fonts Caveat (Impallari Type), Marck Script
-(Denis Masharov), Bad Script (Gaslight), Aref Ruqaa (Abdullah Aref, Khaled Hosny), Klee One
-(Fontworks) and LXGW WenKai / WenKai TC (LXGW) are under the SIL Open Font License 1.1; the
-subsets shipped here are rebuilt from the upstream files by `tools/prepare_fonts.py`. The chess
-figures of the promotion picker come from a subset of GNU FreeFont FreeSerif (GPL-3.0+ with the
-font exception). All licence texts are in `assets/fonts/` and `assets/fonts/hand/`.
+`third_party/stockfish/` with its own copyright notices. Stockfish's neural network was trained on
+data provided by the Leela Chess Zero project, which is made available under the Open Database
+License (ODbL). The Cinzel, EB Garamond and Amiri (Khaled Hosny) interface fonts and the handwriting
+fonts Caveat (Impallari Type), Marck Script (Denis Masharov), Bad Script (Gaslight), Aref Ruqaa
+(Abdullah Aref, Khaled Hosny), Klee One (Fontworks) and LXGW WenKai / WenKai TC (LXGW) are under the
+SIL Open Font License 1.1; the subsets shipped here are rebuilt from the upstream files by
+`tools/prepare_fonts.py`. The chess figures of the promotion picker come from a subset of GNU
+FreeFont FreeSerif (GPL-3.0+ with the font exception). All licence texts are in `assets/fonts/` and
+`assets/fonts/hand/`.

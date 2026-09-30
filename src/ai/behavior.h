@@ -8,7 +8,7 @@
 
 namespace ai::detail {
 
-// Stockfish 16's Skill level for these settings (search.cpp, Skill::Skill): UCI_Elo is mapped to a
+// Stockfish's Skill level for these settings (search.h, Skill::Skill): UCI_Elo is mapped to a
 // fractional level with Stockfish's own fit; -1 = full strength (no Skill handicap).
 double skillLevel(const EngineSettings& s);
 

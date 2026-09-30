@@ -134,6 +134,33 @@ TEST(ai_skill_mapping) {
     CHECK(std::abs(ai::detail::skillLevel(s) - 5.0) < 0.05);
 }
 
+TEST(ai_handicap_estimates) {
+    // A depth cap costs strength at or below the pick iteration (1 + level), more for every ply it
+    // stops short of it, and nothing above it.
+    ai::EngineSettings s;
+    s.skillLevel = 1;
+    const int uncapped = ai::Engine::estimateElo(s);
+    s.depth = 3;
+    CHECK_EQ(ai::Engine::estimateElo(s), uncapped);
+    s.depth = 2;
+    const int atPick = ai::Engine::estimateElo(s);
+    CHECK(atPick < uncapped);
+    s.depth = 1;
+    CHECK(ai::Engine::estimateElo(s) < atPick);
+    // Every MultiPV line above Stockfish's minimum of 4 costs strength, up to 20.
+    s.depth = 0;
+    for (int multiPV = 4; multiPV < 20; ++multiPV) {
+        s.multiPV = multiPV;
+        const int narrower = ai::Engine::estimateElo(s);
+        s.multiPV = multiPV + 1;
+        CHECK(ai::Engine::estimateElo(s) < narrower);
+    }
+    s.multiPV = 1;
+    const int single = ai::Engine::estimateElo(s);
+    s.multiPV = 4;
+    CHECK_EQ(ai::Engine::estimateElo(s), single);
+}
+
 TEST(ai_think_time) {
     using ai::detail::humanThinkTimeMs;
     ai::EngineSettings strong, weak = ai::presets().front().settings;
@@ -413,7 +440,7 @@ TEST(ai_supersede_and_new_games) {
 TEST(ai_shutdown_restart) {
     ai::Engine a, b;
     CHECK(a.start());
-    CHECK(!b.start());  // Stockfish's state is global: one session at a time
+    CHECK(!b.start());  // the engine uses the process's standard streams: one session at a time
     CHECK(!b.available());
     b.requestMove({}, ai::ClockInfo{});  // requests on an engine that is not running fail at once
     CHECK(b.moveReady());

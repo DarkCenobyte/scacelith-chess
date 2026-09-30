@@ -24,7 +24,7 @@ Data& data() {
             {"Expert", "Tournament expert: rarely errs, converts advantages.", 2100},
             {"Master", "Master strength: deep calculation and fine positional play.", 2400},
             {"Grandmaster", "Grandmaster level: extremely hard to beat.", 2700},
-            {"Stockfish Max", "Stockfish 16 at full strength. Good luck.", 3500},
+            {"Stockfish Max", "Stockfish 19 at full strength. Good luck.", 3500},
             {"Custom", "Your own engine settings.", 0},
         };
         x.timeControls = {"Unlimited", "1+0", "3+0", "3+2", "5+0", "5+3", "10+0", "10+5", "15+10", "30+0", "30+20", "90+30"};
