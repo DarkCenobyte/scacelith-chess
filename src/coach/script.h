@@ -17,13 +17,15 @@ namespace coach {
 // Typed argument of a catalog line. The catalog renders it twice: written (subtitles: "e4", figurine
 // SAN "♘f3", digits) and spoken (TTS: squares and moves as words, numbers where the voice stumbles).
 struct Arg {
-    enum class Kind : uint8_t { Piece, Square, Move, Number, Text, Opening } kind = Kind::Text;
+    enum class Kind : uint8_t { Piece, Square, Move, Number, Text, Opening, Moves, Eval } kind = Kind::Text;
     chess::PieceType piece = chess::NoPiece;
     chess::Color color = chess::White;
     bool own = false;                          // Piece: belongs to the listener (the human): "your" forms
     chess::Square square = chess::NoSquare;    // Piece: where it stands (for pointing); Square: the square
-    std::string san, uci;                      // Move (san without figurines; the catalog adds them)
-    int number = 0;                            // Number
+    std::string san, uci;                      // Move (san without figurines; the catalog adds them);
+                                               // Moves: 'san' holds a line, space-separated SAN ("Nxe5 dxe5 Qg4")
+    int number = 0;                            // Number; Eval: centipawns, listener's point of view
+    int mate = 0;                              // Eval: mate in N moves (> 0 the listener mates, < 0 is mated)
     std::string text;                          // Text: a catalog key rendered in place (or literal text
                                                // when it is no key); Opening: the opening's catalog id
 
@@ -37,6 +39,10 @@ struct Arg {
     static Arg ofNumber(int n) { Arg a; a.kind = Kind::Number; a.number = n; return a; }
     static Arg ofText(const std::string& keyOrText) { Arg a; a.kind = Kind::Text; a.text = keyOrText; return a; }
     static Arg ofOpening(const std::string& id) { Arg a; a.kind = Kind::Opening; a.text = id; return a; }
+    static Arg ofMoves(const std::string& sanLine) { Arg a; a.kind = Kind::Moves; a.san = sanLine; return a; }
+    static Arg ofEval(int centipawns, int mateIn = 0) {
+        Arg a; a.kind = Kind::Eval; a.number = centipawns; a.mate = mateIn; return a;
+    }
 };
 
 // One message of the catalog: a key ("ex.fork.b2"; the renderer picks one of its variants) and the
