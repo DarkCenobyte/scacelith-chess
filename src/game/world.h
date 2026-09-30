@@ -89,8 +89,9 @@ public:
     void setCoachSeat(int seat);
     int coachSeat() const;
     // Board coordinates (Settings::showCoordinates; off by default, like tournament boards):
-    // files a-h and ranks 1-8 inlaid in pale gold stone in the board's marble border, each
-    // player's files along his edge and his ranks on his left, upright from his chair.
+    // files a-h (Cinzel's small capitals) and ranks 1-8 inlaid in pale gold stone in the board's
+    // marble border, under its polish; each player's files along his edge and his ranks on his
+    // left, upright from his chair. Changing it needs no reload (the frame's material is swapped).
     void setBoardCoordinates(bool on);
     bool boardCoordinates() const;
     // submitPieces with the pieces the coach designates (nullptr or empty = none).
