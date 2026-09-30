@@ -596,6 +596,8 @@ void GameScene::startPlaying() {
     }
     // Online, the server keeps the clocks (the display reads them).
     if (!online()) clock_.start(game_.position().sideToMove());
+    // The authority of this game leaves the clock press to the players: say so once.
+    if (online() && !og_.autoPress) ui::notify(i18n::tr("notify.manual_clock"), 5.0f);
     captionAge_ = 0.0f;  // hot-seat: "Alice, your move"
     audio::playUI(audio::Sfx::GameStart, 0.6f);
     // Both players take their pen while White thinks.
@@ -608,6 +610,7 @@ void GameScene::beginTurn() {
     touchedId_ = -1;
     touchedSq_ = placedTo_ = NoSquare;
     pressQueued_ = false;
+    moveStaged_ = false;
     hoverId_ = -1;
     aimSq_ = NoSquare;
     aimLegal_ = false;
@@ -619,7 +622,8 @@ void GameScene::beginTurn() {
         turn_ = Turn::HumanIdle;
     } else if (online()) {
         turn_ = Turn::RemoteWaiting;
-        anim_[seatOf(stm)].setThinking(true);
+        // The opponent may already hold a piece (their gestures, while my robot was pressing).
+        anim_[seatOf(stm)].setThinking(remoteLive_.pieceId < 0);
     } else {
         turn_ = Turn::AiThinking;
         aiRequested_ = false;
@@ -635,6 +639,8 @@ void GameScene::endGame() {
             anim_[inputSeat()].enqueue({task(anim::TaskType::Place, p->id, p->basePos), task(anim::TaskType::Retract)});
         }
     }
+    // So is the online opponent's piece held live (a move they put down is taken back).
+    if (online()) cancelRemoteLive();
     clock_.stop();
     turn_ = Turn::None;
     state_ = State::GameOver;
@@ -1041,10 +1047,11 @@ void GameScene::simulate(float dt) {
     updateCamera(dt, firstPerson);  // sets the player's head override before the animation update
     updateGaze(dt);
     // Reading one's own scoresheet (S): the writing hand waits off the page meanwhile (the sheet
-    // of the player whose eyes are the view).
+    // of the player whose eyes are the view, and online the opponent's while their gestures say so).
     int reader = firstPersonSeat();
     for (int seat = 0; seat < 2; ++seat)
-        scorekeeper_.setHandAside(seat, glance_ && !watching() && firstPerson && seat == reader);
+        scorekeeper_.setHandAside(seat, (glance_ && !watching() && firstPerson && seat == reader) ||
+                                            (online() && seat == aiSeat() && remoteGlancing_));
     if (!frozen && state_ != State::Loading) {
         for (int seat = 0; seat < 2; ++seat) {
             events_.clear();
@@ -1111,7 +1118,7 @@ void GameScene::updatePlaying(float dt) {
         }
     }
     if (hotSeat()) updateHotSeatTurn(dt);
-    if (!online() && !watching()) updateScript(dt);
+    if (!watching() && !(online() && (resync_ || endPending_))) updateScript(dt);
     switch (turn_) {
     case Turn::HumanPlacing:
         if (dest_.empty() && !anim_[inputSeat()].busy()) {
@@ -1136,13 +1143,13 @@ void GameScene::updatePlaying(float dt) {
             if (!mv.valid()) break;
             PieceObject* occupant = board_.at(to);
             int moverId = touchedId_;
-            sendOnlineMove(mv);
+            placeOnlineMove(mv);
             std::vector<anim::Task> tasks;
             planPlacement(tasks, moverId, to, occupant ? occupant->id : -1, NoSquare, NoSquare);
             planPromotionSwap(tasks, moverId, to, PieceType(choice));
             anim_[inputSeat()].enqueue(tasks);
             placedTo_ = to;
-            pressQueued_ = true;
+            pressQueued_ = autoPressClock();
             turn_ = Turn::HumanPlacing;
             break;
         }
@@ -1357,16 +1364,21 @@ void GameScene::humanPlace(Square to) {
             rookTo = makeSquare(king ? 5 : 3, rank);
         }
     }
-    // Online the move goes to the server now, before the hand moves; the robot then places the
-    // piece and presses the clock by itself.
-    if (online()) sendOnlineMove(mv);
+    // Online the move goes to the authority now, before the hand moves, when the robots press the
+    // clock by themselves; otherwise it waits on the board for the player's press.
+    if (online()) placeOnlineMove(mv);
     std::vector<anim::Task> tasks;
     planPlacement(tasks, mover->id, to, victimId, rookFrom, rookTo);
     anim_[inputSeat()].enqueue(tasks);
     placedTo_ = to;
     turn_ = Turn::HumanPlacing;
-    if (online()) pressQueued_ = true;
+    // Auto-press: the robot presses once the placement (capture, castling rook) is done, or the
+    // promotion swap after the piece is chosen, whatever the legality of the placement when the
+    // hints are off (the arbiter's verdict comes at the press, as for a press by hand).
+    if (autoPressClock()) pressQueued_ = true;
 }
+
+bool GameScene::autoPressClock() const { return online() ? og_.autoPress : settings().autoPressClock; }
 
 void GameScene::humanPressClock() {
     if (turn_ == Turn::HumanPlacing) {
@@ -1536,11 +1548,12 @@ float GameScene::carryHeight(vec3 from, vec3 to, int ignoreA, int ignoreB) const
 }
 
 void GameScene::planPlacement(std::vector<anim::Task>& tasks, int moverId, Square to, int victimId, Square rookFrom,
-                              Square rookTo) {
+                              Square rookTo, bool lifted) {
     PieceObject* mover = board_.byId(moverId);
     if (!mover) return;
     vec3 toPos = jitteredSquare(to);
-    tasks.push_back(task(anim::TaskType::Lift, moverId, vec3(0), carryHeight(mover->basePos, toPos, moverId, victimId)));
+    if (!lifted)
+        tasks.push_back(task(anim::TaskType::Lift, moverId, vec3(0), carryHeight(mover->basePos, toPos, moverId, victimId)));
     tasks.push_back(task(anim::TaskType::Carry, moverId, toPos));
     PieceObject* victim = board_.byId(victimId);
     if (victim) tasks.push_back(task(anim::TaskType::TakeCaptured, victimId));
@@ -1658,8 +1671,10 @@ void GameScene::onClockPressed(int seat) {
     leverTarget_ = half == 1 ? 1.0f : -1.0f;
     if (state_ != State::Playing) return;
     if (online()) {
-        // Animation only: the server has the move already.
+        // Animation only: the server has the move already, unless the players press the clock
+        // themselves in this game: the move staged on the board goes now.
         if (seat == humanSeat() && turn_ == Turn::HumanPressing) {
+            pressOnlineClock();
             pressedPly_ = int(game_.moves().size()) - 1;
             if (pendingPly_ < 0) recordOnline(pressedPly_);  // else once confirmed
             beginTurn();
@@ -1944,6 +1959,8 @@ void GameScene::updateGaze(float dt) {
     int firstPerson = menu ? -1 : firstPersonSeat();  // that head follows the player's look
     for (int seat = 0; seat < 2; ++seat) {
         if (seat == firstPerson) continue;
+        // Online, the opponent's own head turns their robot's while their gestures come.
+        if (online() && seat == aiSeat() && driveRemoteHead(dt)) continue;
         int other = 1 - seat;
         vec3 face = anim_[other].eyeCameraTransform().c[3].xyz();
         vec3 target = vec3(0, layout::BOARD_TOP_Y, 0);
@@ -1952,6 +1969,8 @@ void GameScene::updateGaze(float dt) {
             bool myTurn = seatOf(stm) == seat;
             if (myTurn && opponentMoving() && aiMoveTo_ != NoSquare) {
                 target = board_.squareBase(aiMoveTo_);
+            } else if (myTurn && online() && remoteLive_.pieceId >= 0) {
+                target = board_.squareBase(remoteLive_.hover);  // the piece the opponent holds, or where it goes
             } else if (!myTurn && touchedSq_ != NoSquare) {
                 target = board_.squareBase(touchedSq_);
             } else if (!myTurn && opponentMoving() && aiMoveTo_ != NoSquare) {
@@ -2024,7 +2043,8 @@ ui::GameCursor GameScene::gameCursorKind() const {
         if (aimSq_ == NoSquare || aimSq_ == touchedSq_) return ui::GameCursor::Holding;
         return settings().showLegalMoves && !aimLegal_ ? ui::GameCursor::Holding : ui::GameCursor::Square;
     case Turn::HumanPlacing:
-    case Turn::HumanPlaced: return clockHover_ ? ui::GameCursor::Clock : ui::GameCursor::Idle;
+    case Turn::HumanPlaced:  // no clock pointer while the press is queued (auto-press)
+        return clockHover_ && !pressQueued_ ? ui::GameCursor::Clock : ui::GameCursor::Idle;
     default: return ui::GameCursor::Idle;
     }
 }
@@ -2032,7 +2052,11 @@ ui::GameCursor GameScene::gameCursorKind() const {
 vec3 GameScene::glanceTarget() const {
     // The sheet of the player whose eyes are the view (hot-seat: the player at the table).
     int seat = firstPersonSeat();
-    sheet::PadFrame f = sheet::padFrame(seat < 0 ? humanSeat() : seat, world_.clockOnPositiveX());
+    return glanceTarget(seat < 0 ? humanSeat() : seat);
+}
+
+vec3 GameScene::glanceTarget(int seat) const {
+    sheet::PadFrame f = sheet::padFrame(seat & 1, world_.clockOnPositiveX());
     return f.center + vec3(0.0f, layout::SCORESHEET_THICKNESS, 0.0f);
 }
 

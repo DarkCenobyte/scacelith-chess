@@ -745,13 +745,15 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     float idleTwist = sway * 0.018f * (std::sin(t * 0.23f + seed * 7.0f) * 0.7f + std::sin(t * 0.41f) * 0.3f);
     float idleSide = sway * 0.012f * std::sin(t * 0.19f + seed * 2.0f);
 
-    SpineParams sp = solveSpine(pose, hr.p, thinkLean, idleFlex, idleTwist, idleSide);
+    // Forward bend of the thinking poses and of setLean (at most 0.2 rad from the hips).
+    const float flex = thinkLean + 0.2f * lean;
+    SpineParams sp = solveSpine(pose, hr.p, flex, idleFlex, idleTwist, idleSide);
     if (mirrored && running && cur.type == TaskType::Handshake) {
         // Left-handed player shaking hands with the solver's left hand: the torso follows that
         // hand the way it follows the right one (mirror image of the solve), blended in and out.
         const float u = t - curStart, w = smoothstep(0.0f, 0.3f, u) * (1.0f - smoothstep(curT - 0.3f, curT, u));
         if (w > 0.0f) {
-            SpineParams sl = solveSpine(pose, mirrorX(left().motion.sample(t).p), thinkLean, idleFlex, -idleTwist, -idleSide);
+            SpineParams sl = solveSpine(pose, mirrorX(left().motion.sample(t).p), flex, idleFlex, -idleTwist, -idleSide);
             sp.flex = lerp(sp.flex, sl.flex, w);
             sp.twist = lerp(sp.twist, -sl.twist, w);
             sp.side = lerp(sp.side, -sl.side, w);
@@ -1034,6 +1036,7 @@ void Animator::Impl::updateIdle(float dt) {
     }
     thinkLeanTarget = desired == 0 ? 0.0f : 0.16f;
     thinkLean += (thinkLeanTarget - thinkLean) * (1.0f - std::exp(-dt * 1.8f));
+    lean += (leanTarget - lean) * (1.0f - std::exp(-dt * 4.0f));
 
     auto drive = [&](Hand& hand, bool want, int& state) {
         if (int(want) == state) return;
@@ -1302,6 +1305,7 @@ void Animator::enqueue(const std::vector<Task>& tasks) {
     for (auto& t : tasks) enqueue(t);
 }
 bool Animator::busy() const { return impl_->running || !impl_->queue.empty(); }
+bool Animator::runningTask(TaskType type) const { return impl_->running && impl_->cur.type == type; }
 void Animator::clearQueue() { impl_->queue.clear(); }
 float Animator::remainingTime() const {
     const Impl& I = *impl_;
@@ -1327,6 +1331,13 @@ void Animator::setHeadOverride(bool enabled, float yaw, float pitch) {
     I.ovYaw = yaw;
     I.ovPitch = pitch;
 }
+void Animator::headAngles(float& yaw, float& pitch) const {
+    const Impl& I = *impl_;
+    yaw = I.headOverride ? I.ovYaw : I.headYaw;
+    pitch = I.headOverride ? I.ovPitch : I.headPitch;
+    if (I.mirrored) yaw = -yaw;   // back from the solver's side to the character's
+}
+void Animator::setLean(float lean) { impl_->leanTarget = clamp(lean, 0.0f, 1.0f); }
 void Animator::setThinking(bool thinking) {
     Impl& I = *impl_;
     if (thinking && !I.thinking) I.thinkTimer = I.rng.range(1.0f, 3.0f);

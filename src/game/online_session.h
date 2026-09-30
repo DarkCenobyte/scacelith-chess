@@ -14,6 +14,7 @@
 #include "../net/direct_match.h"
 #include "../net/online_client.h"
 #include "game_link.h"
+#include "online_live.h"
 #include <deque>
 #include <map>
 #include <memory>
@@ -109,6 +110,10 @@ public:
     // Once per frame (menus and games alike): polls the network layer, advances the virtual
     // clock. Game events wait in a queue for the scene.
     void update(float dt);
+    // The scene says, before update(), whether a game is being played (any kind: online, direct,
+    // or on this PC while connected). Some toasts wait until none is: the RatingRestored notice
+    // shows in the menus, on the game over card, or at once when no game is going on.
+    void setInGame(bool inGame) { inGame_ = inGame; }
 
     ServerApi& api();
     DirectApi& direct();
@@ -234,6 +239,8 @@ private:
     std::vector<Incoming> incoming_;
     double cooldownUntilMs_ = 0, bannedUntilMs_ = 0;
     std::string autoQueue_;                     // --start-online
+    bool inGame_ = false;
+    live::HeldNotice ratingRestored_;           // RatingRestored points waiting for the end of the game
 
     bool gameReady_ = false;
     uint64_t gameId_ = 0;

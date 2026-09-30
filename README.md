@@ -15,6 +15,9 @@ real-time material shaders, physically based lighting.
   pointer (it looks through them at the square behind), and your arm turns see-through.
 - **Space**, or a click on the chess clock: your hand presses the clock. A move is only completed
   once the clock is pressed, and after a promotion the new piece must be on the board first.
+  With Options > Gameplay > Auto-press clock your hand presses it by itself once the move is on
+  the board (capture, castling rook and promotion piece included); online, the server (or the
+  host of a direct match) decides for each game.
 - **Right mouse button** (hold and drag): look around from your chair. **Mouse wheel**: lean
   towards the board. **Middle click** or **C**: look at the board again.
 - **S**: look at your own scoresheet, lying out of sight beside you, and back (**S** again,
@@ -112,8 +115,9 @@ equal position late in the game), and the game over card offers to watch another
 ## Online play
 
 **Play Online** on the title page plays people through a Scacelith server, still in the first
-person: your opponent sits in the other chair as a robot that moves the pieces and presses the
-clock by itself, as soon as their move arrives.
+person: your opponent sits in the other chair as a robot that moves with them, live: it takes the
+piece they touch, holds it over the square they aim at, looks where they look and leans in when
+they do.
 
 - **Server.** The official server is `caissa.scacelith.com` (port 44664, secure web API and
   secure WebSocket on the same port). Options > Online server > Custom server takes a community
@@ -136,15 +140,20 @@ clock by itself, as soon as their move arrives.
   the colour you want), or create a private game whose short code a friend enters to play you.
   Challenges you receive appear as a card wherever you are in the menus, and at the table
   between two games.
-- **At the table.** You can only let go of a piece on a legal square; the move is sent the
-  moment you choose it, and the robot hand then places the piece and presses the clock. The
-  clocks are the server's (they never stop, not even in the Esc menu). The ping to the server is
-  in the top right corner. Esc: offer or claim a draw, resign, abort before your first move,
-  report the opponent, leave (which resigns). If your opponent loses the connection a banner
-  counts down the time they have to come back; if yours drops, the game waits behind a
-  "Reconnecting…" veil and picks up where the server is. The scoresheets are headed with the
-  server's name, "Online", the time control, rated or casual, both players with their ratings and
-  the game's number; the game over card shows the rating change and offers a rematch.
+- **At the table.** You can only let go of a piece on a legal square. When the server lets the
+  robots press the clock (its default; in a direct match, the host's choice), the move is sent the
+  moment you choose it, and the robot hand then places the piece and presses the clock. Otherwise
+  a notice says so at the start of the game: the robot places the piece, you press the clock
+  (Space or a click), and the move goes at the press. The opponent's robot plays their move from
+  where their hand is, and its head follows theirs unless Options > Gameplay > Ignore opponent's
+  head movements is on (the robot then looks around by itself, as against Stockfish; it still
+  moves the pieces with them). The clocks are the server's (they never stop, not even in the Esc
+  menu). The ping to the server is in the top right corner. Esc: offer or claim a draw, resign,
+  abort before your first move, report the opponent, leave (which resigns). If your opponent loses
+  the connection a banner counts down the time they have to come back; if yours drops, the game
+  waits behind a "Reconnecting…" veil and picks up where the server is. The scoresheets are headed
+  with the server's name, "Online", the time control, rated or casual, both players with their
+  ratings and the game's number; the game over card shows the rating change and offers a rematch.
 - **Direct match.** Two computers play each other directly, without a server or an account
   (friendly games, never rated): one player **hosts** (time control, colour, port 47100 by
   default, opened on the home router with UPnP when possible) and reads the address, the port and
@@ -155,9 +164,11 @@ clock by itself, as soon as their move arrives.
 Development: `--online-mock` replaces the network with an in-process fake server and a fake
 direct-match friend (any password works; see `src/game/online_mock.h` for the inputs that try
 error paths), and `--start-online [category]` goes straight to a game (with `--online-mock` the
-opponent is a random mover). In a mock game F9 makes the opponent disconnect for a while and F10
-drops your own connection. `--scene ui --ui-screen online-play` (and the other `online-*` and
-`direct-*` screens listed in `src/ui/ui_viewer.cpp`) shows the pages on the fake server.
+opponent is a random mover whose hands and head move like a player's; `--online-manual-clock`
+leaves the clock press to the players, and `--play e2e4,...` makes your moves). In a mock game F9
+makes the opponent disconnect for a while and F10 drops your own connection. `--scene ui
+--ui-screen online-play` (and the other `online-*` and `direct-*` screens listed in
+`src/ui/ui_viewer.cpp`) shows the pages on the fake server.
 [docs/ONLINE_CLIENT.md](docs/ONLINE_CLIENT.md) describes the client side. QR codes are drawn with
 Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-library) (MIT licence,
 `third_party/qrcodegen/`).

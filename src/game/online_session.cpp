@@ -268,6 +268,7 @@ void OnlineSession::applyServer() {
     incoming_.clear();
     results_.clear();
     pending_.clear();
+    ratingRestored_ = live::HeldNotice();  // points of the previous server's account
     LOGI("online: server %s", ep.origin().c_str());
 }
 
@@ -504,6 +505,9 @@ void OnlineSession::update(float dt) {
     for (int guard = 0; guard < 256 && api_->poll(e); ++guard) handleServer(e);
     if (directUsed_)
         for (int guard = 0; guard < 256 && direct_->poll(e); ++guard) handleDirect(e);
+    double restored = 0.0;
+    if (ratingRestored_.take(inGame_, restored))
+        ui::notify(i18n::trf("online.notice.rating_restored", {std::to_string(std::lround(restored))}), 8.0f);
     // --start-online: queue as soon as the connection is up.
     if (!autoQueue_.empty() && signedIn_ && conn_ == net::ConnState::Online) {
         findOpponent(autoQueue_, true);
@@ -659,8 +663,9 @@ void OnlineSession::handleServer(const net::Event& e) {
         case NCooldown: cooldownUntilMs_ = e.noticeArg; break;
         case NReplaced: ui::notify(i18n::tr("online.notice.replaced"), 6.0f); break;
         case NRatingRestored:
-            // An opponent of rated games was banned for cheating: the points come back.
-            ui::notify(i18n::trf("online.notice.rating_restored", {std::to_string(std::lround(e.noticeArg))}), 8.0f);
+            // An opponent of rated games was banned for cheating: the points come back. The toast
+            // never interrupts a game: it waits for its end (update()), the points adding up.
+            ratingRestored_.add(e.noticeArg);
             if (signedIn_) {
                 api_->fetchAccount();
                 expect(Kind::AccountResult);

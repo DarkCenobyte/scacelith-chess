@@ -32,8 +32,11 @@ games). It drains both network objects and sorts the events:
   code), `incoming()` (challenges received, with their expiry), cooldown and ban ends. Notices
   (server shutdown, session revoked, replaced by another window) and errors become toasts. The
   `RatingRestored` notice (an opponent of our rated games was banned for cheating; its argument is
-  the points given back) shows `online.notice.rating_restored` and fetches the account again, so
-  the ratings shown are the restored ones.
+  the points given back) fetches the account again, so the ratings shown are the restored ones,
+  and shows `online.notice.rating_restored`, but never while a game is being played (a server
+  game, a direct match or an offline game alike; the scene tells the session with
+  `setInGame()`): it then waits for the game over card or the menus, and the points of several
+  notices add up.
 - **Game events** go to a queue. A `GameSnapshot` of an unknown game id with status Ongoing is a
   new game (matchmaking, challenge, private game, rematch, direct match): `gameReady()` becomes
   true, the menu (or the game over card) fades to the table, and the scene calls
@@ -78,14 +81,68 @@ The opponent sits in the other chair as a robot (`Controller::Remote`); the phys
 same as against Stockfish, with these differences:
 
 - **My move.** A piece can only be released on a legal square (no arbiter penalties online).
-  The move (`packMove`, plus the promotion) is sent with `GameLink::sendMove` the moment the
-  destination is chosen, before the hand places the piece; the robot then places it and presses
-  the clock by itself (animation only). My clock display is frozen from that moment until the
-  server confirms the move (`MoveMade` with `mine`). Moves are written on the scoresheet in ply
-  order once confirmed and pressed.
+  Who presses the clock is the authority's rule for the game (`OnlineGame::autoPress`: on by
+  default on the server, the host's choice in a direct match):
+  - `autoPress` on: the move (`packMove`, plus the promotion) is sent with
+    `GameLink::sendMove` the moment the destination (and the promotion piece) is chosen, before
+    the hand places the piece; the robot then places it and presses the clock by itself
+    (animation only).
+  - `autoPress` off: the move is staged. The robot places it and waits, the player presses the
+    clock (Space or a click on it, as against Stockfish) and the move is sent at the lever's
+    contact, so that its thinking time covers the placement and the press, as the server's lag
+    compensation assumes. A staged move is not sent when the game ended or a rebuild happened
+    meanwhile (the board is then set up again from the authority's moves). A notice at the start
+    of such a game says so (`notify.manual_clock`).
+
+  The thinking time sent with the move is measured on a steady local clock from the opponent's
+  `MoveMade` (or the start of the game), not as a difference of two `serverNowMs()` readings:
+  a correction of the server clock estimate between them would make an honest time look
+  implausible to the server. My clock display stands still from the send until the server
+  confirms the move (`MoveMade` with `mine`), but no longer than max(1 s, 3 pings) and never
+  while reconnecting: the authority's clock runs meanwhile, and so does the display. A move sent
+  just as the connection dropped (or pressed while it was being restored) is sent again, same
+  ply and move, when the snapshot after the reconnection holds every local move but that one
+  and it is still my turn there (the authority answers a duplicate with the original
+  `MoveMade`), instead of the board being rebuilt without it. Moves are written on the
+  scoresheet in ply order once confirmed and pressed.
 - **The opponent's move.** `MoveMade` queues the move; the robot plays it without thinking
-  time (reach, lift, carry, capture, castling rook, promotion swap, clock). I may touch my pieces
-  as soon as its pieces are down.
+  time (reach, lift, carry, capture, castling rook, promotion swap, clock), from where their live
+  gestures left it: the piece already in its hand is carried on, and a move already put down
+  only gets the clock press. I may touch my pieces as soon as its pieces are down.
+- **Live gestures** (the rules and their tests: `src/game/online_live.h`,
+  `tests/online_live_tests.cpp`). Hot-seat and Stockfish games send and receive none.
+  - Mine (`sendOnlineGesture`): built every frame while the game is played (intro, handshake,
+    play; nothing while reconnecting): the square of the piece in hand, the legal square it is
+    aimed at once the pointer has rested there for 120 ms, `Promoting` while the promotion
+    picker is open, `placed` for a staged move from its placement to my press (with `autoPress`
+    the hand is idle again once the move is sent), the look of my robot's eyes and the wheel
+    lean, `Glance` while I read my scoresheet (S) and `Side` when the look falls on the table
+    beside the board (clock, captured pieces, scoresheets). `ply` is the number of plies played
+    when the hand's state began. It goes to `GameLink::sendGesture` when that state changes, when
+    the head turns by about a degree or the lean by 0.05, and once a second at least; after the
+    end of the game, one last idle gesture and nothing more.
+  - The opponent's (`OpponentGesture`) are cosmetic and untrusted: they never touch the game,
+    the arbiter, the clocks or `og_`. Their piece fields move the robot only while the local
+    game has exactly `ply` plies, it is their turn, my robot is done with my move, their
+    `MoveMade` for that ply has not come, no rebuild is pending, the game goes on, and the
+    gesture came after the last snapshot and after both players' last reconnection; the square
+    must hold one of their pieces, the aim and `placed` must be legal there. The robot then takes
+    the piece (reach, lift), carries it over the square aimed at once the aim has held for
+    150 ms (back over its own square after 0.6 s without one), puts a `placed` move down (the
+    placement without the press; the game is not changed), and puts the piece back when their
+    hand is empty again, when their gestures stop for 5 s (our own connection lost included),
+    when they disconnect and at the end of the game. A move put down that its `MoveMade` does not confirm (another move, a
+    rebuild, the end, or 5 s of gestures showing something else) is taken back: once the hands
+    are idle the board is set up from the game again, behind a short dip.
+  - Their head: while their last gesture is under 2.5 s old and both players are connected,
+    the robot's head follows their look with a critically damped spring and leans with them. A
+    `Side` look turns the other way here (each client puts the clock at its own player's
+    right, so what lies beside the board is mirrored), and a `Glance` turns the head to the
+    robot's own scoresheet on this table, its writing hand waiting aside meanwhile. While it
+    presses the clock, its eyes follow its hand. Otherwise the automatic gaze of a game
+    against Stockfish returns, looking at the piece their robot holds, if any. Options >
+    Gameplay > "Ignore opponent's head movements" turns the head and the lean off; the piece
+    gestures still play.
 - **Clocks.** The server's values, extrapolated with `serverNowMs()` for the side to move. The
   local clock never flags: a clock at zero shows 0.0 until the server's `GameEnd`.
 - **Rejected move / disagreeing snapshot.** Once the robots are idle, the board, the game and the
@@ -152,7 +209,10 @@ the page) closes the match, which removes the port mapping.
   down first (`placed`) and its `MoveMade` comes 0.6-1.0 s later. It is silent while away (F9)
   and once the game is over.
 - `--start-online [category]` signs in and plays the first opponent found (at once with the
-  fakes); `--touch <square>` then touches that piece once the handshake is over.
+  fakes); `--touch <square>` then touches that piece once the handshake is over, and
+  `--play e2e4,d2d3,...` makes my moves by hand (touch, carry, clock press), so that the fake's
+  gestures show on its robot in screenshots (with `--warp <s>`: its moves come at the same times
+  from run to run).
 - In a mock game, F9 makes the opponent disconnect for 20 s, F10 drops our connection for 8 s.
 - `--scene ui --ui-screen <name>`: the pages on the fakes with a frozen clock: `online`,
   `online-register`, `online-mfa`, `online-play`, `online-search`, `online-account`,
