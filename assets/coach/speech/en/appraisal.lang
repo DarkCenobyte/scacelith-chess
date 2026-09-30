@@ -174,6 +174,7 @@ appraisal.best.brilliant.b4.2 = {move} at move {n} was brilliant.
 appraisal.best.brilliant.b5 = {move} at move {n} was brilliant.
 appraisal.best.brilliant.b5.2 = Move {n}, {move}: brilliant.
 appraisal.best.brilliant.b6 = {move}!! at move {n}.
+appraisal.best.brilliant.b6.spoken = {move}, a brilliant move, at move {n}.
 appraisal.best.brilliant.b6.2 = Move {n}: {move}, brilliant.
 appraisal.best.great.b1 = My favourite moment: {move}. That was a great move!
 appraisal.best.great.b1.2 = Remember {move}? That was a great find.
