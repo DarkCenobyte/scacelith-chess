@@ -78,7 +78,9 @@ public:
     // Pieces missing from the board come back from the captured ones, the last set down first, so
     // that taking a move back restores the table as it was: its victim, the pawn of a promotion.
     // The spare of a promotion taken back goes back to the reserve; the other pieces left over
-    // are captured (syncTo in physical_board.cpp).
+    // are captured (syncTo in physical_board.cpp). A piece leaving the board goes to a spot that
+    // was free before the snap as well, so that hands can make the same change one piece at a
+    // time (coach::planRewind) without waiting for the pieces coming back to leave theirs.
     void syncTo(const chess::Position& pos);
 
     void beginFrame();                            // prevTransform = transform
@@ -90,9 +92,9 @@ private:
     int captures_ = 0;                            // pieces set down as captured (captureOrder)
     int newPiece(chess::PieceType t, chess::Color c);
     // Distance from 'at' to the nearest piece standing beside the board (captured, spare; not in a
-    // hand) or slot kept for one.
-    float clearance(m::vec3 at) const;
-    m::vec3 freeCaptureSlot(chess::Color beside) const;
+    // hand), slot kept for one, or spot in 'alsoTaken'.
+    float clearance(m::vec3 at, const std::vector<m::vec3>* alsoTaken = nullptr) const;
+    m::vec3 freeCaptureSlot(chess::Color beside, const std::vector<m::vec3>* alsoTaken = nullptr) const;
     // takeSpare; inReach = false (syncTo snaps pieces into place) also takes captured pieces
     // standing beside the opponent.
     int offBoardPiece(chess::PieceType t, chess::Color c, bool inReach);
