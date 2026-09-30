@@ -132,7 +132,7 @@ void surface(in SurfaceInput i, inout Surface s) {
     // Printed in the glaze: a slightly uneven layer of pigment (thinner in places, as fired
     // cobalt is) that no light scatters through; the seam gaps interrupt it.
     float ink = robotMarking(p, nOS, i.matParams[5], i.matParams[6].w, i.matParams[7]) * (1.0 - gap);
-    ink *= 0.90 + 0.10 * smoothstep(-0.6, 0.6, fbm(p * 260.0 + seed * 3.0, 2));
+    ink *= 0.93 + 0.07 * smoothstep(-0.6, 0.6, fbm(p * 260.0 + seed * 3.0, 2));
     albedo = mix(albedo, i.matParams[6].rgb * (1.0 + 0.6 * i.matParams[4].w * lowF), ink);
 #endif
 

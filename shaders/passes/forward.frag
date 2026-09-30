@@ -67,7 +67,7 @@ void main() {
             float k = hl.a * (0.80 + 0.20 * sin(i.time * 3.4));
             vec3 hue = hl.rgb / max(luminance(hl.rgb), 1e-4);
             c = mix(c, hue * (1.25 * luminance(c)), 0.65 * k * broad) * (1.0 + 0.12 * k);
-            c += hl.rgb * (0.25 * k * narrow);
+            c += hl.rgb * (0.18 * k * narrow);
         }
     }
 #endif

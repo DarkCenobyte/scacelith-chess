@@ -18,18 +18,18 @@ constexpr float kCapPx = 64.0f;
 // Print size and place (Spine2 space, metres). The front of the upper chest is nearly flat between
 // the pectoral seam (y ~ 0.119) and the collar slope (y > 0.19): over |x| < 0.055 the surface stays
 // within 5 mm of a plane and 17 degrees of +Z, so a projection along +Z does not stretch the
-// letters. An 18 mm cap height reads at the human's seat (~1.1 m: ~19 px at 1080p, ~13 at 720p).
-constexpr float kCapHeight = 0.018f;
+// letters. A 19 mm cap height reads at the human's seat (~1.1 m: ~20 px at 1080p, ~14 at 720p).
+constexpr float kCapHeight = 0.019f;
 constexpr float kCentreY = 0.166f;        // middle of the cap band
 constexpr float kTracking = 0.14f;        // em: spaced capitals, as maker's marks are
-// Cinzel's stems are ~0.075 em (1.9 mm here) and its hairlines ~0.03 em (0.8 mm): at about a pixel
+// Cinzel's stems are ~0.075 em (2 mm here) and its hairlines ~0.03 em (0.8 mm): at about a pixel
 // per millimetre, and through the depth of field of a player looking at the board, the regular
-// weight fades to a grey smear, so the print is bolder than the face (0.45 mm added on each side
-// of every stroke: stems ~2.8 mm, hairlines ~1.7 mm).
-constexpr float kDilation = 0.00045f;
+// weight fades to a grey smear, so the print is bolder than the face (0.5 mm added on each side
+// of every stroke: stems ~3 mm, hairlines ~1.8 mm).
+constexpr float kDilation = 0.0005f;
 constexpr float kBleed = 0.00009f;        // soft pigment edge (fired under-glaze colour)
 // Cobalt blue (linear albedo): the colour of blue-and-white porcelain, and the coach's accent.
-const vec3 kPigment(0.010f, 0.026f, 0.165f);
+const vec3 kPigment(0.008f, 0.020f, 0.135f);
 constexpr float kTranslucencyUnderInk = 0.2f;
 constexpr float kMinNormalZ = 0.5f;
 }  // namespace

@@ -180,14 +180,15 @@ bool World::loadStep() {
         // the marker shapes saw only the corner of their [-1,1] space, which lit the whole touched
         // square and left the legal-move dots and rings out.
         w.markerQuad.upload(prim::plane(layout::SQUARE_SIZE, layout::SQUARE_SIZE, 1, 1, 1.0f / layout::SQUARE_SIZE), "marker");
-        // Coach marks: cobalt lines a little above the gold markers' level (the blue carries less
-        // luminance), a thin dark rim, a soft halo on the board and a faint wash in the square.
+        // Coach marks: cobalt lines a little below the gold markers' level (the blue saturates
+        // less than a whiter line would), a thin dark rim and a soft halo on the board; no wash
+        // (on a black square it read as a lit tile).
         w.coachMarkMat.name = "coach_marker";
         w.coachMarkMat.surface = "shaders/materials/coach_marker.glsl";
         w.coachMarkMat.transparent = true;
         w.coachMarkMat.castShadow = false;
         w.coachMarkMat.params[0] = vec4(kCoachLight, 1.9f);
-        w.coachMarkMat.params[1] = vec4(0.34f, 0.24f, 0.03f, 0.45f);
+        w.coachMarkMat.params[1] = vec4(0.34f, 0.24f, 0.0f, 0.45f);
         w.coachQuad.upload(prim::plane(1.0f, 1.0f, 1, 1, 1.0f), "coach_mark");
         break;
     }

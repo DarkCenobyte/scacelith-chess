@@ -59,7 +59,7 @@ void surface(in SurfaceInput i, inout Surface s) {
         float ad = abs(d);
         line = 1.0 - smoothstep(lw - u, lw + u, ad);
         shade = 1.0 - smoothstep(lw + 0.05 - u, lw + 0.05 + u, ad);
-        halo = exp(-max(ad - lw, 0.0) / 0.09) * (d > 0.0 ? 1.0 : 0.3);
+        halo = exp(-max(ad - lw, 0.0) / 0.09) * (d > 0.0 ? 1.0 : 0.15);
         wash = (1.0 - smoothstep(-u, u, d)) * i.matParams[1].z;
         // Arrival: a ring closes onto the outline over 0.7 s and merges with it.
         float t = clamp(age / 0.7, 0.0, 1.0);
