@@ -10,13 +10,15 @@
 //                    startRecording() has the players write it, a dozen seconds of writing)
 //   startRecording() both players pick up their pen
 //   recordMove()     on every completed move: both players write it (turning the page first
-//                    when the move starts a new page); a held sheet (setHold, hot-seat) waits
+//                    when the move starts a new page); a held sheet (setHold, hot-seat) waits,
+//                    and so do both sheets from the write limit on (setWriteLimit, Coach mode)
 //   finishGame()     both players write the result and lay the pen down (before the final
 //                    handshake: it is made with the right hand, which may be a writing hand)
 // update() once per frame after the animators, onEvent() for their events, submit() when drawing.
 #pragma once
 #include "../anim/animator.h"
 #include "../render/renderer.h"
+#include "scorekeeper_ledger.h"
 #include "scoresheet.h"
 #include <string>
 #include <vector>
@@ -50,12 +52,14 @@ public:
                  const std::string& date);
     // Header already filled in (event, date, round, names, ratings).
     void writeHeaderInstantly();
-    // Position set up without animation (--moves): the moves are already on the sheets.
+    // Position set up without animation (--moves): the moves are already on the sheets (holds and
+    // the write limit do not apply).
     void writeMovesInstantly(const std::vector<std::string>& san);
     void startRecording();
     // Move 'ply' (0 = White's first) has just been completed with the clock press.
     void recordMove(int ply, const std::string& san);
-    // "1-0", "0-1" or "½-½": written, then the pens go back on the table.
+    // "1-0", "0-1" or "½-½": written after the moves still owed (holds and the write limit are
+    // lifted), then the pens go back on the table.
     void finishGame(const std::string& result);
     // Pads back to blank, pens on the table, nothing queued (menu, abandoned game).
     void clear();
@@ -64,7 +68,18 @@ public:
     // opponent's move at the start of their turn, unless they touch a piece first: it is then
     // written after their own move (FIDE 8.1.2). finishGame() releases every hold.
     void setHold(int seat, bool hold);
-    bool held(int seat) const { return hold_[seat & 1]; }
+    bool held(int seat) const { return ledger_.held(seat); }
+    // Coach mode: the moves from ply 'plies' on are recorded but neither sheet writes them yet
+    // (the human's move while the coach may still take it back); -1 lifts the limit. Lifting or
+    // raising it lets both sheets catch up, in order. A demonstration is never recorded at all.
+    void setWriteLimit(int plies);
+    int writeLimit() const { return ledger_.writeLimit(); }
+    // A takeback: forgets the moves recorded from 'fromPly' on, provided neither sheet has begun
+    // writing any of them (a limit or holds keep them off the sheets until then); the move played
+    // instead, recorded at 'fromPly', is written normally. False (nothing changes) when a sheet
+    // has begun one: ink is not erased.
+    bool dropMoves(int fromPly);
+    const ScoreLedger& ledger() const { return ledger_; }
 
     // Writing-hand events of 'seat' (sounds, entry and page bookkeeping).
     void onEvent(int seat, const anim::Event& e);
@@ -93,10 +108,7 @@ private:
     bool hasDetails_ = false;
     int round_ = 1;
     std::string date_;
-    int nextPly_[2] = {0, 0};                 // next ply each sheet will write
-    std::vector<std::string> moves_;          // SAN of every recorded move (for late starts)
-    int movesQueued_[2] = {0, 0};             // moves handed to each writing hand
-    bool hold_[2] = {false, false};           // setHold()
+    ScoreLedger ledger_;                      // moves recorded, next ply of each sheet, holds, limit
     bool handAside_[2] = {false, false};
     m::mat4 prevPen_[2];
     bool hasPrevPen_[2] = {false, false};
