@@ -1,7 +1,8 @@
 // Output device backends. The backend owns the audio thread and calls the render function with
 // interleaved float stereo at the device rate; it converts to the device format itself.
 //   * Windows: WASAPI shared mode, event driven (backend_wasapi.cpp)
-//   * elsewhere: null backend consuming at real-time pace (backend_null.cpp)
+//   * elsewhere: null backend consuming at real-time pace, optionally dumping to a WAV file
+//     (SCACELITH_AUDIO_DUMP, backend_null.cpp)
 #pragma once
 #include <atomic>
 #include <memory>

@@ -76,4 +76,79 @@ inline SpatialParams computeSpatial(const Basis& b, m::vec3 src, float fs, bool 
     return p;
 }
 
+// Block targets of a SpatialChain: per-ear gains (distance included), ITD, head shadow, low-pass
+// and the hall send level.
+struct SpatialTarget {
+    float gL = 0.0f, gR = 0.0f, itd = 0.0f, shL = 0.0f, shR = 0.0f, lp = 0.0f, send = 0.0f;
+};
+
+// Targets for a source of gain 'g' at 'src' (spatial) or centred (non-spatial, still sent to the
+// hall). 'extraLp' is a further low-pass coefficient (talker directivity), merged with the
+// behind/air one.
+inline SpatialTarget spatialTarget(const Basis& b, bool spatial, m::vec3 src, float fs, float g, float send,
+                                   float extraLp = 0.0f) {
+    SpatialTarget t;
+    if (spatial) {
+        SpatialParams sp = computeSpatial(b, src, fs);
+        t.gL = sp.gL * g;
+        t.gR = sp.gR * g;
+        t.itd = sp.itd;
+        t.shL = sp.shadowL;
+        t.shR = sp.shadowR;
+        t.lp = std::max(sp.lp, extraLp);
+    } else {
+        t.gL = t.gR = 0.70710678f * g;
+        t.lp = extraLp;
+    }
+    t.send = g * send;
+    return t;
+}
+
+// Per-voice state of the spatial chain shared by the effect voices and the speech voices: the
+// block targets are ramped linearly per sample; the hall send is taken pre-filter and pre-pan, then
+// behind/air low-pass, ITD (64-sample ring, clamped to 60 samples: fine up to ~96 kHz), far-ear
+// head shadow and the per-ear gains.
+struct SpatialChain {
+    float gL = 0, gR = 0, itd = 0, shL = 0, shR = 0, lp = 0, sendG = 0;
+    float dgL = 0, dgR = 0, dItd = 0, dShL = 0, dShR = 0, dLp = 0, dSend = 0;
+    float lpZ = 0, zL = 0, zR = 0;
+    float ring[64] = {};
+    uint32_t w = 0;
+    bool fresh = true;  // the next begin() jumps to its targets instead of ramping
+
+    void reset() { *this = SpatialChain(); }
+    // Sets up the ramps of a block of n samples towards 't'.
+    void begin(const SpatialTarget& t, int n) {
+        if (fresh) {
+            gL = t.gL; gR = t.gR; itd = t.itd; shL = t.shL; shR = t.shR; lp = t.lp; sendG = t.send;
+            fresh = false;
+        }
+        const float inv = 1.0f / float(n);
+        dgL = (t.gL - gL) * inv; dgR = (t.gR - gR) * inv; dItd = (t.itd - itd) * inv;
+        dShL = (t.shL - shL) * inv; dShR = (t.shR - shR) * inv; dLp = (t.lp - lp) * inv;
+        dSend = (t.send - sendG) * inv;
+    }
+    // One source sample: adds the ears into l/r and the hall send into room.
+    void tick(float s, float& l, float& r, float& room) {
+        gL += dgL; gR += dgR; itd += dItd; shL += dShL; shR += dShR; lp += dLp; sendG += dSend;
+        room += s * sendG;
+        lpZ = s + lp * (lpZ - s);
+        ring[w & 63u] = lpZ;
+        ++w;
+        float sl = lpZ, sr = lpZ;
+        if (itd != 0.0f) {
+            float dd = std::min(std::fabs(itd), 60.0f);
+            int i0 = int(dd);
+            float fr = dd - float(i0);
+            float a = ring[(w - 1u - uint32_t(i0)) & 63u], b = ring[(w - 2u - uint32_t(i0)) & 63u];
+            float delayed = a + (b - a) * fr;
+            if (itd > 0.0f) sl = delayed; else sr = delayed;
+        }
+        zL = sl + shL * (zL - sl);
+        zR = sr + shR * (zR - sr);
+        l += zL * gL;
+        r += zR * gR;
+    }
+};
+
 }  // namespace audio
