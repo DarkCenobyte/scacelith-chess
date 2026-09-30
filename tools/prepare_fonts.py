@@ -16,8 +16,8 @@ What it does:
   * CJK: subsets to the characters a player name or the UI can reasonably need: GB2312 hanzi
     (Simplified), Big5 levels 1 and 2 (Traditional), JIS X 0208 kanji (Japanese), plus kana, CJK
     punctuation, full-width forms, Latin and every character used by the ja / zh-Hans / zh-Hant
-    translations (assets/i18n/*.lang) and coach texts (assets/coach/speech/*.lang, the subtitles,
-    and assets/coach/openings/*.lang): rerun this script after changing them.
+    translations (assets/i18n/*.lang) and coach texts (assets/coach/speech/<code>/*.lang, the
+    subtitles, and assets/coach/openings/*.lang): rerun this script after changing them.
   * Arabic: stb_truetype does no OpenType shaping, so the game maps letters to the Unicode
     presentation forms (U+FB50..U+FDFF, U+FE70..U+FEFF) itself (src/i18n/unicode.cpp). Amiri maps
     those codepoints already. Aref Ruqaa builds its contextual forms with GSUB multiple
@@ -98,10 +98,17 @@ def lang_chars(root, codes):
     chars = set()
     dirs = [("i18n",), ("coach", "speech"), ("coach", "openings")]
     for code in codes:
+        paths = []
         for d in dirs:
+            # One file per language (assets/i18n/<code>.lang) or a folder of topic files
+            # (assets/coach/speech/<code>/*.lang: common, events, lesson, review, appraisal).
             path = os.path.join(root, "assets", *d, code + ".lang")
-            if not os.path.exists(path):
-                continue
+            if os.path.exists(path):
+                paths.append(path)
+            folder = os.path.join(root, "assets", *d, code)
+            if os.path.isdir(folder):
+                paths += [os.path.join(folder, n) for n in sorted(os.listdir(folder)) if n.endswith(".lang")]
+        for path in paths:
             with open(path, encoding="utf-8") as f:
                 for line in f:
                     line = line.strip()
