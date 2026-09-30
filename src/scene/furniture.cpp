@@ -57,7 +57,8 @@ void flatXZ(MeshData& d, const std::vector<vec3>& pts, bool up) {
 
 // Carved apron face: flat band with vertical flutes and a bead along the bottom edge.
 // The face lies in the plane through 'o' spanned by 'along' (length len) and +Y (height h),
-// facing 'out'.
+// facing 'out', and stands 2.5 mm (plus the bead) proud of that plane. Its top edge meets the
+// underside of the table top; its ends and its bottom are closed down to 1 mm behind the plane.
 void carvedApron(MeshData& d, vec3 o, vec3 along, vec3 out, float len, float h) {
     int nu = std::max(8, int(len / 0.004f));
     int nv = 14;
@@ -79,6 +80,23 @@ void carvedApron(MeshData& d, vec3 o, vec3 along, vec3 out, float len, float h) 
         return o + along * x + vec3(0, y, 0) + out * (relief + 0.0025f);
     };
     surfaceFacing(d, nu, nv, fn, out, UVMode::Meters);
+    // Returns at both ends and along the bottom, built from the grid's own boundary samples so they
+    // share its edges exactly. They run 1 mm into the leg block or the backing box behind the face,
+    // so the joints overlap: a single sheet would leave its ends and bottom open, and a grazing view
+    // past them would look into the apron (whose inner faces are culled) and out under the table.
+    const std::vector<float> us = linspace(0, 1, nu), vs = linspace(0, 1, nv);
+    auto back = [&](vec3 p) { return p - out * (dot(p - o, out) + 0.001f); };
+    for (size_t j = 0; j + 1 < vs.size(); ++j) {
+        vec3 a = fn(us.front(), vs[j]), b = fn(us.front(), vs[j + 1]);
+        quadFlat(d, a, b, back(b), back(a), -along, out);
+        a = fn(us.back(), vs[j]);
+        b = fn(us.back(), vs[j + 1]);
+        quadFlat(d, a, b, back(b), back(a), along, out);
+    }
+    for (size_t i = 0; i + 1 < us.size(); ++i) {
+        vec3 a = fn(us[i], vs.front()), b = fn(us[i + 1], vs.front());
+        quadFlat(d, a, b, back(b), back(a), vec3(0, -1, 0), along);
+    }
 }
 
 }  // namespace
@@ -87,9 +105,12 @@ Model buildTable() {
     MeshData top, carved, gilt;
     const float Y = layout::TABLE_TOP_Y, T = layout::TABLE_TOP_THICKNESS;
     const float hx = layout::TABLE_WIDTH * 0.5f, hz = layout::TABLE_DEPTH * 0.5f, rc = 0.05f;
-    // ---- Top: moulded edge sweep + flat top (exactly at TABLE_TOP_Y) + underside.
+    // ---- Top: moulded edge sweep + flat top (exactly at TABLE_TOP_Y) + underside. The underside
+    // starts less deep inside the outline than the corner radius: at an inset equal to the radius
+    // the mitred corner arcs would turn inside out into small bow ties.
     std::vector<vec3> outline = roundedRect(hx, hz, rc, 0.0f, 10);
-    Profile edge = {{-0.05f, Y - T},          {-0.012f, Y - T},         {-0.008f, Y - T + 0.002f}, {-0.004f, Y - T + 0.006f},
+    const float underInset = 0.045f;
+    Profile edge = {{-underInset, Y - T},     {-0.012f, Y - T},         {-0.008f, Y - T + 0.002f}, {-0.004f, Y - T + 0.006f},
                     {-0.001f, Y - T + 0.011f}, {0.0f, Y - T + 0.016f},  {0.0f, Y - 0.018f},         {-0.001f, Y - 0.012f},
                     {-0.003f, Y - 0.007f},     {-0.006f, Y - 0.0032f}, {-0.01f, Y - 0.001f},      {-0.016f, Y},
                     {-0.03f, Y}};
@@ -97,7 +118,7 @@ Model buildTable() {
     std::vector<vec3> inner = offsetPath(outline, vec3(0, 1, 0), -0.03f, true);
     for (auto& p : inner) p.y = Y;
     flatXZ(top, inner, true);
-    std::vector<vec3> under = offsetPath(outline, vec3(0, 1, 0), -0.05f, true);
+    std::vector<vec3> under = offsetPath(outline, vec3(0, 1, 0), -underInset, true);
     for (auto& p : under) p.y = Y - T;
     flatXZ(carved, under, false);
 
@@ -109,7 +130,7 @@ Model buildTable() {
         vec3 o(-lx + bh, yLong, sz * az);
         float len = 2.0f * (lx - bh);
         // Box behind the carved face (top against the table, back and bottom).
-        boxAA(carved, vec3(-lx + bh, yLong, sz > 0 ? az - th : -az), vec3(lx - bh, yTopA, sz > 0 ? az - 0.0005f : -az + th + 0.0005f),
+        boxAA(carved, vec3(-lx + bh, yLong, sz > 0 ? az - th : -az + 0.0005f), vec3(lx - bh, yTopA, sz > 0 ? az - 0.0005f : -az + th),
               F_NY | (sz > 0 ? F_NZ : F_PZ));
         if (sz > 0) carvedApron(carved, o, vec3(1, 0, 0), vec3(0, 0, 1), len, yTopA - yLong);
         else carvedApron(carved, vec3(lx - bh, yLong, -az), vec3(-1, 0, 0), vec3(0, 0, -1), len, yTopA - yLong);
@@ -120,12 +141,15 @@ Model buildTable() {
               F_NY | (sx > 0 ? F_NX : F_PX));
         if (sx > 0) carvedApron(carved, vec3(ax, yShort, lz - bh), vec3(0, 0, -1), vec3(1, 0, 0), len, yTopA - yShort);
         else carvedApron(carved, vec3(-ax, yShort, -lz + bh), vec3(0, 0, 1), vec3(-1, 0, 0), len, yTopA - yShort);
-        // Gilded central rosette on the short aprons.
+        // Gilded central rosette on the short aprons. It sits on the fluted field: a 3 mm collar
+        // under its rim (its own lathe, for a hard edge) sinks it below the bottom of the flutes,
+        // so no gap opens under the rim where a flute passes.
         vec3 n(sx, 0, 0), t(0, 0, 1), b = cross(t, n);
+        const mat4 xf = mat4(mat3(t, n, b), vec3(sx * (ax + 0.0025f), 0.5f * (yShort + yTopA), 0));
+        auto lobes = [](float r, float a, float) { return r * (0.72f + 0.28f * std::pow(std::fabs(std::cos(a * 5.0f)), 0.6f)); };
         Profile pr = {{0.035f, 0.0f}, {0.033f, 0.003f}, {0.026f, 0.007f}, {0.018f, 0.008f}, {0.012f, 0.007f}, {0.008f, 0.01f}, {0.0f, 0.012f}};
-        latheMod(gilt, pr, 60, mat4(mat3(t, n, b), vec3(sx * (ax + 0.0025f), 0.5f * (yShort + yTopA), 0)), [](float r, float a, float) {
-            return r * (0.72f + 0.28f * std::pow(std::fabs(std::cos(a * 5.0f)), 0.6f));
-        }, 1);
+        latheMod(gilt, pr, 60, xf, lobes, 1);
+        latheMod(gilt, {{0.035f, -0.003f}, {0.035f, 0.0f}}, 60, xf, lobes, 1);
     }
     // ---- Legs at the corners: block flush with the aprons, fluted tapering leg, gilded collar rosettes.
     for (float sx : {-1.0f, 1.0f})
