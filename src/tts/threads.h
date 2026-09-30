@@ -39,7 +39,6 @@ public:
 
 private:
     void workerMain();
-    void work();
 
     std::vector<std::thread> workers_;
     std::mutex mutex_;
@@ -47,7 +46,7 @@ private:
     const std::function<void(int)>* job_ = nullptr;
     int jobSize_ = 0;
     std::atomic<int> next_{0};
-    int busy_ = 0;            // helpers still inside the current job
+    int active_ = 0;          // helpers inside the current job
     uint64_t generation_ = 0;
     bool quit_ = false;
 };

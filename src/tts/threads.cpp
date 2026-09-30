@@ -37,26 +37,27 @@ ThreadPool::~ThreadPool() {
     for (std::thread& t : workers_) t.join();
 }
 
-void ThreadPool::work() {
-    const std::function<void(int)>& fn = *job_;
-    for (int i = next_.fetch_add(1); i < jobSize_; i = next_.fetch_add(1)) fn(i);
-}
-
 void ThreadPool::workerMain() {
     lowerThreadPriority();
     _mm_setcsr(_mm_getcsr() | 0x8040u);
     uint64_t seen = 0;
     for (;;) {
+        const std::function<void(int)>* fn;
+        int n;
         {
             std::unique_lock<std::mutex> lk(mutex_);
             wake_.wait(lk, [&] { return quit_ || generation_ != seen; });
             if (quit_) return;
             seen = generation_;
+            if (!job_) continue;   // woke after the others had finished that job
+            fn = job_;
+            n = jobSize_;
+            ++active_;
         }
-        work();
+        for (int i = next_.fetch_add(1); i < n; i = next_.fetch_add(1)) (*fn)(i);
         {
             std::lock_guard<std::mutex> lk(mutex_);
-            if (--busy_ == 0) done_.notify_one();
+            if (--active_ == 0) done_.notify_one();
         }
     }
 }
@@ -72,14 +73,16 @@ void ThreadPool::run(int n, const std::function<void(int)>& fn) {
         job_ = &fn;
         jobSize_ = n;
         next_.store(0);
-        busy_ = int(workers_.size());
         ++generation_;
     }
     wake_.notify_all();
-    work();
+    for (int i = next_.fetch_add(1); i < n; i = next_.fetch_add(1)) fn(i);
+    // Every item is taken. Wait only for the helpers still running one: a helper that has not
+    // woken up yet (the machine is busy: render thread, Stockfish) is not waited for, it finds no
+    // job when it does.
     std::unique_lock<std::mutex> lk(mutex_);
-    done_.wait(lk, [&] { return busy_ == 0; });
     job_ = nullptr;
+    done_.wait(lk, [&] { return active_ == 0; });
 }
 
 }  // namespace tts
