@@ -1,4 +1,4 @@
-// Opponent AI: Stockfish 16 compiled into the executable, running its UCI loop in a background
+// Opponent AI: Stockfish 19 compiled into the executable, running its UCI loop in a background
 // thread with in-memory streams (no child process, no files). Implemented by the stockfish work
 // package. All methods are called from the game (main) thread and never block for long.
 #pragma once
@@ -11,7 +11,7 @@ namespace ai {
 struct EngineSettings {
     int skillLevel = 20;        // UCI "Skill Level" 0..20 (20 = full strength); ignored if limitStrength
     bool limitStrength = false; // UCI_LimitStrength
-    int elo = 1500;             // UCI_Elo (Stockfish 16: 1320..3190)
+    int elo = 1500;             // UCI_Elo (Stockfish 19: 1320..3190)
     int depth = 0;              // go depth N (0 = none)
     int moveTimeMs = 0;         // go movetime N (0 = none)
     int64_t nodes = 0;          // go nodes N (0 = none)
@@ -22,9 +22,6 @@ struct EngineSettings {
     // UCI "MultiPV". While Skill Level / UCI_Elo weaken the engine, Stockfish picks its move among
     // max(4, multiPV) candidate lines, so values above 4 make it weaker still (used below 1320).
     int multiPV = 1;
-    // UCI "Use NNUE". Stockfish 16 still ships its classical hand-written evaluation; false makes
-    // shallow searches clearly weaker (used by the weakest preset). The network stays loaded.
-    bool useNNUE = true;
 };
 
 struct Preset {
@@ -57,8 +54,8 @@ public:
     bool start();               // spawns the engine thread (idempotent); false if unavailable
     void shutdown();            // sends quit and joins
     bool available() const;
-    // Only one Engine can run at a time (Stockfish's state is global): start() on a second
-    // instance returns false until the first one is shut down.
+    // Only one Engine can run at a time (the engine reads and writes the process's std::cin /
+    // std::cout): start() on a second instance returns false until the first one is shut down.
     bool ready() const;                  // UCI handshake done (commands sent earlier are queued)
     bool waitReady(int timeoutMs);       // blocks until ready(); for loading screens and tests
     void newGame();             // ucinewgame + isready
@@ -68,7 +65,7 @@ public:
     // with a cleared hash table and search history ("Clear Hash", the same as ucinewgame), so a
     // side never plays with what the other one computed: the weak presets are calibrated with a
     // hash table that only ever saw their own shallow searches (presets.cpp), and each side of an
-    // engine match has its own hash. Costs ~5-20 ms per switch at 64 MB (ai_engine_side_switch).
+    // engine match has its own hash. Costs ~25 ms per switch at 64 MB (ai_engine_side_switch).
     void configure(const EngineSettings& s);
     // Queues a hash / history clear before the next search.
     void clearHash();
@@ -78,9 +75,10 @@ public:
     bool sync(int timeoutMs);
 
     // Asynchronous search from the standard start position + moves (UCI long algebraic). A new
-    // request replaces a pending one; on an engine that is not running it fails at once
-    // (moveReady() true, takeMove() empty). Untimed games without depth/nodes/movetime search
-    // 1 s (handicapped) or 3 s (full strength); the humanised thinking time runs concurrently.
+    // request replaces a pending one; on an engine that is not running, or with a move that is
+    // not legal (never sent: Stockfish would end the process), it fails (moveReady() true,
+    // takeMove() empty). Untimed games without depth/nodes/movetime search 1 s (handicapped) or
+    // 3 s (full strength); the humanised thinking time runs concurrently.
     void requestMove(const std::vector<std::string>& uciMoves, const ClockInfo& clock);
     bool moveReady() const;
     // Returns the best move once ready ("e2e4", "e7e8q"), empty on failure. evalCp is from the
@@ -90,7 +88,8 @@ public:
     int lastSearchMs() const;   // wall time of the last completed move search
 
     // Quick evaluation for draw offers/claims (full strength whatever the preset, depth 12, at most
-    // 1.5 s), asynchronous as well; queued behind a running move search and vice versa.
+    // 1.5 s), asynchronous as well; queued behind a running move search and vice versa. Fails
+    // like requestMove(), with a neutral 0.
     void requestEval(const std::vector<std::string>& uciMoves);
     bool evalReady() const;
     int takeEval();             // centipawns from the side to move's point of view

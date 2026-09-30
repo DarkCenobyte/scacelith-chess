@@ -1,4 +1,4 @@
-// Tests for src/ai: presets, humanised timing, draw decisions and the embedded Stockfish 16
+// Tests for src/ai: presets, humanised timing, draw decisions and the embedded Stockfish 19
 // (start-up, moves, evaluation, stop, new games, shutdown/restart).
 #include "test.h"
 
@@ -69,6 +69,17 @@ bool plausibleMove(const std::vector<std::string>& moves, const std::string& m) 
 }
 
 const std::vector<std::string> kItalian = {"e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5", "c2c3", "g8f6", "d2d4", "e5d4"};
+
+std::vector<std::string> words(const std::string& s) {
+    std::vector<std::string> out;
+    for (size_t i = 0; i < s.size();) {
+        size_t j = s.find(' ', i);
+        if (j == std::string::npos) j = s.size();
+        if (j > i) out.push_back(s.substr(i, j - i));
+        i = j + 1;
+    }
+    return out;
+}
 
 ai::EngineSettings fast() {
     ai::EngineSettings s;
@@ -290,23 +301,58 @@ TEST(ai_every_preset_moves) {
     e.shutdown();
 }
 
-TEST(ai_classical_eval_toggle) {
-    // "Use NNUE" false/true switches between Stockfish's evaluations without reloading anything;
-    // evaluations always use the network, moves use the configured one.
+TEST(ai_special_moves) {
+    // Stockfish 19 ends the whole process on a "position" command it cannot replay, so every kind of
+    // move must reach it in the notation it expects: the four castlings, en passant by both sides
+    // and the four promotions, each as the last move of a request.
+    const std::string promotion = "e2e4 d7d5 e4d5 c7c6 d5c6 g8f6 c6b7 c8d7 b7a8";
+    const std::vector<std::vector<std::string>> lines = {
+        words("d2d4 d7d5 g1f3 b8c6 e2e3 c8f5 f1e2 d8d7 e1g1"),       // White castles kingside
+        words("d2d4 d7d5 g1f3 b8c6 e2e3 c8f5 f1e2 d8d7 e1g1 e8c8"),  // Black castles queenside
+        words("d2d4 g8f6 b1c3 g7g6 c1f4 f8g7 d1d2 e8g8"),            // Black castles kingside
+        words("d2d4 g8f6 b1c3 g7g6 c1f4 f8g7 d1d2 e8g8 e1c1"),       // White castles queenside
+        words("e2e4 a7a6 e4e5 d7d5 e5d6"),                           // White takes en passant
+        words("g1f3 d7d5 b1c3 d5d4 e2e4 d4e3"),                      // Black takes en passant
+        words(promotion + "q"), words(promotion + "r"), words(promotion + "b"), words(promotion + "n"),
+    };
     ai::Engine e;
     CHECK(e.start());
-    ai::EngineSettings s;
-    s.skillLevel = 0;
-    s.depth = 1;
-    s.useNNUE = false;
-    e.configure(s);
-    for (int i = 0; i < 3; ++i) {
-        e.requestMove(kItalian, ai::ClockInfo{});
-        CHECK(plausibleMove(kItalian, waitMove(e, 20000)));
-        e.requestEval({"e2e4", "e7e5", "g1f3", "d8h4", "f3h4"});
-        CHECK(waitEval(e, 20000));
-        CHECK(e.takeEval() < -500);
+    e.configure(fast());
+    for (const auto& line : lines) {
+        e.requestMove(line, ai::ClockInfo{});
+        std::string m = waitMove(e, 20000);
+        CHECK(plausibleMove(line, m));
+        if (!plausibleMove(line, m)) std::fprintf(stderr, "  after %s: '%s'\n", line.back().c_str(), m.c_str());
     }
+    e.requestEval(lines.back());  // evaluations send the same "position" command
+    CHECK(waitEval(e, 20000));
+    e.shutdown();
+}
+
+TEST(ai_illegal_line_not_sent) {
+    // A move list the game's rules reject never reaches Stockfish, which would end the process: the
+    // request fails (empty move, neutral evaluation) and the engine keeps working.
+    const std::vector<std::vector<std::string>> bad = {
+        {"e2e5"},                     // not a legal move
+        {"e2e4", "e7e5", "e1g1"},     // castling through pieces
+        {"e2e4", "d7d5", "e4e5", "f7f5", "h2h3", "b8c6", "e5f6"},  // en passant one move too late
+        {"e2e4", "e7e5", "e4e5"},     // blocked pawn
+        {"e2e4q"},                    // promotion letter on a quiet move
+        {"e2e4", ""},                 // empty move
+        {"e2e4", "e7e5 g1f3"},        // two moves in one
+    };
+    ai::Engine e;
+    CHECK(e.start());
+    e.configure(fast());
+    for (const auto& line : bad) {
+        e.requestMove(line, ai::ClockInfo{});
+        CHECK_EQ(waitMove(e, 5000), std::string());
+        e.requestEval(line);
+        CHECK(waitEval(e, 5000));
+        CHECK_EQ(e.takeEval(), 0);
+    }
+    e.requestMove(kItalian, ai::ClockInfo{});
+    CHECK(plausibleMove(kItalian, waitMove(e, 20000)));
     e.shutdown();
 }
 

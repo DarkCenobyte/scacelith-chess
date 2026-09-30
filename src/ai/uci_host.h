@@ -1,7 +1,7 @@
-// Process-wide host of the embedded Stockfish 16 (third_party/stockfish): runs the engine's UCI
+// Process-wide host of the embedded Stockfish 19 (third_party/stockfish): runs the engine's UCI
 // loop on a background thread with std::cin / std::cout redirected to in-memory, thread-safe line
-// queues. Stockfish keeps its state in globals, so there is exactly one host and one owner (an
-// ai::Engine) at a time. Internal to src/ai.
+// queues. The engine reads and writes the process's standard streams, so there is exactly one host
+// and one owner (an ai::Engine) at a time. Internal to src/ai.
 #pragma once
 #include <string>
 

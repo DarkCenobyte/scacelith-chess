@@ -22,8 +22,6 @@
 //  * MultiPV: the random pick is made among max(4, MultiPV) candidates, so a wider list lets the
 //    engine choose clearly worse moves more often, like a player who overlooks threats. 6 costs
 //    ~150 Elo, 7 ~220, and it saturates around 10 (~300).
-//  * Use NNUE = false: Stockfish 16's classical evaluation instead of the network, ~160-210 Elo
-//    weaker at depth 1 (its judgement of quiet moves is cruder).
 #include "ai/behavior.h"
 
 #include <algorithm>
@@ -51,7 +49,6 @@ namespace {
 // Measured effects on Skill Level 0 (Elo, see the file comment); applied to any handicapped
 // settings as an approximation.
 constexpr int kDepthCapPenalty = 156;
-constexpr int kClassicalEvalPenalty = 185;
 // Index = MultiPV (<= 4 is Stockfish's own minimum); 10 and more saturate.
 constexpr int kMultiPVPenalty[] = {0, 0, 0, 0, 0, 72, 148, 222, 243, 286, 295};
 
@@ -62,14 +59,13 @@ EngineSettings limited(int elo) {
     return s;
 }
 
-// Skill Level 0 searching one ply (+ quiescence) only.
-EngineSettings shallowSkillZero(int multiPV, bool useNNUE) {
+// A low Skill Level searching one or two plies (+ quiescence) only.
+EngineSettings shallowSkill(int level, int depth, int multiPV) {
     EngineSettings s;
-    s.skillLevel = 0;
-    s.depth = 1;
+    s.skillLevel = level;
+    s.depth = depth;
     s.multiPV = multiPV;
-    s.useNNUE = useNNUE;
-    s.hashMB = 16;  // a one-ply search barely touches the hash table
+    s.hashMB = 16;  // a shallow search barely touches the hash table
     return s;
 }
 
@@ -96,7 +92,6 @@ int Engine::estimateElo(const EngineSettings& s) {
         const int n = int(sizeof(kMultiPVPenalty) / sizeof(kMultiPVPenalty[0]));
         elo -= kMultiPVPenalty[std::min(s.multiPV, n - 1)];
     }
-    if (!s.useNNUE) elo -= kClassicalEvalPenalty;
     return std::max(elo, 100);
 }
 
@@ -105,17 +100,15 @@ int Engine::estimateElo(const EngineSettings& s) {
 // fast games. The labels are Stockfish's (engine, CCRL-anchored) scale, not FIDE ratings.
 const std::vector<Preset>& presets() {
     static const std::vector<Preset> list = {
-        {"Novice", "Just learned the moves: hangs pieces and misses simple threats.", 800,
-         shallowSkillZero(7, false)},
-        {"Beginner", "Knows the basics, but still blunders material regularly.", 1000, shallowSkillZero(6, true)},
-        {"Casual", "A relaxed evening opponent: sensible moves, frequent mistakes.", 1200,
-         shallowSkillZero(1, true)},
+        {"Novice", "Just learned the moves: hangs pieces and misses simple threats.", 800, shallowSkill(0, 1, 9)},
+        {"Beginner", "Knows the basics, but still blunders material regularly.", 1000, shallowSkill(0, 1, 5)},
+        {"Casual", "A relaxed evening opponent: sensible moves, frequent mistakes.", 1200, shallowSkill(1, 2, 5)},
         {"Club Player", "Solid club player who punishes obvious blunders.", 1500, limited(1500)},
         {"Advanced", "Strong club player with good tactical vision.", 1800, limited(1800)},
         {"Expert", "Tournament expert: rarely errs, converts advantages.", 2100, limited(2100)},
         {"Master", "Master strength: deep calculation and fine positional play.", 2400, limited(2400)},
         {"Grandmaster", "Grandmaster level: extremely hard to beat.", 2700, limited(2700)},
-        {"Stockfish Max", "Stockfish 16 at full strength. Good luck.", 3500, EngineSettings{}},
+        {"Stockfish Max", "Stockfish 19 at full strength. Good luck.", 3500, EngineSettings{}},
         {"Custom", "Your own engine settings.", 0, EngineSettings{}},
     };
     return list;

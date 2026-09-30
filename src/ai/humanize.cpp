@@ -104,7 +104,7 @@ bool offersDraw(int evalCp, int plyCount, int pliesSinceOwnOffer) {
 
 bool sameStrength(const EngineSettings& a, const EngineSettings& b) {
     return a.skillLevel == b.skillLevel && a.limitStrength == b.limitStrength && a.elo == b.elo && a.depth == b.depth &&
-           a.moveTimeMs == b.moveTimeMs && a.nodes == b.nodes && a.multiPV == b.multiPV && a.useNNUE == b.useNNUE &&
+           a.moveTimeMs == b.moveTimeMs && a.nodes == b.nodes && a.multiPV == b.multiPV &&
            a.threads == b.threads && a.hashMB == b.hashMB && a.useClock == b.useClock;
 }
 
