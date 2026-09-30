@@ -13,6 +13,7 @@
 #include "ui_theme.h"
 #include "ui_widgets.h"
 #include "../chess/chess.h"
+#include "../core/embedded.h"
 #include "../game/online_session.h"
 #include "../game/settings.h"
 #include "../i18n/i18n.h"
@@ -37,7 +38,8 @@ using namespace theme;
 namespace {
 
 // ---- State ----------------------------------------------------------------------------------------
-enum class Page { Title, NewGame, Options, Credits, Watch, Online, Calibration };
+// debug::MenuPage casts to this by value: new pages go at the end, in both lists.
+enum class Page { Title, NewGame, Options, Credits, Watch, Online, Calibration, Coach, Licences };
 
 struct OptionsState {
     game::Settings work;
@@ -59,6 +61,7 @@ struct State {
     bool pageFresh = false;
     uint64_t menuFrame = 0;
     float presetScroll = 0.0f, presetScrollTarget = 0.0f;
+    float creditsScroll = 0.0f, creditsScrollTarget = 0.0f;
     bool resumeOnline = false;      // an online game started from the online page: back to it after
     bool optionsToOnline = false;   // Options opened from the online page: back to it on close
     // options (shared by both menus)
@@ -260,6 +263,8 @@ void copyOptions(game::Settings& dst, const game::Settings& src) {
     dst.effectsVolume = src.effectsVolume;
     dst.ambienceVolume = src.ambienceVolume;
     dst.ambience = src.ambience;
+    dst.voiceVolume = src.voiceVolume;
+    dst.subtitles = src.subtitles;
     dst.showLegalMoves = src.showLegalMoves;
     dst.showCoordinates = src.showCoordinates;
     dst.mouseSensitivity = src.mouseSensitivity;
@@ -280,6 +285,7 @@ bool sameOptions(const game::Settings& a, const game::Settings& b) {
            a.vsync == b.vsync && feq(a.renderScale, b.renderScale) && a.quality == b.quality && a.motionBlur == b.motionBlur &&
            a.depthOfField == b.depthOfField && feq(a.brightness, b.brightness) && feq(a.masterVolume, b.masterVolume) &&
            feq(a.effectsVolume, b.effectsVolume) && feq(a.ambienceVolume, b.ambienceVolume) && a.ambience == b.ambience &&
+           feq(a.voiceVolume, b.voiceVolume) && a.subtitles == b.subtitles &&
            a.showLegalMoves == b.showLegalMoves && a.showCoordinates == b.showCoordinates &&
            feq(a.mouseSensitivity, b.mouseSensitivity) && a.invertLook == b.invertLook && a.gameCursor == b.gameCursor &&
            a.autoPressClock == b.autoPressClock && a.ignoreOpponentHead == b.ignoreOpponentHead &&
@@ -516,6 +522,13 @@ bool optionsPage(MenuAction& act) {
             im::toggleRow(L("options.ambience"), s.ambience, row());
             im::tooltip(T("options.ambience.help"));
             im::sliderRow(L("options.ambience_volume"), s.ambienceVolume, 0.0f, 1.0f, 0.05f, pct, row(), s.ambience);
+            // Coach mode: its voice, and its words written at the bottom of the screen.
+            im::sliderRow(L("options.voice_volume"), s.voiceVolume, 0.0f, 1.0f, 0.05f, pct, row());
+            im::tooltip(T("options.voice_volume.help"));
+            int sub = std::clamp(s.subtitles, 0, 2);
+            if (im::selectorRow(L("options.subtitles"), sub, {T("options.subtitles.auto"), T("common.on"), T("common.off")}, row()))
+                s.subtitles = sub;
+            im::tooltip(T("options.subtitles.help"));
             break;
         }
         case 3: {
@@ -574,6 +587,8 @@ bool optionsPage(MenuAction& act) {
                 {"controls.sheet.keys", "controls.sheet"},
                 {"controls.moves.keys", "controls.moves"},
                 {"controls.menu.keys", "controls.menu"},
+                {"controls.coach_skip.keys", "controls.coach_skip"},
+                {"controls.coach_takeback.keys", "controls.coach_takeback"},
             };
             TextStyle ks = style(font::FACE_TITLE, 19.0f, gold, im::endAlign(), 0.14f);
             TextStyle as = style(font::FACE_TEXT, kBody, ivory, im::startAlign());
@@ -656,7 +671,7 @@ MenuAction titlePage(float t) {
     float slide = (1.0f - t) * 10.0f;
 
     TextStyle wm = style(font::FACE_TITLE, kWordmark, ivory, start, kTrackWordmark);
-    float wmBase = 330.0f + slide;
+    float wmBase = 296.0f + slide;
     float wmW = gfx::textWidth("SCACELITH", wm);
     TextStyle sh = wm;
     sh.color = vec4(0, 0, 0, 0.55f);
@@ -677,37 +692,53 @@ MenuAction titlePage(float t) {
     TextStyle sub = style(font::FACE_ITALIC, 30.0f, ivoryDim, start);
     gfx::text(T("menu.subtitle"), im::flipX(sr, x + 4.0f), ruleY + 48.0f, sub);
 
-    float ey = 490.0f + slide;
-    float eh = 62.0f, ew = 440.0f, step = 70.0f;
+    // Seven entries, then the player's rating and the version line at the bottom.
+    const int entries = 7;
+    float ey = 444.0f + slide;
+    float eh = 60.0f, ew = 440.0f, step = 68.0f;
+    int k = 0;
+    auto entry = [&]() { return im::flip(sr, Rect(x, ey + float(k++) * step, ew, eh)); };
     im::pushId("title");
     im::Id first = im::makeId("##menu.new_game");
-    if (im::menuEntry(L("menu.new_game"), im::flip(sr, Rect(x, ey, ew, eh)))) {
+    if (im::menuEntry(L("menu.new_game"), entry())) {
         setPage(Page::NewGame);
         im::sound(Sound::Open);
     }
-    if (im::menuEntry(L("menu.online"), im::flip(sr, Rect(x, ey + step, ew, eh)))) {
+    if (im::menuEntry(L("menu.coach"), entry())) {
+        setPage(Page::Coach);
+        im::sound(Sound::Open);
+    }
+    if (im::menuEntry(L("menu.online"), entry())) {
         setPage(Page::Online);
         im::sound(Sound::Open);
     }
-    if (im::menuEntry(L("menu.watch"), im::flip(sr, Rect(x, ey + 2.0f * step, ew, eh)))) {
+    if (im::menuEntry(L("menu.watch"), entry())) {
         setPage(Page::Watch);
         im::sound(Sound::Open);
     }
-    if (im::menuEntry(L("menu.options"), im::flip(sr, Rect(x, ey + 3.0f * step, ew, eh)))) {
+    if (im::menuEntry(L("menu.options"), entry())) {
         setPage(Page::Options);
         openOptions();
     }
-    if (im::menuEntry(L("menu.credits"), im::flip(sr, Rect(x, ey + 4.0f * step, ew, eh)))) {
+    if (im::menuEntry(L("menu.credits"), entry())) {
         setPage(Page::Credits);
         im::sound(Sound::Open);
     }
-    if (im::menuEntry(L("menu.quit"), im::flip(sr, Rect(x, ey + 5.0f * step, ew, eh)))) act = MenuAction::Quit;
+    if (im::menuEntry(L("menu.quit"), entry())) act = MenuAction::Quit;
     im::setDefaultFocus(first);
     im::popId();
 
-    detail::titleRating(im::flipX(sr, x), ey + 5.0f * step + 132.0f);
+    detail::titleRating(im::flipX(sr, x), ey + float(entries - 1) * step + 126.0f);
     TextStyle vs = style(font::FACE_ITALIC, 19.0f, withAlpha(muted, 0.85f), start);
     gfx::text(i18n::trf("menu.version", {i18n::ltr(detail::data().version)}), im::flipX(sr, x), v.y - 48.0f, vs);
+    // The voice of Coach mode is credited in the other bottom corner, on the version's baseline
+    // (small but legible). Challenge cards stack in that corner when signed in: it gives way to them.
+    if (game::onlineSession().incoming().empty()) {
+        TextStyle cs = style(font::FACE_ITALIC, 19.0f, withAlpha(muted, 0.85f), im::endAlign());
+        std::string credit = i18n::trf("menu.tts_credit", {i18n::ltr("Supertonic 3")});
+        cs.size = gfx::fitSize(credit, cs, v.x * 0.5f - x);
+        gfx::text(credit, im::flipX(sr, v.x - x), v.y - 48.0f, cs);
+    }
     gfx::popAlpha();
     return act;
 }
@@ -1079,45 +1110,290 @@ MenuAction newGamePage(NewGameSetup& setup, bool opened) {
 }
 
 // ---- Credits ----------------------------------------------------------------------------------------
-void creditsPage() {
+struct CreditsEntry { const char* head; const char* lines[3]; };
+const CreditsEntry kCredits[] = {
+    {"credits.game.head", {"credits.game", nullptr, nullptr}},
+    {"credits.engine.head", {"credits.engine", "credits.engine.licence", "credits.engine.data"}},
+    {"credits.voice.head", {"credits.voice", "credits.voice.licence", nullptr}},
+    {"credits.openings.head", {"credits.openings", nullptr, nullptr}},
+    {"credits.fonts.head", {"credits.fonts", "credits.fonts.hand", "credits.fonts.figures"}},
+};
+
+// Vertical scroll of a clipped area: the wheel over it, PageUp / PageDown, Home / End, and the
+// arrow keys when 'arrows' (pages whose buttons stand side by side, so Up / Down move nothing).
+// Returns the offset.
+float scrollArea(float& scroll, float& target, const Rect& area, float contentH, float lineH, bool arrows, bool opened) {
+    float maxScroll = std::max(0.0f, contentH - area.h);
+    if (area.contains(im::mouse()) && im::wheel() != 0.0f) target -= im::wheel() * lineH * 3.0f;
+    if (im::keyPressed(plat::KEY_PAGEDOWN)) target += area.h * 0.85f;
+    if (im::keyPressed(plat::KEY_PAGEUP)) target -= area.h * 0.85f;
+    if (im::keyPressed(plat::KEY_HOME)) target = 0.0f;
+    if (im::keyPressed(plat::KEY_END)) target = maxScroll;
+    int dy = 0;
+    if (arrows && im::consumeNavigation(nullptr, &dy)) target += float(dy) * lineH * 2.0f;
+    target = m::clamp(target, 0.0f, maxScroll);
+    scroll = opened ? target : std::min(im::approach(scroll, target, 16.0f), maxScroll);
+    return scroll;
+}
+
+// Scroll indicator (on the end side) and fades at the edges of a scrolled area (panel colour).
+void scrollDecor(const Rect& area, float scroll, float contentH) {
+    float maxScroll = contentH - area.h;
+    if (maxScroll <= 0.5f) return;
+    float bh = area.h * area.h / contentH;
+    Rect bar = im::flip(area, Rect(area.r() + 10.0f, area.y + (area.h - bh) * (scroll / maxScroll), 2.0f, bh));
+    gfx::fill(bar, withAlpha(gold, 0.35f), 1.0f);
+    vec4 pc(0.05f, 0.043f, 0.039f, 0.95f), pz(0.05f, 0.043f, 0.039f, 0.0f);
+    if (scroll > 0.5f) gfx::fillV(Rect(area.x, area.y, area.w, 26.0f), pc, pz);
+    if (scroll < maxScroll - 0.5f) gfx::fillV(Rect(area.x, area.b() - 26.0f, area.w, 26.0f), pz, pc);
+}
+
+void creditsPage(bool opened) {
     vec2 v = view();
     float t = ease(S.pageT);
     dimScene(t);
-    float w = std::min(1100.0f, v.x - 80.0f), h = 880.0f;
+    float w = std::min(1180.0f, v.x - 80.0f), h = 1000.0f;
     Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 14.0f, w, h);
     gfx::pushAlpha(t);
     im::panel(p);
     im::pageTitle(T("credits.title"), p.cx(), p.y + 80.0f);
-    struct Entry { const char* head; const char* lines[3]; };
-    static const Entry entries[] = {
-        {"credits.game.head", {"credits.game", nullptr, nullptr}},
-        {"credits.engine.head", {"credits.engine", "credits.engine.licence", "credits.engine.data"}},
-        {"credits.fonts.head", {"credits.fonts", "credits.fonts.hand", "credits.fonts.figures"}},
-    };
-    float y = p.y + 160.0f;
+    // The entries scroll between the title and the quote when they do not fit (long translations);
+    // when they fit they are centred in that space.
+    Rect area(p.x + 50.0f, p.y + 124.0f, p.w - 100.0f, p.h - 124.0f - 176.0f);
     TextStyle hs = style(font::FACE_TITLE, kSection, gold, HAlign::Center, 0.22f);
     TextStyle ls = style(font::FACE_TEXT, 24.0f, ivoryDim, HAlign::Center);
-    for (const Entry& e : entries) {
+    const float lineH = 32.0f, textW = w - 180.0f;
+    float contentH = 26.0f;
+    for (const CreditsEntry& e : kCredits) {
+        contentH += 40.0f;
+        for (const char* l : e.lines)
+            if (l) contentH += lineH * float(gfx::wrapLineCount(T(l), textW, ls));
+        contentH += 30.0f;
+    }
+    contentH -= 30.0f;
+    float scroll = scrollArea(S.creditsScroll, S.creditsScrollTarget, area, contentH, lineH, true, opened);
+    float y = area.y + 34.0f - scroll + std::max(0.0f, (area.h - contentH) * 0.5f);
+    gfx::pushClip(area);
+    for (const CreditsEntry& e : kCredits) {
         gfx::text(T(e.head), p.cx(), y, hs);
         y += 40.0f;
         for (const char* l : e.lines) {
             if (!l) break;
-            y += 32.0f * float(gfx::textWrapped(T(l), p.cx(), y, w - 160.0f, ls, 32.0f));
+            y += lineH * float(gfx::textWrapped(T(l), p.cx(), y, textW, ls, lineH));
         }
         y += 30.0f;
     }
+    gfx::popClip();
+    scrollDecor(area, scroll, contentH);
     TextStyle qs = style(font::FACE_ITALIC, 24.0f, muted, HAlign::Center);
     qs.size = gfx::fitSize(T("credits.quote"), qs, w - 120.0f);
-    gfx::text(T("credits.quote"), p.cx(), p.b() - 140.0f, qs);
+    gfx::text(T("credits.quote"), p.cx(), p.b() - 128.0f, qs);
     im::pushId("credits");
     im::Id backId = im::makeId("##common.back");
-    bool back = im::button(L("common.back"), Rect(p.cx() - 130.0f, p.b() - 110.0f, 260.0f, 56.0f), im::ButtonKind::Secondary);
+    float bw = 260.0f, bh = 56.0f, gap = 24.0f, by = p.b() - 96.0f;
+    bool back = im::button(L("common.back"), im::flip(p, Rect(p.cx() - gap * 0.5f - bw, by, bw, bh)), im::ButtonKind::Secondary);
+    if (im::button(L("credits.licences"), im::flip(p, Rect(p.cx() + gap * 0.5f, by, bw, bh)), im::ButtonKind::Secondary)) {
+        setPage(Page::Licences);
+        im::sound(Sound::Open);
+    }
     im::setDefaultFocus(backId);
     im::popId();
     gfx::popAlpha();
     if (back || im::consumeBack()) {
         if (!back) im::sound(Sound::Back);
         setPage(Page::Title);
+    }
+}
+
+// ---- Licences ---------------------------------------------------------------------------------------
+// The licence texts embedded with the game, shown as they are (in English): every file under
+// assets/licences/ (the coach's voice model, ...), then the licences of the engine and of the
+// typefaces that already ship with the game.
+struct LicenceFile {
+    std::string path, title, subtitle;
+};
+
+const std::vector<LicenceFile>& licenceFiles() {
+    static const std::vector<LicenceFile> files = [] {
+        // Display names of the files known today; any other file shows its name ("A-B.txt" -> "A B").
+        static const struct { const char* path; const char* title; const char* subtitle; } known[] = {
+            {"assets/licences/Supertonic-3-OpenRAIL-M.txt", "Supertonic 3", "OpenRAIL-M"},
+            {"assets/fonts/GPL-3.0.txt", "GNU GPL v3", "Scacelith, Stockfish, GNU FreeFont"},
+            {"assets/fonts/LICENSE-FreeFont.txt", "GNU FreeFont", "GPL v3 + font exception"},
+            {"assets/fonts/OFL-EBGaramond.txt", "EB Garamond", "SIL Open Font License 1.1"},
+            {"assets/fonts/OFL-Cinzel.txt", "Cinzel", "SIL Open Font License 1.1"},
+            {"assets/fonts/OFL-Amiri.txt", "Amiri", "SIL Open Font License 1.1"},
+            {"assets/fonts/hand/OFL-Caveat.txt", "Caveat", "SIL Open Font License 1.1"},
+            {"assets/fonts/hand/OFL-MarckScript.txt", "Marck Script", "SIL Open Font License 1.1"},
+            {"assets/fonts/hand/OFL-BadScript.txt", "Bad Script", "SIL Open Font License 1.1"},
+            {"assets/fonts/hand/OFL-ArefRuqaa.txt", "Aref Ruqaa", "SIL Open Font License 1.1"},
+            {"assets/fonts/hand/OFL-KleeOne.txt", "Klee One", "SIL Open Font License 1.1"},
+            {"assets/fonts/hand/OFL-LXGWWenKai.txt", "LXGW WenKai", "SIL Open Font License 1.1"},
+            {"assets/fonts/hand/OFL-LXGWWenKaiTC.txt", "LXGW WenKai TC", "SIL Open Font License 1.1"},
+        };
+        auto describe = [&](const std::string& path) {
+            LicenceFile f;
+            f.path = path;
+            for (const auto& k : known)
+                if (path == k.path) {
+                    f.title = k.title;
+                    f.subtitle = k.subtitle;
+                    return f;
+                }
+            std::string stem = path.substr(path.rfind('/') + 1);
+            stem = stem.substr(0, stem.size() - 4);
+            for (char& ch : stem)
+                if (ch == '-' || ch == '_') ch = ' ';
+            f.title = stem;
+            return f;
+        };
+        const std::string dir = "assets/licences/";
+        std::vector<LicenceFile> out;
+        size_t count = 0;
+        const embedded::File* all = embedded::all(&count);
+        for (size_t i = 0; i < count; ++i) {  // sorted by path
+            std::string path = all[i].path;
+            if (path.compare(0, dir.size(), dir) == 0 && path.size() > dir.size() + 4 && path.compare(path.size() - 4, 4, ".txt") == 0)
+                out.push_back(describe(path));
+        }
+        for (const auto& k : known)
+            if (dir.compare(0, dir.size(), k.path, dir.size()) != 0 && embedded::find(k.path)) out.push_back(describe(k.path));
+        return out;
+    }();
+    return files;
+}
+
+// The selected licence laid out once for a width: its lines (tabs expanded, no '\r') and the
+// number of wrapped lines each takes.
+struct LicenceLayout {
+    int file = -1;
+    float width = 0.0f;
+    int generation = -1;
+    std::vector<std::string> lines;
+    std::vector<int> rows;
+    int totalRows = 0;
+};
+
+const LicenceLayout& licenceLayout(int file, float width, const TextStyle& st) {
+    static LicenceLayout lay;
+    if (lay.file == file && std::fabs(lay.width - width) < 0.5f && lay.generation == font::atlasGeneration()) return lay;
+    lay = LicenceLayout();
+    lay.file = file;
+    lay.width = width;
+    lay.generation = font::atlasGeneration();
+    std::string text = embedded::text(licenceFiles()[size_t(file)].path.c_str());
+    std::string line;
+    auto flush = [&]() {
+        int n = line.empty() || gfx::textWidth(line, st) <= width ? 1 : std::max(1, gfx::wrapLineCount(line, width, st));
+        lay.lines.push_back(line);
+        lay.rows.push_back(n);
+        lay.totalRows += n;
+        line.clear();
+    };
+    for (char ch : text) {
+        if (ch == '\r') continue;
+        if (ch == '\n') flush();
+        else if (ch == '\t') line += "    ";
+        else line += ch;
+    }
+    if (!line.empty()) flush();
+    return lay;
+}
+
+// Page opened from the credits: the list of licences on the start side, the selected text on
+// the other, scrolled with the wheel, PageUp / PageDown, Home / End.
+struct LicencesState {
+    int selected = 0;
+    float scroll = 0.0f, target = 0.0f;
+};
+LicencesState g_licences;
+
+void licencesPage(bool opened) {
+    vec2 v = view();
+    float t = ease(S.pageT);
+    dimScene(t);
+    const std::vector<LicenceFile>& files = licenceFiles();
+    if (opened) g_licences = LicencesState();
+    float w = std::min(1480.0f, v.x - 80.0f), h = 1000.0f;
+    Rect p(v.x * 0.5f - w * 0.5f, 40.0f + (1.0f - t) * 14.0f, w, h);
+    gfx::pushAlpha(t);
+    im::panel(p);
+    im::pageTitle(T("licences.title"), p.cx(), p.y + 78.0f);
+    im::pushId("licences");
+    float pad = 56.0f, listW = std::min(400.0f, p.w * 0.3f), gap = 48.0f;
+    float top = p.y + 138.0f, footer = p.b() - 118.0f;
+    Rect list = im::flip(p, Rect(p.x + pad, top, listW, footer - top - 20.0f));
+    Rect textArea = im::flip(p, Rect(p.x + pad + listW + gap, top + 4.0f, p.w - 2.0f * pad - listW - gap - 18.0f, footer - top - 28.0f));
+    gfx::vline(im::flipX(p, p.x + pad + listW + gap * 0.5f), top, footer - 20.0f, withAlpha(gold, 0.12f));
+    // The list: name and licence of each file.
+    int n = int(files.size());
+    g_licences.selected = std::clamp(g_licences.selected, 0, std::max(0, n - 1));
+    float rowH = std::min(58.0f, list.h / float(std::max(1, n)));
+    for (int i = 0; i < n; ++i) {
+        const LicenceFile& f = files[size_t(i)];
+        Rect r(list.x, list.y + float(i) * rowH, list.w, rowH - 4.0f);
+        im::Item it = im::item(im::makeId(i), r);
+        bool sel = g_licences.selected == i;
+        // The keyboard selects as it moves (like tabs); the mouse by a click.
+        if ((it.activated || (it.focused && im::keyboardMode())) && !sel) {
+            g_licences.selected = i;
+            g_licences.scroll = g_licences.target = 0.0f;
+            sel = true;
+            im::sound(Sound::Toggle);
+        }
+        if (sel) {
+            if (im::rtl()) gfx::fillH(r, withAlpha(gold, 0.04f), withAlpha(gold, 0.13f), 2.0f);
+            else gfx::fillH(r, withAlpha(gold, 0.13f), withAlpha(gold, 0.04f), 2.0f);
+            gfx::stroke(r, withAlpha(gold, 0.55f), 0.0f, 2.0f);
+            gfx::diamond(vec2(im::flipX(r, r.x), r.cy()), 4.0f, goldBright);
+        } else {
+            im::rowHighlight(r, it.hoverT);
+        }
+        bool two = !f.subtitle.empty() && rowH >= 50.0f;
+        TextStyle ns = style(font::FACE_TEXT, 23.0f, sel ? goldBright : theme::mix(ivory, goldBright, it.hoverT * 0.5f), im::startAlign());
+        ns.size = gfx::fitSize(f.title, ns, r.w - 40.0f);
+        gfx::text(f.title, im::flipX(r, r.x + 22.0f), two ? r.y + 24.0f : baselineCentered(r, ns), ns);
+        if (two) {
+            TextStyle ss = style(font::FACE_ITALIC, 17.0f, sel ? gold : muted, im::startAlign());
+            ss.size = gfx::fitSize(f.subtitle, ss, r.w - 40.0f);
+            gfx::text(f.subtitle, im::flipX(r, r.x + 22.0f), r.y + 45.0f, ss);
+        }
+    }
+    // The text, left to right in every language (the licences are in English).
+    if (n > 0) {
+        TextStyle ts = style(font::FACE_TEXT, 20.0f, ivoryDim, HAlign::Left);
+        ts.dir = 0;
+        const float lineH = 27.0f;
+        const LicenceLayout& lay = licenceLayout(g_licences.selected, textArea.w, ts);
+        float contentH = float(lay.totalRows) * lineH + 16.0f;
+        float scroll = scrollArea(g_licences.scroll, g_licences.target, textArea, contentH, lineH, false, opened);
+        gfx::pushClip(Rect(textArea.x - 4.0f, textArea.y, textArea.w + 8.0f, textArea.h));
+        float y = textArea.y + 20.0f - scroll;
+        for (size_t i = 0; i < lay.lines.size(); ++i) {
+            float hgt = float(lay.rows[i]) * lineH;
+            if (y + hgt > textArea.y - lineH && y - lineH < textArea.b() && !lay.lines[i].empty()) {
+                if (lay.rows[i] == 1) gfx::text(lay.lines[i], textArea.x, y, ts);
+                else gfx::textWrapped(lay.lines[i], textArea.x, y, textArea.w, ts, lineH);
+            }
+            y += hgt;
+        }
+        gfx::popClip();
+        scrollDecor(textArea, scroll, contentH);
+    }
+    // Footer: Back, and a note that the texts are the original ones.
+    float bw = 260.0f, bh = 58.0f, by = p.b() - 52.0f - bh;
+    gfx::hlineFade(p.x + 40.0f, p.r() - 40.0f, by - 26.0f, withAlpha(gold, 0.25f), 0.3f);
+    im::Id backId = im::makeId("##common.back");
+    bool back = im::button(L("common.back"), im::flip(p, Rect(p.x + pad, by, bw, bh)), im::ButtonKind::Secondary);
+    TextStyle note = style(font::FACE_ITALIC, 21.0f, muted, im::endAlign());
+    note.size = gfx::fitSize(T("licences.note"), note, p.w - 2.0f * pad - bw - 40.0f);
+    gfx::text(T("licences.note"), im::flipX(p, p.r() - pad), by + bh * 0.5f + 7.0f, note);
+    im::setDefaultFocus(backId);
+    im::popId();
+    gfx::popAlpha();
+    if (back || im::consumeBack()) {
+        if (!back) im::sound(Sound::Back);
+        setPage(Page::Credits);
     }
 }
 
@@ -1246,6 +1522,11 @@ MenuAction mainMenu(NewGameSetup& setup) {
 }
 
 MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
+    static CoachSetup coach;
+    return mainMenu(setup, watch, coach);
+}
+
+MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach) {
     im::Id menuId = im::makeId("##mainmenu");
     bool appear = im::appearing(menuId);
     if (appear) {
@@ -1270,7 +1551,14 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
                 S.optionsToOnline = false;
             }
             break;
-        case Page::Credits: creditsPage(); break;
+        case Page::Credits: creditsPage(fresh); break;
+        case Page::Licences: licencesPage(fresh); break;
+        case Page::Coach: {
+            bool back = false;
+            act = detail::coachPage(coach, ease(S.pageT), fresh, back);
+            if (back) setPage(Page::Title);
+            break;
+        }
         case Page::Watch: {
             bool back = false;
             act = detail::watchPage(watch, ease(S.pageT), fresh, back);
@@ -1292,7 +1580,7 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
     if (S.page != Page::Calibration) detail::onlineMenuOverlay(S.page == Page::Online);
     if (detail::onlineGameStarting()) S.resumeOnline = S.page == Page::Online;
     if (act == MenuAction::StartGame || act == MenuAction::Quit) setPage(Page::Title);
-    if (act == MenuAction::StartWatching) setPage(Page::Title);
+    if (act == MenuAction::StartWatching || act == MenuAction::StartCoach) setPage(Page::Title);
     return act;
 }
 
@@ -1532,6 +1820,7 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
         if (blockCard) im::pushBlock();
         im::panel(p);
         TextStyle rs = style(font::FACE_TITLE, 76.0f, goldBright, HAlign::Center, 0.08f);
+        rs.size = gfx::fitSize(res, rs, w - 80.0f, 0.4f);  // a word instead of a score (the end of a lesson)
         TextStyle glow = rs;
         glow.color = withAlpha(gold, 0.25f);
         glow.softness = 14.0f;

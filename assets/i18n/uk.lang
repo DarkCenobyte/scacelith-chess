@@ -69,6 +69,11 @@ options.effects = Ефекти
 options.ambience = Атмосфера
 options.ambience.help = Гомін зали: вогонь у каміні, далекі кроки, старий годинник.
 options.ambience_volume = Гучність атмосфери
+options.voice_volume = Голос тренера
+options.voice_volume.help = Гучність голосу тренера в режимі «Тренер».
+options.subtitles = Субтитри
+options.subtitles.auto = Автоматично
+options.subtitles.help = Слова тренера внизу екрана. Автоматично: показуються, коли тренер говорить не мовою меню (з китайським меню він говорить англійською). Показуються завжди, якщо його голос не встановлено.
 
 options.legal_moves = Показувати ходи
 options.legal_moves.help = Підсвічує поля, на які може піти торкнута фігура. Без підказки ніщо не вкаже, чи хід можливий: арбітр карає за неможливий хід, щойно ви натиснете на годинник.
@@ -112,6 +117,10 @@ controls.moves.keys = Tab
 controls.moves = Показати або сховати ходи
 controls.menu.keys = Esc
 controls.menu = Меню
+controls.coach_skip.keys = Пробіл
+controls.coach_skip = Тренер: пропустити пояснення
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Тренер: повернути хід, коли він пропонує
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = ЯСКРАВІСТЬ
@@ -199,11 +208,20 @@ credits.engine.head = ШАХОВИЙ РУШІЙ
 credits.engine = Stockfish 19, розробники Stockfish.
 credits.engine.licence = GNU General Public License v3.
 credits.engine.data = Його нейромережу навчено на даних проєкту Leela Chess Zero, що поширюються за ліцензією Open Database License (ODbL).
+credits.voice.head = ГОЛОС ТРЕНЕРА
+credits.voice = Синтетичне мовлення створено за допомогою Supertonic 3 для режиму «Тренер».
+credits.voice.licence = Supertonic 3 — модель компанії Supertone, що використовується за ліцензією OpenRAIL-M; її обмеження щодо використання поширюються на всіх користувачів (див. «Ліцензії»).
+credits.openings.head = ДЕБЮТИ
+credits.openings = Назви дебютів із бази chess-openings сайту lichess.org, переданої в суспільне надбання (CC0).
 credits.fonts.head = ШРИФТИ
 credits.fonts = EB Garamond — Георг Даффнер, Cinzel — Натанаель Гама, Amiri — Халед Хосні.
 credits.fonts.hand = Рукописні: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
 credits.fonts.figures = Шахові фігури з GNU FreeFont (GPL v3 з винятком для шрифтів).
 credits.quote = «Шахи — це мистецтво аналізу».  — Михайло Ботвинник
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Ліцензії
+licences.title = ЛІЦЕНЗІЇ
+licences.note = Тексти ліцензій наведено в оригіналі, англійською мовою.
 
 # ---- Pause menu --------------------------------------------------------------------------------
 pause.title = ПАУЗА
@@ -834,3 +852,67 @@ hotseat.gameover.friendly = {0} проти {1} · товариська парт�
 # {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
 hotseat.elo.change = {0} {1} → {2} ({3})
 hotseat.elo.unrated = Ця партія не рейтингова.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Тренер
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Синтетичне мовлення створено за допомогою {0} для режиму «Тренер»
+# Coach page
+coach.title = ТРЕНЕР
+coach.section.level = РІВЕНЬ
+coach.section.lesson = З ТРЕНЕРОМ
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Ело
+# {0} = coach.band
+coach.band_for = Для гравців із рейтингом {0}
+coach.completed = Пройдено
+coach.recommended = Рекомендовано
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Правила шахів
+coach.level.0.desc = Інтерактивний урок, правило за правилом.
+coach.level.0.detail = Тренер розставляє невеликі позиції й показує, як ходить і б’є кожна фігура, потім рокіровку, перетворення пішака, шах і мат. Кожну ідею ви пробуєте самі на дошці.
+coach.level.1.name = Перші кроки
+coach.level.1.desc = Що під ударом, що залишилося без захисту.
+coach.level.1.detail = Тренер грає м’яко й пояснює простими словами: які ваші фігури під ударом, які залишилися без захисту і як їх зберегти.
+coach.level.2.name = Початківець
+coach.level.2.desc = Проста тактика, розвиток, безпека короля.
+coach.level.2.detail = Вилки та зв’язки називаються своїми іменами. Тренер говорить про розвиток фігур і про безпеку вашого короля.
+coach.level.3.name = Аматор
+coach.level.3.desc = Плани, пішакова структура, єдині ходи.
+coach.level.3.detail = Тренер пояснює плани й пішакові структури та попереджає, коли позицію тримає лише один хід.
+coach.level.4.name = Клубний гравець
+coach.level.4.desc = Ходи-кандидати, оцінка в пішаках.
+coach.level.4.detail = Тренер порівнює ходи-кандидати й дає оцінку в пішаках, як клубний тренер.
+coach.level.5.name = Сильний клубний гравець
+coach.level.5.desc = Стислі варіанти, позиційні терміни.
+coach.level.5.detail = Короткі зауваження, конкретні варіанти й мова позиційної гри.
+coach.level.6.name = Експерт
+coach.level.6.desc = Лаконічні зауваження, глибокі варіанти, оцінки в цифрах.
+coach.level.6.detail = Небагатослівно, як між сильними гравцями: варіанти на кілька ходів уперед і оцінки в цифрах.
+coach.note.clock = Без годинника: думайте стільки, скільки потрібно.
+coach.note.takeback = Після грубої помилки тренер показує, що пішло не так, і пропонує повернути хід.
+coach.note.lesson = Ви граєте білими; тренер розставляє кожну вправу на дошці.
+coach.note.unrated = Партії з тренером не впливають на рейтинг.
+coach.colour = Ваш колір
+coach.colour.help = Колір, яким ви граєте проти тренера. По черзі: білі й чорні змінюються від партії до партії. Урок про правила завжди грається білими.
+coach.colour.alternate = По черзі
+# Shown when the voice files (the coach folder next to the game) are missing.
+coach.no_voice = Голос тренера не знайдено (тека coach): він говоритиме лише субтитрами.
+# At the table
+coach.speaker = ТРЕНЕР
+coach.skip = Пропустити
+coach.offer.title = ПОВЕРНУТИ ХІД?
+coach.offer.text = Тренер пропонує повернути ваш останній хід, щоб ви пошукали кращий.
+coach.offer.hint = Backspace — повернути. Торкнутися фігури — грати далі.
+coach.offer.accept = Повернути
+coach.offer.decline = Грати далі
+coach.pause.take_back = Повернути мій хід
+coach.pause.take_back.help = Скасовує ваш останній хід, а також відповідь тренера, якщо він уже зробив хід.
+coach.confirm.resign = Здати цю партію? Переможцем буде оголошено тренера.
+coach.confirm.leave = Повернутися до головного меню? Цю партію з тренером буде перервано.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Зіграти ще
+coach.gameover.unrated = Ця партія з тренером не рейтингова.
+coach.lesson.done = ЧУДОВО
+coach.lesson.done.line = Тепер ви знаєте правила шахів.
+coach.lesson.next = Перша партія

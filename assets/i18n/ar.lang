@@ -71,6 +71,11 @@ options.effects = المؤثرات
 options.ambience = الأجواء
 options.ambience.help = همهمة القاعة: النار، ووقع خطى بعيدة، والساعة القديمة.
 options.ambience_volume = صوت الأجواء
+options.voice_volume = صوت المدرّب
+options.voice_volume.help = مستوى صوت المدرّب في وضع المدرّب.
+options.subtitles = الترجمة النصية
+options.subtitles.auto = تلقائي
+options.subtitles.help = كلمات المدرّب مكتوبةً أسفل الشاشة. تلقائي: تظهر حين لا يتحدث المدرّب لغة القوائم (مع القوائم الصينية يتحدث الإنجليزية). وتظهر دائمًا إن لم يكن صوته مثبّتًا.
 
 options.legal_moves = إظهار النقلات القانونية
 options.legal_moves.help = يميّز المربعات التي تستطيع القطعة الملموسة بلوغها. عند إيقافه لا شيء يخبرك إن كانت النقلة قانونية: يعاقب الحكم على النقلة غير القانونية بمجرد ضغطك على الساعة.
@@ -114,6 +119,10 @@ controls.moves.keys = Tab
 controls.moves = إظهار قائمة النقلات أو إخفاؤها
 controls.menu.keys = Esc
 controls.menu = القائمة
+controls.coach_skip.keys = المسافة
+controls.coach_skip = المدرّب: تخطّي ما يقوله
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = المدرّب: استرجاع النقلة حين يعرض ذلك
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = السطوع
@@ -201,11 +210,20 @@ credits.engine.head = محرّك الشطرنج
 credits.engine = Stockfish 19، من تطوير فريق Stockfish.
 credits.engine.licence = رخصة جنو العمومية العامة، الإصدار 3.
 credits.engine.data = تم تدريب شبكته العصبية على بيانات قدمها مشروع Leela Chess Zero، وهي متاحة بموجب رخصة قاعدة البيانات المفتوحة (ODbL).
+credits.voice.head = صوت المدرّب
+credits.voice = كلام اصطناعي مولَّد بواسطة Supertonic 3 لوضع المدرّب.
+credits.voice.licence = نموذج Supertonic 3 من إنتاج شركة Supertone، ويُستخدم بموجب رخصة OpenRAIL-M التي تسري قيود الاستخدام فيها على كل من يستخدمه (انظر التراخيص).
+credits.openings.head = الافتتاحيات
+credits.openings = أسماء الافتتاحيات مأخوذة من قاعدة بيانات chess-openings لموقع lichess.org، المهداة إلى الملك العام وفق CC0.
 credits.fonts.head = الخطوط
 credits.fonts = EB Garamond لجورج دافنر، وCinzel لناتانايل غاما، وAmiri لخالد حسني.
 credits.fonts.hand = خطوط اليد: Caveat وMarck Script وBad Script وAref Ruqaa وKlee One وLXGW WenKai ‏(SIL Open Font License).
 credits.fonts.figures = رموز الشطرنج من GNU FreeFont ‏(GPL v3 مع استثناء الخطوط).
 credits.quote = «الشطرنج هو فن التحليل.»  — ميخائيل بوتفينيك
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = التراخيص
+licences.title = التراخيص
+licences.note = تُعرض التراخيص بنصّها الإنجليزي الأصلي.
 
 # ---- Pause menu --------------------------------------------------------------------------------
 pause.title = إيقاف مؤقت
@@ -838,3 +856,67 @@ hotseat.gameover.friendly = {0} ضد {1} · مباراة ودية
 # {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
 hotseat.elo.change = {0} {1} ← {2} ({3})
 hotseat.elo.unrated = هذه المباراة غير محتسبة.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = المدرّب
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = كلام اصطناعي مولَّد بواسطة {0} لوضع المدرّب
+# Coach page
+coach.title = المدرّب
+coach.section.level = المستوى
+coach.section.lesson = مع المدرّب
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} إيلو
+# {0} = coach.band
+coach.band_for = للاعبين المصنَّفين {0}
+coach.completed = مكتمل
+coach.recommended = موصى به
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = قواعد الشطرنج
+coach.level.0.desc = درس تفاعلي، قاعدة تلو الأخرى.
+coach.level.0.detail = يرتّب المدرّب مواقف صغيرة ويُريك كيف تتحرك كل قطعة وكيف تأسر، ثم التبييت والترقية والكش والكش مات. وتجرّب كل فكرة بنفسك على الرقعة.
+coach.level.1.name = الخطوات الأولى
+coach.level.1.desc = ما المهدَّد، وما بقي بلا حماية.
+coach.level.1.detail = يلعب المدرّب بلطف ويشرح بكلمات بسيطة: أيّ قطعك مهدَّدة، وأيّها بقي بلا حماية، وكيف تحافظ عليها.
+coach.level.2.name = مبتدئ
+coach.level.2.desc = تكتيكات بسيطة، تطوير القطع، أمان الملك.
+coach.level.2.detail = تُسمّى الشوكة والتثبيت بأسمائهما. ويتحدث المدرّب عن تطوير قطعك وحماية ملكك.
+coach.level.3.name = متوسط
+coach.level.3.desc = الخطط، بنية البيادق، النقلات الوحيدة.
+coach.level.3.detail = يشرح المدرّب الخطط وبنى البيادق، وينبّهك حين لا تصمد الوضعية إلا بنقلة واحدة.
+coach.level.4.name = لاعب نادٍ
+coach.level.4.desc = النقلات المرشّحة، التقييم بالبيادق.
+coach.level.4.detail = يوازن المدرّب بين النقلات المرشّحة ويعطي التقييم بالبيادق، كما يفعل مدرّب النادي.
+coach.level.5.name = لاعب نادٍ قوي
+coach.level.5.desc = تفريعات موجزة، مصطلحات موضعية.
+coach.level.5.detail = ملاحظات قصيرة وتفريعات ملموسة ومفردات اللعب الموضعي.
+coach.level.6.name = خبير
+coach.level.6.desc = ملاحظات مقتضبة، تفريعات عميقة، تقييمات بالأرقام.
+coach.level.6.detail = كلام قليل كما بين اللاعبين الأقوياء: تفريعات تمتد عدة نقلات وتقييمات بالأرقام.
+coach.note.clock = بلا ساعة: خذ كل الوقت الذي تحتاجه.
+coach.note.takeback = بعد الخطأ الفادح، يُريك المدرّب موضع الخلل ويعرض عليك استرجاع النقلة.
+coach.note.lesson = تلعب بالقطع البيضاء، ويرتّب المدرّب كل تمرين على الرقعة.
+coach.note.unrated = المباريات مع المدرّب غير محتسبة في التصنيف.
+coach.colour = لونك
+coach.colour.help = اللون الذي تلعب به ضد المدرّب. بالتناوب: الأبيض ثم الأسود من مباراة إلى أخرى. يُلعب درس القواعد دائمًا بالقطع البيضاء.
+coach.colour.alternate = بالتناوب
+# Shown when the voice files (the coach folder next to the game) are missing.
+coach.no_voice = لم يُعثر على صوت المدرّب في مجلد coach: سيتحدث عبر الترجمة النصية فقط.
+# At the table
+coach.speaker = المدرّب
+coach.skip = تخطّي
+coach.offer.title = استرجاع النقلة؟
+coach.offer.text = يعرض عليك المدرّب استرجاع نقلتك الأخيرة لتبحث عن نقلة أفضل.
+coach.offer.hint = مفتاح Backspace يسترجعها. لمس أي قطعة يعني متابعة اللعب.
+coach.offer.accept = استرجاع
+coach.offer.decline = متابعة اللعب
+coach.pause.take_back = استرجاع نقلتي
+coach.pause.take_back.help = يسترجع نقلتك الأخيرة، وردّ المدرّب إن كان قد لعب.
+coach.confirm.resign = هل تستسلم في هذه المباراة؟ سيُعلَن المدرّب فائزًا.
+coach.confirm.leave = هل تعود إلى القائمة الرئيسية؟ ستُلغى هذه المباراة مع المدرّب.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = العب مجددًا
+coach.gameover.unrated = هذه المباراة مع المدرّب غير محتسبة.
+coach.lesson.done = أحسنت
+coach.lesson.done.line = أصبحت تعرف قواعد الشطرنج.
+coach.lesson.next = المباراة الأولى

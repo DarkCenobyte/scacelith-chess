@@ -4,6 +4,10 @@
 //                                     watch|viewer-pause|viewer-hud|viewer-gameover|gameover-elo|
 //                                     calibration (first start; the slider starts at the .ini's
 //                                     brightness)
+//   coach mode: coach (the coach page), coach-novoice (the same without the voice files), licences
+//     (credits > Licences), coach-hud (a subtitle, the takeback offer card, the skip hint),
+//     coach-subtitle (a subtitle alone; --ui-text <text> replaces the sample line), coach-pause,
+//     coach-gameover, coach-lesson-done
 //   hot-seat (two players on one PC): newgame-hotseat (New Game with "Human, same PC"),
 //     hotseat-hud (players, caption, draw offer card), hotseat-confirm (named resignation),
 //     hotseat-gameover (both names and ratings)
@@ -62,6 +66,7 @@ public:
             game::settings().handStyle = ui::font::HandStyle(std::atoi(ctx.argValue("--ui-hand").c_str()) % ui::font::HAND_STYLE_COUNT);
         black_ = ctx.hasArg("--ui-black");
         drawn_ = ctx.hasArg("--ui-draw");
+        text_ = ctx.argValue("--ui-text");
         kb_ = ctx.hasArg("--ui-kb");
         std::string mouse = ctx.argValue("--ui-mouse");
         float mx = 0, my = 0;
@@ -143,6 +148,11 @@ public:
             ui::debug::setOptionsTab(tab_);
         }
         if (screen == "credits") ui::debug::openMenuPage(ui::debug::MenuPage::Credits);
+        if (screen == "licences") ui::debug::openMenuPage(ui::debug::MenuPage::Licences);
+        if (screen == "coach" || screen == "coach-novoice") {
+            ui::debug::openMenuPage(ui::debug::MenuPage::Coach);
+            coach_.voiceAvailable = screen == "coach";
+        }
         if (screen == "calibration") ui::debug::openMenuPage(ui::debug::MenuPage::Calibration);
         if (screen == "watch") ui::debug::openMenuPage(ui::debug::MenuPage::Watch);
         if (screen == "confirm") ui::debug::openPauseConfirm(1);
@@ -277,8 +287,37 @@ public:
         const std::string& s = screen_;
         if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
         if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "credits" ||
-            s == "watch" || s == "calibration" || menu_) {
-            a = ui::mainMenu(setup_, watch_);
+            s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || menu_) {
+            a = ui::mainMenu(setup_, watch_, coach_);
+        } else if (s == "coach-hud" || s == "coach-subtitle") {
+            ui::Subtitle sub;
+            sub.text = text_.empty() ? i18n::tr("coach.offer.text") : text_;
+            sub.age = 1.0f;
+            sub.duration = ui::subtitleDuration(sub.text, 4.0f);
+            ui::subtitles(sub);
+            if (s == "coach-hud") {
+                ui::CoachHud hud;
+                hud.offer = true;
+                hud.skippable = true;
+                ui::CoachHudAction ca = ui::coachHud(hud);
+                if (ca != ui::CoachHudAction::None) LOGI("ui viewer: coach hud -> %d", int(ca));
+            }
+        } else if (s == "coach-pause") {
+            ui::CoachPause p;
+            p.canTakeBack = true;
+            p.canOfferDraw = true;
+            p.canClaimDraw = true;
+            a = ui::coachPauseMenu(p);
+        } else if (s == "coach-gameover") {
+            ui::GameOverExtras x;
+            x.detail = i18n::tr("coach.gameover.unrated");
+            x.primaryLabel = i18n::tr("coach.gameover.again");
+            a = ui::gameOver("0-1", chess::endReasonText(chess::GameEndReason::Checkmate), false, false, 38, x);
+        } else if (s == "coach-lesson-done") {
+            ui::GameOverExtras x;
+            x.line = i18n::tr("coach.lesson.done.line");
+            x.primaryLabel = i18n::tr("coach.lesson.next");
+            a = ui::gameOver(i18n::tr("coach.lesson.done"), i18n::tr("coach.level.0.name"), true, false, -1, x);
         } else if (s == "hotseat-hud") {
             ui::HotSeatHud hud;
             hud.names[0] = "Alice";
@@ -386,6 +425,8 @@ private:
     game::Settings saved_;
     ui::NewGameSetup setup_;
     ui::WatchSetup watch_;
+    ui::CoachSetup coach_;
+    std::string text_;
     std::string screen_;
     int tab_ = 0;
     bool black_ = false, drawn_ = false, kb_ = false, quit_ = false;

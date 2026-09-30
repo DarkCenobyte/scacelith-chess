@@ -95,7 +95,9 @@ enum class MenuAction {
     None, StartGame, Quit, Resume, Resign, OfferDraw, ClaimDraw, BackToMainMenu, OptionsChanged, Rematch,
     StartWatching,  // "Watch a Game" page: Start (the WatchSetup holds the choice)
     Abort,          // online: abort the game (before your first move)
-    Report          // online: report the opponent (Esc menu, game over card)
+    Report,         // online: report the opponent (Esc menu, game over card)
+    StartCoach,     // Coach page: Start (the CoachSetup holds the choice)
+    TakeBack        // coach game, Esc menu: take back the player's last move
 };
 
 // "Watch a Game" (viewer mode): two Stockfish players. The page starts from the last choices saved
@@ -116,6 +118,9 @@ struct WatchSetup {
 MenuAction mainMenu(NewGameSetup& setup);
 // Same, with the "Watch a Game" entry filling 'watch' (returns StartWatching on its Start).
 MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch);
+// Same, with the "Coach" entry filling 'coach' (returns StartCoach on its Start; see CoachSetup).
+struct CoachSetup;
+MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach);
 // In-game pause menu (Esc). canClaimDraw enables the claim entry; canOfferDraw = false greys out
 // "Offer draw" (e.g. an offer is already pending). Esc resumes.
 MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw = true);
@@ -186,6 +191,75 @@ struct HotSeatHud {
 };
 enum class HotSeatAction { None, AcceptDraw, DeclineDraw };
 HotSeatAction hotSeatHud(const HotSeatHud& hud);
+
+// ---- Coach mode (ui_coach.cpp) ------------------------------------------------------------------
+// The coach page (title entry "Coach"), the coach's subtitles, the takeback offer card and the Esc
+// menu of a coach game. Names, descriptions and texts of the levels come from assets/i18n
+// (coach.level.<n>.name / .desc / .detail).
+//
+// Levels, index = level: 0 is the interactive lesson on the rules, then the player's Elo bands.
+struct CoachLevelInfo {
+    int eloLow = 0, eloHigh = 0;  // band shown on the page ("600–900"); both 0 = the rules lesson;
+                                  // eloHigh 0 = open band ("2100+")
+};
+// Replaces the default list (0 rules, 600-900, 900-1200, 1200-1500, 1500-1800, 1800-2100, 2100+).
+// A level without translated texts shows its band only.
+void setCoachLevels(const std::vector<CoachLevelInfo>& levels);
+const std::vector<CoachLevelInfo>& coachLevels();
+
+// Choices of the coach page. The page starts from game::settings() [coach] and writes them back
+// (and saves the .ini) on Start.
+struct CoachSetup {
+    int level = 1;               // index into coachLevels(): 0 = the rules lesson
+    int colour = 2;              // the player's colour: 0 White, 1 Black, 2 alternate (the rules
+                                 // lesson is always played with White: Settings::coachPlayerColour)
+    // Set by the game before mainMenu(): false when the coach's voice files (the coach/ folder
+    // beside the executable) are missing or failed to load. The page then says in one line that
+    // the coach will speak through subtitles only.
+    bool voiceAvailable = true;
+};
+
+// The coach's words, bottom centre, over the game (LAYER_OVERLAY: under tooltips and the pointer,
+// above the game over card). The game owns the timing: 'age' follows the audio clock of the
+// utterance so that text and voice stay in step. Do not draw it while a menu is open (paused,
+// ui::optionsOpen()) or while the promotion picker is up: it would paint over them.
+struct Subtitle {
+    std::string text;            // already in the UI language; "" = none (the last text fades out)
+    float age = 1e9f;            // seconds since this line started (fades in over 0.18 s)
+    float duration = 0.0f;       // seconds it stays, then fades out over 0.35 s (subtitleDuration)
+    float bottom = 0.0f;         // lowest y the plate may use (reference px); 0 = 96 above the bottom
+                                 // edge. Pass v.y - 110 while the folded game over bar is shown.
+    bool speaker = true;         // "COACH" tag above the text
+};
+void subtitles(const Subtitle& s);
+// How long a subtitle should stay: the audio length or the time needed to read the text,
+// whichever is longer (about 15 Latin or 7 CJK characters a second), plus a short margin.
+float subtitleDuration(const std::string& text, float audioSeconds);
+
+// Coach overlay at the table: the takeback offer card (after a blunder has been explained) and
+// the "Space: skip" hint while something skippable runs (an explanation, a demonstration, the
+// appraisal at the end of the game). The card's buttons are mouse only: the keyboard stays with
+// the game, which reads the keys itself (Backspace accepts, as the Controls tab says; Space never
+// answers the card, it skips the coach's talk; touching a piece plays on).
+struct CoachHud {
+    bool offer = false;          // show the takeback card
+    std::string offerText;       // its question ("" = coach.offer.text)
+    bool skippable = false;      // show the skip hint (bottom, start side)
+};
+enum class CoachHudAction { None, TakeBack, PlayOn };
+CoachHudAction coachHud(const CoachHud& hud);
+
+// Esc menu of a coach game: Resume, Take back (last move), Offer draw, Claim draw, Resign,
+// Options, Main menu (confirmed). Entries whose flag is false are left out (Resume, Options and
+// Main menu always show). Returns Resume, TakeBack, OfferDraw, ClaimDraw, Resign, OptionsChanged
+// or BackToMainMenu. Esc resumes.
+struct CoachPause {
+    bool canTakeBack = false;    // the player has a move to take back
+    bool canOfferDraw = false;
+    bool canClaimDraw = false;
+    bool canResign = true;       // false in the rules lesson
+};
+MenuAction coachPauseMenu(const CoachPause& p);
 
 // ---- In-game pointer (ui_screens_game.cpp) -------------------------------------------------------
 // Drawn by the game during first-person play in place of the system arrow (hidden meanwhile), on
