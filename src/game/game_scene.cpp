@@ -244,6 +244,9 @@ void GameScene::finishLoading() {
         }
         glance_ = !watching() && ctx_->hasArg("--glance");
     } else {
+        // First start (no settings file yet; not in deterministic screenshot runs) or --calibrate:
+        // the brightness calibration comes before the title page.
+        if ((settings().firstLaunch && !ctx_->screenshotMode) || ctx_->hasArg("--calibrate")) ui::openBrightnessCalibration();
         enterMenu();
     }
 }

@@ -24,7 +24,7 @@ void screensReset();
 
 // Hooks used by the "ui" viewer scene to open a given state directly.
 namespace debug {
-enum class MenuPage { Title = 0, NewGame = 1, Options = 2, Credits = 3, Watch = 4, Online = 5 };
+enum class MenuPage { Title = 0, NewGame = 1, Options = 2, Credits = 3, Watch = 4, Online = 5, Calibration = 6 };
 void openMenuPage(MenuPage page);   // next mainMenu() call starts on this page
 // Next mainMenu() call starts on the online page's sub-page 'sub' (see debug::openOnlinePage).
 void openOnlineMenu(const std::string& sub);

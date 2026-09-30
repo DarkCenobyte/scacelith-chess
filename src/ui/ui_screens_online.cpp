@@ -1372,6 +1372,7 @@ void pageDirectHost(float t) {
     game::Settings& gs = game::settings();
     Rect p = beginPage(t, 1400.0f, 900.0f, T("online.direct.host_title"));
     im::pushId("directhost");
+    im::beginInfoMarks();  // the host's choices carry their definitions as in Options
     float pad = 64.0f, gap = 72.0f;
     float colW = (p.w - 2.0f * pad - gap) * 0.5f;
     float lx = im::flip(p, Rect(p.x + pad, 0, colW, 0)).x, rx = im::flip(p, Rect(p.x + pad + colW + gap, 0, colW, 0)).x;
@@ -1426,6 +1427,9 @@ void pageDirectHost(float t) {
     int color = std::clamp(gs.directColor, 0, 2);
     if (im::selectorRow(L("online.direct.your_color"), color, {T("online.color.random"), T("common.white"), T("common.black")}, row(lx, colW)))
         gs.directColor = color;
+    // The robots press the clock by themselves (both players), or each player presses it.
+    im::toggleRow(L("options.auto_press"), gs.directAutoPress, row(lx, colW));
+    im::tooltip(T("online.direct.auto_press.help"));
     TextStyle us = style(font::FACE_ITALIC, kCaption, muted, im::startAlign());
     gfx::text(T("online.direct.unrated"), im::flipX(Rect(lx, 0, colW, 0), lx), y + 16.0f, us);
 
@@ -1451,6 +1455,7 @@ void pageDirectHost(float t) {
         gfx::text(T("online.direct.port_range"), im::flipX(Rect(rx, 0, colW, 0), rx), cy + 130.0f, es);
     }
 
+    im::endInfoMarks();
     footerRule(p);
     bool back = backButton(p);
     bool host = primaryButton(p, "online.direct.host_button", portOk);
@@ -1470,6 +1475,7 @@ void pageDirectHost(float t) {
             opt.incSec = gs.directIncrementSeconds;
         }
         opt.hostColor = gs.directColor;
+        opt.autoPress = gs.directAutoPress;
         const std::string& nm = gs.playerName;
         opt.playerName = nm.empty() || nm == "Human" ? std::string(T("player.default_name")) : nm;
         ses().hostDirect(opt);
@@ -1741,23 +1747,27 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
         y += h;
         return r;
     };
-    // Server: two choices side by side (the official one first, with its address).
+    // Server: its label, then two choices side by side (the official one first, with its address).
     {
         Rect r = row(64.0f);
         bool customNow = !official || s.onlineCustomServer;
-        float w1 = official ? (rw - 14.0f) * 0.64f : 0.0f, w2 = official ? rw - 14.0f - w1 : rw;
+        const std::string help = T("options.online.server.help");
+        float cx = r.x + im::formLabel(L("options.online.server"), Rect(r.x, r.y, rw, 56.0f), rw * 0.72f);
+        im::tooltip(help);
+        float cw = r.r() - cx;
+        float w1 = official ? (cw - 14.0f) * 0.64f : 0.0f, w2 = official ? cw - 14.0f - w1 : cw;
         struct Choice { std::string text; Rect r; bool sel, enabled; int id; };
         Choice cs[2] = {
             {official ? i18n::trf("options.online.official", {i18n::ltr(hostPort(off.host, off.apiPort))}) : std::string(),
-             im::flip(r, Rect(r.x, r.y, w1, 56.0f)), !customNow, official && !inGame, 0},
-            {T("options.online.community"), im::flip(r, Rect(r.x + (official ? w1 + 14.0f : 0.0f), r.y, w2, 56.0f)), customNow,
+             im::flip(r, Rect(cx, r.y, w1, 56.0f)), !customNow, official && !inGame, 0},
+            {T("options.online.community"), im::flip(r, Rect(cx + (official ? w1 + 14.0f : 0.0f), r.y, w2, 56.0f)), customNow,
              official && !inGame, 1},
         };
         for (const Choice& c : cs) {
             if (c.text.empty()) continue;
             im::Item it = im::item(im::makeId(std::string("##options.online.server") + char('0' + c.id)), c.r,
                                    c.enabled ? im::ITEM_FOCUSABLE : im::ITEM_DISABLED);
-            im::tooltip(T("options.online.server.help"));
+            im::tooltip(help);
             gfx::fill(c.r, vec4(0, 0, 0, 0.25f), 2.0f);
             if (c.sel) {
                 gfx::fillV(c.r, withAlpha(gold, 0.16f), withAlpha(gold, 0.06f), 2.0f);
@@ -1817,25 +1827,15 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
             if (!std::isxdigit(static_cast<unsigned char>(c))) hexOk = false;
             hex += c;
         }
-        bool pinBad = !hex.empty() && (!hexOk || hex.size() != 64);
-        const char* pinKey = pinBad ? "options.online.pin.invalid" : "options.online.pin.warning";
-        TextStyle ws2 = cs;
-        ws2.color = pinBad ? danger : withAlpha(goldBright, 0.85f);
-        ws2.size = gfx::fitSize(T(pinKey), ws2, rw - 20.0f, 0.7f);
-        gfx::text(T(pinKey), im::flipX(area, rx + 10.0f), y + 6.0f, ws2);
-        y += 30.0f;
-    } else {
-        TextStyle os = style(font::FACE_TEXT, kSmall + 1.0f, ivoryDim, im::startAlign());
-        std::string line = i18n::trf("options.online.official_line", {i18n::ltr(off.host), std::to_string(off.apiPort)});
-        os.size = gfx::fitSize(line, os, rw - 20.0f, 0.75f);
-        gfx::text(line, im::flipX(area, rx + 10.0f), y + 30.0f, os);
-        y += 56.0f;
+        if (!hex.empty() && (!hexOk || hex.size() != 64)) {
+            TextStyle ws2 = cs;
+            ws2.color = danger;
+            ws2.size = gfx::fitSize(T("options.online.pin.invalid"), ws2, rw - 20.0f, 0.7f);
+            gfx::text(T("options.online.pin.invalid"), im::flipX(area, rx + 10.0f), y + 6.0f, ws2);
+            y += 30.0f;
+        }
     }
-    // Separate sign-in on every server.
-    TextStyle ns = cs;
-    ns.size = gfx::fitSize(T("options.online.separate"), ns, rw - 20.0f, 0.75f);
-    gfx::text(T("options.online.separate"), im::flipX(area, rx + 10.0f), y + 6.0f, ns);
-    y += 34.0f;
+    y += 14.0f;
     // Test connection (the values on the page, applied or not).
     net::ServerEndpoint ep;
     if (!custom) {
@@ -1953,6 +1953,7 @@ void openOnlinePage(const std::string& sub) {
         if (n.sub == Sub::DirectWait) {
             net::DirectHostOptions opt;
             opt.port = uint16_t(gs.directPort);
+            opt.autoPress = gs.directAutoPress;
             opt.playerName = "Olivier";
             s.hostDirect(opt);
             s.runMock(1500.0);

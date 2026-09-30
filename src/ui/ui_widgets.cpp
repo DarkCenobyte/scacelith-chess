@@ -28,6 +28,11 @@ struct LastItem {
     bool highlight = false;
     bool hovered = false;
     float highlightTime = 0.0f;
+    // Form rows: the label drawn at the start of the row (its advance, the row's height), for the
+    // info mark of a following tooltip().
+    bool hasLabel = false;
+    Rect label;
+    bool enabled = true;
 };
 
 struct Ctx {
@@ -58,8 +63,10 @@ struct Ctx {
     LastItem last;
     bool mouseOverride = false;
     vec2 mouseOverridePos;
-    bool helpSink = false;
-    std::string helpText;
+    bool infoMarks = false;  // between beginInfoMarks() and endInfoMarks()
+    // Info marks drawn this frame and the previous one, with the id of their row: a click on a
+    // mark shows its definition and does not operate the row.
+    std::vector<std::pair<Id, Rect>> marks, prevMarks;
     const plat::Input* inputOverride = nullptr;
     float wheel = 0.0f;
     // Text field being edited (textField): it owns the keyboard until the edit ends.
@@ -176,6 +183,8 @@ void beginFrame(float dt) {
 void endFrame() {
     c.prevList.swap(c.curList);
     c.curList.clear();
+    c.prevMarks.swap(c.marks);
+    c.marks.clear();
     if (c.defaultFocus && !findEntry(c.prevList, c.focus) && findEntry(c.prevList, c.defaultFocus)) c.focus = c.defaultFocus;
     c.defaultFocus = 0;
     if (c.editId && !c.editSeen) c.editId = 0;  // the field left the screen
@@ -318,6 +327,8 @@ Item item(Id id, const Rect& r, uint32_t flags) {
             it.activated = true;
             c.activateConsumed = true;
         }
+        for (const auto& mk : c.prevMarks)
+            if (it.clicked && mk.first == id && mk.second.contains(c.mouse)) it.clicked = false;
         if (it.clicked) it.activated = true;
     }
     it.highlight = interactive && (it.hovered || (it.focused && c.kbMode));
@@ -331,6 +342,8 @@ Item item(Id id, const Rect& r, uint32_t flags) {
     c.last.highlight = it.highlight;
     c.last.hovered = it.hovered;
     c.last.highlightTime = a.v[2];
+    c.last.hasLabel = false;
+    c.last.enabled = !(flags & ITEM_DISABLED);
     return it;
 }
 
@@ -423,14 +436,24 @@ TextStyle valueStyle(bool enabled, float hover) {
 }
 float centerBaseline(const Rect& r, const TextStyle& st) { return r.cy() + gfx::capHeight(st) * 0.5f; }
 
+// Info mark: a circled "i" this far after the label (centre), and the room a label leaves for it.
+constexpr float kInfoRadius = 8.5f;
+constexpr float kInfoOffset = 13.0f + kInfoRadius;
+constexpr float kInfoRoom = kInfoOffset + kInfoRadius + 10.0f;
+
 // Label of a form row on the start side, shrunk (down to 70 %) to leave 'reserved' units free for
-// the control at the end of the row (long German and Russian labels).
-void rowLabel(const std::string& label, const Rect& r, float reserved, bool enabled) {
+// the control at the end of the row (long German and Russian labels), and room for an info mark
+// between info mark calls. Recorded for a following tooltip(). Returns its advance width.
+float rowLabel(const std::string& label, const Rect& r, float reserved, bool enabled) {
     TextStyle ls = labelStyle(enabled);
     std::string shown = displayText(label);
+    if (c.infoMarks) reserved += kInfoRoom;
     ls.size = gfx::fitSize(shown, ls, std::max(40.0f, r.w - 44.0f - reserved));
     ls.align = startAlign();
-    gfx::text(shown, flipX(r, r.x + 22.0f), centerBaseline(r, ls), ls);
+    float w = gfx::text(shown, flipX(r, r.x + 22.0f), centerBaseline(r, ls), ls);
+    c.last.hasLabel = true;
+    c.last.label = flip(r, Rect(r.x + 22.0f, r.y, w, r.h));
+    return w;
 }
 }  // namespace
 
@@ -942,23 +965,22 @@ bool tabBar(const std::vector<std::string>& tabs, int& current, const Rect& r) {
     return changed;
 }
 
-void beginHelpSink() {
-    c.helpSink = true;
-    c.helpText.clear();
-}
-std::string endHelpSink() {
-    c.helpSink = false;
-    return c.helpText;
+void beginInfoMarks() { c.infoMarks = true; }
+void endInfoMarks() { c.infoMarks = false; }
+
+float formLabel(const std::string& label, const Rect& r, float reserved, bool enabled) {
+    c.last = LastItem();
+    c.last.id = makeId(label);
+    c.last.r = r;
+    c.last.enabled = enabled;
+    float w = rowLabel(label, r, reserved, enabled);
+    return 22.0f + w + (c.infoMarks ? kInfoRoom : 16.0f);
 }
 
-void tooltip(const std::string& text) {
-    if (c.helpSink) {
-        if (c.last.highlight && c.last.id == c.focus) c.helpText = text;
-        else if (c.last.highlight && c.helpText.empty()) c.helpText = text;
-        return;
-    }
-    if (!c.last.highlight || c.last.highlightTime < 0.55f || text.empty()) return;
-    float fade = m::saturate((c.last.highlightTime - 0.55f) / 0.15f);
+namespace {
+// Floating tip box: at the mouse, or under 'below' from its start side (fromStart) or its end
+// side, above it when there is no room below. 'fade' 0..1.
+void drawTip(const std::string& text, float fade, bool atMouse, const Rect& below, bool fromStart) {
     gfx::Layer prev = gfx::layer();
     gfx::setLayer(gfx::LAYER_TOP);
     TextStyle st;
@@ -969,19 +991,75 @@ void tooltip(const std::string& text) {
     float maxW = 440.0f;
     int lines = gfx::wrapLineCount(text, maxW, st);
     float lh = st.size * 1.3f;
-    float w = std::min(maxW, gfx::wrapWidth(text, maxW, st)) + 36.0f;
+    // More room at the end of right-to-left lines: Arabic final letters have tails that reach
+    // past their advance.
+    float w = std::min(maxW, gfx::wrapWidth(text, maxW, st)) + (rtl() ? 46.0f : 36.0f);
     float h = float(lines) * lh + 24.0f;
     vec2 view = gfx::viewSize();
-    vec2 p = c.last.hovered ? mouse() + vec2(rtl() ? -18.0f - w : 18.0f, 26.0f)
-                            : vec2(rtl() ? c.last.r.x : c.last.r.r() - w, c.last.r.b() + 6.0f);
+    vec2 p = atMouse ? mouse() + vec2(rtl() ? -18.0f - w : 18.0f, 26.0f)
+                     : vec2(fromStart != rtl() ? below.x : below.r() - w, below.b() + 6.0f);
     p.x = m::clamp(p.x, 8.0f, view.x - w - 8.0f);
-    if (p.y + h > view.y - 8.0f) p.y = (c.last.hovered ? mouse().y : c.last.r.y) - h - 10.0f;
+    if (p.y + h > view.y - 8.0f) p.y = (atMouse ? mouse().y : below.y) - h - 10.0f;
     Rect r(p.x, p.y, w, h);
     gfx::shadow(r.offset(0, 6), 3, 24, withAlpha(black, 0.6f * fade));
     gfx::fillV(r, vec4(0.08f, 0.07f, 0.06f, 0.96f * fade), vec4(0.05f, 0.045f, 0.04f, 0.96f * fade), 2.0f);
     gfx::stroke(r, withAlpha(gold, 0.45f * fade), 0.0f, 2.0f);
     gfx::textWrapped(text, rtl() ? r.r() - 18.0f : r.x + 18.0f, r.y + 12.0f + st.size * 0.78f, maxW, st, lh);
     gfx::setLayer(prev);
+}
+
+// The circled "i" after the label of the last form row (before it in a right-to-left layout), and
+// its tip while the mouse rests on the label or the mark (sooner on the mark), or after a moment
+// of keyboard focus. The mark and the label hover also work on a disabled row (they say why it
+// is off).
+void infoMark(const std::string& text) {
+    const LastItem& li = c.last;
+    const Rect& lb = li.label;
+    vec2 centre(rtl() ? lb.x - kInfoOffset : lb.r() + kInfoOffset, lb.cy());
+    Rect mark(centre.x - kInfoRadius - 5.0f, centre.y - kInfoRadius - 6.0f, 2.0f * kInfoRadius + 10.0f, 2.0f * kInfoRadius + 12.0f);
+    c.marks.push_back({li.id, mark});
+    float x0 = std::min(lb.x, mark.x), x1 = std::max(lb.r(), mark.r());
+    Rect zone(x0, lb.y, x1 - x0, lb.h);
+    bool canHover = c.blockDepth == 0 && c.mouseInWindow && !c.mDown && gfx::clipContains(c.mouse);
+    bool onMark = canHover && mark.contains(c.mouse);
+    bool hot = canHover && (onMark || zone.contains(c.mouse));
+    Anim& a = anim(li.id);
+    a.v[5] = hot ? a.v[5] + c.dt : 0.0f;
+    bool keyboard = c.kbMode && c.blockDepth == 0 && li.id == c.focus && li.highlight;
+
+    float h = hot ? 1.0f : keyboard ? 0.6f : 0.0f;
+    gfx::pushAlpha(li.enabled ? 1.0f : 0.45f);
+    vec4 ink = theme::mix(gold, goldBright, h);
+    gfx::circle(centre, kInfoRadius, withAlpha(gold, 0.08f + 0.14f * h));
+    gfx::circle(centre, kInfoRadius, withAlpha(ink, 0.55f + 0.4f * h), 1.0f);
+    TextStyle is;
+    is.face = font::FACE_ITALIC;
+    is.size = 18.0f;
+    is.color = ink;
+    is.dir = 0;
+    if (const font::Glyph* g = font::glyph(is.face, 'i')) {  // centred on its ink
+        gfx::text("i", centre.x - (g->x0 + g->x1) * 0.5f * is.size, centre.y - (g->y0 + g->y1) * 0.5f * is.size, is);
+    }
+    gfx::popAlpha();
+
+    float shown = hot ? a.v[5] - (onMark ? 0.1f : 0.35f) : keyboard ? li.highlightTime - 0.7f : -1.0f;
+    if (shown < 0.0f) return;
+    drawTip(text, m::saturate(shown / 0.15f), hot, lb, true);
+}
+}  // namespace
+
+void tooltip(const std::string& text) {
+    if (text.empty()) return;
+    if (c.infoMarks) {
+        if (c.last.hasLabel) {
+            infoMark(text);
+        } else if (c.kbMode && c.last.id == c.focus && c.last.highlight && c.last.highlightTime >= 0.7f) {
+            drawTip(text, m::saturate((c.last.highlightTime - 0.7f) / 0.15f), false, c.last.r, false);
+        }
+        return;
+    }
+    if (!c.last.highlight || c.last.highlightTime < 0.55f) return;
+    drawTip(text, m::saturate((c.last.highlightTime - 0.55f) / 0.15f), c.last.hovered, c.last.r, false);
 }
 
 int confirmDialog(const char* idStr, const std::string& title, const std::string& message, const std::string& confirmLabel,

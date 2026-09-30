@@ -41,6 +41,7 @@
 //                           --touch <square> touches that piece once the handshake is over
 //   --mouse fx,fy           pointer position as fractions of the window (screenshots)
 //   --glance                a human game starts looking at the player's scoresheet (S)
+//   --calibrate             the brightness calibration before the title page, as on a first start
 #pragma once
 #include "../ai/engine.h"
 #include "../anim/animator.h"

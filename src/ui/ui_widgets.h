@@ -142,12 +142,21 @@ bool formField(const std::string& label, std::string& text, const Rect& r, int m
 bool editingText();  // a text field has the keyboard (Space and letters type text)
 // Tab bar: Left/Right while focused, PageUp/PageDown anywhere. Returns true when changed.
 bool tabBar(const std::vector<std::string>& tabs, int& current, const Rect& r);
-// Hover/focus tooltip for the previous item.
+// Hover/focus tooltip for the previous item (a floating tip; an info mark between
+// beginInfoMarks() and endInfoMarks()).
 void tooltip(const std::string& text);
-// Between these calls tooltip() texts are not drawn as floating tips; endHelpSink() returns the
-// text of the highlighted item instead (pages with a fixed help line).
-void beginHelpSink();
-std::string endHelpSink();
+// Info marks (settings pages: Options, hosting a direct match). Between these calls, a tooltip()
+// that follows a form row (or a formLabel()) puts a small circled "i" after the row's label, and
+// its text shows while the mouse rests on the label or on the mark, or once the row has had the
+// keyboard focus for a moment; a click on the mark does not operate the row. A tooltip() that
+// follows any other item shows for the keyboard focus only. Form row labels leave room for the
+// mark.
+void beginInfoMarks();
+void endInfoMarks();
+// Label of a custom form row, drawn at the start of r like the labels of the form rows (shrunk to
+// leave 'reserved' units free at the end of the row); a tooltip() right after it gives it an info
+// mark. Returns the width it takes from the start side of r, the mark and a gap included.
+float formLabel(const std::string& label, const Rect& r, float reserved, bool enabled = true);
 
 // Decorations.
 void panel(const Rect& r, float alpha = 1.0f);

@@ -1,7 +1,9 @@
 // "ui" viewer scene: every UI screen over a dark marble backdrop (stand-in for the 3D hall).
 //   scacelith --scene ui --ui-screen main|newgame|custom|options|credits|pause|confirm|promotion|
 //                                     gameover|gameover-folded|loading|movelist|notify|hud|hand|
-//                                     watch|viewer-pause|viewer-hud|viewer-gameover|gameover-elo
+//                                     watch|viewer-pause|viewer-hud|viewer-gameover|gameover-elo|
+//                                     calibration (first start; the slider starts at the .ini's
+//                                     brightness)
 //   hot-seat (two players on one PC): newgame-hotseat (New Game with "Human, same PC"),
 //     hotseat-hud (players, caption, draw offer card), hotseat-confirm (named resignation),
 //     hotseat-gameover (both names and ratings)
@@ -141,6 +143,7 @@ public:
             ui::debug::setOptionsTab(tab_);
         }
         if (screen == "credits") ui::debug::openMenuPage(ui::debug::MenuPage::Credits);
+        if (screen == "calibration") ui::debug::openMenuPage(ui::debug::MenuPage::Calibration);
         if (screen == "watch") ui::debug::openMenuPage(ui::debug::MenuPage::Watch);
         if (screen == "confirm") ui::debug::openPauseConfirm(1);
         if (screen == "gameover-folded") ui::debug::foldGameOver(true);
@@ -274,7 +277,7 @@ public:
         const std::string& s = screen_;
         if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
         if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "credits" ||
-            s == "watch" || menu_) {
+            s == "watch" || s == "calibration" || menu_) {
             a = ui::mainMenu(setup_, watch_);
         } else if (s == "hotseat-hud") {
             ui::HotSeatHud hud;

@@ -143,6 +143,11 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
 bool gameOverFolded();  // the card is folded away ("View the board")
 // Options page is reachable from both menus; changes go to game::settings() when applied.
 bool optionsOpen();
+// Brightness calibration (first start, --calibrate): the next mainMenu() call opens on it instead
+// of the title page. Three squares (black, mid grey, white, each with a black knight) show what
+// the 3D frame would show at the brightness of the slider. Continue stores the brightness in
+// game::settings(), Esc keeps the stored one; both save the .ini and go on to the title page.
+void openBrightnessCalibration();
 // Optional small move list (toggled by the player with Tab).
 void moveList(const std::vector<std::string>& san, bool visible);
 // Loading screen while shaders/probes/textures are prepared (progress 0..1).

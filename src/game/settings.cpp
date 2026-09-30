@@ -24,11 +24,24 @@ render::RenderSettings Settings::renderSettings() const {
 
 bool Settings::load(const std::string& p) {
     path = p;
+    firstLaunch = false;
     IniFile ini;
     if (!ini.load(p)) {
-        LOGI("no settings file at %s, using defaults", p.c_str());
-        applyLanguage();
-        return false;
+        // save() falls back to the user data directory when the executable's folder cannot be
+        // written (a read-only install): the settings are read back from there. 'path' stays the
+        // first choice of save(). An explicit --ini file has no fallback.
+        bool fallback = false;
+        if (p == plat::exeDirectory() + "Scacelith.ini") {
+            std::string alt = plat::userDataDirectory() + "Scacelith.ini";
+            fallback = alt != p && ini.load(alt);
+            if (fallback) LOGI("settings read from %s", alt.c_str());
+        }
+        if (!fallback) {
+            LOGI("no settings file at %s, using defaults", p.c_str());
+            firstLaunch = true;  // the brightness calibration comes first
+            applyLanguage();
+            return false;
+        }
     }
     displayWidth = ini.getInt("display.width", displayWidth);
     displayHeight = ini.getInt("display.height", displayHeight);

@@ -176,10 +176,27 @@ Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-librar
 ## Options
 
 Settings are stored in `Scacelith.ini` next to the executable when that folder is writable,
-otherwise in `%APPDATA%\Scacelith\`. All of them are editable from the Options page: display
-mode and resolution, V-sync, render scale, quality preset, motion blur, depth of field,
-brightness, volumes, ambience, legal-move hints, mouse sensitivity, the game pointer, and the
-hand-over between the two players of a game on one PC (a camera flight, or an instant cut).
+otherwise in `%APPDATA%\Scacelith\` (and read back from there). All of them are editable from the
+Options page: display mode and resolution, V-sync, render scale, quality preset, motion blur,
+depth of field, brightness, volumes, ambience, legal-move hints, auto-press clock, the opponent's
+head movements, mouse sensitivity, the game pointer, and the hand-over between the two players of
+a game on one PC (a camera flight, or an instant cut). An option marked with a small circled
+**i** after its name has a definition: rest the pointer on the name or on the mark, or keep the
+keyboard focus on the row for a moment, to read it.
+
+- **Auto-press clock** (Options > Gameplay, off by default): your robot presses the clock by
+  itself once your move is on the board. In online games the server decides, and in a direct
+  match the player who hosts it (**Auto-press clock** on the Host a game page, on by default).
+- **Ignore opponent's head movements** (Options > Gameplay, off by default): in online games and
+  direct matches the opponent's robot looks where its player looks; with this option it moves
+  its head by itself, as against Stockfish.
+
+The first start (no settings file yet) opens on a brightness calibration: three squares, black on
+the left, mid grey and white on the right, each with a black knight, drawn exactly as the 3D hall
+would show them at the brightness of the slider. Move the slider until the knight on the black
+square is barely visible, or no longer visible, and **Continue** (Esc keeps the current value);
+Options > Graphics > Brightness changes it later. `--calibrate` opens the page again, and the UI
+viewer shows it with `--scene ui --ui-screen calibration`.
 
 The interface speaks English, French, German, Spanish, Ukrainian, Russian, Arabic (laid out right
 to left), Japanese, Simplified Chinese and Traditional Chinese. The first start follows the
@@ -218,7 +235,8 @@ normal game), `--handover-preview` (watching through the players' eyes with the 
 each camera handover, the same hand-over as [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`,
 `--warp <seconds>` (simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
 `--mouse fx,fy` (pointer position as fractions of the window), `--glance` (start looking at the
-scoresheet) and `--ini <file>`.
+scoresheet), `--calibrate` (the brightness calibration before the title page, as on a first
+start) and `--ini <file>`.
 
 Two players on one PC: `--start --hotseat` starts one at once, with `--white-name N`, `--black-name
 N`, `--clock-right white|black`, `--rated` and `--handover <seconds>` (0 = instant cut). `--play

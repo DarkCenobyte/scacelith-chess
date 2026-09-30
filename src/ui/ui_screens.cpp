@@ -18,6 +18,8 @@
 #include "../i18n/i18n.h"
 #include "../i18n/unicode.h"
 #include "../platform/platform.h"
+#include "../render/post/display_transform.h"
+#include "../render/post/postfx.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
@@ -35,11 +37,10 @@ using namespace theme;
 namespace {
 
 // ---- State ----------------------------------------------------------------------------------------
-enum class Page { Title, NewGame, Options, Credits, Watch, Online };
+enum class Page { Title, NewGame, Options, Credits, Watch, Online, Calibration };
 
 struct OptionsState {
     game::Settings work;
-    std::string help;
     int tab = 0;
     bool confirmDiscard = false;
     float pageT = 0.0f;
@@ -81,6 +82,8 @@ struct State {
     // loading
     float loadShown = 0.0f;
     uint64_t loadFrame = 0;
+    // brightness calibration: the slider's value (EV)
+    float calib = 0.0f;
 };
 State S;
 
@@ -126,6 +129,11 @@ std::string decimal(double v, int digits) {
     return s;
 }
 std::string percent(float x) { return i18n::trf("number.percent", {decimal(x * 100.0, 0)}); }
+// Brightness (exposure compensation) as Options > Graphics and the calibration show it.
+std::string brightnessText(float ev) {
+    if (std::fabs(ev) < 0.05f) return T("options.brightness.neutral");
+    return std::string(ev > 0.0f ? "+" : "\xE2\x88\x92") + decimal(std::fabs(ev), 1) + " EV";
+}
 
 // Whole screen, for mirroring page layouts in a right-to-left language.
 Rect screenRect() {
@@ -257,6 +265,8 @@ void copyOptions(game::Settings& dst, const game::Settings& src) {
     dst.mouseSensitivity = src.mouseSensitivity;
     dst.invertLook = src.invertLook;
     dst.gameCursor = src.gameCursor;
+    dst.autoPressClock = src.autoPressClock;
+    dst.ignoreOpponentHead = src.ignoreOpponentHead;
     dst.handoverSeconds = src.handoverSeconds;
     dst.humanizeThinking = src.humanizeThinking;
     dst.language = src.language;
@@ -272,6 +282,7 @@ bool sameOptions(const game::Settings& a, const game::Settings& b) {
            feq(a.effectsVolume, b.effectsVolume) && feq(a.ambienceVolume, b.ambienceVolume) && a.ambience == b.ambience &&
            a.showLegalMoves == b.showLegalMoves && a.showCoordinates == b.showCoordinates &&
            feq(a.mouseSensitivity, b.mouseSensitivity) && a.invertLook == b.invertLook && a.gameCursor == b.gameCursor &&
+           a.autoPressClock == b.autoPressClock && a.ignoreOpponentHead == b.ignoreOpponentHead &&
            a.humanizeThinking == b.humanizeThinking && feq(a.handoverSeconds, b.handoverSeconds) &&
            cleanName(a.playerName) == cleanName(b.playerName) && a.handStyle == b.handStyle && detail::sameOnlineOptions(a, b);
 }
@@ -414,7 +425,7 @@ bool optionsPage(MenuAction& act) {
     float t = ease(o.pageT);
     vec2 v = view();
     dimScene(1.0f);
-    float w = std::min(1120.0f, v.x - 80.0f), h = 760.0f;
+    float w = std::min(1120.0f, v.x - 80.0f), h = 800.0f;
     Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 14.0f, w, h);
     im::captureMouseAll();
     im::captureKeyboard();
@@ -431,7 +442,8 @@ bool optionsPage(MenuAction& act) {
     im::tabBar(tabs, o.tab, Rect(p.x + 60.0f, p.y + 124.0f, p.w - 120.0f, 50.0f));
 
     game::Settings& s = o.work;
-    float rx = p.x + 70.0f, rw = p.w - 140.0f, rh = 60.0f;
+    // Rows from under the tabs to above the buttons: the nine rows of Gameplay are closer.
+    float rx = p.x + 70.0f, rw = p.w - 140.0f, rh = o.tab == 3 ? 52.0f : 60.0f;
     float y = p.y + 200.0f;
     auto row = [&]() {
         Rect r(rx, y, rw, rh - 4.0f);
@@ -440,7 +452,7 @@ bool optionsPage(MenuAction& act) {
     };
     auto pct = [](float x) { return percent(x); };
     im::pushId(o.tab);
-    im::beginHelpSink();
+    im::beginInfoMarks();
     switch (o.tab) {
         case 0: {
             // Language: applied and saved at once (the page itself changes language).
@@ -459,6 +471,7 @@ bool optionsPage(MenuAction& act) {
             int mode = s.fullscreen ? 0 : 1;
             if (im::selectorRow(L("options.display_mode"), mode, {T("options.fullscreen"), T("options.windowed")}, row()))
                 s.fullscreen = mode == 0;
+            im::tooltip(T("options.display_mode.help"));
             auto& res = detail::data().resolutions;
             std::vector<std::string> labels;
             int cur = -1;
@@ -490,13 +503,10 @@ bool optionsPage(MenuAction& act) {
                 s.quality = q;
             im::tooltip(T("options.quality.help"));
             im::toggleRow(L("options.motion_blur"), s.motionBlur, row());
+            im::tooltip(T("options.motion_blur.help"));
             im::toggleRow(L("options.depth_of_field"), s.depthOfField, row());
-            im::sliderRow(L("options.brightness"), s.brightness, -2.0f, 2.0f, 0.1f,
-                          [](float x) {
-                              if (std::fabs(x) < 0.05f) return T("options.brightness.neutral");
-                              return std::string(x > 0.0f ? "+" : "\xE2\x88\x92") + decimal(std::fabs(x), 1) + " EV";
-                          },
-                          row());
+            im::tooltip(T("options.depth_of_field.help"));
+            im::sliderRow(L("options.brightness"), s.brightness, -2.0f, 2.0f, 0.1f, brightnessText, row());
             im::tooltip(T("options.brightness.help"));
             break;
         }
@@ -512,8 +522,12 @@ bool optionsPage(MenuAction& act) {
             im::toggleRow(L("options.legal_moves"), s.showLegalMoves, row());
             im::tooltip(T("options.legal_moves.help"));
             im::toggleRow(L("options.coordinates"), s.showCoordinates, row());
+            im::toggleRow(L("options.auto_press"), s.autoPressClock, row());
+            im::tooltip(T("options.auto_press.help"));
             im::toggleRow(L("options.thinking_time"), s.humanizeThinking, row());
             im::tooltip(T("options.thinking_time.help"));
+            im::toggleRow(L("options.ignore_head"), s.ignoreOpponentHead, row());
+            im::tooltip(T("options.ignore_head.help"));
             im::sliderRow(L("options.mouse_sensitivity"), s.mouseSensitivity, 0.25f, 3.0f, 0.05f,
                           [](float x) { return decimal(x, 2) + " \xC3\x97"; }, row());
             im::toggleRow(L("options.invert_look"), s.invertLook, row());
@@ -577,24 +591,12 @@ bool optionsPage(MenuAction& act) {
             break;
         }
     }
-    std::string help = im::endHelpSink();
+    im::endInfoMarks();
     im::popId();
 
-    // Help line for the highlighted row.
+    // Footer.
     float bw = 240.0f, bh = 56.0f;
     float by = p.b() - 50.0f - bh;
-    {
-        im::Anim& ha = im::anim(im::makeId("##help"));
-        if (!help.empty()) S.opt.help = help;
-        ha.v[3] = im::approach(ha.v[3], help.empty() ? 0.0f : 1.0f, 10.0f);
-        if (ha.v[3] > 0.01f && !S.opt.help.empty()) {
-            TextStyle hs = style(font::FACE_ITALIC, 23.0f, withAlpha(ivoryDim, ha.v[3]), HAlign::Center);
-            float hy = by - 88.0f;
-            gfx::hlineFade(p.cx() - 200.0f, p.cx() + 200.0f, hy - 34.0f, withAlpha(gold, 0.3f * ha.v[3]), 0.5f);
-            gfx::textWrapped(S.opt.help, p.cx(), hy, p.w - 220.0f, hs, 30.0f);
-        }
-    }
-    // Footer.
     TextStyle hs = style(font::FACE_ITALIC, kCaption, withAlpha(muted, dirty ? 1.0f : 0.0f), HAlign::Center);
     hs.size = gfx::fitSize(T("options.pending"), hs, p.w - 120.0f - 2.0f * bw - 40.0f);
     gfx::text(T("options.pending"), p.cx(), by + bh * 0.5f + 7.0f, hs);
@@ -1119,6 +1121,82 @@ void creditsPage() {
     }
 }
 
+// ---- Brightness calibration ---------------------------------------------------------------------------
+// Pre-exposed radiances of the patches, in the renderer's units (renderer.h: sunlit white marble
+// ~2.5 after exposure, shaded walls ~0.1-0.2): mid grey, white, and the knight, a deep shadow
+// that the default brightness shows faintly on black (sRGB code ~6), -2 EV not at all (code 0)
+// and +2 EV clearly (code ~40).
+constexpr float kCalibGrey = 0.18f, kCalibWhite = 2.5f, kCalibKnight = 0.0065f;
+
+// Display colour of a flat radiance at brightness 'ev': the tonemapper's display transform with
+// the game's grade (PostSettings), as the 3D frame would show it at the centre of the screen.
+vec4 calibrationColor(float radiance, float ev) {
+    const PostSettings grade{};
+    m::vec3 c = render::srgbEncode(
+        render::displayTransform(m::vec3(radiance * std::exp2(ev)), grade.contrast, grade.saturation, grade.splitTone));
+    return vec4(c.x, c.y, c.z, 1.0f);
+}
+
+void openCalibration() { S.calib = std::clamp(game::settings().brightness, -2.0f, 2.0f); }
+
+// Black page with the three patches (black on the left, mid grey, white on the right, whatever the
+// reading direction: the text names the black one), the brightness slider, and Continue. Returns
+// true when the player is done (the .ini is saved).
+bool calibrationPage(float t) {
+    vec2 v = view();
+    gfx::Layer prev = gfx::layer();
+    gfx::setLayer(gfx::LAYER_BACK);
+    gfx::fill(Rect(0, 0, v.x, v.y), vec4(0.0f, 0.0f, 0.0f, 1.0f));  // hides the hall
+    gfx::setLayer(prev);
+    gfx::pushAlpha(t);
+    // The whole page (title, patches, instruction, slider, note, button) centred vertically.
+    const float gap = 36.0f, side = std::min(300.0f, (v.x - 160.0f - 2.0f * gap) / 3.0f);
+    const float textW = 3.0f * side + 2.0f * gap;
+    TextStyle ts = style(font::FACE_TEXT, kBody, ivory, HAlign::Center);
+    const std::string text = T("calibration.text");
+    int lines = gfx::wrapLineCount(text, textW, ts);
+    float height = 36.0f + 88.0f + side + 76.0f + 36.0f * float(lines) + 206.0f;
+    float top = std::max(40.0f, (v.y - height) * 0.5f);
+    float cx = v.x * 0.5f;
+    im::pageTitle(T("calibration.title"), cx, top + 36.0f);
+    float sy = top + 124.0f;
+    const float radiance[3] = {0.0f, kCalibGrey, kCalibWhite};
+    TextStyle ks;
+    ks.face = font::FACE_SYMBOL;
+    ks.color = calibrationColor(kCalibKnight, S.calib);
+    for (int i = 0; i < 3; ++i) {
+        Rect sq(cx - 1.5f * side - gap + float(i) * (side + gap), sy, side, side);
+        gfx::fill(sq, calibrationColor(radiance[i], S.calib));
+        gfx::stroke(sq.inset(-9.0f), withAlpha(gold, 0.3f), 0.0f);
+        glyphCentered(0x265E, sq.center(), side * 1.05f, ks);  // flat colour: no shadow, halo or rim
+    }
+    float y = sy + side + 76.0f;
+    y += 36.0f * float(gfx::textWrapped(text, cx, y, textW, ts, 36.0f));
+    im::pushId("calibration");
+    im::Id sliderId = im::makeId("##options.brightness");
+    float sw = std::min(760.0f, v.x - 120.0f);
+    im::sliderRow(L("options.brightness"), S.calib, -2.0f, 2.0f, 0.1f, brightnessText, Rect(cx - sw * 0.5f, y, sw, 56.0f));
+    im::setDefaultFocus(sliderId);
+    TextStyle ls = style(font::FACE_ITALIC, kCaption, muted, HAlign::Center);
+    ls.size = gfx::fitSize(T("calibration.later"), ls, textW);
+    gfx::text(T("calibration.later"), cx, y + 108.0f, ls);
+    bool done = im::button(L("calibration.continue"), Rect(cx - 150.0f, y + 150.0f, 300.0f, 56.0f), im::ButtonKind::Primary);
+    im::popId();
+    gfx::popAlpha();
+    if (done) {
+        game::settings().brightness = S.calib;
+        im::sound(Sound::Confirm);
+    } else if (im::consumeBack()) {
+        done = true;  // keeps the stored brightness
+        im::sound(Sound::Back);
+    }
+    if (done) {
+        game::settings().firstLaunch = false;
+        game::settings().save();
+    }
+    return done;
+}
+
 }  // namespace
 
 // ==== Public screens ==================================================================================
@@ -1160,6 +1238,8 @@ void foldGameOver(bool folded) { S.forcedFold = folded ? 1 : 0; }
 
 bool optionsOpen() { return S.optionsVisible || S.optionsVisiblePrev; }
 
+void openBrightnessCalibration() { S.forcedPage = int(Page::Calibration); }
+
 MenuAction mainMenu(NewGameSetup& setup) {
     static WatchSetup watch;
     return mainMenu(setup, watch);
@@ -1171,6 +1251,7 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
     if (appear) {
         setPage(S.forcedPage >= 0 ? Page(S.forcedPage) : S.resumeOnline ? Page::Online : Page::Title);
         if (S.page == Page::Options) openOptions();
+        if (S.page == Page::Calibration) openCalibration();
         S.forcedPage = -1;
         S.resumeOnline = false;
     }
@@ -1202,10 +1283,13 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
             if (back) setPage(Page::Title);
             break;
         }
+        case Page::Calibration:
+            if (calibrationPage(ease(S.pageT))) setPage(Page::Title);
+            break;
     }
-    // Online: challenge cards on every page once signed in, the ping on the online page. A game
-    // that starts from the online page brings the menu back to it afterwards.
-    detail::onlineMenuOverlay(S.page == Page::Online);
+    // Online: challenge cards on every page once signed in (not over the calibration), the ping on
+    // the online page. A game that starts from the online page brings the menu back to it afterwards.
+    if (S.page != Page::Calibration) detail::onlineMenuOverlay(S.page == Page::Online);
     if (detail::onlineGameStarting()) S.resumeOnline = S.page == Page::Online;
     if (act == MenuAction::StartGame || act == MenuAction::Quit) setPage(Page::Title);
     if (act == MenuAction::StartWatching) setPage(Page::Title);
