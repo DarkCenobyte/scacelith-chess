@@ -4,10 +4,10 @@
 // (World::submitCoachMarks). Orbit camera (right-drag / wheel) unless a first-person view is chosen.
 //
 // Options:
-//   --view player|chest|side|board|marks   camera preset: through the human's eyes at the board
-//                                          (default), through the human's eyes at the coach's
-//                                          chest, the chest from the side, the board from above,
-//                                          a close-up of the marks
+//   --view player|chest|side|board|marks|coords   camera preset: through the human's eyes at the
+//                        board (default), through the human's eyes at the coach's chest, the chest
+//                        from the side, the board from above, a close-up of the marks, a close-up
+//                        of the human's near left corner of the border (files and ranks, --coords)
 //   --human 0|1          the human's seat (0 = White at +Z, default); the coach sits opposite
 //   --moves "e4 e5 ..."  moves played before (SAN, space separated; default a short opening)
 //   --hl e4,d8           pieces highlighted, by square
@@ -156,6 +156,12 @@ public:
             cam_.target = vec3(0.04f, layout::BOARD_TOP_Y, -zs * 0.02f);
             cam_.distance = 0.45f;
             cam_.pitch = 0.75f;
+        } else if (view_ == "coords") {
+            // The human's near left corner (a1 for White, h8 for Black), seen from over his left hand.
+            cam_.target = vec3(-zs * 0.15f, layout::BOARD_TOP_Y, zs * 0.17f);
+            cam_.distance = 0.42f;
+            cam_.yaw -= 0.55f;
+            cam_.pitch = 0.62f;
         } else {
             cam_.target = vec3(0.0f, 0.9f, 0.0f);
             cam_.distance = 1.4f;
