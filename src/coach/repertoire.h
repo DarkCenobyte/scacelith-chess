@@ -20,4 +20,8 @@ chess::Move repertoireMove(const chess::Game& game, int level, uint64_t seed,
 
 constexpr int kRepertoireMaxPly = 16;
 
+// Checks the curated choices (tests): every listed line parses from the start position, and every choice is legal
+// there and stays in book. False with the first problem in 'error'.
+bool checkRepertoireTable(const OpeningBook& book = OpeningBook::instance(), std::string* error = nullptr);
+
 }  // namespace coach

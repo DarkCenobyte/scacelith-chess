@@ -60,7 +60,6 @@ const std::vector<Preference>& preferences() {
         {0, "e4 Nf6", {{"e5", 1}}},
         {0, "d4 d5 c4", {{"e6", 1}, {"c6", 1}}},
         {0, "d4 d5 Nf3", {{"Nf6", 1}}},
-        {0, "d4 d5 Bf4", {{"Nf6", 1}}},
         {0, "c4 e5 Nc3", {{"Nf6", 1}}},
         {0, "Nf3 d5 d4", {{"Nf6", 1}}},
         {0, "Nf3 d5 c4", {{"e6", 1}}},
@@ -210,6 +209,37 @@ chess::Move repertoireMove(const chess::Game& game, int level, uint64_t seed, co
         cands.push_back({m, w});
     }
     return pick(cands, rng);
+}
+
+bool checkRepertoireTable(const OpeningBook& book, std::string* error) {
+    auto fail = [error](const std::string& what) {
+        if (error) *error = what;
+        return false;
+    };
+    for (const Preference& p : preferences()) {
+        chess::Position pos;
+        const std::string line = p.line;
+        size_t i = 0;
+        while (i < line.size()) {
+            size_t j = line.find(' ', i);
+            if (j == std::string::npos) j = line.size();
+            const chess::Move m = pos.parseSAN(line.substr(i, j - i));
+            if (!m.valid()) return fail("unparsable line \"" + line + "\"");
+            pos.makeMove(m);
+            if (!book.lookup(pos.hash())) return fail("line out of book \"" + line + "\"");
+            i = j + 1;
+        }
+        if (p.choices.empty()) return fail("no choice after \"" + line + "\"");
+        for (const Choice& c : p.choices) {
+            const chess::Move m = pos.parseSAN(c.san);
+            if (!m.valid() || c.weight <= 0) return fail("bad choice " + std::string(c.san) + " after \"" + line + "\"");
+            chess::Position next = pos;
+            next.makeMove(m);
+            if (!book.lookup(next.hash()))
+                return fail("choice " + std::string(c.san) + " leaves the book after \"" + line + "\"");
+        }
+    }
+    return true;
 }
 
 }  // namespace coach
