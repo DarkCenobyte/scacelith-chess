@@ -1606,6 +1606,36 @@ TEST(tts_samples) {
     if (!dir) return;
     tts::Synthesizer* s = model();
     if (!s) return;
+    // Texts from a file instead of the built-in lines: "lang<TAB>name<TAB>text" per line, where
+    // lang may carry a voice ("en:M3"; default voice otherwise). The noise seed is the game's
+    // default (derived from the text), so the files sound as the game will play them.
+    if (const char* list = std::getenv("SCACELITH_TTS_SAMPLE_LIST")) {
+        std::string content;
+        CHECK(net::sys::readFile(list, content, 1 << 20));
+        size_t pos = 0;
+        while (pos < content.size()) {
+            size_t e = content.find('\n', pos);
+            if (e == std::string::npos) e = content.size();
+            std::string line = content.substr(pos, e - pos);
+            pos = e + 1;
+            size_t t1 = line.find('\t'), t2 = t1 == std::string::npos ? t1 : line.find('\t', t1 + 1);
+            if (t2 == std::string::npos) continue;
+            std::string lang = line.substr(0, t1), voice;
+            if (size_t c = lang.find(':'); c != std::string::npos) {
+                voice = lang.substr(c + 1);
+                lang.resize(c);
+            }
+            tts::Options o;
+            for (int v = 0; v < s->voiceCount(); ++v)
+                if (s->voiceName(v) == voice) o.voice = v;
+            CHECK(voice.empty() || o.voice >= 0);
+            std::vector<float> pcm = s->synthesize(line.substr(t2 + 1), lang, o);
+            CHECK(!pcm.empty());
+            std::string path = std::string(dir) + "/" + line.substr(t1 + 1, t2 - t1 - 1) + ".wav";
+            CHECK(audio::writeWav16(path.c_str(), pcm.data(), pcm.size(), 1, 44100));
+        }
+        return;
+    }
     struct Line {
         const char* lang;
         const char* text;
@@ -1642,25 +1672,6 @@ TEST(tts_samples) {
             std::string path = std::string(dir) + "/notation_" + lang + "_" + std::to_string(i) + ".wav";
             CHECK(audio::writeWav16(path.c_str(), pcm.data(), pcm.size(), 1, 44100));
         }
-    // Free-form texts from a file (lang<TAB>name<TAB>text lines), for listening and comparisons.
-    if (const char* list = std::getenv("SCACELITH_TTS_SAMPLE_LIST")) {
-        std::string content;
-        CHECK(net::sys::readFile(list, content, 1 << 20));
-        size_t pos = 0;
-        while (pos < content.size()) {
-            size_t e = content.find('\n', pos);
-            if (e == std::string::npos) e = content.size();
-            std::string line = content.substr(pos, e - pos);
-            pos = e + 1;
-            size_t t1 = line.find('\t'), t2 = t1 == std::string::npos ? t1 : line.find('\t', t1 + 1);
-            if (t2 == std::string::npos) continue;
-            tts::Options o;
-            o.seed = 42;
-            std::vector<float> pcm = s->synthesize(line.substr(t2 + 1), line.substr(0, t1), o);
-            std::string path = std::string(dir) + "/" + line.substr(t1 + 1, t2 - t1 - 1) + ".wav";
-            CHECK(audio::writeWav16(path.c_str(), pcm.data(), pcm.size(), 1, 44100));
-        }
-    }
 }
 
 TEST(tts_node_diff) {

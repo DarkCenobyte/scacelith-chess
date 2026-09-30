@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """How Supertonic 3 reads chess notation, per speech language (input for the coach's speech catalog).
 
-    tools/tts_pronunciation.py --model DIR [--voice N] [--seeds 3] [--wav OUTDIR] [--lang xx ...]
+    tools/tts_pronunciation.py --model DIR [--voice N] [--seeds 4] [--wav OUTDIR] [--lang xx ...]
+                               [--probe "lang:form=candidate|candidate|..." ...]
 
 No speech recogniser is available offline, so the reading of each written form ("e4", "Nf3",
 "O-O", ...) is identified acoustically: the form and several spelled-out candidates ("e four",
@@ -18,7 +19,8 @@ winner (excess near 0, well below the next candidate) is how the model reads the
 the best candidate stays well above 0, the form is read in a way none of the candidates describes
 (often a mumble), and the catalog must spell it out. This is a heuristic: listen to the --wav
 files before relying on a close call.
---wav writes every rendition (seed 0) for listening. Needs numpy and onnxruntime.
+--wav writes every rendition (seed 0) for listening; --probe replaces the built-in probes with
+the given ones (e.g. --probe "en:a8=ay eight|uh eight"). Needs numpy and onnxruntime.
 """
 import argparse
 import os
@@ -156,7 +158,16 @@ def main():
     ap.add_argument("--wav", default="")
     ap.add_argument("--lang", nargs="*", default=list(PROBES))
     ap.add_argument("--threads", type=int, default=1)
+    ap.add_argument("--probe", action="append", default=[])
     a = ap.parse_args()
+    probes = PROBES
+    if a.probe:
+        probes = {}
+        for spec in a.probe:
+            head, cands = spec.split("=", 1)
+            lang, form = head.split(":", 1)
+            probes.setdefault(lang, {})[form] = cands.split("|")
+        a.lang = list(probes)
     m = Model(a.model, a.threads)
     cache = {}
 
@@ -175,7 +186,7 @@ def main():
 
     for lang in a.lang:
         print("== %s" % lang)
-        for form, cands in PROBES[lang].items():
+        for form, cands in probes[lang].items():
             wf, ff = renditions(form, lang)
             self_d = spread(ff)
             rows = []
@@ -186,7 +197,7 @@ def main():
             print("  %-5s self %5.2f | %s" % (form, self_d, "  ".join("%s %+.2f" % (c, d) for d, c in rows)))
             if a.wav:
                 os.makedirs(a.wav, exist_ok=True)
-                idx = list(PROBES[lang]).index(form)
+                idx = list(probes[lang]).index(form)
                 write_wav(os.path.join(a.wav, "%s_%d_form.wav" % (lang, idx)), wf[0])
                 for k, c in enumerate(cands):
                     write_wav(os.path.join(a.wav, "%s_%d_cand%d.wav" % (lang, idx, k)), renditions(c, lang)[0][0])
