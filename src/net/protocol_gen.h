@@ -326,13 +326,15 @@ struct Rematch {
     uint64_t game = 0;
     bool accept = false;
 };
-// The player's current gestures in game `game`, sent when they change (at most gestureRate per
-// second, see Welcome): the head (yaw and pitch of the look in milliradians, seat-relative: 0 =
-// straight ahead, level; lean 0..100), the piece in hand and where it is aimed, the move placed on
-// the board before the clock press. The whole state travels every time, so a lost one heals with
-// the next. ply: plies played when it was sent; touch / aim: squares (64 = none); placed: the move
-// placed, packed as in Move (0 = none); flags: GestureFlag bits. The server forwards it to the
-// opponent as a Gesture without looking at it: it never counts as a move.
+// The player's current gestures in game `game`, sent when they change and at least once a second
+// (at most gestureRate per second, see Welcome): the head (yaw and pitch of the look in
+// milliradians, seat-relative: 0 = straight ahead, level, yaw > 0 to the left, pitch < 0 down;
+// lean 0..100), the piece in hand and where it is aimed, the move placed on the board before the
+// clock press. The whole state travels every time, so a lost one heals with the next. ply: plies
+// played when the current state of the hand (touch, aim, placed, Promoting) began, which a change
+// of the head alone keeps; touch / aim: squares (64 = none); placed: the move placed, packed as in
+// Move (0 = none); flags: GestureFlag bits. The server forwards it to the opponent as a Gesture
+// without looking at it: it never counts as a move.
 struct C_Gesture {
     static constexpr MsgType kType = MsgType::C_Gesture;
     static constexpr bool kClientToServer = true;
