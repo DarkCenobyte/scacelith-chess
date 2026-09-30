@@ -194,10 +194,13 @@ bool rewindTo(PhysicalBoard& b, const Position& target, Tally& tally, std::vecto
     return bad == 0 && sameState(b, want) && coach::tableMatches(b, target) && coach::planRewind(b, target).empty();
 }
 
-// Trips of a single move taken back come in stage order: off the board, on it, back onto it.
-bool inStageOrder(const std::vector<PieceTrip>& trips) {
-    for (size_t i = 1; i < trips.size(); ++i)
-        if (stageOf(trips[i]) < stageOf(trips[i - 1])) return false;
+// The trips of one move taken back: in stage order (off the board, on it, back onto it), none to
+// the captured pieces (a move taken back only brings pieces from there), no stop on a free square.
+bool likeOneMoveBack(const std::vector<PieceTrip>& trips) {
+    for (size_t i = 0; i < trips.size(); ++i) {
+        if (trips[i].to.kind == RestKind::Captured || trips[i].park || trips[i].created) return false;
+        if (i > 0 && stageOf(trips[i]) < stageOf(trips[i - 1])) return false;
+    }
     return true;
 }
 
@@ -283,7 +286,7 @@ TEST(rewind_single_moves) {
             CHECK(rewindTo(b, pos, tally, &trips));
             CHECK_EQ(trips.size(), c.trips);
             CHECK(!trips.empty() && trips.front().type == c.first);
-            CHECK(inStageOrder(trips));
+            CHECK(likeOneMoveBack(trips));
             CHECK(standsAsBefore(b, before));
             // The mover of a capture goes back before its victim comes back; a promotion's pawn
             // comes back from beside its owner.
@@ -337,7 +340,7 @@ TEST(rewind_scripted_lines) {
                 std::vector<PieceTrip> trips;
                 CHECK(rewindTo(b, seen[k], tally, &trips));
                 CHECK(standsAsBefore(b, spots[k]));
-                CHECK(inStageOrder(trips));
+                CHECK(likeOneMoveBack(trips));
                 CHECK_EQ(offBoardOverlaps(b), 0);
                 ++stepsChecked;
             }
@@ -391,7 +394,7 @@ TEST(rewind_random_games) {
                         std::vector<PieceTrip> trips;
                         ok = rewindTo(b, to.position(), single, &trips) && offBoardOverlaps(b) == 0 &&
                              (!known[n - size_t(i)] || standsAsBefore(b, spots[n - size_t(i)]));
-                        if (!inStageOrder(trips)) ++single.stageOrder;
+                        if (!likeOneMoveBack(trips)) ++single.stageOrder;
                         // The move taken back was played by one side: its hand reaches every trip.
                         if (!withinHalf(trips, to.position().sideToMove())) ++single.bad;
                     }
@@ -506,7 +509,7 @@ TEST(rewind_demonstration_lines) {
             for (size_t k = seen.size(); k-- > 0;) {
                 std::vector<PieceTrip> trips;
                 CHECK(rewindTo(b, seen[k], tally, &trips));
-                CHECK(inStageOrder(trips));
+                CHECK(likeOneMoveBack(trips));
                 for (const PieceTrip& t : trips) {
                     const float side = coachColor == White ? 1.0f : -1.0f;
                     for (const coach::Rest* r : {&t.from, &t.to}) {
@@ -575,7 +578,7 @@ TEST(rewind_demonstration_six_moves) {
                 std::vector<PieceTrip> trips;
                 CHECK(rewindTo(b, seen[k], tally, &trips));
                 CHECK(!trips.empty() && trips.size() <= 3);
-                CHECK(inStageOrder(trips));
+                CHECK(likeOneMoveBack(trips));
                 const float side = line.coach == White ? 1.0f : -1.0f;
                 for (const PieceTrip& t : trips)
                     for (const coach::Rest* r : {&t.from, &t.to})
