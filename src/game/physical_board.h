@@ -78,8 +78,8 @@ public:
     // Pieces missing from the board come back from the captured ones, the last set down first, so
     // that taking a move back restores the table as it was: its victim, the pawn of a promotion.
     // The spare of a promotion taken back goes back to the reserve; the other pieces left over
-    // are captured (syncTo in physical_board.cpp). A piece leaving the board goes to a spot that
-    // was free before the snap as well, so that hands can make the same change one piece at a
+    // are captured (syncTo in physical_board.cpp). The slots the pieces leaving the board take
+    // were free before the snap as well, so that hands can make the same change one piece at a
     // time (coach::planRewind) without waiting for the pieces coming back to leave theirs.
     void syncTo(const chess::Position& pos);
 
