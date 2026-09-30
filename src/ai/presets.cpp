@@ -139,4 +139,40 @@ int presetElo(int index, const EngineSettings& custom) {
     return Engine::estimateElo(custom);
 }
 
+// Coach mode levels: the coach plays a little below the top of the student's band, on the presets'
+// scale (the labels above), from the same measurements:
+//  0  rules lesson (scripted)  Skill 0, depth 1, MultiPV 20  ~650   estimate 1320-185-466 = 669; S0 d1 MPV 20
+//                                                                   is ~135 below the Novice (-449 vs -315)
+//  1  First steps (600-900)    Skill 0, depth 1, MultiPV 12  ~750   estimate 759; ~75 below the Novice
+//                                                                   (S0 d1: MPV 12 -389, MPV 9 -315)
+//  2  Beginner (900-1200)      the Beginner preset           ~1000  measured -6 against its Stockfish 16 self
+//  3  Improver (1200-1500)     UCI_Elo 1400                  ~1300  see below
+//  4  Club player (1500-1800)  UCI_Elo 1650                  ~1650  Stockfish 19 vs 16: 1500 -22, 1800 +12
+//  5  Strong club (1800-2100)  UCI_Elo 1950                  ~1950  1800 +12, 2100 +22
+//  6  Expert (2100+)           UCI_Elo 2300                  ~2300  Stockfish's calibration
+// Level 3: UCI_Elo 1320 (Skill Level 0 without a depth cap) would play at only ~1200 on this scale
+// (Stockfish 19's level 0 at a normal search time scores -120 against Stockfish 16's, the scale's
+// 1320), about as the Casual preset, while UCI_Elo 1500 (level 1.49) is within ~20 of its label.
+// Between the two the handicap is driven by the fractional level (~185 per level here): ~1300
+// needs level ~0.55, i.e. UCI_Elo ~1400 (level 0.57). estimateElo() says 1400: like any uncapped
+// setting at level 0-1 it is ~100 too high (see kDepthCapPenalty).
+// The UCI_Elo levels search 1 s per move in the coach's untimed games (engine.cpp), as the
+// presets do; the depth-capped ones answer in milliseconds.
+EngineSettings coachLevelSettings(int level) {
+    switch (std::clamp(level, 0, kCoachLevels - 1)) {
+    case 0: return shallowSkill(0, 1, 20);
+    case 1: return shallowSkill(0, 1, 12);
+    case 2: return shallowSkill(1, 1, 6);  // = presets()[1], the Beginner
+    case 3: return limited(1400);
+    case 4: return limited(1650);
+    case 5: return limited(1950);
+    default: return limited(2300);
+    }
+}
+
+int coachLevelElo(int level) {
+    static const int elo[kCoachLevels] = {650, 750, 1000, 1300, 1650, 1950, 2300};
+    return elo[std::clamp(level, 0, kCoachLevels - 1)];
+}
+
 }  // namespace ai
