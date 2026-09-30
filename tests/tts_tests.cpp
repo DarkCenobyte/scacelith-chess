@@ -28,6 +28,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <limits>
 #include <map>
 #include <memory>
@@ -841,7 +842,7 @@ TEST(tts_kernels_all_levels) {
             for (int variant = 0; variant < 2; ++variant) {
                 tts::GemmA ga;
                 ga.ld = Kd;
-                if (variant == 0) ga.f32 = A.data();
+                if (variant % 3 == 0) ga.f32 = A.data();
                 else {
                     ga.i8 = Aq.data();
                     ga.scale = sc.data();
@@ -1396,26 +1397,37 @@ TEST(tts_perf) {
     tts::Synthesizer* s = model();
     if (!s) return;
     const char* text = "Good move, well played. Now the knight goes to f3.";
-    for (int threads : {1, 2}) {
-        tts::Options o;
-        o.threads = threads;
-        o.seed = 7;
-        s->synthesize(text, "en", o);   // warm-up
-        double best = 1e9;
-        tts::Synthesizer::Stats st;
-        for (int rep = 0; rep < 3; ++rep) {
-            s->synthesize(text, "en", o);
-            if (s->lastStats().total < best) {
-                best = s->lastStats().total;
-                st = s->lastStats();
+    // The best kernel set of this CPU, and AVX2 (the common desktop case) when it is not the best.
+    std::vector<const char*> arches = {"auto"};
+    if (tts::kern::active().level > tts::kern::kAvx2 && tts::kern::cpuRuns(tts::kern::kAvx2)) arches.push_back("avx2");
+    for (const char* arch : arches) {
+        tts::setArchCap(arch);
+        for (int threads : {1, 2}) {
+            tts::Options o;
+            o.threads = threads;
+            o.seed = 7;
+            s->synthesize(text, "en", o);   // warm-up
+            double best = 1e9, cpu = 0;
+            tts::Synthesizer::Stats st;
+            for (int rep = 0; rep < 3; ++rep) {
+                std::clock_t c0 = std::clock();
+                s->synthesize(text, "en", o);
+                double c = double(std::clock() - c0) / CLOCKS_PER_SEC;
+                if (s->lastStats().total < best) {
+                    best = s->lastStats().total;
+                    st = s->lastStats();
+                    cpu = c;
+                }
             }
+            std::fprintf(stderr,
+                         "  %d thread(s), %s: %.2f s of audio in %.3f s, RTF %.3f, CPU %.3f s (dp %.1f ms, te %.1f ms, "
+                         "ve %.1f ms, vocoder %.1f ms), load average %.2f\n",
+                         threads, tts::activeArch(), st.audioSeconds, st.total, st.total / st.audioSeconds, cpu,
+                         st.duration * 1e3, st.textEncoder * 1e3, st.vectorEstimator * 1e3, st.vocoder * 1e3,
+                         loadAverage());
         }
-        std::fprintf(stderr,
-                     "  %d thread(s), %s: %.2f s of audio in %.3f s, RTF %.3f (dp %.1f ms, te %.1f ms, ve %.1f ms, "
-                     "vocoder %.1f ms), load average %.2f\n",
-                     threads, tts::activeArch(), st.audioSeconds, st.total, st.total / st.audioSeconds,
-                     st.duration * 1e3, st.textEncoder * 1e3, st.vectorEstimator * 1e3, st.vocoder * 1e3, loadAverage());
     }
+    tts::setArchCap("auto");
     std::fprintf(stderr, "  memory: VmRSS %ld kB, VmHWM %ld kB (mapped model files count in RSS)\n", statusKb("VmRSS:"),
                  statusKb("VmHWM:"));
     // GEMM throughput on the shapes of the vector estimator (pointwise convolutions at L = 61, batch 2)
@@ -1423,6 +1435,7 @@ TEST(tts_perf) {
     {
         std::mt19937 rng(1);
         const int shapes[][3] = {{2048, 122, 512}, {512, 122, 2048}, {2048, 366, 512}};
+        tts::ThreadPool pool2(2);
         for (auto& sh : shapes) {
             int M = sh[0], N = sh[1], Kd = sh[2];
             std::vector<float> A = randomVec(size_t(M) * Kd, rng), B = randomVec(size_t(Kd) * N, rng), C(size_t(M) * N);
@@ -1430,10 +1443,11 @@ TEST(tts_perf) {
             std::vector<float> sc(static_cast<size_t>(M), 0.01f);
             std::vector<uint8_t> Bu(size_t(Kd) * N, 7);
             std::vector<int32_t> Ci(size_t(M) * N);
-            for (int variant = 0; variant < 3; ++variant) {
+            for (int variant = 0; variant < 6; ++variant) {
+                tts::ThreadPool* gp = variant >= 3 ? &pool2 : nullptr;
                 tts::GemmA ga;
                 ga.ld = Kd;
-                if (variant == 0) ga.f32 = A.data();
+                if (variant % 3 == 0) ga.f32 = A.data();
                 else {
                     ga.i8 = Aq.data();
                     ga.scale = sc.data();
@@ -1444,14 +1458,15 @@ TEST(tts_perf) {
                 auto t0 = std::chrono::steady_clock::now();
                 const int reps = 10;
                 for (int r = 0; r < reps; ++r) {
-                    if (variant < 2) tts::sgemm(K(), nullptr, M, N, Kd, ga, gb, C.data(), N);
+                    if (variant % 3 < 2) tts::sgemm(K(), gp, M, N, Kd, ga, gb, C.data(), N);
                     else
-                        tts::igemm(K(), nullptr, M, N, Kd, reinterpret_cast<const uint8_t*>(Aq.data()), Kd, false, 0,
+                        tts::igemm(K(), gp, M, N, Kd, reinterpret_cast<const uint8_t*>(Aq.data()), Kd, false, 0,
                                    Bu.data(), N, true, 128, Ci.data(), N);
                 }
                 double sec = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() / reps;
-                std::fprintf(stderr, "  gemm %s %dx%dx%d: %.2f ms, %.1f G MAC/s\n",
-                             variant == 0 ? "f32 " : variant == 1 ? "i8w " : "int8", M, N, Kd, sec * 1e3,
+                std::fprintf(stderr, "  gemm %s %dx%dx%d, %d thread(s): %.2f ms, %.1f G MAC/s\n",
+                             variant % 3 == 0 ? "f32 " : variant % 3 == 1 ? "i8w " : "int8", M, N, Kd, gp ? 2 : 1,
+                             sec * 1e3,
                              double(M) * N * Kd / sec * 1e-9);
             }
         }
@@ -1489,14 +1504,21 @@ TEST(tts_samples) {
         {"en", "Good move! Your knight is well placed now. Let's see how you continue."},
         {"fr", "Bien joué ! Ton cavalier est maintenant bien placé. Voyons la suite."},
         {"ja", "いい手ですね。ナイトがよい位置にあります。"},
+        {"en", "Careful: after this move, your queen is attacked by the bishop. Would you like to take it back "
+               "and try again?"},
+        {"fr", "Attention : après ce coup, ta dame est attaquée par le fou. Veux-tu reprendre ton coup et "
+               "chercher autre chose ?"},
+        {"ja", "気をつけてください。この手のあと、クイーンがビショップに狙われます。もう一度考えてみましょうか。"},
     };
     for (int voice : {6, 7, 9})
-        for (const Line& l : voiceLines) {
+        for (size_t i = 0; i < sizeof voiceLines / sizeof voiceLines[0]; ++i) {
+            const Line& l = voiceLines[i];
             tts::Options o;
             o.voice = voice;
             o.seed = 42;
             std::vector<float> pcm = s->synthesize(l.text, l.lang, o);
-            std::string path = std::string(dir) + "/voice_" + s->voiceName(voice) + "_" + l.lang + ".wav";
+            std::string path = std::string(dir) + "/voice_" + s->voiceName(voice) + "_" + l.lang + "_" +
+                               std::to_string(i / 3 + 1) + ".wav";
             CHECK(audio::writeWav16(path.c_str(), pcm.data(), pcm.size(), 1, 44100));
         }
     // Chess notation probes: each written form, one file per language and form.
