@@ -10,11 +10,13 @@
 //   --only <substring>       debug: draw only parts whose name contains the substring
 //   --fp                     first-person flags (hides the head, eyes, lids, neck top)
 //   --sun <x,y,z>            direction towards the sun
+//   --coach [text]           the coach's chest marking (ChestMarking; default text "COACH")
 #include "robot.h"
 #include "../app/orbit_camera.h"
 #include "../app/scene.h"
 #include "../core/log.h"
 #include "../game/layout.h"
+#include "../render/post/postfx.h"
 #include <cstdio>
 #include <cstdlib>
 
@@ -118,6 +120,11 @@ public:
         }
         gpu_.upload(parts_);
         LOGI("robot viewer: %d draws, %u triangles", int(gpu_.parts.size()), unsigned(gpu_.triangleCount));
+        if (ctx.hasArg("--coach")) {
+            std::string text = ctx.argValue("--coach");
+            if (text.empty() || text[0] == '-') text = "COACH";
+            marking_.create(text);
+        }
 
         // Props: floor, seat block, table slab.
         floor_.upload(prim::plane(8, 8, 1, 1, 1.0f), "floor");
@@ -256,6 +263,7 @@ public:
         render::Environment env;
         env.time = time_;
         env.sunDirection = sunDir_;
+        r.post().settings.dofFocusDistance = cam_.distance;  // in focus at the orbit target
         r.beginFrame(cam_.camera(), env, dt);
         render::DrawItem d;
         d.mesh = &floor_;
@@ -291,13 +299,15 @@ public:
                 r.submit(w);
             }
         } else {
-            submitRobot(r, gpu_, poser_.g, firstPerson_, 100, nullptr, pupil_);
+            submitRobot(r, gpu_, poser_.g, firstPerson_, 100, nullptr, pupil_, 1.0f, Side::Right,
+                        marking_.valid() ? &marking_.material : nullptr);
         }
         r.endFrame();
     }
 
     void shutdown(AppContext&) override {
         gpu_.destroy();
+        marking_.destroy();
         floor_.destroy();
         seat_.destroy();
         table_.destroy();
@@ -306,6 +316,7 @@ public:
 private:
     std::vector<RobotPart> parts_;
     GpuRobot gpu_;
+    ChestMarking marking_;
     Poser poser_;
     Mesh floor_, seat_, table_;
     Material floorMat_, seatMat_, tableMat_, wireMat_[2];

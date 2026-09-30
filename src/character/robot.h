@@ -1,6 +1,7 @@
 // Scacelith's player character: an elegant porcelain humanoid robot (1.78 m, slim), generated
 // procedurally at startup (SDF sculpting + adaptive meshing, see sdf.h). Both players use the
-// exact same model.
+// exact same model; the only per-robot difference is an optional chest material (ChestMarking:
+// the coach's "COACH" marking in Coach mode).
 //
 // The robot is rigid and segmented: every part is attached to one bone of character::Skeleton
 // (no skinning). Joints are ball/hinge mechanisms (RobotJoint) hidden between overlapping
@@ -23,6 +24,7 @@
 #include "../render/materials/material_library.h"
 #include "../render/mesh.h"
 #include "../render/renderer.h"
+#include <string>
 #include <vector>
 
 namespace character {
@@ -76,13 +78,31 @@ struct GpuRobot {
     void destroy();
 };
 
+// A word printed in the glaze of the chest shell (Coach mode: "COACH" on the coach robot). Owns a
+// copy of the RobotPorcelain material with the ROBOT_MARKING define and the word's distance field
+// (shaders/materials/robot_porcelain.glsl); pass &material to submitRobot as chestMaterial for the
+// robot that wears it. The word is set in Cinzel (the title face), cobalt blue, centred on the
+// sternum across the flat upper chest, above the pectoral seam, reading left to right for someone
+// facing the robot.
+struct ChestMarking {
+    Material material;
+    GLuint texture = 0;
+    // After setupRobotMaterials() (copies RobotPorcelain as it is then), with a GL context. The
+    // font does not need ui::font::init(). Returns false (and stays invalid) if the text cannot be
+    // rendered.
+    bool create(const std::string& text = "COACH");
+    void destroy();
+    bool valid() const { return texture != 0; }
+};
+
 // Submits every part with its bone's world matrix. firstPerson = this robot is the viewer: parts
 // flagged firstPersonHidden get DRAW_HIDDEN_MAIN (still cast shadows). objectIdBase + part index is
 // used as the stable object id. pupilDilation in [0,1] goes to the iris (inst[0].x). armOpacity < 1
 // makes the arm on armSide (upper arm, forearm, hand, fingers) see-through in the main view
-// (DrawItem::opacity; its shadow stays).
+// (DrawItem::opacity; its shadow stays). chestMaterial, when set, replaces RobotPorcelain on the
+// chest shell (the porcelain part on Spine2), e.g. ChestMarking::material.
 void submitRobot(render::Renderer& r, const GpuRobot& robot, const m::mat4 boneWorld[BoneCount], bool firstPerson,
                  uint32_t objectIdBase, const m::mat4* prevBoneWorld = nullptr, float pupilDilation = 0.35f,
-                 float armOpacity = 1.0f, Side armSide = Side::Right);
+                 float armOpacity = 1.0f, Side armSide = Side::Right, const Material* chestMaterial = nullptr);
 
 }  // namespace character

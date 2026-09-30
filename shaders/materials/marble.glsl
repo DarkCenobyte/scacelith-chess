@@ -21,6 +21,17 @@
 // inst (per draw): PIECE inst[0].x = piece seed; others unused.
 // Textures: 0 = marble slab (FLOOR: r vein cores, g vein body, b cloud+halo, a fracture network),
 //           7 = polish (bake/polish.comp).
+// BOARD_COORDINATES (with MARBLE_FRAME, the board border; World::setBoardCoordinates): files a-h
+// and ranks 1-8 inlaid in the flat of the border, a pale gold stone polished flush with the
+// marble (the polish, its scratches and the reflections run over them). Each player reads his
+// files along his edge and his ranks on his left, upright. Positions are object space = board
+// space (the board stands at the origin, see scene/board.h).
+//   texture 1  R8 atlas, 16 distance-field cells in a row (a..h then 1..8), row 0 = top, value
+//              0.5 + signed distance (texels, inside > 0) / range, mipmapped
+//   inst[0] = (unused, distance of the label line from the board centre (m), cell size (m),
+//              half size of the playing area (m))
+//   inst[1] = (inlay albedo rgb (linear), dilation (texels))
+//   inst[2] = (distance range (texels), square size (m), texels per cell, top of the border y (m))
 #define MAT_USE_POLISH
 #include "shaders/materials/include/matlib.glsl"
 #include "shaders/materials/include/marble_field.glsl"
@@ -28,6 +39,39 @@
 #ifdef MARBLE_FLOOR
 layout(binding = 0) uniform sampler2D uSlab;
 const float kSlabSize = 1.6;  // meters covered by the tileable slab texture (bake/marble_slab.comp)
+#endif
+
+#if defined(MARBLE_FRAME) && defined(BOARD_COORDINATES)
+layout(binding = 1) uniform sampler2D uCoords;
+
+// Inlay coverage of the board coordinates at object-space p (see the header).
+float boardCoordinates(vec3 p, vec3 nOS, vec4 I0, vec4 I1, vec4 I2) {
+    vec2 q = p.xz;
+    vec2 qdx = dFdx(q), qdy = dFdy(q);
+    float c0 = I0.y, cell = I0.z, halfPlay = I0.w, sqSize = I2.y;
+    vec2 aq = abs(q);
+    bool files = aq.y > halfPlay && aq.x < halfPlay;
+    bool ranks = aq.x > halfPlay && aq.y < halfPlay;
+    float file = clamp(floor(q.x / sqSize + 4.0), 0.0, 7.0);
+    float rank = clamp(floor(4.0 - q.y / sqSize), 0.0, 7.0);
+    // Glyph frame of the label under p: origin, reading direction, up (towards the board).
+    // White sits at +Z: his files are on the +Z edge, his ranks on the -X edge; Black's opposite.
+    float sgn = files ? sign(q.y) : -sign(q.x);
+    vec2 o = files ? vec2((file - 3.5) * sqSize, sgn * c0) : vec2(-sgn * c0, (3.5 - rank) * sqSize);
+    vec2 right = vec2(sgn, 0.0), up = vec2(0.0, -sgn);
+    float index = files ? file : 8.0 + rank;
+    vec2 local = vec2(dot(q - o, right), dot(q - o, up)) / cell;   // [-0.5, 0.5] in the cell
+    vec2 uv = vec2((index + 0.5 + local.x) / 16.0, 0.5 - local.y);
+    vec2 gx = vec2(dot(qdx, right) / 16.0, -dot(qdx, up)) / cell;
+    vec2 gy = vec2(dot(qdy, right) / 16.0, -dot(qdy, up)) / cell;
+    float v = textureGrad(uCoords, uv, gx * 0.5, gy * 0.5).r;       // a level sharper: thin strokes
+    float texels = sqrt(length(qdx) * length(qdy)) / cell * I2.z;   // texels per pixel
+    float sd = (v - 0.5) * I2.x + I1.w;
+    float cov = clamp(sd / max(texels, 0.35) + 0.5, 0.0, 1.0);
+    float inCell = step(abs(local.x), 0.5) * step(abs(local.y), 0.5);
+    float top = smoothstep(0.97, 0.995, nOS.y) * step(I2.w - 0.0003, p.y);
+    return (files || ranks) ? cov * inCell * top : 0.0;
+}
 #endif
 
 #ifdef MAT_LOW_DETAIL
@@ -189,6 +233,14 @@ void surface(in SurfaceInput i, inout Surface s) {
     coatRough = mix(coatRough, 0.3, joint);
 #else
     float joint = 0.0;
+#endif
+#if defined(MARBLE_FRAME) && defined(BOARD_COORDINATES)
+    // Inlaid coordinates: a pale gold stone with a faint cloud of its own, under the same polish.
+    float inlay = boardCoordinates(pos, normalize(i.normalOS), i.instParams[0], i.instParams[1], i.instParams[2]);
+    vec3 inlayAlbedo = i.instParams[1].rgb * (0.94 + 0.06 * mat_gnoise(pos * 900.0));
+    albedo = mix(albedo, inlayAlbedo, inlay);
+    rough = mix(rough, 0.35, inlay);
+    baseN = normalize(mix(baseN, N, inlay));
 #endif
     s.albedo = albedo;
     s.normalWS = baseN;
