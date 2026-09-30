@@ -31,4 +31,27 @@ Prebuilt Windows binaries. This branch only holds binaries; the source code is o
   been run on real Windows hardware by the build.
 - SHA-256: `183543a6718c9c43786c54b8d564727210a1874b13a38f39a57b9b09ee7bdf2f`
 
+## windows/Scacelith-2026-09-30-fiabilite.zip
+
+- Holds `Scacelith-2026-09-30-fiabilite.exe` (129 MB, too large for a plain file on GitHub, so it is
+  zipped; the zip is 94 MB).
+- Source: branch `claude/reliability-visual-polish-mq6fwh` at commit `dd6655d` (pull request #5, not
+  merged yet), based on `master` at `71881cc` (online multiplayer merged).
+- Contents: everything above, plus the opponent's robot hand and head following the other player
+  live in online games, the clock press automatic or by hand (an option offline, the server's or
+  the host's choice online), captured pieces that no longer clip, looking up at the opponent with
+  the pointer at the top of the screen, a closed table without see-through seams, an info mark
+  with each option's definition, a brightness calibration page on the first start, FIDE 2024
+  ratings and point refunds for the victims of a banned cheater. The embedded engine is
+  Stockfish 19, in five builds (x86-64, SSE4.1, AVX2, AVX-VNNI, AVX-512); the game runs the fastest
+  one the CPU supports.
+- Protocol version 2: it plays online only on a server running this branch or later, and older clients are
+  refused by such a server.
+- Windows x64, self-contained (Stockfish 19 and its NNUE network are embedded). Needs a GPU with
+  OpenGL 4.6.
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (223 tests); it has
+  not been run on real Windows hardware by the build.
+- SHA-256 of the exe: `589b8c6d106ffa40af3957bfbb9df43fb46772aa0fe4b2957a50e7e87f562ccb`
+- SHA-256 of the zip: `822bca587586c53cade9e6d2eecec30815be3366441a0e6ab40b05b33ae62c6e`
+
 Licence: GPL-3.0 (see `LICENSE` on `master`); the source of each build is the commit named above.
