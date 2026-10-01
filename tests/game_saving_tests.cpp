@@ -146,6 +146,23 @@ TEST(saving_direct_match_left) {
     CHECK(saving::directMatchRecord(leftWhite, d));
     CHECK_EQ(d.info.result, std::string("0-1"));
 
+    // The guest lost the host for good (ServerAborted, ended locally): kept unfinished once both
+    // players have moved, with the authority's moves and times.
+    net::OnlineGame hostGone = directGame({{"e2e4", 0, 600000}, {"e7e5", 0, 600000}, {"g1f3", 4000, 601000}}, 1, 4, 25);
+    CHECK(saving::directMatchRecord(hostGone, d));
+    CHECK(!d.finished);
+    CHECK_EQ(int(d.game.moves().size()), 3);
+    CHECK_EQ(d.info.result, std::string("*"));
+    CHECK_EQ(d.info.endKey, std::string("reason.online.server_aborted"));
+    CHECK_EQ((long long)d.info.elapsedMs[2], 4000LL);
+    CHECK(archive::shouldSave(archive::Mode::Direct, -1, int(d.game.moves().size()), d.finished, true));
+    pgn::Record lost = archive::makeRecord(d.game, d.info);
+    CHECK_EQ(lost.result, std::string("*"));
+    CHECK_EQ(lost.tag("Termination"), std::string("unterminated"));
+    // ... but not before both have moved: the authority would have aborted it.
+    net::OnlineGame hostGoneEarly = directGame({{"e2e4", 0, 600000}}, 1, 4, 25);
+    CHECK(!saving::directMatchRecord(hostGoneEarly, d));
+
     // A spectator never saves.
     net::OnlineGame watched = directGame({{"e2e4", 0, 600000}}, 2, 1, int(chess::GameEndReason::Resignation));
     CHECK(!saving::directMatchRecord(watched, d));

@@ -274,7 +274,14 @@ void GameScene::updateScript(float dt) {
     }
     const std::string& u = script_[scriptPos_++];
     Move mv = game_.position().parseUCI(u);
-    PieceObject* p = mv.valid() ? board_.at(mv.from) : nullptr;
+    // Without the legal-move hints an illegal move can be made too: the arbiter judges it at the
+    // clock press (as a player's would be).
+    if (!mv.valid() && !settings().showLegalMoves && !online() && !coach() && u.size() >= 4) {
+        mv.from = parseSquare(u.substr(0, 2));
+        mv.to = parseSquare(u.substr(2, 2));
+    }
+    PieceObject* p = mv.from != NoSquare && mv.to != NoSquare ? board_.at(mv.from) : nullptr;
+    if (p && p->color != inputColor()) p = nullptr;
     if (!p) {
         LOGW("--play: '%s' is not legal here, the script stops", u.c_str());
         scriptPos_ = script_.size();

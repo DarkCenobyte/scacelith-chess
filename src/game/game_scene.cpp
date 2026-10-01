@@ -975,9 +975,10 @@ void GameScene::shutdown(AppContext& ctx) {
         rateGame();
     }
     // The game being played goes to the saved games as it stands (resigned above; a hot-seat or
-    // coach game unfinished). Screenshot runs stop wherever the capture happens: not saved then.
+    // coach game unfinished; nothing for a game closed before its first move, its resignation
+    // included). Screenshot runs stop wherever the capture happens: not saved then.
     if (!ctx.screenshotMode && (state_ == State::Playing || state_ == State::Intro || state_ == State::Handshake))
-        archiveGame(game_.isOver());
+        archiveGame(game_.isOver() && !game_.moves().empty());
     if (onlineSession().directActive()) onlineSession().closeDirect();
     if (osCursorHidden_) plat::setCursorVisible(true);
     osCursorHidden_ = false;
@@ -1126,8 +1127,9 @@ bool GameScene::update(AppContext& ctx, float dt) {
                     if (game_.status() == GameStatus::Ongoing) game_.resign(humanColor_);
                     rateGame();
                 }
-                // Saved as it stands: the resignation, or a hot-seat game unfinished ("*").
-                archiveGame(game_.isOver());
+                // Saved as it stands: the resignation, or a hot-seat game unfinished ("*"). Left
+                // before any move, the automatic resignation is not a game: nothing is saved.
+                archiveGame(game_.isOver() && !game_.moves().empty());
                 clock_.stop();
                 state_ = State::FadeToMenu;
                 stateTime_ = 0.0f;
@@ -2108,7 +2110,10 @@ void GameScene::completeMove(int seat) {
     clock_.addTime(opposite(mover), v.opponentBonusMs);
     board_.syncTo(game_.position());
     if (!untimed()) leverTarget_ = -leverTarget_;
+    // Still the offender's turn: the time their move takes (saved games) goes on from there.
+    const double spent = plyElapsedMs_;
     beginTurn();
+    plyElapsedMs_ = spent;
 }
 
 void GameScene::answerAiDrawOffer(int offeringSeat) {
