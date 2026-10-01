@@ -286,6 +286,7 @@ public:
             return false;
         }
         audio::closeVoice(id);
+        LOGD("coach: voice of %.2f s", seconds);
         r.voice = id;
         r.voiceActive = true;
         r.voiceStarted = true;
@@ -349,6 +350,7 @@ public:
     // ---- Subtitles
     void showSubtitle(const std::string& written, float holdSeconds) override {
         CoachRuntime& r = rt();
+        LOGD("coach: subtitle \"%s\" (%.1f s)", written.c_str(), holdSeconds);
         r.subText = written;
         r.subAge = 0.0f;
         r.subHold = holdSeconds;
