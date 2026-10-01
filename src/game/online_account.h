@@ -16,7 +16,10 @@ namespace game {
 // The game history, page by page, newest first: the server's cursor (GamesPage::next) leads to the
 // next page; the cursors of the pages already seen are kept, so that Previous needs none of its own.
 // One request at a time: next() and previous() refuse while one is in flight (the page greys its
-// buttons meanwhile), and an answer is kept only when it is the one awaited (same cursor).
+// buttons meanwhile). restart() and reload() may be asked while one is in flight (the filters
+// change, the page opens again): every answer names its request (GamesPage::before and filter),
+// and an answer is kept only when it is the one awaited (same cursor and filter); a failure stops
+// the wait only when it is the one awaited and no request like it is still in flight.
 class HistoryPager {
 public:
     static constexpr int kPageSize = 10;
@@ -29,9 +32,11 @@ public:
     bool previous(uint64_t& before);
     // The current page again (after an error): its cursor.
     uint64_t reload();
-    // The answer of the request in flight: true when it was kept.
+    // An answer (page: GamesPage::before and filter name its request): true when it was kept.
     bool accept(const net::GamesPage& page);
-    void fail(const std::string& error);   // the request failed: the page shown stays
+    // A request failed (request: its GamesPage::before and filter): when it is the one awaited, the
+    // page shown stays with the error.
+    void fail(const net::GamesPage& request, const std::string& error);
     void clear();                          // nothing loaded (signed out, another server)
 
     const net::GamesFilter& filter() const { return filter_; }
@@ -53,6 +58,13 @@ private:
     uint64_t wantBefore_ = 0;
     int wantIndex_ = 0;
     std::string error_;
+    struct Request {
+        uint64_t before;
+        net::GamesFilter filter;
+    };
+    std::vector<Request> inFlight_;   // the requests sent and not answered yet, oldest first
+    void sent();                      // a request of filter_ and wantBefore_
+    bool answered(const net::GamesPage& request);  // forgets it; true when it is the one awaited
 };
 
 struct AccountData {

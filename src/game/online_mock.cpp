@@ -1278,11 +1278,14 @@ struct FakeServer::Impl {
         e.error = err;
         return e;
     }
-    // Transport failures of the configured host.
-    bool transportError(Event::Kind k) {
+    // Transport failures of the configured host (e: the other fields of the answer, if any).
+    bool transportError(Event::Kind k, Event e = Event()) {
         const char* err = hostHas("offline") ? "network" : hostHas("badcert") ? "certificate" : nullptr;
         if (!err) return false;
-        http(result(k, false, err));
+        e.kind = k;
+        e.ok = false;
+        e.error = err;
+        http(std::move(e));
         return true;
     }
     void rt(Event e, double delay = kOneWay) {
@@ -1983,16 +1986,22 @@ void FakeServer::fetchMyGames(uint64_t before, int limit, const GamesFilter& fil
     Impl& I = *impl_;
     I.lastNow = nowMs();
     const Event::Kind k = Event::Kind::GamesResult;
-    if (I.transportError(k)) return;
-    if (!I.signedIn) return I.http(I.result(k, false, "unauthorized"));
-    if (limit < 1 || limit > 50) return I.http(I.result(k, false, "invalid_limit"));
+    // Every answer names its request (the cursor and the filter), as net::OnlineClient's do.
+    auto answer = [&](bool ok, const char* error) {
+        Event e = I.result(k, ok, error);
+        e.gamesPage.before = before;
+        e.gamesPage.filter = filter;
+        return e;
+    };
+    if (I.transportError(k, answer(false, ""))) return;
+    if (!I.signedIn) return I.http(answer(false, "unauthorized"));
+    if (limit < 1 || limit > 50) return I.http(answer(false, "invalid_limit"));
     const bool catOk = filter.category.empty() || filter.category == "custom" || findCategory(filter.category);
     const bool resultOk = filter.result.empty() || filter.result == "win" || filter.result == "loss" || filter.result == "draw";
-    if (!catOk || !resultOk || filter.rated < -1 || filter.rated > 1) return I.http(I.result(k, false, "invalid_filter"));
+    if (!catOk || !resultOk || filter.rated < -1 || filter.rated > 1) return I.http(answer(false, "invalid_filter"));
     I.ensureHistory();
-    Event e = I.result(k, true);
+    Event e = answer(true, "");
     GamesPage& page = e.gamesPage;
-    page.before = before;
     for (const Impl::Past& p : I.history) {
         const GameDetails& d = p.d;
         if (!filter.category.empty() && d.category != filter.category) continue;

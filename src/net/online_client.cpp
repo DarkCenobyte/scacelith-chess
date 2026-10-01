@@ -1949,13 +1949,14 @@ void OnlineClient::fetchMyGames(uint64_t before, int limit, const GamesFilter& f
     if (!filter.category.empty()) path += "&category=" + urlEncode(filter.category);
     if (filter.rated >= 0) path += filter.rated ? "&rated=true" : "&rated=false";
     if (!filter.result.empty()) path += "&result=" + urlEncode(filter.result);
-    d->http([d, e, path, before] {
+    d->http([d, e, path, before, filter] {
         Impl::Call call;
         call.auth = Impl::Auth::Required;
         Impl::Api a = d->request(e, "GET", path, nullptr, call, d->httpCancel);
         Event ev;
         ev.kind = Event::Kind::GamesResult;
         ev.gamesPage.before = before;
+        ev.gamesPage.filter = filter;
         finish(ev, a, [&] { return parseGamesPage(a.body, ev.gamesPage); });
         if (!ev.ok) ev.gamesPage.games.clear();
         d->post(ev);

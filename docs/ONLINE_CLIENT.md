@@ -99,7 +99,7 @@ server's code, `retryAfterSec` when it gave one).
 
 | Call | Request | Event and what it carries |
 |---|---|---|
-| `fetchMyGames(before, limit, filter)` | `GET /account/games?before=&limit=&category=&rated=&result=` (bearer) | `GamesResult`: `gamesPage` (the games newest first, `next` = the `before` of the next page or 0, `total` = the games matching the filter) |
+| `fetchMyGames(before, limit, filter)` | `GET /account/games?before=&limit=&category=&rated=&result=` (bearer) | `GamesResult`: `gamesPage` (the games newest first, `next` = the `before` of the next page or 0, `total` = the games matching the filter; `before` and `filter` name the request, errors included) |
 | `fetchGame(id)` | `GET /games/:id` (bearer when signed in) | `GameDetailsResult`: `gameDetails` (players, ratings and changes, result, reason, clocks, the moves as UCI text and `packMove` with each move's time spent and clock; `you` and `reportable` for its players) |
 | `downloadPgn(id)` | `GET /games/:id/pgn` | `PgnResult`: `gameId`, `text` (the PGN as the server wrote it, `[%clk]`/`[%emt]` comments) |
 | `fetchSessions()` | `GET /auth/sessions` (bearer) | `SessionsResult`: `sessions` (id, created, last active, expiry, client label, `current`) |

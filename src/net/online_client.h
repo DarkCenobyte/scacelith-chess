@@ -149,6 +149,7 @@ struct GamesFilter {
 
 struct GamesPage {
     uint64_t before = 0;              // the cursor of the request (0 = the first page)
+    GamesFilter filter;               // the filter of the request (with 'before', on errors too)
     std::vector<GameSummary> games;   // newest first
     uint64_t next = 0;                // 'before' of the next page, 0 = this was the last page
     int total = 0;                    // games matching the filter, all pages together

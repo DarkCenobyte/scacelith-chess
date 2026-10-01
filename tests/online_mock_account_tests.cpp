@@ -162,6 +162,51 @@ TEST(mock_account_history_pages_and_filters) {
     CHECK_EQ(n, 0);
 }
 
+// The history page's filter changed before the first answer (as OnlineSession::loadHistory does):
+// whatever order the fake's answers come in, the page kept is the one of the filter shown. Every
+// answer names its request, failures included.
+TEST(mock_account_history_filter_changed_while_loading) {
+    VirtualClock vc;
+    mock::FakeServer srv;
+    signIn(srv, "Paul_M");
+    int ratedTotal = 0;
+    net::GamesFilter rated;
+    rated.rated = 1;
+    allGames(srv, rated, 10, &ratedTotal);
+    CHECK(ratedTotal > 0);
+    int wrong = 0;
+    for (int trial = 0; trial < 40; ++trial) {
+        game::AccountData d;
+        net::AccountInfo account;
+        bool signedIn = true;
+        srv.fetchMyGames(d.history.restart(net::GamesFilter()), game::HistoryPager::kPageSize, net::GamesFilter());
+        srv.fetchMyGames(d.history.restart(rated), game::HistoryPager::kPageSize, rated);
+        for (int answers = 0, guard = 0; answers < 2 && guard < 1200; ++guard) {
+            Event e;
+            while (srv.poll(e))
+                if (e.kind == Kind::GamesResult) {
+                    d.apply(e, account, signedIn);
+                    ++answers;
+                }
+            mock::advance(50.0);
+        }
+        CHECK(d.history.loaded());
+        bool casual = false;
+        for (const net::GameSummary& g : d.history.page().games) casual = casual || !g.rated;
+        if (casual || d.history.page().total != ratedTotal) ++wrong;
+    }
+    CHECK_EQ(wrong, 0);
+    // A refusal names its request too.
+    net::GamesFilter bad;
+    bad.result = "aborted";
+    srv.fetchMyGames(30, 10, bad);
+    Event e;
+    CHECK(await(srv, Kind::GamesResult, e));
+    CHECK_EQ(e.error, std::string("invalid_filter"));
+    CHECK_EQ(e.gamesPage.before, uint64_t(30));
+    CHECK_EQ(e.gamesPage.filter.result, std::string("aborted"));
+}
+
 TEST(mock_account_games_are_legal_and_consistent) {
     VirtualClock vc;
     mock::FakeServer srv;

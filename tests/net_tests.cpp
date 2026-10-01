@@ -2541,6 +2541,9 @@ TEST(net_account_games_history) {
     ev = r.wait(K::GamesResult);
     CHECK_EQ(r.last().path, std::string("/api/v1/account/games?before=790&limit=50&category=3%2B2&rated=true&result=win"));
     CHECK_EQ(ev.gamesPage.before, uint64_t(790));
+    CHECK_EQ(ev.gamesPage.filter.category, std::string("3+2"));   // the request, named in its answer
+    CHECK_EQ(ev.gamesPage.filter.rated, 1);
+    CHECK_EQ(ev.gamesPage.filter.result, std::string("win"));
     f = net::GamesFilter();
     f.rated = 0;
     f.category = "custom";
@@ -2548,12 +2551,16 @@ TEST(net_account_games_history) {
     r.wait(K::GamesResult);
     CHECK_EQ(r.last().path, std::string("/api/v1/account/games?limit=20&category=custom&rated=false"));
 
-    // Errors: the server's code; malformed answers.
+    // Errors: the server's code (the request still named); malformed answers.
     mode = 1;
-    r.c->fetchMyGames(0, 10, net::GamesFilter());
+    f = net::GamesFilter();
+    f.result = "draw";
+    r.c->fetchMyGames(812, 10, f);
     ev = r.wait(K::GamesResult);
     CHECK(!ev.ok);
     CHECK_EQ(ev.error, std::string("invalid_filter"));
+    CHECK_EQ(ev.gamesPage.before, uint64_t(812));
+    CHECK_EQ(ev.gamesPage.filter.result, std::string("draw"));
     for (int m : {2, 3}) {
         mode = m;
         r.c->fetchMyGames(0, 10, net::GamesFilter());

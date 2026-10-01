@@ -16,9 +16,12 @@ using Kind = net::Event::Kind;
 
 namespace {
 
-net::GamesPage pageOf(uint64_t before, uint64_t next, int total, int count, uint64_t firstId) {
+// An answer to the request of cursor 'before' and filter f.
+net::GamesPage pageOf(uint64_t before, uint64_t next, int total, int count, uint64_t firstId,
+                      const net::GamesFilter& f = net::GamesFilter()) {
     net::GamesPage p;
     p.before = before;
+    p.filter = f;
     p.next = next;
     p.total = total;
     for (int i = 0; i < count; ++i) {
@@ -50,7 +53,7 @@ TEST(account_history_pages_forward_and_back) {
     CHECK_EQ(h.filter().rated, 1);
     uint64_t before = 0;
     CHECK(!h.next(before));  // nothing loaded yet
-    CHECK(h.accept(pageOf(0, 900, 25, 10, 1000)));
+    CHECK(h.accept(pageOf(0, 900, 25, 10, 1000, f)));
     CHECK(!h.waiting());
     CHECK(h.loaded());
     CHECK_EQ(h.pageIndex(), 0);
@@ -63,13 +66,13 @@ TEST(account_history_pages_forward_and_back) {
     CHECK_EQ(before, uint64_t(900));
     CHECK(!h.next(before));  // one request at a time
     CHECK(h.waiting());
-    CHECK(h.accept(pageOf(900, 800, 25, 10, 899)));
+    CHECK(h.accept(pageOf(900, 800, 25, 10, 899, f)));
     CHECK_EQ(h.pageIndex(), 1);
     CHECK(h.hasPrevious());
 
     CHECK(h.next(before));
     CHECK_EQ(before, uint64_t(800));
-    CHECK(h.accept(pageOf(800, 0, 25, 5, 799)));
+    CHECK(h.accept(pageOf(800, 0, 25, 5, 799, f)));
     CHECK_EQ(h.pageIndex(), 2);
     CHECK(!h.hasNext());
     CHECK_EQ(int(h.page().games.size()), 5);
@@ -77,11 +80,11 @@ TEST(account_history_pages_forward_and_back) {
     // Back: the cursor of the page before, kept from the way forward.
     CHECK(h.previous(before));
     CHECK_EQ(before, uint64_t(900));
-    CHECK(h.accept(pageOf(900, 800, 25, 10, 899)));
+    CHECK(h.accept(pageOf(900, 800, 25, 10, 899, f)));
     CHECK_EQ(h.pageIndex(), 1);
     CHECK(h.previous(before));
     CHECK_EQ(before, uint64_t(0));
-    CHECK(h.accept(pageOf(0, 900, 25, 10, 1000)));
+    CHECK(h.accept(pageOf(0, 900, 25, 10, 1000, f)));
     CHECK_EQ(h.pageIndex(), 0);
     CHECK(!h.hasPrevious());
 }
@@ -93,6 +96,9 @@ TEST(account_history_keeps_only_the_awaited_answer) {
     CHECK(h.waiting());
     CHECK(h.accept(pageOf(0, 900, 12, 10, 1000)));
     CHECK(!h.accept(pageOf(0, 900, 12, 10, 1000)));  // nothing awaited any more
+    h.reload();
+    CHECK(!h.accept(pageOf(0, 900, 12, 10, 1000, net::GamesFilter{"3+2", -1, ""})));  // another filter
+    CHECK(h.accept(pageOf(0, 900, 12, 10, 1000)));
 
     // A filter changed while a page was coming: the old answer is dropped.
     uint64_t before = 0;
@@ -101,15 +107,90 @@ TEST(account_history_keeps_only_the_awaited_answer) {
     wins.result = "win";
     h.restart(wins);
     CHECK(!h.accept(pageOf(900, 0, 12, 2, 899)));
-    CHECK(h.accept(pageOf(0, 0, 4, 4, 1000)));
+    CHECK(h.accept(pageOf(0, 0, 4, 4, 1000, wins)));
     CHECK_EQ(h.filter().result, std::string("win"));
     CHECK_EQ(h.pageCount(), 1);
+}
+
+// Every answer names its request (GamesPage::before and filter): an answer of an earlier filter,
+// or the failure of an earlier request, never stands for the one awaited, in whatever order the
+// answers arrive (the fake server's latencies differ from one call to the next).
+TEST(account_history_answers_of_other_requests) {
+    net::GamesFilter all, rated;
+    rated.rated = 1;
+    auto answer = [](const net::GamesFilter& f, uint64_t before, uint64_t next, int total, int count, uint64_t firstId) {
+        net::Event e = event(Kind::GamesResult);
+        e.gamesPage = pageOf(before, next, total, count, firstId);
+        e.gamesPage.filter = f;
+        return e;
+    };
+    auto failure = [](const net::GamesFilter& f, uint64_t before, const char* error) {
+        net::Event e = event(Kind::GamesResult, false, error);
+        e.gamesPage.before = before;
+        e.gamesPage.filter = f;
+        return e;
+    };
+    AccountData d;
+    net::AccountInfo account;
+    bool signedIn = true;
+
+    // Games = All, then Rated before the first answer: All's first page arrives first, dropped.
+    d.history.restart(all);
+    d.history.restart(rated);
+    CHECK(d.apply(answer(all, 0, 900, 45, 10, 1000), account, signedIn));
+    CHECK(!d.history.loaded());
+    CHECK(d.history.waiting());
+    CHECK(d.apply(answer(rated, 0, 980, 20, 10, 990), account, signedIn));
+    CHECK(d.history.loaded());
+    CHECK(!d.history.waiting());
+    CHECK_EQ(d.history.page().total, 20);
+    CHECK_EQ(d.history.page().games.front().id, uint64_t(990));
+
+    // Next in flight, then the filter changes and the old Next fails: the new filter's first page
+    // is still awaited, and kept when it comes.
+    uint64_t before = 0;
+    CHECK(d.history.next(before));
+    CHECK_EQ(before, uint64_t(980));
+    d.history.restart(all);
+    CHECK(d.apply(failure(rated, 980, "timeout"), account, signedIn));
+    CHECK(d.history.waiting());
+    CHECK(d.history.error().empty());
+    CHECK(d.apply(answer(all, 0, 900, 45, 10, 1000), account, signedIn));
+    CHECK(d.history.loaded());
+    CHECK_EQ(d.history.page().total, 45);
+
+    // The same request twice (Account > History while the first is in flight), the first fails:
+    // the second still answers it.
+    d.history.restart(rated);
+    d.history.restart(rated);
+    CHECK(d.apply(failure(rated, 0, "rate_limited"), account, signedIn));
+    CHECK(d.history.waiting());
+    CHECK(d.apply(answer(rated, 0, 980, 20, 10, 990), account, signedIn));
+    CHECK(d.history.loaded());
+    CHECK(d.history.error().empty());
+    // All, Rated, All again: the first All fails, the Rated answer is not the one awaited, the
+    // second All is kept.
+    d.history.restart(all);
+    d.history.restart(rated);
+    d.history.restart(all);
+    CHECK(d.apply(failure(all, 0, "timeout"), account, signedIn));
+    CHECK(d.apply(answer(rated, 0, 980, 20, 10, 990), account, signedIn));
+    CHECK(d.history.waiting());
+    CHECK(d.apply(answer(all, 0, 900, 45, 10, 1000), account, signedIn));
+    CHECK(d.history.loaded());
+    CHECK_EQ(d.history.page().total, 45);
+    // The failure of the request awaited, with none like it in flight: the error shows.
+    CHECK(d.history.next(before));
+    CHECK(d.apply(failure(all, 900, "timeout"), account, signedIn));
+    CHECK(!d.history.waiting());
+    CHECK_EQ(d.history.error(), std::string("timeout"));
+    CHECK_EQ(d.history.page().total, 45);  // the page shown stays
 }
 
 TEST(account_history_errors_and_reload) {
     HistoryPager h;
     h.restart(net::GamesFilter());
-    h.fail("");
+    h.fail(pageOf(0, 0, 0, 0, 0), "");
     CHECK(!h.waiting());
     CHECK(!h.loaded());
     CHECK_EQ(h.error(), std::string("server_error"));
@@ -118,7 +199,7 @@ TEST(account_history_errors_and_reload) {
     CHECK(h.accept(pageOf(0, 900, 30, 10, 1000)));
     uint64_t before = 0;
     CHECK(h.next(before));
-    h.fail("network");
+    h.fail(pageOf(900, 0, 0, 0, 0), "network");
     CHECK_EQ(h.error(), std::string("network"));
     CHECK_EQ(h.pageIndex(), 0);  // the page shown stays
     CHECK_EQ(int(h.page().games.size()), 10);
