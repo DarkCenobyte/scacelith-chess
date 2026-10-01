@@ -200,6 +200,16 @@ count.time = {n}回
 count.time.spoken = {n:q}かい
 count.square = {n}マス
 count.square.spoken = {n:m}マス
+# Japanese-only counters of the review and the appraisal (pass 2):
+#   ko       a plain count of things with 個 ("{sq}を攻める私の駒は{n:ko}" = 3個, さんこ)
+#   moveno   a move NUMBER, "the 11th move" ("{n:moveno}の{move}" = 11手目, じゅういってめ)
+#   percent  an accuracy ("精度{acc:percent}" = 75%, ななじゅうごパーセント; 1/8/10 いっ/はっ/じゅっ)
+count.ko = {n}個
+count.ko.spoken = {n:q}こ
+count.moveno = {n}手目
+count.moveno.spoken = {n:qt}てめ
+count.percent = {n}%
+count.percent.spoken = {n:qt}パーセント
 # The number forms themselves, so that a line may say a bare number with a sound change ("{n:qt}");
 # they also register q, qt and m as number forms for the catalog check. Digits in writing.
 count.q = {n:q}
