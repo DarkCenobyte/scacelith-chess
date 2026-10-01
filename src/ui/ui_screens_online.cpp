@@ -4,9 +4,14 @@
 //   - sign in (user name or e-mail + password, Google), the two-factor code step, create an
 //     account (then "check your e-mail" with Resend), forgot password, Google first login
 //     (choose a user name);
-//   - account: ratings per time control (provisional "1500?", games, W/D/L), change password,
-//     two-factor setup (QR code + key in groups of four + code, then 10 recovery codes shown
-//     once), turn it off, new recovery codes, sign out (here / everywhere);
+//   - account, in three columns: the account (user name, e-mail and an e-mail change waiting
+//     for its link, two-factor, Google, the "Accept challenges" preference, sign out here /
+//     everywhere), security and data (change password, change e-mail, two-factor setup (QR
+//     code + key in groups of four + code, then 10 recovery codes shown once), turn it off, new
+//     recovery codes, signed-in devices, download my data, delete the account) and the ratings
+//     per time control (provisional "1500?", games, W/D/L); Game history in the footer. The
+//     account API's pages (history, a game of it, devices, e-mail, export, deletion) are in
+//     ui_screens_account.cpp, sharing this page's chrome through ui_online_pages.h;
 //   - play: the server's rated categories with the player's ratings, rated or casual, Find
 //     opponent (searching card: elapsed time, rating window, Cancel), challenge a player,
 //     private game (create: a code to share / join with a code), matchmaking pause and ban notices;
