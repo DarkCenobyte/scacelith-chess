@@ -54,4 +54,24 @@ Prebuilt Windows binaries. This branch only holds binaries; the source code is o
 - SHA-256 of the exe: `589b8c6d106ffa40af3957bfbb9df43fb46772aa0fe4b2957a50e7e87f562ccb`
 - SHA-256 of the zip: `822bca587586c53cade9e6d2eecec30815be3366441a0e6ab40b05b33ae62c6e`
 
+## windows/Scacelith-2026-10-01-coach.zip
+
+- Holds `Scacelith-2026-10-01-coach.exe` (135 MB, zipped to 96 MB).
+- Source: branch `claude/coach-mode-qpdb1i` at commit `2a1069a` (the Coach mode pull request, not
+  merged yet), based on `master` at `435d8bc` (pull request #5 merged).
+- Contents: everything above, plus Coach mode (a talking, pointing robot coach: the rules lesson and
+  levels 1 to 6, explanations of mistakes with takebacks and demonstration lines played on the
+  board, opening names, an end-of-game appraisal), untimed games without a clock press, games saved
+  as PGN files with a "Saved Games" page, and replays of those games with the free camera.
+- The coach's voice model (Supertonic 3, 145 MB, OpenRAIL-M licence) is not in the exe: the game
+  offers to download it from Hugging Face (fallback: the sherpa-onnx GitHub release) the first time
+  Coach mode or the "Coach voice" option needs it, into `%APPDATA%\scacelith\coach\`. Saved games go to
+  `%APPDATA%\scacelith\pgn\`.
+- Windows x64, self-contained otherwise (Stockfish 19 in five builds and its NNUE network are
+  embedded). Needs a GPU with OpenGL 4.6.
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (486 tests); it has
+  not been run on real Windows hardware by the build.
+- SHA-256 of the exe: `573090297946ea6d6282c0e263e8eb4b59c16d68ce54bb838209865f59acd7e3`
+- SHA-256 of the zip: `c80a2befb7eed7764c997cd37a33b97e13c97e61660c44a434f4097674cb323a`
+
 Licence: GPL-3.0 (see `LICENSE` on `master`); the source of each build is the commit named above.
