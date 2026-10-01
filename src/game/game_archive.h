@@ -9,11 +9,17 @@
 // the folder and moved to its name in one step that never replaces a file (a suffix _2, _3...
 // on a collision): a crash or a full disk never leaves half a game under a game's name.
 //
-// Which games are saved (shouldSave): games against Stockfish, coach games of levels 1 to 6 (not
-// the rules lesson; the coach's demonstration lines never reach the game record), hot-seat games
-// and direct matches (no server); not the games of an online server (the server keeps them), not
-// the viewer mode. Finished games with their result; a game left before its end with "*" and
-// Termination "unterminated". Options [archive] save_games turns it off.
+// Which games are saved when they end (shouldSave): games against Stockfish, coach games of levels
+// 1 to 6 (not the rules lesson; the coach's demonstration lines never reach the game record),
+// hot-seat games and direct matches (no server); not the viewer mode, and not the games of an
+// online server (the server keeps them). Finished games with their result; a game left before its
+// end with "*" and Termination "unterminated". Options [archive] save_games turns it off.
+//
+// Games of an online server are saved on the player's request instead (the account pages' game
+// history, "Save to saved games" and "Replay"): the server's own PGN (GET /games/:id/pgn, read as
+// untrusted input) with the tags ScacelithMode "server", ScacelithServer (the server's origin) and
+// ScacelithGameId, each game of a server once (saveServerGame). [archive] save_games does not
+// apply: the player asked for it.
 //
 // Listing: every *.pgn file of the folder, one entry per game, newest first (Date and Time tags,
 // UTCDate and UTCTime for exports, then the file's time). Only the tags and the number of moves are
@@ -40,7 +46,7 @@ enum class Mode {
     Coach,     // against the coach ("coach")
     HotSeat,   // two players on one PC ("hotseat")
     Direct,    // a direct match, no server ("direct")
-    Server,    // a game of an online server: never saved ("server")
+    Server,    // a game of an online server: saved on request only ("server")
     Watch,     // the viewer mode: never saved ("watch")
     Imported   // no ScacelithMode tag: a file from elsewhere
 };
@@ -49,7 +55,8 @@ Mode modeFromName(const std::string& name);   // Imported for anything else
 
 // Whether a game is saved when it ends or is left. coachLevel: Coach games only (0 = the rules
 // lesson); plies: moves played; finished: it has a result; enabled: Options [archive] save_games.
-// Nothing is saved for a game left before its first move.
+// Nothing is saved for a game left before its first move, and never a game of an online server
+// (Mode::Server: saveServerGame, on the player's request).
 bool shouldSave(Mode mode, int coachLevel, int plies, bool finished, bool enabled);
 
 // What the scene knows of a game besides its moves (makeRecord). Termination, when not given:
@@ -101,6 +108,10 @@ struct SaveResult {
 // Writes the record as a new file in 'folder' (created when missing), named by fileName(record,
 // when) (when 0 = now), never replacing a file.
 SaveResult save(const std::string& folder, const chess::pgn::Record& record, std::time_t when = 0);
+// Writes 'text' as a new file 'name' in 'folder' (created when missing), the way save() writes a
+// game: a temporary file moved to its name in one step that never replaces a file, "name_2.ext",
+// "name_3.ext"... on a collision. The account page's data export is written this way.
+SaveResult saveFile(const std::string& folder, const std::string& name, const std::string& text);
 
 // ---- Listing ---------------------------------------------------------------------------------------
 struct Entry {
@@ -173,6 +184,45 @@ struct RemoveResult {
 };
 // Deletes the entry's file when it holds this one game only.
 RemoveResult remove(const Entry& entry);
+
+// ---- Games of an online server (saved on request) ---------------------------------------------------
+struct ServerGame {
+    std::string server;                // the server's origin ("caissa.scacelith.com:443"): ScacelithServer
+    uint64_t gameId = 0;               // the server's id of the game: ScacelithGameId
+    std::string endKey;                // i18n key of the ending ("reason.checkmate"), "" = unknown:
+                                       // ScacelithEnd (without "reason.") of a finished game
+};
+// The largest PGN text taken from a server for one game.
+constexpr size_t kMaxServerPgnBytes = size_t(4) << 20;
+// The server's PGN of one game as a record of the saved games. The text is untrusted: at most
+// kMaxServerPgnBytes, exactly one game, read without error. Tags set: ScacelithMode "server",
+// ScacelithServer, ScacelithGameId (a different id in the text is refused), ScacelithEnd (finished
+// games, when endKey is known); Date and Time become the local date and time of the start, from
+// UTCDate and UTCTime (the folder's own games are in local time; UTCDate and UTCTime are kept).
+// False with an English error when the text cannot be used.
+bool serverRecord(const std::string& pgnText, const ServerGame& game, chess::pgn::Record& out, std::string& error);
+// The entry of a listing that is this game of this server (ScacelithMode "server", the same
+// ScacelithServer and ScacelithGameId), nullptr when there is none.
+const Entry* findServerGame(const std::vector<Entry>& entries, const std::string& server, uint64_t gameId);
+enum class ServerSaveStatus {
+    Saved,                             // written now
+    AlreadySaved,                      // a file of the folder holds it: nothing written
+    NeedsText,                         // not saved yet, and no PGN text was given (a lookup only)
+    Invalid,                           // the text is not a usable game (serverRecord)
+    Failed                             // the file could not be written
+};
+struct ServerSaveResult {
+    ServerSaveStatus status = ServerSaveStatus::Failed;
+    std::string path;                  // the file of the game (Saved, AlreadySaved)
+    int index = 0;                     // the game's index in that file
+    std::string error;                 // English, for the log
+};
+// Saves a game of a server in 'folder' once: when a file of the folder holds it already, says so
+// (AlreadySaved, with its file) and writes nothing; otherwise serverRecord(pgnText) is saved with
+// save(), named after the start of the game. An empty pgnText only looks (NeedsText when the game
+// is not there yet). Lists the folder (list(): cached, but the first listing of a large folder
+// takes a while): call it off the UI thread.
+ServerSaveResult saveServerGame(const std::string& folder, const ServerGame& game, const std::string& pgnText);
 
 }  // namespace archive
 }  // namespace game

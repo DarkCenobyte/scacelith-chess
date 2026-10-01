@@ -64,6 +64,7 @@ struct State {
     float creditsScroll = 0.0f, creditsScrollTarget = 0.0f;
     bool resumeOnline = false;      // an online game started from the online page: back to it after
     bool optionsToOnline = false;   // Options opened from the online page: back to it on close
+    bool replayFromOnline = false;  // a replay started from the online page (a game of the history)
     // options (shared by both menus)
     OptionsState opt;
     int forcedTab = -1;
@@ -1533,7 +1534,11 @@ void foldGameOver(bool folded) { S.forcedFold = folded ? 1 : 0; }
 bool optionsOpen() { return S.optionsVisible || S.optionsVisiblePrev; }
 
 void openBrightnessCalibration() { S.forcedPage = int(Page::Calibration); }
-void openSavedGames() { S.forcedPage = int(Page::Library); }
+// Back from a replay: the saved games, or the online page's game it was started from.
+void openSavedGames() {
+    S.forcedPage = int(S.replayFromOnline ? Page::Online : Page::Library);
+    S.replayFromOnline = false;
+}
 
 MenuAction mainMenu(NewGameSetup& setup) {
     static WatchSetup watch;
@@ -1596,7 +1601,7 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, L
         }
         case Page::Online: {
             bool back = false;
-            detail::onlinePage(ease(S.pageT), fresh, back);
+            act = detail::onlinePage(hasLibrary ? &library : nullptr, ease(S.pageT), fresh, back);
             if (back) setPage(Page::Title);
             break;
         }
@@ -1616,7 +1621,11 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, L
     if (detail::onlineGameStarting()) S.resumeOnline = S.page == Page::Online;
     if (act == MenuAction::StartGame || act == MenuAction::Quit) setPage(Page::Title);
     if (act == MenuAction::StartWatching || act == MenuAction::StartCoach) setPage(Page::Title);
-    if (act == MenuAction::StartReplay) setPage(Page::Title);
+    if (act == MenuAction::StartReplay) {
+        // After the replay, openSavedGames() comes back to the page it started from.
+        S.replayFromOnline = S.page == Page::Online;
+        setPage(Page::Title);
+    }
     return act;
 }
 

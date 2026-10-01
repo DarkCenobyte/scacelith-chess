@@ -1,8 +1,9 @@
 // Online play on the game's side. One OnlineSession per process (onlineSession()) sits between
 // the network layer (net::OnlineClient for the Scacelith server, net::DirectMatch for a direct
 // match) and the game, and is the only code that polls them:
-//   - the menus (ui/ui_screens_online*.cpp) read its state (server info, account, connection,
-//     matchmaking, challenges) and send commands through api() / direct();
+//   - the menus (ui/ui_screens_online*.cpp, ui/ui_screens_account.cpp) read its state (server
+//     info, account, connection, matchmaking, challenges, the account API's data: game history,
+//     the game opened from it, signed-in devices) and send commands through api() / direct();
 //   - the 3D scene plays the games it announces (gameReady() / takeGame()) through a GameLink and
 //     drains their events with nextGameEvent(), the opponent's live gestures (OpponentGesture)
 //     included: only those of the game being played, the latest one replacing one still queued.
@@ -14,6 +15,7 @@
 #include "../net/direct_match.h"
 #include "../net/online_client.h"
 #include "game_link.h"
+#include "online_account.h"
 #include "online_live.h"
 #include <deque>
 #include <map>
@@ -160,6 +162,20 @@ public:
     bool busy(net::Event::Kind k) const;
     bool take(net::Event::Kind k, net::Event& out);
 
+    // ---- Account API (game history, devices, preferences) -----------------------------------------
+    // What the account pages show, kept from the answers (AccountData::apply). The requests below
+    // send the command and expect() its result, so busy() and take() work as for the others; an
+    // account deleted (AccountDeleted) signs out here, a changed e-mail fetches the account again.
+    const AccountData& accountData() const { return data_; }
+    void loadHistory(const net::GamesFilter& filter);   // its first page
+    void historyNext();
+    void historyPrevious();
+    void historyReload();                               // the page shown, again (after an error)
+    void openGame(uint64_t gameId);                     // accountData().game
+    void loadSessions();
+    void revokeSession(int64_t sessionId);
+    void setAcceptChallenges(bool accept);
+
     // ---- Realtime -------------------------------------------------------------------------------
     net::ConnState conn() const { return conn_; }
     int pingMs() const;                         // of the connection in use (server, or the direct peer)
@@ -238,6 +254,7 @@ private:
     net::ServerInfo info_;
     bool signedIn_ = false;
     net::AccountInfo account_;
+    AccountData data_;
     std::string serverNameRt_;
     std::map<int, net::Event> results_;
     std::map<int, int> pending_;

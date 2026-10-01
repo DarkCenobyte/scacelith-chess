@@ -4,9 +4,14 @@
 //   - sign in (user name or e-mail + password, Google), the two-factor code step, create an
 //     account (then "check your e-mail" with Resend), forgot password, Google first login
 //     (choose a user name);
-//   - account: ratings per time control (provisional "1500?", games, W/D/L), change password,
-//     two-factor setup (QR code + key in groups of four + code, then 10 recovery codes shown
-//     once), turn it off, new recovery codes, sign out (here / everywhere);
+//   - account, in three columns: the account (user name, e-mail and an e-mail change waiting
+//     for its link, two-factor, Google, the "Accept challenges" preference, sign out here /
+//     everywhere), security and data (change password, change e-mail, two-factor setup (QR
+//     code + key in groups of four + code, then 10 recovery codes shown once), turn it off, new
+//     recovery codes, signed-in devices, download my data, delete the account) and the ratings
+//     per time control (provisional "1500?", games, W/D/L); Game history in the footer. The
+//     account API's pages (history, a game of it, devices, e-mail, export, deletion) are in
+//     ui_screens_account.cpp, sharing this page's chrome through ui_online_pages.h;
 //   - play: the server's rated categories with the player's ratings, rated or casual, Find
 //     opponent (searching card: elapsed time, rating window, Cancel), challenge a player,
 //     private game (create: a code to share / join with a code), matchmaking pause and ban notices;
@@ -19,6 +24,7 @@
 #include "ui_draw.h"
 #include "ui_internal.h"
 #include "ui_online.h"
+#include "ui_online_pages.h"
 #include "ui_screens_game.h"
 #include "ui_screens_online.h"
 #include "ui_theme.h"
@@ -43,12 +49,11 @@ using m::vec2;
 using m::vec4;
 using namespace theme;
 
-namespace {
+// ---- Shared with the account pages (ui_online_pages.h) -----------------------------------------------
+namespace detail {
+namespace onl {
 
-using Kind = net::Event::Kind;
-
-// ---- Helpers ---------------------------------------------------------------------------------------
-TextStyle style(int face, float size, vec4 color, HAlign align = HAlign::Left, float tracking = 0.0f) {
+TextStyle style(int face, float size, vec4 color, HAlign align, float tracking) {
     TextStyle st;
     st.face = face;
     st.size = size;
@@ -57,10 +62,8 @@ TextStyle style(int face, float size, vec4 color, HAlign align = HAlign::Left, f
     st.tracking = tracking;
     return st;
 }
-float ease(float t) { return m::smootherstep(t); }
 std::string T(const char* key) { return i18n::tr(key); }
 std::string L(const char* key) { return std::string(i18n::tr(key)) + "##" + key; }
-vec2 view() { return gfx::viewSize(); }
 game::OnlineSession& ses() { return game::onlineSession(); }
 
 std::string spacedPlus(const std::string& label) {
@@ -68,6 +71,116 @@ std::string spacedPlus(const std::string& label) {
     if (p == std::string::npos) return label;
     return label.substr(0, p) + "\xE2\x80\x89+\xE2\x80\x89" + label.substr(p + 1);
 }
+std::string trim(const std::string& s) {
+    size_t a = s.find_first_not_of(" \t"), b = s.find_last_not_of(" \t");
+    return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
+}
+
+// Rotating dots (a request in flight).
+void spinner(vec2 c, float r, float alpha) {
+    float t = float(im::time());
+    for (int i = 0; i < 8; ++i) {
+        float a = float(i) / 8.0f * 6.2831853f;
+        float phase = std::fmod(t * 1.3f - float(i) / 8.0f + 8.0f, 1.0f);
+        gfx::diamond(vec2(c.x + std::cos(a) * r, c.y + std::sin(a) * r), 2.6f, withAlpha(gold, (0.2f + 0.8f * phase) * alpha));
+    }
+}
+
+// Centered wrapped paragraph from 'y' (baseline of the first line); returns the height used.
+float paragraph(const std::string& s, const Rect& p, float y, float width, vec4 color, float size, int face) {
+    if (s.empty()) return 0.0f;
+    TextStyle ts = style(face, size, color, HAlign::Center);
+    float lh = size * 1.35f;
+    int n = gfx::textWrapped(s, p.cx(), y, width, ts, lh);
+    return float(n) * lh;
+}
+
+Rect beginPage(float t, float w, float h, const std::string& title) {
+    vec2 v = gfx::viewSize();
+    detail::dimBackground(t);
+    w = std::min(w, v.x - 80.0f);
+    h = std::min(h, v.y - 40.0f);
+    Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 14.0f, w, h);
+    gfx::pushAlpha(t);
+    im::panel(p);
+    im::pageTitle(title, p.cx(), p.y + 80.0f);
+    return p;
+}
+void endPage() { gfx::popAlpha(); }
+
+// Server and connection in the panel's top corner (start side).
+void serverLine(const Rect& p, bool showConnection) {
+    game::OnlineSession& s = ses();
+    std::string server = s.serverName();
+    if (server.empty()) return;
+    std::string line = i18n::ltr(server);
+    vec4 dot = withAlpha(muted, 0.8f);
+    if (showConnection) {
+        switch (s.conn()) {
+        case net::ConnState::Online: line += "  \xC2\xB7  " + T("online.conn.online"); dot = vec4(0.45f, 0.72f, 0.42f, 1.0f); break;
+        case net::ConnState::Connecting: line += "  \xC2\xB7  " + T("online.conn.connecting"); dot = withAlpha(gold, 0.9f); break;
+        case net::ConnState::Reconnecting: line += "  \xC2\xB7  " + T("online.conn.reconnecting"); dot = withAlpha(gold, 0.9f); break;
+        case net::ConnState::Incompatible: line += "  \xC2\xB7  " + T("online.conn.incompatible"); dot = danger; break;
+        default: line += "  \xC2\xB7  " + T("online.conn.offline"); break;
+        }
+    }
+    TextStyle ts = style(font::FACE_ITALIC, kCaption, withAlpha(muted, 0.95f), im::startAlign());
+    ts.size = gfx::fitSize(line, ts, p.w * 0.3f, 0.75f);
+    // Above the page title's height, so a long title never meets it.
+    gfx::diamond(vec2(im::flipX(p, p.x + 40.0f), p.y + 31.0f), 3.5f, dot);
+    gfx::text(line, im::flipX(p, p.x + 54.0f), p.y + 37.0f, ts);
+}
+
+Rect formRow(const Rect& p, float& y, float inset) {
+    Rect r(p.x + inset, y, p.w - 2.0f * inset, 56.0f);
+    y += 64.0f;
+    return r;
+}
+
+float footerY(const Rect& p) { return p.b() - 48.0f - kBtnH; }
+bool backButton(const Rect& p, const char* key) {
+    return im::button(L(key), im::flip(p, Rect(p.x + 60.0f, footerY(p), kBtnW, kBtnH)), im::ButtonKind::Secondary);
+}
+bool primaryButton(const Rect& p, const char* key, bool enabled, bool busy) {
+    Rect r = im::flip(p, Rect(p.r() - 60.0f - kBtnW, footerY(p), kBtnW, kBtnH));
+    im::Id id = im::makeId(std::string("##") + key);
+    bool hit = im::button(L(key), r, im::ButtonKind::Primary, enabled && !busy);
+    if (busy) spinner(vec2(im::flipX(p, r.x - 34.0f), r.cy()));
+    im::setDefaultFocus(id);
+    return hit && enabled && !busy;
+}
+void footerRule(const Rect& p) {
+    gfx::hlineFade(p.x + 40.0f, p.r() - 40.0f, footerY(p) - 26.0f, withAlpha(gold, 0.25f), 0.3f);
+}
+
+// A quiet link-like button, centered at cx.
+bool linkButton(const char* key, float cx, float y, bool enabled) {
+    TextStyle qs = style(font::FACE_ITALIC, kSmall, muted);
+    float w = std::max(160.0f, gfx::textWidth(T(key), qs) + 40.0f);
+    return im::button(L(key), Rect(cx - w * 0.5f, y, w, 44.0f), im::ButtonKind::Quiet, enabled);
+}
+
+// Label / value line of the account page.
+void infoLine(const std::string& label, const std::string& value, const Rect& col, float y, vec4 valueColor) {
+    TextStyle ls = style(font::FACE_TITLE, 17.0f, withAlpha(gold, 0.9f), im::startAlign(), 0.18f);
+    gfx::text(label, im::flipX(col, col.x), y, ls);
+    TextStyle vs = style(font::FACE_TEXT, kBody, valueColor, im::startAlign());
+    vs.size = gfx::fitSize(value, vs, col.w - 10.0f, 0.7f);
+    gfx::text(value, im::flipX(col, col.x), y + 34.0f, vs);
+}
+
+}  // namespace onl
+}  // namespace detail
+
+namespace {
+
+using namespace detail::onl;
+using Kind = net::Event::Kind;
+
+// ---- Helpers ---------------------------------------------------------------------------------------
+float ease(float t) { return m::smootherstep(t); }
+vec2 view() { return gfx::viewSize(); }
+
 std::string tcLabel(int baseSec, int incSec) {
     std::string base = baseSec % 60 == 0 ? std::to_string(baseSec / 60) : [&] {
         char b[16];
@@ -102,10 +215,6 @@ std::string ratingText(const net::RatingInfo* r) {
     if (!r) return "1500?";
     return std::to_string(r->rating) + (r->provisional ? "?" : "");
 }
-std::string trim(const std::string& s) {
-    size_t a = s.find_first_not_of(" \t"), b = s.find_last_not_of(" \t");
-    return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
-}
 std::string digitsOnly(const std::string& s) {
     std::string r;
     for (char c : s)
@@ -138,37 +247,45 @@ bool isOfficialCategory(int baseSec, int incSec) {
     return false;
 }
 
-// Rotating dots (a request in flight).
-void spinner(vec2 c, float r = 12.0f, float alpha = 1.0f) {
-    float t = float(im::time());
-    for (int i = 0; i < 8; ++i) {
-        float a = float(i) / 8.0f * 6.2831853f;
-        float phase = std::fmod(t * 1.3f - float(i) / 8.0f + 8.0f, 1.0f);
-        gfx::diamond(vec2(c.x + std::cos(a) * r, c.y + std::sin(a) * r), 2.6f, withAlpha(gold, (0.2f + 0.8f * phase) * alpha));
-    }
-}
 
-// Centered wrapped paragraph from 'y' (baseline of the first line); returns the height used.
-float paragraph(const std::string& s, const Rect& p, float y, float width, vec4 color = ivoryDim, float size = kBody,
-                int face = font::FACE_ITALIC) {
-    if (s.empty()) return 0.0f;
-    TextStyle ts = style(face, size, color, HAlign::Center);
-    float lh = size * 1.35f;
-    int n = gfx::textWrapped(s, p.cx(), y, width, ts, lh);
-    return float(n) * lh;
-}
 
 // ---- State -----------------------------------------------------------------------------------------
 enum class Sub {
     NoServer, SignIn, Mfa, Register, CheckEmail, Forgot, SsoWait, SsoName,
     Account, Password, MfaSetup, MfaOff, Recovery,
+    History, Game, Devices, Email, Export, Delete,   // the account API's pages (ui_screens_account.cpp)
     Play, Challenge, Private,
     Direct, DirectHost, DirectWait, DirectJoin
 };
 
+// The account API's pages and their sub-pages here.
+bool accountSub(Sub s, AccountPage& page) {
+    switch (s) {
+    case Sub::History: page = AccountPage::History; return true;
+    case Sub::Game: page = AccountPage::Game; return true;
+    case Sub::Devices: page = AccountPage::Devices; return true;
+    case Sub::Email: page = AccountPage::Email; return true;
+    case Sub::Export: page = AccountPage::Export; return true;
+    case Sub::Delete: page = AccountPage::Delete; return true;
+    default: return false;
+    }
+}
+Sub subOf(AccountPage page) {
+    switch (page) {
+    case AccountPage::History: return Sub::History;
+    case AccountPage::Game: return Sub::Game;
+    case AccountPage::Devices: return Sub::Devices;
+    case AccountPage::Email: return Sub::Email;
+    case AccountPage::Export: return Sub::Export;
+    case AccountPage::Delete: return Sub::Delete;
+    }
+    return Sub::Account;
+}
+
 bool needsAccount(Sub s) {
+    AccountPage page;
     return s == Sub::Account || s == Sub::Password || s == Sub::MfaSetup || s == Sub::MfaOff || s == Sub::Recovery ||
-           s == Sub::Play || s == Sub::Challenge || s == Sub::Private;
+           s == Sub::Play || s == Sub::Challenge || s == Sub::Private || accountSub(s, page);
 }
 bool isDirect(Sub s) { return s == Sub::Direct || s == Sub::DirectHost || s == Sub::DirectWait || s == Sub::DirectJoin; }
 
@@ -226,42 +343,15 @@ void clearSecrets() {
     O.code.clear();
 }
 
-// ---- Page chrome -------------------------------------------------------------------------------------
-Rect beginPage(float t, float w, float h, const std::string& title) {
-    vec2 v = view();
-    detail::dimBackground(t);
-    w = std::min(w, v.x - 80.0f);
-    h = std::min(h, v.y - 40.0f);
-    Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 14.0f, w, h);
-    gfx::pushAlpha(t);
-    im::panel(p);
-    im::pageTitle(title, p.cx(), p.y + 80.0f);
-    return p;
+// An account API page opened from the account page: its forms and messages start empty.
+void openAccountPage(Sub sub) {
+    AccountPage page;
+    if (accountSub(sub, page)) accountReset(page);
+    setSub(sub);
 }
-void endPage() { gfx::popAlpha(); }
 
-// Server and connection in the panel's top corner (start side).
-void serverLine(const Rect& p, bool showConnection) {
-    game::OnlineSession& s = ses();
-    std::string server = s.serverName();
-    if (server.empty()) return;
-    std::string line = i18n::ltr(server);
-    vec4 dot = withAlpha(muted, 0.8f);
-    if (showConnection) {
-        switch (s.conn()) {
-        case net::ConnState::Online: line += "  \xC2\xB7  " + T("online.conn.online"); dot = vec4(0.45f, 0.72f, 0.42f, 1.0f); break;
-        case net::ConnState::Connecting: line += "  \xC2\xB7  " + T("online.conn.connecting"); dot = withAlpha(gold, 0.9f); break;
-        case net::ConnState::Reconnecting: line += "  \xC2\xB7  " + T("online.conn.reconnecting"); dot = withAlpha(gold, 0.9f); break;
-        case net::ConnState::Incompatible: line += "  \xC2\xB7  " + T("online.conn.incompatible"); dot = danger; break;
-        default: line += "  \xC2\xB7  " + T("online.conn.offline"); break;
-        }
-    }
-    TextStyle ts = style(font::FACE_ITALIC, kCaption, withAlpha(muted, 0.95f), im::startAlign());
-    ts.size = gfx::fitSize(line, ts, p.w * 0.3f, 0.75f);
-    // Above the page title's height, so a long title never meets it.
-    gfx::diamond(vec2(im::flipX(p, p.x + 40.0f), p.y + 31.0f), 3.5f, dot);
-    gfx::text(line, im::flipX(p, p.x + 54.0f), p.y + 37.0f, ts);
-}
+// ---- Page chrome -------------------------------------------------------------------------------------
+
 
 // Error (red) or note (ivory) under a form, centered; returns the height used.
 float messageLine(const Rect& p, float y) {
@@ -270,35 +360,8 @@ float messageLine(const Rect& p, float y) {
     return 0.0f;
 }
 
-Rect formRow(const Rect& p, float& y, float inset = 90.0f) {
-    Rect r(p.x + inset, y, p.w - 2.0f * inset, 56.0f);
-    y += 64.0f;
-    return r;
-}
 
-constexpr float kBtnW = 260.0f, kBtnH = 56.0f;
-float footerY(const Rect& p) { return p.b() - 48.0f - kBtnH; }
-bool backButton(const Rect& p, const char* key = "common.back") {
-    return im::button(L(key), im::flip(p, Rect(p.x + 60.0f, footerY(p), kBtnW, kBtnH)), im::ButtonKind::Secondary);
-}
-bool primaryButton(const Rect& p, const char* key, bool enabled, bool busy = false) {
-    Rect r = im::flip(p, Rect(p.r() - 60.0f - kBtnW, footerY(p), kBtnW, kBtnH));
-    im::Id id = im::makeId(std::string("##") + key);
-    bool hit = im::button(L(key), r, im::ButtonKind::Primary, enabled && !busy);
-    if (busy) spinner(vec2(im::flipX(p, r.x - 34.0f), r.cy()));
-    im::setDefaultFocus(id);
-    return hit && enabled && !busy;
-}
-void footerRule(const Rect& p) {
-    gfx::hlineFade(p.x + 40.0f, p.r() - 40.0f, footerY(p) - 26.0f, withAlpha(gold, 0.25f), 0.3f);
-}
 
-// A quiet link-like button, centered at cx.
-bool linkButton(const char* key, float cx, float y, bool enabled = true) {
-    TextStyle qs = style(font::FACE_ITALIC, kSmall, muted);
-    float w = std::max(160.0f, gfx::textWidth(T(key), qs) + 40.0f);
-    return im::button(L(key), Rect(cx - w * 0.5f, y, w, 44.0f), im::ButtonKind::Quiet, enabled);
-}
 
 // A large choice: title and a one-line description (Play page, direct match).
 bool choiceRow(const char* key, const char* descKey, const Rect& r, bool enabled = true) {
@@ -343,14 +406,6 @@ bool tcTile(int id, const Rect& r, const std::string& label, const std::string& 
     return hit;
 }
 
-// Label / value line of the account page.
-void infoLine(const std::string& label, const std::string& value, const Rect& col, float y, vec4 valueColor = ivory) {
-    TextStyle ls = style(font::FACE_TITLE, 17.0f, withAlpha(gold, 0.9f), im::startAlign(), 0.18f);
-    gfx::text(label, im::flipX(col, col.x), y, ls);
-    TextStyle vs = style(font::FACE_TEXT, kBody, valueColor, im::startAlign());
-    vs.size = gfx::fitSize(value, vs, col.w - 10.0f, 0.7f);
-    gfx::text(value, im::flipX(col, col.x), y + 34.0f, vs);
-}
 
 // ---- Result handling (HTTPS answers of the pages) ----------------------------------------------------
 void pumpResults() {
@@ -711,63 +766,90 @@ void pageAccount(float t) {
         s.api().fetchAccount();
         s.expect(Kind::AccountResult);
     }
-    Rect p = beginPage(t, 1320.0f, 900.0f, T("online.account.title"));
+    Rect p = beginPage(t, 1720.0f, 960.0f, T("online.account.title"));
     serverLine(p, true);
     im::pushId("account");
-    float pad = 70.0f, gap = 70.0f;
-    float colW = (p.w - 2.0f * pad - gap) * 0.42f, col2W = (p.w - 2.0f * pad - gap) - colW;
-    float lx = im::flip(p, Rect(p.x + pad, 0, colW, 0)).x, rx = im::flip(p, Rect(p.x + pad + colW + gap, 0, col2W, 0)).x;
-    float top = p.y + 150.0f;
+    // Three columns from the start side: the account, what can be done with it, the ratings.
+    const float pad = 70.0f, gap = 64.0f;
+    const float inner = p.w - 2.0f * pad - 2.0f * gap;
+    const float colW = std::floor(inner * 0.3f), actW = colW, col2W = inner - colW - actW;
+    const float lx = im::flip(p, Rect(p.x + pad, 0, colW, 0)).x;
+    const float ax = im::flip(p, Rect(p.x + pad + colW + gap, 0, actW, 0)).x;
+    const float rx = im::flip(p, Rect(p.x + pad + colW + gap + actW + gap, 0, col2W, 0)).x;
+    const float top = p.y + 150.0f;
     gfx::vline(im::flipX(p, p.x + pad + colW + gap * 0.5f), top, footerY(p) - 40.0f, withAlpha(gold, 0.12f));
+    gfx::vline(im::flipX(p, p.x + pad + colW + gap + actW + gap * 0.5f), top, footerY(p) - 40.0f, withAlpha(gold, 0.12f));
 
     // Account column.
     Rect col(lx, top, colW, 0);
     im::sectionLabel(T("online.account.section"), lx, top + 8.0f, colW);
     float y = top + 56.0f;
     infoLine(T("online.account.username"), a.username.empty() ? "\xE2\x80\x94" : a.username, col, y);
-    y += 78.0f;
+    y += 72.0f;
     std::string mail = a.email.empty() ? std::string("\xE2\x80\x94") : i18n::ltr(a.email);
     if (!a.email.empty() && !a.emailVerified) mail += "  " + T("online.account.unverified");
     infoLine(T("online.account.email"), mail, col, y);
-    y += 78.0f;
+    y += 72.0f;
+    if (!a.pendingEmail.empty()) {
+        // An e-mail change waiting for its link.
+        TextStyle ps = style(font::FACE_ITALIC, kCaption, gold, im::startAlign());
+        std::string line = i18n::trf("online.account.pending_email", {i18n::ltr(a.pendingEmail)});
+        int n = gfx::textWrapped(line, im::flipX(col, lx), y - 6.0f, colW - 10.0f, ps, 26.0f);
+        y += float(n) * 26.0f + 8.0f;
+    }
     infoLine(T("online.account.mfa"), T(a.mfaEnabled ? "online.account.mfa_on" : "online.account.mfa_off"), col, y,
              a.mfaEnabled ? ivory : ivoryDim);
-    y += 78.0f;
+    y += 72.0f;
     if (a.googleLinked) {
         infoLine(T("online.account.google"), T("online.account.google_linked"), col, y);
-        y += 78.0f;
+        y += 72.0f;
     }
-    y += 4.0f;
-    float bh = 50.0f, bstep = 60.0f;
-    Rect b(lx, y, colW, bh);
-    if (im::button(L("online.account.change_password"), b, im::ButtonKind::Secondary)) {
+    // Challenges by name (the server's preference).
+    bool accept = a.acceptChallenges;
+    if (im::toggleRow(L("online.account.accept_challenges"), accept, Rect(lx, y, colW, 54.0f), !s.busy(Kind::PreferencesResult)))
+        s.setAcceptChallenges(accept);
+    im::tooltip(T("online.account.accept_challenges.help"));
+    y += 76.0f;
+    const float bh = 50.0f, bstep = 58.0f;
+    bool signOut = im::button(L("online.account.sign_out"), Rect(lx, y, colW, bh), im::ButtonKind::Quiet);
+    y += bstep - 8.0f;
+    bool signOutAll = im::button(L("online.account.sign_out_all"), Rect(lx, y, colW, bh), im::ButtonKind::Quiet);
+    im::tooltip(T("online.account.sign_out_all.help"));
+
+    // What can be done: security, devices, data.
+    im::sectionLabel(T("online.account.manage"), ax, top + 8.0f, actW);
+    Rect b(ax, top + 56.0f, actW, bh);
+    auto next = [&]() {
+        Rect r = b;
+        b = b.offset(0, bstep);
+        return r;
+    };
+    if (im::button(L("online.account.change_password"), next(), im::ButtonKind::Secondary)) {
         clearSecrets();
         setSub(Sub::Password);
     }
-    b = b.offset(0, bstep);
+    if (im::button(L("online.account.change_email"), next(), im::ButtonKind::Secondary)) openAccountPage(Sub::Email);
     if (!a.mfaEnabled) {
-        if (im::button(L("online.account.mfa_setup"), b, im::ButtonKind::Secondary)) {
+        if (im::button(L("online.account.mfa_setup"), next(), im::ButtonKind::Secondary)) {
             clearSecrets();
             O.mfaStep = 0;
             setSub(Sub::MfaSetup);
         }
     } else {
-        if (im::button(L("online.account.mfa_disable"), b, im::ButtonKind::Secondary)) {
+        if (im::button(L("online.account.mfa_disable"), next(), im::ButtonKind::Secondary)) {
             clearSecrets();
             setSub(Sub::MfaOff);
         }
-        b = b.offset(0, bstep);
-        if (im::button(L("online.account.recovery"), b, im::ButtonKind::Secondary)) {
+        if (im::button(L("online.account.recovery"), next(), im::ButtonKind::Secondary)) {
             clearSecrets();
             O.mfaStep = 0;
             setSub(Sub::Recovery);
         }
     }
-    b = b.offset(0, bstep + 10.0f);
-    float half = (colW - 16.0f) * 0.5f;
-    bool signOut = im::button(L("online.account.sign_out"), im::flip(col, Rect(lx, b.y, half, bh)), im::ButtonKind::Quiet);
-    bool signOutAll = im::button(L("online.account.sign_out_all"), im::flip(col, Rect(lx + half + 16.0f, b.y, half, bh)), im::ButtonKind::Quiet);
-    im::tooltip(T("online.account.sign_out_all.help"));
+    if (im::button(L("online.account.devices"), next(), im::ButtonKind::Secondary)) openAccountPage(Sub::Devices);
+    if (im::button(L("online.account.export"), next(), im::ButtonKind::Secondary)) openAccountPage(Sub::Export);
+    b = b.offset(0, 10.0f);
+    if (im::button(L("online.account.delete"), next(), im::ButtonKind::Secondary)) openAccountPage(Sub::Delete);
 
     // Ratings column.
     im::sectionLabel(T("online.account.ratings"), rx, top + 8.0f, col2W);
@@ -784,6 +866,7 @@ void pageAccount(float t) {
         TextStyle h = hs;
         h.align = i == 0 ? im::startAlign() : HAlign::Center;
         float x = i == 0 ? cx[0] : cx[i] + col2W * 0.1f;
+        h.size = gfx::fitSize(T(heads[i]), h, i == 0 ? col2W * 0.34f : col2W * 0.21f, 0.7f);
         gfx::text(T(heads[i]), im::flipX(tcol, x), ty, h);
     }
     ty += 14.0f;
@@ -810,14 +893,20 @@ void pageAccount(float t) {
     if (cats.empty()) spinner(vec2(rx + col2W * 0.5f, ty + 40.0f));
     TextStyle ns = style(font::FACE_ITALIC, kCaption, muted, im::startAlign());
     float noteY = ty + rowH * float(cats.size()) + 38.0f;
-    ns.size = gfx::fitSize(T("online.account.provisional"), ns, col2W);
-    gfx::text(T("online.account.provisional"), im::flipX(tcol, rx), noteY, ns);
+    gfx::textWrapped(T("online.account.provisional"), im::flipX(tcol, rx), noteY, col2W, ns, 26.0f);
     float my = footerY(p) - 50.0f;
     if (!O.error.empty() || !O.note.empty()) messageLine(p, my);
     footerRule(p);
     bool back = backButton(p);
+    // The game history, from the ratings (end side).
+    const Rect hb = im::flip(p, Rect(p.r() - 60.0f - 320.0f, footerY(p), 320.0f, kBtnH));
+    bool history = im::button(L("online.account.history"), hb, im::ButtonKind::Primary);
     im::popId();
     endPage();
+    if (history) {
+        openAccountPage(Sub::History);
+        return;
+    }
     if (signOut || signOutAll) {
         s.signOut(signOutAll);
         clearSecrets();
@@ -1659,8 +1748,9 @@ namespace detail {
 
 bool onlineGameStarting() { return game::onlineSession().gameReady(); }
 
-void onlinePage(float t, bool opened, bool& back) {
+MenuAction onlinePage(LibrarySetup* library, float t, bool opened, bool& back) {
     game::OnlineSession& s = ses();
+    MenuAction act = MenuAction::None;
     if (opened) {
         O.leave = false;
         if (!O.forced.empty()) {
@@ -1678,6 +1768,23 @@ void onlinePage(float t, bool opened, bool& back) {
         if (s.serverConfigured() && !s.infoKnown() && !s.busy(Kind::ServerInfoResult)) s.refreshInfo();
     }
     pumpResults();
+    {
+        // The answers of the account API (any page), before the check below: a deleted account
+        // goes to the sign-in page with its note.
+        AccountPage page;
+        const bool onAccountPage = accountSub(O.sub, page);
+        std::string note, error;
+        AccountNav nav = accountPump(onAccountPage ? &page : nullptr, note, error);
+        if (nav == AccountNav::SignIn) {
+            clearSecrets();
+            setSub(s.serverConfigured() ? Sub::SignIn : Sub::NoServer);
+            O.note = note;
+        } else if (nav == AccountNav::Account) {
+            setSub(Sub::Account);
+            O.note = note;
+        }
+        if (!error.empty()) O.error = error;
+    }
     // A game is starting: come back to this page after it.
     if (s.gameReady()) {
         O.afterGame = isDirect(O.sub) ? Sub::Direct : s.signedIn() ? Sub::Play : Sub::SignIn;
@@ -1708,6 +1815,40 @@ void onlinePage(float t, bool opened, bool& back) {
     case Sub::MfaSetup: pageMfaSetup(pt); break;
     case Sub::MfaOff: pageMfaOff(pt, false); break;
     case Sub::Recovery: pageMfaOff(pt, true); break;
+    case Sub::History:
+    case Sub::Game:
+    case Sub::Devices:
+    case Sub::Email:
+    case Sub::Export:
+    case Sub::Delete: {
+        AccountPage page = AccountPage::History;
+        accountSub(O.sub, page);
+        std::string note;
+        AccountNav nav = accountPage(page, pt, fresh, library, act, note);
+        switch (nav) {
+        case AccountNav::Account:
+            setSub(Sub::Account);
+            O.note = note;
+            break;
+        case AccountNav::History: setSub(Sub::History); break;
+        case AccountNav::Game:
+            accountReset(AccountPage::Game);
+            setSub(Sub::Game);
+            break;
+        case AccountNav::SignIn:
+            clearSecrets();
+            setSub(Sub::SignIn);
+            O.note = note;
+            break;
+        case AccountNav::Stay: break;
+        }
+        // A replay started from a game of the history: back to that game after it.
+        if (act == MenuAction::StartReplay) {
+            O.afterGame = Sub::Game;
+            O.haveAfterGame = true;
+        }
+        break;
+    }
     case Sub::Play: pagePlay(pt); break;
     case Sub::Challenge: pageChallenge(pt, false); break;
     case Sub::Private: pageChallenge(pt, true); break;
@@ -1725,6 +1866,7 @@ void onlinePage(float t, bool opened, bool& back) {
         im::sound(Sound::Back);
         back = true;
     }
+    return act;
 }
 
 void onlineMenuOverlay(bool onOnlinePage) {
@@ -1801,7 +1943,7 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
         Rect pr = row(rh);
         float half = (rw - 20.0f) * 0.5f;
         std::string api = s.onlineApiPort > 0 ? std::to_string(s.onlineApiPort) : "";
-        if (im::formField(L("options.online.api_port"), api, im::flip(pr, Rect(pr.x, pr.y, half, pr.h)), 5, im::FIELD_LTR, "44664", en)) {
+        if (im::formField(L("options.online.api_port"), api, im::flip(pr, Rect(pr.x, pr.y, half, pr.h)), 5, im::FIELD_LTR, "443", en)) {
             s.onlineApiPort = std::clamp(std::atoi(digitsOnly(api).c_str()), 0, 65535);
             O.testShown = false;
         }
@@ -1893,7 +2035,7 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
 void copyOnlineOptions(game::Settings& dst, const game::Settings& src) {
     dst.onlineCustomServer = src.onlineCustomServer;
     dst.onlineHost = trim(src.onlineHost);
-    dst.onlineApiPort = src.onlineApiPort > 0 ? src.onlineApiPort : 44664;
+    dst.onlineApiPort = src.onlineApiPort > 0 ? src.onlineApiPort : 443;
     dst.onlineWsPort = src.onlineWsPort;
     dst.onlinePin = trim(src.onlinePin);
 }
@@ -1909,6 +2051,12 @@ bool onlineServerChanged(const game::Settings& before, const game::Settings& aft
 
 namespace debug {
 void openOnlinePage(const std::string& sub) {
+    AccountPage page;
+    if (accountDebugOpen(sub, page)) {
+        setSub(subOf(page));
+        O.forced = sub;
+        return;
+    }
     static const struct { const char* name; Sub sub; } names[] = {
         {"noserver", Sub::NoServer}, {"signin", Sub::SignIn},       {"mfa", Sub::Mfa},           {"register", Sub::Register},
         {"check-email", Sub::CheckEmail}, {"forgot", Sub::Forgot},  {"account", Sub::Account},   {"password", Sub::Password},
