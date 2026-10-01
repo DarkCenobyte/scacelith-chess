@@ -1559,3 +1559,30 @@ TEST(chess_game_position_at) {
     CHECK(g.positionAt(3).samePosition(g.position()));
     CHECK(g.positionAt(99).samePosition(g.position()));  // clamped
 }
+
+TEST(chess_game_end_detection_off) {
+    // The rules lesson's first exercise: two kings alone, over on load as a dead position.
+    Game over;
+    CHECK(over.resetFromFEN("4k3/8/8/8/8/8/8/4K3 w - - 0 1"));
+    CHECK(over.isOver());
+    CHECK(!over.play(over.position().parseUCI("e1e2")));
+    Game g;
+    g.setEndDetection(false);
+    CHECK(g.resetFromFEN("4k3/8/8/8/8/8/8/4K3 w - - 0 1"));
+    CHECK(!g.isOver());
+    CHECK(g.play(g.position().parseUCI("e1e2")));
+    CHECK_EQ(int(g.moves().size()), 1);
+    // A mate does not end it either; undo still works; a resignation still ends it.
+    Game m;
+    m.setEndDetection(false);
+    CHECK(m.resetFromFEN("6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1"));
+    CHECK(m.play(m.position().parseUCI("a1a8")));
+    CHECK(!m.isOver());
+    CHECK(m.undo(1));
+    m.resign(Black);
+    CHECK(m.isOver());
+    // Back on: the next status update sees the position again.
+    g.setEndDetection(true);
+    CHECK(g.resetFromFEN("4k3/8/8/8/8/8/8/4K3 w - - 0 1"));
+    CHECK(g.isOver());
+}

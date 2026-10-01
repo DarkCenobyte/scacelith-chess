@@ -203,6 +203,11 @@ public:
     GameStatus status() const { return status_; }
     GameEndReason endReason() const { return reason_; }
     bool isOver() const { return status_ != GameStatus::Ongoing; }
+    // Off: the game never ends by itself (mate, stalemate, dead position, 5-fold, 75 moves): the
+    // rules lesson of Coach mode plays exercises on positions that are over on load (two kings
+    // alone) and goes on after a mate. On by default; reset() and resetFromFEN() keep the setting.
+    void setEndDetection(bool on) { endDetection_ = on; }
+    bool endDetection() const { return endDetection_; }
     const char* resultString() const;             // "1-0", "0-1", "1/2-1/2", "*"
     int repetitionCount() const;                  // occurrences of the current position
     bool canClaimThreefold() const;               // current position occurred >= 3 times
@@ -221,6 +226,7 @@ private:
     std::vector<std::string> san_;
     GameStatus status_ = GameStatus::Ongoing;
     GameEndReason reason_ = GameEndReason::None;
+    bool endDetection_ = true;
     void finish(GameStatus s, GameEndReason r);
     void updateStatus();
 };
