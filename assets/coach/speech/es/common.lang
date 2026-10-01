@@ -38,6 +38,21 @@ phrase.my.bishop.lo = lo
 phrase.my.rook.lo = la
 phrase.my.queen.lo = la
 phrase.my.king.lo = lo
+# Ending "o" or "a" of an adjective or participle agreeing with the piece of the placeholder,
+# written joined to the adjective's stem, after the piece itself: "{your} está atrapad{your:o}" =
+# "tu caballo está atrapado" / "tu torre está atrapada" (review and appraisal lines).
+phrase.your.pawn.o = o
+phrase.your.knight.o = o
+phrase.your.bishop.o = o
+phrase.your.rook.o = a
+phrase.your.queen.o = a
+phrase.your.king.o = o
+phrase.my.pawn.o = o
+phrase.my.knight.o = o
+phrase.my.bishop.o = o
+phrase.my.rook.o = a
+phrase.my.queen.o = a
+phrase.my.king.o = o
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # Letter names as in the opening texts (tools/gen_opening_lang.py): "e cuatro", "de cinco",
@@ -130,6 +145,9 @@ number.90.spoken = noventa
 number.100.spoken = ciento
 number.100.m.spoken = cien
 number.100.f.spoken = cien
+# "{n:num}": a number said on its own, not before a noun nor in "por ciento" (a score, a move
+# number): "Precisión: cien", "la jugada cien". Every other number says its bare form.
+number.100.num.spoken = cien
 number.200.spoken = doscientos
 number.200.f.spoken = doscientas
 number.300.spoken = trescientos
@@ -168,11 +186,20 @@ count.inaccuracy = {n:f} imprecisión|{n:f} imprecisiones
 count.game = {n:f} partida|{n:f} partidas
 count.time = {n:f} vez|{n:f} veces
 count.square = {n:f} casilla|{n:f} casillas
+# Spanish-only counted nouns of the review and appraisal lines ("{n:attacker}" = "tres atacantes",
+# "{n:captured}" = "una pieza capturada", "{m:check}" = "dos jaques"): the adjective after the
+# noun agrees with the number, which a line cannot do around "{n:piece}".
+count.attacker = {n:m} atacante|{n:m} atacantes
+count.defender = {n:m} defensor|{n:m} defensores
+count.captured = {n:f} pieza capturada|{n:f} piezas capturadas
+count.check = {n:m} jaque|{n:m} jaques
 # "{n:m}" / "{n:f}" in a line say a number before a masculine / feminine noun ("un", "una",
-# "veintiún", "cien"); they are count keys so that the forms also work outside the counted nouns
+# "veintiún", "cien"); "{n:num}" says a number on its own ("cien", where the bare {n} says
+# "ciento"). They are count keys so that the forms also work outside the counted nouns
 # (and the form check knows them). Written: the digits.
 count.m = {n:m}|{n:m}
 count.f = {n:f}|{n:f}
+count.num = {n:num}|{n:num}
 
 # ---- Evaluations (the strongest levels) ------------------------------------------------------------
 # From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
