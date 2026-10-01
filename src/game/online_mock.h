@@ -24,7 +24,11 @@
 // the PGN of each game (the server's format: its tags, [%clk]/[%emt] comments, the end reason);
 // four signed-in devices (this one, two others, one without a label); the challenge preference
 // (no demo challenge when it is off); an e-mail change waiting for its link, which the fake
-// "opens" 40 s later; the data export (five an hour) and the deletion of the account.
+// "opens" 40 s later; the data export (five an hour) and the deletion of the account. Animated
+// GIFs of the history's games and of PGN texts: a small but valid GIF89a drawn by the fake (a tiny
+// board, a frame per move; the tests decode it), after a render time that grows with the game,
+// with the server's quota per account (four renders a minute, thirty an hour; a GIF asked again
+// costs nothing) and its checks (options, unreadable PGN, more than 600 moves).
 //
 // Special inputs to try the error paths: user name "banned", "unverified" or "ratelimited",
 // password "wrong", a user name containing "mfa" (asks for a code), a custom server host
@@ -36,7 +40,9 @@
 // two-factor on no code (mfa_code_required) or "000000" (invalid_code), a new address equal to
 // the current one (same_email) or without "@" and a dot (invalid_email), a host containing
 // "noverify" (a server without e-mail confirmation: the address changes at once; one containing
-// "taken" is refused, email_taken).
+// "taken" is refused, email_taken). GIFs: game id 429 (rate_limited, retry after 2 min 30 s) or
+// 503 (server_busy, retry after 8 s), a PGN whose White or Black is "ratelimited" or "serverbusy"
+// (the same), a host containing "nogif" (gif_disabled).
 //
 // Used by src/game/online_stub.cpp (the OnlineClient / DirectMatch implementation of builds
 // without the real network layer, i.e. without SCACELITH_NET_REAL) and meant to back a
@@ -108,6 +114,8 @@ public:
     void changeEmail(const std::string& newEmail, const std::string& password, const std::string& codeOrRecovery);
     void exportAccount(const std::string& password, const std::string& codeOrRecovery);
     void deleteAccount(const std::string& password, const std::string& codeOrRecovery);
+    void downloadGameGif(uint64_t gameId, const GifOptions& options);
+    void renderPgnGif(const std::string& pgn, const GifOptions& options);
 
     void connect();
     void disconnect();

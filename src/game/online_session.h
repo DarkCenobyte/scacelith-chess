@@ -58,6 +58,8 @@ public:
     virtual void changeEmail(const std::string& newEmail, const std::string& password, const std::string& codeOrRecovery) = 0;
     virtual void exportAccount(const std::string& password, const std::string& codeOrRecovery) = 0;
     virtual void deleteAccount(const std::string& password, const std::string& codeOrRecovery) = 0;
+    virtual void downloadGameGif(uint64_t gameId, const net::GifOptions& options) = 0;
+    virtual void renderPgnGif(const std::string& pgn, const net::GifOptions& options) = 0;
     virtual void connect() = 0;
     virtual void disconnect() = 0;
     virtual net::ConnState state() const = 0;

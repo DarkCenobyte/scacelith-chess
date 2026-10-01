@@ -36,6 +36,10 @@
 //     the challenge preference, the e-mail change, the data export and the account deletion
 //     (fetchMyGames ... deleteAccount below; dedicated-server/docs/API.md). A 401 answer to any
 //     call that carried the session token erases that token (the session expired or was revoked).
+//   - Animated GIFs (additive): downloadGameGif() and renderPgnGif() ask the server for the GIF of a
+//     game of its own (GET /games/:id/gif) or of any game given as PGN text (POST /gif); the file
+//     comes back in Event::Kind::GifResult (signed-in players only: the renders count against the
+//     account's quota).
 #pragma once
 #include "gesture.h"
 #include <cstdint>
@@ -159,6 +163,17 @@ struct SessionInfo {                  // a signed-in device (GET /auth/sessions)
     bool current = false;             // the session of this game
 };
 
+// How the server draws the animated GIF of a game (GET /games/:id/gif, POST /gif): the size of
+// the board ("small", "medium", "large"), the side at the bottom ("white", "black"), the time each
+// move stays on screen in milliseconds (100..3000; the server refuses other values) and the
+// coordinates on the border.
+struct GifOptions {
+    std::string size = "medium";
+    std::string orientation = "white";
+    int delayMs = 500;
+    bool coords = true;
+};
+
 struct PlayerInfo {
     uint32_t userId = 0;
     std::string name;
@@ -267,6 +282,9 @@ struct Event {
                               // "email_changed" (servers without e-mail confirmation) (changeEmail)
         AccountExportResult,  // text = the JSON document (exportAccount)
         AccountDeleted,       // ok: the account is gone and the local session erased (deleteAccount)
+        GifResult,            // text = the GIF file, gameId = the game (0 for a PGN text)
+                              // (downloadGameGif, renderPgnGif); rate_limited (the account's quota)
+                              // and server_busy (the renderer is full) come with retryAfterSec
         // ---- realtime ----
         ConnectionChanged,    // state (and error for Incompatible/Unauthorized/Banned)
         Welcome,              // account.username/userId, serverName
@@ -315,7 +333,7 @@ struct Event {
     std::vector<SessionInfo> sessions;
     int64_t sessionId = 0;
     std::string status;               // EmailChangeResult
-    std::string text;                 // PgnResult, AccountExportResult
+    std::string text;                 // PgnResult, AccountExportResult, GifResult (the file's bytes)
 };
 
 class OnlineClient {
@@ -372,6 +390,24 @@ public:
     // On success the token and the user name saved for the origin are erased and the realtime
     // connection stops (no reconnection); AccountDeleted then comes with ok.
     void deleteAccount(const std::string& password, const std::string& codeOrRecovery);
+
+    // ---- animated GIFs (HTTPS; dedicated-server/docs/API.md) ----
+    // The server draws the game (a 2D board seen from above, a frame per move) and answers with the
+    // .gif file: GifResult, text = the file (16 MiB at most; an answer that does not start with
+    // "GIF87a" or "GIF89a" is "invalid_response"). Signed-in players only ("not_logged_in" without
+    // a saved token, nothing sent): each render counts against the account's quota (429
+    // "rate_limited" with retryAfterSec; a GIF the server rendered before costs nothing), and a
+    // busy renderer answers 503 "server_busy" with retryAfterSec. "game_too_long" over the
+    // server's limit of moves (GIF_MAX_PLIES), "gif_disabled" on a server without GIFs.
+    // A game of the server: GET /games/:id/gif?size=&orientation=&delay=&coords=0|1 (gameId 0:
+    // "invalid_game_id", nothing sent).
+    void downloadGameGif(uint64_t gameId, const GifOptions& options);
+    // Any game: POST /gif { pgn, size, orientation, delayMs, coords }, the first game of the text
+    // (at most kGifMaxPgnBytes: "pgn_too_large" above, nothing sent; "invalid_pgn" when the server
+    // cannot read it). GifResult's gameId is 0.
+    void renderPgnGif(const std::string& pgn, const GifOptions& options);
+    static constexpr size_t kGifMaxPgnBytes = 65536;   // the server's limit of the pgn field
+    static constexpr size_t kGifMaxBytes = size_t(16) << 20;
 
     // ---- realtime (WSS) ----
     void connect();                              // uses the saved session; reconnects automatically until disconnect()

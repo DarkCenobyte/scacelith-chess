@@ -54,6 +54,8 @@ public:
     void changeEmail(const std::string& e, const std::string& p, const std::string& c) override { c_->changeEmail(e, p, c); }
     void exportAccount(const std::string& p, const std::string& c) override { c_->exportAccount(p, c); }
     void deleteAccount(const std::string& p, const std::string& c) override { c_->deleteAccount(p, c); }
+    void downloadGameGif(uint64_t id, const net::GifOptions& o) override { c_->downloadGameGif(id, o); }
+    void renderPgnGif(const std::string& pgn, const net::GifOptions& o) override { c_->renderPgnGif(pgn, o); }
     void connect() override { c_->connect(); }
     void disconnect() override { c_->disconnect(); }
     net::ConnState state() const override { return c_->state(); }
