@@ -184,6 +184,8 @@ bool GameScene::init(AppContext& ctx) {
     replaySpeedArg_ = speed == "x2" ? replay::Speed::X2 : speed == "x4" ? replay::Speed::X4 : speed == "x8" ? replay::Speed::X8
                       : speed == "instant" ? replay::Speed::Instant : replay::Speed::X1;
     replayPausedArg_ = ctx.hasArg("--replay-paused");
+    for (const std::string& k : split(ctx.argValue("--replay-keys"), ','))
+        if (!k.empty()) replayKeys_.push_back(k);
 
     if (!audio::init()) LOGW("audio unavailable, continuing silently");
     if (!ui::init()) {
@@ -230,7 +232,15 @@ void GameScene::finishLoading() {
     clock_.setup(chosenTimeControl());
     if (!startOnline_.empty()) {
         // --start-online: straight to the table once an opponent is found (at once with the fakes).
-        onlineSession().quickStart(startOnline_, localPlayerName());
+        if (startOnline_ != "direct") {
+            onlineSession().quickStart(startOnline_, localPlayerName());
+        } else if (ctx_->hasArg("--online-mock")) {
+            // A direct match joined with a valid code: the fakes' friend hosts it (10+5).
+            onlineSession().joinDirect("192.168.1.23", 47100, "ABCD-EFGH-JKMN");
+            for (int i = 0; i < 400 && !onlineSession().gameReady(); ++i) onlineSession().runMock(25.0);
+        } else {
+            LOGW("--start-online direct needs --online-mock");
+        }
         if (takeOnlineGame()) {
             fade_ = skipIntro_ ? 0.0f : 1.0f;
             state_ = State::Intro;
@@ -766,10 +776,14 @@ void GameScene::endGame() {
         const std::string& r = replayRecord_.result;
         // An unfinished game ("*") shows a dash on the card and nothing on the sheets.
         resultText_ = r == "1-0" ? "1-0" : r == "0-1" ? "0-1" : r == "1/2-1/2" ? "\xC2\xBD-\xC2\xBD" : "\xE2\x80\x94";
+        // As the saved games page says it (ui_library.cpp reasonText): nothing for a plain
+        // "Normal" termination (a resignation or an agreed draw in a file from elsewhere).
         const std::string key = replay::endReasonKey(replayRecord_);
+        const std::string term = replayRecord_.tag("Termination");
         reasonText_ = !key.empty() && i18n::has(key.c_str()) ? std::string(i18n::tr(key.c_str()))
                       : r == "*"                              ? std::string(i18n::tr("library.unfinished"))
-                                                              : replayRecord_.tag("Termination");
+                      : term == "?" || term == "normal" || term == "Normal" ? std::string()
+                                                                             : term;
         isDraw_ = r == "1/2-1/2";
         playerWon_ = false;
     } else {
@@ -856,7 +870,11 @@ void GameScene::archiveGame(bool finished) {
         finished = direct.finished;
     }
     const int plies = int(game->moves().size());
-    if (!archive::shouldSave(mode, coach() ? coachLevel_ : -1, plies, finished, settings().saveGames)) return;
+    if (!archive::shouldSave(mode, coach() ? coachLevel_ : -1, plies, finished, settings().saveGames)) {
+        LOGI("saved games: not saved (mode %s, %d plies%s%s)", archive::modeName(mode),
+             plies, finished ? ", over" : "", settings().saveGames ? "" : ", saving off");
+        return;
+    }
     info.mode = mode;
     info.white = seats_[0].name;
     info.black = seats_[1].name;
@@ -980,6 +998,8 @@ bool GameScene::update(AppContext& ctx, float dt) {
         warpDone_ = true;
         float warp = float(std::atof(ctx.argValue("--warp", "0").c_str()));
         if (warp > 0.0f && state_ != State::Loading) runWarp(warp);
+    } else if (warpLeft_ > 0.0f && scriptMenu_ == ui::MenuAction::None) {
+        runWarp(warpLeft_);   // the rest of a warp that stopped for a --play-then menu choice
     }
     const plat::Input& in = plat::input();
     ui::beginFrame(plat::width(), plat::height(), dt);
@@ -1185,13 +1205,22 @@ bool GameScene::update(AppContext& ctx, float dt) {
 void GameScene::runWarp(float seconds) {
     const float step = 1.0f / 60.0f;
     LOGI("warping %.1f s of game time", seconds);
+    warpLeft_ = 0.0f;
     for (float t = 0.0f; t < seconds; t += step) {
+        // A --play-then choice is made in the Esc menu, which only a frame shows: the warp goes on
+        // after that frame (update).
+        if (paused_ && scriptMenu_ != ui::MenuAction::None) {
+            warpLeft_ = seconds - t;
+            break;
+        }
         // The engine searches in real time: wait for it so the warp stays deterministic.
         if (state_ == State::Playing && turn_ == Turn::AiThinking && aiRequested_ && !aiHasMove_ && engineOk_) {
             for (int i = 0; i < 6000 && !engine_.moveReady(); ++i) plat::sleepMs(5);
         }
         // A coach game goes on to its end card (closing words, handshake, appraisal).
-        if (state_ == State::GameOver && stateTime_ > 1.0f && (!coach() || coachEndCardReady())) break;
+        if (state_ == State::GameOver && stateTime_ > 1.0f && (!coach() || coachEndCardReady()) &&
+            !(replaying() && replayKeysPos_ < replayKeys_.size()))
+            break;
         simulate(step);
     }
 }

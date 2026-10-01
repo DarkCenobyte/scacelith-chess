@@ -76,7 +76,9 @@
 //   --play-then a,b,...     once the --play moves are made, the player picks these in the Esc menu,
 //                           one per turn: resign, leave (Main menu), takeback (coach games)
 //   --replay <file.pgn>     skip the menu: replay a saved game (--game N: the Nth game of the file,
-//                           from 1; --replay-speed x1|x2|x4|x8|instant; --replay-paused)
+//                           from 1; --replay-speed x1|x2|x4|x8|instant; --replay-paused;
+//                           --replay-keys K,L,J,Shift+L,Home,End,... presses these keys in turn,
+//                           each once the board is still)
 //   --mouse fx,fy           pointer position as fractions of the window (screenshots)
 //   --glance                a human game starts looking at the player's scoresheet (S)
 //   --calibrate             the brightness calibration before the title page, as on a first start
@@ -423,7 +425,8 @@ private:
     void completeReplayMove(int seat, const chess::Arbiter::Verdict& v);   // completeMove() of a replay
     void endReplay();                         // the record's last move is played: its result card
     ui::GameOverExtras replayGameOverExtras() const;   // the record's players and result, "Replay again"
-    void updateReplayInput();                 // updateWatchInput(): K, J, L, Shift+J/L, Home, End
+    void updateReplayInput();
+    bool replayKey(const std::string& key);   // "K", "J", "L", "Shift+J", "Shift+L", "Home", "End"                 // updateWatchInput(): K, J, L, Shift+J/L, Home, End
     void drawReplayBar();                     // the replay's buttons, speed and move counter
     ClockDisplay replayClockDisplay() const;  // the record's clocks (replayClock_), dashes without them
 
@@ -467,6 +470,7 @@ private:
     bool startWatching_ = false;  // --viewer
     bool skipIntro_ = false;
     bool warpDone_ = false;
+    float warpLeft_ = 0.0f;             // --warp time still to run after a --play-then menu choice
     chess::Color humanColor_ = chess::White;
     ui::NewGameSetup setup_;
     ui::WatchSetup watch_;
@@ -586,7 +590,10 @@ private:
     replay::ReplayClock replayClock_;   // when its moves are played, what its clocks show
     replay::Speed replaySpeedArg_ = replay::Speed::X1;   // --replay-speed
     bool replayPausedArg_ = false;      // --replay-paused
-    float replayMoveAt_ = 0.0f;         // time_ when the robot began the move being played (log)
+    float replayMoveAt_ = 0.0f;
+    std::vector<std::string> replayKeys_;   // --replay-keys
+    size_t replayKeysPos_ = 0;
+    float replayKeyWait_ = 0.0f;         // time_ when the robot began the move being played (log)
 
     // UI
     bool showMoveList_ = false;

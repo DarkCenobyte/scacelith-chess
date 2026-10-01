@@ -34,9 +34,11 @@ namespace game {
 
 namespace {
 
-// A robot's move, from the reach to the clock press (measured on the replays of the saved
-// games: 1.7 to 2.3 s, captures and castling the longest): part of the time each move takes at x1.
-constexpr int64_t kRobotMoveMs = 2000;
+// A robot's move, from the reach to the clock press: part of the time each move takes at x1.
+// Measured on replays (the "replay: ply" log lines): 1.17 s for a quiet move, 1.67 s for a
+// capture, 2.05 s for castling, 3.4 s for a promotion; 0.3 s less without a clock to press.
+constexpr int64_t kRobotMoveMs = 1300;
+constexpr int64_t kRobotMoveUntimedMs = 1000;
 
 // A rating tag ("2350"), 0 when there is none or it is not a plausible rating.
 int tagElo(const pgn::Record& r, const char* tag) {
@@ -114,7 +116,7 @@ std::string GameScene::replaySheetDate() const {
 
 void GameScene::setupReplay() {
     replay::Options opts;
-    opts.moveAnimationMs = kRobotMoveMs;
+    opts.moveAnimationMs = untimed() ? kRobotMoveUntimedMs : kRobotMoveMs;
     replayClock_.load(replayRecord_, opts);   // its first event sets the start position (done already)
     replayClock_.setSpeed(replaySpeedArg_);
     if (replayPausedArg_) replayClock_.pause();
@@ -156,6 +158,18 @@ void GameScene::updateReplay(float dt) {
             replayMoveAt_ = time_;
         }
     }
+    // --replay-keys: the next key once the board is still (between two moves, or paused).
+    if (replayKeysPos_ < replayKeys_.size() && (state_ == State::Playing || (state_ == State::GameOver && stateTime_ > 1.0f))) {
+        replayKeyWait_ -= dt;
+        const bool still = turn_ != Turn::AiMoving && !replayClock_.moving() && dest_.empty() && !anim_[0].busy() &&
+                           !anim_[1].busy();
+        if (still && replayKeyWait_ <= 0.0f) {
+            const std::string& k = replayKeys_[replayKeysPos_++];
+            LOGI("--replay-keys: %s (at ply %d)", k.c_str(), replayClock_.ply());
+            if (!replayKey(k)) LOGW("--replay-keys: '%s' is not K, J, L, Shift+J, Shift+L, Home or End", k.c_str());
+            replayKeyWait_ = 0.6f;
+        }
+    }
     if (state_ != State::Playing) return;
     // The player to move thinks (idle variations) until the robot reaches for the piece.
     int s = seatOf(replayClock_.toMove());
@@ -175,8 +189,10 @@ void GameScene::completeReplayMove(int seat, const Arbiter::Verdict& v) {
     game_.play(v.move);
     int ply = int(game_.moves().size()) - 1;
     scorekeeper_.recordMove(ply, game_.sanMoves().back());
-    LOGI("replay: move %d %s (robot %.2f s)", ply + 1, game_.sanMoves().back().c_str(), double(time_ - replayMoveAt_));
     replayClock_.moveDone();
+    const replay::ClockView c = replayClock_.clocks();
+    LOGI("replay: ply %d %s at %.2f s (robot %.2f s), clocks %lld / %lld ms", ply + 1, game_.sanMoves().back().c_str(),
+         double(time_), double(time_ - replayMoveAt_), (long long)c.ms[0], (long long)c.ms[1]);
     beginTurn();
     followEyesAfterMove(seat);
 }
@@ -208,6 +224,7 @@ void GameScene::setReplayPosition(int ply) {
     initAnimators();
     for (auto& a : anim_) a.setHeadOverride(false);
     board_.syncTo(game_.position());
+    LOGI("replay: board set at ply %d: %s", int(game_.moves().size()), game_.position().fen().c_str());
     newScoresheets();
     scorekeeper_.setDetails(replaySheetDetails());
     scorekeeper_.writeHeaderInstantly();
@@ -265,17 +282,23 @@ void GameScene::updateReplayInput() {
     // PageUp / PageDown, 0-9, H, Tab): J K L as in video players, Home and End.
     const plat::Input& in = plat::input();
     const bool shift = in.keyDown[plat::KEY_LSHIFT] || in.keyDown[plat::KEY_RSHIFT];
-    if (in.keyPressed['K']) replayClock_.togglePause();
-    if (in.keyPressed['J']) {
-        if (shift) replayClock_.setSpeed(replay::slower(replayClock_.speed()));
-        else replayClock_.stepBack();
-    }
-    if (in.keyPressed['L']) {
-        if (shift) replayClock_.setSpeed(replay::faster(replayClock_.speed()));
-        else replayClock_.stepForward();
-    }
-    if (in.keyPressed[plat::KEY_HOME]) replayClock_.jumpTo(0);
-    if (in.keyPressed[plat::KEY_END]) replayClock_.jumpTo(replayClock_.plies());
+    if (in.keyPressed['K']) replayKey("K");
+    if (in.keyPressed['J']) replayKey(shift ? "Shift+J" : "J");
+    if (in.keyPressed['L']) replayKey(shift ? "Shift+L" : "L");
+    if (in.keyPressed[plat::KEY_HOME]) replayKey("Home");
+    if (in.keyPressed[plat::KEY_END]) replayKey("End");
+}
+
+bool GameScene::replayKey(const std::string& key) {
+    if (key == "K") replayClock_.togglePause();
+    else if (key == "J") replayClock_.stepBack();
+    else if (key == "L") replayClock_.stepForward();
+    else if (key == "Shift+J") replayClock_.setSpeed(replay::slower(replayClock_.speed()));
+    else if (key == "Shift+L") replayClock_.setSpeed(replay::faster(replayClock_.speed()));
+    else if (key == "Home") replayClock_.jumpTo(0);
+    else if (key == "End") replayClock_.jumpTo(replayClock_.plies());
+    else return false;
+    return true;
 }
 
 void GameScene::drawReplayBar() {

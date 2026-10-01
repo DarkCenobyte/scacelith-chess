@@ -1526,6 +1526,9 @@ void GameScene::runCoachTable(float dt) {
                 LOGW("coach: lesson position '%s' is not valid", job.fen.c_str());
             } else {
                 game_ = g;
+                moveElapsedMs_.clear();   // a new game record: no move times yet
+                moveClockMs_.clear();
+                plyElapsedMs_ = 0.0;
                 arbiter_.reset(game_);
                 board_.syncTo(game_.position());
                 cameraCut_ = true;
