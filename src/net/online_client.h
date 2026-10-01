@@ -90,6 +90,67 @@ struct AccountInfo {
     bool emailVerified = false, mfaEnabled = false, googleLinked = false;
     std::vector<RatingInfo> ratings;
     int64_t bannedUntilMs = 0;        // 0 = not banned
+    // Account API additions (GET /account/me):
+    bool hasPassword = true;          // false: a Google-only account (no password set yet)
+    bool acceptChallenges = true;     // preferences.acceptChallenges == "all"
+    std::string pendingEmail;         // a requested e-mail change waiting for its confirmation link
+    int64_t createdAtMs = 0, lastLoginAtMs = 0;
+};
+
+// ---- Account API: game history, game details, sessions (HTTPS) -----------------------------------
+struct GameSide {                     // one player of a finished server game
+    std::string name;                 // "deleted#123" once that account was deleted
+    int rating = 0;                   // at the start of the game (0 = unknown)
+    int ratingAfter = 0, ratingDiff = 0;
+    bool ratingChanged = false;       // a rated game that changed the ratings: ratingAfter / ratingDiff hold
+};
+
+// A finished game of a server: GET /account/games (the player's history) and the head of GameDetails.
+struct GameSummary {
+    uint64_t id = 0;
+    std::string category;             // "3+2", or "custom"
+    bool rated = false;
+    int64_t baseMs = 0, incMs = 0;
+    GameSide white, black;
+    int you = 2;                      // 0 White, 1 Black, 2 not one of the players
+    int status = 0, reason = 0;       // net::proto GameStatus / EndReason
+    std::string result = "*";         // "1-0", "0-1", "1/2-1/2", "*" (aborted)
+    int plies = 0;
+    int64_t startedAtMs = 0, endedAtMs = 0;
+};
+
+// One game in full: GET /games/:id.
+struct GameDetails : GameSummary {
+    struct Ply {
+        uint16_t move = 0;            // packMove() form, from the UCI text
+        std::string uci;              // "e2e4", "e7e8q"
+        int64_t spentMs = -1;         // time the mover was charged for it, -1 = unknown
+        int64_t clockMs = -1;         // the mover's clock after it (increment included), -1 = unknown
+    };
+    std::vector<Ply> moves;
+    uint64_t rematchOf = 0;
+    bool reportable = false;          // the caller may report the opponent (POST /reports)
+};
+
+// Filter of the history (empty / -1 = everything).
+struct GamesFilter {
+    std::string category;             // "", "custom" or an official category id ("3+2")
+    int rated = -1;                   // -1 all, 0 casual only, 1 rated only
+    std::string result;               // "", "win", "loss", "draw"
+};
+
+struct GamesPage {
+    uint64_t before = 0;              // the cursor of the request (0 = the first page)
+    std::vector<GameSummary> games;   // newest first
+    uint64_t next = 0;                // 'before' of the next page, 0 = this was the last page
+    int total = 0;                    // games matching the filter, all pages together
+};
+
+struct SessionInfo {                  // a signed-in device (GET /auth/sessions)
+    int64_t id = 0;
+    int64_t createdAtMs = 0, lastSeenAtMs = 0, expiresAtMs = 0;
+    std::string clientLabel;          // "Scacelith 0.1.0 (Windows)", "" when the client gave none
+    bool current = false;             // the session of this game
 };
 
 struct PlayerInfo {
@@ -189,6 +250,17 @@ struct Event {
         SsoBrowserOpened,     // the system browser shows the provider's page; polling
         SsoNeedsUsername,     // first Google login: choose a username, then completeSso()
         ReportResult,
+        // ---- HTTPS, account API ----
+        GamesResult,          // gamesPage (fetchMyGames)
+        GameDetailsResult,    // gameDetails (fetchGame)
+        PgnResult,            // gameId, text = the PGN (downloadPgn)
+        SessionsResult,       // sessions (fetchSessions)
+        SessionRevoked,       // sessionId (revokeSession)
+        PreferencesResult,    // ok: account.acceptChallenges updated (setAcceptChallenges)
+        EmailChangeResult,    // status: "verification_sent" (link mailed to the new address) or
+                              // "email_changed" (servers without e-mail confirmation) (changeEmail)
+        AccountExportResult,  // text = the JSON document (exportAccount)
+        AccountDeleted,       // ok: the account is gone and the local session erased (deleteAccount)
         // ---- realtime ----
         ConnectionChanged,    // state (and error for Incompatible/Unauthorized/Banned)
         Welcome,              // account.username/userId, serverName
@@ -231,6 +303,13 @@ struct Event {
     struct Rating { int before = 0, after = 0, games = 0; bool provisional = false; } ratingWhite, ratingBlack;
     int noticeCode = 0; double noticeArg = 0;
     Gesture gesture;
+    // account API
+    GamesPage gamesPage;
+    GameDetails gameDetails;
+    std::vector<SessionInfo> sessions;
+    int64_t sessionId = 0;
+    std::string status;               // EmailChangeResult
+    std::string text;                 // PgnResult, AccountExportResult
 };
 
 class OnlineClient {
@@ -263,6 +342,20 @@ public:
     void mfaDisable(const std::string& password, const std::string& codeOrRecovery);
     void regenerateRecoveryCodes(const std::string& password, const std::string& code);
     void report(uint64_t gameId, const std::string& username, const std::string& category, const std::string& comment);
+
+    // ---- account API (HTTPS; dedicated-server/docs/API.md) ----
+    // The signed-in player's finished games, newest first: before = 0 for the first page, then
+    // GamesPage::next; limit 1..50.
+    void fetchMyGames(uint64_t before, int limit, const GamesFilter& filter);
+    void fetchGame(uint64_t gameId);                                    // GET /games/:id
+    void downloadPgn(uint64_t gameId);                                  // GET /games/:id/pgn
+    void fetchSessions();                                               // GET /auth/sessions
+    void revokeSession(int64_t sessionId);                              // DELETE /auth/sessions/:id
+    void setAcceptChallenges(bool accept);                              // PUT /account/preferences
+    // codeOrRecovery: "" when two-factor is off, else a 6-digit code or a recovery code.
+    void changeEmail(const std::string& newEmail, const std::string& password, const std::string& codeOrRecovery);
+    void exportAccount(const std::string& password, const std::string& codeOrRecovery);
+    void deleteAccount(const std::string& password, const std::string& codeOrRecovery);
 
     // ---- realtime (WSS) ----
     void connect();                              // uses the saved session; reconnects automatically until disconnect()

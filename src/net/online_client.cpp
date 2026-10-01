@@ -1627,6 +1627,32 @@ void OnlineClient::report(uint64_t gameId, const std::string& username, const st
                obj({{"gameId", json::Value(gameId)}, {"reported", username}, {"category", category}, {"comment", comment}}), true);
 }
 
+// ---- account API ----
+// CONTRACT STUBS (replaced by the net work package): each answers its result event with
+// error "not_implemented".
+namespace {
+void notImplemented(OnlineClient::Impl* d, Event::Kind kind) {
+    d->http([d, kind] {
+        Event ev;
+        ev.kind = kind;
+        ev.error = "not_implemented";
+        d->post(ev);
+    });
+}
+}  // namespace
+
+void OnlineClient::fetchMyGames(uint64_t, int, const GamesFilter&) { notImplemented(impl_.get(), Event::Kind::GamesResult); }
+void OnlineClient::fetchGame(uint64_t) { notImplemented(impl_.get(), Event::Kind::GameDetailsResult); }
+void OnlineClient::downloadPgn(uint64_t) { notImplemented(impl_.get(), Event::Kind::PgnResult); }
+void OnlineClient::fetchSessions() { notImplemented(impl_.get(), Event::Kind::SessionsResult); }
+void OnlineClient::revokeSession(int64_t) { notImplemented(impl_.get(), Event::Kind::SessionRevoked); }
+void OnlineClient::setAcceptChallenges(bool) { notImplemented(impl_.get(), Event::Kind::PreferencesResult); }
+void OnlineClient::changeEmail(const std::string&, const std::string&, const std::string&) {
+    notImplemented(impl_.get(), Event::Kind::EmailChangeResult);
+}
+void OnlineClient::exportAccount(const std::string&, const std::string&) { notImplemented(impl_.get(), Event::Kind::AccountExportResult); }
+void OnlineClient::deleteAccount(const std::string&, const std::string&) { notImplemented(impl_.get(), Event::Kind::AccountDeleted); }
+
 // ---- realtime ----
 
 void OnlineClient::connect() {

@@ -85,6 +85,15 @@ public:
     void mfaDisable(const std::string& password, const std::string& codeOrRecovery);
     void regenerateRecoveryCodes(const std::string& password, const std::string& code);
     void report(uint64_t gameId, const std::string& username, const std::string& category, const std::string& comment);
+    void fetchMyGames(uint64_t before, int limit, const GamesFilter& filter);
+    void fetchGame(uint64_t gameId);
+    void downloadPgn(uint64_t gameId);
+    void fetchSessions();
+    void revokeSession(int64_t sessionId);
+    void setAcceptChallenges(bool accept);
+    void changeEmail(const std::string& newEmail, const std::string& password, const std::string& codeOrRecovery);
+    void exportAccount(const std::string& password, const std::string& codeOrRecovery);
+    void deleteAccount(const std::string& password, const std::string& codeOrRecovery);
 
     void connect();
     void disconnect();

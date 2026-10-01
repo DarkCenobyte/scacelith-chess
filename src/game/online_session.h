@@ -47,6 +47,15 @@ public:
     virtual void mfaDisable(const std::string& password, const std::string& codeOrRecovery) = 0;
     virtual void regenerateRecoveryCodes(const std::string& password, const std::string& code) = 0;
     virtual void report(uint64_t gameId, const std::string& username, const std::string& category, const std::string& comment) = 0;
+    virtual void fetchMyGames(uint64_t before, int limit, const net::GamesFilter& filter) = 0;
+    virtual void fetchGame(uint64_t gameId) = 0;
+    virtual void downloadPgn(uint64_t gameId) = 0;
+    virtual void fetchSessions() = 0;
+    virtual void revokeSession(int64_t sessionId) = 0;
+    virtual void setAcceptChallenges(bool accept) = 0;
+    virtual void changeEmail(const std::string& newEmail, const std::string& password, const std::string& codeOrRecovery) = 0;
+    virtual void exportAccount(const std::string& password, const std::string& codeOrRecovery) = 0;
+    virtual void deleteAccount(const std::string& password, const std::string& codeOrRecovery) = 0;
     virtual void connect() = 0;
     virtual void disconnect() = 0;
     virtual net::ConnState state() const = 0;

@@ -45,6 +45,15 @@ public:
     void report(uint64_t id, const std::string& u, const std::string& cat, const std::string& comment) override {
         c_->report(id, u, cat, comment);
     }
+    void fetchMyGames(uint64_t before, int limit, const net::GamesFilter& f) override { c_->fetchMyGames(before, limit, f); }
+    void fetchGame(uint64_t id) override { c_->fetchGame(id); }
+    void downloadPgn(uint64_t id) override { c_->downloadPgn(id); }
+    void fetchSessions() override { c_->fetchSessions(); }
+    void revokeSession(int64_t id) override { c_->revokeSession(id); }
+    void setAcceptChallenges(bool accept) override { c_->setAcceptChallenges(accept); }
+    void changeEmail(const std::string& e, const std::string& p, const std::string& c) override { c_->changeEmail(e, p, c); }
+    void exportAccount(const std::string& p, const std::string& c) override { c_->exportAccount(p, c); }
+    void deleteAccount(const std::string& p, const std::string& c) override { c_->deleteAccount(p, c); }
     void connect() override { c_->connect(); }
     void disconnect() override { c_->disconnect(); }
     net::ConnState state() const override { return c_->state(); }

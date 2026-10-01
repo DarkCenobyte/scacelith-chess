@@ -77,6 +77,15 @@ void OnlineClient::regenerateRecoveryCodes(const std::string& p, const std::stri
 void OnlineClient::report(uint64_t id, const std::string& u, const std::string& cat, const std::string& comment) {
     impl_->fake.report(id, u, cat, comment);
 }
+void OnlineClient::fetchMyGames(uint64_t before, int limit, const GamesFilter& f) { impl_->fake.fetchMyGames(before, limit, f); }
+void OnlineClient::fetchGame(uint64_t id) { impl_->fake.fetchGame(id); }
+void OnlineClient::downloadPgn(uint64_t id) { impl_->fake.downloadPgn(id); }
+void OnlineClient::fetchSessions() { impl_->fake.fetchSessions(); }
+void OnlineClient::revokeSession(int64_t id) { impl_->fake.revokeSession(id); }
+void OnlineClient::setAcceptChallenges(bool accept) { impl_->fake.setAcceptChallenges(accept); }
+void OnlineClient::changeEmail(const std::string& e, const std::string& p, const std::string& c) { impl_->fake.changeEmail(e, p, c); }
+void OnlineClient::exportAccount(const std::string& p, const std::string& c) { impl_->fake.exportAccount(p, c); }
+void OnlineClient::deleteAccount(const std::string& p, const std::string& c) { impl_->fake.deleteAccount(p, c); }
 void OnlineClient::connect() { impl_->fake.connect(); }
 void OnlineClient::disconnect() { impl_->fake.disconnect(); }
 ConnState OnlineClient::state() const { return impl_->fake.state(); }

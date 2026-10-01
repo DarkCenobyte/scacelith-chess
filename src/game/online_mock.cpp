@@ -1212,6 +1212,27 @@ void FakeServer::report(uint64_t, const std::string&, const std::string&, const 
     impl_->http(impl_->result(Event::Kind::ReportResult, true));
 }
 
+// ---- account API: CONTRACT STUBS (replaced by the UI work package with realistic fakes) ----
+namespace {
+Event notImplemented(Event::Kind kind) {
+    Event ev;
+    ev.kind = kind;
+    ev.error = "not_implemented";
+    return ev;
+}
+}  // namespace
+void FakeServer::fetchMyGames(uint64_t, int, const GamesFilter&) { impl_->http(notImplemented(Event::Kind::GamesResult)); }
+void FakeServer::fetchGame(uint64_t) { impl_->http(notImplemented(Event::Kind::GameDetailsResult)); }
+void FakeServer::downloadPgn(uint64_t) { impl_->http(notImplemented(Event::Kind::PgnResult)); }
+void FakeServer::fetchSessions() { impl_->http(notImplemented(Event::Kind::SessionsResult)); }
+void FakeServer::revokeSession(int64_t) { impl_->http(notImplemented(Event::Kind::SessionRevoked)); }
+void FakeServer::setAcceptChallenges(bool) { impl_->http(notImplemented(Event::Kind::PreferencesResult)); }
+void FakeServer::changeEmail(const std::string&, const std::string&, const std::string&) {
+    impl_->http(notImplemented(Event::Kind::EmailChangeResult));
+}
+void FakeServer::exportAccount(const std::string&, const std::string&) { impl_->http(notImplemented(Event::Kind::AccountExportResult)); }
+void FakeServer::deleteAccount(const std::string&, const std::string&) { impl_->http(notImplemented(Event::Kind::AccountDeleted)); }
+
 void FakeServer::connect() {
     Impl& I = *impl_;
     I.lastNow = nowMs();
