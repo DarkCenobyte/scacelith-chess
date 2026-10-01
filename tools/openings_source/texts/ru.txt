@@ -1,27 +1,29 @@
 # Coach openings: Russian texts (keys of en.txt). tools/gen_opening_lang.py merges them with the names of
 # families.json into assets/coach/openings/ru.lang.
-# Formal "вы". Names appear only in the nominative (after a dash, after "это", "на доске", "у белых") and as the
-# object "{white}" only in the gambit sentences, where the name is a masculine inanimate noun (accusative =
-# nominative). The coach has no grammatical gender: no first-person past tense. Squares as "e4", files as
-# "линия c", pawns as "пешка d"; pieces in words.
+# Informal "ты" (the coach's register; the game menus stay formal). Names appear only in the nominative (after a
+# dash, after "это", "на доске", "у белых") and as the object "{white}" only in the gambit sentences, where the
+# name is a masculine inanimate noun (accusative = nominative). The coach is male: first-person past tense in the
+# masculine ("я его отклонил"); the player's gender is unknown: no second-person past tense ("ты сыграл"), the
+# present instead ("ты его принимаешь").
+# Squares as "e4", files as "линия c", pawns as "пешка d"; pieces in words.
 
 # ---- Sentences
-opening.say.pw.both = Ваш дебют — {white:def}, мой ответ — {black:def}.
-opening.say.pw.both.2 = Итак, у вас {white:def}, а у меня {black:def}.
-opening.say.pb.both = Мой дебют — {white:def}, ваш ответ — {black:def}.
-opening.say.pb.both.2 = Итак, у меня {white:def}, а у вас {black:def}.
-opening.say.pw.declined = Вы сыграли {white:def}, и гамбит отклонён.
-opening.say.pb.declined = Мой дебют — {white:def}, и вы его отклонили.
-opening.say.pw.accepted = Вы сыграли {white:def}, и гамбит принят.
-opening.say.pb.accepted = Мой дебют — {white:def}, и вы его приняли.
-opening.say.pw.white = Ваш дебют — {white:def}.
-opening.say.pw.white.2 = Ваш выбор — {white:def}.
+opening.say.pw.both = Твой дебют — {white:def}, мой ответ — {black:def}.
+opening.say.pw.both.2 = Итак, у тебя {white:def}, а у меня {black:def}.
+opening.say.pb.both = Мой дебют — {white:def}, твой ответ — {black:def}.
+opening.say.pb.both.2 = Итак, у меня {white:def}, а у тебя {black:def}.
+opening.say.pw.declined = Твой дебют — {white:def}, и я его отклонил.
+opening.say.pb.declined = Мой дебют — {white:def}, а ты его отклоняешь.
+opening.say.pw.accepted = Твой дебют — {white:def}, и я его принял.
+opening.say.pb.accepted = Мой дебют — {white:def}, и ты его принимаешь.
+opening.say.pw.white = Твой дебют — {white:def}.
+opening.say.pw.white.2 = Твой выбор — {white:def}.
 opening.say.pb.white = Мой дебют — {white:def}.
 opening.say.pb.white.2 = Мой выбор — {white:def}.
-opening.say.pw.var_white = Мой ответ — {black:def}, а ваш выбор — {white:def}.
-opening.say.pb.var_white = Ваш ответ — {black:def}, а мой выбор — {white:def}.
+opening.say.pw.var_white = Мой ответ — {black:def}, а твой выбор — {white:def}.
+opening.say.pb.var_white = Твой ответ — {black:def}, а мой выбор — {white:def}.
 opening.say.pw.black = Мой ответ — {black:def}.
-opening.say.pb.black = Ваш ответ — {black:def}.
+opening.say.pb.black = Твой ответ — {black:def}.
 opening.say.both = На доске {both:def}.
 opening.say.both.2 = Это {both:def}.
 opening.say.variation = Точнее, это {variation:def}.
@@ -41,7 +43,7 @@ opening.family.queens_pawn.beginner = Ферзевая пешка занимае
 opening.family.queens_pawn.advanced = Дебюты ферзевой пешки ведут к закрытым позициям, где расстановка фигур, пешечная структура и подрывы c4 и e4 важнее ранней тактики.
 opening.family.kings_knight.beginner = Конь выходит и нападает на пешку e5: самый естественный развивающий ход, на который обычно отвечают защитой другим конём.
 opening.family.kings_knight.advanced = Конь на f3 сохраняет все классические пути, испанскую, итальянскую, шотландскую партию или партию четырёх коней, и заставляет чёрных выбрать способ защиты e5.
-opening.family.sicilian.beginner = Чёрные отвечают пешкой c, а не пешкой e, и нарушают равновесие: ждите острой борьбы, в которой каждая сторона атакует на своём фланге.
+opening.family.sicilian.beginner = Чёрные отвечают пешкой c, а не пешкой e, и нарушают равновесие: жди острой борьбы, в которой каждая сторона атакует на своём фланге.
 opening.family.sicilian.advanced = После d4 и размена пешек у чёрных полуоткрытая линия c и больше центральных пешек, у белых быстрее развитие и шансы на атаку на королевском фланге.
 opening.family.french.beginner = Чёрные готовят d5 ходом e6: надёжная защита, но белопольный слон часто оказывается запертым за собственными пешками.
 opening.family.french.advanced = Когда белые продвигают пешку на e5, возникает запертая пешечная цепь: белые атакуют на королевском фланге, чёрные подрывают цепь ходами c5 и f6.
@@ -57,7 +59,7 @@ opening.family.scotch.beginner = Белые сразу вскрывают цен
 opening.family.scotch.advanced = Напряжение в центре сразу исчезает; борьба идёт вокруг активного развития чёрных и пешечных структур после размена на c6.
 opening.family.philidor.beginner = Чёрные защищают e5 пешкой d: надёжно, но несколько пассивно, ведь чернопольный слон заперт.
 opening.family.philidor.advanced = Чёрные уступают пространство ради прочного опорного пункта на e5; у белых удобное давление в центре, а удары по f7 часто встречаются в любительских партиях.
-opening.family.petrov.beginner = Чёрные не защищают e5, а контратакуют e4 конём: надёжная симметричная защита; только не копируйте ходы белых слишком долго.
+opening.family.petrov.beginner = Чёрные не защищают e5, а контратакуют e4 конём: надёжная симметричная защита; только не копируй ходы белых слишком долго.
 opening.family.petrov.advanced = Русская партия ведёт к симметричным, часто ничейным структурам: у белых небольшая инициатива, чёрные быстро развиваются и ищут уравнивающие размены.
 opening.family.four_knights.beginner = Обе стороны сначала выводят коней: здоровый, спокойный дебют, соблюдающий правила развития.
 opening.family.four_knights.advanced = Симметричный, уравновешенный дебют: белые выбирают испанскую, шотландскую или итальянскую трактовку, а чёрным стоит знать контргамбит Рубинштейна.
@@ -219,7 +221,7 @@ opening.variation.ck_exchange.advanced = Карлсбадская структу
 opening.variation.ck_panov.advanced = Белые играют c4 и соглашаются на изолированную пешку d ради активных фигур и шансов на атаку.
 opening.variation.ck_classical.advanced = Слон выходит на f5 с темпом, нападая на коня; белые выигрывают пространство ходами h4 и h5, и разносторонние рокировки здесь обычны.
 opening.variation.ck_two_knights.advanced = Белые развивают обоих коней до d4, сохраняя гибкость и избегая главных вариантов.
-opening.variation.two_knights.beginner = Чёрные контратакуют e4 конём вместо того, чтобы копировать белых; остерегайтесь прыжка коня на g5 с нападением на f7.
+opening.variation.two_knights.beginner = Чёрные контратакуют e4 конём вместо того, чтобы копировать белых; остерегайся прыжка коня на g5 с нападением на f7.
 opening.variation.two_knights.advanced = Самый активный ответ чёрных на итальянскую партию: он допускает острый прыжок коня на g5 или спокойный d3.
 opening.variation.giuoco_piano.beginner = По-итальянски «тихая игра»: оба слона нацелены на пешку f соперника, и партия развивается спокойно.
 opening.variation.giuoco_piano.advanced = Чёрный слон зеркально повторяет белого; белые выбирают между игрой в центре с c3 и d4, неспешным d3 и гамбитом Эванса.
