@@ -818,6 +818,7 @@ void GameScene::persistCoachResults() {
     if (s.coachHistory.size() > size_t(Settings::kCoachHistoryMax))
         s.coachHistory.erase(s.coachHistory.begin(), s.coachHistory.end() - Settings::kCoachHistoryMax);
     s.coachAccuracyExplained = rt.session.accuracyExplained();
+    LOGI("coach: results saved (%d games in the history)", int(s.coachHistory.size()));
     if (lesson()) s.coachLessonChapter = rt.session.lessonCompleted() ? 0 : rt.session.lessonChapter();
     // The level the coach suggested is the Coach page's choice next time ("Play again" keeps this
     // game's level).
@@ -1046,6 +1047,7 @@ void GameScene::updateCoach(float dt) {
     if (state_ == State::GameOver && endHandshakeDone_ && !rt.handshakeReported && !anim_[0].busy() && !anim_[1].busy() &&
         stateTime_ > 1.0f) {
         rt.handshakeReported = true;
+        LOGI("coach: handshake done, the appraisal follows");
         if (rt.sessionRunning) rt.session.onHandshakeDone(game_);
     }
     if (state_ == State::GameOver && coachEndCardReady()) persistCoachResults();

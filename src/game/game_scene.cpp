@@ -1033,7 +1033,8 @@ void GameScene::runWarp(float seconds) {
         if (state_ == State::Playing && turn_ == Turn::AiThinking && aiRequested_ && !aiHasMove_ && engineOk_) {
             for (int i = 0; i < 6000 && !engine_.moveReady(); ++i) plat::sleepMs(5);
         }
-        if (state_ == State::GameOver && stateTime_ > 1.0f) break;
+        // A coach game goes on to its end card (closing words, handshake, appraisal).
+        if (state_ == State::GameOver && stateTime_ > 1.0f && (!coach() || coachEndCardReady())) break;
         simulate(step);
     }
 }
