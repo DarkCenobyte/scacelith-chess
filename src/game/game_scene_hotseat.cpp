@@ -96,6 +96,16 @@ void GameScene::initHotSeatArgs() {
         if (q == std::string::npos) break;
         p = q + 1;
     }
+    // --play-then resign|leave|takeback,...: the Esc menu's choices once those moves are made.
+    std::string then = ctx.argValue("--play-then");
+    scriptThen_.clear();
+    for (size_t a = 0; a < then.size();) {
+        size_t b = then.find(',', a);
+        std::string m = then.substr(a, b == std::string::npos ? std::string::npos : b - a);
+        if (!m.empty()) scriptThen_.push_back(m);
+        if (b == std::string::npos) break;
+        a = b + 1;
+    }
     if (!ctx.hasArg("--hotseat")) return;
     // --start --hotseat [--white-name N] [--black-name N] [--clock-right white|black] [--rated]
     setup_.opponent = 1;
@@ -240,13 +250,38 @@ void GameScene::updateHotSeatTurn(float dt) {
 
 void GameScene::updateScript(float dt) {
     if (scriptWait_ > 0.0f) scriptWait_ -= dt;
-    if (scriptPos_ >= script_.size() || turn_ != Turn::HumanIdle || paused_ || scriptWait_ > 0.0f) return;
+    if (turn_ != Turn::HumanIdle || paused_ || scriptWait_ > 0.0f) return;
+    if (scriptPos_ >= script_.size() && scriptThenPos_ >= scriptThen_.size()) return;
     if (hotSeat() && handover_.active()) return;
     if (anim_[inputSeat()].busy()) return;
     if (coach() && !coachMayTouch()) return;  // the coach has the floor (or its hands the table)
+    if (scriptPos_ >= script_.size()) {
+        // --play-then: the player opens the Esc menu and picks the next choice (menuChoice).
+        const std::string& a = scriptThen_[scriptThenPos_++];
+        ui::MenuAction m = a == "resign"     ? ui::MenuAction::Resign
+                           : a == "leave"    ? ui::MenuAction::BackToMainMenu
+                           : a == "takeback" ? ui::MenuAction::TakeBack
+                                             : ui::MenuAction::None;
+        if (m == ui::MenuAction::None) {
+            LOGW("--play-then: '%s' is not resign, leave or takeback", a.c_str());
+            return;
+        }
+        LOGI("--play-then: %s", a.c_str());
+        paused_ = true;
+        scriptMenu_ = m;
+        scriptWait_ = kScriptThink;
+        return;
+    }
     const std::string& u = script_[scriptPos_++];
     Move mv = game_.position().parseUCI(u);
-    PieceObject* p = mv.valid() ? board_.at(mv.from) : nullptr;
+    // Without the legal-move hints an illegal move can be made too: the arbiter judges it at the
+    // clock press (as a player's would be).
+    if (!mv.valid() && !settings().showLegalMoves && !online() && !coach() && u.size() >= 4) {
+        mv.from = parseSquare(u.substr(0, 2));
+        mv.to = parseSquare(u.substr(2, 2));
+    }
+    PieceObject* p = mv.from != NoSquare && mv.to != NoSquare ? board_.at(mv.from) : nullptr;
+    if (p && p->color != inputColor()) p = nullptr;
     if (!p) {
         LOGW("--play: '%s' is not legal here, the script stops", u.c_str());
         scriptPos_ = script_.size();
@@ -259,6 +294,13 @@ void GameScene::updateScript(float dt) {
     scriptPromo_ = mv.promotion;
     humanPlace(mv.to);
     humanPressClock();
+}
+
+ui::MenuAction GameScene::menuChoice(ui::MenuAction shown) {
+    if (scriptMenu_ == ui::MenuAction::None) return shown;
+    ui::MenuAction m = scriptMenu_;
+    scriptMenu_ = ui::MenuAction::None;
+    return m;
 }
 
 void GameScene::offerDrawHotSeat() {

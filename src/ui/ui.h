@@ -155,6 +155,9 @@ bool optionsOpen();
 // stores the brightness in game::settings(), Esc keeps the stored one; both complete it
 // (Settings::brightnessCalibrated), save the .ini and go on to the title page.
 void openBrightnessCalibration();
+// The next mainMenu() call opens on the "Saved games" page (back from a replay); on the title page
+// when that call has no library.
+void openSavedGames();
 // Optional small move list (toggled by the player with Tab).
 void moveList(const std::vector<std::string>& san, bool visible);
 // Loading screen while shaders/probes/textures are prepared (progress 0..1).
@@ -173,8 +176,25 @@ struct ViewerHud {
     float viewpointAge = 0.0f;   // seconds since it was selected (the label fades out)
     float speed = 1.2f;          // observer speed (m/s), shown for a moment after a change
     float speedAge = 1e9f;       // seconds since the speed changed
+    bool replay = false;         // a saved game replayed: its keys head the controls hint, and the
+                                 // labels above leave room for its bar (replayBar)
 };
 void viewerHud(const ViewerHud& hud);
+
+// ---- Replay of a saved game (ui_screens_game.cpp) ----------------------------------------------
+// The replay's bar, bottom centre over the viewer overlay (drawn after viewerHud while it is
+// visible): the move counter, the buttons start, one move back, pause / resume, one move forward,
+// end (mouse only, with tooltips naming their keys: the keyboard is the game's), and the speed.
+struct ReplayBar {
+    int move = 0, moves = 0;     // full moves played so far, in the whole game
+    std::string speed;           // "×2", "Instant" (already translated)
+    bool paused = false;         // the middle button resumes
+    bool atStart = false;        // start and back greyed out
+    bool atEnd = false;          // forward and end greyed out
+    bool aboveCard = false;      // the folded game over bar is shown: the bar sits above it
+};
+enum class ReplayAction { None, Start, Back, TogglePause, Forward, End };
+ReplayAction replayBar(const ReplayBar& bar);
 
 // ---- Hot-seat: two players on one PC (ui_hotseat.cpp) ------------------------------------------
 // Overlay of a hot-seat game: the two players (top left, the one to move marked), a caption naming

@@ -306,3 +306,36 @@ TEST(replay_end_reasons) {
     own.result = "*";
     CHECK_EQ(replay::endReasonKey(own), std::string(""));
 }
+
+TEST(replay_move_numbers) {
+    // The standard start: plies 1 and 2 are move 1, ply 3 is move 2.
+    chess::Position std0;
+    CHECK_EQ(replay::moveNumberAfter(std0, 0), 1);
+    CHECK_EQ(replay::moveNumberAfter(std0, 1), 1);
+    CHECK_EQ(replay::moveNumberAfter(std0, 2), 1);
+    CHECK_EQ(replay::moveNumberAfter(std0, 3), 2);
+    CHECK_EQ(replay::moveNumberAfter(std0, 31), 16);
+    CHECK_EQ(replay::sheetRowsAfter(std0, 0), 0);
+    CHECK_EQ(replay::sheetRowsAfter(std0, 1), 1);
+    CHECK_EQ(replay::sheetRowsAfter(std0, 2), 1);
+    CHECK_EQ(replay::sheetRowsAfter(std0, 3), 2);
+    // From "40... Kd7" to "43. Ke3" (6 plies): moves 40 to 43, on rows 1 to 4 of the sheets.
+    chess::Position fen;
+    CHECK(fen.setFEN("4k3/8/8/8/8/8/4P3/4K3 b - - 0 40"));
+    CHECK_EQ(replay::moveNumberAfter(fen, 0), 40);
+    CHECK_EQ(replay::moveNumberAfter(fen, 1), 40);   // 40... Kd7
+    CHECK_EQ(replay::moveNumberAfter(fen, 2), 41);   // 41. Kd2
+    CHECK_EQ(replay::moveNumberAfter(fen, 3), 41);   // 41... Kd6
+    CHECK_EQ(replay::moveNumberAfter(fen, 6), 43);   // 43. Ke3
+    CHECK_EQ(replay::sheetRowsAfter(fen, 0), 0);
+    CHECK_EQ(replay::sheetRowsAfter(fen, 1), 1);
+    CHECK_EQ(replay::sheetRowsAfter(fen, 2), 2);
+    CHECK_EQ(replay::sheetRowsAfter(fen, 5), 3);
+    CHECK_EQ(replay::sheetRowsAfter(fen, 6), 4);
+    // White to move at move 20.
+    chess::Position w20;
+    CHECK(w20.setFEN("4k3/8/8/8/8/8/4P3/4K3 w - - 0 20"));
+    CHECK_EQ(replay::moveNumberAfter(w20, 1), 20);
+    CHECK_EQ(replay::moveNumberAfter(w20, 3), 21);
+    CHECK_EQ(replay::sheetRowsAfter(w20, 3), 2);
+}

@@ -1126,7 +1126,7 @@ void GameScene::coachPauseMenuFrame() {
     cp.canOfferDraw = !lesson() && drawOfferPly_ != int(game_.moves().size()) && !rt.drawAnalysis;
     cp.canClaimDraw = !lesson() && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
     cp.canResign = !lesson();
-    switch (ui::coachPauseMenu(cp)) {
+    switch (menuChoice(ui::coachPauseMenu(cp))) {
     case ui::MenuAction::Resume: paused_ = false; break;
     case ui::MenuAction::TakeBack:
         paused_ = false;
@@ -1160,7 +1160,9 @@ void GameScene::coachPauseMenuFrame() {
     }
     case ui::MenuAction::BackToMainMenu:
         // A coach game is never rated: leaving abandons it (the lesson resumes at its chapter).
+        // It is saved unfinished ("*"; never the rules lesson).
         paused_ = false;
+        archiveGame(game_.isOver());
         leaveCoachGame();
         clock_.stop();
         state_ = State::FadeToMenu;
@@ -1429,6 +1431,10 @@ void GameScene::runCoachTable(float dt) {
                 // (they were never written: the write limit, §4.2).
                 if (turn_ == Turn::HumanTouched) humanRelease();
                 game_.undo(k);
+                // The saved game's move times follow the game: one per move played.
+                moveElapsedMs_.resize(game_.moves().size());
+                moveClockMs_.resize(game_.moves().size());
+                plyElapsedMs_ = 0.0;
                 arbiter_.reset(game_);
                 if (!lesson() && !scorekeeper_.dropMoves(n - k))
                     LOGW("coach: takeback of %d plies: a scoresheet has begun writing them already", k);
@@ -1520,6 +1526,9 @@ void GameScene::runCoachTable(float dt) {
                 LOGW("coach: lesson position '%s' is not valid", job.fen.c_str());
             } else {
                 game_ = g;
+                moveElapsedMs_.clear();   // a new game record: no move times yet
+                moveClockMs_.clear();
+                plyElapsedMs_ = 0.0;
                 arbiter_.reset(game_);
                 board_.syncTo(game_.position());
                 cameraCut_ = true;
