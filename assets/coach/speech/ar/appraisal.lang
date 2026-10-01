@@ -1,0 +1,437 @@
+# Coach speech (Arabic, Modern Standard Arabic): the appraisal after the game
+# (src/coach/appraisal.cpp). Same keys and variants as assets/coach/speech/en/appraisal.lang; its
+# header documents every placeholder. Always positive, never blaming.
+#
+# Register (as common.lang and review.lang): second person singular, gender-neutral where the
+# writing allows ("الفوز لك", "كان الفوز في يدك", "كانت لديك", "لم ترتكب", "استرجعنا"). A
+# 2nd-person past verb is also the coach's "I": "فزت / لعبت / وجدت" are avoided; "أخذت ... من
+# قطعي" and "هزمتني" are kept because the coach cannot be their subject. The coach's own figures
+# are nouns ("دقتي", "الفوز لي").
+# Move numbers are said as cardinals after the noun ("في النقلة {n}" = في النقلة سبعة), as in the
+# opening texts ("خرجنا من النظرية المعروفة في النقلة {n}").
+# Counts: "{moves:move}", "{n:piece}", "{m:time}", "{n:mistake}", "{m:f}" (a feminine number,
+# نقلة understood: "في ثلاث منها") ...; a dual count is oblique, so every count follows a verb, a
+# preposition (مع، في، من، سوى) or a verbal noun ("أخذ {n:piece}", "استرجاع {n:move}").
+# {opening:def} is the definite opening name of assets/coach/openings/ar.lang ("الدفاع الصقلي").
+
+# ---- Names used inside the lines ------------------------------------------------------------------
+# Phases: definite nouns, said after "في" ("في {text}") or after a colon.
+appraisal.phase.opening = الافتتاح
+appraisal.phase.middlegame = وسط المباراة
+appraisal.phase.endgame = نهاية المباراة
+# Draw reasons: said right after "تعادل" ("تعادل {text}." = تعادل بالتكرار).
+appraisal.reason.stalemate = بالجمود
+appraisal.reason.material = لتعذّر الإماتة
+appraisal.reason.repetition = بالتكرار
+appraisal.reason.fifty = بقاعدة الخمسين نقلة
+appraisal.reason.agreement = بالاتفاق
+appraisal.reason.other = هذه المرة
+# Level names of the Coach page (assets/i18n/ar.lang, coach.level.<n>.name), in quotation marks;
+# the lines say "مستوى {level}".
+appraisal.level.l1 = «الخطوات الأولى»
+appraisal.level.l2 = «مبتدئ»
+appraisal.level.l3 = «متوسط»
+appraisal.level.l4 = «لاعب نادٍ»
+appraisal.level.l5 = «لاعب نادٍ قوي»
+appraisal.level.l6 = «خبير»
+# What to practise, after "أمر واحد للتمرين:" and "اعمل على" (a verbal-noun phrase, no full stop).
+theme.general = النظر إلى الرقعة كلها قبل كل نقلة
+theme.mate_allowed = التأكد من سلامة ملِكك قبل كل نقلة
+theme.mate_missed = البحث عن كش مات، بدءًا بنقلات الكش
+theme.stalemate = ترك مربع لملِكي عند التفوق
+theme.fork = الحذر من الهجمات المزدوجة
+theme.discovered = الحذر من الهجمات المختبئة خلف قطعي
+theme.skewer = إبعاد القطع الثمينة عن الخط نفسه
+theme.pin = رصد التثبيتات قبل وقوعها
+theme.trapped = ترك طريق هروب لقطعك
+theme.back_rank = فتح نافذة صغيرة لملِكك
+theme.hanging = إبقاء قطعك محمية
+theme.exchange = عدّ المهاجمين والمدافعين قبل التبادل
+theme.missed_capture = البحث أولًا عن القطع المجانية
+theme.missed_fork = البحث عن فرصك للهجوم المزدوج
+theme.promotion = سباق البيادق، وقاعدة المربع
+theme.king_safety = إبقاء ملِكك آمنًا خلف بيادقه
+theme.bad_trade = اختيار القطع التي تُبادَل
+theme.opening = تطوير قطعك والتبييت مبكرًا
+theme.endgame = تنشيط ملِكك ودفع البيادق الحرة
+theme.positional = تحسين أضعف قطعة لديك
+
+# ---- 1. Opener (always positive) ---------------------------------------------------------------------
+appraisal.open.win.b1 = كش مات! الفوز لك. أحسنت!
+appraisal.open.win.b1.2 = انتصار! وإنهاء رائع للمباراة.
+appraisal.open.win.b1.3 = خسرتُ أمامك! كانت مباراة جيدة حقًا.
+appraisal.open.win.b2 = أحسنت! الفوز لك في {moves:move}.
+appraisal.open.win.b2.2 = تهانينا، الفوز لك!
+appraisal.open.win.b2.3 = فوز في {moves:move}. أداء جميل!
+appraisal.open.win.b3 = تهانينا، فوز مستحق.
+appraisal.open.win.b3.2 = لعب ممتاز. هذا الفوز من حقك.
+appraisal.open.win.b3.3 = فوز جميل. أهنّئك.
+appraisal.open.win.b4 = انتصار جميل.
+appraisal.open.win.b4.2 = أحسنت، فوز مستحق.
+appraisal.open.win.b4.3 = فوز جيد.
+appraisal.open.win.b5 = لعب ممتاز.
+appraisal.open.win.b5.2 = فوز أنيق.
+appraisal.open.win.b5.3 = مباراة جيدة، وفوز مستحق.
+appraisal.open.win.b6 = أحسنت.
+appraisal.open.win.b6.2 = فوز مستحق.
+appraisal.open.win.b6.3 = مباراة جيدة.
+appraisal.open.draw.b1 = تعادل! لم يستطع أحد الفوز هذه المرة.
+appraisal.open.draw.b1.2 = إنه تعادل. كانت مباراة متقاربة!
+appraisal.open.draw.b1.3 = تعادل: نتقاسم النقطة. أحسنت!
+appraisal.open.draw.b2 = تعادل: نتيجة منصفة.
+appraisal.open.draw.b2.2 = تعادلنا. معركة جيدة!
+appraisal.open.draw.b2.3 = تعادل، ومباراة جيدة.
+appraisal.open.draw.b3 = تعادل. كانت لكل طرف فرصه.
+appraisal.open.draw.b3.2 = تعادل منصف.
+appraisal.open.draw.b3.3 = تعادل {text}. معركة جيدة.
+appraisal.open.draw.b4 = تعادل {text}.
+appraisal.open.draw.b4.2 = النتيجة تعادل {text}.
+appraisal.open.draw.b4.3 = انتهت المباراة بتعادل {text}.
+appraisal.open.draw.b5 = تعادل.
+appraisal.open.draw.b5.2 = تعادل {text}.
+appraisal.open.draw.b5.3 = إنه تعادل.
+appraisal.open.draw.b6 = تعادل.
+appraisal.open.draw.b6.2 = تعادل {text}.
+appraisal.open.draw.b6.3 = النتيجة تعادل.
+appraisal.open.stalemate.b1 = تعادل بالجمود: كان الفوز قريبًا جدًا! في المرة القادمة، اترك لملِكي مربعًا.
+appraisal.open.stalemate.b1.2 = جمود، أي تعادل. كان الفوز على بُعد خطوة!
+appraisal.open.stalemate.b2 = تعادل بالجمود. كان الفوز قريبًا جدًا منك!
+appraisal.open.stalemate.b2.2 = جمود: تعادل، مع أن الفوز كان في يدك.
+appraisal.open.stalemate.b3 = تعادل بالجمود، من موقف رابح.
+appraisal.open.stalemate.b3.2 = جمود. أفلت الفوز في اللحظة الأخيرة.
+appraisal.open.stalemate.b4 = تعادل بالجمود.
+appraisal.open.stalemate.b4.2 = جمود: تعادل.
+appraisal.open.stalemate.b5 = جمود.
+appraisal.open.stalemate.b5.2 = تعادل، بالجمود.
+appraisal.open.stalemate.b6 = جمود.
+appraisal.open.stalemate.b6.2 = تعادل، جمود.
+appraisal.open.loss.b1 = الفوز لي هذه المرة، لكن كانت لك نقلات جيدة حقًا.
+appraisal.open.loss.b1.2 = مباراة جيدة! لم يكن فوزي سهلًا.
+appraisal.open.loss.b1.3 = كانت مباراة ممتعة! الفوز لي هذه المرة، لكن تقدّمك سريع.
+appraisal.open.loss.b2 = مباراة جيدة! لنرَ ما كان جيدًا، وفكرة واحدة لنجرّبها.
+appraisal.open.loss.b2.2 = شكرًا على المباراة! كانت لديك أفكار جيدة.
+appraisal.open.loss.b2.3 = مباراة جيدة. لنرَ ما نتعلمه منها.
+appraisal.open.loss.b3 = مباراة جيدة.
+appraisal.open.loss.b3.2 = شكرًا على المباراة.
+appraisal.open.loss.b3.3 = مباراة جيدة. لنلقِ نظرة.
+appraisal.open.loss_close.b3 = معركة جيدة. بقيت المباراة متقاربة لوقت طويل.
+appraisal.open.loss_close.b3.2 = قتال جيد: ظل التوازن قائمًا لوقت طويل.
+appraisal.open.loss.b4 = مباراة جيدة. وإليك ما حسمها.
+appraisal.open.loss.b4.2 = مباراة جيدة. حسمتها لحظة واحدة.
+appraisal.open.loss.b4.3 = شكرًا على المباراة. لنرَ أين انقلبت.
+appraisal.open.loss_close.b4 = معركة متقاربة لوقت طويل. وإليك ما حسمها.
+appraisal.open.loss_close.b4.2 = مباراة جيدة، متوازنة لمدة طويلة.
+appraisal.open.loss.b5 = مباراة جيدة.
+appraisal.open.loss.b5.2 = شكرًا على المباراة.
+appraisal.open.loss.b5.3 = معركة جيدة.
+appraisal.open.loss.b6 = مباراة جيدة.
+appraisal.open.loss.b6.2 = شكرًا على المباراة.
+appraisal.open.loss.b6.3 = معركة جيدة.
+appraisal.open.resigned.b1 = الاستسلام جزء من الشطرنج، ويحتاج إلى شجاعة. مباراة جيدة!
+appraisal.open.resigned.b1.2 = لا بأس. معرفة وقت الاستسلام جزء من الشطرنج.
+appraisal.open.resigned.b2 = الاستسلام جزء من الشطرنج، ويحتاج إلى شجاعة.
+appraisal.open.resigned.b2.2 = قرار مفهوم. الاستسلام يحتاج إلى شجاعة أيضًا.
+appraisal.open.resigned.b3 = الاستسلام جزء من الشطرنج. مباراة جيدة.
+appraisal.open.resigned.b3.2 = قرار مفهوم. شكرًا على المباراة.
+appraisal.open.resigned.b4 = مباراة جيدة.
+appraisal.open.resigned.b4.2 = شكرًا على المباراة.
+appraisal.open.resigned.b5 = مباراة جيدة.
+appraisal.open.resigned.b5.2 = شكرًا على المباراة.
+appraisal.open.resigned.b6 = مباراة جيدة.
+appraisal.open.resigned.b6.2 = شكرًا.
+# The player resigned while the position was still playable (levels 3-6).
+appraisal.resign_early.b3 = لم تكن المباراة قد انتهت بعد: التقييم نحو {eval}.
+appraisal.resign_early.b3.2 = في الحقيقة، كانت لديك فرص بعد: نحو {eval}.
+appraisal.resign_early.b4 = لم تنتهِ المباراة بعد: نحو {eval}.
+appraisal.resign_early.b4.2 = كان الموقف ما زال قابلًا للعب: نحو {eval}.
+appraisal.resign_early.b5 = لم يُحسم شيء بعد: {eval}.
+appraisal.resign_early.b5.2 = ما زال قابلًا للعب، نحو {eval}.
+appraisal.resign_early.b6 = لم يُحسم: {eval}.
+appraisal.resign_early.b6.2 = كان التقييم {eval}.
+# The opening played (levels 3-6). Most Arabic names already start with "افتتاح" or "الدفاع",
+# so the lines never say "الافتتاح: {opening}".
+appraisal.opening.b3 = لعبنا {opening:def}.
+appraisal.opening.b3.2 = بدأت مباراتنا ب{opening:def}.
+appraisal.opening.b4 = على الرقعة كان {opening:def}.
+appraisal.opening.b4.2 = البداية: {opening:def}.
+appraisal.opening.b5 = {opening:def}.
+appraisal.opening.b5.2 = البداية: {opening:def}.
+appraisal.opening.b6 = {opening:def}.
+appraisal.opening.b6.2 = البداية: {opening:def}.
+
+# ---- 2. Highlight: the best moment ({move} is pointed at when the piece is still there) -------------
+appraisal.best.brilliant.b1 = يا لها من تضحية في النقلة رقم {n}: {move}!
+appraisal.best.brilliant.b1.2 = لحظتي المفضلة: {move}. تضحية بقطعة، وكانت ناجحة!
+appraisal.best.brilliant.b2 = أفضل لحظاتك: في النقلة رقم {n}، تضحيتك بنقلة {move}.
+appraisal.best.brilliant.b2.2 = {move} في النقلة رقم {n}: تضحية شجاعة. أحسنت!
+appraisal.best.brilliant.b3 = تضحية عبقرية بنقلة {move}.
+appraisal.best.brilliant.b3.2 = أبرز لحظة: {move}، تضحية حقيقية، في النقلة رقم {n}.
+appraisal.best.brilliant.b4 = أفضل لحظة: {move}، النقلة رقم {n}. تضحية عبقرية.
+appraisal.best.brilliant.b4.2 = {move} في النقلة رقم {n}: نقلة عبقرية.
+appraisal.best.brilliant.b5 = {move} في النقلة رقم {n}: ضربة عبقرية.
+appraisal.best.brilliant.b5.2 = النقلة رقم {n}، {move}: ضربة عبقرية.
+appraisal.best.brilliant.b6 = {move}!! في النقلة رقم {n}.
+appraisal.best.brilliant.b6.spoken = {move}، نقلة عبقرية، في النقلة رقم {n}.
+appraisal.best.brilliant.b6.2 = النقلة رقم {n}: {move}، ضربة عبقرية.
+appraisal.best.great.b1 = لحظتي المفضلة: {move}. كانت نقلة رائعة!
+appraisal.best.great.b1.2 = هل ما زالت نقلة {move} في ذاكرتك؟ كانت اكتشافًا رائعًا.
+appraisal.best.great.b2 = أفضل لحظاتك: {move} في النقلة رقم {n}. بها انقلبت المباراة.
+appraisal.best.great.b2.2 = {move} في النقلة رقم {n}: نقلة رائعة.
+appraisal.best.great.b3 = النقلة الحاسمة كانت {move} في النقلة رقم {n}: بها انقلبت الأمور.
+appraisal.best.great.b3.2 = اكتشاف رائع: {move}، في النقلة رقم {n}.
+appraisal.best.great.b4 = خطئي لقي عقابه فورًا: {move}.
+appraisal.best.great.b4.2 = أفضل لحظة: {move}، النقلة رقم {n}.
+appraisal.best.great.b5 = {move} في النقلة رقم {n}. اكتشاف موفّق.
+appraisal.best.great.b5.2 = النقلة رقم {n}، {move}: اكتشاف رائع.
+appraisal.best.great.b6 = {move} في النقلة رقم {n}. اكتشاف موفّق.
+appraisal.best.great.b6.2 = النقلة رقم {n}: {move}!
+# "لم تَفُتْك" = it did not escape you (vowelled: the bare تفتك reads as another verb).
+appraisal.best.only.b1 = لحظتي المفضلة: {move}. كانت النقلة الجيدة الوحيدة!
+appraisal.best.only.b1.2 = في النقلة رقم {n}، لم تَفُتْك النقلة الجيدة الوحيدة: {move}. ممتاز!
+appraisal.best.only.b2 = أفضل لحظاتك: {move}، النقلة الجيدة الوحيدة هناك.
+appraisal.best.only.b2.2 = في النقلة رقم {n}، كانت النقلة الوحيدة {move}، ولم تَفُتْك.
+appraisal.best.only.b3 = النقلة الحاسمة كانت {move} في النقلة رقم {n}: الوحيدة التي حافظت على التوازن.
+appraisal.best.only.b3.2 = في النقلة رقم {n}، لم يصمد إلا {move}، ولم تَفُتْك.
+appraisal.best.only.b4 = أفضل لحظة: {move}، النقلة رقم {n}. نقلة وحيدة.
+appraisal.best.only.b4.2 = النقلة رقم {n}: {move}، النقلة الوحيدة.
+appraisal.best.only.b5 = {move} في النقلة رقم {n}: النقلة الوحيدة. اكتشاف موفّق.
+appraisal.best.only.b5.2 = الخيار الوحيد في النقلة رقم {n}: {move}.
+appraisal.best.only.b6 = {move} في النقلة رقم {n}: النقلة الوحيدة. اكتشاف موفّق.
+appraisal.best.only.b6.2 = النقلة رقم {n}: {move}، ولا بديل.
+appraisal.best.won.b1 = لحظتي المفضلة: {move}، بمكسب {pts:point} لك!
+appraisal.best.won.b1.2 = لنتذكّر نقلة {move}: كانت قيمتها {pts:point} لصالحك. أحسنت!
+appraisal.best.won.b2 = أفضل لحظاتك: {move} في النقلة رقم {n}، وربْح {pts:point}.
+appraisal.best.won.b2.2 = {move} في النقلة رقم {n}: مادة إضافية لك. جميل!
+appraisal.best.won.b3 = النقلة الحاسمة كانت {move} في النقلة رقم {n}: ربْح {pts:point}.
+appraisal.best.won.b3.2 = {move} في النقلة رقم {n}: ربْح مادة دون مقابل.
+appraisal.best.won.b4 = أفضل لحظة: {move}، النقلة رقم {n}، وربْح مادة.
+appraisal.best.won.b4.2 = {move} في النقلة رقم {n}: ربْح {pts:point}.
+appraisal.best.won.b5 = {move} في النقلة رقم {n}، بربح مادة.
+appraisal.best.won.b5.2 = النقلة رقم {n}: {move}، وربْح مادة.
+appraisal.best.won.b6 = {move} في النقلة رقم {n}، بربح مادة.
+appraisal.best.won.b6.2 = النقلة رقم {n}: {move}، مكسب {pts:point}.
+# A run of best moves: "{n:time} على التوالي" (invariable "in a row") avoids an adjective that
+# would have to agree with the count.
+appraisal.best.streak.b1 = كانت نقلتك الأفضل {n:time} على التوالي. ممتاز!
+appraisal.best.streak.b1.2 = أفضل نقلة، {n:time} على التوالي! هذا شطرنج رائع.
+appraisal.best.streak.b2 = كانت نقلتك الأفضل {n:time} على التوالي.
+appraisal.best.streak.b2.2 = أفضل نقلة {n:time} على التوالي. جيد جدًا!
+appraisal.best.streak.b3 = سلسلة من أفضل النقلات، {n:time} على التوالي. أداء متين جدًا.
+appraisal.best.streak.b3.2 = أفضل نقلة {n:time} على التوالي. أحسنت!
+appraisal.best.streak.b4 = أفضل نقلة {n:time} على التوالي.
+appraisal.best.streak.b4.2 = سلسلة مثالية من {n:move}.
+appraisal.best.streak.b5 = {n:time} على التوالي، أفضل نقلة.
+appraisal.best.streak.b5.2 = سلسلة مثالية من {n:move}.
+appraisal.best.streak.b6 = أفضل نقلة {n:time} على التوالي.
+appraisal.best.streak.b6.2 = سلسلة مثالية على مدى {n:move}.
+appraisal.best.capture.b1 = لحظتي المفضلة: {move}. {my} صار لك مجانًا!
+appraisal.best.capture.b1.2 = لنتذكّر نقلة {move}: لم يَفُتْك أن {my} كان بلا حماية!
+appraisal.best.capture.b2 = أفضل لحظاتك: {move}، وربْح {my}.
+appraisal.best.capture.b2.2 = أخذ جميل في النقلة رقم {n}: {move}.
+appraisal.best.capture.b3 = نظرة ثاقبة في النقلة رقم {n}: {move}، وسقط {my}.
+appraisal.best.capture.b3.2 = مع {move} في النقلة رقم {n} سقط {my}.
+appraisal.best.capture.b4 = أفضل لحظة: {move}، النقلة رقم {n}، وربْح {my}.
+appraisal.best.capture.b4.2 = {move} في النقلة رقم {n}: ربْح مادة.
+appraisal.best.capture.b5 = {move} في النقلة رقم {n}، وسقط {my}.
+appraisal.best.capture.b5.2 = النقلة رقم {n}: {move}.
+appraisal.best.capture.b6 = {move} في النقلة رقم {n}.
+appraisal.best.capture.b6.2 = النقلة رقم {n}: {move}، وربْح مادة.
+appraisal.best.phase.b1 = كان أداؤك ممتازًا في {text}.
+appraisal.best.phase.b1.2 = أفضل جزء من مباراتك: {text}.
+appraisal.best.phase.b2 = أقوى جزء من مباراتك كان {text}.
+appraisal.best.phase.b2.2 = في {text} كان لعبك ممتازًا.
+appraisal.best.phase.b3 = أفضل مرحلة لديك: {text}، بدقة {acc} بالمئة.
+appraisal.best.phase.b3.2 = في {text} كان أداؤك الأفضل: دقة {acc} بالمئة.
+appraisal.best.phase.b4 = أقوى مرحلة: {text}، {acc} بالمئة.
+appraisal.best.phase.b4.2 = أفضل مراحلك: {text}، بدقة {acc}.
+appraisal.best.phase.b5 = أفضل مرحلة: {text}، {acc}.
+appraisal.best.phase.b5.2 = {text}: {acc}.
+appraisal.best.phase.b6 = {text}: {acc}.
+appraisal.best.phase.b6.2 = أفضل مرحلة: {text}، {acc}.
+
+# ---- 3. Numbers ------------------------------------------------------------------------------------
+# Counted nouns ("{n:piece}" = قطعة واحدة / قطعتين / ثلاث قطع) come from count.<noun> in common.lang.
+# Pieces captured ({n}, pawns included) and checks given ({m}); also the fallback without the engine.
+appraisal.num.material.b1 = استولت قطعك على {n:piece} من قطعي، وأعطت ملِكي كشًّا {m:time}.
+appraisal.num.material.b1.2 = خسرتُ أمامك {n:piece}، ووقع ملِكي في الكش {m:time}.
+appraisal.num.material.b2 = حصيلتك: أخْذ {n:piece} من قطعي، وكش على ملِكي {m:time}.
+appraisal.num.material.b2.2 = نالت قطعك {n:piece} من قطعي، وتعرّض ملِكي للكش {m:time}.
+appraisal.num.material.b3 = خسرتُ {n:piece} أمامك، وتلقّى ملِكي الكش {m:time}.
+appraisal.num.material.b3.2 = أخْذ {n:piece}، وكش {m:time}.
+appraisal.num.material.b4 = أخْذ {n:piece} من قطعي، وكش {m:time}.
+appraisal.num.material.b4.2 = استولت قطعك على {n:piece}، وأعطت الكش {m:time}.
+appraisal.num.material.b5 = أخْذ {n:piece}؛ وكش {m:time}.
+appraisal.num.material.b5.2 = الحصيلة: أخْذ {n:piece}، وكش {m:time}.
+appraisal.num.material.b6 = أخْذ {n:piece}، وكش {m:time}.
+appraisal.num.material.b6.2 = أخْذ {n:piece}؛ الكش {m:time}.
+appraisal.num.material_nochecks.b1 = خسرتُ أمامك {n:piece} من قطعي.
+appraisal.num.material_nochecks.b1.2 = في هذه المباراة، استولت قطعك على {n:piece} من قطعي.
+appraisal.num.material_nochecks.b2 = نالت قطعك {n:piece} من قطعي.
+appraisal.num.material_nochecks.b2.2 = حصيلتك في هذه المباراة: أخْذ {n:piece} من قطعي.
+appraisal.num.material_nochecks.b3 = خسرتُ {n:piece} أمامك.
+appraisal.num.material_nochecks.b3.2 = حصيلتك أخْذ {n:piece}.
+appraisal.num.material_nochecks.b4 = أخْذ {n:piece} من قطعي.
+appraisal.num.material_nochecks.b4.2 = استولت قطعك على {n:piece}.
+appraisal.num.material_nochecks.b5 = أخْذ {n:piece}.
+appraisal.num.material_nochecks.b5.2 = الحصيلة: أخْذ {n:piece}.
+appraisal.num.material_nochecks.b6 = أخْذ {n:piece}.
+appraisal.num.material_nochecks.b6.2 = حصيلة المباراة: أخْذ {n:piece}.
+# Takebacks, always positive: {n} moves taken back, {m} of them replayed well ("{m:f}" = ثلاث،
+# واحدة، اثنتين: نقلة understood). "استرجعنا" = we took back.
+appraisal.num.takebacks.b1 = استرجعنا {n:move}، وكان التصحيح موفّقًا في {m:f} منها. هكذا نتعلم!
+appraisal.num.takebacks.b1.2 = استرجعنا {n:move}، و{m:time} كانت نقلتك الجديدة أفضل. رائع!
+appraisal.num.takebacks.b2 = استرجعنا {n:move}، وجاء التحسّن في {m:f} منها. هكذا نتعلم.
+appraisal.num.takebacks.b2.2 = تصحيح موفّق في {m:f} من أصل {n:move}. تعلّم جيد!
+appraisal.num.takebacks.b3 = استرجعنا {n:move}، والتصحيح جاء في {m:f} منها.
+appraisal.num.takebacks.b3.2 = استرجاع {n:move}، وتصحيح {m:f} منها. جيد.
+# Level 2: big mistakes ({n} = mistakes and blunders), or the best moves found ({n}).
+appraisal.num.clean.b2 = لا أخطاء كبيرة على الإطلاق: رائع!
+appraisal.num.clean.b2.2 = ولا خطأ كبير واحد في هذه المباراة. ممتاز!
+appraisal.num.clean.b2.3 = خلت مباراتك من الأخطاء الكبيرة. جيد جدًا!
+appraisal.num.few.b2 = لم يكن في هذه المباراة سوى {n:mistake}.
+appraisal.num.few.b2.2 = في المباراة كلها، لم يقع منك سوى {n:mistake}. جيد!
+appraisal.num.few.b2.3 = لا شيء يُذكر سوى {n:mistake}. أحسنت.
+appraisal.num.best.b2 = كانت نقلتك الأفضل {n:time}.
+appraisal.num.best.b2.2 = {n:time} كانت نقلتك هي الأفضل تمامًا.
+appraisal.num.best.b2.3 = {n:time}، كانت أفضل نقلة من نصيبك.
+appraisal.num.acc.b3 = دقتك {acc} بالمئة، مع {n:mistake} و{m:blunder}.
+appraisal.num.acc.b3.2 = دقة {acc} بالمئة، مع {n:mistake}، و{m:blunder}.
+appraisal.num.acc.b3.3 = كانت دقة لعبك {acc} بالمئة، مع {n:mistake} و{m:blunder}.
+appraisal.num.acc_explain.b3 = الدقة تقارن نقلاتك بأفضل نقلات المحرّك: مئة تعني الكمال.
+appraisal.num.acc_explain.b3.2 = الدقة تقيس قرب نقلاتك من أفضل النقلات. والمئة هي الكمال.
+appraisal.num.acc.b4 = الدقة {acc} بالمئة.
+appraisal.num.acc.b4.2 = دقة لعبك {acc} بالمئة.
+appraisal.num.acc.b4.3 = دقة {acc} بالمئة.
+appraisal.num.acc_phase.b4 = الدقة {acc}، وفي {text}، أقوى مراحلك، {acc_phase}.
+appraisal.num.acc_phase.b4.2 = الدقة {acc} بالمئة إجمالًا، مقابل {acc_phase} في {text}.
+appraisal.num.acc_phase.b4.3 = دقتك {acc}؛ والأفضل في {text}، بنسبة {acc_phase}.
+appraisal.num.coach.b4 = دقتي أنا {acc_coach}.
+appraisal.num.coach.b4.2 = كانت دقتي {acc_coach}.
+appraisal.num.acc.b5 = دقة {acc}؛ مع {n:inaccuracy} و{m:mistake}.
+appraisal.num.acc.b5.2 = بلغت الدقة {acc}، مع {n:inaccuracy} و{m:mistake}.
+appraisal.num.acc.b5.3 = {acc} بالمئة، مع {n:inaccuracy} و{m:mistake}.
+appraisal.num.book.b5 = خروج من النظرية في النقلة رقم {k}.
+appraisal.num.book.b5.2 = خرجنا من النظرية في النقلة رقم {k}.
+appraisal.num.acc.b6 = {acc} مقابل {acc_coach} لي؛ مع {n:inaccuracy} و{m:mistake} و{k:blunder}.
+appraisal.num.acc.b6.2 = دقتك {acc} ودقتي {acc_coach}؛ مع {n:inaccuracy} و{m:mistake} و{k:blunder}.
+appraisal.num.acc.b6.3 = الدقة {acc}، ودقتي {acc_coach}، مع {n:inaccuracy} و{m:mistake} و{k:blunder}.
+appraisal.num.acc_solo.b6 = دقة {acc}، مع {n:inaccuracy} و{m:mistake} و{k:blunder}.
+appraisal.num.acc_solo.b6.2 = الدقة {acc}؛ مع {n:inaccuracy} و{m:mistake} و{k:blunder}.
+
+# ---- 4. One improvement ------------------------------------------------------------------------------
+# Level 1 (the critical blunder's theme), and the recurring theme at every level.
+appraisal.improve.theme.b1 = أمر واحد للتمرين: {theme}.
+appraisal.improve.theme.b1.2 = نصيحة للمرة القادمة: {theme}.
+appraisal.improve.theme.b1.3 = شيء نعمل عليه: {theme}.
+appraisal.improve.theme.b2 = شيء للتمرين: {theme}.
+appraisal.improve.theme.b2.2 = فكرة للمرة القادمة: {theme}.
+appraisal.improve.theme.b2.3 = أمر جيد للعمل عليه: {theme}.
+appraisal.improve.theme.b3 = موضوع هذه المباراة: {theme}.
+appraisal.improve.theme.b3.2 = يستحق التمرين: {theme}.
+appraisal.improve.theme.b4 = موضوع متكرر: {theme}.
+appraisal.improve.theme.b4.2 = تكرر أكثر من مرة: {theme}.
+appraisal.improve.theme.b5 = متكرر: {theme}.
+appraisal.improve.theme.b5.2 = موضوع المباراة: {theme}.
+appraisal.improve.theme.b6 = متكرر: {theme}.
+appraisal.improve.theme.b6.2 = الموضوع: {theme}.
+# The critical moment (levels 2-6). "النقلات القسرية" = forcing moves.
+appraisal.improve.critical.b2 = انقلبت المباراة في النقلة رقم {crit_no}. لنعمل على {theme}.
+appraisal.improve.critical.b2.2 = اللحظة الحاسمة: النقلة رقم {crit_no}، {crit_move}. للتمرين: {theme}.
+appraisal.improve.critical.b3 = اللحظة الحاسمة كانت النقلة رقم {crit_no}. بدلًا من {crit_move}، كان الأفضل {crit_best}.
+appraisal.improve.critical.b3.2 = في النقلة رقم {crit_no}، {crit_best} أفضل من {crit_move}. تفقّد نقلاتي القسرية أولًا.
+appraisal.improve.critical.b4 = اللحظة الحاسمة: النقلة رقم {crit_no}، {crit_move}. مع {crit_best} كان التوازن سيبقى.
+appraisal.improve.critical.b4.2 = النقلة رقم {crit_no} حسمت المباراة: {crit_best} بدلًا من {crit_move}.
+appraisal.improve.critical.b5 = النقلة رقم {crit_no}: {crit_best} بدلًا من {crit_move}، {eval}.
+appraisal.improve.critical.b5.2 = النقلة الحاسمة رقم {crit_no}: {crit_best}، {eval}.
+appraisal.improve.critical.b6 = النقلة رقم {crit_no}: {crit_best} بدلًا من {crit_move}، {eval}.
+appraisal.improve.critical.b6.2 = النقلة رقم {crit_no}: {crit_best} وليس {crit_move}، {eval}.
+# A winning game lost to one mistake: no blame words.
+appraisal.improve.was_winning.b1 = كان الفوز في يدك حتى النقلة رقم {crit_no}. نصيحة: {theme}.
+appraisal.improve.was_winning.b1.2 = كان لعبك رائعًا حتى النقلة رقم {crit_no}. تذكّر: {theme}.
+appraisal.improve.was_winning.b2 = كان الفوز لك حتى النقلة رقم {crit_no}. مستقبلًا: {theme}.
+appraisal.improve.was_winning.b2.2 = حتى النقلة رقم {crit_no} كان موقفك رابحًا. للتمرين: {theme}.
+appraisal.improve.was_winning.b3 = كان موقفك رابحًا حتى النقلة رقم {crit_no}. مع {crit_best} كانت أفضليتك ستبقى.
+appraisal.improve.was_winning.b3.2 = حتى النقلة رقم {crit_no} كان الفوز لك؛ ومع {crit_best} كان سيبقى.
+appraisal.improve.was_winning.b4 = موقف رابح حتى النقلة رقم {crit_no}. مع {crit_best} تبقى الأفضلية لك.
+appraisal.improve.was_winning.b4.2 = الفوز لك حتى النقلة رقم {crit_no}؛ ومع {crit_best} يبقى.
+appraisal.improve.was_winning.b5 = موقف رابح حتى النقلة رقم {crit_no}: {crit_best}، {eval}.
+appraisal.improve.was_winning.b5.2 = النقلة رقم {crit_no}: مع {crit_best} يبقى الفوز، {eval}.
+appraisal.improve.was_winning.b6 = النقلة رقم {crit_no}: {crit_best}، {eval}.
+appraisal.improve.was_winning.b6.2 = مع {crit_best} في النقلة رقم {crit_no} يبقى الفوز: {eval}.
+# The game ended in stalemate while the player was winning.
+appraisal.improve.stalemate.b1 = نصيحة: حين يكون الفوز في يدك، اترك لملِكي دائمًا مربعًا يتحرك إليه.
+appraisal.improve.stalemate.b1.2 = تذكّر: قرب النهاية، تأكد قبل كل نقلة أن ملِكي ما زال يستطيع التحرك.
+appraisal.improve.stalemate.b2 = حين يكون الفوز في يدك، اترك لملِكي مربعًا دائمًا، وإلا فهو الجمود.
+appraisal.improve.stalemate.b2.2 = في المرة القادمة، تأكد قبل نقلتك أن ملِكي ما زال يستطيع التحرك.
+appraisal.improve.stalemate.b3 = مع التفوق، تأكد في كل نقلة أن لملِكي مربعًا بعد.
+appraisal.improve.stalemate.b3.2 = احذر الجمود في النهايات الرابحة: اترك لملِكي متنفَّسًا.
+appraisal.improve.stalemate.b4 = في النهايات الرابحة، انتبه دائمًا للجمود.
+appraisal.improve.stalemate.b4.2 = حذارِ من الجمود: هو الذي أضاع الفوز هنا.
+appraisal.improve.stalemate.b5 = تفقّد الجمود في النهايات الرابحة.
+appraisal.improve.stalemate.b5.2 = الجمود كلّفك الفوز.
+appraisal.improve.stalemate.b6 = احذر الجمود.
+appraisal.improve.stalemate.b6.2 = الجمود أضاع الفوز.
+# The coach hung a piece the player did not take (levels 1-3, only when nothing else is said).
+appraisal.improve.coach_hung.b1 = في النقلة رقم {n} تركتُ {my} بلا حماية. هل لفت ذلك نظرك؟
+appraisal.improve.coach_hung.b1.2 = في النقلة رقم {n}، كان {my} في متناولك مجانًا. ابحث دائمًا عن القطع المجانية!
+appraisal.improve.coach_hung.b2 = في النقلة رقم {n} كان {my} بلا حماية. هل كان ذلك واضحًا لك؟
+appraisal.improve.coach_hung.b2.2 = في النقلة رقم {n}، كان بإمكانك أخذ {my} مجانًا.
+appraisal.improve.coach_hung.b3 = في النقلة رقم {n} تركتُ {my} مكشوفًا. هل كان ذلك في حسابك؟
+appraisal.improve.coach_hung.b3.2 = {my} كان بلا حماية في النقلة رقم {n}. ابحث عن القطع غير المحمية في كل نقلة.
+# A clean game: keep doing it.
+appraisal.improve.clean.b1 = واصل التأكد من سلامة قطعك، مثل اليوم.
+appraisal.improve.clean.b1.2 = واصل النظر إلى ما أهاجمه قبل كل نقلة. هذا ينجح!
+appraisal.improve.clean.b1.3 = واصل اللعب بحذر!
+appraisal.improve.clean.b2 = مباراة نظيفة. واصل تفقّد تهديداتي هكذا.
+appraisal.improve.clean.b2.2 = واصل على نهج اليوم: قطع آمنة، ونقلات جيدة.
+appraisal.improve.clean.b3 = مباراة نظيفة. واصل تفقّد النقلات القسرية أولًا.
+appraisal.improve.clean.b3.2 = لا أخطاء كبيرة: واصل هكذا.
+appraisal.improve.clean.b4 = مباراة نظيفة. لا شيء كبير يحتاج إلى إصلاح.
+appraisal.improve.clean.b4.2 = لا أخطاء حاسمة.
+appraisal.improve.clean.b5 = لا أخطاء حاسمة.
+appraisal.improve.clean.b5.2 = مباراة نظيفة.
+appraisal.improve.clean.b6 = مباراة نظيفة.
+appraisal.improve.clean.b6.2 = بلا أخطاء حاسمة.
+
+# ---- 5. Encouragement and the level suggestion -----------------------------------------------------
+# No adjective about the player ("مستعد"): "في متناولك", "يناسبك", "حان وقت".
+appraisal.end.b1 = مستواك يتحسّن مع كل مباراة. مباراة أخرى؟
+appraisal.end.b1.2 = استمتعتُ بهذه المباراة! هل نلعب مجددًا؟
+appraisal.end.b1.3 = مجهود رائع. ما رأيك في مباراة أخرى؟
+appraisal.end.b2 = مستواك يتحسّن من مباراة إلى أخرى. نلعب مرة أخرى؟
+appraisal.end.b2.2 = مباراة جيدة. هل نلعب مجددًا؟
+appraisal.end.b2.3 = أحسنت. مباراة أخرى؟
+appraisal.end.b3 = مباراة متينة. هل نبدأ التالية؟
+appraisal.end.b3.2 = مباراة جيدة. أخرى؟
+appraisal.end.b3.3 = لعب جميل. نعيد الكرّة؟
+appraisal.end.b4 = مباراة متينة. إلى المباراة التالية؟
+appraisal.end.b4.2 = مباراة أخرى؟
+appraisal.end.b4.3 = مباراة جيدة. التالية؟
+appraisal.end.b5 = أخرى؟
+appraisal.end.b5.2 = المباراة التالية؟
+appraisal.end.b5.3 = مجددًا؟
+appraisal.end.b6 = أخرى؟
+appraisal.end.b6.2 = المباراة التالية؟
+appraisal.end.b6.3 = مجددًا؟
+appraisal.end.up.b1 = مستوى {level} في متناولك الآن. ما رأيك في تجربته؟
+appraisal.end.up.b1.2 = أظن أن مستوى {level} يناسبك الآن. هل نجرّبه؟
+appraisal.end.up.b2 = حان وقت مستوى {level}. ما رأيك في تجربته؟
+appraisal.end.up.b2.2 = ما رأيك في مستوى {level} في المرة القادمة؟ أظن أن الوقت حان.
+appraisal.end.up.b3 = هذا المستوى صار صغيرًا عليك: جرّب مستوى {level}.
+appraisal.end.up.b3.2 = هل حان وقت مستوى {level}؟ أظن ذلك.
+appraisal.end.up.b4 = هذا المستوى لم يعد كافيًا لك: جرّب مستوى {level}.
+appraisal.end.up.b4.2 = حان وقت مستوى {level}؟
+appraisal.end.up.b5 = جرّب مستوى {level} في المرة القادمة.
+appraisal.end.up.b5.2 = مستوى {level} بعد ذلك؟
+appraisal.end.up.b6 = جرّب مستوى {level} لاحقًا.
+appraisal.end.up.b6.2 = التالي: {level}؟
+appraisal.end.down.b2 = لنلعب مباراة بمستوى {level}، لنتمرّن على هذه الأفكار.
+appraisal.end.down.b2.2 = ما رأيك في مباراة بمستوى {level}، للتمرين؟
+appraisal.end.down.b3 = ما رأيك في مباراة بمستوى {level}، للتمرّن على هذه الأفكار؟
+appraisal.end.down.b3.2 = مباراة بمستوى {level} قد تساعدك في التمرّن على هذه الأفكار.
+appraisal.end.down.b4 = ربما تفيدك مباراة بمستوى {level} في تمرين هذه الأفكار.
+appraisal.end.down.b4.2 = ربما مباراة بمستوى {level}، للتمرين؟
+appraisal.end.down.b5 = ربما واحدة بمستوى {level}؟
+appraisal.end.down.b5.2 = {level}، للتمرين؟
+appraisal.end.down.b6 = ربما واحدة بمستوى {level}؟
+appraisal.end.down.b6.2 = {level}، للتمرين؟
