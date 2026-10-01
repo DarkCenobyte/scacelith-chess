@@ -129,7 +129,10 @@ Rules common to these calls:
   for, a PGN that does not start with its tags, an export that is not the export document
   (`format` `scacelith-account-export`), or a PGN over 4 MiB or an export over 64 MiB come back
   as `invalid_response`. The export is checked whole but only its top level is kept in memory
-  while checking.
+  while checking, and a document with more than 64 top-level members (the server's has about
+  fifteen) is refused there, so a hostile answer can use neither gigabytes of memory nor hours of
+  the HTTP thread. An allocation failure during an HTTPS call fails that call instead of ending
+  the game.
 - `deleteAccount` success erases the token and the user name saved for the origin (its server id
   and pin stay) and stops the realtime connection without reconnecting. `revokeSession` on the
   session marked `current` in the last `fetchSessions` signs this game out the same way (token

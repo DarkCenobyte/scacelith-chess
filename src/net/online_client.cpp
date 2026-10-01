@@ -57,6 +57,7 @@
 #include <deque>
 #include <functional>
 #include <mutex>
+#include <new>
 #include <random>
 #include <thread>
 
@@ -737,8 +738,14 @@ struct OnlineClient::Impl {
                     httpQ.pop_front();
                 }
             }
-            if (cmd) cmd();
-            else if (sso.active && Clock::now() >= sso.nextPoll) ssoPollOnce();
+            try {
+                if (cmd) cmd();
+                else if (sso.active && Clock::now() >= sso.nextPoll) ssoPollOnce();
+            } catch (const std::bad_alloc&) {
+                // A large answer (an account export is up to 64 MiB) with too little memory free:
+                // that call fails, the game goes on.
+                LOGE("net: out of memory in an HTTPS call");
+            }
         }
     }
 
@@ -1889,12 +1896,17 @@ bool looksLikePgn(const std::string& t) {
 }
 
 // The account export (S7): one JSON object, format "scacelith-account-export". The whole document
-// is checked, but only its top level is kept in memory while doing so (it may be large).
+// is checked, but only its top level is kept in memory while doing so (it may be large). The
+// server's document has about fifteen top-level members: more than kExportMaxMembers is not the
+// export, and is refused there (a hostile server's million members or items would otherwise all be
+// kept, and their names looked up one by one: gigabytes, or hours of this thread).
+constexpr size_t kExportMaxMembers = 64;
 bool validExport(const std::string& t) {
     json::Limits lim;
     lim.maxBytes = kExportMaxBytes;
     lim.maxElements = SIZE_MAX;
     lim.keepDepth = 1;
+    lim.maxKept = kExportMaxMembers;
     json::Value head;
     std::string err;
     if (!json::parse(t, head, &err, lim)) {
@@ -2084,14 +2096,21 @@ void OnlineClient::exportAccount(const std::string& password, const std::string&
     b.set("password", password);
     setSecondFactor(b, codeOrRecovery);
     d->http([d, e, b] {
-        Impl::Call call;
-        call.auth = Impl::Auth::Required;
-        call.rawCap = kExportMaxBytes;
-        Impl::Api a = d->request(e, "POST", "/account/export", &b, call, d->httpCancel);
         Event ev;
         ev.kind = Event::Kind::AccountExportResult;
-        finish(ev, a, [&] { return validExport(a.text); });
-        if (ev.ok) ev.text = std::move(a.text);   // up to 64 MiB: moved, never copied
+        try {
+            Impl::Call call;
+            call.auth = Impl::Auth::Required;
+            call.rawCap = kExportMaxBytes;
+            Impl::Api a = d->request(e, "POST", "/account/export", &b, call, d->httpCancel);
+            finish(ev, a, [&] { return validExport(a.text); });
+            if (ev.ok) ev.text = std::move(a.text);   // up to 64 MiB: moved, never copied
+        } catch (const std::bad_alloc&) {
+            LOGW("net: out of memory for the account export");
+            ev.ok = false;
+            ev.error = "invalid_response";
+            ev.text.clear();
+        }
         d->post(std::move(ev));
     });
 }

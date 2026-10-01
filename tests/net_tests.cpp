@@ -686,6 +686,24 @@ TEST(net_json_keep_depth) {
     CHECK_EQ(v["list"][1].size(), size_t(0));
     CHECK(net::json::parse("[[1],[2]]", v, nullptr, lim));
     CHECK_EQ(v[0][0].asInt(), int64_t(1));
+
+    // Limits::maxKept: the kept containers may have that many members or items, the deeper ones any
+    // number; the reader stops at the first one too many (not at the end of the document).
+    lim = net::json::Limits();
+    lim.keepDepth = 1;
+    lim.maxKept = 3;
+    CHECK(net::json::parse(R"({"a":1,"b":[1,2,3,4,5],"c":{"d":1,"e":2,"f":3,"g":4}})", v, nullptr, lim));
+    CHECK_EQ(v.size(), size_t(3));
+    std::string err;
+    CHECK(!net::json::parse(R"({"a":1,"b":2,"c":3,"d":4})", v, &err, lim));
+    CHECK(err.find("too many members") != std::string::npos);
+    std::string big = "[0";
+    for (int i = 1; i < 100000; ++i) big += ",0";
+    big += "]";
+    CHECK(!net::json::parse(big, v, &err, lim));
+    CHECK_EQ(err, std::string("too many items at byte 7"));
+    lim.keepDepth = 2;
+    CHECK(!net::json::parse(R"({"b":[1,2,3,4]})", v, nullptr, lim));
 }
 
 TEST(net_json_write) {
@@ -2967,6 +2985,14 @@ TEST(net_account_export) {
         R"({"format":"scacelith-account-export","version":1,"exportedAt":1790000000000,"server":{"name":"Fake","host":"127.0.0.1"},)"
         R"("account":{"id":7,"username":"alice","email":"a@example.org"},"ratings":[],"sessions":[{"id":32}],)"
         R"("games":{"total":2,"list":[{"id":812,"white":{"name":"alice"}},{"id":790}]},"notes":["No password hash."]})";
+    // A hostile server's documents: tens of thousands of top-level members (each one kept, and a
+    // name looked up among the kept ones: quadratic), or a top-level array of a million values.
+    std::string manyKeys = R"({"format":"scacelith-account-export","version":1)";
+    for (int i = 0; i < 60000; ++i) manyKeys += ",\"k" + std::to_string(i) + "\":0";
+    manyKeys += "}";
+    std::string bigArray = "[0";
+    for (int i = 1; i < 1000000; ++i) bigArray += ",0";
+    bigArray += "]";
     std::atomic<int> mode{0};
     AccountRig r("acct-export", [&](const fakehttp::Request& q) {
         if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
@@ -2986,6 +3012,8 @@ TEST(net_account_export) {
             busy.headers.emplace_back("Retry-After", "120");
             return busy;
         }
+        case 5: rep.body = manyKeys; break;
+        case 6: rep.body = bigArray; break;
         default: break;
         }
         return rep;
@@ -3012,6 +3040,20 @@ TEST(net_account_export) {
         CHECK(!ev.ok);
         CHECK_EQ(ev.error, std::string("invalid_response"));
         CHECK(ev.text.empty());
+    }
+    // Only a handful of top-level members are kept while the document is checked: more is not the
+    // export, refused at once (neither memory nor time grows with what the server sends).
+    for (int m : {5, 6}) {
+        mode = m;
+        const auto t0 = std::chrono::steady_clock::now();
+        r.c->exportAccount("pw", "");
+        ev = r.wait(K::AccountExportResult);
+        const double s = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string("invalid_response"));
+        CHECK(ev.text.empty());
+        CHECK(s < 3.0);
+        if (s >= 3.0) std::fprintf(stderr, "  export mode %d answered after %.1f s\n", m, s);
     }
     mode = 4;
     r.c->exportAccount("pw", "");

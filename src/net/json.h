@@ -83,6 +83,11 @@ struct Limits {
     // (their elements are not kept): a large document is validated whole while only its head
     // stays in memory (1 = the members of the top-level object or array).
     int keepDepth = 1 << 30;
+    // Members (items) an object (array) whose elements are kept (keepDepth) may have; more is an
+    // error, found before the next one is read. With keepDepth and maxElements unbounded, this
+    // bounds what a large document keeps in memory, and the time spent looking a member name up
+    // among the kept ones (linear, so quadratic over a whole object).
+    size_t maxKept = SIZE_MAX;
 };
 
 // Parses a whole document (surrounding whitespace allowed). On failure returns false and, when
