@@ -4,18 +4,18 @@
 
 # ---- Sentences said about the opening
 opening.say.pw.both = افتتاحك هو {white:def}، وردّي هو {black:def}.
-opening.say.pw.both.2 = اخترتَ {white:def}، واخترتُ في الرد {black:def}.
+opening.say.pw.both.2 = وقع اختيارك على {white:def}، واخترتُ في الرد {black:def}.
 opening.say.pb.both = افتتاحي هو {white:def}، وردّك هو {black:def}.
-opening.say.pb.both.2 = اخترتُ {white:def}، واخترتَ في الرد {black:def}.
-opening.say.pw.declined = لعبتَ {white:def}، فرفضتُه.
-opening.say.pb.declined = لعبتُ {white:def}، فرفضتَه.
-opening.say.pw.accepted = لعبتَ {white:def}، فقبلتُه.
-opening.say.pb.accepted = لعبتُ {white:def}، فقبلتَه.
+opening.say.pb.both.2 = اخترتُ {white:def}، ووقع اختيارك في الرد على {black:def}.
+opening.say.pw.declined = كان افتتاحك {white:def}، فرفضتُه.
+opening.say.pb.declined = لعبتُ {white:def}، وكان ردّك الرفض.
+opening.say.pw.accepted = كان افتتاحك {white:def}، فقبلتُه.
+opening.say.pb.accepted = لعبتُ {white:def}، وكان ردّك القبول.
 opening.say.pw.white = افتتاحك هو {white:def}.
-opening.say.pw.white.2 = اخترتَ {white:def}.
+opening.say.pw.white.2 = وقع اختيارك على {white:def}.
 opening.say.pb.white = افتتاحي هو {white:def}.
 opening.say.pb.white.2 = اخترتُ {white:def}.
-opening.say.pw.var_white = ردّي هو {black:def}، واخترتَ أنت {white:def}.
+opening.say.pw.var_white = ردّي هو {black:def}، ووقع اختيارك على {white:def}.
 opening.say.pb.var_white = ردّك هو {black:def}، واخترتُ أنا {white:def}.
 opening.say.pw.black = ردّي هو {black:def}.
 opening.say.pb.black = ردّك هو {black:def}.
@@ -27,7 +27,7 @@ opening.say.now_variation = نحن الآن في {variation:def}.
 opening.say.transposed = بتبديل ترتيب النقلات، صرنا الآن في {opening:def}.
 opening.say.deep = الخط الدقيق: {line}.
 opening.say.left_book = خرجنا للتو من النظرية المعروفة.
-opening.say.left_book_move = خرجنا من النظرية المعروفة في النقلة {n}.
+opening.say.left_book_move = خرجنا من النظرية المعروفة في النقلة رقم {n}.
 opening.say.rare = هذا افتتاح نادر.
 opening.say.rare_named = هذا افتتاح نادر: {line}.
 

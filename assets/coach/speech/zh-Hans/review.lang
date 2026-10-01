@@ -30,8 +30,10 @@ ann.check.coach.3 = 将你一军！
 # Once per game at levels 1-2, right after the coach's first check.
 ann.check.coach.first = 这表示{your}正受到攻击。你必须解除将军。
 ann.check.coach.first.2 = 将军就是{your}受到攻击。把它移开、挡住将军，或吃掉我的子。
-ann.double_check = 双将！我的两个子同时将军，所以王必须走开。
-ann.double_check.2 = 这是双将：只有走王才行。
+ann.double_check.coach = 双将！我的两个子同时攻击你的王，所以它必须走开。
+ann.double_check.coach.2 = 这是双将：现在你只能走王。
+ann.double_check.human = 双将！你的两个子同时攻击我的王，所以它必须走开。
+ann.double_check.human.2 = 这下是双将！只有走王才能救我了。
 # The player checkmates the coach.
 ann.mate.human.b1 = 将死！你赢了！我的王逃不掉了。
 ann.mate.human.b1.2 = 将死了！干得好，这盘你赢了！

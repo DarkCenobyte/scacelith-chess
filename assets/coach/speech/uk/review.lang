@@ -37,8 +37,10 @@ ann.check.coach.3 = І шах!
 # Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
 ann.check.coach.first = Це означає, що {your} під ударом. Виведи {your:pron_acc} з-під шаху.
 ann.check.coach.first.2 = Шах означає, що {your} під ударом. Відійди, закрийся або візьми мою фігуру.
-ann.double_check = Подвійний шах! Дві мої фігури атакують одночасно, тож король мусить відійти.
-ann.double_check.2 = Це подвійний шах: допоможе лише хід королем.
+ann.double_check.coach = Подвійний шах! Твого короля атакують одразу дві мої фігури, тож він мусить відійти.
+ann.double_check.coach.2 = Це подвійний шах: тепер тобі допоможе лише хід королем.
+ann.double_check.human = Подвійний шах! Мого короля атакують одразу дві твої фігури, тож він мусить відійти.
+ann.double_check.human.2 = Це ж подвійний шах! Мене врятує лише хід королем.
 # The player checkmates the coach.
 ann.mate.human.b1 = Мат! Перемога за тобою! Моєму королю нікуди втекти.
 ann.mate.human.b1.2 = Це мат! Молодець, партія твоя!

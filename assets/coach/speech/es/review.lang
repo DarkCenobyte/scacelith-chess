@@ -31,8 +31,10 @@ ann.check.coach.3 = ¡Y jaque!
 # Once per game at levels 1-2, right after the coach's first check ({your} = the king).
 ann.check.coach.first = Eso quiere decir que ataco a {your}. Tienes que sacar{your:lo} del jaque.
 ann.check.coach.first.2 = Jaque significa que {your} está atacad{your:o}. Muéve{your:lo}, tapa el jaque o captura mi pieza.
-ann.double_check = ¡Jaque doble! Dos de mis piezas atacan a la vez, así que el rey tiene que moverse.
-ann.double_check.2 = Es un jaque doble: solo sirve mover el rey.
+ann.double_check.coach = ¡Jaque doble! Dos de mis piezas atacan a tu rey a la vez, así que tiene que moverse.
+ann.double_check.coach.2 = Es un jaque doble: ahora solo te sirve mover el rey.
+ann.double_check.human = ¡Jaque doble! Dos de tus piezas atacan a mi rey a la vez, así que tiene que moverse.
+ann.double_check.human.2 = ¡Un jaque doble! Ahora solo puedo salvarme moviendo el rey.
 # The player checkmates the coach.
 ann.mate.human.b1 = ¡Jaque mate! ¡Has ganado! Mi rey no puede escapar.
 ann.mate.human.b1.2 = ¡Es jaque mate! ¡Muy bien, has ganado la partida!

@@ -28,8 +28,10 @@ ann.check.coach.3 = Und Schach!
 # Once per game at levels 1-2, right after the coach's first check ({your} = the king).
 ann.check.coach.first = Das heißt, {your} wird angegriffen. Du musst das Schach abwehren.
 ann.check.coach.first.2 = Bei Schach wird {your} angegriffen. Weich aus, zieh dazwischen oder schlag meine Figur.
-ann.double_check = Doppelschach! Zwei meiner Figuren greifen zugleich an, also muss der König ziehen.
-ann.double_check.2 = Das ist ein Doppelschach: Nur ein Königszug hilft.
+ann.double_check.coach = Doppelschach! Zwei meiner Figuren greifen deinen König zugleich an: Er muss ziehen.
+ann.double_check.coach.2 = Das ist ein Doppelschach: Jetzt hilft dir nur ein Königszug.
+ann.double_check.human = Doppelschach! Zwei deiner Figuren greifen meinen König zugleich an: Er muss ziehen.
+ann.double_check.human.2 = Ein Doppelschach! Jetzt kann mich nur noch ein Königszug retten.
 # The player checkmates the coach.
 ann.mate.human.b1 = Schachmatt! Du hast gewonnen! Mein König kann nicht entkommen.
 ann.mate.human.b1.2 = Das ist Schachmatt! Super, du hast die Partie gewonnen!

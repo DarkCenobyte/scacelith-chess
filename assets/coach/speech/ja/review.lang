@@ -37,9 +37,12 @@ ann.check.coach.3 = そして、チェック！
 ann.check.coach.first = つまり{your}が攻められています。チェックをかわしましょう。
 ann.check.coach.first.2 = チェックは{your}への攻撃。逃げるか、間に駒を置くか、私の駒を取りましょう。
 ann.check.coach.first.2.spoken = チェックは{your}への攻撃。逃げるか、あいだに駒を置くか、私の駒を取りましょう。
-ann.double_check = ダブルチェック！私の駒2つが同時に攻めるので、キングが動くしかありません。
-ann.double_check.spoken = ダブルチェック！私のこまふたつが同時に攻めるので、キングが動くしかありません。
-ann.double_check.2 = ダブルチェックです。助かるのはキングの動きだけ。
+ann.double_check.coach = ダブルチェック！私の駒2つが同時に攻めるので、キングが動くしかありません。
+ann.double_check.coach.spoken = ダブルチェック！私のこまふたつが同時に攻めるので、キングが動くしかありません。
+ann.double_check.coach.2 = ダブルチェックです。助かるのはキングを動かす手だけです。
+ann.double_check.human = ダブルチェック！駒2つで同時に私のキングを攻めましたね。逃げるしかありません。
+ann.double_check.human.spoken = ダブルチェック！こまふたつで同時に私のキングを攻めましたね。逃げるしかありません。
+ann.double_check.human.2 = おっと、ダブルチェック！助かるにはキングを動かすしかありません。
 # The player checkmates the coach.
 ann.mate.human.b1 = チェックメイト！あなたの勝ちです！私のキングは逃げられません。
 ann.mate.human.b1.2 = チェックメイトです！よくできました、あなたの勝ち！
