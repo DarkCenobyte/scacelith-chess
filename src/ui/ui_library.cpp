@@ -677,7 +677,8 @@ bool sameName(const std::string& a, const std::string& b) {
 }
 std::string gifOrientation(const chess::pgn::Record& r) {
     const std::string white = r.tag("White"), black = r.tag("Black");
-    for (const std::string& me : {game::onlineSession().account().username, game::settings().playerName})
+    const game::OnlineSession& se = game::onlineSession();
+    for (const std::string& me : {se.account().username, se.savedUsername(), game::settings().playerName})
         if (sameName(black, me) && !sameName(white, me)) return "black";
     return "white";
 }
@@ -1007,7 +1008,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         const float leftEnd = p.x + pad + 2.0f * bw + bgap, rightStart = p.r() - pad - 2.0f * bw - bgap;
         const float gw = std::max(150.0f, std::min(bw, rightStart - leftEnd - 2.0f * bgap));
         const Rect gifR = im::flip(p, Rect((leftEnd + rightStart) * 0.5f - gw * 0.5f, by, gw, bh));
-        const bool signedIn = se.signedIn();
+        const bool signedIn = se.signedIn() || se.hasSavedSession();   // signed in on an earlier run too
         bool pressed = false;
         if (!signedIn) {
             im::disabledButton(L("gif.save"), gifR, im::ButtonKind::Secondary, T("gif.sign_in_first"));

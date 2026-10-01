@@ -155,6 +155,11 @@ public:
     // Signed in: a login this run, or a session saved for this server (resumed with resume()).
     bool signedIn() const { return signedIn_; }
     void resume();                              // saved session: connect and fetch the account
+    // A session of the configured server saved on this computer, resumed or not (the Online menu
+    // not opened yet this run): the requests that carry the token (the GIFs) work without
+    // resume(). False before init() (nothing is started for it). Its user name, or "".
+    bool hasSavedSession() const;
+    std::string savedUsername() const;
     const net::AccountInfo& account() const { return account_; }
     const net::RatingInfo* rating(const std::string& category) const;
     void signOut(bool everywhere);

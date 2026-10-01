@@ -320,6 +320,10 @@ std::string OnlineSession::serverName() const {
 
 // ---- Account --------------------------------------------------------------------------------------
 
+bool OnlineSession::hasSavedSession() const { return ready_ && api_ && serverConfigured() && api_->hasSavedSession(); }
+
+std::string OnlineSession::savedUsername() const { return hasSavedSession() ? api_->savedUsername() : std::string(); }
+
 void OnlineSession::resume() {
     if (!serverConfigured()) return;
     ServerApi& a = api();
