@@ -40,7 +40,7 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 | `src/i18n` + `assets/i18n` | Translations (`tr`, `trf`, `trn` with CLDR plurals), language choice, Unicode helpers (`unicode.h`: joining, bidi, line breaks) |
 | `src/game` | Game state machine, settings, world layout (`layout.h`); seats and game modes (play / watch / hot-seat / online / coach), Elo (`elo.h`), camera flights and the viewer's observer camera (engine-free, in the core library and unit-tested); `game_scene_coach.cpp`: the coach's stage in the scene |
 | `src/coach` | Coach mode's brain, engine-free and GL-free: session, director, scripts, the spoken line catalogue (`assets/coach`), review and appraisal of the player's moves, openings and the teaching repertoire, the rules lesson, rewinds by hand (`rewind.h`) |
-| `src/tts` | Text-to-speech for the coach's voice (Supertonic 3, ONNX graphs run by an in-house int8 runtime with per-ISA kernels), a worker thread; the model lives in `coach/` next to the exe |
+| `src/tts` | Text-to-speech for the coach's voice (Supertonic 3, ONNX graphs run by an in-house int8 runtime with per-ISA kernels), a worker thread; the model files are read from the `coach` folder (`--coach-dir` overrides it) |
 | `src/app` | Scene registry (`--scene`), test scenes |
 
 ## Rendering contracts

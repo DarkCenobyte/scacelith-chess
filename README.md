@@ -143,9 +143,9 @@ your colour (White, Black, or alternating from one game to the next); the choice
   card offers to play again at the same level. When the coach suggests another level, the Coach
   page proposes it next time.
 
-The coach speaks with a voice synthesised on your computer from the model in the `coach` folder
-next to the executable (Supertonic 3, under its own licence: see `coach/README.txt`); without that
-folder, or without a sound device, it speaks through subtitles only. Options > Audio >
+The coach speaks with a voice synthesised on your computer (Supertonic 3) from the model files in
+the `coach` folder; without them, or without a sound device, it speaks through subtitles only.
+Options > Audio >
 Subtitles shows its words at the bottom of the screen (Automatic: when it does not speak the
 language of the menus, as with Chinese menus where it speaks English), and Options > Audio >
 Coach voice sets its volume. `[tts]` in the settings file tunes the synthesis: `threads` (0 = 2),
@@ -311,8 +311,8 @@ screenshots of a game in progress, for instance the hand-over halfway (`--start 
 
 Coach mode: `--start --coach` starts a coach game at once, at the level and colour of the Coach
 page unless `--coach-level 0..6` (0 = the rules lesson) or `--coach-colour white|black` say
-otherwise; `--coach-dir <folder>` reads the voice model from another folder than `coach/` next to
-the executable. `--coach-stage-test` (alone, or with `--start`) runs a fixed sequence through the
+otherwise; `--coach-dir <folder>` reads the voice model files from that folder instead of the
+default one. `--coach-stage-test` (alone, or with `--start`) runs a fixed sequence through the
 scene's coach stage without the session: a line spoken and subtitled, the coach pointing at g1 and
 tracing the knight's jump to f3 on their words, a mark and a highlight, two demonstration moves
 taken back by hand, then the takeback card (`--coach-stage-test lesson`: on the lesson's first
@@ -333,7 +333,5 @@ fonts Caveat (Impallari Type), Marck Script (Denis Masharov), Bad Script (Gaslig
 SIL Open Font License 1.1; the subsets shipped here are rebuilt from the upstream files by
 `tools/prepare_fonts.py`. The chess figures of the promotion picker come from a subset of GNU
 FreeFont FreeSerif (GPL-3.0+ with the font exception). All licence texts are in `assets/fonts/` and
-`assets/fonts/hand/`. The coach's voice model in the `coach` folder (Supertonic 3 by Supertone
-Inc., quantised by the sherpa-onnx project) is not part of the program: it is read at run time and
-is under the BigScience Open RAIL-M licence, whose use restrictions are in
-`coach/Supertonic-3-OpenRAIL-M.txt`.
+`assets/fonts/hand/`. The coach's voice model (Supertonic 3, in the `coach` folder) is not part of
+the program and has its own licence (BigScience Open RAIL-M).
