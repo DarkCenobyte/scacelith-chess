@@ -352,7 +352,7 @@ AccountNav pageHistory(float t, bool fresh) {
     }
 
     // Columns (fractions of the width, from the start side).
-    const float cDate = 0.0f, cMark = 0.152f, cOpp = 0.172f, cResult = 0.47f, cTc = 0.6f, cKind = 0.69f, cRating = 0.8f;
+    const float cDate = 0.0f, cMark = 0.152f, cOpp = 0.172f, cResult = 0.45f, cTc = 0.565f, cKind = 0.705f, cRating = 0.81f;
     const Rect cols(x0, 0, cw, 0);
     auto at = [&](float frac) { return im::flipX(cols, x0 + cw * frac); };
     const float headY = top + 102.0f;
@@ -821,7 +821,7 @@ AccountNav pageEmail(float t) {
     game::OnlineSession& se = ses();
     const net::AccountInfo& a = se.account();
     const bool busy = se.busy(Kind::EmailChangeResult);
-    Rect p = beginPage(t, 1040.0f, 860.0f, T("online.email.title"));
+    Rect p = beginPage(t, 1040.0f, 720.0f, T("online.email.title"));
     serverLine(p, true);
     im::pushId("email");
     float y = p.y + 160.0f;
@@ -874,14 +874,17 @@ AccountNav pageExport(float t) {
     game::OnlineSession& se = ses();
     const net::AccountInfo& a = se.account();
     const bool busy = se.busy(Kind::AccountExportResult) || s.exportWriting;
-    Rect p = beginPage(t, 1040.0f, 860.0f, T("online.export.title"));
+    Rect p = beginPage(t, 1040.0f, 700.0f, T("online.export.title"));
     serverLine(p, true);
     im::pushId("export");
     float y = p.y + 160.0f;
-    y += paragraph(T("online.export.lead"), p, y, p.w - 220.0f, ivoryDim, kSmall + 2.0f) + 22.0f;
     bool go = false;
     if (!s.exportPath.empty()) {
-        y += paragraph(T("online.export.saved"), p, y + 10.0f, p.w - 220.0f, ivory, kBody, font::FACE_TEXT) + 22.0f;
+        // Written: where, and its folder.
+        y += 30.0f;
+        gfx::diamond(vec2(p.cx(), y - 8.0f), 5.0f, withAlpha(gold, 0.8f));
+        y += 40.0f;
+        y += paragraph(T("online.export.saved"), p, y, p.w - 220.0f, ivory, kBody, font::FACE_TEXT) + 22.0f;
         TextStyle ps = style(font::FACE_TEXT, 22.0f, goldBright, HAlign::Center);
         ps.dir = 0;
         std::string path = s.exportPath;
@@ -895,11 +898,14 @@ AccountNav pageExport(float t) {
             if (cut != std::string::npos) folder.erase(cut + 1);
             if (!plat::openInFileManager(folder)) notify(T("library.open_failed"));
         }
-    } else if (!a.hasPassword) {
-        paragraph(game::onlineErrorText("password_not_set"), p, y + 20.0f, p.w - 220.0f, danger, kSmall + 1.0f);
     } else {
-        reauthFields(p, y);
-        messageLine(p, y + 22.0f, s.error, s.note);
+        y += paragraph(T("online.export.lead"), p, y, p.w - 220.0f, ivoryDim, kSmall + 2.0f) + 22.0f;
+        if (!a.hasPassword) {
+            paragraph(game::onlineErrorText("password_not_set"), p, y + 20.0f, p.w - 220.0f, danger, kSmall + 1.0f);
+        } else {
+            reauthFields(p, y);
+            messageLine(p, y + 22.0f, s.error, s.note);
+        }
     }
     footerRule(p);
     bool back = backButton(p);
@@ -925,7 +931,7 @@ AccountNav pageDelete(float t) {
     game::OnlineSession& se = ses();
     const net::AccountInfo& a = se.account();
     const bool busy = se.busy(Kind::AccountDeleted);
-    Rect p = beginPage(t, 1080.0f, 940.0f, T("online.delete.title"));
+    Rect p = beginPage(t, 1100.0f, 820.0f, T("online.delete.title"));
     serverLine(p, true);
     im::pushId("delete");
     float y = p.y + 160.0f;
@@ -935,7 +941,8 @@ AccountNav pageDelete(float t) {
     if (!a.hasPassword) {
         paragraph(game::onlineErrorText("password_not_set"), p, y + 20.0f, p.w - 220.0f, danger, kSmall + 1.0f);
     } else {
-        im::formField(L("online.delete.confirm_name"), s.confirmName, formRow(p, y, 160.0f), 40, im::FIELD_LTR, a.username);
+        y += paragraph(T("online.delete.confirm_name"), p, y, p.w - 220.0f, ivoryDim, kSmall + 1.0f) + 8.0f;
+        im::formField(L("online.field.username"), s.confirmName, formRow(p, y, 160.0f), 40, im::FIELD_LTR, a.username);
         reauthFields(p, y);
         messageLine(p, y + 22.0f, s.error, s.note);
     }

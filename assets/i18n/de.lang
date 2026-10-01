@@ -846,7 +846,7 @@ online.export.failed = Die Datei konnte nicht geschrieben werden.
 online.delete.title = KONTO LÖSCHEN
 online.delete.warning = Ihr Konto wird von diesem Server gelöscht: E-Mail-Adresse, Passwort, Zwei-Faktor-Authentifizierung und Geräte werden entfernt, und Sie können sich nicht mehr anmelden. Dies kann nicht rückgängig gemacht werden.
 online.delete.games = Ihre Partien und Wertungen bleiben unter dem anonymen Namen {0} auf dem Server.
-online.delete.confirm_name = Ihr Benutzername zur Bestätigung
+online.delete.confirm_name = Geben Sie zur Bestätigung Ihren Benutzernamen und Ihr Passwort ein.
 online.delete.button = Mein Konto löschen
 online.delete.done = Ihr Konto wurde gelöscht.
 

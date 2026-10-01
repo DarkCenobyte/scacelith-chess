@@ -851,7 +851,7 @@ online.export.failed = تعذّرت كتابة الملف.
 online.delete.title = حذف الحساب
 online.delete.warning = سيُحذف حسابك من هذا الخادم: سيُمحى عنوان بريدك الإلكتروني وكلمة المرور والمصادقة الثنائية والأجهزة، ولن تتمكن من تسجيل الدخول بعد ذلك. لا يمكن التراجع عن ذلك.
 online.delete.games = تبقى مبارياتك وتصنيفاتك على الخادم تحت الاسم المجهول {0}.
-online.delete.confirm_name = اسم المستخدم للتأكيد
+online.delete.confirm_name = للتأكيد، أدخل اسم المستخدم وكلمة المرور.
 online.delete.button = حذف حسابي
 online.delete.done = حُذف حسابك.
 

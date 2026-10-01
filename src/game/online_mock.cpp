@@ -576,6 +576,7 @@ std::vector<GameDetails> makeHistory(const AccountInfo& account, double now) {
     static const int kCustom[][2] = {{420, 3}, {240, 2}, {90, 1}, {1200, 15}, {150, 0}};
     int64_t endedAt = int64_t(now) - int64_t(rng.range(20.0f, 90.0f) * 60000.0f);
     uint32_t seq = 0;
+    size_t lastDeleted = 0;  // deleted accounts are rare: one in a dozen games at most
     for (size_t i = 0; i < endings.size(); ++i) {
         std::string cat;
         int baseSec = 0, incSec = 0;
@@ -602,7 +603,10 @@ std::vector<GameDetails> makeHistory(const AccountInfo& account, double now) {
         d.category = cat;
         d.rated = rated;
         std::string opp = kHistoryNames[rng.rangeInt(0, int(sizeof kHistoryNames / sizeof *kHistoryNames) - 1)];
-        if (rng.uniform() < 0.08f) opp = "deleted#" + std::to_string(1000 + rng.rangeInt(0, 8999));
+        if (rng.uniform() < 0.08f && (lastDeleted == 0 || i >= lastDeleted + 12)) {
+            opp = "deleted#" + std::to_string(1000 + rng.rangeInt(0, 8999));
+            lastDeleted = i + 1;
+        }
         (me == 0 ? d.white : d.black).name = account.username;
         (me == 0 ? d.black : d.white).name = opp;
         int* mine = ratingOf(cat);

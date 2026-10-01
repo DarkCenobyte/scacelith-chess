@@ -846,7 +846,7 @@ online.export.failed = No se ha podido escribir el archivo.
 online.delete.title = ELIMINAR LA CUENTA
 online.delete.warning = Su cuenta se eliminará de este servidor: se borrarán su dirección de correo, su contraseña, la autenticación de dos factores y sus dispositivos, y ya no podrá iniciar sesión. Esta acción no se puede deshacer.
 online.delete.games = Sus partidas y puntuaciones permanecen en el servidor con el nombre anónimo {0}.
-online.delete.confirm_name = Su nombre de usuario, para confirmar
+online.delete.confirm_name = Para confirmar, introduzca su nombre de usuario y su contraseña.
 online.delete.button = Eliminar mi cuenta
 online.delete.done = Su cuenta se ha eliminado.
 

@@ -847,7 +847,7 @@ online.export.failed = Le fichier n’a pas pu être écrit.
 online.delete.title = SUPPRIMER LE COMPTE
 online.delete.warning = Votre compte sera supprimé de ce serveur : votre adresse e-mail, votre mot de passe, la double authentification et vos appareils seront effacés, et vous ne pourrez plus vous connecter. Cette action est irréversible.
 online.delete.games = Vos parties et vos classements restent sur le serveur sous le nom anonyme {0}.
-online.delete.confirm_name = Votre nom d’utilisateur, pour confirmer
+online.delete.confirm_name = Pour confirmer, saisissez votre nom d’utilisateur et votre mot de passe.
 online.delete.button = Supprimer mon compte
 online.delete.done = Votre compte a été supprimé.
 

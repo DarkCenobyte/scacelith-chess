@@ -856,7 +856,7 @@ online.export.failed = The file could not be written.
 online.delete.title = DELETE ACCOUNT
 online.delete.warning = Your account will be deleted from this server: your e-mail address, password, two-factor authentication and devices are erased, and you can no longer sign in. This cannot be undone.
 online.delete.games = Your games and ratings stay on the server under the anonymous name {0}.
-online.delete.confirm_name = Your user name, to confirm
+online.delete.confirm_name = To confirm, enter your user name and your password.
 online.delete.button = Delete my account
 online.delete.done = Your account has been deleted.
 

@@ -846,7 +846,7 @@ online.export.failed = 無法寫入檔案。
 online.delete.title = 刪除帳號
 online.delete.warning = 你的帳號將從此伺服器刪除：電子郵件地址、密碼、雙重驗證和裝置都會被清除，你將無法再登入。此操作無法復原。
 online.delete.games = 你的對局和等級分會以匿名名稱 {0} 保留在伺服器上。
-online.delete.confirm_name = 輸入使用者名稱以確認
+online.delete.confirm_name = 請輸入使用者名稱和密碼以確認。
 online.delete.button = 刪除我的帳號
 online.delete.done = 你的帳號已刪除。
 

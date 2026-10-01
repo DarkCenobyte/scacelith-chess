@@ -847,7 +847,7 @@ online.export.failed = ファイルを書き込めませんでした。
 online.delete.title = アカウントの削除
 online.delete.warning = このサーバーからアカウントが削除されます。メールアドレス、パスワード、二要素認証、デバイスの情報は消去され、ログインできなくなります。元に戻すことはできません。
 online.delete.games = 対局とレーティングは、匿名の名前 {0} でサーバーに残ります。
-online.delete.confirm_name = 確認のためのユーザー名
+online.delete.confirm_name = 確認のため、ユーザー名とパスワードを入力してください。
 online.delete.button = アカウントを削除
 online.delete.done = アカウントを削除しました。
 

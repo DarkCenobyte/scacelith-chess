@@ -846,7 +846,7 @@ online.export.failed = 无法写入文件。
 online.delete.title = 删除账号
 online.delete.warning = 你的账号将从此服务器删除：邮箱地址、密码、双重验证和设备都会被清除，你将无法再登录。此操作无法撤销。
 online.delete.games = 你的对局和等级分会以匿名名称 {0} 保留在服务器上。
-online.delete.confirm_name = 输入用户名以确认
+online.delete.confirm_name = 请输入用户名和密码以确认。
 online.delete.button = 删除我的账号
 online.delete.done = 你的账号已删除。
 
