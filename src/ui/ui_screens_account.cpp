@@ -219,21 +219,18 @@ float messageLine(const Rect& p, float y, const std::string& error, const std::s
 }
 
 // ---- State ------------------------------------------------------------------------------------------
-enum class Save { Unknown, Checking, NotSaved, Downloading, Writing, Saved, Failed };
+using Save = game::GameSaveState::Save;
 
-struct State {
+// The save state of the game page (saveId, save, saveGame, savedPath, savedIndex, replayWanted and
+// what changes them) is game::GameSaveState, unit-tested.
+struct State : game::GameSaveState {
     // history
     int kindFilter = 0;      // 0 all, 1 rated, 2 casual
     int resultFilter = 0;    // 0 all, 1 won, 2 lost, 3 drawn
     bool reloadHistory = true;
     // a game: saved games, replay, report
     std::string saveFolder;  // the saved games (the menu's LibrarySetup)
-    uint64_t saveId = 0;     // the game the save state is about
-    Save save = Save::Unknown;
     std::future<archive::ServerSaveResult> saveJob;
-    std::string savedPath;
-    int savedIndex = 0;
-    bool replayWanted = false;
     bool reportOpen = false;
     int reportCategory = 0;
     std::string reportComment;
@@ -277,10 +274,9 @@ archive::ServerGame serverGameOf(const net::GameDetails& g) {
 }
 
 // Saved games: looks (pgnText empty) or writes, off the UI thread.
-void startSave(const std::string& folder, const net::GameDetails& g, const std::string& pgnText) {
+void startSave(const std::string& folder, const archive::ServerGame& sg, const std::string& pgnText) {
     State& s = st();
     s.save = pgnText.empty() ? Save::Checking : Save::Writing;
-    const archive::ServerGame sg = serverGameOf(g);
     s.saveJob = std::async(std::launch::async, [folder, sg, pgnText]() {
         try {
             return archive::saveServerGame(folder, sg, pgnText);
@@ -526,18 +522,15 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         s.movesScroll = s.movesTarget = 0.0f;
         s.reportOpen = false;
         if (!loaded && data.gameWanted && !se.busy(Kind::GameDetailsResult)) se.openGame(data.gameWanted);
+        s.opened(s.saveJob.valid());
     }
     // Is it in the saved games already?
-    if (loaded && canSave && s.saveId != g.id && !s.saveJob.valid()) {
-        s.saveId = g.id;
-        s.savedPath.clear();
+    if (loaded && canSave && s.lookupDue(g.id, s.saveJob.valid())) {
         s.error.clear();
         s.note.clear();
-        s.replayWanted = false;
-        startSave(library->folder, g, std::string());
+        startSave(library->folder, serverGameOf(g), std::string());
     }
-    if (loaded && s.save == Save::Saved && s.replayWanted && s.saveId == g.id) {
-        s.replayWanted = false;
+    if (loaded && s.replayDue(g.id)) {
         library->replay.path = s.savedPath;
         library->replay.game = s.savedIndex;
         LOGI("online: replay of server game %llu (%s)", (unsigned long long)g.id, s.savedPath.c_str());
@@ -683,13 +676,10 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
     if (loaded && (save || replay) && canSave) {
         s.error.clear();
         s.note.clear();
-        if (replay) s.replayWanted = true;
-        if (s.save == Save::Saved && s.saveId == g.id) {
-            // Replay of a saved game: next frame (above).
-        } else if (s.save != Save::Checking && s.save != Save::Downloading && s.save != Save::Writing) {
+        // A saved game's replay starts next frame (above).
+        if (s.request(serverGameOf(g), replay)) {
             se.api().downloadPgn(g.id);
             se.expect(Kind::PgnResult);
-            s.save = Save::Downloading;
         }
     }
     if (report) {
@@ -1012,9 +1002,9 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
     }
     if (se.take(Kind::PreferencesResult, e) && !e.ok && e.error != "unauthorized") notify(errorText(e), 4.0f);
     if (se.take(Kind::PgnResult, e) && s.save == Save::Downloading) {
-        const game::AccountData& data = se.accountData();
-        if (e.ok && data.gameLoaded && data.game.id == s.saveId && e.gameId == s.saveId) {
-            startSave(s.saveFolder, data.game, e.text);
+        // Saved as the game it was asked for, whatever game the page shows now.
+        if (s.pgnArrived(e)) {
+            startSave(s.saveFolder, s.saveGame, e.text);
         } else {
             s.save = Save::Failed;
             s.replayWanted = false;

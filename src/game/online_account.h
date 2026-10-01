@@ -6,6 +6,7 @@
 // tests/online_account_tests.cpp.
 #pragma once
 #include "../net/online_client.h"
+#include "game_archive.h"
 #include <cstdint>
 #include <ctime>
 #include <string>
@@ -85,6 +86,37 @@ struct AccountData {
     // challenges; an account deleted signs out and forgets it; "unauthorized" or sessionLost, the
     // token refused, signs out). False for the other kinds of events (nothing changed).
     bool apply(const net::Event& e, net::AccountInfo& account, bool& signedIn);
+};
+
+// "Save to saved games" and "Replay" on the page of a game of the history (ui_screens_account.cpp):
+// the game the state is about, where its save stands, the game a PGN being downloaded is saved as,
+// and whether a replay waits for the save. The page runs the lookups in the saved games and the
+// writes off the UI thread (game::archive::saveServerGame); 'job' below: one of them runs.
+struct GameSaveState {
+    enum class Save { Unknown, Checking, NotSaved, Downloading, Writing, Saved, Failed };
+    uint64_t saveId = 0;              // the game the state is about
+    Save save = Save::Unknown;
+    archive::ServerGame saveGame;     // the game the PGN being downloaded is saved as
+    std::string savedPath;            // Saved: the file, and the game's index in it
+    int savedIndex = 0;
+    bool replayWanted = false;        // Replay pressed: the replay starts once the game is saved
+
+    // The page of a game opens (from the history, back from a replay...). A Replay pressed on an
+    // earlier visit is given up (a download or write still running ends as a plain save), and a
+    // finished state is forgotten so that the saved games are looked at again (the file may have
+    // been deleted meanwhile); one still in progress goes on.
+    void opened(bool job);
+    // Whether the saved games must be looked at for game 'gameId' now: true makes the state about
+    // that game (Checking; the page starts the lookup). Not while a lookup, a download or a write
+    // runs (the PGN of another game on its way is still saved as that game).
+    bool lookupDue(uint64_t gameId, bool job);
+    // Save or Replay pressed on game g: true when its PGN must be downloaded (Downloading).
+    bool request(const archive::ServerGame& g, bool replay);
+    // The PGN awaited (PgnResult while Downloading): true to write it as saveGame, whatever game
+    // the page shows now.
+    bool pgnArrived(const net::Event& e) const;
+    // Whether the replay of game 'gameId' starts now (saved, asked for on this visit).
+    bool replayDue(uint64_t gameId);
 };
 
 // The result of a finished game from the player's side.

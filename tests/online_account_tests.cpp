@@ -1,8 +1,10 @@
 // The account pages' data (src/game/online_account.h): the history pager (the cursors of the pages
 // seen, Previous / Next, an answer kept only when it is the one awaited, errors, the page count),
 // what the answers of the account API change (AccountData::apply: the game asked for, the devices
-// sorted and signed out, the preference, the account deleted, the token refused), the result from
-// the player's side, the moves of a server game with their clocks, the time control labels and the
+// sorted and signed out, the preference, the account deleted, the token refused), Save and Replay
+// on a game of the history (GameSaveState: a Replay given up with its page, the PGN of a game left
+// still saved as that game, the saved games looked at again on each visit), the result from the
+// player's side, the moves of a server game with their clocks, the time control labels and the
 // file name of an account export.
 #include "test.h"
 #include "game/online_account.h"
@@ -367,6 +369,122 @@ TEST(account_apply_preferences_and_deletion) {
     CHECK(account.username.empty());
     CHECK_EQ(d.gameWanted, uint64_t(0));
     CHECK(!d.sessionsLoaded);
+}
+
+namespace {
+using Save = GameSaveState::Save;
+
+archive::ServerGame serverGame(uint64_t id) {
+    archive::ServerGame g;
+    g.server = "caissa.scacelith.com:443";
+    g.gameId = id;
+    g.endKey = "reason.checkmate";
+    return g;
+}
+net::Event pgnOf(uint64_t id) {
+    net::Event e = event(Kind::PgnResult);
+    e.gameId = id;
+    e.text = "[Event \"x\"]\n\n1. e4 *\n";
+    return e;
+}
+// What the page does with a PGN arrived and the write that follows (accountPump).
+void written(GameSaveState& s, const char* path) {
+    s.save = Save::Writing;   // startSave(..., text)
+    s.save = Save::Saved;     // the write job's result
+    s.savedPath = path;
+}
+}  // namespace
+
+// Replay pressed on game A, then Back before the download and the write end: they end as a plain
+// save, and opening A later only to look at it starts no replay.
+TEST(account_game_save_replay_given_up_with_its_page) {
+    GameSaveState s;
+    s.opened(false);
+    CHECK(s.lookupDue(100, false));
+    CHECK(s.save == Save::Checking);
+    s.save = Save::NotSaved;              // the lookup's answer
+    CHECK(!s.lookupDue(100, false));      // once per visit
+    CHECK(s.request(serverGame(100), true));
+    CHECK(s.save == Save::Downloading);
+    CHECK(s.replayWanted);
+    // Back: the history page; the PGN comes and is written there.
+    CHECK(s.pgnArrived(pgnOf(100)));
+    written(s, "/saved/2026-09-28.pgn");
+    // Game A opened again.
+    s.opened(false);
+    CHECK(!s.replayDue(100));
+    CHECK(s.lookupDue(100, false));
+    s.save = Save::Saved;                 // already saved
+    s.savedPath = "/saved/2026-09-28.pgn";
+    CHECK(!s.replayDue(100));
+    // Replay pressed on this visit: it starts (the game is saved already: no download).
+    CHECK(!s.request(serverGame(100), true));
+    CHECK(s.replayDue(100));
+    CHECK(!s.replayDue(100));
+
+    // The same with the page opened again while the write still runs.
+    GameSaveState t;
+    t.opened(false);
+    CHECK(t.lookupDue(7, false));
+    t.save = Save::NotSaved;
+    CHECK(t.request(serverGame(7), true));
+    CHECK(t.pgnArrived(pgnOf(7)));
+    t.save = Save::Writing;
+    t.opened(true);
+    CHECK(t.save == Save::Writing);       // the write goes on
+    t.save = Save::Saved;
+    CHECK(!t.replayDue(7));
+}
+
+// Save on game A, Back, game B opened before A's PGN arrives: A's PGN is still saved as A, and B's
+// lookup waits for it.
+TEST(account_game_save_of_a_game_left_still_saved) {
+    GameSaveState s;
+    s.opened(false);
+    CHECK(s.lookupDue(100, false));
+    s.save = Save::NotSaved;
+    CHECK(s.request(serverGame(100), false));
+    s.opened(false);                      // game B's page
+    CHECK(s.save == Save::Downloading);
+    CHECK(!s.lookupDue(200, false));      // not while A's PGN is on its way
+    CHECK(s.pgnArrived(pgnOf(100)));
+    CHECK_EQ(s.saveGame.gameId, uint64_t(100));
+    CHECK_EQ(s.saveGame.server, std::string("caissa.scacelith.com:443"));
+    CHECK_EQ(s.saveGame.endKey, std::string("reason.checkmate"));
+    CHECK(!s.pgnArrived(pgnOf(200)));     // only the PGN asked for
+    net::Event failed = pgnOf(100);
+    failed.ok = false;
+    failed.error = "timeout";
+    CHECK(!s.pgnArrived(failed));
+    s.save = Save::Writing;
+    CHECK(!s.lookupDue(200, true));
+    written(s, "/saved/2026-09-28.pgn");
+    CHECK(s.lookupDue(200, false));       // then B's turn
+    CHECK_EQ(s.saveId, uint64_t(200));
+    CHECK(s.savedPath.empty());
+}
+
+// The saved games are looked at again on each visit: a file deleted meanwhile (or a replay of it
+// that failed) does not leave the game stuck on "Saved".
+TEST(account_game_save_looked_at_again_on_each_visit) {
+    GameSaveState s;
+    s.opened(false);
+    CHECK(s.lookupDue(100, false));
+    s.save = Save::NotSaved;
+    CHECK(s.request(serverGame(100), false));
+    CHECK(s.pgnArrived(pgnOf(100)));
+    written(s, "/saved/2026-09-28.pgn");
+    CHECK(!s.lookupDue(100, false));      // the same visit: known
+    // The file deleted on the Saved games page, then game A opened again.
+    s.opened(false);
+    CHECK(s.lookupDue(100, false));
+    s.save = Save::NotSaved;
+    CHECK(s.request(serverGame(100), true));   // it can be saved (and replayed) again
+    CHECK(s.save == Save::Downloading);
+    // Opened again while it downloads: the download goes on and is still awaited.
+    s.opened(false);
+    CHECK(s.save == Save::Downloading);
+    CHECK(s.pgnArrived(pgnOf(100)));
 }
 
 TEST(account_outcome_from_the_player_side) {

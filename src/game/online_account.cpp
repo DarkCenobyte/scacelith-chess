@@ -170,6 +170,45 @@ bool AccountData::apply(const net::Event& e, net::AccountInfo& account, bool& si
     return true;
 }
 
+// ---- Saving a game of the history ---------------------------------------------------------------------
+
+void GameSaveState::opened(bool job) {
+    replayWanted = false;
+    if (job || save == Save::Downloading) return;
+    saveId = 0;
+    save = Save::Unknown;
+    savedPath.clear();
+}
+
+bool GameSaveState::lookupDue(uint64_t gameId, bool job) {
+    if (saveId == gameId || job || save == Save::Downloading) return false;
+    saveId = gameId;
+    save = Save::Checking;
+    savedPath.clear();
+    replayWanted = false;
+    return true;
+}
+
+bool GameSaveState::request(const archive::ServerGame& g, bool replay) {
+    if (replay) replayWanted = true;
+    if (save == Save::Saved && saveId == g.gameId) return false;  // a replay: it starts next frame
+    if (save == Save::Checking || save == Save::Downloading || save == Save::Writing) return false;
+    saveId = g.gameId;
+    saveGame = g;
+    save = Save::Downloading;
+    return true;
+}
+
+bool GameSaveState::pgnArrived(const net::Event& e) const {
+    return save == Save::Downloading && e.ok && e.gameId == saveId && saveGame.gameId == saveId;
+}
+
+bool GameSaveState::replayDue(uint64_t gameId) {
+    if (save != Save::Saved || !replayWanted || saveId != gameId) return false;
+    replayWanted = false;
+    return true;
+}
+
 // ---- Texts and moves ---------------------------------------------------------------------------------
 
 Outcome outcomeOf(const net::GameSummary& g) {
