@@ -1801,7 +1801,7 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
         Rect pr = row(rh);
         float half = (rw - 20.0f) * 0.5f;
         std::string api = s.onlineApiPort > 0 ? std::to_string(s.onlineApiPort) : "";
-        if (im::formField(L("options.online.api_port"), api, im::flip(pr, Rect(pr.x, pr.y, half, pr.h)), 5, im::FIELD_LTR, "44664", en)) {
+        if (im::formField(L("options.online.api_port"), api, im::flip(pr, Rect(pr.x, pr.y, half, pr.h)), 5, im::FIELD_LTR, "443", en)) {
             s.onlineApiPort = std::clamp(std::atoi(digitsOnly(api).c_str()), 0, 65535);
             O.testShown = false;
         }
@@ -1893,7 +1893,7 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
 void copyOnlineOptions(game::Settings& dst, const game::Settings& src) {
     dst.onlineCustomServer = src.onlineCustomServer;
     dst.onlineHost = trim(src.onlineHost);
-    dst.onlineApiPort = src.onlineApiPort > 0 ? src.onlineApiPort : 44664;
+    dst.onlineApiPort = src.onlineApiPort > 0 ? src.onlineApiPort : 443;
     dst.onlineWsPort = src.onlineWsPort;
     dst.onlinePin = trim(src.onlinePin);
 }

@@ -20,19 +20,19 @@ std::string ServerEndpoint::origin() const {
 
 bool ServerEndpoint::valid() const { return !host.empty() && apiPort != 0; }
 
-// The official server: caissa.scacelith.com, HTTPS API and WSS on the same port 44664 (a build
+// The official server: caissa.scacelith.com, HTTPS API and WSS on the same port 443 (a build
 // may name another with SCACELITH_OFFICIAL_SERVER "host[:apiPort[:wsPort]]", "" = none).
 ServerEndpoint officialServer() {
     ServerEndpoint ep;
 #ifdef SCACELITH_OFFICIAL_SERVER
     std::string spec = SCACELITH_OFFICIAL_SERVER;
 #else
-    std::string spec = "caissa.scacelith.com:44664";
+    std::string spec = "caissa.scacelith.com:443";
 #endif
     if (spec.empty()) return ep;
     size_t a = spec.find(':');
     ep.host = spec.substr(0, a);
-    ep.apiPort = 44664;
+    ep.apiPort = 443;
     ep.wsPort = 0;  // = the API port
     if (a != std::string::npos) {
         size_t b = spec.find(':', a + 1);
