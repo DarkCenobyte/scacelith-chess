@@ -114,6 +114,9 @@ enum class ButtonKind { Primary, Secondary, Quiet };
 bool menuEntry(const std::string& label, const Rect& r, bool enabled = true, gfx::HAlign align = gfx::HAlign::Left);
 bool button(const std::string& label, const Rect& r, ButtonKind kind = ButtonKind::Secondary, bool enabled = true,
             uint32_t extraFlags = 0);
+// A button that is off for a reason: drawn like a disabled button, but the mouse resting on it (or
+// the keyboard focus, which stops on it) shows 'why' as its tooltip. Never activates.
+void disabledButton(const std::string& label, const Rect& r, ButtonKind kind, const std::string& why);
 // Form rows: label on the left, control on the right. Return true when the value changed.
 bool toggleRow(const std::string& label, bool& value, const Rect& r, bool enabled = true);
 bool sliderRow(const std::string& label, float& value, float lo, float hi, float step,

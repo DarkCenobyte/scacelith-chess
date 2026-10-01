@@ -2,12 +2,15 @@
 // dedicated-server/docs/API.md): the pages of the player's game history, the game opened from it,
 // the signed-in devices, and what the answers change in the account. game::OnlineSession keeps one
 // AccountData and routes the answers of net::OnlineClient to it (AccountData::apply); the pages
-// (ui/ui_screens_account.cpp) read it. Engine-free (no GL, no UI): unit-tested in
-// tests/online_account_tests.cpp.
+// (ui/ui_screens_account.cpp) read it. The animated GIFs of games (a game of the history, a game
+// of the saved games: ui/ui_library.cpp) go through one GifSaver, which writes each file to the
+// GIF folder. Engine-free (no GL, no UI): unit-tested in tests/online_account_tests.cpp.
 #pragma once
 #include "../net/online_client.h"
+#include "game_archive.h"
 #include <cstdint>
 #include <ctime>
+#include <future>
 #include <string>
 #include <vector>
 
@@ -94,5 +97,61 @@ std::string timeControlLabel(int64_t baseMs, int64_t incMs);
 // The file of an account export: "<host>_<username>_<YYYY-MM-DD>.json", the date in local time, the
 // host and the user name made safe for a file name (game::archive::sanitizeName).
 std::string exportFileName(const std::string& host, const std::string& username, std::time_t when);
+
+// ---- Animated GIFs of games (GET /games/:id/gif, POST /gif) -------------------------------------------
+// The file of a game's GIF, named like the saved games' PGN files:
+// "<YYYY-MM-DD_HHMMSS>_<White>-vs-<Black>_<gameId>.gif", the start of the game in local time
+// ("0000-00-00_000000" when unknown: started 0), the names made safe for a file name
+// (archive::sanitizeName), "_<gameId>" only for a game with a server id. GifSaver writes it with
+// archive::saveFile, never over a file ("..._2.gif" next to one of the same name).
+std::string gifFileName(std::time_t started, const std::string& white, const std::string& black, uint64_t gameId);
+// The local time of a PGN's Date ("2026.09.27") and Time ("21:47:05", "21:47") tags, the time
+// taken as midnight when it is missing; 'fallback' when the date is not a whole one ("2026.??.??").
+std::time_t pgnLocalTime(const std::string& date, const std::string& time, std::time_t fallback);
+// A wait in words in the interface language (i18n "gif.wait.*"): "45 seconds", "2 minutes and
+// 30 seconds", "13 minutes" (whole minutes, rounded up, from 5 minutes on); at least 1 second.
+std::string waitText(int seconds);
+
+// One GIF at a time, asked by a page (a game of the account's history, a game of the saved games)
+// and written to the GIF folder when the server's answer arrives, whatever page shows by then.
+// The page sends the request (ServerApi::downloadGameGif or renderPgnGif) and calls begin() with
+// what it is about and where the file goes; game::OnlineSession routes the answer (GifResult) to
+// finish(), which writes the file off the calling thread (archive::saveFile: a new file, never one
+// replaced), and calls poll() every frame until the file is written. The pages show the state of
+// their own game (owner()): rendering, written (path()), or the error (the server's code with its
+// retryAfterSec, "write_failed" when the file could not be written).
+class GifSaver {
+public:
+    enum class Stage { Idle, Rendering, Writing, Saved, Failed };
+
+    GifSaver() = default;
+    ~GifSaver();                          // waits for a write in progress
+    GifSaver(const GifSaver&) = delete;
+    GifSaver& operator=(const GifSaver&) = delete;
+
+    // A request was sent: owner = what the page shows it for ("history:812", a saved game's key),
+    // gameId = the GifResult's gameId awaited (0 for a PGN text). False (nothing changes) while
+    // another GIF is being made: one at a time.
+    bool begin(const std::string& owner, uint64_t gameId, const std::string& folder, const std::string& fileName);
+    // The server's answer: false when it is not the one awaited (nothing asked, another game).
+    bool finish(const net::Event& e);
+    // The write in progress ended (wait: until it has): true on the call that moved to Saved or Failed.
+    bool poll(bool wait = false);
+    void clear();                         // back to Idle (a write in progress is waited for)
+
+    Stage stage() const { return stage_; }
+    bool busy() const { return stage_ == Stage::Rendering || stage_ == Stage::Writing; }
+    const std::string& owner() const { return owner_; }
+    const std::string& path() const { return path_; }     // Saved: the file written
+    const std::string& error() const { return error_; }   // Failed
+    int retryAfterSec() const { return retryAfterSec_; }  // Failed: rate_limited, server_busy
+
+private:
+    Stage stage_ = Stage::Idle;
+    std::string owner_, folder_, fileName_, path_, error_;
+    uint64_t gameId_ = 0;
+    int retryAfterSec_ = 0;
+    std::future<archive::SaveResult> job_;
+};
 
 }  // namespace game

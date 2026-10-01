@@ -6,6 +6,7 @@
 #include "online_mock.h"
 #include "settings.h"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstdio>
 #include <ctime>
@@ -200,6 +201,9 @@ enum ChallengeState { ChPending = 0, ChAccepted = 1, ChDeclined = 2, ChCancelled
 enum QueueState { QLeft = 0, QSearching = 1, QMatched = 2 };
 enum NoticeCode { NShutdown = 1, NBanned = 2, NRevoked = 3, NCooldown = 4, NReplaced = 5, NRatingRestored = 7 };
 constexpr int kErrMatchmakingCooldown = 207;
+
+// Seconds of the monotonic clock: when a page last showed the state of the GIF being made.
+double gifClock() { return std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count(); }
 
 }  // namespace
 
@@ -419,6 +423,32 @@ void OnlineSession::setAcceptChallenges(bool accept) {
     expect(Kind::PreferencesResult);
 }
 
+// ---- Animated GIFs ----------------------------------------------------------------------------------
+
+bool OnlineSession::saveGameGif(const std::string& owner, uint64_t gameId, const net::GifOptions& options, const std::string& folder,
+                                const std::string& fileName) {
+    if (!gif_.begin(owner, gameId, folder, fileName)) return false;
+    api().downloadGameGif(gameId, options);
+    gifShownAt_ = gifClock();
+    return true;
+}
+
+bool OnlineSession::savePgnGif(const std::string& owner, const std::string& pgn, const net::GifOptions& options, const std::string& folder,
+                               const std::string& fileName) {
+    if (!gif_.begin(owner, 0, folder, fileName)) return false;
+    api().renderPgnGif(pgn, options);
+    gifShownAt_ = gifClock();
+    return true;
+}
+
+void OnlineSession::gifShown(const std::string& owner) {
+    if (owner == gif_.owner()) gifShownAt_ = gifClock();
+}
+
+void OnlineSession::clearGif() {
+    if (!gif_.busy()) gif_.clear();
+}
+
 // ---- Realtime -------------------------------------------------------------------------------------
 
 int OnlineSession::pingMs() const {
@@ -562,6 +592,7 @@ void OnlineSession::quickStart(const std::string& category, const std::string& u
 void OnlineSession::runMock(double ms) {
     if (!(mock_ && virtual_)) return;
     for (double t = 0.0; t < ms; t += 25.0) update(0.025f);
+    gif_.poll(true);   // a GIF file being written: on the disk before the page is drawn
 }
 
 // ---- Event pump -----------------------------------------------------------------------------------
@@ -569,10 +600,22 @@ void OnlineSession::runMock(double ms) {
 void OnlineSession::update(float dt) {
     if (virtual_ && dt > 0.0f) net::mock::advance(double(dt) * 1000.0);
     if (!ready_) return;
+    const GifSaver::Stage gifBefore = gif_.stage();
     net::Event e;
     for (int guard = 0; guard < 256 && api_->poll(e); ++guard) handleServer(e);
     if (directUsed_)
         for (int guard = 0; guard < 256 && direct_->poll(e); ++guard) handleDirect(e);
+    // A GIF finished while no page shows it (the player went elsewhere): said by a notification.
+    const bool gifEnded = gif_.poll() || (gifBefore == GifSaver::Stage::Rendering && gif_.stage() == GifSaver::Stage::Failed);
+    if (gifEnded && gifClock() - gifShownAt_ > 0.5) {
+        if (gif_.stage() == GifSaver::Stage::Saved) {
+            const std::string& path = gif_.path();
+            const size_t cut = path.find_last_of("/\\");
+            ui::notify(i18n::trf("gif.saved_as", {i18n::ltr(cut == std::string::npos ? path : path.substr(cut + 1))}), 6.0f);
+        } else {
+            ui::notify(gifErrorText(gif_.error(), gif_.retryAfterSec()), 6.0f);
+        }
+    }
     double restored = 0.0;
     if (ratingRestored_.take(inGame_, restored))
         ui::notify(i18n::trn("online.notice.rating_restored", std::lround(restored)), 8.0f);
@@ -676,6 +719,15 @@ void OnlineSession::handleServer(const net::Event& e) {
         }
         if (wasSignedIn && !signedIn_ && !(e.kind == Kind::AccountDeleted && e.ok)) LOGI("online: session refused, signed out");
         store();
+        break;
+    }
+    case Kind::GifResult: {
+        // The GifSaver writes the file (not kept in results_: up to 16 MiB); a refused token
+        // signs out like any account API answer.
+        const bool wasSignedIn = signedIn_;
+        data_.apply(e, account_, signedIn_);
+        gif_.finish(e);
+        if (wasSignedIn && !signedIn_) LOGI("online: session refused, signed out");
         break;
     }
     case Kind::MfaDisableResult:
@@ -876,6 +928,23 @@ std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t 
     for (const char* k : known)
         if (code == k) return i18n::tr(std::string("online.err.") + k);
     return i18n::trf("online.err.other", {code});
+}
+
+std::string gifErrorText(const std::string& code, int retryAfterSec) {
+    if (code == "rate_limited") {
+        if (retryAfterSec > 0) return i18n::trf("gif.err.rate_limited_for", {waitText(retryAfterSec)});
+        return i18n::tr("gif.err.rate_limited");
+    }
+    if (code == "server_busy") {
+        if (retryAfterSec > 0) return i18n::trf("gif.err.server_busy_for", {waitText(retryAfterSec)});
+        return i18n::tr("gif.err.server_busy");
+    }
+    // Signed out: the token was refused (expired, revoked), or there is none.
+    if (code == "unauthorized" || code == "invalid_token" || code == "not_logged_in") return i18n::tr("gif.err.signed_out");
+    static const char* known[] = {"game_too_long", "pgn_too_large", "invalid_pgn", "gif_disabled", "write_failed", "not_found"};
+    for (const char* k : known)
+        if (code == k) return i18n::tr(std::string("gif.err.") + k);
+    return onlineErrorText(code, retryAfterSec);
 }
 
 std::string serverErrorText(int code) {

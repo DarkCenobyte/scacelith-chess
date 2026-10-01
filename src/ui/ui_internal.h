@@ -41,6 +41,9 @@ void setOptionsTab(int tab);        // 0 Display, 1 Graphics, 2 Audio, 3 Gamepla
 void openPauseConfirm(int which);   // 1 = resign, 2 = main menu (next pauseMenu() call)
 void foldGameOver(bool folded);
 void showModelLicence();            // the next modelPrompt() opens on the licence text
+// The next frame of Saved games with a game shown presses its Save as GIF (signed in to the
+// in-process fake server with a virtual clock: the GIF is made and written before that frame ends).
+void libraryGif();
 }  // namespace debug
 
 }  // namespace ui

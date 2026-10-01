@@ -8,8 +8,11 @@
 //     (scrollable); Save to saved games (the server's PGN read as untrusted input and saved once
 //     per game and server: game::archive::saveServerGame, off the UI thread), Replay (saves it
 //     first when needed, then replays the file like the Saved games page: MenuAction::StartReplay),
-//     Report opponent while the server accepts a report of that game (the report dialog of the
-//     online games);
+//     Save as GIF (the server's animated GIF of the game, GET /games/:id/gif, seen from the
+//     player's side, written to <app data>/gif/ under the name of its date, players and game id,
+//     never over a file: game::OnlineSession::saveGameGif; a spinner while the server draws it,
+//     then its path with Open folder, or why not in words), Report opponent while the server
+//     accepts a report of that game (the report dialog of the online games);
 //   - signed-in devices: each session of the account (its client's label or "Unknown device",
 //     signed in, last active, "This device"), Sign out per other device, Sign out everywhere;
 //   - change of e-mail: the new address, the password and, with two-factor on, a code (a recovery
@@ -234,6 +237,7 @@ struct State {
     std::string savedPath;
     int savedIndex = 0;
     bool replayWanted = false;
+    bool gifLast = false;    // the message under the buttons is the GIF's (the last action was Save as GIF)
     bool reportOpen = false;
     int reportCategory = 0;
     std::string reportComment;
@@ -299,6 +303,62 @@ net::GamesFilter filterOf(const State& s) {
     static const char* const results[] = {"", "win", "loss", "draw"};
     f.result = results[std::clamp(s.resultFilter, 0, 3)];
     return f;
+}
+
+// ---- Animated GIF of the game ------------------------------------------------------------------------
+// The GifSaver's owner of a game of this server, and where its GIFs go.
+std::string gifOwner(const net::GameDetails& g) { return "history:" + ses().endpoint().origin() + "#" + num((long long)g.id); }
+std::string gifFolder() { return plat::appDataDirectory() + "gif/"; }
+
+// The end of a path that fits maxWidth ("…/gif/2026-09-26_164700_Magnus_T-vs-bob_812.gif"): the
+// file's name matters more than the folder's.
+std::string elideStart(const std::string& s, const TextStyle& st, float maxWidth) {
+    if (gfx::textWidth(s, st) <= maxWidth) return s;
+    std::u32string cps = uni::decode(s);
+    size_t lo = 0, hi = cps.size();
+    while (lo < hi) {  // the fewest characters cut from the start
+        size_t mid = (lo + hi) / 2;
+        if (gfx::textWidth(kEllipsis + uni::encode(cps.substr(mid)), st) <= maxWidth) hi = mid;
+        else lo = mid + 1;
+    }
+    return kEllipsis + uni::encode(cps.substr(lo));
+}
+
+std::string folderOf(const std::string& path) {
+    const size_t cut = path.find_last_of("/\\");
+    return cut == std::string::npos ? path : path.substr(0, cut + 1);
+}
+
+// The GIF's state under the buttons of a game: making it (spinner), saved (where, Open folder) or
+// why not. Returns the height used.
+float gifMessage(const game::GifSaver& gif, const Rect& col, float y) {
+    using Stage = game::GifSaver::Stage;
+    const float x = col.x;
+    if (gif.busy()) {
+        spinner(vec2(im::flipX(col, x + 12.0f), y + 10.0f), 9.0f);
+        TextStyle ms = style(font::FACE_ITALIC, kSmall, ivoryDim, im::startAlign());
+        std::string text = T("gif.making");
+        fitOrElide(text, ms, col.w - 36.0f, 0.75f);
+        gfx::text(text, im::flipX(col, x + 34.0f), y + 18.0f, ms);
+        return 40.0f;
+    }
+    if (gif.stage() == Stage::Failed) {
+        TextStyle ms = style(font::FACE_ITALIC, kSmall, danger, im::startAlign());
+        const std::string text = game::gifErrorText(gif.error(), gif.retryAfterSec());
+        gfx::textWrapped(text, im::flipX(col, x), y + 18.0f, col.w, ms, 29.0f);
+        return 29.0f * float(gfx::wrapLineCount(text, col.w, ms)) + 10.0f;
+    }
+    if (gif.stage() != Stage::Saved) return 0.0f;
+    TextStyle ns = style(font::FACE_ITALIC, kSmall, ivoryDim, im::startAlign());
+    gfx::text(T("gif.saved"), im::flipX(col, x), y + 18.0f, ns);
+    TextStyle ps = style(font::FACE_TEXT, 20.0f, goldBright, im::startAlign());
+    ps.dir = 0;
+    gfx::text(elideStart(gif.path(), ps, col.w), im::flipX(col, x), y + 47.0f, ps);
+    const float bw = 260.0f;
+    if (im::button(L("library.open_folder"), im::flip(col, Rect(x, y + 62.0f, bw, 46.0f)), im::ButtonKind::Secondary)) {
+        if (!plat::openInFileManager(folderOf(gif.path()))) notify(T("library.open_failed"));
+    }
+    return 112.0f;
 }
 
 bool mfaOn() { return ses().account().mfaEnabled; }
@@ -554,7 +614,7 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
     const float lx = im::flip(p, Rect(p.x + pad, 0, leftW, 0)).x, rx = im::flip(p, Rect(p.x + pad + leftW + gap, 0, rightW, 0)).x;
     const Rect lcol(lx, 0, leftW, 0), rcol(rx, 0, rightW, 0);
     const float top = p.y + 150.0f, bottom = footerY(p) - 40.0f;
-    bool save = false, replay = false, report = false;
+    bool save = false, replay = false, report = false, gifPressed = false;
 
     if (!loaded) {
         Rect area(p.x + pad, top, p.w - 2.0f * pad, bottom - top);
@@ -593,25 +653,41 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
             }
             y += 92.0f;
         }
-        infoLine(T("online.game.date"), dateTimeText(g.startedAtMs), lcol, y);
-        y += 74.0f;
-        std::string tc = tcText(g) + kDot + T(g.rated ? "online.rated" : "online.casual");
-        infoLine(T("online.game.time_control"), tc, lcol, y);
+        // Date and time control side by side.
+        {
+            const float cgap = 30.0f, half = std::floor((leftW - cgap) * 0.5f);
+            const Rect dcol = im::flip(lcol, Rect(lx, 0, half, 0)), tcol = im::flip(lcol, Rect(lx + half + cgap, 0, leftW - half - cgap, 0));
+            infoLine(T("online.game.date"), dateTimeText(g.startedAtMs), dcol, y);
+            std::string tc = tcText(g) + kDot + T(g.rated ? "online.rated" : "online.casual");
+            infoLine(T("online.game.time_control"), tc, tcol, y);
+        }
         y += 82.0f;
-        // Actions.
-        const float bh = 52.0f, bstep = 62.0f;
+        // Actions: Save game and Save as GIF side by side (the GIF alone without saved games), Replay,
+        // Report opponent; the spinner of a save on the start side of its button, the GIF's on the end.
+        const float bh = 52.0f, bstep = 62.0f, bgap = 16.0f;
         const bool hasMoves = !g.moves.empty();
         const bool working = s.save == Save::Checking || s.save == Save::Downloading || s.save == Save::Writing;
+        const game::GifSaver& gif = se.gif();
+        const std::string owner = gifOwner(g);
+        const bool gifMine = gif.owner() == owner;
+        const float halfW = std::floor((leftW - bgap) * 0.5f);
+        const Rect gb = canSave ? im::flip(lcol, Rect(lx + halfW + bgap, y, leftW - halfW - bgap, bh)) : Rect(lx, y, leftW, bh);
         if (canSave) {
             const bool saved = s.save == Save::Saved && s.saveId == g.id;
-            Rect b(lx, y, leftW, bh);
+            const Rect b = im::flip(lcol, Rect(lx, y, halfW, bh));
             save = im::button(L(saved ? "online.game.saved_button" : "online.game.save"), b, im::ButtonKind::Secondary,
                               hasMoves && !saved && !working);
-            if (working && !s.replayWanted) spinner(vec2(im::flipX(lcol, lx + leftW + 30.0f), b.cy()), 10.0f);
-            y += bstep;
+            if (working && !s.replayWanted) spinner(vec2(im::flipX(lcol, lx - 34.0f), b.cy()), 10.0f);
+        }
+        if (!se.signedIn()) im::disabledButton(L("gif.save"), gb, im::ButtonKind::Secondary, T("gif.err.signed_out"));
+        else if (gif.busy() && !gifMine) im::disabledButton(L("gif.save"), gb, im::ButtonKind::Secondary, T("gif.busy_other"));
+        else gifPressed = im::button(L("gif.save"), gb, im::ButtonKind::Secondary, !gif.busy());
+        if (gif.busy() && gifMine) spinner(vec2(im::flipX(lcol, lx + leftW + 34.0f), gb.cy()), 10.0f);
+        y += bstep;
+        if (canSave) {
             Rect rb(lx, y, leftW, bh);
             replay = im::button(L("online.game.replay"), rb, im::ButtonKind::Primary, hasMoves && !working);
-            if (working && s.replayWanted) spinner(vec2(im::flipX(lcol, lx + leftW + 30.0f), rb.cy()), 10.0f);
+            if (working && s.replayWanted) spinner(vec2(im::flipX(lcol, lx - 34.0f), rb.cy()), 10.0f);
             y += bstep;
         }
         const bool reported = std::find(s.reported.begin(), s.reported.end(), g.id) != s.reported.end();
@@ -619,7 +695,10 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
             report = im::button(L("online.report.button"), Rect(lx, y, leftW, bh), im::ButtonKind::Quiet);
             y += bstep;
         }
-        if (!s.error.empty() || !s.note.empty()) {
+        if (s.gifLast && gifMine && gif.stage() != game::GifSaver::Stage::Idle) {
+            gifMessage(gif, lcol, y);
+            se.gifShown(owner);
+        } else if (!s.error.empty() || !s.note.empty()) {
             TextStyle ms = style(font::FACE_ITALIC, kSmall, s.error.empty() ? ivoryDim : danger, im::startAlign());
             gfx::textWrapped(s.error.empty() ? s.note : s.error, im::flipX(lcol, lx), y + 18.0f, leftW, ms, 29.0f);
         }
@@ -680,7 +759,19 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
     if (s.reportOpen) im::popBlock();
 
     // Actions.
+    if (loaded && gifPressed) {
+        // The GIF seen from the player's side, saved next to the others whatever page shows then.
+        s.gifLast = true;
+        s.error.clear();
+        s.note.clear();
+        net::GifOptions options;
+        options.orientation = g.you == 1 ? "black" : "white";
+        const std::string name = game::gifFileName(std::time_t(g.startedAtMs / 1000), g.white.name, g.black.name, g.id);
+        if (se.saveGameGif(gifOwner(g), g.id, options, gifFolder(), name))
+            LOGI("online: GIF of server game %llu asked for", (unsigned long long)g.id);
+    }
     if (loaded && (save || replay) && canSave) {
+        s.gifLast = false;
         s.error.clear();
         s.note.clear();
         if (replay) s.replayWanted = true;
@@ -1125,7 +1216,8 @@ AccountNav accountPage(AccountPage page, float t, bool fresh, LibrarySetup* libr
 
 bool accountDebugOpen(const std::string& sub, AccountPage& page) {
     static const struct { const char* name; AccountPage page; } names[] = {
-        {"history", AccountPage::History}, {"game", AccountPage::Game},     {"devices", AccountPage::Devices},
+        {"history", AccountPage::History}, {"game", AccountPage::Game},     {"game-gif", AccountPage::Game},
+        {"game-gif-making", AccountPage::Game}, {"devices", AccountPage::Devices},
         {"email", AccountPage::Email},     {"email-sent", AccountPage::Email}, {"export", AccountPage::Export},
         {"export-done", AccountPage::Export}, {"delete", AccountPage::Delete},
     };
@@ -1154,6 +1246,17 @@ bool accountDebugOpen(const std::string& sub, AccountPage& page) {
                 se.openGame(id);
                 se.runMock(1000.0);
                 se.take(Kind::GameDetailsResult, e);
+            }
+            // Save as GIF pressed: being made, or made (a real file in the GIF folder).
+            const game::AccountData& data = se.accountData();
+            if ((sub == "game-gif" || sub == "game-gif-making") && data.gameLoaded) {
+                const net::GameDetails& g = data.game;
+                net::GifOptions options;
+                options.orientation = g.you == 1 ? "black" : "white";
+                s.gifLast = true;
+                se.saveGameGif(gifOwner(g), g.id, options, gifFolder(),
+                               game::gifFileName(std::time_t(g.startedAtMs / 1000), g.white.name, g.black.name, g.id));
+                if (sub == "game-gif") se.runMock(4000.0);
             }
         }
         if (page == AccountPage::Devices) {

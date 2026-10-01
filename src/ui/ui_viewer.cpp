@@ -23,9 +23,11 @@
 //     online-mfa (code step), online-play, online-search, online-account, online-mfa-setup,
 //     online-recovery, online-challenge, online-private, online-noserver, direct, direct-host,
 //     direct-wait, direct-join; the account API's pages: online-history, online-game (a game of
-//     the history), online-devices, online-email, online-email-sent, online-export,
-//     online-export-done, online-delete; at the table: online-hud, online-pause, online-report,
-//     online-gameover
+//     the history), online-game-gif (its GIF saved: a file written to the GIF folder),
+//     online-game-gif-making (the GIF being made), online-devices, online-email,
+//     online-email-sent, online-export, online-export-done, online-delete; at the table:
+//     online-hud, online-pause, online-report, online-gameover; Saved games signed in:
+//     library-gif (Save as GIF enabled), library-gif-done (the selected game's GIF saved)
 //   --ui-tab <0..6|display|graphics|audio|gameplay|player|online|controls>   options tab
 //   --lang <code>   interface language (en fr de es uk ar ru ja zh-Hant zh-Hans; read by game::Settings)
 //   --ui-name <name>, --ui-hand <0..2>   player name / handwriting shown by Options > Player
@@ -189,6 +191,12 @@ public:
         if (screen == "calibration") ui::debug::openMenuPage(ui::debug::MenuPage::Calibration);
         if (screen == "watch") ui::debug::openMenuPage(ui::debug::MenuPage::Watch);
         if (screen == "library" || screen == "library-empty") ui::debug::openMenuPage(ui::debug::MenuPage::Library);
+        if (screen == "library-gif" || screen == "library-gif-done") {
+            ui::debug::openMenuPage(ui::debug::MenuPage::Library);
+            openOnline(screen);  // signed in to the fake server
+            menu_ = true;
+            if (screen == "library-gif-done") ui::debug::libraryGif();
+        }
         if (screen == "confirm") ui::debug::openPauseConfirm(1);
         if (screen == "gameover-folded") ui::debug::foldGameOver(true);
         if (screen.compare(0, 6, "online") == 0 || screen.compare(0, 6, "direct") == 0) openOnline(screen);
@@ -226,6 +234,7 @@ public:
             {"online-recovery", "recovery"}, {"online-challenge", "challenge"}, {"online-private", "private"},
             {"online-noserver", "noserver"}, {"direct", "direct"}, {"direct-host", "direct-host"}, {"direct-wait", "direct-wait"},
             {"direct-join", "direct-join"}, {"online-history", "history"}, {"online-game", "game"},
+            {"online-game-gif", "game-gif"}, {"online-game-gif-making", "game-gif-making"},
             {"online-devices", "devices"}, {"online-email", "email"}, {"online-email-sent", "email-sent"},
             {"online-export", "export"}, {"online-export-done", "export-done"}, {"online-delete", "delete"},
         };

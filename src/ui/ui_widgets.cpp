@@ -544,6 +544,15 @@ bool button(const std::string& label, const Rect& r, ButtonKind kind, bool enabl
     return it.activated;
 }
 
+void disabledButton(const std::string& label, const Rect& r, ButtonKind kind, const std::string& why) {
+    button(label, r, kind, false);
+    // An item of its own over the disabled one, for the tip only: hovered or focused, it shows a
+    // faint frame (the focus stops there) and the reason; activating it does nothing.
+    Item it = item(makeId(label + "##why"), r, ITEM_FOCUSABLE | ITEM_SILENT);
+    if (it.hoverT > 0.01f) gfx::stroke(r, withAlpha(gold, 0.3f * it.hoverT), 0.0f, 1.5f);
+    tooltip(why);
+}
+
 bool toggleRow(const std::string& label, bool& value, const Rect& r, bool enabled) {
     Item it = item(makeId(label), r, enabled ? ITEM_FOCUSABLE : ITEM_DISABLED);
     Anim& a = anim(it.id);
