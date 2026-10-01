@@ -42,7 +42,7 @@ struct ModelManifest {
     std::string hubBase;          // URL prefix of a file on the hub ("https://huggingface.co/<repo>/resolve/main/")
     std::string hubLabel;         // shown in the progress panel ("huggingface.co/csukuangfj2/...")
     std::string archiveUrl;       // the release archive (.tar.bz2)
-    std::string archiveLabel;     // shown in the progress panel ("github.com/k2-fsa/sherpa-onnx ...")
+    std::string archiveLabel;     // shown in the progress panel ("github.com/k2-fsa/sherpa-onnx")
     uint64_t archiveSize = 0;
     std::string archiveSha256;
     std::string archiveFolder;    // the folder of the files inside the archive

@@ -71,7 +71,7 @@ options.effects = المؤثرات
 options.ambience = الأجواء
 options.ambience.help = همهمة القاعة: النار، ووقع خطى بعيدة، والساعة القديمة.
 options.ambience_volume = صوت الأجواء
-options.voice_volume = صوت المدرّب
+options.voice_volume = مستوى صوت المدرّب
 options.voice_volume.help = مستوى صوت المدرّب في وضع المدرّب.
 options.subtitles = الترجمة النصية
 options.subtitles.auto = تلقائي
@@ -900,8 +900,8 @@ coach.note.unrated = المباريات مع المدرّب غير محتسبة 
 coach.colour = لونك
 coach.colour.help = اللون الذي تلعب به ضد المدرّب. بالتناوب: الأبيض ثم الأسود من مباراة إلى أخرى. يُلعب درس القواعد دائمًا بالقطع البيضاء.
 coach.colour.alternate = بالتناوب
-# Shown when the voice files (the coach folder next to the game) are missing.
-coach.no_voice = لم يُعثر على صوت المدرّب في مجلد coach: سيتحدث عبر الترجمة النصية فقط.
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = صوت المدرّب غير مثبّت أو متوقف (الخيارات > الصوت): ستظهر كلماته مكتوبةً على الشاشة.
 # At the table
 coach.speaker = المدرّب
 coach.skip = تخطّي
@@ -920,3 +920,44 @@ coach.gameover.unrated = هذه المباراة مع المدرّب غير مح
 coach.lesson.done = أحسنت
 coach.lesson.done.line = أصبحت تعرف قواعد الشطرنج.
 coach.lesson.next = المباراة الأولى
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = صوت المدرّب
+options.coach_voice.help = يتحدث المدرّب بصوت مسموع في وضع المدرّب. يُنزَّل نموذج صوته عند الحاجة إليه أول مرة (نحو 145 ميغابايت). إيقاف: تظهر كلمات المدرّب مكتوبةً على الشاشة فقط.
+# The prompt. {0} = the size in megabytes ("145.3")
+coach.download.title = صوت المدرّب
+coach.download.text = يتحدث المدرّب بواسطة Supertonic 3، وهو نموذج لتوليد الكلام من شركة Supertone. هذا النموذج غير مضمَّن في Scacelith: يمكن للعبة تنزيله الآن من Hugging Face ({0} ميغابايت، مرة واحدة). ومن دونه يكتب المدرّب كلماته على الشاشة.
+coach.download.licence = النموذج منشور بموجب ترخيص OpenRAIL-M، الذي يحظر بعض استخدامات الصوت الذي يولّده، مثل تقديمه على أنه صوت بشري أو انتحال شخصية شخص حقيقي.
+coach.download.read_licence = قراءة الترخيص
+coach.download.accept = باختيارك «تنزيل»، فإنك توافق على شروط هذا الترخيص.
+# {0} = a folder
+coach.download.folder = يُحفظ في: {0}
+coach.download.not_now = ليس الآن
+# {0} = the size in megabytes
+coach.download.download = تنزيل ({0} ميغابايت)
+coach.download.licence_title = ترخيص OpenRAIL-M
+coach.download.back = رجوع
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = صوت المدرّب
+coach.download.checking = جارٍ التحقق من الملفات…
+coach.download.downloading = جارٍ التنزيل…
+coach.download.extracting = جارٍ استخراج الملفات…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} ميغابايت
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = من Hugging Face
+coach.download.from_github = من GitHub (أرشيف الإصدار)
+coach.download.cancel = إلغاء
+coach.download.failed = تعذّر التنزيل.
+coach.download.error.network = تعذّر الوصول إلى الخوادم. يُرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.
+# {0} = a folder
+coach.download.error.disk = تعذّرت كتابة الملفات في {0}. يُرجى التحقق من المساحة الفارغة والمحاولة مرة أخرى.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = أرسلت الخوادم ردًّا غير متوقع ({0}). يُرجى المحاولة لاحقًا.
+coach.download.retry = إعادة المحاولة
+coach.download.close = إغلاق
+# Notices
+coach.download.done = تم تثبيت صوت المدرّب.
+coach.download.cancelled = أُلغي التنزيل: سيُستأنف في المرة القادمة من حيث توقف.

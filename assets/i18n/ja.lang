@@ -68,7 +68,7 @@ options.effects = 効果音
 options.ambience = 環境音
 options.ambience.help = 広間のざわめき：暖炉の火、遠くの足音、古い時計。
 options.ambience_volume = 環境音の音量
-options.voice_volume = コーチの声
+options.voice_volume = 音声の音量
 options.voice_volume.help = コーチモードでのコーチの声の音量。
 options.subtitles = 字幕
 options.subtitles.auto = 自動
@@ -896,8 +896,8 @@ coach.note.unrated = コーチとの対局はレーティング対象外です�
 coach.colour = あなたの色
 coach.colour.help = コーチと対局するときの色。交互：対局ごとに白と黒が入れ替わります。ルールのレッスンは常に白番です。
 coach.colour.alternate = 交互
-# Shown when the voice files (the coach folder next to the game) are missing.
-coach.no_voice = コーチの音声（coach フォルダー）が見つかりません。字幕だけで話します。
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = コーチの音声がインストールされていないか、オフになっています（設定 > サウンド）。コーチの言葉は画面に表示されます。
 # At the table
 coach.speaker = コーチ
 coach.skip = スキップ
@@ -916,3 +916,44 @@ coach.gameover.unrated = コーチとのこの対局はレーティング対象�
 coach.lesson.done = よくできました
 coach.lesson.done.line = これでチェスのルールを覚えました。
 coach.lesson.next = 最初の対局
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = コーチの音声
+options.coach_voice.help = コーチモードでコーチが声に出して話します。音声モデルは初めて必要になったときにダウンロードされます（約 145 MB）。オフ：コーチの言葉は画面に表示されるだけです。
+# The prompt. {0} = the size in megabytes ("145.3")
+coach.download.title = コーチの音声
+coach.download.text = コーチは Supertone 社の音声合成モデル Supertonic 3 で話します。このモデルは Scacelith に含まれていませんが、今すぐ Hugging Face からダウンロードできます（{0} MB、1 回のみ）。モデルがない場合、コーチは言葉を画面に表示します。
+coach.download.licence = このモデルは OpenRAIL-M ライセンスで公開されており、生成した音声を人間の声として示すことや、実在の人物をまねることなど、一部の使い方が禁止されています。
+coach.download.read_licence = ライセンスを読む
+coach.download.accept = 「ダウンロード」を選ぶと、このライセンスの条件に同意したことになります。
+# {0} = a folder
+coach.download.folder = 保存先：{0}
+coach.download.not_now = 今はしない
+# {0} = the size in megabytes
+coach.download.download = ダウンロード（{0} MB）
+coach.download.licence_title = OpenRAIL-M ライセンス
+coach.download.back = 戻る
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = コーチの音声
+coach.download.checking = ファイルを確認しています…
+coach.download.downloading = ダウンロードしています…
+coach.download.extracting = ファイルを展開しています…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Hugging Face から
+coach.download.from_github = GitHub から（リリースのアーカイブ）
+coach.download.cancel = キャンセル
+coach.download.failed = ダウンロードに失敗しました。
+coach.download.error.network = サーバーに接続できません。インターネット接続を確認して、もう一度お試しください。
+# {0} = a folder
+coach.download.error.disk = {0} にファイルを書き込めませんでした。空き容量を確認して、もう一度お試しください。
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = サーバーから予期しない応答がありました（{0}）。しばらくしてから、もう一度お試しください。
+coach.download.retry = 再試行
+coach.download.close = 閉じる
+# Notices
+coach.download.done = コーチの音声をインストールしました。
+coach.download.cancelled = ダウンロードを中止しました。次回は中断したところから再開します。

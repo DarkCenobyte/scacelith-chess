@@ -20,6 +20,10 @@ Data& data();
 void screensBeginFrame(float dt);
 void screensEndFrame();
 void screensReset();
+// The coach voice download (ui_model_download.cpp): the modal block of its prompt, called from
+// ui::beginFrame, and the title page's Coach entry (setCoachEntryHook).
+void modelDownloadBeginFrame();
+void coachEntryOpened();
 
 }  // namespace detail
 
@@ -35,6 +39,7 @@ void openOnlineMenu(const std::string& sub);
 void setOptionsTab(int tab);        // 0 Display, 1 Graphics, 2 Audio, 3 Gameplay, 4 Player, 5 Online, 6 Controls
 void openPauseConfirm(int which);   // 1 = resign, 2 = main menu (next pauseMenu() call)
 void foldGameOver(bool folded);
+void showModelLicence();            // the next modelPrompt() opens on the licence text
 }  // namespace debug
 
 }  // namespace ui

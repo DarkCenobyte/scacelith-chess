@@ -8,6 +8,10 @@
 //     (credits > Licences), coach-hud (a subtitle, the takeback offer card, the skip hint),
 //     coach-subtitle (a subtitle alone; --ui-text <text> replaces the sample line), coach-pause,
 //     coach-gameover, coach-lesson-done
+//   coach voice download (sample figures): coach-download (the prompt over the Coach page),
+//     coach-download-licence (its licence view), coach-download-hub / coach-download-github /
+//     coach-download-extracting / coach-download-failed (the progress panel; github over the
+//     title page)
 //   hot-seat (two players on one PC): newgame-hotseat (New Game with "Human, same PC"),
 //     hotseat-hud (players, caption, draw offer card), hotseat-confirm (named resignation),
 //     hotseat-gameover (both names and ratings)
@@ -42,6 +46,7 @@
 #include "../platform/platform.h"
 #include "../render/gpu.h"
 #include "../render/shader.h"
+#include "../tts/model_store.h"
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
@@ -152,6 +157,11 @@ public:
         if (screen == "coach" || screen == "coach-novoice") {
             ui::debug::openMenuPage(ui::debug::MenuPage::Coach);
             coach_.voiceAvailable = screen == "coach";
+        }
+        if (screen.compare(0, 14, "coach-download") == 0) {
+            ui::debug::openMenuPage(screen == "coach-download-github" ? ui::debug::MenuPage::Title : ui::debug::MenuPage::Coach);
+            coach_.voiceAvailable = false;
+            if (screen == "coach-download-licence") ui::debug::showModelLicence();
         }
         if (screen == "calibration") ui::debug::openMenuPage(ui::debug::MenuPage::Calibration);
         if (screen == "watch") ui::debug::openMenuPage(ui::debug::MenuPage::Watch);
@@ -287,7 +297,8 @@ public:
         const std::string& s = screen_;
         if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
         if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "credits" ||
-            s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || menu_) {
+            s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || menu_ ||
+            s.compare(0, 14, "coach-download") == 0) {
             a = ui::mainMenu(setup_, watch_, coach_);
         } else if (s == "coach-hud" || s == "coach-subtitle") {
             ui::Subtitle sub;
@@ -406,6 +417,7 @@ public:
         } else if (s == "hand") {
             handSheet();
         }
+        if (s.compare(0, 14, "coach-download") == 0) modelDownloadSample(s);
         ui::drawNotifications();
         if (a != ui::MenuAction::None) {
             LOGI("ui viewer: action %d", int(a));
@@ -413,6 +425,46 @@ public:
         }
         ui::endFrame();
         ++frames_;
+    }
+
+    // The coach voice download's prompt and progress panel with sample figures (nothing is
+    // downloaded here).
+    void modelDownloadSample(const std::string& s) {
+        const tts::ModelManifest& m = tts::supertonicManifest();
+        if (s == "coach-download" || s == "coach-download-licence") {
+            ui::ModelPrompt p;
+            p.bytes = double(m.totalBytes());
+            p.folder = tts::modelFolder();
+            ui::ModelPromptAction pa = ui::modelPrompt(p);
+            if (pa != ui::ModelPromptAction::None) LOGI("ui viewer: model prompt -> %d", int(pa));
+            return;
+        }
+        ui::ModelProgressView v;
+        if (s == "coach-download-hub") {
+            v.state = ui::ModelProgressView::State::Downloading;
+            v.done = 63.2e6;
+            v.total = double(m.totalBytes());
+            v.sourceLabel = m.hubLabel;
+            v.file = "vector_estimator.int8.onnx";
+        } else if (s == "coach-download-github") {
+            v.state = ui::ModelProgressView::State::Downloading;
+            v.done = 41.0e6;
+            v.total = double(m.archiveSize);
+            v.github = true;
+            v.sourceLabel = m.archiveLabel;
+            v.file = m.archiveName();
+        } else if (s == "coach-download-extracting") {
+            v.state = ui::ModelProgressView::State::Extracting;
+            v.done = 88.0e6;
+            v.total = double(m.archiveSize);
+            v.github = true;
+            v.sourceLabel = m.archiveLabel;
+        } else if (s == "coach-download-failed") {
+            v.state = ui::ModelProgressView::State::Failed;
+            v.error = i18n::tr("coach.download.error.network");
+        }
+        ui::ModelPanelAction pa = ui::modelProgressPanel(v);
+        if (pa != ui::ModelPanelAction::None) LOGI("ui viewer: model panel -> %d", int(pa));
     }
 
     void shutdown(AppContext&) override {

@@ -76,7 +76,7 @@ const ModelManifest& supertonicManifest() {
         r.hubBase = "https://huggingface.co/csukuangfj2/" + release + "/resolve/main/";
         r.hubLabel = "huggingface.co/csukuangfj2/" + release;
         r.archiveUrl = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/" + release + ".tar.bz2";
-        r.archiveLabel = "github.com/k2-fsa/sherpa-onnx (release tts-models)";
+        r.archiveLabel = "github.com/k2-fsa/sherpa-onnx";   // its release "tts-models"
         r.archiveSize = 128774318;
         r.archiveSha256 = "82fa96f91c4ef8abaae3a14a3f4153facf88bed821d1f7331cec2700f432c427";
         r.archiveFolder = release;

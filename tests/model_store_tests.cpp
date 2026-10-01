@@ -5,6 +5,8 @@
 // and bz2 modules (the generator is described with them).
 #include "test.h"
 #include "http_fake.h"
+#include "core/ini.h"
+#include "game/settings.h"
 #include "net/crypto.h"
 #include "net/net_sys.h"
 #include "tts/model_store.h"
@@ -687,6 +689,23 @@ TEST(model_store_resumes_and_cancels) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     CHECK(std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() < 1.5);
+}
+
+// [coach] voice: on by default, kept off once the player declined the download.
+TEST(coach_voice_setting_round_trip) {
+    game::Settings fresh;
+    CHECK(fresh.coachVoice);
+    IniFile empty;
+    game::readCoachSettings(empty, fresh);
+    CHECK(fresh.coachVoice);   // a file from before the key: on
+    game::Settings off;
+    off.coachVoice = false;
+    IniFile out;
+    game::writeCoachSettings(out, off);
+    CHECK_EQ(out.getString("coach.voice"), std::string("false"));
+    game::Settings back;
+    game::readCoachSettings(out, back);
+    CHECK(!back.coachVoice);
 }
 
 // The real thing, once, by hand (needs the network, not run by default):

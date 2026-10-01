@@ -76,7 +76,7 @@ options.effects = Effects
 options.ambience = Ambience
 options.ambience.help = The murmur of the hall: fire, distant footsteps, the old clock.
 options.ambience_volume = Ambience volume
-options.voice_volume = Coach voice
+options.voice_volume = Voice volume
 options.voice_volume.help = Volume of the coach's voice in Coach mode.
 options.subtitles = Subtitles
 options.subtitles.auto = Automatic
@@ -905,8 +905,8 @@ coach.note.unrated = Games with the coach are not rated.
 coach.colour = Your colour
 coach.colour.help = The colour you play against the coach. Alternate: White, then Black, from one game to the next. The lesson on the rules is always played with White.
 coach.colour.alternate = Alternate
-# Shown when the voice files (the coach folder next to the game) are missing.
-coach.no_voice = The coach's voice was not found (coach folder): it will speak through subtitles only.
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = The coach's voice is not installed or is switched off (Options > Audio): its words will be written on screen.
 # At the table
 coach.speaker = COACH
 coach.skip = Skip
@@ -925,3 +925,44 @@ coach.gameover.unrated = This game with the coach is not rated.
 coach.lesson.done = WELL DONE
 coach.lesson.done.line = You now know the rules of chess.
 coach.lesson.next = First game
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Coach voice
+options.coach_voice.help = The coach speaks aloud in Coach mode. Its voice model is downloaded the first time it is needed (about 145 MB). Off: the coach's words are only written on screen.
+# The prompt. {0} = the size in megabytes ("145.3")
+coach.download.title = The Coach's Voice
+coach.download.text = The coach speaks with Supertonic 3, a speech synthesis model by Supertone. It is not included with Scacelith: the game can download it now from Hugging Face ({0} MB, once). Without it, the coach writes its words on screen.
+coach.download.licence = The model is published under the OpenRAIL-M licence, which forbids certain uses of the voice it produces, such as presenting it as a human voice or imitating a real person.
+coach.download.read_licence = Read the licence
+coach.download.accept = By choosing Download, you accept the terms of this licence.
+# {0} = a folder
+coach.download.folder = Saved in: {0}
+coach.download.not_now = Not now
+# {0} = the size in megabytes
+coach.download.download = Download ({0} MB)
+coach.download.licence_title = OPENRAIL-M LICENCE
+coach.download.back = Back
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = THE COACH'S VOICE
+coach.download.checking = Checking the files…
+coach.download.downloading = Downloading…
+coach.download.extracting = Extracting the files…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = From Hugging Face
+coach.download.from_github = From GitHub (release archive)
+coach.download.cancel = Cancel
+coach.download.failed = The download failed.
+coach.download.error.network = The servers could not be reached. Please check your Internet connection and try again.
+# {0} = a folder
+coach.download.error.disk = The files could not be written in {0}. Please check the free space and try again.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = The servers sent an unexpected answer ({0}). Please try again later.
+coach.download.retry = Retry
+coach.download.close = Close
+# Notices
+coach.download.done = The coach's voice is installed.
+coach.download.cancelled = Download cancelled: it will resume where it stopped next time.

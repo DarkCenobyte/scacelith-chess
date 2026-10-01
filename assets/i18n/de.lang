@@ -68,7 +68,7 @@ options.effects = Effekte
 options.ambience = Atmosphäre
 options.ambience.help = Das Murmeln des Saals: Kaminfeuer, ferne Schritte, die alte Uhr.
 options.ambience_volume = Lautstärke der Atmosphäre
-options.voice_volume = Stimme des Trainers
+options.voice_volume = Lautstärke der Stimme
 options.voice_volume.help = Lautstärke der Stimme des Trainers im Trainer-Modus.
 options.subtitles = Untertitel
 options.subtitles.auto = Automatisch
@@ -895,8 +895,8 @@ coach.note.unrated = Partien mit dem Trainer werden nicht gewertet.
 coach.colour = Ihre Farbe
 coach.colour.help = Die Farbe, mit der Sie gegen den Trainer spielen. Abwechselnd: erst Weiß, dann Schwarz, von Partie zu Partie. Die Lektion über die Regeln wird immer mit Weiß gespielt.
 coach.colour.alternate = Abwechselnd
-# Shown when the voice files (the coach folder next to the game) are missing.
-coach.no_voice = Die Stimme des Trainers wurde nicht gefunden (Ordner coach): Er spricht nur über Untertitel.
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Die Stimme des Trainers ist nicht installiert oder ausgeschaltet (Optionen > Ton): Seine Worte werden auf dem Bildschirm angezeigt.
 # At the table
 coach.speaker = TRAINER
 coach.skip = Überspringen
@@ -915,3 +915,44 @@ coach.gameover.unrated = Diese Partie mit dem Trainer wird nicht gewertet.
 coach.lesson.done = GUT GEMACHT
 coach.lesson.done.line = Jetzt kennen Sie die Schachregeln.
 coach.lesson.next = Erste Partie
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Stimme des Trainers
+options.coach_voice.help = Der Trainer spricht im Trainer-Modus laut. Sein Stimmmodell wird heruntergeladen, wenn es zum ersten Mal gebraucht wird (etwa 145 MB). Aus: Die Worte des Trainers werden nur auf dem Bildschirm angezeigt.
+# The prompt. {0} = the size in megabytes ("145.3")
+coach.download.title = Die Stimme des Trainers
+coach.download.text = Der Trainer spricht mit Supertonic 3, einem Sprachsynthesemodell von Supertone. Es ist nicht in Scacelith enthalten: Das Spiel kann es jetzt von Hugging Face herunterladen ({0} MB, einmalig). Ohne das Modell schreibt der Trainer seine Worte auf den Bildschirm.
+coach.download.licence = Das Modell ist unter der Lizenz OpenRAIL-M veröffentlicht, die bestimmte Verwendungen der erzeugten Stimme verbietet, etwa sie als menschliche Stimme auszugeben oder eine reale Person nachzuahmen.
+coach.download.read_licence = Lizenz lesen
+coach.download.accept = Wenn Sie „Herunterladen“ wählen, akzeptieren Sie die Bedingungen dieser Lizenz.
+# {0} = a folder
+coach.download.folder = Gespeichert in: {0}
+coach.download.not_now = Nicht jetzt
+# {0} = the size in megabytes
+coach.download.download = Herunterladen ({0} MB)
+coach.download.licence_title = LIZENZ OPENRAIL-M
+coach.download.back = Zurück
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = DIE STIMME DES TRAINERS
+coach.download.checking = Dateien werden geprüft…
+coach.download.downloading = Wird heruntergeladen…
+coach.download.extracting = Dateien werden entpackt…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Von Hugging Face
+coach.download.from_github = Von GitHub (Release-Archiv)
+coach.download.cancel = Abbrechen
+coach.download.failed = Der Download ist fehlgeschlagen.
+coach.download.error.network = Die Server sind nicht erreichbar. Bitte prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.
+# {0} = a folder
+coach.download.error.disk = Die Dateien konnten nicht in {0} geschrieben werden. Bitte prüfen Sie den freien Speicherplatz und versuchen Sie es erneut.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Die Server haben eine unerwartete Antwort gesendet ({0}). Bitte versuchen Sie es später erneut.
+coach.download.retry = Erneut versuchen
+coach.download.close = Schließen
+# Notices
+coach.download.done = Die Stimme des Trainers ist installiert.
+coach.download.cancelled = Download abgebrochen: Er wird beim nächsten Mal dort fortgesetzt, wo er aufgehört hat.

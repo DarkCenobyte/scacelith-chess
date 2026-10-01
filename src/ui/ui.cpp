@@ -75,6 +75,7 @@ void beginFrame(int width, int height, float dt) {
     gfx::beginFrame(width, height);
     im::beginFrame(dt);
     detail::screensBeginFrame(dt);
+    detail::modelDownloadBeginFrame();   // the voice download prompt is modal
     g_inFrame = true;
 }
 
