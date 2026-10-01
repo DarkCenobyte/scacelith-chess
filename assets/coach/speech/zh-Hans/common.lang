@@ -1,0 +1,133 @@
+# Coach speech (Simplified Chinese, mainland): the building blocks every line uses
+# (src/coach/catalog.cpp renders them). Same keys as assets/coach/speech/en/common.lang.
+# Subtitle text only: the Chinese voice speaks the English line, so every ".spoken" key below is
+# the English value, copied unchanged (required by the parity tests, never used).
+# Register: the coach says 你 (never 您), as the game's interface and the opening texts do.
+# Chess words as in assets/i18n/zh-Hans.lang and the opening texts: 兵 马 象 车 后 王, 将军, 将死,
+# 逼和, 和棋, 王车易位 (短易位 / 长易位), 吃过路兵, 升变, 捉双, 牵制, 棋钟, 对局记录表, 等级分.
+# Squares are written "e4" with no space around them ("走到e4"); files "c线"; ranks "第二横线".
+# Punctuation: full-width (，。！？：“”), as in the interface.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Chinese has no gender or case: the possessive 你的 / 我的 goes in front of the noun. Forms:
+#   nom   你的车 / 我的马     "用{your}。" (the default form)
+#   bare  车 / 马 (no owner)  for a sentence where the owner is already clear: Chinese does not
+#                             repeat 你的 ("用{your:bare}吃掉它。").
+piece.pawn.nom = 兵
+piece.knight.nom = 马
+piece.bishop.nom = 象
+piece.rook.nom = 车
+piece.queen.nom = 后
+piece.king.nom = 王
+piece.pawn.bare = 兵
+piece.knight.bare = 马
+piece.bishop.bare = 象
+piece.rook.bare = 车
+piece.queen.bare = 后
+piece.king.bare = 王
+owner.your.nom = 你的{piece}
+owner.my.nom = 我的{piece}
+owner.your.bare = {piece}
+owner.my.bare = {piece}
+
+# ---- Squares, files and ranks (spoken: the English values, unused) ----------------------------------
+square.spoken = {file} {rank}
+file.a.spoken = ay
+file.b.spoken = bee
+file.c.spoken = see
+file.d.spoken = dee
+file.e.spoken = ee
+file.f.spoken = eff
+file.g.spoken = gee
+file.h.spoken = aitch
+rank.1.spoken = one
+rank.2.spoken = two
+rank.3.spoken = three
+rank.4.spoken = four
+rank.5.spoken = five
+rank.6.spoken = six
+rank.7.spoken = seven
+rank.8.spoken = eight
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Written moves are figurine notation. "{move:letters}" shows the Chinese piece names of the
+# scoresheet (assets/i18n/zh-Hans.lang scoresheet.pieces), in the order king queen rook bishop
+# knight: "马f3", "后xf7".
+move.letters = 王 后 车 象 马
+# Spoken moves: the English values, unused.
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} takes {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} takes {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} takes {to}
+move.recapture.spoken = {piece} takes
+move.castle_short.spoken = castles kingside
+move.castle_long.spoken = castles queenside
+move.promotion.spoken = {move}, promoting to a {piece}
+move.check.spoken = {move}, check
+move.mate.spoken = {move}, checkmate
+moves.join.spoken = {a}, {b}
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Written numbers are digits. Spoken: the English values, unused.
+number.0.spoken = zero
+number.1.spoken = one
+number.2.spoken = two
+number.3.spoken = three
+number.4.spoken = four
+number.5.spoken = five
+number.6.spoken = six
+number.7.spoken = seven
+number.8.spoken = eight
+number.9.spoken = nine
+number.10.spoken = ten
+number.11.spoken = eleven
+number.12.spoken = twelve
+number.13.spoken = thirteen
+number.14.spoken = fourteen
+number.15.spoken = fifteen
+number.16.spoken = sixteen
+number.17.spoken = seventeen
+number.18.spoken = eighteen
+number.19.spoken = nineteen
+number.20.spoken = twenty
+number.30.spoken = thirty
+number.40.spoken = forty
+number.50.spoken = fifty
+number.60.spoken = sixty
+number.70.spoken = seventy
+number.80.spoken = eighty
+number.90.spoken = ninety
+number.tens.spoken = {tens}-{units}
+number.hundreds.spoken = {n} hundred
+number.hundreds_rest.spoken = {hundreds} and {rest}
+number.minus.spoken = minus {n}
+# A decimal number: {int} and {frac} (one digit), with a decimal point as in mainland usage.
+number.decimal = {int}.{frac}
+number.decimal.spoken = {int} point {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# A single form (Chinese has no plural): number + measure word + noun, no space ("3步", "2个兵").
+# Moves and mistakes are counted with 步 ("1步漏着"), games with 盘, times with 次.
+count.move = {n}步
+count.point = {n}分
+count.pawn = {n}个兵
+count.piece = {n}个子
+count.mistake = {n}步错着
+count.blunder = {n}步漏着
+count.inaccuracy = {n}步不精确着法
+count.game = {n}盘棋
+count.time = {n}次
+count.square = {n}格
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = minus {x}
+eval.even = 0.0
+eval.even.spoken = level
+eval.mate_win = {n}步将死
+eval.mate_loss = {n}步被将死

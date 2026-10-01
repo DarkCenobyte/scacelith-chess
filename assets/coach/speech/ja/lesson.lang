@@ -1,0 +1,300 @@
+# Coach speech (Japanese): the rules lesson (level 0, src/coach/lesson.cpp; research-pedagogy §3).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("あなたのルーク", "私のナイト");
+# {your:bare} = the piece name alone, used when the owner is clear ("{your:bare}を使いましょう");
+# {sq}, {sq2}, {to}, {esc} = squares; {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach
+# points at something while saying the word right after the mark. A ".spoken" key is what the voice
+# says instead: Latin letters, digits and counters in kana ("ふたマス", "さんてん", "いってで").
+# Rules the lines follow: files = ファイル, ranks = ランク ("第2ランク"), back rank = バックランク;
+# "{sq}へ" / "{sq}の", never "{sq}に" (rank 2 is spoken "に").
+
+# ---- Chapter titles (said inside "{chapter}の続きから始めましょう。") ------------------------------------
+lesson.title.welcome = チェス盤
+lesson.title.pieces = 駒の動き方
+lesson.title.safety = 安全な取り方と危ない取り方
+lesson.title.check = チェック
+lesson.title.mate = チェックメイト
+lesson.title.castling = キャスリング
+lesson.title.en_passant = アンパッサン
+lesson.title.promotion = プロモーション
+lesson.title.draws = ステイルメイトと引き分け
+lesson.title.etiquette = 実戦のレーティング、時計、マナー
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = では、やってみてください。
+lesson.now_you.2 = 今度はあなたの番です。
+lesson.now_you.3 = さあ、どうぞ。
+# Another wrong move after the demonstration.
+lesson.almost = 惜しい！私が見せた手を指してみましょう。
+lesson.almost.2 = 少し違います。お手本の手を試してください。
+lesson.almost.3 = あと少し。今見せたことを思い出してください。
+# A wrong move without a line of its own.
+lesson.try_again = その手ではありません。もう一度やってみましょう。
+lesson.try_again.2 = これは違いますね。もう一回どうぞ。
+lesson.try_again.3 = もう一度挑戦しましょう。
+lesson.use_your = {your:bare}を使いましょう。
+lesson.use_your.2 = {your:bare}で試してみましょう。
+lesson.watch = 見ていてください。
+lesson.like_this = こんなふうに。
+lesson.and_back = そして、元に戻します。
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = チェックですが、私のキングは{esc}へ逃げます。
+lesson.check_takes = チェックですが、私のキングがあっさり{your:bare}を取ります。
+lesson.check_block = チェックですが、間に駒を置いて防げます。
+lesson.check_block.spoken = チェックですが、あいだに駒を置いて防げます。
+lesson.stalemate = ステイルメイト！キングは動けず、チェックもなし。勝っていたのに引き分けです！
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = {sq}は{my}が狙っています。キングは危ないマスに入れません。
+why.PathBlocked = {@}通り道に駒があります。ナイト以外は、駒を飛び越えられません。
+why.WrongGeometry = {your:bare}は、そういう動き方はしません。
+why.MustAnswerCheck = {@}チェックされています。まずチェックを防がないといけません。
+why.CastlingThroughCheck = キングが通る{sq}を、{my}が狙っています。
+why.CastlingNoRights = そのキングかルークは、もう動いています。キャスリングはできません。
+why.CastlingBlocked = キャスリングには、キングとルークの間のマスが空いている必要があります。
+why.CastlingBlocked.spoken = キャスリングには、キングとルークのあいだのマスが、あいている必要があります。
+why.CastlingOutOfCheck = チェックされているときは、キャスリングできません。
+why.PawnForwardBlocked = ポーンは真正面の駒を取れません。そのマスは{@}ふさがっています。
+why.LeavesKingInCheck = その{your:bare}はピンされていて、動かすとキングが{my}に狙われます。
+why.OwnPieceOnTarget = 自分の駒がいるマスには行けません。
+why.PawnCaptureNeedsVictim = ポーンがななめに進むのは、駒を取るときだけです。
+why.EnPassantExpired = アンパッサンは、ポーンが2マス進んだ直後にしかできません。
+why.EnPassantExpired.spoken = アンパッサンは、ポーンがふたマス進んだ直後にしかできません。
+why.NotYourTurn = 待ってください。今は私の番です。
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = こんにちは！コーチです。チェスのルールを、一歩ずつ一緒に学びましょう。
+lesson.welcome.board = これがチェス盤です。白と黒のマスが、縦横8つずつ並んだ64マスです。
+lesson.welcome.board.spoken = これがチェス盤です。白と黒のマスが、たてよこやっつずつ並んだ、ろくじゅうよんマスです。
+lesson.welcome.light = 手前の{@}右隅は、いつも白マスです。「右手前は白」と覚えましょう。
+lesson.welcome.files = 縦の列をファイルといいます。{@}aから{@2}hまでの文字で表します。
+lesson.welcome.files.spoken = たての列をファイルといいます。{@}エーから{@2}エイチまでの文字で表します。
+lesson.welcome.ranks = 横の列をランクといいます。手前から順に{@}1から{@2}8までの数字です。
+lesson.welcome.ranks.spoken = よこの列をランクといいます。手前から順に{@}いちから{@2}はちまでの数字です。
+lesson.welcome.square = マスは、文字、数字の順で呼びます。このマスは{sq}です。
+lesson.welcome.square2 = そして、こちらは{sq}です。
+lesson.welcome.kings = これが両方のキングです。あなたのキングは{sq}、私のは{sq2}です。
+lesson.welcome.ask = やってみましょう。キングを1マス前の{sq}へ動かしてください。
+lesson.welcome.ask.spoken = やってみましょう。キングをひとマス前の{sq}へ動かしてください。
+lesson.welcome.wrong = そこは{to}です。目指すのは{sq}、文字はe、数字は2です。
+lesson.welcome.wrong.spoken = そこは{to}です。目指すのは{sq}、文字はイー、数字は、にです。
+lesson.welcome.ok = 完璧です。これでキングは{sq}のマスにいます。
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = これが{your:bare}です。ファイルとランクに沿って、まっすぐどこまでも進めます。
+lesson.rook.lines = ファイルを上へ、{@}またはランクに沿って横へ。
+lesson.rook.capture = 駒を取るには、{@}相手の駒のマスへ移ります。取った駒は盤から外します。
+lesson.rook.ask = ルークで{my}を取りましょう！
+lesson.rook.short = 方向は合っています！そのまま{my}まで上へ進みましょう。
+lesson.rook.rank = それはランクに沿った動きです。{my}は、このファイルの先にいます。
+lesson.rook.king = それはキングです。隅にある{your:bare}を使いましょう。
+lesson.rook.ok = 取りました！{my}は盤の外へ。
+# Pieces don't jump
+lesson.jump.blocked = 駒は飛び越えられません。{sq}のポーンが、ルークの道をふさいでいます。
+lesson.jump.knight = 飛び越えられるのはナイトだけです。すぐに出てきますよ。
+# Bishop
+lesson.bishop.intro = これが{your:bare}です。ななめに、どこまでも進めます。
+lesson.bishop.colour = ビショップは、いつも同じ色のマスの上を動きます。
+lesson.bishop.ask = {my}が、ビショップのななめの線上にいます。取りましょう！
+lesson.bishop.short = ななめは合っています！{my}まで、もっと進みましょう。
+lesson.bishop.other = それは反対のななめです。{my}の方向を見てください。
+lesson.bishop.ok = 素晴らしい！ビショップは長いななめで力を発揮します。
+# Queen
+lesson.queen.intro = これが最強の駒、{your:bare}です。ルークとビショップの動きを兼ねます。
+lesson.queen.ask = {my}を見つけて、クイーンで取りましょう。
+lesson.queen.wrong = クイーンなら、ななめに一気に{my}まで届きます。
+lesson.queen.ok = よくできました！クイーンは価値が高いので、大事にしましょう。
+# King
+lesson.king.intro = キングは、どの方向にも1マスだけ動けます。
+lesson.king.intro.spoken = キングは、どの方向にもひとマスだけ動けます。
+lesson.king.important = キングは一番大切な駒です。追い詰められたら負けです。
+lesson.king.ask = キングも駒を取れます。{my}を取りましょう！
+lesson.king.wrong = キングは{my}のすぐ隣です。そのマスに移って取りましょう。
+lesson.king.ok = いいですね！キングは足が遅いけれど、近くの相手には強いんです。
+# Knight
+lesson.knight.intro = これが{your:bare}です。L字に動きます。まっすぐ2マス、横に1マス。
+lesson.knight.intro.spoken = これが{your:bare}です。エル字に動きます。まっすぐふたマス、横にひとマス。
+lesson.knight.l = {@}このように。着地するのは、いつも反対の色のマスです。
+lesson.knight.jump = 他の駒を飛び越えられるのは、ナイトだけです。
+lesson.knight.ask = ナイトで{my}を取りましょう！
+lesson.knight.wrong = 動きは正しいですが、{my}に届きません。別のL字を試しましょう。
+lesson.knight.wrong.spoken = 動きは正しいですが、{my}に届きません。別のエル字を試しましょう。
+lesson.knight.ok = 見事なジャンプです！
+# Pawn: moving
+lesson.pawn.intro = 次は{your:bare}です。まっすぐ前に1マスずつ進み、後ろには戻れません。
+lesson.pawn.intro.spoken = 次は{your:bare}です。まっすぐ前にひとマスずつ進み、後ろには戻れません。
+lesson.pawn.first = ポーンが最初に動くときは、1マスか2マス進めます。
+lesson.pawn.first.spoken = ポーンが最初に動くときは、ひとマスかふたマス進めます。
+lesson.pawn.ask = ポーンを2マス前に進めましょう。
+lesson.pawn.ask.spoken = ポーンをふたマス前に進めましょう。
+lesson.pawn.one = それは1マスです。正しい手ですが、今回は2マス進めましょう。
+lesson.pawn.one.spoken = それはひとマスです。正しい手ですが、今回はふたマス進めましょう。
+lesson.pawn.use = ポーンを使いましょう。
+lesson.pawn.ok = いいですね。
+# Pawn: capturing
+lesson.pawncap.blocked = 私のポーンが前をふさいでいます。ポーンは真正面の駒を取れません。
+lesson.pawncap.diagonal = でも、ポーンはななめ前1マスの駒なら取れます。
+lesson.pawncap.diagonal.spoken = でも、ポーンはななめ前ひとマスの駒なら取れます。
+lesson.pawncap.ask = ポーンで{my}を取りましょう。
+lesson.pawncap.use = {your:bare}を使いましょう。ななめ前の駒を取れます。
+lesson.pawncap.ok = そうです！進むときはまっすぐ、取るときはななめ。
+# Values, set-up and the first moves
+lesson.values.pawn = 駒にはそれぞれ点数があります。ポーンは1点です。
+lesson.values.pawn.spoken = 駒にはそれぞれ点数があります。ポーンはいってんです。
+lesson.values.pieces = ナイトと{@}ビショップは3点、{@2}ルークは5点、{@3}クイーンは9点です。
+lesson.values.pieces.spoken = ナイトと{@}ビショップはさんてん、{@2}ルークはごてん、{@3}クイーンはきゅうてんです。
+lesson.values.king = キングには値段がつけられません。絶対に手放せない駒だからです。
+lesson.values.trade = 駒を、その価値より安く手放さないようにしましょう。
+lesson.setup.corners = どの対局もこの配置から。{@}隅にルーク、次に{@2}ナイト、その次に{@3}ビショップ。
+lesson.setup.queen = クイーンは自分の色のマスに置きます。あなたのクイーンは白マスに。
+lesson.setup.king = キングはその隣です。そして、先に指すのはいつも白です。
+lesson.first.ask = 対局開始です。キングの前のポーンを2マス、{sq}へ進めましょう。
+lesson.first.ask.spoken = 対局開始です。キングの前のポーンをふたマス、{sq}へ進めましょう。
+lesson.first.wrong = それも正しい手です！今は、キングの前のポーンを{sq}へ進めましょう。
+lesson.first.ok = 素晴らしい初手です。クイーンとビショップの通り道が開きました。
+lesson.first.reply = 私も同じ手で応じます。次はナイトを、{sq}から{sq2}へ出しましょう。
+lesson.first.knight_wrong = ナイトはポーンを飛び越えます。{sq}から{sq2}へ動かしてみましょう。
+lesson.first.knight_ok = 完璧です。ナイトとビショップは早めに出しましょう。
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = 味方の駒が取り返せるとき、その駒は守られています。
+lesson.safety.pawn = 私の{@}ポーンが{my:bare}を守っています。
+lesson.safety.free = でも{my}を守る駒はいません。あなたのクイーンは、どちらも狙えます。
+lesson.safety.ask = 守りのない駒を取りましょう！
+lesson.safety.watch = どうなるか見ていてください。
+lesson.safety.gave = 9点のクイーンを、3点のナイトと引き換えにしてしまいました。
+lesson.safety.gave.spoken = きゅうてんのクイーンを、さんてんのナイトと引き換えにしてしまいました。
+lesson.safety.other = もう一方の駒を狙ってみましょう。
+lesson.safety.look = 何にも守られていない駒を探しましょう。
+lesson.safety.ok = 素晴らしい！いつも「その駒は守られている？」と確かめましょう。
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = 私のルークが、第2ランク全体を押さえています。
+lesson.danger.rank.spoken = 私のルークが、だいにランク全体を押さえています。
+lesson.danger.rule = キングは、取られるマスへは決して動けません。
+lesson.danger.ask = キングを安全なマスへ動かしましょう。
+lesson.danger.ok = そうです。そこならキングは安全です。
+lesson.check.what = 私のルークが、あなたのキングを攻撃しています。これがチェックです。
+lesson.check.must = チェックされたら、すぐにチェックをかわさなければなりません。
+lesson.check.ways = 方法は3つ。{@}キングを動かす、{@2}間に駒を置く、{@3}攻めている駒を取る。
+lesson.check.ways.spoken = 方法はみっつ。{@}キングを動かす、{@2}あいだに駒を置く、{@3}攻めている駒を取る。
+lesson.check.ask = ここでは、キングを動かしてチェックをかわしましょう。
+lesson.check.file = {to}は、まだ{@}私のルークのファイル上です。その線から外れましょう。
+lesson.check.ok = いいですね。チェックをかわせました。
+lesson.block.again = またチェックです！今度はキングの逃げ場がありません。
+lesson.block.ask = では、間に駒を置いて防ぎましょう。
+lesson.block.ask.spoken = では、あいだに駒を置いて防ぎましょう。
+lesson.block.queen = 防げました！でもクイーンが取られます。もっと安い駒で防ぎましょう。
+lesson.block.queen_ok = これでも大丈夫。ただ、防ぐなら一番安い駒で、と覚えましょう。
+lesson.block.ok = 完璧です。防ぐときは、価値の一番低い駒で。
+lesson.capture.check = 私のクイーンが、キングのすぐ隣でチェックしています。
+lesson.capture.ask = 攻めている駒を取りましょう！
+lesson.capture.king_ok = そうです！クイーンに守りがなかったので、キングで取れました。
+lesson.capture.knight_ok = そうです！ナイトが攻めている駒を取り除きました。
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = チェックされて逃げ道がない状態がチェックメイト。これで勝ちです。
+lesson.mate1.stuck = 私のキングは、{@}自分のポーンの後ろで動けません。
+lesson.mate1.ask = 1手でチェックメイトしましょう！
+lesson.mate1.ask.spoken = いってでチェックメイトしましょう！
+lesson.mate1.wrong = 惜しい！キングが逃げられないバックランクで、チェックしましょう。
+lesson.mate1.ok = チェックメイト！これがバックランクメイトです。覚えておきましょう！
+lesson.mate2.ask = キングとクイーンが力を合わせます。1手でチェックメイトしましょう。
+lesson.mate2.ask.spoken = キングとクイーンが力を合わせます。いってでチェックメイトしましょう。
+lesson.mate2.wrong = 私のキングの逃げ場が一つもなくなるチェックを探しましょう。
+lesson.mate2.ok = チェックメイト！あなたのキングが守るので、クイーンは取れません。
+lesson.mate2.ok_rank = バックランクでチェックメイト！逃げ道はあなたのキングが押さえています。
+lesson.mate3.edge = 第7ランクのルークが、私のキングを端に閉じ込めています。
+lesson.mate3.edge.spoken = だいななランクのルークが、私のキングをはしに閉じ込めています。
+lesson.mate3.ask = では、{your:bare}でチェックメイトしましょう。
+lesson.mate3.free = チェックですが、第7ランクが空いたので、私のキングは逃げられます。
+lesson.mate3.free.spoken = チェックですが、だいななランクがあいたので、私のキングは逃げられます。
+lesson.mate3.takes = 私のキングがあっさりルークを取ります。
+lesson.mate3.hint = 第7ランクにいない方のルークを使い、バックランクでチェックしましょう。
+lesson.mate3.hint.spoken = だいななランクにいない方のルークを使い、バックランクでチェックしましょう。
+lesson.mate3.ok = チェックメイト！両方のルークが、はしごのように連携しました。
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = キャスリングはキングを守る特別な手。キングとルークが同時に動きます。
+lesson.castle.how = {@}キングがルークの方へ2マス動き、{@2}ルークはキングを飛び越えて反対側へ。
+lesson.castle.how.spoken = {@}キングがルークの方へふたマス動き、{@2}ルークはキングを飛び越えて反対側へ。
+lesson.castle.ask = 必ずキングから触ります。では、キングサイドにキャスリングしましょう。
+lesson.castle.rook = それはルークだけの動きです。キングをルーク側へ2マス動かしましょう。
+lesson.castle.rook.spoken = それはルークだけの動きです。キングをルーク側へふたマス動かしましょう。
+lesson.castle.long = クイーンサイドのキャスリングも正しい手です！今回は近いルークの方へ。
+lesson.castle.one = 1マスは普通のキングの動きです。キャスリングでは2マス動きます。
+lesson.castle.one.spoken = ひとマスは普通のキングの動きです。キャスリングではふたマス動きます。
+lesson.castle.other = キャスリングするには、キングを{sq}のルークの方へ2マス動かします。
+lesson.castle.other.spoken = キャスリングするには、キングを{sq}のルークの方へふたマス動かします。
+lesson.castle.ok = キャスリング完了！キングは安全な場所に収まり、ルークも活躍できます。
+lesson.castle2.moved = キングかそのルークがすでに動いていたら、キャスリングはできません。
+lesson.castle2.attacked = チェック中や、キングの通り道や行き先が狙われている時もできません。
+lesson.castle2.bishop = 私のビショップが{sq}を狙っています。今は、こちら側にキャスリングできません。
+lesson.castle2.ask = 反対側にキャスリングしましょう。
+lesson.castle2.other = もう一方のルーク、クイーンサイドの方へキャスリングしましょう。
+lesson.castle2.ok = 正解！クイーンサイドのキャスリングで、キングは{sq}へ行きます。
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = アンパッサンは、ポーンの特別な取り方です。「通りがけに」という意味です。
+lesson.ep.watch = 私のポーンに注目。2マス進んで、あなたのポーンの真横に来ます。
+lesson.ep.watch.spoken = 私のポーンに注目。ふたマス進んで、あなたのポーンの真横に来ます。
+lesson.ep.how = 私のポーンが1マスだけ進んだとみなして、{sq}へ動いて取れます。
+lesson.ep.how.spoken = 私のポーンがひとマスだけ進んだとみなして、{sq}へ動いて取れます。
+lesson.ep.now = ただし、できるのは今この手だけ。アンパッサンで取りましょう！
+lesson.ep.gone = チャンスは消えました。アンパッサンは直後だけ。もう一度やりましょう。
+lesson.ep.ok = アンパッサン！{sq}の私のポーンは盤から外れます。
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = ポーンが最終ランクに着くとプロモーション。キングとポーン以外の駒に変身します。
+lesson.promo.ask = 選ぶのはほとんどの場合クイーンです。では、プロモーションしましょう！
+lesson.promo.under = それも可能です！でもクイーンの方が強いので、クイーンを選びましょう。
+lesson.promo.under_ok = それでも構いません。ただ、ほとんどの人はクイーンを選びます。
+lesson.promo.push = ポーンを最終ランクの{sq}まで進めましょう。
+lesson.promo.ok = 新しいクイーンの誕生です！クイーンを同時に2つ持つこともできます。
+lesson.promo.ok.spoken = 新しいクイーンの誕生です！クイーンを同時にふたつ持つこともできます。
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = 私の番です。キングはチェックされていませんが、{@}周りは全部狙われています。
+lesson.stale.draw = 私には指せる手がありません。これがステイルメイト、引き分けです。
+lesson.stale2.ask = 勝っている時はステイルメイトに注意！1手でチェックメイトしましょう。
+lesson.stale2.ask.spoken = 勝っている時はステイルメイトに注意！いってでチェックメイトしましょう。
+lesson.stale2.wrong = 私のキングが逃げられないバックランクで、チェックしましょう。
+lesson.stale2.ok = チェックメイト！メイトする時以外は、相手に指せる手を残しましょう。
+lesson.draws.kings = ほかにも、キング同士だけなど、どちらもメイトできなければ引き分けです。
+lesson.draws.agree = 両者の合意で、引き分けにすることもできます。
+lesson.draws.repeat = 同じ局面が3回、または駒取りもポーンの移動もない50手で、引き分けにできます。
+lesson.draws.repeat.spoken = 同じ局面がさんかい、または駒取りもポーンの移動もないごじゅってで、引き分けにできます。
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = これでチェスのルールは全部覚えました。よくできました！
+lesson.talk.real = では、実際の対局がどう行われるかお話しします。
+lesson.talk.elo = Eloというレーティングがあり、勝てば上がり、負ければ下がります。
+lesson.talk.elo.spoken = イロというレーティングがあり、勝てば上がり、負ければ下がります。
+lesson.talk.elo_gap = 強い相手に勝つと多く上がり、弱い相手に負けると多く下がります。
+lesson.talk.elo_start = レーティング戦を5局指すと、レーティングが出ます。コーチ戦は練習なので対象外です。
+lesson.talk.elo_start.spoken = レーティング戦をごきょく指すと、レーティングが出ます。コーチ戦は練習なので対象外です。
+lesson.talk.clock = これが{@}対局時計です。各自の持ち時間は、自分の手番の間だけ減ります。
+lesson.talk.press = 駒を動かした手で時計を押します。すると私の時間が動き出します。
+lesson.talk.flag = 時間切れは負けです。ただし、私にメイトの手段がない場合は別です。
+lesson.talk.increment = 「5＋3」は、持ち時間が各5分、1手ごとに3秒加算という意味です。
+lesson.talk.increment.spoken = 「ごプラスさん」は、持ち時間がそれぞれごふん、いってごとにさんびょう加算という意味です。
+lesson.talk.speeds = 短い対局はブリッツ、長めはラピッド、最も長いのはクラシカル。
+lesson.talk.no_clock = 私との対局では時計は使いません。好きなだけ考えてください。
+lesson.talk.touch = 実戦では、自分の駒に触れたら、その駒を動かさなければなりません。
+lesson.talk.touch_mine = 私の駒に触れたら、取れる場合はその駒を取らなければなりません。
+lesson.talk.adjust = 駒を動かさずに位置を直すときは、先に「アジャスト」と言います。
+lesson.talk.release = 新しいマスで駒から手を離したら、その手は確定です。
+lesson.talk.sheet = 大会では、両者がすべての手を{@}棋譜用紙に書きます。
+lesson.talk.notation = 駒の頭文字とマスを、{move:letters}のように書きます。ポーンはマスだけです。
+lesson.talk.robot = あなたのロボットが、代わりに棋譜をつけます。速い対局では記録は不要です。
+lesson.talk.handshake = 対局は握手に始まり握手に終わります。挨拶と感謝のしるしです。
+lesson.talk.polite = 勝っても負けても礼儀正しく。相手の考慮中は邪魔をしないように。
+lesson.talk.tips = コツは3つ。{@}センターを押さえ、{@2}ナイトとビショップを出し、{@3}早めにキャスリング。
+lesson.talk.tips.spoken = コツはみっつ。{@}センターを押さえ、{@2}ナイトとビショップを出し、{@3}早めにキャスリング。
+lesson.talk.next = 準備ができたら「はじめの一歩」へ。やさしく指し、ミスのたびに手伝います。
+lesson.talk.welcome = チェスの世界へようこそ！握手しましょう。
