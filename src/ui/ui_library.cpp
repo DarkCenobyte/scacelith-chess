@@ -776,6 +776,8 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         s.confirmDelete = false;
         s.truncatedShown = false;
         s.scroll = s.target;
+        // A GIF of a saved game made on an earlier visit is not shown again (one being made is).
+        if (game::onlineSession().gif().owner().compare(0, 8, "library:") == 0) game::onlineSession().clearGif();
         requestListing(s);
         pollListing(s, 250);
     } else {

@@ -238,6 +238,7 @@ struct State {
     int savedIndex = 0;
     bool replayWanted = false;
     bool gifLast = false;    // the message under the buttons is the GIF's (the last action was Save as GIF)
+    uint64_t gifGame = 0;    // the game gifLast is about (0: the page was opened again since)
     bool reportOpen = false;
     int reportCategory = 0;
     std::string reportComment;
@@ -587,6 +588,12 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         s.reportOpen = false;
         if (!loaded && data.gameWanted && !se.busy(Kind::GameDetailsResult)) se.openGame(data.gameWanted);
     }
+    // Another game shown, or the page opened again after leaving it: the line under the buttons
+    // tells of the game's GIF only while one is being made (one saved before is not shown again).
+    if (loaded && s.gifGame != g.id) {
+        s.gifGame = g.id;
+        s.gifLast = se.gif().busy() && se.gif().owner() == gifOwner(g);
+    }
     // Is it in the saved games already?
     if (loaded && canSave && s.saveId != g.id && !s.saveJob.valid()) {
         s.saveId = g.id;
@@ -803,6 +810,7 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         return AccountNav::Stay;
     }
     if (back || im::consumeBack()) nav = AccountNav::History;
+    if (nav != AccountNav::Stay) s.gifGame = 0;
     return nav;
 }
 
@@ -1256,6 +1264,7 @@ bool accountDebugOpen(const std::string& sub, AccountPage& page) {
                 net::GifOptions options;
                 options.orientation = g.you == 1 ? "black" : "white";
                 s.gifLast = true;
+                s.gifGame = g.id;
                 se.saveGameGif(gifOwner(g), g.id, options, gifFolder(),
                                game::gifFileName(std::time_t(g.startedAtMs / 1000), g.white.name, g.black.name, g.id));
                 if (sub == "game-gif") se.runMock(4000.0);
