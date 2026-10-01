@@ -68,6 +68,11 @@ options.effects = 音效
 options.ambience = 環境音
 options.ambience.help = 大廳裡的低語：爐火、遠處的腳步聲、古老的時鐘。
 options.ambience_volume = 環境音音量
+options.voice_volume = 語音音量
+options.voice_volume.help = 教練模式中教練語音的音量。
+options.subtitles = 字幕
+options.subtitles.auto = 自動
+options.subtitles.help = 在畫面下方顯示教練說的話。自動：教練說的語言與選單語言不同時顯示（中文選單下教練說英語）。未安裝教練語音時一律顯示。
 
 options.legal_moves = 顯示合法著法
 options.legal_moves.help = 標示所摸棋子可以到達的格子。關閉後，不會有任何提示告訴你著法是否合法：一按下棋鐘，裁判就會處罰違例著法。
@@ -111,6 +116,10 @@ controls.moves.keys = Tab
 controls.moves = 顯示或隱藏著法列表
 controls.menu.keys = Esc
 controls.menu = 選單
+controls.coach_skip.keys = 空白鍵
+controls.coach_skip = 教練：跳過講解
+controls.coach_takeback.keys = 退格鍵
+controls.coach_takeback = 教練：在提議時悔棋
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = 亮度
@@ -198,11 +207,20 @@ credits.engine.head = 西洋棋引擎
 credits.engine = Stockfish 19，由 Stockfish 開發者製作。
 credits.engine.licence = GNU 通用公共授權條款第 3 版。
 credits.engine.data = 其神經網路使用 Leela Chess Zero 專案提供的資料訓練，這些資料依據開放資料庫授權條款（ODbL）發布。
+credits.voice.head = 教練語音
+credits.voice = 教練模式的合成語音由 Supertonic 3 生成。
+credits.voice.licence = Supertonic 3 是 Supertone 公司的模型，依 OpenRAIL-M 授權條款使用，其使用限制適用於所有使用者（見「授權條款」）。
+credits.openings.head = 開局
+credits.openings = 開局名稱取自 lichess.org 的 chess-openings 資料庫，已貢獻至公有領域（CC0）。
 credits.fonts.head = 字型
 credits.fonts = EB Garamond（Georg Duffner）、Cinzel（Natanael Gama）、Amiri（Khaled Hosny）。
 credits.fonts.hand = 手寫字型：Caveat、Marck Script、Bad Script、Aref Ruqaa、Klee One、霞鶩文楷 LXGW WenKai（SIL Open Font License）。
 credits.fonts.figures = 棋子符號來自 GNU FreeFont（附字型例外條款的 GPL v3）。
 credits.quote = 「西洋棋是分析的藝術。」——米哈伊爾·鮑特溫尼克
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = 授權條款
+licences.title = 授權條款
+licences.note = 授權條款以英文原文呈現。
 
 # ---- Pause menu --------------------------------------------------------------------------------
 pause.title = 暫停
@@ -371,6 +389,14 @@ viewer.keys.menu = Esc
 viewer.controls.menu = 選單
 viewer.keys.hide = H
 viewer.controls.hide = 隱藏此說明
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = 暫停 / 繼續
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = 後退一步 / 前進一步
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = 減速 / 加速
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = 對局開始 / 結束
 viewer.speed = 速度 {0} 公尺/秒
 viewer.view.0 = 棋手的視角
 viewer.view.1 = 桌旁
@@ -833,3 +859,191 @@ hotseat.gameover.friendly = {0} 對 {1} · 友誼賽
 # {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
 hotseat.elo.change = {0} {1} → {2}（{3}）
 hotseat.elo.unrated = 本局不計分。
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = 教練
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = 教練模式的合成語音由 {0} 生成
+# Coach page
+coach.title = 教練
+coach.section.level = 級別
+coach.section.lesson = 跟教練學棋
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} 等級分
+# {0} = coach.band
+coach.band_for = 適合 {0} 的棋手
+coach.completed = 已完成
+coach.recommended = 推薦
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = 西洋棋規則
+coach.level.0.desc = 互動課程，一次學一條規則。
+coach.level.0.detail = 教練在棋盤上擺出小局面，示範每種棋子怎麼走、怎麼吃子，再講王車易位、升變、將軍和將死。每個重點你都親手在棋盤上試一試。
+coach.level.1.name = 入門第一步
+coach.level.1.desc = 哪些子受到攻擊，哪些子無人保護。
+coach.level.1.detail = 教練下得溫和，講得淺顯：你的哪些棋子受到攻擊，哪些沒有保護，以及怎樣保住它們。
+coach.level.2.name = 初學者
+coach.level.2.desc = 簡單戰術、出子、王的安全。
+coach.level.2.detail = 捉雙和牽制都會直呼其名。教練會講如何出子，以及如何保護好你的王。
+coach.level.3.name = 中級棋手
+coach.level.3.desc = 計畫、兵形、唯一著法。
+coach.level.3.detail = 教練講解計畫和兵形，並在只有一步棋能守住局面時提醒你。
+coach.level.4.name = 俱樂部棋手
+coach.level.4.desc = 候選著法、以兵為單位的評估。
+coach.level.4.detail = 像俱樂部教練一樣，比較各個候選著法，並給出以兵為單位的局面評估。
+coach.level.5.name = 強俱樂部棋手
+coach.level.5.desc = 簡明變化、局面術語。
+coach.level.5.detail = 簡短的講評、具體的變化和局面型下法的術語。
+coach.level.6.name = 專家
+coach.level.6.desc = 言簡意賅、深遠變化、評估數值。
+coach.level.6.detail = 像高手之間那樣惜字如金：推演數步之後的變化，並給出評估數值。
+coach.note.clock = 不用棋鐘：想多久都可以。
+coach.note.takeback = 出現大錯後，教練會指出問題所在，並提議悔棋。
+coach.note.lesson = 你執白，教練會在棋盤上擺好每道練習。
+coach.note.unrated = 與教練的對局不計等級分。
+coach.colour = 你的顏色
+coach.colour.help = 你與教練對局時所執的顏色。輪流：每局交替執白、執黑。規則課程一律執白。
+coach.colour.alternate = 輪流
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = 教練語音未安裝或已關閉（選項 > 聲音）：教練的話將以文字顯示在畫面上。
+# At the table
+coach.speaker = 教練
+coach.skip = 跳過
+coach.offer.title = 要悔棋嗎？
+coach.offer.text = 教練提議收回你的上一步棋，好讓你另找一步更好的。
+coach.offer.hint = 按退格鍵悔棋。觸碰任何棋子即繼續對局。
+coach.offer.accept = 悔棋
+coach.offer.decline = 繼續
+coach.pause.take_back = 悔一步棋
+coach.pause.take_back.help = 收回你的上一步棋；如果教練已經應著，也一併收回。
+coach.confirm.resign = 要認輸這盤棋嗎？教練將被判為勝方。
+coach.confirm.leave = 回到主選單嗎？與教練的這盤對局將被放棄。
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = 再下一局
+coach.gameover.unrated = 與教練的這盤對局不計等級分。
+coach.lesson.done = 做得好
+coach.lesson.done.line = 你已經掌握了西洋棋的規則。
+coach.lesson.next = 第一盤對局
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = 教練語音
+options.coach_voice.help = 在教練模式中，教練會出聲講解。其語音模型會在首次需要時下載（約 145 MB）。關閉：教練的話只以文字顯示在畫面上。
+# The prompt. {0} = the size in megabytes ("145.3")
+coach.download.title = 教練語音
+coach.download.text = 教練使用 Supertone 公司的語音合成模型 Supertonic 3 說話。Scacelith 並未附帶此模型：遊戲現在可以從 Hugging Face 下載（{0} MB，只需一次）。沒有它，教練會把要說的話以文字顯示在畫面上。
+coach.download.licence = 此模型依 OpenRAIL-M 授權條款發布，該條款禁止以某些方式使用其產生的語音，例如將其冒充為真人聲音或模仿真實人物。
+coach.download.read_licence = 閱讀授權條款
+coach.download.accept = 選擇「下載」即表示您接受此授權條款。
+# {0} = a folder
+coach.download.folder = 儲存位置：{0}
+coach.download.not_now = 稍後再說
+# {0} = the size in megabytes
+coach.download.download = 下載（{0} MB）
+coach.download.licence_title = OpenRAIL-M 授權條款
+coach.download.back = 返回
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = 教練語音
+coach.download.checking = 正在檢查檔案…
+coach.download.downloading = 正在下載…
+coach.download.extracting = 正在解壓縮檔案…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = 來自 Hugging Face
+coach.download.from_github = 來自 GitHub（發行版封存檔）
+coach.download.cancel = 取消
+coach.download.failed = 下載失敗。
+coach.download.error.network = 無法連線到伺服器。請檢查您的網路連線，然後再試一次。
+# {0} = a folder
+coach.download.error.disk = 無法將檔案寫入 {0}。請檢查可用空間，然後再試一次。
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = 伺服器傳回了非預期的回應（{0}）。請稍後再試。
+coach.download.retry = 重試
+coach.download.close = 關閉
+# Notices
+coach.download.done = 教練語音已安裝。
+coach.download.cancelled = 下載已取消：下次會從中斷處繼續。
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = 已儲存的對局
+options.save_games = 儲存我的對局
+options.save_games.help = 你與 Stockfish、與教練、在這台電腦上雙人對弈的對局，以及直連對局，結束時都會儲存為 PGN 檔案，可在「已儲存的對局」中找到。線上對局由伺服器保存。
+library.title = 已儲存的對局
+library.section.games = 對局
+library.section.details = 對局資訊
+library.section.tags = 標籤
+library.section.moves = 著法
+library.count = {0} 局
+library.filter = 顯示
+library.filter.all = 所有對局
+library.filter.play = 對戰 Stockfish
+library.filter.coach = 與教練對弈
+library.filter.hotseat = 雙人對弈
+library.filter.direct = 直連對局
+library.filter.imported = 匯入
+library.mode.play = 對戰 Stockfish
+library.mode.coach = 與教練對弈
+library.mode.hotseat = 雙人對弈
+library.mode.direct = 直連對局
+library.mode.imported = 匯入
+library.coach_level = 級別 {0}
+library.unknown_player = 不詳
+library.unfinished = 未完成
+library.unreadable = 無法讀取此對局。
+library.moves = {0} 回合
+library.opening_variation = {0}：{1}
+library.file = 檔案：{0}
+library.file_game = 檔案：{0}（共 {2} 局中的第 {1} 局）
+library.no_moves = 尚未走任何一步。
+library.none_selected = 請從清單中選擇一局。
+library.reading = 正在讀取已儲存的對局
+library.empty.title = 尚無已儲存的對局
+library.empty.text = 你與 Stockfish、與教練、在這台電腦上雙人對弈的對局，以及直連對局，結束後都會出現在這裡。你也可以把 PGN 檔案放進這個資料夾：從其他程式或網站匯出的對局會與你的對局一起列出。
+library.empty.filter = 沒有這類對局。
+library.error.folder = 無法讀取已儲存對局的資料夾
+library.error.game = 無法讀取此對局：{0}
+library.folder = 資料夾：{0}
+library.open_folder = 開啟資料夾
+library.open_failed = 無法開啟資料夾。
+library.replay = 重播
+library.delete = 刪除
+library.delete.title = 刪除對局
+library.delete.text = 對局 {0} 將連同其檔案從這台電腦刪除。此操作無法復原。
+library.delete.ok = 刪除
+library.delete.several = 此檔案包含 {0} 局對局，只能在資料夾中刪除。
+library.deleted = 對局已刪除。
+library.delete.failed = 無法刪除對局。
+library.delete.changed = 檔案已變更，清單已更新。
+library.truncated = 此資料夾中的對局過多，僅顯示最新的 {0} 局。
+library.tag.Event = 賽事
+library.tag.Site = 地點
+library.tag.Date = 日期
+library.tag.Time = 時間
+library.tag.Round = 輪次
+library.tag.White = 白方
+library.tag.Black = 黑方
+library.tag.Result = 結果
+library.tag.WhiteElo = 白方等級分
+library.tag.BlackElo = 黑方等級分
+library.tag.TimeControl = 時限
+library.tag.Termination = 結束方式
+library.tag.Opening = 開局
+library.tag.Variation = 變例
+library.tag.PlyCount = 半回合數
+library.tag.FEN = 起始局面
+library.tag.ScacelithMode = 模式
+library.tag.CoachLevel = 教練級別
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = 第 {0} 回合，共 {1} 回合
+replay.speed.factor = ×{0}
+replay.speed.instant = 即時
+replay.again = 再次重播
+replay.gameover.unfinished = 對局在第 {0} 回合後中斷，沒有結果。
+replay.tip.start = 對局開始（Home）
+replay.tip.back = 後退一步（J）
+replay.tip.pause = 暫停（K）
+replay.tip.resume = 繼續（K）
+replay.tip.forward = 前進一步（L）
+replay.tip.end = 對局結束（End）

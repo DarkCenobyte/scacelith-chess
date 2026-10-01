@@ -3,6 +3,7 @@
 #include "ui_draw.h"
 #include "ui_font.h"
 #include "ui_internal.h"
+#include "ui_screens_game.h"
 #include "ui_theme.h"
 #include "ui_widgets.h"
 #include "../core/log.h"
@@ -29,6 +30,8 @@ Data& data() {
         };
         x.timeControls = {"Unlimited", "1+0", "3+0", "3+2", "5+0", "5+3", "10+0", "10+5", "15+10", "30+0", "30+20", "90+30"};
         x.resolutions = {{1280, 720}, {1366, 768}, {1600, 900}, {1920, 1080}, {2560, 1440}, {3200, 1800}, {3840, 2160}};
+        // The coach's levels: the lesson on the rules, then the Elo bands of the players it teaches.
+        x.coachLevels = {{0, 0}, {600, 900}, {900, 1200}, {1200, 1500}, {1500, 1800}, {1800, 2100}, {2100, 0}};
         return x;
     }();
     return d;
@@ -63,6 +66,7 @@ bool init() {
 }
 
 void shutdown() {
+    detail::libraryShutdown();  // its listing worker, which may run without the UI being up
     if (!g_inited) return;
     font::shutdown();
     gfx::shutdown();
@@ -73,6 +77,7 @@ void beginFrame(int width, int height, float dt) {
     gfx::beginFrame(width, height);
     im::beginFrame(dt);
     detail::screensBeginFrame(dt);
+    detail::modelDownloadBeginFrame();   // the voice download prompt is modal
     g_inFrame = true;
 }
 
@@ -141,6 +146,10 @@ void setResolutionList(const std::vector<m::ivec2>& sizes) {
     if (!sizes.empty()) detail::data().resolutions = sizes;
 }
 void setVersionString(const std::string& v) { detail::data().version = v; }
+void setCoachLevels(const std::vector<CoachLevelInfo>& levels) {
+    if (!levels.empty()) detail::data().coachLevels = levels;
+}
+const std::vector<CoachLevelInfo>& coachLevels() { return detail::data().coachLevels; }
 
 namespace {
 // "Club Player" -> "preset.club_player" (the section "Opponent presets" of the .lang files).

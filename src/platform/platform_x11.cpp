@@ -13,9 +13,13 @@
 #include <unistd.h>
 #include <limits.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
+#include <spawn.h>
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <thread>
+extern char** environ;
 
 typedef GLXContext (*PFN_glXCreateContextAttribsARB)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 typedef void (*PFN_glXSwapIntervalEXT)(Display*, GLXDrawable, int);
@@ -263,6 +267,21 @@ std::string userDataDirectory() {
     mkdir(d.c_str(), 0755);
     return d;
 }
+// XDG base directories: data in $XDG_DATA_HOME (an absolute path), else ~/.local/share.
+std::string appDataDirectory() {
+    const char* xdg = getenv("XDG_DATA_HOME");
+    const char* home = getenv("HOME");
+    std::string base;
+    if (xdg && xdg[0] == '/') base = xdg;
+    else if (home && home[0]) base = std::string(home) + "/.local/share";
+    else return exeDirectory();
+    while (base.size() > 1 && base.back() == '/') base.pop_back();
+    for (size_t p = base.find('/', 1); p != std::string::npos; p = base.find('/', p + 1)) mkdir(base.substr(0, p).c_str(), 0755);
+    mkdir(base.c_str(), 0755);
+    std::string d = base + "/scacelith/";
+    mkdir(d.c_str(), 0755);
+    return d;
+}
 void messageBox(const char* title, const char* text) { LOGE("%s: %s", title, text); }
 uint64_t randomSeed() {
     timespec t;
@@ -293,6 +312,26 @@ std::vector<std::string> commandLine() {
         p = q;
     }
     return args;
+}
+
+// ---- Saved games ---------------------------------------------------------------------------------
+bool openInFileManager(const std::string& path) {
+    if (path.empty()) return false;
+    // A relative path starting with '-' would read as an option.
+    const std::string arg = path[0] == '-' ? "./" + path : path;
+    pid_t pid;
+    char* argv[] = {const_cast<char*>("xdg-open"), const_cast<char*>(arg.c_str()), nullptr};
+    if (posix_spawnp(&pid, "xdg-open", nullptr, nullptr, argv, environ) != 0) {
+        LOGW("could not start xdg-open for %s", path.c_str());
+        return false;
+    }
+    // xdg-open may wait for the file manager: reaped on a thread of its own, so the menu never waits
+    // and no zombie stays behind.
+    std::thread([pid]() {
+        int status = 0;
+        waitpid(pid, &status, 0);
+    }).detach();
+    return true;
 }
 }  // namespace plat
 #endif

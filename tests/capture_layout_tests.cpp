@@ -581,3 +581,207 @@ TEST(capture_slots_hole_reuse_keeps_the_grid_compact) {
         CHECK(n && length(n->basePos - b.captureSlot(White, 0)) < 1e-6f);
     }
 }
+
+// ---- Explicit operations --------------------------------------------------------------------------
+
+namespace {
+
+// Two tables in exactly the same state, piece by piece.
+bool sameState(const PhysicalBoard& a, const PhysicalBoard& b) {
+    if (a.pieces().size() != b.pieces().size()) return false;
+    for (size_t i = 0; i < a.pieces().size(); ++i) {
+        const PieceObject &p = a.pieces()[i], &q = b.pieces()[i];
+        if (p.id != q.id || p.type != q.type || p.color != q.color || p.square != q.square || p.captured != q.captured ||
+            p.inReserve != q.inReserve || p.spare != q.spare || p.held != q.held || p.slotReserved != q.slotReserved ||
+            p.capturedBesideOwner != q.capturedBesideOwner || p.captureOrder != q.captureOrder ||
+            length(p.basePos - q.basePos) > 1e-6f || length(p.reserveSpot - q.reserveSpot) > 1e-6f)
+            return false;
+    }
+    return true;
+}
+
+// 'b' brought to the state of 'want' (b after a syncTo) with the explicit operations only: the new
+// pieces first, then each piece that changed, those set down among the captured in id order (the
+// order syncTo sets them down in).
+void rebuildWithCalls(PhysicalBoard& b, const PhysicalBoard& want) {
+    for (size_t i = b.pieces().size(); i < want.pieces().size(); ++i) {
+        const PieceObject& w = want.pieces()[i];
+        CHECK_EQ(b.addSpare(w.type, w.color, w.reserveSpot), w.id);
+    }
+    for (const PieceObject& w : want.pieces()) {
+        const PieceObject& p = *b.byId(w.id);
+        bool same = p.square == w.square && p.captured == w.captured && p.inReserve == w.inReserve &&
+                    length(p.basePos - w.basePos) < 1e-6f;
+        if (same) continue;
+        if (w.captured) b.setCaptured(w.id, w.basePos);
+        else if (w.inReserve) b.setInReserve(w.id, w.basePos);
+        else b.setOnSquare(w.id, w.square);
+    }
+}
+
+}  // namespace
+
+TEST(capture_slots_set_in_reserve_and_add_spare) {
+    // e8=Q played, then the queen put back in the reserve and the pawn back on e7 by hand: the
+    // table is as syncTo leaves it.
+    Position pos;
+    CHECK(pos.setFEN("k7/4P3/8/8/8/8/8/3QK3 w - - 0 1"));
+    PhysicalBoard b;
+    b.reset(true);
+    b.syncTo(pos);
+    Move mv = pos.findLegal(Square(52), Square(60), Queen);
+    int pawn = b.idAt(Square(52));
+    playOnBoard(b, pos, mv);
+    int queen = b.idAt(Square(60));
+    CHECK(b.byId(queen)->spare);
+    PhysicalBoard snap = b;
+    snap.syncTo(pos);
+    b.setInReserve(queen, b.reserveSlot(White));
+    b.setOnSquare(pawn, Square(52));
+    const PieceObject* q = b.byId(queen);
+    CHECK(q->inReserve && !q->captured && !q->held && q->square == NoSquare);
+    CHECK(length(q->basePos - b.reserveSlot(White)) < 1e-6f && length(q->reserveSpot - b.reserveSlot(White)) < 1e-6f);
+    CHECK(b.at(Square(60)) == nullptr);
+    CHECK(boardMatches(b, pos));
+    CHECK(sameState(b, snap));
+    // The reserve piece is the one a promotion takes again.
+    CHECK_EQ(b.takeSpare(Queen, White), queen);
+    // A spare the arbiter brings.
+    PhysicalBoard c = b;
+    int n = c.takeSpare(Knight, White);
+    CHECK_EQ(n, int(b.pieces().size()));
+    CHECK_EQ(b.addSpare(Knight, White, c.byId(n)->reserveSpot), n);
+    CHECK(sameState(b, c));
+    CHECK_EQ(b.takeSpare(Knight, White), n);
+    // setInReserve ends a plan and a hand's hold like the other operations.
+    PhysicalBoard d = b;
+    d.byId(queen)->held = true;
+    d.nextCaptureSlot(Black, queen);
+    d.setInReserve(queen, d.reserveSlot(White));
+    CHECK(!d.byId(queen)->held && !d.byId(queen)->slotReserved);
+}
+
+TEST(capture_slots_every_synced_state_reachable_by_calls) {
+    // Capture-hungry random games with jumps (syncTo to the position several moves later or
+    // earlier, as online resyncs and takebacks do): each state syncTo leaves can be built with the
+    // explicit operations (setOnSquare, setCaptured, setInReserve, addSpare), exactly.
+    int jumps = 0, created = 0, toReserve = 0;
+    for (uint64_t seed = 1; seed <= 40; ++seed) {
+        Rng rng(seed * 104729);
+        Game g;
+        PhysicalBoard b;
+        b.reset(seed % 2 == 0);
+        std::vector<Position> seen{g.position()};
+        for (int ply = 0; ply < 200 && !g.isOver(); ++ply) {
+            Position before = g.position();
+            Move mv = pickMove(before, rng);
+            playOnBoard(b, before, mv);
+            g.play(mv);
+            seen.push_back(g.position());
+            if (rng.next() % 5 != 0) continue;
+            // An earlier position (a takeback) or a position ahead (a resync).
+            Position to = seen[size_t(rng.next() % seen.size())];
+            if (rng.next() % 3 == 0) {
+                Game ahead = g;
+                for (int k = 0; k < 4 && !ahead.isOver(); ++k) ahead.play(pickMove(ahead.position(), rng));
+                to = ahead.position();
+            }
+            PhysicalBoard want = b, calls = b;
+            want.syncTo(to);
+            created += int(want.pieces().size() - b.pieces().size());
+            for (const PieceObject& w : want.pieces())
+                if (w.inReserve && w.id < int(b.pieces().size()) && !b.byId(w.id)->inReserve) ++toReserve;
+            rebuildWithCalls(calls, want);
+            CHECK(sameState(calls, want));
+            ++jumps;
+        }
+    }
+    // A position the table cannot show with its pieces: the arbiter brings a knight and a queen.
+    Position odd;
+    CHECK(odd.setFEN("1k6/8/8/8/8/8/8/NNNQQQK1 w - - 0 1"));
+    for (bool clockPosX : {true, false}) {
+        PhysicalBoard b;
+        b.reset(clockPosX);
+        PhysicalBoard want = b, calls = b;
+        want.syncTo(odd);
+        CHECK(boardMatches(want, odd));
+        created += int(want.pieces().size() - b.pieces().size());
+        rebuildWithCalls(calls, want);
+        CHECK(sameState(calls, want));
+    }
+    std::printf("  %d jumps, %d spares back in the reserve, %d pieces brought\n", jumps, toReserve, created);
+    CHECK(jumps > 800);
+    CHECK(created >= 4);
+    CHECK(toReserve > 20);
+}
+
+TEST(capture_slots_victim_beside_its_owner) {
+    // A demonstration keeps its victims within the coach's reach: Black's pawn taken by White is set
+    // down in Black's half (coach::demoCaptureSlot marks it). Black then promotes, the pawn set down
+    // in Black's half too, the spare queen on b1. Taking the promotion back sends the queen back to
+    // the reserve: the victim does not count as a pawn set down at a promotion.
+    Position start;
+    CHECK(start.setFEN("4k3/8/8/2p5/8/8/1p6/4K1B1 w - - 0 1"));
+    for (bool clockPosX : {true, false}) {
+        PhysicalBoard b;
+        b.reset(clockPosX);
+        b.syncTo(start);
+        Move bxc5 = start.findLegal(Square(6), Square(34));
+        CHECK(bxc5.valid());
+        int victim = b.idAt(Square(34));
+        vec3 slot = b.nextCaptureSlot(Black, victim);
+        b.byId(victim)->capturedBesideOwner = true;
+        b.setOnSquare(b.idAt(Square(6)), Square(34));
+        b.setCaptured(victim, slot);
+        CHECK(b.byId(victim)->captured && b.byId(victim)->capturedBesideOwner && b.byId(victim)->basePos.z < 0.0f);
+        Position afterCapture = start;
+        afterCapture.makeMove(bxc5);
+        Move b1q = afterCapture.findLegal(Square(9), Square(1), Queen);
+        CHECK(b1q.valid());
+        int pawn = b.idAt(Square(9));
+        playOnBoard(b, afterCapture, b1q);
+        int queen = b.idAt(Square(1));
+        CHECK(b.byId(queen)->spare);
+        CHECK(!b.byId(pawn)->capturedBesideOwner);
+        CHECK(b.byId(victim)->capturedBesideOwner);   // setCaptured of other pieces leaves it
+        // Back one move: the queen in the reserve, the pawn on b2, the victim still waiting.
+        PhysicalBoard back = b;
+        back.syncTo(afterCapture);
+        CHECK(boardMatches(back, afterCapture));
+        CHECK(back.byId(queen)->inReserve && length(back.byId(queen)->basePos - back.reserveSlot(Black)) < 1e-6f);
+        CHECK_EQ(back.idAt(Square(9)), pawn);
+        CHECK(back.byId(victim)->captured && back.byId(victim)->capturedBesideOwner);
+        // Unmarked, the victim would pass for the promoted pawn and the queen would stay captured.
+        PhysicalBoard unmarked = b;
+        unmarked.byId(victim)->capturedBesideOwner = false;
+        unmarked.syncTo(afterCapture);
+        CHECK(unmarked.byId(queen)->captured);
+        // Back one more: the victim on c5, unmarked.
+        back.syncTo(start);
+        CHECK(boardMatches(back, start));
+        CHECK_EQ(back.idAt(Square(34)), victim);
+        CHECK(!back.byId(victim)->capturedBesideOwner);
+    }
+    // A marked piece is not one to promote to, though it stands in its owner's half.
+    Position pos;
+    CHECK(pos.setFEN("4k3/1n6/8/8/8/8/1p6/4K3 b - - 0 1"));
+    PhysicalBoard b;
+    b.reset(true);
+    b.syncTo(pos);
+    int knight = b.idAt(Square(49));
+    vec3 slot = b.nextCaptureSlot(Black, knight);
+    b.byId(knight)->capturedBesideOwner = true;
+    b.setCaptured(knight, slot);
+    int spare = b.takeSpare(Knight, Black);
+    CHECK(spare != knight);
+    CHECK(b.byId(spare)->inReserve && b.byId(spare)->spare);
+    // The plan of a normal capture, a square, the reserve: each clears the mark.
+    b.nextCaptureSlot(White, knight);
+    CHECK(!b.byId(knight)->capturedBesideOwner);
+    b.byId(knight)->capturedBesideOwner = true;
+    b.setOnSquare(knight, Square(49));
+    CHECK(!b.byId(knight)->capturedBesideOwner);
+    b.byId(knight)->capturedBesideOwner = true;
+    b.setInReserve(knight, b.reserveSlot(Black));
+    CHECK(!b.byId(knight)->capturedBesideOwner);
+}

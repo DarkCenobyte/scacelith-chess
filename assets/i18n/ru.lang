@@ -69,6 +69,11 @@ options.effects = Эффекты
 options.ambience = Атмосфера
 options.ambience.help = Гул зала: огонь в камине, далёкие шаги, старые часы.
 options.ambience_volume = Громкость атмосферы
+options.voice_volume = Громкость голоса
+options.voice_volume.help = Громкость голоса тренера в режиме «Тренер».
+options.subtitles = Субтитры
+options.subtitles.auto = Автоматически
+options.subtitles.help = Слова тренера внизу экрана. Автоматически: показываются, когда тренер говорит не на языке меню (при китайском меню он говорит по-английски). Показываются всегда, если его голос не установлен.
 
 options.legal_moves = Показывать ходы
 options.legal_moves.help = Подсвечивает поля, на которые может пойти тронутая фигура. Без подсказки ничто не укажет, возможен ли ход: арбитр наказывает за невозможный ход, как только вы нажмёте на часы.
@@ -112,6 +117,10 @@ controls.moves.keys = Tab
 controls.moves = Показать или скрыть ходы
 controls.menu.keys = Esc
 controls.menu = Меню
+controls.coach_skip.keys = Пробел
+controls.coach_skip = Тренер: пропустить объяснение
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = Тренер: взять ход назад, когда он предлагает
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = ЯРКОСТЬ
@@ -199,11 +208,20 @@ credits.engine.head = ШАХМАТНЫЙ ДВИЖОК
 credits.engine = Stockfish 19, разработчики Stockfish.
 credits.engine.licence = GNU General Public License v3.
 credits.engine.data = Его нейросеть обучена на данных проекта Leela Chess Zero, распространяемых по лицензии Open Database License (ODbL).
+credits.voice.head = ГОЛОС ТРЕНЕРА
+credits.voice = Синтетическая речь создана с помощью Supertonic 3 для режима «Тренер».
+credits.voice.licence = Supertonic 3 — модель компании Supertone, используемая по лицензии OpenRAIL-M; её ограничения на использование распространяются на всех пользователей (см. «Лицензии»).
+credits.openings.head = ДЕБЮТЫ
+credits.openings = Названия дебютов из базы chess-openings сайта lichess.org, переданной в общественное достояние (CC0).
 credits.fonts.head = ШРИФТЫ
 credits.fonts = EB Garamond — Георг Даффнер, Cinzel — Натанаэль Гама, Amiri — Халед Хосни.
 credits.fonts.hand = Рукописные: Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
 credits.fonts.figures = Шахматные фигуры из GNU FreeFont (GPL v3 с исключением для шрифтов).
 credits.quote = «Шахматы — это искусство анализа».  — Михаил Ботвинник
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Лицензии
+licences.title = ЛИЦЕНЗИИ
+licences.note = Тексты лицензий приведены в оригинале, на английском языке.
 
 # ---- Pause menu --------------------------------------------------------------------------------
 pause.title = ПАУЗА
@@ -372,6 +390,14 @@ viewer.keys.menu = Esc
 viewer.controls.menu = Меню
 viewer.keys.hide = H
 viewer.controls.hide = Скрыть эти подсказки
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Пауза / продолжить
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Ход назад / вперёд
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = Медленнее / быстрее
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = Начало / конец партии
 viewer.speed = Скорость {0} м/с
 viewer.view.0 = Глазами игроков
 viewer.view.1 = У стола
@@ -834,3 +860,191 @@ hotseat.gameover.friendly = {0} против {1} · товарищеская п�
 # {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
 hotseat.elo.change = {0} {1} → {2} ({3})
 hotseat.elo.unrated = Эта партия не рейтинговая.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Тренер
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Синтетическая речь создана с помощью {0} для режима «Тренер»
+# Coach page
+coach.title = ТРЕНЕР
+coach.section.level = УРОВЕНЬ
+coach.section.lesson = С ТРЕНЕРОМ
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Эло
+# {0} = coach.band
+coach.band_for = Для игроков с рейтингом {0}
+coach.completed = Пройден
+coach.recommended = Рекомендуется
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Правила шахмат
+coach.level.0.desc = Интерактивный урок, правило за правилом.
+coach.level.0.detail = Тренер расставляет небольшие позиции и показывает, как ходит и бьёт каждая фигура, затем рокировку, превращение пешки, шах и мат. Каждую идею вы пробуете сами на доске.
+coach.level.1.name = Первые шаги
+coach.level.1.desc = Что под ударом, что осталось без защиты.
+coach.level.1.detail = Тренер играет мягко и объясняет простыми словами: какие ваши фигуры под ударом, какие остались без защиты и как их сохранить.
+coach.level.2.name = Начинающий
+coach.level.2.desc = Простая тактика, развитие, безопасность короля.
+coach.level.2.detail = Вилки и связки называются своими именами. Тренер говорит о развитии фигур и о безопасности вашего короля.
+coach.level.3.name = Любитель
+coach.level.3.desc = Планы, пешечная структура, единственные ходы.
+coach.level.3.detail = Тренер объясняет планы и пешечные структуры и предупреждает, когда позицию держит лишь один ход.
+coach.level.4.name = Клубный игрок
+coach.level.4.desc = Ходы-кандидаты, оценка в пешках.
+coach.level.4.detail = Тренер сравнивает ходы-кандидаты и даёт оценку в пешках, как клубный тренер.
+coach.level.5.name = Сильный клубный игрок
+coach.level.5.desc = Сжатые варианты, позиционные термины.
+coach.level.5.detail = Короткие замечания, конкретные варианты и язык позиционной игры.
+coach.level.6.name = Эксперт
+coach.level.6.desc = Краткие замечания, глубокие варианты, оценки в цифрах.
+coach.level.6.detail = Немногословно, как между сильными игроками: варианты на несколько ходов вперёд и оценки в цифрах.
+coach.note.clock = Без часов: думайте столько, сколько нужно.
+coach.note.takeback = После зевка тренер показывает, в чём ошибка, и предлагает взять ход назад.
+coach.note.lesson = Вы играете белыми; тренер расставляет каждое упражнение на доске.
+coach.note.unrated = Партии с тренером не влияют на рейтинг.
+coach.colour = Ваш цвет
+coach.colour.help = Цвет, которым вы играете против тренера. Поочерёдно: белые и чёрные сменяются от партии к партии. Урок о правилах всегда играется белыми.
+coach.colour.alternate = Поочерёдно
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Голос тренера не установлен или выключен (Настройки > Звук): его слова будут показаны на экране.
+# At the table
+coach.speaker = ТРЕНЕР
+coach.skip = Пропустить
+coach.offer.title = ВЗЯТЬ ХОД НАЗАД?
+coach.offer.text = Тренер предлагает взять ваш последний ход назад, чтобы вы поискали ход получше.
+coach.offer.hint = Backspace — взять назад. Коснуться фигуры — играть дальше.
+coach.offer.accept = Взять назад
+coach.offer.decline = Играть дальше
+coach.pause.take_back = Взять мой ход назад
+coach.pause.take_back.help = Отменяет ваш последний ход, а также ответ тренера, если он уже сходил.
+coach.confirm.resign = Сдать эту партию? Победителем будет объявлен тренер.
+coach.confirm.leave = Вернуться в главное меню? Эта партия с тренером будет прервана.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Сыграть ещё
+coach.gameover.unrated = Эта партия с тренером не рейтинговая.
+coach.lesson.done = ОТЛИЧНО
+coach.lesson.done.line = Теперь вы знаете правила шахмат.
+coach.lesson.next = Первая партия
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Голос тренера
+options.coach_voice.help = В режиме «Тренер» тренер говорит вслух. Модель его голоса скачивается, когда она впервые нужна (около 145 МБ). Выкл.: слова тренера только показываются на экране.
+# The prompt. {0} = the size in megabytes ("145.3")
+coach.download.title = Голос тренера
+coach.download.text = Тренер говорит с помощью Supertonic 3 — модели синтеза речи от Supertone. Она не входит в состав Scacelith: игра может скачать её сейчас с Hugging Face ({0} МБ, один раз). Без неё тренер пишет свои слова на экране.
+coach.download.licence = Модель распространяется по лицензии OpenRAIL-M, которая запрещает некоторые способы использования созданного ею голоса, например выдавать его за человеческий голос или подражать реальному человеку.
+coach.download.read_licence = Прочитать лицензию
+coach.download.accept = Выбирая «Скачать», вы принимаете условия этой лицензии.
+# {0} = a folder
+coach.download.folder = Сохраняется в: {0}
+coach.download.not_now = Не сейчас
+# {0} = the size in megabytes
+coach.download.download = Скачать ({0} МБ)
+coach.download.licence_title = ЛИЦЕНЗИЯ OPENRAIL-M
+coach.download.back = Назад
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = ГОЛОС ТРЕНЕРА
+coach.download.checking = Проверка файлов…
+coach.download.downloading = Загрузка…
+coach.download.extracting = Распаковка файлов…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} МБ
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = С Hugging Face
+coach.download.from_github = С GitHub (архив выпуска)
+coach.download.cancel = Отмена
+coach.download.failed = Загрузка не удалась.
+coach.download.error.network = Не удаётся связаться с серверами. Проверьте подключение к интернету и повторите попытку.
+# {0} = a folder
+coach.download.error.disk = Не удалось записать файлы в {0}. Проверьте свободное место и повторите попытку.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Серверы прислали неожиданный ответ ({0}). Повторите попытку позже.
+coach.download.retry = Повторить
+coach.download.close = Закрыть
+# Notices
+coach.download.done = Голос тренера установлен.
+coach.download.cancelled = Загрузка отменена: в следующий раз она продолжится с того места, где остановилась.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Сохранённые партии
+options.save_games = Сохранять мои партии
+options.save_games.help = По окончании ваши партии со Stockfish, с тренером, вдвоём за этим компьютером и игры напрямую сохраняются в файлы PGN — их можно найти в разделе «Сохранённые партии». Онлайн-партии хранит сервер.
+library.title = СОХРАНЁННЫЕ ПАРТИИ
+library.section.games = ПАРТИИ
+library.section.details = ПАРТИЯ
+library.section.tags = ТЕГИ
+library.section.moves = ХОДЫ
+library.count = {0} партия|{0} партии|{0} партий
+library.filter = Показать
+library.filter.all = Все партии
+library.filter.play = Со Stockfish
+library.filter.coach = С тренером
+library.filter.hotseat = Вдвоём
+library.filter.direct = Игры напрямую
+library.filter.imported = Импортированные
+library.mode.play = Со Stockfish
+library.mode.coach = С тренером
+library.mode.hotseat = Вдвоём
+library.mode.direct = Игра напрямую
+library.mode.imported = Импорт
+library.coach_level = Уровень {0}
+library.unknown_player = Неизвестный
+library.unfinished = Не окончена
+library.unreadable = Эту партию не удаётся прочитать.
+library.moves = {0} ход|{0} хода|{0} ходов
+library.opening_variation = {0}: {1}
+library.file = Файл: {0}
+library.file_game = Файл: {0}, партия {1} из {2}
+library.no_moves = Не сделано ни одного хода.
+library.none_selected = Выберите партию в списке.
+library.reading = Чтение сохранённых партий
+library.empty.title = Сохранённых партий пока нет
+library.empty.text = Ваши партии со Stockfish, с тренером, вдвоём за этим компьютером и игры напрямую появятся здесь после их окончания. В эту папку можно также положить файлы PGN: партии, экспортированные из других программ или с сайтов, будут показаны вместе с вашими.
+library.empty.filter = Партий такого вида нет.
+library.error.folder = Не удаётся прочитать папку сохранённых партий
+library.error.game = Эту партию не удаётся прочитать: {0}
+library.folder = Папка: {0}
+library.open_folder = Открыть папку
+library.open_failed = Не удалось открыть папку.
+library.replay = Просмотр
+library.delete = Удалить
+library.delete.title = УДАЛИТЬ ПАРТИЮ
+library.delete.text = Партия {0} будет удалена с этого компьютера вместе с её файлом. Это действие нельзя отменить.
+library.delete.ok = Удалить
+library.delete.several = В этом файле {0} партия: его можно удалить только в папке.|В этом файле {0} партии: его можно удалить только в папке.|В этом файле {0} партий: его можно удалить только в папке.
+library.deleted = Партия удалена.
+library.delete.failed = Не удалось удалить партию.
+library.delete.changed = Файл изменился: список обновлён.
+library.truncated = В этой папке слишком много партий: показаны только {0} последних.
+library.tag.Event = Соревнование
+library.tag.Site = Место
+library.tag.Date = Дата
+library.tag.Time = Время
+library.tag.Round = Тур
+library.tag.White = Белые
+library.tag.Black = Чёрные
+library.tag.Result = Результат
+library.tag.WhiteElo = Рейтинг белых
+library.tag.BlackElo = Рейтинг чёрных
+library.tag.TimeControl = Контроль времени
+library.tag.Termination = Завершение
+library.tag.Opening = Дебют
+library.tag.Variation = Вариант
+library.tag.PlyCount = Полуходы
+library.tag.FEN = Начальная позиция
+library.tag.ScacelithMode = Режим
+library.tag.CoachLevel = Уровень тренера
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Ход {0} из {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Мгновенно
+replay.again = Посмотреть снова
+replay.gameover.unfinished = Партия прервана после {0}-го хода, без результата.
+replay.tip.start = Начало партии (Home)
+replay.tip.back = Ход назад (J)
+replay.tip.pause = Пауза (K)
+replay.tip.resume = Продолжить (K)
+replay.tip.forward = Ход вперёд (L)
+replay.tip.end = Конец партии (End)

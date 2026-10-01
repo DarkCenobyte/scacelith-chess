@@ -247,10 +247,14 @@ Checked properties:
   the engine thread, so the host's `atexit` handler (below) would wait for itself and the game
   would vanish without a message. `ai::Engine` therefore replays every move list with the game's
   own rules (`chess::Position::parseUCI`) before sending it; a list that fails is never sent and
-  the request fails (empty move, neutral evaluation), which the game already handles. It only
-  sends numbers it formats itself in `go`, and never `flip` or a FEN. The tests play every kind of
-  special move through the engine (both castlings of each side, en passant, the four promotions)
-  and check that illegal lines are refused.
+  the request fails (empty move, neutral evaluation, failed analysis), which the game already
+  handles. A start FEN (tutorial positions, analyses) is parsed by `chess::Position::setFEN`,
+  checked for Stockfish's own limit on promoted pieces, and sent as the game re-emits it, with the
+  move counters within Stockfish's range; analysis search moves are checked in the position
+  (Stockfish would silently search every move instead). It only sends numbers it formats itself in
+  `go`, and never `flip`. The tests play every kind of special move through the engine (both
+  castlings of each side, en passant, the four promotions) and check that illegal lines and
+  invalid FENs are refused.
 * **Process exit without shutdown.** The host registers an `atexit` handler that sends `quit` and
   joins, after the initialisers of each variant it starts (so it runs before the destructors of
   that variant's static objects). The wait is bounded (2 s): on Windows `exit()` holds the CRT's

@@ -1,0 +1,912 @@
+# Coach speech (Japanese): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang.
+#
+# Register: polite です/ます style, warm at levels 1-2, short noun-ending sentences (体言止め) at
+# levels 5-6, never plain casual verb endings. The coach is 私.
+# Placeholders (see the English header): {your} {my} = "あなたのナイト" / "私のビショップ";
+# {your:bare} {my2:bare} {t2:bare} = the piece name alone, used when the owner is already clear
+# from the sentence ("{t1}と{t2:bare}" = "あなたのクイーンとルーク": both targets of a fork, a
+# skewer or a pin always belong to the same side). {sq} = a square: "{sq}へ", "{sq}の", "{sq}で",
+# never "{sq}に" (rank 2 is spoken "に"). Moves and lines are noun phrases in speech
+# ("ナイト・エフさん"), so particles follow them: "{best}が良い手でした", "{line}でメイト".
+# Counted numbers: {m:move} "3手", {pts:point} "3点", {n:square} "3マス", {n:time} "3回",
+# {n:ko} "3個" (count.ko in common.lang). A ".spoken" key respells for the voice what it may
+# misread: digits and chess kanji in kana (大悪手 だいあくしゅ, 疑問手 ぎもんしゅ, 妙手
+# みょうしゅ, 駒得 こまどく, 両取り りょうどり, 端 はし ...).
+#
+# Chess words (glossary): fork フォーク, double attack 両取り, pin ピン, skewer スキュア,
+# discovered attack ディスカバードアタック, back rank バックランク, passed pawn パスポーン,
+# opposition オポジション, bishop pair ビショップペア, pawn ending ポーンエンディング,
+# sacrifice サクリファイス (levels 1-2: 駒を捨てる / 捨て駒), brilliant move 妙手, great move 好手,
+# blunder 大悪手, mistake 悪手 / ミス, inaccuracy 疑問手, loose / hanging piece 浮き駒 (levels 1-2:
+# 守りのない駒, ただで取れる), mate in N "N手でメイト".
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = チェック！私のキングが攻められています。
+ann.check.human.b1.2 = チェック！私のキングを攻めていますね。
+ann.check.human.b1.3 = チェックです！私のキングは逃げないといけません。
+ann.check.human = チェック。
+ann.check.human.2 = チェック！
+ann.check.human.3 = チェックですね。
+# The coach gives check.
+ann.check.coach = チェック！
+ann.check.coach.2 = チェックです。
+ann.check.coach.3 = そして、チェック！
+# Once per game at levels 1-2, right after the coach's first check.
+ann.check.coach.first = つまり{your}が攻められています。チェックをかわしましょう。
+ann.check.coach.first.2 = チェックは{your}への攻撃。逃げるか、間に駒を置くか、私の駒を取りましょう。
+ann.check.coach.first.2.spoken = チェックは{your}への攻撃。逃げるか、あいだに駒を置くか、私の駒を取りましょう。
+ann.double_check.coach = ダブルチェック！私の駒2つが同時に攻めるので、キングが動くしかありません。
+ann.double_check.coach.spoken = ダブルチェック！私のこまふたつが同時に攻めるので、キングが動くしかありません。
+ann.double_check.coach.2 = ダブルチェックです。助かるのはキングを動かす手だけです。
+ann.double_check.human = ダブルチェック！駒2つで同時に私のキングを攻めましたね。逃げるしかありません。
+ann.double_check.human.spoken = ダブルチェック！こまふたつで同時に私のキングを攻めましたね。逃げるしかありません。
+ann.double_check.human.2 = おっと、ダブルチェック！助かるにはキングを動かすしかありません。
+# The player checkmates the coach.
+ann.mate.human.b1 = チェックメイト！あなたの勝ちです！私のキングは逃げられません。
+ann.mate.human.b1.2 = チェックメイトです！よくできました、あなたの勝ち！
+ann.mate.human.b1.3 = チェックメイト！私のキングがつかまりました。おめでとうございます！
+ann.mate.human = チェックメイト。お見事です。
+ann.mate.human.2 = メイトです。おめでとうございます。
+ann.mate.human.3 = チェックメイト！うまく決めましたね。
+# The coach checkmates the player.
+ann.mate.coach.b1 = チェックメイトです。あなたのキングには逃げ道がありません。
+ann.mate.coach.b1.2 = チェックメイト。キングが攻められていて、逃げられません。
+ann.mate.coach.b1.3 = 残念ですが、チェックメイトです。キングは逃げられません。
+ann.mate.coach = チェックメイト。
+ann.mate.coach.2 = これでメイトです。
+ann.mate.coach.3 = 残念ですが、チェックメイトです。
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = おっと！その手だと、何かを失ってしまいます。
+ex.verdict.blunder.b1.2 = 気をつけて！これから何が起きるか見せますね。
+ex.verdict.blunder.b1.3 = あっ、ちょっと待ってください。その手には問題があります。
+ex.verdict.blunder.b2 = うーん、その手には問題があります。見てください。
+ex.verdict.blunder.b2.2 = それはミスです。見ていてください。
+ex.verdict.blunder.b2.3 = 気をつけて、その手は損をします。見てください。
+ex.verdict.blunder.b3 = それは大悪手です。
+ex.verdict.blunder.b3.spoken = それはだいあくしゅです。
+ex.verdict.blunder.b3.2 = {move}はミスです。理由を説明しますね。
+ex.verdict.blunder.b3.3 = 痛い、{move}は大きなミスです。
+ex.verdict.blunder.b4 = {move}は大悪手です。
+ex.verdict.blunder.b4.spoken = {move}はだいあくしゅです。
+ex.verdict.blunder.b4.2 = {move}は重大なミスです。
+ex.verdict.blunder.b4.3 = 残念ながら、大悪手です。
+ex.verdict.blunder.b4.3.spoken = 残念ながら、だいあくしゅです。
+ex.verdict.blunder.b5 = {move}は重大なミスです。
+ex.verdict.blunder.b5.2 = {move}は大悪手。
+ex.verdict.blunder.b5.2.spoken = {move}はだいあくしゅ。
+ex.verdict.blunder.b5.3 = {move}で台無しです。
+ex.verdict.blunder.b6 = {move}が敗着。
+ex.verdict.blunder.b6.spoken = {move}がはいちゃく。
+ex.verdict.blunder.b6.2 = {move}は大悪手。
+ex.verdict.blunder.b6.2.spoken = {move}はだいあくしゅ。
+ex.verdict.blunder.b6.3 = {move}？これは負けです。
+ex.verdict.mistake.b3 = 最善ではありません。理由はこうです。
+ex.verdict.mistake.b3.2 = うーん、{move}には問題があります。
+ex.verdict.mistake.b3.3 = それはミスです。説明しますね。
+ex.verdict.mistake.b4 = {move}は悪手です。
+ex.verdict.mistake.b4.spoken = {move}はあくしゅです。
+ex.verdict.mistake.b4.2 = {move}は良くありません。理由はこうです。
+ex.verdict.mistake.b4.3 = それはミスです。
+ex.verdict.mistake.b5 = {move}は不正確です。
+ex.verdict.mistake.b5.2 = {move}は悪手です。
+ex.verdict.mistake.b5.2.spoken = {move}はあくしゅです。
+ex.verdict.mistake.b5.3 = {move}で優位を逃しました。
+ex.verdict.mistake.b6 = {move}は悪手。
+ex.verdict.mistake.b6.spoken = {move}はあくしゅ。
+ex.verdict.mistake.b6.2 = {move}は不正確。
+ex.verdict.mistake.b6.3 = {move}は違います。
+# An inaccuracy with no concrete cause: the line names the better move ({best} is pointed at).
+ex.verdict.inaccuracy.b4 = 少し不正確です。{best}の方が正確でした。
+ex.verdict.inaccuracy.b4.2 = 小さな疑問手です。{best}が少し良かったです。
+ex.verdict.inaccuracy.b4.2.spoken = 小さなぎもんしゅです。{best}が少し良かったです。
+ex.verdict.inaccuracy.b4.3 = 最善とは言えません。{best}の方が正確でした。
+ex.verdict.inaccuracy.b5 = {move}は不正確。{best}の方が強力でした。
+ex.verdict.inaccuracy.b5.2 = 少し不正確です。私なら{best}を指していました。
+ex.verdict.inaccuracy.b5.3 = {move}より{best}の方が正確でした。
+ex.verdict.inaccuracy.b6 = {move}は不正確。{best}。
+ex.verdict.inaccuracy.b6.2 = 不正確。{best}。
+ex.verdict.inaccuracy.b6.3 = {best}の方が上でした。
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = あれ？いい手を見逃しましたよ。
+ex.verdict.missed.b1.2 = もう一度見てみましょう！もっと良い手がありました。
+ex.verdict.missed.b1.3 = ちょっと待ってください、チャンスがありましたよ！
+ex.verdict.missed.b2 = そこはチャンスを逃しましたね。
+ex.verdict.missed.b2.2 = うーん、もっと良い手がありました。
+ex.verdict.missed.b2.3 = おっと、そこにはすごくいい手がありました。
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+ex.better.b3 = {best}の方が良い手でした。
+ex.better.b3.2 = より良いのは{best}でした。
+ex.better.b3.3 = 代わりに{best}が良かったですね。
+ex.better.b4 = {best}なら、すべて安全でした。
+ex.better.b4.2 = {best}が正しい手でした。
+ex.better.b4.3 = 良いのは{best}でした。
+ex.better.b5 = {best}、{line}という狙いです。
+ex.better.b5.2 = {best}が正解でした：{line}。
+ex.better.b5.3 = {best}の方が良く、{line}のあとも大丈夫です。
+ex.better.b6 = {best}：{eval}。
+ex.better.b6.2 = 代わりに{best}、{eval}。
+ex.better.b6.3 = {best}なら{eval}。
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = 駒を元に戻しましょう。
+ex.rewind.b1.2 = では、全部元の場所に戻しますね。
+ex.rewind.b1.3 = 駒を戻しますね。
+ex.rewind.b2 = 全部元に戻しましょう。
+ex.rewind.b2.2 = さっきの局面に戻ります。
+ex.rewind.b2.3 = 駒を戻します。
+ex.rewind.b3 = 対局に戻りましょう。
+ex.rewind.b3.2 = 戻りましょう。
+ex.rewind.b3.3 = 局面を戻します。
+ex.rewind.b4 = 対局に戻ります。
+ex.rewind.b4.2 = 戻します。
+ex.rewind.b4.3 = では、戻りましょう。
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = 別の手を指してみますか？
+ex.offer.b1.2 = その手を戻して、やり直してみますか？
+ex.offer.b1.3 = 違う手を試してみましょうか？
+ex.offer.b2 = 別の手を試してみますか？
+ex.offer.b2.2 = 手を戻しますか？
+ex.offer.b2.3 = もう一度やってみますか？
+ex.offer.b3 = 手を戻しますか？
+ex.offer.b3.2 = やり直してみますか？
+ex.offer.b3.3 = 戻しますか？
+ex.offer.b4 = 戻しますか？
+ex.offer.b4.2 = 手を戻しますか？
+ex.offer.b4.3 = 別の手を試しますか？
+ex.offer.b5 = 戻しますか？
+ex.offer.b5.2 = 手を戻しますか？
+ex.offer.b5.3 = 取り消しますか？
+ex.offer.b6 = 戻しますか？
+ex.offer.b6.2 = 取り消しますか？
+ex.offer.b6.3 = やり直しますか？
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}。
+demo.move.2 = {move}と指します。
+demo.move.3 = 続いて{move}。
+# Levels 1-3, the coach's moves.
+demo.my.move = {my}が{sq}へ。
+demo.my.move.2 = {my}を{sq}へ動かします。
+demo.my.move.3 = 次に{my}が{sq}へ行きます。
+demo.my.take = 私が{your}を取ります。
+demo.my.take.2 = {my}が{your}を取ります。
+demo.my.take.3 = そして{your}を取ります。
+demo.my.check = {my}が{sq}へ。チェックです。
+demo.my.check.2 = {my}を{sq}へ動かして、チェック。
+demo.my.check.3 = {my}が{sq}へ、チェック！
+demo.my.mate = {my}が{sq}へ。チェックメイトです。
+demo.my.mate.2 = そして{my}が{sq}へ行けば、チェックメイト。
+demo.my.mate.3 = {my}を{sq}へ。これでチェックメイトです。
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = {your}を{sq}へ動かすとします。
+demo.your.move.2 = たとえば、{your}を{sq}へ。
+demo.your.move.3 = 次に{your}が{sq}へ。
+demo.your.take = あなたが{my}を取ります。
+demo.your.take.2 = {your}で{my}を取ります。
+demo.your.take.3 = 次に、あなたが{my}を取ります。
+demo.your.back = あなたが取り返します。
+demo.your.back.2 = あなたは{sq}で取り返します。
+demo.your.back.3 = そして取り返します。
+demo.your.king = あなたのキングは動くしかありません。
+demo.your.king.2 = キングは{sq}へ逃げるしかありません。
+demo.your.king.3 = あなたのキングは{sq}へ逃げます。
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = そしてここ、{sq}で新しいクイーンができます。
+demo.promote.2 = そして{your}が{sq}まで進み、クイーンになります。
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = 気をつけて。{my}が{sq}へ行くと、チェックメイトです。
+ex.mate_allowed.b1.2 = 今、{my}は{sq}へ動けます。そうなればチェックメイト！
+ex.mate_allowed.b1.3 = 注意！{my}が{sq}へ来たら、チェックメイトです。
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = この手だと、{m:move}で{your}をチェックメイトできます。
+ex.mate_allowed.b2.2 = これで{your}を{m:move}でチェックメイトできます。見てください。
+ex.mate_allowed.b2.3 = 気をつけて！{your}が危ない。{m:move}でチェックメイトです。
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = この手だと、{m:move}でメイトです：{line}。
+ex.mate_allowed.b3.2 = このあと、私は{m:move}でメイトできます：{line}。
+ex.mate_allowed.b3.3 = あなたのキングがメイトされます：{line}。
+ex.mate_allowed.b4 = {move}では、強制メイトがあります：{line}。
+ex.mate_allowed.b4.2 = この手だと、{m:move}でメイトされます：{line}。
+ex.mate_allowed.b4.3 = {move}のあと、{line}でメイトです。
+ex.mate_allowed.b5 = {move}では、{m:move}の強制メイトがあります。
+ex.mate_allowed.b5.2 = これは{m:move}でメイトされる手です。
+ex.mate_allowed.b5.3 = これで{m:move}の強制メイトが生じました。
+ex.mate_allowed.b6 = {m:move}でメイト：{line}。
+ex.mate_allowed.b6.2 = {line}、メイト。
+ex.mate_allowed.b6.3 = {line}でメイト。
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = 見てください。{your}には逃げるマスがもうありません。
+ex.mate_allowed.tail.b1.2 = わかりますか？{your}は攻められていて、逃げられません。
+ex.mate_allowed.tail.b1.3 = {your}の行き場がありません。これがチェックメイトです。
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = この形は{text}といいます。
+ex.mate_allowed.pattern.2 = 覚えておきましょう。これが{text}です。
+ex.mate_allowed.tip.b3 = 指す前に毎回、キングが安全か確かめましょう。
+ex.mate_allowed.tip.b3.2 = 「この手のあと、メイトされないか？」といつも考えましょう。
+
+# Inserted in "この形は{text}といいます。" and "これが{text}です。": a noun.
+name.pattern.back_rank = バックランクメイト
+name.pattern.smothered = スマザードメイト
+name.pattern.support = 支えられたクイーンのメイト
+name.pattern.ladder = はしごメイト
+name.pattern.epaulette = エポレットメイト
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = {best}なら、{my}をチェックメイトできました！
+ex.mate_missed.b1.2 = {best}でチェックメイトでした！{my}は逃げられませんでした。
+ex.mate_missed.b1.3 = 見て！{best}で{my}をチェックメイトできていました。
+ex.mate_missed.b2 = {best}から、{m:move}でチェックメイトできました。
+ex.mate_missed.b2.2 = {best}で、{m:move}のチェックメイトでした！
+ex.mate_missed.b2.3 = {best}で、私をチェックメイトできましたよ。
+ex.mate_missed.b3 = {m:move}でメイトがありました。{best}です。
+ex.mate_missed.b3.2 = {best}から{m:move}でメイト：{line}。
+ex.mate_missed.b3.3 = {best}から始まる、{m:move}のメイトがありました。
+ex.mate_missed.b4 = メイトを見逃しました：{line}。初手は{best}。
+ex.mate_missed.b4.spoken = メイトを見逃しました：{line}。しょては{best}。
+ex.mate_missed.b4.2 = {best}で{m:move}の強制メイトでした。
+ex.mate_missed.b4.3 = {best}で、{m:move}のメイトがありました。
+ex.mate_missed.b5 = {best}で{m:move}のメイト：{line}。
+ex.mate_missed.b5.2 = {m:move}のメイトを見逃しました。初手は{best}。
+ex.mate_missed.b5.2.spoken = {m:move}のメイトを見逃しました。しょては{best}。
+ex.mate_missed.b5.3 = 強制メイトがありました：{best}。
+ex.mate_missed.b6 = {best}でメイト：{line}。
+ex.mate_missed.b6.2 = {best}で{m:move}のメイト。
+ex.mate_missed.b6.3 = {best}、{m:move}でメイト。
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = {best}の方が速く、{m:move}でメイトでした。
+ex.mate_delayed.b5.2 = {best}なら、もっと早く{m:move}でメイトでした。
+ex.mate_delayed.b6 = {best}なら{m:move}でメイト。
+ex.mate_delayed.b6.2 = 最短は{best}、{m:move}でメイト。
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = あっ、ステイルメイト！{my}は動けず、チェックでもないので引き分けです。
+ex.stalemate.b1.2 = 見て。{my}は行き場がないのに、チェックではありません。引き分けです！
+ex.stalemate.b1.3 = ステイルメイトです。{my}が動けないので、引き分けになります。
+ex.stalemate.b2 = ステイルメイト！{my}に指せる手がなく、チェックでもないので引き分け。
+ex.stalemate.b2.2 = ああ、ステイルメイト。{my}は動けませんが、チェックではありません。
+ex.stalemate.b2.3 = ステイルメイトで引き分けです。{my}が動けません。
+ex.stalemate.b3 = ステイルメイトです。{my}に動ける手がありません。勝っていたのに！
+ex.stalemate.b3.2 = ステイルメイト！{my}が動けず、勝ちの対局が引き分けに。
+ex.stalemate.b3.3 = {my}は手がなく、チェックでもありません。ステイルメイトです。
+ex.stalemate.b4 = ステイルメイト：{my}に指せる手がありません。勝ちを逃しました。
+ex.stalemate.b4.2 = {move}で{my}がステイルメイト。勝ちの局面から引き分けです。
+ex.stalemate.b4.3 = ステイルメイトです。{my}が閉じ込められました。
+ex.stalemate.b5 = {move}で{my}がステイルメイト。勝ちが消えました。
+ex.stalemate.b5.2 = ステイルメイト：{my}に行けるマスがありません。
+ex.stalemate.b5.3 = ステイルメイト、{my}が動けません。
+ex.stalemate.b6 = ステイルメイト。{my}に手がありません。
+ex.stalemate.b6.2 = {move}、ステイルメイト：{my}が閉じ込められています。
+ex.stalemate.b6.3 = ステイルメイト。{my}は動けません。
+ex.stalemate.tip.b1 = 勝っているときは、私のキングに動けるマスを必ず残しましょう。
+ex.stalemate.tip.b1.2 = 勝っているときこそ、私のキングに少しすき間を残してあげましょう。
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = 気をつけて！私が駒を捨てると、{my}が動けなくなってステイルメイトです。
+ex.stalemate_trick.b1.2 = 注意！{my}はもうほとんど動けません。引き分けにできてしまいます。
+ex.stalemate_trick.b2 = 気をつけて。私が駒を捨てれば、{my}はステイルメイトになります。
+ex.stalemate_trick.b2.2 = {my}には行けるマスがほとんどありません。ステイルメイトにできます！
+ex.stalemate_trick.b3 = この手だと、ステイルメイトで逃げられます。{my}の手がなくなります。
+ex.stalemate_trick.b3.2 = 注意：{line}のあと、{my}はステイルメイトです。
+ex.stalemate_trick.b4 = {move}ではステイルメイトの罠：{line}で{my}が動けません。
+ex.stalemate_trick.b4.2 = これで{my}はステイルメイトに逃げ込めます：{line}。
+ex.stalemate_trick.b5 = {move}でステイルメイトが可能に：{line}。{my}が閉じ込められます。
+ex.stalemate_trick.b5.2 = ステイルメイトの罠：{line}で{my}に手がなくなります。
+ex.stalemate_trick.b6 = {line}、ステイルメイト：{my}が閉じ込められます。
+ex.stalemate_trick.b6.2 = {line}でステイルメイト。{my}は動けません。
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my}が{sq}へ行くと、{t1}と{t2:bare}を同時に攻められます。
+ex.fork.b1.2 = {my}が{sq}へ行くと、ふたつの駒を攻めます：{t1}と{t2:bare}。
+ex.fork.b1.3 = {my}に注目。{sq}から{t1}と{t2:bare}を一度に攻めます。
+ex.fork.b2 = フォーク！{sq}の{my}が{t1}と{t2:bare}を同時に攻めます。
+ex.fork.b2.2 = その手のあと、{my}が{sq}から{t1}と{t2:bare}をフォークできます。
+ex.fork.b2.3 = {my}が{sq}へ。{t1}と{t2:bare}の両取りです。
+ex.fork.b2.3.spoken = {my}が{sq}へ。{t1}と{t2:bare}のりょうどりです。
+ex.fork.b3 = {move}だと{reply}があり、{t1}と{t2:bare}のフォークです。
+ex.fork.b3.2 = {reply}で、私は{t1}と{t2:bare}を同時に攻めます。
+ex.fork.b3.3 = {reply}はフォーク：{t1}も{t2:bare}も攻められています。
+ex.fork.b4 = {reply}で{t1}と{t2:bare}のフォーク。{line}のあと{pts:point}の駒損です。
+ex.fork.b4.spoken = {reply}で{t1}と{t2:bare}のフォーク。{line}のあと{pts:point}のこまぞんです。
+ex.fork.b4.2 = {reply}が{t1}と{t2:bare}を同時に攻めます。
+ex.fork.b4.3 = {move}だと、{reply}で{t1}と{t2:bare}がフォークされます。
+ex.fork.b5 = {move}では、{reply}が{t1}と{t2:bare}へのフォーク。
+ex.fork.b5.2 = {reply}で{t1}と{t2:bare}のフォーク。
+ex.fork.b5.3 = {reply}のあと、{t1}と{t2:bare}が両方狙われています。
+ex.fork.b6 = {reply}でフォーク。
+ex.fork.b6.2 = {move}には{reply}、フォーク。
+ex.fork.b6.3 = {reply}、両取り。
+ex.fork.b6.3.spoken = {reply}、りょうどり。
+# After the one-move demonstration (level 1).
+ex.fork.tail.b1 = 助けられるのはどちらか一つ。{t1}か{t2:bare}です。
+ex.fork.tail.b1.2 = 今、{t1}と{t2:bare}を同時に攻めています。これが両取りです！
+ex.fork.tail.b1.2.spoken = 今、{t1}と{t2:bare}を同時に攻めています。これがりょうどりです！
+ex.fork.tail.b1.3 = ほら、{t1}も{t2:bare}も攻められています。どちらかが取られます。
+ex.fork.more.b3 = 指す前に{sq}を確かめましょう。{my}がフォークできるマスです。
+ex.fork.more.b3.2 = {sq}のマスに注意。そこから{my}がフォークします。
+ex.fork.tip.knight = キングやクイーンの近くに跳んでくるナイトに注意！
+ex.fork.tip.knight.2 = ナイトは両取りが得意です。どこへ跳べるか見ておきましょう。
+ex.fork.tip.knight.2.spoken = ナイトはりょうどりが得意です。どこへ跳べるか見ておきましょう。
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = {my}がどくと、後ろの{my2:bare}が{t1}を攻めます！
+ex.discovered.b1.2 = 見て、{my}がじゃま。どけば、後ろの{my2:bare}が{t1}を攻撃！
+ex.discovered.b1.3 = {my}が横へどけば、{my2:bare}が{t1}を攻撃します。
+ex.discovered.b2 = かくれた攻撃：{my}が動くと、{my2:bare}が{t1}を攻めます。
+ex.discovered.b2.2 = 注意：{my}が狙いを持ってどくと、{my2:bare}が{t1}を攻撃します。
+ex.discovered.b2.3 = {my}がどいて、後ろの{my2:bare}が{t1}を狙います。
+ex.discovered.b3 = {reply}で、{t1}へのディスカバードアタックです。
+ex.discovered.b3.2 = {reply}で、隠れていた{t1}への攻撃が現れます。
+ex.discovered.b3.3 = {move}だと{reply}、{t1}へのディスカバードアタック。
+ex.discovered.b4 = {reply}で{t1}への線が開きます。ディスカバードアタックです。
+ex.discovered.b4.2 = {move}だと、{reply}のディスカバードアタックで{t1}を失います。
+ex.discovered.b4.3 = {reply}のあと、ディスカバードアタックで{t1}が取られます。
+ex.discovered.b5 = {move}では、{reply}のディスカバードアタックがあります。
+ex.discovered.b5.2 = {reply}はディスカバードアタック。
+ex.discovered.b5.3 = {reply}で二重の狙いが現れます。
+ex.discovered.b6 = {reply}で{t1}にディスカバードアタック。
+ex.discovered.b6.2 = {reply}で{t1}が落ちます。
+ex.discovered.b6.3 = ディスカバードアタック：{reply}で{t1}を攻撃。
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my}が{t1}を攻撃。逃げれば、後ろの{t2:bare}を取ります。
+ex.skewer.b1.2 = 見て。{my}が{t1}を攻めていて、すぐ後ろに{t2:bare}がいます。
+ex.skewer.b1.3 = {my}が{t1}を狙います。逃げるしかなく、{t2:bare}が取られます。
+ex.skewer.b2 = スキュア：{my}が{t1}を攻撃し、後ろには{t2:bare}がいます。
+ex.skewer.b2.2 = {my}の線上に{t1}と{t2:bare}が並び、前が動けば後ろを取ります。
+ex.skewer.b2.3 = 注意：{t1}と{t2:bare}が一直線上に。{my}でスキュアできます。
+ex.skewer.b3 = {reply}で{t1}と{t2:bare}のスキュア。
+ex.skewer.b3.2 = {reply}のあと、{t1}が逃げると{t2:bare}が取られます。
+ex.skewer.b3.3 = {move}だと{reply}で、{t1}と{t2:bare}のスキュアです。
+ex.skewer.b4 = {reply}で{t1}にスキュア。後ろの{t2:bare}が取られます。
+ex.skewer.b4.2 = {move}で{t1}と{t2:bare}が並び、{reply}が来ます。
+ex.skewer.b4.3 = {reply}のあと、{t1}が動いて{t2:bare}が落ちます。
+ex.skewer.b5 = {reply}は{t1}と{t2:bare}へのスキュア。
+ex.skewer.b5.2 = {move}だと、{reply}が{t1}越しに{t2:bare}を狙うスキュア。
+ex.skewer.b6 = {reply}でスキュア。
+ex.skewer.b6.2 = {reply}、スキュア。
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it (the player's
+# too, hence {t1:bare}).
+ex.pin.b1 = {my}が{sq}へ行くと、{your}は{t1:bare}の前で動けなくなります。
+ex.pin.b1.2 = {sq}の{my}に注目。{your}が{t1:bare}の前で動けなくなります。
+ex.pin.b1.3 = {my}で{your}を{t1:bare}にピンして、取れます。
+ex.pin.b2 = ピン：後ろに{t1:bare}がいるので、{your}は動けません。
+ex.pin.b2.2 = {your}は{t1:bare}にピンされています。だから私が取れます。
+ex.pin.b2.3 = これで{your}は{t1:bare}の前で動けません。これがピンです。
+ex.pin.b3 = {your}が{t1:bare}にピンされ、私が取ります。
+ex.pin.b3.2 = このあと、{your}は{t1:bare}にピンされます。
+ex.pin.b3.3 = {your}へのピンで駒損：後ろに{t1:bare}がいます。
+ex.pin.b3.3.spoken = {your}へのピンでこまぞん：後ろに{t1:bare}がいます。
+ex.pin.b4 = {reply}のピンで、私の駒得です。
+ex.pin.b4.spoken = {reply}のピンで、私のこまどくです。
+ex.pin.b4.2 = {move}は{reply}のピンにかかります。
+ex.pin.b4.3 = {reply}のあと、ピンされた駒が落ちます。
+ex.pin.b5 = {move}だと{reply}でピン。
+ex.pin.b5.2 = {reply}でピン、駒が取られます。
+ex.pin.b6 = {reply}でピン。
+ex.pin.b6.2 = {reply}、ピン。
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your}はピンされていて、{sq}を守れません。後ろに{t1:bare}がいます。
+ex.pin_defender.b1.2 = 見て。{your}は{sq}を守れません。{t1:bare}を取られてしまうからです。
+ex.pin_defender.b2 = {your}は{t1:bare}にピンされて、{sq}を本当は守れません。
+ex.pin_defender.b2.2 = ピンされた駒は頼れません。{your}は{sq}を守れず、後ろに{t1:bare}。
+ex.pin_defender.b3 = {your}は{t1:bare}にピンされ、{sq}を守れていません。
+ex.pin_defender.b3.2 = {sq}は守られているように見えますが、{your}は{t1:bare}にピンされています。
+ex.pin_defender.b4 = {your}がピンされていて、{sq}は実は守られていません。
+ex.pin_defender.b4.2 = ピンされている{your}では、{sq}を守れません。
+ex.pin_defender.b5 = {your}はピン。{sq}が手薄です。
+ex.pin_defender.b5.spoken = {your}はピン。{sq}がてうすです。
+ex.pin_defender.b5.2 = {sq}が落ちます。{your}がピンされています。
+ex.pin_defender.b6 = {your}はピン。{sq}が落ちます。
+ex.pin_defender.b6.2 = {your}はピン、{sq}は手薄。
+ex.pin_defender.b6.2.spoken = {your}はピン、{sq}はてうす。
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your}が閉じ込められています。行けるマスがみんな攻められています。
+ex.trapped.b1.2 = {your}を見て。逃げられる安全なマスがありません。
+ex.trapped.b1.3 = {your}は身動きがとれません。攻められても逃げられないのです。
+ex.trapped.b2 = {your}に安全なマスがありません。私が取れます。
+ex.trapped.b2.2 = {your}は閉じ込められています。どこへ行っても取られます。
+ex.trapped.b2.3 = 気をつけて、{your}の逃げ場がなくなってきています。
+ex.trapped.b3 = {your}が閉じ込められます。安全なマスがありません。
+ex.trapped.b3.2 = このあと{your}は閉じ込められ、取られます。
+ex.trapped.b3.3 = {your}は罠にはまりました。もう出られません。
+ex.trapped.b4 = {move}で{your}が閉じ込められます。
+ex.trapped.b4.2 = {your}に逃げ道がなく、私が取ります。
+ex.trapped.b4.3 = {reply}のあと、{your}は閉じ込められます。
+ex.trapped.b5 = {your}が閉じ込められます：{line}。
+ex.trapped.b5.2 = {move}で{your}が取り残されます。
+ex.trapped.b6 = {your}に逃げ場なし。
+ex.trapped.b6.2 = {line}で{your}が捕まります。
+ex.trapped.tip.b1 = 駒を動かす前に、ちゃんと戻ってこられるか確かめましょう。
+ex.trapped.tip.b1.2 = 私の陣地の奥の駒は閉じ込められがち。逃げ道を残しましょう。
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your}はポーンに囲まれ、{my}が後ろの列からチェックできます。
+ex.back_rank.b1.2 = 気をつけて。{your}には逃げるマスがなく、{my}は{sq}へ行けます。
+ex.back_rank.b1.3 = {my}は{sq}へ行けます。{your}は自分のポーンに閉じ込められています。
+ex.back_rank.b2 = バックランク注意！{your}は逃げられず、{my}が{sq}でチェックできます。
+ex.back_rank.b2.2 = {your}が閉じ込められています。{my}が{sq}へ行けば、駒を取れます。
+ex.back_rank.b2.3 = 一番後ろの列が弱いです。{my}が{sq}で{your}にチェックできます。
+ex.back_rank.b3 = バックランクが弱い：{line}。{your}に逃げ道がありません。
+ex.back_rank.b3.2 = {your}に逃げ道がないので、{line}で駒得されます。
+ex.back_rank.b3.2.spoken = {your}に逃げ道がないので、{line}でこまどくされます。
+ex.back_rank.b3.3 = {line}のあと、バックランクで決まります。{your}が閉じ込められています。
+ex.back_rank.b4 = バックランク：{line}、{your}には逃げ道がありません。
+ex.back_rank.b4.2 = {line}で、{your}の周りの弱いバックランクを突かれます。
+ex.back_rank.b4.3 = {your}に逃げ道がありません：{line}。
+ex.back_rank.b5 = {your}の周りのバックランクの弱さ：{line}。
+ex.back_rank.b5.2 = {line}。{your}に逃げ道なし。
+ex.back_rank.b6 = {line}、バックランク。{your}に逃げ場なし。
+ex.back_rank.b6.2 = バックランク：{line}（{your}）。
+ex.back_rank.tip.b1 = キングに逃げ道を作ってあげましょう。前のポーンをひとつ動かします。
+ex.back_rank.tip.b1.2 = ポーンの後ろに閉じこもったキングは危険。すき間を作りましょう。
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {sq}の{your}には守りがありません。{my}がただで取れます。
+ex.hanging.b1.2 = {your}を見て。守りがないのに、{my}が攻めています。
+ex.hanging.b1.3 = {your}は守られていません。{my}がそのまま取れます。
+ex.hanging.b2 = {sq}の{your}に守りがありません。{my}が取っても、取り返せません。
+ex.hanging.b2.2 = {my}が{your}をただで取れます。守る駒がありません。
+ex.hanging.b2.3 = {sq}の{your}がひとりぼっち。{my}が取ります。
+ex.hanging.b3 = {move}で{your}の守りがなくなります：{reply}、取り返せません。
+ex.hanging.b3.2 = {sq}の{your}は{reply}で取られます。
+ex.hanging.b3.3 = {reply}のあと、{your}はただで失われます。
+ex.hanging.b4 = {move}で{your}がただに。{reply}で私が{pts:point}得します。
+ex.hanging.b4.spoken = {move}で{your}がただに。{reply}で私が{pts:point}とくします。
+ex.hanging.b4.2 = {reply}で{your}をただで取ります。
+ex.hanging.b4.3 = {your}が浮いています。{reply}で取ります。
+ex.hanging.b5 = {move}で{your}が浮き、{reply}で取られます。
+ex.hanging.b5.2 = {sq}の{your}は{reply}で落ちます。
+ex.hanging.b5.3 = {reply}で{your}を取ります。
+ex.hanging.b6 = {move}？{reply}で{your}が落ちます。
+ex.hanging.b6.2 = {reply}で{your}が取れます。
+ex.hanging.b6.3 = {your}が浮き駒：{reply}。
+ex.hanging.b6.3.spoken = {your}がうきごま：{reply}。
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2}が{your:bare}を守っていました。今は{my}が取れます。
+ex.hanging_guard.b1.2 = {your2}が離れたので、{your:bare}がひとりに。{my}が取ります。
+ex.hanging_guard.b2 = {your2}は{your:bare}の守りでした。今はひとりなので、{my}が取ります。
+ex.hanging_guard.b2.2 = {your2}が動いて{your:bare}の守りが消え、{my}が取れます。
+ex.hanging_guard.b3 = {your2}が{your:bare}を守っていました。動かすと{reply}で取られます。
+ex.hanging_guard.b3.2 = {your2}がいないと、{your:bare}は浮いています：{reply}。
+ex.hanging_guard.b4 = {move}で{your2}が{your:bare}の守りを外れ、{reply}で取られます。
+ex.hanging_guard.b4.2 = {your2}が{your:bare}の唯一の守りでした。{reply}で取ります。
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my}がもう{your}を攻めていました。私の狙いは毎回確かめましょう。
+ex.hanging_threat.b1.2 = 私の狙いに気づきませんでしたね。{my}が{your}を攻めています。
+ex.hanging_threat.b2 = 直前の手で、{my}が{your}を攻めていました。私の狙いに注意しましょう。
+ex.hanging_threat.b2.2 = {my}が{your}を狙っていて、今なら私が取れます。
+ex.hanging_threat.b3 = 私の狙いを見逃しました：{my}が{your}を攻めていました。
+ex.hanging_threat.b3.2 = {my}はずっと{your}を狙っていました。
+ex.hanging.tip.b1 = 指す前に、自分の駒がみんな安全か確かめましょう。
+ex.hanging.tip.b1.2 = いい習慣：指したあとは毎回、どの駒が守られているか確かめましょう。
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured.
+ex.exchange_capture.b1 = {your}で駒を取りましたが、{my}が取り返します。損な交換です。
+ex.exchange_capture.b1.2 = {my}が取り返します。{your}は{n:point}なのに、取れたのは{n2:point}だけ。
+ex.exchange_capture.b1.3 = 気をつけて。{my}で{your}を取り返せます。損な交換です。
+ex.exchange_capture.b2 = 交換に注意。{your}は{n:point}、{my}に取り返され、得たのは{n2:point}だけ。
+ex.exchange_capture.b2.2 = {my}が{your}を取り返します。{n:point}を失い、得たのは{n2:point}だけです。
+ex.exchange_capture.b3 = {sq}での駒取りはうまくいきません：{line}で{your}を失います。
+ex.exchange_capture.b3.2 = {your}で{sq}の駒を取っても、{line}のあと{pts:point}の損です。
+ex.exchange_capture.b4 = {move}は{sq}での数え違い：{line}で{your}を失います。
+ex.exchange_capture.b4.2 = {sq}で取ると{your}を失います：{line}。
+ex.exchange_capture.b5 = {move}は{sq}での交換で{your}を失います：{line}。
+ex.exchange_capture.b5.2 = {sq}では{your}の負担が重すぎます：{line}。
+ex.exchange_capture.b6 = {move}は{line}で{sq}の{your}を落とします。
+ex.exchange_capture.b6.2 = {line}、{sq}の{your}が消えます。
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = 数えてみましょう。{sq}を攻める私の駒は{n:ko}、守るあなたの駒は{n2:ko}です。
+ex.exchange_count.b1.2 = {sq}では、攻める私の駒が{n:ko}、守る駒が{n2:ko}。取り合いは私の勝ちです。
+ex.exchange_count.b2 = {sq}を攻める駒は{n:ko}、守る駒は{n2:ko}。ここで駒を損します。
+ex.exchange_count.b2.2 = {sq}で数えましょう：攻める駒{n:ko}、守る駒{n2:ko}。
+ex.exchange_count.b3 = {sq}の攻めと守りを数えましょう。私の方が多いです。
+ex.exchange_count.b3.2 = {sq}での交換はうまくいきません：{line}のあと、{pts:point}の損です。
+ex.exchange_count.b4 = {move}は{sq}での数え違い：{line}で{pts:point}の損。
+ex.exchange_count.b4.2 = {sq}は守りより攻めが多いです：{line}。
+ex.exchange_count.b5 = {sq}では攻める駒{n:ko}が守る駒{n2:ko}を上回ります：{line}。
+ex.exchange_count.b5.2 = {move}では{sq}の数で負けます。
+ex.exchange_count.b6 = {line}、{sq}で私が{pts:point}得。
+ex.exchange_count.b6.spoken = {line}、{sq}で私が{pts:point}とく。
+ex.exchange_count.b6.2 = {sq}：{n}対{n2}。
+ex.exchange_count.b6.2.spoken = {sq}：{n}たい{n2}。
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my}は{your}より価値が低い駒です。私が取ると、あなたの損です。
+ex.exchange_cheap.b1.2 = {my}が{your}を攻めています。この交換はあなたの損です。
+ex.exchange_cheap.b2 = {your}は{n:point}、{my}は{n2:point}だけ。その交換は損です。
+ex.exchange_cheap.b2.2 = {my}は{your}より安い駒なので、この攻めで駒を損します。
+ex.exchange_cheap.b3 = {sq}の{your}が、もっと安い駒に攻められています。
+ex.exchange_cheap.b3.2 = {n2:point}の駒が{sq}の{your}を攻めます：{line}。
+ex.exchange_cheap.b4 = {sq}の{your}が安い駒に攻められ、{reply}で駒得されます。
+ex.exchange_cheap.b4.spoken = {sq}の{your}が安い駒に攻められ、{reply}でこまどくされます。
+ex.exchange_cheap.b4.2 = {reply}で、安い駒が{sq}の{your}を攻めます。
+ex.exchange_cheap.b5 = {sq}の{your}は安い駒の攻撃にさらされています：{line}。
+ex.exchange_cheap.b5.2 = {reply}で、{sq}の{your}に対して駒得。
+ex.exchange_cheap.b5.2.spoken = {reply}で、{sq}の{your}に対してこまどく。
+ex.exchange_cheap.b6 = {reply}で{sq}の{your}が落ちます。
+ex.exchange_cheap.b6.2 = {line}：{sq}の{your}が失われます。
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = 気づきましたか？{sq}の{my}はただでした。{your}で取れましたよ。
+ex.missed_capture.b1.2 = 見て。{my}には守りがありませんでした。{your}で取れました。
+ex.missed_capture.b1.3 = {sq}の{my}は守られていませんでした。{your}で取れたのに！
+ex.missed_capture.b2 = ただで取れる駒を見逃しました：{best}で{my}が取れました。
+ex.missed_capture.b2.2 = {sq}の{my}は守りなし。{best}で取れました。次は取りましょう！
+ex.missed_capture.b2.3 = {best}なら、{my}をただで取れました。
+ex.missed_capture.b3 = {best}なら、{my}がただで手に入りました。
+ex.missed_capture.b3.2 = {sq}の{my}は浮いていました：{best}。浮き駒を毎回探しましょう。
+ex.missed_capture.b3.2.spoken = {sq}の{my}は浮いていました：{best}。うきごまを毎回探しましょう。
+ex.missed_capture.b3.3 = {best}で{my}を取れました。
+ex.missed_capture.b4 = 見逃し：{best}で{sq}の{my}を取れました。
+ex.missed_capture.b4.2 = {best}で、浮いていた{my}が取れました。
+ex.missed_capture.b4.3 = {my}が浮いていました：{best}。
+ex.missed_capture.b5 = {best}で{my}が取れました。{move}では逃げられます。
+ex.missed_capture.b5.2 = {sq}の{my}が浮き駒：{best}。
+ex.missed_capture.b5.2.spoken = {sq}の{my}がうきごま：{best}。
+ex.missed_capture.b6 = {best}！{sq}の{my}が浮いていました。
+ex.missed_capture.b6.2 = {best}なら{my}が取れました。
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = 両取りがありました：{best}で{t1}と{t2:bare}を攻められます！
+ex.missed_fork.b1.spoken = りょうどりがありました：{best}で{t1}と{t2:bare}を攻められます！
+ex.missed_fork.b1.2 = 見て！{best}なら{t1}と{t2:bare}を同時に攻められました。
+ex.missed_fork.b1.3 = {best}は両取りでした：{t1}も{t2:bare}も攻撃できました。
+ex.missed_fork.b1.3.spoken = {best}はりょうどりでした：{t1}も{t2:bare}も攻撃できました。
+ex.missed_fork.b2 = {best}はフォークでした：{t1}と{t2:bare}。
+ex.missed_fork.b2.2 = 両取りを見逃しました：{best}で{t1}と{t2:bare}を攻撃。
+ex.missed_fork.b2.2.spoken = りょうどりを見逃しました：{best}で{t1}と{t2:bare}を攻撃。
+ex.missed_fork.b2.3 = {best}で{t1}と{t2:bare}を同時に攻撃。フォークです！
+ex.missed_fork.b3 = {best}で{t1}と{t2:bare}のフォークでした。
+ex.missed_fork.b3.2 = {best}があり、{t1}と{t2:bare}をフォークできました。
+ex.missed_fork.b3.3 = {best}なら{t1}と{t2:bare}をフォークできていました。
+ex.missed_fork.b4 = {best}で{t1}と{t2:bare}のフォーク。
+ex.missed_fork.b4.2 = フォークの見逃し：{best}で{t1}と{t2:bare}。
+ex.missed_fork.b5 = {best}が{t1}と{t2:bare}をフォーク。
+ex.missed_fork.b5.2 = {best}で{t1}と{t2:bare}を攻撃。
+ex.missed_fork.b6 = {best}、{t1}と{t2:bare}のフォーク。
+ex.missed_fork.b6.2 = {best}：{t1}と{t2:bare}へのフォーク。
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my}は{sq}まで走ってクイーンになれます。{your}は遠すぎます。
+ex.promotion.b1.2 = 見て。{my}が{sq}へ行くのを止められません。{your}では追いつけません。
+ex.promotion.b1.3 = {my}は{sq}まであと{n:square}。{your}は間に合いません。
+ex.promotion.b1.3.spoken = {my}は{sq}まであと{n:square}。{your}はまにあいません。
+ex.promotion.b2 = {my}が{sq}へ走り、{your}は追いつけません。
+ex.promotion.b2.2 = {sq}まで{my}は{n:move}、{your}は{n2:move}かかります。間に合いません。
+ex.promotion.b2.2.spoken = {sq}まで{my}は{n:move}、{your}は{n2:move}かかります。まにあいません。
+ex.promotion.b2.3 = 注意：{my}が{sq}でクイーンになり、{your}は遠すぎます。
+ex.promotion.b3 = {your}は{my}のスクエアの外。{sq}までに追いつけません。
+ex.promotion.b3.2 = 競走は負けです。{my}が{your}より先に{sq}へ着きます。
+ex.promotion.b4 = {your}はポーンのスクエアの外。{sq}でクイーンになります。
+ex.promotion.b4.2 = {my}が{sq}でプロモーション。{your}は一手足りません。
+ex.promotion.b4.2.spoken = {my}が{sq}でプロモーション。{your}はいって足りません。
+ex.promotion.b5 = ポーン競走は負け。{your}はスクエアの外で、{sq}まで届きません。
+ex.promotion.b5.2 = {line}、{sq}でクイーンができ、{your}は手遅れ。
+ex.promotion.b5.2.spoken = {line}、{sq}でクイーンができ、{your}はておくれ。
+ex.promotion.b6 = {your}はスクエアの外。{sq}でクイーン。
+ex.promotion.b6.2 = {line}、{sq}でクイーン（{your}は手遅れ）。
+ex.promotion.b6.2.spoken = {line}、{sq}でクイーン（{your}はておくれ）。
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = あなたのポーンは{sq}まで走って、クイーンになれました！
+ex.promotion_missed.b1.2 = {sq}を見て！あなたのポーンはそこまで走れました。
+ex.promotion_missed.b2 = あなたのポーンは{sq}まで走れました。じゃまのないポーンは進めましょう！
+ex.promotion_missed.b2.2 = あなたのポーンが{sq}へ進むのを、止めるものはありませんでした。
+ex.promotion_missed.b3 = {best}で、{sq}への競走に勝てました。
+ex.promotion_missed.b3.2 = あなたのポーンの方が速かったです：{best}から{sq}でクイーンに。
+ex.promotion_missed.b4 = {best}で、{sq}へのポーン競走に勝てました。
+ex.promotion_missed.b4.2 = {best}！ポーンが{sq}でクイーンに。
+ex.promotion_missed.b5 = {best}なら先に{sq}でクイーン。
+ex.promotion_missed.b5.2 = {best}で{sq}はあなたのもの。
+ex.promotion_missed.b6 = {best}で{sq}への競走に勝ち。
+ex.promotion_missed.b6.2 = {best}、{sq}が先。
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = そのポーンは{your}の盾でした。守りが弱くなりました。
+ex.king_shield.b1.2 = {sq}のポーンは{your}の盾でした。これで私の駒が入ってこられます。
+ex.king_shield.b2 = {sq}のポーンを動かすと、{your}が弱くなります。私の駒が攻めてきます。
+ex.king_shield.b2.2 = {your}の守りが一つ減りました：{sq}のポーンが盾でした。
+ex.king_shield.b3 = そのポーンの動きで、{your}が私の攻撃にさらされます。
+ex.king_shield.b3.2 = {your}のポーンの盾がなくなり、私の駒が入ってきます。
+ex.king_shield.b4 = {move}で{your}の周りのポーンが弱まり、私の攻撃が入ります。
+ex.king_shield.b4.2 = {move}のあと、{your}を囲む盾が崩れました。
+ex.king_shield.b5 = {move}で{your}の守りが緩みます：{line}。
+ex.king_shield.b5.2 = {move}のあと、{your}がむき出しに：{line}。
+ex.king_shield.b6 = {move}で{your}が弱体化：{line}。
+ex.king_shield.b6.2 = {line}。{your}の守りが薄すぎます。
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your}が危険です。私の駒が向かっています。
+ex.king_exposed.b1.2 = {your}がむき出しです。ポーンの後ろで守りましょう。
+ex.king_exposed.b2 = {your}の周りが開きすぎています。私はたくさんチェックできます。
+ex.king_exposed.b2.2 = 気をつけて。{your}には隠れ場所がなく、私の駒が攻めています。
+ex.king_exposed.b3 = {your}がむき出しで、私の駒がチェックで攻撃できます。
+ex.king_exposed.b3.2 = このあと、{your}には隠れ場所がありません。
+ex.king_exposed.b4 = {your}がむき出しになります：{line}。
+ex.king_exposed.b4.2 = {move}で{your}が攻撃にさらされます。
+ex.king_exposed.b5 = {your}が無防備すぎます：{line}。
+ex.king_exposed.b5.2 = {move}で{your}が丸裸に。
+ex.king_exposed.b6 = {line}。{your}がむき出し。
+ex.king_exposed.b6.2 = {your}の守りが薄すぎます：{line}。
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = この交換で、私が勝つポーンエンディングになります。
+ex.bad_trade.b3.2 = {line}のあとはポーンだけ。私のキングの方が良い位置です。
+ex.bad_trade.b4 = 交換で負けのポーンエンディングに：{line}。
+ex.bad_trade.b4.2 = このポーンエンディングへの交換は負けです。
+ex.bad_trade.b5 = 間違った交換：{line}のあとのポーンエンディングは負け。
+ex.bad_trade.b5.2 = ポーンエンディングは負け。駒を残しましょう。
+ex.bad_trade.b6 = {line}のあとのポーンエンディングは負け。
+ex.bad_trade.b6.2 = 負けのポーンエンディング：{line}。
+ex.bishop_pair.b5 = 見返りなしにビショップペアを手放しました。
+ex.bishop_pair.b5.2 = その交換でビショップペアを失い、私のは残ります。
+ex.bishop_pair.b6 = ビショップペアが消えます。
+ex.bishop_pair.b6.2 = ビショップペアを放棄。
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best}でオポジション：キング同士が1マス空けて向かい合います。
+ex.opposition.b3.spoken = {best}でオポジション：キング同士がひとマスあけて向かい合います。
+ex.opposition.b3.2 = キングに注目！{best}でオポジションを取れました。
+ex.opposition.b4 = {best}でオポジションを取り、勝ちです。
+ex.opposition.b4.2 = オポジションで決まります：{best}。
+ex.opposition.b5 = {best}、オポジションを取る手。
+ex.opposition.b5.2 = オポジション：{best}。
+ex.opposition.b6 = {best}、オポジション。
+ex.opposition.b6.2 = {best}：オポジション。
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = ポーンを{sq}まで走らせられました。じゃまのないポーンは進めましょう！
+ex.push_passed.b1.2 = じゃまのないポーンを進めましょう！{sq}を目指しています。
+ex.push_passed.b1.3 = あなたのポーンが{sq}へ進むのを、何も止められません。進めましょう！
+ex.push_passed.b2 = {best}：じゃまのないポーンを{sq}の方へ進めましょう。
+ex.push_passed.b2.2 = じゃまのないポーンは強いです。{best}で進めます。
+ex.push_passed.b2.3 = 進めましょう！{best}でポーンが{sq}へ近づきます。
+ex.push_passed.b3 = {best}でパスポーンを進めます。
+ex.push_passed.b3.2 = パスポーンは進めるもの：{best}。
+ex.push_passed.b3.3 = {best}が正解：ポーンが{sq}へ走ります。
+ex.push_passed.b4 = {best}：パスポーンが決め手です。
+ex.push_passed.b4.2 = 前進：{best}。
+ex.push_passed.b5 = {best}でパスポーンを前進、{eval}。
+ex.push_passed.b5.2 = パスポーン：{best}。
+ex.push_passed.b6 = {best}：{eval}。
+ex.push_passed.b6.2 = {best}、パスポーン。
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = {your}を前へ出しましょう！駒が減ったら、キングは強い駒です。
+ex.king_active.b1.2 = いよいよ{your}も戦いに参加できます。真ん中へ歩かせましょう。
+ex.king_active.b1.3 = 駒が少なくなったら、{your}も出てきて手伝いましょう。
+ex.king_active.b2 = エンドゲームでは{your}を使いましょう。センターへ！
+ex.king_active.b2.2 = {your}を働かせるときです。前へ進めましょう。
+ex.king_active.b3 = {best}でキングが活躍します。エンドゲームではキングも戦います。
+ex.king_active.b3.2 = {best}：今はキングがセンターにいるべきです。
+ex.king_active.b4 = {best}でキングをセンターへ。
+ex.king_active.b4.2 = キングは前へ出るべき：{best}。
+ex.king_active.b5 = {best}でキングを活用：{line}。
+ex.king_active.b5.2 = キングの活用：{best}。
+ex.king_active.b6 = {best}：{eval}。
+ex.king_active.b6.2 = {best}、キングを前へ。
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best}なら、より良い局面を保てました。
+ex.positional.b4.2 = ここは{best}の方が強力でした。
+ex.positional.b4.3 = 私なら{best}を選んでいました。
+ex.positional.b5 = {best}の方が強力：{line}。
+ex.positional.b5.2 = {best}、{line}という狙い。
+ex.positional.b5.3 = {best}を検討しましょう：{line}。
+ex.positional.b6 = {best}：{eval}。
+ex.positional.b6.2 = {best}、{eval}。
+ex.positional.b6.3 = {best}（{eval}）。
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your}が早く出すぎました。先にナイトとビショップを出しましょう。
+tip.early_queen.b1.2 = こんなに早く{your}を出すと、私の駒に追い回されますよ。
+tip.early_queen.b1.3 = {your}を動かすのは楽しいけれど、先にナイトやビショップを出しましょう。
+tip.early_queen.b2 = こんなに早く{your}を動かすと、私が攻めて時間を稼げます。
+tip.early_queen.b2.2 = もう{your}を出すんですか？ナイトとビショップが先です！
+tip.early_queen.b3 = {your}が早く出ると、私はそれを攻めてテンポを稼げます。
+tip.early_queen.b3.2 = この時期の{your}は追い回されやすい。先に展開しましょう。
+tip.queen_grab.b1 = {your}が遠くのポーンを取りました。これから困ったことになるかも。
+tip.queen_grab.b1.2 = {your}でのポーン取りは時間がかかります。先に駒を出しましょう！
+tip.queen_grab.b2 = {your}が端のポーンを取りに行きました。時間を大きく損します。
+tip.queen_grab.b2.spoken = {your}がはしのポーンを取りに行きました。時間を大きく損します。
+tip.queen_grab.b2.2 = {your}で遠くのポーンを取りに行くときは、気をつけて。
+tip.queen_grab.b3 = この時期に{your}でポーンを取りに行くと、時間を失います。
+tip.queen_grab.b3.2 = {your}が自陣から遠く離れました。私の展開が生きてきます。
+tip.queen_grab.b3.2.spoken = {your}がじじんから遠く離れました。私の展開が生きてきます。
+tip.queen_grab.b4 = {your}がポーンを取りましたが、時間を失いすぎです。
+tip.queen_grab.b4.2 = {your}での端のポーン取りは、テンポを失います。
+tip.queen_grab.b4.2.spoken = {your}でのはしのポーン取りは、テンポを失います。
+tip.same_piece.b1 = {your}を2回動かしました。毎回、新しい駒を出してみましょう。
+tip.same_piece.b1.spoken = {your}をにかい動かしました。毎回、新しい駒を出してみましょう。
+tip.same_piece.b1.2 = また{your}？ほかの駒も出しましょう。
+tip.same_piece.b1.3 = {your}ばかりでなく、毎回新しい駒を出してみましょう。
+tip.same_piece.b2 = オープニングで{your}を2回動かすと、時間を損します。
+tip.same_piece.b2.spoken = オープニングで{your}をにかい動かすと、時間を損します。
+tip.same_piece.b2.2 = {your}がまた動きました。ほかの駒はまだ最初の位置のままです。
+tip.same_piece.b3 = {your}を2回動かすと、展開が遅れます。
+tip.same_piece.b3.spoken = {your}をにかい動かすと、展開が遅れます。
+tip.same_piece.b3.2 = また{your}の手。残りの駒が待っています。
+tip.castle.b1 = {your}はまだ真ん中です。キャスリングすれば安全になります。
+tip.castle.b1.2 = キャスリングの時間です！{your}は隅の方が安全です。
+tip.castle.b1.2.spoken = キャスリングの時間です！{your}はすみの方が安全です。
+tip.castle.b1.3 = そろそろキャスリングを考えましょう。{your}がむき出しです。
+tip.castle.b2 = {your}はまだセンターにいます。早めにキャスリングを！
+tip.castle.b2.2 = キャスリングで{your}を安全にしまえます。
+tip.castle.b3 = センターが開いてきたので、{your}はキャスリングすべきです。
+tip.castle.b3.2 = {your}がまだセンターに。キャスリングの頃合いでした。
+tip.knight_rim.b1 = 端にいる{your}は、あまり働きません。ナイトは真ん中が好きです。
+tip.knight_rim.b1.spoken = はしにいる{your}は、あまり働きません。ナイトは真ん中が好きです。
+tip.knight_rim.b1.2 = 端のナイトは働かない！そこの{your}は行けるマスが少ないです。
+tip.knight_rim.b1.2.spoken = はしのナイトは働かない！そこの{your}は行けるマスが少ないです。
+tip.knight_rim.b2 = 端にいる{your}は押さえるマスが少ないです。センターを目指しましょう。
+tip.knight_rim.b2.spoken = はしにいる{your}は押さえるマスが少ないです。センターを目指しましょう。
+tip.knight_rim.b2.2 = 「端のナイトは働かない」：{your}はセンターに行きたがっています。
+tip.knight_rim.b2.2.spoken = 「はしのナイトは働かない」：{your}はセンターに行きたがっています。
+tip.knight_rim.b3 = {your}が端で遊んでいます。
+tip.knight_rim.b3.spoken = {your}がはしで遊んでいます。
+tip.knight_rim.b3.2 = 端は{your}にとって良い場所ではありません。
+tip.knight_rim.b3.2.spoken = はしは{your}にとって良い場所ではありません。
+tip.flank.b1 = 真ん中のポーンから動かしてみましょう。端のポーンはあまり役に立ちません。
+tip.flank.b1.spoken = 真ん中のポーンから動かしてみましょう。はしのポーンはあまり役に立ちません。
+tip.flank.b1.2 = 端のポーンを動かしても、駒は出てきません。真ん中のポーンを使いましょう。
+tip.flank.b1.2.spoken = はしのポーンを動かしても、駒は出てきません。真ん中のポーンを使いましょう。
+tip.flank.b2 = 端のポーンを動かしても展開になりません。センターのポーンを使いましょう。
+tip.flank.b2.spoken = はしのポーンを動かしても展開になりません。センターのポーンを使いましょう。
+tip.flank.b2.2 = 端のポーンの手が多すぎます。駒を出しましょう！
+tip.flank.b2.2.spoken = はしのポーンの手が多すぎます。駒を出しましょう！
+tip.flank.b3 = オープニングでの端のポーンの手は、展開を遅らせます。
+tip.flank.b3.spoken = オープニングでのはしのポーンの手は、展開を遅らせます。
+tip.flank.b3.2 = 端のポーンは後回し。展開して、センターを争いましょう。
+tip.flank.b3.2.spoken = はしのポーンは後回し。展開して、センターを争いましょう。
+tip.centre.b1 = 盤の真ん中、たとえば{sq}を押さえましょう。
+tip.centre.b1.2 = 真ん中は大切です。{sq}の近くにポーンか駒を置きましょう。
+tip.centre.b1.3 = 真ん中の駒は強いです。{sq}のようなマスを目指しましょう。
+tip.centre.b2 = センターを争いましょう：{sq}のようなマスが大事です。
+tip.centre.b2.2 = センターを私に譲っていますよ。{sq}を見てください。
+tip.centre.b3 = センターを争っていません。{sq}は私のものです。
+tip.centre.b3.2 = {sq}のあたりで、センターに挑みましょう。
+# Endgame technique tips.
+tip.mate_technique.b1 = 私のキングだけになったら、端へ追い詰めてからチェックメイト。
+tip.mate_technique.b1.spoken = 私のキングだけになったら、はしへ追い詰めてからチェックメイト。
+tip.mate_technique.b1.2 = コツ：私のキングを端へ押し込みましょう。あなたのキングも近づけて。
+tip.mate_technique.b1.2.spoken = コツ：私のキングをはしへ押し込みましょう。あなたのキングも近づけて。
+tip.fifty.b1 = 注意：駒取りもポーンの移動もなく50手続くと、引き分けです。
+tip.fifty.b1.spoken = 注意：駒取りもポーンの移動もなくごじゅって続くと、引き分けです。
+tip.fifty.b1.2 = 急ぎましょう：駒取りもポーンの手もない50手で引き分けです。
+tip.fifty.b1.2.spoken = 急ぎましょう：駒取りもポーンの手もないごじゅってで引き分けです。
+tip.repetition.b1 = 気をつけて！同じ局面が3回目になると、引き分けです。
+tip.repetition.b1.spoken = 気をつけて！同じ局面がさんかいめになると、引き分けです。
+tip.repetition.b1.2 = 同じ手の繰り返しは避けましょう。勝っているのに、3回目で引き分けです。
+tip.repetition.b1.2.spoken = 同じ手の繰り返しは避けましょう。勝っているのに、さんかいめで引き分けです。
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = わあ、駒を捨てて、それがうまくいきました！
+praise.sacrifice.2 = 上手な捨て駒です！とても良い手です。
+praise.sacrifice.2.spoken = じょうずなすてごまです！とても良い手です。
+praise.brilliant.b3 = 妙手！本物のサクリファイスです。
+praise.brilliant.b3.spoken = みょうしゅ！本物のサクリファイスです。
+praise.brilliant.b3.2 = わあ、{move}は素晴らしいサクリファイスです！
+praise.brilliant.b4 = {move}！見事なサクリファイスです。
+praise.brilliant.b4.2 = 妙手です。それは予想していませんでした。
+praise.brilliant.b4.2.spoken = みょうしゅです。それは予想していませんでした。
+praise.brilliant.b5 = {move}!! 妙手。
+praise.brilliant.b5.spoken = {move}。みょうしゅです！
+praise.brilliant.b5.2 = 見事なサクリファイス。
+praise.brilliant.b6 = {move}!! お見事。
+praise.brilliant.b6.spoken = {move}。お見事！
+praise.brilliant.b6.2 = 妙手。
+praise.brilliant.b6.2.spoken = みょうしゅ。
+praise.great.b2 = すごい手！反撃の手を見つけましたね。
+praise.great.b2.2 = 素晴らしい手です。よく見つけました！
+praise.great.b3 = 素晴らしい手！唯一の正しい考えを見つけましたね。
+praise.great.b3.2 = お見事、{move}で流れが変わりました。
+praise.great.b4 = {move}！よく見つけました。
+praise.great.b4.2 = 好手です。
+praise.great.b4.2.spoken = こうしゅです。
+praise.great.b5 = {move}！見事な発見。
+praise.great.b5.2 = 強い手：{move}。
+praise.great.b6 = {move}！好手。
+praise.great.b6.spoken = {move}！こうしゅ。
+praise.great.b6.2 = 見事な発見。
+praise.only.b2 = いいですね！それが唯一の良い手でした。
+praise.only.b2.2 = よくできました、うまくいく唯一の手を見つけましたね。
+praise.only.b3 = 唯一の手、よく見つけました。
+praise.only.b3.2 = その通り！ここでは他の手はうまくいきませんでした。
+praise.only.b4 = 唯一の手です。お見事。
+praise.only.b4.2 = 唯一の手を発見。
+praise.only.b5 = 唯一の手。いいですね。
+praise.only.b5.2 = {move}、唯一の手。
+praise.only.b6 = 唯一の手。
+praise.only.b6.2 = 正確です：唯一の手。
+praise.fork.b2 = 両取り！よくできました。
+praise.fork.b2.spoken = りょうどり！よくできました。
+praise.fork.b2.2 = 駒をふたつ同時に攻めています！すごい。
+praise.fork.b2.3 = いいですね！それがフォークです。
+praise.fork.b3 = いいフォーク。
+praise.fork.b3.2 = 見事なフォーク！
+praise.fork.b3.3 = フォークです。うまい。
+praise.capture.b1 = よくできました！{my}をただで取りましたね。
+praise.capture.b1.2 = よく見ていますね！{my}は守られていませんでした。
+praise.capture.b1.3 = やった！{my}を取りました。
+praise.capture.b2 = いい駒取り！{my}に守りがありませんでした。
+praise.capture.b2.2 = いいですね、{my}を手に入れました。
+praise.capture.b2.3 = よく気づきました：{my}は守られていませんでした。
+praise.best.b1 = いい手です！
+praise.best.b1.2 = とてもいいですね！
+praise.best.b1.3 = うまい！
+praise.best.b2 = いい手です。
+praise.best.b2.2 = とてもいいですね。
+praise.best.b2.3 = うまく指しました。
+praise.best.b3 = いい手です。簡単には見つかりません。
+praise.best.b3.2 = よく見つけました。
+praise.best.b3.3 = ここでは{move}が最善手。いいですね。
+praise.best.b3.3.spoken = ここでは{move}がさいぜんしゅ。いいですね。
+praise.trade.b1 = いいですね！リードしているときは、駒を交換すると有利です。
+praise.trade.b1.2 = いい交換。リードしているので、駒が減るのは有利です。
+praise.trade.b2 = いい交換：リードしているなら駒を交換しましょう。
+praise.trade.b2.2 = リードしているときに{my}を交換するのは賢いです。
+praise.trade.b3 = いいですね：優勢なら交換。
+praise.trade.b3.2 = 堅実な交換です。
+praise.excellent.b3 = 素晴らしい手です。
+praise.excellent.b3.2 = 強い手ですね。
+praise.excellent.b3.3 = とても正確です。
+praise.excellent.b4 = 正確です。
+praise.excellent.b4.2 = 素晴らしい。
+praise.excellent.b4.3 = いいですね、{move}は正確です。
+praise.castle.b1 = いいですね！キャスリングしました。キングがより安全になりました。
+praise.castle.b1.2 = いいキャスリング！キングが安全な場所に収まりました。
+praise.saved.b1 = いいですね！駒を助けました。
+praise.saved.b1.2 = よくできました、安全な場所へ動かしましたね。
+praise.book.b1 = いいですね、よく知られたオープニングの手です。
+praise.book.b1.2 = いいですね、強い人もそうやって始めます。
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = 気をつけて！{sq}でチェックメイトを狙っています。
+threat.mate.b1.2 = 注意：{my}は{sq}へ行きたがっています。そうなればチェックメイトです。
+threat.mate.b1.3 = {sq}を見て。私がそこへ行けば、チェックメイト！
+threat.mate.b2 = 気をつけて、チェックメイトを狙っています。
+threat.mate.b2.2 = 注意：{sq}でチェックメイトの狙いがあります。
+threat.mate.b2.3 = よく見て。チェックメイトを狙っていますよ。
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = 見て：{my}が{your}を攻めています。
+threat.piece.b1.2 = 気をつけて！{your}が{my}に攻められています。
+threat.piece.b1.3 = 注意、{my}が{your}を取ろうとしています。
+threat.piece.b2 = {your}に気をつけて。
+threat.piece.b2.2 = {your}が攻められています。
+threat.piece.b2.3 = {your}に注意。
+threat.punish.b1 = 今の私の手はミスでした。チャンスを生かせますか？
+threat.punish.b1.2 = うーん、ミスをしたかもしれません。見つけられますか？
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = 今度は{your}のことを考えましょう。
+tb.hint.b1.2 = {your}をよく見ておきましょう。
+tb.hint.king.b1 = {your}の安全を考えましょう。
+tb.hint.king.b1.2 = まず{your}を見て。安全ですか？
+tb.hint.missed.b1 = ただで取れる駒を探しましょう。
+tb.hint.missed.b1.2 = よく見て：取れるものはありますか？
+tb.hint.mate_missed.b1 = 私のキングを見て。チェックメイトできますか？
+tb.hint.mate_missed.b1.2 = まずチェックを試しましょう。チェックメイトがあるかも！
+tb.hint.general.b1 = ゆっくりと、盤全体を見ましょう。
+tb.hint.general.b1.2 = もっと安全な手を探しましょう。
+# The retry.
+tb.fixed.b1 = ずっと良くなりました！
+tb.fixed.b1.2 = そう、その方がいいです！
+tb.fixed.b1.3 = いいですね、ずっとうまくいきます。
+tb.fixed = その方が良いです。
+tb.fixed.2 = 良くなりました。
+tb.fixed.3 = いい修正です。
+tb.same = また同じ手ですか？わかりました、見てみましょう。
+tb.same.2 = その手が好きなんですね。では、指し進めましょう。

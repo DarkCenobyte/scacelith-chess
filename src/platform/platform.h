@@ -76,7 +76,14 @@ void setMouseCaptured(bool captured);
 
 // ---- Paths & misc ----------------------------------------------------------------------------
 std::string exeDirectory();      // with trailing separator
-std::string userDataDirectory(); // writable (e.g. %APPDATA%/Scacelith/), with trailing separator
+std::string userDataDirectory(); // writable (e.g. %APPDATA%/scacelith/), with trailing separator
+// The per-user folder of the game's data files, "scacelith", created if missing, with trailing
+// separator; each kind of data has its subfolder there ("coach" = the coach's voice model).
+// Windows: %APPDATA%\scacelith\ (Roaming). Linux: $XDG_DATA_HOME/scacelith/, by default
+// ~/.local/share/scacelith/ (the settings fallback stays in ~/.config/scacelith/). A macOS port
+// would use ~/Library/Application Support/scacelith/. net::sys::appDataDirectory() is the same
+// rule for the core library.
+std::string appDataDirectory();
 void messageBox(const char* title, const char* text);
 uint64_t randomSeed();           // non-deterministic seed from the OS
 // Text on the system clipboard as UTF-8 ("" when there is none; the X11 layer always returns "").
@@ -87,5 +94,10 @@ std::string systemLanguage();
 // Command line arguments after the program name, UTF-8 (for modules that read an option before
 // a scene exists, e.g. --lang).
 std::vector<std::string> commandLine();
+
+// ---- Saved games (the library page) -----------------------------------------------------------
+// Shows a folder (or opens a file) in the system's file manager: ShellExecuteW "open" on Windows,
+// xdg-open on Linux (started directly, no shell). Returns at once; false when it could not start.
+bool openInFileManager(const std::string& path);
 
 }  // namespace plat

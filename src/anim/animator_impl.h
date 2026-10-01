@@ -162,6 +162,25 @@ inline const FingerPose& poseLooseFist() {
                                   {-0.03f, 1.18f, 1.38f, 0.72f}, {-0.06f, 1.24f, 1.40f, 0.72f}});
     return p;
 }
+// Pointing: the index extended (a slight natural flexion), the other fingers curled into the palm,
+// the thumb tucked against the curled middle finger (its pad beside the middle phalanx).
+inline const FingerPose& posePoint() {
+    static FingerPose p = fpMake({{1.50f, -0.35f, 1.05f, 0.85f}, {0.02f, 0.10f, 0.10f, 0.05f}, {0.0f, 1.45f, 1.70f, 1.00f},
+                                  {-0.03f, 1.50f, 1.65f, 0.95f}, {-0.06f, 1.55f, 1.50f, 0.80f}});
+    return p;
+}
+// Presenting / open hand: fingers loosely extended and a little spread, thumb out.
+inline const FingerPose& poseOpenPalm() {
+    static FingerPose p = fpMake({{0.10f, -0.05f, 0.05f, 0.05f}, {0.10f, 0.08f, 0.10f, 0.05f}, {0.02f, 0.10f, 0.12f, 0.06f},
+                                  {-0.08f, 0.14f, 0.15f, 0.07f}, {-0.16f, 0.18f, 0.17f, 0.08f}});
+    return p;
+}
+// Baton beats: loosely open, the fingers a little more curled towards the little finger.
+inline const FingerPose& poseBeat() {
+    static FingerPose p = fpMake({{0.30f, 0.10f, 0.18f, 0.12f}, {0.04f, 0.18f, 0.26f, 0.14f}, {0.0f, 0.26f, 0.36f, 0.20f},
+                                  {-0.04f, 0.36f, 0.46f, 0.26f}, {-0.09f, 0.46f, 0.54f, 0.30f}});
+    return p;
+}
 
 // Finger bone of 'side': finger f (0 thumb .. 4 pinky), joint j (0..2).
 inline Bone fingerBone(Side s, int f, int j) { return Bone((s == Side::Right ? ThumbR1 : ThumbL1) + f * 3 + j); }
@@ -466,7 +485,8 @@ struct Segment {
     float hs = 0, he = 1;          // horizontal (XZ) motion window, fractions of T
     float vs = 0, ve = 1;          // vertical motion window
     float arcH = 0, arcPeak = 0.5f;
-    float oscAmp = 0, oscCycles = 0, os = 0, oe = 1;   // vertical oscillation (handshake pumps)
+    float oscAmp = 0, oscCycles = 0, os = 0, oe = 1;   // oscillation (handshake pumps, pointing jabs)
+    vec3 oscAxis{0, 1, 0};                             // its direction (vertical unless set)
     Track<quat> rot;
     Track<FingerPose> fing;
     float swing = 0;               // dynamic tilt of the held piece (rad per m/s^2 of horizontal acc)
@@ -487,19 +507,24 @@ struct Segment {
     // (t from the segment start) and every field above except T is ignored.
     std::function<HandSample(float t)> follow;
 
-    // Vertical extras on top of the quintic: the arc bump and the handshake pumps. Both are zero
-    // with zero slope and curvature outside the segment, so symmetric differences work anywhere.
+    // Extras on top of the quintic: the arc bump (vertical) and the oscillation along oscAxis (the
+    // handshake pumps, the jabs of a pointing finger). Both are zero with zero slope and curvature
+    // outside the segment, so symmetric differences work anywhere.
+    float osc(float t) const {
+        float u = t / T;
+        if (oscAmp == 0.0f || u <= os || u >= oe) return 0.0f;
+        float w = (u - os) / (oe - os);
+        float env = std::sin(PI * w);
+        env *= env;
+        return oscAmp * env * std::sin(TAU * oscCycles * w);
+    }
     float extraY(float t) const {
         float u = t / T, y = 0.0f;
         if (arcH != 0.0f) y += arcH * bump(u, arcPeak);
-        if (oscAmp != 0.0f && u > os && u < oe) {
-            float w = (u - os) / (oe - os);
-            float env = std::sin(PI * w);
-            env *= env;
-            y += oscAmp * env * std::sin(TAU * oscCycles * w);
-        }
+        if (oscAmp != 0.0f) y += osc(t) * oscAxis.y;
         return y;
     }
+    bool oscFlat() const { return oscAmp != 0.0f && (oscAxis.x != 0.0f || oscAxis.z != 0.0f); }   // a horizontal part
     vec3 basePos(float t, vec3* vel = nullptr, vec3* acc = nullptr) const {
         vec3 p, v, a;
         auto axis = [&](int i, float ws, float we) {
@@ -515,6 +540,11 @@ struct Segment {
         axis(2, hs, he);
         axis(1, vs, ve);
         p.y += extraY(t);
+        if (oscFlat()) {
+            float o = osc(t);
+            p.x += o * oscAxis.x;
+            p.z += o * oscAxis.z;
+        }
         if (vel) *vel = v;
         if (acc) *acc = a;
         return p;
@@ -529,6 +559,13 @@ struct Segment {
             float ya = extraY(t - h), y0 = extraY(t), yb = extraY(t + h);
             s.v.y += (yb - ya) / (2.0f * h);
             s.a.y += (yb - 2.0f * y0 + ya) / (h * h);
+        }
+        if (oscFlat()) {
+            const float h = 1.0f / 480.0f;
+            float oa = osc(t - h), o0 = osc(t), ob = osc(t + h);
+            vec3 dir(oscAxis.x, 0.0f, oscAxis.z);
+            s.v += dir * ((ob - oa) / (2.0f * h));
+            s.a += dir * ((ob - 2.0f * o0 + oa) / (h * h));
         }
         s.q = evalTrack(rot, u);
         if (rotCorr.w < 0.99999f) {
@@ -603,6 +640,45 @@ struct Motion {
     }
 };
 
+// Timeline of a Trace (seconds): the approach onto the first waypoint, the pause there, one leg
+// per pair of waypoints (horizontal length / TraceSpeed) with a pause on each inner waypoint, the
+// settle on the last one. T > 0: fitted into that duration (see taskDuration).
+struct TraceSchedule {
+    float approach = 0.0f, dwell = 0.0f, corner = 0.0f, settle = 0.0f;
+    std::vector<float> legs;
+    float travel() const {   // first waypoint -> last one, pauses included
+        float s = dwell;
+        for (size_t i = 0; i < legs.size(); ++i) s += legs[i] + (i + 1 < legs.size() ? corner : 0.0f);
+        return s;
+    }
+    float total() const { return approach + travel() + settle; }
+};
+inline TraceSchedule traceSchedule(const std::vector<vec3>& path, float T) {
+    TraceSchedule s;
+    s.approach = Timing::PointApproach;
+    s.dwell = Timing::TraceDwell;
+    s.corner = Timing::TraceCornerPause;
+    s.settle = Timing::TraceSettle;
+    for (size_t i = 0; i + 1 < path.size(); ++i) {
+        const vec3 d = path[i + 1] - path[i];
+        s.legs.push_back(length(vec3(d.x, 0.0f, d.z)) / Timing::TraceSpeed);
+    }
+    if (T <= 0.0f) return s;
+    const float natural = s.total();
+    if (T >= natural) {
+        s.settle += T - natural;   // a longer hold on the last waypoint
+        return s;
+    }
+    // Shorter: everything but a short settle shrinks in proportion.
+    const float settle = std::min(s.settle, 0.15f * T), k = (T - settle) / std::max(1e-6f, natural - s.settle);
+    s.approach *= k;
+    s.dwell *= k;
+    s.corner *= k;
+    for (float& l : s.legs) l *= k;
+    s.settle = T - s.approach - s.travel();
+    return s;
+}
+
 // =============================================================================================
 // 4. Body solver
 // =============================================================================================
@@ -657,13 +733,51 @@ struct Animator::Impl {
     bool running = false;
     Task cur;
     float curStart = 0, curT = 0;
-    struct TimedEvent { float t; EventType type; int action; bool done; };
+    struct TimedEvent {
+        float t;
+        EventType type;
+        int action;
+        bool done;
+        bool hasPos = false;       // the event's own position (solver world) instead of the task's
+        vec3 pos{0, 0, 0};
+    };
     std::vector<TimedEvent> curEvents;
     enum Action { ActNone, ActGripPrimary, ActReleasePrimary, ActGripCaptured, ActReleaseCaptured, ActPutPen };
     mat4 shakePutFrame;                    // ActPutPen: where the handshake lays the pen (solver world)
     vec3 curTargetWorld{0, 0, 0};
     bool prevWasClock = false;             // the previous task ended with the clock tap
     TaskType prevType = TaskType::Wait;
+
+    // ---- coach gestures (animator_gesture.cpp)
+    float curArrive = 0.0f;                // gesture arrived (from curStart): endHold never cuts before
+    bool curLook = true;                   // the running task's target draws the eyes (see gazeHold)
+    // Running Trace: the tip path (character space) from traceStart, for the eyes to pursue it.
+    struct TracePlan;
+    std::shared_ptr<TracePlan> trace;
+    float traceStart = 0.0f;
+    // Speech and head gestures (updateGaze).
+    float speechLevel = 0.0f, speechEnv = 0.0f, speechFast = 0.0f, speechSlow = 0.0f, speechStress = 0.0f;
+    float nodT = -1.0f, nodDur = 0.45f, nodAmp = 0.0f;
+    float shakeHT = -1.0f, shakeHDur = 0.6f, shakeHAmp = 0.0f;
+    float gestYaw = 0.0f, gestPitch = 0.0f;   // nod / shake offsets added after the head spring
+    bool isGesture(TaskType ty) const { return ty == TaskType::Point || ty == TaskType::Trace || ty == TaskType::Gesture; }
+    // Pointing: hand pose with the index tip at 'tip' (aimed at 'aim' for a Point).
+    struct PointChoice {
+        quat q;
+        vec3 wrist{0, 0, 0}, tip{0, 0, 0};
+        float cost = 1e9f, strain = 0.0f, flex = 0.0f, clear = 0.0f;
+    };
+    PointChoice choosePoint(vec3 aim, float topAim, float hover, const vec3* fixedTip, const quat* prevQ, const FingerPose& fp);
+    // How deep the hand (wrist at w, rotation q, fingers f) dips into the space 'margin' above the
+    // standing pieces (m, the worst point); ignoreId is not an obstacle.
+    float handDepth(vec3 w, quat q, const FingerPose& f, float margin, int ignoreId) const;
+    bool gestureBlocked(const HandSample& from, float T, Motion& mo);
+    Segment pointApproach(const HandSample& from, float Ta, vec3 w, quat q, const FingerPose& fp, vec3 tipL) const;
+    void planPoint(const Task& t, float start, float T, const HandSample& from, Motion& mo);
+    void planTrace(const Task& t, float start, float T, const HandSample& from, Motion& mo);
+    void planGesture(const Task& t, float start, float T, const HandSample& from, Motion& mo);
+    void finishTracePlan(Hand& h);    // after liftForearm: the elbow along the path
+    void updateSpeech(float dt, float& hy, float& hp);
 
     // ---- handshake (clasp point, character space) for gaze
     Animator* partner = nullptr;
@@ -1117,10 +1231,12 @@ struct Animator::Impl {
     // How hard it is for the right arm to put the hand bone at wristC with rotation q (rad): joint
     // limit clamps, plus a soft penalty near the wrist and forearm limits.
     // 'achieved' (optional): the hand rotation the arm really gets to (joint limits).
-    float armStrain(vec3 wristC, quat q, quat* achieved = nullptr) {
+    // 'flexOut' (optional): the torso flexion the reach takes.
+    float armStrain(vec3 wristC, quat q, quat* achieved = nullptr, float* flexOut = nullptr) {
         Pose tmp;
         reachShort = wristClamp = pronClamp = 0;
         SpineParams sp = solveSpine(tmp, wristC, 0.0f, 0.0f, 0.0f, 0.0f);
+        if (flexOut) *flexOut = sp.flex;
         applySpine(tmp, sp);
         fkChain(tmp, Pelvis, Spine2);
         solveArm(tmp, Side::Right, wristC, q);
@@ -1411,6 +1527,69 @@ struct Animator::Impl {
     void planHandshake(const Task& t, float start, float T, HandSample from, Motion& mo);
     bool shakeTookPut = false;      // the handshake took over a queued PutPen
     void writingSpine(SpineParams& sp, const HandSample& hl);
+};
+
+// The path of a Trace (character space): the index tip rests on waypoint i from arrive[i] to
+// leave[i] (seconds from the start of the path) and moves in a straight line to the next one in
+// between (minimum jerk, the hand rotation and the elbow interpolated alongside).
+struct Animator::Impl::TracePlan {
+    std::vector<vec3> tip;              // tip over each waypoint
+    std::vector<quat> q;                // hand rotation there
+    std::vector<float> elbow;           // elbow lift there
+    std::vector<float> arrive, leave;
+    FingerPose f;
+    vec3 tipL{0, 0, 0};                 // hand-local index tip
+    float P = 0.0f;                     // arrival on the last waypoint
+    // Waypoint i and the progress s (0..1, minimum jerk) towards i + 1 at time tt.
+    void at(float tt, size_t& i, float& s) const {
+        i = 0;
+        s = 0.0f;
+        const size_t n = tip.size();
+        if (n < 2 || tt <= leave[0]) return;
+        for (size_t k = 0; k + 1 < n; ++k) {
+            if (tt < arrive[k + 1]) {
+                i = k;
+                s = minJerk(clamp((tt - leave[k]) / std::max(1e-5f, arrive[k + 1] - leave[k]), 0.0f, 1.0f));
+                return;
+            }
+            if (k + 2 == n || tt < leave[k + 1]) {
+                i = k + 1;
+                return;
+            }
+        }
+    }
+    vec3 tipAt(float tt) const {
+        size_t i;
+        float s;
+        at(tt, i, s);
+        return s > 0.0f ? lerp(tip[i], tip[i + 1], s) : tip[i];
+    }
+    HandSample poseAt(float tt) const {
+        size_t i;
+        float s;
+        at(tt, i, s);
+        HandSample h;
+        const vec3 tp = s > 0.0f ? lerp(tip[i], tip[i + 1], s) : tip[i];
+        h.q = s > 0.0f ? qslerp(q[i], q[i + 1], s) : q[i];
+        h.elbow = s > 0.0f ? lerp(elbow[i], elbow[i + 1], s) : elbow[i];
+        h.f = f;
+        h.p = tp - rotate(h.q, tipL);
+        h.pinW = 1.0f;   // the tip exactly on its path
+        h.pinLocal = tipL;
+        return h;
+    }
+    // With the wrist velocity and acceleration (symmetric differences, as the pen paths).
+    HandSample sample(float tt) const {
+        const float hstep = 1.0f / 480.0f;
+        HandSample s = poseAt(tt);
+        const float ta = std::max(0.0f, tt - hstep), tb = std::min(P, tt + hstep);
+        const vec3 pa = poseAt(ta).p, pb = poseAt(tb).p;
+        if (tb - ta > 1e-5f) {
+            s.v = (pb - pa) / (tb - ta);
+            s.a = tb - ta > 1.9f * hstep ? (pb - s.p * 2.0f + pa) / (hstep * hstep) : vec3(0);
+        }
+        return s;
+    }
 };
 
 }  // namespace anim

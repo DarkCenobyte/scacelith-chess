@@ -1,5 +1,6 @@
 // Internal to src/ui: the game-mode pages (ui_screens_game.cpp: Watch a Game, the viewer's pause
-// menu and overlay, the player's Elo) and the hooks they share with ui_screens.cpp.
+// menu and overlay, the player's Elo; ui_coach.cpp: the coach page; ui_library.cpp: the saved
+// games) and the hooks they share with ui_screens.cpp.
 #pragma once
 #include "../i18n/i18n.h"
 #include "ui.h"
@@ -12,6 +13,13 @@ namespace detail {
 // "Watch a Game" page. t = page appearance (0..1), opened = first frame on the page. Sets 'back'
 // when the player leaves the page; returns StartWatching on Start.
 MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back);
+// Coach page (ui_coach.cpp), same contract as watchPage: returns StartCoach on Start.
+MenuAction coachPage(CoachSetup& setup, float t, bool opened, bool& back);
+// "Saved games" page (ui_library.cpp), same contract as watchPage: returns StartReplay on Replay
+// (setup.replay names the game).
+MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back);
+// Stops the library's listing worker and waits for it (ui::shutdown, before the program exits).
+void libraryShutdown();
 // The player's Elo under the title menu, from x (the start edge: left, or right in a right-to-left
 // UI) on the first baseline y.
 void titleRating(float x, float y);

@@ -1,4 +1,5 @@
 #include "game_scene.h"
+#include "coach_model.h"
 #include "../audio/audio.h"
 #include "../character/skeleton.h"
 #include "../core/log.h"
@@ -6,6 +7,8 @@
 #include "../platform/platform.h"
 #include "../render/post/postfx.h"
 #include "elo.h"
+#include "game_archive.h"
+#include "game_saving.h"
 #include "../ui/ui_font.h"
 #include "../ui/ui_online.h"
 #include "layout.h"
@@ -165,6 +168,8 @@ bool GameScene::init(AppContext& ctx) {
     watch_.customIncrementSeconds = s.viewerCustomIncrementSeconds;
     watch_.customDelaySeconds = s.viewerCustomDelaySeconds;
     hudVisible_ = s.viewerShowControls;
+    // Saved games: the title page's "Saved games" lists this folder, games are saved there.
+    library_.folder = plat::appDataDirectory() + "pgn/";
     // Command-line games (screenshots, tests).
     if (ctx.hasArg("--white-preset")) watch_.whitePreset = std::clamp(std::atoi(ctx.argValue("--white-preset").c_str()), 0, presetCount - 1);
     if (ctx.hasArg("--black-preset")) watch_.blackPreset = std::clamp(std::atoi(ctx.argValue("--black-preset").c_str()), 0, presetCount - 1);
@@ -173,6 +178,14 @@ bool GameScene::init(AppContext& ctx) {
         setup_.timeControl = watch_.timeControl = std::clamp(tc, 0, int(timeControlPresets().size()) - 1);
     }
     initHotSeatArgs();
+    initCoachArgs();
+    // --replay <file> scripted: --replay-speed x1|x2|x4|x8|instant, --replay-paused.
+    const std::string speed = ctx.argValue("--replay-speed");
+    replaySpeedArg_ = speed == "x2" ? replay::Speed::X2 : speed == "x4" ? replay::Speed::X4 : speed == "x8" ? replay::Speed::X8
+                      : speed == "instant" ? replay::Speed::Instant : replay::Speed::X1;
+    replayPausedArg_ = ctx.hasArg("--replay-paused");
+    for (const std::string& k : split(ctx.argValue("--replay-keys"), ','))
+        if (!k.empty()) replayKeys_.push_back(k);
 
     if (!audio::init()) LOGW("audio unavailable, continuing silently");
     if (!ui::init()) {
@@ -219,7 +232,15 @@ void GameScene::finishLoading() {
     clock_.setup(chosenTimeControl());
     if (!startOnline_.empty()) {
         // --start-online: straight to the table once an opponent is found (at once with the fakes).
-        onlineSession().quickStart(startOnline_, localPlayerName());
+        if (startOnline_ != "direct") {
+            onlineSession().quickStart(startOnline_, localPlayerName());
+        } else if (ctx_->hasArg("--online-mock")) {
+            // A direct match joined with a valid code: the fakes' friend hosts it (10+5).
+            onlineSession().joinDirect("192.168.1.23", 47100, "ABCD-EFGH-JKMN");
+            for (int i = 0; i < 400 && !onlineSession().gameReady(); ++i) onlineSession().runMock(25.0);
+        } else {
+            LOGW("--start-online direct needs --online-mock");
+        }
         if (takeOnlineGame()) {
             fade_ = skipIntro_ ? 0.0f : 1.0f;
             state_ = State::Intro;
@@ -229,8 +250,29 @@ void GameScene::finishLoading() {
         }
         return;
     }
-    if (ctx_->hasArg("--start") || startWatching_) {
-        mode_ = startWatching_ ? GameMode::Watch : ctx_->hasArg("--hotseat") ? GameMode::HotSeat : GameMode::Play;
+    if (ctx_->hasArg("--replay")) {
+        // --replay <file> [--game N]: N counts from 1, as the saved games page shows a file's
+        // games; the scene's replay setup counts from 0.
+        int n = ctx_->hasArg("--game") ? std::max(1, std::atoi(ctx_->argValue("--game").c_str())) : 1;
+        if (loadReplay(ctx_->argValue("--replay"), n - 1)) {
+            mode_ = GameMode::Replay;
+            setupNewGame();
+            if (skipIntro_) {
+                fade_ = 0.0f;
+                startPlaying();
+            } else {
+                state_ = State::Intro;
+                stateTime_ = 0.0f;
+            }
+            return;
+        }
+        LOGE("--replay: no game to replay, to the menu");
+    }
+    if (ctx_->hasArg("--start") || startWatching_ || coachArgs_.start) {
+        mode_ = startWatching_          ? GameMode::Watch
+                : coachArgs_.start      ? GameMode::Coach
+                : ctx_->hasArg("--hotseat") ? GameMode::HotSeat
+                                        : GameMode::Play;
         setupNewGame();
         if (skipIntro_) {
             fade_ = 0.0f;
@@ -304,11 +346,26 @@ bool GameScene::pieceInHand(const PieceObject& p) const {
 }
 
 void GameScene::enterMenu() {
+    // A game still unsaved (the window of a game left in an unusual way): saved now, while link_
+    // and the game are still there (archiveGame does nothing when it ran already).
+    archiveGame(game_.isOver());
     if (online()) {
         mode_ = GameMode::Play;
         link_ = nullptr;
     }
+    if (replaying()) {
+        // Back from a replay: the menu opens on the saved games, where it was chosen.
+        mode_ = GameMode::Play;
+        ui::openSavedGames();
+    }
     if (hotSeat()) mode_ = GameMode::Play;  // the New Game page chooses again
+    if (coach()) {
+        leaveCoachGame();
+        mode_ = GameMode::Play;
+    }
+    world_.setCoachSeat(-1);
+    world_.setBoardCoordinates(settings().showCoordinates);
+    refreshCoachVoice();  // the Coach page says whether the coach can be heard
     handover_.cancel();
     inputGate_.reset();
     inputBlocked_ = false;
@@ -316,6 +373,7 @@ void GameScene::enterMenu() {
     stateTime_ = 0.0f;
     turn_ = Turn::None;
     paused_ = false;
+    game_.setEndDetection(true);
     game_.reset();
     arbiter_.reset(game_);
     board_.reset(true);
@@ -346,6 +404,12 @@ TimeControl GameScene::chosenTimeControl() const {
         tc.incrementMs = og_.incMs;
         return tc;
     }
+    if (coach()) {
+        TimeControl tc;  // a coach game has no clock to watch (W1: the move completes on release)
+        tc.unlimited = true;
+        return tc;
+    }
+    if (replaying()) return replayTimeControl();
     const auto& presets = timeControlPresets();
     // Watching uses the choice of the Watch a Game page ([viewer] in the .ini).
     int index = watching() ? watch_.timeControl : setup_.timeControl;
@@ -382,12 +446,25 @@ ai::EngineSettings GameScene::engineSettingsFor(int preset) const {
 void GameScene::setupNewGame() {
     Settings& s = settings();
     ++round_;
+    // Saved games: a new record of the moves' times; nothing saved yet.
+    moveElapsedMs_.clear();
+    moveClockMs_.clear();
+    plyElapsedMs_ = 0.0;
+    gameStartedAt_ = 0;
+    archived_ = false;
+    directMatch_ = false;
     if (online()) {
         setupOnlineGame();  // the game announced by the session: colours, link, server state
+    } else if (replaying()) {
+        humanColor_ = White;  // nobody: keeps the human-game helpers well defined
+        LOGI("Replay: %s vs %s, %s, %d plies, %s", replayRecord_.tag("White", "?").c_str(), replayRecord_.tag("Black", "?").c_str(),
+             replayRecord_.tag("Date", "?").c_str(), int(replayRecord_.plies.size()), replayRecord_.result.c_str());
     } else if (watching()) {
         humanColor_ = White;  // nobody: keeps the human-game helpers well defined
         LOGI("New game (watching): %s vs %s, %s", ai::presets()[size_t(watch_.whitePreset)].name,
              ai::presets()[size_t(watch_.blackPreset)].name, chosenTimeControl().label().c_str());
+    } else if (coach()) {
+        setupCoachGame();  // colours, level; the session starts with the game
     } else if (hotSeat()) {
         humanColor_ = White;  // both seats are human: the helpers of the one-human game see White
         // The players as set up on the New Game page (an empty name or a hand < 0: the defaults,
@@ -415,12 +492,20 @@ void GameScene::setupNewGame() {
     }
 
     game_.reset();
+    // The rules lesson's positions may be over on load (two kings alone) and its exercises go on
+    // after a mate: its game never ends by itself. Nor does a replay: the record says when and how
+    // it ended (moves after a dead position are played as recorded).
+    game_.setEndDetection(!lesson() && !replaying());
+    // A replay starts from the record's position (a FEN game), set up before the board is.
+    if (replaying() && !replayRecord_.fen.empty() && !game_.resetFromFEN(replayRecord_.fen))
+        LOGW("replay: the start position '%s' cannot be set up", replayRecord_.fen.c_str());
     arbiter_.reset(game_);
     // At the human player's right hand; at White's right when watching; where the New Game page
     // put it in a hot-seat game.
     bool clockPosX = hotSeat() ? hotseat::clockOnPositiveX(hsPlayers_.clockRightOf) : (watching() || humanColor_ == White);
     world_.setClockSide(clockPosX);
     board_.reset(clockPosX);
+    if (replaying() && !replayRecord_.fen.empty()) board_.syncTo(game_.position());  // a FEN game
     clock_.setup(chosenTimeControl());
     clockAccumMs_ = 0.0;
     // White's clock runs first, as if Black had pressed: Black's half of the lever is down.
@@ -455,10 +540,14 @@ void GameScene::setupNewGame() {
         d.note = i18n::tr(hsPlayers_.rated ? "hotseat.sheet.rated" : "hotseat.sheet.friendly");
         scorekeeper_.setDetails(d);
     }
+    if (replaying()) scorekeeper_.setDetails(replaySheetDetails());  // the record's event and round
     // The players filled in their header before sitting down at the board, as in a tournament
-    // round: the pens only record the moves.
-    scorekeeper_.writeHeaderInstantly();
-    if (engineOk_ && !online() && !hotSeat()) {
+    // round: the pens only record the moves. The rules lesson records nothing.
+    if (!lesson()) scorekeeper_.writeHeaderInstantly();
+    // The coach's seat wears its marking (W3); the others none.
+    world_.setCoachSeat(coach() ? aiSeat() : -1);
+    world_.setBoardCoordinates(settings().showCoordinates || (coach() && coachLevel_ <= 2));
+    if (engineOk_ && !online() && !hotSeat() && !replaying()) {  // a replay's robots never search
         engine_.newGame();
         engine_.configure(seats_[seats_[0].human() ? 1 : 0].engine);
     }
@@ -480,8 +569,9 @@ void GameScene::setupNewGame() {
     drawOfferBy_ = drawCardFor_ = -1;
     writeGrace_ = 0.0f;
     captionAge_ = 0.0f;
-    scriptPos_ = 0;
+    scriptPos_ = scriptThenPos_ = 0;
     scriptPromo_ = NoPiece;
+    scriptMenu_ = ui::MenuAction::None;
     for (int i = 0; i < 2; ++i) hsEloBefore_[i] = hsEloAfter_[i] = seats_[i].elo;
 
     if (watching()) {
@@ -505,6 +595,10 @@ void GameScene::setupNewGame() {
         rebuildOnline();  // moves already made (a fast opponent, a reconnection)
         return;
     }
+    if (replaying()) {
+        setupReplay();  // the replay clock, from the start position just set up
+        return;
+    }
     std::string moves = ctx_->argValue("--moves");
     if (!moves.empty()) applyMovesInstantly(split(moves, ','));
     if (hotSeat()) {
@@ -522,6 +616,14 @@ void GameScene::configureSeats() {
     }
     if (hotSeat()) {
         configureHotSeatSeats();
+        return;
+    }
+    if (coach()) {
+        configureCoachSeats();
+        return;
+    }
+    if (replaying()) {
+        configureReplaySeats();
         return;
     }
     const Settings& s = settings();
@@ -556,6 +658,8 @@ void GameScene::applyMovesInstantly(const std::vector<std::string>& uci) {
             break;
         }
         game_.play(mv);
+        moveElapsedMs_.push_back(-1);  // no time for a move set up (saved games)
+        moveClockMs_.push_back(-1);
     }
     board_.syncTo(game_.position());
     arbiter_.reset(game_);
@@ -572,7 +676,9 @@ void GameScene::newScoresheets() {
         p[i].handStyle = handStyleOf(i);
         p[i].blueInk = seats_[i].human() || i == 0;  // Stockfish as Black writes in black
     }
-    scorekeeper_.newGame(anim_, world_.clockOnPositiveX(), p, std::max(1, round_), scoresheetDate(ctx_->screenshotMode));
+    // A replay's sheets bear the date the game was played.
+    std::string date = replaying() ? replaySheetDate() : scoresheetDate(ctx_->screenshotMode);
+    scorekeeper_.newGame(anim_, world_.clockOnPositiveX(), p, std::max(1, round_), date);
 }
 
 int GameScene::handStyleOf(int seat) const {
@@ -590,8 +696,8 @@ int GameScene::handStyleOf(int seat) const {
 void GameScene::startPlaying() {
     state_ = State::Playing;
     stateTime_ = 0.0f;
-    if (!watching() && !online() && !hotSeat()) {
-        // Colours alternate from one game to the next.
+    if (!watching() && !online() && !hotSeat() && !coach()) {
+        // Colours alternate from one game to the next (coach games alternate their own, [coach]).
         settings().nextColor = int(opposite(humanColor_));
         settings().save();
     }
@@ -599,19 +705,23 @@ void GameScene::startPlaying() {
         endGame();
         return;
     }
-    // Online, the server keeps the clocks (the display reads them).
-    if (!online()) clock_.start(game_.position().sideToMove());
+    gameStartedAt_ = std::time(nullptr);  // the saved game's Date and Time
+    // Online, the server keeps the clocks (the display reads them); a replay's come from its
+    // record (replayClock_).
+    if (!online() && !replaying()) clock_.start(game_.position().sideToMove());
     // The authority of this game leaves the clock press to the players: say so once.
     if (online() && !og_.autoPress) ui::notify(i18n::tr("notify.manual_clock"), 5.0f);
     captionAge_ = 0.0f;  // hot-seat: "Alice, your move"
     audio::playUI(audio::Sfx::GameStart, 0.6f);
-    // Both players take their pen while White thinks.
-    scorekeeper_.startRecording();
+    // Both players take their pen while White thinks (the rules lesson has no scoresheet).
+    if (!lesson()) scorekeeper_.startRecording();
+    if (coach()) startCoachGame();
     beginTurn();
 }
 
 void GameScene::beginTurn() {
     Color stm = game_.position().sideToMove();
+    plyElapsedMs_ = 0.0;  // the time this move takes (saved games)
     touchedId_ = -1;
     touchedSq_ = placedTo_ = NoSquare;
     pressQueued_ = false;
@@ -623,8 +733,12 @@ void GameScene::beginTurn() {
     scriptWait_ = kScriptThink;
     if (online() && game_.status() != GameStatus::Ongoing) {
         turn_ = Turn::None;  // the server's GameEnd follows
+    } else if (replaying()) {
+        turn_ = Turn::None;  // the replay clock says when the next move begins (updateReplay)
     } else if (isHumanSeat(seatOf(stm))) {
         turn_ = Turn::HumanIdle;
+    } else if (lesson()) {
+        turn_ = Turn::LessonWait;  // the lesson's moves for Black come from its script (playLessonMove)
     } else if (online()) {
         turn_ = Turn::RemoteWaiting;
         // The opponent may already hold a piece (their gestures, while my robot was pressing).
@@ -656,6 +770,22 @@ void GameScene::endGame() {
     for (auto& a : anim_) a.setThinking(false);
     if (online()) {
         onlineResult();  // the server's result and reason
+    } else if (replaying()) {
+        // The record's ending: game_ never ends by itself in a replay, and a game resigned, lost
+        // on time or drawn by agreement still looks ongoing on the board.
+        const std::string& r = replayRecord_.result;
+        // An unfinished game ("*") shows a dash on the card and nothing on the sheets.
+        resultText_ = r == "1-0" ? "1-0" : r == "0-1" ? "0-1" : r == "1/2-1/2" ? "\xC2\xBD-\xC2\xBD" : "\xE2\x80\x94";
+        // As the saved games page says it (ui_library.cpp reasonText): nothing for a plain
+        // "Normal" termination (a resignation or an agreed draw in a file from elsewhere).
+        const std::string key = replay::endReasonKey(replayRecord_);
+        const std::string term = replayRecord_.tag("Termination");
+        reasonText_ = !key.empty() && i18n::has(key.c_str()) ? std::string(i18n::tr(key.c_str()))
+                      : r == "*"                              ? std::string(i18n::tr("library.unfinished"))
+                      : term == "?" || term == "normal" || term == "Normal" ? std::string()
+                                                                             : term;
+        isDraw_ = r == "1/2-1/2";
+        playerWon_ = false;
     } else {
         GameStatus st = game_.status();
         resultText_ = st == GameStatus::WhiteWins ? "1-0" : st == GameStatus::BlackWins ? "0-1" : "\xC2\xBD-\xC2\xBD";
@@ -663,21 +793,38 @@ void GameScene::endGame() {
         isDraw_ = st == GameStatus::Draw;
         playerWon_ = (st == GameStatus::WhiteWins && humanColor_ == White) || (st == GameStatus::BlackWins && humanColor_ == Black);
     }
-    LOGI("Game over: %s (%s)\n%s", resultText_.c_str(), reasonText_.c_str(), game_.pgn(seats_[0].name, seats_[1].name).c_str());
+    if (replaying()) {
+        LOGI("Replay over: %s (%s), %d plies", replayRecord_.result.c_str(), reasonText_.c_str(), int(game_.moves().size()));
+    } else if (coach()) {
+        // The coach's name in the interface language, its level's rating in the event tag.
+        PgnTags tags;
+        tags.event = "Coach level " + std::to_string(coachLevel_) + " (" + std::to_string(seats_[aiSeat()].elo) + ")";
+        tags.timeControl = clock_.timeControl().pgnTag();
+        LOGI("Game over: %s (%s)\n%s", resultText_.c_str(), reasonText_.c_str(), game_.pgn(seats_[0].name, seats_[1].name, tags).c_str());
+    } else {
+        LOGI("Game over: %s (%s)\n%s", resultText_.c_str(), reasonText_.c_str(), game_.pgn(seats_[0].name, seats_[1].name).c_str());
+    }
     pendingOffer_ = -1;
     clockFrozen_ = false;
     drawOfferBy_ = drawCardFor_ = -1;
     writeGrace_ = 0.0f;
     rateGame();
+    // Into the saved games (an aborted online game, a server game, the lesson, the viewer and a
+    // replay excepted: archiveGame decides).
+    archiveGame(online() || game_.isOver());
     // Both players write the result and lay their pen down before shaking hands (an aborted
     // online game has no result).
     endPending_ = false;
-    scorekeeper_.finishGame(online() && og_.status == 4 ? std::string() : resultText_);
+    if (coach()) scorekeeper_.setWriteLimit(-1);  // the last moves are written with the result
+    bool noResult = (online() && og_.status == 4) || (replaying() && replayRecord_.result == "*");
+    scorekeeper_.finishGame(noResult ? std::string() : resultText_);
     audio::playUI(audio::Sfx::GameEnd, 0.7f);
+    if (coach()) coachGameOver();  // the coach's closing words, then the handshake (simulate)
 }
 
 void GameScene::rateGame() {
-    if (rated_ || watching() || online() || game_.status() == GameStatus::Ongoing) return;
+    // A game with the coach is never rated.
+    if (rated_ || watching() || online() || coach() || game_.status() == GameStatus::Ongoing) return;
     rated_ = true;
     if (hotSeat()) {
         rateHotSeat();  // never the rating against Stockfish
@@ -705,10 +852,69 @@ void GameScene::rateGame() {
          c.expected, c.k, r.rated ? "" : ", unrated phase");
 }
 
+void GameScene::archiveGame(bool finished) {
+    if (archived_) return;
+    archived_ = true;
+    const archive::Mode mode = saving::archiveMode(mode_, directMatch_);
+    // A direct match: the authority's moves, times and ending (the local game may lag behind).
+    saving::DirectRecord direct;
+    const Game* game = &game_;
+    archive::GameInfo info;
+    if (mode == archive::Mode::Direct) {
+        if (!saving::directMatchRecord(og_, direct)) {
+            LOGI("saved games: the direct match is not saved (aborted)");
+            return;
+        }
+        game = &direct.game;
+        info = direct.info;
+        finished = direct.finished;
+    }
+    const int plies = int(game->moves().size());
+    if (!archive::shouldSave(mode, coach() ? coachLevel_ : -1, plies, finished, settings().saveGames)) {
+        LOGI("saved games: not saved (mode %s, %d plies%s%s)", archive::modeName(mode),
+             plies, finished ? ", over" : "", settings().saveGames ? "" : ", saving off");
+        return;
+    }
+    info.mode = mode;
+    info.white = seats_[0].name;
+    info.black = seats_[1].name;
+    // Ratings: Stockfish's and the coach's level rating; the player's in a game that counts for
+    // it (against Stockfish, a rated hot-seat game); none in a direct match or for the player of
+    // a coach game.
+    for (int i = 0; i < 2; ++i) {
+        const Seat& st = seats_[i];
+        bool shown = st.controller == Controller::Stockfish || (mode == archive::Mode::Play && engineOk_) ||
+                     (mode == archive::Mode::HotSeat && hsPlayers_.rated);
+        (i == 0 ? info.whiteElo : info.blackElo) = shown && mode != archive::Mode::Direct ? st.elo : 0;
+    }
+    info.started = gameStartedAt_;
+    if (mode != archive::Mode::Direct) {
+        info.timeControl = clock_.timeControl().pgnTag();
+        info.elapsedMs = moveElapsedMs_;
+        info.clockMs = moveClockMs_;
+    }
+    if (mode == archive::Mode::Coach) info.coachLevel = coachLevel_;
+    chess::pgn::Record rec = archive::makeRecord(*game, info);
+    archive::SaveResult r = archive::save(library_.folder, rec, gameStartedAt_);
+    if (r.ok) LOGI("saved game: %s", r.path.c_str());
+    else LOGW("game not saved: %s", r.error.c_str());
+}
+
 ui::GameOverExtras GameScene::gameOverExtras() const {
     if (online()) return onlineGameOverExtras();
     if (hotSeat()) return hotSeatGameOverExtras();
     ui::GameOverExtras x;
+    if (coach()) {
+        if (lesson()) {
+            x.line = i18n::tr("coach.lesson.done.line");
+            x.primaryLabel = i18n::tr("coach.lesson.next");
+        } else {
+            x.detail = i18n::tr("coach.gameover.unrated");
+            x.primaryLabel = i18n::tr("coach.gameover.again");
+        }
+        return x;
+    }
+    if (replaying()) return replayGameOverExtras();
     if (watching()) {
         int moveNo = std::max(1, int(game_.moves().size() + 1) / 2);
         GameStatus st = game_.status();
@@ -746,12 +952,16 @@ void GameScene::applySettings(bool displayToo) {
     audio::setEffectsVolume(s.effectsVolume);
     audio::setAmbienceVolume(s.ambienceVolume);
     audio::setAmbienceEnabled(s.ambience);
+    audio::setVoiceVolume(s.voiceVolume);
+    // Board coordinates: the option, and always for the rules lesson and the first coach levels.
+    world_.setBoardCoordinates(s.showCoordinates || (coach() && coachLevel_ <= 2 && state_ != State::Menu));
     if (displayToo) {
         plat::setDisplayMode(s.fullscreen ? plat::DisplayMode::Borderless : plat::DisplayMode::Windowed, s.displayWidth,
                              s.displayHeight);
         plat::setVsync(s.vsync);
         s.save();
     }
+    refreshCoachVoice();   // Options > Audio > Coach voice
 }
 
 void GameScene::shutdown(AppContext& ctx) {
@@ -759,14 +969,21 @@ void GameScene::shutdown(AppContext& ctx) {
     // (screenshot runs excepted: they stop wherever the capture happens).
     if (!ctx.screenshotMode && online() && link_ && state_ == State::Playing && og_.status == 0) {
         link_->resign();
-    } else if (!ctx.screenshotMode && !watching() && !hotSeat() && state_ == State::Playing &&
+    } else if (!ctx.screenshotMode && !watching() && !hotSeat() && !coach() && state_ == State::Playing &&
                game_.status() == GameStatus::Ongoing) {
         game_.resign(humanColor_);
         rateGame();
     }
+    // The game being played goes to the saved games as it stands (resigned above; a hot-seat or
+    // coach game unfinished; nothing for a game closed before its first move, its resignation
+    // included). Screenshot runs stop wherever the capture happens: not saved then.
+    if (!ctx.screenshotMode && (state_ == State::Playing || state_ == State::Intro || state_ == State::Handshake))
+        archiveGame(game_.isOver() && !game_.moves().empty());
     if (onlineSession().directActive()) onlineSession().closeDirect();
     if (osCursorHidden_) plat::setCursorVisible(true);
     osCursorHidden_ = false;
+    shutdownCoach();  // the voice worker and the coach's analyses, before the engine and the audio
+    coachModelShutdown();   // a voice model download in progress stops (its .part files stay)
     engine_.shutdown();
     scorekeeper_.shutdown();
     ui::shutdown();
@@ -782,6 +999,8 @@ bool GameScene::update(AppContext& ctx, float dt) {
         warpDone_ = true;
         float warp = float(std::atof(ctx.argValue("--warp", "0").c_str()));
         if (warp > 0.0f && state_ != State::Loading) runWarp(warp);
+    } else if (warpLeft_ > 0.0f && scriptMenu_ == ui::MenuAction::None) {
+        runWarp(warpLeft_);   // the rest of a warp that stopped for a --play-then menu choice
     }
     const plat::Input& in = plat::input();
     ui::beginFrame(plat::width(), plat::height(), dt);
@@ -794,8 +1013,26 @@ bool GameScene::update(AppContext& ctx, float dt) {
         break;
     case State::Menu: {
         fade_ = std::max(0.0f, fade_ - dt / kFadeIn);
-        ui::MenuAction a = ui::mainMenu(setup_, watch_);
-        if (a == ui::MenuAction::StartWatching) {
+        coachSetup_.voiceAvailable = coachVoiceExpected();
+        ui::MenuAction a = ui::mainMenu(setup_, watch_, coachSetup_, library_);
+        if (a == ui::MenuAction::StartReplay) {
+            // A saved game chosen on the "Saved games" page (it loaded there already: a failure
+            // here means the file changed meanwhile).
+            if (loadReplay(library_.replay.path, library_.replay.game)) {
+                mode_ = GameMode::Replay;
+                state_ = State::FadeToGame;
+                stateTime_ = 0.0f;
+            } else {
+                ui::openSavedGames();
+            }
+        } else if (a == ui::MenuAction::StartCoach) {
+            // The Coach page saved its choice in the .ini ([coach]): the level and the colour come
+            // from there (the command line's forced ones no longer apply).
+            mode_ = GameMode::Coach;
+            coachArgs_.level = coachArgs_.colour = -1;
+            state_ = State::FadeToGame;
+            stateTime_ = 0.0f;
+        } else if (a == ui::MenuAction::StartWatching) {
             // The page saved the choice in the .ini ([viewer]); watch_ holds it.
             mode_ = GameMode::Watch;
             state_ = State::FadeToGame;
@@ -840,6 +1077,10 @@ bool GameScene::update(AppContext& ctx, float dt) {
             updateOnlineInput();
             break;
         }
+        if (coach()) {
+            updateCoachInput();
+            break;
+        }
         // Hot-seat: nobody acts during the handover, and buttons still held by the previous player
         // are ignored until released.
         if (hotSeat()) inputBlocked_ = handover_.active() ? true : inputGate_.blocked(anyInputHeld());
@@ -860,7 +1101,7 @@ bool GameScene::update(AppContext& ctx, float dt) {
                 canOffer = canOffer && drawOfferBy_ < 0 && drawCardFor_ < 0;
                 resignQuestion = i18n::trf("hotseat.confirm.resign", {seats_[inputSeat()].name, seats_[1 - inputSeat()].name});
             }
-            switch (ui::pauseMenu(canClaim, canOffer, resignQuestion)) {
+            switch (menuChoice(ui::pauseMenu(canClaim, canOffer, resignQuestion))) {
             case ui::MenuAction::Resume: paused_ = false; break;
             case ui::MenuAction::Resign:
                 paused_ = false;
@@ -886,6 +1127,9 @@ bool GameScene::update(AppContext& ctx, float dt) {
                     if (game_.status() == GameStatus::Ongoing) game_.resign(humanColor_);
                     rateGame();
                 }
+                // Saved as it stands: the resignation, or a hot-seat game unfinished ("*"). Left
+                // before any move, the automatic resignation is not a game: nothing is saved.
+                archiveGame(game_.isOver() && !game_.moves().empty());
                 clock_.stop();
                 state_ = State::FadeToMenu;
                 stateTime_ = 0.0f;
@@ -909,15 +1153,27 @@ bool GameScene::update(AppContext& ctx, float dt) {
             break;
         }
         if (watching()) updateWatchInput();
-        if (stateTime_ > 1.2f && (endHandshakeDone_ || stateTime_ > 5.0f)) {
+        if (coach()) updateCoachGameOver();
+        if (coach() ? coachEndCardReady() : stateTime_ > 1.2f && (endHandshakeDone_ || stateTime_ > 5.0f)) {
             gameOverShown_ = true;
             ui::MenuAction a = ui::gameOver(resultText_, reasonText_, playerWon_, isDraw_, int(game_.moves().size() + 1) / 2,
                                             gameOverExtras());
-            if (a == ui::MenuAction::Rematch) {
+            if (a == ui::MenuAction::Rematch && replaying()) {
+                // "Replay again": from the start, at once (the observer stays where it is).
+                replayClock_.jumpTo(0);
+                replayClock_.resume();
+            } else if (a == ui::MenuAction::Rematch) {
                 if (hotSeat()) swapHotSeatColours();  // the rematch swaps colours
+                if (coach()) {
+                    // "Play again": the same level (the Coach page offers the one the coach
+                    // suggested); "First game" after the lesson: level 1.
+                    if (!lesson()) coachArgs_.level = coachLevel_;
+                    leaveCoachGame();
+                }
                 state_ = State::FadeToGame;
                 stateTime_ = 0.0f;
             } else if (a == ui::MenuAction::BackToMainMenu) {
+                if (coach()) leaveCoachGame();
                 state_ = State::FadeToMenu;
                 stateTime_ = 0.0f;
             }
@@ -951,12 +1207,22 @@ bool GameScene::update(AppContext& ctx, float dt) {
 void GameScene::runWarp(float seconds) {
     const float step = 1.0f / 60.0f;
     LOGI("warping %.1f s of game time", seconds);
+    warpLeft_ = 0.0f;
     for (float t = 0.0f; t < seconds; t += step) {
+        // A --play-then choice is made in the Esc menu, which only a frame shows: the warp goes on
+        // after that frame (update).
+        if (paused_ && scriptMenu_ != ui::MenuAction::None) {
+            warpLeft_ = seconds - t;
+            break;
+        }
         // The engine searches in real time: wait for it so the warp stays deterministic.
-        if (state_ == State::Playing && turn_ == Turn::AiThinking && aiRequested_ && engineOk_) {
+        if (state_ == State::Playing && turn_ == Turn::AiThinking && aiRequested_ && !aiHasMove_ && engineOk_) {
             for (int i = 0; i < 6000 && !engine_.moveReady(); ++i) plat::sleepMs(5);
         }
-        if (state_ == State::GameOver && stateTime_ > 1.0f) break;
+        // A coach game goes on to its end card (closing words, handshake, appraisal).
+        if (state_ == State::GameOver && stateTime_ > 1.0f && (!coach() || coachEndCardReady()) &&
+            !(replaying() && replayKeysPos_ < replayKeys_.size()))
+            break;
         simulate(step);
     }
 }
@@ -1012,9 +1278,14 @@ void GameScene::simulate(float dt) {
         if (!paused_ || online()) updatePlaying(dt);  // an online game goes on behind the menu
         break;
     case State::GameOver:
+        // A replay: a step back or a jump from its end card (J, Home, "Replay again") sets the
+        // board again and goes on playing.
+        if (replaying()) updateReplay(dt);
+        if (state_ != State::GameOver) break;
         // The result is written and the pens laid down first (a writing hand may be the right one).
+        // The coach shakes hands once its closing words are said (Session::handshakeWanted).
         if (!endHandshakeDone_ && stateTime_ > 0.8f && !anim_[0].busy() && !anim_[1].busy() &&
-            !anim_[0].writingBusy() && !anim_[1].writingBusy()) {
+            !anim_[0].writingBusy() && !anim_[1].writingBusy() && (!coach() || coachHandshakeWanted())) {
             anim::Task h0 = task(anim::TaskType::Handshake), h1 = h0;
             h0.partner = &anim_[1];
             h1.partner = &anim_[0];
@@ -1054,6 +1325,8 @@ void GameScene::simulate(float dt) {
         }
         scorekeeper_.update();
     }
+    // Coach mode: the session, the coach's voice and body, its hands on the table.
+    if (coach() && state_ != State::Loading && state_ != State::Menu) updateCoach(dt);
     // Pieces in a hand follow it; the others rest where they were put.
     for (PieceObject& p : board_.pieces()) {
         if (!p.held) continue;
@@ -1094,9 +1367,15 @@ void GameScene::updatePlaying(float dt) {
     // The handover between two players (hot-seat) freezes the clock between a clock press and the
     // moment the next player can act: nothing counts and nobody acts.
     if (clockFrozen_) return;
+    // A replay: the record's pace, its clocks (no clock_, no engine, no input).
+    if (replaying()) {
+        updateReplay(dt);
+        return;
+    }
     // Clock (online: the server's, see onlineClockDisplay())
     if (clock_.isRunning() && !online()) {
         hotseat::advanceClock(clock_, clockAccumMs_, dt, clockFrozen_);
+        plyElapsedMs_ += double(dt) * 1000.0;  // what the clock counted: the move's time (saved games)
         Color r = clock_.running();
         if (!clock_.timeControl().unlimited && clock_.flagged(r)) {
             game_.flagFall(r);
@@ -1120,7 +1399,16 @@ void GameScene::updatePlaying(float dt) {
                 turn_ = Turn::HumanPromotion;
             } else {
                 turn_ = Turn::HumanPlaced;
-                if (pressQueued_) humanPressClock();
+                if (untimed()) {
+                    // No clock to press: the move is made now that its last piece is released
+                    // (the promotion's new piece included) and the hand goes back meanwhile.
+                    // The seat is taken first: in a hot-seat game the turn passes in completeMove.
+                    int seat = inputSeat();
+                    anim_[seat].enqueue(task(anim::TaskType::Retract));
+                    completeMove(seat);
+                } else if (pressQueued_) {
+                    humanPressClock();
+                }
             }
         }
         break;
@@ -1158,6 +1446,11 @@ void GameScene::updatePlaying(float dt) {
         break;
     }
     case Turn::AiThinking: updateAi(dt); break;
+    case Turn::AiMoving:
+        // Untimed: the robot's move is completed once its last piece is released (dest_ holds only
+        // its pieces now); its hand goes back meanwhile. Timed: at its clock press.
+        if (untimed() && dest_.empty()) completeMove(seatOf(game_.position().sideToMove()));
+        break;
     default: break;
     }
 }
@@ -1173,24 +1466,28 @@ void GameScene::updateHumanInput() {
     int pid = pickPiece(ray, &tPiece);
     PieceObject* p = pid >= 0 ? board_.byId(pid) : nullptr;
     const Color me = inputColor();  // the human, or in a hot-seat game the player to move
-    bool ownPiece = p && p->color == me;
+    // Coach mode: not while the coach's hands are on the table, the takeback card is up, or (the
+    // rules lesson) the coach has the floor between two exercises.
+    bool ownPiece = p && p->color == me && (!coach() || turn_ != Turn::HumanIdle || coachMayTouch());
     hoverId_ = ownPiece && turn_ == Turn::HumanIdle ? pid : -1;
     float tClock = 1e30f;
-    clockHover_ = world_.rayHitsClock(ray, &tClock) && tClock < tPiece;
+    clockHover_ = !untimed() && world_.rayHitsClock(ray, &tClock) && tClock < tPiece;  // untimed: no press
     // While a piece is in hand the pointer designates a square (shown on the board, see markers()).
     bool castling = false;
     aimSq_ = turn_ == Turn::HumanTouched && !clockHover_ ? aimSquare(ray, &castling) : NoSquare;
     aimLegal_ = aimSq_ != NoSquare && legalDestination(aimSq_);
     // A touched piece without a legal move may be let go: pointing at another of your pieces then
     // offers it instead of a square.
+    // The rules lesson relaxes touch-move: any piece may be put back.
     bool canSwitch = turn_ == Turn::HumanTouched && ownPiece && pid != touchedId_ && !castling &&
-                     !arbiter_.touchedHasLegalMove(game_);
+                     (lesson() || !arbiter_.touchedHasLegalMove(game_));
     if (canSwitch) {
         aimSq_ = NoSquare;
         hoverId_ = pid;
     }
 
-    if (in.keyPressed[plat::KEY_SPACE] && !ui::wantsKeyboard()) {
+    // Space presses the clock (a coach game has none: Space skips what the coach says).
+    if (in.keyPressed[plat::KEY_SPACE] && !ui::wantsKeyboard() && !coach()) {
         humanPressClock();
         return;
     }
@@ -1237,7 +1534,7 @@ void GameScene::updateHumanInput() {
         const PieceObject* occupant = aimSq_ != NoSquare ? board_.at(aimSq_) : nullptr;
         bool ownSquare = occupant && occupant->color == me && occupant->id != touchedId_;
         if (aimSq_ == touchedSq_) {
-            if (!arbiter_.touchedHasLegalMove(game_)) {
+            if (lesson() || !arbiter_.touchedHasLegalMove(game_)) {
                 humanRelease();
             } else if (touched) {
                 ui::notify(i18n::tr(std::string("notify.touched.") + pieceName(touched->type)), 3.0f);
@@ -1249,7 +1546,9 @@ void GameScene::updateHumanInput() {
         }
         break;
     }
-    case Turn::HumanPlaced: ui::notify(i18n::tr("notify.press_clock"), 2.5f); break;
+    case Turn::HumanPlaced:
+        if (!untimed()) ui::notify(i18n::tr("notify.press_clock"), 2.5f);
+        break;
     default: break;
     }
 }
@@ -1288,7 +1587,7 @@ Square GameScene::aimSquare(const Ray& ray, bool* castling) const {
         // which they often hide from a seated player.
         return under;
     }
-    if (p && under != NoSquare && under != p->square && settings().showLegalMoves) {
+    if (p && under != NoSquare && under != p->square && legalHints()) {
         // An opposing piece stands in front of the square under the pointer: take whichever of
         // the two the touched piece can go to (hints shown only, else this would tell).
         if (!legalDestination(p->square) && legalDestination(under)) return under;
@@ -1308,6 +1607,7 @@ void GameScene::humanTouch(int pieceId) {
     touchedId_ = pieceId;
     touchedSq_ = p->square;
     turn_ = Turn::HumanTouched;
+    if (coach()) coachPlayerTouched();
     // Hot-seat: touching a piece declines a draw offer, and the recording of the opponent's move
     // waits until after this move (updateHotSeatTurn).
     if (hotSeat() && drawCardFor_ == inputSeat()) answerHotSeatDraw(false);
@@ -1333,9 +1633,11 @@ void GameScene::humanPlace(Square to) {
     if (occupant && occupant->color == inputColor()) return;
     bool promo = mover->type == Pawn && (rankOf(to) == 7 || rankOf(to) == 0);
     Move mv = pos.findLegal(touchedSq_, to, promo ? Queen : NoPiece);
-    if (!mv.valid() && (settings().showLegalMoves || online())) {
+    if (!mv.valid() && (settings().showLegalMoves || online() || coach())) {
         // Online there is no arbiter penalty: the piece cannot be released on an illegal square.
-        ui::notify(i18n::tr("notify.illegal"), 2.0f);
+        // Nor with the coach, who explains instead (the rules lesson says why, it has no notice).
+        if (!lesson()) ui::notify(i18n::tr("notify.illegal"), 2.0f);
+        if (coach()) coachIllegalAttempt(touchedSq_, to);
         return;
     }
     if (online() && promo) {
@@ -1375,6 +1677,8 @@ void GameScene::humanPlace(Square to) {
 bool GameScene::autoPressClock() const { return online() ? og_.autoPress : settings().autoPressClock; }
 
 void GameScene::humanPressClock() {
+    // Untimed: nothing to press (Space, a click on the clock, --play); the move completes itself.
+    if (untimed()) return;
     if (turn_ == Turn::HumanPlacing || turn_ == Turn::HumanPromotion) {
         // Pressed as soon as the pieces are down: after the promotion swap, and online, where the
         // new piece is chosen before the pawn moves, once the move it completes is placed.
@@ -1435,6 +1739,28 @@ void GameScene::updateAi(float dt) {
     Color side = game_.position().sideToMove();
     int seat = seatOf(side);
     const Position& pos = game_.position();
+    if (!aiRequested_ && coach()) {
+        // The coach: not while it reviews the player's move or its hands are busy; its teaching
+        // repertoire first, else its Stockfish level. It does not strike a thinking pose (its
+        // gestures go on) and never claims or offers a draw.
+        if (coachHoldsMove()) return;
+        aiElapsed_ = 0.0f;
+        aiRequested_ = true;
+        aiHasMove_ = false;
+        aiThinkMs_ = -1;
+        Move book;
+        if (coachBookMove(book)) {
+            aiMove_ = book;
+            aiHasMove_ = true;
+            aiThinkMs_ = rng_.rangeInt(900, 1700);
+            lastAiEval_ = 0;
+            LOGI("coach: repertoire move %s", pos.toUCI(book).c_str());
+        } else if (engineOk_) {
+            engine_.configure(seats_[seat].engine);
+            engine_.requestMove(game_.uciMoves(), clockInfo());
+        }
+        return;
+    }
     if (!aiRequested_) {
         if (engineOk_) {
             // One Stockfish for both sides when watching: each search uses its side's settings
@@ -1467,14 +1793,17 @@ void GameScene::updateAi(float dt) {
         // Human-like thinking time, counted from the request (the search ran concurrently).
         int legalCount = int(pos.legalMoves().size());
         aiThinkMs_ = engineOk_ ? engine_.thinkTimeMs(clockInfo(), int(game_.moves().size()), legalCount, pos.inCheck()) : 900;
+        // The coach takes a moment over its move (its searches are short and not humanised).
+        if (coach()) aiThinkMs_ = std::max(aiThinkMs_, rng_.rangeInt(700, 1500));
         aiHasMove_ = true;
     }
     if (aiElapsed_ * 1000.0f < float(aiThinkMs_)) return;
+    if (coach() && coachHoldsMove()) return;  // it began to speak meanwhile: the move waits
     Move mv = aiMove_;
     int evalCp = lastAiEval_;
 
     // The opponent claims a draw by repetition / fifty moves when it is not better.
-    if ((game_.canClaimThreefold() || game_.canClaimFiftyMove()) && engineOk_ &&
+    if (!coach() && (game_.canClaimThreefold() || game_.canClaimFiftyMove()) && engineOk_ &&
         engine_.acceptsDraw(evalCp, int(game_.moves().size()))) {
         game_.claimDraw();
         if (game_.status() != GameStatus::Ongoing) {
@@ -1496,7 +1825,11 @@ void GameScene::updateAi(float dt) {
         lastOfferPly_[seat] = ply;
         pendingOffer_ = seat;
     }
+    playRobotMove(seat, mv);
+}
 
+void GameScene::playRobotMove(int seat, const Move& mv) {
+    Color side = colorOfSeat(seat);
     arbiter_.touch(game_, mv.from);
     arbiter_.place(game_, mv.to, mv.promotion);
     int moverId = board_.idAt(mv.from);
@@ -1513,8 +1846,10 @@ void GameScene::updateAi(float dt) {
     tasks.push_back(task(anim::TaskType::Reach, moverId));
     planPlacement(tasks, moverId, mv.to, victimId, rookFrom, rookTo);
     if (mv.promotion != NoPiece) planPromotionSwap(tasks, moverId, mv.to, mv.promotion);
-    int half = world_.clockHalfForSeat(seat == 0 ? 1.0f : -1.0f);
-    tasks.push_back(task(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)));
+    if (!untimed()) {  // untimed: completed as the last piece is released (updatePlaying)
+        int half = world_.clockHalfForSeat(seat == 0 ? 1.0f : -1.0f);
+        tasks.push_back(task(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)));
+    }
     tasks.push_back(task(anim::TaskType::Retract));
     anim_[seat].setThinking(false);
     anim_[seat].enqueue(tasks);
@@ -1636,6 +1971,9 @@ void GameScene::handleEvents(int seat, std::vector<anim::Event>& events) {
             if (d.captured) {
                 board_.setCaptured(p->id, d.pos);
                 p->yaw = heldYaw;
+            } else if (d.reserve) {
+                board_.setInReserve(p->id, d.pos);  // the coach's rewind: a promoted piece goes back
+                p->yaw = heldYaw;
             } else if (d.square != NoSquare) {
                 board_.setOnSquare(p->id, d.square);
                 p->basePos = d.pos;
@@ -1679,10 +2017,27 @@ void GameScene::onClockPressed(int seat) {
         }
         return;
     }
+    completeMove(seat);
+}
+
+void GameScene::completeMove(int seat) {
+    // Online the authority completes the moves (onClockPressed above, game_scene_online.cpp).
+    if (state_ != State::Playing || online()) return;
     Color mover = colorOfSeat(seat);
-    if (!(turn_ == Turn::HumanPressing || turn_ == Turn::AiMoving) || game_.position().sideToMove() != mover) return;
+    // A move waits for its completion: pressing the clock (by hand or the robot's hand), or in an
+    // untimed game put down by the human (HumanPlaced) or by the robot (AiMoving, its last piece
+    // released).
+    bool waiting = turn_ == Turn::HumanPressing || turn_ == Turn::AiMoving || (untimed() && turn_ == Turn::HumanPlaced);
+    if (!waiting || game_.position().sideToMove() != mover) return;
+    // The arbiter's verdict: an illegal move is completed too (FIDE 7.5.1), in an untimed game as
+    // soon as it is made.
     chess::Arbiter::Verdict v = arbiter_.clockPressed(game_, clock_.timeControl());
+    if (replaying()) {
+        completeReplayMove(seat, v);  // the record's move: no clock, no offers, no end of its own
+        return;
+    }
     if (v.legal || v.moveStands) {
+        // Untimed: nobody sees this clock, it only switches the side whose used time it counts.
         clock_.press(mover);
         if (v.moveStands) {
             // Art. 7.5.2: pawn left unpromoted: penalised, the move stands with a queen.
@@ -1690,6 +2045,10 @@ void GameScene::onClockPressed(int seat) {
             clock_.addTime(opposite(mover), v.opponentBonusMs);
         }
         game_.play(v.move);
+        // The saved game: the time the move took, the mover's clock after the press (increment
+        // and a penalty bonus included), one entry per move of game_.
+        moveElapsedMs_.push_back(int64_t(plyElapsedMs_));
+        moveClockMs_.push_back(untimed() ? -1 : clock_.remainingMs(mover));
         if (hotSeat()) {
             // The mover records their move at once (after the opponent's, if that one waited);
             // the next player records it once the view has reached them (updateHotSeatTurn).
@@ -1697,10 +2056,23 @@ void GameScene::onClockPressed(int seat) {
             scorekeeper_.setHold(1 - seat, true);
         }
         // Both players record the move on their scoresheet (their writing hands, off the clock).
-        scorekeeper_.recordMove(int(game_.moves().size()) - 1, game_.sanMoves().back());
+        // Coach mode: the player's move and the coach's reply stay off the sheets until the
+        // player's next move, while the coach may still take them back (lead decision 4.2); the
+        // rules lesson records nothing.
+        int ply = int(game_.moves().size()) - 1;
+        if (coach() && !lesson() && mover == humanColor_) scorekeeper_.setWriteLimit(ply);
+        if (!lesson()) scorekeeper_.recordMove(ply, game_.sanMoves().back());
         LOGI("move %d: %s (%s, clocks %lld / %lld ms)", int(game_.moves().size()), game_.sanMoves().back().c_str(),
              mover == White ? "White" : "Black", (long long)clock_.remainingMs(White), (long long)clock_.remainingMs(Black));
         if (v.moveStands) board_.syncTo(game_.position());
+        // ---- Coach hook (move completed) ----
+        // game_ holds the move and the scoresheets have it; the game may be over. A coach reacts
+        // here (check, mate, opening, review of the move), before the end of the game and before
+        // the turn passes.
+        if (coach()) {
+            coachMoveCompleted();  // the session hears of it, then the end of the game or the turn
+            return;
+        }
         if (game_.status() != GameStatus::Ongoing) {
             endGame();
             return;
@@ -1723,17 +2095,7 @@ void GameScene::onClockPressed(int seat) {
             startHandover(seat);
             return;
         }
-        // Watching through the players' eyes: the view flies to the next player (the hot-seat
-        // handover; --handover-preview also freezes the clock until the camera has landed).
-        if (watching() && followEyes_) {
-            int next = 1 - seat;
-            CameraPose to = eyePose(next);
-            observer_.flyTo(to, CameraFlight::kHandoverDuration,
-                            CameraFlight::handoverShape(observer_.pose(), to, vec3(0, layout::BOARD_TOP_Y, 0)));
-            eyesSeat_ = next;
-            eyesSmooth_ = to;
-            if (handoverPreview_) setClockFrozen(true);
-        }
+        followEyesAfterMove(seat);
         return;
     }
     // Illegal move completed: the arbiter restores the position and applies the penalty.
@@ -1744,11 +2106,14 @@ void GameScene::onClockPressed(int seat) {
         return;
     }
     // The clock was not switched: the offender's time keeps running while the position is
-    // restored.
+    // restored, and the lever goes back (untimed: it never moved).
     clock_.addTime(opposite(mover), v.opponentBonusMs);
     board_.syncTo(game_.position());
-    leverTarget_ = -leverTarget_;
+    if (!untimed()) leverTarget_ = -leverTarget_;
+    // Still the offender's turn: the time their move takes (saved games) goes on from there.
+    const double spent = plyElapsedMs_;
     beginTurn();
+    plyElapsedMs_ = spent;
 }
 
 void GameScene::answerAiDrawOffer(int offeringSeat) {
@@ -1895,6 +2260,10 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     float targetYaw = L.yaw - cx * 0.11f;
     float basePitch = kBaseGazePitch + L.pitch - cy * 0.08f;
     L.lookUpLift = lookUpLift(up, basePitch, L.leanSmooth);
+    // The coach talking to the player: the view rises to its face as the pointer rests (the
+    // weight is coachFaceLift_, eased in updateCoach; lead decision 4.1).
+    if (coach() && coachFaceLift_ > 0.0f && !dragging_)
+        L.lookUpLift = std::max(L.lookUpLift, lookUpLift(smootherstep(coachFaceLift_), basePitch, L.leanSmooth));
     float targetPitch = basePitch + L.lookUpLift;
     glanceBlend_ = clamp(glanceBlend_ + (glance_ ? dt : -dt) / kGlanceTime, 0.0f, 1.0f);
     if (glanceBlend_ > 0.0f) {
@@ -1995,6 +2364,8 @@ void GameScene::updateGaze(float dt) {
         } else {
             target = aiGazeTarget_;
         }
+        // The coach looks where its words go (the director's Look), and at its hand on the table.
+        if (coach() && seat == aiSeat() && state_ != State::Handshake && state_ != State::Intro) coachGazeTarget(target);
         anim_[seat].lookAt(target, 1.0f);
     }
     glanceTime_ -= dt;
@@ -2019,7 +2390,7 @@ std::vector<Marker> GameScene::markers() const {
     }
     if (turn_ == Turn::HumanTouched && touchedSq_ != NoSquare) {
         out.push_back({touchedSq_, 1, 1.0f});
-        bool hints = settings().showLegalMoves;
+        bool hints = legalHints();
         if (hints) {
             const Position& pos = game_.position();
             bool seen[64] = {};
@@ -2052,10 +2423,10 @@ ui::GameCursor GameScene::gameCursorKind() const {
     case Turn::HumanTouched:
         if (hoverId_ >= 0) return ui::GameCursor::Piece;
         if (aimSq_ == NoSquare || aimSq_ == touchedSq_) return ui::GameCursor::Holding;
-        return settings().showLegalMoves && !aimLegal_ ? ui::GameCursor::Holding : ui::GameCursor::Square;
+        return legalHints() && !aimLegal_ ? ui::GameCursor::Holding : ui::GameCursor::Square;
     case Turn::HumanPlacing:
-    case Turn::HumanPlaced:  // no clock pointer while the press is queued (auto-press)
-        return clockHover_ && !pressQueued_ ? ui::GameCursor::Clock : ui::GameCursor::Idle;
+    case Turn::HumanPlaced:  // no clock pointer while the press is queued (auto-press), nor untimed
+        return clockHover_ && !pressQueued_ && !untimed() ? ui::GameCursor::Clock : ui::GameCursor::Idle;
     default: return ui::GameCursor::Idle;
     }
 }
@@ -2073,6 +2444,7 @@ vec3 GameScene::glanceTarget(int seat) const {
 
 ClockDisplay GameScene::clockDisplay() const {
     if (online() && link_) return onlineClockDisplay();
+    if (replaying() && state_ != State::Menu && state_ != State::Loading) return replayClockDisplay();
     ClockDisplay d;
     int hw = world_.clockHalfForSeat(1.0f), hb = 1 - hw;
     d.ms[hw] = clock_.remainingMs(White);
@@ -2083,6 +2455,12 @@ ClockDisplay GameScene::clockDisplay() const {
     d.unlimited = clock_.timeControl().unlimited;
     d.paused = paused_ && state_ == State::Playing;
     d.leverSide = leverSide_;
+    if (untimed()) {
+        // Nobody presses this clock: it shows no time and no side running by itself (clock_ still
+        // counts each side's used time, unseen).
+        d.dashes = true;
+        d.running = -1;
+    }
     return d;
 }
 
@@ -2147,10 +2525,15 @@ void GameScene::render(AppContext& ctx, float dt) {
     // shadow, and the sunlit floor around it would keep the exposure low).
     r.post().settings.exposureCompensation = settings().brightness + 0.6f * smootherstep(glanceBlend_);
     r.fade = hotSeat() ? std::max(fade_, handover_.fade()) : fade_;  // a hot-seat cut goes through black
+    if (coach()) r.fade = std::max(r.fade, coachFade_);             // a lesson position set up behind a fade
     r.beginFrame(cam, env, dt);
     if (state_ != State::Loading) {
+        // Coach mode: the pieces and squares the coach designates (the director's marks).
+        std::vector<PieceHighlight> highlights;
+        std::vector<CoachMark> coachMarkList;
+        if (coach()) coachMarks(highlights, coachMarkList);
         world_.submitStatic(r);
-        world_.submitPieces(r, board_);
+        world_.submitPieces(r, board_, highlights.empty() ? nullptr : &highlights);
         world_.submitClock(r, clockDisplay());
         // Through the player's eyes, the playing arm fades to a see-through ghost while a piece is
         // in hand, so the squares under it stay readable (the piece itself stays opaque). The arm
@@ -2167,6 +2550,7 @@ void GameScene::render(AppContext& ctx, float dt) {
             hasPrevGlobals_[seat] = true;
         }
         world_.submitMarkers(r, markers());
+        if (!coachMarkList.empty()) world_.submitCoachMarks(r, coachMarkList);
         scorekeeper_.submit(r);
     }
     r.endFrame();
@@ -2182,14 +2566,33 @@ void GameScene::renderOverlay(AppContext&, float) {
             std::string& name = i == 0 ? hud.white : hud.black;
             name = i18n::trf("viewer.player", {ui::presetName(seats_[i].presetName), std::to_string(seats_[i].elo)});
         }
+        if (replaying()) {
+            // The record's players: name and rating as written in it.
+            auto label = [](const std::string& name, int elo) { return elo > 0 ? name + " \xC2\xB7 " + std::to_string(elo) : name; };
+            hud.white = label(seats_[0].name, seats_[0].elo);
+            hud.black = label(seats_[1].name, seats_[1].elo);
+            hud.replay = true;
+        }
         hud.sideToMove = state_ == State::Playing ? seatOf(game_.position().sideToMove()) : -1;
         if (viewpointShown_ >= 0) hud.viewpoint = i18n::tr("viewer.view." + std::to_string(viewpointShown_));
         hud.viewpointAge = viewpointAge_;
         hud.speed = observer_.speed();
         hud.speedAge = speedAge_;
         ui::viewerHud(hud);
+        if (replaying() && hud.visible) drawReplayBar();
     }
-    ui::moveList(game_.sanMoves(), inGame && showMoveList_);
+    if (replaying() && replaySheetOffset() && !game_.sanMoves().empty()) {
+        // A record that starts with Black to move: its first move in Black's column, as on the sheets.
+        std::vector<std::string> san(1, std::string("..."));
+        san.insert(san.end(), game_.sanMoves().begin(), game_.sanMoves().end());
+        ui::moveList(san, inGame && showMoveList_);
+    } else {
+        ui::moveList(game_.sanMoves(), inGame && showMoveList_);
+    }
+    if (coach() && (inGame || state_ == State::Handshake)) drawCoachSubtitles();
+    // The coach's voice model: its download prompt, progress panel and notices (coach_model.h).
+    drawModelDownload();
+    if (coachModelInstalled()) refreshCoachVoice();   // heard from the coach's next line on
     ui::drawNotifications();
     // No pointer while the view goes over to the other player (hot-seat): the arrow stays hidden.
     if (osCursorHidden_ && !(hotSeat() && handover_.active()) &&
@@ -2217,7 +2620,7 @@ void GameScene::updateWatchInput() {
             dragging_ = false;
             plat::setMouseCaptured(false);
         }
-        switch (ui::viewerPauseMenu()) {
+        switch (menuChoice(ui::viewerPauseMenu())) {
         case ui::MenuAction::Resume: paused_ = false; break;
         case ui::MenuAction::BackToMainMenu:
             paused_ = false;
@@ -2245,6 +2648,7 @@ void GameScene::updateWatchInput() {
     observerControls_ = ObserverCamera::read(in, keys, dragging_);
     if (ui::wantsMouse() && !dragging_) observerControls_.wheel = 0.0f;
     if (!keys) return;
+    if (replaying()) updateReplayInput();
     for (int n = 0; n <= 9; ++n) {
         if (in.keyPressed[plat::KEY_0 + n]) selectViewpoint(n, false);
     }
@@ -2344,6 +2748,17 @@ void GameScene::selectViewpoint(int n, bool jump) {
     } else {
         observer_.flyTo(to);
     }
+}
+
+void GameScene::followEyesAfterMove(int seat) {
+    if (!watching() || !followEyes_) return;
+    int next = 1 - seat;
+    CameraPose to = eyePose(next);
+    observer_.flyTo(to, CameraFlight::kHandoverDuration,
+                    CameraFlight::handoverShape(observer_.pose(), to, vec3(0, layout::BOARD_TOP_Y, 0)));
+    eyesSeat_ = next;
+    eyesSmooth_ = to;
+    if (handoverPreview_) setClockFrozen(true);
 }
 
 int GameScene::headNearCamera(vec3 p) const {

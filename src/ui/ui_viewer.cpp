@@ -4,6 +4,18 @@
 //                                     watch|viewer-pause|viewer-hud|viewer-gameover|gameover-elo|
 //                                     calibration (first start; the slider starts at the .ini's
 //                                     brightness)
+//   coach mode: coach (the coach page), coach-novoice (the same without the voice files), licences
+//     (credits > Licences), coach-hud (a subtitle, the takeback offer card, the skip hint),
+//     coach-subtitle (a subtitle alone; --ui-text <text> replaces the sample line), coach-pause,
+//     coach-gameover, coach-lesson-done
+//   coach voice download (sample figures): coach-download (the prompt over the Coach page),
+//     coach-download-licence (its licence view), coach-download-hub / coach-download-github /
+//     coach-download-extracting / coach-download-failed (the progress panel; github over the
+//     title page); coach-flow: the real thing over the title page (game/coach_model.h: the
+//     Coach entry's prompt, a real download into --coach-dir <folder>, the panel, the notices)
+//   saved games: library (the page; --ui-library <folder> lists that folder, default the pgn folder
+//     of the user data directory), library-empty (the same, its folder replaced by an empty one
+//     when --ui-library is not given); the title page ("main") shows the "Saved games" entry
 //   hot-seat (two players on one PC): newgame-hotseat (New Game with "Human, same PC"),
 //     hotseat-hud (players, caption, draw offer card), hotseat-confirm (named resignation),
 //     hotseat-gameover (both names and ratings)
@@ -20,7 +32,7 @@
 //   --ui-kb         show the keyboard focus highlight, --ui-mouse X,Y   fake mouse (reference px)
 //   --ui-keys a,b,.. scripted input, one token per frame: up down left right enter space esc tab
 //                   pgup pgdn home end bksp del wait <letter> click@X:Y (reference px, press +
-//                   release) type:<text> (typed characters)
+//                   release) type:<text> (typed characters) wheel:<notches> (negative: down)
 // Interactive: keys 1..9 / 0 switch screens.
 #include "ui.h"
 #include "ui_internal.h"
@@ -38,6 +50,9 @@
 #include "../platform/platform.h"
 #include "../render/gpu.h"
 #include "../render/shader.h"
+#include "../game/coach_model.h"
+#include "../tts/model_store.h"
+#include "../tts/tts.h"
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
@@ -62,10 +77,16 @@ public:
             game::settings().handStyle = ui::font::HandStyle(std::atoi(ctx.argValue("--ui-hand").c_str()) % ui::font::HAND_STYLE_COUNT);
         black_ = ctx.hasArg("--ui-black");
         drawn_ = ctx.hasArg("--ui-draw");
+        text_ = ctx.argValue("--ui-text");
+        coachDir_ = ctx.argValue("--coach-dir");
         kb_ = ctx.hasArg("--ui-kb");
         std::string mouse = ctx.argValue("--ui-mouse");
         float mx = 0, my = 0;
         if (!mouse.empty() && std::sscanf(mouse.c_str(), "%f,%f", &mx, &my) == 2) ui::im::setMouseOverride(true, m::vec2(mx, my));
+        // Saved games: the folder the library page lists.
+        library_.folder = ctx.argValue("--ui-library", plat::userDataDirectory() + "pgn/");
+        if (ctx.argValue("--ui-screen", "main") == "library-empty" && !ctx.hasArg("--ui-library"))
+            library_.folder = plat::userDataDirectory() + "pgn-viewer-empty/";
         open(ctx.argValue("--ui-screen", "main"));
         std::string keys = ctx.argValue("--ui-keys");
         size_t p = 0;
@@ -92,6 +113,11 @@ public:
         fake_.textCount = 0;
         if (step_ >= script_.size()) return;
         const std::string tok = script_[step_++];
+        if (tok.compare(0, 6, "wheel:") == 0) {  // mouse wheel notches (negative: down), at the mouse
+            fake_.wheel = float(std::atof(tok.c_str() + 6));
+            LOGI("ui viewer: script frame %d '%s'", int(step_), tok.c_str());
+            return;
+        }
         if (tok.compare(0, 5, "type:") == 0) {  // typed characters, as WM_CHAR / XLookupString deliver them
             for (char32_t c : uni::decode(tok.substr(5)))
                 if (fake_.textCount < int(sizeof(fake_.text) / sizeof(fake_.text[0]))) fake_.text[fake_.textCount++] = uint32_t(c);
@@ -143,8 +169,24 @@ public:
             ui::debug::setOptionsTab(tab_);
         }
         if (screen == "credits") ui::debug::openMenuPage(ui::debug::MenuPage::Credits);
+        if (screen == "licences") ui::debug::openMenuPage(ui::debug::MenuPage::Licences);
+        if (screen == "coach" || screen == "coach-novoice") {
+            ui::debug::openMenuPage(ui::debug::MenuPage::Coach);
+            coach_.voiceAvailable = screen == "coach";
+        }
+        if (screen == "coach-flow") {
+            if (!coachDir_.empty()) tts::setModelDirectory(coachDir_);
+            game::coachModelInit();
+            coach_.voiceAvailable = game::coachVoiceWanted();
+        }
+        if (screen.compare(0, 14, "coach-download") == 0) {
+            ui::debug::openMenuPage(screen == "coach-download-github" ? ui::debug::MenuPage::Title : ui::debug::MenuPage::Coach);
+            coach_.voiceAvailable = false;
+            if (screen == "coach-download-licence") ui::debug::showModelLicence();
+        }
         if (screen == "calibration") ui::debug::openMenuPage(ui::debug::MenuPage::Calibration);
         if (screen == "watch") ui::debug::openMenuPage(ui::debug::MenuPage::Watch);
+        if (screen == "library" || screen == "library-empty") ui::debug::openMenuPage(ui::debug::MenuPage::Library);
         if (screen == "confirm") ui::debug::openPauseConfirm(1);
         if (screen == "gameover-folded") ui::debug::foldGameOver(true);
         if (screen.compare(0, 6, "online") == 0 || screen.compare(0, 6, "direct") == 0) openOnline(screen);
@@ -277,8 +319,40 @@ public:
         const std::string& s = screen_;
         if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
         if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "credits" ||
-            s == "watch" || s == "calibration" || menu_) {
-            a = ui::mainMenu(setup_, watch_);
+            s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || s == "library" ||
+            s == "library-empty" || menu_ || s.compare(0, 14, "coach-download") == 0 || s == "coach-flow") {
+            a = ui::mainMenu(setup_, watch_, coach_, library_);
+            if (a == ui::MenuAction::StartReplay)
+                LOGI("ui viewer: replay %s, game %d", library_.replay.path.c_str(), library_.replay.game);
+        } else if (s == "coach-hud" || s == "coach-subtitle") {
+            ui::Subtitle sub;
+            sub.text = text_.empty() ? i18n::tr("coach.offer.text") : text_;
+            sub.age = 1.0f;
+            sub.duration = ui::subtitleDuration(sub.text, 4.0f);
+            ui::subtitles(sub);
+            if (s == "coach-hud") {
+                ui::CoachHud hud;
+                hud.offer = true;
+                hud.skippable = true;
+                ui::CoachHudAction ca = ui::coachHud(hud);
+                if (ca != ui::CoachHudAction::None) LOGI("ui viewer: coach hud -> %d", int(ca));
+            }
+        } else if (s == "coach-pause") {
+            ui::CoachPause p;
+            p.canTakeBack = true;
+            p.canOfferDraw = true;
+            p.canClaimDraw = true;
+            a = ui::coachPauseMenu(p);
+        } else if (s == "coach-gameover") {
+            ui::GameOverExtras x;
+            x.detail = i18n::tr("coach.gameover.unrated");
+            x.primaryLabel = i18n::tr("coach.gameover.again");
+            a = ui::gameOver("0-1", chess::endReasonText(chess::GameEndReason::Checkmate), false, false, 38, x);
+        } else if (s == "coach-lesson-done") {
+            ui::GameOverExtras x;
+            x.line = i18n::tr("coach.lesson.done.line");
+            x.primaryLabel = i18n::tr("coach.lesson.next");
+            a = ui::gameOver(i18n::tr("coach.lesson.done"), i18n::tr("coach.level.0.name"), true, false, -1, x);
         } else if (s == "hotseat-hud") {
             ui::HotSeatHud hud;
             hud.names[0] = "Alice";
@@ -367,6 +441,12 @@ public:
         } else if (s == "hand") {
             handSheet();
         }
+        if (s.compare(0, 14, "coach-download") == 0) modelDownloadSample(s);
+        if (s == "coach-flow") {
+            game::drawModelDownload();
+            if (game::coachModelInstalled()) LOGI("ui viewer: coach voice installed");
+            coach_.voiceAvailable = game::coachVoiceWanted();
+        }
         ui::drawNotifications();
         if (a != ui::MenuAction::None) {
             LOGI("ui viewer: action %d", int(a));
@@ -376,7 +456,48 @@ public:
         ++frames_;
     }
 
+    // The coach voice download's prompt and progress panel with sample figures (nothing is
+    // downloaded here).
+    void modelDownloadSample(const std::string& s) {
+        const tts::ModelManifest& m = tts::supertonicManifest();
+        if (s == "coach-download" || s == "coach-download-licence") {
+            ui::ModelPrompt p;
+            p.bytes = double(m.totalBytes());
+            p.folder = tts::modelFolder();
+            ui::ModelPromptAction pa = ui::modelPrompt(p);
+            if (pa != ui::ModelPromptAction::None) LOGI("ui viewer: model prompt -> %d", int(pa));
+            return;
+        }
+        ui::ModelProgressView v;
+        if (s == "coach-download-hub") {
+            v.state = ui::ModelProgressView::State::Downloading;
+            v.done = 63.2e6;
+            v.total = double(m.totalBytes());
+            v.sourceLabel = m.hubLabel;
+            v.file = "vector_estimator.int8.onnx";
+        } else if (s == "coach-download-github") {
+            v.state = ui::ModelProgressView::State::Downloading;
+            v.done = 41.0e6;
+            v.total = double(m.archiveSize);
+            v.github = true;
+            v.sourceLabel = m.archiveLabel;
+            v.file = m.archiveName();
+        } else if (s == "coach-download-extracting") {
+            v.state = ui::ModelProgressView::State::Extracting;
+            v.done = 88.0e6;
+            v.total = double(m.archiveSize);
+            v.github = true;
+            v.sourceLabel = m.archiveLabel;
+        } else if (s == "coach-download-failed") {
+            v.state = ui::ModelProgressView::State::Failed;
+            v.error = i18n::tr("coach.download.error.network");
+        }
+        ui::ModelPanelAction pa = ui::modelProgressPanel(v);
+        if (pa != ui::ModelPanelAction::None) LOGI("ui viewer: model panel -> %d", int(pa));
+    }
+
     void shutdown(AppContext&) override {
+        if (screen_ == "coach-flow") game::coachModelShutdown();
         ui::im::setInputOverride(nullptr);
         ui::shutdown();
         game::settings() = saved_;  // the viewer never persists its test choices
@@ -386,6 +507,10 @@ private:
     game::Settings saved_;
     ui::NewGameSetup setup_;
     ui::WatchSetup watch_;
+    ui::CoachSetup coach_;
+    ui::LibrarySetup library_;
+    std::string text_;
+    std::string coachDir_;
     std::string screen_;
     int tab_ = 0;
     bool black_ = false, drawn_ = false, kb_ = false, quit_ = false;

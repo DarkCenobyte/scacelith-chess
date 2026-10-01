@@ -1,0 +1,260 @@
+# Coach speech (French): the rules lesson (level 0, src/coach/lesson.cpp; research-pedagogy §3).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("ta tour", "mon cavalier");
+# {your:il} / {my:il} = "il" or "elle" for that piece, {your:le} / {my:le} = "le" or "la" (see
+# common.lang), so every sentence agrees with whatever piece the program passes.
+# {sq}, {sq2}, {to}, {esc} = squares ("en {sq}"); {move} = a move. {@}, {@2}, {@3} are invisible
+# marks: the coach points while saying the word right after the mark.
+# A ".spoken" key is what the voice says instead (here: file letters spelled for the voice).
+
+# ---- Chapter titles (said inside "Continuons avec {chapter}.": with their article) ---------------------
+lesson.title.welcome = l’échiquier
+lesson.title.pieces = la marche des pièces
+lesson.title.safety = les prises sûres et les prises risquées
+lesson.title.check = l’échec
+lesson.title.mate = l’échec et mat
+lesson.title.castling = le roque
+lesson.title.en_passant = la prise en passant
+lesson.title.promotion = la promotion
+lesson.title.draws = le pat et les parties nulles
+lesson.title.etiquette = le classement, la pendule et le savoir-vivre des vraies parties
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = À toi d’essayer.
+lesson.now_you.2 = À ton tour, maintenant.
+lesson.now_you.3 = À toi.
+# Another wrong move after the demonstration.
+lesson.almost = Presque ! Joue le coup que je t’ai montré.
+lesson.almost.2 = Pas tout à fait. Essaie le coup de ma démonstration.
+lesson.almost.3 = Tu y es presque. Souviens-toi de ce que je viens de te montrer.
+# A wrong move without a line of its own.
+lesson.try_again = Ce n’est pas ça. Essaie encore.
+lesson.try_again.2 = Pas ce coup-là. Recommence.
+lesson.try_again.3 = Essayons encore une fois.
+lesson.use_your = Utilise {your}.
+lesson.use_your.2 = Essaie avec {your}.
+lesson.watch = Regarde.
+lesson.like_this = Comme ceci.
+lesson.and_back = Et on revient en arrière.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Échec, mais mon roi s’échappe en {esc}.
+lesson.check_takes = Échec, mais mon roi prend tout simplement {your}.
+lesson.check_block = Échec, mais je peux interposer une pièce.
+lesson.stalemate = Pat ! Mon roi ne peut pas bouger et n’est pas en échec : partie nulle, alors que tu gagnais !
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Pas en {sq} : {my} attaque cette case. Un roi ne se met jamais en échec.
+why.PathBlocked = Quelque chose barre le {@}chemin : les pièces ne sautent pas, sauf le cavalier.
+why.WrongGeometry = {your} ne se déplace pas comme ça.
+why.MustAnswerCheck = Tu es en {@}échec : tu dois d’abord y répondre.
+why.CastlingThroughCheck = Ton roi passerait par {sq}, et {my} attaque cette case.
+why.CastlingNoRights = Ce roi ou cette tour a déjà bougé : le roque est impossible.
+why.CastlingBlocked = Pour roquer, les cases entre le roi et la tour doivent être vides.
+why.CastlingOutOfCheck = Tu ne peux pas roquer quand tu es en échec.
+why.PawnForwardBlocked = Un pion ne prend pas tout droit : cette case est {@}bloquée.
+why.LeavesKingInCheck = Il y a un clouage : déplacer {your} exposerait ton roi à {my}.
+why.OwnPieceOnTarget = Tu ne peux pas aller sur une case occupée par une de tes pièces.
+why.PawnCaptureNeedsVictim = Un pion ne se déplace en diagonale que pour prendre.
+why.EnPassantExpired = La prise en passant n’est permise que juste après l’avance du pion de deux cases.
+why.NotYourTurn = Attends : c’est à moi de jouer.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Bonjour ! Je suis ton coach. Apprenons ensemble les règles des échecs, pas à pas.
+lesson.welcome.board = Voici l’échiquier : soixante-quatre cases, claires et foncées, huit rangées de huit.
+lesson.welcome.light = La case du coin, à ta {@}droite, est toujours claire. Retiens : case claire à droite.
+lesson.welcome.files = Les lignes verticales sont les colonnes. Elles portent des lettres, de {@}a à {@2}h.
+lesson.welcome.files.spoken = Les lignes verticales sont les colonnes. Elles portent des lettres, de {@}a à {@2}ache.
+lesson.welcome.ranks = Les lignes horizontales sont les rangées, numérotées de {@}un à {@2}huit depuis ton côté.
+lesson.welcome.square = Une case se nomme par sa lettre, puis par son chiffre. Celle-ci, c’est {sq}.
+lesson.welcome.square2 = Et celle-là, c’est {sq}.
+lesson.welcome.kings = Voici les deux rois. Le tien est en {sq}, le mien en {sq2}.
+lesson.welcome.ask = À toi : avance ton roi d’une case, en {sq}.
+lesson.welcome.wrong = Ça, c’est {to}. On veut {sq} : la lettre e, le chiffre deux.
+lesson.welcome.ok = Parfait. Ton roi est en {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = Voici {your}. {your:il} va en ligne droite, en colonne ou en rangée, aussi loin que tu veux.
+lesson.rook.lines = En montant la colonne, {@}ou le long de la rangée.
+lesson.rook.capture = Pour prendre, une pièce se pose sur une pièce {@}adverse, qui quitte alors l’échiquier.
+lesson.rook.ask = Prends {my} avec ta tour !
+lesson.rook.short = Bonne direction ! Continue à monter la colonne, jusqu’à {my}.
+lesson.rook.rank = Ça, c’est le long de la rangée. {my} est plus haut, sur la colonne.
+lesson.rook.king = Ça, c’est ton roi. Utilise {your}, dans le coin.
+lesson.rook.ok = Capture réussie ! {my} quitte l’échiquier.
+# Pieces don't jump
+lesson.jump.blocked = Les pièces ne sautent pas par-dessus les autres. Ton pion en {sq} bloque la tour.
+lesson.jump.knight = Seul le cavalier peut sauter. On le verra bientôt.
+# Bishop
+lesson.bishop.intro = Voici {your}. {your:il} se déplace en diagonale, aussi loin que tu veux.
+lesson.bishop.colour = Un fou reste toujours sur des cases de la même couleur.
+lesson.bishop.ask = {my} est sur la diagonale de ton fou. Prends-{my:le} !
+lesson.bishop.short = Bonne diagonale ! Va plus loin, jusqu’à {my}.
+lesson.bishop.other = Ça, c’est l’autre diagonale. Regarde du côté de {my}.
+lesson.bishop.ok = Excellent. Les fous adorent les grandes diagonales.
+# Queen
+lesson.queen.intro = Voici {your}, la pièce la plus forte. {your:il} se déplace comme une tour et un fou réunis.
+lesson.queen.ask = Trouve {my} et prends-{my:le} avec ta dame.
+lesson.queen.wrong = Ta dame peut atteindre {my} en un seul coup, par une diagonale.
+lesson.queen.ok = Bravo ! Garde ta dame à l’abri : elle vaut très cher.
+# King
+lesson.king.intro = Le roi ne se déplace que d’une case, dans n’importe quelle direction.
+lesson.king.important = Le roi est la pièce la plus importante. S’il est pris au piège, la partie est perdue.
+lesson.king.ask = Le roi peut prendre, lui aussi. Prends {my} !
+lesson.king.wrong = Ton roi est juste à côté de {my}. Va sur sa case pour {my:le} prendre.
+lesson.king.ok = Bien ! Le roi est lent, mais redoutable de près.
+# Knight
+lesson.knight.intro = Voici {your}. {your:il} se déplace en L : deux cases tout droit, puis une sur le côté.
+lesson.knight.l = Comme {@}ça. Il arrive toujours sur une case de l’autre couleur.
+lesson.knight.jump = Le cavalier est la seule pièce qui puisse sauter par-dessus les autres.
+lesson.knight.ask = Prends {my} avec ton cavalier !
+lesson.knight.wrong = C’est bien un coup de cavalier, mais il n’atteint pas {my}. Essaie un autre L.
+lesson.knight.ok = Joli saut !
+# Pawn: moving
+lesson.pawn.intro = Maintenant, {your}. {your:il} avance tout droit, une case à la fois, et ne recule jamais.
+lesson.pawn.first = À son premier coup, un pion peut avancer d’une ou de deux cases.
+lesson.pawn.ask = Avance ton pion de deux cases.
+lesson.pawn.one = Une seule case : c’est légal, mais cette fois, avance de deux.
+lesson.pawn.use = Utilise le pion.
+lesson.pawn.ok = Bien.
+# Pawn: capturing
+lesson.pawncap.blocked = Mon pion bloque le tien. Un pion ne peut pas prendre tout droit.
+lesson.pawncap.diagonal = Mais un pion prend en diagonale, une case vers l’avant.
+lesson.pawncap.ask = Prends {my} avec ton pion.
+lesson.pawncap.use = Utilise {your} : {your:il} prend en diagonale, vers l’avant.
+lesson.pawncap.ok = Oui ! Tout droit pour avancer, en diagonale pour prendre.
+# Values, set-up and the first moves
+lesson.values.pawn = Chaque pièce a une valeur en points. Un pion vaut un point.
+lesson.values.pieces = Un cavalier ou un {@}fou, trois. Une {@2}tour, cinq. La {@3}dame, neuf.
+lesson.values.king = Le roi n’a pas de prix : tu ne peux jamais le donner.
+lesson.values.trade = Essaie de ne jamais donner une pièce pour moins que sa valeur.
+lesson.setup.corners = Toute partie commence ainsi : les tours aux {@}coins, puis les {@2}cavaliers, puis les {@3}fous.
+lesson.setup.queen = La dame se place sur sa couleur : ta dame est sur une case claire.
+lesson.setup.king = Le roi se place à côté d’elle. Les Blancs jouent toujours en premier.
+lesson.first.ask = Commence la partie : avance de deux cases le pion devant ton roi, en {sq}.
+lesson.first.wrong = Ce coup aussi est légal ! Pour l’instant, joue ton pion roi en {sq}, s’il te plaît.
+lesson.first.ok = Un excellent premier coup : il ouvre des lignes à ta dame et à ton fou.
+lesson.first.reply = Je réponds de la même façon. Maintenant, sors un cavalier : saute de {sq} en {sq2}.
+lesson.first.knight_wrong = Les cavaliers sautent par-dessus les pions. Essaie de {sq} en {sq2}.
+lesson.first.knight_ok = Parfait. Les cavaliers et les fous sortent tôt.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Une pièce est défendue quand une pièce amie peut reprendre.
+lesson.safety.pawn = Mon {@}pion défend {my}.
+lesson.safety.free = Mais {my} n’a aucun défenseur. Ta dame attaque les deux pièces.
+lesson.safety.ask = Prends la pièce non défendue !
+lesson.safety.watch = Regarde ce qui se passe.
+lesson.safety.gave = Tu as donné ta dame, qui vaut neuf, pour mon cavalier, qui vaut trois.
+lesson.safety.other = Essaie l’autre pièce.
+lesson.safety.look = Cherche la pièce que rien ne défend.
+lesson.safety.ok = Excellent ! Demande-toi toujours : cette pièce est-elle défendue ?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = Ma tour contrôle toute la deuxième rangée.
+lesson.danger.rule = Un roi ne doit jamais aller sur une case où il pourrait être pris.
+lesson.danger.ask = Mets ton roi sur une case sûre.
+lesson.danger.ok = C’est ça. Ton roi est en sécurité, là.
+lesson.check.what = Ma tour attaque ton roi : on dit qu’il est en échec.
+lesson.check.must = Quand tu es en échec, tu dois t’en sortir tout de suite.
+lesson.check.ways = Il y a trois façons : {@}déplacer le roi, {@2}bloquer l’attaque, ou {@3}prendre l’attaquant.
+lesson.check.ask = Ici, déplace ton roi pour sortir de l’échec.
+lesson.check.file = En {to}, ton roi reste sur la colonne de {@}ma tour. Quitte cette ligne.
+lesson.check.ok = Bien : tu n’es plus en échec.
+lesson.block.again = Encore un échec ! Cette fois, ton roi n’a aucune case libre.
+lesson.block.ask = Alors bloque l’attaque : interpose une pièce.
+lesson.block.queen = Ça bloque ! Mais ma tour prendrait ta dame. Interpose une pièce moins précieuse.
+lesson.block.queen_ok = Ça marche. Mais retiens : on bloque avec sa pièce la moins précieuse.
+lesson.block.ok = Parfait. Bloque toujours avec ta pièce de moindre valeur.
+lesson.capture.check = Ma dame donne échec, juste à côté de ton roi.
+lesson.capture.ask = Prends l’attaquant !
+lesson.capture.king_ok = Oui ! Ma dame n’était pas défendue, donc ton roi pouvait la prendre.
+lesson.capture.knight_ok = Oui ! Ton cavalier a éliminé l’attaquant.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Échec et mat : le roi est en échec, et il n’a aucune issue. La partie est gagnée.
+lesson.mate1.stuck = Mon roi est coincé derrière ses {@}propres pions.
+lesson.mate1.ask = Fais-moi échec et mat en un coup !
+lesson.mate1.wrong = Presque ! Donne échec sur ma rangée du fond, d’où mon roi ne peut pas s’échapper.
+lesson.mate1.ok = Échec et mat ! C’est le mat du couloir. Retiens-le !
+lesson.mate2.ask = Ton roi et ta dame travaillent en équipe. Fais-moi échec et mat en un coup.
+lesson.mate2.wrong = Trouve un échec qui ne laisse aucune case à mon roi.
+lesson.mate2.ok = Échec et mat ! Ton roi protège ta dame, donc le mien ne peut pas la prendre.
+lesson.mate2.ok_rank = Échec et mat sur la rangée du fond ! Ton roi contrôle toutes les cases devant le mien.
+lesson.mate3.edge = Ta tour sur la septième rangée enferme mon roi sur le bord.
+lesson.mate3.ask = Maintenant, utilise {your} pour faire échec et mat.
+lesson.mate3.free = Échec, mais la septième rangée est libérée, et mon roi s’échappe.
+lesson.mate3.takes = Mon roi prend simplement ta tour.
+lesson.mate3.hint = Donne échec sur la rangée du fond avec la tour qui ne garde pas la septième.
+lesson.mate3.ok = Échec et mat ! Les deux tours ont travaillé en escalier.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Le roque est un coup spécial qui met ton roi à l’abri : roi et tour bougent ensemble.
+lesson.castle.how = Le {@}roi va de deux cases vers une tour, et la {@2}tour passe de l’autre côté du roi.
+lesson.castle.ask = Touche toujours le roi en premier. À toi : roque côté roi.
+lesson.castle.rook = Là, tu ne bouges que la tour. Pour roquer, déplace ton roi de deux cases vers elle.
+lesson.castle.long = C’est le grand roque, légal lui aussi ! Cette fois, roque vers la tour la plus proche.
+lesson.castle.one = Une seule case, c’est un coup de roi normal. Pour roquer, le roi se déplace de deux.
+lesson.castle.other = Pour roquer, déplace ton roi de deux cases vers la tour en {sq}.
+lesson.castle.ok = Roque réussi ! Ton roi est à l’abri, et ta tour est prête à jouer.
+lesson.castle2.moved = Tu ne peux pas roquer si ton roi ou cette tour a déjà bougé.
+lesson.castle2.attacked = Ni quand tu es en échec, ni si ton roi traverse ou atteint une case attaquée.
+lesson.castle2.bishop = Mon fou attaque {sq}. Le roque de ce côté est donc interdit pour l’instant.
+lesson.castle2.ask = Roque de l’autre côté.
+lesson.castle2.other = Roque vers ton autre tour, côté dame.
+lesson.castle2.ok = Exact ! Le grand roque place ton roi en {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = Les pions ont une prise spéciale : la prise en passant. Le pion est pris au passage.
+lesson.ep.watch = Regarde mon pion : il avance de deux cases et arrive juste à côté du tien.
+lesson.ep.how = Ton pion peut le prendre comme s’il n’avait avancé que d’une case : en {sq}.
+lesson.ep.now = Mais seulement maintenant, à ce coup-ci. Prends en passant !
+lesson.ep.gone = Trop tard : la prise en passant, c’est tout de suite ou jamais. On recommence.
+lesson.ep.ok = Prise en passant ! Mon pion en {sq} quitte l’échiquier.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Un pion qui atteint la dernière rangée est promu : il devient dame, tour, fou ou cavalier.
+lesson.promo.ask = Presque toujours, on choisit la dame. À toi de promouvoir ton pion !
+lesson.promo.under = C’est permis ! Mais une dame est plus forte. Choisissons la dame.
+lesson.promo.under_ok = D’accord. Mais la plupart des joueurs choisissent la dame.
+lesson.promo.push = Pousse ton pion jusqu’à la dernière rangée, en {sq}.
+lesson.promo.ok = Une nouvelle dame ! Tu peux même avoir deux dames en même temps.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = À moi de jouer : mon roi n’est pas en échec, mais {@}chaque case autour est attaquée.
+lesson.stale.draw = Je n’ai aucun coup légal : je suis pat, et la partie est nulle.
+lesson.stale2.ask = Quand tu gagnes, méfie-toi du pat. Fais-moi échec et mat en un coup, sans me mettre pat !
+lesson.stale2.wrong = Donne échec sur ma rangée du fond, d’où mon roi ne peut pas s’échapper.
+lesson.stale2.ok = Échec et mat ! Laisse toujours un coup au roi adverse, sauf si tu le mates.
+lesson.draws.kings = Autre cas de partie nulle : quand personne ne peut mater, comme avec deux rois seuls.
+lesson.draws.agree = Les joueurs peuvent aussi convenir de la nulle.
+lesson.draws.repeat = La triple répétition, ou cinquante coups sans prise ni coup de pion, permettent aussi la nulle.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Tu connais maintenant toutes les règles des échecs. Bravo !
+lesson.talk.real = Laisse-moi te raconter comment se jouent les vraies parties.
+lesson.talk.elo = Chaque joueur a un classement Elo. Il monte quand tu gagnes et baisse quand tu perds.
+lesson.talk.elo_gap = Battre plus fort que soi rapporte plus de points ; perdre contre plus faible en coûte plus.
+lesson.talk.elo_start = Ton Elo apparaît après cinq parties classées. Avec moi, c’est de l’entraînement, sans Elo.
+lesson.talk.clock = Voici une {@}pendule. Chaque joueur a son temps, qui ne s’écoule que pendant son tour.
+lesson.talk.press = Après ton coup, tu appuies sur la pendule avec la même main. Mon temps démarre alors.
+lesson.talk.flag = Si ton temps est écoulé, tu perds, sauf si je n’ai aucun moyen de te mater.
+lesson.talk.increment = Cinq plus trois, c’est cinq minutes chacun, plus trois secondes après chaque coup.
+lesson.talk.speeds = Des parties les plus courtes aux plus longues : le blitz, le rapide et le classique.
+lesson.talk.no_clock = Avec moi, pas de pendule. Prends tout le temps qu’il te faut pour réfléchir.
+lesson.talk.touch = En vraie partie, si tu touches une de tes pièces, tu dois la jouer.
+lesson.talk.touch_mine = Si tu touches une de mes pièces, tu dois la prendre, si c’est possible.
+lesson.talk.adjust = Pour redresser une pièce sans la jouer, dis d’abord « j’adoube ».
+lesson.talk.release = Dès que tu lâches une pièce sur une nouvelle case, le coup est joué.
+lesson.talk.sheet = En tournoi, les deux joueurs notent chaque coup sur une {@}feuille de partie.
+# {move:letters} shows the French scoresheet letters ("Cf3"), which is what this line teaches.
+lesson.talk.notation = On note la lettre de la pièce et la case, comme {move:letters}. Pour un pion, seulement la case.
+lesson.talk.robot = Ton robot note tes coups à ta place. En partie rapide, noter n’est pas obligatoire.
+lesson.talk.handshake = Une partie commence et finit par une poignée de main. Elle veut dire : bonne partie, et merci.
+lesson.talk.polite = Victoire ou défaite, on reste poli, et on ne dérange jamais l’adversaire qui réfléchit.
+lesson.talk.tips = Trois conseils pour tes parties : {@}contrôle le centre, {@2}sors tes cavaliers et tes fous, et {@3}roque tôt.
+lesson.talk.next = Quand tu voudras, choisis Premiers pas : je jouerai en douceur et t’aiderai après chaque erreur.
+lesson.talk.welcome = Bienvenue dans le monde des échecs ! Serrons-nous la main.

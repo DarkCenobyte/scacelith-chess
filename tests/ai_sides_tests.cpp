@@ -126,4 +126,58 @@ TEST(ai_engine_side_switch) {
     e.shutdown();
 }
 
+TEST(ai_engine_analysis_shares_hash) {
+    // Coach mode: the coach's own (weak) moves and full-strength analyses share one engine. An
+    // analysis warms the hash like an evaluation, so the next move of a depth-capped weak setting
+    // starts from a cleared table (its calibration); a UCI_Elo setting keeps its table, and an
+    // analysis never counts as a change of side.
+    ai::Engine e;
+    CHECK(e.start());
+    CHECK(e.waitReady(30000));
+    ai::EngineSettings weak = ai::coachLevelSettings(1), club = ai::coachLevelSettings(4);
+    weak.hashMB = club.hashMB = 64;
+    weak.humanize = club.humanize = false;
+    club.moveTimeMs = 100;  // keep the test short
+    const std::vector<std::string> moves = {"e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5"};
+    auto analyse = [&e, &moves] {
+        ai::AnalysisRequest r;
+        r.moves = moves;
+        r.depth = 10;
+        r.moveTimeMs = 0;
+        const uint32_t id = e.requestAnalysis(r);
+        auto t0 = SteadyClock::now();
+        while (!e.analysisReady(id) && msSince(t0) < 20000) std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        ai::Analysis a;
+        return e.takeAnalysis(id, a) && a.ok;
+    };
+    auto move = [&e, &moves] {
+        e.requestMove(moves, ai::ClockInfo{});
+        return waitMove(e, 20000).size() >= 4;
+    };
+    e.configure(weak);
+    e.newGame();
+    CHECK(move());
+    const int base = e.hashClears();
+    CHECK(move());  // same settings: no clear
+    CHECK_EQ(e.hashClears(), base);
+    CHECK(analyse());
+    CHECK_EQ(e.hashClears(), base);  // the analysis itself clears nothing
+    CHECK(move());                   // the weak move after it starts from a cleared table
+    CHECK_EQ(e.hashClears(), base + 1);
+    CHECK(move());
+    CHECK_EQ(e.hashClears(), base + 1);
+    CHECK(analyse());                // two analyses in a row: still one clear
+    CHECK(analyse());
+    CHECK(move());
+    CHECK_EQ(e.hashClears(), base + 2);
+    // A UCI_Elo level: switching from the weak setting clears (as between two sides), analyses do not.
+    e.configure(club);
+    CHECK(move());
+    CHECK_EQ(e.hashClears(), base + 3);
+    CHECK(analyse());
+    CHECK(move());
+    CHECK_EQ(e.hashClears(), base + 3);
+    e.shutdown();
+}
+
 #endif

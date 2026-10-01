@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <iterator>
+#include <vector>
 
 namespace ui {
 
@@ -38,6 +40,14 @@ TextStyle style(int face, float size, vec4 color, HAlign align = HAlign::Left, f
 
 float ease(float t) { return m::smootherstep(t); }
 float baselineCentered(const Rect& r, const TextStyle& st) { return r.cy() + gfx::capHeight(st) * 0.5f; }
+
+// The replay's bar (replayBar): its height, its gap to the bottom edge, and the room the
+// viewer's centred labels leave under them for it.
+constexpr float kReplayBarH = 64.0f, kReplayBarBottom = 44.0f;
+constexpr float kReplayBarClear = kReplayBarBottom + kReplayBarH + 76.0f;
+// Where the viewer's controls panel was drawn this frame (empty when hidden): the replay's bar,
+// drawn after it, keeps clear of it.
+Rect g_viewerControls;
 std::string num(int v) { return std::to_string(v); }
 
 // ---- Values (same steps as the New Game page) ----------------------------------------------------
@@ -431,6 +441,7 @@ MenuAction viewerPauseMenu() {
 
 // ==== Viewer overlay ===================================================================================
 void viewerHud(const ViewerHud& hud) {
+    g_viewerControls = Rect();
     if (!hud.visible) return;
     vec2 v = gfx::viewSize();
     gfx::Layer prev = gfx::layer();
@@ -461,17 +472,24 @@ void viewerHud(const ViewerHud& hud) {
         }
     }
 
-    // Controls, bottom left.
+    // Controls, bottom left (a replay's own keys first).
     {
         struct Line { const char* keys; const char* action; };
-        static const Line lines[] = {
+        static const Line replayLines[] = {
+            {"viewer.keys.replay_pause", "viewer.controls.replay_pause"}, {"viewer.keys.replay_step", "viewer.controls.replay_step"},
+            {"viewer.keys.replay_speed", "viewer.controls.replay_speed"}, {"viewer.keys.replay_ends", "viewer.controls.replay_ends"},
+        };
+        static const Line viewerLines[] = {
             {"viewer.keys.move", "viewer.controls.move"},     {"viewer.keys.updown", "viewer.controls.updown"},
             {"viewer.keys.fast", "viewer.controls.fast"},     {"viewer.keys.look", "viewer.controls.look"},
             {"viewer.keys.speed", "viewer.controls.speed"},   {"viewer.keys.views", "viewer.controls.views"},
             {"viewer.keys.eyes", "viewer.controls.eyes"},     {"viewer.keys.moves", "viewer.controls.moves"},
             {"viewer.keys.menu", "viewer.controls.menu"},     {"viewer.keys.hide", "viewer.controls.hide"},
         };
-        const int count = int(sizeof(lines) / sizeof(lines[0]));
+        std::vector<Line> lines;
+        if (hud.replay) lines.assign(std::begin(replayLines), std::end(replayLines));
+        lines.insert(lines.end(), std::begin(viewerLines), std::end(viewerLines));
+        const int count = int(lines.size());
         TextStyle ks = style(font::FACE_TEXT, 20.0f, goldBright, im::endAlign());
         TextStyle as = style(font::FACE_ITALIC, 20.0f, ivoryDim, im::startAlign());
         float kw = 0.0f, aw = 0.0f;
@@ -482,21 +500,22 @@ void viewerHud(const ViewerHud& hud) {
         float lineH = 29.0f;
         float w = kw + aw + 110.0f, h = 76.0f + lineH * float(count);
         Rect p(x - 16.0f, v.y - h - 44.0f, w, h);
-        im::panel(im::flip(screen, p), 0.82f);
+        g_viewerControls = im::flip(screen, p);
+        im::panel(g_viewerControls, 0.82f);
         TextStyle ts = style(font::FACE_TITLE, 17.0f, gold, im::startAlign(), 0.24f);
         gfx::text(tr("viewer.controls.title"), im::flipX(screen, p.x + 30.0f), p.y + 40.0f, ts);
         float mid = p.x + 30.0f + kw + 20.0f;
         for (int i = 0; i < count; ++i) {
             float y = p.y + 76.0f + float(i) * lineH;
-            gfx::text(tr(lines[i].keys), im::flipX(screen, mid - 12.0f), y, ks);
+            gfx::text(tr(lines[size_t(i)].keys), im::flipX(screen, mid - 12.0f), y, ks);
             gfx::diamond(vec2(im::flipX(screen, mid), y - 6.0f), 2.5f, withAlpha(gold, 0.55f));
-            gfx::text(tr(lines[i].action), im::flipX(screen, mid + 12.0f), y, as);
+            gfx::text(tr(lines[size_t(i)].action), im::flipX(screen, mid + 12.0f), y, as);
         }
     }
 
     // Viewpoint just selected / speed just changed: centred low, fading out.
     auto fading = [](float age, float hold) { return m::saturate(age / 0.2f) * m::saturate((hold + 0.6f - age) / 0.6f); };
-    float cy = v.y - 120.0f;
+    float cy = v.y - (hud.replay ? kReplayBarClear : 120.0f);   // above the replay's bar
     if (!hud.viewpoint.empty()) {
         float a = fading(hud.viewpointAge, 1.8f);
         if (a > 0.001f) {
@@ -515,6 +534,112 @@ void viewerHud(const ViewerHud& hud) {
         gfx::text(trf("viewer.speed", {decimal2(hud.speed)}), v.x * 0.5f, cy, ss);
     }
     gfx::setLayer(prev);
+}
+
+// ==== Replay bar ========================================================================================
+namespace {
+
+// A filled triangle pointing left (dir -1) or right (dir 1), tip at 'tip', 'w' long and 'h' tall:
+// a fan of strokes from the base to the tip (the draw layer has no polygons).
+void replayTriangle(vec2 tip, float dir, float w, float h, vec4 c) {
+    const float baseX = tip.x - dir * w;
+    const int n = std::max(6, int(std::ceil(h / std::max(0.5f, gfx::px()))));
+    for (int k = 0; k <= n; ++k) {
+        float y = tip.y - h * 0.5f + h * float(k) / float(n);
+        gfx::line(vec2(baseX, y), tip, c, 1.6f * gfx::px());
+    }
+}
+
+enum class ReplayIcon { Start, Back, Pause, Play, Forward, End };
+
+void replayIcon(ReplayIcon icon, vec2 c, vec4 col) {
+    const float h = 16.0f, w = 13.0f, bar = 3.0f;
+    switch (icon) {
+    case ReplayIcon::Start:
+        gfx::fill(Rect(c.x - w * 0.5f - bar, c.y - h * 0.5f, bar, h), col);
+        replayTriangle(vec2(c.x - w * 0.5f + 1.0f, c.y), -1.0f, w, h, col);
+        break;
+    case ReplayIcon::Back: replayTriangle(vec2(c.x - w * 0.5f, c.y), -1.0f, w, h, col); break;
+    case ReplayIcon::Pause:
+        gfx::fill(Rect(c.x - 6.0f, c.y - h * 0.5f, 4.0f, h), col);
+        gfx::fill(Rect(c.x + 2.0f, c.y - h * 0.5f, 4.0f, h), col);
+        break;
+    case ReplayIcon::Play: replayTriangle(vec2(c.x + w * 0.5f + 1.0f, c.y), 1.0f, w + 2.0f, h + 2.0f, col); break;
+    case ReplayIcon::Forward: replayTriangle(vec2(c.x + w * 0.5f, c.y), 1.0f, w, h, col); break;
+    case ReplayIcon::End:
+        replayTriangle(vec2(c.x + w * 0.5f - 1.0f, c.y), 1.0f, w, h, col);
+        gfx::fill(Rect(c.x + w * 0.5f, c.y - h * 0.5f, bar, h), col);
+        break;
+    }
+}
+
+// A square HUD button with an icon (mouse only: the keys are the game's), its tooltip naming the key.
+bool replayButton(const char* id, ReplayIcon icon, const Rect& r, bool enabled, const std::string& tip) {
+    im::Item it = im::item(im::makeId(id), r, im::ITEM_MOUSE_ONLY | (enabled ? 0u : im::ITEM_DISABLED));
+    float t = enabled ? it.hoverT : 0.0f;
+    gfx::pushAlpha(enabled ? 1.0f : 0.35f);
+    gfx::fill(r, vec4(0, 0, 0, 0.28f), 2.0f);
+    gfx::fillV(r, withAlpha(gold, 0.08f * t), withAlpha(gold, 0.03f * t), 2.0f);
+    gfx::stroke(r, withAlpha(gold, 0.30f + 0.5f * t), 0.0f, 2.0f);
+    replayIcon(icon, vec2(r.cx(), r.cy() + it.pressT), theme::mix(ivoryDim, goldBright, t));
+    gfx::popAlpha();
+    if (enabled) im::tooltip(tip);
+    if (it.activated) im::sound(Sound::Click);
+    return enabled && it.activated;
+}
+
+}  // namespace
+
+ReplayAction replayBar(const ReplayBar& bar) {
+    ReplayAction act = ReplayAction::None;
+    vec2 v = gfx::viewSize();
+    gfx::Layer prev = gfx::layer();
+    gfx::setLayer(gfx::LAYER_MAIN);
+    // Laid out left to right in every language, as the moves go: start on the left, end on the right.
+    TextStyle ms = style(font::FACE_TITLE, 18.0f, gold, HAlign::Right, 0.18f);
+    TextStyle ss = style(font::FACE_ITALIC, 23.0f, ivory, HAlign::Left);
+    // Widths that do not change as the game goes on: the counter at its last move, the longest speed.
+    std::string moveText = trf("replay.move", {i18n::ltr(num(bar.move)), i18n::ltr(num(bar.moves))});
+    float mw = std::max(gfx::textWidth(moveText, ms),
+                        gfx::textWidth(trf("replay.move", {i18n::ltr(num(bar.moves)), i18n::ltr(num(bar.moves))}), ms));
+    float sw = std::max({gfx::textWidth(bar.speed, ss), gfx::textWidth(trf("replay.speed.factor", {"8"}), ss),
+                         gfx::textWidth(tr("replay.speed.instant"), ss)});
+    const float bs = 46.0f, gap = 10.0f, pad = 30.0f, sep = 26.0f;
+    const float buttonsW = 5.0f * bs + 4.0f * gap;
+    const float w = pad + mw + sep + buttonsW + sep + sw + pad, h = kReplayBarH;
+    // Above the folded game over bar (64 tall, 36 from the bottom) when it is shown.
+    const float bottom = bar.aboveCard ? 36.0f + 64.0f + 18.0f : kReplayBarBottom;
+    Rect p(std::floor(v.x * 0.5f - w * 0.5f), v.y - bottom - h, w, h);
+    // Beside the viewer's controls panel when the window is not wide enough to centre it (16:10,
+    // 4:3, a long language): on the other side of it, else as far from it as the window allows.
+    const Rect& c = g_viewerControls;
+    const float margin = 24.0f;
+    if (c.w > 0.0f && p.x < c.x + c.w + margin && p.x + p.w > c.x - margin) {
+        if (c.cx() < v.x * 0.5f) p.x = std::floor(std::max(margin, std::min(c.x + c.w + margin, v.x - margin - p.w)));
+        else p.x = std::floor(std::min(v.x - margin - p.w, std::max(margin, c.x - margin - p.w)));
+    }
+    im::captureMouseRect(p);
+    im::panel(p, 0.86f);
+    gfx::text(moveText, p.x + pad + mw, baselineCentered(p, ms), ms);
+    im::pushId("replaybar");
+    float x = p.x + pad + mw + sep, y = p.cy() - bs * 0.5f;
+    struct B { const char* id; ReplayIcon icon; bool enabled; const char* tip; ReplayAction action; };
+    const B buttons[5] = {
+        {"start", ReplayIcon::Start, !bar.atStart, "replay.tip.start", ReplayAction::Start},
+        {"back", ReplayIcon::Back, !bar.atStart, "replay.tip.back", ReplayAction::Back},
+        {"pause", bar.paused ? ReplayIcon::Play : ReplayIcon::Pause, !bar.atEnd || bar.paused,
+         bar.paused ? "replay.tip.resume" : "replay.tip.pause", ReplayAction::TogglePause},
+        {"forward", ReplayIcon::Forward, !bar.atEnd, "replay.tip.forward", ReplayAction::Forward},
+        {"end", ReplayIcon::End, !bar.atEnd, "replay.tip.end", ReplayAction::End},
+    };
+    for (const B& b : buttons) {
+        if (replayButton(b.id, b.icon, Rect(x, y, bs, bs), b.enabled, tr(b.tip))) act = b.action;
+        x += bs + gap;
+    }
+    im::popId();
+    gfx::text(bar.speed, x - gap + sep, baselineCentered(p, ss), ss);
+    gfx::setLayer(prev);
+    return act;
 }
 
 void gameCursor(vec2 pixelPos, GameCursor kind) {

@@ -13,6 +13,7 @@
 //     pin (OpenSSL: checked right after the handshake; WinHTTP: see transport_win32.cpp).
 //   - Plain HTTP / WS only for loopback hosts (localhost, 127.0.0.1, ::1).
 //   - HTTP redirects are never followed (a 3xx comes back as it is), cookies are not kept.
+//     (net/download.h follows the redirects of public file hosts itself, with its own rules.)
 //
 // Every function blocks and is called from the client's network threads only. A CancelToken
 // lets another thread abort a blocking call (shutdown).
@@ -67,6 +68,28 @@ struct HttpResponse {
 };
 
 void httpRequest(const HttpRequest& req, HttpResponse& resp, CancelToken* cancel = nullptr);
+
+// ---- Streamed responses (downloads: net/download.h) ----
+// The head of a response: status and headers (names lower-case, in the order received).
+struct HttpHead {
+    int status = 0;
+    std::vector<std::pair<std::string, std::string>> headers;
+    std::string get(const std::string& lowerName) const;   // first value, "" when absent
+};
+
+// One exchange whose body is handed over piece by piece as it arrives, never held whole in
+// memory. onHead receives the status and headers (return false to stop there: a redirect, an
+// error status); then onBody receives each piece of the body (return false to abort). Same rules
+// as httpRequest: redirects are never followed, cookies are not kept, plain HTTP only to loopback
+// hosts. req.headers are sent as given (a User-Agent there replaces the default one); req.body
+// must be empty. req.timeoutMs bounds the connection and each wait for data (an idle timeout: a
+// large body takes as long as it needs while data keeps coming). req.maxResponseBytes caps the
+// body. resp.status is set once a head arrived; resp.error is "" when the body arrived complete
+// (or onHead stopped the exchange), else as for httpRequest, "aborted" when onBody returned
+// false, "truncated" when the connection ended before the announced end of the body.
+void httpStream(const HttpRequest& req, const std::function<bool(const HttpHead&)>& onHead,
+                const std::function<bool(const char* data, size_t n)>& onBody, HttpResponse& resp,
+                CancelToken* cancel = nullptr);
 
 struct WsParams {
     std::string host;

@@ -3,6 +3,7 @@
 #include "../render/renderer.h"
 #include "../ui/ui_font.h"
 #include "elo.h"
+#include "../core/ini.h"
 #include <string>
 #include <vector>
 
@@ -37,6 +38,7 @@ struct Settings {
     float effectsVolume = 1.0f;
     float ambienceVolume = 0.7f;
     bool ambience = true;
+    float voiceVolume = 1.0f;     // the coach's voice (Coach mode), before the master volume
     // [gameplay]
     bool showLegalMoves = true;   // highlight the legal destinations of the touched piece
     bool showCoordinates = false; // board has no printed coordinates by default (tournament boards)
@@ -122,8 +124,52 @@ struct Settings {
     bool directAutoPress = true;      // host: the robots press the clock by themselves
     std::string directAddress;        // last address joined
     int directJoinPort = 47100;
+    // [coach] last choices on the Coach page
+    int coachLevel = 1;           // 0 = the rules of chess (interactive lesson), 1.. = the Elo bands
+    int coachColour = 2;          // the player's colour: 0 White, 1 Black, 2 alternate from game to game
+    int coachNextColour = 0;      // alternate: the player's colour in the next coach game (0 White, 1 Black)
+    bool coachRulesDone = false;  // the rules lesson was completed once
+    // The player's colour in the next coach game (0 White, 1 Black): the rules lesson is always
+    // played with White, else the chosen colour, or the next one of the alternation. The game
+    // flips coachNextColour after each alternating game (and saves).
+    int coachPlayerColour() const {
+        if (coachLevel <= 0) return 0;
+        if (coachColour == 0 || coachColour == 1) return coachColour;
+        return coachNextColour == 1 ? 1 : 0;
+    }
+    // What the coach remembers between games (coach::Session's results): the finished coach games,
+    // oldest first (the level suggestion reads them; the last kCoachHistoryMax are kept), whether
+    // the end-of-game appraisal has explained what accuracy is, and the chapter the rules lesson
+    // resumes at (0 = from the start).
+    struct CoachGame {
+        int level = 1;
+        int result = 0;           // +1 the player won, 0 draw, -1 lost
+        double accuracy = -1.0;   // the player's game accuracy (percent), -1 unknown
+    };
+    static constexpr int kCoachHistoryMax = 40;
+    std::vector<CoachGame> coachHistory;
+    bool coachAccuracyExplained = false;
+    int coachLessonChapter = 0;
+    // [tts] the coach's voice (src/tts): threads of one synthesis (0 = automatic: 2), the voice
+    // (-1 = the default teacher voice, else an index into the model's voices), flow-matching steps
+    // (5; 3 is faster and slightly rougher) and the kernels' instruction set ("auto", or a cap for
+    // troubleshooting: avx512, avxvnni, avx2, sse2, scalar; tts::setArchCap).
+    int ttsThreads = 0;
+    int ttsVoice = -1;
+    int ttsSteps = 5;
+    std::string ttsArch = "auto";
+    // [coach] voice: the coach speaks (Options > Audio > Coach voice). Its model is not shipped:
+    // the game offers to download it (game/coach_model.h) the first time Coach mode or this
+    // option needs it. Off = the coach's words as subtitles only; declining the download prompt
+    // switches it off (remembered), switching it back on offers the download again.
+    bool coachVoice = true;
+    // [archive] saved games (game_archive.h): the games played on this PC and the direct matches
+    // are saved as PGN files in the pgn folder of the user data directory when they end.
+    bool saveGames = true;
     // [interface]
     std::string language;         // i18n code ("fr", "zh-Hant"...); "" = the OS language (first start)
+    // The coach's words at the bottom of the screen (SubtitleMode).
+    int subtitles = 0;
     // [player] (written on the scoresheets)
     std::string playerName = "Human";
     ui::font::HandStyle handStyle = ui::font::HAND_CAVEAT;  // Latin/Cyrillic handwriting
@@ -144,5 +190,28 @@ struct Settings {
 };
 
 Settings& settings();
+
+// The [coach] and [tts] sections of Settings::load / save, apart so that the unit tests can check
+// their round trip without the game target (settings_coach.cpp is in the core library). The
+// history is one line of "level:result:accuracy" entries, oldest first ("3:1:81.4 3:-1:-").
+std::string encodeCoachHistory(const std::vector<Settings::CoachGame>& games);
+std::vector<Settings::CoachGame> decodeCoachHistory(const std::string& text);
+void readCoachSettings(const IniFile& ini, Settings& s);
+void writeCoachSettings(IniFile& ini, const Settings& s);
+
+// [interface] subtitles: the coach's words written at the bottom of the screen.
+enum SubtitleMode { SubtitlesAuto = 0, SubtitlesOn = 1, SubtitlesOff = 2 };
+// Whether the coach's subtitles are shown: always when its voice cannot be heard (voice files
+// missing or failed to load), else per the option, 'Automatic' meaning when the coach does not
+// speak the language of the menus (Chinese menus: the coach speaks English). Pass
+// i18n::language() (the language in use, not Settings::language) and the coach's speech
+// language for it.
+inline bool coachSubtitlesShown(int mode, const std::string& uiLanguage, const std::string& speechLanguage,
+                                bool voiceAvailable) {
+    if (!voiceAvailable) return true;
+    if (mode == SubtitlesOn) return true;
+    if (mode == SubtitlesOff) return false;
+    return speechLanguage != uiLanguage;
+}
 
 }  // namespace game

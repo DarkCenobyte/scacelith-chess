@@ -1,0 +1,835 @@
+# Coach speech (Arabic, Modern Standard Arabic): the review of the player's moves
+# (src/coach/review.cpp, review_explain.cpp). Same keys and variants as
+# assets/coach/speech/en/review.lang; its header documents every placeholder.
+#
+# Register (as common.lang): second person singular. The player's gender is unknown: the lines
+# prefer forms that are neutral in writing (the suffix ـك, لديك / لك / بإمكانك, فاتك, verbal
+# nouns, "ما رأيك في...", "نجرّب" = let's try); imperatives and present-tense verbs of the player
+# are masculine, the conventional default. A 2nd-person past verb ("أخذت") is also the coach's
+# "I took": it is used only where the context rules out the coach ("أخذت ... من قطعي"); the
+# coach's own actions use the present ("آخذ", "أهاجم") or noun phrases.
+# Pieces: {your} {my} {t1} {t2} ... carry their possessive ("حصانك", "رخّي") and are all
+# masculine, so every verb, adjective and pronoun about them is masculine ("يهاجمه", "محاصر").
+# Prepositions are glued to piece placeholders ("ب{your}" = بحصانك, "ل{my}" = لملِكي).
+# Moves ({move} {best} {reply}) are spoken as "الحصان إلى إف ثلاثة" / "إي أربعة": a verb or an
+# adjective agreeing with a move as its subject would sound wrong after "الحصان", so the lines
+# use "نقلة {best} كانت...", "مع {best} ...", "بعد {move} ..." or a colon ("{move}: خطأ فادح").
+# Counts: "{m:move}" = نقلتين / ثلاث نقلات, "{pts:point}", "{n:time}" = مرتين, "{n:piece}" (with
+# ب: "أهاجم ب{n:piece}" = بثلاث قطع), "{m:mv}" = the bare mate distance (digits written, "ثلاث
+# نقلات" spoken). Dual counts are oblique: they always follow a preposition or a verb.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+ann.check.human.b1 = كش! ملِكي تحت الهجوم.
+ann.check.human.b1.2 = كش! قطعتك تهاجم ملِكي الآن.
+ann.check.human.b1.3 = هذا كش! على ملِكي أن يخرج منه.
+ann.check.human = كش.
+ann.check.human.2 = كش!
+ann.check.human.3 = وهذا كش.
+ann.check.coach = كش!
+ann.check.coach.2 = كش.
+ann.check.coach.3 = وكش!
+# Once per game at levels 1-2 ({your} = the player's king).
+ann.check.coach.first = هذا يعني أن {your} مهاجَم. عليك إخراجه من الكش.
+ann.check.coach.first.2 = الكش يعني أن {your} تحت الهجوم: حرّكه، أو اعترض، أو خذ قطعتي.
+ann.double_check.coach = كش مزدوج! اثنتان من قطعي تهاجمان ملِكك معًا، فلا بد أن يتحرك.
+ann.double_check.coach.2 = هذا كش مزدوج: لا ينفعك الآن إلا تحريك ملِكك.
+ann.double_check.human = كش مزدوج! اثنتان من قطعك تهاجمان ملِكي معًا، فلا بد أن يتحرك.
+ann.double_check.human.2 = يا له من كش مزدوج! لا ينقذني الآن إلا تحريك ملِكي.
+ann.mate.human.b1 = كش مات! الفوز لك! ملِكي لا يستطيع الهرب.
+ann.mate.human.b1.2 = هذا كش مات! أحسنت، المباراة لك!
+ann.mate.human.b1.3 = كش مات! ملِكي محاصر. تهانينا!
+ann.mate.human = كش مات. لعب ممتاز.
+ann.mate.human.2 = إنه كش مات. أهنّئك.
+ann.mate.human.3 = كش مات! عمل رائع.
+ann.mate.coach.b1 = هذا كش مات. ملِكك لا مخرج له.
+ann.mate.coach.b1.2 = كش مات. ملِكك مهاجَم ولا يستطيع الهرب.
+ann.mate.coach.b1.3 = للأسف، هذا كش مات. ملِكك لا مفرّ له.
+ann.mate.coach = كش مات.
+ann.mate.coach.2 = وهذا كش مات.
+ann.mate.coach.3 = كش مات، للأسف.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = أوه! هذه النقلة تُفقدك شيئًا.
+ex.verdict.blunder.b1.2 = حذارِ! سأُريك ما قد يحدث الآن.
+ex.verdict.blunder.b1.3 = مهلًا. في هذه النقلة مشكلة.
+ex.verdict.blunder.b2 = لحظة، هذه النقلة فيها مشكلة. انظر.
+ex.verdict.blunder.b2.2 = هذا خطأ. انظر جيدًا.
+ex.verdict.blunder.b2.3 = انتبه، هذه النقلة تكلّفك شيئًا. انظر.
+ex.verdict.blunder.b3 = هذا خطأ فادح.
+ex.verdict.blunder.b3.2 = {move} خطأ. وإليك السبب.
+ex.verdict.blunder.b3.3 = آه، {move} خطأ كبير.
+ex.verdict.blunder.b4 = {move} خطأ فادح.
+ex.verdict.blunder.b4.2 = {move} خطأ جسيم.
+ex.verdict.blunder.b4.3 = للأسف، هذا خطأ فادح.
+ex.verdict.blunder.b5 = {move}: خطأ جسيم.
+ex.verdict.blunder.b5.2 = {move}: خطأ فادح.
+ex.verdict.blunder.b5.3 = مع {move} تضيع الأفضلية كلها.
+ex.verdict.blunder.b6 = {move}: نقلة خاسرة.
+ex.verdict.blunder.b6.2 = {move} خطأ فادح.
+ex.verdict.blunder.b6.3 = {move}؟ وتضيع المباراة.
+ex.verdict.mistake.b3 = ليست أفضل نقلة. وإليك السبب.
+ex.verdict.mistake.b3.2 = آه، في نقلة {move} مشكلة.
+ex.verdict.mistake.b3.3 = هذا خطأ. سأُريك.
+ex.verdict.mistake.b4 = {move} خطأ.
+ex.verdict.mistake.b4.2 = نقلة {move} ليست جيدة. وإليك السبب.
+ex.verdict.mistake.b4.3 = هذه نقلة خاطئة.
+ex.verdict.mistake.b5 = {move}: نقلة غير دقيقة.
+ex.verdict.mistake.b5.2 = {move}: خطأ.
+ex.verdict.mistake.b5.3 = مع {move} تفلت الأفضلية.
+ex.verdict.mistake.b6 = {move} خطأ.
+ex.verdict.mistake.b6.2 = {move}: عدم دقة.
+ex.verdict.mistake.b6.3 = ليس {move}.
+# An inaccuracy with no concrete cause: the line names the better move ({best} is pointed at).
+ex.verdict.inaccuracy.b4 = نقلة غير دقيقة: نقلة {best} كانت أدقّ.
+ex.verdict.inaccuracy.b4.2 = عدم دقة طفيف. نقلة {best} كانت أفضل قليلًا.
+ex.verdict.inaccuracy.b4.3 = ليست الأفضل تمامًا: الأدقّ كان {best}.
+ex.verdict.inaccuracy.b5 = {move} نقلة غير دقيقة؛ والأقوى كان {best}.
+ex.verdict.inaccuracy.b5.2 = غير دقيقة قليلًا. كنتُ سألعب {best}.
+ex.verdict.inaccuracy.b5.3 = {best} أدقّ من {move}.
+ex.verdict.inaccuracy.b6 = {move}: عدم دقة؛ {best}.
+ex.verdict.inaccuracy.b6.2 = غير دقيقة. {best}.
+ex.verdict.inaccuracy.b6.3 = الأفضل كان {best}.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = مهلًا! فاتك شيء جيد.
+ex.verdict.missed.b1.2 = انظر مرة أخرى! كان هناك ما هو أفضل.
+ex.verdict.missed.b1.3 = لحظة، كانت لديك فرصة هنا!
+ex.verdict.missed.b2 = فاتتك فرصة هنا.
+ex.verdict.missed.b2.2 = في الواقع، كان هناك ما هو أفضل.
+ex.verdict.missed.b2.3 = مهلًا، كانت لديك نقلة رائعة هنا.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+ex.better.b3 = الأفضل كان {best}.
+ex.better.b3.2 = النقلة الأفضل كانت {best}.
+ex.better.b3.3 = بدلًا منها، {best} نقلة جيدة.
+ex.better.b4 = مع {best} يبقى كل شيء آمنًا.
+ex.better.b4.2 = النقلة الصحيحة كانت {best}.
+ex.better.b4.3 = كان الأفضل {best}.
+ex.better.b5 = {best}، والفكرة: {line}.
+ex.better.b5.2 = النقلة المطلوبة كانت {best}: {line}.
+ex.better.b5.3 = الأفضل {best}، وبعد {line}، موقفك جيد.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = بدلًا منها {best}، {eval}.
+ex.better.b6.3 = مع {best} التقييم {eval}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = لنُعِد القطع إلى أماكنها.
+ex.rewind.b1.2 = والآن أُعيد كل شيء كما كان.
+ex.rewind.b1.3 = سأُرجع القطع إلى مكانها.
+ex.rewind.b2 = لنُعِد كل شيء كما كان.
+ex.rewind.b2.2 = نعود إلى حيث كنا.
+ex.rewind.b2.3 = سأُعيد القطع.
+ex.rewind.b3 = نعود إلى المباراة.
+ex.rewind.b3.2 = لنرجع.
+ex.rewind.b3.3 = نعود إلى الموقف.
+ex.rewind.b4 = عودة إلى المباراة.
+ex.rewind.b4.2 = نعود.
+ex.rewind.b4.3 = لنرجع إلى الموقف.
+
+# ---- Takeback offer (the player answers yes or no; "نسترجع" = shall we take it back) -----------
+ex.offer.b1 = ما رأيك في تجربة نقلة أخرى؟
+ex.offer.b1.2 = هل نسترجع هذه النقلة ونحاول من جديد؟
+ex.offer.b1.3 = هل نجرّب نقلة مختلفة؟
+ex.offer.b2 = نجرّب نقلة أخرى؟
+ex.offer.b2.2 = ما رأيك في استرجاعها؟
+ex.offer.b2.3 = نحاول مرة أخرى؟
+ex.offer.b3 = هل نسترجع النقلة؟
+ex.offer.b3.2 = ما رأيك في محاولة أخرى؟
+ex.offer.b3.3 = نسترجعها؟
+ex.offer.b4 = نسترجعها؟
+ex.offer.b4.2 = ما رأيك في استرجاعها؟
+ex.offer.b4.3 = نجرّب نقلة أخرى؟
+ex.offer.b5 = استرجاع؟
+ex.offer.b5.2 = نسترجعها؟
+ex.offer.b5.3 = استرجاع النقلة؟
+ex.offer.b6 = استرجاع؟
+ex.offer.b6.2 = استرجاع النقلة؟
+ex.offer.b6.3 = إعادة المحاولة؟
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}.
+demo.move.2 = و{move}.
+demo.move.3 = ثم {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} ينتقل إلى {sq}.
+demo.my.move.2 = أنقل {my} إلى {sq}.
+demo.my.move.3 = ثم يذهب {my} إلى {sq}.
+demo.my.take = آخذ {your}.
+demo.my.take.2 = {my} يأخذ {your}.
+demo.my.take.3 = وها أنا آخذ {your}.
+demo.my.check = {my} إلى {sq}. كش.
+demo.my.check.2 = كش ب{my} من {sq}.
+demo.my.check.3 = {my} ينتقل إلى {sq}، كش!
+demo.my.mate = {my} إلى {sq}. كش مات.
+demo.my.mate.2 = و{my} إلى {sq}: كش مات.
+demo.my.mate.3 = {my} ينتقل إلى {sq}. هذا كش مات.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = نقلتك: {your} إلى {sq}.
+demo.your.move.2 = لنفترض أن {your} انتقل إلى {sq}.
+demo.your.move.3 = ثم ينتقل {your} إلى {sq}.
+demo.your.take = يقع {my} في يدك.
+demo.your.take.2 = {your} يأخذ {my}.
+demo.your.take.3 = ثم يصبح {my} لك.
+demo.your.back = وتستردّ بدورك.
+demo.your.back.2 = تستردّ في {sq}.
+demo.your.back.3 = وتستردّ القطعة.
+demo.your.king = على ملِكك أن يتحرك.
+demo.your.king.2 = على الملك أن يبتعد، إلى {sq}.
+demo.your.king.3 = يهرب ملِكك إلى {sq}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = وهنا، في {sq}، تحصل على وزير جديد.
+demo.promote.2 = ثم يبلغ {your} المربع {sq} ويصبح وزيرًا.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = انتبه: {my} يستطيع الذهاب إلى {sq}، وهذا كش مات.
+ex.mate_allowed.b1.2 = الآن يستطيع {my} أن ينتقل إلى {sq}. سيكون ذلك كش مات!
+ex.mate_allowed.b1.3 = حذارِ! إذا ذهب {my} إلى {sq}، فهذا كش مات.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = بهذه النقلة، أستطيع أن أعطي {your} كش مات في {m:move}.
+ex.mate_allowed.b2.2 = الآن أستطيع إماتة {your} في {m:move}. انظر.
+ex.mate_allowed.b2.3 = انتبه! {your} في خطر: كش مات في {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = هذا يسمح بكش مات في {m:move}: {line}.
+ex.mate_allowed.b3.2 = بعد هذا لديّ كش مات في {m:move}: {line}.
+ex.mate_allowed.b3.3 = ملِكك يتلقى كش مات: {line}.
+ex.mate_allowed.b4 = بعد {move} هناك كش مات إجباري: {line}.
+ex.mate_allowed.b4.2 = هذه النقلة تقود إلى كش مات في {m:move}: {line}.
+ex.mate_allowed.b4.3 = بعد {move}: {line}، وكش مات.
+ex.mate_allowed.b5 = بعد {move} يوجد كش مات إجباري في {m:move}.
+ex.mate_allowed.b5.2 = هذا يقود إلى كش مات في {m:move}.
+ex.mate_allowed.b5.3 = الآن هناك كش مات إجباري في {m:move}.
+ex.mate_allowed.b6 = كش مات في {m:mv}: {line}.
+ex.mate_allowed.b6.2 = {line}، كش مات.
+ex.mate_allowed.b6.3 = كش مات بعد {line}.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = انظر: لم يبقَ ل{your} أي مربع يهرب إليه.
+ex.mate_allowed.tail.b1.2 = أترى؟ {your} مهاجَم ولا يستطيع الهرب.
+ex.mate_allowed.tail.b1.3 = لا مفرّ ل{your}. هذا كش مات.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = يُسمّى هذا النمط {text}.
+ex.mate_allowed.pattern.2 = تذكّر هذا النمط: إنه {text}.
+ex.mate_allowed.tip.b3 = قبل كل نقلة، تأكد أن ملِكك ما زال آمنًا.
+ex.mate_allowed.tip.b3.2 = اسأل نفسك دائمًا: بعد نقلتي، هل يمكن إماتة ملِكي؟
+
+# Definite noun phrases (construct with مات, like the lesson's "مات الصف الأخير"), said after
+# "يُسمّى هذا النمط" and "إنه".
+name.pattern.back_rank = «كش مات الصف الأخير»
+name.pattern.smothered = «كش مات بالخنق»
+name.pattern.support = «كش مات بالوزير المدعوم»
+name.pattern.ladder = «كش مات السلّم»
+name.pattern.epaulette = «كش مات الإيبوليت»
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = بنقلة {best} كان بإمكانك إماتة {my}!
+ex.mate_missed.b1.2 = نقلة {best} كانت كش مات! {my} لم يكن ليهرب.
+ex.mate_missed.b1.3 = انظر! مع {best} كان {my} سيتلقى كش مات.
+ex.mate_missed.b2 = كان لديك كش مات في {m:move}، بدءًا من {best}.
+ex.mate_missed.b2.2 = نقلة {best} كانت كش مات في {m:move}!
+ex.mate_missed.b2.3 = كان بإمكانك إماتة ملِكي بنقلة {best}.
+ex.mate_missed.b3 = فاتك كش مات في {m:move}: {best}.
+ex.mate_missed.b3.2 = مع {best}، كش مات في {m:move}: {line}.
+ex.mate_missed.b3.3 = كان هناك كش مات في {m:move}، بدءًا من {best}.
+ex.mate_missed.b4 = فرصة كش مات ضائعة: {line}، بدءًا من {best}.
+ex.mate_missed.b4.2 = نقلة {best} كانت تفرض كش مات في {m:move}.
+ex.mate_missed.b4.3 = كان لديك كش مات في {m:move} بنقلة {best}.
+ex.mate_missed.b5 = مع {best} كش مات في {m:move}: {line}.
+ex.mate_missed.b5.2 = فاتك كش مات في {m:move}، بدءًا من {best}.
+ex.mate_missed.b5.3 = كان هناك كش مات إجباري: {best}.
+ex.mate_missed.b6 = {best}، كش مات: {line}.
+ex.mate_missed.b6.2 = كش مات في {m:mv} مع {best}.
+ex.mate_missed.b6.3 = {best}، كش مات في {m:mv}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = الأسرع كان {best}: كش مات في {m:move}.
+ex.mate_delayed.b5.2 = مع {best} يأتي الكش مات أسرع، في {m:move}.
+ex.mate_delayed.b6 = {best}: كش مات في {m:mv}.
+ex.mate_delayed.b6.2 = أسرع: {best}، كش مات في {m:mv}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = أوه لا! {my} لا يستطيع التحرك وليس في كش. هذا جمود: تعادل.
+ex.stalemate.b1.2 = انظر: لا مربع آمنًا ل{my}، لكنه ليس في كش. إنه تعادل!
+ex.stalemate.b1.3 = هذا جمود. {my} لا يستطيع التحرك، فالمباراة تعادل.
+ex.stalemate.b2 = جمود! ليس ل{my} أي نقلة قانونية، وليس في كش. تعادل.
+ex.stalemate.b2.2 = أوه لا، جمود: {my} عالق لكنه ليس في كش.
+ex.stalemate.b2.3 = هذا تعادل بالجمود. {my} لا يستطيع التحرك.
+ex.stalemate.b3 = هذا جمود: ليس ل{my} أي نقلة قانونية. والفوز كان في يدك!
+ex.stalemate.b3.2 = جمود! {my} عالق، فتتحول المباراة الرابحة إلى تعادل.
+ex.stalemate.b3.3 = {my} بلا نقلات وليس في كش: جمود.
+ex.stalemate.b4 = جمود: ليس ل{my} أي نقلة قانونية. ضاع الفوز.
+ex.stalemate.b4.2 = بعد {move} يقع {my} في الجمود. تعادل من موقف رابح.
+ex.stalemate.b4.3 = هذا جمود؛ {my} محاصر تمامًا.
+ex.stalemate.b5 = مع {move} يقع {my} في الجمود. ضاع الفوز.
+ex.stalemate.b5.2 = جمود: لا مربعات ل{my}.
+ex.stalemate.b5.3 = إنه جمود، {my} عالق.
+ex.stalemate.b6 = جمود. لا نقلات ل{my}.
+ex.stalemate.b6.2 = {move}، جمود: {my} محاصر.
+ex.stalemate.b6.3 = جمود؛ {my} لا يتحرك.
+ex.stalemate.tip.b1 = حين يكون الفوز قريبًا، اترك لملِكي دائمًا مربعًا يتحرك إليه.
+ex.stalemate.tip.b1.2 = تذكّر: مع التفوق، اترك لملِكي بعض المساحة.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = انتبه! أستطيع التخلي عن قطعي، فلا تبقى ل{my} أي نقلة: جمود.
+ex.stalemate_trick.b1.2 = حذارِ: {my} شبه عالق. أستطيع أن أجعلها تعادلًا.
+ex.stalemate_trick.b2 = انتبه: أستطيع التضحية، فيقع {my} في الجمود.
+ex.stalemate_trick.b2.2 = {my} يكاد لا يملك مربعات. أستطيع فرض الجمود!
+ex.stalemate_trick.b3 = هذا يتيح لي النجاة بالجمود: لا تبقى ل{my} نقلات.
+ex.stalemate_trick.b3.2 = انتبه: بعد {line}، يقع {my} في الجمود.
+ex.stalemate_trick.b4 = بعد {move} هناك فخ جمود: {line}، ولا يستطيع {my} التحرك.
+ex.stalemate_trick.b4.2 = الآن يستطيع {my} الاحتماء بالجمود: {line}.
+ex.stalemate_trick.b5 = بعد {move} الجمود ممكن: {line}؛ {my} محاصر.
+ex.stalemate_trick.b5.2 = فخ الجمود: {line}، ولا نقلات ل{my}.
+ex.stalemate_trick.b6 = {line}، جمود: {my} محاصر.
+ex.stalemate_trick.b6.2 = جمود بعد {line}؛ {my} عالق.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = يستطيع {my} الانتقال إلى {sq} ليهاجم {t1} و{t2} معًا.
+ex.fork.b1.2 = {my} ينتقل إلى {sq} ويهاجم هدفين: {t1} و{t2}.
+ex.fork.b1.3 = راقب {my}: من {sq} يهاجم {t1} و{t2} معًا.
+ex.fork.b2 = شوكة! {my} في {sq} يهاجم {t1} و{t2} معًا.
+ex.fork.b2.2 = بعد نقلتك، يستطيع {my} من {sq} أن يهاجم {t1} و{t2} بشوكة.
+ex.fork.b2.3 = {my} ينتقل إلى {sq}: هجوم مزدوج على {t1} و{t2}.
+ex.fork.b3 = بعد {move} يأتي ردّي: {reply}، شوكة على {t1} و{t2}.
+ex.fork.b3.2 = بعد {reply}، أهاجم {t1} و{t2} في آن واحد.
+ex.fork.b3.3 = {reply} شوكة: {t1} و{t2} كلاهما مهاجَم.
+ex.fork.b4 = {reply}: شوكة على {t1} و{t2}؛ وبعد {line}، تخسر {pts:point}.
+ex.fork.b4.2 = {reply}: هجوم على {t1} و{t2} معًا.
+ex.fork.b4.3 = بعد {move} تصبح الشوكة ممكنة: {reply}، ضد {t1} و{t2}.
+ex.fork.b5 = بعد {move} تأتي الشوكة: {reply}، على {t1} و{t2}.
+ex.fork.b5.2 = {reply}، شوكة على {t1} و{t2}.
+ex.fork.b5.3 = بعد {reply}، يصبح {t1} و{t2} كلاهما في خطر.
+ex.fork.b6 = {reply}، شوكة.
+ex.fork.b6.2 = بعد {move}: {reply}، شوكة.
+ex.fork.b6.3 = {reply} بشوكة.
+# After the one-move demonstration (level 1).
+ex.fork.tail.b1 = لا يمكنك إلا إنقاذ واحد منهما: {t1} أو {t2}.
+ex.fork.tail.b1.2 = الآن أهاجم هدفين معًا: {t1} و{t2}. هذه شوكة!
+ex.fork.tail.b1.3 = أترى؟ {t1} و{t2} مهاجَمان معًا. سيسقط أحدهما.
+ex.fork.more.b3 = قبل نقلتك، تفقّد {sq}: إنه مربع شوكة ل{my}.
+ex.fork.more.b3.2 = راقب {sq}. من هناك يهاجم {my} قطعتين معًا.
+ex.fork.tip.knight = احذر قفزات الحصان قرب ملِكك ووزيرك!
+ex.fork.tip.knight.2 = الأحصنة تحب مهاجمة قطعتين معًا. انظر أين يمكنها أن تقفز.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = حين يبتعد {my}، يهاجم {my2} {t1}!
+ex.discovered.b1.2 = انظر: {my} يسدّ الطريق. إذا تحرك، هاجم {my2} {t1}.
+ex.discovered.b1.3 = يستطيع {my} أن يتنحّى، فيهاجم {my2} {t1}.
+ex.discovered.b2 = هجوم خفي: يتحرك {my}، فيهاجم {my2} {t1}.
+ex.discovered.b2.2 = انتبه: يستطيع {my} أن يتحرك بتهديد، فيضرب {my2} {t1}.
+ex.discovered.b2.3 = يتنحّى {my} فيكشف هجوم {my2} على {t1}.
+ex.discovered.b3 = بعد {reply}، هجوم مكشوف يصيب {t1}.
+ex.discovered.b3.2 = مع {reply} ينكشف هجوم على {t1}.
+ex.discovered.b3.3 = بعد {move}: {reply}، هجوم مكشوف على {t1}.
+ex.discovered.b4 = مع {reply} ينفتح خط نحو {t1}: هجوم مكشوف.
+ex.discovered.b4.2 = بعد {move} يأتي الكشف بنقلة {reply}، فيضيع {t1}.
+ex.discovered.b4.3 = بعد {reply}، يسقط {t1} بهجوم مكشوف.
+ex.discovered.b5 = بعد {move}: هجوم مكشوف بنقلة {reply}.
+ex.discovered.b5.2 = {reply} هجوم مكشوف.
+ex.discovered.b5.3 = {reply}: تهديد مزدوج مكشوف.
+ex.discovered.b6 = {reply}، كشف على {t1}.
+ex.discovered.b6.2 = {reply} ويسقط {t1}.
+ex.discovered.b6.3 = هجوم مكشوف: {reply}، على {t1}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+# "السيخ" (هجوم السيخ): the Arabic term varies by country; b1 explains it in words.
+ex.skewer.b1 = {my} يهاجم {t1}. حين يتحرك، آخذ {t2} الذي خلفه.
+ex.skewer.b1.2 = انظر: {my} يهاجم {t1}، و{t2} خلفه مباشرة.
+ex.skewer.b1.3 = {my} يطارد {t1}. عليه أن يتحرك، فيسقط {t2}.
+ex.skewer.b2 = هجوم السيخ: {my} يهاجم {t1}، و{t2} خلفه.
+ex.skewer.b2.2 = {my} يهاجم {t1} و{t2} على خط واحد. حين يتحرك الأول، آخذ الثاني.
+ex.skewer.b2.3 = انتبه: {t1} و{t2} على خط واحد. يستطيع {my} مهاجمتهما معًا بالسيخ.
+ex.skewer.b3 = {reply}: سيخ على {t1} و{t2}.
+ex.skewer.b3.2 = بعد {reply}، على {t1} أن يتحرك، فيسقط {t2}.
+ex.skewer.b3.3 = بعد {move}: {reply}، سيخ على {t1} و{t2}.
+ex.skewer.b4 = {reply} سيخ على {t1}؛ و{t2} الذي خلفه ضائع.
+ex.skewer.b4.2 = بعد {move} يقف {t1} و{t2} على خط واحد، والجواب {reply}.
+ex.skewer.b4.3 = بعد {reply}، يتحرك {t1} ويسقط {t2}.
+ex.skewer.b5 = {reply}، سيخ: {t1} ثم {t2}.
+ex.skewer.b5.2 = بعد {move}: سيخ بنقلة {reply}، من {t1} إلى {t2}.
+ex.skewer.b6 = {reply}، سيخ.
+ex.skewer.b6.2 = سيخ: {reply}.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = يستطيع {my} الذهاب إلى {sq}. عندها يعلق {your} أمام {t1}.
+ex.pin.b1.2 = راقب {my} في {sq}: يعلق {your} أمام {t1}.
+ex.pin.b1.3 = يستطيع {my} تثبيت {your} أمام {t1}. ثم أربحه.
+ex.pin.b2 = تثبيت: {your} لا يستطيع التحرك، لأن {t1} خلفه.
+ex.pin.b2.2 = {your} مثبَّت أمام {t1}. وبعدها أستطيع أن أربحه.
+ex.pin.b2.3 = الآن {your} عالق أمام {t1}. هذا تثبيت.
+ex.pin.b3 = يُثبَّت {your} أمام {t1}، فأربحه.
+ex.pin.b3.2 = بعد هذا، يصبح {your} مثبَّتًا أمام {t1}.
+ex.pin.b3.3 = تثبيت {your} يكلّف مادة: {t1} خلفه.
+ex.pin.b4 = {reply}: تثبيت يربح مادة.
+ex.pin.b4.2 = بعد {move} يأتي التثبيت بنقلة {reply}.
+ex.pin.b4.3 = بعد {reply}، تسقط القطعة المثبَّتة.
+ex.pin.b5 = بعد {move}: تثبيت بنقلة {reply}.
+ex.pin.b5.2 = {reply} تثبيت، وتضيع القطعة.
+ex.pin.b6 = {reply}، تثبيت.
+ex.pin.b6.2 = تثبيت: {reply}.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} مثبَّت، فلا يستطيع حماية {sq}. {t1} خلفه.
+ex.pin_defender.b1.2 = انظر: {your} لا يستطيع الدفاع عن {sq}، وإلا ضاع {t1}.
+ex.pin_defender.b2 = {your} مثبَّت أمام {t1}، فالمربع {sq} بلا حماية حقيقية.
+ex.pin_defender.b2.2 = القطعة المثبَّتة مدافع سيئ. {your} لا يستطيع حراسة {sq}: {t1} خلفه.
+ex.pin_defender.b3 = {your} مثبَّت أمام {t1}؛ فهو لا يحمي {sq} فعلًا.
+ex.pin_defender.b3.2 = يبدو المربع {sq} محميًّا، لكن {your} مثبَّت أمام {t1}.
+ex.pin_defender.b4 = {your} مثبَّت، فالمربع {sq} غير محمي فعلًا.
+ex.pin_defender.b4.2 = {your} المثبَّت لا يحرس {sq}.
+ex.pin_defender.b5 = {your} مثبَّت؛ {sq} بلا حماية.
+ex.pin_defender.b5.2 = {sq} بلا دفاع: {your} مثبَّت.
+ex.pin_defender.b6 = {your} مثبَّت، فيسقط {sq}.
+ex.pin_defender.b6.2 = {your} مثبَّت، {sq} مكشوف.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} محاصر. كل مربع يستطيع الذهاب إليه مهاجَم.
+ex.trapped.b1.2 = انظر إلى {your}: لا مربع آمنًا يهرب إليه.
+ex.trapped.b1.3 = {your} عالق. أستطيع مهاجمته، ولا يستطيع الهرب.
+ex.trapped.b2 = لا مربعات آمنة ل{your}. أستطيع أن أربحه.
+ex.trapped.b2.2 = {your} محاصر: أينما ذهب، آخذه.
+ex.trapped.b2.3 = انتبه، {your} لم يعد يجد مربعات.
+ex.trapped.b3 = {your} يقع في الحصار: لا مربع آمنًا له.
+ex.trapped.b3.2 = بعد هذا، {your} محاصر وضائع.
+ex.trapped.b3.3 = دخل {your} في فخ: لا يستطيع الخروج.
+ex.trapped.b4 = بعد {move} يبقى {your} محاصرًا.
+ex.trapped.b4.2 = لا خط تراجع ل{your}؛ وأربحه.
+ex.trapped.b4.3 = {your} محاصر بعد {reply}.
+ex.trapped.b5 = ينتهي {your} محاصرًا: {line}.
+ex.trapped.b5.2 = بعد {move} يعلق {your}.
+ex.trapped.b6 = {your} محاصر.
+ex.trapped.b6.2 = {line}، و{your} محاصر.
+ex.trapped.tip.b1 = قبل تحريك أي قطعة، تأكد أنها تستطيع العودة.
+ex.trapped.tip.b1.2 = القطع المتوغلة في معسكري قد تعلق. احتفظ بطريق للخروج.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+# "متنفَّس" = luft (an escape square for the king).
+ex.back_rank.b1 = {your} عالق خلف بيادقه. يستطيع {my} أن يعطيه كشًّا على الصف الأخير.
+ex.back_rank.b1.2 = انتبه: لا مربع هروب ل{your}، و{my} يستطيع بلوغ {sq}.
+ex.back_rank.b1.3 = يستطيع {my} الذهاب إلى {sq}. و{your} محبوس خلف بيادقه.
+ex.back_rank.b2 = خطر الصف الأخير: لا متنفَّس ل{your}. يستطيع {my} أن يعطي كشًّا في {sq}.
+ex.back_rank.b2.2 = {your} محبوس. {my} ينتقل إلى {sq} ويربح مادة.
+ex.back_rank.b2.3 = صفّك الأخير ضعيف: يستطيع {my} أن يعطي {your} كشًّا في {sq}.
+ex.back_rank.b3 = صفّك الأخير ضعيف: {line}. لا مربع هروب ل{your}.
+ex.back_rank.b3.2 = لا متنفَّس ل{your}؛ {line}، وأربح مادة.
+ex.back_rank.b3.3 = بعد {line}، يحسم الصف الأخير المباراة: {your} محبوس.
+ex.back_rank.b4 = الصف الأخير: {line}، ولا متنفَّس ل{your}.
+ex.back_rank.b4.2 = {line}: استغلال لضعف الصف الأخير حول {your}.
+ex.back_rank.b4.3 = {your} بلا مربع هروب: {line}.
+ex.back_rank.b5 = ضعف الصف الأخير حول {your}: {line}.
+ex.back_rank.b5.2 = {line}؛ لا متنفَّس ل{your}.
+ex.back_rank.b6 = {line}، الصف الأخير؛ {your} محبوس.
+ex.back_rank.b6.2 = الصف الأخير: {line} ({your}).
+ex.back_rank.tip.b1 = افتح لملِكك نافذة صغيرة: قدّم أحد البيادق التي أمامه.
+ex.back_rank.tip.b1.2 = الملك الذي يقف خلف ثلاثة بيادق قد يتلقى كش مات على الصف الأخير. افسح له مكانًا.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} في {sq} بلا حماية. يستطيع {my} أخذه مجانًا.
+ex.hanging.b1.2 = انظر إلى {your}: لا شيء يحميه، و{my} يهاجمه.
+ex.hanging.b1.3 = {your} غير محمي. يستطيع {my} أن يأخذه ببساطة.
+ex.hanging.b2 = {your} في {sq} بلا حماية. {my} يأخذه، ولا يمكنك الاسترداد.
+ex.hanging.b2.2 = يستطيع {my} أخذ {your} مجانًا. لا شيء يحميه.
+ex.hanging.b2.3 = {your} وحيد في {sq}، و{my} يأخذه.
+ex.hanging.b3 = بعد {move} يبقى {your} بلا حماية: {reply}، ولا استرداد.
+ex.hanging.b3.2 = {your} في {sq} يضيع بعد {reply}.
+ex.hanging.b3.3 = بعد {reply}، يضيع {your} بلا مقابل.
+ex.hanging.b4 = مع {move} يصبح {your} بلا حماية: {reply}، وأربح {pts:point}.
+ex.hanging.b4.2 = مع {reply} آخذ {your} مجانًا.
+ex.hanging.b4.3 = {your} بلا حماية: {reply}، وآخذه.
+ex.hanging.b5 = بعد {move} يبقى {your} مكشوفًا؛ وبعد {reply} يضيع.
+ex.hanging.b5.2 = {your} في {sq} يسقط بعد {reply}.
+ex.hanging.b5.3 = {reply} وأربح {your}.
+ex.hanging.b6 = {move}؟ {reply} ويسقط {your}.
+ex.hanging.b6.2 = مع {reply} يضيع {your}.
+ex.hanging.b6.3 = {your} مكشوف: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = كان {your2} يحمي {your}. الآن يستطيع {my} أخذه.
+ex.hanging_guard.b1.2 = ابتعد {your2}، فبقي {your} وحيدًا. {my} يأخذه.
+ex.hanging_guard.b2 = كان {your2} يحمي {your}. الآن صار وحيدًا، و{my} يأخذه.
+ex.hanging_guard.b2.2 = تحريك {your2} ترك {your} بلا حماية أمام {my}.
+ex.hanging_guard.b3 = كان {your2} يحرس {your}. وبتحريكه، يسقط الأخير بعد {reply}.
+ex.hanging_guard.b3.2 = بدون {your2}، {your} مكشوف: {reply}.
+ex.hanging_guard.b4 = بعد {move} زالت الحماية: ابتعد {your2} عن {your}، ثم {reply} وآخذه.
+ex.hanging_guard.b4.2 = كان {your2} الحامي الوحيد ل{your}؛ {reply} وأربحه.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = كان {my} يهاجم {your} من قبل. تفقّد دائمًا ما تهدده نقلتي.
+ex.hanging_threat.b1.2 = فاتك تهديدي: {my} يهاجم {your}.
+ex.hanging_threat.b2 = نقلتي الأخيرة هاجمت {your} ب{my}. انظر دائمًا إلى تهديداتي.
+ex.hanging_threat.b2.2 = كان {my} يهدد {your}، والآن أستطيع أخذه.
+ex.hanging_threat.b3 = فاتك تهديدي: كان {my} يهاجم {your}.
+ex.hanging_threat.b3.2 = كان {my} يصوّب نحو {your} طوال الوقت.
+ex.hanging.tip.b1 = قبل كل نقلة، اسأل نفسك: هل كل قطعي في أمان؟
+ex.hanging.tip.b1.2 = عادة جيدة: بعد كل نقلة، تفقّد أيّ قطعك محمية.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured (said with نقاط: "{n:point}").
+ex.exchange_capture.b1 = أخذ {your} قطعة، لكن {my} يستردّ. هذا التبادل يكلّفك نقاطًا.
+ex.exchange_capture.b1.2 = {my} يستردّ. {your} يساوي {n:point}، ولم تحصل إلا على {n2:point}.
+ex.exchange_capture.b1.3 = انتبه: يستطيع {my} أن يستردّ بأخذ {your}. هذا تبادل سيئ.
+ex.exchange_capture.b2 = انتبه عند التبادل: {your} يساوي {n:point}. {my} يستردّ، ولم تكسب إلا {n2:point}.
+ex.exchange_capture.b2.2 = {my} يستردّ بأخذ {your}. تخسر {n:point} ولا تربح إلا {n2:point}.
+ex.exchange_capture.b3 = الأخذ في {sq} لا ينجح: يضيع {your} بعد {line}.
+ex.exchange_capture.b3.2 = {your} يأخذ في {sq}، لكنك تخسر {pts:point} بعد {line}.
+ex.exchange_capture.b4 = {move} خطأ في الحساب على {sq}: بعد {line}، يضيع {your}.
+ex.exchange_capture.b4.2 = الأخذ في {sq} يكلّفك {your}: {line}.
+ex.exchange_capture.b5 = مع {move} يضيع {your} في تبادلات {sq}: {line}.
+ex.exchange_capture.b5.2 = في {sq}، {your} مثقَل بالمهام: {line}.
+ex.exchange_capture.b6 = مع {move} يسقط {your} في {sq} بعد {line}.
+ex.exchange_capture.b6.2 = في {sq}: {line}، ويضيع {your}.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders
+# (said as times, "{n:time}", or as pieces, "ب{n:piece}").
+ex.exchange_count.b1 = لنعدّ: على {sq} أهاجم {n:time}، وتحميه {n2:time}.
+ex.exchange_count.b1.2 = على {sq} أهاجم ب{n:piece}، وتدافع ب{n2:piece}. الغلبة لي.
+ex.exchange_count.b2 = المربع {sq} مهاجَم {n:time} ومحمي {n2:time}. ستخسر مادة هناك.
+ex.exchange_count.b2.2 = احسب على {sq}: الهجوم ب{n:piece} مقابل الدفاع ب{n2:piece}.
+ex.exchange_count.b3 = عُدّ المهاجمين والمدافعين على {sq}: عندي أكثر.
+ex.exchange_count.b3.2 = التبادل على {sq} لا ينجح: بعد {line}، تخسر {pts:point}.
+ex.exchange_count.b4 = {move} خطأ في الحساب على {sq}: بعد {line}، تخسر {pts:point}.
+ex.exchange_count.b4.2 = المربع {sq} مهاجَم أكثر مما هو محمي: {line}.
+ex.exchange_count.b5 = على {sq}، الهجوم ب{n:piece} يغلب الدفاع ب{n2:piece}: {line}.
+ex.exchange_count.b5.2 = مع {move} يخذلك الحساب على {sq}.
+ex.exchange_count.b6 = على {sq}: {line}، وأتقدّم ب{pts:point}.
+ex.exchange_count.b6.2 = {sq}: {n} مقابل {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = قيمة {my} أقل من قيمة {your}. وإذا تبادلنا، تخسر نقاطًا.
+ex.exchange_cheap.b1.2 = {my} يهاجم {your}. تبادلهما ليس في صالحك.
+ex.exchange_cheap.b2 = {your} يساوي {n:point}، و{my} {n2:point} فقط. هذا التبادل يكلّفك.
+ex.exchange_cheap.b2.2 = {my} أقل قيمة من {your}، لذا يربح هذا الهجوم نقاطًا.
+ex.exchange_cheap.b3 = {your} في {sq} تهاجمه قطعة أقل قيمة.
+ex.exchange_cheap.b3.2 = قطعة بقيمة {n2:point} تهاجم {your} في {sq}: {line}.
+ex.exchange_cheap.b4 = {your} في {sq} تهاجمه قطعة أرخص؛ ومع {reply} أربح مادة.
+ex.exchange_cheap.b4.2 = {reply}: قطعة أقل قيمة تهاجم {your} في {sq}.
+ex.exchange_cheap.b5 = {your} في {sq} عرضة لمهاجم أقل قيمة: {line}.
+ex.exchange_cheap.b5.2 = مع {reply} أربح مادة في {sq} على حساب {your}.
+ex.exchange_cheap.b6 = {reply} ويسقط {your} في {sq}.
+ex.exchange_cheap.b6.2 = {line}: يضيع {your} في {sq}.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = انظر! {my} في {sq} كان بلا حماية. كان بإمكان {your} أخذه.
+ex.missed_capture.b1.2 = لاحظ: {my} لم يكن محميًّا، وكان {your} قادرًا على أخذه.
+ex.missed_capture.b1.3 = {my} في {sq} لم يكن محميًّا. كان {your} يستطيع اقتناصه!
+ex.missed_capture.b2 = فاتتك قطعة مجانية: مع {best} تربح {my}.
+ex.missed_capture.b2.2 = {my} كان بلا حماية في {sq}: {best}. في المرة القادمة، اقتنصه!
+ex.missed_capture.b2.3 = مع {best} كان بإمكانك ربح {my} مجانًا.
+ex.missed_capture.b3 = نقلة {best} كانت ستربح {my} بلا مقابل.
+ex.missed_capture.b3.2 = {my} في {sq} كان بلا حماية: {best}. ابحث عن القطع غير المحمية في كل نقلة.
+ex.missed_capture.b3.3 = كان بإمكانك أخذ {my} بنقلة {best}.
+ex.missed_capture.b4 = فرصة ضائعة: مع {best} يسقط {my} في {sq}.
+ex.missed_capture.b4.2 = نقلة {best} كانت تربح {my}، وقد كان بلا حماية.
+ex.missed_capture.b4.3 = {my} كان بلا حماية: {best}.
+ex.missed_capture.b5 = مع {best} تربح {my}؛ وبعد {move} يفلت.
+ex.missed_capture.b5.2 = {my} في {sq} كان مكشوفًا: {best}.
+ex.missed_capture.b6 = {best}! {my} في {sq} كان بلا حماية.
+ex.missed_capture.b6.2 = مع {best} يسقط {my}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = كان لديك هجوم مزدوج: مع {best} تهاجم {t1} و{t2}!
+ex.missed_fork.b1.2 = انظر! مع {best} كان بإمكانك مهاجمة {t1} و{t2} في آن واحد.
+ex.missed_fork.b1.3 = نقلة {best} كانت شوكة: {t1} و{t2} مهاجَمان معًا.
+ex.missed_fork.b2 = نقلة {best} كانت شوكة: {t1} و{t2}.
+ex.missed_fork.b2.2 = فاتك هجوم مزدوج: {best}، على {t1} و{t2}.
+ex.missed_fork.b2.3 = مع {best} تهاجم {t1} و{t2} معًا. شوكة!
+ex.missed_fork.b3 = {best} شوكة على {t1} و{t2}.
+ex.missed_fork.b3.2 = كانت لديك نقلة {best}، شوكة على {t1} و{t2}.
+ex.missed_fork.b3.3 = مع {best} كانت الشوكة على {t1} و{t2}.
+ex.missed_fork.b4 = {best}: شوكة على {t1} و{t2}.
+ex.missed_fork.b4.2 = شوكة ضائعة: {best} على {t1} و{t2}.
+ex.missed_fork.b5 = {best}، شوكة على {t1} و{t2}.
+ex.missed_fork.b5.2 = مع {best} هجوم على {t1} و{t2}.
+ex.missed_fork.b6 = {best}: شوكة على {t1} و{t2}.
+ex.missed_fork.b6.2 = {best} بشوكة على {t1} و{t2}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = يستطيع {my} الوصول إلى {sq} ليصبح وزيرًا. {your} بعيد جدًا.
+ex.promotion.b1.2 = انظر: لا شيء يمنع {my} من بلوغ {sq}. {your} لا يستطيع اللحاق به.
+ex.promotion.b1.3 = {my} على بعد {n:square} من {sq}، و{your} بطيء جدًا.
+ex.promotion.b2 = {my} ينطلق نحو {sq}، و{your} لا يلحق به.
+ex.promotion.b2.2 = {my} يحتاج إلى {n:move} ليبلغ {sq}، و{your} إلى {n2:move}. هذا بطيء جدًا.
+ex.promotion.b2.3 = انتبه: {my} يترقّى في {sq}، و{your} بعيد جدًا.
+ex.promotion.b3 = قاعدة المربع: {your} لا يلحق ب{my} قبل {sq}.
+ex.promotion.b3.2 = السباق خاسر: {my} يبلغ {sq} قبل {your}.
+ex.promotion.b4 = {your} خارج مربع البيدق؛ فيترقّى في {sq}.
+ex.promotion.b4.2 = {my} يترقّى في {sq}؛ و{your} متأخر بنقلة.
+ex.promotion.b5 = سباق البيادق خاسر: {your} خارج المربع، والترقية في {sq}.
+ex.promotion.b5.2 = {line}: وزير جديد لي في {sq}، و{your} متأخر.
+ex.promotion.b6 = {your} خارج المربع؛ والترقية في {sq}.
+ex.promotion.b6.2 = {line}، ترقية في {sq} ({your} متأخر).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = كان بإمكان بيدقك الوصول إلى {sq} ليصبح وزيرًا!
+ex.promotion_missed.b1.2 = انظر إلى {sq}! كان بيدقك يستطيع الانطلاق إلى هناك.
+ex.promotion_missed.b2 = كان بإمكان بيدقك بلوغ {sq}. قدّم البيادق الحرة!
+ex.promotion_missed.b2.2 = لم يكن شيء يعترض بيدقك في طريقه إلى {sq}.
+ex.promotion_missed.b3 = مع {best} تفوز بالسباق إلى {sq}.
+ex.promotion_missed.b3.2 = بيدقك كان أسرع: {best}، ويترقّى في {sq}.
+ex.promotion_missed.b4 = مع {best} تكسب سباق البيادق إلى {sq}.
+ex.promotion_missed.b4.2 = {best}! البيدق يترقّى في {sq}.
+ex.promotion_missed.b5 = مع {best} يترقّى بيدقك أولًا في {sq}.
+ex.promotion_missed.b5.2 = {best}، والمربع {sq} لك.
+ex.promotion_missed.b6 = {best}، والسباق إلى {sq} لك.
+ex.promotion_missed.b6.2 = {best}؛ {sq} أولًا.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = كان ذلك البيدق يحمي {your}. الآن صارت حمايته أضعف.
+ex.king_shield.b1.2 = كان البيدق في {sq} درعًا ل{your}. الآن تستطيع قطعي الاقتراب.
+ex.king_shield.b2 = تحريك البيدق من {sq} يُضعف حماية {your}. الآن تستطيع قطعي مهاجمته.
+ex.king_shield.b2.2 = فقد {your} حارسًا: البيدق في {sq} كان درعه.
+ex.king_shield.b3 = نقلة البيدق هذه تكشف {your} لهجومي.
+ex.king_shield.b3.2 = يفقد {your} غطاء بيادقه، فتقتحم قطعي.
+ex.king_shield.b4 = بعد {move} تضعف البيادق حول {your}، ويخترق هجومي.
+ex.king_shield.b4.2 = الدرع حول {your} ينكسر بعد {move}.
+ex.king_shield.b5 = مع {move} تتخلخل حماية {your}: {line}.
+ex.king_shield.b5.2 = بعد {move}، {your} مكشوف: {line}.
+ex.king_shield.b6 = بعد {move} يضعف {your}: {line}.
+ex.king_shield.b6.2 = {line}؛ {your} مكشوف أكثر من اللازم.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} في خطر. قطعي قادمة نحوه.
+ex.king_exposed.b1.2 = انظر إلى {your}: إنه مكشوف تمامًا. أبقِه آمنًا خلف بيادقه.
+ex.king_exposed.b2 = {your} مكشوف جدًا. أستطيع الآن أن أعطي كشًّا بعد كش.
+ex.king_exposed.b2.2 = انتبه: لا ملجأ ل{your}، وقطعي تهاجمه.
+ex.king_exposed.b3 = {your} مكشوف؛ تستطيع قطعي مهاجمته بكش تلو الآخر.
+ex.king_exposed.b3.2 = بعد هذا، لا ملجأ ل{your}.
+ex.king_exposed.b4 = {your} يصبح مكشوفًا: {line}.
+ex.king_exposed.b4.2 = بعد {move} يبقى {your} عرضة للهجوم.
+ex.king_exposed.b5 = {your} مكشوف أكثر من اللازم: {line}.
+ex.king_exposed.b5.2 = مع {move} يبقى {your} في العراء.
+ex.king_exposed.b6 = {line}؛ {your} مكشوف.
+ex.king_exposed.b6.2 = {your} مكشوف جدًا: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = هذا التبادل يقود إلى نهاية بيادق أربحها.
+ex.bad_trade.b3.2 = بعد {line}، لا يبقى إلا البيادق، وملِكي أفضل.
+ex.bad_trade.b4 = التبادلات تقود إلى نهاية بيادق خاسرة: {line}.
+ex.bad_trade.b4.2 = الدخول بالتبادل في نهاية البيادق هذه خاسر.
+ex.bad_trade.b5 = تبادل خاطئ: نهاية البيادق خاسرة بعد {line}.
+ex.bad_trade.b5.2 = نهاية البيادق خاسرة؛ أبقِ القطع على الرقعة.
+ex.bad_trade.b6 = بعد {line}، نهاية البيادق خاسرة.
+ex.bad_trade.b6.2 = نهاية بيادق خاسرة: {line}.
+ex.bishop_pair.b5 = تخلٍّ عن زوج الأفيال بلا مقابل.
+ex.bishop_pair.b5.2 = هذا التبادل يُفقدك زوج الأفيال؛ وزوجي يبقى.
+ex.bishop_pair.b6 = ضاع زوج الأفيال.
+ex.bishop_pair.b6.2 = زوج الأفيال ذهب مجانًا.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at). "المعارضة" = the opposition.
+ex.opposition.b3 = مع {best} تأخذ المعارضة: الملكان متقابلان بينهما مربع واحد.
+ex.opposition.b3.2 = الملكان! مع {best} كان بإمكانك أخذ المعارضة.
+ex.opposition.b4 = مع {best} تأخذ المعارضة وتفوز.
+ex.opposition.b4.2 = المعارضة تحسم: {best}.
+ex.opposition.b5 = {best}، بأخذ المعارضة.
+ex.opposition.b5.2 = المعارضة: {best}.
+ex.opposition.b6 = {best}، معارضة.
+ex.opposition.b6.2 = {best}: المعارضة.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+# "البيدق الحر" = the passed pawn.
+ex.push_passed.b1 = بيدقك يستطيع الانطلاق نحو {sq}. البيادق الحرة تحب التقدم!
+ex.push_passed.b1.2 = قدّم بيدقك الحر! إنه يريد بلوغ {sq}.
+ex.push_passed.b1.3 = لا شيء يمنع بيدقك من الزحف نحو {sq}. قدّمه!
+ex.push_passed.b2 = {best}: قدّم البيدق الحر نحو {sq}.
+ex.push_passed.b2.2 = بيدقك الحر قوي. قدّمه بنقلة {best}.
+ex.push_passed.b2.3 = قدّمه! مع {best} يقترب البيدق من {sq}.
+ex.push_passed.b3 = مع {best} يتقدّم البيدق الحر.
+ex.push_passed.b3.2 = البيادق الحرة تُدفع إلى الأمام: {best}.
+ex.push_passed.b3.3 = الطريق كان {best}: البيدق ينطلق نحو {sq}.
+ex.push_passed.b4 = {best}: البيدق الحر يحسم.
+ex.push_passed.b4.2 = ادفع البيدق: {best}.
+ex.push_passed.b5 = {best}، بتقديم البيدق الحر: {eval}.
+ex.push_passed.b5.2 = البيدق الحر: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}، البيدق الحر.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = قدّم {your} إلى الأمام! في نهاية المباراة، الملك قطعة قوية.
+ex.king_active.b1.2 = الآن يستطيع {your} المشاركة في القتال. سِر به نحو الوسط.
+ex.king_active.b1.3 = مع قلة القطع، على {your} أن يخرج ويساعد.
+ex.king_active.b2 = في نهاية المباراة، استخدم {your}: قرّبه من المركز.
+ex.king_active.b2.2 = على {your} أن ينشط الآن. تقدّم به.
+ex.king_active.b3 = مع {best} ينشط الملك. في النهايات، الملك يقاتل.
+ex.king_active.b3.2 = {best}: مكان الملك الآن في المركز.
+ex.king_active.b4 = مع {best} يتمركز الملك.
+ex.king_active.b4.2 = على الملك أن يتقدّم: {best}.
+ex.king_active.b5 = {best}، بتنشيط الملك: {line}.
+ex.king_active.b5.2 = نشاط الملك: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}، الملك إلى الأمام.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = مع {best} يبقى موقفك أفضل.
+ex.positional.b4.2 = الأقوى هنا كان {best}.
+ex.positional.b4.3 = كنتُ سأفضّل {best}.
+ex.positional.b5 = الأقوى {best}: {line}.
+ex.positional.b5.2 = {best}، والفكرة: {line}.
+ex.positional.b5.3 = فكّر في {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}، {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = خرج {your} مبكرًا جدًا. أخرج الأحصنة والأفيال أولًا.
+tip.early_queen.b1.2 = انتبه إلى {your} في هذا الوقت المبكر: قطعي تستطيع مطاردته.
+tip.early_queen.b1.3 = تحريك {your} ممتع، لكن أخرج القطع الصغيرة أولًا.
+tip.early_queen.b2 = تحريك {your} بهذا التبكير يتيح لي مهاجمته وكسب الوقت.
+tip.early_queen.b2.2 = خرج {your} بهذه السرعة؟ الأحصنة والأفيال أولًا!
+tip.early_queen.b3 = خروج {your} المبكر يمنحني نقلات تكسب الوقت ضده.
+tip.early_queen.b3.2 = من السهل مطاردة {your} في هذا الوقت المبكر. طوّر قطعك أولًا.
+tip.queen_grab.b1 = أخذ {your} بيدقًا بعيدًا، وقد يقع الآن في ورطة.
+tip.queen_grab.b1.2 = خطف البيادق ب{your} يضيّع الوقت. طوّر قطعك أولًا!
+tip.queen_grab.b2 = ذهب {your} لخطف البيادق على الجناح. هذا يضيّع وقتًا كثيرًا.
+tip.queen_grab.b2.2 = احذر من إرسال {your} وراء البيادق البعيدة.
+tip.queen_grab.b3 = خطف البيادق ب{your} بهذا التبكير يضيّع الوقت.
+tip.queen_grab.b3.2 = {your} بعيد عن قواعده الآن، وتطوير قطعي سيصنع الفارق.
+tip.queen_grab.b4 = {your} يخطف بيدقًا لكنه يضيّع وقتًا كثيرًا.
+tip.queen_grab.b4.2 = خطف بيدق على الطرف ب{your} يكلّف وقتًا.
+tip.same_piece.b1 = {your} تحرّك مرتين. حاول إخراج قطعة جديدة في كل نقلة.
+tip.same_piece.b1.2 = {your} مرة أخرى؟ أخرج قطعك الأخرى أيضًا.
+tip.same_piece.b1.3 = في كل نقلة، حاول تطوير قطعة جديدة، لا {your} من جديد.
+tip.same_piece.b2 = تحريك {your} مرتين في الافتتاح يضيّع الوقت.
+tip.same_piece.b2.2 = تحرّك {your} مجددًا، وقطعك الأخرى ما زالت في مكانها.
+tip.same_piece.b3 = تحريك {your} مرتين يؤخّر التطوير.
+tip.same_piece.b3.2 = نقلة أخرى ب{your}، وبقية جيشك تنتظر.
+tip.castle.b1 = {your} ما زال في الوسط. التبييت يحميه.
+tip.castle.b1.2 = حان وقت التبييت! {your} أكثر أمانًا في الزاوية.
+tip.castle.b1.3 = فكّر في التبييت قريبًا. {your} مكشوف.
+tip.castle.b2 = {your} ما زال في المركز. بيّت قريبًا!
+tip.castle.b2.2 = التبييت يضع {your} في مأمن.
+tip.castle.b3 = مع انفتاح المركز، على {your} أن يبيّت.
+tip.castle.b3.2 = {your} ما زال في المركز؛ وقد حان وقت التبييت منذ مدة.
+tip.knight_rim.b1 = {your} على الحافة لا يفعل الكثير. الأحصنة تحب الوسط.
+tip.knight_rim.b1.2 = الحصان على الحافة حصان ضعيف! {your} يسيطر هناك على مربعات أقل.
+tip.knight_rim.b2 = {your} على الطرف يسيطر على مربعات قليلة. اتجه نحو المركز.
+tip.knight_rim.b2.2 = الحصان على الطرف قليل النفع: مكان {your} في المركز.
+tip.knight_rim.b3 = {your} بعيد عن اللعب على الطرف.
+tip.knight_rim.b3.2 = الطرف مكان سيئ ل{your}.
+tip.flank.b1 = حاول تحريك بيادق الوسط أولًا. بيادق الأطراف لا تفيد كثيرًا.
+tip.flank.b1.2 = بيادق الجانب لا تساعد قطعك على الخروج. استخدم بيادق الوسط.
+tip.flank.b2 = نقلات بيادق الأطراف لا تطوّر شيئًا. استخدم بيادق المركز.
+tip.flank.b2.2 = نقلات كثيرة لبيادق الجانب. طوّر قطعك!
+tip.flank.b3 = نقلات بيادق الأجنحة في الافتتاح تؤخّر التطوير.
+tip.flank.b3.2 = بيادق الأطراف يمكنها الانتظار؛ طوّر قطعك ونافس على المركز.
+tip.centre.b1 = حاول السيطرة على وسط الرقعة، مثل {sq}.
+tip.centre.b1.2 = المركز مهم. ضع بيدقًا أو قطعة قرب {sq}.
+tip.centre.b1.3 = القطع في الوسط قوية. اتجه نحو مربعات مثل {sq}.
+tip.centre.b2 = نافس على المركز: مربعات مثل {sq} مهمة.
+tip.centre.b2.2 = نقلاتك تترك لي المركز. انظر إلى {sq}.
+tip.centre.b3 = المركز بلا منافسة منك؛ والمربع {sq} لي.
+tip.centre.b3.2 = نافس على المركز، حول {sq}.
+# Endgame technique tips.
+tip.mate_technique.b1 = حين يبقى الملك وحيدًا، ادفعه إلى الحافة، ثم أعطِه كش مات.
+tip.mate_technique.b1.2 = نصيحة: ضيّق على ملِكي نحو الحافة. وقرّب ملِكك أيضًا.
+tip.fifty.b1 = انتبه: بعد خمسين نقلة دون أخذ أو تحريك بيدق، تصبح المباراة تعادلًا.
+tip.fifty.b1.2 = الوقت ينفد: خمسون نقلة دون أخذ أو تحريك بيدق تعني التعادل.
+tip.repetition.b1 = انتبه! إذا تكرر الموقف نفسه ثلاث مرات، فهو تعادل.
+tip.repetition.b1.2 = تجنّب تكرار النقلات: التكرار الثالث تعادل، والفوز في متناولك.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = رائع، تضحية بقطعة، وهي ناجحة!
+praise.sacrifice.2 = تضحية ذكية! لعب ممتاز.
+praise.brilliant.b3 = رائع! تضحية حقيقية.
+praise.brilliant.b3.2 = يا لها من تضحية رائعة: {move}!
+praise.brilliant.b4 = {move}! تضحية عبقرية.
+praise.brilliant.b4.2 = نقلة عبقرية. لم أتوقعها.
+praise.brilliant.b5 = {move}!! نقلة عبقرية.
+praise.brilliant.b5.spoken = {move}. نقلة عبقرية!
+praise.brilliant.b5.2 = تضحية عبقرية.
+praise.brilliant.b6 = {move}!! ممتاز.
+praise.brilliant.b6.spoken = {move}. ممتاز!
+praise.brilliant.b6.2 = ضربة عبقرية.
+praise.great.b2 = نقلة رائعة! هكذا تكون المقاومة.
+praise.great.b2.2 = هذه نقلة رائعة. أحسنت!
+praise.great.b3 = نقلة رائعة! إنها الفكرة الجيدة الوحيدة.
+praise.great.b3.2 = ممتاز، مع {move} تنقلب الأمور.
+praise.great.b4 = {move}! اكتشاف رائع.
+praise.great.b4.2 = نقلة رائعة.
+praise.great.b5 = {move}! اكتشاف موفّق.
+praise.great.b5.2 = نقلة قوية: {move}.
+praise.great.b6 = {move}! رائع.
+praise.great.b6.2 = اكتشاف رائع.
+# "لم تَفُتْك" = it did not escape you (vowelled: the bare تفتك reads as another verb).
+praise.only.b2 = جيد! كانت هذه النقلة الجيدة الوحيدة.
+praise.only.b2.2 = أحسنت، هذه هي النقلة الوحيدة التي تنجح.
+praise.only.b3 = النقلة الوحيدة، ولم تَفُتْك.
+praise.only.b3.2 = بالضبط! لا شيء غيرها كان ينجح هنا.
+praise.only.b4 = النقلة الوحيدة. أحسنت.
+praise.only.b4.2 = نقلة وحيدة، وقد وُجدت.
+praise.only.b5 = النقلة الوحيدة. جيد.
+praise.only.b5.2 = {move}، النقلة الوحيدة.
+praise.only.b6 = النقلة الوحيدة.
+praise.only.b6.2 = بدقة: النقلة الوحيدة.
+praise.fork.b2 = هجوم مزدوج! أحسنت.
+praise.fork.b2.2 = قطعتان تحت هجومك معًا! رائع.
+praise.fork.b2.3 = جميل! هذه شوكة.
+praise.fork.b3 = شوكة جميلة.
+praise.fork.b3.2 = شوكة موفّقة!
+praise.fork.b3.3 = شوكة. أحسنت!
+praise.capture.b1 = أحسنت! {my} صار لك مجانًا.
+praise.capture.b1.2 = نظرة ثاقبة! {my} لم يكن محميًّا.
+praise.capture.b1.3 = نعم! {my} من نصيبك.
+praise.capture.b2 = أخذ جيد! {my} كان بلا حماية.
+praise.capture.b2.2 = جميل، {my} أصبح لك.
+praise.capture.b2.3 = ملاحظة موفّقة: لم يكن ل{my} أي حماية.
+praise.best.b1 = نقلة جيدة!
+praise.best.b1.2 = جيد جدًا!
+praise.best.b1.3 = لعب رائع!
+praise.best.b2 = نقلة جيدة.
+praise.best.b2.2 = جميل جدًا.
+praise.best.b2.3 = أحسنت.
+praise.best.b3 = نقلة جيدة: ليس من السهل إيجادها.
+praise.best.b3.2 = اكتشاف جميل.
+praise.best.b3.3 = أفضل نقلة هنا هي {move}. جيد.
+praise.trade.b1 = جيد! مع التفوق، تبادل القطع يفيدك.
+praise.trade.b1.2 = تبادل جميل. التفوق لك، وكلما قلّت القطع كان ذلك أفضل لك.
+praise.trade.b2 = تبادل جيد: الأفضلية لك، فبادل القطع.
+praise.trade.b2.2 = تبادل {my} مع تفوقك قرار ذكي.
+praise.trade.b3 = جيد: التبادل عند التفوق.
+praise.trade.b3.2 = تبادل حكيم.
+praise.excellent.b3 = نقلة ممتازة.
+praise.excellent.b3.2 = هذه نقلة قوية.
+praise.excellent.b3.3 = دقيقة جدًا.
+praise.excellent.b4 = نقلة دقيقة.
+praise.excellent.b4.2 = ممتاز.
+praise.excellent.b4.3 = جيد، {move} نقلة دقيقة.
+praise.castle.b1 = جيد! تبييت في وقته. ملِكك الآن أكثر أمانًا.
+praise.castle.b1.2 = تبييت جميل! ملِكك في مأمن.
+praise.saved.b1 = جيد! قطعتك نجت.
+praise.saved.b1.2 = أحسنت، قطعتك الآن في أمان.
+praise.book.b1 = جيد، هذه نقلة افتتاح معروفة.
+praise.book.b1.2 = جميل، هكذا يبدأ اللاعبون الأقوياء أيضًا.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = انتبه! أهدد بكش مات في {sq}.
+threat.mate.b1.2 = حذارِ: {my} يريد الذهاب إلى {sq}. سيكون ذلك كش مات.
+threat.mate.b1.3 = انظر إلى {sq}. وصولي إليه يعني كش مات!
+threat.mate.b2 = انتبه، أهدد بكش مات.
+threat.mate.b2.2 = حذارِ: هناك تهديد بكش مات في {sq}.
+threat.mate.b2.3 = دقّق النظر: هناك تهديد بالكش مات.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = انظر: {my} يهاجم {your}.
+threat.piece.b1.2 = انتبه! {your} مهدَّد من {my}.
+threat.piece.b1.3 = حذارِ، {my} يريد أخذ {your}.
+threat.piece.b2 = انتبه إلى {your}.
+threat.piece.b2.2 = {your} تحت الهجوم.
+threat.piece.b2.3 = راقب {your}.
+threat.punish.b1 = نقلتي الأخيرة كانت خطأً. هل يمكنك معاقبتي عليها؟
+threat.punish.b1.2 = أظن أنني ارتكبتُ خطأً. هل يمكنك إيجاده؟
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = فكّر في {your} هذه المرة.
+tb.hint.b1.2 = راقب {your} جيدًا.
+tb.hint.king.b1 = فكّر في سلامة {your}.
+tb.hint.king.b1.2 = انظر إلى {your} أولًا. هل هو آمن؟
+tb.hint.missed.b1 = ابحث عن قطع يمكنك أخذها مجانًا.
+tb.hint.missed.b1.2 = انظر جيدًا: هل هناك ما يمكنك أخذه؟
+tb.hint.mate_missed.b1 = انظر إلى ملِكي. هل يمكنك إعطاؤه كش مات؟
+tb.hint.mate_missed.b1.2 = جرّب نقلات الكش أولًا. ربما هناك كش مات!
+tb.hint.general.b1 = خذ وقتك وانظر إلى الرقعة كلها.
+tb.hint.general.b1.2 = حاول إيجاد نقلة أكثر أمانًا.
+# The retry.
+tb.fixed.b1 = أفضل بكثير!
+tb.fixed.b1.2 = نعم، هذا أفضل!
+tb.fixed.b1.3 = جيد، هذه النقلة أفضل بكثير.
+tb.fixed = هذا أفضل.
+tb.fixed.2 = أفضل.
+tb.fixed.3 = تصحيح جيد.
+tb.same = النقلة نفسها مرة أخرى؟ حسنًا، لنرَ.
+tb.same.2 = يبدو أن هذه النقلة تعجبك. لنكمل بها.

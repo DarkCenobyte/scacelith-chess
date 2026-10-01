@@ -7,6 +7,16 @@
 //   * builder thread (low priority): synthesises the initial bank (kVariants per Sfx), then
 //     re-synthesises each variant right after it is played (fresh seed), and frees retired
 //     buffers so the audio thread never allocates or frees.
+//
+// Speech voices (openVoice ...): the ordered operations that carry data (open, append) go through
+// their own command queue, without the 250 ms staleness rule of play() (an append must never be
+// lost: chunks are owned by the command); only an open older than 1.5 s is dropped (the device was
+// away: do not start an out-of-context sentence), and the appends that follow it are discarded.
+// Chunks are allocated by the caller and freed by the builder thread (retired list -> graveyard).
+// Close, stop and pause are id-tagged flags and the pose is a mutex + version (like the listener),
+// so per-frame calls never fill the queue when no device drains it. The audio thread publishes
+// each slot's state (CAS on the id), speech clock and consumed chunk count as id-tagged words;
+// the game-side bookkeeping is guarded by g_voiceMutex, which the audio thread never takes.
 #include "audio.h"
 #include "backend.h"
 #include "mixer.h"
@@ -52,8 +62,68 @@ std::atomic<uint32_t> g_listenerVersion{1};
 std::atomic<float> g_outPeak{0.0f};
 std::atomic<unsigned> g_refreshCount{0};
 
+// ---- Speech voices: shared per-slot state (outlives the engine, so a handle stays answerable
+// across restarts). Voice id = (generation << 1) | slot, generation >= 1.
+static_assert(kMaxSpeech == 2, "voice ids keep the slot in their lowest bit");
+constexpr int64_t kVoiceOpenMaxAgeMs = 1500;
+
+struct VoiceShared {
+    std::atomic<uint64_t> state{0};   // (id << 8) | VoiceState: openVoice allocates, the audio thread publishes
+    std::atomic<uint64_t> played{0};  // (id << 32) | source frames consumed (audio thread)
+    std::atomic<uint64_t> done{0};    // (id << 32) | chunks consumed or discarded (audio thread)
+    std::atomic<uint32_t> closeId{0}, stopId{0}, pausedId{0};  // flags, read by the audio thread
+    std::atomic<float> stopFade{0.06f};
+    // Game side (g_voiceMutex).
+    int64_t queued = 0;  // source frames appended
+    int rate = 44100;
+    uint32_t sent = 0;   // chunks appended
+    bool closed = false;
+    // Emitter pose (listener pattern: the audio thread try_locks when the version moved).
+    std::mutex poseMutex;
+    uint32_t poseId = 0;
+    m::vec3 pos, facing;
+    std::atomic<uint32_t> poseVersion{0};
+};
+VoiceShared g_voices[kMaxSpeech];
+std::mutex g_voiceMutex;
+uint32_t g_voiceGeneration = 0;           // g_voiceMutex
+std::atomic<float> g_voiceVol{1.0f};
+std::atomic<int> g_speechChunksAlive{0};  // leak probe: chunks allocated by appendVoice, not yet freed
+
+uint64_t stateWord(uint32_t id, VoiceState s) { return (uint64_t(id) << 8) | uint64_t(s); }
+uint32_t wordId(uint64_t w) { return uint32_t(w >> 8); }
+VoiceState wordState(uint64_t w) { return VoiceState(uint8_t(w & 0xffu)); }
+bool terminal(VoiceState s) { return s == VoiceState::Finished || s == VoiceState::Stopped || s == VoiceState::Dropped; }
+
+// Audio thread (and shutdown): moves a slot's published state forward for 'id' only. Terminal
+// states are final; Dropped only replaces Pending. A slot reallocated meanwhile is left alone.
+void publishState(VoiceShared& v, uint32_t id, VoiceState st) {
+    uint64_t w = v.state.load(std::memory_order_acquire);
+    for (;;) {
+        if (wordId(w) != id || wordState(w) == st || terminal(wordState(w))) return;
+        if (st == VoiceState::Dropped && wordState(w) != VoiceState::Pending) return;
+        if (v.state.compare_exchange_weak(w, stateWord(id, st), std::memory_order_acq_rel, std::memory_order_acquire)) return;
+    }
+}
+
+// Frees a buffer off the audio thread (builder thread, shutdown), counting speech chunks.
+void freeBuffer(SoundBuffer* b) {
+    if (!b) return;
+    if (b->sfx < 0) g_speechChunksAlive.fetch_sub(1, std::memory_order_relaxed);
+    delete b;
+}
+
+struct VoiceCmd {
+    enum Op : uint8_t { Open, Append } op = Open;
+    uint32_t id = 0;
+    SoundBuffer* chunk = nullptr;  // Append: ownership travels with the command
+    VoiceParams params;            // Open
+    int64_t stampMs = 0;
+};
+
 struct Engine {
     MpmcQueue<Command, 512> commands;
+    MpmcQueue<VoiceCmd, 256> voiceCmds;
     MpmcQueue<SoundBuffer*, 256> incoming;   // builder -> audio thread
     MpmcQueue<SoundBuffer*, 1024> graveyard; // audio thread -> builder (free)
     MpmcQueue<RefreshReq, 256> refresh;      // audio thread -> builder
@@ -66,9 +136,13 @@ struct Engine {
     std::atomic<uint32_t> seedCounter{0};
     // audio-thread state
     uint32_t listenerVersion = 0;
+    uint32_t speechId[kMaxSpeech] = {};    // voice id held by each mixer speech slot
+    bool speechPaused[kMaxSpeech] = {};
+    uint32_t poseSeen[kMaxSpeech] = {};
     double loadAvg = 0.0;
     std::atomic<float> cpuLoad{0.0f};
     std::atomic<int> voices{0};
+    std::atomic<int> speech{0};
     std::atomic<bool> running{false};
 
     uint32_t nextSeed() { return seedCounter.fetch_add(0x9E3779B9u) ^ 0xA5A5F00Du; }
@@ -78,6 +152,74 @@ std::atomic<Engine*> g_engine{nullptr};
 void onRefresh(void* user, int sfx, int variant) {
     Engine* e = static_cast<Engine*>(user);
     e->refresh.push({sfx, variant});  // dropped if full: the old variant simply stays
+}
+
+// Audio thread, before Mixer::process: speech commands, flags, pauses and poses.
+void speechCommands(Engine& e, Mixer& m, int64_t now) {
+    // The close/stop flags are read before the queue is drained: an append made before a close is
+    // then guaranteed to be found in the queue (its push happened before the flag was set).
+    uint32_t closeIds[kMaxSpeech], stopIds[kMaxSpeech];
+    float fades[kMaxSpeech];
+    for (int k = 0; k < kMaxSpeech; ++k) {
+        closeIds[k] = g_voices[k].closeId.load(std::memory_order_acquire);
+        stopIds[k] = g_voices[k].stopId.load(std::memory_order_acquire);
+        fades[k] = g_voices[k].stopFade.load(std::memory_order_relaxed);
+    }
+    VoiceCmd vc;
+    while (e.voiceCmds.pop(vc)) {
+        const int k = int(vc.id & 1u);
+        if (vc.op == VoiceCmd::Open) {
+            if (now - vc.stampMs > kVoiceOpenMaxAgeMs) {
+                publishState(g_voices[k], vc.id, VoiceState::Dropped);
+                continue;  // its appends no longer match the slot and are discarded
+            }
+            m.speechOpen(k, speechParams(vc.params));
+            e.speechId[k] = vc.id;
+            e.speechPaused[k] = false;
+        } else if (vc.id == e.speechId[k] && vc.id != 0) {
+            m.speechAppend(k, vc.chunk);
+        } else {
+            m.discard(vc.chunk);
+        }
+    }
+    for (int k = 0; k < kMaxSpeech; ++k) {
+        const uint32_t id = e.speechId[k];
+        if (!id) continue;
+        VoiceShared& v = g_voices[k];
+        if (stopIds[k] == id) m.speechStop(k, fades[k]);
+        if (closeIds[k] == id) m.speechClose(k);
+        const bool paused = v.pausedId.load(std::memory_order_acquire) == id;
+        if (paused != e.speechPaused[k]) {
+            m.speechPause(k, paused);
+            e.speechPaused[k] = paused;
+        }
+        const uint32_t pv = v.poseVersion.load(std::memory_order_acquire);
+        if (pv != e.poseSeen[k] && v.poseMutex.try_lock()) {  // contended: picked up next callback
+            const uint32_t pid = v.poseId;
+            const m::vec3 pos = v.pos, facing = v.facing;
+            v.poseMutex.unlock();
+            if (pid == id) m.speechPose(k, pos, facing);
+            // A pose for a voice whose open is still in flight is kept for the next callback.
+            const uint64_t w = v.state.load(std::memory_order_acquire);
+            if (pid == id || pid != wordId(w) || terminal(wordState(w))) e.poseSeen[k] = pv;
+        }
+    }
+    m.setVoiceVolume(g_voiceVol.load(std::memory_order_relaxed));
+}
+
+// Audio thread, after Mixer::process: speech clock and consumed chunks first, then the state, so a
+// reader that sees Finished also sees the final clock.
+void speechPublish(Engine& e, Mixer& m) {
+    for (int k = 0; k < kMaxSpeech; ++k) {
+        const uint32_t id = e.speechId[k];
+        if (!id) continue;
+        const SpeechInfo info = m.speechInfo(k);
+        VoiceShared& v = g_voices[k];
+        const uint64_t played = uint64_t(std::min<int64_t>(std::max<int64_t>(info.played, 0), 0xffffffffLL));
+        v.played.store((uint64_t(id) << 32) | played, std::memory_order_release);
+        v.done.store((uint64_t(id) << 32) | info.chunksDone, std::memory_order_release);
+        publishState(v, id, info.state);
+    }
 }
 
 void renderCallback(void* user, float* out, int frames, int sampleRate) {
@@ -105,7 +247,9 @@ void renderCallback(void* user, float* out, int frames, int sampleRate) {
     while (e.commands.pop(c))
         if (now - c.stampMs < 250) m.play(c.req);  // stale requests (device was closed) are dropped
 
+    speechCommands(e, m, now);
     m.process(out, frames);
+    speechPublish(e, m);
 
     while (SoundBuffer* r = m.peekRetired()) {
         if (!e.graveyard.push(r)) break;
@@ -121,6 +265,7 @@ void renderCallback(void* user, float* out, int frames, int sampleRate) {
     e.loadAvg += (used / avail - e.loadAvg) * 0.02;
     e.cpuLoad.store(float(e.loadAvg), std::memory_order_relaxed);
     e.voices.store(m.activeVoices(), std::memory_order_relaxed);
+    e.speech.store(m.activeSpeech(), std::memory_order_relaxed);
 }
 
 SoundBuffer* makeVariant(Sfx s, int variant, uint32_t seed) {
@@ -154,7 +299,7 @@ void builderMain(Engine* e) {
     while (!e->quit.load()) {
         bool busy = false;
         SoundBuffer* dead = nullptr;
-        while (e->graveyard.pop(dead)) delete dead;
+        while (e->graveyard.pop(dead)) freeBuffer(dead);
         RefreshReq r;
         if (e->refresh.pop(r)) {
             pushOrWait(makeVariant(Sfx(r.sfx), r.variant, e->nextSeed()));
@@ -207,13 +352,26 @@ void shutdown() {
     e->wake.notify_all();
     if (e->builder.joinable()) e->builder.join();
     SoundBuffer* b = nullptr;
-    while (e->incoming.pop(b)) delete b;
-    while (e->graveyard.pop(b)) delete b;
+    VoiceCmd vc;
+    while (e->voiceCmds.pop(vc))
+        if (vc.op == VoiceCmd::Append) freeBuffer(vc.chunk);
+    if (e->mixer)
+        for (int k = 0; k < kMaxSpeech; ++k) e->mixer->speechStop(k, 0.0f);  // hands its chunks back
+    while (e->incoming.pop(b)) freeBuffer(b);
+    while (e->graveyard.pop(b)) freeBuffer(b);
     if (e->mixer)
         while (SoundBuffer* r = e->mixer->peekRetired()) {
-            delete r;
+            freeBuffer(r);
             e->mixer->dropRetired();
         }
+    // Every voice not yet over ends Stopped; its handle stays answerable.
+    for (VoiceShared& v : g_voices) {
+        uint64_t w = v.state.load(std::memory_order_acquire);
+        while (wordId(w) != 0 && !terminal(wordState(w)) &&
+               !v.state.compare_exchange_weak(w, stateWord(wordId(w), VoiceState::Stopped), std::memory_order_acq_rel,
+                                              std::memory_order_acquire)) {
+        }
+    }
     delete e;
     LOGI("audio: stopped");
 }
@@ -296,6 +454,165 @@ void setAmbienceEnabled(bool on) { g_ambienceOn.store(on); }
 void setMasterVolume(float v) { if (std::isfinite(v)) g_master.store(dsp::clampf(v, 0.0f, 2.0f)); }
 void setEffectsVolume(float v) { if (std::isfinite(v)) g_effects.store(dsp::clampf(v, 0.0f, 2.0f)); }
 void setAmbienceVolume(float v) { if (std::isfinite(v)) g_ambienceVol.store(dsp::clampf(v, 0.0f, 2.0f)); }
+void setVoiceVolume(float v) { if (std::isfinite(v)) g_voiceVol.store(dsp::clampf(v, 0.0f, 2.0f)); }
+
+// ---- Speech voices ----------------------------------------------------------------------------
+
+VoiceId openVoice(const VoiceParams& p) {
+    Engine* e = g_engine.load(std::memory_order_acquire);
+    if (!e) return {};
+    if (!finiteVec(p.position) || !finiteVec(p.facing) || p.sampleRate < 8000 || p.sampleRate > 192000 ||
+        !std::isfinite(p.gain) || !std::isfinite(p.roomSend) || !std::isfinite(p.duckDb)) {
+        LOGW("audio: openVoice: invalid parameters");
+        return {};
+    }
+    std::lock_guard<std::mutex> lk(g_voiceMutex);
+    // A free slot first (never used or over); else one whose voice was asked to stop (its fade is
+    // then cut short, declicked, by the new voice).
+    for (int pass = 0; pass < 2; ++pass)
+        for (int k = 0; k < kMaxSpeech; ++k) {
+            VoiceShared& v = g_voices[k];
+            uint64_t w = v.state.load(std::memory_order_acquire);
+            for (;;) {
+                const VoiceState st = wordState(w);
+                const bool usable = pass == 0 ? (st == VoiceState::None || terminal(st))
+                                              : (wordId(w) != 0 && v.stopId.load(std::memory_order_relaxed) == wordId(w));
+                if (!usable) break;
+                if (++g_voiceGeneration >= (1u << 31)) g_voiceGeneration = 1;
+                const uint32_t id = (g_voiceGeneration << 1) | uint32_t(k);
+                // The audio thread may publish a new state for the old id meanwhile: re-check then.
+                if (!v.state.compare_exchange_strong(w, stateWord(id, VoiceState::Pending), std::memory_order_acq_rel,
+                                                     std::memory_order_acquire))
+                    continue;
+                v.queued = 0;
+                v.rate = p.sampleRate;
+                v.sent = 0;
+                v.closed = false;
+                {
+                    std::lock_guard<std::mutex> pl(v.poseMutex);
+                    v.poseId = id;
+                    v.pos = p.position;
+                    v.facing = p.facing;
+                }
+                VoiceCmd c;
+                c.op = VoiceCmd::Open;
+                c.id = id;
+                c.params = p;
+                c.stampMs = nowMs();
+                if (!e->voiceCmds.push(c)) {  // queue full (device stalled)
+                    v.state.store(stateWord(id, VoiceState::Dropped), std::memory_order_release);
+                    return {};
+                }
+                return VoiceId{id};
+            }
+        }
+    return {};
+}
+
+double appendVoice(VoiceId id, std::vector<float>&& mono) {
+    Engine* e = g_engine.load(std::memory_order_acquire);
+    if (!id || !e) return -1.0;
+    VoiceShared& v = g_voices[id.v & 1u];
+    std::lock_guard<std::mutex> lk(g_voiceMutex);
+    const uint64_t w = v.state.load(std::memory_order_acquire);
+    if (wordId(w) != id.v || terminal(wordState(w)) || v.closed || v.stopId.load(std::memory_order_relaxed) == id.v)
+        return -1.0;
+    const double start = double(v.queued) / double(v.rate);
+    if (mono.empty()) return start;
+    const uint64_t dw = v.done.load(std::memory_order_acquire);
+    const uint32_t done = uint32_t(dw >> 32) == id.v ? uint32_t(dw) : 0u;
+    if (v.sent - done >= uint32_t(kSpeechChunks)) return -1.0;  // the mixer FIFO is full: retry later
+    SoundBuffer* b = new SoundBuffer();
+    b->samples = std::move(mono);
+    b->sfx = -1;
+    b->variant = int(id.v & 1u);
+    const int64_t frames = int64_t(b->samples.size());
+    VoiceCmd c;
+    c.op = VoiceCmd::Append;
+    c.id = id.v;
+    c.chunk = b;
+    c.stampMs = nowMs();
+    g_speechChunksAlive.fetch_add(1, std::memory_order_relaxed);
+    if (!e->voiceCmds.push(c)) {  // the caller keeps its audio and may retry
+        mono = std::move(b->samples);
+        freeBuffer(b);
+        return -1.0;
+    }
+    v.queued += frames;
+    ++v.sent;
+    return start;
+}
+
+void closeVoice(VoiceId id) {
+    if (!id) return;
+    VoiceShared& v = g_voices[id.v & 1u];
+    std::lock_guard<std::mutex> lk(g_voiceMutex);
+    const uint64_t w = v.state.load(std::memory_order_acquire);
+    if (wordId(w) != id.v || terminal(wordState(w)) || v.closed) return;
+    v.closed = true;
+    v.closeId.store(id.v, std::memory_order_release);
+}
+
+VoiceId playVoice(std::vector<float>&& mono, const VoiceParams& p) {
+    VoiceId id = openVoice(p);
+    if (!id) return {};
+    if (appendVoice(id, std::move(mono)) < 0.0) {
+        stopVoice(id, 0.0f);
+        return {};
+    }
+    closeVoice(id);
+    return id;
+}
+
+void stopVoice(VoiceId id, float fadeSeconds) {
+    if (!id) return;
+    VoiceShared& v = g_voices[id.v & 1u];
+    std::lock_guard<std::mutex> lk(g_voiceMutex);
+    const uint64_t w = v.state.load(std::memory_order_acquire);
+    if (wordId(w) != id.v || terminal(wordState(w))) return;
+    v.stopFade.store(std::isfinite(fadeSeconds) ? dsp::clampf(fadeSeconds, 0.0f, 10.0f) : 0.0f, std::memory_order_relaxed);
+    v.stopId.store(id.v, std::memory_order_release);
+}
+
+void setVoicePaused(VoiceId id, bool paused) {
+    if (!id) return;
+    VoiceShared& v = g_voices[id.v & 1u];
+    std::lock_guard<std::mutex> lk(g_voiceMutex);
+    const uint64_t w = v.state.load(std::memory_order_acquire);
+    if (wordId(w) != id.v || terminal(wordState(w))) return;
+    if (paused) {
+        v.pausedId.store(id.v, std::memory_order_release);
+    } else {
+        uint32_t expected = id.v;
+        v.pausedId.compare_exchange_strong(expected, 0u, std::memory_order_acq_rel);
+    }
+}
+
+void setVoicePose(VoiceId id, m::vec3 position, m::vec3 facing) {
+    if (!id || !finiteVec(position) || !finiteVec(facing)) return;
+    VoiceShared& v = g_voices[id.v & 1u];
+    std::lock_guard<std::mutex> pl(v.poseMutex);
+    if (v.poseId != id.v) return;  // stale handle: the slot holds another voice
+    v.pos = position;
+    v.facing = facing;
+    v.poseVersion.fetch_add(1, std::memory_order_release);
+}
+
+VoiceStatus voiceStatus(VoiceId id) {
+    VoiceStatus s;
+    if (!id) return s;
+    VoiceShared& v = g_voices[id.v & 1u];
+    std::lock_guard<std::mutex> lk(g_voiceMutex);
+    const uint64_t w = v.state.load(std::memory_order_acquire);
+    if (wordId(w) != id.v) return s;  // stale: None
+    s.state = wordState(w);
+    const uint64_t pw = v.played.load(std::memory_order_acquire);
+    const double rate = double(v.rate);
+    s.played = uint32_t(pw >> 32) == id.v ? double(uint32_t(pw)) / rate : 0.0;
+    s.queued = double(v.queued) / rate;
+    s.closed = v.closed;
+    return s;
+}
 
 Stats stats() {
     Stats s;
@@ -310,12 +627,14 @@ Stats stats() {
         s.deviceRestarts = e->backend->status.restarts.load();
     }
     s.activeVoices = e->voices.load();
+    s.activeSpeech = e->speech.load();
     s.cpuLoad = e->cpuLoad.load();
     return s;
 }
 
 float debugTakeOutputPeak() { return g_outPeak.exchange(0.0f); }
 unsigned debugBankRefreshCount() { return g_refreshCount.load(); }
+int debugSpeechChunksAlive() { return g_speechChunksAlive.load(); }
 
 // ---------------------------------------------------------------------------------------------
 // Offline rendering
@@ -439,6 +758,38 @@ std::vector<float> renderAmbienceOffline(float seconds, uint32_t seed, OfflineSt
     std::vector<float> out;
     renderFrames(m, out, size_t(std::max(0.01f, seconds) * kBankRate));
     fadeEdges(out, 0.05f, 0.05f);
+    if (stats) stats->limiterMinGain = m.takeLimiterMinGain();
+    return out;
+}
+
+m::vec3 coachMouthDefault() {
+    // Black's robot, head up: the mouth line sits ~6 cm below the eyes, at the pelvis plane.
+    return m::vec3(0.0f, layout::EYE_HEIGHT - 0.06f, -layout::PLAYER_PELVIS_Z);
+}
+
+std::vector<float> renderVoiceOffline(const std::vector<float>& mono, int srcRate, float seconds, m::vec3 pos,
+                                      const ListenerPose& lis, bool ambience, OfflineStats* stats, m::vec3 facing,
+                                      bool withRoom) {
+    Mixer m(1u);
+    m.prepare(float(kBankRate));
+    m.setVolumes(1.0f, 1.0f, 1.0f);
+    m.setVoiceVolume(1.0f);
+    m.setAmbienceEnabled(ambience, true);
+    m.setRoomEnabled(withRoom);
+    m.setListener(lis);
+    if (ambience) installAll(m, Sfx::ChairCreak, 1u);
+    VoiceParams vp;
+    vp.position = pos;
+    vp.facing = facing;
+    vp.sampleRate = srcRate;
+    m.speechOpen(0, speechParams(vp));
+    SoundBuffer* b = new SoundBuffer();
+    b->samples = mono;
+    b->sfx = -1;
+    m.speechAppend(0, b);
+    m.speechClose(0);
+    std::vector<float> out;
+    renderFrames(m, out, size_t(std::max(0.01f, seconds) * kBankRate));
     if (stats) stats->limiterMinGain = m.takeLimiterMinGain();
     return out;
 }

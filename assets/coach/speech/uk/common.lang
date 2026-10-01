@@ -1,0 +1,462 @@
+# Coach speech (Ukrainian): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Ukrainian needs.
+# Register: the coach says "ти" to the player (the game menus stay formal, "ви"). The coach is male
+# ("я радий", "я показав"); the player's gender is unknown: no second-person past tense, no short
+# adjectives or participles agreeing with the player ("готовий", "здався"): present or future tense,
+# impersonal forms in -но/-то ("партію здано") and noun phrases instead.
+# Words as in assets/i18n/uk.lang: пішак, кінь, слон, тура, ферзь, король; рокіровка, перетворення,
+# бланк запису партії, годинник, Ело. The apostrophe is ’ (U+2019), as in the UI and the opening texts.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns: пішак, кінь, слон, ферзь, король (m), тура (f). In chess Ukrainian the masculine pieces are
+# animate: accusative = genitive ("візьми мого коня", "віддати ферзя", "посунь пішака").
+# Forms (every one defined for all six pieces and both owners):
+#   nom       твій кінь / твоя тура               "{your} так не ходить."
+#   acc       твого коня / твою туру               "Візьми {my:acc} турою!"
+#   gen       твого коня / твоєї тури              "аж до {my:gen}", "у {my:gen} захисту немає"
+#   dat       твоєму коневі / твоїй турі           (not used yet)
+#   ins       твоїм конем / твоєю турою            "поруч із {my:ins}"
+#   loc       твоєму коневі / твоїй турі           (not used yet; "на твоєму коневі")
+#   bare_ins  конем / турою (no possessive)        "Ходи {your:bare_ins}." When the player acts with
+#             their own piece Ukrainian says "своєю турою" or nothing, never "твоєю турою": use bare_ins.
+#   pron      він / вона (the piece as subject)    "Це {your}. {your:pron} ходить по діагоналі."
+#   pron_acc  його / її (object, also "its")       "Візьми {my:pron_acc}!", "на {my:pron_acc} поле"
+#             (never right after a preposition as an object, where Ukrainian says "нього / неї":
+#             rephrase instead; as a possessive, "на його поле", it is right)
+#   pron_prep нього / неї (gen or acc right after a preposition)  "у {your:pron_prep} немає
+#             безпечного поля", "мої фігури йдуть до {your:pron_prep}" (review.lang)
+#   pron_ins  ним / нею (after a preposition)      "бо за {your:pron_ins} стоїть {t1}"
+#   pron_dat  йому / їй                            "{t1:pron_dat} доведеться відійти"
+#   refl_acc  свого коня / свою туру (both owners) when the sentence's subject owns the piece:
+#             "Подбай про {your:refl_acc}", "я залишив {my:refl_acc} без захисту" (Ukrainian
+#             says "свій" there, never "твій" / "мій")
+#   refl_gen  свого коня / своєї тури              "Подумай про безпеку {your:refl_gen}"
+#   refl_ins  своїм конем / своєю турою            "Стеж за {your:refl_ins}"
+# Past tenses, short adjectives and participles agree with the piece's gender: the lines avoid
+# them with a piece placeholder as subject ("{my} залишає дошку", "у {my:gen} захисту немає").
+piece.pawn.gender = m
+piece.knight.gender = m
+piece.bishop.gender = m
+piece.rook.gender = f
+piece.queen.gender = m
+piece.king.gender = m
+piece.pawn.nom = пішак
+piece.pawn.acc = пішака
+piece.pawn.gen = пішака
+piece.pawn.dat = пішакові
+piece.pawn.ins = пішаком
+piece.pawn.loc = пішакові
+piece.pawn.bare_ins = пішаком
+piece.pawn.pron = він
+piece.pawn.pron_acc = його
+piece.pawn.pron_prep = нього
+piece.pawn.pron_ins = ним
+piece.pawn.pron_dat = йому
+piece.pawn.refl_acc = пішака
+piece.pawn.refl_gen = пішака
+piece.pawn.refl_ins = пішаком
+piece.knight.nom = кінь
+piece.knight.acc = коня
+piece.knight.gen = коня
+piece.knight.dat = коневі
+piece.knight.ins = конем
+piece.knight.loc = коневі
+piece.knight.bare_ins = конем
+piece.knight.pron = він
+piece.knight.pron_acc = його
+piece.knight.pron_prep = нього
+piece.knight.pron_ins = ним
+piece.knight.pron_dat = йому
+piece.knight.refl_acc = коня
+piece.knight.refl_gen = коня
+piece.knight.refl_ins = конем
+piece.bishop.nom = слон
+piece.bishop.acc = слона
+piece.bishop.gen = слона
+piece.bishop.dat = слонові
+piece.bishop.ins = слоном
+piece.bishop.loc = слонові
+piece.bishop.bare_ins = слоном
+piece.bishop.pron = він
+piece.bishop.pron_acc = його
+piece.bishop.pron_prep = нього
+piece.bishop.pron_ins = ним
+piece.bishop.pron_dat = йому
+piece.bishop.refl_acc = слона
+piece.bishop.refl_gen = слона
+piece.bishop.refl_ins = слоном
+piece.rook.nom = тура
+piece.rook.acc = туру
+piece.rook.gen = тури
+piece.rook.dat = турі
+piece.rook.ins = турою
+piece.rook.loc = турі
+piece.rook.bare_ins = турою
+piece.rook.pron = вона
+piece.rook.pron_acc = її
+piece.rook.pron_prep = неї
+piece.rook.pron_ins = нею
+piece.rook.pron_dat = їй
+piece.rook.refl_acc = туру
+piece.rook.refl_gen = тури
+piece.rook.refl_ins = турою
+piece.queen.nom = ферзь
+piece.queen.acc = ферзя
+piece.queen.gen = ферзя
+piece.queen.dat = ферзеві
+piece.queen.ins = ферзем
+piece.queen.loc = ферзеві
+piece.queen.bare_ins = ферзем
+piece.queen.pron = він
+piece.queen.pron_acc = його
+piece.queen.pron_prep = нього
+piece.queen.pron_ins = ним
+piece.queen.pron_dat = йому
+piece.queen.refl_acc = ферзя
+piece.queen.refl_gen = ферзя
+piece.queen.refl_ins = ферзем
+piece.king.nom = король
+piece.king.acc = короля
+piece.king.gen = короля
+piece.king.dat = королеві
+piece.king.ins = королем
+piece.king.loc = королеві
+piece.king.bare_ins = королем
+piece.king.pron = він
+piece.king.pron_acc = його
+piece.king.pron_prep = нього
+piece.king.pron_ins = ним
+piece.king.pron_dat = йому
+piece.king.refl_acc = короля
+piece.king.refl_gen = короля
+piece.king.refl_ins = королем
+# Possessives: твій / твоя ... мій / моя ..., by case and gender.
+owner.your.nom.m = твій {piece}
+owner.your.nom.f = твоя {piece}
+owner.your.acc.m = твого {piece}
+owner.your.acc.f = твою {piece}
+owner.your.gen.m = твого {piece}
+owner.your.gen.f = твоєї {piece}
+owner.your.dat.m = твоєму {piece}
+owner.your.dat.f = твоїй {piece}
+owner.your.ins.m = твоїм {piece}
+owner.your.ins.f = твоєю {piece}
+owner.your.loc.m = твоєму {piece}
+owner.your.loc.f = твоїй {piece}
+owner.my.nom.m = мій {piece}
+owner.my.nom.f = моя {piece}
+owner.my.acc.m = мого {piece}
+owner.my.acc.f = мою {piece}
+owner.my.gen.m = мого {piece}
+owner.my.gen.f = моєї {piece}
+owner.my.dat.m = моєму {piece}
+owner.my.dat.f = моїй {piece}
+owner.my.ins.m = моїм {piece}
+owner.my.ins.f = моєю {piece}
+owner.my.loc.m = моєму {piece}
+owner.my.loc.f = моїй {piece}
+# Forms without a possessive: the noun or the pronoun alone.
+owner.your.bare_ins = {piece}
+owner.my.bare_ins = {piece}
+owner.your.pron = {piece}
+owner.my.pron = {piece}
+owner.your.pron_acc = {piece}
+owner.my.pron_acc = {piece}
+owner.your.pron_prep = {piece}
+owner.my.pron_prep = {piece}
+owner.your.pron_ins = {piece}
+owner.my.pron_ins = {piece}
+owner.your.pron_dat = {piece}
+owner.my.pron_dat = {piece}
+owner.your.refl_acc.m = свого {piece}
+owner.your.refl_acc.f = свою {piece}
+owner.your.refl_gen.m = свого {piece}
+owner.your.refl_gen.f = своєї {piece}
+owner.your.refl_ins.m = своїм {piece}
+owner.your.refl_ins.f = своєю {piece}
+owner.my.refl_acc.m = свого {piece}
+owner.my.refl_acc.f = свою {piece}
+owner.my.refl_gen.m = свого {piece}
+owner.my.refl_gen.f = своєї {piece}
+owner.my.refl_ins.m = своїм {piece}
+owner.my.refl_ins.f = своєю {piece}
+# The English keys (every language defines them); Ukrainian uses the gendered patterns above.
+owner.your.nom = твій {piece}
+owner.my.nom = мій {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# The voice drops Latin letters: file letters are Cyrillic letter names, as in the opening texts
+# (tools/gen_opening_lang.py): e4 = "е чотири", f5 = "еф п’ять", a8 = "а вісім", h7 = "аш сім".
+square.spoken = {file} {rank}
+file.a.spoken = а
+file.b.spoken = бе
+file.c.spoken = це
+file.d.spoken = де
+file.e.spoken = е
+file.f.spoken = еф
+file.g.spoken = же
+file.h.spoken = аш
+rank.1.spoken = один
+rank.2.spoken = два
+rank.3.spoken = три
+rank.4.spoken = чотири
+rank.5.spoken = п’ять
+rank.6.spoken = шість
+rank.7.spoken = сім
+rank.8.spoken = вісім
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Ukrainian scoresheet letters (assets/i18n/uk.lang scoresheet.pieces): Кр(ороль) Ф(ерзь) Т(ура)
+# С(лон) К(інь): "Кf3", "Тad1", "Кр:e2".
+move.letters = Кр Ф Т С К
+# Spoken as Ukrainian players read notation: "кінь еф три", "кінь б’є на е п’ять", "кінь бе де сім",
+# "пішак де б’є на е п’ять" (the bare file letter "де" would sound like the word "where"), "пішак
+# б’є у відповідь" (the opening texts' word for a recapture), "коротка рокіровка", "ферзь же чотири,
+# шах". {piece} is always the nominative here, so the promotion names the new piece after a colon
+# ("перетворення на" would need the accusative "на ферзя").
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} б’є на {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} б’є на {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = пішак {file} б’є на {to}
+move.recapture.spoken = {piece} б’є у відповідь
+move.castle_short.spoken = коротка рокіровка
+move.castle_long.spoken = довга рокіровка
+move.promotion.spoken = {move}, перетворення: {piece}
+move.check.spoken = {move}, шах
+move.mate.spoken = {move}, мат
+moves.join.spoken = {a}, {b}
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words (nominative). 21-99 compose as "{tens} {units}" ("двадцять три"), 101-999 as
+# "{hundreds} {rest}" ("сто двадцять"); every hundred is listed. Forms: "f" = feminine ("одна фігура",
+# "дві помилки", "двадцять одна партія"), "neut" = neuter ("одне очко", "одне поле"); a number
+# without its own form falls back to the plain word (neuter "два" = masculine "два").
+number.0.spoken = нуль
+number.1.spoken = один
+number.1.f.spoken = одна
+number.1.neut.spoken = одне
+number.2.spoken = два
+number.2.f.spoken = дві
+number.3.spoken = три
+number.4.spoken = чотири
+number.5.spoken = п’ять
+number.6.spoken = шість
+number.7.spoken = сім
+number.8.spoken = вісім
+number.9.spoken = дев’ять
+number.10.spoken = десять
+number.11.spoken = одинадцять
+number.12.spoken = дванадцять
+number.13.spoken = тринадцять
+number.14.spoken = чотирнадцять
+number.15.spoken = п’ятнадцять
+number.16.spoken = шістнадцять
+number.17.spoken = сімнадцять
+number.18.spoken = вісімнадцять
+number.19.spoken = дев’ятнадцять
+number.20.spoken = двадцять
+number.30.spoken = тридцять
+number.40.spoken = сорок
+number.50.spoken = п’ятдесят
+number.60.spoken = шістдесят
+number.70.spoken = сімдесят
+number.80.spoken = вісімдесят
+number.90.spoken = дев’яносто
+number.100.spoken = сто
+number.200.spoken = двісті
+number.300.spoken = триста
+number.400.spoken = чотириста
+number.500.spoken = п’ятсот
+number.600.spoken = шістсот
+number.700.spoken = сімсот
+number.800.spoken = вісімсот
+number.900.spoken = дев’ятсот
+number.tens.spoken = {tens} {units}
+# Unused (every hundred is listed above), kept because English defines it.
+number.hundreds.spoken = {n} сотень
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = мінус {n}
+# A decimal number: Ukrainian writes a decimal comma ("1,3") and says it with "кома" ("плюс один
+# кома три"), not the bookish "одна ціла три десятих".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} кома {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Ukrainian plural rule (assets/i18n): one (1, 21, 31 ...) | few (2-4, 22-24 ...) | many (0, 5-20, 25 ...).
+# Nominative (= accusative for the inanimate nouns): "мат у три ходи". A sentence needing another
+# case ("після трьох ходів", "одну помилку") will need its own count key (count.<noun>_gen ...), with
+# number words in that case. Feminine nouns say their number with the form "f", neuter ones with
+# "neut". After 2-4 Ukrainian adjectives stay in the nominative plural: "дві грубі помилки".
+count.move = {n} хід|{n} ходи|{n} ходів
+count.point = {n:neut} очко|{n:neut} очки|{n:neut} очок
+count.pawn = {n} пішак|{n} пішаки|{n} пішаків
+count.piece = {n:f} фігура|{n:f} фігури|{n:f} фігур
+count.mistake = {n:f} помилка|{n:f} помилки|{n:f} помилок
+count.blunder = {n:f} груба помилка|{n:f} грубі помилки|{n:f} грубих помилок
+count.inaccuracy = {n:f} неточність|{n:f} неточності|{n:f} неточностей
+count.game = {n:f} партія|{n:f} партії|{n:f} партій
+count.time = {n} раз|{n} рази|{n} разів
+count.square = {n:neut} поле|{n:neut} поля|{n:neut} полів
+# "{n:f}" / "{n:neut}" in a line say a bare number in the feminine / neuter ("одна", "одне"); they are
+# count keys so that the same forms also work outside the counted nouns (and the form check knows them).
+count.f = {n:f}|{n:f}|{n:f}
+count.neut = {n:neut}|{n:neut}|{n:neut}
+
+# ---- Added for review.lang and appraisal.lang (pass 2) ---------------------------------------------
+# Accusative of a counted feminine noun: only "one" differs from the nominative ("взято одну
+# фігуру", "двадцять одну фігуру"; 2-4 and 5+ are the nominative forms "дві фігури", "п’ять фігур").
+# "Взято {n:piece_acc}" says what was captured without a past tense that would show the player's
+# gender ("ти взяв / взяла").
+number.1.f_acc.spoken = одну
+count.f_acc = {n:f_acc}|{n:f_acc}|{n:f_acc}
+count.piece_acc = {n:f_acc} фігуру|{n:f} фігури|{n:f} фігур
+# Attackers and defenders of a square ("на e4 у мене 3 нападники, а в тебе 2 захисники").
+count.attacker = {n} нападник|{n} нападники|{n} нападників
+count.defender = {n} захисник|{n} захисники|{n} захисників
+# A run of best moves ("3 найкращі ходи поспіль").
+count.top_move = {n} найкращий хід|{n} найкращі ходи|{n} найкращих ходів
+# Accuracy in percent: written "87 %" (as assets/i18n/uk.lang number.percent), spoken with the noun
+# in its plural form ("вісімдесят сім відсотків", "двадцять один відсоток").
+count.pct = {n} %|{n} %|{n} %
+count.pct.spoken = {n} відсоток|{n} відсотки|{n} відсотків
+# "Mate in N" with the preposition the voice needs: "в" before the vowel of "один" ("мат в один
+# хід"), "у" before a consonant ("мат у два ходи", "у двадцять один хід", "у вісім ходів").
+# Written always "у" ("мат у 1 хід"). Use it after a word ending in a consonant: "мат {m:in_move}".
+# Among the "one" numbers only 1 starts with a vowel (21, 31 ... are listed so that the composed
+# number does not become "двадцять в один"); 11 keeps "у" ("у одинадцять ходів", allowed after a
+# consonant). {n:prep_in} is the number with its preposition; count.prep_in only declares the form.
+count.in_move = у {n} хід|у {n} ходи|у {n} ходів
+count.in_move.spoken = {n:prep_in} хід|у {n} ходи|у {n} ходів
+count.prep_in = {n:prep_in}|{n:prep_in}|{n:prep_in}
+number.1.prep_in.spoken = в один
+number.21.prep_in.spoken = у двадцять один
+number.31.prep_in.spoken = у тридцять один
+number.41.prep_in.spoken = у сорок один
+number.51.prep_in.spoken = у п’ятдесят один
+number.61.prep_in.spoken = у шістдесят один
+number.71.prep_in.spoken = у сімдесят один
+number.81.prep_in.spoken = у вісімдесят один
+number.91.prep_in.spoken = у дев’яносто один
+# Move numbers as ordinals: "на 12-му ході" (locative), "до 12-го ходу" (genitive), "12-й хід"
+# (nominative). Written with the digits and the ordinal ending, spoken with ordinal words: compound
+# ordinals change only their last word ("двадцять першому", "сто двадцятому"), which is how
+# number.tens / number.hundreds_rest compose them; every ordinal word below is listed for the three
+# cases (the round tens and hundreds too, which have no units word to carry the ending).
+count.nth_move = {n}-й хід|{n}-й хід|{n}-й хід
+count.nth_move.spoken = {n:ord} хід|{n:ord} хід|{n:ord} хід
+count.nth_move_gen = {n}-го ходу|{n}-го ходу|{n}-го ходу
+count.nth_move_gen.spoken = {n:ord_gen} ходу|{n:ord_gen} ходу|{n:ord_gen} ходу
+count.nth_move_loc = {n}-му ході|{n}-му ході|{n}-му ході
+count.nth_move_loc.spoken = {n:ord_loc} ході|{n:ord_loc} ході|{n:ord_loc} ході
+count.ord = {n:ord}|{n:ord}|{n:ord}
+count.ord_gen = {n:ord_gen}|{n:ord_gen}|{n:ord_gen}
+count.ord_loc = {n:ord_loc}|{n:ord_loc}|{n:ord_loc}
+number.1.ord.spoken = перший
+number.1.ord_gen.spoken = першого
+number.1.ord_loc.spoken = першому
+number.2.ord.spoken = другий
+number.2.ord_gen.spoken = другого
+number.2.ord_loc.spoken = другому
+number.3.ord.spoken = третій
+number.3.ord_gen.spoken = третього
+number.3.ord_loc.spoken = третьому
+number.4.ord.spoken = четвертий
+number.4.ord_gen.spoken = четвертого
+number.4.ord_loc.spoken = четвертому
+number.5.ord.spoken = п’ятий
+number.5.ord_gen.spoken = п’ятого
+number.5.ord_loc.spoken = п’ятому
+number.6.ord.spoken = шостий
+number.6.ord_gen.spoken = шостого
+number.6.ord_loc.spoken = шостому
+number.7.ord.spoken = сьомий
+number.7.ord_gen.spoken = сьомого
+number.7.ord_loc.spoken = сьомому
+number.8.ord.spoken = восьмий
+number.8.ord_gen.spoken = восьмого
+number.8.ord_loc.spoken = восьмому
+number.9.ord.spoken = дев’ятий
+number.9.ord_gen.spoken = дев’ятого
+number.9.ord_loc.spoken = дев’ятому
+number.10.ord.spoken = десятий
+number.10.ord_gen.spoken = десятого
+number.10.ord_loc.spoken = десятому
+number.11.ord.spoken = одинадцятий
+number.11.ord_gen.spoken = одинадцятого
+number.11.ord_loc.spoken = одинадцятому
+number.12.ord.spoken = дванадцятий
+number.12.ord_gen.spoken = дванадцятого
+number.12.ord_loc.spoken = дванадцятому
+number.13.ord.spoken = тринадцятий
+number.13.ord_gen.spoken = тринадцятого
+number.13.ord_loc.spoken = тринадцятому
+number.14.ord.spoken = чотирнадцятий
+number.14.ord_gen.spoken = чотирнадцятого
+number.14.ord_loc.spoken = чотирнадцятому
+number.15.ord.spoken = п’ятнадцятий
+number.15.ord_gen.spoken = п’ятнадцятого
+number.15.ord_loc.spoken = п’ятнадцятому
+number.16.ord.spoken = шістнадцятий
+number.16.ord_gen.spoken = шістнадцятого
+number.16.ord_loc.spoken = шістнадцятому
+number.17.ord.spoken = сімнадцятий
+number.17.ord_gen.spoken = сімнадцятого
+number.17.ord_loc.spoken = сімнадцятому
+number.18.ord.spoken = вісімнадцятий
+number.18.ord_gen.spoken = вісімнадцятого
+number.18.ord_loc.spoken = вісімнадцятому
+number.19.ord.spoken = дев’ятнадцятий
+number.19.ord_gen.spoken = дев’ятнадцятого
+number.19.ord_loc.spoken = дев’ятнадцятому
+number.20.ord.spoken = двадцятий
+number.20.ord_gen.spoken = двадцятого
+number.20.ord_loc.spoken = двадцятому
+number.30.ord.spoken = тридцятий
+number.30.ord_gen.spoken = тридцятого
+number.30.ord_loc.spoken = тридцятому
+number.40.ord.spoken = сороковий
+number.40.ord_gen.spoken = сорокового
+number.40.ord_loc.spoken = сороковому
+number.50.ord.spoken = п’ятдесятий
+number.50.ord_gen.spoken = п’ятдесятого
+number.50.ord_loc.spoken = п’ятдесятому
+number.60.ord.spoken = шістдесятий
+number.60.ord_gen.spoken = шістдесятого
+number.60.ord_loc.spoken = шістдесятому
+number.70.ord.spoken = сімдесятий
+number.70.ord_gen.spoken = сімдесятого
+number.70.ord_loc.spoken = сімдесятому
+number.80.ord.spoken = вісімдесятий
+number.80.ord_gen.spoken = вісімдесятого
+number.80.ord_loc.spoken = вісімдесятому
+number.90.ord.spoken = дев’яностий
+number.90.ord_gen.spoken = дев’яностого
+number.90.ord_loc.spoken = дев’яностому
+number.100.ord.spoken = сотий
+number.100.ord_gen.spoken = сотого
+number.100.ord_loc.spoken = сотому
+number.200.ord.spoken = двохсотий
+number.200.ord_gen.spoken = двохсотого
+number.200.ord_loc.spoken = двохсотому
+number.300.ord.spoken = трьохсотий
+number.300.ord_gen.spoken = трьохсотого
+number.300.ord_loc.spoken = трьохсотому
+number.400.ord.spoken = чотирьохсотий
+number.400.ord_gen.spoken = чотирьохсотого
+number.400.ord_loc.spoken = чотирьохсотому
+number.500.ord.spoken = п’ятисотий
+number.500.ord_gen.spoken = п’ятисотого
+number.500.ord_loc.spoken = п’ятисотому
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = плюс {x}
+eval.down = −{x}
+eval.down.spoken = мінус {x}
+eval.even = 0,0
+eval.even.spoken = рівність
+eval.mate_win = мат у {n:move}
+eval.mate_loss = тобі мат у {n:move}

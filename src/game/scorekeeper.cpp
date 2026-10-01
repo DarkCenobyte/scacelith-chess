@@ -84,13 +84,10 @@ void Scorekeeper::newGame(anim::Animator* anim, bool clockOnPositiveX, const Pla
     recording_ = headerWritten_ = finished_ = false;
     hasDetails_ = false;
     details_ = Details();
-    moves_.clear();
+    ledger_.reset();
     sheet::PieceLetters letters = localizedPieceLetters();
     for (int s = 0; s < 2; ++s) {
         players_[s] = players[s];
-        nextPly_[s] = 0;
-        movesQueued_[s] = 0;
-        hold_[s] = false;
         handAside_[s] = false;
         hasPrevPen_[s] = false;
         if (!ready_) continue;
@@ -107,10 +104,8 @@ void Scorekeeper::newGame(anim::Animator* anim, bool clockOnPositiveX, const Pla
 
 void Scorekeeper::clear() {
     recording_ = headerWritten_ = finished_ = false;
-    moves_.clear();
+    ledger_.reset();
     for (int s = 0; s < 2; ++s) {
-        nextPly_[s] = movesQueued_[s] = 0;
-        hold_[s] = false;
         hasPrevPen_[s] = false;
         if (ready_) sheets_[s].reset();
     }
@@ -146,12 +141,10 @@ void Scorekeeper::writeHeaderInstantly() {
 void Scorekeeper::writeMovesInstantly(const std::vector<std::string>& san) {
     if (!ready_) return;
     writeHeaderInstantly();
-    for (int s = 0; s < 2; ++s) {
-        for (size_t i = size_t(nextPly_[s]); i < san.size(); ++i) sheets_[s].writeMoveInstant(int(i), san[i]);
-        nextPly_[s] = std::max(nextPly_[s], int(san.size()));
-        refreshRest(s);
-    }
-    moves_ = san;
+    for (int s = 0; s < 2; ++s)
+        for (size_t i = size_t(ledger_.next(s)); i < san.size(); ++i) sheets_[s].writeMoveInstant(int(i), san[i]);
+    ledger_.writtenInstantly(san);
+    for (int s = 0; s < 2; ++s) refreshRest(s);
 }
 
 void Scorekeeper::startRecording() {
@@ -172,14 +165,14 @@ void Scorekeeper::startRecording() {
 }
 
 void Scorekeeper::recordMove(int ply, const std::string& san) {
-    if (int(moves_.size()) <= ply) moves_.resize(size_t(ply) + 1);
-    moves_[size_t(ply)] = san;
+    ledger_.record(ply, san);
     if (!ready_ || !anim_ || finished_) return;
     if (!recording_) startRecording();
     for (int s = 0; s < 2; ++s) {
-        if (hold_[s]) continue;  // written once released (hot-seat)
-        // Moves completed before this sheet caught up (a hold, else never in normal play) come first.
-        for (int p = nextPly_[s]; p <= ply; ++p) beginMoveEntry(s, p, moves_[size_t(p)]);
+        // A held sheet (hot-seat) and the plies from the write limit on wait. Moves completed
+        // before this sheet caught up (a hold, a limit, else never in normal play) come first.
+        const int end = std::min(ply + 1, ledger_.due(s));
+        for (int p = ledger_.next(s); p < end; ++p) beginMoveEntry(s, p, ledger_.san(p));
     }
     LOGD("scoresheet: move %d queued, writing backlog %.1f s / %.1f s", ply + 1,
          anim_[0].writingRemainingTime(), anim_[1].writingRemainingTime());
@@ -203,27 +196,39 @@ void Scorekeeper::beginMoveEntry(int seat, int ply, const std::string& san) {
         w.path.push_back(k);
     }
     anim_[seat].enqueueWriting(w);
-    nextPly_[seat] = ply + 1;
-    ++movesQueued_[seat];
+    ledger_.begin(seat, ply);
 }
 
 void Scorekeeper::setHold(int seat, bool hold) {
     seat &= 1;
-    if (hold_[seat] == hold) return;
-    hold_[seat] = hold;
+    if (ledger_.held(seat) == hold) return;
+    ledger_.setHold(seat, hold);
     if (!hold) catchUp(seat);
+}
+
+void Scorekeeper::setWriteLimit(int plies) {
+    ledger_.setWriteLimit(plies);
+    for (int s = 0; s < 2; ++s) catchUp(s);
+}
+
+bool Scorekeeper::dropMoves(int fromPly) {
+    if (!ledger_.dropMoves(fromPly)) return false;
+    LOGD("scoresheet: moves from %d on dropped before being written", fromPly + 1);
+    return true;
 }
 
 void Scorekeeper::catchUp(int seat) {
     if (!ready_ || !anim_ || finished_ || !recording_) return;
-    for (int p = nextPly_[seat]; p < int(moves_.size()); ++p) beginMoveEntry(seat, p, moves_[size_t(p)]);
+    const int end = ledger_.due(seat);
+    for (int p = ledger_.next(seat); p < end; ++p) beginMoveEntry(seat, p, ledger_.san(p));
 }
 
 void Scorekeeper::finishGame(const std::string& result) {
     if (finished_) return;
-    // The moves a held sheet still owes come before the result.
+    // The moves a held or limited sheet still owes come before the result.
+    ledger_.setWriteLimit(-1);
     for (int s = 0; s < 2; ++s) {
-        hold_[s] = false;
+        ledger_.setHold(s, false);
         catchUp(s);
     }
     finished_ = true;
@@ -237,7 +242,7 @@ void Scorekeeper::finishGame(const std::string& result) {
         w.path = sheets_[s].beginResult(result);
         if (w.path.empty()) {
             anim::PenKey k;
-            k.tip = sheets_[s].writingRest(nextPly_[s]) + vec3(0, 0.004f, 0);
+            k.tip = sheets_[s].writingRest(ledger_.next(s)) + vec3(0, 0.004f, 0);
             w.path.push_back(k);
         }
         anim_[s].enqueueWriting(w);
@@ -249,7 +254,7 @@ void Scorekeeper::finishGame(const std::string& result) {
 
 void Scorekeeper::refreshRest(int seat) {
     if (!anim_ || !ready_) return;
-    vec3 rest = sheets_[seat].writingRest(nextPly_[seat]);
+    vec3 rest = sheets_[seat].writingRest(ledger_.next(seat));
     if (handAside_[seat]) {
         // Beside the pad's outer long edge (where the rest point already lies), near the bottom
         // of the page: the page stays in sight.

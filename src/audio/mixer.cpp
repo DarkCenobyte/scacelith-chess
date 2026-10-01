@@ -7,7 +7,6 @@ using namespace dsp;
 
 struct Mixer::Voice {
     bool active = false;
-    bool fresh = true;
     bool spatial = true;
     Bus bus = Bus::Effects;
     int sfx = 0, variant = 0;
@@ -19,19 +18,71 @@ struct Mixer::Voice {
     float send = 0.0f;   // hall send relative to gain
     m::vec3 position;
     float tilt = 0.0f, tiltZ = 0.0f;
-    // Current (per-sample ramped) parameters.
-    float gL = 0, gR = 0, itd = 0, shL = 0, shR = 0, lp = 0, sendG = 0;
-    float lpZ = 0, zL = 0, zR = 0;
-    float ring[64];
-    uint32_t w = 0;
+    SpatialChain chain;  // current (per-sample ramped) 3D parameters and filter/ITD state
     uint32_t start = 0;
     // Windowed playback (PlayRequest::duration): source positions of the window, fade lengths.
     double winStart = 0.0, winEnd = 0.0;  // winEnd 0 = whole sound
     float fadeIn = 1.0f, fadeOut = 1.0f;
 };
 
+// A streamed speech voice: FIFO of chunks read as one continuous stream.
+struct Mixer::Speech {
+    bool open = false;             // holds a voice (speechOpen .. Finished / Stopped)
+    bool closed = false, paused = false, stopping = false;
+    bool starved = true;           // the read position waits for more audio (or the close)
+    VoiceState state = VoiceState::None;  // last terminal state once closed
+    SpeechParams p;
+    SoundBuffer* fifo[kSpeechChunks] = {};
+    int head = 0, count = 0;
+    int64_t avail = 0;             // source samples in the FIFO, from the head chunk's start
+    double pos = 0.0;              // read position in the head chunk (source samples)
+    int64_t playedBase = 0;        // source samples of the chunks already consumed
+    int64_t played = 0;            // reported speech clock (monotonic)
+    uint32_t chunksDone = 0;
+    float prev[2] = {0.0f, 0.0f};  // the two stream samples before the head chunk (Hermite continuity)
+    float env = 0.0f;              // start / pause / stop / resume fade (linear, smoothstepped)
+    float envFade = kSpeechEdgeFade;  // length of the current fade (s)
+    float lastY = 0.0f;            // last source output
+    float tail = 0.0f;             // declick: an abrupt cut hands its last value over, decaying fast
+    int flush = 0;                 // samples still rendered after the voice ended (tail, ITD ring)
+    SpatialChain chain;
+
+    // Stream sample k counted from the head chunk's start (k >= -2; silence past the queued audio).
+    float at(int64_t k) const {
+        if (k < 0) return k >= -2 ? prev[2 + k] : 0.0f;
+        for (int i = 0, c = head; i < count; ++i, c = (c + 1) % kSpeechChunks) {
+            const int64_t len = int64_t(fifo[c]->samples.size());
+            if (k < len) return fifo[c]->samples[size_t(k)];
+            k -= len;
+        }
+        return 0.0f;
+    }
+    // Source samples played. While starved, everything queued counts as played (the interpolator
+    // still holds its last two samples back, waiting for the next chunk).
+    int64_t clock() const {
+        return starved ? played : playedBase + std::min<int64_t>(int64_t(pos), avail);
+    }
+};
+
+namespace {
+float smooth01(float e) { return e * e * (3.0f - 2.0f * e); }
+}  // namespace
+
+SpeechParams speechParams(const VoiceParams& v) {
+    SpeechParams p;
+    p.pos = v.position;
+    p.facing = m::length2(v.facing) > 1e-8f ? m::normalize(v.facing) : m::vec3(0.0f);
+    p.srcRate = float(std::min(192000, std::max(8000, v.sampleRate)));
+    p.gain = std::isfinite(v.gain) ? clampf(v.gain, 0.0f, 4.0f) : 1.0f;
+    p.send = std::isfinite(v.roomSend) ? clampf(v.roomSend, 0.0f, 1.0f) : 0.13f;
+    p.duckGain = dbToGain(std::isfinite(v.duckDb) ? clampf(v.duckDb, -40.0f, 0.0f) : 0.0f);
+    p.spatial = v.spatial;
+    return p;
+}
+
 Mixer::Mixer(uint32_t seed) : rng_(seed, 99u), seed_(seed) {
     voices_ = new Voice[kMaxVoices];
+    speech_ = new Speech[kMaxSpeech];
     for (int& v : lastVariant_) v = -1;
     basis_ = makeBasis(pose_);
 }
@@ -42,7 +93,10 @@ Mixer::~Mixer() {
             delete s.buf;
             delete s.pending;
         }
+    for (int k = 0; k < kMaxSpeech; ++k)
+        for (int i = 0; i < speech_[k].count; ++i) delete speech_[k].fifo[(speech_[k].head + i) % kSpeechChunks];
     for (int i = 0; i < retiredCount_; ++i) delete retired_[i];
+    delete[] speech_;
     delete[] voices_;
 }
 
@@ -93,7 +147,8 @@ void Mixer::prepare(float sampleRate) {
     dcR_ = DcBlock();
     dcL_.set(10.0f, fs_);
     dcR_.set(10.0f, fs_);
-    for (int i = 0; i < kMaxVoices; ++i) voices_[i].fresh = true;
+    for (int i = 0; i < kMaxVoices; ++i) voices_[i].chain.fresh = true;
+    for (int k = 0; k < kMaxSpeech; ++k) speech_[k].chain.fresh = true;
 }
 
 void Mixer::setListener(const ListenerPose& p) {
@@ -110,6 +165,11 @@ void Mixer::setVolumes(float master, float effects, float ambience) {
         fx_ = fxT_;
         amb_ = ambT_;
     }
+}
+
+void Mixer::setVoiceVolume(float voice) {
+    voiceT_ = clampf(voice, 0.0f, 2.0f);
+    if (first_) voice_ = voiceT_;
 }
 
 void Mixer::setAmbienceEnabled(bool on, bool instant) {
@@ -170,8 +230,9 @@ float Mixer::takeLimiterMinGain() {
 
 float Mixer::busGain(Bus b) const {
     switch (b) {
-        case Bus::Ambience: return amb_ * ambFade_ * ambFade_;
-        default: return fx_;
+        case Bus::Ambience: return amb_ * ambFade_ * ambFade_ * duck_;  // creaks are ducked too
+        case Bus::Voice: return voice_;
+        default: return fx_;  // effects and UI (never ducked: the board stays audible under speech)
     }
 }
 
@@ -214,7 +275,6 @@ bool Mixer::play(const PlayRequest& r) {
     }
     const SfxInfo& info = sfxInfo(r.sfx);
     v->active = true;
-    v->fresh = true;
     v->spatial = r.spatial;
     v->bus = r.bus;
     v->sfx = si;
@@ -240,9 +300,8 @@ bool Mixer::play(const PlayRequest& r) {
     v->send = info.roomSend;
     v->position = r.pos;
     v->tilt = 0.3f * rng_.bi();
-    v->tiltZ = v->lpZ = v->zL = v->zR = 0.0f;
-    std::memset(v->ring, 0, sizeof(v->ring));
-    v->w = 0;
+    v->tiltZ = 0.0f;
+    v->chain.reset();
     v->start = clock_;
     ++slot.users;
     lastVariant_[si] = var;
@@ -253,28 +312,8 @@ bool Mixer::play(const PlayRequest& r) {
 }
 
 void Mixer::renderVoice(Voice& v, int n, float bg) {
-    float g = v.gain * bg;
-    float tgL, tgR, tItd = 0.0f, tShL = 0.0f, tShR = 0.0f, tLp = 0.0f;
-    if (v.spatial) {
-        SpatialParams sp = computeSpatial(basis_, v.position, fs_);
-        tgL = sp.gL * g;
-        tgR = sp.gR * g;
-        tItd = sp.itd;
-        tShL = sp.shadowL;
-        tShR = sp.shadowR;
-        tLp = sp.lp;
-    } else {
-        tgL = tgR = 0.70710678f * g;
-    }
-    float tSend = g * v.send;
-    if (v.fresh) {
-        v.gL = tgL; v.gR = tgR; v.itd = tItd; v.shL = tShL; v.shR = tShR; v.lp = tLp; v.sendG = tSend;
-        v.fresh = false;
-    }
-    const float inv = 1.0f / float(n);
-    const float dgL = (tgL - v.gL) * inv, dgR = (tgR - v.gR) * inv, dItd = (tItd - v.itd) * inv;
-    const float dShL = (tShL - v.shL) * inv, dShR = (tShR - v.shR) * inv, dLp = (tLp - v.lp) * inv;
-    const float dSend = (tSend - v.sendG) * inv;
+    // Non-spatial voices (UI bus) are centred and still feed the hall through the send.
+    v.chain.begin(spatialTarget(basis_, v.spatial, v.position, fs_, v.gain * bg, v.send), n);
     const double step = double(v.rate) * double(kBankRate) / double(fs_);
     const float tiltA = OnePole::coefFor(2500.0f, fs_);
     const float* d = v.data;
@@ -302,27 +341,239 @@ void Mixer::renderVoice(Voice& v, int n, float bg) {
         v.pos += step;
         v.tiltZ = s + tiltA * (v.tiltZ - s);
         s += v.tilt * (s - v.tiltZ);
-
-        v.gL += dgL; v.gR += dgR; v.itd += dItd; v.shL += dShL; v.shR += dShR; v.lp += dLp; v.sendG += dSend;
-        room_[i] += s * v.sendG;
-
-        v.lpZ = s + v.lp * (v.lpZ - s);
-        v.ring[v.w & 63u] = v.lpZ;
-        ++v.w;
-        float sl = v.lpZ, sr = v.lpZ;
-        if (v.itd != 0.0f) {
-            float dd = std::min(std::fabs(v.itd), 60.0f);
-            int i0 = int(dd);
-            float fr = dd - float(i0);
-            float a = v.ring[(v.w - 1u - uint32_t(i0)) & 63u], b = v.ring[(v.w - 2u - uint32_t(i0)) & 63u];
-            float delayed = a + (b - a) * fr;
-            if (v.itd > 0.0f) sl = delayed; else sr = delayed;
-        }
-        v.zL = sl + v.shL * (v.zL - sl);
-        v.zR = sr + v.shR * (v.zR - sr);
-        L_[i] += v.zL * v.gL;
-        R_[i] += v.zR * v.gR;
+        v.chain.tick(s, L_[i], R_[i], room_[i]);
     }
+}
+
+// ---- Speech -----------------------------------------------------------------------------------
+
+bool Mixer::speechOpen(int slot, const SpeechParams& p) {
+    if (slot < 0 || slot >= kMaxSpeech) return false;
+    Speech& s = speech_[slot];
+    // A voice still sounding in the slot is cut: its last value is handed to the declick tail and
+    // the chain keeps its state (no jump in the filters or the ITD line).
+    const bool sounding = s.open || s.flush > 0;
+    for (int i = 0; i < s.count; ++i) retire(s.fifo[(s.head + i) % kSpeechChunks]);
+    const float tail = sounding ? s.tail + s.lastY : 0.0f;
+    const SpatialChain chain = s.chain;
+    s = Speech();
+    if (sounding) s.chain = chain;
+    s.tail = tail;
+    s.p = p;
+    s.open = true;
+    s.starved = true;
+    s.envFade = kSpeechEdgeFade;
+    return true;
+}
+
+bool Mixer::speechAppend(int slot, SoundBuffer* chunk) {
+    if (!chunk) return false;
+    if (slot < 0 || slot >= kMaxSpeech) {
+        retire(chunk);
+        return false;
+    }
+    Speech& s = speech_[slot];
+    const bool accept = s.open && !s.closed && !s.stopping;
+    const bool empty = chunk->samples.empty();
+    if (!accept || empty || s.count >= kSpeechChunks) {
+        retire(chunk);
+        ++s.chunksDone;
+        return accept && empty;  // an empty chunk is accepted: nothing to play
+    }
+    s.fifo[(s.head + s.count) % kSpeechChunks] = chunk;
+    ++s.count;
+    s.avail += int64_t(chunk->samples.size());
+    return true;
+}
+
+void Mixer::speechClose(int slot) {
+    if (slot >= 0 && slot < kMaxSpeech && speech_[slot].open) speech_[slot].closed = true;
+}
+
+void Mixer::speechStop(int slot, float fadeSeconds) {
+    if (slot < 0 || slot >= kMaxSpeech) return;
+    Speech& s = speech_[slot];
+    if (!s.open) return;
+    // Nothing audible to fade (starved, paused, not started): at once.
+    if (!(fadeSeconds > 0.0f) || s.starved || s.env <= 0.0f) {
+        endSpeech(s, VoiceState::Stopped);
+        return;
+    }
+    const float fade = std::min(fadeSeconds, 10.0f);
+    s.envFade = s.stopping ? std::min(s.envFade, fade) : fade;
+    s.stopping = true;
+}
+
+void Mixer::speechPause(int slot, bool paused) {
+    if (slot < 0 || slot >= kMaxSpeech) return;
+    Speech& s = speech_[slot];
+    if (!s.open || s.paused == paused) return;
+    s.paused = paused;
+    if (!s.stopping) s.envFade = kSpeechPauseFade;
+}
+
+void Mixer::speechPose(int slot, m::vec3 pos, m::vec3 facing) {
+    if (slot < 0 || slot >= kMaxSpeech) return;
+    Speech& s = speech_[slot];
+    s.p.pos = pos;
+    s.p.facing = m::length2(facing) > 1e-8f ? m::normalize(facing) : m::vec3(0.0f);
+}
+
+SpeechInfo Mixer::speechInfo(int slot) const {
+    SpeechInfo info;
+    if (slot < 0 || slot >= kMaxSpeech) return info;
+    const Speech& s = speech_[slot];
+    if (!s.open) info.state = s.state;
+    else if (s.paused) info.state = VoiceState::Paused;
+    else if (s.starved) info.state = VoiceState::Starved;
+    else info.state = VoiceState::Playing;
+    info.played = s.open ? std::max(s.played, s.clock()) : s.played;
+    info.chunksDone = s.chunksDone;
+    return info;
+}
+
+int Mixer::activeSpeech() const {
+    int n = 0;
+    for (int k = 0; k < kMaxSpeech; ++k) n += speech_[k].open ? 1 : 0;
+    return n;
+}
+
+void Mixer::advanceChunk(Speech& s) {
+    SoundBuffer* c = s.fifo[s.head];
+    const int64_t len = int64_t(c->samples.size());  // >= 1 (empty chunks are never queued)
+    if (len >= 2) {
+        s.prev[0] = c->samples[size_t(len - 2)];
+        s.prev[1] = c->samples[size_t(len - 1)];
+    } else {
+        s.prev[0] = s.prev[1];
+        s.prev[1] = c->samples[0];
+    }
+    s.pos -= double(len);
+    s.playedBase += len;
+    s.avail -= len;
+    retire(c);
+    s.fifo[s.head] = nullptr;
+    s.head = (s.head + 1) % kSpeechChunks;
+    --s.count;
+    ++s.chunksDone;
+}
+
+void Mixer::endSpeech(Speech& s, VoiceState st) {
+    s.played = std::max(s.played, s.clock());
+    for (int i = 0; i < s.count; ++i) {
+        retire(s.fifo[(s.head + i) % kSpeechChunks]);
+        s.fifo[(s.head + i) % kSpeechChunks] = nullptr;
+        ++s.chunksDone;
+    }
+    s.head = s.count = 0;
+    s.avail = 0;
+    s.open = false;
+    s.state = st;
+    s.tail += s.lastY;
+    s.lastY = 0.0f;
+    s.env = 0.0f;
+    s.flush = std::max(96, int(0.012f * fs_));
+}
+
+// One source sample of a speech voice (before the spatial chain); advances the voice.
+float Mixer::speechSample(Speech& s, double step) {
+    while (s.count > 0 && s.pos >= double(s.fifo[s.head]->samples.size())) advanceChunk(s);
+    const int64_t ip = int64_t(s.pos);
+    // Interpolating at ip needs the stream up to ip + 2: wait for it (starve) unless the voice is
+    // closed, in which case the end reads silence. Holding back keeps a late chunk's join seamless.
+    const bool ready = s.closed ? s.count > 0 : ip + 2 < s.avail;
+    if (!ready) {
+        if (s.closed || s.stopping) {
+            endSpeech(s, s.stopping ? VoiceState::Stopped : VoiceState::Finished);
+            return 0.0f;
+        }
+        if (!s.starved) {
+            s.starved = true;
+            s.played = std::max(s.played, s.playedBase + s.avail);
+            s.tail += s.lastY;  // non-silent phrase end: decays instead of a step
+            s.lastY = 0.0f;
+            s.env = 0.0f;       // the next chunk fades in
+            if (!s.paused) s.envFade = kSpeechEdgeFade;
+        }
+        return 0.0f;
+    }
+    s.starved = false;
+    const float target = (s.paused || s.stopping) ? 0.0f : 1.0f;
+    const float step1 = 1.0f / (s.envFade * fs_);
+    if (s.env < target) s.env = std::min(target, s.env + step1);
+    else if (s.env > target) s.env = std::max(target, s.env - step1);
+    if (s.env <= 0.0f) {
+        if (s.stopping) {
+            endSpeech(s, VoiceState::Stopped);
+            return 0.0f;
+        }
+        s.lastY = 0.0f;
+        return 0.0f;  // paused: the position is held
+    }
+    const std::vector<float>& c = s.fifo[s.head]->samples;
+    const float f = float(s.pos - double(ip));
+    float x;
+    if (ip >= 1 && ip + 2 < int64_t(c.size())) {
+        const size_t k = size_t(ip);
+        x = hermite(c[k - 1], c[k], c[k + 1], c[k + 2], f);
+    } else {
+        x = hermite(s.at(ip - 1), s.at(ip), s.at(ip + 1), s.at(ip + 2), f);
+    }
+    s.pos += step;
+    const float y = x * smooth01(s.env);
+    s.lastY = y;
+    return y;
+}
+
+void Mixer::renderSpeech(Speech& s, int n) {
+    // Talker directivity: speech radiates its highs forward. A coach turned towards the board or
+    // aside sounds a little softer and duller from the player's seat; the hall send is unchanged.
+    float dirGain = 1.0f, dirLp = 0.0f;
+    if (s.p.spatial && m::length2(s.p.facing) > 0.5f) {
+        const m::vec3 d = basis_.pos - s.p.pos;
+        const float len = m::length(d);
+        if (len > 1e-4f) {
+            const float w = 0.5f + 0.5f * clampf(m::dot(s.p.facing, d / len), -1.0f, 1.0f);
+            dirGain = 0.55f + 0.45f * w;
+            dirLp = (1.0f - w) * OnePole::coefFor(3000.0f, fs_);
+        }
+    }
+    const float g = kSpeechLevel * s.p.gain * voice_;
+    s.chain.begin(spatialTarget(basis_, s.p.spatial, s.p.pos, fs_, g * dirGain, s.p.send / dirGain, dirLp), n);
+    const double step = double(s.p.srcRate) / double(fs_);
+    const float tailK = std::exp(-1.0f / (0.0012f * fs_));
+    for (int i = 0; i < n; ++i) {
+        float y = 0.0f;
+        if (s.open) y = speechSample(s, step);
+        else if (s.flush > 0) --s.flush;
+        y += s.tail;
+        s.tail *= tailK;
+        s.chain.tick(y, L_[i], R_[i], room_[i]);
+    }
+    if (s.open) s.played = std::max(s.played, s.clock());
+    else if (s.flush <= 0) s.tail = 0.0f;
+}
+
+// Ambience ducking under speech: attack while a voice sounds, hold through short gaps (between
+// phrases, demonstration moves), then release. Only the ambience bus: effects are never ducked.
+void Mixer::updateDuck(float blockSec) {
+    bool talking = false;
+    float target = 1.0f;
+    for (int k = 0; k < kMaxSpeech; ++k) {
+        const Speech& s = speech_[k];
+        if (s.open && !s.starved && !s.paused) {
+            talking = true;
+            target = std::min(target, s.p.duckGain);
+        }
+    }
+    if (talking) {
+        duckHold_ = kDuckHold;
+    } else {
+        duckHold_ = std::max(0.0f, duckHold_ - blockSec);
+        if (duckHold_ > 0.0f) return;
+    }
+    const float tau = target < duck_ ? kDuckAttack : kDuckRelease;
+    duck_ += (target - duck_) * (1.0f - std::exp(-blockSec / tau));
 }
 
 void Mixer::block(float* out, int n) {
@@ -340,9 +591,11 @@ void Mixer::block(float* out, int n) {
     master_ += (masterT_ - master_) * kv;
     fx_ += (fxT_ - fx_) * kv;
     amb_ += (ambT_ - amb_) * kv;
+    voice_ += (voiceT_ - voice_) * kv;
     first_ = false;
     const float fadeStep = blockSec / 1.5f;
     ambFade_ = ambOn_ ? std::min(1.0f, ambFade_ + fadeStep) : std::max(0.0f, ambFade_ - fadeStep);
+    updateDuck(blockSec);
 
     std::memset(L_, 0, sizeof(float) * size_t(n));
     std::memset(R_, 0, sizeof(float) * size_t(n));
@@ -365,6 +618,10 @@ void Mixer::block(float* out, int n) {
     for (int i = 0; i < kMaxVoices; ++i) {
         Voice& v = voices_[i];
         if (v.active) renderVoice(v, n, busGain(v.bus));
+    }
+    for (int k = 0; k < kMaxSpeech; ++k) {
+        Speech& s = speech_[k];
+        if (s.open || s.flush > 0) renderSpeech(s, n);
     }
     if (roomOn_) reverb_.process(room_, L_, R_, n);
 

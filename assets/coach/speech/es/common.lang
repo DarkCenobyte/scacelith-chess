@@ -1,0 +1,213 @@
+# Coach speech (Spanish): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Spanish needs.
+# Register: the coach says "tú" to the player (the game's menus keep "usted"); the coach is male
+# ("estoy listo"). Vocabulary as assets/i18n/es.lang (Spain): jugada, casilla, fila, columna,
+# jaque, enroque, tablas, rey ahogado, planilla, reloj, Elo, horquilla, clavada, error grave.
+# Written Spanish: opening ¡ and ¿; the renderer capitalises a piece after them.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns and genders: el peón, el caballo, el alfil, la torre, la dama, el rey.
+piece.pawn.nom = peón
+piece.knight.nom = caballo
+piece.bishop.nom = alfil
+piece.rook.nom = torre
+piece.queen.nom = dama
+piece.king.nom = rey
+piece.pawn.gender = m
+piece.knight.gender = m
+piece.bishop.gender = m
+piece.rook.gender = f
+piece.queen.gender = f
+piece.king.gender = m
+# {your} = "tu caballo" / "tu torre", {my} = "mi caballo" / "mi torre": the possessive does not
+# change with the gender, so one pattern serves every piece. Never put an article before them.
+owner.your.nom = tu {piece}
+owner.my.nom = mi {piece}
+# Object pronoun standing for the piece of the placeholder, "lo" or "la", written joined to the
+# verb as Spanish does: "¡Captúra{my:lo}!" = "¡Captúralo!" / "¡Captúrala!",
+# "para capturar{my:lo}" = "para capturarlo" / "para capturarla".
+phrase.your.pawn.lo = lo
+phrase.your.knight.lo = lo
+phrase.your.bishop.lo = lo
+phrase.your.rook.lo = la
+phrase.your.queen.lo = la
+phrase.your.king.lo = lo
+phrase.my.pawn.lo = lo
+phrase.my.knight.lo = lo
+phrase.my.bishop.lo = lo
+phrase.my.rook.lo = la
+phrase.my.queen.lo = la
+phrase.my.king.lo = lo
+# Ending "o" or "a" of an adjective or participle agreeing with the piece of the placeholder,
+# written joined to the adjective's stem, after the piece itself: "{your} está atrapad{your:o}" =
+# "tu caballo está atrapado" / "tu torre está atrapada" (review and appraisal lines).
+phrase.your.pawn.o = o
+phrase.your.knight.o = o
+phrase.your.bishop.o = o
+phrase.your.rook.o = a
+phrase.your.queen.o = a
+phrase.your.king.o = o
+phrase.my.pawn.o = o
+phrase.my.knight.o = o
+phrase.my.bishop.o = o
+phrase.my.rook.o = a
+phrase.my.queen.o = a
+phrase.my.king.o = o
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# Letter names as in the opening texts (tools/gen_opening_lang.py): "e cuatro", "de cinco",
+# "efe tres", "hache siete" (a bare written h is silent in Spanish).
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = be
+file.c.spoken = ce
+file.d.spoken = de
+file.e.spoken = e
+file.f.spoken = efe
+file.g.spoken = ge
+file.h.spoken = hache
+rank.1.spoken = uno
+rank.2.spoken = dos
+rank.3.spoken = tres
+rank.4.spoken = cuatro
+rank.5.spoken = cinco
+rank.6.spoken = seis
+rank.7.spoken = siete
+rank.8.spoken = ocho
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Spanish scoresheet letters: R(ey) D(ama) T(orre) A(lfil) C(aballo).
+move.letters = R D T A C
+# Spoken: "caballo efe tres", "caballo toma en e cinco", "peón e toma en de cinco",
+# "peón recaptura", "enroque corto", "e ocho, corona dama", "dama ge cuatro, jaque".
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} toma en {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} toma en {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = peón {file} toma en {to}
+move.recapture.spoken = {piece} recaptura
+move.castle_short.spoken = enroque corto
+move.castle_long.spoken = enroque largo
+move.promotion.spoken = {move}, corona {piece}
+move.check.spoken = {move}, jaque
+move.mate.spoken = {move}, jaque mate
+moves.join.spoken = {a}, {b}
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words. 16-29 are single words (listed); 31-99 compose as "{tens} y {units}".
+# Forms: "m" before a masculine noun ("un punto", "veintiún puntos", "treinta y un peones",
+# "cien puntos"), "f" before a feminine noun ("una jugada", "veintiuna partidas", "cien jugadas");
+# the bare number is the counting form ("uno", "veintiuno"). Used by the counted nouns below.
+# 100: a bare 100 says "ciento" (the composition needs it: "ciento uno", "ciento veinte"); with a
+# form it says "cien". Hundreds 200-900 are masculine ("doscientas" only for exactly 200 with "f").
+number.0.spoken = cero
+number.1.spoken = uno
+number.1.m.spoken = un
+number.1.f.spoken = una
+number.2.spoken = dos
+number.3.spoken = tres
+number.4.spoken = cuatro
+number.5.spoken = cinco
+number.6.spoken = seis
+number.7.spoken = siete
+number.8.spoken = ocho
+number.9.spoken = nueve
+number.10.spoken = diez
+number.11.spoken = once
+number.12.spoken = doce
+number.13.spoken = trece
+number.14.spoken = catorce
+number.15.spoken = quince
+number.16.spoken = dieciséis
+number.17.spoken = diecisiete
+number.18.spoken = dieciocho
+number.19.spoken = diecinueve
+number.20.spoken = veinte
+number.21.spoken = veintiuno
+number.21.m.spoken = veintiún
+number.21.f.spoken = veintiuna
+number.22.spoken = veintidós
+number.23.spoken = veintitrés
+number.24.spoken = veinticuatro
+number.25.spoken = veinticinco
+number.26.spoken = veintiséis
+number.27.spoken = veintisiete
+number.28.spoken = veintiocho
+number.29.spoken = veintinueve
+number.30.spoken = treinta
+number.40.spoken = cuarenta
+number.50.spoken = cincuenta
+number.60.spoken = sesenta
+number.70.spoken = setenta
+number.80.spoken = ochenta
+number.90.spoken = noventa
+number.100.spoken = ciento
+number.100.m.spoken = cien
+number.100.f.spoken = cien
+# "{n:num}": a number said on its own, not before a noun nor in "por ciento" (a score, a move
+# number): "Precisión: cien", "la jugada cien". Every other number says its bare form.
+number.100.num.spoken = cien
+number.200.spoken = doscientos
+number.200.f.spoken = doscientas
+number.300.spoken = trescientos
+number.300.f.spoken = trescientas
+number.400.spoken = cuatrocientos
+number.400.f.spoken = cuatrocientas
+number.500.spoken = quinientos
+number.500.f.spoken = quinientas
+number.600.spoken = seiscientos
+number.600.f.spoken = seiscientas
+number.700.spoken = setecientos
+number.700.f.spoken = setecientas
+number.800.spoken = ochocientos
+number.800.f.spoken = ochocientas
+number.900.spoken = novecientos
+number.900.f.spoken = novecientas
+number.tens.spoken = {tens} y {units}
+# Never used (every hundred from 100 to 900 is listed above); kept because English defines it.
+number.hundreds.spoken = {n}cientos
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = menos {n}
+# A decimal number: Spain writes a decimal comma ("1,3") and says "uno coma tres".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} coma {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Spanish plural rule (assets/i18n): one (exactly 1) | other. Masculine nouns say their number with
+# the form "m" ("un error", "veintiún puntos"), feminine nouns with "f" ("una jugada").
+count.move = {n:f} jugada|{n:f} jugadas
+count.point = {n:m} punto|{n:m} puntos
+count.pawn = {n:m} peón|{n:m} peones
+count.piece = {n:f} pieza|{n:f} piezas
+count.mistake = {n:m} error|{n:m} errores
+count.blunder = {n:m} error grave|{n:m} errores graves
+count.inaccuracy = {n:f} imprecisión|{n:f} imprecisiones
+count.game = {n:f} partida|{n:f} partidas
+count.time = {n:f} vez|{n:f} veces
+count.square = {n:f} casilla|{n:f} casillas
+# Spanish-only counted nouns of the review and appraisal lines ("{n:attacker}" = "tres atacantes",
+# "{n:captured}" = "una pieza capturada", "{m:check}" = "dos jaques"): the adjective after the
+# noun agrees with the number, which a line cannot do around "{n:piece}".
+count.attacker = {n:m} atacante|{n:m} atacantes
+count.defender = {n:m} defensor|{n:m} defensores
+count.captured = {n:f} pieza capturada|{n:f} piezas capturadas
+count.check = {n:m} jaque|{n:m} jaques
+# "{n:m}" / "{n:f}" in a line say a number before a masculine / feminine noun ("un", "una",
+# "veintiún", "cien"); "{n:num}" says a number on its own ("cien", where the bare {n} says
+# "ciento"). They are count keys so that the forms also work outside the counted nouns
+# (and the form check knows them). Written: the digits.
+count.m = {n:m}|{n:m}
+count.f = {n:f}|{n:f}
+count.num = {n:num}|{n:num}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = más {x}
+eval.down = −{x}
+eval.down.spoken = menos {x}
+eval.even = 0,0
+eval.even.spoken = igualdad
+eval.mate_win = mate en {n}
+eval.mate_loss = mate en {n} en tu contra

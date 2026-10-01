@@ -96,5 +96,15 @@ void flushUploads();
 // UTF-8 decoding helper: returns the codepoint at s[i] and advances i (invalid bytes -> U+FFFD).
 uint32_t decodeUtf8(const std::string& s, size_t& i);
 
+// Renders one line of text in 'face' into a standalone single-channel distance field, independent
+// of the atlas (for markings baked into 3D material textures). No shaping: left to right, with the
+// face's kerning plus 'tracking' (em) between letters. out = w*h bytes, row 0 = top, value
+// 0.5 + d / (2 * spread) with d the signed distance in texels (inside > 0). The ink is centred
+// horizontally and the cap band (baseline to cap line, capPx texels high) vertically. Needs no GL
+// context and works before init(). Returns false when the face is missing or the ink plus the
+// spread does not fit; inkWidthPx receives the ink width in texels.
+bool renderLineSdf(int face, const std::string& utf8, float capPx, int spread, float tracking, int w, int h,
+                   std::vector<uint8_t>& out, float* inkWidthPx = nullptr);
+
 }  // namespace font
 }  // namespace ui

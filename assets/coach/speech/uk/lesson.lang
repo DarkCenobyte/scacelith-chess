@@ -1,0 +1,268 @@
+# Coach speech (Ukrainian): the rules lesson (level 0, src/coach/lesson.cpp; research-pedagogy §3).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("твоя тура", "мій кінь"), with
+# the forms of common.lang ({my:acc}, {my:gen}, {my:ins}, {your:bare_ins}, {your:pron} ...);
+# {sq}, {sq2}, {to}, {esc} = squares; {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach
+# points at something while saying the word right after the mark. A ".spoken" key is what the voice
+# says instead (here: the Latin file letters said as Cyrillic letter names, which the voice reads).
+# Rules the lines follow: no past tense, short adjective or participle with a piece placeholder or the
+# player as subject (their gender varies); "своєю"/no possessive, not "твоєю", when the player acts
+# with their own piece ({your:bare_ins}); files = вертикалі, ranks = горизонталі, back rank =
+# остання горизонталь.
+
+# ---- Chapter titles (said inside "Продовжимо урок: {chapter}.") --------------------------------------
+# Nominative, lower case (see event.lesson.* in events.lang).
+lesson.title.welcome = шахова дошка
+lesson.title.pieces = як ходять фігури
+lesson.title.safety = безпечні й небезпечні взяття
+lesson.title.check = шах
+lesson.title.mate = мат
+lesson.title.castling = рокіровка
+lesson.title.en_passant = взяття на проході
+lesson.title.promotion = перетворення пішака
+lesson.title.draws = пат і нічия
+lesson.title.etiquette = справжні партії: рейтинг, годинник і етикет
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Тепер спробуй ти.
+lesson.now_you.2 = Тепер твій хід.
+lesson.now_you.3 = Тепер ти.
+# Another wrong move after the demonstration.
+lesson.almost = Майже! Зіграй хід, який я показав.
+lesson.almost.2 = Не зовсім. Повтори хід із мого прикладу.
+lesson.almost.3 = Близько. Згадай, що я щойно показав.
+# A wrong move without a line of its own.
+lesson.try_again = Не те. Спробуй ще раз.
+lesson.try_again.2 = Не цей хід. Спробуй знову.
+lesson.try_again.3 = Спробуймо ще раз.
+lesson.use_your = Ходи {your:bare_ins}.
+lesson.use_your.2 = Спробуй зіграти {your:bare_ins}.
+lesson.watch = Дивись.
+lesson.like_this = Ось так.
+lesson.and_back = І назад.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Шах, але мій король відходить на {esc}.
+lesson.check_takes = Шах, але мій король просто забирає {your:acc}.
+lesson.check_block = Шах, але я можу закритися фігурою.
+lesson.stalemate = Пат! Моєму королю нікуди ходити, а шаху немає. Нічия, хоча позиція була виграшна!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Не на {sq}: {my} атакує це поле. Король ніколи не стає під удар.
+why.PathBlocked = На {@}шляху стоїть фігура: перестрибувати через фігури вміє лише кінь.
+why.WrongGeometry = {your} так не ходить.
+why.MustAnswerCheck = Тобі {@}шах: спершу треба від нього захиститися.
+why.CastlingThroughCheck = Твій король пройшов би через {sq}, а {my} атакує це поле.
+why.CastlingNoRights = Король або ця тура вже ходили, тож рокіровка неможлива.
+why.CastlingBlocked = Для рокіровки поля між королем і турою мають бути вільні.
+why.CastlingOutOfCheck = Під шахом робити рокіровку не можна.
+why.PawnForwardBlocked = Прямо вперед пішак не б’є, а це поле {@}зайняте.
+why.LeavesKingInCheck = Це зв’язка: якщо {your} піде, твій король опиниться під ударом {my:gen}.
+why.OwnPieceOnTarget = На поле, де стоїть твоя ж фігура, ходити не можна.
+why.PawnCaptureNeedsVictim = По діагоналі пішак ходить, лише коли б’є.
+why.EnPassantExpired = Брати на проході можна лише одразу після ходу пішака на два поля.
+why.NotYourTurn = Зачекай: зараз мій хід.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Привіт! Я твій тренер. Давай разом вивчимо правила шахів, крок за кроком.
+lesson.welcome.board = Це шахова дошка: шістдесят чотири поля, світлі й темні, вісім на вісім.
+lesson.welcome.light = Кутове поле {@}праворуч від тебе завжди світле. Запам’ятай: праворуч — світле.
+lesson.welcome.files = Стовпці називаються вертикалями. Їх позначають літерами, від {@}a до {@2}h.
+lesson.welcome.files.spoken = Стовпці називаються вертикалями. Їх позначають літерами, від {@}а до {@2}аш.
+lesson.welcome.ranks = Ряди — це горизонталі, з номерами від {@}одного до {@2}восьми, рахуючи від тебе.
+lesson.welcome.square = Поле називають літерою, а потім цифрою. Ось це поле — {sq}.
+lesson.welcome.square2 = А це — {sq}.
+lesson.welcome.kings = Ось два королі. Твій стоїть на {sq}, мій — на {sq2}.
+lesson.welcome.ask = Твій хід: пересунь короля на одне поле вперед, на {sq}.
+lesson.welcome.wrong = Це поле {to}, а нам потрібне {sq}: літера e, цифра два.
+lesson.welcome.wrong.spoken = Це поле {to}, а нам потрібне {sq}: літера е, цифра два.
+lesson.welcome.ok = Чудово. Твій король стоїть на {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = Це {your}. {your:pron} ходить по вертикалях і горизонталях на будь-яку відстань.
+lesson.rook.lines = Угору по вертикалі — {@}або вздовж горизонталі.
+lesson.rook.capture = Щоб узяти, фігура стає на поле {@}фігури суперника, і та покидає дошку.
+lesson.rook.ask = Візьми {my:acc} турою!
+lesson.rook.short = Напрямок правильний! Далі вгору по вертикалі, аж до {my:gen}.
+lesson.rook.rank = Це хід по горизонталі. А {my} стоїть вище, на цій вертикалі.
+lesson.rook.king = Це твій король. Ходи {your:bare_ins}, що стоїть у кутку.
+lesson.rook.ok = Взято! {my} покидає дошку.
+# Pieces don't jump
+lesson.jump.blocked = Фігури не перестрибують через інші. Твій пішак на {sq} перекриває турі шлях.
+lesson.jump.knight = Стрибати вміє лише кінь. З ним ми скоро познайомимося.
+# Bishop
+lesson.bishop.intro = Це {your}. {your:pron} ходить по діагоналі на будь-яку відстань.
+lesson.bishop.colour = Слон завжди залишається на полях одного кольору.
+lesson.bishop.ask = {my} стоїть на цій діагоналі. Візьми {my:pron_acc}!
+lesson.bishop.short = Діагональ правильна! Іди далі, аж до {my:gen}.
+lesson.bishop.other = Це інша діагональ. Дивись у бік {my:gen}.
+lesson.bishop.ok = Чудово. Слони люблять довгі діагоналі.
+# Queen
+lesson.queen.intro = Це {your}, найсильніша фігура. {your:pron} ходить, як тура і слон разом.
+lesson.queen.ask = Знайди {my:acc} і візьми {my:pron_acc} ферзем.
+lesson.queen.wrong = Твій ферзь може дійти до {my:gen} одним ходом, по діагоналі.
+lesson.queen.ok = Молодець! Бережи ферзя: він дуже цінний.
+# King
+lesson.king.intro = Король ходить лише на одне поле, у будь-який бік.
+lesson.king.important = Король — найважливіша фігура. Якщо він потрапить у пастку, партію програно.
+lesson.king.ask = Король теж уміє брати. Візьми {my:acc}!
+lesson.king.wrong = Твій король стоїть поруч із {my:ins}. Стань на {my:pron_acc} поле, щоб узяти.
+lesson.king.ok = Добре! Король повільний, але зблизька сильний.
+# Knight
+lesson.knight.intro = Це {your}. {your:pron} ходить літерою «Г»: два поля прямо, потім одне вбік.
+lesson.knight.intro.spoken = Це {your}. {your:pron} ходить літерою «ге»: два поля прямо, потім одне вбік.
+lesson.knight.l = Ось {@}так. Кінь завжди стає на поле іншого кольору.
+lesson.knight.jump = Кінь — єдина фігура, яка вміє перестрибувати через інші.
+lesson.knight.ask = Візьми {my:acc} конем!
+lesson.knight.wrong = Хід конем правильний, але до {my:gen} так не дістатися. Спробуй інший стрибок.
+lesson.knight.ok = Чудовий стрибок!
+# Pawn: moving
+lesson.pawn.intro = Тепер {your}. {your:pron} ходить прямо вперед, по одному полю, і ніколи назад.
+lesson.pawn.first = Першим ходом пішак може піти на одне або на два поля.
+lesson.pawn.ask = Посунь пішака на два поля вперед.
+lesson.pawn.one = Це хід на одне поле: так можна, але цього разу — на два.
+lesson.pawn.use = Ходи пішаком.
+lesson.pawn.ok = Добре.
+# Pawn: capturing
+lesson.pawncap.blocked = Мій пішак загороджує шлях твоєму. Прямо вперед пішаки не б’ють.
+lesson.pawncap.diagonal = Зате пішак б’є по діагоналі, на одне поле вперед.
+lesson.pawncap.ask = Візьми {my:acc} пішаком.
+lesson.pawncap.use = Бий {your:bare_ins}: {your:pron} б’є по діагоналі вперед.
+lesson.pawncap.ok = Так! Ходить прямо, а б’є по діагоналі.
+# Values, set-up and the first moves
+lesson.values.pawn = Кожна фігура має цінність в очках. Пішак коштує одне очко.
+lesson.values.pieces = Кінь або {@}слон — три. {@2}Тура — п’ять. {@3}Ферзь — дев’ять.
+lesson.values.king = Король безцінний: його ніколи не можна віддати.
+lesson.values.trade = Намагайся не віддавати фігуру дешевше, ніж вона коштує.
+lesson.setup.corners = Кожна партія починається так: тури в {@}кутах, поруч {@2}коні, далі {@3}слони.
+lesson.setup.queen = Ферзь стоїть на полі свого кольору: твій білий ферзь — на світлому полі.
+lesson.setup.king = Король стоїть поруч із ним. Білі завжди ходять першими.
+lesson.first.ask = Починаємо партію: посунь пішака перед королем на два поля, на {sq}.
+lesson.first.wrong = Так теж можна! Але зараз, будь ласка, зіграй королівським пішаком на {sq}.
+lesson.first.ok = Чудовий перший хід: він відкриває шлях ферзеві та слонові.
+lesson.first.reply = Я відповідаю так само. Тепер виведи коня: стрибок із {sq} на {sq2}.
+lesson.first.knight_wrong = Кінь перестрибує через пішаків. Спробуй із {sq} на {sq2}.
+lesson.first.knight_ok = Чудово. Коней і слонів виводять на самому початку.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Фігура захищена, якщо своя фігура може одразу побити у відповідь.
+lesson.safety.pawn = Мій {@}пішак захищає {my:acc}.
+lesson.safety.free = А в {my:gen} захисту немає. Твій ферзь атакує обидві фігури.
+lesson.safety.ask = Візьми незахищену фігуру!
+lesson.safety.watch = Дивись, що буде.
+lesson.safety.gave = Ферзя віддано за коня: дев’ять очок за три.
+lesson.safety.other = Спробуй іншу фігуру.
+lesson.safety.look = Знайди фігуру, яку ніщо не захищає.
+lesson.safety.ok = Чудово! Завжди питай себе: чи захищена ця фігура?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = Моя тура тримає під контролем усю другу горизонталь.
+lesson.danger.rule = Король ніколи не може стати на поле, де його можна взяти.
+lesson.danger.ask = Відведи короля на безпечне поле.
+lesson.danger.ok = Правильно. Там твій король у безпеці.
+lesson.check.what = Моя тура атакує твого короля. Це називається шах.
+lesson.check.must = Якщо тобі шах, від нього треба захиститися негайно.
+lesson.check.ways = Є три способи: {@}відійти королем, {@2}закритися або {@3}побити фігуру, що дає шах.
+lesson.check.ask = Тут виведи короля з-під шаху.
+lesson.check.file = Поле {to} досі на {@}вертикалі моєї тури. Зійди з цієї лінії.
+lesson.check.ok = Добре: шаху більше немає.
+lesson.block.again = Знову шах! Цього разу твоєму королю нікуди відступити.
+lesson.block.ask = Тож закрийся: постав фігуру на лінію шаху.
+lesson.block.queen = Шах закрито! Але моя тура може взяти ферзя. Закрийся дешевшою фігурою.
+lesson.block.queen_ok = Спрацювало. Запам’ятай: закривайся найдешевшою фігурою.
+lesson.block.ok = Чудово. Закривайся найменш цінною фігурою.
+lesson.capture.check = Мій ферзь оголошує шах просто поруч із твоїм королем.
+lesson.capture.ask = Побий фігуру, що дає шах!
+lesson.capture.king_ok = Так! Мій ферзь був без захисту, тож твій король зміг його взяти.
+lesson.capture.knight_ok = Так! Твій кінь прибрав фігуру, що давала шах.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Мат: король під шахом, і сховатися йому нікуди. Це перемога в партії.
+lesson.mate1.stuck = Мій король замкнений за {@}своїми пішаками.
+lesson.mate1.ask = Постав мені мат в один хід!
+lesson.mate1.wrong = Майже! Дай шах на останній горизонталі: мій король не зможе втекти.
+lesson.mate1.ok = Мат! Це мат на останній горизонталі. Запам’ятай його!
+lesson.mate2.ask = Твої король і ферзь працюють разом. Постав мені мат в один хід.
+lesson.mate2.wrong = Знайди шах, після якого в мого короля не залишиться жодного поля.
+lesson.mate2.ok = Мат! Твій король захищає ферзя, тож мій не може його взяти.
+lesson.mate2.ok_rank = Мат на останній горизонталі! Твій король тримає всі поля перед моїм.
+lesson.mate3.edge = Твоя тура на сьомій горизонталі притискає мого короля до краю.
+lesson.mate3.ask = Тепер постав мат {your:bare_ins}.
+lesson.mate3.free = Шах, але сьома горизонталь тепер вільна, і мій король тікає.
+lesson.mate3.takes = Мій король просто забирає твою туру.
+lesson.mate3.hint = Дай шах на останній горизонталі турою, яка не тримає сьому.
+lesson.mate3.ok = Мат! Дві тури спрацювали, як драбина.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Рокіровка — особливий хід, що береже короля. Король і тура ходять разом.
+lesson.castle.how = {@}Король іде на два поля в бік тури, а {@2}тура перестрибує через нього.
+lesson.castle.ask = Завжди спершу торкайся короля. Тепер ти: зроби коротку рокіровку.
+lesson.castle.rook = Це лише хід турою. Для рокіровки пересунь короля на два поля в її бік.
+lesson.castle.long = Це довга рокіровка, теж за правилами! А зараз зроби рокіровку в бік ближчої тури.
+lesson.castle.one = На одне поле — це звичайний хід короля. При рокіровці король іде на два.
+lesson.castle.other = Для рокіровки пересунь короля на два поля в бік тури на {sq}.
+lesson.castle.ok = Рокіровку зроблено! Король у схованці, а тура готова до гри.
+lesson.castle2.moved = Рокіровка неможлива, якщо король або ця тура вже ходили.
+lesson.castle2.attacked = І не під шахом, і не тоді, коли король перетинає атаковане поле чи стає на нього.
+lesson.castle2.bishop = Мій слон атакує {sq}. Тому рокіровка в цей бік зараз заборонена.
+lesson.castle2.ask = Зроби рокіровку в інший бік.
+lesson.castle2.other = Зроби рокіровку в бік другої тури, на ферзевому фланзі.
+lesson.castle2.ok = Правильно! Після довгої рокіровки король стоїть на {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = Є особливе взяття пішаком — взяття на проході, французькою en passant.
+lesson.ep.what.spoken = Є особливе взяття пішаком — взяття на проході, французькою ан пассан.
+lesson.ep.watch = Дивись на мого пішака: він іде на два поля й стає поруч із твоїм.
+lesson.ep.how = Твій пішак може взяти його так, ніби той пройшов лише одне поле: на {sq}.
+lesson.ep.now = Але тільки зараз, цим самим ходом. Бий на проході!
+lesson.ep.gone = Момент втрачено: брати на проході можна лише одразу. Спробуймо ще раз.
+lesson.ep.ok = Взяття на проході! Мого пішака на {sq} знято з дошки.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = На останній горизонталі пішак перетворюється на ферзя, туру, слона чи коня.
+lesson.promo.ask = Майже завжди обирай ферзя. Перетвори пішака зараз!
+lesson.promo.under = Так можна! Але ферзь сильніший. Оберімо ферзя.
+lesson.promo.under_ok = Гаразд. Хоча здебільшого обирають ферзя.
+lesson.promo.push = Посунь пішака на останню горизонталь, на {sq}.
+lesson.promo.ok = Новий ферзь! Можна мати навіть двох ферзів одночасно.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Мій хід. Мій король не під шахом, але {@}всі поля навколо нього під ударом.
+lesson.stale.draw = У мене немає жодного ходу. Це пат, і партія закінчується внічию.
+lesson.stale2.ask = У виграшній позиції остерігайся пату. Постав мені мат в один хід, без пату!
+lesson.stale2.wrong = Дай шах на останній горизонталі, де моєму королю нікуди втекти.
+lesson.stale2.ok = Мат! Завжди залишай королю суперника хід, якщо тільки не ставиш мат.
+lesson.draws.kings = Інші нічиї: якщо мат поставити неможливо, наприклад, на дошці лише королі.
+lesson.draws.agree = Гравці також можуть домовитися про нічию.
+lesson.draws.repeat = Право на нічию дає й триразове повторення чи 50 ходів без взять і ходів пішаків.
+lesson.draws.repeat.spoken = Право на нічию дає й триразове повторення чи п’ятдесят ходів без взять і ходів пішаків.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Тепер ти знаєш усі правила шахів. Молодець!
+lesson.talk.real = Розповім, як проходять справжні партії.
+lesson.talk.elo = У гравців є рейтинг Ело. Він росте, коли виграєш, і падає, коли програєш.
+lesson.talk.elo_gap = Перемога над сильнішим дає більше пунктів, а поразка від слабшого коштує дорожче.
+lesson.talk.elo_start = Рейтинг матимеш після п’яти рейтингових партій. Зі мною — тренування без рейтингу.
+lesson.talk.clock = Це {@}шаховий годинник. У кожного гравця свій час, і він іде лише в його хід.
+lesson.talk.press = Зробивши хід, натисни на годинник тією ж рукою. Тоді піде мій час.
+lesson.talk.flag = Якщо твій час скінчиться, ти програєш, хіба що мені нічим поставити мат.
+lesson.talk.increment = «П’ять плюс три» означає: по п’ять хвилин кожному і три секунди за кожен хід.
+lesson.talk.speeds = Короткі партії — це бліц, довші — рапід, а найдовші — класика.
+lesson.talk.no_clock = Зі мною годинник вимкнено. Думай стільки, скільки потрібно.
+lesson.talk.touch = У справжній партії: торкнешся своєї фігури — мусиш нею ходити.
+lesson.talk.touch_mine = Торкнешся моєї фігури — мусиш її взяти, якщо це можливо.
+lesson.talk.adjust = Щоб поправити фігуру, не роблячи ходу, спершу скажи «поправляю».
+lesson.talk.release = Щойно ти відпустиш фігуру на новому полі, хід зроблено.
+lesson.talk.sheet = На турнірах обидва гравці записують кожен хід у {@}бланк запису партії.
+# {move:letters} shows the Ukrainian scoresheet letters ("Кf3"), which is what this line teaches.
+lesson.talk.notation = Пишуть літеру фігури і поле, наприклад {move:letters}. Для пішака — лише поле.
+lesson.talk.robot = Твій робот записує ходи за тебе. У швидких партіях записувати не обов’язково.
+lesson.talk.handshake = Партія починається й закінчується рукостисканням. Це означає: гарна гра і дякую.
+lesson.talk.polite = Виграш чи поразка — ввічливість понад усе. І ніколи не заважай суперникові думати.
+lesson.talk.tips = Три поради: {@}борися за центр, {@2}виводь коней і слонів, {@3}рано роби рокіровку.
+lesson.talk.next = Коли захочеш, обери «Перші кроки». Я гратиму м’яко й пояснюватиму кожну помилку.
+lesson.talk.welcome = Ласкаво просимо у світ шахів! Потиснімо руки.

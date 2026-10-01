@@ -1,0 +1,230 @@
+# Coach speech (Japanese): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the forms Japanese needs.
+# Register: a warm teacher in polite です/ます style; the coach calls himself 私 (as the opening
+# texts do) and avoids "あなた" where Japanese leaves the listener implicit. The game menus use the
+# same chess words (assets/i18n/ja.lang): ポーン ナイト ビショップ ルーク クイーン キング, チェック,
+# チェックメイト, ステイルメイト, キャスリング, プロモーション, 引き分け, 棋譜用紙, 時計, レーティング.
+# Spoken values: kana for everything the voice must not guess (file letters, numbers, counters).
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Japanese has no gender or case: particles follow the phrase. Forms:
+#   nom   あなたのルーク / 私のナイト     "{my}を取りましょう。" (the default form)
+#   bare  ルーク / ナイト (no owner)      "{your:bare}を使いましょう。" Use it when the owner is clear
+#                                         from the sentence: Japanese does not repeat "あなたの".
+piece.pawn.nom = ポーン
+piece.knight.nom = ナイト
+piece.bishop.nom = ビショップ
+piece.rook.nom = ルーク
+piece.queen.nom = クイーン
+piece.king.nom = キング
+piece.pawn.bare = ポーン
+piece.knight.bare = ナイト
+piece.bishop.bare = ビショップ
+piece.rook.bare = ルーク
+piece.queen.bare = クイーン
+piece.king.bare = キング
+owner.your.nom = あなたの{piece}
+owner.my.nom = 私の{piece}
+owner.your.bare = {piece}
+owner.my.bare = {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# Written squares stay "e4". The voice reads a Latin letter + digit badly ("a8" gets an English
+# "eight"): kana letter names and Japanese number readings, as the opening texts ("イーよん",
+# "エフご", "エーはち", "エイチなな"). Avoid "{sq}に" in the lines: rank 2 is "に" too ("イーにに").
+square.spoken = {file}{rank}
+file.a.spoken = エー
+file.b.spoken = ビー
+file.c.spoken = シー
+file.d.spoken = ディー
+file.e.spoken = イー
+file.f.spoken = エフ
+file.g.spoken = ジー
+file.h.spoken = エイチ
+rank.1.spoken = いち
+rank.2.spoken = に
+rank.3.spoken = さん
+rank.4.spoken = よん
+rank.5.spoken = ご
+rank.6.spoken = ろく
+rank.7.spoken = なな
+rank.8.spoken = はち
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Japanese scoresheets use the English piece letters (assets/i18n/ja.lang scoresheet.pieces).
+move.letters = K Q R B N
+# Spoken moves are noun phrases, so that a line can put a particle after them ("{move}が最善手でした"):
+# "ナイト・エフさん", "ナイトでイーご取り" (knight takes e5), "ディーポーンでイーご取り" (d-pawn takes e5),
+# "ビーのナイト・ディーに" (the b-knight to d2), "ポーンで取り返し" (recapture).
+move.piece.spoken = {piece}・{to}
+move.piece_capture.spoken = {piece}で{to}取り
+move.piece_from.spoken = {from}の{piece}・{to}
+move.piece_from_capture.spoken = {from}の{piece}で{to}取り
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file}ポーンで{to}取り
+move.recapture.spoken = {piece}で取り返し
+move.castle_short.spoken = キングサイド・キャスリング
+move.castle_long.spoken = クイーンサイド・キャスリング
+move.promotion.spoken = {move}、{piece}にプロモーション
+move.check.spoken = {move}、チェック
+move.mate.spoken = {move}、チェックメイト
+moves.join.spoken = {a}、{b}
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Kana readings (よん, なな, きゅう). Hundreds with their sound changes (さんびゃく, ろっぴゃく,
+# はっぴゃく) are listed; 21-99 compose ("にじゅう" + "いち").
+number.0.spoken = ゼロ
+number.1.spoken = いち
+number.2.spoken = に
+number.3.spoken = さん
+number.4.spoken = よん
+number.5.spoken = ご
+number.6.spoken = ろく
+number.7.spoken = なな
+number.8.spoken = はち
+number.9.spoken = きゅう
+number.10.spoken = じゅう
+number.11.spoken = じゅういち
+number.12.spoken = じゅうに
+number.13.spoken = じゅうさん
+number.14.spoken = じゅうよん
+number.15.spoken = じゅうご
+number.16.spoken = じゅうろく
+number.17.spoken = じゅうなな
+number.18.spoken = じゅうはち
+number.19.spoken = じゅうきゅう
+number.20.spoken = にじゅう
+number.30.spoken = さんじゅう
+number.40.spoken = よんじゅう
+number.50.spoken = ごじゅう
+number.60.spoken = ろくじゅう
+number.70.spoken = ななじゅう
+number.80.spoken = はちじゅう
+number.90.spoken = きゅうじゅう
+number.100.spoken = ひゃく
+number.200.spoken = にひゃく
+number.300.spoken = さんびゃく
+number.400.spoken = よんひゃく
+number.500.spoken = ごひゃく
+number.600.spoken = ろっぴゃく
+number.700.spoken = ななひゃく
+number.800.spoken = はっぴゃく
+number.900.spoken = きゅうひゃく
+number.tens.spoken = {tens}{units}
+number.hundreds.spoken = {n}ひゃく
+number.hundreds_rest.spoken = {hundreds}{rest}
+number.minus.spoken = マイナス{n}
+# A decimal number: {int} and {frac} (one digit). "いちてんさん" (the voice cannot say the
+# contracted "いってん" here: {int} comes without a form).
+number.decimal = {int}.{frac}
+number.decimal.spoken = {int}てん{frac}
+# Sound changes before a counter (forms used by the counted nouns below and by eval.mate_*):
+#   q   before か/こ/き counters (回 かい, 個 こ, 局 きょく): いっかい, ろっこ, はっきょく, じゅっかい,
+#       じゅういっかい, ひゃっかい, さんびゃっかい
+#   qt  before た-row counters (手 て, 点 てん): いって, いってん, はってん, じゅって, じゅういって
+#       (6 stays ろく; 100 stays ひゃく: ひゃくてん, ひゃくて)
+#   m   before マス: ひとマス, ふたマス
+# 11-19 have their own number.<n>.spoken key, so their sound-change forms must be listed too (a form
+# falls back to the plain number.<n>.spoken, not to the composed units); 21-99 compose with the units' form.
+number.1.q.spoken = いっ
+number.6.q.spoken = ろっ
+number.8.q.spoken = はっ
+number.10.q.spoken = じゅっ
+number.11.q.spoken = じゅういっ
+number.16.q.spoken = じゅうろっ
+number.18.q.spoken = じゅうはっ
+number.20.q.spoken = にじゅっ
+number.30.q.spoken = さんじゅっ
+number.40.q.spoken = よんじゅっ
+number.50.q.spoken = ごじゅっ
+number.60.q.spoken = ろくじゅっ
+number.70.q.spoken = ななじゅっ
+number.80.q.spoken = はちじゅっ
+number.90.q.spoken = きゅうじゅっ
+number.100.q.spoken = ひゃっ
+number.200.q.spoken = にひゃっ
+number.300.q.spoken = さんびゃっ
+number.400.q.spoken = よんひゃっ
+number.500.q.spoken = ごひゃっ
+number.600.q.spoken = ろっぴゃっ
+number.700.q.spoken = ななひゃっ
+number.800.q.spoken = はっぴゃっ
+number.900.q.spoken = きゅうひゃっ
+number.1.qt.spoken = いっ
+number.8.qt.spoken = はっ
+number.10.qt.spoken = じゅっ
+number.11.qt.spoken = じゅういっ
+number.18.qt.spoken = じゅうはっ
+number.20.qt.spoken = にじゅっ
+number.30.qt.spoken = さんじゅっ
+number.40.qt.spoken = よんじゅっ
+number.50.qt.spoken = ごじゅっ
+number.60.qt.spoken = ろくじゅっ
+number.70.qt.spoken = ななじゅっ
+number.80.qt.spoken = はちじゅっ
+number.90.qt.spoken = きゅうじゅっ
+number.1.m.spoken = ひと
+number.2.m.spoken = ふた
+# 21, 22 ... 61, 62 squares keep いち/に (にじゅういちマス): the composed form would give "にじゅうひと".
+number.21.m.spoken = にじゅういち
+number.22.m.spoken = にじゅうに
+number.31.m.spoken = さんじゅういち
+number.32.m.spoken = さんじゅうに
+number.41.m.spoken = よんじゅういち
+number.42.m.spoken = よんじゅうに
+number.51.m.spoken = ごじゅういち
+number.52.m.spoken = ごじゅうに
+number.61.m.spoken = ろくじゅういち
+number.62.m.spoken = ろくじゅうに
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Japanese has a single form. "{n:point}" says the number with its counter; the ".spoken" values
+# spell the counter in kana after the number's sound-change form.
+count.move = {n}手
+count.move.spoken = {n:qt}て
+count.point = {n}点
+count.point.spoken = {n:qt}てん
+count.pawn = ポーン{n}個
+count.pawn.spoken = ポーン{n:q}こ
+count.piece = 駒{n}個
+count.piece.spoken = こま{n:q}こ
+count.mistake = {n}回のミス
+count.mistake.spoken = {n:q}かいのミス
+count.blunder = {n}回の大悪手
+count.blunder.spoken = {n:q}かいのだいあくしゅ
+count.inaccuracy = {n}回の疑問手
+count.inaccuracy.spoken = {n:q}かいのぎもんしゅ
+count.game = {n}局
+count.game.spoken = {n:q}きょく
+count.time = {n}回
+count.time.spoken = {n:q}かい
+count.square = {n}マス
+count.square.spoken = {n:m}マス
+# Japanese-only counters of the review and the appraisal (pass 2):
+#   ko       a plain count of things with 個 ("{sq}を攻める私の駒は{n:ko}" = 3個, さんこ)
+#   moveno   a move NUMBER, "the 11th move" ("{n:moveno}の{move}" = 11手目, じゅういってめ)
+#   percent  an accuracy ("精度{acc:percent}" = 75%, ななじゅうごパーセント; 1/8/10 いっ/はっ/じゅっ)
+count.ko = {n}個
+count.ko.spoken = {n:q}こ
+count.moveno = {n}手目
+count.moveno.spoken = {n:qt}てめ
+count.percent = {n}%
+count.percent.spoken = {n:qt}パーセント
+# The number forms themselves, so that a line may say a bare number with a sound change ("{n:qt}");
+# they also register q, qt and m as number forms for the catalog check. Digits in writing.
+count.q = {n:q}
+count.qt = {n:qt}
+count.m = {n:m}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = プラス{x}
+eval.down = −{x}
+eval.down.spoken = マイナス{x}
+eval.even = 0.0
+eval.even.spoken = ごかく
+eval.mate_win = {n}手でメイト
+eval.mate_win.spoken = {n:qt}てでメイト
+eval.mate_loss = {n}手でメイトされる
+eval.mate_loss.spoken = {n:qt}てでメイトされる

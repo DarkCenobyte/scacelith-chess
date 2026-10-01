@@ -1,10 +1,16 @@
 // Scoresheet layout tests (engine-free part of the scoresheet): printed form, move -> cell mapping,
-// localized notation, handwriting placement, pen path, pad placement and page-flip geometry.
+// localized notation, handwriting placement, pen path, pad placement and page-flip geometry; and
+// which moves each sheet writes when (Scorekeeper's ledger: holds, the write limit, takebacks).
 #include "test.h"
 #include "game/layout.h"
+#include "game/scorekeeper_ledger.h"
 #include "game/scoresheet_layout.h"
+#include <algorithm>
 #include <cmath>
+#include <cstdint>
 #include <cstdio>
+#include <string>
+#include <vector>
 
 using namespace game::sheet;
 using m::vec2;
@@ -358,4 +364,216 @@ TEST(scoresheet_page_flip_geometry) {
     // A page turned over others lies on top of them.
     vec3 k0 = flipPoint(70.0f, 150.0f, 1.0f, {0, 1.0f}), k3 = flipPoint(70.0f, 150.0f, 1.0f, {3, 1.0f});
     CHECK(k3.y > k0.y + 0.0002f);
+}
+
+// ---- Which moves the sheets write (ScoreLedger) ---------------------------------------------------
+
+namespace {
+
+// Scorekeeper's use of the ledger (scorekeeper.cpp), without the pads and the writing hands: what
+// each sheet has begun writing, in order.
+struct Keeper {
+    game::ScoreLedger ledger;
+    std::vector<std::string> written[2];
+
+    void beginEntry(int s, int p) {
+        written[s].push_back(ledger.san(p));
+        ledger.begin(s, p);
+    }
+    void catchUp(int s) {
+        const int end = ledger.due(s);
+        for (int p = ledger.next(s); p < end; ++p) beginEntry(s, p);
+    }
+    void recordMove(int ply, const std::string& san) {
+        ledger.record(ply, san);
+        for (int s = 0; s < 2; ++s) {
+            const int end = std::min(ply + 1, ledger.due(s));
+            for (int p = ledger.next(s); p < end; ++p) beginEntry(s, p);
+        }
+    }
+    void setHold(int s, bool hold) {
+        if (ledger.held(s) == hold) return;
+        ledger.setHold(s, hold);
+        if (!hold) catchUp(s);
+    }
+    void setWriteLimit(int plies) {
+        ledger.setWriteLimit(plies);
+        for (int s = 0; s < 2; ++s) catchUp(s);
+    }
+    void finishGame() {
+        ledger.setWriteLimit(-1);
+        for (int s = 0; s < 2; ++s) {
+            ledger.setHold(s, false);
+            catchUp(s);
+        }
+    }
+};
+
+using Sans = std::vector<std::string>;
+
+}  // namespace
+
+TEST(scoresheet_ledger_order_and_holds) {
+    Keeper k;
+    k.recordMove(0, "e4");
+    k.recordMove(1, "e5");
+    CHECK(k.written[0] == (Sans{"e4", "e5"}) && k.written[1] == (Sans{"e4", "e5"}));
+    // Hot-seat: Black's sheet held while White moves; released, it catches up in order.
+    k.setHold(1, true);
+    k.recordMove(2, "Nf3");
+    CHECK(k.written[0] == (Sans{"e4", "e5", "Nf3"}));
+    CHECK(k.written[1] == (Sans{"e4", "e5"}));
+    CHECK_EQ(k.ledger.due(1), 2);
+    k.setHold(1, false);
+    k.recordMove(3, "Nc6");
+    CHECK(k.written[1] == (Sans{"e4", "e5", "Nf3", "Nc6"}));
+    // The result waits for a held sheet's moves.
+    k.setHold(0, true);
+    k.recordMove(4, "Bb5");
+    k.finishGame();
+    CHECK(k.written[0] == (Sans{"e4", "e5", "Nf3", "Nc6", "Bb5"}));
+    CHECK(!k.ledger.held(0));
+    // Moves set up instantly: both sheets go on after them.
+    game::ScoreLedger l;
+    l.writtenInstantly({"d4", "d5", "c4"});
+    CHECK_EQ(l.next(0), 3);
+    CHECK_EQ(l.next(1), 3);
+    CHECK_EQ(l.recorded(), 3);
+    l.record(3, "e6");
+    CHECK_EQ(l.due(0), 4);
+    l.reset();
+    CHECK(l.recorded() == 0 && l.next(0) == 0 && l.writeLimit() == -1 && !l.held(1));
+}
+
+TEST(scoresheet_ledger_write_limit) {
+    // Coach mode: the human's move waits until the coach has reviewed it; the coach's reply comes
+    // after it on the sheets, whenever it was recorded.
+    Keeper k;
+    k.setWriteLimit(0);
+    k.recordMove(0, "e4");
+    CHECK(k.written[0].empty() && k.written[1].empty());
+    CHECK_EQ(k.ledger.recorded(), 1);
+    k.setWriteLimit(-1);
+    CHECK(k.written[0] == (Sans{"e4"}) && k.written[1] == (Sans{"e4"}));
+    k.recordMove(1, "c5");
+    k.setWriteLimit(2);
+    k.recordMove(2, "Nf3");
+    k.recordMove(3, "d6");
+    CHECK(k.written[0] == (Sans{"e4", "c5"}));
+    // Raised: the sheets catch up to the new limit, in order.
+    k.setWriteLimit(3);
+    CHECK(k.written[0] == (Sans{"e4", "c5", "Nf3"}) && k.written[1] == k.written[0]);
+    // Lowered below what was begun: nothing is unwritten, nothing more is written.
+    k.setWriteLimit(1);
+    CHECK_EQ(k.ledger.due(0), 3);
+    k.recordMove(4, "d4");
+    CHECK_EQ(k.written[0].size(), size_t(3));
+    // Lifted: everything recorded, in order.
+    k.setWriteLimit(-1);
+    CHECK(k.written[0] == (Sans{"e4", "c5", "Nf3", "d6", "d4"}) && k.written[1] == k.written[0]);
+    // A limit and a hold together: the sheet waits for both.
+    k.setHold(1, true);
+    k.setWriteLimit(5);
+    k.recordMove(5, "cxd4");
+    k.setHold(1, false);
+    CHECK_EQ(k.written[1].size(), size_t(5));
+    k.setHold(0, true);
+    k.setWriteLimit(-1);
+    CHECK_EQ(k.written[0].size(), size_t(5));
+    CHECK_EQ(k.written[1].size(), size_t(6));
+    // The result lifts both.
+    k.finishGame();
+    CHECK(k.written[0].size() == 6 && k.written[0] == k.written[1]);
+}
+
+TEST(scoresheet_ledger_takeback) {
+    Keeper k;
+    k.recordMove(0, "e4");
+    k.recordMove(1, "e5");
+    // The human's blunder waits for the coach's review, then is taken back and replaced.
+    k.setWriteLimit(2);
+    k.recordMove(2, "Qh5");
+    CHECK(!k.ledger.dropMoves(1));   // begun on both sheets: ink stays
+    CHECK(!k.ledger.dropMoves(-1));
+    CHECK_EQ(k.ledger.recorded(), 3);
+    CHECK(k.ledger.dropMoves(2));
+    CHECK_EQ(k.ledger.recorded(), 2);
+    CHECK(k.ledger.dropMoves(7));    // nothing recorded there: nothing to drop
+    k.recordMove(2, "Nf3");
+    k.setWriteLimit(-1);
+    CHECK(k.written[0] == (Sans{"e4", "e5", "Nf3"}) && k.written[1] == k.written[0]);
+    // The human asks on their turn: the coach's reply and their move both go (two plies).
+    k.setWriteLimit(4);
+    k.recordMove(3, "Nc6");
+    k.recordMove(4, "Bc4");
+    k.recordMove(5, "Nd4");
+    CHECK(!k.ledger.dropMoves(3));   // Nc6 is on the sheets already
+    CHECK(k.ledger.dropMoves(4));
+    k.recordMove(4, "Bb5");
+    k.setWriteLimit(-1);
+    CHECK(k.written[0] == (Sans{"e4", "e5", "Nf3", "Nc6", "Bb5"}) && k.written[1] == k.written[0]);
+    // One sheet began the move (the other was held): it cannot be dropped any more.
+    k.setHold(1, true);
+    k.recordMove(5, "a6");
+    CHECK(!k.ledger.dropMoves(5));
+    CHECK_EQ(k.ledger.recorded(), 6);
+    k.setHold(1, false);
+    CHECK(k.written[1] == k.written[0]);
+}
+
+TEST(scoresheet_ledger_random_sessions) {
+    // Random sequences of recorded moves, holds, limits and takebacks: each sheet writes exactly
+    // the moves of the game as it stands, once each and in order, as soon as nothing keeps them
+    // back; a takeback succeeds exactly when neither sheet has begun the moves it drops.
+    uint64_t state = 0x9E3779B97F4A7C15ULL;
+    auto next = [&state]() {
+        state ^= state << 13;
+        state ^= state >> 7;
+        state ^= state << 17;
+        return state;
+    };
+    int drops = 0, refused = 0;
+    for (int session = 0; session < 200; ++session) {
+        Keeper k;
+        Sans game;   // the moves of the game as it stands
+        int counter = 0;
+        for (int step = 0; step < 120; ++step) {
+            switch (next() % 6) {
+            case 0:
+            case 1:
+                game.push_back("m" + std::to_string(counter++));
+                k.recordMove(int(game.size()) - 1, game.back());
+                break;
+            case 2: k.setHold(int(next() % 2), next() % 2 == 0); break;
+            case 3: k.setWriteLimit(next() % 3 == 0 ? -1 : int(game.size()) - int(next() % 3)); break;
+            default: {
+                if (game.empty()) break;
+                const int from = int(game.size()) - 1 - int(next() % std::min<uint64_t>(game.size(), 3));
+                const bool allowed = k.ledger.next(0) <= from && k.ledger.next(1) <= from;
+                const bool dropped = k.ledger.dropMoves(from);
+                CHECK_EQ(dropped, allowed);
+                if (dropped) {
+                    game.resize(size_t(from));
+                    ++drops;
+                } else {
+                    ++refused;
+                }
+                break;
+            }
+            }
+            CHECK_EQ(k.ledger.recorded(), int(game.size()));
+            for (int s = 0; s < 2; ++s) {
+                // Written: a prefix of the game, and everything that may be written already is.
+                CHECK_EQ(int(k.written[s].size()), k.ledger.next(s));
+                CHECK(k.written[s].size() <= game.size());
+                CHECK(std::equal(k.written[s].begin(), k.written[s].end(), game.begin()));
+                const int limit = k.ledger.writeLimit();
+                const int end = k.ledger.held(s) ? 0 : (limit < 0 ? int(game.size()) : std::min(limit, int(game.size())));
+                CHECK(k.ledger.next(s) >= end);
+            }
+        }
+        k.finishGame();
+        CHECK(k.written[0] == game && k.written[1] == game);
+    }
+    CHECK(drops > 500 && refused > 500);
 }

@@ -1,0 +1,114 @@
+# Coach speech (Russian): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "ты"; the player's gender is unknown: no "ты сыграл", "ты готов", "ты сдался"
+# (present or future tense, impersonal phrases). The coach is male: "я согласен", "я предпочёл бы".
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Привет! Давай сыграем по-дружески. Если что-то пойдёт не так, я помогу.
+event.greet.l1.2 = Здравствуй! Я буду играть мягко и подскажу, на что обращать внимание.
+event.greet.l1.3 = Добро пожаловать! Не спеши: я скажу, когда фигура окажется под ударом.
+event.greet.l2 = Привет! Сыграем. Как только появится вилка или связка, я её покажу.
+event.greet.l2.2 = Здравствуй! Выводи фигуры и береги короля. Я буду помогать по ходу партии.
+event.greet.l2.3 = Снова за доской! Следи за вилками и связками: они выигрывают партии.
+event.greet.l3 = Привет! Сыграем настоящую партию. Я буду разбирать твои планы и серьёзные ошибки.
+event.greet.l3.2 = Здравствуй! Продумай план для своих фигур. Я скажу, если ход что-то упускает.
+event.greet.l3.3 = Начнём! Я подскажу, где ход единственный, а где ход ошибочный.
+event.greet.l4 = Привет! На этот раз я буду давать оценки и показывать лучшие ходы-кандидаты.
+event.greet.l4.2 = Сыграем. После ошибки я скажу, какой ход был точнее.
+event.greet.l4.3 = Сыграем как в клубе? Я буду комментировать, когда меняется оценка.
+event.greet.l5 = Сыграем. Я буду краток.
+event.greet.l5.2 = Я готов — начнём, когда захочешь. Комментарии будут короткими.
+event.greet.l5.3 = Удачи. Я заговорю, только когда это важно.
+event.greet.l6 = Удачи.
+event.greet.l6.2 = Играем.
+event.greet.l6.3 = Я готов. Прокомментирую только критические моменты.
+
+# Who starts (said after the greeting).
+event.colour.white = Ты играешь белыми, так что начинаешь ты.
+event.colour.white.2 = У тебя белые: первый ход за тобой.
+event.colour.black = Я играю белыми, так что начинаю я.
+event.colour.black.2 = На этот раз у тебя чёрные: я хожу первым.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those of assets/i18n/ru.lang (coach.level.<n>.name).
+event.level.l0 = Правила шахмат: изучаем игру шаг за шагом, с небольшими упражнениями.
+event.level.l1 = Первые шаги: я играю мягко и объясняю каждую ошибку простыми словами.
+event.level.l2 = Начинающий: я играю чуть сильнее и называю вилки, связки и другую простую тактику.
+event.level.l3 = Любитель: я говорю о планах и пешечной структуре и показываю короткие варианты.
+event.level.l4 = Клубный игрок: я даю оценку в пешках и предлагаю ходы-кандидаты.
+event.level.l5 = Сильный клубный игрок: короткие замечания и длинные варианты, когда это важно.
+event.level.l6 = Эксперт: я играю в полную силу и комментирую только критические моменты.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Твой ход.
+event.your_move.2 = Твоя очередь.
+event.your_move.3 = Слово за тобой.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Не торопись.
+event.take_time.2 = Спешить некуда: в наших партиях нет часов.
+# Short filler while the coach is still looking at the position.
+event.filler = Хм.
+event.filler.2 = Посмотрим.
+event.filler.3 = Дай-ка взгляну.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Хорошо, возьмём ход назад.
+event.takeback.taken.2 = Хорошая мысль. Посмотри ещё раз.
+event.takeback.taken.3 = Отменяем ход. Попробуй снова.
+# The player declined the offer and played on.
+event.takeback.declined = Хорошо, играем дальше.
+event.takeback.declined.2 = Ладно, партия продолжается.
+event.takeback.declined.3 = Тебе решать. Продолжаем.
+# After an explanation without an offer.
+event.play_on = Играем дальше.
+event.play_on.2 = Продолжим.
+event.play_on.3 = А теперь вернёмся к нашей партии.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Такие ошибки делают все. Главное — научиться их замечать.
+event.encourage.mistake.2 = Не переживай. Посмотри, на что нападает мой последний ход, и ты всё увидишь.
+event.encourage.mistake.3 = Такое бывает с каждым. Продолжаем.
+# The player is behind (material or evaluation).
+event.encourage.behind = Не сдавайся: ищи шансы, пусть мне придётся потрудиться.
+event.encourage.behind.2 = Борись дальше. Такие позиции ещё можно переломить.
+event.encourage.behind.3 = Спокойно. Ищи слабости в моей позиции.
+# The player has played several good moves in a row.
+event.encourage.well = Ты проверяешь мои угрозы, прежде чем ходить. Молодец.
+event.encourage.well.2 = Аккуратные, надёжные ходы. Так держать.
+event.encourage.well.3 = Сегодня ты играешь очень вдумчиво.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Я согласен. Значит, ничья.
+event.draw.accepted.2 = Договорились: ничья.
+event.draw.declined = Нет, спасибо, давай играть дальше.
+event.draw.declined.2 = Я бы предпочёл продолжить.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Хорошо сыграно. Поздравляю!
+event.end.win.2 = Заслуженная победа. Молодец!
+event.end.win.3 = Поздравляю, всё честно: победа твоя.
+event.end.loss = Хорошая партия. В следующий раз отыграешься.
+event.end.loss.2 = Спасибо за партию. Каждое поражение чему-то учит.
+event.end.loss.3 = Хорошая борьба. Давай посмотрим, что произошло.
+event.end.draw = Ничья. Хорошая партия!
+event.end.draw.2 = На этот раз никто не выиграл. Достойная борьба.
+event.end.draw.3 = Справедливый результат. Хорошая партия.
+event.end.resigned = Партия сдана. Но борьба всё равно была хорошей.
+event.end.resigned.2 = Хорошо. Спасибо за партию.
+event.end.handshake = Давай пожмём руки.
+event.end.handshake.2 = Спасибо за игру.
+event.end.handshake.3 = Хорошая партия. Спасибо.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a nominative in lower case: it
+# comes after a colon or a dash, or in quotes after "на теме" (a quoted title keeps its nominative).
+event.lesson.resume = С возвращением! Продолжим урок: {chapter}.
+event.lesson.resume.2 = Снова привет! Мы остановились на теме «{chapter}».
+event.lesson.next = Дальше: {chapter}.
+event.lesson.next.2 = Теперь — {chapter}.
+event.lesson.skip = Хорошо, идём дальше.
+event.lesson.skip.2 = Ладно, пропускаем.

@@ -69,6 +69,11 @@ options.effects = Effets
 options.ambience = Ambiance
 options.ambience.help = La rumeur de la salle : le feu, des pas lointains, la vieille horloge.
 options.ambience_volume = Volume de l’ambiance
+options.voice_volume = Volume de la voix
+options.voice_volume.help = Volume de la voix du coach en mode Coach.
+options.subtitles = Sous-titres
+options.subtitles.auto = Automatique
+options.subtitles.help = Les paroles du coach, écrites en bas de l’écran. Automatique : affichés quand le coach ne parle pas la langue des menus (avec les menus en chinois, il parle anglais). Toujours affichés quand sa voix n’est pas installée.
 
 options.legal_moves = Afficher les coups légaux
 options.legal_moves.help = Met en évidence les cases qu’une pièce touchée peut atteindre. Sans cette aide, rien ne vous dit si un coup est légal : l’arbitre sanctionne un coup illégal dès que vous appuyez sur la pendule.
@@ -112,6 +117,10 @@ controls.moves.keys = Tab
 controls.moves = Afficher ou masquer les coups
 controls.menu.keys = Échap
 controls.menu = Menu
+controls.coach_skip.keys = Espace
+controls.coach_skip = Coach : passer ce que dit le coach
+controls.coach_takeback.keys = Retour arrière
+controls.coach_takeback = Coach : reprendre le coup quand il le propose
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = LUMINOSITÉ
@@ -199,11 +208,20 @@ credits.engine.head = MOTEUR D’ÉCHECS
 credits.engine = Stockfish 19, par les développeurs de Stockfish.
 credits.engine.licence = Licence publique générale GNU v3.
 credits.engine.data = Son réseau neuronal a été entraîné sur des données fournies par le projet Leela Chess Zero, mises à disposition sous l’Open Database License (ODbL).
+credits.voice.head = VOIX DU COACH
+credits.voice = Synthèse vocale générée par Supertonic 3 pour le mode Coach.
+credits.voice.licence = Supertonic 3 est un modèle de Supertone, utilisé sous la licence OpenRAIL-M, dont les restrictions d’usage s’appliquent à tous ses utilisateurs (voir Licences).
+credits.openings.head = OUVERTURES
+credits.openings = Noms des ouvertures tirés de la base chess-openings de lichess.org, versée dans le domaine public (CC0).
 credits.fonts.head = POLICES
 credits.fonts = EB Garamond par Georg Duffner et Cinzel par Natanael Gama ; Amiri par Khaled Hosny.
 credits.fonts.hand = Écritures : Caveat, Marck Script, Bad Script, Aref Ruqaa, Klee One, LXGW WenKai (SIL Open Font License).
 credits.fonts.figures = Figurines d’échecs de GNU FreeFont (GPL v3 avec exception pour les polices).
 credits.quote = « Les échecs sont l’art de l’analyse. »  — Mikhaïl Botvinnik
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = Licences
+licences.title = LICENCES
+licences.note = Les licences sont reproduites dans leur texte original, en anglais.
 
 # ---- Pause menu --------------------------------------------------------------------------------
 pause.title = PAUSE
@@ -372,6 +390,14 @@ viewer.keys.menu = Échap
 viewer.controls.menu = Menu
 viewer.keys.hide = H
 viewer.controls.hide = Masquer ces indications
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = Pause / reprise
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = Un coup en arrière / en avant
+viewer.keys.replay_speed = Maj + J  /  L
+viewer.controls.replay_speed = Plus lent / plus vite
+viewer.keys.replay_ends = Début  /  Fin
+viewer.controls.replay_ends = Début / fin de la partie
 viewer.speed = Vitesse {0} m/s
 viewer.view.0 = Par les yeux des joueurs
 viewer.view.1 = À côté de la table
@@ -834,3 +860,191 @@ hotseat.gameover.friendly = {0} contre {1} · partie amicale
 # {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
 hotseat.elo.change = {0} {1} → {2} ({3})
 hotseat.elo.unrated = Cette partie ne compte pas pour le classement.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = Coach
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = Synthèse vocale générée par {0} pour le mode Coach
+# Coach page
+coach.title = COACH
+coach.section.level = NIVEAU
+coach.section.lesson = AVEC LE COACH
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = Pour les joueurs classés {0}
+coach.completed = Terminée
+coach.recommended = Conseillé
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = Les règles des échecs
+coach.level.0.desc = Une leçon interactive, une règle à la fois.
+coach.level.0.detail = Le coach installe de petites positions et montre comment chaque pièce se déplace et prend, puis le roque, la promotion, l’échec et le mat. Vous essayez chaque idée vous-même sur l’échiquier.
+coach.level.1.name = Premiers pas
+coach.level.1.desc = Ce qui est attaqué, ce qui reste sans protection.
+coach.level.1.detail = Le coach joue en douceur et parle simplement : quelles pièces sont attaquées, lesquelles restent sans protection, et comment les garder.
+coach.level.2.name = Débutant
+coach.level.2.desc = Tactiques simples, développement, sécurité du roi.
+coach.level.2.detail = Les fourchettes et les clouages sont appelés par leur nom. Le coach parle de sortir vos pièces et de mettre votre roi à l’abri.
+coach.level.3.name = En progrès
+coach.level.3.desc = Plans, structure de pions, coups uniques.
+coach.level.3.detail = Le coach explique les plans et les structures de pions, et vous prévient quand un seul coup tient la position.
+coach.level.4.name = Joueur de club
+coach.level.4.desc = Coups candidats, évaluation en pions.
+coach.level.4.detail = Le coach pèse les coups candidats et donne l’évaluation en pions, comme le ferait un entraîneur de club.
+coach.level.5.name = Bon joueur de club
+coach.level.5.desc = Variantes concises, termes positionnels.
+coach.level.5.detail = Des remarques courtes, des variantes concrètes et le vocabulaire du jeu positionnel.
+coach.level.6.name = Expert
+coach.level.6.desc = Remarques brèves, variantes profondes, évaluations chiffrées.
+coach.level.6.detail = Peu de mots, comme entre joueurs forts : des variantes de plusieurs coups et des évaluations chiffrées.
+coach.note.clock = Pas de pendule : prenez tout le temps qu’il vous faut.
+coach.note.takeback = Après une gaffe, le coach montre ce qui n’allait pas et propose de reprendre le coup.
+coach.note.lesson = Vous jouez les Blancs ; le coach installe chaque exercice sur l’échiquier.
+coach.note.unrated = Les parties avec le coach ne sont pas classées.
+coach.colour = Votre couleur
+coach.colour.help = La couleur que vous jouez contre le coach. Alternée : les Blancs, puis les Noirs, d’une partie à l’autre. La leçon sur les règles se joue toujours avec les Blancs.
+coach.colour.alternate = Alternée
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = La voix du coach n’est pas installée ou est désactivée (Options > Son) : ses paroles seront écrites à l’écran.
+# At the table
+coach.speaker = COACH
+coach.skip = Passer
+coach.offer.title = REPRENDRE LE COUP ?
+coach.offer.text = Le coach vous propose de reprendre votre dernier coup, pour en chercher un meilleur.
+coach.offer.hint = Retour arrière pour le reprendre. Toucher une pièce, c’est continuer.
+coach.offer.accept = Reprendre
+coach.offer.decline = Continuer
+coach.pause.take_back = Reprendre mon coup
+coach.pause.take_back.help = Reprend votre dernier coup, et la réponse du coach s’il l’a déjà jouée.
+coach.confirm.resign = Abandonner cette partie ? Le coach sera déclaré vainqueur.
+coach.confirm.leave = Revenir au menu principal ? Cette partie avec le coach sera abandonnée.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = Rejouer
+coach.gameover.unrated = Cette partie avec le coach n’est pas classée.
+coach.lesson.done = BRAVO
+coach.lesson.done.line = Vous connaissez maintenant les règles des échecs.
+coach.lesson.next = Première partie
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Voix du coach
+options.coach_voice.help = Le coach parle à voix haute en mode Coach. Son modèle de voix est téléchargé la première fois qu’il est nécessaire (environ 145 Mo). Désactivée : les paroles du coach sont seulement écrites à l’écran.
+# The prompt. {0} = the size in megabytes ("145.3")
+coach.download.title = La voix du coach
+coach.download.text = Le coach parle avec Supertonic 3, un modèle de synthèse vocale de Supertone. Il n’est pas fourni avec Scacelith : le jeu peut le télécharger maintenant depuis Hugging Face ({0} Mo, une seule fois). Sans lui, le coach écrit ses paroles à l’écran.
+coach.download.licence = Le modèle est publié sous la licence OpenRAIL-M, qui interdit certains usages de la voix qu’il produit, comme la faire passer pour une voix humaine ou imiter une personne réelle.
+coach.download.read_licence = Lire la licence
+coach.download.accept = En choisissant Télécharger, vous acceptez les conditions de cette licence.
+# {0} = a folder
+coach.download.folder = Enregistré dans : {0}
+coach.download.not_now = Pas maintenant
+# {0} = the size in megabytes
+coach.download.download = Télécharger ({0} Mo)
+coach.download.licence_title = LICENCE OPENRAIL-M
+coach.download.back = Retour
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = LA VOIX DU COACH
+coach.download.checking = Vérification des fichiers…
+coach.download.downloading = Téléchargement…
+coach.download.extracting = Extraction des fichiers…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} Mo
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Depuis Hugging Face
+coach.download.from_github = Depuis GitHub (archive de la version)
+coach.download.cancel = Annuler
+coach.download.failed = Le téléchargement a échoué.
+coach.download.error.network = Impossible de joindre les serveurs. Veuillez vérifier votre connexion à Internet et réessayer.
+# {0} = a folder
+coach.download.error.disk = Impossible d’écrire les fichiers dans {0}. Veuillez vérifier l’espace libre et réessayer.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Les serveurs ont envoyé une réponse inattendue ({0}). Veuillez réessayer plus tard.
+coach.download.retry = Réessayer
+coach.download.close = Fermer
+# Notices
+coach.download.done = La voix du coach est installée.
+coach.download.cancelled = Téléchargement annulé : il reprendra là où il s’est arrêté la prochaine fois.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = Parties sauvegardées
+options.save_games = Sauvegarder mes parties
+options.save_games.help = À leur fin, vos parties contre Stockfish, avec le coach, à deux sur cet ordinateur et vos parties directes sont enregistrées en fichiers PGN, à retrouver dans Parties sauvegardées. Les parties en ligne sont conservées par le serveur.
+library.title = PARTIES SAUVEGARDÉES
+library.section.games = PARTIES
+library.section.details = LA PARTIE
+library.section.tags = EN-TÊTES
+library.section.moves = COUPS
+library.count = {0} partie|{0} parties
+library.filter = Afficher
+library.filter.all = Toutes les parties
+library.filter.play = Contre Stockfish
+library.filter.coach = Avec le coach
+library.filter.hotseat = À deux joueurs
+library.filter.direct = Parties directes
+library.filter.imported = Importées
+library.mode.play = Contre Stockfish
+library.mode.coach = Avec le coach
+library.mode.hotseat = À deux joueurs
+library.mode.direct = Partie directe
+library.mode.imported = Importée
+library.coach_level = Niveau {0}
+library.unknown_player = Inconnu
+library.unfinished = Inachevée
+library.unreadable = Cette partie est illisible.
+library.moves = {0} coup|{0} coups
+library.opening_variation = {0} : {1}
+library.file = Fichier : {0}
+library.file_game = Fichier : {0}, partie {1} sur {2}
+library.no_moves = Aucun coup n’a été joué.
+library.none_selected = Choisissez une partie dans la liste.
+library.reading = Lecture des parties sauvegardées
+library.empty.title = Aucune partie sauvegardée
+library.empty.text = Vos parties contre Stockfish, avec le coach, à deux sur cet ordinateur et vos parties directes apparaissent ici une fois terminées. Vous pouvez aussi déposer des fichiers PGN dans ce dossier : les parties exportées d’autres logiciels ou de sites web s’affichent avec les vôtres.
+library.empty.filter = Aucune partie de ce type.
+library.error.folder = Le dossier des parties sauvegardées est illisible
+library.error.game = Cette partie est illisible : {0}
+library.folder = Dossier : {0}
+library.open_folder = Ouvrir le dossier
+library.open_failed = Le dossier n’a pas pu être ouvert.
+library.replay = Revoir
+library.delete = Supprimer
+library.delete.title = SUPPRIMER LA PARTIE
+library.delete.text = La partie {0} sera supprimée de cet ordinateur, avec son fichier. Cette action est irréversible.
+library.delete.ok = Supprimer
+library.delete.several = Ce fichier contient {0} partie : il ne peut être supprimé que depuis le dossier.|Ce fichier contient {0} parties : il ne peut être supprimé que depuis le dossier.
+library.deleted = La partie a été supprimée.
+library.delete.failed = La partie n’a pas pu être supprimée.
+library.delete.changed = Le fichier a changé : la liste a été mise à jour.
+library.truncated = Ce dossier contient trop de parties : seules les {0} plus récentes sont affichées.
+library.tag.Event = Événement
+library.tag.Site = Lieu
+library.tag.Date = Date
+library.tag.Time = Heure
+library.tag.Round = Ronde
+library.tag.White = Blancs
+library.tag.Black = Noirs
+library.tag.Result = Résultat
+library.tag.WhiteElo = Elo des Blancs
+library.tag.BlackElo = Elo des Noirs
+library.tag.TimeControl = Cadence
+library.tag.Termination = Fin de partie
+library.tag.Opening = Ouverture
+library.tag.Variation = Variante
+library.tag.PlyCount = Demi-coups
+library.tag.FEN = Position de départ
+library.tag.ScacelithMode = Mode
+library.tag.CoachLevel = Niveau du coach
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = Coup {0} sur {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = Instantané
+replay.again = Revoir la partie
+replay.gameover.unfinished = La partie s’arrête au coup {0}, sans résultat.
+replay.tip.start = Début de la partie (Début)
+replay.tip.back = Un coup en arrière (J)
+replay.tip.pause = Pause (K)
+replay.tip.resume = Reprendre (K)
+replay.tip.forward = Un coup en avant (L)
+replay.tip.end = Fin de la partie (Fin)

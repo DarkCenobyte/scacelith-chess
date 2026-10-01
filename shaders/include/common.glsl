@@ -41,6 +41,7 @@ struct DrawData {
     vec4 instParams[4];
     vec4 info;               // x objectSeed, y planar reflector (-1 none), z flags, w objectId
     vec4 fade;               // x screen-door opacity (DrawItem::opacity), y 1 = dither animated (TAA)
+    vec4 highlight;          // DrawItem::highlight: rgb colour x level (exposure-relative), a strength
 };
 layout(std430, binding = 1) readonly buffer DrawSSBO { DrawData draws[]; };
 

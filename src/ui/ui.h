@@ -95,7 +95,10 @@ enum class MenuAction {
     None, StartGame, Quit, Resume, Resign, OfferDraw, ClaimDraw, BackToMainMenu, OptionsChanged, Rematch,
     StartWatching,  // "Watch a Game" page: Start (the WatchSetup holds the choice)
     Abort,          // online: abort the game (before your first move)
-    Report          // online: report the opponent (Esc menu, game over card)
+    Report,         // online: report the opponent (Esc menu, game over card)
+    StartCoach,     // Coach page: Start (the CoachSetup holds the choice)
+    TakeBack,       // coach game, Esc menu: take back the player's last move
+    StartReplay     // "Saved games" page: Replay (LibrarySetup::replay holds the game)
 };
 
 // "Watch a Game" (viewer mode): two Stockfish players. The page starts from the last choices saved
@@ -116,6 +119,9 @@ struct WatchSetup {
 MenuAction mainMenu(NewGameSetup& setup);
 // Same, with the "Watch a Game" entry filling 'watch' (returns StartWatching on its Start).
 MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch);
+// Same, with the "Coach" entry filling 'coach' (returns StartCoach on its Start; see CoachSetup).
+struct CoachSetup;
+MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach);
 // In-game pause menu (Esc). canClaimDraw enables the claim entry; canOfferDraw = false greys out
 // "Offer draw" (e.g. an offer is already pending). Esc resumes.
 MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw = true);
@@ -149,6 +155,9 @@ bool optionsOpen();
 // stores the brightness in game::settings(), Esc keeps the stored one; both complete it
 // (Settings::brightnessCalibrated), save the .ini and go on to the title page.
 void openBrightnessCalibration();
+// The next mainMenu() call opens on the "Saved games" page (back from a replay); on the title page
+// when that call has no library.
+void openSavedGames();
 // Optional small move list (toggled by the player with Tab).
 void moveList(const std::vector<std::string>& san, bool visible);
 // Loading screen while shaders/probes/textures are prepared (progress 0..1).
@@ -167,8 +176,25 @@ struct ViewerHud {
     float viewpointAge = 0.0f;   // seconds since it was selected (the label fades out)
     float speed = 1.2f;          // observer speed (m/s), shown for a moment after a change
     float speedAge = 1e9f;       // seconds since the speed changed
+    bool replay = false;         // a saved game replayed: its keys head the controls hint, and the
+                                 // labels above leave room for its bar (replayBar)
 };
 void viewerHud(const ViewerHud& hud);
+
+// ---- Replay of a saved game (ui_screens_game.cpp) ----------------------------------------------
+// The replay's bar, bottom centre over the viewer overlay (drawn after viewerHud while it is
+// visible): the move counter, the buttons start, one move back, pause / resume, one move forward,
+// end (mouse only, with tooltips naming their keys: the keyboard is the game's), and the speed.
+struct ReplayBar {
+    int move = 0, moves = 0;     // full moves played so far, in the whole game
+    std::string speed;           // "×2", "Instant" (already translated)
+    bool paused = false;         // the middle button resumes
+    bool atStart = false;        // start and back greyed out
+    bool atEnd = false;          // forward and end greyed out
+    bool aboveCard = false;      // the folded game over bar is shown: the bar sits above it
+};
+enum class ReplayAction { None, Start, Back, TogglePause, Forward, End };
+ReplayAction replayBar(const ReplayBar& bar);
 
 // ---- Hot-seat: two players on one PC (ui_hotseat.cpp) ------------------------------------------
 // Overlay of a hot-seat game: the two players (top left, the one to move marked), a caption naming
@@ -186,6 +212,128 @@ struct HotSeatHud {
 };
 enum class HotSeatAction { None, AcceptDraw, DeclineDraw };
 HotSeatAction hotSeatHud(const HotSeatHud& hud);
+
+// ---- Coach mode (ui_coach.cpp) ------------------------------------------------------------------
+// The coach page (title entry "Coach"), the coach's subtitles, the takeback offer card and the Esc
+// menu of a coach game. Names, descriptions and texts of the levels come from assets/i18n
+// (coach.level.<n>.name / .desc / .detail).
+//
+// Levels, index = level: 0 is the interactive lesson on the rules, then the player's Elo bands.
+struct CoachLevelInfo {
+    int eloLow = 0, eloHigh = 0;  // band shown on the page ("600–900"); both 0 = the rules lesson;
+                                  // eloHigh 0 = open band ("2100+")
+};
+// Replaces the default list (0 rules, 600-900, 900-1200, 1200-1500, 1500-1800, 1800-2100, 2100+).
+// A level without translated texts shows its band only.
+void setCoachLevels(const std::vector<CoachLevelInfo>& levels);
+const std::vector<CoachLevelInfo>& coachLevels();
+
+// Choices of the coach page. The page starts from game::settings() [coach] and writes them back
+// (and saves the .ini) on Start.
+struct CoachSetup {
+    int level = 1;               // index into coachLevels(): 0 = the rules lesson
+    int colour = 2;              // the player's colour: 0 White, 1 Black, 2 alternate (the rules
+                                 // lesson is always played with White: Settings::coachPlayerColour)
+    // Set by the game before mainMenu(): false when the coach's voice files (the coach/ folder
+    // beside the executable) are missing or failed to load. The page then says in one line that
+    // the coach will speak through subtitles only.
+    bool voiceAvailable = true;
+};
+
+// The coach's words, bottom centre, over the game (LAYER_OVERLAY: under tooltips and the pointer,
+// above the game over card). The game owns the timing: 'age' follows the audio clock of the
+// utterance so that text and voice stay in step. Do not draw it while a menu is open (paused,
+// ui::optionsOpen()) or while the promotion picker is up: it would paint over them.
+struct Subtitle {
+    std::string text;            // already in the UI language; "" = none (the last text fades out)
+    float age = 1e9f;            // seconds since this line started (fades in over 0.18 s)
+    float duration = 0.0f;       // seconds it stays, then fades out over 0.35 s (subtitleDuration)
+    float bottom = 0.0f;         // lowest y the plate may use (reference px); 0 = 96 above the bottom
+                                 // edge. Pass v.y - 110 while the folded game over bar is shown.
+    bool speaker = true;         // "COACH" tag above the text
+};
+void subtitles(const Subtitle& s);
+// How long a subtitle should stay: the audio length or the time needed to read the text,
+// whichever is longer (about 15 Latin or 7 CJK characters a second), plus a short margin.
+float subtitleDuration(const std::string& text, float audioSeconds);
+
+// Coach overlay at the table: the takeback offer card (after a blunder has been explained) and
+// the "Space: skip" hint while something skippable runs (an explanation, a demonstration, the
+// appraisal at the end of the game). The card's buttons are mouse only: the keyboard stays with
+// the game, which reads the keys itself (Backspace accepts, as the Controls tab says; Space never
+// answers the card, it skips the coach's talk; touching a piece plays on).
+struct CoachHud {
+    bool offer = false;          // show the takeback card
+    std::string offerText;       // its question ("" = coach.offer.text)
+    bool skippable = false;      // show the skip hint (bottom, start side)
+};
+enum class CoachHudAction { None, TakeBack, PlayOn };
+CoachHudAction coachHud(const CoachHud& hud);
+
+// Esc menu of a coach game: Resume, Take back (last move), Offer draw, Claim draw, Resign,
+// Options, Main menu (confirmed). Entries whose flag is false are left out (Resume, Options and
+// Main menu always show). Returns Resume, TakeBack, OfferDraw, ClaimDraw, Resign, OptionsChanged
+// or BackToMainMenu. Esc resumes.
+struct CoachPause {
+    bool canTakeBack = false;    // the player has a move to take back
+    bool canOfferDraw = false;
+    bool canClaimDraw = false;
+    bool canResign = true;       // false in the rules lesson
+};
+MenuAction coachPauseMenu(const CoachPause& p);
+
+// ---- Coach voice download (ui_model_download.cpp) ---------------------------------------------
+// The prompt that offers to download the coach's voice model (Supertonic 3, not shipped with the
+// game) and the progress panel of the download. The game owns the job and the decisions
+// (game/coach_model.h: call that, not these, from a scene); these draw and report the choice.
+// Texts: coach.download.* in assets/i18n.
+struct ModelPrompt {
+    double bytes = 145316356.0;  // download size, shown in the text and on the Download button
+    std::string folder;          // where the files go (shown in small print)
+};
+enum class ModelPromptAction { None, Download, NotNow };
+// Modal card over whatever is on screen (menus or the table; what was drawn before it this frame
+// and the game's input are blocked from the next frame on). "Read the licence" turns the card
+// into the OpenRAIL-M text, Back returns. Esc = Not now (Back on the licence). Draw it every frame
+// while it is open, after the menus and HUD; it closes when it returns an action.
+ModelPromptAction modelPrompt(const ModelPrompt& p);
+
+struct ModelProgressView {
+    enum class State { Hidden, Checking, Downloading, Extracting, Failed };
+    State state = State::Hidden;   // Hidden: fades out
+    double done = 0.0, total = 0.0;   // the bar and, while downloading, the megabytes
+    bool github = false;           // the source: the GitHub release archive, else Hugging Face
+    std::string sourceLabel;       // "huggingface.co/csukuangfj2/...", "k2-fsa/sherpa-onnx release"
+    std::string file;              // the file in progress (small print), "" = none
+    std::string error;             // Failed: the reason, translated
+};
+enum class ModelPanelAction { None, Cancel, Retry, Close };
+// Non-modal panel in the top end corner, over the menus and the table alike: what is happening,
+// the bar, megabytes, the host, Cancel; when it failed, the reason with Close / Retry. Its
+// buttons are mouse only (the keyboard stays with the menus and the game).
+ModelPanelAction modelProgressPanel(const ModelProgressView& v);
+// Called when the player picks "Coach" on the title page, as the Coach page opens (the game's
+// voice download prompt hooks in here: game::coachModelInit). nullptr = none.
+void setCoachEntryHook(std::function<void()> hook);
+
+// ---- Saved games (ui_library.cpp) ----------------------------------------------------------------
+// The "Saved games" page (title entry after "Watch a Game"): the games of the pgn folder
+// (game_archive.h: the player's own games, saved when they end, and any PGN file dropped there),
+// newest first, with a filter by mode; the details of the selected game (its tags and moves);
+// Replay, Delete (confirmed; files of one game only) and Open folder (the system's file manager).
+// The list is read on a worker thread and read again every few seconds while the page is open.
+struct ReplaySetup {
+    std::string path;            // the .pgn file
+    int game = 0;                // the game's index in the file (0 = the first)
+};
+struct LibrarySetup {
+    std::string folder;          // the pgn folder (plat::appDataDirectory() + "pgn/"); "" = no
+                                 // "Saved games" entry on the title page
+    ReplaySetup replay;          // the game to replay when mainMenu() returns StartReplay
+};
+// mainMenu() with the "Saved games" entry: returns StartReplay on Replay ('library.replay' then
+// names the game). The overloads above have no such entry.
+MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, LibrarySetup& library);
 
 // ---- In-game pointer (ui_screens_game.cpp) -------------------------------------------------------
 // Drawn by the game during first-person play in place of the system arrow (hidden meanwhile), on

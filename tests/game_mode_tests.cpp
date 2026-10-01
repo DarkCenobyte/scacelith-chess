@@ -1,6 +1,8 @@
-// Game modes: camera flights, the viewer's observer camera (the Elo rating: elo_tests.cpp).
+// Game modes: camera flights, the viewer's observer camera, untimed games (the Elo rating:
+// elo_tests.cpp).
 #include "test.h"
 #include "game/camera_flight.h"
+#include "game/clock_rules.h"
 #include "game/layout.h"
 #include "game/observer_camera.h"
 #include <cmath>
@@ -177,4 +179,38 @@ TEST(observer_flight_is_interrupted_by_controls) {
     for (int i = 0; i < 60; ++i) cam.update(1.0f / 60.0f, none);
     CHECK(!cam.flying());
     CHECK(near(cam.pose().position, goal.position));
+}
+
+// ---- Untimed games ------------------------------------------------------------------------------
+
+TEST(untimed_game_only_offline_without_time_control) {
+    const std::vector<chess::TimeControl>& presets = chess::timeControlPresets();
+    // "No clock" (preset 0, offered to Play, hot-seat and Watch) is the only untimed preset.
+    CHECK(game::untimedGame(false, presets[0]));
+    for (size_t i = 1; i < presets.size(); ++i) CHECK(!game::untimedGame(false, presets[i]));
+    // A custom time control is always timed (at least 10 s, GameScene::chosenTimeControl).
+    chess::TimeControl custom;
+    custom.unlimited = false;
+    custom.baseMs = 10000;
+    CHECK(!game::untimedGame(false, custom));
+    // Online and direct games are never untimed, whatever they carry.
+    CHECK(!game::untimedGame(true, presets[0]));
+    CHECK(!game::untimedGame(true, presets[5]));
+}
+
+TEST(untimed_clock_keeps_used_time_without_press) {
+    // Nobody presses the clock of an untimed game: each completed move switches it (completeMove),
+    // so the used time of each side stays known (a coach's statistics), shown as dashes only.
+    chess::Clock c;
+    c.setup(chess::timeControlPresets()[0]);
+    c.start(chess::White);
+    c.update(4200);          // White thinks and moves
+    c.press(chess::White);   // the move is completed as its piece is released
+    c.update(1300);          // Black
+    c.press(chess::Black);
+    c.update(800);           // White again
+    CHECK_EQ(c.remainingMs(chess::White), int64_t(5000));
+    CHECK_EQ(c.remainingMs(chess::Black), int64_t(1300));
+    CHECK(c.running() == chess::White);
+    CHECK(!c.flagged(chess::White) && !c.flagged(chess::Black));
 }

@@ -1,0 +1,267 @@
+# Coach speech (Arabic): the rules lesson (level 0, src/coach/lesson.cpp; research-pedagogy §3).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("رخّك", "حصاني": every piece
+# is masculine, so "it" is always ـه / هو); {sq}, {sq2}, {to}, {esc} = squares; {move} = a move.
+# {@}, {@2}, {@3} are invisible marks placed right before the word the coach points at.
+# Literal Latin letters (files a-h, the knight's L) are dropped by the voice: those lines have a
+# ".spoken" version with the Arabic letter names of the opening texts (إيه، إي، إتش، إل).
+# "ملِك" carries a kasra in the possessives (ملِكي، ملِكك) and "رخّ" a shadda (رخّي، رخّك), as in
+# common.lang, so that neither the reader nor the voice mistakes them for other words.
+
+# ---- Chapter titles (said inside "لنواصل مع {chapter}.") -----------------------------------------------
+lesson.title.welcome = الرقعة
+lesson.title.pieces = حركة القطع
+lesson.title.safety = الأخذ الآمن وغير الآمن
+lesson.title.check = الكش
+lesson.title.mate = الكش مات
+lesson.title.castling = التبييت
+lesson.title.en_passant = الأخذ بالمرور
+lesson.title.promotion = الترقية
+lesson.title.draws = الجمود والتعادل
+lesson.title.etiquette = المباريات الحقيقية: التصنيف والساعة والآداب
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = الآن جرّب بنفسك.
+lesson.now_you.2 = دورك الآن.
+lesson.now_you.3 = والآن أنت.
+# Another wrong move after the demonstration.
+lesson.almost = اقتربت! النقلة التي أريتك إياها هي المطلوبة.
+lesson.almost.2 = ليس تمامًا. جرّب النقلة التي عرضتها عليك.
+lesson.almost.3 = لم يبقَ إلا القليل. تذكّر ما أريتك إياه للتو.
+# A wrong move without a line of its own.
+lesson.try_again = ليست هذه هي النقلة. حاول مرة أخرى.
+lesson.try_again.2 = لا، ليست هذه. أعد المحاولة.
+lesson.try_again.3 = لنحاول مرة أخرى.
+lesson.use_your = استخدم {your}.
+lesson.use_your.2 = جرّب ذلك ب{your}.
+lesson.watch = انظر جيدًا.
+lesson.like_this = هكذا.
+lesson.and_back = ونعيدها كما كانت.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = كش، لكن ملِكي يهرب إلى {esc}.
+lesson.check_takes = كش، لكن ملِكي يأخذ {your} ببساطة.
+lesson.check_block = كش، لكن يمكنني أن أضع قطعة في الطريق.
+lesson.stalemate = جمود! ملِكي لا يستطيع التحرك وليس في كش. تعادل، مع أن الفوز كان في يدك!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = ليس إلى {sq}: {my} يهاجم هذا المربع. الملك لا يدخل الخطر أبدًا.
+why.PathBlocked = هناك قطعة تسدّ {@}الطريق: القطع لا تقفز، ما عدا الحصان.
+why.WrongGeometry = {your} لا يتحرك هكذا.
+why.MustAnswerCheck = ملِكك في {@}كش: عليك الخروج منه أولًا.
+why.CastlingThroughCheck = سيمرّ ملِكك عبر {sq}، و{my} يهاجم هذا المربع.
+why.CastlingNoRights = هذا الملك أو هذا الرخ تحرّك من قبل: لا تبييت.
+why.CastlingBlocked = يتطلب التبييت أن تكون المربعات بين الملك والرخ فارغة.
+why.CastlingOutOfCheck = لا يمكنك التبييت وملِكك في كش.
+why.PawnForwardBlocked = البيدق لا يأخذ إلى الأمام مباشرة: هذا المربع {@}مسدود.
+why.LeavesKingInCheck = {your} مثبَّت: تحريكه سيكشف ملِكك أمام {my}.
+why.OwnPieceOnTarget = لا يمكنك التحرك إلى مربع فيه إحدى قطعك.
+why.PawnCaptureNeedsVictim = لا يتحرك البيدق قطريًّا إلا ليأخذ.
+why.EnPassantExpired = الأخذ بالمرور مسموح فقط مباشرة بعد تقدّم البيدق مربعين.
+why.NotYourTurn = مهلًا: الدور لي.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = مرحبًا! أنا مدرّبك. لنتعلّم قواعد الشطرنج معًا، خطوة صغيرة في كل مرة.
+lesson.welcome.board = هذه رقعة الشطرنج: أربعة وستون مربعًا، فاتحة وداكنة، في ثمانية صفوف من ثمانية.
+lesson.welcome.light = مربع الزاوية على {@}يمينك فاتح دائمًا. تذكّر: الفاتح على اليمين.
+lesson.welcome.files = تُسمّى الخطوط العمودية أعمدة، ولها حروف، من {@}a إلى {@2}h.
+lesson.welcome.files.spoken = تُسمّى الخطوط العمودية أعمدة، ولها حروف، من {@}إيه إلى {@2}إتش.
+lesson.welcome.ranks = وتُسمّى الخطوط الأفقية صفوفًا، ولها أرقام، من {@}واحد إلى {@2}ثمانية، بدءًا من جهتك.
+lesson.welcome.square = يُسمّى كل مربع بحرفه ثم برقمه. هذا المربع هو {sq}.
+lesson.welcome.square2 = وهذا هو {sq}.
+lesson.welcome.kings = هذان هما الملكان. ملِكك في {sq}، وملِكي في {sq2}.
+lesson.welcome.ask = دورك: حرّك ملِكك مربعًا واحدًا إلى الأمام، إلى {sq}.
+lesson.welcome.wrong = هذا هو {to}. نريد {sq}: الحرف e، والرقم اثنان.
+lesson.welcome.wrong.spoken = هذا هو {to}. نريد {sq}: الحرف إي، والرقم اثنان.
+lesson.welcome.ok = ممتاز. ملِكك الآن في {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = هذا {your}. يتحرك في خطوط مستقيمة، على الأعمدة والصفوف، إلى أي مسافة يشاء.
+lesson.rook.lines = صعودًا على العمود، {@}أو على امتداد الصف.
+lesson.rook.capture = للأخذ، تحلّ القطعة محلّ {@}قطعة للخصم، فتخرج هذه الأخيرة من الرقعة.
+lesson.rook.ask = خذ {my} برخّك!
+lesson.rook.short = الاتجاه صحيح! واصل الصعود على العمود حتى تصل إلى {my}.
+lesson.rook.rank = هذا على امتداد الصف. {my} في أعلى العمود.
+lesson.rook.king = هذا ملِكك. استخدم {your}، الذي في الزاوية.
+lesson.rook.ok = تمّ الأخذ! {my} يغادر الرقعة.
+# Pieces don't jump
+lesson.jump.blocked = لا تستطيع القطع القفز فوق غيرها. بيدقك في {sq} يسدّ طريق الرخ.
+lesson.jump.knight = وحده الحصان يستطيع القفز. سنتعرّف عليه قريبًا.
+# Bishop
+lesson.bishop.intro = هذا {your}. يتحرك قطريًّا، إلى أي مسافة يشاء.
+lesson.bishop.colour = يبقى الفيل دائمًا على مربعات من اللون نفسه.
+lesson.bishop.ask = {my} يقف على قطر فيلك. خذه!
+lesson.bishop.short = القطر صحيح! تقدّم أكثر حتى تصل إلى {my}.
+lesson.bishop.other = هذا هو القطر الآخر. انظر نحو {my}.
+lesson.bishop.ok = ممتاز. الأفيال تحب الأقطار الطويلة.
+# Queen
+lesson.queen.intro = هذا {your}، أقوى قطعة. يتحرك كالرخ والفيل معًا.
+lesson.queen.ask = ابحث عن {my} وخذه بوزيرك.
+lesson.queen.wrong = يستطيع وزيرك بلوغ {my} في نقلة واحدة، على قطر.
+lesson.queen.ok = أحسنت! حافظ على وزيرك: فقيمته كبيرة.
+# King
+lesson.king.intro = يتحرك الملك مربعًا واحدًا فقط، في أي اتجاه.
+lesson.king.important = الملك أهم قطعة. إذا حوصر، ضاعت المباراة.
+lesson.king.ask = الملك يستطيع الأخذ أيضًا. خذ {my}!
+lesson.king.wrong = ملِكك بجوار {my} تمامًا. انتقل إلى مربعه لتأخذه.
+lesson.king.ok = جيد! الملك بطيء، لكنه قوي عن قرب.
+# Knight
+lesson.knight.intro = هذا {your}. يتحرك على شكل حرف L: مربعان في خط مستقيم، ثم مربع إلى الجانب.
+lesson.knight.intro.spoken = هذا {your}. يتحرك على شكل حرف إل: مربعان في خط مستقيم، ثم مربع إلى الجانب.
+lesson.knight.l = {@}هكذا. ويصل دائمًا إلى مربع من اللون الآخر.
+lesson.knight.jump = الحصان هو القطعة الوحيدة التي تستطيع القفز فوق غيرها.
+lesson.knight.ask = خذ {my} بحصانك!
+lesson.knight.wrong = هذه نقلة حصان صحيحة، لكنها لا تصل إلى {my}. جرّب قفزة أخرى.
+lesson.knight.ok = قفزة رائعة!
+# Pawn: moving
+lesson.pawn.intro = والآن {your}. يتقدّم إلى الأمام مباشرة، مربعًا واحدًا في كل مرة، ولا يتراجع أبدًا.
+lesson.pawn.first = في نقلته الأولى، يمكن للبيدق أن يتقدّم مربعًا أو مربعين.
+lesson.pawn.ask = قدّم بيدقك مربعين إلى الأمام.
+lesson.pawn.one = هذا مربع واحد: نقلة قانونية، لكن تقدّم مربعين هذه المرة.
+lesson.pawn.use = استخدم البيدق.
+lesson.pawn.ok = جيد.
+# Pawn: capturing
+lesson.pawncap.blocked = بيدقي يسدّ طريق بيدقك. البيادق لا تأخذ إلى الأمام مباشرة.
+lesson.pawncap.diagonal = لكن البيدق يأخذ قطريًّا، مربعًا واحدًا إلى الأمام.
+lesson.pawncap.ask = خذ {my} ببيدقك.
+lesson.pawncap.use = استخدم {your}: فهو يأخذ قطريًّا إلى الأمام.
+lesson.pawncap.ok = نعم! مستقيمًا للتحرك، وقطريًّا للأخذ.
+# Values, set-up and the first moves
+# The values count points (نقاط, feminine): the numbers take the feminine form (ثلاث، خمس، تسع), and
+# the noun is said, so that خمس/تسع cannot be read as the fractions خُمس/تُسع.
+lesson.values.pawn = لكل قطعة قيمة بالنقاط. البيدق يساوي نقطة واحدة.
+lesson.values.pieces = الحصان أو {@}الفيل: ثلاث نقاط. {@2}الرخ: خمس نقاط. {@3}الوزير: تسع نقاط.
+lesson.values.king = الملك لا يُقدَّر بثمن: لا يمكنك أبدًا التخلي عنه.
+lesson.values.trade = احرص ألّا تتخلى أبدًا عن قطعة مقابل أقل من قيمتها.
+lesson.setup.corners = تبدأ كل مباراة هكذا: الرخاخ في {@}الزوايا، ثم {@2}الأحصنة، ثم {@3}الأفيال.
+lesson.setup.queen = يقف الوزير على مربع من لونه: وزيرك على مربع فاتح.
+lesson.setup.king = والملك يقف بجانبه. والأبيض يلعب أولًا دائمًا.
+lesson.first.ask = ابدأ المباراة: قدّم البيدق الذي أمام ملِكك مربعين، إلى {sq}.
+lesson.first.wrong = هذه نقلة قانونية أيضًا! أما الآن، فمن فضلك حرّك بيدق ملِكك إلى {sq}.
+lesson.first.ok = نقلة أولى ممتازة: تفتح الطريق لوزيرك وفيلك.
+lesson.first.reply = أردّ بالمثل. والآن أخرج حصانًا: اقفز من {sq} إلى {sq2}.
+lesson.first.knight_wrong = الأحصنة تقفز فوق البيادق. جرّب من {sq} إلى {sq2}.
+lesson.first.knight_ok = ممتاز. الأحصنة والأفيال تخرج مبكرًا.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = تكون القطعة محمية حين تستطيع قطعة صديقة أن تأخذ بدورها.
+lesson.safety.pawn = {@}بيدقي يحمي {my}.
+lesson.safety.free = لكن {my} بلا حماية. وزيرك يهاجم القطعتين كلتيهما.
+lesson.safety.ask = خذ القطعة غير المحمية!
+lesson.safety.watch = انظر ماذا يحدث.
+lesson.safety.gave = ذهب وزيرك، وقيمته تسع نقاط، مقابل حصاني، وقيمته ثلاث نقاط.
+lesson.safety.other = جرّب القطعة الأخرى.
+lesson.safety.look = ابحث عن القطعة التي لا يحميها شيء.
+lesson.safety.ok = ممتاز! اسأل نفسك دائمًا: هل هذه القطعة محمية؟
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = رخّي يسيطر على الصف الثاني كله.
+lesson.danger.rule = لا يجوز للملك أبدًا أن ينتقل إلى مربع يمكن أخذه فيه.
+lesson.danger.ask = انقل ملِكك إلى مربع آمن.
+lesson.danger.ok = صحيح. ملِكك آمن هناك.
+lesson.check.what = رخّي يهاجم ملِكك. هذا يُسمّى كش.
+lesson.check.must = حين يكون ملِكك في كش، عليك الخروج منه فورًا.
+lesson.check.ways = هناك ثلاث طرق: {@}تحريك الملك، أو {@2}اعتراض الهجوم، أو {@3}أخذ القطعة المهاجمة.
+lesson.check.ask = هنا، أخرج ملِكك من الكش.
+lesson.check.file = المربع {to} ما زال على {@}عمود رخّي. ابتعد عن هذا الخط.
+lesson.check.ok = جيد: لم يعد ملِكك في كش.
+lesson.block.again = كش مرة أخرى! هذه المرة لا يجد ملِكك مربعًا حرًّا.
+lesson.block.ask = اعترض الهجوم إذن: ضع قطعة في الطريق.
+lesson.block.queen = هذا يعترض الكش! لكن رخّي يستطيع أخذ وزيرك. اعترض بقطعة أقل قيمة.
+lesson.block.queen_ok = هذا ينجح. لكن تذكّر: اعترض بأقل قطعك قيمة.
+lesson.block.ok = ممتاز. الاعتراض يكون بالقطعة الأقل قيمة.
+lesson.capture.check = وزيري يعطي كشًّا، وهو ملاصق لملِكك تمامًا.
+lesson.capture.ask = خذ القطعة المهاجمة!
+lesson.capture.king_ok = نعم! وزيري لم يكن محميًّا، فاستطاع ملِكك أخذه.
+lesson.capture.knight_ok = نعم! أزال حصانك القطعة المهاجمة.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = الكش مات: الملك في كش، ولا مخرج له. وبه تُكسب المباراة.
+lesson.mate1.stuck = ملِكي عالق خلف {@}بيادقه.
+lesson.mate1.ask = أعطِ كش مات في نقلة واحدة!
+lesson.mate1.wrong = اقتربت! أعطِ كشًّا على صفّي الأخير، حيث لا يستطيع ملِكي الهرب.
+lesson.mate1.ok = كش مات! هذا هو مات الصف الأخير. تذكّره!
+lesson.mate2.ask = ملِكك ووزيرك يعملان كفريق. أعطِ كش مات في نقلة واحدة.
+lesson.mate2.wrong = ابحث عن كش لا يترك لملِكي أي مربع.
+lesson.mate2.ok = كش مات! ملِكك يحمي الوزير، فلا يستطيع ملِكي أخذه.
+lesson.mate2.ok_rank = كش مات على الصف الأخير! ملِكك يحرس كل المربعات أمام ملِكي.
+lesson.mate3.edge = رخّك على الصف السابع يحبس ملِكي على الحافة.
+lesson.mate3.ask = والآن استخدم {your} لتعطي كش مات.
+lesson.mate3.free = كش، لكن الصف السابع صار حرًّا الآن، فيهرب ملِكي.
+lesson.mate3.takes = ملِكي يأخذ رخّك ببساطة.
+lesson.mate3.hint = أعطِ كشًّا على الصف الأخير بالرخ الذي لا يحرس الصف السابع.
+lesson.mate3.ok = كش مات! عمل الرخّان معًا كدرجات السلّم.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = التبييت نقلة خاصة تحمي ملِكك. يتحرك فيها الملك والرخ معًا.
+lesson.castle.how = يتحرك {@}الملك مربعين نحو أحد الرخّين، ويقفز {@2}الرخ إلى جانبه الآخر.
+lesson.castle.ask = المس الملك أولًا دائمًا. والآن أنت: بيّت على جناح الملك.
+lesson.castle.rook = هذا يحرك الرخ فقط. للتبييت، حرّك ملِكك مربعين نحوه.
+lesson.castle.long = هذا تبييت على جناح الوزير، وهو قانوني أيضًا! هذه المرة، بيّت نحو الرخ الأقرب.
+lesson.castle.one = التحرك مربعًا واحدًا نقلة عادية للملك. في التبييت، يتحرك الملك مربعين.
+lesson.castle.other = للتبييت، حرّك ملِكك مربعين نحو الرخ الذي في {sq}.
+lesson.castle.ok = تم التبييت! ملِكك في مأمن، ورخّك جاهز للعب.
+lesson.castle2.moved = لا يمكنك التبييت إذا سبق أن تحرك ملِكك أو ذلك الرخ.
+lesson.castle2.attacked = ولا يجوز أيضًا وملِكك في كش، أو إذا كان سيعبر مربعًا مهاجَمًا أو يقف عليه.
+lesson.castle2.bishop = فيلي يهاجم {sq}. لذا فالتبييت على هذا الجناح ممنوع الآن.
+lesson.castle2.ask = بيّت على الجناح الآخر.
+lesson.castle2.other = بيّت نحو رخّك الآخر، على جناح الوزير.
+lesson.castle2.ok = صحيح! التبييت على جناح الوزير يضع ملِكك في {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+# The Arabic name already means "in passing": the line gives the French name instead.
+lesson.ep.what = هناك أخذ خاص بالبيادق يُسمّى الأخذ بالمرور، وبالفرنسية «أون باسان».
+lesson.ep.watch = راقب بيدقي: يتقدم مربعين ويقف بجانب بيدقك تمامًا.
+lesson.ep.how = يستطيع بيدقك أخذه كأنه تقدّم مربعًا واحدًا فقط: إلى {sq}.
+lesson.ep.now = لكن الآن فقط، في هذه النقلة. خذه بالمرور!
+lesson.ep.gone = ضاعت الفرصة: الأخذ بالمرور يكون فورًا أو لا يكون. لنحاول مرة أخرى.
+lesson.ep.ok = أخذ بالمرور! بيدقي الذي في {sq} يخرج من الرقعة.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = حين يبلغ البيدق الصف الأخير يترقّى: فيصبح وزيرًا أو رخًّا أو فيلًا أو حصانًا.
+lesson.promo.ask = اختر الوزير في أغلب الأحيان. والآن، حان وقت ترقية بيدقك!
+lesson.promo.under = هذا مسموح! لكن الوزير أقوى. لنختر الوزير.
+lesson.promo.under_ok = لا بأس. لكن معظم اللاعبين يختارون الوزير.
+lesson.promo.push = قدّم بيدقك إلى الصف الأخير، إلى {sq}.
+lesson.promo.ok = وزير جديد! بل يمكن أن يكون لديك وزيران في آن واحد.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = الدور لي. ملِكي ليس في كش، لكن {@}كل المربعات حوله مهاجَمة.
+lesson.stale.draw = ليس لديّ أي نقلة قانونية. هذا هو الجمود، أو الباط، والمباراة تعادل.
+lesson.stale2.ask = حين يكون الفوز في متناولك، احذر الجمود. أعطِ كش مات في نقلة واحدة، بلا جمود!
+lesson.stale2.wrong = أعطِ كشًّا على صفّي الأخير، حيث لا يستطيع ملِكي الهرب.
+lesson.stale2.ok = كش مات! اترك لملِك الخصم نقلة دائمًا، إلا إذا كانت نقلتك كش مات.
+lesson.draws.kings = وللتعادل حالات أخرى: إذا تعذّرت الإماتة، كملِكين وحدهما، فالمباراة تعادل.
+lesson.draws.agree = ويمكن للاعبين أيضًا الاتفاق على التعادل.
+lesson.draws.repeat = وتكرار الموقف ثلاث مرات، أو خمسون نقلة دون أخذ أو تحريك بيدق، يتيح التعادل أيضًا.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = أنت الآن تعرف كل قواعد الشطرنج. أحسنت!
+lesson.talk.real = سأخبرك الآن كيف تُلعب المباريات الحقيقية.
+lesson.talk.elo = للاعبين تصنيف يُسمّى إيلو. يرتفع مع الفوز، وينخفض مع الخسارة.
+lesson.talk.elo_gap = الفوز على لاعب أقوى يكسبك نقاطًا أكثر، والخسارة أمام لاعب أضعف تكلّفك أكثر.
+lesson.talk.elo_start = يظهر تصنيفك بعد خمس مباريات محتسبة. مباريات المدرّب للتمرين، فهي غير محتسبة.
+lesson.talk.clock = هذه {@}ساعة الشطرنج. لكل لاعب وقته الخاص، ولا يجري إلا في دوره.
+lesson.talk.press = بعد نقلتك، اضغط على الساعة باليد نفسها، فيبدأ وقتي.
+lesson.talk.flag = إذا نفد وقتك فالخسارة لك، إلا إذا استحال عليّ أن أعطيك كش مات.
+lesson.talk.increment = خمسة زائد ثلاثة تعني خمس دقائق لكل لاعب، وثلاث ثوانٍ إضافية بعد كل نقلة.
+lesson.talk.speeds = تُسمّى المباريات القصيرة خاطفة، والأطول منها سريعة، وأطولها كلاسيكية.
+lesson.talk.no_clock = معي، الساعة متوقفة. خذ كل الوقت الذي تحتاجه للتفكير.
+lesson.talk.touch = في المباراة الحقيقية، لمسُ إحدى قطعك يُلزمك بتحريكها.
+lesson.talk.touch_mine = ولمسُ إحدى قطعي يُلزمك بأخذها، إن كان ذلك ممكنًا.
+lesson.talk.adjust = لتعديل وضع قطعة دون تحريكها، قل أولًا: «أُعدِّل».
+lesson.talk.release = بمجرد إفلات القطعة على مربع جديد، تُحتسب النقلة.
+lesson.talk.sheet = في البطولات، يدوّن كلا اللاعبين كل نقلة على {@}ورقة التسجيل.
+# Written: the scoresheet letters (K Q R B N, as Arab federations score: "Nf3"); the voice says the
+# move in words ("الحصان إلى إف ثلاثة"), never a piece letter.
+lesson.talk.notation = نكتب حرف القطعة بالإنجليزية ثم المربع، مثل {move:letters}. وللبيدق المربع فقط.
+lesson.talk.robot = روبوتك يدوّن نقلاتك نيابةً عنك. وفي المباريات السريعة، التدوين غير مطلوب.
+lesson.talk.handshake = تبدأ المباريات وتنتهي بالمصافحة. ومعناها: مباراة جيدة، وشكرًا.
+lesson.talk.polite = في الفوز كما في الخسارة، حافظ على أدبك، ولا تزعج خصمك أبدًا وهو يفكر.
+lesson.talk.tips = ثلاث نصائح لمبارياتك: {@}السيطرة على المركز، و{@2}إخراج الأحصنة والأفيال، و{@3}التبييت مبكرًا.
+lesson.talk.next = متى شئت، اختر «الخطوات الأولى»: سألعب بلطف وأساعدك بعد كل خطأ.
+lesson.talk.welcome = أهلًا بك في عالم الشطرنج! لنتصافح.

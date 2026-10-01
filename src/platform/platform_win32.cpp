@@ -423,7 +423,7 @@ std::string exeDirectory() {
 std::string userDataDirectory() {
     wchar_t w[MAX_PATH];
     if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, w))) {
-        std::wstring dir = std::wstring(w) + L"\\Scacelith";
+        std::wstring dir = std::wstring(w) + L"\\scacelith";
         CreateDirectoryW(dir.c_str(), nullptr);
         char buf[MAX_PATH * 3];
         int n = WideCharToMultiByte(CP_UTF8, 0, dir.c_str(), -1, buf, sizeof(buf), nullptr, nullptr);
@@ -431,6 +431,9 @@ std::string userDataDirectory() {
     }
     return exeDirectory();
 }
+
+// The same folder as userDataDirectory() on Windows (Roaming application data).
+std::string appDataDirectory() { return userDataDirectory(); }
 
 void messageBox(const char* title, const char* text) {
     wchar_t wt[256], wx[2048];
@@ -502,6 +505,19 @@ uint64_t randomSeed() {
     LARGE_INTEGER t;
     QueryPerformanceCounter(&t);
     return uint64_t(t.QuadPart) ^ (uint64_t(GetCurrentProcessId()) << 32) ^ uint64_t(GetTickCount64() * 2654435761ULL);
+}
+
+// ---- Saved games ---------------------------------------------------------------------------------
+bool openInFileManager(const std::string& path) {
+    if (path.empty()) return false;
+    int n = MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, nullptr, 0);
+    if (n <= 0) return false;
+    std::wstring w(size_t(n), L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, &w[0], n);
+    HINSTANCE r = ShellExecuteW(g_hwnd, L"open", w.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+    if (reinterpret_cast<INT_PTR>(r) > 32) return true;
+    LOGW("could not open %s in the file manager (%d)", path.c_str(), int(reinterpret_cast<INT_PTR>(r)));
+    return false;
 }
 
 }  // namespace plat

@@ -1,0 +1,115 @@
+# Coach speech (Arabic): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# Register: MSA, second person singular; the player's gender is unknown, so the lines prefer
+# wordings that are gender-neutral in writing (ـك, verbal nouns, noun phrases, "لا داعي للقلق";
+# a past-tense verb only where it cannot be read as the coach's "I": هزمتني، لكنك قاتلت);
+# the remaining imperatives are masculine, the conventional default. The coach is male.
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = مرحبًا! لنلعب مباراة ودية، وسأساعدك كلما وقع خطأ.
+event.greet.l1.2 = أهلًا! سألعب بلطف وأُريك ما يستحق الانتباه.
+event.greet.l1.3 = أهلًا بك! لا داعي للعجلة: سأنبّهك حين تكون إحدى قطعك في خطر.
+event.greet.l2 = مرحبًا! لنلعب. إذا ظهرت شوكة أو تثبيت، فسأُريك ذلك.
+event.greet.l2.2 = أهلًا! المهم إخراج قطعك وحماية ملِكك، وسأساعدك طوال الطريق.
+event.greet.l2.3 = أهلًا بعودتك إلى الرقعة! عينك على الشوكات والتثبيتات: فهي تحسم المباريات.
+event.greet.l3 = مرحبًا! لنلعب مباراة حقيقية. سأعلّق على خططك وعلى الأخطاء الكبيرة.
+event.greet.l3.2 = أهلًا! قطعك تحتاج إلى خطة، وسأنبّهك حين تُغفل نقلةٌ شيئًا مهمًّا.
+event.greet.l3.3 = لنلعب! سأشير إلى النقلات الوحيدة وإلى النقلات الخاطئة.
+event.greet.l4 = مرحبًا! هذه المرة سأعطي تقييمات وأُريك أفضل النقلات المرشّحة.
+event.greet.l4.2 = لنلعب. بعد كل خطأ سأخبرك بما كان أدقّ.
+event.greet.l4.3 = ما رأيك في مباراة بمستوى النادي؟ سأعلّق حين يتغيّر التقييم.
+event.greet.l5 = لنلعب. ستكون تعليقاتي موجزة.
+event.greet.l5.2 = أنا مستعد متى شئت. تعليقات قصيرة فقط.
+event.greet.l5.3 = حظًّا موفقًا. لن أتكلم إلا عند الحاجة.
+event.greet.l6 = بالتوفيق.
+event.greet.l6.2 = لنلعب.
+event.greet.l6.3 = أنا مستعد. لن أعلّق إلا على اللحظات الحاسمة.
+
+# Who starts (said after the greeting).
+event.colour.white = معك القطع البيضاء، إذن البداية لك.
+event.colour.white.2 = لك الأبيض: النقلة الأولى من نصيبك.
+event.colour.black = معي الأبيض، لذا سأبدأ أنا.
+event.colour.black.2 = هذه المرة لك الأسود: أنا أبدأ.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those of the Coach page (assets/i18n/ar.lang, coach.level.<n>.name).
+event.level.l0 = قواعد الشطرنج: نتعلّم اللعبة خطوة خطوة، بتمارين صغيرة.
+event.level.l1 = الخطوات الأولى: ألعب بلطف وأشرح كل خطأ بكلمات بسيطة.
+event.level.l2 = مبتدئ: ألعب بقوة أكبر قليلًا، وأسمّي التكتيكات البسيطة كالشوكة والتثبيت.
+event.level.l3 = متوسط: أتحدث عن الخطط وبنية البيادق، وأعرض تفريعات قصيرة.
+event.level.l4 = لاعب نادٍ: أعطي التقييم بالبيادق وأقترح نقلات مرشّحة.
+event.level.l5 = لاعب نادٍ قوي: تعليقات قصيرة، وتفريعات أطول عند الحاجة.
+event.level.l6 = خبير: ألعب بكامل قوتي ولا أعلّق إلا على اللحظات الحاسمة.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = دورك.
+event.your_move.2 = النقلة لك.
+event.your_move.3 = حان دورك.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = على مهلك.
+event.take_time.2 = لا عجلة: لا ساعة في مبارياتنا.
+# Short filler while the coach is still looking at the position.
+event.filler = همم.
+event.filler.2 = لنرَ.
+event.filler.3 = لحظة، أتأمّل الموقف.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = حسنًا، لنسترجع النقلة.
+event.takeback.taken.2 = فكرة جيدة. نظرة ثانية لا تضر.
+event.takeback.taken.3 = ها قد استرجعناها. لنحاول من جديد.
+# The player declined the offer and played on.
+event.takeback.declined = حسنًا، نواصل اللعب.
+event.takeback.declined.2 = لا بأس، المباراة مستمرة.
+event.takeback.declined.3 = القرار لك. لنكمل.
+# After an explanation without an offer.
+event.play_on = لنواصل اللعب.
+event.play_on.2 = لنكمل.
+event.play_on.3 = والآن، نعود إلى مباراتنا.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = الجميع يرتكب أخطاء كهذه. المهم هو اكتشافها.
+event.encourage.mistake.2 = لا داعي للقلق. تفقُّد ما تهاجمه نقلتي الأخيرة يدلّك على الجواب.
+event.encourage.mistake.3 = هذا يحدث لكل لاعب. لنواصل.
+# The player is behind (material or evaluation).
+event.encourage.behind = لا تستسلم: ابحث عن فرصك، واجعل مهمتي صعبة.
+event.encourage.behind.2 = واصل القتال. مواقف كهذه قد تنقلب في أي لحظة.
+event.encourage.behind.3 = حافظ على هدوئك وابحث عن نقاط ضعفي.
+# The player has played several good moves in a row.
+event.encourage.well = تفحّصك لتهديداتي قبل كل نقلة عادة ممتازة. أحسنت.
+event.encourage.well.2 = نقلات حذرة ومتينة. على هذا المنوال!
+event.encourage.well.3 = تفكيرك موفّق اليوم.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = أقبل. تعادل إذن.
+event.draw.accepted.2 = اتفقنا: إنه تعادل.
+event.draw.declined = لا، شكرًا. لنواصل اللعب.
+event.draw.declined.2 = أفضّل أن نكمل.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = لعب متقن. تهانينا!
+event.end.win.2 = فوز مستحق. أحسنت!
+event.end.win.3 = أهنّئك: فوزك عليّ جاء بكل جدارة.
+event.end.loss = مباراة جيدة. والمرة القادمة قد تكون لك.
+event.end.loss.2 = شكرًا على المباراة. كل خسارة تعلّمك شيئًا.
+event.end.loss.3 = كانت معركة جيدة. لنلقِ نظرة على ما حدث.
+event.end.draw = تعادل. مباراة جيدة!
+event.end.draw.2 = لا غالب ولا مغلوب هذه المرة. كان قتالك رائعًا.
+event.end.draw.3 = نتيجة منصفة. مباراة ممتعة.
+event.end.resigned = انتهت المباراة باستسلامك. لكن مقاومتك كانت جيدة.
+event.end.resigned.2 = حسنًا. شكرًا على المباراة.
+event.end.handshake = لنتصافح.
+event.end.handshake.2 = شكرًا لك على هذه المباراة.
+event.end.handshake.3 = مباراة جيدة. شكرًا لك.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang, definite noun phrases: "مع التبييت").
+event.lesson.resume = أهلًا بعودتك! لنواصل مع {chapter}.
+event.lesson.resume.2 = مرحبًا من جديد! توقفنا عند {chapter}.
+event.lesson.next = التالي: {chapter}.
+event.lesson.next.2 = والآن، {chapter}.
+event.lesson.skip = حسنًا، لننتقل إلى ما يلي.
+event.lesson.skip.2 = لا بأس، نتجاوز هذا الجزء.

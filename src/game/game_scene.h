@@ -3,7 +3,8 @@
 // one PC, each from their own robot's eyes, see docs/MULTIPLAYER_PLAN.md), online play (a player
 // of the Scacelith server or of a direct match sits in the other chair, see
 // game_scene_online.cpp), the viewer mode (two Stockfish players watched from a free, invisible
-// camera), the player's Elo, animations, audio and UI.
+// camera), the replay of a saved game (game_scene_replay.cpp), the player's Elo, animations,
+// audio and UI.
 //
 // Seats: seat 0 is White's chair (+Z), seat 1 Black's (-Z). Each seat has a controller (Human,
 // Stockfish or Remote; a hot-seat game has two Humans), the name and Elo written on the
@@ -13,18 +14,49 @@
 // left-handed), at White's right (+X) when watching.
 //
 // Hot-seat: the seat to move has the mouse and keyboard and the view from its robot's eyes. After
-// the clock press the view flies to the other player's eyes (or cuts through black, Options >
-// Gameplay) with the clock frozen; buttons still held by the previous player are ignored until
-// released. Each seat keeps its own look (yaw, pitch, lean). The in-game pointer, the square
-// aimed at, the clock hover, the see-through arm and the look at the scoresheet (S) belong to the
-// player to move; there is no pointer or aiming while the view goes over.
+// the clock press (untimed: once the move is made) the view flies to the other player's eyes (or
+// cuts through black, Options > Gameplay) with the clock frozen; buttons still held by the
+// previous player are ignored until released. Each seat keeps its own look (yaw, pitch, lean).
+// The in-game pointer, the square aimed at, the clock hover, the see-through arm and the look at
+// the scoresheet (S) belong to the player to move; there is no pointer or aiming while the view
+// goes over.
+//
+// Untimed games (no time control; Play, hot-seat and Watch can be, online never is, see
+// clock_rules.h) have no clock press: a move is completed as its last piece is released and the
+// turn passes at once (completeMove). The clock shows dashes, its lever stays still.
+//
+// Coach mode (game_scene_coach.cpp): the human against the coach robot ("COACH" on its chest),
+// levels 1-6, or the rules lesson (level 0). Untimed, never rated, touch-move on, illegal
+// placements refused. The scene is the coach's coach::Stage (its voice, subtitles, gestures, gaze,
+// demonstration moves, takebacks, marks, HUD) and coach::Analyst (the Stockfish analyses); a
+// coach::Session decides what the coach says and when (src/coach). The coach's own moves come
+// from its teaching repertoire, then Stockfish at the level's strength, and wait while the
+// session reviews the player's move (coachMayMove).
+//
+// Saved games (game_archive.h, game_saving.h): games against Stockfish, coach games of levels 1-6,
+// hot-seat games and direct matches go to plat::appDataDirectory() + "pgn/" as PGN files, with the
+// time each move took and the clocks, when they end or are left (archiveGame); never server games,
+// the viewer mode, the rules lesson or a replay. The title page's "Saved games" lists them.
+//
+// Replay (game_scene_replay.cpp): a saved game played again by the two robots at the pace it was
+// played (replay::ReplayClock), watched like the viewer mode (free camera, viewpoints, the
+// players' eyes), its clocks from the record, its scoresheets written as the moves are played,
+// its result card at the end. K pauses, J / L step back / forward, Shift+J / Shift+L slower /
+// faster, Home / End the start / the end; the same as mouse buttons on the overlay.
 //
 // Command line (development and screenshots):
 //   --start                 skip the menu: a game against Stockfish (--human white|black)
+//   --start --coach         skip the menu: a coach game (--coach-level N, 0 = the rules lesson,
+//                           1..6; --coach-colour white|black); the [coach] settings otherwise
+//   --coach-dir <path>      the folder of the coach's voice files (default: coach/ beside the exe)
+//   --coach-stage-test      a coach game whose Stage performs a fixed sequence (a spoken line with
+//                           its subtitle, pointing, a knight's trace, marks, two demonstration
+//                           moves and their rewind, the takeback card), without the session
 //   --start --hotseat       skip the menu: a hot-seat game (--white-name N --black-name N,
 //                           --clock-right white|black, --rated, --handover <s> with 0 = a cut)
 //   --play e2e4,e7e5,...    the human player(s) make these moves by hand, one per turn (touch,
-//                           carry, clock press; the promotion piece as a fifth letter), online too
+//                           carry, clock press unless untimed; the promotion piece as a fifth
+//                           letter), online too
 //   --viewer                skip the menu: watch Stockfish vs Stockfish (--white-preset N
 //                           --black-preset N, indices into ai::presets(); --demo is an alias)
 //   --viewpoint N           viewer: start at viewpoint N (0 eyes, 1 side, 2 board, 3 hall, 4 clock,
@@ -34,11 +66,19 @@
 //   --handover-preview      viewer: follow the eyes of the player to move, flying from one to the
 //                           other after each move with the clock frozen (hot-seat preview)
 //   --tc N                  time control preset index for a game started from the command line
+//                           (0 = no clock: an untimed game)
 //   --no-intro --warp <s> --moves e2e4,e7e5,... --touch <square>
 //   --online-mock           online play against the in-process fake server (online_mock.h)
 //   --start-online [cat]    skip the menu: sign in and play the first opponent found in category
 //                           "cat" (default 5+3; with --online-mock the game starts at once);
 //                           --touch <square> touches that piece once the handshake is over
+//   --start-online direct   with --online-mock: a direct match against the fakes' friend
+//   --play-then a,b,...     once the --play moves are made, the player picks these in the Esc menu,
+//                           one per turn: resign, leave (Main menu), takeback (coach games)
+//   --replay <file.pgn>     skip the menu: replay a saved game (--game N: the Nth game of the file,
+//                           from 1; --replay-speed x1|x2|x4|x8|instant; --replay-paused;
+//                           --replay-keys K,L,J,Shift+L,Home,End,... presses these keys in turn,
+//                           each once the board is still; Leave: Esc and "Main menu")
 //   --mouse fx,fy           pointer position as fractions of the window (screenshots)
 //   --glance                a human game starts looking at the player's scoresheet (S)
 //   --calibrate             the brightness calibration before the title page, as on a first start
@@ -49,29 +89,33 @@
 #include "../chess/chess.h"
 #include "../ui/ui.h"
 #include "camera_flight.h"
+#include "clock_rules.h"
+#include "coach_args.h"
+#include "game_mode.h"
 #include "hotseat.h"
 #include "observer_camera.h"
 #include "online_live.h"
 #include "online_session.h"
 #include "physical_board.h"
+#include "replay.h"
 #include "scorekeeper.h"
 #include "world.h"
+#include <ctime>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 namespace game {
 
+struct CoachRuntime;   // game_scene_coach.cpp
+class CoachStage;
+class CoachAnalyst;
+
 enum class Controller {
     Human,
     Stockfish,
     Remote   // an online opponent: its robot plays the moves the server (or direct peer) reports
-};
-enum class GameMode {
-    Play,    // the human against Stockfish, first person
-    Watch,   // viewer mode: Stockfish against Stockfish, free observer camera
-    Online,  // the human against a player of the server or of a direct match, first person
-    HotSeat  // two humans on this PC, in turn, each from their own robot's eyes
 };
 
 struct Seat {
@@ -93,6 +137,8 @@ struct Seat {
 
 class GameScene : public Scene {
 public:
+    GameScene();
+    ~GameScene() override;
     bool init(AppContext& ctx) override;
     bool update(AppContext& ctx, float dt) override;
     void render(AppContext& ctx, float dt) override;
@@ -125,12 +171,15 @@ private:
         HumanTouched,    // a piece is gripped on its square (touch-move applies)
         HumanPlacing,    // the hand is moving the piece (and any capture / castling rook)
         HumanPromotion,  // pawn on the last rank: choosing the new piece
-        HumanPlaced,     // move made on the board, waiting for the clock press
+        HumanPlaced,     // move made on the board, waiting for the clock press (untimed: completed at once)
         HumanPressing,   // hand on its way to the clock
         AiThinking,
         AiMoving,
         RemoteWaiting,   // online: waiting for the opponent's move
-        RemoteMoving     // online: the opponent's robot is placing the move
+        RemoteMoving,    // online: the opponent's robot is placing the move
+        CoachTable,      // coach: moves being taken back, a lesson position set up or a lesson move
+                         // played by hand (the hands work on the table; nobody plays meanwhile)
+        LessonWait       // rules lesson: the coach's side is to move, or the lesson has the floor
     };
 
     // Where a piece ends up when the hand releases it.
@@ -138,6 +187,7 @@ private:
         chess::Square square = chess::NoSquare;  // NoSquare = off-board at 'pos'
         m::vec3 pos{0, 0, 0};
         bool captured = false;
+        bool reserve = false;                    // a spare back in the reserve (a promotion taken back)
     };
 
     // ---- flow ----
@@ -159,6 +209,12 @@ private:
     void offerDraw();
     void updateAi(float dt);
     void onClockPressed(int seat);
+    // The move on the board is completed (FIDE 6.2.1; untimed: 4.7): the arbiter's verdict, the
+    // move into game_, the scoresheets, the end of the game, then the turn passes (hot-seat: the
+    // handover). The one entry point for every completed offline move: the clock press
+    // (onClockPressed) of a timed game, the last piece released (updatePlaying) of an untimed one.
+    // Ignored unless a move by 'seat' waits for its completion.
+    void completeMove(int seat);
     void answerAiDrawOffer(int offeringSeat);
     void handleEvents(int seat, std::vector<anim::Event>& events);
 
@@ -183,9 +239,15 @@ private:
     int humanSeat() const { return seatOf(humanColor_); }
     int aiSeat() const { return 1 - humanSeat(); }
     bool isHumanSeat(int seat) const { return seats_[seat & 1].human(); }
-    bool watching() const { return mode_ == GameMode::Watch; }
+    // The viewer mode, and a replay: both are watched from the free observer camera, with the
+    // viewpoints, the overlay and the Esc menu of the viewer (replaying() tells them apart).
+    bool watching() const { return mode_ == GameMode::Watch || mode_ == GameMode::Replay; }
+    bool replaying() const { return mode_ == GameMode::Replay; }
     bool online() const { return mode_ == GameMode::Online; }
     bool hotSeat() const { return mode_ == GameMode::HotSeat; }
+    // No time control: no clock press, the move is completed as its last piece is released
+    // (clock_rules.h). Never online.
+    bool untimed() const { return untimedGame(online(), clock_.timeControl()); }
     // The seat whose player has the mouse and keyboard: the human, or in a hot-seat game the seat
     // to move (hotseat::inputSeat).
     int inputSeat() const;
@@ -196,7 +258,8 @@ private:
     int firstPersonSeat() const;
     bool opponentMoving() const { return turn_ == Turn::AiMoving || turn_ == Turn::RemoteMoving; }
     // The player's robot presses the clock by itself once the move is on the board: online the
-    // authority decides (og_.autoPress), on this PC Options > Gameplay (off by default).
+    // authority decides (og_.autoPress), on this PC Options > Gameplay (off by default). Untimed
+    // games have no press at all (untimed()).
     bool autoPressClock() const;
     ai::ClockInfo clockInfo() const;
     chess::TimeControl chosenTimeControl() const;
@@ -231,7 +294,7 @@ private:
     // ---- hot-seat (two players on one PC) ----
     void initHotSeatArgs();                    // command line: --hotseat and its options
     void configureHotSeatSeats();
-    void startHandover(int mover);             // after a clock press: the view goes to the other player
+    void startHandover(int mover);             // move completed (completeMove): the view goes to the other player
     void updateHandover(float dt);             // inside simulate, after the animation update
     void landHandover();
     void beginLook(int seat, bool snap);       // the seat's first-person look takes its head over
@@ -243,7 +306,10 @@ private:
     ui::GameOverExtras hotSeatGameOverExtras() const;
     void swapHotSeatColours();                 // rematch
     bool anyInputHeld() const;
-    void updateScript(float dt);               // --play: the next scripted move, when idle
+    void updateScript(float dt);               // --play: the next scripted move, when idle; then --play-then
+    // The action of the Esc menu chosen this frame: the one --play-then queued (scripted runs),
+    // else what 'shown' (the menu drawn this frame) returned.
+    ui::MenuAction menuChoice(ui::MenuAction shown);
 
     // ---- online play (game_scene_online.cpp) ----
     struct RemoteMove { int ply = 0; uint16_t move = 0; };
@@ -296,6 +362,77 @@ private:
     int64_t onlineClockMs(int color) const;   // server time, extrapolated
     bool myFirstMoveMade() const;
 
+    // ---- Coach mode (game_scene_coach.cpp) ----
+    friend class CoachStage;
+    friend class CoachAnalyst;
+    bool coach() const { return mode_ == GameMode::Coach; }
+    bool lesson() const { return coach() && coachLevel_ == 0; }   // the rules lesson
+    // Legal-move hints: the option, forced on in the rules lesson.
+    bool legalHints() const;
+    void initCoachArgs();                     // command line: --coach and its options
+    void refreshCoachVoice();                 // are the voice's model files there (tts::modelFilesPresent)
+    CoachRuntime& coachRuntime();             // created on first use: the voice starts loading
+    bool coachVoiceExpected() const;          // the voice files are there (the coach page's notice)
+    void setupCoachGame();                    // part of setupNewGame() for a coach game
+    void configureCoachSeats();
+    void startCoachGame();                    // startPlaying(): the session begins
+    void leaveCoachGame();                    // back to the menu, a new game, shutdown: silence
+    void shutdownCoach();                     // before audio::shutdown(): the TTS worker joins
+    void updateCoach(float dt);               // once per frame (inside simulate, after the animators)
+    void updateCoachInput();                  // Playing: Esc menu, the HUD, Space, Backspace, input
+    void updateCoachGameOver();               // GameOver: Space skips the appraisal, the HUD
+    void coachMoveCompleted();                // completeMove(): after the move is recorded
+    void coachGameOver();                     // endGame()
+    void endLesson();                         // the rules lesson is over: its own ending
+    bool coachEndCardReady() const;           // GameOver: the coach has said everything
+    bool coachHandshakeWanted() const;        // GameOver: the closing words are said
+    bool coachHoldsMove() const;              // updateAi: the coach's move waits (review, hands)
+    bool coachMayTouch() const;               // the player may touch a piece now
+    void coachPlayerTouched();                // humanTouch(): the session hears of it
+    void coachIllegalAttempt(chess::Square from, chess::Square to);
+    bool coachBookMove(chess::Move& mv);      // updateAi: the teaching repertoire's move, if any
+    void coachGazeTarget(m::vec3& target);    // updateGaze: where the coach looks while it talks
+    // render(): the pieces the coach designates and its marks on the board, this frame.
+    void coachMarks(std::vector<PieceHighlight>& highlights, std::vector<CoachMark>& marks);
+    void drawCoachSubtitles();                // renderOverlay()
+    void persistCoachResults();               // Settings [coach] from the session (once per game)
+    bool coachCanTakeBack() const;            // the Esc menu's "Take back" (session and scoresheets)
+    void coachOfferDraw();                    // the Esc menu: the coach answers after an analysis
+    void coachPauseMenuFrame();               // the Esc menu of a coach game (paused_)
+    void coachHudFrame();                     // the takeback card and the skip hint, their answers
+    void runCoachTable(float dt);             // the coach's table jobs (demonstrations, takebacks...)
+    void runStageTest(float dt);              // --coach-stage-test
+
+    // ---- saved games (game_archive.h, game_saving.h) ----
+    // Saves the game being played in the folder of saved games, once (archived_): at its end, when
+    // the player leaves it, and as a safety net (the menu, the window closed). 'finished': it has
+    // a result (a direct match: what its authority reports, see saving::directMatchRecord).
+    void archiveGame(bool finished);
+
+    // ---- replay of a saved game (GameMode::Replay) ----
+    bool loadReplay(const std::string& path, int game);   // replayRecord_ from a file, false (logged) when it cannot be read
+    void setupReplay();                       // part of setupNewGame(): the replay clock, the sheets' header
+    Scorekeeper::Details replaySheetDetails() const;   // the record's Event and Round
+    std::string replaySheetDate() const;      // its Date as a scoresheet writes dates
+    void configureReplaySeats();              // the players of the record (names, Elo) in robot seats
+    chess::TimeControl replayTimeControl() const;   // the record's: untimed without TimeControl or clocks
+    void updateReplay(float dt);              // updatePlaying() while replaying: the replay clock drives the robots
+    // The robot of 'seat' plays 'mv' on the board: touch, carry, capture, castling rook, promotion
+    // swap, clock press (untimed: completed as its last piece is released). Stockfish's moves and
+    // the replay's.
+    void playRobotMove(int seat, const chess::Move& mv);
+    void setReplayPosition(int ply);          // the board, the game and the sheets at 'ply', at once
+    void completeReplayMove(int seat, const chess::Arbiter::Verdict& v);   // completeMove() of a replay
+    void endReplay();                         // the record's last move is played: its result card
+    ui::GameOverExtras replayGameOverExtras() const;   // the record's players and result, "Replay again"
+    // A record that starts with Black to move (a FEN game, "40... Kd7"): 1, its moves go one ply
+    // further on the sheets and in the move list, after White's cell left with "..."; else 0.
+    int replaySheetOffset() const;
+    void updateReplayInput();
+    bool replayKey(const std::string& key);   // "K", "J", "L", "Shift+J", "Shift+L", "Home", "End"
+    void drawReplayBar();                     // the replay's buttons, speed and move counter
+    ClockDisplay replayClockDisplay() const;  // the record's clocks (replayClock_), dashes without them
+
     // ---- viewer mode ----
     bool observerView() const;                // the observer camera is the view
     void updateWatchInput();                  // once per frame: menu, viewpoints, overlay
@@ -303,6 +440,9 @@ private:
     CameraPose viewpoint(int n) const;        // presets 1..9 (0 = eyes of the player to move)
     CameraPose eyePose(int seat) const;
     void selectViewpoint(int n, bool jump);
+    // A move completed while watching through the players' eyes: the view flies to the other
+    // player's (the hot-seat handover; --handover-preview also freezes the clock until it lands).
+    void followEyesAfterMove(int seat);
     int headNearCamera(m::vec3 p) const;      // seat whose head contains p (drawn headless), or -1
     float observerFocus(const render::Camera& cam) const;
     float firstPersonFocus(const m::Ray& gaze) const;  // distance the player's eyes focus at
@@ -333,6 +473,7 @@ private:
     bool startWatching_ = false;  // --viewer
     bool skipIntro_ = false;
     bool warpDone_ = false;
+    float warpLeft_ = 0.0f;             // --warp time still to run after a --play-then menu choice
     chess::Color humanColor_ = chess::White;
     ui::NewGameSetup setup_;
     ui::WatchSetup watch_;
@@ -387,7 +528,7 @@ private:
     };
     Look look_[2];
     // S: the player whose eyes are the view looks at their own scoresheet. One state for the
-    // view, not per seat: in a hot-seat game a turn's look ends at the clock press (startHandover).
+    // view, not per seat: in a hot-seat game a turn's look ends with the move (startHandover).
     bool glance_ = false;
     float glanceBlend_ = 0.0f;
     bool dragging_ = false;
@@ -423,7 +564,7 @@ private:
     bool inputBlocked_ = false;         // this frame: the gate holds the input back
     int viewSeat_ = 0;                  // the seat whose eyes the view is in (outside a handover)
     float writeGrace_ = 0.0f;           // after the landing: a piece touched before it ends defers the writing
-    int drawOfferBy_ = -1;              // seat whose draw offer goes with its next clock press
+    int drawOfferBy_ = -1;              // seat whose draw offer goes with its next move (completeMove)
     int drawCardFor_ = -1;              // seat asked to accept a draw (card)
     float captionAge_ = 1e9f;           // "Bob, your move" (since the handover began)
     float handoverArg_ = -1.0f;         // --handover <s> (this session only); -1 = Options > Gameplay
@@ -433,6 +574,29 @@ private:
     std::vector<std::string> script_;
     size_t scriptPos_ = 0;
     chess::PieceType scriptPromo_ = chess::NoPiece;
+    // --play-then: what the player picks in the Esc menu once the moves of --play are made
+    std::vector<std::string> scriptThen_;
+    size_t scriptThenPos_ = 0;
+    ui::MenuAction scriptMenu_ = ui::MenuAction::None;   // chosen in the Esc menu this frame
+
+    // Saved games: the time each move took, by ply (the clock's own count: pauses and hot-seat
+    // handovers excluded), and the mover's clock after it (-1 untimed, or a move set up by --moves)
+    std::vector<int64_t> moveElapsedMs_, moveClockMs_;
+    double plyElapsedMs_ = 0.0;         // the turn being played, so far
+    std::time_t gameStartedAt_ = 0;     // the first turn began (Date and Time tags)
+    bool archived_ = false;             // archiveGame() ran for this game
+    bool directMatch_ = false;          // the online game is a direct match (link_ goes before saving)
+    ui::LibrarySetup library_;          // the title page's "Saved games" entry
+
+    // Replay (GameMode::Replay)
+    chess::pgn::Record replayRecord_;   // the game replayed
+    replay::ReplayClock replayClock_;   // when its moves are played, what its clocks show
+    replay::Speed replaySpeedArg_ = replay::Speed::X1;   // --replay-speed
+    bool replayPausedArg_ = false;      // --replay-paused
+    float replayMoveAt_ = 0.0f;
+    std::vector<std::string> replayKeys_;   // --replay-keys
+    size_t replayKeysPos_ = 0;
+    float replayKeyWait_ = 0.0f;         // time_ when the robot began the move being played (log)
 
     // UI
     bool showMoveList_ = false;
@@ -512,6 +676,15 @@ private:
     std::string startOnline_;           // --start-online category
     std::string startTouch_;            // --start-online with --touch <square>: touched once idle
     float fadeDip_ = 0.0f;              // short darkening while the board is rebuilt
+
+    // Coach mode
+    CoachArgs coachArgs_;               // --start --coach and its options
+    ui::CoachSetup coachSetup_;         // the coach page's choice
+    int coachLevel_ = 1;                // the coach game being played: 0 = the rules lesson, 1..6
+    float coachFaceLift_ = 0.0f;        // 0..1: the view rises gently to the coach's face as it talks to the player
+    float coachFade_ = 0.0f;            // a lesson position being set up behind a fade
+    bool coachVoiceFiles_ = false;      // tts::modelFilesPresent() at start-up
+    std::unique_ptr<CoachRuntime> coach_;
 };
 
 }  // namespace game

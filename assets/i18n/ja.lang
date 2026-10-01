@@ -68,6 +68,11 @@ options.effects = 効果音
 options.ambience = 環境音
 options.ambience.help = 広間のざわめき：暖炉の火、遠くの足音、古い時計。
 options.ambience_volume = 環境音の音量
+options.voice_volume = 音声の音量
+options.voice_volume.help = コーチモードでのコーチの声の音量。
+options.subtitles = 字幕
+options.subtitles.auto = 自動
+options.subtitles.help = コーチの言葉を画面の下に表示します。自動：コーチがメニューの言語を話さないときに表示します（中国語のメニューではコーチは英語を話します）。声がインストールされていないときは常に表示します。
 
 options.legal_moves = 合法手を表示
 options.legal_moves.help = 触れた駒が進めるマスを強調します。オフにすると手が合法かどうかは表示されません。反則手は時計を押した時点でアービターが罰します。
@@ -111,6 +116,10 @@ controls.moves.keys = Tab
 controls.moves = 棋譜の表示・非表示
 controls.menu.keys = Esc
 controls.menu = メニュー
+controls.coach_skip.keys = スペース
+controls.coach_skip = コーチ：説明をスキップ
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = コーチ：提案されたら手を戻す
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = 明るさ
@@ -198,11 +207,20 @@ credits.engine.head = チェスエンジン
 credits.engine = Stockfish 19（Stockfish 開発者による）。
 credits.engine.licence = GNU 一般公衆利用許諾書 第3版。
 credits.engine.data = ニューラルネットワークの学習には、Leela Chess Zero プロジェクトが Open Database License（ODbL）の下で提供するデータが使われています。
+credits.voice.head = コーチの声
+credits.voice = コーチモードの合成音声は Supertonic 3 で生成しています。
+credits.voice.licence = Supertonic 3 は Supertone のモデルで、OpenRAIL-M ライセンスの下で使用しています。その利用制限はすべての利用者に適用されます（「ライセンス」を参照）。
+credits.openings.head = オープニング
+credits.openings = オープニング名は lichess.org の chess-openings データベース（CC0、パブリックドメイン）によります。
 credits.fonts.head = 書体
 credits.fonts = EB Garamond（Georg Duffner）、Cinzel（Natanael Gama）、Amiri（Khaled Hosny）。
 credits.fonts.hand = 手書き書体：Caveat、Marck Script、Bad Script、Aref Ruqaa、Klee One、LXGW WenKai（SIL Open Font License）。
 credits.fonts.figures = チェスの駒の記号は GNU FreeFont より（フォント例外付き GPL v3）。
 credits.quote = 「チェスとは分析の芸術である。」 — ミハイル・ボトヴィニク
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = ライセンス
+licences.title = ライセンス
+licences.note = ライセンスは英語の原文のまま掲載しています。
 
 # ---- Pause menu --------------------------------------------------------------------------------
 pause.title = 一時停止
@@ -371,6 +389,14 @@ viewer.keys.menu = Esc
 viewer.controls.menu = メニュー
 viewer.keys.hide = H
 viewer.controls.hide = この表示を隠す
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = 一時停止 / 再開
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = 1手戻る / 1手進む
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = 遅く / 速く
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = 対局の最初 / 最後
 viewer.speed = 速度 {0} m/s
 viewer.view.0 = 対局者の目線
 viewer.view.1 = テーブルの横
@@ -834,3 +860,191 @@ hotseat.gameover.friendly = {0} 対 {1} · 親善対局
 # {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
 hotseat.elo.change = {0} {1} → {2}（{3}）
 hotseat.elo.unrated = この対局はレーティング対象外です。
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = コーチ
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = コーチモードの合成音声は {0} で生成しています
+# Coach page
+coach.title = コーチ
+coach.section.level = レベル
+coach.section.lesson = コーチと学ぶ
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} Elo
+# {0} = coach.band
+coach.band_for = 対象：{0} のプレイヤー
+coach.completed = 修了
+coach.recommended = おすすめ
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = チェスのルール
+coach.level.0.desc = ルールを一つずつ学ぶ対話型レッスン。
+coach.level.0.detail = コーチが盤上に小さな局面を並べ、各駒の動き方と取り方、続いてキャスリング、プロモーション、チェック、チェックメイトを教えます。一つひとつ、自分で盤上で試してみましょう。
+coach.level.1.name = はじめの一歩
+coach.level.1.desc = 何が攻められ、何が守られていないか。
+coach.level.1.detail = コーチはやさしく指し、わかりやすい言葉で話します。どの駒が攻められ、どの駒が守られていないか、どうすれば駒を失わずにすむかを説明します。
+coach.level.2.name = 初心者
+coach.level.2.desc = 簡単な戦術、駒の展開、キングの安全。
+coach.level.2.detail = フォークやピンを名前で呼びます。駒の展開やキングの安全についても話します。
+coach.level.3.name = 中級者
+coach.level.3.desc = 作戦、ポーン構造、唯一の手。
+coach.level.3.detail = コーチは作戦やポーン構造を説明し、局面を保つ手が一つしかないときには知らせてくれます。
+coach.level.4.name = クラブ会員
+coach.level.4.desc = 候補手、ポーン単位の評価値。
+coach.level.4.detail = クラブのコーチのように、候補手を比べてポーン単位の評価値を示します。
+coach.level.5.name = 強いクラブ会員
+coach.level.5.desc = 簡潔な変化、ポジショナルな用語。
+coach.level.5.detail = 短いコメント、具体的な変化、ポジショナルな指し方の用語。
+coach.level.6.name = エキスパート
+coach.level.6.desc = 簡潔なコメント、深い変化、評価値。
+coach.level.6.detail = 強い者同士のように言葉は少なく、数手先までの変化と評価値を示します。
+coach.note.clock = 時計なし：好きなだけ時間をかけてください。
+coach.note.takeback = 大悪手のあとは、コーチが何がまずかったかを示し、手を戻すことを提案します。
+coach.note.lesson = あなたは白番で、コーチが各練習問題を盤上に並べます。
+coach.note.unrated = コーチとの対局はレーティング対象外です。
+coach.colour = あなたの色
+coach.colour.help = コーチと対局するときの色。交互：対局ごとに白と黒が入れ替わります。ルールのレッスンは常に白番です。
+coach.colour.alternate = 交互
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = コーチの音声がインストールされていないか、オフになっています（設定 > サウンド）。コーチの言葉は画面に表示されます。
+# At the table
+coach.speaker = コーチ
+coach.skip = スキップ
+coach.offer.title = 手を戻しますか？
+coach.offer.text = もっと良い手を探せるように、コーチが最後の手を戻すことを提案しています。
+coach.offer.hint = Backspace で戻します。駒に触れるとそのまま続けます。
+coach.offer.accept = 手を戻す
+coach.offer.decline = 続ける
+coach.pause.take_back = 自分の手を戻す
+coach.pause.take_back.help = 最後の手を戻します。コーチがすでに応じていれば、その手も戻します。
+coach.confirm.resign = この対局を投了しますか？コーチの勝ちになります。
+coach.confirm.leave = メインメニューに戻りますか？コーチとのこの対局は放棄されます。
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = もう一局
+coach.gameover.unrated = コーチとのこの対局はレーティング対象外です。
+coach.lesson.done = よくできました
+coach.lesson.done.line = これでチェスのルールを覚えました。
+coach.lesson.next = 最初の対局
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = コーチの音声
+options.coach_voice.help = コーチモードでコーチが声に出して話します。音声モデルは初めて必要になったときにダウンロードされます（約 145 MB）。オフ：コーチの言葉は画面に表示されるだけです。
+# The prompt. {0} = the size in megabytes ("145.3")
+coach.download.title = コーチの音声
+coach.download.text = コーチは Supertone 社の音声合成モデル Supertonic 3 で話します。このモデルは Scacelith に含まれていませんが、今すぐ Hugging Face からダウンロードできます（{0} MB、1 回のみ）。モデルがない場合、コーチは言葉を画面に表示します。
+coach.download.licence = このモデルは OpenRAIL-M ライセンスで公開されており、生成した音声を人間の声として示すことや、実在の人物をまねることなど、一部の使い方が禁止されています。
+coach.download.read_licence = ライセンスを読む
+coach.download.accept = 「ダウンロード」を選ぶと、このライセンスの条件に同意したことになります。
+# {0} = a folder
+coach.download.folder = 保存先：{0}
+coach.download.not_now = 今はしない
+# {0} = the size in megabytes
+coach.download.download = ダウンロード（{0} MB）
+coach.download.licence_title = OpenRAIL-M ライセンス
+coach.download.back = 戻る
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = コーチの音声
+coach.download.checking = ファイルを確認しています…
+coach.download.downloading = ダウンロードしています…
+coach.download.extracting = ファイルを展開しています…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Hugging Face から
+coach.download.from_github = GitHub から（リリースのアーカイブ）
+coach.download.cancel = キャンセル
+coach.download.failed = ダウンロードに失敗しました。
+coach.download.error.network = サーバーに接続できません。インターネット接続を確認して、もう一度お試しください。
+# {0} = a folder
+coach.download.error.disk = {0} にファイルを書き込めませんでした。空き容量を確認して、もう一度お試しください。
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = サーバーから予期しない応答がありました（{0}）。しばらくしてから、もう一度お試しください。
+coach.download.retry = 再試行
+coach.download.close = 閉じる
+# Notices
+coach.download.done = コーチの音声をインストールしました。
+coach.download.cancelled = ダウンロードを中止しました。次回は中断したところから再開します。
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = 保存した対局
+options.save_games = 対局を保存
+options.save_games.help = Stockfishとの対局、コーチとの対局、このコンピューターでの二人対局、ダイレクト対局は、終了時にPGNファイルとして保存され、「保存した対局」で見ることができます。オンライン対局はサーバーが保管します。
+library.title = 保存した対局
+library.section.games = 対局
+library.section.details = 対局の詳細
+library.section.tags = タグ
+library.section.moves = 棋譜
+library.count = {0}局
+library.filter = 表示
+library.filter.all = すべての対局
+library.filter.play = Stockfishとの対局
+library.filter.coach = コーチとの対局
+library.filter.hotseat = 二人対局
+library.filter.direct = ダイレクト対局
+library.filter.imported = インポート
+library.mode.play = Stockfishとの対局
+library.mode.coach = コーチとの対局
+library.mode.hotseat = 二人対局
+library.mode.direct = ダイレクト対局
+library.mode.imported = インポート
+library.coach_level = レベル{0}
+library.unknown_player = 不明
+library.unfinished = 未終局
+library.unreadable = この対局は読み込めません。
+library.moves = {0}手
+library.opening_variation = {0}：{1}
+library.file = ファイル：{0}
+library.file_game = ファイル：{0}（{2}局中{1}局目）
+library.no_moves = 指し手はありません。
+library.none_selected = リストから対局を選んでください。
+library.reading = 保存した対局を読み込んでいます
+library.empty.title = 保存した対局はまだありません
+library.empty.text = Stockfishとの対局、コーチとの対局、このコンピューターでの二人対局、ダイレクト対局は、終了するとここに表示されます。このフォルダーにPGNファイルを置くこともできます。他のソフトやウェブサイトから書き出した対局も一緒に表示されます。
+library.empty.filter = この種類の対局はありません。
+library.error.folder = 保存した対局のフォルダーを読み込めません
+library.error.game = この対局は読み込めません：{0}
+library.folder = フォルダー：{0}
+library.open_folder = フォルダーを開く
+library.open_failed = フォルダーを開けませんでした。
+library.replay = 再生
+library.delete = 削除
+library.delete.title = 対局を削除
+library.delete.text = 対局 {0} をファイルごとこのコンピューターから削除します。元に戻すことはできません。
+library.delete.ok = 削除
+library.delete.several = このファイルには{0}局が含まれているため、フォルダーからのみ削除できます。
+library.deleted = 対局を削除しました。
+library.delete.failed = 対局を削除できませんでした。
+library.delete.changed = ファイルが変更されたため、リストを更新しました。
+library.truncated = このフォルダーには対局が多すぎるため、最新の{0}局のみを表示しています。
+library.tag.Event = 大会
+library.tag.Site = 場所
+library.tag.Date = 日付
+library.tag.Time = 時刻
+library.tag.Round = ラウンド
+library.tag.White = 白
+library.tag.Black = 黒
+library.tag.Result = 結果
+library.tag.WhiteElo = 白のレーティング
+library.tag.BlackElo = 黒のレーティング
+library.tag.TimeControl = 持ち時間
+library.tag.Termination = 終局理由
+library.tag.Opening = オープニング
+library.tag.Variation = 変化
+library.tag.PlyCount = 手数
+library.tag.FEN = 開始局面
+library.tag.ScacelithMode = モード
+library.tag.CoachLevel = コーチのレベル
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = {1}手中 {0}手目
+replay.speed.factor = ×{0}
+replay.speed.instant = 即時
+replay.again = もう一度再生
+replay.gameover.unfinished = {0}手目で中断され、結果はありません。
+replay.tip.start = 対局の最初へ（Home）
+replay.tip.back = 1手戻る（J）
+replay.tip.pause = 一時停止（K）
+replay.tip.resume = 再開（K）
+replay.tip.forward = 1手進む（L）
+replay.tip.end = 対局の最後へ（End）

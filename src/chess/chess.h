@@ -38,6 +38,16 @@ inline Square makeSquare(int file, int rank) { return Square(rank * 8 + file); }
 std::string squareName(Square s);           // "e4" ("-" for NoSquare)
 Square parseSquare(const std::string& s);   // "e4" -> 28, NoSquare on error
 
+// Square sets (bitboards, bit s = square s) for the board queries of Position and the coach.
+inline uint64_t squareBit(Square s) { return uint64_t(1) << s; }
+std::vector<Square> squaresOf(uint64_t set);  // ascending order (a1 first)
+int squareCount(uint64_t set);
+// Squares a piece of type t and colour c standing on s attacks with the board occupancy 'occ'
+// (sliders stop at the first piece; a pawn: its two capture squares).
+uint64_t attacksOf(PieceType t, Color c, Square s, uint64_t occ);
+// Squares strictly between two squares on one line (rank, file or diagonal); 0 when not aligned.
+uint64_t squaresBetween(Square a, Square b);
+
 // An en passant capture carries MoveCapture | MoveEnPassant; a capturing promotion carries
 // MoveCapture | MovePromotion.
 enum MoveFlags : uint8_t {
@@ -95,6 +105,26 @@ public:
     bool isStalemate() const { return !inCheck() && !hasLegalMove(); }
     // Repetition identity (FIDE 9.2.3): placement, side to move, castling rights, en passant.
     bool samePosition(const Position& o) const;
+
+    // ---- Board queries for explanations (the coach's tactics, src/coach/tactics.h) ----------------
+    // Square sets are bitboards: bit s stands for square s (a1 = bit 0); squaresOf() lists them.
+    uint64_t pieces(Color c) const { return colorBB_[c]; }
+    uint64_t pieces(PieceType t) const { return typeBB_[t]; }
+    uint64_t pieces(Color c, PieceType t) const { return colorBB_[c] & typeBB_[t]; }
+    uint64_t occupancy() const { return occupied(); }
+    // Pieces of both colours attacking s when the board holds 'occ' (pawns by their capture
+    // pattern, the king included). Pass an occupancy without pieces already exchanged on s to see
+    // the x-rays behind them; the result only holds pieces present in 'occ'.
+    uint64_t attackersTo(Square s, uint64_t occ) const;
+    uint64_t attackersTo(Square s, Color by) const { return attackersTo(s, occupied()) & colorBB_[by]; }
+    // Squares the piece on s attacks (a pawn: its two capture squares, whatever stands there); 0 if s is empty.
+    uint64_t attacksFrom(Square s) const;
+    uint64_t checkers() const;                    // pieces giving check to the side to move
+    uint64_t pinned(Color c) const;               // c's pieces pinned to their own king (absolute pins)
+    // Null move for analysis: the other side is to move (en passant cleared, halfmove clock + 1,
+    // hash updated). False, and nothing changes, when the side to move is in check. The result is
+    // for questions such as "what does the opponent threaten": never feed it to a Game or the arbiter.
+    bool passTurn();
 
     std::string toSAN(const Move& m) const;       // "Nbd7", "exd8=Q+", "O-O#" ("" if m is not legal)
     std::string toUCI(const Move& m) const;       // "e7e8q"
@@ -158,13 +188,26 @@ public:
     bool resetFromFEN(const std::string& fen);    // custom start position (tests, analysis); false = invalid FEN
     const Position& position() const { return positions_.back(); }
     const Position& startPosition() const { return positions_.front(); }
+    // Position before move 'ply' (0 = the start position, moves().size() = the current one); clamped.
+    const Position& positionAt(size_t ply) const { return positions_[ply < positions_.size() ? ply : positions_.size() - 1]; }
     const std::vector<Move>& moves() const { return moves_; }
     const std::vector<std::string>& sanMoves() const { return san_; }
     std::vector<std::string> uciMoves() const;
     bool play(const Move& m);                     // legal move; updates status (mate, stalemate, 5-fold, 75, material)
+    // Takes the last 'plies' moves back (a takeback, a demonstration line undone): the record is as
+    // if they had never been played. The status is derived again from the position reached, so an
+    // ending the moves brought (mate, stalemate, repetition) is lifted, and so is any other ending
+    // (resignation, agreement, flag fall, claim, forfeit): taking moves back reopens the game.
+    // False (nothing changes) unless 1 <= plies <= moves().size().
+    bool undo(int plies = 1);
     GameStatus status() const { return status_; }
     GameEndReason endReason() const { return reason_; }
     bool isOver() const { return status_ != GameStatus::Ongoing; }
+    // Off: the game never ends by itself (mate, stalemate, dead position, 5-fold, 75 moves): the
+    // rules lesson of Coach mode plays exercises on positions that are over on load (two kings
+    // alone) and goes on after a mate. On by default; reset() and resetFromFEN() keep the setting.
+    void setEndDetection(bool on) { endDetection_ = on; }
+    bool endDetection() const { return endDetection_; }
     const char* resultString() const;             // "1-0", "0-1", "1/2-1/2", "*"
     int repetitionCount() const;                  // occurrences of the current position
     bool canClaimThreefold() const;               // current position occurred >= 3 times
@@ -183,6 +226,7 @@ private:
     std::vector<std::string> san_;
     GameStatus status_ = GameStatus::Ongoing;
     GameEndReason reason_ = GameEndReason::None;
+    bool endDetection_ = true;
     void finish(GameStatus s, GameEndReason r);
     void updateStatus();
 };

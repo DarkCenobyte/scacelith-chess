@@ -101,6 +101,13 @@ struct DrawItem {
     // and TAA blends them into a see-through surface. Shadows and probes are unaffected. Only
     // honoured by materials with the MATERIAL_SCREEN_DOOR define (others stay opaque).
     float opacity = 1.0f;
+    // Designation highlight of opaque draws in the main view and the planar reflections (Coach
+    // mode: the pieces the coach talks about), as if a cool light of hue rgb picked the object
+    // out, breathing slowly (forward.frag): a pale object turns a cooler white, and towards the
+    // silhouette every object takes on the hue, with a thin rim of rgb (as a level after
+    // exposure, sunlit white marble ~2.5) that keeps it visible on dark ones. a = strength in
+    // [0,1] (0 = off). No new program variant: any material.
+    m::vec4 highlight{0.0f, 0.0f, 0.0f, 0.0f};
 };
 
 // Point light; becomes a spot light after setSpot() (spotCosOuter > -1). 64 bytes, mirrors PointLightData.
@@ -201,6 +208,7 @@ struct DrawDataGPU {
     m::vec4 instParams[4];
     m::vec4 info;           // x = objectSeed, y = planarReflector index (-1 none), z = flags, w = objectId
     m::vec4 fade;           // x = screen-door opacity, y = 1 when the dither changes every frame (TAA), zw unused
+    m::vec4 highlight;      // DrawItem::highlight
 };
 
 enum class PassId { Main = 0, Prepass = 1, Shadow = 2, Planar = 3, Probe = 4 };

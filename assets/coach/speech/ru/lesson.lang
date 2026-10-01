@@ -1,0 +1,266 @@
+# Coach speech (Russian): the rules lesson (level 0, src/coach/lesson.cpp; research-pedagogy §3).
+# Same keys and variants as assets/coach/speech/en/lesson.lang.
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("твоя ладья", "мой конь"), with
+# the forms of common.lang ({my:acc}, {my:gen}, {my:ins}, {your:bare_ins}, {your:pron} ...);
+# {sq}, {sq2}, {to}, {esc} = squares; {move} = a move. {@}, {@2}, {@3} are invisible marks: the coach
+# points at something while saying the word right after the mark. A ".spoken" key is what the voice
+# says instead (here: the Latin file letters said as Cyrillic letter names, which the voice reads).
+# Rules the lines follow: no past tense, short adjective or participle with a piece placeholder or the
+# player as subject (their gender varies); "своей"/no possessive, not "твоей", when the player acts
+# with their own piece ({your:bare_ins}); files = вертикали, ranks = горизонтали, back rank =
+# последняя горизонталь.
+
+# ---- Chapter titles (said inside "Продолжим урок: {chapter}.") --------------------------------------
+# Nominative, lower case (see event.lesson.* in events.lang).
+lesson.title.welcome = шахматная доска
+lesson.title.pieces = как ходят фигуры
+lesson.title.safety = безопасные и опасные взятия
+lesson.title.check = шах
+lesson.title.mate = мат
+lesson.title.castling = рокировка
+lesson.title.en_passant = взятие на проходе
+lesson.title.promotion = превращение пешки
+lesson.title.draws = пат и ничья
+lesson.title.etiquette = рейтинг, часы и этикет в настоящих партиях
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Теперь попробуй ты.
+lesson.now_you.2 = Теперь твой ход.
+lesson.now_you.3 = Теперь ты.
+# Another wrong move after the demonstration.
+lesson.almost = Почти! Сыграй ход, который я показал.
+lesson.almost.2 = Не совсем. Повтори ход из моего примера.
+lesson.almost.3 = Близко. Вспомни, что я только что показал.
+# A wrong move without a line of its own.
+lesson.try_again = Не то. Попробуй ещё раз.
+lesson.try_again.2 = Не этот ход. Попробуй снова.
+lesson.try_again.3 = Давай попробуем ещё раз.
+lesson.use_your = Ходи {your:bare_ins}.
+lesson.use_your.2 = Попробуй сыграть {your:bare_ins}.
+lesson.watch = Смотри.
+lesson.like_this = Вот так.
+lesson.and_back = И обратно.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Шах, но мой король уходит на {esc}.
+lesson.check_takes = Шах, но мой король просто забирает {your:acc}.
+lesson.check_block = Шах, но я могу закрыться фигурой.
+lesson.stalemate = Пат! Моему королю некуда ходить, а шаха нет. Ничья, хотя позиция была выигрышной!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Не на {sq}: это поле бьёт {my}. Король никогда не встаёт под удар.
+why.PathBlocked = На {@}пути стоит фигура: перепрыгивать умеет только конь.
+why.WrongGeometry = {your} так не ходит.
+why.MustAnswerCheck = Тебе {@}шах: сначала нужно от него защититься.
+why.CastlingThroughCheck = Твой король прошёл бы через {sq}, а это поле бьёт {my}.
+why.CastlingNoRights = Король или эта ладья уже ходили, так что рокировка невозможна.
+why.CastlingBlocked = Для рокировки поля между королём и ладьёй должны быть свободны.
+why.CastlingOutOfCheck = Под шахом рокироваться нельзя.
+why.PawnForwardBlocked = Прямо вперёд пешка не бьёт, а это поле {@}занято.
+why.LeavesKingInCheck = Связка: если {your} уйдёт, твой король попадёт под удар {my:gen}.
+why.OwnPieceOnTarget = Нельзя ходить на поле, где стоит твоя же фигура.
+why.PawnCaptureNeedsVictim = По диагонали пешка ходит, только когда бьёт.
+why.EnPassantExpired = Брать на проходе можно только сразу после хода пешки на два поля.
+why.NotYourTurn = Подожди: сейчас мой ход.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Привет! Я твой тренер. Давай вместе изучим правила шахмат, шаг за шагом.
+lesson.welcome.board = Это шахматная доска: шестьдесят четыре поля, светлые и тёмные, восемь на восемь.
+lesson.welcome.light = Угловое поле {@}справа от тебя всегда светлое. Запомни: справа — светлое.
+lesson.welcome.files = Столбцы называются вертикалями. Они обозначаются буквами, от {@}a до {@2}h.
+lesson.welcome.files.spoken = Столбцы называются вертикалями. Они обозначаются буквами, от {@}а до {@2}аш.
+lesson.welcome.ranks = Ряды — это горизонтали, у них номера от {@}одного до {@2}восьми, считая от тебя.
+lesson.welcome.square = Поле называют так: сначала буква, потом цифра. Вот это поле — {sq}.
+lesson.welcome.square2 = А это — {sq}.
+lesson.welcome.kings = Вот два короля. Твой стоит на {sq}, мой — на {sq2}.
+lesson.welcome.ask = Твой ход: передвинь короля на одно поле вперёд, на {sq}.
+lesson.welcome.wrong = Это {to}. А нужно поле {sq}: буква e, цифра два.
+lesson.welcome.wrong.spoken = Это {to}. А нужно поле {sq}: буква е, цифра два.
+lesson.welcome.ok = Отлично. Твой король стоит на {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = Это {your}. {your:pron} ходит по вертикалям и горизонталям на любое расстояние.
+lesson.rook.lines = Вверх по вертикали — {@}или по горизонтали.
+lesson.rook.capture = При взятии фигура встаёт на место {@}фигуры соперника, а та покидает доску.
+lesson.rook.ask = Возьми {my:acc} ладьёй!
+lesson.rook.short = Направление верное! Дальше вверх по вертикали, прямо до {my:gen}.
+lesson.rook.rank = Это ход по горизонтали. А {my} — выше по вертикали.
+lesson.rook.king = Это твой король. Сыграй {your:bare_ins} из угла.
+lesson.rook.ok = Есть! {my} покидает доску.
+# Pieces don't jump
+lesson.jump.blocked = Фигуры не перепрыгивают через другие. Твоя пешка на {sq} закрывает ладье путь.
+lesson.jump.knight = Прыгать умеет только конь. С ним мы скоро познакомимся.
+# Bishop
+lesson.bishop.intro = Это {your}. {your:pron} ходит по диагонали на любое расстояние.
+lesson.bishop.colour = Слон всегда остаётся на полях одного цвета.
+lesson.bishop.ask = {my} стоит на этой диагонали. Возьми {my:pron_acc}!
+lesson.bishop.short = Диагональ верная! Иди дальше, до {my:gen}.
+lesson.bishop.other = Это другая диагональ. Смотри в сторону {my:gen}.
+lesson.bishop.ok = Отлично. Слоны любят длинные диагонали.
+# Queen
+lesson.queen.intro = Это {your}, самая сильная фигура. {your:pron} ходит как ладья и слон вместе.
+lesson.queen.ask = Найди {my:acc} и возьми {my:pron_acc} ферзём.
+lesson.queen.wrong = Твой ферзь может дойти до {my:gen} одним ходом, по диагонали.
+lesson.queen.ok = Молодец! Береги ферзя: он очень ценный.
+# King
+lesson.king.intro = Король ходит всего на одно поле, в любую сторону.
+lesson.king.important = Король — самая важная фигура. Если ему некуда деться, партия проиграна.
+lesson.king.ask = Король тоже умеет брать. Возьми {my:acc}!
+lesson.king.wrong = Твой король стоит совсем рядом с {my:ins}. Шагни на {my:pron_acc} поле и возьми {my:pron_acc}.
+lesson.king.ok = Хорошо! Король ходит медленно, но вблизи он силён.
+# Knight
+lesson.knight.intro = Это {your}. {your:pron} ходит буквой «Г»: два поля прямо, потом одно в сторону.
+lesson.knight.l = Вот {@}так. Конь всегда попадает на поле другого цвета.
+lesson.knight.jump = Конь — единственная фигура, которая умеет перепрыгивать через другие.
+lesson.knight.ask = Возьми {my:acc} конём!
+lesson.knight.wrong = Ход конём правильный, но до {my:gen} так не добраться. Попробуй другую «Г».
+lesson.knight.ok = Отличный прыжок!
+# Pawn: moving
+lesson.pawn.intro = Теперь {your}. {your:pron} ходит прямо вперёд, по одному полю, и никогда назад.
+lesson.pawn.first = Первым ходом пешка может пойти на одно или на два поля.
+lesson.pawn.ask = Продвинь пешку на два поля вперёд.
+lesson.pawn.one = Это на одно поле: так можно, но сейчас пойди на два.
+lesson.pawn.use = Ходи пешкой.
+lesson.pawn.ok = Хорошо.
+# Pawn: capturing
+lesson.pawncap.blocked = Моя пешка загораживает твою. Прямо вперёд пешки не бьют.
+lesson.pawncap.diagonal = Зато пешка бьёт наискосок, на одно поле вперёд.
+lesson.pawncap.ask = Возьми {my:acc} пешкой.
+lesson.pawncap.use = Бери {your:bare_ins}: {your:pron} бьёт наискосок вперёд.
+lesson.pawncap.ok = Да! Ходит прямо, бьёт наискосок.
+# Values, set-up and the first moves
+lesson.values.pawn = У каждой фигуры есть ценность в очках. Пешка стоит одно очко.
+lesson.values.pieces = Конь или {@}слон — три. {@2}Ладья — пять. {@3}Ферзь — девять.
+lesson.values.king = Король бесценен: его никогда нельзя отдать.
+lesson.values.trade = Старайся не отдавать фигуру дешевле, чем она стоит.
+lesson.setup.corners = Каждая партия начинается так: ладьи в {@}углах, рядом {@2}кони, затем {@3}слоны.
+lesson.setup.queen = Ферзь любит свой цвет: твой белый ферзь стоит на светлом поле.
+lesson.setup.king = Король стоит рядом с ним. Первыми всегда ходят белые.
+lesson.first.ask = Начинаем партию: продвинь пешку перед королём на два поля, на {sq}.
+lesson.first.wrong = Так тоже можно! Но сейчас, пожалуйста, сыграй королевской пешкой на {sq}.
+lesson.first.ok = Отличный первый ход: он открывает дорогу ферзю и слону.
+lesson.first.reply = Я отвечаю так же. Теперь выведи коня: прыжок с {sq} на {sq2}.
+lesson.first.knight_wrong = Конь перепрыгивает через пешки. Попробуй с {sq} на {sq2}.
+lesson.first.knight_ok = Отлично. Коней и слонов выводят в начале партии.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Фигура защищена, если другая фигура того же цвета может взять в ответ.
+lesson.safety.pawn = Моя {@}пешка защищает {my:acc}.
+lesson.safety.free = А у {my:gen} защиты нет. Твой ферзь атакует обе фигуры.
+lesson.safety.ask = Возьми незащищённую фигуру!
+lesson.safety.watch = Смотри, что будет.
+lesson.safety.gave = Ферзь отдан за коня: девять очков за три.
+lesson.safety.other = Попробуй другую фигуру.
+lesson.safety.look = Найди фигуру, которую ничто не защищает.
+lesson.safety.ok = Отлично! Всегда спрашивай себя: защищена ли эта фигура?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = Моя ладья контролирует всю вторую горизонталь.
+lesson.danger.rule = Король не может встать на поле, которое атакует соперник.
+lesson.danger.ask = Уведи короля на безопасное поле.
+lesson.danger.ok = Верно. Там твой король в безопасности.
+lesson.check.what = Моя ладья атакует твоего короля. Это называется шах.
+lesson.check.must = Если тебе шах, от него нужно защититься сразу же.
+lesson.check.ways = Есть три способа: {@}уйти королём, {@2}закрыться или {@3}взять атакующую фигуру.
+lesson.check.ask = Здесь уведи короля из-под шаха.
+lesson.check.file = Поле {to} всё ещё на {@}вертикали моей ладьи. Уйди с этой линии.
+lesson.check.ok = Хорошо: шаха больше нет.
+lesson.block.again = Снова шах! На этот раз твоему королю некуда отступить.
+lesson.block.ask = Значит, закройся: поставь фигуру на линию шаха.
+lesson.block.queen = Шах закрыт! Но моя ладья может взять ферзя. Закройся фигурой подешевле.
+lesson.block.queen_ok = Сработало. Запомни: закрывайся самой дешёвой фигурой.
+lesson.block.ok = Отлично. Закрывайся наименее ценной фигурой.
+lesson.capture.check = Мой ферзь объявляет шах вплотную к твоему королю.
+lesson.capture.ask = Возьми атакующую фигуру!
+lesson.capture.king_ok = Да! Мой ферзь был без защиты, поэтому твой король смог его взять.
+lesson.capture.knight_ok = Да! Твой конь убрал атакующую фигуру.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Мат: королю объявлен шах, и спасения нет. Это победа в партии.
+lesson.mate1.stuck = Мой король заперт за {@}своими пешками.
+lesson.mate1.ask = Поставь мне мат в один ход!
+lesson.mate1.wrong = Почти! Дай шах по последней горизонтали: оттуда моему королю не уйти.
+lesson.mate1.ok = Мат! Это мат по последней горизонтали. Запомни его!
+lesson.mate2.ask = Твои король и ферзь работают вместе. Поставь мне мат в один ход.
+lesson.mate2.wrong = Найди шах, после которого у моего короля не останется ни одного поля.
+lesson.mate2.ok = Мат! Твой король защищает ферзя, поэтому мой не может его взять.
+lesson.mate2.ok_rank = Мат по последней горизонтали! Твой король держит все поля перед моим.
+lesson.mate3.edge = Твоя ладья на седьмой горизонтали прижимает моего короля к краю.
+lesson.mate3.ask = Теперь поставь мат {your:bare_ins}.
+lesson.mate3.free = Шах, но седьмая горизонталь теперь свободна, и мой король уходит.
+lesson.mate3.takes = Мой король просто забирает твою ладью.
+lesson.mate3.hint = Дай шах по последней горизонтали той ладьёй, что не держит седьмую.
+lesson.mate3.ok = Мат! Две ладьи прошли лесенкой.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Рокировка — особый ход для безопасности короля. Король и ладья ходят вместе.
+lesson.castle.how = {@}Король идёт на два поля к ладье, а {@2}ладья перепрыгивает через него.
+lesson.castle.ask = Всегда сначала берись за короля. Теперь ты: сделай короткую рокировку.
+lesson.castle.rook = Это просто ход ладьёй. Для рокировки передвинь короля на два поля к ней.
+lesson.castle.long = Это длинная рокировка, тоже по правилам! А сейчас рокируйся к ближней ладье.
+lesson.castle.one = На одно поле — это обычный ход короля. При рокировке король идёт на два.
+lesson.castle.other = Для рокировки передвинь короля на два поля к ладье на {sq}.
+lesson.castle.ok = Рокировка сделана! Король укрыт, а ладья готова к игре.
+lesson.castle2.moved = Рокироваться нельзя, если король или эта ладья уже ходили.
+lesson.castle2.attacked = Нельзя и под шахом, и если король пройдёт через битое поле или встанет на него.
+lesson.castle2.bishop = Мой слон атакует {sq}. Поэтому рокировка в эту сторону сейчас запрещена.
+lesson.castle2.ask = Рокируйся в другую сторону.
+lesson.castle2.other = Рокируйся к другой ладье, в сторону ферзевого фланга.
+lesson.castle2.ok = Верно! После длинной рокировки король стоит на {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = Есть особое взятие пешкой — взятие на проходе, по-французски en passant.
+lesson.ep.what.spoken = Есть особое взятие пешкой — взятие на проходе, по-французски ан пассан.
+lesson.ep.watch = Смотри на мою пешку: она идёт на два поля и встаёт рядом с твоей.
+lesson.ep.how = Твоя пешка может взять её так, будто та прошла лишь одно поле: на {sq}.
+lesson.ep.now = Но только сейчас, этим же ходом. Бери на проходе!
+lesson.ep.gone = Момент упущен: брать на проходе можно только сразу. Попробуем ещё раз.
+lesson.ep.ok = Взятие на проходе! Моей пешки на {sq} больше нет.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Дойдя до последней горизонтали, пешка превращается в ферзя, ладью, слона или коня.
+lesson.promo.ask = Почти всегда выбирай ферзя. Превращай пешку!
+lesson.promo.under = Так можно! Но ферзь сильнее. Давай выберем ферзя.
+lesson.promo.under_ok = Ладно. Но чаще всего выбирают ферзя.
+lesson.promo.push = Продвинь пешку на последнюю горизонталь, на {sq}.
+lesson.promo.ok = Новый ферзь! Можно иметь даже двух ферзей сразу.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Мой ход. Моему королю не объявлен шах, но {@}все поля вокруг него под ударом.
+lesson.stale.draw = У меня нет ни одного возможного хода. Это пат, и партия заканчивается вничью.
+lesson.stale2.ask = Когда выигрываешь, остерегайся пата. Поставь мне мат в один ход, без пата!
+lesson.stale2.wrong = Дай шах по последней горизонтали, где моему королю не уйти.
+lesson.stale2.ok = Мат! Всегда оставляй королю соперника ход, если только не ставишь мат.
+lesson.draws.kings = Другие ничьи: когда мат поставить невозможно, например, если остались одни короли.
+lesson.draws.agree = Ещё игроки могут договориться о ничьей.
+lesson.draws.repeat = Ничью дают и троекратное повторение, и пятьдесят ходов без взятий и ходов пешек.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Теперь ты знаешь все правила шахмат. Молодец!
+lesson.talk.real = Расскажу, как проходят настоящие партии.
+lesson.talk.elo = У игроков есть рейтинг Эло. Выигрываешь — он растёт, проигрываешь — падает.
+lesson.talk.elo_gap = Победа над более сильным даёт больше очков, а проигрыш более слабому стоит дороже.
+lesson.talk.elo_start = Рейтинг появится после пяти рейтинговых партий. Со мной — тренировка, без рейтинга.
+lesson.talk.clock = Это {@}шахматные часы. У каждого игрока своё время, и оно идёт только в его ход.
+lesson.talk.press = Сделав ход, нажми на часы той же рукой. Тогда пойдёт моё время.
+lesson.talk.flag = Если у тебя кончится время, ты проиграешь, разве что мне нечем поставить мат.
+lesson.talk.increment = «Пять плюс три» значит: по пять минут каждому и три секунды за каждый ход.
+lesson.talk.speeds = Короткие партии — это блиц, подлиннее — рапид, а самые долгие — классика.
+lesson.talk.no_clock = Со мной часы выключены. Думай столько, сколько нужно.
+lesson.talk.touch = В настоящей партии действует правило: взялся — ходи. Тронешь свою фигуру — ходи ею.
+lesson.talk.touch_mine = Тронешь мою фигуру — нужно её взять, если это возможно.
+lesson.talk.adjust = Чтобы поправить фигуру, не делая хода, сначала скажи «поправляю».
+lesson.talk.release = Как только фигура отпущена на новом поле, ход сделан.
+lesson.talk.sheet = На турнирах оба игрока записывают каждый ход в {@}бланк записи.
+# {move:letters} shows the Russian scoresheet letters ("Кf3"), which is what this line teaches.
+lesson.talk.notation = Записывают букву фигуры и поле, например {move:letters}. Для пешки — только поле.
+lesson.talk.robot = Твой робот записывает ходы за тебя. В быстрых партиях записывать не обязательно.
+lesson.talk.handshake = Партия начинается и заканчивается рукопожатием. Это значит: хорошая партия, спасибо.
+lesson.talk.polite = Победа или поражение — вежливость прежде всего. И никогда не мешай сопернику думать.
+lesson.talk.tips = Три совета для игры: {@}борись за центр, {@2}выводи коней и слонов и {@3}рано рокируйся.
+lesson.talk.next = Когда захочешь, выбирай «Первые шаги». Я сыграю мягко и помогу после каждой ошибки.
+lesson.talk.welcome = Добро пожаловать в мир шахмат! Давай пожмём руки.

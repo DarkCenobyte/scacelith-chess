@@ -2,6 +2,8 @@
 // thread with in-memory streams (no child process, no files). Implemented by the stockfish work
 // package. All methods are called from the game (main) thread and never block for long.
 #pragma once
+#include "ai/analysis.h"
+
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -37,6 +39,15 @@ const std::vector<Preset>& presets();
 // the scoresheets show it for the Stockfish players.
 int presetElo(int index, const EngineSettings& custom = EngineSettings{});
 
+// Coach mode: the coach's own playing strength per level (0 = the rules lesson, whose moves are
+// scripted: a very weak setting in case the engine has to fill in; 1 = "First steps" ... 6 =
+// "Expert"; out-of-range levels are clamped). Strength fields only: threads, hash and humanize are
+// the defaults, override them from the user's settings as for the presets. coachLevelElo() is the
+// rating shown for that level (the same scale as Preset::approxElo). Calibration in presets.cpp.
+constexpr int kCoachLevels = 7;
+EngineSettings coachLevelSettings(int level);
+int coachLevelElo(int level);
+
 struct ClockInfo {
     bool timed = false;
     int64_t whiteMs = 0, blackMs = 0, whiteIncMs = 0, blackIncMs = 0;
@@ -64,7 +75,9 @@ public:
     // std::cout): start() on a second instance returns false until the first one is shut down.
     bool ready() const;                  // UCI handshake done (commands sent earlier are queued)
     bool waitReady(int timeoutMs);       // blocks until ready(); for loading screens and tests
-    void newGame();             // ucinewgame + isready
+    // ucinewgame + isready. Cancels the pending move and evaluation requests and every analysis
+    // (queued, running or ready but not taken: their ids are forgotten).
+    void newGame();
     // Settings used by the next requests. Two players may share the engine (AI vs AI in the
     // viewer mode): configure it with the side to move's settings before each requestMove(). A
     // move search whose strength settings differ from those of the previous move search starts
@@ -86,11 +99,18 @@ public:
     // takeMove() empty). Untimed games without depth/nodes/movetime search 1 s (handicapped) or
     // 3 s (full strength); the humanised thinking time runs concurrently.
     void requestMove(const std::vector<std::string>& uciMoves, const ClockInfo& clock);
+    // The same from a custom start position (tutorial exercises, games set up from a FEN):
+    // startFen "" is the standard start (= requestMove), uciMoves are played from it. An invalid
+    // FEN fails like an illegal move.
+    void requestMoveFrom(const std::string& startFen, const std::vector<std::string>& uciMoves,
+                         const ClockInfo& clock);
     bool moveReady() const;
     // Returns the best move once ready ("e2e4", "e7e8q"), empty on failure. evalCp is from the
     // engine's point of view (side to move), mate scores mapped to +-100000.
     std::string takeMove(int* evalCp = nullptr);
-    void stopSearch();          // abort a running search (move is still reported)
+    // Abort the running search and every queued one once it has completed depth 1 (a move or
+    // analysis is still reported). To cut a single analysis short, use stopAnalysis().
+    void stopSearch();
     int lastSearchMs() const;   // wall time of the last completed move search
 
     // Quick evaluation for draw offers/claims (full strength whatever the preset, depth 12, at most
@@ -100,10 +120,40 @@ public:
     bool evalReady() const;
     int takeEval();             // centipawns from the side to move's point of view
 
+    // Full-strength analysis (Skill Level 20, no UCI_LimitStrength, WDL on) with MultiPV lines,
+    // mate distances, principal variations, optional search moves and start FEN (AnalysisRequest).
+    // Asynchronous like requestMove(): queued by priority, then first come first served, with
+    // move and evaluation requests (priority 0); analyses never supersede one another. Returns the
+    // request's id (> 0, never reused by this Engine). Fails at once (analysisReady(id) true,
+    // Analysis::ok false) on an engine that is not running, an invalid FEN, an illegal move or
+    // search move, or a request without a depth, movetime or node limit: nothing is sent.
+    // A position without legal moves is answered at once without searching (noLegalMove).
+    // Like evaluations, an analysis warms the hash table, so the next move search of a
+    // depth-capped weak setting starts with a cleared one (their calibration).
+    // Results are kept per id until taken (or newGame()): always match a result with the id you
+    // asked for, a stale one (after a takeback) is simply never taken. Analyses still pending at
+    // shutdown() fail (ok false). Pump (call any Engine method) every frame while waiting: queued
+    // requests only start from a call.
+    uint32_t requestAnalysis(const AnalysisRequest& r);
+    bool analysisReady(uint32_t id) const;
+    bool analysisPending(uint32_t id) const;         // queued or running (not ready, not cancelled)
+    bool takeAnalysis(uint32_t id, Analysis& out);   // false if not ready or unknown; frees the slot
+    // Stops this analysis only (other queued searches keep their limits), as soon as its search has
+    // completed depth 1; a queued one runs until its own depth 1. Its result is kept: the last
+    // report, possibly with bounds and short PVs.
+    void stopAnalysis(uint32_t id);
+    // Forgets this analysis (0 = every analysis): dropped if queued, stopped if running, discarded
+    // if ready. Its id then stays unknown (analysisReady() false).
+    void cancelAnalysis(uint32_t id);
+    // Nothing queued and no search running (true on an engine that is not running): for warp /
+    // screenshot determinism and tests.
+    bool idle() const;
+
     // Human-like thinking time before the move is physically played (ms), based on the time
     // control, remaining time, move number and how forced the position looks. The game waits
     // max(0, thinkTime - searchTime) after the search finishes. 0 when humanize is off.
-    // plyCount = half-moves played so far (the AI is to move). Call it after takeMove(): an
+    // plyCount = half-moves played so far (the AI is to move), from the request's start position
+    // (standard or requestMoveFrom's FEN). Call it after takeMove(): an
     // obvious recapture of the opponent's last capture is then detected and played faster.
     // Randomised (log-normal), so call it once per move.
     int thinkTimeMs(const ClockInfo& clock, int plyCount, int legalMoveCount, bool inCheck) const;

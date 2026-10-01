@@ -1,0 +1,301 @@
+# Coach speech (Arabic, Modern Standard Arabic): the building blocks every line uses
+# (src/coach/catalog.cpp renders them). Same keys as assets/coach/speech/en/common.lang, plus the
+# forms Arabic needs.
+# Register: the coach speaks MSA and addresses the player in the second person singular. The
+# player's gender is unknown: the lines prefer forms that are gender-neutral in unvowelled writing
+# (the suffix ـك, verbal nouns: "عليك الخروج من الكش", noun phrases); imperatives and present
+# tense verbs are masculine, the conventional default ("خذ", "حرّك"). The coach is male: his own
+# adjectives are masculine ("أنا مستعد", "موافق").
+# Past-tense verbs of the player ("استسلمت", "خرجت", "لمست") are also read "I resigned", "I got
+# out", "I touched": use them only where the context rules out the coach (هزمتني، لكنك قاتلت);
+# otherwise a noun phrase ("انتهت المباراة باستسلامك", "لم يعد ملِكك في كش").
+# Chess words follow the game UI (assets/i18n/ar.lang) and the opening texts: بيدق حصان فيل رخ
+# وزير ملك, كش, كش مات, التبييت, الترقية, الجمود (الباط), التعادل, ورقة التسجيل, إيلو.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Every piece noun is masculine (the queen is الوزير), so verbs, adjectives and pronouns referring
+# to a piece are always masculine: "{my} يغادر الرقعة", "خذه", "{your} مثبَّت".
+# piece.<type>.nom is the bare indefinite noun. The possessive is a suffix: owner patterns glue ـك
+# (your) or ـي (my) to it: {your} = حصانك, {my} = حصاني. Written Arabic does not show the case
+# endings, so one form, "nom", serves every position: subject, object, after a preposition
+# ("ب{your}" = برخّك) and as the second term of a construct ("عمود {my}" = عمود رخّي).
+# Spoken moves put the article in front of the bare noun ("ال{piece}" = الحصان).
+# Diacritics only where the voice or the reader could misread: رخّ (shadda, so that رخّي is not
+# read رخيّ; the lesson lines write it the same way) and ملِك in the possessives (ملِكي = "my king", not مَلَكي "royal" or مُلكي "my
+# property"), set as whole phrases below.
+piece.pawn.gender = m
+piece.knight.gender = m
+piece.bishop.gender = m
+piece.rook.gender = m
+piece.queen.gender = m
+piece.king.gender = m
+piece.pawn.nom = بيدق
+piece.knight.nom = حصان
+piece.bishop.nom = فيل
+piece.rook.nom = رخّ
+piece.queen.nom = وزير
+piece.king.nom = ملك
+owner.your.nom = {piece}ك
+owner.my.nom = {piece}ي
+phrase.your.king.nom = ملِكك
+phrase.my.king.nom = ملِكي
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# The voice drops Latin letters and reads digits in English: file letters are spelled as Arabic
+# letter names and ranks are number words, as in the opening texts: e4 = "إي أربعة", f5 = "إف
+# خمسة", a8 = "إيه ثمانية", h7 = "إتش سبعة". Ranks keep the citation form (اثنان).
+square.spoken = {file} {rank}
+file.a.spoken = إيه
+file.b.spoken = بي
+file.c.spoken = سي
+file.d.spoken = دي
+file.e.spoken = إي
+file.f.spoken = إف
+file.g.spoken = جي
+file.h.spoken = إتش
+rank.1.spoken = واحد
+rank.2.spoken = اثنان
+rank.3.spoken = ثلاثة
+rank.4.spoken = أربعة
+rank.5.spoken = خمسة
+rank.6.spoken = ستة
+rank.7.spoken = سبعة
+rank.8.spoken = ثمانية
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Scoresheet letters: Arab federations use the Latin letters K Q R B N (assets/i18n/ar.lang,
+# scoresheet.pieces), so "{move:letters}" shows "Nf3".
+move.letters = K Q R B N
+# Spoken as Arabic players read notation: "الحصان إلى إف ثلاثة", "الحصان يأخذ في إي خمسة",
+# "الحصان من بي إلى دي سبعة", "بيدق إي يأخذ في دي خمسة", "البيدق يستردّ" (recapture, the opening
+# texts' verb), "تبييت قصير" / "تبييت طويل" (the opening texts say "يبيّت طويلًا"), "إي ثمانية،
+# مع الترقية إلى وزير", "...، كش", "...، كش مات". {piece} is the bare noun, so the patterns add
+# the article ("ال{piece}") and the promotion keeps it indefinite ("إلى وزير").
+move.piece.spoken = ال{piece} إلى {to}
+move.piece_capture.spoken = ال{piece} يأخذ في {to}
+move.piece_from.spoken = ال{piece} من {from} إلى {to}
+move.piece_from_capture.spoken = ال{piece} من {from} يأخذ في {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = بيدق {file} يأخذ في {to}
+move.recapture.spoken = ال{piece} يستردّ
+move.castle_short.spoken = تبييت قصير
+move.castle_long.spoken = تبييت طويل
+move.promotion.spoken = {move}، مع الترقية إلى {piece}
+move.check.spoken = {move}، كش
+move.mate.spoken = {move}، كش مات
+moves.join.spoken = {a}، {b}
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words. Case: the plain words are the oblique (منصوب/مجرور) forms for 2, 12, the
+# tens and 200 (اثنين، اثني عشر، عشرين، مئتين): numbers in these lines nearly always follow a
+# preposition or are objects ("في عشرين نقلة", "بفارق اثنين"), and these are the forms heard in
+# spoken MSA. The plain words (3-10 with ة: ثلاثة) are also the forms for counting MASCULINE nouns.
+# 21-99 compose units first: "{units} و{tens}" (ثلاثة وعشرين); 101-999: "{hundreds} و{rest}".
+# Every hundred is listed. Numbers of 1000 and more have no words (the renderer says digits).
+number.0.spoken = صفر
+number.1.spoken = واحد
+number.2.spoken = اثنين
+number.3.spoken = ثلاثة
+number.4.spoken = أربعة
+number.5.spoken = خمسة
+number.6.spoken = ستة
+number.7.spoken = سبعة
+number.8.spoken = ثمانية
+number.9.spoken = تسعة
+number.10.spoken = عشرة
+number.11.spoken = أحد عشر
+number.12.spoken = اثني عشر
+number.13.spoken = ثلاثة عشر
+number.14.spoken = أربعة عشر
+number.15.spoken = خمسة عشر
+number.16.spoken = ستة عشر
+number.17.spoken = سبعة عشر
+number.18.spoken = ثمانية عشر
+number.19.spoken = تسعة عشر
+number.20.spoken = عشرين
+number.30.spoken = ثلاثين
+number.40.spoken = أربعين
+number.50.spoken = خمسين
+number.60.spoken = ستين
+number.70.spoken = سبعين
+number.80.spoken = ثمانين
+number.90.spoken = تسعين
+number.100.spoken = مئة
+number.200.spoken = مئتين
+number.300.spoken = ثلاثمئة
+number.400.spoken = أربعمئة
+number.500.spoken = خمسمئة
+number.600.spoken = ستمئة
+number.700.spoken = سبعمئة
+number.800.spoken = ثمانمئة
+number.900.spoken = تسعمئة
+# Form "f": the number counting a FEMININE noun (نقلة، نقطة، قطعة، مباراة، مرة): 3-10 drop the ة
+# (gender polarity: ثلاث نقلات), 11-19 as إحدى عشرة ... تسع عشرة. "إحدى" (1) is only right inside a
+# compound (21 = إحدى وعشرين): a single feminine "one" is written out ("نقلة واحدة", count.f).
+number.1.f.spoken = إحدى
+number.2.f.spoken = اثنتين
+number.3.f.spoken = ثلاث
+number.4.f.spoken = أربع
+number.5.f.spoken = خمس
+number.6.f.spoken = ستّ
+number.7.f.spoken = سبع
+number.8.f.spoken = ثماني
+number.9.f.spoken = تسع
+number.10.f.spoken = عشر
+number.11.f.spoken = إحدى عشرة
+number.12.f.spoken = اثنتي عشرة
+number.13.f.spoken = ثلاث عشرة
+number.14.f.spoken = أربع عشرة
+number.15.f.spoken = خمس عشرة
+number.16.f.spoken = ستّ عشرة
+number.17.f.spoken = سبع عشرة
+number.18.f.spoken = ثماني عشرة
+number.19.f.spoken = تسع عشرة
+number.tens.spoken = {units} و{tens}
+# Unused (every hundred is listed above), kept because English defines it.
+number.hundreds.spoken = {n} مئة
+number.hundreds_rest.spoken = {hundreds} و{rest}
+number.minus.spoken = ناقص {n}
+# A decimal number: written with a point (Western digits, as the UI), said "واحد فاصلة ثلاثة".
+number.decimal = {int}.{frac}
+number.decimal.spoken = {int} فاصلة {frac}
+# Form "mv": the number said with the word نقلة in its right form ("{n:mv}": mate distances). The
+# noun follows the units in Arabic (إحدى وعشرين نقلة), so composing cannot work: 1-99 are listed.
+number.1.mv.spoken = نقلة واحدة
+number.2.mv.spoken = نقلتين
+number.3.mv.spoken = ثلاث نقلات
+number.4.mv.spoken = أربع نقلات
+number.5.mv.spoken = خمس نقلات
+number.6.mv.spoken = ستّ نقلات
+number.7.mv.spoken = سبع نقلات
+number.8.mv.spoken = ثماني نقلات
+number.9.mv.spoken = تسع نقلات
+number.10.mv.spoken = عشر نقلات
+number.11.mv.spoken = إحدى عشرة نقلة
+number.12.mv.spoken = اثنتي عشرة نقلة
+number.13.mv.spoken = ثلاث عشرة نقلة
+number.14.mv.spoken = أربع عشرة نقلة
+number.15.mv.spoken = خمس عشرة نقلة
+number.16.mv.spoken = ستّ عشرة نقلة
+number.17.mv.spoken = سبع عشرة نقلة
+number.18.mv.spoken = ثماني عشرة نقلة
+number.19.mv.spoken = تسع عشرة نقلة
+number.20.mv.spoken = عشرين نقلة
+number.21.mv.spoken = إحدى وعشرين نقلة
+number.22.mv.spoken = اثنتين وعشرين نقلة
+number.23.mv.spoken = ثلاث وعشرين نقلة
+number.24.mv.spoken = أربع وعشرين نقلة
+number.25.mv.spoken = خمس وعشرين نقلة
+number.26.mv.spoken = ستّ وعشرين نقلة
+number.27.mv.spoken = سبع وعشرين نقلة
+number.28.mv.spoken = ثماني وعشرين نقلة
+number.29.mv.spoken = تسع وعشرين نقلة
+number.30.mv.spoken = ثلاثين نقلة
+number.31.mv.spoken = إحدى وثلاثين نقلة
+number.32.mv.spoken = اثنتين وثلاثين نقلة
+number.33.mv.spoken = ثلاث وثلاثين نقلة
+number.34.mv.spoken = أربع وثلاثين نقلة
+number.35.mv.spoken = خمس وثلاثين نقلة
+number.36.mv.spoken = ستّ وثلاثين نقلة
+number.37.mv.spoken = سبع وثلاثين نقلة
+number.38.mv.spoken = ثماني وثلاثين نقلة
+number.39.mv.spoken = تسع وثلاثين نقلة
+number.40.mv.spoken = أربعين نقلة
+number.41.mv.spoken = إحدى وأربعين نقلة
+number.42.mv.spoken = اثنتين وأربعين نقلة
+number.43.mv.spoken = ثلاث وأربعين نقلة
+number.44.mv.spoken = أربع وأربعين نقلة
+number.45.mv.spoken = خمس وأربعين نقلة
+number.46.mv.spoken = ستّ وأربعين نقلة
+number.47.mv.spoken = سبع وأربعين نقلة
+number.48.mv.spoken = ثماني وأربعين نقلة
+number.49.mv.spoken = تسع وأربعين نقلة
+number.50.mv.spoken = خمسين نقلة
+number.51.mv.spoken = إحدى وخمسين نقلة
+number.52.mv.spoken = اثنتين وخمسين نقلة
+number.53.mv.spoken = ثلاث وخمسين نقلة
+number.54.mv.spoken = أربع وخمسين نقلة
+number.55.mv.spoken = خمس وخمسين نقلة
+number.56.mv.spoken = ستّ وخمسين نقلة
+number.57.mv.spoken = سبع وخمسين نقلة
+number.58.mv.spoken = ثماني وخمسين نقلة
+number.59.mv.spoken = تسع وخمسين نقلة
+number.60.mv.spoken = ستين نقلة
+number.61.mv.spoken = إحدى وستين نقلة
+number.62.mv.spoken = اثنتين وستين نقلة
+number.63.mv.spoken = ثلاث وستين نقلة
+number.64.mv.spoken = أربع وستين نقلة
+number.65.mv.spoken = خمس وستين نقلة
+number.66.mv.spoken = ستّ وستين نقلة
+number.67.mv.spoken = سبع وستين نقلة
+number.68.mv.spoken = ثماني وستين نقلة
+number.69.mv.spoken = تسع وستين نقلة
+number.70.mv.spoken = سبعين نقلة
+number.71.mv.spoken = إحدى وسبعين نقلة
+number.72.mv.spoken = اثنتين وسبعين نقلة
+number.73.mv.spoken = ثلاث وسبعين نقلة
+number.74.mv.spoken = أربع وسبعين نقلة
+number.75.mv.spoken = خمس وسبعين نقلة
+number.76.mv.spoken = ستّ وسبعين نقلة
+number.77.mv.spoken = سبع وسبعين نقلة
+number.78.mv.spoken = ثماني وسبعين نقلة
+number.79.mv.spoken = تسع وسبعين نقلة
+number.80.mv.spoken = ثمانين نقلة
+number.81.mv.spoken = إحدى وثمانين نقلة
+number.82.mv.spoken = اثنتين وثمانين نقلة
+number.83.mv.spoken = ثلاث وثمانين نقلة
+number.84.mv.spoken = أربع وثمانين نقلة
+number.85.mv.spoken = خمس وثمانين نقلة
+number.86.mv.spoken = ستّ وثمانين نقلة
+number.87.mv.spoken = سبع وثمانين نقلة
+number.88.mv.spoken = ثماني وثمانين نقلة
+number.89.mv.spoken = تسع وثمانين نقلة
+number.90.mv.spoken = تسعين نقلة
+number.91.mv.spoken = إحدى وتسعين نقلة
+number.92.mv.spoken = اثنتين وتسعين نقلة
+number.93.mv.spoken = ثلاث وتسعين نقلة
+number.94.mv.spoken = أربع وتسعين نقلة
+number.95.mv.spoken = خمس وتسعين نقلة
+number.96.mv.spoken = ستّ وتسعين نقلة
+number.97.mv.spoken = سبع وتسعين نقلة
+number.98.mv.spoken = ثماني وتسعين نقلة
+number.99.mv.spoken = تسع وتسعين نقلة
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Arabic plural rule (assets/i18n): zero (0) | one (1) | two (2) | few (3-10, 103-110 ...) |
+# many (11-99, 111-199 ...) | other (100-102, 200-202 ...).
+# one: the noun + واحد/واحدة, no digit ("نقلة واحدة", as the UI); two: the dual, no digit, in the
+# oblique case (نقلتين، خطأين: after a preposition or as an object; a sentence that needs the
+# nominative dual (نقلتان) must be phrased around it); few: number + plural (gender polarity:
+# "{n:f}" for feminine nouns: ثلاث نقلات، ثلاثة أخطاء); many: number + singular accusative
+# (إحدى عشرة نقلة، خمسة عشر بيدقًا); other: number + singular genitive (مئة نقلة); zero: as the UI.
+# Nouns: نقلة (f), نقطة (f), بيدق (m), قطعة (f), خطأ (m), خطأ فادح (m, the UI's blunder), نقلة غير
+# دقيقة (f, inaccuracy), مباراة (f), مرة (f), مربع (m).
+count.move = {n} نقلة|نقلة واحدة|نقلتين|{n:f} نقلات|{n:f} نقلة|{n:f} نقلة
+count.point = {n} نقطة|نقطة واحدة|نقطتين|{n:f} نقاط|{n:f} نقطة|{n:f} نقطة
+count.pawn = {n} بيدق|بيدق واحد|بيدقين|{n} بيادق|{n} بيدقًا|{n} بيدق
+count.piece = {n} قطعة|قطعة واحدة|قطعتين|{n:f} قطع|{n:f} قطعة|{n:f} قطعة
+count.mistake = {n} خطأ|خطأ واحد|خطأين|{n} أخطاء|{n} خطأً|{n} خطأ
+count.blunder = {n} خطأ فادح|خطأ فادح واحد|خطأين فادحين|{n} أخطاء فادحة|{n} خطأً فادحًا|{n} خطأ فادح
+count.inaccuracy = {n} نقلة غير دقيقة|نقلة غير دقيقة واحدة|نقلتين غير دقيقتين|{n:f} نقلات غير دقيقة|{n:f} نقلة غير دقيقة|{n:f} نقلة غير دقيقة
+count.game = {n} مباراة|مباراة واحدة|مباراتين|{n:f} مباريات|{n:f} مباراة|{n:f} مباراة
+count.time = {n} مرة|مرة واحدة|مرتين|{n:f} مرات|{n:f} مرة|{n:f} مرة
+count.square = {n} مربع|مربع واحد|مربعين|{n} مربعات|{n} مربعًا|{n} مربع
+# "{n:f}" in a line says a bare number in the feminine (a feminine noun understood: "تساوي {n:f}" =
+# "worth three (points)"); one is written out. "{n:mv}" says the number with نقلة in speech and the
+# digits alone in writing. They are count keys so that the form check knows them.
+count.f = {n:f}|واحدة|{n:f}|{n:f}|{n:f}|{n:f}
+count.mv = {n:mv}|{n:mv}|{n:mv}|{n:mv}|{n:mv}|{n:mv}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+# {n} is a bare number here (count keys do not apply): "mv" says it with نقلة ("كش مات في ثلاث
+# نقلات"); the subtitles keep the short "كش مات في 3".
+eval.up = +{x}
+eval.up.spoken = زائد {x}
+eval.down = −{x}
+eval.down.spoken = ناقص {x}
+eval.even = 0.0
+eval.even.spoken = تكافؤ
+eval.mate_win = كش مات في {n:mv}
+eval.mate_loss = كش مات ضدك في {n:mv}

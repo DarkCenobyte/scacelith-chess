@@ -63,6 +63,7 @@ bool Settings::load(const std::string& p) {
     effectsVolume = ini.getFloat("audio.effects_volume", effectsVolume);
     ambienceVolume = ini.getFloat("audio.ambience_volume", ambienceVolume);
     ambience = ini.getBool("audio.ambience", ambience);
+    voiceVolume = std::clamp(ini.getFloat("audio.voice_volume", voiceVolume), 0.0f, 1.0f);
     showLegalMoves = ini.getBool("gameplay.show_legal_moves", showLegalMoves);
     showCoordinates = ini.getBool("gameplay.show_coordinates", showCoordinates);
     mouseSensitivity = ini.getFloat("gameplay.mouse_sensitivity", mouseSensitivity);
@@ -133,7 +134,11 @@ bool Settings::load(const std::string& p) {
     directAutoPress = ini.getBool("direct.auto_press_clock", directAutoPress);
     directAddress = ini.getString("direct.address", directAddress);
     directJoinPort = std::clamp(ini.getInt("direct.join_port", directJoinPort), 1, 65535);
+    readCoachSettings(ini, *this);  // [coach], [tts] (settings_coach.cpp)
+    // [archive] saved games
+    saveGames = ini.getBool("archive.save_games", saveGames);
     language = ini.getString("interface.language", language);
+    subtitles = std::clamp(ini.getInt("interface.subtitles", subtitles), 0, 2);
     playerName = ini.getString("player.name", playerName);
     if (playerName.empty()) playerName = "Human";
     handStyle = ui::font::HandStyle(std::clamp(ini.getInt("player.hand_style", int(handStyle)), 0, int(ui::font::HAND_STYLE_COUNT) - 1));
@@ -220,6 +225,7 @@ bool Settings::save() const {
     ini.setFloat("audio.effects_volume", effectsVolume);
     ini.setFloat("audio.ambience_volume", ambienceVolume);
     ini.setBool("audio.ambience", ambience);
+    ini.setFloat("audio.voice_volume", voiceVolume);
     ini.setBool("gameplay.show_legal_moves", showLegalMoves);
     ini.setBool("gameplay.show_coordinates", showCoordinates);
     ini.setFloat("gameplay.mouse_sensitivity", mouseSensitivity);
@@ -284,7 +290,11 @@ bool Settings::save() const {
     ini.setBool("direct.auto_press_clock", directAutoPress);
     ini.set("direct.address", directAddress);
     ini.setInt("direct.join_port", directJoinPort);
+    writeCoachSettings(ini, *this);  // [coach], [tts] (settings_coach.cpp)
+    // [archive] saved games
+    ini.setBool("archive.save_games", saveGames);
     ini.set("interface.language", language);
+    ini.setInt("interface.subtitles", subtitles);
     ini.set("player.name", playerName);
     ini.setInt("player.hand_style", int(handStyle));
     if (!path.empty() && ini.save(path)) return true;

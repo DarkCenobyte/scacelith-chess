@@ -248,6 +248,13 @@ def main():
 
     declared = {regex.pattern: level for regex, level in variants}
     functions, refs = disassemble(exe, objdump)
+    # MinGW links the constructor and destructor lists (pointers to static initialisers) into
+    # .text, so objdump decodes them as code; a pointer byte 0x62 then reads as an EVEX prefix.
+    # They are data: no instruction level.
+    for f in functions:
+        r = range_at(f[0])
+        if r is not None and r[3].startswith(('.ctors', '.dtors')):
+            f[2] = 0
     pointers = data_pointers(exe, objdump)
     problems = []
     if pointers is None:

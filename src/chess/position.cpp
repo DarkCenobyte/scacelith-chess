@@ -284,6 +284,64 @@ bool Position::attackedWith(Square s, Color by, U64 occ, U64 removed) const {
 
 bool Position::isAttacked(Square s, Color by) const { return attackedWith(s, by, occupied(), 0); }
 
+// ---- Board queries (explanations) -----------------------------------------------------------
+
+std::vector<Square> squaresOf(U64 set) {
+    std::vector<Square> out;
+    out.reserve(size_t(popcount(set)));
+    while (set) out.push_back(Square(popLsb(set)));
+    return out;
+}
+
+int squareCount(U64 set) { return popcount(set); }
+
+U64 attacksOf(PieceType t, Color c, Square s, U64 occ) {
+    if (s < 0 || s > 63) return 0;
+    return t == Pawn ? kTables.pawn[c][s] : pieceAttacks(t, s, occ);
+}
+
+U64 squaresBetween(Square a, Square b) {
+    if (a < 0 || a > 63 || b < 0 || b > 63) return 0;
+    return kTables.between[a][b];
+}
+
+U64 Position::attackersTo(Square s, U64 occ) const {
+    if (s < 0 || s > 63) return 0;
+    const U64 pawns = (kTables.pawn[Black][s] & typeBB_[Pawn] & colorBB_[White]) |
+                      (kTables.pawn[White][s] & typeBB_[Pawn] & colorBB_[Black]);
+    return (pawns | (kTables.knight[s] & typeBB_[Knight]) | (kTables.king[s] & typeBB_[King]) |
+            (bishopAttacks(s, occ) & (typeBB_[Bishop] | typeBB_[Queen])) |
+            (rookAttacks(s, occ) & (typeBB_[Rook] | typeBB_[Queen]))) &
+           occ;
+}
+
+U64 Position::attacksFrom(Square s) const {
+    if (s < 0 || s > 63 || board_[s].empty()) return 0;
+    return attacksOf(board_[s].type, board_[s].color, s, occupied());
+}
+
+U64 Position::checkers() const {
+    const Square k = kingSquare(side_);
+    return k == NoSquare ? 0 : attackersTo(k, opposite(side_));
+}
+
+U64 Position::pinned(Color c) const {
+    const Square k = kingSquare(c);
+    return k == NoSquare ? 0 : pinnedPieces(c, k);
+}
+
+bool Position::passTurn() {
+    if (inCheck()) return false;  // the side passing would stay in check: never a legal position
+    if (ep_ != NoSquare) {
+        hash_ ^= kZobrist.epFile[fileOf(ep_)];
+        ep_ = NoSquare;
+    }
+    side_ = opposite(side_);
+    hash_ ^= kZobrist.side;
+    ++halfmove_;  // the move number is left alone (analysis only, never recorded)
+    return true;
+}
+
 bool Position::inCheck() const { return attackedWith(kingSquare(side_), opposite(side_), occupied(), 0); }
 
 U64 Position::pinnedPieces(Color c, Square ksq) const {

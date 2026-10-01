@@ -51,6 +51,39 @@ void main() {
 #endif
     float planarLayer = draws[vin.draw].info.y;
     vec3 c = shadeSurface(i, s, planarLayer);
+#if (defined(PASS_MAIN) || defined(PASS_PLANAR)) && !defined(MATERIAL_TRANSPARENT)
+    {
+        // Designation highlight (DrawItem::highlight), as if a cool light picked the object out.
+        // 1. On a pale surface the lit colour is filtered towards the highlight's hue (red and
+        //    green held back), over the whole object and more towards the silhouette (Fresnel on
+        //    the interpolated normal, so polish or bump detail does not speckle it): a white
+        //    piece turns a cool, bluish white that stands apart from its cream neighbours. Not on
+        //    a dark one: its look is mostly reflections, which would turn it into a blue piece.
+        //    On a turned piece the grazing band is thin on screen (NoV < 0.5 is the outer 13% of
+        //    a column's half width), so the edge term reaches in to NoV ~0.85.
+        // 2. Near the silhouette the colour moves to the hue itself, at a luminance that follows
+        //    the surface's (a little brighter on a dark one) but stays under the tonemapper's
+        //    shoulder on a bright one, whose highlight desaturation would erase a blue-white:
+        //    a clear cobalt edge on sunlit white, a soft blue sheen on black, no neon line.
+        // 3. A thin absolute rim on the silhouette keeps it visible on black; a faint lift.
+        // Breathes slowly.
+        vec4 hl = draws[vin.draw].highlight;
+        if (hl.a > 0.0) {  // uniform per draw
+            float NoV = saturate(dot(i.normalWS, i.viewDirWS));
+            float k = hl.a * (0.80 + 0.20 * sin(i.time * 3.4));
+            vec3 hue = hl.rgb / max(luminance(hl.rgb), 1e-4);
+            vec3 filt = hue / max(max(hue.r, hue.g), hue.b);
+            float lum = luminance(c);
+            float edge = smoothstep(0.85, 0.1, NoV);
+            float pale = smoothstep(0.08, 0.45, luminance(s.albedo));
+            c *= mix(vec3(1.0), filt, k * pale * (0.35 + 0.45 * edge));
+            float tone = min(1.3 * lum + 0.01, 0.25 + 0.15 * lum);
+            c = mix(c, hue * tone, k * 0.7 * edge * sqrt(edge));
+            c += hl.rgb * (0.18 * k * pow(1.0 - NoV, 3.5));
+            c *= 1.0 + 0.08 * k;
+        }
+    }
+#endif
     c = min(c, vec3(60000.0));
 #ifdef MATERIAL_TRANSPARENT
     if (s.transmission > 0.0) {

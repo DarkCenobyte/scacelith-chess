@@ -679,5 +679,122 @@ const Metrics& metrics(int face) {
 GLuint atlasTexture() { return g_atlas.tex; }
 int atlasGeneration() { return g_atlas.gen; }
 
+// ---- Standalone line distance fields (3D markings) ---------------------------------------------
+
+bool renderLineSdf(int face, const std::string& utf8, float capPx, int spread, float tracking, int w, int h,
+                   std::vector<uint8_t>& out, float* inkWidthPx) {
+    out.clear();
+    if (face < 0 || face >= FACE_COUNT || w <= 0 || h <= 0 || capPx <= 0.0f || spread <= 0) return false;
+    // The face as loaded by init(), else parsed here: no GL and no atlas are needed, so a world can
+    // bake its markings before (or without) the UI.
+    stbtt_fontinfo info;
+    if (g_faces[face].ok) {
+        info = g_faces[face].info;
+    } else {
+        const embedded::File* file = embedded::find(kFaces[face].path);
+        int off = file ? stbtt_GetFontOffsetForIndex(file->data, 0) : -1;
+        if (off < 0 || !stbtt_InitFont(&info, file->data, off)) {
+            LOGW("ui: renderLineSdf: font %s unavailable", kFaces[face].path);
+            return false;
+        }
+    }
+    int bx0, by0, bx1, by1;
+    if (!stbtt_GetCodepointBox(&info, 'H', &bx0, &by0, &bx1, &by1) || by1 <= 0) return false;
+    constexpr int O = 4;  // rasterisation oversampling, as the atlas
+    const int W = w * O, H = h * O;
+    const float s = capPx * float(O) / float(by1);          // font units -> high resolution pixels
+    const float emHi = s / stbtt_ScaleForMappingEmToPixels(&info, 1.0f);  // high resolution pixels per em
+
+    // Pen layout (left to right, face kerning, tracking in em), then the ink extent.
+    struct Placed { int gi; float pen; int x0, y0, x1, y1; };
+    std::vector<Placed> glyphs;
+    float pen = 0.0f;
+    int prev = 0;
+    int inkX0 = 1 << 30, inkX1 = -(1 << 30);
+    for (size_t i = 0; i < utf8.size();) {
+        uint32_t cp = decodeUtf8(utf8, i);
+        int gi = stbtt_FindGlyphIndex(&info, int(cp));
+        if (prev && gi) pen += float(stbtt_GetGlyphKernAdvance(&info, prev, gi)) * s;
+        Placed p{gi, pen, 0, 0, 0, 0};
+        float shift = pen - std::floor(pen);
+        stbtt_GetGlyphBitmapBoxSubpixel(&info, gi, s, s, shift, 0.0f, &p.x0, &p.y0, &p.x1, &p.y1);
+        if (gi && p.x1 > p.x0 && p.y1 > p.y0) {
+            inkX0 = std::min(inkX0, int(std::floor(pen)) + p.x0);
+            inkX1 = std::max(inkX1, int(std::floor(pen)) + p.x1);
+            glyphs.push_back(p);
+        }
+        int adv = 0, lsb = 0;
+        stbtt_GetGlyphHMetrics(&info, gi, &adv, &lsb);
+        pen += float(adv) * s + tracking * emHi;
+        prev = gi;
+    }
+    if (glyphs.empty()) return false;
+    // Ink centred horizontally; the cap band (baseline to cap line) centred vertically.
+    int offX = (W - (inkX1 - inkX0)) / 2 - inkX0;
+    int baseY = int(std::lround(0.5f * float(H) + 0.5f * capPx * float(O)));
+    const int margin = spread * O;
+    if (inkX0 + offX < margin || inkX1 + offX > W - margin) {
+        LOGW("ui: renderLineSdf: \"%s\" does not fit %dx%d texels at cap %.0f", utf8.c_str(), w, h, double(capPx));
+        return false;
+    }
+
+    // Union of the glyph coverages (max), at O x the output resolution.
+    Scratch sc;
+    sc.cov.assign(size_t(W) * size_t(H), 0);
+    std::vector<uint8_t> tmp;
+    for (const Placed& p : glyphs) {
+        int gw = p.x1 - p.x0, gh = p.y1 - p.y0;
+        tmp.assign(size_t(gw) * size_t(gh), 0);
+        float shift = p.pen - std::floor(p.pen);
+        stbtt_MakeGlyphBitmapSubpixel(&info, tmp.data(), gw, gh, gw, s, s, shift, 0.0f, p.gi);
+        int ox = int(std::floor(p.pen)) + p.x0 + offX, oy = baseY + p.y0;
+        for (int y = 0; y < gh; ++y) {
+            int ty = oy + y;
+            if (ty < 0 || ty >= H) continue;
+            for (int x = 0; x < gw; ++x) {
+                int tx = ox + x;
+                if (tx < 0 || tx >= W) continue;
+                uint8_t& c = sc.cov[size_t(ty) * size_t(W) + size_t(tx)];
+                c = std::max(c, tmp[size_t(y) * size_t(gw) + size_t(x)]);
+            }
+        }
+    }
+
+    // Exact inside / outside distances, box-filtered to the output resolution (as buildGlyph).
+    size_t N = size_t(W) * size_t(H);
+    sc.in.resize(N);
+    sc.out.resize(N);
+    for (size_t i = 0; i < N; ++i) {
+        bool inside = sc.cov[i] >= 128;
+        sc.out[i] = inside ? 0.0f : float(kInf);
+        sc.in[i] = inside ? float(kInf) : 0.0f;
+    }
+    edt2d(sc, sc.out, W, H);
+    edt2d(sc, sc.in, W, H);
+    out.resize(size_t(w) * size_t(h));
+    const float invO = 1.0f / float(O);
+    const float norm = 1.0f / (2.0f * float(spread));
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            float sum = 0.0f;
+            for (int sy = 0; sy < O; ++sy) {
+                size_t row = size_t(y * O + sy) * size_t(W);
+                for (int sx = 0; sx < O; ++sx) {
+                    size_t i = row + size_t(x * O + sx);
+                    float d;
+                    if (sc.cov[i] >= 128) d = std::sqrt(sc.in[i]) - 0.5f;
+                    else d = -(std::sqrt(sc.out[i]) - 0.5f);
+                    if (std::fabs(d) <= 1.0f) d = float(sc.cov[i]) / 255.0f - 0.5f;
+                    sum += d;
+                }
+            }
+            float v = 0.5f + sum * invO * invO * invO * norm;
+            out[size_t(y) * size_t(w) + size_t(x)] = uint8_t(std::lround(std::clamp(v, 0.0f, 1.0f) * 255.0f));
+        }
+    }
+    if (inkWidthPx) *inkWidthPx = float(inkX1 - inkX0) * invO;
+    return true;
+}
+
 }  // namespace font
 }  // namespace ui

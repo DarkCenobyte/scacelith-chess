@@ -2,12 +2,13 @@
 // (docs/MULTIPLAYER_PLAN.md).
 //   - The seat to move has the mouse and keyboard (inputSeat()) and the view (viewSeat()); every
 //     rule of the game against Stockfish applies to it: touch-move, the arbiter's penalties when
-//     the legal-move hints are off, the clock pressed by hand, the claims.
-//   - After the clock press the view goes over to the other player: a camera flight
-//     (CameraFlight::handoverShape) or, with Options > Gameplay > Handover on "Instant cut", a cut
-//     through black. The clock is frozen meanwhile (nothing counts, the delay window waits), drags
-//     are cancelled at the press, and buttons still held from the previous turn are ignored until
-//     released. During a flight the mover's head is its robot's again and the next player's head
+//     the legal-move hints are off, the clock pressed by hand (none in an untimed game: the move is
+//     completed as its last piece is released, clock_rules.h), the claims.
+//   - Once the move is completed (completeMove) the view goes over to the other player: a camera
+//     flight (CameraFlight::handoverShape) or, with Options > Gameplay > Handover on "Instant cut",
+//     a cut through black. The clock is frozen meanwhile (nothing counts, the delay window waits),
+//     drags are cancelled at the completion, and buttons still held from the previous turn are
+//     ignored until released. During a flight the mover's head is its robot's again and the next player's head
 //     turns to that player's own look (each seat keeps its yaw, pitch and lean).
 //   - Scoresheets: each player writes their own sheet in their own hand. The mover records the
 //     move at once; the next player records it once the view has reached them, unless they touch
@@ -95,6 +96,16 @@ void GameScene::initHotSeatArgs() {
         if (q == std::string::npos) break;
         p = q + 1;
     }
+    // --play-then resign|leave|takeback,...: the Esc menu's choices once those moves are made.
+    std::string then = ctx.argValue("--play-then");
+    scriptThen_.clear();
+    for (size_t a = 0; a < then.size();) {
+        size_t b = then.find(',', a);
+        std::string m = then.substr(a, b == std::string::npos ? std::string::npos : b - a);
+        if (!m.empty()) scriptThen_.push_back(m);
+        if (b == std::string::npos) break;
+        a = b + 1;
+    }
     if (!ctx.hasArg("--hotseat")) return;
     // --start --hotseat [--white-name N] [--black-name N] [--clock-right white|black] [--rated]
     setup_.opponent = 1;
@@ -173,7 +184,7 @@ void GameScene::startHandover(int mover) {
 }
 
 void GameScene::updateHandover(float dt) {
-    // The caption ("Bob, your move") fades in at the press and stays up while the view goes over
+    // The caption ("Bob, your move") fades in at the completion and stays up while the view goes over
     // (ui::hotSeatHud); updatePlaying() does not run meanwhile (the clock is frozen).
     if (!paused_) captionAge_ = handover_.active() ? std::min(captionAge_ + dt, 0.3f) : captionAge_ + dt;
     if (!handover_.active()) return;
@@ -229,7 +240,7 @@ void GameScene::updateHotSeatTurn(float dt) {
         writeGrace_ -= dt;
         if (turn_ != Turn::HumanIdle) {
             // A piece touched first: the opponent's move is recorded after this one (the hold is
-            // released at this player's clock press, onClockPressed).
+            // released when this player's move is completed, completeMove).
             writeGrace_ = 0.0f;
         } else if (writeGrace_ <= 0.0f) {
             scorekeeper_.setHold(inputSeat(), false);  // records the opponent's move now
@@ -239,23 +250,57 @@ void GameScene::updateHotSeatTurn(float dt) {
 
 void GameScene::updateScript(float dt) {
     if (scriptWait_ > 0.0f) scriptWait_ -= dt;
-    if (scriptPos_ >= script_.size() || turn_ != Turn::HumanIdle || paused_ || scriptWait_ > 0.0f) return;
+    if (turn_ != Turn::HumanIdle || paused_ || scriptWait_ > 0.0f) return;
+    if (scriptPos_ >= script_.size() && scriptThenPos_ >= scriptThen_.size()) return;
     if (hotSeat() && handover_.active()) return;
     if (anim_[inputSeat()].busy()) return;
+    if (coach() && !coachMayTouch()) return;  // the coach has the floor (or its hands the table)
+    if (scriptPos_ >= script_.size()) {
+        // --play-then: the player opens the Esc menu and picks the next choice (menuChoice).
+        const std::string& a = scriptThen_[scriptThenPos_++];
+        ui::MenuAction m = a == "resign"     ? ui::MenuAction::Resign
+                           : a == "leave"    ? ui::MenuAction::BackToMainMenu
+                           : a == "takeback" ? ui::MenuAction::TakeBack
+                                             : ui::MenuAction::None;
+        if (m == ui::MenuAction::None) {
+            LOGW("--play-then: '%s' is not resign, leave or takeback", a.c_str());
+            return;
+        }
+        LOGI("--play-then: %s", a.c_str());
+        paused_ = true;
+        scriptMenu_ = m;
+        scriptWait_ = kScriptThink;
+        return;
+    }
     const std::string& u = script_[scriptPos_++];
     Move mv = game_.position().parseUCI(u);
-    PieceObject* p = mv.valid() ? board_.at(mv.from) : nullptr;
+    // Without the legal-move hints an illegal move can be made too: the arbiter judges it at the
+    // clock press (as a player's would be).
+    if (!mv.valid() && !settings().showLegalMoves && !online() && !coach() && u.size() >= 4) {
+        mv.from = parseSquare(u.substr(0, 2));
+        mv.to = parseSquare(u.substr(2, 2));
+    }
+    PieceObject* p = mv.from != NoSquare && mv.to != NoSquare ? board_.at(mv.from) : nullptr;
+    if (p && p->color != inputColor()) p = nullptr;
     if (!p) {
         LOGW("--play: '%s' is not legal here, the script stops", u.c_str());
         scriptPos_ = script_.size();
         return;
     }
-    // By hand, as a player would: touch, carry, press the clock (queued until the piece is down).
+    // By hand, as a player would: touch, carry, press the clock (queued until the piece is down;
+    // untimed, there is no press: humanPressClock ignores it).
     humanTouch(p->id);
     if (turn_ != Turn::HumanTouched) return;
     scriptPromo_ = mv.promotion;
     humanPlace(mv.to);
     humanPressClock();
+}
+
+ui::MenuAction GameScene::menuChoice(ui::MenuAction shown) {
+    if (scriptMenu_ == ui::MenuAction::None) return shown;
+    ui::MenuAction m = scriptMenu_;
+    scriptMenu_ = ui::MenuAction::None;
+    return m;
 }
 
 void GameScene::offerDrawHotSeat() {
@@ -267,7 +312,8 @@ void GameScene::offerDrawHotSeat() {
     int seat = inputSeat();
     drawOfferPly_ = ply;
     drawOfferBy_ = seat;
-    // FIDE 9.1.2: make the move, offer, press the clock; the opponent sees it when the view reaches them.
+    // FIDE 9.1.2: make the move, offer, press the clock (untimed: the offer goes with the move made);
+    // the opponent sees it when the view reaches them.
     ui::notify(i18n::trf("hotseat.draw.offer_noted", {seats_[1 - seat].name}), 4.0f);
 }
 

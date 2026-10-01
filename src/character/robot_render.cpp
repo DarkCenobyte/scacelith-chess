@@ -28,13 +28,16 @@ void GpuRobot::destroy() {
 }
 
 void submitRobot(render::Renderer& r, const GpuRobot& robot, const mat4 boneWorld[BoneCount], bool firstPerson,
-                 uint32_t objectIdBase, const mat4* prevBoneWorld, float pupilDilation, float armOpacity, Side armSide) {
+                 uint32_t objectIdBase, const mat4* prevBoneWorld, float pupilDilation, float armOpacity, Side armSide,
+                 const Material* chestMaterial) {
     const Bone armFirst = sideBone(UpperArmL, armSide), armLast = sideBone(PinkyL3, armSide);
     for (size_t i = 0; i < robot.parts.size(); ++i) {
         const GpuRobot::Part& p = robot.parts[i];
         render::DrawItem d;
         d.mesh = &p.mesh;
         d.material = &materials::get(p.material);
+        // The chest shell is the only porcelain part on Spine2 (robot_body.cpp, buildTorso).
+        if (chestMaterial && p.bone == Spine2 && p.material == MaterialId::RobotPorcelain) d.material = chestMaterial;
         d.model = boneWorld[p.bone];
         if (prevBoneWorld) {
             d.prevModel = prevBoneWorld[p.bone];

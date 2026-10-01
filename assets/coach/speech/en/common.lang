@@ -1,0 +1,142 @@
+# Coach speech: the building blocks every line uses (src/coach/catalog.cpp renders them).
+# English is the reference language. Same syntax as assets/i18n: "key = value", '#' comments, \n.
+#
+# Translators, read this first:
+# - A key ending in ".spoken" is what the voice says instead of the key without it (the subtitles
+#   never show it). Building blocks that only the voice needs (squares, moves and numbers in words)
+#   exist only as ".spoken" keys.
+# - This file must define every key English defines. It may define MORE keys: the grammatical
+#   forms and genders your sentences need (see "Pieces" below), and ".spoken" overrides.
+# - Placeholders inside the values ({piece}, {file}, {n} ...) are filled by the program: keep them.
+# - Chinese files hold the subtitle text only: Chinese speech is the English line.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# A piece in a sentence is always someone's: "{your}" = the listener's piece ("your knight"),
+# "{my}" = the coach's ("my bishop"). The program builds the phrase in this order:
+#   1. phrase.<owner>.<type>.<form>          a whole phrase, when your language changes the noun
+#                                            itself with the possessive (Arabic suffixes):
+#                                            phrase.your.knight.nom = حصانك
+#   2. owner.<owner>.<form>.<gender>         the possessive pattern for pieces of that gender
+#      owner.<owner>.<form>                  or for every piece; {piece} = piece.<type>.<form>
+# with <owner> = your | my, <type> = pawn knight bishop rook queen king, <form> = the form the
+# sentence asks for: "{my:acc}" asks for "acc"; "{my}" asks for "nom". Invent the forms your
+# language needs (French: nom, and the gender "piece.rook.gender = f" with
+# "owner.your.nom.f = ta {piece}"; German: nom acc dat; Russian: nom acc gen dat ins pre) and
+# define each form you use for all six pieces. English needs only "nom".
+piece.pawn.nom = pawn
+piece.knight.nom = knight
+piece.bishop.nom = bishop
+piece.rook.nom = rook
+piece.queen.nom = queen
+piece.king.nom = king
+owner.your.nom = your {piece}
+owner.my.nom = my {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# Written squares are always "e4". The voice says {file} then {rank}. Spell the file letters the way
+# your voice reads them correctly as letter names ("a4" must not sound like the article "a").
+square.spoken = {file} {rank}
+file.a.spoken = ay
+file.b.spoken = bee
+file.c.spoken = see
+file.d.spoken = dee
+file.e.spoken = ee
+file.f.spoken = eff
+file.g.spoken = gee
+file.h.spoken = aitch
+rank.1.spoken = one
+rank.2.spoken = two
+rank.3.spoken = three
+rank.4.spoken = four
+rank.5.spoken = five
+rank.6.spoken = six
+rank.7.spoken = seven
+rank.8.spoken = eight
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Written moves are figurine notation ("♘f3", "exd5", "O-O"). With "{move:letters}" a line shows the
+# piece letters instead, in this order: king queen rook bishop knight (the scoresheet's letters).
+move.letters = K Q R B N
+# Spoken moves: {piece} = piece.<type>.nom, {to} / {from} = a square, file or rank in words,
+# {file} = the file a pawn captures from, {move} = the move said so far.
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} takes {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} takes {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} takes {to}
+# In a line of moves, a capture on the square the previous move went to: "knight takes e5, pawn takes".
+move.recapture.spoken = {piece} takes
+move.castle_short.spoken = castles kingside
+move.castle_long.spoken = castles queenside
+move.promotion.spoken = {move}, promoting to a {piece}
+move.check.spoken = {move}, check
+move.mate.spoken = {move}, checkmate
+# Two moves of a line: {a} = the moves so far, {b} = the next one.
+moves.join.spoken = {a}, {b}
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Written numbers are digits. The voice reads number words: number.<n>.spoken for any n you need
+# (a missing one is composed: number.tens for 21-99, number.hundreds and number.hundreds_rest for
+# 100-999). A form, "{n:f}", looks for number.<n>.f.spoken first (gendered numbers).
+number.0.spoken = zero
+number.1.spoken = one
+number.2.spoken = two
+number.3.spoken = three
+number.4.spoken = four
+number.5.spoken = five
+number.6.spoken = six
+number.7.spoken = seven
+number.8.spoken = eight
+number.9.spoken = nine
+number.10.spoken = ten
+number.11.spoken = eleven
+number.12.spoken = twelve
+number.13.spoken = thirteen
+number.14.spoken = fourteen
+number.15.spoken = fifteen
+number.16.spoken = sixteen
+number.17.spoken = seventeen
+number.18.spoken = eighteen
+number.19.spoken = nineteen
+number.20.spoken = twenty
+number.30.spoken = thirty
+number.40.spoken = forty
+number.50.spoken = fifty
+number.60.spoken = sixty
+number.70.spoken = seventy
+number.80.spoken = eighty
+number.90.spoken = ninety
+number.tens.spoken = {tens}-{units}
+number.hundreds.spoken = {n} hundred
+number.hundreds_rest.spoken = {hundreds} and {rest}
+number.minus.spoken = minus {n}
+# A decimal number: {int} and {frac} (one digit).
+number.decimal = {int}.{frac}
+number.decimal.spoken = {int} point {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# "{n:point}" says the number with its noun: the forms are separated by '|' in the plural order of
+# assets/i18n (English one|other, French one|other, Russian and Ukrainian one|few|many, Arabic
+# zero|one|two|few|many|other, Japanese and Chinese a single form). {n} is the number.
+count.move = {n} move|{n} moves
+count.point = {n} point|{n} points
+count.pawn = {n} pawn|{n} pawns
+count.piece = {n} piece|{n} pieces
+count.mistake = {n} mistake|{n} mistakes
+count.blunder = {n} blunder|{n} blunders
+count.inaccuracy = {n} inaccuracy|{n} inaccuracies
+count.game = {n} game|{n} games
+count.time = {n} time|{n} times
+count.square = {n} square|{n} squares
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = minus {x}
+eval.even = 0.0
+eval.even.spoken = level
+eval.mate_win = mate in {n}
+eval.mate_loss = mated in {n}

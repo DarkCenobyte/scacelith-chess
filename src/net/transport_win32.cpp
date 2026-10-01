@@ -23,8 +23,11 @@
 #include <winhttp.h>
 #include <wincrypt.h>
 
+#include <algorithm>
+#include <cctype>
 #include <chrono>
 #include <condition_variable>
+#include <cstdlib>
 #include <deque>
 #include <thread>
 
@@ -130,6 +133,7 @@ std::string mapError(DWORD e, const RequestContext& c) {
     if (c.pinMismatch.load()) return "certificate";
     switch (e) {
     case ERROR_WINHTTP_TIMEOUT: return "timeout";
+    case 10060: return "timeout";   // WSAETIMEDOUT, which Wine's WinHTTP passes on
     case ERROR_WINHTTP_SECURE_FAILURE:
         return (c.secureFlags.load() & WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR) ? "tls" : "certificate";
     case ERROR_WINHTTP_SECURE_CERT_DATE_INVALID:
@@ -448,6 +452,113 @@ void httpRequest(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel) 
         resp = HttpResponse();
     }
     perform(r, resp, cancel);
+}
+
+// ---- Streamed responses ----
+
+namespace {
+
+// Every header of the response (WINHTTP_QUERY_RAW_HEADERS_CRLF), names lower-case.
+void queryAllHeaders(HINTERNET req, HttpHead& head) {
+    DWORD size = 0;
+    WinHttpQueryHeaders(req, WINHTTP_QUERY_RAW_HEADERS_CRLF, WINHTTP_HEADER_NAME_BY_INDEX, WINHTTP_NO_OUTPUT_BUFFER, &size,
+                        WINHTTP_NO_HEADER_INDEX);
+    if (GetLastError() != ERROR_INSUFFICIENT_BUFFER || size == 0) return;
+    std::wstring w(size / sizeof(wchar_t) + 1, L'\0');
+    if (!WinHttpQueryHeaders(req, WINHTTP_QUERY_RAW_HEADERS_CRLF, WINHTTP_HEADER_NAME_BY_INDEX, &w[0], &size, WINHTTP_NO_HEADER_INDEX))
+        return;
+    std::string all = narrow(w.data(), size / sizeof(wchar_t));
+    size_t pos = all.find("\r\n");   // after the status line
+    while (pos != std::string::npos && pos + 2 < all.size()) {
+        pos += 2;
+        size_t e = all.find("\r\n", pos);
+        std::string line = all.substr(pos, e == std::string::npos ? std::string::npos : e - pos);
+        size_t c = line.find(':');
+        if (c != std::string::npos) {
+            std::string name = line.substr(0, c), value = line.substr(c + 1);
+            for (char& ch : name) ch = char(std::tolower((unsigned char)ch));
+            size_t a = value.find_first_not_of(" \t"), b = value.find_last_not_of(" \t");
+            head.headers.emplace_back(name, a == std::string::npos ? std::string() : value.substr(a, b - a + 1));
+        }
+        pos = e;
+    }
+}
+
+}  // namespace
+
+void httpStream(const HttpRequest& r, const std::function<bool(const HttpHead&)>& onHead,
+                const std::function<bool(const char*, size_t)>& onBody, HttpResponse& resp, CancelToken* cancel) {
+    resp = HttpResponse();
+    if (!r.tls && !isLoopbackHost(r.host)) {
+        resp.error = "insecure";
+        return;
+    }
+    Handle conn, req;
+    std::string pin = r.tls ? r.pinnedSha256 : std::string();
+    if (!openRequest(r.host, r.port, r.tls, r.method, r.path, pin, r.timeoutMs, conn, req, resp.error, resp.detail)) return;
+    // The wait for the response headers has its own timeout (90 s by default), which some
+    // WinHTTP implementations (Wine's) apply instead of the receive timeout.
+    DWORD headersTimeout = DWORD(r.timeoutMs);
+    WinHttpSetOption(req.get(), WINHTTP_OPTION_RECEIVE_RESPONSE_TIMEOUT, &headersTimeout, sizeof(headersTimeout));
+    RequestContext ctx;
+    ctx.pin = pin;
+    ctx.request = &req;
+    if (cancel) cancel->setAbort([&req] { req.close(); });
+
+    // The session's agent ("Scacelith") is only added when the request has none.
+    std::wstring headers = L"Accept: */*\r\n";
+    for (auto& h : r.headers) headers += widen(h.first) + L": " + widen(h.second) + L"\r\n";
+    std::string err;
+    bool ok = exchange(req, ctx, headers, std::string(), resp.error, resp.detail);
+    if (ok) {
+        HttpHead head;
+        head.status = int(queryStatus(req.get()));
+        queryAllHeaders(req.get(), head);
+        resp.status = head.status;
+        resp.retryAfter = head.get("retry-after");
+        bool wantBody = onHead(head) && r.method != "HEAD" && head.status != 204 && head.status != 304;
+        // WinHTTP removes the chunked coding itself; a sized body is checked for truncation here.
+        std::string cl = head.get("content-length");
+        bool sized = !cl.empty() && head.get("transfer-encoding").empty();
+        uint64_t announced = sized ? std::strtoull(cl.c_str(), nullptr, 10) : 0, total = 0;
+        if (wantBody && sized && announced > r.maxResponseBytes) { err = "too_large"; ok = false; wantBody = false; }
+        std::vector<char> buf(64 * 1024);
+        while (wantBody) {
+            DWORD avail = 0;
+            if (!WinHttpQueryDataAvailable(req.get(), &avail)) {
+                DWORD e = GetLastError();
+                resp.error = mapError(e, ctx);
+                resp.detail = "read " + std::to_string(e);
+                ok = false;
+                break;
+            }
+            if (avail == 0) {
+                if (sized && total < announced) { err = "truncated"; ok = false; }
+                break;
+            }
+            DWORD got = 0;
+            if (!WinHttpReadData(req.get(), buf.data(), std::min<DWORD>(avail, DWORD(buf.size())), &got)) {
+                DWORD e = GetLastError();
+                resp.error = mapError(e, ctx);
+                resp.detail = "read " + std::to_string(e);
+                ok = false;
+                break;
+            }
+            if (got == 0) {
+                if (sized && total < announced) { err = "truncated"; ok = false; }
+                break;
+            }
+            total += got;
+            if (total > r.maxResponseBytes) { err = "too_large"; ok = false; break; }
+            if (!onBody(buf.data(), got)) { err = "aborted"; ok = false; break; }
+        }
+    }
+    if (cancel) {
+        cancel->setAbort(nullptr);
+        if (cancel->cancelled()) { err = "cancelled"; ok = false; }
+    }
+    if (!ok && !err.empty()) resp.error = err;
+    if (!ok && resp.error.empty()) resp.error = "network";
 }
 
 std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int& httpStatus, CancelToken* cancel) {

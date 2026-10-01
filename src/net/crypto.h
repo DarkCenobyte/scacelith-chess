@@ -10,6 +10,7 @@
 #include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -24,6 +25,25 @@ const char* backendName();                       // "bcrypt", "openssl" or "port
 Sha256 sha256(const void* data, size_t n);
 inline Sha256 sha256(const std::string& s) { return sha256(s.data(), s.size()); }
 Sha1 sha1(const void* data, size_t n);           // WebSocket accept key only
+
+// Incremental SHA-256, for data that never sits whole in memory (downloads, model files).
+class Sha256Stream {
+public:
+    Sha256Stream();
+    ~Sha256Stream();
+    Sha256Stream(const Sha256Stream&) = delete;
+    Sha256Stream& operator=(const Sha256Stream&) = delete;
+    void update(const void* data, size_t n);
+    Sha256 finish();                             // the digest of everything so far; starts over
+    void reset();
+    uint64_t bytes() const { return bytes_; }    // fed since the last reset
+
+private:
+    struct State;
+    std::unique_ptr<State> st_;
+    uint64_t bytes_ = 0;
+};
+
 bool randomBytes(void* out, size_t n);           // false when the OS generator failed
 
 std::string base64(const void* data, size_t n);           // RFC 4648 with padding

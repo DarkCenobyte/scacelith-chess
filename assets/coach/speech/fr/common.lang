@@ -1,0 +1,218 @@
+# Coach speech (French): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms French needs.
+# Register: the coach says "tu" to the player; the coach is male ("je suis content").
+# Typography as in assets/i18n/fr.lang: a no-break space before : ; ? ! and inside guillemets,
+# typographic apostrophes.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns and genders: le pion, le cavalier, le fou, la tour, la dame, le roi.
+piece.pawn.nom = pion
+piece.knight.nom = cavalier
+piece.bishop.nom = fou
+piece.rook.nom = tour
+piece.queen.nom = dame
+piece.king.nom = roi
+piece.pawn.gender = m
+piece.knight.gender = m
+piece.bishop.gender = m
+piece.rook.gender = f
+piece.queen.gender = f
+piece.king.gender = m
+# {your} = "ton cavalier" / "ta tour", {my} = "mon cavalier" / "ma tour" (masculine is the default).
+owner.your.nom = ton {piece}
+owner.your.nom.f = ta {piece}
+owner.my.nom = mon {piece}
+owner.my.nom.f = ma {piece}
+# Pronouns standing for the piece of the placeholder, so that a sentence agrees with any piece:
+#   {your:il} / {my:il} = subject pronoun, "il" or "elle" ("Voici ta tour. Elle se déplace...")
+#   {your:le} / {my:le} = direct object pronoun before a consonant, "le" or "la" ("Prends-la !")
+phrase.your.pawn.il = il
+phrase.your.knight.il = il
+phrase.your.bishop.il = il
+phrase.your.rook.il = elle
+phrase.your.queen.il = elle
+phrase.your.king.il = il
+phrase.my.pawn.il = il
+phrase.my.knight.il = il
+phrase.my.bishop.il = il
+phrase.my.rook.il = elle
+phrase.my.queen.il = elle
+phrase.my.king.il = il
+phrase.your.pawn.le = le
+phrase.your.knight.le = le
+phrase.your.bishop.le = le
+phrase.your.rook.le = la
+phrase.your.queen.le = la
+phrase.your.king.le = le
+phrase.my.pawn.le = le
+phrase.my.knight.le = le
+phrase.my.bishop.le = le
+phrase.my.rook.le = la
+phrase.my.queen.le = la
+phrase.my.king.le = le
+# {your:e} / {my:e} (also {your2:e}, {my2:e}) = the feminine ending of a past participle or adjective
+# that agrees with the piece, empty for a masculine piece: "{your} est cloué{your:e}" = "ton fou est
+# cloué" / "ta tour est clouée" (review.lang). Only after the placeholder it agrees with, and only for
+# endings that add "e" ("cloué", "piégé", "perdu", "pris", "lent"; not "actif").
+phrase.your.pawn.e =
+phrase.your.knight.e =
+phrase.your.bishop.e =
+phrase.your.rook.e = e
+phrase.your.queen.e = e
+phrase.your.king.e =
+phrase.my.pawn.e =
+phrase.my.knight.e =
+phrase.my.bishop.e =
+phrase.my.rook.e = e
+phrase.my.queen.e = e
+phrase.my.king.e =
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# Letter names as in the opening texts (tools/gen_opening_lang.py): "e quatre", "dé cinq", "effe trois".
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = bé
+file.c.spoken = cé
+file.d.spoken = dé
+file.e.spoken = e
+file.f.spoken = effe
+file.g.spoken = gé
+file.h.spoken = ache
+rank.1.spoken = un
+rank.2.spoken = deux
+rank.3.spoken = trois
+rank.4.spoken = quatre
+rank.5.spoken = cinq
+rank.6.spoken = six
+rank.7.spoken = sept
+rank.8.spoken = huit
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# French scoresheet letters: R(oi) D(ame) T(our) F(ou) C(avalier).
+move.letters = R D T F C
+# Spoken: "cavalier effe trois", "cavalier prend en e cinq", "pion dé prend en e cinq",
+# "pion reprend", "petit roque", "e huit, promotion en dame", "dame gé quatre, échec".
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} prend en {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} prend en {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = pion {file} prend en {to}
+move.recapture.spoken = {piece} reprend
+move.castle_short.spoken = petit roque
+move.castle_long.spoken = grand roque
+move.promotion.spoken = {move}, promotion en {piece}
+move.check.spoken = {move}, échec
+move.mate.spoken = {move}, échec et mat
+moves.join.spoken = {a}, {b}
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words. 21-99 compose as "{tens}-{units}" except where French does not (et un,
+# soixante-dix, quatre-vingts): those are listed. The form "f" is the feminine ("une pièce",
+# "vingt et une parties"): number.<n>.f.spoken, used by the feminine counted nouns below.
+number.0.spoken = zéro
+number.1.spoken = un
+number.1.f.spoken = une
+number.2.spoken = deux
+number.3.spoken = trois
+number.4.spoken = quatre
+number.5.spoken = cinq
+number.6.spoken = six
+number.7.spoken = sept
+number.8.spoken = huit
+number.9.spoken = neuf
+number.10.spoken = dix
+number.11.spoken = onze
+number.12.spoken = douze
+number.13.spoken = treize
+number.14.spoken = quatorze
+number.15.spoken = quinze
+number.16.spoken = seize
+number.17.spoken = dix-sept
+number.18.spoken = dix-huit
+number.19.spoken = dix-neuf
+number.20.spoken = vingt
+number.21.spoken = vingt et un
+number.21.f.spoken = vingt et une
+number.30.spoken = trente
+number.31.spoken = trente et un
+number.31.f.spoken = trente et une
+number.40.spoken = quarante
+number.41.spoken = quarante et un
+number.41.f.spoken = quarante et une
+number.50.spoken = cinquante
+number.51.spoken = cinquante et un
+number.51.f.spoken = cinquante et une
+number.60.spoken = soixante
+number.61.spoken = soixante et un
+number.61.f.spoken = soixante et une
+number.70.spoken = soixante-dix
+number.71.spoken = soixante et onze
+number.72.spoken = soixante-douze
+number.73.spoken = soixante-treize
+number.74.spoken = soixante-quatorze
+number.75.spoken = soixante-quinze
+number.76.spoken = soixante-seize
+number.77.spoken = soixante-dix-sept
+number.78.spoken = soixante-dix-huit
+number.79.spoken = soixante-dix-neuf
+number.80.spoken = quatre-vingts
+number.81.spoken = quatre-vingt-un
+number.81.f.spoken = quatre-vingt-une
+number.82.spoken = quatre-vingt-deux
+number.83.spoken = quatre-vingt-trois
+number.84.spoken = quatre-vingt-quatre
+number.85.spoken = quatre-vingt-cinq
+number.86.spoken = quatre-vingt-six
+number.87.spoken = quatre-vingt-sept
+number.88.spoken = quatre-vingt-huit
+number.89.spoken = quatre-vingt-neuf
+number.90.spoken = quatre-vingt-dix
+number.91.spoken = quatre-vingt-onze
+number.92.spoken = quatre-vingt-douze
+number.93.spoken = quatre-vingt-treize
+number.94.spoken = quatre-vingt-quatorze
+number.95.spoken = quatre-vingt-quinze
+number.96.spoken = quatre-vingt-seize
+number.97.spoken = quatre-vingt-dix-sept
+number.98.spoken = quatre-vingt-dix-huit
+number.99.spoken = quatre-vingt-dix-neuf
+number.100.spoken = cent
+number.tens.spoken = {tens}-{units}
+number.hundreds.spoken = {n} cent
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = moins {n}
+# A decimal number: French writes a decimal comma ("1,3") and says "un virgule trois".
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} virgule {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# French plural rule (assets/i18n): one (0 and 1) | other. Feminine nouns say their number with the
+# form "f": "une erreur", "vingt et une parties".
+count.move = {n} coup|{n} coups
+count.point = {n} point|{n} points
+count.pawn = {n} pion|{n} pions
+count.piece = {n:f} pièce|{n:f} pièces
+count.mistake = {n:f} erreur|{n:f} erreurs
+count.blunder = {n:f} gaffe|{n:f} gaffes
+count.inaccuracy = {n:f} imprécision|{n:f} imprécisions
+count.game = {n:f} partie|{n:f} parties
+count.time = {n:f} fois|{n:f} fois
+count.square = {n:f} case|{n:f} cases
+# "{n:f}" in a line says a number in the feminine ("une", "vingt et une"); it is a count key so
+# that the same form also works outside the counted nouns (and the form check knows it).
+count.f = {n:f}|{n:f}
+# Attackers and defenders of a square (review.lang, ex.exchange_count): "2 attaquants", "1 défenseur".
+count.attacker = {n} attaquant|{n} attaquants
+count.defender = {n} défenseur|{n} défenseurs
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = moins {x}
+eval.even = 0,0
+eval.even.spoken = égalité
+eval.mate_win = mat en {n}
+eval.mate_loss = mat en {n} contre toi

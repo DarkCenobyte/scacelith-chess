@@ -1,0 +1,260 @@
+# Coach speech: the rules lesson (level 0, src/coach/lesson.cpp; research-pedagogy §3). German.
+# Every language has exactly the English keys (and the same variants).
+#
+# Placeholders: {your} / {my} = a piece of the player / of the coach ("dein Turm", "mein Springer");
+# {your:acc}, {my:dat} ... ask for a case (common.lang). {sq}, {sq2}, {to}, {esc} = squares ({to} = the
+# square the player just moved to, {esc} = where the coach's king escapes); {move} = a move. {@}, {@2},
+# {@3} are invisible marks: the coach points at something while saying the word right after the mark.
+# German notes: no pronoun refers back to a {your}/{my} piece (er/sie would depend on the piece), and
+# no piece placeholder follows a colon (the program capitalises a piece only after . ! ?).
+
+# ---- Chapter titles (said inside "Machen wir weiter mit {chapter}.") ------------------------------------
+# German: dative noun phrases, since every sentence of events.lang puts them after "mit".
+lesson.title.welcome = dem Schachbrett
+lesson.title.pieces = den Gangarten der Figuren
+lesson.title.safety = gedeckten und ungedeckten Figuren
+lesson.title.check = dem Schachgebot
+lesson.title.mate = dem Schachmatt
+lesson.title.castling = der Rochade
+lesson.title.en_passant = dem Schlagen en passant
+lesson.title.promotion = der Umwandlung
+lesson.title.draws = Patt und Remis
+lesson.title.etiquette = echten Partien: Wertung, Uhr und Umgangsformen
+
+# ---- Lines every exercise uses ------------------------------------------------------------------------
+# After the coach demonstrated the solution.
+lesson.now_you = Jetzt probierst du es.
+lesson.now_you.2 = Jetzt bist du dran.
+lesson.now_you.3 = Jetzt du.
+# Another wrong move after the demonstration.
+lesson.almost = Fast! Spiel den Zug, den ich dir gezeigt habe.
+lesson.almost.2 = Nicht ganz. Versuch den Zug aus meiner Vorführung.
+lesson.almost.3 = Knapp daneben. Denk an das, was ich dir gerade gezeigt habe.
+# A wrong move without a line of its own.
+lesson.try_again = Das ist es nicht. Versuch es noch einmal.
+lesson.try_again.2 = Dieser Zug nicht. Probier es noch mal.
+lesson.try_again.3 = Versuchen wir es noch einmal.
+lesson.use_your = Nimm {your:acc}.
+lesson.use_your.2 = Versuch es mit {your:dat}.
+lesson.watch = Schau zu.
+lesson.like_this = So geht das.
+lesson.and_back = Und wieder zurück.
+# A check that is not checkmate (the coach then shows the escape).
+lesson.check_escape = Schach, aber mein König entkommt nach {esc}.
+lesson.check_takes = Schach, aber mein König schlägt einfach {your:acc}.
+lesson.check_block = Schach, aber ich kann eine Figur dazwischenstellen.
+lesson.stalemate = Patt! Kein Schach, aber mein König kann nicht ziehen. Remis, obwohl du vorn lagst!
+
+# ---- Why a move is not allowed (the coach points at the piece or square in question) ----------------
+# {sq} = the square in question, {my} = the coach's piece that attacks, pins, blocks or gives
+# check, {your} = the piece the player tried to move.
+why.KingIntoCheck = Nicht nach {sq}! {my} greift das Feld an. Ein König zieht nie in Gefahr.
+why.PathBlocked = Da steht etwas im {@}Weg: Figuren können nicht springen, außer dem Springer.
+why.WrongGeometry = So zieht {your} nicht.
+why.MustAnswerCheck = Du stehst im {@}Schach: Das musst du zuerst abwehren.
+why.CastlingThroughCheck = Dein König müsste über {sq} ziehen, und {my} greift das Feld an.
+why.CastlingNoRights = Der König oder dieser Turm hat schon gezogen: keine Rochade.
+why.CastlingBlocked = Für die Rochade müssen die Felder zwischen König und Turm frei sein.
+why.CastlingOutOfCheck = Im Schach darfst du nicht rochieren.
+why.PawnForwardBlocked = Bauern schlagen nicht geradeaus: Das Feld ist {@}versperrt.
+why.LeavesKingInCheck = {your} ist gefesselt. Ziehst du damit, gibt {my} deinem König Schach.
+why.OwnPieceOnTarget = Auf deine eigene Figur kannst du nicht ziehen.
+why.PawnCaptureNeedsVictim = Ein Bauer zieht nur schräg, wenn er schlägt.
+why.EnPassantExpired = En passant geht nur direkt nach dem Doppelschritt des Bauern.
+why.NotYourTurn = Warte: Ich bin am Zug.
+
+# ---- Chapter 0: welcome and the board -------------------------------------------------------------------
+lesson.welcome.hello = Hallo! Ich bin dein Trainer. Wir lernen gemeinsam die Regeln, Schritt für Schritt.
+lesson.welcome.board = Das ist das Schachbrett: vierundsechzig helle und dunkle Felder, acht mal acht.
+lesson.welcome.light = Das Eckfeld zu deiner {@}Rechten ist immer ein helles Feld. Merk dir: Hell ist rechts.
+lesson.welcome.files = Die Spalten heißen Linien. Sie tragen Buchstaben, von {@}a bis {@2}h.
+lesson.welcome.files.spoken = Die Spalten heißen Linien. Sie tragen Buchstaben, von {@}a bis {@2}ha.
+lesson.welcome.ranks = Die Zeilen heißen Reihen. Sie tragen Zahlen, von {@}eins bis {@2}acht, ab deiner Seite.
+lesson.welcome.square = Jedes Feld hat einen Namen: erst der Buchstabe, dann die Zahl. Dieses Feld heißt {sq}.
+lesson.welcome.square2 = Und das hier ist {sq}.
+lesson.welcome.kings = Das sind die beiden Könige. Deiner steht auf {sq}, meiner auf {sq2}.
+lesson.welcome.ask = Jetzt du: Zieh deinen König ein Feld vor, nach {sq}.
+lesson.welcome.wrong = Das ist {to}. Wir wollen nach {sq}: Buchstabe e, Zahl zwei.
+lesson.welcome.ok = Perfekt. Dein König steht auf {sq}.
+
+# ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
+# Rook
+lesson.rook.intro = Das ist {your}. Der Turm zieht geradeaus, auf Linien und Reihen, so weit er will.
+lesson.rook.lines = Die Linie hinauf {@}oder die Reihe entlang.
+lesson.rook.capture = Zum Schlagen ziehst du auf das Feld einer {@}gegnerischen Figur. Sie verlässt das Brett.
+lesson.rook.ask = Schlag {my:acc} mit deinem Turm!
+lesson.rook.short = Richtige Richtung! Weiter die Linie hinauf, bis zu {my:dat}.
+lesson.rook.rank = Das geht die Reihe entlang. {my} steht weiter oben auf der Linie.
+lesson.rook.king = Das ist dein König. Nimm {your:acc} in der Ecke.
+lesson.rook.ok = Geschlagen! {my} verlässt das Brett.
+# Pieces don't jump
+lesson.jump.blocked = Figuren springen nicht über andere. Dein Bauer auf {sq} versperrt dem Turm den Weg.
+lesson.jump.knight = Nur der Springer kann springen. Den lernst du bald kennen.
+# Bishop
+lesson.bishop.intro = Das ist {your}. Der Läufer zieht schräg, so weit er will.
+lesson.bishop.colour = Ein Läufer bleibt immer auf Feldern derselben Farbe.
+lesson.bishop.ask = {my} steht auf der Diagonale deines Läufers. Schlag zu!
+lesson.bishop.short = Richtige Diagonale! Geh weiter, bis du {my:acc} erreichst.
+lesson.bishop.other = Das ist die andere Diagonale. Schau, wo {my} steht.
+lesson.bishop.ok = Ausgezeichnet. Läufer lieben lange Diagonalen.
+# Queen
+lesson.queen.intro = Das ist {your}, die stärkste Figur. Die Dame zieht wie Turm und Läufer zusammen.
+lesson.queen.ask = Finde {my:acc} und schlag mit deiner Dame zu.
+lesson.queen.wrong = Deine Dame kann {my:acc} in einem Zug erreichen, über eine Diagonale.
+lesson.queen.ok = Gut gemacht! Pass auf deine Dame auf: Sie ist viel wert.
+# King
+lesson.king.intro = Der König zieht nur ein Feld weit, in jede Richtung.
+lesson.king.important = Der König ist die wichtigste Figur. Ist er gefangen, ist die Partie verloren.
+lesson.king.ask = Auch der König kann schlagen. Schlag {my:acc}!
+lesson.king.wrong = Dein König steht direkt neben {my:dat}. Zieh einfach darauf, um zu schlagen.
+lesson.king.ok = Gut! Der König ist langsam, aber aus der Nähe stark.
+# Knight
+lesson.knight.intro = Das ist {your}. Springer ziehen im L: zwei geradeaus, dann eins zur Seite.
+lesson.knight.l = {@}So. Der Springer landet immer auf einem Feld der anderen Farbe.
+lesson.knight.jump = Der Springer ist die einzige Figur, die über andere springen kann.
+lesson.knight.ask = Schlag {my:acc} mit deinem Springer!
+lesson.knight.wrong = Ein echter Springerzug, aber er erreicht {my:acc} nicht. Versuch ein anderes L.
+lesson.knight.ok = Toller Sprung!
+# Pawn: moving
+lesson.pawn.intro = Nun zu {your:dat}. Bauern ziehen geradeaus nach vorn, ein Feld pro Zug, nie zurück.
+lesson.pawn.first = Beim ersten Zug darf ein Bauer ein oder zwei Felder vorgehen.
+lesson.pawn.ask = Zieh deinen Bauern zwei Felder vor.
+lesson.pawn.one = Nur ein Feld: erlaubt, aber diesmal bitte zwei.
+lesson.pawn.use = Nimm den Bauern.
+lesson.pawn.ok = Gut.
+# Pawn: capturing
+lesson.pawncap.blocked = Mein Bauer blockiert deinen. Bauern schlagen nicht geradeaus.
+lesson.pawncap.diagonal = Aber ein Bauer schlägt schräg, ein Feld nach vorn.
+lesson.pawncap.ask = Schlag {my:acc} mit deinem Bauern.
+lesson.pawncap.use = Nimm {your:acc}. Geschlagen wird schräg nach vorn.
+lesson.pawncap.ok = Ja! Geradeaus ziehen, schräg schlagen.
+# Values, set-up and the first moves
+lesson.values.pawn = Jede Figur hat einen Wert in Punkten. Ein Bauer ist einen Punkt wert.
+lesson.values.pieces = Ein Springer oder ein {@}Läufer: drei. Ein {@2}Turm: fünf. Die {@3}Dame: neun.
+lesson.values.king = Der König ist unbezahlbar: Du kannst ihn nie hergeben.
+lesson.values.trade = Gib möglichst nie eine Figur für weniger her, als sie wert ist.
+lesson.setup.corners = Jede Partie beginnt so: Türme in den {@}Ecken, dann {@2}Springer, dann {@3}Läufer.
+lesson.setup.queen = Die Dame steht auf ihrer eigenen Farbe: Deine Dame steht auf einem hellen Feld.
+lesson.setup.king = Der König steht neben ihr. Weiß zieht immer zuerst.
+lesson.first.ask = Fang an: Zieh den Bauern vor deinem König zwei Felder vor, nach {sq}.
+lesson.first.wrong = Auch das ist erlaubt! Aber jetzt zieh bitte deinen Königsbauern nach {sq}.
+lesson.first.ok = Ein starker erster Zug: Er öffnet deiner Dame und deinem Läufer den Weg.
+lesson.first.reply = Ich antworte genauso. Bring jetzt einen Springer heraus: Spring von {sq} nach {sq2}.
+lesson.first.knight_wrong = Springer springen über die Bauern. Versuch es von {sq} nach {sq2}.
+lesson.first.knight_ok = Perfekt. Springer und Läufer kommen früh ins Spiel.
+
+# ---- Chapter 2: safe and unsafe captures ---------------------------------------------------------------------
+lesson.safety.defended = Eine Figur ist gedeckt, wenn eine eigene Figur zurückschlagen kann.
+lesson.safety.pawn = Mein {@}Bauer deckt {my:acc}.
+lesson.safety.free = Aber {my} ist ungedeckt. Deine Dame greift beide Figuren an.
+lesson.safety.ask = Schlag die ungedeckte Figur!
+lesson.safety.watch = Schau, was jetzt passiert.
+lesson.safety.gave = Du hast deine Dame, neun Punkte wert, für meinen Springer gegeben, der drei wert ist.
+lesson.safety.other = Schlag diesmal die andere Figur.
+lesson.safety.look = Such die Figur, die nicht gedeckt ist.
+lesson.safety.ok = Ausgezeichnet! Frag dich immer: Ist diese Figur gedeckt?
+
+# ---- Chapter 3: check and getting out of check -----------------------------------------------------------------
+lesson.danger.rank = Mein Turm beherrscht die ganze zweite Reihe.
+lesson.danger.rule = Ein König darf nie auf ein Feld ziehen, auf dem er geschlagen werden könnte.
+lesson.danger.ask = Zieh deinen König auf ein sicheres Feld.
+lesson.danger.ok = Richtig. Dort ist dein König sicher.
+lesson.check.what = Mein Turm greift deinen König an. Das nennt man Schach.
+lesson.check.must = Stehst du im Schach, musst du es sofort abwehren.
+lesson.check.ways = Es gibt drei Wege: {@}den König wegziehen, {@2}dazwischenziehen oder {@3}den Angreifer schlagen.
+lesson.check.ask = Zieh hier deinen König aus dem Schach.
+lesson.check.file = Auf {to} bleibt dein König auf der Linie {@}meines Turms. Verlass die Linie.
+lesson.check.ok = Gut: Du stehst nicht mehr im Schach.
+lesson.block.again = Wieder Schach! Diesmal hat dein König kein freies Feld.
+lesson.block.ask = Also zieh dazwischen: Stell eine Figur in den Weg.
+lesson.block.queen = Das hilft! Aber mein Turm könnte deine Dame schlagen. Nimm eine billigere Figur.
+lesson.block.queen_ok = Das geht. Merk dir: Zieh mit der billigsten Figur dazwischen.
+lesson.block.ok = Perfekt. Zieh mit deiner schwächsten Figur dazwischen.
+lesson.capture.check = Meine Dame gibt Schach, direkt neben deinem König.
+lesson.capture.ask = Schlag den Angreifer!
+lesson.capture.king_ok = Ja! Meine Dame war ungedeckt, also konnte dein König sie schlagen.
+lesson.capture.knight_ok = Ja! Dein Springer hat den Angreifer geschlagen.
+
+# ---- Chapter 4: checkmate ------------------------------------------------------------------------------------
+lesson.mate1.what = Schachmatt: Der König steht im Schach und hat keinen Ausweg. Die Partie ist gewonnen.
+lesson.mate1.stuck = Mein König sitzt hinter seinen {@}eigenen Bauern fest.
+lesson.mate1.ask = Setz mich in einem Zug matt!
+lesson.mate1.wrong = Nah dran! Gib Schach auf meiner Grundreihe, wo mein König nicht entkommen kann.
+lesson.mate1.ok = Schachmatt! Das ist das Grundreihenmatt. Merk es dir!
+lesson.mate2.ask = Dein König und deine Dame arbeiten als Team. Setz mich in einem Zug matt.
+lesson.mate2.wrong = Finde ein Schach, das meinem König überhaupt kein Feld lässt.
+lesson.mate2.ok = Schachmatt! Dein König deckt die Dame, also kann meiner sie nicht schlagen.
+lesson.mate2.ok_rank = Schachmatt auf der Grundreihe! Dein König bewacht jedes Feld vor meinem.
+lesson.mate3.edge = Dein Turm auf der siebten Reihe hält meinen König am Rand fest.
+lesson.mate3.ask = Setz jetzt mit {your:dat} matt.
+lesson.mate3.free = Schach, aber die siebte Reihe ist jetzt frei, und mein König entkommt.
+lesson.mate3.takes = Mein König schlägt einfach deinen Turm.
+lesson.mate3.hint = Gib Schach auf der Grundreihe, mit dem Turm, der nicht die siebte Reihe bewacht.
+lesson.mate3.ok = Schachmatt! Die beiden Türme haben wie eine Leiter zusammengearbeitet.
+
+# ---- Chapter 5: castling ---------------------------------------------------------------------------------------
+lesson.castle.what = Die Rochade ist ein Sonderzug, der deinen König schützt. König und Turm ziehen zusammen.
+lesson.castle.how = Der {@}König zieht zwei Felder Richtung Turm, und der {@2}Turm springt über ihn hinweg.
+lesson.castle.ask = Fass immer zuerst den König an. Jetzt du: Rochiere kurz, auf der Königsseite.
+lesson.castle.rook = Damit ziehst du nur den Turm. Zum Rochieren zieh den König zwei Felder auf ihn zu.
+lesson.castle.long = Das ist die lange Rochade, auch erlaubt! Rochiere diesmal zum näheren Turm.
+lesson.castle.one = Ein Feld ist ein normaler Königszug. Bei der Rochade zieht der König zwei.
+lesson.castle.other = Zum Rochieren zieh deinen König zwei Felder in Richtung des Turms auf {sq}.
+lesson.castle.ok = Rochiert! Dein König steht geschützt, und dein Turm ist bereit fürs Spiel.
+lesson.castle2.moved = Du darfst nicht rochieren, wenn dein König oder dieser Turm schon gezogen hat.
+lesson.castle2.attacked = Auch nicht im Schach, oder wenn dein König ein bedrohtes Feld überquert oder betritt.
+lesson.castle2.bishop = Mein Läufer greift {sq} an. Die Rochade auf dieser Seite ist also verboten.
+lesson.castle2.ask = Rochiere auf der anderen Seite.
+lesson.castle2.other = Rochiere zu deinem anderen Turm, auf der Damenseite.
+lesson.castle2.ok = Richtig! Nach der langen Rochade steht dein König auf {sq}.
+
+# ---- Chapter 6: en passant ------------------------------------------------------------------------------------
+lesson.ep.what = Ein besonderer Schlagzug des Bauern heißt en passant. Das bedeutet „im Vorbeigehen“.
+lesson.ep.watch = Schau auf meinen Bauern: Er zieht zwei Felder und landet direkt neben deinem.
+lesson.ep.how = Dein Bauer darf ihn schlagen, als wäre meiner nur ein Feld gezogen: auf {sq}.
+lesson.ep.now = Aber nur sofort, in genau diesem Zug. Schlag en passant!
+lesson.ep.gone = Die Chance ist vorbei: En passant geht nur sofort. Versuchen wir es noch einmal.
+lesson.ep.ok = En passant! Mein Bauer auf {sq} verschwindet vom Brett.
+
+# ---- Chapter 7: promotion -------------------------------------------------------------------------------------
+lesson.promo.what = Auf der letzten Reihe wird ein Bauer umgewandelt: in Dame, Turm, Läufer oder Springer.
+lesson.promo.ask = Wähl fast immer die Dame. Wandle deinen Bauern jetzt um!
+lesson.promo.under = Erlaubt! Aber die Dame ist stärker. Nehmen wir die Dame.
+lesson.promo.under_ok = Gut. Die meisten Spieler wählen aber die Dame.
+lesson.promo.push = Zieh deinen Bauern auf die letzte Reihe, nach {sq}.
+lesson.promo.ok = Eine neue Dame! Du kannst sogar zwei Damen gleichzeitig haben.
+
+# ---- Chapter 8: stalemate and draws -----------------------------------------------------------------------------
+lesson.stale.what = Ich bin am Zug. Kein Schach, aber {@}alle Nachbarfelder meines Königs sind angegriffen.
+lesson.stale.draw = Ich habe keinen erlaubten Zug. Das ist Patt, und die Partie endet remis.
+lesson.stale2.ask = Liegst du vorn, achte aufs Patt! Setz mich in einem Zug matt, ohne Patt.
+lesson.stale2.wrong = Gib Schach auf meiner Grundreihe, wo mein König nicht entkommen kann.
+lesson.stale2.ok = Schachmatt! Lass dem gegnerischen König immer einen Zug, außer du setzt ihn matt.
+lesson.draws.kings = Remis ist es auch, wenn keiner mehr mattsetzen kann, etwa bei zwei Königen allein.
+lesson.draws.agree = Die Spieler können sich auch auf Remis einigen.
+lesson.draws.repeat = Dreimal dieselbe Stellung oder fünfzig Züge ohne Schlagen und Bauernzug erlauben auch Remis.
+
+# ---- Chapter 9: real games (rating, clock, touch-move, scoresheet, manners) ------------------------------------
+lesson.talk.rules = Jetzt kennst du alle Schachregeln. Gut gemacht!
+lesson.talk.real = Ich erzähle dir jetzt, wie echte Partien ablaufen.
+lesson.talk.elo = Jeder Spieler hat eine Elo-Zahl. Sie steigt bei Siegen und sinkt bei Niederlagen.
+lesson.talk.elo_gap = Siege gegen Stärkere bringen mehr Punkte, Niederlagen gegen Schwächere kosten mehr.
+lesson.talk.elo_start = Deine Elo erscheint nach fünf gewerteten Partien. Unsere Übungspartien zählen nicht.
+lesson.talk.clock = Das ist eine {@}Schachuhr. Die Zeit jedes Spielers läuft nur, solange er am Zug ist.
+lesson.talk.press = Nach deinem Zug drückst du die Uhr mit derselben Hand. Dann läuft meine Zeit.
+lesson.talk.flag = Läuft deine Zeit ab, verlierst du, es sei denn, ich kann dich gar nicht mattsetzen.
+lesson.talk.increment = Fünf plus drei heißt: je fünf Minuten, plus drei Sekunden nach jedem Zug.
+lesson.talk.speeds = Kurze Partien heißen Blitz, längere Schnellschach und die längsten klassische Partien.
+lesson.talk.no_clock = Bei mir läuft keine Uhr. Nimm dir zum Nachdenken alle Zeit, die du brauchst.
+lesson.talk.touch = In einer echten Partie gilt: Berührst du eine deiner Figuren, musst du sie ziehen.
+lesson.talk.touch_mine = Berührst du eine meiner Figuren, musst du sie schlagen, wenn das möglich ist.
+lesson.talk.adjust = Willst du eine Figur nur zurechtrücken, sag vorher „Ich rücke zurecht“.
+lesson.talk.release = Sobald du eine Figur auf einem neuen Feld loslässt, ist der Zug gemacht.
+lesson.talk.sheet = Im Turnier notieren beide Spieler jeden Zug auf einem {@}Partieformular.
+lesson.talk.notation = Man notiert den Buchstaben der Figur und das Feld, etwa {move:letters}. Bei Bauern nur das Feld.
+lesson.talk.robot = Dein Roboter notiert deine Züge. In schnellen Partien muss niemand mitschreiben.
+lesson.talk.handshake = Partien beginnen und enden mit einem Handschlag. Er bedeutet: gute Partie und danke.
+lesson.talk.polite = Ob Sieg oder Niederlage: Bleib höflich und stör deinen Gegner nie beim Nachdenken.
+lesson.talk.tips = Drei Tipps: {@}Beherrsche das Zentrum, {@2}entwickle Springer und Läufer, {@3}rochiere früh.
+lesson.talk.next = Bereit? Dann wähl „Erste Schritte“. Ich spiele behutsam und helfe dir nach jedem Fehler.
+lesson.talk.welcome = Willkommen in der Welt des Schachs! Geben wir uns die Hand.

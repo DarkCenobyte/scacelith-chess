@@ -71,6 +71,11 @@ options.effects = المؤثرات
 options.ambience = الأجواء
 options.ambience.help = همهمة القاعة: النار، ووقع خطى بعيدة، والساعة القديمة.
 options.ambience_volume = صوت الأجواء
+options.voice_volume = مستوى صوت المدرّب
+options.voice_volume.help = مستوى صوت المدرّب في وضع المدرّب.
+options.subtitles = الترجمة النصية
+options.subtitles.auto = تلقائي
+options.subtitles.help = كلمات المدرّب مكتوبةً أسفل الشاشة. تلقائي: تظهر حين لا يتحدث المدرّب لغة القوائم (مع القوائم الصينية يتحدث الإنجليزية). وتظهر دائمًا إن لم يكن صوته مثبّتًا.
 
 options.legal_moves = إظهار النقلات القانونية
 options.legal_moves.help = يميّز المربعات التي تستطيع القطعة الملموسة بلوغها. عند إيقافه لا شيء يخبرك إن كانت النقلة قانونية: يعاقب الحكم على النقلة غير القانونية بمجرد ضغطك على الساعة.
@@ -114,6 +119,10 @@ controls.moves.keys = Tab
 controls.moves = إظهار قائمة النقلات أو إخفاؤها
 controls.menu.keys = Esc
 controls.menu = القائمة
+controls.coach_skip.keys = المسافة
+controls.coach_skip = المدرّب: تخطّي ما يقوله
+controls.coach_takeback.keys = Backspace
+controls.coach_takeback = المدرّب: استرجاع النقلة حين يعرض ذلك
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = السطوع
@@ -201,11 +210,20 @@ credits.engine.head = محرّك الشطرنج
 credits.engine = Stockfish 19، من تطوير فريق Stockfish.
 credits.engine.licence = رخصة جنو العمومية العامة، الإصدار 3.
 credits.engine.data = تم تدريب شبكته العصبية على بيانات قدمها مشروع Leela Chess Zero، وهي متاحة بموجب رخصة قاعدة البيانات المفتوحة (ODbL).
+credits.voice.head = صوت المدرّب
+credits.voice = كلام اصطناعي مولَّد بواسطة Supertonic 3 لوضع المدرّب.
+credits.voice.licence = نموذج Supertonic 3 من إنتاج شركة Supertone، ويُستخدم بموجب رخصة OpenRAIL-M التي تسري قيود الاستخدام فيها على كل من يستخدمه (انظر التراخيص).
+credits.openings.head = الافتتاحيات
+credits.openings = أسماء الافتتاحيات مأخوذة من قاعدة بيانات chess-openings لموقع lichess.org، المهداة إلى الملك العام وفق CC0.
 credits.fonts.head = الخطوط
 credits.fonts = EB Garamond لجورج دافنر، وCinzel لناتانايل غاما، وAmiri لخالد حسني.
 credits.fonts.hand = خطوط اليد: Caveat وMarck Script وBad Script وAref Ruqaa وKlee One وLXGW WenKai ‏(SIL Open Font License).
 credits.fonts.figures = رموز الشطرنج من GNU FreeFont ‏(GPL v3 مع استثناء الخطوط).
 credits.quote = «الشطرنج هو فن التحليل.»  — ميخائيل بوتفينيك
+# Credits > Licences: the licence texts shipped with the game (they stay in English)
+credits.licences = التراخيص
+licences.title = التراخيص
+licences.note = تُعرض التراخيص بنصّها الإنجليزي الأصلي.
 
 # ---- Pause menu --------------------------------------------------------------------------------
 pause.title = إيقاف مؤقت
@@ -374,6 +392,14 @@ viewer.keys.menu = Esc
 viewer.controls.menu = القائمة
 viewer.keys.hide = H
 viewer.controls.hide = إخفاء هذه الإرشادات
+viewer.keys.replay_pause = K
+viewer.controls.replay_pause = إيقاف مؤقت / استئناف
+viewer.keys.replay_step = J  /  L
+viewer.controls.replay_step = نقلة إلى الوراء / إلى الأمام
+viewer.keys.replay_speed = Shift + J  /  L
+viewer.controls.replay_speed = أبطأ / أسرع
+viewer.keys.replay_ends = Home  /  End
+viewer.controls.replay_ends = بداية المباراة / نهايتها
 viewer.speed = السرعة {0} م/ث
 viewer.view.0 = بعيون اللاعبين
 viewer.view.1 = بجانب الطاولة
@@ -838,3 +864,191 @@ hotseat.gameover.friendly = {0} ضد {1} · مباراة ودية
 # {0} = name, {1} = rating before, {2} = after, {3} = change (+12)
 hotseat.elo.change = {0} {1} ← {2} ({3})
 hotseat.elo.unrated = هذه المباراة غير محتسبة.
+
+# ---- Coach mode (src/ui/ui_coach.cpp, src/ui/ui_screens.cpp; the coach's spoken lines are in assets/coach/speech)
+menu.coach = المدرّب
+# Bottom corner of the title page. {0} = "Supertonic 3" (a product name, never translated).
+menu.tts_credit = كلام اصطناعي مولَّد بواسطة {0} لوضع المدرّب
+# Coach page
+coach.title = المدرّب
+coach.section.level = المستوى
+coach.section.lesson = مع المدرّب
+# {0} = a rating range ("600–900", "2100+")
+coach.band = {0} إيلو
+# {0} = coach.band
+coach.band_for = للاعبين المصنَّفين {0}
+coach.completed = مكتمل
+coach.recommended = موصى به
+# Levels: a name, a one-line description (60 characters at most) and a paragraph for the lesson column
+coach.level.0.name = قواعد الشطرنج
+coach.level.0.desc = درس تفاعلي، قاعدة تلو الأخرى.
+coach.level.0.detail = يرتّب المدرّب مواقف صغيرة ويُريك كيف تتحرك كل قطعة وكيف تأسر، ثم التبييت والترقية والكش والكش مات. وتجرّب كل فكرة بنفسك على الرقعة.
+coach.level.1.name = الخطوات الأولى
+coach.level.1.desc = ما المهدَّد، وما بقي بلا حماية.
+coach.level.1.detail = يلعب المدرّب بلطف ويشرح بكلمات بسيطة: أيّ قطعك مهدَّدة، وأيّها بقي بلا حماية، وكيف تحافظ عليها.
+coach.level.2.name = مبتدئ
+coach.level.2.desc = تكتيكات بسيطة، تطوير القطع، أمان الملك.
+coach.level.2.detail = تُسمّى الشوكة والتثبيت بأسمائهما. ويتحدث المدرّب عن تطوير قطعك وحماية ملكك.
+coach.level.3.name = متوسط
+coach.level.3.desc = الخطط، بنية البيادق، النقلات الوحيدة.
+coach.level.3.detail = يشرح المدرّب الخطط وبنى البيادق، وينبّهك حين لا تصمد الوضعية إلا بنقلة واحدة.
+coach.level.4.name = لاعب نادٍ
+coach.level.4.desc = النقلات المرشّحة، التقييم بالبيادق.
+coach.level.4.detail = يوازن المدرّب بين النقلات المرشّحة ويعطي التقييم بالبيادق، كما يفعل مدرّب النادي.
+coach.level.5.name = لاعب نادٍ قوي
+coach.level.5.desc = تفريعات موجزة، مصطلحات موضعية.
+coach.level.5.detail = ملاحظات قصيرة وتفريعات ملموسة ومفردات اللعب الموضعي.
+coach.level.6.name = خبير
+coach.level.6.desc = ملاحظات مقتضبة، تفريعات عميقة، تقييمات بالأرقام.
+coach.level.6.detail = كلام قليل كما بين اللاعبين الأقوياء: تفريعات تمتد عدة نقلات وتقييمات بالأرقام.
+coach.note.clock = بلا ساعة: خذ كل الوقت الذي تحتاجه.
+coach.note.takeback = بعد الخطأ الفادح، يُريك المدرّب موضع الخلل ويعرض عليك استرجاع النقلة.
+coach.note.lesson = تلعب بالقطع البيضاء، ويرتّب المدرّب كل تمرين على الرقعة.
+coach.note.unrated = المباريات مع المدرّب غير محتسبة في التصنيف.
+coach.colour = لونك
+coach.colour.help = اللون الذي تلعب به ضد المدرّب. بالتناوب: الأبيض ثم الأسود من مباراة إلى أخرى. يُلعب درس القواعد دائمًا بالقطع البيضاء.
+coach.colour.alternate = بالتناوب
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = صوت المدرّب غير مثبّت أو متوقف (الخيارات > الصوت): ستظهر كلماته مكتوبةً على الشاشة.
+# At the table
+coach.speaker = المدرّب
+coach.skip = تخطّي
+coach.offer.title = استرجاع النقلة؟
+coach.offer.text = يعرض عليك المدرّب استرجاع نقلتك الأخيرة لتبحث عن نقلة أفضل.
+coach.offer.hint = مفتاح Backspace يسترجعها. لمس أي قطعة يعني متابعة اللعب.
+coach.offer.accept = استرجاع
+coach.offer.decline = متابعة اللعب
+coach.pause.take_back = استرجاع نقلتي
+coach.pause.take_back.help = يسترجع نقلتك الأخيرة، وردّ المدرّب إن كان قد لعب.
+coach.confirm.resign = هل تستسلم في هذه المباراة؟ سيُعلَن المدرّب فائزًا.
+coach.confirm.leave = هل تعود إلى القائمة الرئيسية؟ ستُلغى هذه المباراة مع المدرّب.
+# Game over card of a coach game, and the end of the lesson on the rules
+coach.gameover.again = العب مجددًا
+coach.gameover.unrated = هذه المباراة مع المدرّب غير محتسبة.
+coach.lesson.done = أحسنت
+coach.lesson.done.line = أصبحت تعرف قواعد الشطرنج.
+coach.lesson.next = المباراة الأولى
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = صوت المدرّب
+options.coach_voice.help = يتحدث المدرّب بصوت مسموع في وضع المدرّب. يُنزَّل نموذج صوته عند الحاجة إليه أول مرة (نحو 145 ميغابايت). إيقاف: تظهر كلمات المدرّب مكتوبةً على الشاشة فقط.
+# The prompt. {0} = the size in megabytes ("145.3")
+coach.download.title = صوت المدرّب
+coach.download.text = يتحدث المدرّب بواسطة Supertonic 3، وهو نموذج لتوليد الكلام من شركة Supertone. هذا النموذج غير مضمَّن في Scacelith: يمكن للعبة تنزيله الآن من Hugging Face ({0} ميغابايت، مرة واحدة). ومن دونه يكتب المدرّب كلماته على الشاشة.
+coach.download.licence = النموذج منشور بموجب ترخيص OpenRAIL-M، الذي يحظر بعض استخدامات الصوت الذي يولّده، مثل تقديمه على أنه صوت بشري أو انتحال شخصية شخص حقيقي.
+coach.download.read_licence = قراءة الترخيص
+coach.download.accept = باختيارك «تنزيل»، فإنك توافق على شروط هذا الترخيص.
+# {0} = a folder
+coach.download.folder = يُحفظ في: {0}
+coach.download.not_now = ليس الآن
+# {0} = the size in megabytes
+coach.download.download = تنزيل ({0} ميغابايت)
+coach.download.licence_title = ترخيص OpenRAIL-M
+coach.download.back = رجوع
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = صوت المدرّب
+coach.download.checking = جارٍ التحقق من الملفات…
+coach.download.downloading = جارٍ التنزيل…
+coach.download.extracting = جارٍ استخراج الملفات…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} ميغابايت
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = من Hugging Face
+coach.download.from_github = من GitHub (أرشيف الإصدار)
+coach.download.cancel = إلغاء
+coach.download.failed = تعذّر التنزيل.
+coach.download.error.network = تعذّر الوصول إلى الخوادم. يُرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.
+# {0} = a folder
+coach.download.error.disk = تعذّرت كتابة الملفات في {0}. يُرجى التحقق من المساحة الفارغة والمحاولة مرة أخرى.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = أرسلت الخوادم ردًّا غير متوقع ({0}). يُرجى المحاولة لاحقًا.
+coach.download.retry = إعادة المحاولة
+coach.download.close = إغلاق
+# Notices
+coach.download.done = تم تثبيت صوت المدرّب.
+coach.download.cancelled = أُلغي التنزيل: سيُستأنف في المرة القادمة من حيث توقف.
+
+# ---- Saved games (src/ui/ui_library.cpp; Options > Player: options.save_games) ----------------
+menu.library = المباريات المحفوظة
+options.save_games = حفظ مبارياتي
+options.save_games.help = عند انتهائها، تُحفظ مبارياتك ضد Stockfish ومع المدرّب وبين لاعبَين على هذا الحاسوب ومبارياتك عبر الاتصال المباشر في ملفات PGN، وتجدها في «المباريات المحفوظة». أما المباريات عبر الإنترنت فيحتفظ بها الخادم.
+library.title = المباريات المحفوظة
+library.section.games = المباريات
+library.section.details = المباراة
+library.section.tags = الوسوم
+library.section.moves = النقلات
+library.count = {0} مباراة|مباراة واحدة|مباراتان|{0} مباريات|{0} مباراة|{0} مباراة
+library.filter = عرض
+library.filter.all = كل المباريات
+library.filter.play = ضد Stockfish
+library.filter.coach = مع المدرّب
+library.filter.hotseat = لاعبان
+library.filter.direct = الاتصال المباشر
+library.filter.imported = مستوردة
+library.mode.play = ضد Stockfish
+library.mode.coach = مع المدرّب
+library.mode.hotseat = لاعبان
+library.mode.direct = اتصال مباشر
+library.mode.imported = مستوردة
+library.coach_level = المستوى {0}
+library.unknown_player = مجهول
+library.unfinished = لم تكتمل
+library.unreadable = تتعذّر قراءة هذه المباراة.
+library.moves = {0} نقلة|نقلة واحدة|نقلتان|{0} نقلات|{0} نقلة|{0} نقلة
+library.opening_variation = {0}: {1}
+library.file = الملف: {0}
+library.file_game = الملف: {0}، المباراة {1} من {2}
+library.no_moves = لم تُلعب أي نقلة.
+library.none_selected = اختر مباراة من القائمة.
+library.reading = جارٍ قراءة المباريات المحفوظة
+library.empty.title = لا توجد مباريات محفوظة بعد
+library.empty.text = تظهر هنا مبارياتك ضد Stockfish ومع المدرّب وبين لاعبَين على هذا الحاسوب ومبارياتك عبر الاتصال المباشر بعد انتهائها. يمكنك أيضًا وضع ملفات PGN في هذا المجلد: تظهر المباريات المصدَّرة من برامج أو مواقع أخرى مع مبارياتك.
+library.empty.filter = لا توجد مباريات من هذا النوع.
+library.error.folder = تتعذّر قراءة مجلد المباريات المحفوظة
+library.error.game = تتعذّر قراءة هذه المباراة: {0}
+library.folder = المجلد: {0}
+library.open_folder = فتح المجلد
+library.open_failed = تعذّر فتح المجلد.
+library.replay = إعادة العرض
+library.delete = حذف
+library.delete.title = حذف المباراة
+library.delete.text = ستُحذف المباراة {0} من هذا الحاسوب مع ملفها. لا يمكن التراجع عن ذلك.
+library.delete.ok = حذف
+library.delete.several = يحتوي هذا الملف على {0} مباراة: لا يمكن حذفه إلا من المجلد.|يحتوي هذا الملف على مباراة واحدة: لا يمكن حذفه إلا من المجلد.|يحتوي هذا الملف على مباراتين: لا يمكن حذفه إلا من المجلد.|يحتوي هذا الملف على {0} مباريات: لا يمكن حذفه إلا من المجلد.|يحتوي هذا الملف على {0} مباراة: لا يمكن حذفه إلا من المجلد.|يحتوي هذا الملف على {0} مباراة: لا يمكن حذفه إلا من المجلد.
+library.deleted = حُذفت المباراة.
+library.delete.failed = تعذّر حذف المباراة.
+library.delete.changed = تغيّر الملف: حُدّثت القائمة.
+library.truncated = يحتوي هذا المجلد على عدد كبير جدًا من المباريات: لا تُعرض إلا أحدث {0} مباراة.
+library.tag.Event = الحدث
+library.tag.Site = المكان
+library.tag.Date = التاريخ
+library.tag.Time = الوقت
+library.tag.Round = الجولة
+library.tag.White = الأبيض
+library.tag.Black = الأسود
+library.tag.Result = النتيجة
+library.tag.WhiteElo = تصنيف الأبيض
+library.tag.BlackElo = تصنيف الأسود
+library.tag.TimeControl = نظام الوقت
+library.tag.Termination = نهاية المباراة
+library.tag.Opening = الافتتاح
+library.tag.Variation = المتغير
+library.tag.PlyCount = أنصاف النقلات
+library.tag.FEN = وضعية البداية
+library.tag.ScacelithMode = النمط
+library.tag.CoachLevel = مستوى المدرّب
+
+# ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
+replay.move = النقلة {0} من {1}
+replay.speed.factor = ×{0}
+replay.speed.instant = فوري
+replay.again = إعادة العرض مرة أخرى
+replay.gameover.unfinished = توقفت المباراة بعد النقلة {0} دون نتيجة.
+replay.tip.start = بداية المباراة (Home)
+replay.tip.back = نقلة إلى الوراء (J)
+replay.tip.pause = إيقاف مؤقت (K)
+replay.tip.resume = استئناف (K)
+replay.tip.forward = نقلة إلى الأمام (L)
+replay.tip.end = نهاية المباراة (End)
