@@ -597,6 +597,12 @@ void OnlineSession::handleServer(const net::Event& e) {
         routeGame(e, LinkKind::Server);
         return;
     }
+    // A call that found the saved session refused (expired, revoked): the network layer erased the
+    // token, whatever the call (net::Event::sessionLost).
+    if (e.sessionLost && signedIn_) {
+        signedIn_ = false;
+        LOGI("online: session refused, signed out");
+    }
     // HTTPS results are kept for the page that asked.
     auto store = [&]() {
         auto it = pending_.find(int(e.kind));

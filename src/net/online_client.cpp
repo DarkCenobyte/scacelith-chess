@@ -57,6 +57,7 @@
 #include <deque>
 #include <functional>
 #include <mutex>
+#include <new>
 #include <random>
 #include <thread>
 
@@ -426,6 +427,7 @@ struct OnlineClient::Impl {
         std::string text;        // Call::rawCap: the body of a 2xx answer as received
         std::string error;       // "" on 2xx
         int retryAfter = 0;
+        bool sessionLost = false;  // the saved token was refused (401) on the way, and erased
         bool ok() const { return error.empty(); }
     };
 
@@ -434,7 +436,7 @@ struct OnlineClient::Impl {
         None,                    // no token
         Optional,                // the token when one is saved (public reads that tell the signed-in
                                  // player more); when it is refused (401): erased, asked again without
-        Required                 // "not_logged_in" without a saved token
+        Required                 // "unauthorized" without a saved token (nothing sent)
     };
     struct Call {
         Auth auth = Auth::None;
@@ -451,7 +453,10 @@ struct OnlineClient::Impl {
     }
 
     // One API call to e's origin. A 401 answer to a request that carried the token means that the
-    // session is gone (expired, revoked, the account deleted): the token is erased, whatever the call.
+    // session is gone (expired, revoked, the account deleted): the token is erased, whatever the call,
+    // Api::sessionLost is set and the error is "unauthorized" whatever the server's code (the real
+    // server says invalid_token): the game has one code for "signed out", the same as for a call
+    // that needs the session while none is saved.
     Api request(const ServerEndpoint& e, const std::string& method, const std::string& path, const json::Value* body,
                 const Call& call, CancelToken& cancel) {
         Api out;
@@ -472,17 +477,18 @@ struct OnlineClient::Impl {
                 req.headers.emplace_back("Authorization", "Bearer " + c.token);
                 sentToken = true;
             } else if (call.auth == Auth::Required) {
-                out.error = "not_logged_in";
+                out.error = "unauthorized";
                 return out;
             }
         }
         json::Value payload = body ? *body : json::Value();
-        bool powSolved = false;
+        bool powSolved = false, refused = false;
         for (;;) {
             req.body = body ? payload.dump() : std::string();
             HttpResponse resp;
             httpRequest(req, resp, &cancel);
             out = Api();
+            out.sessionLost = refused;
             if (!resp.error.empty()) {
                 // Larger than this text answer may be: not what the call expects.
                 out.error = call.rawCap > 0 && resp.error == "too_large" ? "invalid_response" : resp.error;
@@ -508,7 +514,10 @@ struct OnlineClient::Impl {
             if (success) return out;
             out.error = out.body["error"].asString("http_" + std::to_string(resp.status));
             if (resp.status == 401 && sentToken) {
+                LOGW("net: %s %s: the session was refused (%s); its token is erased", method.c_str(), path.c_str(), out.error.c_str());
                 creds.clearToken(e.origin());
+                refused = out.sessionLost = true;
+                out.error = "unauthorized";
                 if (call.auth != Auth::Optional) return out;
                 // A public read: the same request again, without the token that was refused.
                 req.headers.erase(std::remove_if(req.headers.begin(), req.headers.end(),
@@ -546,6 +555,7 @@ struct OnlineClient::Impl {
         ev.ok = a.ok();
         ev.error = a.error;
         ev.retryAfterSec = a.retryAfter;
+        ev.sessionLost = a.sessionLost;
     }
 
     static RatingInfo parseRating(const json::Value& r) {
@@ -728,8 +738,14 @@ struct OnlineClient::Impl {
                     httpQ.pop_front();
                 }
             }
-            if (cmd) cmd();
-            else if (sso.active && Clock::now() >= sso.nextPoll) ssoPollOnce();
+            try {
+                if (cmd) cmd();
+                else if (sso.active && Clock::now() >= sso.nextPoll) ssoPollOnce();
+            } catch (const std::bad_alloc&) {
+                // A large answer (an account export is up to 64 MiB) with too little memory free:
+                // that call fails, the game goes on.
+                LOGE("net: out of memory in an HTTPS call");
+            }
         }
     }
 
@@ -1618,7 +1634,7 @@ void OnlineClient::logout(bool allSessions) {
         Event ev;
         ev.kind = Event::Kind::LogoutResult;
         Impl::fillError(ev, a);
-        if (a.status == 401 || a.error == "not_logged_in") {
+        if (a.status == 401 || a.error == "unauthorized") {
             ev.ok = true;
             ev.error.clear();
         }
@@ -1880,12 +1896,17 @@ bool looksLikePgn(const std::string& t) {
 }
 
 // The account export (S7): one JSON object, format "scacelith-account-export". The whole document
-// is checked, but only its top level is kept in memory while doing so (it may be large).
+// is checked, but only its top level is kept in memory while doing so (it may be large). The
+// server's document has about fifteen top-level members: more than kExportMaxMembers is not the
+// export, and is refused there (a hostile server's million members or items would otherwise all be
+// kept, and their names looked up one by one: gigabytes, or hours of this thread).
+constexpr size_t kExportMaxMembers = 64;
 bool validExport(const std::string& t) {
     json::Limits lim;
     lim.maxBytes = kExportMaxBytes;
     lim.maxElements = SIZE_MAX;
     lim.keepDepth = 1;
+    lim.maxKept = kExportMaxMembers;
     json::Value head;
     std::string err;
     if (!json::parse(t, head, &err, lim)) {
@@ -1928,13 +1949,14 @@ void OnlineClient::fetchMyGames(uint64_t before, int limit, const GamesFilter& f
     if (!filter.category.empty()) path += "&category=" + urlEncode(filter.category);
     if (filter.rated >= 0) path += filter.rated ? "&rated=true" : "&rated=false";
     if (!filter.result.empty()) path += "&result=" + urlEncode(filter.result);
-    d->http([d, e, path, before] {
+    d->http([d, e, path, before, filter] {
         Impl::Call call;
         call.auth = Impl::Auth::Required;
         Impl::Api a = d->request(e, "GET", path, nullptr, call, d->httpCancel);
         Event ev;
         ev.kind = Event::Kind::GamesResult;
         ev.gamesPage.before = before;
+        ev.gamesPage.filter = filter;
         finish(ev, a, [&] { return parseGamesPage(a.body, ev.gamesPage); });
         if (!ev.ok) ev.gamesPage.games.clear();
         d->post(ev);
@@ -2075,14 +2097,21 @@ void OnlineClient::exportAccount(const std::string& password, const std::string&
     b.set("password", password);
     setSecondFactor(b, codeOrRecovery);
     d->http([d, e, b] {
-        Impl::Call call;
-        call.auth = Impl::Auth::Required;
-        call.rawCap = kExportMaxBytes;
-        Impl::Api a = d->request(e, "POST", "/account/export", &b, call, d->httpCancel);
         Event ev;
         ev.kind = Event::Kind::AccountExportResult;
-        finish(ev, a, [&] { return validExport(a.text); });
-        if (ev.ok) ev.text = std::move(a.text);   // up to 64 MiB: moved, never copied
+        try {
+            Impl::Call call;
+            call.auth = Impl::Auth::Required;
+            call.rawCap = kExportMaxBytes;
+            Impl::Api a = d->request(e, "POST", "/account/export", &b, call, d->httpCancel);
+            finish(ev, a, [&] { return validExport(a.text); });
+            if (ev.ok) ev.text = std::move(a.text);   // up to 64 MiB: moved, never copied
+        } catch (const std::bad_alloc&) {
+            LOGW("net: out of memory for the account export");
+            ev.ok = false;
+            ev.error = "invalid_response";
+            ev.text.clear();
+        }
         d->post(std::move(ev));
     });
 }

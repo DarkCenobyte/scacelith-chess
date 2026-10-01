@@ -1278,11 +1278,14 @@ struct FakeServer::Impl {
         e.error = err;
         return e;
     }
-    // Transport failures of the configured host.
-    bool transportError(Event::Kind k) {
+    // Transport failures of the configured host (e: the other fields of the answer, if any).
+    bool transportError(Event::Kind k, Event e = Event()) {
         const char* err = hostHas("offline") ? "network" : hostHas("badcert") ? "certificate" : nullptr;
         if (!err) return false;
-        http(result(k, false, err));
+        e.kind = k;
+        e.ok = false;
+        e.error = err;
+        http(std::move(e));
         return true;
     }
     void rt(Event e, double delay = kOneWay) {
@@ -1983,16 +1986,22 @@ void FakeServer::fetchMyGames(uint64_t before, int limit, const GamesFilter& fil
     Impl& I = *impl_;
     I.lastNow = nowMs();
     const Event::Kind k = Event::Kind::GamesResult;
-    if (I.transportError(k)) return;
-    if (!I.signedIn) return I.http(I.result(k, false, "unauthorized"));
-    if (limit < 1 || limit > 50) return I.http(I.result(k, false, "invalid_limit"));
+    // Every answer names its request (the cursor and the filter), as net::OnlineClient's do.
+    auto answer = [&](bool ok, const char* error) {
+        Event e = I.result(k, ok, error);
+        e.gamesPage.before = before;
+        e.gamesPage.filter = filter;
+        return e;
+    };
+    if (I.transportError(k, answer(false, ""))) return;
+    if (!I.signedIn) return I.http(answer(false, "unauthorized"));
+    if (limit < 1 || limit > 50) return I.http(answer(false, "invalid_limit"));
     const bool catOk = filter.category.empty() || filter.category == "custom" || findCategory(filter.category);
     const bool resultOk = filter.result.empty() || filter.result == "win" || filter.result == "loss" || filter.result == "draw";
-    if (!catOk || !resultOk || filter.rated < -1 || filter.rated > 1) return I.http(I.result(k, false, "invalid_filter"));
+    if (!catOk || !resultOk || filter.rated < -1 || filter.rated > 1) return I.http(answer(false, "invalid_filter"));
     I.ensureHistory();
-    Event e = I.result(k, true);
+    Event e = answer(true, "");
     GamesPage& page = e.gamesPage;
-    page.before = before;
     for (const Impl::Past& p : I.history) {
         const GameDetails& d = p.d;
         if (!filter.category.empty() && d.category != filter.category) continue;
@@ -2016,12 +2025,18 @@ void FakeServer::fetchGame(uint64_t gameId) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
     const Event::Kind k = Event::Kind::GameDetailsResult;
-    if (I.transportError(k)) return;
-    if (!I.signedIn) return I.http(I.result(k, false, "unauthorized"));
+    // Every answer names the game asked for, as net::OnlineClient's do.
+    auto answer = [&](bool ok, const char* error) {
+        Event e = I.result(k, ok, error);
+        e.gameId = gameId;
+        return e;
+    };
+    if (I.transportError(k, answer(false, ""))) return;
+    if (!I.signedIn) return I.http(answer(false, "unauthorized"));
     I.ensureHistory();
     Impl::Past* p = I.findPast(gameId);
-    if (!p) return I.http(I.result(k, false, "not_found"));
-    Event e = I.result(k, true);
+    if (!p) return I.http(answer(false, "not_found"));
+    Event e = answer(true, "");
     e.gameDetails = p->d;
     e.gameDetails.reportable = I.reportable(*p);
     I.http(e);
@@ -2030,12 +2045,16 @@ void FakeServer::downloadPgn(uint64_t gameId) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
     const Event::Kind k = Event::Kind::PgnResult;
-    if (I.transportError(k)) return;
+    auto answer = [&](bool ok, const char* error) {
+        Event e = I.result(k, ok, error);
+        e.gameId = gameId;
+        return e;
+    };
+    if (I.transportError(k, answer(false, ""))) return;
     I.ensureHistory();
     Impl::Past* p = I.signedIn ? I.findPast(gameId) : nullptr;
-    if (!p) return I.http(I.result(k, false, "not_found"));
-    Event e = I.result(k, true);
-    e.gameId = gameId;
+    if (!p) return I.http(answer(false, "not_found"));
+    Event e = answer(true, "");
     e.text = serverPgn(p->d, contains(I.ep.host, "official") ? "Scacelith" : "Scacelith (mock server)", I.ep.host);
     I.http(e);
 }
@@ -2121,8 +2140,8 @@ void FakeServer::exportAccount(const std::string& password, const std::string& c
     const Event::Kind k = Event::Kind::AccountExportResult;
     if (I.transportError(k)) return;
     if (!I.signedIn) return I.http(I.result(k, false, "unauthorized"));
-    if (!I.reauth(k, password, codeOrRecovery)) return;
-    // Five an hour (account_export).
+    // Five an hour (account_export), as the server's router checks it: before the password, every
+    // attempt counted, failed ones included.
     I.exportTimes.erase(std::remove_if(I.exportTimes.begin(), I.exportTimes.end(), [&](double t) { return I.lastNow - t >= 3600000.0; }),
                         I.exportTimes.end());
     if (I.exportTimes.size() >= 5) {
@@ -2131,6 +2150,7 @@ void FakeServer::exportAccount(const std::string& password, const std::string& c
         return I.http(e);
     }
     I.exportTimes.push_back(I.lastNow);
+    if (!I.reauth(k, password, codeOrRecovery)) return;
     Event e = I.result(k, true);
     e.text = I.exportDocument();
     I.http(e);

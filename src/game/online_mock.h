@@ -24,7 +24,8 @@
 // the PGN of each game (the server's format: its tags, [%clk]/[%emt] comments, the end reason);
 // four signed-in devices (this one, two others, one without a label); the challenge preference
 // (no demo challenge when it is off); an e-mail change waiting for its link, which the fake
-// "opens" 40 s later; the data export (five an hour) and the deletion of the account.
+// "opens" 40 s later; the data export (five attempts an hour, failed ones included, checked
+// before the password as the server's router does) and the deletion of the account.
 //
 // Special inputs to try the error paths: user name "banned", "unverified" or "ratelimited",
 // password "wrong", a user name containing "mfa" (asks for a code), a custom server host

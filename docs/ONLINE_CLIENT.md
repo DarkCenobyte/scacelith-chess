@@ -99,7 +99,7 @@ server's code, `retryAfterSec` when it gave one).
 
 | Call | Request | Event and what it carries |
 |---|---|---|
-| `fetchMyGames(before, limit, filter)` | `GET /account/games?before=&limit=&category=&rated=&result=` (bearer) | `GamesResult`: `gamesPage` (the games newest first, `next` = the `before` of the next page or 0, `total` = the games matching the filter) |
+| `fetchMyGames(before, limit, filter)` | `GET /account/games?before=&limit=&category=&rated=&result=` (bearer) | `GamesResult`: `gamesPage` (the games newest first, `next` = the `before` of the next page or 0, `total` = the games matching the filter; `before` and `filter` name the request, errors included) |
 | `fetchGame(id)` | `GET /games/:id` (bearer when signed in) | `GameDetailsResult`: `gameDetails` (players, ratings and changes, result, reason, clocks, the moves as UCI text and `packMove` with each move's time spent and clock; `you` and `reportable` for its players) |
 | `downloadPgn(id)` | `GET /games/:id/pgn` | `PgnResult`: `gameId`, `text` (the PGN as the server wrote it, `[%clk]`/`[%emt]` comments) |
 | `fetchSessions()` | `GET /auth/sessions` (bearer) | `SessionsResult`: `sessions` (id, created, last active, expiry, client label, `current`) |
@@ -118,15 +118,21 @@ Rules common to these calls:
   empty one.
 - A 401 answer to any call that carried the session token means the session is gone (expired,
   revoked elsewhere, the account deleted): the token is erased (the user name stays), as for
-  `fetchAccount`. `fetchGame` and `downloadPgn` then ask again without the token, since a game is
-  public.
+  `fetchAccount`, and the event carries `sessionLost`. The error is then `unauthorized` whatever
+  the server's code (the server answers `invalid_token` to a bearer it refuses), as for a call
+  that needs the session while none is saved (nothing is sent): the game signs out on that one
+  code. `fetchGame` and `downloadPgn` ask again without the token, since a game is public: their
+  answer may then be ok, with `sessionLost` telling the game that it is signed out.
 - `/account/me` also gives `hasPassword` (false for a Google-only account), `acceptChallenges`,
   `pendingEmail` (an address change waiting for its link), `createdAt` and `lastLoginAt`.
 - Answers are untrusted: a move that is not UCI text, a game with another id than the one asked
   for, a PGN that does not start with its tags, an export that is not the export document
   (`format` `scacelith-account-export`), or a PGN over 4 MiB or an export over 64 MiB come back
   as `invalid_response`. The export is checked whole but only its top level is kept in memory
-  while checking.
+  while checking, and a document with more than 64 top-level members (the server's has about
+  fifteen) is refused there, so a hostile answer can use neither gigabytes of memory nor hours of
+  the HTTP thread. An allocation failure during an HTTPS call fails that call instead of ending
+  the game.
 - `deleteAccount` success erases the token and the user name saved for the origin (its server id
   and pin stay) and stops the realtime connection without reconnecting. `revokeSession` on the
   session marked `current` in the last `fetchSessions` signs this game out the same way (token

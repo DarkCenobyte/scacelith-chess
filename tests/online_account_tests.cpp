@@ -1,8 +1,10 @@
 // The account pages' data (src/game/online_account.h): the history pager (the cursors of the pages
 // seen, Previous / Next, an answer kept only when it is the one awaited, errors, the page count),
 // what the answers of the account API change (AccountData::apply: the game asked for, the devices
-// sorted and signed out, the preference, the account deleted, the token refused), the result from
-// the player's side, the moves of a server game with their clocks, the time control labels and the
+// sorted and signed out, the preference, the account deleted, the token refused), Save and Replay
+// on a game of the history (GameSaveState: a Replay given up with its page, the PGN of a game left
+// still saved as that game, the saved games looked at again on each visit), the result from the
+// player's side, the moves of a server game with their clocks, the time control labels and the
 // file name of an account export.
 #include "test.h"
 #include "game/online_account.h"
@@ -16,9 +18,12 @@ using Kind = net::Event::Kind;
 
 namespace {
 
-net::GamesPage pageOf(uint64_t before, uint64_t next, int total, int count, uint64_t firstId) {
+// An answer to the request of cursor 'before' and filter f.
+net::GamesPage pageOf(uint64_t before, uint64_t next, int total, int count, uint64_t firstId,
+                      const net::GamesFilter& f = net::GamesFilter()) {
     net::GamesPage p;
     p.before = before;
+    p.filter = f;
     p.next = next;
     p.total = total;
     for (int i = 0; i < count; ++i) {
@@ -50,7 +55,7 @@ TEST(account_history_pages_forward_and_back) {
     CHECK_EQ(h.filter().rated, 1);
     uint64_t before = 0;
     CHECK(!h.next(before));  // nothing loaded yet
-    CHECK(h.accept(pageOf(0, 900, 25, 10, 1000)));
+    CHECK(h.accept(pageOf(0, 900, 25, 10, 1000, f)));
     CHECK(!h.waiting());
     CHECK(h.loaded());
     CHECK_EQ(h.pageIndex(), 0);
@@ -63,13 +68,13 @@ TEST(account_history_pages_forward_and_back) {
     CHECK_EQ(before, uint64_t(900));
     CHECK(!h.next(before));  // one request at a time
     CHECK(h.waiting());
-    CHECK(h.accept(pageOf(900, 800, 25, 10, 899)));
+    CHECK(h.accept(pageOf(900, 800, 25, 10, 899, f)));
     CHECK_EQ(h.pageIndex(), 1);
     CHECK(h.hasPrevious());
 
     CHECK(h.next(before));
     CHECK_EQ(before, uint64_t(800));
-    CHECK(h.accept(pageOf(800, 0, 25, 5, 799)));
+    CHECK(h.accept(pageOf(800, 0, 25, 5, 799, f)));
     CHECK_EQ(h.pageIndex(), 2);
     CHECK(!h.hasNext());
     CHECK_EQ(int(h.page().games.size()), 5);
@@ -77,11 +82,11 @@ TEST(account_history_pages_forward_and_back) {
     // Back: the cursor of the page before, kept from the way forward.
     CHECK(h.previous(before));
     CHECK_EQ(before, uint64_t(900));
-    CHECK(h.accept(pageOf(900, 800, 25, 10, 899)));
+    CHECK(h.accept(pageOf(900, 800, 25, 10, 899, f)));
     CHECK_EQ(h.pageIndex(), 1);
     CHECK(h.previous(before));
     CHECK_EQ(before, uint64_t(0));
-    CHECK(h.accept(pageOf(0, 900, 25, 10, 1000)));
+    CHECK(h.accept(pageOf(0, 900, 25, 10, 1000, f)));
     CHECK_EQ(h.pageIndex(), 0);
     CHECK(!h.hasPrevious());
 }
@@ -93,6 +98,9 @@ TEST(account_history_keeps_only_the_awaited_answer) {
     CHECK(h.waiting());
     CHECK(h.accept(pageOf(0, 900, 12, 10, 1000)));
     CHECK(!h.accept(pageOf(0, 900, 12, 10, 1000)));  // nothing awaited any more
+    h.reload();
+    CHECK(!h.accept(pageOf(0, 900, 12, 10, 1000, net::GamesFilter{"3+2", -1, ""})));  // another filter
+    CHECK(h.accept(pageOf(0, 900, 12, 10, 1000)));
 
     // A filter changed while a page was coming: the old answer is dropped.
     uint64_t before = 0;
@@ -101,15 +109,90 @@ TEST(account_history_keeps_only_the_awaited_answer) {
     wins.result = "win";
     h.restart(wins);
     CHECK(!h.accept(pageOf(900, 0, 12, 2, 899)));
-    CHECK(h.accept(pageOf(0, 0, 4, 4, 1000)));
+    CHECK(h.accept(pageOf(0, 0, 4, 4, 1000, wins)));
     CHECK_EQ(h.filter().result, std::string("win"));
     CHECK_EQ(h.pageCount(), 1);
+}
+
+// Every answer names its request (GamesPage::before and filter): an answer of an earlier filter,
+// or the failure of an earlier request, never stands for the one awaited, in whatever order the
+// answers arrive (the fake server's latencies differ from one call to the next).
+TEST(account_history_answers_of_other_requests) {
+    net::GamesFilter all, rated;
+    rated.rated = 1;
+    auto answer = [](const net::GamesFilter& f, uint64_t before, uint64_t next, int total, int count, uint64_t firstId) {
+        net::Event e = event(Kind::GamesResult);
+        e.gamesPage = pageOf(before, next, total, count, firstId);
+        e.gamesPage.filter = f;
+        return e;
+    };
+    auto failure = [](const net::GamesFilter& f, uint64_t before, const char* error) {
+        net::Event e = event(Kind::GamesResult, false, error);
+        e.gamesPage.before = before;
+        e.gamesPage.filter = f;
+        return e;
+    };
+    AccountData d;
+    net::AccountInfo account;
+    bool signedIn = true;
+
+    // Games = All, then Rated before the first answer: All's first page arrives first, dropped.
+    d.history.restart(all);
+    d.history.restart(rated);
+    CHECK(d.apply(answer(all, 0, 900, 45, 10, 1000), account, signedIn));
+    CHECK(!d.history.loaded());
+    CHECK(d.history.waiting());
+    CHECK(d.apply(answer(rated, 0, 980, 20, 10, 990), account, signedIn));
+    CHECK(d.history.loaded());
+    CHECK(!d.history.waiting());
+    CHECK_EQ(d.history.page().total, 20);
+    CHECK_EQ(d.history.page().games.front().id, uint64_t(990));
+
+    // Next in flight, then the filter changes and the old Next fails: the new filter's first page
+    // is still awaited, and kept when it comes.
+    uint64_t before = 0;
+    CHECK(d.history.next(before));
+    CHECK_EQ(before, uint64_t(980));
+    d.history.restart(all);
+    CHECK(d.apply(failure(rated, 980, "timeout"), account, signedIn));
+    CHECK(d.history.waiting());
+    CHECK(d.history.error().empty());
+    CHECK(d.apply(answer(all, 0, 900, 45, 10, 1000), account, signedIn));
+    CHECK(d.history.loaded());
+    CHECK_EQ(d.history.page().total, 45);
+
+    // The same request twice (Account > History while the first is in flight), the first fails:
+    // the second still answers it.
+    d.history.restart(rated);
+    d.history.restart(rated);
+    CHECK(d.apply(failure(rated, 0, "rate_limited"), account, signedIn));
+    CHECK(d.history.waiting());
+    CHECK(d.apply(answer(rated, 0, 980, 20, 10, 990), account, signedIn));
+    CHECK(d.history.loaded());
+    CHECK(d.history.error().empty());
+    // All, Rated, All again: the first All fails, the Rated answer is not the one awaited, the
+    // second All is kept.
+    d.history.restart(all);
+    d.history.restart(rated);
+    d.history.restart(all);
+    CHECK(d.apply(failure(all, 0, "timeout"), account, signedIn));
+    CHECK(d.apply(answer(rated, 0, 980, 20, 10, 990), account, signedIn));
+    CHECK(d.history.waiting());
+    CHECK(d.apply(answer(all, 0, 900, 45, 10, 1000), account, signedIn));
+    CHECK(d.history.loaded());
+    CHECK_EQ(d.history.page().total, 45);
+    // The failure of the request awaited, with none like it in flight: the error shows.
+    CHECK(d.history.next(before));
+    CHECK(d.apply(failure(all, 900, "timeout"), account, signedIn));
+    CHECK(!d.history.waiting());
+    CHECK_EQ(d.history.error(), std::string("timeout"));
+    CHECK_EQ(d.history.page().total, 45);  // the page shown stays
 }
 
 TEST(account_history_errors_and_reload) {
     HistoryPager h;
     h.restart(net::GamesFilter());
-    h.fail("");
+    h.fail(pageOf(0, 0, 0, 0, 0), "");
     CHECK(!h.waiting());
     CHECK(!h.loaded());
     CHECK_EQ(h.error(), std::string("server_error"));
@@ -118,7 +201,7 @@ TEST(account_history_errors_and_reload) {
     CHECK(h.accept(pageOf(0, 900, 30, 10, 1000)));
     uint64_t before = 0;
     CHECK(h.next(before));
-    h.fail("network");
+    h.fail(pageOf(900, 0, 0, 0, 0), "network");
     CHECK_EQ(h.error(), std::string("network"));
     CHECK_EQ(h.pageIndex(), 0);  // the page shown stays
     CHECK_EQ(int(h.page().games.size()), 10);
@@ -170,7 +253,9 @@ TEST(account_apply_routes_history_and_game) {
     CHECK(d.apply(g, account, signedIn));
     CHECK(d.gameLoaded);
     CHECK_EQ(d.game.plies, 3);
-    CHECK(d.apply(event(Kind::GameDetailsResult, false, "not_found"), account, signedIn));
+    net::Event missing = event(Kind::GameDetailsResult, false, "not_found");
+    missing.gameId = 42;
+    CHECK(d.apply(missing, account, signedIn));
     CHECK_EQ(d.gameError, std::string("not_found"));
     CHECK(signedIn);
 
@@ -179,6 +264,39 @@ TEST(account_apply_routes_history_and_game) {
     CHECK(signedIn);
     // The token refused by any of them signs out.
     CHECK(d.apply(event(Kind::GamesResult, false, "unauthorized"), account, signedIn));
+    CHECK(!signedIn);
+    // So does a public read answered once the refused token was erased (sessionLost, ok).
+    signedIn = true;
+    net::Event pub = event(Kind::GameDetailsResult);
+    pub.sessionLost = true;
+    pub.gameDetails.id = 42;
+    CHECK(d.apply(pub, account, signedIn));
+    CHECK(d.gameLoaded);
+    CHECK(!signedIn);
+}
+
+// Game A opened, Back, game B opened before A's answer: A's failure is not B's error (B's page
+// keeps waiting for its own answer); a refused token signs out whichever game it came with.
+TEST(account_apply_game_error_of_a_game_left) {
+    AccountData d;
+    net::AccountInfo account;
+    bool signedIn = true;
+    d.gameWanted = 200;
+    for (const char* error : {"not_found", "timeout", "rate_limited"}) {
+        net::Event a = event(Kind::GameDetailsResult, false, error);
+        a.gameId = 100;
+        CHECK(d.apply(a, account, signedIn));
+        CHECK(d.gameError.empty());
+        CHECK(!d.gameLoaded);
+    }
+    net::Event b = event(Kind::GameDetailsResult, false, "not_found");
+    b.gameId = 200;
+    CHECK(d.apply(b, account, signedIn));
+    CHECK_EQ(d.gameError, std::string("not_found"));
+    CHECK(signedIn);
+    net::Event refused = event(Kind::GameDetailsResult, false, "unauthorized");
+    refused.gameId = 100;
+    CHECK(d.apply(refused, account, signedIn));
     CHECK(!signedIn);
 }
 
@@ -251,6 +369,122 @@ TEST(account_apply_preferences_and_deletion) {
     CHECK(account.username.empty());
     CHECK_EQ(d.gameWanted, uint64_t(0));
     CHECK(!d.sessionsLoaded);
+}
+
+namespace {
+using Save = GameSaveState::Save;
+
+archive::ServerGame serverGame(uint64_t id) {
+    archive::ServerGame g;
+    g.server = "caissa.scacelith.com:443";
+    g.gameId = id;
+    g.endKey = "reason.checkmate";
+    return g;
+}
+net::Event pgnOf(uint64_t id) {
+    net::Event e = event(Kind::PgnResult);
+    e.gameId = id;
+    e.text = "[Event \"x\"]\n\n1. e4 *\n";
+    return e;
+}
+// What the page does with a PGN arrived and the write that follows (accountPump).
+void written(GameSaveState& s, const char* path) {
+    s.save = Save::Writing;   // startSave(..., text)
+    s.save = Save::Saved;     // the write job's result
+    s.savedPath = path;
+}
+}  // namespace
+
+// Replay pressed on game A, then Back before the download and the write end: they end as a plain
+// save, and opening A later only to look at it starts no replay.
+TEST(account_game_save_replay_given_up_with_its_page) {
+    GameSaveState s;
+    s.opened(false);
+    CHECK(s.lookupDue(100, false));
+    CHECK(s.save == Save::Checking);
+    s.save = Save::NotSaved;              // the lookup's answer
+    CHECK(!s.lookupDue(100, false));      // once per visit
+    CHECK(s.request(serverGame(100), true));
+    CHECK(s.save == Save::Downloading);
+    CHECK(s.replayWanted);
+    // Back: the history page; the PGN comes and is written there.
+    CHECK(s.pgnArrived(pgnOf(100)));
+    written(s, "/saved/2026-09-28.pgn");
+    // Game A opened again.
+    s.opened(false);
+    CHECK(!s.replayDue(100));
+    CHECK(s.lookupDue(100, false));
+    s.save = Save::Saved;                 // already saved
+    s.savedPath = "/saved/2026-09-28.pgn";
+    CHECK(!s.replayDue(100));
+    // Replay pressed on this visit: it starts (the game is saved already: no download).
+    CHECK(!s.request(serverGame(100), true));
+    CHECK(s.replayDue(100));
+    CHECK(!s.replayDue(100));
+
+    // The same with the page opened again while the write still runs.
+    GameSaveState t;
+    t.opened(false);
+    CHECK(t.lookupDue(7, false));
+    t.save = Save::NotSaved;
+    CHECK(t.request(serverGame(7), true));
+    CHECK(t.pgnArrived(pgnOf(7)));
+    t.save = Save::Writing;
+    t.opened(true);
+    CHECK(t.save == Save::Writing);       // the write goes on
+    t.save = Save::Saved;
+    CHECK(!t.replayDue(7));
+}
+
+// Save on game A, Back, game B opened before A's PGN arrives: A's PGN is still saved as A, and B's
+// lookup waits for it.
+TEST(account_game_save_of_a_game_left_still_saved) {
+    GameSaveState s;
+    s.opened(false);
+    CHECK(s.lookupDue(100, false));
+    s.save = Save::NotSaved;
+    CHECK(s.request(serverGame(100), false));
+    s.opened(false);                      // game B's page
+    CHECK(s.save == Save::Downloading);
+    CHECK(!s.lookupDue(200, false));      // not while A's PGN is on its way
+    CHECK(s.pgnArrived(pgnOf(100)));
+    CHECK_EQ(s.saveGame.gameId, uint64_t(100));
+    CHECK_EQ(s.saveGame.server, std::string("caissa.scacelith.com:443"));
+    CHECK_EQ(s.saveGame.endKey, std::string("reason.checkmate"));
+    CHECK(!s.pgnArrived(pgnOf(200)));     // only the PGN asked for
+    net::Event failed = pgnOf(100);
+    failed.ok = false;
+    failed.error = "timeout";
+    CHECK(!s.pgnArrived(failed));
+    s.save = Save::Writing;
+    CHECK(!s.lookupDue(200, true));
+    written(s, "/saved/2026-09-28.pgn");
+    CHECK(s.lookupDue(200, false));       // then B's turn
+    CHECK_EQ(s.saveId, uint64_t(200));
+    CHECK(s.savedPath.empty());
+}
+
+// The saved games are looked at again on each visit: a file deleted meanwhile (or a replay of it
+// that failed) does not leave the game stuck on "Saved".
+TEST(account_game_save_looked_at_again_on_each_visit) {
+    GameSaveState s;
+    s.opened(false);
+    CHECK(s.lookupDue(100, false));
+    s.save = Save::NotSaved;
+    CHECK(s.request(serverGame(100), false));
+    CHECK(s.pgnArrived(pgnOf(100)));
+    written(s, "/saved/2026-09-28.pgn");
+    CHECK(!s.lookupDue(100, false));      // the same visit: known
+    // The file deleted on the Saved games page, then game A opened again.
+    s.opened(false);
+    CHECK(s.lookupDue(100, false));
+    s.save = Save::NotSaved;
+    CHECK(s.request(serverGame(100), true));   // it can be saved (and replayed) again
+    CHECK(s.save == Save::Downloading);
+    // Opened again while it downloads: the download goes on and is still awaited.
+    s.opened(false);
+    CHECK(s.save == Save::Downloading);
+    CHECK(s.pgnArrived(pgnOf(100)));
 }
 
 TEST(account_outcome_from_the_player_side) {

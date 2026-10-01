@@ -89,6 +89,51 @@ TEST(i18n_lang_files_match_english) {
     }
 }
 
+// The note after signing out another device (the devices page: the current one has no Sign out
+// button) speaks of that device, never in the words of the tag that marks this one ("THIS
+// DEVICE"): "This device is signed out" tells the player that they were signed out themselves.
+TEST(i18n_devices_signed_out_note_is_about_another_device) {
+    // "this device" in the cases a sentence may put it in (the tag is in the nominative).
+    const std::map<std::string, std::vector<std::string>> thisDevice = {
+        {"en", {"this device"}},
+        {"fr", {"cet appareil"}},
+        {"de", {"dieses Ger\xC3\xA4t", "diesem Ger\xC3\xA4t"}},
+        {"es", {"este dispositivo"}},
+        {"ru", {"\xD1\x8D\xD1\x82\xD0\xBE\xD0\xBC \xD1\x83\xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD0\xB9\xD1\x81\xD1\x82\xD0\xB2\xD0\xB5",       // этом устройстве
+                "\xD1\x8D\xD1\x82\xD0\xBE\xD0\xB3\xD0\xBE \xD1\x83\xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD0\xB9\xD1\x81\xD1\x82\xD0\xB2\xD0\xB0"}},  // этого устройства
+        {"uk", {"\xD1\x86\xD1\x8C\xD0\xBE\xD0\xBC\xD1\x83 \xD0\xBF\xD1\x80\xD0\xB8\xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD1\x97",              // цьому пристрої
+                "\xD1\x86\xD1\x8C\xD0\xBE\xD0\xB3\xD0\xBE \xD0\xBF\xD1\x80\xD0\xB8\xD1\x81\xD1\x82\xD1\x80\xD0\xBE\xD1\x8E"}},             // цього пристрою
+        {"ar", {"\xD9\x87\xD8\xB0\xD8\xA7 \xD8\xA7\xD9\x84\xD8\xAC\xD9\x87\xD8\xA7\xD8\xB2"}},                                             // هذا الجهاز
+        {"ja", {"\xE3\x81\x93\xE3\x81\xAE\xE3\x83\x87\xE3\x83\x90\xE3\x82\xA4\xE3\x82\xB9"}},                                               // このデバイス
+        {"zh-Hans", {"\xE6\x9C\xAC\xE8\xAE\xBE\xE5\xA4\x87", "\xE6\xAD\xA4\xE8\xAE\xBE\xE5\xA4\x87"}},                                     // 本设备, 此设备
+        {"zh-Hant", {"\xE6\x9C\xAC\xE8\xA3\x9D\xE7\xBD\xAE", "\xE6\xAD\xA4\xE8\xA3\x9D\xE7\xBD\xAE"}},                                     // 本裝置, 此裝置
+    };
+    CHECK_EQ(int(thisDevice.size()), int(i18n::languages().size()));
+    for (const i18n::Language& lang : i18n::languages()) {
+        std::vector<std::pair<std::string, std::string>> entries;
+        const std::string path = std::string("assets/i18n/") + lang.code + ".lang";
+        if (!embedded::find(path.c_str())) continue;  // reported by i18n_lang_files_match_english
+        CHECK(i18n::parse(embedded::text(path.c_str()), entries, nullptr));
+        std::string note, tag;
+        for (const auto& kv : entries) {
+            if (kv.first == "online.devices.signed_out") note = uni::toUpper(kv.second);
+            if (kv.first == "online.devices.this") tag = uni::toUpper(kv.second);
+        }
+        CHECK(!note.empty() && !tag.empty());
+        std::vector<std::string> words{tag};
+        auto it = thisDevice.find(lang.code);
+        CHECK(it != thisDevice.end());
+        if (it != thisDevice.end())
+            for (const std::string& w : it->second)
+                if (uni::toUpper(w) != tag) words.push_back(uni::toUpper(w));
+        for (const std::string& w : words) {
+            if (note.find(w) == std::string::npos) continue;
+            std::fprintf(stderr, "  %s: online.devices.signed_out says \"%s\"\n", lang.code, w.c_str());
+            CHECK(false);
+        }
+    }
+}
+
 // Every language names the five pieces of its scoresheet notation with distinct letters that cannot be
 // read as a file (a-h), a capture (x) or castling (O), and writes the date with day, month and year once each.
 TEST(i18n_scoresheet_pieces_and_date) {

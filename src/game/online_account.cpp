@@ -11,6 +11,12 @@ using Kind = net::Event::Kind;
 
 // ---- History pages ------------------------------------------------------------------------------------
 
+namespace {
+bool sameFilter(const net::GamesFilter& a, const net::GamesFilter& b) {
+    return a.category == b.category && a.rated == b.rated && a.result == b.result;
+}
+}  // namespace
+
 uint64_t HistoryPager::restart(const net::GamesFilter& filter) {
     filter_ = filter;
     page_ = net::GamesPage();
@@ -21,6 +27,7 @@ uint64_t HistoryPager::restart(const net::GamesFilter& filter) {
     waiting_ = true;
     wantBefore_ = 0;
     wantIndex_ = 0;
+    sent();
     return 0;
 }
 
@@ -30,6 +37,7 @@ bool HistoryPager::next(uint64_t& before) {
     wantBefore_ = before = page_.next;
     wantIndex_ = index_ + 1;
     error_.clear();
+    sent();
     return true;
 }
 
@@ -39,6 +47,7 @@ bool HistoryPager::previous(uint64_t& before) {
     wantBefore_ = before = cursors_[size_t(index_ - 1)];
     wantIndex_ = index_ - 1;
     error_.clear();
+    sent();
     return true;
 }
 
@@ -47,11 +56,27 @@ uint64_t HistoryPager::reload() {
     wantIndex_ = loaded_ ? index_ : 0;
     wantBefore_ = loaded_ && size_t(index_) < cursors_.size() ? cursors_[size_t(index_)] : 0;
     error_.clear();
+    sent();
     return wantBefore_;
 }
 
+void HistoryPager::sent() {
+    // Every request gets one answer; a bound all the same, should one never come.
+    if (inFlight_.size() >= 32) inFlight_.erase(inFlight_.begin());
+    inFlight_.push_back(Request{wantBefore_, filter_});
+}
+
+bool HistoryPager::answered(const net::GamesPage& request) {
+    for (auto it = inFlight_.begin(); it != inFlight_.end(); ++it)
+        if (it->before == request.before && sameFilter(it->filter, request.filter)) {
+            inFlight_.erase(it);
+            break;
+        }
+    return waiting_ && request.before == wantBefore_ && sameFilter(request.filter, filter_);
+}
+
 bool HistoryPager::accept(const net::GamesPage& page) {
-    if (!waiting_ || page.before != wantBefore_) return false;
+    if (!answered(page)) return false;
     waiting_ = false;
     page_ = page;
     index_ = wantIndex_;
@@ -63,7 +88,11 @@ bool HistoryPager::accept(const net::GamesPage& page) {
     return true;
 }
 
-void HistoryPager::fail(const std::string& error) {
+void HistoryPager::fail(const net::GamesPage& request, const std::string& error) {
+    if (!answered(request)) return;
+    // The same request asked again meanwhile (the page opened again): its answer is awaited.
+    for (const Request& r : inFlight_)
+        if (r.before == wantBefore_ && sameFilter(r.filter, filter_)) return;
     waiting_ = false;
     error_ = error.empty() ? std::string("server_error") : error;
 }
@@ -89,15 +118,15 @@ bool AccountData::apply(const net::Event& e, net::AccountInfo& account, bool& si
     switch (e.kind) {
     case Kind::GamesResult:
         if (e.ok) history.accept(e.gamesPage);
-        else history.fail(e.error);
+        else history.fail(e.gamesPage, e.error);
         break;
     case Kind::GameDetailsResult:
         if (e.ok && e.gameDetails.id == gameWanted) {
             game = e.gameDetails;
             gameLoaded = true;
             gameError.clear();
-        } else if (!e.ok) {
-            gameError = e.error;
+        } else if (!e.ok && e.gameId == gameWanted) {
+            gameError = e.error;   // not the failure of a game left meanwhile
         }
         break;
     case Kind::SessionsResult:
@@ -135,8 +164,48 @@ bool AccountData::apply(const net::Event& e, net::AccountInfo& account, bool& si
     case Kind::AccountExportResult: break;  // for the page that asked
     default: return false;
     }
-    // The token was refused: the network layer has forgotten it.
-    if (!e.ok && e.error == "unauthorized") signedIn = false;
+    // The token was refused (or none is saved): the network layer has forgotten it. A public read
+    // asked again without it is answered (ok) and says so with sessionLost.
+    if (e.sessionLost || (!e.ok && e.error == "unauthorized")) signedIn = false;
+    return true;
+}
+
+// ---- Saving a game of the history ---------------------------------------------------------------------
+
+void GameSaveState::opened(bool job) {
+    replayWanted = false;
+    if (job || save == Save::Downloading) return;
+    saveId = 0;
+    save = Save::Unknown;
+    savedPath.clear();
+}
+
+bool GameSaveState::lookupDue(uint64_t gameId, bool job) {
+    if (saveId == gameId || job || save == Save::Downloading) return false;
+    saveId = gameId;
+    save = Save::Checking;
+    savedPath.clear();
+    replayWanted = false;
+    return true;
+}
+
+bool GameSaveState::request(const archive::ServerGame& g, bool replay) {
+    if (replay) replayWanted = true;
+    if (save == Save::Saved && saveId == g.gameId) return false;  // a replay: it starts next frame
+    if (save == Save::Checking || save == Save::Downloading || save == Save::Writing) return false;
+    saveId = g.gameId;
+    saveGame = g;
+    save = Save::Downloading;
+    return true;
+}
+
+bool GameSaveState::pgnArrived(const net::Event& e) const {
+    return save == Save::Downloading && e.ok && e.gameId == saveId && saveGame.gameId == saveId;
+}
+
+bool GameSaveState::replayDue(uint64_t gameId) {
+    if (save != Save::Saved || !replayWanted || saveId != gameId) return false;
+    replayWanted = false;
     return true;
 }
 

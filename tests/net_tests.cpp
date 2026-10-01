@@ -6,7 +6,8 @@
 // client Ping (Welcome.clientPingMs) and of the reconnections (full server, shutdown, /info reuse);
 // live gestures (wire units, pacing, the opponent's); the account API (history, game details, PGN,
 // signed-in devices, preferences, e-mail change, export, deletion) against a scripted server
-// (tests/http_fake.h), and the move of the official server's saved session from port 44664 to 443.
+// (tests/http_fake.h), a refused session signing the game out (game::AccountData fed the client's
+// events), and the move of the official server's saved session from port 44664 to 443.
 //
 // Vectors: tests/data/net-protocol-vectors.json (dedicated-server/tools/gen-cpp-test-vectors.js)
 // and, when present, dedicated-server/test/fixtures/protocol-vectors.json. The files are looked
@@ -26,6 +27,7 @@
 #include "test.h"
 #include "http_fake.h"
 #include "chess/chess.h"
+#include "game/online_account.h"
 #include "net/credential_store.h"
 #include "net/crypto.h"
 #include "net/json.h"
@@ -684,6 +686,24 @@ TEST(net_json_keep_depth) {
     CHECK_EQ(v["list"][1].size(), size_t(0));
     CHECK(net::json::parse("[[1],[2]]", v, nullptr, lim));
     CHECK_EQ(v[0][0].asInt(), int64_t(1));
+
+    // Limits::maxKept: the kept containers may have that many members or items, the deeper ones any
+    // number; the reader stops at the first one too many (not at the end of the document).
+    lim = net::json::Limits();
+    lim.keepDepth = 1;
+    lim.maxKept = 3;
+    CHECK(net::json::parse(R"({"a":1,"b":[1,2,3,4,5],"c":{"d":1,"e":2,"f":3,"g":4}})", v, nullptr, lim));
+    CHECK_EQ(v.size(), size_t(3));
+    std::string err;
+    CHECK(!net::json::parse(R"({"a":1,"b":2,"c":3,"d":4})", v, &err, lim));
+    CHECK(err.find("too many members") != std::string::npos);
+    std::string big = "[0";
+    for (int i = 1; i < 100000; ++i) big += ",0";
+    big += "]";
+    CHECK(!net::json::parse(big, v, &err, lim));
+    CHECK_EQ(err, std::string("too many items at byte 7"));
+    lim.keepDepth = 2;
+    CHECK(!net::json::parse(R"({"b":[1,2,3,4]})", v, nullptr, lim));
 }
 
 TEST(net_json_write) {
@@ -2521,6 +2541,9 @@ TEST(net_account_games_history) {
     ev = r.wait(K::GamesResult);
     CHECK_EQ(r.last().path, std::string("/api/v1/account/games?before=790&limit=50&category=3%2B2&rated=true&result=win"));
     CHECK_EQ(ev.gamesPage.before, uint64_t(790));
+    CHECK_EQ(ev.gamesPage.filter.category, std::string("3+2"));   // the request, named in its answer
+    CHECK_EQ(ev.gamesPage.filter.rated, 1);
+    CHECK_EQ(ev.gamesPage.filter.result, std::string("win"));
     f = net::GamesFilter();
     f.rated = 0;
     f.category = "custom";
@@ -2528,12 +2551,16 @@ TEST(net_account_games_history) {
     r.wait(K::GamesResult);
     CHECK_EQ(r.last().path, std::string("/api/v1/account/games?limit=20&category=custom&rated=false"));
 
-    // Errors: the server's code; malformed answers.
+    // Errors: the server's code (the request still named); malformed answers.
     mode = 1;
-    r.c->fetchMyGames(0, 10, net::GamesFilter());
+    f = net::GamesFilter();
+    f.result = "draw";
+    r.c->fetchMyGames(812, 10, f);
     ev = r.wait(K::GamesResult);
     CHECK(!ev.ok);
     CHECK_EQ(ev.error, std::string("invalid_filter"));
+    CHECK_EQ(ev.gamesPage.before, uint64_t(812));
+    CHECK_EQ(ev.gamesPage.filter.result, std::string("draw"));
     for (int m : {2, 3}) {
         mode = m;
         r.c->fetchMyGames(0, 10, net::GamesFilter());
@@ -2545,18 +2572,74 @@ TEST(net_account_games_history) {
     CHECK(r.c->hasSavedSession());
 
     // 401: the session is gone, its token erased (the user name stays); later calls need a login.
+    // Whatever the server's code (invalid_token for a refused bearer), the game gets one:
+    // "unauthorized", and the same without a saved token (nothing sent).
     mode = 4;
     r.c->fetchMyGames(0, 10, net::GamesFilter());
     ev = r.wait(K::GamesResult);
     CHECK(!ev.ok);
-    CHECK_EQ(ev.error, std::string("invalid_token"));
+    CHECK_EQ(ev.error, std::string("unauthorized"));
+    CHECK(ev.sessionLost);
     CHECK(!r.c->hasSavedSession());
     CHECK_EQ(r.c->savedUsername(), std::string("alice"));
     size_t before = r.count();
     r.c->fetchMyGames(0, 10, net::GamesFilter());
     ev = r.wait(K::GamesResult);
-    CHECK_EQ(ev.error, std::string("not_logged_in"));
+    CHECK_EQ(ev.error, std::string("unauthorized"));
     CHECK_EQ(r.count(), before);
+}
+
+// The real server refuses a session it no longer accepts (expired, revoked, the account gone)
+// with 401 invalid_token. The game, fed the client's events, must then show the player signed out:
+// on an account call, on a public read asked again without the token (its answer is ok), and on a
+// call made after the token was erased.
+TEST(net_account_refused_session_signs_the_game_out) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    auto handler = [](const fakehttp::Request& q) {
+        if (q.has("authorization")) return jsonReply(401, R"({"error":"invalid_token","message":"Log in again."})");
+        if (q.path == "/api/v1/games/812") return jsonReply(200, std::string(kGameDetails).substr(0, std::string(kGameDetails).find(R"(,"you")")) + "}");
+        return jsonReply(401, R"({"error":"unauthorized"})");
+    };
+    {
+        AccountRig r("acct-refused", handler);
+        net::AccountInfo account;
+        account.username = "alice";
+        bool signedIn = true;
+        game::AccountData data;
+        r.c->fetchMyGames(0, 10, net::GamesFilter());
+        net::Event ev = r.wait(K::GamesResult);
+        CHECK(!ev.ok);
+        CHECK(!r.c->hasSavedSession());
+        CHECK(data.apply(ev, account, signedIn));
+        CHECK(!signedIn);
+        // A call after that: no token any more, nothing sent, still signed out.
+        signedIn = true;
+        const size_t n = r.count();
+        r.c->fetchSessions();
+        ev = r.wait(K::SessionsResult);
+        CHECK(!ev.ok);
+        CHECK_EQ(r.count(), n);
+        CHECK(data.apply(ev, account, signedIn));
+        CHECK(!signedIn);
+    }
+    {
+        // A public read: the refused token is erased and the game asked for again without it. The
+        // answer is the public one (ok), and the game learns that its session is gone.
+        AccountRig r("acct-refused-public", handler);
+        net::AccountInfo account;
+        bool signedIn = true;
+        game::AccountData data;
+        data.gameWanted = 812;
+        r.c->fetchGame(812);
+        net::Event ev = r.wait(K::GameDetailsResult);
+        CHECK(ev.ok);
+        CHECK_EQ(ev.gameDetails.you, 2);
+        CHECK(!r.c->hasSavedSession());
+        CHECK(data.apply(ev, account, signedIn));
+        CHECK(data.gameLoaded);
+        CHECK(!signedIn);
+    }
 }
 
 TEST(net_account_game_details) {
@@ -2642,11 +2725,13 @@ TEST(net_account_game_details) {
     CHECK_EQ(r.count(), n);
 
     // A refused token is erased, and the public answer asked for without it.
+    CHECK(!ev.sessionLost);
     mode = 4;
     n = r.count();
     r.c->fetchGame(812);
     ev = r.wait(K::GameDetailsResult);
     CHECK(ev.ok);
+    CHECK(ev.sessionLost);                          // the game signs out
     CHECK_EQ(ev.gameDetails.you, 2);
     std::vector<fakehttp::Request> all = r.srv.requests();
     CHECK_EQ(all.size(), n + 2);
@@ -2660,6 +2745,7 @@ TEST(net_account_game_details) {
     r.c->fetchGame(812);
     ev = r.wait(K::GameDetailsResult);
     CHECK(ev.ok);
+    CHECK(!ev.sessionLost);
     CHECK(!r.last().has("authorization"));
 }
 
@@ -2906,6 +2992,14 @@ TEST(net_account_export) {
         R"({"format":"scacelith-account-export","version":1,"exportedAt":1790000000000,"server":{"name":"Fake","host":"127.0.0.1"},)"
         R"("account":{"id":7,"username":"alice","email":"a@example.org"},"ratings":[],"sessions":[{"id":32}],)"
         R"("games":{"total":2,"list":[{"id":812,"white":{"name":"alice"}},{"id":790}]},"notes":["No password hash."]})";
+    // A hostile server's documents: tens of thousands of top-level members (each one kept, and a
+    // name looked up among the kept ones: quadratic), or a top-level array of a million values.
+    std::string manyKeys = R"({"format":"scacelith-account-export","version":1)";
+    for (int i = 0; i < 60000; ++i) manyKeys += ",\"k" + std::to_string(i) + "\":0";
+    manyKeys += "}";
+    std::string bigArray = "[0";
+    for (int i = 1; i < 1000000; ++i) bigArray += ",0";
+    bigArray += "]";
     std::atomic<int> mode{0};
     AccountRig r("acct-export", [&](const fakehttp::Request& q) {
         if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
@@ -2925,6 +3019,8 @@ TEST(net_account_export) {
             busy.headers.emplace_back("Retry-After", "120");
             return busy;
         }
+        case 5: rep.body = manyKeys; break;
+        case 6: rep.body = bigArray; break;
         default: break;
         }
         return rep;
@@ -2951,6 +3047,20 @@ TEST(net_account_export) {
         CHECK(!ev.ok);
         CHECK_EQ(ev.error, std::string("invalid_response"));
         CHECK(ev.text.empty());
+    }
+    // Only a handful of top-level members are kept while the document is checked: more is not the
+    // export, refused at once (neither memory nor time grows with what the server sends).
+    for (int m : {5, 6}) {
+        mode = m;
+        const auto t0 = std::chrono::steady_clock::now();
+        r.c->exportAccount("pw", "");
+        ev = r.wait(K::AccountExportResult);
+        const double s = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string("invalid_response"));
+        CHECK(ev.text.empty());
+        CHECK(s < 3.0);
+        if (s >= 3.0) std::fprintf(stderr, "  export mode %d answered after %.1f s\n", m, s);
     }
     mode = 4;
     r.c->exportAccount("pw", "");
