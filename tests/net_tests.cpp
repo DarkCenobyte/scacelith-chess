@@ -4,7 +4,9 @@
 // (plain HTTP + WebSocket, the insecureDev mode): login with a proof of work, account, Hello /
 // Welcome, ping and clock offset, queue, moves, reconnection, 4003 and logout; the pacing of the
 // client Ping (Welcome.clientPingMs) and of the reconnections (full server, shutdown, /info reuse);
-// live gestures (wire units, pacing, the opponent's).
+// live gestures (wire units, pacing, the opponent's); the account API (history, game details, PGN,
+// signed-in devices, preferences, e-mail change, export, deletion) against a scripted server
+// (tests/http_fake.h), and the move of the official server's saved session from port 44664 to 443.
 //
 // Vectors: tests/data/net-protocol-vectors.json (dedicated-server/tools/gen-cpp-test-vectors.js)
 // and, when present, dedicated-server/test/fixtures/protocol-vectors.json. The files are looked
@@ -22,6 +24,7 @@
 #endif
 
 #include "test.h"
+#include "http_fake.h"
 #include "chess/chess.h"
 #include "net/credential_store.h"
 #include "net/crypto.h"
@@ -923,19 +926,20 @@ TEST(net_endpoint_validation) {
     CHECK(!custom.insecureDev);
     custom.wsPort = 9443;
     CHECK_EQ(custom.effectiveWsPort(), uint16_t(9443));
-    // The official server: wss://caissa.scacelith.com:44664/ws, same port for the API.
+    // The official server: https://caissa.scacelith.com/api/v1 and wss://caissa.scacelith.com/ws,
+    // one port, 443.
     net::ServerEndpoint off = net::officialServer();
 #ifndef SCACELITH_OFFICIAL_SERVER
 #define SCACELITH_OFFICIAL_SERVER ""
 #endif
     if (std::string(SCACELITH_OFFICIAL_SERVER).empty()) {
         CHECK_EQ(off.host, std::string("caissa.scacelith.com"));
-        CHECK_EQ(off.apiPort, uint16_t(44664));
-        CHECK_EQ(off.wsPort, uint16_t(44664));
+        CHECK_EQ(off.apiPort, uint16_t(443));
+        CHECK_EQ(off.wsPort, uint16_t(443));
         CHECK(off.pinnedSha256.empty());
         CHECK(!off.insecureDev);
         CHECK(off.valid());
-        CHECK_EQ(off.origin(), std::string("caissa.scacelith.com:44664"));
+        CHECK_EQ(off.origin(), std::string("caissa.scacelith.com:443"));
     } else {
         CHECK(off.host.empty() || (off.valid() && off.wsPort != 0));   // configured build
     }
@@ -1022,6 +1026,7 @@ public:
     const std::string powChallenge = "fake-challenge-0123456789abcdef";
     static constexpr double kSkewMs = 5000;         // the server clock runs 5 s ahead
     std::atomic<int> loginAttempts{0}, powAccepted{0}, hellos{0}, pings{0}, moves{0}, logouts{0};
+    std::atomic<int> deletes{0};                    // POST /api/v1/account/delete accepted
     std::atomic<int> infos{0}, upgrades{0};         // GET /api/v1/info, WebSocket upgrade requests
     std::atomic<int> upgradeStatus{0};              // != 0: upgrades are refused with this HTTP status
     std::atomic<uint32_t> clientPingMs{0};          // Welcome.clientPingMs
@@ -1263,6 +1268,11 @@ private:
         } else if (method == "POST" && path == "/api/v1/auth/logout") {
             ++logouts;
             respond(s, authed ? 200 : 401, authed ? "{\"status\":\"logged_out\"}" : "{\"error\":\"unauthorized\"}");
+        } else if (method == "POST" && path == "/api/v1/account/delete") {
+            if (!authed) return respond(s, 401, "{\"error\":\"unauthorized\"}");
+            if (body["password"].asString() != "pw") return respond(s, 403, "{\"error\":\"invalid_password\"}");
+            ++deletes;
+            respond(s, 200, "{\"status\":\"deleted\"}");
         } else {
             respond(s, 404, "{\"error\":\"not_found\"}");
         }
@@ -2319,6 +2329,786 @@ TEST(net_online_client_gestures) {
     const char* tags[kRigs] = {"gesture", "gesture-off", "gesture-down"};
     void (*scenarios[kRigs])(PacingRig&) = {gestureScenario, gestureOffScenario, gestureDownScenario};
     runRigs(rigs, tags, scenarios, kRigs);
+}
+
+// =============================================================================================
+// Account API (HTTPS) against a scripted server (tests/http_fake.h): each call's request (method,
+// path and query, body, bearer token) and what the client makes of the answers, errors included
+// (a 401 erases the token, size caps, malformed answers); the realtime connection stops when the
+// account is deleted; the saved session of the official server's former port moves to 443.
+// =============================================================================================
+
+namespace {
+
+const std::string kRigToken = "sct_" + std::string(43, 'K');
+
+fakehttp::Reply jsonReply(int status, const std::string& body) {
+    fakehttp::Reply r;
+    r.status = status;
+    r.headers.emplace_back("Content-Type", "application/json; charset=utf-8");
+    r.body = body;
+    return r;
+}
+
+bool hasBearer(const fakehttp::Request& r) { return r.get("authorization") == "Bearer " + kRigToken; }
+
+Value bodyOf(const fakehttp::Request& r) {
+    Value v;
+    net::json::parse(r.body, v);
+    return v;
+}
+
+// One OnlineClient on its own scripted server (plain HTTP to 127.0.0.1), signed in as "alice"
+// unless told otherwise: the token is in the credential file before the client reads it.
+struct AccountRig {
+    fakehttp::Server srv;
+    std::string credPath;
+    net::ServerEndpoint ep;
+    std::unique_ptr<net::OnlineClient> c;
+
+    AccountRig(const char* tag, fakehttp::Server::Handler h, bool signedIn = true) : srv(std::move(h)) {
+        credPath = tempCredentialPath(tag);
+        ep.host = "127.0.0.1";
+        ep.apiPort = srv.port();
+        ep.insecureDev = true;
+        if (signedIn) {
+            net::CredentialStore s(credPath);
+            net::Credential cr;
+            cr.origin = ep.origin();
+            cr.username = "alice";
+            cr.token = kRigToken;
+            cr.serverId = "srv-acct";
+            s.put(cr);
+        }
+        c = std::make_unique<net::OnlineClient>();
+        c->setCredentialsFile(credPath);
+        c->setServer(ep);
+    }
+    ~AccountRig() {
+        c.reset();
+        net::sys::removeFile(credPath);
+    }
+    net::Event wait(net::Event::Kind k) {
+        net::Event ev;
+        bool got = waitEvent(*c, k, ev, 15000);
+        CHECK(got);
+        return ev;
+    }
+    size_t count() const { return srv.requests().size(); }
+    fakehttp::Request last() const {
+        std::vector<fakehttp::Request> r = srv.requests();
+        return r.empty() ? fakehttp::Request() : r.back();
+    }
+};
+
+const char kGamesPage[] = R"({"games":[
+  {"id":812,"category":"3+2","rated":true,"timeControl":"180+2","baseMs":180000,"incMs":2000,
+   "white":{"name":"alice","rating":1520,"ratingAfter":1528,"ratingDiff":8},
+   "black":{"name":"deleted#12","rating":1490,"ratingAfter":1482,"ratingDiff":-8},
+   "color":"white","status":1,"reason":1,"result":"1-0","termination":"Checkmate","plies":41,
+   "startedAt":1790000000000,"endedAt":1790000400000,"outcome":"win"},
+  {"id":790,"category":"custom","rated":false,"timeControl":"600+5",
+   "white":{"name":"bob","rating":null,"ratingAfter":null,"ratingDiff":null},
+   "black":{"name":"alice","rating":1500,"ratingAfter":null,"ratingDiff":null},
+   "color":"black","status":4,"reason":12,"result":"*","termination":"Aborted","plies":1,
+   "startedAt":1789000000000,"endedAt":1789000030000,"outcome":"aborted"}],
+ "next":790,"total":45})";
+
+const char kGameDetails[] = R"({"id":812,"category":"3+2","rated":true,"timeControl":"180+2",
+  "white":{"name":"alice","rating":1520,"ratingAfter":1528,"ratingDiff":8},
+  "black":{"name":"bob","rating":1490,"ratingAfter":1482,"ratingDiff":-8},
+  "status":1,"reason":1,"result":"1-0","termination":"Checkmate","plies":3,
+  "startedAt":1790000000000,"endedAt":1790000400000,"baseMs":180000,"incMs":2000,"statusName":"WhiteWins",
+  "rematchOf":700,"moves":[{"uci":"e2e4","spentMs":1500,"clockMs":180500},{"uci":"e7e8q","spentMs":null,"clockMs":null},
+  {"uci":"a2a1n","spentMs":250,"clockMs":3000}],"pgn":{"Event":"Fake rated 3+2"},"you":"black","reportable":true})";
+
+}  // namespace
+
+TEST(net_account_games_history) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    std::atomic<int> mode{0};
+    AccountRig r("acct-games", [&](const fakehttp::Request& q) {
+        if (q.path.compare(0, 22, "/api/v1/account/games?") != 0) return jsonReply(404, R"({"error":"not_found"})");
+        if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
+        switch (mode.load()) {
+        case 1: return jsonReply(400, R"({"error":"invalid_filter","message":"result must be win, loss or draw."})");
+        case 2: return jsonReply(200, R"({"games":[{"id":"x"}],"next":null,"total":1})");
+        case 3: return jsonReply(200, R"({"games":{},"next":null,"total":0})");
+        case 4: return jsonReply(401, R"({"error":"invalid_token","message":"log in again"})");
+        default: return jsonReply(200, kGamesPage);
+        }
+    });
+    CHECK(r.srv.ok());
+    CHECK(r.c->hasSavedSession());
+
+    r.c->fetchMyGames(0, 20, net::GamesFilter());
+    net::Event ev = r.wait(K::GamesResult);
+    fakehttp::Request q = r.last();
+    CHECK_EQ(q.method, std::string("GET"));
+    CHECK_EQ(q.path, std::string("/api/v1/account/games?limit=20"));
+    CHECK(hasBearer(q));
+    CHECK(q.body.empty());
+    CHECK(ev.ok);
+    const net::GamesPage& p = ev.gamesPage;
+    CHECK_EQ(p.before, uint64_t(0));
+    CHECK_EQ(p.next, uint64_t(790));
+    CHECK_EQ(p.total, 45);
+    CHECK_EQ(p.games.size(), size_t(2));
+    if (p.games.size() == 2) {
+        const net::GameSummary& a = p.games[0];
+        CHECK_EQ(a.id, uint64_t(812));
+        CHECK_EQ(a.category, std::string("3+2"));
+        CHECK(a.rated);
+        CHECK_EQ(a.baseMs, int64_t(180000));
+        CHECK_EQ(a.incMs, int64_t(2000));
+        CHECK_EQ(a.white.name, std::string("alice"));
+        CHECK_EQ(a.white.rating, 1520);
+        CHECK(a.white.ratingChanged);
+        CHECK_EQ(a.white.ratingAfter, 1528);
+        CHECK_EQ(a.white.ratingDiff, 8);
+        CHECK_EQ(a.black.name, std::string("deleted#12"));
+        CHECK_EQ(a.black.ratingDiff, -8);
+        CHECK_EQ(a.you, 0);
+        CHECK_EQ(a.status, 1);
+        CHECK_EQ(a.reason, 1);
+        CHECK_EQ(a.result, std::string("1-0"));
+        CHECK_EQ(a.plies, 41);
+        CHECK_EQ(a.startedAtMs, int64_t(1790000000000));
+        CHECK_EQ(a.endedAtMs, int64_t(1790000400000));
+        const net::GameSummary& b = p.games[1];
+        CHECK_EQ(b.id, uint64_t(790));
+        CHECK_EQ(b.category, std::string("custom"));
+        CHECK(!b.rated);
+        CHECK_EQ(b.baseMs, int64_t(600000));        // from timeControl when baseMs is absent
+        CHECK_EQ(b.incMs, int64_t(5000));
+        CHECK_EQ(b.white.rating, 0);                // null: unknown
+        CHECK(!b.white.ratingChanged);
+        CHECK(!b.black.ratingChanged);
+        CHECK_EQ(b.you, 1);
+        CHECK_EQ(b.result, std::string("*"));
+        CHECK_EQ(b.reason, 12);
+    }
+
+    // The cursor and the filters, URL-encoded ("3+2" would read "3 2"); limit at most 50.
+    net::GamesFilter f;
+    f.category = "3+2";
+    f.rated = 1;
+    f.result = "win";
+    r.c->fetchMyGames(790, 99, f);
+    ev = r.wait(K::GamesResult);
+    CHECK_EQ(r.last().path, std::string("/api/v1/account/games?before=790&limit=50&category=3%2B2&rated=true&result=win"));
+    CHECK_EQ(ev.gamesPage.before, uint64_t(790));
+    f = net::GamesFilter();
+    f.rated = 0;
+    f.category = "custom";
+    r.c->fetchMyGames(0, 0, f);
+    r.wait(K::GamesResult);
+    CHECK_EQ(r.last().path, std::string("/api/v1/account/games?limit=20&category=custom&rated=false"));
+
+    // Errors: the server's code; malformed answers.
+    mode = 1;
+    r.c->fetchMyGames(0, 10, net::GamesFilter());
+    ev = r.wait(K::GamesResult);
+    CHECK(!ev.ok);
+    CHECK_EQ(ev.error, std::string("invalid_filter"));
+    for (int m : {2, 3}) {
+        mode = m;
+        r.c->fetchMyGames(0, 10, net::GamesFilter());
+        ev = r.wait(K::GamesResult);
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string("invalid_response"));
+        CHECK(ev.gamesPage.games.empty());
+    }
+    CHECK(r.c->hasSavedSession());
+
+    // 401: the session is gone, its token erased (the user name stays); later calls need a login.
+    mode = 4;
+    r.c->fetchMyGames(0, 10, net::GamesFilter());
+    ev = r.wait(K::GamesResult);
+    CHECK(!ev.ok);
+    CHECK_EQ(ev.error, std::string("invalid_token"));
+    CHECK(!r.c->hasSavedSession());
+    CHECK_EQ(r.c->savedUsername(), std::string("alice"));
+    size_t before = r.count();
+    r.c->fetchMyGames(0, 10, net::GamesFilter());
+    ev = r.wait(K::GamesResult);
+    CHECK_EQ(ev.error, std::string("not_logged_in"));
+    CHECK_EQ(r.count(), before);
+}
+
+TEST(net_account_game_details) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    static_assert(chess::Knight == 2 && chess::Bishop == 3 && chess::Rook == 4 && chess::Queen == 5, "promotion numbering");
+    std::atomic<int> mode{0};
+    AccountRig r("acct-game", [&](const fakehttp::Request& q) {
+        if (q.method != "GET" || q.path.compare(0, 14, "/api/v1/games/") != 0) return jsonReply(404, R"({"error":"not_found"})");
+        if (q.path != "/api/v1/games/812") return jsonReply(404, R"({"error":"not_found","message":"No such game."})");
+        std::string body = kGameDetails;
+        switch (mode.load()) {
+        case 1: {                                   // the public answer: no you, no reportable
+            size_t at = body.find(R"(,"you")");
+            body = body.substr(0, at) + "}";
+            break;
+        }
+        case 2: body.replace(body.find("a2a1n"), 5, "a2a9n"); break;
+        case 3: body.replace(body.find("\"id\":812"), 8, "\"id\":813"); break;
+        case 4:                                     // a session the server no longer knows
+            if (q.has("authorization")) return jsonReply(401, R"({"error":"invalid_token"})");
+            body = body.substr(0, body.find(R"(,"you")")) + "}";
+            break;
+        default: break;
+        }
+        return jsonReply(200, body);
+    });
+    CHECK(r.srv.ok());
+
+    r.c->fetchGame(812);
+    net::Event ev = r.wait(K::GameDetailsResult);
+    CHECK_EQ(r.last().method, std::string("GET"));
+    CHECK_EQ(r.last().path, std::string("/api/v1/games/812"));
+    CHECK(hasBearer(r.last()));                     // the token goes along when one is saved
+    CHECK(ev.ok);
+    CHECK_EQ(ev.gameId, uint64_t(812));
+    const net::GameDetails& d = ev.gameDetails;
+    CHECK_EQ(d.id, uint64_t(812));
+    CHECK_EQ(d.you, 1);
+    CHECK(d.reportable);
+    CHECK_EQ(d.rematchOf, uint64_t(700));
+    CHECK_EQ(d.plies, 3);
+    CHECK_EQ(d.baseMs, int64_t(180000));
+    CHECK_EQ(d.white.ratingAfter, 1528);
+    CHECK_EQ(d.moves.size(), size_t(3));
+    if (d.moves.size() == 3) {
+        CHECK_EQ(d.moves[0].uci, std::string("e2e4"));
+        CHECK_EQ(d.moves[0].move, net::packMove(12, 28, 0));
+        CHECK_EQ(d.moves[0].spentMs, int64_t(1500));
+        CHECK_EQ(d.moves[0].clockMs, int64_t(180500));
+        CHECK_EQ(d.moves[1].move, net::packMove(52, 60, chess::Queen));
+        CHECK_EQ(net::movePromo(d.moves[1].move), int(chess::Queen));
+        CHECK_EQ(d.moves[1].spentMs, int64_t(-1));  // null: unknown
+        CHECK_EQ(d.moves[1].clockMs, int64_t(-1));
+        CHECK_EQ(d.moves[2].move, net::packMove(8, 0, chess::Knight));
+        CHECK_EQ(d.moves[2].clockMs, int64_t(3000));
+    }
+
+    mode = 1;
+    r.c->fetchGame(812);
+    ev = r.wait(K::GameDetailsResult);
+    CHECK(ev.ok);
+    CHECK_EQ(ev.gameDetails.you, 2);
+    CHECK(!ev.gameDetails.reportable);
+
+    // A move that is not UCI text, or another game than the one asked for: refused whole.
+    for (int m : {2, 3}) {
+        mode = m;
+        r.c->fetchGame(812);
+        ev = r.wait(K::GameDetailsResult);
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string("invalid_response"));
+        CHECK(ev.gameDetails.moves.empty());
+    }
+    mode = 0;
+    r.c->fetchGame(9);
+    ev = r.wait(K::GameDetailsResult);
+    CHECK_EQ(ev.error, std::string("not_found"));
+    size_t n = r.count();
+    r.c->fetchGame(0);
+    ev = r.wait(K::GameDetailsResult);
+    CHECK_EQ(ev.error, std::string("invalid_game_id"));
+    CHECK_EQ(r.count(), n);
+
+    // A refused token is erased, and the public answer asked for without it.
+    mode = 4;
+    n = r.count();
+    r.c->fetchGame(812);
+    ev = r.wait(K::GameDetailsResult);
+    CHECK(ev.ok);
+    CHECK_EQ(ev.gameDetails.you, 2);
+    std::vector<fakehttp::Request> all = r.srv.requests();
+    CHECK_EQ(all.size(), n + 2);
+    if (all.size() == n + 2) {
+        CHECK(hasBearer(all[n]));
+        CHECK(!all[n + 1].has("authorization"));
+    }
+    CHECK(!r.c->hasSavedSession());
+    // Signed out: asked without a token.
+    mode = 1;
+    r.c->fetchGame(812);
+    ev = r.wait(K::GameDetailsResult);
+    CHECK(ev.ok);
+    CHECK(!r.last().has("authorization"));
+}
+
+TEST(net_account_pgn) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    const std::string pgn =
+        "[Event \"Fake rated 3+2\"]\n[Site \"127.0.0.1\"]\n[Date \"2026.09.21\"]\n[Round \"-\"]\n[White \"alice\"]\n"
+        "[Black \"bob\"]\n[Result \"1-0\"]\n[ScacelithGameId \"812\"]\n\n"
+        "1. e4 {[%clk 0:03:00.5] [%emt 0:00:01.5]} e5 {[%clk 0:03:01.0] [%emt 0:00:01.0]} 1-0\n";
+    std::string exact = "[Event \"x\"]\n\n{";
+    exact += std::string((size_t(4) << 20) - exact.size() - 4, 'a');
+    exact += "} *\n";
+    std::atomic<int> mode{0};
+    AccountRig r("acct-pgn", [&](const fakehttp::Request& q) {
+        if (q.path != "/api/v1/games/812/pgn") return jsonReply(404, R"({"error":"not_found","message":"No such game."})");
+        fakehttp::Reply rep;
+        rep.headers.emplace_back("Content-Type", "application/x-chess-pgn; charset=utf-8");
+        rep.headers.emplace_back("Content-Disposition", "attachment; filename=\"scacelith-812.pgn\"");
+        switch (mode.load()) {
+        case 1: rep.body = exact; break;
+        case 2: rep.body = exact + "\n"; break;   // one byte over 4 MiB
+        case 3: rep.body = "<html><body>Proxy error</body></html>"; break;
+        case 4: return jsonReply(500, R"({"error":"internal_error","message":"The game cannot be replayed."})");
+        default: rep.body = "\xEF\xBB\xBF" + pgn; break;
+        }
+        return rep;
+    });
+    CHECK(r.srv.ok());
+    CHECK_EQ(exact.size(), size_t(4) << 20);
+
+    r.c->downloadPgn(812);
+    net::Event ev = r.wait(K::PgnResult);
+    fakehttp::Request q = r.last();
+    CHECK_EQ(q.method, std::string("GET"));
+    CHECK_EQ(q.path, std::string("/api/v1/games/812/pgn"));
+    CHECK_EQ(q.get("accept"), std::string("application/x-chess-pgn"));
+    CHECK(hasBearer(q));
+    CHECK(ev.ok);
+    CHECK_EQ(ev.gameId, uint64_t(812));
+    CHECK_EQ(ev.text, "\xEF\xBB\xBF" + pgn);            // as received, byte for byte
+
+    mode = 1;                                           // 4 MiB exactly: accepted
+    r.c->downloadPgn(812);
+    ev = r.wait(K::PgnResult);
+    CHECK(ev.ok);
+    CHECK_EQ(ev.text.size(), size_t(4) << 20);
+    for (int m : {2, 3}) {                              // too large; not a PGN
+        mode = m;
+        r.c->downloadPgn(812);
+        ev = r.wait(K::PgnResult);
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string("invalid_response"));
+        CHECK(ev.text.empty());
+    }
+    mode = 4;
+    r.c->downloadPgn(812);
+    ev = r.wait(K::PgnResult);
+    CHECK_EQ(ev.error, std::string("internal_error"));
+    mode = 0;
+    r.c->downloadPgn(5);
+    ev = r.wait(K::PgnResult);
+    CHECK_EQ(ev.error, std::string("not_found"));
+    CHECK_EQ(ev.gameId, uint64_t(5));
+    CHECK(r.c->hasSavedSession());
+}
+
+TEST(net_account_sessions) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    AccountRig r("acct-sessions", [&](const fakehttp::Request& q) {
+        if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
+        if (q.method == "GET" && q.path == "/api/v1/auth/sessions")
+            return jsonReply(200, R"({"sessions":[
+              {"id":31,"createdAt":1789000000000,"lastSeenAt":1790000000000,"expiresAt":1792000000000,"clientLabel":"Scacelith/0.1.0 win64","current":false},
+              {"id":32,"createdAt":1789500000000,"lastSeenAt":1790000500000,"expiresAt":1792500000000,"clientLabel":null,"current":true}]})");
+        if (q.method == "DELETE" && (q.path == "/api/v1/auth/sessions/31" || q.path == "/api/v1/auth/sessions/32"))
+            return jsonReply(200, R"({"status":"revoked"})");
+        return jsonReply(404, R"({"error":"not_found","message":"No such session."})");
+    });
+    CHECK(r.srv.ok());
+
+    r.c->fetchSessions();
+    net::Event ev = r.wait(K::SessionsResult);
+    CHECK_EQ(r.last().method, std::string("GET"));
+    CHECK_EQ(r.last().path, std::string("/api/v1/auth/sessions"));
+    CHECK(ev.ok);
+    CHECK_EQ(ev.sessions.size(), size_t(2));
+    if (ev.sessions.size() == 2) {
+        CHECK_EQ(ev.sessions[0].id, int64_t(31));
+        CHECK_EQ(ev.sessions[0].createdAtMs, int64_t(1789000000000));
+        CHECK_EQ(ev.sessions[0].lastSeenAtMs, int64_t(1790000000000));
+        CHECK_EQ(ev.sessions[0].expiresAtMs, int64_t(1792000000000));
+        CHECK_EQ(ev.sessions[0].clientLabel, std::string("Scacelith/0.1.0 win64"));
+        CHECK(!ev.sessions[0].current);
+        CHECK_EQ(ev.sessions[1].clientLabel, std::string(""));   // null: the client gave none
+        CHECK(ev.sessions[1].current);
+    }
+
+    // Another device: signed out there, not here.
+    r.c->revokeSession(31);
+    ev = r.wait(K::SessionRevoked);
+    fakehttp::Request q = r.last();
+    CHECK_EQ(q.method, std::string("DELETE"));
+    CHECK_EQ(q.path, std::string("/api/v1/auth/sessions/31"));
+    CHECK(hasBearer(q));
+    CHECK(q.body.empty());
+    CHECK(ev.ok);
+    CHECK_EQ(ev.sessionId, int64_t(31));
+    CHECK(r.c->hasSavedSession());
+    r.c->revokeSession(77);
+    ev = r.wait(K::SessionRevoked);
+    CHECK(!ev.ok);
+    CHECK_EQ(ev.error, std::string("not_found"));
+    CHECK_EQ(ev.sessionId, int64_t(77));
+    size_t n = r.count();
+    r.c->revokeSession(0);
+    ev = r.wait(K::SessionRevoked);
+    CHECK_EQ(ev.error, std::string("not_found"));
+    CHECK_EQ(r.count(), n);
+    // The session of this game: signed out here too.
+    r.c->revokeSession(32);
+    ev = r.wait(K::SessionRevoked);
+    CHECK(ev.ok);
+    CHECK(!r.c->hasSavedSession());
+    CHECK(r.c->state() == net::ConnState::Offline);
+}
+
+TEST(net_account_me_and_preferences) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    std::atomic<int> mode{0};
+    AccountRig r("acct-prefs", [&](const fakehttp::Request& q) {
+        if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
+        if (q.method == "PUT" && q.path == "/api/v1/account/preferences") {
+            Value b = bodyOf(q);
+            return jsonReply(200, R"({"preferences":{"acceptChallenges":")" + b["acceptChallenges"].asString() + "\"}}");
+        }
+        if (q.method == "GET" && q.path == "/api/v1/account/me") {
+            if (mode.load() == 1)
+                return jsonReply(200, R"({"user":{"id":7,"username":"alice","email":"a@example.org","emailVerified":true,
+                  "mfaEnabled":false,"googleLinked":false},"ratings":[],"sanctions":[],"ban":null})");
+            return jsonReply(200, R"({"user":{"id":7,"username":"alice","email":"a@example.org","emailVerified":true,
+              "mfaEnabled":true,"googleLinked":true,"hasPassword":false,"acceptChallenges":"none","createdAt":1700000000000,
+              "lastLoginAt":1790000000000,"pendingEmail":"new@example.org"},"ratings":[{"category":"3+2","rating":1520,
+              "games":3,"wins":2,"draws":0,"losses":1,"peak":1530,"provisional":true}],"sanctions":[],"ban":null})");
+        }
+        return jsonReply(404, R"({"error":"not_found"})");
+    });
+    CHECK(r.srv.ok());
+
+    r.c->fetchAccount();
+    net::Event ev = r.wait(K::AccountResult);
+    CHECK(ev.ok);
+    CHECK_EQ(ev.account.userId, 7u);
+    CHECK(ev.account.googleLinked);
+    CHECK(!ev.account.hasPassword);
+    CHECK(!ev.account.acceptChallenges);
+    CHECK_EQ(ev.account.pendingEmail, std::string("new@example.org"));
+    CHECK_EQ(ev.account.createdAtMs, int64_t(1700000000000));
+    CHECK_EQ(ev.account.lastLoginAtMs, int64_t(1790000000000));
+    CHECK_EQ(ev.account.ratings.size(), size_t(1));
+    mode = 1;                                         // a server without these fields: the defaults
+    r.c->fetchAccount();
+    ev = r.wait(K::AccountResult);
+    CHECK(ev.ok);
+    CHECK(ev.account.hasPassword);
+    CHECK(ev.account.acceptChallenges);
+    CHECK(ev.account.pendingEmail.empty());
+    CHECK_EQ(ev.account.createdAtMs, int64_t(0));
+    CHECK_EQ(ev.account.lastLoginAtMs, int64_t(0));
+
+    r.c->setAcceptChallenges(false);
+    ev = r.wait(K::PreferencesResult);
+    fakehttp::Request q = r.last();
+    CHECK_EQ(q.method, std::string("PUT"));
+    CHECK_EQ(q.path, std::string("/api/v1/account/preferences"));
+    CHECK_EQ(q.get("content-type"), std::string("application/json"));
+    CHECK_EQ(q.body, std::string(R"({"acceptChallenges":"none"})"));
+    CHECK(hasBearer(q));
+    CHECK(ev.ok);
+    CHECK(!ev.account.acceptChallenges);
+    r.c->setAcceptChallenges(true);
+    ev = r.wait(K::PreferencesResult);
+    CHECK_EQ(r.last().body, std::string(R"({"acceptChallenges":"all"})"));
+    CHECK(ev.ok);
+    CHECK(ev.account.acceptChallenges);
+}
+
+TEST(net_account_email_change) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    AccountRig r("acct-email", [&](const fakehttp::Request& q) {
+        if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
+        if (q.method != "POST" || q.path != "/api/v1/account/email") return jsonReply(404, R"({"error":"not_found"})");
+        Value b = bodyOf(q);
+        if (b["password"].asString() != "pw") return jsonReply(403, R"({"error":"invalid_password","message":"Wrong password."})");
+        std::string to = b["newEmail"].asString();
+        if (to == "taken@example.org") return jsonReply(409, R"({"error":"email_taken"})");
+        if (to == "a@example.org") return jsonReply(400, R"({"error":"same_email"})");
+        if (b.has("code") || b.has("recoveryCode")) return jsonReply(200, R"({"status":"email_changed","email":")" + to + "\"}");
+        return jsonReply(202, R"({"status":"verification_sent"})");
+    });
+    CHECK(r.srv.ok());
+
+    r.c->changeEmail("new@example.org", "pw", "");
+    net::Event ev = r.wait(K::EmailChangeResult);
+    fakehttp::Request q = r.last();
+    CHECK_EQ(q.path, std::string("/api/v1/account/email"));
+    CHECK(hasBearer(q));
+    CHECK_EQ(q.body, std::string(R"({"newEmail":"new@example.org","password":"pw"})"));   // two-factor off: no field
+    CHECK(ev.ok);
+    CHECK_EQ(ev.status, std::string("verification_sent"));
+
+    r.c->changeEmail("new@example.org", "pw", "123456");
+    ev = r.wait(K::EmailChangeResult);
+    CHECK_EQ(r.last().body, std::string(R"({"newEmail":"new@example.org","password":"pw","code":"123456"})"));
+    CHECK(ev.ok);
+    CHECK_EQ(ev.status, std::string("email_changed"));
+    CHECK_EQ(ev.account.email, std::string("new@example.org"));
+    r.c->changeEmail("new@example.org", "pw", "abcd-efgh-12");
+    r.wait(K::EmailChangeResult);
+    CHECK_EQ(r.last().body, std::string(R"({"newEmail":"new@example.org","password":"pw","recoveryCode":"abcd-efgh-12"})"));
+    r.c->changeEmail("new@example.org", "pw", "12345");         // not 6 digits: a recovery code
+    r.wait(K::EmailChangeResult);
+    CHECK(bodyOf(r.last()).has("recoveryCode"));
+
+    for (auto& c : std::vector<std::pair<std::string, std::string>>{{"taken@example.org", "email_taken"}, {"a@example.org", "same_email"}}) {
+        r.c->changeEmail(c.first, "pw", "");
+        ev = r.wait(K::EmailChangeResult);
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, c.second);
+    }
+    r.c->changeEmail("new@example.org", "nope", "");
+    ev = r.wait(K::EmailChangeResult);
+    CHECK_EQ(ev.error, std::string("invalid_password"));
+    CHECK(r.c->hasSavedSession());                    // a 403 is not a lost session
+}
+
+TEST(net_account_export) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    const std::string doc =
+        R"({"format":"scacelith-account-export","version":1,"exportedAt":1790000000000,"server":{"name":"Fake","host":"127.0.0.1"},)"
+        R"("account":{"id":7,"username":"alice","email":"a@example.org"},"ratings":[],"sessions":[{"id":32}],)"
+        R"("games":{"total":2,"list":[{"id":812,"white":{"name":"alice"}},{"id":790}]},"notes":["No password hash."]})";
+    std::atomic<int> mode{0};
+    AccountRig r("acct-export", [&](const fakehttp::Request& q) {
+        if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
+        if (q.method != "POST" || q.path != "/api/v1/account/export") return jsonReply(404, R"({"error":"not_found"})");
+        fakehttp::Reply rep = jsonReply(200, doc);
+        rep.headers.emplace_back("Content-Disposition", "attachment; filename=\"scacelith-account-alice.json\"");
+        switch (mode.load()) {
+        case 1: rep.body = doc.substr(0, doc.size() - 1); break;                               // truncated JSON
+        case 2: rep.body = R"({"format":"something-else","version":1})"; break;
+        case 3:                                                                               // announces 64 MiB + 1
+            rep.noLength = true;
+            rep.headers.emplace_back("Content-Length", std::to_string((size_t(64) << 20) + 1));
+            rep.body = "{}";
+            break;
+        case 4: {
+            fakehttp::Reply busy = jsonReply(429, R"({"error":"rate_limited","message":"Later.","retryAfter":120})");
+            busy.headers.emplace_back("Retry-After", "120");
+            return busy;
+        }
+        default: break;
+        }
+        return rep;
+    });
+    CHECK(r.srv.ok());
+
+    r.c->exportAccount("pw", "123456");
+    net::Event ev = r.wait(K::AccountExportResult);
+    fakehttp::Request q = r.last();
+    CHECK_EQ(q.method, std::string("POST"));
+    CHECK_EQ(q.path, std::string("/api/v1/account/export"));
+    CHECK(hasBearer(q));
+    CHECK_EQ(q.body, std::string(R"({"password":"pw","code":"123456"})"));
+    CHECK(ev.ok);
+    CHECK_EQ(ev.text, doc);                         // the document as the server wrote it
+    r.c->exportAccount("pw", "");
+    r.wait(K::AccountExportResult);
+    CHECK_EQ(r.last().body, std::string(R"({"password":"pw"})"));
+
+    for (int m : {1, 2, 3}) {
+        mode = m;
+        r.c->exportAccount("pw", "");
+        ev = r.wait(K::AccountExportResult);
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string("invalid_response"));
+        CHECK(ev.text.empty());
+    }
+    mode = 4;
+    r.c->exportAccount("pw", "");
+    ev = r.wait(K::AccountExportResult);
+    CHECK_EQ(ev.error, std::string("rate_limited"));
+    CHECK_EQ(ev.retryAfterSec, 120);
+}
+
+TEST(net_account_delete) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    AccountRig r("acct-delete", [&](const fakehttp::Request& q) {
+        if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
+        if (q.method != "POST" || q.path != "/api/v1/account/delete") return jsonReply(404, R"({"error":"not_found"})");
+        Value b = bodyOf(q);
+        if (b["password"].asString() != "pw") return jsonReply(403, R"({"error":"invalid_password"})");
+        if (!b.has("code") && !b.has("recoveryCode")) return jsonReply(403, R"({"error":"mfa_code_required"})");
+        return jsonReply(200, R"({"status":"deleted"})");
+    });
+    CHECK(r.srv.ok());
+    r.c->deleteAccount("wrong", "123456");
+    net::Event ev = r.wait(K::AccountDeleted);
+    CHECK(!ev.ok);
+    CHECK_EQ(ev.error, std::string("invalid_password"));
+    r.c->deleteAccount("pw", "");
+    ev = r.wait(K::AccountDeleted);
+    CHECK_EQ(ev.error, std::string("mfa_code_required"));
+    CHECK_EQ(r.last().body, std::string(R"({"password":"pw"})"));
+    CHECK(r.c->hasSavedSession());
+
+    r.c->deleteAccount("pw", "abcd-efgh-12");
+    ev = r.wait(K::AccountDeleted);
+    CHECK_EQ(r.last().path, std::string("/api/v1/account/delete"));
+    CHECK_EQ(r.last().body, std::string(R"({"password":"pw","recoveryCode":"abcd-efgh-12"})"));
+    CHECK(ev.ok);
+    CHECK(!r.c->hasSavedSession());
+    CHECK(r.c->savedUsername().empty());            // the deleted account's name is forgotten
+    net::CredentialStore s(r.credPath);             // the origin's server id stays
+    net::Credential cr;
+    CHECK(s.get(r.ep.origin(), cr));
+    CHECK(cr.token.empty());
+    CHECK_EQ(cr.serverId, std::string("srv-acct"));
+}
+
+// The realtime connection of a deleted account stops for good.
+TEST(net_account_delete_stops_realtime) {
+    if (!net::transportAvailable()) return;
+    FakeServer srv;
+    CHECK(srv.start());
+    std::string credPath = tempCredentialPath("acct-delete-rt");
+    using K = net::Event::Kind;
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        net::ServerEndpoint ep;
+        ep.host = "127.0.0.1";
+        ep.apiPort = srv.port;
+        ep.insecureDev = true;
+        c.setServer(ep);
+        net::Event ev;
+        c.login("alice", "pw");
+        CHECK(waitEvent(c, K::LoginResult, ev, 20000) && ev.ok);
+        c.connect();
+        CHECK(waitEvent(c, K::Welcome, ev, 10000));
+        int hellos = srv.hellos.load();
+        c.deleteAccount("pw", "");
+        std::vector<net::Event> seen;
+        CHECK(waitEvent(c, K::AccountDeleted, ev, 10000, &seen));
+        CHECK(ev.ok);
+        CHECK_EQ(srv.deletes.load(), 1);
+        CHECK(!c.hasSavedSession());
+        // Offline (its event may come before or after AccountDeleted), and it stays so.
+        auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (c.state() != net::ConnState::Offline && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK(c.state() == net::ConnState::Offline);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        while (c.poll(ev)) seen.push_back(ev);
+        CHECK(std::none_of(seen.begin(), seen.end(), [](const net::Event& e) {
+            return e.kind == net::Event::Kind::ConnectionChanged &&
+                   (e.state == net::ConnState::Reconnecting || e.state == net::ConnState::Connecting);
+        }));
+        CHECK(c.state() == net::ConnState::Offline);
+        CHECK_EQ(srv.hellos.load(), hellos);        // no reconnection
+    }
+    net::sys::removeFile(credPath);
+}
+
+// The official server moved from port 44664 to 443: a saved session moves with it, once; other
+// origins never move.
+TEST(net_credentials_origin_move) {
+    const std::string oldO = "play.example.org:44664", newO = "play.example.org:443", other = "chess.example.net:44664";
+    const std::string token = "sct_" + std::string(43, 'M'), token2 = "sct_" + std::string(43, 'N');
+    std::string path = tempCredentialPath("move");
+    {
+        net::CredentialStore s(path);
+        net::Credential c;
+        c.origin = oldO;
+        c.username = "alice";
+        c.token = token;
+        c.serverId = "srv-official";
+        c.pinnedSha256 = std::string(64, 'c');
+        CHECK(s.put(c));
+        c.origin = other;
+        c.username = "bob";
+        c.token = token2;
+        CHECK(s.put(c));
+    }
+    {
+        net::CredentialStore s(path);
+        s.addOriginMove(oldO, newO);
+        net::Credential out;
+        CHECK(s.get(newO, out));
+        CHECK_EQ(out.username, std::string("alice"));
+        CHECK_EQ(out.token, token);                 // re-protected for its new origin
+        CHECK_EQ(out.serverId, std::string("srv-official"));
+        CHECK_EQ(out.pinnedSha256, std::string(64, 'c'));
+        CHECK(!s.get(oldO, out));
+        CHECK(s.get(other, out));
+        CHECK_EQ(out.token, token2);
+    }
+    {
+        net::CredentialStore s(path);               // saved: no move rule needed any more
+        net::Credential out;
+        CHECK(s.get(newO, out));
+        CHECK_EQ(out.token, token);
+        CHECK_EQ(s.origins().size(), size_t(2));
+        // A record for the new origin already there: nothing moves (the old one stays as it is).
+        net::Credential c;
+        c.origin = oldO;
+        c.username = "carol";
+        c.token = token2;
+        CHECK(s.put(c));
+    }
+    {
+        net::CredentialStore s(path);
+        net::Credential out;
+        CHECK(s.get(oldO, out));                    // loaded before the rule: applied at once
+        s.addOriginMove(oldO, newO);
+        CHECK(s.get(newO, out));
+        CHECK_EQ(out.username, std::string("alice"));
+        CHECK(s.get(oldO, out));
+        CHECK_EQ(out.username, std::string("carol"));
+    }
+    net::sys::removeFile(path);
+
+    // Through the client: this build's official server, when it is not on 44664.
+    net::ServerEndpoint off = net::officialServer();
+    if (!off.valid() || off.apiPort == 44664) return;
+    net::ServerEndpoint legacy = off;
+    legacy.apiPort = 44664;
+    path = tempCredentialPath("move-official");
+    {
+        net::CredentialStore s(path);
+        net::Credential c;
+        c.origin = legacy.origin();
+        c.username = "alice";
+        c.token = token;
+        CHECK(s.put(c));
+        c.origin = other;                           // a community server on the former port
+        c.username = "bob";
+        CHECK(s.put(c));
+    }
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(path);
+        c.setServer(off);
+        CHECK(c.hasSavedSession());
+        CHECK_EQ(c.savedUsername(), std::string("alice"));
+    }
+    {
+        net::CredentialStore s(path);
+        net::Credential out;
+        CHECK(!s.get(legacy.origin(), out));
+        CHECK(s.get(off.origin(), out));
+        CHECK_EQ(out.token, token);
+        CHECK(s.get(other, out));                   // never moved
+        CHECK_EQ(out.username, std::string("bob"));
+    }
+    net::sys::removeFile(path);
 }
 
 // TLS certificate rules against a real TLS server, opt-in because the test cannot start one on
