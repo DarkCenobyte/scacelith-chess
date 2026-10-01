@@ -128,10 +128,18 @@ public:
                 skipLine();
                 continue;
             }
-            if (c == '<') {  // reserved for future expansion: skipped
-                while (p_ < s_.size() && s_[p_] != '>') advance();
-                if (p_ < s_.size()) advance();
-                continue;
+            if (c == '<') {  // reserved for future expansion: skipped up to its '>' on the same line
+                size_t q = p_ + 1;
+                while (q < s_.size() && s_[q] != '>' && !lineBreak(q)) ++q;
+                if (q < s_.size() && s_[q] == '>') {
+                    while (p_ <= q) advance();
+                    continue;
+                }
+                // Never further: a stray '<' must not swallow the games after it.
+                advance();
+                bad(t, "'<' without '>' on its line");
+                t.end = p_;
+                return t;
             }
             if (c == '.') {  // periods of move numbers
                 advance();
@@ -175,9 +183,12 @@ private:
     int line_ = 1, col_ = 1;
 
     char peek(size_t k) const { return p_ + k < s_.size() ? s_[p_ + k] : '\0'; }
+    // A line ends at '\n', and at a '\r' not followed by '\n' (files with CR line ends).
+    bool lineBreak(size_t q) const { return s_[q] == '\n' || (s_[q] == '\r' && (q + 1 >= s_.size() || s_[q + 1] != '\n')); }
     void advance() {
+        const bool newLine = lineBreak(p_);
         const unsigned char c = (unsigned char)s_[p_++];
-        if (c == '\n') {
+        if (newLine) {
             ++line_;
             col_ = 1;
         } else if ((c & 0xC0) != 0x80) {
@@ -189,7 +200,7 @@ private:
         while (p_ < s_.size() && ((unsigned char)s_[p_] & 0xC0) == 0x80) advance();
     }
     void skipLine() {
-        while (p_ < s_.size() && s_[p_] != '\n') advance();
+        while (p_ < s_.size() && !lineBreak(p_)) advance();
     }
     void skipSpacesInLine() {
         while (p_ < s_.size() && (s_[p_] == ' ' || s_[p_] == '\t')) advance();
@@ -240,24 +251,22 @@ private:
             return bad(t, "quoted value expected in tag " + name);
         }
         advance();
+        // An unescaped quote inside the value (some writers) when a later quote on the line closes
+        // the tag: the last quote of the line followed by ']' is found once, so that a line full of
+        // quotes costs one pass, not one per quote.
+        size_t lastClose = std::string::npos;
+        for (size_t q = p_; q < s_.size() && !lineBreak(q); ++q)
+            if (s_[q] == '"' && closesTag(q)) lastClose = q;
         std::string value;
         bool tooLong = false;
         for (;;) {
-            if (p_ >= s_.size() || s_[p_] == '\n') return bad(t, "unterminated value of tag " + name);
+            if (p_ >= s_.size() || lineBreak(p_)) return bad(t, "unterminated value of tag " + name);
             char c = s_[p_];
             if (c == '\\' && (peek(1) == '"' || peek(1) == '\\')) {
                 advance();
                 c = s_[p_];
             } else if (c == '"') {
-                // An unescaped quote inside the value (some writers) when a later quote on the line
-                // closes the tag.
-                bool closing = closesTag(p_);
-                if (!closing) {
-                    bool later = false;
-                    for (size_t q = p_ + 1; q < s_.size() && s_[q] != '\n'; ++q)
-                        if (s_[q] == '"' && closesTag(q)) later = true;
-                    closing = !later;
-                }
+                const bool closing = lastClose == std::string::npos || lastClose <= p_ || closesTag(p_);
                 if (closing) {
                     advance();
                     break;
@@ -289,8 +298,9 @@ private:
                 advance();
                 break;
             }
+            const bool newLine = lineBreak(p_);
             advance();
-            if (c == '\n' && tagLineAhead()) return bad(t, "unterminated comment");
+            if (newLine && tagLineAhead()) return bad(t, "unterminated comment");
             if (text.size() < lim_.maxComment) text += c;
         }
         t.kind = Tok::Comment;
@@ -300,7 +310,7 @@ private:
     void lineComment(Token& t) {
         advance();  // ';'
         std::string text;
-        while (p_ < s_.size() && s_[p_] != '\n') {
+        while (p_ < s_.size() && !lineBreak(p_)) {
             if (text.size() < lim_.maxComment) text += s_[p_];
             advance();
         }
@@ -379,6 +389,12 @@ std::string sanLetters(const std::string& s) {
         out += char(c);
     }
     return out;
+}
+
+// A Variant tag value naming Chess960 (which needs its start position in a FEN tag).
+bool chess960Variant(const std::string& value) {
+    const std::string v = lower(trim(value));
+    return v == "chess960" || v == "chess 960" || v == "fischerandom" || v == "fischer random" || v == "960";
 }
 
 bool hasAsciiAlnum(const std::string& s) {
@@ -460,6 +476,7 @@ private:
         for (;;) {
             switch (t.kind) {
             case Tok::End:
+                if (any) beginMoves();  // a game of tags only: its FEN and Variant are checked too
                 if (depth > 0 && !skipping) failAt(last, "unterminated variation");
                 return finish(g, any);
             case Tok::TagPair:
@@ -504,6 +521,7 @@ private:
                 break;
             case Tok::Star:
                 any = true;
+                beginMoves();  // "*" alone is a game too (a study chapter, a position): its FEN counts
                 finishResult("*");
                 return finish(g, true);
             case Tok::Symbol: {
@@ -564,7 +582,7 @@ private:
         bool chess960 = false;
         if (vi >= 0) {
             const std::string v = lower(trim(r.tags[size_t(vi)].value));
-            if (v == "chess960" || v == "chess 960" || v == "fischerandom" || v == "fischer random" || v == "960") {
+            if (chess960Variant(v)) {
                 chess960 = true;
             } else if (!v.empty() && v != "standard" && v != "chess" && v != "normal" && v != "from position") {
                 why = "variant '" + r.tags[size_t(vi)].value + "' is not supported";
@@ -903,7 +921,9 @@ std::string write(const Record& r) {
     const Position start = r.startPosition();
     const Position standard;
     const bool custom = !(start.samePosition(standard) && start.halfmoveClock() == 0 && start.fullmoveNumber() == 1);
-    if (custom) {
+    // A Chess960 game from the standard setup (position 518) keeps its FEN: the reader requires it.
+    const std::string* variant = r.findTag("Variant");
+    if (custom || (variant && chess960Variant(*variant))) {
         tag("SetUp", "1");
         tag("FEN", start.fen());
     }

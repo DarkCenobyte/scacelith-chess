@@ -4,6 +4,8 @@
 #include "chess/pgn.h"
 
 #include <algorithm>
+#include <chrono>
+#include <cstdio>
 #include <string>
 #include <vector>
 
@@ -524,6 +526,125 @@ TEST(pgn_times_and_helpers) {
     CHECK(pgn::tagRank("FEN") < pgn::tagRank("ScacelithMode"));
 }
 
+// A game whose movetext is only "*" (a study chapter, a position) keeps its set-up position, and
+// its tags are checked as those of any game.
+TEST(pgn_result_only_game_keeps_its_position) {
+    const char* text = "[SetUp \"1\"]\n[FEN \"8/8/8/8/8/8/k7/7K b - - 0 40\"]\n\n*";
+    auto res = pgn::read(text);
+    if (const pgn::ParsedGame* g = only(res)) {
+        CHECK(g->ok());
+        CHECK_EQ(g->record.fen, std::string("8/8/8/8/8/8/k7/7K b - - 0 40"));
+        CHECK(g->record.plies.empty());
+        // Written and read again, the position is still there.
+        auto back = pgn::read(pgn::write(g->record));
+        if (const pgn::ParsedGame* b = only(back)) CHECK_EQ(b->record.fen, g->record.fen);
+    }
+    auto zh = pgn::read("[Variant \"Crazyhouse\"]\n\n*");
+    if (const pgn::ParsedGame* g = only(zh)) CHECK(!g->ok());
+    auto badFen = pgn::read("[SetUp \"1\"]\n[FEN \"not a position\"]\n\n*\n");
+    if (const pgn::ParsedGame* g = only(badFen)) {
+        CHECK(!g->ok());
+        CHECK_EQ(g->error.line, 2);
+    }
+    // Tags and no movetext at all, at the end of a file: checked too.
+    auto tagsOnly = pgn::read("[Event \"A\"]\n\n1. e4 *\n\n[Variant \"Atomic\"]\n");
+    CHECK_EQ(int(tagsOnly.games.size()), 2);
+    if (tagsOnly.games.size() == 2) CHECK(!tagsOnly.games[1].ok());
+    CHECK_EQ(int(pgn::scan(text).games.size()), 1);
+}
+
+// Chess960 from the standard setup (position 518, as lichess exports it): what the reader
+// accepts, the writer writes so that it reads back.
+TEST(pgn_chess960_standard_setup_round_trip) {
+    auto res = pgn::read(
+        "[Variant \"Chess960\"]\n[SetUp \"1\"]\n[FEN \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\"]\n\n"
+        "1. e4 e5 2. Nf3 *\n");
+    const pgn::ParsedGame* g = only(res);
+    if (!g) return;
+    CHECK(g->ok());
+    const std::string text = pgn::write(g->record);
+    CHECK(text.find("[SetUp \"1\"]\n[FEN \"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\"]") != std::string::npos);
+    auto back = pgn::read(text);
+    if (const pgn::ParsedGame* b = only(back)) {
+        if (!b->ok()) std::fprintf(stderr, "  %s\n", b->error.text().c_str());
+        CHECK(b->ok());
+        CHECK_EQ(int(b->record.plies.size()), 3);
+        CHECK_EQ(pgn::write(b->record), text);
+    }
+    // A standard game still gets no FEN.
+    CHECK(pgn::write(pgn::Record()).find("[FEN") == std::string::npos);
+}
+
+// A tag value full of unescaped quotes is read in one pass: a small hostile file must not stall
+// the listing (it took seconds per 160 KB when every quote looked ahead to the end of the line).
+TEST(pgn_quotes_in_tag_values_take_linear_time) {
+    std::string small = "[Event \"";
+    for (int i = 0; i < 500; ++i) small += "\"x";
+    small += "\"]\n\n1. e4 *\n";
+    auto res = pgn::read(small);
+    if (const pgn::ParsedGame* g = only(res)) {
+        CHECK(g->ok());
+        CHECK_EQ(g->record.tag("Event").size(), size_t(1000));
+        CHECK_EQ(g->record.tag("Event").substr(0, 4), std::string("\"x\"x"));
+    }
+    std::string big = "[Event \"";
+    for (int i = 0; i < 80000; ++i) big += "\"x";
+    big += "\"]\n\n1. e4 *\n\n[Event \"Next\"]\n\n1. d4 *\n";
+    auto t0 = std::chrono::steady_clock::now();
+    auto sc = pgn::scan(big);
+    const double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    std::fprintf(stderr, "  %zu bytes of quotes scanned in %.1f ms\n", big.size(), ms);
+    CHECK(ms < 1000.0);
+    CHECK_EQ(int(sc.games.size()), 2);
+    if (sc.games.size() == 2) {
+        CHECK(sc.games[0].error.message.find("too long") != std::string::npos);
+        CHECK_EQ(sc.games[1].tag("Event"), std::string("Next"));
+    }
+}
+
+// Nothing swallows the games after it: a '<' without its '>' stops at the end of its line, and a
+// file with CR line ends (old Mac programs) has lines too.
+TEST(pgn_stray_bracket_and_cr_line_ends) {
+    const std::string three =
+        "[Event \"One\"]\n\n1. e4 e5 2. Nf3 < 2... Nc6 1-0\n\n[Event \"Two\"]\n\n1. d4 *\n\n[Event \"Three\"]\n\n1. c4 *\n";
+    auto res = pgn::read(three);
+    CHECK_EQ(int(res.games.size()), 3);
+    if (res.games.size() == 3) {
+        CHECK(!res.games[0].ok());
+        CHECK_EQ(res.games[0].error.line, 3);
+        CHECK_EQ(res.games[0].error.column, 17);
+        CHECK(res.games[1].ok());
+        CHECK_EQ(res.games[1].record.tag("Event"), std::string("Two"));
+        CHECK(res.games[2].ok());
+    }
+    CHECK_EQ(int(pgn::scan(three).games.size()), 3);
+    // A reserved <...> on one line is still skipped.
+    auto reserved = pgn::read("1. e4 <reserved> e5 *\n");
+    if (const pgn::ParsedGame* g = only(reserved)) {
+        CHECK(g->ok());
+        CHECK_EQ(int(g->record.plies.size()), 2);
+    }
+    // CR line ends: the ; comment ends with its line, the next game is a game of its own, an
+    // escape line is one line, and positions count the lines.
+    const std::string cr = "[Event \"One\"]\r\r1. e4 e5 ; note\r2. Nf3 1-0\r\r[Event \"Two\"]\r%escaped\r\r1. d4 Ke4 *\r";
+    auto mac = pgn::read(cr);
+    CHECK_EQ(int(mac.games.size()), 2);
+    if (mac.games.size() == 2) {
+        CHECK(mac.games[0].ok());
+        CHECK_EQ(int(mac.games[0].record.plies.size()), 3);
+        if (mac.games[0].record.plies.size() == 3) CHECK_EQ(mac.games[0].record.plies[1].comment, std::string("note"));
+        CHECK_EQ(mac.games[1].record.tag("Event"), std::string("Two"));
+        CHECK(!mac.games[1].ok());
+        CHECK_EQ(mac.games[1].error.line, 9);
+        CHECK_EQ(mac.games[1].error.column, 7);
+    }
+    CHECK_EQ(int(pgn::scan(cr).games.size()), 2);
+    // An unterminated comment in a CR file is found at the next tag line.
+    auto open = pgn::read("[Event \"A\"]\r\r1. e4 {never closed\r[Event \"B\"]\r\r1. d4 *\r");
+    CHECK_EQ(int(open.games.size()), 2);
+    if (open.games.size() == 2) CHECK(open.games[1].ok());
+}
+
 // Mutated real files (bytes replaced, inserted, deleted, cut): the reader never crashes, and the
 // scan of the listing finds the same games, at the same places, as the full read.
 TEST(pgn_mutations_never_crash_and_scan_agrees) {
@@ -533,7 +654,7 @@ TEST(pgn_mutations_never_crash_and_scan_agrees) {
         seed = seed * 1664525u + 1013904223u;
         return seed >> 8;
     };
-    static const char alphabet[] = "[]{}()\";%$!?.*-+#=/\\\n 0123456789abcdefghKQRBNOxe\xE2\x99\x98\xC3\xA9\xFF";
+    static const char alphabet[] = "[]{}()<>\";%$!?.*-+#=/\\\n\r 0123456789abcdefghKQRBNOxe\xE2\x99\x98\xC3\xA9\xFF";
     int checked = 0;
     for (int round = 0; round < 600; ++round) {
         std::string s = base;
