@@ -326,6 +326,7 @@ void GameScene::enterMenu() {
     stateTime_ = 0.0f;
     turn_ = Turn::None;
     paused_ = false;
+    game_.setEndDetection(true);
     game_.reset();
     arbiter_.reset(game_);
     board_.reset(true);
@@ -432,6 +433,9 @@ void GameScene::setupNewGame() {
     }
 
     game_.reset();
+    // The rules lesson's positions may be over on load (two kings alone) and its exercises go on
+    // after a mate: its game never ends by itself.
+    game_.setEndDetection(!lesson());
     arbiter_.reset(game_);
     // At the human player's right hand; at White's right when watching; where the New Game page
     // put it in a hot-seat game.

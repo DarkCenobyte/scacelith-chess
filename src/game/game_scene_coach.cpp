@@ -850,6 +850,7 @@ void GameScene::coachPlayerTouched() {
 }
 
 void GameScene::coachIllegalAttempt(Square from, Square to) {
+    LOGI("coach: %s-%s refused (not a legal move)", squareName(from).c_str(), squareName(to).c_str());
     if (coach_ && coach_->sessionRunning) coach_->session.onIllegalAttempt(game_, from, to);
 }
 
@@ -1296,7 +1297,11 @@ void GameScene::runCoachTable(float dt) {
     switch (job.kind) {
     case TableJob::Kind::Demo: {
         if (rt.phase == 1) {
-            if (handsIdle()) rt.jobRunning = false;   // placed, and the pause is over
+            if (!handsIdle()) return;   // placed, and the pause is over
+            rt.jobRunning = false;
+            // The hand goes back to rest unless the table has more for it (a rewind usually
+            // follows the line about the demonstration: it reaches out again then).
+            if (rt.jobs.empty()) coachHand.enqueue(task(anim::TaskType::Retract));
             return;
         }
         const Position& pos = rt.demoPos;
@@ -1489,6 +1494,7 @@ void GameScene::runCoachTable(float dt) {
             coachFade_ = std::min(1.0f, coachFade_ + dt / kSetupFadeOut);
             if (coachFade_ < 1.0f) return;
             Game g;
+            g.setEndDetection(game_.endDetection());   // off in the lesson: two kings alone are no draw
             if (!g.resetFromFEN(job.fen)) {
                 LOGW("coach: lesson position '%s' is not valid", job.fen.c_str());
             } else {
@@ -1618,8 +1624,8 @@ void GameScene::runStageTest(float dt) {
             rt.testSq = coach::anchorTime(timing, rt.testSpoken, "sq", 0.3f);
             rt.testSq2 = coach::anchorTime(timing, rt.testSpoken, "sq2", 0.7f);
             duration = timing.duration;
-            LOGI("coach stage test: %.2f s of speech, %zu pauses, anchors sq %.2f s, sq2 %.2f s", timing.duration,
-                 timing.pauses.size(), rt.testSq, rt.testSq2);
+            LOGI("coach stage test: %.2f s of speech, %d pauses, anchors sq %.2f s, sq2 %.2f s", timing.duration,
+                 int(timing.pauses.size()), rt.testSq, rt.testSq2);
             std::vector<float> pcm = rt.testPcm;
             if (!st.startVoice(std::move(pcm))) return;   // retried next frame
         } else {
