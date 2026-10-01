@@ -78,7 +78,7 @@
 //   --replay <file.pgn>     skip the menu: replay a saved game (--game N: the Nth game of the file,
 //                           from 1; --replay-speed x1|x2|x4|x8|instant; --replay-paused;
 //                           --replay-keys K,L,J,Shift+L,Home,End,... presses these keys in turn,
-//                           each once the board is still)
+//                           each once the board is still; Leave: Esc and "Main menu")
 //   --mouse fx,fy           pointer position as fractions of the window (screenshots)
 //   --glance                a human game starts looking at the player's scoresheet (S)
 //   --calibrate             the brightness calibration before the title page, as on a first start

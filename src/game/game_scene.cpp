@@ -2608,7 +2608,7 @@ void GameScene::updateWatchInput() {
             dragging_ = false;
             plat::setMouseCaptured(false);
         }
-        switch (ui::viewerPauseMenu()) {
+        switch (menuChoice(ui::viewerPauseMenu())) {
         case ui::MenuAction::Resume: paused_ = false; break;
         case ui::MenuAction::BackToMainMenu:
             paused_ = false;

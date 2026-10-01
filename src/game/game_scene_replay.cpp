@@ -166,7 +166,15 @@ void GameScene::updateReplay(float dt) {
         if (still && replayKeyWait_ <= 0.0f) {
             const std::string& k = replayKeys_[replayKeysPos_++];
             LOGI("--replay-keys: %s (at ply %d)", k.c_str(), replayClock_.ply());
-            if (!replayKey(k)) LOGW("--replay-keys: '%s' is not K, J, L, Shift+J, Shift+L, Home or End", k.c_str());
+            if (k == "Leave") {
+                // Esc, then "Main menu" in the viewer's pause menu (menuChoice).
+                if (state_ == State::Playing) {
+                    paused_ = true;
+                    scriptMenu_ = ui::MenuAction::BackToMainMenu;
+                }
+            } else if (!replayKey(k)) {
+                LOGW("--replay-keys: '%s' is not K, J, L, Shift+J, Shift+L, Home, End or Leave", k.c_str());
+            }
             replayKeyWait_ = 0.6f;
         }
     }
