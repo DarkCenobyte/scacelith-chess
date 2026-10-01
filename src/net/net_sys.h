@@ -10,7 +10,11 @@ namespace net {
 namespace sys {
 
 std::string exeDirectory();        // directory of the running executable, trailing separator
-std::string userDataDirectory();   // %APPDATA%\Scacelith\ or ~/.config/scacelith/ (created)
+std::string userDataDirectory();   // %APPDATA%\scacelith\ or ~/.config/scacelith/ (created)
+// The per-user folder of the game's data files (created), the rule of plat::appDataDirectory():
+// %APPDATA%\scacelith\ on Windows, $XDG_DATA_HOME/scacelith/ (default ~/.local/share/scacelith/)
+// on Linux. The coach's voice model lives in its "coach" subfolder (src/tts/model_store.h).
+std::string appDataDirectory();
 bool fileExists(const std::string& path);
 bool directoryWritable(const std::string& dir);
 bool readFile(const std::string& path, std::string& out, size_t maxBytes);

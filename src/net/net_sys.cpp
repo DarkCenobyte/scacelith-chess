@@ -51,12 +51,14 @@ std::string exeDirectory() {
 std::string userDataDirectory() {
     wchar_t w[MAX_PATH];
     if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, w))) {
-        std::wstring dir = std::wstring(w) + L"\\Scacelith";
+        std::wstring dir = std::wstring(w) + L"\\scacelith";
         CreateDirectoryW(dir.c_str(), nullptr);
         return narrow(dir.c_str()) + "\\";
     }
     return exeDirectory();
 }
+
+std::string appDataDirectory() { return userDataDirectory(); }   // Roaming, as plat::appDataDirectory()
 
 bool fileExists(const std::string& path) {
     DWORD a = GetFileAttributesW(widen(path).c_str());
@@ -153,6 +155,18 @@ std::string userDataDirectory() {
     std::string d = std::string(home) + "/.config/scacelith/";
     mkdir((std::string(home) + "/.config").c_str(), 0755);
     mkdir(d.c_str(), 0700);
+    return d;
+}
+
+std::string appDataDirectory() {
+    const char* xdg = getenv("XDG_DATA_HOME");
+    const char* home = getenv("HOME");
+    std::string base;
+    if (xdg && xdg[0] == '/') base = xdg;
+    else if (home && home[0]) base = std::string(home) + "/.local/share";
+    else return exeDirectory();
+    std::string d = base + (base.back() == '/' ? "" : "/") + "scacelith/";
+    makeDirectories(d);
     return d;
 }
 

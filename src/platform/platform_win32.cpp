@@ -423,7 +423,7 @@ std::string exeDirectory() {
 std::string userDataDirectory() {
     wchar_t w[MAX_PATH];
     if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, w))) {
-        std::wstring dir = std::wstring(w) + L"\\Scacelith";
+        std::wstring dir = std::wstring(w) + L"\\scacelith";
         CreateDirectoryW(dir.c_str(), nullptr);
         char buf[MAX_PATH * 3];
         int n = WideCharToMultiByte(CP_UTF8, 0, dir.c_str(), -1, buf, sizeof(buf), nullptr, nullptr);
@@ -431,6 +431,9 @@ std::string userDataDirectory() {
     }
     return exeDirectory();
 }
+
+// The same folder as userDataDirectory() on Windows (Roaming application data).
+std::string appDataDirectory() { return userDataDirectory(); }
 
 void messageBox(const char* title, const char* text) {
     wchar_t wt[256], wx[2048];
