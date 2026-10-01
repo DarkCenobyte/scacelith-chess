@@ -475,8 +475,8 @@ TEST(mock_account_export_and_deletion) {
     CHECK(doc["notes"].size() >= 1);
     CHECK(e.text.find("recoveryCodes") == std::string::npos);
     CHECK(e.text.find("passwordHash") == std::string::npos);
-    // Five an hour.
-    for (int i = 0; i < 4; ++i) {
+    // Five attempts an hour, the wrong password above included.
+    for (int i = 0; i < 3; ++i) {
         srv.exportAccount("pw", "");
         CHECK(await(srv, Kind::AccountExportResult, e));
         CHECK(e.ok);
@@ -500,4 +500,30 @@ TEST(mock_account_export_and_deletion) {
     srv.fetchMyGames(0, 10, net::GamesFilter());
     CHECK(await(srv, Kind::GamesResult, e));
     CHECK_EQ(e.error, std::string("unauthorized"));
+}
+
+// The export's limit as on the server (account-export.js: rate [account_export 5/h, reauth],
+// checked by the router before the handler): every attempt counts, failed ones included, and the
+// limit is checked before the password.
+TEST(mock_account_export_limit_counts_every_attempt) {
+    VirtualClock vc;
+    mock::FakeServer srv;
+    signIn(srv, "Paul_M");
+    Event e;
+    for (int i = 0; i < 5; ++i) {
+        srv.exportAccount("wrong", "");
+        CHECK(await(srv, Kind::AccountExportResult, e));
+        CHECK_EQ(e.error, std::string("invalid_password"));
+    }
+    srv.exportAccount("pw", "");
+    CHECK(await(srv, Kind::AccountExportResult, e));
+    CHECK_EQ(e.error, std::string("rate_limited"));
+    CHECK(e.retryAfterSec > 3500 && e.retryAfterSec <= 3600);
+    srv.exportAccount("wrong", "");  // no word about the password
+    CHECK(await(srv, Kind::AccountExportResult, e));
+    CHECK_EQ(e.error, std::string("rate_limited"));
+    mock::advance(3600000.0);
+    srv.exportAccount("pw", "");
+    CHECK(await(srv, Kind::AccountExportResult, e));
+    CHECK(e.ok);
 }

@@ -2140,8 +2140,8 @@ void FakeServer::exportAccount(const std::string& password, const std::string& c
     const Event::Kind k = Event::Kind::AccountExportResult;
     if (I.transportError(k)) return;
     if (!I.signedIn) return I.http(I.result(k, false, "unauthorized"));
-    if (!I.reauth(k, password, codeOrRecovery)) return;
-    // Five an hour (account_export).
+    // Five an hour (account_export), as the server's router checks it: before the password, every
+    // attempt counted, failed ones included.
     I.exportTimes.erase(std::remove_if(I.exportTimes.begin(), I.exportTimes.end(), [&](double t) { return I.lastNow - t >= 3600000.0; }),
                         I.exportTimes.end());
     if (I.exportTimes.size() >= 5) {
@@ -2150,6 +2150,7 @@ void FakeServer::exportAccount(const std::string& password, const std::string& c
         return I.http(e);
     }
     I.exportTimes.push_back(I.lastNow);
+    if (!I.reauth(k, password, codeOrRecovery)) return;
     Event e = I.result(k, true);
     e.text = I.exportDocument();
     I.http(e);
