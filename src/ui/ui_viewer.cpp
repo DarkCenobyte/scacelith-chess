@@ -11,7 +11,8 @@
 //   coach voice download (sample figures): coach-download (the prompt over the Coach page),
 //     coach-download-licence (its licence view), coach-download-hub / coach-download-github /
 //     coach-download-extracting / coach-download-failed (the progress panel; github over the
-//     title page)
+//     title page); coach-flow: the real thing over the title page (game/coach_model.h: the
+//     Coach entry's prompt, a real download into --coach-dir <folder>, the panel, the notices)
 //   hot-seat (two players on one PC): newgame-hotseat (New Game with "Human, same PC"),
 //     hotseat-hud (players, caption, draw offer card), hotseat-confirm (named resignation),
 //     hotseat-gameover (both names and ratings)
@@ -46,7 +47,9 @@
 #include "../platform/platform.h"
 #include "../render/gpu.h"
 #include "../render/shader.h"
+#include "../game/coach_model.h"
 #include "../tts/model_store.h"
+#include "../tts/tts.h"
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
@@ -72,6 +75,7 @@ public:
         black_ = ctx.hasArg("--ui-black");
         drawn_ = ctx.hasArg("--ui-draw");
         text_ = ctx.argValue("--ui-text");
+        coachDir_ = ctx.argValue("--coach-dir");
         kb_ = ctx.hasArg("--ui-kb");
         std::string mouse = ctx.argValue("--ui-mouse");
         float mx = 0, my = 0;
@@ -157,6 +161,11 @@ public:
         if (screen == "coach" || screen == "coach-novoice") {
             ui::debug::openMenuPage(ui::debug::MenuPage::Coach);
             coach_.voiceAvailable = screen == "coach";
+        }
+        if (screen == "coach-flow") {
+            if (!coachDir_.empty()) tts::setModelDirectory(coachDir_);
+            game::coachModelInit();
+            coach_.voiceAvailable = game::coachVoiceWanted();
         }
         if (screen.compare(0, 14, "coach-download") == 0) {
             ui::debug::openMenuPage(screen == "coach-download-github" ? ui::debug::MenuPage::Title : ui::debug::MenuPage::Coach);
@@ -298,7 +307,7 @@ public:
         if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
         if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "credits" ||
             s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || menu_ ||
-            s.compare(0, 14, "coach-download") == 0) {
+            s.compare(0, 14, "coach-download") == 0 || s == "coach-flow") {
             a = ui::mainMenu(setup_, watch_, coach_);
         } else if (s == "coach-hud" || s == "coach-subtitle") {
             ui::Subtitle sub;
@@ -418,6 +427,11 @@ public:
             handSheet();
         }
         if (s.compare(0, 14, "coach-download") == 0) modelDownloadSample(s);
+        if (s == "coach-flow") {
+            game::drawModelDownload();
+            if (game::coachModelInstalled()) LOGI("ui viewer: coach voice installed");
+            coach_.voiceAvailable = game::coachVoiceWanted();
+        }
         ui::drawNotifications();
         if (a != ui::MenuAction::None) {
             LOGI("ui viewer: action %d", int(a));
@@ -468,6 +482,7 @@ public:
     }
 
     void shutdown(AppContext&) override {
+        if (screen_ == "coach-flow") game::coachModelShutdown();
         ui::im::setInputOverride(nullptr);
         ui::shutdown();
         game::settings() = saved_;  // the viewer never persists its test choices
@@ -479,6 +494,7 @@ private:
     ui::WatchSetup watch_;
     ui::CoachSetup coach_;
     std::string text_;
+    std::string coachDir_;
     std::string screen_;
     int tab_ = 0;
     bool black_ = false, drawn_ = false, kb_ = false, quit_ = false;

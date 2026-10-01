@@ -6,6 +6,8 @@
 #include "../tts/model_store.h"
 #include "../tts/tts.h"
 #include "../ui/ui.h"
+#include <cstdlib>
+#include <cstring>
 #include <memory>
 
 namespace game {
@@ -37,7 +39,14 @@ void startDownload() {
     u.job.reset(new tts::ModelDownloader());   // the folder as it is now (--coach-dir)
     u.failed = false;
     u.failure.clear();
-    if (u.job->start()) {
+    // Testing aid: SCACELITH_COACH_SOURCE=github skips Hugging Face (the fallback path),
+    // =hub never falls back to the release archive.
+    tts::ModelDownloader::Options o;
+    if (const char* src = std::getenv("SCACELITH_COACH_SOURCE")) {
+        if (std::strcmp(src, "github") == 0) o.useHub = false;
+        if (std::strcmp(src, "hub") == 0) o.useArchive = false;
+    }
+    if (u.job->start(o)) {
         u.watching = true;
         LOGI("coach: voice model download started into %s", u.job->folder().c_str());
     }
