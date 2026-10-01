@@ -114,6 +114,7 @@ struct CoachRuntime {
     std::map<uint32_t, std::vector<float>> speechDone;   // finished, not taken yet (empty = failed)
     audio::VoiceId voice;
     bool voiceActive = false;
+    bool voiceStarted = false;                        // an utterance was started (voiceClock >= 0 after it)
     double voiceQueued = 0.0;                         // seconds of the utterance
     double voiceGameT = 0.0;                          // game time since it started (paused: stops)
     bool voicePausedByDirector = false, voicePausedByScene = false;
@@ -124,6 +125,7 @@ struct CoachRuntime {
     std::string subText;
     float subAge = 0.0f, subHold = 0.0f;
     bool offerShown = false, skipHint = false;
+    float offerAge = 0.0f;                            // seconds the takeback card has been up
     bool forceSubtitles = false;                      // the stage test shows its line whatever the option
 
     // Body
@@ -280,6 +282,7 @@ public:
         audio::closeVoice(id);
         r.voice = id;
         r.voiceActive = true;
+        r.voiceStarted = true;
         r.voiceQueued = seconds;
         r.voiceGameT = 0.0;
         if (r.voicePausedByDirector || r.voicePausedByScene) audio::setVoicePaused(id, true);
@@ -304,8 +307,9 @@ public:
         CoachRuntime& r = rt();
         if (finished) *finished = false;
         if (!r.voiceActive) {
+            // Over (heard, stopped or dropped): the end, as long as nothing new starts.
             if (finished) *finished = true;
-            return -1.0;
+            return r.voiceStarted ? r.voiceQueued : -1.0;
         }
         audio::VoiceStatus st = audio::voiceStatus(r.voice);
         audio::Stats as = audio::stats();
@@ -465,9 +469,8 @@ public:
         j.fast = fast;
         r.jobs.push_back(j);
     }
-    // Space during a rewind: the rest of it (and the rewinds queued) at the pace of play. Not in
-    // coach::Stage yet: the director can call it once the contract has it.
-    void hurryTable() {
+    // Space during a rewind: the rest of it (and the rewinds queued) at the pace of play.
+    void hurryTable() override {
         CoachRuntime& r = rt();
         if (r.jobRunning && (r.job.kind == TableJob::Kind::Rewind || r.job.kind == TableJob::Kind::TakeBack)) r.job.fast = true;
         for (TableJob& j : r.jobs)
@@ -588,12 +591,10 @@ CoachRuntime& GameScene::coachRuntime() {
     if (coach_) return *coach_;
     coach_.reset(new CoachRuntime(*this));
     CoachRuntime& rt = *coach_;
-    // The catalog on this thread (a few ms), the opening names through W10's texts; the book and
-    // those texts are built on a thread of their own (~40 ms) before the first move needs them.
-    coach::Catalog::shared().setOpeningResolver(
-        [](const std::string& ref, const std::string& form, const std::string& lang, bool spoken) {
-            return coach::OpeningTexts::instance().arg(ref, form, lang, spoken);
-        });
+    // The catalog on this thread (a few ms; Session::start installs its opening resolver); the
+    // opening book and texts are built on a thread of their own (~40 ms) before the first move
+    // needs them.
+    coach::Catalog::shared();
     rt.warm = std::thread([] {
         coach::OpeningBook::instance();
         coach::OpeningTexts::instance();
@@ -610,9 +611,11 @@ void GameScene::setupCoachGame() {
     int colour = coachArgs_.colour >= 0 ? coachArgs_.colour
                  : s.coachColour == 0 || s.coachColour == 1 ? s.coachColour
                                                              : (s.coachNextColour == 1 ? 1 : 0);
-    humanColor_ = coachLevel_ == 0 ? White : Color(colour);
-    rt.seed = (uint64_t(rng_.next()) << 32) | rng_.next();
     rt.test = coachArgs_.stageTest;
+    // The rules lesson is played with White; so is the stage test unless told otherwise (its line
+    // points at White's g1 knight).
+    humanColor_ = coachLevel_ == 0 || (rt.test && coachArgs_.colour < 0) ? White : Color(colour);
+    rt.seed = (uint64_t(rng_.next()) << 32) | rng_.next();
     rt.testKind = ctx_->argValue("--coach-stage-test");
     if (rt.testKind.compare(0, 2, "--") == 0) rt.testKind.clear();
     rt.testStep = 0;
@@ -655,7 +658,7 @@ void GameScene::startCoachGame() {
     CoachRuntime& rt = coachRuntime();
     Settings& s = settings();
     // Alternating colours: the next coach game is played with the other colour.
-    if (coachLevel_ > 0 && coachArgs_.colour < 0 && s.coachColour == 2) {
+    if (coachLevel_ > 0 && coachArgs_.colour < 0 && s.coachColour == 2 && !rt.test) {
         s.coachNextColour = humanColor_ == White ? 1 : 0;
         s.save();
     }
@@ -709,6 +712,7 @@ void GameScene::leaveCoachGame() {
     rt.drawAnalysis = 0;
     rt.stage->cancelSpeech(0);
     rt.stage->stopVoice();
+    rt.voiceStarted = false;
     rt.subText.clear();
     rt.offerShown = rt.skipHint = false;
     rt.jobs.clear();
@@ -782,6 +786,7 @@ void GameScene::endLesson() {
 
 bool GameScene::coachHandshakeWanted() const {
     if (!coach_ || !coach_->sessionRunning) return true;
+    if (coach_->jobRunning || !coach_->jobs.empty()) return false;   // the table is put back first
     return coach_->session.handshakeWanted() || stateTime_ > kHandshakeFailsafe;
 }
 
@@ -802,7 +807,13 @@ void GameScene::persistCoachResults() {
         s.coachHistory.erase(s.coachHistory.begin(), s.coachHistory.end() - Settings::kCoachHistoryMax);
     s.coachAccuracyExplained = rt.session.accuracyExplained();
     if (lesson()) s.coachLessonChapter = rt.session.lessonCompleted() ? 0 : rt.session.lessonChapter();
-    if (rt.session.suggestedLevel() > 0) LOGI("coach: suggested level %d", rt.session.suggestedLevel());
+    // The level the coach suggested is the Coach page's choice next time ("Play again" keeps this
+    // game's level).
+    int suggested = rt.session.suggestedLevel();
+    if (!lesson() && suggested > 0 && suggested != coachLevel_) {
+        LOGI("coach: suggests level %d (was %d)", suggested, coachLevel_);
+        s.coachLevel = std::clamp(suggested, 1, ai::kCoachLevels - 1);
+    }
     s.save();
 }
 
@@ -828,10 +839,10 @@ bool GameScene::coachMayTouch() const {
     if (!coach_) return true;
     const CoachRuntime& rt = *coach_;
     if (rt.jobRunning || !rt.jobs.empty() || rt.offerShown) return false;
-    if (rt.sessionRunning && rt.session.offerOpen()) return false;
-    // The lesson asks for each move (a WaitMove beat); between them the coach has the floor.
-    if (lesson()) return rt.sessionRunning && rt.session.director().waitingMove();
-    return true;
+    // The session's word: the human's turn without the takeback card; the lesson, while an
+    // exercise waits for the move (between them the coach has the floor).
+    if (rt.sessionRunning) return rt.session.playerMayMove(game_);
+    return !rt.test;
 }
 
 void GameScene::coachPlayerTouched() {
@@ -912,16 +923,39 @@ void GameScene::updateCoach(float dt) {
     if (rt.voiceActive) {
         bool finished = false;
         stage.voiceClock(&finished);
-        if (finished) rt.voiceActive = false;
+        if (finished) {
+            // Heard to the end by the game's clock (no device, screenshot runs, the watchdog): the
+            // audio engine may still hold it (Pending without a device), which would keep its slot.
+            audio::VoiceState vs = audio::voiceStatus(rt.voice).state;
+            if (vs != audio::VoiceState::Finished && vs != audio::VoiceState::Stopped && vs != audio::VoiceState::Dropped &&
+                vs != audio::VoiceState::None)
+                audio::stopVoice(rt.voice, 0.02f);
+            rt.voiceActive = false;
+        }
     }
 
-    // The session: what the coach says and does (not while paused).
-    if (rt.sessionRunning && !hold && (state_ == State::Playing || state_ == State::GameOver)) rt.session.update(game_, dt);
+    // The session: what the coach says and does (not while paused). It hears how long the engine
+    // has been searching the coach's move (a filler line after a long search).
+    if (rt.sessionRunning && !hold && (state_ == State::Playing || state_ == State::GameOver)) {
+        bool searching = state_ == State::Playing && turn_ == Turn::AiThinking && aiRequested_ && !aiHasMove_;
+        rt.session.onCoachThinking(searching ? aiElapsed_ : 0.0f);
+        rt.session.update(game_, dt);
+    }
     if (rt.test && !hold && state_ == State::Playing) runStageTest(dt);
     if (!frozen) runCoachTable(dt);
     // A dip to hide a correction of the table fades back (a lesson set-up runs its own fade).
     if (!(rt.jobRunning && rt.job.kind == TableJob::Kind::SetPosition) && coachFade_ > 0.0f)
         coachFade_ = std::max(0.0f, coachFade_ - dt / kSetupFadeIn);
+
+    // --coach-auto-answer: the card answers itself (scripted runs, where nobody clicks).
+    bool offerUp = rt.offerShown || (rt.sessionRunning && rt.session.offerOpen());
+    rt.offerAge = offerUp && !hold ? rt.offerAge + dt : offerUp ? rt.offerAge : 0.0f;
+    if (offerUp && coachArgs_.autoAnswer >= 0 && rt.offerAge > 1.5f && state_ == State::Playing) {
+        LOGI("coach: takeback offer %s (--coach-auto-answer)", coachArgs_.autoAnswer ? "accepted" : "declined");
+        rt.offerShown = false;
+        rt.offerAge = 0.0f;
+        if (rt.sessionRunning) rt.session.onOfferAnswer(game_, coachArgs_.autoAnswer == 1);
+    }
 
     // The draw offer's evaluation.
     if (rt.drawAnalysis && engine_.analysisReady(rt.drawAnalysis)) {
@@ -1042,7 +1076,13 @@ void GameScene::coachHudFrame() {
     if (hud.offer && act == ui::CoachHudAction::None && in.mousePressed[plat::MOUSE_LEFT] && !ui::wantsMouse() && !dragging_) {
         int pid = pickPiece(mouseRay());
         const PieceObject* p = pid >= 0 ? board_.byId(pid) : nullptr;
-        if (p && p->color == humanColor_) act = ui::CoachHudAction::PlayOn;
+        if (p && p->color == humanColor_) {
+            // Touching a piece plays on (the session's own "Let's play on"); the touch itself then
+            // goes through below, the card gone.
+            LOGI("coach: takeback offer declined (a piece touched)");
+            rt.offerShown = false;
+            if (rt.sessionRunning) rt.session.onPlayerActive();
+        }
     }
     if (act != ui::CoachHudAction::None) {
         bool accept = act == ui::CoachHudAction::TakeBack;
@@ -1401,6 +1441,7 @@ void GameScene::runCoachTable(float dt) {
             if (rt.plies.empty()) {
                 if (job.kind == TableJob::Kind::TakeBack) {
                     rt.demoPos = game_.position();
+                    clock_.start(game_.position().sideToMove());   // unseen: it follows the side to move
                     beginTurn();
                 }
                 finish();
@@ -1464,6 +1505,7 @@ void GameScene::runCoachTable(float dt) {
         coachFade_ = std::max(0.0f, coachFade_ - dt / kSetupFadeIn);
         if (coachFade_ > 0.0f) return;
         rt.jobRunning = false;
+        clock_.start(game_.position().sideToMove());
         beginTurn();
         return;
     }
@@ -1503,6 +1545,7 @@ void GameScene::runCoachTable(float dt) {
         // The move is on the board: the lesson game records it (no scoresheet, no clock).
         game_.play(rt.lessonMove);
         arbiter_.reset(game_);
+        clock_.start(game_.position().sideToMove());
         rt.demoPos = game_.position();
         rt.jobRunning = false;
         LOGI("coach: lesson move %s", job.uci.c_str());

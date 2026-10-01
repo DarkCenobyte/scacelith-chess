@@ -243,6 +243,7 @@ void GameScene::updateScript(float dt) {
     if (scriptPos_ >= script_.size() || turn_ != Turn::HumanIdle || paused_ || scriptWait_ > 0.0f) return;
     if (hotSeat() && handover_.active()) return;
     if (anim_[inputSeat()].busy()) return;
+    if (coach() && !coachMayTouch()) return;  // the coach has the floor (or its hands the table)
     const std::string& u = script_[scriptPos_++];
     Move mv = game_.position().parseUCI(u);
     PieceObject* p = mv.valid() ? board_.at(mv.from) : nullptr;

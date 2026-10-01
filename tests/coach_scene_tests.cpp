@@ -52,6 +52,13 @@ TEST(coach_args_stage_test_and_bad_values) {
     CoachArgs last = parseCoachArgs({"--start", "--coach", "--coach-level"});
     CHECK_EQ(last.level, -1);
     CHECK_EQ(int(last.problems.size()), 1);
+    // Scripted runs: the takeback card answers itself.
+    CHECK_EQ(parseCoachArgs({"--coach-auto-answer", "yes"}).autoAnswer, 1);
+    CHECK_EQ(parseCoachArgs({"--coach-auto-answer", "no"}).autoAnswer, 0);
+    CoachArgs bad = parseCoachArgs({"--coach-auto-answer", "maybe", "--start", "--coach"});
+    CHECK_EQ(bad.autoAnswer, -1);
+    CHECK_EQ(int(bad.problems.size()), 1);
+    CHECK(bad.start);
 }
 
 TEST(coach_settings_history_codec) {

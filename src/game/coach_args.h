@@ -13,6 +13,8 @@ struct CoachArgs {
     int colour = -1;          // --coach-colour white|black: 0 / 1; -1 = Settings (the lesson: White)
     std::string dir;          // --coach-dir <path>: the voice's model folder; "" = <exe dir>/coach/
     bool stageTest = false;   // --coach-stage-test: the scene's Stage performs a fixed sequence
+    int autoAnswer = -1;      // --coach-auto-answer yes|no: the takeback card answers itself (1 / 0)
+                              // after 1.5 s, for scripted runs (--play) and screenshots; -1 = no
     std::vector<std::string> problems;   // values that were ignored, for the log
 };
 
@@ -45,6 +47,14 @@ inline CoachArgs parseCoachArgs(const std::vector<std::string>& args) {
                 ++i;
             } else {
                 c.problems.push_back(a + " expects white or black, got '" + value + "'");
+                if (hasValue && value.compare(0, 2, "--") != 0) ++i;
+            }
+        } else if (a == "--coach-auto-answer") {
+            if (value == "yes" || value == "no") {
+                c.autoAnswer = value == "yes" ? 1 : 0;
+                ++i;
+            } else {
+                c.problems.push_back("--coach-auto-answer expects yes or no, got '" + value + "'");
                 if (hasValue && value.compare(0, 2, "--") != 0) ++i;
             }
         } else if (a == "--coach-dir") {

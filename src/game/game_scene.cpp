@@ -980,7 +980,12 @@ bool GameScene::update(AppContext& ctx, float dt) {
                                             gameOverExtras());
             if (a == ui::MenuAction::Rematch) {
                 if (hotSeat()) swapHotSeatColours();  // the rematch swaps colours
-                if (coach()) leaveCoachGame();         // "Play again" / "First game": a new session
+                if (coach()) {
+                    // "Play again": the same level (the Coach page offers the one the coach
+                    // suggested); "First game" after the lesson: level 1.
+                    if (!lesson()) coachArgs_.level = coachLevel_;
+                    leaveCoachGame();
+                }
                 state_ = State::FadeToGame;
                 stateTime_ = 0.0f;
             } else if (a == ui::MenuAction::BackToMainMenu) {
