@@ -782,7 +782,9 @@ AccountNav pageDevices(float t, bool fresh, std::string& navNote) {
                     s.note.clear();
                     se.revokeSession(d.id);
                 }
-                if (busy) spinner(vec2(im::flipX(rowCol, b.x - 30.0f), b.cy()), 10.0f);
+                // Before the button on its start side (b is mirrored already: flipped once, here
+                // from the unmirrored x).
+                if (busy) spinner(vec2(im::flipX(rowCol, r.r() - 22.0f - bw - 30.0f), b.cy()), 10.0f);
                 im::popId();
             }
         }
