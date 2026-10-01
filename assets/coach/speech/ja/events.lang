@@ -1,0 +1,112 @@
+# Coach speech (Japanese): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# Polite です/ます style with a warm teacher's ね/よ; the coach is 私; "あなた" only where Japanese
+# needs it ("あなたの番です"). Level names as in assets/i18n/ja.lang (coach.level.*.name).
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = こんにちは！気楽に一局指しましょう。困ったらいつでも手伝いますね。
+event.greet.l1.2 = やあ！やさしく指して、気をつけるポイントを教えますね。
+event.greet.l1.3 = ようこそ！ゆっくり考えてください。駒が危ないときは教えます。
+event.greet.l2 = こんにちは！指しましょう。フォークやピンが出てきたら教えますね。
+event.greet.l2.2 = やあ！駒を展開して、キングを安全に保ちましょう。途中で手伝います。
+event.greet.l2.3 = おかえりなさい！フォークとピンに注目。勝負を決める武器です。
+event.greet.l3 = こんにちは！本格的な一局を指しましょう。作戦と大きなミスにコメントします。
+event.greet.l3.2 = やあ！駒をどう使うか、作戦を立てましょう。見落としがあれば教えます。
+event.greet.l3.3 = さあ、指しましょう！唯一の手と、うまくいかない手を指摘します。
+event.greet.l4 = こんにちは！今回は評価値を示し、より良い候補手もお見せします。
+event.greet.l4.2 = 指しましょう。ミスのあとは、より正確な手をお伝えします。
+event.greet.l4.3 = クラブでの一局、準備はいいですか？評価値が変わったらコメントします。
+event.greet.l5 = 指しましょう。コメントは短めにします。
+event.greet.l5.2 = いつでもどうぞ。コメントは手短にします。
+event.greet.l5.3 = 健闘を祈ります。大事な場面でだけ話します。
+event.greet.l6 = よろしくお願いします。
+event.greet.l6.2 = 始めましょう。
+event.greet.l6.3 = 準備はできました。勝負どころだけコメントします。
+
+# Who starts (said after the greeting).
+event.colour.white = あなたが白なので、先に指してください。
+event.colour.white.2 = あなたは白番です。お先にどうぞ。
+event.colour.black = 私が白なので、私から指します。
+event.colour.black.2 = 今回あなたは黒です。私が先に指します。
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+event.level.l0 = チェスのルール：小さな練習問題で、一歩ずつ学んでいきます。
+event.level.l1 = はじめの一歩：手加減して指し、どのミスもわかりやすく説明します。
+event.level.l2 = 初心者：少し強めに指し、フォークやピンなど簡単な戦術を教えます。
+event.level.l3 = 中級者：作戦やポーン構造について話し、短い変化を見せます。
+event.level.l4 = クラブ会員：ポーン単位の評価値を示し、候補手を提案します。
+event.level.l5 = 強いクラブ会員：コメントは短く、大事な場面では長い変化も示します。
+event.level.l6 = エキスパート：全力で指し、勝負どころだけコメントします。
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = あなたの番です。
+event.your_move.2 = どうぞ、指してください。
+event.your_move.3 = さあ、次の一手をどうぞ。
+# The player has been thinking for a while (never during the first minute).
+event.take_time = ゆっくり考えてください。
+event.take_time.2 = 急がなくて大丈夫ですよ。私たちの対局に時計はありません。
+# Short filler while the coach is still looking at the position.
+event.filler = うーん。
+event.filler.2 = どれどれ。
+event.filler.3 = 少し考えさせてください。
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = わかりました、手を戻しましょう。
+event.takeback.taken.2 = いい判断です。もう一度よく見てみましょう。
+event.takeback.taken.3 = はい、戻しました。もう一度どうぞ。
+# The player declined the offer and played on.
+event.takeback.declined = わかりました、このまま続けましょう。
+event.takeback.declined.2 = 了解です。対局を続けます。
+event.takeback.declined.3 = それも一つの考えですね。続けましょう。
+# After an explanation without an offer.
+event.play_on = では、続けましょう。
+event.play_on.2 = 続きを指しましょう。
+event.play_on.3 = さあ、対局に戻りましょう。
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = こういうミスは誰にでもあります。大事なのは気づくことです。
+event.encourage.mistake.2 = 大丈夫ですよ。私の直前の手の狙いを確かめれば、見つかります。
+event.encourage.mistake.3 = どんなプレイヤーにも起こることです。さあ、続けましょう。
+# The player is behind (material or evaluation).
+event.encourage.behind = あきらめないで。チャンスを探して、私をてこずらせてください。
+event.encourage.behind.2 = 粘りましょう。こういう局面は、まだ逆転できます。
+event.encourage.behind.3 = 落ち着いて、私の弱点を探しましょう。
+# The player has played several good moves in a row.
+event.encourage.well = 指す前に、私の狙いをちゃんと確かめていますね。素晴らしいです。
+event.encourage.well.2 = 慎重で堅実な手ですね。その調子です。
+event.encourage.well.3 = 今日はよく考えていますね。
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = お受けします。では、引き分けですね。
+event.draw.accepted.2 = 了解です。引き分けにしましょう。
+event.draw.declined = せっかくですが、続けましょう。
+event.draw.declined.2 = 私はもう少し指したいです。
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = お見事でした。おめでとうございます！
+event.end.win.2 = 勝つべくして勝ちましたね。よくできました！
+event.end.win.3 = おめでとうございます。文句なしにあなたの勝ちです。
+event.end.loss = いい対局でした。次はきっと勝てますよ。
+event.end.loss.2 = 対局ありがとうございました。負けからも必ず学べます。
+event.end.loss.3 = よく戦いました。何が起きたか見てみましょう。
+event.end.draw = 引き分けです。いい対局でした！
+event.end.draw.2 = 今回は勝負つかず。いい戦いでした。
+event.end.draw.3 = 妥当な結果ですね。楽しい対局でした。
+event.end.resigned = 投了ですね。それでも、よく戦いました。
+event.end.resigned.2 = わかりました。対局ありがとうございました。
+event.end.handshake = 握手しましょう。
+event.end.handshake.2 = ありがとうございました。
+event.end.handshake.3 = いい勝負でした。ありがとうございます。
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a noun phrase.
+event.lesson.resume = おかえりなさい！{chapter}の続きから始めましょう。
+event.lesson.resume.2 = また会えましたね！前回は{chapter}のところで終わりました。
+event.lesson.next = 次は{chapter}です。
+event.lesson.next.2 = さて、今度は{chapter}です。
+event.lesson.skip = わかりました、先に進みましょう。
+event.lesson.skip.2 = では、飛ばして次へ行きます。
