@@ -182,7 +182,7 @@ person: your opponent sits in the other chair as a robot that moves with them, l
 piece they touch, holds it over the square they aim at, looks where they look and leans in when
 they do.
 
-- **Server.** The official server is `caissa.scacelith.com` (port 44664, secure web API and
+- **Server.** The official server is `caissa.scacelith.com` (port 443, secure web API and
   secure WebSocket on the same port). Options > Online server > Custom server takes a community
   server instead: host (domain or IP), HTTPS/API port, WSS port (empty = the API port) and, for a
   server with a self-signed certificate, its **Certificate fingerprint (SHA-256)** as its owner
