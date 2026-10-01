@@ -189,8 +189,12 @@ public:
     anim::Animator& hand() const { return s_.anim_[s_.aiSeat()]; }
 
     // ---- Voice
+    // Heard: the model files, a worker that loaded them, and an output device (without one the
+    // audio engine runs silently, Windows retrying in the background: the lines go to subtitles).
     bool voiceAvailable() const override {
-        return s_.coachVoiceFiles_ && rt().workerStarted && !rt().worker.failed() && audio::stats().running;
+        if (!s_.coachVoiceFiles_ || !rt().workerStarted || rt().worker.failed()) return false;
+        audio::Stats a = audio::stats();
+        return a.running && a.deviceOpen;
     }
     void ensureWorker(float speed) {
         CoachRuntime& r = rt();
