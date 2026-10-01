@@ -1,0 +1,828 @@
+# Coach speech (Simplified Chinese, mainland): the review of the player's moves
+# (src/coach/review.cpp, review_explain.cpp). Same keys and variants as
+# assets/coach/speech/en/review.lang. Subtitle text only: the voice speaks the English line of the
+# same key and variant, so each variant translates its English twin. The ".spoken" keys below are
+# the English values, copied unchanged (never used).
+#
+# Placeholders: {your} {your2} / {my} {my2} = a piece with its owner ("你的车", "我的马");
+# {t1} {t2} = a piece of either side, owner included; never write 你的 / 我的 in front of them.
+# {sq} = a square ("e4"); {move} {best} {reply} = moves ("♘f3"); {line} = a few moves;
+# {eval} = "+1.3" or "3步将死"; {m:move} = "2步"; {pts:point} = "3分"; {n} {n2} = plain numbers.
+# {text} = name.pattern.* (a mate pattern, said after 叫作 / 这是).
+# No space between Chinese and a square, move or digit. Level bands: b1-b2 plain words,
+# b3-b4 club vocabulary, b5-b6 terse. Terms: 捉双 (fork), 闪击 (discovered attack), 串击 (skewer),
+# 牵制 (pin), 底线 (back rank), 透气孔 (luft), 逃生格 (escape square), 通路兵 (passed pawn),
+# 对王 (opposition), 兵的正方形 (square of the pawn), 兵残局 (pawn ending), 双象 (bishop pair),
+# 子力 (material), 得子 (to win material), 胜势 (winning position), "{m}步杀" (terse mate in m).
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = 将军！我的王受到攻击了。
+ann.check.human.b1.2 = 将军！你在攻击我的王。
+ann.check.human.b1.3 = 将军了！我的王必须摆脱将军。
+ann.check.human = 将军。
+ann.check.human.2 = 将军！
+ann.check.human.3 = 这步是将军。
+# The coach gives check.
+ann.check.coach = 将军！
+ann.check.coach.2 = 将军。
+ann.check.coach.3 = 将你一军！
+# Once per game at levels 1-2, right after the coach's first check.
+ann.check.coach.first = 这表示{your}正受到攻击。你必须解除将军。
+ann.check.coach.first.2 = 将军就是{your}受到攻击。把它移开、挡住将军，或吃掉我的子。
+ann.double_check = 双将！我的两个子同时将军，所以王必须走开。
+ann.double_check.2 = 这是双将：只有走王才行。
+# The player checkmates the coach.
+ann.mate.human.b1 = 将死！你赢了！我的王逃不掉了。
+ann.mate.human.b1.2 = 将死了！干得好，这盘你赢了！
+ann.mate.human.b1.3 = 将死！我的王被困住了。恭喜你！
+ann.mate.human = 将死。下得好。
+ann.mate.human.2 = 将死了。恭喜你。
+ann.mate.human.3 = 将死！漂亮。
+# The coach checkmates the player.
+ann.mate.coach.b1 = 将死了。你的王无路可逃。
+ann.mate.coach.b1.2 = 将死。你的王受到攻击，又逃不掉。
+ann.mate.coach.b1.3 = 很遗憾，这是将死。你的王逃不掉了。
+ann.mate.coach = 将死。
+ann.mate.coach.2 = 将死了。
+ann.mate.coach.3 = 很遗憾，将死了。
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = 哎呀！这步棋会白白送掉东西。
+ex.verdict.blunder.b1.2 = 小心！我给你看看现在会发生什么。
+ex.verdict.blunder.b1.3 = 哦，等一下。这步棋有问题。
+ex.verdict.blunder.b2 = 嗯，这步棋有问题。你看。
+ex.verdict.blunder.b2.2 = 这是个错误。看好了。
+ex.verdict.blunder.b2.3 = 小心，这步棋会让你吃亏。你看。
+ex.verdict.blunder.b3 = 这是一步漏着。
+ex.verdict.blunder.b3.2 = {move}是个错误。我来告诉你为什么。
+ex.verdict.blunder.b3.3 = 哎哟，{move}是个大错。
+ex.verdict.blunder.b4 = {move}是一步漏着。
+ex.verdict.blunder.b4.2 = {move}是个严重的错误。
+ex.verdict.blunder.b4.3 = 恐怕这是一步漏着。
+ex.verdict.blunder.b5 = {move}是严重错误。
+ex.verdict.blunder.b5.2 = {move}是漏着。
+ex.verdict.blunder.b5.3 = {move}，前功尽弃。
+ex.verdict.blunder.b6 = {move}是败着。
+ex.verdict.blunder.b6.2 = {move}是漏着。
+ex.verdict.blunder.b6.3 = {move}？这就输了。
+ex.verdict.mistake.b3 = 这步不算最好。原因是这样的。
+ex.verdict.mistake.b3.2 = 嗯，{move}有问题。
+ex.verdict.mistake.b3.3 = 这是一步错着。我演示给你看。
+ex.verdict.mistake.b4 = {move}是一步错着。
+ex.verdict.mistake.b4.2 = {move}不好。原因如下。
+ex.verdict.mistake.b4.3 = 这是一步错着。
+ex.verdict.mistake.b5 = {move}不够精确。
+ex.verdict.mistake.b5.2 = {move}是错着。
+ex.verdict.mistake.b5.3 = {move}让优势溜走了。
+ex.verdict.mistake.b6 = {move}是错着。
+ex.verdict.mistake.b6.2 = {move}不精确。
+ex.verdict.mistake.b6.3 = 不该走{move}。
+# An inaccuracy with no concrete cause: the line names the better move ({best} is pointed at).
+ex.verdict.inaccuracy.b4 = 不够精确：{best}更准确。
+ex.verdict.inaccuracy.b4.2 = 有点不精确。{best}稍好一些。
+ex.verdict.inaccuracy.b4.3 = 不算最佳：{best}更精确。
+ex.verdict.inaccuracy.b5 = {move}不够精确；{best}更强。
+ex.verdict.inaccuracy.b5.2 = 略欠精确。我会走{best}。
+ex.verdict.inaccuracy.b5.3 = {best}比{move}更精确。
+ex.verdict.inaccuracy.b6 = {move}不精确，该走{best}。
+ex.verdict.inaccuracy.b6.2 = 欠精确。应走{best}。
+ex.verdict.inaccuracy.b6.3 = {best}更好。
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = 哦，等等！你错过了一步好棋。
+ex.verdict.missed.b1.2 = 再看看！刚才有更好的走法。
+ex.verdict.missed.b1.3 = 等一下，你刚才有个机会！
+ex.verdict.missed.b2 = 你刚才错过了一个机会。
+ex.verdict.missed.b2.2 = 嗯，刚才有更好的走法。
+ex.verdict.missed.b2.3 = 等等，你刚才有一步妙棋。
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+ex.better.b3 = 更好的是{best}。
+ex.better.b3.2 = {best}才是更好的着法。
+ex.better.b3.3 = 换成{best}就好了。
+ex.better.b4 = 走{best}就万无一失。
+ex.better.b4.2 = {best}才是正确的着法。
+ex.better.b4.3 = 应该走{best}。
+ex.better.b5 = {best}，意图是{line}。
+ex.better.b5.2 = 应走{best}：{line}。
+ex.better.b5.3 = 更好的是{best}，{line}之后你没问题。
+ex.better.b6 = {best}：{eval}。
+ex.better.b6.2 = 应走{best}，{eval}。
+ex.better.b6.3 = {best}的评估是{eval}。
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = 我们把棋子摆回去吧。
+ex.rewind.b1.2 = 现在我把所有棋子放回原位。
+ex.rewind.b1.3 = 我把棋子摆回去。
+ex.rewind.b2 = 我们把棋子都摆回去。
+ex.rewind.b2.2 = 回到刚才的局面。
+ex.rewind.b2.3 = 我来把棋子摆回去。
+ex.rewind.b3 = 回到对局。
+ex.rewind.b3.2 = 我们退回去。
+ex.rewind.b3.3 = 回到原来的局面。
+ex.rewind.b4 = 回到对局。
+ex.rewind.b4.2 = 退回。
+ex.rewind.b4.3 = 我们退回去吧。
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = 你想换一步棋试试吗？
+ex.offer.b1.2 = 要不要悔棋，再试一次？
+ex.offer.b1.3 = 我们试试别的走法好吗？
+ex.offer.b2 = 想换一步棋试试吗？
+ex.offer.b2.2 = 你要悔棋吗？
+ex.offer.b2.3 = 想再试一次吗？
+ex.offer.b3 = 要不要悔棋？
+ex.offer.b3.2 = 想再试一次吗？
+ex.offer.b3.3 = 悔棋吗？
+ex.offer.b4 = 悔棋吗？
+ex.offer.b4.2 = 你要悔棋吗？
+ex.offer.b4.3 = 想换一步棋吗？
+ex.offer.b5 = 悔棋？
+ex.offer.b5.2 = 要悔棋吗？
+ex.offer.b5.3 = 收回这步吗？
+ex.offer.b6 = 悔棋？
+ex.offer.b6.2 = 收回这步？
+ex.offer.b6.3 = 重下？
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move.
+demo.move = {move}。
+demo.move.2 = 走{move}。
+demo.move.3 = 接着{move}。
+# Levels 1-3, the coach's moves.
+demo.my.move = {my}走到{sq}。
+demo.my.move.2 = 我把{my}走到{sq}。
+demo.my.move.3 = 接着{my}走到{sq}。
+demo.my.take = 我吃掉{your}。
+demo.my.take.2 = {my}吃掉{your}。
+demo.my.take.3 = 然后我吃掉{your}。
+demo.my.check = {my}走到{sq}。将军。
+demo.my.check.2 = 用{my}在{sq}将军。
+demo.my.check.3 = {my}到{sq}，将军！
+demo.my.mate = {my}走到{sq}。将死。
+demo.my.mate.2 = {my}走到{sq}，就是将死。
+demo.my.mate.3 = {my}到{sq}。将死了。
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = 你会把{your}走到{sq}。
+demo.your.move.2 = 假设你把{your}走到{sq}。
+demo.your.move.3 = 接着{your}走到{sq}。
+demo.your.take = 你会吃掉{my}。
+demo.your.take.2 = 你用{your}吃掉{my}。
+demo.your.take.3 = 然后你吃掉{my}。
+demo.your.back = 你吃回来。
+demo.your.back.2 = 你在{sq}吃回来。
+demo.your.back.3 = 然后你把它吃回来。
+demo.your.king = 你的王必须走开。
+demo.your.king.2 = 王必须躲开，走到{sq}。
+demo.your.king.3 = 你的王逃到{sq}。
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = 然后在{sq}这里，你会得到一个新的后。
+demo.promote.2 = 接着{your}到达{sq}，变成后。
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = 小心：{my}可以走到{sq}，那就是将死。
+ex.mate_allowed.b1.2 = 现在{my}可以走到{sq}。那就将死了！
+ex.mate_allowed.b1.3 = 小心！如果{my}走到{sq}，就是将死。
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = 这步棋让我可以{m:move}将死{your}。
+ex.mate_allowed.b2.2 = 现在我可以{m:move}将死{your}。你看。
+ex.mate_allowed.b2.3 = 小心！{your}有危险：我能{m:move}将死它。
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = 这步让我可以{m:move}将死：{line}。
+ex.mate_allowed.b3.2 = 这步之后，我能{m:move}将死你：{line}。
+ex.mate_allowed.b3.3 = 你的王会被将死：{line}。
+ex.mate_allowed.b4 = {move}之后我有强制将死：{line}。
+ex.mate_allowed.b4.2 = 这步之后你会被{m:move}将死：{line}。
+ex.mate_allowed.b4.3 = {move}之后，{line}就是将死。
+ex.mate_allowed.b5 = {move}之后，我有强制的{m:move}杀。
+ex.mate_allowed.b5.2 = 这步自投罗网：{m:move}杀。
+ex.mate_allowed.b5.3 = 现在有强制的{m:move}杀。
+ex.mate_allowed.b6 = {m}步杀：{line}。
+ex.mate_allowed.b6.2 = {line}，将死。
+ex.mate_allowed.b6.3 = {line}之后将死。
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = 你看：{your}已经没有格子可以逃了。
+ex.mate_allowed.tail.b1.2 = 看到了吗？{your}受到攻击，又逃不掉。
+ex.mate_allowed.tail.b1.3 = {your}无处可去。这就是将死。
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = 这种杀法叫作{text}。
+ex.mate_allowed.pattern.2 = 记住它：这是{text}。
+ex.mate_allowed.tip.b3 = 每走一步前，都要检查你的王是否安全。
+ex.mate_allowed.tip.b3.2 = 时刻问自己：我走完这步，我的王会被将死吗？
+
+# Mate pattern names, said after 叫作 / 这是 (no measure word, no quotes).
+name.pattern.back_rank = 底线杀
+name.pattern.smothered = 闷杀
+name.pattern.support = 有保护的后杀
+name.pattern.ladder = 梯子杀
+name.pattern.epaulette = 肩章杀
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = 要是走{best}，你就将死{my}了！
+ex.mate_missed.b1.2 = {best}就是将死！{my}本来逃不掉。
+ex.mate_missed.b1.3 = 你看！走{best}本来能将死{my}。
+ex.mate_missed.b2 = 你本来可以{m:move}将死我，第一步是{best}。
+ex.mate_missed.b2.2 = {best}本来可以{m:move}将死！
+ex.mate_missed.b2.3 = 你本来可以用{best}将死我。
+ex.mate_missed.b3 = 你错过了{m:move}将死：{best}。
+ex.mate_missed.b3.2 = {best}可以{m:move}将死：{line}。
+ex.mate_missed.b3.3 = 本来有{m:move}将死，第一步是{best}。
+ex.mate_missed.b4 = 错过了将死：{line}，从{best}开始。
+ex.mate_missed.b4.2 = {best}可以强制{m:move}将死。
+ex.mate_missed.b4.3 = 走{best}，你本可以{m:move}将死我。
+ex.mate_missed.b5 = {best}，{m:move}杀：{line}。
+ex.mate_missed.b5.2 = 错过了{m:move}杀，起手是{best}。
+ex.mate_missed.b5.3 = 本有强制杀：{best}。
+ex.mate_missed.b6 = {best}成杀：{line}。
+ex.mate_missed.b6.2 = {best}可{m}步杀。
+ex.mate_missed.b6.3 = {best}，{m}步杀。
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = 更快的是{best}：{m:move}杀。
+ex.mate_delayed.b5.2 = {best}杀得更快，只要{m:move}。
+ex.mate_delayed.b6 = {best}，{m}步杀。
+ex.mate_delayed.b6.2 = 更快：{best}，{m}步杀。
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = 哎呀！{my}不能走，又没有被将军。这是逼和：和棋。
+ex.stalemate.b1.2 = 你看：{my}没有安全的格子，但没被将军。这是和棋！
+ex.stalemate.b1.3 = 这是逼和。{my}不能走，所以这盘是和棋。
+ex.stalemate.b2 = 逼和！{my}没有合法着法，又没被将军。和棋。
+ex.stalemate.b2.2 = 哎呀，逼和：{my}动不了，但没被将军。
+ex.stalemate.b2.3 = 逼和，这盘和了。{my}不能走。
+ex.stalemate.b3 = 逼和：{my}没有合法着法。你本来是赢棋！
+ex.stalemate.b3.2 = 逼和！{my}被困住了，赢棋变成了和棋。
+ex.stalemate.b3.3 = {my}无棋可走，也没被将军：逼和。
+ex.stalemate.b4 = 逼和：{my}没有合法着法。到手的胜利丢掉了。
+ex.stalemate.b4.2 = {move}让{my}陷入逼和。赢棋的局面成了和棋。
+ex.stalemate.b4.3 = 这是逼和；{my}被困住了。
+ex.stalemate.b5 = {move}把{my}逼和了。胜利没了。
+ex.stalemate.b5.2 = 逼和：{my}无格可走。
+ex.stalemate.b5.3 = 逼和了，{my}动不了。
+ex.stalemate.b6 = 逼和。{my}无着可走。
+ex.stalemate.b6.2 = {move}，逼和：{my}被困。
+ex.stalemate.b6.3 = 逼和；{my}动弹不得。
+ex.stalemate.tip.b1 = 你占优的时候，一定要给我的王留一个能走的格子。
+ex.stalemate.tip.b1.2 = 记住：你领先时，给我的王留点空间。
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = 小心！我可以把棋子都送掉，然后{my}无路可走：逼和。
+ex.stalemate_trick.b1.2 = 当心：{my}快被困住了。我可以弄成和棋。
+ex.stalemate_trick.b2 = 小心：我可以弃子，让{my}被逼和。
+ex.stalemate_trick.b2.2 = {my}几乎没有格子可走了。我可以强行逼和！
+ex.stalemate_trick.b3 = 这让我能靠逼和脱身：{my}无着可走。
+ex.stalemate_trick.b3.2 = 小心：{line}之后，{my}被逼和。
+ex.stalemate_trick.b4 = {move}让我能逼和：{line}，{my}就动不了了。
+ex.stalemate_trick.b4.2 = 现在{my}可以借逼和逃生：{line}。
+ex.stalemate_trick.b5 = {move}之后可以逼和：{line}；{my}被困。
+ex.stalemate_trick.b5.2 = 逼和陷阱：{line}，{my}无着可走。
+ex.stalemate_trick.b6 = {line}，逼和：{my}被困。
+ex.stalemate_trick.b6.2 = {line}后逼和；{my}动不了。
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my}可以走到{sq}，攻击{t1}和{t2}。
+ex.fork.b1.2 = {my}走到{sq}，同时攻击两个子：{t1}和{t2}。
+ex.fork.b1.3 = 看{my}：它在{sq}同时攻击{t1}和{t2}。
+ex.fork.b2 = 捉双！{my}在{sq}同时攻击{t1}和{t2}。
+ex.fork.b2.2 = 你走完这步，{my}就能从{sq}捉双{t1}和{t2}。
+ex.fork.b2.3 = {my}走到{sq}：对{t1}和{t2}形成双重攻击。
+ex.fork.b3 = {move}让我可以走{reply}，捉双{t1}和{t2}。
+ex.fork.b3.2 = {reply}之后，我同时攻击{t1}和{t2}。
+ex.fork.b3.3 = {reply}是捉双：{t1}和{t2}都受到攻击。
+ex.fork.b4 = {reply}捉双{t1}和{t2}；{line}之后你亏{pts:point}。
+ex.fork.b4.2 = {reply}同时攻击{t1}和{t2}。
+ex.fork.b4.3 = {move}让我可以用{reply}捉双{t1}和{t2}。
+ex.fork.b5 = {move}撞上了{reply}的捉双，目标是{t1}和{t2}。
+ex.fork.b5.2 = {reply}捉双{t1}和{t2}。
+ex.fork.b5.3 = {reply}之后，{t1}和{t2}都岌岌可危。
+ex.fork.b6 = {reply}捉双。
+ex.fork.b6.2 = {move}之后有{reply}捉双。
+ex.fork.b6.3 = {reply}，捉双。
+# After the one-move demonstration (level 1).
+ex.fork.tail.b1 = 你只能救其中一个：{t1}或{t2}。
+ex.fork.tail.b1.2 = 现在我同时攻击两个子：{t1}和{t2}。这就是捉双！
+ex.fork.tail.b1.3 = 看到了吗？{t1}和{t2}都受到攻击。总有一个保不住。
+ex.fork.more.b3 = 走棋前，看看{sq}：{my}可以在那里捉双。
+ex.fork.more.b3.2 = 留意{sq}。{my}从那里可以捉双。
+ex.fork.tip.knight = 小心马跳到你的王和后附近！
+ex.fork.tip.knight.2 = 马最喜欢同时攻击两个子。看看它能跳到哪里。
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = {my}一走开，{my2}就会攻击{t1}！
+ex.discovered.b1.2 = 你看：{my}挡在中间。它一走，{my2}就攻击{t1}。
+ex.discovered.b1.3 = {my}可以让开，然后{my2}攻击{t1}。
+ex.discovered.b2 = 隐藏的攻击：{my}一走，{my2}就攻击{t1}。
+ex.discovered.b2.2 = 小心：{my}可以带着威胁走开，同时{my2}攻击{t1}。
+ex.discovered.b2.3 = {my}一让开，{my2}就对准了{t1}。
+ex.discovered.b3 = {reply}之后形成闪击，攻击{t1}。
+ex.discovered.b3.2 = {reply}让开线路，闪击{t1}。
+ex.discovered.b3.3 = {move}让我可以走{reply}，闪击{t1}。
+ex.discovered.b4 = {reply}打开线路攻击{t1}：这是闪击。
+ex.discovered.b4.2 = {move}之后，{reply}闪击，拿下{t1}。
+ex.discovered.b4.3 = {reply}之后，闪击拿下{t1}。
+ex.discovered.b5 = {move}之后有{reply}闪击。
+ex.discovered.b5.2 = {reply}是闪击。
+ex.discovered.b5.3 = {reply}闪出双重威胁。
+ex.discovered.b6 = {reply}，闪击{t1}。
+ex.discovered.b6.2 = {reply}，{t1}不保。
+ex.discovered.b6.3 = 闪击：{reply}，攻击{t1}。
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my}攻击{t1}，{t2}在它后面。它一走开，我就吃后面那个。
+ex.skewer.b1.2 = 你看：{my}攻击{t1}，{t2}就在它后面。
+ex.skewer.b1.3 = {my}盯上了{t1}。它必须走开，然后{t2}就丢了。
+ex.skewer.b2 = 串击：{my}攻击{t1}，{t2}在它后面。
+ex.skewer.b2.2 = {my}把{t1}和{t2}串在一条线上。前面的一走，我就吃后面的。
+ex.skewer.b2.3 = 小心：{t1}和{t2}在一条线上。{my}可以串击它们。
+ex.skewer.b3 = {reply}串击{t1}和{t2}。
+ex.skewer.b3.2 = {reply}之后，{t1}必须走开，{t2}就丢了。
+ex.skewer.b3.3 = {move}让我可以走{reply}，串击{t1}和{t2}。
+ex.skewer.b4 = {reply}串击{t1}；{t2}在它后面，保不住了。
+ex.skewer.b4.2 = {move}让{t1}和{t2}排成一线，正好被{reply}串击。
+ex.skewer.b4.3 = {reply}之后，{t1}一走，{t2}就丢。
+ex.skewer.b5 = {reply}串击{t1}和{t2}。
+ex.skewer.b5.2 = {move}之后，{reply}穿过{t1}串击{t2}。
+ex.skewer.b6 = {reply}串击。
+ex.skewer.b6.2 = {reply}，串击。
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my}可以走到{sq}。那样{your}就被卡在{t1}前面了。
+ex.pin.b1.2 = 看{my}到{sq}：{your}会被卡在{t1}前面。
+ex.pin.b1.3 = {my}可以把{your}牵制在{t1}前面。然后我就能吃掉它。
+ex.pin.b2 = 牵制：{your}不能走，因为{t1}在它后面。
+ex.pin.b2.2 = {your}被牵制了，后面是{t1}。我可以吃掉它。
+ex.pin.b2.3 = 现在{your}被卡在{t1}前面。这就是牵制。
+ex.pin.b3 = {your}被牵制，后面就是{t1}，我能把它拿下。
+ex.pin.b3.2 = 这步之后，{your}被牵制，背后是{t1}。
+ex.pin.b3.3 = {your}被牵制，会丢子：它后面是{t1}。
+ex.pin.b4 = {reply}牵制并得子。
+ex.pin.b4.2 = {move}撞上了{reply}的牵制。
+ex.pin.b4.3 = {reply}之后，被牵制的子保不住。
+ex.pin.b5 = {move}之后有{reply}牵制。
+ex.pin.b5.2 = {reply}牵制，丢子。
+ex.pin.b6 = {reply}牵制。
+ex.pin.b6.2 = {reply}，牵制。
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your}被牵制了，所以保护不了{sq}。它后面是{t1}。
+ex.pin_defender.b1.2 = 你看：{your}不能去保护{sq}，否则{t1}就丢了。
+ex.pin_defender.b2 = {your}被牵制，后面是{t1}，所以{sq}其实没人保护。
+ex.pin_defender.b2.2 = 被牵制的子，防守靠不住。{your}保护不了{sq}：{t1}在它后面。
+ex.pin_defender.b3 = {your}被牵制，后面是{t1}；它其实守不住{sq}。
+ex.pin_defender.b3.2 = {sq}看似有保护，但{your}被牵制在{t1}前面。
+ex.pin_defender.b4 = {your}被牵制，所以{sq}其实没有保护。
+ex.pin_defender.b4.2 = {your}被牵制，守不住{sq}。
+ex.pin_defender.b5 = {your}被牵制；{sq}失去保护。
+ex.pin_defender.b5.2 = {sq}失守：{your}被牵制。
+ex.pin_defender.b6 = {your}被牵制；{sq}失守。
+ex.pin_defender.b6.2 = {your}被牵制，{sq}无保护。
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your}被困住了。它能去的每一格都受到攻击。
+ex.trapped.b1.2 = 看{your}：它没有安全的格子可逃。
+ex.trapped.b1.3 = {your}被卡住了。我攻击它，它也逃不掉。
+ex.trapped.b2 = {your}没有安全的格子。我可以吃掉它。
+ex.trapped.b2.2 = {your}被困住了：它走到哪里，我就在哪里吃掉它。
+ex.trapped.b2.3 = 小心，{your}快没有格子可走了。
+ex.trapped.b3 = {your}被困：没有安全的格子了。
+ex.trapped.b3.2 = 这步之后，{your}被困住，保不住了。
+ex.trapped.b3.3 = {your}走进了陷阱：出不来了。
+ex.trapped.b4 = {move}让{your}被困住了。
+ex.trapped.b4.2 = {your}无路可退；我会吃掉它。
+ex.trapped.b4.3 = {reply}之后，{your}被困。
+ex.trapped.b5 = {your}最终被困：{line}。
+ex.trapped.b5.2 = {move}让{your}陷入绝境。
+ex.trapped.b6 = {your}被困。
+ex.trapped.b6.2 = {line}困住{your}。
+ex.trapped.tip.b1 = 走一个子之前，先看看它还能不能退回来。
+ex.trapped.tip.b1.2 = 深入我阵地的棋子可能被困住。要给它留条退路。
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your}被自己的兵挡住了。{my}可以到底线将军。
+ex.back_rank.b1.2 = 小心：{your}没有格子可逃，而{my}能走到{sq}。
+ex.back_rank.b1.3 = {my}可以走到{sq}。{your}被自己的兵关住了。
+ex.back_rank.b2 = 底线危险：{your}没有出路。{my}可以到{sq}将军。
+ex.back_rank.b2.2 = {your}被关住了。{my}走到{sq}就能得子。
+ex.back_rank.b2.3 = 你的底线很弱：{my}可以在{sq}对{your}将军。
+ex.back_rank.b3 = 你的底线很弱：{line}。{your}没有逃生格。
+ex.back_rank.b3.2 = {your}没有透气孔，所以{line}能得子。
+ex.back_rank.b3.3 = {line}之后，底线成了致命伤：{your}被困。
+ex.back_rank.b4 = 底线问题：{line}，{your}没有透气孔。
+ex.back_rank.b4.2 = {line}抓住了底线弱点，直攻{your}。
+ex.back_rank.b4.3 = {your}缺少逃生格：{line}。
+ex.back_rank.b5 = 底线薄弱，{your}危险：{line}。
+ex.back_rank.b5.2 = {line}；{your}没有透气孔。
+ex.back_rank.b6 = {line}，底线问题；{your}被困。
+ex.back_rank.b6.2 = 底线：{line}（{your}）。
+ex.back_rank.tip.b1 = 给你的王开一扇小窗：把它前面的一个兵走一步。
+ex.back_rank.tip.b1.2 = 王躲在三个兵后面，可能在底线被将死。给它留点空间。
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your}在{sq}，没有保护。{my}可以白吃掉它。
+ex.hanging.b1.2 = 看{your}：没有子保护它，而{my}在攻击它。
+ex.hanging.b1.3 = {your}没有保护。{my}可以直接吃掉它。
+ex.hanging.b2 = {your}在{sq}没有保护。{my}吃掉它，你吃不回来。
+ex.hanging.b2.2 = {my}可以白吃{your}。没有子保护它。
+ex.hanging.b2.3 = {your}孤零零地留在{sq}，{my}把它吃掉。
+ex.hanging.b3 = {move}让{your}失去保护：{reply}，你吃不回来。
+ex.hanging.b3.2 = {your}在{sq}，会被{reply}吃掉。
+ex.hanging.b3.3 = {reply}之后，{your}白白丢了。
+ex.hanging.b4 = {move}送掉{your}：{reply}赢得{pts:point}的子力。
+ex.hanging.b4.2 = {reply}白吃{your}。
+ex.hanging.b4.3 = {your}没有保护；{reply}吃掉它。
+ex.hanging.b5 = {move}让{your}没有保护；{reply}吃掉它。
+ex.hanging.b5.2 = {your}在{sq}，被{reply}吃掉。
+ex.hanging.b5.3 = {reply}拿下{your}。
+ex.hanging.b6 = {move}？{reply}，{your}丢了。
+ex.hanging.b6.2 = {reply}吃掉{your}。
+ex.hanging.b6.3 = {your}无保护：{reply}。
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2}原本保护着{your}。现在{my}可以吃掉它。
+ex.hanging_guard.b1.2 = {your2}走开了，现在{your}没人保护。{my}把它吃掉。
+ex.hanging_guard.b2 = {your2}原来保护{your}。现在它孤立无援，{my}吃掉它。
+ex.hanging_guard.b2.2 = {your2}一走开，{your}就没了保护，{my}可以吃掉它。
+ex.hanging_guard.b3 = {your2}原本守着{your}。它一走，{your}就被{reply}吃掉。
+ex.hanging_guard.b3.2 = 没有了{your2}，{your}就没有保护：{reply}。
+ex.hanging_guard.b4 = {move}撤掉了保护：{your2}离开了{your}，{reply}把它吃掉。
+ex.hanging_guard.b4.2 = {your2}是{your}唯一的保护者；{reply}吃掉它。
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my}已经在攻击{your}了。一定要看清我每步棋的威胁。
+ex.hanging_threat.b1.2 = 你没看到我的威胁：{my}在攻击{your}。
+ex.hanging_threat.b2 = 我上一步用{my}攻击了{your}。要时刻注意我的威胁。
+ex.hanging_threat.b2.2 = {my}一直在威胁{your}，现在我可以吃掉它了。
+ex.hanging_threat.b3 = 你漏看了我的威胁：{my}在攻击{your}。
+ex.hanging_threat.b3.2 = {my}早就瞄准了{your}。
+ex.hanging.tip.b1 = 每走一步前，问问自己：我的棋子都安全吗？
+ex.hanging.tip.b1.2 = 好习惯：每走一步后，都看看你的哪些棋子有保护。
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured.
+ex.exchange_capture.b1 = {your}吃了一个子，但{my}能吃回来。这样交换你会吃亏。
+ex.exchange_capture.b1.2 = {my}吃回来了。{your}值{n}分，你却只得了{n2}分。
+ex.exchange_capture.b1.3 = 小心：{my}可以吃回{your}。这是亏本的交换。
+ex.exchange_capture.b2 = 交换要小心：{your}值{n}分。{my}吃回来，你只得了{n2}分。
+ex.exchange_capture.b2.2 = {my}吃回{your}。你丢了{n}分，只赚了{n2}分。
+ex.exchange_capture.b3 = 在{sq}吃子不成立：{line}之后{your}丢了。
+ex.exchange_capture.b3.2 = {your}在{sq}吃子，但{line}之后你亏{pts:point}。
+ex.exchange_capture.b4 = {move}在{sq}算错了：{line}之后{your}丢了。
+ex.exchange_capture.b4.2 = 在{sq}吃子要赔上{your}：{line}。
+ex.exchange_capture.b5 = {move}在{sq}的交换中丢了{your}：{line}。
+ex.exchange_capture.b5.2 = 在{sq}，{your}负担过重：{line}。
+ex.exchange_capture.b6 = {move}之后，{line}，{your}在{sq}丢了。
+ex.exchange_capture.b6.2 = 在{sq}：{line}，{your}没了。
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = 数一数：{sq}上，我有{n}个子攻击，你有{n2}个子保护。
+ex.exchange_count.b1.2 = {sq}上我有{n}个子进攻，你有{n2}个子防守。这一格归我。
+ex.exchange_count.b2 = {sq}被攻击{n}次，被保护{n2}次。你会在那里丢子。
+ex.exchange_count.b2.2 = 数数{sq}：{n}个攻击者对{n2}个保护者。
+ex.exchange_count.b3 = 数一数{sq}上的攻击者和保护者：我的子更多。
+ex.exchange_count.b3.2 = {sq}的交换不成立：{line}之后，你亏{pts:point}。
+ex.exchange_count.b4 = {move}在{sq}算错了：{line}之后你亏{pts:point}。
+ex.exchange_count.b4.2 = {sq}受到的攻击多于保护：{line}。
+ex.exchange_count.b5 = {sq}上{n}攻{n2}守，守不住：{line}。
+ex.exchange_count.b5.2 = {move}：{sq}上的攻守数没算对。
+ex.exchange_count.b6 = 在{sq}：{line}，我子力领先{pts:point}。
+ex.exchange_count.b6.2 = {sq}：{n}对{n2}。
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my}不如{your}值钱。我要是吃，你就亏了。
+ex.exchange_cheap.b1.2 = {my}在攻击{your}。这样交换对你不利。
+ex.exchange_cheap.b2 = {your}值{n}分，{my}只值{n2}分。这样换你吃亏。
+ex.exchange_cheap.b2.2 = {my}比{your}便宜，所以这个攻击能得子。
+ex.exchange_cheap.b3 = {your}在{sq}被价值更低的子攻击。
+ex.exchange_cheap.b3.2 = {your}在{sq}，被一个{n2}分的子攻击：{line}。
+ex.exchange_cheap.b4 = {your}在{sq}被更便宜的子攻击；{reply}得子。
+ex.exchange_cheap.b4.2 = {your}在{sq}，{reply}用更便宜的子攻击它。
+ex.exchange_cheap.b5 = {your}在{sq}，受到更便宜的子威胁：{line}。
+ex.exchange_cheap.b5.2 = {your}在{sq}，{reply}得子。
+ex.exchange_cheap.b6 = {reply}，{your}在{sq}丢了。
+ex.exchange_cheap.b6.2 = {line}：{your}在{sq}保不住。
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = 看到了吗？{my}在{sq}没有保护。{your}本来可以吃掉它。
+ex.missed_capture.b1.2 = 你看：{my}没有子保护。{your}本来可以吃掉它。
+ex.missed_capture.b1.3 = {my}在{sq}没有保护。{your}本来可以把它吃掉！
+ex.missed_capture.b2 = 你错过了一个白给的子：{best}能吃掉{my}。
+ex.missed_capture.b2.2 = {my}在{sq}没有保护。{best}可以吃掉它。下次别放过！
+ex.missed_capture.b2.3 = {best}本来能白得{my}。
+ex.missed_capture.b3 = {best}本可以白吃{my}。
+ex.missed_capture.b3.2 = {my}在{sq}没有保护：{best}。每步都要找没有保护的子。
+ex.missed_capture.b3.3 = 你本来可以用{best}吃掉{my}。
+ex.missed_capture.b4 = 错过了：{my}在{sq}，{best}可以吃掉它。
+ex.missed_capture.b4.2 = {best}可以吃掉{my}，它没有保护。
+ex.missed_capture.b4.3 = {my}没有保护：{best}。
+ex.missed_capture.b5 = {best}吃掉{my}；{move}让它溜了。
+ex.missed_capture.b5.2 = {my}在{sq}无保护：{best}。
+ex.missed_capture.b6 = {best}！{my}在{sq}无保护。
+ex.missed_capture.b6.2 = {best}吃掉{my}。
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = 你本来有个双重攻击：{best}同时攻击{t1}和{t2}！
+ex.missed_fork.b1.2 = 你看！{best}能同时攻击{t1}和{t2}。
+ex.missed_fork.b1.3 = {best}是捉双：{t1}和{t2}都受到攻击。
+ex.missed_fork.b2 = {best}是捉双：{t1}和{t2}。
+ex.missed_fork.b2.2 = 你错过了双重攻击：{best}，同时攻击{t1}和{t2}。
+ex.missed_fork.b2.3 = {best}同时攻击{t1}和{t2}。捉双！
+ex.missed_fork.b3 = {best}可以捉双{t1}和{t2}。
+ex.missed_fork.b3.2 = 你本可以走{best}，捉双{t1}和{t2}。
+ex.missed_fork.b3.3 = {best}本来能捉双{t1}和{t2}。
+ex.missed_fork.b4 = {best}捉双{t1}和{t2}。
+ex.missed_fork.b4.2 = 错过了捉双：{best}，目标{t1}和{t2}。
+ex.missed_fork.b5 = {best}捉双{t1}和{t2}。
+ex.missed_fork.b5.2 = {best}同时攻击{t1}和{t2}。
+ex.missed_fork.b6 = {best}捉双{t1}和{t2}。
+ex.missed_fork.b6.2 = {best}：捉双{t1}和{t2}。
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my}可以冲到{sq}变成后。{your}离得太远了。
+ex.promotion.b1.2 = 你看：什么都挡不住{my}到达{sq}。{your}追不上它。
+ex.promotion.b1.3 = {my}离{sq}还有{n}格，而{your}太慢了。
+ex.promotion.b2 = {my}冲向{sq}，{your}追不上。
+ex.promotion.b2.2 = {my}要走{n}步到{sq}；{your}要{n2}步。太慢了。
+ex.promotion.b2.3 = 小心：{my}会在{sq}变成后，{your}离得太远。
+ex.promotion.b3 = {your}不在兵的正方形里：{my}到{sq}之前追不上。
+ex.promotion.b3.2 = 赛跑输了：{my}比{your}先到{sq}。
+ex.promotion.b4 = {your}在兵的正方形之外；兵将在{sq}升后。
+ex.promotion.b4.2 = {my}在{sq}升变；{your}差一步。
+ex.promotion.b5 = 兵的赛跑输了：{your}在正方形外，兵直冲{sq}。
+ex.promotion.b5.2 = {line}：我在{sq}升后，{your}来不及。
+ex.promotion.b6 = {your}在正方形外；我在{sq}升后。
+ex.promotion.b6.2 = {line}，在{sq}升后（{your}来不及）。
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = 你的兵本来可以冲到{sq}，变成后！
+ex.promotion_missed.b1.2 = 看{sq}！你的兵本来可以冲到那里。
+ex.promotion_missed.b2 = 你的兵本来可以冲到{sq}。通路兵要往前推！
+ex.promotion_missed.b2.2 = 你的兵冲向{sq}的路上，什么都挡不住它。
+ex.promotion_missed.b3 = {best}能赢得冲向{sq}的赛跑。
+ex.promotion_missed.b3.2 = 你的兵本来更快：{best}，它会在{sq}升变为后。
+ex.promotion_missed.b4 = {best}赢得冲向{sq}的兵赛跑。
+ex.promotion_missed.b4.2 = {best}！兵在{sq}升后。
+ex.promotion_missed.b5 = {best}，先在{sq}升后。
+ex.promotion_missed.b5.2 = {best}，{sq}归你了。
+ex.promotion_missed.b6 = {best}赢得赛跑，抢先到{sq}。
+ex.promotion_missed.b6.2 = {best}；先到{sq}。
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = 那个兵原本保护着{your}。现在{your}没那么安全了。
+ex.king_shield.b1.2 = 原来在{sq}的兵像盾牌一样护着{your}。现在我的棋子能攻进来了。
+ex.king_shield.b2 = 把{sq}的兵走掉，{your}就少了掩护。我的棋子现在能攻击它。
+ex.king_shield.b2.2 = {your}少了一个护卫：{sq}上的兵原本是它的盾牌。
+ex.king_shield.b3 = 这步挺兵让{your}暴露在我的攻击下。
+ex.king_shield.b3.2 = {your}失去了兵的掩护，我的棋子可以攻进来。
+ex.king_shield.b4 = {move}让{your}少了兵的掩护；我的攻击能打进来。
+ex.king_shield.b4.2 = {move}之后，{your}周围的兵阵破了。
+ex.king_shield.b5 = {move}让{your}掩护变弱：{line}。
+ex.king_shield.b5.2 = {move}之后，{your}暴露了：{line}。
+ex.king_shield.b6 = {move}削弱了{your}：{line}。
+ex.king_shield.b6.2 = {line}；{your}门户大开。
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your}有危险。我的棋子正冲着它来。
+ex.king_exposed.b1.2 = 你看{your}多么暴露。让它躲在兵后面，保持安全。
+ex.king_exposed.b2 = {your}太暴露了。我现在可以连续将军。
+ex.king_exposed.b2.2 = 小心：{your}没有掩护，我的棋子在攻击它。
+ex.king_exposed.b3 = {your}暴露了；我的棋子可以连续将军攻击它。
+ex.king_exposed.b3.2 = 这步之后，{your}没有掩护了。
+ex.king_exposed.b4 = {your}暴露了：{line}。
+ex.king_exposed.b4.2 = {move}让{your}暴露在攻击之下。
+ex.king_exposed.b5 = {your}太暴露：{line}。
+ex.king_exposed.b5.2 = {move}让{your}无处藏身。
+ex.king_exposed.b6 = {line}；{your}暴露。
+ex.king_exposed.b6.2 = {your}缺乏掩护：{line}。
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = 这样交换会进入兵残局，而我能赢。
+ex.bad_trade.b3.2 = {line}之后只剩下兵，我的王位置更好。
+ex.bad_trade.b4 = 这些交换导向一个必输的兵残局：{line}。
+ex.bad_trade.b4.2 = 换成这个兵残局就输了。
+ex.bad_trade.b5 = 换错了：{line}之后的兵残局是输棋。
+ex.bad_trade.b5.2 = 兵残局必输；应该保留棋子。
+ex.bad_trade.b6 = {line}之后的兵残局是输棋。
+ex.bad_trade.b6.2 = 兵残局必输：{line}。
+ex.bishop_pair.b5 = 白白放弃了双象。
+ex.bishop_pair.b5.2 = 这次交换让你失去双象，而我的还在。
+ex.bishop_pair.b6 = 双象没了。
+ex.bishop_pair.b6.2 = 白送双象。
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best}占据对王：两个王面对面，中间隔一格。
+ex.opposition.b3.2 = 注意王！{best}本来能占据对王。
+ex.opposition.b4 = {best}占据对王，取胜。
+ex.opposition.b4.2 = 对王决定胜负：{best}。
+ex.opposition.b5 = {best}，占据对王。
+ex.opposition.b5.2 = 对王：{best}。
+ex.opposition.b6 = {best}，对王。
+ex.opposition.b6.2 = {best}：占对王。
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = 你的兵可以冲向{sq}。前面没人挡的兵，就要往前冲！
+ex.push_passed.b1.2 = 把这个没人挡的兵往前推！它想走到{sq}。
+ex.push_passed.b1.3 = 什么都挡不住你的兵走向{sq}。往前推！
+ex.push_passed.b2 = {best}：把通路兵推向{sq}。
+ex.push_passed.b2.2 = 你的通路兵很强。{best}把它往前推。
+ex.push_passed.b2.3 = 推兵！{best}让兵离{sq}更近。
+ex.push_passed.b3 = {best}推进通路兵。
+ex.push_passed.b3.2 = 通路兵就要推：{best}。
+ex.push_passed.b3.3 = 应走{best}：兵冲向{sq}。
+ex.push_passed.b4 = {best}：通路兵决定胜负。
+ex.push_passed.b4.2 = 推兵：{best}。
+ex.push_passed.b5 = {best}，推进通路兵：{eval}。
+ex.push_passed.b5.2 = 通路兵：{best}。
+ex.push_passed.b6 = {best}：{eval}。
+ex.push_passed.b6.2 = {best}，通路兵。
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = 把{your}走出来！残局里，王是很强的棋子。
+ex.king_active.b1.2 = 现在{your}可以参战了。把它走到中间。
+ex.king_active.b1.3 = 棋子少了，{your}应该出来帮忙。
+ex.king_active.b2 = 残局里要用上{your}：把它走到中心。
+ex.king_active.b2.2 = 现在{your}要积极起来。让它向前走。
+ex.king_active.b3 = {best}让王活跃起来。残局里，王也要战斗。
+ex.king_active.b3.2 = {best}：现在王应该去中心。
+ex.king_active.b4 = {best}把王走向中心。
+ex.king_active.b4.2 = 王应该上前：{best}。
+ex.king_active.b5 = {best}，活跃王：{line}。
+ex.king_active.b5.2 = 王要积极：{best}。
+ex.king_active.b6 = {best}：{eval}。
+ex.king_active.b6.2 = {best}，王上前。
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = {best}能保持更好的局面。
+ex.positional.b4.2 = 这里{best}更强。
+ex.positional.b4.3 = 我会选{best}。
+ex.positional.b5 = {best}更强：{line}。
+ex.positional.b5.2 = {best}，意图是{line}。
+ex.positional.b5.3 = 考虑{best}：{line}。
+ex.positional.b6 = {best}：{eval}。
+ex.positional.b6.2 = {best}，{eval}。
+ex.positional.b6.3 = {best}（{eval}）。
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your}出来得太早了。先把马和象走出来。
+tip.early_queen.b1.2 = 这么早动{your}要小心：我的棋子会到处追它。
+tip.early_queen.b1.3 = 走{your}很好玩，但要先出动马和象。
+tip.early_queen.b2 = 这么早走{your}，我就能一边追它一边出子。
+tip.early_queen.b2.2 = {your}这么快就出来了？先出马和象！
+tip.early_queen.b3 = {your}过早出动，我可以边攻击它边抢先手。
+tip.early_queen.b3.2 = 这么早，{your}很容易被追赶。先出子。
+tip.queen_grab.b1 = {your}去吃远处的兵，现在可能会有麻烦。
+tip.queen_grab.b1.2 = 用{your}吃兵会浪费时间。先出子！
+tip.queen_grab.b2 = {your}跑到边上去吃兵了。这很浪费时间。
+tip.queen_grab.b2.2 = 派{your}去追远处的兵要小心。
+tip.queen_grab.b3 = 这么早用{your}吃兵，会浪费时间。
+tip.queen_grab.b3.2 = {your}现在离家很远；我的出子优势会起作用。
+tip.queen_grab.b4 = {your}吃了兵，但损失了太多时间。
+tip.queen_grab.b4.2 = 用{your}跑到边路吃兵，会损失先手。
+tip.same_piece.b1 = 你把{your}走了两次。每步尽量走出一个新的子。
+tip.same_piece.b1.2 = 又走{your}？把你的其他棋子也走出来。
+tip.same_piece.b1.3 = 每一步都尽量出动一个新的子，别再走{your}了。
+tip.same_piece.b2 = 开局时把{your}走两次会浪费时间。
+tip.same_piece.b2.2 = {your}又走了一步；你的其他棋子还在家里。
+tip.same_piece.b3 = 把{your}走两次会耽误出子。
+tip.same_piece.b3.2 = 又是{your}；你的其他部队还在等着。
+tip.castle.b1 = {your}还在中间。王车易位能让它安全。
+tip.castle.b1.2 = 该王车易位了！{your}在角落里更安全。
+tip.castle.b1.3 = 尽快考虑王车易位吧。{your}太暴露了。
+tip.castle.b2 = {your}还在中心。快王车易位！
+tip.castle.b2.2 = 王车易位能把{your}安全地藏起来。
+tip.castle.b3 = 中心正在打开，{your}应该易位了。
+tip.castle.b3.2 = {your}还在中心；早该易位了。
+tip.knight_rim.b1 = {your}在边上作用不大。马喜欢待在中间。
+tip.knight_rim.b1.2 = 马到边，威力减半！{your}在那里控制的格子更少。
+tip.knight_rim.b2 = {your}在边上控制的格子很少。瞄准中心吧。
+tip.knight_rim.b2.2 = 马到边，威力减半：{your}想去中心。
+tip.knight_rim.b3 = {your}跑到边上，远离战场。
+tip.knight_rim.b3.2 = 边线对{your}来说是个糟糕的位置。
+tip.flank.b1 = 先走中间的兵。边上的兵帮不了多少忙。
+tip.flank.b1.2 = 边上的兵不能帮你的棋子出来。用中间的兵。
+tip.flank.b2 = 走边兵不能出子。用中心兵。
+tip.flank.b2.2 = 边兵走得太多了。出动你的棋子！
+tip.flank.b3 = 开局走侧翼兵会耽误出子。
+tip.flank.b3.2 = 边兵可以等一等；先出子，争夺中心。
+tip.centre.b1 = 尽量控制棋盘中间，比如{sq}。
+tip.centre.b1.2 = 中心很重要。在{sq}附近放一个兵或一个子。
+tip.centre.b1.3 = 中间的棋子很强。瞄准{sq}这样的格子。
+tip.centre.b2 = 争夺中心：{sq}这样的格子很重要。
+tip.centre.b2.2 = 你把中心让给我了。看看{sq}。
+tip.centre.b3 = 你没有争夺中心；{sq}归我了。
+tip.centre.b3.2 = 在{sq}附近争夺中心。
+# Endgame technique tips.
+tip.mate_technique.b1 = 只剩一个王时，先把它逼到边上，再将死。
+tip.mate_technique.b1.2 = 提示：把我的王往边上挤。你的王也要靠近。
+tip.fifty.b1 = 小心：五十回合不吃子也不走兵，就是和棋。
+tip.fifty.b1.2 = 要抓紧了：五十回合没有吃子或走兵，就是和棋。
+tip.repetition.b1 = 小心！同一个局面出现第三次，就是和棋。
+tip.repetition.b1.2 = 别重复走棋：第三次重复就是和棋，而你占优。
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = 哇，你弃了一个子，而且成功了！
+praise.sacrifice.2 = 聪明的弃子！下得非常好。
+praise.brilliant.b3 = 妙极了！真正的弃子。
+praise.brilliant.b3.2 = 哇，{move}是一步漂亮的弃子！
+praise.brilliant.b4 = {move}！精彩的弃子。
+praise.brilliant.b4.2 = 妙极了。我没想到这步。
+praise.brilliant.b5 = {move}!! 妙着。
+praise.brilliant.b5.spoken = {move}. Brilliant!
+praise.brilliant.b5.2 = 精彩的弃子。
+praise.brilliant.b6 = {move}!! 好极了。
+praise.brilliant.b6.spoken = {move}. Excellent!
+praise.brilliant.b6.2 = 妙极。
+praise.great.b2 = 好棋！你找到了反击的办法。
+praise.great.b2.2 = 这步棋真好。找得好！
+praise.great.b3 = 好棋！你找到了唯一正确的思路。
+praise.great.b3.2 = 太好了，{move}扭转了局面。
+praise.great.b4 = {move}！好棋。
+praise.great.b4.2 = 好棋。
+praise.great.b5 = {move}！找得好。
+praise.great.b5.2 = 强手：{move}。
+praise.great.b6 = {move}！漂亮。
+praise.great.b6.2 = 妙手。
+praise.only.b2 = 好！这是唯一的好棋。
+praise.only.b2.2 = 干得好，你找到了唯一可行的一步。
+praise.only.b3 = 唯一着法，你找到了。
+praise.only.b3.2 = 正是！这里别的都不行。
+praise.only.b4 = 唯一着法。干得好。
+praise.only.b4.2 = 唯一着法，找到了。
+praise.only.b5 = 唯一着法。好。
+praise.only.b5.2 = {move}，唯一着法。
+praise.only.b6 = 唯一着法。
+praise.only.b6.2 = 精确：唯一着法。
+praise.fork.b2 = 双重攻击！干得好。
+praise.fork.b2.2 = 你同时攻击两个子！太棒了。
+praise.fork.b2.3 = 漂亮！这就是捉双。
+praise.fork.b3 = 漂亮的捉双。
+praise.fork.b3.2 = 好一个捉双！
+praise.fork.b3.3 = 捉双。下得好。
+praise.capture.b1 = 干得好！你白吃了{my}。
+praise.capture.b1.2 = 眼光真好！{my}没有保护。
+praise.capture.b1.3 = 对！你吃到了{my}。
+praise.capture.b2 = 吃得好！{my}没有保护。
+praise.capture.b2.2 = 不错，你吃掉了{my}。
+praise.capture.b2.3 = 看得准：{my}没人保护。
+praise.best.b1 = 好棋！
+praise.best.b1.2 = 非常好！
+praise.best.b1.3 = 下得好！
+praise.best.b2 = 好棋。
+praise.best.b2.2 = 很漂亮。
+praise.best.b2.3 = 下得好。
+praise.best.b3 = 好棋：不容易找到。
+praise.best.b3.2 = 找得漂亮。
+praise.best.b3.3 = {move}是这里的最佳着法。好。
+praise.trade.b1 = 好！你领先的时候，兑子对你有利。
+praise.trade.b1.2 = 换得好。你领先，所以棋子越少对你越好。
+praise.trade.b2 = 换得好：你领先，就该兑子。
+praise.trade.b2.2 = 领先时兑掉{my}，很聪明。
+praise.trade.b3 = 好：领先就兑子。
+praise.trade.b3.2 = 明智的交换。
+praise.excellent.b3 = 非常好的一步。
+praise.excellent.b3.2 = 这步很有力。
+praise.excellent.b3.3 = 非常精确。
+praise.excellent.b4 = 精确。
+praise.excellent.b4.2 = 好极了。
+praise.excellent.b4.3 = 好，{move}很精确。
+praise.castle.b1 = 好！你王车易位了。你的王现在更安全了。
+praise.castle.b1.2 = 这次易位真漂亮！你的王藏好了。
+praise.saved.b1 = 好！你救下了自己的棋子。
+praise.saved.b1.2 = 干得好，你把它移到了安全的地方。
+praise.book.b1 = 好，这是一步有名的开局着法。
+praise.book.b1.2 = 不错，高手也是这样开局的。
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = 小心！我威胁要在{sq}将死你。
+threat.mate.b1.2 = 当心：{my}想走到{sq}。那就是将死。
+threat.mate.b1.3 = 看{sq}。如果我走到那里，就是将死！
+threat.mate.b2 = 小心，我在威胁将死。
+threat.mate.b2.2 = 当心：{sq}有将死的威胁。
+threat.mate.b2.3 = 仔细看：我在威胁将死你。
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = 你看：{my}在攻击{your}。
+threat.piece.b1.2 = 小心！{your}被{my}攻击了。
+threat.piece.b1.3 = 当心，{my}想吃掉{your}。
+threat.piece.b2 = 小心{your}。
+threat.piece.b2.2 = {your}受到了攻击。
+threat.piece.b2.3 = 注意{your}。
+threat.punish.b1 = 我上一步走错了。你能抓住这个机会吗？
+threat.punish.b1.2 = 嗯，我好像走错了。你能找到吗？
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = 这次多想想{your}。
+tb.hint.b1.2 = 留意{your}。
+tb.hint.king.b1 = 想想{your}安不安全。
+tb.hint.king.b1.2 = 先看看{your}。它安全吗？
+tb.hint.missed.b1 = 找找能白吃的棋子。
+tb.hint.missed.b1.2 = 仔细看：有没有可以吃的子？
+tb.hint.mate_missed.b1 = 看看我的王。你能将死它吗？
+tb.hint.mate_missed.b1.2 = 先试试将军的着法。说不定能将死！
+tb.hint.general.b1 = 慢慢来，看看整个棋盘。
+tb.hint.general.b1.2 = 试着找一步更安全的棋。
+# The retry.
+tb.fixed.b1 = 好多了！
+tb.fixed.b1.2 = 对，这样更好！
+tb.fixed.b1.3 = 好，这样走好多了。
+tb.fixed = 这样更好。
+tb.fixed.2 = 更好了。
+tb.fixed.3 = 改得好。
+tb.same = 还是这步？好吧，我们看看。
+tb.same.2 = 你很喜欢这步棋。那就走下去看看。
