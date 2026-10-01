@@ -39,7 +39,7 @@ namespace {
 
 // ---- State ----------------------------------------------------------------------------------------
 // debug::MenuPage casts to this by value: new pages go at the end, in both lists.
-enum class Page { Title, NewGame, Options, Credits, Watch, Online, Calibration, Coach, Licences };
+enum class Page { Title, NewGame, Options, Credits, Watch, Online, Calibration, Coach, Licences, Library };
 
 struct OptionsState {
     game::Settings work;
@@ -278,6 +278,7 @@ void copyOptions(game::Settings& dst, const game::Settings& src) {
     dst.language = src.language;
     dst.playerName = cleanName(src.playerName);
     dst.handStyle = src.handStyle;
+    dst.saveGames = src.saveGames;  // [archive]
     detail::copyOnlineOptions(dst, src);
 }
 bool sameOptions(const game::Settings& a, const game::Settings& b) {
@@ -291,7 +292,8 @@ bool sameOptions(const game::Settings& a, const game::Settings& b) {
            feq(a.mouseSensitivity, b.mouseSensitivity) && a.invertLook == b.invertLook && a.gameCursor == b.gameCursor &&
            a.autoPressClock == b.autoPressClock && a.ignoreOpponentHead == b.ignoreOpponentHead &&
            a.humanizeThinking == b.humanizeThinking && feq(a.handoverSeconds, b.handoverSeconds) &&
-           cleanName(a.playerName) == cleanName(b.playerName) && a.handStyle == b.handStyle && detail::sameOnlineOptions(a, b);
+           cleanName(a.playerName) == cleanName(b.playerName) && a.handStyle == b.handStyle && a.saveGames == b.saveGames &&
+           detail::sameOnlineOptions(a, b);
 }
 
 // Hot-seat defaults: White is the player of Options > Player, Black "Player 2" in another hand.
@@ -580,6 +582,10 @@ bool optionsPage(MenuAction& act) {
             im::tooltip(T("player.handwriting.help"));
             std::string written = cleanName(s.playerName);
             handwritingPreview(written == "Human" ? T("player.default_name") : written, hs, Rect(rx, y + 18.0f, rw, 170.0f));
+            // Saved games (ui_library.cpp): the games of this PC and the direct matches as PGN files.
+            y += 18.0f + 170.0f + 22.0f;
+            im::toggleRow(L("options.save_games"), s.saveGames, row());
+            im::tooltip(T("options.save_games.help"));
             break;
         }
         case detail::kOnlineOptionsTab: detail::onlineOptionsRows(s, rx, rw, y); break;
@@ -659,7 +665,8 @@ bool optionsPage(MenuAction& act) {
 }
 
 // ---- Title page -----------------------------------------------------------------------------------
-MenuAction titlePage(float t) {
+// library: the "Saved games" entry (mainMenu() with a LibrarySetup).
+MenuAction titlePage(float t, bool library) {
     vec2 v = view();
     MenuAction act = MenuAction::None;
     const Rect sr = screenRect();  // the page is mirrored in a right-to-left language
@@ -697,10 +704,11 @@ MenuAction titlePage(float t) {
     TextStyle sub = style(font::FACE_ITALIC, 30.0f, ivoryDim, start);
     gfx::text(T("menu.subtitle"), im::flipX(sr, x + 4.0f), ruleY + 48.0f, sub);
 
-    // Seven entries, then the player's rating and the version line at the bottom.
-    const int entries = 7;
-    float ey = 444.0f + slide;
-    float eh = 60.0f, ew = 440.0f, step = 68.0f;
+    // Seven entries (eight with "Saved games", a little closer), then the player's rating and the
+    // version line at the bottom.
+    const int entries = library ? 8 : 7;
+    float ey = (library ? 424.0f : 444.0f) + slide;
+    float eh = library ? 56.0f : 60.0f, ew = 440.0f, step = library ? 62.0f : 68.0f;
     int k = 0;
     auto entry = [&]() { return im::flip(sr, Rect(x, ey + float(k++) * step, ew, eh)); };
     im::pushId("title");
@@ -722,6 +730,10 @@ MenuAction titlePage(float t) {
         setPage(Page::Watch);
         im::sound(Sound::Open);
     }
+    if (library && im::menuEntry(L("menu.library"), entry())) {
+        setPage(Page::Library);
+        im::sound(Sound::Open);
+    }
     if (im::menuEntry(L("menu.options"), entry())) {
         setPage(Page::Options);
         openOptions();
@@ -734,7 +746,7 @@ MenuAction titlePage(float t) {
     im::setDefaultFocus(first);
     im::popId();
 
-    detail::titleRating(im::flipX(sr, x), ey + float(entries - 1) * step + 126.0f);
+    detail::titleRating(im::flipX(sr, x), ey + float(entries - 1) * step + (library ? 120.0f : 126.0f));
     TextStyle vs = style(font::FACE_ITALIC, 19.0f, withAlpha(muted, 0.85f), start);
     gfx::text(i18n::trf("menu.version", {i18n::ltr(detail::data().version)}), im::flipX(sr, x), v.y - 48.0f, vs);
     // The voice of Coach mode is credited in the other bottom corner, on the version's baseline
@@ -1533,10 +1545,18 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
 }
 
 MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach) {
+    static LibrarySetup none;  // no folder: no "Saved games" entry
+    none.folder.clear();
+    return mainMenu(setup, watch, coach, none);
+}
+
+MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, LibrarySetup& library) {
+    const bool hasLibrary = !library.folder.empty();
     im::Id menuId = im::makeId("##mainmenu");
     bool appear = im::appearing(menuId);
     if (appear) {
         setPage(S.forcedPage >= 0 ? Page(S.forcedPage) : S.resumeOnline ? Page::Online : Page::Title);
+        if (S.page == Page::Library && !hasLibrary) setPage(Page::Title);
         if (S.page == Page::Options) openOptions();
         if (S.page == Page::Calibration) openCalibration();
         S.forcedPage = -1;
@@ -1549,7 +1569,7 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach) {
     bool fresh = S.pageFresh;
     S.pageFresh = false;
     switch (S.page) {
-        case Page::Title: act = titlePage(ease(S.pageT)); break;
+        case Page::Title: act = titlePage(ease(S.pageT), hasLibrary); break;
         case Page::NewGame: act = newGamePage(setup, fresh); break;
         case Page::Options:
             if (optionsPage(act)) {
@@ -1580,6 +1600,12 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach) {
         case Page::Calibration:
             if (calibrationPage(ease(S.pageT))) setPage(Page::Title);
             break;
+        case Page::Library: {  // saved games (ui_library.cpp)
+            bool back = false;
+            if (hasLibrary) act = detail::libraryPage(library, ease(S.pageT), fresh, back);
+            if (back || !hasLibrary) setPage(Page::Title);
+            break;
+        }
     }
     // Online: challenge cards on every page once signed in (not over the calibration), the ping on
     // the online page. A game that starts from the online page brings the menu back to it afterwards.
@@ -1587,6 +1613,7 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach) {
     if (detail::onlineGameStarting()) S.resumeOnline = S.page == Page::Online;
     if (act == MenuAction::StartGame || act == MenuAction::Quit) setPage(Page::Title);
     if (act == MenuAction::StartWatching || act == MenuAction::StartCoach) setPage(Page::Title);
+    if (act == MenuAction::StartReplay) setPage(Page::Title);
     return act;
 }
 

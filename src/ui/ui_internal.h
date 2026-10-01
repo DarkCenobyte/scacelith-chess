@@ -31,7 +31,8 @@ void coachEntryOpened();
 namespace debug {
 // Same order as the menu's own page list (cast by value): new pages go at the end.
 enum class MenuPage {
-    Title = 0, NewGame = 1, Options = 2, Credits = 3, Watch = 4, Online = 5, Calibration = 6, Coach = 7, Licences = 8
+    Title = 0, NewGame = 1, Options = 2, Credits = 3, Watch = 4, Online = 5, Calibration = 6, Coach = 7, Licences = 8,
+    Library = 9  // "Saved games" (needs mainMenu() with a LibrarySetup)
 };
 void openMenuPage(MenuPage page);   // next mainMenu() call starts on this page
 // Next mainMenu() call starts on the online page's sub-page 'sub' (see debug::openOnlinePage).

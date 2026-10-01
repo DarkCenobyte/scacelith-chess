@@ -13,6 +13,9 @@
 //     coach-download-extracting / coach-download-failed (the progress panel; github over the
 //     title page); coach-flow: the real thing over the title page (game/coach_model.h: the
 //     Coach entry's prompt, a real download into --coach-dir <folder>, the panel, the notices)
+//   saved games: library (the page; --ui-library <folder> lists that folder, default the pgn folder
+//     of the user data directory), library-empty (the same, its folder replaced by an empty one
+//     when --ui-library is not given); the title page ("main") shows the "Saved games" entry
 //   hot-seat (two players on one PC): newgame-hotseat (New Game with "Human, same PC"),
 //     hotseat-hud (players, caption, draw offer card), hotseat-confirm (named resignation),
 //     hotseat-gameover (both names and ratings)
@@ -29,7 +32,7 @@
 //   --ui-kb         show the keyboard focus highlight, --ui-mouse X,Y   fake mouse (reference px)
 //   --ui-keys a,b,.. scripted input, one token per frame: up down left right enter space esc tab
 //                   pgup pgdn home end bksp del wait <letter> click@X:Y (reference px, press +
-//                   release) type:<text> (typed characters)
+//                   release) type:<text> (typed characters) wheel:<notches> (negative: down)
 // Interactive: keys 1..9 / 0 switch screens.
 #include "ui.h"
 #include "ui_internal.h"
@@ -80,6 +83,10 @@ public:
         std::string mouse = ctx.argValue("--ui-mouse");
         float mx = 0, my = 0;
         if (!mouse.empty() && std::sscanf(mouse.c_str(), "%f,%f", &mx, &my) == 2) ui::im::setMouseOverride(true, m::vec2(mx, my));
+        // Saved games: the folder the library page lists.
+        library_.folder = ctx.argValue("--ui-library", plat::userDataDirectory() + "pgn/");
+        if (ctx.argValue("--ui-screen", "main") == "library-empty" && !ctx.hasArg("--ui-library"))
+            library_.folder = plat::userDataDirectory() + "pgn-viewer-empty/";
         open(ctx.argValue("--ui-screen", "main"));
         std::string keys = ctx.argValue("--ui-keys");
         size_t p = 0;
@@ -106,6 +113,11 @@ public:
         fake_.textCount = 0;
         if (step_ >= script_.size()) return;
         const std::string tok = script_[step_++];
+        if (tok.compare(0, 6, "wheel:") == 0) {  // mouse wheel notches (negative: down), at the mouse
+            fake_.wheel = float(std::atof(tok.c_str() + 6));
+            LOGI("ui viewer: script frame %d '%s'", int(step_), tok.c_str());
+            return;
+        }
         if (tok.compare(0, 5, "type:") == 0) {  // typed characters, as WM_CHAR / XLookupString deliver them
             for (char32_t c : uni::decode(tok.substr(5)))
                 if (fake_.textCount < int(sizeof(fake_.text) / sizeof(fake_.text[0]))) fake_.text[fake_.textCount++] = uint32_t(c);
@@ -174,6 +186,7 @@ public:
         }
         if (screen == "calibration") ui::debug::openMenuPage(ui::debug::MenuPage::Calibration);
         if (screen == "watch") ui::debug::openMenuPage(ui::debug::MenuPage::Watch);
+        if (screen == "library" || screen == "library-empty") ui::debug::openMenuPage(ui::debug::MenuPage::Library);
         if (screen == "confirm") ui::debug::openPauseConfirm(1);
         if (screen == "gameover-folded") ui::debug::foldGameOver(true);
         if (screen.compare(0, 6, "online") == 0 || screen.compare(0, 6, "direct") == 0) openOnline(screen);
@@ -306,9 +319,11 @@ public:
         const std::string& s = screen_;
         if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
         if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "credits" ||
-            s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || menu_ ||
-            s.compare(0, 14, "coach-download") == 0 || s == "coach-flow") {
-            a = ui::mainMenu(setup_, watch_, coach_);
+            s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || s == "library" ||
+            s == "library-empty" || menu_ || s.compare(0, 14, "coach-download") == 0 || s == "coach-flow") {
+            a = ui::mainMenu(setup_, watch_, coach_, library_);
+            if (a == ui::MenuAction::StartReplay)
+                LOGI("ui viewer: replay %s, game %d", library_.replay.path.c_str(), library_.replay.game);
         } else if (s == "coach-hud" || s == "coach-subtitle") {
             ui::Subtitle sub;
             sub.text = text_.empty() ? i18n::tr("coach.offer.text") : text_;
@@ -493,6 +508,7 @@ private:
     ui::NewGameSetup setup_;
     ui::WatchSetup watch_;
     ui::CoachSetup coach_;
+    ui::LibrarySetup library_;
     std::string text_;
     std::string coachDir_;
     std::string screen_;

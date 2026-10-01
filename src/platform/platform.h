@@ -95,4 +95,9 @@ std::string systemLanguage();
 // a scene exists, e.g. --lang).
 std::vector<std::string> commandLine();
 
+// ---- Saved games (the library page) -----------------------------------------------------------
+// Shows a folder (or opens a file) in the system's file manager: ShellExecuteW "open" on Windows,
+// xdg-open on Linux (started directly, no shell). Returns at once; false when it could not start.
+bool openInFileManager(const std::string& path);
+
 }  // namespace plat

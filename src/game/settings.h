@@ -163,6 +163,9 @@ struct Settings {
     // option needs it. Off = the coach's words as subtitles only; declining the download prompt
     // switches it off (remembered), switching it back on offers the download again.
     bool coachVoice = true;
+    // [archive] saved games (game_archive.h): the games played on this PC and the direct matches
+    // are saved as PGN files in the pgn folder of the user data directory when they end.
+    bool saveGames = true;
     // [interface]
     std::string language;         // i18n code ("fr", "zh-Hant"...); "" = the OS language (first start)
     // The coach's words at the bottom of the screen (SubtitleMode).

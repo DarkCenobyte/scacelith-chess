@@ -97,7 +97,8 @@ enum class MenuAction {
     Abort,          // online: abort the game (before your first move)
     Report,         // online: report the opponent (Esc menu, game over card)
     StartCoach,     // Coach page: Start (the CoachSetup holds the choice)
-    TakeBack        // coach game, Esc menu: take back the player's last move
+    TakeBack,       // coach game, Esc menu: take back the player's last move
+    StartReplay     // "Saved games" page: Replay (LibrarySetup::replay holds the game)
 };
 
 // "Watch a Game" (viewer mode): two Stockfish players. The page starts from the last choices saved
@@ -294,6 +295,25 @@ ModelPanelAction modelProgressPanel(const ModelProgressView& v);
 // Called when the player picks "Coach" on the title page, as the Coach page opens (the game's
 // voice download prompt hooks in here: game::coachModelInit). nullptr = none.
 void setCoachEntryHook(std::function<void()> hook);
+
+// ---- Saved games (ui_library.cpp) ----------------------------------------------------------------
+// The "Saved games" page (title entry after "Watch a Game"): the games of the pgn folder
+// (game_archive.h: the player's own games, saved when they end, and any PGN file dropped there),
+// newest first, with a filter by mode; the details of the selected game (its tags and moves);
+// Replay, Delete (confirmed; files of one game only) and Open folder (the system's file manager).
+// The list is read on a worker thread and read again every few seconds while the page is open.
+struct ReplaySetup {
+    std::string path;            // the .pgn file
+    int game = 0;                // the game's index in the file (0 = the first)
+};
+struct LibrarySetup {
+    std::string folder;          // the pgn folder (plat::appDataDirectory() + "pgn/"); "" = no
+                                 // "Saved games" entry on the title page
+    ReplaySetup replay;          // the game to replay when mainMenu() returns StartReplay
+};
+// mainMenu() with the "Saved games" entry: returns StartReplay on Replay ('library.replay' then
+// names the game). The overloads above have no such entry.
+MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, LibrarySetup& library);
 
 // ---- In-game pointer (ui_screens_game.cpp) -------------------------------------------------------
 // Drawn by the game during first-person play in place of the system arrow (hidden meanwhile), on
