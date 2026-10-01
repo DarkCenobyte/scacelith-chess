@@ -27,7 +27,7 @@ opening.say.now_variation = Теперь на доске {variation:def}.
 opening.say.transposed = После перестановки ходов на доске {opening:def}.
 opening.say.deep = Если совсем точно: {line}.
 opening.say.left_book = Мы только что вышли из известной теории.
-opening.say.left_book_move = Мы вышли из известной теории на {n}-м ходу.
+opening.say.left_book_move = Мы вышли из известной теории на ходу номер {n}.
 opening.say.rare = Это редкий дебют.
 opening.say.rare_named = Это редкий дебют: {line}.
 

@@ -1,0 +1,826 @@
+# Coach speech (Russian): the review of the player's moves (src/coach/review.cpp, review_explain.cpp).
+# Same keys and variants as assets/coach/speech/en/review.lang (its header documents every placeholder).
+#
+# Placeholders: {your} {your2} = the player's piece with "твой", {my} {my2} = the coach's piece with
+# "мой", {t1} {t2} = a piece of EITHER side (the possessive comes with it); forms from common.lang:
+# acc gen dat ins pre bare_ins pron pron_acc npron_ins ("за ним / за ней"). {move} {best} {reply} =
+# moves, {line} = several moves, {eval} = an evaluation, {m:move} = "2 хода", {pts:point} = "3 очка",
+# {n:time} = "3 раза", {text} = a mate pattern name (name.pattern.*, nominative, said inside «...»).
+# Rules the lines follow (see the glossary): no past tense, short adjective or participle with a piece
+# placeholder or the player as subject (their gender varies): "под ударом", "под связкой", "в
+# ловушке", "без защиты", "висит" and the present or future tense instead; "можно было", "был ход",
+# "упущен мат" instead of "ты мог", "ты пропустил". The coach is male ("я оставил", "я бы сыграл").
+# A move as subject of a past tense is preceded by "ход" ("Ход {best} давал вилку").
+# Levels 1-2: simple words, at most about 15 words per sentence; levels 5-6: terse.
+
+# ---- Announcements (either side's move) -------------------------------------------------------
+# The player gives check (levels 1-2: say what it means).
+ann.check.human.b1 = Шах! Мой король под ударом.
+ann.check.human.b1.2 = Шах! Ты нападаешь на моего короля.
+ann.check.human.b1.3 = Это шах! Моему королю надо уйти из-под удара.
+ann.check.human = Шах.
+ann.check.human.2 = Шах!
+ann.check.human.3 = А это шах.
+# The coach gives check.
+ann.check.coach = Шах!
+ann.check.coach.2 = Шах.
+ann.check.coach.3 = И шах!
+# Once per game at levels 1-2, right after the coach's first check ({your} = the player's king).
+ann.check.coach.first = Это значит, что {your} под ударом. Тебе нужно защититься от шаха.
+ann.check.coach.first.2 = Шах значит, что {your} под ударом. Уведи {your:pron_acc}, закройся или возьми мою фигуру.
+ann.double_check = Двойной шах! Нападают сразу две мои фигуры, так что королю придётся уйти.
+ann.double_check.2 = Это двойной шах: спасает только ход королём.
+# The player checkmates the coach.
+ann.mate.human.b1 = Мат! Победа твоя! Моему королю некуда уйти.
+ann.mate.human.b1.2 = Это мат! Молодец, партия твоя!
+ann.mate.human.b1.3 = Мат! Мой король в ловушке. Поздравляю!
+ann.mate.human = Мат. Хорошо сыграно.
+ann.mate.human.2 = Это мат. Поздравляю.
+ann.mate.human.3 = Мат! Отличная работа.
+# The coach checkmates the player.
+ann.mate.coach.b1 = Это мат. Твоему королю некуда уйти.
+ann.mate.coach.b1.2 = Мат. Твой король под ударом, и ему некуда деться.
+ann.mate.coach.b1.3 = Боюсь, это мат. Твоему королю не спастись.
+ann.mate.coach = Мат.
+ann.mate.coach.2 = А это мат.
+ann.mate.coach.3 = Боюсь, это мат.
+
+# ---- Verdicts (the first sentence about a bad move) --------------------------------------------
+ex.verdict.blunder.b1 = Ой! После этого хода можно кое-что потерять.
+ex.verdict.blunder.b1.2 = Осторожно! Давай покажу, что теперь может случиться.
+ex.verdict.blunder.b1.3 = Ой, подожди. С этим ходом что-то не так.
+ex.verdict.blunder.b2 = Хм, у этого хода есть недостаток. Смотри.
+ex.verdict.blunder.b2.2 = Это ошибка. Смотри.
+ex.verdict.blunder.b2.3 = Осторожно, из-за этого хода ты кое-что теряешь. Смотри.
+ex.verdict.blunder.b3 = Это зевок.
+ex.verdict.blunder.b3.2 = {move} — ошибка. Сейчас объясню почему.
+ex.verdict.blunder.b3.3 = Ой, {move} — серьёзная ошибка.
+ex.verdict.blunder.b4 = {move} — зевок.
+ex.verdict.blunder.b4.2 = {move} — серьёзная ошибка.
+ex.verdict.blunder.b4.3 = Боюсь, это зевок.
+ex.verdict.blunder.b5 = {move} — грубая ошибка.
+ex.verdict.blunder.b5.2 = {move} — зевок.
+ex.verdict.blunder.b5.3 = {move} всё портит.
+ex.verdict.blunder.b6 = {move} проигрывает.
+ex.verdict.blunder.b6.2 = {move} — зевок.
+ex.verdict.blunder.b6.3 = {move}? Проигрывает.
+ex.verdict.mistake.b3 = Не лучший ход. Объясню почему.
+ex.verdict.mistake.b3.2 = Хм, у хода {move} есть недостаток.
+ex.verdict.mistake.b3.3 = Это ошибка. Давай покажу.
+ex.verdict.mistake.b4 = {move} — ошибка.
+ex.verdict.mistake.b4.2 = {move} — слабый ход. Вот почему.
+ex.verdict.mistake.b4.3 = Это ошибка.
+ex.verdict.mistake.b5 = {move} — неточный ход.
+ex.verdict.mistake.b5.2 = {move} — ошибка.
+ex.verdict.mistake.b5.3 = {move} упускает преимущество.
+ex.verdict.mistake.b6 = {move} — ошибка.
+ex.verdict.mistake.b6.2 = {move} — неточность.
+ex.verdict.mistake.b6.3 = Не {move}.
+# An inaccuracy with no concrete cause: the line names the better move ({best} is pointed at).
+ex.verdict.inaccuracy.b4 = Неточно: точнее было {best}.
+ex.verdict.inaccuracy.b4.2 = Небольшая неточность. Чуть лучше было {best}.
+ex.verdict.inaccuracy.b4.3 = Не самый точный ход: сильнее было {best}.
+ex.verdict.inaccuracy.b5 = {move} — неточно, сильнее {best}.
+ex.verdict.inaccuracy.b5.2 = Чуть неточно. Я бы сыграл {best}.
+ex.verdict.inaccuracy.b5.3 = {best} точнее, чем {move}.
+ex.verdict.inaccuracy.b6 = {move} — неточно; лучше {best}.
+ex.verdict.inaccuracy.b6.2 = Неточно. {best}.
+ex.verdict.inaccuracy.b6.3 = Лучше было {best}.
+# Something good was missed (levels 1-2).
+ex.verdict.missed.b1 = Ой, подожди! Здесь было кое-что получше.
+ex.verdict.missed.b1.2 = Посмотри ещё раз! Был ход лучше.
+ex.verdict.missed.b1.3 = Постой, здесь у тебя был шанс!
+ex.verdict.missed.b2 = Здесь был упущен шанс.
+ex.verdict.missed.b2.2 = Хм, был ход получше.
+ex.verdict.missed.b2.3 = Подожди, здесь у тебя был отличный ход.
+
+# ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+ex.better.b3 = Лучше было {best}.
+ex.better.b3.2 = Ход {best} был бы лучше.
+ex.better.b3.3 = Вместо этого хорошо было {best}.
+ex.better.b4 = После {best} всё было бы в порядке.
+ex.better.b4.2 = Правильный ход — {best}.
+ex.better.b4.3 = Сильнее было {best}.
+ex.better.b5 = {best} с идеей {line}.
+ex.better.b5.2 = Нужно было {best}: {line}.
+ex.better.b5.3 = Лучше было {best}; после {line} — всё в порядке.
+ex.better.b6 = {best}: {eval}.
+ex.better.b6.2 = Вместо этого {best}, {eval}.
+ex.better.b6.3 = После {best} — {eval}.
+
+# ---- Putting the demonstration back (levels 1-4; silent from level 5) --------------------------
+ex.rewind.b1 = Давай вернём фигуры на место.
+ex.rewind.b1.2 = Теперь я верну всё как было.
+ex.rewind.b1.3 = Сейчас расставлю фигуры обратно.
+ex.rewind.b2 = Вернём всё назад.
+ex.rewind.b2.2 = Вернёмся туда, где были.
+ex.rewind.b2.3 = Я верну фигуры на место.
+ex.rewind.b3 = Вернёмся к партии.
+ex.rewind.b3.2 = Возвращаемся.
+ex.rewind.b3.3 = Восстанавливаем позицию.
+ex.rewind.b4 = Обратно к партии.
+ex.rewind.b4.2 = Назад.
+ex.rewind.b4.3 = Вернёмся.
+
+# ---- Takeback offer (the player answers yes or no) ---------------------------------------------
+ex.offer.b1 = Хочешь попробовать другой ход?
+ex.offer.b1.2 = Хочешь взять этот ход назад и попробовать снова?
+ex.offer.b1.3 = Попробуем другой ход?
+ex.offer.b2 = Попробуешь другой ход?
+ex.offer.b2.2 = Хочешь взять ход назад?
+ex.offer.b2.3 = Попробуем ещё раз?
+ex.offer.b3 = Возьмёшь ход назад?
+ex.offer.b3.2 = Хочешь попробовать снова?
+ex.offer.b3.3 = Вернём ход?
+ex.offer.b4 = Берёшь ход назад?
+ex.offer.b4.2 = Хочешь вернуть ход?
+ex.offer.b4.3 = Сыграешь иначе?
+ex.offer.b5 = Вернуть ход?
+ex.offer.b5.2 = Возьмёшь назад?
+ex.offer.b5.3 = Переиграешь?
+ex.offer.b6 = Вернуть?
+ex.offer.b6.2 = Берёшь назад?
+ex.offer.b6.3 = Ещё попытка?
+
+# ---- Demonstration narration: one short line per move shown on the board ------------------------
+# Levels 4-6: just the move (the first two variants are the bare move, as in English).
+demo.move = {move}.
+demo.move.2 = {move}.
+demo.move.3 = Затем {move}.
+# Levels 1-3, the coach's moves.
+demo.my.move = {my} идёт на {sq}.
+demo.my.move.2 = Я хожу {my:bare_ins} на {sq}.
+demo.my.move.3 = Затем {my} встаёт на {sq}.
+demo.my.take = Я беру {your:acc}.
+demo.my.take.2 = {my} бьёт {your:acc}.
+demo.my.take.3 = И я забираю {your:acc}.
+demo.my.check = {my} идёт на {sq}. Шах.
+demo.my.check.2 = Шах: {my} на {sq}.
+demo.my.check.3 = {my} на {sq}, шах!
+demo.my.mate = {my} идёт на {sq}. Мат.
+demo.my.mate.2 = И {my} на {sq} — это мат.
+demo.my.mate.3 = {my} на {sq}. Это мат.
+# Levels 1-3, the player's moves (what they would play).
+demo.your.move = Ты ходишь {your:bare_ins} на {sq}.
+demo.your.move.2 = Допустим, {your} идёт на {sq}.
+demo.your.move.3 = Потом {your} встаёт на {sq}.
+demo.your.take = Ты берёшь {my:acc}.
+demo.your.take.2 = Ты берёшь {my:acc} {your:bare_ins}.
+demo.your.take.3 = Потом ты забираешь {my:acc}.
+demo.your.back = Ты бьёшь в ответ.
+demo.your.back.2 = Ты отвечаешь взятием на {sq}.
+demo.your.back.3 = И ты берёшь в ответ.
+demo.your.king = Твоему королю надо уйти.
+demo.your.king.2 = Королю приходится отступить на {sq}.
+demo.your.king.3 = Твой король бежит на {sq}.
+# The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
+demo.promote = А здесь, на {sq}, у тебя появился бы новый ферзь.
+demo.promote.2 = Потом {your} доходит до {sq} и становится ферзём.
+
+# ---- 1. Mate allowed ---------------------------------------------------------------------------
+# b1 ({my} is pointed at): mate in one.
+ex.mate_allowed.b1 = Осторожно: {my} может пойти на {sq}, и это мат.
+ex.mate_allowed.b1.2 = Теперь {my} может встать на {sq}. Это был бы мат!
+ex.mate_allowed.b1.3 = Внимание! Если {my} пойдёт на {sq}, будет мат.
+# b2 ({your} = the king, pointed at).
+ex.mate_allowed.b2 = Этот ход позволяет мне поставить {your:dat} мат в {m:move}.
+ex.mate_allowed.b2.2 = Теперь я могу поставить {your:dat} мат в {m:move}. Смотри.
+ex.mate_allowed.b2.3 = Осторожно! {your} в опасности: мат в {m:move}.
+# b3 b4 b6 ({line} is pointed at).
+ex.mate_allowed.b3 = Это допускает мат в {m:move}: {line}.
+ex.mate_allowed.b3.2 = Теперь у меня есть мат в {m:move}: {line}.
+ex.mate_allowed.b3.3 = Твой король получает мат: {line}.
+ex.mate_allowed.b4 = {move} допускает форсированный мат: {line}.
+ex.mate_allowed.b4.2 = Этот ход ведёт к мату в {m:move}: {line}.
+ex.mate_allowed.b4.3 = После {move} следует мат: {line}.
+ex.mate_allowed.b5 = {move} допускает форсированный мат в {m:move}.
+ex.mate_allowed.b5.2 = Это ведёт к мату в {m:move}.
+ex.mate_allowed.b5.3 = Теперь есть форсированный мат в {m:move}.
+ex.mate_allowed.b6 = Мат в {m:mv}: {line}.
+ex.mate_allowed.b6.2 = {line}, мат.
+ex.mate_allowed.b6.3 = После {line} — мат.
+# After the one-move demonstration ({your} = the king).
+ex.mate_allowed.tail.b1 = Смотри: {your:dat} некуда бежать.
+ex.mate_allowed.tail.b1.2 = Видишь? {your} под ударом, и бежать некуда.
+ex.mate_allowed.tail.b1.3 = {your:dat} некуда идти. Это мат.
+# The name of the mating pattern (levels 2-4); {text} is one of the name.pattern keys below.
+ex.mate_allowed.pattern = Этот приём называется «{text}».
+ex.mate_allowed.pattern.2 = Запомни эту матовую картину: это {text}.
+ex.mate_allowed.tip.b3 = Перед каждым ходом проверяй, в безопасности ли твой король.
+ex.mate_allowed.tip.b3.2 = Всегда спрашивай себя: можно ли после моего хода поставить мне мат?
+
+# Nominative noun phrases (said inside «...» and after "это").
+name.pattern.back_rank = мат по последней горизонтали
+name.pattern.smothered = спёртый мат
+name.pattern.support = мат защищённым ферзём
+name.pattern.ladder = линейный мат
+name.pattern.epaulette = эполетный мат
+
+# ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
+ex.mate_missed.b1 = Ходом {best} можно было поставить мат {my:dat}!
+ex.mate_missed.b1.2 = {best} — и мат! {my:dat} было бы некуда уйти.
+ex.mate_missed.b1.3 = Смотри! После {best} {my:dat} был бы мат.
+ex.mate_missed.b2 = У тебя был мат в {m:move}, начиная с хода {best}.
+ex.mate_missed.b2.2 = Ход {best} давал мат в {m:move}!
+ex.mate_missed.b2.3 = Можно было поставить мне мат: {best}.
+ex.mate_missed.b3 = Упущен мат в {m:move}: {best}.
+ex.mate_missed.b3.2 = {best} ставит мат в {m:move}: {line}.
+ex.mate_missed.b3.3 = Был мат в {m:move}, начиная с хода {best}.
+ex.mate_missed.b4 = Упущенный мат: {line}, первый ход {best}.
+ex.mate_missed.b4.2 = Ход {best} форсировал мат в {m:move}.
+ex.mate_missed.b4.3 = У тебя был мат в {m:move}: {best}.
+ex.mate_missed.b5 = {best} — мат в {m:move}: {line}.
+ex.mate_missed.b5.2 = Упущен мат в {m:move}, начиная с хода {best}.
+ex.mate_missed.b5.3 = Был форсированный мат: {best}.
+ex.mate_missed.b6 = {best} ведёт к мату: {line}.
+ex.mate_missed.b6.2 = Мат в {m:mv}: {best}.
+ex.mate_missed.b6.3 = {best}, мат в {m:mv}.
+# Both moves mate, the played one much later (levels 5-6).
+ex.mate_delayed.b5 = Быстрее было {best}: мат в {m:move}.
+ex.mate_delayed.b5.2 = После {best} мат был бы быстрее, в {m:move}.
+ex.mate_delayed.b6 = {best} — мат в {m:mv}.
+ex.mate_delayed.b6.2 = Быстрее: {best}, мат в {m:mv}.
+
+# ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
+ex.stalemate.b1 = Ой! {my:dat} некуда ходить, а шаха нет. Это пат, ничья.
+ex.stalemate.b1.2 = Смотри: у {my:gen} нет ни одного безопасного поля, но и шаха нет. Ничья!
+ex.stalemate.b1.3 = Это пат. {my} не может ходить, поэтому ничья.
+ex.stalemate.b2 = Пат! У {my:gen} нет ходов, и шаха нет. Ничья.
+ex.stalemate.b2.2 = Ой, пат: {my:dat} некуда ходить, но шаха нет.
+ex.stalemate.b2.3 = Ничья из-за пата. {my} не может сделать ни одного хода.
+ex.stalemate.b3 = Это пат: у {my:gen} нет ходов. А ведь позиция была выигранной!
+ex.stalemate.b3.2 = Пат! {my:dat} некуда ходить, и выигранная позиция превращается в ничью.
+ex.stalemate.b3.3 = У {my:gen} нет ходов и нет шаха: пат.
+ex.stalemate.b4 = Пат: у {my:gen} нет ходов. Победа упущена.
+ex.stalemate.b4.2 = {move} — и {my:dat} пат. Ничья в выигранной позиции.
+ex.stalemate.b4.3 = Это пат: {my} в тисках.
+ex.stalemate.b5 = {move} — пат {my:dat}. Выигрыша больше нет.
+ex.stalemate.b5.2 = Пат: у {my:gen} нет полей.
+ex.stalemate.b5.3 = Это пат, {my} в ловушке.
+ex.stalemate.b6 = Пат. У {my:gen} нет ходов.
+ex.stalemate.b6.2 = {move}, пат: {my} в тисках.
+ex.stalemate.b6.3 = Пат: {my} без ходов.
+ex.stalemate.tip.b1 = Когда выигрываешь, всегда оставляй моему королю свободное поле.
+ex.stalemate.tip.b1.2 = Запомни: когда ты впереди, дай моему королю немного места.
+# The coach can reach stalemate on purpose along the line.
+ex.stalemate_trick.b1 = Осторожно! Я могу отдать свои фигуры, и тогда у {my:gen} не будет ходов: пат.
+ex.stalemate_trick.b1.2 = Внимание: {my:dat} почти некуда ходить. Я могу свести партию вничью.
+ex.stalemate_trick.b2 = Осторожно: я могу пожертвовать фигуру, и {my:dat} будет пат.
+ex.stalemate_trick.b2.2 = У {my:gen} почти нет полей. Я могу добиться пата!
+ex.stalemate_trick.b3 = Теперь я могу спастись патом: у {my:gen} заканчиваются ходы.
+ex.stalemate_trick.b3.2 = Осторожно: после {line} — пат {my:dat}.
+ex.stalemate_trick.b4 = {move} допускает патовую ловушку: {line}, и {my} не может ходить.
+ex.stalemate_trick.b4.2 = Теперь {my} может спастись патом: {line}.
+ex.stalemate_trick.b5 = {move} допускает пат: {line}, и {my} в тисках.
+ex.stalemate_trick.b5.2 = Патовая ловушка: {line}, и у {my:gen} нет ходов.
+ex.stalemate_trick.b6 = {line}, пат: {my:dat} некуда ходить.
+ex.stalemate_trick.b6.2 = Пат после {line}: {my} без ходов.
+
+# ---- 4. Fork (b1 b2: {my} {t1} {t2} pointed at; b3-b5: {reply} {t1} {t2}; b6: {reply}) ----------
+ex.fork.b1 = {my} может пойти на {sq} и напасть на {t1:acc} и {t2:acc}.
+ex.fork.b1.2 = {my} идёт на {sq} и нападает на две фигуры: на {t1:acc} и {t2:acc}.
+ex.fork.b1.3 = Смотри: с поля {sq} {my} нападает сразу на {t1:acc} и {t2:acc}.
+ex.fork.b2 = Вилка! {my} на {sq} нападает сразу на {t1:acc} и {t2:acc}.
+ex.fork.b2.2 = После твоего хода {my} может с поля {sq} устроить вилку {t1:dat} и {t2:dat}.
+ex.fork.b2.3 = {my} идёт на {sq}: двойной удар по {t1:dat} и {t2:dat}.
+ex.fork.b3 = {move} допускает {reply} — вилку {t1:dat} и {t2:dat}.
+ex.fork.b3.2 = После {reply} я нападаю сразу на {t1:acc} и {t2:acc}.
+ex.fork.b3.3 = {reply} — вилка: под ударом и {t1}, и {t2}.
+ex.fork.b4 = {reply} — вилка {t1:dat} и {t2:dat}; после {line} — у тебя минус {pts:point}.
+ex.fork.b4.2 = {reply} бьёт сразу по {t1:dat} и {t2:dat}.
+ex.fork.b4.3 = {move} допускает вилку {reply} на {t1:acc} и {t2:acc}.
+ex.fork.b5 = {move} нарывается на вилку {reply}: {t1} и {t2}.
+ex.fork.b5.2 = {reply} — вилка на {t1:acc} и {t2:acc}.
+ex.fork.b5.3 = После {reply} висят и {t1}, и {t2}.
+ex.fork.b6 = {reply} с вилкой.
+ex.fork.b6.2 = {move} допускает вилку {reply}.
+ex.fork.b6.3 = {reply}, вилка.
+# After the one-move demonstration (level 1).
+ex.fork.tail.b1 = Спасти можно только одну фигуру: {t1:acc} или {t2:acc}.
+ex.fork.tail.b1.2 = Теперь я нападаю сразу на две фигуры: на {t1:acc} и {t2:acc}. Это вилка!
+ex.fork.tail.b1.3 = Видишь? Под ударом и {t1}, и {t2}. Одна фигура пропадёт.
+ex.fork.more.b3 = Перед ходом проверяй поле {sq}: оттуда {my} может сделать вилку.
+ex.fork.more.b3.2 = Следи за полем {sq}. С него {my} устраивает вилку.
+ex.fork.tip.knight = Остерегайся прыжков коня рядом с королём и ферзём!
+ex.fork.tip.knight.2 = Кони любят нападать сразу на две фигуры. Смотри, куда они могут прыгнуть.
+
+# ---- 5. Discovered attack (b1 b2: {my} {my2} {t1}; b3 b4 b6: {reply} {t1}; b5: {reply}) ---------
+ex.discovered.b1 = Когда {my} уйдёт, {my2} нападёт на {t1:acc}!
+ex.discovered.b1.2 = Смотри: {my} стоит на пути. Если {my:pron} уйдёт, {my2} ударит по {t1:dat}.
+ex.discovered.b1.3 = {my} может отойти, и тогда {my2} нападёт на {t1:acc}.
+ex.discovered.b2 = Скрытое нападение: {my} уходит, и {my2} нападает на {t1:acc}.
+ex.discovered.b2.2 = Осторожно: {my} может уйти с угрозой, а {my2} ударит по {t1:dat}.
+ex.discovered.b2.3 = {my} отходит и открывает {my2:dat} путь к {t1:dat}.
+ex.discovered.b3 = После {reply} вскрытое нападение бьёт по {t1:dat}.
+ex.discovered.b3.2 = {reply} вскрывает нападение на {t1:acc}.
+ex.discovered.b3.3 = {move} допускает {reply} — вскрытое нападение на {t1:acc}.
+ex.discovered.b4 = {reply} открывает линию на {t1:acc}: вскрытое нападение.
+ex.discovered.b4.2 = {move} допускает вскрытое нападение {reply} с выигрышем {t1:gen}.
+ex.discovered.b4.3 = После {reply} {t1} гибнет от вскрытого нападения.
+ex.discovered.b5 = {move} допускает вскрытое нападение {reply}.
+ex.discovered.b5.2 = {reply} — вскрытое нападение.
+ex.discovered.b5.3 = {reply} вскрывает двойную угрозу.
+ex.discovered.b6 = {reply}, вскрытое нападение на {t1:acc}.
+ex.discovered.b6.2 = {reply}, и {t1} пропадает.
+ex.discovered.b6.3 = Вскрытое нападение: {reply} с ударом по {t1:dat}.
+
+# ---- 6. Skewer (b1 b2: {my} {t1} {t2}; b3-b5: {reply} {t1} {t2}; b6: {reply}) -------------------
+ex.skewer.b1 = {my} нападает на {t1:acc}. Когда {t1:pron} уйдёт, я возьму {t2:acc} за {t1:npron_ins}.
+ex.skewer.b1.2 = Смотри: {my} бьёт по {t1:dat}, а прямо за {t1:npron_ins} стоит {t2}.
+ex.skewer.b1.3 = {my} нападает на {t1:acc}. {t1:dat} придётся уйти, и тогда пропадёт {t2}.
+ex.skewer.b2 = Сквозной удар: {my} нападает на {t1:acc}, а за {t1:npron_ins} стоит {t2}.
+ex.skewer.b2.2 = {t1} и {t2} на одной линии с {my:ins}. Уйдёт одна фигура — возьму другую.
+ex.skewer.b2.3 = Осторожно: {t1} и {t2} на одной линии. {my} может ударить насквозь.
+ex.skewer.b3 = {reply} — сквозной удар по {t1:dat} и {t2:dat}.
+ex.skewer.b3.2 = После {reply} {t1:dat} придётся уйти, и {t2} пропадёт.
+ex.skewer.b3.3 = {move} допускает {reply} — сквозной удар по {t1:dat} и {t2:dat}.
+ex.skewer.b4 = {reply} — сквозной удар по {t1:dat}; {t2} за {t1:npron_ins} пропадает.
+ex.skewer.b4.2 = После {move} {t1} и {t2} на одной линии: {reply}.
+ex.skewer.b4.3 = После {reply} {t1} уходит, а {t2} пропадает.
+ex.skewer.b5 = {reply} — сквозной удар: {t1} и {t2}.
+ex.skewer.b5.2 = {move} допускает сквозной удар {reply} через {t1:acc} на {t2:acc}.
+ex.skewer.b6 = {reply}, сквозной удар.
+ex.skewer.b6.2 = {reply} со сквозным ударом.
+
+# ---- 7. Pin (b1: {my} {your} {t1}; b2 b3: {your} {t1}; b4-b6: {reply}) -------------------------
+# {my} = the pinning piece, {your} = the pinned piece, {t1} = the piece behind it.
+ex.pin.b1 = {my} может пойти на {sq}. Тогда {your} застрянет перед {t1:ins}.
+ex.pin.b1.2 = Смотри, {my} на {sq}: {your} застревает перед {t1:ins}.
+ex.pin.b1.3 = {my} может связать {your:acc} с {t1:ins}. И я {your:pron_acc} выиграю.
+ex.pin.b2 = Связка: {your} не может ходить, ведь за {your:npron_ins} стоит {t1}.
+ex.pin.b2.2 = Связка {your:gen} с {t1:ins}: теперь я могу {your:pron_acc} выиграть.
+ex.pin.b2.3 = Теперь {your} прикрывает {t1:acc} и не может уйти. Это связка.
+ex.pin.b3 = {your} попадает в связку с {t1:ins}, и я {your:pron_acc} выигрываю.
+ex.pin.b3.2 = После этого {your} под связкой: за {your:npron_ins} {t1}.
+ex.pin.b3.3 = Связка {your:gen} стоит материала: за {your:npron_ins} {t1}.
+ex.pin.b4 = {reply} связывает и выигрывает материал.
+ex.pin.b4.2 = {move} нарывается на связку {reply}.
+ex.pin.b4.3 = После {reply} связанная фигура гибнет.
+ex.pin.b5 = {move} допускает связку {reply}.
+ex.pin.b5.2 = {reply} со связкой, и фигура потеряна.
+ex.pin.b6 = {reply} связывает.
+ex.pin.b6.2 = {reply}, связка.
+# The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
+ex.pin_defender.b1 = {your} под связкой и не может защитить поле {sq}. За {your:npron_ins} стоит {t1}.
+ex.pin_defender.b1.2 = Смотри: {your} не может защитить поле {sq}, иначе пропадёт {t1}.
+ex.pin_defender.b2 = Из-за связки с {t1:ins} {your} на самом деле не защищает поле {sq}.
+ex.pin_defender.b2.2 = Связанная фигура — плохой защитник. {your} не охраняет поле {sq}: за {your:npron_ins} {t1}.
+ex.pin_defender.b3 = Связка с {t1:ins}: {your} на деле не защищает {sq}.
+ex.pin_defender.b3.2 = Поле {sq} вроде бы защищено, но {your} под связкой перед {t1:ins}.
+ex.pin_defender.b4 = {your} под связкой, так что {sq} фактически без защиты.
+ex.pin_defender.b4.2 = Из-за связки {your} не держит {sq}.
+ex.pin_defender.b5 = {your} под связкой; {sq} без защиты.
+ex.pin_defender.b5.2 = {sq} не удержать: {your} под связкой.
+ex.pin_defender.b6 = {your} под связкой, {sq} не удержать.
+ex.pin_defender.b6.2 = Связка {your:gen}, {sq} без защиты.
+
+# ---- 8. Trapped piece ({your} is pointed at) ---------------------------------------------------
+ex.trapped.b1 = {your} в ловушке. Все поля, куда {your:pron} может пойти, под ударом.
+ex.trapped.b1.2 = Посмотри на {your:refl_acc}: безопасных полей нет.
+ex.trapped.b1.3 = {your} в западне. Я могу {your:pron_acc} атаковать, и {your:pron} не убежит.
+ex.trapped.b2 = У {your:gen} нет безопасных полей. Я могу {your:pron_acc} выиграть.
+ex.trapped.b2.2 = {your} в ловушке: куда {your:pron} ни пойдёт, я {your:pron_acc} возьму.
+ex.trapped.b2.3 = Осторожно, у {your:gen} заканчиваются поля.
+ex.trapped.b3 = {your} попадает в ловушку: безопасных полей не осталось.
+ex.trapped.b3.2 = После этого {your} в ловушке и пропадает.
+ex.trapped.b3.3 = {your} попадает в западню, откуда не выбраться.
+ex.trapped.b4 = После {move} {your} в ловушке.
+ex.trapped.b4.2 = {your:dat} некуда отступить, я {your:pron_acc} выигрываю.
+ex.trapped.b4.3 = {reply} — и {your} в ловушке.
+ex.trapped.b5 = {your} оказывается в ловушке: {line}.
+ex.trapped.b5.2 = {move} оставляет {your:acc} без отступления.
+ex.trapped.b6 = {your} в ловушке.
+ex.trapped.b6.2 = {line}, и {your} в ловушке.
+ex.trapped.tip.b1 = Прежде чем ходить фигурой, проверь, сможет ли она вернуться назад.
+ex.trapped.tip.b1.2 = Фигуры глубоко в моём лагере могут застрять. Оставляй им путь назад.
+
+# ---- 9. Back rank ({your} = the king; b1 b2 also {my}; b3-b6 also {line}) ----------------------
+ex.back_rank.b1 = {your:dat} не уйти из-за своих пешек. {my} может дать шах на последнем ряду.
+ex.back_rank.b1.2 = Осторожно: {your:dat} некуда уйти, а {my} может попасть на {sq}.
+ex.back_rank.b1.3 = {my} может пойти на {sq}. {your:dat} мешают уйти собственные пешки.
+ex.back_rank.b2 = {your:dat} не хватает воздуха на последнем ряду. {my} может дать шах на {sq}.
+ex.back_rank.b2.2 = {your:dat} некуда деться. {my} идёт на {sq} и выигрывает материал.
+ex.back_rank.b2.3 = Твой последний ряд слаб: {my} может дать {your:dat} шах на {sq}.
+ex.back_rank.b3 = Твоя последняя горизонталь слаба: {line}. {your:dat} некуда уйти.
+ex.back_rank.b3.2 = {your:dat} не хватает воздуха, и я выигрываю материал: {line}.
+ex.back_rank.b3.3 = Всё решает последняя горизонталь: {line}, и {your} в западне.
+ex.back_rank.b4 = Последняя горизонталь: {line}, а у {your:gen} нет форточки.
+ex.back_rank.b4.2 = {line} — удар по слабой последней горизонтали, где стоит {your}.
+ex.back_rank.b4.3 = У {your:gen} нет поля для отступления: {line}.
+ex.back_rank.b5 = Слабость последней горизонтали, {your} без форточки: {line}.
+ex.back_rank.b5.2 = {line}; у {your:gen} нет форточки.
+ex.back_rank.b6 = {line}, последняя горизонталь; {your} в западне.
+ex.back_rank.b6.2 = Последняя горизонталь: {line} ({your}).
+ex.back_rank.tip.b1 = Сделай королю «форточку»: продвинь одну из пешек перед ним.
+ex.back_rank.tip.b1.2 = Королю за тремя пешками можно поставить мат на последнем ряду. Дай ему немного места.
+
+# ---- 10. Hanging piece ({your} is pointed at; b1 b2 also {my}; b3-b6 also {reply}) -------------
+ex.hanging.b1 = {your} на {sq} без защиты. {my} может забрать {your:pron_acc} даром.
+ex.hanging.b1.2 = Посмотри на {your:refl_acc}: {your:pron_acc} никто не защищает, а {my} нападает.
+ex.hanging.b1.3 = У {your:gen} нет защиты. {my} может просто {your:pron_acc} взять.
+ex.hanging.b2 = {your} на {sq} висит. {my} {your:pron_acc} берёт, а взять в ответ нечем.
+ex.hanging.b2.2 = {my} может бесплатно взять {your:acc}. Защиты нет.
+ex.hanging.b2.3 = {your} на {sq} остаётся без защиты, и {my} {your:pron_acc} забирает.
+ex.hanging.b3 = {move} оставляет {your:acc} без защиты: {reply}, и взять в ответ нечем.
+ex.hanging.b3.2 = {your} на {sq} висит: {reply}.
+ex.hanging.b3.3 = После {reply} {your} пропадает даром.
+ex.hanging.b4 = {move} подставляет {your:acc}: {reply} выигрывает {pts:point}.
+ex.hanging.b4.2 = {reply} даром забирает {your:acc}.
+ex.hanging.b4.3 = {your} без защиты, и {reply} {your:pron_acc} снимает.
+ex.hanging.b5 = {move} оставляет {your:acc} без защиты; {reply} {your:pron_acc} выигрывает.
+ex.hanging.b5.2 = {your} на {sq} пропадает после {reply}.
+ex.hanging.b5.3 = {reply} выигрывает {your:acc}.
+ex.hanging.b6 = {move}? {reply}, и {your} гибнет.
+ex.hanging.b6.2 = {reply} забирает {your:acc}.
+ex.hanging.b6.3 = {your} висит: {reply}.
+# Removal of the guard ({your2} = the piece that moved away, {your} = the piece it protected).
+ex.hanging_guard.b1 = {your2} больше не защищает {your:acc}. Теперь {my} может {your:pron_acc} взять.
+ex.hanging_guard.b1.2 = {your2} уходит, и {your} остаётся без защиты. {my} {your:pron_acc} забирает.
+ex.hanging_guard.b2 = У {your:gen} был защитник — {your2}. Теперь защиты нет, и {my} {your:pron_acc} берёт.
+ex.hanging_guard.b2.2 = Ход {your2:bare_ins} оставил {your:acc} без защиты, и {my} этим пользуется.
+ex.hanging_guard.b3 = Уход {your2:gen} оставляет {your:acc} без защиты: {reply}.
+ex.hanging_guard.b3.2 = Без {your2:gen} у {your:gen} нет защиты: {reply}.
+ex.hanging_guard.b4 = {move} снимает защиту: {your2} уходит от {your:gen}, и {reply} {your:pron_acc} забирает.
+ex.hanging_guard.b4.2 = У {your:gen} был единственный защитник — {your2}; {reply} {your:pron_acc} выигрывает.
+# The coach's threat was not seen (levels 1-3; {my} = the attacker, {your} = the target).
+ex.hanging_threat.b1 = {my} уже нападает на {your:acc}. Всегда смотри, чем грозит мой ход.
+ex.hanging_threat.b1.2 = Моя угроза осталась незамеченной: {my} нападает на {your:acc}.
+ex.hanging_threat.b2 = Последним ходом я напал {my:bare_ins} на {your:acc}. Всегда смотри на мои угрозы.
+ex.hanging_threat.b2.2 = {my} угрожает {your:dat}, и теперь я могу {your:pron_acc} взять.
+ex.hanging_threat.b3 = Угроза упущена из виду: {my} нападает на {your:acc}.
+ex.hanging_threat.b3.2 = {my} давно держит {your:acc} под прицелом.
+ex.hanging.tip.b1 = Перед каждым ходом спрашивай себя: все ли мои фигуры в безопасности?
+ex.hanging.tip.b1.2 = Хорошая привычка: после каждого хода проверяй, какие твои фигуры защищены.
+
+# ---- 11. Exchange going wrong -------------------------------------------------------------------
+# A bad capture ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece's points,
+# {n2} = what it captured.
+ex.exchange_capture.b1 = {your} берёт фигуру, но {my} бьёт в ответ. На этом размене ты теряешь очки.
+ex.exchange_capture.b1.2 = {my} бьёт в ответ. {your} стоит {n:point}, а взамен только {n2:point}.
+ex.exchange_capture.b1.3 = Осторожно: {my} может взять {your:acc} в ответ. Это плохой размен.
+ex.exchange_capture.b2 = Осторожно: {your} стоит {n:point}. {my} бьёт в ответ, а у тебя только {n2:point}.
+ex.exchange_capture.b2.2 = {my} забирает {your:acc} в ответ. Ты теряешь {n:point}, а получаешь только {n2:point}.
+ex.exchange_capture.b3 = Взятие на {sq} не проходит: {line}, и {your} пропадает.
+ex.exchange_capture.b3.2 = {your} бьёт на {sq}, но после {line} — минус {pts:point}.
+ex.exchange_capture.b4 = {move} — просчёт на {sq}: {line}, и {your} пропадает.
+ex.exchange_capture.b4.2 = Взятие на {sq} стоит {your:gen}: {line}.
+ex.exchange_capture.b5 = {move} теряет {your:acc} в разменах на {sq}: {line}.
+ex.exchange_capture.b5.2 = На {sq} {your} не выдерживает нагрузки: {line}.
+ex.exchange_capture.b6 = {move} теряет {your:acc} на {sq}: {line}.
+ex.exchange_capture.b6.2 = {line} на {sq}, и {your} пропадает.
+# Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
+ex.exchange_count.b1 = Посчитай: на {sq} я нападаю {n:time}, а ты защищаешь {n2:time}.
+ex.exchange_count.b1.2 = На {sq} у меня нападающих: {n}, у тебя защитников: {n2}. Перевес мой.
+ex.exchange_count.b2 = Поле {sq} атаковано {n:time}, а защищено {n2:time}. Там ты потеряешь материал.
+ex.exchange_count.b2.2 = Счёт на {sq}: нападающих {n}, защитников {n2}.
+ex.exchange_count.b3 = Посчитай нападающих и защитников на {sq}: у меня их больше.
+ex.exchange_count.b3.2 = Размен на {sq} не проходит: после {line} — минус {pts:point}.
+ex.exchange_count.b4 = {move} — просчёт на {sq}: после {line} — минус {pts:point}.
+ex.exchange_count.b4.2 = Нападающих на {sq} больше, чем защитников: {line}.
+ex.exchange_count.b5 = На {sq} нападающих {n}, защитников {n2}: {line}.
+ex.exchange_count.b5.2 = {move}: просчёт на {sq}.
+ex.exchange_count.b6 = {line} на {sq}, и у меня плюс {pts:point}.
+ex.exchange_count.b6.2 = {sq}: {n} на {n2}.
+# A cheaper piece attacks ({your} pointed at; b1 b2 also {my}; b3-b6 also {sq}); {n} = your piece,
+# {n2} = my attacker.
+ex.exchange_cheap.b1 = {my} стоит меньше, чем {your}. Если я возьму, ты потеряешь очки.
+ex.exchange_cheap.b1.2 = {my} нападает на {your:acc}. Такой размен тебе невыгоден.
+ex.exchange_cheap.b2 = {your} стоит {n:point}, а {my} — всего {n2:point}. Этот размен тебе невыгоден.
+ex.exchange_cheap.b2.2 = {my} дешевле, чем {your}, поэтому нападение выигрывает материал.
+ex.exchange_cheap.b3 = {your} на {sq} под ударом более дешёвой фигуры.
+ex.exchange_cheap.b3.2 = На {sq} {your} под ударом фигуры ценой в {n2:point}: {line}.
+ex.exchange_cheap.b4 = {your} на {sq} под ударом более дешёвой фигуры; {reply} выигрывает материал.
+ex.exchange_cheap.b4.2 = {reply} — более дешёвая фигура бьёт по {your:dat} на {sq}.
+ex.exchange_cheap.b5 = {your} на {sq} — мишень для фигуры подешевле: {line}.
+ex.exchange_cheap.b5.2 = {reply} выигрывает материал на {sq}: под ударом {your}.
+ex.exchange_cheap.b6 = {reply} выигрывает {your:acc} на {sq}.
+ex.exchange_cheap.b6.2 = {line}: {your} на {sq} пропадает.
+
+# ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
+ex.missed_capture.b1 = Видишь? {my} на {sq} без защиты. {your:bare_ins} можно было {my:pron_acc} взять.
+ex.missed_capture.b1.2 = Смотри: у {my:gen} не было защиты. {your:bare_ins} можно было {my:pron_acc} забрать.
+ex.missed_capture.b1.3 = {my} на {sq} без защиты! {your:bare_ins} можно было {my:pron_acc} схватить.
+ex.missed_capture.b2 = Здесь была бесплатная фигура: {best} выигрывает {my:acc}.
+ex.missed_capture.b2.2 = {my} на {sq} висит. {best} {my:pron_acc} забирает. В следующий раз бери!
+ex.missed_capture.b2.3 = Ход {best} выиграл бы {my:acc} даром.
+ex.missed_capture.b3 = Ходом {best} можно было даром выиграть {my:acc}.
+ex.missed_capture.b3.2 = {my} на {sq} без защиты: {best}. Каждый ход ищи незащищённые фигуры.
+ex.missed_capture.b3.3 = Можно было взять {my:acc}: {best}.
+ex.missed_capture.b4 = Упущено: {best} забирает {my:acc} на {sq}.
+ex.missed_capture.b4.2 = {best} выигрывает {my:acc}: защиты не было.
+ex.missed_capture.b4.3 = {my} висит: {best}.
+ex.missed_capture.b5 = {best} выигрывает {my:acc}; после {move} {my:pron} уходит.
+ex.missed_capture.b5.2 = {my} на {sq} без защиты: {best}.
+ex.missed_capture.b6 = {best}! {my} на {sq} без защиты.
+ex.missed_capture.b6.2 = Ход {best} выигрывал {my:acc}.
+
+# ---- 13. Missed fork ({best} {t1} {t2} pointed at; the targets are mine) ------------------------
+ex.missed_fork.b1 = У тебя был двойной удар: {best} нападает на {t1:acc} и {t2:acc}!
+ex.missed_fork.b1.2 = Смотри! После {best} под ударом сразу {t1} и {t2}.
+ex.missed_fork.b1.3 = Ход {best} давал вилку: под ударом и {t1}, и {t2}.
+ex.missed_fork.b2 = {best} — вилка: {t1} и {t2}.
+ex.missed_fork.b2.2 = Упущен двойной удар: {best} по {t1:dat} и {t2:dat}.
+ex.missed_fork.b2.3 = {best} нападает сразу на {t1:acc} и {t2:acc}. Вилка!
+ex.missed_fork.b3 = Ход {best} давал вилку: {t1} и {t2}.
+ex.missed_fork.b3.2 = У тебя был ход {best} с вилкой {t1:dat} и {t2:dat}.
+ex.missed_fork.b3.3 = Ход {best} создал бы вилку {t1:dat} и {t2:dat}.
+ex.missed_fork.b4 = {best} — вилка {t1:dat} и {t2:dat}.
+ex.missed_fork.b4.2 = Упущенная вилка: {best} на {t1:acc} и {t2:acc}.
+ex.missed_fork.b5 = {best} с вилкой на {t1:acc} и {t2:acc}.
+ex.missed_fork.b5.2 = {best} бьёт по {t1:dat} и {t2:dat}.
+ex.missed_fork.b6 = {best}, вилка: {t1} и {t2}.
+ex.missed_fork.b6.2 = {best}: вилка на {t1:acc} и {t2:acc}.
+
+# ---- 14. Promotion race ({sq} = the promotion square, {your} = your king, both pointed at) -------
+# {my} = my pawn, {n} = squares it has to go, {n2} = your king's distance to the square.
+ex.promotion.b1 = {my} может добежать до {sq} и стать ферзём. {your} слишком далеко.
+ex.promotion.b1.2 = Смотри: ничто не мешает {my:dat} дойти до {sq}. {your} {my:pron_acc} не догонит.
+ex.promotion.b1.3 = {my:dat} осталось {n:square} до {sq}, а {your} не успевает.
+ex.promotion.b2 = {my} бежит на {sq}, и {your} не успевает {my:pron_acc} догнать.
+ex.promotion.b2.2 = {my:dat} до {sq} — {n:move}, {your:dat} — {n2:move}. Не успеть.
+ex.promotion.b2.3 = Осторожно: {my} превращается в ферзя на {sq}, а {your} слишком далеко.
+ex.promotion.b3 = {your} не попадает в квадрат, и {my} проходит на {sq}.
+ex.promotion.b3.2 = Гонка проиграна: {my} доходит до {sq} раньше, чем {your}.
+ex.promotion.b4 = {your} вне квадрата пешки, и она проходит в ферзи на {sq}.
+ex.promotion.b4.2 = {my} проходит в ферзи на {sq}; {your:dat} не хватает одного темпа.
+ex.promotion.b5 = Пешечная гонка проиграна: {your} вне квадрата, превращение на {sq}.
+ex.promotion.b5.2 = {line}: я получаю ферзя на {sq}, а {your} опаздывает.
+ex.promotion.b6 = {your} вне квадрата; превращение на {sq}.
+ex.promotion.b6.2 = {line}, превращение на {sq} ({your} опаздывает).
+# The player's own pawn could have run ({sq} pointed at; b3-b6 also {best}).
+ex.promotion_missed.b1 = Твоя пешка могла добежать до {sq} и стать ферзём!
+ex.promotion_missed.b1.2 = Посмотри на {sq}! Туда могла добежать твоя пешка.
+ex.promotion_missed.b2 = Твоя пешка могла пройти на {sq}. Проходные пешки надо двигать!
+ex.promotion_missed.b2.2 = Ничто не мешало твоей пешке дойти до {sq}.
+ex.promotion_missed.b3 = {best} выигрывает гонку до поля {sq}.
+ex.promotion_missed.b3.2 = Твоя пешка была быстрее: {best}, и она проходит в ферзи на {sq}.
+ex.promotion_missed.b4 = {best} выигрывает пешечную гонку до {sq}.
+ex.promotion_missed.b4.2 = {best}! Пешка проходит в ферзи на {sq}.
+ex.promotion_missed.b5 = После {best} пешка первой проходит в ферзи на {sq}.
+ex.promotion_missed.b5.2 = {best}, и поле {sq} твоё.
+ex.promotion_missed.b6 = {best} выигрывает гонку до {sq}.
+ex.promotion_missed.b6.2 = {best}: пешка на {sq} раньше.
+
+# ---- 15. King safety ({your} = your king, pointed at) ------------------------------------------
+# A pawn in front of the castled king moved ({sq} = where it stood).
+ex.king_shield.b1 = Эта пешка прикрывала {your:acc}. Теперь у {your:gen} меньше защиты.
+ex.king_shield.b1.2 = Пешка с {sq} была щитом для {your:gen}. Теперь мои фигуры могут прорваться.
+ex.king_shield.b2 = Ход пешкой с {sq} ослабляет укрытие {your:gen}. Теперь мои фигуры могут {your:pron_acc} атаковать.
+ex.king_shield.b2.2 = У {your:gen} больше нет защитника: пешка на {sq} была {your:pron_acc} щитом.
+ex.king_shield.b3 = Этот ход пешкой открывает {your:acc} для моей атаки.
+ex.king_shield.b3.2 = {your} лишается пешечного прикрытия, и мои фигуры врываются.
+ex.king_shield.b4 = {move} ослабляет пешки вокруг {your:gen}, и моя атака проходит.
+ex.king_shield.b4.2 = После {move} пешечный щит {your:gen} разрушен.
+ex.king_shield.b5 = {move} ослабляет укрытие {your:gen}: {line}.
+ex.king_shield.b5.2 = После {move} {your} без прикрытия: {line}.
+ex.king_shield.b6 = {move} ослабляет позицию {your:gen}: {line}.
+ex.king_shield.b6.2 = {line}; {your} без укрытия.
+# The king is exposed (in the centre, walking out, many attackers).
+ex.king_exposed.b1 = {your} в опасности. Мои фигуры уже идут в атаку.
+ex.king_exposed.b1.2 = Смотри, у {your:gen} совсем нет укрытия. Прячь {your:pron_acc} за пешками.
+ex.king_exposed.b2 = {your} без укрытия. Теперь я могу давать много шахов.
+ex.king_exposed.b2.2 = Осторожно: у {your:gen} нет укрытия, и мои фигуры {your:pron_acc} атакуют.
+ex.king_exposed.b3 = {your} на открытом месте; мои фигуры могут атаковать {your:pron_acc} шахами.
+ex.king_exposed.b3.2 = После этого у {your:gen} нет укрытия.
+ex.king_exposed.b4 = {your} оказывается под огнём: {line}.
+ex.king_exposed.b4.2 = {move} оставляет {your:acc} без защиты от атаки.
+ex.king_exposed.b5 = {your} под атакой: {line}.
+ex.king_exposed.b5.2 = {move} оставляет {your:acc} без укрытия.
+ex.king_exposed.b6 = {line}; {your} под огнём.
+ex.king_exposed.b6.2 = {your} без прикрытия: {line}.
+
+# ---- 16. Bad trade (levels 3-6) -------------------------------------------------------------------
+ex.bad_trade.b3 = Этот размен ведёт в пешечный эндшпиль, который я выигрываю.
+ex.bad_trade.b3.2 = {line}, и остаются только пешки, а мой король активнее.
+ex.bad_trade.b4 = Размены ведут в проигранный пешечный эндшпиль: {line}.
+ex.bad_trade.b4.2 = Переход в этот пешечный эндшпиль проигрывает.
+ex.bad_trade.b5 = Неверный размен: после {line} — пешечный эндшпиль проигран.
+ex.bad_trade.b5.2 = Пешечный эндшпиль проигран; не меняй фигуры.
+ex.bad_trade.b6 = После {line} — проигранный пешечный эндшпиль.
+ex.bad_trade.b6.2 = Пешечный эндшпиль проигран: {line}.
+ex.bishop_pair.b5 = Преимущество двух слонов отдано просто так.
+ex.bishop_pair.b5.2 = После этого размена два слона остаются только у меня.
+ex.bishop_pair.b6 = Пара слонов уходит.
+ex.bishop_pair.b6.2 = Пара слонов отдана.
+
+# ---- 17. Endgame technique -------------------------------------------------------------------------
+# Opposition (levels 3-6; {best} pointed at).
+ex.opposition.b3 = {best} занимает оппозицию: короли стоят друг против друга через одно поле.
+ex.opposition.b3.2 = Короли! Ходом {best} можно было занять оппозицию.
+ex.opposition.b4 = {best} занимает оппозицию и выигрывает.
+ex.opposition.b4.2 = Всё решает оппозиция: {best}.
+ex.opposition.b5 = {best} с захватом оппозиции.
+ex.opposition.b5.2 = Оппозиция: {best}.
+ex.opposition.b6 = {best}, оппозиция.
+ex.opposition.b6.2 = {best} — оппозиция.
+# Push the passed pawn (b1: {sq} = the promotion square, pointed at; b2-b6: {best}).
+ex.push_passed.b1 = Твоя пешка может бежать на {sq}. Проходные пешки любят идти вперёд!
+ex.push_passed.b1.2 = Двигай свою свободную пешку! Она хочет дойти до {sq}.
+ex.push_passed.b1.3 = Ничто не мешает твоей пешке дойти до {sq}. Двигай её!
+ex.push_passed.b2 = {best}: двигай проходную пешку к полю {sq}.
+ex.push_passed.b2.2 = Твоя проходная пешка сильна. {best} двигает её вперёд.
+ex.push_passed.b2.3 = Вперёд! {best} приближает пешку к полю {sq}.
+ex.push_passed.b3 = {best} продвигает проходную.
+ex.push_passed.b3.2 = Проходные пешки надо двигать: {best}.
+ex.push_passed.b3.3 = Нужно было {best}: пешка бежит на {sq}.
+ex.push_passed.b4 = {best}: всё решает проходная.
+ex.push_passed.b4.2 = Вперёд: {best}.
+ex.push_passed.b5 = {best} с продвижением проходной: {eval}.
+ex.push_passed.b5.2 = Проходная: {best}.
+ex.push_passed.b6 = {best}: {eval}.
+ex.push_passed.b6.2 = {best}, проходная.
+# Bring the king forward (b1 b2: {your} = the king, pointed at; b3-b6: {best}).
+ex.king_active.b1 = Выводи {your:refl_acc} вперёд! В конце партии король — сильная фигура.
+ex.king_active.b1.2 = Теперь {your} может вступить в бой. Веди {your:pron_acc} в центр.
+ex.king_active.b1.3 = Фигур осталось мало, и {your:dat} пора выходить и помогать.
+ex.king_active.b2 = В эндшпиле используй {your:refl_acc}: веди {your:pron_acc} в центр.
+ex.king_active.b2.2 = {your:dat} пора действовать. Веди {your:pron_acc} вперёд.
+ex.king_active.b3 = {best} активизирует короля. В эндшпиле король — боевая фигура.
+ex.king_active.b3.2 = {best}: теперь королю место в центре.
+ex.king_active.b4 = {best} централизует короля.
+ex.king_active.b4.2 = Короля пора выводить вперёд: {best}.
+ex.king_active.b5 = {best} с активизацией короля: {line}.
+ex.king_active.b5.2 = Активность короля: {best}.
+ex.king_active.b6 = {best}: {eval}.
+ex.king_active.b6.2 = {best}, король вперёд.
+
+# ---- 18. No concrete motif (levels 4-6; {best} pointed at) --------------------------------------
+ex.positional.b4 = Лучшую позицию сохранял ход {best}.
+ex.positional.b4.2 = Здесь сильнее было {best}.
+ex.positional.b4.3 = Я бы предпочёл {best}.
+ex.positional.b5 = Сильнее было {best}: {line}.
+ex.positional.b5.2 = {best} с идеей {line}.
+ex.positional.b5.3 = Стоило рассмотреть {best}: {line}.
+ex.positional.b6 = {best}: {eval}.
+ex.positional.b6.2 = {best}, {eval}.
+ex.positional.b6.3 = {best} ({eval}).
+
+# ---- Tips: principles, never a fault claim (levels 1-3) ----------------------------------------
+tip.early_queen.b1 = {your} выходит слишком рано. Сначала выводи коней и слонов.
+tip.early_queen.b1.2 = Не выводи {your:refl_acc} так рано: мои фигуры будут {your:pron_acc} гонять.
+tip.early_queen.b1.3 = Ходить {your:bare_ins} интересно, но сначала выведи коней и слонов.
+tip.early_queen.b2 = Ранний выход {your:gen} позволяет мне атаковать {your:pron_acc} и выигрывать время.
+tip.early_queen.b2.2 = {your} уже в игре? Сначала кони и слоны!
+tip.early_queen.b3 = Ранний выход {your:gen} даёт мне выигрыш темпов.
+tip.early_queen.b3.2 = Так рано {your:acc} легко гонять. Сначала развитие.
+tip.queen_grab.b1 = {your} забирает далёкую пешку и может попасть в беду.
+tip.queen_grab.b1.2 = Собирать пешки {your:bare_ins} — потеря времени. Сначала выводи фигуры!
+tip.queen_grab.b2 = {your} отправляется за пешкой на край доски. Это отнимает много времени.
+tip.queen_grab.b2.2 = Осторожнее, когда отправляешь {your:refl_acc} за далёкими пешками.
+tip.queen_grab.b3 = Так рано охотиться за пешками {your:bare_ins} — потеря времени.
+tip.queen_grab.b3.2 = {your} теперь далеко от дома, а у меня перевес в развитии.
+tip.queen_grab.b4 = {your} берёт пешку, но теряет слишком много времени.
+tip.queen_grab.b4.2 = Взятие пешки на краю {your:bare_ins} стоит темпов.
+tip.same_piece.b1 = {your} ходит уже второй раз. Старайся каждым ходом выводить новую фигуру.
+tip.same_piece.b1.2 = Снова {your}? Выводи и другие фигуры.
+tip.same_piece.b1.3 = Каждым ходом выводи новую фигуру, а не снова {your:refl_acc}.
+tip.same_piece.b2 = Два хода {your:bare_ins} в дебюте — потеря времени.
+tip.same_piece.b2.2 = {your} снова ходит, а остальные твои фигуры ещё дома.
+tip.same_piece.b3 = Второй ход {your:bare_ins} тормозит развитие.
+tip.same_piece.b3.2 = Ещё один ход {your:bare_ins}, а остальная армия ждёт.
+tip.castle.b1 = {your} всё ещё в центре. Рокировка спрятала бы {your:pron_acc}.
+tip.castle.b1.2 = Пора рокироваться! В углу {your:dat} безопаснее.
+tip.castle.b1.3 = Пора подумать о рокировке. {your} пока на открытом месте.
+tip.castle.b2 = {your} всё ещё в центре. Рокируйся поскорее!
+tip.castle.b2.2 = Рокировка надёжно укрыла бы {your:acc}.
+tip.castle.b3 = Центр вскрывается, и {your:dat} пора уходить рокировкой.
+tip.castle.b3.2 = {your} всё ещё в центре, а рокировка давно назрела.
+tip.knight_rim.b1 = {your} на краю доски мало что делает. Кони любят центр.
+tip.knight_rim.b1.2 = Конь на краю — плохой конь! Там {your} держит меньше полей.
+tip.knight_rim.b2 = {your} на краю держит мало полей. Стремись в центр.
+tip.knight_rim.b2.2 = Конь на краю доски — плохой конь: {your:dat} место в центре.
+tip.knight_rim.b3 = {your} на краю вне игры.
+tip.knight_rim.b3.2 = Край доски — плохое место для {your:gen}.
+tip.flank.b1 = Сначала ходи центральными пешками. Крайние пешки мало помогают.
+tip.flank.b1.2 = Пешки на краю не помогают фигурам выйти. Ходи центральными.
+tip.flank.b2 = Ходы крайними пешками ничего не развивают. Играй центральными.
+tip.flank.b2.2 = Слишком много ходов крайними пешками. Выводи фигуры!
+tip.flank.b3 = Фланговые ходы пешками в дебюте тормозят развитие.
+tip.flank.b3.2 = Крайние пешки подождут: развивайся и борись за центр.
+tip.centre.b1 = Старайся занять середину доски, например поле {sq}.
+tip.centre.b1.2 = Центр очень важен. Поставь пешку или фигуру поближе к {sq}.
+tip.centre.b1.3 = Фигуры в центре сильны. Ставь их на такие поля, как {sq}.
+tip.centre.b2 = Борись за центр: такие поля, как {sq}, важны.
+tip.centre.b2.2 = Ты отдаёшь мне центр. Посмотри на {sq}.
+tip.centre.b3 = Ты не борешься за центр, и поле {sq} за мной.
+tip.centre.b3.2 = Борись за центр, за поле {sq}.
+# Endgame technique tips.
+tip.mate_technique.b1 = Когда у меня остался один король, прижми его к краю и ставь мат.
+tip.mate_technique.b1.2 = Совет: оттесняй моего короля к краю. И держи своего короля рядом.
+tip.fifty.b1 = Осторожно: пятьдесят ходов без взятий и ходов пешками — и ничья.
+tip.fifty.b1.2 = Время уходит: пятьдесят ходов без взятий и ходов пешками — это ничья.
+tip.repetition.b1 = Осторожно! Если позиция повторится в третий раз, будет ничья.
+tip.repetition.b1.2 = Не повторяй ходы: третье повторение — это ничья, а ты выигрываешь.
+
+# ---- Praise (only for the best moves) ------------------------------------------------------------
+praise.sacrifice = Ух ты, жертва фигуры — и она работает!
+praise.sacrifice.2 = Хитрая жертва! Отлично сыграно.
+praise.brilliant.b3 = Блестяще! Настоящая жертва.
+praise.brilliant.b3.2 = Ух ты, {move} — отличная жертва!
+praise.brilliant.b4 = {move}! Блестящая жертва.
+praise.brilliant.b4.2 = Блестяще. Этого я не ожидал.
+praise.brilliant.b5 = {move}!! Блестяще.
+praise.brilliant.b5.spoken = {move}. Блестяще!
+praise.brilliant.b5.2 = Блестящая жертва.
+praise.brilliant.b6 = {move}!! Превосходно.
+praise.brilliant.b6.spoken = {move}. Превосходно!
+praise.brilliant.b6.2 = Блестяще.
+praise.great.b2 = Отличный ход! Вот так и надо отбиваться.
+praise.great.b2.2 = Это отличный ход. Хорошо найдено!
+praise.great.b3 = Отличный ход! Найдена единственная хорошая идея.
+praise.great.b3.2 = Превосходно, {move} переворачивает игру.
+praise.great.b4 = {move}! Отличная находка.
+praise.great.b4.2 = Отличный ход.
+praise.great.b5 = {move}! Хорошо найдено.
+praise.great.b5.2 = Сильно: {move}.
+praise.great.b6 = {move}! Отлично.
+praise.great.b6.2 = Отличная находка.
+praise.only.b2 = Хорошо! Это был единственный хороший ход.
+praise.only.b2.2 = Молодец, это единственный ход, который работает.
+praise.only.b3 = Единственный ход, и он найден.
+praise.only.b3.2 = Точно! Здесь больше ничего не работало.
+praise.only.b4 = Единственный ход. Молодец.
+praise.only.b4.2 = Единственный ход — найден.
+praise.only.b5 = Единственный ход. Хорошо.
+praise.only.b5.2 = {move}, единственный ход.
+praise.only.b6 = Единственный ход.
+praise.only.b6.2 = Точно: единственный ход.
+praise.fork.b2 = Двойной удар! Молодец.
+praise.fork.b2.2 = Ты нападаешь сразу на две фигуры! Здорово.
+praise.fork.b2.3 = Отлично! Это вилка.
+praise.fork.b3 = Красивая вилка.
+praise.fork.b3.2 = Хорошая вилка!
+praise.fork.b3.3 = Вилка. Хорошо сыграно.
+praise.capture.b1 = Молодец! {my} достаётся тебе даром.
+praise.capture.b1.2 = Глаз-алмаз! У {my:gen} не было защиты.
+praise.capture.b1.3 = Да! Ты выигрываешь {my:acc}.
+praise.capture.b2 = Хорошее взятие! Защиты у {my:gen} не было.
+praise.capture.b2.2 = Отлично, ты забираешь {my:acc}.
+praise.capture.b2.3 = Хорошо замечено: я оставил {my:refl_acc} без защиты.
+praise.best.b1 = Хороший ход!
+praise.best.b1.2 = Очень хорошо!
+praise.best.b1.3 = Хорошо сыграно!
+praise.best.b2 = Хороший ход.
+praise.best.b2.2 = Очень красиво.
+praise.best.b2.3 = Хорошо сыграно.
+praise.best.b3 = Хороший ход, его непросто найти.
+praise.best.b3.2 = Хорошо найдено.
+praise.best.b3.3 = {move} — здесь лучший ход. Хорошо.
+praise.trade.b1 = Хорошо! Когда ты впереди, размены тебе на руку.
+praise.trade.b1.2 = Хороший размен. Ты впереди, а значит, чем меньше фигур, тем лучше.
+praise.trade.b2 = Хороший размен: ты впереди, так что меняй фигуры.
+praise.trade.b2.2 = Разменять {my:acc}, когда ты впереди, — умно.
+praise.trade.b3 = Хорошо: при перевесе меняйся.
+praise.trade.b3.2 = Разумный размен.
+praise.excellent.b3 = Превосходный ход.
+praise.excellent.b3.2 = Это сильный ход.
+praise.excellent.b3.3 = Очень точно.
+praise.excellent.b4 = Точно.
+praise.excellent.b4.2 = Превосходно.
+praise.excellent.b4.3 = Хорошо, {move} — точный ход.
+praise.castle.b1 = Хорошо! Рокировка сделана. Теперь твоему королю безопаснее.
+praise.castle.b1.2 = Отличная рокировка! Твой король надёжно спрятан.
+praise.saved.b1 = Хорошо! Фигура спасена.
+praise.saved.b1.2 = Молодец, фигура ушла из-под удара.
+praise.book.b1 = Хорошо, это известный дебютный ход.
+praise.book.b1.2 = Отлично, так начинают и сильные шахматисты.
+
+# ---- The coach's own threats (levels 1-2, before the player moves) ------------------------------
+# A mate threat ({sq} = where it would mate, pointed at at level 1; {my} = the piece).
+threat.mate.b1 = Осторожно! Я угрожаю матом на {sq}.
+threat.mate.b1.2 = Внимание: {my} хочет пойти на {sq}. Это был бы мат.
+threat.mate.b1.3 = Посмотри на {sq}. Если я туда попаду, будет мат!
+threat.mate.b2 = Осторожно, я угрожаю матом.
+threat.mate.b2.2 = Внимание: угроза мата на {sq}.
+threat.mate.b2.3 = Посмотри внимательно: я грожу матом.
+# A threat on a piece ({my} = my attacker, pointed at at level 1; {your} = the target, pointed at).
+threat.piece.b1 = Смотри: {my} нападает на {your:acc}.
+threat.piece.b1.2 = Осторожно! {your} под ударом {my:gen}.
+threat.piece.b1.3 = Внимание, {my} хочет взять {your:acc}.
+threat.piece.b2 = Осторожнее со {your:refl_ins}.
+threat.piece.b2.2 = {your} под ударом.
+threat.piece.b2.3 = Следи за {your:refl_ins}.
+threat.punish.b1 = Мой последний ход был ошибкой. Сможешь меня наказать?
+threat.punish.b1.2 = Хм, кажется, я ошибся. Найдёшь мою ошибку?
+
+# ---- Takebacks ------------------------------------------------------------------------------------
+# After the takeback is accepted, a hint (levels 1-2).
+tb.hint.b1 = На этот раз подумай о {your:refl_pre}.
+tb.hint.b1.2 = Присмотри за {your:refl_ins}.
+tb.hint.king.b1 = Подумай о безопасности {your:refl_gen}.
+tb.hint.king.b1.2 = Сначала посмотри на {your:refl_acc}. {your:pron} в безопасности?
+tb.hint.missed.b1 = Поищи фигуры, которые можно взять даром.
+tb.hint.missed.b1.2 = Посмотри внимательно: можно ли что-нибудь взять?
+tb.hint.mate_missed.b1 = Посмотри на моего короля. Можешь поставить ему мат?
+tb.hint.mate_missed.b1.2 = Сначала попробуй шахи. Может, там есть мат!
+tb.hint.general.b1 = Не спеши и посмотри на всю доску.
+tb.hint.general.b1.2 = Попробуй найти ход понадёжнее.
+# The retry.
+tb.fixed.b1 = Гораздо лучше!
+tb.fixed.b1.2 = Да, так лучше!
+tb.fixed.b1.3 = Хорошо, так намного лучше.
+tb.fixed = Так лучше.
+tb.fixed.2 = Лучше.
+tb.fixed.3 = Хорошее исправление.
+tb.same = Опять тот же ход? Ладно, посмотрим.
+tb.same.2 = Тебе нравится этот ход. Что ж, сыграем.
