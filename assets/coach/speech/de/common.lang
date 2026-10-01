@@ -209,6 +209,29 @@ count.square_acc = {n} Feld|{n} Felder
 count.square_acc.spoken = ein Feld|{n} Felder
 count.square_dat = {n} Feld|{n} Feldern
 count.square_dat.spoken = einem Feld|{n} Feldern
+# German only (review.lang and appraisal.lang): attackers and defenders of a square ("drei Angreifer
+# gegen einen Verteidiger"), percent ("ein Prozent", never "eins Prozent"; nominative = accusative),
+# and the best moves of a streak ("fünf beste Züge in Folge", "eine Serie von fünf besten Zügen").
+count.attacker = {n} Angreifer|{n} Angreifer
+count.attacker.spoken = ein Angreifer|{n} Angreifer
+count.attacker_acc = {n} Angreifer|{n} Angreifer
+count.attacker_acc.spoken = einen Angreifer|{n} Angreifer
+count.attacker_dat = {n} Angreifer|{n} Angreifern
+count.attacker_dat.spoken = einem Angreifer|{n} Angreifern
+count.defender = {n} Verteidiger|{n} Verteidiger
+count.defender.spoken = ein Verteidiger|{n} Verteidiger
+count.defender_acc = {n} Verteidiger|{n} Verteidiger
+count.defender_acc.spoken = einen Verteidiger|{n} Verteidiger
+count.defender_dat = {n} Verteidiger|{n} Verteidigern
+count.defender_dat.spoken = einem Verteidiger|{n} Verteidigern
+count.percent = {n} Prozent|{n} Prozent
+count.percent.spoken = ein Prozent|{n} Prozent
+count.best_move = {n} bester Zug|{n} beste Züge
+count.best_move.spoken = ein bester Zug|{n} beste Züge
+count.best_move_acc = {n} besten Zug|{n} beste Züge
+count.best_move_acc.spoken = einen besten Zug|{n} beste Züge
+count.best_move_dat = {n} besten Zug|{n} besten Zügen
+count.best_move_dat.spoken = einem besten Zug|{n} besten Zügen
 
 # ---- Evaluations (the strongest levels) ------------------------------------------------------------
 # From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.

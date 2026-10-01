@@ -23,6 +23,15 @@
 #   pron_acc  його / її (object, also "its")       "Візьми {my:pron_acc}!", "на {my:pron_acc} поле"
 #             (never right after a preposition as an object, where Ukrainian says "нього / неї":
 #             rephrase instead; as a possessive, "на його поле", it is right)
+#   pron_prep нього / неї (gen or acc right after a preposition)  "у {your:pron_prep} немає
+#             безпечного поля", "мої фігури йдуть до {your:pron_prep}" (review.lang)
+#   pron_ins  ним / нею (after a preposition)      "бо за {your:pron_ins} стоїть {t1}"
+#   pron_dat  йому / їй                            "{t1:pron_dat} доведеться відійти"
+#   refl_acc  свого коня / свою туру (both owners) when the sentence's subject owns the piece:
+#             "Подбай про {your:refl_acc}", "я залишив {my:refl_acc} без захисту" (Ukrainian
+#             says "свій" there, never "твій" / "мій")
+#   refl_gen  свого коня / своєї тури              "Подумай про безпеку {your:refl_gen}"
+#   refl_ins  своїм конем / своєю турою            "Стеж за {your:refl_ins}"
 # Past tenses, short adjectives and participles agree with the piece's gender: the lines avoid
 # them with a piece placeholder as subject ("{my} залишає дошку", "у {my:gen} захисту немає").
 piece.pawn.gender = m
@@ -40,6 +49,12 @@ piece.pawn.loc = пішакові
 piece.pawn.bare_ins = пішаком
 piece.pawn.pron = він
 piece.pawn.pron_acc = його
+piece.pawn.pron_prep = нього
+piece.pawn.pron_ins = ним
+piece.pawn.pron_dat = йому
+piece.pawn.refl_acc = пішака
+piece.pawn.refl_gen = пішака
+piece.pawn.refl_ins = пішаком
 piece.knight.nom = кінь
 piece.knight.acc = коня
 piece.knight.gen = коня
@@ -49,6 +64,12 @@ piece.knight.loc = коневі
 piece.knight.bare_ins = конем
 piece.knight.pron = він
 piece.knight.pron_acc = його
+piece.knight.pron_prep = нього
+piece.knight.pron_ins = ним
+piece.knight.pron_dat = йому
+piece.knight.refl_acc = коня
+piece.knight.refl_gen = коня
+piece.knight.refl_ins = конем
 piece.bishop.nom = слон
 piece.bishop.acc = слона
 piece.bishop.gen = слона
@@ -58,6 +79,12 @@ piece.bishop.loc = слонові
 piece.bishop.bare_ins = слоном
 piece.bishop.pron = він
 piece.bishop.pron_acc = його
+piece.bishop.pron_prep = нього
+piece.bishop.pron_ins = ним
+piece.bishop.pron_dat = йому
+piece.bishop.refl_acc = слона
+piece.bishop.refl_gen = слона
+piece.bishop.refl_ins = слоном
 piece.rook.nom = тура
 piece.rook.acc = туру
 piece.rook.gen = тури
@@ -67,6 +94,12 @@ piece.rook.loc = турі
 piece.rook.bare_ins = турою
 piece.rook.pron = вона
 piece.rook.pron_acc = її
+piece.rook.pron_prep = неї
+piece.rook.pron_ins = нею
+piece.rook.pron_dat = їй
+piece.rook.refl_acc = туру
+piece.rook.refl_gen = тури
+piece.rook.refl_ins = турою
 piece.queen.nom = ферзь
 piece.queen.acc = ферзя
 piece.queen.gen = ферзя
@@ -76,6 +109,12 @@ piece.queen.loc = ферзеві
 piece.queen.bare_ins = ферзем
 piece.queen.pron = він
 piece.queen.pron_acc = його
+piece.queen.pron_prep = нього
+piece.queen.pron_ins = ним
+piece.queen.pron_dat = йому
+piece.queen.refl_acc = ферзя
+piece.queen.refl_gen = ферзя
+piece.queen.refl_ins = ферзем
 piece.king.nom = король
 piece.king.acc = короля
 piece.king.gen = короля
@@ -85,6 +124,12 @@ piece.king.loc = королеві
 piece.king.bare_ins = королем
 piece.king.pron = він
 piece.king.pron_acc = його
+piece.king.pron_prep = нього
+piece.king.pron_ins = ним
+piece.king.pron_dat = йому
+piece.king.refl_acc = короля
+piece.king.refl_gen = короля
+piece.king.refl_ins = королем
 # Possessives: твій / твоя ... мій / моя ..., by case and gender.
 owner.your.nom.m = твій {piece}
 owner.your.nom.f = твоя {piece}
@@ -117,6 +162,24 @@ owner.your.pron = {piece}
 owner.my.pron = {piece}
 owner.your.pron_acc = {piece}
 owner.my.pron_acc = {piece}
+owner.your.pron_prep = {piece}
+owner.my.pron_prep = {piece}
+owner.your.pron_ins = {piece}
+owner.my.pron_ins = {piece}
+owner.your.pron_dat = {piece}
+owner.my.pron_dat = {piece}
+owner.your.refl_acc.m = свого {piece}
+owner.your.refl_acc.f = свою {piece}
+owner.your.refl_gen.m = свого {piece}
+owner.your.refl_gen.f = своєї {piece}
+owner.your.refl_ins.m = своїм {piece}
+owner.your.refl_ins.f = своєю {piece}
+owner.my.refl_acc.m = свого {piece}
+owner.my.refl_acc.f = свою {piece}
+owner.my.refl_gen.m = свого {piece}
+owner.my.refl_gen.f = своєї {piece}
+owner.my.refl_ins.m = своїм {piece}
+owner.my.refl_ins.f = своєю {piece}
 # The English keys (every language defines them); Ukrainian uses the gendered patterns above.
 owner.your.nom = твій {piece}
 owner.my.nom = мій {piece}
@@ -240,6 +303,152 @@ count.square = {n:neut} поле|{n:neut} поля|{n:neut} полів
 # count keys so that the same forms also work outside the counted nouns (and the form check knows them).
 count.f = {n:f}|{n:f}|{n:f}
 count.neut = {n:neut}|{n:neut}|{n:neut}
+
+# ---- Added for review.lang and appraisal.lang (pass 2) ---------------------------------------------
+# Accusative of a counted feminine noun: only "one" differs from the nominative ("взято одну
+# фігуру", "двадцять одну фігуру"; 2-4 and 5+ are the nominative forms "дві фігури", "п’ять фігур").
+# "Взято {n:piece_acc}" says what was captured without a past tense that would show the player's
+# gender ("ти взяв / взяла").
+number.1.f_acc.spoken = одну
+count.f_acc = {n:f_acc}|{n:f_acc}|{n:f_acc}
+count.piece_acc = {n:f_acc} фігуру|{n:f} фігури|{n:f} фігур
+# Attackers and defenders of a square ("на e4 у мене 3 нападники, а в тебе 2 захисники").
+count.attacker = {n} нападник|{n} нападники|{n} нападників
+count.defender = {n} захисник|{n} захисники|{n} захисників
+# A run of best moves ("3 найкращі ходи поспіль").
+count.top_move = {n} найкращий хід|{n} найкращі ходи|{n} найкращих ходів
+# Accuracy in percent: written "87 %" (as assets/i18n/uk.lang number.percent), spoken with the noun
+# in its plural form ("вісімдесят сім відсотків", "двадцять один відсоток").
+count.pct = {n} %|{n} %|{n} %
+count.pct.spoken = {n} відсоток|{n} відсотки|{n} відсотків
+# "Mate in N" with the preposition the voice needs: "в" before the vowel of "один" ("мат в один
+# хід"), "у" before a consonant ("мат у два ходи", "у двадцять один хід", "у вісім ходів").
+# Written always "у" ("мат у 1 хід"). Use it after a word ending in a consonant: "мат {m:in_move}".
+# Among the "one" numbers only 1 starts with a vowel (21, 31 ... are listed so that the composed
+# number does not become "двадцять в один"); 11 keeps "у" ("у одинадцять ходів", allowed after a
+# consonant). {n:prep_in} is the number with its preposition; count.prep_in only declares the form.
+count.in_move = у {n} хід|у {n} ходи|у {n} ходів
+count.in_move.spoken = {n:prep_in} хід|у {n} ходи|у {n} ходів
+count.prep_in = {n:prep_in}|{n:prep_in}|{n:prep_in}
+number.1.prep_in.spoken = в один
+number.21.prep_in.spoken = у двадцять один
+number.31.prep_in.spoken = у тридцять один
+number.41.prep_in.spoken = у сорок один
+number.51.prep_in.spoken = у п’ятдесят один
+number.61.prep_in.spoken = у шістдесят один
+number.71.prep_in.spoken = у сімдесят один
+number.81.prep_in.spoken = у вісімдесят один
+number.91.prep_in.spoken = у дев’яносто один
+# Move numbers as ordinals: "на 12-му ході" (locative), "до 12-го ходу" (genitive), "12-й хід"
+# (nominative). Written with the digits and the ordinal ending, spoken with ordinal words: compound
+# ordinals change only their last word ("двадцять першому", "сто двадцятому"), which is how
+# number.tens / number.hundreds_rest compose them; every ordinal word below is listed for the three
+# cases (the round tens and hundreds too, which have no units word to carry the ending).
+count.nth_move = {n}-й хід|{n}-й хід|{n}-й хід
+count.nth_move.spoken = {n:ord} хід|{n:ord} хід|{n:ord} хід
+count.nth_move_gen = {n}-го ходу|{n}-го ходу|{n}-го ходу
+count.nth_move_gen.spoken = {n:ord_gen} ходу|{n:ord_gen} ходу|{n:ord_gen} ходу
+count.nth_move_loc = {n}-му ході|{n}-му ході|{n}-му ході
+count.nth_move_loc.spoken = {n:ord_loc} ході|{n:ord_loc} ході|{n:ord_loc} ході
+count.ord = {n:ord}|{n:ord}|{n:ord}
+count.ord_gen = {n:ord_gen}|{n:ord_gen}|{n:ord_gen}
+count.ord_loc = {n:ord_loc}|{n:ord_loc}|{n:ord_loc}
+number.1.ord.spoken = перший
+number.1.ord_gen.spoken = першого
+number.1.ord_loc.spoken = першому
+number.2.ord.spoken = другий
+number.2.ord_gen.spoken = другого
+number.2.ord_loc.spoken = другому
+number.3.ord.spoken = третій
+number.3.ord_gen.spoken = третього
+number.3.ord_loc.spoken = третьому
+number.4.ord.spoken = четвертий
+number.4.ord_gen.spoken = четвертого
+number.4.ord_loc.spoken = четвертому
+number.5.ord.spoken = п’ятий
+number.5.ord_gen.spoken = п’ятого
+number.5.ord_loc.spoken = п’ятому
+number.6.ord.spoken = шостий
+number.6.ord_gen.spoken = шостого
+number.6.ord_loc.spoken = шостому
+number.7.ord.spoken = сьомий
+number.7.ord_gen.spoken = сьомого
+number.7.ord_loc.spoken = сьомому
+number.8.ord.spoken = восьмий
+number.8.ord_gen.spoken = восьмого
+number.8.ord_loc.spoken = восьмому
+number.9.ord.spoken = дев’ятий
+number.9.ord_gen.spoken = дев’ятого
+number.9.ord_loc.spoken = дев’ятому
+number.10.ord.spoken = десятий
+number.10.ord_gen.spoken = десятого
+number.10.ord_loc.spoken = десятому
+number.11.ord.spoken = одинадцятий
+number.11.ord_gen.spoken = одинадцятого
+number.11.ord_loc.spoken = одинадцятому
+number.12.ord.spoken = дванадцятий
+number.12.ord_gen.spoken = дванадцятого
+number.12.ord_loc.spoken = дванадцятому
+number.13.ord.spoken = тринадцятий
+number.13.ord_gen.spoken = тринадцятого
+number.13.ord_loc.spoken = тринадцятому
+number.14.ord.spoken = чотирнадцятий
+number.14.ord_gen.spoken = чотирнадцятого
+number.14.ord_loc.spoken = чотирнадцятому
+number.15.ord.spoken = п’ятнадцятий
+number.15.ord_gen.spoken = п’ятнадцятого
+number.15.ord_loc.spoken = п’ятнадцятому
+number.16.ord.spoken = шістнадцятий
+number.16.ord_gen.spoken = шістнадцятого
+number.16.ord_loc.spoken = шістнадцятому
+number.17.ord.spoken = сімнадцятий
+number.17.ord_gen.spoken = сімнадцятого
+number.17.ord_loc.spoken = сімнадцятому
+number.18.ord.spoken = вісімнадцятий
+number.18.ord_gen.spoken = вісімнадцятого
+number.18.ord_loc.spoken = вісімнадцятому
+number.19.ord.spoken = дев’ятнадцятий
+number.19.ord_gen.spoken = дев’ятнадцятого
+number.19.ord_loc.spoken = дев’ятнадцятому
+number.20.ord.spoken = двадцятий
+number.20.ord_gen.spoken = двадцятого
+number.20.ord_loc.spoken = двадцятому
+number.30.ord.spoken = тридцятий
+number.30.ord_gen.spoken = тридцятого
+number.30.ord_loc.spoken = тридцятому
+number.40.ord.spoken = сороковий
+number.40.ord_gen.spoken = сорокового
+number.40.ord_loc.spoken = сороковому
+number.50.ord.spoken = п’ятдесятий
+number.50.ord_gen.spoken = п’ятдесятого
+number.50.ord_loc.spoken = п’ятдесятому
+number.60.ord.spoken = шістдесятий
+number.60.ord_gen.spoken = шістдесятого
+number.60.ord_loc.spoken = шістдесятому
+number.70.ord.spoken = сімдесятий
+number.70.ord_gen.spoken = сімдесятого
+number.70.ord_loc.spoken = сімдесятому
+number.80.ord.spoken = вісімдесятий
+number.80.ord_gen.spoken = вісімдесятого
+number.80.ord_loc.spoken = вісімдесятому
+number.90.ord.spoken = дев’яностий
+number.90.ord_gen.spoken = дев’яностого
+number.90.ord_loc.spoken = дев’яностому
+number.100.ord.spoken = сотий
+number.100.ord_gen.spoken = сотого
+number.100.ord_loc.spoken = сотому
+number.200.ord.spoken = двохсотий
+number.200.ord_gen.spoken = двохсотого
+number.200.ord_loc.spoken = двохсотому
+number.300.ord.spoken = трьохсотий
+number.300.ord_gen.spoken = трьохсотого
+number.300.ord_loc.spoken = трьохсотому
+number.400.ord.spoken = чотирьохсотий
+number.400.ord_gen.spoken = чотирьохсотого
+number.400.ord_loc.spoken = чотирьохсотому
+number.500.ord.spoken = п’ятисотий
+number.500.ord_gen.spoken = п’ятисотого
+number.500.ord_loc.spoken = п’ятисотому
 
 # ---- Evaluations (the strongest levels) ------------------------------------------------------------
 # From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.

@@ -278,3 +278,177 @@ eval.even.spoken = равенство
 # word "ход" in the right plural ("мат в три хода"); the subtitles keep the short "мат в 3".
 eval.mate_win = мат в {n:mv}
 eval.mate_loss = тебе мат в {n:mv}
+
+# ---- Added for the review and the appraisal (pass 2) ------------------------------------------------
+# A piece placeholder as a pronoun after a preposition takes the "н-" forms: "за ним", "за ней"
+# ("behind it": "а за {your:npron_ins} стоит {t1}"). Same for every owner (no possessive).
+piece.pawn.npron_ins = ней
+piece.knight.npron_ins = ним
+piece.bishop.npron_ins = ним
+piece.rook.npron_ins = ней
+piece.queen.npron_ins = ним
+piece.king.npron_ins = ним
+owner.your.npron_ins = {piece}
+owner.my.npron_ins = {piece}
+
+# Percentages (accuracy): "{acc:percent}" = "85%" in the subtitles, "восемьдесят пять процентов" spoken.
+count.percent = {n}%|{n}%|{n}%
+count.percent.spoken = {n} процент|{n} процента|{n} процентов
+# More counted nouns: "{m:check}" = "2 шаха", "{n:capture}" = "3 взятия" (pawns included, unlike
+# "фигура"), "{n:best_move}" = "5 лучших ходов" (a streak).
+count.check = {n} шах|{n} шаха|{n} шахов
+count.capture = {n:neut} взятие|{n:neut} взятия|{n:neut} взятий
+count.best_move = {n} лучший ход|{n} лучших хода|{n} лучших ходов
+# The accusative of "фигура" after a verb ("взять {n:piece_acc}" = "взять одну фигуру / три фигуры");
+# "{n:fa}" says the feminine accusative "одну" (21 = "двадцать одну").
+count.piece_acc = {n:fa} фигуру|{n:f} фигуры|{n:f} фигур
+count.fa = {n:fa}|{n:fa}|{n:fa}
+number.1.fa.spoken = одну
+
+# Move numbers as ordinals (the appraisal): "{n:ord}" = "21-й" / "двадцать первый" (nominative,
+# "21-й ход"), "{n:ord_gen}" = "21-го" / "двадцать первого" ("до 21-го хода"), "{n:ord_pre}" =
+# "21-м" / "двадцать первом" ("на 21-м ходу"). The subtitles write the number with its ending, the
+# voice says the ordinal: 21-99 compose as "двадцать" + "первый" (only the last word is ordinal).
+count.ord = {n}-й|{n}-й|{n}-й
+count.ord.spoken = {n:ord}|{n:ord}|{n:ord}
+count.ord_gen = {n}-го|{n}-го|{n}-го
+count.ord_gen.spoken = {n:ord_gen}|{n:ord_gen}|{n:ord_gen}
+count.ord_pre = {n}-м|{n}-м|{n}-м
+count.ord_pre.spoken = {n:ord_pre}|{n:ord_pre}|{n:ord_pre}
+number.1.ord.spoken = первый
+number.2.ord.spoken = второй
+number.3.ord.spoken = третий
+number.4.ord.spoken = четвёртый
+number.5.ord.spoken = пятый
+number.6.ord.spoken = шестой
+number.7.ord.spoken = седьмой
+number.8.ord.spoken = восьмой
+number.9.ord.spoken = девятый
+number.10.ord.spoken = десятый
+number.11.ord.spoken = одиннадцатый
+number.12.ord.spoken = двенадцатый
+number.13.ord.spoken = тринадцатый
+number.14.ord.spoken = четырнадцатый
+number.15.ord.spoken = пятнадцатый
+number.16.ord.spoken = шестнадцатый
+number.17.ord.spoken = семнадцатый
+number.18.ord.spoken = восемнадцатый
+number.19.ord.spoken = девятнадцатый
+number.20.ord.spoken = двадцатый
+number.30.ord.spoken = тридцатый
+number.40.ord.spoken = сороковой
+number.50.ord.spoken = пятидесятый
+number.60.ord.spoken = шестидесятый
+number.70.ord.spoken = семидесятый
+number.80.ord.spoken = восьмидесятый
+number.90.ord.spoken = девяностый
+number.100.ord.spoken = сотый
+number.200.ord.spoken = двухсотый
+number.1.ord_gen.spoken = первого
+number.2.ord_gen.spoken = второго
+number.3.ord_gen.spoken = третьего
+number.4.ord_gen.spoken = четвёртого
+number.5.ord_gen.spoken = пятого
+number.6.ord_gen.spoken = шестого
+number.7.ord_gen.spoken = седьмого
+number.8.ord_gen.spoken = восьмого
+number.9.ord_gen.spoken = девятого
+number.10.ord_gen.spoken = десятого
+number.11.ord_gen.spoken = одиннадцатого
+number.12.ord_gen.spoken = двенадцатого
+number.13.ord_gen.spoken = тринадцатого
+number.14.ord_gen.spoken = четырнадцатого
+number.15.ord_gen.spoken = пятнадцатого
+number.16.ord_gen.spoken = шестнадцатого
+number.17.ord_gen.spoken = семнадцатого
+number.18.ord_gen.spoken = восемнадцатого
+number.19.ord_gen.spoken = девятнадцатого
+number.20.ord_gen.spoken = двадцатого
+number.30.ord_gen.spoken = тридцатого
+number.40.ord_gen.spoken = сорокового
+number.50.ord_gen.spoken = пятидесятого
+number.60.ord_gen.spoken = шестидесятого
+number.70.ord_gen.spoken = семидесятого
+number.80.ord_gen.spoken = восьмидесятого
+number.90.ord_gen.spoken = девяностого
+number.100.ord_gen.spoken = сотого
+number.200.ord_gen.spoken = двухсотого
+number.1.ord_pre.spoken = первом
+number.2.ord_pre.spoken = втором
+number.3.ord_pre.spoken = третьем
+number.4.ord_pre.spoken = четвёртом
+number.5.ord_pre.spoken = пятом
+number.6.ord_pre.spoken = шестом
+number.7.ord_pre.spoken = седьмом
+number.8.ord_pre.spoken = восьмом
+number.9.ord_pre.spoken = девятом
+number.10.ord_pre.spoken = десятом
+number.11.ord_pre.spoken = одиннадцатом
+number.12.ord_pre.spoken = двенадцатом
+number.13.ord_pre.spoken = тринадцатом
+number.14.ord_pre.spoken = четырнадцатом
+number.15.ord_pre.spoken = пятнадцатом
+number.16.ord_pre.spoken = шестнадцатом
+number.17.ord_pre.spoken = семнадцатом
+number.18.ord_pre.spoken = восемнадцатом
+number.19.ord_pre.spoken = девятнадцатом
+number.20.ord_pre.spoken = двадцатом
+number.30.ord_pre.spoken = тридцатом
+number.40.ord_pre.spoken = сороковом
+number.50.ord_pre.spoken = пятидесятом
+number.60.ord_pre.spoken = шестидесятом
+number.70.ord_pre.spoken = семидесятом
+number.80.ord_pre.spoken = восьмидесятом
+number.90.ord_pre.spoken = девяностом
+number.100.ord_pre.spoken = сотом
+number.200.ord_pre.spoken = двухсотом
+
+# The reflexive possessive "свой", for a piece owned by the subject of its own clause:
+# "я оставил {my:refl_acc} без защиты" = "своего слона", "следи за {your:refl_ins}" = "своей ладьёй".
+# Russian uses "свой" here, not "мой"/"твой". The same words for both owners.
+piece.pawn.refl_acc = пешку
+piece.pawn.refl_gen = пешки
+piece.pawn.refl_ins = пешкой
+piece.pawn.refl_pre = пешке
+piece.knight.refl_acc = коня
+piece.knight.refl_gen = коня
+piece.knight.refl_ins = конём
+piece.knight.refl_pre = коне
+piece.bishop.refl_acc = слона
+piece.bishop.refl_gen = слона
+piece.bishop.refl_ins = слоном
+piece.bishop.refl_pre = слоне
+piece.rook.refl_acc = ладью
+piece.rook.refl_gen = ладьи
+piece.rook.refl_ins = ладьёй
+piece.rook.refl_pre = ладье
+piece.queen.refl_acc = ферзя
+piece.queen.refl_gen = ферзя
+piece.queen.refl_ins = ферзём
+piece.queen.refl_pre = ферзе
+piece.king.refl_acc = короля
+piece.king.refl_gen = короля
+piece.king.refl_ins = королём
+piece.king.refl_pre = короле
+owner.your.refl_acc.m = своего {piece}
+owner.your.refl_acc.f = свою {piece}
+owner.your.refl_gen.m = своего {piece}
+owner.your.refl_gen.f = своей {piece}
+owner.your.refl_ins.m = своим {piece}
+owner.your.refl_ins.f = своей {piece}
+owner.your.refl_pre.m = своём {piece}
+owner.your.refl_pre.f = своей {piece}
+owner.my.refl_acc.m = своего {piece}
+owner.my.refl_acc.f = свою {piece}
+owner.my.refl_gen.m = своего {piece}
+owner.my.refl_gen.f = своей {piece}
+owner.my.refl_ins.m = своим {piece}
+owner.my.refl_ins.f = своей {piece}
+owner.my.refl_pre.m = своём {piece}
+owner.my.refl_pre.f = своей {piece}
+
+# The phases of the game (appraisal.lang appraisal.phase.*) in the prepositional case: "{text:pre}"
+# = "в дебюте / миттельшпиле / эндшпиле". All three nouns are masculine (agreement "удался", "прошёл").
+appraisal.phase.opening.pre = дебюте
+appraisal.phase.middlegame.pre = миттельшпиле
+appraisal.phase.endgame.pre = эндшпиле

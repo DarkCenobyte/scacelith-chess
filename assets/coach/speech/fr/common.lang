@@ -50,6 +50,22 @@ phrase.my.bishop.le = le
 phrase.my.rook.le = la
 phrase.my.queen.le = la
 phrase.my.king.le = le
+# {your:e} / {my:e} (also {your2:e}, {my2:e}) = the feminine ending of a past participle or adjective
+# that agrees with the piece, empty for a masculine piece: "{your} est cloué{your:e}" = "ton fou est
+# cloué" / "ta tour est clouée" (review.lang). Only after the placeholder it agrees with, and only for
+# endings that add "e" ("cloué", "piégé", "perdu", "pris", "lent"; not "actif").
+phrase.your.pawn.e =
+phrase.your.knight.e =
+phrase.your.bishop.e =
+phrase.your.rook.e = e
+phrase.your.queen.e = e
+phrase.your.king.e =
+phrase.my.pawn.e =
+phrase.my.knight.e =
+phrase.my.bishop.e =
+phrase.my.rook.e = e
+phrase.my.queen.e = e
+phrase.my.king.e =
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # Letter names as in the opening texts (tools/gen_opening_lang.py): "e quatre", "dé cinq", "effe trois".
@@ -186,6 +202,9 @@ count.square = {n:f} case|{n:f} cases
 # "{n:f}" in a line says a number in the feminine ("une", "vingt et une"); it is a count key so
 # that the same form also works outside the counted nouns (and the form check knows it).
 count.f = {n:f}|{n:f}
+# Attackers and defenders of a square (review.lang, ex.exchange_count): "2 attaquants", "1 défenseur".
+count.attacker = {n} attaquant|{n} attaquants
+count.defender = {n} défenseur|{n} défenseurs
 
 # ---- Evaluations (the strongest levels) ------------------------------------------------------------
 # From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
