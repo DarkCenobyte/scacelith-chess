@@ -703,10 +703,13 @@ Review Reviewer::review(const ReviewInput& in) {
             s.push_back(b);
         }
         if (better) {
-            Beat bb = sayBeat(bandKey("ex.better", level_), Look::Target, ply);
+            // {line} is what follows {best} ("Nf3, with the idea d4 c5"), never {best} again; level 5
+            // names that idea, so without a continuation it says the level-4 line instead.
+            std::string idea = sanLine(c.best, 1, size_t(std::max(1, std::min(4, bd.demoPlies) - 1)));
+            Beat bb = sayBeat(bandKey("ex.better", idea.empty() && level_ == 5 ? 4 : level_), Look::Target, ply);
             bb.line.with("best", moveArg(c.best[0]))
                 .with("move", Arg::ofMove(c.playedSan, c.playedUci))
-                .with("line", Arg::ofMoves(sanLine(c.best, 0, size_t(std::min(4, bd.demoPlies)))))
+                .with("line", Arg::ofMoves(idea))
                 .with("eval", evalArg(c.l1->score));
             traceMove(bb, c.best[0].piece, c.best[0].move.from, c.best[0].move.to, "best");
             s.push_back(bb);

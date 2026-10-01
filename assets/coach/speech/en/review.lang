@@ -102,6 +102,7 @@ ex.verdict.missed.b2.2 = Hmm, there was something better.
 ex.verdict.missed.b2.3 = Wait, you had a great move there.
 
 # ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
 ex.better.b3 = Better was {best}.
 ex.better.b3.2 = {best} was the better move.
 ex.better.b3.3 = Instead, {best} was good.
