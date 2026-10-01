@@ -11,6 +11,7 @@
 // every piece are at rest: a demonstration is never recorded and never uses Turn::AiMoving (an
 // untimed game completes any AiMoving move once its pieces are down).
 #include "game_scene.h"
+#include "coach_model.h"
 #include "../audio/audio.h"
 #include "../character/skeleton.h"
 #include "../coach/catalog.h"
@@ -587,13 +588,17 @@ void GameScene::initCoachArgs() {
     coachArgs_ = parseCoachArgs(ctx_->args);
     for (const std::string& p : coachArgs_.problems) LOGW("command line: %s", p.c_str());
     if (!coachArgs_.dir.empty()) tts::setModelDirectory(coachArgs_.dir);
-    coachVoiceFiles_ = tts::modelFilesPresent();
+    coachModelInit();   // the voice model download: the Coach entry's prompt (coach_model.h)
+    coachVoiceFiles_ = coachVoiceWanted();
     LOGI("coach: voice files %s in %s", coachVoiceFiles_ ? "found" : "missing (subtitles only)", tts::modelDirectory().c_str());
 }
 
 void GameScene::refreshCoachVoice() {
-    // The model files may come and go while the game runs (downloaded from the menu).
-    coachVoiceFiles_ = tts::modelFilesPresent();
+    // The model files may come and go while the game runs (downloaded from the menu), and the
+    // voice can be switched off (Options > Audio > Coach voice). Files that are all there but do
+    // not load are checked by the next download (coach_model.h).
+    if (coachVoiceFiles_ && coach_ && coach_->workerStarted && coach_->worker.failed()) coachModelLoadFailed();
+    coachVoiceFiles_ = coachVoiceWanted();
 }
 
 bool GameScene::coachVoiceExpected() const {

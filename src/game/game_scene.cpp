@@ -1,4 +1,5 @@
 #include "game_scene.h"
+#include "coach_model.h"
 #include "../audio/audio.h"
 #include "../character/skeleton.h"
 #include "../core/log.h"
@@ -808,6 +809,7 @@ void GameScene::applySettings(bool displayToo) {
         plat::setVsync(s.vsync);
         s.save();
     }
+    refreshCoachVoice();   // Options > Audio > Coach voice
 }
 
 void GameScene::shutdown(AppContext& ctx) {
@@ -824,6 +826,7 @@ void GameScene::shutdown(AppContext& ctx) {
     if (osCursorHidden_) plat::setCursorVisible(true);
     osCursorHidden_ = false;
     shutdownCoach();  // the voice worker and the coach's analyses, before the engine and the audio
+    coachModelShutdown();   // a voice model download in progress stops (its .part files stay)
     engine_.shutdown();
     scorekeeper_.shutdown();
     ui::shutdown();
@@ -2371,6 +2374,9 @@ void GameScene::renderOverlay(AppContext&, float) {
     }
     ui::moveList(game_.sanMoves(), inGame && showMoveList_);
     if (coach() && (inGame || state_ == State::Handshake)) drawCoachSubtitles();
+    // The coach's voice model: its download prompt, progress panel and notices (coach_model.h).
+    drawModelDownload();
+    if (coachModelInstalled()) refreshCoachVoice();   // heard from the coach's next line on
     ui::drawNotifications();
     // No pointer while the view goes over to the other player (hot-seat): the arrow stays hidden.
     if (osCursorHidden_ && !(hotSeat() && handover_.active()) &&
