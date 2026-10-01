@@ -47,6 +47,16 @@ bool setArchCap(const char* arch);
 // Name of the kernel set the next load would use ("avx2", ...).
 const char* activeArch();
 
+// Folder Synthesizer::load() reads the model files from: tts::modelFolder() of the model store
+// (<application data>/coach/), or 'dir' (--coach-dir, "" = the default again). Applies to later
+// loads. Same as tts::setModelFolder() / tts::modelFolder() (model_store.h).
+void setModelDirectory(const std::string& dir);
+std::string modelDirectory();
+// Whether load() can find the model files without loading them: every file of the manifest in
+// modelDirectory() with its size (tts::modelStatus() == Ready). False means the coach speaks
+// through subtitles only until the files are downloaded (model_store.h).
+bool modelFilesPresent();
+
 class Engine;
 class ThreadPool;
 

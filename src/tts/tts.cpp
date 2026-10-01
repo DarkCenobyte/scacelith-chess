@@ -125,6 +125,11 @@ bool setArchCap(const char* arch) { return kern::setArchCap(arch); }
 
 const char* activeArch() { return kern::active().name; }
 
+// The model folder and its quick check belong to the model store (model_store.h).
+void setModelDirectory(const std::string& dir) { setModelFolder(dir); }
+std::string modelDirectory() { return modelFolder(); }
+bool modelFilesPresent() { return modelStatus() == ModelStatus::Ready; }
+
 // ------------------------------------------------------------------------------------------------
 // Synthesizer
 // ------------------------------------------------------------------------------------------------

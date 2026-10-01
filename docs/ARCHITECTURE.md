@@ -38,7 +38,9 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 | `src/audio` | Procedural sound synthesis, mixer, reverb, WASAPI |
 | `src/ui` | SDF text (lazy atlas, font fallback, Arabic joining + bidi via `text_shape.h`), widgets (mirrored for RTL), menus |
 | `src/i18n` + `assets/i18n` | Translations (`tr`, `trf`, `trn` with CLDR plurals), language choice, Unicode helpers (`unicode.h`: joining, bidi, line breaks) |
-| `src/game` | Game state machine, settings, world layout (`layout.h`); seats and game modes (play / watch), Elo (`elo.h`), camera flights and the viewer's observer camera (engine-free, in the core library and unit-tested) |
+| `src/game` | Game state machine, settings, world layout (`layout.h`); seats and game modes (play / watch / hot-seat / online / coach), Elo (`elo.h`), camera flights and the viewer's observer camera (engine-free, in the core library and unit-tested); `game_scene_coach.cpp`: the coach's stage in the scene |
+| `src/coach` | Coach mode's brain, engine-free and GL-free: session, director, scripts, the spoken line catalogue (`assets/coach`), review and appraisal of the player's moves, openings and the teaching repertoire, the rules lesson, rewinds by hand (`rewind.h`) |
+| `src/tts` | Text-to-speech for the coach's voice (Supertonic 3, ONNX graphs run by an in-house int8 runtime with per-ISA kernels), a worker thread; the model files are read from the `coach` folder (`--coach-dir` overrides it) |
 | `src/app` | Scene registry (`--scene`), test scenes |
 
 ## Rendering contracts
@@ -154,3 +156,67 @@ helpers `evalDirect()`, `ambientSpecular()`, `sunShadow()`, `hemisphereAmbient()
 `SCACELITH_GPU_PROFILE=1` logs per-pass CPU+glFinish timings each frame (opt-in, stalls the GPU).
 Test scenes: `lightbox` (hall of boxes per layout.h: `--view 0..4`, `--sun az,el`, `--ev`) and
 `testbed` (outdoor material spheres: `--view 0..2`, `--dusk`, `--sun`, `--ev`).
+
+## Coach mode
+
+`GameMode::Coach` is a game against Stockfish (the coach's seat, `aiSeat()`) with a teacher on top.
+The pieces of it:
+
+* **`coach::Session`** (`src/coach/session.h`) is the coach's brain for one game or for the rules
+  lesson: it hears the game's events (`onMove`, `onGameOver`, the takeback card's answer, the
+  player touching a piece...), asks Stockfish for analyses, judges the player's moves and decides
+  what to say and show. It speaks through a **`coach::Director`** (`director.h`), which plays
+  scripts of beats (`script.h`: say a line, look, gesture, mark a square, demonstrate a move,
+  rewind, offer a takeback, wait for the lesson's move) in time with the voice.
+* Both only reach the world through two interfaces (`src/coach/stage.h`): **`coach::Stage`**
+  (voice, subtitles, the coach's body, its hands on the table, the HUD) and **`coach::Analyst`**
+  (the engine's analysis queue). They are engine-free and GL-free, and unit-tested with fakes
+  (`tests/coach_fakes.h`).
+* **`src/game/game_scene_coach.cpp`** implements both for the scene (`CoachStage`, `CoachAnalyst`,
+  in a `CoachRuntime` the scene owns) and holds the coach's part of the game flow; the hooks in
+  `game_scene.cpp` are short calls into it, guarded by `coach()`.
+
+Per frame (`GameScene::simulate`, after the animators): `updateCoach` pauses the session and the
+voice while the pause menu is open or the window has lost the focus, hands the session the
+coach's search time (`onCoachThinking`) and its `update`, runs the table jobs, answers the
+player's draw offer from a full-strength analysis, schedules nods and blinks, eases the view up to
+the coach's face while it talks to a still pointer (`coachFaceLift_`), moves the voice with the
+coach's mouth (`audio::setVoicePose`) and drives the end of the game. `render` draws the
+director's marks (`World::submitCoachMarks`, piece highlights through `submitPieces`) and
+`renderOverlay` the subtitles.
+
+* **Voice.** One `tts::Worker` (started when the coach mode is first used, restarted when the
+  lesson's slower speed is wanted, stopped before `audio::shutdown`). The director requests each
+  line's synthesis ahead of time; the scene plays the PCM as one streamed audio voice from the
+  coach's mouth. The speech clock is the audio engine's (`played` minus the output latency) while
+  a device plays it, else the game's time; a voice that never starts is ended by a watchdog.
+  Glyphs of a line are put in the font atlas when its synthesis is requested.
+* **Body.** Gestures become animator tasks on the coach's playing arm (`Point`, `Trace`,
+  `Gesture`) scheduled with `notBefore` so that their apex lands on the word (`anchorTime`); nods
+  and head shakes are timed separately; the speech level drives the mouth and a blink ends each
+  phrase. The director's look overrides the coach's gaze while it talks.
+* **Table jobs.** Demonstrations, rewinds, takebacks, lesson set-ups and lesson moves are queued
+  and run one after the other once every piece is at rest and no hand is busy, ply by ply. A
+  demonstration is never recorded and never uses `Turn::AiMoving` (an untimed game completes any
+  AiMoving move once its pieces are down); its captured pieces go beside the board in the coach's
+  half (`coach::demoCaptureSlot`). A rewind plans each ply with `coach::planRewind` and gives each
+  trip to the hand on whose half the piece rests (the mover's hand on the board), then checks
+  `coach::tableMatches` and resynchronises behind a short fade if needed. A takeback undoes the
+  game (`Game::undo`), resets the arbiter and drops the moves from the scoresheets
+  (`Scorekeeper::dropMoves`) before the hands put the pieces back; the scoresheets never begin a
+  move the coach could still take back (`Scorekeeper::setWriteLimit` on the player's move until
+  their next one). `Stage::tableBusy()` is true from the call until the job is over.
+* **The coach's moves** go through `updateAi`: the teaching repertoire first
+  (`coach::repertoireMove`), else a search at `ai::coachLevelSettings(level)` with the player's
+  threads and hash, never humanised; the search starts and the move is played only while
+  `Session::coachMayMove()` and the coach's hands are free. The player touches a piece only when
+  `Session::playerMayMove()` allows it.
+* **End of the game.** `endGame` → `Session::onGameOver`; the handshake waits for
+  `handshakeWanted()`, then `onHandshakeDone`; the end card waits for `finished()`, and the
+  results (`history`, `accuracyExplained`, the suggested level, the lesson's chapter) are saved in
+  `[coach]`. The rules lesson has no end-of-game flow of its own: when its last chapter is said,
+  the session wants the handshake and the scene ends the lesson (`endLesson`).
+* **Settings.** `[coach]` (level, colour, alternating colour, history, lesson chapter...) and
+  `[tts]` are read and written by `src/game/settings_coach.cpp` (core library, unit-tested).
+  The command line (`--start --coach`, `--coach-level`, `--coach-colour`, `--coach-dir`,
+  `--coach-stage-test`, `--coach-auto-answer`) is parsed by `src/game/coach_args.h`.

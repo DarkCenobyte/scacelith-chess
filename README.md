@@ -114,6 +114,44 @@ before the game (a game between two unrated names counts for both, unless it is 
 that has not drawn or won yet: FIDE then ignores it for both); leaving a game early rates
 nothing.
 
+## Coach
+
+**Coach** on the title page seats you in front of a robot with "COACH" on its chest, a teacher
+who plays you at your level and talks you through the game. The Coach page chooses the level and
+your colour (White, Black, or alternating from one game to the next); the choice is remembered
+(`[coach]` in the settings file).
+
+- **The rules of chess** (level 0) is an interactive lesson, always with White: the coach sets up
+  small positions and shows how each piece moves and captures, then castling, promotion, check
+  and checkmate, and you try each idea on the board. Legal-move hints are on, touch-move is
+  relaxed (a piece can be put back), nothing is written down; leaving it resumes at the same
+  chapter next time.
+- **Levels 1 to 6** (from *First steps* to *Expert*) are real games against the coach's Stockfish
+  at that strength, with its teaching repertoire in the opening. The lower the level, the plainer
+  the words; levels 0 to 2 show the board's coordinates. There is no clock, the game is never
+  rated, the scoresheets name the coach with its level's rating, and touch-move and the hints
+  option apply as in a normal game.
+- After your move the coach may say what it saw: a threat, a good move, a mistake. It points at
+  the pieces and squares it talks about, which light up in blue on the board, and it can show a
+  line by playing it with its own hand, then put the pieces back. After a blunder it offers to take
+  your move back: **Take back** or **Backspace** accepts, **Play on** or touching one of your
+  pieces declines.
+- **Space** skips what the coach is saying. **Esc** opens the menu: take back my move (your last
+  move and the coach's reply, as long as neither scoresheet has written them), offer or claim a
+  draw, resign, options, main menu (abandons the game).
+- At the end the coach says a word on the game, shakes your hand and sums the game up; the end
+  card offers to play again at the same level. When the coach suggests another level, the Coach
+  page proposes it next time.
+
+The coach speaks with a voice synthesised on your computer (Supertonic 3) from the model files in
+the `coach` folder; without them, or without a sound device, it speaks through subtitles only.
+Options > Audio >
+Subtitles shows its words at the bottom of the screen (Automatic: when it does not speak the
+language of the menus, as with Chinese menus where it speaks English), and Options > Audio >
+Coach voice sets its volume. `[tts]` in the settings file tunes the synthesis: `threads` (0 = 2),
+`voice` (-1 = the default voice), `steps` (5) and `arch` (`auto`, or `avx512`, `avxvnni`, `avx2`,
+`sse2`, `scalar` when troubleshooting).
+
 ## Watch a Game
 
 **Watch a Game** on the title page lets two Stockfish players (one preset per side, and a time
@@ -271,6 +309,16 @@ screenshots of a game in progress, for instance the hand-over halfway (`--start 
 --no-intro --play e2e4 --warp 2.35`). The UI viewer has the hot-seat screens (`--scene ui
 --ui-screen newgame-hotseat|hotseat-hud|hotseat-confirm|hotseat-gameover`).
 
+Coach mode: `--start --coach` starts a coach game at once, at the level and colour of the Coach
+page unless `--coach-level 0..6` (0 = the rules lesson) or `--coach-colour white|black` say
+otherwise; `--coach-dir <folder>` reads the voice model files from that folder instead of the
+default one. `--coach-stage-test` (alone, or with `--start`) runs a fixed sequence through the
+scene's coach stage without the session: a line spoken and subtitled, the coach pointing at g1 and
+tracing the knight's jump to f3 on their words, a mark and a highlight, two demonstration moves
+taken back by hand, then the takeback card (`--coach-stage-test lesson`: on the lesson's first
+position); its log gives the time of each step, for `--warp`. `--coach-auto-answer yes|no` answers
+the takeback card by itself after 1.5 s, for runs with `--play`.
+
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised.
 
 ## Licence
@@ -285,4 +333,5 @@ fonts Caveat (Impallari Type), Marck Script (Denis Masharov), Bad Script (Gaslig
 SIL Open Font License 1.1; the subsets shipped here are rebuilt from the upstream files by
 `tools/prepare_fonts.py`. The chess figures of the promotion picker come from a subset of GNU
 FreeFont FreeSerif (GPL-3.0+ with the font exception). All licence texts are in `assets/fonts/` and
-`assets/fonts/hand/`.
+`assets/fonts/hand/`. The coach's voice model (Supertonic 3, in the `coach` folder) is not part of
+the program and has its own licence (BigScience Open RAIL-M).

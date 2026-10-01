@@ -910,7 +910,7 @@ TEST(coach_review_every_key_exists) {
         {"threat.mate", 1, 2}, {"threat.piece", 1, 2},
     };
     const char* fixed[] = {
-        "ann.check.human.b1", "ann.check.human", "ann.check.coach", "ann.check.coach.first", "ann.double_check",
+        "ann.check.human.b1", "ann.check.human", "ann.check.coach", "ann.check.coach.first", "ann.double_check.coach", "ann.double_check.human",
         "ann.mate.human.b1", "ann.mate.human", "ann.mate.coach.b1", "ann.mate.coach", "demo.move", "demo.my.move",
         "demo.my.take", "demo.my.check", "demo.my.mate", "demo.your.move", "demo.your.take", "demo.your.back",
         "demo.your.king", "demo.promote", "ex.mate_allowed.tail.b1", "ex.mate_allowed.pattern",

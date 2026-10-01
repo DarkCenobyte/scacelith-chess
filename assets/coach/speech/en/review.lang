@@ -35,8 +35,10 @@ ann.check.coach.3 = And check!
 # Once per game at levels 1-2, right after the coach's first check.
 ann.check.coach.first = That means {your} is attacked. You must get it out of check.
 ann.check.coach.first.2 = Check means {your} is under attack. Move it, block, or capture my piece.
-ann.double_check = Double check! Two of my pieces attack at once, so the king must move.
-ann.double_check.2 = That's a double check: only a king move helps.
+ann.double_check.coach = Double check! Two of my pieces attack your king at once, so it must move.
+ann.double_check.coach.2 = That's a double check: only a king move helps you now.
+ann.double_check.human = Double check! Two of your pieces attack my king at once, so it must move.
+ann.double_check.human.2 = A double check! Only a king move can save me now.
 # The player checkmates the coach.
 ann.mate.human.b1 = Checkmate! You won! My king can't escape.
 ann.mate.human.b1.2 = That's checkmate! Well done, you won the game!
@@ -102,6 +104,7 @@ ex.verdict.missed.b2.2 = Hmm, there was something better.
 ex.verdict.missed.b2.3 = Wait, you had a great move there.
 
 # ---- The better move (levels 3-6; {best} is pointed at) ----------------------------------------
+# {line} (level 5) holds the moves that follow {best}, not {best} itself.
 ex.better.b3 = Better was {best}.
 ex.better.b3.2 = {best} was the better move.
 ex.better.b3.3 = Instead, {best} was good.

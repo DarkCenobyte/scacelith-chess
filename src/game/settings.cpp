@@ -134,10 +134,7 @@ bool Settings::load(const std::string& p) {
     directAutoPress = ini.getBool("direct.auto_press_clock", directAutoPress);
     directAddress = ini.getString("direct.address", directAddress);
     directJoinPort = std::clamp(ini.getInt("direct.join_port", directJoinPort), 1, 65535);
-    coachLevel = std::max(0, ini.getInt("coach.level", coachLevel));  // the UI clamps to its list
-    coachColour = std::clamp(ini.getInt("coach.colour", coachColour), 0, 2);
-    coachNextColour = std::clamp(ini.getInt("coach.next_colour", coachNextColour), 0, 1);
-    coachRulesDone = ini.getBool("coach.rules_done", coachRulesDone);
+    readCoachSettings(ini, *this);  // [coach], [tts] (settings_coach.cpp)
     language = ini.getString("interface.language", language);
     subtitles = std::clamp(ini.getInt("interface.subtitles", subtitles), 0, 2);
     playerName = ini.getString("player.name", playerName);
@@ -291,10 +288,7 @@ bool Settings::save() const {
     ini.setBool("direct.auto_press_clock", directAutoPress);
     ini.set("direct.address", directAddress);
     ini.setInt("direct.join_port", directJoinPort);
-    ini.setInt("coach.level", coachLevel);
-    ini.setInt("coach.colour", coachColour);
-    ini.setInt("coach.next_colour", coachNextColour);
-    ini.setBool("coach.rules_done", coachRulesDone);
+    writeCoachSettings(ini, *this);  // [coach], [tts] (settings_coach.cpp)
     ini.set("interface.language", language);
     ini.setInt("interface.subtitles", subtitles);
     ini.set("player.name", playerName);
