@@ -8,6 +8,9 @@
 //     (credits > Licences), coach-hud (a subtitle, the takeback offer card, the skip hint),
 //     coach-subtitle (a subtitle alone; --ui-text <text> replaces the sample line), coach-pause,
 //     coach-gameover, coach-lesson-done
+//   saved games: library (the page; --ui-library <folder> lists that folder, default the pgn folder
+//     of the user data directory), library-empty (the same, its folder replaced by an empty one
+//     when --ui-library is not given); the title page ("main") shows the "Saved games" entry
 //   hot-seat (two players on one PC): newgame-hotseat (New Game with "Human, same PC"),
 //     hotseat-hud (players, caption, draw offer card), hotseat-confirm (named resignation),
 //     hotseat-gameover (both names and ratings)
@@ -71,6 +74,10 @@ public:
         std::string mouse = ctx.argValue("--ui-mouse");
         float mx = 0, my = 0;
         if (!mouse.empty() && std::sscanf(mouse.c_str(), "%f,%f", &mx, &my) == 2) ui::im::setMouseOverride(true, m::vec2(mx, my));
+        // Saved games: the folder the library page lists.
+        library_.folder = ctx.argValue("--ui-library", plat::userDataDirectory() + "pgn/");
+        if (ctx.argValue("--ui-screen", "main") == "library-empty" && !ctx.hasArg("--ui-library"))
+            library_.folder = plat::userDataDirectory() + "pgn-viewer-empty/";
         open(ctx.argValue("--ui-screen", "main"));
         std::string keys = ctx.argValue("--ui-keys");
         size_t p = 0;
@@ -155,6 +162,7 @@ public:
         }
         if (screen == "calibration") ui::debug::openMenuPage(ui::debug::MenuPage::Calibration);
         if (screen == "watch") ui::debug::openMenuPage(ui::debug::MenuPage::Watch);
+        if (screen == "library" || screen == "library-empty") ui::debug::openMenuPage(ui::debug::MenuPage::Library);
         if (screen == "confirm") ui::debug::openPauseConfirm(1);
         if (screen == "gameover-folded") ui::debug::foldGameOver(true);
         if (screen.compare(0, 6, "online") == 0 || screen.compare(0, 6, "direct") == 0) openOnline(screen);
@@ -287,8 +295,11 @@ public:
         const std::string& s = screen_;
         if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
         if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "credits" ||
-            s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || menu_) {
-            a = ui::mainMenu(setup_, watch_, coach_);
+            s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || s == "library" ||
+            s == "library-empty" || menu_) {
+            a = ui::mainMenu(setup_, watch_, coach_, library_);
+            if (a == ui::MenuAction::StartReplay)
+                LOGI("ui viewer: replay %s, game %d", library_.replay.path.c_str(), library_.replay.game);
         } else if (s == "coach-hud" || s == "coach-subtitle") {
             ui::Subtitle sub;
             sub.text = text_.empty() ? i18n::tr("coach.offer.text") : text_;
@@ -426,6 +437,7 @@ private:
     ui::NewGameSetup setup_;
     ui::WatchSetup watch_;
     ui::CoachSetup coach_;
+    ui::LibrarySetup library_;
     std::string text_;
     std::string screen_;
     int tab_ = 0;
