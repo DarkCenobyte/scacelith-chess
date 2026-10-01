@@ -1,0 +1,115 @@
+# Coach speech (Ukrainian): events of a coach game and of the rules lesson (greetings, turn-taking,
+# takebacks, encouragement, the end of a game, level introductions). src/coach/events.cpp says
+# them. Same keys and variants as assets/coach/speech/en/events.lang.
+# The coach says "ти"; the player's gender is unknown: no "ти зіграв", "ти готовий", "ти здався"
+# (present or future tense, impersonal forms, "молодець" is common gender). The coach is male:
+# "я згоден", "я б волів", "радий тебе бачити".
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = Привіт! Зіграймо дружню партію. Якщо щось піде не так, я допоможу.
+event.greet.l1.2 = Вітаю! Я гратиму м’яко й підкажу, на що звертати увагу.
+event.greet.l1.3 = Радий тебе бачити! Не поспішай: я скажу, коли фігура опиниться під ударом.
+event.greet.l2 = Привіт! Граймо. Щойно з’явиться вилка чи зв’язка, я її покажу.
+event.greet.l2.2 = Вітаю! Виводь фігури й бережи короля. Я допомагатиму по ходу гри.
+event.greet.l2.3 = З поверненням за дошку! Стеж за вилками та зв’язками: вони виграють партії.
+event.greet.l3 = Привіт! Зіграймо справжню партію. Я коментуватиму твої плани й серйозні помилки.
+event.greet.l3.2 = Вітаю! Продумай план для своїх фігур. Я скажу, якщо ти щось пропустиш.
+event.greet.l3.3 = Почнімо! Я підкажу, де хід єдиний, а де хибний.
+event.greet.l4 = Привіт! Цього разу я даватиму оцінки й показуватиму кращі ходи-кандидати.
+event.greet.l4.2 = Граймо. Після помилки я скажу, який хід був точнішим.
+event.greet.l4.3 = Зіграємо, як у клубі? Я коментуватиму, коли змінюється оцінка.
+event.greet.l5 = Граймо. Коментуватиму коротко.
+event.greet.l5.2 = Я готовий, починаймо. Коментарі будуть короткі.
+event.greet.l5.3 = Успіхів. Я говоритиму, лише коли це важливо.
+event.greet.l6 = Удачі.
+event.greet.l6.2 = Граймо.
+event.greet.l6.3 = Я готовий. Прокоментую лише критичні моменти.
+
+# Who starts (said after the greeting).
+event.colour.white = У тебе білі фігури, тож починаєш ти.
+event.colour.white.2 = Ти граєш білими: перший хід за тобою.
+event.colour.black = Білими граю я, тож я й починаю.
+event.colour.black.2 = Цього разу в тебе чорні: першим ходжу я.
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+# The level names are those of assets/i18n/uk.lang (coach.level.<n>.name).
+event.level.l0 = Правила шахів: вивчаємо гру крок за кроком, з невеликими вправами.
+event.level.l1 = Перші кроки: я граю м’яко й пояснюю кожну помилку простими словами.
+event.level.l2 = Початківець: граю трохи сильніше й називаю вилки, зв’язки та іншу просту тактику.
+event.level.l3 = Аматор: я говорю про плани й пішакову структуру та показую короткі варіанти.
+event.level.l4 = Клубний гравець: я даю оцінку в пішаках і пропоную ходи-кандидати.
+event.level.l5 = Сильний клубний гравець: короткі зауваження й довші варіанти, коли це важливо.
+event.level.l6 = Експерт: я граю на повну силу й коментую лише критичні моменти.
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = Твій хід.
+event.your_move.2 = Твоя черга.
+event.your_move.3 = Слово за тобою.
+# The player has been thinking for a while (never during the first minute).
+event.take_time = Не поспішай.
+event.take_time.2 = Нема куди квапитися: у наших партіях немає годинника.
+# Short filler while the coach is still looking at the position.
+event.filler = Хм.
+event.filler.2 = Подивімося.
+event.filler.3 = Дай-но гляну.
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = Гаразд, повертаємо хід.
+event.takeback.taken.2 = Слушна думка. Подивися ще раз.
+event.takeback.taken.3 = Скасовуємо хід. Спробуй ще.
+# The player declined the offer and played on.
+event.takeback.declined = Гаразд, граємо далі.
+event.takeback.declined.2 = Добре, партія триває.
+event.takeback.declined.3 = Тобі вирішувати. Продовжуймо.
+# After an explanation without an offer.
+event.play_on = Граймо далі.
+event.play_on.2 = Продовжуймо.
+event.play_on.3 = А тепер повернімося до нашої партії.
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = Такі помилки роблять усі. Головне — навчитися їх помічати.
+event.encourage.mistake.2 = Не хвилюйся. Перевір, що атакує мій останній хід, і ти все побачиш.
+event.encourage.mistake.3 = Таке трапляється з кожним. Продовжуймо.
+# The player is behind (material or evaluation).
+event.encourage.behind = Не здавайся: шукай шанси, і нехай мені доведеться попрацювати.
+event.encourage.behind.2 = Борися далі. Такі позиції ще можна переломити.
+event.encourage.behind.3 = Спокійно. Шукай слабкості в моїй позиції.
+# The player has played several good moves in a row.
+event.encourage.well = Ти перевіряєш мої загрози, перш ніж ходити. Молодець.
+event.encourage.well.2 = Обережні, надійні ходи. Так тримати.
+event.encourage.well.3 = Сьогодні ти граєш дуже вдумливо.
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = Я згоден. Отже, нічия.
+event.draw.accepted.2 = Домовилися: нічия.
+event.draw.declined = Ні, дякую, граймо далі.
+event.draw.declined.2 = Я б волів продовжити.
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = Добре зіграно. Вітаю!
+event.end.win.2 = Заслужена перемога. Молодець!
+event.end.win.3 = Вітаю: перемога твоя, і цілком чесна.
+event.end.loss = Гарна партія. Наступного разу відіграєшся.
+event.end.loss.2 = Дякую за партію. Кожна поразка чогось навчає.
+event.end.loss.3 = Гарна боротьба. Подивімося, що сталося.
+event.end.draw = Нічия. Гарна партія!
+event.end.draw.2 = Цього разу ніхто не виграв. Гідна боротьба.
+event.end.draw.3 = Справедливий результат. Гарна гра.
+event.end.resigned = Партію здано. Але боротьба все одно була гарна.
+event.end.resigned.2 = Гаразд. Дякую за партію.
+event.end.handshake = Потиснімо руки.
+event.end.handshake.2 = Дякую за гру.
+event.end.handshake.3 = Гарна партія. Дякую.
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), a nominative in lower case: it
+# comes after a colon or a dash, or in quotes after "на темі" (a quoted title keeps its nominative).
+event.lesson.resume = З поверненням! Продовжимо урок: {chapter}.
+event.lesson.resume.2 = Знову привіт! Ми зупинилися на темі «{chapter}».
+event.lesson.next = Далі: {chapter}.
+event.lesson.next.2 = Тепер — {chapter}.
+event.lesson.skip = Гаразд, ідемо далі.
+event.lesson.skip.2 = Добре, пропускаємо.

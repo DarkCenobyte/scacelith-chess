@@ -1,0 +1,280 @@
+# Coach speech (Russian): the building blocks every line uses (src/coach/catalog.cpp renders them).
+# Same keys as assets/coach/speech/en/common.lang, plus the grammatical forms Russian needs.
+# Register: the coach says "ты" to the player (the game menus stay formal, "вы"). The coach is male
+# ("я рад", "я показал"); the player's gender is unknown: no second-person past tense, no short
+# adjectives or participles agreeing with the player ("готов", "сдался"): present or future tense,
+# impersonal and noun phrases instead.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Nouns: пешка (f), конь, слон, ладья (f), ферзь, король. In chess Russian конь, слон, ферзь and
+# король are animate: accusative = genitive ("возьми моего коня", "отдать ферзя").
+# Forms (every one defined for all six pieces and both owners):
+#   nom       твой конь / твоя ладья            "{your} так не ходит."
+#   acc       твоего коня / твою ладью           "Возьми {my:acc} ладьёй!"
+#   gen       твоего коня / твоей ладьи          "прямо до {my:gen}", "у {my:gen} защиты нет"
+#   dat       твоему коню / твоей ладье          (not used yet)
+#   ins       твоим конём / твоей ладьёй          "рядом с {my:ins}"
+#   pre       твоём коне / твоей ладье           (not used yet)
+#   bare_ins  конём / ладьёй (no possessive)     "Ходи {your:bare_ins}." When the player is the
+#             subject Russian says "своей ладьёй" or nothing, never "твоей ладьёй": use bare_ins.
+#   pron      он / она (the piece as subject)    "Это {your}. {your:pron} ходит по диагонали."
+#   pron_acc  его / её (object, also "its")      "Возьми {my:pron_acc}!", "на {my:pron_acc} поле"
+#             (never after a preposition that needs "него/неё": rephrase instead)
+# Past tenses, short adjectives and participles agree with the piece's gender: the lines avoid
+# them with a piece placeholder as subject ("{my} покидает доску", "у {my:gen} защиты нет").
+piece.pawn.gender = f
+piece.knight.gender = m
+piece.bishop.gender = m
+piece.rook.gender = f
+piece.queen.gender = m
+piece.king.gender = m
+piece.pawn.nom = пешка
+piece.pawn.acc = пешку
+piece.pawn.gen = пешки
+piece.pawn.dat = пешке
+piece.pawn.ins = пешкой
+piece.pawn.pre = пешке
+piece.pawn.bare_ins = пешкой
+piece.pawn.pron = она
+piece.pawn.pron_acc = её
+piece.knight.nom = конь
+piece.knight.acc = коня
+piece.knight.gen = коня
+piece.knight.dat = коню
+piece.knight.ins = конём
+piece.knight.pre = коне
+piece.knight.bare_ins = конём
+piece.knight.pron = он
+piece.knight.pron_acc = его
+piece.bishop.nom = слон
+piece.bishop.acc = слона
+piece.bishop.gen = слона
+piece.bishop.dat = слону
+piece.bishop.ins = слоном
+piece.bishop.pre = слоне
+piece.bishop.bare_ins = слоном
+piece.bishop.pron = он
+piece.bishop.pron_acc = его
+piece.rook.nom = ладья
+piece.rook.acc = ладью
+piece.rook.gen = ладьи
+piece.rook.dat = ладье
+piece.rook.ins = ладьёй
+piece.rook.pre = ладье
+piece.rook.bare_ins = ладьёй
+piece.rook.pron = она
+piece.rook.pron_acc = её
+piece.queen.nom = ферзь
+piece.queen.acc = ферзя
+piece.queen.gen = ферзя
+piece.queen.dat = ферзю
+piece.queen.ins = ферзём
+piece.queen.pre = ферзе
+piece.queen.bare_ins = ферзём
+piece.queen.pron = он
+piece.queen.pron_acc = его
+piece.king.nom = король
+piece.king.acc = короля
+piece.king.gen = короля
+piece.king.dat = королю
+piece.king.ins = королём
+piece.king.pre = короле
+piece.king.bare_ins = королём
+piece.king.pron = он
+piece.king.pron_acc = его
+# Possessives: твой / твоя ... мой / моя ..., by case and gender.
+owner.your.nom.m = твой {piece}
+owner.your.nom.f = твоя {piece}
+owner.your.acc.m = твоего {piece}
+owner.your.acc.f = твою {piece}
+owner.your.gen.m = твоего {piece}
+owner.your.gen.f = твоей {piece}
+owner.your.dat.m = твоему {piece}
+owner.your.dat.f = твоей {piece}
+owner.your.ins.m = твоим {piece}
+owner.your.ins.f = твоей {piece}
+owner.your.pre.m = твоём {piece}
+owner.your.pre.f = твоей {piece}
+owner.my.nom.m = мой {piece}
+owner.my.nom.f = моя {piece}
+owner.my.acc.m = моего {piece}
+owner.my.acc.f = мою {piece}
+owner.my.gen.m = моего {piece}
+owner.my.gen.f = моей {piece}
+owner.my.dat.m = моему {piece}
+owner.my.dat.f = моей {piece}
+owner.my.ins.m = моим {piece}
+owner.my.ins.f = моей {piece}
+owner.my.pre.m = моём {piece}
+owner.my.pre.f = моей {piece}
+# Forms without a possessive: the noun or the pronoun alone.
+owner.your.bare_ins = {piece}
+owner.my.bare_ins = {piece}
+owner.your.pron = {piece}
+owner.my.pron = {piece}
+owner.your.pron_acc = {piece}
+owner.my.pron_acc = {piece}
+# The English keys (every language defines them); Russian uses the gendered patterns above.
+owner.your.nom = твой {piece}
+owner.my.nom = мой {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# The voice drops Latin letters: file letters are Cyrillic letter names, as in the opening texts
+# (tools/gen_opening_lang.py): e4 = "е четыре", f5 = "эф пять", a8 = "а восемь", h7 = "аш семь".
+square.spoken = {file} {rank}
+file.a.spoken = а
+file.b.spoken = бэ
+file.c.spoken = цэ
+file.d.spoken = дэ
+file.e.spoken = е
+file.f.spoken = эф
+file.g.spoken = жэ
+file.h.spoken = аш
+rank.1.spoken = один
+rank.2.spoken = два
+rank.3.spoken = три
+rank.4.spoken = четыре
+rank.5.spoken = пять
+rank.6.spoken = шесть
+rank.7.spoken = семь
+rank.8.spoken = восемь
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# Russian scoresheet letters: Кр(ороль) Ф(ерзь) Л(адья) С(лон) К(онь): "Кf3", "Лad1", "Кр:e2".
+move.letters = Кр Ф Л С К
+# Spoken as Russian players read notation: "конь эф три", "конь бьёт на е пять", "конь бэ дэ семь",
+# "е бьёт на дэ пять", "пешка бьёт в ответ" (the opening texts' word for a recapture), "короткая
+# рокировка", "ферзь жэ четыре, шах". {piece} is always the nominative here, so the promotion names
+# the new piece after a colon ("превращение в" would need the accusative "в ферзя").
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} бьёт на {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} бьёт на {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} бьёт на {to}
+move.recapture.spoken = {piece} бьёт в ответ
+move.castle_short.spoken = короткая рокировка
+move.castle_long.spoken = длинная рокировка
+move.promotion.spoken = {move}, превращение: {piece}
+move.check.spoken = {move}, шах
+move.mate.spoken = {move}, мат
+moves.join.spoken = {a}, {b}
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# Spoken number words (nominative). 21-99 compose as "{tens} {units}" ("двадцать три"), 101-999 as
+# "{hundreds} {rest}" ("сто двадцать"); every hundred is listed. Forms: "f" = feminine ("одна пешка",
+# "две ошибки", "двадцать одна партия"), "neut" = neuter ("одно очко", "одно поле"); a number
+# without its own form falls back to the plain word (neuter "два" = masculine "два").
+number.0.spoken = ноль
+number.1.spoken = один
+number.1.f.spoken = одна
+number.1.neut.spoken = одно
+number.2.spoken = два
+number.2.f.spoken = две
+number.3.spoken = три
+number.4.spoken = четыре
+number.5.spoken = пять
+number.6.spoken = шесть
+number.7.spoken = семь
+number.8.spoken = восемь
+number.9.spoken = девять
+number.10.spoken = десять
+number.11.spoken = одиннадцать
+number.12.spoken = двенадцать
+number.13.spoken = тринадцать
+number.14.spoken = четырнадцать
+number.15.spoken = пятнадцать
+number.16.spoken = шестнадцать
+number.17.spoken = семнадцать
+number.18.spoken = восемнадцать
+number.19.spoken = девятнадцать
+number.20.spoken = двадцать
+number.30.spoken = тридцать
+number.40.spoken = сорок
+number.50.spoken = пятьдесят
+number.60.spoken = шестьдесят
+number.70.spoken = семьдесят
+number.80.spoken = восемьдесят
+number.90.spoken = девяносто
+number.100.spoken = сто
+number.200.spoken = двести
+number.300.spoken = триста
+number.400.spoken = четыреста
+number.500.spoken = пятьсот
+number.600.spoken = шестьсот
+number.700.spoken = семьсот
+number.800.spoken = восемьсот
+number.900.spoken = девятьсот
+# Numbers with "ход" for the mate distances ("{n:mv}"): 1-20 and the tens are listed, 21-99 compose
+# ("двадцать" + "один ход").
+number.1.mv.spoken = один ход
+number.2.mv.spoken = два хода
+number.3.mv.spoken = три хода
+number.4.mv.spoken = четыре хода
+number.5.mv.spoken = пять ходов
+number.6.mv.spoken = шесть ходов
+number.7.mv.spoken = семь ходов
+number.8.mv.spoken = восемь ходов
+number.9.mv.spoken = девять ходов
+number.10.mv.spoken = десять ходов
+number.11.mv.spoken = одиннадцать ходов
+number.12.mv.spoken = двенадцать ходов
+number.13.mv.spoken = тринадцать ходов
+number.14.mv.spoken = четырнадцать ходов
+number.15.mv.spoken = пятнадцать ходов
+number.16.mv.spoken = шестнадцать ходов
+number.17.mv.spoken = семнадцать ходов
+number.18.mv.spoken = восемнадцать ходов
+number.19.mv.spoken = девятнадцать ходов
+number.20.mv.spoken = двадцать ходов
+number.30.mv.spoken = тридцать ходов
+number.40.mv.spoken = сорок ходов
+number.50.mv.spoken = пятьдесят ходов
+number.60.mv.spoken = шестьдесят ходов
+number.70.mv.spoken = семьдесят ходов
+number.80.mv.spoken = восемьдесят ходов
+number.90.mv.spoken = девяносто ходов
+number.tens.spoken = {tens} {units}
+# Unused (every hundred is listed above), kept because English defines it.
+number.hundreds.spoken = {n} сотен
+number.hundreds_rest.spoken = {hundreds} {rest}
+number.minus.spoken = минус {n}
+# A decimal number: Russian writes a decimal comma ("1,3") and reads an engine evaluation digit by digit,
+# "плюс один три", "плюс ноль пять" (not "ноль и пять", nor the bookish "одна целая три десятых").
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# Russian plural rule (assets/i18n): one (1, 21, 31 ...) | few (2-4, 22-24 ...) | many (0, 5-20, 25 ...).
+# Nominative (= accusative for the inanimate masculine and neuter nouns): a sentence needing another
+# case ("после трёх ходов", "одну ошибку") will need its own count key (count.<noun>_gen ...), with
+# number words in that case. Feminine nouns say their number with the form "f", neuter ones with "neut".
+count.move = {n} ход|{n} хода|{n} ходов
+count.point = {n:neut} очко|{n:neut} очка|{n:neut} очков
+count.pawn = {n:f} пешка|{n:f} пешки|{n:f} пешек
+count.piece = {n:f} фигура|{n:f} фигуры|{n:f} фигур
+count.mistake = {n:f} ошибка|{n:f} ошибки|{n:f} ошибок
+count.blunder = {n} зевок|{n} зевка|{n} зевков
+count.inaccuracy = {n:f} неточность|{n:f} неточности|{n:f} неточностей
+count.game = {n:f} партия|{n:f} партии|{n:f} партий
+count.time = {n} раз|{n} раза|{n} раз
+count.square = {n:neut} поле|{n:neut} поля|{n:neut} полей
+# "{n:f}" / "{n:neut}" in a line say a bare number in the feminine / neuter ("одна", "одно"); they are
+# count keys so that the same forms also work outside the counted nouns (and the form check knows them).
+count.f = {n:f}|{n:f}|{n:f}
+count.neut = {n:neut}|{n:neut}|{n:neut}
+# "{n:mv}" = a number followed by "ход" in speech (number.<n>.mv.spoken below), digits alone in writing.
+count.mv = {n:mv}|{n:mv}|{n:mv}
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = плюс {x}
+eval.down = −{x}
+eval.down.spoken = минус {x}
+eval.even = 0,0
+eval.even.spoken = равенство
+# {n} here is a bare number (count keys do not apply to it): the form "mv" says the number with the
+# word "ход" in the right plural ("мат в три хода"); the subtitles keep the short "мат в 3".
+eval.mate_win = мат в {n:mv}
+eval.mate_loss = тебе мат в {n:mv}

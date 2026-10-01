@@ -5,22 +5,22 @@
 # "d-Bauer"; pieces in words, never piece letters.
 
 # ---- Sentences
-opening.say.pw.both = Ihre Eröffnung ist {white:def}, und meine Antwort ist {black:def}.
-opening.say.pw.both.2 = Ihre Eröffnung: {white}. Meine Antwort: {black}.
-opening.say.pb.both = Meine Eröffnung ist {white:def}, und Ihre Antwort ist {black:def}.
-opening.say.pb.both.2 = Meine Eröffnung: {white}. Ihre Antwort: {black}.
-opening.say.pw.declined = Sie haben {white:def} gespielt, und ich habe es abgelehnt.
-opening.say.pb.declined = Ich habe {white:def} gespielt, und Sie haben es abgelehnt.
-opening.say.pw.accepted = Sie haben {white:def} gespielt, und ich habe es angenommen.
-opening.say.pb.accepted = Ich habe {white:def} gespielt, und Sie haben es angenommen.
-opening.say.pw.white = Ihre Eröffnung ist {white:def}.
-opening.say.pw.white.2 = Ihre Eröffnung: {white}.
+opening.say.pw.both = Deine Eröffnung ist {white:def}, und meine Antwort ist {black:def}.
+opening.say.pw.both.2 = Deine Eröffnung: {white}. Meine Antwort: {black}.
+opening.say.pb.both = Meine Eröffnung ist {white:def}, und deine Antwort ist {black:def}.
+opening.say.pb.both.2 = Meine Eröffnung: {white}. Deine Antwort: {black}.
+opening.say.pw.declined = Du hast {white:def} gespielt, und ich habe es abgelehnt.
+opening.say.pb.declined = Ich habe {white:def} gespielt, und du hast es abgelehnt.
+opening.say.pw.accepted = Du hast {white:def} gespielt, und ich habe es angenommen.
+opening.say.pb.accepted = Ich habe {white:def} gespielt, und du hast es angenommen.
+opening.say.pw.white = Deine Eröffnung ist {white:def}.
+opening.say.pw.white.2 = Deine Eröffnung: {white}.
 opening.say.pb.white = Meine Eröffnung ist {white:def}.
 opening.say.pb.white.2 = Meine Eröffnung: {white}.
-opening.say.pw.var_white = Meine Antwort ist {black:def}, und Ihre Wahl ist {white:def}.
-opening.say.pb.var_white = Ihre Antwort ist {black:def}, und meine Wahl ist {white:def}.
+opening.say.pw.var_white = Meine Antwort ist {black:def}, und deine Wahl ist {white:def}.
+opening.say.pb.var_white = Deine Antwort ist {black:def}, und meine Wahl ist {white:def}.
 opening.say.pw.black = Meine Antwort ist {black:def}.
-opening.say.pb.black = Ihre Antwort ist {black:def}.
+opening.say.pb.black = Deine Antwort ist {black:def}.
 opening.say.both = Das ist {both:def}.
 opening.say.both.2 = Auf dem Brett steht {both:def}.
 opening.say.variation = Genauer gesagt ist das {variation:def}.
@@ -29,7 +29,7 @@ opening.say.now_variation = Daraus ist {variation:def} geworden.
 opening.say.transposed = Durch Zugumstellung ist daraus {opening:def} geworden.
 opening.say.deep = Die genaue Variante: {line}.
 opening.say.left_book = Wir haben gerade die bekannte Eröffnungstheorie verlassen.
-opening.say.left_book_move = Wir haben die bekannte Theorie im {n}. Zug verlassen.
+opening.say.left_book_move = Wir haben die bekannte Theorie bei Zug {n} verlassen.
 opening.say.rare = Das ist eine seltene Eröffnung.
 opening.say.rare_named = Das ist eine seltene Eröffnung: {line}.
 
@@ -125,7 +125,7 @@ opening.family.scotch.beginner = Weiß öffnet das Zentrum sofort mit d4: Die Fi
 opening.family.scotch.advanced = Die Spannung im Zentrum verschwindet sofort; es geht um die aktive Entwicklung von Schwarz und um die Bauernstrukturen nach einem Tausch auf c6.
 opening.family.philidor.beginner = Schwarz deckt e5 mit dem d-Bauern: solide, aber etwas passiv, weil der schwarzfeldrige Läufer eingesperrt ist.
 opening.family.philidor.advanced = Schwarz gibt Raum für einen festen Halt auf e5; Weiß hat bequemen Druck im Zentrum, und Fallen gegen f7 sind im Vereinsschach häufig.
-opening.family.petrov.beginner = Schwarz deckt e5 nicht, sondern greift e4 mit dem Springer an: eine solide, symmetrische Verteidigung; nur sollten Sie die weißen Züge nicht zu lange nachahmen.
+opening.family.petrov.beginner = Schwarz deckt e5 nicht, sondern greift e4 mit dem Springer an: eine solide, symmetrische Verteidigung; nur solltest du die weißen Züge nicht zu lange nachahmen.
 opening.family.petrov.advanced = Die Russische Verteidigung führt zu symmetrischen, oft remislichen Strukturen: Weiß behält eine kleine Initiative, Schwarz entwickelt schnell und sucht ausgleichende Abtäusche.
 opening.family.four_knights.beginner = Beide Seiten entwickeln zuerst ihre Springer: eine gesunde, ruhige Eröffnung, die den Regeln der Entwicklung folgt.
 opening.family.four_knights.advanced = Eine symmetrische, ausgeglichene Eröffnung: Weiß wählt eine spanische, schottische oder italienische Behandlung, und Schwarz sollte das Rubinstein-Gegengambit kennen.
