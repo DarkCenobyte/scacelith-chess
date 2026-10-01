@@ -19,9 +19,13 @@
 // UTCDate and UTCTime for exports, then the file's time). Only the tags and the number of moves are
 // read (pgn::scan), and each file is read again only when its size or time changed: a folder of
 // thousands of games lists quickly from the second time on. Files that cannot be read are listed
-// with their error. Thread-safe: the cache has a lock (the library lists on a worker thread).
+// with their error. At most kMaxListed games are listed, from the most recently written files.
+// Thread-safe: the cache has a lock (the library lists on a worker thread), held only to look
+// files up and store them, never while a file is read; the cache is never destroyed, so a listing
+// still running when the program exits never touches a destroyed object.
 #pragma once
 #include "../chess/pgn.h"
+#include <atomic>
 #include <cstdint>
 #include <ctime>
 #include <string>
@@ -48,7 +52,9 @@ Mode modeFromName(const std::string& name);   // Imported for anything else
 // Nothing is saved for a game left before its first move.
 bool shouldSave(Mode mode, int coachLevel, int plies, bool finished, bool enabled);
 
-// What the scene knows of a game besides its moves (makeRecord).
+// What the scene knows of a game besides its moves (makeRecord). Termination, when not given:
+// "unterminated" for "*", else from endKey (the authority's ending of a direct match: "time
+// forfeit", "rules infraction", "abandoned"), else from the Game, else "normal".
 struct GameInfo {
     Mode mode = Mode::Play;
     std::string white, black;          // the names on the scoresheets
@@ -67,6 +73,8 @@ struct GameInfo {
     std::string opening, eco;          // Opening / ECO tags when known
     // Per ply (index = ply), -1 = unknown: the time the mover spent on the move ([%emt]) and the
     // mover's clock after it, increment included ([%clk], timed games only). Rounded to 0.1 s.
+    // A vector longer than the game (moves taken back without trimming it) cannot be matched to
+    // the plies: its times are left out rather than put on the wrong moves.
     std::vector<int64_t> elapsedMs, clockMs;
 };
 chess::pgn::Record makeRecord(const chess::Game& game, const GameInfo& info);
@@ -104,6 +112,8 @@ struct Entry {
     int64_t fileTimeMs = 0;            // last write, ms since 1970-01-01 UTC
     size_t offset = 0, length = 0;     // the game's bytes in the file
     int line = 1, column = 1;          // where it starts
+    // The tags the listing uses (the Seven Tag Roster, dates and times, Elo, time control,
+    // opening, termination and Scacelith's own), first of each name; load() gives them all.
     std::vector<chess::pgn::Tag> tags;
     int plies = 0;                     // moves of the main line (counted, not checked)
     std::string result = "*";
@@ -126,10 +136,16 @@ struct ListStats {
     int files = 0;                     // *.pgn files in the folder
     int read = 0;                      // files read this time (new or changed)
     int cached = 0;                    // files taken from the cache
+    bool truncated = false;            // more than kMaxListed games: the oldest files are left out
+    bool cancelled = false;            // stopped by 'cancel': the list is incomplete
     std::string error;                 // the folder could not be read ("" when it does not exist)
 };
+// Games listed at most (memory and the copy of each listing stay bounded whatever the folder
+// holds): the files written last come first, so the player's own new games are always in.
+constexpr int kMaxListed = 20000;
 // Every game of every *.pgn file in 'folder', newest first. A missing folder is an empty list.
-std::vector<Entry> list(const std::string& folder, ListStats* stats = nullptr);
+// 'cancel' (optional) is checked between files: set, the listing stops early (the program exits).
+std::vector<Entry> list(const std::string& folder, ListStats* stats = nullptr, const std::atomic<bool>* cancel = nullptr);
 void clearCache();                     // forget every listed file (tests)
 
 struct LoadResult {

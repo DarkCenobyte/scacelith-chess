@@ -4,6 +4,7 @@
 #include "game/game_archive.h"
 #include "net/net_sys.h"
 
+#include <atomic>
 #include <chrono>
 #include <cstdio>
 #include <ctime>
@@ -438,4 +439,137 @@ TEST(archive_lists_thousands_quickly) {
     std::fprintf(stderr, "  %d games: first listing %.1f ms, cached %.1f ms\n", n, coldMs, warmMs);
     CHECK(warmMs < 1000.0);
     CHECK(warmMs < coldMs);
+}
+
+// Times are matched to plies by index: a vector longer than the game (moves taken back in a coach
+// game and not trimmed from it) is left out rather than shifting every later time.
+TEST(archive_record_drops_times_that_do_not_fit) {
+    chess::Game g = playedGame({"e4", "e5", "Nf3"});
+    archive::GameInfo in = info(archive::Mode::Coach, "P", "Coach", 0);
+    in.coachLevel = 2;
+    in.elapsedMs = {3000, 2000, 40000, 5000};  // 2. Qh5 (40 s) taken back, then 2. Nf3 (5 s)
+    in.clockMs = {60000, 59000, 21000, 55000};
+    pgn::Record r = archive::makeRecord(g, in);
+    CHECK_EQ(int(r.plies.size()), 3);
+    for (const pgn::Ply& p : r.plies) {
+        CHECK_EQ(p.elapsedMs, int64_t(-1));
+        CHECK_EQ(p.clockMs, int64_t(-1));
+    }
+    // Vectors that fit (or are shorter: a game set up with --moves) are kept.
+    in.elapsedMs = {3000, 2000, 5000};
+    in.clockMs = {60000};
+    r = archive::makeRecord(g, in);
+    CHECK_EQ(r.plies[2].elapsedMs, int64_t(5000));
+    CHECK_EQ(r.plies[0].clockMs, int64_t(60000));
+    CHECK_EQ(r.plies[1].clockMs, int64_t(-1));
+}
+
+// A direct match ended by the authority (the local Game never ends): Termination from its end key.
+TEST(archive_termination_of_an_authority_ending) {
+    chess::Game open = playedGame({"e4", "e5"});
+    struct Case {
+        const char* key;
+        const char* termination;
+    } cases[] = {{"reason.timeout", "time forfeit"},
+                 {"reason.timeout_vs_insufficient", "time forfeit"},
+                 {"reason.illegal_moves", "rules infraction"},
+                 {"reason.online.abandonment", "abandoned"},
+                 {"reason.online.abandonment_vs_insufficient", "abandoned"},
+                 {"reason.online.both_disconnected", "abandoned"},
+                 {"reason.resignation", "normal"},
+                 {"reason.agreement", "normal"}};
+    for (const Case& c : cases) {
+        archive::GameInfo dm = info(archive::Mode::Direct, "Me", "Friend", 0);
+        dm.result = std::string(c.key).find("insufficient") != std::string::npos || std::string(c.key) == "reason.agreement" ? "1/2-1/2" : "0-1";
+        dm.endKey = c.key;
+        pgn::Record r = archive::makeRecord(open, dm);
+        CHECK_EQ(r.tag("Termination"), std::string(c.termination));
+        CHECK_EQ(r.tag("ScacelithEnd"), std::string(c.key + 7));
+    }
+    // Given, it wins; "*" is always unterminated.
+    archive::GameInfo given = info(archive::Mode::Direct, "Me", "Friend", 0);
+    given.result = "1-0";
+    given.endKey = "reason.timeout";
+    given.termination = "adjudication";
+    CHECK_EQ(archive::makeRecord(open, given).tag("Termination"), std::string("adjudication"));
+    archive::GameInfo left = info(archive::Mode::Direct, "Me", "Friend", 0);
+    left.endKey = "reason.timeout";
+    CHECK_EQ(archive::makeRecord(open, left).tag("Termination"), std::string("unterminated"));
+}
+
+// A listed entry keeps the tags the list needs, once each (a file repeating tags by the hundred
+// stays small in memory); load() still gives every tag.
+TEST(archive_listing_keeps_the_listed_tags) {
+    TempFolder tmp("tags");
+    CHECK(archive::makeFolder(tmp.path));
+    std::string text = "[Event \"E\"]\n[White \"W\"]\n[Black \"B\"]\n[Opening \"Ruy Lopez\"]\n[Link \"https://x\"]\n";
+    for (int i = 0; i < 60; ++i) text += "[White \"\"]\n[Annotator \"\"]\n";  // 125 tags: within maxTags
+    text += "\n1. e4 e5 1-0\n";
+    CHECK(writeText(tmp.file("many-tags.pgn"), text));
+    std::vector<archive::Entry> list = archive::list(tmp.path);
+    CHECK_EQ(int(list.size()), 1);
+    if (list.empty()) return;
+    const archive::Entry& e = list[0];
+    CHECK_EQ(e.tag("White"), std::string("W"));
+    CHECK_EQ(e.tag("Opening"), std::string("Ruy Lopez"));
+    CHECK(e.tag("Link").empty());
+    CHECK(e.tags.size() <= 5);
+    archive::LoadResult l = archive::load(e);
+    CHECK(l.ok);
+    CHECK_EQ(l.record.tag("Link"), std::string("https://x"));
+    CHECK_EQ(int(l.record.tags.size()), 125);
+}
+
+// A folder of more than kMaxListed games lists the files written last, up to the cap; a listing
+// can be cancelled between files and then leaves the cache as it was.
+TEST(archive_listing_cap_and_cancel) {
+    TempFolder tmp("cap");
+    CHECK(archive::makeFolder(tmp.path));
+    std::string older, newer;
+    for (int i = 0; i < 15000; ++i) older += "[Event \"Old\"]\n\n1. e4 *\n\n";
+    for (int i = 0; i < 10000; ++i) newer += "[Event \"New\"]\n\n1. d4 *\n\n";
+    CHECK(writeText(tmp.file("b-old.pgn"), older));
+    CHECK(writeText(tmp.file("a-new.pgn"), newer));  // written last (and first by name on a tie)
+    archive::ListStats st;
+    std::vector<archive::Entry> list = archive::list(tmp.path, &st);
+    CHECK(st.truncated);
+    CHECK_EQ(int(list.size()), archive::kMaxListed);
+    int fromNew = 0;
+    for (const archive::Entry& e : list) fromNew += e.file == "a-new.pgn";
+    CHECK_EQ(fromNew, 10000);
+    std::atomic<bool> cancel{true};
+    std::vector<archive::Entry> none = archive::list(tmp.path, &st, &cancel);
+    CHECK(st.cancelled);
+    CHECK(none.empty());
+    archive::list(tmp.path, &st);
+    CHECK_EQ(st.read, 0);  // the cancelled listing forgot nothing
+    CHECK_EQ(st.cached, 2);
+}
+
+// load() of a listed game reads its bytes only, not the whole file: loading the small first game
+// of a big export many times costs less than one listing of the file.
+TEST(archive_load_reads_the_game_only) {
+    TempFolder tmp("slice");
+    CHECK(archive::makeFolder(tmp.path));
+    std::string text = "[Event \"Small\"]\n[White \"A\"]\n[Black \"B\"]\n\n1. e4 e5 1-0\n\n[Event \"Big\"]\n\n1. d4 {";
+    text += std::string(size_t(12) << 20, 'x');
+    text += "} d5 *\n";
+    CHECK(writeText(tmp.file("big-export.pgn"), text));
+    auto t0 = std::chrono::steady_clock::now();
+    std::vector<archive::Entry> list = archive::list(tmp.path);
+    auto t1 = std::chrono::steady_clock::now();
+    CHECK_EQ(int(list.size()), 2);
+    const archive::Entry* small = nullptr;
+    for (const archive::Entry& e : list)
+        if (e.index == 0) small = &e;
+    if (!small) return;
+    for (int i = 0; i < 40; ++i) CHECK(archive::load(*small).ok);
+    auto t2 = std::chrono::steady_clock::now();
+    const double listMs = std::chrono::duration<double, std::milli>(t1 - t0).count();
+    const double loadMs = std::chrono::duration<double, std::milli>(t2 - t1).count();
+    std::fprintf(stderr, "  12 MB file: listing %.1f ms, 40 loads of its first game %.1f ms\n", listMs, loadMs);
+    CHECK(loadMs < listMs);
+    archive::LoadResult l = archive::load(*small);
+    CHECK_EQ(l.record.tag("Event"), std::string("Small"));
+    CHECK_EQ(int(l.record.plies.size()), 2);
 }

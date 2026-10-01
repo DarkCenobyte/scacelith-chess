@@ -9,9 +9,12 @@
 #include <cstdio>
 #include <cstring>
 #include <map>
+#include <memory>
 #include <mutex>
+#include <set>
 
 #ifdef _WIN32
+#include <io.h>
 #include <windows.h>
 #else
 #include <cerrno>
@@ -98,7 +101,9 @@ bool dirExists(const std::string& path) {
     DWORD a = GetFileAttributesW(widen(path).c_str());
     return a != INVALID_FILE_ATTRIBUTES && (a & FILE_ATTRIBUTE_DIRECTORY);
 }
-bool flushToDisk(FILE* f) { return fflush(f) == 0; }
+// fflush only hands the data to the system: _commit (FlushFileBuffers) puts it on the disk before
+// the rename makes it the game's file, so a power cut never leaves an empty file under that name.
+bool flushToDisk(FILE* f) { return fflush(f) == 0 && _commit(_fileno(f)) == 0; }
 Place placeNew(const std::string& tmp, const std::string& dst, std::string& err) {
     // Without MOVEFILE_REPLACE_EXISTING the move fails when the name is taken: never a replacement.
     if (MoveFileExW(widen(tmp).c_str(), widen(dst).c_str(), MOVEFILE_WRITE_THROUGH)) return Place::Ok;
@@ -206,6 +211,21 @@ bool readWhole(const std::string& path, std::string& out, size_t maxBytes, std::
     return ok;
 }
 
+// 'length' bytes of the file from 'offset' (one game of a listed file).
+bool readSlice(const std::string& path, size_t offset, size_t length, std::string& out, std::string& err) {
+    FILE* f = openFile(path, "r");
+    if (!f) {
+        err = "cannot open the file";
+        return false;
+    }
+    out.assign(length, '\0');
+    // Offsets stay under pgn::Limits::maxBytes (32 MB): a long is wide enough everywhere.
+    const bool ok = std::fseek(f, long(offset), SEEK_SET) == 0 && (length == 0 || fread(&out[0], 1, length, f) == length);
+    fclose(f);
+    if (!ok) err = "cannot read the file";
+    return ok;
+}
+
 bool hasPgnExtension(const std::string& name) {
     if (name.size() < 5) return false;
     std::string ext = name.substr(name.size() - 4);
@@ -265,8 +285,27 @@ struct CachedFile {
     int64_t timeMs = 0;
     std::vector<Entry> games;
 };
-std::mutex g_cacheLock;
-std::map<std::string, CachedFile> g_cache;  // by path
+struct Cache {
+    std::mutex lock;
+    std::map<std::string, std::shared_ptr<const CachedFile>> files;  // by path
+};
+// Never destroyed: the library's listing worker can still be inside list() while the program's
+// static objects are destroyed at exit.
+Cache& cache() {
+    static Cache* c = new Cache();
+    return *c;
+}
+
+// The tags an Entry keeps (what the listing shows and sorts by); the others come with load().
+bool listedTag(const std::string& name) {
+    static const char* const names[] = {"Event",       "Site",     "Date",     "Round",       "White",     "Black",
+                                        "Result",      "UTCDate",  "UTCTime",  "Time",        "WhiteElo",  "BlackElo",
+                                        "TimeControl", "ECO",      "Opening",  "Variation",   "Termination", "ScacelithMode",
+                                        "CoachLevel",  "ScacelithEnd"};
+    for (const char* n : names)
+        if (name == n) return true;
+    return false;
+}
 
 // The entries of one file, read and scanned.
 std::vector<Entry> scanFile(const std::string& folder, const FileInfo& info) {
@@ -276,7 +315,8 @@ std::vector<Entry> scanFile(const std::string& folder, const FileInfo& info) {
     base.file = info.name;
     base.fileSize = info.size;
     base.fileTimeMs = info.timeMs;
-    const chess::pgn::Limits limits;
+    chess::pgn::Limits limits;
+    limits.summaryTag = &listedTag;
     std::string text, err;
     if (info.size > limits.maxBytes) {
         err = "the file is too large (more than " + std::to_string(limits.maxBytes >> 20) + " MB)";
@@ -294,7 +334,8 @@ std::vector<Entry> scanFile(const std::string& folder, const FileInfo& info) {
             e.length = s.length;
             e.line = s.line;
             e.column = s.column;
-            e.tags = s.tags;
+            for (const Tag& t : s.tags)  // without the reader's own Variant, SetUp and FEN
+                if (listedTag(t.name)) e.tags.push_back(t);
             e.plies = s.plies;
             e.result = s.result;
             e.mode = modeFromName(s.tag("ScacelithMode"));
@@ -331,6 +372,20 @@ bool newerFirst(const Entry& a, const Entry& b) {
 }
 
 int64_t roundTenth(int64_t ms) { return ms < 0 ? -1 : (ms + 50) / 100 * 100; }
+
+// The PGN Termination of an ending given by its i18n key (a direct match ended by the authority,
+// whose local Game never ends).
+const char* terminationOfKey(const std::string& key) {
+    if (key == "reason.timeout" || key == "reason.timeout_vs_insufficient") return "time forfeit";
+    if (key == "reason.illegal_moves" || key == "reason.illegal_vs_insufficient" || key == "reason.online.forfeit")
+        return "rules infraction";
+    const std::string abandonment = "reason.online.abandonment";  // and its "_vs_insufficient" draw
+    if (key.compare(0, abandonment.size(), abandonment) == 0 || key == "reason.online.no_show" ||
+        key == "reason.online.both_disconnected")
+        return "abandoned";
+    if (key == "reason.online.aborted" || key == "reason.online.server_aborted") return "unterminated";
+    return "normal";
+}
 
 }  // namespace
 
@@ -393,9 +448,10 @@ Record makeRecord(const chess::Game& game, const GameInfo& info) {
     r.setTag("TimeControl", info.timeControl.empty() ? std::string("?") : info.timeControl);
     std::string termination = info.termination;
     if (termination.empty()) {
-        termination = r.result == "*" ? "unterminated"
-                      : game.isOver() ? chess::pgn::terminationValue(game.status(), game.endReason())
-                                      : "normal";
+        termination = r.result == "*"          ? "unterminated"
+                      : !info.endKey.empty()   ? terminationOfKey(info.endKey)
+                      : game.isOver()          ? chess::pgn::terminationValue(game.status(), game.endReason())
+                                               : "normal";
     }
     r.setTag("Termination", termination);
     if (!info.eco.empty()) r.setTag("ECO", info.eco);
@@ -409,9 +465,14 @@ Record makeRecord(const chess::Game& game, const GameInfo& info) {
     if (end.empty() && game.isOver()) end = chess::endReasonKey(game.endReason());
     if (end.compare(0, 7, "reason.") == 0) end = end.substr(7);
     if (!end.empty() && r.result != "*") r.setTag("ScacelithEnd", end);
+    // Times are matched to plies by index: a vector longer than the game (moves taken back and
+    // not trimmed from it) would put the times of undone moves on the moves played instead.
+    const bool elapsedFit = info.elapsedMs.size() <= r.plies.size(), clockFit = info.clockMs.size() <= r.plies.size();
+    if (!elapsedFit || !clockFit)
+        LOGW("archive: %zu/%zu move times for %zu plies: left out", info.elapsedMs.size(), info.clockMs.size(), r.plies.size());
     for (size_t i = 0; i < r.plies.size(); ++i) {
-        if (i < info.elapsedMs.size()) r.plies[i].elapsedMs = roundTenth(info.elapsedMs[i]);
-        if (i < info.clockMs.size()) r.plies[i].clockMs = roundTenth(info.clockMs[i]);
+        if (elapsedFit && i < info.elapsedMs.size()) r.plies[i].elapsedMs = roundTenth(info.elapsedMs[i]);
+        if (clockFit && i < info.clockMs.size()) r.plies[i].clockMs = roundTenth(info.clockMs[i]);
     }
     return r;
 }
@@ -556,50 +617,85 @@ int Entry::coachLevel() const {
     return std::stoi(v);
 }
 
-std::vector<Entry> list(const std::string& folder, ListStats* stats) {
+std::vector<Entry> list(const std::string& folder, ListStats* stats, const std::atomic<bool>* cancel) {
     ListStats st;
     std::vector<FileInfo> files;
     const int r = listFolder(folder, files, st.error);
-    std::vector<Entry> out;
-    std::lock_guard<std::mutex> lock(g_cacheLock);
-    std::map<std::string, bool> seen;
+    files.erase(std::remove_if(files.begin(), files.end(), [](const FileInfo& f) { return !hasPgnExtension(f.name) || f.name[0] == '.'; }),
+                files.end());
+    st.files = int(files.size());
+    // The files written last first: when the folder holds more than kMaxListed games, the oldest
+    // files are the ones left out.
+    std::sort(files.begin(), files.end(), [](const FileInfo& a, const FileInfo& b) {
+        return a.timeMs != b.timeMs ? a.timeMs > b.timeMs : a.name < b.name;
+    });
+    Cache& c = cache();
+    std::vector<std::shared_ptr<const CachedFile>> parts;
+    std::set<std::string> seen;
+    size_t total = 0;
     for (const FileInfo& f : files) {
-        if (!hasPgnExtension(f.name) || f.name[0] == '.') continue;
-        ++st.files;
+        if (cancel && cancel->load()) {
+            st.cancelled = true;
+            break;
+        }
+        if (total >= size_t(kMaxListed)) {
+            st.truncated = true;
+            break;
+        }
         const std::string path = joinPath(folder, f.name);
-        seen[path] = true;
-        auto it = g_cache.find(path);
-        if (it != g_cache.end() && it->second.size == f.size && it->second.timeMs == f.timeMs) {
+        seen.insert(path);
+        std::shared_ptr<const CachedFile> part;
+        {
+            std::lock_guard<std::mutex> lock(c.lock);
+            auto it = c.files.find(path);
+            if (it != c.files.end() && it->second->size == f.size && it->second->timeMs == f.timeMs) part = it->second;
+        }
+        if (part) {
             ++st.cached;
         } else {
-            CachedFile c;
-            c.size = f.size;
-            c.timeMs = f.timeMs;
-            c.games = scanFile(folder, f);
-            g_cache[path] = std::move(c);
-            it = g_cache.find(path);
+            // Read and scanned without the lock: a slow file never holds up remove() on the UI thread.
+            auto fresh = std::make_shared<CachedFile>();
+            fresh->size = f.size;
+            fresh->timeMs = f.timeMs;
+            fresh->games = scanFile(folder, f);
+            part = fresh;
+            std::lock_guard<std::mutex> lock(c.lock);
+            c.files[path] = part;
             ++st.read;
         }
-        out.insert(out.end(), it->second.games.begin(), it->second.games.end());
+        total += part->games.size();
+        parts.push_back(std::move(part));
     }
-    // Files of this folder that are gone.
-    const std::string prefix = joinPath(folder, "");
-    for (auto it = g_cache.begin(); it != g_cache.end();) {
-        if (r != 2 && it->first.compare(0, prefix.size(), prefix) == 0 && !seen.count(it->first) &&
-            it->first.find_first_of("/\\", prefix.size()) == std::string::npos)
-            it = g_cache.erase(it);
-        else
-            ++it;
+    if (!st.cancelled) {
+        // Files of this folder that are gone (or left out): forgotten.
+        const std::string prefix = joinPath(folder, "");
+        std::lock_guard<std::mutex> lock(c.lock);
+        for (auto it = c.files.begin(); it != c.files.end();) {
+            if (r != 2 && it->first.compare(0, prefix.size(), prefix) == 0 && !seen.count(it->first) &&
+                it->first.find_first_of("/\\", prefix.size()) == std::string::npos)
+                it = c.files.erase(it);
+            else
+                ++it;
+        }
+    }
+    std::vector<Entry> out;
+    out.reserve(std::min(total, size_t(kMaxListed)));
+    for (const auto& part : parts) {
+        const size_t room = size_t(kMaxListed) - out.size();
+        if (part->games.size() > room) st.truncated = true;
+        out.insert(out.end(), part->games.begin(), part->games.begin() + long(std::min(room, part->games.size())));
     }
     std::stable_sort(out.begin(), out.end(), newerFirst);
     if (r == 2) LOGW("archive: %s: %s", folder.c_str(), st.error.c_str());
+    if (st.truncated) LOGW("archive: %s holds more than %d games: the oldest files are not listed", folder.c_str(), kMaxListed);
     if (stats) *stats = st;
     return out;
 }
 
 void clearCache() {
-    std::lock_guard<std::mutex> lock(g_cacheLock);
-    g_cache.clear();
+    Cache& c = cache();
+    std::lock_guard<std::mutex> lock(c.lock);
+    c.files.clear();
 }
 
 namespace {
@@ -612,19 +708,26 @@ LoadResult loadGame(const std::string& path, int index, const Entry* listed) {
     }
     const chess::pgn::Limits limits;
     std::string text, err;
-    if (!readWhole(path, text, limits.maxBytes, err)) {
-        res.error = err;
-        return res;
-    }
-    size_t offset = 0, length = text.size();
+    size_t offset = 0, length = 0;
     chess::pgn::Origin origin;
-    if (listed && listed->fileSize == now.size && listed->fileTimeMs == now.timeMs && listed->offset + listed->length <= text.size()) {
-        offset = listed->offset;
-        length = listed->length;
+    if (listed && listed->fileSize == now.size && listed->fileTimeMs == now.timeMs && listed->offset + listed->length <= now.size) {
+        // The file as listed: only the game's bytes are read (the library loads a game per
+        // selection and per row of a big export).
+        if (!readSlice(path, listed->offset, listed->length, text, err)) {
+            res.error = err;
+            return res;
+        }
+        length = text.size();
         origin = chess::pgn::Origin{listed->line, listed->column};
     } else {
-        // Unknown or changed file: find the game by its index.
-        chess::pgn::Result<chess::pgn::Summary> sc = chess::pgn::scan(text, limits);
+        if (!readWhole(path, text, limits.maxBytes, err)) {
+            res.error = err;
+            return res;
+        }
+        // Unknown or changed file: find the game by its index (only its place is needed).
+        chess::pgn::Limits placesOnly = limits;
+        placesOnly.summaryTag = [](const std::string&) { return false; };
+        chess::pgn::Result<chess::pgn::Summary> sc = chess::pgn::scan(text, placesOnly);
         if (!sc.error.empty()) {
             res.error = sc.error;
             return res;
@@ -638,7 +741,8 @@ LoadResult loadGame(const std::string& path, int index, const Entry* listed) {
         length = s.length;
         origin = chess::pgn::Origin{s.line, s.column};
     }
-    chess::pgn::Result<chess::pgn::ParsedGame> rd = chess::pgn::read(text.substr(offset, length), limits, origin);
+    chess::pgn::Result<chess::pgn::ParsedGame> rd =
+        chess::pgn::read(offset == 0 && length == text.size() ? text : text.substr(offset, length), limits, origin);
     if (rd.games.empty()) {
         res.error = rd.error.empty() ? std::string("no game found") : rd.error;
         return res;
@@ -690,8 +794,9 @@ RemoveResult remove(const Entry& entry) {
         return res;
     }
     {
-        std::lock_guard<std::mutex> lock(g_cacheLock);
-        g_cache.erase(entry.path);
+        Cache& c = cache();
+        std::lock_guard<std::mutex> lock(c.lock);
+        c.files.erase(entry.path);
     }
     LOGI("archive: %s deleted", entry.path.c_str());
     res.status = RemoveStatus::Removed;

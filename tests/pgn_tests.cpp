@@ -645,6 +645,36 @@ TEST(pgn_stray_bracket_and_cr_line_ends) {
     if (open.games.size() == 2) CHECK(open.games[1].ok());
 }
 
+// A scan can keep only some tags (the archive's listing): each name once, the reader's own tags
+// too, every tag still counted against maxTags, and the games found at the same places.
+TEST(pgn_scan_tag_filter) {
+    std::string text = "[Event \"E\"]\n[White \"W\"]\n[FEN \"8/8/8/4k3/8/8/4P3/4K3 w - - 0 1\"]\n";
+    for (int i = 0; i < 50; ++i) text += "[White \"again\"]\n[Junk \"x\"]\n";
+    text += "\n1. e4 *\n\n";
+    std::string tooMany = "[White \"A\"]\n";
+    for (int i = 0; i < 200; ++i) tooMany += "[Junk \"x\"]\n";
+    tooMany += "\n1. d4 *\n";
+    pgn::Limits lim;
+    lim.summaryTag = [](const std::string& n) { return n == "White" || n == "Event"; };
+    auto sc = pgn::scan(text + tooMany, lim);
+    auto full = pgn::scan(text + tooMany);
+    CHECK_EQ(int(sc.games.size()), 2);
+    CHECK_EQ(int(full.games.size()), 2);
+    if (sc.games.size() != 2 || full.games.size() != 2) return;
+    const pgn::Summary& s = sc.games[0];
+    CHECK_EQ(int(s.tags.size()), 3);  // Event, White (the first one), FEN
+    CHECK_EQ(s.tag("White"), std::string("W"));
+    CHECK(s.tag("Junk").empty());
+    CHECK(s.error.empty());
+    CHECK_EQ(int(full.games[0].tags.size()), 103);
+    CHECK(!sc.games[1].error.empty());  // too many tags, filtered or not
+    CHECK_EQ(sc.games[1].error.message, full.games[1].error.message);
+    for (size_t i = 0; i < 2; ++i) {
+        CHECK_EQ(sc.games[i].offset, full.games[i].offset);
+        CHECK_EQ(sc.games[i].length, full.games[i].length);
+    }
+}
+
 // Mutated real files (bytes replaced, inserted, deleted, cut): the reader never crashes, and the
 // scan of the listing finds the same games, at the same places, as the full read.
 TEST(pgn_mutations_never_crash_and_scan_agrees) {

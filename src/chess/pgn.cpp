@@ -448,7 +448,7 @@ private:
         g.column = t.column;
         std::vector<TagPos> tagPos;
         bool started = false, skipping = false, setUp = false, any = false;
-        int depth = 0;
+        int depth = 0, tagCount = 0;
         Position pos;
         Token last = t;
         auto fail = [&](int line, int column, const std::string& why) {
@@ -482,11 +482,14 @@ private:
             case Tok::TagPair:
                 if (started) return finish(g, any);  // the next game (this one had no result)
                 any = true;
-                if (int(g.record.tags.size()) >= lim_.maxTags) {
+                if (tagCount >= lim_.maxTags) {
                     failAt(t, "too many tags");
                 } else {
-                    g.record.tags.push_back(Tag{t.text, t.value});
-                    tagPos.push_back(TagPos{t.line, t.column});
+                    ++tagCount;
+                    if (keepTag(g.record, t.text)) {
+                        g.record.tags.push_back(Tag{t.text, t.value});
+                        tagPos.push_back(TagPos{t.line, t.column});
+                    }
                 }
                 break;
             case Tok::Bad:
@@ -562,6 +565,13 @@ private:
             last = t;
             t = lex_.next();
         }
+    }
+
+    // Whether a tag goes in the record: always when reading; in a scan, the Summary's filter.
+    bool keepTag(const Record& r, const std::string& name) const {
+        if (validate_ || !lim_.summaryTag) return true;
+        if (r.findTag(name)) return false;
+        return name == "Variant" || name == "SetUp" || name == "FEN" || name == "Result" || lim_.summaryTag(name);
     }
 
     bool finish(Parsed& g, bool any) {

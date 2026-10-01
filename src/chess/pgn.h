@@ -39,6 +39,10 @@ struct Limits {
     size_t maxTagValue = 2048;            // bytes
     int maxDepth = 64;                    // nesting of variations
     size_t maxComment = 8192;             // bytes of comment text kept per ply (the rest is cut)
+    // scan() only: when set, a Summary keeps the tags it accepts, each name once (the reader's own
+    // Variant, SetUp, FEN and Result too), so that a file repeating tags by the hundred stays small
+    // in memory. Every tag still counts in maxTags.
+    bool (*summaryTag)(const std::string& name) = nullptr;
 };
 
 struct Tag {
