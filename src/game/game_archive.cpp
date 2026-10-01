@@ -469,7 +469,7 @@ Record makeRecord(const chess::Game& game, const GameInfo& info) {
     // not trimmed from it) would put the times of undone moves on the moves played instead.
     const bool elapsedFit = info.elapsedMs.size() <= r.plies.size(), clockFit = info.clockMs.size() <= r.plies.size();
     if (!elapsedFit || !clockFit)
-        LOGW("archive: %zu/%zu move times for %zu plies: left out", info.elapsedMs.size(), info.clockMs.size(), r.plies.size());
+        LOGW("archive: %d/%d move times for %d plies: left out", int(info.elapsedMs.size()), int(info.clockMs.size()), int(r.plies.size()));
     for (size_t i = 0; i < r.plies.size(); ++i) {
         if (elapsedFit && i < info.elapsedMs.size()) r.plies[i].elapsedMs = roundTenth(info.elapsedMs[i]);
         if (clockFit && i < info.clockMs.size()) r.plies[i].clockMs = roundTenth(info.clockMs[i]);

@@ -593,7 +593,7 @@ TEST(pgn_quotes_in_tag_values_take_linear_time) {
     auto t0 = std::chrono::steady_clock::now();
     auto sc = pgn::scan(big);
     const double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
-    std::fprintf(stderr, "  %zu bytes of quotes scanned in %.1f ms\n", big.size(), ms);
+    std::fprintf(stderr, "  %d bytes of quotes scanned in %.1f ms\n", int(big.size()), ms);
     CHECK(ms < 1000.0);
     CHECK_EQ(int(sc.games.size()), 2);
     if (sc.games.size() == 2) {
