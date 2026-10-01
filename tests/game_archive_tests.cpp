@@ -23,6 +23,32 @@ namespace pgn = chess::pgn;
 
 namespace {
 
+#ifdef _WIN32
+// The archive's paths are UTF-8: the helpers use the wide API too (the ANSI one fails on "Élodie").
+std::wstring wide(const std::string& s) {
+    int n = MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, nullptr, 0);
+    std::wstring w(size_t(n > 0 ? n : 1), L'\0');
+    if (n > 0) MultiByteToWideChar(CP_UTF8, 0, s.c_str(), -1, &w[0], n);
+    w.resize(w.size() - 1);
+    return w;
+}
+std::string utf8(const wchar_t* w) {
+    int n = WideCharToMultiByte(CP_UTF8, 0, w, -1, nullptr, 0, nullptr, nullptr);
+    std::string s(size_t(n > 0 ? n : 1), '\0');
+    if (n > 0) WideCharToMultiByte(CP_UTF8, 0, w, -1, &s[0], n, nullptr, nullptr);
+    s.resize(s.size() - 1);
+    return s;
+}
+#endif
+
+FILE* openUtf8(const std::string& path, const char* mode) {
+#ifdef _WIN32
+    return _wfopen(wide(path).c_str(), mode[0] == 'r' ? L"rb" : L"wb");
+#else
+    return std::fopen(path.c_str(), mode);
+#endif
+}
+
 // A fresh folder beside the test executable, removed by the destructor.
 struct TempFolder {
     std::string path;
@@ -44,22 +70,28 @@ struct TempFolder {
             if (!removeFile(p)) wipe(p);
         }
 #ifdef _WIN32
-        RemoveDirectoryA(dir.c_str());
+        RemoveDirectoryW(wide(dir).c_str());
 #else
         rmdir(dir.c_str());
 #endif
     }
-    static bool removeFile(const std::string& p) { return std::remove(p.c_str()) == 0; }
+    static bool removeFile(const std::string& p) {
+#ifdef _WIN32
+        return DeleteFileW(wide(p).c_str()) != 0;
+#else
+        return std::remove(p.c_str()) == 0;
+#endif
+    }
     static std::vector<std::string> names(const std::string& dir) {
         std::vector<std::string> out;
 #ifdef _WIN32
-        WIN32_FIND_DATAA fd;
-        HANDLE h = FindFirstFileA((dir + "\\*").c_str(), &fd);
+        WIN32_FIND_DATAW fd;
+        HANDLE h = FindFirstFileW(wide(dir + "\\*").c_str(), &fd);
         if (h == INVALID_HANDLE_VALUE) return out;
         do {
-            std::string n = fd.cFileName;
+            std::string n = utf8(fd.cFileName);
             if (n != "." && n != "..") out.push_back(n);
-        } while (FindNextFileA(h, &fd));
+        } while (FindNextFileW(h, &fd));
         FindClose(h);
 #else
         DIR* d = opendir(dir.c_str());
@@ -75,7 +107,7 @@ struct TempFolder {
 };
 
 bool writeText(const std::string& path, const std::string& text) {
-    FILE* f = std::fopen(path.c_str(), "wb");
+    FILE* f = openUtf8(path, "wb");
     if (!f) return false;
     bool ok = std::fwrite(text.data(), 1, text.size(), f) == text.size();
     return std::fclose(f) == 0 && ok;
@@ -83,7 +115,7 @@ bool writeText(const std::string& path, const std::string& text) {
 
 std::string readText(const std::string& path) {
     std::string out;
-    FILE* f = std::fopen(path.c_str(), "rb");
+    FILE* f = openUtf8(path, "rb");
     if (!f) return out;
     char buf[4096];
     size_t n;
