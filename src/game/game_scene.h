@@ -428,9 +428,6 @@ private:
     // A record that starts with Black to move (a FEN game, "40... Kd7"): 1, its moves go one ply
     // further on the sheets and in the move list, after White's cell left with "..."; else 0.
     int replaySheetOffset() const;
-    // The record's number of the move 'plies' plies in (its start position's move number on): the
-    // move of the last ply played, the first move's for 0.
-    int replayMoveNumber(int plies) const;
     void updateReplayInput();
     bool replayKey(const std::string& key);   // "K", "J", "L", "Shift+J", "Shift+L", "Home", "End"
     void drawReplayBar();                     // the replay's buttons, speed and move counter

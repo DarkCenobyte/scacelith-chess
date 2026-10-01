@@ -227,5 +227,17 @@ std::string endReasonKey(const chess::pgn::Record& record) {
     return std::string();
 }
 
+// ---- Move numbers ----------------------------------------------------------------------------------
+
+int moveNumberAfter(const chess::Position& start, int plies) {
+    const int blackFirst = start.sideToMove() == chess::Black ? 1 : 0;
+    return std::max(1, start.fullmoveNumber()) + std::max(0, plies + blackFirst - 1) / 2;
+}
+
+int sheetRowsAfter(const chess::Position& start, int plies) {
+    const int blackFirst = start.sideToMove() == chess::Black ? 1 : 0;
+    return plies > 0 ? (plies + blackFirst + 1) / 2 : 0;
+}
+
 }  // namespace replay
 }  // namespace game

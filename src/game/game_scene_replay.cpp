@@ -268,10 +268,6 @@ int GameScene::replaySheetOffset() const {
     return game_.startPosition().sideToMove() == Black ? 1 : 0;
 }
 
-int GameScene::replayMoveNumber(int plies) const {
-    return std::max(1, game_.startPosition().fullmoveNumber()) + std::max(0, plies + replaySheetOffset() - 1) / 2;
-}
-
 void GameScene::endReplay() {
     if (state_ != State::Playing) return;
     endGame();  // the record's result (endGame's replay branch); nothing rated, nothing saved
@@ -281,7 +277,7 @@ ui::GameOverExtras GameScene::replayGameOverExtras() const {
     ui::GameOverExtras x;
     const std::string& r = replayRecord_.result;
     // The move as the record numbers it (a FEN game may start at move 40).
-    std::string moveNo = std::to_string(replayMoveNumber(int(game_.moves().size())));
+    std::string moveNo = std::to_string(replay::moveNumberAfter(game_.startPosition(), int(game_.moves().size())));
     if (r == "1-0") x.line = i18n::trf("viewer.gameover.white_wins", {moveNo});
     else if (r == "0-1") x.line = i18n::trf("viewer.gameover.black_wins", {moveNo});
     else if (r == "1/2-1/2") x.line = i18n::trf("viewer.gameover.draw", {moveNo});
@@ -329,9 +325,8 @@ void GameScene::drawReplayBar() {
     const int ply = replayClock_.ply(), plies = replayClock_.plies();
     // Full moves: White's 12th and Black's 12th are both move 12. Counted from the record's first
     // move, as the rows of the sheets (a FEN game from "40... Kd7" to "43. Ke3": 4 moves).
-    const int off = replaySheetOffset();
-    b.move = ply > 0 ? (ply + off + 1) / 2 : 0;
-    b.moves = plies > 0 ? (plies + off + 1) / 2 : 0;
+    b.move = replay::sheetRowsAfter(game_.startPosition(), ply);
+    b.moves = replay::sheetRowsAfter(game_.startPosition(), plies);
     replay::Speed sp = replayClock_.speed();
     b.speed = sp == replay::Speed::Instant ? std::string(i18n::tr("replay.speed.instant"))
                                            : i18n::trf("replay.speed.factor", {std::to_string(int(replay::speedFactor(sp)))});

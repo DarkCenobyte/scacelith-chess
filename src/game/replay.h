@@ -149,5 +149,12 @@ private:
 // stalemate, dead position), else a Termination "time forfeit".
 std::string endReasonKey(const chess::pgn::Record& record);
 
+// Move numbers of a record whose start position may come from a FEN ("40... Kd7"): the record's
+// number of the move of the last of 'plies' plies played (the first move's for 0), and the rows
+// those plies fill on a scoresheet numbered from 1, where a first move by Black goes in Black's
+// column of the first row (0 for no ply).
+int moveNumberAfter(const chess::Position& start, int plies);
+int sheetRowsAfter(const chess::Position& start, int plies);
+
 }  // namespace replay
 }  // namespace game
