@@ -1,6 +1,7 @@
 // OnlineClient: two network threads behind a command/event interface.
 //
-//   net-http  HTTPS API calls (account, login, SSO polling, proof of work), one at a time.
+//   net-http  HTTPS API calls (account, login, SSO polling, proof of work, the account API:
+//             history, game details and PGN, devices, e-mail, export, deletion), one at a time.
 //   net-rt    the realtime WebSocket: connection, Hello/Welcome, heartbeats, reconnection with
 //             backoff, decoding of the server's messages into Events and the OnlineGame copy.
 //
@@ -1979,8 +1980,8 @@ void OnlineClient::downloadPgn(uint64_t gameId) {
         call.accept = "application/x-chess-pgn";
         Impl::Api a = d->request(e, "GET", "/games/" + std::to_string(gameId) + "/pgn", nullptr, call, d->httpCancel);
         finish(ev, a, [&] { return looksLikePgn(a.text); });
-        if (ev.ok) ev.text = a.text;
-        d->post(ev);
+        if (ev.ok) ev.text = std::move(a.text);
+        d->post(std::move(ev));
     });
 }
 
@@ -2081,8 +2082,8 @@ void OnlineClient::exportAccount(const std::string& password, const std::string&
         Event ev;
         ev.kind = Event::Kind::AccountExportResult;
         finish(ev, a, [&] { return validExport(a.text); });
-        if (ev.ok) ev.text = a.text;
-        d->post(ev);
+        if (ev.ok) ev.text = std::move(a.text);   // up to 64 MiB: moved, never copied
+        d->post(std::move(ev));
     });
 }
 
