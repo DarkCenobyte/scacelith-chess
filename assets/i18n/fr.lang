@@ -1159,10 +1159,10 @@ replay.tip.end = Fin de la partie (Fin)
 # ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
 #      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
 gif.save = Enregistrer en GIF
-gif.making = Création du GIF : le serveur dessine la partie…
-gif.saved = Le GIF a été enregistré :
-gif.saved_as = GIF enregistré : {0}
-gif.sign_in_first = Connectez-vous à un serveur en ligne pour créer des GIF : c’est le serveur qui les dessine.
+gif.making = Création du GIF : le serveur dessine la partie…
+gif.saved = Le GIF a été enregistré :
+gif.saved_as = GIF enregistré : {0}
+gif.sign_in_first = Connectez-vous à un serveur en ligne pour créer des GIF : c’est le serveur qui les dessine.
 gif.busy_other = Un autre GIF est en cours de création. Veuillez patienter jusqu’à ce qu’il soit prêt.
 gif.err.rate_limited_for = Vous avez créé de nombreux GIF en peu de temps. Vous pourrez créer le suivant dans {0}.
 gif.err.rate_limited = Vous avez créé de nombreux GIF en peu de temps. Veuillez réessayer plus tard.

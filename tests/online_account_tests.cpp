@@ -425,6 +425,16 @@ TEST(account_gif_file_names) {
     CHECK_EQ(pgnLocalTime("", "", 77), std::time_t(77));
     CHECK_EQ(gifFileName(pgnLocalTime("2026.09.27", "21:47:05", 0), "Magnus_T", "bob", 812),
              std::string("2026-09-27_214705_Magnus_T-vs-bob_812.gif"));
+
+    // The local Time first, else the server's UTC tags, else the local Date at midnight.
+    CHECK_EQ(pgnGameStart("2026.09.27", "21:47:05", "2026.09.27", "19:47:05", 77), when);
+    CHECK_EQ(pgnGameStart("2026.09.27", "", "2026.09.27", "21:47:12", 77), std::time_t(1790545632));
+    CHECK_EQ(pgnGameStart("2026.09.27", "??:??:??", "2000.02.29", "00:00:00", 77), std::time_t(951782400));
+    CHECK_EQ(pgnGameStart("????.??.??", "", "1970.01.01", "00:00:01", 77), std::time_t(1));
+    CHECK_EQ(pgnGameStart("2026.09.27", "", "2026.09.27", "21:47", 77), localTime(2026, 9, 27, 0, 0, 0));
+    CHECK_EQ(pgnGameStart("2026.09.27", "", "", "", 77), localTime(2026, 9, 27, 0, 0, 0));
+    CHECK_EQ(pgnGameStart("", "", "2026.13.27", "21:47:12", 77), std::time_t(77));
+    CHECK_EQ(pgnGameStart("", "", "", "", 77), std::time_t(77));
 }
 
 TEST(account_gif_wait_in_words) {

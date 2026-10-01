@@ -109,6 +109,11 @@ std::string gifFileName(std::time_t started, const std::string& white, const std
 // The local time of a PGN's Date ("2026.09.27") and Time ("21:47:05", "21:47") tags, the time
 // taken as midnight when it is missing; 'fallback' when the date is not a whole one ("2026.??.??").
 std::time_t pgnLocalTime(const std::string& date, const std::string& time, std::time_t fallback);
+// The start of a saved game: its local Date and Time tags when it has a Time, else its UTCDate
+// and UTCTime (a server's PGN as the server writes it: "2026.09.27", "21:47:12"), else the local
+// Date at midnight, else 'fallback'.
+std::time_t pgnGameStart(const std::string& date, const std::string& time, const std::string& utcDate, const std::string& utcTime,
+                         std::time_t fallback);
 // A wait in words in the interface language (i18n "gif.wait.*"): "45 seconds", "2 minutes and
 // 30 seconds", "13 minutes" (whole minutes, rounded up, from 5 minutes on); at least 1 second.
 std::string waitText(int seconds);

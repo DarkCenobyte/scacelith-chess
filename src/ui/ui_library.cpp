@@ -683,7 +683,8 @@ std::string gifOrientation(const chess::pgn::Record& r) {
 }
 
 std::string gifFileOf(const archive::Entry& e, const chess::pgn::Record& r) {
-    const std::time_t when = game::pgnLocalTime(r.tag("Date"), r.tag("Time"), std::time_t(e.fileTimeMs / 1000));
+    const std::time_t when =
+        game::pgnGameStart(r.tag("Date"), r.tag("Time"), r.tag("UTCDate"), r.tag("UTCTime"), std::time_t(e.fileTimeMs / 1000));
     const uint64_t id = std::strtoull(r.tag("ScacelithGameId").c_str(), nullptr, 10);
     return game::gifFileName(when, r.tag("White"), r.tag("Black"), id);
 }

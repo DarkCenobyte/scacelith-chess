@@ -663,13 +663,15 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         }
         y += 82.0f;
         // Actions: Save game and Save as GIF side by side (the GIF alone without saved games), Replay,
-        // Report opponent; the spinner of a save on the start side of its button, the GIF's on the end.
+        // Report opponent; the spinner of a save on the start side of its button, the GIF's on the end
+        // (when the line under the buttons tells of the save rather than of the GIF).
         const float bh = 52.0f, bstep = 62.0f, bgap = 16.0f;
         const bool hasMoves = !g.moves.empty();
         const bool working = s.save == Save::Checking || s.save == Save::Downloading || s.save == Save::Writing;
         const game::GifSaver& gif = se.gif();
         const std::string owner = gifOwner(g);
         const bool gifMine = gif.owner() == owner;
+        const bool gifBelow = s.gifLast && gifMine && gif.stage() != game::GifSaver::Stage::Idle;
         const float halfW = std::floor((leftW - bgap) * 0.5f);
         const Rect gb = canSave ? im::flip(lcol, Rect(lx + halfW + bgap, y, leftW - halfW - bgap, bh)) : Rect(lx, y, leftW, bh);
         if (canSave) {
@@ -682,7 +684,7 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         if (!se.signedIn()) im::disabledButton(L("gif.save"), gb, im::ButtonKind::Secondary, T("gif.err.signed_out"));
         else if (gif.busy() && !gifMine) im::disabledButton(L("gif.save"), gb, im::ButtonKind::Secondary, T("gif.busy_other"));
         else gifPressed = im::button(L("gif.save"), gb, im::ButtonKind::Secondary, !gif.busy());
-        if (gif.busy() && gifMine) spinner(vec2(im::flipX(lcol, lx + leftW + 34.0f), gb.cy()), 10.0f);
+        if (gif.busy() && gifMine && !gifBelow) spinner(vec2(im::flipX(lcol, lx + leftW + 22.0f), gb.cy()), 10.0f);
         y += bstep;
         if (canSave) {
             Rect rb(lx, y, leftW, bh);
@@ -695,7 +697,7 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
             report = im::button(L("online.report.button"), Rect(lx, y, leftW, bh), im::ButtonKind::Quiet);
             y += bstep;
         }
-        if (s.gifLast && gifMine && gif.stage() != game::GifSaver::Stage::Idle) {
+        if (gifBelow) {
             gifMessage(gif, lcol, y);
             se.gifShown(owner);
         } else if (!s.error.empty() || !s.note.empty()) {
