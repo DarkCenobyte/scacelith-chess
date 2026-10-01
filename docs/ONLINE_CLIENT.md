@@ -3,7 +3,8 @@
 How the game shows and plays online games. The network layer itself (`src/net/`: HTTPS API,
 secure WebSocket, credential store, direct match with UPnP) and the server
 (`dedicated-server/`) are described in their own documents; this page covers what sits on top
-of them in `src/game/` and `src/ui/`.
+of them in `src/game/` and `src/ui/`, the server in use and the account API calls of
+`net::OnlineClient`.
 
 ## Pieces
 
@@ -70,13 +71,66 @@ game; the others become toasts. An error with code 0 and `error == "offline"` (a
 while not connected, dropped by the network layer) clears the search and the pending challenge.
 
 The server in use comes from `[online]` in the settings: the official server
-(`net::officialServer()`, `caissa.scacelith.com:44664`, API and WebSocket on that port) unless
+(`net::officialServer()`, `caissa.scacelith.com` on port 443, the HTTPS port: API
+`https://caissa.scacelith.com/api/v1` and WebSocket `wss://caissa.scacelith.com/ws`) unless
 `custom_server = 1`, then `host`, `api_port`, `ws_port` (0 = the API port) and `pinned_sha256`
-(certificate fingerprint of a self-signed server). No token is ever stored there: the network
-layer keeps one session per origin (`host:apiPort`), so switching servers never reuses another
-server's sign-in. `applyServer()` (called when Options are applied with another server) selects
-the new origin and forgets the previous server's state; the page then resumes a session saved
-for that origin, if any.
+(certificate fingerprint of a self-signed server). A build may name another official server with
+the CMake option `SCACELITH_OFFICIAL_SERVER` (`host[:apiPort[:wsPort]]`, port 443 when omitted,
+`none` for none). No token is ever stored there: the network layer keeps one session per origin
+(`host:apiPort`), so switching servers never reuses another server's sign-in. `applyServer()`
+(called when Options are applied with another server) selects the new origin and forgets the
+previous server's state; the page then resumes a session saved for that origin, if any.
+
+The official server used port 44664 before. A player signed in there stays signed in: when the
+credential file has a record for `<official host>:44664` and none for the official origin, the
+record (user name, token, server id, pin) moves to the official origin the first time the file is
+read (`CredentialStore::addOriginMove`; on Windows the token is decrypted for the old origin and
+encrypted again for the new one). Only the official host of the build moves, never a community
+server.
+
+## Account API
+
+Besides the WebSocket, the server has an HTTPS API under `/api/v1` on the same port
+(`dedicated-server/docs/API.md` is the full reference). `net::OnlineClient` uses it for the
+sign-in (register, login with its proof of work, two-factor step, Google sign-in, logout), the
+account (`/account/me`, password, two-factor setup, recovery codes, reports) and the account API
+calls below. Each returns at once; its answer comes back as one event (`ok`, or `error` with the
+server's code, `retryAfterSec` when it gave one).
+
+| Call | Request | Event and what it carries |
+|---|---|---|
+| `fetchMyGames(before, limit, filter)` | `GET /account/games?before=&limit=&category=&rated=&result=` (bearer) | `GamesResult`: `gamesPage` (the games newest first, `next` = the `before` of the next page or 0, `total` = the games matching the filter) |
+| `fetchGame(id)` | `GET /games/:id` (bearer when signed in) | `GameDetailsResult`: `gameDetails` (players, ratings and changes, result, reason, clocks, the moves as UCI text and `packMove` with each move's time spent and clock; `you` and `reportable` for its players) |
+| `downloadPgn(id)` | `GET /games/:id/pgn` | `PgnResult`: `gameId`, `text` (the PGN as the server wrote it, `[%clk]`/`[%emt]` comments) |
+| `fetchSessions()` | `GET /auth/sessions` (bearer) | `SessionsResult`: `sessions` (id, created, last active, expiry, client label, `current`) |
+| `revokeSession(id)` | `DELETE /auth/sessions/:id` (bearer) | `SessionRevoked`: `sessionId` |
+| `setAcceptChallenges(on)` | `PUT /account/preferences {acceptChallenges: "all"/"none"}` | `PreferencesResult`: `account.acceptChallenges` |
+| `changeEmail(address, password, code)` | `POST /account/email` | `EmailChangeResult`: `status` = `verification_sent` (a link went to the new address) or `email_changed` (`account.email`) |
+| `exportAccount(password, code)` | `POST /account/export` | `AccountExportResult`: `text` (the JSON document) |
+| `deleteAccount(password, code)` | `POST /account/delete` | `AccountDeleted` |
+
+Rules common to these calls:
+
+- The query values are percent-encoded (`3+2` goes as `3%2B2`); `limit` is 1 to 50 (0 or less
+  asks for the server's default, 20).
+- The re-authenticated calls (e-mail, export, deletion) take the password and, when two-factor is
+  on, a code: 6 digits go as `code`, anything else as `recoveryCode`, and nothing is sent for an
+  empty one.
+- A 401 answer to any call that carried the session token means the session is gone (expired,
+  revoked elsewhere, the account deleted): the token is erased (the user name stays), as for
+  `fetchAccount`. `fetchGame` and `downloadPgn` then ask again without the token, since a game is
+  public.
+- `/account/me` also gives `hasPassword` (false for a Google-only account), `acceptChallenges`,
+  `pendingEmail` (an address change waiting for its link), `createdAt` and `lastLoginAt`.
+- Answers are untrusted: a move that is not UCI text, a game with another id than the one asked
+  for, a PGN that does not start with its tags, an export that is not the export document
+  (`format` `scacelith-account-export`), or a PGN over 4 MiB or an export over 64 MiB come back
+  as `invalid_response`. The export is checked whole but only its top level is kept in memory
+  while checking.
+- `deleteAccount` success erases the token and the user name saved for the origin (its server id
+  and pin stay) and stops the realtime connection without reconnecting. `revokeSession` on the
+  session marked `current` in the last `fetchSessions` signs this game out the same way (token
+  erased, connection stopped).
 
 ## The game at the table
 
