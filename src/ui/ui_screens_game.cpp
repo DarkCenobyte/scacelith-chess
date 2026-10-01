@@ -45,6 +45,9 @@ float baselineCentered(const Rect& r, const TextStyle& st) { return r.cy() + gfx
 // viewer's centred labels leave under them for it.
 constexpr float kReplayBarH = 64.0f, kReplayBarBottom = 44.0f;
 constexpr float kReplayBarClear = kReplayBarBottom + kReplayBarH + 76.0f;
+// Where the viewer's controls panel was drawn this frame (empty when hidden): the replay's bar,
+// drawn after it, keeps clear of it.
+Rect g_viewerControls;
 std::string num(int v) { return std::to_string(v); }
 
 // ---- Values (same steps as the New Game page) ----------------------------------------------------
@@ -438,6 +441,7 @@ MenuAction viewerPauseMenu() {
 
 // ==== Viewer overlay ===================================================================================
 void viewerHud(const ViewerHud& hud) {
+    g_viewerControls = Rect();
     if (!hud.visible) return;
     vec2 v = gfx::viewSize();
     gfx::Layer prev = gfx::layer();
@@ -496,7 +500,8 @@ void viewerHud(const ViewerHud& hud) {
         float lineH = 29.0f;
         float w = kw + aw + 110.0f, h = 76.0f + lineH * float(count);
         Rect p(x - 16.0f, v.y - h - 44.0f, w, h);
-        im::panel(im::flip(screen, p), 0.82f);
+        g_viewerControls = im::flip(screen, p);
+        im::panel(g_viewerControls, 0.82f);
         TextStyle ts = style(font::FACE_TITLE, 17.0f, gold, im::startAlign(), 0.24f);
         gfx::text(tr("viewer.controls.title"), im::flipX(screen, p.x + 30.0f), p.y + 40.0f, ts);
         float mid = p.x + 30.0f + kw + 20.0f;
@@ -605,6 +610,14 @@ ReplayAction replayBar(const ReplayBar& bar) {
     // Above the folded game over bar (64 tall, 36 from the bottom) when it is shown.
     const float bottom = bar.aboveCard ? 36.0f + 64.0f + 18.0f : kReplayBarBottom;
     Rect p(std::floor(v.x * 0.5f - w * 0.5f), v.y - bottom - h, w, h);
+    // Beside the viewer's controls panel when the window is not wide enough to centre it (16:10,
+    // 4:3, a long language): on the other side of it, else as far from it as the window allows.
+    const Rect& c = g_viewerControls;
+    const float margin = 24.0f;
+    if (c.w > 0.0f && p.x < c.x + c.w + margin && p.x + p.w > c.x - margin) {
+        if (c.cx() < v.x * 0.5f) p.x = std::floor(std::max(margin, std::min(c.x + c.w + margin, v.x - margin - p.w)));
+        else p.x = std::floor(std::min(v.x - margin - p.w, std::max(margin, c.x - margin - p.w)));
+    }
     im::captureMouseRect(p);
     im::panel(p, 0.86f);
     gfx::text(moveText, p.x + pad + mw, baselineCentered(p, ms), ms);
