@@ -13,9 +13,13 @@
 #include <unistd.h>
 #include <limits.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
+#include <spawn.h>
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <thread>
+extern char** environ;
 
 typedef GLXContext (*PFN_glXCreateContextAttribsARB)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 typedef void (*PFN_glXSwapIntervalEXT)(Display*, GLXDrawable, int);
@@ -293,6 +297,26 @@ std::vector<std::string> commandLine() {
         p = q;
     }
     return args;
+}
+
+// ---- Saved games ---------------------------------------------------------------------------------
+bool openInFileManager(const std::string& path) {
+    if (path.empty()) return false;
+    // A relative path starting with '-' would read as an option.
+    const std::string arg = path[0] == '-' ? "./" + path : path;
+    pid_t pid;
+    char* argv[] = {const_cast<char*>("xdg-open"), const_cast<char*>(arg.c_str()), nullptr};
+    if (posix_spawnp(&pid, "xdg-open", nullptr, nullptr, argv, environ) != 0) {
+        LOGW("could not start xdg-open for %s", path.c_str());
+        return false;
+    }
+    // xdg-open may wait for the file manager: reaped on a thread of its own, so the menu never waits
+    // and no zombie stays behind.
+    std::thread([pid]() {
+        int status = 0;
+        waitpid(pid, &status, 0);
+    }).detach();
+    return true;
 }
 }  // namespace plat
 #endif

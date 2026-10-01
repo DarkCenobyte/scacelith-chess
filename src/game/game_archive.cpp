@@ -479,6 +479,8 @@ std::string joinPath(const std::string& folder, const std::string& name) {
     return folder + sep + name;
 }
 
+bool makeFolder(const std::string& folder) { return !folder.empty() && makeDirs(folder); }
+
 SaveResult save(const std::string& folder, const Record& record, std::time_t when) {
     SaveResult res;
     if (!makeDirs(folder)) {

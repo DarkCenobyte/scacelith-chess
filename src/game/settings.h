@@ -136,6 +136,9 @@ struct Settings {
         if (coachColour == 0 || coachColour == 1) return coachColour;
         return coachNextColour == 1 ? 1 : 0;
     }
+    // [archive] saved games (game_archive.h): the games played on this PC and the direct matches
+    // are saved as PGN files in the pgn folder of the user data directory when they end.
+    bool saveGames = true;
     // [interface]
     std::string language;         // i18n code ("fr", "zh-Hant"...); "" = the OS language (first start)
     // The coach's words at the bottom of the screen (SubtitleMode).

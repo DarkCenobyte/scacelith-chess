@@ -138,6 +138,8 @@ bool Settings::load(const std::string& p) {
     coachColour = std::clamp(ini.getInt("coach.colour", coachColour), 0, 2);
     coachNextColour = std::clamp(ini.getInt("coach.next_colour", coachNextColour), 0, 1);
     coachRulesDone = ini.getBool("coach.rules_done", coachRulesDone);
+    // [archive] saved games
+    saveGames = ini.getBool("archive.save_games", saveGames);
     language = ini.getString("interface.language", language);
     subtitles = std::clamp(ini.getInt("interface.subtitles", subtitles), 0, 2);
     playerName = ini.getString("player.name", playerName);
@@ -295,6 +297,8 @@ bool Settings::save() const {
     ini.setInt("coach.colour", coachColour);
     ini.setInt("coach.next_colour", coachNextColour);
     ini.setBool("coach.rules_done", coachRulesDone);
+    // [archive] saved games
+    ini.setBool("archive.save_games", saveGames);
     ini.set("interface.language", language);
     ini.setInt("interface.subtitles", subtitles);
     ini.set("player.name", playerName);

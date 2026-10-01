@@ -82,6 +82,8 @@ std::string sanitizeName(const std::string& name, size_t maxBytes = 40);
 std::string fileName(const chess::pgn::Record& record, std::time_t when);
 // "folder/name" with the folder's separator (or the platform's when it has none).
 std::string joinPath(const std::string& folder, const std::string& name);
+// Creates the folder and its missing parents (the library's "Open folder" before the first save).
+bool makeFolder(const std::string& folder);
 
 struct SaveResult {
     bool ok = false;

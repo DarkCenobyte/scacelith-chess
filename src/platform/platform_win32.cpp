@@ -504,5 +504,18 @@ uint64_t randomSeed() {
     return uint64_t(t.QuadPart) ^ (uint64_t(GetCurrentProcessId()) << 32) ^ uint64_t(GetTickCount64() * 2654435761ULL);
 }
 
+// ---- Saved games ---------------------------------------------------------------------------------
+bool openInFileManager(const std::string& path) {
+    if (path.empty()) return false;
+    int n = MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, nullptr, 0);
+    if (n <= 0) return false;
+    std::wstring w(size_t(n), L'\0');
+    MultiByteToWideChar(CP_UTF8, 0, path.c_str(), -1, &w[0], n);
+    HINSTANCE r = ShellExecuteW(g_hwnd, L"open", w.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+    if (reinterpret_cast<INT_PTR>(r) > 32) return true;
+    LOGW("could not open %s in the file manager (%d)", path.c_str(), int(reinterpret_cast<INT_PTR>(r)));
+    return false;
+}
+
 }  // namespace plat
 #endif
