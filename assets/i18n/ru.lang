@@ -967,6 +967,7 @@ library.delete.several = В этом файле {0} партия: его мож�
 library.deleted = Партия удалена.
 library.delete.failed = Не удалось удалить партию.
 library.delete.changed = Файл изменился: список обновлён.
+library.truncated = В этой папке слишком много партий: показаны только {0} последних.
 library.tag.Event = Соревнование
 library.tag.Site = Место
 library.tag.Date = Дата

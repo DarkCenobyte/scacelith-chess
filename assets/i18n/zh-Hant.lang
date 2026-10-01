@@ -966,6 +966,7 @@ library.delete.several = 此檔案包含 {0} 局對局，只能在資料夾中�
 library.deleted = 對局已刪除。
 library.delete.failed = 無法刪除對局。
 library.delete.changed = 檔案已變更，清單已更新。
+library.truncated = 此資料夾中的對局過多，僅顯示最新的 {0} 局。
 library.tag.Event = 賽事
 library.tag.Site = 地點
 library.tag.Date = 日期

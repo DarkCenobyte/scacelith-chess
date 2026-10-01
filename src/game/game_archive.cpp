@@ -687,7 +687,8 @@ std::vector<Entry> list(const std::string& folder, ListStats* stats, const std::
     }
     std::stable_sort(out.begin(), out.end(), newerFirst);
     if (r == 2) LOGW("archive: %s: %s", folder.c_str(), st.error.c_str());
-    if (st.truncated) LOGW("archive: %s holds more than %d games: the oldest files are not listed", folder.c_str(), kMaxListed);
+    if (st.truncated && st.read > 0)  // once per change, not at every listing of the library's page
+        LOGW("archive: %s holds more than %d games: the oldest files are not listed", folder.c_str(), kMaxListed);
     if (stats) *stats = st;
     return out;
 }

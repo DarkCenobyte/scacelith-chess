@@ -18,6 +18,8 @@ MenuAction coachPage(CoachSetup& setup, float t, bool opened, bool& back);
 // "Saved games" page (ui_library.cpp), same contract as watchPage: returns StartReplay on Replay
 // (setup.replay names the game).
 MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back);
+// Stops the library's listing worker and waits for it (ui::shutdown, before the program exits).
+void libraryShutdown();
 // The player's Elo under the title menu, from x (the start edge: left, or right in a right-to-left
 // UI) on the first baseline y.
 void titleRating(float x, float y);

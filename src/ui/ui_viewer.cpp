@@ -27,7 +27,7 @@
 //   --ui-kb         show the keyboard focus highlight, --ui-mouse X,Y   fake mouse (reference px)
 //   --ui-keys a,b,.. scripted input, one token per frame: up down left right enter space esc tab
 //                   pgup pgdn home end bksp del wait <letter> click@X:Y (reference px, press +
-//                   release) type:<text> (typed characters)
+//                   release) type:<text> (typed characters) wheel:<notches> (negative: down)
 // Interactive: keys 1..9 / 0 switch screens.
 #include "ui.h"
 #include "ui_internal.h"
@@ -104,6 +104,11 @@ public:
         fake_.textCount = 0;
         if (step_ >= script_.size()) return;
         const std::string tok = script_[step_++];
+        if (tok.compare(0, 6, "wheel:") == 0) {  // mouse wheel notches (negative: down), at the mouse
+            fake_.wheel = float(std::atof(tok.c_str() + 6));
+            LOGI("ui viewer: script frame %d '%s'", int(step_), tok.c_str());
+            return;
+        }
         if (tok.compare(0, 5, "type:") == 0) {  // typed characters, as WM_CHAR / XLookupString deliver them
             for (char32_t c : uni::decode(tok.substr(5)))
                 if (fake_.textCount < int(sizeof(fake_.text) / sizeof(fake_.text[0]))) fake_.text[fake_.textCount++] = uint32_t(c);

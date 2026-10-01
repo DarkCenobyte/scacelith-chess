@@ -966,6 +966,7 @@ library.delete.several = Diese Datei enthält {0} Partie und lässt sich nur im 
 library.deleted = Die Partie wurde gelöscht.
 library.delete.failed = Die Partie konnte nicht gelöscht werden.
 library.delete.changed = Die Datei hat sich geändert: Die Liste wurde aktualisiert.
+library.truncated = Dieser Ordner enthält zu viele Partien: Nur die {0} neuesten werden angezeigt.
 library.tag.Event = Veranstaltung
 library.tag.Site = Ort
 library.tag.Date = Datum

@@ -976,6 +976,7 @@ library.delete.several = This file holds {0} game: it can only be deleted from t
 library.deleted = The game has been deleted.
 library.delete.failed = The game could not be deleted.
 library.delete.changed = The file has changed: the list has been updated.
+library.truncated = This folder holds too many games: only the {0} most recent are listed.
 library.tag.Event = Event
 library.tag.Site = Site
 library.tag.Date = Date

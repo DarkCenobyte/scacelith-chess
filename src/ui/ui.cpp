@@ -3,6 +3,7 @@
 #include "ui_draw.h"
 #include "ui_font.h"
 #include "ui_internal.h"
+#include "ui_screens_game.h"
 #include "ui_theme.h"
 #include "ui_widgets.h"
 #include "../core/log.h"
@@ -65,6 +66,7 @@ bool init() {
 }
 
 void shutdown() {
+    detail::libraryShutdown();  // its listing worker, which may run without the UI being up
     if (!g_inited) return;
     font::shutdown();
     gfx::shutdown();

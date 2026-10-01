@@ -22,6 +22,7 @@
 #include "../i18n/unicode.h"
 #include "../platform/platform.h"
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cmath>
 #include <ctime>
@@ -259,15 +260,23 @@ struct Listing {
     std::vector<archive::Entry> entries;
     archive::ListStats stats;
 };
-Listing listFolder(std::string folder) {
+Listing listFolder(std::string folder, const std::atomic<bool>* cancel) {
     Listing l;
     l.folder = folder;
-    l.entries = archive::list(folder, &l.stats);
+    l.entries = archive::list(folder, &l.stats, cancel);
+    if (l.stats.cancelled) return l;
     // The opening book and texts are built on first use (~40 ms): here rather than in a frame.
     coach::OpeningBook::instance();
     coach::OpeningTexts::instance();
     return l;
 }
+
+// A tag of the details pane, fitted to its column once (not measured again every frame).
+struct TagLine {
+    std::string label, value;
+    float labelSize = 0.0f, valueSize = 0.0f;
+    bool fen = false;
+};
 
 struct Details {
     std::string key;                   // contentKey of the entry shown
@@ -276,12 +285,17 @@ struct Details {
     std::string error;                 // English (the loader's)
     std::string moves;                 // figurine text
     std::string opening, reason;
+    std::vector<TagLine> tags;         // fitted to tagsWidth
+    float tagsWidth = -1.0f;
 };
 
 struct LibraryState {
     std::string folder;
     Listing listing;
     bool listed = false;               // a listing of 'folder' arrived
+    bool truncatedShown = false;       // the "too many games" notice was shown since the page opened
+    bool keyboard = false;             // im::keyboardMode() last frame
+    std::atomic<bool> cancel{false};   // set by libraryShutdown()
     std::future<Listing> pending;
     double lastList = -1e9;            // im::time() of the last listing
     int filter = 0;
@@ -296,13 +310,19 @@ struct LibraryState {
     std::unordered_map<std::string, std::string> openings;  // contentKey -> opening ("" = none)
     int openingsGen = -1;              // i18n::generation() of 'openings'
 };
-LibraryState g_lib;
+// Never destroyed: a static's destructor would join a listing still running at exit (after the
+// objects it uses may be gone); libraryShutdown() stops it first instead.
+LibraryState& lib() {
+    static LibraryState* s = new LibraryState();
+    return *s;
+}
 
 constexpr double kRelistSeconds = 2.0;
 
 void requestListing(LibraryState& s) {
     if (s.pending.valid()) return;
-    s.pending = std::async(std::launch::async, listFolder, s.folder);
+    s.cancel = false;
+    s.pending = std::async(std::launch::async, listFolder, s.folder, &s.cancel);
 }
 // Takes the listing once it is ready (waiting up to waitMs for it).
 void pollListing(LibraryState& s, int waitMs) {
@@ -316,10 +336,14 @@ void pollListing(LibraryState& s, int waitMs) {
         l.stats.error = ex.what();
     }
     s.lastList = im::time();
-    if (l.folder != s.folder) return;  // the folder changed meanwhile
+    if (l.folder != s.folder || l.stats.cancelled) return;  // the folder changed meanwhile, or stopped
     if (!s.listed || l.stats.read > 0 || l.entries.size() != s.listing.entries.size())
         LOGI("library: %d games in %d files (%d read, %d cached)%s%s", int(l.entries.size()), l.stats.files, l.stats.read,
              l.stats.cached, l.stats.error.empty() ? "" : ": ", l.stats.error.c_str());
+    if (l.stats.truncated && !s.truncatedShown) {
+        notify(i18n::trf("library.truncated", {num(archive::kMaxListed)}), 6.0f);
+        s.truncatedShown = true;
+    }
     s.listing = std::move(l);
     s.listed = true;
 }
@@ -500,7 +524,7 @@ float detailsHeader(const archive::Entry& e, const Details& d, const Rect& col, 
 }
 
 // Tags and moves, scrolled inside 'area'. Returns the height of the content.
-float detailsBody(const archive::Entry& e, const Details& d, const Rect& area, const Rect& col, float scroll) {
+float detailsBody(const archive::Entry& e, Details& d, const Rect& area, const Rect& col, float scroll) {
     float y = area.y + 30.0f - scroll;
     const float x = col.x, w = col.w;
     if (!d.ok) {
@@ -540,24 +564,44 @@ float detailsBody(const archive::Entry& e, const Details& d, const Rect& area, c
     const float nameW = std::min(210.0f, w * 0.36f);
     TextStyle ns = style(font::FACE_TITLE, 15.0f, withAlpha(gold, 0.85f), im::startAlign(), 0.12f);
     TextStyle vs = style(font::FACE_TEXT, 21.0f, ivoryDim, im::startAlign());
-    for (const chess::pgn::Tag& t : d.record.tags) {
-        if (t.name == "ScacelithEnd") continue;  // shown as the reason
-        std::string label = uni::toUpper(tagLabel(t.name));
-        TextStyle n = ns;
-        n.size = gfx::fitSize(label, n, nameW - 14.0f, 0.75f);
-        label = elide(label, n, nameW - 14.0f);
-        gfx::text(label, im::flipX(col, x + 2.0f), y, n);
-        std::string value = t.value;
-        if (t.name == "Result") value = resultText(value).empty() ? value : resultText(value);
-        else if (t.name == "ScacelithMode") value = modeLabel(archive::modeFromName(value));
-        TextStyle v = vs;
-        if (t.name == "FEN") {  // a set-up start position: left to right, smaller
-            v.dir = 0;
-            v.size = 18.0f;
+    // Fitted once per game and column width: a game can carry 128 tags of 2 KB each.
+    if (d.tagsWidth != w) {
+        d.tags.clear();
+        d.tagsWidth = w;
+        for (const chess::pgn::Tag& t : d.record.tags) {
+            if (t.name == "ScacelithEnd") continue;  // shown as the reason
+            TagLine line;
+            line.label = uni::toUpper(tagLabel(t.name));
+            TextStyle n = ns;
+            n.size = gfx::fitSize(line.label, n, nameW - 14.0f, 0.75f);
+            line.label = elide(line.label, n, nameW - 14.0f);
+            line.labelSize = n.size;
+            line.value = t.value;
+            if (t.name == "Result") line.value = resultText(t.value).empty() ? t.value : resultText(t.value);
+            else if (t.name == "ScacelithMode") line.value = modeLabel(archive::modeFromName(t.value));
+            TextStyle v = vs;
+            line.fen = t.name == "FEN";
+            if (line.fen) {  // a set-up start position: left to right, smaller
+                v.dir = 0;
+                v.size = 18.0f;
+            }
+            fitOrElide(line.value, v, w - nameW - 4.0f, 0.8f);
+            line.valueSize = v.size;
+            d.tags.push_back(std::move(line));
         }
-        fitOrElide(value, v, w - nameW - 4.0f, 0.8f);
-        gfx::text(value, im::flipX(col, x + nameW), y, v);
-        y += 29.0f;
+    }
+    const float rowH = 29.0f;
+    for (const TagLine& line : d.tags) {
+        if (y + rowH > area.y && y - rowH < area.b()) {  // only the rows in view are drawn
+            TextStyle n = ns;
+            n.size = line.labelSize;
+            gfx::text(line.label, im::flipX(col, x + 2.0f), y, n);
+            TextStyle v = vs;
+            v.size = line.valueSize;
+            if (line.fen) v.dir = 0;
+            gfx::text(line.value, im::flipX(col, x + nameW), y, v);
+        }
+        y += rowH;
     }
     return y - y0 + 10.0f;
 }
@@ -603,7 +647,7 @@ void message(const Rect& area, const std::string& head, const std::string& text,
 namespace detail {
 
 MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
-    LibraryState& s = g_lib;
+    LibraryState& s = lib();
     vec2 v = gfx::viewSize();
     MenuAction act = MenuAction::None;
 
@@ -623,6 +667,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
     }
     if (opened) {
         s.confirmDelete = false;
+        s.truncatedShown = false;
         s.scroll = s.target;
         requestListing(s);
         pollListing(s, 250);
@@ -728,7 +773,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
                 if (im::keyPressed(plat::KEY_PAGEUP)) moveTo = std::max(0, sel - page);
                 if (im::keyPressed(plat::KEY_HOME)) moveTo = 0;
                 if (im::keyPressed(plat::KEY_END)) moveTo = n - 1;
-                if (im::keyPressed(plat::KEY_DELETE) && cur && cur->removable()) askDelete = true;
+                if (im::keyPressed(plat::KEY_DELETE) && cur && !cur->fileError) askDelete = true;
                 if (moveTo >= 0 && moveTo != sel) {
                     select(moveTo, true);
                     im::sound(Sound::Tick);
@@ -740,6 +785,10 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
             int first = std::max(0, int(std::floor(s.scroll / rowH)) - 1);
             int last = std::min(n - 1, int(std::ceil((s.scroll + area.h) / rowH)));
             gfx::pushClip(area);
+            // The keyboard focus shown again (a mouse user's first arrow press) on a selected row
+            // scrolled out of view: the row comes back into view.
+            const bool revealed = im::keyboardMode() && !s.keyboard;
+            s.keyboard = im::keyboardMode();
             // The opening of a row is worked out when it first shows (a few a frame).
             int budget = 3;
             std::string newSel;
@@ -752,6 +801,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
                 bool visible = r.b() > area.y && r.y < area.b();
                 // The selection follows the keyboard focus, not the mouse passing over the rows.
                 if (it.focused && im::keyboardMode() && key != s.selected) newSel = key;
+                if (it.focused && revealed && key == s.selected && !visible) select(i, false);
                 if (it.clicked) {
                     if (s.lastClick == key && im::time() - s.lastClickTime < 0.45) replay = true;
                     s.lastClick = key;
@@ -773,7 +823,10 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
                 drawRow(e, r, key == s.selected, it.hoverT, op != s.openings.end() ? &op->second : nullptr);
             };
             for (int i = first; i <= last; ++i) row(i);
-            if (sel >= 0 && (sel < first || sel > last)) row(sel);  // keeps the keyboard focus registered
+            // The selected row out of view keeps the keyboard focus registered, and its neighbours
+            // too, so that Up / Down go to the next game rather than to the nearest row on screen.
+            for (int i : {sel - 1, sel, sel + 1})
+                if (sel >= 0 && i >= 0 && i < n && (i < first || i > last)) row(i);
             gfx::popClip();
             scrollDecor(area, s.scroll, contentH);
             if (!newSel.empty()) {
@@ -830,10 +883,15 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         if (!plat::openInFileManager(s.folder)) notify(T("library.open_failed"));
     }
     const bool canReplay = cur && cur->error.empty() && s.details.key == contentKey(*cur) && s.details.ok;
-    const bool canDelete = cur && cur->removable();
+    // A game of a file of several games cannot be deleted from here: Delete says so when pressed
+    // (a disabled button could not explain it).
+    const bool canDelete = cur && !cur->fileError;
     if (im::button(L("library.delete"), im::flip(p, Rect(p.r() - pad - 2.0f * bw - bgap, by, bw, bh)), im::ButtonKind::Secondary, canDelete))
         askDelete = true;
-    if (cur && !canDelete && cur->games > 1) im::tooltip(i18n::trn("library.delete.several", cur->games));
+    if (askDelete && canDelete && !cur->removable() && !s.confirmDelete) {
+        notify(i18n::trn("library.delete.several", cur->games), 5.0f);
+        askDelete = false;
+    }
     if (im::button(L("library.replay"), im::flip(p, Rect(p.r() - pad - bw, by, bw, bh)), im::ButtonKind::Primary, canReplay))
         replay = true;
     im::setDefaultFocus(defaultFocus ? defaultFocus : backId);
@@ -847,7 +905,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         LOGI("library: replay %s, game %d", cur->file.c_str(), cur->index + 1);
         act = MenuAction::StartReplay;
     }
-    if (askDelete && canDelete && !s.confirmDelete) {
+    if (askDelete && canDelete && cur->removable() && !s.confirmDelete) {
         s.confirmDelete = true;
         s.deleting = s.selected;
     }
@@ -893,6 +951,14 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         back = true;
     }
     return act;
+}
+
+void libraryShutdown() {
+    LibraryState& s = lib();
+    if (!s.pending.valid()) return;
+    s.cancel = true;  // the listing stops at its next file
+    s.pending.wait();
+    s.pending = std::future<Listing>();
 }
 
 }  // namespace detail

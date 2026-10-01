@@ -967,6 +967,7 @@ library.delete.several = У цьому файлі {0} партія: його м�
 library.deleted = Партію видалено.
 library.delete.failed = Не вдалося видалити партію.
 library.delete.changed = Файл змінився: список оновлено.
+library.truncated = У цій теці забагато партій: показано лише {0} останніх.
 library.tag.Event = Змагання
 library.tag.Site = Місце
 library.tag.Date = Дата

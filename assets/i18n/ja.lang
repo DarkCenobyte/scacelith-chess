@@ -967,6 +967,7 @@ library.delete.several = このファイルには{0}局が含まれているた�
 library.deleted = 対局を削除しました。
 library.delete.failed = 対局を削除できませんでした。
 library.delete.changed = ファイルが変更されたため、リストを更新しました。
+library.truncated = このフォルダーには対局が多すぎるため、最新の{0}局のみを表示しています。
 library.tag.Event = 大会
 library.tag.Site = 場所
 library.tag.Date = 日付

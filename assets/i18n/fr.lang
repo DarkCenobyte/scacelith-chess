@@ -967,6 +967,7 @@ library.delete.several = Ce fichier contient {0} partie : il ne peut être supp
 library.deleted = La partie a été supprimée.
 library.delete.failed = La partie n’a pas pu être supprimée.
 library.delete.changed = Le fichier a changé : la liste a été mise à jour.
+library.truncated = Ce dossier contient trop de parties : seules les {0} plus récentes sont affichées.
 library.tag.Event = Événement
 library.tag.Site = Lieu
 library.tag.Date = Date

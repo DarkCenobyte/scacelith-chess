@@ -971,6 +971,7 @@ library.delete.several = يحتوي هذا الملف على {0} مباراة: �
 library.deleted = حُذفت المباراة.
 library.delete.failed = تعذّر حذف المباراة.
 library.delete.changed = تغيّر الملف: حُدّثت القائمة.
+library.truncated = يحتوي هذا المجلد على عدد كبير جدًا من المباريات: لا تُعرض إلا أحدث {0} مباراة.
 library.tag.Event = الحدث
 library.tag.Site = المكان
 library.tag.Date = التاريخ

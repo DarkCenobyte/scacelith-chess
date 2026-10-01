@@ -966,6 +966,7 @@ library.delete.several = Este archivo contiene {0} partida: solo puede eliminars
 library.deleted = La partida se ha eliminado.
 library.delete.failed = No se pudo eliminar la partida.
 library.delete.changed = El archivo ha cambiado: la lista se ha actualizado.
+library.truncated = Esta carpeta contiene demasiadas partidas: solo se muestran las {0} más recientes.
 library.tag.Event = Evento
 library.tag.Site = Lugar
 library.tag.Date = Fecha
