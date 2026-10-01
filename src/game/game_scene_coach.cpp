@@ -195,7 +195,9 @@ public:
     void ensureWorker(float speed) {
         CoachRuntime& r = rt();
         if (!s_.coachVoiceFiles_) return;
-        if (r.workerStarted && std::fabs(speed - r.workerSpeed) < 0.005f) return;
+        // A worker that failed to load is tried again (the model files may have arrived since).
+        bool retry = r.workerStarted && r.worker.failed();
+        if (r.workerStarted && !retry && std::fabs(speed - r.workerSpeed) < 0.005f) return;
         // A new speed restarts the worker: only between lines (nothing queued would be lost).
         if (r.workerStarted && (!r.speechIds.empty() || r.worker.pending() > 0)) return;
         const Settings& st = settings();
@@ -583,6 +585,11 @@ void GameScene::initCoachArgs() {
     LOGI("coach: voice files %s in %s", coachVoiceFiles_ ? "found" : "missing (subtitles only)", tts::modelDirectory().c_str());
 }
 
+void GameScene::refreshCoachVoice() {
+    // The model files may come and go while the game runs (downloaded from the menu).
+    coachVoiceFiles_ = tts::modelFilesPresent();
+}
+
 bool GameScene::coachVoiceExpected() const {
     return coachVoiceFiles_ && !(coach_ && coach_->workerStarted && coach_->worker.failed());
 }
@@ -604,6 +611,7 @@ CoachRuntime& GameScene::coachRuntime() {
 }
 
 void GameScene::setupCoachGame() {
+    refreshCoachVoice();
     CoachRuntime& rt = coachRuntime();
     leaveCoachGame();
     const Settings& s = settings();

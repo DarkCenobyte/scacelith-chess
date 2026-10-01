@@ -349,6 +349,7 @@ private:
     // Legal-move hints: the option, forced on in the rules lesson.
     bool legalHints() const;
     void initCoachArgs();                     // command line: --coach and its options
+    void refreshCoachVoice();                 // are the voice's model files there (tts::modelFilesPresent)
     CoachRuntime& coachRuntime();             // created on first use: the voice starts loading
     bool coachVoiceExpected() const;          // the voice files are there (the coach page's notice)
     void setupCoachGame();                    // part of setupNewGame() for a coach game

@@ -319,6 +319,7 @@ void GameScene::enterMenu() {
     }
     world_.setCoachSeat(-1);
     world_.setBoardCoordinates(settings().showCoordinates);
+    refreshCoachVoice();  // the Coach page says whether the coach can be heard
     handover_.cancel();
     inputGate_.reset();
     inputBlocked_ = false;
