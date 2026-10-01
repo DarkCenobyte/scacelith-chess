@@ -125,8 +125,8 @@ bool AccountData::apply(const net::Event& e, net::AccountInfo& account, bool& si
             game = e.gameDetails;
             gameLoaded = true;
             gameError.clear();
-        } else if (!e.ok) {
-            gameError = e.error;
+        } else if (!e.ok && e.gameId == gameWanted) {
+            gameError = e.error;   // not the failure of a game left meanwhile
         }
         break;
     case Kind::SessionsResult:

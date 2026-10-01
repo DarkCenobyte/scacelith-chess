@@ -260,10 +260,22 @@ TEST(mock_account_games_are_legal_and_consistent) {
     for (int r : {1, 2, 3, 5, 10, 12, 20, 24}) CHECK(reasons.count(r) == 1);
     CHECK(reasons.count(22) + reasons.count(23) >= 1);
 
+    // Failures name the game asked for, as net::OnlineClient's do (the page of another game
+    // opened meanwhile ignores them).
     Event e;
     srv.fetchGame(12345);
     CHECK(await(srv, Kind::GameDetailsResult, e));
     CHECK_EQ(e.error, std::string("not_found"));
+    CHECK_EQ(e.gameId, uint64_t(12345));
+    srv.downloadPgn(12346);
+    CHECK(await(srv, Kind::PgnResult, e));
+    CHECK_EQ(e.error, std::string("not_found"));
+    CHECK_EQ(e.gameId, uint64_t(12346));
+    srv.logout(false);
+    srv.fetchGame(12347);
+    CHECK(await(srv, Kind::GameDetailsResult, e));
+    CHECK(!e.ok);
+    CHECK_EQ(e.gameId, uint64_t(12347));
 }
 
 TEST(mock_account_pgn_reads_back_into_the_saved_games) {

@@ -251,7 +251,9 @@ TEST(account_apply_routes_history_and_game) {
     CHECK(d.apply(g, account, signedIn));
     CHECK(d.gameLoaded);
     CHECK_EQ(d.game.plies, 3);
-    CHECK(d.apply(event(Kind::GameDetailsResult, false, "not_found"), account, signedIn));
+    net::Event missing = event(Kind::GameDetailsResult, false, "not_found");
+    missing.gameId = 42;
+    CHECK(d.apply(missing, account, signedIn));
     CHECK_EQ(d.gameError, std::string("not_found"));
     CHECK(signedIn);
 
@@ -268,6 +270,31 @@ TEST(account_apply_routes_history_and_game) {
     pub.gameDetails.id = 42;
     CHECK(d.apply(pub, account, signedIn));
     CHECK(d.gameLoaded);
+    CHECK(!signedIn);
+}
+
+// Game A opened, Back, game B opened before A's answer: A's failure is not B's error (B's page
+// keeps waiting for its own answer); a refused token signs out whichever game it came with.
+TEST(account_apply_game_error_of_a_game_left) {
+    AccountData d;
+    net::AccountInfo account;
+    bool signedIn = true;
+    d.gameWanted = 200;
+    for (const char* error : {"not_found", "timeout", "rate_limited"}) {
+        net::Event a = event(Kind::GameDetailsResult, false, error);
+        a.gameId = 100;
+        CHECK(d.apply(a, account, signedIn));
+        CHECK(d.gameError.empty());
+        CHECK(!d.gameLoaded);
+    }
+    net::Event b = event(Kind::GameDetailsResult, false, "not_found");
+    b.gameId = 200;
+    CHECK(d.apply(b, account, signedIn));
+    CHECK_EQ(d.gameError, std::string("not_found"));
+    CHECK(signedIn);
+    net::Event refused = event(Kind::GameDetailsResult, false, "unauthorized");
+    refused.gameId = 100;
+    CHECK(d.apply(refused, account, signedIn));
     CHECK(!signedIn);
 }
 

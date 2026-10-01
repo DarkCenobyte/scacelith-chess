@@ -2025,12 +2025,18 @@ void FakeServer::fetchGame(uint64_t gameId) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
     const Event::Kind k = Event::Kind::GameDetailsResult;
-    if (I.transportError(k)) return;
-    if (!I.signedIn) return I.http(I.result(k, false, "unauthorized"));
+    // Every answer names the game asked for, as net::OnlineClient's do.
+    auto answer = [&](bool ok, const char* error) {
+        Event e = I.result(k, ok, error);
+        e.gameId = gameId;
+        return e;
+    };
+    if (I.transportError(k, answer(false, ""))) return;
+    if (!I.signedIn) return I.http(answer(false, "unauthorized"));
     I.ensureHistory();
     Impl::Past* p = I.findPast(gameId);
-    if (!p) return I.http(I.result(k, false, "not_found"));
-    Event e = I.result(k, true);
+    if (!p) return I.http(answer(false, "not_found"));
+    Event e = answer(true, "");
     e.gameDetails = p->d;
     e.gameDetails.reportable = I.reportable(*p);
     I.http(e);
@@ -2039,12 +2045,16 @@ void FakeServer::downloadPgn(uint64_t gameId) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
     const Event::Kind k = Event::Kind::PgnResult;
-    if (I.transportError(k)) return;
+    auto answer = [&](bool ok, const char* error) {
+        Event e = I.result(k, ok, error);
+        e.gameId = gameId;
+        return e;
+    };
+    if (I.transportError(k, answer(false, ""))) return;
     I.ensureHistory();
     Impl::Past* p = I.signedIn ? I.findPast(gameId) : nullptr;
-    if (!p) return I.http(I.result(k, false, "not_found"));
-    Event e = I.result(k, true);
-    e.gameId = gameId;
+    if (!p) return I.http(answer(false, "not_found"));
+    Event e = answer(true, "");
     e.text = serverPgn(p->d, contains(I.ep.host, "official") ? "Scacelith" : "Scacelith (mock server)", I.ep.host);
     I.http(e);
 }
