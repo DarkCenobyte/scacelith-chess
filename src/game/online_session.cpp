@@ -271,6 +271,7 @@ void OnlineSession::applyServer() {
     infoError_.clear();
     signedIn_ = false;
     account_ = net::AccountInfo();
+    data_.clear();
     conn_ = api_->state();
     queue_ = Queue();
     outgoing_ = Outgoing();
@@ -337,6 +338,7 @@ void OnlineSession::signOut(bool everywhere) {
     expect(Kind::LogoutResult);
     signedIn_ = false;
     account_ = net::AccountInfo();
+    data_.clear();
     incoming_.clear();
 }
 
@@ -358,6 +360,61 @@ bool OnlineSession::take(Kind k, net::Event& out) {
     out = it->second;
     results_.erase(it);
     return true;
+}
+
+// ---- Account API ----------------------------------------------------------------------------------
+
+void OnlineSession::loadHistory(const net::GamesFilter& filter) {
+    uint64_t before = data_.history.restart(filter);
+    api().fetchMyGames(before, HistoryPager::kPageSize, filter);
+    expect(Kind::GamesResult);
+}
+
+void OnlineSession::historyNext() {
+    uint64_t before = 0;
+    if (!data_.history.next(before)) return;
+    api().fetchMyGames(before, HistoryPager::kPageSize, data_.history.filter());
+    expect(Kind::GamesResult);
+}
+
+void OnlineSession::historyPrevious() {
+    uint64_t before = 0;
+    if (!data_.history.previous(before)) return;
+    api().fetchMyGames(before, HistoryPager::kPageSize, data_.history.filter());
+    expect(Kind::GamesResult);
+}
+
+void OnlineSession::historyReload() {
+    uint64_t before = data_.history.reload();
+    api().fetchMyGames(before, HistoryPager::kPageSize, data_.history.filter());
+    expect(Kind::GamesResult);
+}
+
+void OnlineSession::openGame(uint64_t gameId) {
+    if (data_.gameWanted != gameId) {
+        data_.gameLoaded = false;
+        data_.game = net::GameDetails();
+    }
+    data_.gameWanted = gameId;
+    data_.gameError.clear();
+    api().fetchGame(gameId);
+    expect(Kind::GameDetailsResult);
+}
+
+void OnlineSession::loadSessions() {
+    data_.sessionsError.clear();
+    api().fetchSessions();
+    expect(Kind::SessionsResult);
+}
+
+void OnlineSession::revokeSession(int64_t sessionId) {
+    api().revokeSession(sessionId);
+    expect(Kind::SessionRevoked);
+}
+
+void OnlineSession::setAcceptChallenges(bool accept) {
+    api().setAcceptChallenges(accept);
+    expect(Kind::PreferencesResult);
 }
 
 // ---- Realtime -------------------------------------------------------------------------------------
@@ -571,6 +628,7 @@ void OnlineSession::handleServer(const net::Event& e) {
         if (e.ok) {
             signedIn_ = true;
             account_ = e.account;
+            data_.clear();  // the history and devices of whoever was signed in before
             api_->connect();
             LOGI("online: signed in as %s", account_.username.c_str());
         }
@@ -579,6 +637,7 @@ void OnlineSession::handleServer(const net::Event& e) {
     case Kind::LogoutResult:
         signedIn_ = false;
         account_ = net::AccountInfo();
+        data_.clear();
         store();
         break;
     case Kind::AccountResult:
@@ -590,6 +649,33 @@ void OnlineSession::handleServer(const net::Event& e) {
         if (e.ok) account_.mfaEnabled = true;
         store();
         break;
+    case Kind::GamesResult:
+    case Kind::GameDetailsResult:
+    case Kind::PgnResult:
+    case Kind::SessionsResult:
+    case Kind::SessionRevoked:
+    case Kind::PreferencesResult:
+    case Kind::EmailChangeResult:
+    case Kind::AccountExportResult:
+    case Kind::AccountDeleted: {
+        const bool wasSignedIn = signedIn_;
+        data_.apply(e, account_, signedIn_);
+        if (e.kind == Kind::AccountDeleted && e.ok) {
+            // The network layer erased the session and stopped the realtime connection.
+            queue_ = Queue();
+            outgoing_ = Outgoing();
+            incoming_.clear();
+            ratingRestored_ = live::HeldNotice();
+            LOGI("online: account deleted");
+        } else if (e.kind == Kind::EmailChangeResult && e.ok && signedIn_) {
+            // The pending change (or the new address) shows on the account page.
+            api_->fetchAccount();
+            expect(Kind::AccountResult);
+        }
+        if (wasSignedIn && !signedIn_ && !(e.kind == Kind::AccountDeleted && e.ok)) LOGI("online: session refused, signed out");
+        store();
+        break;
+    }
     case Kind::MfaDisableResult:
         if (e.ok) account_.mfaEnabled = false;
         store();
