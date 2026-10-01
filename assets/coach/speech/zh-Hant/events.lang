@@ -1,0 +1,112 @@
+# Coach speech (Traditional Chinese, Taiwan / Hong Kong): events of a coach game and of the rules
+# lesson (greetings, turn-taking, takebacks, encouragement, the end of a game, level introductions).
+# src/coach/events.cpp says them. Same keys and variants as assets/coach/speech/en/events.lang.
+# Subtitle text only (the voice speaks the English line). The coach says 你; level names as
+# coach.level.*.name in assets/i18n/zh-Hant.lang; comments are 講評 (the interface's word).
+
+# ---- Start of a coach game, per level (1 First steps ... 6 Expert) --------------------------------
+event.greet.l1 = 你好！我們輕鬆下一盤吧。遇到問題，我隨時幫你。
+event.greet.l1.2 = 嗨！我會下得溫和一點，也會告訴你要注意什麼。
+event.greet.l1.3 = 歡迎！慢慢來：哪個棋子有危險，我會提醒你。
+event.greet.l2 = 你好！開始吧。一出現捉雙或牽制，我就指給你看。
+event.greet.l2.2 = 嗨！把棋子出動起來，保護好你的王。我會一路幫你。
+event.greet.l2.3 = 歡迎回到棋盤前！留意捉雙和牽制：它們常常決定勝負。
+event.greet.l3 = 你好！我們認真下一盤。我會講評你的計畫和較大的失誤。
+event.greet.l3.2 = 嗨！替你的棋子想個計畫。哪步棋有疏漏，我會告訴你。
+event.greet.l3.3 = 開始吧！唯一著法和走錯的著法，我都會指出來。
+event.greet.l4 = 你好！這次我會給出評估，並告訴你更好的候選著法。
+event.greet.l4.2 = 開始吧。你走錯之後，我會告訴你更精確的下法。
+event.greet.l4.3 = 準備好下一盤俱樂部水準的棋了嗎？評估一變，我就講評。
+event.greet.l5 = 開始吧。我的講評會很簡短。
+event.greet.l5.2 = 你準備好就開始。我只做簡短講評。
+event.greet.l5.3 = 祝你好運。只有重要的時候，我才會開口。
+event.greet.l6 = 祝你好運。
+event.greet.l6.2 = 我們下棋吧。
+event.greet.l6.3 = 準備好了。我只講評關鍵時刻。
+
+# Who starts (said after the greeting).
+event.colour.white = 你執白，所以由你先走。
+event.colour.white.2 = 這盤你下白棋：由你先走。
+event.colour.black = 我執白，所以我先走。
+event.colour.black.2 = 這次你下黑棋：我先走。
+
+# ---- Level introductions (the first game at a level, or when the player changes it) -------------
+event.level.l0 = 西洋棋規則：我們透過小練習，一步一步學會下棋。
+event.level.l1 = 入門第一步：我下得溫和，用淺顯的話講解每個錯誤。
+event.level.l2 = 初學者：我下得稍強一點，並點出捉雙、牽制這類簡單戰術。
+event.level.l3 = 中級棋手：我會講計畫和兵形，並示範簡短的變化。
+event.level.l4 = 俱樂部棋手：我以兵為單位給出評估，並建議候選著法。
+event.level.l5 = 強俱樂部棋手：講評簡短，關鍵時刻給出較長的變化。
+event.level.l6 = 專家：我會全力以赴，只講評關鍵時刻。
+
+# ---- Turn-taking -------------------------------------------------------------------------------------
+# After an explanation or a demonstration, when the player may move again.
+event.your_move = 輪到你走了。
+event.your_move.2 = 換你了。
+event.your_move.3 = 看你的了。
+# The player has been thinking for a while (never during the first minute).
+event.take_time = 慢慢來。
+event.take_time.2 = 不用急：我們下棋不用棋鐘。
+# Short filler while the coach is still looking at the position.
+event.filler = 嗯……
+event.filler.2 = 我想想。
+event.filler.3 = 讓我看一下局面。
+
+# ---- Takebacks -----------------------------------------------------------------------------------------
+# The player took the move back after the coach's offer.
+event.takeback.taken = 好，這步棋我們收回。
+event.takeback.taken.2 = 好主意。再仔細看一看。
+event.takeback.taken.3 = 棋退回去了。再試一次。
+# The player declined the offer and played on.
+event.takeback.declined = 好，我們繼續下。
+event.takeback.declined.2 = 好吧，對局繼續。
+event.takeback.declined.3 = 你決定就好。我們接著下。
+# After an explanation without an offer.
+event.play_on = 我們接著下吧。
+event.play_on.2 = 繼續吧。
+event.play_on.3 = 好，回到我們的對局。
+
+# ---- Encouragement -------------------------------------------------------------------------------------
+# After the player's mistake has been explained (never mocking; praise the process, not the person).
+event.encourage.mistake = 這種錯誤人人都會犯。重要的是學會發現它。
+event.encourage.mistake.2 = 別擔心。看看我上一步攻擊了什麼，你就會找到答案。
+event.encourage.mistake.3 = 每個棋手都遇過這種事。我們繼續吧。
+# The player is behind (material or evaluation).
+event.encourage.behind = 別放棄：找找機會，別讓我贏得太輕鬆。
+event.encourage.behind.2 = 繼續奮戰。這樣的局面還有機會翻盤。
+event.encourage.behind.3 = 保持冷靜，找找我的弱點。
+# The player has played several good moves in a row.
+event.encourage.well = 你走棋前會先檢查我的威脅。做得好。
+event.encourage.well.2 = 走得細心又穩健。繼續保持。
+event.encourage.well.3 = 你今天的思路很清楚。
+
+# ---- Draw offers ------------------------------------------------------------------------------------------
+event.draw.accepted = 我接受。那就和棋吧。
+event.draw.accepted.2 = 同意：這盤和棋。
+event.draw.declined = 不了，謝謝，我們繼續下。
+event.draw.declined.2 = 我還是想繼續下。
+
+# ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
+event.end.win = 下得好。恭喜你！
+event.end.win.2 = 這是你應得的勝利。做得好！
+event.end.win.3 = 恭喜：你堂堂正正地贏了我。
+event.end.loss = 這盤下得不錯。下次就換你贏我了。
+event.end.loss.2 = 謝謝你和我下這盤棋。每盤輸棋都能讓你學到東西。
+event.end.loss.3 = 你奮戰到了最後。我們來看看剛才發生了什麼。
+event.end.draw = 和棋。這盤下得不錯！
+event.end.draw.2 = 這次誰也沒贏。雙方都下得很頑強。
+event.end.draw.3 = 很公平的結果。這盤下得很好。
+event.end.resigned = 你認輸了。不過這盤你下得很頑強。
+event.end.resigned.2 = 好的。謝謝你陪我下棋。
+event.end.handshake = 我們握個手吧。
+event.end.handshake.2 = 謝謝你陪我下這盤棋。
+event.end.handshake.3 = 下得不錯。謝謝你。
+
+# ---- The rules lesson -----------------------------------------------------------------------------------------
+# {chapter} = the chapter's title (lesson.title.* in lesson.lang), in 「」 inside a sentence.
+event.lesson.resume = 歡迎回來！我們繼續學「{chapter}」。
+event.lesson.resume.2 = 又見面了！我們上次學到「{chapter}」。
+event.lesson.next = 下一課：{chapter}。
+event.lesson.next.2 = 現在來學「{chapter}」。
+event.lesson.skip = 好，我們往下學。
+event.lesson.skip.2 = 好吧，我們跳到後面。
