@@ -69,7 +69,7 @@ options.effects = Effets
 options.ambience = Ambiance
 options.ambience.help = La rumeur de la salle : le feu, des pas lointains, la vieille horloge.
 options.ambience_volume = Volume de l’ambiance
-options.voice_volume = Voix du coach
+options.voice_volume = Volume de la voix
 options.voice_volume.help = Volume de la voix du coach en mode Coach.
 options.subtitles = Sous-titres
 options.subtitles.auto = Automatique
@@ -896,8 +896,8 @@ coach.note.unrated = Les parties avec le coach ne sont pas classées.
 coach.colour = Votre couleur
 coach.colour.help = La couleur que vous jouez contre le coach. Alternée : les Blancs, puis les Noirs, d’une partie à l’autre. La leçon sur les règles se joue toujours avec les Blancs.
 coach.colour.alternate = Alternée
-# Shown when the voice files (the coach folder next to the game) are missing.
-coach.no_voice = La voix du coach est introuvable (dossier coach) : il s’exprimera par sous-titres uniquement.
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = La voix du coach n’est pas installée ou est désactivée (Options > Son) : ses paroles seront écrites à l’écran.
 # At the table
 coach.speaker = COACH
 coach.skip = Passer
@@ -916,3 +916,44 @@ coach.gameover.unrated = Cette partie avec le coach n’est pas classée.
 coach.lesson.done = BRAVO
 coach.lesson.done.line = Vous connaissez maintenant les règles des échecs.
 coach.lesson.next = Première partie
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Voix du coach
+options.coach_voice.help = Le coach parle à voix haute en mode Coach. Son modèle de voix est téléchargé la première fois qu’il est nécessaire (environ 145 Mo). Désactivée : les paroles du coach sont seulement écrites à l’écran.
+# The prompt. {0} = the size in megabytes ("145.3")
+coach.download.title = La voix du coach
+coach.download.text = Le coach parle avec Supertonic 3, un modèle de synthèse vocale de Supertone. Il n’est pas fourni avec Scacelith : le jeu peut le télécharger maintenant depuis Hugging Face ({0} Mo, une seule fois). Sans lui, le coach écrit ses paroles à l’écran.
+coach.download.licence = Le modèle est publié sous la licence OpenRAIL-M, qui interdit certains usages de la voix qu’il produit, comme la faire passer pour une voix humaine ou imiter une personne réelle.
+coach.download.read_licence = Lire la licence
+coach.download.accept = En choisissant Télécharger, vous acceptez les conditions de cette licence.
+# {0} = a folder
+coach.download.folder = Enregistré dans : {0}
+coach.download.not_now = Pas maintenant
+# {0} = the size in megabytes
+coach.download.download = Télécharger ({0} Mo)
+coach.download.licence_title = LICENCE OPENRAIL-M
+coach.download.back = Retour
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = LA VOIX DU COACH
+coach.download.checking = Vérification des fichiers…
+coach.download.downloading = Téléchargement…
+coach.download.extracting = Extraction des fichiers…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} Mo
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = Depuis Hugging Face
+coach.download.from_github = Depuis GitHub (archive de la version)
+coach.download.cancel = Annuler
+coach.download.failed = Le téléchargement a échoué.
+coach.download.error.network = Impossible de joindre les serveurs. Veuillez vérifier votre connexion à Internet et réessayer.
+# {0} = a folder
+coach.download.error.disk = Impossible d’écrire les fichiers dans {0}. Veuillez vérifier l’espace libre et réessayer.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Les serveurs ont envoyé une réponse inattendue ({0}). Veuillez réessayer plus tard.
+coach.download.retry = Réessayer
+coach.download.close = Fermer
+# Notices
+coach.download.done = La voix du coach est installée.
+coach.download.cancelled = Téléchargement annulé : il reprendra là où il s’est arrêté la prochaine fois.

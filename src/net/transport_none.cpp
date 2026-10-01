@@ -12,6 +12,13 @@ void httpRequest(const HttpRequest&, HttpResponse& resp, CancelToken*) {
     resp.detail = "this build has no TLS library (OpenSSL was not found by CMake)";
 }
 
+void httpStream(const HttpRequest&, const std::function<bool(const HttpHead&)>&, const std::function<bool(const char*, size_t)>&,
+                HttpResponse& resp, CancelToken*) {
+    resp = HttpResponse();
+    resp.error = "unavailable";
+    resp.detail = "this build has no TLS library (OpenSSL was not found by CMake)";
+}
+
 std::unique_ptr<WebSocket> wsConnect(const WsParams&, std::string& error, int& httpStatus, CancelToken*) {
     error = "unavailable";
     httpStatus = 0;

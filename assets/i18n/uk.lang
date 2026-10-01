@@ -69,7 +69,7 @@ options.effects = Ефекти
 options.ambience = Атмосфера
 options.ambience.help = Гомін зали: вогонь у каміні, далекі кроки, старий годинник.
 options.ambience_volume = Гучність атмосфери
-options.voice_volume = Голос тренера
+options.voice_volume = Гучність голосу
 options.voice_volume.help = Гучність голосу тренера в режимі «Тренер».
 options.subtitles = Субтитри
 options.subtitles.auto = Автоматично
@@ -896,8 +896,8 @@ coach.note.unrated = Партії з тренером не впливають н
 coach.colour = Ваш колір
 coach.colour.help = Колір, яким ви граєте проти тренера. По черзі: білі й чорні змінюються від партії до партії. Урок про правила завжди грається білими.
 coach.colour.alternate = По черзі
-# Shown when the voice files (the coach folder next to the game) are missing.
-coach.no_voice = Голос тренера не знайдено (тека coach): він говоритиме лише субтитрами.
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = Голос тренера не встановлено або вимкнено (Налаштування > Звук): його слова буде показано на екрані.
 # At the table
 coach.speaker = ТРЕНЕР
 coach.skip = Пропустити
@@ -916,3 +916,44 @@ coach.gameover.unrated = Ця партія з тренером не рейтин
 coach.lesson.done = ЧУДОВО
 coach.lesson.done.line = Тепер ви знаєте правила шахів.
 coach.lesson.next = Перша партія
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = Голос тренера
+options.coach_voice.help = У режимі «Тренер» тренер говорить уголос. Модель його голосу завантажується, коли вона вперше потрібна (близько 145 МБ). Вимк.: слова тренера лише показуються на екрані.
+# The prompt. {0} = the size in megabytes ("145.3")
+coach.download.title = Голос тренера
+coach.download.text = Тренер говорить за допомогою Supertonic 3 — моделі синтезу мовлення від Supertone. Вона не входить до складу Scacelith: гра може завантажити її зараз із Hugging Face ({0} МБ, один раз). Без неї тренер пише свої слова на екрані.
+coach.download.licence = Модель поширюється за ліцензією OpenRAIL-M, яка забороняє деякі способи використання створеного нею голосу, наприклад видавати його за людський голос або наслідувати реальну людину.
+coach.download.read_licence = Прочитати ліцензію
+coach.download.accept = Вибираючи «Завантажити», ви приймаєте умови цієї ліцензії.
+# {0} = a folder
+coach.download.folder = Зберігається в: {0}
+coach.download.not_now = Не зараз
+# {0} = the size in megabytes
+coach.download.download = Завантажити ({0} МБ)
+coach.download.licence_title = ЛІЦЕНЗІЯ OPENRAIL-M
+coach.download.back = Назад
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = ГОЛОС ТРЕНЕРА
+coach.download.checking = Перевірка файлів…
+coach.download.downloading = Завантаження…
+coach.download.extracting = Розпакування файлів…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} МБ
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = З Hugging Face
+coach.download.from_github = З GitHub (архів випуску)
+coach.download.cancel = Скасувати
+coach.download.failed = Не вдалося завантажити.
+coach.download.error.network = Не вдається зв’язатися із серверами. Перевірте підключення до інтернету й повторіть спробу.
+# {0} = a folder
+coach.download.error.disk = Не вдалося записати файли в {0}. Перевірте вільне місце й повторіть спробу.
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = Сервери надіслали неочікувану відповідь ({0}). Повторіть спробу пізніше.
+coach.download.retry = Повторити
+coach.download.close = Закрити
+# Notices
+coach.download.done = Голос тренера встановлено.
+coach.download.cancelled = Завантаження скасовано: наступного разу воно продовжиться з того місця, де зупинилося.

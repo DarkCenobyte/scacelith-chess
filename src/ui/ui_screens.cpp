@@ -265,6 +265,7 @@ void copyOptions(game::Settings& dst, const game::Settings& src) {
     dst.ambience = src.ambience;
     dst.voiceVolume = src.voiceVolume;
     dst.subtitles = src.subtitles;
+    dst.coachVoice = src.coachVoice;  // the voice model download (W12)
     dst.showLegalMoves = src.showLegalMoves;
     dst.showCoordinates = src.showCoordinates;
     dst.mouseSensitivity = src.mouseSensitivity;
@@ -285,7 +286,7 @@ bool sameOptions(const game::Settings& a, const game::Settings& b) {
            a.vsync == b.vsync && feq(a.renderScale, b.renderScale) && a.quality == b.quality && a.motionBlur == b.motionBlur &&
            a.depthOfField == b.depthOfField && feq(a.brightness, b.brightness) && feq(a.masterVolume, b.masterVolume) &&
            feq(a.effectsVolume, b.effectsVolume) && feq(a.ambienceVolume, b.ambienceVolume) && a.ambience == b.ambience &&
-           feq(a.voiceVolume, b.voiceVolume) && a.subtitles == b.subtitles &&
+           feq(a.voiceVolume, b.voiceVolume) && a.subtitles == b.subtitles && a.coachVoice == b.coachVoice &&
            a.showLegalMoves == b.showLegalMoves && a.showCoordinates == b.showCoordinates &&
            feq(a.mouseSensitivity, b.mouseSensitivity) && a.invertLook == b.invertLook && a.gameCursor == b.gameCursor &&
            a.autoPressClock == b.autoPressClock && a.ignoreOpponentHead == b.ignoreOpponentHead &&
@@ -523,7 +524,11 @@ bool optionsPage(MenuAction& act) {
             im::tooltip(T("options.ambience.help"));
             im::sliderRow(L("options.ambience_volume"), s.ambienceVolume, 0.0f, 1.0f, 0.05f, pct, row(), s.ambience);
             // Coach mode: its voice, and its words written at the bottom of the screen.
-            im::sliderRow(L("options.voice_volume"), s.voiceVolume, 0.0f, 1.0f, 0.05f, pct, row());
+            // Coach voice (W12): off = subtitles only; switched on without the model, the game
+            // offers the download once the options are applied (game/coach_model.h).
+            im::toggleRow(L("options.coach_voice"), s.coachVoice, row());
+            im::tooltip(T("options.coach_voice.help"));
+            im::sliderRow(L("options.voice_volume"), s.voiceVolume, 0.0f, 1.0f, 0.05f, pct, row(), s.coachVoice);
             im::tooltip(T("options.voice_volume.help"));
             int sub = std::clamp(s.subtitles, 0, 2);
             if (im::selectorRow(L("options.subtitles"), sub, {T("options.subtitles.auto"), T("common.on"), T("common.off")}, row()))
@@ -707,6 +712,7 @@ MenuAction titlePage(float t) {
     if (im::menuEntry(L("menu.coach"), entry())) {
         setPage(Page::Coach);
         im::sound(Sound::Open);
+        detail::coachEntryOpened();   // the voice download prompt (ui_model_download.cpp)
     }
     if (im::menuEntry(L("menu.online"), entry())) {
         setPage(Page::Online);

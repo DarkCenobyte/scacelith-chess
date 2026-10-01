@@ -143,14 +143,20 @@ your colour (White, Black, or alternating from one game to the next); the choice
   card offers to play again at the same level. When the coach suggests another level, the Coach
   page proposes it next time.
 
-The coach speaks with a voice synthesised on your computer (Supertonic 3) from the model files in
-the `coach` folder; without them, or without a sound device, it speaks through subtitles only.
-Options > Audio >
-Subtitles shows its words at the bottom of the screen (Automatic: when it does not speak the
-language of the menus, as with Chinese menus where it speaks English), and Options > Audio >
-Coach voice sets its volume. `[tts]` in the settings file tunes the synthesis: `threads` (0 = 2),
-`voice` (-1 = the default voice), `steps` (5) and `arch` (`auto`, or `avx512`, `avxvnni`, `avx2`,
-`sse2`, `scalar` when troubleshooting).
+The coach speaks with a voice synthesised on your computer (Supertonic 3). Its model is not part of
+the game: the first time you open the Coach page (or switch Options > Audio > Coach voice on), the
+game offers to download it, about 145 MB, from Hugging Face (or, if that fails, from the sherpa-onnx
+release on GitHub), into the game's folder of application data: `%APPDATA%\scacelith\coach\` on
+Windows, `$XDG_DATA_HOME/scacelith/coach/` (by default `~/.local/share/scacelith/coach/`) on Linux.
+The prompt shows the model's licence (OpenRAIL-M) and its use restrictions; "Not now" switches the
+coach's voice off. A small panel in the corner shows the download while you keep playing, and an
+interrupted download continues where it stopped. Without the model, with Coach voice off, or
+without a sound device, the coach speaks through subtitles only. Options > Audio > Subtitles shows
+its words at the bottom of the screen (Automatic: when it does not speak the language of the menus,
+as with Chinese menus where it speaks English), and Options > Audio > Voice volume sets its volume.
+`[tts]` in the settings file tunes the synthesis: `threads` (0 = 2), `voice` (-1 = the default
+voice), `steps` (5) and `arch` (`auto`, or `avx512`, `avxvnni`, `avx2`, `sse2`, `scalar` when
+troubleshooting).
 
 ## Watch a Game
 
@@ -233,8 +239,8 @@ Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-librar
 ## Options
 
 Settings are stored in `Scacelith.ini` next to the executable when that folder is writable,
-otherwise in `%APPDATA%\Scacelith\` (and read back from there); a file given with `--ini <file>`
-is read and written there only (the log warns when it cannot be written). All of them are
+otherwise in `%APPDATA%\scacelith\` (`~/.config/scacelith/` on Linux; read back from there); a
+file given with `--ini <file>` is read and written there only (the log warns when it cannot be written). All of them are
 editable from the Options page: display mode and resolution, V-sync, render scale, quality
 preset, motion blur, depth of field, brightness, volumes, ambience, legal-move hints, auto-press
 clock, the opponent's head movements, mouse sensitivity, the game pointer, and the hand-over
@@ -311,9 +317,13 @@ screenshots of a game in progress, for instance the hand-over halfway (`--start 
 
 Coach mode: `--start --coach` starts a coach game at once, at the level and colour of the Coach
 page unless `--coach-level 0..6` (0 = the rules lesson) or `--coach-colour white|black` say
-otherwise; `--coach-dir <folder>` reads the voice model files from that folder instead of the
-default one. `--coach-stage-test` (alone, or with `--start`) runs a fixed sequence through the
-scene's coach stage without the session: a line spoken and subtitled, the coach pointing at g1 and
+otherwise; `--coach-dir <folder>` reads (and downloads) the voice model files in that folder instead
+of the default one (`--coach-dir build/coach`: the copy a development build prepares).
+`SCACELITH_COACH_SOURCE=github` in the environment skips Hugging Face (to try the fallback), and
+`--scene ui --ui-screen coach-flow [--coach-dir <folder>]` runs the download flow over the title
+page (`coach-download*` screens: the prompt and the panel with sample figures).
+`--coach-stage-test` (alone, or with `--start`) runs a fixed sequence through the scene's coach
+stage without the session: a line spoken and subtitled, the coach pointing at g1 and
 tracing the knight's jump to f3 on their words, a mark and a highlight, two demonstration moves
 taken back by hand, then the takeback card (`--coach-stage-test lesson`: on the lesson's first
 position); its log gives the time of each step, for `--warp`. `--coach-auto-answer yes|no` answers
@@ -333,5 +343,7 @@ fonts Caveat (Impallari Type), Marck Script (Denis Masharov), Bad Script (Gaslig
 SIL Open Font License 1.1; the subsets shipped here are rebuilt from the upstream files by
 `tools/prepare_fonts.py`. The chess figures of the promotion picker come from a subset of GNU
 FreeFont FreeSerif (GPL-3.0+ with the font exception). All licence texts are in `assets/fonts/` and
-`assets/fonts/hand/`. The coach's voice model (Supertonic 3, in the `coach` folder) is not part of
-the program and has its own licence (BigScience Open RAIL-M).
+`assets/fonts/hand/`. The coach's voice model (Supertonic 3) is not part of the program nor of its
+release package: the game downloads it from its publishers at the player's request. It has its own
+licence (BigScience Open RAIL-M), whose use restrictions the download prompt shows; see
+`third_party/supertonic3/README.scacelith.md`.

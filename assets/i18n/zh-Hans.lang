@@ -68,7 +68,7 @@ options.effects = 音效
 options.ambience = 环境音
 options.ambience.help = 大厅里的低语：炉火、远处的脚步声、古老的时钟。
 options.ambience_volume = 环境音音量
-options.voice_volume = 教练语音
+options.voice_volume = 语音音量
 options.voice_volume.help = 教练模式中教练语音的音量。
 options.subtitles = 字幕
 options.subtitles.auto = 自动
@@ -895,8 +895,8 @@ coach.note.unrated = 与教练的对局不计等级分。
 coach.colour = 你的颜色
 coach.colour.help = 你与教练对局时所执的颜色。轮换：每局交替执白、执黑。规则课程始终执白。
 coach.colour.alternate = 轮换
-# Shown when the voice files (the coach folder next to the game) are missing.
-coach.no_voice = 未找到教练语音（coach 文件夹）：教练将只通过字幕讲解。
+# Shown when the coach's voice cannot be heard: its model is not downloaded, or Options > Audio > Coach voice is off.
+coach.no_voice = 教练语音未安装或已关闭（选项 > 声音）：教练的话将以文字显示在屏幕上。
 # At the table
 coach.speaker = 教练
 coach.skip = 跳过
@@ -915,3 +915,44 @@ coach.gameover.unrated = 与教练的这盘对局不计等级分。
 coach.lesson.done = 做得好
 coach.lesson.done.line = 你已经掌握了国际象棋的规则。
 coach.lesson.next = 第一盘对局
+
+# ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
+# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Options > Audio
+options.coach_voice = 教练语音
+options.coach_voice.help = 在教练模式中，教练会出声讲解。其语音模型在首次需要时下载（约 145 MB）。关闭：教练的话只以文字显示在屏幕上。
+# The prompt. {0} = the size in megabytes ("145.3")
+coach.download.title = 教练语音
+coach.download.text = 教练使用 Supertone 公司的语音合成模型 Supertonic 3 说话。Scacelith 未附带该模型：游戏现在可以从 Hugging Face 下载它（{0} MB，仅需一次）。没有它，教练会把要说的话以文字显示在屏幕上。
+coach.download.licence = 该模型依据 OpenRAIL-M 许可证发布，该许可证禁止以某些方式使用其生成的语音，例如将其冒充为真人声音或模仿真实人物。
+coach.download.read_licence = 阅读许可证
+coach.download.accept = 选择“下载”即表示您接受此许可证的条款。
+# {0} = a folder
+coach.download.folder = 保存位置：{0}
+coach.download.not_now = 以后再说
+# {0} = the size in megabytes
+coach.download.download = 下载（{0} MB）
+coach.download.licence_title = OpenRAIL-M 许可证
+coach.download.back = 返回
+# Progress panel (top corner, over the menus and the game)
+coach.download.caption = 教练语音
+coach.download.checking = 正在检查文件…
+coach.download.downloading = 正在下载…
+coach.download.extracting = 正在解压文件…
+# {0} = megabytes received, {1} = megabytes in all
+coach.download.megabytes = {0} / {1} MB
+# Where the files come from (the repository's address is shown under it)
+coach.download.from_hub = 来自 Hugging Face
+coach.download.from_github = 来自 GitHub（发布归档）
+coach.download.cancel = 取消
+coach.download.failed = 下载失败。
+coach.download.error.network = 无法连接服务器。请检查您的网络连接，然后重试。
+# {0} = a folder
+coach.download.error.disk = 无法将文件写入 {0}。请检查可用空间，然后重试。
+# {0} = a short technical code ("http 503", "hash")
+coach.download.error.server = 服务器返回了意外的响应（{0}）。请稍后重试。
+coach.download.retry = 重试
+coach.download.close = 关闭
+# Notices
+coach.download.done = 教练语音已安装。
+coach.download.cancelled = 下载已取消：下次将从中断处继续。

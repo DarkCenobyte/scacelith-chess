@@ -291,6 +291,78 @@ Sha256 sha256(const void* data, size_t n) {
     return out;
 }
 
+// ---- incremental SHA-256 ----
+#if defined(_WIN32)
+struct Sha256Stream::State {
+    BCRYPT_HASH_HANDLE h = nullptr;
+    void open() {
+        if (sha256Provider()) BCryptCreateHash(sha256Provider(), &h, nullptr, 0, nullptr, 0, 0);
+    }
+    void close() {
+        if (h) BCryptDestroyHash(h);
+        h = nullptr;
+    }
+};
+#elif defined(SCACELITH_HAS_OPENSSL)
+struct Sha256Stream::State {
+    EVP_MD_CTX* ctx = nullptr;
+    void open() {
+        ctx = EVP_MD_CTX_new();
+        if (ctx && EVP_DigestInit_ex(ctx, EVP_sha256(), nullptr) != 1) close();
+    }
+    void close() {
+        EVP_MD_CTX_free(ctx);
+        ctx = nullptr;
+    }
+};
+#else
+struct Sha256Stream::State {
+    Sha256Ctx c;
+    void open() { c = Sha256Ctx(); }
+    void close() {}
+};
+#endif
+
+Sha256Stream::Sha256Stream() : st_(new State) { st_->open(); }
+Sha256Stream::~Sha256Stream() { st_->close(); }
+
+void Sha256Stream::reset() {
+    st_->close();
+    st_->open();
+    bytes_ = 0;
+}
+
+void Sha256Stream::update(const void* data, size_t n) {
+    bytes_ += n;
+#if defined(_WIN32)
+    const uint8_t* p = static_cast<const uint8_t*>(data);
+    while (n && st_->h) {
+        ULONG k = n > 0x40000000u ? 0x40000000u : ULONG(n);
+        BCryptHashData(st_->h, (PUCHAR)p, k, 0);
+        p += k;
+        n -= k;
+    }
+#elif defined(SCACELITH_HAS_OPENSSL)
+    if (st_->ctx) EVP_DigestUpdate(st_->ctx, data, n);
+#else
+    st_->c.update(data, n);
+#endif
+}
+
+Sha256 Sha256Stream::finish() {
+    Sha256 out{};
+#if defined(_WIN32)
+    if (st_->h) BCryptFinishHash(st_->h, out.data(), 32, 0);
+#elif defined(SCACELITH_HAS_OPENSSL)
+    unsigned len = 0;
+    if (st_->ctx) EVP_DigestFinal_ex(st_->ctx, out.data(), &len);
+#else
+    out = st_->c.final();
+#endif
+    reset();
+    return out;
+}
+
 Sha1 sha1(const void* data, size_t n) {
     Sha1 out{};
 #if defined(_WIN32)

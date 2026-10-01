@@ -263,6 +263,21 @@ std::string userDataDirectory() {
     mkdir(d.c_str(), 0755);
     return d;
 }
+// XDG base directories: data in $XDG_DATA_HOME (an absolute path), else ~/.local/share.
+std::string appDataDirectory() {
+    const char* xdg = getenv("XDG_DATA_HOME");
+    const char* home = getenv("HOME");
+    std::string base;
+    if (xdg && xdg[0] == '/') base = xdg;
+    else if (home && home[0]) base = std::string(home) + "/.local/share";
+    else return exeDirectory();
+    while (base.size() > 1 && base.back() == '/') base.pop_back();
+    for (size_t p = base.find('/', 1); p != std::string::npos; p = base.find('/', p + 1)) mkdir(base.substr(0, p).c_str(), 0755);
+    mkdir(base.c_str(), 0755);
+    std::string d = base + "/scacelith/";
+    mkdir(d.c_str(), 0755);
+    return d;
+}
 void messageBox(const char* title, const char* text) { LOGE("%s: %s", title, text); }
 uint64_t randomSeed() {
     timespec t;

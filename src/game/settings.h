@@ -158,6 +158,11 @@ struct Settings {
     int ttsVoice = -1;
     int ttsSteps = 5;
     std::string ttsArch = "auto";
+    // [coach] voice: the coach speaks (Options > Audio > Coach voice). Its model is not shipped:
+    // the game offers to download it (game/coach_model.h) the first time Coach mode or this
+    // option needs it. Off = the coach's words as subtitles only; declining the download prompt
+    // switches it off (remembered), switching it back on offers the download again.
+    bool coachVoice = true;
     // [interface]
     std::string language;         // i18n code ("fr", "zh-Hant"...); "" = the OS language (first start)
     // The coach's words at the bottom of the screen (SubtitleMode).

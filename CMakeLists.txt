@@ -117,6 +117,9 @@ include(third_party/supertonic3/supertonic3.cmake)
 # without it (online play then reports "unavailable").
 set_source_files_properties(${ROOT}/src/net/online_client.cpp PROPERTIES COMPILE_DEFINITIONS
     "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\";SCACELITH_VERSION_STRING=\"${PROJECT_VERSION}\"")
+# The User-Agent of the voice model downloads ("Scacelith/<version>").
+set_source_files_properties(${ROOT}/src/tts/model_store.cpp PROPERTIES COMPILE_DEFINITIONS
+    "SCACELITH_VERSION_STRING=\"${PROJECT_VERSION}\"")
 set_source_files_properties(${ROOT}/tests/net_tests.cpp PROPERTIES COMPILE_DEFINITIONS
     "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\"")
 if(WIN32)

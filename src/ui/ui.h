@@ -261,6 +261,40 @@ struct CoachPause {
 };
 MenuAction coachPauseMenu(const CoachPause& p);
 
+// ---- Coach voice download (ui_model_download.cpp) ---------------------------------------------
+// The prompt that offers to download the coach's voice model (Supertonic 3, not shipped with the
+// game) and the progress panel of the download. The game owns the job and the decisions
+// (game/coach_model.h: call that, not these, from a scene); these draw and report the choice.
+// Texts: coach.download.* in assets/i18n.
+struct ModelPrompt {
+    double bytes = 145316356.0;  // download size, shown in the text and on the Download button
+    std::string folder;          // where the files go (shown in small print)
+};
+enum class ModelPromptAction { None, Download, NotNow };
+// Modal card over whatever is on screen (menus or the table; what was drawn before it this frame
+// and the game's input are blocked from the next frame on). "Read the licence" turns the card
+// into the OpenRAIL-M text, Back returns. Esc = Not now (Back on the licence). Draw it every frame
+// while it is open, after the menus and HUD; it closes when it returns an action.
+ModelPromptAction modelPrompt(const ModelPrompt& p);
+
+struct ModelProgressView {
+    enum class State { Hidden, Checking, Downloading, Extracting, Failed };
+    State state = State::Hidden;   // Hidden: fades out
+    double done = 0.0, total = 0.0;   // the bar and, while downloading, the megabytes
+    bool github = false;           // the source: the GitHub release archive, else Hugging Face
+    std::string sourceLabel;       // "huggingface.co/csukuangfj2/...", "k2-fsa/sherpa-onnx release"
+    std::string file;              // the file in progress (small print), "" = none
+    std::string error;             // Failed: the reason, translated
+};
+enum class ModelPanelAction { None, Cancel, Retry, Close };
+// Non-modal panel in the top end corner, over the menus and the table alike: what is happening,
+// the bar, megabytes, the host, Cancel; when it failed, the reason with Close / Retry. Its
+// buttons are mouse only (the keyboard stays with the menus and the game).
+ModelPanelAction modelProgressPanel(const ModelProgressView& v);
+// Called when the player picks "Coach" on the title page, as the Coach page opens (the game's
+// voice download prompt hooks in here: game::coachModelInit). nullptr = none.
+void setCoachEntryHook(std::function<void()> hook);
+
 // ---- In-game pointer (ui_screens_game.cpp) -------------------------------------------------------
 // Drawn by the game during first-person play in place of the system arrow (hidden meanwhile), on
 // top of everything, at 'pixelPos' (physical pixels, as plat::Input). Its shape says what a click

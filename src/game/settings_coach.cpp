@@ -59,6 +59,7 @@ void readCoachSettings(const IniFile& ini, Settings& s) {
     s.ttsSteps = std::clamp(ini.getInt("tts.steps", s.ttsSteps), 1, 16);
     s.ttsArch = ini.getString("tts.arch", s.ttsArch);
     if (s.ttsArch.empty()) s.ttsArch = "auto";
+    s.coachVoice = ini.getBool("coach.voice", s.coachVoice);  // the voice model download (W12)
 }
 
 void writeCoachSettings(IniFile& ini, const Settings& s) {
@@ -73,6 +74,7 @@ void writeCoachSettings(IniFile& ini, const Settings& s) {
     ini.setInt("tts.voice", s.ttsVoice);
     ini.setInt("tts.steps", s.ttsSteps);
     ini.set("tts.arch", s.ttsArch);
+    ini.setBool("coach.voice", s.coachVoice);  // the voice model download (W12)
 }
 
 }  // namespace game

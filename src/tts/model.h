@@ -29,14 +29,12 @@ public:
 
     // From a folder holding the release files (mapped, used in place).
     bool loadDirectory(const std::string& dir, const kern::Table& k, std::string* error);
-    // From memory that outlives the engine (the embedded copy).
-    bool loadBlobs(const Blob blobs[kFileCount], const kern::Table& k, std::string* error);
     bool loaded() const { return loaded_; }
 
     int voiceCount() const { return voices_; }
     std::string voiceName(int i) const;
     const int32_t* indexer() const { return indexer_; }
-    size_t modelBytes() const;   // bytes of the four graphs (mapped or embedded)
+    size_t modelBytes() const;   // bytes of the four graphs (mapped)
 
     // Stages. 'ids' are model ids (text::indices), 'voice' in [0, voiceCount()).
     bool duration(const std::vector<int64_t>& ids, int voice, const ExecContext& ctx, float* seconds,

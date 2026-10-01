@@ -36,6 +36,12 @@ static std::string lower(const std::string& s) {
     return r;
 }
 
+std::string HttpHead::get(const std::string& lowerName) const {
+    for (auto& h : headers)
+        if (h.first == lowerName) return h.second;
+    return std::string();
+}
+
 bool isLoopbackHost(const std::string& host) {
     std::string h = lower(host);
     return h == "localhost" || h == "127.0.0.1" || h == "::1";

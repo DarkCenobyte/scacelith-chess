@@ -2,7 +2,11 @@
 
 In-house engine on OpenGL 4.6 core (DSA only), C++17, no third-party engine. The shipping target
 is a single self-contained Windows x64 executable (MinGW-w64, static). Everything (shaders,
-fonts, the Stockfish NNUE network) is embedded; only `Scacelith.ini` lives next to the exe.
+fonts, the Stockfish NNUE network) is embedded; only `Scacelith.ini` lives next to the exe. The
+coach's voice model is never shipped: the game downloads it, at the player's request, into its
+per-user application folder (`plat::appDataDirectory()`: `%APPDATA%\scacelith\` on Windows,
+`$XDG_DATA_HOME/scacelith/` or `~/.local/share/scacelith/` on Linux, and
+`~/Library/Application Support/scacelith/` for a future macOS port), subfolder `coach/`.
 
 ## Build
 
@@ -25,7 +29,7 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 | `src/platform` | Win32 (+X11 for tests) window, GL 4.6 context, input, timing |
 | `src/gl` | Generated GL 4.6 loader (`tools/gen_gl_loader.py`) |
 | `src/math` | vec/mat/quat, reverse-Z projections, rays (conventions in `math.h`) |
-| `src/core` | log, ini, embedded files, PNG writer |
+| `src/core` | log, ini, embedded files, PNG writer, streaming bzip2 decoder and tar reader (`bzip2.h`, `tar.h`: the voice model's release archive) |
 | `src/render` | Renderer (forward PBR, frame orchestration), shader builder, meshes |
 | `src/render/lighting` + `shaders/lighting` | Atmosphere/sky, sun cascades (PCSS), light probes (GI), planar reflections |
 | `src/render/post` | Post chain (GTAO, SSR, volumetrics, TAA, motion blur, DOF, bloom, tonemap) |
@@ -40,7 +44,7 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 | `src/i18n` + `assets/i18n` | Translations (`tr`, `trf`, `trn` with CLDR plurals), language choice, Unicode helpers (`unicode.h`: joining, bidi, line breaks) |
 | `src/game` | Game state machine, settings, world layout (`layout.h`); seats and game modes (play / watch / hot-seat / online / coach), Elo (`elo.h`), camera flights and the viewer's observer camera (engine-free, in the core library and unit-tested); `game_scene_coach.cpp`: the coach's stage in the scene |
 | `src/coach` | Coach mode's brain, engine-free and GL-free: session, director, scripts, the spoken line catalogue (`assets/coach`), review and appraisal of the player's moves, openings and the teaching repertoire, the rules lesson, rewinds by hand (`rewind.h`) |
-| `src/tts` | Text-to-speech for the coach's voice (Supertonic 3, ONNX graphs run by an in-house int8 runtime with per-ISA kernels), a worker thread; the model files are read from the `coach` folder (`--coach-dir` overrides it) |
+| `src/tts` | Text-to-speech for the coach's voice (Supertonic 3, ONNX graphs run by an in-house int8 runtime with per-ISA kernels), a worker thread; `model_store.h`: the model's nine files (manifest with sizes and SHA-256), its folder (`<application data>/coach/`, `--coach-dir` overrides it) and the download job (Hugging Face file by file, else the sherpa-onnx release archive on GitHub, extracted) |
 | `src/app` | Scene registry (`--scene`), test scenes |
 
 ## Rendering contracts
@@ -191,6 +195,13 @@ director's marks (`World::submitCoachMarks`, piece highlights through `submitPie
   coach's mouth. The speech clock is the audio engine's (`played` minus the output latency) while
   a device plays it, else the game's time; a voice that never starts is ended by a watchdog.
   Glyphs of a line are put in the font atlas when its synthesis is requested.
+* **Voice model download.** `src/game/coach_model.h` decides when to offer the model (the Coach
+  entry of the title page, through `ui::setCoachEntryHook`; Options > Audio > Coach voice switched
+  on; files that did not load), runs the `tts::ModelDownloader` and draws the prompt and the
+  progress panel (`src/ui/ui_model_download.cpp`); `net::download` (`src/net/download.h`) streams
+  each file, follows the hosts' redirects (the online client never does) and resumes with `Range`.
+  The scene calls `drawModelDownload()` every frame and re-reads `coachVoiceWanted()`
+  (`refreshCoachVoice`) after a download or an options change.
 * **Body.** Gestures become animator tasks on the coach's playing arm (`Point`, `Trace`,
   `Gesture`) scheduled with `notBefore` so that their apex lands on the word (`anchorTime`); nods
   and head shakes are timed separately; the speech level drives the mouth and a blink ends each
