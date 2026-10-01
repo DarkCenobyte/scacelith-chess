@@ -53,12 +53,6 @@ bool Engine::loadDirectory(const std::string& dir, const kern::Table& k, std::st
     return build(b, k, error);
 }
 
-bool Engine::loadBlobs(const Blob blobs[kFileCount], const kern::Table& k, std::string* error) {
-    for (int i = 0; i < kFileCount; ++i)
-        if (!blobs[i].data || !blobs[i].size) return fail(error, std::string("missing ") + kFiles[i]);
-    return build(blobs, k, error);
-}
-
 bool Engine::build(const Blob blobs[kFileCount], const kern::Table& k, std::string* error) {
     loaded_ = false;
     for (int i = 0; i < kFileCount; ++i) blobs_[i] = blobs[i];

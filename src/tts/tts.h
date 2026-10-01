@@ -1,7 +1,9 @@
 // The coach's voice: in-process text-to-speech with the Supertonic 3 INT8 model (sherpa-onnx
 // release of Supertone's OpenRAIL-M weights), run by our own small ONNX interpreter (src/tts/graph.*,
-// no onnxruntime). The model files live in a "coach" folder beside the executable (or are embedded
-// with -DSCACELITH_TTS_EMBED=ON); without them load() fails and the coach runs with subtitles only.
+// no onnxruntime). The model files are never shipped with the game: they live in the folder of the
+// model store (src/tts/model_store.h: <application data>/coach/, or --coach-dir), which the game
+// fills by downloading them at the player's request. Without them load() fails and the coach runs
+// with subtitles only.
 //
 // Pipeline per chunk of text (sentence-aligned, at most 300 characters, 120 for Japanese): the
 // official text normalisation, duration predictor, text encoder, 'steps' Euler steps of the flow
@@ -57,7 +59,8 @@ public:
     Synthesizer(const Synthesizer&) = delete;
     Synthesizer& operator=(const Synthesizer&) = delete;
 
-    // From <exe dir>/coach/, else the embedded copy (when built with SCACELITH_TTS_EMBED).
+    // From the model store's folder (tts::modelFolder()). On failure with every file there
+    // (tts::modelStatus() Ready), run tts::verifyModel(): damaged files mean a new download.
     bool load(std::string* error = nullptr);
     // From a given folder (tests, tools).
     bool loadFrom(const std::string& dir, std::string* error = nullptr);

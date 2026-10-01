@@ -19,6 +19,7 @@
 #include "tts/onnx.h"
 #include "tts/text.h"
 #include "tts/threads.h"
+#include "tts/model_store.h"
 #include "tts/tts.h"
 
 #include <algorithm>
@@ -1408,6 +1409,11 @@ TEST(tts_synthesizer_output) {
 }
 
 TEST(tts_worker) {
+    // The worker loads from the model store's folder: the build's development copy here.
+    tts::setModelFolder(modelDir());
+    struct Restore {
+        ~Restore() { tts::setModelFolder(std::string()); }
+    } restore;
     tts::Worker w;
     tts::Options o;
     o.threads = 2;
