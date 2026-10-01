@@ -664,6 +664,28 @@ TEST(net_json_rejects) {
     CHECK(!net::json::parse(deep, v));
 }
 
+// Limits::keepDepth: the whole document is checked, only its head is kept (the account export).
+TEST(net_json_keep_depth) {
+    net::json::Limits lim;
+    lim.keepDepth = 1;
+    Value v;
+    CHECK(net::json::parse(R"({"format":"x","version":1,"list":[1,{"a":[2]}],"obj":{"k":"v"}})", v, nullptr, lim));
+    CHECK_EQ(v["format"].asString(), std::string("x"));
+    CHECK_EQ(v["version"].asInt(), int64_t(1));
+    CHECK(v["list"].isArray());
+    CHECK_EQ(v["list"].size(), size_t(0));
+    CHECK(v["obj"].isObject());
+    CHECK_EQ(v["obj"].size(), size_t(0));
+    CHECK(!net::json::parse(R"({"format":"x","list":[1,{"a":[2,]}]})", v, nullptr, lim));   // still checked
+    CHECK(!net::json::parse(R"({"list":["\ud800"]})", v, nullptr, lim));
+    lim.keepDepth = 2;
+    CHECK(net::json::parse(R"({"list":[1,{"a":[2]}]})", v, nullptr, lim));
+    CHECK_EQ(v["list"].size(), size_t(2));
+    CHECK_EQ(v["list"][1].size(), size_t(0));
+    CHECK(net::json::parse("[[1],[2]]", v, nullptr, lim));
+    CHECK_EQ(v[0][0].asInt(), int64_t(1));
+}
+
 TEST(net_json_write) {
     Value o = Value::object();
     o.set("s", "q\"\\\n\x01\xC3\xA9");
