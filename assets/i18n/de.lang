@@ -1040,6 +1040,7 @@ replay.move = Zug {0} von {1}
 replay.speed.factor = ×{0}
 replay.speed.instant = Sofort
 replay.again = Noch einmal nachspielen
+replay.gameover.unfinished = Die Partie bricht nach dem {0}. Zug ohne Ergebnis ab.
 replay.tip.start = Anfang der Partie (Pos1)
 replay.tip.back = Einen Zug zurück (J)
 replay.tip.pause = Pause (K)

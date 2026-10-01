@@ -2581,7 +2581,14 @@ void GameScene::renderOverlay(AppContext&, float) {
         ui::viewerHud(hud);
         if (replaying() && hud.visible) drawReplayBar();
     }
-    ui::moveList(game_.sanMoves(), inGame && showMoveList_);
+    if (replaying() && replaySheetOffset() && !game_.sanMoves().empty()) {
+        // A record that starts with Black to move: its first move in Black's column, as on the sheets.
+        std::vector<std::string> san(1, std::string("..."));
+        san.insert(san.end(), game_.sanMoves().begin(), game_.sanMoves().end());
+        ui::moveList(san, inGame && showMoveList_);
+    } else {
+        ui::moveList(game_.sanMoves(), inGame && showMoveList_);
+    }
     if (coach() && (inGame || state_ == State::Handshake)) drawCoachSubtitles();
     // The coach's voice model: its download prompt, progress panel and notices (coach_model.h).
     drawModelDownload();

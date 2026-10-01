@@ -1050,6 +1050,7 @@ replay.move = Move {0} of {1}
 replay.speed.factor = ×{0}
 replay.speed.instant = Instant
 replay.again = Replay again
+replay.gameover.unfinished = The game stops after move {0}, without a result.
 replay.tip.start = Start of the game (Home)
 replay.tip.back = One move back (J)
 replay.tip.pause = Pause (K)

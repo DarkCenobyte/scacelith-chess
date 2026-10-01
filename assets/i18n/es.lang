@@ -1040,6 +1040,7 @@ replay.move = Jugada {0} de {1}
 replay.speed.factor = ×{0}
 replay.speed.instant = Instantáneo
 replay.again = Reproducir de nuevo
+replay.gameover.unfinished = La partida se interrumpe tras la jugada {0}, sin resultado.
 replay.tip.start = Inicio de la partida (Inicio)
 replay.tip.back = Una jugada atrás (J)
 replay.tip.pause = Pausa (K)

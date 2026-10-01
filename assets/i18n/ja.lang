@@ -1041,6 +1041,7 @@ replay.move = {1}手中 {0}手目
 replay.speed.factor = ×{0}
 replay.speed.instant = 即時
 replay.again = もう一度再生
+replay.gameover.unfinished = {0}手目で中断され、結果はありません。
 replay.tip.start = 対局の最初へ（Home）
 replay.tip.back = 1手戻る（J）
 replay.tip.pause = 一時停止（K）

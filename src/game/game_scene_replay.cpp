@@ -118,6 +118,8 @@ void GameScene::setupReplay() {
     replay::Options opts;
     opts.moveAnimationMs = untimed() ? kRobotMoveUntimedMs : kRobotMoveMs;
     replayClock_.load(replayRecord_, opts);   // its first event sets the start position (done already)
+    // Black to move first: White's cell of the first row stays "..." (the header is written).
+    if (replaySheetOffset()) scorekeeper_.writeMovesInstantly({"..."});
     replayClock_.setSpeed(replaySpeedArg_);
     if (replayPausedArg_) replayClock_.pause();
     // The lever is down on the side of the player who would have moved last (a FEN game may start
@@ -196,7 +198,7 @@ void GameScene::completeReplayMove(int seat, const Arbiter::Verdict& v) {
     }
     game_.play(v.move);
     int ply = int(game_.moves().size()) - 1;
-    scorekeeper_.recordMove(ply, game_.sanMoves().back());
+    scorekeeper_.recordMove(ply + replaySheetOffset(), game_.sanMoves().back());
     replayClock_.moveDone();
     const replay::ClockView c = replayClock_.clocks();
     LOGI("replay: ply %d %s at %.2f s (robot %.2f s), clocks %lld / %lld ms", ply + 1, game_.sanMoves().back().c_str(),
@@ -236,7 +238,9 @@ void GameScene::setReplayPosition(int ply) {
     newScoresheets();
     scorekeeper_.setDetails(replaySheetDetails());
     scorekeeper_.writeHeaderInstantly();
-    if (!game_.sanMoves().empty()) scorekeeper_.writeMovesInstantly(game_.sanMoves());
+    std::vector<std::string> sheetMoves(size_t(replaySheetOffset()), std::string("..."));
+    sheetMoves.insert(sheetMoves.end(), game_.sanMoves().begin(), game_.sanMoves().end());
+    if (!sheetMoves.empty()) scorekeeper_.writeMovesInstantly(sheetMoves);
     // The lever is down on the side of the player who moved last.
     Color moved = opposite(game_.position().sideToMove());
     leverTarget_ = leverSide_ = world_.clockHalfForSeat(seatOf(moved) == 0 ? 1.0f : -1.0f) == 1 ? 1.0f : -1.0f;
@@ -259,6 +263,15 @@ void GameScene::setReplayPosition(int ply) {
     }
 }
 
+int GameScene::replaySheetOffset() const {
+    // game_ starts from the record's start position (setupNewGame, setReplayPosition).
+    return game_.startPosition().sideToMove() == Black ? 1 : 0;
+}
+
+int GameScene::replayMoveNumber(int plies) const {
+    return std::max(1, game_.startPosition().fullmoveNumber()) + std::max(0, plies + replaySheetOffset() - 1) / 2;
+}
+
 void GameScene::endReplay() {
     if (state_ != State::Playing) return;
     endGame();  // the record's result (endGame's replay branch); nothing rated, nothing saved
@@ -267,10 +280,12 @@ void GameScene::endReplay() {
 ui::GameOverExtras GameScene::replayGameOverExtras() const {
     ui::GameOverExtras x;
     const std::string& r = replayRecord_.result;
-    std::string moveNo = std::to_string(std::max(1, int(game_.moves().size() + 1) / 2));
+    // The move as the record numbers it (a FEN game may start at move 40).
+    std::string moveNo = std::to_string(replayMoveNumber(int(game_.moves().size())));
     if (r == "1-0") x.line = i18n::trf("viewer.gameover.white_wins", {moveNo});
     else if (r == "0-1") x.line = i18n::trf("viewer.gameover.black_wins", {moveNo});
     else if (r == "1/2-1/2") x.line = i18n::trf("viewer.gameover.draw", {moveNo});
+    else x.line = i18n::trf("replay.gameover.unfinished", {moveNo});   // never the player's win or loss
     // The players as the record names them ("?" for an unknown name), their rating when it has one.
     auto label = [this](int i) {
         const Seat& st = seats_[i];
@@ -312,8 +327,11 @@ bool GameScene::replayKey(const std::string& key) {
 void GameScene::drawReplayBar() {
     ui::ReplayBar b;
     const int ply = replayClock_.ply(), plies = replayClock_.plies();
-    b.move = (ply + 1) / 2;   // full moves: White's 12th and Black's 12th are both move 12
-    b.moves = (plies + 1) / 2;
+    // Full moves: White's 12th and Black's 12th are both move 12. Counted from the record's first
+    // move, as the rows of the sheets (a FEN game from "40... Kd7" to "43. Ke3": 4 moves).
+    const int off = replaySheetOffset();
+    b.move = ply > 0 ? (ply + off + 1) / 2 : 0;
+    b.moves = plies > 0 ? (plies + off + 1) / 2 : 0;
     replay::Speed sp = replayClock_.speed();
     b.speed = sp == replay::Speed::Instant ? std::string(i18n::tr("replay.speed.instant"))
                                            : i18n::trf("replay.speed.factor", {std::to_string(int(replay::speedFactor(sp)))});

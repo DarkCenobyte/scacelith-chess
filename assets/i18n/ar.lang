@@ -1045,6 +1045,7 @@ replay.move = النقلة {0} من {1}
 replay.speed.factor = ×{0}
 replay.speed.instant = فوري
 replay.again = إعادة العرض مرة أخرى
+replay.gameover.unfinished = توقفت المباراة بعد النقلة {0} دون نتيجة.
 replay.tip.start = بداية المباراة (Home)
 replay.tip.back = نقلة إلى الوراء (J)
 replay.tip.pause = إيقاف مؤقت (K)

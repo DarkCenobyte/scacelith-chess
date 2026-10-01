@@ -1040,6 +1040,7 @@ replay.move = 第 {0} 回合，共 {1} 回合
 replay.speed.factor = ×{0}
 replay.speed.instant = 即时
 replay.again = 再次重播
+replay.gameover.unfinished = 对局在第 {0} 回合后中断，没有结果。
 replay.tip.start = 对局开始（Home）
 replay.tip.back = 后退一步（J）
 replay.tip.pause = 暂停（K）

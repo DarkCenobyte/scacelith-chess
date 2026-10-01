@@ -1041,6 +1041,7 @@ replay.move = Ход {0} из {1}
 replay.speed.factor = ×{0}
 replay.speed.instant = Мгновенно
 replay.again = Посмотреть снова
+replay.gameover.unfinished = Партия прервана после {0}-го хода, без результата.
 replay.tip.start = Начало партии (Home)
 replay.tip.back = Ход назад (J)
 replay.tip.pause = Пауза (K)
