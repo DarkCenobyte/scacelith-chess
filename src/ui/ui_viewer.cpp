@@ -22,7 +22,9 @@
 //   online pages (in-process mock server, frozen clock): online (sign in), online-register,
 //     online-mfa (code step), online-play, online-search, online-account, online-mfa-setup,
 //     online-recovery, online-challenge, online-private, online-noserver, direct, direct-host,
-//     direct-wait, direct-join; at the table: online-hud, online-pause, online-report,
+//     direct-wait, direct-join; the account API's pages: online-history, online-game (a game of
+//     the history), online-devices, online-email, online-email-sent, online-export,
+//     online-export-done, online-delete; at the table: online-hud, online-pause, online-report,
 //     online-gameover
 //   --ui-tab <0..6|display|graphics|audio|gameplay|player|online|controls>   options tab
 //   --lang <code>   interface language (en fr de es uk ar ru ja zh-Hant zh-Hans; read by game::Settings)
@@ -223,7 +225,9 @@ public:
             {"online-search", "search"}, {"online-account", "account"}, {"online-mfa-setup", "mfa-setup"},
             {"online-recovery", "recovery"}, {"online-challenge", "challenge"}, {"online-private", "private"},
             {"online-noserver", "noserver"}, {"direct", "direct"}, {"direct-host", "direct-host"}, {"direct-wait", "direct-wait"},
-            {"direct-join", "direct-join"},
+            {"direct-join", "direct-join"}, {"online-history", "history"}, {"online-game", "game"},
+            {"online-devices", "devices"}, {"online-email", "email"}, {"online-email-sent", "email-sent"},
+            {"online-export", "export"}, {"online-export-done", "export-done"}, {"online-delete", "delete"},
         };
         for (const auto& p : pages)
             if (screen == p.screen) {

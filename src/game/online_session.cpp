@@ -858,6 +858,10 @@ std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t 
         if (retryAfterSec > 0) return i18n::trf("online.err.server_busy_for", {durationText(retryAfterSec * 1000.0)});
         return i18n::tr("online.err.server_busy");
     }
+    if (code == "too_many_attempts") {
+        if (retryAfterSec > 0) return i18n::trf("online.err.too_many_attempts_for", {durationText(retryAfterSec * 1000.0)});
+        return i18n::tr("online.err.too_many_attempts");
+    }
     if (code == "banned") {
         if (bannedUntilMs > 0) return i18n::trf("online.err.banned_until", {localTimeText(double(bannedUntilMs))});
         return i18n::tr("online.err.banned");
@@ -865,7 +869,8 @@ std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t 
     static const char* known[] = {"invalid_credentials", "email_unverified", "network", "tls", "certificate", "incompatible",
                                   "unauthorized", "username_taken", "email_taken", "invalid_username", "invalid_email",
                                   "weak_password", "invalid_code", "expired", "registration_closed", "sso_cancelled",
-                                  "server_error", "timeout", "offline"};
+                                  "server_error", "timeout", "offline", "invalid_password", "mfa_code_required",
+                                  "password_not_set", "same_email", "not_found", "invalid_response"};
     for (const char* k : known)
         if (code == k) return i18n::tr(std::string("online.err.") + k);
     return i18n::trf("online.err.other", {code});

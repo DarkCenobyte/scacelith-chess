@@ -87,12 +87,12 @@ std::string contentKey(const archive::Entry& e) {
 
 // Filter of the list: 0 every game, then one mode each.
 const archive::Mode kFilterModes[] = {archive::Mode::Play, archive::Mode::Coach, archive::Mode::HotSeat,
-                                      archive::Mode::Direct, archive::Mode::Imported};
-constexpr int kFilterCount = 6;
+                                      archive::Mode::Direct, archive::Mode::Server, archive::Mode::Imported};
+constexpr int kFilterCount = 7;
 bool passes(int filter, archive::Mode m) { return filter <= 0 || filter >= kFilterCount || kFilterModes[filter - 1] == m; }
 std::vector<std::string> filterLabels() {
     return {T("library.filter.all"), T("library.filter.play"), T("library.filter.coach"), T("library.filter.hotseat"),
-            T("library.filter.direct"), T("library.filter.imported")};
+            T("library.filter.direct"), T("library.filter.server"), T("library.filter.imported")};
 }
 
 std::string modeLabel(archive::Mode m) {
@@ -101,6 +101,7 @@ std::string modeLabel(archive::Mode m) {
         case archive::Mode::Coach: return T("library.mode.coach");
         case archive::Mode::HotSeat: return T("library.mode.hotseat");
         case archive::Mode::Direct: return T("library.mode.direct");
+        case archive::Mode::Server: return T("library.mode.server");
         default: return T("library.mode.imported");
     }
 }

@@ -10,10 +10,12 @@ namespace ui {
 namespace detail {
 
 // ---- Implemented in ui_screens_online.cpp, called from ui_screens.cpp ----------------------------
-// "Play Online" page of the title menu: sign-in and account pages, matchmaking, challenges,
-// private games and the direct match. t = page appearance (0..1), opened = first frame on the
-// page. Sets 'back' when the player leaves it.
-void onlinePage(float t, bool opened, bool& back);
+// "Play Online" page of the title menu: sign-in and account pages (game history, devices, e-mail,
+// data export, deletion), matchmaking, challenges, private games and the direct match. t = page
+// appearance (0..1), opened = first frame on the page. Sets 'back' when the player leaves it.
+// library: the saved games folder of the menu (nullptr: a game of the history can be neither saved
+// nor replayed); StartReplay when a game of the history is replayed (library->replay names it).
+MenuAction onlinePage(LibrarySetup* library, float t, bool opened, bool& back);
 // Every frame of the main menu, after the page: challenge cards (any page, once signed in) and
 // the ping indicator (on the online page).
 void onlineMenuOverlay(bool onOnlinePage);
@@ -44,7 +46,8 @@ bool setClipboardText(const std::string& text);
 namespace debug {
 // Viewer: opens the online page on a sub-page ("signin", "register", "mfa", "account",
 // "mfa-setup", "play", "search", "challenge", "private", "direct", "direct-host",
-// "direct-wait", "direct-join", "noserver").
+// "direct-wait", "direct-join", "noserver"; the account API's pages: "history", "game",
+// "devices", "email", "email-sent", "export", "export-done", "delete").
 void openOnlinePage(const std::string& sub);
 }  // namespace debug
 
