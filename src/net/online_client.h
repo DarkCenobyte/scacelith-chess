@@ -32,6 +32,10 @@
 //   - Protocol v2 (additive): sendGesture() and Event::Kind::OpponentGesture relay the live
 //     gestures of the two players (net/gesture.h), and OnlineGame::autoPress tells whether the
 //     robots press the clock by themselves in the game.
+//   - Account API (additive): the game history, a game's details and PGN, the signed-in devices,
+//     the challenge preference, the e-mail change, the data export and the account deletion
+//     (fetchMyGames ... deleteAccount below; dedicated-server/docs/API.md). A 401 answer to any
+//     call that carried the session token erases that token (the session expired or was revoked).
 #pragma once
 #include "gesture.h"
 #include <cstdint>
@@ -56,10 +60,12 @@ struct ServerEndpoint {
     uint16_t effectiveWsPort() const { return wsPort ? wsPort : apiPort; }
 };
 
-// The official server of this build: caissa.scacelith.com, HTTPS API and WSS on port 44664
-// (wss://caissa.scacelith.com:44664/ws), trust store, no pin. The CMake option
-// SCACELITH_OFFICIAL_SERVER ("host[:apiPort[:wsPort]]", wsPort = apiPort when omitted) replaces
-// it; "none" builds without one (host "").
+// The official server of this build: caissa.scacelith.com, HTTPS API and WSS on port 443
+// (https://caissa.scacelith.com/api/v1, wss://caissa.scacelith.com/ws), trust store, no pin. The
+// CMake option SCACELITH_OFFICIAL_SERVER ("host[:apiPort[:wsPort]]", apiPort 443 and wsPort =
+// apiPort when omitted) replaces it; "none" builds without one (host ""). The official server
+// used port 44664 before: a session saved for "<official host>:44664" moves once to the official
+// origin (CredentialStore::addOriginMove), so its players stay signed in.
 ServerEndpoint officialServer();
 
 struct Category {                     // an official (rated) time control
@@ -344,17 +350,27 @@ public:
     void report(uint64_t gameId, const std::string& username, const std::string& category, const std::string& comment);
 
     // ---- account API (HTTPS; dedicated-server/docs/API.md) ----
-    // The signed-in player's finished games, newest first: before = 0 for the first page, then
-    // GamesPage::next; limit 1..50.
+    // Answers that do not have the documented shape (a move that is not UCI text, a PGN that does
+    // not start with its tags, an export that is not the export document...) come back with error
+    // "invalid_response", like a PGN over 4 MiB or an export over 64 MiB.
+    // The signed-in player's finished games, newest first (GET /account/games): before = 0 for the
+    // first page, then GamesPage::next; limit 1..50 (0 or less: the server's 20, more: 50).
     void fetchMyGames(uint64_t before, int limit, const GamesFilter& filter);
-    void fetchGame(uint64_t gameId);                                    // GET /games/:id
-    void downloadPgn(uint64_t gameId);                                  // GET /games/:id/pgn
+    // GET /games/:id, with the session token when one is saved (the players then get `you` and
+    // `reportable`); a refused token is erased and the public answer asked for instead.
+    void fetchGame(uint64_t gameId);
+    void downloadPgn(uint64_t gameId);                                  // GET /games/:id/pgn (text)
     void fetchSessions();                                               // GET /auth/sessions
-    void revokeSession(int64_t sessionId);                              // DELETE /auth/sessions/:id
+    // DELETE /auth/sessions/:id. Revoking the session marked current in the last fetchSessions()
+    // signs this game out (token erased, realtime connection stopped), as logout() would.
+    void revokeSession(int64_t sessionId);
     void setAcceptChallenges(bool accept);                              // PUT /account/preferences
-    // codeOrRecovery: "" when two-factor is off, else a 6-digit code or a recovery code.
+    // Re-authenticated changes. codeOrRecovery: "" when two-factor is off (no field sent), a
+    // 6-digit code ("code") or a recovery code ("recoveryCode").
     void changeEmail(const std::string& newEmail, const std::string& password, const std::string& codeOrRecovery);
-    void exportAccount(const std::string& password, const std::string& codeOrRecovery);
+    void exportAccount(const std::string& password, const std::string& codeOrRecovery);   // text = the JSON
+    // On success the token and the user name saved for the origin are erased and the realtime
+    // connection stops (no reconnection); AccountDeleted then comes with ok.
     void deleteAccount(const std::string& password, const std::string& codeOrRecovery);
 
     // ---- realtime (WSS) ----

@@ -383,7 +383,7 @@ void perform(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel) {
     ctx.request = &req;
     if (cancel) cancel->setAbort([&req] { req.close(); });
 
-    std::wstring headers = L"Accept: application/json\r\n";
+    std::wstring headers = L"Accept: " + widen(r.accept) + L"\r\n";
     bool hasBody = !r.body.empty() || r.method == "POST" || r.method == "PUT";
     if (hasBody) headers += L"Content-Type: application/json\r\n";
     for (auto& h : r.headers) headers += widen(h.first) + L": " + widen(h.second) + L"\r\n";

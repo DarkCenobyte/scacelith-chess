@@ -52,6 +52,7 @@ struct HttpRequest {
     std::string pinnedSha256;                 // hex, lower-case; "" = trust store only
     std::string path = "/";                   // "/api/v1/info"
     std::string body;                         // JSON; sent with Content-Type application/json
+    std::string accept = "application/json";  // the Accept header (a PGN download asks for its type)
     std::vector<std::pair<std::string, std::string>> headers;   // e.g. Authorization
     int timeoutMs = 15000;                    // for each of connect, send and receive
     size_t maxResponseBytes = 1 << 20;

@@ -17,7 +17,7 @@ endif()
 
 option(SCACELITH_CONSOLE "Windows: build a console-subsystem exe (logs visible)" OFF)
 option(SCACELITH_STOCKFISH "Embed the Stockfish engine" ON)
-set(SCACELITH_OFFICIAL_SERVER "" CACHE STRING "Official online server: host[:apiPort[:wsPort]] (empty = caissa.scacelith.com:44664, none = no official server)")
+set(SCACELITH_OFFICIAL_SERVER "" CACHE STRING "Official online server: host[:apiPort[:wsPort]] (empty = caissa.scacelith.com:443, apiPort 443 when omitted, none = no official server)")
 
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 if(WIN32)
