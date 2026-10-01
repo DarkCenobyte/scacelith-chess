@@ -1,0 +1,222 @@
+# Coach speech: the building blocks every line uses (src/coach/catalog.cpp renders them). German.
+# Same syntax as assets/i18n: "key = value", '#' comments, \n. Read the header of en/common.lang first.
+# The coach speaks to the player informally ("du", "dein"); the game menus stay formal.
+
+# ---- Pieces --------------------------------------------------------------------------------------
+# Forms: nom (the default of "{your}" / "{my}"), acc ("{my:acc}": "Schlag meinen Springer"),
+# dat ("{my:dat}": "mit deinem Turm", "neben meiner Dame"), gen ("{my:gen}": "die Diagonale deines
+# Läufers"; not used yet). Der Bauer is a weak noun: den/dem/des Bauern.
+# Genders: m for every piece except the queen (die Dame, f). The owner patterns below carry the case
+# and gender ending of the possessive: dein / deine / deinen / deinem / deiner / deines.
+piece.pawn.nom = Bauer
+piece.pawn.acc = Bauern
+piece.pawn.dat = Bauern
+piece.pawn.gen = Bauern
+piece.pawn.gender = m
+piece.knight.nom = Springer
+piece.knight.acc = Springer
+piece.knight.dat = Springer
+piece.knight.gen = Springers
+piece.knight.gender = m
+piece.bishop.nom = Läufer
+piece.bishop.acc = Läufer
+piece.bishop.dat = Läufer
+piece.bishop.gen = Läufers
+piece.bishop.gender = m
+piece.rook.nom = Turm
+piece.rook.acc = Turm
+piece.rook.dat = Turm
+piece.rook.gen = Turms
+piece.rook.gender = m
+piece.queen.nom = Dame
+piece.queen.acc = Dame
+piece.queen.dat = Dame
+piece.queen.gen = Dame
+piece.queen.gender = f
+piece.king.nom = König
+piece.king.acc = König
+piece.king.dat = König
+piece.king.gen = Königs
+piece.king.gender = m
+owner.your.nom.m = dein {piece}
+owner.your.nom.f = deine {piece}
+owner.your.acc.m = deinen {piece}
+owner.your.acc.f = deine {piece}
+owner.your.dat.m = deinem {piece}
+owner.your.dat.f = deiner {piece}
+owner.your.gen.m = deines {piece}
+owner.your.gen.f = deiner {piece}
+owner.my.nom.m = mein {piece}
+owner.my.nom.f = meine {piece}
+owner.my.acc.m = meinen {piece}
+owner.my.acc.f = meine {piece}
+owner.my.dat.m = meinem {piece}
+owner.my.dat.f = meiner {piece}
+owner.my.gen.m = meines {piece}
+owner.my.gen.f = meiner {piece}
+# The English keys (every language defines them); German uses the gendered patterns above.
+owner.your.nom = dein {piece}
+owner.my.nom = mein {piece}
+
+# ---- Squares, files and ranks (spoken) -----------------------------------------------------------
+# File letters spelled for the voice. The voice tests found that f must be written "eff" and h "ha"
+# ("eff drei", "ha sieben"); the other letters as in the opening texts ("de vier", "ce sechs").
+square.spoken = {file} {rank}
+file.a.spoken = a
+file.b.spoken = be
+file.c.spoken = ce
+file.d.spoken = de
+file.e.spoken = e
+file.f.spoken = eff
+file.g.spoken = ge
+file.h.spoken = ha
+rank.1.spoken = eins
+rank.2.spoken = zwei
+rank.3.spoken = drei
+rank.4.spoken = vier
+rank.5.spoken = fünf
+rank.6.spoken = sechs
+rank.7.spoken = sieben
+rank.8.spoken = acht
+
+# ---- Moves ---------------------------------------------------------------------------------------
+# German scoresheet letters: König K, Dame D, Turm T, Läufer L, Springer S ("Sf3").
+move.letters = K D T L S
+# Spoken as German club players read notation: "Springer eff drei", "Springer schlägt e fünf",
+# "e schlägt de fünf", "Bauer schlägt zurück", "kurze Rochade", "e acht und wird Dame".
+move.piece.spoken = {piece} {to}
+move.piece_capture.spoken = {piece} schlägt {to}
+move.piece_from.spoken = {piece} {from} {to}
+move.piece_from_capture.spoken = {piece} {from} schlägt {to}
+move.pawn.spoken = {to}
+move.pawn_capture.spoken = {file} schlägt {to}
+move.recapture.spoken = {piece} schlägt zurück
+move.castle_short.spoken = kurze Rochade
+move.castle_long.spoken = lange Rochade
+# {piece} is the bare noun here (no article possible): "Bauer wird Dame" is the idiom.
+move.promotion.spoken = {move} und wird {piece}
+move.check.spoken = {move}, Schach
+move.mate.spoken = {move}, Schachmatt
+moves.join.spoken = {a}, {b}
+
+# ---- Numbers -------------------------------------------------------------------------------------
+# German writes numbers under a million as one word: 21-99 as "{units}und{tens}" ("dreiundzwanzig");
+# the numbers ending in one are spelled out ("einundzwanzig", not "einsundzwanzig").
+number.0.spoken = null
+number.1.spoken = eins
+number.2.spoken = zwei
+number.3.spoken = drei
+number.4.spoken = vier
+number.5.spoken = fünf
+number.6.spoken = sechs
+number.7.spoken = sieben
+number.8.spoken = acht
+number.9.spoken = neun
+number.10.spoken = zehn
+number.11.spoken = elf
+number.12.spoken = zwölf
+number.13.spoken = dreizehn
+number.14.spoken = vierzehn
+number.15.spoken = fünfzehn
+number.16.spoken = sechzehn
+number.17.spoken = siebzehn
+number.18.spoken = achtzehn
+number.19.spoken = neunzehn
+number.20.spoken = zwanzig
+number.21.spoken = einundzwanzig
+number.30.spoken = dreißig
+number.31.spoken = einunddreißig
+number.40.spoken = vierzig
+number.41.spoken = einundvierzig
+number.50.spoken = fünfzig
+number.51.spoken = einundfünfzig
+number.60.spoken = sechzig
+number.61.spoken = einundsechzig
+number.70.spoken = siebzig
+number.71.spoken = einundsiebzig
+number.80.spoken = achtzig
+number.81.spoken = einundachtzig
+number.90.spoken = neunzig
+number.91.spoken = einundneunzig
+number.100.spoken = hundert
+number.tens.spoken = {units}und{tens}
+number.hundreds.spoken = {n}hundert
+number.hundreds_rest.spoken = {hundreds}{rest}
+number.minus.spoken = minus {n}
+# A decimal number: German uses a decimal comma ("1,3", "eins Komma drei").
+number.decimal = {int},{frac}
+number.decimal.spoken = {int} Komma {frac}
+
+# ---- Counted nouns ---------------------------------------------------------------------------------
+# one|other. Written: digits ("1 Zug", "3 Züge"). Spoken: the ".spoken" forms say the article for one
+# ("ein Zug", "eine Figur") instead of "eins Zug".
+# Case forms for the sentences that need them: "{n:move}" nominative, "{n:move_acc}" accusative
+# ("Du hast einen Fehler gemacht": {n:mistake_acc}), "{n:move_dat}" dative ("in drei Zügen",
+# "nach einer Partie": {n:move_dat}, {n:game_dat}).
+count.move = {n} Zug|{n} Züge
+count.move.spoken = ein Zug|{n} Züge
+count.move_acc = {n} Zug|{n} Züge
+count.move_acc.spoken = einen Zug|{n} Züge
+count.move_dat = {n} Zug|{n} Zügen
+count.move_dat.spoken = einem Zug|{n} Zügen
+count.point = {n} Punkt|{n} Punkte
+count.point.spoken = ein Punkt|{n} Punkte
+count.point_acc = {n} Punkt|{n} Punkte
+count.point_acc.spoken = einen Punkt|{n} Punkte
+count.point_dat = {n} Punkt|{n} Punkten
+count.point_dat.spoken = einem Punkt|{n} Punkten
+count.pawn = {n} Bauer|{n} Bauern
+count.pawn.spoken = ein Bauer|{n} Bauern
+count.pawn_acc = {n} Bauern|{n} Bauern
+count.pawn_acc.spoken = einen Bauern|{n} Bauern
+count.pawn_dat = {n} Bauern|{n} Bauern
+count.pawn_dat.spoken = einem Bauern|{n} Bauern
+count.piece = {n} Figur|{n} Figuren
+count.piece.spoken = eine Figur|{n} Figuren
+count.piece_acc = {n} Figur|{n} Figuren
+count.piece_acc.spoken = eine Figur|{n} Figuren
+count.piece_dat = {n} Figur|{n} Figuren
+count.piece_dat.spoken = einer Figur|{n} Figuren
+count.mistake = {n} Fehler|{n} Fehler
+count.mistake.spoken = ein Fehler|{n} Fehler
+count.mistake_acc = {n} Fehler|{n} Fehler
+count.mistake_acc.spoken = einen Fehler|{n} Fehler
+count.mistake_dat = {n} Fehler|{n} Fehlern
+count.mistake_dat.spoken = einem Fehler|{n} Fehlern
+count.blunder = {n} grober Fehler|{n} grobe Fehler
+count.blunder.spoken = ein grober Fehler|{n} grobe Fehler
+count.blunder_acc = {n} groben Fehler|{n} grobe Fehler
+count.blunder_acc.spoken = einen groben Fehler|{n} grobe Fehler
+count.blunder_dat = {n} groben Fehler|{n} groben Fehlern
+count.blunder_dat.spoken = einem groben Fehler|{n} groben Fehlern
+count.inaccuracy = {n} Ungenauigkeit|{n} Ungenauigkeiten
+count.inaccuracy.spoken = eine Ungenauigkeit|{n} Ungenauigkeiten
+count.inaccuracy_acc = {n} Ungenauigkeit|{n} Ungenauigkeiten
+count.inaccuracy_acc.spoken = eine Ungenauigkeit|{n} Ungenauigkeiten
+count.inaccuracy_dat = {n} Ungenauigkeit|{n} Ungenauigkeiten
+count.inaccuracy_dat.spoken = einer Ungenauigkeit|{n} Ungenauigkeiten
+count.game = {n} Partie|{n} Partien
+count.game.spoken = eine Partie|{n} Partien
+count.game_acc = {n} Partie|{n} Partien
+count.game_acc.spoken = eine Partie|{n} Partien
+count.game_dat = {n} Partie|{n} Partien
+count.game_dat.spoken = einer Partie|{n} Partien
+count.time = einmal|{n}-mal
+count.time.spoken = einmal|{n} Mal
+count.square = {n} Feld|{n} Felder
+count.square.spoken = ein Feld|{n} Felder
+count.square_acc = {n} Feld|{n} Felder
+count.square_acc.spoken = ein Feld|{n} Felder
+count.square_dat = {n} Feld|{n} Feldern
+count.square_dat.spoken = einem Feld|{n} Feldern
+
+# ---- Evaluations (the strongest levels) ------------------------------------------------------------
+# From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
+eval.up = +{x}
+eval.up.spoken = plus {x}
+eval.down = −{x}
+eval.down.spoken = minus {x}
+eval.even = 0,0
+eval.even.spoken = ausgeglichen
+eval.mate_win = Matt in {n}
+eval.mate_loss = Matt in {n} gegen dich
