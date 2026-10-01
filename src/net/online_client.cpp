@@ -2136,6 +2136,9 @@ void gifCall(Impl* d, const ServerEndpoint& e, const std::string& method, const 
     ev.gameId = gameId;
     finish(ev, a, [&] { return looksLikeGif(a.text); });
     if (ev.ok) ev.text = std::move(a.text);   // up to 16 MiB: moved, never copied
+    // The quota and the busy renderer without the server's JSON (a proxy's page): the same codes.
+    if (ev.error == "http_429") ev.error = "rate_limited";
+    if (ev.error == "http_503") ev.error = "server_busy";
     d->post(std::move(ev));
 }
 

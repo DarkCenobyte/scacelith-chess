@@ -134,10 +134,14 @@ bool AccountData::apply(const net::Event& e, net::AccountInfo& account, bool& si
             clear();
         }
         break;
+    case Kind::GifResult:
+        // For the GifSaver. The GIF routes need the token: any 401 refused it (the network layer
+        // has forgotten it: "invalid_token" from the server), and "not_logged_in" means none is saved.
+        if (!e.ok && (e.error == "invalid_token" || e.error == "not_logged_in")) signedIn = false;
+        break;
     case Kind::PgnResult:
     case Kind::EmailChangeResult:
-    case Kind::AccountExportResult:
-    case Kind::GifResult: break;  // for the page that asked (GifResult: GifSaver)
+    case Kind::AccountExportResult: break;  // for the page that asked
     default: return false;
     }
     // The token was refused: the network layer has forgotten it.

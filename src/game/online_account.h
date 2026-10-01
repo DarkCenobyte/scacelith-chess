@@ -74,7 +74,8 @@ struct AccountData {
     // Applies an answer of the account API: keeps what the pages show (the history page awaited,
     // the game asked for, the devices, a device signed out) and updates the account (accept
     // challenges; an account deleted signs out and forgets it; "unauthorized", the token refused,
-    // signs out). False for the other kinds of events (nothing changed).
+    // signs out, and so do a GIF's "invalid_token" and "not_logged_in"). False for the other kinds
+    // of events (nothing changed).
     bool apply(const net::Event& e, net::AccountInfo& account, bool& signedIn);
 };
 
