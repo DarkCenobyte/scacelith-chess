@@ -137,6 +137,8 @@ struct Session::Impl {
         float lastThinking = 0.0f;
         float engineHold = 0.0f;
         bool fillerSaid = false;
+        // Greeting and opening names: what is still queued of them is dropped at game over.
+        std::vector<uint64_t> chatScripts;
         // The end.
         bool over = false, resigned = false, endPending = false;
         GameEnd end = GameEnd::Draw;
@@ -288,7 +290,9 @@ struct Session::Impl {
     void announceOpenings(const chess::Game& game, bool canSpeak) {
         const std::vector<OpeningLine> lines = announcer.update(game, canSpeak);
         g.announcerWaiting = !canSpeak;
-        if (!lines.empty()) play(openingScript(lines, int(game.moves().size()) - 1));
+        if (lines.empty()) return;
+        play(openingScript(lines, int(game.moves().size()) - 1));
+        g.chatScripts.push_back(director.lastScript());
     }
 
     void onMove(const chess::Game& game) {
@@ -539,6 +543,8 @@ struct Session::Impl {
             director.clear();
             g.review = ReviewState::None;
         }
+        for (uint64_t s : g.chatScripts) director.dropQueued(s);   // "You play White" after the mate
+        g.chatScripts.clear();
         g.coachMovedPly = -1;
         g.announcerWaiting = false;
         for (auto it = g.jobs.begin(); it != g.jobs.end();) {   // no human turn follows
@@ -728,6 +734,7 @@ void Session::start(Stage& stage, Analyst& analyst, const chess::Game& game, con
     d.announcer.setLanguages(config.director.uiLanguage, speechLanguage(config.director.uiLanguage));
     if (!game.moves().empty()) d.announcer.catchUp(game);
     d.play(greetingScript(d.g.level, d.g.human, config.introduceLevel));
+    d.g.chatScripts.push_back(d.director.lastScript());
 }
 
 void Session::stop() {

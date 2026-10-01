@@ -992,6 +992,21 @@ bool Director::busy() const {
 
 bool Director::jumpToWait() { return d_->stage && d_->jumpToWait(); }
 
+void Director::dropQueued(uint64_t script) {
+    if (script == 0) return;
+    Impl& d = *d_;
+    for (std::deque<Impl::Item>* q : {&d.queue, &d.held}) {
+        for (auto it = q->begin(); it != q->end();) {
+            if (it->script == script && !tableBeat(it->beat.kind)) {
+                d.drop(*it);
+                it = q->erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+}
+
 void Director::setObserver(std::function<void(const Beat&)> observer) { d_->observer = std::move(observer); }
 
 }  // namespace coach

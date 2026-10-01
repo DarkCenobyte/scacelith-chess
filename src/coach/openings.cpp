@@ -92,7 +92,7 @@ const OpeningBook& OpeningBook::instance() {
             LOGE("Opening book: %s", error.c_str());
             b = OpeningBook();
         } else {
-            LOGI("Opening book: %zu lines, %zu positions, %.1f ms", b.rows(), b.positions(), b.buildMs());
+            LOGI("Opening book: %u lines, %u positions, %.1f ms", unsigned(b.rows()), unsigned(b.positions()), b.buildMs());
         }
         return b;
     }();

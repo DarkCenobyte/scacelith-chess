@@ -399,6 +399,24 @@ TEST(coach_session_game_end_handshake_appraisal) {
     }
 }
 
+// A mate while the greeting is still being said: the mate is announced at once, the rest of the
+// greeting ("You play White") is dropped, the closing words follow.
+TEST(coach_session_game_over_drops_the_greeting) {
+    Table t;
+    t.game.resetFromFEN(kMateFen);
+    t.analyst.results[fenOf(kMateFen) + "|A0"] = analysisOf({pvl(0, "a1a8", 1), pvl(300, "g1f1 g8f8")});
+    t.start(levelConfig(3));
+    CHECK(t.until([&] { return t.session.director().speaking(); }, 10.0f));
+    t.move("a1a8");
+    CHECK(t.game.isOver());
+    t.session.onGameOver(t.game, false);
+    CHECK(t.until([&] { return t.session.handshakeWanted(); }, 60.0f));
+    CHECK(t.said("ann.mate.human.b1"));
+    CHECK(t.said("event.end.win"));
+    CHECK(t.queued("event.colour.white"));
+    CHECK(!t.said("event.colour.white"));
+}
+
 TEST(coach_session_rules_lesson_chapter) {
     Table t;
     SessionConfig cfg = levelConfig(0);

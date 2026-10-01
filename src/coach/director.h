@@ -91,6 +91,9 @@ public:
     // pauses stand before the next queued WaitMove, drop them (cutting the running line) and wait
     // at once. False (nothing changes) otherwise.
     bool jumpToWait();
+    // Drop the queued beats of this script (game over: the rest of the greeting, opening names).
+    // The running beat finishes; table actions (demonstration moves, rewinds) are kept.
+    void dropQueued(uint64_t script);
     // Called with every beat play() / playNext() queue, in order (tests, logs).
     void setObserver(std::function<void(const Beat&)> observer);
 
