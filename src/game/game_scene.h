@@ -24,8 +24,22 @@
 // clock_rules.h) have no clock press: a move is completed as its last piece is released and the
 // turn passes at once (completeMove). The clock shows dashes, its lever stays still.
 //
+// Coach mode (game_scene_coach.cpp): the human against the coach robot ("COACH" on its chest),
+// levels 1-6, or the rules lesson (level 0). Untimed, never rated, touch-move on, illegal
+// placements refused. The scene is the coach's coach::Stage (its voice, subtitles, gestures, gaze,
+// demonstration moves, takebacks, marks, HUD) and coach::Analyst (the Stockfish analyses); a
+// coach::Session decides what the coach says and when (src/coach). The coach's own moves come
+// from its teaching repertoire, then Stockfish at the level's strength, and wait while the
+// session reviews the player's move (coachMayMove).
+//
 // Command line (development and screenshots):
 //   --start                 skip the menu: a game against Stockfish (--human white|black)
+//   --start --coach         skip the menu: a coach game (--coach-level N, 0 = the rules lesson,
+//                           1..6; --coach-colour white|black); the [coach] settings otherwise
+//   --coach-dir <path>      the folder of the coach's voice files (default: coach/ beside the exe)
+//   --coach-stage-test      a coach game whose Stage performs a fixed sequence (a spoken line with
+//                           its subtitle, pointing, a knight's trace, marks, two demonstration
+//                           moves and their rewind, the takeback card), without the session
 //   --start --hotseat       skip the menu: a hot-seat game (--white-name N --black-name N,
 //                           --clock-right white|black, --rated, --handover <s> with 0 = a cut)
 //   --play e2e4,e7e5,...    the human player(s) make these moves by hand, one per turn (touch,
@@ -57,6 +71,7 @@
 #include "../ui/ui.h"
 #include "camera_flight.h"
 #include "clock_rules.h"
+#include "coach_args.h"
 #include "hotseat.h"
 #include "observer_camera.h"
 #include "online_live.h"
@@ -65,10 +80,15 @@
 #include "scorekeeper.h"
 #include "world.h"
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
 namespace game {
+
+struct CoachRuntime;   // game_scene_coach.cpp
+class CoachStage;
+class CoachAnalyst;
 
 enum class Controller {
     Human,
@@ -79,7 +99,8 @@ enum class GameMode {
     Play,    // the human against Stockfish, first person
     Watch,   // viewer mode: Stockfish against Stockfish, free observer camera
     Online,  // the human against a player of the server or of a direct match, first person
-    HotSeat  // two humans on this PC, in turn, each from their own robot's eyes
+    HotSeat, // two humans on this PC, in turn, each from their own robot's eyes
+    Coach    // the human against the coach (a Stockfish seat that teaches), first person
 };
 
 struct Seat {
@@ -101,6 +122,8 @@ struct Seat {
 
 class GameScene : public Scene {
 public:
+    GameScene();
+    ~GameScene() override;
     bool init(AppContext& ctx) override;
     bool update(AppContext& ctx, float dt) override;
     void render(AppContext& ctx, float dt) override;
@@ -138,7 +161,10 @@ private:
         AiThinking,
         AiMoving,
         RemoteWaiting,   // online: waiting for the opponent's move
-        RemoteMoving     // online: the opponent's robot is placing the move
+        RemoteMoving,    // online: the opponent's robot is placing the move
+        CoachTable,      // coach: moves being taken back, a lesson position set up or a lesson move
+                         // played by hand (the hands work on the table; nobody plays meanwhile)
+        LessonWait       // rules lesson: the coach's side is to move, or the lesson has the floor
     };
 
     // Where a piece ends up when the hand releases it.
@@ -146,6 +172,7 @@ private:
         chess::Square square = chess::NoSquare;  // NoSquare = off-board at 'pos'
         m::vec3 pos{0, 0, 0};
         bool captured = false;
+        bool reserve = false;                    // a spare back in the reserve (a promotion taken back)
     };
 
     // ---- flow ----
@@ -313,6 +340,47 @@ private:
     ui::GameOverExtras onlineGameOverExtras() const;
     int64_t onlineClockMs(int color) const;   // server time, extrapolated
     bool myFirstMoveMade() const;
+
+    // ---- Coach mode (game_scene_coach.cpp) ----
+    friend class CoachStage;
+    friend class CoachAnalyst;
+    bool coach() const { return mode_ == GameMode::Coach; }
+    bool lesson() const { return coach() && coachLevel_ == 0; }   // the rules lesson
+    // Legal-move hints: the option, forced on in the rules lesson.
+    bool legalHints() const;
+    void initCoachArgs();                     // command line: --coach and its options
+    void refreshCoachVoice();                 // are the voice's model files there (tts::modelFilesPresent)
+    CoachRuntime& coachRuntime();             // created on first use: the voice starts loading
+    bool coachVoiceExpected() const;          // the voice files are there (the coach page's notice)
+    void setupCoachGame();                    // part of setupNewGame() for a coach game
+    void configureCoachSeats();
+    void startCoachGame();                    // startPlaying(): the session begins
+    void leaveCoachGame();                    // back to the menu, a new game, shutdown: silence
+    void shutdownCoach();                     // before audio::shutdown(): the TTS worker joins
+    void updateCoach(float dt);               // once per frame (inside simulate, after the animators)
+    void updateCoachInput();                  // Playing: Esc menu, the HUD, Space, Backspace, input
+    void updateCoachGameOver();               // GameOver: Space skips the appraisal, the HUD
+    void coachMoveCompleted();                // completeMove(): after the move is recorded
+    void coachGameOver();                     // endGame()
+    void endLesson();                         // the rules lesson is over: its own ending
+    bool coachEndCardReady() const;           // GameOver: the coach has said everything
+    bool coachHandshakeWanted() const;        // GameOver: the closing words are said
+    bool coachHoldsMove() const;              // updateAi: the coach's move waits (review, hands)
+    bool coachMayTouch() const;               // the player may touch a piece now
+    void coachPlayerTouched();                // humanTouch(): the session hears of it
+    void coachIllegalAttempt(chess::Square from, chess::Square to);
+    bool coachBookMove(chess::Move& mv);      // updateAi: the teaching repertoire's move, if any
+    void coachGazeTarget(m::vec3& target);    // updateGaze: where the coach looks while it talks
+    // render(): the pieces the coach designates and its marks on the board, this frame.
+    void coachMarks(std::vector<PieceHighlight>& highlights, std::vector<CoachMark>& marks);
+    void drawCoachSubtitles();                // renderOverlay()
+    void persistCoachResults();               // Settings [coach] from the session (once per game)
+    bool coachCanTakeBack() const;            // the Esc menu's "Take back" (session and scoresheets)
+    void coachOfferDraw();                    // the Esc menu: the coach answers after an analysis
+    void coachPauseMenuFrame();               // the Esc menu of a coach game (paused_)
+    void coachHudFrame();                     // the takeback card and the skip hint, their answers
+    void runCoachTable(float dt);             // the coach's table jobs (demonstrations, takebacks...)
+    void runStageTest(float dt);              // --coach-stage-test
 
     // ---- viewer mode ----
     bool observerView() const;                // the observer camera is the view
@@ -530,6 +598,15 @@ private:
     std::string startOnline_;           // --start-online category
     std::string startTouch_;            // --start-online with --touch <square>: touched once idle
     float fadeDip_ = 0.0f;              // short darkening while the board is rebuilt
+
+    // Coach mode
+    CoachArgs coachArgs_;               // --start --coach and its options
+    ui::CoachSetup coachSetup_;         // the coach page's choice
+    int coachLevel_ = 1;                // the coach game being played: 0 = the rules lesson, 1..6
+    float coachFaceLift_ = 0.0f;        // 0..1: the view rises gently to the coach's face as it talks to the player
+    float coachFade_ = 0.0f;            // a lesson position being set up behind a fade
+    bool coachVoiceFiles_ = false;      // tts::modelFilesPresent() at start-up
+    std::unique_ptr<CoachRuntime> coach_;
 };
 
 }  // namespace game

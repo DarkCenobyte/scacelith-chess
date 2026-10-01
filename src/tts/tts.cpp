@@ -8,6 +8,7 @@
 #include <cctype>
 #include <chrono>
 #include <cmath>
+#include <mutex>
 
 #if defined(SCACELITH_TTS_EMBEDDED)
 namespace tts {
@@ -132,6 +133,33 @@ bool setArchCap(const char* arch) { return kern::setArchCap(arch); }
 
 const char* activeArch() { return kern::active().name; }
 
+namespace {
+std::mutex g_dirMutex;
+std::string g_modelDir;   // "" = <exe dir>/coach/
+}  // namespace
+
+void setModelDirectory(const std::string& dir) {
+    std::lock_guard<std::mutex> lock(g_dirMutex);
+    g_modelDir = dir;
+    if (!g_modelDir.empty() && g_modelDir.back() != '/' && g_modelDir.back() != '\\') g_modelDir += '/';
+}
+
+std::string modelDirectory() {
+    std::lock_guard<std::mutex> lock(g_dirMutex);
+    return g_modelDir.empty() ? net::sys::exeDirectory() + "coach/" : g_modelDir;
+}
+
+bool modelFilesPresent() {
+#if defined(SCACELITH_TTS_EMBEDDED)
+    return true;
+#else
+    std::string dir = modelDirectory();
+    for (const char* f : Engine::kFiles)
+        if (!net::sys::fileExists(dir + f)) return false;
+    return true;
+#endif
+}
+
 // ------------------------------------------------------------------------------------------------
 // Synthesizer
 // ------------------------------------------------------------------------------------------------
@@ -158,7 +186,7 @@ bool Synthesizer::loadFrom(const std::string& dir, std::string* error) {
 }
 
 bool Synthesizer::load(std::string* error) {
-    std::string dir = net::sys::exeDirectory() + "coach/";
+    std::string dir = modelDirectory();
     std::string err;
     if (loadFrom(dir, &err)) return true;
 #if defined(SCACELITH_TTS_EMBEDDED)

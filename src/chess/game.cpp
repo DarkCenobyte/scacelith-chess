@@ -96,6 +96,7 @@ void Game::finish(GameStatus s, GameEndReason r) {
 }
 
 void Game::updateStatus() {
+    if (!endDetection_) return;
     const Position& p = position();
     if (!p.hasLegalMove()) {
         if (p.inCheck()) finish(p.sideToMove() == White ? GameStatus::BlackWins : GameStatus::WhiteWins, GameEndReason::Checkmate);
