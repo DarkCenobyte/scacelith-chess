@@ -1,6 +1,6 @@
-// Saved games folder (see game_archive.h): file names, atomic saving, the cached listing, loading
-// and removal. The file system calls are the platform's own (wide-character paths on Windows,
-// POSIX elsewhere) so that UTF-8 names work everywhere.
+// Saved games folder (see game_archive.h): file names, atomic saving, the cached listing, loading,
+// removal, and the games of an online server saved on request. The file system calls are the
+// platform's own (wide-character paths on Windows, POSIX elsewhere) so that UTF-8 names work everywhere.
 #include "game_archive.h"
 #include "../core/log.h"
 
@@ -301,7 +301,7 @@ bool listedTag(const std::string& name) {
     static const char* const names[] = {"Event",       "Site",     "Date",     "Round",       "White",     "Black",
                                         "Result",      "UTCDate",  "UTCTime",  "Time",        "WhiteElo",  "BlackElo",
                                         "TimeControl", "ECO",      "Opening",  "Variation",   "Termination", "ScacelithMode",
-                                        "CoachLevel",  "ScacelithEnd"};
+                                        "CoachLevel",  "ScacelithEnd", "ScacelithServer", "ScacelithGameId"};
     for (const char* n : names)
         if (name == n) return true;
     return false;
@@ -542,13 +542,12 @@ std::string joinPath(const std::string& folder, const std::string& name) {
 
 bool makeFolder(const std::string& folder) { return !folder.empty() && makeDirs(folder); }
 
-SaveResult save(const std::string& folder, const Record& record, std::time_t when) {
+SaveResult saveFile(const std::string& folder, const std::string& name, const std::string& text) {
     SaveResult res;
     if (!makeDirs(folder)) {
         res.error = "cannot create the folder " + folder;
         return res;
     }
-    const std::string text = chess::pgn::write(record);
     static std::atomic<unsigned> counter{0};
     const std::string tmp =
         joinPath(folder, ".scacelith-save-" + std::to_string(processId()) + "-" + std::to_string(counter++) + ".tmp");
@@ -562,20 +561,21 @@ SaveResult save(const std::string& folder, const Record& record, std::time_t whe
     ok = fclose(f) == 0 && ok;
     if (!ok) {
         deleteFile(tmp);
-        res.error = "cannot write the game (disk full?)";
+        res.error = "cannot write the file (disk full?)";
         return res;
     }
-    std::string name = fileName(record, when ? when : std::time(nullptr));
-    const std::string stem = name.substr(0, name.size() - 4);
+    // "name_2.ext" before the extension (a name without one gets the suffix at its end).
+    const size_t dot = name.find_last_of('.');
+    const bool hasExt = dot != std::string::npos && dot > 0;
+    const std::string stem = hasExt ? name.substr(0, dot) : name, ext = hasExt ? name.substr(dot) : std::string();
     for (int n = 1; n <= 99; ++n) {
-        const std::string candidate = n == 1 ? name : stem + "_" + std::to_string(n) + ".pgn";
+        const std::string candidate = n == 1 ? name : stem + "_" + std::to_string(n) + ext;
         const std::string path = joinPath(folder, candidate);
         std::string err;
         const Place p = placeNew(tmp, path, err);
         if (p == Place::Ok) {
             res.ok = true;
             res.path = path;
-            LOGI("archive: game saved as %s", path.c_str());
             return res;
         }
         if (p == Place::Failed) {
@@ -585,6 +585,12 @@ SaveResult save(const std::string& folder, const Record& record, std::time_t whe
     }
     if (res.error.empty()) res.error = "too many files named " + name;
     deleteFile(tmp);
+    return res;
+}
+
+SaveResult save(const std::string& folder, const Record& record, std::time_t when) {
+    SaveResult res = saveFile(folder, fileName(record, when ? when : std::time(nullptr)), chess::pgn::write(record));
+    if (res.ok) LOGI("archive: game saved as %s", res.path.c_str());
     return res;
 }
 
@@ -801,6 +807,144 @@ RemoveResult remove(const Entry& entry) {
     }
     LOGI("archive: %s deleted", entry.path.c_str());
     res.status = RemoveStatus::Removed;
+    return res;
+}
+
+// ---- Games of an online server ----------------------------------------------------------------------------
+
+namespace {
+
+// Days from 1970-01-01 to a date of the proleptic Gregorian calendar (H. Hinnant's days_from_civil).
+int64_t daysFromCivil(int64_t y, int m, int d) {
+    y -= m <= 2 ? 1 : 0;
+    const int64_t era = (y >= 0 ? y : y - 399) / 400;
+    const int64_t yoe = y - era * 400;
+    const int64_t doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + d - 1;
+    const int64_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    return era * 146097 + doe - 719468;
+}
+
+// Digits of s at [at, at + n) as a number; -1 when one of them is not a digit.
+int digitsAt(const std::string& s, size_t at, size_t n) {
+    if (s.size() < at + n) return -1;
+    int v = 0;
+    for (size_t i = at; i < at + n; ++i) {
+        if (s[i] < '0' || s[i] > '9') return -1;
+        v = v * 10 + (s[i] - '0');
+    }
+    return v;
+}
+
+// "2026.09.28" and "14:03:07", in UTC, as a time_t; false unless both are complete and valid.
+bool utcInstant(const std::string& date, const std::string& time, std::time_t& out) {
+    if (date.size() != 10 || time.size() < 8) return false;
+    const int y = digitsAt(date, 0, 4), mo = digitsAt(date, 5, 2), d = digitsAt(date, 8, 2);
+    const int h = digitsAt(time, 0, 2), mi = digitsAt(time, 3, 2), se = digitsAt(time, 6, 2);
+    if (y < 1970 || mo < 1 || mo > 12 || d < 1 || d > 31 || h < 0 || h > 23 || mi < 0 || mi > 59 || se < 0 || se > 60) return false;
+    out = std::time_t(daysFromCivil(y, mo, d) * 86400 + h * 3600 + mi * 60 + se);
+    return true;
+}
+
+std::string lowerAscii(std::string s) {
+    for (char& c : s)
+        if (c >= 'A' && c <= 'Z') c = char(c - 'A' + 'a');
+    return s;
+}
+
+// The start of a server's game: UTCDate (else Date, which the server writes in UTC too) and UTCTime.
+bool serverStart(const Record& r, std::time_t& out) {
+    const std::string date = r.findTag("UTCDate") ? r.tag("UTCDate") : r.tag("Date");
+    return utcInstant(date, r.tag("UTCTime"), out);
+}
+
+}  // namespace
+
+bool serverRecord(const std::string& pgnText, const ServerGame& game, Record& out, std::string& error) {
+    if (pgnText.size() > kMaxServerPgnBytes) {
+        error = "the PGN is too large";
+        return false;
+    }
+    chess::pgn::Limits limits;
+    limits.maxBytes = kMaxServerPgnBytes;
+    limits.maxGames = 2;  // one game is expected: a second one is refused
+    chess::pgn::Result<chess::pgn::ParsedGame> r = chess::pgn::read(pgnText, limits);
+    if (!r.error.empty()) {
+        error = r.error;
+        return false;
+    }
+    if (r.games.size() != 1) {
+        error = r.games.empty() ? "no game in the PGN" : "more than one game in the PGN";
+        return false;
+    }
+    const chess::pgn::ParsedGame& g = r.games[0];
+    if (!g.ok()) {
+        error = g.error.text();
+        return false;
+    }
+    Record rec = g.record;
+    const std::string id = std::to_string(game.gameId);
+    if (const std::string* given = rec.findTag("ScacelithGameId")) {
+        if (*given != id) {
+            error = "the PGN is the one of game " + *given + ", not " + id;
+            return false;
+        }
+    }
+    rec.setTag("ScacelithMode", modeName(Mode::Server));
+    rec.setTag("ScacelithServer", game.server);
+    rec.setTag("ScacelithGameId", id);
+    std::string end = game.endKey;
+    if (end.compare(0, 7, "reason.") == 0) end = end.substr(7);
+    if (!end.empty() && rec.result != "*") rec.setTag("ScacelithEnd", end);
+    // Local date and time, as the folder's own games (the listing sorts and shows them by these).
+    std::time_t start = 0;
+    std::tm tm{};
+    if (serverStart(rec, start) && localTime(start, tm)) {
+        if (!rec.findTag("UTCDate")) rec.setTag("UTCDate", rec.tag("Date"));
+        rec.setTag("Date", std::to_string(tm.tm_year + 1900) + "." + twoDigits(tm.tm_mon + 1) + "." + twoDigits(tm.tm_mday));
+        rec.setTag("Time", twoDigits(tm.tm_hour) + ":" + twoDigits(tm.tm_min) + ":" + twoDigits(tm.tm_sec));
+    }
+    out = std::move(rec);
+    return true;
+}
+
+const Entry* findServerGame(const std::vector<Entry>& entries, const std::string& server, uint64_t gameId) {
+    const std::string id = std::to_string(gameId), origin = lowerAscii(server);
+    for (const Entry& e : entries)
+        if (e.mode == Mode::Server && e.tag("ScacelithGameId") == id && lowerAscii(e.tag("ScacelithServer")) == origin) return &e;
+    return nullptr;
+}
+
+ServerSaveResult saveServerGame(const std::string& folder, const ServerGame& game, const std::string& pgnText) {
+    ServerSaveResult res;
+    const std::vector<Entry> entries = list(folder);
+    if (const Entry* e = findServerGame(entries, game.server, game.gameId)) {
+        res.status = ServerSaveStatus::AlreadySaved;
+        res.path = e->path;
+        res.index = e->index;
+        return res;
+    }
+    if (pgnText.empty()) {
+        res.status = ServerSaveStatus::NeedsText;
+        return res;
+    }
+    Record rec;
+    if (!serverRecord(pgnText, game, rec, res.error)) {
+        res.status = ServerSaveStatus::Invalid;
+        LOGW("archive: game %llu of %s cannot be saved: %s", (unsigned long long)game.gameId, game.server.c_str(), res.error.c_str());
+        return res;
+    }
+    std::time_t start = 0;
+    serverStart(rec, start);
+    const SaveResult saved = save(folder, rec, start);
+    if (!saved.ok) {
+        res.status = ServerSaveStatus::Failed;
+        res.error = saved.error;
+        LOGW("archive: game %llu of %s cannot be saved: %s", (unsigned long long)game.gameId, game.server.c_str(), res.error.c_str());
+        return res;
+    }
+    res.status = ServerSaveStatus::Saved;
+    res.path = saved.path;
+    res.index = 0;
     return res;
 }
 

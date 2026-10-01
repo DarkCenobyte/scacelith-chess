@@ -1,0 +1,356 @@
+// Games of an online server in the saved games (src/game/game_archive.h): the server's PGN read as
+// untrusted input and tagged (serverRecord), each game of a server saved once (saveServerGame,
+// findServerGame), the atomic file writer of the data export (saveFile), and the PGN texts the
+// dedicated server writes (tests/data/server-pgn/*.pgn, from dedicated-server/tools/gen-pgn-fixtures.js,
+// with index.json describing them; one fixture is made by hand in the same format) read through
+// chess::pgn and the archive. The folder is looked up from the current directory (run from the
+// repository root), $SCACELITH_SOURCE_DIR and the executable's parent directories.
+#include "test.h"
+#include "chess/pgn.h"
+#include "game/game_archive.h"
+#include "net/json.h"
+#include "net/net_sys.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
+#include <string>
+#include <vector>
+
+#ifndef _WIN32
+#include <dirent.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#else
+#include <windows.h>
+#endif
+
+using namespace game;
+namespace pgn = chess::pgn;
+
+namespace {
+
+// A fresh folder beside the test executable, removed (with its files) by the destructor.
+struct Folder {
+    std::string path;
+    explicit Folder(const char* tag) {
+#ifdef _WIN32
+        const unsigned pid = unsigned(GetCurrentProcessId());
+#else
+        const unsigned pid = unsigned(getpid());
+#endif
+        path = net::sys::exeDirectory() + "server-games-test-" + tag + "-" + std::to_string(pid);
+        wipe();
+        archive::clearCache();
+    }
+    ~Folder() { wipe(); }
+    std::vector<std::string> names() const {
+        std::vector<std::string> out;
+#ifdef _WIN32
+        WIN32_FIND_DATAA fd;
+        HANDLE h = FindFirstFileA((path + "\\*").c_str(), &fd);
+        if (h == INVALID_HANDLE_VALUE) return out;
+        do {
+            std::string n = fd.cFileName;
+            if (n != "." && n != "..") out.push_back(n);
+        } while (FindNextFileA(h, &fd));
+        FindClose(h);
+#else
+        DIR* d = opendir(path.c_str());
+        if (!d) return out;
+        while (dirent* e = readdir(d)) {
+            std::string n = e->d_name;
+            if (n != "." && n != "..") out.push_back(n);
+        }
+        closedir(d);
+#endif
+        return out;
+    }
+    void wipe() {
+        for (const std::string& n : names()) std::remove(archive::joinPath(path, n).c_str());
+#ifdef _WIN32
+        RemoveDirectoryA(path.c_str());
+#else
+        rmdir(path.c_str());
+#endif
+    }
+};
+
+std::string readAll(const std::string& path) {
+    std::string text;
+    net::sys::readFile(path, text, 16 << 20);
+    return text;
+}
+
+// The folder of the server's PGN fixtures ("" when it cannot be found).
+std::string fixtureFolder() {
+    std::vector<std::string> roots;
+    if (const char* env = std::getenv("SCACELITH_SOURCE_DIR")) roots.push_back(std::string(env) + "/");
+    roots.push_back("");
+    roots.push_back("../");
+    roots.push_back("../../");
+    const std::string exe = net::sys::exeDirectory();
+    roots.push_back(exe + "../");
+    roots.push_back(exe + "../../");
+    for (const std::string& r : roots) {
+        const std::string dir = r + "tests/data/server-pgn";
+        if (!archive::list(dir).empty()) return dir;
+    }
+    return std::string();
+}
+
+// A game of a server in its own format (dedicated-server, GET /api/v1/games/:id/pgn).
+const char* const kServerPgn =
+    "[Event \"Scacelith rated 3+2\"]\n"
+    "[Site \"caissa.scacelith.com\"]\n"
+    "[Date \"2026.09.28\"]\n"
+    "[Round \"-\"]\n"
+    "[White \"Magnus_T\"]\n"
+    "[Black \"Wilhelmina\"]\n"
+    "[Result \"0-1\"]\n"
+    "[UTCDate \"2026.09.28\"]\n"
+    "[UTCTime \"23:30:05\"]\n"
+    "[WhiteElo \"1605\"]\n"
+    "[BlackElo \"1588\"]\n"
+    "[WhiteRatingDiff \"-9\"]\n"
+    "[BlackRatingDiff \"+9\"]\n"
+    "[TimeControl \"180+2\"]\n"
+    "[Termination \"normal\"]\n"
+    "[PlyCount \"4\"]\n"
+    "[ScacelithGameId \"4100000000123\"]\n"
+    "\n"
+    "1. f3 {[%clk 0:03:00.0] [%emt 0:00:00.0]} 1... e5 {[%clk 0:03:00.0]\n"
+    "[%emt 0:00:00.0]} 2. g4 {[%clk 0:02:58.6] [%emt 0:00:03.3]} 2... Qh4#\n"
+    "{[%clk 0:02:57.7] [%emt 0:00:04.2]} {Checkmate} 0-1\n";
+
+archive::ServerGame serverGame(uint64_t id, const char* server = "caissa.scacelith.com:443") {
+    archive::ServerGame g;
+    g.server = server;
+    g.gameId = id;
+    g.endKey = "reason.checkmate";
+    return g;
+}
+
+}  // namespace
+
+TEST(archive_save_file_never_replaces) {
+    Folder f("savefile");
+    archive::SaveResult a = archive::saveFile(f.path, "caissa.scacelith.com_Magnus_T_2026-10-01.json", "{\"a\":1}");
+    archive::SaveResult b = archive::saveFile(f.path, "caissa.scacelith.com_Magnus_T_2026-10-01.json", "{\"b\":2}");
+    archive::SaveResult c = archive::saveFile(f.path, "notes", "x");
+    archive::SaveResult d = archive::saveFile(f.path, "notes", "y");
+    CHECK(a.ok && b.ok && c.ok && d.ok);
+    CHECK_EQ(a.path, archive::joinPath(f.path, "caissa.scacelith.com_Magnus_T_2026-10-01.json"));
+    CHECK_EQ(b.path, archive::joinPath(f.path, "caissa.scacelith.com_Magnus_T_2026-10-01_2.json"));
+    CHECK_EQ(d.path, archive::joinPath(f.path, "notes_2"));
+    CHECK_EQ(readAll(a.path), std::string("{\"a\":1}"));
+    CHECK_EQ(readAll(b.path), std::string("{\"b\":2}"));
+    CHECK_EQ(int(f.names().size()), 4);  // no temporary file left behind
+}
+
+TEST(archive_server_record_tags_and_untrusted_text) {
+    pgn::Record r;
+    std::string err;
+    CHECK(archive::serverRecord(kServerPgn, serverGame(4100000000123ull), r, err));
+    CHECK_EQ(int(r.plies.size()), 4);
+    CHECK_EQ(r.result, std::string("0-1"));
+    CHECK_EQ(r.tag("ScacelithMode"), std::string("server"));
+    CHECK_EQ(r.tag("ScacelithServer"), std::string("caissa.scacelith.com:443"));
+    CHECK_EQ(r.tag("ScacelithGameId"), std::string("4100000000123"));
+    CHECK_EQ(r.tag("ScacelithEnd"), std::string("checkmate"));
+    CHECK_EQ(r.tag("UTCDate"), std::string("2026.09.28"));
+    CHECK_EQ(r.tag("UTCTime"), std::string("23:30:05"));
+    CHECK_EQ(r.tag("WhiteRatingDiff"), std::string("-9"));
+    // Date and Time in local time, from the UTC instant.
+    std::tm utc{};
+    utc.tm_year = 2026 - 1900;
+    utc.tm_mon = 8;
+    utc.tm_mday = 28;
+    utc.tm_hour = 23;
+    utc.tm_min = 30;
+    utc.tm_sec = 5;
+#ifdef _WIN32
+    std::time_t t = _mkgmtime(&utc);
+    std::tm local{};
+    localtime_s(&local, &t);
+#else
+    std::time_t t = timegm(&utc);
+    std::tm local{};
+    localtime_r(&t, &local);
+#endif
+    char date[32], time[32];
+    std::snprintf(date, sizeof date, "%04d.%02d.%02d", local.tm_year + 1900, local.tm_mon + 1, local.tm_mday);
+    std::snprintf(time, sizeof time, "%02d:%02d:%02d", local.tm_hour, local.tm_min, local.tm_sec);
+    CHECK_EQ(r.tag("Date"), std::string(date));
+    CHECK_EQ(r.tag("Time"), std::string(time));
+    // Clocks and times of the moves, and the termination comment on the last one.
+    CHECK_EQ(r.plies[0].clockMs, int64_t(180000));
+    CHECK_EQ(r.plies[2].clockMs, int64_t(178600));
+    CHECK_EQ(r.plies[2].elapsedMs, int64_t(3300));
+    CHECK_EQ(r.plies[3].elapsedMs, int64_t(4200));
+    CHECK_EQ(r.plies[3].comment, std::string("Checkmate"));
+
+    // Refused: another game's text, two games, nothing, a broken game, too much text.
+    CHECK(!archive::serverRecord(kServerPgn, serverGame(77), r, err));
+    CHECK(err.find("4100000000123") != std::string::npos);
+    CHECK(!archive::serverRecord(std::string(kServerPgn) + "\n" + kServerPgn, serverGame(4100000000123ull), r, err));
+    CHECK(!archive::serverRecord("", serverGame(1), r, err));
+    CHECK(!archive::serverRecord("<html>Bad gateway</html>", serverGame(1), r, err));
+    std::string illegal = kServerPgn;
+    illegal.replace(illegal.find("Qh4#"), 4, "Qh5#");
+    CHECK(!archive::serverRecord(illegal, serverGame(4100000000123ull), r, err));
+    CHECK(!archive::serverRecord(std::string(archive::kMaxServerPgnBytes + 1, ' '), serverGame(1), r, err));
+    // A text without the id gets it; an aborted game gets no ScacelithEnd.
+    std::string noId = kServerPgn;
+    noId.erase(noId.find("[ScacelithGameId"), std::string("[ScacelithGameId \"4100000000123\"]\n").size());
+    archive::ServerGame aborted = serverGame(55);
+    CHECK(archive::serverRecord(noId, aborted, r, err));
+    CHECK_EQ(r.tag("ScacelithGameId"), std::string("55"));
+    const char* star = "[Event \"x\"]\n[Result \"*\"]\n[UTCDate \"2026.09.28\"]\n[UTCTime \"23:30:05\"]\n\n1. e4 *\n";
+    aborted.endKey = "reason.online.no_show";
+    CHECK(archive::serverRecord(star, aborted, r, err));
+    CHECK(r.findTag("ScacelithEnd") == nullptr);
+}
+
+TEST(archive_server_game_saved_once) {
+    Folder f("once");
+    // A lookup in an empty (missing) folder.
+    archive::ServerSaveResult look = archive::saveServerGame(f.path, serverGame(4100000000123ull), std::string());
+    CHECK(look.status == archive::ServerSaveStatus::NeedsText);
+    archive::ServerSaveResult a = archive::saveServerGame(f.path, serverGame(4100000000123ull), kServerPgn);
+    CHECK(a.status == archive::ServerSaveStatus::Saved);
+    CHECK(a.path.find("_server_Magnus_T-vs-Wilhelmina.pgn") != std::string::npos);
+    // The same game again: found, nothing written; also with the origin in capitals.
+    archive::ServerSaveResult b = archive::saveServerGame(f.path, serverGame(4100000000123ull), kServerPgn);
+    CHECK(b.status == archive::ServerSaveStatus::AlreadySaved);
+    CHECK_EQ(b.path, a.path);
+    CHECK_EQ(b.index, 0);
+    b = archive::saveServerGame(f.path, serverGame(4100000000123ull, "CAISSA.scacelith.com:443"), std::string());
+    CHECK(b.status == archive::ServerSaveStatus::AlreadySaved);
+    // The same id on another server is another game.
+    archive::ServerSaveResult c = archive::saveServerGame(f.path, serverGame(4100000000123ull, "chess.example.org:443"), kServerPgn);
+    CHECK(c.status == archive::ServerSaveStatus::Saved);
+    CHECK(c.path != a.path);
+    // A broken text saves nothing.
+    archive::ServerSaveResult d = archive::saveServerGame(f.path, serverGame(9), "1. e4 e5 2. Ke3 *");
+    CHECK(d.status == archive::ServerSaveStatus::Invalid);
+    CHECK_EQ(int(f.names().size()), 2);
+    // The listing shows them as games of a server, and the saved game loads with its clocks.
+    std::vector<archive::Entry> list = archive::list(f.path);
+    CHECK_EQ(int(list.size()), 2);
+    for (const archive::Entry& e : list) CHECK(e.mode == archive::Mode::Server);
+    const archive::Entry* e = archive::findServerGame(list, "caissa.scacelith.com:443", 4100000000123ull);
+    CHECK(e != nullptr);
+    CHECK(archive::findServerGame(list, "caissa.scacelith.com:443", 4100000000124ull) == nullptr);
+    CHECK(archive::findServerGame(list, "caissa.scacelith.com:8443", 4100000000123ull) == nullptr);
+    if (e) {
+        archive::LoadResult lr = archive::load(*e);
+        CHECK(lr.ok);
+        CHECK_EQ(int(lr.record.plies.size()), 4);
+        CHECK_EQ(lr.record.plies[2].clockMs, int64_t(178600));
+        CHECK_EQ(lr.record.tag("ScacelithEnd"), std::string("checkmate"));
+        CHECK_EQ(lr.record.tag("UTCTime"), std::string("23:30:05"));
+    }
+    // A server game is never saved automatically.
+    CHECK(!archive::shouldSave(archive::Mode::Server, -1, 40, true, true));
+}
+
+// Every PGN text of the dedicated server in tests/data/server-pgn reads through chess::pgn (moves,
+// clocks, times, tags) and goes into the saved games and back; with index.json, the moves (UCI),
+// clocks and times are the ones the server stored.
+TEST(archive_reads_the_servers_pgn_fixtures) {
+    const std::string dir = fixtureFolder();
+    if (dir.empty()) std::fprintf(stderr, "  tests/data/server-pgn not found (run from the repository root or set SCACELITH_SOURCE_DIR)\n");
+    CHECK(!dir.empty());
+    if (dir.empty()) return;
+    net::json::Value index;
+    {
+        std::string text;
+        if (net::sys::readFile(dir + "/index.json", text, 1 << 20)) {
+            std::string err;
+            CHECK(net::json::parse(text, index, &err));
+        }
+    }
+    Folder saved("fixtures");
+    int files = 0;
+    for (const archive::Entry& entry : archive::list(dir)) {
+        ++files;
+        const std::string text = readAll(entry.path);
+        CHECK(!text.empty());
+        CHECK(text.find('\r') == std::string::npos);  // \n line endings
+        // Lines under 80 columns.
+        size_t start = 0;
+        while (start < text.size()) {
+            size_t end = text.find('\n', start);
+            if (end == std::string::npos) end = text.size();
+            if (end - start >= 80) std::fprintf(stderr, "  %s: a line of %d columns\n", entry.file.c_str(), int(end - start));
+            CHECK(end - start < 80);
+            start = end + 1;
+        }
+        pgn::Result<pgn::ParsedGame> r = pgn::read(text);
+        CHECK_EQ(int(r.games.size()), 1);
+        if (r.games.size() != 1) continue;
+        const pgn::ParsedGame& g = r.games[0];
+        if (!g.ok()) std::fprintf(stderr, "  %s: %s\n", entry.file.c_str(), g.error.text().c_str());
+        CHECK(g.ok());
+        const pgn::Record& rec = g.record;
+        // The tags of the server's PGN, in its order.
+        static const char* const order[] = {"Event", "Site", "Date", "Round", "White", "Black", "Result", "UTCDate", "UTCTime",
+                                            "WhiteElo", "BlackElo"};
+        for (size_t i = 0; i < sizeof order / sizeof order[0]; ++i) {
+            CHECK(i < rec.tags.size());
+            if (i < rec.tags.size()) CHECK_EQ(rec.tags[i].name, std::string(order[i]));
+        }
+        CHECK_EQ(rec.tag("Result"), rec.result);
+        CHECK_EQ(rec.tag("PlyCount"), std::to_string(rec.plies.size()));
+        const std::string term = rec.tag("Termination");
+        CHECK(term == "normal" || term == "time forfeit" || term == "abandoned" || term == "rules infraction" ||
+              term == "unterminated");
+        CHECK_EQ(rec.result == "*", term == "unterminated");
+        int64_t baseMs = 0, incMs = 0;
+        CHECK(pgn::parseTimeControl(rec.tag("TimeControl"), baseMs, incMs));
+        const std::string id = rec.tag("ScacelithGameId");
+        CHECK(!id.empty() && id.find_first_not_of("0123456789") == std::string::npos);
+        // Clocks: the mover's clock after the move, at most the base time plus the increments.
+        for (size_t i = 0; i < rec.plies.size(); ++i) {
+            const pgn::Ply& p = rec.plies[i];
+            CHECK(p.clockMs >= 0 && p.elapsedMs >= 0);
+            CHECK(p.clockMs <= baseMs + incMs * int64_t(i / 2 + 1));
+            CHECK(p.clockMs % 100 == 0 && p.elapsedMs % 100 == 0);  // tenths of a second
+        }
+        // index.json: what the server stored.
+        for (const net::json::Value& want : index["games"].items()) {
+            if (want["file"].asString() != entry.file) continue;
+            CHECK_EQ(id, want["gameId"].asString());
+            CHECK_EQ(rec.tag("White"), want["white"].asString());
+            CHECK_EQ(rec.tag("Black"), want["black"].asString());
+            CHECK_EQ(rec.result, want["result"].asString());
+            CHECK_EQ(term, want["termination"].asString());
+            CHECK_EQ(int(rec.plies.size()), int(want["plies"].asInt()));
+            const std::vector<chess::Position> pos = rec.positions();
+            for (size_t i = 0; i < rec.plies.size() && i < want["uci"].size(); ++i) {
+                CHECK_EQ(pos[i].toUCI(rec.plies[i].move), want["uci"][i].asString());
+                CHECK_EQ(rec.plies[i].clockMs, want["clockMs"][i].asInt());
+                CHECK_EQ(rec.plies[i].elapsedMs, want["elapsedMs"][i].asInt());
+            }
+        }
+        // Into the saved games and back.
+        archive::ServerGame sg;
+        sg.server = "chess.example.org:443";
+        sg.gameId = std::strtoull(id.c_str(), nullptr, 10);
+        archive::ServerSaveResult res = archive::saveServerGame(saved.path, sg, text);
+        CHECK(res.status == archive::ServerSaveStatus::Saved);
+        archive::LoadResult back = archive::loadFile(res.path, res.index);
+        CHECK(back.ok);
+        CHECK_EQ(int(back.record.plies.size()), int(rec.plies.size()));
+        for (size_t i = 0; i < rec.plies.size() && i < back.record.plies.size(); ++i) {
+            CHECK(back.record.plies[i].move == rec.plies[i].move);
+            CHECK_EQ(back.record.plies[i].clockMs, rec.plies[i].clockMs);
+            CHECK_EQ(back.record.plies[i].elapsedMs, rec.plies[i].elapsedMs);
+        }
+        CHECK_EQ(back.record.result, rec.result);
+        CHECK_EQ(back.record.tag("ScacelithMode"), std::string("server"));
+        CHECK(archive::saveServerGame(saved.path, sg, text).status == archive::ServerSaveStatus::AlreadySaved);
+    }
+    CHECK(files >= 1);
+}
