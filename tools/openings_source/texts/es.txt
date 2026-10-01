@@ -1,25 +1,26 @@
 # Coach openings: Spanish texts (keys of en.txt). tools/gen_opening_lang.py merges them with the names of
 # families.json into assets/coach/openings/es.lang.
-# Formal "usted", as in the game's interface. The names never follow "de" or "a" (no "de el" / "a el"
-# contraction to handle). Squares as "e4", files as "columna c", pawns as "peón d"; pieces in words.
+# Informal "tú", the coach's register (the game's menus keep "usted"). The names never follow "de" or "a"
+# (no "de el" / "a el" contraction to handle). Squares as "e4", files as "columna c", pawns as "peón d";
+# pieces in words.
 
 # ---- Sentences
-opening.say.pw.both = Usted abrió con {white:def} y yo respondí con {black:def}.
-opening.say.pw.both.2 = Su apertura es {white:def} y mi respuesta es {black:def}.
-opening.say.pb.both = Abrí con {white:def} y usted respondió con {black:def}.
-opening.say.pb.both.2 = Mi apertura es {white:def} y su respuesta es {black:def}.
-opening.say.pw.declined = Usted jugó {white:def} y yo lo rehusé.
-opening.say.pb.declined = Jugué {white:def} y usted lo rehusó.
-opening.say.pw.accepted = Usted jugó {white:def} y yo lo acepté.
-opening.say.pb.accepted = Jugué {white:def} y usted lo aceptó.
-opening.say.pw.white = Usted abrió con {white:def}.
-opening.say.pw.white.2 = Su apertura es {white:def}.
+opening.say.pw.both = Abriste con {white:def} y yo respondí con {black:def}.
+opening.say.pw.both.2 = Tu apertura es {white:def} y mi respuesta es {black:def}.
+opening.say.pb.both = Abrí con {white:def} y tú respondiste con {black:def}.
+opening.say.pb.both.2 = Mi apertura es {white:def} y tu respuesta es {black:def}.
+opening.say.pw.declined = Jugaste {white:def} y yo lo rehusé.
+opening.say.pb.declined = Jugué {white:def} y tú lo rehusaste.
+opening.say.pw.accepted = Jugaste {white:def} y yo lo acepté.
+opening.say.pb.accepted = Jugué {white:def} y tú lo aceptaste.
+opening.say.pw.white = Abriste con {white:def}.
+opening.say.pw.white.2 = Tu apertura es {white:def}.
 opening.say.pb.white = Abrí con {white:def}.
 opening.say.pb.white.2 = Mi apertura es {white:def}.
-opening.say.pw.var_white = Respondí con {black:def} y usted optó por {white:def}.
-opening.say.pb.var_white = Usted respondió con {black:def} y yo opté por {white:def}.
+opening.say.pw.var_white = Respondí con {black:def} y tú optaste por {white:def}.
+opening.say.pb.var_white = Respondiste con {black:def} y yo opté por {white:def}.
 opening.say.pw.black = Respondí con {black:def}.
-opening.say.pb.black = Usted respondió con {black:def}.
+opening.say.pb.black = Respondiste con {black:def}.
 opening.say.both = Estamos jugando {both:def}.
 opening.say.both.2 = Esto es {both:def}.
 opening.say.variation = Más exactamente, es {variation:def}.
@@ -39,7 +40,7 @@ opening.family.queens_pawn.beginner = El peón de dama ocupa el centro en d4, do
 opening.family.queens_pawn.advanced = Las aperturas de peón de dama llevan a posiciones cerradas donde la colocación de las piezas, la estructura de peones y las rupturas c4 y e4 cuentan más que la táctica temprana.
 opening.family.kings_knight.beginner = El caballo sale y ataca el peón de e5: la jugada de desarrollo más natural, que suele responderse defendiéndolo con el otro caballo.
 opening.family.kings_knight.advanced = El caballo en f3 mantiene abiertas todas las opciones clásicas, la española, la italiana, la escocesa o los cuatro caballos, y obliga a las negras a elegir cómo defender e5.
-opening.family.sicilian.beginner = Las negras responden con el peón c en lugar del peón e y desequilibran la partida: espere una lucha aguda, cada bando atacando en su flanco.
+opening.family.sicilian.beginner = Las negras responden con el peón c en lugar del peón e y desequilibran la partida: espera una lucha aguda, cada bando atacando en su flanco.
 opening.family.sicilian.advanced = Tras d4 y el cambio de peones, las negras obtienen la columna c semiabierta y más peones centrales; las blancas, un desarrollo más rápido y opciones de ataque en el flanco de rey.
 opening.family.french.beginner = Las negras preparan d5 con e6: una defensa sólida, pero el alfil de casillas blancas suele quedar encerrado tras sus propios peones.
 opening.family.french.advanced = Cuando las blancas avanzan a e5, aparece una cadena de peones bloqueada: las blancas atacan en el flanco de rey y las negras golpean la cadena con c5 y f6.
@@ -55,7 +56,7 @@ opening.family.scotch.beginner = Las blancas abren el centro de inmediato con d4
 opening.family.scotch.advanced = La tensión central desaparece enseguida; la lucha gira en torno al desarrollo activo de las negras y a las estructuras de peones tras un cambio en c6.
 opening.family.philidor.beginner = Las negras defienden e5 con el peón d: sólido pero algo pasivo, porque el alfil de casillas negras queda encerrado.
 opening.family.philidor.advanced = Las negras ceden espacio a cambio de un apoyo firme en e5; las blancas disfrutan de una cómoda presión central, y los golpes sobre f7 son frecuentes en el ajedrez de club.
-opening.family.petrov.beginner = Las negras no defienden e5, sino que contraatacan e4 con el caballo: una defensa sólida y simétrica; eso sí, no copie las jugadas de las blancas demasiado tiempo.
+opening.family.petrov.beginner = Las negras no defienden e5, sino que contraatacan e4 con el caballo: una defensa sólida y simétrica; eso sí, no copies las jugadas de las blancas demasiado tiempo.
 opening.family.petrov.advanced = La Petrov lleva a estructuras simétricas, a menudo tablíferas: las blancas conservan una pequeña iniciativa, y las negras se desarrollan rápido y buscan cambios que igualen.
 opening.family.four_knights.beginner = Ambos bandos sacan primero sus caballos: una apertura sana y tranquila que sigue las reglas del desarrollo.
 opening.family.four_knights.advanced = Una apertura simétrica y equilibrada: las blancas eligen un tratamiento español, escocés o italiano, y las negras deben conocer el contragambito Rubinstein.
