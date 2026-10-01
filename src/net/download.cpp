@@ -416,6 +416,13 @@ DownloadResult download(const DownloadRequest& rq, CancelToken* cancel) {
             failDetail = "cannot write " + part;
             complete = false;
         }
+        // A body that ends before the size the file is known to have: the connection closed
+        // early (WinHTTP reports the end of a cut chunked body as its end). Continued like a cut.
+        if (complete && total && have < total) {
+            complete = false;
+            resp.error = "truncated";
+            resp.detail = "the body ended at " + std::to_string(have) + " of " + std::to_string(total) + " bytes";
+        }
         if (complete) {
             bool resumed = res.resumed;
             finish(res);

@@ -133,6 +133,7 @@ std::string mapError(DWORD e, const RequestContext& c) {
     if (c.pinMismatch.load()) return "certificate";
     switch (e) {
     case ERROR_WINHTTP_TIMEOUT: return "timeout";
+    case 10060: return "timeout";   // WSAETIMEDOUT, which Wine's WinHTTP passes on
     case ERROR_WINHTTP_SECURE_FAILURE:
         return (c.secureFlags.load() & WINHTTP_CALLBACK_STATUS_FLAG_SECURITY_CHANNEL_ERROR) ? "tls" : "certificate";
     case ERROR_WINHTTP_SECURE_CERT_DATE_INVALID:
@@ -495,6 +496,10 @@ void httpStream(const HttpRequest& r, const std::function<bool(const HttpHead&)>
     Handle conn, req;
     std::string pin = r.tls ? r.pinnedSha256 : std::string();
     if (!openRequest(r.host, r.port, r.tls, r.method, r.path, pin, r.timeoutMs, conn, req, resp.error, resp.detail)) return;
+    // The wait for the response headers has its own timeout (90 s by default), which some
+    // WinHTTP implementations (Wine's) apply instead of the receive timeout.
+    DWORD headersTimeout = DWORD(r.timeoutMs);
+    WinHttpSetOption(req.get(), WINHTTP_OPTION_RECEIVE_RESPONSE_TIMEOUT, &headersTimeout, sizeof(headersTimeout));
     RequestContext ctx;
     ctx.pin = pin;
     ctx.request = &req;
