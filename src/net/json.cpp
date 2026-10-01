@@ -215,7 +215,7 @@ private:
             ws();
             Value v;
             if (!value(v, depth)) return false;
-            out.set(key, std::move(v));   // a duplicate name keeps the last value
+            if (depth <= lim_.keepDepth) out.set(key, std::move(v));   // a duplicate name keeps the last value
             ws();
             if (p_ < n_ && s_[p_] == ',') { ++p_; continue; }
             if (p_ < n_ && s_[p_] == '}') { ++p_; return true; }
@@ -233,7 +233,7 @@ private:
             ws();
             Value v;
             if (!value(v, depth)) return false;
-            out.items_.push_back(std::move(v));
+            if (depth <= lim_.keepDepth) out.items_.push_back(std::move(v));
             ws();
             if (p_ < n_ && s_[p_] == ',') { ++p_; continue; }
             if (p_ < n_ && s_[p_] == ']') { ++p_; return true; }

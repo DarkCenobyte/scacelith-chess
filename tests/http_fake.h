@@ -1,7 +1,8 @@
-// A small scripted HTTP/1.1 server on the loopback interface for the download tests (plain HTTP
-// is allowed to loopback hosts only, net/transport.h). One thread, one connection at a time; the
-// handler decides every answer, so a test can play a file host: redirects, Range, a connection
-// cut in the middle of a body, a slow or silent server.
+// A small scripted HTTP/1.1 server on the loopback interface for the download and account API
+// tests (plain HTTP is allowed to loopback hosts only, net/transport.h). One thread, one
+// connection at a time; the handler decides every answer, so a test can play a file host
+// (redirects, Range, a connection cut in the middle of a body, a slow or silent server) or the
+// dedicated server's HTTP API (requests are recorded with their body).
 #pragma once
 #include "net/socket_util.h"
 
@@ -23,8 +24,9 @@
 namespace fakehttp {
 
 struct Request {
-    std::string method, path;
+    std::string method, path;                                   // path with its query string
     std::vector<std::pair<std::string, std::string>> headers;   // names lower-case
+    std::string body;                                           // as long as its Content-Length
     std::string get(const std::string& name) const {
         for (auto& h : headers)
             if (h.first == name) return h.second;
@@ -186,6 +188,19 @@ private:
             }
             pos = e + 2;
         }
+        // The body (Content-Length; the clients under test never send a chunked one).
+        size_t want = size_t(std::strtoull(req.get("content-length").c_str(), nullptr, 10));
+        req.body = raw.substr(end + 4);
+        while (req.body.size() < want) {
+            if (std::chrono::steady_clock::now() > deadline || stop_) return;
+            uint8_t buf[4096];
+            bool closed = false;
+            int r = net::sock::recvSome(c, buf, sizeof buf, closed);
+            if (r > 0) req.body.append(reinterpret_cast<char*>(buf), size_t(r));
+            else if (closed || r < 0) return;
+            else waitFor(c, false, 100);
+        }
+        if (req.body.size() > want) req.body.resize(want);
         Handler h;
         {
             std::lock_guard<std::mutex> lk(mu_);

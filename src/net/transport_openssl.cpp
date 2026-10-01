@@ -692,7 +692,7 @@ void httpRequest(const HttpRequest& req, HttpResponse& resp, CancelToken* cancel
     }
     std::string head = req.method + " " + req.path + " HTTP/1.1\r\n";
     head += "Host: " + hostHeader(req.host, req.port, req.tls) + "\r\n";
-    head += "User-Agent: Scacelith\r\nAccept: application/json\r\nConnection: close\r\n";
+    head += "User-Agent: Scacelith\r\nAccept: " + req.accept + "\r\nConnection: close\r\n";
     bool hasBody = !req.body.empty() || req.method == "POST" || req.method == "PUT";
     if (hasBody) head += "Content-Type: application/json\r\nContent-Length: " + std::to_string(req.body.size()) + "\r\n";
     for (auto& h : req.headers) head += h.first + ": " + h.second + "\r\n";

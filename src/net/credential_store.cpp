@@ -22,13 +22,12 @@ const char kPrefix[] = "dpapi:";
 const char kPrefix[] = "bound:";
 #endif
 
-#ifndef _WIN32
 void wipe(std::string& s) {
+    if (s.empty()) return;
     volatile char* p = &s[0];
     for (size_t i = 0; i < s.size(); ++i) p[i] = 0;
     s.clear();
 }
-#endif
 }  // namespace
 
 // ---- token protection ----
@@ -130,6 +129,33 @@ void CredentialStore::loadLocked() const {
         if (rec.origin.empty() || findLocked(rec.origin)) continue;   // one record per origin
         records_.push_back(std::move(rec));
     }
+    applyMovesLocked();
+}
+
+void CredentialStore::applyMovesLocked() const {
+    bool moved = false;
+    for (const auto& mv : moves_) {
+        if (mv.first == mv.second || findLocked(mv.second)) continue;
+        Record* r = findLocked(mv.first);
+        if (!r) continue;
+        // The token is bound to its origin (DPAPI entropy, or the clear binding): unwrap it for the
+        // old origin, wrap it again for the new one. One that cannot be read here moves without it.
+        std::string token, blob;
+        if (!r->tokenBlob.empty() && unprotectToken(mv.first, r->tokenBlob, token)) blob = protectToken(mv.second, token);
+        wipe(token);
+        r->origin = mv.second;
+        r->tokenBlob = blob;
+        moved = true;
+        LOGI("net: the saved session of %s moved to %s", mv.first.c_str(), mv.second.c_str());
+    }
+    if (moved) saveLocked();
+}
+
+void CredentialStore::addOriginMove(const std::string& from, const std::string& to) {
+    if (from.empty() || to.empty() || from == to) return;
+    std::lock_guard<std::mutex> lk(mu_);
+    moves_.emplace_back(from, to);
+    if (loaded_) applyMovesLocked();
 }
 
 bool CredentialStore::saveLocked() const {

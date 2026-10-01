@@ -79,6 +79,10 @@ struct Limits {
     size_t maxBytes = 1 << 20;     // input size
     int maxDepth = 32;             // nesting of arrays/objects
     size_t maxElements = 100000;   // values in the whole document
+    // Arrays and objects nested deeper than this are checked like the rest but come back empty
+    // (their elements are not kept): a large document is validated whole while only its head
+    // stays in memory (1 = the members of the top-level object or array).
+    int keepDepth = 1 << 30;
 };
 
 // Parses a whole document (surrounding whitespace allowed). On failure returns false and, when
