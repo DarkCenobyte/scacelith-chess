@@ -428,7 +428,8 @@ Script Reviewer::announce(const Game& g) {
     }
     if (!p.inCheck()) return s;
     if (level_ >= 2 && squareCount(p.checkers()) >= 2) {
-        s.push_back(sayBeat("ann.double_check", Look::Board, ply, Priority::Urgent));
+        s.push_back(sayBeat(byHuman ? "ann.double_check.human" : "ann.double_check.coach", Look::Board, ply,
+                            Priority::Urgent));
         return s;
     }
     if (byHuman) {
