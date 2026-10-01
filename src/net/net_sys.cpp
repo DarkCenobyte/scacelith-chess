@@ -107,6 +107,35 @@ bool openBrowser(const std::string& url) {
     return reinterpret_cast<INT_PTR>(r) > 32;
 }
 
+std::FILE* openFile(const std::string& path, const char* mode) { return _wfopen(widen(path).c_str(), widen(mode).c_str()); }
+
+bool fileSize(const std::string& path, uint64_t& size) {
+    WIN32_FILE_ATTRIBUTE_DATA d;
+    if (!GetFileAttributesExW(widen(path).c_str(), GetFileExInfoStandard, &d) || (d.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+        return false;
+    size = uint64_t(d.nFileSizeHigh) << 32 | d.nFileSizeLow;
+    return true;
+}
+
+bool renameFile(const std::string& from, const std::string& to) {
+    return MoveFileExW(widen(from).c_str(), widen(to).c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
+}
+
+bool directoryExists(const std::string& dir) {
+    DWORD a = GetFileAttributesW(widen(dir).c_str());
+    return a != INVALID_FILE_ATTRIBUTES && (a & FILE_ATTRIBUTE_DIRECTORY);
+}
+
+bool makeDirectories(const std::string& dir) {
+    if (dir.empty()) return false;
+    if (directoryExists(dir)) return true;
+    std::string d = dir;
+    while (d.size() > 1 && (d.back() == '\\' || d.back() == '/')) d.pop_back();
+    size_t cut = d.find_last_of("\\/");
+    if (cut != std::string::npos && cut > 0 && d[cut - 1] != ':') makeDirectories(d.substr(0, cut));
+    return CreateDirectoryW(widen(d).c_str(), nullptr) != 0 || directoryExists(d);
+}
+
 #else  // POSIX (Linux development builds)
 
 std::string exeDirectory() {
@@ -180,6 +209,35 @@ bool openBrowser(const std::string& url) {
     int status = 0;
     waitpid(pid, &status, 0);
     return WIFEXITED(status) && WEXITSTATUS(status) == 0;
+}
+
+std::FILE* openFile(const std::string& path, const char* mode) {
+    std::string m = std::string(mode) + "e";   // O_CLOEXEC
+    return std::fopen(path.c_str(), m.c_str());
+}
+
+bool fileSize(const std::string& path, uint64_t& size) {
+    struct stat st;
+    if (stat(path.c_str(), &st) != 0 || !S_ISREG(st.st_mode)) return false;
+    size = uint64_t(st.st_size);
+    return true;
+}
+
+bool renameFile(const std::string& from, const std::string& to) { return rename(from.c_str(), to.c_str()) == 0; }
+
+bool directoryExists(const std::string& dir) {
+    struct stat st;
+    return stat(dir.c_str(), &st) == 0 && S_ISDIR(st.st_mode);
+}
+
+bool makeDirectories(const std::string& dir) {
+    if (dir.empty()) return false;
+    if (directoryExists(dir)) return true;
+    std::string d = dir;
+    while (d.size() > 1 && d.back() == '/') d.pop_back();
+    size_t cut = d.find_last_of('/');
+    if (cut != std::string::npos && cut > 0) makeDirectories(d.substr(0, cut));
+    return mkdir(d.c_str(), 0755) == 0 || directoryExists(d);
 }
 
 #endif

@@ -756,6 +756,182 @@ void httpRequest(const HttpRequest& req, HttpResponse& resp, CancelToken* cancel
     s.shutdownTls();
 }
 
+// ---- Streamed responses ----
+
+namespace {
+
+// The chunked transfer coding, decoded as the bytes come in.
+class Dechunker {
+public:
+    // Consumes p[0..n); chunk data goes to 'out' (false from it: aborted). False when the coding
+    // is malformed or 'out' aborted.
+    bool feed(const char* p, size_t n, const std::function<bool(const char*, size_t)>& out, bool& aborted) {
+        aborted = false;
+        while (n) {
+            if (state_ == Data) {
+                size_t k = left_ < n ? size_t(left_) : n;
+                if (!out(p, k)) { aborted = true; return false; }
+                p += k; n -= k; left_ -= k;
+                if (left_ == 0) state_ = DataEnd;
+                continue;
+            }
+            if (state_ == Done) return true;   // anything after the trailers is ignored
+            // Size, DataEnd and Trailer read lines.
+            char c = *p++;
+            --n;
+            if (c != '\n') {
+                if (line_.size() > 4096) return false;
+                line_ += c;
+                continue;
+            }
+            if (!line_.empty() && line_.back() == '\r') line_.pop_back();
+            std::string line;
+            line.swap(line_);
+            if (state_ == DataEnd) {
+                if (!line.empty()) return false;
+                state_ = Size;
+            } else if (state_ == Size) {
+                size_t semi = line.find(';');
+                if (semi != std::string::npos) line.resize(semi);
+                line = trim(line);
+                if (line.empty() || line.size() > 15) return false;
+                char* end = nullptr;
+                left_ = std::strtoull(line.c_str(), &end, 16);
+                if (*end) return false;
+                state_ = left_ ? Data : Trailer;
+            } else if (state_ == Trailer && line.empty()) {
+                state_ = Done;
+            }
+        }
+        return true;
+    }
+    bool done() const { return state_ == Done; }
+
+private:
+    enum State { Size, Data, DataEnd, Trailer, Done };
+    State state_ = Size;
+    uint64_t left_ = 0;
+    std::string line_;
+};
+
+}  // namespace
+
+void httpStream(const HttpRequest& req, const std::function<bool(const HttpHead&)>& onHead,
+                const std::function<bool(const char*, size_t)>& onBody, HttpResponse& resp, CancelToken* cancel) {
+    resp = HttpResponse();
+    if (!req.tls && !isLoopbackHost(req.host)) {
+        resp.error = "insecure";
+        return;
+    }
+    Stream s;
+    if (!s.open(req.host, req.port, req.tls, req.pinnedSha256, req.timeoutMs, cancel)) {
+        resp.error = s.error;
+        resp.detail = s.detail;
+        return;
+    }
+    std::string head = req.method + " " + req.path + " HTTP/1.1\r\n";
+    head += "Host: " + hostHeader(req.host, req.port, req.tls) + "\r\n";
+    bool agent = false;
+    for (auto& h : req.headers) agent = agent || lower(h.first) == "user-agent";
+    if (!agent) head += "User-Agent: Scacelith\r\n";
+    head += "Accept: */*\r\nAccept-Encoding: identity\r\nConnection: close\r\n";
+    for (auto& h : req.headers) head += h.first + ": " + h.second + "\r\n";
+    head += "\r\n";
+
+    if (cancel) cancel->setAbort([&s] { s.abortSocket(); });
+    std::string err;
+    bool ok = s.writeAll(head.data(), head.size(), Deadline(req.timeoutMs));
+    // The head (interim 1xx answers skipped); 'raw' keeps what came after it.
+    std::string raw;
+    ParsedHead ph;
+    std::vector<char> buf(64 * 1024);
+    for (bool haveHead = false; ok && !haveHead;) {
+        size_t e = raw.find("\r\n\r\n");
+        if (e == std::string::npos) {
+            if (raw.size() > 65536) { s.error = "network"; s.detail = "response header too large"; ok = false; break; }
+            int r = s.readBlocking(buf.data(), buf.size(), Deadline(req.timeoutMs));
+            if (r <= 0) {
+                if (r == 0) { s.error = "network"; s.detail = "connection closed before the response"; }
+                ok = false;
+                break;
+            }
+            raw.append(buf.data(), size_t(r));
+            continue;
+        }
+        ph = ParsedHead();
+        if (!parseHead(raw.substr(0, e), ph)) { s.error = "network"; s.detail = "bad HTTP response"; ok = false; break; }
+        raw.erase(0, e + 4);
+        haveHead = ph.status >= 200;
+    }
+    if (ok) {
+        resp.status = ph.status;
+        resp.retryAfter = ph.get("retry-after");
+        HttpHead hh;
+        hh.status = ph.status;
+        hh.headers = ph.headers;
+        bool wantBody = onHead(hh) && req.method != "HEAD" && ph.status != 204 && ph.status != 304;
+        if (wantBody) {
+            const bool chunked = lower(ph.get("transfer-encoding")).find("chunked") != std::string::npos;
+            const std::string cl = ph.get("content-length");
+            const bool sized = !chunked && !cl.empty();
+            uint64_t left = sized ? std::strtoull(cl.c_str(), nullptr, 10) : 0;
+            uint64_t total = 0;
+            Dechunker dechunk;
+            bool aborted = false;
+            // Body bytes to the caller, with the size cap.
+            auto deliver = [&](const char* p, size_t n) {
+                total += n;
+                if (total > req.maxResponseBytes) { err = "too_large"; return false; }
+                if (!onBody(p, n)) { err = "aborted"; return false; }
+                return true;
+            };
+            if (sized && left > req.maxResponseBytes) { err = "too_large"; ok = false; }
+            bool finished = sized && left == 0;
+            // 'raw' first, then the socket.
+            const char* p = raw.data();
+            size_t n = raw.size();
+            while (ok && !finished) {
+                if (n) {
+                    if (chunked) {
+                        if (!dechunk.feed(p, n, deliver, aborted)) {
+                            if (err.empty()) { s.error = "network"; s.detail = "bad chunked body"; }
+                            ok = false;
+                            break;
+                        }
+                        finished = dechunk.done();
+                    } else {
+                        size_t k = sized && left < n ? size_t(left) : n;
+                        if (!deliver(p, k)) { ok = false; break; }
+                        if (sized) {
+                            left -= k;
+                            finished = left == 0;
+                        }
+                    }
+                    if (finished) break;
+                }
+                int r = s.readBlocking(buf.data(), buf.size(), Deadline(req.timeoutMs));
+                if (r < 0) { ok = false; break; }
+                if (r == 0) {
+                    // End of stream: complete only for a body that runs to the end of the connection.
+                    if (chunked || sized) err = "truncated";
+                    else finished = true;
+                    ok = finished;
+                    break;
+                }
+                p = buf.data();
+                n = size_t(r);
+            }
+        }
+    }
+    if (cancel) cancel->setAbort(nullptr);
+    if (!ok) {
+        resp.error = cancel && cancel->cancelled() ? "cancelled" : !err.empty() ? err : (s.error.empty() ? "network" : s.error);
+        resp.detail = s.detail;
+        return;
+    }
+    s.shutdownTls();
+}
+
 std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int& httpStatus, CancelToken* cancel) {
     error.clear();
     httpStatus = 0;
