@@ -1533,6 +1533,7 @@ void foldGameOver(bool folded) { S.forcedFold = folded ? 1 : 0; }
 bool optionsOpen() { return S.optionsVisible || S.optionsVisiblePrev; }
 
 void openBrightnessCalibration() { S.forcedPage = int(Page::Calibration); }
+void openSavedGames() { S.forcedPage = int(Page::Library); }
 
 MenuAction mainMenu(NewGameSetup& setup) {
     static WatchSetup watch;
@@ -1554,7 +1555,9 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, L
     const bool hasLibrary = !library.folder.empty();
     im::Id menuId = im::makeId("##mainmenu");
     bool appear = im::appearing(menuId);
-    if (appear) {
+    // A page asked for while the menu is up already (openSavedGames after a replay that could not
+    // start) opens at once.
+    if (appear || S.forcedPage >= 0) {
         setPage(S.forcedPage >= 0 ? Page(S.forcedPage) : S.resumeOnline ? Page::Online : Page::Title);
         if (S.page == Page::Library && !hasLibrary) setPage(Page::Title);
         if (S.page == Page::Options) openOptions();

@@ -3,7 +3,8 @@
 // one PC, each from their own robot's eyes, see docs/MULTIPLAYER_PLAN.md), online play (a player
 // of the Scacelith server or of a direct match sits in the other chair, see
 // game_scene_online.cpp), the viewer mode (two Stockfish players watched from a free, invisible
-// camera), the player's Elo, animations, audio and UI.
+// camera), the replay of a saved game (game_scene_replay.cpp), the player's Elo, animations,
+// audio and UI.
 //
 // Seats: seat 0 is White's chair (+Z), seat 1 Black's (-Z). Each seat has a controller (Human,
 // Stockfish or Remote; a hot-seat game has two Humans), the name and Elo written on the
@@ -31,6 +32,17 @@
 // coach::Session decides what the coach says and when (src/coach). The coach's own moves come
 // from its teaching repertoire, then Stockfish at the level's strength, and wait while the
 // session reviews the player's move (coachMayMove).
+//
+// Saved games (game_archive.h, game_saving.h): games against Stockfish, coach games of levels 1-6,
+// hot-seat games and direct matches go to plat::appDataDirectory() + "pgn/" as PGN files, with the
+// time each move took and the clocks, when they end or are left (archiveGame); never server games,
+// the viewer mode, the rules lesson or a replay. The title page's "Saved games" lists them.
+//
+// Replay (game_scene_replay.cpp): a saved game played again by the two robots at the pace it was
+// played (replay::ReplayClock), watched like the viewer mode (free camera, viewpoints, the
+// players' eyes), its clocks from the record, its scoresheets written as the moves are played,
+// its result card at the end. K pauses, J / L step back / forward, Shift+J / Shift+L slower /
+// faster, Home / End the start / the end; the same as mouse buttons on the overlay.
 //
 // Command line (development and screenshots):
 //   --start                 skip the menu: a game against Stockfish (--human white|black)
@@ -60,6 +72,11 @@
 //   --start-online [cat]    skip the menu: sign in and play the first opponent found in category
 //                           "cat" (default 5+3; with --online-mock the game starts at once);
 //                           --touch <square> touches that piece once the handshake is over
+//   --start-online direct   with --online-mock: a direct match against the fakes' friend
+//   --play-then a,b,...     once the --play moves are made, the player picks these in the Esc menu,
+//                           one per turn: resign, leave (Main menu), takeback (coach games)
+//   --replay <file.pgn>     skip the menu: replay a saved game (--game N: the Nth game of the file,
+//                           from 1; --replay-speed x1|x2|x4|x8|instant; --replay-paused)
 //   --mouse fx,fy           pointer position as fractions of the window (screenshots)
 //   --glance                a human game starts looking at the player's scoresheet (S)
 //   --calibrate             the brightness calibration before the title page, as on a first start
@@ -72,13 +89,16 @@
 #include "camera_flight.h"
 #include "clock_rules.h"
 #include "coach_args.h"
+#include "game_mode.h"
 #include "hotseat.h"
 #include "observer_camera.h"
 #include "online_live.h"
 #include "online_session.h"
 #include "physical_board.h"
+#include "replay.h"
 #include "scorekeeper.h"
 #include "world.h"
+#include <ctime>
 #include <map>
 #include <memory>
 #include <string>
@@ -94,13 +114,6 @@ enum class Controller {
     Human,
     Stockfish,
     Remote   // an online opponent: its robot plays the moves the server (or direct peer) reports
-};
-enum class GameMode {
-    Play,    // the human against Stockfish, first person
-    Watch,   // viewer mode: Stockfish against Stockfish, free observer camera
-    Online,  // the human against a player of the server or of a direct match, first person
-    HotSeat, // two humans on this PC, in turn, each from their own robot's eyes
-    Coach    // the human against the coach (a Stockfish seat that teaches), first person
 };
 
 struct Seat {
@@ -224,7 +237,10 @@ private:
     int humanSeat() const { return seatOf(humanColor_); }
     int aiSeat() const { return 1 - humanSeat(); }
     bool isHumanSeat(int seat) const { return seats_[seat & 1].human(); }
-    bool watching() const { return mode_ == GameMode::Watch; }
+    // The viewer mode, and a replay: both are watched from the free observer camera, with the
+    // viewpoints, the overlay and the Esc menu of the viewer (replaying() tells them apart).
+    bool watching() const { return mode_ == GameMode::Watch || mode_ == GameMode::Replay; }
+    bool replaying() const { return mode_ == GameMode::Replay; }
     bool online() const { return mode_ == GameMode::Online; }
     bool hotSeat() const { return mode_ == GameMode::HotSeat; }
     // No time control: no clock press, the move is completed as its last piece is released
@@ -288,7 +304,10 @@ private:
     ui::GameOverExtras hotSeatGameOverExtras() const;
     void swapHotSeatColours();                 // rematch
     bool anyInputHeld() const;
-    void updateScript(float dt);               // --play: the next scripted move, when idle
+    void updateScript(float dt);               // --play: the next scripted move, when idle; then --play-then
+    // The action of the Esc menu chosen this frame: the one --play-then queued (scripted runs),
+    // else what 'shown' (the menu drawn this frame) returned.
+    ui::MenuAction menuChoice(ui::MenuAction shown);
 
     // ---- online play (game_scene_online.cpp) ----
     struct RemoteMove { int ply = 0; uint16_t move = 0; };
@@ -382,6 +401,32 @@ private:
     void runCoachTable(float dt);             // the coach's table jobs (demonstrations, takebacks...)
     void runStageTest(float dt);              // --coach-stage-test
 
+    // ---- saved games (game_archive.h, game_saving.h) ----
+    // Saves the game being played in the folder of saved games, once (archived_): at its end, when
+    // the player leaves it, and as a safety net (the menu, the window closed). 'finished': it has
+    // a result (a direct match: what its authority reports, see saving::directMatchRecord).
+    void archiveGame(bool finished);
+
+    // ---- replay of a saved game (GameMode::Replay) ----
+    bool loadReplay(const std::string& path, int game);   // replayRecord_ from a file, false (logged) when it cannot be read
+    void setupReplay();                       // part of setupNewGame(): the replay clock, the sheets' header
+    Scorekeeper::Details replaySheetDetails() const;   // the record's Event and Round
+    std::string replaySheetDate() const;      // its Date as a scoresheet writes dates
+    void configureReplaySeats();              // the players of the record (names, Elo) in robot seats
+    chess::TimeControl replayTimeControl() const;   // the record's: untimed without TimeControl or clocks
+    void updateReplay(float dt);              // updatePlaying() while replaying: the replay clock drives the robots
+    // The robot of 'seat' plays 'mv' on the board: touch, carry, capture, castling rook, promotion
+    // swap, clock press (untimed: completed as its last piece is released). Stockfish's moves and
+    // the replay's.
+    void playRobotMove(int seat, const chess::Move& mv);
+    void setReplayPosition(int ply);          // the board, the game and the sheets at 'ply', at once
+    void completeReplayMove(int seat, const chess::Arbiter::Verdict& v);   // completeMove() of a replay
+    void endReplay();                         // the record's last move is played: its result card
+    ui::GameOverExtras replayGameOverExtras() const;   // the record's players and result, "Replay again"
+    void updateReplayInput();                 // updateWatchInput(): K, J, L, Shift+J/L, Home, End
+    void drawReplayBar();                     // the replay's buttons, speed and move counter
+    ClockDisplay replayClockDisplay() const;  // the record's clocks (replayClock_), dashes without them
+
     // ---- viewer mode ----
     bool observerView() const;                // the observer camera is the view
     void updateWatchInput();                  // once per frame: menu, viewpoints, overlay
@@ -389,6 +434,9 @@ private:
     CameraPose viewpoint(int n) const;        // presets 1..9 (0 = eyes of the player to move)
     CameraPose eyePose(int seat) const;
     void selectViewpoint(int n, bool jump);
+    // A move completed while watching through the players' eyes: the view flies to the other
+    // player's (the hot-seat handover; --handover-preview also freezes the clock until it lands).
+    void followEyesAfterMove(int seat);
     int headNearCamera(m::vec3 p) const;      // seat whose head contains p (drawn headless), or -1
     float observerFocus(const render::Camera& cam) const;
     float firstPersonFocus(const m::Ray& gaze) const;  // distance the player's eyes focus at
@@ -519,6 +567,26 @@ private:
     std::vector<std::string> script_;
     size_t scriptPos_ = 0;
     chess::PieceType scriptPromo_ = chess::NoPiece;
+    // --play-then: what the player picks in the Esc menu once the moves of --play are made
+    std::vector<std::string> scriptThen_;
+    size_t scriptThenPos_ = 0;
+    ui::MenuAction scriptMenu_ = ui::MenuAction::None;   // chosen in the Esc menu this frame
+
+    // Saved games: the time each move took, by ply (the clock's own count: pauses and hot-seat
+    // handovers excluded), and the mover's clock after it (-1 untimed, or a move set up by --moves)
+    std::vector<int64_t> moveElapsedMs_, moveClockMs_;
+    double plyElapsedMs_ = 0.0;         // the turn being played, so far
+    std::time_t gameStartedAt_ = 0;     // the first turn began (Date and Time tags)
+    bool archived_ = false;             // archiveGame() ran for this game
+    bool directMatch_ = false;          // the online game is a direct match (link_ goes before saving)
+    ui::LibrarySetup library_;          // the title page's "Saved games" entry
+
+    // Replay (GameMode::Replay)
+    chess::pgn::Record replayRecord_;   // the game replayed
+    replay::ReplayClock replayClock_;   // when its moves are played, what its clocks show
+    replay::Speed replaySpeedArg_ = replay::Speed::X1;   // --replay-speed
+    bool replayPausedArg_ = false;      // --replay-paused
+    float replayMoveAt_ = 0.0f;         // time_ when the robot began the move being played (log)
 
     // UI
     bool showMoveList_ = false;

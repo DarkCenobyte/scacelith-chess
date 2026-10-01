@@ -130,6 +130,8 @@ bool GameScene::takeOnlineGame() {
 void GameScene::setupOnlineGame() {
     OnlineSession& s = onlineSession();
     link_ = s.takeGame(og_);
+    // Kept for the saved games: link_ is gone by the time a game left is saved.
+    directMatch_ = link_ && link_->kind() == LinkKind::Direct;
     humanColor_ = og_.you == 1 ? Black : White;
     remoteQueue_.clear();
     pendingPly_ = -1;
@@ -999,7 +1001,7 @@ void GameScene::updateOnlineInput() {
         p.canClaimDraw = game_.canClaimThreefold() || game_.canClaimFiftyMove();
         p.canAbort = !myFirstMoveMade() && og_.status == StOngoing;
         p.canReport = link_ && link_->canReport() && !reported_;
-        switch (ui::onlinePauseMenu(p)) {
+        switch (menuChoice(ui::onlinePauseMenu(p))) {
         case ui::MenuAction::Resume: paused_ = false; break;
         case ui::MenuAction::OfferDraw:
             paused_ = false;
@@ -1080,6 +1082,9 @@ void GameScene::updateOnlineGameOver() {
 }
 
 void GameScene::leaveOnlineGame() {
+    // A direct match goes to the saved games first (nothing happens when its end saved it): its
+    // authority has not answered a resignation or abort just sent, see saving::directMatchRecord.
+    archiveGame(true);
     onlineSession().leaveGame();
     link_ = nullptr;
     clock_.stop();
