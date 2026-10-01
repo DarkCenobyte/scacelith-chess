@@ -6,7 +6,8 @@
 // client Ping (Welcome.clientPingMs) and of the reconnections (full server, shutdown, /info reuse);
 // live gestures (wire units, pacing, the opponent's); the account API (history, game details, PGN,
 // signed-in devices, preferences, e-mail change, export, deletion) against a scripted server
-// (tests/http_fake.h), and the move of the official server's saved session from port 44664 to 443.
+// (tests/http_fake.h), a refused session signing the game out (game::AccountData fed the client's
+// events), and the move of the official server's saved session from port 44664 to 443.
 //
 // Vectors: tests/data/net-protocol-vectors.json (dedicated-server/tools/gen-cpp-test-vectors.js)
 // and, when present, dedicated-server/test/fixtures/protocol-vectors.json. The files are looked
@@ -26,6 +27,7 @@
 #include "test.h"
 #include "http_fake.h"
 #include "chess/chess.h"
+#include "game/online_account.h"
 #include "net/credential_store.h"
 #include "net/crypto.h"
 #include "net/json.h"
@@ -2545,18 +2547,74 @@ TEST(net_account_games_history) {
     CHECK(r.c->hasSavedSession());
 
     // 401: the session is gone, its token erased (the user name stays); later calls need a login.
+    // Whatever the server's code (invalid_token for a refused bearer), the game gets one:
+    // "unauthorized", and the same without a saved token (nothing sent).
     mode = 4;
     r.c->fetchMyGames(0, 10, net::GamesFilter());
     ev = r.wait(K::GamesResult);
     CHECK(!ev.ok);
-    CHECK_EQ(ev.error, std::string("invalid_token"));
+    CHECK_EQ(ev.error, std::string("unauthorized"));
+    CHECK(ev.sessionLost);
     CHECK(!r.c->hasSavedSession());
     CHECK_EQ(r.c->savedUsername(), std::string("alice"));
     size_t before = r.count();
     r.c->fetchMyGames(0, 10, net::GamesFilter());
     ev = r.wait(K::GamesResult);
-    CHECK_EQ(ev.error, std::string("not_logged_in"));
+    CHECK_EQ(ev.error, std::string("unauthorized"));
     CHECK_EQ(r.count(), before);
+}
+
+// The real server refuses a session it no longer accepts (expired, revoked, the account gone)
+// with 401 invalid_token. The game, fed the client's events, must then show the player signed out:
+// on an account call, on a public read asked again without the token (its answer is ok), and on a
+// call made after the token was erased.
+TEST(net_account_refused_session_signs_the_game_out) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    auto handler = [](const fakehttp::Request& q) {
+        if (q.has("authorization")) return jsonReply(401, R"({"error":"invalid_token","message":"Log in again."})");
+        if (q.path == "/api/v1/games/812") return jsonReply(200, std::string(kGameDetails).substr(0, std::string(kGameDetails).find(R"(,"you")")) + "}");
+        return jsonReply(401, R"({"error":"unauthorized"})");
+    };
+    {
+        AccountRig r("acct-refused", handler);
+        net::AccountInfo account;
+        account.username = "alice";
+        bool signedIn = true;
+        game::AccountData data;
+        r.c->fetchMyGames(0, 10, net::GamesFilter());
+        net::Event ev = r.wait(K::GamesResult);
+        CHECK(!ev.ok);
+        CHECK(!r.c->hasSavedSession());
+        CHECK(data.apply(ev, account, signedIn));
+        CHECK(!signedIn);
+        // A call after that: no token any more, nothing sent, still signed out.
+        signedIn = true;
+        const size_t n = r.count();
+        r.c->fetchSessions();
+        ev = r.wait(K::SessionsResult);
+        CHECK(!ev.ok);
+        CHECK_EQ(r.count(), n);
+        CHECK(data.apply(ev, account, signedIn));
+        CHECK(!signedIn);
+    }
+    {
+        // A public read: the refused token is erased and the game asked for again without it. The
+        // answer is the public one (ok), and the game learns that its session is gone.
+        AccountRig r("acct-refused-public", handler);
+        net::AccountInfo account;
+        bool signedIn = true;
+        game::AccountData data;
+        data.gameWanted = 812;
+        r.c->fetchGame(812);
+        net::Event ev = r.wait(K::GameDetailsResult);
+        CHECK(ev.ok);
+        CHECK_EQ(ev.gameDetails.you, 2);
+        CHECK(!r.c->hasSavedSession());
+        CHECK(data.apply(ev, account, signedIn));
+        CHECK(data.gameLoaded);
+        CHECK(!signedIn);
+    }
 }
 
 TEST(net_account_game_details) {
@@ -2642,11 +2700,13 @@ TEST(net_account_game_details) {
     CHECK_EQ(r.count(), n);
 
     // A refused token is erased, and the public answer asked for without it.
+    CHECK(!ev.sessionLost);
     mode = 4;
     n = r.count();
     r.c->fetchGame(812);
     ev = r.wait(K::GameDetailsResult);
     CHECK(ev.ok);
+    CHECK(ev.sessionLost);                          // the game signs out
     CHECK_EQ(ev.gameDetails.you, 2);
     std::vector<fakehttp::Request> all = r.srv.requests();
     CHECK_EQ(all.size(), n + 2);
@@ -2660,6 +2720,7 @@ TEST(net_account_game_details) {
     r.c->fetchGame(812);
     ev = r.wait(K::GameDetailsResult);
     CHECK(ev.ok);
+    CHECK(!ev.sessionLost);
     CHECK(!r.last().has("authorization"));
 }
 

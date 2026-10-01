@@ -426,6 +426,7 @@ struct OnlineClient::Impl {
         std::string text;        // Call::rawCap: the body of a 2xx answer as received
         std::string error;       // "" on 2xx
         int retryAfter = 0;
+        bool sessionLost = false;  // the saved token was refused (401) on the way, and erased
         bool ok() const { return error.empty(); }
     };
 
@@ -434,7 +435,7 @@ struct OnlineClient::Impl {
         None,                    // no token
         Optional,                // the token when one is saved (public reads that tell the signed-in
                                  // player more); when it is refused (401): erased, asked again without
-        Required                 // "not_logged_in" without a saved token
+        Required                 // "unauthorized" without a saved token (nothing sent)
     };
     struct Call {
         Auth auth = Auth::None;
@@ -451,7 +452,10 @@ struct OnlineClient::Impl {
     }
 
     // One API call to e's origin. A 401 answer to a request that carried the token means that the
-    // session is gone (expired, revoked, the account deleted): the token is erased, whatever the call.
+    // session is gone (expired, revoked, the account deleted): the token is erased, whatever the call,
+    // Api::sessionLost is set and the error is "unauthorized" whatever the server's code (the real
+    // server says invalid_token): the game has one code for "signed out", the same as for a call
+    // that needs the session while none is saved.
     Api request(const ServerEndpoint& e, const std::string& method, const std::string& path, const json::Value* body,
                 const Call& call, CancelToken& cancel) {
         Api out;
@@ -472,17 +476,18 @@ struct OnlineClient::Impl {
                 req.headers.emplace_back("Authorization", "Bearer " + c.token);
                 sentToken = true;
             } else if (call.auth == Auth::Required) {
-                out.error = "not_logged_in";
+                out.error = "unauthorized";
                 return out;
             }
         }
         json::Value payload = body ? *body : json::Value();
-        bool powSolved = false;
+        bool powSolved = false, refused = false;
         for (;;) {
             req.body = body ? payload.dump() : std::string();
             HttpResponse resp;
             httpRequest(req, resp, &cancel);
             out = Api();
+            out.sessionLost = refused;
             if (!resp.error.empty()) {
                 // Larger than this text answer may be: not what the call expects.
                 out.error = call.rawCap > 0 && resp.error == "too_large" ? "invalid_response" : resp.error;
@@ -508,7 +513,10 @@ struct OnlineClient::Impl {
             if (success) return out;
             out.error = out.body["error"].asString("http_" + std::to_string(resp.status));
             if (resp.status == 401 && sentToken) {
+                LOGW("net: %s %s: the session was refused (%s); its token is erased", method.c_str(), path.c_str(), out.error.c_str());
                 creds.clearToken(e.origin());
+                refused = out.sessionLost = true;
+                out.error = "unauthorized";
                 if (call.auth != Auth::Optional) return out;
                 // A public read: the same request again, without the token that was refused.
                 req.headers.erase(std::remove_if(req.headers.begin(), req.headers.end(),
@@ -546,6 +554,7 @@ struct OnlineClient::Impl {
         ev.ok = a.ok();
         ev.error = a.error;
         ev.retryAfterSec = a.retryAfter;
+        ev.sessionLost = a.sessionLost;
     }
 
     static RatingInfo parseRating(const json::Value& r) {
@@ -1618,7 +1627,7 @@ void OnlineClient::logout(bool allSessions) {
         Event ev;
         ev.kind = Event::Kind::LogoutResult;
         Impl::fillError(ev, a);
-        if (a.status == 401 || a.error == "not_logged_in") {
+        if (a.status == 401 || a.error == "unauthorized") {
             ev.ok = true;
             ev.error.clear();
         }

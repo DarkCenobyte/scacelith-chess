@@ -180,6 +180,14 @@ TEST(account_apply_routes_history_and_game) {
     // The token refused by any of them signs out.
     CHECK(d.apply(event(Kind::GamesResult, false, "unauthorized"), account, signedIn));
     CHECK(!signedIn);
+    // So does a public read answered once the refused token was erased (sessionLost, ok).
+    signedIn = true;
+    net::Event pub = event(Kind::GameDetailsResult);
+    pub.sessionLost = true;
+    pub.gameDetails.id = 42;
+    CHECK(d.apply(pub, account, signedIn));
+    CHECK(d.gameLoaded);
+    CHECK(!signedIn);
 }
 
 TEST(account_apply_sessions_sorted_and_revoked) {

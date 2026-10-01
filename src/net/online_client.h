@@ -35,7 +35,9 @@
 //   - Account API (additive): the game history, a game's details and PGN, the signed-in devices,
 //     the challenge preference, the e-mail change, the data export and the account deletion
 //     (fetchMyGames ... deleteAccount below; dedicated-server/docs/API.md). A 401 answer to any
-//     call that carried the session token erases that token (the session expired or was revoked).
+//     call that carried the session token erases that token (the session expired or was revoked)
+//     and sets Event::sessionLost; such a call, or one that needs the session while none is saved,
+//     fails with "unauthorized" whatever the server's code (it says invalid_token).
 #pragma once
 #include "gesture.h"
 #include <cstdint>
@@ -316,6 +318,10 @@ struct Event {
     int64_t sessionId = 0;
     std::string status;               // EmailChangeResult
     std::string text;                 // PgnResult, AccountExportResult
+    // HTTPS: the saved session was refused (401) during this call, and its token erased: the player
+    // is signed out. The error is then "unauthorized", or none when a public read was asked again
+    // without the token and answered (fetchGame, downloadPgn).
+    bool sessionLost = false;
 };
 
 class OnlineClient {

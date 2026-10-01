@@ -118,8 +118,11 @@ Rules common to these calls:
   empty one.
 - A 401 answer to any call that carried the session token means the session is gone (expired,
   revoked elsewhere, the account deleted): the token is erased (the user name stays), as for
-  `fetchAccount`. `fetchGame` and `downloadPgn` then ask again without the token, since a game is
-  public.
+  `fetchAccount`, and the event carries `sessionLost`. The error is then `unauthorized` whatever
+  the server's code (the server answers `invalid_token` to a bearer it refuses), as for a call
+  that needs the session while none is saved (nothing is sent): the game signs out on that one
+  code. `fetchGame` and `downloadPgn` ask again without the token, since a game is public: their
+  answer may then be ok, with `sessionLost` telling the game that it is signed out.
 - `/account/me` also gives `hasPassword` (false for a Google-only account), `acceptChallenges`,
   `pendingEmail` (an address change waiting for its link), `createdAt` and `lastLoginAt`.
 - Answers are untrusted: a move that is not UCI text, a game with another id than the one asked

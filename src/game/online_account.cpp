@@ -135,8 +135,9 @@ bool AccountData::apply(const net::Event& e, net::AccountInfo& account, bool& si
     case Kind::AccountExportResult: break;  // for the page that asked
     default: return false;
     }
-    // The token was refused: the network layer has forgotten it.
-    if (!e.ok && e.error == "unauthorized") signedIn = false;
+    // The token was refused (or none is saved): the network layer has forgotten it. A public read
+    // asked again without it is answered (ok) and says so with sessionLost.
+    if (e.sessionLost || (!e.ok && e.error == "unauthorized")) signedIn = false;
     return true;
 }
 
