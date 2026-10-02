@@ -1499,8 +1499,8 @@ void pageDirect(float t) {
     if (choiceRow("online.direct.host", "online.direct.host.desc", Rect(p.cx() - w * 0.5f, y, w, 100.0f))) {
         game::Settings& gs = game::settings();
         O.hostPortText = std::to_string(gs.directPort);
-        // The custom time control as its steppers show it (a hand-edited .ini may hold others; the
-        // .ini is written when the match is hosted).
+        // The custom time control as its steppers show it (a hand-edited .ini may hold others: it
+        // keeps them until the settings are next saved, at the latest when the match is hosted).
         gs.directBaseSeconds = nearestValue(baseTimeValues(), gs.directBaseSeconds);
         gs.directIncrementSeconds = std::clamp(gs.directIncrementSeconds, 0, 60);
         setSub(Sub::DirectHost);
