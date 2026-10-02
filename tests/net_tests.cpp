@@ -26,6 +26,7 @@
 #endif
 
 #include "test.h"
+#include "alloc_fail.h"
 #include "http_fake.h"
 #include "chess/chess.h"
 #include "game/online_account.h"
@@ -1034,6 +1035,57 @@ TEST(net_transport_refuses_insecure) {
     bool ran = false;
     tok.setAbort([&] { ran = true; });
     CHECK(ran);
+}
+
+// A request that runs out of memory (a large answer while the system has none left) throws
+// std::bad_alloc out of the transport. The abort action it gave its CancelToken (closing its
+// socket or handle, locals of the call) is taken back all the same, so that a later cancel() (the
+// client's shutdown) never reaches a socket or handle that is gone; the token serves again.
+TEST(net_transport_cancel_cleared_when_out_of_memory) {
+    if (!net::transportAvailable()) return;
+    allocfail::Reset reset;
+    const std::string big(size_t(12) << 20, 'x');
+    fakehttp::Server srv([&](const fakehttp::Request& q) {
+        allocfail::spareThisThread();   // the server has the memory it needs
+        fakehttp::Reply rep;
+        rep.headers.emplace_back("Content-Type", "application/octet-stream");
+        rep.body = q.path == "/big" ? big : std::string("small");
+        return rep;
+    });
+    CHECK(srv.ok());
+    net::HttpRequest req;
+    req.host = "127.0.0.1";
+    req.port = srv.port();
+    req.tls = false;
+    req.path = "/big";
+    req.maxResponseBytes = size_t(16) << 20;
+    net::CancelToken tok;
+    net::HttpResponse resp;
+    bool threw = false;
+    allocfail::failFrom(size_t(8) << 20);
+    try {
+        net::httpRequest(req, resp, &tok);
+    } catch (const std::bad_alloc&) {
+        threw = true;
+    }
+    allocfail::failFrom(0);
+    CHECK(threw);
+    CHECK(!tok.hasAbort());
+    // A streamed answer whose reader throws: the same.
+    threw = false;
+    try {
+        net::httpStream(
+            req, [](const net::HttpHead&) { return true; }, [](const char*, size_t) -> bool { throw std::bad_alloc(); }, resp, &tok);
+    } catch (const std::bad_alloc&) {
+        threw = true;
+    }
+    CHECK(threw);
+    CHECK(!tok.hasAbort());
+    req.path = "/small";
+    net::httpRequest(req, resp, &tok);
+    CHECK(resp.error.empty());
+    CHECK_EQ(resp.body, std::string("small"));
+    CHECK(!tok.hasAbort());
 }
 
 // =============================================================================================
@@ -3162,6 +3214,68 @@ TEST(net_account_gif_beside_other_calls) {
     CHECK_EQ(gif.gameId, uint64_t(812));
     CHECK_EQ(gif.text.compare(0, 6, "GIF89a"), 0);
     CHECK_EQ(gif.origin, origin);
+}
+
+// Out of memory while a large answer arrives (a GIF of up to 16 MiB on net-gif, a PGN of up to
+// 4 MiB on net-http): the call still answers, a failure (invalid_response, its game named), so
+// that the GIF saver and the game page waiting for it end; the next calls are answered as usual.
+TEST(net_account_large_answers_out_of_memory) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    allocfail::Reset reset;
+    const std::string gif = "GIF89a" + std::string(size_t(12) << 20, '\0');
+    std::string pgn = "[Event \"x\"]\n\n{";
+    pgn += std::string(size_t(3) << 20, 'a');
+    pgn += "} *\n";
+    AccountRig r("acct-oom", [&](const fakehttp::Request& q) {
+        allocfail::spareThisThread();   // the server has the memory it needs
+        fakehttp::Reply rep;
+        if (q.path.compare(0, 22, "/api/v1/games/812/gif?") == 0) {
+            rep.headers.emplace_back("Content-Type", "image/gif");
+            rep.body = gif;
+        } else if (q.path == "/api/v1/games/812/pgn") {
+            rep.headers.emplace_back("Content-Type", "application/x-chess-pgn; charset=utf-8");
+            rep.body = pgn;
+        } else {
+            return jsonReply(404, R"({"error":"not_found","message":"No such endpoint."})");
+        }
+        return rep;
+    });
+    CHECK(r.srv.ok());
+    game::GifSaver saver;
+    CHECK(saver.begin("history:812", 812, net::sys::exeDirectory() + "acct-oom-gif", "never.gif"));
+    allocfail::failFrom(size_t(8) << 20);
+    r.c->downloadGameGif(812, net::GifOptions());
+    net::Event ev = r.wait(K::GifResult);
+    CHECK(!ev.ok);
+    CHECK_EQ(ev.error, std::string("invalid_response"));
+    CHECK_EQ(ev.gameId, uint64_t(812));
+    CHECK(ev.text.empty());
+    CHECK_EQ(ev.origin, r.ep.origin());
+    CHECK(saver.finish(std::move(ev)));
+    CHECK(saver.stage() == game::GifSaver::Stage::Failed);
+    CHECK(!saver.busy());
+    CHECK_EQ(saver.error(), std::string("invalid_response"));
+
+    allocfail::failFrom(size_t(2) << 20);
+    r.c->downloadPgn(812);
+    ev = r.wait(K::PgnResult);
+    CHECK(!ev.ok);
+    CHECK_EQ(ev.error, std::string("invalid_response"));
+    CHECK_EQ(ev.gameId, uint64_t(812));
+    CHECK(ev.text.empty());
+
+    // Memory again: the same calls are answered (neither thread stopped).
+    allocfail::failFrom(0);
+    r.c->downloadGameGif(812, net::GifOptions());
+    ev = r.wait(K::GifResult);
+    CHECK(ev.ok);
+    CHECK_EQ(ev.text.size(), gif.size());
+    r.c->downloadPgn(812);
+    ev = r.wait(K::PgnResult);
+    CHECK(ev.ok);
+    CHECK_EQ(ev.text.size(), pgn.size());
+    CHECK(r.c->hasSavedSession());
 }
 
 TEST(net_account_sessions) {
