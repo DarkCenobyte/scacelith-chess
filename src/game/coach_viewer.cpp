@@ -127,7 +127,7 @@ public:
         for (int seat = 0; seat < 2; ++seat) {
             float zs = seat == 0 ? 1.0f : -1.0f;
             anim_[seat].init(sk, vec3(0, layout::PLAYER_PELVIS_Y, zs * layout::PLAYER_PELVIS_Z), zs, character::Side::Right);
-            anim_[seat].setRestHand(vec3(zs * 0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
+            anim_[seat].setRestHand(vec3(zs * layout::REST_HAND_X, layout::TABLE_TOP_Y, zs * layout::REST_HAND_Z));
             anim_[seat].pieceTransform = [this](int id) {
                 const game::PieceObject* p = board_.byId(id);
                 return p ? p->transform : mat4();

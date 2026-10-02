@@ -371,6 +371,9 @@ void swapBuffers() { SwapBuffers(g_hdc); }
 void setVsync(bool on) { if (g_swapInterval) g_swapInterval(on ? 1 : 0); }
 
 void setDisplayMode(DisplayMode mode, int w, int h) {
+    // Unchanged (Options applied for another setting): the window stays where the player moved,
+    // resized or maximised it.
+    if (mode == g_mode && (mode == DisplayMode::Borderless || (w == g_windowedW && h == g_windowedH))) return;
     g_mode = mode;
     if (mode == DisplayMode::Windowed) { g_windowedW = w; g_windowedH = h; }
     DWORD style;

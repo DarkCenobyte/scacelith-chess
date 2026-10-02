@@ -360,9 +360,6 @@ void World::submitPieces(render::Renderer& r, const PhysicalBoard& board, const 
     Impl& w = *impl_;
     for (const PieceObject& p : board.pieces()) {
         if (p.type == NoPiece) continue;
-        if (p.inReserve && !p.held) {
-            // Spare pieces are only shown once they have been brought to the table.
-        }
         render::DrawItem d;
         d.mesh = &w.pieceBody[p.type];
         d.material = &materials::get(p.color == White ? MaterialId::MarbleWhitePiece : MaterialId::MarbleBlackPiece);
@@ -447,8 +444,6 @@ void World::submitMarkers(render::Renderer& r, const std::vector<Marker>& marker
 
 void World::setCoachSeat(int seat) { impl_->coachSeat = seat == 0 || seat == 1 ? seat : -1; }
 void World::setBoardCoordinates(bool on) { impl_->boardCoords = on; }
-bool World::boardCoordinates() const { return impl_->boardCoords; }
-int World::coachSeat() const { return impl_->coachSeat; }
 
 void World::submitPieces(render::Renderer& r, const PhysicalBoard& board) { submitPieces(r, board, nullptr); }
 
@@ -507,8 +502,5 @@ void World::submitCoachMarks(render::Renderer& r, const std::vector<CoachMark>& 
         ++n;
     }
 }
-
-float World::pieceHeight(PieceType t) { return layout::PIECE_HEIGHT[t]; }
-float World::pieceRadius(PieceType t) { return layout::PIECE_BASE_RADIUS[t]; }
 
 }  // namespace game

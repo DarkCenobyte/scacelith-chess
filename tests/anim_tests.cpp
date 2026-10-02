@@ -61,7 +61,7 @@ m::vec3 pageCorner(float s, float xMirror = 1.0f) {
 
 void initWhite(anim::Animator& an) {
     an.init(character::robotSkeleton(), m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
-    an.setRestHand(m::vec3(0.24f, layout::TABLE_TOP_Y, 0.34f));
+    an.setRestHand(m::vec3(layout::REST_HAND_X, layout::TABLE_TOP_Y, layout::REST_HAND_Z));
 }
 
 anim::Task pressClock(float xMirror, float zSign) {
@@ -319,8 +319,8 @@ TEST(anim_left_handed_mirror) {
     CHECK(L.playHand() == Side::Left);
     CHECK(L.writingHand() == Side::Right);
     CHECK(R.writingHand() == Side::Left);
-    L.setRestHand(m::vec3(0.24f, layout::TABLE_TOP_Y, -0.34f));
-    R.setRestHand(m::vec3(-0.24f, layout::TABLE_TOP_Y, -0.34f));
+    L.setRestHand(m::vec3(layout::REST_HAND_X, layout::TABLE_TOP_Y, -layout::REST_HAND_Z));
+    R.setRestHand(m::vec3(-layout::REST_HAND_X, layout::TABLE_TOP_Y, -layout::REST_HAND_Z));
     const m::mat4 S = m::scale(m::vec3(-1, 1, 1));
     for (int k = 0; k < 2; ++k) {
         anim::Animator& a = k == 0 ? L : R;
@@ -805,7 +805,7 @@ TEST(anim_own_scoresheet_writing_heard_first_person) {
             an[seat].init(character::robotSkeleton(), m::vec3(0, layout::PLAYER_PELVIS_Y, zs * layout::PLAYER_PELVIS_Z), zs,
                           clockOnRight ? character::Side::Right : character::Side::Left);
             const float side = an[seat].playHand() == character::Side::Right ? zs : -zs;
-            an[seat].setRestHand(m::vec3(side * 0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
+            an[seat].setRestHand(m::vec3(side * layout::REST_HAND_X, layout::TABLE_TOP_Y, zs * layout::REST_HAND_Z));
             // Scorekeeper: pads, pen on the table, the writing rest beside the first row, 1. e4 Nf6.
             pad[seat] = sh::padFrame(seat, clockPosX);
             const float restX = pad[seat].outerSign > 0.0f ? sh::PAGE_W - 4.0f : 4.0f;
@@ -1083,7 +1083,7 @@ struct CoachBoard {
 void initCoach(anim::Animator& an, float mirror = 1.0f) {
     an.init(character::robotSkeleton(), m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f,
             mirror > 0.0f ? Side::Left : Side::Right);
-    an.setRestHand(m::vec3(mirror * 0.24f, layout::TABLE_TOP_Y, -0.34f));
+    an.setRestHand(m::vec3(mirror * layout::REST_HAND_X, layout::TABLE_TOP_Y, -layout::REST_HAND_Z));
 }
 
 anim::Task coachTask(anim::TaskType type, int pieceId = -1, m::vec3 pos = m::vec3(0), int tag = 0) {

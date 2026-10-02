@@ -69,7 +69,8 @@ public:
     // the markers' programs).
     void setupRenderer(render::Renderer& r);
 
-    // The chess clock stands at the human player's right (layout.h).
+    // The side of the table the chess clock stands on (layout.h: at the human player's right, where
+    // the New Game page puts it in a hot-seat game, at White's right when watching or replaying).
     void setClockSide(bool positiveX);
     bool clockOnPositiveX() const { return clockPosX_; }
     m::mat4 clockTransform() const;
@@ -92,21 +93,15 @@ public:
     // ---- Coach mode -------------------------------------------------------------------------------
     // The robot in this seat wears the "COACH" marking on its chest (-1 = none, the default).
     void setCoachSeat(int seat);
-    int coachSeat() const;
     // Board coordinates (Settings::showCoordinates; off by default, like tournament boards):
     // files a-h (Cinzel's small capitals) and ranks 1-8 inlaid in pale gold stone in the board's
     // marble border, under its polish; each player's files along his edge and his ranks on his
     // left, upright from his chair. Changing it needs no reload (the frame's material is swapped).
     void setBoardCoordinates(bool on);
-    bool boardCoordinates() const;
     // submitPieces with the pieces the coach designates (nullptr or empty = none).
     void submitPieces(render::Renderer& r, const PhysicalBoard& board, const std::vector<PieceHighlight>* highlights);
     // Squares and arrows the coach shows, after the pieces (any number; strength 0 skips a mark).
     void submitCoachMarks(render::Renderer& r, const std::vector<CoachMark>& marks);
-
-    // Piece geometry helpers for picking and grasping.
-    static float pieceHeight(chess::PieceType t);
-    static float pieceRadius(chess::PieceType t);
 
 private:
     struct Impl;

@@ -11,7 +11,6 @@
 #include "game_saving.h"
 #include "game_scene_detail.h"
 #include "../ui/ui_font.h"
-#include "../ui/ui_online.h"
 #include "layout.h"
 #include "look_up.h"
 #include "scoresheet_layout.h"
@@ -297,7 +296,7 @@ void GameScene::initAnimators() {
         // The playing hand rests on the table beside the board, on the clock side (White's right
         // is +X, Black's is -X).
         float side = anim_[seat].playHand() == character::Side::Right ? zs : -zs;
-        anim_[seat].setRestHand(vec3(side * 0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
+        anim_[seat].setRestHand(vec3(side * layout::REST_HAND_X, layout::TABLE_TOP_Y, zs * layout::REST_HAND_Z));
         anim_[seat].pieceTransform = [this](int id) {
             const PieceObject* p = board_.byId(id);
             return p ? p->transform : mat4();
@@ -337,6 +336,7 @@ bool GameScene::pieceInHand(const PieceObject& p) const {
 }
 
 void GameScene::enterMenu() {
+    cancelAiSearch();
     // A game still unsaved (the window of a game left in an unusual way): saved now, while link_
     // and the game are still there (archiveGame does nothing when it ran already).
     archiveGame(game_.isOver());
@@ -550,10 +550,7 @@ void GameScene::setupNewGame() {
         anim_[humanSeat()].setHeadOverride(true, 0.0f, kBaseGazePitch);
         anim_[aiSeat()].setHeadOverride(false);
     }
-    for (Look& l : look_) {
-        l = Look();
-        l.gazePitch = kBaseGazePitch;
-    }
+    for (Look& l : look_) l = Look();
     cameraCut_ = true;
     handover_.cancel();
     inputGate_.reset();
@@ -741,7 +738,12 @@ void GameScene::beginTurn() {
     }
 }
 
+void GameScene::cancelAiSearch() {
+    if (engineOk_ && !coach() && turn_ == Turn::AiThinking && aiRequested_ && !aiHasMove_) engine_.cancelMove();
+}
+
 void GameScene::endGame() {
+    cancelAiSearch();
     // A piece still gripped on its square is let go.
     if (turn_ == Turn::HumanTouched && touchedId_ >= 0) {
         PieceObject* p = board_.byId(touchedId_);
@@ -846,7 +848,8 @@ void GameScene::rateGame() {
 }
 
 void GameScene::archiveGame(bool finished) {
-    if (archived_) return;
+    // Screenshot runs leave the player's saved games alone.
+    if (archived_ || ctx_->screenshotMode) return;
     archived_ = true;
     const archive::Mode mode = saving::archiveMode(mode_, directMatch_);
     // A direct match: the authority's moves, times and ending (the local game may lag behind).
@@ -934,10 +937,9 @@ void GameScene::applySettings(bool displayToo) {
     if (ctx_ && ctx_->renderer) {
         ctx_->renderer->setSettings(s.renderSettings());
         PostSettings& ps = ctx_->renderer->post().settings;
-        ps.exposureCompensation = s.brightness;
-        // A seated player's eyes: gentle depth of field, only far objects soften.
+        // A seated player's eyes: gentle depth of field, only far objects soften (the exposure and
+        // the f-number are set each frame by render()).
         applyDofPreset(ps, s.depthOfField ? DofPreset::Subtle : DofPreset::Off);
-        ps.dofFStop = kEyeFStop;
         ps.dofMaxRadius = 8.0f;
     }
     audio::setMasterVolume(s.masterVolume);
@@ -951,7 +953,6 @@ void GameScene::applySettings(bool displayToo) {
         plat::setDisplayMode(s.fullscreen ? plat::DisplayMode::Borderless : plat::DisplayMode::Windowed, s.displayWidth,
                              s.displayHeight);
         plat::setVsync(s.vsync);
-        s.save();
     }
     refreshCoachVoice();   // Options > Audio > Coach voice
 }
@@ -998,6 +999,9 @@ bool GameScene::update(AppContext& ctx, float dt) {
     const plat::Input& in = plat::input();
     ui::beginFrame(plat::width(), plat::height(), dt);
     bool keepRunning = true;
+    // Hot-seat: nobody acts during the handover, and buttons still held by the previous player
+    // are ignored until released (in every state: a game can end while the view goes over).
+    if (hotSeat()) inputBlocked_ = handover_.active() ? true : inputGate_.blocked(anyInputHeld());
 
     switch (state_) {
     case State::Loading:
@@ -1033,19 +1037,6 @@ bool GameScene::update(AppContext& ctx, float dt) {
         } else if (a == ui::MenuAction::StartGame) {
             // Against Stockfish, or two players on this PC (the page saved its choices).
             mode_ = setup_.opponent == 1 ? GameMode::HotSeat : GameMode::Play;
-            Settings& s = settings();
-            s.difficultyPreset = setup_.difficulty;
-            s.timeControlPreset = setup_.timeControl;
-            s.customBaseSeconds = setup_.customBaseSeconds;
-            s.customIncrementSeconds = setup_.customIncrementSeconds;
-            s.customDelaySeconds = setup_.customDelaySeconds;
-            s.customSkillLevel = setup_.skillLevel;
-            s.customLimitElo = setup_.limitElo;
-            s.customElo = setup_.elo;
-            s.customDepth = setup_.depth;
-            s.customMoveTimeMs = setup_.moveTimeMs;
-            s.customNodes = setup_.nodes;
-            s.save();
             state_ = State::FadeToGame;
             stateTime_ = 0.0f;
         } else if (a == ui::MenuAction::Quit) {
@@ -1074,9 +1065,6 @@ bool GameScene::update(AppContext& ctx, float dt) {
             updateCoachInput();
             break;
         }
-        // Hot-seat: nobody acts during the handover, and buttons still held by the previous player
-        // are ignored until released.
-        if (hotSeat()) inputBlocked_ = handover_.active() ? true : inputGate_.blocked(anyInputHeld());
         // Esc opens the pause menu; once open, the menu handles Esc itself (back / resume).
         if (!paused_ && in.keyPressed[plat::KEY_ESCAPE] && turn_ != Turn::HumanPromotion) {
             paused_ = true;
@@ -1176,7 +1164,9 @@ bool GameScene::update(AppContext& ctx, float dt) {
                 stateTime_ = 0.0f;
             }
         }
-        if (in.keyPressed[plat::KEY_TAB] && !ui::wantsKeyboard()) showMoveList_ = !showMoveList_;
+        // The card holds the keyboard even folded ("View the board"): Tab works once it is folded.
+        if (in.keyPressed[plat::KEY_TAB] && (gameOverShown_ ? ui::gameOverFolded() : !ui::wantsKeyboard()))
+            showMoveList_ = !showMoveList_;
         break;
     default: break;
     }
@@ -1308,7 +1298,6 @@ void GameScene::simulate(float dt) {
     // Characters (frozen while the game is paused).
     bool frozen = paused_ && state_ == State::Playing && !online();
     bool firstPerson = state_ != State::Menu && state_ != State::Loading && state_ != State::FadeToGame;
-    if (state_ == State::FadeToGame) firstPerson = false;
     updateCamera(dt, firstPerson);  // sets the player's head override before the animation update
     updateGaze(dt);
     // Reading one's own scoresheet (S): the writing hand waits off the page meanwhile (the sheet
@@ -1623,7 +1612,9 @@ void GameScene::humanRelease() {
     vec3 pos = board_.squareBase(touchedSq_);
     dest_[p->id].push_back({touchedSq_, pos, false});
     anim_[inputSeat()].enqueue({task(anim::TaskType::Place, p->id, pos), task(anim::TaskType::Retract)});
-    arbiter_.cancelTouch();
+    // The rules lesson relaxes touch-move (lesson.cpp): a piece put back is released for real.
+    if (lesson()) arbiter_.reset(game_);
+    else arbiter_.cancelTouch();
     touchedId_ = -1;
     touchedSq_ = NoSquare;
     turn_ = Turn::HumanIdle;
@@ -2218,7 +2209,11 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     bool handingOver = hotSeat() && handover_.active();
     bool canLook = (state_ == State::Playing || state_ == State::Intro || state_ == State::Handshake || state_ == State::GameOver) &&
                    !handingOver && !(hotSeat() && inputBlocked_);
-    bool uiBlocks = paused_ || gameOverShown_ || turn_ == Turn::HumanPromotion;
+    // The game over card stops the look until it is folded ("View the board"); it keeps the
+    // keyboard even folded.
+    bool cardUp = state_ == State::GameOver && gameOverShown_ && !ui::gameOverFolded();
+    bool uiBlocks = paused_ || cardUp || turn_ == Turn::HumanPromotion;
+    bool keys = state_ == State::GameOver && gameOverShown_ ? ui::gameOverFolded() : !ui::wantsKeyboard();
     if (canLook && !uiBlocks) {
         if (in.mouseDown[plat::MOUSE_RIGHT] && !dragging_ && !ui::wantsMouse()) {
             dragging_ = true;
@@ -2228,14 +2223,14 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
             L.lookUpLift = 0.0f;
             L.lookUpArmed = false;
         }
-        if (in.mousePressed[plat::MOUSE_MIDDLE] || (in.keyPressed['C'] && !ui::wantsKeyboard())) {
+        if (in.mousePressed[plat::MOUSE_MIDDLE] || (in.keyPressed['C'] && keys)) {
             L.yaw = L.pitch = 0.0f;
             L.lookUpArmed = false;
             glance_ = false;
         }
         if (!ui::wantsMouse()) L.lean = clamp(L.lean + in.wheel * 0.2f, 0.0f, 1.0f);
         // S: a look at your own scoresheet, out of sight on the table beside you, and back.
-        if (!watching() && in.keyPressed['S'] && !ui::wantsKeyboard()) glance_ = !glance_;
+        if (!watching() && in.keyPressed['S'] && keys) glance_ = !glance_;
     }
     if (dragging_ && glanceBlend_ > 0.0f) {
         // Looking around from the scoresheet starts from where the eyes are.

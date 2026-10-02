@@ -21,9 +21,10 @@
 // the scoresheet (S) belong to the player to move; there is no pointer or aiming while the view
 // goes over.
 //
-// Untimed games (no time control; Play, hot-seat and Watch can be, online never is, see
-// clock_rules.h) have no clock press: a move is completed as its last piece is released and the
-// turn passes at once (completeMove). The clock shows dashes, its lever stays still.
+// Untimed games (no time control; Play, hot-seat and Watch can be, Coach always is, a replay is
+// when its record has no TimeControl or clocks, online never is, see clock_rules.h) have no clock
+// press: a move is completed as its last piece is released and the turn passes at once
+// (completeMove). The clock shows dashes, its lever stays still.
 //
 // Coach mode (game_scene_coach.cpp): the human against the coach robot ("COACH" on its chest),
 // levels 1-6, or the rules lesson (level 0). Untimed, never rated, touch-move on, illegal
@@ -71,7 +72,7 @@
 //                           other after each move with the clock frozen (hot-seat preview)
 //   --tc N                  time control preset index for a game started from the command line
 //                           (0 = no clock: an untimed game)
-//   --no-intro --warp <s> --moves e2e4,e7e5,... --touch <square>
+//   --no-intro --warp <s> (with --shot) --moves e2e4,e7e5,... --touch <square>
 //   --online-mock           online play against the in-process fake server (online_mock.h)
 //   --start-online [cat]    skip the menu: sign in and play the first opponent found in category
 //                           "cat" (default 5+3; with --online-mock the game starts at once);
@@ -211,6 +212,9 @@ private:
     void updateHumanInput();
     void offerDraw();
     void updateAi(float dt);
+    // The game ends or is left while Stockfish searches the AI's move: the search is cancelled (it
+    // would go on to the end of its time budget). Not in coach games (their closing analyses).
+    void cancelAiSearch();
     void onClockPressed(int seat);
     // The move on the board is completed (FIDE 6.2.1; untimed: 4.7): the arbiter's verdict, the
     // move into game_, the scoresheets, the end of the game, then the turn passes (hot-seat: the
@@ -609,7 +613,6 @@ private:
     bool showMoveList_ = false;
     bool gameOverShown_ = false;
     bool endHandshakeDone_ = false;
-    float gameOverTime_ = 0.0f;
     std::string resultText_, reasonText_;
     bool playerWon_ = false, isDraw_ = false;
     // Elo of the game just played (human games)

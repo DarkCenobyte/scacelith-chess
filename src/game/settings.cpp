@@ -1,11 +1,9 @@
 #include "settings.h"
-#include "../core/ini.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
 #include "../platform/platform.h"
 #include <algorithm>
 #include <cmath>
-#include <cstdio>
 
 namespace game {
 
@@ -102,11 +100,15 @@ bool Settings::load(const std::string& p) {
     hotseatClockRightOf = std::clamp(ini.getInt("hotseat.clock_right_of", hotseatClockRightOf), 0, 1);
     hotseatRated = ini.getBool("hotseat.rated", hotseatRated);
     localPlayers.clear();
-    // Every player save() wrote (the bound only stops a hand-edited file: the duplicate check is
-    // linear).
+    // Every player save() wrote. A section removed by hand leaves a gap: skipped within the first
+    // 256 entries (beyond, the entries are read as long as they follow one another, as save()
+    // writes them). The bound only stops a hand-edited file: the duplicate check is linear.
     for (int n = 1; n <= 10000; ++n) {
         std::string sec = "local_player_" + std::to_string(n) + ".";
-        if (!ini.has(sec + "name")) break;
+        if (!ini.has(sec + "name")) {
+            if (n <= 256) continue;
+            break;
+        }
         LocalPlayer p;
         p.name = ini.getString(sec + "name");
         p.record = elo::readRecord(ini, "local_player_" + std::to_string(n));
@@ -214,6 +216,7 @@ void Settings::applyLanguage() {
 }
 
 bool Settings::save() const {
+    if (readOnly) return true;
     IniFile ini;
     ini.setInt("display.width", displayWidth);
     ini.setInt("display.height", displayHeight);

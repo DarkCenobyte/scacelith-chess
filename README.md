@@ -302,10 +302,11 @@ saved games' tests fail although Windows takes the name. `tools/test_win.sh` and
 
 Development options: `--scene <name>` runs a viewer scene (`--list-scenes`), `--data-dir .`
 reads shaders from disk and **F5** reloads them, **F12** saves a screenshot,
-`--shot out.png --frames N --size 1280x720` renders headlessly. `tools/shot.sh` and
-`tools/shot_win.sh` do this under Xvfb (Linux build and Windows build through Wine). The Windows
-exe has no console: redirect what it prints (`Scacelith.exe --list-scenes > scenes.txt`, or
-`| more`), or configure with `-DSCACELITH_CONSOLE=ON` for a console build.
+`--shot out.png --frames N --size 1280x720` renders headlessly (leaving the settings file and the
+saved games as they are). `tools/shot.sh` and `tools/shot_win.sh` do this under Xvfb (Linux build
+and Windows build through Wine). The Windows exe has no console: redirect what it prints
+(`Scacelith.exe --list-scenes > scenes.txt`, or `| more`), or configure with
+`-DSCACELITH_CONSOLE=ON` for a console build.
 
 The game itself (`--scene game`, the default) takes `--start` (a game against Stockfish at once;
 `--human white|black`), `--viewer` (a watched game at once; `--white-preset N --black-preset N`
@@ -313,7 +314,7 @@ with N an index of the preset list, `--viewpoint 0..9`), `--tc N` (time control 
 x,y,z [--look x,y,z] [--fov deg]` (initial observer camera when watching; a detached camera in a
 normal game), `--handover-preview` (watching through the players' eyes with the clock frozen during
 each camera handover, the same hand-over as [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`,
-`--warp <seconds>` (simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
+`--warp <seconds>` (with `--shot`: simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
 `--mouse fx,fy` (pointer position as fractions of the window; the view follows it, `0.5,0.03` looks
 up at the opponent), `--glance` (start looking at the scoresheet), `--calibrate` (the brightness
 calibration before the title page, as on a first start) and `--ini <file>`.

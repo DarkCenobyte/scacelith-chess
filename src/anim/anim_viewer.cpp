@@ -811,8 +811,8 @@ private:
         anim_[1].init(*sk_, vec3(0, py, -pz), -1.0f, lefty ? Side::Left : Side::Right);
         if (lefty) {
             // As the game does: the playing hands rest on the clock side, in front of the body.
-            anim_[0].setRestHand(vec3(0.24f, layout::TABLE_TOP_Y, 0.34f));
-            anim_[1].setRestHand(vec3(0.24f, layout::TABLE_TOP_Y, -0.34f));
+            anim_[0].setRestHand(vec3(layout::REST_HAND_X, layout::TABLE_TOP_Y, layout::REST_HAND_Z));
+            anim_[1].setRestHand(vec3(layout::REST_HAND_X, layout::TABLE_TOP_Y, -layout::REST_HAND_Z));
         }
         captures_[0] = captures_[1] = 0;
         for (int a = 0; a < 2; ++a) {
@@ -2009,7 +2009,7 @@ void AnimViewer::selfTest() {
                 const float facing = c0.player == 0 ? 1.0f : -1.0f;
                 Animator a;
                 a.init(sk, vec3(0, layout::PLAYER_PELVIS_Y, facing * layout::PLAYER_PELVIS_Z), facing, c0.player == 0 ? Side::Right : Side::Left);
-                a.setRestHand(vec3(0.24f, layout::TABLE_TOP_Y, facing * 0.34f));   // the playing hand, clock side (as in the game)
+                a.setRestHand(vec3(layout::REST_HAND_X, layout::TABLE_TOP_Y, facing * layout::REST_HAND_Z));   // the playing hand, clock side (as in the game)
                 a.pieceTransform = [&](int i) { return i >= 0 && i < kPieces ? ps[i].xf : mat4(); };
                 a.pieceGripInfo = [&](int i) {
                     int t = i >= 0 && i < kPieces ? ps[i].type : 1;
@@ -2133,7 +2133,7 @@ void AnimViewer::writingSelfTest() {
     auto setup = [&](Animator& an, int a, Piece* ps, bool lefty) {
         const float zs = a == 0 ? 1.0f : -1.0f;
         an.init(sk, vec3(0, layout::PLAYER_PELVIS_Y, zs * layout::PLAYER_PELVIS_Z), zs, lefty ? Side::Left : Side::Right);
-        an.setRestHand(vec3(0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
+        an.setRestHand(vec3(layout::REST_HAND_X, layout::TABLE_TOP_Y, zs * layout::REST_HAND_Z));
         an.pieceTransform = [ps](int i) { return i >= 0 && i < kPieces ? ps[i].xf : mat4(); };
         an.pieceGripInfo = [ps](int i) {
             int t = i >= 0 && i < kPieces ? ps[i].type : 1;
@@ -2332,7 +2332,7 @@ void AnimViewer::writingSelfTest() {
         Animator L, R;
         setup(L, 1, psL, true);
         setup(R, 1, psR, false);
-        R.setRestHand(vec3(-0.24f, layout::TABLE_TOP_Y, -0.34f));
+        R.setRestHand(vec3(-layout::REST_HAND_X, layout::TABLE_TOP_Y, -layout::REST_HAND_Z));
         auto mirrorV = [](vec3 v) { return vec3(-v.x, v.y, v.z); };
         PadFrame f = padFrame(1);
         std::vector<PenKey> path = handwriting("Nf6", rowBase(1, 2, 1), f.right, f.up), pathR = path;

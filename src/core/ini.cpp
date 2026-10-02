@@ -1,7 +1,11 @@
 #include "ini.h"
+#include <algorithm>
+#include <cctype>
+#include <climits>
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <map>
 #ifdef _WIN32
@@ -24,27 +28,33 @@ static std::string oneLine(std::string s) {
 // Writes text to path as std::ofstream does (text mode: CRLF line ends on Windows). 'created':
 // the file could be opened, whether the writes succeeded or not.
 static bool writeText(const std::string& path, const std::string& text, bool& created) {
-    std::ofstream f(path, std::ios::trunc);
+    std::ofstream f(std::filesystem::u8path(path), std::ios::trunc);
     created = bool(f);
     f << text;
     f.close();
     return created && !f.fail();
 }
 
-// Renames 'from' over 'to' (narrow paths, as std::ofstream takes them).
+// Renames 'from' over 'to'.
 static bool replaceFile(const std::string& from, const std::string& to) {
 #ifdef _WIN32
-    return MoveFileExA(from.c_str(), to.c_str(), MOVEFILE_REPLACE_EXISTING) != 0;
+    return MoveFileExW(std::filesystem::u8path(from).c_str(), std::filesystem::u8path(to).c_str(),
+                       MOVEFILE_REPLACE_EXISTING) != 0;
 #else
     return std::rename(from.c_str(), to.c_str()) == 0;
 #endif
 }
 
+// The paths are UTF-8: opened as wide paths on Windows (u8path), whatever the process code page.
 bool IniFile::load(const std::string& path) {
-    std::ifstream f(path);
+    std::ifstream f(std::filesystem::u8path(path));
     if (!f) return false;
     std::string line, section;
+    bool first = true;
     while (std::getline(f, line)) {
+        // A UTF-8 byte order mark (an editor's "UTF-8 with BOM") would hide a first [section].
+        if (first && line.compare(0, 3, "\xEF\xBB\xBF") == 0) line.erase(0, 3);
+        first = false;
         line = trim(line);
         if (line.empty() || line[0] == ';' || line[0] == '#') continue;
         if (line[0] == '[') {
@@ -81,7 +91,10 @@ bool IniFile::save(const std::string& path) const {
     const std::string tmp = path + ".tmp";
     bool created = false;
     if (writeText(tmp, text, created) && replaceFile(tmp, path)) return true;
-    if (created) std::remove(tmp.c_str());
+    if (created) {
+        std::error_code ec;
+        std::filesystem::remove(std::filesystem::u8path(tmp), ec);
+    }
     return writeText(path, text, created);
 }
 
@@ -95,7 +108,8 @@ int IniFile::getInt(const std::string& key, int def) const {
     if (s.empty()) return def;
     char* end = nullptr;
     long v = std::strtol(s.c_str(), &end, 10);
-    return end == s.c_str() ? def : int(v);
+    // Saturated to the int range, as strtol does where long is 32-bit (Windows): never wrapped.
+    return end == s.c_str() ? def : int(std::clamp(v, long(INT_MIN), long(INT_MAX)));
 }
 float IniFile::getFloat(const std::string& key, float def) const {
     std::string s = getString(key);
@@ -107,6 +121,8 @@ float IniFile::getFloat(const std::string& key, float def) const {
 bool IniFile::getBool(const std::string& key, bool def) const {
     std::string s = getString(key);
     if (s.empty()) return def;
+    // Any case: a hand-edited "True" or "YES" is true too.
+    for (char& c : s) c = char(std::tolower((unsigned char)c));
     return s == "1" || s == "true" || s == "yes" || s == "on";
 }
 void IniFile::set(const std::string& key, const std::string& value) {
