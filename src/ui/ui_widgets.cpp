@@ -569,6 +569,10 @@ bool buttonLabelFits(const std::string& label, float width) {
     st.size *= kButtonMinScale;
     return gfx::textWidth(displayText(label), st) <= width - 2.0f * kButtonLabelPad;
 }
+float buttonWidthFor(const std::string& label) {
+    // 4 px to spare: fitSize() shrinks a label that measures a hair over its room.
+    return gfx::textWidth(displayText(label), buttonLabelStyle()) + 2.0f * kButtonLabelPad + 4.0f;
+}
 
 void disabledButton(const std::string& label, const Rect& r, ButtonKind kind, const std::string& why, const Rect& within) {
     button(label, r, kind, false);

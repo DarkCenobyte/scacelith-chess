@@ -235,7 +235,7 @@ ModelPromptAction modelPrompt(const ModelPrompt& p) {
         gfx::diamond(vec2(im::flipX(r, r.x + 56.0f), y - 8.0f), 3.5f, withAlpha(gold, 0.9f));
         gfx::textWrapped(licence, x, y, textW, ls, smallH);
         y += smallH * float(licLines) + 18.0f;
-        float lbw = std::min(textW, std::max(300.0f, gfx::textWidth(T("coach.download.read_licence"), style(font::FACE_TEXT, kButton, ivory)) + 70.0f));
+        float lbw = std::min(textW, std::max(300.0f, im::buttonWidthFor(L("coach.download.read_licence"))));
         if (im::button(L("coach.download.read_licence"), im::flip(r, Rect(r.x + 70.0f, y - 6.0f, lbw, 48.0f)), im::ButtonKind::Secondary)) {
             g_prompt.licence = true;
             g_prompt.scroll = g_prompt.target = 0.0f;
