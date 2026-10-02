@@ -1219,7 +1219,8 @@ TEST(net_transport_silent_server_times_out) {
 }
 
 // Chunked answers to httpRequest: chunk sizes that end the reads anywhere (in a size line, in the
-// data, between CR and LF), a large body in linear time, malformed and truncated codings.
+// data, between CR and LF), a large body in linear time, malformed and truncated codings (the
+// OpenSSL transport's own decoder; WinHTTP decodes the coding itself).
 TEST(net_transport_chunked_answers) {
     if (!net::transportAvailable()) return;
     std::string body, coded;
@@ -1278,11 +1279,13 @@ TEST(net_transport_chunked_answers) {
     CHECK(resp.error.empty());
     CHECK(resp.body == large);
     CHECK(ms < 5000);
+#ifndef _WIN32
     for (const char* bad : {"/bad-line-end", "/bad-size", "/bare-lf", "/truncated"}) {
         get(bad, resp);
         CHECK_EQ(resp.error, std::string("network"));
         CHECK(resp.body.empty());
     }
+#endif
 }
 
 // An operation that ends while another thread runs its abort action waits for that action: what
