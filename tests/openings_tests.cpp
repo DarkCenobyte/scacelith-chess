@@ -580,6 +580,36 @@ TEST(openings_announcer_sees_a_replaced_move_as_a_takeback) {
     CHECK(describe(lines).find("family:chigorin") != std::string::npos);
 }
 
+TEST(openings_announcer_keeps_the_comment_of_stale_news) {
+    // News that went stale while speech was busy is never said, and neither is its comment: a later game can still
+    // say it.
+    const std::string najdorf = "e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be3 e5 Nb3 Be6 f3 Be7";
+    const std::string dragon = "e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6";
+    auto run = [](OpeningAnnouncer& a, chess::Game& g, const std::string& sans, bool canSpeak) {
+        std::string out;
+        std::istringstream in(sans);
+        std::string t;
+        while (in >> t) {
+            playMore(g, t);
+            out += describe(a.update(g, canSpeak));
+        }
+        return out;
+    };
+    OpeningAnnouncer a;
+    a.setLevel(4);
+    a.setHumanColor(chess::White);
+    chess::Game g;
+    CHECK(run(a, g, najdorf, true).find("opening.variation.najdorf.advanced") != std::string::npos);
+    // Back to 5.Nc3, then the Dragon while speech is busy: the news is stale when speech is free.
+    chess::Game back = takeBack(g, int(g.moves().size()) - 9);
+    CHECK(a.update(back, false).empty());
+    CHECK_EQ(run(a, back, "g6 Be3 Bg7 f3 O-O Qd2 Nc6", false), std::string());
+    CHECK(a.update(back, true).empty());
+    a.newGame();
+    chess::Game h;
+    CHECK(run(a, h, dragon, true).find("opening.variation.dragon.advanced") != std::string::npos);
+}
+
 TEST(openings_announcer_waits_for_speech_and_catches_up_silently) {
     OpeningAnnouncer a;
     a.setLevel(1);

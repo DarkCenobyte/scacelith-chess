@@ -828,8 +828,10 @@ std::vector<OpeningLine> OpeningAnnouncer::update(const chess::Game& game, bool 
     if (!st.determined || utterances_ >= utteranceCap(level_)) return {};
     Plan p = plan(st);
     if (p.empty()) return {};
-    if (summarySaid_ && st.plies - p.since > 4) {   // stale news: never said
-        markSaid(p);
+    if (summarySaid_ && st.plies - p.since > 4) {   // stale news: never said (its comment stays for later)
+        Plan q = p;
+        q.comment.clear();
+        markSaid(q);
         return {};
     }
     if (st.plies < lastTalkPly_ + 2 || !canSpeak) return {};
