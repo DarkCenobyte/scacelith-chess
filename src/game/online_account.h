@@ -172,6 +172,10 @@ std::vector<MoveLine> gameMoves(const net::GameDetails& g, bool* complete = null
 // "3+2", "7+3", "1:30+1": a time control as the history shows it (base in minutes, or m:ss).
 std::string timeControlLabel(int64_t baseMs, int64_t incMs);
 
+// "14:32": the local time of an epoch-ms instant (the end of a ban or of a matchmaking cooldown),
+// "17.10.2026 14:32" when it is not today.
+std::string localTimeText(double epochMs);
+
 // The file of an account export: "<host>_<username>_<YYYY-MM-DD>.json", the date in local time, the
 // host and the user name made safe for a file name (game::archive::sanitizeName).
 std::string exportFileName(const std::string& host, const std::string& username, std::time_t when);

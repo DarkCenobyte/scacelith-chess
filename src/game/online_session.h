@@ -320,8 +320,7 @@ std::string serverErrorText(int code);
 // while not connected, which the network layer drops).
 std::string eventErrorText(const net::Event& e);
 std::string directErrorText(const std::string& code);
-// "14:32" (local time of an epoch-ms instant) and "0:45" (a duration).
-std::string localTimeText(double epochMs);
+// "0:45" (a duration); the local time of an instant is localTimeText (online_account.h).
 std::string durationText(double ms);
 
 }  // namespace game

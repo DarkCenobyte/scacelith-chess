@@ -10,7 +10,6 @@
 #include <chrono>
 #include <cmath>
 #include <cstdio>
-#include <ctime>
 
 namespace game {
 
@@ -900,20 +899,6 @@ void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
 // =============================================================================================
 // Texts
 // =============================================================================================
-
-std::string localTimeText(double epochMs) {
-    std::time_t t = std::time_t(epochMs / 1000.0);
-    char buf[64] = "";
-    if (const std::tm* tm = std::localtime(&t)) {
-        std::time_t now = std::time(nullptr);
-        const std::tm* today = std::localtime(&now);
-        bool sameDay = today && today->tm_yday == tm->tm_yday && today->tm_year == tm->tm_year;
-        std::tm copy = *tm;
-        if (sameDay) std::snprintf(buf, sizeof buf, "%02d:%02d", copy.tm_hour, copy.tm_min);
-        else std::snprintf(buf, sizeof buf, "%02d.%02d.%04d %02d:%02d", copy.tm_mday, copy.tm_mon + 1, copy.tm_year + 1900, copy.tm_hour, copy.tm_min);
-    }
-    return i18n::ltr(buf);
-}
 
 std::string durationText(double ms) {
     long long s = std::max(0LL, (long long)std::ceil(ms / 1000.0));

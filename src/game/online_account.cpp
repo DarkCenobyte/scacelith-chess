@@ -318,6 +318,19 @@ std::string timeControlLabel(int64_t baseMs, int64_t incMs) {
     return buf;
 }
 
+std::string localTimeText(double epochMs) {
+    const std::time_t t = std::time_t(epochMs / 1000.0), now = std::time(nullptr);
+    std::tm when{}, today{};
+    char buf[64] = "";
+    if (archive::localTime(t, when)) {
+        // Two separate results: std::localtime would hand out one shared buffer for both.
+        bool sameDay = archive::localTime(now, today) && today.tm_yday == when.tm_yday && today.tm_year == when.tm_year;
+        if (sameDay) std::snprintf(buf, sizeof buf, "%02d:%02d", when.tm_hour, when.tm_min);
+        else std::snprintf(buf, sizeof buf, "%02d.%02d.%04d %02d:%02d", when.tm_mday, when.tm_mon + 1, when.tm_year + 1900, when.tm_hour, when.tm_min);
+    }
+    return i18n::ltr(buf);
+}
+
 std::string exportFileName(const std::string& host, const std::string& username, std::time_t when) {
     std::tm tm{};
     const bool have = archive::localTime(when, tm);
