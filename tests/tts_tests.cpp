@@ -913,6 +913,34 @@ TEST(tts_ops_quantization) {
 // ------------------------------------------------------------------------------------------------
 // Kernels of every instruction set this CPU runs, against scalar references
 // ------------------------------------------------------------------------------------------------
+namespace {
+
+// f32 GEMM in the plain loop order (row panel, k block of 512, column panel) with the table's own
+// packing and tiles: the arithmetic sgemm must reproduce bit for bit.
+std::vector<float> sgemmRef(const tts::kern::Table& k, int M, int N, int K, const tts::GemmA& a, const float* B) {
+    const int mr = k.mr, nr = k.nr, panels = (N + nr - 1) / nr;
+    tts::Buffer bbuf(size_t(panels) * size_t(K) * size_t(nr) * 4), abuf(size_t(mr) * size_t(std::min(K, 512)) * 4);
+    float* Bp = static_cast<float*>(bbuf.data);
+    float* Ap = static_cast<float*>(abuf.data);
+    for (int p = 0; p < panels; ++p) k.packBf32(B + p * nr, N, K, std::min(nr, N - p * nr), Bp + size_t(p) * K * nr);
+    std::vector<float> C(size_t(M) * size_t(N));
+    for (int i0 = 0; i0 < M; i0 += mr) {
+        int rows = std::min(mr, M - i0);
+        for (int kb = 0; kb < K; kb += 512) {
+            int kc = std::min(512, K - kb);
+            std::memset(Ap, 0, size_t(mr) * size_t(kc) * 4);
+            if (a.i8) k.packAi8(a.i8 + i0 * a.ld + kb, a.ld, rows, kc, a.scale + i0, a.zp ? a.zp + i0 : nullptr, Ap);
+            else k.packAf32(a.f32 + i0 * a.ld + kb, a.ld, rows, kc, Ap);
+            for (int p = 0; p < panels; ++p)
+                k.sgemmTile(kc, Ap, Bp + (size_t(p) * K + size_t(kb)) * nr, C.data() + size_t(i0) * N + p * nr, N, rows,
+                            std::min(nr, N - p * nr), kb > 0);
+        }
+    }
+    return C;
+}
+
+}  // namespace
+
 TEST(tts_kernels_all_levels) {
     std::vector<int> levels = levelsRun();
     CHECK(!levels.empty());
@@ -994,6 +1022,50 @@ TEST(tts_kernels_all_levels) {
                     ok = ok && std::fabs(C[size_t(i * 2 * cols + j)] - s) < 1e-4;
                 }
             CHECK(ok);
+        }
+        // Deep K (several k blocks): the bits of the plain loop order, whatever the blocking of the
+        // output and the threads.
+        for (int Kd : {513, 1536, 2048}) {
+            const int M = 37, cols = 23, N = 2 * cols;
+            std::vector<float> A = randomVec(size_t(M * Kd), rng), B = randomVec(size_t(Kd * N), rng);
+            std::vector<int8_t> Aq(size_t(M * Kd));
+            for (auto& v : Aq) v = int8_t(int(rng() % 255) - 127);
+            std::vector<float> sc(size_t(M), 0.02f);
+            std::vector<float> Bb(B.size());   // the same B as two column blocks of K x cols
+            for (int kk = 0; kk < Kd; ++kk)
+                for (int j = 0; j < N; ++j)
+                    Bb[size_t((j / cols) * Kd * cols + kk * cols + j % cols)] = B[size_t(kk * N + j)];
+            for (int variant = 0; variant < 2; ++variant) {
+                tts::GemmA ga;
+                ga.ld = Kd;
+                if (variant == 0) ga.f32 = A.data();
+                else {
+                    ga.i8 = Aq.data();
+                    ga.scale = sc.data();
+                }
+                std::vector<float> want = sgemmRef(k, M, N, Kd, ga, B.data());
+                for (tts::ThreadPool* p : {static_cast<tts::ThreadPool*>(nullptr), &pool}) {
+                    tts::GemmB gb;
+                    gb.f32 = B.data();
+                    gb.ld = N;
+                    std::vector<float> C(size_t(M * N));
+                    tts::sgemm(k, p, M, N, Kd, ga, gb, C.data(), N);
+                    CHECK(std::memcmp(C.data(), want.data(), C.size() * 4) == 0);
+                    gb.f32 = Bb.data();
+                    gb.ld = cols;
+                    gb.blocks = 2;
+                    gb.blockCols = cols;
+                    gb.blockStride = Kd * cols;
+                    std::vector<float> Cb(size_t(M * N));
+                    tts::sgemm(k, p, M, N, Kd, ga, gb, Cb.data(), cols, M * cols);
+                    bool same = true;
+                    for (int i = 0; i < M; ++i)
+                        for (int j = 0; j < N; ++j)
+                            same = same && std::memcmp(&Cb[size_t((j / cols) * M * cols + i * cols + j % cols)],
+                                                       &want[size_t(i * N + j)], 4) == 0;
+                    CHECK(same);
+                }
+            }
         }
         // Integer GEMM: exact, both operand orders, with zero points on the unsigned side.
         const int ishapes[][3] = {{1, 1, 1}, {5, 9, 3}, {13, 40, 256}, {33, 17, 1025}, {4, 64, 7}};
@@ -1550,10 +1622,10 @@ TEST(tts_perf) {
                  "  memory: VmRSS %ld kB (RssAnon %ld kB, RssFile %ld kB: the mapped model files), VmHWM %ld kB\n",
                  statusKb("VmRSS:"), statusKb("RssAnon:"), statusKb("RssFile:"), statusKb("VmHWM:"));
     // GEMM throughput on the shapes of the vector estimator (pointwise convolutions at L = 61, batch 2)
-    // and of the vocoder (T = 366).
+    // and of the vocoder (T = 366, and T = 318 with K = 2048).
     {
         std::mt19937 rng(1);
-        const int shapes[][3] = {{2048, 122, 512}, {512, 122, 2048}, {2048, 366, 512}};
+        const int shapes[][3] = {{2048, 122, 512}, {512, 122, 2048}, {2048, 366, 512}, {512, 318, 2048}};
         tts::ThreadPool pool2(2);
         for (auto& sh : shapes) {
             int M = sh[0], N = sh[1], Kd = sh[2];
