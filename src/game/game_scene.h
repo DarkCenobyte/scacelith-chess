@@ -592,10 +592,10 @@ private:
     replay::ReplayClock replayClock_;   // when its moves are played, what its clocks show
     replay::Speed replaySpeedArg_ = replay::Speed::X1;   // --replay-speed
     bool replayPausedArg_ = false;      // --replay-paused
-    float replayMoveAt_ = 0.0f;
+    float replayMoveAt_ = 0.0f;         // time_ when the robot began the move being played (log)
     std::vector<std::string> replayKeys_;   // --replay-keys
     size_t replayKeysPos_ = 0;
-    float replayKeyWait_ = 0.0f;         // time_ when the robot began the move being played (log)
+    float replayKeyWait_ = 0.0f;        // seconds before the next --replay-keys key
 
     // UI
     bool showMoveList_ = false;
