@@ -401,21 +401,6 @@ void play(Sfx s, m::vec3 position, float gain, float pitch) {
     pushPlay(r);
 }
 
-void playFor(Sfx s, m::vec3 position, float seconds, float gain, float pitch) {
-    if (int(s) < 0 || int(s) >= int(Sfx::Count) || !finiteVec(position) || !std::isfinite(gain) || !std::isfinite(pitch) ||
-        !(seconds > 0.0f) || !std::isfinite(seconds))
-        return;
-    PlayRequest r;
-    r.sfx = s;
-    r.pos = position;
-    r.gain = gain;
-    r.pitch = pitch;
-    r.bus = sfxInfo(s).ui ? Bus::UI : Bus::Effects;
-    r.spatial = true;
-    r.duration = seconds;
-    pushPlay(r);
-}
-
 int penStrokeRequests(m::vec3 tip, float seconds, float gain, PlayRequest out[2]) {
     PlayRequest r;
     r.sfx = Sfx::PenTap;
