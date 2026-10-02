@@ -30,7 +30,7 @@ under the Open Database License (ODbL).
 
 | File | Purpose |
 |---|---|
-| `CMakeLists.txt` | Static library `stockfish_embedded`: all upstream sources except `src/main.cpp`, once per instruction-set variant |
+| `CMakeLists.txt` | Static library `stockfish_embedded`: all upstream sources except `src/main.cpp` and `src/universal/` (upstream's own multi-architecture build), once per instruction-set variant |
 | `cmake/isolate.cmake` | Makes each variant one object with three global symbols, and verifies it |
 | `scacelith/entry.cpp` | `scacelith_sf_main_<tag>()` (one per variant, e.g. `_x86_64_avx2`): the body of upstream `main()` as a function, with a fixed command line |
 | `scacelith/cpu.cpp` | The dispatcher: chooses the variant for the CPU, runs its static initialisers, calls its entry point |

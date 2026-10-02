@@ -10,6 +10,11 @@ using namespace bb;
 
 namespace {
 
+// Move buffers (generatePseudo writes them without a bound check). 256 is enough only because
+// setFEN caps each side at 16 pieces and 8 pawns and rejects a side not to move in check, caps that
+// makeMove and passTurn keep: searches over such positions found at most 242 pseudo-legal moves
+// (15 queens and a king). That is a measured margin, not a proof: revisit it if setFEN is ever
+// relaxed (a board editor, variants).
 constexpr int kMaxMoves = 256;
 
 inline Move mkMove(int from, int to, PieceType promo, int flags) {
@@ -263,6 +268,8 @@ bool Position::samePosition(const Position& o) const {
     return true;
 }
 
+bool Position::isStandardStart() const { return samePosition(Position()) && halfmove_ == 0 && fullmove_ == 1; }
+
 // ---- Attacks / legality ---------------------------------------------------------------------
 
 Square Position::kingSquare(Color c) const {
@@ -454,12 +461,6 @@ int Position::generateLegal(Move* out) const {
         if (ok) out[m++] = mv;
     }
     return m;
-}
-
-void Position::pseudoMoves(std::vector<Move>& out) const {
-    Move buf[kMaxMoves];
-    const int n = generatePseudo(buf);
-    out.assign(buf, buf + n);
 }
 
 std::vector<Move> Position::legalMoves() const {

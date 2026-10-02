@@ -16,6 +16,7 @@ namespace {
 bool isDigit(char c) { return c >= '0' && c <= '9'; }
 bool isAlpha(char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
 bool isSpace(char c) { return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\f' || c == '\v'; }
+bool inSet(const char* set, char c) { return c != '\0' && std::strchr(set, c) != nullptr; }  // never the terminator
 bool allDigits(const std::string& s) {
     if (s.empty()) return false;
     for (char c : s)
@@ -90,6 +91,19 @@ void cutUtf8(std::string& s, size_t max) {
     while (n > 0 && ((unsigned char)s[n] & 0xC0) == 0x80) --n;
     s.resize(n);
 }
+// A comment the lexer cut at Limits::maxComment may end inside a UTF-8 sequence, which would make
+// the whole comment read as Windows-1252: drop that incomplete sequence (at most 3 bytes) when the
+// text before it is UTF-8. Any other text is left alone.
+void dropCutSequence(std::string& s) {
+    if (validUtf8(s)) return;
+    for (size_t k = 1; k <= 3 && k <= s.size(); ++k) {
+        const unsigned char c = (unsigned char)s[s.size() - k];
+        if ((c & 0xC0) == 0x80) continue;  // continuation byte
+        const size_t len = (c >> 5) == 0x6 ? 2 : (c >> 4) == 0xE ? 3 : (c >> 3) == 0x1E ? 4 : 0;
+        if (len > k && validUtf8(s.substr(0, s.size() - k))) s.resize(s.size() - k);
+        return;
+    }
+}
 
 // ---- Lexer --------------------------------------------------------------------------------------
 enum class Tok { End, TagPair, Comment, Open, Close, Nag, Symbol, Star, Bad };
@@ -129,12 +143,15 @@ public:
                 continue;
             }
             if (c == '<') {  // reserved for future expansion: skipped up to its '>' on the same line
-                size_t q = p_ + 1;
+                // A failed search ends at the line break: the next '<' of that line resumes there,
+                // so that a line full of '<' costs one pass, not one per '<'.
+                size_t q = std::max(p_ + 1, angleOpenUntil_);
                 while (q < s_.size() && s_[q] != '>' && !lineBreak(q)) ++q;
                 if (q < s_.size() && s_[q] == '>') {
                     while (p_ <= q) advance();
                     continue;
                 }
+                angleOpenUntil_ = q;
                 // Never further: a stray '<' must not swallow the games after it.
                 advance();
                 bad(t, "'<' without '>' on its line");
@@ -158,7 +175,7 @@ public:
             default:
                 if (c == '+' || c == '=' || (c == '-' && peek(1) != '-')) {
                     // Text evaluations of some exports ("+-", "=", "-/+"): ignored.
-                    while (p_ < s_.size() && std::strchr("+-=/", s_[p_])) advance();
+                    while (p_ < s_.size() && inSet("+-=/", s_[p_])) advance();
                     continue;
                 }
                 if (isAlpha(c) || isDigit(c) || c == '-' || (unsigned char)c >= 0x80) {
@@ -181,6 +198,9 @@ private:
     const Limits& lim_;
     size_t p_ = 0;
     int line_ = 1, col_ = 1;
+    size_t angleOpenUntil_ = 0;              // a stray '<' found no '>' before this (its line break)
+    size_t closeLineEnd_ = 0;                // tagPair: the line ending before this was searched ...
+    size_t closeLast_ = std::string::npos;   // ... and this is its last quote closing a tag (npos: none)
 
     char peek(size_t k) const { return p_ + k < s_.size() ? s_[p_ + k] : '\0'; }
     // A line ends at '\n', and at a '\r' not followed by '\n' (files with CR line ends).
@@ -252,11 +272,16 @@ private:
         }
         advance();
         // An unescaped quote inside the value (some writers) when a later quote on the line closes
-        // the tag: the last quote of the line followed by ']' is found once, so that a line full of
-        // quotes costs one pass, not one per quote.
-        size_t lastClose = std::string::npos;
-        for (size_t q = p_; q < s_.size() && !lineBreak(q); ++q)
-            if (s_[q] == '"' && closesTag(q)) lastClose = q;
+        // the tag: the last quote of the line followed by ']' is found once per line, so that a line
+        // full of quotes or of tag pairs costs one pass, not one per quote or per tag.
+        if (p_ >= closeLineEnd_) {
+            size_t q = p_;
+            closeLast_ = std::string::npos;
+            for (; q < s_.size() && !lineBreak(q); ++q)
+                if (s_[q] == '"' && closesTag(q)) closeLast_ = q;
+            closeLineEnd_ = q + 1;
+        }
+        const size_t lastClose = closeLast_ != std::string::npos && closeLast_ >= p_ ? closeLast_ : std::string::npos;
         std::string value;
         bool tooLong = false;
         for (;;) {
@@ -291,6 +316,7 @@ private:
     void braceComment(Token& t) {
         advance();  // '{'
         std::string text;
+        bool cut = false;
         for (;;) {
             if (p_ >= s_.size()) return bad(t, "unterminated comment");
             const char c = s_[p_];
@@ -302,7 +328,9 @@ private:
             advance();
             if (newLine && tagLineAhead()) return bad(t, "unterminated comment");
             if (text.size() < lim_.maxComment) text += c;
+            else cut = true;
         }
+        if (cut) dropCutSequence(text);
         t.kind = Tok::Comment;
         t.text = std::move(text);
     }
@@ -310,10 +338,13 @@ private:
     void lineComment(Token& t) {
         advance();  // ';'
         std::string text;
+        bool cut = false;
         while (p_ < s_.size() && !lineBreak(p_)) {
             if (text.size() < lim_.maxComment) text += s_[p_];
+            else cut = true;
             advance();
         }
+        if (cut) dropCutSequence(text);
         t.kind = Tok::Comment;
         t.text = std::move(text);
     }
@@ -354,7 +385,7 @@ private:
                 for (int k = 0; k < 4; ++k) advance();
                 continue;
             }
-            const bool ok = isAlpha(c) || isDigit(c) || (unsigned char)c >= 0x80 || std::strchr("_+#=:-/", c);
+            const bool ok = isAlpha(c) || isDigit(c) || (unsigned char)c >= 0x80 || inSet("_+#=:-/", c);
             if (!ok) break;
             if (sym.size() < 40) sym += c;
             else tooLong = true;
@@ -473,14 +504,19 @@ private:
             g.end = t.end;
             t = lex_.next();
         };
+        // The game ends before t without a result (end of the input, the next game's tags): the
+        // same check whichever it is, so that reading the game alone (its slice) agrees.
+        auto endBefore = [&]() {
+            if (depth > 0 && !skipping) failAt(last, "unterminated variation");
+            return finish(g, any);
+        };
         for (;;) {
             switch (t.kind) {
             case Tok::End:
                 if (any) beginMoves();  // a game of tags only: its FEN and Variant are checked too
-                if (depth > 0 && !skipping) failAt(last, "unterminated variation");
-                return finish(g, any);
+                return endBefore();
             case Tok::TagPair:
-                if (started) return finish(g, any);  // the next game (this one had no result)
+                if (started) return endBefore();  // the next game (this one had no result)
                 any = true;
                 if (tagCount >= lim_.maxTags) {
                     failAt(t, "too many tags");
@@ -493,7 +529,7 @@ private:
                 }
                 break;
             case Tok::Bad:
-                if (t.tagLike && started) return finish(g, any);  // a broken tag opens the next game
+                if (t.tagLike && started) return endBefore();  // a broken tag opens the next game
                 any = true;
                 if (!skipping) failAt(t, t.text);
                 break;
@@ -552,7 +588,7 @@ private:
                         break;
                     }
                     Ply p;
-                    p.move = pos.findLegal(m.from, m.to, m.promotion);
+                    p.move = m;  // parseSAN returns the generated legal move, flags included
                     p.san = pos.toSAN(p.move);
                     pos.makeMove(p.move);
                     g.record.plies.push_back(std::move(p));
@@ -638,8 +674,7 @@ private:
             }
         }
         pos = p;
-        const Position standard;
-        if (!(p.samePosition(standard) && p.halfmoveClock() == 0 && p.fullmoveNumber() == 1)) r.fen = p.fen();
+        if (!p.isStandardStart()) r.fen = p.fen();
         return true;
     }
 
@@ -792,8 +827,7 @@ bool Record::hasElapsed() const {
 Record Record::fromGame(const chess::Game& game) {
     Record r;
     const Position& start = game.startPosition();
-    const Position standard;
-    if (!(start.samePosition(standard) && start.halfmoveClock() == 0 && start.fullmoveNumber() == 1)) r.fen = start.fen();
+    if (!start.isStandardStart()) r.fen = start.fen();
     for (size_t i = 0; i < game.moves().size(); ++i) {
         Ply p;
         p.move = game.moves()[i];
@@ -881,7 +915,9 @@ struct Wrapper {
         if (!line.empty()) line += ' ';
         line += tok;
     }
-    // A comment, breakable between its words (each [%command] stays whole).
+    // A comment, breakable between its words (each [%command] stays whole). A word opening like a
+    // tag pair ("[Event") stays with the word before it: at the start of a line, the reader would
+    // take it for the next game's tags and the comment for an unterminated one.
     void comment(const std::vector<std::string>& commands, const std::string& text) {
         std::vector<std::string> words = commands;
         size_t i = 0;
@@ -889,7 +925,12 @@ struct Wrapper {
             while (i < text.size() && text[i] == ' ') ++i;
             size_t j = text.find(' ', i);
             if (j == std::string::npos) j = text.size();
-            if (j > i) words.push_back(text.substr(i, j - i));
+            if (j > i) {
+                std::string w = text.substr(i, j - i);
+                const bool tagLike = w.size() > 1 && w[0] == '[' && (isAlpha(w[1]) || isDigit(w[1]) || w[1] == '_');
+                if (tagLike && !words.empty()) words.back() += ' ' + w;
+                else words.push_back(std::move(w));
+            }
             i = j;
         }
         if (words.empty()) return;
@@ -929,8 +970,7 @@ std::string write(const Record& r) {
         if (const std::string* v = r.findTag(kRanked[i])) tag(kRanked[i], *v);
     tag("PlyCount", std::to_string(r.plies.size()));
     const Position start = r.startPosition();
-    const Position standard;
-    const bool custom = !(start.samePosition(standard) && start.halfmoveClock() == 0 && start.fullmoveNumber() == 1);
+    const bool custom = !start.isStandardStart();
     // A Chess960 game from the standard setup (position 518) keeps its FEN: the reader requires it.
     const std::string* variant = r.findTag("Variant");
     if (custom || (variant && chess960Variant(*variant))) {
@@ -1056,16 +1096,7 @@ std::string normalizeResult(const std::string& s) {
     return std::string();
 }
 
-const char* terminationValue(GameStatus status, GameEndReason reason) {
-    if (status == GameStatus::Ongoing) return "unterminated";
-    switch (reason) {
-    case GameEndReason::Timeout:
-    case GameEndReason::TimeoutVsInsufficient: return "time forfeit";
-    case GameEndReason::IllegalMoves:
-    case GameEndReason::IllegalMovesVsInsufficient: return "rules infraction";
-    default: return "normal";
-    }
-}
+const char* terminationValue(GameStatus status, GameEndReason reason) { return terminationTag(status, reason); }
 
 }  // namespace pgn
 }  // namespace chess

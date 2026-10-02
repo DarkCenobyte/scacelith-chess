@@ -1,8 +1,9 @@
 # Stockfish 19 (GPL-3.0) compiled into the game as the static library `stockfish_embedded`.
 # See README.scacelith.md for provenance and details.
 #
-#  * All upstream sources except src/main.cpp, unmodified, compiled once per instruction-set
-#    variant (SCACELITH_SF_VARIANTS). scacelith/entry.cpp replaces main() with a function that
+#  * All upstream sources except src/main.cpp and src/universal/ (upstream's own
+#    multi-architecture build), unmodified, compiled once per instruction-set variant
+#    (SCACELITH_SF_VARIANTS). scacelith/entry.cpp replaces main() with a function that
 #    src/ai runs on a thread (UCI over redirected std::cin / std::cout); scacelith/cpu.cpp picks
 #    the variant the CPU runs best. The game only sees scacelith/stockfish_embedded.h.
 #  * Instead of patching upstream, headers are force-included into every Stockfish source file:

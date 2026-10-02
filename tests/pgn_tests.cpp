@@ -272,6 +272,28 @@ TEST(pgn_broken_game_between_good_ones) {
     }
 }
 
+// A variation left open in a game without a result is an error however the game ends (the end of
+// the input, the next game's tags, a broken tag), so the listing, a whole read and a slice agree.
+TEST(pgn_unterminated_variation_at_every_game_end) {
+    const std::string endings[] = {"", "[Event \"Next\"]\n\n1. d4 *\n", "[Event broken\n\n1. d4 *\n"};
+    for (const std::string& next : endings) {
+        const std::string text = "[Event \"Open\"]\n\n1. e4 e5 (1... c5 2. Nf3\n\n" + next;
+        auto sc = pgn::scan(text);
+        auto rd = pgn::read(text);
+        CHECK_EQ(int(sc.games.size()), next.empty() ? 1 : 2);
+        CHECK_EQ(int(rd.games.size()), next.empty() ? 1 : 2);
+        if (sc.games.empty() || rd.games.empty()) continue;
+        CHECK_EQ(rd.games[0].error.text(), std::string("line 3, column 22: unterminated variation"));
+        CHECK_EQ(sc.games[0].error.text(), rd.games[0].error.text());
+        CHECK_EQ(int(rd.games[0].record.plies.size()), 2);
+        const pgn::Summary& s0 = sc.games[0];
+        auto slice = pgn::read(text.substr(s0.offset, s0.length), pgn::Limits(), pgn::Origin{s0.line, s0.column});
+        if (const pgn::ParsedGame* g = only(slice)) CHECK_EQ(g->error.text(), rd.games[0].error.text());
+        // The next game loads, unless its own tag is the broken one.
+        if (rd.games.size() == 2) CHECK_EQ(rd.games[1].ok(), next.find('"') != std::string::npos);
+    }
+}
+
 TEST(pgn_lenient_notation_and_recovery) {
     // 0-0, e8Q, figurines, "e.p.", lowercase pieces, trailing annotations, text evaluations.
     auto res = pgn::read(
@@ -375,6 +397,28 @@ TEST(pgn_caps) {
     if (const pgn::ParsedGame* g = only(chatty)) {
         CHECK(g->ok());
         if (!g->record.plies.empty()) CHECK_EQ(g->record.plies[0].comment.size(), size_t(10));
+    }
+    // A cut inside a UTF-8 sequence drops that sequence only (the comment stays UTF-8, not read as
+    // Windows-1252); a Windows-1252 comment is cut as before.
+    auto cjk = pgn::read("1. e4 {ab\xe4\xb8\xad\xe4\xb8\xad\xe4\xb8\xad\xe4\xb8\xad\xe4\xb8\xad} e5 ;a"
+                         "\xd0\x96\xd0\x96\xd0\x96\xd0\x96\xd0\x96\xd0\x96\n2. Nf3 {caf\xe9 \x85\x85\x85\x85\x85\x85\x85} *\n",
+                         lim);
+    if (const pgn::ParsedGame* g = only(cjk)) {
+        CHECK(g->ok());
+        if (g->record.plies.size() == 3) {
+            CHECK_EQ(g->record.plies[0].comment, std::string("ab\xe4\xb8\xad\xe4\xb8\xad"));
+            CHECK_EQ(g->record.plies[1].comment, std::string("a\xd0\x96\xd0\x96\xd0\x96\xd0\x96"));
+            CHECK_EQ(g->record.plies[2].comment, std::string("caf\xc3\xa9 \xe2\x80\xa6"));
+        }
+    }
+    auto longCjk = pgn::read("{" + [] {
+        std::string s;
+        for (int i = 0; i < 3000; ++i) s += "\xe4\xb8\xad";
+        return s;
+    }() + "} 1. e4 *\n");
+    if (const pgn::ParsedGame* g = only(longCjk)) {
+        CHECK_EQ(g->record.comment.size(), size_t(2730 * 3));
+        CHECK_EQ(g->record.comment.substr(0, 3), std::string("\xe4\xb8\xad"));
     }
 }
 
@@ -484,6 +528,32 @@ TEST(pgn_round_trip) {
     second.plies = pgn::Record::fromGame(chess::Game()).plies;
     auto both = pgn::read(pgn::writeAll({r, second}));
     CHECK_EQ(int(both.games.size()), 2);
+}
+
+// Comment text that looks like a tag pair never starts a written line, wherever the wrap falls:
+// the reader would take that line for the next game and the comment for an unterminated one.
+TEST(pgn_tag_like_comment_round_trip) {
+    int failures = 0;
+    for (int pad = 1; pad <= 80; ++pad) {
+        pgn::Record r;
+        chess::Position pos;
+        for (const char* san : {"e4", "e5"}) {
+            pgn::Ply p;
+            p.move = pos.parseSAN(san);
+            p.san = pos.toSAN(p.move);
+            pos.makeMove(p.move);
+            r.plies.push_back(p);
+        }
+        r.plies[0].comment = std::string(size_t(pad), 'a') + " see [Event \"x\"] and [Site \"y\"] here";
+        r.comment = "[Round \"z\"] first";
+        const std::string text = pgn::write(r);
+        auto back = pgn::read(text);
+        const bool ok = back.games.size() == 1 && back.games[0].ok() && back.games[0].record.plies.size() == 2 &&
+                        back.games[0].record.plies[0].comment == r.plies[0].comment &&
+                        back.games[0].record.comment == r.comment;
+        if (!ok && failures++ == 0) std::fprintf(stderr, "  pad %d:\n%s\n", pad, text.c_str());
+    }
+    CHECK_EQ(failures, 0);
 }
 
 TEST(pgn_times_and_helpers) {
@@ -602,6 +672,34 @@ TEST(pgn_quotes_in_tag_values_take_linear_time) {
     }
 }
 
+// A line full of tag pairs or of stray '<' is searched once, not once per tag or per '<'.
+TEST(pgn_long_lines_take_linear_time) {
+    const std::string tags = [] {
+        std::string line;
+        for (int i = 0; i < 32000; ++i) line += "[A \"x\"]";
+        return line + "\n\n1. e4 *\n\n[Event \"Next\"]\n\n1. d4 *\n";
+    }();
+    const std::string angles = "[Event \"x\"]\n\n" + std::string(64000, '<') + "\n1. e4 *\n\n[Event \"Next\"]\n\n1. d4 *\n";
+    for (const std::string* text : {&tags, &angles}) {
+        auto t0 = std::chrono::steady_clock::now();
+        auto sc = pgn::scan(*text);
+        auto rd = pgn::read(*text);
+        const double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+        std::fprintf(stderr, "  %d bytes on one line scanned and read in %.1f ms\n", int(text->size()), ms);
+        CHECK(ms < 1000.0);
+        CHECK_EQ(int(sc.games.size()), 2);
+        CHECK_EQ(int(rd.games.size()), 2);
+        if (sc.games.size() == 2 && rd.games.size() == 2) {
+            const std::string why = text == &tags ? "too many tags" : "'<' without '>' on its line";
+            CHECK_EQ(sc.games[0].error.message, why);
+            CHECK_EQ(rd.games[0].error.message, why);
+            CHECK_EQ(rd.games[0].error.text(), sc.games[0].error.text());
+            CHECK(rd.games[1].ok());
+            CHECK_EQ(rd.games[1].record.tag("Event"), std::string("Next"));
+        }
+    }
+}
+
 // Nothing swallows the games after it: a '<' without its '>' stops at the end of its line, and a
 // file with CR line ends (old Mac programs) has lines too.
 TEST(pgn_stray_bracket_and_cr_line_ends) {
@@ -643,6 +741,24 @@ TEST(pgn_stray_bracket_and_cr_line_ends) {
     auto open = pgn::read("[Event \"A\"]\r\r1. e4 {never closed\r[Event \"B\"]\r\r1. d4 *\r");
     CHECK_EQ(int(open.games.size()), 2);
     if (open.games.size() == 2) CHECK(open.games[1].ok());
+}
+
+// A NUL byte is a control character wherever it stands, never part of a move or an evaluation.
+TEST(pgn_nul_bytes_are_control_characters) {
+    const std::string inputs[] = {std::string("1. e4\0 e5 *\n", 12), std::string("1. e4 +=\0\0 e5 *\n", 16),
+                                  std::string("1. e4 \0 e5 *\n", 13)};
+    const int columns[] = {6, 9, 7};
+    for (int i = 0; i < 3; ++i) {
+        auto res = pgn::read(inputs[i]);
+        if (const pgn::ParsedGame* g = only(res)) {
+            CHECK_EQ(g->error.message, std::string("unexpected control character"));
+            CHECK_EQ(g->error.line, 1);
+            CHECK_EQ(g->error.column, columns[i]);
+        }
+        auto sc = pgn::scan(inputs[i]);
+        CHECK_EQ(int(sc.games.size()), 1);
+        if (sc.games.size() == 1) CHECK_EQ(sc.games[0].error.text(), res.games.empty() ? "" : res.games[0].error.text());
+    }
 }
 
 // A scan can keep only some tags (the archive's listing): each name once, the reader's own tags

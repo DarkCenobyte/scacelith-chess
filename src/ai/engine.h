@@ -75,8 +75,8 @@ public:
     // std::cout): start() on a second instance returns false until the first one is shut down.
     bool ready() const;                  // UCI handshake done (commands sent earlier are queued)
     bool waitReady(int timeoutMs);       // blocks until ready(); for loading screens and tests
-    // ucinewgame + isready. Cancels the pending move and evaluation requests and every analysis
-    // (queued, running or ready but not taken: their ids are forgotten).
+    // ucinewgame + isready. Cancels the pending move request and every analysis (queued, running
+    // or ready but not taken: their ids are forgotten).
     void newGame();
     // Settings used by the next requests. Two players may share the engine (AI vs AI in the
     // viewer mode): configure it with the side to move's settings before each requestMove(). A
@@ -108,28 +108,17 @@ public:
     // Returns the best move once ready ("e2e4", "e7e8q"), empty on failure. evalCp is from the
     // engine's point of view (side to move), mate scores mapped to +-100000.
     std::string takeMove(int* evalCp = nullptr);
-    // Abort the running search and every queued one once it has completed depth 1 (a move or
-    // analysis is still reported). To cut a single analysis short, use stopAnalysis().
-    void stopSearch();
-    int lastSearchMs() const;   // wall time of the last completed move search
-
-    // Quick evaluation for draw offers/claims (full strength whatever the preset, depth 12, at most
-    // 1.5 s), asynchronous as well; queued behind a running move search and vice versa. Fails
-    // like requestMove(), with a neutral 0.
-    void requestEval(const std::vector<std::string>& uciMoves);
-    bool evalReady() const;
-    int takeEval();             // centipawns from the side to move's point of view
 
     // Full-strength analysis (Skill Level 20, no UCI_LimitStrength, WDL on) with MultiPV lines,
     // mate distances, principal variations, optional search moves and start FEN (AnalysisRequest).
     // Asynchronous like requestMove(): queued by priority, then first come first served, with
-    // move and evaluation requests (priority 0); analyses never supersede one another. Returns the
-    // request's id (> 0, never reused by this Engine). Fails at once (analysisReady(id) true,
-    // Analysis::ok false) on an engine that is not running, an invalid FEN, an illegal move or
-    // search move, or a request without a depth, movetime or node limit: nothing is sent.
+    // move requests (priority 0); analyses never supersede one another. Returns the request's id
+    // (> 0, never reused by this Engine). Fails at once (analysisReady(id) true, Analysis::ok
+    // false) on an engine that is not running, an invalid FEN, an illegal move or search move, or
+    // a request without a depth, movetime or node limit: nothing is sent.
     // A position without legal moves is answered at once without searching (noLegalMove).
-    // Like evaluations, an analysis warms the hash table, so the next move search of a
-    // depth-capped weak setting starts with a cleared one (their calibration).
+    // An analysis warms the hash table, so the next move search of a depth-capped weak setting
+    // starts with a cleared one (their calibration).
     // Results are kept per id until taken (or newGame()): always match a result with the id you
     // asked for, a stale one (after a takeback) is simply never taken. Analyses still pending at
     // shutdown() fail (ok false). Pump (call any Engine method) every frame while waiting: queued
@@ -159,7 +148,8 @@ public:
     int thinkTimeMs(const ClockInfo& clock, int plyCount, int legalMoveCount, bool inCheck) const;
 
     // Decides whether the AI accepts a draw offer / claims a draw given its evaluation (evalCp
-    // from the AI's point of view, e.g. takeEval() with the AI to move). Thresholds in humanize.cpp.
+    // from the AI's point of view; the game passes takeMove()'s evalCp of the AI's last move
+    // search, handicap included). Thresholds in humanize.cpp.
     bool acceptsDraw(int evalCp, int plyCount) const;
     // Whether the AI offers a draw along with the move it is about to play (evalCp from its own
     // point of view, as for acceptsDraw; pliesSinceOwnOffer = half-moves since its last offer,

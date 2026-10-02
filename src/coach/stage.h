@@ -104,7 +104,7 @@ public:
     virtual uint32_t analyse(const ai::AnalysisRequest& request) = 0;   // 0 = no engine
     // The result once ready (true once). Calling it also pumps the engine's queue.
     virtual bool takeAnalysis(uint32_t id, ai::Analysis& out) = 0;
-    virtual void stopAnalysis(uint32_t id) = 0;     // finish now with what it has (never stopSearch)
+    virtual void stopAnalysis(uint32_t id) = 0;     // finish now with what it has (this analysis only)
     virtual void cancelAnalysis(uint32_t id) = 0;   // 0 = all of the coach's analyses
     virtual bool idle() const = 0;                  // nothing running or queued
 };

@@ -81,7 +81,6 @@ EngineSettings shallowSkill(int level, int depth, int multiPV) {
     s.skillLevel = level;
     s.depth = depth;
     s.multiPV = multiPV;
-    s.hashMB = 16;  // a shallow search barely touches the hash table
     return s;
 }
 
