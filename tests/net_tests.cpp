@@ -817,6 +817,12 @@ std::string tempCredentialPath(const char* tag) {
     net::sys::removeFile(p);
     return p;
 }
+
+// Removes the file when the test ends, also when a REQUIRE ends it early.
+struct RemovedAtEnd {
+    std::string path;
+    ~RemovedAtEnd() { net::sys::removeFile(path); }
+};
 }  // namespace
 
 TEST(net_credentials_isolation) {
@@ -1627,6 +1633,7 @@ TEST(net_online_client_loopback) {
     FakeServer srv;
     CHECK(srv.start());
     std::string credPath = tempCredentialPath("client");
+    RemovedAtEnd removeCredentials{credPath};
     using K = net::Event::Kind;
     {
         net::OnlineClient c;
@@ -1785,7 +1792,6 @@ TEST(net_online_client_loopback) {
         CHECK(waitEvent(c, K::ServerError, ev, 5000));
         CHECK_EQ(ev.error, std::string("offline"));
     }
-    net::sys::removeFile(credPath);
 }
 
 TEST(net_online_client_unreachable) {
