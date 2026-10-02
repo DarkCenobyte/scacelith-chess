@@ -100,7 +100,9 @@ bool Settings::load(const std::string& p) {
     hotseatClockRightOf = std::clamp(ini.getInt("hotseat.clock_right_of", hotseatClockRightOf), 0, 1);
     hotseatRated = ini.getBool("hotseat.rated", hotseatRated);
     localPlayers.clear();
-    for (int n = 1; n <= 256; ++n) {
+    // Every player save() wrote (the bound only stops a hand-edited file: the duplicate check is
+    // linear).
+    for (int n = 1; n <= 10000; ++n) {
         std::string sec = "local_player_" + std::to_string(n) + ".";
         if (!ini.has(sec + "name")) break;
         LocalPlayer p;
