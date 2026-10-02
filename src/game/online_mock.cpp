@@ -1,6 +1,7 @@
 // Fake server and fake direct-match peer (see online_mock.h).
 #include "online_mock.h"
 #include "../chess/chess.h"
+#include "../chess/pgn.h"
 #include "../core/log.h"
 #include "../math/math.h"
 #include "../net/json.h"
@@ -14,6 +15,8 @@
 #include <ctime>
 #include <deque>
 #include <functional>
+#include <unordered_map>
+#include <unordered_set>
 
 namespace net {
 namespace mock {
@@ -1174,6 +1177,186 @@ std::string groups(const std::string& s, size_t n, char sep) {
     return out;
 }
 
+// ---- The account API: animated GIFs ------------------------------------------------------------------
+// The fake draws a small but valid animated GIF89a (GET /games/:id/gif, POST /gif): a tiny board
+// seen from above (8, 12 or 16 pixels a square for small, medium and large), its coordinates as a
+// plain frame around it, pieces as little pixel-art figures with an outline, the last move
+// highlighted and a king in check on red; the start position held 1 s, a frame per move (the
+// delay asked for), the last one held 3 s, looping forever. Full frames, a 16-colour global
+// palette, real LZW (variable code width, a clear code when the table is full), so that any GIF
+// reader, the tests' included, decodes it.
+
+constexpr int kGifMaxPlies = 600;                   // GIF_MAX_PLIES
+constexpr double kGifRenderMsPerPly = 12.0;          // the fake "renders" this long a move...
+constexpr double kGifRenderMsMax = 2500.0;           // ...at most
+
+// Palette indexes.
+enum GifColour : uint8_t { GLight, GDark, GLightMove, GDarkMove, GWhiteFill, GWhiteEdge, GBlackFill, GBlackEdge, GFrame, GCheck };
+const uint8_t kGifPalette[16][3] = {
+    {240, 217, 181}, {181, 136, 99}, {205, 210, 106}, {170, 162, 58}, {250, 248, 240}, {40, 36, 32},
+    {34, 30, 28},    {214, 206, 192}, {58, 46, 36},  {214, 64, 52},  {0, 0, 0},     {0, 0, 0},
+    {0, 0, 0},       {0, 0, 0},       {0, 0, 0},     {0, 0, 0}};
+
+// The figures on an 8 x 8 grid (scaled to the square), indexed by chess::PieceType.
+const char* const kGifFigures[7][8] = {
+    {"........", "........", "........", "........", "........", "........", "........", "........"},
+    {"........", "...##...", "..####..", "...##...", "..####..", ".######.", "........", "........"},   // pawn
+    {"........", "...##...", "..####..", ".#####..", "...###..", "..####..", ".######.", "........"},   // knight
+    {"...#....", "..###...", "..#.##..", "..####..", "...##...", "..####..", ".######.", "........"},   // bishop
+    {"........", ".#.##.#.", ".######.", "..####..", "..####..", ".######.", ".######.", "........"},   // rook
+    {"#..##..#", "#.####.#", ".######.", "..####..", "..####..", ".######.", ".######.", "........"},   // queen
+    {"...##...", "..####..", "...##...", ".######.", "..####..", "..####..", ".######.", "........"}};  // king
+
+struct GifPicture {
+    int w = 0, h = 0;
+    std::vector<uint8_t> px;
+};
+
+// One position: the board (White at the bottom unless 'flip'), the move that led to it.
+GifPicture gifBoard(const chess::Position& pos, int square, int border, bool flip, int fromSq, int toSq) {
+    GifPicture pic;
+    pic.w = pic.h = 8 * square + 2 * border;
+    pic.px.assign(size_t(pic.w) * size_t(pic.h), GFrame);
+    const int checked = pos.inCheck() ? int(pos.kingSquare(pos.sideToMove())) : -1;
+    for (int row = 0; row < 8; ++row)
+        for (int col = 0; col < 8; ++col) {
+            const int file = flip ? 7 - col : col, rank = flip ? row : 7 - row;
+            const chess::Square sq = chess::makeSquare(file, rank);
+            const bool light = (file + rank) % 2 == 1;
+            uint8_t bg = light ? GLight : GDark;
+            if (sq == fromSq || sq == toSq) bg = light ? GLightMove : GDarkMove;
+            if (sq == checked) bg = GCheck;
+            const chess::Piece pc = pos.at(sq);
+            const char* const* fig = kGifFigures[pc.type];
+            auto inFigure = [&](int x, int y) {
+                if (pc.empty() || x < 0 || y < 0 || x >= square || y >= square) return false;
+                return fig[y * 8 / square][x * 8 / square] == '#';
+            };
+            for (int y = 0; y < square; ++y)
+                for (int x = 0; x < square; ++x) {
+                    uint8_t c = bg;
+                    if (inFigure(x, y)) c = pc.color == chess::White ? GWhiteFill : GBlackFill;
+                    else if (inFigure(x - 1, y) || inFigure(x + 1, y) || inFigure(x, y - 1) || inFigure(x, y + 1))
+                        c = pc.color == chess::White ? GWhiteEdge : GBlackEdge;
+                    pic.px[size_t(border + row * square + y) * size_t(pic.w) + size_t(border + col * square + x)] = c;
+                }
+        }
+    return pic;
+}
+
+// GIF's LZW: codes of minCode + 1 bits growing to 12, a clear code first and whenever the table is
+// full, the end code last; packed least significant bit first, in sub-blocks of 255 bytes at most.
+std::string gifLzw(const std::vector<uint8_t>& px, int minCode) {
+    const int clear = 1 << minCode, end = clear + 1;
+    std::string bytes;
+    uint32_t acc = 0;
+    int bits = 0;
+    auto put = [&](int code, int width) {
+        acc |= uint32_t(code) << bits;
+        bits += width;
+        while (bits >= 8) {
+            bytes += char(acc & 0xFF);
+            acc >>= 8;
+            bits -= 8;
+        }
+    };
+    std::unordered_map<uint32_t, int> table;
+    int next = end + 1, width = minCode + 1, prefix = -1;
+    put(clear, width);
+    for (uint8_t c : px) {
+        if (prefix < 0) {
+            prefix = c;
+            continue;
+        }
+        const uint32_t key = uint32_t(prefix) << 8 | c;
+        auto it = table.find(key);
+        if (it != table.end()) {
+            prefix = it->second;
+            continue;
+        }
+        put(prefix, width);
+        if (next < 4096) {
+            table.emplace(key, next++);
+            if (next > (1 << width) && width < 12) ++width;   // the reader widens one code later
+        } else {
+            put(clear, width);
+            table.clear();
+            next = end + 1;
+            width = minCode + 1;
+        }
+        prefix = c;
+    }
+    if (prefix >= 0) put(prefix, width);
+    put(end, width);
+    if (bits > 0) bytes += char(acc & 0xFF);
+    std::string out;
+    for (size_t at = 0; at < bytes.size(); at += 255) {
+        const size_t n = std::min<size_t>(255, bytes.size() - at);
+        out += char(n);
+        out.append(bytes, at, n);
+    }
+    out += '\0';
+    return out;
+}
+
+void gifWord(std::string& out, int v) {
+    out += char(v & 0xFF);
+    out += char((v >> 8) & 0xFF);
+}
+
+// The frames as one looping GIF89a file; delays in hundredths of a second.
+std::string gifFile(const std::vector<GifPicture>& frames, const std::vector<int>& delaysCs) {
+    std::string out = "GIF89a";
+    const int w = frames.empty() ? 1 : frames[0].w, h = frames.empty() ? 1 : frames[0].h;
+    gifWord(out, w);
+    gifWord(out, h);
+    out += char(0xF3);   // a global palette of 16 colours (2^(3+1)), 8 bits per primary
+    out += '\0';         // background: colour 0
+    out += '\0';         // square pixels
+    for (const auto& c : kGifPalette) out.append(reinterpret_cast<const char*>(c), 3);
+    out += "\x21\xFF\x0BNETSCAPE2.0\x03\x01";   // loop forever
+    gifWord(out, 0);
+    out += '\0';
+    for (size_t i = 0; i < frames.size(); ++i) {
+        out += "\x21\xF9\x04";
+        out += char(0x04);   // disposal: leave the frame in place (each frame covers the whole picture)
+        gifWord(out, i < delaysCs.size() ? delaysCs[i] : 50);
+        out += '\0';         // no transparent colour
+        out += '\0';
+        out += char(0x2C);
+        gifWord(out, 0);
+        gifWord(out, 0);
+        gifWord(out, frames[i].w);
+        gifWord(out, frames[i].h);
+        out += '\0';         // no local palette, not interlaced
+        out += char(4);      // LZW minimum code size (16 colours)
+        out += gifLzw(frames[i].px, 4);
+    }
+    out += char(0x3B);
+    return out;
+}
+
+// The GIF of a game: its moves (protocol form) from the standard start, or from 'fen'.
+std::string gameGif(const std::vector<uint16_t>& moves, const std::string& fen, const GifOptions& opt) {
+    const int square = opt.size == "small" ? 8 : opt.size == "large" ? 16 : 12;
+    const int border = opt.coords ? square / 2 : 0;
+    const bool flip = opt.orientation == "black";
+    const int delay = std::clamp(opt.delayMs, 100, 3000) / 10;
+    chess::Position pos;
+    if (!fen.empty()) pos.setFEN(fen);
+    std::vector<GifPicture> frames{gifBoard(pos, square, border, flip, -1, -1)};
+    std::vector<int> delays{100};
+    for (uint16_t m : moves) {
+        const chess::Move mv = pos.findLegal(chess::Square(moveFrom(m)), chess::Square(moveTo(m)), chess::PieceType(movePromo(m)));
+        if (!mv.valid()) break;
+        pos.makeMove(mv);
+        frames.push_back(gifBoard(pos, square, border, flip, moveFrom(m), moveTo(m)));
+        delays.push_back(delay);
+    }
+    delays.back() = 300;   // the final position held 3 s
+    return gifFile(frames, delays);
+}
+
 }  // namespace
 
 void useVirtualClock(bool on) { g_virtual = on; }
@@ -1258,6 +1441,10 @@ struct FakeServer::Impl {
     std::vector<SessionInfo> devices;
     double signedInAt = 0, pendingSince = 0;
     std::vector<double> exportTimes;
+    // animated GIFs: the renders of the last hour (the account's quota) and what was rendered
+    // (a GIF asked again costs nothing, like the server's cache)
+    std::vector<double> gifRenders;
+    std::unordered_set<std::string> gifRendered;
     // game
     std::unique_ptr<Room> room;
     OnlineGame delivered;             // the client's view (last game event delivered)
@@ -1268,8 +1455,10 @@ struct FakeServer::Impl {
     bool online() const { return conn == ConnState::Online; }
     bool hostHas(const char* w) const { return contains(ep.host, w); }
 
-    void http(Event e) {
-        out.push(lastNow + double(rng.range(float(kHttpMin), float(kHttpMax))), std::move(e));
+    // An HTTPS result, named after the server in use when its command was given (Event::origin).
+    void http(Event e, double extraMs = 0.0) {
+        if (e.origin.empty()) e.origin = ep.origin();
+        out.push(lastNow + extraMs + double(rng.range(float(kHttpMin), float(kHttpMax))), std::move(e));
     }
     Event result(Event::Kind k, bool ok, const std::string& err = "") {
         Event e;
@@ -1278,11 +1467,14 @@ struct FakeServer::Impl {
         e.error = err;
         return e;
     }
-    // Transport failures of the configured host.
-    bool transportError(Event::Kind k) {
+    // Transport failures of the configured host (e: the other fields of the answer, if any).
+    bool transportError(Event::Kind k, Event e = Event()) {
         const char* err = hostHas("offline") ? "network" : hostHas("badcert") ? "certificate" : nullptr;
         if (!err) return false;
-        http(result(k, false, err));
+        e.kind = k;
+        e.ok = false;
+        e.error = err;
+        http(std::move(e));
         return true;
     }
     void rt(Event e, double delay = kOneWay) {
@@ -1412,6 +1604,7 @@ struct FakeServer::Impl {
     Past* findPast(uint64_t id);
     bool reportable(const Past& p) const;
     std::string exportDocument();
+    void gif(uint64_t gameId, const std::string& key, const std::vector<uint16_t>& moves, const std::string& fen, const GifOptions& opt);
     void leaveQueueSilently() { queued = false; }
     bool busyInGame() const { return room && !room->over; }
 
@@ -1983,16 +2176,22 @@ void FakeServer::fetchMyGames(uint64_t before, int limit, const GamesFilter& fil
     Impl& I = *impl_;
     I.lastNow = nowMs();
     const Event::Kind k = Event::Kind::GamesResult;
-    if (I.transportError(k)) return;
-    if (!I.signedIn) return I.http(I.result(k, false, "unauthorized"));
-    if (limit < 1 || limit > 50) return I.http(I.result(k, false, "invalid_limit"));
+    // Every answer names its request (the cursor and the filter), as net::OnlineClient's do.
+    auto answer = [&](bool ok, const char* error) {
+        Event e = I.result(k, ok, error);
+        e.gamesPage.before = before;
+        e.gamesPage.filter = filter;
+        return e;
+    };
+    if (I.transportError(k, answer(false, ""))) return;
+    if (!I.signedIn) return I.http(answer(false, "unauthorized"));
+    if (limit < 1 || limit > 50) return I.http(answer(false, "invalid_limit"));
     const bool catOk = filter.category.empty() || filter.category == "custom" || findCategory(filter.category);
     const bool resultOk = filter.result.empty() || filter.result == "win" || filter.result == "loss" || filter.result == "draw";
-    if (!catOk || !resultOk || filter.rated < -1 || filter.rated > 1) return I.http(I.result(k, false, "invalid_filter"));
+    if (!catOk || !resultOk || filter.rated < -1 || filter.rated > 1) return I.http(answer(false, "invalid_filter"));
     I.ensureHistory();
-    Event e = I.result(k, true);
+    Event e = answer(true, "");
     GamesPage& page = e.gamesPage;
-    page.before = before;
     for (const Impl::Past& p : I.history) {
         const GameDetails& d = p.d;
         if (!filter.category.empty() && d.category != filter.category) continue;
@@ -2016,12 +2215,18 @@ void FakeServer::fetchGame(uint64_t gameId) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
     const Event::Kind k = Event::Kind::GameDetailsResult;
-    if (I.transportError(k)) return;
-    if (!I.signedIn) return I.http(I.result(k, false, "unauthorized"));
+    // Every answer names the game asked for, as net::OnlineClient's do.
+    auto answer = [&](bool ok, const char* error) {
+        Event e = I.result(k, ok, error);
+        e.gameId = gameId;
+        return e;
+    };
+    if (I.transportError(k, answer(false, ""))) return;
+    if (!I.signedIn) return I.http(answer(false, "unauthorized"));
     I.ensureHistory();
     Impl::Past* p = I.findPast(gameId);
-    if (!p) return I.http(I.result(k, false, "not_found"));
-    Event e = I.result(k, true);
+    if (!p) return I.http(answer(false, "not_found"));
+    Event e = answer(true, "");
     e.gameDetails = p->d;
     e.gameDetails.reportable = I.reportable(*p);
     I.http(e);
@@ -2030,12 +2235,16 @@ void FakeServer::downloadPgn(uint64_t gameId) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
     const Event::Kind k = Event::Kind::PgnResult;
-    if (I.transportError(k)) return;
+    auto answer = [&](bool ok, const char* error) {
+        Event e = I.result(k, ok, error);
+        e.gameId = gameId;
+        return e;
+    };
+    if (I.transportError(k, answer(false, ""))) return;
     I.ensureHistory();
     Impl::Past* p = I.signedIn ? I.findPast(gameId) : nullptr;
-    if (!p) return I.http(I.result(k, false, "not_found"));
-    Event e = I.result(k, true);
-    e.gameId = gameId;
+    if (!p) return I.http(answer(false, "not_found"));
+    Event e = answer(true, "");
     e.text = serverPgn(p->d, contains(I.ep.host, "official") ? "Scacelith" : "Scacelith (mock server)", I.ep.host);
     I.http(e);
 }
@@ -2121,8 +2330,8 @@ void FakeServer::exportAccount(const std::string& password, const std::string& c
     const Event::Kind k = Event::Kind::AccountExportResult;
     if (I.transportError(k)) return;
     if (!I.signedIn) return I.http(I.result(k, false, "unauthorized"));
-    if (!I.reauth(k, password, codeOrRecovery)) return;
-    // Five an hour (account_export).
+    // Five an hour (account_export), as the server's router checks it: before the password, every
+    // attempt counted, failed ones included.
     I.exportTimes.erase(std::remove_if(I.exportTimes.begin(), I.exportTimes.end(), [&](double t) { return I.lastNow - t >= 3600000.0; }),
                         I.exportTimes.end());
     if (I.exportTimes.size() >= 5) {
@@ -2131,6 +2340,7 @@ void FakeServer::exportAccount(const std::string& password, const std::string& c
         return I.http(e);
     }
     I.exportTimes.push_back(I.lastNow);
+    if (!I.reauth(k, password, codeOrRecovery)) return;
     Event e = I.result(k, true);
     e.text = I.exportDocument();
     I.http(e);
@@ -2154,6 +2364,115 @@ void FakeServer::deleteAccount(const std::string& password, const std::string& c
     I.historyOf.clear();
     I.devices.clear();
     I.http(I.result(k, true));
+}
+
+// Animated GIFs (dedicated-server/docs/API.md): the options checked like the server's, its quota
+// per account (4 renders a minute, 30 an hour; a GIF rendered before costs nothing), the render
+// time (a little longer for long games), the answer the fake GIF of gameGif().
+void FakeServer::Impl::gif(uint64_t gameId, const std::string& key, const std::vector<uint16_t>& moves, const std::string& fen,
+                           const GifOptions& opt) {
+    const Event::Kind k = Event::Kind::GifResult;
+    if (int(moves.size()) > kGifMaxPlies) {
+        Event e = result(k, false, "game_too_long");
+        e.gameId = gameId;
+        return http(e);
+    }
+    const std::string cacheKey = key + "|" + opt.size + "|" + opt.orientation + "|" + std::to_string(opt.delayMs) + (opt.coords ? "|1" : "|0");
+    const bool cached = gifRendered.count(cacheKey) != 0;
+    if (!cached) {
+        gifRenders.erase(std::remove_if(gifRenders.begin(), gifRenders.end(), [&](double t) { return lastNow - t >= 3600000.0; }),
+                         gifRenders.end());
+        const int lastMinute = int(std::count_if(gifRenders.begin(), gifRenders.end(), [&](double t) { return lastNow - t < 60000.0; }));
+        if (lastMinute >= 4 || gifRenders.size() >= 30) {
+            // Free again when the oldest render of each full window has left it.
+            double freeAt = gifRenders.size() >= 30 ? gifRenders.front() + 3600000.0 : lastNow;
+            if (lastMinute >= 4) freeAt = std::max(freeAt, gifRenders[gifRenders.size() - size_t(lastMinute)] + 60000.0);
+            Event e = result(k, false, "rate_limited");
+            e.gameId = gameId;
+            e.retryAfterSec = std::max(1, int(std::ceil((freeAt - lastNow) / 1000.0)));
+            return http(e);
+        }
+        gifRenders.push_back(lastNow);
+        gifRendered.insert(cacheKey);
+    }
+    Event e = result(k, true);
+    e.gameId = gameId;
+    e.text = gameGif(moves, fen, opt);
+    http(e, cached ? 0.0 : std::min(kGifRenderMsMax, 400.0 + kGifRenderMsPerPly * double(moves.size())));
+}
+
+namespace {
+bool gifOptionsValid(const GifOptions& o) {
+    return (o.size == "small" || o.size == "medium" || o.size == "large") && (o.orientation == "white" || o.orientation == "black") &&
+           o.delayMs >= 100 && o.delayMs <= 3000;
+}
+}  // namespace
+
+void FakeServer::downloadGameGif(uint64_t gameId, const GifOptions& options) {
+    Impl& I = *impl_;
+    I.lastNow = nowMs();
+    const Event::Kind k = Event::Kind::GifResult;
+    // Every answer names the game asked for, as net::OnlineClient's do (the GifSaver keeps only the
+    // answer of the game it awaits).
+    auto answer = [&](const char* error, int retryAfterSec = 0) {
+        Event e = I.result(k, false, error);
+        e.gameId = gameId;
+        e.retryAfterSec = retryAfterSec;
+        return e;
+    };
+    auto refuse = [&](const char* error, int retryAfterSec = 0) { I.http(answer(error, retryAfterSec)); };
+    // As the client says it: nothing sent, so neither the network nor the session matters.
+    if (gameId == 0) return refuse("invalid_game_id");
+    if (I.transportError(k, answer(""))) return;
+    if (!I.signedIn) return refuse("unauthorized");
+    if (I.hostHas("nogif")) return refuse("gif_disabled");
+    if (!gifOptionsValid(options)) return refuse("invalid_option");
+    // Special games: the account's quota used up, the renderer full.
+    if (gameId == 429) return refuse("rate_limited", 150);
+    if (gameId == 503) return refuse("server_busy", 8);
+    I.ensureHistory();
+    Impl::Past* p = I.findPast(gameId);
+    if (!p) return refuse("not_found");
+    std::vector<uint16_t> moves;
+    for (const GameDetails::Ply& ply : p->d.moves) moves.push_back(ply.move);
+    I.gif(gameId, "game:" + std::to_string(gameId), moves, std::string(), options);
+}
+
+void FakeServer::renderPgnGif(const std::string& pgn, const GifOptions& options) {
+    Impl& I = *impl_;
+    I.lastNow = nowMs();
+    const Event::Kind k = Event::Kind::GifResult;
+    if (I.transportError(k)) return;
+    auto refuse = [&](const char* error, int retryAfterSec = 0) {
+        Event e = I.result(k, false, error);
+        e.retryAfterSec = retryAfterSec;
+        I.http(e);
+    };
+    if (pgn.size() > OnlineClient::kGifMaxPgnBytes) return refuse("pgn_too_large");   // as the client says it
+    if (!I.signedIn) return refuse("unauthorized");
+    if (I.hostHas("nogif")) return refuse("gif_disabled");
+    if (!gifOptionsValid(options)) return refuse("invalid_option");
+    chess::pgn::Limits lim;
+    lim.maxBytes = OnlineClient::kGifMaxPgnBytes;
+    lim.maxGames = 1;
+    const chess::pgn::Result<chess::pgn::ParsedGame> read = chess::pgn::read(pgn, lim);
+    if (!read.error.empty() || read.games.empty() || !read.games[0].ok()) {
+        if (!read.games.empty()) LOGI("mock server: GIF of a PGN refused: %s", read.games[0].error.text().c_str());
+        return refuse("invalid_pgn");
+    }
+    const chess::pgn::Record& rec = read.games[0].record;
+    // Special players: the account's quota used up, the renderer full.
+    for (const char* tag : {"White", "Black"}) {
+        if (lower(rec.tag(tag)) == "ratelimited") return refuse("rate_limited", 150);
+        if (lower(rec.tag(tag)) == "serverbusy") return refuse("server_busy", 8);
+    }
+    std::vector<uint16_t> moves;
+    std::string key = "pgn:" + rec.fen + "|" + rec.tag("White") + "|" + rec.tag("Black") + "|" + rec.result + "|";
+    for (const chess::pgn::Ply& ply : rec.plies) {
+        moves.push_back(packMove(ply.move.from, ply.move.to, ply.move.promotion));
+        key += std::to_string(moves.back()) + ",";
+    }
+    I.gif(0, key, moves, rec.fen, options);
 }
 
 void FakeServer::connect() {

@@ -86,6 +86,8 @@ void OnlineClient::setAcceptChallenges(bool accept) { impl_->fake.setAcceptChall
 void OnlineClient::changeEmail(const std::string& e, const std::string& p, const std::string& c) { impl_->fake.changeEmail(e, p, c); }
 void OnlineClient::exportAccount(const std::string& p, const std::string& c) { impl_->fake.exportAccount(p, c); }
 void OnlineClient::deleteAccount(const std::string& p, const std::string& c) { impl_->fake.deleteAccount(p, c); }
+void OnlineClient::downloadGameGif(uint64_t id, const GifOptions& o) { impl_->fake.downloadGameGif(id, o); }
+void OnlineClient::renderPgnGif(const std::string& pgn, const GifOptions& o) { impl_->fake.renderPgnGif(pgn, o); }
 void OnlineClient::connect() { impl_->fake.connect(); }
 void OnlineClient::disconnect() { impl_->fake.disconnect(); }
 ConnState OnlineClient::state() const { return impl_->fake.state(); }

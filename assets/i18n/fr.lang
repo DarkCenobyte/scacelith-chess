@@ -829,7 +829,7 @@ online.devices.signed_in = Connecté le {0}
 online.devices.last_active = dernière activité le {0}
 online.devices.active_now = utilisé en ce moment
 online.devices.sign_out = Déconnecter
-online.devices.signed_out = Cet appareil est déconnecté.
+online.devices.signed_out = L’appareil a été déconnecté.
 online.devices.error = IMPOSSIBLE DE CHARGER LES APPAREILS
 online.devices.all.title = SE DÉCONNECTER PARTOUT
 online.email.title = CHANGER D’ADRESSE E-MAIL
@@ -1155,3 +1155,27 @@ replay.tip.pause = Pause (K)
 replay.tip.resume = Reprendre (K)
 replay.tip.forward = Un coup en avant (L)
 replay.tip.end = Fin de la partie (Fin)
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Enregistrer en GIF
+gif.making = Création du GIF : le serveur dessine la partie…
+gif.saved = Le GIF a été enregistré :
+gif.saved_as = GIF enregistré : {0}
+gif.sign_in_first = Connectez-vous à un serveur en ligne pour créer des GIF : c’est le serveur qui les dessine.
+gif.busy_other = Un autre GIF est en cours de création. Veuillez patienter jusqu’à ce qu’il soit prêt.
+gif.err.rate_limited_for = Vous avez créé de nombreux GIF en peu de temps. Vous pourrez créer le suivant dans {0}.
+gif.err.rate_limited = Vous avez créé de nombreux GIF en peu de temps. Veuillez réessayer plus tard.
+gif.err.server_busy_for = Le serveur est occupé à dessiner d’autres GIF. Veuillez réessayer dans {0}.
+gif.err.server_busy = Le serveur est occupé à dessiner d’autres GIF. Veuillez réessayer dans un instant.
+gif.err.signed_out = Votre session a pris fin. Veuillez vous reconnecter pour créer un GIF.
+gif.err.game_too_long = Cette partie est trop longue pour en faire un GIF.
+gif.err.pgn_too_large = Cette partie est trop longue pour en faire un GIF.
+gif.err.invalid_pgn = Le serveur n’a pas pu lire cette partie.
+gif.err.render_failed = Le serveur n’a pas pu créer ce GIF. Veuillez réessayer.
+gif.err.gif_disabled = Ce serveur ne crée pas de GIF.
+gif.err.write_failed = Le GIF n’a pas pu être enregistré sur cet ordinateur.
+gif.err.not_found = Cette partie n’est plus sur le serveur.
+gif.wait.seconds = {0} seconde|{0} secondes
+gif.wait.minutes = {0} minute|{0} minutes
+gif.wait.both = {0} et {1}

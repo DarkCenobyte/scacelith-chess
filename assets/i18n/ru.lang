@@ -829,7 +829,7 @@ online.devices.signed_in = Вход: {0}
 online.devices.last_active = последняя активность: {0}
 online.devices.active_now = используется сейчас
 online.devices.sign_out = Завершить сеанс
-online.devices.signed_out = Сеанс на этом устройстве завершён.
+online.devices.signed_out = Сеанс на том устройстве завершён.
 online.devices.error = НЕ УДАЛОСЬ ЗАГРУЗИТЬ СЕАНСЫ
 online.devices.all.title = ВЫЙТИ ВЕЗДЕ
 online.email.title = СМЕНА ЭЛ. ПОЧТЫ
@@ -1155,3 +1155,27 @@ replay.tip.pause = Пауза (K)
 replay.tip.resume = Продолжить (K)
 replay.tip.forward = Ход вперёд (L)
 replay.tip.end = Конец партии (End)
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Сохранить как GIF
+gif.making = Создание GIF: сервер рисует партию…
+gif.saved = GIF сохранён:
+gif.saved_as = GIF сохранён: {0}
+gif.sign_in_first = Войдите на онлайн-сервер, чтобы создавать GIF: их рисует сервер.
+gif.busy_other = Сейчас создаётся другой GIF. Пожалуйста, дождитесь его готовности.
+gif.err.rate_limited_for = Вы создали много GIF за короткое время. Следующий можно будет создать через {0}.
+gif.err.rate_limited = Вы создали много GIF за короткое время. Пожалуйста, повторите попытку позже.
+gif.err.server_busy_for = Сервер занят созданием других GIF. Пожалуйста, повторите попытку через {0}.
+gif.err.server_busy = Сервер занят созданием других GIF. Пожалуйста, повторите попытку чуть позже.
+gif.err.signed_out = Ваш сеанс завершён. Пожалуйста, войдите снова, чтобы создать GIF.
+gif.err.game_too_long = Эта партия слишком длинная для GIF.
+gif.err.pgn_too_large = Эта партия слишком длинная для GIF.
+gif.err.invalid_pgn = Сервер не смог прочитать эту партию.
+gif.err.render_failed = Серверу не удалось создать этот GIF. Пожалуйста, повторите попытку.
+gif.err.gif_disabled = Этот сервер не создаёт GIF.
+gif.err.write_failed = Не удалось сохранить GIF на этом компьютере.
+gif.err.not_found = Этой партии больше нет на сервере.
+gif.wait.seconds = {0} секунду|{0} секунды|{0} секунд
+gif.wait.minutes = {0} минуту|{0} минуты|{0} минут
+gif.wait.both = {0} и {1}

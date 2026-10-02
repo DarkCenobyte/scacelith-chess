@@ -6,6 +6,7 @@
 #include "online_mock.h"
 #include "settings.h"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstdio>
 #include <ctime>
@@ -54,6 +55,8 @@ public:
     void changeEmail(const std::string& e, const std::string& p, const std::string& c) override { c_->changeEmail(e, p, c); }
     void exportAccount(const std::string& p, const std::string& c) override { c_->exportAccount(p, c); }
     void deleteAccount(const std::string& p, const std::string& c) override { c_->deleteAccount(p, c); }
+    void downloadGameGif(uint64_t id, const net::GifOptions& o) override { c_->downloadGameGif(id, o); }
+    void renderPgnGif(const std::string& pgn, const net::GifOptions& o) override { c_->renderPgnGif(pgn, o); }
     void connect() override { c_->connect(); }
     void disconnect() override { c_->disconnect(); }
     net::ConnState state() const override { return c_->state(); }
@@ -199,6 +202,9 @@ enum QueueState { QLeft = 0, QSearching = 1, QMatched = 2 };
 enum NoticeCode { NShutdown = 1, NBanned = 2, NRevoked = 3, NCooldown = 4, NReplaced = 5, NRatingRestored = 7 };
 constexpr int kErrMatchmakingCooldown = 207;
 
+// Seconds of the monotonic clock: when a page last showed the state of the GIF being made.
+double gifClock() { return std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count(); }
+
 }  // namespace
 
 // =============================================================================================
@@ -276,8 +282,7 @@ void OnlineSession::applyServer() {
     queue_ = Queue();
     outgoing_ = Outgoing();
     incoming_.clear();
-    results_.clear();
-    pending_.clear();
+    answers_.setServer(ep.origin());
     ratingRestored_ = live::HeldNotice();  // points of the previous server's account
     LOGI("online: server %s", ep.origin().c_str());
 }
@@ -314,6 +319,10 @@ std::string OnlineSession::serverName() const {
 
 // ---- Account --------------------------------------------------------------------------------------
 
+bool OnlineSession::hasSavedSession() const { return ready_ && api_ && serverConfigured() && api_->hasSavedSession(); }
+
+std::string OnlineSession::savedUsername() const { return hasSavedSession() ? api_->savedUsername() : std::string(); }
+
 void OnlineSession::resume() {
     if (!serverConfigured()) return;
     ServerApi& a = api();
@@ -344,23 +353,11 @@ void OnlineSession::signOut(bool everywhere) {
 
 // ---- Requests -------------------------------------------------------------------------------------
 
-void OnlineSession::expect(Kind k) {
-    pending_[int(k)]++;
-    results_.erase(int(k));
-}
+void OnlineSession::expect(Kind k) { answers_.expect(k); }
 
-bool OnlineSession::busy(Kind k) const {
-    auto it = pending_.find(int(k));
-    return it != pending_.end() && it->second > 0;
-}
+bool OnlineSession::busy(Kind k) const { return answers_.busy(k); }
 
-bool OnlineSession::take(Kind k, net::Event& out) {
-    auto it = results_.find(int(k));
-    if (it == results_.end()) return false;
-    out = it->second;
-    results_.erase(it);
-    return true;
-}
+bool OnlineSession::take(Kind k, net::Event& out) { return answers_.take(k, out); }
 
 // ---- Account API ----------------------------------------------------------------------------------
 
@@ -397,12 +394,14 @@ void OnlineSession::openGame(uint64_t gameId) {
     }
     data_.gameWanted = gameId;
     data_.gameError.clear();
+    data_.gameRetryAfter = 0;
     api().fetchGame(gameId);
     expect(Kind::GameDetailsResult);
 }
 
 void OnlineSession::loadSessions() {
     data_.sessionsError.clear();
+    data_.sessionsRetryAfter = 0;
     api().fetchSessions();
     expect(Kind::SessionsResult);
 }
@@ -415,6 +414,32 @@ void OnlineSession::revokeSession(int64_t sessionId) {
 void OnlineSession::setAcceptChallenges(bool accept) {
     api().setAcceptChallenges(accept);
     expect(Kind::PreferencesResult);
+}
+
+// ---- Animated GIFs ----------------------------------------------------------------------------------
+
+bool OnlineSession::saveGameGif(const std::string& owner, uint64_t gameId, const net::GifOptions& options, const std::string& folder,
+                                const std::string& fileName) {
+    if (!gif_.begin(owner, gameId, folder, fileName)) return false;
+    api().downloadGameGif(gameId, options);
+    gifShownAt_ = gifClock();
+    return true;
+}
+
+bool OnlineSession::savePgnGif(const std::string& owner, const std::string& pgn, const net::GifOptions& options, const std::string& folder,
+                               const std::string& fileName) {
+    if (!gif_.begin(owner, 0, folder, fileName)) return false;
+    api().renderPgnGif(pgn, options);
+    gifShownAt_ = gifClock();
+    return true;
+}
+
+void OnlineSession::gifShown(const std::string& owner) {
+    if (owner == gif_.owner()) gifShownAt_ = gifClock();
+}
+
+void OnlineSession::clearGif() {
+    if (!gif_.busy()) gif_.clear();
 }
 
 // ---- Realtime -------------------------------------------------------------------------------------
@@ -560,6 +585,7 @@ void OnlineSession::quickStart(const std::string& category, const std::string& u
 void OnlineSession::runMock(double ms) {
     if (!(mock_ && virtual_)) return;
     for (double t = 0.0; t < ms; t += 25.0) update(0.025f);
+    gif_.poll(true);   // a GIF file being written: on the disk before the page is drawn
 }
 
 // ---- Event pump -----------------------------------------------------------------------------------
@@ -567,10 +593,22 @@ void OnlineSession::runMock(double ms) {
 void OnlineSession::update(float dt) {
     if (virtual_ && dt > 0.0f) net::mock::advance(double(dt) * 1000.0);
     if (!ready_) return;
+    const GifSaver::Stage gifBefore = gif_.stage();
     net::Event e;
     for (int guard = 0; guard < 256 && api_->poll(e); ++guard) handleServer(e);
     if (directUsed_)
         for (int guard = 0; guard < 256 && direct_->poll(e); ++guard) handleDirect(e);
+    // A GIF finished while no page shows it (the player went elsewhere): said by a notification.
+    const bool gifEnded = gif_.poll() || (gifBefore == GifSaver::Stage::Rendering && gif_.stage() == GifSaver::Stage::Failed);
+    if (gifEnded && gifClock() - gifShownAt_ > 0.5) {
+        if (gif_.stage() == GifSaver::Stage::Saved) {
+            const std::string& path = gif_.path();
+            const size_t cut = path.find_last_of("/\\");
+            ui::notify(i18n::trf("gif.saved_as", {i18n::ltr(cut == std::string::npos ? path : path.substr(cut + 1))}), 6.0f);
+        } else {
+            ui::notify(gifErrorText(gif_.error(), gif_.retryAfterSec()), 6.0f);
+        }
+    }
     double restored = 0.0;
     if (ratingRestored_.take(inGame_, restored))
         ui::notify(i18n::trn("online.notice.rating_restored", std::lround(restored)), 8.0f);
@@ -597,12 +635,23 @@ void OnlineSession::handleServer(const net::Event& e) {
         routeGame(e, LinkKind::Server);
         return;
     }
+    // An answer of the server used before the last applyServer(): not this server's history, game,
+    // devices, account or session. Its GIF is still written and its PGN still saved (ServerAnswers
+    // keeps it for the game page), each as the game it was asked for. (The info of the server being
+    // tested in Options names that server.)
+    if (answers_.foreign(e) && !(e.kind == Kind::ServerInfoResult && testing_)) {
+        if (e.kind == Kind::GifResult) gif_.finish(e);
+        else if (!answers_.keep(e)) LOGI("online: an answer of %s dropped (another server since)", e.origin.c_str());
+        return;
+    }
+    // A call that found the saved session refused (expired, revoked): the network layer erased the
+    // token, whatever the call (net::Event::sessionLost).
+    if (e.sessionLost && signedIn_) {
+        signedIn_ = false;
+        LOGI("online: session refused, signed out");
+    }
     // HTTPS results are kept for the page that asked.
-    auto store = [&]() {
-        auto it = pending_.find(int(e.kind));
-        if (it != pending_.end() && it->second > 0) it->second--;
-        results_[int(e.kind)] = e;
-    };
+    auto store = [&]() { answers_.keep(e); };
     switch (e.kind) {
     case Kind::ServerInfoResult:
         if (testing_) {
@@ -674,6 +723,15 @@ void OnlineSession::handleServer(const net::Event& e) {
         }
         if (wasSignedIn && !signedIn_ && !(e.kind == Kind::AccountDeleted && e.ok)) LOGI("online: session refused, signed out");
         store();
+        break;
+    }
+    case Kind::GifResult: {
+        // The GifSaver writes the file (not kept with the other answers: up to 16 MiB); a refused
+        // token signs out like any account API answer.
+        const bool wasSignedIn = signedIn_;
+        data_.apply(e, account_, signedIn_);
+        gif_.finish(e);
+        if (wasSignedIn && !signedIn_) LOGI("online: session refused, signed out");
         break;
     }
     case Kind::MfaDisableResult:
@@ -874,6 +932,25 @@ std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t 
     for (const char* k : known)
         if (code == k) return i18n::tr(std::string("online.err.") + k);
     return i18n::trf("online.err.other", {code});
+}
+
+std::string gifErrorText(const std::string& code, int retryAfterSec) {
+    if (code == "rate_limited") {
+        if (retryAfterSec > 0) return i18n::trf("gif.err.rate_limited_for", {waitText(retryAfterSec)});
+        return i18n::tr("gif.err.rate_limited");
+    }
+    if (code == "server_busy") {
+        if (retryAfterSec > 0) return i18n::trf("gif.err.server_busy_for", {waitText(retryAfterSec)});
+        return i18n::tr("gif.err.server_busy");
+    }
+    // Signed out: the token was refused (expired, revoked), or there is none (the network layer
+    // says "unauthorized" for both).
+    if (code == "unauthorized") return i18n::tr("gif.err.signed_out");
+    static const char* known[] = {"game_too_long", "pgn_too_large", "invalid_pgn", "render_failed", "gif_disabled", "write_failed",
+                                  "not_found"};
+    for (const char* k : known)
+        if (code == k) return i18n::tr(std::string("gif.err.") + k);
+    return onlineErrorText(code, retryAfterSec);
 }
 
 std::string serverErrorText(int code) {

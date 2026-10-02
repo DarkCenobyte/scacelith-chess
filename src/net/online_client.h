@@ -2,9 +2,9 @@
 // repository; protocol in dedicated-server/src/protocol/schema.js, design in
 // dedicated-server/docs/DESIGN.md).
 //
-// OnlineClient owns a network thread. Every command below returns at once and queues work for
-// that thread; results and server pushes come back as Events that the game thread drains with
-// poll() once per frame. No command blocks, no callback runs on the game thread by surprise.
+// OnlineClient owns network threads. Every command below returns at once and queues work for
+// them; results and server pushes come back as Events that the game thread drains with poll()
+// once per frame. No command blocks, no callback runs on the game thread by surprise.
 //
 // Trust boundary: each server is identified by its origin ServerEndpoint::origin()
 // ("host:apiPort"). The session token, the pinned certificate and the remembered user name are
@@ -35,7 +35,14 @@
 //   - Account API (additive): the game history, a game's details and PGN, the signed-in devices,
 //     the challenge preference, the e-mail change, the data export and the account deletion
 //     (fetchMyGames ... deleteAccount below; dedicated-server/docs/API.md). A 401 answer to any
-//     call that carried the session token erases that token (the session expired or was revoked).
+//     call that carried the session token erases that token (the session expired or was revoked)
+//     and sets Event::sessionLost; such a call, or one that needs the session while none is saved,
+//     fails with "unauthorized" whatever the server's code (it says invalid_token).
+//   - Animated GIFs (additive): downloadGameGif() and renderPgnGif() ask the server for the GIF of a
+//     game of its own (GET /games/:id/gif) or of any game given as PGN text (POST /gif); the file
+//     comes back in Event::Kind::GifResult (signed-in players only: the renders count against the
+//     account's quota; a refused or missing session is "unauthorized", as above).
+//   - Event::origin (additive): the HTTPS results name the server their command went to.
 #pragma once
 #include "gesture.h"
 #include <cstdint>
@@ -147,6 +154,7 @@ struct GamesFilter {
 
 struct GamesPage {
     uint64_t before = 0;              // the cursor of the request (0 = the first page)
+    GamesFilter filter;               // the filter of the request (with 'before', on errors too)
     std::vector<GameSummary> games;   // newest first
     uint64_t next = 0;                // 'before' of the next page, 0 = this was the last page
     int total = 0;                    // games matching the filter, all pages together
@@ -157,6 +165,17 @@ struct SessionInfo {                  // a signed-in device (GET /auth/sessions)
     int64_t createdAtMs = 0, lastSeenAtMs = 0, expiresAtMs = 0;
     std::string clientLabel;          // "Scacelith 0.1.0 (Windows)", "" when the client gave none
     bool current = false;             // the session of this game
+};
+
+// How the server draws the animated GIF of a game (GET /games/:id/gif, POST /gif): the size of
+// the board ("small", "medium", "large"), the side at the bottom ("white", "black"), the time each
+// move stays on screen in milliseconds (100..3000; the server refuses other values) and the
+// coordinates on the border.
+struct GifOptions {
+    std::string size = "medium";
+    std::string orientation = "white";
+    int delayMs = 500;
+    bool coords = true;
 };
 
 struct PlayerInfo {
@@ -267,6 +286,9 @@ struct Event {
                               // "email_changed" (servers without e-mail confirmation) (changeEmail)
         AccountExportResult,  // text = the JSON document (exportAccount)
         AccountDeleted,       // ok: the account is gone and the local session erased (deleteAccount)
+        GifResult,            // text = the GIF file, gameId = the game (0 for a PGN text)
+                              // (downloadGameGif, renderPgnGif); rate_limited (the account's quota)
+                              // and server_busy (the renderer is full) come with retryAfterSec
         // ---- realtime ----
         ConnectionChanged,    // state (and error for Incompatible/Unauthorized/Banned)
         Welcome,              // account.username/userId, serverName
@@ -315,13 +337,21 @@ struct Event {
     std::vector<SessionInfo> sessions;
     int64_t sessionId = 0;
     std::string status;               // EmailChangeResult
-    std::string text;                 // PgnResult, AccountExportResult
+    std::string text;                 // PgnResult, AccountExportResult, GifResult (the file's bytes)
+    // HTTPS: the saved session was refused (401) during this call, and its token erased: the player
+    // is signed out. The error is then "unauthorized", or none when a public read was asked again
+    // without the token and answered (fetchGame, downloadPgn).
+    bool sessionLost = false;
+    // HTTPS results: the origin (ServerEndpoint::origin()) of the server the command went to, the
+    // one in use when it was given; "" for the realtime events. An answer that arrives after
+    // setServer() chose another server names the previous one.
+    std::string origin;
 };
 
 class OnlineClient {
 public:
     OnlineClient();
-    ~OnlineClient();                  // closes the connection and joins the network thread
+    ~OnlineClient();                  // closes the connection and joins the network threads
     OnlineClient(const OnlineClient&) = delete;
     OnlineClient& operator=(const OnlineClient&) = delete;
 
@@ -372,6 +402,34 @@ public:
     // On success the token and the user name saved for the origin are erased and the realtime
     // connection stops (no reconnection); AccountDeleted then comes with ok.
     void deleteAccount(const std::string& password, const std::string& codeOrRecovery);
+
+    // ---- animated GIFs (HTTPS; dedicated-server/docs/API.md) ----
+    // The server draws the game (a 2D board seen from above, a frame per move) and answers with the
+    // .gif file: GifResult, text = the file (16 MiB at most; an answer that does not start with
+    // "GIF87a" or "GIF89a" is "invalid_response"). Signed-in players only ("unauthorized" without
+    // a saved token, nothing sent; "unauthorized" with sessionLost when the server refuses the
+    // saved session, its token erased): each render counts against the account's quota (429
+    // "rate_limited" with retryAfterSec; a GIF the server rendered before costs nothing), and a
+    // busy renderer answers 503 "server_busy" with retryAfterSec (so does the 503 "busy" of a
+    // locked database). "game_too_long" over the server's limit of moves (GIF_MAX_PLIES),
+    // "render_failed" when the server could not make it, "gif_disabled" on a server without GIFs:
+    // turned off, or an older server without these routes (its 404 "not_found" for POST /gif, and
+    // for GET /games/:id/gif when GET /games/:id finds the game). The GIFs have a thread of their
+    // own (one at a time, the other calls never wait for them) and kGifTimeoutMs: the server may
+    // hold the request for 45 s with its default settings before it answers 503 "timeout".
+    // A game of the server: GET /games/:id/gif?size=&orientation=&delay=&coords=0|1 (gameId 0:
+    // "invalid_game_id", nothing sent).
+    void downloadGameGif(uint64_t gameId, const GifOptions& options);
+    // Any game: POST /gif { pgn, size, orientation, delayMs, coords }, the first game of the text
+    // (at most kGifMaxPgnBytes: "pgn_too_large" above, nothing sent; "invalid_pgn" when the server
+    // cannot read it). GifResult's gameId is 0.
+    void renderPgnGif(const std::string& pgn, const GifOptions& options);
+    static constexpr size_t kGifMaxPgnBytes = 65536;   // the server's limit of the pgn field
+    static constexpr size_t kGifMaxBytes = size_t(16) << 20;
+    // How long a GIF request may take, answer included: twice the server's own bound (queue
+    // GIF_QUEUE_TIMEOUT_MS 10 s + render GIF_RENDER_TIMEOUT_MS 30 s + 5 s), against the 15 s of the
+    // other calls ("timeout" after it).
+    static constexpr int kGifTimeoutMs = 90000;
 
     // ---- realtime (WSS) ----
     void connect();                              // uses the saved session; reconnects automatically until disconnect()

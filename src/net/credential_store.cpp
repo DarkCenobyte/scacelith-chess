@@ -246,6 +246,17 @@ bool CredentialStore::clearToken(const std::string& origin) {
     return saveLocked();
 }
 
+bool CredentialStore::clearToken(const std::string& origin, const std::string& token) {
+    std::lock_guard<std::mutex> lk(mu_);
+    loadLocked();
+    Record* r = findLocked(origin);
+    if (!r || r->tokenBlob.empty()) return true;
+    std::string saved;
+    if (unprotectToken(origin, r->tokenBlob, saved) && saved != token) return true;   // another one since
+    r->tokenBlob.clear();
+    return saveLocked();
+}
+
 bool CredentialStore::erase(const std::string& origin) {
     std::lock_guard<std::mutex> lk(mu_);
     loadLocked();

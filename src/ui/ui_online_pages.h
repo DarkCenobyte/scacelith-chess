@@ -66,8 +66,10 @@ AccountNav accountPage(AccountPage page, float t, bool fresh, LibrarySetup* libr
 AccountNav accountPump(const AccountPage* current, std::string& note, std::string& error);
 // Entering the account pages from the account page (forms and messages emptied).
 void accountReset(AccountPage page);
-// Viewer: the page in a given state ("history", "game", "devices", "email", "email-sent", "export",
-// "export-done", "delete"), its data fetched from the in-process fake server.
+// Viewer: the page in a given state ("history", "game", "game-gif" (its GIF saved), "game-gif-making",
+// "game-saving" (its PGN on the way), "game-saved" (its PGN written to the saved games), "devices",
+// "email", "email-sent", "export", "export-done", "delete"), its data fetched from the in-process
+// fake server.
 bool accountDebugOpen(const std::string& sub, AccountPage& page);
 
 }  // namespace onl

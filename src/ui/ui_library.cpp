@@ -4,11 +4,14 @@
 // files are read again), newest first, with a filter by mode. The selected game shows its
 // players, result, opening, every tag and its moves in figurine notation. Replay returns
 // StartReplay; Delete asks first and deletes files of one game only; Open folder shows the folder
-// in the system's file manager. Same look as ui_coach.cpp; mirrored with im::flip / im::flipX in a
-// right-to-left language.
+// in the system's file manager. Save as GIF (signed in to an online server) sends the game's PGN
+// text to the server (POST /gif, game::OnlineSession::savePgnGif) and saves the animated GIF it
+// draws to <app data>/gif/; the folder's line shows it being made, then its path and Open folder.
+// Same look as ui_coach.cpp; mirrored with im::flip / im::flipX in a right-to-left language.
 #include "ui.h"
 #include "ui_draw.h"
 #include "ui_internal.h"
+#include "ui_online_pages.h"
 #include "ui_screens_game.h"
 #include "ui_theme.h"
 #include "ui_widgets.h"
@@ -17,14 +20,18 @@
 #include "../coach/openings.h"
 #include "../core/log.h"
 #include "../game/game_archive.h"
+#include "../game/online_session.h"
 #include "../game/replay.h"
+#include "../game/settings.h"
 #include "../i18n/i18n.h"
 #include "../i18n/unicode.h"
 #include "../platform/platform.h"
 #include <algorithm>
 #include <atomic>
+#include <cctype>
 #include <chrono>
 #include <cmath>
+#include <cstdlib>
 #include <ctime>
 #include <exception>
 #include <future>
@@ -310,6 +317,7 @@ struct LibraryState {
     Details details;
     std::unordered_map<std::string, std::string> openings;  // contentKey -> opening ("" = none)
     int openingsGen = -1;              // i18n::generation() of 'openings'
+    bool debugGif = false;             // debug::libraryGif(): press Save as GIF at the next chance
 };
 // Never destroyed: a static's destructor would join a listing still running at exit (after the
 // objects it uses may be gone); libraryShutdown() stops it first instead.
@@ -642,6 +650,105 @@ void message(const Rect& area, const std::string& head, const std::string& text,
     if (!text.empty()) gfx::textWrapped(text, area.cx(), y + 68.0f, w, ts, lineH);
 }
 
+// ---- Save as GIF -----------------------------------------------------------------------------------------
+// The online server draws the GIF of the selected game from its PGN text (POST /gif): the record
+// written again by the archive's writer without its comments, NAGs and clocks (the picture does not
+// use them, and the text stays far under the server's 64 KiB), seen from the side of the player
+// (the signed-in account or this computer's player named as Black: Black at the bottom), saved to
+// <app data>/gif/ under the name of its date, players and server game number (never over a file).
+std::string gifOwner(const archive::Entry& e) { return "library:" + contentKey(e); }
+
+std::string gifPgn(const chess::pgn::Record& record) {
+    chess::pgn::Record r = record;
+    r.comment.clear();
+    for (chess::pgn::Ply& ply : r.plies) {
+        ply.comment.clear();
+        ply.nags.clear();
+        ply.clockMs = ply.elapsedMs = -1;
+    }
+    return chess::pgn::write(r);
+}
+
+bool sameName(const std::string& a, const std::string& b) {
+    if (a.empty() || a.size() != b.size()) return false;
+    for (size_t i = 0; i < a.size(); ++i)
+        if (std::tolower(static_cast<unsigned char>(a[i])) != std::tolower(static_cast<unsigned char>(b[i]))) return false;
+    return true;
+}
+std::string gifOrientation(const chess::pgn::Record& r) {
+    const std::string white = r.tag("White"), black = r.tag("Black");
+    const game::OnlineSession& se = game::onlineSession();
+    for (const std::string& me : {se.account().username, se.savedUsername(), game::settings().playerName})
+        if (sameName(black, me) && !sameName(white, me)) return "black";
+    return "white";
+}
+
+std::string gifFileOf(const archive::Entry& e, const chess::pgn::Record& r) {
+    const std::time_t when =
+        game::pgnGameStart(r.tag("Date"), r.tag("Time"), r.tag("UTCDate"), r.tag("UTCTime"), std::time_t(e.fileTimeMs / 1000));
+    const uint64_t id = std::strtoull(r.tag("ScacelithGameId").c_str(), nullptr, 10);
+    return game::gifFileName(when, r.tag("White"), r.tag("Black"), id);
+}
+
+// The end of a path that fits maxWidth: the file's name matters more than the folder's.
+std::string elideStart(const std::string& s, const TextStyle& st, float maxWidth) {
+    if (gfx::textWidth(s, st) <= maxWidth) return s;
+    std::u32string cps = uni::decode(s);
+    size_t lo = 0, hi = cps.size();
+    while (lo < hi) {  // the fewest characters cut from the start
+        size_t mid = (lo + hi) / 2;
+        if (gfx::textWidth(kEllipsis + uni::encode(cps.substr(mid)), st) <= maxWidth) hi = mid;
+        else lo = mid + 1;
+    }
+    return kEllipsis + uni::encode(cps.substr(lo));
+}
+
+// The GIF's line in place of the folder's, centred at y: being made (spinner), saved (its path and
+// Open folder after it) or why not.
+void gifLine(const game::GifSaver& gif, const Rect& p, float maxW, float y) {
+    using Stage = game::GifSaver::Stage;
+    if (gif.busy()) {
+        TextStyle ms = style(font::FACE_ITALIC, 20.0f, ivoryDim, HAlign::Center);
+        const std::string text = T("gif.making");
+        ms.size = gfx::fitSize(text, ms, maxW - 60.0f, 0.8f);
+        const float w = gfx::textWidth(text, ms);
+        gfx::text(text, p.cx() + (im::rtl() ? -16.0f : 16.0f), y, ms);
+        detail::onl::spinner(vec2(p.cx() + (im::rtl() ? 1.0f : -1.0f) * (w * 0.5f + 8.0f), y - 6.0f), 9.0f);
+        return;
+    }
+    if (gif.stage() == Stage::Failed) {
+        TextStyle es = style(font::FACE_ITALIC, 20.0f, danger, HAlign::Center);
+        std::string text = game::gifErrorText(gif.error(), gif.retryAfterSec());
+        es.size = gfx::fitSize(text, es, maxW, 0.75f);
+        gfx::text(elide(text, es, maxW), p.cx(), y, es);
+        return;
+    }
+    if (gif.stage() != Stage::Saved) return;
+    TextStyle ls = style(font::FACE_ITALIC, kSmall, muted);
+    const std::string open = T("library.open_folder");
+    const float linkW = std::max(150.0f, gfx::textWidth(open, ls) + 36.0f), gap = 16.0f;
+    TextStyle ts = style(font::FACE_ITALIC, 20.0f, ivoryDim, im::startAlign());
+    const std::string lead = T("gif.saved") + " ";
+    TextStyle ps = style(font::FACE_ITALIC, 20.0f, goldBright, im::startAlign());
+    ps.dir = 0;
+    const float leadW = gfx::textWidth(lead, ts);
+    const std::string path = elideStart(gif.path(), ps, std::max(80.0f, maxW - linkW - gap - leadW));
+    const float pathW = gfx::textWidth(path, ps), total = leadW + pathW + gap + linkW;
+    // The note then its path in the reading direction, Open folder at the end.
+    const float x0 = p.cx() - total * 0.5f;
+    const Rect row(x0, y - 28.0f, total, 40.0f);
+    gfx::text(lead, im::flipX(row, x0), y, ts);
+    TextStyle pe = ps;
+    pe.align = im::startAlign();
+    gfx::text(path, im::flipX(row, x0 + leadW), y, pe);
+    if (im::button(L("library.open_folder") + "##gif", im::flip(row, Rect(x0 + leadW + pathW + gap, y - 30.0f, linkW, 42.0f)),
+                   im::ButtonKind::Quiet)) {
+        const std::string& file = gif.path();
+        const size_t cut = file.find_last_of("/\\");
+        if (!plat::openInFileManager(cut == std::string::npos ? file : file.substr(0, cut + 1))) notify(T("library.open_failed"));
+    }
+}
+
 }  // namespace
 
 // ==== The page ===========================================================================================
@@ -670,6 +777,8 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         s.confirmDelete = false;
         s.truncatedShown = false;
         s.scroll = s.target;
+        // A GIF of a saved game made on an earlier visit is not shown again (one being made is).
+        if (game::onlineSession().gif().owner().compare(0, 8, "library:") == 0) game::onlineSession().clearGif();
         requestListing(s);
         pollListing(s, 250);
     } else {
@@ -712,7 +821,10 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
     const float dx = im::flip(p, Rect(p.x + pad + listW + gap, 0, detW, 0)).x;
     const Rect lcol(lx, 0, listW, 0), dcol(dx, 0, detW, 0);
     const float top = p.y + 150.0f;
-    const float bw = 236.0f, bh = 58.0f, bgap = 20.0f;
+    // The footer's five buttons (Back, Open folder, Save as GIF, Delete, Replay): 236 wide, or as
+    // wide as five can be in a narrower window (5:4), so that Save as GIF keeps its gaps.
+    const float bh = 58.0f, bgap = 20.0f;
+    const float bw = std::min(236.0f, std::floor((p.w - 2.0f * pad - 4.0f * bgap) / 5.0f));
     const float by = p.b() - 52.0f - bh;
     const float bottom = by - 76.0f;  // under the columns: the folder line, then the footer rule
     im::Id defaultFocus = 0;
@@ -868,8 +980,17 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         }
     }
 
-    // ---- The folder, then the footer: Back, Open folder ... Delete, Replay.
-    {
+    // ---- The folder (or the selected game's GIF), then the footer: Back, Open folder, Save as GIF,
+    // Delete, Replay.
+    game::OnlineSession& se = game::onlineSession();
+    const game::GifSaver& gif = se.gif();
+    const bool detailsShown = cur && cur->error.empty() && s.details.key == contentKey(*cur) && s.details.ok;
+    const std::string gifKey = cur ? gifOwner(*cur) : std::string();
+    const bool gifMine = cur && gif.owner() == gifKey;
+    if (gifMine && gif.stage() != game::GifSaver::Stage::Idle) {
+        gifLine(gif, p, p.w - 2.0f * pad, by - 44.0f);
+        se.gifShown(gifKey);
+    } else {
         TextStyle fs = style(font::FACE_ITALIC, 19.0f, withAlpha(muted, 0.9f), HAlign::Center);
         std::string line = i18n::trf("library.folder", {i18n::ltr(s.folder)});
         fs.size = gfx::fitSize(line, fs, p.w - 2.0f * pad, 0.8f);
@@ -883,7 +1004,34 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         archive::makeFolder(s.folder);
         if (!plat::openInFileManager(s.folder)) notify(T("library.open_failed"));
     }
-    const bool canReplay = cur && cur->error.empty() && s.details.key == contentKey(*cur) && s.details.ok;
+    const bool canReplay = detailsShown;
+    {
+        // Save as GIF, between Open folder and Delete: the server draws it, so it needs an account of
+        // an online server signed in (the disabled button's tooltip says so), and one GIF at a time.
+        const float leftEnd = p.x + pad + 2.0f * bw + bgap, rightStart = p.r() - pad - 2.0f * bw - bgap;
+        const float gw = std::min(bw, rightStart - leftEnd - 2.0f * bgap);
+        const Rect gifR = im::flip(p, Rect((leftEnd + rightStart) * 0.5f - gw * 0.5f, by, gw, bh));
+        const bool signedIn = se.signedIn() || se.hasSavedSession();   // signed in on an earlier run too
+        bool pressed = false;
+        if (!signedIn) {
+            im::disabledButton(L("gif.save"), gifR, im::ButtonKind::Secondary, T("gif.sign_in_first"), p);
+        } else if (gif.busy() && !gifMine) {
+            im::disabledButton(L("gif.save"), gifR, im::ButtonKind::Secondary, T("gif.busy_other"), p);
+        } else {
+            pressed = im::button(L("gif.save"), gifR, im::ButtonKind::Secondary, detailsShown && !gif.busy());
+        }
+        const bool debugPress = s.debugGif && detailsShown && signedIn && !gif.busy();
+        if (debugPress) s.debugGif = false;
+        if ((pressed || debugPress) && detailsShown && signedIn && !gif.busy()) {
+            net::GifOptions options;
+            options.orientation = gifOrientation(s.details.record);
+            const std::string file = gifFileOf(*cur, s.details.record);
+            if (se.savePgnGif(gifKey, gifPgn(s.details.record), options, plat::appDataDirectory() + "gif/", file)) {
+                LOGI("library: GIF of %s (game %d) as %s", cur->file.c_str(), cur->index + 1, file.c_str());
+                if (debugPress) se.runMock(4000);  // the fake server's answer and the file, this frame
+            }
+        }
+    }
     // A game of a file of several games cannot be deleted from here: Delete says so when pressed
     // (a disabled button could not explain it).
     const bool canDelete = cur && !cur->fileError;
@@ -963,4 +1111,9 @@ void libraryShutdown() {
 }
 
 }  // namespace detail
+
+namespace debug {
+void libraryGif() { lib().debugGif = true; }
+}  // namespace debug
+
 }  // namespace ui

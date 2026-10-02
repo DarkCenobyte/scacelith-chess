@@ -1154,3 +1154,27 @@ replay.tip.pause = 暂停（K）
 replay.tip.resume = 继续（K）
 replay.tip.forward = 前进一步（L）
 replay.tip.end = 对局结束（End）
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = 保存为 GIF
+gif.making = 正在制作 GIF：服务器正在绘制对局…
+gif.saved = GIF 已保存：
+gif.saved_as = GIF 已保存：{0}
+gif.sign_in_first = 登录在线服务器后即可制作 GIF：GIF 由服务器绘制。
+gif.busy_other = 另一个 GIF 正在制作中。请等待其完成。
+gif.err.rate_limited_for = 短时间内制作的 GIF 过多。可在 {0} 后制作下一个。
+gif.err.rate_limited = 短时间内制作的 GIF 过多。请稍后重试。
+gif.err.server_busy_for = 服务器正忙于绘制其他 GIF。请在 {0} 后重试。
+gif.err.server_busy = 服务器正忙于绘制其他 GIF。请稍后重试。
+gif.err.signed_out = 会话已结束。请重新登录后再制作 GIF。
+gif.err.game_too_long = 该对局过长，无法制作成 GIF。
+gif.err.pgn_too_large = 该对局过长，无法制作成 GIF。
+gif.err.invalid_pgn = 服务器无法读取该对局。
+gif.err.render_failed = 服务器无法制作此 GIF。请重试。
+gif.err.gif_disabled = 此服务器不提供 GIF 制作。
+gif.err.write_failed = 无法将 GIF 保存到这台电脑。
+gif.err.not_found = 服务器上已没有该对局。
+gif.wait.seconds = {0} 秒
+gif.wait.minutes = {0} 分钟
+gif.wait.both = {0} {1}

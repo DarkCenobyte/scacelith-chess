@@ -1154,3 +1154,27 @@ replay.tip.pause = Pausa (K)
 replay.tip.resume = Reanudar (K)
 replay.tip.forward = Una jugada adelante (L)
 replay.tip.end = Final de la partida (Fin)
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Guardar como GIF
+gif.making = Creando el GIF: el servidor está dibujando la partida…
+gif.saved = El GIF se ha guardado:
+gif.saved_as = GIF guardado: {0}
+gif.sign_in_first = Inicie sesión en un servidor en línea para crear GIF: es el servidor quien los dibuja.
+gif.busy_other = Se está creando otro GIF. Espere a que esté listo.
+gif.err.rate_limited_for = Ha creado muchos GIF en poco tiempo. Podrá crear el siguiente dentro de {0}.
+gif.err.rate_limited = Ha creado muchos GIF en poco tiempo. Vuelva a intentarlo más tarde.
+gif.err.server_busy_for = El servidor está ocupado dibujando otros GIF. Vuelva a intentarlo dentro de {0}.
+gif.err.server_busy = El servidor está ocupado dibujando otros GIF. Vuelva a intentarlo en un momento.
+gif.err.signed_out = Su sesión ha terminado. Vuelva a iniciar sesión para crear un GIF.
+gif.err.game_too_long = Esta partida es demasiado larga para convertirla en GIF.
+gif.err.pgn_too_large = Esta partida es demasiado larga para convertirla en GIF.
+gif.err.invalid_pgn = El servidor no ha podido leer esta partida.
+gif.err.render_failed = El servidor no ha podido crear este GIF. Vuelva a intentarlo.
+gif.err.gif_disabled = Este servidor no crea GIF.
+gif.err.write_failed = No se ha podido guardar el GIF en este ordenador.
+gif.err.not_found = Esta partida ya no está en el servidor.
+gif.wait.seconds = {0} segundo|{0} segundos
+gif.wait.minutes = {0} minuto|{0} minutos
+gif.wait.both = {0} y {1}
