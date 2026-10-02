@@ -45,8 +45,6 @@ struct vec3 {
     constexpr vec3(vec2 v, float z_) : x(v.x), y(v.y), z(z_) {}
     float& operator[](int i) { return (&x)[i]; }
     float operator[](int i) const { return (&x)[i]; }
-    vec2 xy() const { return {x, y}; }
-    vec2 xz() const { return {x, z}; }
 };
 struct vec4 {
     float x = 0, y = 0, z = 0, w = 0;
@@ -97,7 +95,6 @@ M_VEC_OPS(vec4, 4)
 
 inline vec3 cross(vec3 a, vec3 b) { return {a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x}; }
 inline float distance(vec3 a, vec3 b) { return length(a - b); }
-inline vec3 reflect(vec3 i, vec3 n) { return i - n * (2.0f * dot(n, i)); }
 // Any unit vector orthogonal to n.
 inline vec3 orthogonal(vec3 n) {
     vec3 a = std::fabs(n.x) < 0.9f ? vec3(1, 0, 0) : vec3(0, 1, 0);
@@ -141,7 +138,6 @@ inline vec4 operator*(const mat4& m, vec4 v) { return m.c[0] * v.x + m.c[1] * v.
 inline mat4 operator*(const mat4& a, const mat4& b) { return {a * b.c[0], a * b.c[1], a * b.c[2], a * b.c[3]}; }
 inline vec3 transformPoint(const mat4& m, vec3 p) { return (m * vec4(p, 1.0f)).xyz(); }
 inline vec3 transformDir(const mat4& m, vec3 d) { return (m * vec4(d, 0.0f)).xyz(); }
-inline vec3 projectPoint(const mat4& m, vec3 p) { vec4 r = m * vec4(p, 1.0f); return r.xyz() / r.w; }
 inline mat4 transpose(const mat4& m) {
     mat4 r;
     for (int i = 0; i < 4; ++i)
@@ -188,11 +184,6 @@ inline mat4 perspectiveReverseZ(float fovY, float aspect, float zNear, float zFa
     float f = 1.0f / std::tan(fovY * 0.5f);
     float a = zNear / (zFar - zNear);
     return mat4({f / aspect, 0, 0, 0}, {0, f, 0, 0}, {0, 0, a, -1}, {0, 0, zFar * a, 0});
-}
-// Orthographic with [0,1] clip depth, reverse-Z (near -> 1, far -> 0). View space looks down -Z.
-inline mat4 orthoReverseZ(float l, float r, float b, float t, float zNear, float zFar) {
-    return mat4({2 / (r - l), 0, 0, 0}, {0, 2 / (t - b), 0, 0}, {0, 0, 1 / (zFar - zNear), 0},
-                {-(r + l) / (r - l), -(t + b) / (t - b), zFar / (zFar - zNear), 1});
 }
 // Orthographic with standard [0,1] depth (near -> 0, far -> 1). Used for shadow maps.
 inline mat4 ortho01(float l, float r, float b, float t, float zNear, float zFar) {
@@ -262,7 +253,6 @@ struct AABB {
     vec3 center() const { return (lo + hi) * 0.5f; }
     vec3 extent() const { return (hi - lo) * 0.5f; }
 };
-AABB transformAABB(const AABB& b, const mat4& m);  // math.cpp
 
 struct Ray { vec3 o, d; };  // d normalized
 // Returns t >= 0 of the hit or a negative value when missed.

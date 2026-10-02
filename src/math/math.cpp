@@ -78,16 +78,6 @@ quat lookRotation(vec3 forward, vec3 up) {
     return fromMat3(mat3(r, u, f));
 }
 
-AABB transformAABB(const AABB& b, const mat4& m) {
-    AABB r;
-    if (!b.valid()) return r;
-    for (int i = 0; i < 8; ++i) {
-        vec3 p{(i & 1) ? b.hi.x : b.lo.x, (i & 2) ? b.hi.y : b.lo.y, (i & 4) ? b.hi.z : b.lo.z};
-        r.add(transformPoint(m, p));
-    }
-    return r;
-}
-
 float rayPlane(const Ray& r, vec3 p, vec3 n) {
     float d = dot(r.d, n);
     if (std::fabs(d) < 1e-8f) return -1.0f;
