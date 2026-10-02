@@ -1409,6 +1409,10 @@ void GameScene::updatePlaying(float dt) {
             // Online the piece is chosen before the pawn moves: the move goes out complete.
             Square to = promoTo_;
             promoTo_ = NoSquare;
+            if (endPending_ || resync_ || og_.status != 0) {   // too late: the game ended, or a resync
+                humanRelease();
+                break;
+            }
             Move mv = game_.position().findLegal(touchedSq_, to, PieceType(choice));
             if (!mv.valid()) break;
             PieceObject* occupant = board_.at(to);

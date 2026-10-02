@@ -255,6 +255,11 @@ void GameScene::updateOnline(float dt) {
     updateRemoteLive(dt);
 
     if (endPending_) {
+        // The game is over: an open promotion picker closes, its pawn going back.
+        if (turn_ == Turn::HumanPromotion) {
+            promoTo_ = NoSquare;
+            humanRelease();
+        }
         endWait_ += dt;
         bool settled = remoteQueue_.empty() && turn_ != Turn::RemoteMoving && turn_ != Turn::HumanPromotion && dest_.empty() &&
                        !anim_[0].busy() && !anim_[1].busy() && !remoteLive_.takeBack;
