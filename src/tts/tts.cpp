@@ -175,7 +175,10 @@ bool Synthesizer::load(std::string* error) {
 ThreadPool* Synthesizer::pool(int threads) {
     threads = std::max(1, std::min(threads, 16));
     if (threads == 1) return nullptr;
-    if (!pool_ || pool_->size() != threads) pool_ = std::make_unique<ThreadPool>(threads);
+    if (!pool_ || poolThreads_ != threads) {
+        pool_ = std::make_unique<ThreadPool>(threads);
+        poolThreads_ = threads;
+    }
     return pool_.get();
 }
 

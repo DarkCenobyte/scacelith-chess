@@ -101,6 +101,7 @@ private:
 
     std::unique_ptr<Engine> engine_;
     std::unique_ptr<ThreadPool> pool_;
+    int poolThreads_ = 0;   // the count pool_ was made for (it runs fewer if helpers failed to start)
     Stats stats_;
 };
 
