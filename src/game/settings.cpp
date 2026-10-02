@@ -4,6 +4,7 @@
 #include "../i18n/i18n.h"
 #include "../platform/platform.h"
 #include <algorithm>
+#include <cmath>
 #include <cstdio>
 
 namespace game {
@@ -53,6 +54,7 @@ bool Settings::load(const std::string& p) {
     fullscreen = ini.getBool("display.fullscreen", fullscreen);
     vsync = ini.getBool("display.vsync", vsync);
     renderScale = ini.getFloat("display.render_scale", renderScale);
+    if (std::isnan(renderScale)) renderScale = 1.0f;  // passes std::clamp, then int(w * NaN) is undefined
     quality = ini.getInt("graphics.quality", quality);
     motionBlur = ini.getBool("graphics.motion_blur", motionBlur);
     depthOfField = ini.getBool("graphics.depth_of_field", depthOfField);
