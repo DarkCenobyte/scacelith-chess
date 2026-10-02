@@ -1440,7 +1440,8 @@ struct Animator::Impl {
     void updateIdle(float dt);
     vec3 headPointWorld() const;
     HandSample chinTarget(Side s) const;
-    HandSample handTarget(const Hand& h, float t) const;
+    HandSample handTarget(const Hand& h, float t) const { return handTarget(h, t, h.motion.sample(t)); }
+    HandSample handTarget(const Hand& h, float t, HandSample motionSample) const;
     void bakeFollow(Hand& h);
 
     // ==========================================================================================

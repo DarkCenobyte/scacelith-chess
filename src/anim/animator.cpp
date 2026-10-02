@@ -749,7 +749,10 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     wristClamp = 0;
     pronClamp = 0;
 
+    // Each hand's motion is sampled once (a procedural one, e.g. a pen path, is costly): hr and
+    // hlMotion stay as sampled until handTarget() below.
     HandSample hr = right().motion.sample(t);
+    const HandSample hlMotion = left().motion.sample(t);
 
     // ---- idle life (breathing always; sway and micro motion only when not the player camera)
     float br = std::sin(t * TAU / 4.2f + seed * 3.0f);
@@ -768,7 +771,7 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
         // hand the way it follows the right one (mirror image of the solve), blended in and out.
         const float u = t - curStart, w = smoothstep(0.0f, 0.3f, u) * (1.0f - smoothstep(curT - 0.3f, curT, u));
         if (w > 0.0f) {
-            SpineParams sl = solveSpine(pose, mirrorX(left().motion.sample(t).p), flex, idleFlex, -idleTwist, -idleSide);
+            SpineParams sl = solveSpine(pose, mirrorX(hlMotion.p), flex, idleFlex, -idleTwist, -idleSide);
             sp.flex = lerp(sp.flex, sl.flex, w);
             sp.twist = lerp(sp.twist, -sl.twist, w);
             sp.side = lerp(sp.side, -sl.side, w);
@@ -776,7 +779,7 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     }
     // The writing hand at work: lean/turn a little towards the sheet, and keep it within reach
     // whatever the playing hand does.
-    writingSpine(sp, left().motion.sample(t));
+    writingSpine(sp, hlMotion);
     spineOut = sp;
     applySpine(pose, sp);
     fkChain(pose, Pelvis, Spine2);
@@ -834,8 +837,8 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     pose.local[LidLowerL] = pose.local[LidLowerR] = qx(lo);
 
     // ---- arms (chin poses follow the head computed above)
-    hr = handTarget(right(), t);
-    HandSample hl = handTarget(left(), t);
+    hr = handTarget(right(), t, hr);
+    HandSample hl = handTarget(left(), t, hlMotion);
     solveArm(pose, Side::Right, hr.p, hr.q, hr.elbow);
     if (hr.pinW > 0.0f) {
         // Point lock (the pointing fingertip): where the wrist clamps the hand's rotation, the whole
@@ -935,11 +938,12 @@ void Animator::Impl::updateGaze(float dt) {
     // The eyes follow the pen (or the page corner) while the writing hand works and the playing
     // hand has nothing to do.
     if (wr.look > 1e-3f) {
-        vec3 wt = toWorld(left().motion.sample(time).p);
-        if (wr.penHeld) wt = transformPoint(worldI[HandL], evalPen.p);
-        else if (wr.running && (wr.cur.type == WriteTaskType::PickPen || wr.cur.type == WriteTaskType::PutPen)) wt = wr.cur.frame.translation();
+        vec3 wt;
         if (wr.running && wr.cur.type == WriteTaskType::TurnPage && wr.corner && wr.turnT > 0.0f)
             wt = wr.corner(pageTurnEase(clamp((time - wr.turnStart) / wr.turnT, 0.0f, 1.0f)));
+        else if (wr.penHeld) wt = transformPoint(worldI[HandL], evalPen.p);
+        else if (wr.running && (wr.cur.type == WriteTaskType::PickPen || wr.cur.type == WriteTaskType::PutPen)) wt = wr.cur.frame.translation();
+        else wt = toWorld(left().motion.sample(time).p);
         target = lerp(target, wt, wr.look * (1.0f - taskGaze));
     }
     float shakeT = time - shakeStart;
@@ -1033,9 +1037,9 @@ HandSample Animator::Impl::chinTarget(Side s) const {
     return h;
 }
 
-// Hand target at time t: the motion, plus the live chin-follow offset of an idle chin pose.
-HandSample Animator::Impl::handTarget(const Hand& h, float t) const {
-    HandSample s = h.motion.sample(t);
+// Hand target at time t: the motion (s = h.motion.sample(t)), plus the live chin-follow offset of
+// an idle chin pose.
+HandSample Animator::Impl::handTarget(const Hand& h, float t, HandSample s) const {
     if (h.chinFollow) {
         HandSample live = chinTarget(h.side);
         float d = std::max(1e-3f, h.motion.duration());
