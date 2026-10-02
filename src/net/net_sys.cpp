@@ -40,17 +40,25 @@ std::string narrow(const wchar_t* w) {
 }
 }  // namespace
 
-std::string exeDirectory() {
+std::wstring moduleFileName(const std::function<unsigned long(wchar_t*, unsigned long)>& get) {
     // A path of MAX_PATH characters or more (long paths enabled) is read again into a larger
     // buffer, up to the 32767 characters of the longest path.
     std::wstring w(MAX_PATH, L'\0');
-    DWORD n = GetModuleFileNameW(nullptr, &w[0], DWORD(w.size()));
+    DWORD n = get(&w[0], DWORD(w.size()));
     while (n >= w.size() && w.size() <= 32767) {
         w.resize(w.size() * 2);
-        n = GetModuleFileNameW(nullptr, &w[0], DWORD(w.size()));
+        n = get(&w[0], DWORD(w.size()));
     }
-    if (n == 0 || n >= w.size()) return ".\\";
+    if (n == 0 || n >= w.size()) return std::wstring();
     w.resize(n);
+    return w;
+}
+
+std::string exeDirectory() {
+    std::wstring w = moduleFileName([](wchar_t* buffer, unsigned long size) {
+        return GetModuleFileNameW(nullptr, buffer, size);
+    });
+    if (w.empty()) return ".\\";
     std::string s = narrow(w.c_str());
     size_t p = s.find_last_of("\\/");
     return p == std::string::npos ? std::string(".\\") : s.substr(0, p + 1);

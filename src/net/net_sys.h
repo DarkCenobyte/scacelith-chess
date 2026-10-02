@@ -5,6 +5,7 @@
 #pragma once
 #include <cstdint>
 #include <cstdio>
+#include <functional>
 #include <string>
 
 namespace net {
@@ -12,6 +13,10 @@ namespace sys {
 
 #ifdef _WIN32
 std::wstring widen(const std::string& utf8);   // to UTF-16, for the W functions of Windows
+// The path 'get' writes as GetModuleFileNameW does (it returns the characters written, the buffer
+// size when the path was cut, 0 on failure), read again into a larger buffer while it is cut, up to
+// the 32767 characters of the longest path; "" on failure. exeDirectory() passes GetModuleFileNameW.
+std::wstring moduleFileName(const std::function<unsigned long(wchar_t* buffer, unsigned long size)>& get);
 #endif
 
 std::string exeDirectory();        // directory of the running executable, trailing separator

@@ -1,7 +1,7 @@
 // Online client tests: protocol codec against the JavaScript codec's vectors, position digest,
 // JSON, crypto (hash / base64 / PKCE / proof of work), the folders of net::sys (also the platform
-// layer's), credential store isolation, endpoint
-// validation, and OnlineClient end to end against a fake server on the loopback interface
+// layer's exeDirectory, userDataDirectory and appDataDirectory), credential store isolation,
+// endpoint validation, and OnlineClient end to end against a fake server on the loopback interface
 // (plain HTTP + WebSocket, the insecureDev mode): login with a proof of work, account, Hello /
 // Welcome, ping and clock offset, queue, moves, reconnection, 4003 and logout; the pacing of the
 // client Ping (Welcome.clientPingMs) and of the reconnections (full server, shutdown, /info reuse);
@@ -849,9 +849,8 @@ TEST(net_crypto_pow) {
 // Folders (net::sys; plat::exeDirectory, userDataDirectory and appDataDirectory return them)
 // =============================================================================================
 
-// The executable's folder is the absolute path of the folder that holds this program. On Windows
-// an exe path of MAX_PATH characters or more is read whole instead of giving ".\\" (the working
-// directory, where the settings and the log would then go).
+// The executable's folder is the absolute path of the folder that holds this program (a long exe
+// path on Windows: net_sys_module_file_name_long_paths).
 TEST(net_sys_exe_directory) {
     std::string d = net::sys::exeDirectory();
     REQUIRE(d.size() > 1);
@@ -865,6 +864,49 @@ TEST(net_sys_exe_directory) {
     CHECK(net::sys::fileExists(d + "scacelith_tests"));
 #endif
 }
+
+#ifdef _WIN32
+// An exe path of MAX_PATH characters or more (long paths enabled) is read whole into a larger
+// buffer instead of giving ".\\" (the working directory, where the settings and the log would then
+// go). Wine cannot start an exe from such a path: a fake GetModuleFileNameW cuts the path as
+// Windows does (the buffer size returned, the copy cut and terminated).
+TEST(net_sys_module_file_name_long_paths) {
+    int calls = 0;
+    std::wstring path;
+    auto get = [&](wchar_t* buffer, unsigned long size) -> unsigned long {
+        ++calls;
+        if (path.empty()) return 0;
+        size_t n = std::min<size_t>(path.size(), size - 1);
+        std::copy(path.begin(), path.begin() + n, buffer);
+        buffer[n] = L'\0';
+        return path.size() < size ? (unsigned long)path.size() : size;
+    };
+    // A short path: one read.
+    path = L"C:\\Games\\Scacelith\\Scacelith.exe";
+    CHECK(net::sys::moduleFileName(get) == path);
+    CHECK_EQ(calls, 1);
+    // 300, 1000 and 32767 characters (the longest path): read again until the buffer holds it.
+    for (size_t length : {size_t(300), size_t(1000), size_t(32767)}) {
+        path = L"C:\\" + std::wstring(length - 17, L'a') + L"\\Scacelith.exe";
+        REQUIRE(path.size() == length);
+        calls = 0;
+        CHECK(net::sys::moduleFileName(get) == path);
+        CHECK(calls > 1);
+    }
+    // Exactly MAX_PATH characters fill the first buffer with no room for the terminator: cut.
+    path = L"C:\\" + std::wstring(260 - 17, L'b') + L"\\Scacelith.exe";
+    calls = 0;
+    CHECK(net::sys::moduleFileName(get) == path);
+    CHECK_EQ(calls, 2);
+    // A failure, and a path no buffer holds (the reads stop past 32767 characters): "".
+    path.clear();
+    CHECK(net::sys::moduleFileName(get).empty());
+    path = std::wstring(40000, L'c');
+    calls = 0;
+    CHECK(net::sys::moduleFileName(get).empty());
+    CHECK(calls < 10);
+}
+#endif
 
 #ifndef _WIN32
 // The user data folder (the settings and log fallback, the default place of the logins) is
