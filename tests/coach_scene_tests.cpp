@@ -81,6 +81,12 @@ TEST(coach_settings_history_codec) {
     CHECK(odd[0].accuracy == 100.0);
     CHECK(odd[1].accuracy < 0.0);
     CHECK_EQ(odd[2].result, -1);
+    // A NaN accuracy (a hand-edited file) is unknown, not an accurate game.
+    std::vector<game::Settings::CoachGame> nan = game::decodeCoachHistory("3:1:nan 2:0:inf 4:1:50");
+    CHECK_EQ(int(nan.size()), 3);
+    CHECK(nan[0].accuracy == -1.0);
+    CHECK(nan[1].accuracy == 100.0);
+    CHECK(nan[2].accuracy == 50.0);
     // Only the last kCoachHistoryMax games are kept.
     std::vector<game::Settings::CoachGame> many;
     for (int i = 0; i < game::Settings::kCoachHistoryMax + 5; ++i) many.push_back({1 + i % 6, 0, double(i)});

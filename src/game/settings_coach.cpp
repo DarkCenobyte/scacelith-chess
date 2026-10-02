@@ -39,7 +39,8 @@ std::vector<Settings::CoachGame> decodeCoachHistory(const std::string& text) {
         g.level = std::clamp(std::atoi(entry.substr(0, c1).c_str()), 0, 6);
         g.result = std::clamp(std::atoi(entry.substr(c1 + 1, c2 - c1 - 1).c_str()), -1, 1);
         std::string acc = entry.substr(c2 + 1);
-        g.accuracy = acc.empty() || acc == "-" ? -1.0 : std::clamp(std::atof(acc.c_str()), 0.0, 100.0);
+        const double a = std::atof(acc.c_str());  // "nan" would pass the clamp: unknown, as "-"
+        g.accuracy = acc.empty() || acc == "-" || std::isnan(a) ? -1.0 : std::clamp(a, 0.0, 100.0);
         out.push_back(g);
     }
     if (out.size() > size_t(Settings::kCoachHistoryMax)) out.erase(out.begin(), out.end() - Settings::kCoachHistoryMax);
