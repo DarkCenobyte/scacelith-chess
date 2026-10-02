@@ -52,7 +52,8 @@ Script gameEndScript(GameEnd end);
 Script lessonResumeScript(const Lesson& lesson, int chapter);
 Script lessonNextScript(const Lesson& lesson, int chapter);
 
-// Every catalog key the helpers above may say (base keys; the catalog adds the variants): tests.
+// Every catalog key the helpers above may say (base keys; the catalog adds the variants), for
+// the tests.
 std::vector<std::string> eventKeys();
 
 }  // namespace coach

@@ -6,7 +6,8 @@
 // scene's stage, a takeback undoes the game only when its table action starts (a frame after the
 // call at the earliest, once the action running is over). A pause asked by the director holds
 // until it releases it, and applies to the utterances started meanwhile too: a pause the director
-// never releases mutes the coach, as it would in the game.
+// never releases mutes the coach here (stricter than CoachStage, whose startVoice also clears it),
+// so a missing release shows in the tests.
 #pragma once
 #include "ai/analysis.h"
 #include "chess/chess.h"
