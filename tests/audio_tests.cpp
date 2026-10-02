@@ -443,6 +443,68 @@ TEST(audio_spatial_pan_itd_behind_distance) {
     CHECK(std::fabs(l01 - l015) < 0.5);
 }
 
+// A device running at 176.4 / 192 kHz (Windows' "Default Format" can be one) up to the 384 kHz limit:
+// a far-lateral source still gets the full interaural delay, about 0.66 ms.
+TEST(audio_spatial_itd_at_high_device_rates) {
+    using namespace audio;
+    ListenerPose lis;
+    lis.pos = m::vec3(0, 1.2f, 0);
+    lis.fwd = m::vec3(0, 0, -1);
+    lis.up = m::vec3(0, 1, 0);
+    const m::vec3 right(0.5f, 1.2f, 0.0f);
+    // The chain alone at 384 kHz, dry and with no head shadow: an impulse reaches the far ear
+    // exactly the ITD later (251.8 samples, between two samples).
+    const SpatialParams sp = computeSpatial(makeBasis(lis), right, 384000.0f);
+    SpatialTarget t;
+    t.gL = t.gR = 1.0f;
+    t.itd = sp.itd;
+    SpatialChain chain;
+    chain.begin(t, 512);
+    double sum = 0.0, moment = 0.0;
+    for (int i = 0; i < 512; ++i) {
+        float l = 0.0f, r = 0.0f, room = 0.0f;
+        chain.tick(i == 0 ? 1.0f : 0.0f, l, r, room);
+        sum += l;
+        moment += double(i) * l;
+    }
+    const double arrival = sum > 0.0 ? moment / sum : -1.0;
+    std::fprintf(stderr, "  384 kHz: ITD %.2f samples, impulse at the far ear after %.2f samples\n", sp.itd, arrival);
+    CHECK(sp.itd > 250.0f);
+    CHECK(std::fabs(arrival - double(sp.itd)) < 0.01);
+    // The whole mixer at 192 kHz: the left ear lags by ~126 samples (plus the far-ear shadow's delay).
+    Mixer mx(3u);
+    mx.prepare(192000.0f);
+    mx.setVolumes(1.0f, 1.0f, 1.0f);
+    mx.setAmbienceEnabled(false, true);
+    mx.setRoomEnabled(false);
+    mx.setListener(lis);
+    for (int v = 0; v < bankVariants(Sfx::PiecePlace); ++v) {
+        SoundBuffer* b = new SoundBuffer();
+        b->samples = synthesize(Sfx::PiecePlace, 3u + uint32_t(v));
+        b->sfx = int(Sfx::PiecePlace);
+        b->variant = v;
+        mx.install(b);
+    }
+    PlayRequest req;
+    req.sfx = Sfx::PiecePlace;
+    req.pos = right;
+    CHECK(mx.play(req));
+    std::vector<float> out(size_t(0.3f * 192000.0f) * 2);
+    mx.process(out.data(), int(out.size() / 2));
+    int bestLag = 0;
+    double best = -1e30;
+    for (int lag = -160; lag <= 160; ++lag) {
+        double s = 0;
+        for (size_t i = 200; i + 200 < out.size() / 2; ++i) s += double(out[2 * i + 1]) * out[2 * (size_t(long(i) + lag))];
+        if (s > best) {
+            best = s;
+            bestLag = lag;
+        }
+    }
+    std::fprintf(stderr, "  192 kHz mixer: left-ear lag %d samples\n", bestLag);
+    CHECK(bestLag >= 120 && bestLag <= 140);
+}
+
 TEST(audio_repeated_triggers_differ) {
     using namespace audio;
     Mixer m(42u);

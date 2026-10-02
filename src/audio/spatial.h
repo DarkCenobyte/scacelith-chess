@@ -106,13 +106,13 @@ inline SpatialTarget spatialTarget(const Basis& b, bool spatial, m::vec3 src, fl
 
 // Per-voice state of the spatial chain shared by the effect voices and the speech voices: the
 // block targets are ramped linearly per sample; the hall send is taken pre-filter and pre-pan, then
-// behind/air low-pass, ITD (64-sample ring, clamped to 60 samples: the full Woodworth range up to
-// ~91 kHz, shortened for far-lateral sources above), far-ear head shadow and the per-ear gains.
+// behind/air low-pass, ITD (256-sample ring, clamped to 252 samples: the full Woodworth range, 251.8
+// samples at most, up to the 384 kHz device rate limit), far-ear head shadow and the per-ear gains.
 struct SpatialChain {
     float gL = 0, gR = 0, itd = 0, shL = 0, shR = 0, lp = 0, sendG = 0;
     float dgL = 0, dgR = 0, dItd = 0, dShL = 0, dShR = 0, dLp = 0, dSend = 0;
     float lpZ = 0, zL = 0, zR = 0;
-    float ring[64] = {};
+    float ring[256] = {};
     uint32_t w = 0;
     bool fresh = true;  // the next begin() jumps to its targets instead of ramping
 
@@ -133,14 +133,14 @@ struct SpatialChain {
         gL += dgL; gR += dgR; itd += dItd; shL += dShL; shR += dShR; lp += dLp; sendG += dSend;
         room += s * sendG;
         lpZ = s + lp * (lpZ - s);
-        ring[w & 63u] = lpZ;
+        ring[w & 255u] = lpZ;
         ++w;
         float sl = lpZ, sr = lpZ;
         if (itd != 0.0f) {
-            float dd = std::min(std::fabs(itd), 60.0f);
+            float dd = std::min(std::fabs(itd), 252.0f);
             int i0 = int(dd);
             float fr = dd - float(i0);
-            float a = ring[(w - 1u - uint32_t(i0)) & 63u], b = ring[(w - 2u - uint32_t(i0)) & 63u];
+            float a = ring[(w - 1u - uint32_t(i0)) & 255u], b = ring[(w - 2u - uint32_t(i0)) & 255u];
             float delayed = a + (b - a) * fr;
             if (itd > 0.0f) sl = delayed; else sr = delayed;
         }
