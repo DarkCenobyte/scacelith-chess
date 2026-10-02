@@ -3688,10 +3688,11 @@ TEST(net_tls_pinning_manual) {
 // Live check against a real dedicated server (opt-in). dedicated-server/tools/live-cpp-check.js
 // starts a server (self-signed certificate, HTTPS API and WSS on one port, proof of work for
 // registration), a Node bot queued in 3+2, then runs:
-//   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password> ./scacelith_tests net_live
+//   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password> ./scacelith_tests net_live_server_game
 // This client registers, logs in, connects, queues rated 3+2, plays legal moves for 12 plies
-// (posHash from its own chess::Position FEN) and resigns; the result and the rating change must
-// come back from the server.
+// (posHash from its own chess::Position FEN) and resigns; the result and the rating update must
+// come back from the server. The account API has its own live check
+// (tests/net_live_account_tests.cpp).
 // =============================================================================================
 TEST(net_live_server_game) {
     const char* env = std::getenv("SCACELITH_NET_LIVE");
@@ -3799,7 +3800,11 @@ TEST(net_live_server_game) {
     CHECK(waitEvent(c, net::Event::Kind::RatingUpdate, ev, 10000, &seen));
     const net::Event::Rating& mine = you == 0 ? ev.ratingWhite : ev.ratingBlack;
     std::fprintf(stderr, "  rating %d -> %d (games %d)\n", mine.before, mine.after, mine.games);
-    CHECK(mine.after < mine.before);
+    // A new account's loss before its first draw or win counts for neither player's rating
+    // (dedicated-server/docs/DESIGN.md, ratings, "Zero score"): the update comes, the game is
+    // counted, the rating stays.
+    CHECK_EQ(mine.games, 1);
+    CHECK_EQ(mine.after, mine.before);
     c.logout();
     waitEvent(c, net::Event::Kind::LogoutResult, ev, 5000, &seen);
     c.disconnect();
