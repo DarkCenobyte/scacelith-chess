@@ -33,6 +33,7 @@ constexpr int kSilenceMs = 10000;          // nothing received for this long: th
 constexpr int kMaxPendingHandshakes = 4;
 constexpr size_t kMaxClosing = 4;          // refused or flooding links lingering (beyond, the oldest is closed)
 constexpr int kMaxFailedHandshakes = 10;   // wrong codes per hosted game, then the host stops listening
+constexpr int kMaxConnectionLogs = 10;     // "connection from" lines a second (anyone may connect), then a count
 constexpr int kMaxMsgPerSec = 20;          // announced in Welcome; twice as many closes the link (Gestures aside)
 constexpr int kGestureRate = 10;           // Gestures per second each way (Welcome.gestureRate)...
 constexpr int kGestureBurst = 20;          // ...with bursts up to this many (Welcome.gestureBurst)
@@ -508,6 +509,8 @@ private:
     std::unique_ptr<direct::Authority> auth_;
     ClientView view_;
     int failedHandshakes_ = 0;
+    int64_t connLogWindow_ = 0;     // the second the "connection from" lines are counted in
+    int connLogged_ = 0, connUnlogged_ = 0;
     bool quit_ = false;
     uint32_t pingNonce_ = 0;
     std::map<uint32_t, int64_t> pingSent_;
@@ -660,6 +663,7 @@ private:
                 dispatch(out);
             }
             if (listener_ != sock::kInvalid && ps.readable(listener_)) acceptAll(now);
+            if (connUnlogged_) endConnectionLog(now);
             serviceHandshakes(now, ps, out);
             if (guest_) serviceGuest(now, ps, out);
             for (size_t i = 0; i < closing_.size();) {
@@ -697,9 +701,28 @@ private:
             c->ch->start();
             c->deadline = now + kHandshakeMs;
             c->lastRecv = now;
-            LOGI("direct: connection from %s", peer.toString().c_str());
+            if (logConnection(now)) LOGI("direct: connection from %s", peer.toString().c_str());
             pending_.push_back(std::move(c));
         }
+    }
+
+    // Anyone who finds the open port can connect as fast as they like: at most
+    // kMaxConnectionLogs "connection from" lines a second; the others are counted, and the count
+    // is logged once that second is over.
+    bool logConnection(int64_t now) {
+        endConnectionLog(now);
+        if (connLogged_ >= kMaxConnectionLogs) {
+            ++connUnlogged_;
+            return false;
+        }
+        ++connLogged_;
+        return true;
+    }
+    void endConnectionLog(int64_t now) {
+        if (now - connLogWindow_ < 1000) return;
+        if (connUnlogged_) LOGI("direct: %d more connections", connUnlogged_);
+        connLogWindow_ = now;
+        connLogged_ = connUnlogged_ = 0;
     }
 
     void serviceHandshakes(int64_t now, const sock::PollSet& ps, direct::Authority::Output& out) {

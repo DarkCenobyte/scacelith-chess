@@ -2381,3 +2381,33 @@ TEST(direct_guest_message_of_unknown_type) {
     CHECK(raw.waitFor(pong, 5000));
     CHECK_EQ(pong.nonce, 7u);
 }
+
+TEST(direct_connection_log_paced) {
+    // Anyone who finds the open port can connect as fast as they like (here: 50 connections that
+    // send garbage, each refused at once): at most 10 "connection from" lines a second, then the
+    // count of the others. The guest still gets in.
+    Peer host, guest;
+    host.dm.host(hostOptions(300, 0, 1, "Alice"));
+    CHECK(waitUntil(host, guest, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
+    DirectInvite inv = host.dm.invite();
+    LogCapture log;
+    sock::Endpoint ep;
+    CHECK(sock::Endpoint::parse("127.0.0.1", inv.port, ep));
+    static const char junk[] = "GET / HTTP/1.1\r\n\r\n";
+    int refused = 0;
+    auto t0 = std::chrono::steady_clock::now();
+    for (int i = 0; i < 50; ++i) {
+        RawChannel c;
+        std::string err;
+        c.h = sock::connectWithTimeout(ep, 2000, err);
+        sock::sendSome(c.h, reinterpret_cast<const uint8_t*>(junk), sizeof junk - 1);
+        refused += c.waitClosed(2000);
+    }
+    const double seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+    CHECK_EQ(refused, 50);
+    guest.dm.join("127.0.0.1", inv.port, inv.code, "Bob");
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameSnapshot) && guest.count(Event::Kind::GameSnapshot); }));
+    const int lines = log.count("direct: connection from");
+    CHECK(lines >= 10 && lines <= 10 * (int(seconds) + 1) + 1);
+    CHECK(waitUntil(host, guest, [&] { return log.count("more connections") > 0; }, 4000));
+}
