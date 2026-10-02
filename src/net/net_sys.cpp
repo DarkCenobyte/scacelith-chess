@@ -3,6 +3,7 @@
 #include <cstdlib>
 
 #ifdef _WIN32
+#include <io.h>
 #include <windows.h>
 #include <shellapi.h>
 #include <shlobj.h>
@@ -95,6 +96,9 @@ bool writeFileAtomic(const std::string& path, const std::string& data, bool) {
     if (!f) return false;
     bool ok = fwrite(data.data(), 1, data.size(), f) == data.size();
     ok = fflush(f) == 0 && ok;
+    // The data on the disk before the rename, as fsync() on POSIX (MOVEFILE_WRITE_THROUGH covers the
+    // rename only). Best effort: some network drives and Wine host file systems refuse it.
+    if (ok) _commit(_fileno(f));
     fclose(f);
     if (ok) ok = MoveFileExW(tmp.c_str(), dst.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
     if (!ok) DeleteFileW(tmp.c_str());
