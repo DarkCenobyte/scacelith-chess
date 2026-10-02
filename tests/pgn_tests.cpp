@@ -695,6 +695,24 @@ TEST(pgn_stray_bracket_and_cr_line_ends) {
     if (open.games.size() == 2) CHECK(open.games[1].ok());
 }
 
+// A NUL byte is a control character wherever it stands, never part of a move or an evaluation.
+TEST(pgn_nul_bytes_are_control_characters) {
+    const std::string inputs[] = {std::string("1. e4\0 e5 *\n", 12), std::string("1. e4 +=\0\0 e5 *\n", 16),
+                                  std::string("1. e4 \0 e5 *\n", 13)};
+    const int columns[] = {6, 9, 7};
+    for (int i = 0; i < 3; ++i) {
+        auto res = pgn::read(inputs[i]);
+        if (const pgn::ParsedGame* g = only(res)) {
+            CHECK_EQ(g->error.message, std::string("unexpected control character"));
+            CHECK_EQ(g->error.line, 1);
+            CHECK_EQ(g->error.column, columns[i]);
+        }
+        auto sc = pgn::scan(inputs[i]);
+        CHECK_EQ(int(sc.games.size()), 1);
+        if (sc.games.size() == 1) CHECK_EQ(sc.games[0].error.text(), res.games.empty() ? "" : res.games[0].error.text());
+    }
+}
+
 // A scan can keep only some tags (the archive's listing): each name once, the reader's own tags
 // too, every tag still counted against maxTags, and the games found at the same places.
 TEST(pgn_scan_tag_filter) {

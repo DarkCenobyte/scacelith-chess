@@ -16,6 +16,7 @@ namespace {
 bool isDigit(char c) { return c >= '0' && c <= '9'; }
 bool isAlpha(char c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
 bool isSpace(char c) { return c == ' ' || c == '\t' || c == '\r' || c == '\n' || c == '\f' || c == '\v'; }
+bool inSet(const char* set, char c) { return c != '\0' && std::strchr(set, c) != nullptr; }  // never the terminator
 bool allDigits(const std::string& s) {
     if (s.empty()) return false;
     for (char c : s)
@@ -174,7 +175,7 @@ public:
             default:
                 if (c == '+' || c == '=' || (c == '-' && peek(1) != '-')) {
                     // Text evaluations of some exports ("+-", "=", "-/+"): ignored.
-                    while (p_ < s_.size() && std::strchr("+-=/", s_[p_])) advance();
+                    while (p_ < s_.size() && inSet("+-=/", s_[p_])) advance();
                     continue;
                 }
                 if (isAlpha(c) || isDigit(c) || c == '-' || (unsigned char)c >= 0x80) {
@@ -384,7 +385,7 @@ private:
                 for (int k = 0; k < 4; ++k) advance();
                 continue;
             }
-            const bool ok = isAlpha(c) || isDigit(c) || (unsigned char)c >= 0x80 || std::strchr("_+#=:-/", c);
+            const bool ok = isAlpha(c) || isDigit(c) || (unsigned char)c >= 0x80 || inSet("_+#=:-/", c);
             if (!ok) break;
             if (sym.size() < 40) sym += c;
             else tooLong = true;
