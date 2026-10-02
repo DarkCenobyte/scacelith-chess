@@ -4,7 +4,7 @@
 //   1. upload FrameUBO, LightingUBO, DrawData SSBO, lights
 //   2. atmosphere: sky-view LUT when the sun moved, sky cubemap + sky SH   (render-lighting)
 //   3. sun shadow cascades (static cache + dynamic casters)                (render-lighting)
-//   4. light probes / IBL bake when dirty (2 bounces)                      (render-lighting)
+//   4. light probes / IBL bake when dirty (probeBounces: 1-3 by preset)    (render-lighting)
 //   5. planar reflection passes + Gaussian mip chain                       (render-lighting)
 //   6. depth + normal + velocity prepass (frustum culled)
 //   7. PostFX::computeAO                                                   (render-post)
