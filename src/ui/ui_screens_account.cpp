@@ -177,28 +177,6 @@ void colourMark(vec2 c, int colour, float size = 15.0f) {
     }
 }
 
-// Scroll of a clipped area by the wheel over it (and PageUp / PageDown when 'keys').
-float wheelScroll(float& scroll, float& target, const Rect& area, float contentH, float step, bool opened, bool keys) {
-    float maxScroll = std::max(0.0f, contentH - area.h);
-    if (area.contains(im::mouse()) && im::wheel() != 0.0f) target -= im::wheel() * step;
-    if (keys && im::keyPressed(plat::KEY_PAGEDOWN)) target += area.h * 0.8f;
-    if (keys && im::keyPressed(plat::KEY_PAGEUP)) target -= area.h * 0.8f;
-    target = m::clamp(target, 0.0f, maxScroll);
-    scroll = opened ? target : std::min(im::approach(scroll, target, 16.0f), maxScroll);
-    return scroll;
-}
-// Scroll bar on the end side and fades at the edges (panel colour), as the saved games.
-void scrollDecor(const Rect& area, float scroll, float contentH) {
-    float maxScroll = contentH - area.h;
-    if (maxScroll <= 0.5f) return;
-    float bh = std::max(24.0f, area.h * area.h / contentH);
-    Rect bar = im::flip(area, Rect(area.r() + 10.0f, area.y + (area.h - bh) * (scroll / maxScroll), 2.0f, bh));
-    gfx::fill(bar, withAlpha(gold, 0.35f), 1.0f);
-    vec4 pc(0.05f, 0.043f, 0.039f, 0.95f), pz(0.05f, 0.043f, 0.039f, 0.0f);
-    if (scroll > 0.5f) gfx::fillV(Rect(area.x, area.y, area.w, 22.0f), pc, pz);
-    if (scroll < maxScroll - 0.5f) gfx::fillV(Rect(area.x, area.b() - 22.0f, area.w, 22.0f), pz, pc);
-}
-
 // A centred message in an area: a heading and a wrapped text under it.
 void message(const Rect& area, const std::string& head, const std::string& text, vec4 headColor) {
     TextStyle hs = style(font::FACE_TITLE, 24.0f, headColor, HAlign::Center, 0.14f);
@@ -306,20 +284,6 @@ net::GamesFilter filterOf(const State& s) {
 // The GifSaver's owner of a game of this server, and where its GIFs go.
 std::string gifOwner(const net::GameDetails& g) { return "history:" + ses().endpoint().origin() + "#" + num((long long)g.id); }
 std::string gifFolder() { return plat::appDataDirectory() + "gif/"; }
-
-// The end of a path that fits maxWidth ("…/gif/2026-09-26_164700_Magnus_T-vs-bob_812.gif"): the
-// file's name matters more than the folder's.
-std::string elideStart(const std::string& s, const TextStyle& st, float maxWidth) {
-    if (gfx::textWidth(s, st) <= maxWidth) return s;
-    std::u32string cps = uni::decode(s);
-    size_t lo = 0, hi = cps.size();
-    while (lo < hi) {  // the fewest characters cut from the start
-        size_t mid = (lo + hi) / 2;
-        if (gfx::textWidth(kEllipsis + uni::encode(cps.substr(mid)), st) <= maxWidth) hi = mid;
-        else lo = mid + 1;
-    }
-    return kEllipsis + uni::encode(cps.substr(lo));
-}
 
 std::string folderOf(const std::string& path) {
     const size_t cut = path.find_last_of("/\\");
@@ -1081,6 +1045,38 @@ AccountNav pageDelete(float t) {
 }
 
 }  // namespace
+
+// ---- Shared with the saved games (ui_library.cpp) ---------------------------------------------------
+float wheelScroll(float& scroll, float& target, const Rect& area, float contentH, float step, bool opened, bool keys) {
+    float maxScroll = std::max(0.0f, contentH - area.h);
+    if (area.contains(im::mouse()) && im::wheel() != 0.0f) target -= im::wheel() * step;
+    if (keys && im::keyPressed(plat::KEY_PAGEDOWN)) target += area.h * 0.8f;
+    if (keys && im::keyPressed(plat::KEY_PAGEUP)) target -= area.h * 0.8f;
+    target = m::clamp(target, 0.0f, maxScroll);
+    scroll = opened ? target : std::min(im::approach(scroll, target, 16.0f), maxScroll);
+    return scroll;
+}
+void scrollDecor(const Rect& area, float scroll, float contentH) {
+    float maxScroll = contentH - area.h;
+    if (maxScroll <= 0.5f) return;
+    float bh = std::max(24.0f, area.h * area.h / contentH);
+    Rect bar = im::flip(area, Rect(area.r() + 10.0f, area.y + (area.h - bh) * (scroll / maxScroll), 2.0f, bh));
+    gfx::fill(bar, withAlpha(gold, 0.35f), 1.0f);
+    vec4 pc(0.05f, 0.043f, 0.039f, 0.95f), pz(0.05f, 0.043f, 0.039f, 0.0f);
+    if (scroll > 0.5f) gfx::fillV(Rect(area.x, area.y, area.w, 22.0f), pc, pz);
+    if (scroll < maxScroll - 0.5f) gfx::fillV(Rect(area.x, area.b() - 22.0f, area.w, 22.0f), pz, pc);
+}
+std::string elideStart(const std::string& s, const TextStyle& st, float maxWidth) {
+    if (gfx::textWidth(s, st) <= maxWidth) return s;
+    std::u32string cps = uni::decode(s);
+    size_t lo = 0, hi = cps.size();
+    while (lo < hi) {  // the fewest characters cut from the start
+        size_t mid = (lo + hi) / 2;
+        if (gfx::textWidth(kEllipsis + uni::encode(cps.substr(mid)), st) <= maxWidth) hi = mid;
+        else lo = mid + 1;
+    }
+    return kEllipsis + uni::encode(cps.substr(lo));
+}
 
 // ==== The account pages' entry points ==================================================================
 void accountReset(AccountPage page) {

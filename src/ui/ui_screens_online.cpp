@@ -66,11 +66,6 @@ std::string T(const char* key) { return i18n::tr(key); }
 std::string L(const char* key) { return std::string(i18n::tr(key)) + "##" + key; }
 game::OnlineSession& ses() { return game::onlineSession(); }
 
-std::string spacedPlus(const std::string& label) {
-    size_t p = label.find('+');
-    if (p == std::string::npos) return label;
-    return label.substr(0, p) + "\xE2\x80\x89+\xE2\x80\x89" + label.substr(p + 1);
-}
 std::string trim(const std::string& s) {
     size_t a = s.find_first_not_of(" \t"), b = s.find_last_not_of(" \t");
     return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
@@ -175,6 +170,10 @@ void infoLine(const std::string& label, const std::string& value, const Rect& co
 namespace {
 
 using namespace detail::onl;
+using detail::baseTimeValues;
+using detail::clockText;
+using detail::nearestIndex;
+using detail::spacedPlus;
 using Kind = net::Event::Kind;
 
 // ---- Helpers ---------------------------------------------------------------------------------------
@@ -188,28 +187,6 @@ std::string tcLabel(int baseSec, int incSec) {
         return std::string(b);
     }();
     return base + "+" + std::to_string(incSec);
-}
-const std::vector<int>& baseTimeValues() {
-    static std::vector<int> v = [] {
-        std::vector<int> r;
-        for (int s = 15; s < 180; s += 15) r.push_back(s);
-        for (int s = 180; s < 600; s += 30) r.push_back(s);
-        for (int s = 600; s < 3600; s += 60) r.push_back(s);
-        for (int s = 3600; s <= 10800; s += 300) r.push_back(s);
-        return r;
-    }();
-    return v;
-}
-int nearestIndex(const std::vector<int>& v, int value) {
-    int best = 0;
-    for (int i = 0; i < int(v.size()); ++i)
-        if (std::abs(v[size_t(i)] - value) < std::abs(v[size_t(best)] - value)) best = i;
-    return best;
-}
-std::string clockText(int seconds) {
-    char buf[32];
-    std::snprintf(buf, sizeof(buf), "%d:%02d", seconds / 60, seconds % 60);
-    return buf;
 }
 std::string ratingText(const net::RatingInfo* r) {
     if (!r) return "1500?";

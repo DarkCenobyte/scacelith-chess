@@ -615,26 +615,6 @@ float detailsBody(const archive::Entry& e, Details& d, const Rect& area, const R
     return y - y0 + 10.0f;
 }
 
-// Scroll of a clipped area by the wheel over it.
-float wheelScroll(float& scroll, float& target, const Rect& area, float contentH, float step, bool opened) {
-    float maxScroll = std::max(0.0f, contentH - area.h);
-    if (area.contains(im::mouse()) && im::wheel() != 0.0f) target -= im::wheel() * step;
-    target = m::clamp(target, 0.0f, maxScroll);
-    scroll = opened ? target : std::min(im::approach(scroll, target, 16.0f), maxScroll);
-    return scroll;
-}
-// Scroll bar on the end side and fades at the edges (panel colour), as on the account pages.
-void scrollDecor(const Rect& area, float scroll, float contentH) {
-    float maxScroll = contentH - area.h;
-    if (maxScroll <= 0.5f) return;
-    float bh = std::max(24.0f, area.h * area.h / contentH);
-    Rect bar = im::flip(area, Rect(area.r() + 10.0f, area.y + (area.h - bh) * (scroll / maxScroll), 2.0f, bh));
-    gfx::fill(bar, withAlpha(gold, 0.35f), 1.0f);
-    vec4 pc(0.05f, 0.043f, 0.039f, 0.95f), pz(0.05f, 0.043f, 0.039f, 0.0f);
-    if (scroll > 0.5f) gfx::fillV(Rect(area.x, area.y, area.w, 22.0f), pc, pz);
-    if (scroll < maxScroll - 0.5f) gfx::fillV(Rect(area.x, area.b() - 22.0f, area.w, 22.0f), pz, pc);
-}
-
 // A centred message in an area: a heading in the title face (upper-cased) and an italic wrapped text
 // under it.
 void message(const Rect& area, const std::string& head, const std::string& text, vec4 headColor) {
@@ -691,19 +671,6 @@ std::string gifFileOf(const archive::Entry& e, const chess::pgn::Record& r) {
     return game::gifFileName(when, r.tag("White"), r.tag("Black"), id);
 }
 
-// The end of a path that fits maxWidth: the file's name matters more than the folder's.
-std::string elideStart(const std::string& s, const TextStyle& st, float maxWidth) {
-    if (gfx::textWidth(s, st) <= maxWidth) return s;
-    std::u32string cps = uni::decode(s);
-    size_t lo = 0, hi = cps.size();
-    while (lo < hi) {  // the fewest characters cut from the start
-        size_t mid = (lo + hi) / 2;
-        if (gfx::textWidth(kEllipsis + uni::encode(cps.substr(mid)), st) <= maxWidth) hi = mid;
-        else lo = mid + 1;
-    }
-    return kEllipsis + uni::encode(cps.substr(lo));
-}
-
 // The GIF's line in place of the folder's, centred at y: being made (spinner), saved (its path and
 // Open folder after it) or why not.
 void gifLine(const game::GifSaver& gif, const Rect& p, float maxW, float y) {
@@ -733,7 +700,7 @@ void gifLine(const game::GifSaver& gif, const Rect& p, float maxW, float y) {
     TextStyle ps = style(font::FACE_ITALIC, 20.0f, goldBright, im::startAlign());
     ps.dir = 0;
     const float leadW = gfx::textWidth(lead, ts);
-    const std::string path = elideStart(gif.path(), ps, std::max(80.0f, maxW - linkW - gap - leadW));
+    const std::string path = detail::onl::elideStart(gif.path(), ps, std::max(80.0f, maxW - linkW - gap - leadW));
     const float pathW = gfx::textWidth(path, ps), total = leadW + pathW + gap + linkW;
     // The note then its path in the reading direction, Open folder at the end.
     const float x0 = p.cx() - total * 0.5f;
@@ -894,7 +861,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
                 }
             }
             const float contentH = float(n) * rowH;
-            wheelScroll(s.scroll, s.target, area, contentH, rowH * 1.5f, opened);
+            detail::onl::wheelScroll(s.scroll, s.target, area, contentH, rowH * 1.5f, opened);
             // Rows on screen, and one more on each side so that the arrows can reach them.
             int first = std::max(0, int(std::floor(s.scroll / rowH)) - 1);
             int last = std::min(n - 1, int(std::ceil((s.scroll + area.h) / rowH)));
@@ -942,7 +909,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
             for (int i : {sel - 1, sel, sel + 1})
                 if (sel >= 0 && i >= 0 && i < n && (i < first || i > last)) row(i);
             gfx::popClip();
-            scrollDecor(area, s.scroll, contentH);
+            detail::onl::scrollDecor(area, s.scroll, contentH);
             if (!newSel.empty()) {
                 for (int i = 0; i < n; ++i)
                     if (entryKey(all[size_t(shown[size_t(i)])]) == newSel) select(i, false);
@@ -968,12 +935,12 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
                     measuredKey = s.details.key;
                     measured = 0.0f;
                 }
-                float scroll = wheelScroll(s.dScroll, s.dTarget, body, measured, 31.0f * 3.0f, false);
+                float scroll = detail::onl::wheelScroll(s.dScroll, s.dTarget, body, measured, 31.0f * 3.0f, false);
                 gfx::pushClip(body);
                 contentH = detailsBody(*cur, s.details, body, dcol, scroll);
                 gfx::popClip();
                 measured = contentH;
-                scrollDecor(body, scroll, contentH);
+                detail::onl::scrollDecor(body, scroll, contentH);
             }
         } else if (!cur) {
             TextStyle es = style(font::FACE_ITALIC, 22.0f, muted, im::startAlign());

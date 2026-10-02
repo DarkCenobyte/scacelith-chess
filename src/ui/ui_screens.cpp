@@ -179,17 +179,10 @@ void glyphCentered(uint32_t cp, vec2 c, float size, const TextStyle& base) {
 }
 
 // ---- Value tables -----------------------------------------------------------------------------------
-const std::vector<int>& baseTimeValues() {
-    static std::vector<int> v = [] {
-        std::vector<int> r;
-        for (int s = 15; s < 180; s += 15) r.push_back(s);
-        for (int s = 180; s < 600; s += 30) r.push_back(s);
-        for (int s = 600; s < 3600; s += 60) r.push_back(s);
-        for (int s = 3600; s <= 10800; s += 300) r.push_back(s);
-        return r;
-    }();
-    return v;
-}
+using detail::baseTimeValues;
+using detail::clockText;
+using detail::nearestIndex;
+using detail::spacedPlus;
 const std::vector<int>& moveTimeValues() {
     static const std::vector<int> v = {0, 100, 200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000, 7500, 10000, 15000, 20000, 30000};
     return v;
@@ -198,17 +191,6 @@ const std::vector<int>& nodeValues() {
     static const std::vector<int> v = {0, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000,
                                        1000000, 2000000, 5000000, 10000000, 20000000, 50000000};
     return v;
-}
-int nearestIndex(const std::vector<int>& v, int value) {
-    int best = 0;
-    for (int i = 0; i < int(v.size()); ++i)
-        if (std::abs(v[size_t(i)] - value) < std::abs(v[size_t(best)] - value)) best = i;
-    return best;
-}
-std::string clockText(int seconds) {
-    char buf[32];
-    std::snprintf(buf, sizeof(buf), "%d:%02d", seconds / 60, seconds % 60);
-    return buf;
 }
 std::string moveTimeText(int ms) {
     if (ms <= 0) return T("engine.no_limit");
@@ -236,11 +218,6 @@ std::string customClockSummary(const NewGameSetup& s) {
     if (s.customIncrementSeconds > 0) r = i18n::trf("tc.summary_increment", {r, std::to_string(s.customIncrementSeconds)});
     if (s.customDelaySeconds > 0) r = i18n::trf("tc.summary_delay", {r, std::to_string(s.customDelaySeconds)});
     return r;
-}
-std::string spacedPlus(const std::string& label) {
-    size_t p = label.find('+');
-    if (p == std::string::npos) return label;
-    return label.substr(0, p) + "\xE2\x80\x89+\xE2\x80\x89" + label.substr(p + 1);
 }
 
 // ---- Settings helpers -------------------------------------------------------------------------------
@@ -1508,6 +1485,34 @@ void openOptionsOnTab(int tab) {
 }
 void openOptionsPage() { openOptions(); }
 void dimBackground(float a) { dimScene(a); }
+
+const std::vector<int>& baseTimeValues() {
+    static std::vector<int> v = [] {
+        std::vector<int> r;
+        for (int s = 15; s < 180; s += 15) r.push_back(s);
+        for (int s = 180; s < 600; s += 30) r.push_back(s);
+        for (int s = 600; s < 3600; s += 60) r.push_back(s);
+        for (int s = 3600; s <= 10800; s += 300) r.push_back(s);
+        return r;
+    }();
+    return v;
+}
+int nearestIndex(const std::vector<int>& v, int value) {
+    int best = 0;
+    for (int i = 0; i < int(v.size()); ++i)
+        if (std::abs(v[size_t(i)] - value) < std::abs(v[size_t(best)] - value)) best = i;
+    return best;
+}
+std::string clockText(int seconds) {
+    char buf[32];
+    std::snprintf(buf, sizeof(buf), "%d:%02d", seconds / 60, seconds % 60);
+    return buf;
+}
+std::string spacedPlus(const std::string& label) {
+    size_t p = label.find('+');
+    if (p == std::string::npos) return label;
+    return label.substr(0, p) + "\xE2\x80\x89+\xE2\x80\x89" + label.substr(p + 1);
+}
 
 void screensBeginFrame(float dt) {
     for (auto& t : S.toasts) t.age += dt;
