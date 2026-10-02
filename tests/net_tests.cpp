@@ -1173,10 +1173,6 @@ TEST(net_transport_refuses_insecure) {
     CHECK(ran);
 }
 
-// A request that runs out of memory (a large answer while the system has none left) throws
-// std::bad_alloc out of the transport. The abort action it gave its CancelToken (closing its
-// socket or handle, locals of the call) is taken back all the same, so that a later cancel() (the
-// client's shutdown) never reaches a socket or handle that is gone; the token serves again.
 // A server that accepts the request and says nothing: the request and the WebSocket upgrade end
 // at their timeout (Wine's WinHTTP waits for the response headers with a timeout of its own).
 TEST(net_transport_silent_server_times_out) {
@@ -1312,6 +1308,10 @@ TEST(net_transport_cancel_waits_for_a_running_abort) {
     CHECK(!tok.hasAbort());
 }
 
+// A request that runs out of memory (a large answer while the system has none left) throws
+// std::bad_alloc out of the transport. The abort action it gave its CancelToken (closing its
+// socket or handle, locals of the call) is taken back all the same, so that a later cancel() (the
+// client's shutdown) never reaches a socket or handle that is gone; the token serves again.
 TEST(net_transport_cancel_cleared_when_out_of_memory) {
     if (!net::transportAvailable()) return;
     allocfail::Reset reset;
