@@ -39,6 +39,7 @@ constexpr int64_t kRenewEveryMs = 30 * 60 * 1000;
 constexpr size_t kMaxOutbox = 1 << 20;
 constexpr int64_t kDefaultGraceMs = 60000;
 constexpr size_t kMaxQueuedCommands = 32;
+constexpr size_t kMaxQueuedEvents = 4096;  // guest: events not polled yet (each holds the whole game)
 constexpr const char* kClientString = "Scacelith direct";
 constexpr const char* kTokenPrefix = "direct:";
 constexpr size_t kTokenMin = 16;
@@ -378,6 +379,10 @@ protected:
     void pushEvent(Event ev) {
         std::lock_guard<std::mutex> lk(m);
         events.push_back(std::move(ev));
+    }
+    size_t queuedEvents() const {
+        std::lock_guard<std::mutex> lk(m);
+        return events.size();
     }
     // The other player's Gesture: it replaces the one of the same game still waiting to be
     // polled (only the latest state matters), so the queue holds at most one per game.
@@ -1167,6 +1172,13 @@ private:
             return;
         }
         default: {
+            // A host that sends faster than the game thread polls cannot grow the queue without
+            // limit: the link is dropped instead (the reconnection brings a snapshot).
+            if (queuedEvents() >= kMaxQueuedEvents) {
+                LOGW("direct: the host floods events");
+                lost(now);
+                return;
+            }
             Event ev;
             if (view_.apply(msg.data(), msg.size(), ev)) pushEvent(std::move(ev));
             return;

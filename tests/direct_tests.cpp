@@ -1957,6 +1957,20 @@ struct RawChannel {
             if (!pumpOnce() || std::chrono::steady_clock::now() > end) return false;
         }
     }
+    // True when the other side closes the connection within ms (what it sends meanwhile is
+    // read and dropped).
+    bool waitClosed(int ms) {
+        auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
+        while (std::chrono::steady_clock::now() < end) {
+            sock::PollSet ps;
+            ps.add(h, true, false);
+            ps.wait(10);
+            uint8_t buf[4096];
+            bool closed = false;
+            if (ps.readable(h) && sock::recvSome(h, buf, sizeof buf, closed) < 0) return true;
+        }
+        return false;
+    }
 
 protected:
     // The channel's handshake over the connected socket 'h', within 5 s.
@@ -2179,4 +2193,55 @@ TEST(direct_gestures_outside_flood_limit) {
     CHECK(e && e->gameId == s.game && e->gesture.touch == 52);
     CHECK(e && e->gesture.ply >= 20 && e->gesture.ply <= 25);   // + what refilled meanwhile
     CHECK(host.dm.currentGame() && host.dm.currentGame()->blackConnected);
+}
+
+namespace {
+
+// The Welcome a host written by hand sends for the game of 'auth'.
+bool sendWelcome(RawHost& raw, const direct::Authority& auth) {
+    P::Welcome w;
+    w.proto = P::kProtocolVersion;
+    w.serverTime = sock::epochMs();
+    w.userId = 2;
+    w.username = "Bob";
+    w.serverName = "Alice";
+    w.heartbeatMs = 2000;
+    w.clientPingMs = 2000;
+    w.maxMsgPerSec = 40;
+    w.activeGame = auth.gameId();
+    w.gestureRate = 10;
+    w.gestureBurst = 20;
+    return raw.send(w);
+}
+
+}  // namespace
+
+TEST(direct_guest_drops_a_flooding_host) {
+    // A host that sends faster than the guest's game thread polls cannot grow its event queue
+    // (every event holds the whole game) without limit: the guest drops the link and comes back.
+    RawHost raw;
+    CHECK(raw.listen());
+    direct::Authority auth(direct::AuthorityConfig(), "Alice", "Bob", 1);
+    direct::Authority::Output out;
+    auth.startGame(sock::epochMs(), out);
+    CHECK(out.toGuest.size() == 1);
+    if (out.toGuest.size() != 1) return;
+    Peer guest;
+    guest.dm.join("127.0.0.1", raw.port, raw.code, "Bob");
+    P::Hello hello;
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    CHECK(sendWelcome(raw, auth) && raw.sendBytes(out.toGuest[0]));
+    // 6000 Errors while the game thread polls nothing (the link may drop meanwhile).
+    P::Error e;
+    e.code = P::ErrorCode::NotYourTurn;
+    e.game = auth.gameId();
+    std::vector<uint8_t> err;
+    P::encode(e, err);
+    for (int i = 0; i < 6000 && raw.sendBytes(err); ++i) {}
+    CHECK(raw.waitClosed(3000));
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));   // the guest comes back
+    guest.drain();
+    CHECK(guest.count(Event::Kind::ServerError) > 1000);
+    CHECK(guest.count(Event::Kind::ServerError) <= 4096);
+    CHECK(guest.hasConn(ConnState::Reconnecting));
 }
