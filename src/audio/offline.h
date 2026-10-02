@@ -20,7 +20,8 @@ struct OfflineStats {
 
 // Interleaved stereo, 48 kHz, through voices + hall + master chain; faded out at the end.
 std::vector<float> renderSfxOffline(Sfx s, float seconds, uint32_t seed = 1u, OfflineStats* stats = nullptr);
-// Same, at an explicit position/listener (tests of the 3D stage). ui = non-spatial UI bus.
+// Same chain at an explicit position/listener (tests of the 3D stage), without the end fade: always
+// spatial (UI sounds too, on the UI bus); withRoom = false: dry.
 std::vector<float> renderSfxOfflineAt(Sfx s, float seconds, m::vec3 pos, const ListenerPose& lis, uint32_t seed,
                                       bool withRoom = true);
 std::vector<float> renderAmbienceOffline(float seconds, uint32_t seed = 1u, OfflineStats* stats = nullptr);
