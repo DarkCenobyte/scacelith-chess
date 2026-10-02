@@ -118,7 +118,8 @@ struct Settings {
     // [direct] direct match (no server)
     int directPort = 47100;
     bool directUpnp = true;
-    int directTimeControl = 7;        // index into chess::timeControlPresets() (10+5), -1 = custom
+    static constexpr int kDefaultDirectTimeControl = 7;  // 10+5
+    int directTimeControl = kDefaultDirectTimeControl;    // index into chess::timeControlPresets(), -1 = custom
     int directBaseSeconds = 600, directIncrementSeconds = 5;
     int directColor = 0;              // host's colour: 0 random, 1 White, 2 Black
     bool directAutoPress = true;      // host: the robots press the clock by themselves

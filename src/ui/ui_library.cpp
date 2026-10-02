@@ -35,6 +35,7 @@
 #include <ctime>
 #include <exception>
 #include <future>
+#include <iterator>
 #include <unordered_map>
 
 namespace ui {
@@ -92,14 +93,18 @@ std::string contentKey(const archive::Entry& e) {
     return entryKey(e) + "@" + num(e.fileTimeMs) + "@" + num(static_cast<long long>(e.fileSize));
 }
 
-// Filter of the list: 0 every game, then one mode each.
+// Filter of the list: 0 every game, then one mode each (their labels in the same order).
 const archive::Mode kFilterModes[] = {archive::Mode::Play, archive::Mode::Coach, archive::Mode::HotSeat,
                                       archive::Mode::Direct, archive::Mode::Server, archive::Mode::Imported};
-constexpr int kFilterCount = 7;
+const char* const kFilterKeys[] = {"library.filter.all", "library.filter.play", "library.filter.coach", "library.filter.hotseat",
+                                   "library.filter.direct", "library.filter.server", "library.filter.imported"};
+constexpr int kFilterCount = 1 + int(std::size(kFilterModes));
+static_assert(std::size(kFilterKeys) == size_t(kFilterCount), "one label per filter");
 bool passes(int filter, archive::Mode m) { return filter <= 0 || filter >= kFilterCount || kFilterModes[filter - 1] == m; }
 std::vector<std::string> filterLabels() {
-    return {T("library.filter.all"), T("library.filter.play"), T("library.filter.coach"), T("library.filter.hotseat"),
-            T("library.filter.direct"), T("library.filter.server"), T("library.filter.imported")};
+    std::vector<std::string> labels;
+    for (const char* key : kFilterKeys) labels.push_back(T(key));
+    return labels;
 }
 
 std::string modeLabel(archive::Mode m) {

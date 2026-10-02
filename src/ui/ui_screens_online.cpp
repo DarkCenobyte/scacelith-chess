@@ -1442,7 +1442,7 @@ void pageDirectHost(float t) {
     float cg = 12.0f, cw = (colW - cg * float(cols - 1)) / float(cols), ch = 66.0f;
     float gy = top + 30.0f;
     int sel = gs.directTimeControl;
-    if (sel == 0 || sel >= n) sel = 7 < n ? 7 : n - 1;
+    if (sel == 0 || sel >= n) sel = std::min(game::Settings::kDefaultDirectTimeControl, n - 1);
     im::pushId("tc");
     for (int i = 1; i <= n; ++i) {
         bool isCustom = i == n;
