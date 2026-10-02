@@ -410,7 +410,7 @@ inline vec3 pocketPoint(const Skeleton& sk, const FingerPose& fp) {
 // Hand-local press point: between the index and middle pads.
 inline vec3 pressPoint(const Skeleton& sk, const FingerPose& fp) {
     vec3 a = fingerTip(sk, Side::Right, fp, Index), b = fingerTip(sk, Side::Right, fp, Middle);
-    return (a + b) * 0.5f + vec3(0, 0, 0);
+    return (a + b) * 0.5f;
 }
 inline vec3 mirrorX(vec3 v) { return vec3(-v.x, v.y, v.z); }
 inline vec3 handPoint(Side s, vec3 rightHandLocal) { return s == Side::Right ? rightHandLocal : mirrorX(rightHandLocal); }
@@ -809,7 +809,6 @@ struct Animator::Impl {
     bool rightIdle = true;                    // right hand free (no piece, at rest or idling)
     int leftChin = 0, rightChin = 0;          // idle motion currently driven towards the chin
     float taskGaze = 0.0f;                    // 0..1: gaze follows the running task's target
-    SpineParams spineOut;
     float thinkLean = 0, thinkLeanTarget = 0;
     float lean = 0, leanTarget = 0;           // setLean (0..1), smoothed in updateIdle
 
@@ -1059,7 +1058,6 @@ struct Animator::Impl {
 
     // ------------------------------------------------------------------------------------------
     // Planning helpers
-    HandSample current(Side s) const { return hands[s == Side::Right ? 1 : 0].motion.sample(time); }
     vec3 shoulderRest(Side s) const {
         vec3 p = sk->restOffset[Spine1] + sk->restOffset[Spine2] + sk->restOffset[armBone(s, ClavicleL)] + sk->restOffset[armBone(s, UpperArmL)];
         return p;
@@ -1418,8 +1416,6 @@ struct Animator::Impl {
     void checkRelease(const mat4& actual, vec3 wanted, int id);
     void liftForearm(Hand& h);
     void relaxWrist(Hand& h);
-    float lastReleaseError = 0.0f, lastReleaseTilt = 0.0f;
-    float planMsMax = 0.0f;         // longest task planning so far (diagnostics)
     void finishTask(std::vector<Event>& ev);
 
     // Pose evaluation at time t (hands from their motions), head from its state.
@@ -1472,7 +1468,6 @@ struct Animator::Impl {
         vec3 pagePinch{0, 0, 0};    // point between the thumb and index pads (page corner)
         vec3 pageAxis{0, 0, 1};     // thumb pad -> index pad
         float gripDist = 0.03f;     // tip -> index contact along the pen (where it is pinched on the table)
-        float err = 0.0f;           // worst pad miss of the finger solves (diagnostics)
     } grip;
     FingerPose tripodFingers(float ext) const;   // tripod with the pen pushed out by ext along -axis
     // Pen lying on the table at a frame (character space), pinched from above.
@@ -1496,11 +1491,9 @@ struct Animator::Impl {
         std::vector<PenKey> path;   // running path, character space
         bool penHeld = false;
         mat4 penTable;              // where the pen lies (solver world): initial / last pick / put frame
-        bool hasPenTable = false;
         vec3 rest{0, 0, 0};         // writing rest point on the paper (character space)
         float restYaw = 0.3f;       // pen azimuth there (see choosePenYaw)
         float suspendUntil = -1.0f; // the writing hand is busy shaking hands (left-handed player)
-        bool follow = false;        // the hand followed a path (tip lock) at the last evaluate
         std::function<vec3(float s)> corner;   // running page turn: corner (solver world)
         float lean = 0.0f;          // 0..1: the body leans towards the sheet while writing
         float look = 0.0f;          // 0..1: the eyes follow the pen
@@ -1511,7 +1504,7 @@ struct Animator::Impl {
     bool writingHandFree() const;   // no writing task, no pen, no handshake: idle behaviours allowed
     bool nextWriteBoundary(float& t) const;
     void stepWriting(std::vector<Event>& ev);   // starts or finishes the writing task at 'time'
-    void startWriteTask(const WriteTask& t, std::vector<Event>& ev);
+    void startWriteTask(const WriteTask& t);
     void finishWriteTask(std::vector<Event>& ev);
     void fireWriteDue(float upTo, std::vector<Event>& ev);
     void interruptWriting(std::vector<Event>& ev);   // the handshake takes the writing hand

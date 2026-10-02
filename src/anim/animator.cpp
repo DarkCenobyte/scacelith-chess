@@ -62,19 +62,6 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
     snapshotPieces();
     validateRests(&t);
 
-    auto heldBase = [&](const HandSample& s) {   // character-space base of the held piece
-        mat4 hand = toMat4(s.q, s.p);
-        mat4 attachC = h.heldAttach;             // attach is relative to the hand bone: same in any space
-        return transformPoint(hand * attachC, vec3(0));
-    };
-    (void)heldBase;
-    auto passVelocity = [&](vec3 p0, vec3 p1, vec3 p2, float T1, float T2, float horizScale) {
-        vec3 v = (p2 - p0) / std::max(0.05f, T1 + T2);
-        v.x *= horizScale;
-        v.z *= horizScale;
-        return v;
-    };
-
     switch (t.type) {
         case TaskType::Reach: {
             vec3 gi = gripInfo(t.pieceId);
@@ -157,7 +144,7 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
             if (next && next->type == TaskType::TakeCaptured && next->pieceId >= 0)
                 hover = std::max(hover, gripInfo(next->pieceId).x + 0.012f);   // stop above the victim
             // Wrist so the held piece base ends at dst + hover (same rotation as at grip time).
-            vec3 attachPos = h.heldId >= 0 ? h.heldAttach.translation() : rotate(conjugate(h.gripQ), -h.pinch.point) * 0.0f;
+            vec3 attachPos = h.heldId >= 0 ? h.heldAttach.translation() : vec3(0.0f);
             // The hand turns about the vertical towards the natural pinch azimuth of the
             // destination (keeps the wrist within its limits); the piece stays upright.
             float dyaw = h.heldId >= 0 ? wrapPi(pinchYawFor(dst + vec3(0, h.gripBelow, 0)) - pinchYawFor(h.gripPos)) * 0.9f : 0.0f;
@@ -367,7 +354,7 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
             quat q1 = handRot(R, yaw, 0.62f, 0.10f);
             FingerPose fp = fpHumanize(posePress(), 0.4f, 0.03f);
             if (h.capId >= 0) fp = withRingPinky(fp, posePocketClosed());
-            vec3 pp = pressPoint(*sk, fp) + vec3(0.0f, 0.0f, 0.0f);
+            vec3 pp = pressPoint(*sk, fp);
             // Pad contact: the pads are kPadRadius under the tip centre line.
             vec3 contact = lever + vec3(0, kPadRadius, 0);
             vec3 p1 = wristFor(contact, q1, pp);
@@ -436,8 +423,6 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
         case TaskType::Trace: planTrace(t, start, T, from, mo); break;
         case TaskType::Gesture: planGesture(t, start, T, from, mo); break;
     }
-    (void)tableC;
-    (void)passVelocity;
     h.motion = mo;
     if (debugLog)
         for (auto& sg : mo.segs) {
@@ -780,7 +765,6 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     // The writing hand at work: lean/turn a little towards the sheet, and keep it within reach
     // whatever the playing hand does.
     writingSpine(sp, hlMotion);
-    spineOut = sp;
     applySpine(pose, sp);
     fkChain(pose, Pelvis, Spine2);
 
@@ -892,7 +876,6 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     // Pen in the writing hand. While a path is followed the tip must be exactly on it: the pen
     // slides in the fingers by whatever the arm solve missed (sub-millimetre when within reach).
     evalPen = hl.pen;
-    wr.follow = hl.tipLock;
     if (debugLog && wr.running && wr.cur.type == WriteTaskType::TurnPage && (leftDiag[0] > 1e-3f || leftDiag[1] > 0.02f || leftDiag[2] > 0.02f))
         LOGI("anim: t=%.3f page turn: writing arm short %.1f mm, wrist clamp %.1f deg (flex %.0f dev %.0f deg), pronation %.0f deg clamped by %.1f deg", t,
              leftDiag[0] * 1000.0f, leftDiag[1] / DEG, leftDiag[3] / DEG, leftDiag[4] / DEG, leftDiag[5] / DEG, leftDiag[2] / DEG);
@@ -1130,11 +1113,10 @@ void Animator::Impl::startTask(const Task& t, std::vector<Event>& ev) {
     curArrive = curT;   // (gestures: set by their plan)
     curLook = true;
     trace.reset();
-    auto c0 = std::chrono::steady_clock::now();
+    const auto c0 = debugLog ? std::chrono::steady_clock::now() : std::chrono::steady_clock::time_point();
     planTask(t, time, curT);
-    float ms = std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - c0).count();
-    planMsMax = std::max(planMsMax, ms);
-    if (debugLog) LOGI("anim: task %d planned in %.2f ms", int(t.type), ms);
+    if (debugLog)
+        LOGI("anim: task %d planned in %.2f ms", int(t.type), std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - c0).count());
     Event e;
     e.type = EventType::TaskStarted;
     e.pieceId = t.pieceId;
@@ -1155,8 +1137,6 @@ static mat4 uprightAt(const mat4& mm, vec3 pos) {
 void Animator::Impl::checkRelease(const mat4& actual, vec3 wanted, int id) {
     float off = length(actual.translation() - wanted);
     float tilt = std::acos(clamp(transformDir(actual, vec3(0, 1, 0)).y, -1.0f, 1.0f));
-    lastReleaseError = off;
-    lastReleaseTilt = tilt;
     if (off > 0.004f || tilt > 0.06f || debugLog)
         LOGW("anim: piece %d released %.1f mm / %.1f deg away from the requested placement (reach short %.1f mm, wrist clamp %.1f deg "
              "flex %.0f dev %.0f, pronation clamp %.1f deg)",
@@ -1178,7 +1158,6 @@ void Animator::Impl::fireDue(float upTo, std::vector<Event>& ev) {
             // The handshake laid the writing hand's pen down.
             wr.penHeld = false;
             wr.penTable = shakePutFrame;
-            wr.hasPenTable = true;
             out.pieceId = -1;
             out.transform = shakePutFrame;
             out.position = shakePutFrame.translation();

@@ -332,7 +332,6 @@ void Animator::Impl::initWriting() {
         vec3 tipC(layout::SCORESHEET_X + layout::SCORESHEET_WIDTH * 0.5f + 0.03f, layout::TABLE_TOP_Y + r - pelvisWorld.y, padZ + 0.07f);
         mat4 penC = toMat4(fromTo(kY, vec3(0, 0, -1)), tipC);   // tip towards the board
         wr.penTable = root * penC;
-        wr.hasPenTable = true;
     }
 }
 
@@ -441,7 +440,6 @@ void Animator::Impl::solveGrip() {
         vec3 zt = safeNormalize(perp(vec3(-1, 0, 0), Dt), vec3(0, 0, 1));
         g.tucked = mirrorPen({fromMat3(mat3(cross(Dt, zt), Dt, zt)), tipT});
     }
-    g.err = err;
     LOGI("anim: pen grip solved (tripod fit %.1f mm, worst pad miss %.1f mm, pinch at %.1f mm from the tip)", fitErr * 1000.0f, err * 1000.0f,
          g.gripDist * 1000.0f);
     if (debugLog) {
@@ -1056,11 +1054,10 @@ void Animator::Impl::stepWriting(std::vector<Event>& ev) {
     }
     WriteTask t = wr.queue.front();
     wr.queue.pop_front();
-    startWriteTask(t, ev);
+    startWriteTask(t);
 }
 
-void Animator::Impl::startWriteTask(const WriteTask& t, std::vector<Event>& ev) {
-    (void)ev;
+void Animator::Impl::startWriteTask(const WriteTask& t) {
     Hand& h = left();
     bakeFollow(h);
     leftChin = 0;
@@ -1107,14 +1104,12 @@ void Animator::Impl::fireWriteDue(float upTo, std::vector<Event>& ev) {
             case WActPick:
                 wr.penHeld = true;
                 wr.penTable = wr.cur.frame;   // a handshake that needs the hand puts it back there
-                wr.hasPenTable = true;
                 out.transform = wr.cur.frame;   // it leaves the table exactly from there
                 out.position = wr.cur.frame.translation();
                 break;
             case WActPut:
                 wr.penHeld = false;
                 wr.penTable = wr.cur.frame;
-                wr.hasPenTable = true;
                 out.transform = wr.cur.frame;
                 out.position = wr.cur.frame.translation();
                 break;
