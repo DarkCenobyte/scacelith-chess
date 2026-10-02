@@ -327,10 +327,7 @@ size_t countOf(const std::string& text, const std::string& what) {
 
 TEST(net_live_account_api) {
     const char* env = std::getenv("SCACELITH_NET_LIVE_ACCOUNT");
-    if (!env || !net::transportAvailable()) {
-        std::fprintf(stderr, "  (SCACELITH_NET_LIVE_ACCOUNT not set: skipped)\n");
-        return;
-    }
+    if (!env || !net::transportAvailable()) SKIP("SCACELITH_NET_LIVE_ACCOUNT not set");
     std::vector<std::string> f;
     {
         std::string s = env, cur;
@@ -1291,10 +1288,7 @@ TEST(net_live_account_api) {
 // The harness then finds the notice mailed to the former address in the server's log.
 TEST(net_live_account_server_settings) {
     const char* env = std::getenv("SCACELITH_NET_LIVE_SETTINGS");
-    if (!env || !net::transportAvailable()) {
-        std::fprintf(stderr, "  (SCACELITH_NET_LIVE_SETTINGS not set: skipped)\n");
-        return;
-    }
+    if (!env || !net::transportAvailable()) SKIP("SCACELITH_NET_LIVE_SETTINGS not set");
     std::vector<std::string> f;
     {
         std::string s = env, cur;

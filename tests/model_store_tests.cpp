@@ -714,10 +714,7 @@ TEST(coach_voice_setting_round_trip) {
 // extracts and checks the nine files. SCACELITH_NET_TESTS=hub tries Hugging Face first.
 TEST(model_store_real_github) {
     const char* env = std::getenv("SCACELITH_NET_TESTS");
-    if (!env || !*env) {
-        std::fprintf(stderr, "  skipped (SCACELITH_NET_TESTS not set)\n");
-        return;
-    }
+    if (!env || !*env) SKIP("SCACELITH_NET_TESTS not set");
     TempFolder t("real");
     tts::ModelDownloader d(tts::supertonicManifest(), t.dir);
     tts::ModelDownloader::Options o;
@@ -753,10 +750,7 @@ TEST(model_store_real_github) {
 //   SCACELITH_SUPERTONIC_ARCHIVE=/path/to/sherpa-onnx-supertonic-3-tts-int8-2026-05-11.tar.bz2
 TEST(model_store_real_archive) {
     const char* archive = std::getenv("SCACELITH_SUPERTONIC_ARCHIVE");
-    if (!archive || !net::sys::fileExists(archive)) {
-        std::fprintf(stderr, "  skipped (SCACELITH_SUPERTONIC_ARCHIVE not set)\n");
-        return;
-    }
+    if (!archive || !net::sys::fileExists(archive)) SKIP("SCACELITH_SUPERTONIC_ARCHIVE not set");
     TempFolder t("realarchive");
     const tts::ModelManifest& m = tts::supertonicManifest();
     std::vector<std::string> names;

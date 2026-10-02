@@ -294,20 +294,15 @@ TEST(net_protocol_vectors) {
 TEST(net_protocol_shared_fixture) {
     std::string path;
     std::string text = readRepoFile("dedicated-server/test/fixtures/protocol-vectors.json", size_t(64) << 20, &path);
-    if (text.empty()) {
-        std::fprintf(stderr, "  (dedicated-server/test/fixtures/protocol-vectors.json not present: skipped)\n");
-        return;
-    }
+    if (text.empty()) SKIP("dedicated-server/test/fixtures/protocol-vectors.json not present");
     Value doc;
     net::json::Limits lim;
     lim.maxBytes = 64 << 20;
     lim.maxElements = 10000000;
     CHECK(net::json::parse(text, doc, nullptr, lim));
     for (const char* k : {"schemaHash", "schema_hash", "SCHEMA_HASH"})
-        if (doc[k].isNumber() && uint32_t(doc[k].asInt()) != pr::kSchemaHash) {
-            std::fprintf(stderr, "  shared fixture has another schema hash: skipped\n");
-            return;
-        }
+        if (doc[k].isNumber() && uint32_t(doc[k].asInt()) != pr::kSchemaHash)
+            SKIP("the shared fixture has another schema hash");
     auto hexOf = [](const Value& e) {
         for (const char* k : {"hex", "bytes", "encoded", "frame"})
             if (e[k].isString()) return e[k].asString();
@@ -1022,7 +1017,7 @@ TEST(net_transport_refuses_insecure) {
 // socket or handle, locals of the call) is taken back all the same, so that a later cancel() (the
 // client's shutdown) never reaches a socket or handle that is gone; the token serves again.
 TEST(net_transport_cancel_cleared_when_out_of_memory) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     allocfail::Reset reset;
     const std::string big(size_t(12) << 20, 'x');
     fakehttp::Server srv([&](const fakehttp::Request& q) {
@@ -1627,10 +1622,7 @@ bool waitState(net::OnlineClient& c, net::ConnState s, int timeoutMs, std::vecto
 }  // namespace
 
 TEST(net_online_client_loopback) {
-    if (!net::transportAvailable()) {
-        std::fprintf(stderr, "  (no transport in this build: skipped)\n");
-        return;
-    }
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     FakeServer srv;
     CHECK(srv.start());
     std::string credPath = tempCredentialPath("client");
@@ -1707,7 +1699,8 @@ TEST(net_online_client_loopback) {
         CHECK_EQ(ev.queueCategory, std::string("3+2"));
         CHECK(waitEvent(c, K::GameSnapshot, ev, 5000));
         CHECK_EQ(ev.game.id, uint64_t(77));
-        CHECK(c.currentGame() && c.currentGame()->id == 77);
+        REQUIRE(c.currentGame());
+        CHECK(c.currentGame()->id == 77);
         CHECK_EQ(c.currentGame()->black.name, std::string("bob"));
         CHECK_EQ(c.currentGame()->you, 0);
         chess::Position pos;
@@ -1734,7 +1727,8 @@ TEST(net_online_client_loopback) {
         int hellosBefore = srv.hellos.load(), infosBefore = srv.infos.load();
         srv.dropWebSockets();
         CHECK(waitState(c, net::ConnState::Reconnecting, 5000));
-        CHECK(c.currentGame() && c.currentGame()->id == 77);
+        REQUIRE(c.currentGame());
+        CHECK(c.currentGame()->id == 77);
         CHECK(waitEvent(c, K::GameSnapshot, ev, 10000));   // Welcome.activeGame, then the snapshot
         CHECK(c.state() == net::ConnState::Online);
         CHECK_EQ(srv.hellos.load(), hellosBefore + 1);
@@ -1794,7 +1788,7 @@ TEST(net_online_client_loopback) {
 }
 
 TEST(net_online_client_unreachable) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     // A port nobody listens on (any more): a network error, quickly.
     uint16_t port = 0;
     {
@@ -2394,7 +2388,7 @@ void runRigs(PacingRig* rigs, const char* const* tags, void (*const* scenarios)(
 }  // namespace
 
 TEST(net_online_client_pacing) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     constexpr int kRigs = 14;
     PacingRig rigs[kRigs];
     rigs[0].srv.clientPingMs.store(60000);
@@ -2416,7 +2410,7 @@ TEST(net_online_client_pacing) {
 // Live gestures through OnlineClient: paced and coalesced at Welcome's rate, for the current game
 // only, none without a relay (rate 0) or while the connection is down; the opponent's.
 TEST(net_online_client_gestures) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     constexpr int kRigs = 3;
     PacingRig rigs[kRigs];
     rigs[0].srv.gestureRate.store(10);
@@ -2525,7 +2519,7 @@ const char kGameDetails[] = R"({"id":812,"category":"3+2","rated":true,"timeCont
 }  // namespace
 
 TEST(net_account_games_history) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
     std::atomic<int> mode{0};
     AccountRig r("acct-games", [&](const fakehttp::Request& q) {
@@ -2652,7 +2646,7 @@ TEST(net_account_games_history) {
 // on an account call, on a public read asked again without the token (its answer is ok), and on a
 // call made after the token was erased.
 TEST(net_account_refused_session_signs_the_game_out) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
     auto handler = [](const fakehttp::Request& q) {
         if (q.has("authorization")) return jsonReply(401, R"({"error":"invalid_token","message":"Log in again."})");
@@ -2719,7 +2713,7 @@ TEST(net_account_refused_session_signs_the_game_out) {
 }
 
 TEST(net_account_game_details) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
     static_assert(chess::Knight == 2 && chess::Bishop == 3 && chess::Rook == 4 && chess::Queen == 5, "promotion numbering");
     std::atomic<int> mode{0};
@@ -2826,7 +2820,7 @@ TEST(net_account_game_details) {
 }
 
 TEST(net_account_pgn) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
     const std::string pgn =
         "[Event \"Fake rated 3+2\"]\n[Site \"127.0.0.1\"]\n[Date \"2026.09.21\"]\n[Round \"-\"]\n[White \"alice\"]\n"
@@ -2895,7 +2889,7 @@ TEST(net_account_pgn) {
 // their wait; a refused or missing session is "unauthorized" (sessionLost when refused), as for
 // every account call.
 TEST(net_account_gif) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
     // A 2x2 GIF (one frame, two colours): zero bytes inside, to see the body kept as binary.
     const unsigned char kTiny[] = {'G', 'I', 'F', '8', '9', 'a', 2, 0, 2, 0, 0x80, 0, 0, 0, 0, 0, 255, 255, 255,
@@ -3132,7 +3126,7 @@ TEST(net_account_gif) {
 // limit of its own: the history asked for meanwhile is answered at once, the GIF when it is ready.
 // Every answer names the server its command went to, the one in use when it was given.
 TEST(net_account_gif_beside_other_calls) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
     using SteadyClock = std::chrono::steady_clock;
     CHECK(net::OnlineClient::kGifTimeoutMs >= 2 * 45000);   // twice the server's default bound
@@ -3200,7 +3194,7 @@ TEST(net_account_gif_beside_other_calls) {
 // 4 MiB on net-http): the call still answers, a failure (invalid_response, its game named), so
 // that the GIF saver and the game page waiting for it end; the next calls are answered as usual.
 TEST(net_account_large_answers_out_of_memory) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
     allocfail::Reset reset;
     const std::string gif = "GIF89a" + std::string(size_t(12) << 20, '\0');
@@ -3259,7 +3253,7 @@ TEST(net_account_large_answers_out_of_memory) {
 }
 
 TEST(net_account_sessions) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
     AccountRig r("acct-sessions", [&](const fakehttp::Request& q) {
         if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
@@ -3320,7 +3314,7 @@ TEST(net_account_sessions) {
 }
 
 TEST(net_account_me_and_preferences) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
     std::atomic<int> mode{0};
     AccountRig r("acct-prefs", [&](const fakehttp::Request& q) {
@@ -3381,7 +3375,7 @@ TEST(net_account_me_and_preferences) {
 }
 
 TEST(net_account_email_change) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
     AccountRig r("acct-email", [&](const fakehttp::Request& q) {
         if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
@@ -3431,7 +3425,7 @@ TEST(net_account_email_change) {
 }
 
 TEST(net_account_export) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
     const std::string doc =
         R"({"format":"scacelith-account-export","version":1,"exportedAt":1790000000000,"server":{"name":"Fake","host":"127.0.0.1"},)"
@@ -3515,7 +3509,7 @@ TEST(net_account_export) {
 }
 
 TEST(net_account_delete) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
     AccountRig r("acct-delete", [&](const fakehttp::Request& q) {
         if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
@@ -3552,7 +3546,7 @@ TEST(net_account_delete) {
 
 // The realtime connection of a deleted account stops for good.
 TEST(net_account_delete_stops_realtime) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     FakeServer srv;
     CHECK(srv.start());
     std::string credPath = tempCredentialPath("acct-delete-rt");
@@ -3710,10 +3704,7 @@ bool runningUnderWine() {
 
 TEST(net_tls_pinning_manual) {
     const char* env = std::getenv("SCACELITH_NET_TLS_TEST");
-    if (!env || !net::transportAvailable()) {
-        std::fprintf(stderr, "  (SCACELITH_NET_TLS_TEST not set: skipped)\n");
-        return;
-    }
+    if (!env || !net::transportAvailable()) SKIP("SCACELITH_NET_TLS_TEST not set");
     std::string spec = env;
     size_t colon = spec.find(':');
     CHECK(colon != std::string::npos);
@@ -3790,10 +3781,7 @@ TEST(net_tls_pinning_manual) {
 // =============================================================================================
 TEST(net_live_server_game) {
     const char* env = std::getenv("SCACELITH_NET_LIVE");
-    if (!env || !net::transportAvailable()) {
-        std::fprintf(stderr, "  (SCACELITH_NET_LIVE not set: skipped)\n");
-        return;
-    }
+    if (!env || !net::transportAvailable()) SKIP("SCACELITH_NET_LIVE not set");
     std::vector<std::string> f;
     {
         std::string s = env, cur;

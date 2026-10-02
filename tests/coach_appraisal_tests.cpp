@@ -373,8 +373,9 @@ TEST(coach_appraisal_won_game) {
         std::snprintf(where, sizeof where, "won b%d", level);
         checkAppraisal(s, level, where);
         const std::string lv = ".b" + std::to_string(level);
-        CHECK(!s.empty() && s.front().line.key == "appraisal.open.win" + lv);
-        CHECK(!s.empty() && s.back().line.key == "appraisal.end" + lv);
+        REQUIRE(!s.empty());
+        CHECK(s.front().line.key == "appraisal.open.win" + lv);
+        CHECK(s.back().line.key == "appraisal.end" + lv);
         CHECK(s.front().look == Look::Player);
         CHECK(hasPrefix(s, "appraisal.improve."));
         if (level == 1) CHECK(hasKey(s, "appraisal.improve.clean.b1"));   // level 1: blunders only
