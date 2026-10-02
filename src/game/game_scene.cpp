@@ -1046,19 +1046,6 @@ bool GameScene::update(AppContext& ctx, float dt) {
         } else if (a == ui::MenuAction::StartGame) {
             // Against Stockfish, or two players on this PC (the page saved its choices).
             mode_ = setup_.opponent == 1 ? GameMode::HotSeat : GameMode::Play;
-            Settings& s = settings();
-            s.difficultyPreset = setup_.difficulty;
-            s.timeControlPreset = setup_.timeControl;
-            s.customBaseSeconds = setup_.customBaseSeconds;
-            s.customIncrementSeconds = setup_.customIncrementSeconds;
-            s.customDelaySeconds = setup_.customDelaySeconds;
-            s.customSkillLevel = setup_.skillLevel;
-            s.customLimitElo = setup_.limitElo;
-            s.customElo = setup_.elo;
-            s.customDepth = setup_.depth;
-            s.customMoveTimeMs = setup_.moveTimeMs;
-            s.customNodes = setup_.nodes;
-            s.save();
             state_ = State::FadeToGame;
             stateTime_ = 0.0f;
         } else if (a == ui::MenuAction::Quit) {
