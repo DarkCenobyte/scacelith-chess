@@ -905,6 +905,14 @@ struct OnlineClient::Impl {
     void tryConnect() {
         uint32_t gen = connectGen.load();
         rtCancel.reset();
+        // A command that came since rtLoop took the queue may stop this attempt (disconnect(),
+        // setServer()...), and its cancel() may have come before the reset above: it waits in
+        // rtQ (pushed before the cancel), so the attempt makes way for it. One pushed after this
+        // check is followed by a cancel() that the reset can no longer undo.
+        {
+            std::lock_guard<std::mutex> lk(mu);
+            if (stopping || !rtQ.empty()) return;
+        }
         const ServerEndpoint e = rt.ep;
         if (!e.valid()) { stopWanting(ConnState::Offline, "invalid_server"); return; }
         if (connState.load() != int(ConnState::Reconnecting)) setState(ConnState::Connecting);
@@ -1486,9 +1494,9 @@ void OnlineClient::setServer(const ServerEndpoint& ep) {
     impl_->ep = e;
     Impl* d = impl_.get();
     if (originChanged) {
-        // Nothing of the previous server survives: connection, game view, SSO, MFA step.
+        // Nothing of the previous server survives: connection, game view, SSO, MFA step. (The
+        // command goes before the cancel: see tryConnect.)
         d->connectGen.fetch_add(1);
-        d->rtCancel.cancel();
         d->realtime([d, e] {
             d->rt.wanted = false;
             d->dropSocket(1000);
@@ -1500,6 +1508,7 @@ void OnlineClient::setServer(const ServerEndpoint& ep) {
             d->rt.banUntil = 0;
             d->setState(ConnState::Offline);
         });
+        d->rtCancel.cancel();
         d->http([d] {
             d->ssoFinished();
             d->mfaToken.clear();
@@ -1999,12 +2008,12 @@ Event failedAnswer(Event::Kind kind, uint64_t gameId) {
 // the session of this game revoked.
 void OnlineClient::Impl::stopRealtime() {
     connectGen.fetch_add(1);
-    rtCancel.cancel();
     realtime([this] {
         rt.wanted = false;
         dropSocket(1000);
         setState(ConnState::Offline);
     });
+    rtCancel.cancel();   // after the command (see tryConnect)
 }
 
 void OnlineClient::fetchMyGames(uint64_t before, int limit, const GamesFilter& filter) {
@@ -2330,12 +2339,12 @@ void OnlineClient::connect() {
 void OnlineClient::disconnect() {
     Impl* d = impl_.get();
     d->connectGen.fetch_add(1);
-    d->rtCancel.cancel();
     d->realtime([d] {
         d->rt.wanted = false;
         d->dropSocket(1000);
         d->setState(ConnState::Offline);
     });
+    d->rtCancel.cancel();   // after the command (see tryConnect)
 }
 
 ConnState OnlineClient::state() const { return ConnState(impl_->connState.load()); }
