@@ -4,6 +4,7 @@
 #include "platform.h"
 #include "../gl/gl_context.h"
 #include "../core/log.h"
+#include "../net/net_sys.h"
 
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
@@ -11,8 +12,6 @@
 #include <GL/glx.h>
 #include <time.h>
 #include <unistd.h>
-#include <limits.h>
-#include <sys/stat.h>
 #include <sys/wait.h>
 #include <spawn.h>
 #include <cstring>
@@ -250,37 +249,10 @@ void setMouseCaptured(bool c) {
     setCursorVisible(g_cursorVisible);
 }
 
-std::string exeDirectory() {
-    char buf[PATH_MAX];
-    ssize_t n = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
-    if (n <= 0) return "./";
-    buf[n] = 0;
-    std::string s(buf);
-    return s.substr(0, s.find_last_of('/') + 1);
-}
-std::string userDataDirectory() {
-    const char* home = getenv("HOME");
-    if (!home) return exeDirectory();
-    std::string d = std::string(home) + "/.config/scacelith/";
-    mkdir((std::string(home) + "/.config").c_str(), 0755);
-    mkdir(d.c_str(), 0755);
-    return d;
-}
-// XDG base directories: data in $XDG_DATA_HOME (an absolute path), else ~/.local/share.
-std::string appDataDirectory() {
-    const char* xdg = getenv("XDG_DATA_HOME");
-    const char* home = getenv("HOME");
-    std::string base;
-    if (xdg && xdg[0] == '/') base = xdg;
-    else if (home && home[0]) base = std::string(home) + "/.local/share";
-    else return exeDirectory();
-    while (base.size() > 1 && base.back() == '/') base.pop_back();
-    for (size_t p = base.find('/', 1); p != std::string::npos; p = base.find('/', p + 1)) mkdir(base.substr(0, p).c_str(), 0755);
-    mkdir(base.c_str(), 0755);
-    std::string d = base + "/scacelith/";
-    mkdir(d.c_str(), 0755);
-    return d;
-}
+// The core library's folders (net::sys), so both layers agree: ~/.config/scacelith/ is private (0700).
+std::string exeDirectory() { return net::sys::exeDirectory(); }
+std::string userDataDirectory() { return net::sys::userDataDirectory(); }
+std::string appDataDirectory() { return net::sys::appDataDirectory(); }
 void messageBox(const char* title, const char* text) { LOGE("%s: %s", title, text); }
 uint64_t randomSeed() {
     timespec t;

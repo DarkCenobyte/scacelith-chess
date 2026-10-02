@@ -3,11 +3,11 @@
 #include "../gl/gl46.h"
 #include "../gl/gl_context.h"
 #include "../core/log.h"
+#include "../net/net_sys.h"
 
 #include <windows.h>
 #include <mmsystem.h>
 #include <shellapi.h>
-#include <shlobj.h>
 #include <algorithm>
 #include <cstring>
 #include <cstdio>
@@ -415,31 +415,11 @@ void setMouseCaptured(bool c) {
     applyCursor();
 }
 
-std::string exeDirectory() {
-    wchar_t w[MAX_PATH];
-    DWORD n = GetModuleFileNameW(nullptr, w, MAX_PATH);
-    char buf[MAX_PATH * 3];
-    int len = WideCharToMultiByte(CP_UTF8, 0, w, int(n), buf, int(sizeof(buf)) - 1, nullptr, nullptr);
-    buf[len > 0 ? len : 0] = 0;
-    std::string s(buf);
-    size_t p = s.find_last_of("\\/");
-    return p == std::string::npos ? std::string(".\\") : s.substr(0, p + 1);
-}
-
-std::string userDataDirectory() {
-    wchar_t w[MAX_PATH];
-    if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, w))) {
-        std::wstring dir = std::wstring(w) + L"\\scacelith";
-        CreateDirectoryW(dir.c_str(), nullptr);
-        char buf[MAX_PATH * 3];
-        int n = WideCharToMultiByte(CP_UTF8, 0, dir.c_str(), -1, buf, sizeof(buf), nullptr, nullptr);
-        if (n > 0) return std::string(buf) + "\\";
-    }
-    return exeDirectory();
-}
-
-// The same folder as userDataDirectory() on Windows (Roaming application data).
-std::string appDataDirectory() { return userDataDirectory(); }
+// The core library's folders (net::sys), so both layers agree, an exe path of MAX_PATH characters
+// or more included. appDataDirectory() is the same folder as userDataDirectory() (Roaming).
+std::string exeDirectory() { return net::sys::exeDirectory(); }
+std::string userDataDirectory() { return net::sys::userDataDirectory(); }
+std::string appDataDirectory() { return net::sys::appDataDirectory(); }
 
 void messageBox(const char* title, const char* text) {
     wchar_t wt[256], wx[2048];

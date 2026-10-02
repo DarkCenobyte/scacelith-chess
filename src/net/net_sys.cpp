@@ -41,11 +41,17 @@ std::string narrow(const wchar_t* w) {
 }  // namespace
 
 std::string exeDirectory() {
-    wchar_t w[MAX_PATH];
-    DWORD n = GetModuleFileNameW(nullptr, w, MAX_PATH);
-    if (n == 0 || n >= MAX_PATH) return ".\\";
-    w[n] = 0;
-    std::string s = narrow(w);
+    // A path of MAX_PATH characters or more (long paths enabled) is read again into a larger
+    // buffer, up to the 32767 characters of the longest path.
+    std::wstring w(MAX_PATH, L'\0');
+    DWORD n = GetModuleFileNameW(nullptr, &w[0], DWORD(w.size()));
+    while (n >= w.size() && w.size() <= 32767) {
+        w.resize(w.size() * 2);
+        n = GetModuleFileNameW(nullptr, &w[0], DWORD(w.size()));
+    }
+    if (n == 0 || n >= w.size()) return ".\\";
+    w.resize(n);
+    std::string s = narrow(w.c_str());
     size_t p = s.find_last_of("\\/");
     return p == std::string::npos ? std::string(".\\") : s.substr(0, p + 1);
 }
@@ -60,7 +66,7 @@ std::string userDataDirectory() {
     return exeDirectory();
 }
 
-std::string appDataDirectory() { return userDataDirectory(); }   // Roaming, as plat::appDataDirectory()
+std::string appDataDirectory() { return userDataDirectory(); }   // Roaming
 
 bool fileExists(const std::string& path) {
     DWORD a = GetFileAttributesW(widen(path).c_str());
