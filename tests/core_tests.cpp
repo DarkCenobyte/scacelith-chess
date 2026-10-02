@@ -6,9 +6,12 @@
 #include "net/net_sys.h"
 
 #include <cstdio>
+#include <fstream>
+#include <iterator>
 #include <string>
 #include <vector>
 #ifndef _WIN32
+#include <sys/stat.h>
 #include <unistd.h>
 #endif
 
@@ -51,6 +54,35 @@ TEST(ini_value_newlines_stay_on_one_line) {
     CHECK_EQ(a.getString("online.category"), std::string("5+3\nhost = attacker.example\r\n[display]\nwidth = 7"));
     std::remove("/tmp/scacelith_ini_lines.ini");
 }
+
+#ifndef _WIN32
+// save() writes a new file and renames it over the old one, which is never truncated in place (a
+// crash midway would leave it empty): a reader that opened the old file still reads it whole.
+TEST(ini_save_replaces_the_file) {
+    const std::string path = "/tmp/scacelith_ini_replace.ini", tmp = path + ".tmp";
+    rmdir(tmp.c_str());
+    IniFile a;
+    a.setInt("display.width", 1920);
+    CHECK(a.save(path));
+    std::ifstream before(path);
+    a.setInt("display.width", 1280);
+    CHECK(a.save(path));
+    std::string old((std::istreambuf_iterator<char>(before)), std::istreambuf_iterator<char>());
+    CHECK(old.find("width = 1920") != std::string::npos);
+    CHECK(!net::sys::fileExists(tmp));
+    IniFile b;
+    CHECK(b.load(path));
+    CHECK_EQ(b.getInt("display.width"), 1280);
+    // No new file can be made there (here a folder named path.tmp): written in place, as before.
+    CHECK(mkdir(tmp.c_str(), 0755) == 0);
+    a.setInt("display.width", 800);
+    CHECK(a.save(path));
+    CHECK(b.load(path));
+    CHECK_EQ(b.getInt("display.width"), 800);
+    CHECK(rmdir(tmp.c_str()) == 0);   // left as it was
+    std::remove(path.c_str());
+}
+#endif
 
 // Every byte of the PNG writer's output. Its deflate blocks hold 65535 bytes: 28x771 RGB fills
 // exactly one, 1x16384 RGB overflows it by one byte; all-0xFF pixels are Adler-32's worst case.
