@@ -107,9 +107,17 @@ bool dirExists(const std::string& path) {
 bool flushToDisk(FILE* f) { return fflush(f) == 0 && _commit(_fileno(f)) == 0; }
 Place placeNew(const std::string& tmp, const std::string& dst, std::string& err) {
     // Without MOVEFILE_REPLACE_EXISTING the move fails when the name is taken: never a replacement.
-    if (MoveFileExW(widen(tmp).c_str(), widen(dst).c_str(), MOVEFILE_WRITE_THROUGH)) return Place::Ok;
-    DWORD e = GetLastError();
-    if (e == ERROR_ALREADY_EXISTS || e == ERROR_FILE_EXISTS) return Place::Exists;
+    // An antivirus or the search indexer may hold the file just written for a few milliseconds: the
+    // move is tried again meanwhile (10, 20, 40 and 80 ms later) before the save gives up.
+    const std::wstring from = widen(tmp), to = widen(dst);
+    for (int attempt = 0;; ++attempt) {
+        if (MoveFileExW(from.c_str(), to.c_str(), MOVEFILE_WRITE_THROUGH)) return Place::Ok;
+        DWORD e = GetLastError();
+        if (e == ERROR_ALREADY_EXISTS || e == ERROR_FILE_EXISTS) return Place::Exists;
+        const bool held = e == ERROR_ACCESS_DENIED || e == ERROR_SHARING_VIOLATION || e == ERROR_LOCK_VIOLATION;
+        if (!held || attempt == 4) break;
+        Sleep(DWORD(10) << attempt);
+    }
     err = "cannot name the file (" + lastError() + ")";
     return Place::Failed;
 }

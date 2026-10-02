@@ -12,6 +12,7 @@
 #include <vector>
 
 #ifdef _WIN32
+#include <thread>
 #include <windows.h>
 #else
 #include <dirent.h>
@@ -581,3 +582,38 @@ TEST(archive_load_reads_the_game_only) {
     CHECK_EQ(l.record.tag("Event"), std::string("Small"));
     CHECK_EQ(int(l.record.plies.size()), 2);
 }
+
+#ifdef _WIN32
+// An antivirus or the search indexer opens a file just written, without FILE_SHARE_DELETE, for a
+// few milliseconds: the save waits for it to let go instead of failing.
+TEST(archive_save_waits_for_a_file_held_for_a_moment) {
+    TempFolder tmp("held");
+    CHECK(archive::makeFolder(tmp.path));
+    std::atomic<bool> held{false}, done{false};
+    std::thread scanner([&] {
+        const auto start = std::chrono::steady_clock::now();
+        while (!done && std::chrono::steady_clock::now() - start < std::chrono::seconds(10)) {
+            WIN32_FIND_DATAW fd;
+            HANDLE find = FindFirstFileW(wide(tmp.file(".scacelith-save-*.tmp")).c_str(), &fd);
+            if (find == INVALID_HANDLE_VALUE) continue;
+            FindClose(find);
+            HANDLE h = CreateFileW(wide(tmp.file(utf8(fd.cFileName))).c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                                   nullptr, OPEN_EXISTING, 0, nullptr);
+            if (h == INVALID_HANDLE_VALUE) continue;
+            held = true;
+            Sleep(60);
+            CloseHandle(h);
+            return;
+        }
+    });
+    const std::string text(size_t(8) << 20, 'x');  // long enough to be caught before its rename
+    archive::SaveResult r = archive::saveFile(tmp.path, "held.pgn", text);
+    done = true;
+    scanner.join();
+    if (!r.ok) std::fprintf(stderr, "  save: %s\n", r.error.c_str());
+    CHECK(r.ok);
+    if (!held) std::fprintf(stderr, "  the temporary file was renamed before it could be held\n");
+    CHECK_EQ(r.path, tmp.file("held.pgn"));
+    CHECK_EQ(int(TempFolder::names(tmp.path).size()), 1);
+}
+#endif
