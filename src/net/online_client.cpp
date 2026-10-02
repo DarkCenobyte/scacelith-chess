@@ -154,6 +154,8 @@ constexpr size_t kOffsetSamples = 8;            // clock offset: lowest round tr
 constexpr auto kOffsetMaxAge = std::chrono::minutes(5);   // ...taken in the last 5 minutes
 constexpr auto kInfoReuse = std::chrono::minutes(10);     // /info answer reused on reconnection
 constexpr uint16_t kCloseServerFull = 4006;     // 4000 + ErrorCode::ServerFull (no CloseCode entry)
+constexpr int kLoggedBadFrames = 5;             // frames ignored or malformed: logged per connection,
+                                                // the others counted when it ends
 // The former port of the official server (HTTPS API and WSS): its saved sessions move to the
 // current official origin (CredentialStore::addOriginMove).
 constexpr uint16_t kLegacyOfficialPort = 44664;
@@ -362,6 +364,7 @@ struct OnlineClient::Impl {
         int lastFatal = 0;                                // ErrorCode of the last fatal Error
         bool shutdownNotice = false;                      // Notice{ServerShutdown} on this connection
         bool restarting = false;                          // lost to a shutdown, no Welcome or 503 since
+        int badFrames = 0;                                // ignored or malformed on this connection
         // The /api/v1/info answer the last connection attempt used. proven: a connection built on
         // it reached Welcome; at: when it was read, or when such a connection last ended.
         struct Info {
@@ -890,6 +893,9 @@ struct OnlineClient::Impl {
             std::unique_ptr<WebSocket> ws = std::move(rt.ws);
             ws->close(code);
         }
+        if (rt.badFrames > kLoggedBadFrames)
+            LOGW("net: %d more frames from the server ignored or malformed", rt.badFrames - kLoggedBadFrames);
+        rt.badFrames = 0;
         rt.welcomed = false;
         rt.samples.clear();
         rt.rttEma = -1;
@@ -1124,11 +1130,14 @@ struct OnlineClient::Impl {
         const uint8_t* p = b.data();
         size_t n = b.size();
         if (!pr::peekType(p, n, t) || pr::isClientType(uint8_t(t))) {
-            LOGW("net: ignoring a frame of unknown type (%u bytes)", unsigned(n));
+            if (++rt.badFrames <= kLoggedBadFrames) LOGW("net: ignoring a frame of unknown type (%u bytes)", unsigned(n));
             return;
         }
         rt.lastRecv = Clock::now();
-        auto bad = [&] { LOGW("net: malformed %s from the server (%u bytes)", pr::messageName(t), unsigned(n)); };
+        auto bad = [&] {
+            if (++rt.badFrames <= kLoggedBadFrames)
+                LOGW("net: malformed %s from the server (%u bytes)", pr::messageName(t), unsigned(n));
+        };
         switch (t) {
         case pr::MsgType::Welcome: {
             pr::Welcome m;

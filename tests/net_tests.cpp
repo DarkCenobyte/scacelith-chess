@@ -29,6 +29,7 @@
 #include "alloc_fail.h"
 #include "http_fake.h"
 #include "chess/chess.h"
+#include "core/log.h"
 #include "game/online_account.h"
 #include "net/credential_store.h"
 #include "net/crypto.h"
@@ -1380,6 +1381,18 @@ public:
         for (Sock s : ws_) sendMsg(s, g);
     }
 
+    // Frames the client ignores on every WebSocket, count of each kind: a client message type,
+    // and a Welcome without its fields.
+    void sendBadFrames(int count) {
+        std::lock_guard<std::mutex> lk(mu_);
+        const uint8_t clientType[1] = {0x01}, shortWelcome[1] = {uint8_t(pr::MsgType::Welcome)};
+        for (Sock s : ws_)
+            for (int i = 0; i < count; ++i) {
+                sendFrame(s, 0x2, clientType, 1);
+                sendFrame(s, 0x2, shortWelcome, 1);
+            }
+    }
+
 private:
     Sock ls_ = kBadSock;
     std::thread acceptor_;
@@ -2582,6 +2595,38 @@ TEST(net_online_client_gestures) {
     const char* tags[kRigs] = {"gesture", "gesture-off", "gesture-down"};
     void (*scenarios[kRigs])(PacingRig&) = {gestureScenario, gestureOffScenario, gestureDownScenario};
     runRigs(rigs, tags, scenarios, kRigs);
+}
+
+// Frames the client ignores (a client message type, a server message that does not decode): the
+// first ones of a connection are logged, the others counted in one line when it ends; it stays up.
+TEST(net_online_client_bad_frames_logged_once) {
+    if (!net::transportAvailable()) return;
+    PacingRig r;
+    CHECK(r.start("bad-frames"));
+    if (!r.c) return;
+    std::string logPath = tempCredentialPath("bad-frames-log");
+    logx::init(logPath.c_str());
+    const int ups = r.srv.upgrades.load();
+    r.srv.sendBadFrames(5000);
+    CHECK(r.always([&] { return r.c->state() == net::ConnState::Online; }, 500));
+    r.srv.kick(1000);   // after the bad frames: the client has read them all when it sees the close
+    CHECK(r.stateIs(net::ConnState::Reconnecting, 5000));
+    logx::shutdown();
+    CHECK_EQ(r.srv.upgrades.load(), ups);
+    std::string text;
+    CHECK(net::sys::readFile(logPath, text, 1 << 20));
+    net::sys::removeFile(logPath);
+    int perFrame = 0, summaries = 0;
+    for (size_t at = 0; at < text.size();) {
+        size_t end = text.find('\n', at);
+        if (end == std::string::npos) end = text.size();
+        std::string line = text.substr(at, end - at);
+        at = end + 1;
+        if (line.find("ignoring a frame") != std::string::npos || line.find("malformed Welcome") != std::string::npos) ++perFrame;
+        if (line.find("9995 more frames from the server ignored or malformed") != std::string::npos) ++summaries;
+    }
+    CHECK_EQ(perFrame, 5);
+    CHECK_EQ(summaries, 1);
 }
 
 // =============================================================================================
