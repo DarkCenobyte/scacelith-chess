@@ -148,7 +148,6 @@ constexpr int kPingBurstGapMs = 1100;           // the server answers one Ping p
 constexpr size_t kOffsetSamples = 8;            // clock offset: lowest round trip of the last 8
 constexpr auto kOffsetMaxAge = std::chrono::minutes(5);   // ...taken in the last 5 minutes
 constexpr auto kInfoReuse = std::chrono::minutes(10);     // /info answer reused on reconnection
-constexpr uint16_t kCloseServerFull = 4006;     // 4000 + ErrorCode::ServerFull (no CloseCode entry)
 // The former port of the official server (HTTPS API and WSS): its saved sessions move to the
 // current official origin (CredentialStore::addOriginMove).
 constexpr uint16_t kLegacyOfficialPort = 44664;
@@ -1378,7 +1377,7 @@ struct OnlineClient::Impl {
             stopWanting(ConnState::Offline, "cheat_detected");
         } else if (rt.wanted) {
             RetryCause why = RetryCause::Failure;
-            if (code == kCloseServerFull || fatal == int(pr::ErrorCode::ServerFull)) {
+            if (code == pr::CloseCode::ServerFull || fatal == int(pr::ErrorCode::ServerFull)) {
                 why = RetryCause::ServerFull;
             } else if (code == pr::CloseCode::ShuttingDown || fatal == int(pr::ErrorCode::ShuttingDown) || rt.shutdownNotice) {
                 why = RetryCause::Shutdown;

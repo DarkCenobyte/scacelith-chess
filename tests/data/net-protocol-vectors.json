@@ -1569,6 +1569,91 @@
    "reason": "moves.move above max"
   },
   {
+   "name": "C_Gesture: yaw below min",
+   "hex": "28170000004d000000000000000c000615000001b9f3ffff2306000000",
+   "reason": "yaw below min"
+  },
+  {
+   "name": "C_Gesture: yaw above max",
+   "hex": "28170000004d000000000000000c000615000001470c00002306000000",
+   "reason": "yaw above max"
+  },
+  {
+   "name": "C_Gesture: yaw = INT32_MIN",
+   "hex": "28170000004d000000000000000c000615000001000000802306000000",
+   "reason": "yaw below min"
+  },
+  {
+   "name": "C_Gesture: pitch below min",
+   "hex": "28170000004d000000000000000c000615000001baf3ffffdcf9ffff00",
+   "reason": "pitch below min"
+  },
+  {
+   "name": "C_Gesture: pitch above max",
+   "hex": "28170000004d000000000000000c000615000001baf3ffff2406000000",
+   "reason": "pitch above max"
+  },
+  {
+   "name": "C_Gesture: touch above max",
+   "hex": "28170000004d000000000000000c004115000001baf3ffff2306000000",
+   "reason": "touch above max"
+  },
+  {
+   "name": "C_Gesture: flags above max",
+   "hex": "28170000004d000000000000000c000615000008baf3ffff2306000000",
+   "reason": "flags above max"
+  },
+  {
+   "name": "C_Gesture: lean above max",
+   "hex": "28170000004d000000000000000c000615000001baf3ffff2306000065",
+   "reason": "lean above max"
+  },
+  {
+   "name": "C_Gesture: ply above max",
+   "hex": "28170000004d00000000000000b0040615000001baf3ffff2306000000",
+   "reason": "ply above max"
+  },
+  {
+   "name": "C_Gesture: placed above max",
+   "hex": "28170000004d000000000000000c000615008001baf3ffff2306000000",
+   "reason": "placed above max"
+  },
+  {
+   "name": "S_Gesture: yaw below min",
+   "hex": "a64d0000000000000003003424340904b9f3ffffd4feffff37",
+   "reason": "yaw below min"
+  },
+  {
+   "name": "S_Gesture: yaw above max",
+   "hex": "a64d0000000000000003003424340904470c0000d4feffff37",
+   "reason": "yaw above max"
+  },
+  {
+   "name": "S_Gesture: pitch = INT32_MIN",
+   "hex": "a64d0000000000000003003424340904bc0200000000008037",
+   "reason": "pitch below min"
+  },
+  {
+   "name": "S_Gesture: pitch above max",
+   "hex": "a64d0000000000000003003424340904bc0200002406000037",
+   "reason": "pitch above max"
+  },
+  {
+   "name": "S_Gesture: aim above max",
+   "hex": "a64d0000000000000003003441340904bc020000d4feffff37",
+   "reason": "aim above max"
+  },
+  {
+   "name": "Welcome: gestureRate above max",
+   "hex": "8002000008608b932179422a00000005616c6963651653636163656c697468206f6666696369616c20e29994983a000010270000140000000000000000003d000800",
+   "reason": "gestureRate above max"
+  },
+  {
+   "name": "Welcome: gestureBurst above max",
+   "hex": "8002000008608b932179422a00000005616c6963651653636163656c697468206f6666696369616c20e29994983a0000102700001400000000000000000004007900",
+   "reason": "gestureBurst above max"
+  },
+  {
    "name": "Move: drawOffer = 2",
    "hex": "200e000000010000000000000000000c071c290637dc05000002",
    "reason": "drawOffer not a bool"

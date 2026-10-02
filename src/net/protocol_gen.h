@@ -118,6 +118,7 @@ constexpr uint16_t Internal = 1011;
 constexpr uint16_t UnsupportedProtocol = 4002;
 constexpr uint16_t Unauthorized = 4003;
 constexpr uint16_t Banned = 4004;
+constexpr uint16_t ServerFull = 4006;
 constexpr uint16_t Replaced = 4007;
 constexpr uint16_t ShuttingDown = 4008;
 constexpr uint16_t HelloTimeout = 4010;
