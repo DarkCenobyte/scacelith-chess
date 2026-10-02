@@ -827,7 +827,12 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     // ---- arms (chin poses follow the head computed above)
     hr = handTarget(right(), t, hr);
     HandSample hl = handTarget(left(), t, hlMotion);
+    // A point lock the last task let go of: its shift fades out (see startTask).
+    const Hand& rh = right();
+    if (length2(rh.pinCarry) > 0.0f && t >= rh.pinCarryStart && t < rh.pinCarryStart + 0.25f)
+        hr.p += rh.pinCarry * (1.0f - minJerk((t - rh.pinCarryStart) / 0.25f));
     solveArm(pose, Side::Right, hr.p, hr.q, hr.elbow);
+    vec3 pinShift(0.0f);
     if (hr.pinW > 0.0f) {
         // Point lock (the pointing fingertip): where the wrist clamps the hand's rotation, the whole
         // hand shifts so the index tip stays on its planned point (weighted in and out by pinW).
@@ -840,7 +845,9 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
             solveArm(pose, Side::Right, hr.p + corr, hr.q, hr.elbow);
         }
         if (hr.pinW < 1.0f && length2(corr) > 0.0f) solveArm(pose, Side::Right, hr.p + corr * hr.pinW, hr.q, hr.elbow);
+        pinShift = corr * hr.pinW;
     }
+    if (&pose == &poseI) right().pinApplied = pinShift;   // (the frame's pose, not a planning evaluate)
     static const bool armTrace = std::getenv("SCACELITH_ANIM_ARMTRACE") != nullptr;   // joint-limit diagnostics
     if (armTrace && (wristClamp > 0.05f || pronClamp > 0.05f))
         LOGI("armtrace %s t=%.4f pron %.3f flex %.3f dev %.3f elbow %.3f clampP %.3f clampW %.3f p %.3f %.3f %.3f", facing > 0 ? "White" : "Black", t, lastPron, lastFlex, lastDev, hr.elbow,
@@ -1111,6 +1118,7 @@ void Animator::Impl::startTask(const Task& t, std::vector<Event>& ev) {
         interruptWriting(ev);
         wr.suspendUntil = time + taskDuration(t);
     }
+    const bool pinned = h.motion.sample(time).pinW > 0.0f;   // the last task's point lock
     cur = t;
     running = true;
     curStart = time;
@@ -1122,6 +1130,11 @@ void Animator::Impl::startTask(const Task& t, std::vector<Event>& ev) {
     planTask(t, time, curT);
     if (debugLog)
         LOGI("anim: task %d planned in %.2f ms", int(t.type), std::chrono::duration<float, std::milli>(std::chrono::steady_clock::now() - c0).count());
+    if (pinned) {
+        // A plan that keeps the lock goes on from it; one that lets it go fades its shift out.
+        h.pinCarry = h.motion.sample(time).pinW > 0.0f ? vec3(0.0f) : h.pinApplied;
+        h.pinCarryStart = time;
+    }
     Event e;
     e.type = EventType::TaskStarted;
     e.pieceId = t.pieceId;

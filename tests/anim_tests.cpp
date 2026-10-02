@@ -1064,6 +1064,38 @@ TEST(anim_point_reaches_every_square_left_handed) {
     CHECK(worstOverlap < 0.001f);
 }
 
+// The point lock lets go without a jump: pointing at e8 / f8 (close to the coach, where the wrist
+// clamps and the lock shifts the hand), then a Retract. Both seats' handedness.
+TEST(anim_point_lock_lets_go_smoothly) {
+    float worst = 0.0f;
+    for (float mirror : {1.0f, -1.0f})
+        for (int sq : {60, 61}) {
+            anim::Animator an;
+            initCoach(an, mirror);
+            CoachBoard b;
+            b.startPosition();
+            b.wire(an);
+            an.enqueue({coachTask(anim::TaskType::Point, -1, layout::squareCenter(sq)), coachTask(anim::TaskType::Retract, -1, m::vec3(0), 1)});
+            const character::Bone hand = an.playHand() == Side::Left ? character::HandL : character::HandR;
+            std::vector<anim::Event> ev;
+            m::vec3 prev = an.globals()[hand].translation();
+            int after = -1;   // frames since the Retract started
+            while (an.time() < 3.0f) {
+                ev.clear();
+                an.update(1.0f / 120.0f, ev);
+                for (const anim::Event& e : ev)
+                    if (e.type == anim::EventType::TaskStarted && e.tag == 1) after = 0;
+                const m::vec3 cur = an.globals()[hand].translation();
+                if (after >= 0 && after < 3) worst = std::max(worst, m::length(cur - prev));   // the boundary frame and the next two
+                if (after >= 0) ++after;
+                prev = cur;
+            }
+            CHECK(after > 0);
+        }
+    std::fprintf(stderr, "  point lock let go: largest wrist step around the boundary %.2f mm\n", worst * 1000.0f);
+    CHECK(worst < 0.001f);
+}
+
 // Point, Trace and the three gesture shapes, a nod, a head shake and speech on the left-handed
 // coach against a right-handed coach in the mirrored world: the same motion bone for bone, the
 // same events (with their tags) at the same instants, the fingertip mirrored.

@@ -731,6 +731,11 @@ struct Animator::Impl {
         vec3 restContact{0, 0, 0}; // requested resting spot (character space); 'rest' may shift away from pieces
         bool chinFollow = false;   // idle chin pose: follows the head
         HandSample chinPlanned;
+        // Playing hand: the point lock's shift at the last frame (character space), and that shift
+        // fading out from pinCarryStart after a task let the lock go (no jump at the boundary).
+        vec3 pinApplied{0, 0, 0};
+        vec3 pinCarry{0, 0, 0};
+        float pinCarryStart = 0.0f;
     } hands[2];                    // [0] = left, [1] = right
     Hand& right() { return hands[1]; }
     Hand& left() { return hands[0]; }
