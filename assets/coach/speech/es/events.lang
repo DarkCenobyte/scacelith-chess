@@ -32,7 +32,6 @@ event.colour.black.2 = Esta vez juegas con negras: muevo yo primero.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
 # The level names are those of the coach page (assets/i18n/es.lang coach.level.<n>.name).
-event.level.l0 = Las reglas del ajedrez: aprendemos el juego paso a paso, con pequeños ejercicios.
 event.level.l1 = Primeros pasos: juego con suavidad y te explico cada error con palabras sencillas.
 event.level.l2 = Principiante: juego algo más fuerte y nombro tácticas como horquillas y clavadas.
 event.level.l3 = En progreso: hablo de planes y de estructura de peones, y muestro variantes cortas.
@@ -110,5 +109,3 @@ event.lesson.resume = ¡De nuevo por aquí! Sigamos con {chapter}.
 event.lesson.resume.2 = ¡Hola otra vez! Nos habíamos quedado en {chapter}.
 event.lesson.next = Siguiente tema: {chapter}.
 event.lesson.next.2 = Ahora, {chapter}.
-event.lesson.skip = De acuerdo, pasemos a lo siguiente.
-event.lesson.skip.2 = Muy bien, nos saltamos esta parte.

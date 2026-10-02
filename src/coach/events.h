@@ -1,6 +1,6 @@
 // The coach's words around the game: greetings per level, who starts, level introductions,
 // turn-taking, takebacks, encouragement, draw answers, the end of a game and the rules lesson's
-// resume/next/skip. Each helper returns a short Script (coach/script.h) whose lines are in
+// resume/next. Each helper returns a short Script (coach/script.h) whose lines are in
 // assets/coach/speech/<lang>/events.lang; the director performs it like any other script.
 // Check, checkmate and praise of good moves belong to the review (review.lang).
 //
@@ -26,7 +26,7 @@ enum class GameEnd : uint8_t { Win, Loss, Draw, Resigned };   // from the player
 // Start of a coach game at 'level' (1 First steps .. 6 Expert): the greeting, who starts, and the
 // level's introduction when 'introduceLevel' (the first game at that level, or after a change).
 Script greetingScript(int level, chess::Color human, bool introduceLevel);
-// A level's introduction alone (0 = the rules lesson .. 6), e.g. when the player picks a level.
+// A level's introduction alone (1 .. 6).
 Script levelIntroScript(int level);
 
 // Turn-taking: "Your move." after an explanation or a demonstration (Normal priority).
@@ -48,11 +48,9 @@ Script drawAnswerScript(bool accepted);
 // said: Session::handshakeWanted).
 Script gameEndScript(GameEnd end);
 
-// The rules lesson: resuming at 'chapter' (the chapter is named), going on to it, or skipping the
-// current one at the player's request.
+// The rules lesson: resuming at 'chapter' (the chapter is named), or going on to it.
 Script lessonResumeScript(const Lesson& lesson, int chapter);
 Script lessonNextScript(const Lesson& lesson, int chapter);
-Script lessonSkipScript();
 
 // Every catalog key the helpers above may say (base keys; the catalog adds the variants): tests.
 std::vector<std::string> eventKeys();

@@ -531,12 +531,12 @@ TEST(coach_events_scripts) {
         CHECK(known);
     }
     std::vector<Script> all = {greetingScript(1, chess::White, true), greetingScript(6, chess::Black, false),
-                               levelIntroScript(0), yourMoveScript(12), takeYourTimeScript(12), fillerScript(12),
+                               levelIntroScript(6), yourMoveScript(12), takeYourTimeScript(12), fillerScript(12),
                                takebackScript(true), takebackScript(false), playOnScript(), drawAnswerScript(true),
                                drawAnswerScript(false), gameEndScript(GameEnd::Win), gameEndScript(GameEnd::Resigned),
                                encouragementScript(Encouragement::AfterMistake), encouragementScript(Encouragement::Behind),
                                encouragementScript(Encouragement::PlayingWell), lessonResumeScript(lesson, 3),
-                               lessonNextScript(lesson, 4), lessonSkipScript()};
+                               lessonNextScript(lesson, 4)};
     for (const Script& s : all) {
         CHECK(!s.empty());
         for (const Beat& b : s) {

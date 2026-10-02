@@ -33,7 +33,6 @@ event.colour.black.2 = Цього разу в тебе чорні: першим 
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
 # The level names are those of assets/i18n/uk.lang (coach.level.<n>.name).
-event.level.l0 = Правила шахів: вивчаємо гру крок за кроком, з невеликими вправами.
 event.level.l1 = Перші кроки: я граю м’яко й пояснюю кожну помилку простими словами.
 event.level.l2 = Початківець: граю трохи сильніше й називаю вилки, зв’язки та іншу просту тактику.
 event.level.l3 = Аматор: я говорю про плани й пішакову структуру та показую короткі варіанти.
@@ -111,5 +110,3 @@ event.lesson.resume = З поверненням! Продовжимо урок: 
 event.lesson.resume.2 = Знову привіт! Ми зупинилися на темі «{chapter}».
 event.lesson.next = Далі: {chapter}.
 event.lesson.next.2 = Тепер — {chapter}.
-event.lesson.skip = Гаразд, ідемо далі.
-event.lesson.skip.2 = Добре, пропускаємо.

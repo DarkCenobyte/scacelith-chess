@@ -32,7 +32,6 @@ event.colour.black.2 = Cette fois, tu joues les Noirs : je joue en premier.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
 # The level names are those of the coach page (assets/i18n/fr.lang coach.level.<n>.name).
-event.level.l0 = Les règles des échecs : on apprend le jeu pas à pas, avec de petits exercices.
 event.level.l1 = Premiers pas : je joue en douceur et j’explique chaque erreur avec des mots simples.
 event.level.l2 = Débutant : je joue un peu plus fort, et je nomme les fourchettes et les clouages.
 event.level.l3 = En progrès : je parle de plans et de structure de pions, avec de courtes variantes.
@@ -110,5 +109,3 @@ event.lesson.resume = Te revoilà ! Continuons avec {chapter}.
 event.lesson.resume.2 = Rebonjour ! Reprenons où nous en étions : {chapter}.
 event.lesson.next = Chapitre suivant : {chapter}.
 event.lesson.next.2 = Maintenant, {chapter}.
-event.lesson.skip = D’accord, passons à la suite.
-event.lesson.skip.2 = Très bien, on avance.

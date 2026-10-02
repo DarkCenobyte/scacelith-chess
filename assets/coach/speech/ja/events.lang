@@ -31,7 +31,6 @@ event.colour.black = 私が白なので、私から指します。
 event.colour.black.2 = 今回あなたは黒です。私が先に指します。
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
-event.level.l0 = チェスのルール：小さな練習問題で、一歩ずつ学んでいきます。
 event.level.l1 = はじめの一歩：手加減して指し、どのミスもわかりやすく説明します。
 event.level.l2 = 初心者：少し強めに指し、フォークやピンなど簡単な戦術を教えます。
 event.level.l3 = 中級者：作戦やポーン構造について話し、短い変化を見せます。
@@ -108,5 +107,3 @@ event.lesson.resume = おかえりなさい！{chapter}の続きから始めま�
 event.lesson.resume.2 = また会えましたね！前回は{chapter}のところで終わりました。
 event.lesson.next = 次は{chapter}です。
 event.lesson.next.2 = さて、今度は{chapter}です。
-event.lesson.skip = わかりました、先に進みましょう。
-event.lesson.skip.2 = では、飛ばして次へ行きます。
