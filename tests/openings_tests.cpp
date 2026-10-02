@@ -809,8 +809,9 @@ TEST(openings_texts_render_and_speak) {
     CHECK(!t.arg("line:Paulsen Attack", "", "ru", false).empty());   // through the eponym table
     CHECK_EQ(t.arg("line:English Attack", "", "fr", false), std::string());   // a common word: not composed
     CHECK_EQ(t.arg("line:English Attack", "", "zh-Hans", false), std::string("English Attack"));
-    for (const char* line : {"line:Scotch Gambit", "line:Scotch Variation", "line:Danish Variation", "line:Catalan Defense",
-                             "line:Kazakh Variation", "line:Florentine Gambit", "line:Netherlands Variation"})
+    for (const char* line : {"line:Scotch Gambit", "line:Scotch Variation", "line:Danish Variation",
+                             "line:Catalan Defense", "line:Kazakh Variation", "line:Florentine Gambit",
+                             "line:Netherlands Variation"})
         for (const char* lang : {"fr", "de", "es"}) CHECK_EQ(t.arg(line, "", lang, false), std::string());
     CHECK_EQ(t.arg("line:Exchange Variation", "", "fr", false), *t.find("fr", "opening.component.exchange_variation"));
     // The rare, unnamed case renders everywhere.

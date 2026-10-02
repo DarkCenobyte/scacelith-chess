@@ -772,7 +772,8 @@ Review Reviewer::review(const ReviewInput& in) {
                 key = level_ <= 2 ? "praise.sacrifice" : bandKey("praise.brilliant", level_);
                 brilliantDone_ = true;
                 v.brilliant = true;
-            } else if (level_ >= 2 && c.isBest && w1 >= 60.0 && c.l2 && w1 - w2 >= 20.0 && lastW >= 0.0 && lastW <= 45.0) {
+            } else if (level_ >= 2 && c.isBest && w1 >= 60.0 && c.l2 && w1 - w2 >= 20.0 && lastW >= 0.0 &&
+                       lastW <= 45.0) {
                 key = bandKey("praise.great", level_);
                 v.great = true;
             } else if (level_ >= 2 && only) {
