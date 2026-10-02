@@ -1,6 +1,7 @@
 // Copy to the system clipboard (the direct-match invitation, recovery codes). Windows only: the
 // X11 layer serves tests and screenshots, where copying reports that it is unavailable.
 #include "ui_screens_online.h"
+#include "../platform/platform.h"
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -23,7 +24,7 @@ bool setClipboardText(const std::string& text) {
         crlf += c;
     }
     int n = MultiByteToWideChar(CP_UTF8, 0, crlf.c_str(), int(crlf.size()), nullptr, 0);
-    if (n < 0) return false;
+    if (n <= 0 && !crlf.empty()) return false;
     HGLOBAL mem = GlobalAlloc(GMEM_MOVEABLE, (size_t(n) + 1) * sizeof(wchar_t));
     if (!mem) return false;
     wchar_t* dst = static_cast<wchar_t*>(GlobalLock(mem));
@@ -37,7 +38,7 @@ bool setClipboardText(const std::string& text) {
     // The clipboard needs an owner window for SetClipboardData to succeed after EmptyClipboard.
     HWND owner = GetActiveWindow();
     if (!owner) owner = GetForegroundWindow();
-    if (!OpenClipboard(owner)) {
+    if (!plat::openClipboard(owner)) {
         GlobalFree(mem);
         return false;
     }

@@ -88,6 +88,11 @@ void messageBox(const char* title, const char* text);
 uint64_t randomSeed();           // non-deterministic seed from the OS
 // Text on the system clipboard as UTF-8 ("" when there is none; the X11 layer always returns "").
 std::string clipboardText();
+#ifdef _WIN32
+// OpenClipboard for 'owner' (an HWND), tried up to 5 times 5 ms apart: a clipboard manager or the
+// clipboard history may hold the clipboard for a moment. CloseClipboard() after a success.
+bool openClipboard(void* owner);
+#endif
 // The user's interface language as a locale tag ("fr-FR", "zh-TW", "de_DE.UTF-8"), "" when
 // unknown. Windows: GetUserDefaultUILanguage; X11: LC_ALL, LC_MESSAGES, LANG.
 std::string systemLanguage();

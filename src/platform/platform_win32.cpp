@@ -444,9 +444,17 @@ void messageBox(const char* title, const char* text) {
     MessageBoxW(g_hwnd, wx, wt, MB_OK | MB_ICONERROR);
 }
 
+bool openClipboard(void* owner) {
+    for (int attempt = 0;; ++attempt) {
+        if (OpenClipboard(static_cast<HWND>(owner))) return true;
+        if (attempt == 4) return false;
+        Sleep(5);
+    }
+}
+
 std::string clipboardText() {
     std::string out;
-    if (!OpenClipboard(g_hwnd)) return out;
+    if (!openClipboard(g_hwnd)) return out;
     if (HANDLE h = GetClipboardData(CF_UNICODETEXT)) {
         if (const wchar_t* w = static_cast<const wchar_t*>(GlobalLock(h))) {
             // Up to the first NUL within the block (another program may have left none), and a
