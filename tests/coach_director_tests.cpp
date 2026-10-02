@@ -501,6 +501,17 @@ TEST(coach_director_without_voice) {
         CHECK(subs2.size() == 1 && subs2[0].text.find("e4") != std::string::npos);
         CHECK(!subs2.empty() && subs2[0].flag);
     }
+    // The same line synthesised ahead (prefetch) and failed: taken from the cache as it is, shown.
+    Rig rig4;
+    rig4.stage.failIf.push_back("ee four");
+    rig4.dir.prefetch({squareLine()});
+    rig4.run(0.2f);
+    rig4.dir.play({say(squareLine())});
+    CHECK(rig4.settle());
+    CHECK_EQ(rig4.voiceStarts(), 0);
+    CHECK_EQ(rig4.stage.reqs.size(), size_t(1));
+    const auto subs4 = rig4.stage.all("subtitle");
+    CHECK(!subs4.empty() && subs4[0].text.find("e4") != std::string::npos && subs4[0].flag);
     // Subtitles On: a heard line is shown, not marked unheard.
     DirectorConfig on;
     on.subtitles = 1;
