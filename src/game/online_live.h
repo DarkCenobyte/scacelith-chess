@@ -12,7 +12,8 @@
 //   - My clock display while my move is on its way, and the resend of a move the authority never
 //     got (a connection lost at the wrong moment).
 //   - The RatingRestored notice, held back while a game is being played.
-//   - Which realtime errors belong to the game being played (OnlineSession routes them to it).
+//   - Which realtime errors belong to the game being played, and which refuse the challenge being
+//     created (OnlineSession's handling of them).
 #pragma once
 #include "../chess/chess.h"
 #include "../math/math.h"
@@ -355,6 +356,16 @@ inline bool gameError(int code) {
     using E = net::proto::ErrorCode;
     return code >= int(E::NotInGame) && code <= int(E::FlagFell) && code != int(E::AlreadyInGame) &&
            code != int(E::InvalidCategory);
+}
+
+// The refusals of a challenge or private game being created, which come before any status gives it
+// an id (UserUnavailable may also answer a challenge accepted). The other errors of 200..209 answer
+// other commands (a QueueJoin, a challenge accepted or declined, a rematch): a challenge of mine
+// still pending stays.
+inline bool challengeRefused(int code) {
+    using E = net::proto::ErrorCode;
+    return code == int(E::UserUnavailable) || code == int(E::ChallengeLimit) || code == int(E::CannotChallengeSelf) ||
+           code == int(E::RatedRequiresOfficialTc) || code == int(E::InvalidTimeControl);
 }
 
 }  // namespace live

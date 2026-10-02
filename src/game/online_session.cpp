@@ -876,7 +876,7 @@ void OnlineSession::handleServer(net::Event& e) {
         // A QueueJoin refused: no search (106 and 107 may also answer a challenge accepted or joined).
         queue_.searching = queue_.searching && e.code != kErrMatchmakingCooldown && e.code != kErrAlreadyInGame &&
                            e.code != kErrInvalidCategory;
-        if (e.code >= 200 && e.code < 210) outgoing_ = Outgoing();
+        if (outgoing_.active && outgoing_.id == 0 && live::challengeRefused(e.code)) outgoing_ = Outgoing();
         if (e.code == 0 && e.error == "offline") {  // a command sent while not connected: dropped
             queue_.searching = false;
             outgoing_ = Outgoing();

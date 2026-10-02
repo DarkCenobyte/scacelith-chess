@@ -4,7 +4,7 @@
 // of their robot's hand and its live work at their move, even under a flood of gestures, the
 // timeouts, the head's spring), my clock's freeze and the resend of my move after a
 // reconnection, the RatingRestored notice held back during a game, and the realtime errors that
-// belong to a game.
+// belong to a game or refuse a challenge being created.
 #include "test.h"
 #include "anim/animator.h"
 #include "chess/chess.h"
@@ -542,4 +542,13 @@ TEST(live_game_errors_leave_the_menus_refusals_out) {
     CHECK(!live::gameError(113));
     CHECK(!live::gameError(201));
     CHECK(!live::gameError(207));
+}
+
+TEST(live_challenge_refusals_are_only_those_of_its_creation) {
+    for (int code : {202, 203, 204, 206, 208}) CHECK(live::challengeRefused(code));
+    // QueueNotAllowed and MatchmakingCooldown answer a QueueJoin, ChallengeNotFound an accept, a
+    // decline or a cancel, CodeInvalid a code joined, RematchUnavailable a rematch.
+    for (int code : {200, 201, 205, 207, 209}) CHECK(!live::challengeRefused(code));
+    CHECK(!live::challengeRefused(0));
+    CHECK(!live::challengeRefused(106));
 }
