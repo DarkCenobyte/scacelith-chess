@@ -273,12 +273,21 @@ fallback); `--lang <code>` overrides the language for one session.
 
 ## Building
 
-Requirements: CMake 3.21+, Ninja, a C++17 compiler. The Windows build is produced with
+Requirements: CMake 3.21+, Ninja, GCC with GNU binutils (tested with GCC 13; on Windows,
+MinGW-w64 GCC with POSIX threads; Clang cannot build the embedded Stockfish variants), and
+Python 3 for the instruction-set audits that run at every build (without it they are skipped,
+with a warning). The Linux build also needs the OpenSSL 3, X11 and OpenGL development files (for
+example `libssl-dev`, `libx11-dev` and `libgl-dev`). The Windows build is produced with
 MinGW-w64 (native or cross-compiled from Linux) and is a single self-contained executable
 (Stockfish 19 and its neural network are embedded). Stockfish is compiled once per x86-64
 instruction set, from plain x86-64 to AVX-512, and the game runs the best one the CPU supports;
 `-DSCACELITH_SF_VARIANTS=x86-64-avx2` (or another variant the CPU runs) builds a single one, for
-quicker local builds (see `third_party/stockfish/README.scacelith.md`).
+quicker local builds (see `third_party/stockfish/README.scacelith.md`). The first configure also
+downloads the coach's voice model archive (129 MB, from the sherpa-onnx release on GitHub) into
+the build folder, for the unit tests and `--coach-dir build/coach`:
+`-DSCACELITH_SUPERTONIC_DIR=<extracted folder>` or `-DSCACELITH_SUPERTONIC_ARCHIVE=<.tar.bz2>`
+take a local copy instead, and `-DSCACELITH_SUPERTONIC_DOWNLOAD=OFF` does without it (the tests
+that need the model are then skipped; see `third_party/supertonic3/README.scacelith.md`).
 
 ```sh
 # Windows x64 (cross-compiled from Linux)
@@ -348,10 +357,11 @@ data provided by the Leela Chess Zero project, which is made available under the
 License (ODbL). The Cinzel, EB Garamond and Amiri (Khaled Hosny) interface fonts and the handwriting
 fonts Caveat (Impallari Type), Marck Script (Denis Masharov), Bad Script (Gaslight), Aref Ruqaa
 (Abdullah Aref, Khaled Hosny), Klee One (Fontworks) and LXGW WenKai / WenKai TC (LXGW) are under the
-SIL Open Font License 1.1; the subsets shipped here are rebuilt from the upstream files by
-`tools/prepare_fonts.py`. The chess figures of the promotion picker come from a subset of GNU
-FreeFont FreeSerif (GPL-3.0+ with the font exception). All licence texts are in `assets/fonts/` and
-`assets/fonts/hand/`. The coach's voice model (Supertonic 3) is not part of the program nor of its
-release package: the game downloads it from its publishers at the player's request. It has its own
-licence (BigScience Open RAIL-M), whose use restrictions the download prompt shows; see
+SIL Open Font License 1.1; the Arabic and CJK fonts (Amiri, Aref Ruqaa, Klee One, LXGW WenKai /
+WenKai TC) are subset and renamed from the upstream files by `tools/prepare_fonts.py`, the others
+are the upstream files unchanged. The chess figures of the promotion picker come from a subset of
+GNU FreeFont FreeSerif (GPL-3.0+ with the font exception). All licence texts are in `assets/fonts/`
+and `assets/fonts/hand/`. The coach's voice model (Supertonic 3) is not part of the program nor of
+its release package: the game downloads it from its publishers at the player's request. It has its
+own licence (BigScience Open RAIL-M), whose use restrictions the download prompt shows; see
 `third_party/supertonic3/README.scacelith.md`.
