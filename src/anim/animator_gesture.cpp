@@ -367,7 +367,10 @@ void Animator::Impl::planGesture(const Task& t, float start, float T, const Hand
                         for (float roll : {0.75f, 1.05f, 0.45f}) {
                             const quat q = handRot(R, yaw, pitch, roll);
                             const vec3 w = spot + vec3(0, up, 0);
-                            float cost = 0.6f * up + 0.2f * std::fabs(yaw - 0.35f) + 0.1f * std::fabs(roll - 0.75f) + 60.0f * handDepth(w, q, base.f, 0.03f, -1);
+                            // (handDepth is >= 0: an orientation already worse without it is skipped.)
+                            const float pref = 0.6f * up + 0.2f * std::fabs(yaw - 0.35f) + 0.1f * std::fabs(roll - 0.75f);
+                            if (pref >= bestCost) continue;
+                            float cost = pref + 60.0f * handDepth(w, q, base.f, 0.03f, -1);
                             if (cost >= bestCost) continue;
                             cost += 8.0f * armStrain(w, q);
                             if (cost < bestCost) {
@@ -433,8 +436,10 @@ void Animator::Impl::planGesture(const Task& t, float start, float T, const Hand
                 for (float roll : {0.8f * PI, 0.7f * PI, 0.9f * PI, -0.8f * PI, -0.7f * PI, -0.9f * PI}) {
                     const quat q = handRot(R, yaw0 + dy, pitch0 + dp, roll);
                     const vec3 w = base + vec3(0, up, 0);
-                    float cost = 0.6f * up + 0.2f * std::fabs(dy) + 0.15f * std::fabs(dp) + 0.1f * std::fabs(std::fabs(roll) - 0.8f * PI) +
-                                 60.0f * handDepth(w, q, fp, 0.03f, -1);
+                    // (handDepth is >= 0: an orientation already worse without it is skipped.)
+                    const float pref = 0.6f * up + 0.2f * std::fabs(dy) + 0.15f * std::fabs(dp) + 0.1f * std::fabs(std::fabs(roll) - 0.8f * PI);
+                    if (pref >= bestCost) continue;
+                    float cost = pref + 60.0f * handDepth(w, q, fp, 0.03f, -1);
                     if (cost >= bestCost) continue;
                     cost += 8.0f * armStrain(w, q);
                     if (cost < bestCost) {
