@@ -84,14 +84,12 @@ enum class MatePattern : uint8_t { None, BackRank, Smothered, Support, Ladder, E
 MatePattern classifyMate(const chess::Position& mated);   // the side to move is checkmated
 
 // ---- Pieces and pawns ------------------------------------------------------------------------
-int mobility(const chess::Position& p, chess::Color c);   // squares knights, bishops, rooks, queens attack (not own)
 // The piece on s (knight, bishop, rook or queen) is attacked with a winning capture and every move
 // it has loses by SEE too (lichess-puzzler's is_trapped); false when its side is in check or the
 // piece is pinned. Works for either colour (the turn is passed on a copy when needed).
 bool isTrapped(const chess::Position& p, chess::Square s);
 bool isPassed(const chess::Position& p, chess::Square pawn);
 int undevelopedMinors(const chess::Position& p, chess::Color c);   // knights / bishops on b1 c1 f1 g1 (b8 c8 f8 g8)
-uint64_t attackedSquares(const chess::Position& p, chess::Color c);
 bool isForced(const chess::Position& p);                  // exactly one legal move
 // Move 'ply' of the game captures on the square where the previous move captured.
 bool isRecapture(const chess::Game& g, size_t ply);
@@ -119,12 +117,10 @@ struct MoveFacts {
     chess::Square capturedOn = chess::NoSquare;    // en passant: the passed pawn's square
     bool enPassant = false, castleKing = false, castleQueen = false;
     chess::PieceType promotion = chess::NoPiece;
-    bool check = false, mate = false, doubleCheck = false, discoveredCheck = false, stalemate = false;
+    bool check = false, doubleCheck = false, discoveredCheck = false, stalemate = false;
     int seeCp = 0;               // exchange balance of the move for the mover (see())
     uint64_t newlyAttacked = 0;  // enemy pieces attacked after the move and not before
     uint64_t forks = 0;          // forkTargets(after, to)
-    uint64_t discovered = 0;     // enemy pieces attacked through the vacated square
-    uint64_t leftHanging = 0;    // own pieces hanging after and not before (the moved piece included)
     uint64_t undefended = 0;     // own pieces the moved piece defended before and no longer does
 };
 MoveFacts analyzeMove(const chess::Position& before, const chess::Move& m);
