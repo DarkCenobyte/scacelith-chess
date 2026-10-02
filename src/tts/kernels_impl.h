@@ -152,14 +152,6 @@ void kTanh(const float* x, float* y, size_t n) {
 }
 
 template <class V>
-void kScaleShift(const float* x, float a, float b, float* y, size_t n) {
-    size_t i = 0;
-    typename V::R va = V::set1(a), vb = V::set1(b);
-    for (; i + V::W <= n; i += V::W) V::storeu(y + i, V::fmadd(V::loadu(x + i), va, vb));
-    for (; i < n; ++i) y[i] = x[i] * a + b;
-}
-
-template <class V>
 void kDwconv(const float* x, const float* w, int k, int dil, float bias, float* y, int n) {
     int t = 0;
     for (; t + V::W <= n; t += V::W) {
@@ -538,29 +530,6 @@ void kDequantizeU8(const uint8_t* q, size_t n, float scale, int zp, float* y) {
     size_t i = 0;
     for (; i + V::W <= n; i += V::W) V::storeu(y + i, V::mul(V::sub(V::cvtU8(q + i), z), s));
     for (; i < n; ++i) y[i] = float(int(q[i]) - zp) * scale;
-}
-
-template <class V>
-void kRequantizeU8(const int32_t* acc, size_t n, int32_t bias, float scale, int zp, uint8_t* y) {
-    using R = typename V::R;
-    using I = typename V::I;
-    const R s = V::set1(scale), lo = V::set1(float(-zp)), hi = V::set1(float(255 - zp));
-    const I b = V::iset1(bias), z = V::iset1(zp);
-    size_t i = 0;
-    for (; i + V::W <= n; i += V::W) {
-        R v = V::mul(V::cvtI2F(V::iadd(V::iloadu(acc + i), b)), s);
-        v = V::min(V::max(v, lo), hi);
-        V::storeU8(y + i, V::iadd(V::cvtRound(v), z));
-    }
-    if (i < n) {
-        alignas(64) int32_t t[V::W];
-        alignas(64) uint8_t u[V::W];
-        for (int j = 0; j < V::W; ++j) t[j] = i + size_t(j) < n ? acc[i + size_t(j)] : 0;
-        R v = V::mul(V::cvtI2F(V::iadd(V::iloadu(t), b)), s);
-        v = V::min(V::max(v, lo), hi);
-        V::storeU8(u, V::iadd(V::cvtRound(v), z));
-        for (size_t j = 0; i + j < n; ++j) y[i + j] = u[j];
-    }
 }
 
 }  // namespace

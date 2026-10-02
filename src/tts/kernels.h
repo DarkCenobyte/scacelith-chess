@@ -52,19 +52,14 @@ struct Table {
     // 8-bit quantization, bit for bit as onnxruntime's MLAS kernels (x86):
     //   quantizeU8:   y = clamp(x / scale, -zp, 255 - zp) rounded to nearest even, + zp
     //   dequantizeU8: y = (q - zp) * scale
-    //   requantizeU8: y = clamp((acc + bias) * scale, -zp, 255 - zp) rounded to nearest even, + zp
-    //                 (the output stage of QLinearConv)
     void (*quantizeU8)(const float* x, size_t n, float scale, int zp, uint8_t* y);
     void (*dequantizeU8)(const uint8_t* q, size_t n, float scale, int zp, float* y);
-    void (*requantizeU8)(const int32_t* acc, size_t n, int32_t bias, float scale, int zp, uint8_t* y);
 
     // Element-wise (n any, in == out allowed).
     void (*erf)(const float* x, float* y, size_t n);
     void (*gelu)(const float* x, float* y, size_t n);   // 0.5 x (1 + erf(x / sqrt 2))
     void (*exp)(const float* x, float* y, size_t n);
     void (*tanh)(const float* x, float* y, size_t n);
-    // y[i] = x[i] * a + b (a, b scalars).
-    void (*scaleShift)(const float* x, float a, float b, float* y, size_t n);
     // Depthwise 1-D convolution of one channel over an already padded input:
     // y[t] = bias + sum_j w[j] * x[t + j * dil], t in [0, n).
     void (*dwconv)(const float* x, const float* w, int k, int dil, float bias, float* y, int n);

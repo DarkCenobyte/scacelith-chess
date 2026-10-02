@@ -107,12 +107,10 @@ tts::kern::Table makeTable(const char* name, int level) {
 #endif
     t.quantizeU8 = kQuantizeU8<VAvx2>;
     t.dequantizeU8 = kDequantizeU8<VAvx2>;
-    t.requantizeU8 = kRequantizeU8<VAvx2>;
     t.erf = kErf<VAvx2>;
     t.gelu = kGelu<VAvx2>;
     t.exp = kExp<VAvx2>;
     t.tanh = kTanh<VAvx2>;
-    t.scaleShift = kScaleShift<VAvx2>;
     t.dwconv = kDwconv<VAvx2>;
     t.layerNormRows = kLayerNormRows<VAvx2>;
     t.softmaxRows = kSoftmaxRows<VAvx2>;

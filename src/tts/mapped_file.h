@@ -17,7 +17,6 @@ public:
     void close();
     const uint8_t* data() const { return data_; }
     size_t size() const { return size_; }
-    bool isOpen() const { return data_ != nullptr; }
 
 private:
     const uint8_t* data_ = nullptr;

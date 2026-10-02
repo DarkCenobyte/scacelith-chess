@@ -111,18 +111,13 @@ int Graph::inputIndex(const char* name) const {
     return -1;
 }
 
-int Graph::outputIndex(const char* name) const {
-    for (size_t i = 0; i < outputs_.size(); ++i)
-        if (values_[size_t(outputs_[i])].name == name) return int(i);
-    return -1;
-}
-
 bool Graph::load(const uint8_t* data, size_t size, const std::string& label,
                  const std::vector<std::string>& invariantInputs, const kern::Table& k, std::string* error) {
     label_ = label;
-    if (!onnx::parse(data, size, model_, error)) return false;
-    if (model_.opset < 13) {
-        if (error) *error = label + ": opset " + std::to_string(model_.opset) + " not supported (13 or later)";
+    onnx::Model model;   // only read here: initializer views point into 'data', the rest is copied
+    if (!onnx::parse(data, size, model, error)) return false;
+    if (model.opset < 13) {
+        if (error) *error = label + ": opset " + std::to_string(model.opset) + " not supported (13 or later)";
         return false;
     }
     std::unordered_map<std::string, int> byName;
@@ -131,7 +126,7 @@ bool Graph::load(const uint8_t* data, size_t size, const std::string& label,
     // Gather rows): those stay in place even when misaligned. Everything else that is misaligned
     // or small is copied, so generic loops always see naturally aligned data.
     std::unordered_map<std::string, bool> kernelOnly;
-    for (const onnx::NodeProto& n : model_.nodes)
+    for (const onnx::NodeProto& n : model.nodes)
         for (size_t i = 0; i < n.inputs.size(); ++i) {
             bool ok = (n.opType == "Conv" && i == 1) || (n.opType == "MatMul") || (n.opType == "Gather" && i == 0) ||
                       (n.opType == "MatMulInteger" && i == 1) || (n.opType == "DequantizeLinear" && i == 0);
@@ -139,7 +134,7 @@ bool Graph::load(const uint8_t* data, size_t size, const std::string& label,
             if (it == kernelOnly.end()) kernelOnly[n.inputs[i]] = ok;
             else it->second = it->second && ok;
         }
-    for (const onnx::TensorData& t : model_.initializers) {
+    for (const onnx::TensorData& t : model.initializers) {
         int v = addValue(t.name);
         byName[t.name] = v;
         Value& val = values_[size_t(v)];
@@ -150,13 +145,12 @@ bool Graph::load(const uint8_t* data, size_t size, const std::string& label,
         bool aligned = es && reinterpret_cast<uintptr_t>(t.bytes()) % es == 0;
         bool copy = !t.raw || t.byteSize() < 4096 || (!aligned && !inPlaceOk);
         val.constant = tensorOf(t, copy);
-        (copy ? copiedBytes_ : inPlaceBytes_) += t.byteSize();
         if (!val.constant.valid()) {
             if (error) *error = label + ": initializer " + t.name + " has an unsupported type";
             return false;
         }
     }
-    for (const onnx::ValueInfo& vi : model_.inputs) {
+    for (const onnx::ValueInfo& vi : model.inputs) {
         if (byName.count(vi.name)) continue;   // an initializer listed as input
         int v = addValue(vi.name);
         byName[vi.name] = v;
@@ -165,7 +159,7 @@ bool Graph::load(const uint8_t* data, size_t size, const std::string& label,
             if (inv == vi.name) values_[size_t(v)].invariant = true;
     }
 
-    for (const onnx::NodeProto& pn : model_.nodes) {
+    for (const onnx::NodeProto& pn : model.nodes) {
         Node n;
         n.name = pn.name;
         bool found = false;
@@ -289,12 +283,11 @@ bool Graph::load(const uint8_t* data, size_t size, const std::string& label,
         for (const std::string& s : pn.outputs) {
             int v = addValue(s);
             byName[s] = v;
-            values_[size_t(v)].producer = int(nodes_.size());
             n.out.push_back(v);
         }
         nodes_.push_back(std::move(n));
     }
-    for (const onnx::ValueInfo& vi : model_.outputs) {
+    for (const onnx::ValueInfo& vi : model.outputs) {
         auto it = byName.find(vi.name);
         if (it == byName.end()) {
             if (error) *error = label + ": output " + vi.name + " is never produced";
@@ -330,6 +323,7 @@ bool Graph::foldConstants(const kern::Table& k, std::string* error) {
             if ((x.type == DType::I8 || x.type == DType::U8) && x.count() >= 4096) {
                 auto q = std::make_shared<QuantWeight>();
                 q->q = x.as<uint8_t>();
+                q->owner = x.owner;
                 q->isUnsigned = x.type == DType::U8;
                 q->dims = x.dims;
                 const Tensor& s = values_[size_t(n.in[1])].constant;
@@ -367,7 +361,6 @@ bool Graph::foldConstants(const kern::Table& k, std::string* error) {
             Value& out = values_[size_t(n.out[i])];
             out.isConst = true;
             out.constant = std::move(outs[i]);
-            copiedBytes_ += out.constant.bytes();
         }
     }
     nodes_ = std::move(kept);
@@ -528,7 +521,6 @@ void Graph::finish(const kern::Table& k) {
     for (Value& v : values_) {
         v.consumers.clear();
         v.lastUse = -1;
-        v.producer = -1;
     }
     for (size_t i = 0; i < nodes_.size(); ++i) {
         Node& n = nodes_[i];
@@ -554,10 +546,7 @@ void Graph::finish(const kern::Table& k) {
                     for (int64_t c = 0; c < b.dims[1]; ++c) n.bSums[size_t(c)] += b.as<int8_t>()[r * b.dims[1] + c];
             }
         }
-        for (int v : n.out) {
-            values_[size_t(v)].producer = int(i);
-            values_[size_t(v)].invariant = inv;
-        }
+        for (int v : n.out) values_[size_t(v)].invariant = inv;
     }
     for (Value& v : values_) {
         v.keep = false;
@@ -577,12 +566,6 @@ const Tensor& Session::output(int index) const {
     int v = g_.outputs()[size_t(index)];
     const Value& val = g_.values()[size_t(v)];
     return val.isConst ? val.constant : slots_[size_t(v)];
-}
-
-void Session::clearCache() {
-    cached_ = false;
-    for (size_t v = 0; v < slots_.size() && v < g_.values().size(); ++v)
-        if (g_.values()[v].keep) slots_[v] = Tensor();
 }
 
 bool Session::run(const ExecContext& ctx, std::string* error, const std::atomic<bool>* cancel) {
