@@ -17,6 +17,7 @@ struct PostUBOData {
     vec4 renderSize, halfSize, outputSize, timing;
     vec4 ao, aoB, ssr, ssrB, vol, volB, volC, taa, mb, dof, bloom, expo, expoB, display, grade, misc;
 };
+static_assert(sizeof(PostUBOData) == 20 * 16 && std::is_trivially_copyable_v<PostUBOData>, "PostUBOData mirrors PostUBO");
 
 constexpr int kBloomLevels = 6;
 constexpr int kNoiseUnit = 7;

@@ -19,6 +19,7 @@
 #include "material.h"
 #include "mesh.h"
 #include <memory>
+#include <type_traits>
 #include <vector>
 
 class PostFX;
@@ -126,6 +127,7 @@ struct PointLight {
         spotCosOuter = std::cos(outerAngle);
     }
 };
+static_assert(sizeof(PointLight) == 64 && std::is_trivially_copyable_v<PointLight>, "PointLight mirrors PointLightData");
 
 // Planar reflector (floor, table top, board): renders the mirrored scene into a layer of the
 // planar reflection texture array (TEXUNIT_PLANAR, half the render resolution for every
@@ -197,6 +199,7 @@ struct FrameUBOData {
     m::vec4 planarPlanes[4];     // planar reflector planes (xyz n, w d)
     m::mat4 planarViewProj[4];   // reflected view-proj of each planar reflector (for projective lookup)
 };
+static_assert(sizeof(FrameUBOData) == 1344 && std::is_trivially_copyable_v<FrameUBOData>, "FrameUBOData mirrors FrameUBO");
 
 // Mirrors DrawData in shaders/include/common.glsl (std430).
 struct DrawDataGPU {
@@ -209,6 +212,7 @@ struct DrawDataGPU {
     m::vec4 fade;           // x = screen-door opacity, y = 1 when the dither changes every frame (TAA), zw unused
     m::vec4 highlight;      // DrawItem::highlight
 };
+static_assert(sizeof(DrawDataGPU) == 432 && std::is_trivially_copyable_v<DrawDataGPU>, "DrawDataGPU mirrors DrawData");
 
 enum class PassId { Main = 0, Prepass = 1, Shadow = 2, Planar = 3, Probe = 4 };
 
