@@ -268,6 +268,11 @@ void GameScene::updateOnline(float dt) {
 }
 
 void GameScene::onlineEvent(const net::Event& e) {
+    if (live::aboutAnotherGame(e, og_.id)) {
+        LOGI("online: a late message of game %llu ignored (game %llu is played)", (unsigned long long)e.gameId,
+             (unsigned long long)og_.id);
+        return;
+    }
     switch (e.kind) {
     case Kind::GameSnapshot: onlineSnapshot(e.game); break;
     case Kind::MoveMade:
