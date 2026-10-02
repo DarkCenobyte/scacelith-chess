@@ -134,7 +134,7 @@ public:
     std::string toUCI(const Move& m) const;       // "e7e8q"
     Move parseUCI(const std::string& s) const;    // invalid Move if not legal here
     // Tolerant: "0-0", "O-O", missing or extra "+"/"#"/"!?", "e8Q", "e8=Q", "e8(Q)", "exd6e.p.",
-    // "Ng1f3", "Ng1-f3", "1.e4", lowercase piece letters, and plain UCI ("e2e4").
+    // "Ng1f3", "Ng1-f3", "1.e4", plain UCI ("e2e4"), then lowercase piece letters ("nf3"; a legal "b1d2" stays UCI).
     Move parseSAN(const std::string& s) const;
     uint64_t perft(int depth) const;
 
