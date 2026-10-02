@@ -25,7 +25,7 @@ void surface(in SurfaceInput i, inout Surface s) {
     vec2 c = f - 0.5;
     vec2 cellId = floor(i.uv);
     vec4 ch = mat_hash4(cellId.x * 13.0 + cellId.y * 57.0 + 1.0);
-    float aa = fwidth(c.x) + fwidth(c.y);
+    float aa = fwidth(i.uv.x) + fwidth(i.uv.y);  // not of c: fract wraps inside some quads
     float r = length(c);
     float box = max(abs(c.x), abs(c.y));
 
@@ -48,7 +48,10 @@ void surface(in SurfaceInput i, inout Surface s) {
     float relief = ros * (0.4 + 0.6 * saturate(-dRos / (rr * 0.25))) + boss * sqrt(saturate(1.0 - sq(r / (rr * 0.22))));
     // Petal veins (painted lines on the gold).
     float ang = atan(c.y, c.x);
-    float veins = mat_band(fract(ang * 8.0 / TAU + 0.5) - 0.5, 0.02, fwidth(ang * 8.0 / TAU)) * ros * (1.0 - boss);
+    float a8 = ang * 8.0 / TAU;
+    // Footprint of a8 without atan's seam (Tarini): fract(a8 + 0.5) wraps between the veins.
+    float fa = min(fwidth(a8), fwidth(fract(a8 + 0.5)));
+    float veins = mat_band(fract(a8 + 0.5) - 0.5, 0.02, fa) * ros * (1.0 - boss);
 
     // Laurel wreath: pairs of pointed leaves (one each side of the stem) pointing along the ring,
     // with berries between the pairs; a thin gold stem line.
