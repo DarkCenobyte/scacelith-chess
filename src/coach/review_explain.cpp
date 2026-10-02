@@ -670,6 +670,12 @@ bool promotionRace(const Ctx& c, Explanation& out) {
                 if (fileOf(s) == fileOf(st.move.from) && (pawn == NoSquare || std::abs(rankOf(s) - rankOf(prom)) < std::abs(rankOf(pawn) - rankOf(prom))))
                     pawn = s;
         if (pawn == NoSquare) continue;
+        // Every line says the king is too far: the rule of the square on the square the line queens on
+        // (the coach to move, as outsideSquare()). Inside it, the pawn queens for another reason.
+        const int kingSteps = std::max(std::abs(fileOf(hk) - fileOf(prom)), std::abs(rankOf(hk) - rankOf(prom)));
+        int pawnSteps = std::abs(rankOf(prom) - rankOf(pawn));
+        if (rankOf(pawn) == (c.coach == White ? 1 : 6)) pawnSteps -= 1;   // the double step saves a move
+        if (kingSteps <= pawnSteps) continue;
         Explanation ex;
         ex.type = ExType::PromotionRace;
         ex.concrete = true;
@@ -679,7 +685,7 @@ bool promotionRace(const Ctx& c, Explanation& out) {
         put(b.line, "your", pieceArg(c.p1, hk, c.human));
         put(b.line, "my", pieceArg(c.p1, pawn, c.human));
         put(b.line, "n", Arg::ofNumber(std::abs(rankOf(prom) - rankOf(pawn))));
-        put(b.line, "n2", Arg::ofNumber(std::max(std::abs(fileOf(hk) - fileOf(prom)), std::abs(rankOf(hk) - rankOf(prom)))));
+        put(b.line, "n2", Arg::ofNumber(kingSteps));
         traceMove(b, Rook, pawn, prom, "sq");   // a straight stroke from the pawn to the square
         pointPiece(b, hk, "your");
         ex.includesBest = c.level == 6;

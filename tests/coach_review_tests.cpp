@@ -954,6 +954,28 @@ TEST(coach_review_promotion_race_names_the_queening_pawn) {
     }
 }
 
+TEST(coach_review_promotion_race_checks_the_square) {
+    // The b-pawn queens because the bishop covers c2, not because the king on d1 is outside its
+    // square: no rule-of-the-square line. With the king on g1 it really is outside: the line is said.
+    for (int level = 1; level <= 6; ++level) {
+        for (bool outside : {false, true}) {
+            // White: Kd1 (or Kg1), h2. Black: Kh8, Be4 (covers c2), b3.
+            Game g = gameOf(outside ? "7k/8/8/8/4b3/1p6/7P/6K1 w - - 0 1" : "7k/8/8/8/4b3/1p6/7P/3K4 w - - 0 1",
+                            {"h3"});
+            Reviewer rv;
+            rv.reset(level, White);
+            const ai::Analysis a0 =
+                analysisOf({pvl(-150, outside ? "g1f2" : "d1c1"),
+                            pvl(-900, outside ? "h2h3 b3b2 g1f2 b2b1q" : "h2h3 b3b2 d1e2 b2b1q")});
+            const Review r = reviewOf(rv, g, a0);
+            CHECK_EQ(hasKey(r.script, "ex.promotion.b" + std::to_string(level)), outside);
+            if (!outside)
+                for (const std::string& k : keysOf(r.script)) CHECK(!startsWith(k, "ex.promotion"));
+            checkScript(r.script, "promotion square");
+        }
+    }
+}
+
 TEST(coach_review_repetition_tip_is_not_a_stalemate) {
     // A winning player repeats the position (level 1): the repetition tip is said, but the move is
     // not recorded as a stalemate fault, so the appraisal gives no stalemate advice about it.
