@@ -241,6 +241,14 @@ TEST(archive_file_names) {
     CHECK_EQ(archive::sanitizeName("\xE7\x8E\x8B\xE5\xB0\x8F\xE6\x98\x8E"), std::string("\xE7\x8E\x8B\xE5\xB0\x8F\xE6\x98\x8E"));
     CHECK_EQ(archive::sanitizeName("evil\xE2\x80\xAE" "fdp.exe"), std::string("evilfdp.exe"));
     CHECK_EQ(archive::sanitizeName("a\xE2\x80\x8B" "b\xE3\x80\x80" "c"), std::string("ab_c"));
+    // Letters whose codepoint ends in the byte of a forbidden character (U+043E, U+017C) or in 00
+    // (U+0100, U+4E00, U+AC00) are kept.
+    CHECK_EQ(archive::sanitizeName("\xD0\x98\xD0\xB2\xD0\xB0\xD0\xBD \xD0\x9F\xD0\xB5\xD1\x82\xD1\x80\xD0\xBE\xD0\xB2"),
+             std::string("\xD0\x98\xD0\xB2\xD0\xB0\xD0\xBD_\xD0\x9F\xD0\xB5\xD1\x82\xD1\x80\xD0\xBE\xD0\xB2"));  // Ivan Petrov
+    CHECK_EQ(archive::sanitizeName("Bo\xC5\xBC" "ena"), std::string("Bo\xC5\xBC" "ena"));
+    CHECK_EQ(archive::sanitizeName("\xE4\xB8\x80"), std::string("\xE4\xB8\x80"));
+    CHECK_EQ(archive::sanitizeName("\xC4\x80" "da"), std::string("\xC4\x80" "da"));
+    CHECK_EQ(archive::sanitizeName("\xEA\xB9\x80\xEA\xB0\x80\xEC\x9D\x80"), std::string("\xEA\xB9\x80\xEA\xB0\x80\xEC\x9D\x80"));
     // Length: whole UTF-8 characters only.
     std::string longName;
     for (int i = 0; i < 30; ++i) longName += "\xC3\xA9";  // 60 bytes

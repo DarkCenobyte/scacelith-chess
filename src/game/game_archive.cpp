@@ -470,7 +470,10 @@ std::string sanitizeName(const std::string& name, size_t maxBytes) {
         uint32_t cp = nextCodepoint(name, i);
         if (cp < 0x20 || cp == 0x7F || cp == 0xFFFD || cp == 0xFEFF) continue;
         if ((cp >= 0x200B && cp <= 0x200F) || (cp >= 0x202A && cp <= 0x202E) || (cp >= 0x2060 && cp <= 0x2069)) continue;
-        if (cp == ' ' || cp == 0xA0 || (cp >= 0x2000 && cp <= 0x200A) || cp == 0x3000 || std::strchr("<>:\"/\\|?*", int(cp)))
+        // The characters Windows refuses in a name are ASCII (strchr alone would test only the low
+        // byte of the codepoint, and match its terminating NUL).
+        if (cp == ' ' || cp == 0xA0 || (cp >= 0x2000 && cp <= 0x200A) || cp == 0x3000 ||
+            (cp < 0x80 && std::strchr("<>:\"/\\|?*", int(cp))))
             cp = '_';
         if (cp == '_' && !out.empty() && out.back() == '_') continue;
         uni::append(out, cp);
