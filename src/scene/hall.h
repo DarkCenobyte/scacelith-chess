@@ -22,8 +22,10 @@
 //   * WallStone, WallPanelWood, GildedTrim, WindowFrame, Brass, Curtain: uv in meters along the
 //     surface (planar faces: world-aligned projection; sweeps: (length along path, length along
 //     profile)); positionOS == world position (the hall model is in world space).
-//   * CeilingPainted: coffer panels and the plafond face down at y = COFFER_TOP / PLAFOND_TOP with
-//     uv = world (x, z) in meters. Paintings (framed canvases on the walls) are a separate part
+//   * CeilingPainted: coffer panels and the plafond face down at y = COFFER_TOP / PLAFOND_TOP. Each
+//     coffer panel has uv = (column, row) of the coffer + position in the panel in [0,1] (one motif
+//     per panel); the plafond panel keeps uv = world (x, z) in meters, and its cove (a sweep) uv in
+//     meters along path and profile. Paintings (framed canvases on the walls) are a separate part
 //     "hall_paintings" (CeilingPainted) with uv in [0,1] over each canvas; its inst[0].x = 1 is
 //     reserved for a painting mode that ceiling.glsl does not implement (it ignores instParams).
 //   * WindowGlass: two thin faces per window (transparent, no shadow casting); uv = (distance along

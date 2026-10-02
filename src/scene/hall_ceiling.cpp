@@ -56,6 +56,17 @@ void downQuad(MeshData& d, float x0, float x1, float z0, float z1, float y) {
     quadFlat(d, vec3(x0, y, z0), vec3(x1, y, z0), vec3(x1, y, z1), vec3(x0, y, z1), vec3(0, -1, 0), vec3(1, 0, 0));
 }
 
+// Painted coffer panel: uv = (kx, kz) + position in the panel in [0,1], so ceiling.glsl draws its
+// motif once per panel (fract(uv)) and floor(uv) = (kx, kz) keeps the per-coffer variation.
+void cofferQuad(MeshData& d, float x0, float x1, float z0, float z1, float y, int kx, int kz) {
+    size_t first = d.vertices.size();
+    downQuad(d, x0, x1, z0, z1, y);
+    for (size_t i = first; i < d.vertices.size(); ++i) {
+        Vertex& v = d.vertices[i];
+        v.uv = vec2(float(kx) + (v.pos.x - x0) / (x1 - x0), float(kz) + (v.pos.z - z0) / (z1 - z0));
+    }
+}
+
 Profile halfRound(float r, float a0 = 0.0f) {
     Profile p;
     for (int i = 0; i <= 6; ++i) {
@@ -111,8 +122,9 @@ void buildCeiling(Accum& a) {
                      {0.052f, 0.104f}, {0.058f, 0.122f}, {0.06f, 0.13f}, {0.06f, 0.13f}, {0.07f, 0.13f}};
     Profile riser2 = {{0.07f, 0.13f}, {0.07f, CT - 0.02f}};
     Profile beadP = {{0.07f, CT - 0.02f}, {0.08f, CT - 0.019f}, {0.088f, CT - 0.014f}, {0.092f, CT - 0.006f}, {0.095f, CT - 0.002f}, {0.1f, CT}};
-    for (auto& ix : cx)
-        for (auto& iz : cz) {
+    for (size_t kx = 0; kx < cx.size(); ++kx)
+        for (size_t kz = 0; kz < cz.size(); ++kz) {
+            const auto &ix = cx[kx], &iz = cz[kz];
             float mx = 0.5f * (ix.first + ix.second), mz = 0.5f * (iz.first + iz.second);
             if (inPlafond(mx, mz)) continue;
             std::vector<vec3> loop = rectLoop(ix.first, ix.second, iz.first, iz.second, H);
@@ -120,7 +132,7 @@ void buildCeiling(Accum& a) {
             sweep(gilt, ovolo, loop, vec3(0, 1, 0), true);
             sweep(stone, riser2, loop, vec3(0, 1, 0), true);
             sweep(gilt, beadP, loop, vec3(0, 1, 0), true);
-            downQuad(paint, ix.first + 0.1f, ix.second - 0.1f, iz.first + 0.1f, iz.second - 0.1f, COFFER_TOP);
+            cofferQuad(paint, ix.first + 0.1f, ix.second - 0.1f, iz.first + 0.1f, iz.second - 0.1f, COFFER_TOP, int(kx), int(kz));
             float r = 0.16f * std::min(ix.second - ix.first, iz.second - iz.first);
             rosette(gilt, vec3(mx, COFFER_TOP, mz), vec3(0, -1, 0), r, 8, 0.055f);
         }
