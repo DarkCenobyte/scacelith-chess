@@ -222,6 +222,38 @@ std::string hostPort(const std::string& host, int port) {
     bool v6 = host.find(':') != std::string::npos;
     return (v6 ? "[" + host + "]" : host) + ":" + std::to_string(port);
 }
+// The direct join's address field read as the host's Copy writes it ("[v6]:port CODE",
+// "a.b.c.d:port CODE"): its host, and the port and code it carries ("" when none). The code is a
+// last word after a space, looked for only when 'withCode'; "host:port" is split only with a single
+// ':' (a bare IPv6 address has several), "[v6]" only with nothing or ":port" after it.
+struct DirectAddress {
+    std::string host, port, code;
+};
+DirectAddress splitDirectAddress(const std::string& field, bool withCode) {
+    DirectAddress a;
+    std::string s = trim(field);
+    const size_t space = s.find_last_of(" \t");
+    if (withCode && space != std::string::npos) {
+        a.code = upperCode(s.substr(space + 1));
+        s = trim(s.substr(0, space));
+    }
+    auto isPort = [](const std::string& p) { return !p.empty() && p.size() <= 5 && digitsOnly(p) == p; };
+    const size_t close = s.find(']'), colon = s.find(':');
+    if (s.size() > 2 && s[0] == '[' && close != std::string::npos) {
+        const std::string rest = s.substr(close + 1);
+        if (rest.empty() || (rest[0] == ':' && isPort(rest.substr(1)))) {
+            a.host = s.substr(1, close - 1);
+            if (!rest.empty()) a.port = rest.substr(1);
+            return a;
+        }
+    } else if (colon != std::string::npos && colon > 0 && s.find(':', colon + 1) == std::string::npos && isPort(s.substr(colon + 1))) {
+        a.host = s.substr(0, colon);
+        a.port = s.substr(colon + 1);
+        return a;
+    }
+    a.host = s;
+    return a;
+}
 bool isOfficialCategory(int baseSec, int incSec) {
     for (const net::Category& c : ses().info().categories)
         if (c.baseSec == baseSec && c.incSec == incSec) return true;
@@ -1772,17 +1804,25 @@ void pageDirectJoin(float t) {
     }
     footerRule(p);
     bool back = backButton(p, connecting ? "common.cancel" : "common.back");
-    int portNum = std::atoi(O.directPort.c_str());
+    // The address may carry the port and the code (pasted from the host's Copy): they go to their
+    // fields when Join is pressed.
+    const DirectAddress to = splitDirectAddress(O.directAddress, O.directCode.empty());
+    const std::string portText = to.port.empty() ? O.directPort : to.port;
+    const std::string codeText = to.code.empty() ? O.directCode : to.code;
+    int portNum = std::atoi(portText.c_str());
     std::string raw;
-    for (char c : O.directCode)
+    for (char c : codeText)
         if (c != '-') raw += c;
-    bool ready = !trim(O.directAddress).empty() && portNum > 0 && portNum <= 65535 && raw.size() == 12;
+    bool ready = !to.host.empty() && portNum > 0 && portNum <= 65535 && raw.size() == 12;
     if (primaryButton(p, "online.direct.join_button", ready && !connecting, connecting)) {
-        gs.directAddress = trim(O.directAddress);
+        if (to.host != trim(O.directAddress)) O.directAddress = to.host;
+        O.directPort = portText;
+        O.directCode = codeText;
+        gs.directAddress = to.host;
         gs.directJoinPort = portNum;
         gs.save();
         O.error.clear();
-        s.joinDirect(trim(O.directAddress), uint16_t(portNum), O.directCode);
+        s.joinDirect(to.host, uint16_t(portNum), O.directCode);
         O.directJoining = true;
     }
     im::popId();
