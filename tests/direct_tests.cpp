@@ -2329,3 +2329,29 @@ TEST(direct_host_refuses_without_stalling) {
     CHECK(guest.waitClosed(2000));
     CHECK(host.dm.currentGame() && !host.dm.currentGame()->blackConnected);
 }
+
+TEST(direct_guest_message_out_of_sequence_logged_once) {
+    // Guest messages out of sequence are dropped and the link stays; the first one is logged,
+    // not each of them (every log line is written and flushed to the log file at once).
+    Peer host;
+    RawGuest raw;
+    P::GameSnapshot snap;
+    CHECK(joinRaw(host, raw, snap));
+    LogCapture log;
+    P::C_Ping ping;
+    std::vector<uint8_t> stale;
+    for (uint32_t i = 0; i < 200; ++i) {
+        ping.seq = 1;
+        ping.nonce = i;
+        stale.clear();
+        P::encode(ping, stale);
+        CHECK(raw.sendBytes(stale));
+    }
+    ping.nonce = 4242;
+    CHECK(raw.send(ping));
+    P::S_Pong pong;
+    CHECK(raw.waitFor(pong, 5000));
+    CHECK_EQ(pong.nonce, 4242u);
+    CHECK_EQ(raw.errors, 0);
+    CHECK_EQ(log.count("dropped (expected"), 1);
+}

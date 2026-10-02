@@ -233,6 +233,7 @@ struct Conn {
     int64_t deadline = 0;    // steady ms: end of the handshake / Hello, or of a closeStep() close
     int64_t lastRecv = 0;
     uint32_t lastSeq = 0;    // host: last seq received from the guest
+    bool badSeqReported = false;   // host: a guest message out of sequence was logged
     bool peerClosed = false;
     bool halfClosed = false; // closeStep(): the sending side is shut down
 
@@ -816,7 +817,9 @@ private:
         if (msg.size() < 5 || !P::isClientType(msg[0])) return;
         const uint32_t seq = uint32_t(msg[1]) | uint32_t(msg[2]) << 8 | uint32_t(msg[3]) << 16 | uint32_t(msg[4]) << 24;
         if (seq != guest_->lastSeq + 1) {
-            LOGW("direct: guest message with seq %u dropped (expected %u)", seq, guest_->lastSeq + 1);
+            // Logged once per connection (as the server does), not for every such message.
+            if (!guest_->badSeqReported) LOGW("direct: guest message with seq %u dropped (expected %u)", seq, guest_->lastSeq + 1);
+            guest_->badSeqReported = true;
             return;
         }
         guest_->lastSeq = seq;
