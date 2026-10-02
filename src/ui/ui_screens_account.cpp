@@ -897,9 +897,9 @@ AccountNav pageDevices(float t, bool fresh, std::string& navNote) {
         int r = im::confirmDialog("##online.devices.all", T("online.devices.all.title"), T("online.account.sign_out_all.help"),
                                   T("online.account.sign_out_all"), T("common.cancel"), true);
         if (r == 1) {
-            se.signOut(true);
+            signOutEverywhere();
             clearSecrets();
-            navNote = T("online.account.signed_out_all");
+            navNote = T("online.account.signing_out_all");
             nav = AccountNav::SignIn;
         }
         if (r >= 0) s.confirmAll = false;

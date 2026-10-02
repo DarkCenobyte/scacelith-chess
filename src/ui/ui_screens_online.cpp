@@ -293,6 +293,9 @@ struct State {
     int mfaStep = 0;
     std::string mfaSecret, mfaUri;
     std::vector<std::string> codes;
+    // sign out
+    bool confirmAll = false;    // the account page's Sign out everywhere dialog is open
+    bool everywhere = false;    // the last sign-out was everywhere: its answer is told
     // challenge / private game
     Terms terms;
     bool privateCreated = false;
@@ -505,7 +508,20 @@ void pumpResults() {
     }
     if (s.take(Kind::AccountResult, e) && !e.ok && e.error != "unauthorized" && O.sub == Sub::Account)
         O.error = game::onlineErrorText(e.error, e.retryAfterSec);
-    s.take(Kind::LogoutResult, e);
+    // Sign out everywhere: done only when the server says so (this computer is signed out anyway).
+    if (s.take(Kind::LogoutResult, e) && O.everywhere) {
+        O.everywhere = false;
+        const std::string text = e.ok ? T("online.account.signed_out_all")
+                                      : i18n::trf("online.account.sign_out_all_failed", {game::onlineErrorText(e.error, e.retryAfterSec)});
+        if (O.sub != Sub::SignIn) {
+            notify(text, 6.0f);
+        } else if (e.ok) {
+            O.note = text;
+        } else {
+            O.note.clear();
+            O.error = text;
+        }
+    }
 }
 
 // ---- Sub-pages: server, sign in ------------------------------------------------------------------------
@@ -780,7 +796,9 @@ void pageAccount(float t) {
     if (O.fresh) {
         s.api().fetchAccount();
         s.expect(Kind::AccountResult);
+        O.confirmAll = false;
     }
+    if (O.confirmAll) im::pushBlock();
     Rect p = beginPage(t, 1720.0f, 960.0f, T("online.account.title"));
     serverLine(p, true);
     im::pushId("account");
@@ -923,15 +941,31 @@ void pageAccount(float t) {
     bool history = im::button(L("online.account.history"), hb, im::ButtonKind::Primary);
     im::popId();
     endPage();
+    if (O.confirmAll) im::popBlock();
     if (history) {
         openAccountPage(Sub::History);
         return;
     }
-    if (signOut || signOutAll) {
-        s.signOut(signOutAll);
+    // Every computer only once confirmed, as on the signed-in devices page.
+    if (signOutAll) O.confirmAll = true;
+    if (O.confirmAll) {
+        int r = im::confirmDialog("##online.account.all", T("online.devices.all.title"), T("online.account.sign_out_all.help"),
+                                  T("online.account.sign_out_all"), T("common.cancel"), true);
+        if (r == 1) {
+            signOutEverywhere();
+            clearSecrets();
+            setSub(Sub::SignIn);
+            O.note = T("online.account.signing_out_all");
+        }
+        if (r >= 0) O.confirmAll = false;
+        return;
+    }
+    if (signOut) {
+        s.signOut(false);
+        O.everywhere = false;
         clearSecrets();
         setSub(Sub::SignIn);
-        O.note = T(signOutAll ? "online.account.signed_out_all" : "online.account.signed_out");
+        O.note = T("online.account.signed_out");
         return;
     }
     if (back || im::consumeBack()) setSub(Sub::Play);
@@ -1762,6 +1796,13 @@ void pageDirectJoin(float t) {
 
 // ==== Hooks ================================================================================================
 namespace detail {
+
+namespace onl {
+void signOutEverywhere() {
+    ses().signOut(true);
+    O.everywhere = true;
+}
+}  // namespace onl
 
 bool onlineGameStarting() { return game::onlineSession().gameReady(); }
 
