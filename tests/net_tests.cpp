@@ -1515,6 +1515,23 @@ public:
         }
     }
 
+    // What the server does to the connections of the sessions it revokes (all of an account deleted):
+    // Notice{SessionRevoked}, a fatal Error{Unauthorized} and close 4003, on every WebSocket.
+    void revokeSessions() {
+        std::lock_guard<std::mutex> lk(mu_);
+        for (Sock s : ws_) {
+            pr::Notice n;
+            n.code = pr::NoticeCode::SessionRevoked;
+            sendMsg(s, n);
+            pr::Error e;
+            e.code = pr::ErrorCode::Unauthorized;
+            e.fatal = true;
+            sendMsg(s, e);
+            uint8_t payload[2] = {uint8_t(pr::CloseCode::Unauthorized >> 8), uint8_t(pr::CloseCode::Unauthorized & 0xFF)};
+            sendFrame(s, 0x8, payload, 2);
+        }
+    }
+
     // The opponent's gesture (S_Gesture) on every WebSocket.
     void sendGesture(const pr::S_Gesture& g) {
         std::lock_guard<std::mutex> lk(mu_);
@@ -1678,6 +1695,10 @@ private:
             if (!authed) return respond(s, 401, "{\"error\":\"unauthorized\"}");
             if (body["password"].asString() != "pw") return respond(s, 403, "{\"error\":\"invalid_password\"}");
             ++deletes;
+            // As the server, the account's connections are closed before the answer, which comes
+            // a little later here: their frames reach the client first.
+            revokeSessions();
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
             respond(s, 200, "{\"status\":\"deleted\"}");
         } else {
             respond(s, 404, "{\"error\":\"not_found\"}");
@@ -3989,6 +4010,64 @@ TEST(net_account_delete_stops_realtime) {
         }));
         CHECK(c.state() == net::ConnState::Offline);
         CHECK_EQ(srv.hellos.load(), hellos);        // no reconnection
+    }
+    net::sys::removeFile(credPath);
+}
+
+// The realtime connection closes before the deletion is asked for, so that the server's closing
+// of the deleted account's connections brings no revoked-session notice, refusal or Unauthorized
+// state. A deletion that fails opens it again, if it was open.
+TEST(net_account_delete_closes_realtime_first) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    FakeServer srv;
+    CHECK(srv.start());
+    std::string credPath = tempCredentialPath("acct-delete-first");
+    using K = net::Event::Kind;
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        net::ServerEndpoint ep;
+        ep.host = "127.0.0.1";
+        ep.apiPort = srv.port;
+        ep.insecureDev = true;
+        c.setServer(ep);
+        net::Event ev;
+        c.login("alice", "pw");
+        CHECK(waitEvent(c, K::LoginResult, ev, 20000) && ev.ok);
+        // Not connected: a deletion refused opens nothing.
+        c.deleteAccount("wrong", "");
+        CHECK(waitEvent(c, K::AccountDeleted, ev, 10000));
+        CHECK_EQ(ev.error, std::string("invalid_password"));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        CHECK(c.state() == net::ConnState::Offline);
+        CHECK_EQ(srv.hellos.load(), 0);
+        // Connected: closed for the request, open again once it is refused.
+        c.connect();
+        CHECK(waitEvent(c, K::Welcome, ev, 10000));
+        c.deleteAccount("wrong", "");
+        std::vector<net::Event> seen;
+        CHECK(waitEvent(c, K::AccountDeleted, ev, 10000, &seen));
+        CHECK_EQ(ev.error, std::string("invalid_password"));
+        CHECK(std::any_of(seen.begin(), seen.end(), [](const net::Event& e) {
+            return e.kind == net::Event::Kind::ConnectionChanged && e.state == net::ConnState::Offline;
+        }));
+        CHECK(waitEvent(c, K::Welcome, ev, 10000));
+        CHECK_EQ(srv.hellos.load(), 2);
+        CHECK(c.hasSavedSession());
+        // Deleted: the connection was closed before, and stays so.
+        seen.clear();
+        c.deleteAccount("pw", "");
+        CHECK(waitEvent(c, K::AccountDeleted, ev, 10000, &seen));
+        CHECK(ev.ok);
+        CHECK_EQ(srv.deletes.load(), 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        while (c.poll(ev)) seen.push_back(ev);
+        CHECK(std::none_of(seen.begin(), seen.end(), [](const net::Event& e) {
+            return e.kind == net::Event::Kind::Notice || e.kind == net::Event::Kind::ServerError ||
+                   (e.kind == net::Event::Kind::ConnectionChanged && e.state != net::ConnState::Offline);
+        }));
+        CHECK(c.state() == net::ConnState::Offline);
+        CHECK_EQ(srv.hellos.load(), 2);
     }
     net::sys::removeFile(credPath);
 }

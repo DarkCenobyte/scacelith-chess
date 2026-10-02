@@ -804,7 +804,10 @@ struct OnlineClient::Impl {
         sso = Sso();
     }
 
-    void stopRealtime();   // account API: the session ended on the server (defined with those calls)
+    // Account API: the session ended on the server, or an account deletion under way (defined with
+    // those calls).
+    uint32_t stopRealtime(std::shared_ptr<bool> wasOpen = nullptr);
+    void resumeRealtime(uint32_t gen, std::shared_ptr<bool> wasOpen);
 
     void ssoPollOnce() {
         Event ev;
@@ -2066,15 +2069,30 @@ Event failedAnswer(Event::Kind kind, uint64_t gameId) {
 }  // namespace
 
 // Ends the realtime connection for good (no reconnection), from any thread: the account deleted,
-// the session of this game revoked.
-void OnlineClient::Impl::stopRealtime() {
-    connectGen.fetch_add(1);
-    realtime([this] {
+// the session of this game revoked. wasOpen: set on net-rt to whether the connection was wanted
+// then (open or opening), for resumeRealtime(). Returns the connectGen it begins.
+uint32_t OnlineClient::Impl::stopRealtime(std::shared_ptr<bool> wasOpen) {
+    const uint32_t gen = connectGen.fetch_add(1) + 1;
+    realtime([this, wasOpen] {
+        if (wasOpen) *wasOpen = rt.wanted;
         rt.wanted = false;
         dropSocket(1000);
         setState(ConnState::Offline);
     });
     rtCancel.cancel();   // after the command (see tryConnect)
+    return gen;
+}
+
+// Opens again the realtime connection that stopRealtime() ended for a call that failed (the
+// account is still there): when it was open or opening then, and nothing stopped it or changed the
+// server since (connectGen still 'gen'). An automatic reconnection: the last /info answer may serve.
+void OnlineClient::Impl::resumeRealtime(uint32_t gen, std::shared_ptr<bool> wasOpen) {
+    realtime([this, gen, wasOpen] {
+        if (!*wasOpen || gen != connectGen.load() || rt.wanted) return;
+        rt.wanted = true;
+        rt.attempt = 0;
+        rt.nextAttempt = Clock::now();
+    });
 }
 
 void OnlineClient::fetchMyGames(uint64_t before, int limit, const GamesFilter& filter) {
@@ -2267,7 +2285,11 @@ void OnlineClient::deleteAccount(const std::string& password, const std::string&
     json::Value b = json::Value::object();
     b.set("password", password);
     setSecondFactor(b, codeOrRecovery);
-    d->http([d, e, b] {
+    // The server closes every connection of the account it deletes: this one is closed first, as by
+    // logout(), so that its revoked-session notice and refusals never reach the game.
+    auto wasOpen = std::make_shared<bool>(false);
+    const uint32_t gen = d->stopRealtime(wasOpen);
+    d->http([d, e, b, gen, wasOpen] {
         Impl::Api a = d->api(e, "POST", "/account/delete", &b, true, d->httpCancel);
         Event ev;
         ev.kind = Event::Kind::AccountDeleted;
@@ -2275,7 +2297,7 @@ void OnlineClient::deleteAccount(const std::string& password, const std::string&
         if (a.ok()) {
             // Gone on the server (every session revoked): the token is erased here as by logout(),
             // and the name of the deleted account is forgotten too (the server id and the pin of
-            // the origin stay). The realtime connection stops without reconnecting.
+            // the origin stay). The realtime connection stays closed (a connect() since included).
             Credential c;
             if (d->creds.get(e.origin(), c)) {
                 c.token.clear();
@@ -2283,6 +2305,10 @@ void OnlineClient::deleteAccount(const std::string& password, const std::string&
                 d->creds.put(c);
             }
             d->stopRealtime();
+        } else if (a.error != "unauthorized") {
+            // The account is still there (a wrong password, the server unreachable...): the
+            // connection opens again if it was open. Not with a session refused (erased).
+            d->resumeRealtime(gen, wasOpen);
         }
         d->post(ev);
     });

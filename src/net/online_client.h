@@ -409,8 +409,9 @@ public:
     // 6-digit code ("code") or a recovery code ("recoveryCode").
     void changeEmail(const std::string& newEmail, const std::string& password, const std::string& codeOrRecovery);
     void exportAccount(const std::string& password, const std::string& codeOrRecovery);   // text = the JSON
-    // On success the token and the user name saved for the origin are erased and the realtime
-    // connection stops (no reconnection); AccountDeleted then comes with ok.
+    // The realtime connection closes first (the server closes every connection of the account it
+    // deletes). On success the token and the user name saved for the origin are erased and it stays
+    // closed; AccountDeleted then comes with ok. On a failure it opens again if it was open.
     void deleteAccount(const std::string& password, const std::string& codeOrRecovery);
 
     // ---- animated GIFs (HTTPS; dedicated-server/docs/API.md) ----
