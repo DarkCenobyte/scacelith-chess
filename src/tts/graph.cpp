@@ -48,6 +48,7 @@ Tensor tensorOf(const onnx::TensorData& t, bool copy) {
     if (type == DType::None) return Tensor();
     if (!copy && t.raw) return Tensor::view(type, t.dims, t.bytes());
     Tensor r = Tensor::alloc(type, t.dims);
+    if (r.bytes() != t.byteSize()) return Tensor();   // onnx::parse checks it; never copy past the buffer
     if (t.byteSize()) std::memcpy(r.owner->data, t.bytes(), t.byteSize());
     return r;
 }

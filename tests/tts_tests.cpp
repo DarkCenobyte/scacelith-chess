@@ -337,6 +337,68 @@ struct Pb {
     }
 };
 
+template <class T>
+std::string bytesOf(const std::vector<T>& v) {
+    return std::string(reinterpret_cast<const char*>(v.data()), v.size() * sizeof(T));
+}
+
+// TensorProto with raw_data (ONNX element type 'type').
+Pb tensorPb(const std::string& name, const Dims& d, int type, const std::string& raw) {
+    Pb t;
+    for (int64_t x : d) t.i(1, uint64_t(x));
+    t.i(2, uint64_t(type));
+    t.s(9, raw);
+    t.s(8, name);
+    return t;
+}
+
+// NodeProto with its attributes (AttributeProto messages).
+Pb nodePb(const std::string& op, const std::vector<std::string>& in, const std::vector<std::string>& out,
+          const std::vector<Pb>& attrs = {}) {
+    Pb n;
+    for (auto& s : in) n.s(1, s);
+    for (auto& s : out) n.s(2, s);
+    n.s(3, op + "_" + out[0]);
+    n.s(4, op);
+    for (const Pb& a : attrs) n.m(5, a);
+    return n;
+}
+
+Pb attrInts(const std::string& name, const std::vector<int64_t>& v) {
+    Pb a;
+    a.s(1, name);
+    for (int64_t x : v) a.i(8, uint64_t(x));
+    return a;
+}
+
+Pb attrTensor(const std::string& name, const Pb& t) {
+    Pb a;
+    a.s(1, name);
+    a.m(5, t);
+    return a;
+}
+
+// ModelProto (opset 19) of one graph.
+std::string modelPb(const std::vector<Pb>& nodes, const std::vector<Pb>& inits, const std::vector<std::string>& inputs,
+                    const std::vector<std::string>& outputs) {
+    Pb graph;
+    for (const Pb& n : nodes) graph.m(1, n);
+    graph.s(2, "test");
+    for (const Pb& t : inits) graph.m(5, t);
+    for (auto& s : inputs) graph.m(11, Pb().s(1, s));
+    for (auto& s : outputs) graph.m(12, Pb().s(1, s));
+    Pb opset;
+    opset.s(1, "").i(2, 19);
+    Pb model;
+    model.i(1, 9).m(7, graph).m(8, opset);
+    return model.b;
+}
+
+// Graph::load of a serialized model ('bytes' must outlive the graph).
+bool loadModel(const std::string& bytes, tts::Graph& g, std::string* err) {
+    return g.load(reinterpret_cast<const uint8_t*>(bytes.data()), bytes.size(), "test", {}, K(), err);
+}
+
 }  // namespace
 
 // ------------------------------------------------------------------------------------------------
@@ -440,6 +502,47 @@ TEST(tts_onnx_reader_tiny_model) {
             want.push_back(float(std::max(0.0, gelu)));
         }
     CHECK(equalF(s.output(0), {2, 3}, want, 1e-6f));
+}
+
+// Malformed files are refused by the reader: nothing is half-parsed, read or copied past its data.
+TEST(tts_onnx_reader_malformed) {
+    tts::onnx::Model m;
+    std::string err;
+    auto parses = [&](const std::string& b) {
+        return tts::onnx::parse(reinterpret_cast<const uint8_t*>(b.data()), b.size(), m, &err);
+    };
+    // Constant / ConstantOfShape tensors whose data is larger or smaller than their dims say.
+    for (const char* op : {"Constant", "ConstantOfShape"})
+        for (size_t bytes : {size_t(4096), size_t(0)}) {
+            Pb value = attrTensor("value", tensorPb("v", {}, 1, std::string(bytes, 'x')));
+            std::string b = modelPb({nodePb(op, {}, {"y"}, {value})}, {}, {}, {"y"});
+            CHECK(!parses(b));
+            tts::Graph g;
+            CHECK(!loadModel(b, g, &err) && err.find("size mismatch") != std::string::npos);
+        }
+    Pb value = attrTensor("value", tensorPb("v", {}, 1, std::string(4, 'x')));
+    CHECK(parses(modelPb({nodePb("Constant", {}, {"y"}, {value})}, {}, {}, {"y"})));
+    // Negative initializer dims, even when their product is the element count.
+    Pb neg = tensorPb("w", {-1, -4}, 1, std::string(16, 'x'));
+    CHECK(!parses(modelPb({nodePb("Identity", {"w"}, {"y"})}, {neg}, {}, {"y"})));
+    // data_location DEFAULT (0) after the data is inline data; EXTERNAL and external_data are refused.
+    Pb inl = tensorPb("w", {4}, 1, std::string(16, 'x'));
+    inl.i(14, 0);
+    CHECK(parses(modelPb({nodePb("Identity", {"w"}, {"y"})}, {inl}, {}, {"y"})));
+    CHECK_EQ(m.initializers.size(), size_t(1));
+    Pb ext = tensorPb("w", {4}, 1, std::string(16, 'x'));
+    ext.i(14, 1);
+    CHECK(!parses(modelPb({nodePb("Identity", {"w"}, {"y"})}, {ext}, {}, {"y"})));
+    Pb ext2 = tensorPb("w", {4}, 1, "");
+    ext2.m(13, Pb().s(1, "location").s(2, "w.bin"));
+    CHECK(!parses(modelPb({nodePb("Identity", {"w"}, {"y"})}, {ext2}, {}, {"y"})));
+    // An attribute cut inside the node's own length: the node is not kept without it.
+    Pb perm = attrInts("perm", {1, 0});
+    Pb tr;
+    tr.s(1, "x").s(2, "y").s(3, "t").s(4, "Transpose");
+    tr.s(5, perm.b.substr(0, perm.b.size() - 1));
+    CHECK(!parses(modelPb({tr}, {}, {"x"}, {"y"})));
+    CHECK(parses(modelPb({nodePb("Transpose", {"x"}, {"y"}, {perm})}, {}, {"x"}, {"y"})));
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -1098,7 +1201,8 @@ TEST(tts_kernels_all_levels) {
                 for (int i = 0; i < M; ++i)
                     for (int j = 0; j < N; ++j)
                         for (int kk = 0; kk < Kd && (aU ? i == 0 : j == 0); ++kk)
-                            sums[size_t(aU ? j : i)] += aU ? int8_t(B[size_t(kk * N + j)]) : int8_t(A[size_t(i * Kd + kk)]);
+                            sums[size_t(aU ? j : i)] +=
+                                aU ? int8_t(B[size_t(kk * N + j)]) : int8_t(A[size_t(i * Kd + kk)]);
                 CHECK(tts::igemm(k, level % 2 ? nullptr : &pool, M, N, Kd, A.data(), Kd, aU, azp, B.data(), N, !aU,
                                  bzp, C2.data(), N, sums.data()));
                 CHECK(C2 == C);

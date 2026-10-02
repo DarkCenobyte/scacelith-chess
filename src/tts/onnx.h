@@ -24,13 +24,10 @@ struct TensorData {
     std::vector<uint8_t> decoded;       // float_data / int32_data / int64_data, converted to the element type
     const uint8_t* bytes() const { return raw ? raw : decoded.data(); }
     size_t byteSize() const { return raw ? rawSize : decoded.size(); }
-    int64_t elementCount() const;
 };
 
 struct Attribute {
-    enum Type : int { kFloat = 1, kInt = 2, kString = 3, kTensor = 4, kFloats = 6, kInts = 7 };
     std::string name;
-    int type = 0;
     float f = 0.0f;
     int64_t i = 0;
     std::string s;
@@ -48,8 +45,6 @@ struct NodeProto {
 
 struct ValueInfo {
     std::string name;
-    int elemType = 0;
-    std::vector<int64_t> dims;   // -1 for symbolic dimensions
 };
 
 struct Model {

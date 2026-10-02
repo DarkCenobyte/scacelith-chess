@@ -123,7 +123,8 @@ size_t elementSize(int dataType) {
     }
 }
 
-void parseTensor(Reader r, TensorData& t) {
+// Each parser returns false when its message is malformed (the caller marks itself bad too).
+bool parseTensor(Reader r, TensorData& t) {
     std::vector<float> floats;
     std::vector<int64_t> ints32, ints64;
     int field, wire;
@@ -141,11 +142,15 @@ void parseTensor(Reader r, TensorData& t) {
             t.rawSize = size_t(s.end - s.p);
             break;
         }
-        case 13: case 14: r.bad = true; break;   // external data: not supported
+        case 13: r.bad = true; break;   // external_data: not supported
+        case 14:                        // data_location: only DEFAULT (the data is in this message)
+            if (wire != kVarint || r.varint() != 0) r.bad = true;
+            break;
         default: r.skip(wire); break;
         }
     }
-    if (t.raw) return;
+    if (r.bad) return false;
+    if (t.raw) return true;
     // Typed storage: float_data for FLOAT; int32_data for INT32 and the 8-bit / bool types (one
     // value per element); int64_data for INT64.
     size_t es = elementSize(t.dataType);
@@ -166,9 +171,10 @@ void parseTensor(Reader r, TensorData& t) {
             }
         }
     }
+    return true;
 }
 
-void parseAttribute(Reader r, Attribute& a) {
+bool parseAttribute(Reader r, Attribute& a) {
     int field, wire;
     while (r.more() && r.tag(field, wire)) {
         switch (field) {
@@ -180,16 +186,18 @@ void parseAttribute(Reader r, Attribute& a) {
         }
         case 3: a.i = int64_t(r.varint()); break;
         case 4: a.s = r.string(); break;
-        case 5: parseTensor(r.bytes(), a.t); break;
+        case 5:
+            if (!parseTensor(r.bytes(), a.t)) r.bad = true;
+            break;
         case 7: readFloats(r, wire, a.floats); break;
         case 8: readInts(r, wire, a.ints); break;
-        case 20: a.type = int(r.varint()); break;
         default: r.skip(wire); break;
         }
     }
+    return !r.bad;
 }
 
-void parseNode(Reader r, NodeProto& n) {
+bool parseNode(Reader r, NodeProto& n) {
     int field, wire;
     while (r.more() && r.tag(field, wire)) {
         switch (field) {
@@ -199,82 +207,52 @@ void parseNode(Reader r, NodeProto& n) {
         case 4: n.opType = r.string(); break;
         case 5: {
             n.attributes.emplace_back();
-            parseAttribute(r.bytes(), n.attributes.back());
+            if (!parseAttribute(r.bytes(), n.attributes.back())) r.bad = true;
             break;
         }
         case 7: n.domain = r.string(); break;
         default: r.skip(wire); break;
         }
     }
+    return !r.bad;
 }
 
-void parseValueInfo(Reader r, ValueInfo& v) {
+bool parseValueInfo(Reader r, ValueInfo& v) {
     int field, wire;
     while (r.more() && r.tag(field, wire)) {
-        if (field == 1) {
-            v.name = r.string();
-        } else if (field == 2) {                      // TypeProto
-            Reader tp = r.bytes();
-            int f2, w2;
-            while (tp.more() && tp.tag(f2, w2)) {
-                if (f2 != 1) {                         // tensor_type
-                    tp.skip(w2);
-                    continue;
-                }
-                Reader tt = tp.bytes();
-                int f3, w3;
-                while (tt.more() && tt.tag(f3, w3)) {
-                    if (f3 == 1) {
-                        v.elemType = int(tt.varint());
-                    } else if (f3 == 2) {              // TensorShapeProto
-                        Reader sh = tt.bytes();
-                        int f4, w4;
-                        while (sh.more() && sh.tag(f4, w4)) {
-                            if (f4 != 1) {
-                                sh.skip(w4);
-                                continue;
-                            }
-                            Reader dim = sh.bytes();
-                            int64_t value = -1;
-                            int f5, w5;
-                            while (dim.more() && dim.tag(f5, w5)) {
-                                if (f5 == 1) value = int64_t(dim.varint());
-                                else dim.skip(w5);
-                            }
-                            v.dims.push_back(value);
-                        }
-                    } else {
-                        tt.skip(w3);
-                    }
-                }
-            }
-        } else {
-            r.skip(wire);
-        }
+        if (field == 1) v.name = r.string();
+        else r.skip(wire);   // the type: the runtime takes shapes from the data
     }
+    return !r.bad;
 }
 
 bool parseGraph(Reader r, Model& m) {
     int field, wire;
     while (r.more() && r.tag(field, wire)) {
+        bool ok = true;
         switch (field) {
-        case 1: m.nodes.emplace_back(); parseNode(r.bytes(), m.nodes.back()); break;
-        case 5: m.initializers.emplace_back(); parseTensor(r.bytes(), m.initializers.back()); break;
-        case 11: m.inputs.emplace_back(); parseValueInfo(r.bytes(), m.inputs.back()); break;
-        case 12: m.outputs.emplace_back(); parseValueInfo(r.bytes(), m.outputs.back()); break;
+        case 1: m.nodes.emplace_back(); ok = parseNode(r.bytes(), m.nodes.back()); break;
+        case 5: m.initializers.emplace_back(); ok = parseTensor(r.bytes(), m.initializers.back()); break;
+        case 11: m.inputs.emplace_back(); ok = parseValueInfo(r.bytes(), m.inputs.back()); break;
+        case 12: m.outputs.emplace_back(); ok = parseValueInfo(r.bytes(), m.outputs.back()); break;
         default: r.skip(wire); break;
         }
+        if (!ok) r.bad = true;
     }
     return !r.bad;
 }
 
-}  // namespace
-
-int64_t TensorData::elementCount() const {
-    int64_t n = 1;
-    for (int64_t d : dims) n *= d;
-    return n;
+// The data of a tensor matches its type and dims: every dim >= 0 and byte size = elements x
+// element size, without overflow.
+bool sizeMatches(const TensorData& t) {
+    uint64_t n = elementSize(t.dataType);
+    if (n == 0) return false;
+    for (int64_t d : t.dims)
+        if (d < 0 || __builtin_mul_overflow(n, uint64_t(d), &n)) return false;
+    return n == t.byteSize();
 }
+
+}  // namespace
 
 const Attribute* NodeProto::attribute(const char* attrName) const {
     for (const Attribute& a : attributes)
@@ -307,6 +285,7 @@ bool parse(const uint8_t* data, size_t size, Model& out, std::string* error) {
                 else if (f2 == 2) version = int64_t(o.varint());
                 else o.skip(w2);
             }
+            if (o.bad) r.bad = true;
             if (domain.empty() || domain == "ai.onnx") out.opset = version;
             break;
         }
@@ -317,13 +296,18 @@ bool parse(const uint8_t* data, size_t size, Model& out, std::string* error) {
         if (error) *error = r.bad ? "malformed ONNX protobuf" : "no graph in the ONNX file";
         return false;
     }
-    for (const TensorData& t : out.initializers) {
-        size_t es = elementSize(t.dataType);
-        if (es == 0 || t.byteSize() != size_t(t.elementCount()) * es) {
+    for (const TensorData& t : out.initializers)
+        if (!sizeMatches(t)) {
             if (error) *error = "initializer " + t.name + ": unsupported type or size mismatch";
             return false;
         }
-    }
+    // Tensor attributes (Constant, ConstantOfShape) are copied by their dims: the same check.
+    for (const NodeProto& n : out.nodes)
+        for (const Attribute& a : n.attributes)
+            if (a.t.dataType != 0 && !sizeMatches(a.t)) {
+                if (error) *error = "node " + n.name + " attribute " + a.name + ": unsupported type or size mismatch";
+                return false;
+            }
     return true;
 }
 
