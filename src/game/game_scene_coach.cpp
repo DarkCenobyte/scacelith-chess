@@ -124,7 +124,7 @@ struct CoachRuntime {
     Square lookSquare = NoSquare;
     float lookHold = 0.0f;                            // the look holds while the coach talks, then this long
     bool handOut = false;                             // gestures given since the last retract
-    std::vector<std::pair<float, bool>> headMoves;    // (game time, nod?) still to come
+    std::vector<std::pair<float, bool>> headMoves;    // (the coach's animator time, nod?) still to come
     vec2 lastPointer{-1.0f, -1.0f};
     float pointerIdle = 0.0f;
 
@@ -430,7 +430,8 @@ public:
             break;
         case coach::GestureKind::Nod:
         case coach::GestureKind::ShakeHead:
-            r.headMoves.push_back({s_.time_ + std::max(0.0f, apexIn - kNodApex), g.kind == coach::GestureKind::Nod});
+            // On the animator's clock, like the hand: it stops with the pause menu, and so does the voice.
+            r.headMoves.push_back({now + std::max(0.0f, apexIn - kNodApex), g.kind == coach::GestureKind::Nod});
             return;
         }
         a.enqueue(t);
@@ -1000,7 +1001,7 @@ void GameScene::updateCoach(float dt) {
     // The coach's body: head gestures on their word, a blink at each phrase end, the look.
     anim::Animator& a = anim_[aiSeat()];
     for (size_t i = 0; i < rt.headMoves.size();) {
-        if (time_ >= rt.headMoves[i].first) {
+        if (a.time() >= rt.headMoves[i].first) {
             if (rt.headMoves[i].second) a.nod();
             else a.shakeHead();
             rt.headMoves.erase(rt.headMoves.begin() + long(i));
