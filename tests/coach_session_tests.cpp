@@ -207,9 +207,10 @@ TEST(coach_session_blunder_offer_accepted_and_retried) {
     t.session.onOfferAnswer(t.game, true);
     const auto tb = t.stage.all("takeBack");
     CHECK(tb.size() == 1 && tb[0].n == 1);
-    CHECK_EQ(t.game.moves().size(), size_t(0));
     CHECK(!t.session.offerOpen());
     CHECK(!t.stage.all("offer").back().flag);
+    CHECK(t.until([&] { return !t.stage.tableBusy(); }, 5.0f));   // undone when the table action starts
+    CHECK_EQ(t.game.moves().size(), size_t(0));
     CHECK(t.quiet());
     CHECK(t.said("event.takeback.taken"));
     CHECK(t.queuedPrefix("tb.hint"));
@@ -298,6 +299,7 @@ TEST(coach_session_takeback_requested) {
     t.session.onTakeBackRequested(t.game);
     const auto tb = t.stage.all("takeBack");
     CHECK(tb.size() == 1 && tb[0].n == 2);   // the reply and the human's move
+    CHECK(t.until([&] { return !t.stage.tableBusy(); }, 5.0f));
     CHECK_EQ(t.game.moves().size(), size_t(0));
     CHECK(t.quiet());
     CHECK(t.said("event.takeback.taken"));
@@ -443,6 +445,7 @@ TEST(coach_session_rules_lesson_chapter) {
     CHECK(t.until([&] { return t.stage.count("takeBack") == 1; }, 30.0f));
     CHECK(t.said("lesson.rook.short"));
     CHECK(t.saidAt("lesson.rook.short") < t.stage.all("takeBack").front().t);
+    CHECK(t.until([&] { return !t.stage.tableBusy(); }, 5.0f));
     CHECK_EQ(t.game.moves().size(), size_t(0));
     int again = -1;
     CHECK(t.until([&] { return t.session.playerMayMove(t.game); }, 30.0f));

@@ -70,6 +70,7 @@ public:
     virtual void rewindDemo(int plies, bool fast) = 0;
     // Take real moves of the game back: Game::undo, the pieces back by hand, the scoresheets
     // (Scorekeeper::dropMoves). Used for an accepted takeback offer and for the lesson's reactions.
+    // The game is undone when the action starts (a later frame, after the table actions before it).
     virtual void takeBack(int plies) = 0;
     // Rules lesson: set up 'fen' (fade, physical re-sync, game reset from the FEN).
     virtual void setPosition(const std::string& fen) = 0;

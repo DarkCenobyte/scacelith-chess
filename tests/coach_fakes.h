@@ -2,7 +2,11 @@
 // records every call with its time, synthesises "speech" as tone bursts (one per character) with
 // 150 ms silences at the punctuation where a voice may pause, plays it on a voice clock advanced
 // by the test's frames, and keeps its table busy for a few frames per action; and an Analyst that
-// answers scripted analyses keyed by position and request shape after a few polls.
+// answers scripted analyses keyed by position and request shape after a few polls. Like the
+// scene's stage, a takeback undoes the game only when its table action starts (a frame after the
+// call at the earliest, once the action running is over). A pause asked by the director holds
+// until it releases it, and applies to the utterances started meanwhile too: a pause the director
+// never releases mutes the coach, as it would in the game.
 #pragma once
 #include "ai/analysis.h"
 #include "chess/chess.h"
@@ -75,6 +79,7 @@ public:
     std::vector<std::string> failIf;        // a request whose text holds one of these fails
     int refuseStarts = 0;                   // startVoice refusals left
     int tableUpdates = 6;                   // frames a table action stays busy
+    int takeBackWait = 1;                   // frames a takeback waits for the free table before its undo
     float gestureHold = 0.5f;               // the hand is busy until a gesture's apex + this
     float retract = 0.3f;                   // ... and this long after endGestures()
     chess::Game* game = nullptr;            // takeBack / setPosition / playLessonMove act on it
@@ -104,9 +109,11 @@ public:
     double now = 0.0;
     // The voice.
     bool vstarted = false, vplaying = false, vpaused = false;
+    bool dpaused = false;                   // pauseVoice(true) not released yet
     double vclock = 0.0, vdur = 0.0;
     std::string vtext;
     int table = 0;
+    int undoPlies = 0, undoWait = 0;        // a takeback asked for, not started yet
     double bodyUntil = 0.0;
     int lessonMoves = 0;                    // playLessonMove calls not yet reported by the test
 
@@ -123,6 +130,15 @@ public:
             }
         }
         if (table > 0) --table;
+        if (undoPlies > 0 && table == 0) {
+            if (undoWait > 0) {
+                --undoWait;
+            } else {
+                if (game) game->undo(undoPlies);
+                undoPlies = 0;
+                table = tableUpdates;
+            }
+        }
     }
 
     Ev& log(const std::string& kind, const std::string& text = std::string()) {
@@ -192,7 +208,7 @@ public:
         for (const Req& r : reqs)
             if (r.taken && r.synth.pcm == pcm) text = r.text;
         vstarted = vplaying = true;
-        vpaused = false;
+        vpaused = dpaused;
         vclock = 0.0;
         vdur = double(pcm.size()) / rate;
         vtext = text;
@@ -204,7 +220,7 @@ public:
         vplaying = false;
     }
     void pauseVoice(bool paused) override {
-        vpaused = paused;
+        vpaused = dpaused = paused;
         log("voice.pause").flag = paused;
     }
     double voiceClock(bool* finished) const override {
@@ -243,8 +259,8 @@ public:
     void hurryTable() override { log("hurryTable"); }
     void takeBack(int plies) override {
         log("takeBack").n = plies;
-        if (game) game->undo(plies);
-        table = tableUpdates;
+        undoPlies += plies;
+        undoWait = takeBackWait;
     }
     void setPosition(const std::string& fen) override {
         log("setPosition", fen);
@@ -260,8 +276,8 @@ public:
         }
         table = tableUpdates;
     }
-    bool tableBusy() const override { return table > 0; }
-    bool bodyBusy() const override { return now < bodyUntil || table > 0; }
+    bool tableBusy() const override { return table > 0 || undoPlies > 0; }
+    bool bodyBusy() const override { return now < bodyUntil || tableBusy(); }
     void showTakebackOffer(bool shown) override { log("offer").flag = shown; }
     void showSkipHint(bool shown) override { log("skipHint").flag = shown; }
     void prewarmGlyphs(const std::string& written) override { log("prewarm", written); }
