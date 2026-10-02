@@ -3962,6 +3962,17 @@ TEST(net_account_delete_stops_realtime) {
     net::sys::removeFile(credPath);
 }
 
+namespace {
+bool runningUnderWine() {
+#ifdef _WIN32
+    HMODULE ntdll = GetModuleHandleA("ntdll.dll");
+    return ntdll && GetProcAddress(ntdll, "wine_get_version");
+#else
+    return false;
+#endif
+}
+}  // namespace
+
 // Signing out while a connection attempt waits for a slow server (here /info, answered after 10 s)
 // cancels that attempt, as disconnect() does: the state is Offline at once, not when the server
 // answers or the request times out.
@@ -4009,7 +4020,9 @@ TEST(net_logout_cancels_a_connection_attempt) {
         auto t0 = std::chrono::steady_clock::now();
         c.logout();
         std::vector<net::Event> seen;
-        CHECK(waitState(c, net::ConnState::Offline, 3000, &seen));
+        // Wine's WinHTTP does not end a blocking call when another thread closes its handle: the
+        // cancelled call ends when the server answers or the call times out, not at once.
+        CHECK(waitState(c, net::ConnState::Offline, runningUnderWine() ? 15000 : 3000, &seen));
         double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
         std::fprintf(stderr, "  Offline %.0f ms after logout()\n", ms);
         net::Event ev;
@@ -4208,17 +4221,6 @@ TEST(net_credentials_origin_move) {
 //   SCACELITH_NET_TLS_TEST=PORT:<hex SHA-256 of the DER certificate> ./scacelith_tests net_tls
 // The server log must hold no request with "pin=<wrong prefix>" (printed by the test): nothing is
 // sent to a server whose certificate differs from the pin.
-namespace {
-bool runningUnderWine() {
-#ifdef _WIN32
-    HMODULE ntdll = GetModuleHandleA("ntdll.dll");
-    return ntdll && GetProcAddress(ntdll, "wine_get_version");
-#else
-    return false;
-#endif
-}
-}  // namespace
-
 TEST(net_tls_pinning_manual) {
     const char* env = std::getenv("SCACELITH_NET_TLS_TEST");
     if (!env || !net::transportAvailable()) {
