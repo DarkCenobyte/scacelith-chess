@@ -643,6 +643,71 @@ TEST(anim_cancel_tasks_lets_go_and_goes_on_from_the_hand) {
     CHECK(!an.busy());
 }
 
+// A piece the robot set down on the table beside its resting hand, which the game later puts back
+// on the board by itself (a board set back after an illegal move, a lesson reset): with the game's
+// obstacle callbacks, the resting hand keeps clear of the piece while it stands there, and rests
+// where a fresh animator does once it is gone.
+TEST(anim_rest_forgets_a_piece_the_game_moved) {
+    using anim::TaskType;
+    const m::vec3 e2 = layout::squareCenter(12), spot(0.29f, layout::TABLE_TOP_Y, 0.30f);
+    m::vec3 pawn = e2;   // where the game has piece 0
+    auto wire = [&pawn](anim::Animator& a) {
+        initWhite(a);
+        a.pieceTransform = [&pawn](int id) { return id == 0 ? m::translate(pawn) : m::mat4(); };
+        a.pieceGripInfo = [](int) { return m::vec3(layout::PIECE_HEIGHT[1], layout::PIECE_GRIP_HEIGHT[1], layout::PIECE_GRIP_RADIUS[1]); };
+        const anim::Animator* self = &a;
+        auto top = [&pawn, self](m::vec3 f, m::vec3 t, float r) {
+            if (self->holding(0)) return layout::BOARD_TOP_Y;
+            const m::vec3 d(t.x - f.x, 0, t.z - f.z);
+            const float s = m::clamp(m::dot(m::vec3(pawn.x - f.x, 0, pawn.z - f.z), d) / std::max(1e-8f, m::length2(d)), 0.0f, 1.0f);
+            const m::vec3 c = f + d * s;
+            return m::length(m::vec3(pawn.x - c.x, 0, pawn.z - c.z)) < r + layout::PIECE_BASE_RADIUS[1] ? pawn.y + layout::PIECE_HEIGHT[1]
+                                                                                                         : layout::BOARD_TOP_Y;
+        };
+        a.pathObstacleTop = [top](m::vec3 f, m::vec3 t) { return top(f, t, 0.02f); };
+        a.obstacleTopNear = [top](m::vec3 p, float r, int ignoreId) { return ignoreId == 0 ? layout::BOARD_TOP_Y : top(p, p, r); };
+    };
+    anim::Animator an, fresh;
+    wire(an);
+    auto task = [](TaskType type, int id, m::vec3 pos = m::vec3(0)) {
+        anim::Task t;
+        t.type = type;
+        t.pieceId = id;
+        t.position = pos;
+        return t;
+    };
+    const float dt = 1.0f / 120.0f;
+    std::vector<anim::Event> ev;
+    int frames = 0;
+    auto run = [&](float seconds) {
+        for (int i = 0; i < int(seconds / dt); ++i, ++frames) {
+            ev.clear();
+            an.update(dt, ev);
+            for (const anim::Event& e : ev)
+                if (e.type == anim::EventType::PieceReleased && e.pieceId == 0) pawn = e.transform.translation();
+        }
+    };
+    an.enqueue({task(TaskType::Reach, 0), task(TaskType::Lift, 0), task(TaskType::Carry, 0, spot), task(TaskType::Place, 0, spot),
+                task(TaskType::Retract, -1)});
+    run(2.0f);
+    CHECK(m::length(pawn - spot) < 0.004f);
+    const m::vec3 beside = an.globals()[character::HandR].translation();
+    // The game puts the pawn back on e2; the next task (a Retract) checks the resting spot again.
+    pawn = e2;
+    an.enqueue(task(TaskType::Retract, -1));
+    run(1.0f);
+    wire(fresh);
+    for (int i = 0; i < frames; ++i) {
+        ev.clear();
+        fresh.update(dt, ev);
+    }
+    const m::vec3 rest = fresh.globals()[character::HandR].translation(), now = an.globals()[character::HandR].translation();
+    std::fprintf(stderr, "  resting wrist: %.1f mm from the free spot beside the pawn, %.2f mm once the game took it away\n",
+                 m::length(beside - rest) * 1000.0f, m::length(now - rest) * 1000.0f);
+    CHECK(m::length(beside - rest) > 0.01f);
+    CHECK(m::length(now - rest) < 0.001f);
+}
+
 // A hand holding a piece does not gesture, Beat included: the task only holds the piece still, its
 // beats still fire on time.
 TEST(anim_beat_while_holding_only_holds) {

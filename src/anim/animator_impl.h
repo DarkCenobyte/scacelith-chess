@@ -1094,6 +1094,8 @@ struct Animator::Impl {
     std::vector<Fresh> fresh;
     // Pieces this animator left standing on the table (captured pieces, promoted pawns): kept
     // until it picks them up again, so the hands keep clear of them even without the callbacks.
+    // With the callbacks they are the game's to report (from the next update() on), and it may
+    // move them itself (a board set back from the game, a lesson reset): not looked at then.
     std::vector<Fresh> tableLeft;
     // The piece the current task is about to set down off the board (resting-hand checks only).
     std::vector<Fresh> pending;
@@ -1126,9 +1128,10 @@ struct Animator::Impl {
         float top = -1e9f;
         vec3 d(toW.x - fromW.x, 0, toW.z - fromW.z);
         float len2 = std::max(1e-8f, length2(d));
+        const bool gameSees = owner && (owner->obstacleTopNear || owner->pathObstacleTop);
         for (const std::vector<Fresh>* list : {&fresh, &tableLeft, &pending, &scene})
             for (const Fresh& f : *list) {
-                if (f.id == ignoreId || isHeld(f.id)) continue;
+                if (f.id == ignoreId || isHeld(f.id) || (gameSees && list == &tableLeft)) continue;
                 float s = clamp(dot(vec3(f.base.x - fromW.x, 0, f.base.z - fromW.z), d) / len2, 0.0f, 1.0f);
                 vec3 c = fromW + d * s;
                 if (length(vec3(f.base.x - c.x, 0, f.base.z - c.z)) < f.radius + radius) top = std::max(top, f.top);
