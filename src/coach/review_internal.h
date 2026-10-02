@@ -45,11 +45,9 @@ struct Explanation {
     int demoPlies = 0;         // plies of Ctx::r shown on the table
     bool offer = false;        // the takeback is offered whatever the class (mates, stalemate, missed pieces)
     bool concrete = false;     // the cause lies within the band's reach (the level 1-2 voice threshold)
-    bool isTip = false;        // a principle, never a fault claim: Low priority, once per game
     int tipBit = -1;           // which principle (Reviewer::tipsSaid_)
     bool includesBest = false; // the cause already names the better move
     bool missed = false;       // the human missed something (no demonstration: the table shows p1)
-    int mateMoves = 0;         // MateAllowed / MateMissed: N
     chess::Square hintSquare = chess::NoSquare;   // takeback hint (levels 1-2): the piece at risk, on p0
 };
 
@@ -68,7 +66,6 @@ void markPiece(Beat& b, chess::Square s, const std::string& anchor);
 void markArrow(Beat& b, chess::PieceType t, chess::Square from, chess::Square to, const std::string& anchor);
 // Research-pedagogy R6: at most three pointing gestures per line; the others keep only their marks.
 void limitPointing(Beat& b);
-int pointingCount(const Beat& b);
 
 // ---- Explanation choice (research-pedagogy §2.0 table, first match wins) ----
 bool findExplanation(const Ctx& c, Explanation& out);

@@ -213,13 +213,6 @@ void traceMove(Beat& b, PieceType t, Square from, Square to, const std::string& 
     markArrow(b, t, from, to, anchor);
 }
 
-int pointingCount(const Beat& b) {
-    int n = 0;
-    for (const Gesture& g : b.gestures)
-        if (isPointing(g.kind)) ++n;
-    return n;
-}
-
 void limitPointing(Beat& b) {
     int n = 0;
     std::vector<Gesture> kept;
@@ -729,8 +722,6 @@ Review Reviewer::review(const ReviewInput& in) {
             offered_ = TakebackRecord{};
             offered_.ply = ply;
             offered_.firstUci = c.playedUci;
-            offered_.firstSan = c.playedSan;
-            offered_.firstClass = cls;
             offered_.firstType = ex.type;
             offeredHint_ = ex.hintSquare;
             out.offersTakeback = true;

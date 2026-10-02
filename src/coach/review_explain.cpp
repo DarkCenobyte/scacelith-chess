@@ -103,7 +103,6 @@ bool mateAllowed(const Ctx& c, Explanation& out) {
     const bool lineKnown = int(c.r.size()) >= plies && c.r[size_t(plies - 1)].mate;
     Explanation ex;
     ex.type = ExType::MateAllowed;
-    ex.mateMoves = n;
     ex.concrete = plies <= c.b.lookahead;
     if (c.level <= 2 && (!ex.concrete || !lineKnown)) return false;   // too deep for the band: not this cause
     static const int kMateLimit[6] = {1, 2, 2, 3, 3, 4};
@@ -171,7 +170,6 @@ bool mateMissed(const Ctx& c, Explanation& out) {
     ex.concrete = true;
     ex.includesBest = true;
     ex.offer = lost;
-    ex.mateMoves = n;
     Beat b = bandLine(c, delayed ? "ex.mate_delayed" : "ex.mate_missed");
     put(b.line, "m", Arg::ofNumber(n));
     put(b.line, "line", Arg::ofMoves(sanLine(c.best, 0, size_t(2 * n - 1))));
@@ -864,7 +862,6 @@ bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out) {
     auto done = [&](TipBit bit, Beat b, ExType type) {
         out = Explanation{};
         out.type = type;
-        out.isTip = true;
         out.tipBit = bit;
         out.cause.push_back(b);
         return true;

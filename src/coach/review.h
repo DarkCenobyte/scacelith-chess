@@ -101,15 +101,11 @@ struct PlyVerdict {
     bool only = false, brilliant = false, great = false, goodCapture = false;
     bool mateMissed = false, mateAllowed = false;
     bool voiced = false, offered = false, praised = false;
-    bool coachHungPiece = false;     // coach move: left a piece of 3+ points hanging (for "did you see it?")
-    chess::PieceType hungType = chess::NoPiece;
-    chess::Square hungSquare = chess::NoSquare;
 };
 
 struct TakebackRecord {
     int ply = -1;
-    std::string firstUci, firstSan;  // the move taken back
-    MoveClass firstClass = MoveClass::Unjudged;
+    std::string firstUci;            // the move taken back
     ExType firstType = ExType::None;
     bool fixed = false;              // the replacement lost less than 5 W% points
     bool same = false;               // the same move was played again
