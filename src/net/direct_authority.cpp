@@ -29,7 +29,7 @@ uint32_t fenDigest(const std::string& fen) { return positionDigest(fen); }
 
 uint32_t positionHash(const chess::Position& pos) { return fenDigest(pos.fen()); }
 
-std::string sanitizeName(const std::string& in, const char* fallback) {
+std::string sanitizeName(const std::string& in, const char* fallback, size_t maxBytes) {
     // Keep printable UTF-8; drop control characters and malformed sequences, overlong forms,
     // surrogates and code points above U+10FFFF included (the protocol's decoder refuses them).
     static const uint32_t kMinCodePoint[5] = {0, 0, 0x80, 0x800, 0x10000};
@@ -49,11 +49,11 @@ std::string sanitizeName(const std::string& in, const char* fallback) {
         s.append(in, i, len);
         i += len;
     }
-    // Trim spaces, then cut to 24 bytes on a character boundary.
+    // Trim spaces, then cut to maxBytes on a character boundary.
     size_t a = s.find_first_not_of(' '), b = s.find_last_not_of(' ');
     s = a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
-    if (s.size() > 24) {
-        size_t cut = 24;
+    if (s.size() > maxBytes) {
+        size_t cut = maxBytes;
         while (cut > 0 && ((unsigned char)s[cut] >> 6) == 2) --cut;
         s.resize(cut);
         size_t e = s.find_last_not_of(' ');

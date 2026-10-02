@@ -42,6 +42,7 @@ constexpr size_t kMaxQueuedCommands = 32;
 constexpr const char* kClientString = "Scacelith direct";
 constexpr const char* kTokenPrefix = "direct:";
 constexpr size_t kTokenMin = 16;
+constexpr size_t kMaxRouterName = 64;      // bytes of the router's friendlyName shown on the hosting page
 
 // ---- the game as one player sees it ------------------------------------------------------------
 
@@ -559,8 +560,10 @@ private:
         };
         upnp::Mapping mp;
         bool ok = client.mapPort(gw_, port_, claim, mp, e);
+        // Any device of the LAN may answer the discovery: its name is cleaned like a player's.
+        const std::string routerName = direct::sanitizeName(gw_.friendlyName, "", kMaxRouterName);
         std::lock_guard<std::mutex> lk(m);
-        upnpStatus.gatewayName = gw_.friendlyName;
+        upnpStatus.gatewayName = routerName;
         upnpStatus.externalIp = ip;
         upnpStatus.cgnatSuspected = !ip.empty() && upnp::cgnatSuspected(ip);
         if (ok) {
@@ -569,7 +572,7 @@ private:
             mapped_ = true;
             mapping_ = mp;
             renewAt_ = sock::steadyMs() + kRenewEveryMs;
-            LOGI("direct: UPnP: %s maps %s:%u -> %s:%u (lease %u s)", gw_.friendlyName.c_str(), ip.c_str(), unsigned(mp.externalPort),
+            LOGI("direct: UPnP: %s maps %s:%u -> %s:%u (lease %u s)", routerName.c_str(), ip.c_str(), unsigned(mp.externalPort),
                  mp.internalClient.c_str(), unsigned(mp.internalPort), unsigned(mp.leaseSec));
         } else {
             upnpStatus.state = UpnpStatus::State::Failed;

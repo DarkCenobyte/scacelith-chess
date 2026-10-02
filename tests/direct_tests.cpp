@@ -931,6 +931,15 @@ TEST(direct_authority_snapshot_and_names) {
     // Valid names stay as they are (C1 controls included: the decoder accepts them).
     for (const char* name : {"\xC3\x89lodie", "\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E", "Dee\xC2\x85x", "\xF0\x9F\x98\x80 Max", "\xF4\x8F\xBF\xBF"})
         CHECK_EQ(direct::sanitizeName(name, "X"), std::string(name));
+    // The router's name (any LAN device may answer the discovery): cleaned, at most 64 bytes.
+    std::string routerName = "  Fake\r\nBox\x01 ";
+    for (int i = 0; i < 20000; ++i) routerName += "\xE6\x97\xA5\x7F\x1B";
+    std::string shown = direct::sanitizeName(routerName, "", 64);
+    CHECK_EQ(shown.substr(0, 7), std::string("FakeBox"));
+    CHECK(shown.size() <= 64 && shown.size() >= 62);
+    CHECK_EQ(direct::sanitizeName(shown, "", 64), shown);   // valid UTF-8 without controls
+    CHECK_EQ(direct::sanitizeName("Livebox 6", "", 64), std::string("Livebox 6"));
+    CHECK_EQ(direct::sanitizeName(" \t", "", 64), std::string(""));
     // The digest covers the first four FEN fields only.
     CHECK_EQ(direct::fenDigest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"),
              direct::fenDigest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 5 9"));
