@@ -300,7 +300,8 @@ void OnlineSession::applyServer() {
     outgoing_ = Outgoing();
     incoming_.clear();
     answers_.setServer(ep.origin());
-    ratingRestored_ = live::HeldNotice();  // points of the previous server's account
+    serverNameRt_.clear();
+    resetAccountState();  // of the previous server's account
     LOGI("online: server %s", ep.origin().c_str());
 }
 
@@ -366,6 +367,14 @@ void OnlineSession::signOut(bool everywhere) {
     account_ = net::AccountInfo();
     data_.clear();
     incoming_.clear();
+    resetAccountState();
+}
+
+// The ban, the matchmaking cooldown and the RatingRestored points known of the account signed in
+// until now: not those of the next one (or of the next server's).
+void OnlineSession::resetAccountState() {
+    bannedUntilMs_ = cooldownUntilMs_ = 0;
+    ratingRestored_ = live::HeldNotice();
 }
 
 // ---- Requests -------------------------------------------------------------------------------------
@@ -695,6 +704,7 @@ void OnlineSession::handleServer(net::Event& e) {
             signedIn_ = true;
             account_ = e.account;
             data_.clear();  // the history and devices of whoever was signed in before
+            resetAccountState();
             api_->connect();
             LOGI("online: signed in as %s", account_.username.c_str());
         }
@@ -731,7 +741,7 @@ void OnlineSession::handleServer(net::Event& e) {
             queue_ = Queue();
             outgoing_ = Outgoing();
             incoming_.clear();
-            ratingRestored_ = live::HeldNotice();
+            resetAccountState();
             LOGI("online: account deleted");
         } else if (e.kind == Kind::EmailChangeResult && e.ok && signedIn_) {
             // The pending change (or the new address) shows on the account page.

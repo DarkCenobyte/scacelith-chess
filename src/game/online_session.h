@@ -264,6 +264,7 @@ private:
     void handleDirect(const net::Event& e);
     void routeGame(const net::Event& e, LinkKind from);
     std::unique_ptr<GameLink> makeLink(LinkKind kind, uint64_t id);
+    void resetAccountState();
 
     bool mock_ = false, virtual_ = false, ready_ = false;
     std::unique_ptr<ServerApi> api_;
