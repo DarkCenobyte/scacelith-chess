@@ -117,13 +117,16 @@ static int runApp(std::vector<std::string> args) {
     double last = plat::time();
     int frame = 0;
     bool running = true;
+    bool f5Held = false;  // F5 acts once per press, not on auto-repeat
     while (running) {
         if (!plat::pumpEvents()) break;
         double now = plat::time();
         float dt = ctx.screenshotMode ? 1.0f / 60.0f : float(std::min(now - last, 0.1));
         last = now;
         const plat::Input& in = plat::input();
-        if (in.keyPressed[plat::KEY_F5]) shaders::reloadAll();
+        // Shader sources only change on disk (--data-dir); the embedded ones would rebuild as they are.
+        if (!dataDir.empty() && in.keyPressed[plat::KEY_F5] && !f5Held) shaders::reloadAll();
+        f5Held = in.keyDown[plat::KEY_F5];
         if (plat::width() > 0 && plat::height() > 0) renderer.resize(plat::width(), plat::height());
 
         running = scene->update(ctx, dt);
