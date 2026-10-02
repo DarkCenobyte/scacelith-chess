@@ -26,6 +26,7 @@
 #include "render/shader.h"
 #include "game/settings.h"
 #include "net/online_client.h"
+#include "scacelith_version.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -47,7 +48,7 @@ static int runApp(std::vector<std::string> args) {
     ctx.args = args;
     std::string exeDir = plat::exeDirectory();
     logx::init((exeDir + "scacelith.log").c_str());
-    LOGI("Scacelith 0.1.0 starting");
+    LOGI("Scacelith " SCACELITH_VERSION " starting");
 
     if (ctx.hasArg("--list-scenes")) {
         for (auto& s : listScenes()) std::printf("%-20s %s\n", s.first.c_str(), s.second.c_str());

@@ -61,7 +61,9 @@ set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cp
     ${ROOT}/src/game/replay.cpp ${ROOT}/src/game/online_account.cpp ${ROOT}/src/game/online_mock.cpp)
 list(APPEND CORE_SOURCES ${GAME_CORE_SOURCES})
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
-target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party)
+# The version of project() above, for every module (generated/scacelith_version.h).
+configure_file(${ROOT}/cmake/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith_version.h @ONLY)
+target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party ${CMAKE_CURRENT_BINARY_DIR}/generated)
 # <KHR/khrplatform.h> of third_party/khronos/GL/glcorearb.h (src/gl/gl46.h): the bundled copy, not
 # the system's (libgl-dev), which a tests-only build may lack.
 target_include_directories(scacelith_core SYSTEM PUBLIC ${ROOT}/third_party/khronos)
@@ -123,10 +125,7 @@ include(third_party/supertonic3/supertonic3.cmake)
 # BCrypt ECDH P-256 / AES-GCM / SHA-256, adapter list for iphlpapi) and UPnP on Windows. Linux
 # development builds require OpenSSL 3 (online client and direct match).
 set_source_files_properties(${ROOT}/src/net/online_client.cpp PROPERTIES COMPILE_DEFINITIONS
-    "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\";SCACELITH_VERSION_STRING=\"${PROJECT_VERSION}\"")
-# The User-Agent of the voice model downloads ("Scacelith/<version>").
-set_source_files_properties(${ROOT}/src/tts/model_store.cpp PROPERTIES COMPILE_DEFINITIONS
-    "SCACELITH_VERSION_STRING=\"${PROJECT_VERSION}\"")
+    "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\"")
 set_source_files_properties(${ROOT}/tests/net_tests.cpp PROPERTIES COMPILE_DEFINITIONS
     "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\"")
 if(WIN32)
@@ -151,7 +150,10 @@ file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS
 list(REMOVE_ITEM GAME_SOURCES ${GAME_CORE_SOURCES})
 set(GAME_EXTRA)
 if(WIN32)
-    list(APPEND GAME_EXTRA ${ROOT}/res/scacelith.rc)
+    # The version resource and the manifest, with the version of project().
+    configure_file(${ROOT}/res/scacelith.rc.in ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.rc @ONLY)
+    configure_file(${ROOT}/res/scacelith.manifest.in ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.manifest @ONLY)
+    list(APPEND GAME_EXTRA ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.rc)
 endif()
 add_executable(scacelith ${ROOT}/src/main.cpp ${GAME_SOURCES} ${GAME_EXTRA})
 target_compile_options(scacelith PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})

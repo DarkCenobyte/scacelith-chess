@@ -49,6 +49,7 @@
 #include "protocol_gen.h"
 #include "transport.h"
 #include "../core/log.h"
+#include "scacelith_version.h"
 
 #include <algorithm>
 #include <cctype>
@@ -65,9 +66,6 @@
 #include <random>
 #include <thread>
 
-#ifndef SCACELITH_VERSION_STRING
-#define SCACELITH_VERSION_STRING "0.1.0"
-#endif
 #ifndef SCACELITH_OFFICIAL_SERVER
 #define SCACELITH_OFFICIAL_SERVER ""
 #endif
@@ -122,9 +120,9 @@ bool validHostName(const std::string& h) {
 
 std::string clientString() {
 #ifdef _WIN32
-    return std::string("Scacelith/") + SCACELITH_VERSION_STRING + " win64";
+    return std::string("Scacelith/") + SCACELITH_VERSION + " win64";
 #else
-    return std::string("Scacelith/") + SCACELITH_VERSION_STRING + " linux";
+    return std::string("Scacelith/") + SCACELITH_VERSION + " linux";
 #endif
 }
 

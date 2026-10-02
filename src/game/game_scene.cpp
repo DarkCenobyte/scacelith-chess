@@ -15,16 +15,13 @@
 #include "look_up.h"
 #include "scoresheet_layout.h"
 #include "settings.h"
+#include "scacelith_version.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
 
 using namespace m;
 using namespace chess;
-
-#ifndef SCACELITH_VERSION_STRING
-#define SCACELITH_VERSION_STRING "Scacelith 0.1"
-#endif
 
 namespace game {
 
@@ -199,7 +196,7 @@ bool GameScene::init(AppContext& ctx) {
     for (const TimeControl& tc : timeControlPresets()) tcs.push_back(tc.label());
     ui::setTimeControlList(tcs);
     ui::setResolutionList({{1280, 720}, {1366, 768}, {1600, 900}, {1920, 1080}, {2560, 1440}, {3840, 2160}});
-    ui::setVersionString(SCACELITH_VERSION_STRING);
+    ui::setVersionString("Scacelith " SCACELITH_VERSION_SHORT);
     initOnline();
     ui::setSoundCallback([](ui::Sound snd) {
         switch (snd) {

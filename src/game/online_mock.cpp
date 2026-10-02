@@ -7,6 +7,7 @@
 #include "../net/json.h"
 #include "../net/protocol_gen.h"
 #include "layout.h"
+#include "scacelith_version.h"
 #include <algorithm>
 #include <cctype>
 #include <chrono>
@@ -1988,11 +1989,11 @@ void FakeServer::Impl::ensureDevices() {
     if (!devices.empty()) return;
     const int64_t now = int64_t(lastNow);
 #ifdef _WIN32
-    const char* here = "Scacelith/0.1.0 win64";
-    const char* other = "Scacelith/0.1.0 linux";
+    const char* here = "Scacelith/" SCACELITH_VERSION " win64";
+    const char* other = "Scacelith/" SCACELITH_VERSION " linux";
 #else
-    const char* here = "Scacelith/0.1.0 linux";
-    const char* other = "Scacelith/0.1.0 win64";
+    const char* here = "Scacelith/" SCACELITH_VERSION " linux";
+    const char* other = "Scacelith/" SCACELITH_VERSION " win64";
 #endif
     struct Seed { const char* label; double createdDays, seenHours; bool current; };
     const Seed seeds[] = {{here, 0.0, 0.0, true}, {other, 18.0, 31.0, false}, {"Scacelith/0.0.9 linux", 46.0, 290.0, false}, {"", 62.0, 1100.0, false}};
