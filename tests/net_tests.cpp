@@ -1695,8 +1695,10 @@ private:
             if (!authed) return respond(s, 401, "{\"error\":\"unauthorized\"}");
             if (body["password"].asString() != "pw") return respond(s, 403, "{\"error\":\"invalid_password\"}");
             ++deletes;
-            // As the server, the account's connections are closed before the answer, which comes
-            // a little later here: their frames reach the client first.
+            // As the server, the account's connections are closed once it is gone (after its
+            // database work: 100 ms here) and before the answer, which comes later still: their
+            // frames reach the client first.
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
             revokeSessions();
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
             respond(s, 200, "{\"status\":\"deleted\"}");
@@ -4048,10 +4050,11 @@ TEST(net_account_delete_closes_realtime_first) {
         std::vector<net::Event> seen;
         CHECK(waitEvent(c, K::AccountDeleted, ev, 10000, &seen));
         CHECK_EQ(ev.error, std::string("invalid_password"));
+        CHECK(waitEvent(c, K::Welcome, ev, 10000, &seen));
+        // Offline in between (net-rt's event may come before or after AccountDeleted).
         CHECK(std::any_of(seen.begin(), seen.end(), [](const net::Event& e) {
             return e.kind == net::Event::Kind::ConnectionChanged && e.state == net::ConnState::Offline;
         }));
-        CHECK(waitEvent(c, K::Welcome, ev, 10000));
         CHECK_EQ(srv.hellos.load(), 2);
         CHECK(c.hasSavedSession());
         // Deleted: the connection was closed before, and stays so.
