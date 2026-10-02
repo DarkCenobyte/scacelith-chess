@@ -952,7 +952,7 @@ void Animator::Impl::planTurnPage(const WriteTask& t, float start, float T) {
         }
     }
     const float tG = kTurnGrip * T, tR = kTurnRelease * T;
-    const float tPre = std::max(0.05f, tG - 0.12f * T / Timing::PageTurn);
+    const float tPre = std::min(std::max(0.05f, tG - 0.12f * T / Timing::PageTurn), tG - 1e-3f);   // (a very short turn)
     const HandSample g0 = handAt(0.0f);
     Motion mo;
     mo.start = start;
