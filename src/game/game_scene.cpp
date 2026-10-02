@@ -9,6 +9,7 @@
 #include "elo.h"
 #include "game_archive.h"
 #include "game_saving.h"
+#include "game_scene_detail.h"
 #include "../ui/ui_font.h"
 #include "../ui/ui_online.h"
 #include "layout.h"
@@ -28,6 +29,8 @@ using namespace chess;
 
 namespace game {
 
+using namespace scene_detail;
+
 namespace {
 
 constexpr float kFadeOut = 0.8f;          // menu -> black
@@ -35,17 +38,7 @@ constexpr float kFadeIn = 1.6f;           // black -> seated at the table
 constexpr float kFov = 52.0f * DEG;
 constexpr float kEyeLimit = 18.0f * DEG;
 constexpr float kGlanceFov = 24.0f * DEG;  // looking at one's own scoresheet (S): a closer look
-constexpr float kGlanceTime = 0.45f;       // seconds to turn to the scoresheet and back
 constexpr float kEyeFStop = 11.0f;         // the player's eyes at kFov: a 2.2 mm pupil in a bright hall
-
-anim::Task task(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0), float height = 0.0f) {
-    anim::Task k;
-    k.type = t;
-    k.pieceId = pieceId;
-    k.position = pos;
-    k.height = height;
-    return k;
-}
 
 std::vector<std::string> split(const std::string& s, char sep) {
     std::vector<std::string> out;
@@ -117,12 +110,7 @@ std::string trimmed(const std::string& s) {
     return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
 }
 
-// The human's name and handwriting on the scoresheets (Options > Player; "Human" by default, written
-// in the interface language).
-std::string localPlayerName() {
-    const std::string& n = settings().playerName;
-    return n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
-}
+// The human's handwriting on the scoresheets (Options > Player; localPlayerName: the name).
 int humanHandStyle() { return int(settings().handStyle); }
 
 const char* sideKey(Color c) { return c == White ? "viewer.side.white" : "viewer.side.black"; }
@@ -928,8 +916,7 @@ ui::GameOverExtras GameScene::gameOverExtras() const {
         return x;
     }
     if (eloCounted_) {
-        int d = eloAfter_ - eloBefore_;
-        std::string delta = (d > 0 ? "+" : d < 0 ? "\xE2\x88\x92" : "\xC2\xB1") + std::to_string(std::abs(d));
+        std::string delta = signedDelta(eloAfter_ - eloBefore_);
         x.detail = i18n::trf("elo.change", {std::to_string(eloBefore_), std::to_string(eloAfter_), i18n::ltr(delta)});
     } else if (rated_) {
         x.detail = i18n::trf("elo.unrated", {std::to_string(eloBefore_)});

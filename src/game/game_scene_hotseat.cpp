@@ -20,6 +20,7 @@
 //     rated one updates both names' local ratings (Settings::localPlayers, elo::applyPair).
 //   - The rematch swaps the colours; the clock follows its player (each keeps their hand).
 #include "game_scene.h"
+#include "game_scene_detail.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
 #include "../platform/platform.h"
@@ -34,13 +35,7 @@ using namespace chess;
 
 namespace game {
 
-namespace {
-
-std::string signedDelta(int d) {
-    return (d > 0 ? "+" : d < 0 ? "\xE2\x88\x92" : "\xC2\xB1") + std::to_string(std::abs(d));
-}
-
-}  // namespace
+using namespace scene_detail;
 
 // =============================================================================================
 // Seats

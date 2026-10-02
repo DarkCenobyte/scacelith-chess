@@ -37,6 +37,7 @@
 //   - GameEnd waits until the last move is on the board, then the usual end (result on the
 //     scoresheets, handshake, game over card with online reasons, rating change, rematch, report).
 #include "game_scene.h"
+#include "game_scene_detail.h"
 #include "../audio/audio.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
@@ -52,6 +53,8 @@ using namespace chess;
 
 namespace game {
 
+using namespace scene_detail;
+
 namespace {
 
 using Kind = net::Event::Kind;
@@ -60,17 +63,6 @@ using Kind = net::Event::Kind;
 enum Status { StOngoing = 0, StWhiteWins = 1, StBlackWins = 2, StDraw = 3, StAborted = 4 };
 enum GameEventKind { EvDrawOffered = 1, EvDrawDeclined = 2, EvDisconnected = 3, EvReconnected = 4, EvRematchOffered = 5, EvRematchDeclined = 6 };
 constexpr int kErrDrawOfferLimit = 108;
-
-constexpr float kGlanceTime = 0.45f;  // seconds to turn to the scoresheet and back (as game_scene.cpp)
-
-anim::Task makeTask(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0), float height = 0.0f) {
-    anim::Task k;
-    k.type = t;
-    k.pieceId = pieceId;
-    k.position = pos;
-    k.height = height;
-    return k;
-}
 
 uint16_t packed(const Move& m) { return net::packMove(m.from, m.to, m.promotion); }
 
@@ -96,11 +88,6 @@ std::string reasonText(int reason) {
     case 26: return i18n::tr("reason.online.both_disconnected");
     default: return reason > 0 && reason <= 13 ? endReasonText(GameEndReason(reason)) : "";
     }
-}
-
-std::string playerName() {
-    const std::string& n = settings().playerName;
-    return n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
 }
 
 }  // namespace
@@ -179,7 +166,7 @@ void GameScene::configureOnlineSeats() {
         st.playHand = hand;
         const net::PlayerInfo& p = i == 0 ? og_.white : og_.black;
         st.controller = st.color == humanColor_ ? Controller::Human : Controller::Remote;
-        st.name = p.name.empty() ? (st.human() ? playerName() : std::string("?")) : p.name;
+        st.name = p.name.empty() ? (st.human() ? localPlayerName() : std::string("?")) : p.name;
         if (!direct) {
             st.elo = p.rating;
             st.provisional = p.provisional;
@@ -582,14 +569,14 @@ void GameScene::startRemoteMove() {
     }
     std::vector<anim::Task> tasks;
     if (start != live::LiveStart::Placed) {
-        if (start != live::LiveStart::Held) tasks.push_back(makeTask(anim::TaskType::Reach, board_.idAt(mv.from)));
+        if (start != live::LiveStart::Held) tasks.push_back(task(anim::TaskType::Reach, board_.idAt(mv.from)));
         planRemoteMove(tasks, mv, start == live::LiveStart::Held);
     }
     remoteLive_ = RemoteLive();
     remoteAim_.reset();
     int half = world_.clockHalfForSeat(seat == 0 ? 1.0f : -1.0f);
-    tasks.push_back(makeTask(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)));
-    tasks.push_back(makeTask(anim::TaskType::Retract));
+    tasks.push_back(task(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)));
+    tasks.push_back(task(anim::TaskType::Retract));
     anim_[seat].setThinking(false);
     anim_[seat].enqueue(tasks);
     game_.play(mv);
@@ -755,7 +742,7 @@ void GameScene::gripRemoteLive(Square from, int ply) {
     int r = aiSeat();
     anim_[r].setThinking(false);
     float reachAt = anim_[r].time() + anim_[r].remainingTime();  // after a piece going back, if any
-    enqueueRemoteLive({makeTask(anim::TaskType::Reach, id), makeTask(anim::TaskType::Lift, id)});
+    enqueueRemoteLive({task(anim::TaskType::Reach, id), task(anim::TaskType::Lift, id)});
     remoteLive_ = RemoteLive();
     remoteLive_.pieceId = id;
     remoteLive_.from = remoteLive_.hover = from;
@@ -779,7 +766,7 @@ void GameScene::followRemoteAim(int aim, float dt) {
     const PieceObject* victim = want != L.from ? board_.at(want) : nullptr;
     float height = victim ? layout::PIECE_HEIGHT[victim->type] + 0.012f : 0.0f;
     vec3 pos = want == L.from ? p->basePos : board_.squareBase(want);
-    enqueueRemoteLive({makeTask(anim::TaskType::Carry, L.pieceId, pos, height)});
+    enqueueRemoteLive({task(anim::TaskType::Carry, L.pieceId, pos, height)});
     L.hover = want;
 }
 
@@ -791,7 +778,7 @@ void GameScene::placeRemoteLive(uint16_t move) {
     // not in game_ (their MoveMade confirms it, startRemoteMove).
     std::vector<anim::Task> tasks;
     planRemoteMove(tasks, mv, true);
-    tasks.push_back(makeTask(anim::TaskType::Retract));
+    tasks.push_back(task(anim::TaskType::Retract));
     enqueueRemoteLive(tasks);
     L.placed = move;
     L.hover = mv.to;
@@ -810,9 +797,9 @@ void GameScene::cancelRemoteLive(bool retract) {
     if (PieceObject* p = board_.byId(L.pieceId)) {
         // Back over its square first (Place comes straight down), then down on it.
         std::vector<anim::Task> tasks;
-        if (L.hover != L.from) tasks.push_back(makeTask(anim::TaskType::Carry, p->id, p->basePos));
-        tasks.push_back(makeTask(anim::TaskType::Place, p->id, p->basePos));
-        if (retract) tasks.push_back(makeTask(anim::TaskType::Retract));
+        if (L.hover != L.from) tasks.push_back(task(anim::TaskType::Carry, p->id, p->basePos));
+        tasks.push_back(task(anim::TaskType::Place, p->id, p->basePos));
+        if (retract) tasks.push_back(task(anim::TaskType::Retract));
         dest_[p->id].push_back({L.from, p->basePos, false});
         enqueueRemoteLive(tasks);
     }
@@ -919,8 +906,7 @@ ui::GameOverExtras GameScene::onlineGameOverExtras() const {
         if (!og_.rated) {
             x.detail = i18n::tr("online.rating.casual");
         } else if (ratingKnown_) {
-            int d = ratingAfter_ - ratingBefore_;
-            std::string delta = (d > 0 ? "+" : d < 0 ? "\xE2\x88\x92" : "\xC2\xB1") + std::to_string(std::abs(d));
+            std::string delta = signedDelta(ratingAfter_ - ratingBefore_);
             x.detail = i18n::trf("online.rating.change", {std::to_string(ratingBefore_), std::to_string(ratingAfter_), i18n::ltr(delta)});
         } else {
             x.detail = i18n::tr("online.rating.pending");

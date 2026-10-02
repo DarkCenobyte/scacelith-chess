@@ -12,6 +12,7 @@
 // untimed game completes any AiMoving move once its pieces are down).
 #include "game_scene.h"
 #include "coach_model.h"
+#include "game_scene_detail.h"
 #include "../audio/audio.h"
 #include "../character/skeleton.h"
 #include "../coach/catalog.h"
@@ -40,6 +41,8 @@ using namespace chess;
 
 namespace game {
 
+using namespace scene_detail;
+
 namespace {
 
 // Demonstration moves: slower than a move in play (anim::Timing), so the player can follow them.
@@ -55,21 +58,6 @@ constexpr float kNodApex = 0.2f;          // a nod is at its lowest this long af
 constexpr float kFaceLiftIdle = 1.5f;
 // Failsafes of the end of a coach game, should the session never get there.
 constexpr float kHandshakeFailsafe = 45.0f, kEndCardFailsafe = 300.0f;
-
-anim::Task task(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0), float height = 0.0f, float duration = 0.0f) {
-    anim::Task k;
-    k.type = t;
-    k.pieceId = pieceId;
-    k.position = pos;
-    k.height = height;
-    k.duration = duration;
-    return k;
-}
-
-std::string playerName() {
-    const std::string& n = settings().playerName;
-    return n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
-}
 
 float smooth01(float x) { return x <= 0.0f ? 0.0f : x >= 1.0f ? 1.0f : x * x * (3.0f - 2.0f * x); }
 
@@ -653,7 +641,7 @@ void GameScene::configureCoachSeats() {
         st.playHand = hand;
         if (st.color == humanColor_) {
             st.controller = Controller::Human;
-            st.name = playerName();
+            st.name = localPlayerName();
             st.elo = s.playerElo;
             st.provisional = s.playerRecord().provisional();
         } else {
