@@ -1077,10 +1077,7 @@ float categoryGrid(const Rect& col, float y, int& index, bool custom, bool withR
         bool sel = isCustom ? index < 0 : index == i;
         std::string label = isCustom ? T("tc.custom") : spacedPlus(cats[size_t(i)].id);
         std::string sub = isCustom ? T("online.casual_only") : withRatings ? ratingText(s.rating(cats[size_t(i)].id)) : std::string();
-        if (!withRatings && !isCustom) {
-            int est = cats[size_t(i)].baseSec + 40 * cats[size_t(i)].incSec;
-            sub = T(est < 180 ? "viewer.tc.bullet" : est < 480 ? "viewer.tc.blitz" : est < 1500 ? "viewer.tc.rapid" : "viewer.tc.classical");
-        }
+        if (!withRatings && !isCustom) sub = T(detail::tcCategoryKey(cats[size_t(i)].baseSec, cats[size_t(i)].incSec));
         if (tcTile(i, r, isCustom ? label : i18n::ltr(label), i18n::ltr(sub), sel)) index = isCustom ? -1 : i;
     }
     im::popId();
@@ -1455,10 +1452,7 @@ void pageDirectHost(float t) {
         std::string label = isCustom ? T("tc.custom") : i18n::ltr(spacedPlus(presets[size_t(i)].label()));
         std::string sub;
         if (isCustom) sub = T("tc.your_own");
-        else {
-            int64_t est = presets[size_t(i)].baseMs / 1000 + 40 * presets[size_t(i)].incrementMs / 1000;
-            sub = T(est < 180 ? "viewer.tc.bullet" : est < 480 ? "viewer.tc.blitz" : est < 1500 ? "viewer.tc.rapid" : "viewer.tc.classical");
-        }
+        else sub = T(detail::tcCategoryKey(presets[size_t(i)].baseMs / 1000, presets[size_t(i)].incrementMs / 1000));
         if (tcTile(i, r, label, sub, on)) sel = isCustom ? -1 : i;
     }
     im::popId();

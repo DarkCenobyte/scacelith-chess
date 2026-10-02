@@ -206,11 +206,7 @@ std::string nodesText(int n) {
 std::string timeCategory(const std::string& label) {
     int base = 0, inc = 0;
     if (std::sscanf(label.c_str(), "%d+%d", &base, &inc) != 2) return T("tc.no_clock");
-    int est = base * 60 + 40 * inc;
-    if (est < 180) return T("tc.bullet");
-    if (est < 480) return T("tc.blitz");
-    if (est < 1500) return T("tc.rapid");
-    return T("tc.classical");
+    return T(detail::tcCategoryKey(int64_t(base) * 60, inc));
 }
 std::string customClockSummary(const NewGameSetup& s) {
     int b = s.customBaseSeconds;
@@ -1512,6 +1508,13 @@ std::string spacedPlus(const std::string& label) {
     size_t p = label.find('+');
     if (p == std::string::npos) return label;
     return label.substr(0, p) + "\xE2\x80\x89+\xE2\x80\x89" + label.substr(p + 1);
+}
+const char* tcCategoryKey(int64_t baseSec, int64_t incSec) {
+    const int64_t est = baseSec + 40 * incSec;
+    if (est < 180) return "tc.bullet";
+    if (est < 480) return "tc.blitz";
+    if (est < 1500) return "tc.rapid";
+    return "tc.classical";
 }
 
 void screensBeginFrame(float dt) {

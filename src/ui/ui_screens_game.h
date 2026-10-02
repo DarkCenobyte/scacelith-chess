@@ -4,6 +4,7 @@
 #pragma once
 #include "../i18n/i18n.h"
 #include "ui.h"
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -40,6 +41,9 @@ const std::vector<int>& baseTimeValues();
 int nearestIndex(const std::vector<int>& v, int value);
 std::string clockText(int seconds);
 std::string spacedPlus(const std::string& label);  // "3+2" -> "3 + 2" with thin spaces
+// The category of a time control (Lichess-style estimate: base + 40 x increment, in seconds):
+// "tc.bullet", "tc.blitz", "tc.rapid" or "tc.classical".
+const char* tcCategoryKey(int64_t baseSec, int64_t incSec);
 
 }  // namespace detail
 }  // namespace ui

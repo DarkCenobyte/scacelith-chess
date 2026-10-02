@@ -58,12 +58,8 @@ using detail::spacedPlus;
 // "3+2" -> category (Lichess-style estimate: base + 40 x increment), as on the New Game page.
 const char* categoryKey(const std::string& label) {
     int base = 0, inc = 0;
-    if (std::sscanf(label.c_str(), "%d+%d", &base, &inc) != 2) return "viewer.tc.none";
-    int est = base * 60 + 40 * inc;
-    if (est < 180) return "viewer.tc.bullet";
-    if (est < 480) return "viewer.tc.blitz";
-    if (est < 1500) return "viewer.tc.rapid";
-    return "viewer.tc.classical";
+    if (std::sscanf(label.c_str(), "%d+%d", &base, &inc) != 2) return "tc.no_clock";
+    return detail::tcCategoryKey(int64_t(base) * 60, inc);
 }
 std::string customClockSummary(const WatchSetup& s) {
     int b = s.customBaseSeconds;
