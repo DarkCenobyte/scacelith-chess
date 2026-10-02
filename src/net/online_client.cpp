@@ -1690,12 +1690,7 @@ void OnlineClient::cancelSso() {
 void OnlineClient::logout(bool allSessions) {
     Impl* d = impl_.get();
     ServerEndpoint e = d->ep;
-    d->connectGen.fetch_add(1);
-    d->realtime([d] {
-        d->rt.wanted = false;
-        d->dropSocket(1000);
-        d->setState(ConnState::Offline);
-    });
+    d->stopRealtime();   // an attempt in progress too (fetchInfo, wsConnect): Offline at once
     d->http([d, e, allSessions] {
         json::Value b = json::Value::object();
         Impl::Api a = d->api(e, "POST", allSessions ? "/auth/logout-all" : "/auth/logout", &b, true, d->httpCancel);

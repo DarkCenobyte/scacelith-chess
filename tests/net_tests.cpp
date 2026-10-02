@@ -3749,6 +3749,64 @@ TEST(net_account_delete_stops_realtime) {
     net::sys::removeFile(credPath);
 }
 
+// Signing out while a connection attempt waits for a slow server (here /info, answered after 10 s)
+// cancels that attempt, as disconnect() does: the state is Offline at once, not when the server
+// answers or the request times out.
+TEST(net_logout_cancels_a_connection_attempt) {
+    if (!net::transportAvailable()) return;
+    std::atomic<int> infos{0};
+    fakehttp::Server srv(
+        [&](const fakehttp::Request& q) {
+            fakehttp::Reply rep;
+            rep.headers.emplace_back("Content-Type", "application/json");
+            if (q.path == "/api/v1/info") {
+                ++infos;
+                rep.silenceMs = 10000;
+                rep.body = "{}";
+            } else {
+                rep.body = "{\"status\":\"logged_out\"}";
+            }
+            return rep;
+        },
+        true);
+    CHECK(srv.ok());
+    std::string credPath = tempCredentialPath("logout-attempt");
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = srv.port();
+    ep.insecureDev = true;
+    {
+        net::CredentialStore s(credPath);
+        net::Credential cr;
+        cr.origin = ep.origin();
+        cr.username = "alice";
+        cr.token = "sct_" + std::string(43, 'L');
+        CHECK(s.put(cr));
+    }
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        c.connect();
+        CHECK(waitState(c, net::ConnState::Connecting, 5000));
+        auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (infos.load() == 0 && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK_EQ(infos.load(), 1);
+        auto t0 = std::chrono::steady_clock::now();
+        c.logout();
+        std::vector<net::Event> seen;
+        CHECK(waitState(c, net::ConnState::Offline, 3000, &seen));
+        double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+        std::fprintf(stderr, "  Offline %.0f ms after logout()\n", ms);
+        net::Event ev;
+        CHECK(std::any_of(seen.begin(), seen.end(), [](const net::Event& e) { return e.kind == net::Event::Kind::LogoutResult; }) ||
+              waitEvent(c, net::Event::Kind::LogoutResult, ev, 10000));
+        CHECK(!c.hasSavedSession());
+    }
+    net::sys::removeFile(credPath);
+}
+
 // The official server moved from port 44664 to 443: a saved session moves with it, once; other
 // origins never move.
 TEST(net_credentials_origin_move) {
