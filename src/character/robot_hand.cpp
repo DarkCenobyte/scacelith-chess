@@ -29,7 +29,6 @@ struct Phalanx {
     float t0, t1;                  // half thickness (pad direction) at the proximal / distal end
     float w0, w1;                  // half width (hinge direction)
     bool tip = false;              // distal phalanx: rounded fingertip, no distal joint
-    bool ballBase = false;         // proximal joint is a ball (MCP/CMC) instead of a hinge
     float base0 = 0.0f;            // radius of this segment's dark base
     float base1 = 0.0f;            // radius of the next segment's dark base (socket = base1 + gap)
     bool ball1 = false;            // next joint is a ball
@@ -194,7 +193,6 @@ void buildHand(Sink& s) {
             ph.width = vec3(0, 0, 1);
             ph.len = sk.boneLength[b];
             ph.tip = seg == 2;
-            ph.ballBase = seg == 0;
             ph.t0 = T[seg][0] * sc;
             ph.t1 = T[seg][1] * sc;
             ph.w0 = W[seg][0] * sc;
@@ -227,7 +225,6 @@ void buildHand(Sink& s) {
         mc.pad = padOf(a1);
         mc.width = vec3(1, 0, 0);
         mc.len = length(o2);
-        mc.ballBase = true;
         mc.t0 = 0.0100f; mc.t1 = 0.0084f;
         mc.w0 = 0.0112f; mc.w1 = 0.0094f;
         mc.base0 = cmcBall;

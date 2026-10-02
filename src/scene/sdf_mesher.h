@@ -24,7 +24,6 @@ inline float smin(float a, float b, float k) {
     return std::min(a, b) - h * h * k * 0.25f;
 }
 inline float smax(float a, float b, float k) { return -smin(-a, -b, k); }
-inline float sdSphere(m::vec3 p, m::vec3 c, float r) { return m::length(p - c) - r; }
 // Ellipsoid (bound, iq's first-order approximation).
 inline float sdEllipsoid(m::vec3 p, m::vec3 c, m::vec3 r) {
     m::vec3 q = p - c;
@@ -33,16 +32,6 @@ inline float sdEllipsoid(m::vec3 p, m::vec3 c, m::vec3 r) {
 }
 // Capsule / round cone between a (radius ra) and b (radius rb).
 float sdRoundCone(m::vec3 p, m::vec3 a, m::vec3 b, float ra, float rb);
-inline float sdCapsule(m::vec3 p, m::vec3 a, m::vec3 b, float r) {
-    m::vec3 pa = p - a, ba = b - a;
-    float h = m::clamp(m::dot(pa, ba) / m::dot(ba, ba), 0.0f, 1.0f);
-    return m::length(pa - ba * h) - r;
-}
-// Box with rounded edges (half extent b includes the rounding radius r).
-inline float sdRoundBox(m::vec3 p, m::vec3 b, float r) {
-    m::vec3 q = m::abs(p) - b + m::vec3(r);
-    return m::length(m::max(q, m::vec3(0))) + std::min(std::max(q.x, std::max(q.y, q.z)), 0.0f) - r;
-}
 float sdSegment2(m::vec2 p, m::vec2 a, m::vec2 b);
 // Extrusion of a 2D field d2 along an axis coordinate w (|w| <= halfLen) with rounded rims.
 inline float extrudeRound(float d2, float w, float halfLen, float round) {
@@ -62,8 +51,6 @@ public:
     // Arc-length parameter (along the polygon, from point 0) of the closest boundary point.
     // Useful to lay details along an outline.
     float sampleParam(m::vec2 p) const;
-    float perimeter() const { return perimeter_; }
-    bool empty() const { return w_ == 0; }
 
 private:
     int w_ = 0, h_ = 0;

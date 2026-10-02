@@ -158,7 +158,6 @@ Model buildTable() {
             louisLeg(carved, carved, base, Y - T, 0.034f, Y - T - yShort, bh, 12);
             // Rosettes on the two outer faces of the block.
             float yc = 0.5f * (yShort + yTopA);
-            MeshData ros;
             auto rosetteAt = [&](vec3 c, vec3 n) {
                 vec3 t = orthogonal(n), b = cross(t, n);
                 Profile pr = {{0.018f, 0.0f}, {0.017f, 0.002f}, {0.013f, 0.004f}, {0.009f, 0.0045f}, {0.006f, 0.004f}, {0.004f, 0.006f}, {0.0f, 0.007f}};

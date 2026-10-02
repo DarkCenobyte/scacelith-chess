@@ -28,13 +28,6 @@ Bone mirrorBone(Bone b) {
     return b;
 }
 
-vec3 restJoint(Bone b) {
-    const Skeleton& sk = robotSkeleton();
-    vec3 p(0);
-    for (int i = b; i >= 0; i = sk.parent[i]) p += sk.restOffset[i];
-    return p;
-}
-
 void Sink::add(const char* name, Bone b, MaterialId mat, MeshJob job, bool fpHidden, const vec4* inst) {
     RobotPart p;
     p.bone = b;

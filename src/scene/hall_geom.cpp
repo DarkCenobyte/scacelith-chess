@@ -47,14 +47,6 @@ void quadFlat(MeshData& d, vec3 a, vec3 b, vec3 c, vec3 e, vec3 n, vec3 uAxis) {
     tri(d, ia, ic, ie);
 }
 
-void polygon(MeshData& d, const std::vector<vec3>& pts, vec3 n, vec3 uAxis) {
-    if (pts.size() < 3) return;
-    vec3 vAxis = cross(n, uAxis);
-    uint32_t base = uint32_t(d.vertices.size());
-    for (vec3 p : pts) vtx(d, p, n, uAxis, vec2(dot(p, uAxis), dot(p, vAxis)));
-    for (uint32_t i = 1; i + 1 < pts.size(); ++i) tri(d, base, base + i, base + i + 1);
-}
-
 void box(MeshData& d, vec3 c, vec3 ax, vec3 ay, vec3 az, vec3 h, unsigned faces) {
     struct F { unsigned bit; vec3 n, u, v; float hn, hu, hv; };
     const F fs[6] = {{F_PX, ax, az, ay, h.x, h.z, h.y},  {F_NX, -ax, az, ay, h.x, h.z, h.y},
@@ -71,12 +63,6 @@ void box(MeshData& d, vec3 c, vec3 ax, vec3 ay, vec3 az, vec3 h, unsigned faces)
 
 void boxAA(MeshData& d, vec3 lo, vec3 hi, unsigned faces) {
     box(d, (lo + hi) * 0.5f, vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), (hi - lo) * 0.5f, faces);
-}
-
-void boxXf(MeshData& d, const mat4& xf, vec3 h, unsigned faces) {
-    MeshData t;
-    box(t, vec3(0), vec3(1, 0, 0), vec3(0, 1, 0), vec3(0, 0, 1), h, faces);
-    d.append(t, xf);
 }
 
 std::vector<float> linspace(float a, float b, int n) {
@@ -352,7 +338,5 @@ std::vector<vec2> archOutline(float uc, float w, float v0, float vs, int archSeg
     r.push_back({uc + w, v0});
     return r;
 }
-
-size_t triangleCount(const MeshData& d) { return d.indices.size() / 3; }
 
 }  // namespace hallgeo

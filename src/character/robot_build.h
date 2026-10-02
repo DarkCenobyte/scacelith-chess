@@ -47,9 +47,5 @@ void buildTorso(Sink& s);   // pelvis, abdomen, chest, neck
 void buildLegs(Sink& s);    // thighs, shins, feet (+ mirrored)
 void buildHead(Sink& s);    // head shell, face, eyes, lids
 
-// Bone-local position of a bone's joint relative to another bone (rest pose), e.g. the elbow in
-// upper-arm space: restOffset chain difference.
-m::vec3 restJoint(Bone b);  // character-space joint position in the rest pose (pelvis at origin)
-
 }  // namespace build
 }  // namespace character

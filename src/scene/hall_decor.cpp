@@ -399,7 +399,6 @@ void buildProps(Accum& a, MeshData& paintings) {
             console(w, u);
         }
     }
-    (void)stone;
 }
 
 }  // namespace detail
