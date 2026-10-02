@@ -215,6 +215,13 @@ std::string CredentialStore::username(const std::string& origin) const {
     return r ? r->username : std::string();
 }
 
+std::string CredentialStore::pin(const std::string& origin) const {
+    std::lock_guard<std::mutex> lk(mu_);
+    loadLocked();
+    const Record* r = findLocked(origin);
+    return r ? r->pin : std::string();
+}
+
 bool CredentialStore::put(const Credential& c) {
     if (c.origin.empty()) return false;
     std::string blob;

@@ -47,6 +47,7 @@ public:
     bool get(const std::string& origin, Credential& out) const;
     bool hasToken(const std::string& origin) const;   // without decrypting
     std::string username(const std::string& origin) const;
+    std::string pin(const std::string& origin) const;   // the saved pin (without decrypting the token)
 
     bool put(const Credential& c);               // creates or replaces c.origin's record; saves
     bool clearToken(const std::string& origin);  // logout: keeps user name, server id and pin

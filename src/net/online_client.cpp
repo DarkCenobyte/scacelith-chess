@@ -458,8 +458,7 @@ struct OnlineClient::Impl {
     std::string effectivePin(const ServerEndpoint& e) {
         std::string p = normalizePin(e.pinnedSha256);
         if (!p.empty()) return p;
-        Credential c;
-        return creds.get(e.origin(), c) ? c.pinnedSha256 : std::string();
+        return creds.pin(e.origin());
     }
 
     // =========================================================================================

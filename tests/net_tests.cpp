@@ -898,6 +898,8 @@ TEST(net_credentials_isolation) {
         CHECK(s.get(A, out));
         CHECK_EQ(out.token, tokenA);
         CHECK_EQ(out.pinnedSha256, std::string(64, 'a'));
+        CHECK_EQ(s.pin(A), std::string(64, 'a'));
+        CHECK(s.pin(B).empty());
     }
     std::string text;
     CHECK(net::sys::readFile(path, text, 1 << 20));
