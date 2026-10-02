@@ -576,7 +576,8 @@ void GameScene::recordOnline(int ply) {
     recordedPly_ = std::max(recordedPly_, std::min(ply + 1, int(san.size())));
 }
 
-bool GameScene::myFirstMoveMade() const { return int(og_.moves.size()) > int(humanColor_); }
+// A move sent and not confirmed yet counts: the server already has it and would refuse an abort.
+bool GameScene::myFirstMoveMade() const { return int(og_.moves.size()) > int(humanColor_) || pendingPly_ >= 0; }
 
 // =============================================================================================
 // Live gestures: mine to the opponent
