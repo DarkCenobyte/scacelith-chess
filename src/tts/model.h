@@ -23,6 +23,9 @@ struct Blob {
     size_t size = 0;
 };
 
+// The loudness normalisation and fades of a synthesized line (tts.cpp).
+void finishPcm(std::vector<float>& pcm);
+
 class Engine {
 public:
     static const char* const kFiles[kFileCount];
@@ -34,19 +37,21 @@ public:
     int voiceCount() const { return voices_; }
     std::string voiceName(int i) const;
     const int32_t* indexer() const { return indexer_; }
-    size_t modelBytes() const;   // bytes of the four graphs (mapped)
+    size_t modelBytes() const;   // bytes of the six model files (mapped)
 
-    // Stages. 'ids' are model ids (text::indices), 'voice' in [0, voiceCount()).
+    // Stages. 'ids' are model ids (text::indices), 'voice' in [0, voiceCount()). A stage stops
+    // with the error "cancelled" once 'cancel' (optional) is set.
     bool duration(const std::vector<int64_t>& ids, int voice, const ExecContext& ctx, float* seconds,
-                  std::string* error) const;
+                  std::string* error, const std::atomic<bool>* cancel = nullptr) const;
     bool encode(const std::vector<int64_t>& ids, int voice, const ExecContext& ctx, Tensor* textEmb,
-                std::string* error) const;
+                std::string* error, const std::atomic<bool>* cancel = nullptr) const;
     // 'steps' Euler steps of the vector estimator from 'noise' [1, 144, L]. 'each' (optional)
     // receives the latent after every step.
     bool denoise(const Tensor& textEmb, int voice, const Tensor& noise, int steps, const ExecContext& ctx,
                  Tensor* latent, const std::atomic<bool>* cancel, std::string* error,
                  std::vector<Tensor>* each = nullptr) const;
-    bool vocode(const Tensor& latent, const ExecContext& ctx, Tensor* wav, std::string* error) const;
+    bool vocode(const Tensor& latent, const ExecContext& ctx, Tensor* wav, std::string* error,
+                const std::atomic<bool>* cancel = nullptr) const;
 
     const Graph& graph(ModelFile f) const;
     Tensor styleTtl(int voice) const;   // [1, 50, 256]

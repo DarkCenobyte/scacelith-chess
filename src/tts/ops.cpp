@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstring>
 #include <limits>
+#include <xmmintrin.h>
 
 namespace tts {
 namespace {
@@ -43,13 +44,14 @@ Tensor alias(const Tensor& t, const Dims& d) {
     return r;
 }
 
-// Dequantised float copy of a QuantWeight (generic operators never see int8 weights otherwise).
+// Dequantised float copy of a QuantWeight (generic operators never see int8 weights otherwise),
+// in the tensor's own shape: a Reshape, Squeeze or Unsqueeze of the weight keeps its flat order.
 Tensor materialize(const Tensor& t) {
     if (!t.qweight || t.data) return t;
     const QuantWeight& q = *t.qweight;
-    Tensor r = Tensor::alloc(DType::F32, q.dims);
-    float* o = r.mut<float>();
     int64_t n = elementCount(q.dims);
+    Tensor r = Tensor::alloc(DType::F32, t.count() == n ? t.dims : q.dims);
+    float* o = r.mut<float>();
     int64_t inner = 1;
     for (size_t d = size_t(q.axis) + 1; d < q.dims.size(); ++d) inner *= q.dims[d];
     int64_t ch = q.scale.size() > 1 ? q.dims[size_t(q.axis)] : 1;
@@ -100,9 +102,6 @@ struct Bcast {
                 else return fail(err, "cannot broadcast " + dimsStr(*ins[0]) + " with " + dimsStr(*ins[i]));
             }
         }
-        for (int i = 0; i < n; ++i)
-            for (size_t d = 0; d < rank; ++d)
-                if (padded[size_t(i)][d] == 1 && out[d] == 0) out[d] = 0;
         // Per-dimension strides, then drop size-1 dimensions and merge contiguous ones.
         std::vector<Dims> strides(static_cast<size_t>(n));
         for (int i = 0; i < n; ++i) {
@@ -261,14 +260,29 @@ bool arith(const ExecContext& ctx, Op op, const Tensor& a0, const Tensor& b0, Te
 
 bool opPow(const Tensor& a, const Tensor& b, Tensor& out, std::string* err) {
     if (a.type == DType::I64) {   // shape arithmetic (relative-position attention windows)
-        auto ipow = [](int64_t x, int64_t y) {
+        // By squaring: an exponent from the file never loops for long. A square is only taken when
+        // a later bit needs it, so 'overflow' means the result itself does not fit.
+        bool overflow = false;
+        auto ipow = [&overflow](int64_t x, int64_t y) {
+            if (y < 0) return int64_t(0);
             int64_t r = 1;
-            for (int64_t i = 0; i < y; ++i) r *= x;
-            return y < 0 ? int64_t(0) : r;
+            for (; y; y >>= 1) {
+                if ((y & 1) && __builtin_mul_overflow(r, x, &r)) overflow = true;
+                if (y > 1 && __builtin_mul_overflow(x, x, &x)) overflow = true;
+            }
+            return r;
         };
-        if (b.type == DType::I64) return binaryT<int64_t, int64_t>(a, b, out, DType::I64, ipow, err);
-        if (b.type == DType::F32)
-            return binaryT<int64_t, int64_t>(a, Tensor::fromInts({int64_t(b.scalarFloat())}), out, DType::I64, ipow, err);
+        bool ok;
+        if (b.type == DType::I64) {
+            ok = binaryT<int64_t, int64_t>(a, b, out, DType::I64, ipow, err);
+        } else if (b.type == DType::F32) {
+            float e = b.scalarFloat();
+            if (!(e >= -0x1p63f && e < 0x1p63f)) return fail(err, "Pow exponent out of range");
+            ok = binaryT<int64_t, int64_t>(a, Tensor::fromInts({int64_t(e)}), out, DType::I64, ipow, err);
+        } else {
+            return fail(err, "Pow exponent type");
+        }
+        return ok && (!overflow || fail(err, "Pow overflow"));
     }
     if (a.type != DType::F32) return fail(err, "Pow base must be float or int64");
     if (b.type == DType::F32 && b.count() == 1) {
@@ -383,7 +397,7 @@ bool opCast(const Tensor& x0, int to, Tensor& out, std::string* err) {
         default: return 0.0;
         }
     };
-    if (x.type == DType::I32 && t == DType::F32) {   // hot: MatMulInteger outputs
+    if (x.type == DType::I32 && t == DType::F32) {   // unfused MatMulInteger outputs (the shipped model fuses them)
         for (int64_t i = 0; i < n; ++i) out.mut<float>()[i] = float(x.as<int32_t>()[i]);
         return true;
     }
@@ -419,13 +433,13 @@ bool opReshape(const Tensor& x, const Tensor& shape, bool allowZero, Tensor& out
         if (s[i] == -1) {
             if (infer >= 0) return fail(err, "Reshape with two -1");
             infer = int(i);
-        } else {
-            known *= s[i];
+        } else if (s[i] < 0 || __builtin_mul_overflow(known, s[i], &known)) {
+            return fail(err, "Reshape to " + dimsStr(s));
         }
     }
-    int64_t total = x.qweight && !x.data ? elementCount(x.dims) : x.count();
+    int64_t total = x.count();
     if (infer >= 0) s[size_t(infer)] = known ? total / known : 0;
-    if (elementCount(s) != total) return fail(err, "Reshape " + dimsStr(x.dims) + " to " + dimsStr(s));
+    if (!validDims(s) || elementCount(s) != total) return fail(err, "Reshape " + dimsStr(x.dims) + " to " + dimsStr(s));
     out = alias(x, s);
     return true;
 }
@@ -436,6 +450,11 @@ bool opTranspose(const Tensor& x0, std::vector<int64_t> perm, Tensor& out, std::
     if (perm.empty())
         for (size_t i = 0; i < r; ++i) perm.push_back(int64_t(r - 1 - i));
     if (perm.size() != r) return fail(err, "Transpose perm rank");
+    std::vector<bool> seen(r, false);
+    for (int64_t p : perm) {
+        if (p < 0 || p >= int64_t(r) || seen[size_t(p)]) return fail(err, "Transpose perm is not a permutation");
+        seen[size_t(p)] = true;
+    }
     Dims od(r);
     Dims is = stridesOf(x.dims);
     Dims ps(r);   // input stride of each output dimension
@@ -462,12 +481,12 @@ bool opTranspose(const Tensor& x0, std::vector<int64_t> perm, Tensor& out, std::
         } else {
             for (int64_t i = 0; i < inner; ++i) std::memcpy(d + i * int64_t(es), src + (off + i * innerStride) * int64_t(es), es);
         }
-        for (size_t dd = r - 1; dd-- > 0;) {
-            ++idx[dd];
-            off += ps[dd];
-            if (idx[dd] < od[dd]) break;
-            off -= ps[dd] * od[dd];
-            idx[dd] = 0;
+        for (int64_t dd = int64_t(r) - 1; dd-- > 0;) {
+            ++idx[size_t(dd)];
+            off += ps[size_t(dd)];
+            if (idx[size_t(dd)] < od[size_t(dd)]) break;
+            off -= ps[size_t(dd)] * od[size_t(dd)];
+            idx[size_t(dd)] = 0;
         }
     }
     return true;
@@ -513,11 +532,17 @@ bool opSplit(const Node& nd, const Tensor& x0, const Tensor* splitT, Tensor* out
     size_t nout = nd.out.size();
     std::vector<int64_t> sizes = splitT && splitT->valid() ? splitT->toInts() : nd.ints;
     int64_t len = x.dims[size_t(axis)];
+    if (nout == 0) return fail(err, "Split without outputs");
     if (sizes.empty()) {
         int64_t each = (len + int64_t(nout) - 1) / int64_t(nout);
         for (size_t i = 0; i < nout; ++i) sizes.push_back(std::min(each, len - each * int64_t(i)));
     }
     if (sizes.size() != nout) return fail(err, "Split sizes count");
+    int64_t sum = 0;
+    for (int64_t v : sizes) {
+        if (v < 0 || v > len - sum) return fail(err, "Split sizes exceed the axis");
+        sum += v;
+    }
     int64_t outer = 1, inner = 1;
     for (int64_t d = 0; d < axis; ++d) outer *= x.dims[size_t(d)];
     for (int64_t d = axis + 1; d < r; ++d) inner *= x.dims[size_t(d)];
@@ -664,9 +689,11 @@ bool opSqueeze(const Tensor& x, const Tensor* axesT, Tensor& out, std::string* e
 bool opExpand(const Tensor& x0, const Tensor& shape, Tensor& out, std::string* err) {
     Tensor x = materialize(x0);
     Dims s = shape.toInts();
+    if (!validDims(s)) return fail(err, "Expand shape " + dimsStr(s));
     const Dims* ins[2] = {&x.dims, &s};
     Bcast bc;
     if (!bc.init(ins, 2, err)) return false;
+    if (!validDims(bc.out)) return fail(err, "Expand shape " + dimsStr(bc.out));
     out = Tensor::alloc(x.type, bc.out);
     size_t es = dtypeSize(x.type);
     const uint8_t* src = x.as<uint8_t>();
@@ -687,7 +714,9 @@ bool opTile(const Tensor& x0, const Tensor& repeats, Tensor& out, std::string* e
     std::vector<int64_t> rep = repeats.toInts();
     if (int64_t(rep.size()) != x.rank()) return fail(err, "Tile repeats rank");
     Dims od = x.dims;
-    for (size_t d = 0; d < od.size(); ++d) od[d] *= rep[d];
+    for (size_t d = 0; d < od.size(); ++d)
+        if (rep[d] < 0 || __builtin_mul_overflow(od[d], rep[d], &od[d])) return fail(err, "Tile repeats");
+    if (!validDims(od)) return fail(err, "Tile output " + dimsStr(od));
     out = Tensor::alloc(x.type, od);
     int64_t n = out.count();
     size_t es = dtypeSize(x.type);
@@ -722,21 +751,31 @@ bool opPad(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tenso
     std::vector<int64_t> lo(size_t(r), 0), hi(size_t(r), 0);
     for (size_t i = 0; i < axes.size(); ++i) {
         int64_t a = normAxis(axes[i], r);
+        if (a < 0 || a >= r) return fail(err, "Pad axis");
         lo[size_t(a)] = p[i];
         hi[size_t(a)] = p[i + axes.size()];
+    }
+    if (r == 0) {   // a scalar: nothing to pad
+        out = x;
+        return true;
     }
     // Negative pads crop (the relative-position attention of the text encoders uses them).
     Dims od = x.dims;
     for (int64_t d = 0; d < r; ++d) {
-        od[size_t(d)] += lo[size_t(d)] + hi[size_t(d)];
-        if (od[size_t(d)] < 0) return fail(err, "Pad crops more than the dimension");
+        int64_t& v = od[size_t(d)];
+        if (__builtin_add_overflow(v, lo[size_t(d)], &v) || __builtin_add_overflow(v, hi[size_t(d)], &v))
+            return fail(err, "Pad pads");
+        if (v < 0) return fail(err, "Pad crops more than the dimension");
     }
+    if (!validDims(od)) return fail(err, "Pad output " + dimsStr(od));
     out = Tensor::alloc(x.type, od);
     size_t es = dtypeSize(x.type);
     bool edge = nd.mode == "edge";
     // Constant fill value (in the input type).
     uint8_t fill[8] = {0};
     if (!edge && valueT && valueT->valid() && valueT->count() > 0) std::memcpy(fill, valueT->data, dtypeSize(valueT->type));
+    uint32_t fill4;
+    std::memcpy(&fill4, fill, 4);
     int64_t n = out.count();
     if (n == 0) return true;
     Dims is = stridesOf(x.dims);
@@ -754,6 +793,7 @@ bool opPad(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tenso
         }
         for (int64_t o = o0; o < o1; ++o) {
             uint8_t* row = dst + o * inner * int64_t(es);
+            uint32_t* row4 = reinterpret_cast<uint32_t*>(row);   // 4-byte elements: whole runs, no per-element memcpy
             bool inside = true;
             int64_t off = 0;
             for (int64_t d = 0; d + 1 < r; ++d) {
@@ -765,15 +805,29 @@ bool opPad(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tenso
                 off += c * is[size_t(d)];
             }
             if (!inside || lastDim == 0) {
-                for (int64_t i = 0; i < inner; ++i) std::memcpy(row + i * int64_t(es), fill, es);
+                if (es == 4) std::fill(row4, row4 + inner, fill4);
+                else
+                    for (int64_t i = 0; i < inner; ++i) std::memcpy(row + i * int64_t(es), fill, es);
             } else {
                 const uint8_t* s = src + off * int64_t(es);
                 int64_t i0 = std::max<int64_t>(0, lastLo), i1 = std::min<int64_t>(inner, lastLo + lastDim);
-                for (int64_t i = 0; i < inner; ++i) {
-                    if (i >= i0 && i < i1) continue;
-                    int64_t c = i - lastLo;
-                    const uint8_t* v = edge ? s + std::clamp<int64_t>(c, 0, lastDim - 1) * int64_t(es) : fill;
-                    std::memcpy(row + i * int64_t(es), v, es);
+                if (es == 4) {
+                    // Before the copied run c < 0, after it c >= lastDim (crops included).
+                    uint32_t left = fill4, right = fill4;
+                    if (edge) {
+                        std::memcpy(&left, s, 4);
+                        std::memcpy(&right, s + (lastDim - 1) * 4, 4);
+                    }
+                    int64_t a = std::min(i0, inner), b = std::max(i1, a);
+                    std::fill(row4, row4 + a, left);
+                    std::fill(row4 + b, row4 + inner, right);
+                } else {
+                    for (int64_t i = 0; i < inner; ++i) {
+                        if (i >= i0 && i < i1) continue;
+                        int64_t c = i - lastLo;
+                        const uint8_t* v = edge ? s + std::clamp<int64_t>(c, 0, lastDim - 1) * int64_t(es) : fill;
+                        std::memcpy(row + i * int64_t(es), v, es);
+                    }
                 }
                 if (i1 > i0) std::memcpy(row + i0 * int64_t(es), s + (i0 - lastLo) * int64_t(es), size_t(i1 - i0) * es);
             }
@@ -799,7 +853,11 @@ bool opReduceSum(const Node& nd, const Tensor& x0, const Tensor* axesT, Tensor& 
         for (int64_t d = 0; d < r; ++d) axes.push_back(d);
     }
     std::vector<bool> red(size_t(r), false);
-    for (int64_t a : axes) red[size_t(normAxis(a, r))] = true;
+    for (int64_t a : axes) {
+        a = normAxis(a, r);
+        if (a < 0 || a >= r) return fail(err, "ReduceSum axis");
+        red[size_t(a)] = true;
+    }
     Dims kd = x.dims, od;
     for (int64_t d = 0; d < r; ++d) {
         if (red[size_t(d)]) kd[size_t(d)] = 1;
@@ -830,6 +888,7 @@ bool opReduceSum(const Node& nd, const Tensor& x0, const Tensor* axesT, Tensor& 
 // ------------------------------------------------------------------------------------------------
 bool opSoftmax(const ExecContext& ctx, const Tensor& x0, int64_t axis, Tensor& out, std::string* err) {
     Tensor x = materialize(x0);
+    if (x.type != DType::F32 || x.rank() == 0) return fail(err, "Softmax expects a float tensor of rank 1 or more");
     axis = normAxis(axis, x.rank());
     if (axis != x.rank() - 1) return fail(err, "Softmax only on the last axis");
     out = Tensor::alloc(DType::F32, x.dims);
@@ -840,30 +899,33 @@ bool opSoftmax(const ExecContext& ctx, const Tensor& x0, int64_t axis, Tensor& o
     return true;
 }
 
-bool opLayerNorm(const ExecContext& ctx, const Node& nd, const Tensor& x, const Tensor& g0, const Tensor* b0, Tensor& out,
+bool opLayerNorm(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tensor& g0, const Tensor* b0, Tensor& out,
                  std::string* err) {
-    Tensor g = materialize(g0);
+    Tensor x = materialize(x0), g = materialize(g0);
     Tensor b = b0 && b0->valid() ? materialize(*b0) : Tensor();
+    if (x.type != DType::F32 || g.type != DType::F32 || (b.valid() && b.type != DType::F32))
+        return fail(err, "LayerNorm expects float");
     int64_t axis = normAxis(nd.axis, x.rank());
+    if (axis < 0 || axis >= x.rank()) return fail(err, "LayerNorm axis");
     int64_t cols = 1;
     for (int64_t d = axis; d < x.rank(); ++d) cols *= x.dims[size_t(d)];
     if (g.count() != cols || (b.valid() && b.count() != cols)) return fail(err, "LayerNorm scale/bias size");
     out = Tensor::alloc(DType::F32, x.dims);
     int64_t rows = cols ? x.count() / cols : 0;
-    auto body = [&](int64_t r0, int64_t r1) {
-        ctx.k->layerNormRows(x.as<float>() + r0 * cols, cols, int(r1 - r0), int(cols), g.as<float>(),
-                             b.valid() ? b.as<float>() : nullptr, nd.f0, out.mut<float>() + r0 * cols);
-    };
-    body(0, rows);
+    ctx.k->layerNormRows(x.as<float>(), cols, int(rows), int(cols), g.as<float>(), b.valid() ? b.as<float>() : nullptr,
+                         nd.f0, out.mut<float>());
     return true;
 }
 
 // LayerNorm over the channel axis of [B, C, L] without the transposes: statistics per (b, t).
-bool opLayerNormChannels(const ExecContext& ctx, const Node& nd, const Tensor& x, const Tensor& g0, const Tensor* b0,
+bool opLayerNormChannels(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tensor& g0, const Tensor* b0,
                          Tensor& out, std::string* err) {
-    Tensor g = materialize(g0);
+    Tensor x = materialize(x0), g = materialize(g0);
     Tensor b = b0 && b0->valid() ? materialize(*b0) : Tensor();
-    if (x.rank() != 3 || g.count() != x.dims[1]) return fail(err, "LayerNormChannels shape");
+    if (x.type != DType::F32 || g.type != DType::F32 || (b.valid() && b.type != DType::F32))
+        return fail(err, "LayerNormChannels expects float");
+    if (x.rank() != 3 || g.count() != x.dims[1] || (b.valid() && b.count() != x.dims[1]))
+        return fail(err, "LayerNormChannels shape");
     int64_t B = x.dims[0], C = x.dims[1], L = x.dims[2];
     out = Tensor::alloc(DType::F32, x.dims);
     const float* gp = g.as<float>();
@@ -901,10 +963,12 @@ bool opLayerNormChannels(const ExecContext& ctx, const Node& nd, const Tensor& x
 }
 
 bool opBatchNorm(const Node& nd, const Tensor* const* in, Tensor& out, std::string* err) {
-    const Tensor& x = *in[0];
+    Tensor x = materialize(*in[0]);
     Tensor sc = materialize(*in[1]), bi = materialize(*in[2]), mu = materialize(*in[3]), va = materialize(*in[4]);
     if (x.rank() < 2) return fail(err, "BatchNorm rank");
     int64_t N = x.dims[0], C = x.dims[1], inner = x.count() / std::max<int64_t>(1, N * C);
+    for (const Tensor* t : {&x, &sc, &bi, &mu, &va})
+        if (t->type != DType::F32 || (t != &x && t->count() != C)) return fail(err, "BatchNorm expects float, C parameters");
     out = Tensor::alloc(DType::F32, x.dims);
     for (int64_t n = 0; n < N; ++n)
         for (int64_t c = 0; c < C; ++c) {
@@ -924,7 +988,7 @@ GemmA gemmA(const Tensor& w, int64_t rowLen, std::vector<float>& scales, std::ve
     GemmA a;
     if (w.qweight && !w.data) {
         const QuantWeight& q = *w.qweight;
-        int64_t rows = q.dims.empty() ? 1 : q.dims[0];
+        int64_t rows = w.dims.empty() ? 1 : w.dims[0];
         scales.resize(size_t(rows));
         zps.resize(size_t(rows));
         for (int64_t r = 0; r < rows; ++r) {
@@ -946,7 +1010,10 @@ bool quantizedPerRow(const Tensor& w) {
     // A QuantWeight can feed the GEMM directly when it is int8 quantized per row (axis 0) or per
     // tensor.
     if (!w.qweight || w.data) return true;
-    return !w.qweight->isUnsigned && (w.qweight->scale.size() == 1 || w.qweight->axis == 0);
+    const QuantWeight& q = *w.qweight;
+    if (q.isUnsigned) return false;
+    // Per-row scales only while the rows are still the quantization axis (not after a reshape).
+    return q.scale.size() == 1 || (q.axis == 0 && !w.dims.empty() && !q.dims.empty() && w.dims[0] == q.dims[0]);
 }
 
 bool opMatMul(const ExecContext& ctx, const Tensor& a0, const Tensor& b0, Tensor& out, std::string* err) {
@@ -1067,16 +1134,24 @@ bool opConv(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tens
     int64_t dil = nd.ints.empty() ? 1 : nd.ints[0];
     int64_t stride = nd.ints3.empty() ? 1 : nd.ints3[0];
     int64_t p0 = nd.ints2.size() >= 2 ? nd.ints2[0] : 0, p1 = nd.ints2.size() >= 2 ? nd.ints2[1] : 0;
+    if (group < 1 || dil < 1 || stride < 1 || p0 < 0 || p1 < 0) return fail(err, "Conv group, dilation, stride or pads");
     if (Cg * group != Cin) return fail(err, "Conv channels " + dimsStr(x.dims) + " weight " + dimsStr(w.dims));
     int64_t Lout = (L + p0 + p1 - dil * (k - 1) - 1) / stride + 1;
     if (Lout <= 0) return fail(err, "Conv output length");
     Tensor bias = b0 && b0->valid() ? materialize(*b0) : Tensor();
+    if (bias.valid() && (bias.type != DType::F32 || bias.count() != Cout)) return fail(err, "Conv bias");
     const float* bp = bias.valid() ? bias.as<float>() : nullptr;
     out = Tensor::alloc(DType::F32, {Nb, Cout, Lout});
     float* po = out.mut<float>();
 
     if (group == Cin && Cg == 1 && Cout == Cin) {   // depthwise
         Tensor wf = materialize(w);
+        if (wf.type != DType::F32) return fail(err, "Conv weight type");
+        if (reinterpret_cast<uintptr_t>(wf.data) % 4) {   // in place in the model file: read as float below
+            Tensor a = Tensor::alloc(DType::F32, wf.dims);
+            std::memcpy(a.mut<float>(), wf.data, wf.bytes());
+            wf = a;
+        }
         std::vector<float> row(size_t(L + p0 + p1));
         for (int64_t n = 0; n < Nb; ++n)
             for (int64_t c = 0; c < Cin; ++c) {
@@ -1151,13 +1226,18 @@ bool opConv(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tens
 }
 
 // MatMulInteger (u8 activations x s8 weights), optionally with the float epilogue of the
-// dynamic-quantization pattern: out = float(acc) * scale [+ bias].
-bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin, bool scaled, Tensor& out,
-                     std::string* err) {
+// dynamic-quantization pattern: out = float(acc) * scale [+ bias]. 'bSums': the column sums of a
+// constant B (Node::bSums), or empty.
+bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin, bool scaled,
+                     const std::vector<int32_t>& bSums, Tensor& out, std::string* err) {
     const Tensor& a = *in[0];
     const Tensor& b = *in[1];
     if (b.rank() != 2 || a.rank() < 2) return fail(err, "MatMulInteger expects [..,M,K] x [K,N]");
     if (b.qweight && !b.data) return fail(err, "MatMulInteger on a dequantized weight");
+    if ((a.type != DType::U8 && a.type != DType::I8) || (b.type != DType::U8 && b.type != DType::I8))
+        return fail(err, "MatMulInteger expects 8-bit operands");
+    if ((nin > 2 && in[2] && in[2]->valid() && in[2]->count() != 1) || (nin > 3 && in[3] && in[3]->valid() && in[3]->count() != 1))
+        return fail(err, "per-row or per-column zero point not supported");
     bool aU = a.type == DType::U8, bU = b.type == DType::U8;
     int azp = (nin > 2 && in[2] && in[2]->valid()) ? int(in[2]->scalarFloat()) : 0;
     int bzp = (nin > 3 && in[3] && in[3]->valid()) ? int(in[3]->scalarFloat()) : 0;
@@ -1167,8 +1247,9 @@ bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin
     Dims od = a.dims;
     od.back() = N;
     Tensor acc = Tensor::alloc(DType::I32, od);
+    const int32_t* sums = aU && b.type == DType::I8 && bSums.size() == size_t(N) ? bSums.data() : nullptr;
     if (!igemm(*ctx.k, ctx.pool, int(M), int(N), int(K), a.as<uint8_t>(), K, aU, azp, b.as<uint8_t>(), N, bU, bzp,
-               acc.mut<int32_t>(), N))
+               acc.mut<int32_t>(), N, sums))
         return fail(err, "MatMulInteger operand types or zero points not supported");
     if (!scaled) {
         out = acc;
@@ -1177,6 +1258,7 @@ bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin
     float s = in[4] ? in[4]->scalarFloat() : 1.0f;
     const float* bias = (nin > 5 && in[5] && in[5]->valid()) ? in[5]->as<float>() : nullptr;
     if (in[4] && in[4]->count() != 1) return fail(err, "per-channel output scale not supported");
+    if (bias && (in[5]->type != DType::F32 || in[5]->count() != N)) return fail(err, "MatMulInteger bias size");
     out = Tensor::alloc(DType::F32, od);
     const int32_t* pa = acc.as<int32_t>();
     float* po = out.mut<float>();
@@ -1195,12 +1277,31 @@ bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin
 // ------------------------------------------------------------------------------------------------
 inline float roundEven(float x) { return std::nearbyint(x); }
 
-bool opDynamicQuantize(const ExecContext& ctx, const Tensor& x, Tensor* out, std::string* err) {
+bool opDynamicQuantize(const ExecContext& ctx, const Tensor& x0, Tensor* out, std::string* err) {
+    Tensor x = materialize(x0);
     if (x.type != DType::F32) return fail(err, "DynamicQuantizeLinear expects float");
     const float* p = x.as<float>();
     int64_t n = x.count();
+    // minps/maxps(x, acc) select exactly as std::min/max(acc, x) do: a NaN never replaces acc and
+    // -0 never replaces the +0 start, so lanes reduced in any order give the scalar loop's bits.
+    __m128 mn0 = _mm_setzero_ps(), mn1 = mn0, mx0 = mn0, mx1 = mn0;
+    int64_t i = 0;
+    for (; i + 8 <= n; i += 8) {
+        __m128 a = _mm_loadu_ps(p + i), b = _mm_loadu_ps(p + i + 4);
+        mn0 = _mm_min_ps(a, mn0);
+        mn1 = _mm_min_ps(b, mn1);
+        mx0 = _mm_max_ps(a, mx0);
+        mx1 = _mm_max_ps(b, mx1);
+    }
+    alignas(16) float lanes[8];
+    _mm_store_ps(lanes, _mm_min_ps(mn0, mn1));
+    _mm_store_ps(lanes + 4, _mm_max_ps(mx0, mx1));
     float mn = 0.0f, mx = 0.0f;
-    for (int64_t i = 0; i < n; ++i) {
+    for (int l = 0; l < 4; ++l) {
+        mn = std::min(mn, lanes[l]);
+        mx = std::max(mx, lanes[4 + l]);
+    }
+    for (; i < n; ++i) {
         mn = std::min(mn, p[i]);
         mx = std::max(mx, p[i]);
     }
@@ -1227,6 +1328,7 @@ struct QParams {
 bool qparams(const Node& nd, const Tensor& x, const Tensor& s0, const Tensor* z, QParams& q, std::string* err) {
     Tensor s = materialize(s0);
     int64_t n = s.count();
+    if (s.type != DType::F32 || n < 1) return fail(err, "quantization scale must be float");
     q.scale.resize(size_t(n));
     std::memcpy(q.scale.data(), s.data, size_t(n) * 4);
     q.zp.assign(size_t(n), 0);
@@ -1252,7 +1354,7 @@ bool qparams(const Node& nd, const Tensor& x, const Tensor& s0, const Tensor* z,
 
 bool opQuantize(const ExecContext& ctx, const Node& nd, const Tensor* const* in, size_t nin, Tensor& out,
                 std::string* err) {
-    const Tensor& x = *in[0];
+    Tensor x = materialize(*in[0]);
     const Tensor* z = nin > 2 ? in[2] : nullptr;
     QParams q;
     if (!qparams(nd, x, *in[1], z, q, err)) return false;
@@ -1263,7 +1365,7 @@ bool opQuantize(const ExecContext& ctx, const Node& nd, const Tensor* const* in,
     out = Tensor::alloc(t, x.dims);
     const float* p = x.as<float>();
     int64_t n = x.count();
-    if (t == DType::U8 && q.channels == 1) {   // per tensor: the vocoder's activations
+    if (t == DType::U8 && q.channels == 1) {   // per tensor (unfused QDQ)
         uint8_t* o = out.mut<uint8_t>();
         parallelRange(&ctx, n, kGrain, [&](int64_t i0, int64_t i1) {
             ctx.k->quantizeU8(p + i0, size_t(i1 - i0), q.scale[0], q.zp[0], o + i0);
@@ -1312,8 +1414,9 @@ bool opDequantize(const ExecContext& ctx, const Node& nd, const Tensor* const* i
 // DequantizeLinear(QuantizeLinear(x)) with one per-tensor uint8 scale and zero point: the same
 // arithmetic as the two operators, float to float, in pieces that stay in the first-level cache
 // instead of an 8-bit tensor in memory.
-bool opQuantDequant(const ExecContext& ctx, const Tensor& x, const Tensor& s, const Tensor* z, Tensor& out,
+bool opQuantDequant(const ExecContext& ctx, const Tensor& x0, const Tensor& s, const Tensor* z, Tensor& out,
                     std::string* err) {
+    Tensor x = materialize(x0);
     if (x.type != DType::F32 || s.count() != 1 || (z && (z->type != DType::U8 || z->count() != 1)))
         return fail(err, "QuantDequant expects float and a per-tensor uint8 quantization");
     float scale = s.scalarFloat();
@@ -1356,6 +1459,7 @@ bool execNode(const Node& n, const Tensor* const* in, Tensor* out, const ExecCon
         float lo = opt(1) ? opt(1)->scalarFloat() : -std::numeric_limits<float>::infinity();
         float hi = opt(2) ? opt(2)->scalarFloat() : std::numeric_limits<float>::infinity();
         if (in[0]->type == DType::I64) {
+            if ((opt(1) && opt(1)->count() < 1) || (opt(2) && opt(2)->count() < 1)) return fail(error, "Clip bounds");
             int64_t ilo = opt(1) ? opt(1)->toInts()[0] : std::numeric_limits<int64_t>::min();
             int64_t ihi = opt(2) ? opt(2)->toInts()[0] : std::numeric_limits<int64_t>::max();
             Tensor x = *in[0];
@@ -1404,6 +1508,7 @@ bool execNode(const Node& n, const Tensor* const* in, Tensor* out, const ExecCon
     case Op::ConstantOfShape: {
         if (!need(1)) return false;
         Dims d = in[0]->toInts();
+        if (!validDims(d) || n.value.count() < 1) return fail(error, "ConstantOfShape shape or value");
         out[0] = Tensor::alloc(n.value.type, d);
         size_t es = dtypeSize(n.value.type);
         for (int64_t i = 0; i < out[0].count(); ++i) std::memcpy(out[0].mut<uint8_t>() + i * int64_t(es), n.value.data, es);
@@ -1420,8 +1525,8 @@ bool execNode(const Node& n, const Tensor* const* in, Tensor* out, const ExecCon
     case Op::MatMul: return need(2) && opMatMul(ctx, *in[0], *in[1], out[0], error);
     case Op::Gemm: return need(2) && opGemm(ctx, n, *in[0], *in[1], opt(2), out[0], error);
     case Op::Conv: return need(2) && opConv(ctx, n, *in[0], *in[1], opt(2), out[0], error);
-    case Op::MatMulInteger: return need(2) && opMatMulInteger(ctx, in, nin, false, out[0], error);
-    case Op::MatMulIntegerScaled: return need(2) && opMatMulInteger(ctx, in, nin, true, out[0], error);
+    case Op::MatMulInteger: return need(2) && opMatMulInteger(ctx, in, nin, false, n.bSums, out[0], error);
+    case Op::MatMulIntegerScaled: return need(2) && opMatMulInteger(ctx, in, nin, true, n.bSums, out[0], error);
     case Op::DynamicQuantize: return need(1) && opDynamicQuantize(ctx, *in[0], out, error);
     case Op::Quantize: return need(2) && opQuantize(ctx, n, in, nin, out[0], error);
     case Op::Dequantize:

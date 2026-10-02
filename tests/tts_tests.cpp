@@ -37,6 +37,13 @@
 #include <string>
 #include <thread>
 #include <vector>
+#ifdef _WIN32
+#include <direct.h>
+#else
+#include <sys/resource.h>
+#include <sys/syscall.h>
+#include <unistd.h>
+#endif
 
 #define CHECK_RUN(EXPR, ERR)                                                \
     do {                                                                    \
@@ -337,6 +344,68 @@ struct Pb {
     }
 };
 
+template <class T>
+std::string bytesOf(const std::vector<T>& v) {
+    return std::string(reinterpret_cast<const char*>(v.data()), v.size() * sizeof(T));
+}
+
+// TensorProto with raw_data (ONNX element type 'type').
+Pb tensorPb(const std::string& name, const Dims& d, int type, const std::string& raw) {
+    Pb t;
+    for (int64_t x : d) t.i(1, uint64_t(x));
+    t.i(2, uint64_t(type));
+    t.s(9, raw);
+    t.s(8, name);
+    return t;
+}
+
+// NodeProto with its attributes (AttributeProto messages).
+Pb nodePb(const std::string& op, const std::vector<std::string>& in, const std::vector<std::string>& out,
+          const std::vector<Pb>& attrs = {}) {
+    Pb n;
+    for (auto& s : in) n.s(1, s);
+    for (auto& s : out) n.s(2, s);
+    n.s(3, op + "_" + out[0]);
+    n.s(4, op);
+    for (const Pb& a : attrs) n.m(5, a);
+    return n;
+}
+
+Pb attrInts(const std::string& name, const std::vector<int64_t>& v) {
+    Pb a;
+    a.s(1, name);
+    for (int64_t x : v) a.i(8, uint64_t(x));
+    return a;
+}
+
+Pb attrTensor(const std::string& name, const Pb& t) {
+    Pb a;
+    a.s(1, name);
+    a.m(5, t);
+    return a;
+}
+
+// ModelProto (opset 19) of one graph.
+std::string modelPb(const std::vector<Pb>& nodes, const std::vector<Pb>& inits, const std::vector<std::string>& inputs,
+                    const std::vector<std::string>& outputs) {
+    Pb graph;
+    for (const Pb& n : nodes) graph.m(1, n);
+    graph.s(2, "test");
+    for (const Pb& t : inits) graph.m(5, t);
+    for (auto& s : inputs) graph.m(11, Pb().s(1, s));
+    for (auto& s : outputs) graph.m(12, Pb().s(1, s));
+    Pb opset;
+    opset.s(1, "").i(2, 19);
+    Pb model;
+    model.i(1, 9).m(7, graph).m(8, opset);
+    return model.b;
+}
+
+// Graph::load of a serialized model ('bytes' must outlive the graph).
+bool loadModel(const std::string& bytes, tts::Graph& g, std::string* err) {
+    return g.load(reinterpret_cast<const uint8_t*>(bytes.data()), bytes.size(), "test", {}, K(), err);
+}
+
 }  // namespace
 
 // ------------------------------------------------------------------------------------------------
@@ -442,6 +511,119 @@ TEST(tts_onnx_reader_tiny_model) {
     CHECK(equalF(s.output(0), {2, 3}, want, 1e-6f));
 }
 
+// Malformed files are refused by the reader: nothing is half-parsed, read or copied past its data.
+TEST(tts_onnx_reader_malformed) {
+    tts::onnx::Model m;
+    std::string err;
+    auto parses = [&](const std::string& b) {
+        return tts::onnx::parse(reinterpret_cast<const uint8_t*>(b.data()), b.size(), m, &err);
+    };
+    // Constant / ConstantOfShape tensors whose data is larger or smaller than their dims say.
+    for (const char* op : {"Constant", "ConstantOfShape"})
+        for (size_t bytes : {size_t(4096), size_t(0)}) {
+            Pb value = attrTensor("value", tensorPb("v", {}, 1, std::string(bytes, 'x')));
+            std::string b = modelPb({nodePb(op, {}, {"y"}, {value})}, {}, {}, {"y"});
+            CHECK(!parses(b));
+            tts::Graph g;
+            CHECK(!loadModel(b, g, &err) && err.find("size mismatch") != std::string::npos);
+        }
+    Pb value = attrTensor("value", tensorPb("v", {}, 1, std::string(4, 'x')));
+    CHECK(parses(modelPb({nodePb("Constant", {}, {"y"}, {value})}, {}, {}, {"y"})));
+    // Negative initializer dims, even when their product is the element count.
+    Pb neg = tensorPb("w", {-1, -4}, 1, std::string(16, 'x'));
+    CHECK(!parses(modelPb({nodePb("Identity", {"w"}, {"y"})}, {neg}, {}, {"y"})));
+    // data_location DEFAULT (0) after the data is inline data; EXTERNAL and external_data are refused.
+    Pb inl = tensorPb("w", {4}, 1, std::string(16, 'x'));
+    inl.i(14, 0);
+    CHECK(parses(modelPb({nodePb("Identity", {"w"}, {"y"})}, {inl}, {}, {"y"})));
+    CHECK_EQ(m.initializers.size(), size_t(1));
+    Pb ext = tensorPb("w", {4}, 1, std::string(16, 'x'));
+    ext.i(14, 1);
+    CHECK(!parses(modelPb({nodePb("Identity", {"w"}, {"y"})}, {ext}, {}, {"y"})));
+    Pb ext2 = tensorPb("w", {4}, 1, "");
+    ext2.m(13, Pb().s(1, "location").s(2, "w.bin"));
+    CHECK(!parses(modelPb({nodePb("Identity", {"w"}, {"y"})}, {ext2}, {}, {"y"})));
+    // An attribute cut inside the node's own length: the node is not kept without it.
+    Pb perm = attrInts("perm", {1, 0});
+    Pb tr;
+    tr.s(1, "x").s(2, "y").s(3, "t").s(4, "Transpose");
+    tr.s(5, perm.b.substr(0, perm.b.size() - 1));
+    CHECK(!parses(modelPb({tr}, {}, {"x"}, {"y"})));
+    CHECK(parses(modelPb({nodePb("Transpose", {"x"}, {"y"}, {perm})}, {}, {"x"}, {"y"})));
+    // A zero byte where a tag should be (a zero-filled block) does not end the node early.
+    Pb zero = nodePb("Transpose", {"x"}, {"y"}, {perm});
+    zero.b.push_back('\0');
+    CHECK(!parses(modelPb({zero}, {}, {"x"}, {"y"})));
+}
+
+// Nodes with fewer inputs or outputs than their operator needs are refused at load, before
+// constant folding or a run writes past the outputs or reads a missing input.
+TEST(tts_graph_arity) {
+    std::string err;
+    auto loads = [&](const Pb& node, const std::vector<std::string>& outs) {
+        tts::Graph g;
+        return loadModel(modelPb({node}, {}, {"x"}, outs), g, &err);
+    };
+    CHECK(loads(nodePb("DynamicQuantizeLinear", {"x"}, {"q", "s", "z"}), {"q"}));
+    CHECK(!loads(nodePb("DynamicQuantizeLinear", {"x"}, {"q"}), {"q"}) && err.find("wrong number") != std::string::npos);
+    CHECK(loads(nodePb("Add", {"x", "x"}, {"y"}), {"y"}));
+    CHECK(!loads(nodePb("Add", {"x"}, {"y"}), {"y"}));
+    CHECK(!loads(nodePb("DequantizeLinear", {"x", ""}, {"y"}), {"y"}));
+    CHECK(loads(nodePb("Clip", {"x", "", ""}, {"y"}), {"y"}));   // optional inputs may be empty
+    Pb noOutput;
+    noOutput.s(1, "x").s(3, "r").s(4, "Relu");
+    CHECK(!loads(noOutput, {}));
+}
+
+// The dynamic-quantized MatMul pattern fuses its bias only when it has one value per column; a
+// broadcast bias stays a separate Add and is not read past its end. Folding a DequantizeLinear
+// into a quantized weight checks its scale and zero point.
+TEST(tts_graph_quantized_matmul) {
+    std::string err;
+    const std::vector<int8_t> w = {1, -2, 3, 4, 0, 5, -6, 7, 8, 9, -10, 11};   // [3, 4]
+    const std::vector<uint8_t> x = {1, 2, 3, 200, 100, 0};                      // [2, 3]
+    Pb to;
+    to.s(1, "to").i(3, uint64_t(tts::onnx::kFloat));
+    for (int64_t biasLen : {4, 1}) {
+        std::vector<float> bias(static_cast<size_t>(biasLen));
+        for (size_t j = 0; j < bias.size(); ++j) bias[j] = 0.25f * float(j + 1);
+        std::string b = modelPb({nodePb("MatMulInteger", {"x", "w"}, {"acc"}), nodePb("Cast", {"acc"}, {"f"}, {to}),
+                                 nodePb("Mul", {"f", "s"}, {"m"}), nodePb("Add", {"m", "bias"}, {"y"})},
+                                {tensorPb("w", {3, 4}, tts::onnx::kInt8, bytesOf(w)),
+                                 tensorPb("s", {}, tts::onnx::kFloat, bytesOf(std::vector<float>{0.5f})),
+                                 tensorPb("bias", {biasLen}, tts::onnx::kFloat, bytesOf(bias))},
+                                {"x"}, {"y"});
+        tts::Graph g;
+        CHECK_RUN(loadModel(b, g, &err), err);
+        CHECK_EQ(g.fusedCount(), 1);
+        tts::Session sess(g);
+        sess.setInput(0, typed<uint8_t>(DType::U8, {2, 3}, x));
+        tts::ExecContext ctx;
+        ctx.k = &K();
+        CHECK_RUN(sess.run(ctx, &err), err);
+        std::vector<float> want;
+        for (int i = 0; i < 2; ++i)
+            for (int j = 0; j < 4; ++j) {
+                int acc = 0;
+                for (int k = 0; k < 3; ++k) acc += int(x[size_t(i * 3 + k)]) * int(w[size_t(k * 4 + j)]);
+                want.push_back(float(acc) * 0.5f + bias[biasLen == 4 ? size_t(j) : 0]);
+            }
+        CHECK(equalF(sess.output(0), {2, 4}, want, 0.0f));
+    }
+    // A folded DequantizeLinear of a large int8 weight: an 8-bit scale or a zero point of another
+    // type than the weight is refused.
+    std::string q(4096, '\x01');
+    for (int bad = 0; bad < 2; ++bad) {
+        Pb scale = bad == 0 ? tensorPb("s", {}, tts::onnx::kInt8, std::string(1, '\x02'))
+                            : tensorPb("s", {}, tts::onnx::kFloat, bytesOf(std::vector<float>{0.5f}));
+        Pb zp = tensorPb("z", {}, tts::onnx::kUint8, std::string(1, '\x00'));
+        std::string b = modelPb({nodePb("DequantizeLinear", {"q", "s", "z"}, {"d"}), nodePb("Add", {"x", "d"}, {"y"})},
+                                {tensorPb("q", {4096}, tts::onnx::kInt8, q), scale, zp}, {"x"}, {"y"});
+        tts::Graph g;
+        CHECK(!loadModel(b, g, &err) && err.find("quantization") != std::string::npos);
+    }
+}
+
 // ------------------------------------------------------------------------------------------------
 // Operators (numpy / ONNX semantics)
 // ------------------------------------------------------------------------------------------------
@@ -458,6 +640,20 @@ TEST(tts_ops_broadcast_arith) {
     CHECK(runOp(node(tts::Op::Add), {&col, &row}, o) && equalF(o[0], {3, 2}, {11, 21, 12, 22, 13, 23}));
     Tensor two = F({}, {2.0f});
     CHECK(runOp(node(tts::Op::Pow), {&a, &two}, o) && equalF(o[0], {2, 3}, {1, 4, 9, 16, 25, 36}));
+    // Integer Pow: huge exponents of 0 and +-1 are instant, an overflow fails instead of wrapping.
+    {
+        const int64_t big = int64_t(1) << 62;
+        Tensor base = I({6}, {3, -2, 1, -1, 0, 5}), ex = I({6}, {4, 63, big, big + 1, big, -1});
+        CHECK(runOp(node(tts::Op::Pow), {&base, &ex}, o) &&
+              equalT<int64_t>(o[0], DType::I64, {6}, {81, std::numeric_limits<int64_t>::min(), 1, -1, 0, 0}));
+        Tensor b2 = I({1}, {2}), e63 = I({1}, {63}), e40 = I({1}, {40}), b3 = I({1}, {3});
+        CHECK(!runOp(node(tts::Op::Pow), {&b2, &e63}, o));
+        CHECK(!runOp(node(tts::Op::Pow), {&b3, &e40}, o));
+        Tensor ef = F({}, {2.0f}), enan = F({}, {std::nanf("")}), ehuge = F({}, {1e30f});
+        CHECK(runOp(node(tts::Op::Pow), {&base, &ef}, o) && equalT<int64_t>(o[0], DType::I64, {6}, {9, 4, 1, 1, 0, 25}));
+        CHECK(!runOp(node(tts::Op::Pow), {&base, &enan}, o));
+        CHECK(!runOp(node(tts::Op::Pow), {&base, &ehuge}, o));
+    }
     Tensor ia = I({3}, {7, -7, 9}), ib = I({1}, {2});
     CHECK(runOp(node(tts::Op::Div), {&ia, &ib}, o) && equalT<int64_t>(o[0], DType::I64, {3}, {3, -3, 4}));
     CHECK(runOp(node(tts::Op::Equal), {&ia, &ib}, o) && equalT<uint8_t>(o[0], DType::Bool, {3}, {0, 0, 0}));
@@ -568,6 +764,54 @@ TEST(tts_ops_pad_reduce) {
     Tensor pads2 = I({6}, {0, 1, 0, 0, 0, 0});
     pad.mode = "constant";
     CHECK(runOp(pad, {&x, &pads2}, o) && equalF(o[0], {1, 3, 3}, {0, 0, 0, 1, 2, 3, 4, 5, 6}));
+    // Random shapes against a per-element reference: negative pads (crops), edge mode, an empty
+    // last dimension, and 1-, 4- and 8-byte elements, with or without a fill value.
+    {
+        std::mt19937 rp(21);
+        bool same = true;
+        for (int round = 0; round < 600 && same; ++round) {
+            const DType types[] = {DType::U8, DType::F32, DType::I64};
+            DType type = types[round % 3];
+            size_t es = tts::dtypeSize(type);
+            bool edge = round % 2 == 1;
+            int r = 1 + int(rp() % 3);
+            Dims d(static_cast<size_t>(r)), od(static_cast<size_t>(r));
+            std::vector<int64_t> pv(size_t(2 * r));
+            for (int k = 0; k < r; ++k) {
+                d[size_t(k)] = (edge || k + 1 < r ? 1 : 0) + int64_t(rp() % 6);
+                pv[size_t(k)] = int64_t(rp() % 9) - 3;
+                pv[size_t(k + r)] = int64_t(rp() % 9) - 3;
+                if (d[size_t(k)] + pv[size_t(k)] + pv[size_t(k + r)] < 0) pv[size_t(k + r)] = -d[size_t(k)] - pv[size_t(k)];
+                od[size_t(k)] = d[size_t(k)] + pv[size_t(k)] + pv[size_t(k + r)];
+            }
+            Tensor xr = Tensor::alloc(type, d), padsR = I({2 * r}, pv), val = Tensor::alloc(type, {});
+            for (size_t i = 0; i < xr.bytes(); ++i) xr.mut<uint8_t>()[i] = uint8_t(rp());
+            for (size_t i = 0; i < es; ++i) val.mut<uint8_t>()[i] = uint8_t(rp());
+            bool hasValue = !edge && rp() % 2 == 0;
+            pad.mode = edge ? "edge" : "constant";
+            same = runOp(pad, {&xr, &padsR, hasValue ? &val : nullptr}, o) && o[0].dims == od;
+            for (int64_t e = 0; same && e < o[0].count(); ++e) {
+                std::vector<int64_t> c(static_cast<size_t>(r));
+                for (int k = r - 1, rem = int(e); k >= 0; --k) {
+                    c[size_t(k)] = rem % od[size_t(k)] - pv[size_t(k)];
+                    rem /= int(od[size_t(k)]);
+                }
+                bool in = true;
+                int64_t off = 0;
+                for (int k = 0; k < r && in; ++k) {
+                    if (c[size_t(k)] < 0 || c[size_t(k)] >= d[size_t(k)]) {
+                        if (!edge) in = false;
+                        else c[size_t(k)] = std::clamp<int64_t>(c[size_t(k)], 0, d[size_t(k)] - 1);
+                    }
+                    off = off * d[size_t(k)] + c[size_t(k)];
+                }
+                static const uint8_t zero[8] = {0};
+                const uint8_t* want = in ? xr.as<uint8_t>() + off * int64_t(es) : hasValue ? val.as<uint8_t>() : zero;
+                same = std::memcmp(o[0].as<uint8_t>() + e * int64_t(es), want, es) == 0;
+            }
+        }
+        CHECK(same);
+    }
     tts::Node rs = node(tts::Op::ReduceSum);
     rs.i0 = 1;
     Tensor ax = I({1}, {2});
@@ -576,6 +820,198 @@ TEST(tts_ops_pad_reduce) {
     Tensor ax1 = I({1}, {1});
     CHECK(runOp(rs, {&x, &ax1}, o) && equalF(o[0], {1, 3}, {5, 7, 9}));
     CHECK(runOp(rs, {&x, nullptr}, o) && equalF(o[0], {}, {21}));
+}
+
+// Attributes, axes and inputs out of range (a damaged model file) fail the node instead of
+// reading or writing outside a buffer; scalars go through Transpose and Pad.
+TEST(tts_ops_bad_attributes) {
+    std::vector<Tensor> o;
+    Tensor s = F({}, {4.5f}), x = F({2, 3}, {1, 2, 3, 4, 5, 6});
+    CHECK(runOp(node(tts::Op::Transpose), {&s}, o) && equalF(o[0], {}, {4.5f}));
+    tts::Node pad = node(tts::Op::Pad);
+    Tensor noPads = I({0}, {});
+    CHECK(runOp(pad, {&s, &noPads}, o) && equalF(o[0], {}, {4.5f}));
+    tts::Node tr = node(tts::Op::Transpose);
+    for (std::vector<int64_t> perm : {std::vector<int64_t>{0, 0}, {1, 2}, {-1, 0}}) {
+        tr.ints = perm;
+        CHECK(!runOp(tr, {&x}, o));
+    }
+    Tensor pads = I({2}, {1, 1}), axis5 = I({1}, {5}), axisM3 = I({1}, {-3});
+    CHECK(!runOp(pad, {&x, &pads, nullptr, &axis5}, o));
+    CHECK(!runOp(pad, {&x, &pads, nullptr, &axisM3}, o));
+    CHECK(!runOp(node(tts::Op::ReduceSum), {&x, &axis5}, o));
+    CHECK(!runOp(node(tts::Op::ReduceSum), {&x, &axisM3}, o));
+    tts::Node sm = node(tts::Op::Softmax);
+    sm.axis = -1;
+    Tensor ix = I({2}, {1, 2});
+    CHECK(!runOp(sm, {&s}, o));
+    CHECK(!runOp(sm, {&ix}, o));
+    tts::Node ln = node(tts::Op::LayerNorm);
+    ln.axis = -3;
+    Tensor g = F({3}, {1, 1, 1});
+    CHECK(!runOp(ln, {&x, &g}, o));
+    ln.axis = 2;
+    CHECK(!runOp(ln, {&x, &g}, o));
+    tts::Node sp = node(tts::Op::Split);
+    sp.axis = 1;
+    Tensor tooLong = I({2}, {2, 2}), negative = I({2}, {-1, 4});
+    CHECK(!runOp(sp, {&x, &tooLong}, o, 2));
+    CHECK(!runOp(sp, {&x, &negative}, o, 2));
+    CHECK(!runOp(sp, {&x}, o, 0));
+    Tensor fits = I({2}, {1, 2});
+    CHECK(runOp(sp, {&x, &fits}, o, 2) && equalF(o[0], {2, 1}, {1, 4}) && equalF(o[1], {2, 2}, {2, 3, 5, 6}));
+    Tensor empty = I({0}, {});
+    CHECK(!runOp(node(tts::Op::Clip), {&ix, &empty}, o));
+    Tensor cx = F({1, 2, 6}, std::vector<float>(12, 1.0f)), cw = F({2, 1, 3}, std::vector<float>(6, 1.0f));
+    tts::Node cv = node(tts::Op::Conv);
+    cv.i0 = 2;
+    CHECK(runOp(cv, {&cx, &cw}, o) && o[0].dims == Dims({1, 2, 4}));
+    for (int field = 0; field < 4; ++field) {
+        tts::Node bad = cv;
+        if (field == 0) bad.ints3 = {0};          // stride
+        if (field == 1) bad.ints = {0};           // dilation
+        if (field == 2) bad.ints2 = {-1, 0};      // pads
+        if (field == 3) bad.i0 = 0;               // group
+        CHECK(!runOp(bad, {&cx, &cw}, o));
+    }
+    // Shapes computed from data: negative or overflowing dimensions are refused, and a wrapped
+    // allocation size throws instead of handing out a tiny block.
+    const int64_t huge = int64_t(1) << 40;
+    Tensor negShape = I({2}, {-2, -3}), hugeShape = I({2}, {huge, huge}), minus1 = I({1}, {-1});
+    CHECK(!runOp(node(tts::Op::Reshape), {&x, &negShape}, o));
+    tts::Node cos = node(tts::Op::ConstantOfShape);
+    cos.value = F({1}, {1.0f});
+    CHECK(!runOp(cos, {&minus1}, o));
+    CHECK(!runOp(cos, {&hugeShape}, o));
+    Tensor one = F({1}, {1.0f});
+    CHECK(!runOp(node(tts::Op::Expand), {&one, &minus1}, o));
+    CHECK(!runOp(node(tts::Op::Expand), {&one, &hugeShape}, o));
+    Tensor tiles = I({2}, {1, -1}), hugeTiles = I({2}, {huge, huge});
+    CHECK(!runOp(node(tts::Op::Tile), {&x, &tiles}, o));
+    CHECK(!runOp(node(tts::Op::Tile), {&x, &hugeTiles}, o));
+    Tensor hugePads = I({4}, {0, std::numeric_limits<int64_t>::max(), 0, 1});
+    pad.mode = "constant";
+    CHECK(!runOp(pad, {&x, &hugePads}, o));
+    bool threw = false;
+    try {
+        Tensor::alloc(DType::F32, {-1});
+    } catch (const std::bad_alloc&) {
+        threw = true;
+    }
+    CHECK(threw);
+}
+
+// Operand types and parameter sizes are checked, and the operators that read an input as float
+// dequantize a quantized-weight placeholder (float type, no data) instead of reading null.
+TEST(tts_ops_operand_checks) {
+    std::vector<Tensor> o, a, b;
+    std::vector<int8_t> qv(8192);
+    for (size_t i = 0; i < qv.size(); ++i) qv[i] = int8_t(int(i % 251) - 125);
+    auto qw = std::make_shared<tts::QuantWeight>();
+    qw->q = reinterpret_cast<const uint8_t*>(qv.data());
+    qw->dims = {2, 4096};
+    qw->scale = {0.03f};
+    qw->zeroPoint = {1};
+    Tensor ph;
+    ph.type = DType::F32;
+    ph.dims = qw->dims;
+    ph.qweight = qw;
+    std::vector<float> fv(qv.size());
+    for (size_t i = 0; i < fv.size(); ++i) fv[i] = float(int(qv[i]) - 1) * 0.03f;
+    Tensor fl = F({2, 4096}, fv);
+    auto same = [&](size_t outputs) {
+        for (size_t i = 0; i < outputs; ++i)
+            if (a[i].bytes() != b[i].bytes() || std::memcmp(a[i].data, b[i].data, a[i].bytes()) != 0) return false;
+        return true;
+    };
+    CHECK(runOp(node(tts::Op::DynamicQuantize), {&ph}, a, 3) && runOp(node(tts::Op::DynamicQuantize), {&fl}, b, 3) &&
+          same(3));
+    tts::Node ln = node(tts::Op::LayerNorm);
+    ln.axis = -1;
+    ln.f0 = 1e-5f;
+    Tensor g = F({4096}, std::vector<float>(4096, 1.0f));
+    CHECK(runOp(ln, {&ph, &g}, a) && runOp(ln, {&fl, &g}, b) && same(1));
+    Tensor sc = F({}, {0.1f});
+    CHECK(runOp(node(tts::Op::Quantize), {&ph, &sc}, a) && runOp(node(tts::Op::Quantize), {&fl, &sc}, b) && same(1));
+    // An 8-bit scale, a float MatMulInteger operand, per-row or per-column zero points.
+    Tensor s8 = typed<int8_t>(DType::I8, {}, {2}), u4 = typed<uint8_t>(DType::U8, {4}, {1, 2, 3, 4});
+    CHECK(!runOp(node(tts::Op::Dequantize), {&u4, &s8}, o));
+    CHECK(!runOp(node(tts::Op::Quantize), {&fl, &s8}, o));
+    Tensor fa = F({2, 3}, {1, 2, 3, 4, 5, 6}), ua = typed<uint8_t>(DType::U8, {2, 3}, {1, 2, 3, 4, 5, 6});
+    Tensor ib = typed<int8_t>(DType::I8, {3, 2}, {1, -1, 2, -2, 3, -3}), zp2 = typed<uint8_t>(DType::U8, {2}, {1, 2});
+    CHECK(runOp(node(tts::Op::MatMulInteger), {&ua, &ib}, o));
+    CHECK(!runOp(node(tts::Op::MatMulInteger), {&fa, &ib}, o));
+    CHECK(!runOp(node(tts::Op::MatMulInteger), {&ua, &ib, &zp2}, o));
+    CHECK(!runOp(node(tts::Op::MatMulInteger), {&ua, &ib, nullptr, &zp2}, o));
+    // Bias and parameter vectors of the wrong length.
+    Tensor one = F({}, {1.0f}), p1 = F({1}, {1}), p2 = F({2}, {1, 1}), p3 = F({3}, {1, 2, 3});
+    CHECK(runOp(node(tts::Op::MatMulIntegerScaled), {&ua, &ib, nullptr, nullptr, &one, &p2}, o));
+    CHECK(!runOp(node(tts::Op::MatMulIntegerScaled), {&ua, &ib, nullptr, nullptr, &one, &p3}, o));
+    CHECK(!runOp(node(tts::Op::MatMulIntegerScaled), {&ua, &ib, nullptr, nullptr, &one, &p1}, o));
+    Tensor bx = F({1, 2, 3}, {1, 2, 3, 4, 5, 6});
+    tts::Node bn = node(tts::Op::BatchNorm);
+    bn.f0 = 1e-5f;
+    CHECK(runOp(bn, {&bx, &p2, &p2, &p2, &p2}, o));
+    CHECK(!runOp(bn, {&bx, &p2, &p1, &p2, &p2}, o));
+    tts::Node lc = node(tts::Op::LayerNormChannels);
+    lc.f0 = 1e-5f;
+    CHECK(runOp(lc, {&bx, &p2, &p2}, o));
+    CHECK(!runOp(lc, {&bx, &p2, &p1}, o));
+    Tensor cx = F({1, 2, 6}, std::vector<float>(12, 1.0f)), cw = F({2, 1, 3}, std::vector<float>(6, 1.0f));
+    tts::Node cv = node(tts::Op::Conv);
+    cv.i0 = 2;
+    CHECK(runOp(cv, {&cx, &cw, &p2}, o));
+    CHECK(!runOp(cv, {&cx, &cw, &p1}, o));
+}
+
+// A quantized weight reshaped before its consumer: generic operators see the reshaped shape, the
+// GEMM pairs per-tensor scales with the reshaped rows and refuses per-row scales that no longer
+// match them. A depthwise weight misaligned in the model file is read through an aligned copy.
+TEST(tts_ops_reshaped_quant_weight) {
+    std::vector<Tensor> o, r, want;
+    std::vector<int8_t> qv(12);
+    for (size_t i = 0; i < qv.size(); ++i) qv[i] = int8_t(int(i * 7 % 23) - 11);
+    auto per = [&](std::vector<float> scale, Dims dims) {
+        auto q = std::make_shared<tts::QuantWeight>();
+        q->q = reinterpret_cast<const uint8_t*>(qv.data());
+        q->dims = dims;
+        q->scale = scale;
+        q->zeroPoint.assign(scale.size(), 0);
+        Tensor t;
+        t.type = DType::F32;
+        t.dims = dims;
+        t.qweight = q;
+        return t;
+    };
+    std::vector<float> fv;
+    for (int8_t v : qv) fv.push_back(float(v) * 0.5f);
+    Tensor ph = per({0.5f}, {2, 6}), shape34 = I({2}, {3, 4}), shape431 = I({3}, {4, 3, 1});
+    CHECK(runOp(node(tts::Op::Reshape), {&ph, &shape34}, r));
+    Tensor f34 = F({3, 4}, fv);
+    CHECK(runOp(node(tts::Op::Transpose), {&r[0]}, o) && runOp(node(tts::Op::Transpose), {&f34}, want) &&
+          equalF(o[0], {4, 3}, std::vector<float>(want[0].as<float>(), want[0].as<float>() + 12), 0.0f));
+    // Pointwise Conv with the per-tensor weight reshaped to [4, 3, 1]: four rows, not two.
+    std::vector<float> xv;
+    for (int i = 0; i < 15; ++i) xv.push_back(0.25f * float(i % 7) - 0.6f);
+    Tensor x = F({1, 3, 5}, xv);
+    tts::Node cv = node(tts::Op::Conv);
+    cv.i0 = 1;
+    CHECK(runOp(node(tts::Op::Reshape), {&ph, &shape431}, r));
+    Tensor f431 = F({4, 3, 1}, fv);
+    CHECK(runOp(cv, {&x, &r[0]}, o) && runOp(cv, {&x, &f431}, want));
+    CHECK(equalF(o[0], {1, 4, 5}, std::vector<float>(want[0].as<float>(), want[0].as<float>() + 20), 1e-6f));
+    Tensor rows = per({0.5f, 0.25f}, {2, 6, 1});
+    CHECK(runOp(node(tts::Op::Reshape), {&rows, &shape431}, r));
+    CHECK(!runOp(cv, {&x, &r[0]}, o));
+    // Depthwise weights at an odd address.
+    std::vector<uint8_t> raw(6 * 4 + 1);
+    std::vector<float> wv = {0.5f, -1, 2, 0.25f, 3, -0.5f};
+    std::memcpy(raw.data() + 1, wv.data(), 24);
+    Tensor wOdd = Tensor::view(DType::F32, {2, 1, 3}, raw.data() + 1), wAligned = F({2, 1, 3}, wv);
+    Tensor dx = F({1, 2, 6}, {1, 2, 3, 4, 5, 6, -1, -2, -3, -4, -5, -6});
+    cv.i0 = 2;
+    CHECK(runOp(cv, {&dx, &wOdd}, o) && runOp(cv, {&dx, &wAligned}, want));
+    CHECK(o[0].bytes() == want[0].bytes() && std::memcmp(o[0].data, want[0].data, o[0].bytes()) == 0);
 }
 
 TEST(tts_ops_norms) {
@@ -848,6 +1284,36 @@ TEST(tts_ops_quantization) {
     CHECK(runOp(node(tts::Op::DynamicQuantize), {&xp}, o, 3));
     CHECK(equalT<uint8_t>(o[0], DType::U8, {3}, {50, 125, 255}));
     CHECK_EQ(int(o[2].scalarFloat()), 0);
+    // The vectorized range scan equals the scalar std::min/std::max loop, NaN, -0 and +inf included,
+    // for lengths around the vector width (-inf is left out: its zero point would be NaN).
+    {
+        std::mt19937 rr(11);
+        const float specials[] = {std::nanf(""), -0.0f, 0.0f, INFINITY, -3e38f};
+        bool same = true;
+        for (int n : {0, 1, 3, 7, 8, 9, 15, 16, 17, 31, 33, 1000}) {
+            for (int round = 0; round < 20; ++round) {
+                std::vector<float> v(static_cast<size_t>(n));
+                for (float& f : v) {
+                    int pick = int(rr() % 16);
+                    f = pick < 5 && round % 4 != 0 ? specials[pick] : std::normal_distribution<float>(0.0f, 2.0f)(rr);
+                    if (round == 1) f = -0.0f;
+                    if (round == 2) f = std::nanf("");
+                }
+                float mn = 0.0f, mx = 0.0f;
+                for (float f : v) {
+                    mn = std::min(mn, f);
+                    mx = std::max(mx, f);
+                }
+                float scale = mx == mn ? 1.0f : (mx - mn) / 255.0f;
+                int zp = int(std::nearbyint(std::clamp(0.0f - mn / scale, 0.0f, 255.0f)));
+                Tensor xv = F({n}, v);
+                same = same && runOp(node(tts::Op::DynamicQuantize), {&xv}, o, 3);
+                float got = o[1].scalarFloat();
+                same = same && std::memcmp(&got, &scale, 4) == 0 && int(o[2].scalarFloat()) == zp;
+            }
+        }
+        CHECK(same);
+    }
     // QuantizeLinear / DequantizeLinear, per tensor (round half to even, saturation) and per axis.
     Tensor qx = F({6}, {0, 1.5f, 2.5f, -1.5f, 1000, -1000});
     Tensor s = F({}, {1.0f});
@@ -913,6 +1379,34 @@ TEST(tts_ops_quantization) {
 // ------------------------------------------------------------------------------------------------
 // Kernels of every instruction set this CPU runs, against scalar references
 // ------------------------------------------------------------------------------------------------
+namespace {
+
+// f32 GEMM in the plain loop order (row panel, k block of 512, column panel) with the table's own
+// packing and tiles: the arithmetic sgemm must reproduce bit for bit.
+std::vector<float> sgemmRef(const tts::kern::Table& k, int M, int N, int K, const tts::GemmA& a, const float* B) {
+    const int mr = k.mr, nr = k.nr, panels = (N + nr - 1) / nr;
+    tts::Buffer bbuf(size_t(panels) * size_t(K) * size_t(nr) * 4), abuf(size_t(mr) * size_t(std::min(K, 512)) * 4);
+    float* Bp = static_cast<float*>(bbuf.data);
+    float* Ap = static_cast<float*>(abuf.data);
+    for (int p = 0; p < panels; ++p) k.packBf32(B + p * nr, N, K, std::min(nr, N - p * nr), Bp + size_t(p) * K * nr);
+    std::vector<float> C(size_t(M) * size_t(N));
+    for (int i0 = 0; i0 < M; i0 += mr) {
+        int rows = std::min(mr, M - i0);
+        for (int kb = 0; kb < K; kb += 512) {
+            int kc = std::min(512, K - kb);
+            std::memset(Ap, 0, size_t(mr) * size_t(kc) * 4);
+            if (a.i8) k.packAi8(a.i8 + i0 * a.ld + kb, a.ld, rows, kc, a.scale + i0, a.zp ? a.zp + i0 : nullptr, Ap);
+            else k.packAf32(a.f32 + i0 * a.ld + kb, a.ld, rows, kc, Ap);
+            for (int p = 0; p < panels; ++p)
+                k.sgemmTile(kc, Ap, Bp + (size_t(p) * K + size_t(kb)) * nr, C.data() + size_t(i0) * N + p * nr, N, rows,
+                            std::min(nr, N - p * nr), kb > 0);
+        }
+    }
+    return C;
+}
+
+}  // namespace
+
 TEST(tts_kernels_all_levels) {
     std::vector<int> levels = levelsRun();
     CHECK(!levels.empty());
@@ -995,6 +1489,50 @@ TEST(tts_kernels_all_levels) {
                 }
             CHECK(ok);
         }
+        // Deep K (several k blocks): the bits of the plain loop order, whatever the blocking of the
+        // output and the threads.
+        for (int Kd : {513, 1536, 2048}) {
+            const int M = 37, cols = 23, N = 2 * cols;
+            std::vector<float> A = randomVec(size_t(M * Kd), rng), B = randomVec(size_t(Kd * N), rng);
+            std::vector<int8_t> Aq(size_t(M * Kd));
+            for (auto& v : Aq) v = int8_t(int(rng() % 255) - 127);
+            std::vector<float> sc(size_t(M), 0.02f);
+            std::vector<float> Bb(B.size());   // the same B as two column blocks of K x cols
+            for (int kk = 0; kk < Kd; ++kk)
+                for (int j = 0; j < N; ++j)
+                    Bb[size_t((j / cols) * Kd * cols + kk * cols + j % cols)] = B[size_t(kk * N + j)];
+            for (int variant = 0; variant < 2; ++variant) {
+                tts::GemmA ga;
+                ga.ld = Kd;
+                if (variant == 0) ga.f32 = A.data();
+                else {
+                    ga.i8 = Aq.data();
+                    ga.scale = sc.data();
+                }
+                std::vector<float> want = sgemmRef(k, M, N, Kd, ga, B.data());
+                for (tts::ThreadPool* p : {static_cast<tts::ThreadPool*>(nullptr), &pool}) {
+                    tts::GemmB gb;
+                    gb.f32 = B.data();
+                    gb.ld = N;
+                    std::vector<float> C(size_t(M * N));
+                    tts::sgemm(k, p, M, N, Kd, ga, gb, C.data(), N);
+                    CHECK(std::memcmp(C.data(), want.data(), C.size() * 4) == 0);
+                    gb.f32 = Bb.data();
+                    gb.ld = cols;
+                    gb.blocks = 2;
+                    gb.blockCols = cols;
+                    gb.blockStride = Kd * cols;
+                    std::vector<float> Cb(size_t(M * N));
+                    tts::sgemm(k, p, M, N, Kd, ga, gb, Cb.data(), cols, M * cols);
+                    bool same = true;
+                    for (int i = 0; i < M; ++i)
+                        for (int j = 0; j < N; ++j)
+                            same = same && std::memcmp(&Cb[size_t((j / cols) * M * cols + i * cols + j % cols)],
+                                                       &want[size_t(i * N + j)], 4) == 0;
+                    CHECK(same);
+                }
+            }
+        }
         // Integer GEMM: exact, both operand orders, with zero points on the unsigned side.
         const int ishapes[][3] = {{1, 1, 1}, {5, 9, 3}, {13, 40, 256}, {33, 17, 1025}, {4, 64, 7}};
         for (auto& sh : ishapes) {
@@ -1021,6 +1559,16 @@ TEST(tts_kernels_all_levels) {
                     }
                 if (!ok) std::fprintf(stderr, "  %s igemm %dx%dx%d order %d wrong\n", k.name, M, N, Kd, order);
                 CHECK(ok);
+                // The same with the sums of the signed operand given (constant weights).
+                std::vector<int32_t> sums(size_t(aU ? N : M), 0), C2(size_t(M * N));
+                for (int i = 0; i < M; ++i)
+                    for (int j = 0; j < N; ++j)
+                        for (int kk = 0; kk < Kd && (aU ? i == 0 : j == 0); ++kk)
+                            sums[size_t(aU ? j : i)] +=
+                                aU ? int8_t(B[size_t(kk * N + j)]) : int8_t(A[size_t(i * Kd + kk)]);
+                CHECK(tts::igemm(k, level % 2 ? nullptr : &pool, M, N, Kd, A.data(), Kd, aU, azp, B.data(), N, !aU,
+                                 bzp, C2.data(), N, sums.data()));
+                CHECK(C2 == C);
             }
         }
         // Element-wise functions.
@@ -1111,7 +1659,41 @@ TEST(tts_thread_pool) {
             pool.run(int(hits.size()), [&](int i) { hits[size_t(i)]++; });
             CHECK(std::all_of(hits.begin(), hits.end(), [](int h) { return h == 1; }));
         }
+        // An exception in an item (on a helper or on the caller) reaches the caller of run() once
+        // the helpers are out of the job, instead of terminating the program; the pool goes on.
+        for (int throwAt : {0, 5, 63}) {
+            bool caught = false;
+            try {
+                pool.run(64, [&](int i) {
+                    if (i == throwAt) throw std::bad_alloc();
+                });
+            } catch (const std::bad_alloc&) {
+                caught = true;
+            }
+            CHECK(caught);
+            std::atomic<int> count{0};
+            pool.run(64, [&](int) { ++count; });
+            CHECK_EQ(count.load(), 64);
+        }
     }
+#ifndef _WIN32
+    // Linux: a lowered thread runs at the process's nice + 5 (at most 19), and so does one started
+    // by an already lowered thread.
+    auto threadNice = [] { return getpriority(PRIO_PROCESS, id_t(syscall(SYS_gettid))); };
+    int base = getpriority(PRIO_PROCESS, id_t(getpid()));
+    int lowered = 0, nested = 0;
+    std::thread([&] {
+        tts::lowerThreadPriority();
+        lowered = threadNice();
+        std::thread([&] {
+            tts::lowerThreadPriority();
+            nested = threadNice();
+        }).join();
+    }).join();
+    CHECK_EQ(lowered, std::min(base + 5, 19));
+    CHECK_EQ(nested, std::min(base + 5, 19));
+    CHECK_EQ(getpriority(PRIO_PROCESS, id_t(getpid())), base);
+#endif
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -1234,6 +1816,47 @@ struct StageFixture {
 
 }  // namespace
 
+// voice.bin: the voice count must be the one its size gives. A crafted count whose product with
+// the per-voice size only matches modulo 2^64 is refused before any style is read.
+TEST(tts_voice_file_header) {
+    std::string dir = net::sys::exeDirectory() + "ttstest-voices/";
+    CHECK(net::sys::makeDirectories(dir));
+    auto write = [&](const char* name, const std::string& data) {
+        std::FILE* f = net::sys::openFile(dir + name, "wb");
+        bool ok = f && std::fwrite(data.data(), 1, data.size(), f) == data.size();
+        if (f) std::fclose(f);
+        return ok;
+    };
+    for (int i = 0; i < tts::kFileCount; ++i) CHECK(write(tts::Engine::kFiles[i], "x"));   // not a model
+    CHECK(write(tts::Engine::kFiles[tts::kFileIndexer], std::string(65536 * 4, '\0')));
+    // 101 * inv == 1 (mod 2^55), so inv * 4 * (50 * 256 + 8 * 16) == 512 (mod 2^64): 48 + 512 bytes.
+    uint64_t inv = 101;
+    for (int i = 0; i < 6; ++i) inv *= 2 - 101 * inv;
+    auto voices = [](int64_t count, size_t payload) {
+        int64_t h[6] = {count, 50, 256, count, 8, 16};
+        return std::string(reinterpret_cast<const char*>(h), 48) + std::string(payload, '\0');
+    };
+    std::string err;
+    // Each engine goes before the files change: Windows neither rewrites nor deletes a mapped file.
+    CHECK(write(tts::Engine::kFiles[tts::kFileVoices], voices(int64_t(inv & ((uint64_t(1) << 55) - 1)), 512)));
+    {
+        tts::Engine crafted;
+        CHECK(!crafted.loadDirectory(dir, K(), &err) && err.find("voice.bin") != std::string::npos);
+    }
+    // One consistent voice passes this check (and then stops at the fake duration model).
+    CHECK(write(tts::Engine::kFiles[tts::kFileVoices], voices(1, 4 * (50 * 256 + 8 * 16))));
+    {
+        tts::Engine one;
+        CHECK(!one.loadDirectory(dir, K(), &err) && err.find("voice.bin") == std::string::npos);
+    }
+    for (int i = 0; i < tts::kFileCount; ++i) net::sys::removeFile(dir + tts::Engine::kFiles[i]);
+#ifdef _WIN32
+    _rmdir(dir.c_str());
+#else
+    rmdir(dir.c_str());
+#endif
+}
+
 TEST(tts_stage_duration_and_text_encoder) {
     StageFixture f;
     if (!f.init()) return;
@@ -1337,6 +1960,13 @@ TEST(tts_stage_vocoder_and_end_to_end) {
     std::fprintf(stderr, "  end to end log-spectral distance %.2f dB\n", lsdE);
     CHECK(de.snrDb > 5.0);
     CHECK(lsdE < 4.0);
+    // Every stage stops on the cancel flag (Worker::stop() and cancel() do not wait for it).
+    std::atomic<bool> cancel{true};
+    CHECK(!e.duration(f.ids, f.voice, f.ctx, &seconds, &err, &cancel) && err == "cancelled");
+    err.clear();
+    CHECK(!e.encode(f.ids, f.voice, f.ctx, &emb, &err, &cancel) && err == "cancelled");
+    err.clear();
+    CHECK(!e.vocode(latent, f.ctx, &out, &err, &cancel) && err == "cancelled");
 }
 
 TEST(tts_stage_every_level) {
@@ -1400,12 +2030,44 @@ TEST(tts_synthesizer_output) {
     o.seed = 5;
     std::vector<float> two = s->synthesize(std::string(200, 'a') + ". " + std::string(150, 'b') + ".", "en", o);
     CHECK_EQ(s->lastStats().chunks, 2);
+    size_t run = 0, longest = 0, longestEnd = 0;
+    for (size_t i = 0; i < two.size(); ++i) {
+        run = two[i] == 0.0f ? run + 1 : 0;
+        if (run > longest) {
+            longest = run;
+            longestEnd = i + 1;
+        }
+    }
+    CHECK(longest >= 13230 && longestEnd - longest > 441 && longestEnd + 441 < two.size());
     // Cancelled before starting: nothing.
     std::atomic<bool> cancel{true};
     CHECK(s->synthesize("Hello.", "en", o, &cancel).empty());
-    // Unknown language: English; unsupported characters are dropped and counted.
+    // Unknown language: English; known CJK characters are kept, unsupported ones (U+E000, a
+    // private-use code point) are dropped and counted.
     CHECK(!s->synthesize("Hello 世.", "zz", o).empty());
-    CHECK(s->lastStats().droppedCharacters >= 0);
+    CHECK_EQ(s->lastStats().droppedCharacters, 0);
+    CHECK(!s->synthesize("Hello \xEE\x80\x80.", "zz", o).empty());
+    CHECK_EQ(s->lastStats().droppedCharacters, 1);
+}
+
+// Non-finite samples (a damaged model) become silence instead of skipping the loudness and peak
+// normalisation and reaching the mixer.
+TEST(tts_finish_pcm_non_finite) {
+    std::vector<float> pcm(44100);
+    for (size_t i = 0; i < pcm.size(); ++i) pcm[i] = 0.5f * std::sin(0.05f * float(i));
+    pcm[1000] = std::nanf("");
+    pcm[20000] = INFINITY;
+    pcm[30000] = -INFINITY;
+    tts::finishPcm(pcm);
+    bool finite = true;
+    float peak = 0.0f;
+    for (float v : pcm) {
+        finite = finite && std::isfinite(v);
+        peak = std::max(peak, std::fabs(v));
+    }
+    CHECK(finite);
+    CHECK(pcm[1000] == 0.0f && pcm[20000] == 0.0f);
+    CHECK(peak > 0.1f && peak <= 0.8913f);
 }
 
 TEST(tts_worker) {
@@ -1550,10 +2212,10 @@ TEST(tts_perf) {
                  "  memory: VmRSS %ld kB (RssAnon %ld kB, RssFile %ld kB: the mapped model files), VmHWM %ld kB\n",
                  statusKb("VmRSS:"), statusKb("RssAnon:"), statusKb("RssFile:"), statusKb("VmHWM:"));
     // GEMM throughput on the shapes of the vector estimator (pointwise convolutions at L = 61, batch 2)
-    // and of the vocoder (T = 366).
+    // and of the vocoder (T = 366, and T = 318 with K = 2048).
     {
         std::mt19937 rng(1);
-        const int shapes[][3] = {{2048, 122, 512}, {512, 122, 2048}, {2048, 366, 512}};
+        const int shapes[][3] = {{2048, 122, 512}, {512, 122, 2048}, {2048, 366, 512}, {512, 318, 2048}};
         tts::ThreadPool pool2(2);
         for (auto& sh : shapes) {
             int M = sh[0], N = sh[1], Kd = sh[2];

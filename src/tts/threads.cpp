@@ -4,6 +4,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #else
+#include <cerrno>
 #include <sys/resource.h>
 #include <sys/syscall.h>
 #include <unistd.h>
@@ -15,8 +16,11 @@ void lowerThreadPriority() {
 #ifdef _WIN32
     SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
 #else
-    // Linux: the nice value of a thread id applies to that thread only.
-    setpriority(PRIO_PROCESS, id_t(syscall(SYS_gettid)), 5);
+    // Linux: the nice value of a thread id applies to that thread only. +5 from the process's
+    // (its main thread's) value, so helpers started by an already lowered thread get the same.
+    errno = 0;
+    int base = getpriority(PRIO_PROCESS, id_t(getpid()));
+    if (errno == 0) setpriority(PRIO_PROCESS, id_t(syscall(SYS_gettid)), std::min(base + 5, 19));
 #endif
 }
 
@@ -25,7 +29,11 @@ FpGuard::~FpGuard() { _mm_setcsr(csr); }
 
 ThreadPool::ThreadPool(int threads) {
     threads = std::clamp(threads, 1, 16);
-    for (int i = 1; i < threads; ++i) workers_.emplace_back([this] { workerMain(); });
+    try {
+        for (int i = 1; i < threads; ++i) workers_.emplace_back([this] { workerMain(); });
+    } catch (const std::exception&) {
+        // No more threads (std::system_error): run with the helpers started so far, size() counts them.
+    }
 }
 
 ThreadPool::~ThreadPool() {
@@ -54,9 +62,15 @@ void ThreadPool::workerMain() {
             n = jobSize_;
             ++active_;
         }
-        for (int i = next_.fetch_add(1); i < n; i = next_.fetch_add(1)) (*fn)(i);
+        std::exception_ptr error;
+        try {
+            for (int i = next_.fetch_add(1); i < n; i = next_.fetch_add(1)) (*fn)(i);
+        } catch (...) {
+            error = std::current_exception();
+        }
         {
             std::lock_guard<std::mutex> lk(mutex_);
+            if (error && !error_) error_ = error;
             if (--active_ == 0) done_.notify_one();
         }
     }
@@ -76,13 +90,22 @@ void ThreadPool::run(int n, const std::function<void(int)>& fn) {
         ++generation_;
     }
     wake_.notify_all();
-    for (int i = next_.fetch_add(1); i < n; i = next_.fetch_add(1)) fn(i);
-    // Every item is taken. Wait only for the helpers still running one: a helper that has not
-    // woken up yet (the machine is busy: render thread, Stockfish) is not waited for, it finds no
-    // job when it does.
+    std::exception_ptr error;
+    try {
+        for (int i = next_.fetch_add(1); i < n; i = next_.fetch_add(1)) fn(i);
+    } catch (...) {
+        error = std::current_exception();
+    }
+    // Every item is taken (or the caller stopped on an exception). Wait only for the helpers still
+    // running one: a helper that has not woken up yet (the machine is busy: render thread,
+    // Stockfish) is not waited for, it finds no job when it does. 'fn' must outlive them all.
     std::unique_lock<std::mutex> lk(mutex_);
     job_ = nullptr;
     done_.wait(lk, [&] { return active_ == 0; });
+    if (!error) error = error_;
+    error_ = nullptr;
+    lk.unlock();
+    if (error) std::rethrow_exception(error);
 }
 
 }  // namespace tts

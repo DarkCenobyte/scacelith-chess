@@ -41,10 +41,11 @@ bool languageSupported(const std::string& uiCode);
 int defaultVoice();
 
 // Caps the instruction set of the compute kernels ("auto", "avx512", "avxvnni", "avx2", "sse2",
-// "scalar"), for troubleshooting (a settings entry or a command-line switch). Applies to
-// synthesizers loaded afterwards. Returns false (and logs) for an unknown name.
+// "scalar"), for troubleshooting (a settings entry or a command-line switch). Applies from the
+// next synthesis (and to the constant folding of later loads). Returns false (and logs) for an
+// unknown name.
 bool setArchCap(const char* arch);
-// Name of the kernel set the next load would use ("avx2", ...).
+// Name of the kernel set the next synthesis will use ("avx2", ...).
 const char* activeArch();
 
 // Folder Synthesizer::load() reads the model files from: tts::modelFolder() of the model store
@@ -100,6 +101,7 @@ private:
 
     std::unique_ptr<Engine> engine_;
     std::unique_ptr<ThreadPool> pool_;
+    int poolThreads_ = 0;   // the count pool_ was made for (it runs fewer if helpers failed to start)
     Stats stats_;
 };
 
@@ -114,6 +116,7 @@ public:
 
     // Starts the thread, which loads the models and then synthesises a short warm-up sentence
     // (pages the weights in) before ready() turns true. Requests made meanwhile are queued.
+    // Returns false (and logs) when the thread cannot be created.
     bool start(const Options& o);
     // Cancels everything and joins the thread (call before audio::shutdown()).
     void stop();

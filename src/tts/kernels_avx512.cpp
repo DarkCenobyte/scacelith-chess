@@ -96,12 +96,10 @@ tts::kern::Table makeTable() {
     t.igemmTile = kIgemmTileVnni<V512, 12, 2>;
     t.quantizeU8 = kQuantizeU8<V512>;
     t.dequantizeU8 = kDequantizeU8<V512>;
-    t.requantizeU8 = kRequantizeU8<V512>;
     t.erf = kErf<V512>;
     t.gelu = kGelu<V512>;
     t.exp = kExp<V512>;
     t.tanh = kTanh<V512>;
-    t.scaleShift = kScaleShift<V512>;
     t.dwconv = kDwconv<V512>;
     t.layerNormRows = kLayerNormRows<V512>;
     t.softmaxRows = kSoftmaxRows<V512>;

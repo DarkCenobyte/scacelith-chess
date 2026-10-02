@@ -17,6 +17,9 @@ const char* dtypeName(DType t);
 
 using Dims = std::vector<int64_t>;
 int64_t elementCount(const Dims& d);
+// Every dimension >= 0 and at most 2^40 elements (non-zero dimensions multiplied without
+// overflow): the check for shapes computed from data.
+bool validDims(const Dims& d);
 
 struct Buffer {
     void* data = nullptr;
@@ -38,6 +41,8 @@ size_t bufferCacheBytes();
 // DequantizeLinear(q, scale, zero_point) of a constant 8-bit tensor, kept quantized.
 struct QuantWeight {
     const uint8_t* q = nullptr;       // int8 (or uint8 when isUnsigned), in place in the model file
+                                      // or in the buffer held by owner
+    std::shared_ptr<Buffer> owner;    // null for a view into the model file
     bool isUnsigned = false;
     Dims dims;
     int axis = 0;                     // quantization axis when scale has several entries

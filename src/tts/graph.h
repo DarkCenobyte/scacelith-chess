@@ -2,8 +2,8 @@
 // subgraphs, fuses a few hot patterns (exact-erf GELU, channel LayerNorm, quantized MatMul
 // epilogues, fake-quantized activations) and runs the nodes in the exported topological order with dynamic shapes.
 //
-// Supported operators (opset 19, the set used by the Supertonic 3 graphs, see
-// research-supertonic.md 5.3): Add Sub Mul Div Pow Equal Where Cast Clip Relu PRelu Erf Exp Sin
+// Supported operators (opset 19, the set used by the Supertonic 3 graphs): Add Sub Mul Div Pow
+// Equal Where Cast Clip Relu PRelu Erf Exp Sin
 // Cos Tanh Softplus Reciprocal Concat Split Slice Gather Reshape Transpose Unsqueeze Squeeze Shape
 // ConstantOfShape Expand Tile Pad(constant, edge) Softmax LayerNormalization BatchNormalization
 // ReduceSum MatMul Gemm Conv(1-D) MatMulInteger DynamicQuantizeLinear QuantizeLinear
@@ -54,13 +54,13 @@ struct Node {
     Tensor value;                      // Constant / ConstantOfShape
     // Set by the loader.
     bool invariant = false;            // depends only on constants and invariant inputs
+    std::vector<int32_t> bSums;        // MatMulInteger with a constant int8 B: the sums of its columns (VNNI)
 };
 
 struct Value {
     std::string name;
     bool isConst = false;
     Tensor constant;
-    int producer = -1;
     std::vector<int> consumers;        // node indices (a node consuming twice is listed twice)
     int lastUse = -1;
     bool isOutput = false;
@@ -84,34 +84,29 @@ public:
               const std::vector<std::string>& invariantInputs, const kern::Table& k, std::string* error);
     const std::string& label() const { return label_; }
     int inputIndex(const char* name) const;
-    int outputIndex(const char* name) const;
     size_t inputCount() const { return inputs_.size(); }
     size_t outputCount() const { return outputs_.size(); }
     const std::vector<Node>& nodes() const { return nodes_; }
     const std::vector<Value>& values() const { return values_; }
     const std::vector<int>& inputs() const { return inputs_; }
     const std::vector<int>& outputs() const { return outputs_; }
-    size_t inPlaceBytes() const { return inPlaceBytes_; }    // initializer bytes used in place
-    size_t copiedBytes() const { return copiedBytes_; }      // initializer bytes copied (small or misaligned)
     int fusedCount() const { return fused_; }
 
 private:
     bool foldConstants(const kern::Table& k, std::string* error);
     void fusePatterns();
-    void finish();
+    void finish(const kern::Table& k);
     int addValue(const std::string& name);
 
     std::string label_;
-    onnx::Model model_;
     std::vector<Value> values_;
     std::vector<Node> nodes_;
     std::vector<int> inputs_, outputs_;
-    size_t inPlaceBytes_ = 0, copiedBytes_ = 0;
     int fused_ = 0;
 };
 
 // Execution state of one graph. Values computed only from constants and the invariant inputs
-// are computed on the first run() and kept until clearCache() (the flow-matching loop runs the
+// are computed on the first run() and kept for the later runs (the flow-matching loop runs the
 // vector estimator several times with the same text and style).
 class Session {
 public:
@@ -119,7 +114,6 @@ public:
     void setInput(int index, Tensor t);
     bool run(const ExecContext& ctx, std::string* error, const std::atomic<bool>* cancel = nullptr);
     const Tensor& output(int index) const;
-    void clearCache();
     // Debug: keep every value (for per-node comparisons); off by default.
     void setKeepAll(bool keep) { keepAll_ = keep; }
     const Tensor& value(int v) const { return slots_[size_t(v)]; }

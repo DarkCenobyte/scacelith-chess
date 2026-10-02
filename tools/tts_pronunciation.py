@@ -160,6 +160,8 @@ def main():
     ap.add_argument("--threads", type=int, default=1)
     ap.add_argument("--probe", action="append", default=[])
     a = ap.parse_args()
+    if a.seeds < 2:
+        ap.error("--seeds must be at least 2 (the self distance compares pairs of renditions)")
     probes = PROBES
     if a.probe:
         probes = {}

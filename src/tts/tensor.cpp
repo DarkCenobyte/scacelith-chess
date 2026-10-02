@@ -35,6 +35,13 @@ int64_t elementCount(const Dims& d) {
     return n;
 }
 
+bool validDims(const Dims& d) {
+    int64_t n = 1;
+    for (int64_t x : d)
+        if (x < 0 || (x && (__builtin_mul_overflow(n, x, &n) || n > (int64_t(1) << 40)))) return false;
+    return true;
+}
+
 namespace {
 
 constexpr size_t kCacheMin = size_t(64) << 10;
@@ -62,6 +69,7 @@ size_t sizeClass(size_t n) {
 }  // namespace
 
 Buffer::Buffer(size_t n) : bytes(n), capacity(n + 64) {
+    if (n > SIZE_MAX / 2) throw std::bad_alloc();   // a wrapped size: never a tiny block
     // 64-byte aligned, rounded up so SIMD tails may read a full register past the end.
     if (capacity >= kCacheMin) {
         capacity = sizeClass(capacity);
