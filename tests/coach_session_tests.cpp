@@ -599,7 +599,8 @@ TEST(coach_session_accuracy_explained_when_said) {
 
 // No takeback is offered for a finished game: stalemate while winning by the human's own move is
 // explained, then the closing words and the handshake follow; an offer open or still queued when a
-// draw is agreed closes without a word; and an answer that comes after the end takes nothing back.
+// draw is agreed closes without a word; and an answer that comes after the end takes nothing back
+// and says nothing.
 TEST(coach_session_no_offer_once_the_game_is_over) {
     Table t;
     const char* fen = "7k/5K2/8/6Q1/8/8/8/8 w - - 0 1";
@@ -658,17 +659,22 @@ TEST(coach_session_no_offer_once_the_game_is_over) {
     CHECK(v.stage.all("takeBack").empty());
     CHECK(!v.queued("event.takeback.declined") && !v.queued("event.play_on"));
 
-    Table w;
-    hangTable(w);
-    w.start(levelConfig(1));
-    CHECK(w.quiet());
-    w.move("c3d5");
-    CHECK(w.until([&] { return w.session.offerOpen(); }, 60.0f));
-    w.game.agreeDraw();
-    w.session.onOfferAnswer(w.game, true);
-    CHECK(!w.session.offerOpen());
-    CHECK(w.stage.all("takeBack").empty());
-    CHECK(!w.queued("event.takeback.taken"));
+    for (bool accept : {true, false}) {
+        Table w;
+        hangTable(w);
+        w.start(levelConfig(1));
+        CHECK(w.quiet());
+        w.move("c3d5");
+        CHECK(w.until([&] { return w.session.offerOpen(); }, 60.0f));
+        w.game.agreeDraw();
+        w.session.onOfferAnswer(w.game, accept);
+        CHECK(!w.session.offerOpen());
+        CHECK(w.stage.all("takeBack").empty());
+        CHECK(w.quiet());
+        CHECK(!w.queued("event.takeback.taken"));
+        CHECK(!w.queued("event.takeback.declined") && !w.queued("event.play_on"));   // no "we play on" either
+        CHECK(!w.queued("event.encourage.mistake"));
+    }
 }
 
 // The human's mate before the turn's A0 is in: the review of that move uses the A0 stopped when

@@ -422,7 +422,10 @@ struct Session::Impl {
         if (g.level == 0 || !director.offerOpen()) return;
         director.closeOffer();
         const int ply = g.offerPly;
-        if (g.over || (game && game->isOver())) accept = false;   // nothing to take back in a finished game
+        if (g.over || (game && game->isOver())) {   // nothing to take back in a finished game, nor to play on
+            reviewer.takebackDeclined();
+            return;
+        }
         if (accept && game) {
             const size_t n = game->moves().size();
             // Back to the position before the human's move (the coach's reply was held).
