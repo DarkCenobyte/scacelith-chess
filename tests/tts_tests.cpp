@@ -1268,11 +1268,21 @@ TEST(tts_ops_quantization) {
     CHECK(runOp(node(tts::Op::DynamicQuantize), {&xp}, o, 3));
     CHECK(equalT<uint8_t>(o[0], DType::U8, {3}, {50, 125, 255}));
     CHECK_EQ(int(o[2].scalarFloat()), 0);
-    // The vectorized range scan equals the scalar std::min/std::max loop, NaN, -0 and +inf included,
-    // for lengths around the vector width (-inf is left out: its zero point would be NaN).
+    // An infinite bound of the range (a damaged model) is refused: -inf would make the zero point
+    // NaN, cast to an int. NaN elements do not count in the range.
+    for (float bad : {-INFINITY, INFINITY}) {
+        for (int n : {3, 8, 17}) {
+            std::vector<float> v(static_cast<size_t>(n), 0.5f);
+            v[static_cast<size_t>(n / 2)] = bad;
+            Tensor xv = F({n}, v);
+            CHECK(!runOp(node(tts::Op::DynamicQuantize), {&xv}, o, 3));
+        }
+    }
+    // The vectorized range scan equals the scalar std::min/std::max loop, NaN, -0 and the largest
+    // finite values included, for lengths around the vector width.
     {
         std::mt19937 rr(11);
-        const float specials[] = {std::nanf(""), -0.0f, 0.0f, INFINITY, -3e38f};
+        const float specials[] = {std::nanf(""), -0.0f, 0.0f, 3e38f, -3e38f};
         bool same = true;
         for (int n : {0, 1, 3, 7, 8, 9, 15, 16, 17, 31, 33, 1000}) {
             for (int round = 0; round < 20; ++round) {

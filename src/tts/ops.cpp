@@ -1305,6 +1305,9 @@ bool opDynamicQuantize(const ExecContext& ctx, const Tensor& x0, Tensor* out, st
         mn = std::min(mn, p[i]);
         mx = std::max(mx, p[i]);
     }
+    // An infinite bound (only a damaged model has one) gives no zero point: -inf makes it NaN,
+    // which the cast to int below cannot take. The node fails, the line goes to subtitles.
+    if (!std::isfinite(mn) || !std::isfinite(mx)) return fail(err, "DynamicQuantizeLinear: non-finite input range");
     // onnxruntime GetQuantizationParameter: scale 1 when the range is empty.
     float scale = mx == mn ? 1.0f : (mx - mn) / 255.0f;
     float zpf = std::clamp(0.0f - mn / scale, 0.0f, 255.0f);
