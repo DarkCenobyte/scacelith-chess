@@ -9,7 +9,6 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
-#include <cstring>
 #endif
 
 namespace ui {

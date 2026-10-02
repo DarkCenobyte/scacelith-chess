@@ -4,7 +4,6 @@
 #include "ui_font.h"
 #include "ui_internal.h"
 #include "ui_screens_game.h"
-#include "ui_theme.h"
 #include "ui_widgets.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
