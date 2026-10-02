@@ -2,7 +2,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
-#include <sstream>
 #include <map>
 
 static std::string trim(const std::string& s) {
