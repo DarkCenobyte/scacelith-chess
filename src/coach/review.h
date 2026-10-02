@@ -11,8 +11,9 @@
 // every pointing target is a placeholder of the line (the gesture's anchor), so translations keep
 // the timing.
 //
-// Engine-free: the director (W9) runs the analyses this file asks for (Reviewer::*Request) and hands
-// the results back as ai::Analysis values; tests build those by hand.
+// Engine-free: coach::Session (session.cpp) runs the analyses this file asks for (Reviewer::*Request)
+// through the coach::Analyst interface (stage.h) and hands the results back as ai::Analysis values;
+// tests build those by hand.
 #pragma once
 #include "../ai/analysis.h"
 #include "../chess/chess.h"
@@ -101,15 +102,11 @@ struct PlyVerdict {
     bool only = false, brilliant = false, great = false, goodCapture = false;
     bool mateMissed = false, mateAllowed = false;
     bool voiced = false, offered = false, praised = false;
-    bool coachHungPiece = false;     // coach move: left a piece of 3+ points hanging (for "did you see it?")
-    chess::PieceType hungType = chess::NoPiece;
-    chess::Square hungSquare = chess::NoSquare;
 };
 
 struct TakebackRecord {
     int ply = -1;
-    std::string firstUci, firstSan;  // the move taken back
-    MoveClass firstClass = MoveClass::Unjudged;
+    std::string firstUci;            // the move taken back
     ExType firstType = ExType::None;
     bool fixed = false;              // the replacement lost less than 5 W% points
     bool same = false;               // the same move was played again
@@ -165,7 +162,8 @@ public:
     // ...and A2 (optional) on the position after the move, for a refutation longer than A0's PV.
     ai::AnalysisRequest afterRequest(const chess::Game& g) const;
     // A3 (optional, levels 3-4): a shallow search (depth 6) of A0's root, requested with A0. When its
-    // move differs from the engine's best, the best move is "not easy to see" (praise at levels 3-4).
+    // move differs from the move played (a top move), that move was "not easy to see" (praise at
+    // levels 3-4).
     ai::AnalysisRequest shallowRequest(const chess::Game& g) const;
 
     // Right after any move is completed (either side): "Check!", "Checkmate!" (Urgent beats).
@@ -203,7 +201,7 @@ private:
     bool coachCheckExplained_ = false;
     bool punishHintDone_ = false;
     uint32_t tipsSaid_ = 0;           // opening principles and endgame tips already voiced (bits)
-    double lastHumanWPlayed_ = -1.0;  // the human's W% after their previous move (their view)
+    std::vector<double> humanW_;      // the human's W% after each judged move on the board (index = ply, -1: none)
     // The last offer, and a takeback in progress.
     TakebackRecord offered_;          // the move the last offer was about
     chess::Square offeredHint_ = chess::NoSquare;

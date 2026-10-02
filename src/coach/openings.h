@@ -104,9 +104,6 @@ public:
     size_t duplicateNamedPositions() const { return dupNamed_; }
     double buildMs() const { return buildMs_; }
 
-    // Metadata the texts need (from openings.json).
-    const std::vector<std::string>& ignoredComponents() const { return ignored_; }
-
 private:
     struct Entry {
         uint64_t hash = 0;
@@ -163,14 +160,12 @@ struct OpeningState {
     int family = -1;                     // current family (a generic family never replaces a specific one)
     int lastNamed = -1, lastNamedPly = -1;   // latest named position (lichess name index)
     bool inBook = true;                  // the current position is a book position
-    int lastBookPly = 0;
     int leftBookPly = -1;                // first ply of the latest two-ply out-of-book run, -1 = none
     OpeningSideLabels side[2];           // [chess::White], [chess::Black]
     bool determined = false;
     int determinedPly = -1;
     DeterminedBy determinedBy = DeterminedBy::None;
     std::string rare;                    // lichess family of the latest named position no curated family covers
-    int rarePly = -1;
     std::vector<OpeningEvent> events;    // in ply order
 };
 
@@ -214,7 +209,8 @@ struct OpeningLine {
 // transposition, a new variation) is dropped once more than 4 plies old, the first summary never is.
 class OpeningAnnouncer {
 public:
-    explicit OpeningAnnouncer(const OpeningBook& book = OpeningBook::instance());
+    OpeningAnnouncer() = default;   // OpeningBook::instance(), resolved on first use (not on the constructing thread)
+    explicit OpeningAnnouncer(const OpeningBook& book);
 
     void setLevel(int level);                        // 0..6
     void setHumanColor(chess::Color c);              // the listener's side ("You opened with ...")
@@ -233,14 +229,14 @@ public:
     // free if canSpeak was false (pending talk waits; the 4-ply staleness rule applies). Deterministic.
     std::vector<OpeningLine> update(const chess::Game& game, bool canSpeak = true);
 
-    // The summary sentence for the end-of-game appraisal, from the game as it stands (empty when no opening can
-    // be named). Does not change what the announcer remembers.
+    // The summary sentence from the game as it stands (empty when no opening can be named). Does not change what
+    // the announcer remembers. Kept for tests: the appraisal names the opening through Session::openingRef().
     std::vector<OpeningLine> summary(const chess::Game& game) const;
 
     int utterances() const { return utterances_; }   // opening utterances this game
 
 private:
-    const OpeningBook& book_;
+    const OpeningBook* book_ = nullptr;   // nullptr: OpeningBook::instance()
     int level_ = 1;
     chess::Color human_ = chess::White;
     std::string subtitleLang_ = "en", speechLang_ = "en";
@@ -251,18 +247,21 @@ private:
     int utterances_ = 0;
     int lastTalkPly_ = -100;
     int lastPlies_ = 0;
+    uint64_t lastHash_ = 0;   // the position after lastPlies_ plies (a replaced move is a takeback too)
 
+    const OpeningBook& book() const { return book_ ? *book_ : OpeningBook::instance(); }
     struct Plan;
     Plan plan(const OpeningState& st) const;
-    std::vector<OpeningLine> lines(const Plan& p, const OpeningState& st, bool first) const;
+    std::vector<OpeningLine> lines(const Plan& p, bool first) const;
     void markSaid(const Plan& p);
 };
 
 int openingPlyLimit(int level);   // the ply at which the opening counts as determined for this level
 
 // ---- Texts ---------------------------------------------------------------------------------------------------------
-// The opening texts of the 10 languages (assets/coach/openings/<code>.lang), to render OpeningLines without the
-// speech catalog, and for the Opening arguments the catalog cannot resolve by key alone ("line:" references).
+// The opening texts of the 10 languages (assets/coach/openings/<code>.lang). The game renders OpeningLines through
+// the speech catalog, which loads these files itself and uses arg() for the Opening arguments it cannot resolve by
+// key alone ("line:" references); render() and variants() serve the tests.
 class OpeningTexts {
 public:
     static const OpeningTexts& instance();                 // loads the embedded files on first use (thread-safe)
@@ -276,7 +275,6 @@ public:
     // text (".spoken" keys, English respellings, " — " inside Russian/Ukrainian names made a hyphen).
     // Empty when the language cannot say it.
     std::string arg(const std::string& ref, const std::string& form, const std::string& lang, bool spoken) const;
-    bool renderable(const OpeningLine& line, const std::string& lang) const;
     // Renders a line: variant key.N picked by variantSeed among the variants English defines; placeholders
     // {name} / {name:form}. Empty when a key or an argument is missing.
     std::string render(const OpeningLine& line, const std::string& lang, bool spoken, uint32_t variantSeed = 0) const;
@@ -293,8 +291,9 @@ private:
     bool properName(const std::string& words) const;
 };
 
-// Speech clean-up shared with the catalog: English respellings are in the .spoken keys; this turns " — " between
-// two capitalised words (Russian and Ukrainian compound names: "Каро — Канн") into "-" so the voice does not pause.
+// Speech clean-up of composed "line:" names (arg() / compose(), and render()): English respellings are in the
+// .spoken keys; this turns " — " between two capitalised words (Russian and Ukrainian compound names: "Каро — Канн")
+// into "-" so the voice does not pause.
 std::string fixNameDashesForSpeech(const std::string& text);
 
 }  // namespace coach

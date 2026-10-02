@@ -10,6 +10,7 @@
 #include "ai/analysis.h"
 #include "ai/engine.h"
 #include "chess/chess.h"
+#include "coach/appraisal.h"
 #include "coach/review.h"
 #include "coach/review_internal.h"
 #include "coach/tactics.h"
@@ -854,6 +855,173 @@ TEST(coach_review_threat_warnings) {
     rv.reset(1, White);
     Script ms = rv.coachMoved(m);
     checkScript(ms, "threat mate");
+}
+
+// ---- Regressions ---------------------------------------------------------------------------------
+
+TEST(coach_review_great_praise_forgets_taken_back_moves) {
+    // "Great move" needs the human's previous move to have left them at W% <= 45. A blunder taken
+    // back from the menu (no offer: the review is not told) must not count as that previous move.
+    const ai::Analysis first = analysisOf({pvl(30, "e2e4 e7e5"), pvl(25, "d2d4 d7d5")});
+    const ai::Analysis root = analysisOf({pvl(300, "g1f3"), pvl(-100, "b1c3"), pvl(-120, "f1c4")});
+    const ai::Analysis queen = analysisOf({pvl(-500, "d1h5")});
+    for (bool takeback : {false, true}) {
+        Game g = gameOf(nullptr, {"e4"});
+        Reviewer rv;
+        rv.reset(2, White);
+        reviewOf(rv, g, first);
+        g.play(g.position().parseSAN("e5"));
+        if (takeback) {
+            g.play(g.position().parseSAN("Qh5"));
+            ReviewInput in;
+            in.game = &g;
+            in.before = &root;
+            in.played = &queen;
+            CHECK_EQ(rv.review(in).verdict.cls, MoveClass::Blunder);
+            CHECK(g.undo(1));
+        }
+        g.play(g.position().parseSAN("Nf3"));
+        const Review r = reviewOf(rv, g, root);
+        CHECK(!r.verdict.great);
+        CHECK(hasKey(r.script, "praise.only.b2"));
+        CHECK(!hasKey(r.script, "praise.great.b2"));
+    }
+}
+
+TEST(coach_review_no_praise_for_a_quicker_mate) {
+    // Lost to a forced mate either way: grabbing the rook allows mate in one instead of three. The
+    // class stays Best (lichess), but the coach does not praise it; at the same distance it does.
+    const char* fen = "3q2k1/5ppp/8/3N4/1r6/8/6PP/4R2K w - - 0 1";
+    for (int bestMate : {-3, -1}) {
+        Game g = gameOf(fen, {"Nxb4"});
+        Reviewer rv;
+        rv.reset(1, White);
+        const ai::Analysis a0 = analysisOf({pvl(0, "e1e8 d8e8", bestMate), pvl(0, "d5b4 d8d1", -1)});
+        const Review r = reviewOf(rv, g, a0);
+        CHECK_EQ(r.verdict.cls, MoveClass::Best);
+        CHECK(r.verdict.goodCapture);
+        CHECK_EQ(hasKey(r.script, "praise.capture.b1"), bestMate == -1);
+        checkScript(r.script, "quicker mate");
+    }
+}
+
+TEST(coach_review_pin_defender_freed_by_the_capture) {
+    // The knight on e4 is pinned by the rook, but ...Rxd6 leaves the e-file and Nxd6 takes back: the
+    // pin does not stop it defending d6, so the coach must not say it does.
+    const char* fen = "6k1/pp6/3Br3/8/4N3/8/P6P/4K3 w - - 0 1";
+    for (int level : {1, 3, 5}) {
+        Game g = gameOf(fen, {"a3"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const ai::Analysis a0 = analysisOf({pvl(0, "d6c5 e6e4"), pvl(-400, "a2a3 e6d6 e4d6 b7b6")});
+        const Review r = reviewOf(rv, g, a0);
+        CHECK(r.verdict.exType != ExType::Pin);
+        for (const std::string& k : keysOf(r.script)) CHECK(!startsWith(k, "ex.pin_defender"));
+        checkScript(r.script, "pin defender");
+    }
+    // ...Bxc5 instead: the rook stays on the e-file, the knight still cannot take back.
+    for (int level : {1, 3, 5}) {
+        Game g = gameOf("4rbk1/8/8/2B5/4N3/8/P7/4K3 w - - 0 1", {"a3"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const ai::Analysis a0 = analysisOf({pvl(0, "c5f8 e8f8"), pvl(-330, "a2a3 f8c5 e1d1")});
+        const Review r = reviewOf(rv, g, a0);
+        CHECK(r.verdict.exType == ExType::Pin);
+        CHECK(hasKey(r.script, "ex.pin_defender.b" + std::to_string(level)));
+        checkScript(r.script, "pin defender held");
+    }
+}
+
+TEST(coach_review_promotion_race_names_the_queening_pawn) {
+    // ...cxb2 and ...b1=Q: the pawn that queens stands on c3 now (b7 is another pawn on the b-file).
+    for (int level : {2, 3}) {
+        Game g = gameOf("6k1/1p6/8/8/8/2p5/1P6/3N2K1 w - - 0 1", {"Kf1"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const ai::Analysis a0 = analysisOf({pvl(150, "g1f2"), pvl(-700, "g1f1 c3b2 f1e2 b2b1q")});
+        const Review r = reviewOf(rv, g, a0);
+        CHECK(r.verdict.exType == ExType::PromotionRace);
+        const Beat* b = beatWithKey(r.script, "ex.promotion.b" + std::to_string(level));
+        CHECK(b != nullptr);
+        if (!b) continue;
+        CHECK(b->line.arg("my") && b->line.arg("my")->square == sq("c3"));
+        CHECK(b->line.arg("n") && b->line.arg("n")->number == 2);   // c3xb2, b2-b1
+        bool arrow = false;
+        for (const Mark& m : b->marks)
+            if (m.kind == Mark::Kind::Arrow) arrow = m.from == sq("c3") && m.to == sq("b1");
+        CHECK(arrow);
+        checkScript(r.script, "promotion pawn");
+    }
+}
+
+TEST(coach_review_promotion_race_knows_the_runner_moved) {
+    // Best was exd6 (the knight is pinned) and d7, d8=Q. Pushing that same pawn to e6 instead is not
+    // "your pawn could have run to d8", although it leaves the d-file; a king move is.
+    const char* fen = "8/8/B2p4/1n2P3/8/3k4/8/7K w - - 0 1";
+    for (int level = 2; level <= 6; ++level) {   // d8=Q is the fifth ply: lookahead 3 and up
+        for (bool push : {true, false}) {
+            Game g = gameOf(fen, {push ? "e6" : "Kg1"});
+            Reviewer rv;
+            rv.reset(level, White);
+            const ai::Analysis a0 =
+                analysisOf({pvl(800, "e5d6 d3e4 d6d7 e4e5 d7d8q"),
+                            pvl(0, push ? "e5e6 d3e4 e6e7 b5c7" : "h1g1 d3e4 g1f2 d6e5")});
+            const Review r = reviewOf(rv, g, a0);
+            CHECK_EQ(r.verdict.exType == ExType::PromotionRace, !push);
+            CHECK_EQ(hasKey(r.script, "ex.promotion_missed.b" + std::to_string(level)), !push);
+            checkScript(r.script, "promotion runner");
+        }
+    }
+}
+
+TEST(coach_review_promotion_race_checks_the_square) {
+    // The b-pawn queens because the bishop covers c2, not because the king on d1 is outside its
+    // square: no rule-of-the-square line. With the king on g1 it really is outside: the line is said.
+    for (int level = 1; level <= 6; ++level) {
+        for (bool outside : {false, true}) {
+            // White: Kd1 (or Kg1), h2. Black: Kh8, Be4 (covers c2), b3.
+            Game g = gameOf(outside ? "7k/8/8/8/4b3/1p6/7P/6K1 w - - 0 1" : "7k/8/8/8/4b3/1p6/7P/3K4 w - - 0 1",
+                            {"h3"});
+            Reviewer rv;
+            rv.reset(level, White);
+            const ai::Analysis a0 =
+                analysisOf({pvl(-150, outside ? "g1f2" : "d1c1"),
+                            pvl(-900, outside ? "h2h3 b3b2 g1f2 b2b1q" : "h2h3 b3b2 d1e2 b2b1q")});
+            const Review r = reviewOf(rv, g, a0);
+            CHECK_EQ(hasKey(r.script, "ex.promotion.b" + std::to_string(level)), outside);
+            if (!outside)
+                for (const std::string& k : keysOf(r.script)) CHECK(!startsWith(k, "ex.promotion"));
+            checkScript(r.script, "promotion square");
+        }
+    }
+}
+
+TEST(coach_review_repetition_tip_is_not_a_stalemate) {
+    // A winning player repeats the position (level 1): the repetition tip is said, but the move is
+    // not recorded as a stalemate fault, so the appraisal gives no stalemate advice about it.
+    Game g = gameOf("6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1", {});
+    Reviewer rv;
+    rv.reset(1, White);
+    Appraisal ap;
+    ap.reset(1, White);
+    const char* sans[] = {"Qd2", "Kh8", "Qd1", "Kg8", "Qd2"};
+    const char* best[] = {"d1d5", "", "d2d5", "", "d1d5"};
+    Review last;
+    for (int i = 0; i < 5; ++i) {
+        const Move m = g.position().parseSAN(sans[i]);
+        const std::string uci = g.position().toUCI(m);
+        g.play(m);
+        if (i % 2) continue;
+        last = reviewOf(rv, g, analysisOf({pvl(900, best[i]), pvl(i == 4 ? 0 : 880, uci.c_str())}));
+        ap.add(last);
+    }
+    CHECK_EQ(g.repetitionCount(), 2);
+    CHECK(hasKey(last.script, "tip.repetition.b1"));
+    CHECK(last.verdict.exType != ExType::Stalemate);
+    g.resign(Black);
+    CHECK(ap.stats(g).theme != ExType::Stalemate);
+    for (const Beat& b : ap.script(g, AppraisalContext{}))
+        if (const Arg* t = b.line.arg("theme")) CHECK(t->text != "theme.stalemate");
 }
 
 // ---- Requests ------------------------------------------------------------------------------------

@@ -295,8 +295,8 @@ bool OpeningBook::build(const std::vector<std::string>& tsvFiles, const std::str
             if (v.row != lastRow) {   // count each line once, even if it passed twice
                 lastRow = v.row;
                 const uint8_t t = teachTier[rowName[v.row]];
-                if (t >= 1 && t <= 1) ++teach1;
-                if (t >= 1 && t <= 2) ++teach2;
+                if (t == 1) ++teach1;
+                if (t == 1 || t == 2) ++teach2;
             }
         }
         // A position whose own name is not a teaching line (a gambit named inside a sound family, such as the
@@ -410,7 +410,6 @@ OpeningState classify(const chess::Game& game, const OpeningBook& book, int maxP
             const int f = book.familyOfName(hit.name);
             if (f < 0) {
                 st.rare = OpeningBook::lichessFamily(book.name(hit.name));
-                st.rarePly = ply;
             } else {
                 // A generic name (King's Pawn Game, Indian Defense) never replaces a specific family.
                 const bool specific = st.family >= 0 && !fams[st.family].generic;
@@ -490,7 +489,6 @@ OpeningState classify(const chess::Game& game, const OpeningBook& book, int maxP
         }
         if (inBook) {
             outRun = 0;
-            st.lastBookPly = ply;
         } else if (++outRun == 2) {
             st.leftBookPly = ply - 1;
             push(OpeningEvent::Kind::LeftBook, ply - 1, sideOf(chess::opposite(mover)));
@@ -557,7 +555,7 @@ struct OpeningAnnouncer::Plan {
     }
 };
 
-OpeningAnnouncer::OpeningAnnouncer(const OpeningBook& book) : book_(book) {}
+OpeningAnnouncer::OpeningAnnouncer(const OpeningBook& book) : book_(&book) {}
 
 void OpeningAnnouncer::setLevel(int level) { level_ = std::max(0, std::min(6, level)); }
 void OpeningAnnouncer::setHumanColor(chess::Color c) { human_ = c; }
@@ -573,6 +571,7 @@ void OpeningAnnouncer::newGame() {
     utterances_ = 0;
     lastTalkPly_ = -100;
     lastPlies_ = 0;
+    lastHash_ = 0;
 }
 
 void OpeningAnnouncer::reset() {
@@ -582,8 +581,8 @@ void OpeningAnnouncer::reset() {
 
 OpeningAnnouncer::Plan OpeningAnnouncer::plan(const OpeningState& st) const {
     Plan p;
-    const std::vector<OpeningFamily>& fams = book_.families();
-    const std::vector<OpeningVariation>& vars = book_.variations();
+    const std::vector<OpeningFamily>& fams = book().families();
+    const std::vector<OpeningVariation>& vars = book().variations();
     auto famRef = [&](int f) { return "family:" + fams[f].id; };
     auto varRef = [&](int v) { return "variation:" + vars[v].id; };
     auto said = [&](const std::string& k) { return said_.count(k) != 0; };
@@ -710,12 +709,12 @@ OpeningAnnouncer::Plan OpeningAnnouncer::plan(const OpeningState& st) const {
     const bool advanced = level_ >= 4;
     auto addVar = [&](const std::string& ref) {
         if (ref.empty()) return;
-        int v = book_.variationIndex(ref.substr(ref.find(':') + 1));
+        int v = book().variationIndex(ref.substr(ref.find(':') + 1));
         if (v >= 0 && (advanced || vars[v].beginnerComment)) subjects.push_back(-1 - v);
     };
     auto addFam = [&](const std::string& ref) {
         if (ref.rfind("family:", 0) != 0) return;
-        int f = book_.familyIndex(ref.substr(7));
+        int f = book().familyIndex(ref.substr(7));
         if (f >= 0) subjects.push_back(f);
     };
     if (level_ >= 2) {
@@ -737,8 +736,8 @@ OpeningAnnouncer::Plan OpeningAnnouncer::plan(const OpeningState& st) const {
         famRefs.push_back(p.white);
     }
     for (const std::string& r : famRefs)
-        if (!r.empty() && book_.familyIndex(r.substr(r.find(':') + 1)) >= 0 &&
-            !fams[book_.familyIndex(r.substr(r.find(':') + 1))].generic)
+        if (!r.empty() && book().familyIndex(r.substr(r.find(':') + 1)) >= 0 &&
+            !fams[book().familyIndex(r.substr(r.find(':') + 1))].generic)
             addFam(r);
     if (p.summary)   // a generic opening still has something to teach (1.e4, 1.d4)
         for (const std::string& r : {p.white, p.black}) addFam(r);
@@ -753,7 +752,7 @@ OpeningAnnouncer::Plan OpeningAnnouncer::plan(const OpeningState& st) const {
     return p;
 }
 
-std::vector<OpeningLine> OpeningAnnouncer::lines(const Plan& p, const OpeningState&, bool first) const {
+std::vector<OpeningLine> OpeningAnnouncer::lines(const Plan& p, bool first) const {
     std::vector<OpeningLine> out;
     auto line = [&out](const std::string& key) -> OpeningLine& {
         out.push_back(OpeningLine{key, {}});
@@ -817,22 +816,26 @@ void OpeningAnnouncer::markSaid(const Plan& p) {
 
 std::vector<OpeningLine> OpeningAnnouncer::update(const chess::Game& game, bool canSpeak) {
     if (level_ <= 0) return {};
-    const OpeningState st = classify(game, book_, openingPlyLimit(level_));
+    const OpeningState st = classify(game, book(), openingPlyLimit(level_));
     if (!st.standardStart) return {};
-    if (st.plies < lastPlies_) {   // takeback
+    // A takeback: fewer plies, or a move replaced (taken back and another played before this update).
+    if (st.plies < lastPlies_ || (lastPlies_ > 0 && game.positionAt(size_t(lastPlies_)).hash() != lastHash_)) {
         takebackSinceTalk_ = true;
         if (lastTalkPly_ > st.plies) lastTalkPly_ = -100;
     }
     lastPlies_ = st.plies;
+    lastHash_ = game.position().hash();
     if (!st.determined || utterances_ >= utteranceCap(level_)) return {};
     Plan p = plan(st);
     if (p.empty()) return {};
-    if (summarySaid_ && st.plies - p.since > 4) {   // stale news: never said
-        markSaid(p);
+    if (summarySaid_ && st.plies - p.since > 4) {   // stale news: never said (its comment stays for later)
+        Plan q = p;
+        q.comment.clear();
+        markSaid(q);
         return {};
     }
     if (st.plies < lastTalkPly_ + 2 || !canSpeak) return {};
-    std::vector<OpeningLine> out = lines(p, st, !summarySaid_);
+    std::vector<OpeningLine> out = lines(p, !summarySaid_);
     markSaid(p);
     ++utterances_;
     lastTalkPly_ = st.plies;
@@ -842,8 +845,9 @@ std::vector<OpeningLine> OpeningAnnouncer::update(const chess::Game& game, bool 
 
 void OpeningAnnouncer::catchUp(const chess::Game& game) {
     if (level_ <= 0) return;
-    const OpeningState st = classify(game, book_, openingPlyLimit(level_));
+    const OpeningState st = classify(game, book(), openingPlyLimit(level_));
     lastPlies_ = st.plies;
+    lastHash_ = game.position().hash();
     lastTalkPly_ = st.plies;
     takebackSinceTalk_ = false;
     if (!st.standardStart || !st.determined) return;
@@ -857,12 +861,12 @@ void OpeningAnnouncer::catchUp(const chess::Game& game) {
 }
 
 std::vector<OpeningLine> OpeningAnnouncer::summary(const chess::Game& game) const {
-    OpeningAnnouncer fresh(book_);
+    OpeningAnnouncer fresh(book());
     fresh.level_ = std::max(1, level_);
     fresh.human_ = human_;
     fresh.subtitleLang_ = subtitleLang_;
     fresh.speechLang_ = speechLang_;
-    OpeningState st = classify(game, book_, openingPlyLimit(fresh.level_));
+    OpeningState st = classify(game, book(), openingPlyLimit(fresh.level_));
     if (!st.standardStart) return {};
     st.determined = true;   // at the end of the game, whatever the opening has become is the opening
     Plan p = fresh.plan(st);
@@ -873,7 +877,7 @@ std::vector<OpeningLine> OpeningAnnouncer::summary(const chess::Game& game) cons
     only.black = p.black;
     only.both = p.both;
     only.relation = p.relation;
-    return fresh.lines(only, st, true);
+    return fresh.lines(only, true);
 }
 
 // ---- Texts -------------------------------------------------------------------------------------------------------------
@@ -1055,13 +1059,6 @@ std::string OpeningTexts::arg(const std::string& ref, const std::string& form, c
         if (v) break;
     }
     return v ? *v : std::string();
-}
-
-bool OpeningTexts::renderable(const OpeningLine& line, const std::string& lang) const {
-    if (!find(lang, line.key)) return false;
-    for (const auto& a : line.args)
-        if (a.second.kind == OpeningArg::Kind::Opening && arg(a.second.text, "", lang, false).empty()) return false;
-    return true;
 }
 
 std::string OpeningTexts::render(const OpeningLine& line, const std::string& lang, bool spoken,

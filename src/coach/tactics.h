@@ -41,8 +41,8 @@ bool isUndefended(const chess::Position& p, chess::Square s);
 
 // ---- Tactical motifs ------------------------------------------------------------------------
 // The piece on 'sq' (just moved there) attacks two or more enemy targets that are the king, worth
-// more than it, or winning by SEE, and stands safe there (or gives check). Returns the targets
-// (0 when fewer than two).
+// more than it, or winning by SEE, and stands safe there. Returns the targets (0 when fewer than
+// two).
 uint64_t forkTargets(const chess::Position& after, chess::Square sq);
 
 struct Pin {
@@ -84,14 +84,12 @@ enum class MatePattern : uint8_t { None, BackRank, Smothered, Support, Ladder, E
 MatePattern classifyMate(const chess::Position& mated);   // the side to move is checkmated
 
 // ---- Pieces and pawns ------------------------------------------------------------------------
-int mobility(const chess::Position& p, chess::Color c);   // squares knights, bishops, rooks, queens attack (not own)
 // The piece on s (knight, bishop, rook or queen) is attacked with a winning capture and every move
 // it has loses by SEE too (lichess-puzzler's is_trapped); false when its side is in check or the
 // piece is pinned. Works for either colour (the turn is passed on a copy when needed).
 bool isTrapped(const chess::Position& p, chess::Square s);
 bool isPassed(const chess::Position& p, chess::Square pawn);
 int undevelopedMinors(const chess::Position& p, chess::Color c);   // knights / bishops on b1 c1 f1 g1 (b8 c8 f8 g8)
-uint64_t attackedSquares(const chess::Position& p, chess::Color c);
 bool isForced(const chess::Position& p);                  // exactly one legal move
 // Move 'ply' of the game captures on the square where the previous move captured.
 bool isRecapture(const chess::Game& g, size_t ply);
@@ -119,12 +117,10 @@ struct MoveFacts {
     chess::Square capturedOn = chess::NoSquare;    // en passant: the passed pawn's square
     bool enPassant = false, castleKing = false, castleQueen = false;
     chess::PieceType promotion = chess::NoPiece;
-    bool check = false, mate = false, doubleCheck = false, discoveredCheck = false, stalemate = false;
+    bool check = false, doubleCheck = false, discoveredCheck = false, stalemate = false;
     int seeCp = 0;               // exchange balance of the move for the mover (see())
     uint64_t newlyAttacked = 0;  // enemy pieces attacked after the move and not before
     uint64_t forks = 0;          // forkTargets(after, to)
-    uint64_t discovered = 0;     // enemy pieces attacked through the vacated square
-    uint64_t leftHanging = 0;    // own pieces hanging after and not before (the moved piece included)
     uint64_t undefended = 0;     // own pieces the moved piece defended before and no longer does
 };
 MoveFacts analyzeMove(const chess::Position& before, const chess::Move& m);
@@ -146,8 +142,8 @@ std::vector<LineStep> replayLine(const chess::Position& start, const std::vector
 std::string sanLine(const std::vector<LineStep>& steps, size_t from, size_t count);   // "Nxe5 dxe5 Qg4"
 
 // Squares a finger passes over for a move of a piece of type t, in order, 'to' last: a slider the
-// squares in between, a knight an L (long leg first: g1 g2 g3 f3), a king or a pawn just 'to'
-// (a double step its middle square too).
+// squares in between, a knight an L (long leg first: g1-f3 gives g2 g3 f3), a king or a pawn just
+// 'to' (a double step its middle square too).
 std::vector<chess::Square> movePath(chess::PieceType t, chess::Square from, chess::Square to);
 // Gesture path of a move: {from, to}, or {from, corner, to} for a knight (the L's corner, long leg
 // first: g1-f3 turns on g3), as the animator's Trace and the board's arrows expect.

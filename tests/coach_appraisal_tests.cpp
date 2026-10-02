@@ -541,6 +541,35 @@ TEST(coach_appraisal_highlight_points_at_the_piece) {
         }
         CHECK(hl->look == Look::Target);
     }
+    // A brilliant promotion: pointed at only while the queen stands on its square (an empty square
+    // reads as a white Piece{}, which must not count as the human's piece).
+    auto promotionHighlight = [](const std::vector<const char*>& sans) {
+        Game p = playSans("k7/4P3/2K5/8/8/8/8/8 w - - 0 1", sans);
+        p.resign(Black);
+        Appraisal ap;
+        ap.reset(2, White);
+        for (int ply = 0; ply < int(p.moves().size()); ply += 2) {
+            Review r = reviewAt(p, ply, MoveClass::Best, 900, 900);
+            r.verdict.brilliant = ply == 0;
+            ap.add(r);
+        }
+        const Script ps = ap.script(p, AppraisalContext{});
+        checkAppraisal(ps, 2, "promotion");
+        for (const Beat& b : ps)
+            if (b.line.key == "appraisal.best.brilliant.b2") return b;
+        CHECK(false);
+        return Beat{};
+    };
+    const Beat left = promotionHighlight({"e8=Q+", "Ka7", "Qe4", "Ka8", "Qd5"});   // e8 is empty at the end
+    CHECK(left.gestures.empty());
+    CHECK(left.look == Look::Board);
+    const Beat stays = promotionHighlight({"e8=Q+", "Ka7"});
+    CHECK_EQ(stays.gestures.size(), size_t(1));
+    if (!stays.gestures.empty()) {
+        CHECK(stays.gestures[0].kind == GestureKind::PointPiece);
+        CHECK_EQ(stays.gestures[0].square, parseSquare("e8"));
+    }
+    CHECK(stays.look == Look::Target);
 }
 
 TEST(coach_appraisal_every_key_exists) {
