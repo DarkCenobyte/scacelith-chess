@@ -41,8 +41,8 @@ bool isUndefended(const chess::Position& p, chess::Square s);
 
 // ---- Tactical motifs ------------------------------------------------------------------------
 // The piece on 'sq' (just moved there) attacks two or more enemy targets that are the king, worth
-// more than it, or winning by SEE, and stands safe there (or gives check). Returns the targets
-// (0 when fewer than two).
+// more than it, or winning by SEE, and stands safe there. Returns the targets (0 when fewer than
+// two).
 uint64_t forkTargets(const chess::Position& after, chess::Square sq);
 
 struct Pin {
@@ -142,8 +142,8 @@ std::vector<LineStep> replayLine(const chess::Position& start, const std::vector
 std::string sanLine(const std::vector<LineStep>& steps, size_t from, size_t count);   // "Nxe5 dxe5 Qg4"
 
 // Squares a finger passes over for a move of a piece of type t, in order, 'to' last: a slider the
-// squares in between, a knight an L (long leg first: g1 g2 g3 f3), a king or a pawn just 'to'
-// (a double step its middle square too).
+// squares in between, a knight an L (long leg first: g1-f3 gives g2 g3 f3), a king or a pawn just
+// 'to' (a double step its middle square too).
 std::vector<chess::Square> movePath(chess::PieceType t, chess::Square from, chess::Square to);
 // Gesture path of a move: {from, to}, or {from, corner, to} for a knight (the L's corner, long leg
 // first: g1-f3 turns on g3), as the animator's Trace and the board's arrows expect.
