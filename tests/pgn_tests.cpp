@@ -376,6 +376,28 @@ TEST(pgn_caps) {
         CHECK(g->ok());
         if (!g->record.plies.empty()) CHECK_EQ(g->record.plies[0].comment.size(), size_t(10));
     }
+    // A cut inside a UTF-8 sequence drops that sequence only (the comment stays UTF-8, not read as
+    // Windows-1252); a Windows-1252 comment is cut as before.
+    auto cjk = pgn::read("1. e4 {ab\xe4\xb8\xad\xe4\xb8\xad\xe4\xb8\xad\xe4\xb8\xad\xe4\xb8\xad} e5 ;a"
+                         "\xd0\x96\xd0\x96\xd0\x96\xd0\x96\xd0\x96\xd0\x96\n2. Nf3 {caf\xe9 \x85\x85\x85\x85\x85\x85\x85} *\n",
+                         lim);
+    if (const pgn::ParsedGame* g = only(cjk)) {
+        CHECK(g->ok());
+        if (g->record.plies.size() == 3) {
+            CHECK_EQ(g->record.plies[0].comment, std::string("ab\xe4\xb8\xad\xe4\xb8\xad"));
+            CHECK_EQ(g->record.plies[1].comment, std::string("a\xd0\x96\xd0\x96\xd0\x96\xd0\x96"));
+            CHECK_EQ(g->record.plies[2].comment, std::string("caf\xc3\xa9 \xe2\x80\xa6"));
+        }
+    }
+    auto longCjk = pgn::read("{" + [] {
+        std::string s;
+        for (int i = 0; i < 3000; ++i) s += "\xe4\xb8\xad";
+        return s;
+    }() + "} 1. e4 *\n");
+    if (const pgn::ParsedGame* g = only(longCjk)) {
+        CHECK_EQ(g->record.comment.size(), size_t(2730 * 3));
+        CHECK_EQ(g->record.comment.substr(0, 3), std::string("\xe4\xb8\xad"));
+    }
 }
 
 TEST(pgn_writer_order_and_wrapping) {

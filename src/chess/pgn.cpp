@@ -90,6 +90,19 @@ void cutUtf8(std::string& s, size_t max) {
     while (n > 0 && ((unsigned char)s[n] & 0xC0) == 0x80) --n;
     s.resize(n);
 }
+// A comment the lexer cut at Limits::maxComment may end inside a UTF-8 sequence, which would make
+// the whole comment read as Windows-1252: drop that incomplete sequence (at most 3 bytes) when the
+// text before it is UTF-8. Any other text is left alone.
+void dropCutSequence(std::string& s) {
+    if (validUtf8(s)) return;
+    for (size_t k = 1; k <= 3 && k <= s.size(); ++k) {
+        const unsigned char c = (unsigned char)s[s.size() - k];
+        if ((c & 0xC0) == 0x80) continue;  // continuation byte
+        const size_t len = (c >> 5) == 0x6 ? 2 : (c >> 4) == 0xE ? 3 : (c >> 3) == 0x1E ? 4 : 0;
+        if (len > k && validUtf8(s.substr(0, s.size() - k))) s.resize(s.size() - k);
+        return;
+    }
+}
 
 // ---- Lexer --------------------------------------------------------------------------------------
 enum class Tok { End, TagPair, Comment, Open, Close, Nag, Symbol, Star, Bad };
@@ -302,6 +315,7 @@ private:
     void braceComment(Token& t) {
         advance();  // '{'
         std::string text;
+        bool cut = false;
         for (;;) {
             if (p_ >= s_.size()) return bad(t, "unterminated comment");
             const char c = s_[p_];
@@ -313,7 +327,9 @@ private:
             advance();
             if (newLine && tagLineAhead()) return bad(t, "unterminated comment");
             if (text.size() < lim_.maxComment) text += c;
+            else cut = true;
         }
+        if (cut) dropCutSequence(text);
         t.kind = Tok::Comment;
         t.text = std::move(text);
     }
@@ -321,10 +337,13 @@ private:
     void lineComment(Token& t) {
         advance();  // ';'
         std::string text;
+        bool cut = false;
         while (p_ < s_.size() && !lineBreak(p_)) {
             if (text.size() < lim_.maxComment) text += s_[p_];
+            else cut = true;
             advance();
         }
+        if (cut) dropCutSequence(text);
         t.kind = Tok::Comment;
         t.text = std::move(text);
     }
