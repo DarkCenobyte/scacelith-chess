@@ -37,6 +37,7 @@
 //   - GameEnd waits until the last move is on the board, then the usual end (result on the
 //     scoresheets, handshake, game over card with online reasons, rating change, rematch, report).
 #include "game_scene.h"
+#include "game_scene_detail.h"
 #include "../audio/audio.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
@@ -52,6 +53,8 @@ using namespace chess;
 
 namespace game {
 
+using namespace scene_detail;
+
 namespace {
 
 using Kind = net::Event::Kind;
@@ -60,17 +63,6 @@ using Kind = net::Event::Kind;
 enum Status { StOngoing = 0, StWhiteWins = 1, StBlackWins = 2, StDraw = 3, StAborted = 4 };
 enum GameEventKind { EvDrawOffered = 1, EvDrawDeclined = 2, EvDisconnected = 3, EvReconnected = 4, EvRematchOffered = 5, EvRematchDeclined = 6 };
 constexpr int kErrDrawOfferLimit = 108;
-
-constexpr float kGlanceTime = 0.45f;  // seconds to turn to the scoresheet and back (as game_scene.cpp)
-
-anim::Task makeTask(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0), float height = 0.0f) {
-    anim::Task k;
-    k.type = t;
-    k.pieceId = pieceId;
-    k.position = pos;
-    k.height = height;
-    return k;
-}
 
 uint16_t packed(const Move& m) { return net::packMove(m.from, m.to, m.promotion); }
 
@@ -96,11 +88,6 @@ std::string reasonText(int reason) {
     case 26: return i18n::tr("reason.online.both_disconnected");
     default: return reason > 0 && reason <= 13 ? endReasonText(GameEndReason(reason)) : "";
     }
-}
-
-std::string playerName() {
-    const std::string& n = settings().playerName;
-    return n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
 }
 
 }  // namespace
@@ -145,7 +132,7 @@ void GameScene::setupOnlineGame() {
     ratingKnown_ = false;
     ratingBefore_ = ratingAfter_ = 0;
     rematchAsked_ = rematchOffered_ = rematchGone_ = false;
-    reportOpen_ = reported_ = false;
+    reportOpen_ = reported_ = reportQueued_ = reportSending_ = false;
     reportCategory_ = 0;
     reportComment_.clear();
     fadeDip_ = 0.0f;
@@ -179,7 +166,7 @@ void GameScene::configureOnlineSeats() {
         st.playHand = hand;
         const net::PlayerInfo& p = i == 0 ? og_.white : og_.black;
         st.controller = st.color == humanColor_ ? Controller::Human : Controller::Remote;
-        st.name = p.name.empty() ? (st.human() ? playerName() : std::string("?")) : p.name;
+        st.name = p.name.empty() ? (st.human() ? localPlayerName() : std::string("?")) : p.name;
         if (!direct) {
             st.elo = p.rating;
             st.provisional = p.provisional;
@@ -268,10 +255,14 @@ void GameScene::updateOnline(float dt) {
     updateRemoteLive(dt);
 
     if (endPending_) {
+        // The game is over: an open promotion picker closes, its pawn going back.
+        if (turn_ == Turn::HumanPromotion) {
+            promoTo_ = NoSquare;
+            humanRelease();
+        }
         endWait_ += dt;
         bool settled = remoteQueue_.empty() && turn_ != Turn::RemoteMoving && turn_ != Turn::HumanPromotion && dest_.empty() &&
                        !anim_[0].busy() && !anim_[1].busy() && !remoteLive_.takeBack;
-        if (turn_ == Turn::RemoteWaiting && !remoteQueue_.empty()) settled = false;
         if (settled || endWait_ > 6.0f) endGame();
     }
 }
@@ -526,22 +517,6 @@ void GameScene::sendOnlineMove(const Move& mv) {
     LOGI("online: move %d %s sent (%u ms)", ply + 1, game_.sanMoves().back().c_str(), pendingThinkMs_);
 }
 
-void GameScene::planRemoteMove(std::vector<anim::Task>& tasks, const Move& mv, bool lifted) {
-    Color side = game_.position().sideToMove();
-    int moverId = board_.idAt(mv.from);
-    int victimId = board_.idAt(mv.to);
-    if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
-    Square rookFrom = NoSquare, rookTo = NoSquare;
-    if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
-        int rank = rankOf(mv.from);
-        bool king = (mv.flags & MoveCastleKing) != 0;
-        rookFrom = makeSquare(king ? 7 : 0, rank);
-        rookTo = makeSquare(king ? 5 : 3, rank);
-    }
-    planPlacement(tasks, moverId, mv.to, victimId, rookFrom, rookTo, lifted);
-    if (mv.promotion != NoPiece) planPromotionSwap(tasks, moverId, mv.to, mv.promotion);
-}
-
 void GameScene::startRemoteMove() {
     RemoteMove r = remoteQueue_.front();
     remoteQueue_.erase(remoteQueue_.begin());
@@ -583,14 +558,14 @@ void GameScene::startRemoteMove() {
     }
     std::vector<anim::Task> tasks;
     if (start != live::LiveStart::Placed) {
-        if (start != live::LiveStart::Held) tasks.push_back(makeTask(anim::TaskType::Reach, board_.idAt(mv.from)));
-        planRemoteMove(tasks, mv, start == live::LiveStart::Held);
+        if (start != live::LiveStart::Held) tasks.push_back(task(anim::TaskType::Reach, board_.idAt(mv.from)));
+        planMove(tasks, mv, game_.position().sideToMove(), start == live::LiveStart::Held);
     }
     remoteLive_ = RemoteLive();
     remoteAim_.reset();
     int half = world_.clockHalfForSeat(seat == 0 ? 1.0f : -1.0f);
-    tasks.push_back(makeTask(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)));
-    tasks.push_back(makeTask(anim::TaskType::Retract));
+    tasks.push_back(task(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)));
+    tasks.push_back(task(anim::TaskType::Retract));
     anim_[seat].setThinking(false);
     anim_[seat].enqueue(tasks);
     game_.play(mv);
@@ -606,7 +581,8 @@ void GameScene::recordOnline(int ply) {
     recordedPly_ = std::max(recordedPly_, std::min(ply + 1, int(san.size())));
 }
 
-bool GameScene::myFirstMoveMade() const { return int(og_.moves.size()) > int(humanColor_); }
+// A move sent and not confirmed yet counts: the server already has it and would refuse an abort.
+bool GameScene::myFirstMoveMade() const { return int(og_.moves.size()) > int(humanColor_) || pendingPly_ >= 0; }
 
 // =============================================================================================
 // Live gestures: mine to the opponent
@@ -756,7 +732,7 @@ void GameScene::gripRemoteLive(Square from, int ply) {
     int r = aiSeat();
     anim_[r].setThinking(false);
     float reachAt = anim_[r].time() + anim_[r].remainingTime();  // after a piece going back, if any
-    enqueueRemoteLive({makeTask(anim::TaskType::Reach, id), makeTask(anim::TaskType::Lift, id)});
+    enqueueRemoteLive({task(anim::TaskType::Reach, id), task(anim::TaskType::Lift, id)});
     remoteLive_ = RemoteLive();
     remoteLive_.pieceId = id;
     remoteLive_.from = remoteLive_.hover = from;
@@ -780,7 +756,7 @@ void GameScene::followRemoteAim(int aim, float dt) {
     const PieceObject* victim = want != L.from ? board_.at(want) : nullptr;
     float height = victim ? layout::PIECE_HEIGHT[victim->type] + 0.012f : 0.0f;
     vec3 pos = want == L.from ? p->basePos : board_.squareBase(want);
-    enqueueRemoteLive({makeTask(anim::TaskType::Carry, L.pieceId, pos, height)});
+    enqueueRemoteLive({task(anim::TaskType::Carry, L.pieceId, pos, height)});
     L.hover = want;
 }
 
@@ -791,8 +767,8 @@ void GameScene::placeRemoteLive(uint16_t move) {
     // Their move stands on the board before their clock press: the placement, not the press, and
     // not in game_ (their MoveMade confirms it, startRemoteMove).
     std::vector<anim::Task> tasks;
-    planRemoteMove(tasks, mv, true);
-    tasks.push_back(makeTask(anim::TaskType::Retract));
+    planMove(tasks, mv, game_.position().sideToMove(), true);
+    tasks.push_back(task(anim::TaskType::Retract));
     enqueueRemoteLive(tasks);
     L.placed = move;
     L.hover = mv.to;
@@ -811,9 +787,9 @@ void GameScene::cancelRemoteLive(bool retract) {
     if (PieceObject* p = board_.byId(L.pieceId)) {
         // Back over its square first (Place comes straight down), then down on it.
         std::vector<anim::Task> tasks;
-        if (L.hover != L.from) tasks.push_back(makeTask(anim::TaskType::Carry, p->id, p->basePos));
-        tasks.push_back(makeTask(anim::TaskType::Place, p->id, p->basePos));
-        if (retract) tasks.push_back(makeTask(anim::TaskType::Retract));
+        if (L.hover != L.from) tasks.push_back(task(anim::TaskType::Carry, p->id, p->basePos));
+        tasks.push_back(task(anim::TaskType::Place, p->id, p->basePos));
+        if (retract) tasks.push_back(task(anim::TaskType::Retract));
         dest_[p->id].push_back({L.from, p->basePos, false});
         enqueueRemoteLive(tasks);
     }
@@ -920,8 +896,7 @@ ui::GameOverExtras GameScene::onlineGameOverExtras() const {
         if (!og_.rated) {
             x.detail = i18n::tr("online.rating.casual");
         } else if (ratingKnown_) {
-            int d = ratingAfter_ - ratingBefore_;
-            std::string delta = (d > 0 ? "+" : d < 0 ? "\xE2\x88\x92" : "\xC2\xB1") + std::to_string(std::abs(d));
+            std::string delta = signedDelta(ratingAfter_ - ratingBefore_);
             x.detail = i18n::trf("online.rating.change", {std::to_string(ratingBefore_), std::to_string(ratingAfter_), i18n::ltr(delta)});
         } else {
             x.detail = i18n::tr("online.rating.pending");
@@ -937,7 +912,8 @@ ui::GameOverExtras GameScene::onlineGameOverExtras() const {
         x.primaryLabel = i18n::tr("online.rematch.gone");
         x.primaryDisabled = true;
     }
-    if (link_ && link_->canReport() && !reported_) x.reportLabel = i18n::tr("online.report.button");
+    if (link_ && link_->canReport() && !reported_ && !reportQueued_ && !reportSending_)
+        x.reportLabel = i18n::tr("online.report.button");
     return x;
 }
 
@@ -973,20 +949,29 @@ void GameScene::drawOnlineHud() {
 // Input and menus
 // =============================================================================================
 
+bool GameScene::updateReportDialog() {
+    if (!reportOpen_) return false;
+    int r = ui::reportDialog(reportCategory_, reportComment_);
+    if (r == 1 && link_) {
+        // The server takes reports of finished games only: one filled in during the game waits
+        // for its end (updateOnlineGameOver).
+        if (og_.status == StOngoing) reportQueued_ = true;
+        else sendReport();
+    }
+    if (r >= 0) reportOpen_ = false;
+    return true;
+}
+
+void GameScene::sendReport() {
+    static const char* cats[] = {"cheating", "abuse", "other"};
+    link_->report(seats_[aiSeat()].name, cats[std::clamp(reportCategory_, 0, 2)], reportComment_);
+    onlineSession().expect(Kind::ReportResult);
+    reportSending_ = true;
+}
+
 void GameScene::updateOnlineInput() {
     const plat::Input& in = plat::input();
-    if (reportOpen_) {
-        int r = ui::reportDialog(reportCategory_, reportComment_);
-        if (r == 1 && link_) {
-            static const char* cats[] = {"cheating", "abuse", "other"};
-            const Seat& opp = seats_[aiSeat()];
-            link_->report(opp.name, cats[std::clamp(reportCategory_, 0, 2)], reportComment_);
-            reported_ = true;
-            ui::notify(i18n::tr("online.report.sent"), 3.5f);
-        }
-        if (r >= 0) reportOpen_ = false;
-        return;
-    }
+    if (updateReportDialog()) return;
     if (!paused_ && in.keyPressed[plat::KEY_ESCAPE] && turn_ != Turn::HumanPromotion) {
         paused_ = true;
         if (dragging_) {
@@ -1000,7 +985,7 @@ void GameScene::updateOnlineInput() {
         p.canOfferDraw = !myDrawOffer_ && !drawOffered_ && og_.status == StOngoing;
         p.canClaimDraw = game_.canClaimThreefold() || game_.canClaimFiftyMove();
         p.canAbort = !myFirstMoveMade() && og_.status == StOngoing;
-        p.canReport = link_ && link_->canReport() && !reported_;
+        p.canReport = link_ && link_->canReport() && !reported_ && !reportQueued_ && !reportSending_;
         switch (menuChoice(ui::onlinePauseMenu(p))) {
         case ui::MenuAction::Resume: paused_ = false; break;
         case ui::MenuAction::OfferDraw:
@@ -1026,11 +1011,7 @@ void GameScene::updateOnlineInput() {
             break;
         case ui::MenuAction::BackToMainMenu:
             paused_ = false;
-            // Leaving resigns (or aborts, before my first move).
-            if (og_.status == StOngoing) {
-                if (p.canAbort) link_->abortGame();
-                else link_->resign();
-            }
+            if (og_.status == StOngoing) leaveOngoingOnlineGame();
             leaveOnlineGame();
             break;
         case ui::MenuAction::OptionsChanged: applySettings(true); break;
@@ -1050,17 +1031,20 @@ void GameScene::updateOnlineGameOver() {
         stateTime_ = 0.0f;
         return;
     }
-    if (reportOpen_) {
-        int r = ui::reportDialog(reportCategory_, reportComment_);
-        if (r == 1 && link_) {
-            static const char* cats[] = {"cheating", "abuse", "other"};
-            link_->report(seats_[aiSeat()].name, cats[std::clamp(reportCategory_, 0, 2)], reportComment_);
-            reported_ = true;
-            ui::notify(i18n::tr("online.report.sent"), 3.5f);
-        }
-        if (r >= 0) reportOpen_ = false;
-        return;
+    // A report filled in during the game goes now (the server has stored the game by then); the
+    // report button comes back when the server refuses one.
+    if (reportQueued_ && link_ && stateTime_ > 1.2f) {
+        reportQueued_ = false;
+        sendReport();
     }
+    net::Event answer;
+    if (reportSending_ && onlineSession().take(Kind::ReportResult, answer)) {
+        reportSending_ = false;
+        reported_ = answer.ok;
+        if (answer.ok) ui::notify(i18n::tr("online.report.sent"), 3.5f);
+        else ui::notify(onlineErrorText(answer.error, answer.retryAfterSec), 4.0f);
+    }
+    if (updateReportDialog()) return;
     if (stateTime_ > 1.2f && (endHandshakeDone_ || stateTime_ > 5.0f)) {
         gameOverShown_ = true;
         ui::MenuAction a = ui::gameOver(resultText_, reasonText_, playerWon_, isDraw_, int(game_.moves().size() + 1) / 2,
@@ -1081,10 +1065,21 @@ void GameScene::updateOnlineGameOver() {
     if (link_ && link_->kind() == LinkKind::Server) ui::onlineChallenges();
 }
 
+void GameScene::leaveOngoingOnlineGame() {
+    // Leaving resigns, or aborts before my first move (unrated), the same way from the menu and
+    // when the window is closed.
+    if (!myFirstMoveMade()) link_->abortGame();
+    else link_->resign();
+}
+
 void GameScene::leaveOnlineGame() {
     // A direct match goes to the saved games first (nothing happens when its end saved it): its
     // authority has not answered a resignation or abort just sent, see saving::directMatchRecord.
     archiveGame(true);
+    // The fade to the menu shows the clock as it stood (without link_, clock_ would show the
+    // starting times).
+    leaveClock_ = onlineClockDisplay();
+    leaveClock_.running = -1;
     onlineSession().leaveGame();
     link_ = nullptr;
     clock_.stop();

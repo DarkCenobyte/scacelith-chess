@@ -9,7 +9,8 @@
 //                                      static: everything already written
 //   --view close|pad|header|macro|pen|corner|stack|player|overview|table   camera preset (default pad)
 //   --sheet 0|1        the pad the camera looks at (0 = White's, default)
-//   --moves N          plies already written when the demo starts (write: 6, static: 40)
+//   --moves N          plies already written when the demo starts (write, header: 6; turn: 80;
+//                      static: 40)
 //   --s S              turn demo: fixed flip progress in [0,1]
 //   --names latin|cyrillic|arabic|cjk|mixed   player names (default mixed: Latin + Cyrillic)
 //   --style0 N --style1 N              hand styles of White's / Black's sheet (0 Caveat, 1 Marck
@@ -405,5 +406,5 @@ private:
 
 SCACELITH_SCENE("scoresheet",
                 "Scoresheet pads, handwriting reveal, page turn and pen (--demo write|turn|header|static, --view "
-                "close|pad|header|macro|pen|corner|stack|player|overview)",
+                "close|pad|header|macro|pen|corner|stack|player|overview|table)",
                 ScoresheetScene);

@@ -9,6 +9,7 @@
 #include "elo.h"
 #include "game_archive.h"
 #include "game_saving.h"
+#include "game_scene_detail.h"
 #include "../ui/ui_font.h"
 #include "../ui/ui_online.h"
 #include "layout.h"
@@ -28,6 +29,8 @@ using namespace chess;
 
 namespace game {
 
+using namespace scene_detail;
+
 namespace {
 
 constexpr float kFadeOut = 0.8f;          // menu -> black
@@ -35,17 +38,7 @@ constexpr float kFadeIn = 1.6f;           // black -> seated at the table
 constexpr float kFov = 52.0f * DEG;
 constexpr float kEyeLimit = 18.0f * DEG;
 constexpr float kGlanceFov = 24.0f * DEG;  // looking at one's own scoresheet (S): a closer look
-constexpr float kGlanceTime = 0.45f;       // seconds to turn to the scoresheet and back
 constexpr float kEyeFStop = 11.0f;         // the player's eyes at kFov: a 2.2 mm pupil in a bright hall
-
-anim::Task task(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0), float height = 0.0f) {
-    anim::Task k;
-    k.type = t;
-    k.pieceId = pieceId;
-    k.position = pos;
-    k.height = height;
-    return k;
-}
 
 std::vector<std::string> split(const std::string& s, char sep) {
     std::vector<std::string> out;
@@ -117,12 +110,7 @@ std::string trimmed(const std::string& s) {
     return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
 }
 
-// The human's name and handwriting on the scoresheets (Options > Player; "Human" by default, written
-// in the interface language).
-std::string localPlayerName() {
-    const std::string& n = settings().playerName;
-    return n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
-}
+// The human's handwriting style on the scoresheets (Options > Player; the name: localPlayerName).
 int humanHandStyle() { return int(settings().handStyle); }
 
 const char* sideKey(Color c) { return c == White ? "viewer.side.white" : "viewer.side.black"; }
@@ -818,8 +806,8 @@ void GameScene::endGame() {
     // Both players write the result and lay their pen down before shaking hands (an aborted
     // online game has no result).
     endPending_ = false;
-    if (coach()) scorekeeper_.setWriteLimit(-1);  // the last moves are written with the result
     bool noResult = (online() && og_.status == 4) || (replaying() && replayRecord_.result == "*");
+    // The moves still owed (the coach's write limit included) are written before the result.
     scorekeeper_.finishGame(noResult ? std::string() : resultText_);
     audio::playUI(audio::Sfx::GameEnd, 0.7f);
     if (coach()) coachGameOver();  // the coach's closing words, then the handshake (simulate)
@@ -931,8 +919,7 @@ ui::GameOverExtras GameScene::gameOverExtras() const {
         return x;
     }
     if (eloCounted_) {
-        int d = eloAfter_ - eloBefore_;
-        std::string delta = (d > 0 ? "+" : d < 0 ? "\xE2\x88\x92" : "\xC2\xB1") + std::to_string(std::abs(d));
+        std::string delta = signedDelta(eloAfter_ - eloBefore_);
         x.detail = i18n::trf("elo.change", {std::to_string(eloBefore_), std::to_string(eloAfter_), i18n::ltr(delta)});
     } else if (rated_) {
         x.detail = i18n::trf("elo.unrated", {std::to_string(eloBefore_)});
@@ -968,10 +955,11 @@ void GameScene::applySettings(bool displayToo) {
 }
 
 void GameScene::shutdown(AppContext& ctx) {
-    // Closing the game in the middle of a rated game resigns it, like leaving to the menu
-    // (screenshot runs excepted: they stop wherever the capture happens).
+    // Closing the window during a game leaves it the way the menu does: an online game is resigned
+    // (aborted before my first move), a game against Stockfish resigned and rated (screenshot runs
+    // excepted: they stop wherever the capture happens).
     if (!ctx.screenshotMode && online() && link_ && state_ == State::Playing && og_.status == 0) {
-        link_->resign();
+        leaveOngoingOnlineGame();
     } else if (!ctx.screenshotMode && !watching() && !hotSeat() && !coach() && state_ == State::Playing &&
                game_.status() == GameStatus::Ongoing) {
         game_.resign(humanColor_);
@@ -1103,6 +1091,8 @@ bool GameScene::update(AppContext& ctx, float dt) {
             if (hotSeat()) {
                 canOffer = canOffer && drawOfferBy_ < 0 && drawCardFor_ < 0;
                 resignQuestion = i18n::trf("hotseat.confirm.resign", {seats_[inputSeat()].name, seats_[1 - inputSeat()].name});
+            } else {
+                canOffer = canOffer && quietTurn();   // answered at once: not with a move on its way
             }
             switch (menuChoice(ui::pauseMenu(canClaim, canOffer, resignQuestion))) {
             case ui::MenuAction::Resume: paused_ = false; break;
@@ -1426,6 +1416,10 @@ void GameScene::updatePlaying(float dt) {
             // Online the piece is chosen before the pawn moves: the move goes out complete.
             Square to = promoTo_;
             promoTo_ = NoSquare;
+            if (endPending_ || resync_ || og_.status != 0) {   // too late: the game ended, or a resync
+                humanRelease();
+                break;
+            }
             Move mv = game_.position().findLegal(touchedSq_, to, PieceType(choice));
             if (!mv.valid()) break;
             PieceObject* occupant = board_.at(to);
@@ -1837,20 +1831,9 @@ void GameScene::playRobotMove(int seat, const Move& mv) {
     Color side = colorOfSeat(seat);
     arbiter_.touch(game_, mv.from);
     arbiter_.place(game_, mv.to, mv.promotion);
-    int moverId = board_.idAt(mv.from);
-    int victimId = board_.idAt(mv.to);
-    if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
-    Square rookFrom = NoSquare, rookTo = NoSquare;
-    if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
-        int rank = rankOf(mv.from);
-        bool king = (mv.flags & MoveCastleKing) != 0;
-        rookFrom = makeSquare(king ? 7 : 0, rank);
-        rookTo = makeSquare(king ? 5 : 3, rank);
-    }
     std::vector<anim::Task> tasks;
-    tasks.push_back(task(anim::TaskType::Reach, moverId));
-    planPlacement(tasks, moverId, mv.to, victimId, rookFrom, rookTo);
-    if (mv.promotion != NoPiece) planPromotionSwap(tasks, moverId, mv.to, mv.promotion);
+    tasks.push_back(task(anim::TaskType::Reach, board_.idAt(mv.from)));
+    planMove(tasks, mv, side);
     if (!untimed()) {  // untimed: completed as the last piece is released (updatePlaying)
         int half = world_.clockHalfForSeat(seat == 0 ? 1.0f : -1.0f);
         tasks.push_back(task(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)));
@@ -1881,6 +1864,21 @@ float GameScene::carryHeight(vec3 from, vec3 to, int ignoreA, int ignoreB) const
         if (d < layout::PIECE_BASE_RADIUS[p.type] + 0.024f) top = std::max(top, layout::PIECE_HEIGHT[p.type]);
     }
     return std::max(0.022f, top + 0.014f);
+}
+
+void GameScene::planMove(std::vector<anim::Task>& tasks, const Move& mv, Color side, bool lifted) {
+    int moverId = board_.idAt(mv.from);
+    int victimId = board_.idAt(mv.to);
+    if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
+    Square rookFrom = NoSquare, rookTo = NoSquare;
+    if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
+        int rank = rankOf(mv.from);
+        bool king = (mv.flags & MoveCastleKing) != 0;
+        rookFrom = makeSquare(king ? 7 : 0, rank);
+        rookTo = makeSquare(king ? 5 : 3, rank);
+    }
+    planPlacement(tasks, moverId, mv.to, victimId, rookFrom, rookTo, lifted);
+    if (mv.promotion != NoPiece) planPromotionSwap(tasks, moverId, mv.to, mv.promotion);
 }
 
 void GameScene::planPlacement(std::vector<anim::Task>& tasks, int moverId, Square to, int victimId, Square rookFrom,
@@ -2062,8 +2060,8 @@ void GameScene::completeMove(int seat) {
         }
         // Both players record the move on their scoresheet (their writing hands, off the clock).
         // Coach mode: the player's move and the coach's reply stay off the sheets until the
-        // player's next move, while the coach may still take them back (lead decision 4.2); the
-        // rules lesson records nothing.
+        // player's next move, while the coach may still take them back; the rules lesson records
+        // nothing.
         int ply = int(game_.moves().size()) - 1;
         if (coach() && !lesson() && mover == humanColor_) scorekeeper_.setWriteLimit(ply);
         if (!lesson()) scorekeeper_.recordMove(ply, game_.sanMoves().back());
@@ -2266,7 +2264,7 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     float basePitch = kBaseGazePitch + L.pitch - cy * 0.08f;
     L.lookUpLift = lookUpLift(up, basePitch, L.leanSmooth);
     // The coach talking to the player: the view rises to its face as the pointer rests (the
-    // weight is coachFaceLift_, eased in updateCoach; lead decision 4.1).
+    // weight is coachFaceLift_, eased in updateCoach).
     if (coach() && coachFaceLift_ > 0.0f && !dragging_)
         L.lookUpLift = std::max(L.lookUpLift, lookUpLift(smootherstep(coachFaceLift_), basePitch, L.leanSmooth));
     float targetPitch = basePitch + L.lookUpLift;
@@ -2448,6 +2446,11 @@ vec3 GameScene::glanceTarget(int seat) const {
 }
 
 ClockDisplay GameScene::clockDisplay() const {
+    if (online() && !link_ && state_ == State::FadeToMenu) {
+        ClockDisplay d = leaveClock_;   // the game just left (leaveOnlineGame)
+        d.leverSide = leverSide_;
+        return d;
+    }
     if (online() && link_) return onlineClockDisplay();
     if (replaying() && state_ != State::Menu && state_ != State::Loading) return replayClockDisplay();
     ClockDisplay d;

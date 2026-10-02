@@ -257,8 +257,9 @@ same as against Stockfish, with these differences:
   another server id in the WebSocket's `101` answer) ends the session as "unauthorized" instead,
   and the saved sign-in is dropped without being sent.
 - **Esc menu.** Resume, offer draw, claim draw, abort (before my first move, in place of
-  resign), resign, report opponent (server games), options, leave (confirmed: resigns, or aborts
-  before my first move). The clock keeps running behind it.
+  resign), resign, report opponent (server games; sent once the game has ended, the server only
+  taking reports of finished games), options, leave (confirmed: resigns, or aborts before my
+  first move). The clock keeps running behind it.
 - **End.** `GameEnd` waits for the last move to be on the board, then the usual end (result on
   the scoresheets, handshake, game over card) with the online reasons (abandonment, no show,
   aborted...), the rating change from `RatingUpdate` ("Rating: …" until it arrives), rematch and

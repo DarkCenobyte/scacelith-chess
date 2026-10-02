@@ -212,7 +212,8 @@ they do.
   head movements is on (the robot then looks around by itself, as against Stockfish; it still
   moves the pieces with them). The clocks are the server's (they never stop, not even in the Esc
   menu). The ping to the server is in the top right corner. Esc: offer or claim a draw, resign,
-  abort before your first move, report the opponent, leave (which resigns). If your opponent loses
+  abort before your first move, report the opponent, leave (which resigns, or aborts before your
+  first move; closing the window does the same). If your opponent loses
   the connection a banner counts down the time they have to come back; if yours drops, the game
   waits behind a "Reconnecting…" veil and picks up where the server is. The scoresheets are headed
   with the server's name, "Online", the time control, rated or casual, both players with their

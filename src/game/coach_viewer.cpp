@@ -184,7 +184,7 @@ public:
         cam_.update(plat::input());
         std::vector<anim::Event> events;
         for (int seat = 0; seat < 2; ++seat) {
-            // Both look at the board, the coach a little towards the human.
+            // Both look at the board centre.
             anim_[seat].lookAt(vec3(0.0f, layout::BOARD_TOP_Y, 0.0f));
             anim_[seat].update(dt, events);
         }

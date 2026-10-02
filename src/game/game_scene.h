@@ -47,11 +47,15 @@
 // Command line (development and screenshots):
 //   --start                 skip the menu: a game against Stockfish (--human white|black)
 //   --start --coach         skip the menu: a coach game (--coach-level N, 0 = the rules lesson,
-//                           1..6; --coach-colour white|black); the [coach] settings otherwise
-//   --coach-dir <path>      the folder of the coach's voice files (default: coach/ beside the exe)
+//                           1..6; --coach-colour white|black, or --coach-color); the [coach]
+//                           settings otherwise
+//   --coach-dir <path>      the folder of the coach's voice files
+//                           (default: <application data>/coach/, see tts/model_store.h)
 //   --coach-stage-test      a coach game whose Stage performs a fixed sequence (a spoken line with
 //                           its subtitle, pointing, a knight's trace, marks, two demonstration
-//                           moves and their rewind, the takeback card), without the session
+//                           moves and their rewind, the takeback card), without the session;
+//                           --coach-stage-test lesson: on the rules lesson's first position
+//   --coach-auto-answer yes|no   the takeback card answers itself after 1.5 s (with --play)
 //   --start --hotseat       skip the menu: a hot-seat game (--white-name N --black-name N,
 //                           --clock-right white|black, --rated, --handover <s> with 0 = a cut)
 //   --play e2e4,e7e5,...    the human player(s) make these moves by hand, one per turn (touch,
@@ -145,14 +149,10 @@ public:
     void renderOverlay(AppContext& ctx, float dt) override;
     void shutdown(AppContext& ctx) override;
 
-    // ---- For the scoresheets and the hot-seat mode ----
-    const Seat& seat(int index) const { return seats_[index & 1]; }
-    GameMode mode() const { return mode_; }
-    int round() const { return round_; }   // games started this session (scoresheet "Round")
+    // ---- For the hot-seat mode ----
     // Clock freeze (hot-seat handover): while frozen the running clock does not count (neither its
     // time nor its delay window) and the next player does not act yet. See docs/MULTIPLAYER_PLAN.md.
     void setClockFrozen(bool frozen) { clockFrozen_ = frozen; }
-    bool clockFrozen() const { return clockFrozen_; }
 
 private:
     static constexpr float kBaseGazePitch = -0.62f;  // looking down at the board from the chair
@@ -205,6 +205,9 @@ private:
     void simulate(float dt);
     void updatePlaying(float dt);
     bool isHumanTurn() const;
+    // No move on its way between the board and the clock: a draw agreed now leaves on the board
+    // what game_ has.
+    bool quietTurn() const { return turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched || turn_ == Turn::AiThinking; }
     void updateHumanInput();
     void offerDraw();
     void updateAi(float dt);
@@ -228,6 +231,9 @@ private:
     // already in the air (an online opponent's piece held live), no Lift.
     void planPlacement(std::vector<anim::Task>& tasks, int moverId, chess::Square to, int victimId,
                        chess::Square rookFrom, chess::Square rookTo, bool lifted = false);
+    // The move 'mv' of 'side' from the piece in hand to the board (placement, capture, castling
+    // rook, promotion swap), without the clock press; 'lifted' as for planPlacement.
+    void planMove(std::vector<anim::Task>& tasks, const chess::Move& mv, chess::Color side, bool lifted = false);
     void planPromotionSwap(std::vector<anim::Task>& tasks, int pawnId, chess::Square sq, chess::PieceType newType);
     float carryHeight(m::vec3 from, m::vec3 to, int ignoreA, int ignoreB) const;
     m::vec3 jitteredSquare(chess::Square sq);
@@ -263,7 +269,6 @@ private:
     bool autoPressClock() const;
     ai::ClockInfo clockInfo() const;
     chess::TimeControl chosenTimeControl() const;
-    ai::EngineSettings chosenEngineSettings() const { return engineSettingsFor(setup_.difficulty); }
     ai::EngineSettings engineSettingsFor(int preset) const;
     m::vec2 cursorPixels() const;             // the pointer (physical pixels), or --mouse
     m::Ray mouseRay() const;
@@ -324,9 +329,6 @@ private:
     void onlineGameEvent(const net::Event& e);
     void rebuildOnline();                     // board, game and sheets from og_ (no animation)
     void startRemoteMove();
-    // The opponent's move 'mv' from the piece in hand to the board (placement, capture, castling
-    // rook, promotion swap), without the clock press; 'lifted': the piece is already in the air.
-    void planRemoteMove(std::vector<anim::Task>& tasks, const chess::Move& mv, bool lifted);
     // My move chosen: sent at once when the robots press the clock by themselves, otherwise staged
     // on the board until my clock press sends it (pressOnlineClock, at the lever contact).
     void placeOnlineMove(const chess::Move& mv);
@@ -355,7 +357,10 @@ private:
     void onlineResult();                      // result texts of og_ (endGame)
     void updateOnlineInput();                 // Esc menu, draw offer, report dialog (Playing)
     void updateOnlineGameOver();              // game over card, rematch, report, challenges
+    bool updateReportDialog();                // the report dialog, while it is open (true)
+    void sendReport();                        // the report filled in, to the server (ReportResult)
     void leaveOnlineGame();                   // back to the menu
+    void leaveOngoingOnlineGame();            // aborts before my first move, else resigns
     void drawOnlineHud();                     // ping, banners, first-move countdown
     ClockDisplay onlineClockDisplay() const;
     ui::GameOverExtras onlineGameOverExtras() const;
@@ -386,7 +391,7 @@ private:
     void endLesson();                         // the rules lesson is over: its own ending
     bool coachEndCardReady() const;           // GameOver: the coach has said everything
     bool coachHandshakeWanted() const;        // GameOver: the closing words are said
-    bool coachHoldsMove() const;              // updateAi: the coach's move waits (review, hands)
+    bool coachHoldsMove() const;              // updateAi: the coach's move waits (review, hands, draw offer)
     bool coachMayTouch() const;               // the player may touch a piece now
     void coachPlayerTouched();                // humanTouch(): the session hears of it
     void coachIllegalAttempt(chess::Square from, chess::Square to);
@@ -594,10 +599,10 @@ private:
     replay::ReplayClock replayClock_;   // when its moves are played, what its clocks show
     replay::Speed replaySpeedArg_ = replay::Speed::X1;   // --replay-speed
     bool replayPausedArg_ = false;      // --replay-paused
-    float replayMoveAt_ = 0.0f;
+    float replayMoveAt_ = 0.0f;         // time_ when the robot began the move being played (log)
     std::vector<std::string> replayKeys_;   // --replay-keys
     size_t replayKeysPos_ = 0;
-    float replayKeyWait_ = 0.0f;         // time_ when the robot began the move being played (log)
+    float replayKeyWait_ = 0.0f;        // seconds before the next --replay-keys key
 
     // UI
     bool showMoveList_ = false;
@@ -627,6 +632,7 @@ private:
     std::string pendingFen_;            // the position before it (the authority checks its digest)
     uint32_t pendingThinkMs_ = 0;
     live::ClockFreeze clockFreeze_;     // my clock display while my move is on its way
+    ClockDisplay leaveClock_;           // the clock as the game was left (the fade to the menu)
     bool virtualTime_ = false;          // screenshots, --warp: localMs() follows the simulated time
     // Manual clock press (og_.autoPress off): my move stands on the board until my press.
     bool moveStaged_ = false;
@@ -671,9 +677,10 @@ private:
     int ratingBefore_ = 0, ratingAfter_ = 0;
     bool rematchAsked_ = false, rematchOffered_ = false, rematchGone_ = false;
     bool reportOpen_ = false, reported_ = false;
+    bool reportQueued_ = false;         // filled in during the game: sent once it has ended
+    bool reportSending_ = false;        // sent, its ReportResult awaited
     int reportCategory_ = 0;
     std::string reportComment_;
-    bool onlinePauseLeave_ = false;
     std::string startOnline_;           // --start-online category
     std::string startTouch_;            // --start-online with --touch <square>: touched once idle
     float fadeDip_ = 0.0f;              // short darkening while the board is rebuilt

@@ -4,7 +4,8 @@
 // - The player is White, the coach Black. Legal-move hints are forced on, so illegal placements
 //   are refused before the arbiter: report each refused (from, to) to explainIllegal().
 // - Touch-move is relaxed: a piece put back on its square is released (Arbiter::reset(game)).
-// - Nothing is recorded: Scorekeeper::setWriteLimit(0), no clock, no rating, and positions that
+// - Nothing is recorded: the scene skips the scorekeeper for the lesson (no header, no recording,
+//   no moves; GameScene's !lesson() guards), no clock, no rating, and positions that
 //   are over on load (8.1 stalemate, 8.3 two kings) or after a move (mates, the stalemate
 //   exercise) never trigger the end-of-game flow; Game::undo works on a finished game.
 // - SetPosition: Game::resetFromFEN + Arbiter::reset + PhysicalBoard::syncTo behind a fade.

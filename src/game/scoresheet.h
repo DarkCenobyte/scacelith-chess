@@ -11,7 +11,8 @@
 //     every frame: float t = animator.writingPathTime(); if (t >= 0) sheet.setWritingTime(t);
 //     on the animator's WritingDone event: sheet.finishEntry();
 // Entries are queued in the order they were begun: setWritingTime() drives the oldest unfinished
-// one, finishEntry() completes it (its ink becomes part of the page).
+// one, finishEntry() completes it (its ink becomes part of the page). Every begin call queues one,
+// even with nothing drawable (an empty path, no ink): one finishEntry() per begin call.
 //
 // Turning a page (before the first move of page 2, 3...):
 //     if (sheet.pageTurnNeeded(ply)) {
@@ -89,7 +90,6 @@ public:
     // Time along the oldest unfinished entry's path (animator.writingPathTime()); t < 0 is ignored.
     void setWritingTime(float t);
     void finishEntry();                   // completes the oldest unfinished entry
-    int pendingEntries() const;
     // Pen path of the entry being written (the oldest unfinished one; page mm and path seconds, as
     // setWritingTime() counts them), nullptr when none: sizes the writing sound on PenDown
     // (sheet::penStrokeSound).
@@ -127,7 +127,7 @@ public:
 
     // ---- Frame ----
     void update();                        // GL: renders the page / entry textures that changed
-    // Pad and pages (objectIdBase .. objectIdBase + 15).
+    // Pad and pages (objectIdBase .. objectIdBase + 4 + the number of pages turned).
     void submit(render::Renderer& r, uint32_t objectIdBase) const;
     // The ballpoint pen at any transform (pen frame: tip at the origin, +Y to the back end).
     // Shared geometry (built on first use, GL context). prevPenToWorld: previous frame's

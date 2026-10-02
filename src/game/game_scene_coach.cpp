@@ -12,6 +12,7 @@
 // untimed game completes any AiMoving move once its pieces are down).
 #include "game_scene.h"
 #include "coach_model.h"
+#include "game_scene_detail.h"
 #include "../audio/audio.h"
 #include "../character/skeleton.h"
 #include "../coach/catalog.h"
@@ -28,7 +29,6 @@
 #include "../tts/tts.h"
 #include "../ui/ui_font.h"
 #include "layout.h"
-#include "look_up.h"
 #include "settings.h"
 #include <algorithm>
 #include <cmath>
@@ -41,6 +41,8 @@ using namespace chess;
 
 namespace game {
 
+using namespace scene_detail;
+
 namespace {
 
 // Demonstration moves: slower than a move in play (anim::Timing), so the player can follow them.
@@ -52,27 +54,15 @@ constexpr float kSetupFadeOut = 0.30f, kSetupFadeIn = 0.45f;
 constexpr float kGestureApproach = anim::Timing::PointApproach;
 constexpr float kBeatDuration = 1.35f;    // three strokes; the first one lands after 0.27 s
 constexpr float kNodApex = 0.2f;          // a nod is at its lowest this long after it starts
-// The view's lift to the coach's face (lead decision §4.1): after the pointer has rested this long.
+// The view's lift to the coach's face: after the pointer has rested this long.
 constexpr float kFaceLiftIdle = 1.5f;
 // Failsafes of the end of a coach game, should the session never get there.
 constexpr float kHandshakeFailsafe = 45.0f, kEndCardFailsafe = 300.0f;
 
-anim::Task task(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0), float height = 0.0f, float duration = 0.0f) {
-    anim::Task k;
-    k.type = t;
-    k.pieceId = pieceId;
-    k.position = pos;
-    k.height = height;
-    k.duration = duration;
-    return k;
-}
-
-std::string playerName() {
-    const std::string& n = settings().playerName;
-    return n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
-}
-
 float smooth01(float x) { return x <= 0.0f ? 0.0f : x >= 1.0f ? 1.0f : x * x * (3.0f - 2.0f * x); }
+
+// The TTS speed of a coach game's lines: the rules lesson speaks slower.
+float speechSpeed(int level) { return level == 0 ? coach::kLessonSpeechSpeed : 1.0f; }
 
 }  // namespace
 
@@ -135,7 +125,7 @@ struct CoachRuntime {
     Square lookSquare = NoSquare;
     float lookHold = 0.0f;                            // the look holds while the coach talks, then this long
     bool handOut = false;                             // gestures given since the last retract
-    std::vector<std::pair<float, bool>> headMoves;    // (game time, nod?) still to come
+    std::vector<std::pair<float, bool>> headMoves;    // (the coach's animator time, nod?) still to come
     vec2 lastPointer{-1.0f, -1.0f};
     float pointerIdle = 0.0f;
 
@@ -443,7 +433,8 @@ public:
             break;
         case coach::GestureKind::Nod:
         case coach::GestureKind::ShakeHead:
-            r.headMoves.push_back({s_.time_ + std::max(0.0f, apexIn - kNodApex), g.kind == coach::GestureKind::Nod});
+            // On the animator's clock, like the hand: it stops with the pause menu, and so does the voice.
+            r.headMoves.push_back({now + std::max(0.0f, apexIn - kNodApex), g.kind == coach::GestureKind::Nod});
             return;
         }
         a.enqueue(t);
@@ -602,6 +593,10 @@ void GameScene::refreshCoachVoice() {
     // not load are checked by the next download (coach_model.h).
     if (coachVoiceFiles_ && coach_ && coach_->workerStarted && coach_->worker.failed()) coachModelLoadFailed();
     coachVoiceFiles_ = coachVoiceWanted();
+    // Switched on, or downloaded, during a coach game: its worker starts now, at the speed of its
+    // lines (the director asks for speech only once the voice is available).
+    if (coachVoiceFiles_ && coach() && coach_ && coach_->sessionRunning && !coach_->workerStarted)
+        coach_->stage->ensureWorker(coach_->session.director().config().speed);
 }
 
 bool GameScene::coachVoiceExpected() const {
@@ -620,7 +615,6 @@ CoachRuntime& GameScene::coachRuntime() {
         coach::OpeningBook::instance();
         coach::OpeningTexts::instance();
     });
-    rt.stage->ensureWorker(1.0f);   // the voice loads while the lights go down
     return rt;
 }
 
@@ -630,6 +624,9 @@ void GameScene::setupCoachGame() {
     leaveCoachGame();
     const Settings& s = settings();
     coachLevel_ = coachArgs_.level >= 0 ? coachArgs_.level : std::clamp(s.coachLevel, 0, ai::kCoachLevels - 1);
+    // The voice loads while the lights go down, at the speed of this game's lines (a worker started
+    // at another speed would load the model again when the first line is asked for).
+    rt.stage->ensureWorker(speechSpeed(coachLevel_));
     int colour = coachArgs_.colour >= 0 ? coachArgs_.colour
                  : s.coachColour == 0 || s.coachColour == 1 ? s.coachColour
                                                              : (s.coachNextColour == 1 ? 1 : 0);
@@ -657,7 +654,7 @@ void GameScene::configureCoachSeats() {
         st.playHand = hand;
         if (st.color == humanColor_) {
             st.controller = Controller::Human;
-            st.name = playerName();
+            st.name = localPlayerName();
             st.elo = s.playerElo;
             st.provisional = s.playerRecord().provisional();
         } else {
@@ -692,7 +689,7 @@ void GameScene::startCoachGame() {
     c.human = humanColor_;
     c.director.uiLanguage = i18n::language();
     c.director.subtitles = s.subtitles;
-    c.director.speed = coachLevel_ == 0 ? coach::kLessonSpeechSpeed : 1.0f;
+    c.director.speed = speechSpeed(coachLevel_);
     c.introduceLevel = s.coachHistory.empty() || s.coachHistory.back().level != coachLevel_;
     c.offersEnabled = true;
     for (const Settings::CoachGame& g : s.coachHistory) c.history.push_back({g.level, g.result, g.accuracy});
@@ -853,6 +850,7 @@ bool GameScene::coachHoldsMove() const {
     if (rt.test) return true;   // the stage test owns the table
     if (rt.sessionRunning && !rt.session.coachMayMove()) return true;
     if (rt.jobRunning || !rt.jobs.empty()) return true;
+    if (rt.drawAnalysis) return true;   // it answers a draw offer before it plays on
     // Its hand first finishes what it shows (a gesture's hold ends with the line, see updateCoach).
     return anim_[aiSeat()].busy();
 }
@@ -883,8 +881,7 @@ bool GameScene::coachCanTakeBack() const {
         turn_ == Turn::HumanPromotion || turn_ == Turn::HumanPlaced || !rt.session.canTakeBack(game_))
         return false;
     // Back to the player's last move: possible only while neither scoresheet has begun writing it
-    // (the write limit keeps it and the coach's reply off the sheets until the player's next move;
-    // lead decision §4.2).
+    // (the write limit keeps it and the coach's reply off the sheets until the player's next move).
     int n = int(game_.moves().size());
     int last = n - 1;
     if (last >= 0 && game_.positionAt(size_t(last)).sideToMove() != humanColor_) --last;
@@ -930,7 +927,7 @@ void GameScene::updateCoach(float dt) {
     const bool hold = frozen || focusLost;
     if (hold != rt.held) {
         // The pause menu, or the window in the background: the voice pauses, the director holds
-        // between beats (the game has no clock to stop; lead decision §4.3).
+        // between beats (the game has no clock to stop).
         rt.held = hold;
         if (rt.sessionRunning) rt.session.setPaused(hold);
         rt.voicePausedByScene = hold;
@@ -980,8 +977,8 @@ void GameScene::updateCoach(float dt) {
         if (rt.sessionRunning) rt.session.onOfferAnswer(game_, coachArgs_.autoAnswer == 1);
     }
 
-    // The draw offer's evaluation.
-    if (rt.drawAnalysis && engine_.analysisReady(rt.drawAnalysis)) {
+    // The draw offer's evaluation, answered once no move is on its way (see quietTurn).
+    if (rt.drawAnalysis && (state_ != State::Playing || quietTurn()) && engine_.analysisReady(rt.drawAnalysis)) {
         ai::Analysis a;
         bool accept = false;
         if (engine_.takeAnalysis(rt.drawAnalysis, a) && a.ok && !a.lines.empty() && rt.drawPly == int(game_.moves().size())) {
@@ -994,7 +991,9 @@ void GameScene::updateCoach(float dt) {
             LOGI("coach: draw offer %s (%d cp for the coach)", accept ? "accepted" : "declined", coachCp);
         }
         rt.drawAnalysis = 0;
-        if (state_ == State::Playing && rt.drawPly == int(game_.moves().size())) {
+        // An offer the game went past lapsed (the player moved or took a move back since; the
+        // coach's own move waits for its answer, see coachHoldsMove): it is answered as declined.
+        if (state_ == State::Playing) {
             ui::notify(i18n::tr(accept ? "notify.draw_accepted" : "notify.draw_declined"), 3.0f);
             if (rt.sessionRunning) rt.session.onDrawAnswer(accept);
             if (accept) {
@@ -1007,7 +1006,7 @@ void GameScene::updateCoach(float dt) {
     // The coach's body: head gestures on their word, a blink at each phrase end, the look.
     anim::Animator& a = anim_[aiSeat()];
     for (size_t i = 0; i < rt.headMoves.size();) {
-        if (time_ >= rt.headMoves[i].first) {
+        if (a.time() >= rt.headMoves[i].first) {
             if (rt.headMoves[i].second) a.nod();
             else a.shakeHead();
             rt.headMoves.erase(rt.headMoves.begin() + long(i));
@@ -1032,7 +1031,7 @@ void GameScene::updateCoach(float dt) {
         stage.endGestures();
 
     // The view rises gently to the coach's face while it talks to the player, once the pointer has
-    // rested for a moment and nothing is in hand (lead decision §4.1).
+    // rested for a moment and nothing is in hand.
     const plat::Input& in = plat::input();
     vec2 p = cursorPixels();
     if (length(p - rt.lastPointer) > 2.0f || in.mouseDown[plat::MOUSE_RIGHT]) rt.pointerIdle = 0.0f;
@@ -1049,7 +1048,7 @@ void GameScene::updateCoach(float dt) {
         stage.mouth(pos, facing);
         audio::setVoicePose(rt.voice, pos, facing);
     }
-    // Board coordinates: the option, forced on for the lesson and the first levels (§4.4).
+    // Board coordinates: the option, forced on for the lesson and the first levels.
     world_.setBoardCoordinates(settings().showCoordinates || coachLevel_ <= 2);
 
     // The end of the game: the handshake once wanted (simulate enqueues it), then the appraisal.
@@ -1125,7 +1124,7 @@ void GameScene::coachPauseMenuFrame() {
     CoachRuntime& rt = coachRuntime();
     ui::CoachPause cp;
     cp.canTakeBack = coachCanTakeBack();
-    cp.canOfferDraw = !lesson() && drawOfferPly_ != int(game_.moves().size()) && !rt.drawAnalysis;
+    cp.canOfferDraw = !lesson() && drawOfferPly_ != int(game_.moves().size()) && !rt.drawAnalysis && quietTurn();
     cp.canClaimDraw = !lesson() && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
     cp.canResign = !lesson();
     switch (menuChoice(ui::coachPauseMenu(cp))) {
@@ -1419,7 +1418,7 @@ void GameScene::runCoachTable(float dt) {
             }
             if (job.kind == TableJob::Kind::TakeBack) {
                 int n = int(game_.moves().size());
-                int k = std::min(job.plies, lesson() ? n : n);
+                int k = std::min(job.plies, n);
                 if (k <= 0) {
                     finish();
                     return;
@@ -1430,7 +1429,7 @@ void GameScene::runCoachTable(float dt) {
                     back.push_back({before, seatOf(before.sideToMove()), false});
                 }
                 // Game: the record as if the moves had never been played; the sheets forget them
-                // (they were never written: the write limit, §4.2).
+                // (they were never written: the write limit).
                 if (turn_ == Turn::HumanTouched) humanRelease();
                 game_.undo(k);
                 // The saved game's move times follow the game: one per move played.
@@ -1556,21 +1555,9 @@ void GameScene::runCoachTable(float dt) {
                 finish();
                 return;
             }
-            Color side = game_.position().sideToMove();
-            int moverId = board_.idAt(mv.from);
-            int victimId = board_.idAt(mv.to);
-            if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
-            Square rookFrom = NoSquare, rookTo = NoSquare;
-            if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
-                int rank = rankOf(mv.from);
-                bool king = (mv.flags & MoveCastleKing) != 0;
-                rookFrom = makeSquare(king ? 7 : 0, rank);
-                rookTo = makeSquare(king ? 5 : 3, rank);
-            }
             std::vector<anim::Task> ts;
-            ts.push_back(task(anim::TaskType::Reach, moverId));
-            planPlacement(ts, moverId, mv.to, victimId, rookFrom, rookTo);
-            if (mv.promotion != NoPiece) planPromotionSwap(ts, moverId, mv.to, mv.promotion);
+            ts.push_back(task(anim::TaskType::Reach, board_.idAt(mv.from)));
+            planMove(ts, mv, game_.position().sideToMove());
             ts.push_back(task(anim::TaskType::Retract));
             coachHand.enqueue(ts);
             rt.lessonMove = mv;
