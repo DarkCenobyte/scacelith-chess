@@ -147,7 +147,6 @@ private:
     uint64_t colorBB_[2] = {0, 0};                 // occupancy per colour
     uint64_t typeBB_[7] = {0, 0, 0, 0, 0, 0, 0};   // occupancy per piece type (index = PieceType)
     void recomputeHash();
-    void pseudoMoves(std::vector<Move>& out) const;
     void clear();
     void putPiece(Square s, Piece p);
     void removePiece(Square s);

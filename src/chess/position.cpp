@@ -463,12 +463,6 @@ int Position::generateLegal(Move* out) const {
     return m;
 }
 
-void Position::pseudoMoves(std::vector<Move>& out) const {
-    Move buf[kMaxMoves];
-    const int n = generatePseudo(buf);
-    out.assign(buf, buf + n);
-}
-
 std::vector<Move> Position::legalMoves() const {
     Move buf[kMaxMoves];
     const int n = generateLegal(buf);
