@@ -8,8 +8,6 @@
 # the title face (Cinzel) is an inscriptional capital face.
 # Keep the sections: other parts of the game add their keys in sections of their own.
 
-language.name = English
-
 # ---- Common words ------------------------------------------------------------------------------
 common.on = On
 common.off = Off

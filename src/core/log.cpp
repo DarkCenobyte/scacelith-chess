@@ -11,9 +11,10 @@ static std::mutex g_mutex;
 static FILE* g_file = nullptr;
 static auto g_start = std::chrono::steady_clock::now();
 
-void init(const char* path) {
+bool init(const char* path) {
     std::lock_guard<std::mutex> lk(g_mutex);
     if (path) g_file = std::fopen(path, "w");
+    return g_file != nullptr;
 }
 
 void shutdown() {

@@ -1,7 +1,5 @@
 # Scacelith - 简体中文
-# assets/i18n/en.lang 的翻译（相同的键，相同的 {n}）。无复数形式（1 种形式）。
-
-language.name = 简体中文
+# Translation of assets/i18n/en.lang (same keys, same {n}). No plural forms (a single form).
 
 # ---- Common words ------------------------------------------------------------------------------
 common.on = 开

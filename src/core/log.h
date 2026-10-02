@@ -1,12 +1,13 @@
 // Logging. Never use std::cout / std::cin anywhere in the game: those streams are owned by the
 // embedded Stockfish engine (see ai/). Log lines go to stderr, to OutputDebugString on Windows
-// and to scacelith.log next to the executable.
+// and to scacelith.log next to the executable (in the user data directory when the executable's
+// folder is read-only, see main.cpp).
 #pragma once
 #include <cstdarg>
 
 namespace logx {
 enum class Level { Debug, Info, Warn, Error };
-void init(const char* logFilePath);  // nullptr = no file
+bool init(const char* logFilePath);  // nullptr = no file; false when no log file is open
 void shutdown();
 void write(Level lvl, const char* fmt, ...)
 #if defined(__GNUC__)

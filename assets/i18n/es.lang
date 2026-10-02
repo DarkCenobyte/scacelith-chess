@@ -1,7 +1,5 @@
 # Scacelith - Español
-# Traducción de assets/i18n/en.lang (mismas claves, mismos {n}). Plural: uno|varios.
-
-language.name = Español
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other.
 
 # ---- Common words ------------------------------------------------------------------------------
 common.on = Sí

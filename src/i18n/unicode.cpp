@@ -66,13 +66,6 @@ std::string encode(const std::u32string& t) {
     return out;
 }
 
-size_t length(const std::string& s) {
-    size_t n = 0;
-    for (char c : s)
-        if ((static_cast<unsigned char>(c) & 0xC0) != 0x80) ++n;
-    return n;
-}
-
 // ---- Scripts ----------------------------------------------------------------------------------------
 bool isArabic(char32_t c) {
     return (c >= 0x0600 && c <= 0x06FF) || (c >= 0x0750 && c <= 0x077F) || (c >= 0x08A0 && c <= 0x08FF) ||

@@ -16,7 +16,6 @@ namespace uni {
 std::u32string decode(const std::string& utf8);
 std::string encode(const std::u32string& text);
 void append(std::string& out, char32_t cp);
-size_t length(const std::string& utf8);  // number of codepoints
 
 // ---- Scripts -----------------------------------------------------------------------------------------
 bool isArabic(char32_t cp);         // Arabic blocks, including the presentation forms

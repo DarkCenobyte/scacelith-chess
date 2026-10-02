@@ -11,6 +11,10 @@
 struct AppContext {
     render::Renderer* renderer = nullptr;
     bool screenshotMode = false;   // deterministic run (fixed dt, no vsync)
+    // This frame's time for chess clocks: the real time, capped at 2 s where the scenes' dt stops
+    // at 0.1 s (slow frames, a window dragged), so the clocks keep up with the wall clock. The
+    // fixed dt in screenshot mode.
+    float clockDt = 0.0f;
     float fixedTime = -1.0f;       // --time: start time for deterministic scenes
     std::vector<std::string> args; // raw command line (scenes may parse extra options)
     bool hasArg(const std::string& a) const;

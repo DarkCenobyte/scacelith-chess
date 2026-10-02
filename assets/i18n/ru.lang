@@ -1,8 +1,6 @@
 # Scacelith - Русский
-# Перевод assets/i18n/en.lang (те же ключи, те же {n}). Множественное число: один|несколько|много
-# (1 ход | 2 хода | 5 ходов).
-
-language.name = Русский
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals have three forms:
+# one (1, 21, 31...)|few (2-4, 22-24...)|many (0, 5-20, 25-30...).
 
 # ---- Common words ------------------------------------------------------------------------------
 common.on = Вкл.

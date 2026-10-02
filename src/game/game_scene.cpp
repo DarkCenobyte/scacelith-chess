@@ -1200,6 +1200,7 @@ bool GameScene::update(AppContext& ctx, float dt) {
         osCursorHidden_ = hideArrow;
     }
 
+    clockDt_ = ctx.clockDt;
     simulate(dt);
     return keepRunning;
 }
@@ -1223,6 +1224,7 @@ void GameScene::runWarp(float seconds) {
         if (state_ == State::GameOver && stateTime_ > 1.0f && (!coach() || coachEndCardReady()) &&
             !(replaying() && replayKeysPos_ < replayKeys_.size()))
             break;
+        clockDt_ = step;
         simulate(step);
     }
 }
@@ -1372,10 +1374,10 @@ void GameScene::updatePlaying(float dt) {
         updateReplay(dt);
         return;
     }
-    // Clock (online: the server's, see onlineClockDisplay())
+    // Clock (online: the server's, see onlineClockDisplay()): the real time, not the capped dt
     if (clock_.isRunning() && !online()) {
-        hotseat::advanceClock(clock_, clockAccumMs_, dt, clockFrozen_);
-        plyElapsedMs_ += double(dt) * 1000.0;  // what the clock counted: the move's time (saved games)
+        hotseat::advanceClock(clock_, clockAccumMs_, clockDt_, clockFrozen_);
+        plyElapsedMs_ += double(clockDt_) * 1000.0;  // what the clock counted: the move's time (saved games)
         Color r = clock_.running();
         if (!clock_.timeControl().unlimited && clock_.flagged(r)) {
             game_.flagFall(r);

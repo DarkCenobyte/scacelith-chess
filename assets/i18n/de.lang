@@ -1,7 +1,5 @@
 # Scacelith - Deutsch
-# Übersetzung von assets/i18n/en.lang (gleiche Schlüssel, gleiche {n}). Plural: eins|mehrere.
-
-language.name = Deutsch
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other.
 
 # ---- Common words ------------------------------------------------------------------------------
 common.on = Ein

@@ -4,8 +4,6 @@
 # zero|one|two|few (3-10)|many (11-99)|other (100, 101, 102...).
 # U+200F (right-to-left mark) keeps a parenthesis after a Latin word on the Arabic side.
 
-language.name = العربية
-
 # ---- Common words ------------------------------------------------------------------------------
 common.on = تشغيل
 common.off = إيقاف

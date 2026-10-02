@@ -482,6 +482,32 @@ TEST(tar_reader_rejects_damage) {
     huge.header("././@LongLink", 'L', 5u << 20);
     r = readTar(huge.data);
     CHECK(!r.error.empty());
+    // pax numbers are plain decimals: a sign would wrap the arithmetic (a record looping back to
+    // an earlier one, a read before the text, a size of 2^64 - 1).
+    for (const char* bad : {"6 a=b\n6 c=d\n-6 z\n", "20 a=bbbbbbbbbbbbbb\n-20 z\n", "11 size=-1\n", " 7 a=b\n"}) {
+        TarBuilder pax;
+        pax.file("PaxHeader", bad, 'x');
+        pax.file("x", "data");
+        pax.end();
+        r = readTar(pax.data);
+        CHECK_EQ(r.entries.size(), size_t(0));
+        CHECK_EQ(r.error, std::string("bad pax header"));
+    }
+    TarBuilder zeros;   // leading zeros are fine; the pax size wins over the header's
+    zeros.file("PaxHeader", "011 size=4\n", 'x');
+    zeros.header("x", '0', 9);
+    zeros.body("data");
+    zeros.end();
+    r = readTar(zeros.data);
+    CHECK_EQ(r.error, std::string(""));
+    CHECK(r.entries.size() == 1 && r.entries[0].size == 4 && r.contents[0] == "data");
+    TarBuilder unset;   // an empty value deletes the keyword (POSIX): the header's size counts
+    unset.file("PaxHeader", "10 size=9\n8 size=\n", 'x');
+    unset.file("x", "data");
+    unset.end();
+    r = readTar(unset.data);
+    CHECK_EQ(r.error, std::string(""));
+    CHECK(r.entries.size() == 1 && r.entries[0].size == 4 && r.contents[0] == "data");
 }
 
 TEST(tar_safe_paths) {

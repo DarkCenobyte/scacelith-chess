@@ -297,7 +297,6 @@ TEST(unicode_utf8_roundtrip) {
     std::u32string u = U(s);
     CHECK_EQ(int(u.size()), 18);
     CHECK_EQ(uni::encode(u), std::string(s));
-    CHECK_EQ(int(uni::length(s)), 18);
     CHECK(U("\xC3")[0] == 0xFFFD);          // truncated sequence
     CHECK(U("\xC0\xAF")[0] == 0xFFFD);      // overlong
 }
