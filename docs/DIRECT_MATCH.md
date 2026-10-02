@@ -55,7 +55,8 @@ WANPPPConnection) and asks:
 
 - `GetExternalIPAddress` for the public address;
 - `AddPortMapping` TCP *external port -> this machine's address, same port*, description
-  "Scacelith direct match", lease 3600 s renewed every 30 minutes. A router that only accepts
+  "Scacelith direct match", lease 3600 s renewed every 30 minutes (every minute after a failure,
+  until the lease ends; the hosting page then says the router refused). A router that only accepts
   permanent leases (error 725) gets lease 0; a port already mapped to another machine (error 718)
   makes the game move to the next free port (at most 10 attempts), and the invitation shows it;
 - `DeletePortMapping` when the match ends or the game closes. If the game crashes, a 3600 s lease
@@ -206,7 +207,7 @@ Limits, accepted for a friendly unrated game:
 | guest disconnection grace | 60 s |
 | rematch window | 60 s |
 | UPnP discovery / HTTP exchange | 2.5 s / 3 s |
-| UPnP lease / renewal | 3600 s / every 30 min |
+| UPnP lease / renewal | 3600 s / every 30 min (every 60 s after a failure, until the lease ends) |
 
 ## Not supported
 

@@ -38,6 +38,7 @@ constexpr int kMaxMsgPerSec = 20;          // announced in Welcome; twice as man
 constexpr int kGestureRate = 10;           // Gestures per second each way (Welcome.gestureRate)...
 constexpr int kGestureBurst = 20;          // ...with bursts up to this many (Welcome.gestureBurst)
 constexpr int64_t kRenewEveryMs = 30 * 60 * 1000;
+constexpr int64_t kRenewRetryMs = 60 * 1000;   // after a failed renewal, until the lease has ended
 constexpr size_t kMaxOutbox = 1 << 20;
 constexpr int64_t kDefaultGraceMs = 60000;
 constexpr size_t kMaxQueuedCommands = 32;
@@ -522,7 +523,10 @@ private:
     bool mapped_ = false;
     upnp::Gateway gw_;
     upnp::Mapping mapping_;
-    int64_t renewAt_ = 0;
+    int64_t renewAt_ = 0, renewStart_ = 0, leaseEnd_ = 0;
+    bool leaseLost_ = false;
+    enum RenewResult : int { RenewPending, RenewOk, RenewFailed };
+    std::atomic<int> renewResult_{RenewPending};   // set by renewThread_
     std::thread renewThread_;
 
     void run() override {
@@ -603,7 +607,9 @@ private:
             upnpStatus.externalPort = mp.externalPort;
             mapped_ = true;
             mapping_ = mp;
-            renewAt_ = sock::steadyMs() + kRenewEveryMs;
+            const int64_t t = sock::steadyMs();
+            renewAt_ = t + kRenewEveryMs;
+            leaseEnd_ = t + int64_t(mp.leaseSec) * 1000;
             LOGI("direct: UPnP: %s maps %s:%u -> %s:%u (lease %u s)", routerName.c_str(), ip.c_str(), unsigned(mp.externalPort),
                  mp.internalClient.c_str(), unsigned(mp.internalPort), unsigned(mp.leaseSec));
         } else {
@@ -676,6 +682,7 @@ private:
             }
             if (guest_ && now >= nextPing_) sendPing(now);
             sendGesture(now);
+            if (mapped_ && mapping_.leaseSec) renewed(now);
             if (mapped_ && mapping_.leaseSec && now >= renewAt_) renew(now);
             if (guest_ && !guest_->write()) dropGuest(out, "write failed");
             if (!auth_) {
@@ -963,6 +970,7 @@ private:
     void renew(int64_t now) {
         if (renewThread_.joinable()) renewThread_.join();
         renewAt_ = now + kRenewEveryMs;
+        renewStart_ = now;
         upnp::Gateway gw = gw_;
         upnp::Mapping mp = mapping_;
         renewThread_ = std::thread([this, gw, mp] {
@@ -970,10 +978,38 @@ private:
             upnp::Error e;
             if (!client.renew(gw, mp, e)) {
                 LOGW("direct: UPnP lease renewal failed: %s", e.text.c_str());
-                std::lock_guard<std::mutex> lk(m);
-                upnpStatus.error = "renewal: " + e.text;
+                {
+                    std::lock_guard<std::mutex> lk(m);
+                    upnpStatus.error = "renewal: " + e.text;
+                }
+                renewResult_ = RenewFailed;
+            } else {
+                renewResult_ = RenewOk;
             }
         });
+    }
+
+    // The last renewal's outcome: after a failure, try again every minute until the lease has
+    // ended. Once it has, the page shows that the mapping is lost, until a renewal (still every
+    // 30 min) maps the port again.
+    void renewed(int64_t now) {
+        const int r = renewResult_.exchange(RenewPending);
+        if (r == RenewOk) {
+            leaseEnd_ = renewStart_ + int64_t(mapping_.leaseSec) * 1000;
+            std::lock_guard<std::mutex> lk(m);
+            if (leaseLost_) LOGI("direct: UPnP: the port is mapped again");
+            leaseLost_ = false;
+            upnpStatus.state = UpnpStatus::State::Mapped;
+            upnpStatus.error.clear();
+        } else if (r == RenewFailed && now < leaseEnd_) {
+            renewAt_ = now + kRenewRetryMs;
+        }
+        if (now >= leaseEnd_ && !leaseLost_) {
+            LOGW("direct: UPnP: the lease has ended without renewal");
+            leaseLost_ = true;
+            std::lock_guard<std::mutex> lk(m);
+            upnpStatus.state = UpnpStatus::State::Failed;
+        }
     }
 
     void cleanup() {
