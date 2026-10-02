@@ -1094,6 +1094,8 @@ struct Animator::Impl {
     std::vector<Fresh> fresh;
     // Pieces this animator left standing on the table (captured pieces, promoted pawns): kept
     // until it picks them up again, so the hands keep clear of them even without the callbacks.
+    // With the callbacks they are the game's to report (from the next update() on), and it may
+    // move them itself (a board set back from the game, a lesson reset): not looked at then.
     std::vector<Fresh> tableLeft;
     // The piece the current task is about to set down off the board (resting-hand checks only).
     std::vector<Fresh> pending;
@@ -1126,9 +1128,10 @@ struct Animator::Impl {
         float top = -1e9f;
         vec3 d(toW.x - fromW.x, 0, toW.z - fromW.z);
         float len2 = std::max(1e-8f, length2(d));
+        const bool gameSees = owner && (owner->obstacleTopNear || owner->pathObstacleTop);
         for (const std::vector<Fresh>* list : {&fresh, &tableLeft, &pending, &scene})
             for (const Fresh& f : *list) {
-                if (f.id == ignoreId || isHeld(f.id)) continue;
+                if (f.id == ignoreId || isHeld(f.id) || (gameSees && list == &tableLeft)) continue;
                 float s = clamp(dot(vec3(f.base.x - fromW.x, 0, f.base.z - fromW.z), d) / len2, 0.0f, 1.0f);
                 vec3 c = fromW + d * s;
                 if (length(vec3(f.base.x - c.x, 0, f.base.z - c.z)) < f.radius + radius) top = std::max(top, f.top);
@@ -1494,6 +1497,9 @@ struct Animator::Impl {
     TablePinch tablePinch(const mat4& frameC, float aperture);
     // One segment laying the held pen on the table at frameC (character space), pinched at the end.
     void penPutSegments(const mat4& frameC, const HandSample& from, float T, Motion& mo, FingerPose* openOut);
+    // The one after it: lets go of the pen (pinched at s; 'open': the fingers letting go), lifts off
+    // it and goes back to the resting spot in T.
+    Segment penLetGo(const HandSample& s, float T, const FingerPose& open) const;
     struct Writing {
         std::deque<WriteTask> queue;
         bool running = false;
@@ -1507,6 +1513,7 @@ struct Animator::Impl {
         mat4 penTable;              // where the pen lies (solver world): initial / last pick / put frame
         vec3 rest{0, 0, 0};         // writing rest point on the paper (character space)
         float restYaw = 0.3f;       // pen azimuth there (see choosePenYaw)
+        bool restPending = false;   // set while the hand was busy: it goes there once free
         float suspendUntil = -1.0f; // the writing hand is busy shaking hands (left-handed player)
         std::function<vec3(float s)> corner;   // running page turn: corner (solver world)
         float lean = 0.0f;          // 0..1: the body leans towards the sheet while writing
@@ -1532,6 +1539,7 @@ struct Animator::Impl {
     quat penBase(vec3 anchor, float yawIn) const;
     float choosePenYaw(vec3 anchor);
     HandSample writingRestSample() const;
+    void glideToWritingRest();      // the idle writing hand, pen in hand, to the writing rest
     float paperY = 0.0f;            // last paper height seen (character space)
     PenPose evalPen;                // pen in the writing hand at the last evaluate() (tip lock applied)
     mat4 toCharM(const mat4& worldSolver) const { return toMat4(qToChar(rotOf(worldSolver)), toChar(worldSolver.translation())); }
@@ -1539,6 +1547,11 @@ struct Animator::Impl {
     // the pen down if it holds it).
     void planHandshake(const Task& t, float start, float T, HandSample from, Motion& mo);
     bool shakeTookPut = false;      // the handshake took over a queued PutPen
+    Segment shakeRetract(const HandSample& s, float T);   // the shaking hand from s back to its rest
+    // cancelTasks() during a handshake (see cutHandshake). shakeCutW: the torso's blend on the
+    // shaking hand then (left-handed player), faded out until wr.suspendUntil.
+    void cutHandshake();
+    float shakeCutW = 0.0f;
     void writingSpine(SpineParams& sp, const HandSample& hl);
 };
 

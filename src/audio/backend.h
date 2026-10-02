@@ -41,6 +41,21 @@ struct ReopenBackoff {
     }
 };
 
+// WASAPI underrun detection, one per stream: an audio event that finds the device buffer empty is
+// an underrun (counted in BackendStatus::underruns; the latency target grows), except in the first
+// kGraceEvents events after Start, while the stream settles.
+struct UnderrunDetector {
+    static constexpr unsigned kGraceEvents = 4;
+    unsigned events = 0;  // audio events seen, up to kGraceEvents
+    bool onEvent(unsigned padding) {
+        if (events < kGraceEvents) {
+            ++events;
+            return false;
+        }
+        return padding == 0;
+    }
+};
+
 struct BackendStatus {
     std::atomic<bool> deviceOpen{false};
     std::atomic<int> sampleRate{0};
