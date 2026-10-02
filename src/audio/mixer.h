@@ -1,9 +1,10 @@
 // Real-time mixer: 32 voices playing bank variants with per-trigger randomisation, 2 speech voices
 // streaming caller-supplied PCM (their own pool: never stolen), 3D spatialisation, four buses
-// (effects, UI, ambience, voice), ambience ducking under speech, hall reverb, master volume, DC
-// blocker and a look-ahead peak limiter. Single-threaded object: every method is called from the
-// thread that renders (the device thread live, the caller's thread offline). No allocation in
-// process(), nor in the speech methods (chunks arrive allocated and leave through the retired list).
+// (effects, UI, ambience, voice; UI currently shares the effects volume), ambience ducking under
+// speech, hall reverb, master volume, DC blocker and a look-ahead peak limiter. Single-threaded
+// object: every method is called from the thread that renders (the device thread live, the
+// caller's thread offline). No allocation in process(), nor in the speech methods (chunks arrive
+// allocated and leave through the retired list).
 #pragma once
 #include "ambience.h"
 #include "audio.h"

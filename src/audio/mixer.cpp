@@ -530,7 +530,7 @@ void Mixer::renderSpeech(Speech& s, int n) {
             dirLp = (1.0f - w) * OnePole::coefFor(3000.0f, fs_);
         }
     }
-    const float g = kSpeechLevel * s.p.gain * voice_;
+    const float g = kSpeechLevel * s.p.gain * busGain(Bus::Voice);
     s.chain.begin(spatialTarget(basis_, s.p.spatial, s.p.pos, fs_, g * dirGain, s.p.send / dirGain, dirLp), n);
     const double step = double(s.p.srcRate) / double(fs_);
     const float tailK = std::exp(-1.0f / (0.0012f * fs_));
