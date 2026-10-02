@@ -419,6 +419,9 @@ void Renderer::drawScene(PassId pass, bool transparents, const DrawFilter& flt) 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_DRAWS, drawSsbo_.id);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_LIGHTS, lightSsbo_.id);
     const ShaderProgram* current = nullptr;
+    // Opaques are sorted by material: look its program up once per run of items, not per draw.
+    const Material* memoMat = nullptr;
+    const ShaderProgram* memoProg = nullptr;
     int planarLayer = pass == PassId::Planar ? int(frame_.passInfo.y) : -2;
     for (const Item& it : items_) {
         const Material& mat = *it.d.material;
@@ -436,7 +439,11 @@ void Renderer::drawScene(PassId pass, bool transparents, const DrawFilter& flt) 
                 if (c.x >= b.lo.x && c.y >= b.lo.y && c.z >= b.lo.z && c.x <= b.hi.x && c.y <= b.hi.y && c.z <= b.hi.z) continue;
             }
         }
-        const ShaderProgram* p = programFor(mat, pass, flt.allowTessellation);
+        if (&mat != memoMat) {
+            memoProg = programFor(mat, pass, flt.allowTessellation);
+            memoMat = &mat;
+        }
+        const ShaderProgram* p = memoProg;
         if (!p) continue;
         if (p != current) { p->use(); current = p; }
         glProgramUniform1i(p->id, 0, int(it.drawIndex));
