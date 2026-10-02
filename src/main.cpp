@@ -114,6 +114,7 @@ static int runApp(std::vector<std::string> args) {
     double last = plat::time();
     int frame = 0;
     bool running = true;
+    bool shotFailed = false;
     while (running) {
         if (!plat::pumpEvents()) break;
         double now = plat::time();
@@ -136,8 +137,12 @@ static int runApp(std::vector<std::string> args) {
             glFinish();
             renderer.readBackbuffer(px, sw, sh);
             std::string out = ctx.screenshotMode ? shotPath : plat::userDataDirectory() + "screenshot_" + std::to_string(frame) + ".png";
-            if (image::writePNG(out, sw, sh, 3, px.data())) LOGI("saved %s (%dx%d)", out.c_str(), sw, sh);
-            else LOGE("could not write %s", out.c_str());
+            if (image::writePNG(out, sw, sh, 3, px.data())) {
+                LOGI("saved %s (%dx%d)", out.c_str(), sw, sh);
+            } else {
+                LOGE("could not write %s", out.c_str());
+                if (ctx.screenshotMode) shotFailed = true;
+            }
             if (ctx.screenshotMode) running = false;
         }
         plat::swapBuffers();
@@ -148,7 +153,7 @@ static int runApp(std::vector<std::string> args) {
     settings.save();
     plat::shutdown();
     logx::shutdown();
-    return 0;
+    return shotFailed ? 2 : 0;  // a --shot run without its image fails (tools/shot.sh)
 }
 
 #ifdef _WIN32

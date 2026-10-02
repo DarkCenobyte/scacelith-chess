@@ -20,14 +20,14 @@ uint32_t crc(const uint8_t* d, size_t n, uint32_t c = 0xFFFFFFFFu) {
 void be32(std::vector<uint8_t>& o, uint32_t v) {
     o.push_back(uint8_t(v >> 24)); o.push_back(uint8_t(v >> 16)); o.push_back(uint8_t(v >> 8)); o.push_back(uint8_t(v));
 }
-void chunk(FILE* f, const char* type, const std::vector<uint8_t>& data) {
+bool chunk(FILE* f, const char* type, const std::vector<uint8_t>& data) {
     std::vector<uint8_t> buf;
     be32(buf, uint32_t(data.size()));
     buf.insert(buf.end(), type, type + 4);
     buf.insert(buf.end(), data.begin(), data.end());
     uint32_t c = crc(buf.data() + 4, buf.size() - 4) ^ 0xFFFFFFFFu;
     be32(buf, c);
-    std::fwrite(buf.data(), 1, buf.size(), f);
+    return std::fwrite(buf.data(), 1, buf.size(), f) == buf.size();
 }
 }  // namespace
 
@@ -35,14 +35,14 @@ bool writePNG(const std::string& path, int w, int h, int ch, const uint8_t* px) 
     FILE* f = std::fopen(path.c_str(), "wb");
     if (!f) return false;
     const uint8_t sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
-    std::fwrite(sig, 1, 8, f);
+    bool ok = std::fwrite(sig, 1, 8, f) == 8;
     std::vector<uint8_t> ihdr;
     be32(ihdr, uint32_t(w));
     be32(ihdr, uint32_t(h));
     ihdr.push_back(8);
     ihdr.push_back(ch == 4 ? 6 : 2);
     ihdr.push_back(0); ihdr.push_back(0); ihdr.push_back(0);
-    chunk(f, "IHDR", ihdr);
+    ok = ok && chunk(f, "IHDR", ihdr);
     // zlib stream with stored (uncompressed) deflate blocks.
     std::vector<uint8_t> raw;
     size_t stride = size_t(w) * size_t(ch);
@@ -66,9 +66,10 @@ bool writePNG(const std::string& path, int w, int h, int ch, const uint8_t* px) 
     uint32_t a = 1, b = 0;
     for (uint8_t v : raw) { a = (a + v) % 65521; b = (b + a) % 65521; }
     be32(z, (b << 16) | a);
-    chunk(f, "IDAT", z);
-    chunk(f, "IEND", {});
-    std::fclose(f);
-    return true;
+    ok = ok && chunk(f, "IDAT", z) && chunk(f, "IEND", {});
+    // fclose writes the buffered tail: a full disk may only show there.
+    if (std::fclose(f) != 0) ok = false;
+    if (!ok) std::remove(path.c_str());  // no truncated image left behind
+    return ok;
 }
 }  // namespace image
