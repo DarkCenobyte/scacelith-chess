@@ -134,7 +134,9 @@ are alpha tested in the prepass and the shadow pass too.
 dual-source blending `dst = src0 + dst × src1`. Glass contract (`s.transmission > 0`): the colour
 output is the full shading (specular reflection never scaled by alpha; diffuse weighted by
 1 − transmission), the background is multiplied by `transmission × (1 − F)² × albedo`
-(`transmittanceOf()`). Without transmission, plain coverage blending by `s.alpha`.
+(`transmittanceOf()`). Without transmission, plain coverage blending by `s.alpha`. Transparents
+take neither the GTAO nor the SSR: both come from the prepass and describe the opaque surface
+behind them.
 
 **Screen-door fade.** `DrawItem::opacity` < 1 (`DrawData.fade.x`) makes an opaque draw
 see-through in the main view and the planar reflections: `screenDoorHidden()`

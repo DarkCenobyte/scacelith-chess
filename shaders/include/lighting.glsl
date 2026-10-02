@@ -445,9 +445,10 @@ vec3 indirectSpecular(ProbeBlend pb, SurfaceInput i, vec3 N, vec3 R, float rough
         probe = mix(probe, pl.rgb, pl.a);
     }
 #endif
-#ifdef PASS_MAIN
+#if defined(PASS_MAIN) && !defined(MATERIAL_TRANSPARENT)
     // Screen-space reflections replace the probe where they found a hit (planar reflectors
     // already have exact reflections). History is reprojected with last frame's camera.
+    // Transparent surfaces are not in the prepass: the SSR there is the opaque surface's behind.
     if (planarLayer < 0.0 || frame.passInfo.w <= planarLayer) {
         vec4 pc = frame.prevViewProj * vec4(i.positionWS, 1.0);
         vec2 uvPrev = pc.xy / max(pc.w, 1e-6) * 0.5 + 0.5;
@@ -497,8 +498,8 @@ vec3 shadeSurface(SurfaceInput i, Surface s, float planarLayer) {
 
     // Ambient occlusion
     float ao = s.occlusion;
-#ifdef PASS_MAIN
-    ao *= texture(uAO, i.screenUV).r;
+#if defined(PASS_MAIN) && !defined(MATERIAL_TRANSPARENT)
+    ao *= texture(uAO, i.screenUV).r;  // of the prepass, which has no transparent surface
 #endif
 
     // Diffuse + specular image based lighting
