@@ -31,6 +31,8 @@ Window g_win;
 GLXContext g_ctx;
 Atom g_wmDelete;
 int g_width, g_height;
+DisplayMode g_mode = DisplayMode::Windowed;   // the mode and windowed size last asked for
+int g_windowedW, g_windowedH;
 bool g_quit, g_focus = true, g_captured, g_cursorVisible = true;
 Input g_input;
 timespec g_t0;
@@ -102,6 +104,9 @@ bool init(const WindowDesc& desc) {
                      PointerMotionMask | StructureNotifyMask | FocusChangeMask | EnterWindowMask | LeaveWindowMask;
     g_width = desc.width;
     g_height = desc.height;
+    g_mode = desc.mode;
+    g_windowedW = desc.width;
+    g_windowedH = desc.height;
     if (desc.mode == DisplayMode::Borderless) {
         g_width = DisplayWidth(g_dpy, screen);
         g_height = DisplayHeight(g_dpy, screen);
@@ -225,7 +230,11 @@ void setVsync(bool on) {
     auto fn = (PFN_glXSwapIntervalEXT)glXGetProcAddressARB((const GLubyte*)"glXSwapIntervalEXT");
     if (fn) fn(g_dpy, g_win, on ? 1 : 0);
 }
-void setDisplayMode(DisplayMode, int w, int h) {
+void setDisplayMode(DisplayMode mode, int w, int h) {
+    // Unchanged (Options applied for another setting): the window keeps its size, as on Windows.
+    if (mode == g_mode && (mode == DisplayMode::Borderless || (w == g_windowedW && h == g_windowedH))) return;
+    g_mode = mode;
+    if (mode == DisplayMode::Windowed) { g_windowedW = w; g_windowedH = h; }
     XResizeWindow(g_dpy, g_win, w, h);
 }
 int width() { return g_width; }
