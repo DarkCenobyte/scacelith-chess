@@ -2296,11 +2296,13 @@ void OnlineClient::deleteAccount(const std::string& password, const std::string&
     json::Value b = json::Value::object();
     b.set("password", password);
     setSecondFactor(b, codeOrRecovery);
-    // The server closes every connection of the account it deletes: this one is closed first, as by
-    // logout(), so that its revoked-session notice and refusals never reach the game.
-    auto wasOpen = std::make_shared<bool>(false);
-    const uint32_t gen = d->stopRealtime(wasOpen);
-    d->http([d, e, b, gen, wasOpen] {
+    d->http([d, e, b] {
+        // The server closes every connection of the account it deletes: this one is closed first, as
+        // by logout(), so that its revoked-session notice and refusals do not reach the game (the
+        // close is queued on net-rt before the request is sent). Here rather than at the call: a
+        // call queued ahead (an export...) does not keep it closed while it runs.
+        auto wasOpen = std::make_shared<bool>(false);
+        const uint32_t gen = d->stopRealtime(wasOpen);
         Impl::Api a = d->api(e, "POST", "/account/delete", &b, true, d->httpCancel);
         Event ev;
         ev.kind = Event::Kind::AccountDeleted;
