@@ -7,7 +7,11 @@ SCENE="$1"; OUT="$(realpath -m "$2")"; FRAMES="${3:-8}"; SIZE="${4:-1280x720}"; 
 # Without a DISPLAY, the shot goes to Xvfb :99, started when it is not running.
 if [ -z "$DISPLAY" ]; then
     export DISPLAY=:99
-    if [ ! -e /tmp/.X11-unix/X99 ]; then (Xvfb :99 -screen 0 1920x1080x24 >/dev/null 2>&1 &); sleep 1; fi
+    # :99 runs when its socket exists and the process in its lock file is alive (a killed Xvfb
+    # leaves both files behind).
+    if [ ! -e /tmp/.X11-unix/X99 ] || ! kill -0 "$(cat /tmp/.X99-lock 2>/dev/null)" 2>/dev/null; then
+        (Xvfb :99 -screen 0 1920x1080x24 >/dev/null 2>&1 &); sleep 1
+    fi
 fi
 export MESA_GL_VERSION_OVERRIDE=4.6 MESA_GLSL_VERSION_OVERRIDE=460 WINEDEBUG=-all
 export WINEPREFIX=${WINEPREFIX:-/tmp/scacelith-wineprefix}
