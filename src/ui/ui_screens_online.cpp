@@ -337,6 +337,7 @@ struct State {
     float copiedAt = -100.0f;
     // Options > Online
     bool testShown = false, testOk = false;
+    net::ServerEndpoint testedEp;    // the endpoint of the last test sent
     std::string testLine, testDetail;
 };
 State O;
@@ -2091,8 +2092,13 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
         ep.wsPort = s.onlineWsPort > 0 ? uint16_t(s.onlineWsPort) : ep.apiPort;
         ep.pinnedSha256 = s.onlinePin;
     }
+    // A result is shown only for the endpoint it tested (not for fields edited during the test).
+    auto tested = [&](const net::ServerEndpoint& t) {
+        return t.host == ep.host && t.apiPort == ep.apiPort && t.wsPort == ep.wsPort && t.pinnedSha256 == ep.pinnedSha256 &&
+               t.insecureDev == ep.insecureDev;
+    };
     net::Event e;
-    if (ses.takeTest(e)) {
+    if (ses.takeTest(e) && tested(O.testedEp)) {
         O.testShown = true;
         O.testOk = e.ok && e.info.compatible;
         if (e.ok) {
@@ -2110,6 +2116,7 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
     if (im::button(L("options.online.test"), im::flip(tr, Rect(tr.x, tr.y + 2.0f, bw, 52.0f)), im::ButtonKind::Secondary,
                    ep.valid() && !testing && !inGame)) {
         O.testShown = false;
+        O.testedEp = ep;
         ses.testServer(ep);
     }
     float tx = tr.x + bw + 26.0f, tw = rw - bw - 30.0f;
