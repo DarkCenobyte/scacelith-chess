@@ -1,6 +1,8 @@
 // Chess rules engine (standard FIDE rules) + tournament arbitration + clock.
-// Pure C++, no GL, no global state (all tables are compile-time constants), thread-safe by
-// construction: independent objects may be used from different threads.
+// Pure C++, no GL, no global state of its own (all tables are compile-time constants), thread-safe
+// by construction: independent objects may be used from different threads. Only the texts read the
+// i18n tables (main thread): endReasonText() and the Arbiter's verdict messages in the current UI
+// language, Game::pgn()'s end-reason comment in English (i18n::english).
 //
 // Layers (kept independent from presentation so that local/online multiplayer can reuse them):
 //   Position  - board state, legal move generation (bitboards), SAN/UCI/FEN, perft.
@@ -333,7 +335,8 @@ public:
         // Art. 7.5.2: a pawn moved to the last rank without being replaced counts as an illegal
         // move (penalised) but the move stands with a queen: play 'move' and press the clock.
         bool moveStands = false;
-        std::string message;           // English, shown to the player ("" for a legal move)
+        // In the UI language (i18n, section "Arbiter"), shown to the player ("" for a legal move).
+        std::string message;
     };
     Verdict clockPressed(const Game& game, const TimeControl& tc);
     void cancelTouch();                 // for touched pieces with no legal move only
