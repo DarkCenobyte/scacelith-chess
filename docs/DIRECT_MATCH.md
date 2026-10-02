@@ -107,8 +107,9 @@ the host itself:
   (a draw if the host cannot mate; aborted before the second ply).
 - **Host gone** (crash, lost network): the guest keeps trying until the grace period ends (plus
   5 s); it gives up sooner when the host's machine refuses the connection three times (the host's
-  game is gone), or at once when the host answers with another code or protocol (it hosts a new
-  match), and the game then ends as *aborted by the server* on the guest's side.
+  game is gone), when the host refuses the code twice in a row or at once when it speaks another
+  protocol (it hosts a new match), and the game then ends as *aborted by the server* on the
+  guest's side.
 - **Leaving** a running game (either side) resigns it, as online.
 - **Rematch** within 60 s after the end, colours swapped, when both accept.
 - **Clock presses**: whether the robots press the clock by themselves is the host's choice

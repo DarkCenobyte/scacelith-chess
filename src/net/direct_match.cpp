@@ -1022,7 +1022,7 @@ private:
     std::unique_ptr<Conn> conn_;
     int64_t phaseDeadline_ = 0, retryAt_ = 0, reconnectDeadline_ = 0;
     bool everOnline_ = false, reconnecting_ = false;
-    int refused_ = 0, attempt_ = 0;
+    int refused_ = 0, unconfirmed_ = 0, attempt_ = 0;
     uint32_t seq_ = 0;
     ClientView view_;
     std::deque<Command> queued_;
@@ -1165,8 +1165,11 @@ private:
             return;
         }
         if (!alive) {
+            // Closed before the host's confirmation: a refused code on a first join; on a
+            // reconnection (the code was right) possibly the link failing at that moment.
+            const bool unconfirmed = phase_ == Phase::Handshake && conn_->ch->awaitingHostConfirm();
             if (phase_ == Phase::Online) lost(now);
-            else attemptFailed(phase_ == Phase::Handshake && conn_->ch->awaitingHostConfirm() ? "wrong_code" : "closed", now);
+            else attemptFailed(unconfirmed ? (everOnline_ ? "unconfirmed" : "wrong_code") : "closed", now);
             return;
         }
         if ((phase_ == Phase::Handshake || phase_ == Phase::Hello) && now >= phaseDeadline_) {
@@ -1257,7 +1260,7 @@ private:
         const bool first = !everOnline_;
         everOnline_ = true;
         reconnecting_ = false;
-        refused_ = attempt_ = 0;
+        refused_ = unconfirmed_ = attempt_ = 0;
         if (!haveRttOffset_) {
             std::lock_guard<std::mutex> lk(m);
             offset_ = w.serverTime - sock::epochMs();
@@ -1308,7 +1311,7 @@ private:
         if (view_.have && view_.game.status == int(P::GameStatus::Ongoing)) {
             LOGI("direct: connection to the host lost, reconnecting");
             reconnecting_ = true;
-            refused_ = attempt_ = 0;
+            refused_ = unconfirmed_ = attempt_ = 0;
             int64_t grace = view_.game.graceMs ? int64_t(view_.game.graceMs) : kDefaultGraceMs;
             reconnectDeadline_ = now + grace + 5000;
             connectionEvent(ConnState::Reconnecting);
@@ -1333,7 +1336,8 @@ private:
             return;
         }
         if (reason == "refused") ++refused_;
-        if (reason == "wrong_code" || reason == "incompatible" || refused_ >= 3 || now >= reconnectDeadline_) {
+        if (reason == "unconfirmed") ++unconfirmed_;   // tried once more; twice is a refused code
+        if (reason == "wrong_code" || reason == "incompatible" || refused_ >= 3 || unconfirmed_ >= 2 || now >= reconnectDeadline_) {
             giveUp();
             return;
         }

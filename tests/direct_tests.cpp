@@ -2049,7 +2049,38 @@ struct RawHost : RawChannel {
         return true;
     }
     // The guest's next connection, through the channel's handshake, within ms.
-    bool accept(int ms) {
+    bool accept(int ms) { return acceptSocket(ms) && handshake(); }
+    // The guest's next connection through the handshake up to the guest's confirmation, then
+    // closed before the host's: what the guest sees when the host refuses its code, or when the
+    // link fails at that moment.
+    bool acceptUnconfirmed(int ms) {
+        if (!acceptSocket(ms) || !ch->start()) return false;
+        auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
+        while (!ch->established()) {
+            if (!flush() || std::chrono::steady_clock::now() > end) return false;
+            sock::PollSet ps;
+            ps.add(h, true, false);
+            ps.wait(10);
+            uint8_t buf[4096];
+            bool closed = false;
+            int r = ps.readable(h) ? sock::recvSome(h, buf, sizeof buf, closed) : 0;
+            if (r < 0 || (r > 0 && !ch->receive(buf, size_t(r)))) return false;
+        }
+        drop();   // the host's confirmation, in the outbox, is never sent
+        return true;
+    }
+    void drop() {
+        sock::closeSocket(h);
+        h = sock::kInvalid;
+    }
+    template <class T> bool send(const T& m) {
+        std::vector<uint8_t> buf;
+        P::encode(m, buf);
+        return sendBytes(buf);
+    }
+
+private:
+    bool acceptSocket(int ms) {
         drop();
         auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
         while (h == sock::kInvalid) {
@@ -2060,16 +2091,7 @@ struct RawHost : RawChannel {
             if (ps.readable(listener)) h = sock::acceptOne(listener, nullptr);
         }
         ch = std::make_unique<direct::SecureChannel>(direct::SecureChannel::Role::Host, code);
-        return handshake();
-    }
-    void drop() {
-        sock::closeSocket(h);
-        h = sock::kInvalid;
-    }
-    template <class T> bool send(const T& m) {
-        std::vector<uint8_t> buf;
-        P::encode(m, buf);
-        return sendBytes(buf);
+        return true;
     }
 };
 
@@ -2410,4 +2432,42 @@ TEST(direct_connection_log_paced) {
     const int lines = log.count("direct: connection from");
     CHECK(lines >= 10 && lines <= 10 * (int(seconds) + 1) + 1);
     CHECK(waitUntil(host, guest, [&] { return log.count("more connections") > 0; }, 4000));
+}
+
+TEST(direct_guest_retries_once_without_host_confirmation) {
+    // On a reconnection the code is known to be right: a connection closed before the host's
+    // confirmation (the link failing at that moment) is tried once more and the guest is back. A
+    // second one in a row means the host refuses the code (it hosts another match): it gives up.
+    RawHost raw;
+    CHECK(raw.listen());
+    direct::Authority auth(direct::AuthorityConfig(), "Alice", "Bob", 1);
+    direct::Authority::Output out;
+    auth.startGame(sock::epochMs(), out);
+    CHECK(out.toGuest.size() == 1);
+    if (out.toGuest.size() != 1) return;
+    Peer guest, nobody;
+    auto conns = [&](ConnState s) {
+        int n = 0;
+        for (auto& e : guest.events) n += e.kind == Event::Kind::ConnectionChanged && e.state == s;
+        return n;
+    };
+    guest.dm.join("127.0.0.1", raw.port, raw.code, "Bob");
+    P::Hello hello;
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    CHECK(sendWelcome(raw, auth) && raw.sendBytes(out.toGuest[0]));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(Event::Kind::GameSnapshot) == 1; }));
+    raw.drop();
+    CHECK(waitUntil(guest, nobody, [&] { return conns(ConnState::Reconnecting) == 1; }));
+    CHECK(raw.acceptUnconfirmed(5000));
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    CHECK(sendWelcome(raw, auth));
+    CHECK(waitUntil(guest, nobody, [&] { return conns(ConnState::Online) == 2; }));
+    raw.drop();
+    CHECK(waitUntil(guest, nobody, [&] { return conns(ConnState::Reconnecting) == 2; }));
+    CHECK(raw.acceptUnconfirmed(5000));
+    CHECK(raw.acceptUnconfirmed(5000));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(Event::Kind::GameEnd) == 1; }));
+    CHECK_EQ(guest.dm.lastError(), std::string("host_left"));
+    const Event* end = guest.last(Event::Kind::GameEnd);
+    CHECK(end && end->game.reason == int(P::EndReason::ServerAborted));
 }
