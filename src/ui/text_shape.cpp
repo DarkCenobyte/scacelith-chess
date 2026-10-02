@@ -37,7 +37,7 @@ Run shapeLine(const std::string& utf8, const std::function<int(uint32_t)>& faceF
     float pen = 0.0f;
     int prevFace = -1, prevIndex = 0;
     char32_t prevCp = 0;
-    bool first = true;
+    bool first = true, anyMark = false;
     run.glyphs.reserve(order.size());
     for (int k : order) {
         char32_t cp = sh.text[size_t(k)];
@@ -83,6 +83,7 @@ Run shapeLine(const std::string& utf8, const std::function<int(uint32_t)>& faceF
             pg.advance = 0.0f;
             pg.x = pen;  // positioned over its base below
             run.glyphs.push_back(pg);
+            anyMark = true;
             continue;
         }
         bool arabicPair = arabicLetter(cp) && arabicLetter(prevCp);
@@ -98,13 +99,27 @@ Run shapeLine(const std::string& utf8, const std::function<int(uint32_t)>& faceF
         first = false;
     }
     // Combining marks: centred over the ink of their base (the closest preceding character in
-    // logical order), wherever the font draws them relative to its own origin.
+    // logical order), wherever the font draws them relative to its own origin. before[s] = the
+    // first glyph (visual order) of the greatest non-mark source below s, -1 when none.
+    std::vector<int> before;
+    if (anyMark) {
+        before.assign(size_t(run.sourceCount), -1);
+        for (size_t i = 0; i < run.glyphs.size(); ++i) {
+            int& at = before[size_t(run.glyphs[i].source)];
+            if (!run.glyphs[i].mark && at < 0) at = int(i);
+        }
+        int last = -1;
+        for (int& b : before) {
+            int at = b;
+            b = last;
+            if (at >= 0) last = at;
+        }
+    }
     for (PlacedGlyph& m : run.glyphs) {
         if (!m.mark) continue;
-        const PlacedGlyph* base = nullptr;
-        for (const PlacedGlyph& b : run.glyphs)
-            if (!b.mark && b.source < m.source && (!base || b.source > base->source)) base = &b;
-        if (!base) continue;
+        int b = before[size_t(m.source)];
+        if (b < 0) continue;
+        const PlacedGlyph* base = &run.glyphs[size_t(b)];
         float bc = base->glyph->hasQuad || base->glyph->x1 > base->glyph->x0
                        ? base->x + 0.5f * (base->glyph->x0 + base->glyph->x1) * base->scale
                        : base->x + 0.5f * base->advance;
