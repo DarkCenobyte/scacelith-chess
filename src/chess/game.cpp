@@ -217,8 +217,7 @@ std::string Game::pgn(const std::string& whiteName, const std::string& blackName
     tag("Black", blackName);
     tag("Result", result);
     const Position& start = startPosition();
-    const Position standard;
-    if (!start.samePosition(standard) || start.halfmoveClock() != 0 || start.fullmoveNumber() != 1) {
+    if (!start.isStandardStart()) {
         tag("SetUp", "1");
         tag("FEN", start.fen());
     }

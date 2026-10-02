@@ -324,8 +324,7 @@ namespace {
 
 std::string startFenOf(const Game& g) {
     const Position& s = g.startPosition();
-    const Position standard;
-    return s.samePosition(standard) && s.fullmoveNumber() == 1 && s.halfmoveClock() == 0 ? std::string() : s.fen();
+    return s.isStandardStart() ? std::string() : s.fen();
 }
 
 ai::AnalysisRequest requestAt(const Game& g, size_t plies) {

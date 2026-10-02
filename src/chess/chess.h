@@ -107,6 +107,7 @@ public:
     bool isStalemate() const { return !inCheck() && !hasLegalMove(); }
     // Repetition identity (FIDE 9.2.3): placement, side to move, castling rights, en passant.
     bool samePosition(const Position& o) const;
+    bool isStandardStart() const;                 // the standard starting position at move 1, halfmove clock 0
 
     // ---- Board queries for explanations (the coach's tactics, src/coach/tactics.h) ----------------
     // Square sets are bitboards: bit s stands for square s (a1 = bit 0); squaresOf() lists them.

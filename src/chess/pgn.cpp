@@ -674,8 +674,7 @@ private:
             }
         }
         pos = p;
-        const Position standard;
-        if (!(p.samePosition(standard) && p.halfmoveClock() == 0 && p.fullmoveNumber() == 1)) r.fen = p.fen();
+        if (!p.isStandardStart()) r.fen = p.fen();
         return true;
     }
 
@@ -828,8 +827,7 @@ bool Record::hasElapsed() const {
 Record Record::fromGame(const chess::Game& game) {
     Record r;
     const Position& start = game.startPosition();
-    const Position standard;
-    if (!(start.samePosition(standard) && start.halfmoveClock() == 0 && start.fullmoveNumber() == 1)) r.fen = start.fen();
+    if (!start.isStandardStart()) r.fen = start.fen();
     for (size_t i = 0; i < game.moves().size(); ++i) {
         Ply p;
         p.move = game.moves()[i];
@@ -965,8 +963,7 @@ std::string write(const Record& r) {
         if (const std::string* v = r.findTag(kRanked[i])) tag(kRanked[i], *v);
     tag("PlyCount", std::to_string(r.plies.size()));
     const Position start = r.startPosition();
-    const Position standard;
-    const bool custom = !(start.samePosition(standard) && start.halfmoveClock() == 0 && start.fullmoveNumber() == 1);
+    const bool custom = !start.isStandardStart();
     // A Chess960 game from the standard setup (position 518) keeps its FEN: the reader requires it.
     const std::string* variant = r.findTag("Variant");
     if (custom || (variant && chess960Variant(*variant))) {

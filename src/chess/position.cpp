@@ -263,6 +263,8 @@ bool Position::samePosition(const Position& o) const {
     return true;
 }
 
+bool Position::isStandardStart() const { return samePosition(Position()) && halfmove_ == 0 && fullmove_ == 1; }
+
 // ---- Attacks / legality ---------------------------------------------------------------------
 
 Square Position::kingSquare(Color c) const {
