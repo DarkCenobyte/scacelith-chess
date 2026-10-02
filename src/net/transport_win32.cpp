@@ -104,7 +104,7 @@ std::string leafSha256(HINTERNET request) {
 struct RequestContext {
     std::string pin;
     Handle* request = nullptr;
-    std::atomic<bool> pinChecked{false}, pinMismatch{false};
+    std::atomic<bool> pinMismatch{false};
     std::atomic<DWORD> secureFlags{0};
 };
 
@@ -113,9 +113,9 @@ void CALLBACK statusCallback(HINTERNET h, DWORD_PTR ctx, DWORD status, LPVOID in
     if (!c) return;
     if (status == WINHTTP_CALLBACK_STATUS_SECURE_FAILURE && info && len >= sizeof(DWORD)) {
         c->secureFlags.store(*static_cast<DWORD*>(info));
-    } else if (status == WINHTTP_CALLBACK_STATUS_SENDING_REQUEST && !c->pin.empty() && !c->pinChecked.load()) {
+    } else if (status == WINHTTP_CALLBACK_STATUS_SENDING_REQUEST && !c->pin.empty()) {
+        // Every time: WinHTTP may send the request more than once (again on another connection).
         std::string got = leafSha256(h);
-        c->pinChecked.store(true);
         if (got.empty() || !crypto::constantTimeEqual(got, c->pin)) {
             LOGW("net: pinned certificate mismatch (server presents %s)", got.empty() ? "?" : got.c_str());
             c->pinMismatch.store(true);
