@@ -636,8 +636,8 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
         } else if (crit) {
             const bool wasWinning = crit->wBest >= 70.0;
             b = say(bandKey(wasWinning ? "appraisal.improve.was_winning"
-                                  : (L == 1 ? "appraisal.improve.theme" : "appraisal.improve.critical"),
-                       L),
+                                       : (L == 1 ? "appraisal.improve.theme" : "appraisal.improve.critical"),
+                            L),
                     Look::Player);
             const int sign = human_ == White ? 1 : -1;
             b.line.with("crit_no", Arg::ofNumber(moveNumberOf(g, crit->ply)))
