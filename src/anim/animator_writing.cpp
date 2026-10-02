@@ -756,14 +756,17 @@ void Animator::Impl::planWrite(const WriteTask& t, float start, float T) {
         std::vector<vec3> tips;
         const int ext = int(std::ceil(3.0f * sigma / step));
         for (int i = -ext; i < n + ext; ++i) tips.push_back(penPathPoint(path, clamp(float(i) * step, 0.0f, P)));
+        // The kernel weights and their sum are the same for every sample.
+        std::vector<float> wts;
+        float wsum = 0.0f;
+        for (int j = -ext; j <= ext; ++j) {
+            float tt = float(j) * step, wj = std::exp(-0.5f * tt * tt / (sigma * sigma));
+            wts.push_back(wj);
+            wsum += wj;
+        }
         for (int i = 0; i < n; ++i) {
             vec3 acc(0);
-            float wsum = 0.0f;
-            for (int j = -ext; j <= ext; ++j) {
-                float tt = float(j) * step, wj = std::exp(-0.5f * tt * tt / (sigma * sigma));
-                acc += tips[size_t(i + j + ext)] * wj;
-                wsum += wj;
-            }
+            for (int j = -ext; j <= ext; ++j) acc += tips[size_t(i + j + ext)] * wts[size_t(j + ext)];
             acc /= wsum;
             acc.y = paper;
             anchor->push_back(acc);
