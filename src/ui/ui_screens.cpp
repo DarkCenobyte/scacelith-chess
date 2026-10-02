@@ -1557,22 +1557,6 @@ void openSavedGames() {
     S.replayFromOnline = false;
 }
 
-MenuAction mainMenu(NewGameSetup& setup) {
-    static WatchSetup watch;
-    return mainMenu(setup, watch);
-}
-
-MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
-    static CoachSetup coach;
-    return mainMenu(setup, watch, coach);
-}
-
-MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach) {
-    static LibrarySetup none;  // no folder: no "Saved games" entry
-    none.folder.clear();
-    return mainMenu(setup, watch, coach, none);
-}
-
 MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, LibrarySetup& library) {
     const bool hasLibrary = !library.folder.empty();
     im::Id menuId = im::makeId("##mainmenu");

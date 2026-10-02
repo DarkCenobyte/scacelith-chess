@@ -109,19 +109,6 @@ struct WatchSetup {
     int customBaseSeconds = 300, customIncrementSeconds = 3, customDelaySeconds = 0;
 };
 
-// Title screen over the 3D hall. Handles its sub-pages (New Game, Options, Credits) itself.
-// The New Game page starts from the last choices saved in game::settings() and writes them back
-// (and saves the .ini) when the player presses Start; 'setup' then holds the choice.
-// OptionsChanged is returned on the frame the player applies new options (already stored in
-// game::settings() and saved); the game re-applies display/graphics/audio settings.
-// The title page also shows the player's Elo (game::settings() [player]) and the New Game page
-// shows it next to the opponent list.
-MenuAction mainMenu(NewGameSetup& setup);
-// Same, with the "Watch a Game" entry filling 'watch' (returns StartWatching on its Start).
-MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch);
-// Same, with the "Coach" entry filling 'coach' (returns StartCoach on its Start; see CoachSetup).
-struct CoachSetup;
-MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach);
 // In-game pause menu (Esc). canClaimDraw enables the claim entry; canOfferDraw = false greys out
 // "Offer draw" (e.g. an offer is already pending). Esc resumes.
 MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw = true);
@@ -331,8 +318,17 @@ struct LibrarySetup {
                                  // "Saved games" entry on the title page
     ReplaySetup replay;          // the game to replay when mainMenu() returns StartReplay
 };
-// mainMenu() with the "Saved games" entry: returns StartReplay on Replay ('library.replay' then
-// names the game). The overloads above have no such entry.
+// Title screen over the 3D hall. Handles its sub-pages (New Game, Options, Credits) itself.
+// The New Game page starts from the last choices saved in game::settings() and writes them back
+// (and saves the .ini) when the player presses Start; 'setup' then holds the choice.
+// OptionsChanged is returned on the frame the player applies new options (already stored in
+// game::settings() and saved); the game re-applies display/graphics/audio settings.
+// The title page also shows the player's Elo (game::settings() [player]) and the New Game page
+// shows it next to the opponent list.
+// The "Watch a Game" entry fills 'watch' (returns StartWatching on its Start), the "Coach" entry
+// fills 'coach' (returns StartCoach on its Start; see CoachSetup), and the "Saved games" entry
+// returns StartReplay on Replay ('library.replay' then names the game; no such entry when
+// library.folder is empty).
 MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, LibrarySetup& library);
 
 // ---- In-game pointer (ui_screens_game.cpp) -------------------------------------------------------
