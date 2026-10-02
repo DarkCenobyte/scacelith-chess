@@ -558,6 +558,28 @@ TEST(openings_announcer_deterministic_and_silent_after_takeback) {
     CHECK(s3.find("opening.family.sicilian.beginner") == std::string::npos);
 }
 
+TEST(openings_announcer_sees_a_replaced_move_as_a_takeback) {
+    // The human's move taken back and another played before the next update (an accepted takeback offer): the same
+    // ply count, but the new opening is summed up again rather than worded as a transposition.
+    OpeningAnnouncer a;
+    a.setLevel(3);
+    a.setHumanColor(chess::Black);
+    chess::Game g;
+    std::string said;
+    for (const char* m : {"c4", "Nc6", "d4", "Nf6"}) {
+        playMore(g, m);
+        said += describe(a.update(g));
+    }
+    CHECK(said.find("opening.say.pb.") != std::string::npos);
+    chess::Game back = takeBack(g, 1);
+    playMore(back, "d5");
+    const std::vector<OpeningLine> lines = a.update(back);
+    CHECK(!lines.empty());
+    if (!lines.empty()) CHECK(lines[0].key.rfind("opening.say.pb.", 0) == 0);
+    CHECK(!hasKey(lines, "opening.say.transposed"));
+    CHECK(describe(lines).find("family:chigorin") != std::string::npos);
+}
+
 TEST(openings_announcer_waits_for_speech_and_catches_up_silently) {
     OpeningAnnouncer a;
     a.setLevel(1);

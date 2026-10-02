@@ -571,6 +571,7 @@ void OpeningAnnouncer::newGame() {
     utterances_ = 0;
     lastTalkPly_ = -100;
     lastPlies_ = 0;
+    lastHash_ = 0;
 }
 
 void OpeningAnnouncer::reset() {
@@ -817,11 +818,13 @@ std::vector<OpeningLine> OpeningAnnouncer::update(const chess::Game& game, bool 
     if (level_ <= 0) return {};
     const OpeningState st = classify(game, book(), openingPlyLimit(level_));
     if (!st.standardStart) return {};
-    if (st.plies < lastPlies_) {   // takeback
+    // A takeback: fewer plies, or a move replaced (taken back and another played before this update).
+    if (st.plies < lastPlies_ || (lastPlies_ > 0 && game.positionAt(size_t(lastPlies_)).hash() != lastHash_)) {
         takebackSinceTalk_ = true;
         if (lastTalkPly_ > st.plies) lastTalkPly_ = -100;
     }
     lastPlies_ = st.plies;
+    lastHash_ = game.position().hash();
     if (!st.determined || utterances_ >= utteranceCap(level_)) return {};
     Plan p = plan(st);
     if (p.empty()) return {};
@@ -842,6 +845,7 @@ void OpeningAnnouncer::catchUp(const chess::Game& game) {
     if (level_ <= 0) return;
     const OpeningState st = classify(game, book(), openingPlyLimit(level_));
     lastPlies_ = st.plies;
+    lastHash_ = game.position().hash();
     lastTalkPly_ = st.plies;
     takebackSinceTalk_ = false;
     if (!st.standardStart || !st.determined) return;

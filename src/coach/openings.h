@@ -247,6 +247,7 @@ private:
     int utterances_ = 0;
     int lastTalkPly_ = -100;
     int lastPlies_ = 0;
+    uint64_t lastHash_ = 0;   // the position after lastPlies_ plies (a replaced move is a takeback too)
 
     const OpeningBook& book() const { return book_ ? *book_ : OpeningBook::instance(); }
     struct Plan;
