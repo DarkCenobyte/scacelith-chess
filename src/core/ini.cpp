@@ -106,6 +106,16 @@ bool IniFile::writable(const std::string& path) {
     // MoveFileExW does not replace a read-only file, and it cannot be written in place.
     DWORD attr = GetFileAttributesW(p.c_str());
     if (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_READONLY)) return false;
+    if (attr == INVALID_FILE_ATTRIBUTES) {
+        // No file yet: save() makes one where the folder lets a file be added, which a handle to
+        // the folder asking for that right tells without adding any.
+        const std::filesystem::path dir = p.has_parent_path() ? p.parent_path() : std::filesystem::path(L".");
+        HANDLE h = CreateFileW(dir.c_str(), FILE_ADD_FILE, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr,
+                               OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+        if (h == INVALID_HANDLE_VALUE) return false;
+        CloseHandle(h);
+        return true;
+    }
 #else
     // The new file renamed over the old one replaces it, read-only or not, when the folder takes
     // new files.

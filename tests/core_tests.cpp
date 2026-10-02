@@ -128,6 +128,14 @@ TEST(ini_writable_read_only_file) {
     a.setInt("display.width", 1280);
     CHECK(a.save(path));
     CHECK(IniFile::writable(path));
+    // No file yet, in a folder that takes new files: save() makes it.
+    const std::string missing = tmpFile("scacelith_ini_missing", ".ini");
+    std::remove(missing.c_str());
+    CHECK(IniFile::writable(missing));
+    CHECK(a.save(missing));
+    std::remove(missing.c_str());
+    // In a folder that does not exist: no.
+    CHECK(!IniFile::writable(tmpFile("scacelith_ini_nowhere", "") + "/Scacelith.ini"));
 #ifdef _WIN32
     namespace fs = std::filesystem;
     const fs::perms w = fs::perms::owner_write | fs::perms::group_write | fs::perms::others_write;
@@ -145,6 +153,12 @@ TEST(ini_writable_read_only_file) {
     bool answer = IniFile::writable(file);
     CHECK_EQ(answer, a.save(file));
     if (geteuid() != 0) CHECK(!answer);
+    // No new file there either.
+    const std::string other = dir + "/Other.ini";
+    answer = IniFile::writable(other);
+    CHECK_EQ(answer, a.save(other));
+    if (geteuid() != 0) CHECK(!answer);
+    std::remove(other.c_str());
     // In a folder that takes new files, save()'s rename replaces a read-only file: yes.
     CHECK(chmod(dir.c_str(), 0755) == 0 && chmod(file.c_str(), 0444) == 0);
     answer = IniFile::writable(file);
