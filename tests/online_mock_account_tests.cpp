@@ -878,6 +878,9 @@ TEST(mock_account_gif_quota_and_special_inputs) {
     CHECK(gifOf(srv, id, o).ok);
 }
 
+// Signed out, offline, or on a server without GIFs: the answers net::OnlineClient would give. A
+// game's answer always names it (the GifSaver keeps only the one it awaits), and game 0 is refused
+// before anything else, as the client refuses it without sending anything.
 TEST(mock_account_gif_signed_out_and_disabled) {
     VirtualClock vc;
     {
@@ -885,8 +888,22 @@ TEST(mock_account_gif_signed_out_and_disabled) {
         net::ServerEndpoint ep;
         ep.host = "fake.example.org";
         srv.setServer(ep);
-        CHECK_EQ(gifOf(srv, 812, net::GifOptions()).error, std::string("unauthorized"));
+        Event e = gifOf(srv, 812, net::GifOptions());
+        CHECK_EQ(e.error, std::string("unauthorized"));   // no session saved: the one code, signed out
+        CHECK(!e.sessionLost);
+        CHECK_EQ(e.gameId, uint64_t(812));
         CHECK_EQ(gifOfPgn(srv, kScholar, net::GifOptions()).error, std::string("unauthorized"));
+        CHECK_EQ(gifOf(srv, 0, net::GifOptions()).error, std::string("invalid_game_id"));
+    }
+    {
+        mock::FakeServer srv;
+        net::ServerEndpoint ep;
+        ep.host = "offline.example.org";
+        srv.setServer(ep);
+        Event e = gifOf(srv, 812, net::GifOptions());
+        CHECK_EQ(e.error, std::string("network"));
+        CHECK_EQ(e.gameId, uint64_t(812));
+        CHECK_EQ(gifOfPgn(srv, kScholar, net::GifOptions()).error, std::string("network"));
     }
     {
         mock::FakeServer srv;
