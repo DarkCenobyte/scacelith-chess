@@ -232,7 +232,8 @@ struct Director::Impl {
             if (s.pcm.empty()) s.failed = true;   // synthesis failed: shown only
         } else if (stage->speechFailed(s.request)) {
             s.failed = true;
-            LOGW("coach: speech of %s failed, shown only", s.written.text.c_str());
+            const std::string& text = s.written.text.empty() ? s.spoken.text : s.written.text;   // prefetched: spoken only
+            LOGW("coach: speech of %s failed, shown only", text.c_str());
         }
     }
 
