@@ -306,7 +306,7 @@ bool Graph::load(const uint8_t* data, size_t size, const std::string& label,
     }
     if (!foldConstants(k, error)) return false;
     fusePatterns();
-    finish();
+    finish(k);
     return true;
 }
 
@@ -525,7 +525,7 @@ void Graph::fusePatterns() {
 }
 
 // Consumers, last uses and the invariant (cacheable) part of the graph.
-void Graph::finish() {
+void Graph::finish(const kern::Table& k) {
     for (Value& v : values_) {
         v.consumers.clear();
         v.lastUse = -1;
@@ -542,6 +542,19 @@ void Graph::finish() {
             if (!val.isConst && !val.invariant) inv = false;
         }
         n.invariant = inv;
+        // The column sums of a constant int8 weight, which the VNNI integer GEMM needs for the
+        // zero point of its activations (the 16-bit one subtracts it while packing), once instead of
+        // on every run.
+        n.bSums.clear();
+        if (k.ik == 4 && (n.op == Op::MatMulInteger || n.op == Op::MatMulIntegerScaled) && n.in.size() > 1 &&
+            n.in[1] >= 0) {
+            const Tensor& b = values_[size_t(n.in[1])].constant;
+            if (values_[size_t(n.in[1])].isConst && b.type == DType::I8 && b.data && b.rank() == 2) {
+                n.bSums.assign(size_t(b.dims[1]), 0);
+                for (int64_t r = 0; r < b.dims[0]; ++r)
+                    for (int64_t c = 0; c < b.dims[1]; ++c) n.bSums[size_t(c)] += b.as<int8_t>()[r * b.dims[1] + c];
+            }
+        }
         for (int v : n.out) {
             values_[size_t(v)].producer = int(i);
             values_[size_t(v)].invariant = inv;

@@ -54,6 +54,7 @@ struct Node {
     Tensor value;                      // Constant / ConstantOfShape
     // Set by the loader.
     bool invariant = false;            // depends only on constants and invariant inputs
+    std::vector<int32_t> bSums;        // MatMulInteger with a constant int8 B: the sums of its columns (VNNI)
 };
 
 struct Value {
@@ -98,7 +99,7 @@ public:
 private:
     bool foldConstants(const kern::Table& k, std::string* error);
     void fusePatterns();
-    void finish();
+    void finish(const kern::Table& k);
     int addValue(const std::string& name);
 
     std::string label_;

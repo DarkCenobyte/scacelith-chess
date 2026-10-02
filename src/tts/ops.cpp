@@ -1151,9 +1151,10 @@ bool opConv(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tens
 }
 
 // MatMulInteger (u8 activations x s8 weights), optionally with the float epilogue of the
-// dynamic-quantization pattern: out = float(acc) * scale [+ bias].
-bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin, bool scaled, Tensor& out,
-                     std::string* err) {
+// dynamic-quantization pattern: out = float(acc) * scale [+ bias]. 'bSums': the column sums of a
+// constant B (Node::bSums), or empty.
+bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin, bool scaled,
+                     const std::vector<int32_t>& bSums, Tensor& out, std::string* err) {
     const Tensor& a = *in[0];
     const Tensor& b = *in[1];
     if (b.rank() != 2 || a.rank() < 2) return fail(err, "MatMulInteger expects [..,M,K] x [K,N]");
@@ -1167,8 +1168,9 @@ bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin
     Dims od = a.dims;
     od.back() = N;
     Tensor acc = Tensor::alloc(DType::I32, od);
+    const int32_t* sums = aU && b.type == DType::I8 && bSums.size() == size_t(N) ? bSums.data() : nullptr;
     if (!igemm(*ctx.k, ctx.pool, int(M), int(N), int(K), a.as<uint8_t>(), K, aU, azp, b.as<uint8_t>(), N, bU, bzp,
-               acc.mut<int32_t>(), N))
+               acc.mut<int32_t>(), N, sums))
         return fail(err, "MatMulInteger operand types or zero points not supported");
     if (!scaled) {
         out = acc;
@@ -1420,8 +1422,8 @@ bool execNode(const Node& n, const Tensor* const* in, Tensor* out, const ExecCon
     case Op::MatMul: return need(2) && opMatMul(ctx, *in[0], *in[1], out[0], error);
     case Op::Gemm: return need(2) && opGemm(ctx, n, *in[0], *in[1], opt(2), out[0], error);
     case Op::Conv: return need(2) && opConv(ctx, n, *in[0], *in[1], opt(2), out[0], error);
-    case Op::MatMulInteger: return need(2) && opMatMulInteger(ctx, in, nin, false, out[0], error);
-    case Op::MatMulIntegerScaled: return need(2) && opMatMulInteger(ctx, in, nin, true, out[0], error);
+    case Op::MatMulInteger: return need(2) && opMatMulInteger(ctx, in, nin, false, n.bSums, out[0], error);
+    case Op::MatMulIntegerScaled: return need(2) && opMatMulInteger(ctx, in, nin, true, n.bSums, out[0], error);
     case Op::DynamicQuantize: return need(1) && opDynamicQuantize(ctx, *in[0], out, error);
     case Op::Quantize: return need(2) && opQuantize(ctx, n, in, nin, out[0], error);
     case Op::Dequantize:

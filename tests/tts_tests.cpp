@@ -1093,6 +1093,15 @@ TEST(tts_kernels_all_levels) {
                     }
                 if (!ok) std::fprintf(stderr, "  %s igemm %dx%dx%d order %d wrong\n", k.name, M, N, Kd, order);
                 CHECK(ok);
+                // The same with the sums of the signed operand given (constant weights).
+                std::vector<int32_t> sums(size_t(aU ? N : M), 0), C2(size_t(M * N));
+                for (int i = 0; i < M; ++i)
+                    for (int j = 0; j < N; ++j)
+                        for (int kk = 0; kk < Kd && (aU ? i == 0 : j == 0); ++kk)
+                            sums[size_t(aU ? j : i)] += aU ? int8_t(B[size_t(kk * N + j)]) : int8_t(A[size_t(i * Kd + kk)]);
+                CHECK(tts::igemm(k, level % 2 ? nullptr : &pool, M, N, Kd, A.data(), Kd, aU, azp, B.data(), N, !aU,
+                                 bzp, C2.data(), N, sums.data()));
+                CHECK(C2 == C);
             }
         }
         // Element-wise functions.
