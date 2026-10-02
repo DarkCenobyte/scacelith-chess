@@ -375,6 +375,15 @@ TEST(chess_san_parse_tolerant) {
     CHECK_EQ(parsedUCI(queens, "Qe1"), "invalid");
     CHECK_EQ(parsedUCI(queens, "Qhe1"), "invalid");  // h4 and h1
     CHECK_EQ(parsedUCI(queens, "Q1e1"), "h1e1");
+    // Legal UCI comes before the lowercase piece letter: "b1d2" is the knight, not "B1d2".
+    const char* bfile = "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2";
+    CHECK_EQ(parsedUCI(bfile, "b8d7"), "b8d7");
+    CHECK_EQ(parsedUCI(bfile, "bd7"), "c8d7");
+    CHECK_EQ(parsedUCI(bfile, "B8d7"), "c8d7");
+    const char* bfileWhite = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2";
+    CHECK_EQ(parsedUCI(bfileWhite, "b1d2"), "b1d2");
+    CHECK_EQ(parsedUCI(bfileWhite, "bd2"), "c1d2");
+    CHECK_EQ(parsedUCI("4k3/8/8/8/8/8/8/2B1K3 w - - 0 1", "b1d2"), "c1d2");  // not UCI here: no piece on b1
     // UCI parsing strictness.
     Position p;
     CHECK(p.parseUCI("e2e4").valid());

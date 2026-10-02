@@ -741,14 +741,16 @@ Move Position::parseSAN(const std::string& in) const {
     if (s.empty()) return Move{};
     Move m = parseSANStrict(s);
     if (m.valid()) return m;
+    // Plain UCI before the lowercase piece letter, so that "b1d2" is the knight and not "B1d2".
+    m = parseUCI(s);
+    if (m.valid()) return m;
     // Lowercase piece letter ("nf3", "bb5" when no pawn move matches).
     if (inSet("nbrqk", s[0])) {
         std::string u = s;
         u[0] = char(u[0] - 'a' + 'A');
-        m = parseSANStrict(u);
-        if (m.valid()) return m;
+        return parseSANStrict(u);
     }
-    return parseUCI(s);
+    return Move{};
 }
 
 // ---- Perft ----------------------------------------------------------------------------------
