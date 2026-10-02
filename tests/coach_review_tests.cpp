@@ -888,6 +888,23 @@ TEST(coach_review_great_praise_forgets_taken_back_moves) {
     }
 }
 
+TEST(coach_review_no_praise_for_a_quicker_mate) {
+    // Lost to a forced mate either way: grabbing the rook allows mate in one instead of three. The
+    // class stays Best (lichess), but the coach does not praise it; at the same distance it does.
+    const char* fen = "3q2k1/5ppp/8/3N4/1r6/8/6PP/4R2K w - - 0 1";
+    for (int bestMate : {-3, -1}) {
+        Game g = gameOf(fen, {"Nxb4"});
+        Reviewer rv;
+        rv.reset(1, White);
+        const ai::Analysis a0 = analysisOf({pvl(0, "e1e8 d8e8", bestMate), pvl(0, "d5b4 d8d1", -1)});
+        const Review r = reviewOf(rv, g, a0);
+        CHECK_EQ(r.verdict.cls, MoveClass::Best);
+        CHECK(r.verdict.goodCapture);
+        CHECK_EQ(hasKey(r.script, "praise.capture.b1"), bestMate == -1);
+        checkScript(r.script, "quicker mate");
+    }
+}
+
 TEST(coach_review_repetition_tip_is_not_a_stalemate) {
     // A winning player repeats the position (level 1): the repetition tip is said, but the move is
     // not recorded as a stalemate fault, so the appraisal gives no stalemate advice about it.
