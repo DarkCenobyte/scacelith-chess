@@ -1,7 +1,6 @@
 // Chess table and players' chairs (Louis XVI): procedural, generated at startup.
 #include "furniture.h"
 #include "hall_geom.h"
-#include "../core/log.h"
 #include "../render/renderer.h"
 
 using namespace m;

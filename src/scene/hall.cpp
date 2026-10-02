@@ -3,7 +3,6 @@
 #include "hall_internal.h"
 #include "../core/log.h"
 #include "../render/renderer.h"
-#include <array>
 #include <cctype>
 #include <chrono>
 

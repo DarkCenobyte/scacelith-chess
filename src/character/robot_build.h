@@ -3,7 +3,6 @@
 #include "robot.h"
 #include "sdf.h"
 #include <functional>
-#include <string>
 
 namespace character {
 namespace build {
