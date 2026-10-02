@@ -1,6 +1,7 @@
 // Shared ornaments of the hall: Corinthian capital relief, rosettes, picture frames, raised
 // panels, urns.
 #include "hall_internal.h"
+#include <cstring>
 
 using namespace m;
 
@@ -50,7 +51,7 @@ float volute(float x, float y, float R, float pj) {
 
 }  // namespace
 
-void corinthianCapital(MeshData& d, const WallDef& w, float u, float y0, float y1, float hw, float p) {
+void corinthianCapital(MeshData& d, const WallDef& w, float u, float y0, float y1, float hw, float p, CapitalCache* cache) {
     const float abacusH = 0.085f;
     const float bellTop = y1 - abacusH;
     const float H = bellTop - y0;
@@ -115,15 +116,32 @@ void corinthianCapital(MeshData& d, const WallDef& w, float u, float y0, float y
         return h * sstep(0.0f, 0.03f, toWall);
     };
     const int NS = 76, NV = 46;
-    auto fn = [&](float s, float tv) {
-        float t = tv;
+    auto bell = [&](float s, float t) {
         float hl = halfLen(t);
         float X = (s * 2.0f - 1.0f) * hl;
         vec2 pos, nrm;
         float Xc;
         outline(X, t, pos, nrm, Xc);
         float h = relief(X, t * H, Xc, hl);
-        vec2 q = pos + nrm * h;
+        return pos + nrm * h;
+    };
+    if (cache && (cache->y0 != y0 || cache->y1 != y1 || cache->hw != hw || cache->p != p)) {
+        cache->bell.clear();
+        cache->y0 = y0; cache->y1 = y1; cache->hw = hw; cache->p = p;
+    }
+    auto fn = [&](float s, float tv) {
+        float t = tv;
+        vec2 q;
+        if (cache) {
+            uint32_t bs, bt;
+            std::memcpy(&bs, &s, sizeof(bs));
+            std::memcpy(&bt, &tv, sizeof(bt));
+            auto [it, inserted] = cache->bell.try_emplace((uint64_t(bs) << 32) | bt);
+            if (inserted) it->second = bell(s, t);
+            q = it->second;
+        } else {
+            q = bell(s, t);
+        }
         return w.P(u + q.x, y0 + t * H, q.y);
     };
     surface(d, NS, NV, fn, false, UVMode::Meters);

@@ -2,6 +2,7 @@
 #pragma once
 #include "hall.h"
 #include "hall_geom.h"
+#include <unordered_map>
 
 namespace hall {
 namespace detail {
@@ -47,8 +48,14 @@ void buildTapestries(Accum& a, std::vector<ModelPart>& parts);
 void buildProps(Accum& a, MeshData& paintings);
 
 // Shared ornament helpers (hall_ornament.cpp).
+// Bell samples of corinthianCapital (outline point + relief per surface sample): they depend only
+// on the capital's size, so the pilasters of one size share them. Refilled when the size changes.
+struct CapitalCache {
+    float y0 = 0, y1 = 0, hw = 0, p = 0;
+    std::unordered_map<uint64_t, vec2> bell;  // key: bit patterns of the sample (s, t)
+};
 // Corinthian capital relief wrapped around a pilaster: shaft outline half width hw, projection p.
-void corinthianCapital(MeshData& d, const WallDef& w, float u, float y0, float y1, float hw, float p);
+void corinthianCapital(MeshData& d, const WallDef& w, float u, float y0, float y1, float hw, float p, CapitalCache* cache = nullptr);
 // Gilded rosette (flower) facing 'n', centred at c, radius r.
 void rosette(MeshData& d, vec3 c, vec3 n, float r, int petals, float depth);
 // Picture frame + canvas on a wall: centre (u, v), canvas size (cw, ch), frame width fw.
