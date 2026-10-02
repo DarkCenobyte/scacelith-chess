@@ -46,7 +46,8 @@ static int runApp(std::vector<std::string> args) {
     AppContext ctx;
     ctx.args = args;
     std::string exeDir = plat::exeDirectory();
-    logx::init((exeDir + "scacelith.log").c_str());
+    // The log falls back to the user data dir like the settings when the exe dir is read-only.
+    if (!logx::init((exeDir + "scacelith.log").c_str())) logx::init((plat::userDataDirectory() + "scacelith.log").c_str());
     LOGI("Scacelith 0.1.0 starting");
 
     if (ctx.hasArg("--list-scenes")) {
