@@ -354,6 +354,13 @@ void Animator::Impl::planGesture(const Task& t, float start, float T, const Hand
         const float P = T / float(nb);
         curLook = false;
         curArrive = T;   // (nothing to cut short)
+        if (gestureBlocked(from, T, mo)) {
+            // (The beats still fire, at the requested spot or where the hand holds.)
+            curTargetWorld = hasPos ? t.position : toWorld(from.p);
+            for (int k = 0; k < nb; ++k)
+                curEvents.push_back({start + (float(k) + 0.6f) * P, EventType::GestureBeat, ActNone, false, true, curTargetWorld});
+            return;
+        }
         // Beat where a Present / Open hand already is, else in front of the body at the board edge.
         const bool inPlace = prevType == TaskType::Gesture && from.p.y > tableC + 0.06f && length(from.v) < 0.3f;
         HandSample base = from;

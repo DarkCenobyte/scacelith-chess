@@ -520,6 +520,44 @@ TEST(anim_cancel_tasks_lets_go_and_goes_on_from_the_hand) {
     CHECK(!an.busy());
 }
 
+// A hand holding a piece does not gesture, Beat included: the task only holds the piece still, its
+// beats still fire on time.
+TEST(anim_beat_while_holding_only_holds) {
+    anim::Animator an;
+    initWhite(an);
+    const m::vec3 e2 = layout::squareCenter(12);
+    an.pieceTransform = [&](int id) { return id == 0 ? m::translate(e2) : m::mat4(); };
+    an.pieceGripInfo = [](int) { return m::vec3(layout::PIECE_HEIGHT[1], layout::PIECE_GRIP_HEIGHT[1], layout::PIECE_GRIP_RADIUS[1]); };
+    anim::Task reach, beat;
+    reach.type = anim::TaskType::Reach;
+    reach.pieceId = 0;
+    beat.type = anim::TaskType::Gesture;
+    beat.shape = anim::HandShape::Beat;
+    beat.duration = 0.9f;   // two strokes
+    an.enqueue({reach, beat});
+    const float dt = 1.0f / 120.0f;
+    std::vector<anim::Event> ev;
+    std::vector<float> beats;
+    m::mat4 held0;
+    float moved = 0.0f;
+    bool held = true;
+    for (int step = 0; step < int((anim::Timing::Reach + 1.0f) / dt); ++step) {
+        ev.clear();
+        an.update(dt, ev);
+        for (const anim::Event& e : ev)
+            if (e.type == anim::EventType::GestureBeat) beats.push_back(e.time);
+        if (an.time() < anim::Timing::Reach) continue;
+        m::mat4 p;
+        held = held && an.heldPieceTransform(0, p);
+        if (an.time() - anim::Timing::Reach < dt) held0 = p;
+        else moved = std::max(moved, m::length(p.translation() - held0.translation()));
+    }
+    CHECK(held);
+    CHECK(moved < 0.002f);
+    CHECK_EQ(int(beats.size()), 2);
+    for (size_t k = 0; k < beats.size(); ++k) CHECK(std::fabs(beats[k] - (anim::Timing::Reach + (float(k) + 0.6f) * 0.45f)) < 1e-4f);
+}
+
 // An animator is not copyable (a copy would drive the same character state); the game resets one
 // by moving a fresh one in.
 static_assert(!std::is_copy_constructible_v<anim::Animator> && !std::is_copy_assignable_v<anim::Animator>);
