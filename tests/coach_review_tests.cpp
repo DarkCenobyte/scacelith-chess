@@ -859,6 +859,35 @@ TEST(coach_review_threat_warnings) {
 
 // ---- Regressions ---------------------------------------------------------------------------------
 
+TEST(coach_review_great_praise_forgets_taken_back_moves) {
+    // "Great move" needs the human's previous move to have left them at W% <= 45. A blunder taken
+    // back from the menu (no offer: the review is not told) must not count as that previous move.
+    const ai::Analysis first = analysisOf({pvl(30, "e2e4 e7e5"), pvl(25, "d2d4 d7d5")});
+    const ai::Analysis root = analysisOf({pvl(300, "g1f3"), pvl(-100, "b1c3"), pvl(-120, "f1c4")});
+    const ai::Analysis queen = analysisOf({pvl(-500, "d1h5")});
+    for (bool takeback : {false, true}) {
+        Game g = gameOf(nullptr, {"e4"});
+        Reviewer rv;
+        rv.reset(2, White);
+        reviewOf(rv, g, first);
+        g.play(g.position().parseSAN("e5"));
+        if (takeback) {
+            g.play(g.position().parseSAN("Qh5"));
+            ReviewInput in;
+            in.game = &g;
+            in.before = &root;
+            in.played = &queen;
+            CHECK_EQ(rv.review(in).verdict.cls, MoveClass::Blunder);
+            CHECK(g.undo(1));
+        }
+        g.play(g.position().parseSAN("Nf3"));
+        const Review r = reviewOf(rv, g, root);
+        CHECK(!r.verdict.great);
+        CHECK(hasKey(r.script, "praise.only.b2"));
+        CHECK(!hasKey(r.script, "praise.great.b2"));
+    }
+}
+
 TEST(coach_review_repetition_tip_is_not_a_stalemate) {
     // A winning player repeats the position (level 1): the repetition tip is said, but the move is
     // not recorded as a stalemate fault, so the appraisal gives no stalemate advice about it.

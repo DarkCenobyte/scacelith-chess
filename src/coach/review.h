@@ -201,7 +201,7 @@ private:
     bool coachCheckExplained_ = false;
     bool punishHintDone_ = false;
     uint32_t tipsSaid_ = 0;           // opening principles and endgame tips already voiced (bits)
-    double lastHumanWPlayed_ = -1.0;  // the human's W% after their previous move (their view)
+    std::vector<double> humanW_;      // the human's W% after each judged move on the board (index = ply, -1: none)
     // The last offer, and a takeback in progress.
     TakebackRecord offered_;          // the move the last offer was about
     chess::Square offeredHint_ = chess::NoSquare;

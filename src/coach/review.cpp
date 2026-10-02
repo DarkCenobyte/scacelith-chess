@@ -466,6 +466,8 @@ Review Reviewer::review(const ReviewInput& in) {
     c.playedSan = g.sanMoves()[size_t(c.ply)];
     c.f = analyzeMove(c.p0, c.played);
     c.base = materialBalance(c.p0, human_);
+    // Moves taken back (an offer accepted or not) leave the W% history.
+    humanW_.resize(size_t(c.ply), -1.0);
 
     PlyVerdict& v = out.verdict;
     v.ply = c.ply;
@@ -759,14 +761,15 @@ Review Reviewer::review(const ReviewInput& in) {
         const bool sacrifice = !promoSoon && (c.f.seeCp <= -200 ||
                                               (c.playedLine.size() >= 2 && c.playedLine[1].balance <= c.base - 2));
         const bool only = c.isBest && legal >= 2 && c.l2 && w1 - w2 >= 15.0 && w1 >= 25.0 && !(c.p0.inCheck() && legal <= 2);
+        double lastW = -1.0;   // the human's W% after their previous judged move
+        for (size_t i = humanW_.size(); i-- > 0 && lastW < 0.0;) lastW = humanW_[i];
         std::string key;
         if (!c.p1.isCheckmate() && !recapture && !decided && cls != MoveClass::Forced) {
             if (!brilliantDone_ && c.j.delta < 2.0 && sacrifice && w1 <= 85.0 && c.j.wPlayed >= 50.0) {
                 key = level_ <= 2 ? "praise.sacrifice" : bandKey("praise.brilliant", level_);
                 brilliantDone_ = true;
                 v.brilliant = true;
-            } else if (level_ >= 2 && c.isBest && w1 >= 60.0 && c.l2 && w1 - w2 >= 20.0 && lastHumanWPlayed_ >= 0.0 &&
-                       lastHumanWPlayed_ <= 45.0) {
+            } else if (level_ >= 2 && c.isBest && w1 >= 60.0 && c.l2 && w1 - w2 >= 20.0 && lastW >= 0.0 && lastW <= 45.0) {
                 key = bandKey("praise.great", level_);
                 v.great = true;
             } else if (level_ >= 2 && only) {
@@ -808,7 +811,7 @@ Review Reviewer::review(const ReviewInput& in) {
         }
     }
 
-    lastHumanWPlayed_ = c.j.wPlayed;
+    humanW_.push_back(c.j.wPlayed);
     out.script = s;
     return out;
 }
