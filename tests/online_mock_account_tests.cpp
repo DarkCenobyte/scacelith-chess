@@ -405,7 +405,8 @@ TEST(mock_account_game_played_goes_into_the_history) {
     int after = 0;
     std::vector<net::GameSummary> games = allGames(srv, net::GamesFilter(), 10, &after);
     CHECK_EQ(after, before + 1);
-    CHECK(!games.empty() && games[0].id == id);
+    REQUIRE(!games.empty());
+    CHECK(games[0].id == id);
     CHECK_EQ(games[0].reason, 2);
     CHECK(games[0].rated);
     CHECK((games[0].you == 0 ? games[0].white : games[0].black).ratingChanged);

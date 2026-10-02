@@ -2,8 +2,10 @@
 
 In-house engine on OpenGL 4.6 core (DSA only), C++17, no third-party engine. The shipping target
 is a single self-contained Windows x64 executable (MinGW-w64, static). Everything (shaders,
-fonts, the Stockfish NNUE network) is embedded; only `Scacelith.ini` lives next to the exe. The
-coach's voice model is never shipped: the game downloads it, at the player's request, into its
+fonts, the Stockfish NNUE network) is embedded; only the settings (`Scacelith.ini`), the online
+sign-ins (`Scacelith.credentials`) and the log (`scacelith.log`) live next to the exe (when that
+folder is read-only, all three go to the user data folder).
+The coach's voice model is never shipped: the game downloads it, at the player's request, into its
 per-user application folder (`plat::appDataDirectory()`: `%APPDATA%\scacelith\` on Windows,
 `$XDG_DATA_HOME/scacelith/` or `~/.local/share/scacelith/` on Linux, and
 `~/Library/Application Support/scacelith/` for a future macOS port), subfolder `coach/`.

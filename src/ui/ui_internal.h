@@ -1,6 +1,7 @@
 // Shared state between the UI translation units (core, screens, viewer). Internal to src/ui.
 #pragma once
 #include "ui.h"
+#include "scacelith_version.h"
 #include <string>
 #include <vector>
 
@@ -12,7 +13,7 @@ struct Data {
     std::vector<std::string> timeControls;
     std::vector<m::ivec2> resolutions;
     std::vector<CoachLevelInfo> coachLevels;
-    std::string version = "0.1.0";
+    std::string version = SCACELITH_VERSION;
 };
 Data& data();
 

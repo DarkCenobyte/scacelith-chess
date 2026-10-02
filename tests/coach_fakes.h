@@ -301,7 +301,6 @@ public:
         ai::AnalysisRequest req;
         std::string fen, shape;
         int left = 0;
-        bool stopped = false;
     };
     std::vector<Job> jobs;
     std::vector<Job> asked;   // every request, in order
@@ -380,10 +379,7 @@ public:
     }
     void stopAnalysis(uint32_t id) override {
         for (Job& j : jobs)
-            if (j.id == id) {
-                j.stopped = true;
-                j.left = std::min(j.left, 1);
-            }
+            if (j.id == id) j.left = std::min(j.left, 1);
     }
     void cancelAnalysis(uint32_t id) override {
         jobs.erase(std::remove_if(jobs.begin(), jobs.end(), [&](const Job& j) { return id == 0 || j.id == id; }),

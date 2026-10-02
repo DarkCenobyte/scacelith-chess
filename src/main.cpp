@@ -27,6 +27,7 @@
 #include "render/shader.h"
 #include "game/settings.h"
 #include "net/online_client.h"
+#include "scacelith_version.h"
 
 #include <chrono>
 #include <cstdio>
@@ -42,10 +43,6 @@ extern "C" {
 __declspec(dllexport) unsigned long NvOptimusEnablement = 1;
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
-#endif
-
-#ifndef SCACELITH_VERSION_STRING
-#define SCACELITH_VERSION_STRING "0.1.0"
 #endif
 
 // Local time to the millisecond, "20261002-134501-123": F12 screenshots are named by it, so a
@@ -68,7 +65,7 @@ static int runApp(std::vector<std::string> args) {
     std::string exeDir = plat::exeDirectory();
     // The log falls back to the user data dir like the settings when the exe dir is read-only.
     if (!logx::init((exeDir + "scacelith.log").c_str())) logx::init((plat::userDataDirectory() + "scacelith.log").c_str());
-    LOGI("Scacelith %s starting", SCACELITH_VERSION_STRING);
+    LOGI("Scacelith " SCACELITH_VERSION " starting");
 
     if (ctx.hasArg("--list-scenes")) {
         for (auto& s : listScenes()) std::printf("%-20s %s\n", s.first.c_str(), s.second.c_str());
@@ -141,6 +138,7 @@ static int runApp(std::vector<std::string> args) {
     int frame = 0;
     bool running = true;
     bool f5Held = false, f12Held = false;  // F5 and F12 act once per press, not on auto-repeat
+    bool shotFailed = false;
     while (running) {
         if (!plat::pumpEvents()) break;
         double now = plat::time();
@@ -168,8 +166,12 @@ static int runApp(std::vector<std::string> args) {
             glFinish();
             renderer.readBackbuffer(px, sw, sh);
             std::string out = ctx.screenshotMode ? shotPath : plat::userDataDirectory() + "screenshot_" + timestamp() + ".png";
-            if (image::writePNG(out, sw, sh, 3, px.data())) LOGI("saved %s (%dx%d)", out.c_str(), sw, sh);
-            else LOGE("could not write %s", out.c_str());
+            if (image::writePNG(out, sw, sh, 3, px.data())) {
+                LOGI("saved %s (%dx%d)", out.c_str(), sw, sh);
+            } else {
+                LOGE("could not write %s", out.c_str());
+                if (ctx.screenshotMode) shotFailed = true;
+            }
             if (ctx.screenshotMode) running = false;
         }
         if (visible) plat::swapBuffers();
@@ -181,7 +183,7 @@ static int runApp(std::vector<std::string> args) {
     settings.save();
     plat::shutdown();
     logx::shutdown();
-    return 0;
+    return shotFailed ? 2 : 0;  // a --shot run without its image fails (tools/shot.sh)
 }
 
 #ifdef _WIN32

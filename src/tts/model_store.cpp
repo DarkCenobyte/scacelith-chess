@@ -6,14 +6,11 @@
 #include "net/crypto.h"
 #include "net/download.h"
 #include "net/net_sys.h"
+#include "scacelith_version.h"
 
 #include <algorithm>
 #include <chrono>
 #include <cstdio>
-
-#ifndef SCACELITH_VERSION_STRING
-#define SCACELITH_VERSION_STRING "0.1.0"
-#endif
 
 namespace tts {
 
@@ -102,9 +99,9 @@ void setModelFolder(const std::string& dir) {
 
 std::string downloadUserAgent() {
 #ifdef _WIN32
-    return std::string("Scacelith/") + SCACELITH_VERSION_STRING + " (Windows)";
+    return std::string("Scacelith/") + SCACELITH_VERSION + " (Windows)";
 #else
-    return std::string("Scacelith/") + SCACELITH_VERSION_STRING + " (Linux)";
+    return std::string("Scacelith/") + SCACELITH_VERSION + " (Linux)";
 #endif
 }
 

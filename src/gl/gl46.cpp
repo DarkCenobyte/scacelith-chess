@@ -658,22 +658,6 @@ PFNGLSPECIALIZESHADERPROC glSpecializeShader = nullptr;
 PFNGLMULTIDRAWARRAYSINDIRECTCOUNTPROC glMultiDrawArraysIndirectCount = nullptr;
 PFNGLMULTIDRAWELEMENTSINDIRECTCOUNTPROC glMultiDrawElementsIndirectCount = nullptr;
 PFNGLPOLYGONOFFSETCLAMPPROC glPolygonOffsetClamp = nullptr;
-PFNGLGETTEXTUREHANDLEARBPROC glGetTextureHandleARB = nullptr;
-PFNGLGETTEXTURESAMPLERHANDLEARBPROC glGetTextureSamplerHandleARB = nullptr;
-PFNGLMAKETEXTUREHANDLERESIDENTARBPROC glMakeTextureHandleResidentARB = nullptr;
-PFNGLMAKETEXTUREHANDLENONRESIDENTARBPROC glMakeTextureHandleNonResidentARB = nullptr;
-PFNGLGETIMAGEHANDLEARBPROC glGetImageHandleARB = nullptr;
-PFNGLMAKEIMAGEHANDLERESIDENTARBPROC glMakeImageHandleResidentARB = nullptr;
-PFNGLMAKEIMAGEHANDLENONRESIDENTARBPROC glMakeImageHandleNonResidentARB = nullptr;
-PFNGLUNIFORMHANDLEUI64ARBPROC glUniformHandleui64ARB = nullptr;
-PFNGLUNIFORMHANDLEUI64VARBPROC glUniformHandleui64vARB = nullptr;
-PFNGLPROGRAMUNIFORMHANDLEUI64ARBPROC glProgramUniformHandleui64ARB = nullptr;
-PFNGLPROGRAMUNIFORMHANDLEUI64VARBPROC glProgramUniformHandleui64vARB = nullptr;
-PFNGLISTEXTUREHANDLERESIDENTARBPROC glIsTextureHandleResidentARB = nullptr;
-PFNGLISIMAGEHANDLERESIDENTARBPROC glIsImageHandleResidentARB = nullptr;
-PFNGLVERTEXATTRIBL1UI64ARBPROC glVertexAttribL1ui64ARB = nullptr;
-PFNGLVERTEXATTRIBL1UI64VARBPROC glVertexAttribL1ui64vARB = nullptr;
-PFNGLGETVERTEXATTRIBLUI64VARBPROC glGetVertexAttribLui64vARB = nullptr;
 
 namespace gl46 {
 int load(GetProcFn getProc, const char** firstMissing) {
@@ -1993,22 +1977,6 @@ int load(GetProcFn getProc, const char** firstMissing) {
     if (!glMultiDrawElementsIndirectCount) { if (firstMissing && !*firstMissing) *firstMissing = "glMultiDrawElementsIndirectCount"; ++missing; }
     glPolygonOffsetClamp = (PFNGLPOLYGONOFFSETCLAMPPROC)getProc("glPolygonOffsetClamp");
     if (!glPolygonOffsetClamp) { if (firstMissing && !*firstMissing) *firstMissing = "glPolygonOffsetClamp"; ++missing; }
-    glGetTextureHandleARB = (PFNGLGETTEXTUREHANDLEARBPROC)getProc("glGetTextureHandleARB");
-    glGetTextureSamplerHandleARB = (PFNGLGETTEXTURESAMPLERHANDLEARBPROC)getProc("glGetTextureSamplerHandleARB");
-    glMakeTextureHandleResidentARB = (PFNGLMAKETEXTUREHANDLERESIDENTARBPROC)getProc("glMakeTextureHandleResidentARB");
-    glMakeTextureHandleNonResidentARB = (PFNGLMAKETEXTUREHANDLENONRESIDENTARBPROC)getProc("glMakeTextureHandleNonResidentARB");
-    glGetImageHandleARB = (PFNGLGETIMAGEHANDLEARBPROC)getProc("glGetImageHandleARB");
-    glMakeImageHandleResidentARB = (PFNGLMAKEIMAGEHANDLERESIDENTARBPROC)getProc("glMakeImageHandleResidentARB");
-    glMakeImageHandleNonResidentARB = (PFNGLMAKEIMAGEHANDLENONRESIDENTARBPROC)getProc("glMakeImageHandleNonResidentARB");
-    glUniformHandleui64ARB = (PFNGLUNIFORMHANDLEUI64ARBPROC)getProc("glUniformHandleui64ARB");
-    glUniformHandleui64vARB = (PFNGLUNIFORMHANDLEUI64VARBPROC)getProc("glUniformHandleui64vARB");
-    glProgramUniformHandleui64ARB = (PFNGLPROGRAMUNIFORMHANDLEUI64ARBPROC)getProc("glProgramUniformHandleui64ARB");
-    glProgramUniformHandleui64vARB = (PFNGLPROGRAMUNIFORMHANDLEUI64VARBPROC)getProc("glProgramUniformHandleui64vARB");
-    glIsTextureHandleResidentARB = (PFNGLISTEXTUREHANDLERESIDENTARBPROC)getProc("glIsTextureHandleResidentARB");
-    glIsImageHandleResidentARB = (PFNGLISIMAGEHANDLERESIDENTARBPROC)getProc("glIsImageHandleResidentARB");
-    glVertexAttribL1ui64ARB = (PFNGLVERTEXATTRIBL1UI64ARBPROC)getProc("glVertexAttribL1ui64ARB");
-    glVertexAttribL1ui64vARB = (PFNGLVERTEXATTRIBL1UI64VARBPROC)getProc("glVertexAttribL1ui64vARB");
-    glGetVertexAttribLui64vARB = (PFNGLGETVERTEXATTRIBLUI64VARBPROC)getProc("glGetVertexAttribLui64vARB");
     return missing;
 }
 }

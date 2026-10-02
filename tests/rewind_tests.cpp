@@ -419,9 +419,9 @@ TEST(rewind_random_games) {
         }
         CHECK(ok);
     }
-    std::printf("  %d rewinds one move at a time (%d trips), %d at once (%d trips, %d parked), %d promotions, "
-                "%d castlings, %d en passant, %d captures\n",
-                oneByOne, single.trips, atOnce, several.trips, several.parks, promotions, castlings, enPassant, captures);
+    std::fprintf(stderr, "  %d rewinds one move at a time (%d trips), %d at once (%d trips, %d parked), %d promotions, "
+                         "%d castlings, %d en passant, %d captures\n",
+                         oneByOne, single.trips, atOnce, several.trips, several.parks, promotions, castlings, enPassant, captures);
     CHECK_EQ(single.bad, 0);
     CHECK_EQ(several.bad, 0);
     CHECK_EQ(single.stageOrder, 0);
@@ -526,9 +526,9 @@ TEST(rewind_demonstration_lines) {
             ++lines;
         }
     }
-    std::printf("  %d demonstration lines, %d moves, %d victims beside their owner, %d promotions by the coach's side, "
-                "%d by the human's\n",
-                lines, plies, victimsBesideOwner, coachPromotions, humanSpares);
+    std::fprintf(stderr, "  %d demonstration lines, %d moves, %d victims beside their owner, %d promotions by the coach's side, "
+                         "%d by the human's\n",
+                         lines, plies, victimsBesideOwner, coachPromotions, humanSpares);
     CHECK_EQ(tally.bad, 0);
     CHECK(lines > 1000);
     CHECK(victimsBesideOwner > 200);
