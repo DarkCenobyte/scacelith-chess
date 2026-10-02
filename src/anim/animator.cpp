@@ -1258,7 +1258,7 @@ void Animator::init(const Skeleton& sk, vec3 pelvisWorld, float facing, Side pla
     I.pelvisWorld = I.mw(pelvisWorld);
     I.facing = facing >= 0.0f ? 1.0f : -1.0f;
     I.rootQ = I.facing > 0 ? axisAngle(vec3(0, 1, 0), PI) : quat();
-    I.root = toMat4(I.rootQ, pelvisWorld);
+    I.root = toMat4(I.rootQ, I.pelvisWorld);   // (rootQ is a turn about Y: the same mirrored)
     I.invRoot = inverseAffine(I.root);
     I.L1 = length(sk.restOffset[ForeArmR]);
     I.L2 = length(sk.restOffset[HandR]);

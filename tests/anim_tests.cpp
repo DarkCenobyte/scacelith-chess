@@ -308,6 +308,79 @@ TEST(anim_left_handed_mirror) {
     CHECK(penDiff < 1e-4f);
 }
 
+// A seat off the X = 0 plane: the left-handed player is still the mirror image of a right-handed
+// one seated at the mirrored spot, and sets the piece down where it was asked to.
+TEST(anim_left_handed_seat_off_centre) {
+    using namespace character;
+    const character::Skeleton& sk = robotSkeleton();
+    anim::Animator L, R;
+    L.init(sk, m::vec3(0.05f, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, Side::Left);
+    R.init(sk, m::vec3(-0.05f, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, Side::Right);
+    L.setRestHand(m::vec3(0.29f, layout::TABLE_TOP_Y, -0.34f));
+    R.setRestHand(m::vec3(-0.29f, layout::TABLE_TOP_Y, -0.34f));
+    // L: a pawn from f7 to f5 (on its playing hand's side); R: the mirror image.
+    const m::vec3 from = layout::squareCenter(5, 6), to = layout::squareCenter(5, 4);
+    auto mirror = [](m::vec3 p) { return m::vec3(-p.x, p.y, p.z); };
+    for (int k = 0; k < 2; ++k) {
+        anim::Animator& a = k == 0 ? L : R;
+        const m::vec3 f = k == 0 ? from : mirror(from), t = k == 0 ? to : mirror(to);
+        a.pieceTransform = [f](int id) { return id == 0 ? m::translate(f) : m::mat4(); };
+        a.pieceGripInfo = [](int) { return m::vec3(layout::PIECE_HEIGHT[1], layout::PIECE_GRIP_HEIGHT[1], layout::PIECE_GRIP_RADIUS[1]); };
+        std::vector<anim::Task> ts(5);
+        ts[0].type = anim::TaskType::Reach;
+        ts[0].pieceId = 0;
+        ts[1].type = anim::TaskType::Lift;
+        ts[2].type = anim::TaskType::Carry;
+        ts[2].position = t;
+        ts[3].type = anim::TaskType::Place;
+        ts[3].position = t;
+        ts[4].type = anim::TaskType::Retract;
+        a.enqueue(ts);
+    }
+    auto mirrorBone = [](int b) {
+        if (b >= ClavicleL && b <= PinkyL3) return b + (ClavicleR - ClavicleL);
+        if (b >= ClavicleR && b <= PinkyR3) return b - (ClavicleR - ClavicleL);
+        if (b >= ThighL && b <= FootL) return b + (ThighR - ThighL);
+        if (b >= ThighR && b <= FootR) return b - (ThighR - ThighL);
+        if (b == EyeL) return int(EyeR);
+        if (b == EyeR) return int(EyeL);
+        if (b == LidUpperL) return int(LidUpperR);
+        if (b == LidUpperR) return int(LidUpperL);
+        if (b == LidLowerL) return int(LidLowerR);
+        if (b == LidLowerR) return int(LidLowerL);
+        return b;
+    };
+    const m::mat4 S = m::scale(m::vec3(-1, 1, 1));
+    float worst = 0.0f, placeErr = -1.0f;
+    int evBad = 0, released = 0;
+    m::mat4 held;
+    std::vector<anim::Event> evL, evR;
+    const float dt = 1.0f / 120.0f;
+    for (int step = 0; step < int(1.6f / dt); ++step) {
+        evL.clear();
+        evR.clear();
+        L.update(dt, evL);
+        R.update(dt, evR);
+        if (evL.size() != evR.size()) ++evBad;
+        for (size_t i = 0; i < std::min(evL.size(), evR.size()); ++i) {
+            if (evL[i].type != evR[i].type || m::length(evL[i].position - mirror(evR[i].position)) > 1e-4f) ++evBad;
+            if (evL[i].type == anim::EventType::PieceReleased) {
+                ++released;
+                placeErr = m::length(held.translation() - to);   // where the hand held it the frame before
+            }
+        }
+        L.heldPieceTransform(0, held);
+        for (int b = 0; b < BoneCount; ++b) {
+            const m::mat4 want = S * R.globals()[mirrorBone(b)] * S;
+            worst = std::max(worst, m::length(L.globals()[b].translation() - want.translation()));
+        }
+    }
+    CHECK_EQ(released, 1);
+    CHECK_EQ(evBad, 0);
+    CHECK(worst < 1e-4f);
+    CHECK(placeErr >= 0.0f && placeErr < 0.004f);
+}
+
 // Tasks cut short (cancelTasks: the online opponent's move comes while its robot still plays their
 // live gestures): the piece in hand is let go without its release, and the next task starts at once
 // from where the hand is, with its usual duration.
