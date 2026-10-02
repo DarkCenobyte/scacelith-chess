@@ -61,7 +61,8 @@ struct AuthorityConfig {
     bool autoPress = true;            // GameSnapshot.autoPress (DirectHostOptions::autoPress)
 };
 
-// FNV-1a 32 of the first four FEN fields (the Move.posHash of schema.js).
+// FNV-1a 32 of the first four FEN fields (the Move.posHash of schema.js): net::positionDigest,
+// the digest of online play.
 uint32_t fenDigest(const std::string& fen);
 uint32_t positionHash(const chess::Position& pos);
 // A player name for PlayerInfo: trimmed, control characters removed, at most 24 bytes of valid

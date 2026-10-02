@@ -1,6 +1,6 @@
 #include "direct_authority.h"
 #include "direct_crypto.h"
-#include "online_client.h"   // packMove helpers
+#include "online_client.h"   // packMove helpers, positionDigest
 #include "protocol_gen.h"
 
 #include <algorithm>
@@ -25,19 +25,7 @@ uint32_t seqOf(const uint8_t* p, size_t n) {
 }
 }  // namespace
 
-uint32_t fenDigest(const std::string& fen) {
-    // The first four fields: placement, side, castling, en passant (up to the fourth space).
-    size_t end = fen.size();
-    int spaces = 0;
-    for (size_t i = 0; i < fen.size(); ++i)
-        if (fen[i] == ' ' && ++spaces == 4) { end = i; break; }
-    uint32_t h = 2166136261u;
-    for (size_t i = 0; i < end; ++i) {
-        h ^= (unsigned char)fen[i];
-        h *= 16777619u;
-    }
-    return h;
-}
+uint32_t fenDigest(const std::string& fen) { return positionDigest(fen); }
 
 uint32_t positionHash(const chess::Position& pos) { return fenDigest(pos.fen()); }
 
