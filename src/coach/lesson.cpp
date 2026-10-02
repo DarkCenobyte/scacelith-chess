@@ -276,10 +276,6 @@ IllegalInfo whyIllegal(const Position& p, Square from, Square to, PieceType prom
                 return info;
             }
         }
-        info.reason = IllegalReason::LeavesKingInCheck;
-        info.culprit = a.empty() ? NoSquare : a.front();
-        info.square = king;
-        return info;
     }
     info.reason = IllegalReason::LeavesKingInCheck;
     info.culprit = a.empty() ? NoSquare : a.front();
