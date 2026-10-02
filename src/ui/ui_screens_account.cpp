@@ -664,9 +664,11 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         }
         y += 82.0f;
         // Actions: Save game and Save as GIF side by side (the GIF alone without saved games), Replay,
-        // Report opponent; the spinner of a save on the start side of its button, the GIF's on the end
-        // (when the line under the buttons tells of the save rather than of the GIF).
-        const float bh = 52.0f, bstep = 62.0f, bgap = 16.0f;
+        // Report opponent. A spinner follows the button whose work it shows, on its end side: the
+        // save's in the gap between Save game and Save as GIF (or after Replay, for a replay), the
+        // GIF's after its button (when the line under the buttons tells of the save rather than of
+        // the GIF).
+        const float bh = 52.0f, bstep = 62.0f, bgap = 40.0f, spinAfter = 22.0f;
         const bool hasMoves = !g.moves.empty();
         const bool working = s.save == Save::Checking || s.save == Save::Downloading || s.save == Save::Writing;
         const game::GifSaver& gif = se.gif();
@@ -682,17 +684,18 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
             const Rect b = im::flip(lcol, Rect(lx, y, halfW, bh));
             save = im::button(L(saved ? "online.game.saved_button" : "online.game.save"), b, im::ButtonKind::Secondary,
                               hasMoves && !saved && !working);
-            if (working && !s.replayWanted) spinner(vec2(im::flipX(lcol, lx - 34.0f), b.cy()), 10.0f);
+            if (working && !s.replayWanted) spinner(vec2(im::flipX(lcol, lx + halfW + bgap * 0.5f), b.cy()), 10.0f);
         }
-        if (!se.signedIn()) im::disabledButton(L("gif.save"), gb, im::ButtonKind::Secondary, T("gif.err.signed_out"));
-        else if (gif.busy() && !gifMine) im::disabledButton(L("gif.save"), gb, im::ButtonKind::Secondary, T("gif.busy_other"));
+        // Off: the reason as the tip, kept inside the page.
+        if (!se.signedIn()) im::disabledButton(L("gif.save"), gb, im::ButtonKind::Secondary, T("gif.err.signed_out"), p);
+        else if (gif.busy() && !gifMine) im::disabledButton(L("gif.save"), gb, im::ButtonKind::Secondary, T("gif.busy_other"), p);
         else gifPressed = im::button(L("gif.save"), gb, im::ButtonKind::Secondary, !gif.busy());
-        if (gif.busy() && gifMine && !gifBelow) spinner(vec2(im::flipX(lcol, lx + leftW + 22.0f), gb.cy()), 10.0f);
+        if (gif.busy() && gifMine && !gifBelow) spinner(vec2(im::flipX(lcol, lx + leftW + spinAfter), gb.cy()), 10.0f);
         y += bstep;
         if (canSave) {
             Rect rb(lx, y, leftW, bh);
             replay = im::button(L("online.game.replay"), rb, im::ButtonKind::Primary, hasMoves && !working);
-            if (working && s.replayWanted) spinner(vec2(im::flipX(lcol, lx - 34.0f), rb.cy()), 10.0f);
+            if (working && s.replayWanted) spinner(vec2(im::flipX(lcol, lx + leftW + spinAfter), rb.cy()), 10.0f);
             y += bstep;
         }
         const bool reported = std::find(s.reported.begin(), s.reported.end(), g.id) != s.reported.end();
@@ -1105,7 +1108,8 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
         }
     }
     if (se.take(Kind::PreferencesResult, e) && !e.ok && e.error != "unauthorized") notify(errorText(e), 4.0f);
-    if (se.take(Kind::PgnResult, e) && s.save == Save::Downloading) {
+    // (The PGN is asked for from the game page, which names the saved games' folder first.)
+    if (!s.saveFolder.empty() && se.take(Kind::PgnResult, e) && s.save == Save::Downloading) {
         // Saved as the game it was asked for, whatever game the page shows now.
         if (s.pgnArrived(e)) {
             startSave(s.saveFolder, s.saveGame, e.text);
@@ -1222,7 +1226,8 @@ AccountNav accountPage(AccountPage page, float t, bool fresh, LibrarySetup* libr
 bool accountDebugOpen(const std::string& sub, AccountPage& page) {
     static const struct { const char* name; AccountPage page; } names[] = {
         {"history", AccountPage::History}, {"game", AccountPage::Game},     {"game-gif", AccountPage::Game},
-        {"game-gif-making", AccountPage::Game}, {"devices", AccountPage::Devices},
+        {"game-gif-making", AccountPage::Game}, {"game-saving", AccountPage::Game}, {"game-saved", AccountPage::Game},
+        {"devices", AccountPage::Devices},
         {"email", AccountPage::Email},     {"email-sent", AccountPage::Email}, {"export", AccountPage::Export},
         {"export-done", AccountPage::Export}, {"delete", AccountPage::Delete},
     };
@@ -1263,6 +1268,13 @@ bool accountDebugOpen(const std::string& sub, AccountPage& page) {
                 se.saveGameGif(gifOwner(g), g.id, options, gifFolder(),
                                game::gifFileName(std::time_t(g.startedAtMs / 1000), g.white.name, g.black.name, g.id));
                 if (sub == "game-gif") se.runMock(4000.0);
+            }
+            // Save game pressed: its PGN on the way (the clock stays frozen), or arrived (written to
+            // the saved games during the first frames, then the note).
+            if ((sub == "game-saving" || sub == "game-saved") && data.gameLoaded && s.request(serverGameOf(data.game), false)) {
+                se.api().downloadPgn(data.game.id);
+                se.expect(Kind::PgnResult);
+                if (sub == "game-saved") se.runMock(1000.0);
             }
         }
         if (page == AccountPage::Devices) {

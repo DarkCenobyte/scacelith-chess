@@ -1011,9 +1011,9 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         const bool signedIn = se.signedIn() || se.hasSavedSession();   // signed in on an earlier run too
         bool pressed = false;
         if (!signedIn) {
-            im::disabledButton(L("gif.save"), gifR, im::ButtonKind::Secondary, T("gif.sign_in_first"));
+            im::disabledButton(L("gif.save"), gifR, im::ButtonKind::Secondary, T("gif.sign_in_first"), p);
         } else if (gif.busy() && !gifMine) {
-            im::disabledButton(L("gif.save"), gifR, im::ButtonKind::Secondary, T("gif.busy_other"));
+            im::disabledButton(L("gif.save"), gifR, im::ButtonKind::Secondary, T("gif.busy_other"), p);
         } else {
             pressed = im::button(L("gif.save"), gifR, im::ButtonKind::Secondary, detailsShown && !gif.busy());
         }

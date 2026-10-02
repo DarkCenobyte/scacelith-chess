@@ -115,8 +115,9 @@ bool menuEntry(const std::string& label, const Rect& r, bool enabled = true, gfx
 bool button(const std::string& label, const Rect& r, ButtonKind kind = ButtonKind::Secondary, bool enabled = true,
             uint32_t extraFlags = 0);
 // A button that is off for a reason: drawn like a disabled button, but the mouse resting on it (or
-// the keyboard focus, which stops on it) shows 'why' as its tooltip. Never activates.
-void disabledButton(const std::string& label, const Rect& r, ButtonKind kind, const std::string& why);
+// the keyboard focus, which stops on it) shows 'why' as its tooltip, kept inside 'within' when
+// given (the page's panel: above the button near its bottom edge). Never activates.
+void disabledButton(const std::string& label, const Rect& r, ButtonKind kind, const std::string& why, const Rect& within = Rect());
 // Form rows: label on the left, control on the right. Return true when the value changed.
 bool toggleRow(const std::string& label, bool& value, const Rect& r, bool enabled = true);
 bool sliderRow(const std::string& label, float& value, float lo, float hi, float step,
@@ -147,8 +148,10 @@ bool editingText();  // a text field has the keyboard (Space and letters type te
 bool tabBar(const std::vector<std::string>& tabs, int& current, const Rect& r);
 // Hover/focus tooltip for the previous item (a floating tip; an info mark between
 // beginInfoMarks() and endInfoMarks()). One tip shows at a time: the focused item's while the
-// keyboard leads (arrows pressed since the mouse last moved), else the hovered item's.
+// keyboard leads (arrows pressed since the mouse last moved), else the hovered item's. With
+// 'within' (a page's panel), the floating tip stays inside it as well as inside the window.
 void tooltip(const std::string& text);
+void tooltip(const std::string& text, const Rect& within);
 // Info marks (settings pages: Options, hosting a direct match). Between these calls, a tooltip()
 // that follows a form row (or a formLabel()) puts a small circled "i" after the row's label, and
 // its text shows while the mouse rests on the label or on the mark, or once the row has had the

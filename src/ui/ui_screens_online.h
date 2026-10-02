@@ -47,8 +47,8 @@ namespace debug {
 // Viewer: opens the online page on a sub-page ("signin", "register", "mfa", "account",
 // "mfa-setup", "play", "search", "challenge", "private", "direct", "direct-host",
 // "direct-wait", "direct-join", "noserver"; the account API's pages: "history", "game",
-// "game-gif", "game-gif-making", "devices", "email", "email-sent", "export", "export-done",
-// "delete").
+// "game-gif", "game-gif-making", "game-saving", "game-saved", "devices", "email", "email-sent",
+// "export", "export-done", "delete").
 void openOnlinePage(const std::string& sub);
 }  // namespace debug
 

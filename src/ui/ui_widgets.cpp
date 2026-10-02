@@ -544,13 +544,13 @@ bool button(const std::string& label, const Rect& r, ButtonKind kind, bool enabl
     return it.activated;
 }
 
-void disabledButton(const std::string& label, const Rect& r, ButtonKind kind, const std::string& why) {
+void disabledButton(const std::string& label, const Rect& r, ButtonKind kind, const std::string& why, const Rect& within) {
     button(label, r, kind, false);
     // An item of its own over the disabled one, for the tip only: hovered or focused, it shows a
     // faint frame (the focus stops there) and the reason; activating it does nothing.
     Item it = item(makeId(label + "##why"), r, ITEM_FOCUSABLE | ITEM_SILENT);
     if (it.hoverT > 0.01f) gfx::stroke(r, withAlpha(gold, 0.3f * it.hoverT), 0.0f, 1.5f);
-    tooltip(why);
+    tooltip(why, within);
 }
 
 bool toggleRow(const std::string& label, bool& value, const Rect& r, bool enabled) {
@@ -988,8 +988,10 @@ float formLabel(const std::string& label, const Rect& r, float reserved, bool en
 
 namespace {
 // Floating tip box: at the mouse, or under 'below' from its start side (fromStart) or its end
-// side, above it when there is no room below. 'fade' 0..1.
-void drawTip(const std::string& text, float fade, bool atMouse, const Rect& below, bool fromStart) {
+// side, above it when there is no room below. 'fade' 0..1. 'within' (when not empty, e.g. the
+// page's panel): the tip stays inside it too; when it would cross its bottom edge, it goes above
+// the item ('below') rather than above the mouse, so that the item stays readable.
+void drawTip(const std::string& text, float fade, bool atMouse, const Rect& below, bool fromStart, const Rect& within = Rect()) {
     gfx::Layer prev = gfx::layer();
     gfx::setLayer(gfx::LAYER_TOP);
     TextStyle st;
@@ -1007,8 +1009,12 @@ void drawTip(const std::string& text, float fade, bool atMouse, const Rect& belo
     vec2 view = gfx::viewSize();
     vec2 p = atMouse ? mouse() + vec2(rtl() ? -18.0f - w : 18.0f, 26.0f)
                      : vec2(fromStart != rtl() ? below.x : below.r() - w, below.b() + 6.0f);
-    p.x = m::clamp(p.x, 8.0f, view.x - w - 8.0f);
-    if (p.y + h > view.y - 8.0f) p.y = (atMouse ? mouse().y : below.y) - h - 10.0f;
+    const bool bounded = within.w > 0.0f && within.h > 0.0f;
+    const float left = bounded ? std::max(8.0f, within.x + 8.0f) : 8.0f;
+    const float right = std::min(view.x, bounded ? within.r() : view.x) - 8.0f;
+    p.x = m::clamp(p.x, left, std::max(left, right - w));
+    if (bounded && p.y + h > std::min(view.y, within.b()) - 8.0f) p.y = below.y - h - 10.0f;
+    else if (p.y + h > view.y - 8.0f) p.y = (atMouse ? mouse().y : below.y) - h - 10.0f;
     Rect r(p.x, p.y, w, h);
     gfx::shadow(r.offset(0, 6), 3, 24, withAlpha(black, 0.6f * fade));
     gfx::fillV(r, vec4(0.08f, 0.07f, 0.06f, 0.96f * fade), vec4(0.05f, 0.045f, 0.04f, 0.96f * fade), 2.0f);
@@ -1059,13 +1065,15 @@ void infoMark(const std::string& text) {
 }
 }  // namespace
 
-void tooltip(const std::string& text) {
+void tooltip(const std::string& text) { tooltip(text, Rect()); }
+
+void tooltip(const std::string& text, const Rect& within) {
     if (text.empty()) return;
     if (c.infoMarks) {
         if (c.last.hasLabel) {
             infoMark(text);
         } else if (c.kbMode && c.last.id == c.focus && c.last.highlight && c.last.highlightTime >= 0.7f) {
-            drawTip(text, m::saturate((c.last.highlightTime - 0.7f) / 0.15f), false, c.last.r, false);
+            drawTip(text, m::saturate((c.last.highlightTime - 0.7f) / 0.15f), false, c.last.r, false, within);
         }
         return;
     }
@@ -1073,7 +1081,7 @@ void tooltip(const std::string& text) {
     // the hovered one's.
     bool owner = c.kbMode ? c.last.id == c.focus : c.last.hovered;
     if (!owner || !c.last.highlight || c.last.highlightTime < 0.55f) return;
-    drawTip(text, m::saturate((c.last.highlightTime - 0.55f) / 0.15f), !c.kbMode, c.last.r, false);
+    drawTip(text, m::saturate((c.last.highlightTime - 0.55f) / 0.15f), !c.kbMode, c.last.r, false, within);
 }
 
 int confirmDialog(const char* idStr, const std::string& title, const std::string& message, const std::string& confirmLabel,

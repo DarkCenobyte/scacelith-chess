@@ -24,8 +24,9 @@
 //     online-recovery, online-challenge, online-private, online-noserver, direct, direct-host,
 //     direct-wait, direct-join; the account API's pages: online-history, online-game (a game of
 //     the history), online-game-gif (its GIF saved: a file written to the GIF folder),
-//     online-game-gif-making (the GIF being made), online-devices, online-email,
-//     online-email-sent, online-export, online-export-done, online-delete; at the table:
+//     online-game-gif-making (the GIF being made), online-game-saving (Save game pressed: the
+//     PGN on its way), online-game-saved (the PGN written to the saved games), online-devices,
+//     online-email, online-email-sent, online-export, online-export-done, online-delete; at the table:
 //     online-hud, online-pause, online-report, online-gameover; Saved games signed in:
 //     library-gif (Save as GIF enabled), library-gif-done (the selected game's GIF saved)
 //   --ui-tab <0..6|display|graphics|audio|gameplay|player|online|controls>   options tab
@@ -235,6 +236,7 @@ public:
             {"online-noserver", "noserver"}, {"direct", "direct"}, {"direct-host", "direct-host"}, {"direct-wait", "direct-wait"},
             {"direct-join", "direct-join"}, {"online-history", "history"}, {"online-game", "game"},
             {"online-game-gif", "game-gif"}, {"online-game-gif-making", "game-gif-making"},
+            {"online-game-saving", "game-saving"}, {"online-game-saved", "game-saved"},
             {"online-devices", "devices"}, {"online-email", "email"}, {"online-email-sent", "email-sent"},
             {"online-export", "export"}, {"online-export-done", "export-done"}, {"online-delete", "delete"},
         };
