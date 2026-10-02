@@ -1648,6 +1648,22 @@ TEST(tts_thread_pool) {
             pool.run(int(hits.size()), [&](int i) { hits[size_t(i)]++; });
             CHECK(std::all_of(hits.begin(), hits.end(), [](int h) { return h == 1; }));
         }
+        // An exception in an item (on a helper or on the caller) reaches the caller of run() once
+        // the helpers are out of the job, instead of terminating the program; the pool goes on.
+        for (int throwAt : {0, 5, 63}) {
+            bool caught = false;
+            try {
+                pool.run(64, [&](int i) {
+                    if (i == throwAt) throw std::bad_alloc();
+                });
+            } catch (const std::bad_alloc&) {
+                caught = true;
+            }
+            CHECK(caught);
+            std::atomic<int> count{0};
+            pool.run(64, [&](int) { ++count; });
+            CHECK_EQ(count.load(), 64);
+        }
     }
 }
 

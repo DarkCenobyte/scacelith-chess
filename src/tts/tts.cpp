@@ -8,6 +8,7 @@
 #include <cctype>
 #include <chrono>
 #include <cmath>
+#include <system_error>
 
 namespace tts {
 namespace {
@@ -265,7 +266,13 @@ bool Worker::start(const Options& o) {
     ready_ = false;
     failed_ = false;
     cancelRunning_ = false;
-    thread_ = std::thread([this] { run(); });
+    try {
+        thread_ = std::thread([this] { run(); });
+    } catch (const std::system_error& e) {
+        LOGE("tts: cannot start the speech thread (%s)", e.what());
+        started_ = false;
+        return false;
+    }
     return true;
 }
 
@@ -332,12 +339,20 @@ void Worker::run() {
     lowerThreadPriority();
     Synthesizer synth;
     std::string err;
-    bool ok = synth.load(&err);
-    if (ok) {
-        // Warm-up: pages the weights in and sizes the allocator before the first real line.
-        Options w = opts_;
-        w.seed = 1;
-        synth.synthesize("Hello.", "en", w, &cancelRunning_);
+    bool ok = false;
+    // An exception (std::bad_alloc, std::system_error) must not leave the thread: it would end the
+    // game. The load then fails, a line ends with no samples (subtitles), as on any other error.
+    try {
+        ok = synth.load(&err);
+        if (ok) {
+            // Warm-up: pages the weights in and sizes the allocator before the first real line.
+            Options w = opts_;
+            w.seed = 1;
+            synth.synthesize("Hello.", "en", w, &cancelRunning_);
+        }
+    } catch (const std::exception& e) {
+        LOGE("tts: speech unavailable (%s)", e.what());
+        ok = false;
     }
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -363,7 +378,13 @@ void Worker::run() {
         lock.unlock();
         Options o = opts_;
         o.seed = job.seed;
-        std::vector<float> pcm = synth.synthesize(job.text, job.lang, o, &cancelRunning_);
+        std::vector<float> pcm;
+        try {
+            pcm = synth.synthesize(job.text, job.lang, o, &cancelRunning_);
+        } catch (const std::exception& e) {
+            LOGE("tts: synthesis failed: %s", e.what());
+            pcm.clear();
+        }
         lock.lock();
         if (!cancelRunning_ && !quit_) results_[job.id] = std::move(pcm);
         running_ = 0;

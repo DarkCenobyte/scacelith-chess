@@ -5,6 +5,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <cstdint>
+#include <exception>
 #include <functional>
 #include <mutex>
 #include <thread>
@@ -34,7 +35,8 @@ public:
 
     int size() const { return int(workers_.size()) + 1; }
     // Calls fn(i) for every i in [0, n), spread over the threads (the caller takes part);
-    // returns when all calls are done. Not re-entrant; one caller at a time.
+    // returns when all calls are done. Not re-entrant; one caller at a time. An exception thrown
+    // by fn (std::bad_alloc) is rethrown here, on the caller, once no helper runs the job.
     void run(int n, const std::function<void(int)>& fn);
 
 private:
@@ -49,6 +51,7 @@ private:
     int active_ = 0;          // helpers inside the current job
     uint64_t generation_ = 0;
     bool quit_ = false;
+    std::exception_ptr error_;   // the first exception of a helper in the current job
 };
 
 }  // namespace tts
