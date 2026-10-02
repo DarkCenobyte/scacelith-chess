@@ -32,13 +32,10 @@ bool wantsKeyboard();
 enum class Align { Left, Center, Right };
 // Regular = EB Garamond, Title = Cinzel display capitals, Italic = EB Garamond Italic.
 enum class FontStyle { Regular, Title, Italic };
-// pos is the left/centre/right point (per align) of the top of the line box; the line box is
-// measure().y tall. tracking = extra letter spacing in em (Cinzel titles look best at ~0.15).
+// pos is the left/centre/right point (per align) of the top of the line box (the face's ascent +
+// descent). tracking = extra letter spacing in em (Cinzel titles look best at ~0.15).
 void text(const std::string& s, m::vec2 pos, float sizePx, m::vec4 color, Align align = Align::Left,
           FontStyle st = FontStyle::Regular, float tracking = 0.0f);
-m::vec2 measure(const std::string& s, float sizePx, FontStyle st = FontStyle::Regular, float tracking = 0.0f);
-void rect(m::vec2 pos, m::vec2 size, m::vec4 color, float radius = 0.0f);
-void fullscreenTint(m::vec4 color);
 m::vec2 viewSize();   // canvas size in reference pixels (height is always 1080)
 float pixelScale();   // physical pixels per reference pixel (window height / 1080)
 // The standard translucent panel (black velvet, gold double hairline) and a button in the same
@@ -226,12 +223,11 @@ struct CoachLevelInfo {
 // Replaces the default list (0 rules, 600-900, 900-1200, 1200-1500, 1500-1800, 1800-2100, 2100+).
 // A level without translated texts shows its band only.
 void setCoachLevels(const std::vector<CoachLevelInfo>& levels);
-const std::vector<CoachLevelInfo>& coachLevels();
 
 // Choices of the coach page. The page starts from game::settings() [coach] and writes them back
 // (and saves the .ini) on Start.
 struct CoachSetup {
-    int level = 1;               // index into coachLevels(): 0 = the rules lesson
+    int level = 1;               // index into the coach levels: 0 = the rules lesson
     int colour = 2;              // the player's colour: 0 White, 1 Black, 2 alternate (the rules
                                  // lesson is always played with White: Settings::coachPlayerColour)
     // Set by the game before mainMenu(): false when the coach's voice files (the coach/ folder

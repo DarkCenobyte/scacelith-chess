@@ -222,11 +222,6 @@ bool consumeBack() {
     c.backConsumed = true;
     return true;
 }
-bool consumeActivate() {
-    if (c.blockDepth > 0 || !c.kActivate || c.activateConsumed) return false;
-    c.activateConsumed = true;
-    return true;
-}
 bool consumeNavigation(int* dx, int* dy) {
     int x = int(c.kRight) - int(c.kLeft), y = int(c.kDown) - int(c.kUp);
     if (c.blockDepth > 0 || (!x && !y)) return false;
@@ -234,7 +229,6 @@ bool consumeNavigation(int* dx, int* dy) {
     if (dy) *dy = y;
     return true;
 }
-bool mousePressedOutside(const Rect& r) { return c.mPressed && !r.contains(c.mouse); }
 
 void pushBlock() { c.blockDepth++; }
 void popBlock() { if (c.blockDepth > 0) c.blockDepth--; }
@@ -278,7 +272,6 @@ Anim& anim(Id id) {
 bool appearing(Id id) { return anim(id).firstFrame == c.frame; }
 float approach(float cur, float target, float rate) { return cur + (target - cur) * (1.0f - std::exp(-rate * c.dt)); }
 
-Id focus() { return c.focus; }
 void setFocus(Id id) { c.focus = id; }
 void setDefaultFocus(Id id) { c.defaultFocus = id; }
 

@@ -281,7 +281,6 @@ void popAlpha() {
     g.alpha = g.alphas.back();
     g.alphas.pop_back();
 }
-float alpha() { return g.alpha; }
 
 // ---- Shapes -------------------------------------------------------------------------------------
 void fill(const Rect& r, vec4 c, float radius) {
@@ -294,10 +293,6 @@ void fillV(const Rect& r, vec4 top, vec4 bottom, float radius) {
 }
 void fillH(const Rect& r, vec4 left, vec4 right, float radius) {
     vec4 col[4] = {left, right, left, right};
-    boxRef(r, radius, 0.0f, col);
-}
-void fill4(const Rect& r, vec4 tl, vec4 tr, vec4 bl, vec4 br, float radius) {
-    vec4 col[4] = {tl, tr, bl, br};
     boxRef(r, radius, 0.0f, col);
 }
 void stroke(const Rect& r, vec4 c, float thickness, float radius) {
@@ -449,12 +444,6 @@ float text(const std::string& s, float x, float baseline, const TextStyle& st) {
         emit(pos, uv, col, p0, p1);
     }
     return w;
-}
-
-void textIn(const std::string& s, const Rect& r, const TextStyle& st) {
-    float base = r.cy() + capHeight(st) * 0.5f;
-    float x = st.align == HAlign::Left ? r.x : st.align == HAlign::Center ? r.cx() : r.r();
-    text(s, x, base, st);
 }
 
 namespace {

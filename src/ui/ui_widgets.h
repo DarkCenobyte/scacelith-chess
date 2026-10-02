@@ -29,9 +29,7 @@ bool keyboardMode();          // last navigation came from the keyboard (show fo
 bool keyPressed(int key);     // plat key pressed this frame and input not blocked
 float wheel();                // mouse wheel notches this frame (0 while blocked)
 bool consumeBack();           // Esc pressed this frame (returns true once)
-bool consumeActivate();       // Enter/Space not consumed by a widget (returns true once)
 bool consumeNavigation(int* dx, int* dy);  // arrow keys this frame, for custom handling
-bool mousePressedOutside(const Rect& r);
 
 // Input blocking: while the depth is > 0 items draw but do not react (content under a dialog).
 void pushBlock();
@@ -68,7 +66,6 @@ bool appearing(Id id);  // true on the first frame an id is used after an absenc
 float approach(float current, float target, float rate);  // frame-rate independent easing
 
 // ---- Focus ------------------------------------------------------------------------------------------
-Id focus();
 void setFocus(Id id);
 // Focus to give when the current focus is not among this frame's focusable items.
 void setDefaultFocus(Id id);
