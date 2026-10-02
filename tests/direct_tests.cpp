@@ -2355,3 +2355,29 @@ TEST(direct_guest_message_out_of_sequence_logged_once) {
     CHECK_EQ(raw.errors, 0);
     CHECK_EQ(log.count("dropped (expected"), 1);
 }
+
+TEST(direct_guest_message_of_unknown_type) {
+    // A guest message, in sequence, whose type id the schema does not define: always
+    // Error{Malformed} (also right after a Gesture), and the link stays.
+    Peer host;
+    RawGuest raw;
+    P::GameSnapshot snap;
+    CHECK(joinRaw(host, raw, snap));
+    P::C_Gesture g;
+    g.game = snap.game;
+    for (uint8_t type : {uint8_t(0x04), uint8_t(0x17), uint8_t(0x7F)}) {
+        CHECK(raw.send(g));
+        const uint32_t seq = ++raw.seq;
+        std::vector<uint8_t> msg = {type, uint8_t(seq), uint8_t(seq >> 8), uint8_t(seq >> 16), uint8_t(seq >> 24)};
+        CHECK(raw.sendBytes(msg));
+        P::Error e;
+        CHECK(raw.waitFor(e, 5000));
+        CHECK(e.code == P::ErrorCode::Malformed && e.ref == seq && !e.fatal);
+    }
+    P::C_Ping ping;
+    ping.nonce = 7;
+    CHECK(raw.send(ping));
+    P::S_Pong pong;
+    CHECK(raw.waitFor(pong, 5000));
+    CHECK_EQ(pong.nonce, 7u);
+}
