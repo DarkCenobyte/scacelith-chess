@@ -161,6 +161,8 @@ target_link_libraries(scacelith PRIVATE scacelith_core)
 if(WIN32)
     target_link_libraries(scacelith PRIVATE opengl32 gdi32 user32 shell32 dwmapi)
     target_link_options(scacelith PRIVATE -static -static-libgcc -static-libstdc++)
+    # The release exe without its symbol table and debug sections: nothing reads them at run time.
+    target_link_options(scacelith PRIVATE $<$<CONFIG:Release>:-s>)
     if(NOT SCACELITH_CONSOLE)
         target_link_options(scacelith PRIVATE -mwindows)
     endif()
