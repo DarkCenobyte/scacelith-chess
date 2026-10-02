@@ -22,7 +22,8 @@
 //      initCoachArgs):
 //          coachVoiceFiles_ = game::coachVoiceWanted();   // in place of tts::modelFilesPresent()
 //      and call refreshCoachVoice() on MenuAction::OptionsChanged (the option may have changed).
-//      The TTS worker then starts with the next line the coach says (CoachStage::ensureWorker).
+//      A coach game being played then starts its TTS worker (CoachStage::ensureWorker): the
+//      voice is heard from the coach's next line on.
 //   4. When the TTS worker failed to load (tts::Worker::failed()) although coachVoiceWanted():
 //          game::coachModelLoadFailed();
 //   5. On exit (GameScene::shutdown; the ui viewer's coach-flow screen likewise):

@@ -586,6 +586,10 @@ void GameScene::refreshCoachVoice() {
     // not load are checked by the next download (coach_model.h).
     if (coachVoiceFiles_ && coach_ && coach_->workerStarted && coach_->worker.failed()) coachModelLoadFailed();
     coachVoiceFiles_ = coachVoiceWanted();
+    // Switched on, or downloaded, during a coach game: its worker starts now, at the speed of its
+    // lines (the director asks for speech only once the voice is available).
+    if (coachVoiceFiles_ && coach() && coach_ && coach_->sessionRunning && !coach_->workerStarted)
+        coach_->stage->ensureWorker(coach_->session.director().config().speed);
 }
 
 bool GameScene::coachVoiceExpected() const {
