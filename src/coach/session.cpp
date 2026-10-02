@@ -437,6 +437,7 @@ struct Session::Impl {
             g.yourMoveAfterCoach = false;
             Script s = takebackScript(true, ply);
             append(s, reviewer.takebackAccepted(after));
+            g.offerPly = -1;   // the offered move is gone: a later takeback at this ply is of the retry
             play(s);
             g.turnPly = -1;   // the human's turn again: A0 comes from the cache
         } else {

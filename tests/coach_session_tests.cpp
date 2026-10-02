@@ -225,6 +225,23 @@ TEST(coach_session_blunder_offer_accepted_and_retried) {
     CHECK(t.reply("g8f8"));
     CHECK(t.until([&] { return t.analyst.count("A0", t.game.position().fen()) == 1; }, 5.0f));
     CHECK(t.session.canTakeBack(t.game));
+
+    // The retry taken back from the pause menu: a plain takeback, the offered move is gone (no
+    // second hint, and the next move is not judged against it).
+    auto count = [&](const std::string& prefix) {
+        int n = 0;
+        for (const Line& l : t.lines) n += l.key.rfind(prefix, 0) == 0 ? 1 : 0;
+        return n;
+    };
+    CHECK_EQ(count("tb.hint"), 1);
+    t.session.onTakeBackRequested(t.game);
+    CHECK(t.until([&] { return t.game.moves().empty() && t.session.playerMayMove(t.game); }, 10.0f));
+    CHECK(t.quiet());
+    CHECK_EQ(count("event.takeback.taken"), 2);
+    CHECK_EQ(count("tb.hint"), 1);
+    t.move("g1f1");
+    CHECK(t.until([&] { return t.session.coachMayMove() && t.session.director().idle(); }, 60.0f));
+    CHECK_EQ(count("tb."), 2);   // the hint and the first retry's "fixed"
     checkRenders(t.lines);
 }
 
