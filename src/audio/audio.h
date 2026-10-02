@@ -2,8 +2,9 @@
 // 3D panning. Backends: WASAPI shared mode (Windows), null (elsewhere: real-time pace, output
 // discarded, or streamed to a WAV file when SCACELITH_AUDIO_DUMP=<path.wav> is set).
 // Implemented by the audio work package. Thread-safe API (the mixer runs on its own thread):
-// play/playUI/setListener/volumes may be called from any thread at any time (they are no-ops
-// before init()); init() and shutdown() must not race with the other calls.
+// play/playUI/setListener/volumes may be called from any thread at any time. play/playUI are no-ops
+// before init(); setListener and the volume/ambience setters (setVoiceVolume too) are stored and
+// apply from the first block. init() and shutdown() must not race with the other calls.
 //
 // Signal flow (mixer thread, 48 kHz or the device rate, float stereo):
 //   voices (32, 3D: inverse distance with 0.15 m min distance, equal-power pan, ITD, head

@@ -2,7 +2,8 @@
 // offline rendering and WAV output.
 //
 // Threads:
-//   * game thread(s): play()/setListener()/volumes -> lock-free MPMC queue / atomics
+//   * game thread(s): play() -> lock-free MPMC queue, volumes -> atomics, setListener() -> mutex
+//     + version (the audio thread only try_locks it)
 //   * audio thread (backend): drains commands, installs bank buffers, runs the Mixer
 //   * builder thread (low priority): synthesises the initial bank (kVariants per Sfx), then
 //     re-synthesises each variant right after it is played (fresh seed), and frees retired
