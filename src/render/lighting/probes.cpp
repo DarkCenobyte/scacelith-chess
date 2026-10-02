@@ -44,14 +44,18 @@ void LightProbes::setProbes(const std::vector<LightProbeDesc>& probes) {
 
 void LightProbes::allocate() {
     int n = std::max(1, int(probes_.size()));
-    if (allocated_ == n && capture_.id) return;
-    capture_.destroy();
-    specular_.destroy();
-    capture_ = gpu::createCubemapArray(res_, n, GL_RGBA16F, 0);
-    specular_ = gpu::createCubemapArray(res_, n, GL_RGBA16F, levels_);
-    glObjectLabel(GL_TEXTURE, capture_.id, -1, "probes.capture");
-    glObjectLabel(GL_TEXTURE, specular_.id, -1, "probes.specular");
-    allocated_ = n;
+    if (allocated_ != n || !specular_.id) {
+        capture_.destroy();
+        specular_.destroy();
+        specular_ = gpu::createCubemapArray(res_, n, GL_RGBA16F, levels_);
+        glObjectLabel(GL_TEXTURE, specular_.id, -1, "probes.specular");
+        allocated_ = n;
+    }
+    // The capture cubes only live during a bake (bake() frees them).
+    if (!capture_.id) {
+        capture_ = gpu::createCubemapArray(res_, n, GL_RGBA16F, 0);
+        glObjectLabel(GL_TEXTURE, capture_.id, -1, "probes.capture");
+    }
 }
 
 void LightProbes::fillUBO(LightingUBOData& l, float exposure, bool enabled) const {
@@ -190,6 +194,10 @@ void LightProbes::bake(Renderer& r, int bounces) {
     bakeExposure_ = r.frame_.exposure.x;
     glFinish();
     lastBakeMs_ = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    // Nothing reads the captures after the bake. Detached first: a texture deleted while attached
+    // to a framebuffer that is not bound keeps its storage.
+    glNamedFramebufferTexture(fb_.id, GL_COLOR_ATTACHMENT0, 0, 0);
+    capture_.destroy();
     LOGI("light probes: baked %d probes x %d bounce(s) at %d^2 in %.0f ms", n, bounces, res_, lastBakeMs_);
 }
 
