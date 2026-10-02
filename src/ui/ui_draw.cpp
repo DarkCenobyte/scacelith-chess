@@ -456,7 +456,8 @@ struct Line {
 
 // Splits into wrapped lines: at spaces (dropped at the break) and between CJK characters. Widths
 // are the sum of the shaped pieces (nothing joins across a break opportunity). Results are cached
-// per frame-independent key since paragraphs are drawn every frame.
+// per frame-independent key since paragraphs are drawn every frame; the returned reference stays
+// valid until the next wrap() call.
 const std::vector<Line>& wrap(const std::string& s, float maxWidth, const TextStyle& st) {
     struct Cache {
         std::unordered_map<std::string, std::vector<Line>> map;
@@ -533,7 +534,7 @@ const std::vector<Line>& wrap(const std::string& s, float maxWidth, const TextSt
 
 int textWrapped(const std::string& s, float x, float baseline, float maxWidth, const TextStyle& st, float lineHeight) {
     if (lineHeight <= 0.0f) lineHeight = st.size * 1.3f;
-    std::vector<Line> lines = wrap(s, maxWidth, st);  // copy: text() may clear the cache
+    const std::vector<Line>& lines = wrap(s, maxWidth, st);  // text() never calls wrap()
     float y = baseline;
     for (auto& l : lines) {
         TextStyle ls = st;
