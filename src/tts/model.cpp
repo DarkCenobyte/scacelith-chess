@@ -188,6 +188,7 @@ bool Engine::vocode(const Tensor& latent, const ExecContext& ctx, Tensor* wav, s
     Session s(voc_);
     if (!setInput(s, voc_, "latent", latent, error) || !s.run(ctx, error)) return false;
     *wav = s.output(0);
+    if (wav->type != DType::F32) return fail(error, "vocoder: bad output");
     return true;
 }
 

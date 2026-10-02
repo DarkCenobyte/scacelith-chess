@@ -564,6 +564,55 @@ TEST(tts_graph_arity) {
     CHECK(!loads(noOutput, {}));
 }
 
+// The dynamic-quantized MatMul pattern fuses its bias only when it has one value per column; a
+// broadcast bias stays a separate Add and is not read past its end. Folding a DequantizeLinear
+// into a quantized weight checks its scale and zero point.
+TEST(tts_graph_quantized_matmul) {
+    std::string err;
+    const std::vector<int8_t> w = {1, -2, 3, 4, 0, 5, -6, 7, 8, 9, -10, 11};   // [3, 4]
+    const std::vector<uint8_t> x = {1, 2, 3, 200, 100, 0};                      // [2, 3]
+    Pb to;
+    to.s(1, "to").i(3, uint64_t(tts::onnx::kFloat));
+    for (int64_t biasLen : {4, 1}) {
+        std::vector<float> bias(static_cast<size_t>(biasLen));
+        for (size_t j = 0; j < bias.size(); ++j) bias[j] = 0.25f * float(j + 1);
+        std::string b = modelPb({nodePb("MatMulInteger", {"x", "w"}, {"acc"}), nodePb("Cast", {"acc"}, {"f"}, {to}),
+                                 nodePb("Mul", {"f", "s"}, {"m"}), nodePb("Add", {"m", "bias"}, {"y"})},
+                                {tensorPb("w", {3, 4}, tts::onnx::kInt8, bytesOf(w)),
+                                 tensorPb("s", {}, tts::onnx::kFloat, bytesOf(std::vector<float>{0.5f})),
+                                 tensorPb("bias", {biasLen}, tts::onnx::kFloat, bytesOf(bias))},
+                                {"x"}, {"y"});
+        tts::Graph g;
+        CHECK_RUN(loadModel(b, g, &err), err);
+        CHECK_EQ(g.fusedCount(), 1);
+        tts::Session sess(g);
+        sess.setInput(0, typed<uint8_t>(DType::U8, {2, 3}, x));
+        tts::ExecContext ctx;
+        ctx.k = &K();
+        CHECK_RUN(sess.run(ctx, &err), err);
+        std::vector<float> want;
+        for (int i = 0; i < 2; ++i)
+            for (int j = 0; j < 4; ++j) {
+                int acc = 0;
+                for (int k = 0; k < 3; ++k) acc += int(x[size_t(i * 3 + k)]) * int(w[size_t(k * 4 + j)]);
+                want.push_back(float(acc) * 0.5f + bias[biasLen == 4 ? size_t(j) : 0]);
+            }
+        CHECK(equalF(sess.output(0), {2, 4}, want, 0.0f));
+    }
+    // A folded DequantizeLinear of a large int8 weight: an 8-bit scale or a zero point of another
+    // type than the weight is refused.
+    std::string q(4096, '\x01');
+    for (int bad = 0; bad < 2; ++bad) {
+        Pb scale = bad == 0 ? tensorPb("s", {}, tts::onnx::kInt8, std::string(1, '\x02'))
+                            : tensorPb("s", {}, tts::onnx::kFloat, bytesOf(std::vector<float>{0.5f}));
+        Pb zp = tensorPb("z", {}, tts::onnx::kUint8, std::string(1, '\x00'));
+        std::string b = modelPb({nodePb("DequantizeLinear", {"q", "s", "z"}, {"d"}), nodePb("Add", {"x", "d"}, {"y"})},
+                                {tensorPb("q", {4096}, tts::onnx::kInt8, q), scale, zp}, {"x"}, {"y"});
+        tts::Graph g;
+        CHECK(!loadModel(b, g, &err) && err.find("quantization") != std::string::npos);
+    }
+}
+
 // ------------------------------------------------------------------------------------------------
 // Operators (numpy / ONNX semantics)
 // ------------------------------------------------------------------------------------------------
@@ -814,6 +863,69 @@ TEST(tts_ops_bad_attributes) {
         if (field == 3) bad.i0 = 0;               // group
         CHECK(!runOp(bad, {&cx, &cw}, o));
     }
+}
+
+// Operand types and parameter sizes are checked, and the operators that read an input as float
+// dequantize a quantized-weight placeholder (float type, no data) instead of reading null.
+TEST(tts_ops_operand_checks) {
+    std::vector<Tensor> o, a, b;
+    std::vector<int8_t> qv(8192);
+    for (size_t i = 0; i < qv.size(); ++i) qv[i] = int8_t(int(i % 251) - 125);
+    auto qw = std::make_shared<tts::QuantWeight>();
+    qw->q = reinterpret_cast<const uint8_t*>(qv.data());
+    qw->dims = {2, 4096};
+    qw->scale = {0.03f};
+    qw->zeroPoint = {1};
+    Tensor ph;
+    ph.type = DType::F32;
+    ph.dims = qw->dims;
+    ph.qweight = qw;
+    std::vector<float> fv(qv.size());
+    for (size_t i = 0; i < fv.size(); ++i) fv[i] = float(int(qv[i]) - 1) * 0.03f;
+    Tensor fl = F({2, 4096}, fv);
+    auto same = [&](size_t outputs) {
+        for (size_t i = 0; i < outputs; ++i)
+            if (a[i].bytes() != b[i].bytes() || std::memcmp(a[i].data, b[i].data, a[i].bytes()) != 0) return false;
+        return true;
+    };
+    CHECK(runOp(node(tts::Op::DynamicQuantize), {&ph}, a, 3) && runOp(node(tts::Op::DynamicQuantize), {&fl}, b, 3) &&
+          same(3));
+    tts::Node ln = node(tts::Op::LayerNorm);
+    ln.axis = -1;
+    ln.f0 = 1e-5f;
+    Tensor g = F({4096}, std::vector<float>(4096, 1.0f));
+    CHECK(runOp(ln, {&ph, &g}, a) && runOp(ln, {&fl, &g}, b) && same(1));
+    Tensor sc = F({}, {0.1f});
+    CHECK(runOp(node(tts::Op::Quantize), {&ph, &sc}, a) && runOp(node(tts::Op::Quantize), {&fl, &sc}, b) && same(1));
+    // An 8-bit scale, a float MatMulInteger operand, per-row or per-column zero points.
+    Tensor s8 = typed<int8_t>(DType::I8, {}, {2}), u4 = typed<uint8_t>(DType::U8, {4}, {1, 2, 3, 4});
+    CHECK(!runOp(node(tts::Op::Dequantize), {&u4, &s8}, o));
+    CHECK(!runOp(node(tts::Op::Quantize), {&fl, &s8}, o));
+    Tensor fa = F({2, 3}, {1, 2, 3, 4, 5, 6}), ua = typed<uint8_t>(DType::U8, {2, 3}, {1, 2, 3, 4, 5, 6});
+    Tensor ib = typed<int8_t>(DType::I8, {3, 2}, {1, -1, 2, -2, 3, -3}), zp2 = typed<uint8_t>(DType::U8, {2}, {1, 2});
+    CHECK(runOp(node(tts::Op::MatMulInteger), {&ua, &ib}, o));
+    CHECK(!runOp(node(tts::Op::MatMulInteger), {&fa, &ib}, o));
+    CHECK(!runOp(node(tts::Op::MatMulInteger), {&ua, &ib, &zp2}, o));
+    CHECK(!runOp(node(tts::Op::MatMulInteger), {&ua, &ib, nullptr, &zp2}, o));
+    // Bias and parameter vectors of the wrong length.
+    Tensor one = F({}, {1.0f}), p1 = F({1}, {1}), p2 = F({2}, {1, 1}), p3 = F({3}, {1, 2, 3});
+    CHECK(runOp(node(tts::Op::MatMulIntegerScaled), {&ua, &ib, nullptr, nullptr, &one, &p2}, o));
+    CHECK(!runOp(node(tts::Op::MatMulIntegerScaled), {&ua, &ib, nullptr, nullptr, &one, &p3}, o));
+    CHECK(!runOp(node(tts::Op::MatMulIntegerScaled), {&ua, &ib, nullptr, nullptr, &one, &p1}, o));
+    Tensor bx = F({1, 2, 3}, {1, 2, 3, 4, 5, 6});
+    tts::Node bn = node(tts::Op::BatchNorm);
+    bn.f0 = 1e-5f;
+    CHECK(runOp(bn, {&bx, &p2, &p2, &p2, &p2}, o));
+    CHECK(!runOp(bn, {&bx, &p2, &p1, &p2, &p2}, o));
+    tts::Node lc = node(tts::Op::LayerNormChannels);
+    lc.f0 = 1e-5f;
+    CHECK(runOp(lc, {&bx, &p2, &p2}, o));
+    CHECK(!runOp(lc, {&bx, &p2, &p1}, o));
+    Tensor cx = F({1, 2, 6}, std::vector<float>(12, 1.0f)), cw = F({2, 1, 3}, std::vector<float>(6, 1.0f));
+    tts::Node cv = node(tts::Op::Conv);
+    cv.i0 = 2;
+    CHECK(runOp(cv, {&cx, &cw, &p2}, o));
+    CHECK(!runOp(cv, {&cx, &cw, &p1}, o));
 }
 
 TEST(tts_ops_norms) {

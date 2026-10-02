@@ -349,20 +349,23 @@ bool Graph::foldConstants(const kern::Table& k, std::string* error) {
         if (n.op == Op::Dequantize) {
             const Tensor& x = values_[size_t(n.in[0])].constant;
             if ((x.type == DType::I8 || x.type == DType::U8) && x.count() >= 4096) {
+                const Tensor& s = values_[size_t(n.in[1])].constant;
+                const Tensor* z = n.in.size() > 2 && n.in[2] >= 0 ? &values_[size_t(n.in[2])].constant : nullptr;
+                if (s.type != DType::F32 || !s.data || s.count() < 1 || (z && (z->type != x.type || z->count() != s.count()))) {
+                    if (error) *error = label_ + ": " + n.name + ": bad quantization scale or zero point";
+                    return false;
+                }
                 auto q = std::make_shared<QuantWeight>();
                 q->q = x.as<uint8_t>();
                 q->owner = x.owner;
                 q->isUnsigned = x.type == DType::U8;
                 q->dims = x.dims;
-                const Tensor& s = values_[size_t(n.in[1])].constant;
                 q->scale.resize(size_t(s.count()));
                 std::memcpy(q->scale.data(), s.data, q->scale.size() * 4);
                 q->zeroPoint.assign(q->scale.size(), 0);
-                if (n.in.size() > 2 && n.in[2] >= 0) {
-                    const Tensor& z = values_[size_t(n.in[2])].constant;
-                    for (size_t i = 0; i < q->zeroPoint.size() && i < size_t(z.count()); ++i)
-                        q->zeroPoint[i] = z.type == DType::U8 ? int(z.as<uint8_t>()[i]) : int(z.as<int8_t>()[i]);
-                }
+                if (z)
+                    for (size_t i = 0; i < q->zeroPoint.size(); ++i)
+                        q->zeroPoint[i] = z->type == DType::U8 ? int(z->as<uint8_t>()[i]) : int(z->as<int8_t>()[i]);
                 int64_t axis = n.axis < 0 ? n.axis + x.rank() : n.axis;
                 q->axis = int(axis);
                 if (q->scale.size() != 1 && (axis < 0 || axis >= x.rank() || x.dims[size_t(axis)] != int64_t(q->scale.size()))) {
@@ -490,7 +493,11 @@ void Graph::fusePatterns() {
                 const Node& add = nodes_[size_t(a)];
                 int b = add.in[0] == outV ? add.in[1] : add.in[0];
                 const Value& bv = values_[size_t(b)];
-                if (bv.isConst && bv.constant.type == DType::F32 && bv.constant.rank() == 1 && !bv.constant.qweight) {
+                // Only a bias of one value per column: a broadcast one is left to the Add.
+                const Value& wv = values_[size_t(n.in[1])];
+                bool perColumn = wv.isConst && wv.constant.rank() == 2 && bv.constant.count() == wv.constant.dims[1];
+                if (bv.isConst && bv.constant.type == DType::F32 && bv.constant.rank() == 1 && !bv.constant.qweight &&
+                    perColumn) {
                     bias = b;
                     outV = add.out[0];
                     last = a;

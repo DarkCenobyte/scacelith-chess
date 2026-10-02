@@ -891,10 +891,12 @@ bool opSoftmax(const ExecContext& ctx, const Tensor& x0, int64_t axis, Tensor& o
     return true;
 }
 
-bool opLayerNorm(const ExecContext& ctx, const Node& nd, const Tensor& x, const Tensor& g0, const Tensor* b0, Tensor& out,
+bool opLayerNorm(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tensor& g0, const Tensor* b0, Tensor& out,
                  std::string* err) {
-    Tensor g = materialize(g0);
+    Tensor x = materialize(x0), g = materialize(g0);
     Tensor b = b0 && b0->valid() ? materialize(*b0) : Tensor();
+    if (x.type != DType::F32 || g.type != DType::F32 || (b.valid() && b.type != DType::F32))
+        return fail(err, "LayerNorm expects float");
     int64_t axis = normAxis(nd.axis, x.rank());
     if (axis < 0 || axis >= x.rank()) return fail(err, "LayerNorm axis");
     int64_t cols = 1;
@@ -908,11 +910,14 @@ bool opLayerNorm(const ExecContext& ctx, const Node& nd, const Tensor& x, const 
 }
 
 // LayerNorm over the channel axis of [B, C, L] without the transposes: statistics per (b, t).
-bool opLayerNormChannels(const ExecContext& ctx, const Node& nd, const Tensor& x, const Tensor& g0, const Tensor* b0,
+bool opLayerNormChannels(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tensor& g0, const Tensor* b0,
                          Tensor& out, std::string* err) {
-    Tensor g = materialize(g0);
+    Tensor x = materialize(x0), g = materialize(g0);
     Tensor b = b0 && b0->valid() ? materialize(*b0) : Tensor();
-    if (x.rank() != 3 || g.count() != x.dims[1]) return fail(err, "LayerNormChannels shape");
+    if (x.type != DType::F32 || g.type != DType::F32 || (b.valid() && b.type != DType::F32))
+        return fail(err, "LayerNormChannels expects float");
+    if (x.rank() != 3 || g.count() != x.dims[1] || (b.valid() && b.count() != x.dims[1]))
+        return fail(err, "LayerNormChannels shape");
     int64_t B = x.dims[0], C = x.dims[1], L = x.dims[2];
     out = Tensor::alloc(DType::F32, x.dims);
     const float* gp = g.as<float>();
@@ -950,10 +955,12 @@ bool opLayerNormChannels(const ExecContext& ctx, const Node& nd, const Tensor& x
 }
 
 bool opBatchNorm(const Node& nd, const Tensor* const* in, Tensor& out, std::string* err) {
-    const Tensor& x = *in[0];
+    Tensor x = materialize(*in[0]);
     Tensor sc = materialize(*in[1]), bi = materialize(*in[2]), mu = materialize(*in[3]), va = materialize(*in[4]);
     if (x.rank() < 2) return fail(err, "BatchNorm rank");
     int64_t N = x.dims[0], C = x.dims[1], inner = x.count() / std::max<int64_t>(1, N * C);
+    for (const Tensor* t : {&x, &sc, &bi, &mu, &va})
+        if (t->type != DType::F32 || (t != &x && t->count() != C)) return fail(err, "BatchNorm expects float, C parameters");
     out = Tensor::alloc(DType::F32, x.dims);
     for (int64_t n = 0; n < N; ++n)
         for (int64_t c = 0; c < C; ++c) {
@@ -1121,6 +1128,7 @@ bool opConv(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tens
     int64_t Lout = (L + p0 + p1 - dil * (k - 1) - 1) / stride + 1;
     if (Lout <= 0) return fail(err, "Conv output length");
     Tensor bias = b0 && b0->valid() ? materialize(*b0) : Tensor();
+    if (bias.valid() && (bias.type != DType::F32 || bias.count() != Cout)) return fail(err, "Conv bias");
     const float* bp = bias.valid() ? bias.as<float>() : nullptr;
     out = Tensor::alloc(DType::F32, {Nb, Cout, Lout});
     float* po = out.mut<float>();
@@ -1209,6 +1217,10 @@ bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin
     const Tensor& b = *in[1];
     if (b.rank() != 2 || a.rank() < 2) return fail(err, "MatMulInteger expects [..,M,K] x [K,N]");
     if (b.qweight && !b.data) return fail(err, "MatMulInteger on a dequantized weight");
+    if ((a.type != DType::U8 && a.type != DType::I8) || (b.type != DType::U8 && b.type != DType::I8))
+        return fail(err, "MatMulInteger expects 8-bit operands");
+    if ((nin > 2 && in[2] && in[2]->valid() && in[2]->count() != 1) || (nin > 3 && in[3] && in[3]->valid() && in[3]->count() != 1))
+        return fail(err, "per-row or per-column zero point not supported");
     bool aU = a.type == DType::U8, bU = b.type == DType::U8;
     int azp = (nin > 2 && in[2] && in[2]->valid()) ? int(in[2]->scalarFloat()) : 0;
     int bzp = (nin > 3 && in[3] && in[3]->valid()) ? int(in[3]->scalarFloat()) : 0;
@@ -1229,6 +1241,7 @@ bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin
     float s = in[4] ? in[4]->scalarFloat() : 1.0f;
     const float* bias = (nin > 5 && in[5] && in[5]->valid()) ? in[5]->as<float>() : nullptr;
     if (in[4] && in[4]->count() != 1) return fail(err, "per-channel output scale not supported");
+    if (bias && (in[5]->type != DType::F32 || in[5]->count() != N)) return fail(err, "MatMulInteger bias size");
     out = Tensor::alloc(DType::F32, od);
     const int32_t* pa = acc.as<int32_t>();
     float* po = out.mut<float>();
@@ -1247,7 +1260,8 @@ bool opMatMulInteger(const ExecContext& ctx, const Tensor* const* in, size_t nin
 // ------------------------------------------------------------------------------------------------
 inline float roundEven(float x) { return std::nearbyint(x); }
 
-bool opDynamicQuantize(const ExecContext& ctx, const Tensor& x, Tensor* out, std::string* err) {
+bool opDynamicQuantize(const ExecContext& ctx, const Tensor& x0, Tensor* out, std::string* err) {
+    Tensor x = materialize(x0);
     if (x.type != DType::F32) return fail(err, "DynamicQuantizeLinear expects float");
     const float* p = x.as<float>();
     int64_t n = x.count();
@@ -1297,6 +1311,7 @@ struct QParams {
 bool qparams(const Node& nd, const Tensor& x, const Tensor& s0, const Tensor* z, QParams& q, std::string* err) {
     Tensor s = materialize(s0);
     int64_t n = s.count();
+    if (s.type != DType::F32 || n < 1) return fail(err, "quantization scale must be float");
     q.scale.resize(size_t(n));
     std::memcpy(q.scale.data(), s.data, size_t(n) * 4);
     q.zp.assign(size_t(n), 0);
@@ -1322,7 +1337,7 @@ bool qparams(const Node& nd, const Tensor& x, const Tensor& s0, const Tensor* z,
 
 bool opQuantize(const ExecContext& ctx, const Node& nd, const Tensor* const* in, size_t nin, Tensor& out,
                 std::string* err) {
-    const Tensor& x = *in[0];
+    Tensor x = materialize(*in[0]);
     const Tensor* z = nin > 2 ? in[2] : nullptr;
     QParams q;
     if (!qparams(nd, x, *in[1], z, q, err)) return false;
@@ -1382,8 +1397,9 @@ bool opDequantize(const ExecContext& ctx, const Node& nd, const Tensor* const* i
 // DequantizeLinear(QuantizeLinear(x)) with one per-tensor uint8 scale and zero point: the same
 // arithmetic as the two operators, float to float, in pieces that stay in the first-level cache
 // instead of an 8-bit tensor in memory.
-bool opQuantDequant(const ExecContext& ctx, const Tensor& x, const Tensor& s, const Tensor* z, Tensor& out,
+bool opQuantDequant(const ExecContext& ctx, const Tensor& x0, const Tensor& s, const Tensor* z, Tensor& out,
                     std::string* err) {
+    Tensor x = materialize(x0);
     if (x.type != DType::F32 || s.count() != 1 || (z && (z->type != DType::U8 || z->count() != 1)))
         return fail(err, "QuantDequant expects float and a per-tensor uint8 quantization");
     float scale = s.scalarFloat();
