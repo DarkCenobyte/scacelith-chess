@@ -397,15 +397,17 @@ CoachHudAction coachHud(const CoachHud& hud) {
         gfx::text(T("coach.offer.hint"), r.cx(), y + 4.0f, hs);
         float bw = 190.0f, bh = 48.0f, gap = 20.0f;
         float by = r.b() - 24.0f - bh;
-        // Answers only once the card is readable: a press as it appears was aimed at something else.
+        // Live only once the card is readable: a press as it appears was aimed at something else.
         bool ready = oa.v[0] >= 0.9f;
         im::pushId("coachoffer");
+        if (!ready) im::pushBlock();
         if (im::button(L("coach.offer.decline"), im::flip(r, Rect(r.cx() - gap * 0.5f - bw, by, bw, bh)), im::ButtonKind::Secondary, true,
-                       im::ITEM_MOUSE_ONLY) && ready)
+                       im::ITEM_MOUSE_ONLY))
             act = CoachHudAction::PlayOn;
         if (im::button(L("coach.offer.accept"), im::flip(r, Rect(r.cx() + gap * 0.5f, by, bw, bh)), im::ButtonKind::Primary, true,
-                       im::ITEM_MOUSE_ONLY) && ready)
+                       im::ITEM_MOUSE_ONLY))
             act = CoachHudAction::TakeBack;
+        if (!ready) im::popBlock();
         im::popId();
         if (!hud.offer) im::popBlock();
         gfx::popAlpha();
