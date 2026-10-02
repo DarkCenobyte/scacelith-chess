@@ -321,7 +321,7 @@ AppraisalStats Appraisal::stats(const Game& g) const {
     const int unjudged = st.human.unjudged;
     st.numbers = st.humanMoves >= 10 && double(unjudged) <= 0.2 * double(st.humanMoves) && st.human.accuracy >= 0.0;
 
-    // The human's moves: specials, streak, critical moment, turning point, theme.
+    // The human's moves: streak, critical moment, turning point, theme.
     int streak = 0;
     double critDelta = 10.0;
     double prevPlayed = -1.0;
@@ -329,9 +329,6 @@ AppraisalStats Appraisal::stats(const Game& g) const {
     std::vector<ExType> faultOrder;
     for (const PlyVerdict& v : vs) {
         if (!v.human) continue;
-        if (v.only) ++st.onlyMoves;
-        if (v.brilliant) ++st.brilliant;
-        if (v.great) ++st.great;
         if (v.cls == MoveClass::Best || v.cls == MoveClass::Excellent) {
             ++streak;
             if (streak > st.bestStreak) st.bestStreak = streak;

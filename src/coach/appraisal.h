@@ -70,7 +70,6 @@ struct AppraisalStats {
     SideStats human, coach;
     int humanMoves = 0;
     bool numbers = false;                          // accuracy may be voiced: >= 10 human moves, <= 20 % unjudged
-    int onlyMoves = 0, brilliant = 0, great = 0;
     int bestStreak = 0;                            // longest run of Best / Excellent (book / forced skipped)
     int criticalPly = -1;                          // the human ply with the largest Δ >= 10 (earliest on ties)
     int turningPly = -1;                           // first human ply from W% >= 50 to < 40 (or a comeback <= 50 to > 60)
