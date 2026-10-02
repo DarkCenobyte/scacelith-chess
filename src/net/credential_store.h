@@ -51,7 +51,10 @@ public:
     std::string username(const std::string& origin) const;
     std::string pin(const std::string& origin) const;   // the saved pin (without decrypting the token)
 
-    bool put(const Credential& c);               // creates or replaces c.origin's record; saves
+    // Creates or replaces c.origin's record and saves the file. False when the token could not be
+    // protected (nothing changed: *stored false) or the file not written (*stored true: the record
+    // holds for this run).
+    bool put(const Credential& c, bool* stored = nullptr);
     bool clearToken(const std::string& origin);  // logout: keeps user name, server id and pin
     // The same, only while the saved token is 'token' (the one a server refused): a token saved
     // since (a new sign-in on another thread) is kept.

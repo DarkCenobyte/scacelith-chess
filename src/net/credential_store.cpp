@@ -226,13 +226,15 @@ std::string CredentialStore::pin(const std::string& origin) const {
     return r ? r->pin : std::string();
 }
 
-bool CredentialStore::put(const Credential& c) {
+bool CredentialStore::put(const Credential& c, bool* stored) {
+    if (stored) *stored = false;
     if (c.origin.empty()) return false;
     std::string blob;
     if (!c.token.empty()) {
         blob = protectToken(c.origin, c.token);
         if (blob.empty()) return false;
     }
+    if (stored) *stored = true;
     std::lock_guard<std::mutex> lk(mu_);
     loadLocked();
     Record* r = findLocked(c.origin);

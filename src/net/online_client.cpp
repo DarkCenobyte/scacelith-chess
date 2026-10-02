@@ -722,8 +722,16 @@ struct OnlineClient::Impl {
         if (!pin.empty()) c.pinnedSha256 = pin;
         ServerInfo info;
         if (fetchInfo(e, info, httpCancel).ok() && !info.serverId.empty()) c.serverId = info.serverId;
-        if (!creds.put(c)) LOGW("net: the session could not be saved (%s)", creds.path().c_str());
+        bool stored = false;
+        if (!creds.put(c, &stored)) LOGW("net: the session could not be saved (%s)", creds.path().c_str());
         mfaToken.clear();
+        if (!stored) {
+            // The token could not be protected (DPAPI): kept nowhere, the session would end at the
+            // first connection (not_logged_in). Only an unwritable file still signs in, this run.
+            ev.ok = false;
+            ev.error = "storage";
+            return;
+        }
         ev.ok = true;
         ev.error.clear();
     }

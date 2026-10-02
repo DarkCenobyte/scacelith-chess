@@ -983,6 +983,27 @@ TEST(net_credentials_undecryptable_token) {
     net::sys::removeFile(path);
 }
 
+// put() tells a record it could not keep at all (no origin, or a token the OS could not protect:
+// a sign-in must not look successful then) from a file it could not write (the record holds for
+// this run, the session works until the game quits).
+TEST(net_credentials_put_reports_what_it_kept) {
+    const std::string A = "a.example.org:443", token = "sct_" + std::string(43, 'K');
+    net::CredentialStore s(net::sys::exeDirectory() + "net-test-no-such-folder/x.credentials");
+    net::Credential c;
+    c.origin = A;
+    c.username = "alice";
+    c.token = token;
+    bool stored = false;
+    CHECK(!s.put(c, &stored));                      // the file cannot be written...
+    CHECK(stored);                                  // ...the record is kept all the same
+    CHECK(s.hasToken(A));
+    net::Credential out;
+    CHECK(s.get(A, out) && out.token == token);
+    c.origin.clear();
+    CHECK(!s.put(c, &stored));
+    CHECK(!stored);
+}
+
 // A token refused by the server is erased only while it is still the one saved: a GIF (on its own
 // thread) may be refused while a new sign-in saves another token.
 TEST(net_credentials_clear_that_token) {
