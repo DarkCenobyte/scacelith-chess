@@ -148,6 +148,9 @@ set(GAME_EXTRA)
 if(WIN32)
     list(APPEND GAME_EXTRA ${ROOT}/res/scacelith.rc)
 endif()
+# The version in the log's first line.
+set_source_files_properties(${ROOT}/src/main.cpp PROPERTIES COMPILE_DEFINITIONS
+    "SCACELITH_VERSION_STRING=\"${PROJECT_VERSION}\"")
 add_executable(scacelith ${ROOT}/src/main.cpp ${GAME_SOURCES} ${GAME_EXTRA})
 target_compile_options(scacelith PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
 target_link_libraries(scacelith PRIVATE scacelith_core)

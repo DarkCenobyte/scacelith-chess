@@ -42,13 +42,17 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
 #endif
 
+#ifndef SCACELITH_VERSION_STRING
+#define SCACELITH_VERSION_STRING "0.1.0"
+#endif
+
 static int runApp(std::vector<std::string> args) {
     AppContext ctx;
     ctx.args = args;
     std::string exeDir = plat::exeDirectory();
     // The log falls back to the user data dir like the settings when the exe dir is read-only.
     if (!logx::init((exeDir + "scacelith.log").c_str())) logx::init((plat::userDataDirectory() + "scacelith.log").c_str());
-    LOGI("Scacelith 0.1.0 starting");
+    LOGI("Scacelith %s starting", SCACELITH_VERSION_STRING);
 
     if (ctx.hasArg("--list-scenes")) {
         for (auto& s : listScenes()) std::printf("%-20s %s\n", s.first.c_str(), s.second.c_str());
