@@ -21,9 +21,10 @@
 // the scoresheet (S) belong to the player to move; there is no pointer or aiming while the view
 // goes over.
 //
-// Untimed games (no time control; Play, hot-seat and Watch can be, online never is, see
-// clock_rules.h) have no clock press: a move is completed as its last piece is released and the
-// turn passes at once (completeMove). The clock shows dashes, its lever stays still.
+// Untimed games (no time control; Play, hot-seat and Watch can be, Coach always is, a replay is
+// when its record has no TimeControl or clocks, online never is, see clock_rules.h) have no clock
+// press: a move is completed as its last piece is released and the turn passes at once
+// (completeMove). The clock shows dashes, its lever stays still.
 //
 // Coach mode (game_scene_coach.cpp): the human against the coach robot ("COACH" on its chest),
 // levels 1-6, or the rules lesson (level 0). Untimed, never rated, touch-move on, illegal

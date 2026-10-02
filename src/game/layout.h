@@ -4,8 +4,10 @@
 //     (rank 1 at +Z). White sits at +Z looking towards -Z; Black sits at -Z looking towards +Z.
 //   * Floor at y = 0. Table top at TABLE_TOP_Y, board playing surface at BOARD_TOP_Y.
 //   * The hall's three tall windows are in the -X wall (White's left, Black's right).
-//   * The chess clock stands on the table at the human player's right-hand side
-//     (x = +CLOCK_OFFSET_X when the human plays White, -CLOCK_OFFSET_X when Black).
+//   * The chess clock stands on the table at the human player's right-hand side in a game against
+//     Stockfish, the coach or a remote opponent (x = +CLOCK_OFFSET_X when the human plays White,
+//     -CLOCK_OFFSET_X when Black), where the New Game page puts it in a hot-seat game, and at
+//     White's right (+X) when watching or replaying (GameScene::setupNewGame).
 #pragma once
 #include "../math/math.h"
 #include <cmath>

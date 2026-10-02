@@ -65,7 +65,8 @@ public:
     // Must be called once after loading (registers planar reflectors on the renderer).
     void setupRenderer(render::Renderer& r);
 
-    // The chess clock stands at the human player's right (layout.h).
+    // The side of the table the chess clock stands on (layout.h: at the human player's right, where
+    // the New Game page puts it in a hot-seat game, at White's right when watching or replaying).
     void setClockSide(bool positiveX);
     bool clockOnPositiveX() const { return clockPosX_; }
     m::mat4 clockTransform() const;
