@@ -1055,6 +1055,10 @@ void GameScene::leaveOnlineGame() {
     // A direct match goes to the saved games first (nothing happens when its end saved it): its
     // authority has not answered a resignation or abort just sent, see saving::directMatchRecord.
     archiveGame(true);
+    // The fade to the menu shows the clock as it stood (without link_, clock_ would show the
+    // starting times).
+    leaveClock_ = onlineClockDisplay();
+    leaveClock_.running = -1;
     onlineSession().leaveGame();
     link_ = nullptr;
     clock_.stop();

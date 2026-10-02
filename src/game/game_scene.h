@@ -627,6 +627,7 @@ private:
     std::string pendingFen_;            // the position before it (the authority checks its digest)
     uint32_t pendingThinkMs_ = 0;
     live::ClockFreeze clockFreeze_;     // my clock display while my move is on its way
+    ClockDisplay leaveClock_;           // the clock as the game was left (the fade to the menu)
     bool virtualTime_ = false;          // screenshots, --warp: localMs() follows the simulated time
     // Manual clock press (og_.autoPress off): my move stands on the board until my press.
     bool moveStaged_ = false;

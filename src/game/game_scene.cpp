@@ -2439,6 +2439,11 @@ vec3 GameScene::glanceTarget(int seat) const {
 }
 
 ClockDisplay GameScene::clockDisplay() const {
+    if (online() && !link_ && state_ == State::FadeToMenu) {
+        ClockDisplay d = leaveClock_;   // the game just left (leaveOnlineGame)
+        d.leverSide = leverSide_;
+        return d;
+    }
     if (online() && link_) return onlineClockDisplay();
     if (replaying() && state_ != State::Menu && state_ != State::Loading) return replayClockDisplay();
     ClockDisplay d;
