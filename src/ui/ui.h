@@ -64,8 +64,8 @@ void setTimeControlList(const std::vector<std::string>& labels);
 void setResolutionList(const std::vector<m::ivec2>& sizes);
 void setVersionString(const std::string& version);  // bottom line of the main menu
 
-// UI sound hooks (the game forwards them to audio::playUI).
-enum class Sound { Hover, Click, Back, Toggle, Tick, Open, Close, Confirm };
+// UI sound hooks (the game forwards them to audio::playUI). Count is the number of sounds.
+enum class Sound { Hover, Click, Back, Toggle, Tick, Open, Close, Confirm, Count };
 void setSoundCallback(std::function<void(Sound)> callback);
 
 // ---- Screens ----------------------------------------------------------------------------------

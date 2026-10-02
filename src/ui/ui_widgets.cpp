@@ -59,7 +59,7 @@ struct Ctx {
     std::vector<Rect> capRects;
     bool lastMouse = false, lastKb = false;
     std::function<void(Sound)> soundCb;
-    double lastSoundTime[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
+    double lastSoundTime[size_t(Sound::Count)] = {-1, -1, -1, -1, -1, -1, -1, -1};  // -1: never played
     LastItem last;
     bool mouseOverride = false;
     vec2 mouseOverridePos;
@@ -277,8 +277,9 @@ void setDefaultFocus(Id id) { c.defaultFocus = id; }
 
 void setSoundCallback(std::function<void(Sound)> cb) { c.soundCb = std::move(cb); }
 void sound(Sound s) {
-    if (!c.soundCb) return;
-    int i = int(s) & 7;
+    static_assert(size_t(Sound::Count) == 8, "one -1 per sound in Ctx::lastSoundTime");
+    if (!c.soundCb || s >= Sound::Count) return;
+    size_t i = size_t(s);
     double minGap = s == Sound::Tick ? 0.045 : s == Sound::Hover ? 0.03 : 0.0;
     if (c.lastSoundTime[i] >= 0.0 && c.time - c.lastSoundTime[i] < minGap) return;
     c.lastSoundTime[i] = c.time;
