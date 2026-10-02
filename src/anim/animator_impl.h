@@ -232,11 +232,14 @@ inline vec3 boneDir(const Skeleton& sk, Bone b) {
     return normalize(sk.restOffset[b]);
 }
 // Hand-local tip (bone end) and pad contact point of finger f.
+inline vec3 fingerTipFrom(const Skeleton& sk, Side side, const mat4 fr[3], int f) {   // fr: its fingerFrames
+    Bone b3 = fingerBone(side, f, 2);
+    return transformPoint(fr[2], boneDir(sk, b3) * sk.boneLength[b3]);
+}
 inline vec3 fingerTip(const Skeleton& sk, Side side, const FingerPose& fp, int f) {
     mat4 fr[3];
     fingerFrames(sk, side, fp, f, fr);
-    Bone b3 = fingerBone(side, f, 2);
-    return transformPoint(fr[2], boneDir(sk, b3) * sk.boneLength[b3]);
+    return fingerTipFrom(sk, side, fr, f);
 }
 inline vec3 fingerPad(const Skeleton& sk, Side side, const FingerPose& fp, int f) {
     mat4 fr[3];
@@ -247,11 +250,14 @@ inline vec3 fingerPad(const Skeleton& sk, Side side, const FingerPose& fp, int f
     return transformPoint(fr[2], d * (sk.boneLength[b3] * 0.72f) + padDir * kPadRadius);
 }
 // Hand-local point on the middle of a phalanx (for the pocket grip).
+inline vec3 phalanxMidFrom(const Skeleton& sk, Side side, const mat4 fr[3], int f, int j) {   // fr: its fingerFrames
+    Bone b = fingerBone(side, f, j);
+    return transformPoint(fr[j], boneDir(sk, fingerBone(side, f, 2)) * (sk.boneLength[b] * 0.5f));
+}
 inline vec3 phalanxMid(const Skeleton& sk, Side side, const FingerPose& fp, int f, int j) {
     mat4 fr[3];
     fingerFrames(sk, side, fp, f, fr);
-    Bone b = fingerBone(side, f, j);
-    return transformPoint(fr[j], boneDir(sk, fingerBone(side, f, 2)) * (sk.boneLength[b] * 0.5f));
+    return phalanxMidFrom(sk, side, fr, f, j);
 }
 // Hand-local palm centre on the palm surface.
 inline vec3 palmCenter(Side side) { return vec3(palmSign(side) * kPalmHalf, -0.052f, 0.003f); }
@@ -343,8 +349,9 @@ const vec3 kPinchAxisPref = normalize(vec3(-0.95f, -1.0f, -0.32f));
 
 // Pinch grasp for hand rotation R (character space) on a vertical piece of grip radius r:
 // the pads of thumb, index and middle are solved onto the piece surface around a horizontal axis.
-// 'aperture' scales the pre-grasp opening (smaller between close neighbours).
-inline PinchGeo pinchFor(const Skeleton& sk, quat R, float r, float aperture = 1.0f) {
+// 'aperture' scales the pre-grasp opening (smaller between close neighbours). 'closed': a pinch
+// already solved for the same R and r, whose closed pose (independent of the aperture) is reused.
+inline PinchGeo pinchFor(const Skeleton& sk, quat R, float r, float aperture = 1.0f, const PinchGeo* closed = nullptr) {
     PinchGeo g;
     g.point = kPinchPoint;
     vec3 aw = rotate(R, kPinchAxisPref);
@@ -378,7 +385,12 @@ inline PinchGeo pinchFor(const Skeleton& sk, quat R, float r, float aperture = 1
         fp.v[Pinky][3] = kDipCoupling * fp.v[Pinky][2];
         return e;
     };
-    g.err = solve(0.0f, 0.0f, g.pose);
+    if (closed) {
+        g.pose = closed->pose;
+        g.err = closed->err;
+    } else {
+        g.err = solve(0.0f, 0.0f, g.pose);
+    }
     solve(0.013f * aperture, 0.006f * aperture, g.open);
     return g;
 }
@@ -1026,8 +1038,8 @@ struct Animator::Impl {
             mat4 fr[3];
             fingerFrames(*sk, Side::Right, r.f, f, fr);
             for (int j = 0; j < 3; ++j)
-                if (hit(fr[j].translation(), 0.010f) || hit(phalanxMid(*sk, Side::Right, r.f, f, j), 0.009f)) return false;
-            if (hit(fingerTip(*sk, Side::Right, r.f, f), 0.008f)) return false;
+                if (hit(fr[j].translation(), 0.010f) || hit(phalanxMidFrom(*sk, Side::Right, fr, f, j), 0.009f)) return false;
+            if (hit(fingerTipFrom(*sk, Side::Right, fr, f), 0.008f)) return false;
         }
         return true;
     }
@@ -1228,7 +1240,7 @@ struct Animator::Impl {
                     test(fr[j].translation(), j == 0 ? 0.011f : 0.009f);                       // joint
                     test(transformPoint(fr[j], d * (sk->boneLength[b] * 0.5f)), 0.009f);      // phalanx middle
                 }
-                test(fingerTip(*sk, Side::Right, *fp, f), 0.008f);
+                test(fingerTipFrom(*sk, Side::Right, fr, f), 0.008f);
             }
         }
         return sum;
@@ -1292,7 +1304,7 @@ struct Animator::Impl {
             // people do in a crowded corner).
             const float tight = 0.3f;
             if (d > 0.0005f && base + tight < bestCost) {
-                PinchGeo pt = pinchFor(*sk, q, r, 0.45f);
+                PinchGeo pt = pinchFor(*sk, q, r, 0.45f, &pg);
                 float dt = depth(pt);
                 if (base + tight + 100.0f * dt < bestCost) {
                     bestCost = base + tight + 100.0f * dt;

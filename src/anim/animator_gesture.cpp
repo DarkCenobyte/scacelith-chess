@@ -50,9 +50,9 @@ float Animator::Impl::handDepth(vec3 w, quat q, const FingerPose& f, float margi
         fingerFrames(*sk, Side::Right, f, fi, fr);
         for (int j = 0; j < 3; ++j) {
             test(fr[j].translation(), j == 0 ? 0.011f : 0.009f);          // joint
-            test(phalanxMid(*sk, Side::Right, f, fi, j), 0.009f);        // phalanx middle
+            test(phalanxMidFrom(*sk, Side::Right, fr, fi, j), 0.009f);   // phalanx middle
         }
-        test(fingerTip(*sk, Side::Right, f, fi), 0.008f);
+        test(fingerTipFrom(*sk, Side::Right, fr, fi), 0.008f);
     }
     return worst;
 }
