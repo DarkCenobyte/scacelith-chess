@@ -954,6 +954,26 @@ TEST(coach_review_promotion_race_names_the_queening_pawn) {
     }
 }
 
+TEST(coach_review_promotion_race_knows_the_runner_moved) {
+    // Best was exd6 (the knight is pinned) and d7, d8=Q. Pushing that same pawn to e6 instead is not
+    // "your pawn could have run to d8", although it leaves the d-file; a king move is.
+    const char* fen = "8/8/B2p4/1n2P3/8/3k4/8/7K w - - 0 1";
+    for (int level = 2; level <= 6; ++level) {   // d8=Q is the fifth ply: lookahead 3 and up
+        for (bool push : {true, false}) {
+            Game g = gameOf(fen, {push ? "e6" : "Kg1"});
+            Reviewer rv;
+            rv.reset(level, White);
+            const ai::Analysis a0 =
+                analysisOf({pvl(800, "e5d6 d3e4 d6d7 e4e5 d7d8q"),
+                            pvl(0, push ? "e5e6 d3e4 e6e7 b5c7" : "h1g1 d3e4 g1f2 d6e5")});
+            const Review r = reviewOf(rv, g, a0);
+            CHECK_EQ(r.verdict.exType == ExType::PromotionRace, !push);
+            CHECK_EQ(hasKey(r.script, "ex.promotion_missed.b" + std::to_string(level)), !push);
+            checkScript(r.script, "promotion runner");
+        }
+    }
+}
+
 TEST(coach_review_promotion_race_checks_the_square) {
     // The b-pawn queens because the bishop covers c2, not because the king on d1 is outside its
     // square: no rule-of-the-square line. With the king on g1 it really is outside: the line is said.
