@@ -10,7 +10,6 @@
 #include "game_archive.h"
 #include "game_saving.h"
 #include "../ui/ui_font.h"
-#include "../ui/ui_online.h"
 #include "layout.h"
 #include "look_up.h"
 #include "scoresheet_layout.h"
@@ -559,10 +558,7 @@ void GameScene::setupNewGame() {
         anim_[humanSeat()].setHeadOverride(true, 0.0f, kBaseGazePitch);
         anim_[aiSeat()].setHeadOverride(false);
     }
-    for (Look& l : look_) {
-        l = Look();
-        l.gazePitch = kBaseGazePitch;
-    }
+    for (Look& l : look_) l = Look();
     cameraCut_ = true;
     handover_.cancel();
     inputGate_.reset();
@@ -949,10 +945,9 @@ void GameScene::applySettings(bool displayToo) {
     if (ctx_ && ctx_->renderer) {
         ctx_->renderer->setSettings(s.renderSettings());
         PostSettings& ps = ctx_->renderer->post().settings;
-        ps.exposureCompensation = s.brightness;
-        // A seated player's eyes: gentle depth of field, only far objects soften.
+        // A seated player's eyes: gentle depth of field, only far objects soften (the exposure and
+        // the f-number are set each frame by render()).
         applyDofPreset(ps, s.depthOfField ? DofPreset::Subtle : DofPreset::Off);
-        ps.dofFStop = kEyeFStop;
         ps.dofMaxRadius = 8.0f;
     }
     audio::setMasterVolume(s.masterVolume);
@@ -1303,7 +1298,6 @@ void GameScene::simulate(float dt) {
     // Characters (frozen while the game is paused).
     bool frozen = paused_ && state_ == State::Playing && !online();
     bool firstPerson = state_ != State::Menu && state_ != State::Loading && state_ != State::FadeToGame;
-    if (state_ == State::FadeToGame) firstPerson = false;
     updateCamera(dt, firstPerson);  // sets the player's head override before the animation update
     updateGaze(dt);
     // Reading one's own scoresheet (S): the writing hand waits off the page meanwhile (the sheet

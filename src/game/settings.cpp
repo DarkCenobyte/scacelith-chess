@@ -1,10 +1,8 @@
 #include "settings.h"
-#include "../core/ini.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
 #include "../platform/platform.h"
 #include <algorithm>
-#include <cstdio>
 
 namespace game {
 
