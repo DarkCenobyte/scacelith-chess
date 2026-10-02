@@ -36,6 +36,7 @@ constexpr int kBehindMoves = 3;           // ... for this many human moves in a 
 constexpr int kWellMoves = 4;             // "playing well": this many Best/Excellent moves in a row...
 constexpr int kWellGap = 8;               // ... spaced by this many human moves
 constexpr size_t kCacheRoots = 32;
+const char* const kAccuracyExplain = "appraisal.num.acc_explain.b3";
 
 // The opening texts (OpeningTexts) resolve the opening names the catalog cannot compose itself
 // (line: references), and give the spoken forms of every name.
@@ -145,6 +146,7 @@ struct Session::Impl {
         uint64_t endScript = 0;
         bool handshakeDone = false;
         uint64_t appraisalScript = 0;
+        bool explainPending = false;  // the appraisal explains accuracy: accuracyExplained once it is said
         bool done = false;            // finished()
         int suggested = 0;
         // The lesson.
@@ -531,6 +533,12 @@ struct Session::Impl {
             play(gameEndScript(g.end));
             g.endScript = director.lastScript();
         }
+        // Accuracy is explained once that line is said (Space may skip the appraisal before it).
+        const std::string* said = director.runningKey();
+        if (g.explainPending && said && *said == kAccuracyExplain) {
+            accuracyExplained = true;
+            g.explainPending = false;
+        }
     }
 
     bool coachMayMove() const {
@@ -608,7 +616,7 @@ struct Session::Impl {
         ctx.opening = openingRef(game, &ctx.outOfBookMove);
         ctx.suggestedLevel = sug;
         const Script s = appraisal.script(game, ctx);
-        if (hasKey(s, "appraisal.num.acc_explain.b3")) accuracyExplained = true;
+        g.explainPending = hasKey(s, kAccuracyExplain);
         if (s.empty()) {
             g.done = true;
             return;

@@ -946,6 +946,11 @@ bool Director::speaking() const {
     return d.run.active && d.run.line && d.run.lineStarted && !d.run.lineDone;
 }
 
+const std::string* Director::runningKey() const {
+    const Impl& d = *d_;
+    return d.run.active && d.run.line && d.run.lineStarted ? &d.run.item.beat.line.key : nullptr;
+}
+
 bool Director::skippable() const { return d_->skippable(); }
 
 bool Director::waitingMove(int* expect) const {

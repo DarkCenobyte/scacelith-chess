@@ -69,6 +69,9 @@ public:
 
     bool idle() const;               // nothing running, nothing queued
     bool speaking() const;           // a line is being heard (or read, without voice)
+    // Key of the line the running beat says once it has started (heard, or shown without a voice);
+    // nullptr otherwise.
+    const std::string* runningKey() const;
     bool skippable() const;          // Space would skip something now
     // The running beat is a WaitMove (rules lesson); *expect = its expectation index.
     bool waitingMove(int* expect = nullptr) const;

@@ -493,6 +493,37 @@ TEST(coach_session_game_over_drops_the_greeting) {
     CHECK(!t.said("event.colour.white"));
 }
 
+// The appraisal explains what accuracy is once (level 3): it counts as explained when that line is
+// said, not when it is only queued (Space on the appraisal skips it, and it comes again next time).
+TEST(coach_session_accuracy_explained_when_said) {
+    for (bool space : {false, true}) {
+        Table t;
+        t.start(levelConfig(3));
+        CHECK(t.quiet());
+        const char* moves[] = {"e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5", "c2c3", "g8f6", "d2d3", "d7d6",
+                               "e1g1", "e8g8", "h2h3", "h7h6", "b1d2", "a7a6", "f1e1", "b7b5", "c4b3", "c8e6"};
+        for (size_t i = 0; i < sizeof moves / sizeof *moves; i += 2) {
+            CHECK(t.until([&] { return t.session.playerMayMove(t.game); }, 10.0f));
+            t.move(moves[i]);
+            CHECK(t.reply(moves[i + 1]));
+        }
+        CHECK(t.quiet());
+        t.game.agreeDraw();
+        t.session.onGameOver(t.game, false);
+        CHECK(t.until([&] { return t.session.handshakeWanted(); }, 60.0f));
+        t.session.onHandshakeDone(t.game);
+        CHECK(t.queued("appraisal.num.acc_explain.b3"));
+        CHECK(!t.session.accuracyExplained());
+        if (space) {
+            CHECK(t.until([&] { return t.session.director().speaking(); }, 10.0f));
+            t.session.skip();
+        }
+        CHECK(t.until([&] { return t.session.finished(); }, 120.0f));
+        CHECK_EQ(t.session.accuracyExplained(), !space);
+        CHECK_EQ(t.said("appraisal.num.acc_explain.b3"), !space);
+    }
+}
+
 // No takeback is offered for a finished game: stalemate while winning by the human's own move is
 // explained, then the closing words and the handshake follow; an offer open when a draw is agreed
 // closes without a word; and an answer that comes after the end takes nothing back.
