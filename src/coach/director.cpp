@@ -184,7 +184,7 @@ struct Director::Impl {
         Phase phase = Phase::Prepare;
         bool line = false;                 // a line is said
         bool voiced = false;               // ... and heard
-        bool lineStarted = false, lineDone = false, cut = false;
+        bool lineStarted = false, lineDone = false;
         float lineTime = 0.0f;             // seconds since the line started (not paused)
         float clock = 0.0f;                // line time: the voice clock, or lineTime without a voice
         float duration = 0.0f;             // audio length, or reading time
@@ -590,7 +590,6 @@ struct Director::Impl {
     // The running line is over (heard, cut or skipped).
     void lineOver(bool cut) {
         run.lineDone = true;
-        run.cut = cut;
         releaseMarks(run.item.serial, cut);
         if (run.gestures) {
             stage->endGestures();
