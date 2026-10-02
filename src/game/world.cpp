@@ -13,7 +13,6 @@
 #include "layout.h"
 #include <algorithm>
 #include <chrono>
-#include <cmath>
 #include <future>
 
 using namespace m;
@@ -233,13 +232,14 @@ bool World::loadStep(bool wait) {
         break;
     case 6:
         // Built on a worker thread (pure CPU) while the loading screen keeps drawing and pumping
-        // messages; uploaded here, on the GL thread, once ready.
+        // messages; uploaded here, on the GL thread, once ready. Each loading frame waits up to
+        // 10 ms for it, so that with vsync off the loading screen does not take the build's CPU.
         if (!wait && !w.robotParts.valid()) {
             w.robotParts = std::async(std::launch::async, character::buildRobot);
             w.robotStart = t0;
         }
         if (w.robotParts.valid()) {
-            if (!wait && w.robotParts.wait_for(std::chrono::seconds(0)) != std::future_status::ready) return false;
+            if (!wait && w.robotParts.wait_for(std::chrono::milliseconds(10)) != std::future_status::ready) return false;
             t0 = w.robotStart;
             w.robot.upload(w.robotParts.get());
         } else {
