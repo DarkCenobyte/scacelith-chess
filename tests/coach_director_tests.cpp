@@ -2,8 +2,8 @@
 // the written and the spoken rendering, synthesis ahead and lines chained without a gap, gesture
 // apexes and marks on their words, marks held after the line and kept until the rewind, Urgent
 // lines cutting at a pause, stale and acted-upon Low lines dropped, Space (skip, the offer's card,
-// the rewind only hurried), pause, the voice-less mode, the takeback offer, WaitMove with lines
-// said on top of it, and clear() putting the demonstration back.
+// the rewind only hurried), pause, the voice-less mode, a voice the stage refuses, the takeback
+// offer, WaitMove with lines said on top of it, and clear() putting the demonstration back.
 #include "test.h"
 #include "coach_fakes.h"
 
@@ -450,6 +450,39 @@ TEST(coach_director_without_voice) {
     CHECK_EQ(rig2.voiceStarts(), 1);
     const auto subs2 = rig2.stage.all("subtitle");
     CHECK(subs2.size() == 1 && subs2[0].text.find("e4") != std::string::npos);
+}
+
+// The voice refused by the audio engine: the line starts on a later frame; refused for a second, it
+// is shown for its reading time without the voice, and the script goes on.
+TEST(coach_director_refused_voice) {
+    Rig rig;
+    rig.stage.refuseStarts = 1;
+    rig.dir.play({say("event.your_move")});
+    CHECK(rig.settle());
+    const auto refused = rig.stage.all("voice.refused"), starts = rig.stage.all("voice.start");
+    REQUIRE(refused.size() == 1 && starts.size() == 1);
+    CHECK(starts[0].t - refused[0].t <= rig.dt + 1e-6);   // retried on the next frame
+    CHECK(rig.started("event.your_move"));
+    CHECK(rig.stage.all("subtitle").empty());               // heard: no subtitle (Automatic, English)
+
+    DirectorConfig cfg;
+    cfg.subtitles = 2;   // Off: the line shown without its voice is shown all the same
+    Rig rig2(true, cfg);
+    rig2.stage.refuseStarts = 1000;
+    rig2.dir.play({say("event.your_move"), say("event.take_time")});
+    CHECK(rig2.until([&] { return !rig2.stage.all("subtitle").empty(); }, 5.0f));
+    const auto refused2 = rig2.stage.all("voice.refused");
+    REQUIRE(refused2.size() >= 2);
+    CHECK(refused2.back().t - refused2.front().t >= 0.9);   // kRefusedVoice: about a second of retries
+    CHECK_EQ(rig2.voiceStarts(), 0);
+    rig2.stage.refuseStarts = 0;   // the device is back for the next line
+    CHECK(rig2.settle());
+    const auto subs = rig2.stage.all("subtitle");
+    REQUIRE(subs.size() == 1);
+    CHECK(std::fabs(subs[0].a - rig2.stage.readingTime(subs[0].text)) < 1e-6f);
+    CHECK(!rig2.started("event.your_move"));
+    CHECK(rig2.started("event.take_time"));
+    CHECK_EQ(rig2.voiceStarts(), 1);
 }
 
 TEST(coach_director_takeback_offer) {

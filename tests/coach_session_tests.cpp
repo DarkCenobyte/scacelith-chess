@@ -5,7 +5,8 @@
 // names, turn-taking lines, the end of a game (closing words, handshake, appraisal, Space skipping
 // it), and a chapter of the rules lesson (a wrong move answered and taken back, an illegal attempt
 // explained, the right move, an idle hint). Every line the session emits renders, in every
-// language that has its key, without a leftover placeholder.
+// language that has its key, without a leftover placeholder. A game without an engine: the
+// blunder unjudged, the coach's reply not held.
 #include "test.h"
 #include "coach_fakes.h"
 
@@ -355,6 +356,27 @@ TEST(coach_session_background_evaluations) {
     const int evals = t.analyst.count("E");
     t.run(5.0f);
     CHECK_EQ(t.analyst.count("E"), evals);   // asked once
+    checkRenders(t.lines);
+}
+
+TEST(coach_session_without_engine) {
+    // No engine (every analysis refused): the blunder goes unjudged, without an offer, and the
+    // coach's reply is not held for a review.
+    Table t;
+    hangTable(t);
+    t.analyst.engine = false;
+    t.start(levelConfig(1));
+    CHECK(t.quiet());
+    CHECK(t.session.playerMayMove(t.game));
+    t.move("c3d5");
+    CHECK(t.until([&] { return t.session.coachMayMove(); }, 1.0f));
+    CHECK(!t.session.offerOpen());
+    CHECK(t.stage.all("offer").empty());
+    CHECK(!t.queuedPrefix("ex."));
+    CHECK(t.reply("e6d5"));
+    CHECK(t.quiet());
+    CHECK(t.session.playerMayMove(t.game));
+    CHECK(t.analyst.asked.empty());
     checkRenders(t.lines);
 }
 
