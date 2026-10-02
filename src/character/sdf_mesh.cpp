@@ -1,6 +1,9 @@
 // SDF shrink-wrap mesher: capsule-parametrised base grid projected radially onto the zero set,
-// then longest-edge (Rivara) bisection wherever edges are too long or bend too much. Midpoints are
-// Newton-projected back onto the surface, normals come from the SDF gradient.
+// then adaptive refinement: edges are marked where they are too long, bend too much or deviate
+// from the surface, a closure pass also marks a triangle's longest edge when its squared length
+// exceeds 2.6x the shortest marked one, and triangles with 1, 2 or 3 marked edges are split
+// (red/green). Midpoints are Newton-projected back onto the surface, normals come from the SDF
+// gradient.
 #include "sdf.h"
 #include "../core/log.h"
 #include <cstdlib>
@@ -241,9 +244,7 @@ MeshData meshSegment(const Fn& f, vec3 a, vec3 b, const MeshOptions& o, vec3 pol
     R = std::max(R * 0.25f, 1e-4f);
     float maxStep = std::max(R * 0.06f, 0.0002f);
     const int nu = std::max(o.nu, 3), nv = std::max(o.nv, 2);
-    const float inset = clamp(o.capInset, 0.0f, 0.95f);
-    const float cs = inset > 0.0f ? 0.4f : 1.0f;  // fraction of the cap spent rotating the rays
-    float cap = 0.5f * PI * R * (1.0f - inset) + R * inset, total = 2.0f * cap + L;
+    float cap = 0.5f * PI * R, total = 2.0f * cap + L;
     MeshData d;
     auto addVertex = [&](vec3 org, vec3 dir) {
         Vertex v;
@@ -252,13 +253,8 @@ MeshData meshSegment(const Fn& f, vec3 a, vec3 b, const MeshOptions& o, vec3 pol
     };
     // Cap ray for cap coordinate c (0 = equator, 1 = pole) at end point e, axis direction ax.
     auto capVertex = [&](vec3 e, vec3 ax, vec3 radial, float c) {
-        float phi = 0.5f * PI * std::max(0.0f, 1.0f - c / cs);
-        float rho = 0.0f;
-        if (inset > 0.0f) {
-            float Rt = march(f, e, radial, maxStep, misses);
-            rho = inset * Rt * (c < cs ? 1.0f : 1.0f - (c - cs) / (1.0f - cs));
-        }
-        addVertex(e + radial * rho, ax * std::cos(phi) + radial * std::sin(phi));
+        float phi = 0.5f * PI * std::max(0.0f, 1.0f - c);
+        addVertex(e, ax * std::cos(phi) + radial * std::sin(phi));
     };
     addVertex(a, -w);  // pole 0
     for (int j = 1; j < nv; ++j) {

@@ -61,7 +61,7 @@ class CoachViewerScene : public Scene {
 public:
     bool init(AppContext& ctx) override {
         ctx_ = &ctx;
-        while (!world_.loadStep()) {}
+        while (!world_.loadStep(true)) {}
         world_.setupRenderer(*ctx.renderer);
         world_.setClockSide(true);
         human_ = std::atoi(ctx.argValue("--human", "0").c_str()) == 1 ? 1 : 0;

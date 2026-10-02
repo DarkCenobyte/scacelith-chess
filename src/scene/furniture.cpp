@@ -1,7 +1,6 @@
 // Chess table and players' chairs (Louis XVI): procedural, generated at startup.
 #include "furniture.h"
 #include "hall_geom.h"
-#include "../core/log.h"
 #include "../render/renderer.h"
 
 using namespace m;
@@ -158,7 +157,6 @@ Model buildTable() {
             louisLeg(carved, carved, base, Y - T, 0.034f, Y - T - yShort, bh, 12);
             // Rosettes on the two outer faces of the block.
             float yc = 0.5f * (yShort + yTopA);
-            MeshData ros;
             auto rosetteAt = [&](vec3 c, vec3 n) {
                 vec3 t = orthogonal(n), b = cross(t, n);
                 Profile pr = {{0.018f, 0.0f}, {0.017f, 0.002f}, {0.013f, 0.004f}, {0.009f, 0.0045f}, {0.006f, 0.004f}, {0.004f, 0.006f}, {0.0f, 0.007f}};
@@ -249,7 +247,7 @@ Model buildChair() {
             }, 1);
         }
     }
-    // Oval (médaillon) back, raked back by 9 degrees.
+    // Oval medallion back, raked back by 9 degrees.
     const float rake = 9.0f * DEG;
     const vec3 C(0, 0.815f, bz - 0.02f);
     const vec3 upB(0, std::cos(rake), -std::sin(rake));

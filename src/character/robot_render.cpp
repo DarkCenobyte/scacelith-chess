@@ -1,6 +1,5 @@
 // GPU upload and draw submission of the robot parts.
 #include "robot.h"
-#include "../core/log.h"
 
 using namespace m;
 

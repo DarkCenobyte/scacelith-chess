@@ -27,8 +27,6 @@ struct Profile {
     // Catmull-Rom spline through the given points (starting from the last point).
     Profile& spline(const std::vector<m::vec2>& through);
     m::vec2 last() const { return pts.empty() ? m::vec2(0, 0) : pts.back(); }
-    // Scales every coordinate (radii and heights).
-    Profile& scaled(float sx, float sy);
 };
 
 // Rounds corners (turn angle > minAngleDeg) with fillets of radius 'fillet' (or the per point

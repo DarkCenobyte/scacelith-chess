@@ -35,13 +35,13 @@ struct Grid {
     Grid(const Fn& fn, float cell) : f(fn), h(cell), origin(cell * 0.371f, cell * 0.213f, cell * 0.529f) {}
     vec3 pos(int i, int j, int k) const { return origin + vec3(float(i), float(j), float(k)) * h; }
     float value(int i, int j, int k) {
-        uint64_t kk = key3(i, j, k);
-        auto it = corner.find(kk);
-        if (it != corner.end()) return it->second;
-        float v = f(pos(i, j, k));
-        if (v == 0.0f) v = 1e-9f;  // no exact zeros: every corner is strictly inside or outside
-        corner.emplace(kk, v);
-        return v;
+        auto [it, inserted] = corner.try_emplace(key3(i, j, k), 0.0f);  // one hash lookup
+        if (inserted) {
+            float v = f(pos(i, j, k));
+            if (v == 0.0f) v = 1e-9f;  // no exact zeros: every corner is strictly inside or outside
+            it->second = v;
+        }
+        return it->second;
     }
 };
 
@@ -114,12 +114,19 @@ struct Decimator {
         scale = 1.0f / std::max(o.cell * 8.0f, 1e-6f);
         faceAlive.assign(nf, 1);
         vfaces.assign(pos.size(), {});
+        // Room for every face at its corners plus a few collapse appends (no regrowth).
+        std::vector<uint32_t> faceCount(pos.size(), 0);
+        for (uint32_t v : tri) ++faceCount[v];
+        for (size_t i = 0; i < pos.size(); ++i) vfaces[i].reserve(faceCount[i] + 4);
         Q.assign(pos.size(), Quadric());
         stamp.assign(pos.size(), 0);
         vAlive.assign(pos.size(), 1);
         nrm.resize(pos.size());
         for (size_t i = 0; i < pos.size(); ++i) nrm[i] = normalize(gradient(f, pos[i], o.gradientStep));
         for (uint32_t fi = 0; fi < nf; ++fi) {
+            // A zero-area face has no plane to add, but it stays listed at its corners: collapses
+            // re-index, kill and check only the faces they find there.
+            for (int k = 0; k < 3; ++k) vfaces[tri[fi * 3 + k]].push_back(fi);
             vec3 n = faceNormal(fi);
             float len = length(n);
             if (len < 1e-20f) continue;
@@ -127,10 +134,7 @@ struct Decimator {
             vec3 p0 = (pos[tri[fi * 3]] - centre) * scale;
             double d = -dot(n, p0);
             double area = double(len) * 0.5 * double(scale) * double(scale);
-            for (int k = 0; k < 3; ++k) {
-                vfaces[tri[fi * 3 + k]].push_back(fi);
-                Q[tri[fi * 3 + k]].addPlane(n.x, n.y, n.z, d, area);
-            }
+            for (int k = 0; k < 3; ++k) Q[tri[fi * 3 + k]].addPlane(n.x, n.y, n.z, d, area);
         }
         bulk = true;
         heap.reserve(tri.size() * 2);
@@ -296,8 +300,7 @@ MeshData meshVolume(const Fn& f, const std::vector<vec3>& seeds, const VolumeOpt
     Grid g(f, h);
     std::unordered_map<uint64_t, uint32_t> cellVertex;
     std::vector<vec3> verts;
-    std::vector<int> cellIdx;  // i,j,k triples of surface cells, in vertex order
-    std::vector<uint64_t> queue;
+    std::vector<int> cellIdx;  // i,j,k triples of surface cells, in vertex order (the flood fill queue)
     std::unordered_map<uint64_t, char> visited;
 
     static const int cornerOff[8][3] = {{0, 0, 0}, {1, 0, 0}, {0, 1, 0}, {1, 1, 0}, {0, 0, 1}, {1, 0, 1}, {0, 1, 1}, {1, 1, 1}};
@@ -311,9 +314,7 @@ MeshData meshVolume(const Fn& f, const std::vector<vec3>& seeds, const VolumeOpt
         return mask;
     };
     auto enqueue = [&](int i, int j, int k) {
-        uint64_t kk = key3(i, j, k);
-        if (visited.emplace(kk, 1).second) {
-            queue.push_back(kk);
+        if (visited.try_emplace(key3(i, j, k), 1).second) {  // no node allocated for a visited cell
             cellIdx.push_back(i);
             cellIdx.push_back(j);
             cellIdx.push_back(k);
@@ -357,7 +358,7 @@ MeshData meshVolume(const Fn& f, const std::vector<vec3>& seeds, const VolumeOpt
     static const int faceDir[6][3] = {{-1, 0, 0}, {1, 0, 0}, {0, -1, 0}, {0, 1, 0}, {0, 0, -1}, {0, 0, 1}};
     size_t head = 0;
     std::vector<int> surfaceCells;
-    while (head < queue.size()) {
+    while (head < cellIdx.size() / 3) {
         size_t idx = head++;
         int i = cellIdx[idx * 3], j = cellIdx[idx * 3 + 1], k = cellIdx[idx * 3 + 2];
         float v[8];

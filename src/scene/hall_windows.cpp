@@ -125,12 +125,8 @@ void curtain(Accum& a, const WallDef& w, float uc, float side, uint32_t seed) {
     };
     auto front = [&](float s, float t) { return fn(s, t, 0.0f); };
     auto backF = [&](float s, float t) { return fn(s, t, 0.006f); };
-    // Sample densely around the tie-back and near the top.
-    std::vector<float> ts;
-    for (int i = 0; i <= 70; ++i) {
-        float x = float(i) / 70.0f;
-        ts.push_back(x);
-    }
+    // 71 uniform samples along the drape height.
+    std::vector<float> ts = linspace(0.0f, 1.0f, 70);
     std::vector<float> ss = linspace(0.0f, 1.0f, K * 8);
     surfaceGrid(cl, ss, ts, front, false, UVMode::Meters);
     surfaceGrid(cl, ss, ts, backF, true, UVMode::Meters);

@@ -31,7 +31,7 @@ quat lidRotation(Bone lid, float closure, float gazePitch) {
 namespace build {
 namespace {
 
-const vec3 kEye(0.032f, 0.080f, 0.075f);          // right/left eye centre (|x|) in head space
+const vec3 kEye = robotSkeleton().restOffset[EyeL];  // right/left eye centre (|x|) in head space
 constexpr float kSocket = eye::LID_OUTER + 0.0004f;  // spherical socket the lids slide in
 
 // Cubic norm (superellipsoid with flatter sides than an ellipsoid).
@@ -190,6 +190,7 @@ void buildHead(Sink& s) {
         }, true, skull);
     }
     // ---- eyes -----------------------------------------------------------------------------------
+    size_t first = s.parts.size();  // eyes and lids are mirrored, the head shell is not
     {
         const float lz = eye::limbusZ(), cz = eye::corneaCenterZ();
         vec4 none[4] = {vec4(0), vec4(0), vec4(0), vec4(0)};
@@ -218,7 +219,7 @@ void buildHead(Sink& s) {
             return sdf::meshVolume([upper](const vec3& p) { return lidShell(p, upper); }, {seed}, o);
         }, true, look, MaterialId::RobotLid);
     }
-    s.mirrorFrom(s.parts.size() - 5);
+    s.mirrorFrom(first);
 }
 
 }  // namespace build

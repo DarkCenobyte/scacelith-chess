@@ -3,14 +3,14 @@
 #include "robot.h"
 #include "sdf.h"
 #include <functional>
-#include <string>
 
 namespace character {
 namespace build {
 
 // Porcelain per-part parameters (DrawItem::inst, see shaders/materials/robot_porcelain.glsl):
 //   inst[0] = (variant, clearcoat scale, roughness offset, seam half-width in m)
-//             variant 0 = glazed shell, 1 = soft-touch pad region on the positive side of seam 0
+//             variant 0 = glazed shell, 1 = soft-touch pad region on the positive side of seam 0,
+//             2 = face (closed-mouth line)
 //   inst[1..3] = panel seam planes in bone space (xyz unit normal, w offset: dot(n,p) + w = 0);
 //                zero vector = unused.
 struct PorcelainLook {
@@ -38,6 +38,10 @@ struct Sink {
 
 m::vec4 seamPlane(m::vec3 n, m::vec3 pointOnPlane);
 
+// Radius of the palm's carpal dome around the wrist pivot (robot_hand.cpp); the forearm's wrist
+// socket wraps it (robot_body.cpp).
+constexpr float kWristDome = 0.0205f;
+
 // Opposite-side bone for a right-side bone.
 Bone mirrorBone(Bone rightBone);
 
@@ -46,10 +50,6 @@ void buildArm(Sink& s);     // clavicle, upper arm, forearm (+ mirrored)
 void buildTorso(Sink& s);   // pelvis, abdomen, chest, neck
 void buildLegs(Sink& s);    // thighs, shins, feet (+ mirrored)
 void buildHead(Sink& s);    // head shell, face, eyes, lids
-
-// Bone-local position of a bone's joint relative to another bone (rest pose), e.g. the elbow in
-// upper-arm space: restOffset chain difference.
-m::vec3 restJoint(Bone b);  // character-space joint position in the rest pose (pelvis at origin)
 
 }  // namespace build
 }  // namespace character

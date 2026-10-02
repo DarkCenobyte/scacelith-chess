@@ -18,12 +18,18 @@ constexpr float kGap = 0.0010f;  // clearance between a shell and the ball it wr
 // Joint radii shared by the parts that meet at a joint.
 constexpr float kShoulderBall = 0.0300f;
 constexpr float kElbowBall = 0.0255f;
-constexpr float kWristDome = 0.0205f;  // carpal dome of the palm (robot_hand.cpp)
 constexpr float kHipCover = 0.0600f;   // convex hip cover of the pelvis around the hip pivot
 constexpr float kKneeBall = 0.0340f;
 constexpr float kKneeCap = kKneeBall + kGap + 0.0100f;  // outer radius of the knee cap shell
 constexpr float kAnkleBall = 0.0255f;
 constexpr float kNeckR = 0.0440f;
+
+// Joint pivots in the parent shell's bone space: the child bones' rest offsets (skeleton.cpp).
+const vec3 kElbow = robotSkeleton().restOffset[ForeArmR];  // upper arm space
+const vec3 kWrist = robotSkeleton().restOffset[HandR];     // forearm space
+const vec3 kKnee = robotSkeleton().restOffset[ShinR];      // thigh space
+const vec3 kAnkle = robotSkeleton().restOffset[FootR];     // shin space
+const vec3 kHip = robotSkeleton().restOffset[ThighL];      // pelvis space (left side, +X)
 
 sdf::VolumeOptions vol(const char* name, vec3 axis, float cell = 0.0015f, float err = 0.00010f, float maxEdge = 0.010f) {
     sdf::VolumeOptions o;
@@ -52,7 +58,6 @@ inline float endCut(float v, float s, float lip, float bevel) { return s * std::
 
 // ---- arm -----------------------------------------------------------------------------------------
 float upperArmShell(const vec3& p) {
-    const vec3 elbow(0, -0.300f, 0);
     vec3 q(p.x * 1.05f, p.y, p.z);
     float d = sdf::roundCone(q, vec3(0, -0.060f, 0.0f), vec3(0, -0.272f, 0.001f), 0.0370f, 0.0305f);
     // Biceps (front) and triceps (back) swell a little.
@@ -66,14 +71,13 @@ float upperArmShell(const vec3& p) {
     d = sdf::smax(d, inner, 0.010f);
     d = sdf::smax(d, (kShoulderBall + kGap) - length(p), 0.002f);
     // Elbow: socket around the ball, lips just past the pivot, front (flexion side) bevelled.
-    vec3 e = p - elbow;
+    vec3 e = p - kElbow;
     d = sdf::smax(d, (kElbowBall + kGap) - length(e), 0.0025f);
     d = sdf::smax(d, endCut(e.y, e.z, 0.003f, 42.0f * DEG), 0.003f);
     return d;
 }
 
 float forearmShell(const vec3& p) {
-    const vec3 wrist(0, -0.265f, 0);
     // Flatter towards the wrist (thin palm-to-back, wide thumb-to-pinky).
     float t = clamp(-p.y / 0.265f, 0.0f, 1.0f);
     float sx = lerp(0.97f, 0.90f, t);
@@ -85,7 +89,7 @@ float forearmShell(const vec3& p) {
     d = sdf::smax(d, (kElbowBall + kGap) - length(p), 0.0025f);
     d = sdf::smax(d, startCut(-p.y, p.z, 0.005f, 42.0f * DEG), 0.003f);
     // Wrist end: socket wrapping the carpal dome of the hand, lips just past the pivot.
-    vec3 w = p - wrist;
+    vec3 w = p - kWrist;
     d = sdf::smin(d, sdf::sphere(w, kWristDome + 0.0045f), 0.010f);  // cuff: the wall never gets thin
     d = sdf::smax(d, (kWristDome + 0.0005f) - length(w), 0.0020f);
     d = sdf::smax(d, -w.y - 0.0025f, 0.0025f);
@@ -94,7 +98,6 @@ float forearmShell(const vec3& p) {
 
 // ---- legs ----------------------------------------------------------------------------------------
 float thighShell(const vec3& p) {
-    const vec3 knee(0, 0, 0.44f);
     vec3 q(p.x, p.y * 1.10f, p.z);
     float d = sdf::roundCone(q, vec3(0, 0.004f, 0.030f), vec3(0, 0.002f, 0.418f), 0.0720f, 0.0520f);
     // Quadriceps swell on top, flatter inner thigh, flattened where it rests on the seat.
@@ -104,7 +107,7 @@ float thighShell(const vec3& p) {
     // Hip: concave cup around the pelvis' hip cover.
     d = sdf::smax(d, (kHipCover + kGap) - length(p), 0.003f);
     // Knee: a sleeve over the shin's knee cap, lips a little past the pivot, underside bevelled.
-    vec3 k = p - knee;
+    vec3 k = p - kKnee;
     d = sdf::smin(d, sdf::sphere(k, kKneeCap + kGap + 0.0050f), 0.016f);  // cuff: the wall never gets thin
     d = sdf::smax(d, (kKneeCap + kGap) - length(k), 0.0025f);
     d = sdf::smax(d, endCut(-k.z, -k.y, 0.004f, 40.0f * DEG), 0.0035f);
@@ -112,7 +115,6 @@ float thighShell(const vec3& p) {
 }
 
 float shinShell(const vec3& p) {
-    const vec3 ankle(0, -0.44f, 0);
     vec3 q(p.x * 1.10f, p.y, p.z);
     float d = sdf::roundCone(q, vec3(0, -0.050f, 0.004f), vec3(0, -0.405f, 0.0f), 0.0440f, 0.0290f);
     // Calf at the back, subtle tibia crest at the front.
@@ -128,7 +130,7 @@ float shinShell(const vec3& p) {
     d = sdf::smin(d, cap, 0.006f);
     d = sdf::smax(d, (kKneeBall + kGap) - r, 0.0015f);
     // Ankle: socket, lips just past the pivot, front and back bevelled (foot flexes both ways).
-    vec3 a = p - ankle;
+    vec3 a = p - kAnkle;
     d = sdf::smin(d, sdf::sphere(a, kAnkleBall + kGap + 0.0045f), 0.012f);  // cuff: the wall never gets thin
     d = sdf::smax(d, (kAnkleBall + kGap) - length(a), 0.0025f);
     d = sdf::smax(d, endCut(a.y, std::fabs(a.z), 0.002f, 30.0f * DEG), 0.0035f);
@@ -156,14 +158,13 @@ float pelvisShell(const vec3& p) {
     vec3 pm(ax, p.y, p.z);
     // Buttocks and hip covers (convex spheres the thigh cups turn around).
     d = sdf::smin(d, sdf::ellipsoid(pm - vec3(0.060f, -0.050f, -0.050f), vec3(0.068f, 0.050f, 0.062f)), 0.03f);
-    const vec3 hip(0.095f, -0.030f, 0.0f);
-    d = sdf::smin(d, sdf::sphere(pm - hip, kHipCover), 0.02f);
+    d = sdf::smin(d, sdf::sphere(pm - kHip, kHipCover), 0.02f);
     // Seat contact is flat.
     d = sdf::smax(d, -(p.y + 0.098f), 0.02f);  // 2 mm above the seat top: no coplanar contact
     // Waist: taper towards the core, open on top.
     d = sdf::smax(d, p.y - 0.080f, 0.012f);
     // Room for the thighs: remove the thigh tube beyond the hip cover.
-    vec3 h = pm - hip;
+    vec3 h = pm - kHip;
     float tube = std::max(length(vec2(h.x, h.y * 1.1f)) - 0.078f, -h.z);
     float thighRoom = sdf::smax(tube, (kHipCover + kGap) - length(h), 0.004f);
     d = sdf::smax(d, -thighRoom, 0.004f);

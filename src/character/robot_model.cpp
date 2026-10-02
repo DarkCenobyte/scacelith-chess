@@ -28,13 +28,6 @@ Bone mirrorBone(Bone b) {
     return b;
 }
 
-vec3 restJoint(Bone b) {
-    const Skeleton& sk = robotSkeleton();
-    vec3 p(0);
-    for (int i = b; i >= 0; i = sk.parent[i]) p += sk.restOffset[i];
-    return p;
-}
-
 void Sink::add(const char* name, Bone b, MaterialId mat, MeshJob job, bool fpHidden, const vec4* inst) {
     RobotPart p;
     p.bone = b;
@@ -72,12 +65,16 @@ void Sink::mirrorFrom(size_t from) {
 }
 
 void Sink::run(int threads) {
-    // Biggest jobs are unknown up front; a shared counter keeps every worker busy.
+    // A shared counter keeps every worker busy. Jobs are handed out from the last one: the head is
+    // declared last and its face and skull jobs are by far the longest (the face alone is about a
+    // third of the whole build), so they start first instead of running alone at the end.
     std::atomic<size_t> next{0};
+    const size_t n = parts.size();
     auto worker = [&]() {
         for (;;) {
-            size_t i = next.fetch_add(1);
-            if (i >= parts.size()) break;
+            size_t k = next.fetch_add(1);
+            if (k >= n) break;
+            size_t i = n - 1 - k;
             if (jobs[i]) parts[i].mesh = jobs[i]();
         }
     };

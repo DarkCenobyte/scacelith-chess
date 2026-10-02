@@ -2,7 +2,12 @@
 //
 // Shapes are written as signed distance functions (or smooth implicit functions whose zero set is
 // the surface: exact distances are not required, only a sane gradient near the surface). The
-// mesher shrink-wraps a capsule grid onto the zero set, then refines it where curvature needs it:
+// porcelain shells go through the volume mesher (Surface Nets + quadric decimation, meshVolume):
+//
+//   MeshData m = sdf::meshVolume(f, seeds, opts);   // f < 0 inside, seeds = points inside the shape
+//
+// Simple convex shapes (the hand's ball joints) use the shrink-wrap mesher instead: a capsule grid
+// projected onto the zero set, then refined where curvature needs it:
 //
 //   MeshData m = sdf::meshSegment(f, a, b, opts);   // f < 0 inside, a..b a segment inside the shape
 //
@@ -47,20 +52,6 @@ inline float roundBox(m::vec3 p, m::vec3 halfExtent, float r) {
     m::vec3 q = m::abs(p) - halfExtent + m::vec3(r);
     return m::length(m::max(q, m::vec3(0))) + std::min(std::max(q.x, std::max(q.y, q.z)), 0.0f) - r;
 }
-// Torus around the Y axis.
-inline float torusY(m::vec3 p, float R, float r) {
-    float q = std::sqrt(p.x * p.x + p.z * p.z) - R;
-    return std::sqrt(q * q + p.y * p.y) - r;
-}
-// Capped cylinder along Y centred at the origin (half height h) with rounded edges (radius e).
-inline float cylinderY(m::vec3 p, float r, float h, float e = 0.0f) {
-    float dx = std::sqrt(p.x * p.x + p.z * p.z) - r + e, dy = std::fabs(p.y) - h + e;
-    return std::min(std::max(dx, dy), 0.0f) + std::sqrt(std::max(dx, 0.0f) * std::max(dx, 0.0f) + std::max(dy, 0.0f) * std::max(dy, 0.0f)) - e;
-}
-inline float cylinderX(m::vec3 p, float r, float h, float e = 0.0f) { return cylinderY(m::vec3(p.y, p.x, p.z), r, h, e); }
-inline float cylinderZ(m::vec3 p, float r, float h, float e = 0.0f) { return cylinderY(m::vec3(p.x, p.z, p.y), r, h, e); }
-// Signed distance to the plane dot(n, p) = d (n unit): positive on the n side.
-inline float plane(m::vec3 p, m::vec3 n, float d) { return m::dot(p, n) - d; }
 
 // ---- operators -------------------------------------------------------------------------------
 // Polynomial smooth min/max, k = blend radius (m).
@@ -70,11 +61,6 @@ inline float smin(float a, float b, float k) {
     return std::min(a, b) - h * h * k * 0.25f;
 }
 inline float smax(float a, float b, float k) { return -smin(-a, -b, k); }
-// Subtract b from a with a fillet of radius k.
-inline float ssub(float a, float b, float k) { return smax(a, -b, k); }
-// Anisotropic scale helper: evaluates d(p / s) * min(s) (keeps a usable distance estimate).
-template <class F>
-inline float scaled(m::vec3 p, m::vec3 s, F&& d) { return d(p / s) * std::min(s.x, std::min(s.y, s.z)); }
 
 // Smooth 1D profile through control points (monotone cubic Hermite), clamped at the ends.
 struct Profile {
@@ -93,10 +79,6 @@ struct MeshOptions {
     int maxIterations = 10;
     int nu = 48, nv = 48;         // base grid (around, along)
     m::vec3 tangentAxis{0, 1, 0}; // tangents follow this direction projected on the surface
-    // End caps: 0 = rays fan out from the segment end (convex, rounded ends). > 0 = "flat" caps:
-    // rays start on a disc of capInset x the local cross-section radius and run parallel to the
-    // axis, so concave ends (sockets wrapping a joint head) are meshed as height fields.
-    float capInset = 0.0f;
     const char* name = "";        // for diagnostics
     float gradientStep = 4e-5f;
 };
@@ -117,7 +99,7 @@ struct VolumeOptions {
     float gradientStep = 4e-5f;
 };
 MeshData meshVolume(const Fn& f, const std::vector<m::vec3>& seeds, const VolumeOptions& o);
-// Adaptive refinement of an existing mesh lying on f's zero set (longest-edge bisection).
+// Adaptive refinement of an existing mesh lying on f's zero set (red/green splits of the marked edges).
 void refine(MeshData& mesh, const Fn& f, const MeshOptions& o);
 // Recomputes normals from the SDF gradient and tangents from o.tangentAxis.
 void surfaceFrames(MeshData& mesh, const Fn& f, const MeshOptions& o);

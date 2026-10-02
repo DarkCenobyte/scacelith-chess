@@ -111,7 +111,8 @@ public:
         cam_.update(plat::input());
         const plat::Input& in = plat::input();
         if (in.keyPressed[plat::KEY_SPACE]) { leverSide_ ^= 1; running_ = leverSide_ ^ 1; }
-        if (!ctx.screenshotMode && running_ >= 0) ms_[running_] = std::max(0.0f, ms_[running_] - dt * 1000.0f);
+        // --running / --lever are not range-checked: only sides 0 and 1 have a time to count down.
+        if (!ctx.screenshotMode && running_ >= 0 && running_ < 2) ms_[running_] = std::max(0.0f, ms_[running_] - dt * 1000.0f);
         return !in.keyPressed[plat::KEY_ESCAPE];
     }
 

@@ -7,7 +7,10 @@
 //   --pupil <0..1>           pupil dilation
 //   --gaze <yaw,pitch>       eye direction in degrees (+yaw = towards the robot's left)
 //   --yaw/--pitch/--dist <v> orbit overrides (radians / meters), --fov <deg>
+//   --target <x,y,z>         orbit centre override
+//   --table                  show the table slab in the rest pose too
 //   --only <substring>       debug: draw only parts whose name contains the substring
+//   --wire                   debug: wireframe (triangle edges over the shells)
 //   --fp                     first-person flags (hides the head, eyes, lids, neck top)
 //   --sun <x,y,z>            direction towards the sun
 //   --coach [text]           the coach's chest marking (ChestMarking; default text "COACH")
