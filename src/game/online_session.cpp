@@ -553,7 +553,7 @@ GameLink* OnlineSession::takeGame(net::OnlineGame& snapshot) {
 
 bool OnlineSession::nextGameEvent(net::Event& e) {
     if (gameReady_ || gameEvents_.empty()) return false;  // a new game waits for takeGame()
-    e = gameEvents_.front();
+    e = std::move(gameEvents_.front());
     gameEvents_.pop_front();
     return true;
 }
@@ -641,7 +641,7 @@ void OnlineSession::handleServer(net::Event& e) {
     // tested in Options names that server.)
     if (answers_.foreign(e) && !(e.kind == Kind::ServerInfoResult && testing_)) {
         if (e.kind == Kind::GifResult) gif_.finish(std::move(e));
-        else if (!answers_.keep(e)) LOGI("online: an answer of %s dropped (another server since)", e.origin.c_str());
+        else if (!answers_.keep(std::move(e))) LOGI("online: an answer of %s dropped (another server since)", e.origin.c_str());
         return;
     }
     // A call that found the saved session refused (expired, revoked): the network layer erased the
@@ -650,8 +650,8 @@ void OnlineSession::handleServer(net::Event& e) {
         signedIn_ = false;
         LOGI("online: session refused, signed out");
     }
-    // HTTPS results are kept for the page that asked.
-    auto store = [&]() { answers_.keep(e); };
+    // HTTPS results are kept for the page that asked (moved: store() is the last use of e).
+    auto store = [&]() { answers_.keep(std::move(e)); };
     switch (e.kind) {
     case Kind::ServerInfoResult:
         if (testing_) {

@@ -35,8 +35,10 @@ public:
     bool busy(net::Event::Kind k) const;
     bool take(net::Event::Kind k, net::Event& out);   // the answer arrived, handed over once
     // An answer arrived: kept for take() (the latest of its kind), one fewer awaited. False, and
-    // nothing changes, for a foreign one other than a PGN.
+    // nothing changes, for a foreign one other than a PGN. The rvalue form moves the answer (an
+    // export or a PGN may be megabytes), and leaves it untouched when it returns false.
     bool keep(const net::Event& e);
+    bool keep(net::Event&& e);
 
 private:
     std::string origin_;

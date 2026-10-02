@@ -22,12 +22,12 @@ void ServerAnswers::setServer(const std::string& origin) {
     const auto arrived = results_.find(pgn);
     net::Event pgnResult;
     const bool pgnArrived = arrived != results_.end();
-    if (pgnArrived) pgnResult = arrived->second;
+    if (pgnArrived) pgnResult = std::move(arrived->second);
     origin_ = origin;
     results_.clear();
     pending_.clear();
     if (pgnPending > 0) pending_[pgn] = pgnPending;
-    if (pgnArrived) results_[pgn] = pgnResult;
+    if (pgnArrived) results_[pgn] = std::move(pgnResult);
 }
 
 void ServerAnswers::expect(Kind k) {
@@ -43,16 +43,19 @@ bool ServerAnswers::busy(Kind k) const {
 bool ServerAnswers::take(Kind k, net::Event& out) {
     auto it = results_.find(int(k));
     if (it == results_.end()) return false;
-    out = it->second;
+    out = std::move(it->second);
     results_.erase(it);
     return true;
 }
 
-bool ServerAnswers::keep(const net::Event& e) {
+bool ServerAnswers::keep(const net::Event& e) { return keep(net::Event(e)); }
+
+bool ServerAnswers::keep(net::Event&& e) {
     if (foreign(e) && e.kind != Kind::PgnResult) return false;
-    auto it = pending_.find(int(e.kind));
+    const int k = int(e.kind);
+    auto it = pending_.find(k);
     if (it != pending_.end() && it->second > 0) it->second--;
-    results_[int(e.kind)] = e;
+    results_[k] = std::move(e);
     return true;
 }
 
