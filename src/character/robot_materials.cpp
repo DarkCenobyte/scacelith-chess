@@ -17,7 +17,6 @@ void setupRobotMaterials() {
     por.params[3] = vec4(0.70f, 0.69f, 0.67f, 0.62f);       // soft-touch pad albedo, roughness
     por.params[4] = vec4(1.0f, 0.00045f, 0.35f, 0.02f);     // seam darkening, bevel width, smudges, albedo variation
     por.tessellated = true;
-    por.tessLevel = 8.0f;
     por.defines = {"MATERIAL_SCREEN_DOOR"};   // see-through playing arm (submitRobot armOpacity)
 
     // Eyelids: same glaze, a touch warmer and smoother.
@@ -38,7 +37,6 @@ void setupRobotMaterials() {
     jt.params[2] = vec4(0.62f, 0.62f, 0.63f, 0.12f);
     jt.params[3] = vec4(1.0f, 9000.0f, 0, 0);
     jt.tessellated = true;
-    jt.tessLevel = 4.0f;
     jt.defines = {"MATERIAL_SCREEN_DOOR"};
 
     // Eyes: one surface file, three variants.

@@ -445,9 +445,7 @@ bool Scoresheet::init(const Config& c) {
     I.paper.params[3] = vec4(float(PAGE_TEX_W), float(PAGE_TEX_H), SPREAD, 1.0f);
     I.paper.params[4] = vec4(float(ENTRY_TEX_W), float(ENTRY_TEX_H), PAGE_W, PAGE_H);
     I.paper.textures[0] = I.pageTex.id;
-    I.paper.textureTargets[0] = GL_TEXTURE_2D_ARRAY;
     I.paper.textures[1] = I.entryTex.id;
-    I.paper.textureTargets[1] = GL_TEXTURE_2D;
     pageGridSamples(I.gx, I.gy);
     // Turning page: a dynamic mesh (updated in place), bounds = everywhere the page can go.
     flipGrid(I.gx, I.gy, 0.0f, FlipParams{0, frame_.outerSign}, I.grid);

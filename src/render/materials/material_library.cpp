@@ -204,7 +204,6 @@ void defineFabrics() {
         m.params[4] = vec4(0.34f, 0.26f, 800.0f, 500.0f);
         m.params[5] = vec4(2.4f, 3.6f, 0.7f, 0.0015f);
         m.textures[0] = g_tex.tapestry.id;
-        m.textureTargets[0] = GL_TEXTURE_2D_ARRAY;
     }
     {
         Material& m = def(MaterialId::ChairVelvet, "shaders/materials/cloth.glsl", {"CLOTH_VELVET"});
@@ -337,7 +336,6 @@ void defineScoresheet() {
         m.params[3] = vec4(1.0f, 1.0f, 4.0f, 1.0f);
         m.params[4] = vec4(1.0f, 1.0f, 148.0f, 210.0f);
         m.textures[0] = g_blankPage;
-        m.textureTargets[0] = GL_TEXTURE_2D_ARRAY;
         m.textures[1] = g_blankEntry;
     }
     {

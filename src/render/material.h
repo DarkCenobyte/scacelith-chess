@@ -52,11 +52,9 @@ struct Material {
     // Available in GLSL as draws[uDraw].matParams[i]; meaning is defined by the surface file.
     m::vec4 params[8] = {};
     GLuint textures[8] = {};                  // bound to units 0..7 when non-zero (any target)
-    GLenum textureTargets[8] = {};            // GL_TEXTURE_2D if 0
     bool doubleSided = false;
     bool transparent = false;                 // drawn after opaques, sorted back to front, no depth write
     bool tessellated = false;                 // PN-triangle / Phong tessellation for smooth silhouettes
-    float tessLevel = 8.0f;                   // max tessellation factor (screen-adaptive)
     bool castShadow = true;
     int planarReflector = -1;                 // index of the planar reflection this surface samples
 };

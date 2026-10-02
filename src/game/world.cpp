@@ -222,7 +222,6 @@ bool World::loadStep() {
         w.frameCoordMat.name = "BoardFrameCoordinates";
         w.frameCoordMat.defines.push_back("BOARD_COORDINATES");
         w.frameCoordMat.textures[1] = w.coordTex;
-        w.frameCoordMat.textureTargets[1] = GL_TEXTURE_2D;
         break;
     case 4:
         for (int t = Pawn; t <= King; ++t) {
