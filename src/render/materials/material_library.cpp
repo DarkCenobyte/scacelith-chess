@@ -31,7 +31,8 @@ vec3 srgb(float r, float g, float b) {
 }
 
 // Placeholder standard.glsl setup (kept for ids owned by other packages and Default).
-void std(MaterialId id, vec3 albedo, float rough, float metal = 0, float clearcoat = 0, float ccRough = 0.05f, float sss = 0) {
+void placeholderStandard(MaterialId id, vec3 albedo, float rough, float metal = 0, float clearcoat = 0, float ccRough = 0.05f,
+                         float sss = 0) {
     Material& m = g_mats[int(id)];
     m.name = g_names[int(id)];
     m.surface = "shaders/materials/standard.glsl";
@@ -365,7 +366,7 @@ void defineScoresheet() {
 
 bool init() {
     if (g_initialized) return true;
-    for (int i = 0; i < int(MaterialId::Count); ++i) std(MaterialId(i), vec3(0.5f), 0.5f);
+    for (int i = 0; i < int(MaterialId::Count); ++i) placeholderStandard(MaterialId(i), vec3(0.5f), 0.5f);
     g_tex = bakeAll();
 
     defineMarbles();
@@ -376,15 +377,15 @@ bool init() {
     defineScoresheet();
 
     // Owned by other packages: placeholders kept as before.
-    std(MaterialId::ClockDisplay, vec3(0.45f, 0.48f, 0.40f), 0.2f, 0, 1, 0.02f);
-    std(MaterialId::RobotPorcelain, vec3(0.92f, 0.91f, 0.89f), 0.3f, 0, 1, 0.05f, 0.4f);
-    std(MaterialId::RobotJoint, vec3(0.03f), 0.45f, 0.6f);
-    std(MaterialId::RobotEyeSclera, vec3(0.85f, 0.82f, 0.80f), 0.1f, 0, 1, 0.02f, 0.5f);
-    std(MaterialId::RobotEyeIris, vec3(0.20f, 0.30f, 0.35f), 0.3f, 0, 1, 0.02f);
-    std(MaterialId::RobotEyeCornea, vec3(1.0f), 0.02f);
+    placeholderStandard(MaterialId::ClockDisplay, vec3(0.45f, 0.48f, 0.40f), 0.2f, 0, 1, 0.02f);
+    placeholderStandard(MaterialId::RobotPorcelain, vec3(0.92f, 0.91f, 0.89f), 0.3f, 0, 1, 0.05f, 0.4f);
+    placeholderStandard(MaterialId::RobotJoint, vec3(0.03f), 0.45f, 0.6f);
+    placeholderStandard(MaterialId::RobotEyeSclera, vec3(0.85f, 0.82f, 0.80f), 0.1f, 0, 1, 0.02f, 0.5f);
+    placeholderStandard(MaterialId::RobotEyeIris, vec3(0.20f, 0.30f, 0.35f), 0.3f, 0, 1, 0.02f);
+    placeholderStandard(MaterialId::RobotEyeCornea, vec3(1.0f), 0.02f);
     g_mats[int(MaterialId::RobotEyeCornea)].transparent = true;
-    std(MaterialId::RobotLid, vec3(0.92f, 0.91f, 0.89f), 0.3f, 0, 1, 0.05f, 0.4f);
-    std(MaterialId::Default, vec3(0.5f), 0.5f);
+    placeholderStandard(MaterialId::RobotLid, vec3(0.92f, 0.91f, 0.89f), 0.3f, 0, 1, 0.05f, 0.4f);
+    placeholderStandard(MaterialId::Default, vec3(0.5f), 0.5f);
     g_initialized = true;
     return true;
 }
