@@ -2,8 +2,7 @@
 //   Windows:  WinHTTP (transport_win32.cpp): OS TLS stack and trust store, system proxy,
 //             WinHTTP WebSocket API.
 //   Linux:    OpenSSL (transport_openssl.cpp, development and test builds) with a minimal
-//             HTTP/1.1 and RFC 6455 client; transport_none.cpp when OpenSSL is missing
-//             (every call fails with "unavailable").
+//             HTTP/1.1 and RFC 6455 client.
 //
 // Security rules applied here, whatever the caller asks:
 //   - TLS certificates are validated by the OS trust store (Linux: OpenSSL default paths),
@@ -151,7 +150,7 @@ protected:
 // "http_<status>" when the server answered without upgrading, or "subprotocol".
 std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int& httpStatus, CancelToken* cancel = nullptr);
 
-bool transportAvailable();                    // false in Linux builds without OpenSSL
+bool transportAvailable();                    // false when the WinHTTP session or the OpenSSL context fails
 bool isLoopbackHost(const std::string& host); // localhost, 127.0.0.1, ::1 (any case)
 bool isIpLiteral(const std::string& host);
 // "host" or "[v6]" followed by ":port" unless it is the scheme's default port.

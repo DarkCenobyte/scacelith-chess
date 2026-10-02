@@ -2,9 +2,7 @@
 // secure random bytes, base64 / base64url / hex, PKCE (RFC 7636, S256) and the proof-of-work
 // solver of the dedicated server (docs/DESIGN.md section 8).
 //
-// Backends: BCrypt on Windows, OpenSSL on Linux dev builds; a portable implementation (hashes
-// from FIPS 180-4, randomness from the kernel) when a Linux build has no OpenSSL. All functions
-// are thread-safe.
+// Backends: BCrypt on Windows, OpenSSL on Linux dev builds. All functions are thread-safe.
 #pragma once
 #include <array>
 #include <atomic>
@@ -20,7 +18,7 @@ namespace crypto {
 using Sha256 = std::array<uint8_t, 32>;
 using Sha1 = std::array<uint8_t, 20>;
 
-const char* backendName();                       // "bcrypt", "openssl" or "portable"
+const char* backendName();                       // "bcrypt" or "openssl"
 
 Sha256 sha256(const void* data, size_t n);
 inline Sha256 sha256(const std::string& s) { return sha256(s.data(), s.size()); }

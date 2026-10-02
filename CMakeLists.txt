@@ -118,8 +118,7 @@ endif()
 include(third_party/supertonic3/supertonic3.cmake)
 # Networking (src/net): online client (WinHTTP, DPAPI, the shell for SSO), direct match (Winsock,
 # BCrypt ECDH P-256 / AES-GCM / SHA-256, adapter list for iphlpapi) and UPnP on Windows. Linux
-# development builds use OpenSSL: required by the direct match; the online client also builds
-# without it (online play then reports "unavailable").
+# development builds require OpenSSL 3 (online client and direct match).
 set_source_files_properties(${ROOT}/src/net/online_client.cpp PROPERTIES COMPILE_DEFINITIONS
     "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\";SCACELITH_VERSION_STRING=\"${PROJECT_VERSION}\"")
 # The User-Agent of the voice model downloads ("Scacelith/<version>").
@@ -130,7 +129,7 @@ set_source_files_properties(${ROOT}/tests/net_tests.cpp PROPERTIES COMPILE_DEFIN
 if(WIN32)
     target_link_libraries(scacelith_core PUBLIC winhttp crypt32 bcrypt ws2_32 iphlpapi shell32)
 else()
-    find_package(OpenSSL REQUIRED)
+    find_package(OpenSSL 3.0 REQUIRED)
     target_link_libraries(scacelith_core PUBLIC OpenSSL::SSL OpenSSL::Crypto)
     target_compile_definitions(scacelith_core PRIVATE SCACELITH_HAS_OPENSSL=1)
 endif()
