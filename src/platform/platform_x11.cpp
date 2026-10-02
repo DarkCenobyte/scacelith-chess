@@ -228,7 +228,6 @@ void setVsync(bool on) {
 void setDisplayMode(DisplayMode, int w, int h) {
     XResizeWindow(g_dpy, g_win, w, h);
 }
-void setTitle(const char* t) { XStoreName(g_dpy, g_win, t); }
 int width() { return g_width; }
 int height() { return g_height; }
 bool hasFocus() { return g_focus; }

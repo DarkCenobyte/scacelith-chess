@@ -379,12 +379,6 @@ void setDisplayMode(DisplayMode mode, int w, int h) {
     SetWindowPos(g_hwnd, HWND_TOP, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
 }
 
-void setTitle(const char* title) {
-    wchar_t w[256];
-    MultiByteToWideChar(CP_UTF8, 0, title, -1, w, 256);
-    SetWindowTextW(g_hwnd, w);
-}
-
 int width() { return g_width; }
 int height() { return g_height; }
 bool hasFocus() { return g_focus; }
