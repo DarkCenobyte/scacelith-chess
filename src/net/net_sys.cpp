@@ -98,7 +98,8 @@ bool writeFileAtomic(const std::string& path, const std::string& data, bool) {
     bool ok = fwrite(data.data(), 1, data.size(), f) == data.size();
     ok = fflush(f) == 0 && ok;
     // The data on the disk before the rename, as fsync() on POSIX (MOVEFILE_WRITE_THROUGH covers the
-    // rename only). Best effort: some network drives and Wine host file systems refuse it.
+    // rename only). Best effort: a file system that cannot flush (some network drives) does not fail
+    // the save.
     if (ok) _commit(_fileno(f));
     fclose(f);
     if (ok) ok = MoveFileExW(tmp.c_str(), dst.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
