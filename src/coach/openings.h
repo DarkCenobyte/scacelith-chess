@@ -104,9 +104,6 @@ public:
     size_t duplicateNamedPositions() const { return dupNamed_; }
     double buildMs() const { return buildMs_; }
 
-    // Metadata the texts need (from openings.json).
-    const std::vector<std::string>& ignoredComponents() const { return ignored_; }
-
 private:
     struct Entry {
         uint64_t hash = 0;
@@ -163,14 +160,12 @@ struct OpeningState {
     int family = -1;                     // current family (a generic family never replaces a specific one)
     int lastNamed = -1, lastNamedPly = -1;   // latest named position (lichess name index)
     bool inBook = true;                  // the current position is a book position
-    int lastBookPly = 0;
     int leftBookPly = -1;                // first ply of the latest two-ply out-of-book run, -1 = none
     OpeningSideLabels side[2];           // [chess::White], [chess::Black]
     bool determined = false;
     int determinedPly = -1;
     DeterminedBy determinedBy = DeterminedBy::None;
     std::string rare;                    // lichess family of the latest named position no curated family covers
-    int rarePly = -1;
     std::vector<OpeningEvent> events;    // in ply order
 };
 
@@ -254,7 +249,7 @@ private:
 
     struct Plan;
     Plan plan(const OpeningState& st) const;
-    std::vector<OpeningLine> lines(const Plan& p, const OpeningState& st, bool first) const;
+    std::vector<OpeningLine> lines(const Plan& p, bool first) const;
     void markSaid(const Plan& p);
 };
 

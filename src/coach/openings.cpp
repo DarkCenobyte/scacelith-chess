@@ -410,7 +410,6 @@ OpeningState classify(const chess::Game& game, const OpeningBook& book, int maxP
             const int f = book.familyOfName(hit.name);
             if (f < 0) {
                 st.rare = OpeningBook::lichessFamily(book.name(hit.name));
-                st.rarePly = ply;
             } else {
                 // A generic name (King's Pawn Game, Indian Defense) never replaces a specific family.
                 const bool specific = st.family >= 0 && !fams[st.family].generic;
@@ -490,7 +489,6 @@ OpeningState classify(const chess::Game& game, const OpeningBook& book, int maxP
         }
         if (inBook) {
             outRun = 0;
-            st.lastBookPly = ply;
         } else if (++outRun == 2) {
             st.leftBookPly = ply - 1;
             push(OpeningEvent::Kind::LeftBook, ply - 1, sideOf(chess::opposite(mover)));
@@ -753,7 +751,7 @@ OpeningAnnouncer::Plan OpeningAnnouncer::plan(const OpeningState& st) const {
     return p;
 }
 
-std::vector<OpeningLine> OpeningAnnouncer::lines(const Plan& p, const OpeningState&, bool first) const {
+std::vector<OpeningLine> OpeningAnnouncer::lines(const Plan& p, bool first) const {
     std::vector<OpeningLine> out;
     auto line = [&out](const std::string& key) -> OpeningLine& {
         out.push_back(OpeningLine{key, {}});
@@ -832,7 +830,7 @@ std::vector<OpeningLine> OpeningAnnouncer::update(const chess::Game& game, bool 
         return {};
     }
     if (st.plies < lastTalkPly_ + 2 || !canSpeak) return {};
-    std::vector<OpeningLine> out = lines(p, st, !summarySaid_);
+    std::vector<OpeningLine> out = lines(p, !summarySaid_);
     markSaid(p);
     ++utterances_;
     lastTalkPly_ = st.plies;
@@ -873,7 +871,7 @@ std::vector<OpeningLine> OpeningAnnouncer::summary(const chess::Game& game) cons
     only.black = p.black;
     only.both = p.both;
     only.relation = p.relation;
-    return fresh.lines(only, st, true);
+    return fresh.lines(only, true);
 }
 
 // ---- Texts -------------------------------------------------------------------------------------------------------------
