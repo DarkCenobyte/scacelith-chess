@@ -4033,6 +4033,66 @@ TEST(net_logout_cancels_a_connection_attempt) {
     net::sys::removeFile(credPath);
 }
 
+// A disconnect() that comes as net-rt starts a connection attempt (after it took its queue, before
+// the attempt resets its cancel token) stops that attempt too: Offline at once, not when the server
+// answers /info (here after 3 s). The window is a few instructions wide, so it is tried at many
+// delays after connect().
+TEST(net_disconnect_as_an_attempt_starts) {
+    if (!net::transportAvailable()) return;
+    if (runningUnderWine()) {
+        std::fprintf(stderr, "  (Wine: a cancelled call ends with the server's answer: skipped)\n");
+        return;
+    }
+    fakehttp::Server srv(
+        [&](const fakehttp::Request&) {
+            fakehttp::Reply rep;
+            rep.headers.emplace_back("Content-Type", "application/json");
+            rep.silenceMs = 3000;
+            rep.body = "{}";
+            return rep;
+        },
+        true);
+    CHECK(srv.ok());
+    std::string credPath = tempCredentialPath("stop-attempt");
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = srv.port();
+    ep.insecureDev = true;
+    {
+        net::CredentialStore s(credPath);
+        net::Credential cr;
+        cr.origin = ep.origin();
+        cr.username = "alice";
+        cr.token = "sct_" + std::string(43, 'S');
+        CHECK(s.put(cr));
+    }
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        int tries = 0, late = 0;
+        for (; tries < 600 && late == 0; ++tries) {
+            c.connect();
+            const auto t0 = std::chrono::steady_clock::now();
+            const auto delay = std::chrono::nanoseconds((tries * 7919) % 100000);   // 0 to 100 us
+            while (std::chrono::steady_clock::now() - t0 < delay) {
+            }
+            c.disconnect();
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+            const auto until = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+            while (c.state() != net::ConnState::Offline && std::chrono::steady_clock::now() < until)
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            if (c.state() != net::ConnState::Offline) ++late;
+            net::Event ev;
+            while (c.poll(ev)) {
+            }
+        }
+        std::fprintf(stderr, "  %d tries, %d attempts still running 1 s after disconnect()\n", tries, late);
+        CHECK_EQ(late, 0);
+    }
+    net::sys::removeFile(credPath);
+}
+
 // A proof of work for a server that was left stops at once: net-http is free for the next one.
 TEST(net_pow_abandoned_on_server_switch) {
     if (!net::transportAvailable()) return;
