@@ -4087,7 +4087,7 @@ TEST(net_logout_all_verdict) {
             return jsonReply(404, R"({"error":"not_found"})");
         if (!hasBearer(q)) return jsonReply(401, R"({"error":"invalid_token"})");
         fakehttp::Reply cut = jsonReply(200, R"({"status":"logged_out"})");
-        cut.cutAfter = 0;                             // the connection lost before the answer's body
+        cut.cutAfter = 5;                             // the connection lost in the middle of the answer
         switch (mode.load()) {
         case 1: return jsonReply(429, R"({"error":"rate_limited","retryAfter":30})");
         case 2: return jsonReply(503, R"({"error":"maintenance"})");
