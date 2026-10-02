@@ -537,20 +537,15 @@ void prewarm(const std::vector<std::pair<int, uint32_t>>& list) {
     if (!g_ready) return;
     struct Job { int face; uint32_t cp; int gi; };
     std::vector<Job> jobs;
-    std::unordered_set<uint64_t> queued;
     for (auto& fc : list) {
         int f = fc.first;
-        uint32_t cp = fc.second;
         if (f < 0 || f >= FACE_COUNT || !g_faces[f].ok) continue;
-        // A codepoint the face lacks is built in the face that will draw it (glyph()'s fallback).
-        if (!faceHas(f, cp) && (f = resolveFace(f, cp)) < 0) continue;
-        auto it = g_faces[f].glyphs.find(cp);
+        auto it = g_faces[f].glyphs.find(fc.second);
         if (it != g_faces[f].glyphs.end()) {
-            if (it->second.ink && it->second.gen != g_atlas.gen && !g_atlas.resetPending) place(it->second, cp);
+            if (it->second.ink && it->second.gen != g_atlas.gen && !g_atlas.resetPending) place(it->second, fc.second);
             continue;
         }
-        if (queued.insert((uint64_t(uint32_t(f)) << 32) | cp).second)  // built once, packed once
-            jobs.push_back({f, cp, stbtt_FindGlyphIndex(&g_faces[f].info, int(cp))});
+        jobs.push_back({f, fc.second, stbtt_FindGlyphIndex(&g_faces[f].info, int(fc.second))});
     }
     if (jobs.empty()) return;
     std::vector<SdfGlyph> results(jobs.size());

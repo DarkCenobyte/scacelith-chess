@@ -90,8 +90,6 @@ const Metrics& metrics(int face);
 GLuint atlasTexture();
 int atlasGeneration();
 // Builds the given (face, codepoint) glyphs now, on worker threads (e.g. a language's UI strings).
-// A codepoint the face lacks is built in the face that draws it (glyph()'s fallback); repeats
-// are built once.
 void prewarm(const std::vector<std::pair<int, uint32_t>>& glyphs);
 // Call once per frame before drawing: uploads glyphs added since the last call.
 void flushUploads();
