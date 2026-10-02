@@ -47,11 +47,15 @@
 // Command line (development and screenshots):
 //   --start                 skip the menu: a game against Stockfish (--human white|black)
 //   --start --coach         skip the menu: a coach game (--coach-level N, 0 = the rules lesson,
-//                           1..6; --coach-colour white|black); the [coach] settings otherwise
-//   --coach-dir <path>      the folder of the coach's voice files (default: coach/ beside the exe)
+//                           1..6; --coach-colour white|black, or --coach-color); the [coach]
+//                           settings otherwise
+//   --coach-dir <path>      the folder of the coach's voice files
+//                           (default: <application data>/coach/, see tts/model_store.h)
 //   --coach-stage-test      a coach game whose Stage performs a fixed sequence (a spoken line with
 //                           its subtitle, pointing, a knight's trace, marks, two demonstration
-//                           moves and their rewind, the takeback card), without the session
+//                           moves and their rewind, the takeback card), without the session;
+//                           --coach-stage-test lesson: on the rules lesson's first position
+//   --coach-auto-answer yes|no   the takeback card answers itself after 1.5 s (with --play)
 //   --start --hotseat       skip the menu: a hot-seat game (--white-name N --black-name N,
 //                           --clock-right white|black, --rated, --handover <s> with 0 = a cut)
 //   --play e2e4,e7e5,...    the human player(s) make these moves by hand, one per turn (touch,

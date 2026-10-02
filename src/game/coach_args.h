@@ -11,7 +11,8 @@ struct CoachArgs {
     bool start = false;       // --start --coach (or --coach-stage-test): straight to a coach game
     int level = -1;           // --coach-level N: 0 = the rules lesson, 1..6; -1 = Settings [coach] level
     int colour = -1;          // --coach-colour white|black: 0 / 1; -1 = Settings (the lesson: White)
-    std::string dir;          // --coach-dir <path>: the voice's model folder; "" = <exe dir>/coach/
+    std::string dir;          // --coach-dir <path>: the voice's model folder; "" = the default,
+                              // <application data>/coach/ (tts::modelFolder)
     bool stageTest = false;   // --coach-stage-test: the scene's Stage performs a fixed sequence
     int autoAnswer = -1;      // --coach-auto-answer yes|no: the takeback card answers itself (1 / 0)
                               // after 1.5 s, for scripted runs (--play) and screenshots; -1 = no
