@@ -593,15 +593,26 @@ TEST(archive_save_waits_for_a_file_held_for_a_moment) {
     std::thread scanner([&] {
         const auto start = std::chrono::steady_clock::now();
         while (!done && std::chrono::steady_clock::now() - start < std::chrono::seconds(10)) {
+            std::this_thread::yield();
             WIN32_FIND_DATAW fd;
             HANDLE find = FindFirstFileW(wide(tmp.file(".scacelith-save-*.tmp")).c_str(), &fd);
             if (find == INVALID_HANDLE_VALUE) continue;
             FindClose(find);
-            HANDLE h = CreateFileW(wide(tmp.file(utf8(fd.cFileName))).c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
-                                   nullptr, OPEN_EXISTING, 0, nullptr);
+            const std::wstring name = wide(tmp.file(utf8(fd.cFileName)));
+            HANDLE h = CreateFileW(name.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
             if (h == INVALID_HANDLE_VALUE) continue;
             held = true;
-            Sleep(60);
+            // Held until the save closed the file (a handle that denies writing then opens), and a
+            // moment more: over its first rename, and well within its retries (10 + 20 + 40 + 80 ms).
+            while (!done) {
+                HANDLE w = CreateFileW(name.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
+                if (w != INVALID_HANDLE_VALUE) {
+                    CloseHandle(w);
+                    break;
+                }
+                std::this_thread::yield();
+            }
+            Sleep(30);
             CloseHandle(h);
             return;
         }
