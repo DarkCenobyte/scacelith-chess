@@ -709,7 +709,7 @@ TEST(capture_slots_every_synced_state_reachable_by_calls) {
         rebuildWithCalls(calls, want);
         CHECK(sameState(calls, want));
     }
-    std::printf("  %d jumps, %d spares back in the reserve, %d pieces brought\n", jumps, toReserve, created);
+    std::fprintf(stderr, "  %d jumps, %d spares back in the reserve, %d pieces brought\n", jumps, toReserve, created);
     CHECK(jumps > 800);
     CHECK(created >= 4);
     CHECK(toReserve > 20);
