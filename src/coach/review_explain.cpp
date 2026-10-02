@@ -642,6 +642,17 @@ bool endgamePhase(const Ctx& c) {
     return phaseOfPly(dividePhases(*c.g), c.ply) == 2 || majorsAndMinors(c.p1) <= 4;
 }
 
+// Where the pawn that moves at line[i] stood when the line began: its earlier moves (its side's plies)
+// traced back, since it may have captured on its way.
+Square pawnOrigin(const std::vector<LineStep>& line, int i) {
+    Square from = line[size_t(i)].move.from;
+    for (int j = i - 2; j >= 0; j -= 2) {
+        const LineStep& prev = line[size_t(j)];
+        if (prev.mover == line[size_t(i)].mover && prev.piece == Pawn && prev.move.to == from) from = prev.move.from;
+    }
+    return from;
+}
+
 // ---- 13. Pawn promotion race (§2.13) ----
 bool promotionRace(const Ctx& c, Explanation& out) {
     if (!endgamePhase(c) || c.j.delta < 5.0) return false;
@@ -651,10 +662,13 @@ bool promotionRace(const Ctx& c, Explanation& out) {
         const LineStep& st = c.r[size_t(i)];
         if (st.mover != c.coach || st.promotion == NoPiece) continue;
         const Square prom = st.move.to;
-        Square pawn = NoSquare;   // the coach's pawn on that file on the table now
-        for (Square s : squaresOf(c.p1.pieces(c.coach, Pawn)))
-            if (fileOf(s) == fileOf(st.move.from) && (pawn == NoSquare || std::abs(rankOf(s) - rankOf(prom)) < std::abs(rankOf(pawn) - rankOf(prom))))
-                pawn = s;
+        // The coach's pawn on the table now: the one that queens, else the nearest one on that file.
+        const Square from = pawnOrigin(c.r, i);
+        Square pawn = c.p1.at(from) == Piece{Pawn, c.coach} ? from : NoSquare;
+        if (pawn == NoSquare)
+            for (Square s : squaresOf(c.p1.pieces(c.coach, Pawn)))
+                if (fileOf(s) == fileOf(st.move.from) && (pawn == NoSquare || std::abs(rankOf(s) - rankOf(prom)) < std::abs(rankOf(pawn) - rankOf(prom))))
+                    pawn = s;
         if (pawn == NoSquare) continue;
         Explanation ex;
         ex.type = ExType::PromotionRace;
@@ -666,7 +680,7 @@ bool promotionRace(const Ctx& c, Explanation& out) {
         put(b.line, "my", pieceArg(c.p1, pawn, c.human));
         put(b.line, "n", Arg::ofNumber(std::abs(rankOf(prom) - rankOf(pawn))));
         put(b.line, "n2", Arg::ofNumber(std::max(std::abs(fileOf(hk) - fileOf(prom)), std::abs(rankOf(hk) - rankOf(prom)))));
-        traceMove(b, Rook, pawn, prom, "sq");   // a straight stroke up the file
+        traceMove(b, Rook, pawn, prom, "sq");   // a straight stroke from the pawn to the square
         pointPiece(b, hk, "your");
         ex.includesBest = c.level == 6;
         ex.cause.push_back(b);
@@ -677,7 +691,10 @@ bool promotionRace(const Ctx& c, Explanation& out) {
     for (int i = 0; i < int(c.best.size()) && i < c.b.lookahead + 2; ++i) {
         const LineStep& st = c.best[size_t(i)];
         if (st.mover != c.human || st.promotion == NoPiece) continue;
-        if (c.f.piece == Pawn && fileOf(c.played.from) == fileOf(st.move.to)) return false;
+        // The human did move that pawn, or one on its file.
+        if (c.f.piece == Pawn &&
+            (c.played.from == pawnOrigin(c.best, i) || fileOf(c.played.from) == fileOf(st.move.to)))
+            return false;
         Explanation ex;
         ex.type = ExType::PromotionRace;
         ex.missed = true;

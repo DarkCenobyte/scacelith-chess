@@ -932,6 +932,28 @@ TEST(coach_review_pin_defender_freed_by_the_capture) {
     }
 }
 
+TEST(coach_review_promotion_race_names_the_queening_pawn) {
+    // ...cxb2 and ...b1=Q: the pawn that queens stands on c3 now (b7 is another pawn on the b-file).
+    for (int level : {2, 3}) {
+        Game g = gameOf("6k1/1p6/8/8/8/2p5/1P6/3N2K1 w - - 0 1", {"Kf1"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const ai::Analysis a0 = analysisOf({pvl(150, "g1f2"), pvl(-700, "g1f1 c3b2 f1e2 b2b1q")});
+        const Review r = reviewOf(rv, g, a0);
+        CHECK(r.verdict.exType == ExType::PromotionRace);
+        const Beat* b = beatWithKey(r.script, "ex.promotion.b" + std::to_string(level));
+        CHECK(b != nullptr);
+        if (!b) continue;
+        CHECK(b->line.arg("my") && b->line.arg("my")->square == sq("c3"));
+        CHECK(b->line.arg("n") && b->line.arg("n")->number == 2);   // c3xb2, b2-b1
+        bool arrow = false;
+        for (const Mark& m : b->marks)
+            if (m.kind == Mark::Kind::Arrow) arrow = m.from == sq("c3") && m.to == sq("b1");
+        CHECK(arrow);
+        checkScript(r.script, "promotion pawn");
+    }
+}
+
 TEST(coach_review_repetition_tip_is_not_a_stalemate) {
     // A winning player repeats the position (level 1): the repetition tip is said, but the move is
     // not recorded as a stalemate fault, so the appraisal gives no stalemate advice about it.
