@@ -312,6 +312,16 @@ TEST(ai_engine_start_and_move) {
     e.requestMove(kItalian, ai::ClockInfo{});
     m = waitMove(e, 20000);
     CHECK(plausibleMove(kItalian, m));
+
+    // The move's evaluation, which the game passes to acceptsDraw/offersDraw: from the side to
+    // move's view, mates as +-100000. Scholar's mate pattern, White to move: Qxf7#.
+    e.requestMove({"e2e4", "e7e5", "f1c4", "b8c6", "d1h5", "g8f6"}, ai::ClockInfo{});
+    CHECK_EQ(waitMove(e, 20000, &eval), std::string("h5f7"));
+    CHECK_EQ(eval, 100000);
+    // Black to move, a clean piece down after 1.e4 e5 2.Nf3 Qh4?? 3.Nxh4
+    e.requestMove({"e2e4", "e7e5", "g1f3", "d8h4", "f3h4"}, ai::ClockInfo{});
+    waitMove(e, 20000, &eval);
+    CHECK(eval < -500);
     e.shutdown();
     CHECK(!e.available());
     CHECK(std::cout.rdbuf() == coutBefore);
