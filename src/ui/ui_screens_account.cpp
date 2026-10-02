@@ -794,6 +794,7 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
             se.api().report(g.id, opp.name, cats[std::clamp(s.reportCategory, 0, 2)], s.reportComment);
             se.expect(Kind::ReportResult);
             s.reported.push_back(g.id);
+            notify(T("online.report.sent"), 3.5f);   // as a report from the game itself
         }
         if (r >= 0) s.reportOpen = false;
         return AccountNav::Stay;
