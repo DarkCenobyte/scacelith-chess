@@ -38,7 +38,10 @@ scacelith_embed_files(${EMBED_CPP} ${ROOT} shaders assets)
 # ---------------------------------------------------------------------------------------------
 # Stockfish (GPL-3.0), compiled into the executable. See third_party/stockfish/README.scacelith.md
 # ---------------------------------------------------------------------------------------------
-if(SCACELITH_STOCKFISH AND EXISTS ${ROOT}/third_party/stockfish/CMakeLists.txt)
+if(SCACELITH_STOCKFISH)
+    if(NOT EXISTS ${ROOT}/third_party/stockfish/CMakeLists.txt)
+        message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but third_party/stockfish is missing (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
+    endif()
     add_subdirectory(third_party/stockfish)
 endif()
 
