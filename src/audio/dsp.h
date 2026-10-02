@@ -209,8 +209,10 @@ struct SlowRandom {
     }
 };
 
-// sin(x) for |x| < ~1e6: reduced to [-pi/2, pi/2], 11th-order Taylor (|error| < 1e-6). Much
-// cheaper than libm sinf (notably the MinGW one) in per-sample synthesis loops.
+// sin(x): reduced to [-pi/2, pi/2] in float arithmetic, then an 11th-order Taylor polynomial.
+// |error| ~2e-7 for |x| <= 2 pi; the float range reduction adds ~6e-8 * |x| (5e-6 at |x| = 100,
+// 8e-4 at 1e4, 6e-2 at 1e6): keep phases wrapped. Much cheaper than libm sinf (notably the MinGW
+// one) in per-sample synthesis loops.
 inline float fastSin(float x) {
     float k = float(int(x * (1.0f / kTau) + (x >= 0.0f ? 0.5f : -0.5f)));
     x -= k * kTau;  // [-pi, pi]
