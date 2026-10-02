@@ -192,10 +192,11 @@ struct Event {
 //   each move  : setWritingRest(start of the next row), Write(path of the move's text)
 //   page full  : TurnPage(pageCorner), then write on the fresh page
 //   game end   : PutPen(frame), wait for WritingQueueEmpty, then the Handshake
-// Write and TurnPage expect the pen in the hand (PickPen first). Event instants: PenPicked 0.36 s
-// and PenPut 0.34 s after their task starts (scaled with a custom duration), PenDown / PenUp /
-// WritingDone at the path key times + WriteApproach, PageGripped / PageTurned at 0.33 / 0.90 of the
-// TurnPage duration. The pageCorner callback is called during the whole task, keep it valid.
+// Write and TurnPage expect the pen in the hand (PickPen first). PickPen and PutPen always take
+// Timing::PickPen / Timing::PutPen. Event instants: PenPicked 0.36 s and PenPut 0.34 s after their
+// task starts, PenDown / PenUp / WritingDone at the path key times + WriteApproach, PageGripped /
+// PageTurned at 0.33 / 0.90 of the TurnPage duration. The pageCorner callback is called during the
+// whole task, keep it valid.
 // Left-handed player (init with Side::Left): the right hand writes, and the handshake needs it: a
 // running writing task is cut short when the handshake starts (its remaining path / page events
 // fire at once), a held pen is laid down first (at the frame of the next queued PutPen, which is
