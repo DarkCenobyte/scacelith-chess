@@ -1,5 +1,6 @@
 #ifdef _WIN32
 #include "platform.h"
+#include "absolute_mouse.h"
 #include "../gl/gl46.h"
 #include "../gl/gl_context.h"
 #include "../core/log.h"
@@ -54,6 +55,7 @@ wchar_t g_highSurrogate = 0;  // first half of a UTF-16 pair waiting for its sec
 LARGE_INTEGER g_freq, g_t0;
 PFN_wglSwapIntervalEXT g_swapInterval;
 POINT g_captureCenter;
+AbsoluteMouse g_absMouse;  // a captured mouse that reports positions only
 bool g_leaveTracked = false;  // a WM_MOUSELEAVE is asked for (TrackMouseEvent)
 
 int mapVK(WPARAM vk, LPARAM lp) {
@@ -188,9 +190,20 @@ LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
             RAWINPUT ri;
             UINT size = sizeof(ri);
             if (GetRawInputData((HRAWINPUT)lp, RID_INPUT, &ri, &size, sizeof(RAWINPUTHEADER)) != (UINT)-1 &&
-                ri.header.dwType == RIM_TYPEMOUSE && !(ri.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)) {
-                g_input.mouseDX += float(ri.data.mouse.lLastX);
-                g_input.mouseDY += float(ri.data.mouse.lLastY);
+                ri.header.dwType == RIM_TYPEMOUSE) {
+                const RAWMOUSE& m = ri.data.mouse;
+                if (!(m.usFlags & MOUSE_MOVE_ABSOLUTE)) {
+                    g_input.mouseDX += float(m.lLastX);
+                    g_input.mouseDY += float(m.lLastY);
+                    if (m.lLastX || m.lLastY) g_absMouse.relativeMotion();
+                } else if (g_captured) {
+                    // Positions (Remote Desktop, a tablet in absolute mode): their steps move the
+                    // look while it holds the mouse (absolute_mouse.h).
+                    bool desktop = (m.usFlags & MOUSE_VIRTUAL_DESKTOP) != 0;
+                    float x = AbsoluteMouse::pixels(m.lLastX, GetSystemMetrics(desktop ? SM_CXVIRTUALSCREEN : SM_CXSCREEN));
+                    float y = AbsoluteMouse::pixels(m.lLastY, GetSystemMetrics(desktop ? SM_CYVIRTUALSCREEN : SM_CYSCREEN));
+                    g_absMouse.position(x, y, g_input.mouseDX, g_input.mouseDY);
+                }
             }
             break;
         }
@@ -359,7 +372,8 @@ bool pumpEvents() {
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
     }
-    if (g_captured && g_focus) {
+    // A mouse that reports positions stays where it goes (ClipCursor keeps it in the window).
+    if (g_captured && g_focus && !g_absMouse.active()) {
         SetCursorPos(g_captureCenter.x, g_captureCenter.y);
     }
     return !g_quit;
@@ -397,6 +411,7 @@ void setMouseCaptured(bool c) {
     if (c == g_captured) return;
     g_captured = c;
     if (c) {
+        g_absMouse.reset();
         GetCursorPos(&g_captureCenter);
         RECT r;
         GetClientRect(g_hwnd, &r);
@@ -407,6 +422,8 @@ void setMouseCaptured(bool c) {
         ClipCursor(&clip);
     } else {
         ClipCursor(nullptr);
+        // Back where the press was, where the re-centring leaves a relative mouse.
+        if (g_absMouse.active()) SetCursorPos(g_captureCenter.x, g_captureCenter.y);
     }
     applyCursor();
 }
