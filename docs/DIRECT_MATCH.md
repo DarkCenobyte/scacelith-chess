@@ -210,7 +210,7 @@ limit).
 
 ## Tests
 
-`build/scacelith_tests direct_` and `upnp_` (Linux), `wine build-win/scacelith_tests.exe direct_`
+`build/scacelith_tests direct_` and `upnp_` (Linux), `tools/test_win.sh direct_`
 (Windows build): UPnP against a fake gateway on 127.0.0.1 (SSDP, relative and absolute control
 URLs, chunked HTTP, 718 and 725 policies, errors, foreign control URLs refused), crypto vectors
 (SHA-256, HMAC RFC 4231, HKDF RFC 5869, AES-GCM, ECDH RFC 5903), channel failures (wrong code, bad
