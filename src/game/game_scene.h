@@ -512,6 +512,7 @@ private:
     // Clock
     bool clockFrozen_ = false;
     double clockAccumMs_ = 0.0;
+    float clockDt_ = 0.0f;              // what the clock counts in this simulate(): AppContext::clockDt, a warp's step
     float leverSide_ = -1.0f, leverTarget_ = -1.0f;
 
     // Camera / look: one first-person look per seat (hot-seat: each player keeps theirs)

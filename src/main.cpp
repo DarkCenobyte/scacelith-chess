@@ -122,6 +122,7 @@ static int runApp(std::vector<std::string> args) {
         if (!plat::pumpEvents()) break;
         double now = plat::time();
         float dt = ctx.screenshotMode ? 1.0f / 60.0f : float(std::min(now - last, 0.1));
+        ctx.clockDt = ctx.screenshotMode ? dt : float(std::min(now - last, 2.0));
         last = now;
         const plat::Input& in = plat::input();
         if (in.keyPressed[plat::KEY_F5]) shaders::reloadAll();
