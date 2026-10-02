@@ -149,7 +149,7 @@ uint32_t mix32(uint32_t a, uint32_t b) { return hash32(a * 0x9E3779B9u ^ (b + 0x
 float unit(uint32_t h) { return float(h & 0xFFFFFF) / 16777216.0f; }
 
 // Distance-field thickness correction of the handwriting faces towards a ballpoint line
-// (~0.35 mm): mm added to the glyph outline at the move size.
+// (about 0.45 mm): mm added to the glyph outline at the move size.
 float styleDilation(int style) {
     // Brings each face to the line of a medium ballpoint (about 0.45 mm): thinner lines fell
     // below a pixel at the player's reading distance and the writing turned pale grey.
