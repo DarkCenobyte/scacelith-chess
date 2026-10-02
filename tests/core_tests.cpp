@@ -7,6 +7,7 @@
 
 #include <climits>
 #include <cstdio>
+#include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <string>
@@ -118,6 +119,46 @@ TEST(ini_save_replaces_the_file) {
     std::remove(path.c_str());
 }
 #endif
+
+// A read-only settings file: save() cannot write it (Settings::save writes its fallback copy) and
+// writable() says so without writing, so that Settings::load reads that copy back.
+TEST(ini_writable_read_only_file) {
+    const std::string path = tmpFile("scacelith_ini_writable", ".ini");
+    IniFile a;
+    a.setInt("display.width", 1280);
+    CHECK(a.save(path));
+    CHECK(IniFile::writable(path));
+#ifdef _WIN32
+    namespace fs = std::filesystem;
+    const fs::perms w = fs::perms::owner_write | fs::perms::group_write | fs::perms::others_write;
+    fs::permissions(fs::u8path(path), w, fs::perm_options::remove);   // the read-only attribute
+    CHECK(!IniFile::writable(path));
+    fs::permissions(fs::u8path(path), w, fs::perm_options::add);
+    CHECK(IniFile::writable(path));
+#else
+    // Read-only, in a folder that takes no new file: save() fails there, and writable() says no
+    // (root, whom permissions do not stop, gets yes from both).
+    const std::string dir = tmpFile("scacelith_ini_folder", ""), file = dir + "/Scacelith.ini";
+    CHECK(mkdir(dir.c_str(), 0755) == 0);
+    CHECK(a.save(file));
+    CHECK(chmod(file.c_str(), 0444) == 0 && chmod(dir.c_str(), 0555) == 0);
+    bool answer = IniFile::writable(file);
+    CHECK_EQ(answer, a.save(file));
+    if (geteuid() != 0) CHECK(!answer);
+    // In a folder that takes new files, save()'s rename replaces a read-only file: yes.
+    CHECK(chmod(dir.c_str(), 0755) == 0 && chmod(file.c_str(), 0444) == 0);
+    answer = IniFile::writable(file);
+    CHECK(answer);
+    CHECK_EQ(answer, a.save(file));
+    std::remove(file.c_str());
+    rmdir(dir.c_str());
+#endif
+    // Asking wrote nothing: the file is as save() made it.
+    IniFile b;
+    CHECK(b.load(path));
+    CHECK_EQ(b.getInt("display.width"), 1280);
+    std::remove(path.c_str());
+}
 
 // Every byte of the PNG writer's output. Its deflate blocks hold 65535 bytes: 28x771 RGB fills
 // exactly one, 1x16384 RGB overflows it by one byte; all-0xFF pixels are Adler-32's worst case.

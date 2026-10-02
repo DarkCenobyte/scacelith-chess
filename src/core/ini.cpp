@@ -10,6 +10,8 @@
 #include <map>
 #ifdef _WIN32
 #include <windows.h>
+#else
+#include <unistd.h>
 #endif
 
 static std::string trim(const std::string& s) {
@@ -96,6 +98,23 @@ bool IniFile::save(const std::string& path) const {
         std::filesystem::remove(std::filesystem::u8path(tmp), ec);
     }
     return writeText(path, text, created);
+}
+
+bool IniFile::writable(const std::string& path) {
+    const std::filesystem::path p = std::filesystem::u8path(path);
+#ifdef _WIN32
+    // MoveFileExW does not replace a read-only file, and it cannot be written in place.
+    DWORD attr = GetFileAttributesW(p.c_str());
+    if (attr != INVALID_FILE_ATTRIBUTES && (attr & FILE_ATTRIBUTE_READONLY)) return false;
+#else
+    // The new file renamed over the old one replaces it, read-only or not, when the folder takes
+    // new files.
+    const std::string dir = p.has_parent_path() ? p.parent_path().string() : std::string(".");
+    if (access(dir.c_str(), W_OK | X_OK) == 0) return true;
+#endif
+    // Written in place, as save() does when no new file can be made: opened, not truncated.
+    std::ofstream f(p, std::ios::in | std::ios::out);
+    return bool(f);
 }
 
 std::string IniFile::getString(const std::string& key, const std::string& def) const {

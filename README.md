@@ -239,8 +239,9 @@ Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-librar
 
 ## Options
 
-Settings are stored in `Scacelith.ini` next to the executable when that folder is writable,
-otherwise in `%APPDATA%\scacelith\` (`~/.config/scacelith/` on Linux; read back from there); a
+Settings are stored in `Scacelith.ini` next to the executable when that file can be written,
+otherwise in `%APPDATA%\scacelith\` (`~/.config/scacelith/` on Linux) and read back from there: a
+read-only `Scacelith.ini` left next to the executable is then ignored once that copy exists. A
 file given with `--ini <file>` is read and written there only (the log warns when it cannot be written). All of them are
 editable from the Options page: display mode and resolution, V-sync, render scale, quality
 preset, motion blur, depth of field, brightness, volumes, ambience, legal-move hints, auto-press
