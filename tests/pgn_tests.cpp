@@ -602,6 +602,34 @@ TEST(pgn_quotes_in_tag_values_take_linear_time) {
     }
 }
 
+// A line full of tag pairs or of stray '<' is searched once, not once per tag or per '<'.
+TEST(pgn_long_lines_take_linear_time) {
+    const std::string tags = [] {
+        std::string line;
+        for (int i = 0; i < 32000; ++i) line += "[A \"x\"]";
+        return line + "\n\n1. e4 *\n\n[Event \"Next\"]\n\n1. d4 *\n";
+    }();
+    const std::string angles = "[Event \"x\"]\n\n" + std::string(64000, '<') + "\n1. e4 *\n\n[Event \"Next\"]\n\n1. d4 *\n";
+    for (const std::string* text : {&tags, &angles}) {
+        auto t0 = std::chrono::steady_clock::now();
+        auto sc = pgn::scan(*text);
+        auto rd = pgn::read(*text);
+        const double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+        std::fprintf(stderr, "  %d bytes on one line scanned and read in %.1f ms\n", int(text->size()), ms);
+        CHECK(ms < 1000.0);
+        CHECK_EQ(int(sc.games.size()), 2);
+        CHECK_EQ(int(rd.games.size()), 2);
+        if (sc.games.size() == 2 && rd.games.size() == 2) {
+            const std::string why = text == &tags ? "too many tags" : "'<' without '>' on its line";
+            CHECK_EQ(sc.games[0].error.message, why);
+            CHECK_EQ(rd.games[0].error.message, why);
+            CHECK_EQ(rd.games[0].error.text(), sc.games[0].error.text());
+            CHECK(rd.games[1].ok());
+            CHECK_EQ(rd.games[1].record.tag("Event"), std::string("Next"));
+        }
+    }
+}
+
 // Nothing swallows the games after it: a '<' without its '>' stops at the end of its line, and a
 // file with CR line ends (old Mac programs) has lines too.
 TEST(pgn_stray_bracket_and_cr_line_ends) {

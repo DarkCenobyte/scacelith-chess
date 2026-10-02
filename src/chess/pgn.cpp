@@ -129,12 +129,15 @@ public:
                 continue;
             }
             if (c == '<') {  // reserved for future expansion: skipped up to its '>' on the same line
-                size_t q = p_ + 1;
+                // A failed search ends at the line break: the next '<' of that line resumes there,
+                // so that a line full of '<' costs one pass, not one per '<'.
+                size_t q = std::max(p_ + 1, angleOpenUntil_);
                 while (q < s_.size() && s_[q] != '>' && !lineBreak(q)) ++q;
                 if (q < s_.size() && s_[q] == '>') {
                     while (p_ <= q) advance();
                     continue;
                 }
+                angleOpenUntil_ = q;
                 // Never further: a stray '<' must not swallow the games after it.
                 advance();
                 bad(t, "'<' without '>' on its line");
@@ -181,6 +184,9 @@ private:
     const Limits& lim_;
     size_t p_ = 0;
     int line_ = 1, col_ = 1;
+    size_t angleOpenUntil_ = 0;              // a stray '<' found no '>' before this (its line break)
+    size_t closeLineEnd_ = 0;                // tagPair: the line ending before this was searched ...
+    size_t closeLast_ = std::string::npos;   // ... and this is its last quote closing a tag (npos: none)
 
     char peek(size_t k) const { return p_ + k < s_.size() ? s_[p_ + k] : '\0'; }
     // A line ends at '\n', and at a '\r' not followed by '\n' (files with CR line ends).
@@ -252,11 +258,16 @@ private:
         }
         advance();
         // An unescaped quote inside the value (some writers) when a later quote on the line closes
-        // the tag: the last quote of the line followed by ']' is found once, so that a line full of
-        // quotes costs one pass, not one per quote.
-        size_t lastClose = std::string::npos;
-        for (size_t q = p_; q < s_.size() && !lineBreak(q); ++q)
-            if (s_[q] == '"' && closesTag(q)) lastClose = q;
+        // the tag: the last quote of the line followed by ']' is found once per line, so that a line
+        // full of quotes or of tag pairs costs one pass, not one per quote or per tag.
+        if (p_ >= closeLineEnd_) {
+            size_t q = p_;
+            closeLast_ = std::string::npos;
+            for (; q < s_.size() && !lineBreak(q); ++q)
+                if (s_[q] == '"' && closesTag(q)) closeLast_ = q;
+            closeLineEnd_ = q + 1;
+        }
+        const size_t lastClose = closeLast_ != std::string::npos && closeLast_ >= p_ ? closeLast_ : std::string::npos;
         std::string value;
         bool tooLong = false;
         for (;;) {
