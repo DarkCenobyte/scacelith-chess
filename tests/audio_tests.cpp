@@ -7,6 +7,7 @@
 // WAV files for listening are written to /tmp/audio_out/ (Windows: %TEMP%\scacelith_audio_out).
 #include "test.h"
 #include "audio/audio.h"
+#include "audio/backend.h"
 #include "audio/mixer.h"
 #include "audio/offline.h"
 #include "audio/queue.h"
@@ -685,6 +686,14 @@ TEST(audio_mixer_cpu_cost) {
     CHECK_EQ(m.activeSpeech(), 1);  // the speech sounded through both phases
     CHECK(typical < 0.02f);
     CHECK(stress < 0.10f);
+}
+
+// WASAPI: a mix format the mixer cannot run at is handed to the engine as float32 stereo at a
+// rate the mixer can run at (the engine converts), never at the unusable device rate.
+TEST(audio_backend_fallback_rate) {
+    using namespace audio;
+    for (unsigned long rate : {8000ul, 44100ul, 48000ul, 192000ul, 384000ul}) CHECK_EQ(fallbackDeviceRate(rate), int(rate));
+    for (unsigned long rate : {0ul, 4000ul, 7999ul, 384001ul, 705600ul, 768000ul}) CHECK_EQ(fallbackDeviceRate(rate), 48000);
 }
 
 TEST(audio_live_engine_init_shutdown) {

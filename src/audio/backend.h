@@ -11,6 +11,14 @@ namespace audio {
 
 using RenderFn = void (*)(void* user, float* stereo, int frames, int sampleRate);
 
+// Device rates the mixer runs at (WASAPI: a mix format outside them is converted by the engine).
+constexpr int kMinDeviceRate = 8000, kMaxDeviceRate = 384000;
+// Rate of the float32 stereo format handed to the engine when the mix format is not usable: the
+// device rate when the mixer can run at it, else 48 kHz (the engine resamples).
+inline int fallbackDeviceRate(unsigned long rate) {
+    return rate >= unsigned(kMinDeviceRate) && rate <= unsigned(kMaxDeviceRate) ? int(rate) : 48000;
+}
+
 struct BackendStatus {
     std::atomic<bool> deviceOpen{false};
     std::atomic<int> sampleRate{0};

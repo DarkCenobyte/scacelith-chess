@@ -207,7 +207,7 @@ private:
                 chR_ = r;
             }
         }
-        if (channels_ < 1 || rate_ < 8000 || rate_ > 384000) return false;
+        if (channels_ < 1 || rate_ < kMinDeviceRate || rate_ > kMaxDeviceRate) return false;
         if (isFloat && bits == 32) type_ = SampleType::Float32;
         else if (isPcm && bits == 16) type_ = SampleType::Int16;
         else if (isPcm && bits == 24) type_ = SampleType::Int24;
@@ -234,7 +234,7 @@ private:
             // Unusual mix format: hand the engine float32 stereo and let it convert.
             fallback.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
             fallback.Format.nChannels = 2;
-            fallback.Format.nSamplesPerSec = wf->nSamplesPerSec >= 8000 ? wf->nSamplesPerSec : 48000;
+            fallback.Format.nSamplesPerSec = DWORD(fallbackDeviceRate(wf->nSamplesPerSec));
             fallback.Format.wBitsPerSample = 32;
             fallback.Format.nBlockAlign = 8;
             fallback.Format.nAvgBytesPerSec = fallback.Format.nSamplesPerSec * 8;
