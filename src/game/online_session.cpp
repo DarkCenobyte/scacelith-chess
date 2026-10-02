@@ -541,14 +541,16 @@ void OnlineSession::answerChallenge(uint32_t id, bool accept) {
 
 void OnlineSession::hostDirect(const net::DirectHostOptions& opt) {
     cancelSearch();
-    cancelOutgoing();  // accepted during the direct match, it would start a server game over it
+    // Accepted during the direct match, our challenge would start a server game over it. Offline,
+    // the next Welcome cancels it (a cancel now would only be refused as not connected).
+    if (conn_ == net::ConnState::Online) cancelOutgoing();
     direct().host(opt);
     directConn_ = net::ConnState::Offline;
 }
 
 void OnlineSession::joinDirect(const std::string& address, uint16_t port, const std::string& code) {
     cancelSearch();
-    cancelOutgoing();
+    if (conn_ == net::ConnState::Online) cancelOutgoing();
     const std::string& n = settings().playerName;
     std::string name = n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
     direct().join(address, port, code, name);
