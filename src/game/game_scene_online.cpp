@@ -132,7 +132,7 @@ void GameScene::setupOnlineGame() {
     ratingKnown_ = false;
     ratingBefore_ = ratingAfter_ = 0;
     rematchAsked_ = rematchOffered_ = rematchGone_ = false;
-    reportOpen_ = reported_ = false;
+    reportOpen_ = reported_ = reportQueued_ = reportSending_ = false;
     reportCategory_ = 0;
     reportComment_.clear();
     fadeDip_ = 0.0f;
@@ -912,7 +912,8 @@ ui::GameOverExtras GameScene::onlineGameOverExtras() const {
         x.primaryLabel = i18n::tr("online.rematch.gone");
         x.primaryDisabled = true;
     }
-    if (link_ && link_->canReport() && !reported_) x.reportLabel = i18n::tr("online.report.button");
+    if (link_ && link_->canReport() && !reported_ && !reportQueued_ && !reportSending_)
+        x.reportLabel = i18n::tr("online.report.button");
     return x;
 }
 
@@ -952,13 +953,20 @@ bool GameScene::updateReportDialog() {
     if (!reportOpen_) return false;
     int r = ui::reportDialog(reportCategory_, reportComment_);
     if (r == 1 && link_) {
-        static const char* cats[] = {"cheating", "abuse", "other"};
-        link_->report(seats_[aiSeat()].name, cats[std::clamp(reportCategory_, 0, 2)], reportComment_);
-        reported_ = true;
-        ui::notify(i18n::tr("online.report.sent"), 3.5f);
+        // The server takes reports of finished games only: one filled in during the game waits
+        // for its end (updateOnlineGameOver).
+        if (og_.status == StOngoing) reportQueued_ = true;
+        else sendReport();
     }
     if (r >= 0) reportOpen_ = false;
     return true;
+}
+
+void GameScene::sendReport() {
+    static const char* cats[] = {"cheating", "abuse", "other"};
+    link_->report(seats_[aiSeat()].name, cats[std::clamp(reportCategory_, 0, 2)], reportComment_);
+    onlineSession().expect(Kind::ReportResult);
+    reportSending_ = true;
 }
 
 void GameScene::updateOnlineInput() {
@@ -977,7 +985,7 @@ void GameScene::updateOnlineInput() {
         p.canOfferDraw = !myDrawOffer_ && !drawOffered_ && og_.status == StOngoing;
         p.canClaimDraw = game_.canClaimThreefold() || game_.canClaimFiftyMove();
         p.canAbort = !myFirstMoveMade() && og_.status == StOngoing;
-        p.canReport = link_ && link_->canReport() && !reported_;
+        p.canReport = link_ && link_->canReport() && !reported_ && !reportQueued_ && !reportSending_;
         switch (menuChoice(ui::onlinePauseMenu(p))) {
         case ui::MenuAction::Resume: paused_ = false; break;
         case ui::MenuAction::OfferDraw:
@@ -1022,6 +1030,19 @@ void GameScene::updateOnlineGameOver() {
         state_ = State::FadeToGame;
         stateTime_ = 0.0f;
         return;
+    }
+    // A report filled in during the game goes now (the server has stored the game by then); the
+    // report button comes back when the server refuses one.
+    if (reportQueued_ && link_ && stateTime_ > 1.2f) {
+        reportQueued_ = false;
+        sendReport();
+    }
+    net::Event answer;
+    if (reportSending_ && onlineSession().take(Kind::ReportResult, answer)) {
+        reportSending_ = false;
+        reported_ = answer.ok;
+        if (answer.ok) ui::notify(i18n::tr("online.report.sent"), 3.5f);
+        else ui::notify(onlineErrorText(answer.error, answer.retryAfterSec), 4.0f);
     }
     if (updateReportDialog()) return;
     if (stateTime_ > 1.2f && (endHandshakeDone_ || stateTime_ > 5.0f)) {

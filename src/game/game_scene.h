@@ -358,6 +358,7 @@ private:
     void updateOnlineInput();                 // Esc menu, draw offer, report dialog (Playing)
     void updateOnlineGameOver();              // game over card, rematch, report, challenges
     bool updateReportDialog();                // the report dialog, while it is open (true)
+    void sendReport();                        // the report filled in, to the server (ReportResult)
     void leaveOnlineGame();                   // back to the menu
     void leaveOngoingOnlineGame();            // aborts before my first move, else resigns
     void drawOnlineHud();                     // ping, banners, first-move countdown
@@ -675,6 +676,8 @@ private:
     int ratingBefore_ = 0, ratingAfter_ = 0;
     bool rematchAsked_ = false, rematchOffered_ = false, rematchGone_ = false;
     bool reportOpen_ = false, reported_ = false;
+    bool reportQueued_ = false;         // filled in during the game: sent once it has ended
+    bool reportSending_ = false;        // sent, its ReportResult awaited
     int reportCategory_ = 0;
     std::string reportComment_;
     std::string startOnline_;           // --start-online category
