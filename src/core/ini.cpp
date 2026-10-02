@@ -75,9 +75,9 @@ bool IniFile::save(const std::string& path) const {
         if (!sec.empty()) text += "\n[" + oneLine(sec) + "]\n";
         for (auto& kv : bySection[sec]) text += oneLine(kv.first) + " = " + oneLine(kv.second) + "\n";
     }
-    // Written whole under path.tmp, then renamed over path: a crash or a full disk midway leaves
-    // the old file intact. Straight to path, as before, when that fails (a folder that takes no
-    // new file, the file held open by another program).
+    // Written whole under path.tmp, then renamed over path: a crash or a kill midway leaves the old
+    // file intact. Straight to path, as before, when that fails (a folder that takes no new file,
+    // the file held open by another program, a disk too full for a second copy): not atomic.
     const std::string tmp = path + ".tmp";
     bool created = false;
     if (writeText(tmp, text, created) && replaceFile(tmp, path)) return true;
