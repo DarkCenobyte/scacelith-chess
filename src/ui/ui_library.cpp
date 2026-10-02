@@ -713,14 +713,24 @@ void message(const Rect& area, const std::string& head, const std::string& text,
 
 // ---- Save as GIF -----------------------------------------------------------------------------------------
 // The online server draws the GIF of the selected game from its PGN text (POST /gif): the record
-// written again by the archive's writer without its comments, NAGs and clocks (the picture does not
-// use them, and the text stays far under the server's 64 KiB), seen from the side of the player
+// written again by the archive's writer with only the tags the server reads and without its
+// comments, NAGs and clocks (the picture uses none of the rest, and an imported game's other tags
+// could take the text past the server's 64 KiB or 128 tags), seen from the side of the player
 // (the signed-in account or this computer's player named as Black: Black at the bottom), saved to
 // <app data>/gif/ under the name of its date, players and server game number (never over a file).
 std::string gifOwner(const archive::Entry& e) { return "library:" + contentKey(e); }
 
 std::string gifPgn(const chess::pgn::Record& record) {
     chess::pgn::Record r = record;
+    // The server's names, ratings and ending, and the reader's Chess960 start (the writer gives
+    // Result, SetUp and FEN from the record itself).
+    static const char* const kGifTags[] = {"White", "Black", "WhiteElo", "BlackElo", "Termination", "Variant"};
+    r.tags.erase(std::remove_if(r.tags.begin(), r.tags.end(),
+                                [](const chess::pgn::Tag& t) {
+                                    return std::none_of(std::begin(kGifTags), std::end(kGifTags),
+                                                        [&t](const char* name) { return t.name == name; });
+                                }),
+                 r.tags.end());
     r.comment.clear();
     for (chess::pgn::Ply& ply : r.plies) {
         ply.comment.clear();
