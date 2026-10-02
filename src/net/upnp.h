@@ -34,6 +34,8 @@ namespace upnp {
 constexpr uint32_t kDefaultLeaseSec = 3600;
 constexpr int kMaxMappingTries = 10;
 constexpr const char* kMappingDescription = "Scacelith direct match";
+constexpr int64_t kRenewEveryMs = 30 * 60 * 1000;
+constexpr int64_t kRenewRetryMs = 60 * 1000;   // after a failed renewal, until the lease has ended
 
 struct Config {
     // Where the M-SEARCH goes: the SSDP multicast group, or a unicast address (tests point it at a
@@ -108,6 +110,28 @@ private:
     bool soap(const Gateway& gw, const char* action, const std::vector<std::pair<std::string, std::string>>& args,
               std::string& body, Error& err, bool finishOnceSent = false);
     bool cancelled() const { return cfg_.cancel && cfg_.cancel->load(); }
+};
+
+// When a mapping with a lease is renewed (the caller sends the renewals and reports their
+// results): every kRenewEveryMs; after a failed renewal, every kRenewRetryMs until the lease has
+// ended (the last retry may come just after it). A lease that ends without a renewal is lost
+// until a later renewal succeeds; a permanent lease (0) never ends. Times in milliseconds of a
+// steady clock.
+class RenewalSchedule {
+public:
+    void mapped(int64_t now, uint32_t leaseSec);   // the mapping was made at 'now'
+    void started(int64_t now);                     // a renewal was sent at 'now'
+    // Its result, at 'now'. True when it maps the port again after the lease was lost.
+    bool finished(int64_t now, bool ok);
+    // True once, at the first call after the lease has ended without a renewal.
+    bool lapsed(int64_t now);
+    bool lost() const { return lost_; }
+    int64_t renewAt() const { return renewAt_; }
+
+private:
+    uint32_t leaseSec_ = 0;
+    int64_t renewAt_ = 0, start_ = 0, leaseEnd_ = 0;
+    bool lost_ = false;
 };
 
 // ---- parsing helpers (exposed for the tests) ----

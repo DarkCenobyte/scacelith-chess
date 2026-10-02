@@ -370,6 +370,89 @@ TEST(upnp_parsers) {
     CHECK(!upnp::cgnatSuspected("223.255.255.254"));
 }
 
+TEST(upnp_renewal_schedule) {
+    // Synthetic times; each renewal answers 3 s after it is sent.
+    const int64_t lease = int64_t(upnp::kDefaultLeaseSec) * 1000;
+    // Fails every renewal sent before the lease ends: each one comes a minute after the previous
+    // failure. Returns how many were sent.
+    auto failUntilLeaseEnds = [&](upnp::RenewalSchedule& s) {
+        int n = 0;
+        for (int64_t t = s.renewAt(); t < lease; t = s.renewAt(), ++n) {
+            CHECK(!s.lapsed(t));
+            s.started(t);
+            CHECK(!s.finished(t + 3000, false));
+            CHECK_EQ(s.renewAt(), t + 3000 + upnp::kRenewRetryMs);
+        }
+        return n;
+    };
+    {
+        // Every renewal succeeds: one every 30 min, and the lease never ends.
+        upnp::RenewalSchedule s;
+        s.mapped(0, upnp::kDefaultLeaseSec);
+        for (int64_t t = upnp::kRenewEveryMs; t <= 4 * lease; t += upnp::kRenewEveryMs) {
+            CHECK_EQ(s.renewAt(), t);
+            CHECK(!s.lapsed(t));
+            s.started(t);
+            CHECK(!s.finished(t + 3000, true));
+        }
+        CHECK(!s.lapsed(4 * lease + 3000) && !s.lost());
+    }
+    {
+        // Failures until the lease ends: it is lost once; the retry due just after still goes,
+        // then one every 30 min until a renewal maps the port again, its lease counted from then.
+        upnp::RenewalSchedule s;
+        s.mapped(0, upnp::kDefaultLeaseSec);
+        CHECK_EQ(failUntilLeaseEnds(s), 29);
+        CHECK(s.renewAt() > lease && s.renewAt() <= lease + upnp::kRenewRetryMs);
+        CHECK(!s.lost());
+        CHECK(s.lapsed(lease));
+        CHECK(s.lost());
+        CHECK(!s.lapsed(lease + 1000));
+        int64_t t = s.renewAt();
+        s.started(t);
+        CHECK(!s.finished(t + 3000, false));
+        CHECK_EQ(s.renewAt(), t + upnp::kRenewEveryMs);
+        CHECK(s.lost());
+        t = s.renewAt();
+        s.started(t);
+        CHECK(s.finished(t + 3000, true));
+        CHECK(!s.lost());
+        CHECK_EQ(s.renewAt(), t + upnp::kRenewEveryMs);
+        CHECK(!s.lapsed(t + lease - 1));
+        CHECK(s.lapsed(t + lease));
+    }
+    {
+        // The retry due just after the lease has ended succeeds: the port is mapped again.
+        upnp::RenewalSchedule s;
+        s.mapped(0, upnp::kDefaultLeaseSec);
+        failUntilLeaseEnds(s);
+        CHECK(s.lapsed(lease));
+        const int64_t t = s.renewAt();
+        s.started(t);
+        CHECK(s.finished(t + 3000, true));
+        CHECK(!s.lost() && !s.lapsed(t + 3000));
+    }
+    {
+        // One failure, then a retry that succeeds: the lease is never lost.
+        upnp::RenewalSchedule s;
+        s.mapped(0, upnp::kDefaultLeaseSec);
+        s.started(upnp::kRenewEveryMs);
+        CHECK(!s.finished(upnp::kRenewEveryMs + 3000, false));
+        const int64_t t = s.renewAt();
+        CHECK_EQ(t, upnp::kRenewEveryMs + 3000 + upnp::kRenewRetryMs);
+        s.started(t);
+        CHECK(!s.finished(t + 3000, true));
+        CHECK_EQ(s.renewAt(), t + upnp::kRenewEveryMs);
+        CHECK(!s.lapsed(lease) && !s.lost());
+    }
+    {
+        // A permanent lease never ends.
+        upnp::RenewalSchedule s;
+        s.mapped(0, 0);
+        CHECK(!s.lapsed(10 * lease) && !s.lost());
+    }
+}
+
 TEST(upnp_fake_gateway_relative_control_url) {
     FakeGateway gw;
     gw.description = kDescRelative;

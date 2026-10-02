@@ -642,6 +642,35 @@ bool Client::renew(const Gateway& gw, const Mapping& m, Error& err) {
     return addPortMapping(gw, m, err);
 }
 
+void RenewalSchedule::mapped(int64_t now, uint32_t leaseSec) {
+    leaseSec_ = leaseSec;
+    renewAt_ = now + kRenewEveryMs;
+    leaseEnd_ = now + int64_t(leaseSec) * 1000;
+    lost_ = false;
+}
+
+void RenewalSchedule::started(int64_t now) {
+    start_ = now;
+    renewAt_ = now + kRenewEveryMs;
+}
+
+bool RenewalSchedule::finished(int64_t now, bool ok) {
+    if (!ok) {
+        if (now < leaseEnd_) renewAt_ = now + kRenewRetryMs;
+        return false;
+    }
+    leaseEnd_ = start_ + int64_t(leaseSec_) * 1000;   // counted from the renewal's request
+    const bool back = lost_;
+    lost_ = false;
+    return back;
+}
+
+bool RenewalSchedule::lapsed(int64_t now) {
+    if (!leaseSec_ || lost_ || now < leaseEnd_) return false;
+    lost_ = true;
+    return true;
+}
+
 }  // namespace upnp
 }  // namespace net
 
