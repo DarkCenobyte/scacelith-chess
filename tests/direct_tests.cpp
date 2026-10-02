@@ -1,7 +1,12 @@
-// Direct match: UPnP client against a fake gateway on 127.0.0.1, the secure channel (vectors
-// and failure cases) and full loopback matches between two DirectMatch instances, gestures
-// included (both ways, paced, never replayed, the first one after a reconnection never dropped,
-// outside the flood limit).
+// Direct match: UPnP client against a fake gateway on 127.0.0.1 (a cancel during AddPortMapping,
+// at most 16 SSDP answers fetched), the carrier-grade NAT ranges and the lease renewal schedule,
+// the secure channel (vectors and failure cases), the authority with synthetic time (names the
+// protocol accepts, the 1200-ply cap) and full loopback matches between two DirectMatch
+// instances, gestures included (both ways, paced, never replayed, the first one after a
+// reconnection never dropped, outside the flood limit). A guest and a host written by hand check
+// the limits: refusals and floods closed without stalling the host, a host flooding the guest
+// dropped, messages out of sequence and connections logged at a bounded rate, a message of an
+// unknown type refused, one more attempt after a close before the host's confirmation.
 #include "test.h"
 #include "chess/chess.h"
 #include "core/log.h"
@@ -2611,7 +2616,8 @@ TEST(direct_connection_log_paced) {
 TEST(direct_guest_retries_once_without_host_confirmation) {
     // On a reconnection the code is known to be right: a connection closed before the host's
     // confirmation (the link failing at that moment) is tried once more and the guest is back. A
-    // second one in a row means the host refuses the code (it hosts another match): it gives up.
+    // second one during the same reconnection means the host refuses the code (it hosts another
+    // match): it gives up.
     RawHost raw;
     CHECK(raw.listen());
     direct::Authority auth(direct::AuthorityConfig(), "Alice", "Bob", 1);

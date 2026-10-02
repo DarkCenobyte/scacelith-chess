@@ -108,9 +108,9 @@ the host itself:
   (a draw if the host cannot mate; aborted before the second ply).
 - **Host gone** (crash, lost network): the guest keeps trying until the grace period ends (plus
   5 s); it gives up sooner when the host's machine refuses the connection three times (the host's
-  game is gone), when the host refuses the code twice in a row or at once when it speaks another
-  protocol (it hosts a new match), and the game then ends as *aborted by the server* on the
-  guest's side.
+  game is gone), when the host refuses the code a second time during the reconnection or at once
+  when it speaks another protocol (it hosts a new match), and the game then ends as *aborted by
+  the server* on the guest's side.
 - **Leaving** a running game (either side) resigns it, as online.
 - **Rematch** within 60 s after the end, colours swapped, when both accept.
 - **Clock presses**: whether the robots press the clock by themselves is the host's choice
@@ -220,16 +220,23 @@ kept unfinished).
 
 `build/scacelith_tests direct_` and `upnp_` (Linux), `tools/test_win.sh direct_`
 (Windows build): UPnP against a fake gateway on 127.0.0.1 (SSDP, relative and absolute control
-URLs, chunked HTTP, 718 and 725 policies, errors, foreign control URLs refused), crypto vectors
+URLs, chunked HTTP, 718 and 725 policies, errors, foreign control URLs refused, at most 16
+answers fetched, a cancel during AddPortMapping that still reports the mapping made and asks
+nothing more), the carrier-grade NAT ranges, the lease renewal schedule with synthetic time
+(retries after a failure, the lease lost, then mapped again), crypto vectors
 (SHA-256, HMAC RFC 4231, HKDF RFC 5869, AES-GCM, ECDH RFC 5903), channel failures (wrong code, bad
 hello, tampered, replayed, reordered, truncated and oversize frames), the authority with synthetic
-time (clocks, lag compensation, flags, first-move timeout and its margin for the guest, draws,
-claims, abort, grace, rematch, `autoPress` in every snapshot), and full matches between two
+time (names cleaned to what the protocol accepts, the router's name too, clocks, lag
+compensation, flags, first-move timeout and its margin for the guest, draws, claims, abort,
+grace, rematch, `autoPress` in every snapshot, the 1200-ply cap), and full matches between two
 `DirectMatch` on 127.0.0.1
 (castling, en passant, promotion, a draw offer declined by a move, resignation, rematch, wrong
 code, reconnection through a relay that cuts the connection, the host vanishing, a flag with a
 1 s clock, leaving; `autoPress` off through a rematch, gestures both ways and their pacing, none
-replayed after a reconnection), a guest written by hand (`Welcome`'s gesture values, 100
-gestures at once without tripping the flood limit, the host keeping its bucket's worth) and a host
-written by hand (a guest's gesture sent the moment it is back online after a reconnection
-arrives).
+replayed after a reconnection; the "connection from" log paced under 50 junk connections), a
+guest written by hand (`Welcome`'s gesture values, 100 gestures at once without tripping the
+flood limit, the host keeping its bucket's worth, a refused connection and a flood closed without
+stalling the host, messages out of sequence logged once, a message of an unknown type answered
+`Malformed`) and a host written by hand (a guest's gesture sent the moment it is back online after
+a reconnection arrives, a host flooding the guest with events dropped, one more attempt after a
+close before the host's confirmation, and giving up after a second one).
