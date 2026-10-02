@@ -1177,6 +1177,30 @@ TEST(net_transport_refuses_insecure) {
 // std::bad_alloc out of the transport. The abort action it gave its CancelToken (closing its
 // socket or handle, locals of the call) is taken back all the same, so that a later cancel() (the
 // client's shutdown) never reaches a socket or handle that is gone; the token serves again.
+// An operation that ends while another thread runs its abort action waits for that action: what
+// the action uses (the operation's socket or handle) is still there.
+TEST(net_transport_cancel_waits_for_a_running_abort) {
+    struct Target { int closed = 0; };
+    auto* target = new Target;
+    std::atomic<bool> inside{false};
+    net::CancelToken tok;
+    tok.setAbort([&] {
+        inside.store(true);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        target->closed = 1;
+        inside.store(false);
+    });
+    std::thread canceller([&] { tok.cancel(); });
+    while (!inside.load()) std::this_thread::yield();
+    tok.setAbort(nullptr);   // the operation ends
+    CHECK(!inside.load());
+    CHECK_EQ(target->closed, 1);
+    canceller.join();
+    delete target;
+    CHECK(tok.cancelled());
+    CHECK(!tok.hasAbort());
+}
+
 TEST(net_transport_cancel_cleared_when_out_of_memory) {
     if (!net::transportAvailable()) return;
     allocfail::Reset reset;

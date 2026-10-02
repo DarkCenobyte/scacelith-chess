@@ -36,7 +36,8 @@ public:
     void reset();
     // The blocking operation in progress registers how to abort it (closing its handle or
     // socket); cleared with setAbort(nullptr) when it ends (AbortGuard below does both). Runs at
-    // once when already cancelled.
+    // once when already cancelled. The action runs under the token's lock (it must neither block
+    // nor call the token): setAbort(nullptr) returns once a running one has finished.
     void setAbort(std::function<void()> fn);
     bool hasAbort();                          // an abort action is registered (an operation runs)
 
