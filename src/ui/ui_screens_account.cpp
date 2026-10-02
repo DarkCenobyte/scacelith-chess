@@ -231,6 +231,7 @@ struct State : game::GameSaveState {
     std::string newEmail, password, code, confirmName;
     std::string error, note;
     std::string sentTo;              // e-mail change: the link went to this address
+    std::string emailRequested;      // e-mail change: the address of the last request sent
     std::future<archive::SaveResult> exportJob;
     bool exportWriting = false;
     std::string exportPath;          // the data export: the file written
@@ -951,7 +952,8 @@ AccountNav pageEmail(float t) {
     if (send) {
         s.error.clear();
         s.note.clear();
-        se.api().changeEmail(trim(s.newEmail), s.password, reauthCode());
+        s.emailRequested = trim(s.newEmail);
+        se.api().changeEmail(s.emailRequested, s.password, reauthCode());
         se.expect(Kind::EmailChangeResult);
     }
     if (done || back || im::consumeBack()) {
@@ -1123,6 +1125,11 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
     net::Event e;
     AccountNav nav = AccountNav::Stay;
     auto on = [&](AccountPage p) { return current && *current == p; };
+    // An answer's error on the page that asked, else (the player went elsewhere meanwhile) a notice.
+    auto fail = [&](AccountPage p, const std::string& text) {
+        if (on(p)) s.error = text;
+        else notify(text, 4.0f);
+    };
     // The pages read these from the session (accountData). A token refused on the way signs out
     // (the session forgot it): the sign-in page says so.
     for (Kind k : {Kind::GamesResult, Kind::GameDetailsResult, Kind::SessionsResult, Kind::ReportResult})
@@ -1155,11 +1162,11 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
             if (on(AccountPage::Email)) nav = AccountNav::Account;
             else notify(note, 4.0f);
         } else if (e.ok) {
-            s.sentTo = trim(s.newEmail);
+            s.sentTo = s.emailRequested;   // not the form's: it may have been opened again since
             clearSecrets();
             if (!on(AccountPage::Email)) notify(i18n::trf("online.email.sent", {i18n::ltr(s.sentTo)}), 6.0f);
         } else if (e.error != "unauthorized") {
-            s.error = errorText(e);
+            fail(AccountPage::Email, errorText(e));
         }
     }
     if (se.take(Kind::AccountExportResult, e)) {
@@ -1179,7 +1186,7 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
                 }
             });
         } else if (e.error != "unauthorized") {
-            s.error = errorText(e);
+            fail(AccountPage::Export, errorText(e));
         }
     }
     if (se.take(Kind::AccountDeleted, e)) {
@@ -1190,7 +1197,7 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
             note = T("online.delete.done");
             nav = AccountNav::SignIn;
         } else if (e.error != "unauthorized") {
-            s.error = errorText(e);
+            fail(AccountPage::Delete, errorText(e));
         }
     }
     // Work done off the UI thread.
@@ -1230,7 +1237,7 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
             LOGI("online: account data saved in %s", r.path.c_str());
             if (!on(AccountPage::Export)) notify(T("online.export.saved"), 4.0f);
         } else {
-            s.error = T("online.export.failed");
+            fail(AccountPage::Export, T("online.export.failed"));
             LOGW("online: the account data could not be written: %s", r.error.c_str());
         }
     }
