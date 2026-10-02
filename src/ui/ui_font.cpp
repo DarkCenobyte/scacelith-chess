@@ -573,7 +573,7 @@ void prewarm(const std::vector<std::pair<int, uint32_t>>& list) {
     if (jobs.empty()) return;
     std::vector<SdfGlyph> results(jobs.size());
     unsigned hw = std::thread::hardware_concurrency();
-    int threads = int(std::clamp(hw == 0 ? 2u : hw, 1u, 4u));
+    int threads = int(std::clamp(hw == 0 ? 2u : hw, 1u, 8u));
     threads = std::min(threads, int(jobs.size()));
     auto work = [&](int t) {
         Scratch sc;
