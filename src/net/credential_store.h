@@ -43,11 +43,12 @@ public:
     std::string path() const;
 
     // The record of this exact origin, token decrypted. A token that cannot be decrypted for
-    // this origin (other user, other machine, blob copied from another origin) comes back empty;
-    // from then on hasToken() is false for it, this run (the file keeps it: another Windows
-    // account sharing a portable install may own it).
+    // this origin (other user, other machine, blob copied from another origin) comes back empty
+    // and is no token for hasToken(), this run (the file keeps it: another Windows account
+    // sharing a portable install may own it).
     bool get(const std::string& origin, Credential& out) const;
-    bool hasToken(const std::string& origin) const;   // without decrypting
+    // A token is saved and can be decrypted here (tried once per record and run).
+    bool hasToken(const std::string& origin) const;
     std::string username(const std::string& origin) const;
     std::string pin(const std::string& origin) const;   // the saved pin (without decrypting the token)
 
@@ -69,7 +70,8 @@ public:
 private:
     struct Record {
         std::string origin, username, serverId, pin, tokenBlob;
-        bool unreadable = false;   // tokenBlob could not be decrypted here (get)
+        bool checked = false;      // whether tokenBlob decrypts here is known (get, hasToken, put)
+        bool unreadable = false;   // tokenBlob could not be decrypted here
     };
     mutable std::mutex mu_;
     mutable std::string path_;
@@ -81,6 +83,7 @@ private:
     void applyMovesLocked() const;
     bool saveLocked() const;
     Record* findLocked(const std::string& origin) const;
+    bool readLocked(Record& r, std::string& token) const;   // decrypts r's token, notes the outcome
 };
 
 // Token protection used by the store (exposed for the unit tests).

@@ -947,8 +947,8 @@ TEST(net_credentials_isolation) {
 }
 
 // A saved token that cannot be decrypted here (a portable install copied to another PC or Windows
-// account) is no saved session once a read found it so: the game offers to sign in instead of
-// resuming a session that fails at every opening. The file keeps it (it may be another account's).
+// account) is no saved session, from the first look of the run: the game offers to sign in instead
+// of resuming a session that fails at every opening. The file keeps it (it may be another account's).
 TEST(net_credentials_undecryptable_token) {
     std::string path = tempCredentialPath("undecryptable");
     const std::string A = "a.example.org:443", B = "b.example.org:443";
@@ -958,13 +958,20 @@ TEST(net_credentials_undecryptable_token) {
     rec.set("origin", B);
     rec.set("username", "bob");
     rec.set("token", blob);
+    Value good = Value::object();
+    good.set("origin", A);
+    good.set("username", "alice");
+    good.set("token", blob);
     Value doc = Value::object();
     doc.set("version", 1);
-    doc.set("records", Value::array()).push(rec);
+    Value& records = doc.set("records", Value::array());
+    records.push(rec);
+    records.push(good);
     CHECK(net::sys::writeFileAtomic(path, doc.dump(), true));
     {
         net::CredentialStore s(path);
-        CHECK(s.hasToken(B));                       // not read yet
+        CHECK(!s.hasToken(B));                      // before any get()
+        CHECK(s.hasToken(A));
         net::Credential out;
         CHECK(s.get(B, out));
         CHECK(out.token.empty());

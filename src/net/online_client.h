@@ -365,7 +365,7 @@ public:
     void forgetSavedPin();
     const ServerEndpoint& server() const;
     void fetchServerInfo();
-    bool hasSavedSession() const;                // a token is stored for the current origin
+    bool hasSavedSession() const;                // a token is stored for the current origin and decrypts here
     std::string savedUsername() const;           // last user name used on this origin
     void registerAccount(const std::string& username, const std::string& email, const std::string& password);
     void login(const std::string& usernameOrEmail, const std::string& password);
