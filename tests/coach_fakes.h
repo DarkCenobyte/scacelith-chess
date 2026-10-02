@@ -227,7 +227,11 @@ public:
         if (finished) *finished = vstarted && !vplaying;
         return vstarted ? vclock : -1.0;
     }
-    void showSubtitle(const std::string& written, float hold) override { log("subtitle", written).a = hold; }
+    void showSubtitle(const std::string& written, float hold, bool unheard) override {
+        Ev& e = log("subtitle", written);
+        e.a = hold;
+        e.flag = unheard;
+    }
     float readingTime(const std::string& written) const override { return 0.4f + float(written.size()) / 15.0f; }
     void look(coach::Look look, chess::Square target) override {
         Ev& e = log("look");

@@ -532,7 +532,7 @@ struct Director::Impl {
             run.lineStarted = true;
             const bool voiceOk = stage->voiceAvailable() && run.voiced;
             if (subtitlesShown(config.subtitles, config.uiLanguage, speechLang(), voiceOk))
-                stage->showSubtitle(s.written.text, run.duration);
+                stage->showSubtitle(s.written.text, run.duration, !voiceOk);
         }
         stage->look(b.look, targetOf(b));
 
@@ -589,7 +589,7 @@ struct Director::Impl {
             stage->endGestures();
             run.gestures = false;
         }
-        if (cut) stage->showSubtitle("", 0.0f);
+        if (cut) stage->showSubtitle("", 0.0f, false);
     }
 
     // Advances the running beat by dt. True once it is over.
@@ -662,7 +662,7 @@ struct Director::Impl {
         } else {
             if (run.line && !run.lineDone) {
                 if (run.voiced) stage->stopVoice();
-                stage->showSubtitle("", 0.0f);
+                stage->showSubtitle("", 0.0f, false);
                 run.lineDone = true;
             }
             for (LiveMark& m : live) {
@@ -764,7 +764,7 @@ struct Director::Impl {
             // The offer's line: the card shows at once.
             if (run.phase == Phase::Running && run.line && !run.lineDone) {
                 if (run.voiced) stage->stopVoice();
-                stage->showSubtitle("", 0.0f);
+                stage->showSubtitle("", 0.0f, false);
                 run.lineDone = true;
                 if (run.gestures) {
                     stage->endGestures();
@@ -783,7 +783,7 @@ struct Director::Impl {
     void clear() {
         if (!stage) return;
         stopRun(false);
-        stage->showSubtitle("", 0.0f);
+        stage->showSubtitle("", 0.0f, false);
         for (Item& it : queue) drop(it);
         for (Item& it : held) drop(it);
         queue.clear();

@@ -45,7 +45,9 @@ public:
 
     // ---- Subtitles --------------------------------------------------------------------------------
     // Show the written rendering of the line being said for 'holdSeconds' ("" hides the subtitle).
-    virtual void showSubtitle(const std::string& written, float holdSeconds) = 0;
+    // unheard: the line has no voice (none available, its synthesis failed, the audio refused it),
+    // so it is shown whatever the subtitle option.
+    virtual void showSubtitle(const std::string& written, float holdSeconds, bool unheard) = 0;
     // How long a subtitle stays when nothing is heard (ui::subtitleDuration(text, 0)).
     virtual float readingTime(const std::string& written) const = 0;
 

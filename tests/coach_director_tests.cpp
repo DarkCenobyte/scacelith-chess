@@ -484,16 +484,31 @@ TEST(coach_director_without_voice) {
     }
     CHECK(rig.dir.marks().empty());
 
-    // A synthesis that fails: that line is shown (even with subtitles off), the others heard.
-    DirectorConfig cfg;
-    cfg.subtitles = 2;   // Off
-    Rig rig2(true, cfg);
-    rig2.stage.failIf.push_back("ee four");
-    rig2.dir.play({say(squareLine()), say("event.your_move")});
-    CHECK(rig2.settle());
-    CHECK_EQ(rig2.voiceStarts(), 1);
-    const auto subs2 = rig2.stage.all("subtitle");
-    CHECK(subs2.size() == 1 && subs2[0].text.find("e4") != std::string::npos);
+    for (const fake::Stage::Ev& e : subs) CHECK(e.flag || e.text.empty());   // unheard: shown whatever the option
+
+    // A synthesis that fails: that line is shown (even with subtitles off, or in Automatic mode
+    // when the voice speaks the UI's language), marked unheard so that the scene draws it too;
+    // the others are heard.
+    for (int mode : {2, 0}) {   // Off, Automatic
+        DirectorConfig cfg;
+        cfg.subtitles = mode;
+        Rig rig2(true, cfg);
+        rig2.stage.failIf.push_back("ee four");
+        rig2.dir.play({say(squareLine()), say("event.your_move")});
+        CHECK(rig2.settle());
+        CHECK_EQ(rig2.voiceStarts(), 1);
+        const auto subs2 = rig2.stage.all("subtitle");
+        CHECK(subs2.size() == 1 && subs2[0].text.find("e4") != std::string::npos);
+        CHECK(!subs2.empty() && subs2[0].flag);
+    }
+    // Subtitles On: a heard line is shown, not marked unheard.
+    DirectorConfig on;
+    on.subtitles = 1;
+    Rig rig3(true, on);
+    rig3.dir.play({say("event.your_move")});
+    CHECK(rig3.settle());
+    const auto subs3 = rig3.stage.all("subtitle");
+    CHECK(!subs3.empty() && !subs3[0].text.empty() && !subs3[0].flag);
 }
 
 TEST(coach_director_takeback_offer) {
