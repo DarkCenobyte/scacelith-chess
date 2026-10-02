@@ -191,8 +191,9 @@ Authorization: Bearer sct_L_8GDd7uzfQ3QQWtqrsWXDTsFWzRwIvJcwIGHhjWPS8
   - a password reset and the deletion of the account, which revoke every session;
   - an administrator (`bin/admin.js`).
 
-  A revocation from the API takes effect at once on every worker. Otherwise a worker may keep
-  using its record of a valid session for up to 30 s.
+  A revocation from the API takes effect at once on every worker, and the WebSocket opened with a
+  revoked session is closed (`Notice{SessionRevoked}`, then close 4003). Otherwise a worker may
+  keep using its record of a valid session for up to 30 s.
 - **Scope.** A token belongs to one server and opens its WebSocket too (`Hello.token`,
   [PROTOCOL.md](PROTOCOL.md)). Never send it to another server.
 
@@ -646,6 +647,7 @@ with the page: each attempt hashes a password).
 Answer: 200 `{ "status": "password_reset" }`. The password reset has these effects:
 
 - every session is revoked, and a pending e-mail change is cancelled;
+- the other reset links of the account stop working;
 - the address counts as confirmed (the link proved it);
 - the owner gets a mail;
 - two-step verification is not touched.
@@ -842,7 +844,7 @@ needed, but no second factor, even with two-step verification on.
 Answer: 200 `{ "status": "password_changed" }`. The change has these effects:
 
 - every other session is revoked, and this one stays signed in;
-- a pending e-mail change is cancelled;
+- a pending e-mail change is cancelled, and the account's password reset links stop working;
 - the owner gets a mail.
 
 Errors: the re-authentication errors (section 1.7) and 400 `weak_password` (checked after the
@@ -1599,7 +1601,7 @@ Pages for a browser, opened from the links of e-mails and by Google. Their links
 | Page | Answers |
 |---|---|
 | `GET /verify-email?token=` | 200: a "Confirm my e-mail address" button. 400: link invalid or expired. Limit `page`. |
-| `POST /verify-email` (form `token`) | 200: address confirmed. 400: link invalid, used or expired. Limit `auth`. |
+| `POST /verify-email` (form `token`) | 200: address confirmed. 400: link invalid, used or expired. 503 (`Retry-After: 1`): the database stayed locked; nothing changed and the link still works. Limit `auth`. |
 | `GET /reset-password?token=` | 200: the new password form (password twice). 400: link invalid (also when it was mailed to an address the account no longer has). Limit `page`. |
 | `POST /reset-password` (form `token`, `newPassword`, `confirmPassword`) | 200: password changed, and every device signed out. 400: the form again with the error (the passwords differ, a weak password), or link invalid. 503 / 429: the form again with `Retry-After` when the server is busy (the password hash queue, or the database stayed locked); the link stays valid. Limits `auth` and `auth_reset`. |
 | `GET /confirm-email-change?token=` | 200: shows the new address and the account's name, with a "Use this e-mail address" button. 400: link invalid or expired (also when the account's address changed since the request). Limit `page`. |

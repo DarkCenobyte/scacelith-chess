@@ -545,7 +545,7 @@ Shard -> primary:
 | `ratelimit.refund` | `{ key, windowMs, cost, ageMs }` | `{ refunded }` (gives back a take granted `ageMs` ago, in the window that counted it) |
 | `once.consume` | `{ key, ttlMs }` | `{ fresh }` |
 | `sanction.applied` | `{ userId, until, reason, refunds }` | - (primary kicks the user everywhere; `refunds`: victims refunded, whose notices it looks for at once) |
-| `session.revoked` | `{ userId, tokenHashes }` | - (broadcast to every shard's auth cache) |
+| `session.revoked` | `{ userId, tokenHashes }` | - (broadcast to every shard as `auth.invalidate`; `tokenHashes`: the revoked sessions, `null` when every session of the user was revoked, `[]` to refresh the cache only) |
 | `abuse.report` | `{ entries: [[key64, key48 or null, weight]] }` | - (notification: the refusals counted toward a block since the last report, at most one report per second per worker and 512 entries, the largest first; section 8) |
 
 Primary -> shard:
@@ -556,7 +556,7 @@ Primary -> shard:
 | `game.attach` | `{ gameId, userId, connId }` | the shard binds that connection to the game (local or via bus) |
 | `conn.send` | `{ connId, frames: [Buffer] }` | writes encoded S2C frames (QueueStatus, Challenge*, Notice); as a request (refund notices) it replies `{ ok }`, false when the connection is gone or has not had its Welcome yet |
 | `conn.kick` | `{ connId, code, closeCode, frames }` | sends then closes |
-| `auth.invalidate` | `{ userId, tokenHashes }` | drops cached sessions |
+| `auth.invalidate` | `{ userId, tokenHashes }` | drops the listed sessions from the auth cache and closes the connection opened with one of them; `null` (every session of the user revoked) drops every cached session of the user and closes the user's connection; `[]` drops them and closes nothing |
 | `metrics.snapshot` | - | replies `registry.snapshot()` |
 | `shutdown` | `{ graceMs }` | drain: Notice{ServerShutdown}, stop accepting, flush |
 | `abuse.block` | `{ blocks: [[key, ttlMs, level]] }` | the shard blocks these addresses (IPv4, IPv6 /64 or /48) for `ttlMs` on its monotonic clock; sent to every shard with the new blocks of each `abuse.report`, and to one shard at its `shard.ready` with every running block (section 8) |
@@ -1184,15 +1184,16 @@ before, until it is overwritten as it is reused after each checkpoint (it is tru
   session is opened with a password the reset has replaced.
 * **Tokens**: 32 random bytes, only their SHA-256 is stored; e-mail verification (24 h),
   password reset (1 h, revokes all sessions; it works only while the account still has the
-  address it was mailed to), e-mail change (24 h, sent to the new address, at most one link per
+  address it was mailed to, and a password reset or change ends the account's other reset
+  links), e-mail change (24 h, sent to the new address, at most one link per
   new address every 5 minutes whoever asks; a new request replaces it, a password change or reset
   cancels it, and a request that one of them overtakes gets 403 `invalid_password`: its write is a
   compare-and-set on the password hash it checked), MFA login challenge (5 min), SSO attempt
   (10 min), all single-use. The confirmation of an e-mail change (the link used, the new address,
   the end of the reset and verification links of the former address) and a password reset (the
-  link used, the new password, the pending e-mail change cancelled) are each one transaction; a
-  store that stays locked answers 503 `server_busy` with `retryAfter: 1`, nothing changed and
-  the link still valid.
+  link used, the new password, the pending e-mail change and the other reset links cancelled) are
+  each one transaction; a store that stays locked answers 503 `server_busy` with
+  `retryAfter: 1`, nothing changed and the link still valid.
 * **TOTP**: RFC 6238 (SHA-1, 6 digits, 30 s, +-1 step), secret 20 bytes, AES-256-GCM at rest with
   a key derived from SERVER_SECRET (or MFA_ENCRYPTION_KEY), replay refused (last used step
   stored). 10 recovery codes (`xxxx-xxxx-xx`, 50 bits) stored as HMAC-SHA256 with a derived

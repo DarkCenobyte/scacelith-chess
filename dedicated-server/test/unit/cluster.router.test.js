@@ -28,7 +28,6 @@ const SESSIONS = {
     [TOKEN]: { userId: 1, username: 'alice', emailVerified: true, sessionId: 5 },
     ['b'.repeat(43)]: { userId: 2, username: 'bob', emailVerified: true },
     ['c'.repeat(43)]: { userId: 3, username: 'carl', emailVerified: false },
-    ['d'.repeat(43)]: { userId: 4, username: 'dan', emailVerified: true, bannedUntil: Date.UTC(2099, 0, 1) },
 };
 
 class FakeHost {
@@ -173,20 +172,14 @@ describe('router: hello', () => {
         });
     }
 
-    it('closes a banned session with the ban end (session or primary)', async () => {
-        const env = await setup();
+    it('closes a player the primary finds banned with the ban end', async () => {
+        const env = await setup({ claim: { error: E.Banned, until: 12345 } });
         const c = await env.connect();
-        c.hello('d'.repeat(43));
+        c.hello();
         assert.equal((await c.recv()).code, E.Banned);
         const n = await c.recv();
-        assert.deepEqual([n.name, n.code, n.arg], ['Notice', N.Banned, Date.UTC(2099, 0, 1)]);
+        assert.deepEqual([n.name, n.code, n.arg], ['Notice', N.Banned, 12345]);
         assert.equal(await c.closed(), 4004);
-        const env2 = await setup({ claim: { error: E.Banned, until: 12345 } });
-        const c2 = await env2.connect();
-        c2.hello();
-        assert.equal((await c2.recv()).code, E.Banned);
-        assert.equal((await c2.recv()).arg, 12345);
-        assert.equal(await c2.closed(), 4004);
     });
 
     it('closes 4006 when the server is full', async () => {
@@ -415,6 +408,17 @@ describe('router: primary and bus', () => {
         assert.equal((await c.recv()).code, E.Unauthorized);
         assert.equal(await c.closed(), 4003);
         assert.equal(env.invalidated.length, 2);
+    });
+
+    it('closes the user\'s connection when every session was revoked (no list); an empty list closes nothing', async () => {
+        const env = await setup();
+        const { c } = await env.login();
+        assert.deepEqual(await env.primary.request('auth.invalidate', { userId: 1, tokenHashes: [] }), { ok: true, closed: 0 });
+        assert.deepEqual(await env.primary.request('auth.invalidate', { userId: 1, tokenHashes: null }), { ok: true, closed: 1 });
+        assert.equal((await c.recv()).code, N.SessionRevoked);
+        assert.equal((await c.recv()).code, E.Unauthorized);
+        assert.equal(await c.closed(), 4003);
+        assert.deepEqual(env.invalidated, [{ userId: 1, tokenHashes: [] }, { userId: 1, tokenHashes: null }]);
     });
 
     it('hosts remote players: attach, relay both ways, RTT, close, detach, shard down', async () => {

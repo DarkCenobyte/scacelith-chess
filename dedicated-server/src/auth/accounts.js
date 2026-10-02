@@ -39,13 +39,14 @@
 //  * A password change or reset cancels a pending e-mail change (whoever requested it knew the
 //    password the owner just replaced). A request racing it gets 403 invalid_password: its token
 //    (or its immediate change) is written only while the password it checked is still the stored
-//    one, in the same transaction (compare and set, as POST /account/password does).
+//    one, in the same transaction (compare and set, as POST /account/password does). It also ends
+//    the account's other password reset links (one of them would replace the new password).
 //
 // Data export (POST /account/export, same re-authentication): exportAccount() checks the
 // credentials, lets the caller build the document (http/routes/account-export.js) and records
 // an account_exported security event.
 //
-// Deviations (documented in the report):
+// Deviations (also in docs/API.md sections 4 and 6, and docs/DESIGN.md section 8):
 //  * REQUIRE_EMAIL_VERIFICATION=false: an account is ready at once (201 { status: 'ready' }) and an
 //    existing e-mail is answered 409 email_taken (without confirmation e-mails the "same answer"
 //    would only hide the failure from honest users; the owner still gets the notice e-mail).
@@ -87,7 +88,7 @@ export function createAccounts(svc) {
     function sendVerification(user) {
         const token = randomToken('', 32);
         store.tokens.create({ kind: 'email_verify', tokenHash: sha256Hex(token), userId: user.id, data: { email: user.email }, expiresAt: now() + TOKEN_TTL_MS.email_verify });
-        svc.mail('verification', user.email, { username: user.username, link: svc.links.verify(token), hours: 24 });
+        svc.mail('verification', user.email, { username: user.username, link: svc.links.verify(token), hours: TOKEN_TTL_MS.email_verify / 3600000 });
     }
 
     async function notifyExistingAddress(user, ip) {
@@ -178,14 +179,21 @@ export function createAccounts(svc) {
         }
     }
 
-    /** POST /verify-email: consumes the token and confirms the address. */
+    /**
+     * POST /verify-email: consumes the token and confirms the address, in one transaction (a busy
+     * store: 503 server_busy, the link still works).
+     */
     function verifyEmail(token, ip = null) {
         if (typeof token !== 'string' || !LINK_TOKEN_RE.test(token)) return false;
-        const row = store.tokens.consume('email_verify', sha256Hex(token), now());
-        if (!row || (row.expiresAt != null && row.expiresAt <= now())) return false;
-        const user = store.users.byId(row.userId);
-        if (!user || user.status !== 'active' || normalizeEmail(user.email) !== normalizeEmail(dataOf(row).email)) return false;
-        if (!user.emailVerified) store.users.update(user.id, { emailVerified: true });
+        const user = atomicallyOrBusy(() => {
+            const row = store.tokens.consume('email_verify', sha256Hex(token), now());
+            if (!row || (row.expiresAt != null && row.expiresAt <= now())) return null;
+            const u = store.users.byId(row.userId);
+            if (!u || u.status !== 'active' || normalizeEmail(u.email) !== normalizeEmail(dataOf(row).email)) return null;
+            if (!u.emailVerified) store.users.update(u.id, { emailVerified: true });
+            return u;
+        });
+        if (!user) return false;
         sessions.invalidate({ userId: user.id });
         events.record('email_verified', { userId: user.id, ip });
         return true;
@@ -211,7 +219,7 @@ export function createAccounts(svc) {
         if (fresh && user && user.status === 'active') {
             const token = randomToken('', 32);
             store.tokens.create({ kind: 'password_reset', tokenHash: sha256Hex(token), userId: user.id, data: { email: user.email }, expiresAt: now() + TOKEN_TTL_MS.password_reset });
-            svc.mail('passwordReset', user.email, { username: user.username, link: svc.links.reset(token), minutes: 60 });
+            svc.mail('passwordReset', user.email, { username: user.username, link: svc.links.reset(token), minutes: TOKEN_TTL_MS.password_reset / 60000 });
             events.record('password_reset_requested', { userId: user.id, ip });
         }
         return { status: 'accepted' };
@@ -235,12 +243,14 @@ export function createAccounts(svc) {
         if (policy) throw weak(policy);
         const passwordHash = await hasher.hash(newPassword, svc.hashBudget(ip).next());
         // One transaction: no change of address can land between the check of the link's address
-        // and the new password, and the pending e-mail change goes with the old password.
+        // and the new password, and the pending e-mail change and the other reset links go with the
+        // old password.
         const done = atomicallyOrBusy(() => {
             const used = store.tokens.consume('password_reset', sha256Hex(token), now());
             if (!used || !sentToCurrentAddress(used)) return false;
             store.users.update(user.id, { passwordHash, emailVerified: true });
             cancelEmailChange(user.id);
+            dropResetLinks(user.id);
             return true;
         });
         if (!done) throw invalidResetToken();
@@ -308,6 +318,7 @@ export function createAccounts(svc) {
         }
         sessions.revokeAll(user.id, sessionId);
         cancelEmailChange(user.id);
+        dropResetLinks(user.id);
         events.record('password_changed', { userId: user.id, ip });
         svc.mail('passwordChanged', user.email, { username: user.username, when: new Date(now()), byReset: false });
         return { status: 'password_changed' };
@@ -375,12 +386,18 @@ export function createAccounts(svc) {
         return { recoveryCodes };
     }
 
-    /** POST /account/delete: anonymises the account and revokes every session. */
+    /**
+     * POST /account/delete: anonymises the account and revokes every session. The security events
+     * still waiting in this process's batch (this request's recovery_code_used, the last second's
+     * logins) are written first, so that the anonymisation erases their IP addresses too; the
+     * deletion's own event, recorded once it is done, has none.
+     */
     async function deleteAccount(ctxUser, { password, code, recoveryCode, ip }) {
         const user = await reauth(ctxUser.userId, { password, code, recoveryCode }, { secondFactor: 'any', ip });
+        events.flush();
         store.users.anonymize(user.id);
         sessions.revokeAll(user.id);
-        events.record('account_deleted', { userId: user.id, ip });
+        events.record('account_deleted', { userId: user.id });
         return { status: 'deleted' };
     }
 
@@ -395,7 +412,12 @@ export function createAccounts(svc) {
 
     /** Drops the user's pending e-mail change (its link stops working). */
     function cancelEmailChange(userId) {
-        if (typeof store.tokens.deleteForUser === 'function') store.tokens.deleteForUser(userId, 'email_change');
+        store.tokens.deleteForUser(userId, 'email_change');
+    }
+
+    /** Drops the user's password reset links (after a password reset or change). */
+    function dropResetLinks(userId) {
+        store.tokens.deleteForUser(userId, 'password_reset');
     }
 
     function emailTaken() {
@@ -405,9 +427,7 @@ export function createAccounts(svc) {
     // The links sent to the former address stop working: run in the transaction that changes the
     // address, so that the change never commits without it.
     function dropAddressLinks(userId) {
-        for (const kind of ['email_change', 'password_reset', 'email_verify']) {
-            if (typeof store.tokens.deleteForUser === 'function') store.tokens.deleteForUser(userId, kind);
-        }
+        for (const kind of ['email_change', 'password_reset', 'email_verify']) store.tokens.deleteForUser(userId, kind);
     }
 
     // Once the address of `user` changed from `from` to `email` (committed): the cached sessions are
@@ -483,7 +503,7 @@ export function createAccounts(svc) {
         const linkFresh = await once(mailKey('emailchange-link', em), MAIL_THROTTLE_MS);
         const token = randomToken('', 32);
         await withPassword(() => {
-            if (!linkFresh && typeof store.tokens.liveForUser === 'function') {
+            if (!linkFresh) {
                 const live = dataOf(store.tokens.liveForUser(user.id, 'email_change', now()));
                 if (normalizeEmail(live.email) === em && normalizeEmail(live.from) === normalizeEmail(from)) return;
             }
@@ -586,7 +606,7 @@ export function createAccounts(svc) {
     function revokeSession(ctxUser, id, ip = null) {
         const row = sessions.find(ctxUser.userId, id);
         if (!row) throw new AuthError(404, 'not_found', 'No such session.');
-        sessions.revoke(ctxUser.userId, row.id, row.tokenHash || null);
+        sessions.revoke(ctxUser.userId, row.id);
         events.record('session_revoked', { userId: ctxUser.userId, ip, detail: { reason: 'user' } });
         return { status: 'revoked' };
     }
