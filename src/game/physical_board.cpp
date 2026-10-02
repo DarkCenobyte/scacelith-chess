@@ -292,6 +292,8 @@ void PhysicalBoard::syncTo(const Position& pos) {
         }
     }
     updateRestingTransforms();
+    // A snap, not a motion: no velocity for the motion blur (as after reset()).
+    for (auto& p : pieces_) p.prevTransform = p.transform;
 }
 
 void PhysicalBoard::beginFrame() {
