@@ -1117,7 +1117,7 @@ void tooltip(const std::string& text, const Rect& within) {
 }
 
 int confirmDialog(const char* idStr, const std::string& title, const std::string& message, const std::string& confirmLabel,
-                  const std::string& cancelLabel, bool dangerous) {
+                  const std::string& cancelLabel, [[maybe_unused]] bool dangerous) {
     Id id = makeId(idStr);
     Anim& a = anim(id);
     bool first = a.firstFrame == frame();
@@ -1155,7 +1155,7 @@ int confirmDialog(const char* idStr, const std::string& title, const std::string
     setDefaultFocus(cancelId);
     int result = -1;
     if (button(cancelLabel, rc, ButtonKind::Secondary)) result = 0;
-    if (button(confirmLabel, ro, dangerous ? ButtonKind::Primary : ButtonKind::Primary)) result = 1;
+    if (button(confirmLabel, ro, ButtonKind::Primary)) result = 1;
     popId();
     if (!first && result < 0 && consumeBack()) {
         result = 0;

@@ -174,6 +174,7 @@ void sectionLabel(const std::string& text, float x, float y, float width);
 void rowHighlight(const Rect& r, float t);
 
 // Modal confirmation. Returns -1 while open, 1 = confirmed, 0 = cancelled (Esc / cancel button).
+// 'dangerous' marks destructive actions; it does not change the look (the confirm button is Primary).
 int confirmDialog(const char* idStr, const std::string& title, const std::string& message, const std::string& confirmLabel,
                   const std::string& cancelLabel, bool dangerous);
 
