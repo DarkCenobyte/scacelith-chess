@@ -559,8 +559,8 @@ TEST(coach_session_accuracy_explained_when_said) {
 }
 
 // No takeback is offered for a finished game: stalemate while winning by the human's own move is
-// explained, then the closing words and the handshake follow; an offer open when a draw is agreed
-// closes without a word; and an answer that comes after the end takes nothing back.
+// explained, then the closing words and the handshake follow; an offer open or still queued when a
+// draw is agreed closes without a word; and an answer that comes after the end takes nothing back.
 TEST(coach_session_no_offer_once_the_game_is_over) {
     Table t;
     const char* fen = "7k/5K2/8/6Q1/8/8/8/8 w - - 0 1";
@@ -597,6 +597,28 @@ TEST(coach_session_no_offer_once_the_game_is_over) {
     CHECK(u.said("event.end.draw"));
     CHECK(!u.queued("event.takeback.declined") && !u.queued("event.play_on"));
 
+    Table v;   // the offer still queued behind the explanation
+    hangTable(v);
+    v.start(levelConfig(1));
+    CHECK(v.quiet());
+    v.move("c3d5");
+    CHECK(v.until([&] {
+        const std::string* key = v.session.director().runningKey();
+        return v.queued("ex.offer.b1") && v.session.director().speaking() && key && *key != "ex.offer.b1";
+    }, 60.0f));
+    v.game.agreeDraw();
+    v.session.onGameOver(v.game, false);
+    offered = false;
+    CHECK(v.until([&] {
+        offered = offered || v.session.offerOpen();
+        return v.session.handshakeWanted();
+    }, 60.0f));
+    CHECK(!offered);
+    CHECK(v.said("event.end.draw"));
+    CHECK(!v.said("ex.offer.b1"));
+    CHECK(v.stage.all("takeBack").empty());
+    CHECK(!v.queued("event.takeback.declined") && !v.queued("event.play_on"));
+
     Table w;
     hangTable(w);
     w.start(levelConfig(1));
@@ -626,6 +648,7 @@ TEST(coach_session_game_over_keeps_the_review_analyses) {
     CHECK(t.until([&] { return t.session.handshakeWanted(); }, 60.0f));
     CHECK(t.said("event.end.win"));
     CHECK_EQ(t.analyst.count("A0", root), 1);
+    CHECK_EQ(t.analyst.count("A3", root), 1);
 
     // A resignation abandons the review: its A1 / A2 go too.
     Table u;
