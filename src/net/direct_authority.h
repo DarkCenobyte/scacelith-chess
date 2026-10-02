@@ -90,14 +90,11 @@ public:
     void sendSnapshot(Side side, double now, Output& out);
     void hostLeaves(double now, Output& out);                // resigns the host's running game
 
-    bool hasGame() const { return started_; }
     bool isOver() const;
     uint64_t gameId() const { return id_; }
     int colorOf(Side side) const { return side == HostSide ? hostColor_ : 1 - hostColor_; }
     int plies() const { return int(recs_.size()); }
-    const chess::Game& game() const { return game_; }
     const std::string& guestName() const { return names_[GuestSide]; }
-    int64_t remainingMs(int color, double now) const { return clockAt(color, now); }
 
 private:
     AuthorityConfig cfg_;

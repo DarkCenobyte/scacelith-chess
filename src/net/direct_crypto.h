@@ -104,7 +104,6 @@ public:
     static constexpr size_t kHelloLen = 4 + 1 + 32 + 65;
     static constexpr size_t kConfirmLen = 32 + 16;
     static constexpr size_t kMaxPlaintext = 16384;
-    static constexpr size_t kMaxFrame = 2 + kMaxPlaintext + 16;
     static constexpr uint8_t kVersion = 1;
 
     // code: the normalised 12-character join code.
@@ -124,9 +123,7 @@ public:
     // Bytes to write to the socket; the caller erases what it wrote.
     std::vector<uint8_t>& outbox() { return out_; }
 
-    Status status() const { return status_; }
     Failure failure() const { return failure_; }
-    Role role() const { return role_; }
     bool established() const { return status_ == Status::Established; }
     bool failed() const { return status_ == Status::Failed; }
     // The guest sent its confirmation and waits for the host's: a connection closed now almost
