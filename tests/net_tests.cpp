@@ -1826,7 +1826,6 @@ TEST(net_online_client_loopback) {
         c.setServer(ep);
         CHECK_EQ(c.server().origin(), "127.0.0.1:" + std::to_string(srv.port));
         CHECK(!c.hasSavedSession());
-        CHECK(c.currentGame() == nullptr);
 
         net::Event ev;
         c.fetchServerInfo();
@@ -1887,9 +1886,8 @@ TEST(net_online_client_loopback) {
         CHECK_EQ(ev.queueCategory, std::string("3+2"));
         CHECK(waitEvent(c, K::GameSnapshot, ev, 5000));
         CHECK_EQ(ev.game.id, uint64_t(77));
-        CHECK(c.currentGame() && c.currentGame()->id == 77);
-        CHECK_EQ(c.currentGame()->black.name, std::string("bob"));
-        CHECK_EQ(c.currentGame()->you, 0);
+        CHECK_EQ(ev.game.black.name, std::string("bob"));
+        CHECK_EQ(ev.game.you, 0);
         chess::Position pos;
         c.sendMove(77, 0, net::packMove(12, 28, 0), pos.fen(), 1500, false);
         CHECK(waitEvent(c, K::MoveMade, ev, 5000));
@@ -1902,8 +1900,8 @@ TEST(net_online_client_loopback) {
         CHECK_EQ(ev.game.running, 0);          // White's clock runs from White's second move
         CHECK(waitEvent(c, K::GameEvent, ev, 5000));
         CHECK_EQ(ev.gameEventKind, int(pr::GameEventKind::DrawOffered));
-        CHECK_EQ(c.currentGame()->moves.size(), size_t(2));
-        CHECK_EQ(c.currentGame()->drawOfferBy, 1);
+        CHECK_EQ(ev.game.moves.size(), size_t(2));
+        CHECK_EQ(ev.game.drawOfferBy, 1);
         // A move with a wrong position digest is refused.
         c.sendMove(77, 2, net::packMove(6, 21, 0), "8/8/8/8/8/8/8/K6k w - - 0 1", 100, false);
         CHECK(waitEvent(c, K::MoveRejected, ev, 5000));
@@ -1914,19 +1912,19 @@ TEST(net_online_client_loopback) {
         int hellosBefore = srv.hellos.load(), infosBefore = srv.infos.load();
         srv.dropWebSockets();
         CHECK(waitState(c, net::ConnState::Reconnecting, 5000));
-        CHECK(c.currentGame() && c.currentGame()->id == 77);
         CHECK(waitEvent(c, K::GameSnapshot, ev, 10000));   // Welcome.activeGame, then the snapshot
+        CHECK_EQ(ev.game.id, uint64_t(77));
         CHECK(c.state() == net::ConnState::Online);
         CHECK_EQ(srv.hellos.load(), hellosBefore + 1);
         CHECK_EQ(srv.infos.load(), infosBefore);
         CHECK_EQ(ev.game.moves.size(), size_t(2));
         CHECK_EQ(ev.game.running, 0);
-        CHECK_EQ(c.currentGame()->drawOfferBy, 2);
+        CHECK_EQ(ev.game.drawOfferBy, 2);
 
         c.resign(77);
         CHECK(waitEvent(c, K::GameEnd, ev, 5000));
-        CHECK_EQ(c.currentGame()->status, int(pr::GameStatus::BlackWins));
-        CHECK_EQ(c.currentGame()->reason, int(pr::EndReason::Resignation));
+        CHECK_EQ(ev.game.status, int(pr::GameStatus::BlackWins));
+        CHECK_EQ(ev.game.reason, int(pr::EndReason::Resignation));
 
         // Banned: the Notice's end of ban comes with the state; no retry.
         srv.kick(pr::CloseCode::Banned, true);
@@ -1954,7 +1952,6 @@ TEST(net_online_client_loopback) {
         other.host = "localhost";
         c.setServer(other);
         CHECK(!c.hasSavedSession());
-        CHECK(c.currentGame() == nullptr);
         c.setServer(ep);
         CHECK(c.hasSavedSession());
 
@@ -2402,7 +2399,7 @@ void gestureScenario(PacingRig& r) {
     using K = net::Event::Kind;
     net::Event ev;
     if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
-    r.expect(!ev.game.autoPress && r.c->currentGame() && !r.c->currentGame()->autoPress, "GameSnapshot.autoPress reaches OnlineGame");
+    r.expect(!ev.game.autoPress, "GameSnapshot.autoPress reaches OnlineGame");
 
     const int kRate = 10, kCapacity = net::gestureSendCapacity(6);
     auto t0 = std::chrono::steady_clock::now();

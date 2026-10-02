@@ -293,8 +293,6 @@ uint32_t clientPingIntervalMs(uint32_t announced) {
 struct OnlineClient::Impl {
     // ---- game thread ----
     ServerEndpoint ep;
-    OnlineGame view;
-    bool hasView = false;
 
     // ---- shared ----
     std::mutex mu;
@@ -1534,8 +1532,8 @@ void OnlineClient::setServer(const ServerEndpoint& ep) {
     impl_->ep = e;
     Impl* d = impl_.get();
     if (originChanged) {
-        // Nothing of the previous server survives: proof of work, connection, game view, SSO, MFA
-        // step. (The command goes before the cancel: see tryConnect.)
+        // Nothing of the previous server survives: proof of work, connection, game, SSO, MFA step.
+        // (The command goes before the cancel: see tryConnect.)
         d->originGen.fetch_add(1);
         d->httpPowAbort.store(true);
         d->gifPowAbort.store(true);
@@ -1557,8 +1555,6 @@ void OnlineClient::setServer(const ServerEndpoint& ep) {
             d->mfaToken.clear();
             d->ssoTicket.clear();
         });
-        d->view = OnlineGame();
-        d->hasView = false;
     } else {
         d->realtime([d, e] { d->rt.ep = e; });
     }
@@ -2552,29 +2548,12 @@ void OnlineClient::sendGesture(uint64_t gameId, const Gesture& g) {
     if (wake) d->rtCv.notify_one();
 }
 
-const OnlineGame* OnlineClient::currentGame() const { return impl_->hasView ? &impl_->view : nullptr; }
-
 bool OnlineClient::poll(Event& out) {
     {
         std::lock_guard<std::mutex> lk(impl_->mu);
         if (impl_->events.empty()) return false;
         out = std::move(impl_->events.front());
         impl_->events.pop_front();
-    }
-    switch (out.kind) {
-    case Event::Kind::GameSnapshot:
-    case Event::Kind::MoveMade:
-    case Event::Kind::MoveRejected:
-    case Event::Kind::GameEvent:
-    case Event::Kind::GameEnd:
-    case Event::Kind::RatingUpdate:
-        if (out.game.id != 0) {
-            impl_->view = out.game;
-            impl_->hasView = true;
-        }
-        break;
-    default:
-        break;
     }
     return true;
 }

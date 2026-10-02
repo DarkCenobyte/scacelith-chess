@@ -465,7 +465,6 @@ public:
     // Dropped while not Online (never queued for a reconnection) and when gameId is not the game
     // of the last GameSnapshot. Cheap enough to call every frame.
     void sendGesture(uint64_t gameId, const Gesture& g);
-    const OnlineGame* currentGame() const;       // game thread view (updated by poll())
 
     // Drains one event; call until it returns false, once per frame.
     bool poll(Event& out);
