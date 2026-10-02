@@ -94,6 +94,11 @@ void setButton(int b, bool down) {
     if (!down && g_input.mouseDown[b]) g_input.mouseReleased[b] = true;
     g_input.mouseDown[b] = down;
 }
+// A button went up (wp = WM_xBUTTONUP's key state): the window keeps the pointer (SetCapture)
+// while another button is still held.
+void releaseCapture(WPARAM wp) {
+    if (!(wp & (MK_LBUTTON | MK_RBUTTON | MK_MBUTTON))) ReleaseCapture();
+}
 
 void applyCursor() {
     // ShowCursor keeps a counter; drive it to the wanted state.
@@ -172,11 +177,11 @@ LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
             g_input.mouseInWindow = pointerOverClient();
             return 0;
         case WM_LBUTTONDOWN: SetCapture(h); setButton(MOUSE_LEFT, true); return 0;
-        case WM_LBUTTONUP: ReleaseCapture(); setButton(MOUSE_LEFT, false); return 0;
+        case WM_LBUTTONUP: releaseCapture(wp); setButton(MOUSE_LEFT, false); return 0;
         case WM_RBUTTONDOWN: SetCapture(h); setButton(MOUSE_RIGHT, true); return 0;
-        case WM_RBUTTONUP: ReleaseCapture(); setButton(MOUSE_RIGHT, false); return 0;
-        case WM_MBUTTONDOWN: setButton(MOUSE_MIDDLE, true); return 0;
-        case WM_MBUTTONUP: setButton(MOUSE_MIDDLE, false); return 0;
+        case WM_RBUTTONUP: releaseCapture(wp); setButton(MOUSE_RIGHT, false); return 0;
+        case WM_MBUTTONDOWN: SetCapture(h); setButton(MOUSE_MIDDLE, true); return 0;
+        case WM_MBUTTONUP: releaseCapture(wp); setButton(MOUSE_MIDDLE, false); return 0;
         case WM_MOUSEWHEEL: g_input.wheel += float(GET_WHEEL_DELTA_WPARAM(wp)) / WHEEL_DELTA; return 0;
         case WM_INPUT: {
             RAWINPUT ri;
