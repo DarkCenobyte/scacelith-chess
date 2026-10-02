@@ -271,7 +271,6 @@ void GameScene::updateOnline(float dt) {
         endWait_ += dt;
         bool settled = remoteQueue_.empty() && turn_ != Turn::RemoteMoving && turn_ != Turn::HumanPromotion && dest_.empty() &&
                        !anim_[0].busy() && !anim_[1].busy() && !remoteLive_.takeBack;
-        if (turn_ == Turn::RemoteWaiting && !remoteQueue_.empty()) settled = false;
         if (settled || endWait_ > 6.0f) endGame();
     }
 }
