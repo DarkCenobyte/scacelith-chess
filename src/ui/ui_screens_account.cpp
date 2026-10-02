@@ -133,7 +133,7 @@ vec4 outcomeColor(game::Outcome o) {
 // "+9", "−12", "±0".
 std::string diffText(int d) {
     if (d > 0) return i18n::ltr("+" + num(d));
-    if (d < 0) return i18n::ltr("\xE2\x88\x92" + num(-d));
+    if (d < 0) return i18n::ltr("\xE2\x88\x92" + num(-static_cast<long long>(d)));
     return i18n::ltr("\xC2\xB1" "0");
 }
 vec4 diffColor(int d) { return d > 0 ? kWon : d < 0 ? danger : muted; }
@@ -694,7 +694,7 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         im::sectionLabel(T("online.game.moves"), rx, top + 8.0f, rightW);
         {
             TextStyle cs = style(font::FACE_ITALIC, 21.0f, ivoryDim, im::endAlign());
-            std::string count = i18n::trn("online.game.move_count", (g.plies + 1) / 2);
+            std::string count = i18n::trn("online.game.move_count", (static_cast<long long>(g.plies) + 1) / 2);
             gfx::text(count, im::flipX(rcol, rx + rightW), top + 8.0f, cs);
         }
         bool complete = true;
