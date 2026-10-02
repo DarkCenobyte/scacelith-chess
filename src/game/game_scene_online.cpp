@@ -1076,7 +1076,9 @@ void GameScene::updateOnlineGameOver() {
             reportOpen_ = true;
         }
     }
-    if (in.keyPressed[plat::KEY_TAB] && !ui::wantsKeyboard()) showMoveList_ = !showMoveList_;
+    // The card holds the keyboard even folded ("View the board"): Tab works once it is folded.
+    if (in.keyPressed[plat::KEY_TAB] && !reportOpen_ && (gameOverShown_ ? ui::gameOverFolded() : !ui::wantsKeyboard()))
+        showMoveList_ = !showMoveList_;
     // Challenges received between two games.
     if (link_ && link_->kind() == LinkKind::Server) ui::onlineChallenges();
 }

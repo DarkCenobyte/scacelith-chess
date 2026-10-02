@@ -1171,7 +1171,9 @@ bool GameScene::update(AppContext& ctx, float dt) {
                 stateTime_ = 0.0f;
             }
         }
-        if (in.keyPressed[plat::KEY_TAB] && !ui::wantsKeyboard()) showMoveList_ = !showMoveList_;
+        // The card holds the keyboard even folded ("View the board"): Tab works once it is folded.
+        if (in.keyPressed[plat::KEY_TAB] && (gameOverShown_ ? ui::gameOverFolded() : !ui::wantsKeyboard()))
+            showMoveList_ = !showMoveList_;
         break;
     default: break;
     }
