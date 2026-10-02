@@ -62,10 +62,11 @@ WANPPPConnection) and asks:
   expires by itself; a permanent one stays until the router restarts (look for the description
   above in the router's page to remove it).
 
-The UPnP status (router name, external address, mapped port, error) is shown on the hosting page.
-When UPnP is disabled on the router or not available, forward TCP 47100 manually to the host's
-local IPv4 address in the router's settings. NAT-PMP and PCP (some Apple and ISP routers) are not
-supported.
+The hosting page shows the router's name when the mapping succeeded, the external address and
+port in the invitation, or that UPnP found no router, was refused or suspects carrier-grade NAT;
+the router's error code is in the log. When UPnP is disabled on the router or not available,
+forward TCP 47100 manually to the host's local IPv4 address in the router's settings. NAT-PMP and
+PCP (some Apple and ISP routers) are not supported.
 
 **Carrier-grade NAT (CGNAT).** Many mobile and some fibre/cable providers share one public IPv4
 between customers. The game suspects it when the router's "external" address is private
