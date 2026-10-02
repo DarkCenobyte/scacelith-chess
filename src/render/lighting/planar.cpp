@@ -87,7 +87,6 @@ void PlanarReflections::render(Renderer& r) {
     gpu::DebugGroup g("planar");
     gpu::ProfileScope prof("planar");
     FrameUBOData& f = r.frame_;
-    glEnable(GL_CLIP_DISTANCE0);
     for (int i = 0; i < 4; ++i) {
         if (!active_[i]) continue;
         const PlanarReflector& pr = r.planar_[size_t(i)];
@@ -135,13 +134,16 @@ void PlanarReflections::render(Renderer& r) {
         flt.eye = eye;
         flt.minSize = pr.minObjectSize;
         glFrontFace(GL_CW);  // mirrored winding
+        // Mesh shaders write gl_ClipDistance[0] (the mirror plane); the sky's fullscreen.vert
+        // does not, and lies at infinity anyway: clip the scene only.
+        glEnable(GL_CLIP_DISTANCE0);
         r.drawScene(PassId::Planar, false, flt);
+        glDisable(GL_CLIP_DISTANCE0);
         glFrontFace(GL_CCW);
         r.renderSky();
         glDisable(GL_SCISSOR_TEST);
     }
     f.passInfo.y = 0;
-    glDisable(GL_CLIP_DISTANCE0);
 
     // Gaussian mip chain.
     gpu::DebugGroup bg("planar.blur");
