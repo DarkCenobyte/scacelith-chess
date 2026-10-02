@@ -7,6 +7,7 @@
 #include "i18n/i18n.h"
 #include <algorithm>
 #include <chrono>
+#include <cstring>
 #include <map>
 #include <regex>
 #include <set>
@@ -471,6 +472,59 @@ TEST(coach_catalog_language_parity) {
     CHECK(!has("b.spoken"));        // nor is a language's own
     CHECK(!has("piece.pawn.acc"));  // grammar keys may be added
     CHECK_EQ(int(p.size()), 5);
+}
+
+// The closing words of a game are followed by the handshake line (gameEndScript), each variant
+// picked on its own: no sentence of a handshake line is already in a closing line, in any language
+// ("All right. Thank you for the game." then "Thank you for the game.").
+TEST(coach_catalog_closing_words_do_not_repeat_the_handshake) {
+    Catalog c;
+    CHECK(c.load());
+    auto variantKey = [](const std::string& key, int v) { return v == 1 ? key : key + "." + std::to_string(v); };
+    // The sentences of a line, without their end punctuation.
+    auto sentences = [](const std::string& s) {
+        std::vector<std::string> out;
+        std::string cur;
+        auto flush = [&] {
+            size_t b = cur.find_first_not_of(' '), e = cur.find_last_not_of(' ');
+            if (b != std::string::npos) out.push_back(cur.substr(b, e - b + 1));
+            cur.clear();
+        };
+        for (size_t i = 0; i < s.size();) {
+            size_t len = 0;   // . ! ? and the full-width and Arabic marks
+            for (const char* end : {".", "!", "?", "\xE3\x80\x82", "\xEF\xBC\x81", "\xEF\xBC\x9F", "\xD8\x9F"})
+                if (s.compare(i, std::strlen(end), end) == 0) len = std::strlen(end);
+            if (len) {
+                flush();
+                i += len;
+            } else {
+                cur += s[i++];
+            }
+        }
+        flush();
+        return out;
+    };
+    int pairs = 0;
+    for (const std::string& lang : c.languages()) {
+        for (int h = 1; h <= c.variants("event.end.handshake"); ++h) {
+            const std::string* hands = c.find(lang, variantKey("event.end.handshake", h));
+            if (!hands) continue;
+            for (const char* key : {"event.end.win", "event.end.loss", "event.end.draw", "event.end.resigned"}) {
+                for (int v = 1; v <= c.variants(key); ++v) {
+                    const std::string* closing = c.find(lang, variantKey(key, v));
+                    if (!closing) continue;
+                    ++pairs;
+                    for (const std::string& s : sentences(*hands)) {
+                        if (closing->find(s) == std::string::npos) continue;
+                        std::fprintf(stderr, "  %s: \"%s\" then \"%s\"\n", lang.c_str(), closing->c_str(),
+                                     hands->c_str());
+                        CHECK(false);
+                    }
+                }
+            }
+        }
+    }
+    CHECK(pairs >= 10 * 11);   // 11 closing lines in each of the 10 languages
 }
 
 // The English lines of this package render cleanly: no placeholder left, no bare square or SAN

@@ -75,12 +75,12 @@ void traceMove(Beat& b, chess::PieceType t, chess::Square from, chess::Square to
 void markSquare(Beat& b, chess::Square s, const std::string& anchor);
 void markPiece(Beat& b, chess::Square s, const std::string& anchor);
 void markArrow(Beat& b, chess::PieceType t, chess::Square from, chess::Square to, const std::string& anchor);
-// Research-pedagogy R6: at most three pointing gestures per line; the others keep only their marks.
+// At most three pointing gestures per line; the others keep only their marks.
 void limitPointing(Beat& b);
 
-// ---- Explanation choice (research-pedagogy §2.0 table, first match wins) ----
+// ---- Explanation choice (in ExType order, first match wins) ----
 bool findExplanation(const Ctx& c, Explanation& out);
-// Opening principles and endgame technique tips (§2.16, §2.17), for moves that are not faults.
+// Opening principles and endgame technique tips, for moves that are not faults.
 bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out);
 
 // Demonstration beats for the first 'plies' plies of c.r (stops before a promotion of the human's

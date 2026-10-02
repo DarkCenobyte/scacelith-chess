@@ -503,8 +503,8 @@ Review Reviewer::review(const ReviewInput& in) {
         }
     }
     if (!c.l1 || c.l1->pv.empty() || !c.lp) {
-        // No judgement without the engine (research-pedagogy §1.6.8): the announcements and the
-        // threat warnings are rules-based and run anyway.
+        // No judgement without the engine: the announcements and the threat warnings are
+        // rules-based and run anyway.
         if (retry) out.takeback.fixed = false;
         return out;
     }
@@ -620,9 +620,9 @@ Review Reviewer::review(const ReviewInput& in) {
     if (voice) {
         v.voiced = true;
         if (isRemark) noteRemark();
-        // Offer policy (research-pedagogy §1.4, §1.6, §2.9, §2.10): every voiced blunder, and the
-        // cases the detector flags per level (a mate within the band's limit, stalemate when
-        // winning, a free piece of 3+ points missed at levels 1-2).
+        // Offer policy: every voiced blunder, and the cases the detector flags per level (a mate
+        // within the band's limit, stalemate when winning, a free piece of 3+ points missed at
+        // levels 1-2).
         bool offer = cls == MoveClass::Blunder || ex.offer;
         if (bd.offerCap >= 0 && offers_ >= bd.offerCap && !(ex.type == ExType::MateAllowed || ex.type == ExType::MateMissed))
             offer = false;
@@ -740,7 +740,7 @@ Review Reviewer::review(const ReviewInput& in) {
         v.voiced = true;
         if (v.exType == ExType::None) v.exType = tipEx.type;
     } else if (topMove && !(retry && !s.empty())) {
-        // ---- Praise (research-pedagogy §1.5): top moves only ----
+        // ---- Praise: top moves only ----
         const int legal = int(c.p0.legalMoves().size());
         const double w1 = c.j.wBest, w2 = c.l2 ? winPercent(c.l2->score) : w1;
         const bool decided = w1 >= 90.0 && !(c.p1.isCheckmate() || (c.l1->score.mate > 0 && c.isBest));

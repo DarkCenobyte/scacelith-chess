@@ -100,8 +100,6 @@ event.end.draw.3 = Справедливий результат. Гарна гр�
 event.end.resigned = Партію здано. Але боротьба все одно була гарна.
 event.end.resigned.2 = Гаразд. Дякую за партію.
 event.end.handshake = Потиснімо руки.
-event.end.handshake.2 = Дякую за гру.
-event.end.handshake.3 = Гарна партія. Дякую.
 
 # ---- The rules lesson -----------------------------------------------------------------------------------------
 # {chapter} = the chapter's title (lesson.title.* in lesson.lang), a nominative in lower case: it

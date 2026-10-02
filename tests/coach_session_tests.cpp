@@ -225,6 +225,23 @@ TEST(coach_session_blunder_offer_accepted_and_retried) {
     CHECK(t.reply("g8f8"));
     CHECK(t.until([&] { return t.analyst.count("A0", t.game.position().fen()) == 1; }, 5.0f));
     CHECK(t.session.canTakeBack(t.game));
+
+    // The retry taken back from the pause menu: a plain takeback, the offered move is gone (no
+    // second hint, and the next move is not judged against it).
+    auto count = [&](const std::string& prefix) {
+        int n = 0;
+        for (const Line& l : t.lines) n += l.key.rfind(prefix, 0) == 0 ? 1 : 0;
+        return n;
+    };
+    CHECK_EQ(count("tb.hint"), 1);
+    t.session.onTakeBackRequested(t.game);
+    CHECK(t.until([&] { return t.game.moves().empty() && t.session.playerMayMove(t.game); }, 10.0f));
+    CHECK(t.quiet());
+    CHECK_EQ(count("event.takeback.taken"), 2);
+    CHECK_EQ(count("tb.hint"), 1);
+    t.move("g1f1");
+    CHECK(t.until([&] { return t.session.coachMayMove() && t.session.director().idle(); }, 60.0f));
+    CHECK_EQ(count("tb."), 2);   // the hint and the first retry's "fixed"
     checkRenders(t.lines);
 }
 
@@ -582,7 +599,8 @@ TEST(coach_session_accuracy_explained_when_said) {
 
 // No takeback is offered for a finished game: stalemate while winning by the human's own move is
 // explained, then the closing words and the handshake follow; an offer open or still queued when a
-// draw is agreed closes without a word; and an answer that comes after the end takes nothing back.
+// draw is agreed closes without a word; and an answer that comes after the end takes nothing back
+// and says nothing.
 TEST(coach_session_no_offer_once_the_game_is_over) {
     Table t;
     const char* fen = "7k/5K2/8/6Q1/8/8/8/8 w - - 0 1";
@@ -641,17 +659,22 @@ TEST(coach_session_no_offer_once_the_game_is_over) {
     CHECK(v.stage.all("takeBack").empty());
     CHECK(!v.queued("event.takeback.declined") && !v.queued("event.play_on"));
 
-    Table w;
-    hangTable(w);
-    w.start(levelConfig(1));
-    CHECK(w.quiet());
-    w.move("c3d5");
-    CHECK(w.until([&] { return w.session.offerOpen(); }, 60.0f));
-    w.game.agreeDraw();
-    w.session.onOfferAnswer(w.game, true);
-    CHECK(!w.session.offerOpen());
-    CHECK(w.stage.all("takeBack").empty());
-    CHECK(!w.queued("event.takeback.taken"));
+    for (bool accept : {true, false}) {
+        Table w;
+        hangTable(w);
+        w.start(levelConfig(1));
+        CHECK(w.quiet());
+        w.move("c3d5");
+        CHECK(w.until([&] { return w.session.offerOpen(); }, 60.0f));
+        w.game.agreeDraw();
+        w.session.onOfferAnswer(w.game, accept);
+        CHECK(!w.session.offerOpen());
+        CHECK(w.stage.all("takeBack").empty());
+        CHECK(w.quiet());
+        CHECK(!w.queued("event.takeback.taken"));
+        CHECK(!w.queued("event.takeback.declined") && !w.queued("event.play_on"));   // no "we play on" either
+        CHECK(!w.queued("event.encourage.mistake"));
+    }
 }
 
 // The human's mate before the turn's A0 is in: the review of that move uses the A0 stopped when

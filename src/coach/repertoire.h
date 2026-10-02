@@ -1,5 +1,5 @@
 // The coach's teaching repertoire: its own opening moves in Coach mode, taken from the opening book so that what
-// it plays is worth naming and teaching (research-openings.md §2.4).
+// it plays is worth naming and teaching.
 #pragma once
 #include "coach/openings.h"
 

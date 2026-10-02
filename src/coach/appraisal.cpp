@@ -1,5 +1,5 @@
-// The coach's end-of-game appraisal (see appraisal.h): lichess game accuracy, the statistics of
-// research-pedagogy §5.2 and the appraisal script of §5.3-5.5.
+// The coach's end-of-game appraisal (see appraisal.h): lichess game accuracy, the statistics and
+// the appraisal script.
 #include "coach/appraisal.h"
 
 #include "coach/review_internal.h"
@@ -321,7 +321,7 @@ AppraisalStats Appraisal::stats(const Game& g) const {
     const int unjudged = st.human.unjudged;
     st.numbers = st.humanMoves >= 10 && double(unjudged) <= 0.2 * double(st.humanMoves) && st.human.accuracy >= 0.0;
 
-    // The human's moves: specials, streak, critical moment, turning point, theme.
+    // The human's moves: streak, critical moment, turning point, theme.
     int streak = 0;
     double critDelta = 10.0;
     double prevPlayed = -1.0;
@@ -329,9 +329,6 @@ AppraisalStats Appraisal::stats(const Game& g) const {
     std::vector<ExType> faultOrder;
     for (const PlyVerdict& v : vs) {
         if (!v.human) continue;
-        if (v.only) ++st.onlyMoves;
-        if (v.brilliant) ++st.brilliant;
-        if (v.great) ++st.great;
         if (v.cls == MoveClass::Best || v.cls == MoveClass::Excellent) {
             ++streak;
             if (streak > st.bestStreak) st.bestStreak = streak;
@@ -505,7 +502,7 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
         b.line.with("eval", Arg::ofEval(cp, 0));
         parts.push_back({b, 3});
     }
-    // The opening (levels 3+, W10).
+    // The opening (levels 3+).
     if (!ctx.opening.empty() && L >= 3) {
         Beat b = say(bandKey("appraisal.opening", L), Look::Player);
         b.line.with("opening", Arg::ofOpening(ctx.opening));

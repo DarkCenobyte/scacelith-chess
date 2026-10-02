@@ -98,8 +98,6 @@ event.end.draw.3 = 妥当な結果ですね。楽しい対局でした。
 event.end.resigned = 投了ですね。それでも、よく戦いました。
 event.end.resigned.2 = わかりました。対局ありがとうございました。
 event.end.handshake = 握手しましょう。
-event.end.handshake.2 = ありがとうございました。
-event.end.handshake.3 = いい勝負でした。ありがとうございます。
 
 # ---- The rules lesson -----------------------------------------------------------------------------------------
 # {chapter} = the chapter's title (lesson.title.* in lesson.lang), a noun phrase.
