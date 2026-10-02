@@ -619,7 +619,7 @@ void OnlineSession::update(float dt) {
     }
 }
 
-void OnlineSession::handleServer(const net::Event& e) {
+void OnlineSession::handleServer(net::Event& e) {
     if (isGameEvent(e.kind)) {
         if (e.kind == Kind::RatingUpdate && !e.game.category.empty()) {
             // The account page shows the new rating at once.
@@ -640,7 +640,7 @@ void OnlineSession::handleServer(const net::Event& e) {
     // keeps it for the game page), each as the game it was asked for. (The info of the server being
     // tested in Options names that server.)
     if (answers_.foreign(e) && !(e.kind == Kind::ServerInfoResult && testing_)) {
-        if (e.kind == Kind::GifResult) gif_.finish(e);
+        if (e.kind == Kind::GifResult) gif_.finish(std::move(e));
         else if (!answers_.keep(e)) LOGI("online: an answer of %s dropped (another server since)", e.origin.c_str());
         return;
     }
@@ -726,11 +726,11 @@ void OnlineSession::handleServer(const net::Event& e) {
         break;
     }
     case Kind::GifResult: {
-        // The GifSaver writes the file (not kept with the other answers: up to 16 MiB); a refused
-        // token signs out like any account API answer.
+        // The GifSaver writes the file (not kept with the other answers: up to 16 MiB, moved to
+        // its write thread); a refused token signs out like any account API answer.
         const bool wasSignedIn = signedIn_;
         data_.apply(e, account_, signedIn_);
-        gif_.finish(e);
+        gif_.finish(std::move(e));
         if (wasSignedIn && !signedIn_) LOGI("online: session refused, signed out");
         break;
     }

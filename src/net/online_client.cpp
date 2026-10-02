@@ -431,8 +431,10 @@ struct OnlineClient::Impl {
         try {
             cmd.fn();
         } catch (const std::bad_alloc&) {
-            // A large answer (an account export is up to 64 MiB, a GIF 16 MiB) with too little
-            // memory free: that call fails, the game goes on.
+            // Too little memory free. The calls with large answers (a PGN is up to 4 MiB, an
+            // account export 64 MiB, a GIF 16 MiB) catch it themselves and answer with a failure,
+            // so that what waits for them ends; any other call ends here without its answer.
+            // The game goes on.
             LOGE("net: out of memory in an HTTPS call");
         }
         tCommandOrigin = nullptr;
@@ -1984,6 +1986,16 @@ void finish(Event& ev, const Impl::Api& a, const std::function<bool()>& fill) {
     }
 }
 
+// The answer of a call whose large answer found no memory (std::bad_alloc): a failure, as for an
+// answer that is not what the call expects.
+Event failedAnswer(Event::Kind kind, uint64_t gameId) {
+    Event ev;
+    ev.kind = kind;
+    ev.gameId = gameId;
+    ev.error = "invalid_response";
+    return ev;
+}
+
 }  // namespace
 
 // Ends the realtime connection for good (no reconnection), from any thread: the account deleted,
@@ -2054,14 +2066,21 @@ void OnlineClient::downloadPgn(uint64_t gameId) {
             d->post(ev);
             return;
         }
-        Impl::Call call;
-        call.auth = Impl::Auth::Optional;
-        call.rawCap = kPgnMaxBytes;
-        call.accept = "application/x-chess-pgn";
-        Impl::Api a = d->request(e, "GET", "/games/" + std::to_string(gameId) + "/pgn", nullptr, call, d->httpCancel);
-        finish(ev, a, [&] { return looksLikePgn(a.text); });
-        if (ev.ok) ev.text = std::move(a.text);
-        d->post(std::move(ev));
+        try {
+            Impl::Call call;
+            call.auth = Impl::Auth::Optional;
+            call.rawCap = kPgnMaxBytes;
+            call.accept = "application/x-chess-pgn";
+            Impl::Api a = d->request(e, "GET", "/games/" + std::to_string(gameId) + "/pgn", nullptr, call, d->httpCancel);
+            finish(ev, a, [&] { return looksLikePgn(a.text); });
+            if (ev.ok) ev.text = std::move(a.text);
+            d->post(std::move(ev));
+        } catch (const std::bad_alloc&) {
+            // No memory for the text: a failure all the same, so that the game page waiting for
+            // it (Save, Replay) ends.
+            LOGW("net: out of memory for the PGN of game %llu", (unsigned long long)gameId);
+            d->post(failedAnswer(Event::Kind::PgnResult, gameId));
+        }
     });
 }
 
@@ -2211,36 +2230,43 @@ bool looksLikeGif(const std::string& t) {
     return t.size() >= 6 && (t.compare(0, 6, "GIF89a") == 0 || t.compare(0, 6, "GIF87a") == 0);
 }
 
-// The answer of either GIF route, as GifResult (net-gif thread).
+// The answer of either GIF route, as GifResult (net-gif thread). No memory for the picture: a
+// failure all the same, so that the GIF saver waiting for it ends (another GIF may be asked).
 void gifCall(Impl* d, const ServerEndpoint& e, const std::string& method, const std::string& path, const json::Value* body,
              uint64_t gameId) {
-    Impl::Call call;
-    call.auth = Impl::Auth::Required;   // the renders count per account
-    call.rawCap = OnlineClient::kGifMaxBytes;
-    call.accept = "image/gif";
-    call.timeoutMs = OnlineClient::kGifTimeoutMs;
-    Impl::Api a = d->request(e, method, path, body, call, d->gifCancel);
-    Event ev;
-    ev.kind = Event::Kind::GifResult;
-    ev.gameId = gameId;
-    finish(ev, a, [&] { return looksLikeGif(a.text); });
-    if (ev.ok) ev.text = std::move(a.text);   // up to 16 MiB: moved, never copied
-    // The quota and the busy renderer without the server's JSON (a proxy's page): the same codes.
-    // The 503 busy of the game's read (the database stayed locked) is a busy server too.
-    if (ev.error == "http_429") ev.error = "rate_limited";
-    if (ev.error == "http_503" || ev.error == "busy") ev.error = "server_busy";
-    // A server without the GIF routes (an older one) answers 404 not_found, its router's "No such
-    // endpoint": POST /gif has no other not_found; for GET /games/:id/gif, the game's public
-    // details tell whether the game is there (then the route is not).
-    if (ev.error == "not_found" && a.status == 404) {
-        if (method == "POST") {
-            ev.error = "gif_disabled";
-        } else {
-            Impl::Call probe;
-            if (d->request(e, "GET", "/games/" + std::to_string(gameId), nullptr, probe, d->gifCancel).ok()) ev.error = "gif_disabled";
+    try {
+        Impl::Call call;
+        call.auth = Impl::Auth::Required;   // the renders count per account
+        call.rawCap = OnlineClient::kGifMaxBytes;
+        call.accept = "image/gif";
+        call.timeoutMs = OnlineClient::kGifTimeoutMs;
+        Impl::Api a = d->request(e, method, path, body, call, d->gifCancel);
+        Event ev;
+        ev.kind = Event::Kind::GifResult;
+        ev.gameId = gameId;
+        finish(ev, a, [&] { return looksLikeGif(a.text); });
+        if (ev.ok) ev.text = std::move(a.text);   // up to 16 MiB: moved, never copied
+        // The quota and the busy renderer without the server's JSON (a proxy's page): the same
+        // codes. The 503 busy of the game's read (the database stayed locked) is a busy server too.
+        if (ev.error == "http_429") ev.error = "rate_limited";
+        if (ev.error == "http_503" || ev.error == "busy") ev.error = "server_busy";
+        // A server without the GIF routes (an older one) answers 404 not_found, its router's "No
+        // such endpoint": POST /gif has no other not_found; for GET /games/:id/gif, the game's
+        // public details tell whether the game is there (then the route is not).
+        if (ev.error == "not_found" && a.status == 404) {
+            if (method == "POST") {
+                ev.error = "gif_disabled";
+            } else {
+                Impl::Call probe;
+                if (d->request(e, "GET", "/games/" + std::to_string(gameId), nullptr, probe, d->gifCancel).ok())
+                    ev.error = "gif_disabled";
+            }
         }
+        d->post(std::move(ev));
+    } catch (const std::bad_alloc&) {
+        LOGW("net: out of memory for a GIF (game %llu)", (unsigned long long)gameId);
+        d->post(failedAnswer(Event::Kind::GifResult, gameId));
     }
-    d->post(std::move(ev));
 }
 
 }  // namespace

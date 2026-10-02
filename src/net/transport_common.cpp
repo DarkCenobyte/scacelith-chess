@@ -20,6 +20,11 @@ void CancelToken::reset() {
     abort_ = nullptr;
 }
 
+bool CancelToken::hasAbort() {
+    std::lock_guard<std::mutex> lk(mu_);
+    return bool(abort_);
+}
+
 void CancelToken::setAbort(std::function<void()> fn) {
     bool runNow;
     {

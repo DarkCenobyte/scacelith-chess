@@ -140,8 +140,10 @@ Rules common to these calls:
   while checking, and a document with more than 64 top-level members (the server's has about
   fifteen) is refused there, so a hostile answer can use neither gigabytes of memory nor hours of
   the HTTP thread. The calls give up after 15 s without an answer, the export after 90 s (the
-  server allows itself 60 s to write it). An allocation failure during an HTTPS call fails that call instead of ending
-  the game.
+  server allows itself 60 s to write it). An allocation failure during an HTTPS call fails that
+  call instead of ending the game: a PGN, an export or a GIF that finds too little memory free
+  still answers, `invalid_response`, so that the page or the GIF saver waiting for it ends (and
+  the transport takes back the abort action of its request, `net::AbortGuard`).
 - The GIFs need the session (each render counts against the account's quota: `rate_limited` and
   `server_busy` come with `retryAfterSec`, from the JSON body or else the `Retry-After` header of a
   proxy's page). They run on a thread of their own (`net-gif`), so that a render of up to 45 s on

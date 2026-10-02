@@ -35,13 +35,36 @@ public:
     bool cancelled() const { return cancelled_.load(); }
     void reset();
     // The blocking operation in progress registers how to abort it (closing its handle or
-    // socket); cleared with setAbort(nullptr) when it ends. Runs at once when already cancelled.
+    // socket); cleared with setAbort(nullptr) when it ends (AbortGuard below does both). Runs at
+    // once when already cancelled.
     void setAbort(std::function<void()> fn);
+    bool hasAbort();                          // an abort action is registered (an operation runs)
 
 private:
     std::mutex mu_;
     std::function<void()> abort_;
     std::atomic<bool> cancelled_{false};
+};
+
+// The abort action of one blocking operation, registered on its token for as long as the guard
+// lives (clear() takes it back earlier). Taken back also when an exception leaves the operation
+// (a std::bad_alloc while a large answer grows): the token never keeps an action on the
+// operation's socket or handle once they are gone.
+class AbortGuard {
+public:
+    AbortGuard(CancelToken* token, std::function<void()> fn) : token_(token) {
+        if (token_) token_->setAbort(std::move(fn));
+    }
+    ~AbortGuard() { clear(); }
+    AbortGuard(const AbortGuard&) = delete;
+    AbortGuard& operator=(const AbortGuard&) = delete;
+    void clear() {
+        if (token_) token_->setAbort(nullptr);
+        token_ = nullptr;
+    }
+
+private:
+    CancelToken* token_;
 };
 
 struct HttpRequest {
