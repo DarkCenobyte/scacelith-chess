@@ -272,6 +272,28 @@ TEST(pgn_broken_game_between_good_ones) {
     }
 }
 
+// A variation left open in a game without a result is an error however the game ends (the end of
+// the input, the next game's tags, a broken tag), so the listing, a whole read and a slice agree.
+TEST(pgn_unterminated_variation_at_every_game_end) {
+    const std::string endings[] = {"", "[Event \"Next\"]\n\n1. d4 *\n", "[Event broken\n\n1. d4 *\n"};
+    for (const std::string& next : endings) {
+        const std::string text = "[Event \"Open\"]\n\n1. e4 e5 (1... c5 2. Nf3\n\n" + next;
+        auto sc = pgn::scan(text);
+        auto rd = pgn::read(text);
+        CHECK_EQ(int(sc.games.size()), next.empty() ? 1 : 2);
+        CHECK_EQ(int(rd.games.size()), next.empty() ? 1 : 2);
+        if (sc.games.empty() || rd.games.empty()) continue;
+        CHECK_EQ(rd.games[0].error.text(), std::string("line 3, column 22: unterminated variation"));
+        CHECK_EQ(sc.games[0].error.text(), rd.games[0].error.text());
+        CHECK_EQ(int(rd.games[0].record.plies.size()), 2);
+        const pgn::Summary& s0 = sc.games[0];
+        auto slice = pgn::read(text.substr(s0.offset, s0.length), pgn::Limits(), pgn::Origin{s0.line, s0.column});
+        if (const pgn::ParsedGame* g = only(slice)) CHECK_EQ(g->error.text(), rd.games[0].error.text());
+        // The next game loads, unless its own tag is the broken one.
+        if (rd.games.size() == 2) CHECK_EQ(rd.games[1].ok(), next.find('"') != std::string::npos);
+    }
+}
+
 TEST(pgn_lenient_notation_and_recovery) {
     // 0-0, e8Q, figurines, "e.p.", lowercase pieces, trailing annotations, text evaluations.
     auto res = pgn::read(

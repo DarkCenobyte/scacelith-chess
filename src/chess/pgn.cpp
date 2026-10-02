@@ -504,14 +504,19 @@ private:
             g.end = t.end;
             t = lex_.next();
         };
+        // The game ends before t without a result (end of the input, the next game's tags): the
+        // same check whichever it is, so that reading the game alone (its slice) agrees.
+        auto endBefore = [&]() {
+            if (depth > 0 && !skipping) failAt(last, "unterminated variation");
+            return finish(g, any);
+        };
         for (;;) {
             switch (t.kind) {
             case Tok::End:
                 if (any) beginMoves();  // a game of tags only: its FEN and Variant are checked too
-                if (depth > 0 && !skipping) failAt(last, "unterminated variation");
-                return finish(g, any);
+                return endBefore();
             case Tok::TagPair:
-                if (started) return finish(g, any);  // the next game (this one had no result)
+                if (started) return endBefore();  // the next game (this one had no result)
                 any = true;
                 if (tagCount >= lim_.maxTags) {
                     failAt(t, "too many tags");
@@ -524,7 +529,7 @@ private:
                 }
                 break;
             case Tok::Bad:
-                if (t.tagLike && started) return finish(g, any);  // a broken tag opens the next game
+                if (t.tagLike && started) return endBefore();  // a broken tag opens the next game
                 any = true;
                 if (!skipping) failAt(t, t.text);
                 break;
