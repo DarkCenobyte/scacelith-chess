@@ -606,9 +606,14 @@ void flushUploads() {
 
 const Glyph* glyph(int face, uint32_t cp, int* usedFace) {
     if (face < 0 || face >= FACE_COUNT) face = FACE_TEXT;
+    // The requested face draws nearly every character: try it before building the chain.
+    if (const Glyph* g = lookupOrBuild(face, cp)) {
+        if (usedFace) *usedFace = face;
+        return g;
+    }
     int chain[FACE_COUNT + 4];
     int n = fallbackChain(face, cp, chain);
-    for (int i = 0; i < n; ++i) {
+    for (int i = 1; i < n; ++i) {  // chain[0] is 'face', tried above
         if (const Glyph* g = lookupOrBuild(chain[i], cp)) {
             if (usedFace) *usedFace = chain[i];
             return g;
