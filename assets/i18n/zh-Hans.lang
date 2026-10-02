@@ -1174,3 +1174,8 @@ gif.err.not_found = 服务器上已没有该对局。
 gif.wait.seconds = {0} 秒
 gif.wait.minutes = {0} 分钟
 gif.wait.both = {0} {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; {0} = the log file) ----
+error.opengl = 无法启动 OpenGL 4.6。请更新显卡驱动程序。\n\n详细信息见日志文件：{0}
+error.renderer = 无法启动渲染器。\n\n详细信息见日志文件：{0}
+error.scene = 无法加载场景。\n\n详细信息见日志文件：{0}

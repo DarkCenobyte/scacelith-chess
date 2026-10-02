@@ -1184,3 +1184,8 @@ gif.err.not_found = This game is no longer on the server.
 gif.wait.seconds = {0} second|{0} seconds
 gif.wait.minutes = {0} minute|{0} minutes
 gif.wait.both = {0} and {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; {0} = the log file) ----
+error.opengl = Could not start OpenGL 4.6. Please update your graphics driver.\n\nDetails are in the log file: {0}
+error.renderer = The renderer could not be started.\n\nDetails are in the log file: {0}
+error.scene = The scene could not be loaded.\n\nDetails are in the log file: {0}

@@ -26,6 +26,7 @@
 #include "render/renderer.h"
 #include "render/shader.h"
 #include "game/settings.h"
+#include "i18n/i18n.h"
 #include "net/online_client.h"
 #include "scacelith_version.h"
 
@@ -59,12 +60,22 @@ static std::string timestamp() {
     return buf;
 }
 
+// The one message box of a failure before the game can show anything, in the player's language
+// (Settings::load has set it), naming the log file that holds the details.
+static void startupError(const char* key, const std::string& logPath) {
+    plat::messageBox("Scacelith", i18n::trf(key, {i18n::ltr(logPath)}).c_str());
+}
+
 static int runApp(std::vector<std::string> args) {
     AppContext ctx;
     ctx.args = args;
     std::string exeDir = plat::exeDirectory();
     // The log falls back to the user data dir like the settings when the exe dir is read-only.
-    if (!logx::init((exeDir + "scacelith.log").c_str())) logx::init((plat::userDataDirectory() + "scacelith.log").c_str());
+    std::string logPath = exeDir + "scacelith.log";
+    if (!logx::init(logPath.c_str())) {
+        logPath = plat::userDataDirectory() + "scacelith.log";
+        logx::init(logPath.c_str());
+    }
     LOGI("Scacelith " SCACELITH_VERSION " starting");
 
     if (ctx.hasArg("--list-scenes")) {
@@ -105,11 +116,8 @@ static int runApp(std::vector<std::string> args) {
     wd.vsync = ctx.screenshotMode ? false : settings.vsync;
     wd.debugContext = ctx.hasArg("--debug-gl");
     if (!plat::init(wd)) {
-#ifdef _WIN32
-        LOGE("could not initialise OpenGL 4.6");  // plat::init has shown the reason in a message box
-#else
-        plat::messageBox("Scacelith", "Could not initialise OpenGL 4.6. Please update your graphics driver.");
-#endif
+        LOGE("could not initialise OpenGL 4.6");  // plat::init has logged the reason
+        startupError("error.opengl", logPath);
         return 1;
     }
 
@@ -117,7 +125,8 @@ static int runApp(std::vector<std::string> args) {
     render::setRenderer(&renderer);
     render::RenderSettings rs = settings.renderSettings();
     if (!renderer.init(rs)) {
-        plat::messageBox("Scacelith", "Renderer initialisation failed (see scacelith.log).");
+        LOGE("renderer initialisation failed");
+        startupError("error.renderer", logPath);
         return 1;
     }
     renderer.resize(plat::width(), plat::height());
@@ -130,7 +139,8 @@ static int runApp(std::vector<std::string> args) {
         scene = createScene("testbed");
     }
     if (!scene || !scene->init(ctx)) {
-        plat::messageBox("Scacelith", "Scene initialisation failed (see scacelith.log).");
+        LOGE("scene initialisation failed");
+        startupError("error.scene", logPath);
         return 1;
     }
 

@@ -1175,3 +1175,8 @@ gif.err.not_found = Цієї партії вже немає на сервері.
 gif.wait.seconds = {0} секунду|{0} секунди|{0} секунд
 gif.wait.minutes = {0} хвилину|{0} хвилини|{0} хвилин
 gif.wait.both = {0} і {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; {0} = the log file) ----
+error.opengl = Не вдалося запустити OpenGL 4.6. Оновіть драйвер відеокарти.\n\nПодробиці у файлі журналу: {0}
+error.renderer = Не вдалося запустити рендерер.\n\nПодробиці у файлі журналу: {0}
+error.scene = Не вдалося завантажити сцену.\n\nПодробиці у файлі журналу: {0}

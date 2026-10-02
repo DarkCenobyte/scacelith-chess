@@ -209,6 +209,21 @@ TEST(i18n_coach_texts) {
     i18n::setLanguage("en");
 }
 
+// The three failures before the game starts (src/main.cpp: OpenGL 4.6, the renderer, the scene)
+// are told in the player's language, naming the log file.
+TEST(i18n_startup_errors) {
+    const std::string log = "C:\\Games\\Scacelith\\scacelith.log";
+    for (const i18n::Language& lang : i18n::languages()) {
+        CHECK(i18n::setLanguage(lang.code));
+        for (const char* key : {"error.opengl", "error.renderer", "error.scene"}) {
+            CHECK(i18n::has(key));
+            CHECK(i18n::trf(key, {log}).find(log) != std::string::npos);
+            if (std::string(lang.code) != "en") CHECK(std::string(i18n::tr(key)) != i18n::english(key));
+        }
+    }
+    i18n::setLanguage("en");
+}
+
 TEST(i18n_tr_fallback_and_format) {
     CHECK(i18n::setLanguage("fr"));
     CHECK_EQ(i18n::language(), std::string("fr"));

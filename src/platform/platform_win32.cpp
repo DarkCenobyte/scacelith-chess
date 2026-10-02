@@ -10,7 +10,6 @@
 #include <shellapi.h>
 #include <algorithm>
 #include <cstring>
-#include <cstdio>
 #include <cwchar>
 
 // WGL_ARB_create_context / WGL_ARB_pixel_format / WGL_EXT_swap_control tokens.
@@ -278,9 +277,9 @@ bool init(const WindowDesc& desc) {
     wglDeleteContext(drc);
     ReleaseDC(dummy, ddc);
     DestroyWindow(dummy);
+    // Failures are logged here; main.cpp tells the player, in their language.
     if (!createContextAttribs || !choosePixelFormat) {
-        messageBox("Scacelith", "This graphics driver does not support modern OpenGL contexts.\nOpenGL 4.6 is required.\n"
-                                "Please update your graphics driver.");
+        LOGE("this graphics driver does not support modern OpenGL contexts (WGL_ARB_create_context)");
         return false;
     }
 
@@ -302,7 +301,7 @@ bool init(const WindowDesc& desc) {
     int format = 0;
     UINT count = 0;
     if (!choosePixelFormat(g_hdc, pfAttribs, nullptr, 1, &format, &count) || count == 0) {
-        messageBox("Scacelith", "No suitable pixel format.\nPlease update your graphics driver.");
+        LOGE("no suitable pixel format");
         return false;
     }
     DescribePixelFormat(g_hdc, format, sizeof(pfd), &pfd);
@@ -313,17 +312,14 @@ bool init(const WindowDesc& desc) {
                               WGL_CONTEXT_FLAGS_ARB, desc.debugContext ? WGL_CONTEXT_DEBUG_BIT_ARB : 0, 0};
     g_glrc = createContextAttribs(g_hdc, nullptr, ctxAttribs);
     if (!g_glrc) {
-        messageBox("Scacelith", "Could not create an OpenGL 4.6 core context.\nPlease update your graphics driver.");
+        LOGE("could not create an OpenGL 4.6 core context");
         return false;
     }
     wglMakeCurrent(g_hdc, g_glrc);
     const char* missing = nullptr;
     int nMissing = gl46::load(getProc, &missing);
     if (nMissing) {
-        char buf[256];
-        std::snprintf(buf, sizeof(buf), "The OpenGL driver is missing %d required 4.6 functions (first: %s).\n"
-                      "Please update your graphics driver.", nMissing, missing);
-        messageBox("Scacelith", buf);
+        LOGE("the OpenGL driver is missing %d required 4.6 functions (first: %s)", nMissing, missing);
         return false;
     }
     gl46::afterContextCreated(desc.debugContext);

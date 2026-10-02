@@ -1175,3 +1175,8 @@ gif.err.not_found = この対局はサーバー上にもうありません。
 gif.wait.seconds = {0}秒
 gif.wait.minutes = {0}分
 gif.wait.both = {0}{1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; {0} = the log file) ----
+error.opengl = OpenGL 4.6 を起動できませんでした。グラフィックドライバーを更新してください。\n\n詳細はログファイルに記録されています：{0}
+error.renderer = レンダラーを起動できませんでした。\n\n詳細はログファイルに記録されています：{0}
+error.scene = シーンを読み込めませんでした。\n\n詳細はログファイルに記録されています：{0}

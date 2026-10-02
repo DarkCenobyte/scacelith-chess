@@ -19,7 +19,9 @@ struct WindowDesc {
     bool hidden = false;             // create without showing (tests)
 };
 
-bool init(const WindowDesc& desc);   // creates window + GL 4.6 core context and loads GL
+// Creates the window and a GL 4.6 core context, and loads GL. False on failure, with the reason in
+// the log only: the caller tells the player (main.cpp).
+bool init(const WindowDesc& desc);
 void shutdown();
 
 // Processes pending OS events and refreshes the input state. Returns false once the user asked
