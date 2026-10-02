@@ -647,6 +647,7 @@ online.challenge.you_random = Farben ausgelost
 online.challenge.declined = {0} hat Ihre Herausforderung abgelehnt.
 online.challenge.expired = Ihre Herausforderung ist ohne Antwort abgelaufen.
 online.challenge.unavailable = {0} ist gerade nicht verfügbar.
+online.challenge.lost = Verbindung verloren: Ihre Herausforderung wurde abgebrochen.
 
 # At the table
 online.pause.clock_runs = Die Partie läuft weiter: Ihre Uhr läuft.

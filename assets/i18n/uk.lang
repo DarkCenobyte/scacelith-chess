@@ -648,6 +648,7 @@ online.challenge.you_random = колір жеребом
 online.challenge.declined = {0} відхиляє ваш виклик.
 online.challenge.expired = Ваш виклик минув без відповіді.
 online.challenge.unavailable = Гравець {0} зараз недоступний.
+online.challenge.lost = З’єднання втрачено: ваш виклик скасовано.
 
 # At the table
 online.pause.clock_runs = Партія триває: ваш годинник іде.

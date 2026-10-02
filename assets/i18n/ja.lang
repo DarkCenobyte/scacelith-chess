@@ -648,6 +648,7 @@ online.challenge.you_random = 先後は抽選
 online.challenge.declined = {0}が申し込みを断りました。
 online.challenge.expired = 返事がないまま申し込みの期限が切れました。
 online.challenge.unavailable = {0}は現在対局できません。
+online.challenge.lost = 接続が切れたため、申し込みは取り消されました。
 
 # At the table
 online.pause.clock_runs = 対局は続いています。あなたの時計は動いたままです。

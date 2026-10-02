@@ -842,7 +842,7 @@ void OnlineSession::handleServer(net::Event& e) {
                 quietNotFound_ = true;
             }
             outgoing_ = Outgoing();
-            ui::notify(i18n::tr("online.err.challenge_not_found"), 4.0f);
+            ui::notify(i18n::tr("online.challenge.lost"), 4.0f);
         }
         incoming_.clear();
         break;

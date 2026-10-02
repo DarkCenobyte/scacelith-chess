@@ -652,6 +652,7 @@ online.challenge.you_random = الألوان بالقرعة
 online.challenge.declined = رفض {0} تحدّيك.
 online.challenge.expired = انتهت مهلة تحدّيك دون رد.
 online.challenge.unavailable = {0} غير متاح الآن.
+online.challenge.lost = انقطع الاتصال: أُلغي تحدّيك.
 
 # At the table
 online.pause.clock_runs = المباراة مستمرة: ساعتك ما زالت تعمل.
