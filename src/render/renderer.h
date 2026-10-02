@@ -129,11 +129,11 @@ struct PointLight {
 };
 
 // Planar reflector (floor, table top, board): renders the mirrored scene into a layer of the
-// planar reflection texture array (TEXUNIT_PLANAR). Materials pick a layer via planarReflector.
+// planar reflection texture array (TEXUNIT_PLANAR, half the render resolution for every
+// reflector). Materials pick a layer via planarReflector.
 struct PlanarReflector {
     m::vec3 point{0, 0, 0};
     m::vec3 normal{0, 1, 0};
-    float resolutionScale = 0.5f;
     bool enabled = true;
     // Optional world bounds of the reflecting surface. When valid, the reflection is skipped
     // when off screen and rendered only inside the reflector's screen rectangle (scissor).
