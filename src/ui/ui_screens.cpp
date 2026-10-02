@@ -7,7 +7,6 @@
 #include "ui.h"
 #include "ui_draw.h"
 #include "ui_internal.h"
-#include "ui_online.h"
 #include "ui_screens_game.h"
 #include "ui_screens_online.h"
 #include "ui_theme.h"

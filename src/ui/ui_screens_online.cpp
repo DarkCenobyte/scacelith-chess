@@ -22,7 +22,6 @@
 // game starts by itself when the session announces one (the scene watches gameReady()).
 #include "ui.h"
 #include "ui_draw.h"
-#include "ui_internal.h"
 #include "ui_online.h"
 #include "ui_online_pages.h"
 #include "ui_screens_game.h"
