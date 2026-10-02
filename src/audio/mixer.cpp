@@ -312,11 +312,12 @@ void Mixer::renderVoice(Voice& v, int n, float bg) {
     const int len = v.length;
     const bool windowed = v.winEnd > 0.0;
     for (int i = 0; i < n; ++i) {
-        int ip = int(v.pos);
-        if (ip >= len || (windowed && v.pos >= v.winEnd)) {
+        // Tested on the double: a huge pitch would overflow the int conversion.
+        if (v.pos >= double(len) || (windowed && v.pos >= v.winEnd)) {
             releaseVoice(v);
             return;
         }
+        int ip = int(v.pos);
         float f = float(v.pos - double(ip));
         float s;
         if (ip >= 1 && ip + 2 < len) {

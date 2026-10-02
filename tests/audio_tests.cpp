@@ -515,6 +515,35 @@ TEST(audio_windowed_play) {
     }
 }
 
+// A huge pitch (only finiteness is checked) moves the read position past INT_MAX after one sample:
+// the voice must end there instead of reading silence until it is stolen.
+TEST(audio_huge_pitch_voice_ends) {
+    using namespace audio;
+    Mixer m(7u);
+    m.prepare(kFs);
+    m.setAmbienceEnabled(false, true);
+    for (int v = 0; v < kVariants; ++v) {
+        SoundBuffer* b = new SoundBuffer();
+        b->samples = synthesize(Sfx::PiecePlace, 500u + uint32_t(v));
+        b->sfx = int(Sfx::PiecePlace);
+        b->variant = v;
+        m.install(b);
+    }
+    for (float pitch : {3e9f, 1e12f, 1e30f}) {
+        PlayRequest r;
+        r.sfx = Sfx::PiecePlace;
+        r.pos = m::vec3(0.0f, 0.78f, 0.0f);
+        r.pitch = pitch;
+        CHECK(m.play(r));
+        std::vector<float> out(size_t(0.1f * kFs) * 2);
+        m.process(out.data(), int(out.size() / 2));
+        CHECK_EQ(m.activeVoices(), 0);
+        bool finite = true;
+        for (float x : out) finite = finite && std::isfinite(x);
+        CHECK(finite);
+    }
+}
+
 TEST(audio_ambience_toggle_fades) {
     using namespace audio;
     Mixer m(7u);
