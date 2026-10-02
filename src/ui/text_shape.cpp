@@ -8,10 +8,15 @@ namespace text {
 namespace {
 
 // Characters that take part in the logic but are never drawn (joiners, direction marks, line
-// breaks, soft hyphen, BOM, explicit bidi controls).
+// breaks, soft hyphen, BOM, explicit bidi controls, and the other default ignorable code points:
+// variation selectors, tags, fillers, format controls). No face has a glyph for them: drawn,
+// they would show as '?' (an emoji picked with its variation selector: "♟?").
 bool invisible(char32_t c) {
     return c == '\n' || c == '\r' || c == 0xAD || (c >= 0x200B && c <= 0x200F) || (c >= 0x202A && c <= 0x202E) ||
-           (c >= 0x2060 && c <= 0x206F) || c == 0xFEFF || c < 0x20;
+           (c >= 0x2060 && c <= 0x206F) || c == 0xFEFF || c < 0x20 || c == 0x34F || c == 0x61C || c == 0x115F ||
+           c == 0x1160 || c == 0x17B4 || c == 0x17B5 || (c >= 0x180B && c <= 0x180F) || c == 0x2028 || c == 0x2029 ||
+           c == 0x3164 || (c >= 0xFE00 && c <= 0xFE0F) || c == 0xFFA0 || (c >= 0x1BCA0 && c <= 0x1BCA3) ||
+           (c >= 0x1D173 && c <= 0x1D17A) || (c >= 0xE0000 && c <= 0xE0FFF);
 }
 
 bool arabicLetter(char32_t c) { return uni::isArabic(c) && !uni::isMark(c); }
