@@ -72,9 +72,10 @@ constexpr float CAPTURE_Z_LATE = 0.280f;     // |z| beyond which slots come last
 constexpr float CAPTURE_Z_MAX = 0.300f;      // |z| limit of the slot centres
 constexpr int CAPTURE_ROWS = 8;              // the last one 30 mm from the table's moulded edge
 constexpr int CAPTURE_MAX_SLOTS = CAPTURE_ROWS * 5;
-// The playing hand rests on the table beside the board, in front of its player (GameScene sets its
-// rest spot at |x| 0.24, |z| 0.34): palm and fingers cover about this area, and no slot comes
-// within a queen's footprint and a finger's thickness of it.
+// The playing hand rests on the table beside the board, in front of its player (its rest spot, the
+// hand's target, at |x| REST_HAND_X, |z| REST_HAND_Z): palm and fingers cover about this area, and
+// no slot comes within a queen's footprint and a finger's thickness of it.
+constexpr float REST_HAND_X = 0.24f, REST_HAND_Z = 0.34f;
 constexpr float REST_HAND_MIN_X = 0.26f, REST_HAND_MAX_X = 0.36f, REST_HAND_MIN_Z = 0.20f;
 constexpr float REST_HAND_CLEARANCE = 0.026f;
 

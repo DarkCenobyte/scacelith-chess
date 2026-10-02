@@ -306,7 +306,7 @@ void GameScene::initAnimators() {
         // The playing hand rests on the table beside the board, on the clock side (White's right
         // is +X, Black's is -X).
         float side = anim_[seat].playHand() == character::Side::Right ? zs : -zs;
-        anim_[seat].setRestHand(vec3(side * 0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
+        anim_[seat].setRestHand(vec3(side * layout::REST_HAND_X, layout::TABLE_TOP_Y, zs * layout::REST_HAND_Z));
         anim_[seat].pieceTransform = [this](int id) {
             const PieceObject* p = board_.byId(id);
             return p ? p->transform : mat4();
