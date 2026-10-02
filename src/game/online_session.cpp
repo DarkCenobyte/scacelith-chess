@@ -647,10 +647,18 @@ void OnlineSession::update(float dt) {
 
 void OnlineSession::handleServer(net::Event& e) {
     if (isGameEvent(e.kind)) {
-        if (e.kind == Kind::RatingUpdate && !e.game.category.empty()) {
+        if (e.kind == Kind::RatingUpdate && e.gameId != e.game.id) {
+            // The update of an earlier game (it follows the game's commit: a rematch may have
+            // started meanwhile). e.game is the game shown now, not our side in that one.
+            if (signedIn_) {
+                api_->fetchAccount();
+                expect(Kind::AccountResult);
+            }
+        } else if (e.kind == Kind::RatingUpdate) {
             // The account page shows the new rating at once.
+            const std::string& category = e.queueCategory.empty() ? e.game.category : e.queueCategory;
             for (net::RatingInfo& r : account_.ratings) {
-                if (r.category != e.game.category) continue;
+                if (category.empty() || r.category != category) continue;
                 const net::Event::Rating& mine = e.game.you == 1 ? e.ratingBlack : e.ratingWhite;
                 r.rating = mine.after;
                 r.games = mine.games;
@@ -884,7 +892,7 @@ void OnlineSession::handleDirect(const net::Event& e) {
 }
 
 void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
-    uint64_t id = e.game.id ? e.game.id : e.gameId;
+    uint64_t id = e.gameId ? e.gameId : e.game.id;  // the message's game (e.game: the one shown now)
     if (e.kind == Kind::GameSnapshot && id != gameId_ && e.game.status == 0) {
         // A new game: matchmaking, a challenge, a rematch, a direct match.
         gameId_ = id;
