@@ -78,7 +78,6 @@ sdf::MeshOptions handOptions(vec3 tangentAxis) {
     o.maxAngleDeg = 25.0f;
     o.nu = 24;
     o.nv = 18;
-    o.capInset = 0.8f;
     o.tangentAxis = tangentAxis;
     return o;
 }
@@ -105,7 +104,6 @@ MeshData meshBase(vec3 hinge, float r, float halfLen, bool ball) {
     o.minEdge = 0.0005f;
     o.nu = 16;
     o.nv = 8;
-    o.capInset = 0.0f;
     o.name = "base";
     if (ball) return sdf::meshSegment([r](const vec3& p) { return sdf::sphere(p, r); }, vec3(0), vec3(0), o, hinge);
     // Hinge barrel: a cylinder with 1.2 mm filleted ends, built analytically as a lathe (exact
@@ -324,7 +322,6 @@ void buildHand(Sink& s) {
         oj.nv = 10;
         oj.maxDeviation = 0.00015f;
         oj.maxAngleDeg = 30.0f;
-        oj.capInset = 0.0f;
         s.addJoint("wrist", HandR, [oj] { return sdf::meshSegment([](const vec3& p) { return sdf::sphere(p, 0.0148f); }, vec3(0), vec3(0), oj); }, false);
     }
     s.mirrorFrom(first);

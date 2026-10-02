@@ -2,7 +2,12 @@
 //
 // Shapes are written as signed distance functions (or smooth implicit functions whose zero set is
 // the surface: exact distances are not required, only a sane gradient near the surface). The
-// mesher shrink-wraps a capsule grid onto the zero set, then refines it where curvature needs it:
+// porcelain shells go through the volume mesher (Surface Nets + quadric decimation, meshVolume):
+//
+//   MeshData m = sdf::meshVolume(f, seeds, opts);   // f < 0 inside, seeds = points inside the shape
+//
+// Simple convex shapes (the hand's ball joints) use the shrink-wrap mesher instead: a capsule grid
+// projected onto the zero set, then refined where curvature needs it:
 //
 //   MeshData m = sdf::meshSegment(f, a, b, opts);   // f < 0 inside, a..b a segment inside the shape
 //
@@ -74,10 +79,6 @@ struct MeshOptions {
     int maxIterations = 10;
     int nu = 48, nv = 48;         // base grid (around, along)
     m::vec3 tangentAxis{0, 1, 0}; // tangents follow this direction projected on the surface
-    // End caps: 0 = rays fan out from the segment end (convex, rounded ends). > 0 = "flat" caps:
-    // rays start on a disc of capInset x the local cross-section radius and run parallel to the
-    // axis, so concave ends (sockets wrapping a joint head) are meshed as height fields.
-    float capInset = 0.0f;
     const char* name = "";        // for diagnostics
     float gradientStep = 4e-5f;
 };
