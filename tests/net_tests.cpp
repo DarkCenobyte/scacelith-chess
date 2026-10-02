@@ -1277,6 +1277,7 @@ class FakeServer {
 public:
     uint16_t port = 0;
     const std::string token = "sct_" + std::string(43, 'T');
+    const std::string token2 = "sct_" + std::string(43, 'U');
     const std::string powChallenge = "fake-challenge-0123456789abcdef";
     static constexpr double kSkewMs = 5000;         // the server clock runs 5 s ahead
     std::atomic<int> loginAttempts{0}, powAccepted{0}, hellos{0}, pings{0}, moves{0}, logouts{0};
@@ -1292,6 +1293,7 @@ public:
     std::atomic<uint16_t> gestureRate{0}, gestureBurst{0};   // Welcome.gestureRate / gestureBurst
     std::atomic<bool> autoPress{true};                        // GameSnapshot.autoPress
     std::atomic<bool> seqOk{true};                            // every client message came numbered in order
+    std::atomic<bool> loginToken2{false};                     // sign-ins answer token2 (another session)
 
     // The C_Gesture frames received, with their arrival time.
     struct GestureIn {
@@ -1371,6 +1373,16 @@ public:
             pr::Notice n;
             n.code = pr::NoticeCode::ServerShutdown;
             n.arg = 3000;
+            sendMsg(s, n);
+        }
+    }
+
+    // Notice{SessionRevoked} on every WebSocket (the session of that connection was revoked).
+    void noticeRevoked() {
+        std::lock_guard<std::mutex> lk(mu_);
+        for (Sock s : ws_) {
+            pr::Notice n;
+            n.code = pr::NoticeCode::SessionRevoked;
             sendMsg(s, n);
         }
     }
@@ -1520,7 +1532,7 @@ private:
             } else if (body["pow"]["challenge"].asString() == powChallenge &&
                        net::crypto::powCheck(powChallenge, body["pow"]["nonce"].asString(), 10)) {
                 ++powAccepted;
-                respond(s, 200, "{\"token\":\"" + token + "\",\"expiresAt\":1,\"user\":{\"id\":7,\"username\":\"alice\","
+                respond(s, 200, "{\"token\":\"" + (loginToken2.load() ? token2 : token) + "\",\"expiresAt\":1,\"user\":{\"id\":7,\"username\":\"alice\","
                                     "\"email\":\"a@example.org\",\"emailVerified\":true,\"mfaEnabled\":false,\"googleLinked\":false}}");
             } else {
                 respond(s, 428, "{\"error\":\"pow_required\",\"pow\":{\"challenge\":\"x\",\"bits\":40}}");
@@ -2627,6 +2639,30 @@ TEST(net_online_client_bad_frames_logged_once) {
     }
     CHECK_EQ(perFrame, 5);
     CHECK_EQ(summaries, 1);
+}
+
+// The session a connection sent is the one erased when the server revokes it (Notice) or refuses
+// it (close 4003): one saved since, by a sign-in on net-http, stays.
+TEST(net_online_client_refusal_keeps_a_newer_session) {
+    if (!net::transportAvailable()) return;
+    for (bool refused : {false, true}) {
+        PacingRig r;
+        bool started = r.start(refused ? "refused-newer" : "revoked-newer");
+        CHECK(started);
+        if (!started) continue;
+        r.srv.loginToken2.store(true);
+        r.c->login("alice", "pw");
+        net::Event ev;
+        CHECK(waitEvent(*r.c, net::Event::Kind::LoginResult, ev, 20000) && ev.ok);
+        if (refused) {
+            r.srv.kick(pr::CloseCode::Unauthorized);
+            CHECK(r.stateIs(net::ConnState::Unauthorized, 5000));
+        } else {
+            r.srv.noticeRevoked();
+            CHECK(waitEvent(*r.c, net::Event::Kind::Notice, ev, 5000));
+        }
+        CHECK(r.c->hasSavedSession());
+    }
 }
 
 // =============================================================================================

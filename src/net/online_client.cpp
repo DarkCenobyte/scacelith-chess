@@ -365,6 +365,7 @@ struct OnlineClient::Impl {
         bool shutdownNotice = false;                      // Notice{ServerShutdown} on this connection
         bool restarting = false;                          // lost to a shutdown, no Welcome or 503 since
         int badFrames = 0;                                // ignored or malformed on this connection
+        std::string helloToken;                           // the session this connection's Hello sent
         // The /api/v1/info answer the last connection attempt used. proven: a connection built on
         // it reached Welcome; at: when it was read, or when such a connection last ended.
         struct Info {
@@ -896,6 +897,7 @@ struct OnlineClient::Impl {
         if (rt.badFrames > kLoggedBadFrames)
             LOGW("net: %d more frames from the server ignored or malformed", rt.badFrames - kLoggedBadFrames);
         rt.badFrames = 0;
+        rt.helloToken.clear();
         rt.welcomed = false;
         rt.samples.clear();
         rt.rttEma = -1;
@@ -1041,6 +1043,7 @@ struct OnlineClient::Impl {
         h.schema = pr::kSchemaHash;
         h.client = clientString();
         h.token = c.token;
+        rt.helloToken = c.token;
         send(h);
     }
 
@@ -1199,7 +1202,8 @@ struct OnlineClient::Impl {
             if (!pr::decode(p, n, m)) return bad();
             if (m.code == pr::NoticeCode::Banned) rt.banUntil = m.arg;
             if (m.code == pr::NoticeCode::ServerShutdown) rt.shutdownNotice = true;
-            if (m.code == pr::NoticeCode::SessionRevoked) creds.clearToken(rt.ep.origin());
+            // That session only (like onClosed): net-http may have saved another one since the Hello.
+            if (m.code == pr::NoticeCode::SessionRevoked) creds.clearToken(rt.ep.origin(), rt.helloToken);
             if (m.code == pr::NoticeCode::ReplacedByNewConnection) rt.lastFatal = int(pr::ErrorCode::Replaced);
             Event ev;
             ev.kind = Event::Kind::Notice;
@@ -1406,13 +1410,15 @@ struct OnlineClient::Impl {
     void onClosed(uint16_t code, const std::string& reason) {
         LOGI("net: realtime connection closed (%u %s)", code, reason.c_str());
         const bool wasOnline = rt.welcomed;
+        const std::string token = rt.helloToken;   // dropSocket forgets it
         dropSocket(1000);
         if (wasOnline && rt.info.proven) rt.info.at = Clock::now();   // the /info answer worked until now
         int fatal = rt.lastFatal;
         if (code == pr::CloseCode::UnsupportedProtocol || fatal == int(pr::ErrorCode::UnsupportedProtocol)) {
             stopWanting(ConnState::Incompatible, "incompatible");
         } else if (code == pr::CloseCode::Unauthorized || fatal == int(pr::ErrorCode::Unauthorized)) {
-            creds.clearToken(rt.ep.origin());
+            // The token this connection sent: a sign-in on net-http may have saved another one since.
+            creds.clearToken(rt.ep.origin(), token);
             stopWanting(ConnState::Unauthorized, "unauthorized");
         } else if (fatal == int(pr::ErrorCode::EmailUnverified)) {
             stopWanting(ConnState::Unauthorized, "email_unverified");
