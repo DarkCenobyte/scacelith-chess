@@ -124,8 +124,10 @@ public:
     bool failed() const { return failed_.load(); }   // load failed: speech is unavailable
 
     // Queues a text; returns its id, or 0 when the worker is stopped or failed. 'seed' 0 derives
-    // the noise seed from the text (Options::seed).
-    uint32_t request(const std::string& text, const std::string& lang, int priority = 0, uint32_t seed = 0);
+    // the noise seed from the text (Options::seed). 'speed' > 0 is this text's speaking rate in
+    // place of the one given to start() (the rules lesson speaks slower; the models stay loaded).
+    uint32_t request(const std::string& text, const std::string& lang, int priority = 0, uint32_t seed = 0,
+                     float speed = 0.0f);
     // True once the request is finished (also when synthesis failed: take() then gives no samples).
     bool done(uint32_t id) const;
     // Moves the samples out and forgets the request. False if not done or unknown.
@@ -141,6 +143,7 @@ private:
         int priority;
         uint64_t order;
         uint32_t seed;
+        float speed;   // 0 = opts_.speed
         std::string text, lang;
     };
     void run();

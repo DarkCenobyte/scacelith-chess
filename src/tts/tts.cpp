@@ -296,12 +296,12 @@ void Worker::stop() {
     ready_ = false;
 }
 
-uint32_t Worker::request(const std::string& text, const std::string& lang, int priority, uint32_t seed) {
+uint32_t Worker::request(const std::string& text, const std::string& lang, int priority, uint32_t seed, float speed) {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!started_ || quit_ || failed_) return 0;
     uint32_t id = nextId_++;
     if (nextId_ == 0) nextId_ = 1;
-    queue_.push_back(Job{id, priority, order_++, seed, text, lang});
+    queue_.push_back(Job{id, priority, order_++, seed, speed > 0.0f ? speed : 0.0f, text, lang});
     wake_.notify_all();
     return id;
 }
@@ -382,6 +382,7 @@ void Worker::run() {
         lock.unlock();
         Options o = opts_;
         o.seed = job.seed;
+        if (job.speed > 0.0f) o.speed = job.speed;
         std::vector<float> pcm;
         try {
             pcm = synth.synthesize(job.text, job.lang, o, &cancelRunning_);

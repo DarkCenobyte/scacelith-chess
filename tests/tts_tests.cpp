@@ -2121,6 +2121,14 @@ TEST(tts_worker) {
         std::vector<float> got;
         CHECK(w.take(low, got));
         CHECK(got == want);
+        // A speed of the request's own (the rules lesson's), from the worker started at 1.0 without
+        // loading anything again: the direct synthesis at that speed, bit for bit.
+        uint32_t slow = w.request("Low priority.", "en", 0, 2, 0.92f);
+        CHECK(slow && waitFor([&] { return w.done(slow); }, 120.0));
+        direct.speed = 0.92f;
+        std::vector<float> slowWant = s->synthesize("Low priority.", "en", direct), slowGot;
+        CHECK(w.take(slow, slowGot));
+        CHECK(slowGot == slowWant && slowGot.size() > got.size());
     }
     // Cancel everything, including the request in progress, then stop while busy.
     uint32_t busy = w.request(std::string(250, 'x') + ".", "en");

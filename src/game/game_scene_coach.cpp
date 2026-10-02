@@ -96,11 +96,10 @@ struct CoachRuntime {
     bool sessionRunning = false;
     uint64_t seed = 1;
 
-    // The voice: the TTS worker (restarted when the lesson's slower speed is wanted) and the one
-    // utterance playing from the coach's mouth.
+    // The voice: the TTS worker (each line asks for its own speed) and the one utterance playing
+    // from the coach's mouth.
     tts::Worker worker;
     bool workerStarted = false;
-    float workerSpeed = 1.0f;
     std::set<uint32_t> speechIds;                     // requested, not taken nor cancelled
     std::map<uint32_t, std::vector<float>> speechDone;   // finished, not taken yet (empty = failed)
     audio::VoiceId voice;
@@ -188,13 +187,12 @@ public:
         audio::Stats a = audio::stats();
         return a.running && a.deviceOpen;
     }
-    void ensureWorker(float speed) {
+    void ensureWorker() {
         CoachRuntime& r = rt();
         if (!s_.coachVoiceFiles_) return;
-        // A worker that failed to load is tried again (the model files may have arrived since).
-        bool retry = r.workerStarted && r.worker.failed();
-        if (r.workerStarted && !retry && std::fabs(speed - r.workerSpeed) < 0.005f) return;
-        // A new speed restarts the worker: only between lines (nothing queued would be lost).
+        // A worker that failed to load is tried again (the model files may have arrived since),
+        // between lines (nothing queued would be lost).
+        if (r.workerStarted && !r.worker.failed()) return;
         if (r.workerStarted && (!r.speechIds.empty() || r.worker.pending() > 0)) return;
         const Settings& st = settings();
         tts::setArchCap(st.ttsArch.c_str());
@@ -202,19 +200,18 @@ public:
         o.threads = st.ttsThreads > 0 ? st.ttsThreads : 2;
         o.voice = st.ttsVoice;
         o.steps = st.ttsSteps;
-        o.speed = speed;
         r.worker.stop();
         r.worker.start(o);
         r.workerStarted = true;
-        r.workerSpeed = speed;
-        LOGI("coach: voice worker started (%s, %d threads, speed %.2f, voice %d, %d steps)", tts::modelDirectory().c_str(),
-             o.threads, speed, o.voice, o.steps);
+        LOGI("coach: voice worker started (%s, %d threads, voice %d, %d steps)", tts::modelDirectory().c_str(), o.threads,
+             o.voice, o.steps);
     }
     uint32_t requestSpeech(const std::string& text, const std::string& lang, float speed, int priority) override {
         CoachRuntime& r = rt();
-        ensureWorker(speed);
+        ensureWorker();
         if (!r.workerStarted || r.worker.failed() || text.empty()) return 0;
-        uint32_t id = r.worker.request(text, lang, priority);
+        // The speed goes with the line (the rules lesson speaks slower): never a reload of the model.
+        uint32_t id = r.worker.request(text, lang, priority, 0, speed);
         if (id) r.speechIds.insert(id);
         return id;
     }
@@ -593,10 +590,10 @@ void GameScene::refreshCoachVoice() {
     // not load are checked by the next download (coach_model.h).
     if (coachVoiceFiles_ && coach_ && coach_->workerStarted && coach_->worker.failed()) coachModelLoadFailed();
     coachVoiceFiles_ = coachVoiceWanted();
-    // Switched on, or downloaded, during a coach game: its worker starts now, at the speed of its
-    // lines (the director asks for speech only once the voice is available).
+    // Switched on, or downloaded, during a coach game: its worker starts now (the director asks for
+    // speech only once the voice is available).
     if (coachVoiceFiles_ && coach() && coach_ && coach_->sessionRunning && !coach_->workerStarted)
-        coach_->stage->ensureWorker(coach_->session.director().config().speed);
+        coach_->stage->ensureWorker();
 }
 
 bool GameScene::coachVoiceExpected() const {
@@ -624,9 +621,8 @@ void GameScene::setupCoachGame() {
     leaveCoachGame();
     const Settings& s = settings();
     coachLevel_ = coachArgs_.level >= 0 ? coachArgs_.level : std::clamp(s.coachLevel, 0, ai::kCoachLevels - 1);
-    // The voice loads while the lights go down, at the speed of this game's lines (a worker started
-    // at another speed would load the model again when the first line is asked for).
-    rt.stage->ensureWorker(speechSpeed(coachLevel_));
+    // The voice loads while the lights go down.
+    rt.stage->ensureWorker();
     int colour = coachArgs_.colour >= 0 ? coachArgs_.colour
                  : s.coachColour == 0 || s.coachColour == 1 ? s.coachColour
                                                              : (s.coachNextColour == 1 ? 1 : 0);
@@ -695,7 +691,7 @@ void GameScene::startCoachGame() {
     for (const Settings::CoachGame& g : s.coachHistory) c.history.push_back({g.level, g.result, g.accuracy});
     c.accuracyExplained = s.coachAccuracyExplained;
     c.lessonChapter = s.coachLessonChapter;
-    rt.stage->ensureWorker(c.director.speed);
+    rt.stage->ensureWorker();
     // Every glyph the coach's lines can show in this language, once (subtitles never wait).
     std::string ui = i18n::language();
     if (!rt.prewarmedLanguages.count(ui)) {
