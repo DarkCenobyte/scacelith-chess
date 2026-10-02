@@ -123,9 +123,9 @@ PostFX::~PostFX() {
 
 bool PostFX::init() {
     Impl& I = *impl_;
-    I.aoWhite = gpu::createTexture2D(1, 1, GL_RGBA8);
-    const unsigned char white[4] = {255, 128, 128, 128};
-    glTextureSubImage2D(I.aoWhite.id, 0, 0, 0, 1, 1, GL_RGBA, GL_UNSIGNED_BYTE, white);
+    I.aoWhite = gpu::createTexture2D(1, 1, GL_R8);
+    const unsigned char white = 255;
+    glTextureSubImage2D(I.aoWhite.id, 0, 0, 0, 1, 1, GL_RED, GL_UNSIGNED_BYTE, &white);
     // Bound on TEXUNIT_SSR while no SSR history exists: zero confidence.
     I.ssrNone = gpu::createTexture2D(1, 1, GL_RGBA16F);
     const float none[4] = {0, 0, 0, 0};
@@ -187,12 +187,12 @@ void PostFX::resize(int renderW, int renderH) {
     for (int i = 0; i < 2; ++i) {
         I.linDepth[i] = gpu::createTexture2D(w, h, GL_R32F);
         I.halfDepth[i] = gpu::createTexture2D(hw, hh, GL_R32F);
-        I.aoHist[i] = gpu::createTexture2D(hw, hh, GL_RGBA16F);
+        I.aoHist[i] = gpu::createTexture2D(hw, hh, GL_R16F);
         I.taaHist[i] = gpu::createTexture2D(w, h, GL_RGBA16F);
     }
     I.halfNormal = gpu::createTexture2D(hw, hh, GL_RGBA8);
-    I.aoRaw = gpu::createTexture2D(hw, hh, GL_RGBA16F);
-    I.aoOut = gpu::createTexture2D(w, h, GL_RGBA8);
+    I.aoRaw = gpu::createTexture2D(hw, hh, GL_R16F);
+    I.aoOut = gpu::createTexture2D(w, h, GL_R8);
     I.scene = gpu::createTexture2D(w, h, GL_RGBA16F);
     I.chainA = gpu::createTexture2D(w, h, GL_RGBA16F);
     I.mbTile = std::clamp(int(std::lround(20.0 * double(h) / 1080.0)), 8, 32);
@@ -582,7 +582,9 @@ void PostFX::resolve(const PostInputs& in) {
             if (compute("shaders/post/exposure_average.comp")) {
                 bindImg(0, I.exposure, 0, GL_READ_WRITE);
                 glDispatchCompute(1, 1, 1);
-                barrier();
+                // barrier() + the histogram the average cleared, for next frame's atomics.
+                glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_FRAMEBUFFER_BARRIER_BIT |
+                                GL_SHADER_STORAGE_BARRIER_BIT);
                 I.expoValid = true;
             }
         }

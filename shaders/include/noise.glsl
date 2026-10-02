@@ -6,7 +6,6 @@ vec3 hash33(vec3 p) {
     q = (q.x ^ q.y ^ q.z) * uvec3(1597334673u, 3812015801u, 2798796415u);
     return vec3(q) * (1.0 / 4294967295.0);
 }
-vec3 hash33c(ivec3 c) { return hash33(vec3(c) + 0.5); }
 
 // Quintic-interpolated gradient noise, range ~[-1,1].
 float gnoise(vec3 p) {

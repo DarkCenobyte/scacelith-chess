@@ -75,13 +75,13 @@ float fleurDeLis(vec2 p) {
 float rosette(vec2 p, float r) {
     float a = atan(p.y, p.x);
     float petals = length(p) - r * (0.72 + 0.28 * cos(a * 6.0));
-    return opU(petals, sdCircle(p, r * 0.3) - 0.0);
+    return opU(petals, sdCircle(p, r * 0.3));
 }
 
 // ---- Layer 0: fleur-de-lis trellis -------------------------------------------------------------
 vec4 layerFleur(vec2 uv) {
     float gold = 0.0, tone = 0.0, ivory = 0.0, h = 0.5;
-    // Fleurs at the centre and the corners (staggered), scale 0.42 of the repeat.
+    // Fleurs at the centre and the corners (staggered), scale 0.52 of the repeat.
     float df = 1e9;
     const float fs = 0.52;
     df = min(df, fleurDeLis((uv - vec2(0.5, 0.5)) / fs) * fs);
@@ -102,7 +102,7 @@ vec4 layerFleur(vec2 uv) {
     dr = min(dr, rosette(uv - vec2(1.0, 0.5), 0.045));
     float ros = fill(dr);
     gold = max(max(fl * (1.0 - outline), trellis), ros);
-    ivory = max(outline * fl, fill(sdCircle(mod(uv, 0.5) - 0.25, 0.0)) * 0.0);
+    ivory = outline * fl;
     ivory = max(ivory, fill(abs(dr + 0.012) - 0.003) * 0.8);
     // Ground: tone-on-tone diaper (small diamonds) inside each lozenge.
     vec2 g = fract(uv * 8.0) - 0.5;
@@ -183,7 +183,7 @@ vec4 layerBorder(vec2 uv) {
     }
     float gold = max(max(f1, f2), max(max(wave, scrolls), flowers));
     float ivory = max(max(f3, f4), flowers * fill(sdCircle(fract(vec2(u * 4.0, v) + vec2(0.5, 0.0)) - vec2(0.5, 0.5), 0.0)));
-    float tone = max(leaves * 0.9, 0.0);
+    float tone = leaves * 0.9;
     ivory = max(ivory, leaves * 0.25);
     float h = 0.5 + 0.3 * gold + 0.2 * leaves;
     return vec4(gold, tone, ivory, clamp(h, 0.0, 1.0));

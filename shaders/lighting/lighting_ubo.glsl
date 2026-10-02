@@ -17,7 +17,7 @@ layout(std140, binding = 2) uniform LightingUBO {
     vec4 planarInfo[4];                     // x enabled, y max lod, z width, w height (texels)
     vec4 lightingMisc;                      // x specular AA strength, y shadow blend band, z ambient intensity, w unused
     vec4 probeSH[MAX_LIGHT_PROBES * 9];     // L2 SH of irradiance / PI (cosine-convolved, windowed), GPU-written
-    vec4 skySH[9];                          // same for the sky cubemap (no sun disk)
+    vec4 skySH[9];                          // unused (nothing projects the sky any more), keeps the layout
 } lighting;
 
 // L2 SH evaluation of coefficients stored at base (9 consecutive vec4) in probeSH.
@@ -32,16 +32,4 @@ vec3 shEvalProbe(int base, vec3 n) {
     r += lighting.probeSH[base + 7].rgb * (1.092548 * n.x * n.z);
     r += lighting.probeSH[base + 8].rgb * (0.546274 * (n.x * n.x - n.y * n.y));
     return r;
-}
-vec3 shEvalSky(vec3 n) {
-    vec3 r = lighting.skySH[0].rgb * 0.282095;
-    r += lighting.skySH[1].rgb * (0.488603 * n.y);
-    r += lighting.skySH[2].rgb * (0.488603 * n.z);
-    r += lighting.skySH[3].rgb * (0.488603 * n.x);
-    r += lighting.skySH[4].rgb * (1.092548 * n.x * n.y);
-    r += lighting.skySH[5].rgb * (1.092548 * n.y * n.z);
-    r += lighting.skySH[6].rgb * (0.315392 * (3.0 * n.z * n.z - 1.0));
-    r += lighting.skySH[7].rgb * (1.092548 * n.x * n.z);
-    r += lighting.skySH[8].rgb * (0.546274 * (n.x * n.x - n.y * n.y));
-    return max(r, vec3(0.0));
 }

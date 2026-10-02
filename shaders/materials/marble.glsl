@@ -180,8 +180,8 @@ void surface(in SurfaceInput i, inout Surface s) {
 #if defined(MARBLE_PIECE)
     seed = fract(i.instParams[0].x * 0.6180339 + i.objectSeed);
 #elif defined(MARBLE_BOARD)
-    vec2 sq = floor(clamp(i.uv, 0.0, 0.99999) * 8.0);
-    seed = fract((sq.x + sq.y * 8.0 + 1.0) * 0.1234567 + i.objectSeed * 0.37);
+    vec2 sqId = floor(clamp(i.uv, 0.0, 0.99999) * 8.0);
+    seed = fract((sqId.x + sqId.y * 8.0 + 1.0) * 0.1234567 + i.objectSeed * 0.37);
     vec2 fl = fract(i.uv * 8.0);
 #endif
     mat3 R = mat_randomRotation(seed);

@@ -110,6 +110,11 @@ void main() {
     outNormalRough = vec4(nOut, rough);
     vec3 f0 = mix(vec3(0.16 * s.specular * s.specular), s.albedo, s.metallic);
     if (s.clearcoat > 0.5) f0 = max(f0, vec3(0.04 * s.clearcoat));
+    // a = SSR mask (trace, resolve, and combine.comp's optional composite): a reflector's pixels
+    // are left out only while its planar reflection is active this frame. shadeSurface never
+    // blends SSR into a reflector's material, active or not, so with the default forward
+    // composite the traces of an inactive reflector (planar off, camera behind the plane, plane
+    // off screen) go unused.
     bool planar = planarLayer >= 0.0 && frame.passInfo.w > planarLayer && lighting.planarInfo[int(planarLayer)].x > 0.5;
     outSpecular = vec4(f0, planar ? 0.0 : (rough < 0.6 ? 1.0 : 0.0));
     outVelocity = motionVector();

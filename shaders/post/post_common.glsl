@@ -14,15 +14,15 @@ layout(std140, binding = 3) uniform PostUBO {
     vec4 vol;          // x scattering (1/m), y HG g, z ambient amount, w max distance
     vec4 volB;         // x steps, y noise amount, z history valid, w motes intensity
     vec4 volC;         // xyz dust drift (m/s), w noise frequency (1/m)
-    vec4 taa;          // x history valid, y sharpen, z variance gamma, w -
+    vec4 taa;          // x history valid, y sharpen, z - (taa.comp's variance gamma is speed-adaptive), w -
     vec4 mb;           // x shutter, y max radius (px), z samples, w tile size (px)
     vec4 dof;          // x focus distance (m), y CoC scale (full-res px radius), z max radius (full px), w radius step
-    vec4 bloom;        // x intensity, y scatter, z levels, w -
-    vec4 expo;         // x compensation EV, y auto on, z min EV, w max EV
+    vec4 bloom;        // x intensity, y scatter, z levels (not read by shaders), w -
+    vec4 expo;         // x compensation EV, y auto on (not read by shaders), z min EV, w max EV
     vec4 expoB;        // x speed up, y speed down, z target (pre-exposed middle grey), w history valid
     vec4 display;      // x grain, y vignette, z chromatic aberration (px), w fade
     vec4 grade;        // x contrast, y saturation, z split tone, w -
-    vec4 misc;         // x debug view, y ssr composite in resolve, z volumetric sky march distance, w blue-noise phase
+    vec4 misc;         // x debug view, y ssr composite in resolve (not read by shaders), z volumetric sky march distance, w blue-noise phase
 } post;
 
 layout(binding = 7) uniform sampler2D uBlueNoise;
@@ -42,6 +42,8 @@ float blueNoiseStatic(ivec2 p, int channel) {
 float linearFromRaw(float d) { return frame.exposure.z / max(d, 1e-7); }
 float rawFromLinear(float z) { return frame.exposure.z / max(z, 1e-7); }
 const float SKY_DEPTH = 6.0e4;  // fits in fp16 (history alpha)
+// Log2-luminance range of the auto-exposure histogram (exposure_histogram / exposure_average).
+const float EXPO_MIN_LOG = -14.0, EXPO_RANGE_LOG = 20.0;
 
 // View-space position from uv and positive linear depth (current, jittered projection).
 vec3 viewPosFromLinear(vec2 uv, float z) {
@@ -49,11 +51,6 @@ vec3 viewPosFromLinear(vec2 uv, float z) {
     return vec3((ndc.x + frame.proj[2][0]) * z / frame.proj[0][0], (ndc.y + frame.proj[2][1]) * z / frame.proj[1][1], -z);
 }
 vec3 worldPosFromLinear(vec2 uv, float z) { return (frame.invView * vec4(viewPosFromLinear(uv, z), 1.0)).xyz; }
-// View-space -> screen uv (current, jittered projection).
-vec2 uvFromView(vec3 p) {
-    vec2 ndc = vec2(frame.proj[0][0] * p.x + frame.proj[2][0] * p.z, frame.proj[1][1] * p.y + frame.proj[2][1] * p.z) / -p.z;
-    return ndc * 0.5 + 0.5;
-}
 
 bool badValue(vec3 c) { return any(isnan(c)) || any(isinf(c)); }
 vec3 sanitize(vec3 c) { return badValue(c) ? vec3(0.0) : clamp(c, vec3(0.0), vec3(60000.0)); }

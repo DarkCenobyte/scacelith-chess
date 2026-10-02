@@ -150,7 +150,6 @@ vec3 atmoIntegrate(vec3 ro, vec3 rd, vec3 sunDir, int steps, float mieScale, boo
     float phaseR = uniformPhase ? 1.0 / (4.0 * PI) : rayleighPhase(mu);
     float phaseM = uniformPhase ? 1.0 / (4.0 * PI) : cornetteShanks(mu, ATMO_MIE_G);
     vec3 L = vec3(0.0);
-    float tPrev = 0.0;
     for (int i = 0; i < steps; ++i) {
         float s0 = float(i) / float(steps), s1 = float(i + 1) / float(steps);
         float t0 = tMax * s0 * s0, t1 = tMax * s1 * s1;
@@ -171,7 +170,6 @@ vec3 atmoIntegrate(vec3 ro, vec3 rd, vec3 sunDir, int steps, float mieScale, boo
         L += throughput * (S - S * sampleT) / ext;
         fms += throughput * (m.scattering - m.scattering * sampleT) / ext;
         throughput *= sampleT;
-        tPrev = t1;
     }
     if (addGround && tBottom > 0.0 && (tTop < 0.0 || tBottom <= tTop + 1e-3)) {
         vec3 P = ro + rd * tBottom;

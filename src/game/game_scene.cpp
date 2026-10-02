@@ -1215,7 +1215,8 @@ void GameScene::runWarp(float seconds) {
 }
 
 void GameScene::simulate(float dt) {
-    time_ += dt;
+    timeSum_ += dt;
+    time_ = float(timeSum_);
     stateTime_ += dt;
     board_.beginFrame();
     updateOnline(dt);

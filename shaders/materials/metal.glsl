@@ -38,13 +38,13 @@ void surface(in SurfaceInput i, inout Surface s) {
     // Gold leaves: a square grid with a jittered row offset (leaves are laid in rows).
     float leaf = P3.x;
     vec2 lc = pl / leaf;
+    float fw = fwidth(lc.x) + fwidth(lc.y);  // before the row offset, which jumps between rows
     float rowId = floor(lc.y);
     lc.x += mat_hash1(rowId + axisId * 31.0) * 0.8;
     vec2 cellId = floor(lc);
     vec2 lf = fract(lc);
     vec4 lh = mat_hash4(cellId.x * 7.0 + cellId.y * 131.0 + axisId * 17.0 + i.objectSeed);
     // Overlaps: a narrow strip along two sides of each leaf is doubled (brighter, a ridge).
-    float fw = fwidth(lc.x) + fwidth(lc.y);
     float overlap = max(mat_band(lf.x - 0.015, 0.012, fw), mat_band(lf.y - 0.015, 0.012, fw)) * P3.y;
     albedo *= 1.0 + (lh.x - 0.5) * 0.06 + overlap * 0.05;
     rough += (lh.y - 0.5) * P3.z + overlap * 0.03;

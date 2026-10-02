@@ -119,7 +119,7 @@ void Atmosphere::bindSkyTextures() const {
     glBindTextureUnit(1, skyView_.id);
 }
 
-void Atmosphere::captureSky(GLuint shBuffer) {
+void Atmosphere::captureSky() {
     gpu::DebugGroup g("sky.capture");
     const ShaderProgram& p = shaders::compute("shaders/lighting/sky_cube.comp");
     if (!p.valid()) return;
@@ -130,18 +130,6 @@ void Atmosphere::captureSky(GLuint shBuffer) {
     glDispatchCompute(SKY_CUBE_SIZE / 8, SKY_CUBE_SIZE / 8, 6);
     glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT);
     glGenerateTextureMipmap(skyCube_.id);
-
-    const ShaderProgram& sh = shaders::compute("shaders/lighting/sh_project.comp", {"SH_SKY"});
-    if (!sh.valid()) return;
-    sh.use();
-    sh.set("uLayer", 0);
-    sh.set("uOutSlot", SH_SLOT_SKY);
-    sh.set("uLod", 2.0f);
-    sh.set("uFaceSize", SKY_CUBE_SIZE / 4);
-    glBindTextureUnit(0, skyCube_.id);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_USER, shBuffer);
-    glDispatchCompute(1, 1, 1);
-    glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT | GL_UNIFORM_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
 }  // namespace lighting

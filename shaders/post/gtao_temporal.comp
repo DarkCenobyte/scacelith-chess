@@ -8,30 +8,30 @@ layout(binding = 1) uniform sampler2D uHalfDepth;
 layout(binding = 2) uniform sampler2D uHalfDepthPrev;
 layout(binding = 3) uniform sampler2D uVelocity;
 layout(binding = 4) uniform sampler2D uHistory;
-layout(binding = 0, rgba16f) uniform writeonly image2D oAO;
+layout(binding = 0, r16f) uniform writeonly image2D oAO;
 
 void main() {
     ivec2 p = ivec2(gl_GlobalInvocationID.xy);
     ivec2 hsize = ivec2(post.halfSize.xy);
     if (any(greaterThanEqual(p, hsize))) return;
     float z = texelFetch(uHalfDepth, p, 0).r;
-    vec4 center = texelFetch(uAORaw, p, 0);
-    if (z >= SKY_DEPTH * 0.5) { imageStore(oAO, p, center); return; }
+    float center = texelFetch(uAORaw, p, 0).r;
+    if (z >= SKY_DEPTH * 0.5) { imageStore(oAO, p, vec4(center)); return; }
 
-    vec4 sum = vec4(0.0);
+    float sum = 0.0;
     float wsum = 0.0, mn = 1.0, mx = 0.0;
     float tol = 1.0 / (0.04 * z + 0.002);
     for (int y = -1; y <= 1; ++y)
         for (int x = -1; x <= 1; ++x) {
             ivec2 q = clamp(p + ivec2(x, y), ivec2(0), hsize - 1);
             float zq = texelFetch(uHalfDepth, q, 0).r;
-            vec4 v = texelFetch(uAORaw, q, 0);
+            float v = texelFetch(uAORaw, q, 0).r;
             float w = exp(-abs(zq - z) * tol) * (x == 0 && y == 0 ? 2.0 : 1.0);
             sum += v * w;
             wsum += w;
-            if (w > 0.3) { mn = min(mn, v.r); mx = max(mx, v.r); }
+            if (w > 0.3) { mn = min(mn, v); mx = max(mx, v); }
         }
-    vec4 cur = sum / max(wsum, 1e-5);
+    float cur = sum / max(wsum, 1e-5);
 
     vec2 uv = (vec2(p) + 0.5) * post.halfSize.zw;
     ivec2 fp = min(p * 2, ivec2(post.renderSize.xy) - 1);
@@ -39,20 +39,20 @@ void main() {
     if (badValue(vec3(vel, 0.0))) vel = vec2(0.0);
     vec2 prevUV = uv - vel;
     bool valid = post.ao.w > 0.5 && all(greaterThanEqual(prevUV, vec2(0.0))) && all(lessThan(prevUV, vec2(1.0)));
-    vec4 result = cur;
+    float result = cur;
     if (valid) {
         vec3 pw = worldPosFromLinear(uv, z);
         vec4 pc = frame.prevViewProj * vec4(pw, 1.0);
         float expected = pc.w;
         float zPrev = texelFetch(uHalfDepthPrev, ivec2(prevUV * post.halfSize.xy), 0).r;
         float rel = abs(zPrev - expected) / max(expected, 1e-4);
-        vec4 hist = textureLod(uHistory, prevUV, 0.0);
-        if (rel < 0.06 && !badValue(hist.rgb) && !isnan(hist.a)) {
+        float hist = textureLod(uHistory, prevUV, 0.0).r;
+        if (rel < 0.06 && !isnan(hist) && !isinf(hist)) {
             float speed = length(vel * post.renderSize.xy);
-            hist.r = clamp(hist.r, mn - 0.15, mx + 0.15);
+            hist = clamp(hist, mn - 0.15, mx + 0.15);
             float alpha = mix(0.08, 0.35, saturate(speed / 12.0));
             result = mix(hist, cur, alpha);
         }
     }
-    imageStore(oAO, p, result);
+    imageStore(oAO, p, vec4(result));
 }
