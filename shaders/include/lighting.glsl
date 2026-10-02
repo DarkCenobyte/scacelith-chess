@@ -244,7 +244,8 @@ vec3 evalLight(Shading sh, vec3 L, float visibility, float thicknessM, float src
     float NoLc = clamp(NoL, 0.0, 1.0);
     vec3 color = vec3(0.0);
     if (NoL > -0.5 || sh.sss > 0.0) {
-        // Specular (isotropic or anisotropic GGX), widened for spherical lights (Karis 2013).
+        // Specular GGX. The isotropic lobe (and the clear coat below) is widened for spherical
+        // lights (Karis 2013); the anisotropic lobe is not.
         float a = clamp(sh.alpha + srcSize, 0.0004, 1.0);
         float norm = sq(sh.alpha / a);
         float D, Vis;
