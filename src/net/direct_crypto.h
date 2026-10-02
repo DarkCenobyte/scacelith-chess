@@ -17,10 +17,9 @@
 // Frames (both directions): u16 length (little-endian, = ciphertext + 16) | ciphertext | 16-byte
 // tag, AES-256-GCM with the direction's key, nonce = 4 zero bytes || u64 counter (big-endian,
 // 0, 1, 2... per direction), aad = the two length bytes. Plaintext = one net::proto message of
-// 1..16384 bytes (a GameSnapshot carries 10 bytes per ply, up to 1200 plies: about 12.2 KB; the
-// 1024 of the first draft could not hold the snapshot of a long game). Any tag failure, a length
-// out of range or a counter overflow fails the channel for good (the connection must be closed):
-// no replay, reordering, truncation or splicing.
+// 1..16384 bytes (a GameSnapshot carries 10 bytes per ply, up to 1200 plies: about 12.2 KB). Any
+// tag failure, a length out of range or a counter overflow fails the channel for good (the
+// connection must be closed): no replay, reordering, truncation or splicing.
 #pragma once
 #include <cstddef>
 #include <cstdint>
@@ -98,7 +97,7 @@ public:
         WrongCode,      // the confirmation did not verify (wrong code, or someone in the middle)
         BadFrame,       // frame length out of range
         AuthFailed,     // a frame's tag did not verify (tampered, replayed, reordered, truncated)
-        TooLarge,       // send() of a message longer than kMaxPlaintext
+        TooLarge,       // send() of an empty message or one longer than kMaxPlaintext
         Crypto,         // RNG or crypto library failure
     };
     static constexpr size_t kHelloLen = 4 + 1 + 32 + 65;

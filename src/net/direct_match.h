@@ -2,9 +2,9 @@
 // player hosts (listens on a TCP port, opened on the home router with UPnP when possible), the
 // other joins with the host's address, port and a short code the host reads to them.
 //
-// Implementation notes (the API below is unchanged; these points refine or amend the first draft):
-//   - Frame plaintext limit: 16 KiB, not 1024 bytes. A GameSnapshot carries 10 bytes per ply (up
-//     to 1200 plies, about 12.2 KB), so 1024 could not hold the snapshot of a long game.
+// Implementation notes:
+//   - Frame plaintext limit: 16 KiB. A GameSnapshot carries 10 bytes per ply (up to 1200 plies,
+//     about 12.2 KB).
 //   - The host runs up to 4 handshakes at a time (10 s each). A new connection that proves the
 //     code and sends a valid Hello replaces the current guest link: that is how a guest whose old
 //     connection is half-open gets back in. The 10-failure limit counts wrong codes only (garbage
@@ -17,10 +17,10 @@
 //   - Time control: baseSec is clamped to 1..10800, incSec to 0..180.
 //   - Hello from the guest: token = "direct:" + player name, padded with spaces to the schema's
 //     16-byte minimum; the host strips both and sanitises the name (1..24 bytes of UTF-8).
-//   - lastError(): "port_in_use", "network", "too_many_attempts" (host); "invalid_code",
-//     "bad_address", "not_found" (DNS), "refused", "timeout", "unreachable", "reset", "closed",
-//     "wrong_code", "incompatible", "host_left" (guest). After ConnectionChanged(Offline) the
-//     commands have no effect; close() and start again.
+//   - lastError(): "network" (both); "port_in_use", "too_many_attempts" (host); "invalid_code",
+//     "bad_address", "not_found" (DNS), "refused", "timeout", "unreachable", "reset", "in_use",
+//     "closed", "wrong_code", "incompatible", "host_left" (guest). After ConnectionChanged(Offline)
+//     the commands have no effect; close() and start again.
 //   - DirectHostOptions::autoPress reaches both players in every GameSnapshot (OnlineGame::
 //     autoPress): at the start, after a reconnection and in every rematch.
 //   - Gestures (sendGesture, net/gesture.h) go straight to the other player, never through the
@@ -102,7 +102,7 @@ class DirectMatch {
 public:
     enum class State {
         Idle,
-        OpeningPort,     // host: UPnP in progress
+        OpeningPort,     // host: opening the port (and UPnP when enabled)
         WaitingForGuest, // host: listening
         Connecting,      // guest: TCP connect
         Handshake,       // both: secure channel being established
