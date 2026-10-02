@@ -420,6 +420,7 @@ struct Session::Impl {
         if (g.level == 0 || !director.offerOpen()) return;
         director.closeOffer();
         const int ply = g.offerPly;
+        if (g.over || (game && game->isOver())) accept = false;   // nothing to take back in a finished game
         if (accept && game) {
             const size_t n = game->moves().size();
             // Back to the position before the human's move (the coach's reply was held).
@@ -545,6 +546,9 @@ struct Session::Impl {
             director.clear();
             g.review = ReviewState::None;
         }
+        // An offer open or still queued (a draw agreed or claimed meanwhile): nothing to take back
+        // any more, the card closes without a word.
+        if (director.closeOffer()) reviewer.takebackDeclined();
         for (uint64_t s : g.chatScripts) director.dropQueued(s);   // "You play White" after the mate
         g.chatScripts.clear();
         g.coachMovedPly = -1;

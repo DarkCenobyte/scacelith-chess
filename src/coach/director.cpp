@@ -965,19 +965,20 @@ void Director::endWait() {
 
 bool Director::offerOpen() const { return d_->run.active && d_->run.phase == Impl::Phase::Offer; }
 
-void Director::closeOffer() {
+bool Director::closeOffer() {
     Impl& d = *d_;
-    if (!d.stage) return;
+    if (!d.stage) return false;
     if (d.run.active && d.run.item.beat.kind == BeatKind::OfferTakeback) {
         d.stopRun(false);
-        return;
+        return true;
     }
     for (auto it = d.queue.begin(); it != d.queue.end(); ++it) {
         if (it->beat.kind != BeatKind::OfferTakeback) continue;
         d.drop(*it);
         d.queue.erase(it);
-        return;
+        return true;
     }
+    return false;
 }
 
 const std::vector<ShownMark>& Director::marks() const { return d_->shown; }

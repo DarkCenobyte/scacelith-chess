@@ -76,7 +76,9 @@ public:
     // The running beat is an OfferTakeback whose line has been said: the card is shown and the
     // director waits for closeOffer().
     bool offerOpen() const;
-    void closeOffer();               // answered: hide the card, go on (the session drops beats if taken back)
+    // Answered: hide the card, go on (the session drops beats if taken back). An offer not shown yet
+    // is dropped. False when there was no offer.
+    bool closeOffer();
 
     const std::vector<ShownMark>& marks() const;
 

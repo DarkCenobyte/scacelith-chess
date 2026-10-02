@@ -493,6 +493,58 @@ TEST(coach_session_game_over_drops_the_greeting) {
     CHECK(!t.said("event.colour.white"));
 }
 
+// No takeback is offered for a finished game: stalemate while winning by the human's own move is
+// explained, then the closing words and the handshake follow; an offer open when a draw is agreed
+// closes without a word; and an answer that comes after the end takes nothing back.
+TEST(coach_session_no_offer_once_the_game_is_over) {
+    Table t;
+    const char* fen = "7k/5K2/8/6Q1/8/8/8/8 w - - 0 1";
+    t.game.resetFromFEN(fen);
+    t.analyst.results[fenOf(fen) + "|A0"] = analysisOf({pvl(0, "g5g7", 1), pvl(900, "g5h6 h8g8")});
+    t.start(levelConfig(1));
+    CHECK(t.quiet());
+    t.move("g5g6");
+    CHECK(t.game.isOver());
+    t.session.onGameOver(t.game, false);
+    bool offered = false;
+    CHECK(t.until([&] {
+        offered = offered || t.session.offerOpen();
+        return t.session.handshakeWanted();
+    }, 60.0f));
+    CHECK(!offered);
+    CHECK(!t.queued("ex.offer.b1"));
+    CHECK(t.queuedPrefix("ex.stalemate"));
+    CHECK(t.said("event.end.draw"));
+    CHECK(t.stage.all("takeBack").empty());
+    CHECK_EQ(t.game.moves().size(), size_t(1));
+    checkRenders(t.lines);
+
+    Table u;
+    hangTable(u);
+    u.start(levelConfig(1));
+    CHECK(u.quiet());
+    u.move("c3d5");
+    CHECK(u.until([&] { return u.session.offerOpen(); }, 60.0f));
+    u.game.agreeDraw();
+    u.session.onGameOver(u.game, false);
+    CHECK(!u.session.offerOpen());
+    CHECK(u.until([&] { return u.session.handshakeWanted(); }, 60.0f));
+    CHECK(u.said("event.end.draw"));
+    CHECK(!u.queued("event.takeback.declined") && !u.queued("event.play_on"));
+
+    Table w;
+    hangTable(w);
+    w.start(levelConfig(1));
+    CHECK(w.quiet());
+    w.move("c3d5");
+    CHECK(w.until([&] { return w.session.offerOpen(); }, 60.0f));
+    w.game.agreeDraw();
+    w.session.onOfferAnswer(w.game, true);
+    CHECK(!w.session.offerOpen());
+    CHECK(w.stage.all("takeBack").empty());
+    CHECK(!w.queued("event.takeback.taken"));
+}
+
 // The human's mate before the turn's A0 is in: the review of that move uses the A0 stopped when
 // it was played, not a fresh full search asked once the game is over.
 TEST(coach_session_game_over_keeps_the_review_analyses) {
