@@ -366,7 +366,7 @@ std::string resolveUrl(const std::string& base, const std::string& ref) {
     std::string path = pathStart == std::string::npos ? "/" : base.substr(pathStart);
     size_t q = path.find_first_of("?#");
     if (q != std::string::npos) path.resize(q);
-    path = path.substr(0, path.rfind('/') + 1);
+    path.resize(path.rfind('/') + 1);
     return origin + path + ref;
 }
 
