@@ -440,9 +440,9 @@ struct Director::Impl {
         if (now) m.fading = true;
     }
 
-    void releaseAll(bool untilRewindOnly) {
+    void releaseUntilRewind() {
         for (LiveMark& m : live) {
-            if (untilRewindOnly && !m.untilRewind) continue;
+            if (!m.untilRewind) continue;
             if (!m.lit) light(m, m.onAt);
             release(m, false);
             m.holdLeft = 0.0f;
@@ -513,7 +513,7 @@ struct Director::Impl {
             if (count <= 0) {   // nothing of the demonstration is on the table (skipped)
                 run.line = false;
                 run.table = false;
-                releaseAll(true);
+                releaseUntilRewind();
                 return true;
             }
         }
@@ -563,7 +563,7 @@ struct Director::Impl {
             break;
         case BeatKind::Rewind: {
             const int count = std::min(b.count, demoDepth);
-            releaseAll(true);
+            releaseUntilRewind();
             stage->rewindDemo(count, run.fast);
             demoDepth -= count;
             run.table = true;
@@ -709,7 +709,7 @@ struct Director::Impl {
             step = 0.0f;
         }
         pump(true);   // the beats just started or moved up
-        if (!run.active && queue.empty() && held.empty() && !waiting) releaseAll(true);
+        if (!run.active && queue.empty() && held.empty() && !waiting) releaseUntilRewind();
         rebuildShown();
 
         float lv = 0.0f;
