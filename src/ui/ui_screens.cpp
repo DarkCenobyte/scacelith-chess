@@ -182,17 +182,11 @@ void glyphCentered(uint32_t cp, vec2 c, float size, const TextStyle& base) {
 // ---- Value tables -----------------------------------------------------------------------------------
 using detail::baseTimeValues;
 using detail::clockText;
+using detail::moveTimeValues;
 using detail::nearestIndex;
+using detail::nearestValue;
+using detail::nodeValues;
 using detail::spacedPlus;
-const std::vector<int>& moveTimeValues() {
-    static const std::vector<int> v = {0, 100, 200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000, 7500, 10000, 15000, 20000, 30000};
-    return v;
-}
-const std::vector<int>& nodeValues() {
-    static const std::vector<int> v = {0, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000,
-                                       1000000, 2000000, 5000000, 10000000, 20000000, 50000000};
-    return v;
-}
 std::string moveTimeText(int ms) {
     if (ms <= 0) return T("engine.no_limit");
     const int digits = ms % 1000 == 0 ? 0 : ms % 100 == 0 ? 1 : 2;   // 750 ms: "0.75 s", not "0.8 s"
@@ -296,15 +290,17 @@ void loadSetupFromSettings(NewGameSetup& s) {
     int tcn = int(detail::data().timeControls.size());
     s.difficulty = std::clamp(g.difficultyPreset, 0, std::max(0, n - 1));
     s.timeControl = g.timeControlPreset < 0 || g.timeControlPreset >= tcn ? -1 : g.timeControlPreset;
-    s.customBaseSeconds = std::clamp(g.customBaseSeconds, 15, 10800);
+    // The base time, the move time and the nodes as their steppers show them: a hand-edited .ini may
+    // hold others (it is rewritten only when a game starts from the page).
+    s.customBaseSeconds = nearestValue(baseTimeValues(), g.customBaseSeconds);
     s.customIncrementSeconds = std::clamp(g.customIncrementSeconds, 0, 60);
     s.customDelaySeconds = std::clamp(g.customDelaySeconds, 0, 60);
     s.skillLevel = std::clamp(g.customSkillLevel, 0, 20);
     s.limitElo = g.customLimitElo;
     s.elo = std::clamp(g.customElo, 1320, 3190);
     s.depth = std::clamp(g.customDepth, 0, 30);
-    s.moveTimeMs = std::max(0, g.customMoveTimeMs);
-    s.nodes = std::max(0, g.customNodes);
+    s.moveTimeMs = nearestValue(moveTimeValues(), g.customMoveTimeMs);
+    s.nodes = nearestValue(nodeValues(), g.customNodes);
     // Hot-seat: the names and hands of the last two-player game, else Options > Player for White
     // and "Player 2" in another hand for Black.
     s.opponent = std::clamp(g.opponent, 0, 1);
@@ -1493,23 +1489,6 @@ void openOptionsOnTab(int tab) {
 void openOptionsPage() { openOptions(); }
 void dimBackground(float a) { dimScene(a); }
 
-const std::vector<int>& baseTimeValues() {
-    static std::vector<int> v = [] {
-        std::vector<int> r;
-        for (int s = 15; s < 180; s += 15) r.push_back(s);
-        for (int s = 180; s < 600; s += 30) r.push_back(s);
-        for (int s = 600; s < 3600; s += 60) r.push_back(s);
-        for (int s = 3600; s <= 10800; s += 300) r.push_back(s);
-        return r;
-    }();
-    return v;
-}
-int nearestIndex(const std::vector<int>& v, int value) {
-    int best = 0;
-    for (int i = 0; i < int(v.size()); ++i)
-        if (std::abs(v[size_t(i)] - value) < std::abs(v[size_t(best)] - value)) best = i;
-    return best;
-}
 std::string clockText(int seconds) {
     char buf[32];
     std::snprintf(buf, sizeof(buf), "%d:%02d", seconds / 60, seconds % 60);

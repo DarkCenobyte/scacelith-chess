@@ -177,6 +177,7 @@ using namespace detail::onl;
 using detail::baseTimeValues;
 using detail::clockText;
 using detail::nearestIndex;
+using detail::nearestValue;
 using detail::spacedPlus;
 using Kind = net::Event::Kind;
 
@@ -1328,8 +1329,9 @@ void pagePlay(float t) {
         O.terms.tc = categoryIndex(gs.onlineCategory);
         O.terms.rated = gs.onlineRated;
         O.terms.color = gs.onlineColor;
-        O.terms.baseSec = gs.onlineCustomBaseSeconds;
-        O.terms.incSec = gs.onlineCustomIncrementSeconds;
+        // The custom time control as its steppers show it (a hand-edited .ini may hold others).
+        O.terms.baseSec = nearestValue(baseTimeValues(), gs.onlineCustomBaseSeconds);
+        O.terms.incSec = std::clamp(gs.onlineCustomIncrementSeconds, 0, 60);
         setSub(Sub::Challenge);
     }
     fy += 110.0f;
@@ -1337,8 +1339,8 @@ void pagePlay(float t) {
         O.terms.tc = categoryIndex(gs.onlineCategory);
         O.terms.rated = gs.onlineRated;
         O.terms.color = gs.onlineColor;
-        O.terms.baseSec = gs.onlineCustomBaseSeconds;
-        O.terms.incSec = gs.onlineCustomIncrementSeconds;
+        O.terms.baseSec = nearestValue(baseTimeValues(), gs.onlineCustomBaseSeconds);
+        O.terms.incSec = std::clamp(gs.onlineCustomIncrementSeconds, 0, 60);
         O.joinCode.clear();
         setSub(Sub::Private);
     }
@@ -1495,7 +1497,12 @@ void pageDirect(float t) {
     y += paragraph(T("online.direct.lead"), p, y, p.w - 220.0f, ivoryDim, kSmall + 2.0f) + 24.0f;
     float w = p.w - 240.0f;
     if (choiceRow("online.direct.host", "online.direct.host.desc", Rect(p.cx() - w * 0.5f, y, w, 100.0f))) {
-        O.hostPortText = std::to_string(game::settings().directPort);
+        game::Settings& gs = game::settings();
+        O.hostPortText = std::to_string(gs.directPort);
+        // The custom time control as its steppers show it (a hand-edited .ini may hold others; the
+        // .ini is written when the match is hosted).
+        gs.directBaseSeconds = nearestValue(baseTimeValues(), gs.directBaseSeconds);
+        gs.directIncrementSeconds = std::clamp(gs.directIncrementSeconds, 0, 60);
         setSub(Sub::DirectHost);
     }
     y += 120.0f;
