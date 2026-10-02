@@ -283,6 +283,7 @@ struct Listing {
     std::string folder;
     std::vector<archive::Entry> entries;
     archive::ListStats stats;
+    uint64_t gen = 0;                  // LibraryState::gen when it was asked for
     uint64_t print = 0;                // listingPrint(): equal for the same games, files and errors
     bool unchanged = false;            // the same print as the listing shown: 'entries' left empty
 };
@@ -332,9 +333,10 @@ uint64_t listingPrint(const Listing& l) {
 }
 // 'shownPrint' is the print of the listing shown (0: none): when this one is the same, its entries
 // are freed here rather than in a frame (up to kMaxListed games every kRelistSeconds).
-Listing listFolder(std::string folder, const std::atomic<bool>* cancel, uint64_t shownPrint) {
+Listing listFolder(std::string folder, const std::atomic<bool>* cancel, uint64_t gen, uint64_t shownPrint) {
     Listing l;
     l.folder = folder;
+    l.gen = gen;
     l.entries = archive::list(folder, &l.stats, cancel);
     if (l.stats.cancelled) return l;
     l.print = listingPrint(l);
@@ -375,6 +377,7 @@ struct LibraryState {
     std::atomic<bool> cancel{false};   // set by libraryShutdown()
     std::future<Listing> pending;
     double lastList = -1e9;            // im::time() of the last listing
+    uint64_t gen = 0;                  // games deleted: a listing asked for before may still hold one
     int filter = 0;
     std::string selected;              // entryKey of the selected game
     float scroll = 0.0f, target = 0.0f;
@@ -400,7 +403,7 @@ constexpr double kRelistSeconds = 2.0;
 void requestListing(LibraryState& s) {
     if (s.pending.valid()) return;
     s.cancel = false;
-    s.pending = std::async(std::launch::async, listFolder, s.folder, &s.cancel, s.listed ? s.listing.print : 0);
+    s.pending = std::async(std::launch::async, listFolder, s.folder, &s.cancel, s.gen, s.listed ? s.listing.print : 0);
 }
 // Takes the listing once it is ready (waiting up to waitMs for it).
 void pollListing(LibraryState& s, int waitMs) {
@@ -412,6 +415,12 @@ void pollListing(LibraryState& s, int waitMs) {
     } catch (const std::exception& ex) {  // out of memory on a huge folder: shown as a folder error
         l.folder = s.folder;
         l.stats.error = ex.what();
+        l.gen = s.gen;
+    }
+    // Asked for before a game was deleted, it may still list that game: listed again at once.
+    if (l.folder == s.folder && !l.stats.cancelled && l.gen != s.gen) {
+        requestListing(s);
+        return;
     }
     s.lastList = im::time();
     if (l.folder != s.folder || l.stats.cancelled) return;  // the folder changed meanwhile, or stopped
@@ -1106,6 +1115,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
             archive::RemoveResult rr = archive::remove(*e);
             if (rr.ok()) {
                 LOGI("library: deleted %s", e->path.c_str());
+                ++s.gen;
                 const std::string path = e->path;
                 // Off the list at once (the next listing agrees); the next game is selected.
                 int at = -1;
