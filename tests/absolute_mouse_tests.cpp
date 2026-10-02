@@ -75,3 +75,25 @@ TEST(absolute_mouse_normalised_coordinates) {
     // One pixel of a 3840 pixel wide desktop is about 17 units.
     CHECK(std::fabs(AbsoluteMouse::pixels(17, 3840) - 0.996f) < 0.01f);
 }
+
+TEST(absolute_mouse_skips_packets_without_position) {
+    // A wheel notch (leaning) or a button during the look, from a mouse that reports positions:
+    // the packet has no coordinates, and is no jump to the top-left corner and back.
+    AbsoluteMouse a;
+    float dx = 0.0f, dy = 0.0f;
+    a.packet(32768, 32768, 1920, 1080, dx, dy);
+    a.packet(0, 0, 1920, 1080, dx, dy);
+    CHECK_EQ(dx, 0.0f);
+    CHECK_EQ(dy, 0.0f);
+    a.packet(32768 + 341, 32768 - 121, 1920, 1080, dx, dy);
+    CHECK(std::fabs(dx - 10.0f) < 0.05f);
+    CHECK(std::fabs(dy + 2.0f) < 0.05f);
+    // Before any position, it is not the reference either.
+    AbsoluteMouse b;
+    dx = dy = 0.0f;
+    b.packet(0, 0, 1920, 1080, dx, dy);
+    CHECK(!b.active());
+    b.packet(65535, 65535, 1920, 1080, dx, dy);
+    CHECK_EQ(dx, 0.0f);
+    CHECK_EQ(dy, 0.0f);
+}

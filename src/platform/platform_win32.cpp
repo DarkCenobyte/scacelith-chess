@@ -200,9 +200,9 @@ LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
                     // Positions (Remote Desktop, a tablet in absolute mode): their steps move the
                     // look while it holds the mouse (absolute_mouse.h).
                     bool desktop = (m.usFlags & MOUSE_VIRTUAL_DESKTOP) != 0;
-                    float x = AbsoluteMouse::pixels(m.lLastX, GetSystemMetrics(desktop ? SM_CXVIRTUALSCREEN : SM_CXSCREEN));
-                    float y = AbsoluteMouse::pixels(m.lLastY, GetSystemMetrics(desktop ? SM_CYVIRTUALSCREEN : SM_CYSCREEN));
-                    g_absMouse.position(x, y, g_input.mouseDX, g_input.mouseDY);
+                    g_absMouse.packet(m.lLastX, m.lLastY, GetSystemMetrics(desktop ? SM_CXVIRTUALSCREEN : SM_CXSCREEN),
+                                      GetSystemMetrics(desktop ? SM_CYVIRTUALSCREEN : SM_CYSCREEN),
+                                      g_input.mouseDX, g_input.mouseDY);
                 }
             }
             break;

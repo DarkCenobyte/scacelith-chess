@@ -29,6 +29,13 @@ public:
         lastX_ = x;
         lastY_ = y;
     }
+    // An absolute packet (coordinates 0..65535 across a screen 'width' x 'height' pixels) during
+    // the capture. One with no coordinates carries only a button or the wheel, not a position: it
+    // is no jump to the top-left corner (SDL reads them the same way).
+    void packet(long x, long y, int width, int height, float& dx, float& dy) {
+        if (x == 0 && y == 0) return;
+        position(pixels(x, width), pixels(y, height), dx, dy);
+    }
     // Positions drive this capture: the cursor is not put back at the centre every frame (the
     // pointer of a Remote Desktop client would follow it and cancel the motion), but once at the end.
     bool active() const { return hasLast_ && !relative_; }
