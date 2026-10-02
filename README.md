@@ -311,7 +311,7 @@ with N an index of the preset list, `--viewpoint 0..9`), `--tc N` (time control 
 x,y,z [--look x,y,z] [--fov deg]` (initial observer camera when watching; a detached camera in a
 normal game), `--handover-preview` (watching through the players' eyes with the clock frozen during
 each camera handover, the same hand-over as [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`,
-`--warp <seconds>` (simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
+`--warp <seconds>` (with `--shot`: simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
 `--mouse fx,fy` (pointer position as fractions of the window; the view follows it, `0.5,0.03` looks
 up at the opponent), `--glance` (start looking at the scoresheet), `--calibrate` (the brightness
 calibration before the title page, as on a first start) and `--ini <file>`.

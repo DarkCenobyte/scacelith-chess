@@ -67,7 +67,7 @@
 //                           other after each move with the clock frozen (hot-seat preview)
 //   --tc N                  time control preset index for a game started from the command line
 //                           (0 = no clock: an untimed game)
-//   --no-intro --warp <s> --moves e2e4,e7e5,... --touch <square>
+//   --no-intro --warp <s> (with --shot) --moves e2e4,e7e5,... --touch <square>
 //   --online-mock           online play against the in-process fake server (online_mock.h)
 //   --start-online [cat]    skip the menu: sign in and play the first opponent found in category
 //                           "cat" (default 5+3; with --online-mock the game starts at once);
