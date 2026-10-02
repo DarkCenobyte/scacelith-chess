@@ -654,23 +654,29 @@ struct Director::Impl {
         run = Run();
     }
 
-    // Stops the running beat now (skip, clear, jump): voice, subtitle, hand, marks.
+    // Stops the started beat's line now: voice, subtitle, hand, marks.
+    void stopLine(bool keepUntilRewind) {
+        if (run.line && !run.lineDone) {
+            if (run.voiced) stage->stopVoice();
+            stage->showSubtitle("", 0.0f, false);
+            run.lineDone = true;
+        }
+        for (LiveMark& m : live) {
+            if (m.serial != run.item.serial) continue;
+            if (!m.lit) light(m, m.onAt);
+            if (!(keepUntilRewind && m.untilRewind)) release(m, true);
+        }
+        if (run.gestures) stage->endGestures();
+        run.gestures = false;
+    }
+
+    // Stops the running beat now (skip, clear, jump): its line, the takeback card.
     void stopRun(bool keepUntilRewind) {
         if (!run.active) return;
         if (run.phase == Phase::Prepare) {
             drop(run.item);
         } else {
-            if (run.line && !run.lineDone) {
-                if (run.voiced) stage->stopVoice();
-                stage->showSubtitle("", 0.0f, false);
-                run.lineDone = true;
-            }
-            for (LiveMark& m : live) {
-                if (m.serial != run.item.serial) continue;
-                if (!m.lit) light(m, m.onAt);
-                if (!(keepUntilRewind && m.untilRewind)) release(m, true);
-            }
-            if (run.gestures) stage->endGestures();
+            stopLine(keepUntilRewind);
             if (run.card) stage->showTakebackOffer(false);
         }
         run = Run();
@@ -776,6 +782,19 @@ struct Director::Impl {
                 run.line = false;
             }
             return;
+        }
+        if (!rest && b.kind == BeatKind::DemoMove) {
+            // Its narration only: the move is still played, the lines kept after it speak of it.
+            if (run.phase == Phase::Prepare) {
+                drop(run.item);
+                run.item.silent = true;
+                run.line = false;
+                return;
+            }
+            if (run.line && !run.lineDone) {
+                stopLine(rewindQueued(script));
+                return;
+            }
         }
         stopRun(rewindQueued(script));
     }

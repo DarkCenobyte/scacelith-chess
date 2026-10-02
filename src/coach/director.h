@@ -9,7 +9,8 @@
 //   - Low beats are dropped when stale (their ply is more than two plies old) or once the player
 //     acts (playerActed);
 //   - Space skips the running skippable beat and the skippable beats of the same script after it
-//     (skipCurrent(): the running beat only); a Rewind is never skipped, it only goes faster.
+//     (skipCurrent(): the running beat only, and of a demonstration move only its narration); a
+//     Rewind is never skipped, it only goes faster.
 // Engine-free and GL-free: the world is reached through coach::Stage only.
 #pragma once
 #include "script.h"

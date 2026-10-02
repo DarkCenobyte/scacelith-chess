@@ -367,6 +367,39 @@ TEST(coach_director_skip) {
         CHECK_EQ(rig.stage.count("rewindDemo"), 1);
         CHECK(rig.started("event.your_move"));
     }
+    // skipCurrent() on a demonstration not begun yet (the hand still busy): its narration only; the
+    // move is still played and taken back, for the lines after it speak of it.
+    {
+        Rig rig;
+        rig.dir.play(script());
+        CHECK(rig.until([&] { return rig.stage.count("voice.end") > 0; }, 10.0f));
+        CHECK(rig.stage.bodyBusy());
+        CHECK_EQ(rig.stage.count("demoMove"), 0);
+        CHECK(rig.dir.skippable());
+        rig.dir.skipCurrent();
+        CHECK(rig.settle());
+        CHECK_EQ(rig.stage.count("demoMove"), 1);
+        CHECK_EQ(rig.stage.count("rewindDemo"), 1);
+        CHECK_EQ(rig.voiceStarts(), 3);   // the explanation, the rewind's line, event.your_move
+        CHECK(rig.started("ex.rewind.b1"));
+        CHECK(rig.started("event.your_move"));
+    }
+    // skipCurrent() during the demonstration's narration: the narration stops, the move stays and
+    // the rewind runs at its pace.
+    {
+        Rig rig;
+        rig.dir.play(script());
+        CHECK(rig.until([&] { return rig.stage.count("demoMove") > 0; }, 20.0f));
+        rig.step();
+        CHECK(rig.dir.speaking());
+        rig.dir.skipCurrent();
+        CHECK_EQ(rig.stage.count("voice.stop"), 1);
+        CHECK(!rig.dir.speaking());
+        CHECK(rig.settle());
+        const auto rw = rig.stage.all("rewindDemo");
+        CHECK(rw.size() == 1 && rw[0].n == 1 && !rw[0].flag);
+        CHECK(rig.started("event.your_move"));
+    }
     // Space during the demonstration: its narration stops, the rewind still runs, briskly.
     {
         Rig rig;
