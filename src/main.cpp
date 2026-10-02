@@ -34,7 +34,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <shellapi.h>
 // Prefer the discrete GPU on hybrid laptops.
 extern "C" {
 __declspec(dllexport) unsigned long NvOptimusEnablement = 1;
@@ -161,18 +160,7 @@ static int runApp(std::vector<std::string> args) {
 }
 
 #ifdef _WIN32
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-    int argc = 0;
-    LPWSTR* wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
-    std::vector<std::string> args;
-    for (int i = 1; i < argc; ++i) {
-        char buf[4096];
-        WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, buf, sizeof(buf), nullptr, nullptr);
-        args.push_back(buf);
-    }
-    LocalFree(wargv);
-    return runApp(args);
-}
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) { return runApp(plat::commandLine()); }
 int main(int argc, char** argv) {
     (void)argc; (void)argv;
     return WinMain(GetModuleHandle(nullptr), nullptr, nullptr, SW_SHOWDEFAULT);
