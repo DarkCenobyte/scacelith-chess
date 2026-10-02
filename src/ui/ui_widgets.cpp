@@ -1151,7 +1151,6 @@ int confirmDialog(const char* idStr, const std::string& title, const std::string
     gfx::setLayer(gfx::LAYER_MODAL);
     vec2 view = gfx::viewSize();
     gfx::fill(Rect(0, 0, view.x, view.y), vec4(0, 0, 0, 0.55f * t));
-    occlude(Rect(0, 0, view.x, view.y));  // the overlays drawn after it too (challenge cards)
     gfx::pushAlpha(t);
     TextStyle ms;
     ms.face = font::FACE_TEXT;
@@ -1184,6 +1183,8 @@ int confirmDialog(const char* idStr, const std::string& title, const std::string
     }
     if (result == 1) sound(Sound::Confirm);
     gfx::popAlpha();
+    // While it stays open it occludes the page, and the overlays drawn after it (challenge cards).
+    if (result < 0) occlude(Rect(0, 0, view.x, view.y));
     gfx::setLayer(prev);
     return result;
 }

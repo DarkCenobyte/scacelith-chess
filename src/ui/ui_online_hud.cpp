@@ -236,7 +236,6 @@ int reportDialog(int& category, std::string& comment) {
     gfx::setLayer(gfx::LAYER_MODAL);
     vec2 v = view();
     gfx::fill(Rect(0, 0, v.x, v.y), vec4(0, 0, 0, 0.55f * t));
-    im::occlude(Rect(0, 0, v.x, v.y));  // the overlays drawn after it too (challenge cards)
     gfx::pushAlpha(t);
     float w = 860.0f, h = 520.0f;
     Rect r(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 12.0f, w, h);
@@ -265,6 +264,8 @@ int reportDialog(int& category, std::string& comment) {
     }
     if (result == 1) im::sound(Sound::Confirm);
     gfx::popAlpha();
+    // While it stays open it occludes the page, and the overlays drawn after it (challenge cards).
+    if (result < 0) im::occlude(Rect(0, 0, v.x, v.y));
     gfx::setLayer(prev);
     if (result >= 0) a.v[0] = 0.0f;
     return result;

@@ -177,7 +177,6 @@ ModelPromptAction modelPrompt(const ModelPrompt& p) {
     gfx::setLayer(gfx::LAYER_MODAL);
     vec2 v = gfx::viewSize();
     gfx::fill(Rect(0, 0, v.x, v.y), vec4(0, 0, 0, 0.6f * t));
-    im::occlude(Rect(0, 0, v.x, v.y));  // the overlays drawn after it too (challenge cards)
     gfx::pushAlpha(t);
     im::pushId("modelprompt");
     ModelPromptAction act = ModelPromptAction::None;
@@ -266,6 +265,8 @@ ModelPromptAction modelPrompt(const ModelPrompt& p) {
     }
     im::popId();
     gfx::popAlpha();
+    // While it stays open it occludes the page, and the overlays drawn after it (challenge cards).
+    if (act == ModelPromptAction::None) im::occlude(Rect(0, 0, v.x, v.y));
     gfx::setLayer(prev);
     if (act != ModelPromptAction::None) {
         g_prompt.lastFrame = 0;   // closed: nothing is blocked on the next frame
