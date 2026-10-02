@@ -274,6 +274,7 @@ TEST(net_protocol_constants) {
     CHECK(!pr::isValid(pr::EndReason(14)));
     CHECK_EQ(std::string(pr::enumName(pr::ErrorCode::IllegalMove)), std::string("IllegalMove"));
     CHECK_EQ(pr::CloseCode::Unauthorized, 4003);
+    CHECK_EQ(pr::CloseCode::ServerFull, 4000 + int(pr::ErrorCode::ServerFull));
 }
 
 TEST(net_protocol_vectors) {
