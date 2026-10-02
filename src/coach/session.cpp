@@ -474,6 +474,7 @@ struct Session::Impl {
     void backgroundEvals(const chess::Game& game) {
         if (hasJob(JobKind::Eval) || !analyst->idle() || g.review != ReviewState::None) return;
         if (g.handshakeDone) return;
+        if (g.takebackTo >= 0) return;   // not of plies a takeback asked of the stage is about to undo
         const bool humanTurn = game.position().sideToMove() == g.human;
         for (size_t k : appraisal.missingEvals(game)) {
             if (k == game.moves().size() && humanTurn && !g.over) continue;   // A0 gives it

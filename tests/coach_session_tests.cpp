@@ -340,7 +340,8 @@ TEST(coach_session_menu_takeback_of_an_offered_move) {
 
 TEST(coach_session_no_turn_while_a_takeback_waits) {
     // The pause menu's Take back after the coach's reply: until the table undoes the moves, the
-    // position on the board is going away, so no human turn begins on it (no A0 nor A3 asked).
+    // positions on the board are going away, so no human turn begins on them (no A0 nor A3 asked)
+    // and no background evaluation is asked of them.
     Table t;
     hangTable(t);
     t.stage.takeBackWait = 30;
@@ -348,16 +349,19 @@ TEST(coach_session_no_turn_while_a_takeback_waits) {
     t.start(levelConfig(3));
     CHECK(t.quiet());
     t.move("g1f1");
+    const std::string played = t.game.position().fen();
     CHECK(t.reply("g8f8"));
     t.step();
     const std::string doomed = t.game.position().fen();
     CHECK_EQ(t.analyst.count("A0", doomed), 1);
     CHECK_EQ(t.analyst.count("A3", doomed), 1);
+    CHECK_EQ(t.analyst.count("E", played), 0);
     t.session.onTakeBackRequested(t.game);
     CHECK(t.until([&] { return !t.stage.tableBusy(); }, 10.0f));
     CHECK_EQ(t.game.moves().size(), size_t(0));
     CHECK_EQ(t.analyst.count("A0", doomed), 1);
     CHECK_EQ(t.analyst.count("A3", doomed), 1);
+    CHECK_EQ(t.analyst.count("E", played), 0);
     CHECK(t.until([&] { return t.session.playerMayMove(t.game); }, 10.0f));
 }
 
