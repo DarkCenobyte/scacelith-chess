@@ -98,8 +98,9 @@ public:
     Square kingSquare(Color c) const;
     void makeMove(const Move& m);                 // m must be legal (use findLegal); flags are re-derived
     bool hasInsufficientMaterial() const;         // dead position: K v K, K+B v K, K+N v K, only same-coloured bishops
-    // FIDE 6.9 / 7.5.5 approximation: false when c has a bare king, when c has a single minor
-    // piece and the opponent a bare king, or when the position is dead; true otherwise.
+    // FIDE 6.9 / 7.5.5 approximation: false when c has a bare king or when the position is dead
+    // (hasInsufficientMaterial(), which covers a single minor piece against a bare king); true
+    // otherwise.
     bool canColorMate(Color c) const;
 
     bool hasLegalMove() const;                    // false = checkmate or stalemate
