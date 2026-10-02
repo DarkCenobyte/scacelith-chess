@@ -2,6 +2,7 @@
 #include <charconv>
 #include <cmath>
 #include <cstdio>
+#include <unordered_map>
 
 namespace net {
 namespace json {
@@ -198,12 +199,18 @@ private:
         }
     }
 
+    // Members kept before the names are looked up through an index rather than one by one.
+    static constexpr size_t kIndexFrom = 16;
+
     bool object(Value& out, int depth) {
         if (depth > lim_.maxDepth) return fail("nesting too deep");
         out = Value::object();
         ++p_;
         ws();
         if (p_ < n_ && s_[p_] == '}') { ++p_; return true; }
+        // Name -> position of the kept members, once there are kIndexFrom of them (a large object
+        // would otherwise cost a scan of the members before it per member: quadratic).
+        std::unordered_map<std::string, size_t> index;
         for (size_t kept = 0;; ++kept) {
             ws();
             if (depth <= lim_.keepDepth && kept >= lim_.maxKept) return fail("too many members");
@@ -216,12 +223,28 @@ private:
             ws();
             Value v;
             if (!value(v, depth)) return false;
-            if (depth <= lim_.keepDepth) out.set(key, std::move(v));   // a duplicate name keeps the last value
+            if (depth <= lim_.keepDepth) keep(out.members_, index, std::move(key), std::move(v));
             ws();
             if (p_ < n_ && s_[p_] == ',') { ++p_; continue; }
             if (p_ < n_ && s_[p_] == '}') { ++p_; return true; }
             return fail("expected ',' or '}'");
         }
+    }
+
+    // A member of an object being read, as Value::set() stores it: a duplicate name keeps the last
+    // value, at the position of the first.
+    static void keep(std::vector<std::pair<std::string, Value>>& members, std::unordered_map<std::string, size_t>& index,
+                     std::string key, Value v) {
+        if (members.size() < kIndexFrom) {
+            for (auto& m : members)
+                if (m.first == key) { m.second = std::move(v); return; }
+        } else {
+            if (index.empty())
+                for (size_t i = 0; i < members.size(); ++i) index.emplace(members[i].first, i);
+            auto at = index.emplace(key, members.size());
+            if (!at.second) { members[at.first->second].second = std::move(v); return; }
+        }
+        members.emplace_back(std::move(key), std::move(v));
     }
 
     bool array(Value& out, int depth) {

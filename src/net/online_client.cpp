@@ -1959,7 +1959,7 @@ bool looksLikePgn(const std::string& t) {
 // is checked, but only its top level is kept in memory while doing so (it may be large). The
 // server's document has about fifteen top-level members: more than kExportMaxMembers is not the
 // export, and is refused there (a hostile server's million members or items would otherwise all be
-// kept, and their names looked up one by one: gigabytes, or hours of this thread).
+// kept: gigabytes).
 constexpr size_t kExportMaxMembers = 64;
 bool validExport(const std::string& t) {
     json::Limits lim;

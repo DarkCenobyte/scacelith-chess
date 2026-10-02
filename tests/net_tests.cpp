@@ -641,6 +641,39 @@ TEST(net_json_parse) {
     CHECK(net::json::parse("{\"k\":1,\"k\":2}", v) && v["k"].asInt() == 2 && v.size() == 1);
 }
 
+// A large object is read in time proportional to its size (a hostile server's answer of 1 MiB,
+// up to 100000 members, must not keep a network thread busy), with the same rule for duplicate
+// names however many members come before them: the last value, at the position of the first.
+TEST(net_json_large_object) {
+    std::string doc = "{";
+    for (int i = 0; i < 90000; ++i) {
+        char member[16];
+        std::snprintf(member, sizeof member, "%s\"%05x\":%d", i ? "," : "", i, i % 10);
+        doc += member;
+    }
+    doc += "}";
+    Value v;
+    auto t0 = std::chrono::steady_clock::now();
+    CHECK(net::json::parse(doc, v));
+    double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    std::fprintf(stderr, "  %zu bytes, 90000 members: %.1f ms\n", doc.size(), ms);
+    CHECK(ms < 2000);   // seconds before (a scan of the kept members per member)
+    CHECK_EQ(v.size(), size_t(90000));
+    CHECK_EQ(v["15f8f"].asInt(), int64_t(89999 % 10));
+
+    std::string dup = "{";
+    for (int i = 0; i < 30; ++i) dup += (i ? ",\"a" : "\"a") + std::to_string(i) + "\":" + std::to_string(i);
+    dup += ",\"a3\":\"x\",\"a20\":\"y\",\"a29\":null,\"a3\":\"z\",\"b\":1}";
+    CHECK(net::json::parse(dup, v));
+    CHECK_EQ(v.size(), size_t(31));
+    CHECK_EQ(v.members()[3].first, std::string("a3"));
+    CHECK_EQ(v.members()[3].second.asString(), std::string("z"));
+    CHECK_EQ(v.members()[20].second.asString(), std::string("y"));
+    CHECK(v.members()[29].second.isNull());
+    CHECK_EQ(v.members()[30].first, std::string("b"));
+    CHECK_EQ(v.dump().substr(0, 32), std::string("{\"a0\":0,\"a1\":1,\"a2\":2,\"a3\":\"z\",\""));
+}
+
 TEST(net_json_rejects) {
     const char* bad[] = {"", "{", "[1,]", "{\"a\":1,}", "01", "1.", ".5", "+1", "-", "1e", "tru", "nul", "NaN", "Infinity",
                          "\"abc", "\"a\\x\"", "\"\\ud800\"", "\"\\udc00\"", "\"\\ud800\\u0041\"", "\"a\tb\"", "\"\xC3\x28\"",
