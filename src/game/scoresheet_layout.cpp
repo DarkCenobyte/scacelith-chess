@@ -1,5 +1,6 @@
 #include "scoresheet_layout.h"
 #include "../i18n/i18n.h"
+#include "../i18n/unicode.h"
 #include <algorithm>
 #include <cmath>
 
@@ -45,20 +46,6 @@ constexpr float LINE_BELOW_BASELINE = 0.7f;  // the writing line sits just under
 
 float blockX0(int block) { return BLOCK_X0 + float(block) * (BLOCK_W + BLOCK_GAP); }
 
-std::string utf8(uint32_t cp) {
-    std::string s;
-    if (cp < 0x80) s += char(cp);
-    else if (cp < 0x800) { s += char(0xC0 | (cp >> 6)); s += char(0x80 | (cp & 0x3F)); }
-    else if (cp < 0x10000) { s += char(0xE0 | (cp >> 12)); s += char(0x80 | ((cp >> 6) & 0x3F)); s += char(0x80 | (cp & 0x3F)); }
-    else {
-        s += char(0xF0 | (cp >> 18));
-        s += char(0x80 | ((cp >> 12) & 0x3F));
-        s += char(0x80 | ((cp >> 6) & 0x3F));
-        s += char(0x80 | (cp & 0x3F));
-    }
-    return s;
-}
-
 }  // namespace
 
 // ---- Form ---------------------------------------------------------------------------------------
@@ -85,7 +72,9 @@ Form printedForm(int page) {
     };
 
     // Title: a knight figure and the form's name, double rule underneath.
-    text(utf8(0x265E), PRINT_SYMBOL, BLOCK_X0, 16.1f, 4.4f, 0);
+    std::string knight;
+    uni::append(knight, 0x265E);
+    text(knight, PRINT_SYMBOL, BLOCK_X0, 16.1f, 4.4f, 0);
     // Labels fit their room in every language: the title ends before "Page", a field label before
     // its writing line, column titles inside their column.
     const float titleX = BLOCK_X0 + 6.3f;

@@ -3,6 +3,7 @@
 // platform's own (wide-character paths on Windows, POSIX elsewhere) so that UTF-8 names work everywhere.
 #include "game_archive.h"
 #include "../core/log.h"
+#include "../i18n/unicode.h"
 
 #include <algorithm>
 #include <atomic>
@@ -261,23 +262,6 @@ uint32_t nextCodepoint(const std::string& s, size_t& i) {
     i += size_t(len);
     return cp;
 }
-void appendCodepoint(std::string& out, uint32_t cp) {
-    if (cp < 0x80) {
-        out += char(cp);
-    } else if (cp < 0x800) {
-        out += char(0xC0 | (cp >> 6));
-        out += char(0x80 | (cp & 0x3F));
-    } else if (cp < 0x10000) {
-        out += char(0xE0 | (cp >> 12));
-        out += char(0x80 | ((cp >> 6) & 0x3F));
-        out += char(0x80 | (cp & 0x3F));
-    } else {
-        out += char(0xF0 | (cp >> 18));
-        out += char(0x80 | ((cp >> 12) & 0x3F));
-        out += char(0x80 | ((cp >> 6) & 0x3F));
-        out += char(0x80 | (cp & 0x3F));
-    }
-}
 
 // ---- Listing cache --------------------------------------------------------------------------------
 struct CachedFile {
@@ -489,7 +473,7 @@ std::string sanitizeName(const std::string& name, size_t maxBytes) {
         if (cp == ' ' || cp == 0xA0 || (cp >= 0x2000 && cp <= 0x200A) || cp == 0x3000 || std::strchr("<>:\"/\\|?*", int(cp)))
             cp = '_';
         if (cp == '_' && !out.empty() && out.back() == '_') continue;
-        appendCodepoint(out, cp);
+        uni::append(out, cp);
     }
     auto trimEnds = [](std::string& s) {
         size_t a = 0, b = s.size();
