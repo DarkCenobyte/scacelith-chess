@@ -746,8 +746,6 @@ void Session::stop() {
     d.g.started = false;
 }
 
-const SessionConfig& Session::config() const { return d_->config; }
-
 void Session::update(const chess::Game& game, float dt) {
     Impl& d = *d_;
     if (!d.g.started) return;
@@ -809,12 +807,6 @@ void Session::onTakeBackRequested(const chess::Game& game) {
     Script s = takebackScript(true, human);
     if (d.g.offerPly == human) append(s, d.reviewer.takebackAccepted(after));   // the replay is judged against it
     d.play(s);
-}
-
-void Session::onTakenBack(const chess::Game& game) {
-    Impl& d = *d_;
-    if (!d.g.started || d.g.level == 0) return;
-    d.takenBack(game);
 }
 
 void Session::onDrawAnswer(bool accepted) {
