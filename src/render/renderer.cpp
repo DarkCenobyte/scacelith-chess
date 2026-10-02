@@ -91,10 +91,6 @@ bool Renderer::init(const RenderSettings& s) {
     fill(dummy2D_, black, GL_RGBA, GL_FLOAT);
     dummyArray_ = gpu::createTexture2DArray(1, 1, 1, GL_RGBA16F);
     fill(dummyArray_, black, GL_RGBA, GL_FLOAT);
-    dummy3D_ = gpu::createTexture3D(1, 1, 1, GL_RGBA16F);
-    glTextureSubImage3D(dummy3D_.id, 0, 0, 0, 0, 1, 1, 1, GL_RGBA, GL_FLOAT, black);
-    dummyCube_ = gpu::createCubemap(1, GL_RGBA16F);
-    fill(dummyCube_, black, GL_RGBA, GL_FLOAT);
     dummyCubeArray_ = gpu::createCubemapArray(1, 1, GL_RGBA16F);
     fill(dummyCubeArray_, black, GL_RGBA, GL_FLOAT);
 
@@ -197,11 +193,6 @@ void Renderer::setLightProbes(const std::vector<LightProbeDesc>& probes) {
     staticDirty_ = true;
 }
 
-void Renderer::setGlobalTexture(int slot, GLuint texture) {
-    if (slot >= 0 && slot < 5) globalTex_[slot] = texture;
-}
-
-GLuint Renderer::skyCubemap() const { return atmosphere_->skyCube(); }
 GLuint Renderer::specularProbes() const { return probes_->baked() ? probes_->specularArray() : dummyCubeArray_.id; }
 
 void Renderer::shutdown() {
@@ -213,7 +204,7 @@ void Renderer::shutdown() {
     planarRefl_->shutdown();
     atmosphere_->shutdown();
     brdfLut_.destroy();
-    for (auto* t : {&dummy2D_, &dummyArray_, &dummyCube_, &dummyCubeArray_, &dummy3D_, &dummyShadow_}) t->destroy();
+    for (auto* t : {&dummy2D_, &dummyArray_, &dummyCubeArray_}) t->destroy();
     frameUbo_.destroy();
     drawSsbo_.destroy();
     lightSsbo_.destroy();
@@ -403,21 +394,15 @@ const ShaderProgram* Renderer::programFor(const Material& mat, PassId pass, bool
 }
 
 void Renderer::bindGlobalTextures() {
-    // Keep every reserved unit complete with a dummy of the right type.
-    for (int u = TEXUNIT_SHADOW; u < TEXUNIT_COUNT; ++u) glBindTextureUnit(GLuint(u), dummy2D_.id);
+    // Keep every unit the lighting samples (8..15) complete with a dummy of the right type.
+    for (int u = TEXUNIT_SHADOW; u <= TEXUNIT_SSR; ++u) glBindTextureUnit(GLuint(u), dummy2D_.id);
     glBindTextureUnit(TEXUNIT_SHADOW, shadows_->depthArray());
     glBindSampler(TEXUNIT_SHADOW, g_samplerShadowCmp);
     glBindTextureUnit(TEXUNIT_SHADOW_DEPTH, shadows_->depthArray());
     glBindSampler(TEXUNIT_SHADOW_DEPTH, g_samplerShadowRaw);
-    glBindTextureUnit(TEXUNIT_IRRADIANCE, dummy2D_.id);  // irradiance SH lives in the LightingUBO
     glBindTextureUnit(TEXUNIT_SPECULAR, specularProbes());
     glBindTextureUnit(TEXUNIT_PLANAR, planarRefl_->colorArray() ? planarRefl_->colorArray() : dummyArray_.id);
     glBindTextureUnit(TEXUNIT_BRDF_LUT, brdfLut_.id);
-    glBindTextureUnit(TEXUNIT_SKY, atmosphere_->skyCube() ? atmosphere_->skyCube() : dummyCube_.id);
-    glBindTextureUnit(TEXUNIT_VOLUMETRIC, dummy3D_.id);
-    glBindTextureUnit(TEXUNIT_NOISE, dummyArray_.id);
-    for (int i = 0; i < 5; ++i)
-        if (globalTex_[i]) glBindTextureUnit(GLuint(TEXUNIT_GLOBAL0 + i), globalTex_[i]);
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_LIGHTING, lightingUbo_.id);
 }
 

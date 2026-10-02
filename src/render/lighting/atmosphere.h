@@ -1,5 +1,5 @@
 // Physically based sky (Hillaire 2020): transmittance / multiple-scattering / sky-view LUTs on the
-// GPU, the sky cubemap bound on TEXUNIT_SKY (+ its SH irradiance), and a CPU evaluation of the
+// GPU, the sky cubemap (+ its SH irradiance), and a CPU evaluation of the
 // sun's transmittance so the sun colour and illuminance follow its elevation.
 #pragma once
 #include "../gpu.h"

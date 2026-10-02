@@ -253,9 +253,6 @@ public:
     void setShadowRegions(const m::AABB* regions, int count);
     // Light probe layout (<= 16). Default: one priority probe above the table + a 3x4 hall grid.
     void setLightProbes(const std::vector<LightProbeDesc>& probes);
-    // Global textures shared by several materials (units TEXUNIT_GLOBAL0 + slot, slot 0..4).
-    void setGlobalTexture(int slot, GLuint texture);
-    GLuint skyCubemap() const;           // TEXUNIT_SKY: sky radiance (pre-exposed, no sun disk)
     GLuint specularProbes() const;       // TEXUNIT_SPECULAR: prefiltered probe cube array
     GLuint lightingUBO() const { return lightingUbo_.id; }
     GLuint brdfLut() const { return brdfLut_.id; }
@@ -338,12 +335,11 @@ private:
     std::unique_ptr<lighting::PlanarReflections> planarRefl_;
     gpu::Texture brdfLut_;
     m::AABB sceneBounds_;
-    GLuint globalTex_[5] = {};
     float skyKey_[9] = {};     // sky capture inputs of the last capture
     float bakeKey_[6] = {};    // probe bake inputs of the last bake
     bool skyKeyValid_ = false;
     // Default textures bound to unused units so samplers are always complete
-    gpu::Texture dummy2D_, dummyArray_, dummyCube_, dummyCubeArray_, dummy3D_, dummyShadow_;
+    gpu::Texture dummy2D_, dummyArray_, dummyCubeArray_;
     std::unique_ptr<PostFX> post_;
 };
 
