@@ -1,6 +1,7 @@
 #include "test.h"
 #include "math/math.h"
 #include "core/ini.h"
+#include "net/net_sys.h"
 
 TEST(math_quat_roundtrip) {
     m::quat q = m::axisAngle(m::vec3(0.3f, 1.0f, -0.2f), 1.1f);
@@ -24,4 +25,19 @@ TEST(ini_roundtrip) {
     CHECK(b.load("/tmp/scacelith_ini_test.ini"));
     CHECK_EQ(b.getInt("display.width"), 1920);
     CHECK_EQ(b.getBool("audio.ambience", true), false);
+}
+
+// The settings file may sit in a folder with any name: its UTF-8 path is the file's real name
+// whatever the code page (on Windows the ANSI one mangles "\xC3\x89checs" unless the process runs
+// in UTF-8). net::sys opens UTF-8 paths with the wide API.
+TEST(ini_utf8_path) {
+    const std::string path = net::sys::exeDirectory() + "ini-test-\xC3\x89" "checs.ini";
+    IniFile a;
+    a.setInt("display.width", 1280);
+    CHECK(a.save(path));
+    CHECK(net::sys::fileExists(path));
+    IniFile b;
+    CHECK(b.load(path));
+    CHECK_EQ(b.getInt("display.width"), 1280);
+    CHECK(net::sys::removeFile(path));
 }

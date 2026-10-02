@@ -1,6 +1,7 @@
 #include "ini.h"
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <map>
@@ -10,8 +11,9 @@ static std::string trim(const std::string& s) {
     return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
 }
 
+// The paths are UTF-8: opened as wide paths on Windows (u8path), whatever the process code page.
 bool IniFile::load(const std::string& path) {
-    std::ifstream f(path);
+    std::ifstream f(std::filesystem::u8path(path));
     if (!f) return false;
     std::string line, section;
     while (std::getline(f, line)) {
@@ -40,7 +42,7 @@ bool IniFile::save(const std::string& path) const {
         if (!bySection.count(sec)) order.push_back(sec);
         bySection[sec].push_back({key, e.second});
     }
-    std::ofstream f(path, std::ios::trunc);
+    std::ofstream f(std::filesystem::u8path(path), std::ios::trunc);
     if (!f) return false;
     f << "; Scacelith settings\n";
     for (auto& sec : order) {
