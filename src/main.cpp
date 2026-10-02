@@ -117,7 +117,7 @@ static int runApp(std::vector<std::string> args) {
     double last = plat::time();
     int frame = 0;
     bool running = true;
-    bool f5Held = false;  // F5 acts once per press, not on auto-repeat
+    bool f5Held = false, f12Held = false;  // F5 and F12 act once per press, not on auto-repeat
     while (running) {
         if (!plat::pumpEvents()) break;
         double now = plat::time();
@@ -135,7 +135,8 @@ static int runApp(std::vector<std::string> args) {
             scene->renderOverlay(ctx, dt);
         }
         ++frame;
-        bool f12 = in.keyPressed[plat::KEY_F12];
+        bool f12 = in.keyPressed[plat::KEY_F12] && !f12Held;
+        f12Held = in.keyDown[plat::KEY_F12];
         if ((ctx.screenshotMode && frame >= shotFrames) || f12) {
             std::vector<uint8_t> px;
             int sw, sh;
