@@ -11,7 +11,8 @@
 // then every estimate is moved 0.1 s earlier: a gesture a little early looks natural, a late one
 // does not (§6.3). Expected error: about ±0.2 s inside a stretch of 3 s or less.
 //
-// Engine-free and allocation-light: run it on the TTS worker's result, before playback.
+// Engine-free; run it once per line before playback (the director does it on the main thread when
+// the line starts).
 #pragma once
 #include "catalog.h"
 #include <cstddef>
