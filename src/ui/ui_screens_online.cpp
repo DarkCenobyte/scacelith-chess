@@ -381,23 +381,52 @@ bool tcTile(int id, const Rect& r, const std::string& label, const std::string& 
 }
 
 // ---- Result handling (HTTPS answers of the pages) ----------------------------------------------------
+// The answer of an account form ('page'): there, the account page with 'note' or the error under the
+// form; on any other page (the player went on meanwhile), a notice.
+void answered(Sub page, bool ok, const std::string& note, const std::string& error) {
+    if (O.sub != page) {
+        notify(ok ? note : error, 4.0f);
+    } else if (ok) {
+        setSub(Sub::Account);
+        O.note = note;
+    } else {
+        O.error = error;
+    }
+}
+
+// Recovery codes just received (shown once): to 'page', which shows them, whatever page the player
+// went to meanwhile, except a direct match's (its host would keep listening unseen).
+void showCodes(Sub page) {
+    if (O.sub != page && !isDirect(O.sub) && ses().signedIn()) setSub(page);
+}
+
 void pumpResults() {
     game::OnlineSession& s = ses();
     net::Event e;
     if (s.take(Kind::LoginResult, e)) {
+        // The answer moves the player on only from the pages of signing in (and, when it signs in or
+        // asks for a code, from the other signed-out forms); on a page opened meanwhile (a direct
+        // match's host would keep listening unseen) it is only told.
+        const bool signingIn = O.sub == Sub::SignIn || O.sub == Sub::Mfa || O.sub == Sub::SsoWait || O.sub == Sub::SsoName;
+        const bool signedOutForm = signingIn || O.sub == Sub::Register || O.sub == Sub::CheckEmail || O.sub == Sub::Forgot;
         if (e.ok) {
             clearSecrets();
-            setSub(Sub::Play);
+            if (signedOutForm) setSub(Sub::Play);
+            else notify(i18n::trf("online.play.signed_in", {s.account().username}), 4.0f);
         } else if (e.mfaRequired) {
-            O.code.clear();
-            setSub(Sub::Mfa);
-        } else {
+            if (signedOutForm) {
+                O.code.clear();
+                setSub(Sub::Mfa);
+            }
+        } else if (signingIn) {
             Sub back = O.sub == Sub::SsoName ? Sub::SsoName
                        : (O.sub == Sub::Mfa && e.error == "invalid_code") ? Sub::Mfa
                                                                            : Sub::SignIn;
             if (O.sub != back) setSub(back);
             O.error = game::onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs);
             O.offerResend = e.error == "email_unverified";
+        } else if (e.error != "cancelled") {
+            notify(game::onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs), 4.0f);
         }
     }
     if (s.take(Kind::SsoBrowserOpened, e) && !e.ok) {
@@ -432,13 +461,8 @@ void pumpResults() {
         else O.error = game::onlineErrorText(e.error, e.retryAfterSec);
     }
     if (s.take(Kind::PasswordChanged, e)) {
-        if (e.ok) {
-            clearSecrets();
-            setSub(Sub::Account);
-            O.note = T("online.password.changed");
-        } else {
-            O.error = game::onlineErrorText(e.error, e.retryAfterSec);
-        }
+        if (e.ok) clearSecrets();
+        answered(Sub::Password, e.ok, T("online.password.changed"), game::onlineErrorText(e.error, e.retryAfterSec));
     }
     if (s.take(Kind::MfaSetupResult, e)) {
         if (e.ok) {
@@ -459,18 +483,14 @@ void pumpResults() {
             O.mfaUri.clear();
             clearSecrets();
             O.error.clear();
+            showCodes(Sub::MfaSetup);
         } else {
             O.error = game::onlineErrorText(e.error, e.retryAfterSec);
         }
     }
     if (s.take(Kind::MfaDisableResult, e)) {
-        if (e.ok) {
-            clearSecrets();
-            setSub(Sub::Account);
-            O.note = T("online.mfa.off_done");
-        } else {
-            O.error = game::onlineErrorText(e.error, e.retryAfterSec);
-        }
+        if (e.ok) clearSecrets();
+        answered(Sub::MfaOff, e.ok, T("online.mfa.off_done"), game::onlineErrorText(e.error, e.retryAfterSec));
     }
     if (s.take(Kind::RecoveryCodesResult, e)) {
         if (e.ok) {
@@ -478,6 +498,7 @@ void pumpResults() {
             O.mfaStep = 2;
             clearSecrets();
             O.error.clear();
+            showCodes(Sub::Recovery);
         } else {
             O.error = game::onlineErrorText(e.error, e.retryAfterSec);
         }
@@ -567,7 +588,7 @@ void pageSignIn(float t) {
         if (O.user.find('@') != std::string::npos) O.email = O.user;
         setSub(Sub::Forgot);
     }
-    if (linkButton("online.direct.button", p.r() - 100.0f - third * 0.5f, linkY)) setSub(Sub::Direct);
+    if (linkButton("online.direct.button", p.r() - 100.0f - third * 0.5f, linkY, !busy)) setSub(Sub::Direct);
     footerRule(p);
     if (backButton(p)) O.leave = true;
     if (primaryButton(p, "online.signin.button", usable && !trim(O.user).empty() && !O.password.empty(), busy)) {
