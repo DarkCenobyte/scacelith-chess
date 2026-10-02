@@ -4,13 +4,16 @@
 //   - Redirects and cookies disabled on every request.
 //   - Pinned servers: SECURITY_FLAG_IGNORE_UNKNOWN_CA for that request only, and the leaf
 //     certificate (WINHTTP_OPTION_SERVER_CERT_CONTEXT, CERT_SHA256_HASH_PROP_ID) is compared
-//     with the pin in the WINHTTP_CALLBACK_STATUS_SENDING_REQUEST notification, after the TLS
+//     with the pin in every WINHTTP_CALLBACK_STATUS_SENDING_REQUEST notification, after the TLS
 //     handshake and before the request is written; a mismatch closes the request handle there,
 //     which aborts the send (the approach of .NET's WinHttpHandler). The pin is checked again
 //     once the response has arrived. Wine's WinHTTP sends the request anyway after that close,
 //     so a pinned request that carries anything (Authorization header, body) is preceded by a
-//     "HEAD /" probe without either: a server that fails the pin never receives the secret, and
-//     the real request normally reuses the probe's verified keep-alive connection.
+//     "HEAD /" probe without either: a server that fails the pin gets the probe only, and the
+//     real request normally reuses the probe's verified keep-alive connection. Under Wine that
+//     reuse is all the protection: an active attacker that relays the probe to the real server,
+//     then closes that connection, receives the real request (header and body) on the new one
+//     WinHTTP opens, before the check after the answer refuses it.
 //   - WebSocket: WinHttpWebSocketCompleteUpgrade / Send / Receive / Shutdown. A reader thread
 //     owned by the socket object blocks in WinHttpWebSocketReceive (WinHTTP allows one send and
 //     one receive in flight at the same time) and queues complete binary messages.

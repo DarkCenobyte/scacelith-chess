@@ -10,7 +10,8 @@
 //     including the host name. With a pin (hex SHA-256 of the leaf certificate's DER), an
 //     unknown issuer is tolerated for that connection only and the leaf must match the pin;
 //     no header or body given by the caller (token, password) reaches a server that fails the
-//     pin (OpenSSL: checked right after the handshake; WinHTTP: see transport_win32.cpp).
+//     pin (OpenSSL: checked right after the handshake; WinHTTP: see transport_win32.cpp, which
+//     also says what an active attacker can still get under Wine).
 //   - Plain HTTP / WS only for loopback hosts (localhost, 127.0.0.1, ::1).
 //   - HTTP redirects are never followed (a 3xx comes back as it is), cookies are not kept.
 //     (net/download.h follows the redirects of public file hosts itself, with its own rules.)
