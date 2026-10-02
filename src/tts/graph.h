@@ -2,8 +2,8 @@
 // subgraphs, fuses a few hot patterns (exact-erf GELU, channel LayerNorm, quantized MatMul
 // epilogues, fake-quantized activations) and runs the nodes in the exported topological order with dynamic shapes.
 //
-// Supported operators (opset 19, the set used by the Supertonic 3 graphs, see
-// research-supertonic.md 5.3): Add Sub Mul Div Pow Equal Where Cast Clip Relu PRelu Erf Exp Sin
+// Supported operators (opset 19, the set used by the Supertonic 3 graphs): Add Sub Mul Div Pow
+// Equal Where Cast Clip Relu PRelu Erf Exp Sin
 // Cos Tanh Softplus Reciprocal Concat Split Slice Gather Reshape Transpose Unsqueeze Squeeze Shape
 // ConstantOfShape Expand Tile Pad(constant, edge) Softmax LayerNormalization BatchNormalization
 // ReduceSum MatMul Gemm Conv(1-D) MatMulInteger DynamicQuantizeLinear QuantizeLinear

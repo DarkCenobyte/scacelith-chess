@@ -397,7 +397,7 @@ bool opCast(const Tensor& x0, int to, Tensor& out, std::string* err) {
         default: return 0.0;
         }
     };
-    if (x.type == DType::I32 && t == DType::F32) {   // hot: MatMulInteger outputs
+    if (x.type == DType::I32 && t == DType::F32) {   // unfused MatMulInteger outputs (the shipped model fuses them)
         for (int64_t i = 0; i < n; ++i) out.mut<float>()[i] = float(x.as<int32_t>()[i]);
         return true;
     }
@@ -1365,7 +1365,7 @@ bool opQuantize(const ExecContext& ctx, const Node& nd, const Tensor* const* in,
     out = Tensor::alloc(t, x.dims);
     const float* p = x.as<float>();
     int64_t n = x.count();
-    if (t == DType::U8 && q.channels == 1) {   // per tensor: the vocoder's activations
+    if (t == DType::U8 && q.channels == 1) {   // per tensor (unfused QDQ)
         uint8_t* o = out.mut<uint8_t>();
         parallelRange(&ctx, n, kGrain, [&](int64_t i0, int64_t i1) {
             ctx.k->quantizeU8(p + i0, size_t(i1 - i0), q.scale[0], q.zp[0], o + i0);

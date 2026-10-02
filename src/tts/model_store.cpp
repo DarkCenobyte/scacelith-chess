@@ -452,7 +452,8 @@ void ModelDownloader::run(Options o) {
             p.total = manifest_.archiveSize;
         });
         LOGI("tts: fetching the release archive %s", manifest_.archiveUrl.c_str());
-        // A complete archive left by a cancelled extraction is used as it is (checked by download()).
+        // A complete archive left by a cancelled extraction is used as it is once its size and SHA-256
+        // match (checked just below; download() itself only continues a .part).
         net::DownloadRequest rq;
         rq.url = manifest_.archiveUrl;
         rq.path = archive;

@@ -37,7 +37,7 @@ public:
     int voiceCount() const { return voices_; }
     std::string voiceName(int i) const;
     const int32_t* indexer() const { return indexer_; }
-    size_t modelBytes() const;   // bytes of the four graphs (mapped)
+    size_t modelBytes() const;   // bytes of the six model files (mapped)
 
     // Stages. 'ids' are model ids (text::indices), 'voice' in [0, voiceCount()). A stage stops
     // with the error "cancelled" once 'cancel' (optional) is set.

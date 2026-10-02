@@ -1,7 +1,7 @@
 // Minimal reader of ONNX model files (protobuf wire format, onnx.proto field numbers): opset
 // imports, graph inputs/outputs, nodes with their attributes, and initializers. Initializer bytes
-// stored as raw_data stay in place in the caller's buffer (a memory-mapped file or the executable
-// image): nothing is copied except tensors stored in the typed repeated fields, which the
+// stored as raw_data stay in place in the caller's buffer (the memory-mapped model file in the
+// game): nothing is copied except tensors stored in the typed repeated fields, which the
 // exporters only use for small constants. No external data (every Supertonic file is < 2 GB).
 #pragma once
 #include <cstddef>

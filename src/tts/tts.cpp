@@ -159,8 +159,8 @@ bool Synthesizer::loadFrom(const std::string& dir, std::string* error) {
         return false;
     }
     engine_ = std::move(e);
-    LOGI("tts: models loaded from %s (%.0f MB, %s kernels, %.0f ms)", dir.c_str(), engine_->modelBytes() / 1048576.0,
-         kern::active().name, since(t0) * 1000.0);
+    LOGI("tts: models loaded from %s (%.0f MB, %s kernels at load, %.0f ms)", dir.c_str(),
+         engine_->modelBytes() / 1048576.0, kern::active().name, since(t0) * 1000.0);
     return true;
 }
 
@@ -345,7 +345,8 @@ void Worker::run() {
     try {
         ok = synth.load(&err);
         if (ok) {
-            // Warm-up: pages the weights in and sizes the allocator before the first real line.
+            // Warm-up: pages the weights in and starts the thread pool before the first real line
+            // (the buffer cache is trimmed after every line).
             Options w = opts_;
             w.seed = 1;
             synth.synthesize("Hello.", "en", w, &cancelRunning_);

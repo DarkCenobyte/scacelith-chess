@@ -85,7 +85,8 @@ const Table& active();
 // Table of a given level when the CPU runs it (tests), else nullptr.
 const Table* tableFor(int level);
 // Caps the level for troubleshooting ("auto", "scalar", "sse2", "avx2", "avxvnni", "avx512").
-// Takes effect for synthesizers created afterwards. Returns false for an unknown name.
+// Takes effect from the next synthesis (and the constant folding of later loads). Returns false
+// for an unknown name.
 bool setArchCap(const char* arch);
 const char* levelName(int level);
 
