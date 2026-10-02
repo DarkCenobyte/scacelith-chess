@@ -362,6 +362,11 @@ TEST(anim_cancel_tasks_lets_go_and_goes_on_from_the_hand) {
     CHECK(!an.busy());
 }
 
+// An animator is not copyable (a copy would drive the same character state); the game resets one
+// by moving a fresh one in.
+static_assert(!std::is_copy_constructible_v<anim::Animator> && !std::is_copy_assignable_v<anim::Animator>);
+static_assert(std::is_move_constructible_v<anim::Animator> && std::is_move_assignable_v<anim::Animator>);
+
 // ---- The first-person player's own scoresheet ----------------------------------------------------
 namespace {
 

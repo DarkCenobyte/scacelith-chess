@@ -247,6 +247,12 @@ bool penPathDown(const std::vector<PenKey>& path, float t);   // tip on the pape
 class Animator {
 public:
     Animator();
+    // Not copyable (a copy would drive the same character state); movable, e.g. to start afresh
+    // with 'a = Animator()'. A moved-from animator needs init() before any other call.
+    Animator(const Animator&) = delete;
+    Animator& operator=(const Animator&) = delete;
+    Animator(Animator&&) = default;
+    Animator& operator=(Animator&&) = default;
     // pelvisWorld: hip joint centre in the world; facing: +1 = faces -Z (White, sitting at +Z),
     // -1 = faces +Z (Black). playHand: the hand that plays and presses the clock (the one on the
     // clock side); the other hand writes (WriteTask). With Side::Left every playing-hand task is
