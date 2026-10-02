@@ -1697,6 +1697,12 @@ struct FakeServer::Impl {
 
     void setConn(ConnState s, const std::string& err = "") {
         conn = s;
+        // The server drops the challenges of a user whose connection closed, telling only the other
+        // party (control-plane.js _dropChallengesOf).
+        if (s != ConnState::Online) {
+            outgoing.active = false;
+            incoming.active = false;
+        }
         Event e;
         e.kind = Event::Kind::ConnectionChanged;
         e.state = s;
@@ -2637,7 +2643,7 @@ void FakeServer::declineChallenge(uint32_t id) {
 void FakeServer::cancelChallenge(uint32_t id) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
-    if (!I.outgoing.active || I.outgoing.id != id) return;
+    if (!I.outgoing.active || I.outgoing.id != id) return I.serverError(int(proto::ErrorCode::ChallengeNotFound));
     I.outgoing.active = false;
     I.challengeStatus(3);
 }

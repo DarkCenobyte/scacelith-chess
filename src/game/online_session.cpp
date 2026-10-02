@@ -197,7 +197,7 @@ bool isGameEvent(Kind k) {
 enum ChallengeState { ChPending = 0, ChAccepted = 1, ChDeclined = 2, ChCancelled = 3, ChExpired = 4, ChUnavailable = 5 };
 enum QueueState { QLeft = 0, QSearching = 1, QMatched = 2 };
 enum NoticeCode { NShutdown = 1, NBanned = 2, NRevoked = 3, NCooldown = 4, NReplaced = 5, NRatingRestored = 7 };
-constexpr int kErrAlreadyInGame = 106, kErrInvalidCategory = 107, kErrMatchmakingCooldown = 207;
+constexpr int kErrAlreadyInGame = 106, kErrInvalidCategory = 107, kErrChallengeNotFound = 201, kErrMatchmakingCooldown = 207;
 // The names above are the generated ones (net/protocol_gen.h): a schema change fails here.
 static_assert(ChPending == int(net::proto::ChallengeState::Pending) && ChAccepted == int(net::proto::ChallengeState::Accepted) &&
                   ChDeclined == int(net::proto::ChallengeState::Declined) &&
@@ -216,6 +216,7 @@ static_assert(NShutdown == int(net::proto::NoticeCode::ServerShutdown) && NBanne
               "NoticeCode");
 static_assert(kErrAlreadyInGame == int(net::proto::ErrorCode::AlreadyInGame) &&
                   kErrInvalidCategory == int(net::proto::ErrorCode::InvalidCategory) &&
+                  kErrChallengeNotFound == int(net::proto::ErrorCode::ChallengeNotFound) &&
                   kErrMatchmakingCooldown == int(net::proto::ErrorCode::MatchmakingCooldown),
               "ErrorCode");
 
@@ -517,9 +518,11 @@ void OnlineSession::cancelOutgoing() {
     if (!outgoing_.active) return;
     if (outgoing_.id) api().cancelChallenge(outgoing_.id);
     outgoing_ = Outgoing();
+    quietNotFound_ = false;  // a ChallengeNotFound now may answer this cancel
 }
 
 void OnlineSession::answerChallenge(uint32_t id, bool accept) {
+    quietNotFound_ = false;  // a ChallengeNotFound now may answer this
     if (accept) {
         cancelSearch();
         // A direct match being hosted or joined would start a second game over this one.
@@ -641,6 +644,12 @@ void OnlineSession::update(float dt) {
         } else {
             ui::notify(gifErrorText(gif_.error(), gif_.retryAfterSec()), 6.0f);
         }
+    }
+    // A challenge received is gone at its expiry, its Expired status missed or not (offline then).
+    if (!incoming_.empty()) {
+        const double now = nowMs();
+        incoming_.erase(std::remove_if(incoming_.begin(), incoming_.end(), [now](const Incoming& c) { return c.expiresMs <= now; }),
+                        incoming_.end());
     }
     double restored = 0.0;
     if (ratingRestored_.take(inGame_, restored))
@@ -805,6 +814,19 @@ void OnlineSession::handleServer(net::Event& e) {
         }
         serverNameRt_ = e.serverName;
         conn_ = net::ConnState::Online;
+        // A new connection: the server dropped our challenges when it saw the previous one close
+        // (telling only the other party), unless we came back first. Ours is cancelled either way,
+        // the ChallengeNotFound of one already dropped not shown; the ones received just expire
+        // for their challengers.
+        if (outgoing_.active) {
+            if (outgoing_.id) {
+                api_->cancelChallenge(outgoing_.id);
+                quietNotFound_ = true;
+            }
+            outgoing_ = Outgoing();
+            ui::notify(i18n::tr("online.err.challenge_not_found"), 4.0f);
+        }
+        incoming_.clear();
         break;
     case Kind::QueueStatus:
         if (e.queueState == QSearching) {
@@ -876,6 +898,10 @@ void OnlineSession::handleServer(net::Event& e) {
     case Kind::ServerError:
         if ((e.gameId != 0 && e.gameId == gameId_) || live::gameError(e.code)) {
             routeGame(e, LinkKind::Server);
+            break;
+        }
+        if (e.code == kErrChallengeNotFound && quietNotFound_) {
+            quietNotFound_ = false;
             break;
         }
         if (e.code == kErrMatchmakingCooldown && cooldownUntilMs_ < nowMs()) cooldownUntilMs_ = nowMs() + 60000.0;

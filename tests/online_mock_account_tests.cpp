@@ -6,7 +6,8 @@
 // signed-in devices, the preference, the e-mail change, the data export and the deletion, with the
 // special inputs of the re-authentication; the animated GIFs (decoded by a reader of the test's
 // own: sizes, frames, delays, the pieces, the last move, the check, either side), their quota, their
-// special inputs and their route to the file. On the fakes' virtual clock (deterministic).
+// special inputs and their route to the file. And the challenges that a dropped realtime
+// connection takes away. On the fakes' virtual clock (deterministic).
 #include "test.h"
 #include "chess/chess.h"
 #include "chess/pgn.h"
@@ -15,6 +16,7 @@
 #include "game/online_mock.h"
 #include "net/json.h"
 #include "net/net_sys.h"
+#include "net/protocol_gen.h"
 
 #include <cstdio>
 #include <ctime>
@@ -408,6 +410,52 @@ TEST(mock_account_game_played_goes_into_the_history) {
     CHECK(games[0].rated);
     CHECK((games[0].you == 0 ? games[0].white : games[0].black).ratingChanged);
     CHECK(game::outcomeOf(games[0]) == game::Outcome::Loss);
+}
+
+// As the server, the fake drops our challenges when our realtime connection drops: once we are
+// back, the one received can no longer be accepted, and ours finds nothing to cancel (the session
+// cancels it at the reconnection and does not show that ChallengeNotFound) and never starts a game.
+// One still held is cancelled with its status.
+TEST(mock_challenges_go_with_a_dropped_connection) {
+    VirtualClock vc;
+    mock::FakeServer srv;
+    signIn(srv, "Paul_M");
+    srv.connect();
+    Event e;
+    CHECK(await(srv, Kind::Welcome, e));
+    CHECK(await(srv, Kind::ChallengeReceived, e));  // the fake's demo challenge, after 25 s idle
+    const uint32_t received = e.challengeId;
+    mock::connectionDrop(1);
+    CHECK(await(srv, Kind::ConnectionChanged, e));
+    CHECK(e.state == net::ConnState::Reconnecting);
+    CHECK(await(srv, Kind::Welcome, e));
+    srv.acceptChallenge(received);
+    CHECK(await(srv, Kind::ServerError, e));
+    CHECK_EQ(e.code, int(net::proto::ErrorCode::ChallengeNotFound));
+
+    srv.challenge("Bob_K", 300, 3, false, 0);
+    CHECK(await(srv, Kind::ChallengeStatus, e));
+    CHECK_EQ(e.challengeState, int(net::proto::ChallengeState::Pending));
+    const uint32_t sent = e.challengeId;
+    mock::connectionDrop(1);
+    CHECK(await(srv, Kind::Welcome, e));
+    srv.cancelChallenge(sent);
+    bool notFound = false, started = false;
+    for (int i = 0; i < 100; ++i) {  // 5 s: Bob_K would have accepted after 2.5 s
+        while (srv.poll(e)) {
+            notFound = notFound || (e.kind == Kind::ServerError && e.code == int(net::proto::ErrorCode::ChallengeNotFound));
+            started = started || e.kind == Kind::GameSnapshot;
+        }
+        mock::advance(50.0);
+    }
+    CHECK(notFound);
+    CHECK(!started);
+
+    srv.challenge("Bob_K", 300, 3, false, 0);
+    CHECK(await(srv, Kind::ChallengeStatus, e));
+    srv.cancelChallenge(e.challengeId);
+    CHECK(await(srv, Kind::ChallengeStatus, e));
+    CHECK_EQ(e.challengeState, int(net::proto::ChallengeState::Cancelled));
 }
 
 TEST(mock_account_devices_and_preferences) {

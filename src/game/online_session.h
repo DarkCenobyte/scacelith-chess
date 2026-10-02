@@ -291,6 +291,7 @@ private:
     Queue queue_;
     Outgoing outgoing_;
     std::vector<Incoming> incoming_;
+    bool quietNotFound_ = false;                // the next ChallengeNotFound answers a reconnection's cancel
     double cooldownUntilMs_ = 0, bannedUntilMs_ = 0;
     std::string autoQueue_;                     // --start-online
     bool inGame_ = false;
