@@ -649,7 +649,7 @@ bool optionsPage(MenuAction& act) {
 }
 
 // ---- Title page -----------------------------------------------------------------------------------
-// library: the "Saved games" entry (mainMenu() with a LibrarySetup).
+// library: the "Saved games" entry (a LibrarySetup::folder was given).
 MenuAction titlePage(float t, bool library) {
     vec2 v = view();
     MenuAction act = MenuAction::None;
