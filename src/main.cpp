@@ -85,7 +85,11 @@ static int runApp(std::vector<std::string> args) {
     wd.vsync = ctx.screenshotMode ? false : settings.vsync;
     wd.debugContext = ctx.hasArg("--debug-gl");
     if (!plat::init(wd)) {
+#ifdef _WIN32
+        LOGE("could not initialise OpenGL 4.6");  // plat::init has shown the reason in a message box
+#else
         plat::messageBox("Scacelith", "Could not initialise OpenGL 4.6. Please update your graphics driver.");
+#endif
         return 1;
     }
 

@@ -272,7 +272,8 @@ bool init(const WindowDesc& desc) {
     ReleaseDC(dummy, ddc);
     DestroyWindow(dummy);
     if (!createContextAttribs || !choosePixelFormat) {
-        messageBox("Scacelith", "This graphics driver does not support modern OpenGL contexts.\nOpenGL 4.6 is required.");
+        messageBox("Scacelith", "This graphics driver does not support modern OpenGL contexts.\nOpenGL 4.6 is required.\n"
+                                "Please update your graphics driver.");
         return false;
     }
 
@@ -294,7 +295,7 @@ bool init(const WindowDesc& desc) {
     int format = 0;
     UINT count = 0;
     if (!choosePixelFormat(g_hdc, pfAttribs, nullptr, 1, &format, &count) || count == 0) {
-        messageBox("Scacelith", "No suitable pixel format.");
+        messageBox("Scacelith", "No suitable pixel format.\nPlease update your graphics driver.");
         return false;
     }
     DescribePixelFormat(g_hdc, format, sizeof(pfd), &pfd);
@@ -313,7 +314,8 @@ bool init(const WindowDesc& desc) {
     int nMissing = gl46::load(getProc, &missing);
     if (nMissing) {
         char buf[256];
-        std::snprintf(buf, sizeof(buf), "The OpenGL driver is missing %d required 4.6 functions (first: %s).", nMissing, missing);
+        std::snprintf(buf, sizeof(buf), "The OpenGL driver is missing %d required 4.6 functions (first: %s).\n"
+                      "Please update your graphics driver.", nMissing, missing);
         messageBox("Scacelith", buf);
         return false;
     }
