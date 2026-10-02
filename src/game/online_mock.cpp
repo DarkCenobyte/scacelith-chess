@@ -125,6 +125,30 @@ bool contains(const std::string& s, const char* what) { return lower(s).find(wha
 bool allDigits(const std::string& s) {
     return !s.empty() && std::all_of(s.begin(), s.end(), [](char c) { return c >= '0' && c <= '9'; });
 }
+// FNV-1a of a user name: the seed of what the fake makes up for that account.
+uint32_t nameHash(const std::string& name) {
+    uint32_t h = 2166136261u;
+    for (char c : name) h = (h ^ uint8_t(c)) * 16777619u;
+    return h;
+}
+// A second-factor code as typed, without its spaces and dashes.
+std::string normalizedCode(const std::string& code) {
+    std::string c;
+    for (char ch : code)
+        if (ch != ' ' && ch != '-') c += ch;
+    return c;
+}
+// Ten new recovery codes ("abcd-efgh-jk").
+std::vector<std::string> recoveryCodes(m::Rng& rng) {
+    static const char* alpha = "abcdefghjkmnpqrstuvwxyz23456789";
+    std::vector<std::string> out;
+    for (int i = 0; i < 10; ++i) {
+        std::string c;
+        for (int k = 0; k < 10; ++k) c += alpha[rng.rangeInt(0, 30)];
+        out.push_back(c.substr(0, 4) + "-" + c.substr(4, 4) + "-" + c.substr(8, 2));
+    }
+    return out;
+}
 
 // Events waiting for their delivery time (stable for equal times).
 struct Outbox {
@@ -583,9 +607,7 @@ void setRatings(GameDetails& d, int mine, int opp, bool provisional) {
 std::vector<GameDetails> makeHistory(const AccountInfo& account, double now) {
     std::vector<GameDetails> out;
     if (contains(account.username, "newbie")) return out;
-    uint32_t h = 2166136261u;
-    for (char c : account.username) h = (h ^ uint8_t(c)) * 16777619u;
-    m::Rng rng(uint64_t(h) * 2654435761u + 77u);
+    m::Rng rng(uint64_t(nameHash(account.username)) * 2654435761u + 77u);
 
     // The endings, in a random order.
     std::vector<Ending> endings;
@@ -1529,8 +1551,7 @@ struct FakeServer::Impl {
         a.acceptChallenges = true;
         a.createdAtMs = int64_t(lastNow) - int64_t(212.0 * 86400000.0);
         a.lastLoginAtMs = int64_t(lastNow);
-        uint32_t h = 2166136261u;
-        for (char c : name) h = (h ^ uint8_t(c)) * 16777619u;
+        const uint32_t h = nameHash(name);
         for (const Category& c : officialCategories()) {
             RatingInfo r;
             r.category = c.id;
@@ -1870,9 +1891,7 @@ void FakeServer::login(const std::string& user, const std::string& password) {
 void FakeServer::loginMfa(const std::string& code) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
-    std::string c;
-    for (char ch : code)
-        if (ch != ' ' && ch != '-') c += ch;
+    const std::string c = normalizedCode(code);
     bool ok = !I.mfaUser.empty() && ((c.size() == 6 && allDigits(c)) || c.size() == 10);
     if (!ok) return I.http(I.result(Event::Kind::LoginResult, false, I.mfaUser.empty() ? "expired" : "invalid_code"));
     std::string name = I.mfaUser;
@@ -1952,12 +1971,7 @@ void FakeServer::mfaEnable(const std::string& code) {
     I.mfaEnabled = true;
     I.account.mfaEnabled = true;
     Event e = I.result(Event::Kind::MfaEnableResult, true);
-    static const char* alpha = "abcdefghjkmnpqrstuvwxyz23456789";
-    for (int i = 0; i < 10; ++i) {
-        std::string c;
-        for (int k = 0; k < 10; ++k) c += alpha[I.rng.rangeInt(0, 30)];
-        e.recoveryCodes.push_back(c.substr(0, 4) + "-" + c.substr(4, 4) + "-" + c.substr(8, 2));
-    }
+    e.recoveryCodes = recoveryCodes(I.rng);
     I.http(e);
 }
 void FakeServer::mfaDisable(const std::string& password, const std::string& code) {
@@ -1975,14 +1989,7 @@ void FakeServer::regenerateRecoveryCodes(const std::string& password, const std:
     I.lastNow = nowMs();
     std::string err = password == "wrong" ? "invalid_credentials" : code.size() != 6 ? "invalid_code" : "";
     Event e = I.result(Event::Kind::RecoveryCodesResult, err.empty(), err);
-    if (err.empty()) {
-        static const char* alpha = "abcdefghjkmnpqrstuvwxyz23456789";
-        for (int i = 0; i < 10; ++i) {
-            std::string c;
-            for (int k = 0; k < 10; ++k) c += alpha[I.rng.rangeInt(0, 30)];
-            e.recoveryCodes.push_back(c.substr(0, 4) + "-" + c.substr(4, 4) + "-" + c.substr(8, 2));
-        }
-    }
+    if (err.empty()) e.recoveryCodes = recoveryCodes(I.rng);
     I.http(e);
 }
 void FakeServer::report(uint64_t gameId, const std::string&, const std::string&, const std::string&) {
@@ -1998,9 +2005,7 @@ bool FakeServer::Impl::reauth(Event::Kind k, const std::string& password, const 
     if (!account.hasPassword) { http(result(k, false, "password_not_set")); return false; }
     if (password == "wrong" || password.empty()) { http(result(k, false, "invalid_password")); return false; }
     if (mfaEnabled) {
-        std::string c;
-        for (char ch : code)
-            if (ch != ' ' && ch != '-') c += ch;
+        const std::string c = normalizedCode(code);
         if (c.empty()) { http(result(k, false, "mfa_code_required")); return false; }
         const bool digits = c.size() == 6 && allDigits(c);
         if ((!digits && c.size() != 10) || c == "000000") { http(result(k, false, "invalid_code")); return false; }
