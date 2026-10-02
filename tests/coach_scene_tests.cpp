@@ -81,11 +81,12 @@ TEST(coach_settings_history_codec) {
     CHECK(odd[0].accuracy == 100.0);
     CHECK(odd[1].accuracy < 0.0);
     CHECK_EQ(odd[2].result, -1);
-    // A NaN accuracy (a hand-edited file) is unknown, not an accurate game.
+    // A NaN accuracy (a hand-edited file) is unknown, not an accurate game. glibc reads "nan" as NaN
+    // (unknown) and "inf" as infinity (100); msvcrt reads both as 0: never NaN.
     std::vector<game::Settings::CoachGame> nan = game::decodeCoachHistory("3:1:nan 2:0:inf 4:1:50");
     CHECK_EQ(int(nan.size()), 3);
-    CHECK(nan[0].accuracy == -1.0);
-    CHECK(nan[1].accuracy == 100.0);
+    CHECK(nan[0].accuracy == -1.0 || nan[0].accuracy == 0.0);
+    CHECK(nan[1].accuracy == 100.0 || nan[1].accuracy == 0.0);
     CHECK(nan[2].accuracy == 50.0);
     // Only the last kCoachHistoryMax games are kept.
     std::vector<game::Settings::CoachGame> many;
