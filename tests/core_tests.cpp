@@ -8,6 +8,9 @@
 #include <cstdio>
 #include <string>
 #include <vector>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 
 TEST(math_quat_roundtrip) {
     m::quat q = m::axisAngle(m::vec3(0.3f, 1.0f, -0.2f), 1.1f);
@@ -57,3 +60,21 @@ TEST(image_png_bytes) {
     }
     std::remove(path.c_str());
 }
+
+#ifndef _WIN32
+// A failed write (a full disk: /dev/full) is reported and leaves no file behind.
+TEST(image_png_write_error) {
+    if (access("/dev/full", W_OK) != 0) return;
+    const char* link = "/tmp/scacelith_png_full.png";
+    std::vector<uint8_t> px(300 * 200 * 3, 7);
+    unlink(link);
+    CHECK(symlink("/dev/full", link) == 0);
+    CHECK(!image::writePNG(link, 7, 3, 3, px.data()));       // buffered: the error comes at fclose
+    CHECK(access(link, F_OK) != 0);                          // removed (the link, not the device)
+    unlink(link);
+    CHECK(symlink("/dev/full", link) == 0);
+    CHECK(!image::writePNG(link, 300, 200, 3, px.data()));   // the IDAT write itself fails
+    CHECK(access(link, F_OK) != 0);
+    unlink(link);
+}
+#endif
