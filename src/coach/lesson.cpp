@@ -1041,7 +1041,8 @@ LessonReaction Lesson::judge(int expect, const Position& before, const Move& mov
     }
     if (ok) {
         r.accepted = true;
-        if (!praise.empty()) r.before.push_back(say(withArg(praise, "to", played), Look::Player, {nod()}));
+        // As chapterLines() lists it (no {to}): said from the audio synthesised with the chapter.
+        if (!praise.empty()) r.before.push_back(say(praise, Look::Player, {nod()}));
         return r;
     }
 
