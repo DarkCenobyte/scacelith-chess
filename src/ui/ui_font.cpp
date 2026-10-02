@@ -431,31 +431,6 @@ void prewarmLanguage() {
 
 }  // namespace
 
-uint32_t decodeUtf8(const std::string& s, size_t& i) {
-    unsigned char c = static_cast<unsigned char>(s[i]);
-    auto cont = [&](size_t k) -> int {
-        if (i + k >= s.size()) return -1;
-        unsigned char b = static_cast<unsigned char>(s[i + k]);
-        return (b & 0xC0) == 0x80 ? (b & 0x3F) : -1;
-    };
-    if (c < 0x80) { i += 1; return c; }
-    if ((c & 0xE0) == 0xC0) {
-        int b1 = cont(1);
-        if (b1 >= 0) { i += 2; return (uint32_t(c & 0x1F) << 6) | uint32_t(b1); }
-    } else if ((c & 0xF0) == 0xE0) {
-        int b1 = cont(1), b2 = cont(2);
-        if (b1 >= 0 && b2 >= 0) { i += 3; return (uint32_t(c & 0x0F) << 12) | (uint32_t(b1) << 6) | uint32_t(b2); }
-    } else if ((c & 0xF8) == 0xF0) {
-        int b1 = cont(1), b2 = cont(2), b3 = cont(3);
-        if (b1 >= 0 && b2 >= 0 && b3 >= 0) {
-            i += 4;
-            return (uint32_t(c & 0x07) << 18) | (uint32_t(b1) << 12) | (uint32_t(b2) << 6) | uint32_t(b3);
-        }
-    }
-    i += 1;
-    return 0xFFFD;
-}
-
 bool init() {
     if (g_ready) return true;
     double t0 = plat::time();
@@ -747,7 +722,7 @@ bool renderLineSdf(int face, const std::string& utf8, float capPx, int spread, f
     int prev = 0;
     int inkX0 = 1 << 30, inkX1 = -(1 << 30);
     for (size_t i = 0; i < utf8.size();) {
-        uint32_t cp = decodeUtf8(utf8, i);
+        uint32_t cp = uni::decodeAt(utf8, i);
         int gi = stbtt_FindGlyphIndex(&info, int(cp));
         if (prev && gi) pen += float(stbtt_GetGlyphKernAdvance(&info, prev, gi)) * s;
         Placed p{gi, pen, 0, 0, 0, 0};

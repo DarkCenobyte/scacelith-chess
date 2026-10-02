@@ -302,6 +302,33 @@ TEST(unicode_utf8_roundtrip) {
     CHECK(U("\xC0\xAF")[0] == 0xFFFD);      // overlong
 }
 
+TEST(unicode_decode_at_steps_like_decode) {
+    // Text wrapping walks a paragraph with decodeAt and the shaper decodes it with decode(): both
+    // must read malformed bytes alike (C0 A0 is no space, a surrogate no character).
+    std::string s = "ab\xC0\xA0" "cd";
+    size_t i = 2;
+    CHECK(uni::decodeAt(s, i) == 0xFFFD);
+    CHECK_EQ(int(i), 3);
+    const char* samples[] = {"Fran\xC3\xA7" "ais \xF0\x9F\x98\x80", "ab\xC0\xA0" "cd", "\xED\xA0\x80", "\xF4\x90\x80\x80",
+                             "\xE0\x80\xAF", "\xF0\x80\x80\xAF", "\xC3", "x\xE2\x82", "\xC1\xBF\xF8\x88\x80\x80\x80"};
+    uint32_t seed = 12345;
+    std::vector<std::string> all(std::begin(samples), std::end(samples));
+    for (int k = 0; k < 2000; ++k) {  // random bytes biased towards lead and continuation bytes
+        std::string r;
+        for (int n = 0; n < 12; ++n) {
+            seed = seed * 1664525u + 1013904223u;
+            unsigned b = seed >> 24;
+            r += char((b & 1) ? (0x80 | (b >> 2)) : b);
+        }
+        all.push_back(r);
+    }
+    for (const std::string& t : all) {
+        std::u32string stepped;
+        for (size_t j = 0; j < t.size();) stepped += uni::decodeAt(t, j);
+        CHECK(stepped == uni::decode(t));
+    }
+}
+
 TEST(unicode_arabic_joining_forms) {
     using F = uni::Form;
     // beh yeh teh: initial, medial, final

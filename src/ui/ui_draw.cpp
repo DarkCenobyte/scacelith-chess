@@ -490,7 +490,7 @@ const std::vector<Line>& wrap(const std::string& s, float maxWidth, const TextSt
         uint32_t prev = 0;
         for (size_t i = 0; i < para.size();) {
             size_t at = i;
-            uint32_t cp = font::decodeUtf8(para, i);
+            uint32_t cp = uni::decodeAt(para, i);
             if (cp == ' ' || cp == 0x3000 || cp == '\t') {
                 pendingSpace = true;
                 prev = cp;

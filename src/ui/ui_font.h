@@ -96,9 +96,6 @@ void prewarm(const std::vector<std::pair<int, uint32_t>>& glyphs);
 // Call once per frame before drawing: uploads glyphs added since the last call.
 void flushUploads();
 
-// UTF-8 decoding helper: returns the codepoint at s[i] and advances i (invalid bytes -> U+FFFD).
-uint32_t decodeUtf8(const std::string& s, size_t& i);
-
 // Renders one line of text in 'face' into a standalone single-channel distance field, independent
 // of the atlas (for markings baked into 3D material textures). No shaping: left to right, with the
 // face's kerning plus 'tracking' (em) between letters. out = w*h bytes, row 0 = top, value
