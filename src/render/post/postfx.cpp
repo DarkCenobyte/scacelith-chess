@@ -534,6 +534,7 @@ void PostFX::resolve(const PostInputs& in) {
         }
         if (settings.bloom || settings.debugView == 6) {
             int last = I.bloomDown.levels - 1;
+            glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT);  // the copy reads bloom_down's image stores
             glCopyImageSubData(I.bloomDown.id, GL_TEXTURE_2D, last, 0, 0, 0, I.bloomUp.id, GL_TEXTURE_2D, last, 0, 0, 0,
                                mipSize(I.hw, last), mipSize(I.hh, last), 1);
             if (const ShaderProgram* p = compute("shaders/post/bloom_up.comp")) {
