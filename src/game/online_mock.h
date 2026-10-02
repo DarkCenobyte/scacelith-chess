@@ -45,10 +45,8 @@
 // 503 (server_busy, retry after 8 s), a PGN whose White or Black is "ratelimited" or "serverbusy"
 // (the same), a host containing "nogif" (gif_disabled).
 //
-// Used by src/game/online_stub.cpp (the OnlineClient / DirectMatch implementation of builds
-// without the real network layer, i.e. without SCACELITH_NET_REAL) and meant to back a
-// --online-mock developer mode next to the real implementation. Engine-free, single-threaded:
-// everything happens inside poll().
+// Backs the --online-mock developer mode (game::OnlineSession::init) and the tests. Engine-free,
+// single-threaded: everything happens inside poll().
 #pragma once
 #include "../net/direct_match.h"
 #include "../net/online_client.h"

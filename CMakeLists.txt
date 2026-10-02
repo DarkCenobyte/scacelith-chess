@@ -131,8 +131,9 @@ else()
     target_link_libraries(scacelith_core PUBLIC OpenSSL::SSL OpenSSL::Crypto)
     target_compile_definitions(scacelith_core PRIVATE SCACELITH_HAS_OPENSSL=1)
 endif()
-# The real network layer replaces the game's offline stand-in (src/game/online_stub.cpp); the
-# in-process fakes stay available with --online-mock.
+# Every build has the real network layer (the offline stand-in that SCACELITH_NET_REAL left out
+# is gone; nothing tests the definition any more); the in-process fakes stay available with
+# --online-mock.
 target_compile_definitions(scacelith_core PUBLIC SCACELITH_NET_REAL=1)
 
 # ---------------------------------------------------------------------------------------------

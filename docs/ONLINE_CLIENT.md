@@ -14,7 +14,6 @@ of them in `src/game/` and `src/ui/`, the server in use and the account API call
 | `src/game/game_link.h` | `GameLink`: the commands of one game (move, resign, draw, abort, resync, rematch, live gestures, report, ping, server clock), for a server game or a direct match alike. |
 | `src/game/game_scene_online.cpp` | `GameMode::Online` in the 3D scene: the remote player's robot, move sending, server clocks, resync, end of game. |
 | `src/game/online_mock.h/.cpp` | In-process fakes of the server and of a direct-match friend (`--online-mock`). |
-| `src/game/online_stub.cpp` | `net::OnlineClient` / `net::DirectMatch` backed by the fakes, compiled only without `SCACELITH_NET_REAL` (builds without the real network layer). |
 | `src/ui/ui_screens_online.cpp` | The "Play Online" page and its sub-pages, Options > Online server. |
 | `src/ui/ui_online_hud.cpp` | Ping indicator, in-game overlay, online Esc menu, report dialog, challenge cards. |
 | `src/ui/ui_qr.cpp`, `ui_clipboard.cpp` | QR code of the two-factor setup (`third_party/qrcodegen`), copy to the Windows clipboard. |

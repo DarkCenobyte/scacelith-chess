@@ -9,10 +9,9 @@
 //   - the 3D scene plays the games it announces (gameReady() / takeGame()) through a GameLink and
 //     drains their events with nextGameEvent(), the opponent's live gestures (OpponentGesture)
 //     included: only those of the game being played, the latest one replacing one still queued.
-// With --online-mock the in-process fakes of online_mock.h replace the network layer (builds
-// without it use them anyway, see online_stub.cpp); --online-manual-clock then makes their games
-// autoPress = false (the moves wait for a clock press). Tokens never pass through here: the
-// network layer stores them per server.
+// With --online-mock the in-process fakes of online_mock.h replace the network layer;
+// --online-manual-clock then makes their games autoPress = false (the moves wait for a clock
+// press). Tokens never pass through here: the network layer stores them per server.
 #pragma once
 #include "../net/direct_match.h"
 #include "../net/online_client.h"
