@@ -299,8 +299,7 @@ float Animator::Impl::armStrainSide(Side s, vec3 wristC, quat q) {
     applySpine(tmp, sp);
     fkChain(tmp, Pelvis, Spine2);
     solveArm(tmp, s, wristC, q);
-    float soft = std::max(0.0f, std::fabs(lastFlex) - 1.10f) + std::max(0.0f, lastDev - 0.35f) + std::max(0.0f, -lastDev - 0.55f) +
-                 std::max(0.0f, std::fabs(lastPron) - 1.60f);
+    float soft = softWristStrain(lastFlex, lastDev, lastPron);
     float r = wristClamp + pronClamp + reachShort * 10.0f + 0.5f * soft;
     diagSide = keep;
     reachShort = wristClamp = pronClamp = 0;
@@ -333,7 +332,6 @@ void Animator::Impl::initWriting() {
         vec3 tipC(layout::SCORESHEET_X + layout::SCORESHEET_WIDTH * 0.5f + 0.03f, layout::TABLE_TOP_Y + r - pelvisWorld.y, padZ + 0.07f);
         mat4 penC = toMat4(fromTo(kY, vec3(0, 0, -1)), tipC);   // tip towards the board
         wr.penTable = root * penC;
-        wr.hasPenTable = true;
     }
 }
 
@@ -442,7 +440,6 @@ void Animator::Impl::solveGrip() {
         vec3 zt = safeNormalize(perp(vec3(-1, 0, 0), Dt), vec3(0, 0, 1));
         g.tucked = mirrorPen({fromMat3(mat3(cross(Dt, zt), Dt, zt)), tipT});
     }
-    g.err = err;
     LOGI("anim: pen grip solved (tripod fit %.1f mm, worst pad miss %.1f mm, pinch at %.1f mm from the tip)", fitErr * 1000.0f, err * 1000.0f,
          g.gripDist * 1000.0f);
     if (debugLog) {
@@ -736,15 +733,18 @@ void Animator::Impl::planWrite(const WriteTask& t, float start, float T) {
     auto data = std::make_shared<std::vector<PenKey>>(t.path);
     std::vector<PenKey>& path = *data;
     for (PenKey& k : path) k.tip = toChar(k.tip);
+    // Nothing to write: the tip goes just over the writing rest and back (the events still fire).
+    const bool noPath = path.empty();
+    if (noPath) path.push_back({0.0f, wr.rest + vec3(0.0f, 0.004f, 0.0f), false});
     wr.path = path;
-    const float P = path.empty() ? 0.0f : std::max(0.0f, path.back().t);
+    const float P = std::max(0.0f, path.back().t);
     const float tA = Timing::WriteApproach, tR = std::max(1e-3f, T - tA - P);
     wr.pathStart = start + tA;
     wr.pathEnd = start + tA + P;
     float paper = 1e9f;
     for (const PenKey& k : path)
         if (k.down) paper = std::min(paper, k.tip.y);
-    if (paper > 1e8f)
+    if (paper > 1e8f && !noPath)
         for (const PenKey& k : path) paper = std::min(paper, k.tip.y);
     if (paper > 1e8f) paper = paperY;
     paperY = paper;
@@ -756,14 +756,17 @@ void Animator::Impl::planWrite(const WriteTask& t, float start, float T) {
         std::vector<vec3> tips;
         const int ext = int(std::ceil(3.0f * sigma / step));
         for (int i = -ext; i < n + ext; ++i) tips.push_back(penPathPoint(path, clamp(float(i) * step, 0.0f, P)));
+        // The kernel weights and their sum are the same for every sample.
+        std::vector<float> wts;
+        float wsum = 0.0f;
+        for (int j = -ext; j <= ext; ++j) {
+            float tt = float(j) * step, wj = std::exp(-0.5f * tt * tt / (sigma * sigma));
+            wts.push_back(wj);
+            wsum += wj;
+        }
         for (int i = 0; i < n; ++i) {
             vec3 acc(0);
-            float wsum = 0.0f;
-            for (int j = -ext; j <= ext; ++j) {
-                float tt = float(j) * step, wj = std::exp(-0.5f * tt * tt / (sigma * sigma));
-                acc += tips[size_t(i + j + ext)] * wj;
-                wsum += wj;
-            }
+            for (int j = -ext; j <= ext; ++j) acc += tips[size_t(i + j + ext)] * wts[size_t(j + ext)];
             acc /= wsum;
             acc.y = paper;
             anchor->push_back(acc);
@@ -852,7 +855,9 @@ void Animator::Impl::planTurnPage(const WriteTask& t, float start, float T) {
             return transformPoint(rt, vec3(x, top + (L + lift) * std::sin(a) + 0.0006f, bindZ - (L + lift) * std::cos(a)));
         };
     }
-    auto corner = [this](float s) { return toChar(wr.corner(clamp(s, 0.0f, 1.0f))); };
+    // (A copy: the motion outlives wr.corner when a handshake interrupts the page turn.)
+    const std::function<vec3(float)> cornerW = wr.corner;
+    auto corner = [this, cornerW](float s) { return toChar(cornerW(clamp(s, 0.0f, 1.0f))); };
     wr.turnStart = start;
     wr.turnT = T;
     // Binding line: the circle through three corner positions.
@@ -947,7 +952,7 @@ void Animator::Impl::planTurnPage(const WriteTask& t, float start, float T) {
         }
     }
     const float tG = kTurnGrip * T, tR = kTurnRelease * T;
-    const float tPre = std::max(0.05f, tG - 0.12f * T / Timing::PageTurn);
+    const float tPre = std::min(std::max(0.05f, tG - 0.12f * T / Timing::PageTurn), tG - 1e-3f);   // (a very short turn)
     const HandSample g0 = handAt(0.0f);
     Motion mo;
     mo.start = start;
@@ -1054,11 +1059,10 @@ void Animator::Impl::stepWriting(std::vector<Event>& ev) {
     }
     WriteTask t = wr.queue.front();
     wr.queue.pop_front();
-    startWriteTask(t, ev);
+    startWriteTask(t);
 }
 
-void Animator::Impl::startWriteTask(const WriteTask& t, std::vector<Event>& ev) {
-    (void)ev;
+void Animator::Impl::startWriteTask(const WriteTask& t) {
     Hand& h = left();
     bakeFollow(h);
     leftChin = 0;
@@ -1105,14 +1109,12 @@ void Animator::Impl::fireWriteDue(float upTo, std::vector<Event>& ev) {
             case WActPick:
                 wr.penHeld = true;
                 wr.penTable = wr.cur.frame;   // a handshake that needs the hand puts it back there
-                wr.hasPenTable = true;
                 out.transform = wr.cur.frame;   // it leaves the table exactly from there
                 out.position = wr.cur.frame.translation();
                 break;
             case WActPut:
                 wr.penHeld = false;
                 wr.penTable = wr.cur.frame;
-                wr.hasPenTable = true;
                 out.transform = wr.cur.frame;
                 out.position = wr.cur.frame.translation();
                 break;
@@ -1146,11 +1148,13 @@ void Animator::Impl::finishWriteTask(std::vector<Event>& ev) {
 }
 
 // A handshake needs the writing hand (left-handed player): the running writing task stops here.
-// Its remaining events fire now (a path is cut where it is, a turning page is reported turned),
-// except the pen's own: a pen still on the table stays there, a pen still in the hand is laid down
-// by the handshake itself. Queued tasks wait for the end of the handshake.
+// The events already due fire first, at their own instants and with their effect (the handshake
+// may start mid-frame); the remaining ones fire now (a path is cut where it is, a turning page is
+// reported turned), except the pen's own: a pen still on the table stays there, a pen still in the
+// hand is laid down by the handshake itself. Queued tasks wait for the end of the handshake.
 void Animator::Impl::interruptWriting(std::vector<Event>& ev) {
     if (!wr.running) return;
+    fireWriteDue(time, ev);
     for (auto& e : wr.events) {
         if (e.done) continue;
         if (e.action == WActPick || e.action == WActPut) {
@@ -1231,7 +1235,6 @@ void Animator::enqueueWriting(const std::vector<WriteTask>& tasks) {
     for (auto& t : tasks) enqueueWriting(t);
 }
 bool Animator::writingBusy() const { return impl_->wr.running || !impl_->wr.queue.empty(); }
-void Animator::clearWritingQueue() { impl_->wr.queue.clear(); }
 float Animator::writingRemainingTime() const {
     const Impl& I = *impl_;
     float r = I.wr.running ? std::max(0.0f, I.wr.start + I.wr.T - I.time) : 0.0f;

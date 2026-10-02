@@ -1,5 +1,6 @@
 // Internal header of the animation package: shared by animator.cpp (playing hand, body, gaze,
-// task machine) and animator_writing.cpp (writing hand, pen, page turns, left-handed mirror).
+// task machine), animator_gesture.cpp (the coach's gestures, speech, nods and head shakes) and
+// animator_writing.cpp (writing hand, pen, page turns, left-handed mirror).
 // Not part of the public API (see animator.h).
 //
 // Everything is planned in CHARACTER space (+Y up, +Z forward, +X = character's left, origin at
@@ -188,17 +189,22 @@ inline Bone armBone(Side s, Bone leftBone) { return sideBone(leftBone, s); }
 inline float palmSign(Side s) { return s == Side::Right ? 1.0f : -1.0f; }   // palm normal = (palmSign,0,0)
 inline float sideX(Side s) { return s == Side::Right ? -1.0f : 1.0f; }      // the arm's side along X
 
-inline void fingerLocals(Side side, const FingerPose& fp, quat out[5][3]) {
-    vec3 curl = fingerCurlAxis(side);
-    float ps = palmSign(side);
-    out[0][0] = qy(ps * fp.v[0][0]) * qx(fp.v[0][1]);
-    out[0][1] = qx(fp.v[0][2]);
-    out[0][2] = qx(fp.v[0][3]);
-    for (int f = 1; f < 5; ++f) {
-        out[f][0] = qx(-fp.v[f][0]) * axisAngle(curl, fp.v[f][1]);
-        out[f][1] = axisAngle(curl, fp.v[f][2]);
-        out[f][2] = axisAngle(curl, fp.v[f][3]);
+// Local rotations of the three joints of finger f.
+inline void fingerLocal(Side side, const FingerPose& fp, int f, quat out[3]) {
+    if (f == Thumb) {
+        float ps = palmSign(side);
+        out[0] = qy(ps * fp.v[0][0]) * qx(fp.v[0][1]);
+        out[1] = qx(fp.v[0][2]);
+        out[2] = qx(fp.v[0][3]);
+        return;
     }
+    vec3 curl = fingerCurlAxis(side);
+    out[0] = qx(-fp.v[f][0]) * axisAngle(curl, fp.v[f][1]);
+    out[1] = axisAngle(curl, fp.v[f][2]);
+    out[2] = axisAngle(curl, fp.v[f][3]);
+}
+inline void fingerLocals(Side side, const FingerPose& fp, quat out[5][3]) {
+    for (int f = 0; f < 5; ++f) fingerLocal(side, fp, f, out[f]);
 }
 inline void applyFingers(const Skeleton&, Pose& pose, Side side, const FingerPose& fp) {
     quat q[5][3];
@@ -212,12 +218,12 @@ constexpr float kPalmHalf = 0.0135f;    // half thickness of the palm
 
 // Hand-local frames of the three phalanges of finger f.
 inline void fingerFrames(const Skeleton& sk, Side side, const FingerPose& fp, int f, mat4 out[3]) {
-    quat q[5][3];
-    fingerLocals(side, fp, q);
+    quat q[3];
+    fingerLocal(side, fp, f, q);
     mat4 m;
     for (int j = 0; j < 3; ++j) {
         Bone b = fingerBone(side, f, j);
-        m = m * toMat4(q[f][j], sk.restOffset[b]);
+        m = m * toMat4(q[j], sk.restOffset[b]);
         out[j] = m;
     }
 }
@@ -227,11 +233,14 @@ inline vec3 boneDir(const Skeleton& sk, Bone b) {
     return normalize(sk.restOffset[b]);
 }
 // Hand-local tip (bone end) and pad contact point of finger f.
+inline vec3 fingerTipFrom(const Skeleton& sk, Side side, const mat4 fr[3], int f) {   // fr: its fingerFrames
+    Bone b3 = fingerBone(side, f, 2);
+    return transformPoint(fr[2], boneDir(sk, b3) * sk.boneLength[b3]);
+}
 inline vec3 fingerTip(const Skeleton& sk, Side side, const FingerPose& fp, int f) {
     mat4 fr[3];
     fingerFrames(sk, side, fp, f, fr);
-    Bone b3 = fingerBone(side, f, 2);
-    return transformPoint(fr[2], boneDir(sk, b3) * sk.boneLength[b3]);
+    return fingerTipFrom(sk, side, fr, f);
 }
 inline vec3 fingerPad(const Skeleton& sk, Side side, const FingerPose& fp, int f) {
     mat4 fr[3];
@@ -242,11 +251,14 @@ inline vec3 fingerPad(const Skeleton& sk, Side side, const FingerPose& fp, int f
     return transformPoint(fr[2], d * (sk.boneLength[b3] * 0.72f) + padDir * kPadRadius);
 }
 // Hand-local point on the middle of a phalanx (for the pocket grip).
+inline vec3 phalanxMidFrom(const Skeleton& sk, Side side, const mat4 fr[3], int f, int j) {   // fr: its fingerFrames
+    Bone b = fingerBone(side, f, j);
+    return transformPoint(fr[j], boneDir(sk, fingerBone(side, f, 2)) * (sk.boneLength[b] * 0.5f));
+}
 inline vec3 phalanxMid(const Skeleton& sk, Side side, const FingerPose& fp, int f, int j) {
     mat4 fr[3];
     fingerFrames(sk, side, fp, f, fr);
-    Bone b = fingerBone(side, f, j);
-    return transformPoint(fr[j], boneDir(sk, fingerBone(side, f, 2)) * (sk.boneLength[b] * 0.5f));
+    return phalanxMidFrom(sk, side, fr, f, j);
 }
 // Hand-local palm centre on the palm surface.
 inline vec3 palmCenter(Side side) { return vec3(palmSign(side) * kPalmHalf, -0.052f, 0.003f); }
@@ -338,8 +350,9 @@ const vec3 kPinchAxisPref = normalize(vec3(-0.95f, -1.0f, -0.32f));
 
 // Pinch grasp for hand rotation R (character space) on a vertical piece of grip radius r:
 // the pads of thumb, index and middle are solved onto the piece surface around a horizontal axis.
-// 'aperture' scales the pre-grasp opening (smaller between close neighbours).
-inline PinchGeo pinchFor(const Skeleton& sk, quat R, float r, float aperture = 1.0f) {
+// 'aperture' scales the pre-grasp opening (smaller between close neighbours). 'closed': a pinch
+// already solved for the same R and r, whose closed pose (independent of the aperture) is reused.
+inline PinchGeo pinchFor(const Skeleton& sk, quat R, float r, float aperture = 1.0f, const PinchGeo* closed = nullptr) {
     PinchGeo g;
     g.point = kPinchPoint;
     vec3 aw = rotate(R, kPinchAxisPref);
@@ -373,7 +386,12 @@ inline PinchGeo pinchFor(const Skeleton& sk, quat R, float r, float aperture = 1
         fp.v[Pinky][3] = kDipCoupling * fp.v[Pinky][2];
         return e;
     };
-    g.err = solve(0.0f, 0.0f, g.pose);
+    if (closed) {
+        g.pose = closed->pose;
+        g.err = closed->err;
+    } else {
+        g.err = solve(0.0f, 0.0f, g.pose);
+    }
     solve(0.013f * aperture, 0.006f * aperture, g.open);
     return g;
 }
@@ -393,7 +411,7 @@ inline vec3 pocketPoint(const Skeleton& sk, const FingerPose& fp) {
 // Hand-local press point: between the index and middle pads.
 inline vec3 pressPoint(const Skeleton& sk, const FingerPose& fp) {
     vec3 a = fingerTip(sk, Side::Right, fp, Index), b = fingerTip(sk, Side::Right, fp, Middle);
-    return (a + b) * 0.5f + vec3(0, 0, 0);
+    return (a + b) * 0.5f;
 }
 inline vec3 mirrorX(vec3 v) { return vec3(-v.x, v.y, v.z); }
 inline vec3 handPoint(Side s, vec3 rightHandLocal) { return s == Side::Right ? rightHandLocal : mirrorX(rightHandLocal); }
@@ -423,28 +441,21 @@ struct Track {
     std::vector<Key> keys;
     void add(float u, const T& v) { keys.push_back({u, v}); }
 };
-inline quat evalTrack(const Track<quat>& tr, float u) {
+// Track value at u: 'lerpFn' between the keys around u (minimum jerk), empty() without keys.
+template <class T, class Empty, class Lerp>
+inline T evalTrack(const Track<T>& tr, float u, Empty empty, Lerp lerpFn) {
     const auto& k = tr.keys;
-    if (k.empty()) return quat();
+    if (k.empty()) return empty();
     if (u <= k.front().u) return k.front().v;
     for (size_t i = 1; i < k.size(); ++i)
         if (u <= k[i].u) {
             float s = (u - k[i - 1].u) / std::max(1e-6f, k[i].u - k[i - 1].u);
-            return qslerp(k[i - 1].v, k[i].v, minJerk(s));
+            return lerpFn(k[i - 1].v, k[i].v, minJerk(s));
         }
     return k.back().v;
 }
-inline FingerPose evalTrack(const Track<FingerPose>& tr, float u) {
-    const auto& k = tr.keys;
-    if (k.empty()) return poseRelaxed();
-    if (u <= k.front().u) return k.front().v;
-    for (size_t i = 1; i < k.size(); ++i)
-        if (u <= k[i].u) {
-            float s = (u - k[i - 1].u) / std::max(1e-6f, k[i].u - k[i - 1].u);
-            return fpLerp(k[i - 1].v, k[i].v, minJerk(s));
-        }
-    return k.back().v;
-}
+inline quat evalTrack(const Track<quat>& tr, float u) { return evalTrack(tr, u, [] { return quat(); }, qslerp); }
+inline FingerPose evalTrack(const Track<FingerPose>& tr, float u) { return evalTrack(tr, u, poseRelaxed, fpLerp); }
 
 // Pen frame (tip at the origin, +Y along the barrel to the back end) in the hand bone's frame.
 struct PenPose {
@@ -452,17 +463,7 @@ struct PenPose {
     vec3 p{0, 0, 0};
 };
 inline PenPose penLerp(const PenPose& a, const PenPose& b, float t) { return {qslerp(a.q, b.q, t), lerp(a.p, b.p, t)}; }
-inline PenPose evalTrack(const Track<PenPose>& tr, float u) {
-    const auto& k = tr.keys;
-    if (k.empty()) return PenPose();
-    if (u <= k.front().u) return k.front().v;
-    for (size_t i = 1; i < k.size(); ++i)
-        if (u <= k[i].u) {
-            float s = (u - k[i - 1].u) / std::max(1e-6f, k[i].u - k[i - 1].u);
-            return penLerp(k[i - 1].v, k[i].v, minJerk(s));
-        }
-    return k.back().v;
-}
+inline PenPose evalTrack(const Track<PenPose>& tr, float u) { return evalTrack(tr, u, [] { return PenPose(); }, penLerp); }
 
 struct HandSample {
     vec3 p{0, 0, 0}, v{0, 0, 0}, a{0, 0, 0};   // wrist (character space)
@@ -685,6 +686,12 @@ inline TraceSchedule traceSchedule(const std::vector<vec3>& path, float T) {
 struct SpineParams {
     float flex = 0, twist = 0, side = 0;   // radians: forward flexion, twist to the left, bend to the right
 };
+// Soft strain penalty of an arm solve near the wrist and forearm limits (wrist flexion and
+// deviation, forearm pronation; radians).
+inline float softWristStrain(float flex, float dev, float pron) {
+    return std::max(0.0f, std::fabs(flex) - 1.10f) + std::max(0.0f, dev - 0.35f) + std::max(0.0f, -dev - 0.55f) +
+           std::max(0.0f, std::fabs(pron) - 1.60f);
+}
 
 }  // namespace detail
 using namespace detail;
@@ -697,6 +704,7 @@ struct Animator::Impl {
     quat rootQ;
     mat4 root, invRoot;
     float time = 0.0f;
+    double timeD = 0.0;   // the clock summed in double: 'time' neither drifts nor stalls in a long session
     Rng rng;
     float seed = 0.0f;
 
@@ -724,6 +732,11 @@ struct Animator::Impl {
         vec3 restContact{0, 0, 0}; // requested resting spot (character space); 'rest' may shift away from pieces
         bool chinFollow = false;   // idle chin pose: follows the head
         HandSample chinPlanned;
+        // Playing hand: the point lock's shift at the last frame (character space), and that shift
+        // fading out from pinCarryStart after a task let the lock go (no jump at the boundary).
+        vec3 pinApplied{0, 0, 0};
+        vec3 pinCarry{0, 0, 0};
+        float pinCarryStart = 0.0f;
     } hands[2];                    // [0] = left, [1] = right
     Hand& right() { return hands[1]; }
     Hand& left() { return hands[0]; }
@@ -769,7 +782,8 @@ struct Animator::Impl {
     };
     PointChoice choosePoint(vec3 aim, float topAim, float hover, const vec3* fixedTip, const quat* prevQ, const FingerPose& fp);
     // How deep the hand (wrist at w, rotation q, fingers f) dips into the space 'margin' above the
-    // standing pieces (m, the worst point); ignoreId is not an obstacle.
+    // standing pieces (m, the worst point; >= 0: planGesture's orientation searches rely on it);
+    // ignoreId is not an obstacle.
     float handDepth(vec3 w, quat q, const FingerPose& f, float margin, int ignoreId) const;
     bool gestureBlocked(const HandSample& from, float T, Motion& mo);
     Segment pointApproach(const HandSample& from, float Ta, vec3 w, quat q, const FingerPose& fp, vec3 tipL) const;
@@ -782,6 +796,7 @@ struct Animator::Impl {
     // ---- handshake (clasp point, character space) for gaze
     Animator* partner = nullptr;
     float shakeStart = -100.0f;
+    float shakeScale = 1.0f;   // its duration / Timing::Handshake (every phase scales with it)
 
     // ---- gaze / head
     vec3 gazeTarget{0, layout::BOARD_TOP_Y, 0};
@@ -803,7 +818,6 @@ struct Animator::Impl {
     bool rightIdle = true;                    // right hand free (no piece, at rest or idling)
     int leftChin = 0, rightChin = 0;          // idle motion currently driven towards the chin
     float taskGaze = 0.0f;                    // 0..1: gaze follows the running task's target
-    SpineParams spineOut;
     float thinkLean = 0, thinkLeanTarget = 0;
     float lean = 0, leanTarget = 0;           // setLean (0..1), smoothed in updateIdle
 
@@ -828,7 +842,7 @@ struct Animator::Impl {
     }
     void fkAll(const Pose& p) { fkChain(p, 0, BoneCount - 1); }
 
-    // Shoulder of 'side' for given spine params and clavicle rotation (character space).
+    // Local rotations of the pelvis, the spine and the legs for spine params s.
     void applySpine(Pose& p, const SpineParams& s) const {
         float fp = s.flex * 0.24f, f1 = s.flex * 0.42f, f2 = s.flex * 0.34f;
         p.local[Pelvis] = qx(fp);
@@ -858,6 +872,7 @@ struct Animator::Impl {
         float prot = clamp(0.55f * std::max(0.0f, reach - 0.62f) * (0.4f + fwd) + 0.20f * crossAmt, 0.0f, 0.34f);
         return qy(prot * -sx) * qz(elev * sx);
     }
+    // Shoulder of 'side' for given spine params and clavicle rotation (character space).
     vec3 shoulderFor(Pose& p, Side s, const SpineParams& sp, vec3 wrist) {
         applySpine(p, sp);
         mat4 pel = localMat(p, Pelvis);
@@ -1021,8 +1036,8 @@ struct Animator::Impl {
             mat4 fr[3];
             fingerFrames(*sk, Side::Right, r.f, f, fr);
             for (int j = 0; j < 3; ++j)
-                if (hit(fr[j].translation(), 0.010f) || hit(phalanxMid(*sk, Side::Right, r.f, f, j), 0.009f)) return false;
-            if (hit(fingerTip(*sk, Side::Right, r.f, f), 0.008f)) return false;
+                if (hit(fr[j].translation(), 0.010f) || hit(phalanxMidFrom(*sk, Side::Right, fr, f, j), 0.009f)) return false;
+            if (hit(fingerTipFrom(*sk, Side::Right, fr, f), 0.008f)) return false;
         }
         return true;
     }
@@ -1053,7 +1068,6 @@ struct Animator::Impl {
 
     // ------------------------------------------------------------------------------------------
     // Planning helpers
-    HandSample current(Side s) const { return hands[s == Side::Right ? 1 : 0].motion.sample(time); }
     vec3 shoulderRest(Side s) const {
         vec3 p = sk->restOffset[Spine1] + sk->restOffset[Spine2] + sk->restOffset[armBone(s, ClavicleL)] + sk->restOffset[armBone(s, UpperArmL)];
         return p;
@@ -1151,7 +1165,8 @@ struct Animator::Impl {
         return std::max(known, layout::TABLE_TOP_Y);
     }
     // Highest obstacle (character Y) under the wrist and the fingertips moving between two hand
-    // poses of the right hand.
+    // poses of hand s (the right one by default; the finger geometry is the right hand's, mirrored by
+    // handPoint).
     float pathTop(const HandSample& a, vec3 pb, quat qb, const FingerPose& fb, Side s = Side::Right) const {
         vec3 ta = a.p + rotate(a.q, handPoint(s, fingerTip(*sk, Side::Right, a.f, Middle)));
         vec3 tb = pb + rotate(qb, handPoint(s, fingerTip(*sk, Side::Right, fb, Middle)));
@@ -1170,16 +1185,19 @@ struct Animator::Impl {
         // Starting from the table among pieces: up first, then across.
         if (from.p.y - tableC < 0.12f && length(from.v) < 0.05f) sg.hs = std::max(sg.hs, 0.10f);
     }
-    // How far the lowest fingertip pad hangs below the wrist (right hand, rotation q).
+    // How far the lowest fingertip pad hangs below the wrist (hand s, the right one by default;
+    // rotation q).
     float handBelow(quat q, const FingerPose& f, Side s = Side::Right) const {
         float below = 0.0f;
         for (int i = 0; i < 5; ++i) below = std::max(below, -rotate(q, handPoint(s, fingerTip(*sk, Side::Right, f, i))).y + kPadRadius);
         return below;
     }
-    // Highest piece top (world Y) whose base comes within 'radius' of pW (world), ignoring piece
-    // ignoreId when the game supports it.
+    // The obstacle queries know where the pieces stand (the game's callbacks, or the pieces read when
+    // the task started) / know at least one piece (also one this animator sets down off the board).
     bool knowsPieces() const { return (owner && (owner->obstacleTopNear || owner->pathObstacleTop)) || sceneKnown; }
     bool knowsAnyPiece() const { return knowsPieces() || !tableLeft.empty() || !pending.empty(); }
+    // Highest piece top (world Y) whose base comes within 'radius' of pW (world), ignoring piece
+    // ignoreId when the game supports it.
     float topNear(vec3 pW, float radius, int ignoreId) const {
         float fr = freshTop(pW, pW, radius, ignoreId);
         if (owner && owner->obstacleTopNear) return std::max(owner->obstacleTopNear(mw(pW), radius, ignoreId), fr);
@@ -1223,7 +1241,7 @@ struct Animator::Impl {
                     test(fr[j].translation(), j == 0 ? 0.011f : 0.009f);                       // joint
                     test(transformPoint(fr[j], d * (sk->boneLength[b] * 0.5f)), 0.009f);      // phalanx middle
                 }
-                test(fingerTip(*sk, Side::Right, *fp, f), 0.008f);
+                test(fingerTipFrom(*sk, Side::Right, fr, f), 0.008f);
             }
         }
         return sum;
@@ -1241,8 +1259,7 @@ struct Animator::Impl {
         fkChain(tmp, Pelvis, Spine2);
         solveArm(tmp, Side::Right, wristC, q);
         if (achieved) *achieved = rotOf(G[HandR]);
-        float soft = std::max(0.0f, std::fabs(lastFlex) - 1.10f) + std::max(0.0f, lastDev - 0.35f) + std::max(0.0f, -lastDev - 0.55f) +
-                     std::max(0.0f, std::fabs(lastPron) - 1.60f);
+        float soft = softWristStrain(lastFlex, lastDev, lastPron);
         return wristClamp + pronClamp + reachShort * 10.0f + 0.5f * soft;
     }
     // Grip orientation for piece 'pieceId' pinched at g: the natural one, turned and pitched
@@ -1287,7 +1304,7 @@ struct Animator::Impl {
             // people do in a crowded corner).
             const float tight = 0.3f;
             if (d > 0.0005f && base + tight < bestCost) {
-                PinchGeo pt = pinchFor(*sk, q, r, 0.45f);
+                PinchGeo pt = pinchFor(*sk, q, r, 0.45f, &pg);
                 float dt = depth(pt);
                 if (base + tight + 100.0f * dt < bestCost) {
                     bestCost = base + tight + 100.0f * dt;
@@ -1413,8 +1430,6 @@ struct Animator::Impl {
     void checkRelease(const mat4& actual, vec3 wanted, int id);
     void liftForearm(Hand& h);
     void relaxWrist(Hand& h);
-    float lastReleaseError = 0.0f, lastReleaseTilt = 0.0f;
-    float planMsMax = 0.0f;         // longest task planning so far (diagnostics)
     void finishTask(std::vector<Event>& ev);
 
     // Pose evaluation at time t (hands from their motions), head from its state.
@@ -1423,7 +1438,8 @@ struct Animator::Impl {
     void updateIdle(float dt);
     vec3 headPointWorld() const;
     HandSample chinTarget(Side s) const;
-    HandSample handTarget(const Hand& h, float t) const;
+    HandSample handTarget(const Hand& h, float t) const { return handTarget(h, t, h.motion.sample(t)); }
+    HandSample handTarget(const Hand& h, float t, HandSample motionSample) const;
     void bakeFollow(Hand& h);
 
     // ==========================================================================================
@@ -1466,7 +1482,6 @@ struct Animator::Impl {
         vec3 pagePinch{0, 0, 0};    // point between the thumb and index pads (page corner)
         vec3 pageAxis{0, 0, 1};     // thumb pad -> index pad
         float gripDist = 0.03f;     // tip -> index contact along the pen (where it is pinched on the table)
-        float err = 0.0f;           // worst pad miss of the finger solves (diagnostics)
     } grip;
     FingerPose tripodFingers(float ext) const;   // tripod with the pen pushed out by ext along -axis
     // Pen lying on the table at a frame (character space), pinched from above.
@@ -1490,11 +1505,9 @@ struct Animator::Impl {
         std::vector<PenKey> path;   // running path, character space
         bool penHeld = false;
         mat4 penTable;              // where the pen lies (solver world): initial / last pick / put frame
-        bool hasPenTable = false;
         vec3 rest{0, 0, 0};         // writing rest point on the paper (character space)
         float restYaw = 0.3f;       // pen azimuth there (see choosePenYaw)
         float suspendUntil = -1.0f; // the writing hand is busy shaking hands (left-handed player)
-        bool follow = false;        // the hand followed a path (tip lock) at the last evaluate
         std::function<vec3(float s)> corner;   // running page turn: corner (solver world)
         float lean = 0.0f;          // 0..1: the body leans towards the sheet while writing
         float look = 0.0f;          // 0..1: the eyes follow the pen
@@ -1505,7 +1518,7 @@ struct Animator::Impl {
     bool writingHandFree() const;   // no writing task, no pen, no handshake: idle behaviours allowed
     bool nextWriteBoundary(float& t) const;
     void stepWriting(std::vector<Event>& ev);   // starts or finishes the writing task at 'time'
-    void startWriteTask(const WriteTask& t, std::vector<Event>& ev);
+    void startWriteTask(const WriteTask& t);
     void finishWriteTask(std::vector<Event>& ev);
     void fireWriteDue(float upTo, std::vector<Event>& ev);
     void interruptWriting(std::vector<Event>& ev);   // the handshake takes the writing hand

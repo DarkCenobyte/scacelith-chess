@@ -50,9 +50,9 @@ float Animator::Impl::handDepth(vec3 w, quat q, const FingerPose& f, float margi
         fingerFrames(*sk, Side::Right, f, fi, fr);
         for (int j = 0; j < 3; ++j) {
             test(fr[j].translation(), j == 0 ? 0.011f : 0.009f);          // joint
-            test(phalanxMid(*sk, Side::Right, f, fi, j), 0.009f);        // phalanx middle
+            test(phalanxMidFrom(*sk, Side::Right, fr, fi, j), 0.009f);   // phalanx middle
         }
-        test(fingerTip(*sk, Side::Right, f, fi), 0.008f);
+        test(fingerTipFrom(*sk, Side::Right, fr, fi), 0.008f);
     }
     return worst;
 }
@@ -354,6 +354,13 @@ void Animator::Impl::planGesture(const Task& t, float start, float T, const Hand
         const float P = T / float(nb);
         curLook = false;
         curArrive = T;   // (nothing to cut short)
+        if (gestureBlocked(from, T, mo)) {
+            // (The beats still fire, at the requested spot or where the hand holds.)
+            curTargetWorld = hasPos ? t.position : toWorld(from.p);
+            for (int k = 0; k < nb; ++k)
+                curEvents.push_back({start + (float(k) + 0.6f) * P, EventType::GestureBeat, ActNone, false, true, curTargetWorld});
+            return;
+        }
         // Beat where a Present / Open hand already is, else in front of the body at the board edge.
         const bool inPlace = prevType == TaskType::Gesture && from.p.y > tableC + 0.06f && length(from.v) < 0.3f;
         HandSample base = from;
@@ -367,7 +374,10 @@ void Animator::Impl::planGesture(const Task& t, float start, float T, const Hand
                         for (float roll : {0.75f, 1.05f, 0.45f}) {
                             const quat q = handRot(R, yaw, pitch, roll);
                             const vec3 w = spot + vec3(0, up, 0);
-                            float cost = 0.6f * up + 0.2f * std::fabs(yaw - 0.35f) + 0.1f * std::fabs(roll - 0.75f) + 60.0f * handDepth(w, q, base.f, 0.03f, -1);
+                            // (handDepth is >= 0: an orientation already worse without it is skipped.)
+                            const float pref = 0.6f * up + 0.2f * std::fabs(yaw - 0.35f) + 0.1f * std::fabs(roll - 0.75f);
+                            if (pref >= bestCost) continue;
+                            float cost = pref + 60.0f * handDepth(w, q, base.f, 0.03f, -1);
                             if (cost >= bestCost) continue;
                             cost += 8.0f * armStrain(w, q);
                             if (cost < bestCost) {
@@ -433,8 +443,10 @@ void Animator::Impl::planGesture(const Task& t, float start, float T, const Hand
                 for (float roll : {0.8f * PI, 0.7f * PI, 0.9f * PI, -0.8f * PI, -0.7f * PI, -0.9f * PI}) {
                     const quat q = handRot(R, yaw0 + dy, pitch0 + dp, roll);
                     const vec3 w = base + vec3(0, up, 0);
-                    float cost = 0.6f * up + 0.2f * std::fabs(dy) + 0.15f * std::fabs(dp) + 0.1f * std::fabs(std::fabs(roll) - 0.8f * PI) +
-                                 60.0f * handDepth(w, q, fp, 0.03f, -1);
+                    // (handDepth is >= 0: an orientation already worse without it is skipped.)
+                    const float pref = 0.6f * up + 0.2f * std::fabs(dy) + 0.15f * std::fabs(dp) + 0.1f * std::fabs(std::fabs(roll) - 0.8f * PI);
+                    if (pref >= bestCost) continue;
+                    float cost = pref + 60.0f * handDepth(w, q, fp, 0.03f, -1);
                     if (cost >= bestCost) continue;
                     cost += 8.0f * armStrain(w, q);
                     if (cost < bestCost) {

@@ -35,9 +35,11 @@
 //                   coachhand | coachhands | coachhandt (Black's playing hand close up, from the front /
 //                   from its outside / from its thumb side)
 //   --robot         draw the real porcelain robot instead of the capsule robots (slower start)
+//   --solo          draw only the pieces held or within 6 cm of a playing index fingertip
 //   --selftest      numeric checks of the IK/grasp/timing/writing/mirroring and of the coach demo (results in
 //                   the log)
-// Keys: Space pause, R restart, V next view, S slow motion, arrows = player's head (White).
+// Keys: Space pause, R restart, V next view, S slow motion, Escape quit (White's head follows the
+// action by itself).
 #include "../app/orbit_camera.h"
 #include "../app/scene.h"
 #include "../character/robot.h"
@@ -165,13 +167,11 @@ struct DebugBody {
         }
         for (int s = 0; s < 2; ++s) {
             Side side = s == 0 ? Side::Left : Side::Right;
-            float ps = side == Side::Right ? 1.0f : -1.0f;
             auto B = [&](Bone l) { return sideBone(l, side); };
             set(B(ClavicleL), capsule({0, 0, 0}, sk.restOffset[B(UpperArmL)], 0.034f, 0.040f));
             set(B(UpperArmL), capsule({0, 0, 0}, sk.restOffset[B(ForeArmL)], 0.043f, 0.036f));
             set(B(ForeArmL), capsule({0, 0, 0}, sk.restOffset[B(HandL)], 0.035f, 0.025f));
             set(B(HandL), rbox({0.0f, -0.047f, 0.002f}, {0.0135f, 0.042f, 0.037f}, 0.010f));
-            (void)ps;
             const float rad[5][3] = {{0.0105f, 0.0092f, 0.0082f}, {0.0082f, 0.0075f, 0.0068f}, {0.0086f, 0.0078f, 0.0070f},
                                      {0.0080f, 0.0073f, 0.0066f}, {0.0072f, 0.0066f, 0.0060f}};
             for (int f = 0; f < 5; ++f)
@@ -945,7 +945,6 @@ private:
     }
     void movePiece(std::vector<anim::Task>& ts, int player, int id, const char* to) {
         using namespace anim;
-        (void)player;
         vec3 dst = layout::squareCenter(sq(to));
         ts.push_back(mkTask(TaskType::Reach, id));
         ts.push_back(mkTask(TaskType::Lift, id));
@@ -2215,7 +2214,7 @@ void AnimViewer::writingSelfTest() {
         float slidePerp = 0, axMin = 0, axMax = 0, lastTp = -1;
         vec3 lt0(0, 0, 0);
         int nDown = 0, nUp = 0, nDone = 0, nGrip = 0, nTurned = 0, nEmpty = 0, bad = 0;
-        bool picked = false, justPicked = false;
+        bool justPicked = false;
         mat4 lastPen;
         const float dt = 1.0f / 120.0f;
         std::vector<Event> ev;
@@ -2238,7 +2237,7 @@ void AnimViewer::writingSelfTest() {
                     case EventType::PenPicked:
                         expectAt(tPick);
                         if (length(e.transform.translation() - pen0.translation()) > 1e-5f) ++bad;
-                        picked = justPicked = true;
+                        justPicked = true;
                         break;
                     case EventType::PenPut: {
                         expectAt(tPut);
@@ -2311,7 +2310,6 @@ void AnimViewer::writingSelfTest() {
                 }
             }
         }
-        (void)picked;
         if (nDown != int(downs.size()) || nUp != int(ups.size()) || nDone != 2 || nGrip != 1 || nTurned != 1 || nEmpty != 1) ++bad;
         const bool fail = bad > 0 || evErr > 1e-4f || tipErr > 2e-4f || belowPaper > 3e-4f || putErr > 5e-4f || sBack > 0.0f || slidePerp > 0.002f ||
                           fingerLow < -0.001f || pinchErr > 0.002f;
