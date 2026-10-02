@@ -44,13 +44,14 @@ Tensor alias(const Tensor& t, const Dims& d) {
     return r;
 }
 
-// Dequantised float copy of a QuantWeight (generic operators never see int8 weights otherwise).
+// Dequantised float copy of a QuantWeight (generic operators never see int8 weights otherwise),
+// in the tensor's own shape: a Reshape, Squeeze or Unsqueeze of the weight keeps its flat order.
 Tensor materialize(const Tensor& t) {
     if (!t.qweight || t.data) return t;
     const QuantWeight& q = *t.qweight;
-    Tensor r = Tensor::alloc(DType::F32, q.dims);
-    float* o = r.mut<float>();
     int64_t n = elementCount(q.dims);
+    Tensor r = Tensor::alloc(DType::F32, t.count() == n ? t.dims : q.dims);
+    float* o = r.mut<float>();
     int64_t inner = 1;
     for (size_t d = size_t(q.axis) + 1; d < q.dims.size(); ++d) inner *= q.dims[d];
     int64_t ch = q.scale.size() > 1 ? q.dims[size_t(q.axis)] : 1;
@@ -980,7 +981,7 @@ GemmA gemmA(const Tensor& w, int64_t rowLen, std::vector<float>& scales, std::ve
     GemmA a;
     if (w.qweight && !w.data) {
         const QuantWeight& q = *w.qweight;
-        int64_t rows = q.dims.empty() ? 1 : q.dims[0];
+        int64_t rows = w.dims.empty() ? 1 : w.dims[0];
         scales.resize(size_t(rows));
         zps.resize(size_t(rows));
         for (int64_t r = 0; r < rows; ++r) {
@@ -1002,7 +1003,10 @@ bool quantizedPerRow(const Tensor& w) {
     // A QuantWeight can feed the GEMM directly when it is int8 quantized per row (axis 0) or per
     // tensor.
     if (!w.qweight || w.data) return true;
-    return !w.qweight->isUnsigned && (w.qweight->scale.size() == 1 || w.qweight->axis == 0);
+    const QuantWeight& q = *w.qweight;
+    if (q.isUnsigned) return false;
+    // Per-row scales only while the rows are still the quantization axis (not after a reshape).
+    return q.scale.size() == 1 || (q.axis == 0 && !w.dims.empty() && !q.dims.empty() && w.dims[0] == q.dims[0]);
 }
 
 bool opMatMul(const ExecContext& ctx, const Tensor& a0, const Tensor& b0, Tensor& out, std::string* err) {
@@ -1135,6 +1139,12 @@ bool opConv(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tens
 
     if (group == Cin && Cg == 1 && Cout == Cin) {   // depthwise
         Tensor wf = materialize(w);
+        if (wf.type != DType::F32) return fail(err, "Conv weight type");
+        if (reinterpret_cast<uintptr_t>(wf.data) % 4) {   // in place in the model file: read as float below
+            Tensor a = Tensor::alloc(DType::F32, wf.dims);
+            std::memcpy(a.mut<float>(), wf.data, wf.bytes());
+            wf = a;
+        }
         std::vector<float> row(size_t(L + p0 + p1));
         for (int64_t n = 0; n < Nb; ++n)
             for (int64_t c = 0; c < Cin; ++c) {

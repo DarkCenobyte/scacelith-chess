@@ -928,6 +928,56 @@ TEST(tts_ops_operand_checks) {
     CHECK(!runOp(cv, {&cx, &cw, &p1}, o));
 }
 
+// A quantized weight reshaped before its consumer: generic operators see the reshaped shape, the
+// GEMM pairs per-tensor scales with the reshaped rows and refuses per-row scales that no longer
+// match them. A depthwise weight misaligned in the model file is read through an aligned copy.
+TEST(tts_ops_reshaped_quant_weight) {
+    std::vector<Tensor> o, r, want;
+    std::vector<int8_t> qv(12);
+    for (size_t i = 0; i < qv.size(); ++i) qv[i] = int8_t(int(i * 7 % 23) - 11);
+    auto per = [&](std::vector<float> scale, Dims dims) {
+        auto q = std::make_shared<tts::QuantWeight>();
+        q->q = reinterpret_cast<const uint8_t*>(qv.data());
+        q->dims = dims;
+        q->scale = scale;
+        q->zeroPoint.assign(scale.size(), 0);
+        Tensor t;
+        t.type = DType::F32;
+        t.dims = dims;
+        t.qweight = q;
+        return t;
+    };
+    std::vector<float> fv;
+    for (int8_t v : qv) fv.push_back(float(v) * 0.5f);
+    Tensor ph = per({0.5f}, {2, 6}), shape34 = I({2}, {3, 4}), shape431 = I({3}, {4, 3, 1});
+    CHECK(runOp(node(tts::Op::Reshape), {&ph, &shape34}, r));
+    Tensor f34 = F({3, 4}, fv);
+    CHECK(runOp(node(tts::Op::Transpose), {&r[0]}, o) && runOp(node(tts::Op::Transpose), {&f34}, want) &&
+          equalF(o[0], {4, 3}, std::vector<float>(want[0].as<float>(), want[0].as<float>() + 12), 0.0f));
+    // Pointwise Conv with the per-tensor weight reshaped to [4, 3, 1]: four rows, not two.
+    std::vector<float> xv;
+    for (int i = 0; i < 15; ++i) xv.push_back(0.25f * float(i % 7) - 0.6f);
+    Tensor x = F({1, 3, 5}, xv);
+    tts::Node cv = node(tts::Op::Conv);
+    cv.i0 = 1;
+    CHECK(runOp(node(tts::Op::Reshape), {&ph, &shape431}, r));
+    Tensor f431 = F({4, 3, 1}, fv);
+    CHECK(runOp(cv, {&x, &r[0]}, o) && runOp(cv, {&x, &f431}, want));
+    CHECK(equalF(o[0], {1, 4, 5}, std::vector<float>(want[0].as<float>(), want[0].as<float>() + 20), 1e-6f));
+    Tensor rows = per({0.5f, 0.25f}, {2, 6, 1});
+    CHECK(runOp(node(tts::Op::Reshape), {&rows, &shape431}, r));
+    CHECK(!runOp(cv, {&x, &r[0]}, o));
+    // Depthwise weights at an odd address.
+    std::vector<uint8_t> raw(6 * 4 + 1);
+    std::vector<float> wv = {0.5f, -1, 2, 0.25f, 3, -0.5f};
+    std::memcpy(raw.data() + 1, wv.data(), 24);
+    Tensor wOdd = Tensor::view(DType::F32, {2, 1, 3}, raw.data() + 1), wAligned = F({2, 1, 3}, wv);
+    Tensor dx = F({1, 2, 6}, {1, 2, 3, 4, 5, 6, -1, -2, -3, -4, -5, -6});
+    cv.i0 = 2;
+    CHECK(runOp(cv, {&dx, &wOdd}, o) && runOp(cv, {&dx, &wAligned}, want));
+    CHECK(o[0].bytes() == want[0].bytes() && std::memcmp(o[0].data, want[0].data, o[0].bytes()) == 0);
+}
+
 TEST(tts_ops_norms) {
     std::vector<Tensor> o;
     Tensor x = F({2, 4}, {1, 2, 3, 4, -1, 0, 5, 100});
