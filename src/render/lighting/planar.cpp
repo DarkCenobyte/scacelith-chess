@@ -155,17 +155,17 @@ void PlanarReflections::render(Renderer& r) {
         for (int lv = 1; lv < levels_; ++lv) {
             int sw = std::max(1, w_ >> lv), sh = std::max(1, h_ >> lv);
             ph.use();
-            ph.set("uLevel", lv);
-            ph.set("uLayer", i);
-            glProgramUniform2i(ph.id, ph.loc("uSize"), sw, sh);
+            glProgramUniform1i(ph.id, 1, lv);  // uLevel, uLayer, uSize: explicit locations 1..3
+            glProgramUniform1i(ph.id, 2, i);
+            glProgramUniform2i(ph.id, 3, sw, sh);
             glBindTextureUnit(0, color_.id);
             glBindImageTexture(0, temp_.id, lv, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
             gpu::dispatch2D(sw, sh);
             glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
             pv.use();
-            pv.set("uLevel", lv);
-            pv.set("uLayer", i);
-            glProgramUniform2i(pv.id, pv.loc("uSize"), sw, sh);
+            glProgramUniform1i(pv.id, 1, lv);
+            glProgramUniform1i(pv.id, 2, i);
+            glProgramUniform2i(pv.id, 3, sw, sh);
             glBindTextureUnit(0, temp_.id);
             glBindImageTexture(0, color_.id, lv, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
             gpu::dispatch2D(sw, sh);

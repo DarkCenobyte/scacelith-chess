@@ -7,9 +7,9 @@
 layout(local_size_x = 8, local_size_y = 8) in;
 layout(binding = 0) uniform sampler2DArray uSrc;
 layout(rgba16f, binding = 0) uniform writeonly image2DArray uDst;
-uniform int uLevel;
-uniform int uLayer;
-uniform ivec2 uSize;   // destination level size
+layout(location = 1) uniform int uLevel;
+layout(location = 2) uniform int uLayer;
+layout(location = 3) uniform ivec2 uSize;   // destination level size
 
 const float W[5] = float[](0.0625, 0.25, 0.375, 0.25, 0.0625);
 
