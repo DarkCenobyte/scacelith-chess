@@ -342,6 +342,16 @@ TEST(upnp_parsers) {
     CHECK(upnp::cgnatSuspected("0.0.0.0"));
     CHECK(upnp::cgnatSuspected(""));
     CHECK(!upnp::cgnatSuspected("203.0.113.7"));
+    // Other ranges the Internet cannot reach: DS-Lite's B4 side, benchmarking, multicast, reserved.
+    CHECK(upnp::cgnatSuspected("192.0.0.2"));
+    CHECK(upnp::cgnatSuspected("198.18.0.1"));
+    CHECK(upnp::cgnatSuspected("198.19.255.254"));
+    CHECK(upnp::cgnatSuspected("224.0.0.1"));
+    CHECK(upnp::cgnatSuspected("240.0.0.1"));
+    CHECK(upnp::cgnatSuspected("255.255.255.255"));
+    CHECK(!upnp::cgnatSuspected("192.0.1.1"));
+    CHECK(!upnp::cgnatSuspected("198.20.0.1"));
+    CHECK(!upnp::cgnatSuspected("223.255.255.254"));
 }
 
 TEST(upnp_fake_gateway_relative_control_url) {

@@ -392,6 +392,9 @@ bool cgnatSuspected(const std::string& ip) {
     if (a == 100 && b >= 64 && b <= 127) return true;       // RFC 6598 shared address space (CGNAT)
     if (a == 169 && b == 254) return true;                  // link-local
     if (a == 127 || a == 0) return true;                    // loopback, unspecified
+    if (a == 192 && b == 0 && c == 0) return true;          // IETF protocol assignments (DS-Lite B4 192.0.0.0/29)
+    if (a == 198 && (b == 18 || b == 19)) return true;      // benchmarking
+    if (a >= 224) return true;                              // multicast, reserved, broadcast
     return false;
 }
 

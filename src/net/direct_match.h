@@ -59,8 +59,9 @@
 // device description over HTTP, WANIPConnection (v2, v1) or WANPPPConnection control URL, SOAP
 // GetExternalIPAddress / AddPortMapping (TCP, lease 3600 s renewed every 30 min; falls back to a
 // permanent lease on error 725 and to the next port on 718) / DeletePortMapping when the match
-// ends or the game closes. When the router's external address is private or in 100.64.0.0/10
-// the host is probably behind carrier-grade NAT: the page says so and suggests IPv6 or a VPN.
+// ends or the game closes. When the router's external address is private, in 100.64.0.0/10 or
+// another range the Internet cannot reach (upnp::cgnatSuspected), the host is probably behind
+// carrier-grade NAT: the page says so and suggests IPv6 or a VPN.
 //
 // Engine-free (no GL, no UI); compiled into scacelith_core and unit-tested (tests/direct_tests.cpp).
 #pragma once
@@ -86,7 +87,7 @@ struct UpnpStatus {
     std::string gatewayName;          // friendlyName of the router, if known
     std::string externalIp;           // from GetExternalIPAddress
     uint16_t externalPort = 0;
-    bool cgnatSuspected = false;      // external address private / shared (100.64.0.0/10)
+    bool cgnatSuspected = false;      // external address private / shared (100.64.0.0/10) / not global
     std::string error;                // UPnP error code/description when Failed
 };
 

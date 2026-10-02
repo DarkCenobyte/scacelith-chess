@@ -122,7 +122,9 @@ bool splitHttpUrl(const std::string& url, std::string& host, uint16_t& port, std
 // The best WAN connection service of a description (nullptr when none).
 const Service* pickService(const Description& d);
 // True when an external IPv4 address cannot be reached from the Internet: private (RFC 1918),
-// shared carrier-grade NAT space 100.64.0.0/10, link-local, loopback or unspecified.
+// shared carrier-grade NAT space 100.64.0.0/10, link-local, loopback, unspecified, the IETF
+// protocol assignments 192.0.0.0/24 (DS-Lite's B4 side), benchmarking 198.18.0.0/15, multicast
+// and reserved (224.0.0.0 and above).
 bool cgnatSuspected(const std::string& externalIpv4);
 
 }  // namespace upnp

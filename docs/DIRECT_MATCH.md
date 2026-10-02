@@ -70,8 +70,9 @@ PCP (some Apple and ISP routers) are not supported.
 
 **Carrier-grade NAT (CGNAT).** Many mobile and some fibre/cable providers share one public IPv4
 between customers. The game suspects it when the router's "external" address is private
-(10/8, 172.16/12, 192.168/16) or in the shared range 100.64.0.0/10: nobody can reach you on IPv4
-then, whatever the router does. What works instead:
+(10/8, 172.16/12, 192.168/16), in the shared range 100.64.0.0/10 or in another range the Internet
+cannot reach (192.0.0.0/24, where DS-Lite puts the router's IPv4 side; 198.18.0.0/15; 224.0.0.0
+and above): nobody can reach you on IPv4 then, whatever the router does. What works instead:
 
 - **IPv6**: if both players have IPv6, the host gives one of its global IPv6 addresses (listed with
   the local addresses). The router's IPv6 firewall may still block inbound connections: allow TCP
