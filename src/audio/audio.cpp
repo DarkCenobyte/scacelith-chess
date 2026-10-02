@@ -29,7 +29,6 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstdio>
-#include <cstring>
 #include <mutex>
 #include <thread>
 #ifdef _WIN32
