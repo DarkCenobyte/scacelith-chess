@@ -13,7 +13,10 @@ using namespace m;
 namespace game {
 
 namespace {
-constexpr uint32_t kSheetObjectId = 3000;   // + 16 per seat (Scoresheet::submit uses 16 ids)
+// + 16 per seat: Scoresheet::submit uses 5 ids plus one per turned page, so 16 cover 11 turned
+// pages; later pages may share ids with the other seat's pad, which is harmless (the paper
+// material reads neither objectSeed nor objectId).
+constexpr uint32_t kSheetObjectId = 3000;
 constexpr uint32_t kPenObjectId = 3100;     // + 2 per seat
 const vec3 kBlackInk(0.010f, 0.010f, 0.013f);
 

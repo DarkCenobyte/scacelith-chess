@@ -126,7 +126,7 @@ public:
 
     // ---- Frame ----
     void update();                        // GL: renders the page / entry textures that changed
-    // Pad and pages (objectIdBase .. objectIdBase + 15).
+    // Pad and pages (objectIdBase .. objectIdBase + 4 + the number of pages turned).
     void submit(render::Renderer& r, uint32_t objectIdBase) const;
     // The ballpoint pen at any transform (pen frame: tip at the origin, +Y to the back end).
     // Shared geometry (built on first use, GL context). prevPenToWorld: previous frame's
