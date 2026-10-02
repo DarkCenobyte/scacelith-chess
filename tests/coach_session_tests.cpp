@@ -308,6 +308,36 @@ TEST(coach_session_takeback_requested) {
     checkRenders(t.lines);
 }
 
+TEST(coach_session_menu_takeback_of_an_offered_move) {
+    // The offer declined, then that move taken back from the pause menu: the hint follows, and the
+    // replay is judged against the move taken back (not reviewed and offered again).
+    Table t;
+    hangTable(t);
+    t.start(levelConfig(1));
+    CHECK(t.quiet());
+    t.move("c3d5");
+    CHECK(t.until([&] { return t.session.offerOpen(); }, 60.0f));
+    t.session.onOfferAnswer(t.game, false);
+    CHECK(t.reply("e6d5"));
+    CHECK(t.quiet());
+    CHECK(t.session.canTakeBack(t.game));
+    t.session.onTakeBackRequested(t.game);
+    CHECK(t.queuedPrefix("tb.hint"));
+    CHECK(t.until([&] { return t.game.moves().empty() && t.session.playerMayMove(t.game); }, 10.0f));
+    CHECK(t.quiet());
+    auto offers = [&] {
+        int n = 0;
+        for (const Line& l : t.lines) n += l.key == "ex.offer.b1" ? 1 : 0;
+        return n;
+    };
+    CHECK_EQ(offers(), 1);
+    t.move("c3d5");
+    CHECK(t.until([&] { return t.session.coachMayMove() && t.session.director().idle(); }, 60.0f));
+    CHECK(t.queued("tb.same"));
+    CHECK_EQ(offers(), 1);
+    checkRenders(t.lines);
+}
+
 TEST(coach_session_no_turn_while_a_takeback_waits) {
     // The pause menu's Take back after the coach's reply: until the table undoes the moves, the
     // position on the board is going away, so no human turn begins on it (no A0 nor A3 asked).

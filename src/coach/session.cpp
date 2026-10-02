@@ -800,6 +800,7 @@ void Session::onTakeBackRequested(const chess::Game& game) {
     const int human = d.lastHumanPly(game);
     const int n = int(game.moves().size());
     const int plies = n - human;   // the human's move and, when the coach has answered, its reply
+    const bool offered = d.g.offerPly == human;   // (takenBack() forgets it)
     d.director.clear();
     d.stage->takeBack(plies);
     chess::Game after = game;
@@ -807,7 +808,7 @@ void Session::onTakeBackRequested(const chess::Game& game) {
     d.takenBack(after);
     d.g.takebackTo = human;
     Script s = takebackScript(true, human);
-    if (d.g.offerPly == human) append(s, d.reviewer.takebackAccepted(after));   // the replay is judged against it
+    if (offered) append(s, d.reviewer.takebackAccepted(after));   // the replay is judged against it
     d.play(s);
 }
 
