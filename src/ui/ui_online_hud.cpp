@@ -308,7 +308,7 @@ void onlineChallenges() {
         Rect r = im::flip(screenRect(), Rect(v.x - w - 32.0f, y, w, h));
         y -= h + 14.0f;
         im::captureMouseRect(r);
-        im::Anim& a = im::anim(im::makeId(int(c.id) + 100000));
+        im::Anim& a = im::anim(im::makeId(int(c.id + 100000u)));
         a.v[0] = im::approach(a.v[0], 1.0f, 9.0f);
         float t = ease(a.v[0]);
         gfx::pushAlpha(t);
