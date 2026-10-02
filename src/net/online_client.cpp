@@ -2075,9 +2075,9 @@ Event failedAnswer(Event::Kind kind, uint64_t gameId) {
 
 }  // namespace
 
-// Ends the realtime connection for good (no reconnection), from any thread: the account deleted,
-// the session of this game revoked. wasOpen: set on net-rt to whether the connection was wanted
-// then (open or opening), for resumeRealtime(). Returns the connectGen it begins.
+// Ends the realtime connection (no reconnection), from any thread: the account deleted or being
+// deleted, the session of this game revoked. wasOpen: set on net-rt to whether the connection was
+// wanted then (open or opening), for resumeRealtime(). Returns the connectGen it begins.
 uint32_t OnlineClient::Impl::stopRealtime(std::shared_ptr<bool> wasOpen) {
     const uint32_t gen = connectGen.fetch_add(1) + 1;
     realtime([this, wasOpen] {

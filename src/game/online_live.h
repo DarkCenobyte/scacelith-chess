@@ -372,7 +372,7 @@ inline bool challengeRefused(int code) {
 }
 
 // The refusals of a QueueJoin, which end the search it began (AlreadyInGame and InvalidCategory
-// may also answer a challenge accepted or joined: no search then anyway).
+// may also answer a challenge accepted or joined).
 inline bool queueRefused(int code) {
     using E = net::proto::ErrorCode;
     return code == int(E::QueueNotAllowed) || code == int(E::MatchmakingCooldown) || code == int(E::AlreadyInGame) ||
