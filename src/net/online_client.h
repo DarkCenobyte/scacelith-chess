@@ -366,7 +366,8 @@ public:
     void setServer(const ServerEndpoint& ep);    // disconnects if the origin changes
     // Forgets the pin saved for the current origin at sign-in (the session stays): with no pin in
     // the endpoint, its requests trust the system's certificates again. Done on net-http, after the
-    // commands already queued (a sign-in queued before would save the pin again).
+    // commands already queued (a sign-in queued before would save the pin again), or as the client
+    // ends if it ends first.
     void forgetSavedPin();
     const ServerEndpoint& server() const;
     void fetchServerInfo();
