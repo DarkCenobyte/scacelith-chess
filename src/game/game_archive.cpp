@@ -3,6 +3,7 @@
 // platform's own (wide-character paths on Windows, POSIX elsewhere) so that UTF-8 names work everywhere.
 #include "game_archive.h"
 #include "../core/log.h"
+#include "../i18n/unicode.h"
 
 #include <algorithm>
 #include <atomic>
@@ -106,15 +107,22 @@ bool dirExists(const std::string& path) {
 bool flushToDisk(FILE* f) { return fflush(f) == 0 && _commit(_fileno(f)) == 0; }
 Place placeNew(const std::string& tmp, const std::string& dst, std::string& err) {
     // Without MOVEFILE_REPLACE_EXISTING the move fails when the name is taken: never a replacement.
-    if (MoveFileExW(widen(tmp).c_str(), widen(dst).c_str(), MOVEFILE_WRITE_THROUGH)) return Place::Ok;
-    DWORD e = GetLastError();
-    if (e == ERROR_ALREADY_EXISTS || e == ERROR_FILE_EXISTS) return Place::Exists;
+    // An antivirus or the search indexer may hold the file just written for a few milliseconds: the
+    // move is tried again meanwhile (10, 20, 40 and 80 ms later) before the save gives up.
+    const std::wstring from = widen(tmp), to = widen(dst);
+    for (int attempt = 0;; ++attempt) {
+        if (MoveFileExW(from.c_str(), to.c_str(), MOVEFILE_WRITE_THROUGH)) return Place::Ok;
+        DWORD e = GetLastError();
+        if (e == ERROR_ALREADY_EXISTS || e == ERROR_FILE_EXISTS) return Place::Exists;
+        const bool held = e == ERROR_ACCESS_DENIED || e == ERROR_SHARING_VIOLATION || e == ERROR_LOCK_VIOLATION;
+        if (!held || attempt == 4) break;
+        Sleep(DWORD(10) << attempt);
+    }
     err = "cannot name the file (" + lastError() + ")";
     return Place::Failed;
 }
 bool deleteFile(const std::string& path) { return DeleteFileW(widen(path).c_str()) != 0; }
 unsigned processId() { return unsigned(GetCurrentProcessId()); }
-bool localTime(std::time_t t, std::tm& out) { return localtime_s(&out, &t) == 0; }
 const char kSeparator = '\\';
 #else
 int listFolder(const std::string& dir, std::vector<FileInfo>& out, std::string& err) {
@@ -168,7 +176,6 @@ Place placeNew(const std::string& tmp, const std::string& dst, std::string& err)
 }
 bool deleteFile(const std::string& path) { return unlink(path.c_str()) == 0; }
 unsigned processId() { return unsigned(getpid()); }
-bool localTime(std::time_t t, std::tm& out) { return localtime_r(&t, &out) != nullptr; }
 const char kSeparator = '/';
 #endif
 
@@ -261,23 +268,6 @@ uint32_t nextCodepoint(const std::string& s, size_t& i) {
     i += size_t(len);
     return cp;
 }
-void appendCodepoint(std::string& out, uint32_t cp) {
-    if (cp < 0x80) {
-        out += char(cp);
-    } else if (cp < 0x800) {
-        out += char(0xC0 | (cp >> 6));
-        out += char(0x80 | (cp & 0x3F));
-    } else if (cp < 0x10000) {
-        out += char(0xE0 | (cp >> 12));
-        out += char(0x80 | ((cp >> 6) & 0x3F));
-        out += char(0x80 | (cp & 0x3F));
-    } else {
-        out += char(0xF0 | (cp >> 18));
-        out += char(0x80 | ((cp >> 12) & 0x3F));
-        out += char(0x80 | ((cp >> 6) & 0x3F));
-        out += char(0x80 | (cp & 0x3F));
-    }
-}
 
 // ---- Listing cache --------------------------------------------------------------------------------
 struct CachedFile {
@@ -361,11 +351,14 @@ std::string sortableDate(const std::string& d) {
     return s;
 }
 
-bool newerFirst(const Entry& a, const Entry& b) {
-    const std::string da = sortableDate(a.date()), db = sortableDate(b.date());
-    if (da != db) return da > db;
-    const std::string ta = a.time(), tb = b.time();
-    if (ta != tb) return ta > tb;
+// The listing's sort keys of an entry, found once (its tags are scanned for them).
+struct SortKey {
+    std::string date, time;  // sortableDate(date()), time()
+};
+
+bool newerFirst(const Entry& a, const SortKey& ka, const Entry& b, const SortKey& kb) {
+    if (ka.date != kb.date) return ka.date > kb.date;
+    if (ka.time != kb.time) return ka.time > kb.time;
     if (a.fileTimeMs != b.fileTimeMs) return a.fileTimeMs > b.fileTimeMs;
     if (a.path != b.path) return a.path < b.path;
     return a.index < b.index;
@@ -486,10 +479,13 @@ std::string sanitizeName(const std::string& name, size_t maxBytes) {
         uint32_t cp = nextCodepoint(name, i);
         if (cp < 0x20 || cp == 0x7F || cp == 0xFFFD || cp == 0xFEFF) continue;
         if ((cp >= 0x200B && cp <= 0x200F) || (cp >= 0x202A && cp <= 0x202E) || (cp >= 0x2060 && cp <= 0x2069)) continue;
-        if (cp == ' ' || cp == 0xA0 || (cp >= 0x2000 && cp <= 0x200A) || cp == 0x3000 || std::strchr("<>:\"/\\|?*", int(cp)))
+        // The characters Windows refuses in a name are ASCII (strchr alone would test only the low
+        // byte of the codepoint, and match its terminating NUL).
+        if (cp == ' ' || cp == 0xA0 || (cp >= 0x2000 && cp <= 0x200A) || cp == 0x3000 ||
+            (cp < 0x80 && std::strchr("<>:\"/\\|?*", int(cp))))
             cp = '_';
         if (cp == '_' && !out.empty() && out.back() == '_') continue;
-        appendCodepoint(out, cp);
+        uni::append(out, cp);
     }
     auto trimEnds = [](std::string& s) {
         size_t a = 0, b = s.size();
@@ -691,7 +687,18 @@ std::vector<Entry> list(const std::string& folder, ListStats* stats, const std::
         if (part->games.size() > room) st.truncated = true;
         out.insert(out.end(), part->games.begin(), part->games.begin() + long(std::min(room, part->games.size())));
     }
-    std::stable_sort(out.begin(), out.end(), newerFirst);
+    std::vector<SortKey> keys(out.size());
+    std::vector<size_t> order(out.size());
+    for (size_t i = 0; i < out.size(); ++i) {
+        keys[i].date = sortableDate(out[i].date());
+        keys[i].time = out[i].time();
+        order[i] = i;
+    }
+    std::stable_sort(order.begin(), order.end(), [&](size_t a, size_t b) { return newerFirst(out[a], keys[a], out[b], keys[b]); });
+    std::vector<Entry> sorted;
+    sorted.reserve(out.size());
+    for (size_t i : order) sorted.push_back(std::move(out[i]));
+    out = std::move(sorted);
     if (r == 2) LOGW("archive: %s: %s", folder.c_str(), st.error.c_str());
     if (st.truncated && st.read > 0)  // once per change, not at every listing of the library's page
         LOGW("archive: %s holds more than %d games: the oldest files are not listed", folder.c_str(), kMaxListed);
@@ -810,21 +817,16 @@ RemoveResult remove(const Entry& entry) {
     return res;
 }
 
-// ---- Games of an online server ----------------------------------------------------------------------------
+// ---- Dates ------------------------------------------------------------------------------------------------
 
-namespace {
-
-// Days from 1970-01-01 to a date of the proleptic Gregorian calendar (H. Hinnant's days_from_civil).
-int64_t daysFromCivil(int64_t y, int m, int d) {
-    y -= m <= 2 ? 1 : 0;
-    const int64_t era = (y >= 0 ? y : y - 399) / 400;
-    const int64_t yoe = y - era * 400;
-    const int64_t doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + d - 1;
-    const int64_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
-    return era * 146097 + doe - 719468;
+bool localTime(std::time_t t, std::tm& out) {
+#ifdef _WIN32
+    return localtime_s(&out, &t) == 0;
+#else
+    return localtime_r(&t, &out) != nullptr;
+#endif
 }
 
-// Digits of s at [at, at + n) as a number; -1 when one of them is not a digit.
 int digitsAt(const std::string& s, size_t at, size_t n) {
     if (s.size() < at + n) return -1;
     int v = 0;
@@ -834,6 +836,19 @@ int digitsAt(const std::string& s, size_t at, size_t n) {
     }
     return v;
 }
+
+int64_t daysFromCivil(int64_t y, int m, int d) {
+    y -= m <= 2 ? 1 : 0;
+    const int64_t era = (y >= 0 ? y : y - 399) / 400;
+    const int64_t yoe = y - era * 400;
+    const int64_t doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + d - 1;
+    const int64_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    return era * 146097 + doe - 719468;
+}
+
+// ---- Games of an online server ----------------------------------------------------------------------------
+
+namespace {
 
 // "2026.09.28" and "14:03:07", in UTC, as a time_t; false unless both are complete and valid.
 bool utcInstant(const std::string& date, const std::string& time, std::time_t& out) {

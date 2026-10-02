@@ -226,9 +226,6 @@ TEST(account_history_errors_and_reload) {
     CHECK_EQ(h.reload(), uint64_t(900));
     CHECK(h.accept(pageOf(900, 800, 30, 10, 899)));
     CHECK_EQ(h.pageIndex(), 1);
-    h.clear();
-    CHECK(!h.loaded());
-    CHECK(!h.waiting());
 }
 
 // A refusal that ends with time (rate_limited: the account's budget of the server) keeps the
@@ -712,6 +709,20 @@ TEST(account_time_control_labels) {
     CHECK_EQ(timeControlLabel(90000, 1000), std::string("1:30+1"));
     CHECK_EQ(timeControlLabel(30000, 0), std::string("0:30+0"));
     CHECK_EQ(timeControlLabel(-5, -5), std::string("0+0"));
+}
+
+// The end of a ban or a cooldown: its own time (std::localtime's shared buffer once made every
+// instant read as now), with the date when it is another day.
+TEST(account_local_time_text) {
+    const std::time_t now = std::time(nullptr), later = now + 3 * 86400 + 5 * 3600 + 17 * 60;
+    std::tm tm{};
+    CHECK(archive::localTime(later, tm));
+    char want[64];
+    std::snprintf(want, sizeof want, "%02d.%02d.%04d %02d:%02d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min);
+    CHECK_EQ(localTimeText(double(later) * 1000.0), i18n::ltr(want));
+    CHECK(archive::localTime(now, tm));
+    std::snprintf(want, sizeof want, "%02d:%02d", tm.tm_hour, tm.tm_min);
+    CHECK_EQ(localTimeText(double(now) * 1000.0), i18n::ltr(want));
 }
 
 TEST(account_export_file_name) {

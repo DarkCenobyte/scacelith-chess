@@ -1,6 +1,7 @@
 // What the game scene saves (see game_saving.h).
 #include "game_saving.h"
 #include "../core/log.h"
+#include "../net/protocol_gen.h"
 
 namespace game {
 namespace saving {
@@ -10,6 +11,12 @@ namespace {
 // Protocol values (dedicated-server/src/protocol/schema.js), as game_scene_online.cpp names them.
 enum Status { StOngoing = 0, StWhiteWins = 1, StBlackWins = 2, StDraw = 3, StAborted = 4 };
 constexpr int kReasonServerAborted = 25;
+// The names above are the generated ones (net/protocol_gen.h): a schema change fails here.
+static_assert(StOngoing == int(net::proto::GameStatus::Ongoing) && StWhiteWins == int(net::proto::GameStatus::WhiteWins) &&
+                  StBlackWins == int(net::proto::GameStatus::BlackWins) && StDraw == int(net::proto::GameStatus::Draw) &&
+                  StAborted == int(net::proto::GameStatus::Aborted),
+              "GameStatus");
+static_assert(kReasonServerAborted == int(net::proto::EndReason::ServerAborted), "EndReason");
 
 }  // namespace
 

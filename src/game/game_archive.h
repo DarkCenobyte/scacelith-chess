@@ -113,6 +113,14 @@ SaveResult save(const std::string& folder, const chess::pgn::Record& record, std
 // "name_3.ext"... on a collision. The account page's data export is written this way.
 SaveResult saveFile(const std::string& folder, const std::string& name, const std::string& text);
 
+// ---- Dates (the account pages' file names use them too) ------------------------------------------
+// 't' in local time (localtime_s / localtime_r: no shared buffer); false when it has none.
+bool localTime(std::time_t t, std::tm& out);
+// The digits of s at [at, at + n) as a number; -1 when one of them is missing or not a digit.
+int digitsAt(const std::string& s, size_t at, size_t n);
+// Days from 1970-01-01 to a date of the proleptic Gregorian calendar (H. Hinnant's days_from_civil).
+int64_t daysFromCivil(int64_t y, int m, int d);
+
 // ---- Listing ---------------------------------------------------------------------------------------
 struct Entry {
     std::string path;                  // the file

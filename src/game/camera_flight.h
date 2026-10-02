@@ -1,8 +1,9 @@
 // Camera poses and smooth camera flights between them (engine-free, unit-tested).
 //
-// Used by the viewer's observer camera (viewpoint presets 1-9 are reached by a flight) and meant
-// for the offline hot-seat mode (docs/MULTIPLAYER_PLAN.md): after a move, the camera leaves the
-// mover's eyes, rises, arcs over the table and settles into the opponent's eyes (handoverShape()).
+// Used by the viewer's observer camera (viewpoint presets 1-9 are reached by a flight, and its
+// follow-the-eyes mode uses handoverShape()) and by the hot-seat handover (hotseat::Handover,
+// docs/MULTIPLAYER_PLAN.md): after a move, the camera leaves the mover's eyes, rises, arcs over the
+// table and settles into the opponent's eyes (handoverShape()).
 //
 // A pose has no roll by construction except for first-person eye poses (the head may tilt): the
 // flight interpolates yaw, pitch and roll separately, so the horizon stays level in between and the

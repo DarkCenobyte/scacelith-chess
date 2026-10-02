@@ -35,8 +35,10 @@ public:
     bool busy(net::Event::Kind k) const;
     bool take(net::Event::Kind k, net::Event& out);   // the answer arrived, handed over once
     // An answer arrived: kept for take() (the latest of its kind), one fewer awaited. False, and
-    // nothing changes, for a foreign one other than a PGN.
+    // nothing changes, for a foreign one other than a PGN. The rvalue form moves the answer (an
+    // export or a PGN may be megabytes), and leaves it untouched when it returns false.
     bool keep(const net::Event& e);
+    bool keep(net::Event&& e);
 
 private:
     std::string origin_;
@@ -68,7 +70,6 @@ public:
     // A request failed (request: its GamesPage::before and filter): when it is the one awaited, the
     // page shown stays with the error (and the server's wait, rate_limited: Event::retryAfterSec).
     void fail(const net::GamesPage& request, const std::string& error, int retryAfterSec = 0);
-    void clear();                          // nothing loaded (signed out, another server)
 
     const net::GamesFilter& filter() const { return filter_; }
     const net::GamesPage& page() const { return page_; }
@@ -169,6 +170,10 @@ std::vector<MoveLine> gameMoves(const net::GameDetails& g, bool* complete = null
 
 // "3+2", "7+3", "1:30+1": a time control as the history shows it (base in minutes, or m:ss).
 std::string timeControlLabel(int64_t baseMs, int64_t incMs);
+
+// "14:32": the local time of an epoch-ms instant (the end of a ban or of a matchmaking cooldown),
+// "17.10.2026 14:32" when it is not today.
+std::string localTimeText(double epochMs);
 
 // The file of an account export: "<host>_<username>_<YYYY-MM-DD>.json", the date in local time, the
 // host and the user name made safe for a file name (game::archive::sanitizeName).

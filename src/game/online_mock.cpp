@@ -48,6 +48,42 @@ enum Err {
     ErrRatedRequiresOfficialTc = 206, ErrMatchmakingCooldown = 207, ErrInvalidTimeControl = 208, ErrRematchUnavailable = 209
 };
 enum MoveFlagBits { FCheck = 64, FMate = 128 };
+// The names above are the generated ones (net/protocol_gen.h): a schema change fails here.
+static_assert(Ongoing == int(proto::GameStatus::Ongoing) && WhiteWins == int(proto::GameStatus::WhiteWins) &&
+                  BlackWins == int(proto::GameStatus::BlackWins) && Draw == int(proto::GameStatus::Draw) &&
+                  Aborted == int(proto::GameStatus::Aborted),
+              "GameStatus");
+static_assert(RNone == int(proto::EndReason::None) && RResignation == int(proto::EndReason::Resignation) &&
+                  RTimeout == int(proto::EndReason::Timeout) && RAgreement == int(proto::EndReason::Agreement) &&
+                  RThreefoldClaim == int(proto::EndReason::ThreefoldClaim) && RFiftyClaim == int(proto::EndReason::FiftyMoveClaim) &&
+                  RAbandonment == int(proto::EndReason::Abandonment) &&
+                  RAbandonmentVsInsufficient == int(proto::EndReason::AbandonmentVsInsufficient) &&
+                  RAborted == int(proto::EndReason::Aborted) && RNoShow == int(proto::EndReason::NoShow),
+              "EndReason");
+static_assert(DrawOffered == int(proto::GameEventKind::DrawOffered) && DrawDeclined == int(proto::GameEventKind::DrawDeclined) &&
+                  PlayerDisconnected == int(proto::GameEventKind::PlayerDisconnected) &&
+                  PlayerReconnected == int(proto::GameEventKind::PlayerReconnected) &&
+                  RematchOffered == int(proto::GameEventKind::RematchOffered) &&
+                  RematchDeclined == int(proto::GameEventKind::RematchDeclined),
+              "GameEventKind");
+static_assert(ErrNotInGame == int(proto::ErrorCode::NotInGame) && ErrNotYourTurn == int(proto::ErrorCode::NotYourTurn) &&
+                  ErrIllegalMove == int(proto::ErrorCode::IllegalMove) && ErrStalePly == int(proto::ErrorCode::StalePly) &&
+                  ErrDesync == int(proto::ErrorCode::Desync) && ErrGameOver == int(proto::ErrorCode::GameOver) &&
+                  ErrAlreadyInGame == int(proto::ErrorCode::AlreadyInGame) &&
+                  ErrInvalidCategory == int(proto::ErrorCode::InvalidCategory) &&
+                  ErrDrawOfferLimit == int(proto::ErrorCode::DrawOfferLimit) &&
+                  ErrNothingToClaim == int(proto::ErrorCode::NothingToClaim) &&
+                  ErrAbortNotAllowed == int(proto::ErrorCode::AbortNotAllowed) &&
+                  ErrNoPendingOffer == int(proto::ErrorCode::NoPendingOffer) && ErrFlagFell == int(proto::ErrorCode::FlagFell) &&
+                  ErrUserUnavailable == int(proto::ErrorCode::UserUnavailable) &&
+                  ErrCannotChallengeSelf == int(proto::ErrorCode::CannotChallengeSelf) &&
+                  ErrCodeInvalid == int(proto::ErrorCode::CodeInvalid) &&
+                  ErrRatedRequiresOfficialTc == int(proto::ErrorCode::RatedRequiresOfficialTc) &&
+                  ErrMatchmakingCooldown == int(proto::ErrorCode::MatchmakingCooldown) &&
+                  ErrInvalidTimeControl == int(proto::ErrorCode::InvalidTimeControl) &&
+                  ErrRematchUnavailable == int(proto::ErrorCode::RematchUnavailable),
+              "ErrorCode");
+static_assert(FCheck == proto::MoveFlag::Check && FMate == proto::MoveFlag::Mate, "MoveFlag");
 
 constexpr double kHttpMin = 250.0, kHttpMax = 520.0;  // HTTPS round trip
 constexpr double kOneWay = 17.0;                      // realtime one-way latency
@@ -88,6 +124,30 @@ std::string lower(std::string s) {
 bool contains(const std::string& s, const char* what) { return lower(s).find(what) != std::string::npos; }
 bool allDigits(const std::string& s) {
     return !s.empty() && std::all_of(s.begin(), s.end(), [](char c) { return c >= '0' && c <= '9'; });
+}
+// FNV-1a of a user name: the seed of what the fake makes up for that account.
+uint32_t nameHash(const std::string& name) {
+    uint32_t h = 2166136261u;
+    for (char c : name) h = (h ^ uint8_t(c)) * 16777619u;
+    return h;
+}
+// A second-factor code as typed, without its spaces and dashes.
+std::string normalizedCode(const std::string& code) {
+    std::string c;
+    for (char ch : code)
+        if (ch != ' ' && ch != '-') c += ch;
+    return c;
+}
+// Ten new recovery codes ("abcd-efgh-jk").
+std::vector<std::string> recoveryCodes(m::Rng& rng) {
+    static const char* alpha = "abcdefghjkmnpqrstuvwxyz23456789";
+    std::vector<std::string> out;
+    for (int i = 0; i < 10; ++i) {
+        std::string c;
+        for (int k = 0; k < 10; ++k) c += alpha[rng.rangeInt(0, 30)];
+        out.push_back(c.substr(0, 4) + "-" + c.substr(4, 4) + "-" + c.substr(8, 2));
+    }
+    return out;
 }
 
 // Events waiting for their delivery time (stable for equal times).
@@ -425,7 +485,7 @@ GameDetails makePastGame(m::Rng& rng, Ending ending, int64_t endedAt, int baseSe
             d.reason = RTimeout;
             if (!game.position().canColorMate(chess::Color(1 - toMove))) {
                 d.status = Draw;
-                d.reason = 7;  // TimeoutVsInsufficient
+                d.reason = int(proto::EndReason::TimeoutVsInsufficient);
             }
             break;
         case Ending::Threefold:
@@ -442,7 +502,7 @@ GameDetails makePastGame(m::Rng& rng, Ending ending, int64_t endedAt, int baseSe
             break;
         case Ending::Forfeit:
             d.status = me == 0 ? WhiteWins : BlackWins;  // the opponent's fair play violation
-            d.reason = 24;
+            d.reason = int(proto::EndReason::Forfeit);
             break;
         case Ending::Abort:
             d.status = Aborted;
@@ -547,9 +607,7 @@ void setRatings(GameDetails& d, int mine, int opp, bool provisional) {
 std::vector<GameDetails> makeHistory(const AccountInfo& account, double now) {
     std::vector<GameDetails> out;
     if (contains(account.username, "newbie")) return out;
-    uint32_t h = 2166136261u;
-    for (char c : account.username) h = (h ^ uint8_t(c)) * 16777619u;
-    m::Rng rng(uint64_t(h) * 2654435761u + 77u);
+    m::Rng rng(uint64_t(nameHash(account.username)) * 2654435761u + 77u);
 
     // The endings, in a random order.
     std::vector<Ending> endings;
@@ -1493,8 +1551,7 @@ struct FakeServer::Impl {
         a.acceptChallenges = true;
         a.createdAtMs = int64_t(lastNow) - int64_t(212.0 * 86400000.0);
         a.lastLoginAtMs = int64_t(lastNow);
-        uint32_t h = 2166136261u;
-        for (char c : name) h = (h ^ uint8_t(c)) * 16777619u;
+        const uint32_t h = nameHash(name);
         for (const Category& c : officialCategories()) {
             RatingInfo r;
             r.category = c.id;
@@ -1640,6 +1697,12 @@ struct FakeServer::Impl {
 
     void setConn(ConnState s, const std::string& err = "") {
         conn = s;
+        // The server drops the challenges of a user whose connection closed, telling only the other
+        // party (control-plane.js _dropChallengesOf).
+        if (s != ConnState::Online) {
+            outgoing.active = false;
+            incoming.active = false;
+        }
         Event e;
         e.kind = Event::Kind::ConnectionChanged;
         e.state = s;
@@ -1722,7 +1785,7 @@ struct FakeServer::Impl {
             Event e;
             e.kind = Event::Kind::ChallengeStatus;
             e.challengeId = incoming.id;
-            e.challengeState = 4;  // Expired
+            e.challengeState = int(proto::ChallengeState::Expired);
             rt(e);
         }
         // Once per session, a player challenges you while you idle in the menus.
@@ -1834,9 +1897,7 @@ void FakeServer::login(const std::string& user, const std::string& password) {
 void FakeServer::loginMfa(const std::string& code) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
-    std::string c;
-    for (char ch : code)
-        if (ch != ' ' && ch != '-') c += ch;
+    const std::string c = normalizedCode(code);
     bool ok = !I.mfaUser.empty() && ((c.size() == 6 && allDigits(c)) || c.size() == 10);
     if (!ok) return I.http(I.result(Event::Kind::LoginResult, false, I.mfaUser.empty() ? "expired" : "invalid_code"));
     std::string name = I.mfaUser;
@@ -1916,12 +1977,7 @@ void FakeServer::mfaEnable(const std::string& code) {
     I.mfaEnabled = true;
     I.account.mfaEnabled = true;
     Event e = I.result(Event::Kind::MfaEnableResult, true);
-    static const char* alpha = "abcdefghjkmnpqrstuvwxyz23456789";
-    for (int i = 0; i < 10; ++i) {
-        std::string c;
-        for (int k = 0; k < 10; ++k) c += alpha[I.rng.rangeInt(0, 30)];
-        e.recoveryCodes.push_back(c.substr(0, 4) + "-" + c.substr(4, 4) + "-" + c.substr(8, 2));
-    }
+    e.recoveryCodes = recoveryCodes(I.rng);
     I.http(e);
 }
 void FakeServer::mfaDisable(const std::string& password, const std::string& code) {
@@ -1939,14 +1995,7 @@ void FakeServer::regenerateRecoveryCodes(const std::string& password, const std:
     I.lastNow = nowMs();
     std::string err = password == "wrong" ? "invalid_credentials" : code.size() != 6 ? "invalid_code" : "";
     Event e = I.result(Event::Kind::RecoveryCodesResult, err.empty(), err);
-    if (err.empty()) {
-        static const char* alpha = "abcdefghjkmnpqrstuvwxyz23456789";
-        for (int i = 0; i < 10; ++i) {
-            std::string c;
-            for (int k = 0; k < 10; ++k) c += alpha[I.rng.rangeInt(0, 30)];
-            e.recoveryCodes.push_back(c.substr(0, 4) + "-" + c.substr(4, 4) + "-" + c.substr(8, 2));
-        }
-    }
+    if (err.empty()) e.recoveryCodes = recoveryCodes(I.rng);
     I.http(e);
 }
 void FakeServer::report(uint64_t gameId, const std::string&, const std::string&, const std::string&) {
@@ -1962,9 +2011,7 @@ bool FakeServer::Impl::reauth(Event::Kind k, const std::string& password, const 
     if (!account.hasPassword) { http(result(k, false, "password_not_set")); return false; }
     if (password == "wrong" || password.empty()) { http(result(k, false, "invalid_password")); return false; }
     if (mfaEnabled) {
-        std::string c;
-        for (char ch : code)
-            if (ch != ' ' && ch != '-') c += ch;
+        const std::string c = normalizedCode(code);
         if (c.empty()) { http(result(k, false, "mfa_code_required")); return false; }
         const bool digits = c.size() == 6 && allDigits(c);
         if ((!digits && c.size() != 10) || c == "000000") { http(result(k, false, "invalid_code")); return false; }
@@ -2583,7 +2630,7 @@ void FakeServer::joinPrivateGame(const std::string& code) {
 void FakeServer::acceptChallenge(uint32_t id) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
-    if (!I.incoming.active || I.incoming.id != id) return I.serverError(201);
+    if (!I.incoming.active || I.incoming.id != id) return I.serverError(int(proto::ErrorCode::ChallengeNotFound));
     I.incoming.active = false;
     int color = I.incoming.color == 1 ? 1 : 2;
     I.startGame(I.incoming.baseSec, I.incoming.incSec, I.incoming.rated, color, I.incoming.from.name, I.incoming.from.rating,
@@ -2596,7 +2643,7 @@ void FakeServer::declineChallenge(uint32_t id) {
 void FakeServer::cancelChallenge(uint32_t id) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
-    if (!I.outgoing.active || I.outgoing.id != id) return;
+    if (!I.outgoing.active || I.outgoing.id != id) return I.serverError(int(proto::ErrorCode::ChallengeNotFound));
     I.outgoing.active = false;
     I.challengeStatus(3);
 }

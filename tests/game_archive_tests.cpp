@@ -12,6 +12,7 @@
 #include <vector>
 
 #ifdef _WIN32
+#include <thread>
 #include <windows.h>
 #else
 #include <dirent.h>
@@ -241,6 +242,14 @@ TEST(archive_file_names) {
     CHECK_EQ(archive::sanitizeName("\xE7\x8E\x8B\xE5\xB0\x8F\xE6\x98\x8E"), std::string("\xE7\x8E\x8B\xE5\xB0\x8F\xE6\x98\x8E"));
     CHECK_EQ(archive::sanitizeName("evil\xE2\x80\xAE" "fdp.exe"), std::string("evilfdp.exe"));
     CHECK_EQ(archive::sanitizeName("a\xE2\x80\x8B" "b\xE3\x80\x80" "c"), std::string("ab_c"));
+    // Letters whose codepoint ends in the byte of a forbidden character (U+043E, U+017C) or in 00
+    // (U+0100, U+4E00, U+AC00) are kept.
+    CHECK_EQ(archive::sanitizeName("\xD0\x98\xD0\xB2\xD0\xB0\xD0\xBD \xD0\x9F\xD0\xB5\xD1\x82\xD1\x80\xD0\xBE\xD0\xB2"),
+             std::string("\xD0\x98\xD0\xB2\xD0\xB0\xD0\xBD_\xD0\x9F\xD0\xB5\xD1\x82\xD1\x80\xD0\xBE\xD0\xB2"));  // Ivan Petrov
+    CHECK_EQ(archive::sanitizeName("Bo\xC5\xBC" "ena"), std::string("Bo\xC5\xBC" "ena"));
+    CHECK_EQ(archive::sanitizeName("\xE4\xB8\x80"), std::string("\xE4\xB8\x80"));
+    CHECK_EQ(archive::sanitizeName("\xC4\x80" "da"), std::string("\xC4\x80" "da"));
+    CHECK_EQ(archive::sanitizeName("\xEA\xB9\x80\xEA\xB0\x80\xEC\x9D\x80"), std::string("\xEA\xB9\x80\xEA\xB0\x80\xEC\x9D\x80"));
     // Length: whole UTF-8 characters only.
     std::string longName;
     for (int i = 0; i < 30; ++i) longName += "\xC3\xA9";  // 60 bytes
@@ -573,3 +582,49 @@ TEST(archive_load_reads_the_game_only) {
     CHECK_EQ(l.record.tag("Event"), std::string("Small"));
     CHECK_EQ(int(l.record.plies.size()), 2);
 }
+
+#ifdef _WIN32
+// An antivirus or the search indexer opens a file just written, without FILE_SHARE_DELETE, for a
+// few milliseconds: the save waits for it to let go instead of failing.
+TEST(archive_save_waits_for_a_file_held_for_a_moment) {
+    TempFolder tmp("held");
+    CHECK(archive::makeFolder(tmp.path));
+    std::atomic<bool> held{false}, done{false};
+    std::thread scanner([&] {
+        const auto start = std::chrono::steady_clock::now();
+        while (!done && std::chrono::steady_clock::now() - start < std::chrono::seconds(10)) {
+            std::this_thread::yield();
+            WIN32_FIND_DATAW fd;
+            HANDLE find = FindFirstFileW(wide(tmp.file(".scacelith-save-*.tmp")).c_str(), &fd);
+            if (find == INVALID_HANDLE_VALUE) continue;
+            FindClose(find);
+            const std::wstring name = wide(tmp.file(utf8(fd.cFileName)));
+            HANDLE h = CreateFileW(name.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, 0, nullptr);
+            if (h == INVALID_HANDLE_VALUE) continue;
+            held = true;
+            // Held until the save closed the file (a handle that denies writing then opens), and a
+            // moment more: over its first rename, and well within its retries (10 + 20 + 40 + 80 ms).
+            while (!done) {
+                HANDLE w = CreateFileW(name.c_str(), GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
+                if (w != INVALID_HANDLE_VALUE) {
+                    CloseHandle(w);
+                    break;
+                }
+                std::this_thread::yield();
+            }
+            Sleep(30);
+            CloseHandle(h);
+            return;
+        }
+    });
+    const std::string text(size_t(8) << 20, 'x');  // long enough to be caught before its rename
+    archive::SaveResult r = archive::saveFile(tmp.path, "held.pgn", text);
+    done = true;
+    scanner.join();
+    if (!r.ok) std::fprintf(stderr, "  save: %s\n", r.error.c_str());
+    CHECK(r.ok);
+    if (!held) std::fprintf(stderr, "  the temporary file was renamed before it could be held\n");
+    CHECK_EQ(r.path, tmp.file("held.pgn"));
+    CHECK_EQ(int(TempFolder::names(tmp.path).size()), 1);
+}
+#endif

@@ -1,6 +1,7 @@
 #include "online_session.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
+#include "../net/protocol_gen.h"
 #include "../platform/platform.h"
 #include "../ui/ui.h"
 #include "online_mock.h"
@@ -9,7 +10,6 @@
 #include <chrono>
 #include <cmath>
 #include <cstdio>
-#include <ctime>
 
 namespace game {
 
@@ -193,14 +193,32 @@ bool isGameEvent(Kind k) {
            k == Kind::GameEnd || k == Kind::RatingUpdate || k == Kind::OpponentGesture;
 }
 
-// Realtime error codes that belong to a game (net::proto ErrorCode 100..112).
-bool isGameError(int code) { return code >= 100 && code <= 112; }
-
 // Protocol values (dedicated-server/src/protocol/schema.js).
 enum ChallengeState { ChPending = 0, ChAccepted = 1, ChDeclined = 2, ChCancelled = 3, ChExpired = 4, ChUnavailable = 5 };
 enum QueueState { QLeft = 0, QSearching = 1, QMatched = 2 };
 enum NoticeCode { NShutdown = 1, NBanned = 2, NRevoked = 3, NCooldown = 4, NReplaced = 5, NRatingRestored = 7 };
-constexpr int kErrMatchmakingCooldown = 207;
+constexpr int kErrAlreadyInGame = 106, kErrInvalidCategory = 107, kErrChallengeNotFound = 201, kErrMatchmakingCooldown = 207;
+// The names above are the generated ones (net/protocol_gen.h): a schema change fails here.
+static_assert(ChPending == int(net::proto::ChallengeState::Pending) && ChAccepted == int(net::proto::ChallengeState::Accepted) &&
+                  ChDeclined == int(net::proto::ChallengeState::Declined) &&
+                  ChCancelled == int(net::proto::ChallengeState::Cancelled) &&
+                  ChExpired == int(net::proto::ChallengeState::Expired) &&
+                  ChUnavailable == int(net::proto::ChallengeState::Unavailable),
+              "ChallengeState");
+static_assert(QLeft == int(net::proto::QueueState::Left) && QSearching == int(net::proto::QueueState::Searching) &&
+                  QMatched == int(net::proto::QueueState::Matched),
+              "QueueState");
+static_assert(NShutdown == int(net::proto::NoticeCode::ServerShutdown) && NBanned == int(net::proto::NoticeCode::Banned) &&
+                  NRevoked == int(net::proto::NoticeCode::SessionRevoked) &&
+                  NCooldown == int(net::proto::NoticeCode::MatchmakingCooldown) &&
+                  NReplaced == int(net::proto::NoticeCode::ReplacedByNewConnection) &&
+                  NRatingRestored == int(net::proto::NoticeCode::RatingRestored),
+              "NoticeCode");
+static_assert(kErrAlreadyInGame == int(net::proto::ErrorCode::AlreadyInGame) &&
+                  kErrInvalidCategory == int(net::proto::ErrorCode::InvalidCategory) &&
+                  kErrChallengeNotFound == int(net::proto::ErrorCode::ChallengeNotFound) &&
+                  kErrMatchmakingCooldown == int(net::proto::ErrorCode::MatchmakingCooldown),
+              "ErrorCode");
 
 // Seconds of the monotonic clock: when a page last showed the state of the GIF being made.
 double gifClock() { return std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count(); }
@@ -283,7 +301,8 @@ void OnlineSession::applyServer() {
     outgoing_ = Outgoing();
     incoming_.clear();
     answers_.setServer(ep.origin());
-    ratingRestored_ = live::HeldNotice();  // points of the previous server's account
+    serverNameRt_.clear();
+    resetAccountState();  // of the previous server's account
     LOGI("online: server %s", ep.origin().c_str());
 }
 
@@ -301,6 +320,7 @@ void OnlineSession::testServer(const net::ServerEndpoint& ep) {
     if (testSwitched_) a.setServer(ep);
     a.fetchServerInfo();
     testing_ = true;
+    testOrigin_ = ep.origin();
     testDone_ = false;
 }
 
@@ -349,6 +369,14 @@ void OnlineSession::signOut(bool everywhere) {
     account_ = net::AccountInfo();
     data_.clear();
     incoming_.clear();
+    resetAccountState();
+}
+
+// The ban, the matchmaking cooldown and the RatingRestored points known of the account signed in
+// until now: not those of the next one (or of the next server's).
+void OnlineSession::resetAccountState() {
+    bannedUntilMs_ = cooldownUntilMs_ = 0;
+    ratingRestored_ = live::HeldNotice();
 }
 
 // ---- Requests -------------------------------------------------------------------------------------
@@ -490,11 +518,17 @@ void OnlineSession::cancelOutgoing() {
     if (!outgoing_.active) return;
     if (outgoing_.id) api().cancelChallenge(outgoing_.id);
     outgoing_ = Outgoing();
+    quietNotFound_ = false;  // a ChallengeNotFound now may answer this cancel
 }
 
 void OnlineSession::answerChallenge(uint32_t id, bool accept) {
+    quietNotFound_ = false;  // a ChallengeNotFound now may answer this
     if (accept) {
         cancelSearch();
+        // A direct match being hosted or joined would start a second game over this one.
+        using DS = net::DirectMatch::State;
+        const DS st = directUsed_ ? direct_->state() : DS::Idle;
+        if (st == DS::OpeningPort || st == DS::WaitingForGuest || st == DS::Connecting || st == DS::Handshake) closeDirect();
         api().acceptChallenge(id);
     } else {
         api().declineChallenge(id);
@@ -507,12 +541,16 @@ void OnlineSession::answerChallenge(uint32_t id, bool accept) {
 
 void OnlineSession::hostDirect(const net::DirectHostOptions& opt) {
     cancelSearch();
+    // Accepted during the direct match, our challenge would start a server game over it. Offline,
+    // the next Welcome cancels it (a cancel now would only be refused as not connected).
+    if (conn_ == net::ConnState::Online) cancelOutgoing();
     direct().host(opt);
     directConn_ = net::ConnState::Offline;
 }
 
 void OnlineSession::joinDirect(const std::string& address, uint16_t port, const std::string& code) {
     cancelSearch();
+    if (conn_ == net::ConnState::Online) cancelOutgoing();
     const std::string& n = settings().playerName;
     std::string name = n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
     direct().join(address, port, code, name);
@@ -553,7 +591,7 @@ GameLink* OnlineSession::takeGame(net::OnlineGame& snapshot) {
 
 bool OnlineSession::nextGameEvent(net::Event& e) {
     if (gameReady_ || gameEvents_.empty()) return false;  // a new game waits for takeGame()
-    e = gameEvents_.front();
+    e = std::move(gameEvents_.front());
     gameEvents_.pop_front();
     return true;
 }
@@ -572,7 +610,7 @@ void OnlineSession::quickStart(const std::string& category, const std::string& u
     if (!signedIn_) {
         if (api_->hasSavedSession()) {
             resume();
-        } else if (mock_ || !net::officialServer().valid()) {
+        } else if (mock_) {
             api_->login(username, "mock-password");
             expect(Kind::LoginResult);
         }
@@ -609,6 +647,12 @@ void OnlineSession::update(float dt) {
             ui::notify(gifErrorText(gif_.error(), gif_.retryAfterSec()), 6.0f);
         }
     }
+    // A challenge received is gone at its expiry, its Expired status missed or not (offline then).
+    if (!incoming_.empty()) {
+        const double now = nowMs();
+        incoming_.erase(std::remove_if(incoming_.begin(), incoming_.end(), [now](const Incoming& c) { return c.expiresMs <= now; }),
+                        incoming_.end());
+    }
     double restored = 0.0;
     if (ratingRestored_.take(inGame_, restored))
         ui::notify(i18n::trn("online.notice.rating_restored", std::lround(restored)), 8.0f);
@@ -621,10 +665,18 @@ void OnlineSession::update(float dt) {
 
 void OnlineSession::handleServer(net::Event& e) {
     if (isGameEvent(e.kind)) {
-        if (e.kind == Kind::RatingUpdate && !e.game.category.empty()) {
+        if (e.kind == Kind::RatingUpdate && !live::ratesShownGame(e)) {
+            // The update of an earlier game (it follows the game's commit: a rematch may have
+            // started meanwhile). e.game is the game shown now, not our side in that one.
+            if (signedIn_) {
+                api_->fetchAccount();
+                expect(Kind::AccountResult);
+            }
+        } else if (e.kind == Kind::RatingUpdate) {
             // The account page shows the new rating at once.
+            const std::string& category = live::ratingCategory(e);
             for (net::RatingInfo& r : account_.ratings) {
-                if (r.category != e.game.category) continue;
+                if (category.empty() || r.category != category) continue;
                 const net::Event::Rating& mine = e.game.you == 1 ? e.ratingBlack : e.ratingWhite;
                 r.rating = mine.after;
                 r.games = mine.games;
@@ -639,9 +691,10 @@ void OnlineSession::handleServer(net::Event& e) {
     // devices, account or session. Its GIF is still written and its PGN still saved (ServerAnswers
     // keeps it for the game page), each as the game it was asked for. (The info of the server being
     // tested in Options names that server.)
-    if (answers_.foreign(e) && !(e.kind == Kind::ServerInfoResult && testing_)) {
+    const bool testAnswer = live::testAnswer(e, testing_, testOrigin_);
+    if (answers_.foreign(e) && !testAnswer) {
         if (e.kind == Kind::GifResult) gif_.finish(std::move(e));
-        else if (!answers_.keep(e)) LOGI("online: an answer of %s dropped (another server since)", e.origin.c_str());
+        else if (!answers_.keep(std::move(e))) LOGI("online: an answer of %s dropped (another server since)", e.origin.c_str());
         return;
     }
     // A call that found the saved session refused (expired, revoked): the network layer erased the
@@ -650,11 +703,13 @@ void OnlineSession::handleServer(net::Event& e) {
         signedIn_ = false;
         LOGI("online: session refused, signed out");
     }
-    // HTTPS results are kept for the page that asked.
-    auto store = [&]() { answers_.keep(e); };
+    // HTTPS results are kept for the page that asked (moved: store() is the last use of e).
+    auto store = [&]() { answers_.keep(std::move(e)); };
     switch (e.kind) {
     case Kind::ServerInfoResult:
-        if (testing_) {
+        // The test's answer comes from the tested server (a refreshInfo() sent before the test is
+        // answered first: not the test's).
+        if (testAnswer) {
             testing_ = false;
             testDone_ = true;
             testResult_ = e;
@@ -667,6 +722,7 @@ void OnlineSession::handleServer(net::Event& e) {
                 }
                 break;
             }
+            if (answers_.foreign(e)) break;  // another server applied since the test began
         }
         infoKnown_ = e.ok;
         infoError_ = e.ok ? std::string() : e.error;
@@ -678,6 +734,7 @@ void OnlineSession::handleServer(net::Event& e) {
             signedIn_ = true;
             account_ = e.account;
             data_.clear();  // the history and devices of whoever was signed in before
+            resetAccountState();
             api_->connect();
             LOGI("online: signed in as %s", account_.username.c_str());
         }
@@ -714,7 +771,7 @@ void OnlineSession::handleServer(net::Event& e) {
             queue_ = Queue();
             outgoing_ = Outgoing();
             incoming_.clear();
-            ratingRestored_ = live::HeldNotice();
+            resetAccountState();
             LOGI("online: account deleted");
         } else if (e.kind == Kind::EmailChangeResult && e.ok && signedIn_) {
             // The pending change (or the new address) shows on the account page.
@@ -759,6 +816,19 @@ void OnlineSession::handleServer(net::Event& e) {
         }
         serverNameRt_ = e.serverName;
         conn_ = net::ConnState::Online;
+        // A new connection: the server dropped our challenges when it saw the previous one close
+        // (telling only the other party), unless we came back first. Ours is cancelled either way,
+        // the ChallengeNotFound of one already dropped not shown; the ones received just expire
+        // for their challengers.
+        if (outgoing_.active) {
+            if (outgoing_.id) {
+                api_->cancelChallenge(outgoing_.id);
+                quietNotFound_ = true;
+            }
+            outgoing_ = Outgoing();
+            ui::notify(i18n::tr("online.err.challenge_not_found"), 4.0f);
+        }
+        incoming_.clear();
         break;
     case Kind::QueueStatus:
         if (e.queueState == QSearching) {
@@ -828,13 +898,19 @@ void OnlineSession::handleServer(net::Event& e) {
         }
         break;
     case Kind::ServerError:
-        if ((e.gameId != 0 && e.gameId == gameId_) || isGameError(e.code)) {
+        if ((e.gameId != 0 && e.gameId == gameId_) || live::gameError(e.code)) {
             routeGame(e, LinkKind::Server);
             break;
         }
+        if (e.code == kErrChallengeNotFound && quietNotFound_) {
+            quietNotFound_ = false;
+            break;
+        }
         if (e.code == kErrMatchmakingCooldown && cooldownUntilMs_ < nowMs()) cooldownUntilMs_ = nowMs() + 60000.0;
-        queue_.searching = queue_.searching && e.code != kErrMatchmakingCooldown;
-        if (e.code >= 200 && e.code < 210) outgoing_ = Outgoing();
+        // A QueueJoin refused: no search (106 and 107 may also answer a challenge accepted or joined).
+        queue_.searching = queue_.searching && e.code != kErrMatchmakingCooldown && e.code != kErrAlreadyInGame &&
+                           e.code != kErrInvalidCategory;
+        if (outgoing_.active && outgoing_.id == 0 && live::challengeRefused(e.code)) outgoing_ = Outgoing();
         if (e.code == 0 && e.error == "offline") {  // a command sent while not connected: dropped
             queue_.searching = false;
             outgoing_ = Outgoing();
@@ -846,7 +922,7 @@ void OnlineSession::handleServer(net::Event& e) {
 }
 
 void OnlineSession::handleDirect(const net::Event& e) {
-    if (isGameEvent(e.kind) || (e.kind == Kind::ServerError && (e.gameId != 0 || isGameError(e.code)))) {
+    if (isGameEvent(e.kind) || (e.kind == Kind::ServerError && (e.gameId != 0 || live::gameError(e.code)))) {
         routeGame(e, LinkKind::Direct);
         return;
     }
@@ -855,7 +931,7 @@ void OnlineSession::handleDirect(const net::Event& e) {
 }
 
 void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
-    uint64_t id = e.game.id ? e.game.id : e.gameId;
+    uint64_t id = live::eventGameId(e);
     if (e.kind == Kind::GameSnapshot && id != gameId_ && e.game.status == 0) {
         // A new game: matchmaking, a challenge, a rematch, a direct match.
         gameId_ = id;
@@ -882,20 +958,6 @@ void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
 // =============================================================================================
 // Texts
 // =============================================================================================
-
-std::string localTimeText(double epochMs) {
-    std::time_t t = std::time_t(epochMs / 1000.0);
-    char buf[64] = "";
-    if (const std::tm* tm = std::localtime(&t)) {
-        std::time_t now = std::time(nullptr);
-        const std::tm* today = std::localtime(&now);
-        bool sameDay = today && today->tm_yday == tm->tm_yday && today->tm_year == tm->tm_year;
-        std::tm copy = *tm;
-        if (sameDay) std::snprintf(buf, sizeof buf, "%02d:%02d", copy.tm_hour, copy.tm_min);
-        else std::snprintf(buf, sizeof buf, "%02d.%02d.%04d %02d:%02d", copy.tm_mday, copy.tm_mon + 1, copy.tm_year + 1900, copy.tm_hour, copy.tm_min);
-    }
-    return i18n::ltr(buf);
-}
 
 std::string durationText(double ms) {
     long long s = std::max(0LL, (long long)std::ceil(ms / 1000.0));

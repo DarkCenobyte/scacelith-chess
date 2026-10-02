@@ -9,10 +9,9 @@
 //   - the 3D scene plays the games it announces (gameReady() / takeGame()) through a GameLink and
 //     drains their events with nextGameEvent(), the opponent's live gestures (OpponentGesture)
 //     included: only those of the game being played, the latest one replacing one still queued.
-// With --online-mock the in-process fakes of online_mock.h replace the network layer (builds
-// without it use them anyway, see online_stub.cpp); --online-manual-clock then makes their games
-// autoPress = false (the moves wait for a clock press). Tokens never pass through here: the
-// network layer stores them per server.
+// With --online-mock the in-process fakes of online_mock.h replace the network layer;
+// --online-manual-clock then makes their games autoPress = false (the moves wait for a clock
+// press). Tokens never pass through here: the network layer stores them per server.
 #pragma once
 #include "../net/direct_match.h"
 #include "../net/online_client.h"
@@ -20,7 +19,6 @@
 #include "online_account.h"
 #include "online_live.h"
 #include <deque>
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -208,7 +206,7 @@ public:
         bool searching = false;
         std::string category;
         bool rated = false;
-        double sinceMs = 0;                     // mock::nowMs() when the search began (elapsed time)
+        double sinceMs = 0;                     // nowMs() when the search began (elapsed time)
         uint32_t window = 0, queued = 0;
     };
     const Queue& queue() const { return queue_; }
@@ -254,8 +252,9 @@ public:
     bool nextGameEvent(net::Event& e);
     // The scene left the game (back to the menu): a direct match is closed.
     void leaveGame();
-    // --start-online: signs in (mock: any name) and looks for an opponent in 'category' as soon
-    // as the connection is up. With the fakes and a virtual clock the game is ready on return.
+    // --start-online: signs in (the saved session; with the fakes, any name) and looks for an
+    // opponent in 'category' as soon as the connection is up. With the fakes and a virtual clock
+    // the game is ready on return.
     void quickStart(const std::string& category, const std::string& username);
     // Fakes with a virtual clock (UI viewer, screenshots): runs them for 'ms' of virtual time, then
     // waits for a GIF file being written.
@@ -266,6 +265,7 @@ private:
     void handleDirect(const net::Event& e);
     void routeGame(const net::Event& e, LinkKind from);
     std::unique_ptr<GameLink> makeLink(LinkKind kind, uint64_t id);
+    void resetAccountState();
 
     bool mock_ = false, virtual_ = false, ready_ = false;
     std::unique_ptr<ServerApi> api_;
@@ -275,6 +275,7 @@ private:
 
     bool infoKnown_ = false;
     bool testing_ = false, testSwitched_ = false, testDone_ = false;
+    std::string testOrigin_;                    // of the server being tested
     net::Event testResult_;
     std::string infoError_;
     net::ServerInfo info_;
@@ -290,6 +291,7 @@ private:
     Queue queue_;
     Outgoing outgoing_;
     std::vector<Incoming> incoming_;
+    bool quietNotFound_ = false;                // the next ChallengeNotFound answers a reconnection's cancel
     double cooldownUntilMs_ = 0, bannedUntilMs_ = 0;
     std::string autoQueue_;                     // --start-online
     bool inGame_ = false;
@@ -320,8 +322,7 @@ std::string serverErrorText(int code);
 // while not connected, which the network layer drops).
 std::string eventErrorText(const net::Event& e);
 std::string directErrorText(const std::string& code);
-// "14:32" (local time of an epoch-ms instant) and "0:45" (a duration).
-std::string localTimeText(double epochMs);
+// "0:45" (a duration); the local time of an instant is localTimeText (online_account.h).
 std::string durationText(double ms);
 
 }  // namespace game
