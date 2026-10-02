@@ -454,7 +454,6 @@ MenuAction coachPauseMenu(const CoachPause& cp) {
     float step = 70.0f, eh = 58.0f;
     float w = 580.0f, h = 170.0f + step * float(entries) + 20.0f;
     Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 12.0f, w, h);
-    if (g_pause.confirm == 1 && !cp.canResign) g_pause.confirm = 0;   // a move set off meanwhile: no entry
     if (g_pause.confirm) im::pushBlock();
     gfx::pushAlpha(t);
     im::panel(p);
@@ -471,10 +470,10 @@ MenuAction coachPauseMenu(const CoachPause& cp) {
     }
     if (cp.canOfferDraw && im::menuEntry(L("pause.offer_draw"), next(), true, HAlign::Center)) act = MenuAction::OfferDraw;
     if (cp.canClaimDraw) {
-        if (im::menuEntry(L("pause.claim_draw"), next(), true, HAlign::Center)) act = MenuAction::ClaimDraw;
+        if (im::menuEntry(L("pause.claim_draw"), next(), cp.mayEndGame, HAlign::Center)) act = MenuAction::ClaimDraw;
         im::tooltip(T("pause.claim_draw.help"));
     }
-    if (cp.canResign && im::menuEntry(L("pause.resign"), next(), true, HAlign::Center)) g_pause.confirm = 1;
+    if (cp.canResign && im::menuEntry(L("pause.resign"), next(), cp.mayEndGame, HAlign::Center)) g_pause.confirm = 1;
     if (im::menuEntry(L("menu.options"), next(), true, HAlign::Center)) {
         g_pause.options = true;
         detail::openOptionsPage();

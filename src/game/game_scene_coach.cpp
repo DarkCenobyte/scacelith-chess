@@ -1132,10 +1132,11 @@ void GameScene::coachPauseMenuFrame() {
     CoachRuntime& rt = coachRuntime();
     ui::CoachPause cp;
     cp.canTakeBack = coachCanTakeBack();
-    // Not while a move is on its way (or taken back): the end of the game would cut it off.
     cp.canOfferDraw = !lesson() && drawOfferPly_ != int(game_.moves().size()) && !rt.drawAnalysis && quietTurn();
-    cp.canClaimDraw = !lesson() && quietTurn() && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
-    cp.canResign = !lesson() && quietTurn();
+    cp.canClaimDraw = !lesson() && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
+    cp.canResign = !lesson();
+    // Greyed while a move is on its way (or taken back), which the end of the game would cut off.
+    cp.mayEndGame = quietTurn();
     switch (menuChoice(ui::coachPauseMenu(cp))) {
     case ui::MenuAction::Resume: paused_ = false; break;
     case ui::MenuAction::TakeBack:

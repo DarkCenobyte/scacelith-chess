@@ -1655,7 +1655,6 @@ MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& re
     dimScene(std::max(t, 0.001f));
     float w = 560.0f, h = 640.0f;
     Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 12.0f, w, h);
-    if (S.pauseConfirm == 1 && !canResign) S.pauseConfirm = 0;   // a move set off meanwhile: greyed again
     if (S.pauseConfirm) im::pushBlock();
     gfx::pushAlpha(t);
     im::panel(p);
