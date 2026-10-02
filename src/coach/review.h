@@ -11,8 +11,9 @@
 // every pointing target is a placeholder of the line (the gesture's anchor), so translations keep
 // the timing.
 //
-// Engine-free: the director (W9) runs the analyses this file asks for (Reviewer::*Request) and hands
-// the results back as ai::Analysis values; tests build those by hand.
+// Engine-free: coach::Session (session.cpp) runs the analyses this file asks for (Reviewer::*Request)
+// through the coach::Analyst interface (stage.h) and hands the results back as ai::Analysis values;
+// tests build those by hand.
 #pragma once
 #include "../ai/analysis.h"
 #include "../chess/chess.h"
@@ -161,7 +162,8 @@ public:
     // ...and A2 (optional) on the position after the move, for a refutation longer than A0's PV.
     ai::AnalysisRequest afterRequest(const chess::Game& g) const;
     // A3 (optional, levels 3-4): a shallow search (depth 6) of A0's root, requested with A0. When its
-    // move differs from the engine's best, the best move is "not easy to see" (praise at levels 3-4).
+    // move differs from the move played (a top move), that move was "not easy to see" (praise at
+    // levels 3-4).
     ai::AnalysisRequest shallowRequest(const chess::Game& g) const;
 
     // Right after any move is completed (either side): "Check!", "Checkmate!" (Urgent beats).

@@ -6,7 +6,7 @@
 // encouragement and level suggestion. Every beat is skippable. Lines are catalog keys of
 // assets/coach/speech/<lang>/appraisal.lang.
 //
-// Engine-free: the director hands in the analyses; nothing is searched at the end of the game.
+// Engine-free: coach::Session hands in the analyses; nothing is searched at the end of the game.
 #pragma once
 #include "../ai/analysis.h"
 #include "../chess/chess.h"
