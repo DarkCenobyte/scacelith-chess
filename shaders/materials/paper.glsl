@@ -192,7 +192,10 @@ void surface(in SurfaceInput i, inout Surface s) {
     s.subsurfaceColor = vec3(1.0, 0.97, 0.9);
     s.subsurfaceRadius = 0.0005;
     s.thickness = 0.0001;
-    if (heightUm != 0.0) s.normalWS = bumpFromHeight(i.positionWS, i.normalWS, heightUm * 1e-6, 1.0);
+    // Derivatives in uniform control flow: heightUm is 0 on some pixels of a quad where the
+    // detail fades out. Where it is 0 the normal stays as it is (the stack edge sets its own).
+    vec3 nb = bumpFromHeight(i.positionWS, i.normalWS, heightUm * 1e-6, 1.0);
+    if (heightUm != 0.0) s.normalWS = nb;
 #endif
     mat_debugAlbedo(s);
 }
