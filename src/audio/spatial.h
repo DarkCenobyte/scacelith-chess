@@ -106,8 +106,8 @@ inline SpatialTarget spatialTarget(const Basis& b, bool spatial, m::vec3 src, fl
 
 // Per-voice state of the spatial chain shared by the effect voices and the speech voices: the
 // block targets are ramped linearly per sample; the hall send is taken pre-filter and pre-pan, then
-// behind/air low-pass, ITD (64-sample ring, clamped to 60 samples: fine up to ~96 kHz), far-ear
-// head shadow and the per-ear gains.
+// behind/air low-pass, ITD (64-sample ring, clamped to 60 samples: the full Woodworth range up to
+// ~91 kHz, shortened for far-lateral sources above), far-ear head shadow and the per-ear gains.
 struct SpatialChain {
     float gL = 0, gR = 0, itd = 0, shL = 0, shR = 0, lp = 0, sendG = 0;
     float dgL = 0, dgR = 0, dItd = 0, dShL = 0, dShR = 0, dLp = 0, dSend = 0;
