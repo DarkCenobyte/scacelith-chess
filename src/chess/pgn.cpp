@@ -588,7 +588,7 @@ private:
                         break;
                     }
                     Ply p;
-                    p.move = pos.findLegal(m.from, m.to, m.promotion);
+                    p.move = m;  // parseSAN returns the generated legal move, flags included
                     p.san = pos.toSAN(p.move);
                     pos.makeMove(p.move);
                     g.record.plies.push_back(std::move(p));
