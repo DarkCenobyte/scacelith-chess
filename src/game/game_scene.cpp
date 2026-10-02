@@ -966,7 +966,6 @@ void GameScene::applySettings(bool displayToo) {
         plat::setDisplayMode(s.fullscreen ? plat::DisplayMode::Borderless : plat::DisplayMode::Windowed, s.displayWidth,
                              s.displayHeight);
         plat::setVsync(s.vsync);
-        s.save();
     }
     refreshCoachVoice();   // Options > Audio > Coach voice
 }
