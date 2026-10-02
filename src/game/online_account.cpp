@@ -153,10 +153,6 @@ void HistoryPager::fail(const net::GamesPage& request, const std::string& error,
     retryAfter_ = std::max(0, retryAfterSec);
 }
 
-void HistoryPager::clear() {
-    *this = HistoryPager();
-}
-
 int HistoryPager::pageCount() const {
     if (!loaded_) return 1;
     const int byTotal = (std::max(0, page_.total) + kPageSize - 1) / kPageSize;

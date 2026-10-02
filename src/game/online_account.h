@@ -70,7 +70,6 @@ public:
     // A request failed (request: its GamesPage::before and filter): when it is the one awaited, the
     // page shown stays with the error (and the server's wait, rate_limited: Event::retryAfterSec).
     void fail(const net::GamesPage& request, const std::string& error, int retryAfterSec = 0);
-    void clear();                          // nothing loaded (signed out, another server)
 
     const net::GamesFilter& filter() const { return filter_; }
     const net::GamesPage& page() const { return page_; }

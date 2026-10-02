@@ -226,9 +226,6 @@ TEST(account_history_errors_and_reload) {
     CHECK_EQ(h.reload(), uint64_t(900));
     CHECK(h.accept(pageOf(900, 800, 30, 10, 899)));
     CHECK_EQ(h.pageIndex(), 1);
-    h.clear();
-    CHECK(!h.loaded());
-    CHECK(!h.waiting());
 }
 
 // A refusal that ends with time (rate_limited: the account's budget of the server) keeps the
