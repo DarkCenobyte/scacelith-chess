@@ -263,6 +263,50 @@ TEST(anim_write_empty_path_stays_at_the_rest) {
     CHECK(!an.writingBusy());
 }
 
+// A very short page turn (0.1 s, where the approach would end after the pinch): the writing hand
+// still moves without a jump, and the page events keep their instants.
+TEST(anim_very_short_page_turn_stays_continuous) {
+    anim::Animator an;
+    initWhite(an);
+    std::vector<WriteTask> w(2);
+    w[0].type = WriteTaskType::PickPen;
+    w[0].frame = penFrame();
+    w[1].type = WriteTaskType::TurnPage;   // the default page geometry
+    w[1].duration = 0.1f;
+    an.enqueueWriting(w);
+    const float tTurn = anim::Timing::PickPen, T = w[1].duration;
+    // 1 ms frames: the wrist flips the page at up to about 50 m/s here, but a jump shows as a step
+    // much longer than the one before it.
+    const float dt = 0.001f;
+    std::vector<anim::Event> ev;
+    float gripped = -1.0f, turned = -1.0f, step = 0.0f, prevStep = 0.0f, jump = 0.0f;
+    bool finite = true;
+    m::vec3 prev = an.globals()[character::HandL].translation();
+    while (an.time() < tTurn + T + 0.3f) {
+        ev.clear();
+        an.update(dt, ev);
+        for (const anim::Event& e : ev) {
+            if (e.type == anim::EventType::PageGripped) gripped = e.time;
+            if (e.type == anim::EventType::PageTurned) turned = e.time;
+        }
+        for (int b = 0; b < character::BoneCount; ++b) {
+            const m::vec3 p = an.globals()[b].translation();
+            if (!std::isfinite(p.x) || !std::isfinite(p.y) || !std::isfinite(p.z)) finite = false;
+        }
+        const m::vec3 p = an.globals()[character::HandL].translation();
+        step = m::length(p - prev);
+        if (an.time() > tTurn) jump = std::max(jump, step - prevStep);
+        prev = p;
+        prevStep = step;
+    }
+    std::fprintf(stderr, "  0.1 s page turn: the wrist's step grows by up to %.1f mm from one 1 ms frame to the next\n", jump * 1000.0f);
+    CHECK(finite);
+    CHECK(std::fabs(gripped - (tTurn + 0.33f * T)) < 1e-4f);
+    CHECK(std::fabs(turned - (tTurn + 0.90f * T)) < 1e-4f);
+    CHECK(jump < 0.025f);
+    CHECK(!an.writingBusy());
+}
+
 // Black left-handed (clock at +X) against Black right-handed in the mirrored world: the same motion
 // bone for bone, the same events at the same instants, the pen mirrored.
 TEST(anim_left_handed_mirror) {
