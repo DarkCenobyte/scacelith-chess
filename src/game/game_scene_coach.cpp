@@ -28,7 +28,6 @@
 #include "../tts/tts.h"
 #include "../ui/ui_font.h"
 #include "layout.h"
-#include "look_up.h"
 #include "settings.h"
 #include <algorithm>
 #include <cmath>
