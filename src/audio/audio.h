@@ -130,7 +130,8 @@ VoiceId openVoice(const VoiceParams& p);
 // Moves 'mono' (at the voice's sampleRate) in and returns the chunk's start on the speech clock
 // (source seconds), or -1 when refused: invalid/stale/terminal id, voice closed or stopped, engine
 // not running, or FIFO full (64 chunks in flight, or the command queue: retry next frame). On
-// refusal 'mono' keeps its content. An empty chunk is not queued (returns the current end).
+// refusal 'mono' keeps its content (except that its non-finite samples may already have been
+// replaced with silence). An empty chunk is not queued (returns the current end).
 // Non-finite samples (NaN, Inf) are replaced with silence.
 // Give phrase edges a few ms of fade or silence (the TTS does); the voice adds 4 ms edge fades when
 // it starts and when it resumes after starving. Use the returned start to schedule gestures and
