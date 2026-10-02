@@ -12,7 +12,7 @@
 //   * Part "table_top" (TableWood): top face uv = world (x, z) in meters, normal +Y at TABLE_TOP_Y.
 //
 // Chair: origin on the floor under the seat centre, facing +Z (the sitter looks towards +Z), seat
-// cushion top at layout::SEAT_HEIGHT. Armless médaillon chair: fluted legs, moulded seat rails
+// cushion top at layout::SEAT_HEIGHT. Armless medallion-back chair: fluted legs, moulded seat rails
 // and oval back frame (ChairWood), velvet seat and back cushions (ChairVelvet). The back cushion's
 // front surface is ~CHAIR_BACK_Z behind the seat centre. Place it at z = +-layout::CHAIR_Z facing the
 // table (White: rotateY(pi) at +CHAIR_Z, Black: identity at -CHAIR_Z).

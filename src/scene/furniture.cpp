@@ -247,7 +247,7 @@ Model buildChair() {
             }, 1);
         }
     }
-    // Oval (médaillon) back, raked back by 9 degrees.
+    // Oval medallion back, raked back by 9 degrees.
     const float rake = 9.0f * DEG;
     const vec3 C(0, 0.815f, bz - 0.02f);
     const vec3 upB(0, std::cos(rake), -std::sin(rake));
