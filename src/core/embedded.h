@@ -11,7 +11,7 @@ struct File { const char* path; const unsigned char* data; size_t size; };
 const File* find(const char* path);
 // Convenience: returns the file as a string, or empty string (and logs an error) if missing.
 std::string text(const char* path);
-// All embedded files (for listing / hot reload).
+// All embedded files, in table order (e.g. the licence listing).
 const File* all(size_t* count);
 
 // Development hot-reload: when set (from --data-dir <repo root>), text() reads files from disk

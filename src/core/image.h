@@ -1,4 +1,4 @@
-// Image output helpers (screenshots, texture dumps for debugging).
+// PNG output for screenshots (F12, --shot).
 #pragma once
 #include <cstdint>
 #include <string>

@@ -165,8 +165,7 @@ inline mat4 rotateAxis(vec3 axis, float angle) {
 inline mat4 rotateX(float a) { return rotateAxis({1, 0, 0}, a); }
 inline mat4 rotateY(float a) { return rotateAxis({0, 1, 0}, a); }
 inline mat4 rotateZ(float a) { return rotateAxis({0, 0, 1}, a); }
-// Camera-to-world style basis looking from eye towards target. The returned matrix is the VIEW
-// matrix (world -> view), view space looks down -Z.
+// View matrix (world -> view) of a camera at 'eye' looking at 'target'; view space looks down -Z.
 inline mat4 lookAt(vec3 eye, vec3 target, vec3 up) {
     vec3 f = normalize(target - eye);
     vec3 s = normalize(cross(f, up));
