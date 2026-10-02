@@ -356,7 +356,6 @@ struct OnlineClient::Impl {
         } info;
         double banUntil = 0;
         OnlineGame game;
-        uint32_t lastGseq = 0;
         struct Pending { uint64_t game = 0; int ply = -1; uint16_t move = 0; } pending;
         GestureBucket gestures;                           // Welcome.gestureRate / gestureBurst
     } rt;
@@ -757,7 +756,6 @@ struct OnlineClient::Impl {
         b.set("clientLabel", clientString());
         ServerEndpoint e = sso.ep;
         Api a = api(e, "POST", "/auth/sso/google/poll", &b, false, httpCancel);
-        if (!sso.active) return;
         if (a.ok() && a.body["status"].asString() == "pending") {
             sso.nextPoll = Clock::now() + std::chrono::milliseconds(sso.pollMs);
             return;
@@ -1215,7 +1213,6 @@ struct OnlineClient::Impl {
             pr::GameSnapshot m;
             if (!pr::decode(p, n, m)) return bad();
             rt.game = fromSnapshot(m);
-            rt.lastGseq = m.gseq;
             if (rt.pending.game == m.game && rt.pending.ply < int(rt.game.moves.size())) rt.pending = Rt::Pending();
             post(gameEvent(Event::Kind::GameSnapshot));
             break;
@@ -1237,7 +1234,6 @@ struct OnlineClient::Impl {
             g.running = g.status != int(pr::GameStatus::Ongoing) || m.ply == 0 ? 2 : (m.ply + 1) & 1;
             if (m.drawOffer) g.drawOfferBy = mover;
             else if (g.drawOfferBy == (mover ^ 1)) g.drawOfferBy = 2;   // a move declines the opponent's offer
-            rt.lastGseq = std::max(rt.lastGseq, m.gseq);
             Event ev = gameEvent(Event::Kind::MoveMade);
             ev.ply = m.ply;
             ev.move = m.move;
@@ -1285,7 +1281,6 @@ struct OnlineClient::Impl {
                 case pr::GameEventKind::RematchDeclined: g.rematchBy = 2; break;
                 default: break;
                 }
-                rt.lastGseq = std::max(rt.lastGseq, m.gseq);
             }
             Event ev = gameEvent(Event::Kind::GameEvent);
             ev.gameId = m.game;
@@ -1307,7 +1302,6 @@ struct OnlineClient::Impl {
                 g.serverTimeMs = m.serverTime;
                 g.running = 2;
                 g.drawOfferBy = 2;
-                rt.lastGseq = std::max(rt.lastGseq, m.gseq);
             }
             Event ev = gameEvent(Event::Kind::GameEnd);
             ev.gameId = m.game;
