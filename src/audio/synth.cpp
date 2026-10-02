@@ -252,7 +252,7 @@ std::vector<float> finish(Buf& b, float hpHz = 0.0f, float fadeSec = 0.004f) {
     }
     float inv = 1.0f / peak;
     for (float& v : b.x) v *= inv;
-    return std::move(b.x);
+    return std::vector<float>(b.x.begin(), b.x.end());  // exact size: the bank keeps no scratch capacity
 }
 
 // ---------------------------------------------------------------------------------------------
