@@ -2,8 +2,6 @@
 # Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other (0 and 1 are
 # singular).
 
-language.name = Français
-
 # ---- Common words ------------------------------------------------------------------------------
 common.on = Activé
 common.off = Désactivé

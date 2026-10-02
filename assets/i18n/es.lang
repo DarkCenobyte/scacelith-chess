@@ -1,8 +1,6 @@
 # Scacelith - Español
 # Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other.
 
-language.name = Español
-
 # ---- Common words ------------------------------------------------------------------------------
 common.on = Sí
 common.off = No

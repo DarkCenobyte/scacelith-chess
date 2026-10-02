@@ -1,8 +1,6 @@
 # Scacelith - 日本語
 # Translation of assets/i18n/en.lang (same keys, same {n}). No plural forms (a single form).
 
-language.name = 日本語
-
 # ---- Common words ------------------------------------------------------------------------------
 common.on = オン
 common.off = オフ

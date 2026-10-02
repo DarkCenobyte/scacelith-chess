@@ -1,8 +1,6 @@
 # Scacelith - Deutsch
 # Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other.
 
-language.name = Deutsch
-
 # ---- Common words ------------------------------------------------------------------------------
 common.on = Ein
 common.off = Aus

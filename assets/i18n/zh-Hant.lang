@@ -1,8 +1,6 @@
 # Scacelith - 繁體中文
 # Translation of assets/i18n/en.lang (same keys, same {n}). No plural forms (a single form).
 
-language.name = 繁體中文
-
 # ---- Common words ------------------------------------------------------------------------------
 common.on = 開
 common.off = 關

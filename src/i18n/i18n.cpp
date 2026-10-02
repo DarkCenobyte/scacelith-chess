@@ -64,6 +64,8 @@ void ensureEnglish() {
 
 }  // namespace
 
+// The native names live here, not in the .lang files: the selector shows every language in its
+// own name whatever the current one.
 const std::vector<Language>& languages() {
     static const std::vector<Language> list = {
         {"en", "English", false},        {"fr", "Fran\xC3\xA7" "ais", false},
