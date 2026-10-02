@@ -149,14 +149,10 @@ public:
     void renderOverlay(AppContext& ctx, float dt) override;
     void shutdown(AppContext& ctx) override;
 
-    // ---- For the scoresheets and the hot-seat mode ----
-    const Seat& seat(int index) const { return seats_[index & 1]; }
-    GameMode mode() const { return mode_; }
-    int round() const { return round_; }   // games started this session (scoresheet "Round")
+    // ---- For the hot-seat mode ----
     // Clock freeze (hot-seat handover): while frozen the running clock does not count (neither its
     // time nor its delay window) and the next player does not act yet. See docs/MULTIPLAYER_PLAN.md.
     void setClockFrozen(bool frozen) { clockFrozen_ = frozen; }
-    bool clockFrozen() const { return clockFrozen_; }
 
 private:
     static constexpr float kBaseGazePitch = -0.62f;  // looking down at the board from the chair
@@ -267,7 +263,6 @@ private:
     bool autoPressClock() const;
     ai::ClockInfo clockInfo() const;
     chess::TimeControl chosenTimeControl() const;
-    ai::EngineSettings chosenEngineSettings() const { return engineSettingsFor(setup_.difficulty); }
     ai::EngineSettings engineSettingsFor(int preset) const;
     m::vec2 cursorPixels() const;             // the pointer (physical pixels), or --mouse
     m::Ray mouseRay() const;
@@ -676,7 +671,6 @@ private:
     bool reportOpen_ = false, reported_ = false;
     int reportCategory_ = 0;
     std::string reportComment_;
-    bool onlinePauseLeave_ = false;
     std::string startOnline_;           // --start-online category
     std::string startTouch_;            // --start-online with --touch <square>: touched once idle
     float fadeDip_ = 0.0f;              // short darkening while the board is rebuilt
