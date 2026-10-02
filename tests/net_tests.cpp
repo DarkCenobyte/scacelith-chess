@@ -4072,6 +4072,67 @@ TEST(net_account_delete_closes_realtime_first) {
     net::sys::removeFile(credPath);
 }
 
+// Signing out everywhere succeeds only when the server says it did. A refused token (401) revoked
+// nothing: a failure, the token erased all the same (it is dead). Any other failure keeps the
+// token, so that the player can try again. Signing out here erases it whatever the answer.
+TEST(net_logout_all_verdict) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    using K = net::Event::Kind;
+    std::atomic<int> mode{0};
+    auto handler = [&](const fakehttp::Request& q) {
+        if (q.method != "POST" || (q.path != "/api/v1/auth/logout-all" && q.path != "/api/v1/auth/logout"))
+            return jsonReply(404, R"({"error":"not_found"})");
+        if (!hasBearer(q)) return jsonReply(401, R"({"error":"invalid_token"})");
+        fakehttp::Reply cut = jsonReply(200, R"({"status":"logged_out"})");
+        cut.cutAfter = 0;                             // the connection lost before the answer's body
+        switch (mode.load()) {
+        case 1: return jsonReply(429, R"({"error":"rate_limited","retryAfter":30})");
+        case 2: return jsonReply(503, R"({"error":"maintenance"})");
+        case 3: return cut;
+        case 4: return jsonReply(401, R"({"error":"invalid_token"})");
+        default: return jsonReply(200, R"({"status":"logged_out"})");
+        }
+    };
+    {
+        AccountRig r("logout-all-fails", handler);
+        CHECK(r.srv.ok());
+        for (int m : {1, 2, 3}) {
+            mode = m;
+            r.c->logout(true);
+            net::Event ev = r.wait(K::LogoutResult);
+            CHECK_EQ(r.last().path, std::string("/api/v1/auth/logout-all"));
+            CHECK(!ev.ok);
+            CHECK(!ev.error.empty());
+            CHECK(r.c->hasSavedSession());
+        }
+        mode = 4;
+        r.c->logout(true);
+        net::Event ev = r.wait(K::LogoutResult);
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string("unauthorized"));
+        CHECK(!r.c->hasSavedSession());
+    }
+    {
+        AccountRig r("logout-all-ok", handler);
+        CHECK(r.srv.ok());
+        mode = 0;
+        r.c->logout(true);
+        net::Event ev = r.wait(K::LogoutResult);
+        CHECK(ev.ok);
+        CHECK(!r.c->hasSavedSession());
+    }
+    {
+        AccountRig r("logout-fails", handler);
+        CHECK(r.srv.ok());
+        mode = 2;
+        r.c->logout(false);
+        net::Event ev = r.wait(K::LogoutResult);
+        CHECK_EQ(r.last().path, std::string("/api/v1/auth/logout"));
+        CHECK_EQ(ev.error, std::string("maintenance"));
+        CHECK(!r.c->hasSavedSession());
+    }
+}
+
 namespace {
 bool runningUnderWine() {
 #ifdef _WIN32

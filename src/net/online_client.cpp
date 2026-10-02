@@ -1765,13 +1765,20 @@ void OnlineClient::logout(bool allSessions) {
     d->http([d, e, allSessions] {
         json::Value b = json::Value::object();
         Impl::Api a = d->api(e, "POST", allSessions ? "/auth/logout-all" : "/auth/logout", &b, true, d->httpCancel);
-        d->creds.clearToken(e.origin());   // gone locally whatever the server said
         Event ev;
         ev.kind = Event::Kind::LogoutResult;
         Impl::fillError(ev, a);
-        if (a.status == 401 || a.error == "unauthorized") {
-            ev.ok = true;
-            ev.error.clear();
+        // This session: gone locally whatever the server said (refused, it was gone already). Every
+        // session: done only when the server says so. A refused token (401) revoked nothing (request()
+        // erased it); any other failure keeps the token, to try again.
+        if (!allSessions) {
+            d->creds.clearToken(e.origin());
+            if (a.status == 401 || a.error == "unauthorized") {
+                ev.ok = true;
+                ev.error.clear();
+            }
+        } else if (a.ok()) {
+            d->creds.clearToken(e.origin());
         }
         d->post(ev);
     });

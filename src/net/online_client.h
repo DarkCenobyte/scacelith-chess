@@ -378,7 +378,10 @@ public:
     void startGoogleSso();                       // PKCE + system browser + polling
     void completeSso(const std::string& username);
     void cancelSso();
-    void logout(bool allSessions = false);       // server-side revocation + local token erase
+    // Server-side revocation + local token erase. This session: erased whatever the server says
+    // (LogoutResult ok, a refused token included). Every session (allSessions): ok only when the
+    // server did it; the token is kept when it failed, except a refused one (401, "unauthorized").
+    void logout(bool allSessions = false);
     void fetchAccount();
     void resendVerification(const std::string& email);
     void forgotPassword(const std::string& email);

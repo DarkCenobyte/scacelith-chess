@@ -162,6 +162,10 @@ Rules common to these calls:
   and the connection stays closed; a failure opens it again if it was open. `revokeSession` on the
   session marked `current` in the last `fetchSessions` signs this game out the same way (token
   erased, connection stopped).
+- `logout(true)` (`POST /auth/logout-all`, Sign out everywhere) is ok only when the server did it.
+  A refused session (401) revoked nothing: `unauthorized`, its token erased. Any other failure
+  (the server unreachable, `rate_limited`, maintenance...) keeps the token, so that the player can
+  try again. A plain `logout()` erases the token whatever the answer.
 
 ## The game at the table
 
