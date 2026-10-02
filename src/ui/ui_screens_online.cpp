@@ -484,6 +484,7 @@ void pumpResults() {
             O.mfaStep = 2;
             O.mfaSecret.clear();
             O.mfaUri.clear();
+            detail::clearQrCache();
             clearSecrets();
             O.error.clear();
             showCodes(Sub::MfaSetup);
@@ -1096,6 +1097,7 @@ void pageMfaSetup(float t) {
         clearSecrets();
         O.mfaSecret.clear();
         O.mfaUri.clear();
+        detail::clearQrCache();
         setSub(Sub::Account);
     }
 }

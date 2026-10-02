@@ -38,6 +38,8 @@ constexpr int kOnlineOptionsTab = 5;   // Display, Graphics, Audio, Gameplay, Pl
 // QR code of 'text' (byte mode, error correction M) drawn dark on light paper in 'r' (square,
 // with its quiet zone). False when the text does not fit a QR code.
 bool drawQrCode(const std::string& text, const gfx::Rect& r);
+// Forgets the last code drawn (the two-factor secret is in its text).
+void clearQrCache();
 // Puts UTF-8 text on the system clipboard (Windows). False where unavailable (X11 test builds).
 bool setClipboardText(const std::string& text);
 

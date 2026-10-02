@@ -64,5 +64,7 @@ bool drawQrCode(const std::string& text, const gfx::Rect& r) {
     return true;
 }
 
+void clearQrCache() { g_qr = QrCache(); }
+
 }  // namespace detail
 }  // namespace ui
