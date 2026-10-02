@@ -269,6 +269,9 @@ void World::setupRenderer(render::Renderer& r) {
     materials::getMutable(MaterialId::BoardSquareLight).planarReflector = w.reflBoard;
     materials::getMutable(MaterialId::BoardSquareDark).planarReflector = w.reflBoard;
     materials::getMutable(MaterialId::BoardFrame).planarReflector = w.reflBoard;
+    // Markers and coach marks (transparent, main view only) first show during play.
+    r.warmProgram(w.markerMat, render::PassId::Main);
+    r.warmProgram(w.coachMarkMat, render::PassId::Main);
 }
 
 void World::setClockSide(bool positiveX) {

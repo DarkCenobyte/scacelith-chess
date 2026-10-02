@@ -248,6 +248,9 @@ public:
 
     // Marks the static environment as changed (re-bake probes / static shadows).
     void invalidateStatic() { staticDirty_ = true; }
+    // Compiles now the program a material uses in a pass, for materials that first appear during
+    // play (otherwise their first draw waits for the compile). GL context required.
+    void warmProgram(const Material& mat, PassId pass) { programFor(mat, pass); }
 
     // --- Lighting configuration (render-lighting). Defaults follow game/layout.h (the hall). ---
     // World bounds of the scene: shadow casters range and default probe parallax box.
