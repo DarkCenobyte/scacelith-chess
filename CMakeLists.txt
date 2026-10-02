@@ -83,6 +83,9 @@ if(WIN32)
     endforeach()
 endif()
 set_source_files_properties(${ROOT}/src/tts/kernels_sse2.cpp PROPERTIES COMPILE_OPTIONS "-O3")
+# The interpreter's element-wise loops: at -O2 GCC's vectorizer refuses every loop that needs a
+# run-time alias check. Never add fast-math options: the bit-exact audio depends on their absence.
+set_source_files_properties(${ROOT}/src/tts/ops.cpp PROPERTIES COMPILE_OPTIONS "-O3")
 set_source_files_properties(${ROOT}/src/tts/kernels_avx2.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVX2_FLAGS}")
 set_source_files_properties(${ROOT}/src/tts/kernels_avxvnni.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVXVNNI_FLAGS}")
 set_source_files_properties(${ROOT}/src/tts/kernels_avx512.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVX512_FLAGS}")
