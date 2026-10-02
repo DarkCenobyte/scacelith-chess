@@ -850,11 +850,8 @@ bool opLayerNorm(const ExecContext& ctx, const Node& nd, const Tensor& x, const 
     if (g.count() != cols || (b.valid() && b.count() != cols)) return fail(err, "LayerNorm scale/bias size");
     out = Tensor::alloc(DType::F32, x.dims);
     int64_t rows = cols ? x.count() / cols : 0;
-    auto body = [&](int64_t r0, int64_t r1) {
-        ctx.k->layerNormRows(x.as<float>() + r0 * cols, cols, int(r1 - r0), int(cols), g.as<float>(),
-                             b.valid() ? b.as<float>() : nullptr, nd.f0, out.mut<float>() + r0 * cols);
-    };
-    body(0, rows);
+    ctx.k->layerNormRows(x.as<float>(), cols, int(rows), int(cols), g.as<float>(), b.valid() ? b.as<float>() : nullptr,
+                         nd.f0, out.mut<float>());
     return true;
 }
 

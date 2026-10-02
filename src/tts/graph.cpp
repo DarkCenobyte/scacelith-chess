@@ -1,8 +1,6 @@
 #include "graph.h"
-#include "core/log.h"
 #include <algorithm>
 #include <chrono>
-#include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <limits>
