@@ -62,6 +62,9 @@ set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cp
 list(APPEND CORE_SOURCES ${GAME_CORE_SOURCES})
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
 target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party)
+# <KHR/khrplatform.h> of third_party/khronos/GL/glcorearb.h (src/gl/gl46.h): the bundled copy, not
+# the system's (libgl-dev), which a tests-only build may lack.
+target_include_directories(scacelith_core SYSTEM PUBLIC ${ROOT}/third_party/khronos)
 target_compile_options(scacelith_core PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
 if(TARGET stockfish_embedded)
     target_link_libraries(scacelith_core PUBLIC stockfish_embedded)
