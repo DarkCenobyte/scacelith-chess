@@ -268,6 +268,7 @@ bool Worker::start(const Options& o) {
     started_ = true;
     ready_ = false;
     failed_ = false;
+    warmUpFailed_ = false;
     cancelRunning_ = false;
     try {
         thread_ = std::thread([this] { run(); });
@@ -349,10 +350,15 @@ void Worker::run() {
         ok = synth.load(&err);
         if (ok) {
             // Warm-up: pages the weights in and starts the thread pool before the first real line
-            // (the buffer cache is trimmed after every line).
+            // (the buffer cache is trimmed after every line). Intact files always give it samples:
+            // none (unless stop() cancelled it) means damaged files that still load.
             Options w = opts_;
             w.seed = 1;
-            synth.synthesize("Hello.", "en", w, &cancelRunning_);
+            if (synth.synthesize("Hello.", "en", w, &cancelRunning_).empty() && !cancelRunning_.load()) {
+                LOGE("tts: speech unavailable (the warm-up synthesis failed)");
+                warmUpFailed_ = true;
+                ok = false;
+            }
         }
     } catch (const std::exception& e) {
         LOGE("tts: speech unavailable (%s)", e.what());

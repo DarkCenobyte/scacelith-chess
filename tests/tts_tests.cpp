@@ -31,6 +31,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <filesystem>
 #include <limits>
 #include <map>
 #include <memory>
@@ -2143,6 +2144,63 @@ TEST(tts_worker) {
     std::fprintf(stderr, "  stop() while busy took %.0f ms\n", stopMs);
     CHECK(stopMs < 2000.0);
     CHECK_EQ(w.request("After stop.", "en"), 0u);
+}
+
+// Files that load but cannot speak (an indexer of the right size whose ids leave the embedding
+// table, as damaged contents of a downloaded file would): the warm-up gives no samples and the
+// worker fails (failed() and warmUpFailed()), taking no request. Missing files fail the load.
+TEST(tts_worker_warm_up_failure) {
+    if (!model()) SKIP("no model files in " + modelDir());
+    const std::string dir = net::sys::exeDirectory() + "ttstest-warmup/";
+    CHECK(net::sys::makeDirectories(dir));
+    // The big files are links to the build's copy (copies where links are refused); the indexer is
+    // a file of its own.
+    for (int i = 0; i < tts::kFileCount; ++i) {
+        if (i == tts::kFileIndexer) continue;
+        const std::filesystem::path from = std::filesystem::u8path(modelDir() + tts::Engine::kFiles[i]);
+        const std::filesystem::path to = std::filesystem::u8path(dir + tts::Engine::kFiles[i]);
+        std::error_code ec;
+        std::filesystem::remove(to, ec);
+        std::filesystem::create_hard_link(from, to, ec);
+        if (ec) std::filesystem::copy_file(from, to, ec);
+        CHECK(!ec);
+    }
+    std::string ix;
+    CHECK(net::sys::readFile(modelDir() + tts::Engine::kFiles[tts::kFileIndexer], ix, size_t(1) << 20));
+    for (size_t i = 0; i + 4 <= ix.size(); i += 4) {
+        int32_t id;
+        std::memcpy(&id, ix.data() + i, 4);
+        if (id >= 0) id = 1 << 20;   // far past the table: Gather "index out of range"
+        std::memcpy(&ix[i], &id, 4);
+    }
+    CHECK(net::sys::writeFileAtomic(dir + tts::Engine::kFiles[tts::kFileIndexer], ix, false));
+    struct Restore {
+        ~Restore() { tts::setModelFolder(std::string()); }
+    } restore;
+    auto settle = [](tts::Worker& w) {
+        for (int i = 0; i < 24000 && !w.ready() && !w.failed(); ++i) std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    };
+    tts::setModelFolder(dir);
+    {
+        tts::Worker w;
+        CHECK(w.start(tts::Options()));
+        settle(w);
+        CHECK(w.failed() && w.warmUpFailed() && !w.ready());
+        CHECK_EQ(w.request("Hello.", "en"), 0u);
+    }
+    tts::setModelFolder(dir + "missing/");
+    {
+        tts::Worker w;
+        CHECK(w.start(tts::Options()));
+        settle(w);
+        CHECK(w.failed() && !w.warmUpFailed());
+    }
+    for (int i = 0; i < tts::kFileCount; ++i) net::sys::removeFile(dir + tts::Engine::kFiles[i]);
+#ifdef _WIN32
+    _rmdir(dir.c_str());
+#else
+    rmdir(dir.c_str());
+#endif
 }
 
 // ------------------------------------------------------------------------------------------------

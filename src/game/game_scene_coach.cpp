@@ -191,8 +191,10 @@ public:
         CoachRuntime& r = rt();
         if (!s_.coachVoiceFiles_) return;
         // A worker that failed to load is tried again (the model files may have arrived since),
-        // between lines (nothing queued would be lost).
-        if (r.workerStarted && !r.worker.failed()) return;
+        // between lines (nothing queued would be lost). One whose warm-up failed is not: files that
+        // load but cannot speak would be loaded again for every line. One such failure per session,
+        // then subtitles (the files are offered for a check once, coachModelLoadFailed).
+        if (r.workerStarted && (!r.worker.failed() || r.worker.warmUpFailed())) return;
         if (r.workerStarted && (!r.speechIds.empty() || r.worker.pending() > 0)) return;
         const Settings& st = settings();
         tts::setArchCap(st.ttsArch.c_str());
@@ -587,7 +589,7 @@ void GameScene::initCoachArgs() {
 void GameScene::refreshCoachVoice() {
     // The model files may come and go while the game runs (downloaded from the menu), and the
     // voice can be switched off (Options > Audio > Coach voice). Files that are all there but do
-    // not load are checked by the next download (coach_model.h).
+    // not load, or cannot speak, are checked by the next download (coach_model.h).
     if (coachVoiceFiles_ && coach_ && coach_->workerStarted && coach_->worker.failed()) coachModelLoadFailed();
     coachVoiceFiles_ = coachVoiceWanted();
     // Switched on, or downloaded, during a coach game: its worker starts now (the director asks for
