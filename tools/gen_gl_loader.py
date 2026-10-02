@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Generates src/gl/gl46.h and src/gl/gl46.cpp from third_party/khronos/GL/glcorearb.h.
 
-Only core entry points from GL_VERSION_1_0 .. GL_VERSION_4_6 plus a few useful ARB/EXT
-extensions are loaded. Run from the repository root:  python3 tools/gen_gl_loader.py
+Only core entry points from GL_VERSION_1_0 .. GL_VERSION_4_6 plus those of the extensions in
+EXTRA_EXT are loaded. Run from the repository root:  python3 tools/gen_gl_loader.py
 """
 import re, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "third_party/khronos/GL/glcorearb.h")
-EXTRA_EXT = {"GL_ARB_bindless_texture", "GL_EXT_texture_filter_anisotropic"}
+EXTRA_EXT = {"GL_EXT_texture_filter_anisotropic"}
 
 with open(SRC, encoding="utf-8") as src:
     text = src.read().splitlines()
