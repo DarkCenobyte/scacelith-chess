@@ -490,6 +490,7 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
     vec3 pPre = pClasp - fingerDir * 0.07f - palmN * 0.015f + vec3(0, 0.01f, 0);
     float tClasp = Timing::HandshakeClaspAt, tRel = Timing::HandshakeReleaseAt;
     float scale = T / Timing::Handshake;
+    shakeScale = scale;
     float t1 = 0.74f * scale, t2 = tClasp * scale, t3 = tRel * scale;
     float t4 = t3 + 0.15f * scale;
     // 0. The pen first goes back onto the table (where the game wanted it, else where it was taken).
@@ -932,7 +933,8 @@ void Animator::Impl::updateGaze(float dt) {
         else wt = toWorld(left().motion.sample(time).p);
         target = lerp(target, wt, wr.look * (1.0f - taskGaze));
     }
-    float shakeT = time - shakeStart;
+    // (Handshake time in the default duration's terms: a custom duration scales every phase.)
+    float shakeT = (time - shakeStart) / shakeScale;
     if (partner && partner->impl_ && shakeT >= 0.0f && shakeT < Timing::Handshake) {
         vec3 face = partnerPoint(partner->impl_->headPointWorld());
         float w = smoothstep(0.0f, 0.25f, shakeT) * (1.0f - smoothstep(Timing::Handshake - 0.5f, Timing::Handshake - 0.1f, shakeT));

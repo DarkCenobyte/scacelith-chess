@@ -789,6 +789,7 @@ struct Animator::Impl {
     // ---- handshake (clasp point, character space) for gaze
     Animator* partner = nullptr;
     float shakeStart = -100.0f;
+    float shakeScale = 1.0f;   // its duration / Timing::Handshake (every phase scales with it)
 
     // ---- gaze / head
     vec3 gazeTarget{0, layout::BOARD_TOP_Y, 0};
