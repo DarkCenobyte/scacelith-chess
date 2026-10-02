@@ -12,7 +12,9 @@
 #include "../ui/ui_font.h"
 #include "layout.h"
 #include <algorithm>
+#include <chrono>
 #include <cmath>
+#include <future>
 
 using namespace m;
 using namespace chess;
@@ -128,6 +130,9 @@ struct World::Impl {
     GLuint coordTex = 0;
     bool boardCoords = false;
     int reflFloor = -1, reflTable = -1, reflBoard = -1;
+    // The robot's meshes being built on a worker thread (loading.porcelain) and when it started.
+    std::future<std::vector<character::RobotPart>> robotParts;
+    double robotStart = 0.0;
 };
 
 // Translation keys (assets/i18n, section "Loading").
@@ -160,7 +165,7 @@ bool World::loaded() const { return impl_->step >= kStepCount; }
 float World::loadProgress() const { return float(impl_->step) / float(kStepCount); }
 const char* World::loadLabel() const { return i18n::tr(kStepLabels[impl_->step < kStepCount ? impl_->step : kStepCount]); }
 
-bool World::loadStep() {
+bool World::loadStep(bool wait) {
     Impl& w = *impl_;
     if (loaded()) return true;
     double t0 = plat::time();
@@ -228,7 +233,19 @@ bool World::loadStep() {
         w.clockLever.upload(w.clockDesc.lever);
         break;
     case 6:
-        w.robot.upload(character::buildRobot());
+        // Built on a worker thread (pure CPU) while the loading screen keeps drawing and pumping
+        // messages; uploaded here, on the GL thread, once ready.
+        if (!wait && !w.robotParts.valid()) {
+            w.robotParts = std::async(std::launch::async, character::buildRobot);
+            w.robotStart = t0;
+        }
+        if (w.robotParts.valid()) {
+            if (!wait && w.robotParts.wait_for(std::chrono::seconds(0)) != std::future_status::ready) return false;
+            t0 = w.robotStart;
+            w.robot.upload(w.robotParts.get());
+        } else {
+            w.robot.upload(character::buildRobot());
+        }
         w.coachMarking.create("COACH");
         break;
     default: break;

@@ -56,8 +56,11 @@ public:
     World();
     ~World();
 
-    // Incremental loading. Returns true when everything is ready.
-    bool loadStep();
+    // Incremental loading. Returns true when everything is ready. The robot's meshes (seconds of
+    // CPU) are built on a worker thread so the window stays responsive: until they are ready the
+    // call returns false at once, unless 'wait' blocks on them (deterministic runs and viewers
+    // that load everything up front).
+    bool loadStep(bool wait = false);
     float loadProgress() const;
     const char* loadLabel() const;
     bool loaded() const;

@@ -214,7 +214,7 @@ bool GameScene::init(AppContext& ctx) {
     fade_ = 1.0f;
     if (ctx.screenshotMode) {
         // Deterministic runs load everything up front.
-        while (!world_.loadStep()) {}
+        while (!world_.loadStep(true)) {}
         finishLoading();
     }
     return true;

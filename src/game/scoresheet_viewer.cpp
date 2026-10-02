@@ -55,7 +55,7 @@ public:
         materials::init();
         if (!ctx.argValue("--lang").empty()) i18n::setLanguage(ctx.argValue("--lang"));
         if (!ui::font::ready()) ui::font::init();
-        while (!world_.loadStep()) {}
+        while (!world_.loadStep(true)) {}
         world_.setupRenderer(*ctx.renderer);
         clockPosX_ = !ctx.hasArg("--clock-left");
         world_.setClockSide(clockPosX_);
