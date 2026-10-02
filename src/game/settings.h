@@ -4,6 +4,7 @@
 #include "../ui/ui_font.h"
 #include "elo.h"
 #include "../core/ini.h"
+#include "../coach/subtitles.h"
 #include <string>
 #include <vector>
 
@@ -208,10 +209,7 @@ enum SubtitleMode { SubtitlesAuto = 0, SubtitlesOn = 1, SubtitlesOff = 2 };
 // language for it.
 inline bool coachSubtitlesShown(int mode, const std::string& uiLanguage, const std::string& speechLanguage,
                                 bool voiceAvailable) {
-    if (!voiceAvailable) return true;
-    if (mode == SubtitlesOn) return true;
-    if (mode == SubtitlesOff) return false;
-    return speechLanguage != uiLanguage;
+    return coach::subtitlesShown(mode, uiLanguage, speechLanguage, voiceAvailable);
 }
 
 }  // namespace game

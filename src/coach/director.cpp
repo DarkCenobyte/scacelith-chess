@@ -11,6 +11,7 @@
 #include "director.h"
 #include "catalog.h"
 #include "pacing.h"
+#include "subtitles.h"
 #include "../core/log.h"
 #include <algorithm>
 #include <cmath>
@@ -28,7 +29,6 @@ constexpr float kDemoPause = 0.4f;       // stillness after a demonstration move
 constexpr float kRefusedVoice = 1.0f;    // startVoice refused this long: the line is only shown
 constexpr float kWatchdog = 1.5f;        // a heard line never reported finished: over after this
 constexpr float kLevelWindow = 0.05f;    // RMS window of the mouth's speech level
-constexpr float kEarlyBias = 0.10f;      // pacing's bias, for the lines shown without a voice
 constexpr size_t kPrefetchMax = 64;      // lines synthesised ahead by prefetch() kept at most
 constexpr int kMaxSteps = 32;            // beats started in one update at most
 
@@ -55,16 +55,6 @@ bool hasHandGesture(const Beat& b) {
 }
 
 bool movesHand(const Beat& b) { return tableBeat(b.kind) || hasHandGesture(b); }
-
-// The rule of game::coachSubtitlesShown (game/settings.h), which src/coach cannot include (the
-// settings header pulls the renderer in). Keep both identical: no voice -> shown; On; Off;
-// Automatic -> shown when the voice speaks another language than the UI.
-bool subtitlesShown(int mode, const std::string& uiLanguage, const std::string& speechLang, bool voiceAvailable) {
-    if (!voiceAvailable) return true;
-    if (mode == 1) return true;
-    if (mode == 2) return false;
-    return speechLang != uiLanguage;
-}
 
 // Beat serials are process-wide (main thread): the catalog remembers its variant picks by seed, so
 // seeds must not start again with every game.
@@ -119,7 +109,7 @@ float readingAnchor(const Catalog::Rendered& spoken, const std::string& name, fl
     const float total = textWeight(spoken.text, 0, spoken.text.size());
     float frac = std::min(1.0f, std::max(0.0f, fallback));
     if (off >= 0 && total > 0.0f) frac = textWeight(spoken.text, 0, size_t(off)) / total;
-    return std::max(0.0f, frac * duration - kEarlyBias);
+    return std::max(0.0f, frac * duration - PacingOptions().earlyBias);   // pacing's bias
 }
 
 // The mouth: RMS of the voice over ~50 ms around 't' (seconds into the PCM), 0..1.
