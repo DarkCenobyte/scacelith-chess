@@ -29,7 +29,6 @@
 #include <algorithm>
 #include <atomic>
 #include <cctype>
-#include <charconv>
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
@@ -89,16 +88,8 @@ void fitOrElide(std::string& s, TextStyle& st, float maxWidth, float minScale = 
 }
 
 // ---- What the rows and the details say -----------------------------------------------------------
-std::string entryKey(const archive::Entry& e) { return e.path + "#" + num(e.index); }
-// entryKey(e) == key without building the key: the page looks for the selection among every
-// listed game on each frame.
-bool hasKey(const archive::Entry& e, const std::string& key) {
-    const size_t n = e.path.size();
-    if (key.size() <= n + 1 || key.compare(0, n, e.path) != 0 || key[n] != '#') return false;
-    char digits[24];
-    const std::to_chars_result r = std::to_chars(digits, digits + sizeof(digits), static_cast<long long>(e.index));
-    return key.compare(n + 1, std::string::npos, digits, size_t(r.ptr - digits)) == 0;
-}
+using archive::entryKey;
+using archive::hasKey;
 // The key of the entry's content: changes when its file changes.
 std::string contentKey(const archive::Entry& e) {
     return entryKey(e) + "@" + num(e.fileTimeMs) + "@" + num(static_cast<long long>(e.fileSize));

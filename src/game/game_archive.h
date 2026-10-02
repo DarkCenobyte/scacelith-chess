@@ -32,6 +32,7 @@
 #pragma once
 #include "../chess/pgn.h"
 #include <atomic>
+#include <charconv>
 #include <cstdint>
 #include <ctime>
 #include <string>
@@ -142,6 +143,18 @@ struct Entry {
     int coachLevel() const;            // CoachLevel tag, -1 = none
     bool removable() const { return games == 1 && !fileError; }
 };
+// An entry's game from one listing to the next: "<path>#<index>" (the library page keeps its
+// selection by it).
+inline std::string entryKey(const Entry& e) { return e.path + "#" + std::to_string(e.index); }
+// entryKey(e) == key without building the key: the library page looks for its selection among
+// every listed game on each frame.
+inline bool hasKey(const Entry& e, const std::string& key) {
+    const size_t n = e.path.size();
+    if (key.size() <= n + 1 || key.compare(0, n, e.path) != 0 || key[n] != '#') return false;
+    char digits[24];
+    const std::to_chars_result r = std::to_chars(digits, digits + sizeof(digits), e.index);
+    return key.compare(n + 1, std::string::npos, digits, size_t(r.ptr - digits)) == 0;
+}
 
 struct ListStats {
     int files = 0;                     // *.pgn files in the folder
