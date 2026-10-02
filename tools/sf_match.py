@@ -175,10 +175,12 @@ class Tally:
     def add(self, headers, a_name):
         if a_name not in (headers.get("White"), headers.get("Black")):
             raise ValueError(f"a game without {a_name!r}")
+        result = headers.get("Result")
+        if result not in ("1-0", "0-1", "1/2-1/2"):
+            raise ValueError(f"a game without a final result ({result!r})")
         why = headers.get("Termination", "?")
         self.endings[why] = self.endings.get(why, 0) + 1
         self.plies += int(headers.get("PlyCount", 0))
-        result = headers.get("Result")
         if result == "1/2-1/2":
             self.draws += 1
         elif (result == "1-0") == (headers.get("White") == a_name):
