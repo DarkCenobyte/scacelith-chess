@@ -981,11 +981,13 @@ void GameScene::updateCoach(float dt) {
         if (rt.sessionRunning) rt.session.onOfferAnswer(game_, coachArgs_.autoAnswer == 1);
     }
 
-    // The draw offer's evaluation, answered once no move is on its way (see quietTurn).
-    if (rt.drawAnalysis && (state_ != State::Playing || quietTurn()) && engine_.analysisReady(rt.drawAnalysis)) {
+    // The draw offer's evaluation, answered once no move is on its way (turn.h, coachDrawStep).
+    const int ply = int(game_.moves().size());
+    const CoachDrawStep drawStep = coachDrawStep(state_ == State::Playing, turn_, rt.drawPly, ply);
+    if (rt.drawAnalysis && drawStep != CoachDrawStep::Wait && engine_.analysisReady(rt.drawAnalysis)) {
         ai::Analysis a;
         bool accept = false;
-        if (engine_.takeAnalysis(rt.drawAnalysis, a) && a.ok && !a.lines.empty() && rt.drawPly == int(game_.moves().size())) {
+        if (engine_.takeAnalysis(rt.drawAnalysis, a) && a.ok && !a.lines.empty() && drawStep == CoachDrawStep::Answer) {
             const ai::Score& sc = a.lines[0].score;
             bool coachToMove = game_.position().sideToMove() != humanColor_;
             int cp = sc.mate != 0 ? (sc.mate > 0 ? 100000 : -100000) : sc.cp;
@@ -996,12 +998,11 @@ void GameScene::updateCoach(float dt) {
         }
         rt.drawAnalysis = 0;
         // The player moved or took a move back before the answer (the coach's own move waits for
-        // it, see coachHoldsMove). The offer stands until the coach answers (FIDE 9.1.2.3): it is
-        // evaluated again in the position now on the board.
-        if (state_ == State::Playing && rt.drawPly != int(game_.moves().size())) {
-            LOGI("coach: draw offer of ply %d evaluated again at ply %d", rt.drawPly, int(game_.moves().size()));
+        // it, see coachHoldsMove): one more analysis, of the position now on the board.
+        if (drawStep == CoachDrawStep::EvaluateAgain) {
+            LOGI("coach: draw offer of ply %d evaluated again at ply %d", rt.drawPly, ply);
             coachEvaluateDraw();
-        } else if (state_ == State::Playing) {
+        } else if (drawStep == CoachDrawStep::Answer) {
             ui::notify(i18n::tr(accept ? "notify.draw_accepted" : "notify.draw_declined"), 3.0f);
             if (rt.sessionRunning) rt.session.onDrawAnswer(accept);
             if (accept) {

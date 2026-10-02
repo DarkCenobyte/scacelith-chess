@@ -31,4 +31,19 @@ inline bool quietTurn(Turn t) { return t == Turn::HumanIdle || t == Turn::HumanT
 // the game would cut it off, the piece on its new square and the record without it.
 inline bool menuMayEndGame(Turn t) { return quietTurn(t) || t == Turn::HumanPlaced; }
 
+// A coach game: what becomes of the player's draw offer, made at offerPly, once the coach's
+// evaluation is in and ply moves are on the board (GameScene::updateCoach).
+enum class CoachDrawStep {
+    Wait,           // a move is on its way (quietTurn): the answer waits for it
+    Answer,         // the evaluation is of the position on the board: the coach answers from it
+    EvaluateAgain,  // the player moved or took a move back since: the offer stands until the coach
+                    // answers (FIDE 9.1.2.3), so the position now on the board is evaluated again
+    NoAnswer        // the game ended meanwhile
+};
+inline CoachDrawStep coachDrawStep(bool playing, Turn t, int offerPly, int ply) {
+    if (!playing) return CoachDrawStep::NoAnswer;
+    if (!quietTurn(t)) return CoachDrawStep::Wait;
+    return offerPly == ply ? CoachDrawStep::Answer : CoachDrawStep::EvaluateAgain;
+}
+
 }  // namespace game

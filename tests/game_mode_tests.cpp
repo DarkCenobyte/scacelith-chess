@@ -1,5 +1,5 @@
-// Game modes: camera flights, the viewer's observer camera, untimed games, the pause menu turn by
-// turn (the Elo rating: elo_tests.cpp).
+// Game modes: camera flights, the viewer's observer camera, untimed games, the pause menu and the
+// coach's answer to a draw offer turn by turn (the Elo rating: elo_tests.cpp).
 #include "test.h"
 #include "game/camera_flight.h"
 #include "game/clock_rules.h"
@@ -238,4 +238,24 @@ TEST(turn_pause_menu_may_end_game) {
         CHECK_EQ(game::quietTurn(c.turn), c.quiet);
         CHECK_EQ(game::menuMayEndGame(c.turn), c.menu);
     }
+}
+
+// The coach's answer to a draw offer: never while a move is on its way, and from the position on
+// the board. An offer the game went past (the player moved, or took a move back) is evaluated
+// again, never declined unseen.
+TEST(turn_coach_draw_offer_step) {
+    using game::CoachDrawStep;
+    using game::Turn;
+    CHECK(game::coachDrawStep(true, Turn::HumanIdle, 4, 4) == CoachDrawStep::Answer);
+    CHECK(game::coachDrawStep(true, Turn::AiThinking, 4, 4) == CoachDrawStep::Answer);
+    CHECK(game::coachDrawStep(true, Turn::AiThinking, 4, 5) == CoachDrawStep::EvaluateAgain);   // moved
+    CHECK(game::coachDrawStep(true, Turn::HumanIdle, 4, 2) == CoachDrawStep::EvaluateAgain);    // took back
+    CHECK(game::coachDrawStep(true, Turn::HumanTouched, 0, 1) == CoachDrawStep::EvaluateAgain);
+    for (Turn t : {Turn::HumanPlacing, Turn::HumanPlaced, Turn::HumanPressing, Turn::AiMoving, Turn::CoachTable}) {
+        CHECK(game::coachDrawStep(true, t, 4, 4) == CoachDrawStep::Wait);
+        CHECK(game::coachDrawStep(true, t, 4, 5) == CoachDrawStep::Wait);
+    }
+    // The game ended meanwhile: nothing to answer.
+    CHECK(game::coachDrawStep(false, Turn::None, 4, 4) == CoachDrawStep::NoAnswer);
+    CHECK(game::coachDrawStep(false, Turn::AiMoving, 4, 5) == CoachDrawStep::NoAnswer);
 }
