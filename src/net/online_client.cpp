@@ -724,9 +724,16 @@ struct OnlineClient::Impl {
             cat.id = c["id"].asString();
             cat.baseSec = int(c["baseSec"].asInt(0));
             cat.incSec = int(c["incSec"].asInt(0));
-            if (!cat.id.empty()) i.categories.push_back(cat);
+            if (categoryIdOk(cat.id)) i.categories.push_back(cat);
         }
         return i;
+    }
+
+    // A category id the protocol can carry (QueueJoin: at most 7 bytes), without control characters
+    // (it is saved in the settings). Any other id a community server names is kept.
+    static bool categoryIdOk(const std::string& id) {
+        return !id.empty() && id.size() <= 7 &&
+               std::none_of(id.begin(), id.end(), [](char ch) { return uint8_t(ch) < 0x20 || uint8_t(ch) == 0x7f; });
     }
 
     // Fetches /info and applies the per-origin identity rule: a saved session whose server id

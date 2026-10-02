@@ -3760,6 +3760,25 @@ TEST(net_account_me_and_preferences) {
     CHECK(ev.account.acceptChallenges);
 }
 
+// The categories of /info: an id longer than the protocol carries (7 bytes) or with a control
+// character is dropped; any other one is kept, the official "digits+digits" form or not.
+TEST(net_info_category_ids) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    AccountRig r("info-categories", [&](const fakehttp::Request& q) {
+        if (q.path != "/api/v1/info") return jsonReply(404, R"({"error":"not_found"})");
+        return jsonReply(200, R"({"name":"Fake","categories":[{"id":"3+2","baseSec":180,"incSec":2},{"id":"1234567"},
+          {"id":"blitz"},{"id":"é+1"},{"id":"12345678"},{"id":"éééé"},{"id":"5+\n3"},
+          {"id":"5+\t3"},{"id":"5+3\u007f"},{"id":""}]})");
+    }, false);
+    CHECK(r.srv.ok());
+    r.c->fetchServerInfo();
+    net::Event ev = r.wait(net::Event::Kind::ServerInfoResult);
+    std::vector<std::string> ids;
+    for (const net::Category& c : ev.info.categories) ids.push_back(c.id);
+    CHECK(ids == std::vector<std::string>({"3+2", "1234567", "blitz", "\xC3\xA9+1"}));
+    CHECK_EQ(ev.info.categories.size() > 0 ? ev.info.categories[0].baseSec : 0, 180);
+}
+
 TEST(net_account_email_change) {
     if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
