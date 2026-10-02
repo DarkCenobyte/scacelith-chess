@@ -14,6 +14,8 @@ namespace uni {
 // ---- UTF-8 ------------------------------------------------------------------------------------------
 // Invalid sequences decode to U+FFFD, one per bad byte.
 std::u32string decode(const std::string& utf8);
+// The codepoint at utf8[i] (i < size), decoded as decode() does; i moves past the bytes it used.
+char32_t decodeAt(const std::string& utf8, size_t& i);
 std::string encode(const std::u32string& text);
 void append(std::string& out, char32_t cp);
 

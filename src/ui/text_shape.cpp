@@ -8,10 +8,15 @@ namespace text {
 namespace {
 
 // Characters that take part in the logic but are never drawn (joiners, direction marks, line
-// breaks, soft hyphen, BOM, explicit bidi controls).
+// breaks, soft hyphen, BOM, explicit bidi controls, and the other default ignorable code points:
+// variation selectors, tags, fillers, format controls). No face has a glyph for them: drawn,
+// they would show as '?' (an emoji picked with its variation selector: "♟?").
 bool invisible(char32_t c) {
     return c == '\n' || c == '\r' || c == 0xAD || (c >= 0x200B && c <= 0x200F) || (c >= 0x202A && c <= 0x202E) ||
-           (c >= 0x2060 && c <= 0x206F) || c == 0xFEFF || c < 0x20;
+           (c >= 0x2060 && c <= 0x206F) || c == 0xFEFF || c < 0x20 || c == 0x34F || c == 0x61C || c == 0x115F ||
+           c == 0x1160 || c == 0x17B4 || c == 0x17B5 || (c >= 0x180B && c <= 0x180F) || c == 0x2028 || c == 0x2029 ||
+           c == 0x3164 || (c >= 0xFE00 && c <= 0xFE0F) || c == 0xFFA0 || (c >= 0x1BCA0 && c <= 0x1BCA3) ||
+           (c >= 0x1D173 && c <= 0x1D17A) || (c >= 0xE0000 && c <= 0xE0FFF);
 }
 
 bool arabicLetter(char32_t c) { return uni::isArabic(c) && !uni::isMark(c); }
@@ -37,7 +42,7 @@ Run shapeLine(const std::string& utf8, const std::function<int(uint32_t)>& faceF
     float pen = 0.0f;
     int prevFace = -1, prevIndex = 0;
     char32_t prevCp = 0;
-    bool first = true;
+    bool first = true, anyMark = false;
     run.glyphs.reserve(order.size());
     for (int k : order) {
         char32_t cp = sh.text[size_t(k)];
@@ -83,6 +88,7 @@ Run shapeLine(const std::string& utf8, const std::function<int(uint32_t)>& faceF
             pg.advance = 0.0f;
             pg.x = pen;  // positioned over its base below
             run.glyphs.push_back(pg);
+            anyMark = true;
             continue;
         }
         bool arabicPair = arabicLetter(cp) && arabicLetter(prevCp);
@@ -98,13 +104,27 @@ Run shapeLine(const std::string& utf8, const std::function<int(uint32_t)>& faceF
         first = false;
     }
     // Combining marks: centred over the ink of their base (the closest preceding character in
-    // logical order), wherever the font draws them relative to its own origin.
+    // logical order), wherever the font draws them relative to its own origin. before[s] = the
+    // first glyph (visual order) of the greatest non-mark source below s, -1 when none.
+    std::vector<int> before;
+    if (anyMark) {
+        before.assign(size_t(run.sourceCount), -1);
+        for (size_t i = 0; i < run.glyphs.size(); ++i) {
+            int& at = before[size_t(run.glyphs[i].source)];
+            if (!run.glyphs[i].mark && at < 0) at = int(i);
+        }
+        int last = -1;
+        for (int& b : before) {
+            int at = b;
+            b = last;
+            if (at >= 0) last = at;
+        }
+    }
     for (PlacedGlyph& m : run.glyphs) {
         if (!m.mark) continue;
-        const PlacedGlyph* base = nullptr;
-        for (const PlacedGlyph& b : run.glyphs)
-            if (!b.mark && b.source < m.source && (!base || b.source > base->source)) base = &b;
-        if (!base) continue;
+        int b = before[size_t(m.source)];
+        if (b < 0) continue;
+        const PlacedGlyph* base = &run.glyphs[size_t(b)];
         float bc = base->glyph->hasQuad || base->glyph->x1 > base->glyph->x0
                        ? base->x + 0.5f * (base->glyph->x0 + base->glyph->x1) * base->scale
                        : base->x + 0.5f * base->advance;

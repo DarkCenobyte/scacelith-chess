@@ -8,8 +8,10 @@
 #include <mmsystem.h>
 #include <shellapi.h>
 #include <shlobj.h>
+#include <algorithm>
 #include <cstring>
 #include <cstdio>
+#include <cwchar>
 
 // WGL_ARB_create_context / WGL_ARB_pixel_format / WGL_EXT_swap_control tokens.
 #define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
@@ -446,16 +448,27 @@ void messageBox(const char* title, const char* text) {
     MessageBoxW(g_hwnd, wx, wt, MB_OK | MB_ICONERROR);
 }
 
+bool openClipboard(void* owner) {
+    for (int attempt = 0;; ++attempt) {
+        if (OpenClipboard(static_cast<HWND>(owner))) return true;
+        if (attempt == 4) return false;
+        Sleep(5);
+    }
+}
+
 std::string clipboardText() {
     std::string out;
-    if (!OpenClipboard(g_hwnd)) return out;
+    if (!openClipboard(g_hwnd)) return out;
     if (HANDLE h = GetClipboardData(CF_UNICODETEXT)) {
         if (const wchar_t* w = static_cast<const wchar_t*>(GlobalLock(h))) {
-            int n = WideCharToMultiByte(CP_UTF8, 0, w, -1, nullptr, 0, nullptr, nullptr);
-            if (n > 1) {
+            // Up to the first NUL within the block (another program may have left none), and a
+            // million characters at most: the text field keeps a few dozen.
+            size_t cap = GlobalSize(h) / sizeof(wchar_t);
+            int len = int(std::min<size_t>(wcsnlen(w, cap), size_t(1) << 20));
+            int n = len > 0 ? WideCharToMultiByte(CP_UTF8, 0, w, len, nullptr, 0, nullptr, nullptr) : 0;
+            if (n > 0) {
                 out.resize(size_t(n));
-                WideCharToMultiByte(CP_UTF8, 0, w, -1, &out[0], n, nullptr, nullptr);
-                out.resize(size_t(n - 1));
+                WideCharToMultiByte(CP_UTF8, 0, w, len, &out[0], n, nullptr, nullptr);
             }
             GlobalUnlock(h);
         }

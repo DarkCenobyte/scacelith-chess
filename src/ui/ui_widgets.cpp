@@ -57,9 +57,15 @@ struct Ctx {
     int blockDepth = 0;
     bool capMouseAll = false, capKb = false;
     std::vector<Rect> capRects;
+    // occlude() rects of this frame and the previous one, with their layer.
+    struct Occluder {
+        Rect r;
+        int layer;
+    };
+    std::vector<Occluder> occluders, prevOccluders;
     bool lastMouse = false, lastKb = false;
     std::function<void(Sound)> soundCb;
-    double lastSoundTime[8] = {-1, -1, -1, -1, -1, -1, -1, -1};
+    double lastSoundTime[size_t(Sound::Count)] = {-1, -1, -1, -1, -1, -1, -1, -1};  // -1: never played
     LastItem last;
     bool mouseOverride = false;
     vec2 mouseOverridePos;
@@ -79,6 +85,13 @@ struct Ctx {
 Ctx c;
 
 const plat::Input& input() { return c.inputOverride ? *c.inputOverride : plat::input(); }
+
+// The mouse is over something a higher layer than the current one drew last frame (occlude()).
+bool occluded() {
+    for (const auto& o : c.prevOccluders)
+        if (o.layer > int(gfx::layer()) && o.r.contains(c.mouse)) return true;
+    return false;
+}
 
 const FocusEntry* findEntry(const std::vector<FocusEntry>& list, Id id) {
     for (auto& e : list)
@@ -199,6 +212,8 @@ void endFrame() {
     c.lastKb = c.capKb;
     c.capMouseAll = c.capKb = false;
     c.capRects.clear();
+    c.prevOccluders.swap(c.occluders);
+    c.occluders.clear();
     c.blockDepth = 0;
     c.idStack.clear();
     if ((c.frame % 240) == 0) {
@@ -215,16 +230,11 @@ uint64_t frame() { return c.frame; }
 vec2 mouse() { return c.mouse; }
 bool keyboardMode() { return c.kbMode; }
 bool keyPressed(int key) { return c.blockDepth == 0 && key >= 0 && key < plat::KEY_COUNT && input().keyPressed[key]; }
-float wheel() { return c.blockDepth == 0 ? c.wheel : 0.0f; }
+float wheel() { return c.blockDepth == 0 && !occluded() ? c.wheel : 0.0f; }
 void setInputOverride(const plat::Input* in) { c.inputOverride = in; }
 bool consumeBack() {
     if (c.blockDepth > 0 || !c.kBack || c.backConsumed) return false;
     c.backConsumed = true;
-    return true;
-}
-bool consumeActivate() {
-    if (c.blockDepth > 0 || !c.kActivate || c.activateConsumed) return false;
-    c.activateConsumed = true;
     return true;
 }
 bool consumeNavigation(int* dx, int* dy) {
@@ -234,7 +244,6 @@ bool consumeNavigation(int* dx, int* dy) {
     if (dy) *dy = y;
     return true;
 }
-bool mousePressedOutside(const Rect& r) { return c.mPressed && !r.contains(c.mouse); }
 
 void pushBlock() { c.blockDepth++; }
 void popBlock() { if (c.blockDepth > 0) c.blockDepth--; }
@@ -242,6 +251,7 @@ bool blocked() { return c.blockDepth > 0; }
 void captureMouseAll() { c.capMouseAll = true; }
 void captureMouseRect(const Rect& r) { c.capRects.push_back(r); }
 void captureKeyboard() { c.capKb = true; }
+void occlude(const Rect& r) { c.occluders.push_back({r, int(gfx::layer())}); }
 bool mouseCapturedLastFrame() { return c.lastMouse; }
 bool keyboardCapturedLastFrame() { return c.lastKb; }
 void setKeyboardMode(bool on) { c.kbMode = on; }
@@ -278,14 +288,14 @@ Anim& anim(Id id) {
 bool appearing(Id id) { return anim(id).firstFrame == c.frame; }
 float approach(float cur, float target, float rate) { return cur + (target - cur) * (1.0f - std::exp(-rate * c.dt)); }
 
-Id focus() { return c.focus; }
 void setFocus(Id id) { c.focus = id; }
 void setDefaultFocus(Id id) { c.defaultFocus = id; }
 
 void setSoundCallback(std::function<void(Sound)> cb) { c.soundCb = std::move(cb); }
 void sound(Sound s) {
-    if (!c.soundCb) return;
-    int i = int(s) & 7;
+    static_assert(size_t(Sound::Count) == 8, "one -1 per sound in Ctx::lastSoundTime");
+    if (!c.soundCb || s >= Sound::Count) return;
+    size_t i = size_t(s);
     double minGap = s == Sound::Tick ? 0.045 : s == Sound::Hover ? 0.03 : 0.0;
     if (c.lastSoundTime[i] >= 0.0 && c.time - c.lastSoundTime[i] < minGap) return;
     c.lastSoundTime[i] = c.time;
@@ -301,7 +311,7 @@ Item item(Id id, const Rect& r, uint32_t flags) {
     bool focusable = (flags & ITEM_FOCUSABLE) != 0 && !(flags & ITEM_MOUSE_ONLY);
     if (interactive) {
         if (focusable) c.curList.push_back({id, r, flags});
-        it.hovered = c.mouseInWindow && r.contains(c.mouse) && gfx::clipContains(c.mouse);
+        it.hovered = c.mouseInWindow && r.contains(c.mouse) && gfx::clipContains(c.mouse) && !occluded();
         if (it.hovered) {
             c.hoveredNow = id;
             if (focusable && c.mouseMoved && !c.editId) c.focus = id;  // an edit keeps the focus
@@ -575,6 +585,10 @@ bool buttonLabelFits(const std::string& label, float width) {
     TextStyle st = buttonLabelStyle();
     st.size *= kButtonMinScale;
     return gfx::textWidth(displayText(label), st) <= width - 2.0f * kButtonLabelPad;
+}
+float buttonWidthFor(const std::string& label) {
+    // 4 px to spare: fitSize() shrinks a label that measures a hair over its room.
+    return gfx::textWidth(displayText(label), buttonLabelStyle()) + 2.0f * kButtonLabelPad + 4.0f;
 }
 
 void disabledButton(const std::string& label, const Rect& r, ButtonKind kind, const std::string& why, const Rect& within) {
@@ -875,9 +889,16 @@ bool editField(const std::string& label, std::string& text, const Rect& r, int m
                 modified = true;
             }
             std::u32string typed;
-            bool ctrl = in.keyDown[plat::KEY_LCTRL] || in.keyDown[plat::KEY_RCTRL];
+            int room = maxChars - int(u.size());
+            // Ctrl without Alt: Windows sends AltGr as Ctrl + right Alt, and AltGr+V types '@' on the
+            // Czech, Slovak, Hungarian and Croatian layouts.
+            bool ctrl = (in.keyDown[plat::KEY_LCTRL] || in.keyDown[plat::KEY_RCTRL]) && !in.keyDown[plat::KEY_LALT] &&
+                        !in.keyDown[plat::KEY_RALT];
             if (ctrl && in.keyPressed['V']) {
-                for (char32_t ch : uni::decode(plat::clipboardText())) {
+                // Decoded only as far as it fits: a huge clipboard costs no more than a name.
+                const std::string clip = room > 0 ? plat::clipboardText() : std::string();
+                for (size_t i = 0; i < clip.size() && int(typed.size()) < room;) {
+                    char32_t ch = uni::decodeAt(clip, i);
                     if (ch == '\n' || ch == '\r' || ch == '\t') ch = ' ';
                     if (ch >= 32 && ch != 127 && !(ch >= 0x80 && ch < 0xA0)) typed += ch;
                 }
@@ -885,7 +906,6 @@ bool editField(const std::string& label, std::string& text, const Rect& r, int m
                 for (int i = 0; i < in.textCount; ++i)
                     if (in.text[i] >= 32 && in.text[i] != 127) typed += char32_t(in.text[i]);
             }
-            int room = maxChars - int(u.size());
             if (!typed.empty() && room > 0) {
                 if (int(typed.size()) > room) typed.resize(size_t(room));
                 u.insert(size_t(c.caret), typed);
@@ -1069,7 +1089,7 @@ void infoMark(const std::string& text) {
     c.marks.push_back({li.id, mark});
     float x0 = std::min(lb.x, mark.x), x1 = std::max(lb.r(), mark.r());
     Rect zone(x0, lb.y, x1 - x0, lb.h);
-    bool canHover = c.blockDepth == 0 && c.mouseInWindow && !c.mDown && gfx::clipContains(c.mouse);
+    bool canHover = c.blockDepth == 0 && c.mouseInWindow && !c.mDown && gfx::clipContains(c.mouse) && !occluded();
     bool onMark = canHover && mark.contains(c.mouse);
     bool hot = canHover && (onMark || zone.contains(c.mouse));
     bool hoverTip = hot && !c.kbMode;
@@ -1118,7 +1138,7 @@ void tooltip(const std::string& text, const Rect& within) {
 }
 
 int confirmDialog(const char* idStr, const std::string& title, const std::string& message, const std::string& confirmLabel,
-                  const std::string& cancelLabel, bool dangerous) {
+                  const std::string& cancelLabel, [[maybe_unused]] bool dangerous) {
     Id id = makeId(idStr);
     Anim& a = anim(id);
     bool first = a.firstFrame == frame();
@@ -1156,7 +1176,7 @@ int confirmDialog(const char* idStr, const std::string& title, const std::string
     setDefaultFocus(cancelId);
     int result = -1;
     if (button(cancelLabel, rc, ButtonKind::Secondary)) result = 0;
-    if (button(confirmLabel, ro, dangerous ? ButtonKind::Primary : ButtonKind::Primary)) result = 1;
+    if (button(confirmLabel, ro, ButtonKind::Primary)) result = 1;
     popId();
     if (!first && result < 0 && consumeBack()) {
         result = 0;
@@ -1164,6 +1184,8 @@ int confirmDialog(const char* idStr, const std::string& title, const std::string
     }
     if (result == 1) sound(Sound::Confirm);
     gfx::popAlpha();
+    // While it stays open it occludes the page, and the overlays drawn after it (challenge cards).
+    if (result < 0) occlude(Rect(0, 0, view.x, view.y));
     gfx::setLayer(prev);
     return result;
 }

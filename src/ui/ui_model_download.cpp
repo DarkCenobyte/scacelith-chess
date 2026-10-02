@@ -23,21 +23,9 @@ using gfx::TextStyle;
 using m::vec2;
 using m::vec4;
 using namespace theme;
+using namespace detail::helpers;
 
 namespace {
-
-TextStyle style(int face, float size, vec4 color, HAlign align = HAlign::Left, float tracking = 0.0f) {
-    TextStyle st;
-    st.face = face;
-    st.size = size;
-    st.color = color;
-    st.align = align;
-    st.tracking = tracking;
-    return st;
-}
-float ease(float t) { return m::smootherstep(t); }
-std::string T(const char* key) { return i18n::tr(key); }
-std::string L(const char* key) { return std::string(i18n::tr(key)) + "##" + key; }
 
 // "145.3" with the language's decimal separator.
 std::string megabytes(double bytes) {
@@ -247,7 +235,7 @@ ModelPromptAction modelPrompt(const ModelPrompt& p) {
         gfx::diamond(vec2(im::flipX(r, r.x + 56.0f), y - 8.0f), 3.5f, withAlpha(gold, 0.9f));
         gfx::textWrapped(licence, x, y, textW, ls, smallH);
         y += smallH * float(licLines) + 18.0f;
-        float lbw = std::min(textW, std::max(300.0f, gfx::textWidth(T("coach.download.read_licence"), style(font::FACE_TEXT, kButton, ivory)) + 70.0f));
+        float lbw = std::min(textW, std::max(300.0f, im::buttonWidthFor(L("coach.download.read_licence"))));
         if (im::button(L("coach.download.read_licence"), im::flip(r, Rect(r.x + 70.0f, y - 6.0f, lbw, 48.0f)), im::ButtonKind::Secondary)) {
             g_prompt.licence = true;
             g_prompt.scroll = g_prompt.target = 0.0f;
@@ -277,6 +265,8 @@ ModelPromptAction modelPrompt(const ModelPrompt& p) {
     }
     im::popId();
     gfx::popAlpha();
+    // While it stays open it occludes the page, and the overlays drawn after it (challenge cards).
+    if (act == ModelPromptAction::None) im::occlude(Rect(0, 0, v.x, v.y));
     gfx::setLayer(prev);
     if (act != ModelPromptAction::None) {
         g_prompt.lastFrame = 0;   // closed: nothing is blocked on the next frame
@@ -313,6 +303,7 @@ ModelPanelAction modelProgressPanel(const ModelProgressView& pv) {
     float h = failed ? 150.0f + 28.0f * float(errLines) + 64.0f : 240.0f;
     Rect r = im::flip(screen, Rect(v.x - w - 36.0f + (1.0f - t) * 24.0f, 36.0f, w, h));
     im::captureMouseRect(r);
+    im::occlude(r);
     gfx::pushAlpha(t);
     if (pv.state == State::Hidden) im::pushBlock();
     gfx::shadow(r.offset(0, 8), 3, 30, vec4(0, 0, 0, 0.5f));

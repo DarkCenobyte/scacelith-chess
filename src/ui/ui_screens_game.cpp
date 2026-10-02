@@ -25,20 +25,10 @@ using i18n::trf;
 using m::vec2;
 using m::vec4;
 using namespace theme;
+using namespace detail::helpers;
 
 namespace {
 
-TextStyle style(int face, float size, vec4 color, HAlign align = HAlign::Left, float tracking = 0.0f) {
-    TextStyle st;
-    st.face = face;
-    st.size = size;
-    st.color = color;
-    st.align = align;
-    st.tracking = tracking;
-    return st;
-}
-
-float ease(float t) { return m::smootherstep(t); }
 float baselineCentered(const Rect& r, const TextStyle& st) { return r.cy() + gfx::capHeight(st) * 0.5f; }
 
 // The replay's bar (replayBar): its height, its gap to the bottom edge, and the room the
@@ -48,7 +38,6 @@ constexpr float kReplayBarClear = kReplayBarBottom + kReplayBarH + 76.0f;
 // Where the viewer's controls panel was drawn this frame (empty when hidden): the replay's bar,
 // drawn after it, keeps clear of it.
 Rect g_viewerControls;
-std::string num(int v) { return std::to_string(v); }
 
 // ---- Values (same steps as the New Game page) ----------------------------------------------------
 using detail::baseTimeValues;

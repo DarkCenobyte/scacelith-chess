@@ -1,6 +1,7 @@
 // Copy to the system clipboard (the direct-match invitation, recovery codes). Windows only: the
 // X11 layer serves tests and screenshots, where copying reports that it is unavailable.
 #include "ui_screens_online.h"
+#include "../platform/platform.h"
 #ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -9,13 +10,12 @@
 #define NOMINMAX
 #endif
 #include <windows.h>
-#include <cstring>
 #endif
 
 namespace ui {
 namespace detail {
 
-bool setClipboardText(const std::string& text) {
+bool setClipboardText(const std::string& text, bool sensitive) {
 #ifdef _WIN32
     // CRLF line breaks and UTF-16, as CF_UNICODETEXT expects.
     std::string crlf;
@@ -24,7 +24,7 @@ bool setClipboardText(const std::string& text) {
         crlf += c;
     }
     int n = MultiByteToWideChar(CP_UTF8, 0, crlf.c_str(), int(crlf.size()), nullptr, 0);
-    if (n < 0) return false;
+    if (n <= 0 && !crlf.empty()) return false;
     HGLOBAL mem = GlobalAlloc(GMEM_MOVEABLE, (size_t(n) + 1) * sizeof(wchar_t));
     if (!mem) return false;
     wchar_t* dst = static_cast<wchar_t*>(GlobalLock(mem));
@@ -38,17 +38,32 @@ bool setClipboardText(const std::string& text) {
     // The clipboard needs an owner window for SetClipboardData to succeed after EmptyClipboard.
     HWND owner = GetActiveWindow();
     if (!owner) owner = GetForegroundWindow();
-    if (!OpenClipboard(owner)) {
+    if (!plat::openClipboard(owner)) {
         GlobalFree(mem);
         return false;
     }
     EmptyClipboard();
     bool ok = SetClipboardData(CF_UNICODETEXT, mem) != nullptr;
+    if (ok && sensitive) {
+        // A DWORD 0 under these registered formats keeps the text out of the clipboard history
+        // (Win+V) and the cloud clipboard; older Windows ignore them.
+        for (const wchar_t* format : {L"CanIncludeInClipboardHistory", L"CanUploadToCloudClipboard"}) {
+            HGLOBAL flag = GlobalAlloc(GMEM_MOVEABLE, sizeof(DWORD));
+            if (!flag) continue;
+            if (DWORD* value = static_cast<DWORD*>(GlobalLock(flag))) {
+                *value = 0;
+                GlobalUnlock(flag);
+                if (SetClipboardData(RegisterClipboardFormatW(format), flag)) continue;  // the clipboard owns it
+            }
+            GlobalFree(flag);
+        }
+    }
     CloseClipboard();
     if (!ok) GlobalFree(mem);  // on success the clipboard owns the memory
     return ok;
 #else
     (void)text;
+    (void)sensitive;
     return false;
 #endif
 }

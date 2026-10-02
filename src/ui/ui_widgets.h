@@ -27,11 +27,9 @@ uint64_t frame();
 vec2 mouse();
 bool keyboardMode();          // last navigation came from the keyboard (show focus highlight)
 bool keyPressed(int key);     // plat key pressed this frame and input not blocked
-float wheel();                // mouse wheel notches this frame (0 while blocked)
+float wheel();                // mouse wheel notches this frame (0 while blocked or occluded)
 bool consumeBack();           // Esc pressed this frame (returns true once)
-bool consumeActivate();       // Enter/Space not consumed by a widget (returns true once)
 bool consumeNavigation(int* dx, int* dy);  // arrow keys this frame, for custom handling
-bool mousePressedOutside(const Rect& r);
 
 // Input blocking: while the depth is > 0 items draw but do not react (content under a dialog).
 void pushBlock();
@@ -41,6 +39,10 @@ bool blocked();
 void captureMouseAll();
 void captureMouseRect(const Rect& r);
 void captureKeyboard();
+// Something drawn over the layers below the current one (a card, a panel, a modal dialog's veil):
+// from the next frame, items of a lower layer under 'r' are not hovered and take no press, and
+// wheel() reads 0 there. Called every frame it is shown.
+void occlude(const Rect& r);
 bool mouseCapturedLastFrame();
 bool keyboardCapturedLastFrame();
 void setKeyboardMode(bool on);  // debug / viewer: show the focus highlight
@@ -68,7 +70,6 @@ bool appearing(Id id);  // true on the first frame an id is used after an absenc
 float approach(float current, float target, float rate);  // frame-rate independent easing
 
 // ---- Focus ------------------------------------------------------------------------------------------
-Id focus();
 void setFocus(Id id);
 // Focus to give when the current focus is not among this frame's focusable items.
 void setDefaultFocus(Id id);
@@ -116,6 +117,8 @@ bool menuEntry(const std::string& label, const Rect& r, bool enabled = true, gfx
 // most), and is cut ("…") when it still does not fit.
 bool button(const std::string& label, const Rect& r, ButtonKind kind = ButtonKind::Secondary, bool enabled = true,
             uint32_t extraFlags = 0);
+// The width of a Primary or Secondary button that shows this label at its full size.
+float buttonWidthFor(const std::string& label);
 // Whether a Primary or Secondary button 'width' wide shows this label whole (shrunk or not).
 bool buttonLabelFits(const std::string& label, float width);
 // s, or when it is wider than maxWidth in st (half a unit of slack), its longest start that fits
@@ -180,6 +183,7 @@ void sectionLabel(const std::string& text, float x, float y, float width);
 void rowHighlight(const Rect& r, float t);
 
 // Modal confirmation. Returns -1 while open, 1 = confirmed, 0 = cancelled (Esc / cancel button).
+// 'dangerous' marks destructive actions; it does not change the look (the confirm button is Primary).
 int confirmDialog(const char* idStr, const std::string& title, const std::string& message, const std::string& confirmLabel,
                   const std::string& cancelLabel, bool dangerous);
 

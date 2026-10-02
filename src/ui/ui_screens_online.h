@@ -41,7 +41,8 @@ bool drawQrCode(const std::string& text, const gfx::Rect& r);
 // Forgets the last code drawn (the two-factor secret is in its text).
 void clearQrCache();
 // Puts UTF-8 text on the system clipboard (Windows). False where unavailable (X11 test builds).
-bool setClipboardText(const std::string& text);
+// 'sensitive' (recovery codes) keeps it out of Windows' clipboard history and cloud clipboard.
+bool setClipboardText(const std::string& text, bool sensitive = false);
 
 }  // namespace detail
 

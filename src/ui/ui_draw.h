@@ -48,14 +48,12 @@ void popClip();
 bool clipContains(vec2 p);
 void pushAlpha(float a);
 void popAlpha();
-float alpha();
 
 // ---- Shapes ---------------------------------------------------------------------------------------
 // Colours are straight-alpha display (sRGB) values.
 void fill(const Rect& r, vec4 c, float radius = 0.0f);
 void fillV(const Rect& r, vec4 top, vec4 bottom, float radius = 0.0f);  // vertical gradient
 void fillH(const Rect& r, vec4 left, vec4 right, float radius = 0.0f);  // horizontal gradient
-void fill4(const Rect& r, vec4 tl, vec4 tr, vec4 bl, vec4 br, float radius = 0.0f);
 // Outline of 'thickness' reference units (at least one physical pixel), drawn inside r.
 void stroke(const Rect& r, vec4 c, float thickness = 0.0f, float radius = 0.0f);
 void shadow(const Rect& r, float radius, float blur, vec4 c);
@@ -99,8 +97,6 @@ float caretOffset(const std::string& s, const TextStyle& st, int index);
 int caretAt(const std::string& s, const TextStyle& st, float offset);
 // Draws a single line; y is the baseline. Returns the advance width.
 float text(const std::string& s, float x, float baseline, const TextStyle& st);
-// Draws text vertically centred on cy (capital height), horizontally per st.align within [x0,x1].
-void textIn(const std::string& s, const Rect& r, const TextStyle& st);
 // Word-wrapped paragraph starting with its first baseline at 'baseline'. Returns the number of
 // lines. lineHeight in reference pixels (0 = 1.3 * size). Explicit '\n' breaks lines. Lines break
 // at spaces, and between CJK characters (with the usual line start / end prohibitions).

@@ -17,34 +17,7 @@ using gfx::TextStyle;
 using m::vec2;
 using m::vec4;
 using namespace theme;
-
-namespace {
-
-TextStyle style(int face, float size, vec4 color, HAlign align = HAlign::Left, float tracking = 0.0f) {
-    TextStyle st;
-    st.face = face;
-    st.size = size;
-    st.color = color;
-    st.align = align;
-    st.tracking = tracking;
-    return st;
-}
-float ease(float t) { return m::smootherstep(t); }
-std::string T(const char* key) { return i18n::tr(key); }
-std::string L(const char* key) { return std::string(i18n::tr(key)) + "##" + key; }
-
-// A dark band like the notifications (fades out at both ends).
-void band(const Rect& r, float a) {
-    float edge = 0.25f;
-    vec4 d(0.02f, 0.017f, 0.015f, 0.74f * a), z(0.02f, 0.017f, 0.015f, 0.0f);
-    gfx::fillH(Rect(r.x, r.y, r.w * edge, r.h), z, d);
-    gfx::fill(Rect(r.x + r.w * edge, r.y, r.w * (1.0f - 2.0f * edge), r.h), d);
-    gfx::fillH(Rect(r.r() - r.w * edge, r.y, r.w * edge, r.h), d, z);
-    gfx::hlineFade(r.x + 40.0f, r.r() - 40.0f, r.y, withAlpha(gold, 0.55f * a), 0.45f);
-    gfx::hlineFade(r.x + 40.0f, r.r() - 40.0f, r.b() - 1.0f, withAlpha(gold, 0.55f * a), 0.45f);
-}
-
-}  // namespace
+using namespace detail::helpers;
 
 HotSeatAction hotSeatHud(const HotSeatHud& hud) {
     HotSeatAction act = HotSeatAction::None;
@@ -91,7 +64,7 @@ HotSeatAction hotSeatHud(const HotSeatHud& hud) {
             TextStyle ts = style(font::FACE_TITLE, 24.0f, withAlpha(goldBright, a), HAlign::Center, 0.16f);
             float w = gfx::textWidth(hud.caption, ts) + 240.0f;
             Rect r(v.x * 0.5f - w * 0.5f, v.y - 150.0f + (1.0f - ease(a)) * 8.0f, w, 56.0f);
-            band(r, a);
+            band(r, a, 0.74f, 0.25f);
             gfx::text(hud.caption, r.cx(), r.cy() + 8.0f, ts);
         }
     }
@@ -108,6 +81,7 @@ HotSeatAction hotSeatHud(const HotSeatHud& hud) {
         float w = 460.0f, h = 196.0f;
         Rect r = im::flip(screen, Rect(v.x - w - 40.0f + (1.0f - t) * 30.0f, v.y * 0.5f - h * 0.5f + 60.0f, w, h));
         im::captureMouseRect(r);
+        im::occlude(r);
         gfx::pushAlpha(t);
         if (!hud.drawOffer) im::pushBlock();
         im::panel(r);
@@ -121,13 +95,17 @@ HotSeatAction hotSeatHud(const HotSeatHud& hud) {
         gfx::text(T("hotseat.draw.card_hint"), r.cx(), r.y + 110.0f, hs);
         float bw = 170.0f, bh = 48.0f, gap = 20.0f;
         float y = r.b() - 24.0f - bh;
+        // Live only once the card is readable: a press as it appears was aimed at something else.
+        bool ready = da.v[0] >= 0.9f;
         im::pushId("hotseatdraw");
+        if (!ready) im::pushBlock();
         if (im::button(L("hotseat.draw.decline"), im::flip(r, Rect(r.cx() - gap * 0.5f - bw, y, bw, bh)), im::ButtonKind::Secondary,
                        true, im::ITEM_MOUSE_ONLY))
             act = HotSeatAction::DeclineDraw;
         if (im::button(L("hotseat.draw.accept"), im::flip(r, Rect(r.cx() + gap * 0.5f, y, bw, bh)), im::ButtonKind::Primary, true,
                        im::ITEM_MOUSE_ONLY))
             act = HotSeatAction::AcceptDraw;
+        if (!ready) im::popBlock();
         im::popId();
         if (!hud.drawOffer) im::popBlock();
         gfx::popAlpha();
