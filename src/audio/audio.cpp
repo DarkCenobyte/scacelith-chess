@@ -524,7 +524,6 @@ double appendVoice(VoiceId id, std::vector<float>&& mono) {
     SoundBuffer* b = new SoundBuffer();
     b->samples = std::move(mono);
     b->sfx = -1;
-    b->variant = int(id.v & 1u);
     const int64_t frames = int64_t(b->samples.size());
     VoiceCmd c;
     c.op = VoiceCmd::Append;

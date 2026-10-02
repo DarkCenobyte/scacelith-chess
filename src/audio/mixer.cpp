@@ -286,7 +286,7 @@ bool Mixer::play(const PlayRequest& r) {
         v->fadeOut = std::min(0.012f * v->rate * float(kBankRate), float(0.4 * win));
         double room = len - win - 0.002 * kBankRate;
         double start = 0.0;
-        if (room > 0.0) start = r.offset >= 0.0f ? std::min(room, double(r.offset) * kBankRate) : double(rng_.uni()) * room;
+        if (room > 0.0) start = double(rng_.uni()) * room;
         v->pos = v->winStart = start;
         v->winEnd = std::min(len, start + win);
     }
