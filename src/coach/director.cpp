@@ -342,7 +342,8 @@ struct Director::Impl {
     }
 
     // An Urgent beat waits at the head of the queue: a Normal/Low beat not started yet goes back
-    // behind it, a running Normal/Low line is cut at its next sentence boundary, a pause ends.
+    // behind it, a running Normal/Low line is cut at its next pause at a punctuation mark, a pause
+    // ends.
     void preempt() {
         if (!run.active || queue.empty() || queue.front().beat.priority != Priority::Urgent) return;
         const Beat& b = run.item.beat;
@@ -363,7 +364,8 @@ struct Director::Impl {
         run.cutAt = nextBoundary();
     }
 
-    // Line time of the next sentence boundary after the running line's clock (-2: none).
+    // Line time of the next pause at a punctuation mark (comma, colon, dash or sentence end) after
+    // the running line's clock (-2: none).
     float nextBoundary() const {
         const float t = run.clock + 0.02f;
         if (run.voiced) {

@@ -1,9 +1,10 @@
 // The director performs coach scripts (coach/script.h) on the Stage: it renders each line twice
 // (written for the subtitle, spoken for the voice, same variant), has it synthesised ahead of time,
 // plays it, times the gestures and marks on the words they refer to (coach/pacing.h), runs the
-// demonstrations and rewinds, and applies the turn-taking rules of research-pedagogy §6.5:
+// demonstrations and rewinds, and applies the turn-taking rules:
 //   - Urgent beats go before everything queued and cut a running Normal/Low line at its next
-//     sentence boundary (a pause of the synthesised audio);
+//     pause at a punctuation mark (comma, colon, dash or sentence end; a pause of the synthesised
+//     audio);
 //   - Normal and Low beats queue behind beats of the same or a higher priority;
 //   - Low beats are dropped when stale (their ply is more than two plies old) or once the player
 //     acts (playerActed);

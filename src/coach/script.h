@@ -117,8 +117,9 @@ enum class BeatKind : uint8_t {
                     // scoresheet (the player answers it: en passant is legal only right after it)
 };
 
-// Turn-taking (research-pedagogy §6.5): Urgent may cut a running Normal/Low line at its next sentence
-// boundary; Low lines are dropped when stale (more than a few plies old) or once the player acts.
+// Turn-taking: Urgent may cut a running Normal/Low line at its next pause at a punctuation mark
+// (comma, colon, dash or sentence end); Low lines are dropped when stale (more than a few plies
+// old) or once the player acts.
 enum class Priority : uint8_t { Urgent = 1, Normal = 2, Low = 3 };
 
 struct Beat {
