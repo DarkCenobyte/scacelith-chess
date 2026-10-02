@@ -489,7 +489,8 @@ private:
     chess::Square touchedSq_ = chess::NoSquare;
     chess::Square placedTo_ = chess::NoSquare;
     bool pressQueued_ = false;
-    bool drawOfferPending_ = false;
+    bool drawOfferPending_ = false;           // offered while my move waits for the clock press: answered
+                                              // once it is pressed (FIDE 9.1.2)
     int drawOfferPly_ = -1;
     int hoverId_ = -1;
     chess::Square aimSq_ = chess::NoSquare;   // square under the pointer while a piece is in hand

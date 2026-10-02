@@ -508,6 +508,7 @@ void GameScene::setupNewGame() {
     touchedId_ = -1;
     touchedSq_ = placedTo_ = NoSquare;
     pressQueued_ = false;
+    drawOfferPending_ = false;
     drawOfferPly_ = -1;
     lastAiEval_ = 0;
     for (int i = 0; i < 2; ++i) {
@@ -796,6 +797,7 @@ void GameScene::endGame() {
         LOGI("Game over: %s (%s)\n%s", resultText_.c_str(), reasonText_.c_str(), game_.pgn(seats_[0].name, seats_[1].name).c_str());
     }
     pendingOffer_ = -1;
+    drawOfferPending_ = false;
     clockFrozen_ = false;
     drawOfferBy_ = drawCardFor_ = -1;
     writeGrace_ = 0.0f;
@@ -1092,7 +1094,9 @@ bool GameScene::update(AppContext& ctx, float dt) {
                 canOffer = canOffer && drawOfferBy_ < 0 && drawCardFor_ < 0;
                 resignQuestion = i18n::trf("hotseat.confirm.resign", {seats_[inputSeat()].name, seats_[1 - inputSeat()].name});
             } else {
-                canOffer = canOffer && quietTurn();   // answered at once: not with a move on its way
+                // Answered at once, so not with a move on its way, except my move made on the board
+                // and waiting for the clock press: the offer goes with it (FIDE 9.1.2).
+                canOffer = canOffer && !drawOfferPending_ && (quietTurn() || turn_ == Turn::HumanPlaced);
             }
             switch (menuChoice(ui::pauseMenu(canClaim, canOffer, resignQuestion))) {
             case ui::MenuAction::Resume: paused_ = false; break;
@@ -1104,6 +1108,7 @@ bool GameScene::update(AppContext& ctx, float dt) {
             case ui::MenuAction::OfferDraw:
                 paused_ = false;
                 if (hotSeat()) offerDrawHotSeat();
+                else if (turn_ == Turn::HumanPlaced) drawOfferPending_ = true;
                 else offerDraw();
                 break;
             case ui::MenuAction::ClaimDraw:
@@ -2087,6 +2092,12 @@ void GameScene::completeMove(int seat) {
             answerAiDrawOffer(seat);
             if (game_.status() != GameStatus::Ongoing) return;
         }
+        // My draw offer made with this move: the opponent answers now that the clock is pressed.
+        if (drawOfferPending_) {
+            drawOfferPending_ = false;
+            offerDraw();
+            if (game_.status() != GameStatus::Ongoing) return;
+        }
         // Hot-seat: a draw offered with this move (FIDE 9.1.2) is put to the opponent once the view
         // has reached them.
         if (hotSeat() && drawOfferBy_ == seat) {
@@ -2101,7 +2112,9 @@ void GameScene::completeMove(int seat) {
         followEyesAfterMove(seat);
         return;
     }
-    // Illegal move completed: the arbiter restores the position and applies the penalty.
+    // Illegal move completed: the arbiter restores the position and applies the penalty. A draw
+    // offered with it goes with it.
+    drawOfferPending_ = false;
     ui::notify(v.message.empty() ? std::string(i18n::tr("notify.illegal")) : v.message, 6.0f);
     if (v.forfeit) {
         game_.forfeitIllegal(mover);
