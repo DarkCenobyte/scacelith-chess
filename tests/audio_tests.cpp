@@ -218,6 +218,7 @@ TEST(audio_synth_variants_sane) {
         for (uint32_t seed = 1; seed <= 5; ++seed) {
             std::vector<float> v = audio::synthesize(ex.sfx, seed * 7777u);
             CHECK(v.size() > 64);
+            CHECK_EQ(v.capacity(), v.size());  // the bank keeps no synthesis scratch capacity
             float peak = 0.0f;
             bool finite = true;
             int den = 0;
