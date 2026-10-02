@@ -228,8 +228,8 @@ public:
     // free if canSpeak was false (pending talk waits; the 4-ply staleness rule applies). Deterministic.
     std::vector<OpeningLine> update(const chess::Game& game, bool canSpeak = true);
 
-    // The summary sentence for the end-of-game appraisal, from the game as it stands (empty when no opening can
-    // be named). Does not change what the announcer remembers.
+    // The summary sentence from the game as it stands (empty when no opening can be named). Does not change what
+    // the announcer remembers. Kept for tests: the appraisal names the opening through Session::openingRef().
     std::vector<OpeningLine> summary(const chess::Game& game) const;
 
     int utterances() const { return utterances_; }   // opening utterances this game
@@ -256,8 +256,9 @@ private:
 int openingPlyLimit(int level);   // the ply at which the opening counts as determined for this level
 
 // ---- Texts ---------------------------------------------------------------------------------------------------------
-// The opening texts of the 10 languages (assets/coach/openings/<code>.lang), to render OpeningLines without the
-// speech catalog, and for the Opening arguments the catalog cannot resolve by key alone ("line:" references).
+// The opening texts of the 10 languages (assets/coach/openings/<code>.lang). The game renders OpeningLines through
+// the speech catalog, which loads these files itself and uses arg() for the Opening arguments it cannot resolve by
+// key alone ("line:" references); render() and variants() serve the tests.
 class OpeningTexts {
 public:
     static const OpeningTexts& instance();                 // loads the embedded files on first use (thread-safe)
@@ -271,7 +272,6 @@ public:
     // text (".spoken" keys, English respellings, " — " inside Russian/Ukrainian names made a hyphen).
     // Empty when the language cannot say it.
     std::string arg(const std::string& ref, const std::string& form, const std::string& lang, bool spoken) const;
-    bool renderable(const OpeningLine& line, const std::string& lang) const;
     // Renders a line: variant key.N picked by variantSeed among the variants English defines; placeholders
     // {name} / {name:form}. Empty when a key or an argument is missing.
     std::string render(const OpeningLine& line, const std::string& lang, bool spoken, uint32_t variantSeed = 0) const;
@@ -288,8 +288,9 @@ private:
     bool properName(const std::string& words) const;
 };
 
-// Speech clean-up shared with the catalog: English respellings are in the .spoken keys; this turns " — " between
-// two capitalised words (Russian and Ukrainian compound names: "Каро — Канн") into "-" so the voice does not pause.
+// Speech clean-up of composed "line:" names (arg() / compose(), and render()): English respellings are in the
+// .spoken keys; this turns " — " between two capitalised words (Russian and Ukrainian compound names: "Каро — Канн")
+// into "-" so the voice does not pause.
 std::string fixNameDashesForSpeech(const std::string& text);
 
 }  // namespace coach

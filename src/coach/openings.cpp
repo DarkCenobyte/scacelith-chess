@@ -1055,13 +1055,6 @@ std::string OpeningTexts::arg(const std::string& ref, const std::string& form, c
     return v ? *v : std::string();
 }
 
-bool OpeningTexts::renderable(const OpeningLine& line, const std::string& lang) const {
-    if (!find(lang, line.key)) return false;
-    for (const auto& a : line.args)
-        if (a.second.kind == OpeningArg::Kind::Opening && arg(a.second.text, "", lang, false).empty()) return false;
-    return true;
-}
-
 std::string OpeningTexts::render(const OpeningLine& line, const std::string& lang, bool spoken,
                                  uint32_t variantSeed) const {
     const int n = variants(line.key);
