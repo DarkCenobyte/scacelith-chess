@@ -202,7 +202,7 @@ std::vector<float> Synthesizer::synthesize(const std::string& textIn, const std:
         if (ids.empty()) continue;
         auto t = Clock::now();
         float seconds = 0.0f;
-        if (!eng.duration(ids, voice, ctx, &seconds, &err)) break;
+        if (!eng.duration(ids, voice, ctx, &seconds, &err, cancel)) break;
         stats_.duration += since(t);
         seconds = std::max(seconds / speed, kMinChunkSeconds);
         int64_t wavLen = int64_t(double(seconds) * kSampleRate);
@@ -213,7 +213,7 @@ std::vector<float> Synthesizer::synthesize(const std::string& textIn, const std:
 
         t = Clock::now();
         Tensor emb;
-        if (!eng.encode(ids, voice, ctx, &emb, &err)) break;
+        if (!eng.encode(ids, voice, ctx, &emb, &err, cancel)) break;
         stats_.textEncoder += since(t);
         t = Clock::now();
         Tensor latent;
@@ -221,7 +221,7 @@ std::vector<float> Synthesizer::synthesize(const std::string& textIn, const std:
         stats_.vectorEstimator += since(t);
         t = Clock::now();
         Tensor wav;
-        if (!eng.vocode(latent, ctx, &wav, &err)) break;
+        if (!eng.vocode(latent, ctx, &wav, &err, cancel)) break;
         stats_.vocoder += since(t);
         wavLen = std::min<int64_t>(wavLen, wav.count());
         if (!out.empty()) out.resize(out.size() + kSilenceSamples, 0.0f);

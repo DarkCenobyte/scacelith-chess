@@ -1906,6 +1906,13 @@ TEST(tts_stage_vocoder_and_end_to_end) {
     std::fprintf(stderr, "  end to end log-spectral distance %.2f dB\n", lsdE);
     CHECK(de.snrDb > 5.0);
     CHECK(lsdE < 4.0);
+    // Every stage stops on the cancel flag (Worker::stop() and cancel() do not wait for it).
+    std::atomic<bool> cancel{true};
+    CHECK(!e.duration(f.ids, f.voice, f.ctx, &seconds, &err, &cancel) && err == "cancelled");
+    err.clear();
+    CHECK(!e.encode(f.ids, f.voice, f.ctx, &emb, &err, &cancel) && err == "cancelled");
+    err.clear();
+    CHECK(!e.vocode(latent, f.ctx, &out, &err, &cancel) && err == "cancelled");
 }
 
 TEST(tts_stage_every_level) {

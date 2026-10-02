@@ -136,11 +136,11 @@ Tensor Engine::styleDp(int voice) const {
 }
 
 bool Engine::duration(const std::vector<int64_t>& ids, int voice, const ExecContext& ctx, float* seconds,
-                      std::string* error) const {
+                      std::string* error, const std::atomic<bool>* cancel) const {
     Session s(dp_);
     int64_t T = int64_t(ids.size());
     if (!setInput(s, dp_, "text_ids", idsTensor(ids), error) || !setInput(s, dp_, "style_dp", styleDp(voice), error) ||
-        !setInput(s, dp_, "text_mask", ones({1, 1, T}), error) || !s.run(ctx, error))
+        !setInput(s, dp_, "text_mask", ones({1, 1, T}), error) || !s.run(ctx, error, cancel))
         return false;
     const Tensor& d = s.output(0);
     if (d.type != DType::F32 || d.count() < 1) return fail(error, "duration predictor: bad output");
@@ -149,12 +149,12 @@ bool Engine::duration(const std::vector<int64_t>& ids, int voice, const ExecCont
 }
 
 bool Engine::encode(const std::vector<int64_t>& ids, int voice, const ExecContext& ctx, Tensor* textEmb,
-                    std::string* error) const {
+                    std::string* error, const std::atomic<bool>* cancel) const {
     Session s(te_);
     int64_t T = int64_t(ids.size());
     if (!setInput(s, te_, "text_ids", idsTensor(ids), error) ||
         !setInput(s, te_, "style_ttl", styleTtl(voice), error) ||
-        !setInput(s, te_, "text_mask", ones({1, 1, T}), error) || !s.run(ctx, error))
+        !setInput(s, te_, "text_mask", ones({1, 1, T}), error) || !s.run(ctx, error, cancel))
         return false;
     *textEmb = s.output(0);
     if (textEmb->rank() != 3 || textEmb->dims[2] != T) return fail(error, "text encoder: bad output shape");
@@ -185,10 +185,11 @@ bool Engine::denoise(const Tensor& textEmb, int voice, const Tensor& noise, int 
     return true;
 }
 
-bool Engine::vocode(const Tensor& latent, const ExecContext& ctx, Tensor* wav, std::string* error) const {
+bool Engine::vocode(const Tensor& latent, const ExecContext& ctx, Tensor* wav, std::string* error,
+                    const std::atomic<bool>* cancel) const {
     if (latent.rank() != 3 || latent.dims[1] != kLatentChannels) return fail(error, "latent shape");
     Session s(voc_);
-    if (!setInput(s, voc_, "latent", latent, error) || !s.run(ctx, error)) return false;
+    if (!setInput(s, voc_, "latent", latent, error) || !s.run(ctx, error, cancel)) return false;
     *wav = s.output(0);
     if (wav->type != DType::F32) return fail(error, "vocoder: bad output");
     return true;
