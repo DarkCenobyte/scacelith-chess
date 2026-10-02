@@ -101,9 +101,6 @@ struct Bcast {
                 else return fail(err, "cannot broadcast " + dimsStr(*ins[0]) + " with " + dimsStr(*ins[i]));
             }
         }
-        for (int i = 0; i < n; ++i)
-            for (size_t d = 0; d < rank; ++d)
-                if (padded[size_t(i)][d] == 1 && out[d] == 0) out[d] = 0;
         // Per-dimension strides, then drop size-1 dimensions and merge contiguous ones.
         std::vector<Dims> strides(static_cast<size_t>(n));
         for (int i = 0; i < n; ++i) {
@@ -424,7 +421,7 @@ bool opReshape(const Tensor& x, const Tensor& shape, bool allowZero, Tensor& out
             known *= s[i];
         }
     }
-    int64_t total = x.qweight && !x.data ? elementCount(x.dims) : x.count();
+    int64_t total = x.count();
     if (infer >= 0) s[size_t(infer)] = known ? total / known : 0;
     if (elementCount(s) != total) return fail(err, "Reshape " + dimsStr(x.dims) + " to " + dimsStr(s));
     out = alias(x, s);
