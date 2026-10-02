@@ -852,7 +852,9 @@ void Animator::Impl::planTurnPage(const WriteTask& t, float start, float T) {
             return transformPoint(rt, vec3(x, top + (L + lift) * std::sin(a) + 0.0006f, bindZ - (L + lift) * std::cos(a)));
         };
     }
-    auto corner = [this](float s) { return toChar(wr.corner(clamp(s, 0.0f, 1.0f))); };
+    // (A copy: the motion outlives wr.corner when a handshake interrupts the page turn.)
+    const std::function<vec3(float)> cornerW = wr.corner;
+    auto corner = [this, cornerW](float s) { return toChar(cornerW(clamp(s, 0.0f, 1.0f))); };
     wr.turnStart = start;
     wr.turnT = T;
     // Binding line: the circle through three corner positions.

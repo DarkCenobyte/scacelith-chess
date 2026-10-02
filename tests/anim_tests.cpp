@@ -381,6 +381,44 @@ TEST(anim_left_handed_seat_off_centre) {
     CHECK(placeErr >= 0.0f && placeErr < 0.004f);
 }
 
+// A left-handed player's handshake needs its writing hand: it cuts a page turn short, even while
+// the hand follows the page corner (the page is reported turned when the handshake starts).
+TEST(anim_left_handed_handshake_cuts_page_turn) {
+    const character::Skeleton& sk = character::robotSkeleton();
+    anim::Animator B, W;
+    W.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
+    B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, character::Side::Left);
+    WriteTask turn;
+    turn.type = WriteTaskType::TurnPage;   // the default page geometry
+    B.enqueueWriting(turn);
+    std::vector<anim::Event> ev;
+    const float dt = 1.0f / 120.0f;
+    float start = -1.0f, turned = -1.0f, clasp = -1.0f;
+    while (B.time() < 4.0f) {
+        if (start < 0.0f && B.time() >= 0.6f) {   // the hand is on the corner, lifting the page
+            CHECK(B.pageTurnProgress() > 0.0f);
+            anim::Task h;
+            h.type = anim::TaskType::Handshake;
+            h.partner = &W;
+            B.enqueue(h);
+            h.partner = &B;
+            W.enqueue(h);
+            start = B.time();
+        }
+        ev.clear();
+        W.update(dt, ev);
+        ev.clear();
+        B.update(dt, ev);
+        for (const anim::Event& e : ev) {
+            if (e.type == anim::EventType::PageTurned) turned = e.time;
+            if (e.type == anim::EventType::HandshakeClasp) clasp = e.time;
+        }
+    }
+    CHECK(start > 0.0f);
+    CHECK(std::fabs(turned - start) < 1e-4f);
+    CHECK(std::fabs(clasp - (start + anim::Timing::HandshakeClaspAt)) < 1e-4f);
+}
+
 // Tasks cut short (cancelTasks: the online opponent's move comes while its robot still plays their
 // live gestures): the piece in hand is let go without its release, and the next task starts at once
 // from where the hand is, with its usual duration.
