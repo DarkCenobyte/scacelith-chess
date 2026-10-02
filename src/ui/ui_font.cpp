@@ -86,13 +86,15 @@ struct FaceData {
 };
 
 struct Shelf { int y, h, x; };
+struct Box { int x, y, w, h; };
 
 struct Atlas {
     GLuint tex = 0;
     std::vector<uint8_t> pixels;
     std::vector<Shelf> shelves;
     int nextY = 0;
-    int dirtyY0 = kAtlasH, dirtyY1 = 0;
+    int dirtyY0 = kAtlasH, dirtyY1 = 0;  // rows to upload whole (init, an atlas clear)
+    std::vector<Box> dirty;              // glyphs packed since the last upload
     int gen = 0;
     bool resetPending = false;
 };
@@ -285,8 +287,7 @@ void place(Slot& s, uint32_t cp) {
     }
     for (int y = 0; y < s.h; ++y)
         std::copy_n(&s.px[size_t(y) * size_t(s.w)], size_t(s.w), &g_atlas.pixels[size_t(oy + y) * kAtlasW + size_t(ox)]);
-    g_atlas.dirtyY0 = std::min(g_atlas.dirtyY0, oy);
-    g_atlas.dirtyY1 = std::max(g_atlas.dirtyY1, oy + s.h);
+    g_atlas.dirty.push_back({ox, oy, s.w, s.h});
     s.g.u0 = float(ox) / kAtlasW;
     s.g.v0 = float(oy) / kAtlasH;
     s.g.u1 = float(ox + s.w) / kAtlasW;
@@ -396,6 +397,7 @@ void resetAtlas() {
     g_atlas.resetPending = false;
     g_atlas.dirtyY0 = 0;
     g_atlas.dirtyY1 = kAtlasH;
+    g_atlas.dirty.clear();
     for (auto& fd : g_faces)
         for (auto& kv : fd.glyphs) {
             kv.second.g.hasQuad = false;
@@ -592,16 +594,35 @@ void prewarm(const std::vector<std::pair<int, uint32_t>>& list) {
 }
 
 void flushUploads() {
-    if (!g_atlas.tex || g_atlas.dirtyY1 <= g_atlas.dirtyY0) return;
-    int y0 = g_atlas.dirtyY0, y1 = g_atlas.dirtyY1;
+    if (!g_atlas.tex) return;
+    // New glyphs go up one rectangle each; many at once (a language's glyphs), or with rows that
+    // go up whole anyway, as the band of rows that holds them.
+    if (g_atlas.dirty.size() > 64 || (g_atlas.dirtyY1 > g_atlas.dirtyY0 && !g_atlas.dirty.empty())) {
+        for (const Box& b : g_atlas.dirty) {
+            g_atlas.dirtyY0 = std::min(g_atlas.dirtyY0, b.y);
+            g_atlas.dirtyY1 = std::max(g_atlas.dirtyY1, b.y + b.h);
+        }
+        g_atlas.dirty.clear();
+    }
+    if (g_atlas.dirtyY1 <= g_atlas.dirtyY0 && g_atlas.dirty.empty()) return;
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glTextureSubImage2D(g_atlas.tex, 0, 0, y0, kAtlasW, y1 - y0, GL_RED, GL_UNSIGNED_BYTE,
-                        &g_atlas.pixels[size_t(y0) * kAtlasW]);
+    if (g_atlas.dirtyY1 > g_atlas.dirtyY0) {
+        int y0 = g_atlas.dirtyY0, y1 = g_atlas.dirtyY1;
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        glTextureSubImage2D(g_atlas.tex, 0, 0, y0, kAtlasW, y1 - y0, GL_RED, GL_UNSIGNED_BYTE,
+                            &g_atlas.pixels[size_t(y0) * kAtlasW]);
+    } else {
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, kAtlasW);
+        for (const Box& b : g_atlas.dirty)
+            glTextureSubImage2D(g_atlas.tex, 0, b.x, b.y, b.w, b.h, GL_RED, GL_UNSIGNED_BYTE,
+                                &g_atlas.pixels[size_t(b.y) * kAtlasW + size_t(b.x)]);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    }
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     glGenerateTextureMipmap(g_atlas.tex);
     g_atlas.dirtyY0 = kAtlasH;
     g_atlas.dirtyY1 = 0;
+    g_atlas.dirty.clear();
 }
 
 const Glyph* glyph(int face, uint32_t cp, int* usedFace) {
