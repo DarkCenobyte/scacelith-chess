@@ -138,7 +138,7 @@ private:
 
         IMMDeviceEnumerator* enumr = nullptr;
         DeviceNotifier* notifier = nullptr;
-        int failures = 0;
+        ReopenBackoff backoff;
         bool loggedNoDevice = false;
         while (!quitting()) {
             if (!enumr) {
@@ -165,7 +165,7 @@ private:
             } else {
                 loggedNoDevice = true;
             }
-            const int waitMs = reopenWaitMs(opened, end, healthy, failures);
+            const int waitMs = backoff.waitMs(opened, end, healthy);
             if (waitMs == 0) continue;  // default changed / working device lost: reopen right away
             HANDLE hs[2] = {quitEvent_, changeEvent_};
             WaitForMultipleObjects(2, hs, FALSE, DWORD(waitMs));
