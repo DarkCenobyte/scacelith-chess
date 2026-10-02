@@ -108,6 +108,7 @@ void serverLine(const Rect& p, bool showConnection) {
     std::string server = s.serverName();
     if (server.empty()) return;
     std::string line = i18n::ltr(server);
+    const size_t named = line.size();
     vec4 dot = withAlpha(muted, 0.8f);
     if (showConnection) {
         switch (s.conn()) {
@@ -120,6 +121,10 @@ void serverLine(const Rect& p, bool showConnection) {
     }
     TextStyle ts = style(font::FACE_ITALIC, kCaption, withAlpha(muted, 0.95f), im::startAlign());
     ts.size = gfx::fitSize(line, ts, p.w * 0.3f, 0.75f);
+    if (gfx::textWidth(line, ts) > p.w * 0.3f + 0.5f) {  // a long server name is cut, not the connection
+        const std::string state = line.substr(named);
+        line = i18n::ltr(im::elideToFit(server, ts, p.w * 0.3f - gfx::textWidth(state, ts))) + state;
+    }
     // Above the page title's height, so a long title never meets it.
     gfx::diamond(vec2(im::flipX(p, p.x + 40.0f), p.y + 31.0f), 3.5f, dot);
     gfx::text(line, im::flipX(p, p.x + 54.0f), p.y + 37.0f, ts);
@@ -160,7 +165,7 @@ void infoLine(const std::string& label, const std::string& value, const Rect& co
     gfx::text(label, im::flipX(col, col.x), y, ls);
     TextStyle vs = style(font::FACE_TEXT, kBody, valueColor, im::startAlign());
     vs.size = gfx::fitSize(value, vs, col.w - 10.0f, 0.7f);
-    gfx::text(value, im::flipX(col, col.x), y + 34.0f, vs);
+    gfx::text(im::elideToFit(value, vs, col.w - 10.0f), im::flipX(col, col.x), y + 34.0f, vs);
 }
 
 }  // namespace onl
@@ -727,6 +732,27 @@ void pageSsoName(float t) {
 }
 
 // ---- Sub-pages: account ----------------------------------------------------------------------------------
+// An e-mail address that, followed by 'tail', fits maxWidth in st: whole when it does, else cut in
+// the middle of its name ("jean-bapt…@example.com") so that its domain stays, or at its end when not
+// even a letter of the name fits with the domain ('tail' is always kept).
+std::string fitAddress(const std::string& email, const std::string& tail, const TextStyle& st, float maxWidth) {
+    auto fits = [&](const std::string& address) { return gfx::textWidth(i18n::ltr(address) + tail, st) <= maxWidth + 0.5f; };
+    if (fits(email)) return email;
+    const size_t at = email.rfind('@');
+    if (at != std::string::npos && at > 0) {
+        const std::u32string name = uni::decode(email.substr(0, at));
+        const std::string domain = "\xE2\x80\xA6" + email.substr(at);
+        size_t lo = 0, hi = name.size();
+        while (lo < hi) {  // the longest start of the name that fits
+            size_t mid = (lo + hi + 1) / 2;
+            if (fits(uni::encode(name.substr(0, mid)) + domain)) lo = mid;
+            else hi = mid - 1;
+        }
+        if (lo > 0) return uni::encode(name.substr(0, lo)) + domain;
+    }
+    return im::elideToFit(email, st, maxWidth - gfx::textWidth(tail, st));
+}
+
 void pageAccount(float t) {
     game::OnlineSession& s = ses();
     const net::AccountInfo& a = s.account();
@@ -754,14 +780,19 @@ void pageAccount(float t) {
     float y = top + 56.0f;
     infoLine(T("online.account.username"), a.username.empty() ? "\xE2\x80\x94" : a.username, col, y);
     y += 72.0f;
-    std::string mail = a.email.empty() ? std::string("\xE2\x80\x94") : i18n::ltr(a.email);
-    if (!a.email.empty() && !a.emailVerified) mail += "  " + T("online.account.unverified");
+    // A long address loses the middle of its name, not its domain or the tag after it (measured as
+    // infoLine draws it at its smallest).
+    const std::string unverified = a.email.empty() || a.emailVerified ? std::string() : "  " + T("online.account.unverified");
+    const std::string mail = a.email.empty() ? std::string("\xE2\x80\x94")
+                                             : i18n::ltr(fitAddress(a.email, unverified, style(font::FACE_TEXT, kBody * 0.7f, ivory), colW - 10.0f)) +
+                                                   unverified;
     infoLine(T("online.account.email"), mail, col, y);
     y += 72.0f;
     if (!a.pendingEmail.empty()) {
         // An e-mail change waiting for its link.
         TextStyle ps = style(font::FACE_ITALIC, kCaption, gold, im::startAlign());
-        std::string line = i18n::trf("online.account.pending_email", {i18n::ltr(a.pendingEmail)});
+        // The address on a line of its own at most (a line breaks only at spaces).
+        std::string line = i18n::trf("online.account.pending_email", {i18n::ltr(fitAddress(a.pendingEmail, std::string(), ps, colW - 10.0f))});
         int n = gfx::textWrapped(line, im::flipX(col, lx), y - 6.0f, colW - 10.0f, ps, 26.0f);
         y += float(n) * 26.0f + 8.0f;
     }
@@ -1979,12 +2010,12 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
     } else if (O.testShown) {
         TextStyle rs = style(font::FACE_TEXT, kSmall, O.testOk ? vec4(0.62f, 0.78f, 0.55f, 1.0f) : danger, im::startAlign());
         rs.size = gfx::fitSize(O.testLine, rs, tw, 0.7f);
-        gfx::text(O.testLine, im::flipX(tcolF, tcolF.x), tr.y + (O.testDetail.empty() ? 36.0f : 24.0f), rs);
+        gfx::text(im::elideToFit(O.testLine, rs, tw), im::flipX(tcolF, tcolF.x), tr.y + (O.testDetail.empty() ? 36.0f : 24.0f), rs);
         if (!O.testDetail.empty()) {
             TextStyle ms = style(font::FACE_ITALIC, kCaption, ivoryDim, im::startAlign());
             std::string motd = O.testDetail.substr(0, O.testDetail.find('\n'));
             ms.size = gfx::fitSize(motd, ms, tw, 0.7f);
-            gfx::text(motd, im::flipX(tcolF, tcolF.x), tr.y + 52.0f, ms);
+            gfx::text(im::elideToFit(motd, ms, tw), im::flipX(tcolF, tcolF.x), tr.y + 52.0f, ms);
         }
     } else if (inGame) {
         TextStyle gs = style(font::FACE_ITALIC, kCaption, muted, im::startAlign());
