@@ -1,6 +1,7 @@
 #include "online_session.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
+#include "../net/protocol_gen.h"
 #include "../platform/platform.h"
 #include "../ui/ui.h"
 #include "online_mock.h"
@@ -201,6 +202,23 @@ enum ChallengeState { ChPending = 0, ChAccepted = 1, ChDeclined = 2, ChCancelled
 enum QueueState { QLeft = 0, QSearching = 1, QMatched = 2 };
 enum NoticeCode { NShutdown = 1, NBanned = 2, NRevoked = 3, NCooldown = 4, NReplaced = 5, NRatingRestored = 7 };
 constexpr int kErrMatchmakingCooldown = 207;
+// The names above are the generated ones (net/protocol_gen.h): a schema change fails here.
+static_assert(ChPending == int(net::proto::ChallengeState::Pending) && ChAccepted == int(net::proto::ChallengeState::Accepted) &&
+                  ChDeclined == int(net::proto::ChallengeState::Declined) &&
+                  ChCancelled == int(net::proto::ChallengeState::Cancelled) &&
+                  ChExpired == int(net::proto::ChallengeState::Expired) &&
+                  ChUnavailable == int(net::proto::ChallengeState::Unavailable),
+              "ChallengeState");
+static_assert(QLeft == int(net::proto::QueueState::Left) && QSearching == int(net::proto::QueueState::Searching) &&
+                  QMatched == int(net::proto::QueueState::Matched),
+              "QueueState");
+static_assert(NShutdown == int(net::proto::NoticeCode::ServerShutdown) && NBanned == int(net::proto::NoticeCode::Banned) &&
+                  NRevoked == int(net::proto::NoticeCode::SessionRevoked) &&
+                  NCooldown == int(net::proto::NoticeCode::MatchmakingCooldown) &&
+                  NReplaced == int(net::proto::NoticeCode::ReplacedByNewConnection) &&
+                  NRatingRestored == int(net::proto::NoticeCode::RatingRestored),
+              "NoticeCode");
+static_assert(kErrMatchmakingCooldown == int(net::proto::ErrorCode::MatchmakingCooldown), "ErrorCode");
 
 // Seconds of the monotonic clock: when a page last showed the state of the GIF being made.
 double gifClock() { return std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count(); }

@@ -48,6 +48,42 @@ enum Err {
     ErrRatedRequiresOfficialTc = 206, ErrMatchmakingCooldown = 207, ErrInvalidTimeControl = 208, ErrRematchUnavailable = 209
 };
 enum MoveFlagBits { FCheck = 64, FMate = 128 };
+// The names above are the generated ones (net/protocol_gen.h): a schema change fails here.
+static_assert(Ongoing == int(proto::GameStatus::Ongoing) && WhiteWins == int(proto::GameStatus::WhiteWins) &&
+                  BlackWins == int(proto::GameStatus::BlackWins) && Draw == int(proto::GameStatus::Draw) &&
+                  Aborted == int(proto::GameStatus::Aborted),
+              "GameStatus");
+static_assert(RNone == int(proto::EndReason::None) && RResignation == int(proto::EndReason::Resignation) &&
+                  RTimeout == int(proto::EndReason::Timeout) && RAgreement == int(proto::EndReason::Agreement) &&
+                  RThreefoldClaim == int(proto::EndReason::ThreefoldClaim) && RFiftyClaim == int(proto::EndReason::FiftyMoveClaim) &&
+                  RAbandonment == int(proto::EndReason::Abandonment) &&
+                  RAbandonmentVsInsufficient == int(proto::EndReason::AbandonmentVsInsufficient) &&
+                  RAborted == int(proto::EndReason::Aborted) && RNoShow == int(proto::EndReason::NoShow),
+              "EndReason");
+static_assert(DrawOffered == int(proto::GameEventKind::DrawOffered) && DrawDeclined == int(proto::GameEventKind::DrawDeclined) &&
+                  PlayerDisconnected == int(proto::GameEventKind::PlayerDisconnected) &&
+                  PlayerReconnected == int(proto::GameEventKind::PlayerReconnected) &&
+                  RematchOffered == int(proto::GameEventKind::RematchOffered) &&
+                  RematchDeclined == int(proto::GameEventKind::RematchDeclined),
+              "GameEventKind");
+static_assert(ErrNotInGame == int(proto::ErrorCode::NotInGame) && ErrNotYourTurn == int(proto::ErrorCode::NotYourTurn) &&
+                  ErrIllegalMove == int(proto::ErrorCode::IllegalMove) && ErrStalePly == int(proto::ErrorCode::StalePly) &&
+                  ErrDesync == int(proto::ErrorCode::Desync) && ErrGameOver == int(proto::ErrorCode::GameOver) &&
+                  ErrAlreadyInGame == int(proto::ErrorCode::AlreadyInGame) &&
+                  ErrInvalidCategory == int(proto::ErrorCode::InvalidCategory) &&
+                  ErrDrawOfferLimit == int(proto::ErrorCode::DrawOfferLimit) &&
+                  ErrNothingToClaim == int(proto::ErrorCode::NothingToClaim) &&
+                  ErrAbortNotAllowed == int(proto::ErrorCode::AbortNotAllowed) &&
+                  ErrNoPendingOffer == int(proto::ErrorCode::NoPendingOffer) && ErrFlagFell == int(proto::ErrorCode::FlagFell) &&
+                  ErrUserUnavailable == int(proto::ErrorCode::UserUnavailable) &&
+                  ErrCannotChallengeSelf == int(proto::ErrorCode::CannotChallengeSelf) &&
+                  ErrCodeInvalid == int(proto::ErrorCode::CodeInvalid) &&
+                  ErrRatedRequiresOfficialTc == int(proto::ErrorCode::RatedRequiresOfficialTc) &&
+                  ErrMatchmakingCooldown == int(proto::ErrorCode::MatchmakingCooldown) &&
+                  ErrInvalidTimeControl == int(proto::ErrorCode::InvalidTimeControl) &&
+                  ErrRematchUnavailable == int(proto::ErrorCode::RematchUnavailable),
+              "ErrorCode");
+static_assert(FCheck == proto::MoveFlag::Check && FMate == proto::MoveFlag::Mate, "MoveFlag");
 
 constexpr double kHttpMin = 250.0, kHttpMax = 520.0;  // HTTPS round trip
 constexpr double kOneWay = 17.0;                      // realtime one-way latency
@@ -425,7 +461,7 @@ GameDetails makePastGame(m::Rng& rng, Ending ending, int64_t endedAt, int baseSe
             d.reason = RTimeout;
             if (!game.position().canColorMate(chess::Color(1 - toMove))) {
                 d.status = Draw;
-                d.reason = 7;  // TimeoutVsInsufficient
+                d.reason = int(proto::EndReason::TimeoutVsInsufficient);
             }
             break;
         case Ending::Threefold:
@@ -442,7 +478,7 @@ GameDetails makePastGame(m::Rng& rng, Ending ending, int64_t endedAt, int baseSe
             break;
         case Ending::Forfeit:
             d.status = me == 0 ? WhiteWins : BlackWins;  // the opponent's fair play violation
-            d.reason = 24;
+            d.reason = int(proto::EndReason::Forfeit);
             break;
         case Ending::Abort:
             d.status = Aborted;
@@ -1722,7 +1758,7 @@ struct FakeServer::Impl {
             Event e;
             e.kind = Event::Kind::ChallengeStatus;
             e.challengeId = incoming.id;
-            e.challengeState = 4;  // Expired
+            e.challengeState = int(proto::ChallengeState::Expired);
             rt(e);
         }
         // Once per session, a player challenges you while you idle in the menus.
@@ -2583,7 +2619,7 @@ void FakeServer::joinPrivateGame(const std::string& code) {
 void FakeServer::acceptChallenge(uint32_t id) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
-    if (!I.incoming.active || I.incoming.id != id) return I.serverError(201);
+    if (!I.incoming.active || I.incoming.id != id) return I.serverError(int(proto::ErrorCode::ChallengeNotFound));
     I.incoming.active = false;
     int color = I.incoming.color == 1 ? 1 : 2;
     I.startGame(I.incoming.baseSec, I.incoming.incSec, I.incoming.rated, color, I.incoming.from.name, I.incoming.from.rating,
