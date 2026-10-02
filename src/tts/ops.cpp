@@ -9,6 +9,7 @@
 #include <cmath>
 #include <cstring>
 #include <limits>
+#include <xmmintrin.h>
 
 namespace tts {
 namespace {
@@ -1198,8 +1199,26 @@ bool opDynamicQuantize(const ExecContext& ctx, const Tensor& x, Tensor* out, std
     if (x.type != DType::F32) return fail(err, "DynamicQuantizeLinear expects float");
     const float* p = x.as<float>();
     int64_t n = x.count();
+    // minps/maxps(x, acc) select exactly as std::min/max(acc, x) do: a NaN never replaces acc and
+    // -0 never replaces the +0 start, so lanes reduced in any order give the scalar loop's bits.
+    __m128 mn0 = _mm_setzero_ps(), mn1 = mn0, mx0 = mn0, mx1 = mn0;
+    int64_t i = 0;
+    for (; i + 8 <= n; i += 8) {
+        __m128 a = _mm_loadu_ps(p + i), b = _mm_loadu_ps(p + i + 4);
+        mn0 = _mm_min_ps(a, mn0);
+        mn1 = _mm_min_ps(b, mn1);
+        mx0 = _mm_max_ps(a, mx0);
+        mx1 = _mm_max_ps(b, mx1);
+    }
+    alignas(16) float lanes[8];
+    _mm_store_ps(lanes, _mm_min_ps(mn0, mn1));
+    _mm_store_ps(lanes + 4, _mm_max_ps(mx0, mx1));
     float mn = 0.0f, mx = 0.0f;
-    for (int64_t i = 0; i < n; ++i) {
+    for (int l = 0; l < 4; ++l) {
+        mn = std::min(mn, lanes[l]);
+        mx = std::max(mx, lanes[4 + l]);
+    }
+    for (; i < n; ++i) {
         mn = std::min(mn, p[i]);
         mx = std::max(mx, p[i]);
     }

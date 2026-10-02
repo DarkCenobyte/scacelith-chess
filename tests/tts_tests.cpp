@@ -951,6 +951,36 @@ TEST(tts_ops_quantization) {
     CHECK(runOp(node(tts::Op::DynamicQuantize), {&xp}, o, 3));
     CHECK(equalT<uint8_t>(o[0], DType::U8, {3}, {50, 125, 255}));
     CHECK_EQ(int(o[2].scalarFloat()), 0);
+    // The vectorized range scan equals the scalar std::min/std::max loop, NaN, -0 and +inf included,
+    // for lengths around the vector width (-inf is left out: its zero point would be NaN).
+    {
+        std::mt19937 rr(11);
+        const float specials[] = {std::nanf(""), -0.0f, 0.0f, INFINITY, -3e38f};
+        bool same = true;
+        for (int n : {0, 1, 3, 7, 8, 9, 15, 16, 17, 31, 33, 1000}) {
+            for (int round = 0; round < 20; ++round) {
+                std::vector<float> v(static_cast<size_t>(n));
+                for (float& f : v) {
+                    int pick = int(rr() % 16);
+                    f = pick < 5 && round % 4 != 0 ? specials[pick] : std::normal_distribution<float>(0.0f, 2.0f)(rr);
+                    if (round == 1) f = -0.0f;
+                    if (round == 2) f = std::nanf("");
+                }
+                float mn = 0.0f, mx = 0.0f;
+                for (float f : v) {
+                    mn = std::min(mn, f);
+                    mx = std::max(mx, f);
+                }
+                float scale = mx == mn ? 1.0f : (mx - mn) / 255.0f;
+                int zp = int(std::nearbyint(std::clamp(0.0f - mn / scale, 0.0f, 255.0f)));
+                Tensor xv = F({n}, v);
+                same = same && runOp(node(tts::Op::DynamicQuantize), {&xv}, o, 3);
+                float got = o[1].scalarFloat();
+                same = same && std::memcmp(&got, &scale, 4) == 0 && int(o[2].scalarFloat()) == zp;
+            }
+        }
+        CHECK(same);
+    }
     // QuantizeLinear / DequantizeLinear, per tensor (round half to even, saturation) and per axis.
     Tensor qx = F({6}, {0, 1.5f, 2.5f, -1.5f, 1000, -1000});
     Tensor s = F({}, {1.0f});
