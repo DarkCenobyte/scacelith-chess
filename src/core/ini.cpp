@@ -16,7 +16,11 @@ bool IniFile::load(const std::string& path) {
     std::ifstream f(std::filesystem::u8path(path));
     if (!f) return false;
     std::string line, section;
+    bool first = true;
     while (std::getline(f, line)) {
+        // A UTF-8 byte order mark (an editor's "UTF-8 with BOM") would hide a first [section].
+        if (first && line.compare(0, 3, "\xEF\xBB\xBF") == 0) line.erase(0, 3);
+        first = false;
         line = trim(line);
         if (line.empty() || line[0] == ';' || line[0] == '#') continue;
         if (line[0] == '[') {

@@ -27,6 +27,23 @@ TEST(ini_roundtrip) {
     CHECK_EQ(b.getBool("audio.ambience", true), false);
 }
 
+// A file saved by an editor as "UTF-8 with BOM" keeps its first section; a BOM elsewhere is text.
+TEST(ini_utf8_bom) {
+    const std::string path = net::sys::exeDirectory() + "ini-test-bom.ini";
+    std::FILE* f = net::sys::openFile(path, "wb");
+    CHECK(f != nullptr);
+    if (!f) return;
+    std::fputs("\xEF\xBB\xBF[display]\nwidth = 1920\n[graphics]\n\xEF\xBB\xBFquality = 2\n", f);
+    std::fclose(f);
+    IniFile a;
+    CHECK(a.load(path));
+    CHECK_EQ(a.getInt("display.width", -1), 1920);
+    CHECK(!a.has("width"));
+    CHECK(!a.has("graphics.quality"));
+    CHECK_EQ(a.getInt("graphics.\xEF\xBB\xBFquality", -1), 2);
+    net::sys::removeFile(path);
+}
+
 // The settings file may sit in a folder with any name: its UTF-8 path is the file's real name
 // whatever the code page (on Windows the ANSI one mangles "\xC3\x89checs" unless the process runs
 // in UTF-8). net::sys opens UTF-8 paths with the wide API.
