@@ -1185,7 +1185,10 @@ void outgoingCard(const Rect& col, float y) {
             gfx::text(i18n::ltr(o.code), im::flipX(r, r.x + 24.0f), r.y + 100.0f, cs);
         }
         gfx::text(terms, im::flipX(r, r.x + 24.0f), r.y + 138.0f, ts);
-        gfx::text(T("online.outgoing.private_hint"), im::flipX(r, r.x + 24.0f), r.y + 170.0f, ts);
+        const std::string hint = T("online.outgoing.private_hint");
+        TextStyle hs = ts;
+        hs.size = gfx::fitSize(hint, hs, r.w - 48.0f, 0.7f);
+        gfx::text(hint, im::flipX(r, r.x + 24.0f), r.y + 170.0f, hs);
     }
     float bw = 150.0f;
     if (im::button(L("common.cancel"), im::flip(r, Rect(r.r() - bw - 18.0f, r.y + 16.0f, bw, 44.0f)), im::ButtonKind::Quiet))
