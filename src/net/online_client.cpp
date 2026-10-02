@@ -1667,8 +1667,7 @@ void OnlineClient::startGoogleSso() {
             return;
         }
         json::Value b = json::Value::object();
-        b.set("codeChallenge", pkce.challenge);
-        b.set("codeChallengeMethod", "S256");
+        b.set("codeChallenge", pkce.challenge);   // S256, the only method (API.md)
         Impl::Api a = d->api(e, "POST", "/auth/sso/google/start", &b, false, d->httpCancel);
         Impl::fillError(ev, a);
         if (!a.ok()) { d->post(ev); return; }

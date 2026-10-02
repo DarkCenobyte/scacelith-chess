@@ -3935,6 +3935,44 @@ TEST(net_pow_abandoned_on_server_switch) {
     net::sys::removeFile(credPath);
 }
 
+// POST /auth/sso/google/start carries what the server's schema declares, nothing else (it refuses
+// an unknown field).
+TEST(net_sso_start_body) {
+    if (!net::transportAvailable()) return;
+    std::mutex mu;
+    std::vector<std::string> keys;
+    std::string challenge;
+    fakehttp::Server srv([&](const fakehttp::Request& q) {
+        if (q.path != "/api/v1/auth/sso/google/start") return jsonReply(404, "{\"error\":\"not_found\"}");
+        Value b = bodyOf(q);
+        std::lock_guard<std::mutex> lk(mu);
+        for (const auto& m : b.members()) keys.push_back(m.first);
+        challenge = b["codeChallenge"].asString();
+        if (keys.size() != 1 || keys[0] != "codeChallenge") return jsonReply(400, "{\"error\":\"invalid_request\"}");
+        // Not https: the client refuses it without starting a browser.
+        return jsonReply(200, "{\"attemptId\":\"sso_x\",\"authUrl\":\"http://127.0.0.1/\",\"pollMs\":2000,\"expiresIn\":600}");
+    });
+    CHECK(srv.ok());
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = srv.port();
+    ep.insecureDev = true;
+    std::string credPath = tempCredentialPath("sso-start");
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        c.startGoogleSso();
+        net::Event ev;
+        CHECK(waitEvent(c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+        CHECK_EQ(ev.error, std::string("bad_response"));   // past the schema, refused for its URL
+    }
+    std::lock_guard<std::mutex> lk(mu);
+    CHECK_EQ(keys.size(), size_t(1));
+    CHECK_EQ(challenge.size(), size_t(43));
+    net::sys::removeFile(credPath);
+}
+
 // The official server moved from port 44664 to 443: a saved session moves with it, once; other
 // origins never move.
 TEST(net_credentials_origin_move) {
