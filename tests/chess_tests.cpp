@@ -1166,6 +1166,24 @@ TEST(chess_arbiter_piece_without_legal_move) {
     CHECK(c.clockPressed(g, preset("5+3")).legal);
 }
 
+// The rules lesson relaxes touch-move: a piece that can move, put back on its square, is
+// released with reset(game) (GameScene::humanRelease); cancelTouch() keeps it committed.
+TEST(chess_arbiter_lesson_release) {
+    Game g;
+    Arbiter a;
+    a.reset(g);
+    CHECK(a.touch(g, sq("e2")));
+    CHECK(a.touchedHasLegalMove(g));
+    a.cancelTouch();                      // touch-move applies: still e2
+    CHECK_EQ(a.touchedSquare(), sq("e2"));
+    CHECK(!a.touch(g, sq("g1")));
+    a.reset(g);                           // the lesson's release
+    CHECK_EQ(a.touchedSquare(), NoSquare);
+    CHECK(a.touch(g, sq("g1")));
+    CHECK(a.place(g, sq("f3"), NoPiece));
+    CHECK(a.clockPressed(g, preset("5+3")).legal);
+}
+
 TEST(chess_arbiter_illegal_move_penalties) {
     struct Case { const char* tc; int64_t bonus; const char* text; };
     const Case cases[] = {

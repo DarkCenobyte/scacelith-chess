@@ -1608,7 +1608,9 @@ void GameScene::humanRelease() {
     vec3 pos = board_.squareBase(touchedSq_);
     dest_[p->id].push_back({touchedSq_, pos, false});
     anim_[inputSeat()].enqueue({task(anim::TaskType::Place, p->id, pos), task(anim::TaskType::Retract)});
-    arbiter_.cancelTouch();
+    // The rules lesson relaxes touch-move (lesson.cpp): a piece put back is released for real.
+    if (lesson()) arbiter_.reset(game_);
+    else arbiter_.cancelTouch();
     touchedId_ = -1;
     touchedSq_ = NoSquare;
     turn_ = Turn::HumanIdle;
