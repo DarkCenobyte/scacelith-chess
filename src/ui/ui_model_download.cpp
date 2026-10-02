@@ -23,21 +23,9 @@ using gfx::TextStyle;
 using m::vec2;
 using m::vec4;
 using namespace theme;
+using namespace detail::helpers;
 
 namespace {
-
-TextStyle style(int face, float size, vec4 color, HAlign align = HAlign::Left, float tracking = 0.0f) {
-    TextStyle st;
-    st.face = face;
-    st.size = size;
-    st.color = color;
-    st.align = align;
-    st.tracking = tracking;
-    return st;
-}
-float ease(float t) { return m::smootherstep(t); }
-std::string T(const char* key) { return i18n::tr(key); }
-std::string L(const char* key) { return std::string(i18n::tr(key)) + "##" + key; }
 
 // "145.3" with the language's decimal separator.
 std::string megabytes(double bytes) {

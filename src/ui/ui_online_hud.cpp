@@ -21,21 +21,10 @@ using gfx::TextStyle;
 using m::vec2;
 using m::vec4;
 using namespace theme;
+using namespace detail::helpers;
 
 namespace {
 
-TextStyle style(int face, float size, vec4 color, HAlign align = HAlign::Left, float tracking = 0.0f) {
-    TextStyle st;
-    st.face = face;
-    st.size = size;
-    st.color = color;
-    st.align = align;
-    st.tracking = tracking;
-    return st;
-}
-float ease(float t) { return m::smootherstep(t); }
-std::string T(const char* key) { return i18n::tr(key); }
-std::string L(const char* key) { return std::string(i18n::tr(key)) + "##" + key; }
 vec2 view() { return gfx::viewSize(); }
 Rect screenRect() {
     vec2 v = view();
@@ -43,17 +32,6 @@ Rect screenRect() {
 }
 
 const vec4 kGood(0.47f, 0.76f, 0.43f, 1.0f), kFair(0.90f, 0.70f, 0.30f, 1.0f), kPoor(0.86f, 0.36f, 0.30f, 1.0f);
-
-// A dark band like the toasts (fades out at both ends).
-void band(const Rect& r, float a) {
-    float edge = 0.25f;
-    vec4 d(0.02f, 0.017f, 0.015f, 0.78f * a), z(0.02f, 0.017f, 0.015f, 0.0f);
-    gfx::fillH(Rect(r.x, r.y, r.w * edge, r.h), z, d);
-    gfx::fill(Rect(r.x + r.w * edge, r.y, r.w * (1.0f - 2.0f * edge), r.h), d);
-    gfx::fillH(Rect(r.r() - r.w * edge, r.y, r.w * edge, r.h), d, z);
-    gfx::hlineFade(r.x + 40.0f, r.r() - 40.0f, r.y, withAlpha(gold, 0.55f * a), 0.45f);
-    gfx::hlineFade(r.x + 40.0f, r.r() - 40.0f, r.b() - 1.0f, withAlpha(gold, 0.55f * a), 0.45f);
-}
 
 void spinner(vec2 c, float r, float alpha) {
     float t = float(im::time());
@@ -110,7 +88,7 @@ OnlineHudAction onlineHud(const OnlineHud& hud) {
         TextStyle ts = style(font::FACE_ITALIC, 26.0f, withAlpha(ivory, ba.v[0]), HAlign::Center);
         float w = gfx::textWidth(lastBanner, ts) + 260.0f;
         Rect r(v.x * 0.5f - w * 0.5f, by, w, 56.0f);
-        band(r, ba.v[0]);
+        band(r, ba.v[0], 0.78f, 0.25f);
         gfx::text(lastBanner, r.cx(), r.cy() + 8.0f, ts);
         by -= 70.0f;
     }
@@ -118,7 +96,7 @@ OnlineHudAction onlineHud(const OnlineHud& hud) {
         TextStyle ts = style(font::FACE_TITLE, 20.0f, withAlpha(goldBright, 0.95f), HAlign::Center, 0.14f);
         float w = gfx::textWidth(hud.countdown, ts) + 200.0f;
         Rect r(v.x * 0.5f - w * 0.5f, v.y - 72.0f, w, 44.0f);
-        band(r, 0.8f);
+        band(r, 0.8f, 0.78f, 0.25f);
         gfx::text(hud.countdown, r.cx(), r.cy() + 7.0f, ts);
     }
     // The opponent offers a draw: a card on the end side, mouse buttons (Space belongs to the game).
