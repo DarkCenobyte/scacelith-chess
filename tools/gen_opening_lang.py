@@ -68,6 +68,7 @@ Second Semi Sharp Short Shuffle Shy Siberian Sicilian Simul Six Slav Slow Small 
 Stone Stonewall Storm Storming Swap Swedish Swiss Symmetric Symmetrical Symmetry Three Toilet Tortoise Tour
 Traditional Transpositional Two Ukrainian Ultra Unicorn Valencian Viennese Walk Wall Wasp Wayward Westphalian Whip
 Wild Wind Wing Winter Wolf Woodchuck Yugoslav Hyperaccelerated Accelerated Wing Beginner Dragon Lion Hippo Rat
+Catalan Danish Florentine Kazakh Netherlands Scotch
 Amsterdam Belgrade Berlin Birmingham Bremen Breslau Brooklyn Brussels Budapest Cambridge Chicago Cologne Copenhagen
 Cracow Dresden Edinburgh Frankfurt Hastings Leningrad Lisbon London Manhattan Melbourne Moscow Oxford Paris Prague
 Riga Seville Stockholm Tashkent Venice Vienna Warsaw York Zagreb Zurich Nuremberg Nürnberg Düsseldorf Wiesbaden
