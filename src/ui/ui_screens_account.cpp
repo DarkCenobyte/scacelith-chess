@@ -414,7 +414,9 @@ AccountNav pageHistory(float t, bool fresh) {
                 T(filtered ? "online.history.empty_filter" : "online.history.empty"), goldBright);
     } else {
         gfx::pushAlpha(h.waiting() ? 0.45f : 1.0f);
-        for (size_t i = 0; i < page.games.size(); ++i) {
+        // The rows the list has room for: a server sending more than the page asked for shows no more.
+        const size_t rows = std::min(page.games.size(), size_t(game::HistoryPager::kPageSize));
+        for (size_t i = 0; i < rows; ++i) {
             const net::GameSummary& g = page.games[i];
             const Rect r(x0, list.y + float(i) * rowH, cw, rowH - 6.0f);
             im::Item it = im::item(im::makeId(std::to_string(g.id)), r, h.waiting() ? im::ITEM_DISABLED : im::ITEM_FOCUSABLE);
