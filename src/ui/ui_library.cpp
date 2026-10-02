@@ -33,6 +33,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 #include <ctime>
 #include <exception>
 #include <future>
@@ -282,12 +283,65 @@ struct Listing {
     std::string folder;
     std::vector<archive::Entry> entries;
     archive::ListStats stats;
+    uint64_t print = 0;                // listingPrint(): equal for the same games, files and errors
+    bool unchanged = false;            // the same print as the listing shown: 'entries' left empty
 };
-Listing listFolder(std::string folder, const std::atomic<bool>* cancel) {
+// A 64-bit hash of all a listing holds but its counts of files read and cached (8 bytes a step).
+uint64_t listingPrint(const Listing& l) {
+    uint64_t h = 0xcbf29ce484222325ull;
+    auto val = [&h](uint64_t v) {
+        h = (h ^ v) * 0x9e3779b97f4a7c15ull;
+        h ^= h >> 29;
+    };
+    auto str = [&val](const std::string& s) {
+        val(s.size());
+        for (size_t i = 0; i < s.size(); i += 8) {
+            uint64_t w = 0;
+            std::memcpy(&w, s.data() + i, std::min<size_t>(8, s.size() - i));
+            val(w);
+        }
+    };
+    str(l.folder);
+    val(uint64_t(l.stats.files));
+    val(l.stats.truncated);
+    str(l.stats.error);
+    val(l.entries.size());
+    for (const archive::Entry& e : l.entries) {
+        str(e.path);
+        str(e.file);
+        val(uint64_t(e.index));
+        val(uint64_t(e.games));
+        val(e.fileSize);
+        val(uint64_t(e.fileTimeMs));
+        val(e.offset);
+        val(e.length);
+        val(uint64_t(e.line));
+        val(uint64_t(e.column));
+        val(e.tags.size());
+        for (const chess::pgn::Tag& t : e.tags) {
+            str(t.name);
+            str(t.value);
+        }
+        val(uint64_t(e.plies));
+        str(e.result);
+        val(uint64_t(e.mode));
+        str(e.error);
+        val(e.fileError);
+    }
+    return h;
+}
+// 'shownPrint' is the print of the listing shown (0: none): when this one is the same, its entries
+// are freed here rather than in a frame (up to kMaxListed games every kRelistSeconds).
+Listing listFolder(std::string folder, const std::atomic<bool>* cancel, uint64_t shownPrint) {
     Listing l;
     l.folder = folder;
     l.entries = archive::list(folder, &l.stats, cancel);
     if (l.stats.cancelled) return l;
+    l.print = listingPrint(l);
+    if (shownPrint != 0 && l.print == shownPrint) {
+        l.entries = std::vector<archive::Entry>();
+        l.unchanged = true;
+    }
     // The opening book and texts are built on first use (~40 ms): here rather than in a frame.
     coach::OpeningBook::instance();
     coach::OpeningTexts::instance();
@@ -346,7 +400,7 @@ constexpr double kRelistSeconds = 2.0;
 void requestListing(LibraryState& s) {
     if (s.pending.valid()) return;
     s.cancel = false;
-    s.pending = std::async(std::launch::async, listFolder, s.folder, &s.cancel);
+    s.pending = std::async(std::launch::async, listFolder, s.folder, &s.cancel, s.listed ? s.listing.print : 0);
 }
 // Takes the listing once it is ready (waiting up to waitMs for it).
 void pollListing(LibraryState& s, int waitMs) {
@@ -361,14 +415,16 @@ void pollListing(LibraryState& s, int waitMs) {
     }
     s.lastList = im::time();
     if (l.folder != s.folder || l.stats.cancelled) return;  // the folder changed meanwhile, or stopped
-    if (!s.listed || l.stats.read > 0 || l.entries.size() != s.listing.entries.size())
-        LOGI("library: %d games in %d files (%d read, %d cached)%s%s", int(l.entries.size()), l.stats.files, l.stats.read,
+    const size_t games = l.unchanged ? s.listing.entries.size() : l.entries.size();
+    if (!s.listed || l.stats.read > 0 || games != s.listing.entries.size())
+        LOGI("library: %d games in %d files (%d read, %d cached)%s%s", int(games), l.stats.files, l.stats.read,
              l.stats.cached, l.stats.error.empty() ? "" : ": ", l.stats.error.c_str());
     if (l.stats.truncated && !s.truncatedShown) {
         notify(i18n::trf("library.truncated", {num(archive::kMaxListed)}), 6.0f);
         s.truncatedShown = true;
     }
-    s.listing = std::move(l);
+    if (l.unchanged) s.listing.stats = l.stats;  // the games shown are kept
+    else s.listing = std::move(l);
     s.listed = true;
 }
 
