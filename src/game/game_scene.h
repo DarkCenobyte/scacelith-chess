@@ -469,6 +469,7 @@ private:
     Turn turn_ = Turn::None;
     float stateTime_ = 0.0f;
     float time_ = 0.0f;
+    double timeSum_ = 0.0;  // time_ summed in double: float += dt drifts within hours, then stops
     bool paused_ = false;
     bool startWatching_ = false;  // --viewer
     bool skipIntro_ = false;
