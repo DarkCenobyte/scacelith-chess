@@ -101,8 +101,6 @@ event.end.draw.3 = نتيجة منصفة. مباراة ممتعة.
 event.end.resigned = انتهت المباراة باستسلامك. لكن مقاومتك كانت جيدة.
 event.end.resigned.2 = حسنًا. شكرًا على المباراة.
 event.end.handshake = لنتصافح.
-event.end.handshake.2 = شكرًا لك على هذه المباراة.
-event.end.handshake.3 = مباراة جيدة. شكرًا لك.
 
 # ---- The rules lesson -----------------------------------------------------------------------------------------
 # {chapter} = the chapter's title (lesson.title.* in lesson.lang, definite noun phrases: "مع التبييت").

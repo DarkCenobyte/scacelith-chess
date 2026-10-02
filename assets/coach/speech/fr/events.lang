@@ -99,8 +99,6 @@ event.end.draw.3 = Un résultat juste. Bonne partie.
 event.end.resigned = Tu as abandonné. C’était quand même une belle lutte.
 event.end.resigned.2 = D’accord. Merci pour la partie.
 event.end.handshake = Serrons-nous la main.
-event.end.handshake.2 = Merci d’avoir joué avec moi.
-event.end.handshake.3 = Merci, c’était un plaisir.
 
 # ---- The rules lesson -----------------------------------------------------------------------------------------
 # {chapter} = the chapter's title with its article ("le roque", lesson.title.* in lesson.lang): never

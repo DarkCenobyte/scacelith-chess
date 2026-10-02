@@ -98,8 +98,6 @@ event.end.draw.3 = 很公平的結果。這盤下得很好。
 event.end.resigned = 你認輸了。不過這盤你下得很頑強。
 event.end.resigned.2 = 好的。謝謝你陪我下棋。
 event.end.handshake = 我們握個手吧。
-event.end.handshake.2 = 謝謝你陪我下這盤棋。
-event.end.handshake.3 = 下得不錯。謝謝你。
 
 # ---- The rules lesson -----------------------------------------------------------------------------------------
 # {chapter} = the chapter's title (lesson.title.* in lesson.lang), in 「」 inside a sentence.

@@ -98,8 +98,6 @@ event.end.draw.3 = Ein gerechtes Ergebnis. Gute Partie.
 event.end.resigned = Du hast aufgegeben. Trotzdem gut gekämpft.
 event.end.resigned.2 = In Ordnung. Danke für die Partie.
 event.end.handshake = Geben wir uns die Hand.
-event.end.handshake.2 = Danke fürs Spielen.
-event.end.handshake.3 = Gute Partie. Danke schön.
 
 # ---- The rules lesson -----------------------------------------------------------------------------------------
 # {chapter} = the chapter's title (lesson.title.* in lesson.lang). German titles are dative noun phrases

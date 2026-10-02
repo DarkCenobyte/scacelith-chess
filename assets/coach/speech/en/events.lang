@@ -98,8 +98,6 @@ event.end.draw.3 = A fair result. Good game.
 event.end.resigned = You resigned. Good fight anyway.
 event.end.resigned.2 = All right. Thank you for the game.
 event.end.handshake = Let's shake hands.
-event.end.handshake.2 = Thank you for the game.
-event.end.handshake.3 = Good game. Thank you.
 
 # ---- The rules lesson -----------------------------------------------------------------------------------------
 # {chapter} = the chapter's title (lesson.title.* in lesson.lang).
