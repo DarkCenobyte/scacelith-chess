@@ -1,6 +1,13 @@
 #include "test.h"
 #include "math/math.h"
+#include "core/image.h"
 #include "core/ini.h"
+#include "net/crypto.h"
+#include "net/net_sys.h"
+
+#include <cstdio>
+#include <string>
+#include <vector>
 
 TEST(math_quat_roundtrip) {
     m::quat q = m::axisAngle(m::vec3(0.3f, 1.0f, -0.2f), 1.1f);
@@ -24,4 +31,29 @@ TEST(ini_roundtrip) {
     CHECK(b.load("/tmp/scacelith_ini_test.ini"));
     CHECK_EQ(b.getInt("display.width"), 1920);
     CHECK_EQ(b.getBool("audio.ambience", true), false);
+}
+
+// Every byte of the PNG writer's output. Its deflate blocks hold 65535 bytes: 28x771 RGB fills
+// exactly one, 1x16384 RGB overflows it by one byte; all-0xFF pixels are Adler-32's worst case.
+TEST(image_png_bytes) {
+    struct Case { int w, h, ch, fill; const char* sha; };
+    const Case cases[] = {
+        {7, 3, 3, -1, "6dbb0a77308d3aebdc6514d0ba87fa6934fbb73075e08cde0d29de2ac53c8818"},
+        {300, 200, 3, -1, "73e9a79701068da41448e4d0a99b78fb77758599c21439ef6a9974c2a40d816b"},
+        {129, 77, 4, -1, "6443f018d226c8da5f08543d9d45cd09c706d598687e5b5b33af1510632d144d"},
+        {0, 0, 3, -1, "906dd47a9e7e9d78e9d45b4d527a0b6d75d57d5913293408c34ae208b2259899"},
+        {28, 771, 3, -1, "5288d0ec1034bf9d581caff5beb5d6ee0687536cb925d927f372de580f64ef7c"},
+        {1, 16384, 3, -1, "0ed95e73673cce70ce2cd99eead5b66f61d6e3d6bc913bc5f611dbee018eb98c"},
+        {1000, 200, 4, 255, "fcc5134c68170922b63c383aedcb29ce6486492807f5e07d0370f3b6e2f3052c"},
+    };
+    const std::string path = "/tmp/scacelith_png_test.png";
+    for (const Case& c : cases) {
+        std::vector<uint8_t> px(size_t(c.w) * size_t(c.h) * size_t(c.ch) + 1);
+        for (size_t i = 0; i < px.size(); ++i) px[i] = c.fill >= 0 ? uint8_t(c.fill) : uint8_t(i * 31 + (i >> 7) * 7);
+        CHECK(image::writePNG(path, c.w, c.h, c.ch, px.data()));
+        std::string bytes;
+        CHECK(net::sys::readFile(path, bytes, size_t(1) << 24));
+        CHECK_EQ(net::crypto::hex(net::crypto::sha256(bytes)), std::string(c.sha));
+    }
+    std::remove(path.c_str());
 }

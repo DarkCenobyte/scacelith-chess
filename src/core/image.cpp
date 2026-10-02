@@ -1,4 +1,5 @@
 #include "image.h"
+#include <algorithm>
 #include <cstdio>
 
 namespace image {
@@ -20,14 +21,15 @@ uint32_t crc(const uint8_t* d, size_t n, uint32_t c = 0xFFFFFFFFu) {
 void be32(std::vector<uint8_t>& o, uint32_t v) {
     o.push_back(uint8_t(v >> 24)); o.push_back(uint8_t(v >> 16)); o.push_back(uint8_t(v >> 8)); o.push_back(uint8_t(v));
 }
+// Length, type, data, CRC of type and data; the data is written where it is, not copied.
 void chunk(FILE* f, const char* type, const std::vector<uint8_t>& data) {
-    std::vector<uint8_t> buf;
-    be32(buf, uint32_t(data.size()));
-    buf.insert(buf.end(), type, type + 4);
-    buf.insert(buf.end(), data.begin(), data.end());
-    uint32_t c = crc(buf.data() + 4, buf.size() - 4) ^ 0xFFFFFFFFu;
-    be32(buf, c);
-    std::fwrite(buf.data(), 1, buf.size(), f);
+    std::vector<uint8_t> head, tail;
+    be32(head, uint32_t(data.size()));
+    head.insert(head.end(), type, type + 4);
+    be32(tail, crc(data.data(), data.size(), crc(head.data() + 4, 4)) ^ 0xFFFFFFFFu);
+    std::fwrite(head.data(), 1, head.size(), f);
+    if (!data.empty()) std::fwrite(data.data(), 1, data.size(), f);
+    std::fwrite(tail.data(), 1, tail.size(), f);
 }
 }  // namespace
 
@@ -52,6 +54,8 @@ bool writePNG(const std::string& path, int w, int h, int ch, const uint8_t* px) 
         raw.insert(raw.end(), px + size_t(y) * stride, px + size_t(y + 1) * stride);
     }
     std::vector<uint8_t> z = {0x78, 0x01};
+    size_t blocks = std::max<size_t>(1, (raw.size() + 65534) / 65535);
+    z.reserve(2 + 5 * blocks + raw.size() + 4);
     size_t pos = 0;
     while (pos < raw.size() || raw.empty()) {
         size_t n = std::min<size_t>(65535, raw.size() - pos);
@@ -63,8 +67,13 @@ bool writePNG(const std::string& path, int w, int h, int ch, const uint8_t* px) 
         pos += n;
         if (raw.empty()) break;
     }
+    // Adler-32, reduced every 5552 bytes (zlib's NMAX: the sums cannot overflow 32 bits sooner).
     uint32_t a = 1, b = 0;
-    for (uint8_t v : raw) { a = (a + v) % 65521; b = (b + a) % 65521; }
+    for (size_t i = 0; i < raw.size();) {
+        size_t end = std::min<size_t>(raw.size(), i + 5552);
+        for (; i < end; ++i) { a += raw[i]; b += a; }
+        a %= 65521; b %= 65521;
+    }
     be32(z, (b << 16) | a);
     chunk(f, "IDAT", z);
     chunk(f, "IEND", {});
