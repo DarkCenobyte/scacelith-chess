@@ -77,7 +77,9 @@ bool directMatchRecord(const net::OnlineGame& og, DirectRecord& out) {
     info.timeControl = tc.pgnTag();
     if (og.status == StOngoing) {
         // Left before the authority answered: aborted before the player's first move, otherwise
-        // resigned.
+        // resigned. A first move sent but not confirmed yet is not in og.moves: the scene resigns
+        // then (GameScene::myFirstMoveMade), but nothing is saved rather than a record without
+        // the move the authority may have applied before the resignation.
         const bool firstMoveMade = int(og.moves.size()) > og.you;
         if (!firstMoveMade) return false;
         info.result = og.you == 0 ? "0-1" : "1-0";

@@ -110,7 +110,7 @@ std::string trimmed(const std::string& s) {
     return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
 }
 
-// The human's handwriting on the scoresheets (Options > Player; localPlayerName: the name).
+// The human's handwriting style on the scoresheets (Options > Player; the name: localPlayerName).
 int humanHandStyle() { return int(settings().handStyle); }
 
 const char* sideKey(Color c) { return c == White ? "viewer.side.white" : "viewer.side.black"; }
@@ -952,9 +952,9 @@ void GameScene::applySettings(bool displayToo) {
 }
 
 void GameScene::shutdown(AppContext& ctx) {
-    // Closing the game in the middle of a game leaves it like the menu does: an online game is
-    // resigned (aborted before my first move), a rated game resigned (screenshot runs excepted:
-    // they stop wherever the capture happens).
+    // Closing the window during a game leaves it the way the menu does: an online game is resigned
+    // (aborted before my first move), a game against Stockfish resigned and rated (screenshot runs
+    // excepted: they stop wherever the capture happens).
     if (!ctx.screenshotMode && online() && link_ && state_ == State::Playing && og_.status == 0) {
         leaveOngoingOnlineGame();
     } else if (!ctx.screenshotMode && !watching() && !hotSeat() && !coach() && state_ == State::Playing &&

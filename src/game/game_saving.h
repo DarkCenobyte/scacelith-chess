@@ -40,8 +40,9 @@ struct DirectRecord {
 // 'og.you' is the local player's colour (0 White, 1 Black). When the authority still reports the
 // game as ongoing, the player is leaving it (the Esc menu, the window closed): the resignation or
 // the abort they just sent is not answered yet. Before their first move the game is aborted and
-// nothing is saved; after it, it is saved as their resignation, the result the opponent's copy
-// gets. A game the guest ended itself when the host was gone for good (status Aborted, reason
+// nothing is saved (nor while that move is sent but not confirmed: the scene resigns then, but
+// og.moves lacks the move); after it, it is saved as their resignation, the result the opponent's
+// copy gets. A game the guest ended itself when the host was gone for good (status Aborted, reason
 // ServerAborted) is saved unfinished ("*") once both players have moved. False when nothing is to
 // be saved: a game aborted by the authority, a spectator, or moves that do not follow one another
 // (never expected from an authority; logged).
