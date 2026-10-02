@@ -17,7 +17,7 @@ struct SfxInfo {
     float roomSend;     // hall send, relative to level (distance independent: diffuse field)
     float pitchJitter;  // +- relative pitch randomisation per trigger
     float levelJitterDb;
-    bool ui;            // rendered centred/dry by default (playUI)
+    bool ui;            // UI bus (playUI renders it centred; the hall send still applies)
 };
 const SfxInfo& sfxInfo(Sfx s);
 

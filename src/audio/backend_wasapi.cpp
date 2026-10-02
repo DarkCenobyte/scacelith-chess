@@ -1,8 +1,8 @@
 // WASAPI shared-mode, event-driven output. The mixer runs at the device mix rate (no resampling
 // stage) and its float stereo is converted to the mix format (float32 / int16 / int24 / int32,
-// any channel count: L/R go to the front pair, mono gets the sum). Device loss, default-device
-// changes and stalls reopen the device; with no device the thread retries with a back-off and
-// stays silent. MMCSS "Pro Audio" priority when available.
+// any channel count: L/R go to the front pair, mono gets their average). Device loss,
+// default-device changes and stalls reopen the device; with no device the thread retries with a
+// back-off and stays silent. MMCSS "Pro Audio" priority when available.
 #ifdef _WIN32
 #include "backend.h"
 #include "dsp.h"
