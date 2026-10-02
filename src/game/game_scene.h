@@ -391,7 +391,7 @@ private:
     void endLesson();                         // the rules lesson is over: its own ending
     bool coachEndCardReady() const;           // GameOver: the coach has said everything
     bool coachHandshakeWanted() const;        // GameOver: the closing words are said
-    bool coachHoldsMove() const;              // updateAi: the coach's move waits (review, hands)
+    bool coachHoldsMove() const;              // updateAi: the coach's move waits (review, hands, draw offer)
     bool coachMayTouch() const;               // the player may touch a piece now
     void coachPlayerTouched();                // humanTouch(): the session hears of it
     void coachIllegalAttempt(chess::Square from, chess::Square to);

@@ -851,6 +851,7 @@ bool GameScene::coachHoldsMove() const {
     if (rt.test) return true;   // the stage test owns the table
     if (rt.sessionRunning && !rt.session.coachMayMove()) return true;
     if (rt.jobRunning || !rt.jobs.empty()) return true;
+    if (rt.drawAnalysis) return true;   // it answers a draw offer before it plays on
     // Its hand first finishes what it shows (a gesture's hold ends with the line, see updateCoach).
     return anim_[aiSeat()].busy();
 }
@@ -991,7 +992,8 @@ void GameScene::updateCoach(float dt) {
             LOGI("coach: draw offer %s (%d cp for the coach)", accept ? "accepted" : "declined", coachCp);
         }
         rt.drawAnalysis = 0;
-        // An offer the game went past (a move made since) lapsed: it is answered as declined.
+        // An offer the game went past lapsed (the player moved or took a move back since; the
+        // coach's own move waits for its answer, see coachHoldsMove): it is answered as declined.
         if (state_ == State::Playing) {
             ui::notify(i18n::tr(accept ? "notify.draw_accepted" : "notify.draw_declined"), 3.0f);
             if (rt.sessionRunning) rt.session.onDrawAnswer(accept);
@@ -1123,7 +1125,7 @@ void GameScene::coachPauseMenuFrame() {
     CoachRuntime& rt = coachRuntime();
     ui::CoachPause cp;
     cp.canTakeBack = coachCanTakeBack();
-    cp.canOfferDraw = !lesson() && drawOfferPly_ != int(game_.moves().size()) && !rt.drawAnalysis;
+    cp.canOfferDraw = !lesson() && drawOfferPly_ != int(game_.moves().size()) && !rt.drawAnalysis && quietTurn();
     cp.canClaimDraw = !lesson() && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
     cp.canResign = !lesson();
     switch (menuChoice(ui::coachPauseMenu(cp))) {
