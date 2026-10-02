@@ -108,6 +108,9 @@ public:
     // Returns the best move once ready ("e2e4", "e7e8q"), empty on failure. evalCp is from the
     // engine's point of view (side to move), mate scores mapped to +-100000.
     std::string takeMove(int* evalCp = nullptr);
+    // Cancels the move request: a queued search is dropped, a running one stopped and its result
+    // discarded (moveReady() false). Evaluations and analyses are left alone.
+    void cancelMove();
     // Abort the running search and every queued one once it has completed depth 1 (a move or
     // analysis is still reported). To cut a single analysis short, use stopAnalysis().
     void stopSearch();

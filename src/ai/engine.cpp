@@ -671,6 +671,14 @@ std::string Engine::takeMove(int* evalCp) {
     return std::move(d.move);
 }
 
+void Engine::cancelMove() {
+    Impl& d = *impl_;
+    if (!d.started) return;
+    d.cancel(Job::Move);
+    d.moveReady = false;
+    d.move.clear();
+}
+
 void Engine::stopSearch() {
     Impl& d = *impl_;
     d.pump();

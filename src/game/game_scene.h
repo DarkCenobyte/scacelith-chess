@@ -208,6 +208,9 @@ private:
     void updateHumanInput();
     void offerDraw();
     void updateAi(float dt);
+    // The game ends or is left while Stockfish searches the AI's move: the search is cancelled (it
+    // would go on to the end of its time budget). Not in coach games (their closing analyses).
+    void cancelAiSearch();
     void onClockPressed(int seat);
     // The move on the board is completed (FIDE 6.2.1; untimed: 4.7): the arbiter's verdict, the
     // move into game_, the scoresheets, the end of the game, then the turn passes (hot-seat: the

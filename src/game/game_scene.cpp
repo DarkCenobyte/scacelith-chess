@@ -346,6 +346,7 @@ bool GameScene::pieceInHand(const PieceObject& p) const {
 }
 
 void GameScene::enterMenu() {
+    cancelAiSearch();
     // A game still unsaved (the window of a game left in an unusual way): saved now, while link_
     // and the game are still there (archiveGame does nothing when it ran already).
     archiveGame(game_.isOver());
@@ -749,7 +750,12 @@ void GameScene::beginTurn() {
     }
 }
 
+void GameScene::cancelAiSearch() {
+    if (engineOk_ && !coach() && turn_ == Turn::AiThinking && aiRequested_ && !aiHasMove_) engine_.cancelMove();
+}
+
 void GameScene::endGame() {
+    cancelAiSearch();
     // A piece still gripped on its square is let go.
     if (turn_ == Turn::HumanTouched && touchedId_ >= 0) {
         PieceObject* p = board_.byId(touchedId_);

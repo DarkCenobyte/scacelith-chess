@@ -440,6 +440,31 @@ TEST(ai_stop_search) {
     e.shutdown();
 }
 
+// The game ends or is left during the AI's search: the request is cancelled, Stockfish stops at
+// once, no move is reported, and the next request is answered normally.
+TEST(ai_cancel_move) {
+    ai::Engine e;
+    CHECK(e.start());
+    CHECK(e.waitReady(30000));
+    ai::EngineSettings s;
+    s.moveTimeMs = 60000;
+    e.configure(s);
+    e.requestMove(kItalian, ai::ClockInfo{});
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    CHECK(!e.moveReady());
+    auto t0 = SteadyClock::now();
+    e.cancelMove();
+    CHECK(e.sync(2000));
+    std::fprintf(stderr, "  cancelled after 300 ms, engine idle %d ms later\n", msSince(t0));
+    CHECK(!e.moveReady());
+    CHECK_EQ(e.takeMove(), std::string());
+    e.cancelMove();  // nothing pending: no effect
+    e.configure(fast());
+    e.requestMove(kItalian, ai::ClockInfo{});
+    CHECK(plausibleMove(kItalian, waitMove(e, 20000)));
+    e.shutdown();
+}
+
 TEST(ai_supersede_and_new_games) {
     ai::Engine e;
     CHECK(e.start());
