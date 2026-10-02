@@ -74,7 +74,6 @@ struct AppraisalStats {
     int bestStreak = 0;                            // longest run of Best / Excellent (book / forced skipped)
     int criticalPly = -1;                          // the human ply with the largest Δ >= 10 (earliest on ties)
     int turningPly = -1;                           // first human ply from W% >= 50 to < 40 (or a comeback <= 50 to > 60)
-    bool comeback = false;                         // the turning point is a comeback
     BestMoment bestMoment = BestMoment::None;
     int bestPly = -1;                              // the best moment's ply (-1: streak / phase)
     int bestPhase = -1;                            // BestMoment::Phase: 0..2
@@ -83,7 +82,6 @@ struct AppraisalStats {
     int offers = 0, takebacks = 0, fixed = 0;      // takeback offers, taken, replayed with Δ < 5
     int coachHungPly = -1;                         // a coach move that hung a piece of 3+ the human did not take
     chess::PieceType coachHungType = chess::NoPiece;
-    chess::Square coachHungSquare = chess::NoSquare;
     double humanWinAtEnd = -1.0;                   // the human's W% at the last evaluated position (resignation)
 };
 

@@ -340,7 +340,7 @@ AppraisalStats Appraisal::stats(const Game& g) const {
     st.numbers = st.humanMoves >= 10 && double(unjudged) <= 0.2 * double(st.humanMoves) && st.human.accuracy >= 0.0;
 
     // The human's moves: specials, streak, critical moment, turning point, theme.
-    int streak = 0, bestStreakEnd = -1;
+    int streak = 0;
     double critDelta = 10.0;
     double prevPlayed = -1.0;
     std::map<ExType, int> faults;
@@ -352,10 +352,7 @@ AppraisalStats Appraisal::stats(const Game& g) const {
         if (v.great) ++st.great;
         if (v.cls == MoveClass::Best || v.cls == MoveClass::Excellent) {
             ++streak;
-            if (streak > st.bestStreak) {
-                st.bestStreak = streak;
-                bestStreakEnd = v.ply;
-            }
+            if (streak > st.bestStreak) st.bestStreak = streak;
         } else if (v.cls != MoveClass::Book && v.cls != MoveClass::Forced && v.cls != MoveClass::Unjudged) {
             streak = 0;
         }
@@ -366,10 +363,7 @@ AppraisalStats Appraisal::stats(const Game& g) const {
         }
         if (judgedMove && st.turningPly < 0) {
             if (v.wBest >= 50.0 && v.wPlayed < 40.0) st.turningPly = v.ply;
-            else if (prevPlayed >= 0.0 && prevPlayed <= 50.0 && v.wPlayed > 60.0) {
-                st.turningPly = v.ply;
-                st.comeback = true;
-            }
+            else if (prevPlayed >= 0.0 && prevPlayed <= 50.0 && v.wPlayed > 60.0) st.turningPly = v.ply;
         }
         if (v.cls != MoveClass::Unjudged) prevPlayed = v.wPlayed;
         if ((v.cls == MoveClass::Mistake || v.cls == MoveClass::Blunder) && v.exType != ExType::None) {
@@ -377,7 +371,6 @@ AppraisalStats Appraisal::stats(const Game& g) const {
             faults[v.exType]++;
         }
     }
-    (void)bestStreakEnd;
     int themeCount = 1;
     for (ExType t : faultOrder)
         if (faults[t] > themeCount) {
@@ -441,7 +434,6 @@ AppraisalStats Appraisal::stats(const Game& g) const {
         if (x.empty() || x.color == human_ || kPiecePoints[x.type] < 3) continue;
         st.coachHungPly = v.ply - 1;
         st.coachHungType = x.type;
-        st.coachHungSquare = bm.to;
         break;
     }
     return st;
