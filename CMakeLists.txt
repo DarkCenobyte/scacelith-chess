@@ -113,7 +113,7 @@ if(Python3_Interpreter_FOUND AND EXISTS ${ROOT}/third_party/stockfish/tools/isa_
         COMMENT "Auditing the instruction sets of the TTS kernels" VERBATIM)
     add_custom_target(tts_isa_audit ALL DEPENDS ${stamp})
 else()
-    message(STATUS "Python 3 not found: the TTS instruction-set audit is skipped")
+    message(WARNING "Python 3 not found: the TTS instruction-set audit is skipped")
 endif()
 include(third_party/supertonic3/supertonic3.cmake)
 # Networking (src/net): online client (WinHTTP, DPAPI, the shell for SSO), direct match (Winsock,
