@@ -14,6 +14,8 @@
 //   - The RatingRestored notice, held back while a game is being played.
 //   - Which realtime errors belong to the game being played, and which refuse the challenge being
 //     created (OnlineSession's handling of them).
+//   - Which game a realtime message is about, whether a RatingUpdate rates the game shown, and
+//     which ServerInfoResult answers Options' "Test connection" (OnlineSession's routing).
 #pragma once
 #include "../chess/chess.h"
 #include "../math/math.h"
@@ -24,6 +26,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
+#include <string>
 #include <vector>
 
 namespace game {
@@ -366,6 +369,29 @@ inline bool challengeRefused(int code) {
     using E = net::proto::ErrorCode;
     return code == int(E::UserUnavailable) || code == int(E::ChallengeLimit) || code == int(E::CannotChallengeSelf) ||
            code == int(E::RatedRequiresOfficialTc) || code == int(E::InvalidTimeControl);
+}
+
+// =============================================================================================
+// Routing
+// =============================================================================================
+
+// The game a realtime message is about: the one it names, or the one its snapshot carries. e.game
+// is the game shown now, not the one of a late message (a rematch may have begun since).
+inline uint64_t eventGameId(const net::Event& e) { return e.gameId ? e.gameId : e.game.id; }
+
+// A RatingUpdate follows the commit of its game, and a rematch may have begun meanwhile: only the
+// update of the game shown (e.game, whose 'you' is our side) changes the account's ratings in
+// place, in its queue's category or else (a challenge) the game's. For an earlier game the account
+// is fetched again.
+inline bool ratesShownGame(const net::Event& e) { return e.gameId == e.game.id; }
+inline const std::string& ratingCategory(const net::Event& e) {
+    return e.queueCategory.empty() ? e.game.category : e.queueCategory;
+}
+
+// Options' "Test connection": a ServerInfoResult answers it only from the tested server (the info
+// of the server in use, asked before the test, may come first).
+inline bool testAnswer(const net::Event& e, bool testing, const std::string& testOrigin) {
+    return e.kind == net::Event::Kind::ServerInfoResult && testing && e.origin == testOrigin;
 }
 
 }  // namespace live

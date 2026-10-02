@@ -665,7 +665,7 @@ void OnlineSession::update(float dt) {
 
 void OnlineSession::handleServer(net::Event& e) {
     if (isGameEvent(e.kind)) {
-        if (e.kind == Kind::RatingUpdate && e.gameId != e.game.id) {
+        if (e.kind == Kind::RatingUpdate && !live::ratesShownGame(e)) {
             // The update of an earlier game (it follows the game's commit: a rematch may have
             // started meanwhile). e.game is the game shown now, not our side in that one.
             if (signedIn_) {
@@ -674,7 +674,7 @@ void OnlineSession::handleServer(net::Event& e) {
             }
         } else if (e.kind == Kind::RatingUpdate) {
             // The account page shows the new rating at once.
-            const std::string& category = e.queueCategory.empty() ? e.game.category : e.queueCategory;
+            const std::string& category = live::ratingCategory(e);
             for (net::RatingInfo& r : account_.ratings) {
                 if (category.empty() || r.category != category) continue;
                 const net::Event::Rating& mine = e.game.you == 1 ? e.ratingBlack : e.ratingWhite;
@@ -691,7 +691,7 @@ void OnlineSession::handleServer(net::Event& e) {
     // devices, account or session. Its GIF is still written and its PGN still saved (ServerAnswers
     // keeps it for the game page), each as the game it was asked for. (The info of the server being
     // tested in Options names that server.)
-    const bool testAnswer = e.kind == Kind::ServerInfoResult && testing_ && e.origin == testOrigin_;
+    const bool testAnswer = live::testAnswer(e, testing_, testOrigin_);
     if (answers_.foreign(e) && !testAnswer) {
         if (e.kind == Kind::GifResult) gif_.finish(std::move(e));
         else if (!answers_.keep(std::move(e))) LOGI("online: an answer of %s dropped (another server since)", e.origin.c_str());
@@ -931,7 +931,7 @@ void OnlineSession::handleDirect(const net::Event& e) {
 }
 
 void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
-    uint64_t id = e.gameId ? e.gameId : e.game.id;  // the message's game (e.game: the one shown now)
+    uint64_t id = live::eventGameId(e);
     if (e.kind == Kind::GameSnapshot && id != gameId_ && e.game.status == 0) {
         // A new game: matchmaking, a challenge, a rematch, a direct match.
         gameId_ = id;

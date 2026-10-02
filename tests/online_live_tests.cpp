@@ -552,3 +552,44 @@ TEST(live_challenge_refusals_are_only_those_of_its_creation) {
     CHECK(!live::challengeRefused(0));
     CHECK(!live::challengeRefused(106));
 }
+
+TEST(live_routing_follows_the_game_a_message_names) {
+    using K = net::Event::Kind;
+    net::Event e;
+    e.kind = K::MoveMade;
+    e.gameId = 7;
+    e.game.id = 7;
+    CHECK_EQ(live::eventGameId(e), uint64_t(7));
+    // A late message of game 7 while the rematch 8 is shown: game 7's.
+    e.game.id = 8;
+    CHECK_EQ(live::eventGameId(e), uint64_t(7));
+    // No game named: the one its snapshot carries.
+    e.gameId = 0;
+    CHECK_EQ(live::eventGameId(e), uint64_t(8));
+
+    // A RatingUpdate of the game shown changes the account in place, in its queue's category or
+    // else (a challenge) the game's; one of an earlier game does not.
+    net::Event r;
+    r.kind = K::RatingUpdate;
+    r.gameId = 8;
+    r.game.id = 8;
+    r.game.category = "5+3";
+    CHECK(live::ratesShownGame(r));
+    CHECK_EQ(live::ratingCategory(r), std::string("5+3"));
+    r.queueCategory = "3+2";
+    CHECK_EQ(live::ratingCategory(r), std::string("3+2"));
+    r.gameId = 7;
+    CHECK(!live::ratesShownGame(r));
+}
+
+TEST(live_test_answer_comes_from_the_tested_server) {
+    net::Event e;
+    e.kind = net::Event::Kind::ServerInfoResult;
+    e.origin = "other.test:443";
+    CHECK(live::testAnswer(e, true, "other.test:443"));
+    // The info of the server in use (asked before the test), or no test going on.
+    CHECK(!live::testAnswer(e, true, "play.example:443"));
+    CHECK(!live::testAnswer(e, false, "other.test:443"));
+    e.kind = net::Event::Kind::AccountResult;
+    CHECK(!live::testAnswer(e, true, "other.test:443"));
+}
