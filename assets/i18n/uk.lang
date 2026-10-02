@@ -1,6 +1,6 @@
 # Scacelith - Українська
-# Переклад assets/i18n/en.lang (ті самі ключі, ті самі {n}). Множина: один|кілька|багато
-# (1 хід | 2 ходи | 5 ходів).
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals have three forms:
+# one (1, 21, 31...)|few (2-4, 22-24...)|many (0, 5-20, 25-30...).
 
 language.name = Українська
 

@@ -1,5 +1,5 @@
 # Scacelith - 繁體中文
-# assets/i18n/en.lang 的翻譯（相同的鍵，相同的 {n}）。無複數形式（1 種形式）。
+# Translation of assets/i18n/en.lang (same keys, same {n}). No plural forms (a single form).
 
 language.name = 繁體中文
 

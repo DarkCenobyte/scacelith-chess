@@ -1,5 +1,5 @@
 # Scacelith - 日本語
-# assets/i18n/en.lang の翻訳（同じキー、同じ {n}）。複数形なし（1形式）。
+# Translation of assets/i18n/en.lang (same keys, same {n}). No plural forms (a single form).
 
 language.name = 日本語
 

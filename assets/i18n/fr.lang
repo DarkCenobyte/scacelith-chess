@@ -1,6 +1,6 @@
 # Scacelith - Français
-# Traduction de assets/i18n/en.lang (mêmes clés, mêmes {n}). Pluriel : un|plusieurs (0 et 1 au
-# singulier).
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other (0 and 1 are
+# singular).
 
 language.name = Français
 
