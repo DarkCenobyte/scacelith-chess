@@ -815,7 +815,7 @@ private:
             return;
         }
         guest_->lastSeq = seq;
-        P::MsgType t;
+        P::MsgType t{};   // 0 (no such type) for an id the schema does not define: the authority answers Malformed
         P::peekType(msg.data(), msg.size(), t);
         // Gestures have their own bucket and never count towards the flood limit: one beyond the
         // announced rate is dropped (the next one carries the whole state again).
