@@ -228,7 +228,9 @@ void PostFX::Impl::beginFrame(PostSettings& s, const PostInputs& in) {
     u.renderSize = vec4(float(w), float(h), 1.0f / float(w), 1.0f / float(h));
     u.halfSize = vec4(float(hw), float(hh), 1.0f / float(hw), 1.0f / float(hh));
     u.outputSize = vec4(float(bw), float(bh), 1.0f / float(bw), 1.0f / float(bh));
-    u.timing = vec4(in.dt, float(frameCounter), f.cameraPos.w, res);
+    // The counter is sent wrapped at 2^23: exact as a float, and a multiple of 8 keeps its &7 / &3
+    // readers continuous. The counter itself never wraps.
+    u.timing = vec4(in.dt, float(frameCounter & 0x7FFFFFu), f.cameraPos.w, res);
     u.ao = vec4(s.aoRadius, s.aoPower, 0.22f * float(hh), aoValid ? 1.0f : 0.0f);
     u.aoB = vec4(float(q.aoSlices), float(q.aoSteps), 0.62f, 0.0f);
     u.ssr = vec4(s.ssrMaxRoughness, s.ssrThickness, s.ssrIntensity, float(q.ssrIterations));
@@ -255,7 +257,8 @@ void PostFX::Impl::beginFrame(PostSettings& s, const PostInputs& in) {
     u.expoB = vec4(s.autoExposureSpeedUp, s.autoExposureSpeedDown, 0.104f, expoValid ? 1.0f : 0.0f);
     u.display = vec4(s.filmGrain, s.vignette, s.chromaticAberration * res, std::clamp(s.fade, 0.0f, 1.0f));
     u.grade = vec4(s.contrast, s.saturation, s.splitTone, 0.0f);
-    u.misc = vec4(float(s.debugView), s.ssrCompositeInResolve ? 1.0f : 0.0f, std::min(s.volumetricSkyDistance, s.volumetricMaxDistance), 0.0f);
+    u.misc = vec4(float(s.debugView), s.ssrCompositeInResolve ? 1.0f : 0.0f, std::min(s.volumetricSkyDistance, s.volumetricMaxDistance),
+                  postnoise::goldenPhase(frameCounter));
     glNamedBufferSubData(ubo.id, 0, sizeof(PostUBOData), &u);
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_POST, ubo.id);
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_FRAME, in.frameUbo);

@@ -327,7 +327,8 @@ void Renderer::beginFrame(const Camera& cam, const Environment& env, float dt) {
     f.sunDirection = vec4(sunDir, 0.00465f);
     f.sunRadiance = vec4(sunLux * exposure, sunLum);
     float skyLux = env.physicalSky ? std::max(sunLum * 0.2f, 2000.0f) * env.skyIntensity : env.skyIlluminance;
-    f.skyParams = vec4(env.turbidity, skyLux * exposure, env.exposureEV100, float(frameIndex_));
+    // Frame index wrapped below 2^24 (exact as a float; a multiple of 64 for its &7, >>3 and mod-64 readers).
+    f.skyParams = vec4(env.turbidity, skyLux * exposure, env.exposureEV100, float(frameIndex_ & 0xFFFFFFu));
     // Fallback hemisphere ambient (only used when light probes are off / not baked yet).
     f.ambientSky = vec4(vec3(0.55f, 0.65f, 0.85f) * (skyLux * 0.12f / PI) * exposure, 0);
     f.ambientGround = vec4(vec3(0.85f, 0.78f, 0.68f) * (sunLum * 0.035f / PI) * exposure, 0);
