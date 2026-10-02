@@ -1415,7 +1415,7 @@ void GameScene::runCoachTable(float dt) {
             }
             if (job.kind == TableJob::Kind::TakeBack) {
                 int n = int(game_.moves().size());
-                int k = std::min(job.plies, lesson() ? n : n);
+                int k = std::min(job.plies, n);
                 if (k <= 0) {
                     finish();
                     return;
