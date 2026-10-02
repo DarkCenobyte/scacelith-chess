@@ -382,6 +382,7 @@ CoachHudAction coachHud(const CoachHud& hud) {
         float h = 190.0f + 28.0f * float(lines);
         Rect r = im::flip(screen, Rect(v.x - w - 40.0f + (1.0f - t) * 30.0f, v.y * 0.5f - h * 0.5f + 60.0f, w, h));
         im::captureMouseRect(r);
+        im::occlude(r);
         gfx::pushAlpha(t);
         if (!hud.offer) im::pushBlock();
         im::panel(r);

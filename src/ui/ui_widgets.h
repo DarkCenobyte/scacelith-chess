@@ -27,7 +27,7 @@ uint64_t frame();
 vec2 mouse();
 bool keyboardMode();          // last navigation came from the keyboard (show focus highlight)
 bool keyPressed(int key);     // plat key pressed this frame and input not blocked
-float wheel();                // mouse wheel notches this frame (0 while blocked)
+float wheel();                // mouse wheel notches this frame (0 while blocked or occluded)
 bool consumeBack();           // Esc pressed this frame (returns true once)
 bool consumeNavigation(int* dx, int* dy);  // arrow keys this frame, for custom handling
 
@@ -39,6 +39,10 @@ bool blocked();
 void captureMouseAll();
 void captureMouseRect(const Rect& r);
 void captureKeyboard();
+// Something drawn over the layers below the current one (a card, a panel, a modal dialog's veil):
+// from the next frame, items of a lower layer under 'r' are not hovered and take no press, and
+// wheel() reads 0 there. Called every frame it is shown.
+void occlude(const Rect& r);
 bool mouseCapturedLastFrame();
 bool keyboardCapturedLastFrame();
 void setKeyboardMode(bool on);  // debug / viewer: show the focus highlight

@@ -81,6 +81,7 @@ HotSeatAction hotSeatHud(const HotSeatHud& hud) {
         float w = 460.0f, h = 196.0f;
         Rect r = im::flip(screen, Rect(v.x - w - 40.0f + (1.0f - t) * 30.0f, v.y * 0.5f - h * 0.5f + 60.0f, w, h));
         im::captureMouseRect(r);
+        im::occlude(r);
         gfx::pushAlpha(t);
         if (!hud.drawOffer) im::pushBlock();
         im::panel(r);

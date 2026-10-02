@@ -177,6 +177,7 @@ ModelPromptAction modelPrompt(const ModelPrompt& p) {
     gfx::setLayer(gfx::LAYER_MODAL);
     vec2 v = gfx::viewSize();
     gfx::fill(Rect(0, 0, v.x, v.y), vec4(0, 0, 0, 0.6f * t));
+    im::occlude(Rect(0, 0, v.x, v.y));  // the overlays drawn after it too (challenge cards)
     gfx::pushAlpha(t);
     im::pushId("modelprompt");
     ModelPromptAction act = ModelPromptAction::None;
@@ -301,6 +302,7 @@ ModelPanelAction modelProgressPanel(const ModelProgressView& pv) {
     float h = failed ? 150.0f + 28.0f * float(errLines) + 64.0f : 240.0f;
     Rect r = im::flip(screen, Rect(v.x - w - 36.0f + (1.0f - t) * 24.0f, 36.0f, w, h));
     im::captureMouseRect(r);
+    im::occlude(r);
     gfx::pushAlpha(t);
     if (pv.state == State::Hidden) im::pushBlock();
     gfx::shadow(r.offset(0, 8), 3, 30, vec4(0, 0, 0, 0.5f));

@@ -107,6 +107,7 @@ OnlineHudAction onlineHud(const OnlineHud& hud) {
         float w = 440.0f, h = 176.0f;
         Rect r = im::flip(screenRect(), Rect(v.x - w - 40.0f + (1.0f - t) * 30.0f, v.y * 0.5f - h * 0.5f + 60.0f, w, h));
         im::captureMouseRect(r);
+        im::occlude(r);
         gfx::pushAlpha(t);
         if (!hud.drawOffer) im::pushBlock();
         im::panel(r);
@@ -233,6 +234,7 @@ int reportDialog(int& category, std::string& comment) {
     gfx::setLayer(gfx::LAYER_MODAL);
     vec2 v = view();
     gfx::fill(Rect(0, 0, v.x, v.y), vec4(0, 0, 0, 0.55f * t));
+    im::occlude(Rect(0, 0, v.x, v.y));  // the overlays drawn after it too (challenge cards)
     gfx::pushAlpha(t);
     float w = 860.0f, h = 520.0f;
     Rect r(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 12.0f, w, h);
@@ -286,6 +288,7 @@ void onlineChallenges() {
         Rect r = im::flip(screenRect(), Rect(v.x - w - 32.0f, y, w, h));
         y -= h + 14.0f;
         im::captureMouseRect(r);
+        im::occlude(r);
         im::Anim& a = im::anim(im::makeId(int(c.id + 100000u)));
         a.v[0] = im::approach(a.v[0], 1.0f, 9.0f);
         float t = ease(a.v[0]);

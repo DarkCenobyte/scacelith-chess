@@ -57,6 +57,12 @@ struct Ctx {
     int blockDepth = 0;
     bool capMouseAll = false, capKb = false;
     std::vector<Rect> capRects;
+    // occlude() rects of this frame and the previous one, with their layer.
+    struct Occluder {
+        Rect r;
+        int layer;
+    };
+    std::vector<Occluder> occluders, prevOccluders;
     bool lastMouse = false, lastKb = false;
     std::function<void(Sound)> soundCb;
     double lastSoundTime[size_t(Sound::Count)] = {-1, -1, -1, -1, -1, -1, -1, -1};  // -1: never played
@@ -79,6 +85,13 @@ struct Ctx {
 Ctx c;
 
 const plat::Input& input() { return c.inputOverride ? *c.inputOverride : plat::input(); }
+
+// The mouse is over something a higher layer than the current one drew last frame (occlude()).
+bool occluded() {
+    for (const auto& o : c.prevOccluders)
+        if (o.layer > int(gfx::layer()) && o.r.contains(c.mouse)) return true;
+    return false;
+}
 
 const FocusEntry* findEntry(const std::vector<FocusEntry>& list, Id id) {
     for (auto& e : list)
@@ -199,6 +212,8 @@ void endFrame() {
     c.lastKb = c.capKb;
     c.capMouseAll = c.capKb = false;
     c.capRects.clear();
+    c.prevOccluders.swap(c.occluders);
+    c.occluders.clear();
     c.blockDepth = 0;
     c.idStack.clear();
     if ((c.frame % 240) == 0) {
@@ -215,7 +230,7 @@ uint64_t frame() { return c.frame; }
 vec2 mouse() { return c.mouse; }
 bool keyboardMode() { return c.kbMode; }
 bool keyPressed(int key) { return c.blockDepth == 0 && key >= 0 && key < plat::KEY_COUNT && input().keyPressed[key]; }
-float wheel() { return c.blockDepth == 0 ? c.wheel : 0.0f; }
+float wheel() { return c.blockDepth == 0 && !occluded() ? c.wheel : 0.0f; }
 void setInputOverride(const plat::Input* in) { c.inputOverride = in; }
 bool consumeBack() {
     if (c.blockDepth > 0 || !c.kBack || c.backConsumed) return false;
@@ -236,6 +251,7 @@ bool blocked() { return c.blockDepth > 0; }
 void captureMouseAll() { c.capMouseAll = true; }
 void captureMouseRect(const Rect& r) { c.capRects.push_back(r); }
 void captureKeyboard() { c.capKb = true; }
+void occlude(const Rect& r) { c.occluders.push_back({r, int(gfx::layer())}); }
 bool mouseCapturedLastFrame() { return c.lastMouse; }
 bool keyboardCapturedLastFrame() { return c.lastKb; }
 void setKeyboardMode(bool on) { c.kbMode = on; }
@@ -295,7 +311,7 @@ Item item(Id id, const Rect& r, uint32_t flags) {
     bool focusable = (flags & ITEM_FOCUSABLE) != 0 && !(flags & ITEM_MOUSE_ONLY);
     if (interactive) {
         if (focusable) c.curList.push_back({id, r, flags});
-        it.hovered = c.mouseInWindow && r.contains(c.mouse) && gfx::clipContains(c.mouse);
+        it.hovered = c.mouseInWindow && r.contains(c.mouse) && gfx::clipContains(c.mouse) && !occluded();
         if (it.hovered) {
             c.hoveredNow = id;
             if (focusable && c.mouseMoved && !c.editId) c.focus = id;  // an edit keeps the focus
@@ -1072,7 +1088,7 @@ void infoMark(const std::string& text) {
     c.marks.push_back({li.id, mark});
     float x0 = std::min(lb.x, mark.x), x1 = std::max(lb.r(), mark.r());
     Rect zone(x0, lb.y, x1 - x0, lb.h);
-    bool canHover = c.blockDepth == 0 && c.mouseInWindow && !c.mDown && gfx::clipContains(c.mouse);
+    bool canHover = c.blockDepth == 0 && c.mouseInWindow && !c.mDown && gfx::clipContains(c.mouse) && !occluded();
     bool onMark = canHover && mark.contains(c.mouse);
     bool hot = canHover && (onMark || zone.contains(c.mouse));
     bool hoverTip = hot && !c.kbMode;
@@ -1135,6 +1151,7 @@ int confirmDialog(const char* idStr, const std::string& title, const std::string
     gfx::setLayer(gfx::LAYER_MODAL);
     vec2 view = gfx::viewSize();
     gfx::fill(Rect(0, 0, view.x, view.y), vec4(0, 0, 0, 0.55f * t));
+    occlude(Rect(0, 0, view.x, view.y));  // the overlays drawn after it too (challenge cards)
     gfx::pushAlpha(t);
     TextStyle ms;
     ms.face = font::FACE_TEXT;
