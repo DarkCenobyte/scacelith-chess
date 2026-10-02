@@ -233,6 +233,8 @@ void Mixer::releaseVoice(Voice& v) {
     v.active = false;
     Slot& s = slots_[v.sfx][v.variant];
     if (s.users > 0) --s.users;
+    // install() only parks a pending buffer while the slot has users: it takes over here, as the
+    // last of them ends (so a slot never holds a pending buffer without users).
     if (s.users == 0 && s.pending) {
         retire(s.buf);
         s.buf = s.pending;
@@ -570,15 +572,6 @@ void Mixer::updateDuck(float blockSec) {
 }
 
 void Mixer::block(float* out, int n) {
-    // Pending bank swaps whose voices ended.
-    for (auto& row : slots_)
-        for (Slot& s : row)
-            if (s.pending && s.users == 0) {
-                retire(s.buf);
-                s.buf = s.pending;
-                s.pending = nullptr;
-            }
-
     const float blockSec = float(n) / fs_;
     const float kv = first_ ? 1.0f : 1.0f - std::exp(-blockSec / 0.05f);
     master_ += (masterT_ - master_) * kv;
