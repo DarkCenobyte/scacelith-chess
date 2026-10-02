@@ -273,14 +273,6 @@ bool localEndpoint(Handle h, Endpoint& out) {
     return true;
 }
 
-bool peerEndpoint(Handle h, Endpoint& out) {
-    out = Endpoint();
-    socklen l = socklen(sizeof out.storage);
-    if (getpeername(S(h), SA(out), &l) != 0) return false;
-    out.len = int(l);
-    return true;
-}
-
 Handle listenTcp(uint16_t port, bool& dualStack, std::string& err) {
     startup();
     dualStack = false;

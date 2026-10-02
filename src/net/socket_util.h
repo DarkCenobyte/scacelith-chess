@@ -54,7 +54,6 @@ Handle openTcp(int family);          // non-blocking
 Handle openUdpV4();                  // non-blocking
 bool bindTo(Handle h, const Endpoint& ep, bool reuseAddr);
 bool localEndpoint(Handle h, Endpoint& out);
-bool peerEndpoint(Handle h, Endpoint& out);
 
 // Listening socket on 'port' (0 = any): IPv6 dual-stack when the system allows it, IPv4
 // otherwise. err = errorName() of the failure ("in_use" when the port is taken).
