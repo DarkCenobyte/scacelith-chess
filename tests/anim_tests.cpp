@@ -419,6 +419,53 @@ TEST(anim_left_handed_handshake_cuts_page_turn) {
     CHECK(std::fabs(clasp - (start + anim::Timing::HandshakeClaspAt)) < 1e-4f);
 }
 
+// A handshake starting in the middle of a frame, just after the writing hand laid its pen down:
+// PenPut fires once, at its own instant and where the PutPen put it (the handshake has no pen to
+// lay down).
+TEST(anim_left_handed_handshake_after_pen_put_mid_frame) {
+    const character::Skeleton& sk = character::robotSkeleton();
+    anim::Animator B, W;
+    W.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
+    B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, character::Side::Left);
+    const m::mat4 taken = m::rotateY(3.1415927f) * penFrame(-1.0f);   // beside Black's pad
+    const m::mat4 laid = m::translate(m::vec3(0, 0, -0.03f)) * taken;
+    WriteTask pick, put;
+    pick.type = WriteTaskType::PickPen;
+    pick.frame = taken;
+    put.type = WriteTaskType::PutPen;
+    put.frame = laid;
+    B.enqueueWriting(pick);
+    B.enqueueWriting(put);
+    const float putAt = anim::Timing::PickPen + 0.34f;   // PenPut, 0.34 s into the PutPen
+    anim::Task h;
+    h.type = anim::TaskType::Handshake;
+    h.notBefore = putAt + 0.005f;                        // within the same 1/60 s frame
+    h.partner = &W;
+    B.enqueue(h);
+    h.partner = &B;
+    W.enqueue(h);
+    std::vector<anim::Event> ev;
+    const float dt = 1.0f / 60.0f;
+    int puts = 0;
+    float putTime = -1.0f;
+    m::vec3 putPos(0.0f);
+    while (B.time() < 3.5f) {
+        ev.clear();
+        W.update(dt, ev);
+        ev.clear();
+        B.update(dt, ev);
+        for (const anim::Event& e : ev)
+            if (e.type == anim::EventType::PenPut) {
+                ++puts;
+                putTime = e.time;
+                putPos = e.position;
+            }
+    }
+    CHECK_EQ(puts, 1);
+    CHECK(std::fabs(putTime - putAt) < 1e-4f);
+    CHECK(m::length(putPos - laid.translation()) < 1e-5f);
+}
+
 // Tasks cut short (cancelTasks: the online opponent's move comes while its robot still plays their
 // live gestures): the piece in hand is let go without its release, and the next task starts at once
 // from where the hand is, with its usual duration.

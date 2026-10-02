@@ -1145,11 +1145,13 @@ void Animator::Impl::finishWriteTask(std::vector<Event>& ev) {
 }
 
 // A handshake needs the writing hand (left-handed player): the running writing task stops here.
-// Its remaining events fire now (a path is cut where it is, a turning page is reported turned),
-// except the pen's own: a pen still on the table stays there, a pen still in the hand is laid down
-// by the handshake itself. Queued tasks wait for the end of the handshake.
+// The events already due fire first, at their own instants and with their effect (the handshake
+// may start mid-frame); the remaining ones fire now (a path is cut where it is, a turning page is
+// reported turned), except the pen's own: a pen still on the table stays there, a pen still in the
+// hand is laid down by the handshake itself. Queued tasks wait for the end of the handshake.
 void Animator::Impl::interruptWriting(std::vector<Event>& ev) {
     if (!wr.running) return;
+    fireWriteDue(time, ev);
     for (auto& e : wr.events) {
         if (e.done) continue;
         if (e.action == WActPick || e.action == WActPut) {
