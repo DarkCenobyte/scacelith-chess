@@ -176,6 +176,9 @@ void LightProbes::bake(Renderer& r, int bounces) {
         glBindTextureUnit(TEXUNIT_SPECULAR, specular_.id);
         for (int k = 0; k < n; ++k) captureProbe(r, k);
         glGenerateTextureMipmap(capture_.id);
+        // From bounce 1 the captures sampled specular_, which the prefilter's image stores
+        // below overwrite: they must wait for those fetches.
+        if (b > 0) glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         bool last = b == bounces - 1;
         for (int k = 0; k < n; ++k) processProbe(k, last ? 48 : 16);
         glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT |
