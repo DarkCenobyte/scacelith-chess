@@ -177,8 +177,10 @@ std::string headerValue(const std::string& lowerHeaders, const char* name) {
     return trim(lowerHeaders.substr(p + key.size(), e == std::string::npos ? std::string::npos : e - p - key.size()));
 }
 
+// cfg.cancel stops the exchange, or only until the whole request is sent when finishOnceSent (the
+// router may have acted on it: its answer says what it did).
 bool httpExchange(const Config& cfg, const std::string& host, uint16_t port, const std::string& request, HttpResponse& resp,
-                  std::string* localIp, Error& err) {
+                  std::string* localIp, Error& err, bool finishOnceSent = false) {
     sock::Endpoint ep;
     if (!sock::Endpoint::parse(host, port, ep) || !ep.isV4()) { err.text = "bad_url"; return false; }
     const int64_t deadline = sock::steadyMs() + cfg.httpTimeoutMs;
@@ -196,7 +198,7 @@ bool httpExchange(const Config& cfg, const std::string& host, uint16_t port, con
     bool closed = false;
     size_t headerEnd = std::string::npos;
     for (;;) {
-        if (cfg.cancel && cfg.cancel->load()) { err.text = "cancelled"; return false; }
+        if (cfg.cancel && cfg.cancel->load() && !(finishOnceSent && sent == request.size())) { err.text = "cancelled"; return false; }
         int64_t left = deadline - sock::steadyMs();
         if (left <= 0) { err.text = "timeout"; return false; }
         sock::PollSet ps;
@@ -535,7 +537,7 @@ bool Client::discover(Gateway& out, Error& err) {
 }
 
 bool Client::soap(const Gateway& gw, const char* action, const std::vector<std::pair<std::string, std::string>>& args,
-                  std::string& body, Error& err) {
+                  std::string& body, Error& err, bool finishOnceSent) {
     err = Error();
     std::string xml = "<?xml version=\"1.0\"?>\r\n"
                       "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -550,7 +552,7 @@ bool Client::soap(const Gateway& gw, const char* action, const std::vector<std::
                       "\r\nContent-Type: text/xml; charset=\"utf-8\"\r\nSOAPAction: \"" + gw.serviceType + "#" + action +
                       "\"\r\nContent-Length: " + std::to_string(xml.size()) + "\r\nConnection: close\r\n\r\n" + xml;
     HttpResponse resp;
-    if (!httpExchange(cfg_, gw.host, gw.port, req, resp, nullptr, err)) return false;
+    if (!httpExchange(cfg_, gw.host, gw.port, req, resp, nullptr, err, finishOnceSent)) return false;
     body = resp.body;
     if (resp.status == 200) return true;
     int code = 0;
@@ -585,7 +587,7 @@ bool Client::addPortMapping(const Gateway& gw, const Mapping& m, Error& err) {
                  {"NewEnabled", "1"},
                  {"NewPortMappingDescription", m.description},
                  {"NewLeaseDuration", std::to_string(m.leaseSec)}},
-                body, err);
+                body, err, true);   // awaited once sent, despite a cancel: a mapping made is known (and deleted)
 }
 
 bool Client::deletePortMapping(const Gateway& gw, uint16_t externalPort, Error& err) {

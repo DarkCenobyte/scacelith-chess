@@ -15,7 +15,8 @@
 //
 // Every call blocks the calling thread (a DirectMatch worker, never the game thread) for a
 // bounded time: discovery <= Config::discoveryMs, each HTTP exchange <= Config::httpTimeoutMs,
-// responses <= Config::maxHttpBytes. A Config::cancel flag stops a call early.
+// responses <= Config::maxHttpBytes. A Config::cancel flag stops a call early, except an
+// AddPortMapping already sent, whose answer is awaited (mapPort() then reports the mapping made).
 //
 // Trust: SSDP answers can come from any machine of the LAN. A description is only fetched from
 // the address that answered, over plain HTTP to an IPv4 literal, and a control URL must point to
@@ -105,7 +106,7 @@ public:
 private:
     Config cfg_;
     bool soap(const Gateway& gw, const char* action, const std::vector<std::pair<std::string, std::string>>& args,
-              std::string& body, Error& err);
+              std::string& body, Error& err, bool finishOnceSent = false);
     bool cancelled() const { return cfg_.cancel && cfg_.cancel->load(); }
 };
 

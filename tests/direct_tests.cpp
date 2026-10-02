@@ -59,6 +59,8 @@ struct FakeGateway {
     bool chunked = false;
     std::string externalIp = "203.0.113.7";
     std::deque<int> addResults;           // next AddPortMapping answers: 0 = success, else a UPnP error code
+    std::atomic<bool>* cancelOnAdd = nullptr;   // set once an AddPortMapping is received...
+    int addDelayMs = 0;                   // ...and its answer comes this much later
     // What the client did.
     std::vector<std::string> searchTargets;
     struct Add { int extPort = 0, intPort = 0, lease = -1; std::string client, desc, proto; };
@@ -161,6 +163,7 @@ struct FakeGateway {
             if (need != std::string::npos && req.size() >= need) break;
         }
         std::string status = "200 OK", body;
+        int delayMs = 0;
         if (req.compare(0, 14, "GET /desc.xml ") == 0) {
             std::lock_guard<std::mutex> lk(m);
             body = replaceAll(description, "%HTTP%", std::to_string(httpPort));
@@ -190,6 +193,8 @@ struct FakeGateway {
                 a.desc = field(xml, "NewPortMappingDescription");
                 a.proto = field(xml, "NewProtocol");
                 adds.push_back(a);
+                if (cancelOnAdd) *cancelOnAdd = true;
+                delayMs = addDelayMs;
                 int result = 0;
                 if (!addResults.empty()) { result = addResults.front(); addResults.pop_front(); }
                 if (result == 718) fault(718, "ConflictInMappingEntry");
@@ -207,6 +212,7 @@ struct FakeGateway {
         } else {
             status = "404 Not Found";
         }
+        if (delayMs) std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
         std::string resp = "HTTP/1.1 " + status + "\r\nContent-Type: text/xml; charset=\"utf-8\"\r\nConnection: close\r\n";
         if (chunked && status[0] == '2') {
             // Two chunks, to exercise the client's chunked decoding.
@@ -437,6 +443,41 @@ TEST(upnp_fake_gateway_conflict_and_permanent_lease) {
         CHECK_EQ(gw.adds[3].extPort, 47103);
         CHECK_EQ(gw.adds[3].lease, 0);
     }
+}
+
+TEST(upnp_fake_gateway_cancel_during_add) {
+    // Cancelled while the router handles an AddPortMapping: its answer is still read, so a mapping
+    // it made is reported (the host deletes it when the match ends), and no other attempt follows.
+    FakeGateway gw;
+    gw.description = kDescRelative;
+    std::atomic<bool> cancel{false};
+    gw.cancelOnAdd = &cancel;
+    gw.addDelayMs = 400;
+    CHECK(gw.start());
+    upnp::Config cfg = gw.clientConfig();
+    cfg.cancel = &cancel;
+    upnp::Client client(cfg);
+    upnp::Gateway g;
+    upnp::Error err;
+    CHECK(client.discover(g, err));
+    upnp::Mapping mp;
+    CHECK(client.mapPort(g, 47100, nullptr, mp, err));
+    CHECK(cancel.load());
+    CHECK_EQ(mp.externalPort, 47100);
+    CHECK_EQ(mp.leaseSec, 3600u);
+    // Refused with 725: no permanent lease is asked after the cancel.
+    cancel = false;
+    {
+        std::lock_guard<std::mutex> lk(gw.m);
+        gw.addResults = {725};
+    }
+    CHECK(!client.mapPort(g, 47100, nullptr, mp, err));
+    CHECK_EQ(err.text, std::string("cancelled"));
+    // Cancelled before anything is sent: nothing is asked.
+    CHECK(!client.mapPort(g, 47100, nullptr, mp, err));
+    CHECK_EQ(err.text, std::string("cancelled"));
+    std::lock_guard<std::mutex> lk(gw.m);
+    CHECK_EQ(gw.adds.size(), size_t(2));
 }
 
 TEST(upnp_fake_gateway_errors) {
