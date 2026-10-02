@@ -22,7 +22,6 @@ namespace net {
 namespace sys {
 
 #ifdef _WIN32
-namespace {
 std::wstring widen(const std::string& s) {
     if (s.empty()) return std::wstring();
     int n = MultiByteToWideChar(CP_UTF8, 0, s.data(), int(s.size()), nullptr, 0);
@@ -30,6 +29,8 @@ std::wstring widen(const std::string& s) {
     if (n > 0) MultiByteToWideChar(CP_UTF8, 0, s.data(), int(s.size()), &w[0], n);
     return w;
 }
+
+namespace {
 std::string narrow(const wchar_t* w) {
     int n = WideCharToMultiByte(CP_UTF8, 0, w, -1, nullptr, 0, nullptr, nullptr);
     if (n <= 1) return std::string();

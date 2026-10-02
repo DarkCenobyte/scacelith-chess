@@ -316,22 +316,12 @@ int verifyCallback(int ok, X509_STORE_CTX* st) {
 
 // ---- HTTP/1.1 ----
 
-struct ParsedHead {
-    int status = 0;
-    std::vector<std::pair<std::string, std::string>> headers;   // names lower-case
-    std::string get(const std::string& name) const {
-        for (auto& h : headers)
-            if (h.first == name) return h.second;
-        return std::string();
-    }
-};
-
 std::string trim(const std::string& s) {
     size_t a = s.find_first_not_of(" \t"), b = s.find_last_not_of(" \t");
     return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
 }
 
-bool parseHead(const std::string& head, ParsedHead& out) {
+bool parseHead(const std::string& head, HttpHead& out) {
     size_t eol = head.find("\r\n");
     std::string line = head.substr(0, eol);
     if (line.compare(0, 5, "HTTP/") != 0) return false;
@@ -703,7 +693,7 @@ void httpRequest(const HttpRequest& req, HttpResponse& resp, CancelToken* cancel
     Deadline dl(req.timeoutMs);
     bool ok = s.writeAll(head.data(), head.size(), dl) && (req.body.empty() || s.writeAll(req.body.data(), req.body.size(), dl));
     std::string raw;
-    ParsedHead ph;
+    HttpHead ph;
     size_t bodyAt = std::string::npos;
     bool chunked = false;
     std::string cl;
@@ -847,7 +837,7 @@ void httpStream(const HttpRequest& req, const std::function<bool(const HttpHead&
     bool ok = s.writeAll(head.data(), head.size(), Deadline(req.timeoutMs));
     // The head (interim 1xx answers skipped); 'raw' keeps what came after it.
     std::string raw;
-    ParsedHead ph;
+    HttpHead ph;
     std::vector<char> buf(64 * 1024);
     for (bool haveHead = false; ok && !haveHead;) {
         size_t e = raw.find("\r\n\r\n");
@@ -862,7 +852,7 @@ void httpStream(const HttpRequest& req, const std::function<bool(const HttpHead&
             raw.append(buf.data(), size_t(r));
             continue;
         }
-        ph = ParsedHead();
+        ph = HttpHead();
         if (!parseHead(raw.substr(0, e), ph)) { s.error = "network"; s.detail = "bad HTTP response"; ok = false; break; }
         raw.erase(0, e + 4);
         haveHead = ph.status >= 200;
@@ -870,10 +860,7 @@ void httpStream(const HttpRequest& req, const std::function<bool(const HttpHead&
     if (ok) {
         resp.status = ph.status;
         resp.retryAfter = ph.get("retry-after");
-        HttpHead hh;
-        hh.status = ph.status;
-        hh.headers = ph.headers;
-        bool wantBody = onHead(hh) && req.method != "HEAD" && ph.status != 204 && ph.status != 304;
+        bool wantBody = onHead(ph) && req.method != "HEAD" && ph.status != 204 && ph.status != 304;
         if (wantBody) {
             const bool chunked = lower(ph.get("transfer-encoding")).find("chunked") != std::string::npos;
             const std::string cl = ph.get("content-length");
@@ -977,7 +964,7 @@ std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int&
         error = cancel && cancel->cancelled() ? "cancelled" : s->error;
         return nullptr;
     }
-    ParsedHead ph;
+    HttpHead ph;
     if (!parseHead(raw.substr(0, end), ph)) { error = "network"; return nullptr; }
     httpStatus = ph.status;
     if (ph.status != 101) { error = "http_" + std::to_string(ph.status); return nullptr; }

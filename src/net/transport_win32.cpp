@@ -17,6 +17,7 @@
 #ifdef _WIN32
 #include "transport.h"
 #include "crypto.h"
+#include "net_sys.h"
 #include "../core/log.h"
 
 #include <windows.h>
@@ -35,13 +36,7 @@ namespace net {
 
 namespace {
 
-std::wstring widen(const std::string& s) {
-    if (s.empty()) return std::wstring();
-    int n = MultiByteToWideChar(CP_UTF8, 0, s.data(), int(s.size()), nullptr, 0);
-    std::wstring w(size_t(n > 0 ? n : 0), L'\0');
-    if (n > 0) MultiByteToWideChar(CP_UTF8, 0, s.data(), int(s.size()), &w[0], n);
-    return w;
-}
+using sys::widen;
 
 std::string narrow(const wchar_t* w, size_t len) {
     if (!len) return std::string();
