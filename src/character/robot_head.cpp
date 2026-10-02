@@ -190,6 +190,7 @@ void buildHead(Sink& s) {
         }, true, skull);
     }
     // ---- eyes -----------------------------------------------------------------------------------
+    size_t first = s.parts.size();  // eyes and lids are mirrored, the head shell is not
     {
         const float lz = eye::limbusZ(), cz = eye::corneaCenterZ();
         vec4 none[4] = {vec4(0), vec4(0), vec4(0), vec4(0)};
@@ -218,7 +219,7 @@ void buildHead(Sink& s) {
             return sdf::meshVolume([upper](const vec3& p) { return lidShell(p, upper); }, {seed}, o);
         }, true, look, MaterialId::RobotLid);
     }
-    s.mirrorFrom(s.parts.size() - 5);
+    s.mirrorFrom(first);
 }
 
 }  // namespace build
