@@ -3802,10 +3802,11 @@ TEST(net_tls_pinning_manual) {
 // Live check against a real dedicated server (opt-in). dedicated-server/tools/live-cpp-check.js
 // starts a server (self-signed certificate, HTTPS API and WSS on one port, proof of work for
 // registration), a Node bot queued in 3+2, then runs:
-//   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password> ./scacelith_tests net_live
+//   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password> ./scacelith_tests net_live_server_game
 // This client registers, logs in, connects, queues rated 3+2, plays legal moves for 12 plies
-// (posHash from its own chess::Position FEN) and resigns; the result and the rating change must
-// come back from the server.
+// (posHash from its own chess::Position FEN) and resigns; the result and the rating update must
+// come back from the server. The account API has its own live check
+// (tests/net_live_account_tests.cpp).
 // =============================================================================================
 TEST(net_live_server_game) {
     const char* env = std::getenv("SCACELITH_NET_LIVE");
