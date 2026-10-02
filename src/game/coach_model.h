@@ -25,8 +25,9 @@
 //      The TTS worker then starts with the next line the coach says (CoachStage::ensureWorker).
 //   4. When the TTS worker failed to load (tts::Worker::failed()) although coachVoiceWanted():
 //          game::coachModelLoadFailed();
-//   5. On exit (scene destructor): game::coachModelShutdown(). The download stops; its .part
-//      files stay and the next download continues them.
+//   5. On exit (GameScene::shutdown; the ui viewer's coach-flow screen likewise):
+//          game::coachModelShutdown();
+//      The download stops; its .part files stay and the next download continues them.
 // Testing aid: the environment variable SCACELITH_COACH_SOURCE=github skips Hugging Face (the
 // fallback path), =hub never falls back to the GitHub archive. The ui viewer's "coach-flow"
 // screen runs all this over the title page (scacelith --scene ui --ui-screen coach-flow
