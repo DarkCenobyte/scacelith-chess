@@ -498,11 +498,21 @@ TEST(upnp_fake_gateway_cancel_during_add) {
     }
     CHECK(!client.mapPort(g, 47100, nullptr, mp, err));
     CHECK_EQ(err.text, std::string("cancelled"));
+    // Refused with 718: the next port is not claimed here either.
+    cancel = false;
+    {
+        std::lock_guard<std::mutex> lk(gw.m);
+        gw.addResults = {718};
+    }
+    std::vector<uint16_t> claimed;
+    CHECK(!client.mapPort(g, 47100, [&](uint16_t p) { claimed.push_back(p); return true; }, mp, err));
+    CHECK_EQ(err.text, std::string("cancelled"));
+    CHECK(claimed.empty());
     // Cancelled before anything is sent: nothing is asked.
     CHECK(!client.mapPort(g, 47100, nullptr, mp, err));
     CHECK_EQ(err.text, std::string("cancelled"));
     std::lock_guard<std::mutex> lk(gw.m);
-    CHECK_EQ(gw.adds.size(), size_t(2));
+    CHECK_EQ(gw.adds.size(), size_t(3));
 }
 
 TEST(upnp_fake_gateway_errors) {

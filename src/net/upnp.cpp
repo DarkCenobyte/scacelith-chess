@@ -612,6 +612,7 @@ bool Client::mapPort(const Gateway& gw, uint16_t port, const std::function<bool(
             out = m;
             return true;
         }
+        if (cancelled()) break;   // cancelled meanwhile: no other port is claimed or asked
         if (err.upnpCode == 725 && m.leaseSec != 0) {
             m.leaseSec = 0;   // OnlyPermanentLeasesSupported: the mapping is deleted when the match ends
             continue;
