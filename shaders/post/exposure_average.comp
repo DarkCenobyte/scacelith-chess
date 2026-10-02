@@ -23,7 +23,8 @@ void main() {
         float a = clamp(lo - acc, 0.0, n);  // part of this bin below the low percentile
         float b = clamp(acc + n - hi, 0.0, n);  // part above the high percentile
         float use = max(n - a - b, 0.0);
-        float logL = i == 0 ? EXPO_MIN_LOG : EXPO_MIN_LOG + (float(i - 1) + 0.5) / 254.0 * EXPO_RANGE_LOG;
+        // Bin i >= 1 is centred at (i - 1) / 254 of the range: exposure_histogram.comp rounds.
+        float logL = i == 0 ? EXPO_MIN_LOG : EXPO_MIN_LOG + float(i - 1) / 254.0 * EXPO_RANGE_LOG;
         sum += use * logL;
         cnt += use;
         acc += n;
