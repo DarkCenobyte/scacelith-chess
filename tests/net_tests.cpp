@@ -3706,7 +3706,8 @@ bool runningUnderWine() {
 
 TEST(net_tls_pinning_manual) {
     const char* env = std::getenv("SCACELITH_NET_TLS_TEST");
-    if (!env || !net::transportAvailable()) SKIP("SCACELITH_NET_TLS_TEST not set");
+    if (!env) SKIP("SCACELITH_NET_TLS_TEST not set");
+    REQUIRE(net::transportAvailable());  // asked for, so it must not pass without running
     std::string spec = env;
     size_t colon = spec.find(':');
     CHECK(colon != std::string::npos);
@@ -3783,7 +3784,8 @@ TEST(net_tls_pinning_manual) {
 // =============================================================================================
 TEST(net_live_server_game) {
     const char* env = std::getenv("SCACELITH_NET_LIVE");
-    if (!env || !net::transportAvailable()) SKIP("SCACELITH_NET_LIVE not set");
+    if (!env) SKIP("SCACELITH_NET_LIVE not set");
+    REQUIRE(net::transportAvailable());  // asked for, so it must not pass without running
     std::vector<std::string> f;
     {
         std::string s = env, cur;
