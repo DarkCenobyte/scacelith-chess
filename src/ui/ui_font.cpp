@@ -162,6 +162,42 @@ void edt2d(Scratch& s, std::vector<float>& grid, int w, int h) {
     }
 }
 
+// Coverage at O x the output resolution (sc.cov, W x H) -> exact inside / outside distances,
+// box-filtered down to w x h bytes: 0.5 + d / (2 * spread), d in output texels (inside > 0).
+void coverageToSdf(Scratch& sc, int W, int H, int w, int h, int O, int spread, uint8_t* dst) {
+    size_t N = size_t(W) * size_t(H);
+    sc.in.resize(N);
+    sc.out.resize(N);
+    for (size_t i = 0; i < N; ++i) {
+        bool inside = sc.cov[i] >= 128;
+        sc.out[i] = inside ? 0.0f : float(kInf);  // distance to the nearest inside pixel
+        sc.in[i] = inside ? float(kInf) : 0.0f;   // distance to the nearest outside pixel
+    }
+    edt2d(sc, sc.out, W, H);
+    edt2d(sc, sc.in, W, H);
+    const float invO = 1.0f / float(O);
+    const float norm = 1.0f / (2.0f * float(spread));
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            float sum = 0.0f;
+            for (int sy = 0; sy < O; ++sy) {
+                size_t row = size_t(y * O + sy) * size_t(W);
+                for (int sx = 0; sx < O; ++sx) {
+                    size_t i = row + size_t(x * O + sx);
+                    // Refine boundary pixels with the anti-aliased coverage.
+                    float d;
+                    if (sc.cov[i] >= 128) d = std::sqrt(sc.in[i]) - 0.5f;
+                    else d = -(std::sqrt(sc.out[i]) - 0.5f);
+                    if (std::fabs(d) <= 1.0f) d = float(sc.cov[i]) / 255.0f - 0.5f;
+                    sum += d;
+                }
+            }
+            float v = 0.5f + sum * invO * invO * invO * norm;  // average, then hi-res px -> output px
+            dst[size_t(y) * size_t(w) + size_t(x)] = uint8_t(std::lround(std::clamp(v, 0.0f, 1.0f) * 255.0f));
+        }
+    }
+}
+
 struct SdfGlyph {
     uint32_t cp = 0;
     Glyph g;
@@ -201,42 +237,10 @@ void buildGlyph(const FaceData& fd, const FaceDesc& desc, uint32_t cp, int gi, S
     if (rw > 0 && rh > 0)
         stbtt_MakeGlyphBitmap(&fd.info, &sc.cov[size_t(oy) * size_t(W) + size_t(ox)], rw, rh, W, hs, hs, gi);
 
-    size_t N = size_t(W) * size_t(H);
-    sc.in.resize(N);
-    sc.out.resize(N);
-    for (size_t i = 0; i < N; ++i) {
-        bool inside = sc.cov[i] >= 128;
-        sc.out[i] = inside ? 0.0f : float(kInf);  // distance to the nearest inside pixel
-        sc.in[i] = inside ? float(kInf) : 0.0f;   // distance to the nearest outside pixel
-    }
-    edt2d(sc, sc.out, W, H);
-    edt2d(sc, sc.in, W, H);
-
     out.w = w;
     out.h = h;
     out.px.resize(size_t(w) * size_t(h));
-    const float invO = 1.0f / float(O);
-    const float norm = 1.0f / (2.0f * float(desc.spread));
-    for (int y = 0; y < h; ++y) {
-        for (int x = 0; x < w; ++x) {
-            float sum = 0.0f;
-            for (int sy = 0; sy < O; ++sy) {
-                size_t row = size_t(y * O + sy) * size_t(W);
-                for (int sx = 0; sx < O; ++sx) {
-                    size_t i = row + size_t(x * O + sx);
-                    // Refine boundary pixels with the anti-aliased coverage.
-                    float d;
-                    if (sc.cov[i] >= 128) d = std::sqrt(sc.in[i]) - 0.5f;
-                    else d = -(std::sqrt(sc.out[i]) - 0.5f);
-                    if (std::fabs(d) <= 1.0f) d = float(sc.cov[i]) / 255.0f - 0.5f;
-                    sum += d;
-                }
-            }
-            float sd = sum * invO * invO * invO;  // average, then hi-res px -> atlas px
-            float v = 0.5f + sd * norm;
-            out.px[size_t(y) * size_t(w) + size_t(x)] = uint8_t(std::lround(std::clamp(v, 0.0f, 1.0f) * 255.0f));
-        }
-    }
+    coverageToSdf(sc, W, H, w, h, O, desc.spread, out.px.data());
     float inv = 1.0f / desc.emPx;
     out.g.hasQuad = true;
     out.g.x0 = float(bx0) * inv;
@@ -761,38 +765,9 @@ bool renderLineSdf(int face, const std::string& utf8, float capPx, int spread, f
     }
 
     // Exact inside / outside distances, box-filtered to the output resolution (as buildGlyph).
-    size_t N = size_t(W) * size_t(H);
-    sc.in.resize(N);
-    sc.out.resize(N);
-    for (size_t i = 0; i < N; ++i) {
-        bool inside = sc.cov[i] >= 128;
-        sc.out[i] = inside ? 0.0f : float(kInf);
-        sc.in[i] = inside ? float(kInf) : 0.0f;
-    }
-    edt2d(sc, sc.out, W, H);
-    edt2d(sc, sc.in, W, H);
     out.resize(size_t(w) * size_t(h));
-    const float invO = 1.0f / float(O);
-    const float norm = 1.0f / (2.0f * float(spread));
-    for (int y = 0; y < h; ++y) {
-        for (int x = 0; x < w; ++x) {
-            float sum = 0.0f;
-            for (int sy = 0; sy < O; ++sy) {
-                size_t row = size_t(y * O + sy) * size_t(W);
-                for (int sx = 0; sx < O; ++sx) {
-                    size_t i = row + size_t(x * O + sx);
-                    float d;
-                    if (sc.cov[i] >= 128) d = std::sqrt(sc.in[i]) - 0.5f;
-                    else d = -(std::sqrt(sc.out[i]) - 0.5f);
-                    if (std::fabs(d) <= 1.0f) d = float(sc.cov[i]) / 255.0f - 0.5f;
-                    sum += d;
-                }
-            }
-            float v = 0.5f + sum * invO * invO * invO * norm;
-            out[size_t(y) * size_t(w) + size_t(x)] = uint8_t(std::lround(std::clamp(v, 0.0f, 1.0f) * 255.0f));
-        }
-    }
-    if (inkWidthPx) *inkWidthPx = float(inkX1 - inkX0) * invO;
+    coverageToSdf(sc, W, H, w, h, O, spread, out.data());
+    if (inkWidthPx) *inkWidthPx = float(inkX1 - inkX0) / float(O);
     return true;
 }
 
