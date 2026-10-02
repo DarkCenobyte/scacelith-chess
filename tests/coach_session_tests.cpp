@@ -493,6 +493,36 @@ TEST(coach_session_game_over_drops_the_greeting) {
     CHECK(!t.said("event.colour.white"));
 }
 
+// The lesson plays a chapter as one script: Space skips the line being said, never the lines after
+// it (the instructions of the exercises that follow, the talk of the last chapter).
+TEST(coach_session_lesson_space_skips_one_line) {
+    Table t;
+    SessionConfig cfg = levelConfig(0);
+    cfg.lessonChapter = 1;   // "pieces": the rook first
+    t.start(cfg);
+    CHECK(t.until([&] { return t.said("lesson.rook.intro"); }, 60.0f));
+    t.step();
+    CHECK(t.session.director().skippable());
+    t.session.skip();
+    CHECK(t.until([&] { return t.session.playerMayMove(t.game); }, 120.0f));
+    CHECK(t.said("lesson.rook.lines"));
+    CHECK(t.said("lesson.rook.ask"));
+    t.move("a1a6");
+    CHECK(t.until([&] { return t.said("lesson.bishop.ask"); }, 120.0f));
+    CHECK(t.said("lesson.jump.blocked"));
+    CHECK(t.said("lesson.bishop.intro"));
+
+    Table u;
+    SessionConfig last = levelConfig(0);
+    last.lessonChapter = 9;   // the talk, no exercise
+    u.start(last);
+    CHECK(u.until([&] { return u.said("lesson.talk.rules"); }, 60.0f));
+    u.step();
+    u.session.skip();
+    CHECK(u.until([&] { return u.said("lesson.talk.real"); }, 60.0f));
+    CHECK(!u.session.lessonCompleted());
+}
+
 // The appraisal explains what accuracy is once (level 3): it counts as explained when that line is
 // said, not when it is only queued (Space on the appraisal skips it, and it comes again next time).
 TEST(coach_session_accuracy_explained_when_said) {

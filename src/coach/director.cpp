@@ -726,7 +726,8 @@ struct Director::Impl {
         return b.skippable;
     }
 
-    void skip() {
+    // Space: the running beat, and with 'rest' the skippable beats of its script queued after it.
+    void skip(bool rest) {
         if (!stage || !run.active) return;
         const Beat& b = run.item.beat;
         const uint64_t script = run.item.script;
@@ -740,7 +741,7 @@ struct Director::Impl {
         if (!b.skippable || run.phase == Phase::Offer) return;
         // The rest of the script: skippable beats go; an offer stays (its card only); a rewind
         // stays and goes briskly.
-        for (auto it = queue.begin(); it != queue.end();) {
+        for (auto it = queue.begin(); rest && it != queue.end();) {
             if (it->script != script) {
                 ++it;
                 continue;
@@ -922,7 +923,9 @@ void Director::setPaused(bool paused) {
     }
 }
 
-void Director::skip() { d_->skip(); }
+void Director::skip() { d_->skip(true); }
+
+void Director::skipCurrent() { d_->skip(false); }
 
 void Director::playerActed() {
     Impl& d = *d_;

@@ -8,8 +8,8 @@
 //   - Normal and Low beats queue behind beats of the same or a higher priority;
 //   - Low beats are dropped when stale (their ply is more than two plies old) or once the player
 //     acts (playerActed);
-//   - Space skips the running skippable beat and the skippable beats of the same script after it;
-//     a Rewind is never skipped, it only goes faster.
+//   - Space skips the running skippable beat and the skippable beats of the same script after it
+//     (skipCurrent(): the running beat only); a Rewind is never skipped, it only goes faster.
 // Engine-free and GL-free: the world is reached through coach::Stage only.
 #pragma once
 #include "script.h"
@@ -62,6 +62,7 @@ public:
     void update(float dt, int ply);
     void setPaused(bool paused);     // focus lost, pause menu: the voice pauses, nothing starts
     void skip();                     // Space
+    void skipCurrent();              // Space in the rules lesson: the running beat only
     void playerActed();              // the player touched a piece: queued Low beats are dropped
     // Stop now: voice, subtitle, gestures, marks, the offer card and every queued beat (a takeback,
     // leaving the game). Table actions already running finish in the scene.

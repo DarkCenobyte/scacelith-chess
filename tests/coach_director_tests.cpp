@@ -354,6 +354,19 @@ TEST(coach_director_skip) {
         rig.run(0.45f);
         CHECK(rig.dir.marks().empty());   // the kept mark faded when the (empty) rewind came
     }
+    // skipCurrent() (the rules lesson): the explanation only; the rest of the script goes on.
+    {
+        Rig rig;
+        rig.dir.play(script());
+        CHECK(rig.until([&] { return rig.voiceStarts() > 0; }, 5.0f));
+        rig.step();
+        rig.dir.skipCurrent();
+        CHECK_EQ(rig.stage.count("voice.stop"), 1);
+        CHECK(rig.settle());
+        CHECK_EQ(rig.stage.count("demoMove"), 1);
+        CHECK_EQ(rig.stage.count("rewindDemo"), 1);
+        CHECK(rig.started("event.your_move"));
+    }
     // Space during the demonstration: its narration stops, the rewind still runs, briskly.
     {
         Rig rig;

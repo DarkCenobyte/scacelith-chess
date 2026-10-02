@@ -838,7 +838,11 @@ void Session::onGameOver(const chess::Game& game, bool humanResigned) {
 }
 
 void Session::skip() {
-    if (d_->g.started) d_->director.skip();
+    Impl& d = *d_;
+    if (!d.g.started) return;
+    // A lesson chapter is one script: Space skips the line being said, never the exercises after it.
+    if (d.g.level == 0) d.director.skipCurrent();
+    else d.director.skip();
 }
 
 void Session::onCoachThinking(float seconds) {
