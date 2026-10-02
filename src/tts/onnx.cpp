@@ -32,11 +32,14 @@ struct Reader {
         bad = true;
         return 0;
     }
+    // Field numbers run from 1 to 2^29 - 1 (protobuf never writes 0): a zero byte where a tag
+    // should be is malformed, not the end of the message.
     bool tag(int& field, int& wire) {
         uint64_t t = varint();
+        if (t >> 3 == 0 || t >> 3 > 0x1fffffff) bad = true;
         field = int(t >> 3);
         wire = int(t & 7);
-        return !bad && field > 0;
+        return !bad;
     }
     uint32_t fixed32() {
         if (end - p < 4) {

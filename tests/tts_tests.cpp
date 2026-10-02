@@ -543,6 +543,10 @@ TEST(tts_onnx_reader_malformed) {
     tr.s(5, perm.b.substr(0, perm.b.size() - 1));
     CHECK(!parses(modelPb({tr}, {}, {"x"}, {"y"})));
     CHECK(parses(modelPb({nodePb("Transpose", {"x"}, {"y"}, {perm})}, {}, {"x"}, {"y"})));
+    // A zero byte where a tag should be (a zero-filled block) does not end the node early.
+    Pb zero = nodePb("Transpose", {"x"}, {"y"}, {perm});
+    zero.b.push_back('\0');
+    CHECK(!parses(modelPb({zero}, {}, {"x"}, {"y"})));
 }
 
 // Nodes with fewer inputs or outputs than their operator needs are refused at load, before
