@@ -77,6 +77,7 @@ struct VoiceShared {
     int rate = 44100;
     uint32_t sent = 0;   // chunks appended
     bool closed = false;
+    bool nonFiniteLogged = false;
     // Emitter pose (listener pattern: the audio thread try_locks when the version moved).
     std::mutex poseMutex;
     uint32_t poseId = 0;
@@ -472,6 +473,7 @@ VoiceId openVoice(const VoiceParams& p) {
                 v.rate = p.sampleRate;
                 v.sent = 0;
                 v.closed = false;
+                v.nonFiniteLogged = false;
                 {
                     std::lock_guard<std::mutex> pl(v.poseMutex);
                     v.poseId = id;
@@ -506,6 +508,18 @@ double appendVoice(VoiceId id, std::vector<float>&& mono) {
     const uint64_t dw = v.done.load(std::memory_order_acquire);
     const uint32_t done = uint32_t(dw >> 32) == id.v ? uint32_t(dw) : 0u;
     if (v.sent - done >= uint32_t(kSpeechChunks)) return -1.0;  // the mixer FIFO is full: retry later
+    // The only float input the API cannot range-check: one NaN/Inf would latch in the hall reverb
+    // and the DC blockers and silence all audio for the session, so it becomes silence here.
+    int nonFinite = 0;
+    for (float& x : mono)
+        if (!std::isfinite(x)) {
+            x = 0.0f;
+            ++nonFinite;
+        }
+    if (nonFinite && !v.nonFiniteLogged) {
+        LOGW("audio: appendVoice: %d non-finite samples replaced with silence", nonFinite);
+        v.nonFiniteLogged = true;
+    }
     SoundBuffer* b = new SoundBuffer();
     b->samples = std::move(mono);
     b->sfx = -1;

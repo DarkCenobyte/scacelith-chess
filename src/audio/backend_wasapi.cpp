@@ -357,6 +357,7 @@ private:
             BYTE* f = out + size_t(i) * size_t(blockAlign_);
             for (int c = 0; c < ch; ++c) {
                 float v = ch == 1 ? 0.5f * (l + r) : (c == chL_ ? l : (c == chR_ ? r : 0.0f));
+                if (v != v) v = 0.0f;  // NaN: silence, never handed to the engine (the clamp keeps it)
                 v = v > 1.0f ? 1.0f : (v < -1.0f ? -1.0f : v);
                 switch (type_) {
                     case SampleType::Float32: std::memcpy(f + c * 4, &v, 4); break;

@@ -1661,3 +1661,40 @@ TEST(audio_voice_live_engine) {
     }
 #endif
 }
+
+// A non-finite sample in the coach's PCM (a TTS numeric blow-up) is silenced on the way in: it
+// must not latch NaN into the hall reverb and the DC blockers, which would mute every later sound.
+TEST(audio_voice_non_finite_samples) {
+    using namespace audio;
+    using namespace std::chrono_literals;
+    setAmbienceEnabled(false);
+    if (!init()) {  // Windows without a device: nothing plays
+        shutdown();
+        setAmbienceEnabled(true);
+        return;
+    }
+    const ListenerPose lis = whiteSeatListener();
+    setListener(lis.pos, lis.fwd, lis.up);
+    std::this_thread::sleep_for(400ms);  // bank synthesis
+    VoiceParams vp;
+    vp.position = coachMouthDefault();
+    vp.sampleRate = kSrcRate;
+    std::vector<float> pcm = speechLike(0.3f, kSrcRate, 50u);
+    pcm[1000] = NAN;
+    pcm[2000] = INFINITY;
+    pcm[3000] = -INFINITY;
+    VoiceId v = playVoice(std::move(pcm), vp);
+    CHECK(bool(v));
+    CHECK_EQ(waitVoice(v, 2.0f, [](const VoiceStatus& s) { return isState(s, VoiceState::Finished); }).state,
+             VoiceState::Finished);
+    std::this_thread::sleep_for(100ms);
+    debugTakeOutputPeak();
+    play(Sfx::PiecePlace, m::vec3(0.0f, 0.78f, 0.0f));
+    std::this_thread::sleep_for(300ms);
+    const float peak = debugTakeOutputPeak();  // NaN output would leave it at 0
+    std::fprintf(stderr, "  live: piece placed after a non-finite voice: peak %.1f dBFS\n", db(peak));
+    CHECK(std::isfinite(peak) && peak > 0.001f && peak <= kMinus1dB);
+    shutdown();
+    CHECK_EQ(debugSpeechChunksAlive(), 0);
+    setAmbienceEnabled(true);
+}
