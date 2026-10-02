@@ -954,9 +954,13 @@ bool GameScene::updateReportDialog() {
     int r = ui::reportDialog(reportCategory_, reportComment_);
     if (r == 1 && link_) {
         // The server takes reports of finished games only: one filled in during the game waits
-        // for its end (updateOnlineGameOver).
-        if (og_.status == StOngoing) reportQueued_ = true;
-        else sendReport();
+        // for its end (updateOnlineGameOver), and the player is told so.
+        if (og_.status == StOngoing) {
+            reportQueued_ = true;
+            ui::notify(i18n::tr("online.report.queued"), 3.5f);
+        } else {
+            sendReport();
+        }
     }
     if (r >= 0) reportOpen_ = false;
     return true;

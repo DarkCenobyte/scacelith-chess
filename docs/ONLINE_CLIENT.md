@@ -260,8 +260,8 @@ same as against Stockfish, with these differences:
   and the saved sign-in is dropped without being sent.
 - **Esc menu.** Resume, offer draw, claim draw, abort (before my first move, in place of
   resign), resign, report opponent (server games; sent once the game has ended, the server only
-  taking reports of finished games), options, leave (confirmed: resigns, or aborts before my
-  first move). The clock keeps running behind it.
+  taking reports of finished games: a notice says so when it is made during the game), options,
+  leave (confirmed: resigns, or aborts before my first move). The clock keeps running behind it.
 - **End.** `GameEnd` waits for the last move to be on the board, then the usual end (result on
   the scoresheets, handshake, game over card) with the online reasons (abandonment, no show,
   aborted...), the rating change from `RatingUpdate` ("Rating: …" until it arrives), rematch and

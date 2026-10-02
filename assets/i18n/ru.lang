@@ -689,6 +689,7 @@ online.report.comment = Комментарий
 online.report.comment.hint = необязательно
 online.report.send = Отправить жалобу
 online.report.sent = Жалоба отправлена. Спасибо.
+online.report.queued = Жалоба будет отправлена после окончания партии.
 # Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
 online.sheet.note = Онлайн, {0}, {1}
 online.sheet.rated = рейтинговая

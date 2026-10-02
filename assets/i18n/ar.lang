@@ -693,6 +693,7 @@ online.report.comment = تعليق
 online.report.comment.hint = اختياري
 online.report.send = إرسال البلاغ
 online.report.sent = أُرسل البلاغ. شكرًا لك.
+online.report.queued = سيُرسَل بلاغك عند انتهاء المباراة.
 # Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
 online.sheet.note = عبر الإنترنت، {0} {1}
 online.sheet.rated = محتسبة

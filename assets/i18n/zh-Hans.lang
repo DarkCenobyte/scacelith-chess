@@ -688,6 +688,7 @@ online.report.comment = 备注
 online.report.comment.hint = 可选
 online.report.send = 发送举报
 online.report.sent = 举报已发送。谢谢。
+online.report.queued = 举报将在对局结束后发送。
 # Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
 online.sheet.note = 在线，{0} {1}
 online.sheet.rated = 计分
