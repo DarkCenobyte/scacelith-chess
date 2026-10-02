@@ -559,7 +559,9 @@ void PostFX::resolve(const PostInputs& in) {
             if (compute("shaders/post/exposure_average.comp")) {
                 bindImg(0, I.exposure, 0, GL_READ_WRITE);
                 glDispatchCompute(1, 1, 1);
-                barrier();
+                // barrier() + the histogram the average cleared, for next frame's atomics.
+                glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_FRAMEBUFFER_BARRIER_BIT |
+                                GL_SHADER_STORAGE_BARRIER_BIT);
                 I.expoValid = true;
             }
         }
