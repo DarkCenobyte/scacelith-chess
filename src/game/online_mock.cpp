@@ -2397,10 +2397,17 @@ void FakeServer::deleteAccount(const std::string& password, const std::string& c
     Impl& I = *impl_;
     I.lastNow = nowMs();
     const Event::Kind k = Event::Kind::AccountDeleted;
-    if (I.transportError(k)) return;
+    // The network layer closes the realtime connection before the request (a stopped state stays)
+    // and opens it again when the deletion fails, unless the session was refused.
+    const bool wasOpen = I.wantOnline;
+    if (wasOpen) disconnect();
+    auto failed = [&] {
+        if (wasOpen) connect();
+    };
+    if (I.transportError(k)) return failed();
     if (!I.signedIn) return I.http(I.result(k, false, "unauthorized"));
-    if (!I.reauth(k, password, codeOrRecovery)) return;
-    // The network layer erases the session and stops the realtime connection.
+    if (!I.reauth(k, password, codeOrRecovery)) return failed();
+    // Deleted: the network layer erases the session, and the connection stays closed.
     disconnect();
     LOGI("mock server: account %s deleted", I.account.username.c_str());
     I.signedIn = false;
