@@ -1,5 +1,5 @@
 // Tests for src/ai: presets, humanised timing, draw decisions and the embedded Stockfish 19
-// (start-up, moves, evaluation, stop, new games, shutdown/restart, instruction-set variants).
+// (start-up, moves, new games, shutdown/restart, instruction-set variants).
 #include "test.h"
 
 #include "ai/behavior.h"
@@ -28,13 +28,18 @@ std::string waitMove(ai::Engine& e, int timeoutMs, int* eval = nullptr) {
     return e.takeMove(eval);
 }
 
-bool waitEval(ai::Engine& e, int timeoutMs) {
+// Depth-6 analysis of the position after `moves`; false on timeout.
+bool waitAnalysis(ai::Engine& e, const std::vector<std::string>& moves, int timeoutMs, ai::Analysis& out) {
+    ai::AnalysisRequest r;
+    r.moves = moves;
+    r.depth = 6;
+    const uint32_t id = e.requestAnalysis(r);
     auto t0 = SteadyClock::now();
-    while (!e.evalReady()) {
+    while (!e.analysisReady(id)) {
         if (msSince(t0) > timeoutMs) return false;
         std::this_thread::sleep_for(std::chrono::milliseconds(2));
     }
-    return true;
+    return e.takeAnalysis(id, out);
 }
 
 // Minimal board replay for checking engine answers: the move must be well-formed and start on a
@@ -298,8 +303,7 @@ TEST(ai_engine_start_and_move) {
     e.requestMove({}, ai::ClockInfo{});
     int eval = 12345;
     std::string m = waitMove(e, 20000, &eval);
-    std::fprintf(stderr, "  startpos depth 6: %s (%d cp) in %d ms (search %d ms)\n", m.c_str(), eval, msSince(t0),
-                 e.lastSearchMs());
+    std::fprintf(stderr, "  startpos depth 6: %s (%d cp) in %d ms\n", m.c_str(), eval, msSince(t0));
     CHECK(plausibleMove({}, m));
     CHECK(eval > -150 && eval < 150);
     CHECK(!e.moveReady());
@@ -312,33 +316,6 @@ TEST(ai_engine_start_and_move) {
     CHECK(!e.available());
     CHECK(std::cout.rdbuf() == coutBefore);
     CHECK(std::cin.rdbuf() == cinBefore);
-}
-
-TEST(ai_engine_eval) {
-    ai::Engine e;
-    CHECK(e.start());
-    e.configure(ai::presets().front().settings);  // evaluation ignores the handicap
-    e.requestEval({});
-    CHECK(waitEval(e, 20000));
-    int cp = e.takeEval();
-    std::fprintf(stderr, "  startpos eval %d cp\n", cp);
-    CHECK(cp > -100 && cp < 100);
-    // Scholar's mate pattern, white to move: Qxf7#
-    e.requestEval({"e2e4", "e7e5", "f1c4", "b8c6", "d1h5", "g8f6"});
-    CHECK(waitEval(e, 20000));
-    CHECK_EQ(e.takeEval(), 100000);
-    // black to move, a clean piece down after 1.e4 e5 2.Nf3 Qh4?? 3.Nxh4
-    e.requestEval({"e2e4", "e7e5", "g1f3", "d8h4", "f3h4"});
-    CHECK(waitEval(e, 20000));
-    CHECK(e.takeEval() < -500);
-    // eval and move requests queue behind each other
-    e.configure(fast());
-    e.requestMove(kItalian, ai::ClockInfo{});
-    e.requestEval(kItalian);
-    std::string m = waitMove(e, 20000);
-    CHECK(plausibleMove(kItalian, m));
-    CHECK(waitEval(e, 20000));
-    e.shutdown();
 }
 
 TEST(ai_every_preset_moves) {
@@ -386,14 +363,15 @@ TEST(ai_special_moves) {
         CHECK(plausibleMove(line, m));
         if (!plausibleMove(line, m)) std::fprintf(stderr, "  after %s: '%s'\n", line.back().c_str(), m.c_str());
     }
-    e.requestEval(lines.back());  // evaluations send the same "position" command
-    CHECK(waitEval(e, 20000));
+    ai::Analysis a;  // analyses send the same "position" command
+    CHECK(waitAnalysis(e, lines.back(), 20000, a));
+    CHECK(a.ok);
     e.shutdown();
 }
 
 TEST(ai_illegal_line_not_sent) {
     // A move list the game's rules reject never reaches Stockfish, which would end the process: the
-    // request fails (empty move, neutral evaluation) and the engine keeps working.
+    // request fails (empty move, analysis not ok) and the engine keeps working.
     const std::vector<std::vector<std::string>> bad = {
         {"e2e5"},                     // not a legal move
         {"e2e4", "e7e5", "e1g1"},     // castling through pieces
@@ -409,34 +387,12 @@ TEST(ai_illegal_line_not_sent) {
     for (const auto& line : bad) {
         e.requestMove(line, ai::ClockInfo{});
         CHECK_EQ(waitMove(e, 5000), std::string());
-        e.requestEval(line);
-        CHECK(waitEval(e, 5000));
-        CHECK_EQ(e.takeEval(), 0);
+        ai::Analysis a;
+        CHECK(waitAnalysis(e, line, 5000, a));
+        CHECK(!a.ok);
     }
     e.requestMove(kItalian, ai::ClockInfo{});
     CHECK(plausibleMove(kItalian, waitMove(e, 20000)));
-    e.shutdown();
-}
-
-TEST(ai_stop_search) {
-    ai::Engine e;
-    CHECK(e.start());
-    ai::EngineSettings s;
-    s.moveTimeMs = 60000;
-    e.configure(s);
-    e.requestMove(kItalian, ai::ClockInfo{});
-    std::this_thread::sleep_for(std::chrono::milliseconds(300));
-    CHECK(!e.moveReady());
-    auto t0 = SteadyClock::now();
-    e.stopSearch();
-    std::string m = waitMove(e, 2000);
-    std::fprintf(stderr, "  stopped after 300 ms: %s, stop latency %d ms\n", m.c_str(), msSince(t0));
-    CHECK(plausibleMove(kItalian, m));
-    // stop immediately after the request: still a searched (depth >= 1) move
-    e.requestMove({"e2e4", "e7e5"}, ai::ClockInfo{});
-    e.stopSearch();
-    m = waitMove(e, 5000);
-    CHECK(plausibleMove({"e2e4", "e7e5"}, m));
     e.shutdown();
 }
 

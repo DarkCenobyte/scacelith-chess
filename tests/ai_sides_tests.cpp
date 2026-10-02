@@ -81,7 +81,6 @@ TEST(ai_engine_side_switch) {
     weak.humanize = strong.humanize = false;
     e.newGame();
     std::vector<std::string> moves;
-    double searchMs = 0.0;
     auto t0 = SteadyClock::now();
     for (int ply = 0; ply < 12; ++ply) {
         e.configure(ply % 2 == 0 ? strong : weak);
@@ -89,14 +88,12 @@ TEST(ai_engine_side_switch) {
         std::string m = waitMove(e, 20000);
         CHECK(m.size() >= 4 && m != "timeout");
         if (m.size() < 4 || m == "timeout") break;
-        searchMs += e.lastSearchMs();
         moves.push_back(m);
     }
     double total = msSince(t0);
     // The first search follows ucinewgame (nothing to clear), then one clear per ply.
     CHECK_EQ(e.hashClears(), 11);
-    std::fprintf(stderr, "  12 plies Master/Novice: %.0f ms (searches %.0f ms, %d hash clears)\n", total, searchMs,
-                 e.hashClears());
+    std::fprintf(stderr, "  12 plies Master/Novice: %.0f ms (%d hash clears)\n", total, e.hashClears());
     // Same settings on both sides: no clear.
     e.newGame();
     int before = e.hashClears();
@@ -128,9 +125,9 @@ TEST(ai_engine_side_switch) {
 
 TEST(ai_engine_analysis_shares_hash) {
     // Coach mode: the coach's own (weak) moves and full-strength analyses share one engine. An
-    // analysis warms the hash like an evaluation, so the next move of a depth-capped weak setting
-    // starts from a cleared table (its calibration); a UCI_Elo setting keeps its table, and an
-    // analysis never counts as a change of side.
+    // analysis warms the hash, so the next move of a depth-capped weak setting starts from a
+    // cleared table (its calibration); a UCI_Elo setting keeps its table, and an analysis never
+    // counts as a change of side.
     ai::Engine e;
     CHECK(e.start());
     CHECK(e.waitReady(30000));
