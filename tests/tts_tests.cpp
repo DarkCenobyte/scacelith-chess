@@ -37,6 +37,11 @@
 #include <string>
 #include <thread>
 #include <vector>
+#ifdef _WIN32
+#include <direct.h>
+#else
+#include <unistd.h>
+#endif
 
 #define CHECK_RUN(EXPR, ERR)                                                \
     do {                                                                    \
@@ -1825,7 +1830,11 @@ TEST(tts_voice_file_header) {
         CHECK(!one.loadDirectory(dir, K(), &err) && err.find("voice.bin") == std::string::npos);
     }
     for (int i = 0; i < tts::kFileCount; ++i) net::sys::removeFile(dir + tts::Engine::kFiles[i]);
-    std::remove(dir.c_str());
+#ifdef _WIN32
+    _rmdir(dir.c_str());
+#else
+    rmdir(dir.c_str());
+#endif
 }
 
 TEST(tts_stage_duration_and_text_encoder) {
