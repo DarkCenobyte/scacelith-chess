@@ -1088,6 +1088,8 @@ bool GameScene::update(AppContext& ctx, float dt) {
             if (hotSeat()) {
                 canOffer = canOffer && drawOfferBy_ < 0 && drawCardFor_ < 0;
                 resignQuestion = i18n::trf("hotseat.confirm.resign", {seats_[inputSeat()].name, seats_[1 - inputSeat()].name});
+            } else {
+                canOffer = canOffer && quietTurn();   // answered at once: not with a move on its way
             }
             switch (menuChoice(ui::pauseMenu(canClaim, canOffer, resignQuestion))) {
             case ui::MenuAction::Resume: paused_ = false; break;

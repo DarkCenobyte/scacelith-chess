@@ -974,8 +974,8 @@ void GameScene::updateCoach(float dt) {
         if (rt.sessionRunning) rt.session.onOfferAnswer(game_, coachArgs_.autoAnswer == 1);
     }
 
-    // The draw offer's evaluation.
-    if (rt.drawAnalysis && engine_.analysisReady(rt.drawAnalysis)) {
+    // The draw offer's evaluation, answered once no move is on its way (see quietTurn).
+    if (rt.drawAnalysis && (state_ != State::Playing || quietTurn()) && engine_.analysisReady(rt.drawAnalysis)) {
         ai::Analysis a;
         bool accept = false;
         if (engine_.takeAnalysis(rt.drawAnalysis, a) && a.ok && !a.lines.empty() && rt.drawPly == int(game_.moves().size())) {

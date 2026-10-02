@@ -205,6 +205,9 @@ private:
     void simulate(float dt);
     void updatePlaying(float dt);
     bool isHumanTurn() const;
+    // No move on its way between the board and the clock: a draw agreed now leaves on the board
+    // what game_ has.
+    bool quietTurn() const { return turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched || turn_ == Turn::AiThinking; }
     void updateHumanInput();
     void offerDraw();
     void updateAi(float dt);
