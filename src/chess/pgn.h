@@ -143,7 +143,8 @@ bool parseTime(const std::string& s, int64_t& ms);
 // PGN TimeControl "300+3" / "300" (seconds) into base and increment; false for "-", "?", "40/7200:3600"...
 bool parseTimeControl(const std::string& tc, int64_t& baseMs, int64_t& incrementMs);
 // The movetext result as written ("1-0", "0-1", "1/2-1/2", "*"); "" when s is not a result
-// ("½-½" and "0.5-0.5" count as a draw).
+// ("½-½" and "1/2" count as a draw, and so does "0.5-0.5" as a Result tag value: in movetext the
+// reader takes its '.' for the period of a move number).
 std::string normalizeResult(const std::string& s);
 // The PGN Termination value of a finished Game ("normal", "time forfeit", "rules infraction"),
 // "unterminated" while it goes on.
