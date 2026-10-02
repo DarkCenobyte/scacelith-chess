@@ -303,7 +303,6 @@ bool parseSsdpResponse(const std::string& text, SsdpResponse& out) {
         if (key == "location") out.location = val;
         else if (key == "server") out.server = val;
         else if (key == "usn") out.usn = val;
-        else if (key == "st") out.st = val;
     }
     return !out.location.empty();
 }
@@ -502,11 +501,8 @@ bool Client::discover(Gateway& out, Error& err) {
         const Service* svc = pickService(d);
         if (!svc) continue;
         Gateway g;
-        g.location = a.location;
         g.server = a.server;
-        g.usn = a.usn;
         g.friendlyName = d.friendlyName;
-        g.deviceType = d.deviceType;
         g.serviceType = svc->serviceType;
         g.controlUrl = resolveUrl(d.urlBase.empty() ? a.location : d.urlBase, svc->controlUrl);
         g.localAddress = localIp;

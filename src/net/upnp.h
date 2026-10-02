@@ -47,7 +47,7 @@ struct Config {
 };
 
 struct SsdpResponse {
-    std::string location, server, usn, st;
+    std::string location, server, usn;
     std::string from;                 // IP address of the device that answered
 };
 
@@ -61,8 +61,7 @@ struct Description {
 };
 
 struct Gateway {
-    std::string location, server, usn;
-    std::string friendlyName, deviceType;
+    std::string server, friendlyName;
     std::string serviceType;          // "urn:schemas-upnp-org:service:WANIPConnection:1"...
     std::string controlUrl;           // absolute "http://192.168.1.1:5000/ctl/IPConn"
     std::string host;                 // parsed control URL
@@ -88,7 +87,6 @@ struct Mapping {
 class Client {
 public:
     explicit Client(const Config& cfg = Config());
-    const Config& config() const { return cfg_; }
 
     // Finds the router and its WAN connection service. err.text "no_gateway" when nothing answered.
     bool discover(Gateway& out, Error& err);
