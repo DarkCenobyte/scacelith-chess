@@ -878,8 +878,9 @@ bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out) {
     }
     if (c.level <= 3 && fresh(Fifty) && c.p1.halfmoveClock() >= 80 && c.j.wBest >= 70.0)
         return done(Fifty, line(c, "tip.fifty.b1", Look::Player), ExType::Endgame);
+    // No explanation type: a repetition is not a stalemate fault (the appraisal's themes).
     if (c.level <= 3 && fresh(Repetition) && c.j.wBest >= 85.0 && c.g->repetitionCount() == 2)
-        return done(Repetition, line(c, "tip.repetition.b1", Look::Player), ExType::Stalemate);
+        return done(Repetition, line(c, "tip.repetition.b1", Look::Player), ExType::None);
 
     // Opening principles (levels 1-3; level 4 only the costly pawn grab), before move 12.
     if (c.ply >= 24 || !worth) return false;

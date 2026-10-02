@@ -10,6 +10,7 @@
 #include "ai/analysis.h"
 #include "ai/engine.h"
 #include "chess/chess.h"
+#include "coach/appraisal.h"
 #include "coach/review.h"
 #include "coach/review_internal.h"
 #include "coach/tactics.h"
@@ -854,6 +855,36 @@ TEST(coach_review_threat_warnings) {
     rv.reset(1, White);
     Script ms = rv.coachMoved(m);
     checkScript(ms, "threat mate");
+}
+
+// ---- Regressions ---------------------------------------------------------------------------------
+
+TEST(coach_review_repetition_tip_is_not_a_stalemate) {
+    // A winning player repeats the position (level 1): the repetition tip is said, but the move is
+    // not recorded as a stalemate fault, so the appraisal gives no stalemate advice about it.
+    Game g = gameOf("6k1/5ppp/8/8/8/8/5PPP/3Q2K1 w - - 0 1", {});
+    Reviewer rv;
+    rv.reset(1, White);
+    Appraisal ap;
+    ap.reset(1, White);
+    const char* sans[] = {"Qd2", "Kh8", "Qd1", "Kg8", "Qd2"};
+    const char* best[] = {"d1d5", "", "d2d5", "", "d1d5"};
+    Review last;
+    for (int i = 0; i < 5; ++i) {
+        const Move m = g.position().parseSAN(sans[i]);
+        const std::string uci = g.position().toUCI(m);
+        g.play(m);
+        if (i % 2) continue;
+        last = reviewOf(rv, g, analysisOf({pvl(900, best[i]), pvl(i == 4 ? 0 : 880, uci.c_str())}));
+        ap.add(last);
+    }
+    CHECK_EQ(g.repetitionCount(), 2);
+    CHECK(hasKey(last.script, "tip.repetition.b1"));
+    CHECK(last.verdict.exType != ExType::Stalemate);
+    g.resign(Black);
+    CHECK(ap.stats(g).theme != ExType::Stalemate);
+    for (const Beat& b : ap.script(g, AppraisalContext{}))
+        if (const Arg* t = b.line.arg("theme")) CHECK(t->text != "theme.stalemate");
 }
 
 // ---- Requests ------------------------------------------------------------------------------------
