@@ -1304,6 +1304,7 @@ void Animator::init(const Skeleton& sk, vec3 pelvisWorld, float facing, Side pla
     I.gazeTarget = look;
     I.fixFrom = I.fixTo = look;
     I.time = 0.0f;
+    I.timeD = 0.0;
     // Head starts looking at the board.
     I.evaluate(0.0f, I.poseI, I.worldI);
     vec3 headW = I.toWorld(transformPoint(I.G[Neck], vec3(0, 0.12f, 0.05f)));
@@ -1421,7 +1422,8 @@ void Animator::update(float dt, std::vector<Event>& events) {
         I.validateRests(nullptr);
     }
     dt = std::max(0.0f, dt);
-    const float tEnd = I.time + dt;
+    I.timeD += dt;
+    const float tEnd = float(I.timeD);
     const size_t ev0 = events.size();
     // Two task machines (playing hand, writing hand), stepped through their boundaries in time
     // order so each task starts exactly when the previous one of its hand ends.

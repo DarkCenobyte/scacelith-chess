@@ -704,6 +704,7 @@ struct Animator::Impl {
     quat rootQ;
     mat4 root, invRoot;
     float time = 0.0f;
+    double timeD = 0.0;   // the clock summed in double: 'time' neither drifts nor stalls in a long session
     Rng rng;
     float seed = 0.0f;
 

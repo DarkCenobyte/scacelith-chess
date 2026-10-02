@@ -594,6 +594,31 @@ TEST(anim_beat_while_holding_only_holds) {
     for (size_t k = 0; k < beats.size(); ++k) CHECK(std::fabs(beats[k] - (anim::Timing::Reach + (float(k) + 0.6f) * 0.45f)) < 1e-4f);
 }
 
+// A long session (the clock near 3 hours, where a float sum of 1/120 s frames runs 5% fast): the
+// clock keeps its rate, and a task still lasts its duration in frames.
+TEST(anim_clock_keeps_its_rate_in_a_long_session) {
+    anim::Animator an;
+    initWhite(an);
+    std::vector<anim::Event> ev;
+    an.update(10000.0f, ev);
+    const float t0 = an.time();
+    anim::Task wait;
+    wait.type = anim::TaskType::Wait;
+    wait.duration = 5.0f;
+    an.enqueue(wait);
+    int frames = 0, doneAt = -1;
+    while (frames < 1200) {
+        ev.clear();
+        an.update(1.0f / 120.0f, ev);
+        ++frames;
+        for (const anim::Event& e : ev)
+            if (e.type == anim::EventType::QueueEmpty && doneAt < 0) doneAt = frames;
+    }
+    CHECK(t0 == 10000.0f);
+    CHECK(doneAt >= 599 && doneAt <= 601);
+    CHECK(std::fabs(an.time() - (t0 + 10.0f)) < 1e-3f);
+}
+
 // An animator is not copyable (a copy would drive the same character state); the game resets one
 // by moving a fresh one in.
 static_assert(!std::is_copy_constructible_v<anim::Animator> && !std::is_copy_assignable_v<anim::Animator>);
