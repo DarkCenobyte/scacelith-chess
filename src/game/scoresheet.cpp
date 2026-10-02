@@ -596,28 +596,34 @@ std::vector<GlyphInk> inks(const std::vector<InkGlyph>& g) {
 using EntryParts = std::vector<std::pair<WriteBox, std::string>>;
 
 // Builds an entry from (field box, text) parts written in order; returns false when empty.
-static bool composeEntry(Entry& e, const EntryParts& parts, int style, uint32_t seed) {
+// !withPath: the ink alone (an instant write), without the pen path and the entry texture's top;
+// the glyphs are the same (a non-empty glyph list always gives a path: every glyph has a stroke).
+static bool composeEntry(Entry& e, const EntryParts& parts, int style, uint32_t seed, bool withPath = true) {
     PathKey last;
     bool any = false;
     for (size_t i = 0; i < parts.size(); ++i) {
         uint32_t s = mix32(seed, uint32_t(i) + 1u);
         std::vector<InkGlyph> g = handwrite(parts[i].second, parts[i].first, style, s);
         if (g.empty()) continue;
-        PenPath p = buildPenPath(inks(g), s);
-        if (p.keys.empty()) continue;
-        float gap = 0.0f;
-        if (any) {
-            float d = length(vec2(p.keys.front().x - last.x, p.keys.front().y - last.y));
-            gap = 0.12f + 0.004f * d;  // pen carried in the air to the next field
+        if (withPath) {
+            PenPath p = buildPenPath(inks(g), s);
+            if (p.keys.empty()) continue;
+            float gap = 0.0f;
+            if (any) {
+                float d = length(vec2(p.keys.front().x - last.x, p.keys.front().y - last.y));
+                gap = 0.12f + 0.004f * d;  // pen carried in the air to the next field
+            }
+            appendPath(e.path, p, gap, int(e.glyphs.size()));
         }
-        appendPath(e.path, p, gap, int(e.glyphs.size()));
         e.glyphs.insert(e.glyphs.end(), g.begin(), g.end());
-        last = e.path.keys.back();
+        if (withPath) last = e.path.keys.back();
         any = true;
     }
     if (!any) return false;
-    Rect r = inkBounds(inks(e.glyphs));
-    e.top = std::max(0.0f, r.y0 - 3.0f);
+    if (withPath) {
+        Rect r = inkBounds(inks(e.glyphs));
+        e.top = std::max(0.0f, r.y0 - 3.0f);
+    }
     return true;
 }
 
@@ -736,7 +742,7 @@ const sheet::PenPath* Scoresheet::writingPath() const {
 void Scoresheet::writeHeaderInstant(const Header& h) {
     Impl& I = *impl_;
     Entry e;
-    if (composeEntry(e, headerParts(h, !I.taken(0, Field::Page)), cfg_.handStyle, headerSeed(cfg_.seed)))
+    if (composeEntry(e, headerParts(h, !I.taken(0, Field::Page)), cfg_.handStyle, headerSeed(cfg_.seed), false))
         I.addInk(0, e.glyphs);
     for (int f = 0; f <= int(Field::Page); ++f) I.taken(0, Field(f)) = true;
     I.taken(0, Field::Note) = I.taken(0, Field::Reference) = true;
@@ -751,7 +757,7 @@ void Scoresheet::writeMoveInstant(int ply, const std::string& san) {
     }
     Entry e;
     bool pageNo = page > 0 && !I.taken(page, Field::Page);
-    if (composeEntry(e, moveParts(ply, san, cfg_.letters, page, pageNo), cfg_.handStyle, moveSeed(cfg_.seed, ply)))
+    if (composeEntry(e, moveParts(ply, san, cfg_.letters, page, pageNo), cfg_.handStyle, moveSeed(cfg_.seed, ply), false))
         I.addInk(page, e.glyphs);
     if (pageNo) I.taken(page, Field::Page) = true;
 }
@@ -760,7 +766,8 @@ void Scoresheet::writeFieldInstant(Field f, const std::string& text) {
     Impl& I = *impl_;
     int page = isHeaderField(f) ? 0 : page_ + pendingTurns_;
     Entry e;
-    if (composeEntry(e, {{fieldBox(f), text}}, cfg_.handStyle, fieldSeed(cfg_.seed, f, page))) I.addInk(page, e.glyphs);
+    if (composeEntry(e, {{fieldBox(f), text}}, cfg_.handStyle, fieldSeed(cfg_.seed, f, page), false))
+        I.addInk(page, e.glyphs);
     I.taken(page, f) = true;
 }
 
