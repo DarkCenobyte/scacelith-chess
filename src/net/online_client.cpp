@@ -1994,8 +1994,9 @@ bool parseSessions(const json::Value& b, std::vector<SessionInfo>& out) {
     return true;
 }
 
-// A PGN as the server writes it (S2): text that starts with its tag pairs. Anything else (an HTML
-// page of a proxy, binary data) is not handed to the game.
+// A PGN as the server writes it (dedicated-server/docs/API.md section 11, GET /games/:id/pgn): text
+// that starts with its tag pairs. Anything else (an HTML page of a proxy, binary data) is not
+// handed to the game.
 bool looksLikePgn(const std::string& t) {
     if (t.empty() || t.find('\0') != std::string::npos) return false;
     size_t i = t.compare(0, 3, "\xEF\xBB\xBF") == 0 ? 3 : 0;   // a byte order mark
@@ -2003,11 +2004,11 @@ bool looksLikePgn(const std::string& t) {
     return i < t.size() && t[i] == '[';
 }
 
-// The account export (S7): one JSON object, format "scacelith-account-export". The whole document
-// is checked, but only its top level is kept in memory while doing so (it may be large). The
-// server's document has about fifteen top-level members: more than kExportMaxMembers is not the
-// export, and is refused there (a hostile server's million members or items would otherwise all be
-// kept: gigabytes).
+// The account export (API.md section 8, POST /account/export): one JSON object, format
+// "scacelith-account-export". The whole document is checked, but only its top level is kept in
+// memory while doing so (it may be large). The server's document has about fifteen top-level
+// members: more than kExportMaxMembers is not the export, and is refused there (a hostile server's
+// million members or items would otherwise all be kept: gigabytes).
 constexpr size_t kExportMaxMembers = 64;
 bool validExport(const std::string& t) {
     json::Limits lim;
@@ -2269,7 +2270,7 @@ void OnlineClient::deleteAccount(const std::string& password, const std::string&
     });
 }
 
-// ---- animated GIFs (dedicated-server/docs/API.md, "GIF of a game") ----
+// ---- animated GIFs (dedicated-server/docs/API.md section 11, GET /games/:id/gif and POST /gif) ----
 namespace {
 
 // A GIF file: the signature of either version. Anything else (a proxy's HTML page, a JSON body

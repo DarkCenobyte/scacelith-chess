@@ -164,7 +164,8 @@ struct GamesPage {
 struct SessionInfo {                  // a signed-in device (GET /auth/sessions)
     int64_t id = 0;
     int64_t createdAtMs = 0, lastSeenAtMs = 0, expiresAtMs = 0;
-    std::string clientLabel;          // "Scacelith 0.1.0 (Windows)", "" when the client gave none
+    std::string clientLabel;          // as the signing-in client gave it, e.g. "Scacelith/0.1.0 win64"
+                                      // (clientString() of this game); "" when it gave none
     bool current = false;             // the session of this game
 };
 

@@ -5,7 +5,7 @@
 // obtained, and the pinned certificate fingerprint (hex SHA-256) if the player set one.
 //
 // The file (Scacelith.credentials, JSON) lives next to the executable like Scacelith.ini, or in
-// the user data directory (%APPDATA%\Scacelith\, ~/.config/scacelith/) when the executable's
+// the user data directory (%APPDATA%\scacelith\, ~/.config/scacelith/) when the executable's
 // directory is not writable. Tokens are never stored in clear on Windows: DPAPI
 // (CryptProtectData, current user, CRYPTPROTECT_UI_FORBIDDEN) with the origin as additional
 // entropy, so a token blob moved to another origin's record cannot be decrypted there. Linux
