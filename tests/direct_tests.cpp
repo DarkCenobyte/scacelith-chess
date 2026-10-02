@@ -23,6 +23,12 @@
 #include <mutex>
 #include <thread>
 
+#ifdef _WIN32
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
+
 using namespace net;
 
 namespace {
@@ -2412,20 +2418,29 @@ bool joinRaw(Peer& host, RawGuest& raw, P::GameSnapshot& snap) {
     return raw.connect(inv.port, inv.code) && raw.send(hello) && raw.waitFor(w, 5000) && raw.waitFor(snap, 5000);
 }
 
-// Copies the log while it lives (logx writes every line to this file too, flushed at once).
+// Copies the log while it lives (logx writes every line to this file too, flushed at once). One
+// file per process: test runs at the same time never share it.
 struct LogCapture {
-    const char* path = "/tmp/scacelith_direct_log_test.txt";
-    LogCapture() { logx::init(path); }
+    std::string path;
+    LogCapture() {
+#ifdef _WIN32
+        const unsigned pid = unsigned(_getpid());
+#else
+        const unsigned pid = unsigned(getpid());
+#endif
+        path = "/tmp/scacelith_direct_log_test_" + std::to_string(pid) + ".txt";
+        logx::init(path.c_str());
+    }
     ~LogCapture() {
         logx::shutdown();
-        std::remove(path);
+        std::remove(path.c_str());
     }
     LogCapture(const LogCapture&) = delete;
     LogCapture& operator=(const LogCapture&) = delete;
     // Lines written so far that contain 'text'.
     int count(const char* text) const {
         int n = 0;
-        if (FILE* f = std::fopen(path, "rb")) {
+        if (FILE* f = std::fopen(path.c_str(), "rb")) {
             char line[4300];
             while (std::fgets(line, sizeof line, f)) n += std::strstr(line, text) != nullptr;
             std::fclose(f);
