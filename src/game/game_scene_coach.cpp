@@ -51,7 +51,7 @@ constexpr float kSetupFadeOut = 0.30f, kSetupFadeIn = 0.45f;
 constexpr float kGestureApproach = anim::Timing::PointApproach;
 constexpr float kBeatDuration = 1.35f;    // three strokes; the first one lands after 0.27 s
 constexpr float kNodApex = 0.2f;          // a nod is at its lowest this long after it starts
-// The view's lift to the coach's face (lead decision §4.1): after the pointer has rested this long.
+// The view's lift to the coach's face: after the pointer has rested this long.
 constexpr float kFaceLiftIdle = 1.5f;
 // Failsafes of the end of a coach game, should the session never get there.
 constexpr float kHandshakeFailsafe = 45.0f, kEndCardFailsafe = 300.0f;
@@ -880,8 +880,7 @@ bool GameScene::coachCanTakeBack() const {
         turn_ == Turn::HumanPromotion || turn_ == Turn::HumanPlaced || !rt.session.canTakeBack(game_))
         return false;
     // Back to the player's last move: possible only while neither scoresheet has begun writing it
-    // (the write limit keeps it and the coach's reply off the sheets until the player's next move;
-    // lead decision §4.2).
+    // (the write limit keeps it and the coach's reply off the sheets until the player's next move).
     int n = int(game_.moves().size());
     int last = n - 1;
     if (last >= 0 && game_.positionAt(size_t(last)).sideToMove() != humanColor_) --last;
@@ -927,7 +926,7 @@ void GameScene::updateCoach(float dt) {
     const bool hold = frozen || focusLost;
     if (hold != rt.held) {
         // The pause menu, or the window in the background: the voice pauses, the director holds
-        // between beats (the game has no clock to stop; lead decision §4.3).
+        // between beats (the game has no clock to stop).
         rt.held = hold;
         if (rt.sessionRunning) rt.session.setPaused(hold);
         rt.voicePausedByScene = hold;
@@ -1029,7 +1028,7 @@ void GameScene::updateCoach(float dt) {
         stage.endGestures();
 
     // The view rises gently to the coach's face while it talks to the player, once the pointer has
-    // rested for a moment and nothing is in hand (lead decision §4.1).
+    // rested for a moment and nothing is in hand.
     const plat::Input& in = plat::input();
     vec2 p = cursorPixels();
     if (length(p - rt.lastPointer) > 2.0f || in.mouseDown[plat::MOUSE_RIGHT]) rt.pointerIdle = 0.0f;
@@ -1046,7 +1045,7 @@ void GameScene::updateCoach(float dt) {
         stage.mouth(pos, facing);
         audio::setVoicePose(rt.voice, pos, facing);
     }
-    // Board coordinates: the option, forced on for the lesson and the first levels (§4.4).
+    // Board coordinates: the option, forced on for the lesson and the first levels.
     world_.setBoardCoordinates(settings().showCoordinates || coachLevel_ <= 2);
 
     // The end of the game: the handshake once wanted (simulate enqueues it), then the appraisal.
@@ -1427,7 +1426,7 @@ void GameScene::runCoachTable(float dt) {
                     back.push_back({before, seatOf(before.sideToMove()), false});
                 }
                 // Game: the record as if the moves had never been played; the sheets forget them
-                // (they were never written: the write limit, §4.2).
+                // (they were never written: the write limit).
                 if (turn_ == Turn::HumanTouched) humanRelease();
                 game_.undo(k);
                 // The saved game's move times follow the game: one per move played.

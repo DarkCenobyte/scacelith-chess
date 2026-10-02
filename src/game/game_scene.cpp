@@ -2057,8 +2057,8 @@ void GameScene::completeMove(int seat) {
         }
         // Both players record the move on their scoresheet (their writing hands, off the clock).
         // Coach mode: the player's move and the coach's reply stay off the sheets until the
-        // player's next move, while the coach may still take them back (lead decision 4.2); the
-        // rules lesson records nothing.
+        // player's next move, while the coach may still take them back; the rules lesson records
+        // nothing.
         int ply = int(game_.moves().size()) - 1;
         if (coach() && !lesson() && mover == humanColor_) scorekeeper_.setWriteLimit(ply);
         if (!lesson()) scorekeeper_.recordMove(ply, game_.sanMoves().back());
@@ -2261,7 +2261,7 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     float basePitch = kBaseGazePitch + L.pitch - cy * 0.08f;
     L.lookUpLift = lookUpLift(up, basePitch, L.leanSmooth);
     // The coach talking to the player: the view rises to its face as the pointer rests (the
-    // weight is coachFaceLift_, eased in updateCoach; lead decision 4.1).
+    // weight is coachFaceLift_, eased in updateCoach).
     if (coach() && coachFaceLift_ > 0.0f && !dragging_)
         L.lookUpLift = std::max(L.lookUpLift, lookUpLift(smootherstep(coachFaceLift_), basePitch, L.leanSmooth));
     float targetPitch = basePitch + L.lookUpLift;
