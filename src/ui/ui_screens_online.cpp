@@ -966,7 +966,7 @@ void recoveryCodes(const Rect& p, float y) {
     for (const std::string& c : O.codes) all += c + "\n";
     bool copiedRecently = float(im::time()) - O.copiedAt < 2.5f;
     if (linkButton(copiedRecently ? "online.copied" : "online.copy", p.cx(), cy)) {
-        if (detail::setClipboardText(all)) O.copiedAt = float(im::time());
+        if (detail::setClipboardText(all, true)) O.copiedAt = float(im::time());
         else notify(T("online.copy.unavailable"), 3.0f);
     }
 }

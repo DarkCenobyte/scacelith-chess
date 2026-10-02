@@ -39,7 +39,8 @@ constexpr int kOnlineOptionsTab = 5;   // Display, Graphics, Audio, Gameplay, Pl
 // with its quiet zone). False when the text does not fit a QR code.
 bool drawQrCode(const std::string& text, const gfx::Rect& r);
 // Puts UTF-8 text on the system clipboard (Windows). False where unavailable (X11 test builds).
-bool setClipboardText(const std::string& text);
+// 'sensitive' (recovery codes) keeps it out of Windows' clipboard history and cloud clipboard.
+bool setClipboardText(const std::string& text, bool sensitive = false);
 
 }  // namespace detail
 

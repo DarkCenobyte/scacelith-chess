@@ -15,7 +15,7 @@
 namespace ui {
 namespace detail {
 
-bool setClipboardText(const std::string& text) {
+bool setClipboardText(const std::string& text, bool sensitive) {
 #ifdef _WIN32
     // CRLF line breaks and UTF-16, as CF_UNICODETEXT expects.
     std::string crlf;
@@ -44,11 +44,26 @@ bool setClipboardText(const std::string& text) {
     }
     EmptyClipboard();
     bool ok = SetClipboardData(CF_UNICODETEXT, mem) != nullptr;
+    if (ok && sensitive) {
+        // A DWORD 0 under these registered formats keeps the text out of the clipboard history
+        // (Win+V) and the cloud clipboard; older Windows ignore them.
+        for (const wchar_t* format : {L"CanIncludeInClipboardHistory", L"CanUploadToCloudClipboard"}) {
+            HGLOBAL flag = GlobalAlloc(GMEM_MOVEABLE, sizeof(DWORD));
+            if (!flag) continue;
+            if (DWORD* value = static_cast<DWORD*>(GlobalLock(flag))) {
+                *value = 0;
+                GlobalUnlock(flag);
+                if (SetClipboardData(RegisterClipboardFormatW(format), flag)) continue;  // the clipboard owns it
+            }
+            GlobalFree(flag);
+        }
+    }
     CloseClipboard();
     if (!ok) GlobalFree(mem);  // on success the clipboard owns the memory
     return ok;
 #else
     (void)text;
+    (void)sensitive;
     return false;
 #endif
 }
