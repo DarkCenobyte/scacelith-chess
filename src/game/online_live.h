@@ -12,8 +12,8 @@
 //   - My clock display while my move is on its way, and the resend of a move the authority never
 //     got (a connection lost at the wrong moment).
 //   - The RatingRestored notice, held back while a game is being played.
-//   - Which realtime errors belong to the game being played, and which refuse the challenge being
-//     created (OnlineSession's handling of them).
+//   - Which realtime errors belong to the game being played, which refuse the challenge being
+//     created, and which refuse a search (OnlineSession's handling of them).
 //   - Which game a realtime message is about, whether a RatingUpdate rates the game shown, and
 //     which ServerInfoResult answers Options' "Test connection" (OnlineSession's routing).
 #pragma once
@@ -369,6 +369,14 @@ inline bool challengeRefused(int code) {
     using E = net::proto::ErrorCode;
     return code == int(E::UserUnavailable) || code == int(E::ChallengeLimit) || code == int(E::CannotChallengeSelf) ||
            code == int(E::RatedRequiresOfficialTc) || code == int(E::InvalidTimeControl);
+}
+
+// The refusals of a QueueJoin, which end the search it began (AlreadyInGame and InvalidCategory
+// may also answer a challenge accepted or joined: no search then anyway).
+inline bool queueRefused(int code) {
+    using E = net::proto::ErrorCode;
+    return code == int(E::QueueNotAllowed) || code == int(E::MatchmakingCooldown) || code == int(E::AlreadyInGame) ||
+           code == int(E::InvalidCategory);
 }
 
 // =============================================================================================
