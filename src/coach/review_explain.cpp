@@ -14,10 +14,6 @@ using namespace chess;
 
 namespace {
 
-int pts(PieceType t) { return kPiecePoints[t]; }
-bool has(uint64_t set, Square s) { return s != NoSquare && (set & squareBit(s)); }
-Arg evalArg(const ai::Score& s) { return Arg::ofEval(s.cp, s.matesNow ? 1 : s.matedNow ? -1 : s.mate); }
-
 // Replaces an argument already set on the line (the common ones below), or adds it.
 void put(Line& l, const std::string& name, const Arg& a) {
     for (auto& p : l.args)
@@ -490,11 +486,11 @@ bool hanging(const Ctx& c, Explanation& out) {
     if (c.lossWithin(c.b.lookahead) < (c.level <= 2 ? 2 : 1)) return false;
     if (see(c.p1, r0.move) < kPieceValueCp[x] - 50) return false;
     if (c.level <= 2 ? !isUndefended(c.p1, s) : seeSquare(c.p1, s, c.coach) <= 0) return false;
-    const bool guard = has(c.f.undefended, s) && c.level <= 4;
+    const bool guard = hasBit(c.f.undefended, s) && c.level <= 4;
     bool threat = false;
     if (!guard && s != c.played.to && c.level <= 3 && c.ply > 0 && seeSquare(c.p0, s, c.coach) > 0) {
         const Position& before = c.g->positionAt(size_t(c.ply - 1));   // before the coach's last move
-        threat = !has(hangingPieces(before, c.human, false), s);
+        threat = !hasBit(hangingPieces(before, c.human, false), s);
     }
     Explanation ex;
     ex.type = ExType::Hanging;
@@ -505,7 +501,7 @@ bool hanging(const Ctx& c, Explanation& out) {
     put(b.line, "your", pieceArg(c.p1, s, c.human));
     put(b.line, "sq", Arg::ofSquare(s));
     put(b.line, "my", pieceArg(c.p1, r0.move.from, c.human));
-    put(b.line, "pts", Arg::ofNumber(pts(x)));
+    put(b.line, "pts", Arg::ofNumber(points(x)));
     if (guard) {
         put(b.line, "your2", Arg::ofPiece(c.f.piece, c.human, true, c.played.to));
         pointSquare(b, c.played.from, "your2");
@@ -551,8 +547,8 @@ bool exchange(const Ctx& c, Explanation& out) {
     put(b.line, "your", pieceArg(c.p1, s, c.human));
     put(b.line, "my", pieceArg(c.p1, r0.move.from, c.human));
     if (badCapture) {
-        put(b.line, "n", Arg::ofNumber(pts(victim)));
-        put(b.line, "n2", Arg::ofNumber(pts(c.f.captured)));
+        put(b.line, "n", Arg::ofNumber(points(victim)));
+        put(b.line, "n2", Arg::ofNumber(points(c.f.captured)));
         pointPiece(b, s, "your", true);
         traceMove(b, r0.piece, r0.move.from, s, c.level <= 2 ? "my" : "sq");
     } else if (family == "ex.exchange_count") {
@@ -562,8 +558,8 @@ bool exchange(const Ctx& c, Explanation& out) {
         for (Square a : squaresOf(att)) markPiece(b, a, "sq");
         for (Square d : squaresOf(def)) markPiece(b, d, "sq");
     } else {
-        put(b.line, "n", Arg::ofNumber(pts(victim)));
-        put(b.line, "n2", Arg::ofNumber(pts(r0.piece)));
+        put(b.line, "n", Arg::ofNumber(points(victim)));
+        put(b.line, "n2", Arg::ofNumber(points(r0.piece)));
         pointPiece(b, s, "your", true);
         traceMove(b, r0.piece, r0.move.from, s, c.level <= 2 ? "my" : "sq");
     }
@@ -582,7 +578,7 @@ bool missedCapture(const Ctx& c, Explanation& out) {
     if (see(c.p0, b0.move) < kPieceValueCp[yt] - 50) return false;
     if (c.p1.at(y).empty() || c.p1.at(y).color != c.coach) return false;   // taken after all, or moved
     if (c.f.captured != NoPiece && c.f.seeCp >= kPieceValueCp[yt] - 150) return false;   // took as much elsewhere
-    const bool bigPiece = pts(yt) >= 3;
+    const bool bigPiece = points(yt) >= 3;
     const bool fault = c.j.delta >= 5.0;
     if (!fault && !(c.level <= 2 && bigPiece)) return false;
     if (c.level <= 2 && !isUndefended(c.p0, y)) return false;   // "free": the lines say it had no protector

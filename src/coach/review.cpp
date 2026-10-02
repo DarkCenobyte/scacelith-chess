@@ -313,7 +313,7 @@ void appendDemo(const Ctx& c, const Explanation& ex, Script& s) {
 
 // ---- Reviewer ------------------------------------------------------------------------------------
 
-namespace {
+namespace detail {
 
 std::string startFenOf(const Game& g) {
     const Position& s = g.startPosition();
@@ -330,11 +330,16 @@ ai::AnalysisRequest requestAt(const Game& g, size_t plies) {
     return r;
 }
 
-int points(PieceType t) { return kPiecePoints[t]; }
-
-bool hasBit(uint64_t set, Square s) { return s != NoSquare && (set & squareBit(s)); }
+int whiteCp(const ai::Score& s, bool whiteToMove) {
+    const int cp = mates(s) ? 1000 : mated(s) ? -1000 : std::clamp(s.cp, -1000, 1000);
+    return whiteToMove ? cp : -cp;
+}
 
 Arg evalArg(const ai::Score& s) { return Arg::ofEval(s.cp, s.matesNow ? 1 : s.matedNow ? -1 : s.mate); }
+
+}  // namespace detail
+
+namespace {
 
 // A synthetic line for a move that ends the game (the engine has nothing to search after it).
 ai::PvLine terminalLine(const Position& p1, const std::string& uci) {
@@ -514,16 +519,10 @@ Review Reviewer::review(const ReviewInput& in) {
     v.wPlayed = c.j.wPlayed;
     v.delta = c.j.delta;
     v.accuracy = moveAccuracy(c.j.wBest, c.j.wPlayed);
-    {
-        auto whiteCp = [&](const ai::Score& sc) {
-            const int cp = mates(sc) ? 1000 : mated(sc) ? -1000 : std::clamp(sc.cp, -1000, 1000);
-            return c.p0.sideToMove() == White ? cp : -cp;
-        };
-        v.cpWhiteAfter = whiteCp(c.lp->score);
-        v.hasEvalAfter = true;
-        v.cpWhiteBefore = whiteCp(c.l1->score);
-        v.hasEvalBefore = true;
-    }
+    v.cpWhiteAfter = whiteCp(c.lp->score, c.p0.sideToMove() == White);
+    v.hasEvalAfter = true;
+    v.cpWhiteBefore = whiteCp(c.l1->score, c.p0.sideToMove() == White);
+    v.hasEvalBefore = true;
     v.bestUci = c.l1->pv[0];
     {
         const Move bm = c.p0.parseUCI(v.bestUci);

@@ -51,6 +51,17 @@ struct Explanation {
     chess::Square hintSquare = chess::NoSquare;   // takeback hint (levels 1-2): the piece at risk, on p0
 };
 
+// ---- Engine requests and figures (shared with the appraisal) ----
+// The start position as sent to the engine: "" for the standard start, else its FEN.
+std::string startFenOf(const chess::Game& g);
+// A request on the position after the first 'plies' moves of g (search settings left to the caller).
+ai::AnalysisRequest requestAt(const chess::Game& g, size_t plies);
+// A score (the side to move's view) as White's centipawns, mates as +-1000, clamped.
+int whiteCp(const ai::Score& s, bool whiteToMove);
+Arg evalArg(const ai::Score& s);
+inline int points(chess::PieceType t) { return kPiecePoints[t]; }
+inline bool hasBit(uint64_t set, chess::Square s) { return s != chess::NoSquare && (set & chess::squareBit(s)); }
+
 // ---- Beats ----
 std::string bandKey(const std::string& family, int level);   // family + ".b" + level
 Beat sayBeat(const std::string& key, Look look, int ply, Priority pr = Priority::Normal);
