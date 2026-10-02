@@ -211,7 +211,8 @@ Limits, accepted for a friendly unrated game:
 
 NAT-PMP and PCP, UPnP IPv6 pinholes, relays (TURN) and hole punching, more than one guest or
 spectators, rated games, unlimited time controls, games longer than 1200 plies (the protocol's
-limit).
+limit: as on the server, such a game ends *aborted by the server* after its 1200th ply, and is
+kept unfinished).
 
 ## Tests
 

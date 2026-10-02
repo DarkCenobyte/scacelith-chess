@@ -1347,6 +1347,45 @@ TEST(direct_authority_auto_press) {
     }
 }
 
+TEST(direct_authority_ply_cap) {
+    // No Move can carry a ply beyond 1199: the game that reaches 1200 plies ends aborted
+    // (ServerAborted) as on the server, instead of leaving the side to move unable to play until
+    // its flag falls. The pieces wander without captures and a pawn steps every 100 plies, so that
+    // neither the 75-move rule nor a fivefold repetition ends the game first.
+    Room r(tc(300, 0), 1);   // host White
+    r.start();
+    uint32_t rng = 12345;
+    while (r.a.plies() < 1200) {
+        const int n = r.a.plies();
+        const std::vector<chess::Move> moves = r.mirror.position().legalMoves();
+        const bool pawnTurn = n % 100 == 99;
+        rng = rng * 1103515245u + 12345u;
+        chess::Move pick;
+        for (int pass = 0; pass < 2 && !pick.valid(); ++pass) {
+            for (size_t k = 0; k < moves.size() && !pick.valid(); ++k) {
+                const chess::Move& mv = moves[(k + rng / 65536) % moves.size()];
+                const bool pawn = r.mirror.position().at(mv.from).type == chess::Pawn;
+                if (pass == 0 && ((mv.flags & chess::MoveCapture) || pawn != pawnTurn)) continue;
+                chess::Game probe = r.mirror;
+                probe.play(mv);
+                if (!probe.isOver()) pick = mv;
+            }
+        }
+        CHECK(pick.valid());
+        if (!pick.valid()) return;
+        r.move(n % 2 == 0 ? HostSide : GuestSide, r.mirror.position().toUCI(pick).c_str());
+        CHECK_EQ(r.a.plies(), n + 1);
+        if (r.a.plies() != n + 1) return;
+        if (n + 1 < 1200) CHECK(!r.a.isOver());
+    }
+    auto mm = r.recent<P::MoveMade>(GuestSide);
+    CHECK(mm.size() == 1 && mm[0].ply == 1199);
+    for (Side s : {HostSide, GuestSide}) {
+        auto e = r.recent<P::GameEnd>(s);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::Aborted && e[0].reason == P::EndReason::ServerAborted);
+    }
+}
+
 // ---- loopback matches: two DirectMatch in this process ------------------------------------------
 
 namespace {

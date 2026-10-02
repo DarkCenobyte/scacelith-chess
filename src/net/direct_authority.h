@@ -29,6 +29,8 @@
 //     pending is an agreement; claims (threefold, fifty moves) via chess::Game; automatic
 //     endings (mate, stalemate, insufficient material, fivefold, 75 moves) via chess::Game.
 //   - Resignation at any time while the game runs; abort only before one's own first move.
+//   - A game that reaches 1200 plies (no Move can carry a later ply) ends aborted
+//     (ServerAborted), as on the server.
 //   - Guest disconnected: its clock keeps running; after graceMs (60 s) it loses by
 //     Abandonment (draw when the host cannot mate; aborted NoShow before 2 plies).
 //   - Rematch within 60 s after the end, both must accept, colours swapped; a decline, the

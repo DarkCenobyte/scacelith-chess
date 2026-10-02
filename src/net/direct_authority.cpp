@@ -15,6 +15,7 @@ namespace P = net::proto;
 namespace {
 constexpr double kInf = std::numeric_limits<double>::infinity();
 constexpr int kNone = 2;
+constexpr int kMaxPlies = 1200;   // Move.ply <= 1199 (schema.js), as room.js MAX_PLIES
 
 uint32_t u32ms(int64_t ms) { return uint32_t(std::max<int64_t>(0, std::min<int64_t>(ms, 0xFFFFFFFFll))); }
 
@@ -464,6 +465,7 @@ void Authority::onMove(Side side, const uint8_t* p, size_t n, double now, Output
     if (declined) gameEvent(out, int(P::GameEventKind::DrawDeclined), c, 0);
     if (offerRefused) error(out, side, m.seq, int(P::ErrorCode::DrawOfferLimit), id_);
     if (game_.isOver()) finishFromChess(now, out);
+    else if (plies() >= kMaxPlies) finish(int(P::GameStatus::Aborted), int(P::EndReason::ServerAborted), now, out);
 }
 
 void Authority::onDisconnect(Side side, double now, Output& out) {
