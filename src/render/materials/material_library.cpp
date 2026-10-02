@@ -4,7 +4,6 @@
 // top of that file; the per-object conventions are summarised in material_library.h.
 #include "material_library.h"
 #include "material_bake.h"
-#include "../../core/log.h"
 
 using namespace m;
 

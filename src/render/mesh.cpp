@@ -1,5 +1,4 @@
 #include "mesh.h"
-#include "../core/log.h"
 #include <cstddef>
 
 using namespace m;

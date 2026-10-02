@@ -6,7 +6,6 @@
 #include "lighting/shadows.h"
 #include "post/postfx.h"
 #include "shader.h"
-#include "../core/log.h"
 #include "../game/layout.h"
 #include <algorithm>
 #include <cstring>
