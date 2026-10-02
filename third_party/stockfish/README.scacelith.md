@@ -164,7 +164,12 @@ build fails with multiple definitions). Each variant is instead turned into one 
 
 1. `ld -r` links its objects into one relocatable object, which resolves its COMDAT groups inside
    the variant (ELF: `--force-group-allocation`, no group left; PE: twice, as one pass leaves an
-   undefined symbol next to each kept COMDAT definition).
+   undefined symbol next to each kept COMDAT definition). PE: the unwind table entries go to the
+   section `.pdata$<tag>`, not `.pdata`, as `ld -r` sorts a `.pdata` by its raw contents (offsets
+   into each input's own sections) without moving the relocations: the executables would get
+   overlapping entries and bad unwind data, also over libgcc's unwinder, and a C++ throw could
+   loop forever or unwind into a wrong frame. The final link takes `.pdata*` into `.pdata` and
+   sorts the relocated entries.
 2. PE only: the COMDAT flag is cleared on every `.text$*`, `.rdata$*`, `.data$*`, `.bss$*`,
    `.xdata$*` and `.pdata$*` section, because COFF merges COMDATs by name even when their symbol
    is local.
@@ -179,8 +184,10 @@ build fails with multiple definitions). Each variant is instead turned into one 
 
 The script then verifies its output and fails the build if anything could leak or go missing:
 exactly those three global symbols, bounds that span the whole initialiser table, no symbol both
-defined and undefined, no COMDAT left, and no section the scheme does not handle (initialiser
-priorities, destructor tables, thread-local storage; Stockfish 19 has none).
+defined and undefined, no COMDAT left, on Windows no `.pdata` left for `ld -r` to sort, and no
+section the scheme does not handle (initialiser priorities, destructor tables, thread-local
+storage; Stockfish 19 has none). The exception table of each Windows executable is then checked
+after its link (`tools/check_pdata.py` at the repository root).
 
 **Verification.**
 

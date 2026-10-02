@@ -175,3 +175,17 @@ if(TEST_SOURCES)
         target_link_options(scacelith_tests PRIVATE -static -static-libgcc -static-libstdc++)
     endif()
 endif()
+
+# Windows: the exception table (.pdata) of each exe is checked after its link when Python is
+# available (tools/check_pdata.py). Windows and Wine binary-search it to unwind every C++ throw:
+# the build fails if its entries are unsorted, overlap or point at bad unwind data, or if libgcc's
+# unwinder would find another function's entry (a throw would then loop forever or crash).
+if(WIN32 AND Python3_Interpreter_FOUND)
+    foreach(exe scacelith scacelith_tests)
+        if(TARGET ${exe})
+            add_custom_command(TARGET ${exe} POST_BUILD
+                COMMAND ${Python3_EXECUTABLE} ${ROOT}/tools/check_pdata.py --quiet $<TARGET_FILE:${exe}>
+                VERBATIM)
+        endif()
+    endforeach()
+endif()

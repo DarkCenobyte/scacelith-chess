@@ -22,8 +22,9 @@
 #      engine still uses the game's std::cin / std::cout.
 # Then the result is verified, and the build fails if anything could leak or go missing: exactly
 # those three globals, bounds that span the whole initialiser table, no symbol both defined and
-# undefined, no COMDAT left, and no section this scheme does not handle (initialiser priorities,
-# destructor tables, thread-local storage).
+# undefined, no COMDAT left, on Windows no unwind table that ld -r has broken (step 1), and no
+# section this scheme does not handle (initialiser priorities, destructor tables, thread-local
+# storage).
 cmake_minimum_required(VERSION 3.20)
 string(REPLACE "|" ";" INPUTS "${INPUTS}")
 
@@ -50,9 +51,17 @@ else()
     # One ld -r leaves, for each COMDAT whose duplicate it dropped, an undefined symbol next to
     # the kept definition; they would only be matched in the final link, after step 4 made the
     # definition invisible. A second ld -r over the single object merges them.
-    run(${LD} -r -o ${linked}.0 ${INPUTS})
-    run(${LD} -r -o ${linked} ${linked}.0)
-    file(REMOVE ${linked}.0)
+    # The unwind table entries (RUNTIME_FUNCTION) go to .pdata$<TAG>, not .pdata: ld -r sorts an
+    # output section named .pdata by the raw BeginAddress fields, which in an object are offsets
+    # into each input's own section, and leaves the relocations in place. Entries then get other
+    # entries' addresses: the exe gets overlapping entries and bad unwind data, over libgcc's
+    # unwinder too, and a C++ throw loops forever or unwinds into a wrong frame. The final link
+    # takes .pdata* into .pdata and sorts the relocated entries (tools/check_pdata.py checks it).
+    set(pdataScript "${OUT}.pdata.ld")
+    file(WRITE ${pdataScript} "SECTIONS { .pdata$${TAG} : { KEEP(*(.pdata)) } } INSERT BEFORE .pdata;\n")
+    run(${LD} -r -T ${pdataScript} -o ${linked}.0 ${INPUTS})
+    run(${LD} -r -T ${pdataScript} -o ${linked} ${linked}.0)
+    file(REMOVE ${linked}.0 ${pdataScript})
 endif()
 
 # 3. Find the initialiser table (the section index may have 3 digits).
@@ -149,4 +158,8 @@ endif()
 run(${OBJDUMP} -h ${OUT})
 if(RUN_OUT MATCHES "LINK_ONCE|GROUP")
     fail("COMDAT sections left")
+endif()
+# PE: the unwind table is in .pdata$<TAG>, not in a .pdata that ld -r has sorted (step 1).
+if(FORMAT STREQUAL "PE" AND RUN_OUT MATCHES "\n *[0-9]+ \\.pdata ")
+    fail("a .pdata section left: ld -r sorted it and broke its relocations")
 endif()
