@@ -98,6 +98,17 @@ struct DirectInvite {
     std::string code;                 // "K7Q2-M9XH-3PTR"
 };
 
+// The guest's address field read as the host's Copy writes it ("[v6]:port CODE",
+// "a.b.c.d:port CODE"): its host, and the port and code it carries ("" when none). The code is a
+// last word after a space, looked for only when 'withCode' (upper-cased; letters, digits and
+// dashes kept); "host:port" is split only with a single ':' (a bare IPv6 address has several) and
+// a port of 1 to 5 digits, "[v6]" only with nothing or ":port" after it. Spaces and tabs around
+// the field and the code are ignored; anything else is the host as typed.
+struct DirectAddress {
+    std::string host, port, code;
+};
+DirectAddress splitDirectAddress(const std::string& field, bool withCode);
+
 class DirectMatch {
 public:
     enum class State {

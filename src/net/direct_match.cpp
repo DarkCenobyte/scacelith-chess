@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cctype>
 #include <chrono>
 #include <cmath>
 #include <cstring>
@@ -1508,6 +1509,39 @@ bool DirectMatch::poll(Event& out) {
 DirectMatch& directMatch() {
     static DirectMatch instance;
     return instance;
+}
+
+DirectAddress splitDirectAddress(const std::string& field, bool withCode) {
+    auto trim = [](const std::string& s) {
+        size_t a = s.find_first_not_of(" \t"), b = s.find_last_not_of(" \t");
+        return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
+    };
+    DirectAddress a;
+    std::string s = trim(field);
+    const size_t space = s.find_last_of(" \t");
+    if (withCode && space != std::string::npos) {
+        for (char c : s.substr(space + 1))
+            if (std::isalnum(static_cast<unsigned char>(c)) || c == '-') a.code += char(std::toupper(static_cast<unsigned char>(c)));
+        s = trim(s.substr(0, space));
+    }
+    auto isPort = [](const std::string& p) {
+        return !p.empty() && p.size() <= 5 && std::all_of(p.begin(), p.end(), [](char c) { return c >= '0' && c <= '9'; });
+    };
+    const size_t close = s.find(']'), colon = s.find(':');
+    if (s.size() > 2 && s[0] == '[' && close != std::string::npos) {
+        const std::string rest = s.substr(close + 1);
+        if (rest.empty() || (rest[0] == ':' && isPort(rest.substr(1)))) {
+            a.host = s.substr(1, close - 1);
+            if (!rest.empty()) a.port = rest.substr(1);
+            return a;
+        }
+    } else if (colon != std::string::npos && colon > 0 && s.find(':', colon + 1) == std::string::npos && isPort(s.substr(colon + 1))) {
+        a.host = s.substr(0, colon);
+        a.port = s.substr(colon + 1);
+        return a;
+    }
+    a.host = s;
+    return a;
 }
 
 }  // namespace net
