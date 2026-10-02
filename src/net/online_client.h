@@ -52,8 +52,8 @@
 
 namespace net {
 
-// Where the server is. The official server (if the build defines SCACELITH_OFFICIAL_SERVER) is
-// the default; players may enter a community server instead (Options > Online).
+// Where the server is. The build's official server (officialServer() below) is the default;
+// players may enter a community server instead (Options > Online).
 struct ServerEndpoint {
     std::string host;                 // DNS name or IP literal (IPv6 without brackets)
     uint16_t apiPort = 443;           // HTTPS API

@@ -48,7 +48,7 @@
 //   --start                 skip the menu: a game against Stockfish (--human white|black)
 //   --start --coach         skip the menu: a coach game (--coach-level N, 0 = the rules lesson,
 //                           1..6; --coach-colour white|black); the [coach] settings otherwise
-//   --coach-dir <path>      the folder of the coach's voice files (default: coach/ beside the exe)
+//   --coach-dir <path>      the folder of the coach's voice files (default: <application data>/coach/)
 //   --coach-stage-test      a coach game whose Stage performs a fixed sequence (a spoken line with
 //                           its subtitle, pointing, a knight's trace, marks, two demonstration
 //                           moves and their rewind, the takeback card), without the session

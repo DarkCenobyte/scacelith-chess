@@ -234,8 +234,8 @@ struct CoachSetup {
     int level = 1;               // index into coachLevels(): 0 = the rules lesson
     int colour = 2;              // the player's colour: 0 White, 1 Black, 2 alternate (the rules
                                  // lesson is always played with White: Settings::coachPlayerColour)
-    // Set by the game before mainMenu(): false when the coach's voice files (the coach/ folder
-    // beside the executable) are missing or failed to load. The page then says in one line that
+    // Set by the game before mainMenu(): false when the coach's voice files (tts::modelFolder(),
+    // <application data>/coach/) are missing or failed to load. The page then says in one line that
     // the coach will speak through subtitles only.
     bool voiceAvailable = true;
 };
