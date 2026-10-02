@@ -302,7 +302,9 @@ saved games' tests fail although Windows takes the name. `tools/test_win.sh` and
 Development options: `--scene <name>` runs a viewer scene (`--list-scenes`), `--data-dir .`
 reads shaders from disk and **F5** reloads them, **F12** saves a screenshot,
 `--shot out.png --frames N --size 1280x720` renders headlessly. `tools/shot.sh` and
-`tools/shot_win.sh` do this under Xvfb (Linux build and Windows build through Wine).
+`tools/shot_win.sh` do this under Xvfb (Linux build and Windows build through Wine). The Windows
+exe has no console: redirect what it prints (`Scacelith.exe --list-scenes > scenes.txt`, or
+`| more`), or configure with `-DSCACELITH_CONSOLE=ON` for a console build.
 
 The game itself (`--scene game`, the default) takes `--start` (a game against Stockfish at once;
 `--human white|black`), `--viewer` (a watched game at once; `--white-preset N --black-preset N`
