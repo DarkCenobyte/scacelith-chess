@@ -561,6 +561,20 @@ TEST(tts_ops_broadcast_arith) {
     CHECK(runOp(node(tts::Op::Add), {&col, &row}, o) && equalF(o[0], {3, 2}, {11, 21, 12, 22, 13, 23}));
     Tensor two = F({}, {2.0f});
     CHECK(runOp(node(tts::Op::Pow), {&a, &two}, o) && equalF(o[0], {2, 3}, {1, 4, 9, 16, 25, 36}));
+    // Integer Pow: huge exponents of 0 and +-1 are instant, an overflow fails instead of wrapping.
+    {
+        const int64_t big = int64_t(1) << 62;
+        Tensor base = I({6}, {3, -2, 1, -1, 0, 5}), ex = I({6}, {4, 63, big, big + 1, big, -1});
+        CHECK(runOp(node(tts::Op::Pow), {&base, &ex}, o) &&
+              equalT<int64_t>(o[0], DType::I64, {6}, {81, std::numeric_limits<int64_t>::min(), 1, -1, 0, 0}));
+        Tensor b2 = I({1}, {2}), e63 = I({1}, {63}), e40 = I({1}, {40}), b3 = I({1}, {3});
+        CHECK(!runOp(node(tts::Op::Pow), {&b2, &e63}, o));
+        CHECK(!runOp(node(tts::Op::Pow), {&b3, &e40}, o));
+        Tensor ef = F({}, {2.0f}), enan = F({}, {std::nanf("")}), ehuge = F({}, {1e30f});
+        CHECK(runOp(node(tts::Op::Pow), {&base, &ef}, o) && equalT<int64_t>(o[0], DType::I64, {6}, {9, 4, 1, 1, 0, 25}));
+        CHECK(!runOp(node(tts::Op::Pow), {&base, &enan}, o));
+        CHECK(!runOp(node(tts::Op::Pow), {&base, &ehuge}, o));
+    }
     Tensor ia = I({3}, {7, -7, 9}), ib = I({1}, {2});
     CHECK(runOp(node(tts::Op::Div), {&ia, &ib}, o) && equalT<int64_t>(o[0], DType::I64, {3}, {3, -3, 4}));
     CHECK(runOp(node(tts::Op::Equal), {&ia, &ib}, o) && equalT<uint8_t>(o[0], DType::Bool, {3}, {0, 0, 0}));
@@ -727,6 +741,60 @@ TEST(tts_ops_pad_reduce) {
     Tensor ax1 = I({1}, {1});
     CHECK(runOp(rs, {&x, &ax1}, o) && equalF(o[0], {1, 3}, {5, 7, 9}));
     CHECK(runOp(rs, {&x, nullptr}, o) && equalF(o[0], {}, {21}));
+}
+
+// Attributes, axes and inputs out of range (a damaged model file) fail the node instead of
+// reading or writing outside a buffer; scalars go through Transpose and Pad.
+TEST(tts_ops_bad_attributes) {
+    std::vector<Tensor> o;
+    Tensor s = F({}, {4.5f}), x = F({2, 3}, {1, 2, 3, 4, 5, 6});
+    CHECK(runOp(node(tts::Op::Transpose), {&s}, o) && equalF(o[0], {}, {4.5f}));
+    tts::Node pad = node(tts::Op::Pad);
+    Tensor noPads = I({0}, {});
+    CHECK(runOp(pad, {&s, &noPads}, o) && equalF(o[0], {}, {4.5f}));
+    tts::Node tr = node(tts::Op::Transpose);
+    for (std::vector<int64_t> perm : {std::vector<int64_t>{0, 0}, {1, 2}, {-1, 0}}) {
+        tr.ints = perm;
+        CHECK(!runOp(tr, {&x}, o));
+    }
+    Tensor pads = I({2}, {1, 1}), axis5 = I({1}, {5}), axisM3 = I({1}, {-3});
+    CHECK(!runOp(pad, {&x, &pads, nullptr, &axis5}, o));
+    CHECK(!runOp(pad, {&x, &pads, nullptr, &axisM3}, o));
+    CHECK(!runOp(node(tts::Op::ReduceSum), {&x, &axis5}, o));
+    CHECK(!runOp(node(tts::Op::ReduceSum), {&x, &axisM3}, o));
+    tts::Node sm = node(tts::Op::Softmax);
+    sm.axis = -1;
+    Tensor ix = I({2}, {1, 2});
+    CHECK(!runOp(sm, {&s}, o));
+    CHECK(!runOp(sm, {&ix}, o));
+    tts::Node ln = node(tts::Op::LayerNorm);
+    ln.axis = -3;
+    Tensor g = F({3}, {1, 1, 1});
+    CHECK(!runOp(ln, {&x, &g}, o));
+    ln.axis = 2;
+    CHECK(!runOp(ln, {&x, &g}, o));
+    tts::Node sp = node(tts::Op::Split);
+    sp.axis = 1;
+    Tensor tooLong = I({2}, {2, 2}), negative = I({2}, {-1, 4});
+    CHECK(!runOp(sp, {&x, &tooLong}, o, 2));
+    CHECK(!runOp(sp, {&x, &negative}, o, 2));
+    CHECK(!runOp(sp, {&x}, o, 0));
+    Tensor fits = I({2}, {1, 2});
+    CHECK(runOp(sp, {&x, &fits}, o, 2) && equalF(o[0], {2, 1}, {1, 4}) && equalF(o[1], {2, 2}, {2, 3, 5, 6}));
+    Tensor empty = I({0}, {});
+    CHECK(!runOp(node(tts::Op::Clip), {&ix, &empty}, o));
+    Tensor cx = F({1, 2, 6}, std::vector<float>(12, 1.0f)), cw = F({2, 1, 3}, std::vector<float>(6, 1.0f));
+    tts::Node cv = node(tts::Op::Conv);
+    cv.i0 = 2;
+    CHECK(runOp(cv, {&cx, &cw}, o) && o[0].dims == Dims({1, 2, 4}));
+    for (int field = 0; field < 4; ++field) {
+        tts::Node bad = cv;
+        if (field == 0) bad.ints3 = {0};          // stride
+        if (field == 1) bad.ints = {0};           // dilation
+        if (field == 2) bad.ints2 = {-1, 0};      // pads
+        if (field == 3) bad.i0 = 0;               // group
+        CHECK(!runOp(bad, {&cx, &cw}, o));
+    }
 }
 
 TEST(tts_ops_norms) {

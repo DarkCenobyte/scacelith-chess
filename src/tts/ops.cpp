@@ -259,14 +259,29 @@ bool arith(const ExecContext& ctx, Op op, const Tensor& a0, const Tensor& b0, Te
 
 bool opPow(const Tensor& a, const Tensor& b, Tensor& out, std::string* err) {
     if (a.type == DType::I64) {   // shape arithmetic (relative-position attention windows)
-        auto ipow = [](int64_t x, int64_t y) {
+        // By squaring: an exponent from the file never loops for long. A square is only taken when
+        // a later bit needs it, so 'overflow' means the result itself does not fit.
+        bool overflow = false;
+        auto ipow = [&overflow](int64_t x, int64_t y) {
+            if (y < 0) return int64_t(0);
             int64_t r = 1;
-            for (int64_t i = 0; i < y; ++i) r *= x;
-            return y < 0 ? int64_t(0) : r;
+            for (; y; y >>= 1) {
+                if ((y & 1) && __builtin_mul_overflow(r, x, &r)) overflow = true;
+                if (y > 1 && __builtin_mul_overflow(x, x, &x)) overflow = true;
+            }
+            return r;
         };
-        if (b.type == DType::I64) return binaryT<int64_t, int64_t>(a, b, out, DType::I64, ipow, err);
-        if (b.type == DType::F32)
-            return binaryT<int64_t, int64_t>(a, Tensor::fromInts({int64_t(b.scalarFloat())}), out, DType::I64, ipow, err);
+        bool ok;
+        if (b.type == DType::I64) {
+            ok = binaryT<int64_t, int64_t>(a, b, out, DType::I64, ipow, err);
+        } else if (b.type == DType::F32) {
+            float e = b.scalarFloat();
+            if (!(e >= -0x1p63f && e < 0x1p63f)) return fail(err, "Pow exponent out of range");
+            ok = binaryT<int64_t, int64_t>(a, Tensor::fromInts({int64_t(e)}), out, DType::I64, ipow, err);
+        } else {
+            return fail(err, "Pow exponent type");
+        }
+        return ok && (!overflow || fail(err, "Pow overflow"));
     }
     if (a.type != DType::F32) return fail(err, "Pow base must be float or int64");
     if (b.type == DType::F32 && b.count() == 1) {
@@ -434,6 +449,11 @@ bool opTranspose(const Tensor& x0, std::vector<int64_t> perm, Tensor& out, std::
     if (perm.empty())
         for (size_t i = 0; i < r; ++i) perm.push_back(int64_t(r - 1 - i));
     if (perm.size() != r) return fail(err, "Transpose perm rank");
+    std::vector<bool> seen(r, false);
+    for (int64_t p : perm) {
+        if (p < 0 || p >= int64_t(r) || seen[size_t(p)]) return fail(err, "Transpose perm is not a permutation");
+        seen[size_t(p)] = true;
+    }
     Dims od(r);
     Dims is = stridesOf(x.dims);
     Dims ps(r);   // input stride of each output dimension
@@ -460,12 +480,12 @@ bool opTranspose(const Tensor& x0, std::vector<int64_t> perm, Tensor& out, std::
         } else {
             for (int64_t i = 0; i < inner; ++i) std::memcpy(d + i * int64_t(es), src + (off + i * innerStride) * int64_t(es), es);
         }
-        for (size_t dd = r - 1; dd-- > 0;) {
-            ++idx[dd];
-            off += ps[dd];
-            if (idx[dd] < od[dd]) break;
-            off -= ps[dd] * od[dd];
-            idx[dd] = 0;
+        for (int64_t dd = int64_t(r) - 1; dd-- > 0;) {
+            ++idx[size_t(dd)];
+            off += ps[size_t(dd)];
+            if (idx[size_t(dd)] < od[size_t(dd)]) break;
+            off -= ps[size_t(dd)] * od[size_t(dd)];
+            idx[size_t(dd)] = 0;
         }
     }
     return true;
@@ -511,11 +531,17 @@ bool opSplit(const Node& nd, const Tensor& x0, const Tensor* splitT, Tensor* out
     size_t nout = nd.out.size();
     std::vector<int64_t> sizes = splitT && splitT->valid() ? splitT->toInts() : nd.ints;
     int64_t len = x.dims[size_t(axis)];
+    if (nout == 0) return fail(err, "Split without outputs");
     if (sizes.empty()) {
         int64_t each = (len + int64_t(nout) - 1) / int64_t(nout);
         for (size_t i = 0; i < nout; ++i) sizes.push_back(std::min(each, len - each * int64_t(i)));
     }
     if (sizes.size() != nout) return fail(err, "Split sizes count");
+    int64_t sum = 0;
+    for (int64_t v : sizes) {
+        if (v < 0 || v > len - sum) return fail(err, "Split sizes exceed the axis");
+        sum += v;
+    }
     int64_t outer = 1, inner = 1;
     for (int64_t d = 0; d < axis; ++d) outer *= x.dims[size_t(d)];
     for (int64_t d = axis + 1; d < r; ++d) inner *= x.dims[size_t(d)];
@@ -720,8 +746,13 @@ bool opPad(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tenso
     std::vector<int64_t> lo(size_t(r), 0), hi(size_t(r), 0);
     for (size_t i = 0; i < axes.size(); ++i) {
         int64_t a = normAxis(axes[i], r);
+        if (a < 0 || a >= r) return fail(err, "Pad axis");
         lo[size_t(a)] = p[i];
         hi[size_t(a)] = p[i + axes.size()];
+    }
+    if (r == 0) {   // a scalar: nothing to pad
+        out = x;
+        return true;
     }
     // Negative pads crop (the relative-position attention of the text encoders uses them).
     Dims od = x.dims;
@@ -814,7 +845,11 @@ bool opReduceSum(const Node& nd, const Tensor& x0, const Tensor* axesT, Tensor& 
         for (int64_t d = 0; d < r; ++d) axes.push_back(d);
     }
     std::vector<bool> red(size_t(r), false);
-    for (int64_t a : axes) red[size_t(normAxis(a, r))] = true;
+    for (int64_t a : axes) {
+        a = normAxis(a, r);
+        if (a < 0 || a >= r) return fail(err, "ReduceSum axis");
+        red[size_t(a)] = true;
+    }
     Dims kd = x.dims, od;
     for (int64_t d = 0; d < r; ++d) {
         if (red[size_t(d)]) kd[size_t(d)] = 1;
@@ -845,6 +880,7 @@ bool opReduceSum(const Node& nd, const Tensor& x0, const Tensor* axesT, Tensor& 
 // ------------------------------------------------------------------------------------------------
 bool opSoftmax(const ExecContext& ctx, const Tensor& x0, int64_t axis, Tensor& out, std::string* err) {
     Tensor x = materialize(x0);
+    if (x.type != DType::F32 || x.rank() == 0) return fail(err, "Softmax expects a float tensor of rank 1 or more");
     axis = normAxis(axis, x.rank());
     if (axis != x.rank() - 1) return fail(err, "Softmax only on the last axis");
     out = Tensor::alloc(DType::F32, x.dims);
@@ -860,6 +896,7 @@ bool opLayerNorm(const ExecContext& ctx, const Node& nd, const Tensor& x, const 
     Tensor g = materialize(g0);
     Tensor b = b0 && b0->valid() ? materialize(*b0) : Tensor();
     int64_t axis = normAxis(nd.axis, x.rank());
+    if (axis < 0 || axis >= x.rank()) return fail(err, "LayerNorm axis");
     int64_t cols = 1;
     for (int64_t d = axis; d < x.rank(); ++d) cols *= x.dims[size_t(d)];
     if (g.count() != cols || (b.valid() && b.count() != cols)) return fail(err, "LayerNorm scale/bias size");
@@ -1079,6 +1116,7 @@ bool opConv(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tens
     int64_t dil = nd.ints.empty() ? 1 : nd.ints[0];
     int64_t stride = nd.ints3.empty() ? 1 : nd.ints3[0];
     int64_t p0 = nd.ints2.size() >= 2 ? nd.ints2[0] : 0, p1 = nd.ints2.size() >= 2 ? nd.ints2[1] : 0;
+    if (group < 1 || dil < 1 || stride < 1 || p0 < 0 || p1 < 0) return fail(err, "Conv group, dilation, stride or pads");
     if (Cg * group != Cin) return fail(err, "Conv channels " + dimsStr(x.dims) + " weight " + dimsStr(w.dims));
     int64_t Lout = (L + p0 + p1 - dil * (k - 1) - 1) / stride + 1;
     if (Lout <= 0) return fail(err, "Conv output length");
@@ -1388,6 +1426,7 @@ bool execNode(const Node& n, const Tensor* const* in, Tensor* out, const ExecCon
         float lo = opt(1) ? opt(1)->scalarFloat() : -std::numeric_limits<float>::infinity();
         float hi = opt(2) ? opt(2)->scalarFloat() : std::numeric_limits<float>::infinity();
         if (in[0]->type == DType::I64) {
+            if ((opt(1) && opt(1)->count() < 1) || (opt(2) && opt(2)->count() < 1)) return fail(error, "Clip bounds");
             int64_t ilo = opt(1) ? opt(1)->toInts()[0] : std::numeric_limits<int64_t>::min();
             int64_t ihi = opt(2) ? opt(2)->toInts()[0] : std::numeric_limits<int64_t>::max();
             Tensor x = *in[0];
