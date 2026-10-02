@@ -418,6 +418,22 @@ void rowHighlight(const Rect& r, float t) {
     gfx::fill(flip(r, Rect(r.x, r.y + 6.0f, std::max(2.0f, 2.0f * gfx::px()), r.h - 12.0f)), withAlpha(goldBright, 0.9f * t));
 }
 
+std::string elideToFit(const std::string& s, const TextStyle& st, float maxWidth) {
+    // Half a unit of slack: a label fitSize() shrank to the exact width measures a hair over it.
+    if (gfx::textWidth(s, st) <= maxWidth + 0.5f) return s;
+    const char* const ellipsis = "\xE2\x80\xA6";
+    std::u32string cps = uni::decode(s);
+    size_t lo = 0, hi = cps.size();
+    while (lo < hi) {  // the longest start that fits with the ellipsis
+        size_t mid = (lo + hi + 1) / 2;
+        if (gfx::textWidth(uni::encode(cps.substr(0, mid)) + ellipsis, st) <= maxWidth) lo = mid;
+        else hi = mid - 1;
+    }
+    std::u32string head = cps.substr(0, lo);
+    while (!head.empty() && head.back() == U' ') head.pop_back();
+    return uni::encode(head) + ellipsis;
+}
+
 // ---- Widgets --------------------------------------------------------------------------------------
 namespace {
 TextStyle labelStyle(bool enabled) {
@@ -446,21 +462,6 @@ TextStyle buttonLabelStyle() {
     st.tracking = kTrackTitle;
     st.align = HAlign::Center;
     return st;
-}
-std::string elideToFit(const std::string& s, const TextStyle& st, float maxWidth) {
-    // Half a unit of slack: a label fitSize() shrank to the exact width measures a hair over it.
-    if (gfx::textWidth(s, st) <= maxWidth + 0.5f) return s;
-    const char* const ellipsis = "\xE2\x80\xA6";
-    std::u32string cps = uni::decode(s);
-    size_t lo = 0, hi = cps.size();
-    while (lo < hi) {  // the longest start that fits with the ellipsis
-        size_t mid = (lo + hi + 1) / 2;
-        if (gfx::textWidth(uni::encode(cps.substr(0, mid)) + ellipsis, st) <= maxWidth) lo = mid;
-        else hi = mid - 1;
-    }
-    std::u32string head = cps.substr(0, lo);
-    while (!head.empty() && head.back() == U' ') head.pop_back();
-    return uni::encode(head) + ellipsis;
 }
 
 // Info mark: a circled "i" this far after the label (centre), and the room a label leaves for it.

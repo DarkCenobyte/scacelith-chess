@@ -1818,7 +1818,17 @@ void drawNotifications() {
         float out = m::saturate((t.duration + 0.6f - t.age) / 0.6f);
         float a = ease(in) * ease(out);
         if (a <= 0.001f) continue;
-        float tw = gfx::textWidth(t.text, ts);
+        // The band (the text and 130 px each side) stays 20 px inside the view: a longer text is
+        // shrunk (to 80 % at most), then cut.
+        TextStyle st = ts;
+        std::string text = t.text;
+        float tw = gfx::textWidth(text, st);
+        const float maxTw = v.x - 300.0f;
+        if (tw > maxTw) {
+            st.size = gfx::fitSize(text, st, maxTw, 0.8f);
+            text = im::elideToFit(text, st, maxTw);
+            tw = gfx::textWidth(text, st);
+        }
         float bw = tw + 260.0f, bh = 58.0f;
         float yy = y - (1.0f - ease(in)) * 8.0f;
         Rect band(v.x * 0.5f - bw * 0.5f, yy, bw, bh);
@@ -1829,8 +1839,8 @@ void drawNotifications() {
         gfx::fillH(Rect(band.r() - band.w * edge, band.y, band.w * edge, bh), d, z);
         gfx::hlineFade(band.x + 40.0f, band.r() - 40.0f, band.y, withAlpha(gold, 0.6f * a), 0.45f);
         gfx::hlineFade(band.x + 40.0f, band.r() - 40.0f, band.b() - 1.0f, withAlpha(gold, 0.6f * a), 0.45f);
-        ts.color = withAlpha(ivory, a);
-        gfx::text(t.text, band.cx(), band.cy() + 8.0f, ts);
+        st.color = withAlpha(ivory, a);
+        gfx::text(text, band.cx(), band.cy() + 8.0f, st);
         y += bh + 12.0f;
     }
     gfx::setLayer(prev);

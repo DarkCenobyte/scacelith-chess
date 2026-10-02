@@ -118,6 +118,9 @@ bool button(const std::string& label, const Rect& r, ButtonKind kind = ButtonKin
             uint32_t extraFlags = 0);
 // Whether a Primary or Secondary button 'width' wide shows this label whole (shrunk or not).
 bool buttonLabelFits(const std::string& label, float width);
+// s, or when it is wider than maxWidth in st (half a unit of slack), its longest start that fits
+// followed by "…" (trailing spaces dropped): the cut of the button labels.
+std::string elideToFit(const std::string& s, const gfx::TextStyle& st, float maxWidth);
 // A button that is off for a reason: drawn like a disabled button, but the mouse resting on it (or
 // the keyboard focus, which stops on it) shows 'why' as its tooltip, kept inside 'within' when
 // given (the page's panel: above the button near its bottom edge). Never activates.
