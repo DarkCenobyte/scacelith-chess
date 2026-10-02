@@ -31,6 +31,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
+#include <filesystem>
 #include <limits>
 #include <map>
 #include <memory>
@@ -1268,11 +1269,21 @@ TEST(tts_ops_quantization) {
     CHECK(runOp(node(tts::Op::DynamicQuantize), {&xp}, o, 3));
     CHECK(equalT<uint8_t>(o[0], DType::U8, {3}, {50, 125, 255}));
     CHECK_EQ(int(o[2].scalarFloat()), 0);
-    // The vectorized range scan equals the scalar std::min/std::max loop, NaN, -0 and +inf included,
-    // for lengths around the vector width (-inf is left out: its zero point would be NaN).
+    // An infinite bound of the range (a damaged model) is refused: -inf would make the zero point
+    // NaN, cast to an int. NaN elements do not count in the range.
+    for (float bad : {-INFINITY, INFINITY}) {
+        for (int n : {3, 8, 17}) {
+            std::vector<float> v(static_cast<size_t>(n), 0.5f);
+            v[static_cast<size_t>(n / 2)] = bad;
+            Tensor xv = F({n}, v);
+            CHECK(!runOp(node(tts::Op::DynamicQuantize), {&xv}, o, 3));
+        }
+    }
+    // The vectorized range scan equals the scalar std::min/std::max loop, NaN, -0 and the largest
+    // finite values included, for lengths around the vector width.
     {
         std::mt19937 rr(11);
-        const float specials[] = {std::nanf(""), -0.0f, 0.0f, INFINITY, -3e38f};
+        const float specials[] = {std::nanf(""), -0.0f, 0.0f, 3e38f, -3e38f};
         bool same = true;
         for (int n : {0, 1, 3, 7, 8, 9, 15, 16, 17, 31, 33, 1000}) {
             for (int round = 0; round < 20; ++round) {
@@ -2111,6 +2122,14 @@ TEST(tts_worker) {
         std::vector<float> got;
         CHECK(w.take(low, got));
         CHECK(got == want);
+        // A speed of the request's own (the rules lesson's), from the worker started at 1.0 without
+        // loading anything again: the direct synthesis at that speed, bit for bit.
+        uint32_t slow = w.request("Low priority.", "en", 0, 2, 0.92f);
+        CHECK(slow && waitFor([&] { return w.done(slow); }, 120.0));
+        direct.speed = 0.92f;
+        std::vector<float> slowWant = s->synthesize("Low priority.", "en", direct), slowGot;
+        CHECK(w.take(slow, slowGot));
+        CHECK(slowGot == slowWant && slowGot.size() > got.size());
     }
     // Cancel everything, including the request in progress, then stop while busy.
     uint32_t busy = w.request(std::string(250, 'x') + ".", "en");
@@ -2125,6 +2144,63 @@ TEST(tts_worker) {
     std::fprintf(stderr, "  stop() while busy took %.0f ms\n", stopMs);
     CHECK(stopMs < 2000.0);
     CHECK_EQ(w.request("After stop.", "en"), 0u);
+}
+
+// Files that load but cannot speak (an indexer of the right size whose ids leave the embedding
+// table, as damaged contents of a downloaded file would): the warm-up gives no samples and the
+// worker fails (failed() and warmUpFailed()), taking no request. Missing files fail the load.
+TEST(tts_worker_warm_up_failure) {
+    if (!model()) SKIP("no model files in " + modelDir());
+    const std::string dir = net::sys::exeDirectory() + "ttstest-warmup/";
+    CHECK(net::sys::makeDirectories(dir));
+    // The big files are links to the build's copy (copies where links are refused); the indexer is
+    // a file of its own.
+    for (int i = 0; i < tts::kFileCount; ++i) {
+        if (i == tts::kFileIndexer) continue;
+        const std::filesystem::path from = std::filesystem::u8path(modelDir() + tts::Engine::kFiles[i]);
+        const std::filesystem::path to = std::filesystem::u8path(dir + tts::Engine::kFiles[i]);
+        std::error_code ec;
+        std::filesystem::remove(to, ec);
+        std::filesystem::create_hard_link(from, to, ec);
+        if (ec) std::filesystem::copy_file(from, to, ec);
+        CHECK(!ec);
+    }
+    std::string ix;
+    CHECK(net::sys::readFile(modelDir() + tts::Engine::kFiles[tts::kFileIndexer], ix, size_t(1) << 20));
+    for (size_t i = 0; i + 4 <= ix.size(); i += 4) {
+        int32_t id;
+        std::memcpy(&id, ix.data() + i, 4);
+        if (id >= 0) id = 1 << 20;   // far past the table: Gather "index out of range"
+        std::memcpy(&ix[i], &id, 4);
+    }
+    CHECK(net::sys::writeFileAtomic(dir + tts::Engine::kFiles[tts::kFileIndexer], ix, false));
+    struct Restore {
+        ~Restore() { tts::setModelFolder(std::string()); }
+    } restore;
+    auto settle = [](tts::Worker& w) {
+        for (int i = 0; i < 24000 && !w.ready() && !w.failed(); ++i) std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    };
+    tts::setModelFolder(dir);
+    {
+        tts::Worker w;
+        CHECK(w.start(tts::Options()));
+        settle(w);
+        CHECK(w.failed() && w.warmUpFailed() && !w.ready());
+        CHECK_EQ(w.request("Hello.", "en"), 0u);
+    }
+    tts::setModelFolder(dir + "missing/");
+    {
+        tts::Worker w;
+        CHECK(w.start(tts::Options()));
+        settle(w);
+        CHECK(w.failed() && !w.warmUpFailed());
+    }
+    for (int i = 0; i < tts::kFileCount; ++i) net::sys::removeFile(dir + tts::Engine::kFiles[i]);
+#ifdef _WIN32
+    _rmdir(dir.c_str());
+#else
+    rmdir(dir.c_str());
+#endif
 }
 
 // ------------------------------------------------------------------------------------------------

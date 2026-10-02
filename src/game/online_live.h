@@ -15,7 +15,8 @@
 //   - Which realtime errors belong to the game being played, and which refuse the challenge being
 //     created (OnlineSession's handling of them).
 //   - Which game a realtime message is about, whether a RatingUpdate rates the game shown, and
-//     which ServerInfoResult answers Options' "Test connection" (OnlineSession's routing).
+//     which ServerInfoResult answers Options' "Test connection" (OnlineSession's routing); the
+//     late messages of an earlier game the scene ignores all the same.
 #pragma once
 #include "../chess/chess.h"
 #include "../math/math.h"
@@ -378,6 +379,15 @@ inline bool challengeRefused(int code) {
 // The game a realtime message is about: the one it names, or the one its snapshot carries. e.game
 // is the game shown now, not the one of a late message (a rematch may have begun since).
 inline uint64_t eventGameId(const net::Event& e) { return e.gameId ? e.gameId : e.game.id; }
+
+// The scene's own guard (GameScene::onlineEvent), whatever the routing above it: a GameEvent,
+// GameEnd or RatingUpdate naming another game than the one played is a late message of an earlier
+// game (its rematch offered or refused, its rating) and changes nothing in this one.
+inline bool aboutAnotherGame(const net::Event& e, uint64_t playedGame) {
+    using K = net::Event::Kind;
+    return (e.kind == K::GameEvent || e.kind == K::GameEnd || e.kind == K::RatingUpdate) && e.gameId != 0 &&
+           e.gameId != playedGame;
+}
 
 // A RatingUpdate follows the commit of its game, and a rematch may have begun meanwhile: only the
 // update of the game shown (e.game, whose 'you' is our side) changes the account's ratings in

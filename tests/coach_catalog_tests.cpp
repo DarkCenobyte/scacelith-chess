@@ -5,6 +5,7 @@
 #include "coach/catalog.h"
 #include "core/embedded.h"
 #include "i18n/i18n.h"
+#include "tts/tts.h"
 #include <algorithm>
 #include <chrono>
 #include <cstring>
@@ -148,6 +149,19 @@ TEST(coach_catalog_speech_language) {
     CHECK_EQ(coach::speechLanguage("zh-Hant"), std::string("en"));
     CHECK_EQ(coach::speechLanguage("pt"), std::string("en"));
     CHECK(!coach::speechSupported("zh-Hans"));
+}
+
+// The coach speaks the voice's languages (tts::languageSupported, the one list): the same answer
+// for every interface language and for codes beyond them.
+TEST(coach_catalog_speech_supported_is_the_voice_list) {
+    std::vector<std::string> codes = {"", "pt", "EN", "en-GB", "zh"};
+    for (const i18n::Language& l : i18n::languages()) codes.push_back(l.code);
+    int spoken = 0;
+    for (const std::string& c : codes) {
+        CHECK_EQ(coach::speechSupported(c), tts::languageSupported(c));
+        spoken += coach::speechSupported(c) ? 1 : 0;
+    }
+    CHECK_EQ(spoken, 8);   // en fr de es ru uk ar ja: every interface language but the two Chinese
 }
 
 TEST(coach_catalog_loads_every_topic) {

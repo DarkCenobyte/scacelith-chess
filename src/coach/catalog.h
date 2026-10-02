@@ -39,7 +39,7 @@ namespace coach {
 // ru uk ar ja), else English (Supertonic 3 has no Chinese: Chinese UIs get English speech and
 // Chinese subtitles).
 std::string speechLanguage(const std::string& uiLanguage);
-// True when the coach's voice speaks this language.
+// True when the coach's voice speaks this language (the voice's own list, tts::languageSupported).
 bool speechSupported(const std::string& lang);
 
 class Catalog {

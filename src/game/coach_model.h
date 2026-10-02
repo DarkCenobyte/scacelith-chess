@@ -24,7 +24,8 @@
 //      and call refreshCoachVoice() on MenuAction::OptionsChanged (the option may have changed).
 //      A coach game being played then starts its TTS worker (CoachStage::ensureWorker): the
 //      voice is heard from the coach's next line on.
-//   4. When the TTS worker failed to load (tts::Worker::failed()) although coachVoiceWanted():
+//   4. When the TTS worker failed to load, or its warm-up failed (tts::Worker::failed()),
+//      although coachVoiceWanted():
 //          game::coachModelLoadFailed();
 //   5. On exit (GameScene::shutdown; the ui viewer's coach-flow screen likewise):
 //          game::coachModelShutdown();
@@ -52,8 +53,9 @@ bool coachModelDownloading();
 // The coach can be heard as far as the option and the files go: [coach] voice on, every file
 // present (tts::modelFilesPresent) and no download running.
 bool coachVoiceWanted();
-// The TTS worker could not load files that looked complete: the next Coach entry offers the
-// download, whose first step checks every file (SHA-256) and fetches only the bad ones.
+// The TTS worker could not load, or not speak with, files that looked complete: the next Coach
+// entry offers the download, whose first step checks every file (SHA-256) and fetches only the
+// bad ones.
 void coachModelLoadFailed();
 // Cancels and joins a running download.
 void coachModelShutdown();

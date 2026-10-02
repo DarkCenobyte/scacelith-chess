@@ -8,6 +8,11 @@ class IniFile {
 public:
     bool load(const std::string& path);
     bool save(const std::string& path) const;
+    // Whether save(path) can write there, found without writing anything: a read-only file (the
+    // read-only attribute on Windows, which save()'s rename cannot replace either), a read-only
+    // share or folder say no. No file yet: whether the folder takes a new one. Settings::load then
+    // reads the copy Settings::save wrote instead.
+    static bool writable(const std::string& path);
 
     std::string getString(const std::string& key, const std::string& def = "") const;
     int getInt(const std::string& key, int def = 0) const;

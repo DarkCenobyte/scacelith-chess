@@ -104,6 +104,7 @@
 #include "physical_board.h"
 #include "replay.h"
 #include "scorekeeper.h"
+#include "turn.h"
 #include "world.h"
 #include <ctime>
 #include <map>
@@ -166,22 +167,7 @@ private:
     static constexpr float kScriptThink = 0.5f;
 
     enum class State { Loading, Menu, FadeToGame, Intro, Handshake, Playing, GameOver, FadeToMenu };
-    enum class Turn {
-        None,
-        HumanIdle,       // nothing touched yet
-        HumanTouched,    // a piece is gripped on its square (touch-move applies)
-        HumanPlacing,    // the hand is moving the piece (and any capture / castling rook)
-        HumanPromotion,  // pawn on the last rank: choosing the new piece
-        HumanPlaced,     // move made on the board, waiting for the clock press (untimed: completed at once)
-        HumanPressing,   // hand on its way to the clock
-        AiThinking,
-        AiMoving,
-        RemoteWaiting,   // online: waiting for the opponent's move
-        RemoteMoving,    // online: the opponent's robot is placing the move
-        CoachTable,      // coach: moves being taken back, a lesson position set up or a lesson move
-                         // played by hand (the hands work on the table; nobody plays meanwhile)
-        LessonWait       // rules lesson: the coach's side is to move, or the lesson has the floor
-    };
+    using Turn = game::Turn;   // turn.h
 
     // Where a piece ends up when the hand releases it.
     struct Destination {
@@ -208,7 +194,7 @@ private:
     bool isHumanTurn() const;
     // No move on its way between the board and the clock: a draw agreed now leaves on the board
     // what game_ has.
-    bool quietTurn() const { return turn_ == Turn::HumanIdle || turn_ == Turn::HumanTouched || turn_ == Turn::AiThinking; }
+    bool quietTurn() const { return game::quietTurn(turn_); }
     void updateHumanInput();
     void offerDraw();
     void updateAi(float dt);
@@ -407,6 +393,7 @@ private:
     void persistCoachResults();               // Settings [coach] from the session (once per game)
     bool coachCanTakeBack() const;            // the Esc menu's "Take back" (session and scoresheets)
     void coachOfferDraw();                    // the Esc menu: the coach answers after an analysis
+    void coachEvaluateDraw();                 // that analysis, of the position on the board
     void coachPauseMenuFrame();               // the Esc menu of a coach game (paused_)
     void coachHudFrame();                     // the takeback card and the skip hint, their answers
     void runCoachTable(float dt);             // the coach's table jobs (demonstrations, takebacks...)

@@ -110,8 +110,8 @@ struct WatchSetup {
 // "Offer draw" (e.g. an offer is already pending). Esc resumes.
 MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw = true);
 // Same, for a hot-seat game: 'resignQuestion' replaces the text of the resignation confirmation
-// (it names the player to move).
-MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& resignQuestion);
+// (it names the player to move). canResign = false greys out "Resign" (a move is on its way).
+MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& resignQuestion, bool canResign = true);
 // Pawn promotion: returns 0 while choosing, else chess::PieceType (Queen, Rook, Bishop, Knight).
 int promotionPicker(bool playerIsWhite);
 // Transient message (arbiter, "Draw offer declined", ...), shown for 'seconds'.
@@ -262,6 +262,7 @@ struct CoachPause {
     bool canOfferDraw = false;
     bool canClaimDraw = false;
     bool canResign = true;       // false in the rules lesson
+    bool mayEndGame = true;      // false while a move is on its way: Claim draw and Resign greyed
 };
 MenuAction coachPauseMenu(const CoachPause& p);
 

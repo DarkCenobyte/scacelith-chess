@@ -3,6 +3,7 @@
 #include "../core/log.h"
 #include "../i18n/i18n.h"
 #include "../i18n/unicode.h"
+#include "../tts/tts.h"
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
@@ -118,12 +119,7 @@ San parseSan(std::string s) {
 }  // namespace
 
 // ==== Languages ==================================================================================
-bool speechSupported(const std::string& lang) {
-    static const char* const kSpoken[] = {"en", "fr", "de", "es", "ru", "uk", "ar", "ja"};
-    for (const char* c : kSpoken)
-        if (lang == c) return true;
-    return false;
-}
+bool speechSupported(const std::string& lang) { return tts::languageSupported(lang); }
 
 std::string speechLanguage(const std::string& uiLanguage) {
     return speechSupported(uiLanguage) ? uiLanguage : std::string("en");

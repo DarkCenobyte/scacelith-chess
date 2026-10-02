@@ -689,6 +689,7 @@ online.report.comment = Коментар
 online.report.comment.hint = необов’язково
 online.report.send = Надіслати скаргу
 online.report.sent = Скаргу надіслано. Дякуємо.
+online.report.queued = Скаргу буде надіслано після завершення партії.
 # Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
 online.sheet.note = Онлайн, {0}, {1}
 online.sheet.rated = рейтингова

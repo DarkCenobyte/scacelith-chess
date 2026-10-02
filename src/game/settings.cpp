@@ -35,9 +35,12 @@ std::string fallbackFor(const std::string& p) {
 bool Settings::load(const std::string& p) {
     path = p;
     IniFile ini;
-    if (!ini.load(p)) {
-        // Where save() wrote when p could not be written; 'path' stays its first choice.
-        std::string alt = fallbackFor(p);
+    // Where save() writes when p cannot be written (none next to the executable in a read-only
+    // folder, a read-only one there): that copy is the one read back. 'path' stays the first choice.
+    std::string alt = fallbackFor(p);
+    if (!alt.empty() && !IniFile::writable(p) && ini.load(alt)) {
+        LOGI("settings read from %s (%s cannot be written)", alt.c_str(), p.c_str());
+    } else if (!ini.load(p)) {
         if (!alt.empty() && ini.load(alt)) {
             LOGI("settings read from %s", alt.c_str());
         } else {

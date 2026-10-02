@@ -688,6 +688,7 @@ online.report.comment = 備註
 online.report.comment.hint = 選填
 online.report.send = 送出檢舉
 online.report.sent = 檢舉已送出。謝謝。
+online.report.queued = 檢舉將在對局結束後送出。
 # Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
 online.sheet.note = 線上，{0} {1}
 online.sheet.rated = 計分

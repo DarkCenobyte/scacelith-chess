@@ -582,6 +582,29 @@ TEST(live_routing_follows_the_game_a_message_names) {
     CHECK(!live::ratesShownGame(r));
 }
 
+// The scene's own guard, should a late message of an earlier game ever be routed to it: its
+// GameEvent (a rematch refused or offered), GameEnd and RatingUpdate change nothing in game 8.
+TEST(live_scene_ignores_another_games_events) {
+    using K = net::Event::Kind;
+    net::Event e;
+    e.game.id = 8;   // what the client fills in: the game shown
+    for (K k : {K::GameEvent, K::GameEnd, K::RatingUpdate}) {
+        e.kind = k;
+        e.gameId = 7;
+        CHECK(live::aboutAnotherGame(e, 8));
+        e.gameId = 8;
+        CHECK(!live::aboutAnotherGame(e, 8));
+        e.gameId = 0;   // no game named: the one played
+        CHECK(!live::aboutAnotherGame(e, 8));
+    }
+    // Only those three: the other kinds are left to the session's routing.
+    for (K k : {K::GameSnapshot, K::MoveMade, K::OpponentGesture, K::ServerError}) {
+        e.kind = k;
+        e.gameId = 7;
+        CHECK(!live::aboutAnotherGame(e, 8));
+    }
+}
+
 TEST(live_test_answer_comes_from_the_tested_server) {
     net::Event e;
     e.kind = net::Event::Kind::ServerInfoResult;

@@ -456,10 +456,10 @@ MenuAction coachPauseMenu(const CoachPause& cp) {
     }
     if (cp.canOfferDraw && im::menuEntry(L("pause.offer_draw"), next(), true, HAlign::Center)) act = MenuAction::OfferDraw;
     if (cp.canClaimDraw) {
-        if (im::menuEntry(L("pause.claim_draw"), next(), true, HAlign::Center)) act = MenuAction::ClaimDraw;
+        if (im::menuEntry(L("pause.claim_draw"), next(), cp.mayEndGame, HAlign::Center)) act = MenuAction::ClaimDraw;
         im::tooltip(T("pause.claim_draw.help"));
     }
-    if (cp.canResign && im::menuEntry(L("pause.resign"), next(), true, HAlign::Center)) g_pause.confirm = 1;
+    if (cp.canResign && im::menuEntry(L("pause.resign"), next(), cp.mayEndGame, HAlign::Center)) g_pause.confirm = 1;
     if (im::menuEntry(L("menu.options"), next(), true, HAlign::Center)) {
         g_pause.options = true;
         detail::openOptionsPage();

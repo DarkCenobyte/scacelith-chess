@@ -1071,7 +1071,9 @@ bool GameScene::update(AppContext& ctx, float dt) {
             }
         }
         if (paused_) {
-            bool canClaim = game_.canClaimThreefold() || game_.canClaimFiftyMove();
+            // Not while a hand carries out a move, which the end of the game would cut off (turn.h).
+            const bool mayEnd = menuMayEndGame(turn_);
+            bool canClaim = mayEnd && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
             bool canOffer = drawOfferPly_ != int(game_.moves().size());
             // Hot-seat: the menu belongs to the player to move (resignation named, offer with the move).
             std::string resignQuestion;
@@ -1081,9 +1083,9 @@ bool GameScene::update(AppContext& ctx, float dt) {
             } else {
                 // Answered at once, so not with a move on its way, except my move made on the board
                 // and waiting for the clock press: the offer goes with it (FIDE 9.1.2).
-                canOffer = canOffer && !drawOfferPending_ && (quietTurn() || turn_ == Turn::HumanPlaced);
+                canOffer = canOffer && !drawOfferPending_ && mayEnd;
             }
-            switch (menuChoice(ui::pauseMenu(canClaim, canOffer, resignQuestion))) {
+            switch (menuChoice(ui::pauseMenu(canClaim, canOffer, resignQuestion, mayEnd))) {
             case ui::MenuAction::Resume: paused_ = false; break;
             case ui::MenuAction::Resign:
                 paused_ = false;
