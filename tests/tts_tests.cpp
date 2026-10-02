@@ -1808,13 +1808,18 @@ TEST(tts_voice_file_header) {
         return std::string(reinterpret_cast<const char*>(h), 48) + std::string(payload, '\0');
     };
     std::string err;
+    // Each engine goes before the files change: Windows neither rewrites nor deletes a mapped file.
     CHECK(write(tts::Engine::kFiles[tts::kFileVoices], voices(int64_t(inv & ((uint64_t(1) << 55) - 1)), 512)));
-    tts::Engine crafted;
-    CHECK(!crafted.loadDirectory(dir, K(), &err) && err.find("voice.bin") != std::string::npos);
+    {
+        tts::Engine crafted;
+        CHECK(!crafted.loadDirectory(dir, K(), &err) && err.find("voice.bin") != std::string::npos);
+    }
     // One consistent voice passes this check (and then stops at the fake duration model).
     CHECK(write(tts::Engine::kFiles[tts::kFileVoices], voices(1, 4 * (50 * 256 + 8 * 16))));
-    tts::Engine one;
-    CHECK(!one.loadDirectory(dir, K(), &err) && err.find("voice.bin") == std::string::npos);
+    {
+        tts::Engine one;
+        CHECK(!one.loadDirectory(dir, K(), &err) && err.find("voice.bin") == std::string::npos);
+    }
     for (int i = 0; i < tts::kFileCount; ++i) net::sys::removeFile(dir + tts::Engine::kFiles[i]);
     std::remove(dir.c_str());
 }
