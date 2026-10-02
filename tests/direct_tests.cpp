@@ -901,6 +901,36 @@ TEST(direct_authority_snapshot_and_names) {
     CHECK_EQ(direct::sanitizeName("\xFF\xFE", "Guest"), std::string("Guest"));
     // 23 ASCII bytes + a 2-byte character would make 25: the character is dropped whole.
     CHECK_EQ(direct::sanitizeName("abcdefghijklmnopqrstuvw\xC3\xA9", "X"), std::string("abcdefghijklmnopqrstuvw"));
+    // Sequences the protocol's decoder refuses are dropped too: an overlong form, a surrogate,
+    // code points above U+10FFFF. Such a name used to make hosting and joining fail.
+    const char* refused[] = {"Ann\xC0\x80" "e", "Bob\xED\xA0\x80", "Cy\xF5\x80\x80\x80", "Di\xF4\x90\x80\x80", "Ed\xE0\x80\xAF"};
+    const char* kept[] = {"Anne", "Bob", "Cy", "Di", "Ed"};
+    for (int i = 0; i < 5; ++i) {
+        CHECK_EQ(direct::sanitizeName(refused[i], "X"), std::string(kept[i]));
+        // The host's snapshot (its name and the guest's), Welcome and the guest's Hello decode.
+        Authority a(tc(300, 0), refused[i], refused[i], 1);
+        Authority::Output o;
+        a.startGame(1.7e12, o);
+        P::GameSnapshot s;
+        CHECK(o.toHost.size() == 1 && P::decode(o.toHost[0].data(), o.toHost[0].size(), s));
+        P::Welcome w;
+        w.username = a.guestName();
+        w.serverName = direct::sanitizeName(refused[i], "Host");
+        P::Hello h;
+        h.proto = P::kProtocolVersion;
+        h.schema = P::kSchemaHash;
+        h.token = "direct:" + direct::sanitizeName(refused[i], "Guest");
+        h.token.resize(16, ' ');
+        std::vector<uint8_t> buf;
+        P::encode(w, buf);
+        CHECK(P::decode(buf.data(), buf.size(), w));
+        buf.clear();
+        P::encode(h, buf);
+        CHECK(P::decode(buf.data(), buf.size(), h));
+    }
+    // Valid names stay as they are (C1 controls included: the decoder accepts them).
+    for (const char* name : {"\xC3\x89lodie", "\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E", "Dee\xC2\x85x", "\xF0\x9F\x98\x80 Max", "\xF4\x8F\xBF\xBF"})
+        CHECK_EQ(direct::sanitizeName(name, "X"), std::string(name));
     // The digest covers the first four FEN fields only.
     CHECK_EQ(direct::fenDigest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"),
              direct::fenDigest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 5 9"));

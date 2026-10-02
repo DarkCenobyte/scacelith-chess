@@ -65,8 +65,9 @@ struct AuthorityConfig {
 // the digest of online play.
 uint32_t fenDigest(const std::string& fen);
 uint32_t positionHash(const chess::Position& pos);
-// A player name for PlayerInfo: trimmed, control characters removed, at most 24 bytes of valid
-// UTF-8, 'fallback' when empty.
+// A player name for PlayerInfo: trimmed, ASCII control characters removed, at most 24 bytes of
+// UTF-8 the protocol accepts (no overlong forms, surrogates or code points above U+10FFFF),
+// 'fallback' when empty.
 std::string sanitizeName(const std::string& name, const char* fallback);
 
 class Authority {

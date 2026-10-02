@@ -30,13 +30,20 @@ uint32_t fenDigest(const std::string& fen) { return positionDigest(fen); }
 uint32_t positionHash(const chess::Position& pos) { return fenDigest(pos.fen()); }
 
 std::string sanitizeName(const std::string& in, const char* fallback) {
-    // Keep printable UTF-8; drop control characters and malformed sequences.
+    // Keep printable UTF-8; drop control characters and malformed sequences, overlong forms,
+    // surrogates and code points above U+10FFFF included (the protocol's decoder refuses them).
+    static const uint32_t kMinCodePoint[5] = {0, 0, 0x80, 0x800, 0x10000};
     std::string s;
     for (size_t i = 0; i < in.size();) {
         unsigned char c = (unsigned char)in[i];
         size_t len = c < 0x80 ? 1 : (c >> 5) == 6 ? 2 : (c >> 4) == 14 ? 3 : (c >> 3) == 30 ? 4 : 0;
         bool ok = len && i + len <= in.size();
-        for (size_t k = 1; ok && k < len; ++k) ok = ((unsigned char)in[i + k] >> 6) == 2;
+        uint32_t cp = c & (0x7F >> len);
+        for (size_t k = 1; ok && k < len; ++k) {
+            ok = ((unsigned char)in[i + k] >> 6) == 2;
+            cp = cp << 6 | ((unsigned char)in[i + k] & 0x3F);
+        }
+        ok = ok && cp >= kMinCodePoint[len] && cp <= 0x10FFFF && (cp < 0xD800 || cp > 0xDFFF);
         if (!ok) { ++i; continue; }
         if (len == 1 && (c < 0x20 || c == 0x7F)) { ++i; continue; }
         s.append(in, i, len);
