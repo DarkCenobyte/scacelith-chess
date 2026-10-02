@@ -68,8 +68,10 @@ bool Engine::build(const Blob blobs[kFileCount], const kern::Table& k, std::stri
     std::memcpy(h, vb.data, 48);
     if (h[0] <= 0 || h[0] != h[3] || h[1] != 50 || h[2] != 256 || h[4] != 8 || h[5] != 16)
         return fail(error, "voice.bin: unexpected header");
-    size_t floats = size_t(h[0] * h[1] * h[2] + h[3] * h[4] * h[5]);
-    if (vb.size != 48 + floats * 4) return fail(error, "voice.bin: unexpected size");
+    // The count must be the one the size gives (multiplying the header's could overflow).
+    const uint64_t perVoice = 4 * (50 * 256 + 8 * 16);
+    if ((vb.size - 48) % perVoice != 0 || uint64_t(h[0]) != (vb.size - 48) / perVoice)
+        return fail(error, "voice.bin: unexpected size");
     voices_ = int(h[0]);
     ttlDims_[0] = h[1];
     ttlDims_[1] = h[2];

@@ -1771,6 +1771,38 @@ struct StageFixture {
 
 }  // namespace
 
+// voice.bin: the voice count must be the one its size gives. A crafted count whose product with
+// the per-voice size only matches modulo 2^64 is refused before any style is read.
+TEST(tts_voice_file_header) {
+    std::string dir = net::sys::exeDirectory() + "ttstest-voices/";
+    CHECK(net::sys::makeDirectories(dir));
+    auto write = [&](const char* name, const std::string& data) {
+        std::FILE* f = net::sys::openFile(dir + name, "wb");
+        bool ok = f && std::fwrite(data.data(), 1, data.size(), f) == data.size();
+        if (f) std::fclose(f);
+        return ok;
+    };
+    for (int i = 0; i < tts::kFileCount; ++i) CHECK(write(tts::Engine::kFiles[i], "x"));   // not a model
+    CHECK(write(tts::Engine::kFiles[tts::kFileIndexer], std::string(65536 * 4, '\0')));
+    // 101 * inv == 1 (mod 2^55), so inv * 4 * (50 * 256 + 8 * 16) == 512 (mod 2^64): 48 + 512 bytes.
+    uint64_t inv = 101;
+    for (int i = 0; i < 6; ++i) inv *= 2 - 101 * inv;
+    auto voices = [](int64_t count, size_t payload) {
+        int64_t h[6] = {count, 50, 256, count, 8, 16};
+        return std::string(reinterpret_cast<const char*>(h), 48) + std::string(payload, '\0');
+    };
+    std::string err;
+    CHECK(write(tts::Engine::kFiles[tts::kFileVoices], voices(int64_t(inv & ((uint64_t(1) << 55) - 1)), 512)));
+    tts::Engine crafted;
+    CHECK(!crafted.loadDirectory(dir, K(), &err) && err.find("voice.bin") != std::string::npos);
+    // One consistent voice passes this check (and then stops at the fake duration model).
+    CHECK(write(tts::Engine::kFiles[tts::kFileVoices], voices(1, 4 * (50 * 256 + 8 * 16))));
+    tts::Engine one;
+    CHECK(!one.loadDirectory(dir, K(), &err) && err.find("voice.bin") == std::string::npos);
+    for (int i = 0; i < tts::kFileCount; ++i) net::sys::removeFile(dir + tts::Engine::kFiles[i]);
+    std::remove(dir.c_str());
+}
+
 TEST(tts_stage_duration_and_text_encoder) {
     StageFixture f;
     if (!f.init()) return;
