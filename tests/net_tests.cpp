@@ -4018,7 +4018,7 @@ TEST(net_account_delete_stops_realtime) {
 
 // The realtime connection closes before the deletion is asked for, so that the server's closing
 // of the deleted account's connections brings no revoked-session notice, refusal or Unauthorized
-// state. A deletion that fails opens it again, if it was open.
+// state. A deletion that fails opens it again, if it was open; a stopped state stays.
 TEST(net_account_delete_closes_realtime_first) {
     if (!net::transportAvailable()) SKIP("transport unavailable");
     FakeServer srv;
@@ -4043,11 +4043,27 @@ TEST(net_account_delete_closes_realtime_first) {
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         CHECK(c.state() == net::ConnState::Offline);
         CHECK_EQ(srv.hellos.load(), 0);
+        // Stopped (Incompatible here): the state stays, nothing opens.
+        c.connect();
+        CHECK(waitEvent(c, K::Welcome, ev, 10000));
+        srv.kick(pr::CloseCode::UnsupportedProtocol);
+        CHECK(waitState(c, net::ConnState::Incompatible, 10000));
+        c.deleteAccount("wrong", "");
+        std::vector<net::Event> seen;
+        CHECK(waitEvent(c, K::AccountDeleted, ev, 10000, &seen));
+        CHECK_EQ(ev.error, std::string("invalid_password"));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        while (c.poll(ev)) seen.push_back(ev);
+        CHECK(std::none_of(seen.begin(), seen.end(), [](const net::Event& e) {
+            return e.kind == net::Event::Kind::ConnectionChanged;
+        }));
+        CHECK(c.state() == net::ConnState::Incompatible);
+        CHECK_EQ(srv.hellos.load(), 1);
         // Connected: closed for the request, open again once it is refused.
         c.connect();
         CHECK(waitEvent(c, K::Welcome, ev, 10000));
         c.deleteAccount("wrong", "");
-        std::vector<net::Event> seen;
+        seen.clear();
         CHECK(waitEvent(c, K::AccountDeleted, ev, 10000, &seen));
         CHECK_EQ(ev.error, std::string("invalid_password"));
         CHECK(waitEvent(c, K::Welcome, ev, 10000, &seen));
@@ -4055,7 +4071,7 @@ TEST(net_account_delete_closes_realtime_first) {
         CHECK(std::any_of(seen.begin(), seen.end(), [](const net::Event& e) {
             return e.kind == net::Event::Kind::ConnectionChanged && e.state == net::ConnState::Offline;
         }));
-        CHECK_EQ(srv.hellos.load(), 2);
+        CHECK_EQ(srv.hellos.load(), 3);
         CHECK(c.hasSavedSession());
         // Deleted: the connection was closed before, and stays so.
         seen.clear();
@@ -4070,7 +4086,7 @@ TEST(net_account_delete_closes_realtime_first) {
                    (e.kind == net::Event::Kind::ConnectionChanged && e.state != net::ConnState::Offline);
         }));
         CHECK(c.state() == net::ConnState::Offline);
-        CHECK_EQ(srv.hellos.load(), 2);
+        CHECK_EQ(srv.hellos.load(), 3);
     }
     net::sys::removeFile(credPath);
 }

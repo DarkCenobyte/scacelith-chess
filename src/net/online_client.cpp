@@ -2077,11 +2077,15 @@ Event failedAnswer(Event::Kind kind, uint64_t gameId) {
 
 // Ends the realtime connection (no reconnection), from any thread: the account deleted or being
 // deleted, the session of this game revoked. wasOpen: set on net-rt to whether the connection was
-// wanted then (open or opening), for resumeRealtime(). Returns the connectGen it begins.
+// wanted then (open or opening), for resumeRealtime(); when it was not, nothing changes (a stopped
+// state, Incompatible..., stays). Returns the connectGen it begins.
 uint32_t OnlineClient::Impl::stopRealtime(std::shared_ptr<bool> wasOpen) {
     const uint32_t gen = connectGen.fetch_add(1) + 1;
     realtime([this, wasOpen] {
-        if (wasOpen) *wasOpen = rt.wanted;
+        if (wasOpen) {
+            *wasOpen = rt.wanted;
+            if (!rt.wanted) return;   // nothing is open or opening without it
+        }
         rt.wanted = false;
         dropSocket(1000);
         setState(ConnState::Offline);
