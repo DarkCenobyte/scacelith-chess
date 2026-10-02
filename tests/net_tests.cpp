@@ -3807,6 +3807,53 @@ TEST(net_logout_cancels_a_connection_attempt) {
     net::sys::removeFile(credPath);
 }
 
+// A proof of work for a server that was left stops at once: net-http is free for the next one.
+TEST(net_pow_abandoned_on_server_switch) {
+    if (!net::transportAvailable()) return;
+    // No 30-bit nonce below 300 000 000 for this challenge (tens of seconds of hashing).
+    std::atomic<int> logins{0}, infos{0};
+    fakehttp::Server hard([&](const fakehttp::Request& q) {
+        if (q.path == "/api/v1/auth/login") ++logins;
+        return jsonReply(428, "{\"error\":\"pow_required\",\"pow\":{\"challenge\":\"abandoned\",\"bits\":30}}");
+    });
+    fakehttp::Server next([&](const fakehttp::Request& q) {
+        if (q.path == "/api/v1/info") ++infos;
+        return jsonReply(200, "{}");
+    });
+    CHECK(hard.ok());
+    CHECK(next.ok());
+    std::string credPath = tempCredentialPath("pow-switch");
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = hard.port();
+    ep.insecureDev = true;
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        c.login("alice", "pw");
+        auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (logins.load() == 0 && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK_EQ(logins.load(), 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));   // the puzzle is being solved
+        auto t0 = std::chrono::steady_clock::now();
+        ep.apiPort = next.port();
+        c.setServer(ep);
+        c.fetchServerInfo();
+        net::Event ev;
+        CHECK(waitEvent(c, net::Event::Kind::LoginResult, ev, 3000));
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string("cancelled"));
+        CHECK(waitEvent(c, net::Event::Kind::ServerInfoResult, ev, 3000));
+        CHECK_EQ(infos.load(), 1);
+        double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+        std::fprintf(stderr, "  the next server answered %.0f ms after setServer()\n", ms);
+        CHECK_EQ(logins.load(), 1);
+    }
+    net::sys::removeFile(credPath);
+}
+
 // The official server moved from port 44664 to 443: a saved session moves with it, once; other
 // origins never move.
 TEST(net_credentials_origin_move) {

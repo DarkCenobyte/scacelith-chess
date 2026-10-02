@@ -167,6 +167,9 @@ constexpr int kExportTimeoutMs = 90000;
 // The origin of the HTTPS command the calling thread runs (net-http, net-gif; null elsewhere):
 // Impl::post() names it in the Events of that command (Event::origin).
 thread_local const std::string* tCommandOrigin = nullptr;
+// That command's Impl::originGen, and the flag that stops a proof of work on this thread.
+thread_local uint32_t tCommandGen = 0;
+thread_local std::atomic<bool>* tPowAbort = nullptr;
 
 // Milliseconds of the monotonic clock (the Gesture bucket's time).
 double steadyMs() { return std::chrono::duration<double, std::milli>(Clock::now().time_since_epoch()).count(); }
@@ -297,6 +300,7 @@ struct OnlineClient::Impl {
     // An HTTPS command and the origin of the server in use when it was given (its requests go there).
     struct HttpCommand {
         std::string origin;
+        uint32_t gen = 0;   // originGen then
         std::function<void()> fn;
     };
     std::deque<HttpCommand> httpQ, gifQ;
@@ -310,6 +314,12 @@ struct OnlineClient::Impl {
     std::atomic<int> ping{-1};
     std::atomic<double> clockOffset{0.0};
     std::atomic<uint32_t> connectGen{0};
+    // Bumped by setServer() when the origin changes: a proof of work for a server that is no
+    // longer the one in use is abandoned (request()). Then the flags of net-http and net-gif are
+    // raised (by ~Impl too): each stops the proof of work in progress on its thread, and each proof
+    // of work lowers its own when it starts.
+    std::atomic<uint32_t> originGen{0};
+    std::atomic<bool> httpPowAbort{false}, gifPowAbort{false};
     CredentialStore creds;
     CancelToken httpCancel, rtCancel, gifCancel;
     std::thread httpThread, rtThread, gifThread;
@@ -385,6 +395,8 @@ struct OnlineClient::Impl {
             stopping = true;
         }
         stopFlag.store(true);
+        httpPowAbort.store(true);
+        gifPowAbort.store(true);
         httpCancel.cancel();
         rtCancel.cancel();
         gifCancel.cancel();
@@ -418,20 +430,21 @@ struct OnlineClient::Impl {
     void http(std::function<void()> fn) {
         {
             std::lock_guard<std::mutex> lk(mu);
-            httpQ.push_back(HttpCommand{ep.origin(), std::move(fn)});
+            httpQ.push_back(HttpCommand{ep.origin(), originGen.load(), std::move(fn)});
         }
         httpCv.notify_one();
     }
     void gif(std::function<void()> fn) {
         {
             std::lock_guard<std::mutex> lk(mu);
-            gifQ.push_back(HttpCommand{ep.origin(), std::move(fn)});
+            gifQ.push_back(HttpCommand{ep.origin(), originGen.load(), std::move(fn)});
         }
         gifCv.notify_one();
     }
     // Runs an HTTPS command on the calling worker thread: its Events name its origin.
     void runCommand(const HttpCommand& cmd) {
         tCommandOrigin = &cmd.origin;
+        tCommandGen = cmd.gen;
         try {
             cmd.fn();
         } catch (const std::bad_alloc&) {
@@ -589,8 +602,17 @@ struct OnlineClient::Impl {
                 std::string nonce;
                 crypto::PowStats st;
                 std::atomic<bool>* stop = &stopFlag;
+                if (tPowAbort) {
+                    // Lowered before the check: a setServer() that raised it already bumped originGen.
+                    stop = tPowAbort;
+                    stop->store(false);
+                }
+                if (tCommandGen != originGen.load() || stopFlag.load()) {
+                    out.error = "cancelled";
+                    return out;
+                }
                 if (!crypto::powSolve(challenge, bits, nonce, stop, &st)) {
-                    out.error = stopFlag.load() ? "cancelled" : "pow_failed";
+                    out.error = stop->load() ? "cancelled" : "pow_failed";
                     return out;
                 }
                 LOGI("net: proof of work %d bits: %llu hashes in %.2f s", bits, (unsigned long long)st.hashes, st.seconds);
@@ -786,6 +808,7 @@ struct OnlineClient::Impl {
     }
 
     void httpLoop() {
+        tPowAbort = &httpPowAbort;
         for (;;) {
             HttpCommand cmd;
             {
@@ -800,12 +823,14 @@ struct OnlineClient::Impl {
                 }
             }
             if (cmd.fn) runCommand(cmd);
-            else if (sso.active && Clock::now() >= sso.nextPoll) runCommand(HttpCommand{sso.ep.origin(), [this] { ssoPollOnce(); }});
+            else if (sso.active && Clock::now() >= sso.nextPoll)
+                runCommand(HttpCommand{sso.ep.origin(), originGen.load(), [this] { ssoPollOnce(); }});
         }
     }
 
     // net-gif: the GIF commands (gif()), one at a time, beside net-http.
     void gifLoop() {
+        tPowAbort = &gifPowAbort;
         for (;;) {
             HttpCommand cmd;
             {
@@ -1494,8 +1519,11 @@ void OnlineClient::setServer(const ServerEndpoint& ep) {
     impl_->ep = e;
     Impl* d = impl_.get();
     if (originChanged) {
-        // Nothing of the previous server survives: connection, game view, SSO, MFA step. (The
-        // command goes before the cancel: see tryConnect.)
+        // Nothing of the previous server survives: proof of work, connection, game view, SSO, MFA
+        // step. (The command goes before the cancel: see tryConnect.)
+        d->originGen.fetch_add(1);
+        d->httpPowAbort.store(true);
+        d->gifPowAbort.store(true);
         d->connectGen.fetch_add(1);
         d->realtime([d, e] {
             d->rt.wanted = false;
