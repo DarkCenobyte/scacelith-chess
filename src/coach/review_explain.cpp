@@ -425,7 +425,7 @@ bool trapped(const Ctx& c, Explanation& out) {
     const bool rimGrab = c.f.piece == Bishop && c.f.captured == Pawn &&
                          (fileOf(c.played.to) == 0 || fileOf(c.played.to) == 7) && c.r[0].piece == Pawn;
     if (x == NoSquare && rimGrab && p2.at(c.played.to).type == Bishop && lostLater(Bishop)) {
-        bool boxed = !p2.inCheck() && p2.sideToMove() == c.human;
+        bool boxed = !p2.inCheck();
         if (boxed)
             for (const Move& m : p2.legalMovesFrom(c.played.to))
                 if (see(p2, m) >= 0) boxed = false;
@@ -440,9 +440,7 @@ bool trapped(const Ctx& c, Explanation& out) {
     Beat b = bandLine(c, "ex.trapped");
     put(b.line, "your", pieceArg(c.p1, x, c.human));
     pointPiece(b, x, "your", true);
-    Position q = p2;
-    if (q.sideToMove() == c.human)
-        for (const Move& m : q.legalMovesFrom(x)) markSquare(b, m.to, "your");
+    for (const Move& m : p2.legalMovesFrom(x)) markSquare(b, m.to, "your");
     ex.cause.push_back(b);
     if (c.level == 1) ex.tip.push_back(line(c, "ex.trapped.tip.b1", Look::Player));
     out = ex;
