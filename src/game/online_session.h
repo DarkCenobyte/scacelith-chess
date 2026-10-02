@@ -275,6 +275,7 @@ private:
 
     bool infoKnown_ = false;
     bool testing_ = false, testSwitched_ = false, testDone_ = false;
+    std::string testOrigin_;                    // of the server being tested
     net::Event testResult_;
     std::string infoError_;
     net::ServerInfo info_;

@@ -319,6 +319,7 @@ void OnlineSession::testServer(const net::ServerEndpoint& ep) {
     if (testSwitched_) a.setServer(ep);
     a.fetchServerInfo();
     testing_ = true;
+    testOrigin_ = ep.origin();
     testDone_ = false;
 }
 
@@ -673,7 +674,8 @@ void OnlineSession::handleServer(net::Event& e) {
     // devices, account or session. Its GIF is still written and its PGN still saved (ServerAnswers
     // keeps it for the game page), each as the game it was asked for. (The info of the server being
     // tested in Options names that server.)
-    if (answers_.foreign(e) && !(e.kind == Kind::ServerInfoResult && testing_)) {
+    const bool testAnswer = e.kind == Kind::ServerInfoResult && testing_ && e.origin == testOrigin_;
+    if (answers_.foreign(e) && !testAnswer) {
         if (e.kind == Kind::GifResult) gif_.finish(std::move(e));
         else if (!answers_.keep(std::move(e))) LOGI("online: an answer of %s dropped (another server since)", e.origin.c_str());
         return;
@@ -688,7 +690,9 @@ void OnlineSession::handleServer(net::Event& e) {
     auto store = [&]() { answers_.keep(std::move(e)); };
     switch (e.kind) {
     case Kind::ServerInfoResult:
-        if (testing_) {
+        // The test's answer comes from the tested server (a refreshInfo() sent before the test is
+        // answered first: not the test's).
+        if (testAnswer) {
             testing_ = false;
             testDone_ = true;
             testResult_ = e;
@@ -701,6 +705,7 @@ void OnlineSession::handleServer(net::Event& e) {
                 }
                 break;
             }
+            if (answers_.foreign(e)) break;  // another server applied since the test began
         }
         infoKnown_ = e.ok;
         infoError_ = e.ok ? std::string() : e.error;
