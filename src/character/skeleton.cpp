@@ -16,7 +16,7 @@ static const char* kNames[BoneCount] = {
 
 const char* boneName(Bone b) { return b < BoneCount ? kNames[b] : "?"; }
 
-static Skeleton buildRobot() {
+static Skeleton buildRobotSkeleton() {
     Skeleton s;
     for (int i = 0; i < BoneCount; ++i) { s.parent[i] = -1; s.restOffset[i] = vec3(0); s.boneLength[i] = 0.0f; }
     auto set = [&](Bone b, Bone parent, vec3 off, float len) {
@@ -75,7 +75,7 @@ static Skeleton buildRobot() {
 }
 
 const Skeleton& robotSkeleton() {
-    static Skeleton s = buildRobot();
+    static Skeleton s = buildRobotSkeleton();
     return s;
 }
 
