@@ -44,7 +44,7 @@ bool startsWith(const std::string& s, const std::string& pre) { return s.compare
 std::vector<std::string> parityProblems(const Catalog& c, const std::string& lang) {
     std::vector<std::string> out;
     for (const std::string& topic : c.topics("en")) {
-        if (topic == "openings") continue;   // W10's files, tested by tests/openings_tests.cpp
+        if (topic == "openings") continue;   // the openings files, tested by tests/openings_tests.cpp
         std::vector<std::string> enKeys = c.keys("en", topic), keys = c.keys(lang, topic);
         std::set<std::string> have(keys.begin(), keys.end());
         std::set<std::string> want;
@@ -417,7 +417,7 @@ TEST(coach_catalog_openings) {
     Line d = line("d");
     d.with("line", Arg::ofOpening("line:English Attack"));
     CHECK_EQ(written(c, d), std::string("English Attack"));
-    // The composing resolver (W10's OpeningTexts::arg) is asked first.
+    // The composing resolver (OpeningTexts::arg) is asked first.
     c.setOpeningResolver([](const std::string& ref, const std::string& form, const std::string& lang, bool sp) {
         return ref == "line:English Attack" ? std::string(sp ? "the English attack (spoken)" : "the English attack")
                                             : std::string();
@@ -434,7 +434,7 @@ TEST(coach_catalog_language_parity) {
     CHECK(c.load());
     for (const std::string& lang : c.languages()) {
         if (lang == "en") continue;
-        // A language with only its openings file (W10) has no speech lines yet: it falls back to
+        // A language with only its openings file has no speech lines yet: it falls back to
         // English as a whole, which is consistent. Once it has one speech file it needs them all.
         std::vector<std::string> topics = c.topics(lang);
         if (std::all_of(topics.begin(), topics.end(), [](const std::string& t) { return t == "openings"; })) continue;

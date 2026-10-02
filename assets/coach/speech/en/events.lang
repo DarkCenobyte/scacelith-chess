@@ -31,7 +31,6 @@ event.colour.black = I have White, so I'll start.
 event.colour.black.2 = You play Black this time: I move first.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
-event.level.l0 = The rules of chess: we learn the game step by step, with small exercises.
 event.level.l1 = First steps: I play gently and explain every mistake in simple words.
 event.level.l2 = Beginner: I play a little stronger, and I name simple tactics like forks and pins.
 event.level.l3 = Improver: I talk about plans and pawn structure, and I show short lines.
@@ -108,5 +107,3 @@ event.lesson.resume = Welcome back! Let's continue with {chapter}.
 event.lesson.resume.2 = Hello again! We stopped at {chapter}.
 event.lesson.next = Next: {chapter}.
 event.lesson.next.2 = Now, {chapter}.
-event.lesson.skip = All right, let's move on.
-event.lesson.skip.2 = Fine, we skip ahead.

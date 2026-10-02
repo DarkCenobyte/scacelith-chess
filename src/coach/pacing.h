@@ -1,6 +1,6 @@
-// When the coach says each word it points at (research-pedagogy §6.4). The voice (Supertonic)
-// gives one duration per utterance and no word timings, so the onset of each anchor word is
-// estimated from the synthesised audio itself:
+// When the coach says each word it points at. The voice (Supertonic) gives one duration per
+// utterance and no word timings, so the onset of each anchor word is estimated from the
+// synthesised audio itself:
 //   1. the voiced span: first and last 10 ms windows above -40 dBFS;
 //   2. the pauses: internal silences of 120 ms or more, mapped in order onto the punctuation of
 //      the spoken text (, ; : — . ! ? and their CJK and Arabic forms) by a small alignment that
@@ -9,9 +9,10 @@
 //      stretch's characters (letters, digits and spaces count 1, punctuation 0), skipping the
 //      pauses the alignment left unmapped;
 // then every estimate is moved 0.1 s earlier: a gesture a little early looks natural, a late one
-// does not (§6.3). Expected error: about ±0.2 s inside a stretch of 3 s or less.
+// does not. Expected error: about ±0.2 s inside a stretch of 3 s or less.
 //
-// Engine-free and allocation-light: run it on the TTS worker's result, before playback.
+// Engine-free; run it once per line before playback (the director does it on the main thread when
+// the line starts).
 #pragma once
 #include "catalog.h"
 #include <cstddef>

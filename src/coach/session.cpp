@@ -1,6 +1,6 @@
 // A Coach-mode game or the rules lesson, seen from the coach (session.h). The flows follow the
-// integrator notes of the brain's headers: coach/review.h (W11a), coach/appraisal.h, coach/openings.h
-// (W10), coach/lesson.h and coach/events.h (W11b).
+// integrator notes of the brain's headers: coach/review.h, coach/appraisal.h, coach/openings.h,
+// coach/lesson.h and coach/events.h.
 //
 // Analyses (all through the Analyst, full strength):
 //   A0  when the human's turn begins: MultiPV 3 of the position (cached by FEN, so the retry after a
@@ -36,9 +36,10 @@ constexpr int kBehindMoves = 3;           // ... for this many human moves in a 
 constexpr int kWellMoves = 4;             // "playing well": this many Best/Excellent moves in a row...
 constexpr int kWellGap = 8;               // ... spaced by this many human moves
 constexpr size_t kCacheRoots = 32;
+const char* const kAccuracyExplain = "appraisal.num.acc_explain.b3";
 
-// W10's texts resolve the opening names the catalog cannot compose itself (line: references),
-// and give the spoken forms of every name.
+// The opening texts (OpeningTexts) resolve the opening names the catalog cannot compose itself
+// (line: references), and give the spoken forms of every name.
 void installOpeningResolver() {
     static std::once_flag once;
     std::call_once(once, [] {
@@ -145,6 +146,7 @@ struct Session::Impl {
         uint64_t endScript = 0;
         bool handshakeDone = false;
         uint64_t appraisalScript = 0;
+        bool explainPending = false;  // the appraisal explains accuracy: accuracyExplained once it is said
         bool done = false;            // finished()
         int suggested = 0;
         // The lesson.
@@ -420,6 +422,7 @@ struct Session::Impl {
         if (g.level == 0 || !director.offerOpen()) return;
         director.closeOffer();
         const int ply = g.offerPly;
+        if (g.over || (game && game->isOver())) accept = false;   // nothing to take back in a finished game
         if (accept && game) {
             const size_t n = game->moves().size();
             // Back to the position before the human's move (the coach's reply was held).
@@ -471,6 +474,7 @@ struct Session::Impl {
     void backgroundEvals(const chess::Game& game) {
         if (hasJob(JobKind::Eval) || !analyst->idle() || g.review != ReviewState::None) return;
         if (g.handshakeDone) return;
+        if (g.takebackTo >= 0) return;   // not of plies a takeback asked of the stage is about to undo
         const bool humanTurn = game.position().sideToMove() == g.human;
         for (size_t k : appraisal.missingEvals(game)) {
             if (k == game.moves().size() && humanTurn && !g.over) continue;   // A0 gives it
@@ -484,7 +488,9 @@ struct Session::Impl {
         const size_t n = game.moves().size();
         if (g.takebackTo >= 0 && int(n) <= g.takebackTo) g.takebackTo = -1;
         const bool humanTurn = game.position().sideToMove() == g.human;
-        if (!g.over && humanTurn && g.review == ReviewState::None && g.turnPly != int(n) && !game.isOver())
+        // Not on a position a takeback asked of the stage is about to undo.
+        if (!g.over && humanTurn && g.review == ReviewState::None && g.turnPly != int(n) && !game.isOver() &&
+            g.takebackTo < 0)
             beginHumanTurn(game);
 
         // The coach's remarks on its own move (threats), once that turn's A0 is in.
@@ -528,6 +534,12 @@ struct Session::Impl {
             play(gameEndScript(g.end));
             g.endScript = director.lastScript();
         }
+        // Accuracy is explained once that line is said (Space may skip the appraisal before it).
+        const std::string* said = director.runningKey();
+        if (g.explainPending && said && *said == kAccuracyExplain) {
+            accuracyExplained = true;
+            g.explainPending = false;
+        }
     }
 
     bool coachMayMove() const {
@@ -543,12 +555,20 @@ struct Session::Impl {
             director.clear();
             g.review = ReviewState::None;
         }
+        // An offer open or still queued (a draw agreed or claimed meanwhile): nothing to take back
+        // any more, the card closes without a word.
+        if (director.closeOffer()) reviewer.takebackDeclined();
         for (uint64_t s : g.chatScripts) director.dropQueued(s);   // "You play White" after the mate
         g.chatScripts.clear();
         g.coachMovedPly = -1;
         g.announcerWaiting = false;
-        for (auto it = g.jobs.begin(); it != g.jobs.end();) {   // no human turn follows
-            if (it->kind == JobKind::A0 || it->kind == JobKind::A3) {
+        // No human turn follows: its analyses go, except the review's own input (the A0 / A3 of the
+        // last move's root, stopped when it was played). A resignation abandons the review: A1 / A2 too.
+        const bool reviewing = g.review == ReviewState::WaitA0 || g.review == ReviewState::WaitA12;
+        for (auto it = g.jobs.begin(); it != g.jobs.end();) {
+            const bool turn = it->kind == JobKind::A0 || it->kind == JobKind::A3;
+            const bool review = it->kind == JobKind::A1 || it->kind == JobKind::A2;
+            if ((turn && !(reviewing && it->fen == g.reviewRoot)) || (review && humanResigned)) {
                 analyst->cancelAnalysis(it->id);
                 it = g.jobs.erase(it);
             } else {
@@ -597,7 +617,7 @@ struct Session::Impl {
         ctx.opening = openingRef(game, &ctx.outOfBookMove);
         ctx.suggestedLevel = sug;
         const Script s = appraisal.script(game, ctx);
-        if (hasKey(s, "appraisal.num.acc_explain.b3")) accuracyExplained = true;
+        g.explainPending = hasKey(s, kAccuracyExplain);
         if (s.empty()) {
             g.done = true;
             return;
@@ -746,8 +766,6 @@ void Session::stop() {
     d.g.started = false;
 }
 
-const SessionConfig& Session::config() const { return d_->config; }
-
 void Session::update(const chess::Game& game, float dt) {
     Impl& d = *d_;
     if (!d.g.started) return;
@@ -800,6 +818,7 @@ void Session::onTakeBackRequested(const chess::Game& game) {
     const int human = d.lastHumanPly(game);
     const int n = int(game.moves().size());
     const int plies = n - human;   // the human's move and, when the coach has answered, its reply
+    const bool offered = d.g.offerPly == human;   // (takenBack() forgets it)
     d.director.clear();
     d.stage->takeBack(plies);
     chess::Game after = game;
@@ -807,14 +826,8 @@ void Session::onTakeBackRequested(const chess::Game& game) {
     d.takenBack(after);
     d.g.takebackTo = human;
     Script s = takebackScript(true, human);
-    if (d.g.offerPly == human) append(s, d.reviewer.takebackAccepted(after));   // the replay is judged against it
+    if (offered) append(s, d.reviewer.takebackAccepted(after));   // the replay is judged against it
     d.play(s);
-}
-
-void Session::onTakenBack(const chess::Game& game) {
-    Impl& d = *d_;
-    if (!d.g.started || d.g.level == 0) return;
-    d.takenBack(game);
 }
 
 void Session::onDrawAnswer(bool accepted) {
@@ -826,7 +839,11 @@ void Session::onGameOver(const chess::Game& game, bool humanResigned) {
 }
 
 void Session::skip() {
-    if (d_->g.started) d_->director.skip();
+    Impl& d = *d_;
+    if (!d.g.started) return;
+    // A lesson chapter is one script: Space skips the line being said, never the exercises after it.
+    if (d.g.level == 0) d.director.skipCurrent();
+    else d.director.skip();
 }
 
 void Session::onCoachThinking(float seconds) {

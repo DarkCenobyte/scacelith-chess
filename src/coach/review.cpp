@@ -636,6 +636,7 @@ Review Reviewer::review(const ReviewInput& in) {
         if (!offersEnabled_) offer = false;
         if (retry && out.takeback.same) offer = false;
         if (offered_.ply == ply && offersAtPly_ >= 2) offer = false;
+        if (g.isOver()) offer = false;   // the move (or a draw meanwhile) ended the game: nothing to take back
 
         // Sentence budget: verdict, cause, tail, tip, better move (demo narration, rewind and offer excluded).
         const bool wantBetter = level_ >= 3 && !ex.includesBest && !c.isBest && !c.best.empty() &&

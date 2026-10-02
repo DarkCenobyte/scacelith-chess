@@ -124,6 +124,7 @@ struct CoachRuntime {
 
     // Subtitles, HUD
     std::string subText;
+    bool subUnheard = false;                          // its line has no voice: shown whatever the option
     float subAge = 0.0f, subHold = 0.0f;
     bool offerShown = false, skipHint = false;
     float offerAge = 0.0f;                            // seconds the takeback card has been up
@@ -293,7 +294,8 @@ public:
         r.voiceStarted = true;
         r.voiceQueued = seconds;
         r.voiceGameT = 0.0;
-        if (r.voicePausedByDirector || r.voicePausedByScene) audio::setVoicePaused(id, true);
+        r.voicePausedByDirector = false;   // the director starts no voice while it holds a pause
+        if (r.voicePausedByScene) audio::setVoicePaused(id, true);
         return true;
     }
     void stopVoice() override {
@@ -349,10 +351,11 @@ public:
     }
 
     // ---- Subtitles
-    void showSubtitle(const std::string& written, float holdSeconds) override {
+    void showSubtitle(const std::string& written, float holdSeconds, bool unheard) override {
         CoachRuntime& r = rt();
         LOGD("coach: subtitle \"%s\" (%.1f s)", written.c_str(), holdSeconds);
         r.subText = written;
+        r.subUnheard = unheard;
         r.subAge = 0.0f;
         r.subHold = holdSeconds;
     }
@@ -692,7 +695,6 @@ void GameScene::startCoachGame() {
     c.director.speed = coachLevel_ == 0 ? coach::kLessonSpeechSpeed : 1.0f;
     c.introduceLevel = s.coachHistory.empty() || s.coachHistory.back().level != coachLevel_;
     c.offersEnabled = true;
-    c.seed = rt.seed;
     for (const Settings::CoachGame& g : s.coachHistory) c.history.push_back({g.level, g.result, g.accuracy});
     c.accuracyExplained = s.coachAccuracyExplained;
     c.lessonChapter = s.coachLessonChapter;
@@ -1259,7 +1261,7 @@ void GameScene::drawCoachSubtitles() {
     if (!coach() || !coach_) return;
     CoachRuntime& rt = *coach_;
     const std::string ui = i18n::language();
-    bool shown = rt.forceSubtitles ||
+    bool shown = rt.forceSubtitles || rt.subUnheard ||
                  coachSubtitlesShown(settings().subtitles, ui, coach::speechLanguage(ui), rt.stage->voiceAvailable());
     bool blocked = paused_ || ui::optionsOpen() || turn_ == Turn::HumanPromotion;
     ui::Subtitle sub;
@@ -1663,7 +1665,7 @@ void GameScene::runStageTest(float dt) {
             rt.testSq = 0.35f * duration;
             rt.testSq2 = 0.7f * duration;
         }
-        st.showSubtitle(rt.testWritten.text, ui::subtitleDuration(rt.testWritten.text, duration));
+        st.showSubtitle(rt.testWritten.text, ui::subtitleDuration(rt.testWritten.text, duration), rt.testSpeech == 0);
         st.look(coach::Look::Target, parseSquare("g1"));
         coach::Gesture point;
         point.kind = coach::GestureKind::PointPiece;

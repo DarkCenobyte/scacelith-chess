@@ -28,7 +28,6 @@ struct SessionConfig {
     DirectorConfig director;
     bool introduceLevel = false;          // first game at this level (or the level changed)
     bool offersEnabled = true;            // takeback offers after blunders
-    uint64_t seed = 0;                    // per-game randomness (variants, repertoire)
     std::vector<GameRecord> history;      // earlier coach games, oldest first (suggestLevel)
     bool accuracyExplained = false;       // the appraisal has already explained what accuracy is
     int lessonChapter = 0;                // level 0: resume at this chapter (0 = from the start)
@@ -45,7 +44,6 @@ public:
     // set-up follows). Starts talking at once.
     void start(Stage& stage, Analyst& analyst, const chess::Game& game, const SessionConfig& config);
     void stop();                          // leaving: silence, cancel the coach's analyses
-    const SessionConfig& config() const;
 
     // Every frame while the game runs (not while paused).
     void update(const chess::Game& game, float dt);
@@ -62,9 +60,6 @@ public:
     // The pause menu's "Take back": back to the player's last move (the coach's reply included).
     bool canTakeBack(const chess::Game& game) const;
     void onTakeBackRequested(const chess::Game& game);
-    // The scene undid moves itself (anything but Stage::takeBack): forget the analyses and verdicts
-    // of the plies that are gone.
-    void onTakenBack(const chess::Game& game);
     void onDrawAnswer(bool accepted);              // the coach answered the player's draw offer
     // The game is over (Game::isOver(): mate, stalemate, a draw, a resignation recorded on the Game).
     void onGameOver(const chess::Game& game, bool humanResigned);

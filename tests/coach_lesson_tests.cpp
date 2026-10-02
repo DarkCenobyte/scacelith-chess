@@ -115,6 +115,19 @@ void playBeats(const Script& s, Position& pos, std::vector<Position>& demos, con
     }
 }
 
+// Same key and arguments, in order: the director then says the line from the audio prefetched for it.
+bool sameLine(const Line& a, const Line& b) {
+    if (a.key != b.key || a.args.size() != b.args.size()) return false;
+    for (size_t i = 0; i < a.args.size(); ++i) {
+        const Arg &x = a.args[i].second, &y = b.args[i].second;
+        if (a.args[i].first != b.args[i].first || x.kind != y.kind || x.piece != y.piece || x.color != y.color ||
+            x.own != y.own || x.square != y.square || x.san != y.san || x.uci != y.uci || x.number != y.number ||
+            x.mate != y.mate || x.text != y.text)
+            return false;
+    }
+    return true;
+}
+
 bool hasKey(const Script& s, const std::string& key) {
     for (const Beat& b : s)
         if (b.line.key == key) return true;
@@ -224,10 +237,10 @@ TEST(coach_lesson_exercises_judge_moves) {
         Position pos;
         CHECK(pos.setFEN(e.fen));
         checkLine(e.ask, where);
-        checkLine(e.success, where, {"to"});
+        checkLine(e.success, where);
         checkLine(e.hint1, where);
         checkLine(e.hint2, where, {}, e.hint2Gestures, e.hint2Marks);
-        for (auto& s : e.successFor) checkLine(s.second, where, {"to"});
+        for (auto& s : e.successFor) checkLine(s.second, where);
         for (auto& r : e.acceptOnRetry) checkLine(r.line, where);
         for (auto& r : e.replies) checkReply(r, where);
         for (auto& r : e.illegal) checkReply(r, where);
@@ -241,6 +254,10 @@ TEST(coach_lesson_exercises_judge_moves) {
                 ++accepted;
                 CHECK_EQ(r.undo, 0);
                 CHECK(!r.before.empty());
+                // The praise is said as chapterLines() lists it (pre-synthesised with the chapter).
+                const std::vector<Line> pre = lesson.chapterLines(lesson.chapterOf(int(i)));
+                if (!r.before.empty())
+                    CHECK(std::any_of(pre.begin(), pre.end(), [&](const Line& l) { return sameLine(l, r.before.front().line); }));
                 Position p = pos;
                 std::vector<Position> demos;
                 playBeats(r.before, p, demos, where);
@@ -531,12 +548,12 @@ TEST(coach_events_scripts) {
         CHECK(known);
     }
     std::vector<Script> all = {greetingScript(1, chess::White, true), greetingScript(6, chess::Black, false),
-                               levelIntroScript(0), yourMoveScript(12), takeYourTimeScript(12), fillerScript(12),
+                               levelIntroScript(6), yourMoveScript(12), takeYourTimeScript(12), fillerScript(12),
                                takebackScript(true), takebackScript(false), playOnScript(), drawAnswerScript(true),
                                drawAnswerScript(false), gameEndScript(GameEnd::Win), gameEndScript(GameEnd::Resigned),
                                encouragementScript(Encouragement::AfterMistake), encouragementScript(Encouragement::Behind),
                                encouragementScript(Encouragement::PlayingWell), lessonResumeScript(lesson, 3),
-                               lessonNextScript(lesson, 4), lessonSkipScript()};
+                               lessonNextScript(lesson, 4)};
     for (const Script& s : all) {
         CHECK(!s.empty());
         for (const Beat& b : s) {

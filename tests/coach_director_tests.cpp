@@ -354,6 +354,52 @@ TEST(coach_director_skip) {
         rig.run(0.45f);
         CHECK(rig.dir.marks().empty());   // the kept mark faded when the (empty) rewind came
     }
+    // skipCurrent() (the rules lesson): the explanation only; the rest of the script goes on.
+    {
+        Rig rig;
+        rig.dir.play(script());
+        CHECK(rig.until([&] { return rig.voiceStarts() > 0; }, 5.0f));
+        rig.step();
+        rig.dir.skipCurrent();
+        CHECK_EQ(rig.stage.count("voice.stop"), 1);
+        CHECK(rig.settle());
+        CHECK_EQ(rig.stage.count("demoMove"), 1);
+        CHECK_EQ(rig.stage.count("rewindDemo"), 1);
+        CHECK(rig.started("event.your_move"));
+    }
+    // skipCurrent() on a demonstration not begun yet (the hand still busy): its narration only; the
+    // move is still played and taken back, for the lines after it speak of it.
+    {
+        Rig rig;
+        rig.dir.play(script());
+        CHECK(rig.until([&] { return rig.stage.count("voice.end") > 0; }, 10.0f));
+        CHECK(rig.stage.bodyBusy());
+        CHECK_EQ(rig.stage.count("demoMove"), 0);
+        CHECK(rig.dir.skippable());
+        rig.dir.skipCurrent();
+        CHECK(rig.settle());
+        CHECK_EQ(rig.stage.count("demoMove"), 1);
+        CHECK_EQ(rig.stage.count("rewindDemo"), 1);
+        CHECK_EQ(rig.voiceStarts(), 3);   // the explanation, the rewind's line, event.your_move
+        CHECK(rig.started("ex.rewind.b1"));
+        CHECK(rig.started("event.your_move"));
+    }
+    // skipCurrent() during the demonstration's narration: the narration stops, the move stays and
+    // the rewind runs at its pace.
+    {
+        Rig rig;
+        rig.dir.play(script());
+        CHECK(rig.until([&] { return rig.stage.count("demoMove") > 0; }, 20.0f));
+        rig.step();
+        CHECK(rig.dir.speaking());
+        rig.dir.skipCurrent();
+        CHECK_EQ(rig.stage.count("voice.stop"), 1);
+        CHECK(!rig.dir.speaking());
+        CHECK(rig.settle());
+        const auto rw = rig.stage.all("rewindDemo");
+        CHECK(rw.size() == 1 && rw[0].n == 1 && !rw[0].flag);
+        CHECK(rig.started("event.your_move"));
+    }
     // Space during the demonstration: its narration stops, the rewind still runs, briskly.
     {
         Rig rig;
@@ -420,6 +466,37 @@ TEST(coach_director_pause_holds_everything) {
     CHECK_EQ(rig.voiceStarts(), 2);
 }
 
+TEST(coach_director_pause_released_after_clear) {
+    // Paused while a line is heard, then cleared (the pause menu's Take back or Resign): the pause
+    // is released on resuming, so the next line is heard to its end.
+    Rig rig;
+    rig.dir.play({say("lesson.welcome.hello")});
+    CHECK(rig.until([&] { return rig.voiceStarts() > 0; }, 5.0f));
+    rig.run(0.3f);
+    rig.dir.setPaused(true);
+    rig.dir.clear();
+    rig.step();
+    rig.dir.setPaused(false);
+    CHECK(!rig.stage.all("voice.pause").back().flag);
+    rig.dir.play({say("event.your_move")});
+    CHECK(rig.settle());
+    CHECK_EQ(rig.voiceStarts(), 2);
+    CHECK_EQ(rig.stage.count("voice.end"), 1);
+
+    // Back to the main menu while paused: the next game's reset() releases it.
+    Rig rig2;
+    rig2.dir.play({say("lesson.welcome.hello")});
+    CHECK(rig2.until([&] { return rig2.voiceStarts() > 0; }, 5.0f));
+    rig2.run(0.3f);
+    rig2.dir.setPaused(true);
+    rig2.dir.clear();
+    rig2.dir.reset(&rig2.stage, DirectorConfig());
+    rig2.dir.play({say("event.your_move")});
+    CHECK(rig2.settle());
+    CHECK_EQ(rig2.voiceStarts(), 2);
+    CHECK_EQ(rig2.stage.count("voice.end"), 1);
+}
+
 TEST(coach_director_without_voice) {
     // No voice: nothing is synthesised, every line is shown for its reading time and the
     // gestures are timed on it.
@@ -440,16 +517,42 @@ TEST(coach_director_without_voice) {
     }
     CHECK(rig.dir.marks().empty());
 
-    // A synthesis that fails: that line is shown (even with subtitles off), the others heard.
-    DirectorConfig cfg;
-    cfg.subtitles = 2;   // Off
-    Rig rig2(true, cfg);
-    rig2.stage.failIf.push_back("ee four");
-    rig2.dir.play({say(squareLine()), say("event.your_move")});
-    CHECK(rig2.settle());
-    CHECK_EQ(rig2.voiceStarts(), 1);
-    const auto subs2 = rig2.stage.all("subtitle");
-    CHECK(subs2.size() == 1 && subs2[0].text.find("e4") != std::string::npos);
+    for (const fake::Stage::Ev& e : subs) CHECK(e.flag || e.text.empty());   // unheard: shown whatever the option
+
+    // A synthesis that fails: that line is shown (even with subtitles off, or in Automatic mode
+    // when the voice speaks the UI's language), marked unheard so that the scene draws it too;
+    // the others are heard.
+    for (int mode : {2, 0}) {   // Off, Automatic
+        DirectorConfig cfg;
+        cfg.subtitles = mode;
+        Rig rig2(true, cfg);
+        rig2.stage.failIf.push_back("ee four");
+        rig2.dir.play({say(squareLine()), say("event.your_move")});
+        CHECK(rig2.settle());
+        CHECK_EQ(rig2.voiceStarts(), 1);
+        const auto subs2 = rig2.stage.all("subtitle");
+        CHECK(subs2.size() == 1 && subs2[0].text.find("e4") != std::string::npos);
+        CHECK(!subs2.empty() && subs2[0].flag);
+    }
+    // The same line synthesised ahead (prefetch) and failed: taken from the cache as it is, shown.
+    Rig rig4;
+    rig4.stage.failIf.push_back("ee four");
+    rig4.dir.prefetch({squareLine()});
+    rig4.run(0.2f);
+    rig4.dir.play({say(squareLine())});
+    CHECK(rig4.settle());
+    CHECK_EQ(rig4.voiceStarts(), 0);
+    CHECK_EQ(rig4.stage.reqs.size(), size_t(1));
+    const auto subs4 = rig4.stage.all("subtitle");
+    CHECK(!subs4.empty() && subs4[0].text.find("e4") != std::string::npos && subs4[0].flag);
+    // Subtitles On: a heard line is shown, not marked unheard.
+    DirectorConfig on;
+    on.subtitles = 1;
+    Rig rig3(true, on);
+    rig3.dir.play({say("event.your_move")});
+    CHECK(rig3.settle());
+    const auto subs3 = rig3.stage.all("subtitle");
+    CHECK(!subs3.empty() && !subs3[0].text.empty() && !subs3[0].flag);
 }
 
 TEST(coach_director_takeback_offer) {
