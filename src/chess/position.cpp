@@ -10,6 +10,11 @@ using namespace bb;
 
 namespace {
 
+// Move buffers (generatePseudo writes them without a bound check). 256 is enough only because
+// setFEN caps each side at 16 pieces and 8 pawns and rejects a side not to move in check, caps that
+// makeMove and passTurn keep: searches over such positions found at most 242 pseudo-legal moves
+// (15 queens and a king). That is a measured margin, not a proof: revisit it if setFEN is ever
+// relaxed (a board editor, variants).
 constexpr int kMaxMoves = 256;
 
 inline Move mkMove(int from, int to, PieceType promo, int flags) {
