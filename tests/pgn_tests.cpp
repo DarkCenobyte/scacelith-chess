@@ -530,6 +530,32 @@ TEST(pgn_round_trip) {
     CHECK_EQ(int(both.games.size()), 2);
 }
 
+// Comment text that looks like a tag pair never starts a written line, wherever the wrap falls:
+// the reader would take that line for the next game and the comment for an unterminated one.
+TEST(pgn_tag_like_comment_round_trip) {
+    int failures = 0;
+    for (int pad = 1; pad <= 80; ++pad) {
+        pgn::Record r;
+        chess::Position pos;
+        for (const char* san : {"e4", "e5"}) {
+            pgn::Ply p;
+            p.move = pos.parseSAN(san);
+            p.san = pos.toSAN(p.move);
+            pos.makeMove(p.move);
+            r.plies.push_back(p);
+        }
+        r.plies[0].comment = std::string(size_t(pad), 'a') + " see [Event \"x\"] and [Site \"y\"] here";
+        r.comment = "[Round \"z\"] first";
+        const std::string text = pgn::write(r);
+        auto back = pgn::read(text);
+        const bool ok = back.games.size() == 1 && back.games[0].ok() && back.games[0].record.plies.size() == 2 &&
+                        back.games[0].record.plies[0].comment == r.plies[0].comment &&
+                        back.games[0].record.comment == r.comment;
+        if (!ok && failures++ == 0) std::fprintf(stderr, "  pad %d:\n%s\n", pad, text.c_str());
+    }
+    CHECK_EQ(failures, 0);
+}
+
 TEST(pgn_times_and_helpers) {
     CHECK_EQ(pgn::formatTime(0), std::string("0:00:00"));
     CHECK_EQ(pgn::formatTime(298000), std::string("0:04:58"));

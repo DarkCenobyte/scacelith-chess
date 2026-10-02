@@ -915,7 +915,9 @@ struct Wrapper {
         if (!line.empty()) line += ' ';
         line += tok;
     }
-    // A comment, breakable between its words (each [%command] stays whole).
+    // A comment, breakable between its words (each [%command] stays whole). A word opening like a
+    // tag pair ("[Event") stays with the word before it: at the start of a line, the reader would
+    // take it for the next game's tags and the comment for an unterminated one.
     void comment(const std::vector<std::string>& commands, const std::string& text) {
         std::vector<std::string> words = commands;
         size_t i = 0;
@@ -923,7 +925,12 @@ struct Wrapper {
             while (i < text.size() && text[i] == ' ') ++i;
             size_t j = text.find(' ', i);
             if (j == std::string::npos) j = text.size();
-            if (j > i) words.push_back(text.substr(i, j - i));
+            if (j > i) {
+                std::string w = text.substr(i, j - i);
+                const bool tagLike = w.size() > 1 && w[0] == '[' && (isAlpha(w[1]) || isDigit(w[1]) || w[1] == '_');
+                if (tagLike && !words.empty()) words.back() += ' ' + w;
+                else words.push_back(std::move(w));
+            }
             i = j;
         }
         if (words.empty()) return;
