@@ -28,7 +28,8 @@
 // opening, arcs, elbow lift, resting spots). The animator learns where they stand from the
 // optional obstacle callbacks (pathObstacleTop, obstacleTopNear); without them it reads
 // pieceTransform for the ids 0, 1, 2... when a task starts (see pieceTransform). Diagnostics:
-// SCACELITH_ANIM_DEBUG=1 logs the planning, SCACELITH_ANIM_ARMTRACE=1 logs joint-limit clamps.
+// SCACELITH_ANIM_DEBUG (set to any value) logs the planning, SCACELITH_ANIM_ARMTRACE (set) logs
+// joint-limit clamps.
 #pragma once
 #include "../character/skeleton.h"
 #include "../math/math.h"
