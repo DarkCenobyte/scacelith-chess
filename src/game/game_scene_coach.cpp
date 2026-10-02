@@ -61,6 +61,9 @@ constexpr float kHandshakeFailsafe = 45.0f, kEndCardFailsafe = 300.0f;
 
 float smooth01(float x) { return x <= 0.0f ? 0.0f : x >= 1.0f ? 1.0f : x * x * (3.0f - 2.0f * x); }
 
+// The TTS speed of a coach game's lines: the rules lesson speaks slower.
+float speechSpeed(int level) { return level == 0 ? coach::kLessonSpeechSpeed : 1.0f; }
+
 }  // namespace
 
 // ==============================================================================================
@@ -608,7 +611,6 @@ CoachRuntime& GameScene::coachRuntime() {
         coach::OpeningBook::instance();
         coach::OpeningTexts::instance();
     });
-    rt.stage->ensureWorker(1.0f);   // the voice loads while the lights go down
     return rt;
 }
 
@@ -618,6 +620,9 @@ void GameScene::setupCoachGame() {
     leaveCoachGame();
     const Settings& s = settings();
     coachLevel_ = coachArgs_.level >= 0 ? coachArgs_.level : std::clamp(s.coachLevel, 0, ai::kCoachLevels - 1);
+    // The voice loads while the lights go down, at the speed of this game's lines (a worker started
+    // at another speed would load the model again when the first line is asked for).
+    rt.stage->ensureWorker(speechSpeed(coachLevel_));
     int colour = coachArgs_.colour >= 0 ? coachArgs_.colour
                  : s.coachColour == 0 || s.coachColour == 1 ? s.coachColour
                                                              : (s.coachNextColour == 1 ? 1 : 0);
@@ -680,7 +685,7 @@ void GameScene::startCoachGame() {
     c.human = humanColor_;
     c.director.uiLanguage = i18n::language();
     c.director.subtitles = s.subtitles;
-    c.director.speed = coachLevel_ == 0 ? coach::kLessonSpeechSpeed : 1.0f;
+    c.director.speed = speechSpeed(coachLevel_);
     c.introduceLevel = s.coachHistory.empty() || s.coachHistory.back().level != coachLevel_;
     c.offersEnabled = true;
     c.seed = rt.seed;
