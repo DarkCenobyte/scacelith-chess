@@ -190,17 +190,20 @@ coach's mouth (`audio::setVoicePose`) and drives the end of the game. `render` d
 director's marks (`World::submitCoachMarks`, piece highlights through `submitPieces`) and
 `renderOverlay` the subtitles.
 
-* **Voice.** One `tts::Worker` (started when the coach mode is first used, restarted when the
-  lesson's slower speed is wanted, stopped before `audio::shutdown`). The director requests each
-  line's synthesis ahead of time; the scene plays the PCM as one streamed audio voice from the
-  coach's mouth. The speech clock is the audio engine's (`played` minus the output latency) while
-  a device plays it, else the game's time; a voice that never starts is ended by a watchdog.
-  Glyphs of a line are put in the font atlas when its synthesis is requested.
+* **Voice.** One `tts::Worker` (started when the coach mode is first used; each line carries its
+  own speed, so the lesson's slower rate needs no reload; a worker whose load failed is tried
+  again between lines, one whose warm-up failed not for the rest of the session; stopped before
+  `audio::shutdown`). The director requests each line's synthesis ahead of time; the scene plays
+  the PCM as one streamed audio voice from the coach's mouth. The speech clock is the audio
+  engine's (`played` minus the output latency) while a device plays it, else the game's time; a
+  voice that never starts is ended by a watchdog. Glyphs of a line are put in the font atlas when
+  its synthesis is requested.
 * **Voice model download.** `src/game/coach_model.h` decides when to offer the model (the Coach
   entry of the title page, through `ui::setCoachEntryHook`; Options > Audio > Coach voice switched
-  on; files that did not load), runs the `tts::ModelDownloader` and draws the prompt and the
-  progress panel (`src/ui/ui_model_download.cpp`); `net::download` (`src/net/download.h`) streams
-  each file, follows the hosts' redirects (the online client never does) and resumes with `Range`.
+  on; files that did not load or could not speak), runs the `tts::ModelDownloader` and draws the
+  prompt and the progress panel (`src/ui/ui_model_download.cpp`); `net::download`
+  (`src/net/download.h`) streams each file, follows the hosts' redirects (the online client never
+  does) and resumes with `Range`.
   The scene calls `drawModelDownload()` every frame and re-reads `coachVoiceWanted()`
   (`refreshCoachVoice`) after a download or an options change.
 * **Body.** Gestures become animator tasks on the coach's playing arm (`Point`, `Trace`,
