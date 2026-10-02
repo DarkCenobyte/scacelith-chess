@@ -271,8 +271,7 @@ void buildHand(Sink& s) {
             sock[f] = mcpBall[f] + kGap;
         }
         vec3 cmc = sk.restOffset[ThumbR1];
-        const float wristR = 0.0205f;
-        auto palm = [mcp, sock, cmc, cmcBall, wristR](const vec3& p) {
+        auto palm = [mcp, sock, cmc, cmcBall](const vec3& p) {
             // Metacarpal slab: superelliptic cross-section, arched back, wider at the knuckles.
             float y = p.y;
             float t = smoothstep(-0.012f, -0.070f, y);  // 0 at the wrist .. 1 at the knuckles
@@ -290,7 +289,7 @@ void buildHand(Sink& s) {
             float hyp = sdf::ellipsoid(p - vec3(0.0078f, -0.045f, -0.021f), vec3(0.0068f, 0.025f, 0.0115f));
             d = sdf::smin(d, hyp, 0.006f);
             // Carpal dome: sphere around the wrist pivot (slides inside the forearm socket).
-            float ball = sdf::sphere(p, wristR);
+            float ball = sdf::sphere(p, kWristDome);
             float dome = sdf::smax(ball, std::fabs(p.x + 0.0008f) - 0.0150f, 0.004f);
             d = sdf::smin(d, dome, 0.008f);
             // Near the wrist everything stays inside the ball, so the hand can bend freely.
@@ -311,7 +310,7 @@ void buildHand(Sink& s) {
         look.variant = 1.0f;
         look.seams[0] = seamPlane(vec3(1, 0, 0), vec3(0.0040f, 0, 0));
         look.seams[1] = seamPlane(vec3(0, -1, 0.10f), vec3(0, -0.066f, 0));
-        look.seams[2] = seamPlane(vec3(0, 1, 0), vec3(0, -0.0205f, 0));
+        look.seams[2] = seamPlane(vec3(0, 1, 0), vec3(0, -kWristDome, 0));
         sdf::VolumeOptions o = handVolume(vec3(0, -1, 0), "palm");
         o.cell = 0.0006f;
         o.maxError = 0.00005f;

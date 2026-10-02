@@ -38,6 +38,10 @@ struct Sink {
 
 m::vec4 seamPlane(m::vec3 n, m::vec3 pointOnPlane);
 
+// Radius of the palm's carpal dome around the wrist pivot (robot_hand.cpp); the forearm's wrist
+// socket wraps it (robot_body.cpp).
+constexpr float kWristDome = 0.0205f;
+
 // Opposite-side bone for a right-side bone.
 Bone mirrorBone(Bone rightBone);
 

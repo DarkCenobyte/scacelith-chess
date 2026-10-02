@@ -31,7 +31,7 @@ quat lidRotation(Bone lid, float closure, float gazePitch) {
 namespace build {
 namespace {
 
-const vec3 kEye(0.032f, 0.080f, 0.075f);          // right/left eye centre (|x|) in head space
+const vec3 kEye = robotSkeleton().restOffset[EyeL];  // right/left eye centre (|x|) in head space
 constexpr float kSocket = eye::LID_OUTER + 0.0004f;  // spherical socket the lids slide in
 
 // Cubic norm (superellipsoid with flatter sides than an ellipsoid).

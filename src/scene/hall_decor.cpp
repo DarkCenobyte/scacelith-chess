@@ -199,13 +199,19 @@ void buildTapestries(Accum& a, std::vector<ModelPart>& parts) {
 }
 
 // ------------------------------------------------------------------------------------------------
+// Chandelier arms at the design size: two tiers of n S-scrolls from the hub (hubR, hubY), dipping
+// by 'dip', to a bobeche and candle at (cupR, cupY); the arms of a tier start rot / n of a turn
+// from +X. Shared by chandelierBody and chandelierCandles.
+struct ChandelierTier { int n; float hubR, hubY, cupR, cupY, dip, rot; };
+constexpr ChandelierTier kChandelierTiers[2] = {{12, 0.08f, 5.42f, 0.86f, CHANDELIER_Y, 0.14f, 0.0f},  // lower candle ring
+                                                {6, 0.06f, 6.2f, 0.5f, 6.36f, 0.08f, 0.5f}};
+
 // Chandelier body at its design size (candle ring radius 0.86 m); scaled up by CHANDELIER_SCALE
 // about the candle ring by buildChandelier.
 static void chandelierBody(Accum& a) {
     MeshData& brass = a[MaterialId::Brass];
     MeshData& crystal = a[MaterialId::Crystal];
     MeshData& wax = a[MaterialId::CandleWax];
-    const float yLow = CHANDELIER_Y;  // lower candle ring
     // Central stem (from the bottom finial to the top hook).
     Profile stem = {{0.0f, 4.62f},  {0.018f, 4.64f}, {0.034f, 4.7f},  {0.036f, 4.76f}, {0.024f, 4.82f}, {0.03f, 4.86f},
                     {0.07f, 4.9f},  {0.15f, 4.98f},  {0.21f, 5.07f},  {0.24f, 5.16f},  {0.245f, 5.2f},  {0.235f, 5.215f},
@@ -241,15 +247,13 @@ static void chandelierBody(Accum& a) {
         }
     }
     // Arms: two tiers of S-scrolls ending in bobeches and candles.
-    struct Tier { int n; float hubR, hubY, cupR, cupY, dip, rot; };
-    const Tier tiers[2] = {{12, 0.08f, 5.42f, 0.86f, yLow, 0.14f, 0.0f}, {6, 0.06f, 6.2f, 0.5f, 6.36f, 0.08f, 0.5f}};
     Profile bob = {{0.0f, -0.03f}, {0.012f, -0.028f}, {0.018f, -0.018f}, {0.03f, -0.006f}, {0.06f, 0.0f}, {0.066f, 0.006f},
                    {0.06f, 0.012f}, {0.024f, 0.012f}, {0.022f, 0.016f}, {0.022f, 0.06f}, {0.026f, 0.064f}, {0.016f, 0.066f}, {0.0f, 0.066f}};
     Profile candle = {{0.0f, 0.0f}, {0.0125f, 0.0f}, {0.0125f, 0.0f}, {0.0125f, 0.15f}, {0.011f, 0.158f}, {0.006f, 0.162f},
                       {0.002f, 0.163f}, {0.001f, 0.172f}, {0.0f, 0.173f}};
     std::vector<vec3> lowCups;
     for (int ti = 0; ti < 2; ++ti) {
-        const Tier& T = tiers[ti];
+        const ChandelierTier& T = kChandelierTiers[ti];
         for (int k = 0; k < T.n; ++k) {
             float th = TAU * (float(k) + T.rot) / float(T.n);
             vec3 dir(std::cos(th), 0, std::sin(th));
@@ -404,12 +408,10 @@ void buildProps(Accum& a, MeshData& paintings) {
 }  // namespace detail
 
 void chandelierCandles(std::vector<m::vec3>& flames) {
-    // Mirrors the arm tiers of chandelierBody (design size), scaled about the candle ring.
-    struct Tier { int n; float cupR, cupY, rot; };
-    const Tier tiers[2] = {{12, 0.86f, CHANDELIER_Y, 0.0f}, {6, 0.5f, 6.36f, 0.5f}};
+    // The arm tiers of chandelierBody (design size), scaled about the candle ring.
     const float flameAbove = 0.066f + 0.19f;  // bobeche + candle, flame centre above the wick
     flames.clear();
-    for (const Tier& T : tiers)
+    for (const detail::ChandelierTier& T : detail::kChandelierTiers)
         for (int k = 0; k < T.n; ++k) {
             float th = m::TAU * (float(k) + T.rot) / float(T.n);
             m::vec3 p(T.cupR * std::cos(th), T.cupY + flameAbove, T.cupR * std::sin(th));
