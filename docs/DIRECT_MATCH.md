@@ -196,7 +196,7 @@ Limits, accepted for a friendly unrated game:
 | what | value |
 |---|---|
 | connect (per resolved address) | 5 s |
-| handshake, then Hello -> Welcome | 10 s each |
+| handshake, then Hello -> Welcome | 10 s each (guest); 10 s for both (host) |
 | ping (both directions, measures the round trip and the host clock) | every 2 s |
 | gestures, each way | 10 per second, bursts of 20 (the sender paces for 19) |
 | link considered dead without any data | 10 s |
