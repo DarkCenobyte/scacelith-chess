@@ -4213,6 +4213,50 @@ TEST(net_forget_saved_pin_after_a_sign_in_under_way) {
     net::sys::removeFile(credPath);
 }
 
+// The pin field emptied, then the game quits while a request still runs ahead of the clear on
+// net-http: the pin is forgotten all the same (else the next start would use it again, and
+// Options could no longer clear it). The session stays.
+TEST(net_forget_saved_pin_at_exit) {
+    if (!net::transportAvailable()) return;
+    std::atomic<int> infos{0};
+    fakehttp::Server srv([&](const fakehttp::Request& q) {
+        if (q.path == "/api/v1/info") ++infos;
+        fakehttp::Reply rep = jsonReply(200, "{}");
+        rep.silenceMs = 1500;
+        return rep;
+    });
+    CHECK(srv.ok());
+    std::string credPath = tempCredentialPath("forget-pin-exit");
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = srv.port();
+    ep.insecureDev = true;
+    {
+        net::CredentialStore s(credPath);
+        net::Credential cr;
+        cr.origin = ep.origin();
+        cr.username = "alice";
+        cr.token = kRigToken;
+        cr.pinnedSha256 = std::string(64, 'c');
+        CHECK(s.put(cr));
+    }
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        c.fetchServerInfo();
+        auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (infos.load() == 0 && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK_EQ(infos.load(), 1);
+        c.forgetSavedPin();
+    }
+    net::CredentialStore after(credPath);
+    CHECK(after.pin(ep.origin()).empty());
+    CHECK(after.hasToken(ep.origin()));
+    net::sys::removeFile(credPath);
+}
+
 // POST /auth/sso/google/start carries what the server's schema declares, nothing else (it refuses
 // an unknown field).
 TEST(net_sso_start_body) {

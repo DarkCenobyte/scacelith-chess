@@ -326,6 +326,7 @@ struct OnlineClient::Impl {
         std::string origin;
         uint32_t gen = 0;   // originGen then
         std::function<void()> fn;
+        bool atExit = false;   // still run when the client ends before net-http reached it (~Impl)
     };
     std::deque<HttpCommand> httpQ, gifQ;
     std::deque<std::function<void()>> rtQ;
@@ -432,6 +433,10 @@ struct OnlineClient::Impl {
         if (httpThread.joinable()) httpThread.join();
         if (rtThread.joinable()) rtThread.join();
         if (gifThread.joinable()) gifThread.join();
+        // The other queued commands are dropped; these change only the credential file (a saved
+        // pin the player cleared, behind a request under way when the game quit).
+        for (const HttpCommand& cmd : httpQ)
+            if (cmd.atExit) runCommand(cmd);
     }
 
     void post(Event ev) {
@@ -452,11 +457,11 @@ struct OnlineClient::Impl {
         events.push_back(std::move(ev));
     }
     // An HTTPS command for net-http; one for net-gif (the GIFs). Given on the game thread, like
-    // setServer(): ep is the server its requests go to.
-    void http(std::function<void()> fn) {
+    // setServer(): ep is the server its requests go to. atExit: HttpCommand::atExit.
+    void http(std::function<void()> fn, bool atExit = false) {
         {
             std::lock_guard<std::mutex> lk(mu);
-            httpQ.push_back(HttpCommand{ep.origin(), originGen.load(), std::move(fn)});
+            httpQ.push_back(HttpCommand{ep.origin(), originGen.load(), std::move(fn), atExit});
         }
         httpCv.notify_one();
     }
@@ -1570,11 +1575,14 @@ void OnlineClient::forgetSavedPin() {
     std::string origin = d->ep.origin();
     // On net-http, behind the sign-ins already queued: they save the pin of the endpoint they were
     // given (the one forgotten here). A Google sign-in under way polls and saves with its own
-    // endpoint, whose pin goes too.
-    d->http([d, origin] {
-        if (d->sso.active && d->sso.ep.origin() == origin) d->sso.ep.pinnedSha256.clear();
-        d->creds.clearPin(origin);
-    });
+    // endpoint, whose pin goes too. Done even when the game quits first (atExit): the next start
+    // would use the old pin again, and Options could no longer clear it.
+    d->http(
+        [d, origin] {
+            if (d->sso.active && d->sso.ep.origin() == origin) d->sso.ep.pinnedSha256.clear();
+            d->creds.clearPin(origin);
+        },
+        true);
 }
 
 const ServerEndpoint& OnlineClient::server() const { return impl_->ep; }
