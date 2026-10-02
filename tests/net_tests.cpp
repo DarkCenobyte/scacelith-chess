@@ -3913,7 +3913,11 @@ TEST(net_live_server_game) {
     CHECK(waitEvent(c, net::Event::Kind::RatingUpdate, ev, 10000, &seen));
     const net::Event::Rating& mine = you == 0 ? ev.ratingWhite : ev.ratingBlack;
     std::fprintf(stderr, "  rating %d -> %d (games %d)\n", mine.before, mine.after, mine.games);
-    CHECK(mine.after < mine.before);
+    // A new account's loss before its first draw or win counts for neither player's rating
+    // (dedicated-server/docs/DESIGN.md, ratings, "Zero score"): the update comes, the game is
+    // counted, the rating stays.
+    CHECK_EQ(mine.games, 1);
+    CHECK_EQ(mine.after, mine.before);
     c.logout();
     waitEvent(c, net::Event::Kind::LogoutResult, ev, 5000, &seen);
     c.disconnect();
