@@ -27,8 +27,10 @@
 #include "game/settings.h"
 #include "net/online_client.h"
 
+#include <chrono>
 #include <cstdio>
 #include <cstdlib>
+#include <ctime>
 #include <string>
 #include <vector>
 
@@ -45,6 +47,20 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #ifndef SCACELITH_VERSION_STRING
 #define SCACELITH_VERSION_STRING "0.1.0"
 #endif
+
+// Local time to the millisecond, "20261002-134501-123": F12 screenshots are named by it, so a
+// later session never overwrites an earlier one.
+static std::string timestamp() {
+    auto now = std::chrono::system_clock::now();
+    std::time_t t = std::chrono::system_clock::to_time_t(now);
+    int ms = int(std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() % 1000);
+    std::tm tm = {};
+    if (const std::tm* local = std::localtime(&t)) tm = *local;
+    char buf[64];
+    std::snprintf(buf, sizeof buf, "%04d%02d%02d-%02d%02d%02d-%03d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,
+                  tm.tm_min, tm.tm_sec, ms);
+    return buf;
+}
 
 static int runApp(std::vector<std::string> args) {
     AppContext ctx;
@@ -140,7 +156,7 @@ static int runApp(std::vector<std::string> args) {
             int sw, sh;
             glFinish();
             renderer.readBackbuffer(px, sw, sh);
-            std::string out = ctx.screenshotMode ? shotPath : plat::userDataDirectory() + "screenshot_" + std::to_string(frame) + ".png";
+            std::string out = ctx.screenshotMode ? shotPath : plat::userDataDirectory() + "screenshot_" + timestamp() + ".png";
             if (image::writePNG(out, sw, sh, 3, px.data())) LOGI("saved %s (%dx%d)", out.c_str(), sw, sh);
             else LOGE("could not write %s", out.c_str());
             if (ctx.screenshotMode) running = false;
