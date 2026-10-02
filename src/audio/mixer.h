@@ -1,9 +1,10 @@
 // Real-time mixer: 32 voices playing bank variants with per-trigger randomisation, 2 speech voices
 // streaming caller-supplied PCM (their own pool: never stolen), 3D spatialisation, four buses
-// (effects, UI, ambience, voice), ambience ducking under speech, hall reverb, master volume, DC
-// blocker and a look-ahead peak limiter. Single-threaded object: every method is called from the
-// thread that renders (the device thread live, the caller's thread offline). No allocation in
-// process(), nor in the speech methods (chunks arrive allocated and leave through the retired list).
+// (effects, UI, ambience, voice; UI currently shares the effects volume), ambience ducking under
+// speech, hall reverb, master volume, DC blocker and a look-ahead peak limiter. Single-threaded
+// object: every method is called from the thread that renders (the device thread live, the
+// caller's thread offline). No allocation in process(), nor in the speech methods (chunks arrive
+// allocated and leave through the retired list).
 #pragma once
 #include "ambience.h"
 #include "audio.h"
@@ -23,7 +24,7 @@ enum class Bus : uint8_t { Effects = 0, UI = 1, Ambience = 2, Voice = 3 };
 
 struct SoundBuffer {
     std::vector<float> samples;  // mono, kBankRate (speech chunk: the voice's source rate)
-    int sfx = 0, variant = 0;    // speech chunk: sfx = -1, variant = speech slot
+    int sfx = 0, variant = 0;    // speech chunk: sfx = -1 (variant unused)
 };
 
 // ---- Speech voices ----
@@ -63,9 +64,8 @@ struct PlayRequest {
     Bus bus = Bus::Effects;
     bool spatial = true;
     // > 0: plays only a window of that many seconds of the sound (sustained textures such as the
-    // pen friction), starting 'offset' seconds into it (< 0: at a random place), with short fades.
+    // pen friction), at a random place in it, with short fades.
     float duration = 0.0f;
-    float offset = -1.0f;
 };
 
 // The voices of one pen-down stroke (audio::playPenStroke): the touch-down tick at the tip and, when
@@ -98,7 +98,6 @@ public:
     void install(SoundBuffer* b);
     SoundBuffer* peekRetired() const { return retiredCount_ ? retired_[0] : nullptr; }
     void dropRetired();
-    bool hasSound(Sfx s) const;
     void setRefreshHook(RefreshFn fn, void* user) { refreshFn_ = fn; refreshUser_ = user; }
 
     int activeVoices() const;  // effect voices only

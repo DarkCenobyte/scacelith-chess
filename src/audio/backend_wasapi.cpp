@@ -1,8 +1,8 @@
 // WASAPI shared-mode, event-driven output. The mixer runs at the device mix rate (no resampling
 // stage) and its float stereo is converted to the mix format (float32 / int16 / int24 / int32,
-// any channel count: L/R go to the front pair, mono gets the sum). Device loss, default-device
-// changes and stalls reopen the device; with no device the thread retries with a back-off and
-// stays silent. MMCSS "Pro Audio" priority when available.
+// any channel count: L/R go to the front pair, mono gets their average). Device loss,
+// default-device changes and stalls reopen the device; with no device the thread retries with a
+// back-off and stays silent. MMCSS "Pro Audio" priority when available.
 #ifdef _WIN32
 #include "backend.h"
 #include "dsp.h"
@@ -111,7 +111,7 @@ public:
     }
 
 private:
-    enum class End { Quit, Changed, Lost, Stalled };
+    using End = StreamEnd;
 
     void closeEvents() {
         if (quitEvent_) CloseHandle(quitEvent_);
@@ -138,7 +138,7 @@ private:
 
         IMMDeviceEnumerator* enumr = nullptr;
         DeviceNotifier* notifier = nullptr;
-        int failures = 0;
+        ReopenBackoff backoff;
         bool loggedNoDevice = false;
         while (!quitting()) {
             if (!enumr) {
@@ -155,23 +155,20 @@ private:
             bool opened = enumr && open(enumr, !loggedNoDevice);
             reportFirst(opened);
             End end = End::Stalled;
+            bool healthy = false;
             if (opened) {
                 loggedNoDevice = false;
-                end = stream();
+                end = stream(healthy);
                 close();
                 if (end == End::Quit) break;
                 status.restarts.fetch_add(1);
-                if (end != End::Stalled) {
-                    failures = 0;
-                    continue;  // device lost / default changed: reopen right away
-                }
             } else {
                 loggedNoDevice = true;
             }
-            DWORD waitMs = DWORD(std::min(5000, 250 << std::min(failures, 5)));
-            ++failures;
+            const int waitMs = backoff.waitMs(opened, end, healthy);
+            if (waitMs == 0) continue;  // default changed / working device lost: reopen right away
             HANDLE hs[2] = {quitEvent_, changeEvent_};
-            WaitForMultipleObjects(2, hs, FALSE, waitMs);
+            WaitForMultipleObjects(2, hs, FALSE, DWORD(waitMs));
         }
         reportFirst(false);
         if (enumr && notifier) enumr->UnregisterEndpointNotificationCallback(notifier);
@@ -207,7 +204,7 @@ private:
                 chR_ = r;
             }
         }
-        if (channels_ < 1 || rate_ < 8000 || rate_ > 384000) return false;
+        if (channels_ < 1 || rate_ < kMinDeviceRate || rate_ > kMaxDeviceRate) return false;
         if (isFloat && bits == 32) type_ = SampleType::Float32;
         else if (isPcm && bits == 16) type_ = SampleType::Int16;
         else if (isPcm && bits == 24) type_ = SampleType::Int24;
@@ -234,7 +231,7 @@ private:
             // Unusual mix format: hand the engine float32 stereo and let it convert.
             fallback.Format.wFormatTag = WAVE_FORMAT_EXTENSIBLE;
             fallback.Format.nChannels = 2;
-            fallback.Format.nSamplesPerSec = wf->nSamplesPerSec >= 8000 ? wf->nSamplesPerSec : 48000;
+            fallback.Format.nSamplesPerSec = DWORD(fallbackDeviceRate(wf->nSamplesPerSec));
             fallback.Format.wBitsPerSample = 32;
             fallback.Format.nBlockAlign = 8;
             fallback.Format.nAvgBytesPerSec = fallback.Format.nSamplesPerSec * 8;
@@ -292,7 +289,9 @@ private:
         audioEvent_ = nullptr;
     }
 
-    End stream() {
+    // 'healthy': the stream delivered at least a second of audio before it ended.
+    End stream(bool& healthy) {
+        healthy = false;
         HRESULT hr = client_->Start();
         if (FAILED(hr)) {
             LOGW("audio: IAudioClient::Start failed (hr=0x%08lx)", (unsigned long)hr);
@@ -300,7 +299,8 @@ private:
         }
         HANDLE hs[3] = {quitEvent_, changeEvent_, audioEvent_};
         int timeouts = 0;
-        unsigned events = 0;
+        uint64_t rendered = 0;
+        unsigned dryBuffers = 0;  // the first 4 of each stream are tolerated: not counted, no adaptation
         End end = End::Quit;
         for (;;) {
             DWORD w = WaitForMultipleObjects(3, hs, FALSE, 200);
@@ -327,7 +327,7 @@ private:
                 end = End::Lost;
                 break;
             }
-            if (padding == 0 && ++events > 4) {  // buffer ran dry: glitch -> allow more latency
+            if (padding == 0 && ++dryBuffers > 4) {  // buffer ran dry: glitch -> allow more latency
                 status.underruns.fetch_add(1);
                 targetFrames_ = std::min(bufferFrames_, targetFrames_ + UINT32(rate_ / 400));
                 status.bufferFrames = int(targetFrames_);
@@ -345,8 +345,10 @@ private:
             convert(scratch_.data(), data, int(avail));
             hr = render_->ReleaseBuffer(avail, 0);
             if (FAILED(hr)) { end = End::Lost; break; }
+            rendered += avail;
         }
         client_->Stop();
+        healthy = rendered >= uint64_t(rate_);
         return end;
     }
 
@@ -357,6 +359,7 @@ private:
             BYTE* f = out + size_t(i) * size_t(blockAlign_);
             for (int c = 0; c < ch; ++c) {
                 float v = ch == 1 ? 0.5f * (l + r) : (c == chL_ ? l : (c == chR_ ? r : 0.0f));
+                if (v != v) v = 0.0f;  // NaN: silence, never handed to the engine (the clamp keeps it)
                 v = v > 1.0f ? 1.0f : (v < -1.0f ? -1.0f : v);
                 switch (type_) {
                     case SampleType::Float32: std::memcpy(f + c * 4, &v, 4); break;

@@ -2,11 +2,12 @@
 // offline rendering and WAV output.
 //
 // Threads:
-//   * game thread(s): play()/setListener()/volumes -> lock-free MPMC queue / atomics
+//   * game thread(s): play() -> lock-free MPMC queue, volumes -> atomics, setListener() -> mutex
+//     + version (the audio thread only try_locks it)
 //   * audio thread (backend): drains commands, installs bank buffers, runs the Mixer
-//   * builder thread (low priority): synthesises the initial bank (kVariants per Sfx), then
-//     re-synthesises each variant right after it is played (fresh seed), and frees retired
-//     buffers so the audio thread never allocates or frees.
+//   * builder thread (low priority): synthesises the initial bank (bankVariants(s) per Sfx, up to
+//     kVariants), then re-synthesises each variant right after it is played (fresh seed), and
+//     frees retired buffers so the audio thread never allocates or frees.
 //
 // Speech voices (openVoice ...): the ordered operations that carry data (open, append) go through
 // their own command queue, without the 250 ms staleness rule of play() (an append must never be
@@ -29,7 +30,6 @@
 #include <chrono>
 #include <condition_variable>
 #include <cstdio>
-#include <cstring>
 #include <mutex>
 #include <thread>
 #ifdef _WIN32
@@ -78,6 +78,7 @@ struct VoiceShared {
     int rate = 44100;
     uint32_t sent = 0;   // chunks appended
     bool closed = false;
+    bool nonFiniteLogged = false;
     // Emitter pose (listener pattern: the audio thread try_locks when the version moved).
     std::mutex poseMutex;
     uint32_t poseId = 0;
@@ -402,21 +403,6 @@ void play(Sfx s, m::vec3 position, float gain, float pitch) {
     pushPlay(r);
 }
 
-void playFor(Sfx s, m::vec3 position, float seconds, float gain, float pitch) {
-    if (int(s) < 0 || int(s) >= int(Sfx::Count) || !finiteVec(position) || !std::isfinite(gain) || !std::isfinite(pitch) ||
-        !(seconds > 0.0f) || !std::isfinite(seconds))
-        return;
-    PlayRequest r;
-    r.sfx = s;
-    r.pos = position;
-    r.gain = gain;
-    r.pitch = pitch;
-    r.bus = sfxInfo(s).ui ? Bus::UI : Bus::Effects;
-    r.spatial = true;
-    r.duration = seconds;
-    pushPlay(r);
-}
-
 int penStrokeRequests(m::vec3 tip, float seconds, float gain, PlayRequest out[2]) {
     PlayRequest r;
     r.sfx = Sfx::PenTap;
@@ -488,6 +474,7 @@ VoiceId openVoice(const VoiceParams& p) {
                 v.rate = p.sampleRate;
                 v.sent = 0;
                 v.closed = false;
+                v.nonFiniteLogged = false;
                 {
                     std::lock_guard<std::mutex> pl(v.poseMutex);
                     v.poseId = id;
@@ -522,10 +509,21 @@ double appendVoice(VoiceId id, std::vector<float>&& mono) {
     const uint64_t dw = v.done.load(std::memory_order_acquire);
     const uint32_t done = uint32_t(dw >> 32) == id.v ? uint32_t(dw) : 0u;
     if (v.sent - done >= uint32_t(kSpeechChunks)) return -1.0;  // the mixer FIFO is full: retry later
+    // The only float input the API cannot range-check: one NaN/Inf would latch in the hall reverb
+    // and the DC blockers and silence all audio for the session, so it becomes silence here.
+    int nonFinite = 0;
+    for (float& x : mono)
+        if (!std::isfinite(x)) {
+            x = 0.0f;
+            ++nonFinite;
+        }
+    if (nonFinite && !v.nonFiniteLogged) {
+        LOGW("audio: appendVoice: %d non-finite samples replaced with silence", nonFinite);
+        v.nonFiniteLogged = true;
+    }
     SoundBuffer* b = new SoundBuffer();
     b->samples = std::move(mono);
     b->sfx = -1;
-    b->variant = int(id.v & 1u);
     const int64_t frames = int64_t(b->samples.size());
     VoiceCmd c;
     c.op = VoiceCmd::Append;

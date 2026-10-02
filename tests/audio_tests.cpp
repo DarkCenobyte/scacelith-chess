@@ -7,6 +7,7 @@
 // WAV files for listening are written to /tmp/audio_out/ (Windows: %TEMP%\scacelith_audio_out).
 #include "test.h"
 #include "audio/audio.h"
+#include "audio/backend.h"
 #include "audio/mixer.h"
 #include "audio/offline.h"
 #include "audio/queue.h"
@@ -218,6 +219,7 @@ TEST(audio_synth_variants_sane) {
         for (uint32_t seed = 1; seed <= 5; ++seed) {
             std::vector<float> v = audio::synthesize(ex.sfx, seed * 7777u);
             CHECK(v.size() > 64);
+            CHECK_EQ(v.capacity(), v.size());  // the bank keeps no synthesis scratch capacity
             float peak = 0.0f;
             bool finite = true;
             int den = 0;
@@ -515,6 +517,35 @@ TEST(audio_windowed_play) {
     }
 }
 
+// A huge pitch (only finiteness is checked) moves the read position past INT_MAX after one sample:
+// the voice must end there instead of reading silence until it is stolen.
+TEST(audio_huge_pitch_voice_ends) {
+    using namespace audio;
+    Mixer m(7u);
+    m.prepare(kFs);
+    m.setAmbienceEnabled(false, true);
+    for (int v = 0; v < kVariants; ++v) {
+        SoundBuffer* b = new SoundBuffer();
+        b->samples = synthesize(Sfx::PiecePlace, 500u + uint32_t(v));
+        b->sfx = int(Sfx::PiecePlace);
+        b->variant = v;
+        m.install(b);
+    }
+    for (float pitch : {3e9f, 1e12f, 1e30f}) {
+        PlayRequest r;
+        r.sfx = Sfx::PiecePlace;
+        r.pos = m::vec3(0.0f, 0.78f, 0.0f);
+        r.pitch = pitch;
+        CHECK(m.play(r));
+        std::vector<float> out(size_t(0.1f * kFs) * 2);
+        m.process(out.data(), int(out.size() / 2));
+        CHECK_EQ(m.activeVoices(), 0);
+        bool finite = true;
+        for (float x : out) finite = finite && std::isfinite(x);
+        CHECK(finite);
+    }
+}
+
 TEST(audio_ambience_toggle_fades) {
     using namespace audio;
     Mixer m(7u);
@@ -655,6 +686,42 @@ TEST(audio_mixer_cpu_cost) {
     CHECK_EQ(m.activeSpeech(), 1);  // the speech sounded through both phases
     CHECK(typical < 0.02f);
     CHECK(stress < 0.10f);
+}
+
+// WASAPI: a mix format the mixer cannot run at is handed to the engine as float32 stereo at a
+// rate the mixer can run at (the engine converts), never at the unusable device rate.
+TEST(audio_backend_fallback_rate) {
+    using namespace audio;
+    for (unsigned long rate : {8000ul, 44100ul, 48000ul, 192000ul, 384000ul}) CHECK_EQ(fallbackDeviceRate(rate), int(rate));
+    for (unsigned long rate : {0ul, 4000ul, 7999ul, 384001ul, 705600ul, 768000ul}) CHECK_EQ(fallbackDeviceRate(rate), 48000);
+}
+
+// WASAPI reopen back-off: it grows over consecutive failures, a stream that played or a device that
+// comes back restarts it, and a device that fails right after opening is not reopened in a tight loop.
+TEST(audio_backend_reopen_policy) {
+    using namespace audio;
+    ReopenBackoff b;
+    // No device at start-up: the back-off grows to 5 s.
+    for (int ms : {250, 500, 1000, 2000, 4000, 5000, 5000}) CHECK_EQ(b.waitMs(false, StreamEnd::Stalled, false), ms);
+    // The device came back and played, then stalled: 250 ms, not the 5 s left by the earlier failures.
+    CHECK_EQ(b.waitMs(true, StreamEnd::Stalled, true), 250);
+    CHECK_EQ(b.waitMs(true, StreamEnd::Stalled, false), 500);  // stalled again at once
+    // A working device lost: at once, back-off reset.
+    CHECK_EQ(b.waitMs(true, StreamEnd::Lost, true), 0);
+    CHECK_EQ(b.failures, 0);
+    // A device that opens but fails at once backs off like a failed open...
+    for (int ms : {250, 500, 1000}) CHECK_EQ(b.waitMs(true, StreamEnd::Lost, false), ms);
+    // ...while a default-device change reopens at once, even right after an open.
+    CHECK_EQ(b.waitMs(true, StreamEnd::Changed, false), 0);
+    CHECK_EQ(b.failures, 0);
+    // No device for a while, then it comes back but flaps right after opening (a waking HDMI sink):
+    // the back-off restarts at 250 ms instead of the 5 s left by the failed opens, then grows again.
+    for (int ms : {250, 500, 1000, 2000, 4000, 5000, 5000}) CHECK_EQ(b.waitMs(false, StreamEnd::Stalled, false), ms);
+    for (int ms : {250, 500, 1000}) CHECK_EQ(b.waitMs(true, StreamEnd::Lost, false), ms);
+    // Failed opens go on with that back-off; a stream that stalls right after the device came back
+    // restarts it too.
+    for (int ms : {2000, 4000}) CHECK_EQ(b.waitMs(false, StreamEnd::Stalled, false), ms);
+    CHECK_EQ(b.waitMs(true, StreamEnd::Stalled, false), 250);
 }
 
 TEST(audio_live_engine_init_shutdown) {
@@ -1660,4 +1727,41 @@ TEST(audio_voice_live_engine) {
         }
     }
 #endif
+}
+
+// A non-finite sample in the coach's PCM (a TTS numeric blow-up) is silenced on the way in: it
+// must not latch NaN into the hall reverb and the DC blockers, which would mute every later sound.
+TEST(audio_voice_non_finite_samples) {
+    using namespace audio;
+    using namespace std::chrono_literals;
+    setAmbienceEnabled(false);
+    if (!init()) {  // Windows without a device: nothing plays
+        shutdown();
+        setAmbienceEnabled(true);
+        return;
+    }
+    const ListenerPose lis = whiteSeatListener();
+    setListener(lis.pos, lis.fwd, lis.up);
+    std::this_thread::sleep_for(400ms);  // bank synthesis
+    VoiceParams vp;
+    vp.position = coachMouthDefault();
+    vp.sampleRate = kSrcRate;
+    std::vector<float> pcm = speechLike(0.3f, kSrcRate, 50u);
+    pcm[1000] = NAN;
+    pcm[2000] = INFINITY;
+    pcm[3000] = -INFINITY;
+    VoiceId v = playVoice(std::move(pcm), vp);
+    CHECK(bool(v));
+    CHECK_EQ(waitVoice(v, 2.0f, [](const VoiceStatus& s) { return isState(s, VoiceState::Finished); }).state,
+             VoiceState::Finished);
+    std::this_thread::sleep_for(100ms);
+    debugTakeOutputPeak();
+    play(Sfx::PiecePlace, m::vec3(0.0f, 0.78f, 0.0f));
+    std::this_thread::sleep_for(300ms);
+    const float peak = debugTakeOutputPeak();  // NaN output would leave it at 0
+    std::fprintf(stderr, "  live: piece placed after a non-finite voice: peak %.1f dBFS\n", db(peak));
+    CHECK(std::isfinite(peak) && peak > 0.001f && peak <= kMinus1dB);
+    shutdown();
+    CHECK_EQ(debugSpeechChunksAlive(), 0);
+    setAmbienceEnabled(true);
 }

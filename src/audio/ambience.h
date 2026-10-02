@@ -36,7 +36,7 @@ private:
         float t = 0.0f, phase = 0.0f, amp = 1.0f;
         dsp::OnePole glass1, glass2;
         dsp::FastNoise noise;
-        float gL = 0, gR = 0, lp = 0, lpZL = 0, lpZR = 0;
+        float gL = 0, gR = 0, lp = 0, lpZ = 0;
     };
     struct Window {
         m::vec3 pos;
@@ -45,7 +45,7 @@ private:
         dsp::Svf bp, lp;
         int lag = 0;
         float fcOffset = 1.0f;
-        float gL = 0, gR = 0, lp1 = 0, zL = 0, zR = 0;
+        float gL = 0, gR = 0, lp1 = 0, z = 0;
         float ampPrev = 0.0f;
     };
 
@@ -70,7 +70,7 @@ private:
     uint32_t gustW_ = 0;
     Window win_[kWindows];
     dsp::Svf whistle_;
-    float whistleAmp_ = 0, whistleAmpPrev_ = 0, whistleF_ = 800;
+    float whistleAmp_ = 0, whistleAmpPrev_ = 0;
     // birds
     Bird birds_[kBirds];
     double nextBird_ = 3.0;
