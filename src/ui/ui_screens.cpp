@@ -193,7 +193,8 @@ const std::vector<int>& nodeValues() {
 }
 std::string moveTimeText(int ms) {
     if (ms <= 0) return T("engine.no_limit");
-    return i18n::trf("tc.seconds", {decimal(ms / 1000.0, ms % 1000 ? 1 : 0)});
+    const int digits = ms % 1000 == 0 ? 0 : ms % 100 == 0 ? 1 : 2;   // 750 ms: "0.75 s", not "0.8 s"
+    return i18n::trf("tc.seconds", {decimal(ms / 1000.0, digits)});
 }
 std::string nodesText(int n) {
     if (n <= 0) return T("engine.no_limit");
