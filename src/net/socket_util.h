@@ -2,9 +2,9 @@
 // POSIX sockets elsewhere). Internal to src/net: the platform headers stay in socket_util.cpp,
 // addresses travel as an opaque Endpoint.
 //
-// Every socket used by the direct match is non-blocking and driven by select() (PollSet), so a
-// worker thread never waits longer than the deadline it chose; nothing here runs on the game
-// thread.
+// Every socket used by the direct match is non-blocking and driven by PollSet (select() on
+// Windows, poll() elsewhere), so a worker thread never waits longer than the deadline it chose;
+// nothing here runs on the game thread.
 #pragma once
 #include <cstddef>
 #include <cstdint>
