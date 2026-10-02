@@ -3,7 +3,8 @@
 // opponent's gestures (when their piece fields apply, which squares and moves are valid, the pace
 // of their robot's hand and its live work at their move, even under a flood of gestures, the
 // timeouts, the head's spring), my clock's freeze and the resend of my move after a
-// reconnection, and the RatingRestored notice held back during a game.
+// reconnection, the RatingRestored notice held back during a game, and the realtime errors that
+// belong to a game.
 #include "test.h"
 #include "anim/animator.h"
 #include "chess/chess.h"
@@ -526,4 +527,19 @@ TEST(live_rating_restored_waits_for_the_end_of_the_game) {
     CHECK(n.take(false, points));
     CHECK(near(float(points), 20.0f));
     CHECK(!n.take(false, points));
+}
+
+// ---- Realtime errors -------------------------------------------------------------------------
+
+TEST(live_game_errors_leave_the_menus_refusals_out) {
+    for (int code = 100; code <= 112; ++code)
+        if (code != 106 && code != 107) CHECK(live::gameError(code));
+    // AlreadyInGame and InvalidCategory answer a QueueJoin or a challenge (no game): the menus show them.
+    CHECK(!live::gameError(106));
+    CHECK(!live::gameError(107));
+    CHECK(!live::gameError(0));
+    CHECK(!live::gameError(11));
+    CHECK(!live::gameError(113));
+    CHECK(!live::gameError(201));
+    CHECK(!live::gameError(207));
 }

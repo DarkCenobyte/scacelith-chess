@@ -12,6 +12,7 @@
 //   - My clock display while my move is on its way, and the resend of a move the authority never
 //     got (a connection lost at the wrong moment).
 //   - The RatingRestored notice, held back while a game is being played.
+//   - Which realtime errors belong to the game being played (OnlineSession routes them to it).
 #pragma once
 #include "../chess/chess.h"
 #include "../math/math.h"
@@ -342,6 +343,19 @@ private:
     bool pending_ = false;
     double points_ = 0.0;
 };
+
+// =============================================================================================
+// Realtime errors
+// =============================================================================================
+
+// The errors of a game (net::proto ErrorCode 100..112), which the scene shows. AlreadyInGame and
+// InvalidCategory are in that range but answer the menus with no game named (a QueueJoin, a
+// challenge accepted or joined): not a game's.
+inline bool gameError(int code) {
+    using E = net::proto::ErrorCode;
+    return code >= int(E::NotInGame) && code <= int(E::FlagFell) && code != int(E::AlreadyInGame) &&
+           code != int(E::InvalidCategory);
+}
 
 }  // namespace live
 }  // namespace game
