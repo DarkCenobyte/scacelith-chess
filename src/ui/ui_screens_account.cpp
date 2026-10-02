@@ -42,6 +42,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <cstdio>
 #include <ctime>
 #include <exception>
@@ -217,6 +218,11 @@ struct State : game::GameSaveState {
     std::string reportComment;
     std::vector<uint64_t> reported;
     float movesScroll = 0.0f, movesTarget = 0.0f;
+    // the moves as listed: replayed again only for another game, or more of it (movesN: none yet)
+    std::vector<game::MoveLine> moveLines;
+    bool movesComplete = true;
+    uint64_t movesId = 0;
+    size_t movesN = SIZE_MAX;
     // devices
     bool reloadDevices = true;
     int64_t revoking = 0;
@@ -543,6 +549,7 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
     const bool canSave = library && !library->folder.empty();
     if (fresh) {
         s.movesScroll = s.movesTarget = 0.0f;
+        s.movesN = SIZE_MAX;
         s.reportOpen = false;
         if (!loaded && data.gameWanted && !se.busy(Kind::GameDetailsResult)) se.openGame(data.gameWanted);
         s.opened(s.saveJob.valid());
@@ -697,8 +704,13 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
             std::string count = i18n::trn("online.game.move_count", (static_cast<long long>(g.plies) + 1) / 2);
             gfx::text(count, im::flipX(rcol, rx + rightW), top + 8.0f, cs);
         }
-        bool complete = true;
-        const std::vector<game::MoveLine> lines = game::gameMoves(g, &complete);
+        if (g.id != s.movesId || g.moves.size() != s.movesN) {
+            s.moveLines = game::gameMoves(g, &s.movesComplete);
+            s.movesId = g.id;
+            s.movesN = g.moves.size();
+        }
+        const bool complete = s.movesComplete;
+        const std::vector<game::MoveLine>& lines = s.moveLines;
         const Rect area(rx, top + 40.0f, rightW, bottom - top - 40.0f);
         if (lines.empty()) {
             TextStyle es = style(font::FACE_ITALIC, 22.0f, muted, im::startAlign());
@@ -1095,7 +1107,10 @@ void accountReset(AccountPage page) {
         break;
     case AccountPage::Export: s.exportPath.clear(); break;
     case AccountPage::Delete: s.confirmName.clear(); break;
-    case AccountPage::Game: s.gifGame = 0; break;   // a game opened from the history: a new visit
+    case AccountPage::Game:   // a game opened from the history: a new visit
+        s.gifGame = 0;
+        s.movesN = SIZE_MAX;
+        break;
     }
 }
 
