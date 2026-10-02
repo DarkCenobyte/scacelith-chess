@@ -942,20 +942,22 @@ void GameScene::drawOnlineHud() {
 // Input and menus
 // =============================================================================================
 
+bool GameScene::updateReportDialog() {
+    if (!reportOpen_) return false;
+    int r = ui::reportDialog(reportCategory_, reportComment_);
+    if (r == 1 && link_) {
+        static const char* cats[] = {"cheating", "abuse", "other"};
+        link_->report(seats_[aiSeat()].name, cats[std::clamp(reportCategory_, 0, 2)], reportComment_);
+        reported_ = true;
+        ui::notify(i18n::tr("online.report.sent"), 3.5f);
+    }
+    if (r >= 0) reportOpen_ = false;
+    return true;
+}
+
 void GameScene::updateOnlineInput() {
     const plat::Input& in = plat::input();
-    if (reportOpen_) {
-        int r = ui::reportDialog(reportCategory_, reportComment_);
-        if (r == 1 && link_) {
-            static const char* cats[] = {"cheating", "abuse", "other"};
-            const Seat& opp = seats_[aiSeat()];
-            link_->report(opp.name, cats[std::clamp(reportCategory_, 0, 2)], reportComment_);
-            reported_ = true;
-            ui::notify(i18n::tr("online.report.sent"), 3.5f);
-        }
-        if (r >= 0) reportOpen_ = false;
-        return;
-    }
+    if (updateReportDialog()) return;
     if (!paused_ && in.keyPressed[plat::KEY_ESCAPE] && turn_ != Turn::HumanPromotion) {
         paused_ = true;
         if (dragging_) {
@@ -1019,17 +1021,7 @@ void GameScene::updateOnlineGameOver() {
         stateTime_ = 0.0f;
         return;
     }
-    if (reportOpen_) {
-        int r = ui::reportDialog(reportCategory_, reportComment_);
-        if (r == 1 && link_) {
-            static const char* cats[] = {"cheating", "abuse", "other"};
-            link_->report(seats_[aiSeat()].name, cats[std::clamp(reportCategory_, 0, 2)], reportComment_);
-            reported_ = true;
-            ui::notify(i18n::tr("online.report.sent"), 3.5f);
-        }
-        if (r >= 0) reportOpen_ = false;
-        return;
-    }
+    if (updateReportDialog()) return;
     if (stateTime_ > 1.2f && (endHandshakeDone_ || stateTime_ > 5.0f)) {
         gameOverShown_ = true;
         ui::MenuAction a = ui::gameOver(resultText_, reasonText_, playerWon_, isDraw_, int(game_.moves().size() + 1) / 2,

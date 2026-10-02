@@ -354,6 +354,7 @@ private:
     void onlineResult();                      // result texts of og_ (endGame)
     void updateOnlineInput();                 // Esc menu, draw offer, report dialog (Playing)
     void updateOnlineGameOver();              // game over card, rematch, report, challenges
+    bool updateReportDialog();                // the report dialog, while it is open (true)
     void leaveOnlineGame();                   // back to the menu
     void drawOnlineHud();                     // ping, banners, first-move countdown
     ClockDisplay onlineClockDisplay() const;
