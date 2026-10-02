@@ -225,6 +225,7 @@ public:
     void challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref);
     void createPrivateGame(int baseSec, int incSec, bool rated, int colorPref);
     void joinPrivateGame(const std::string& code);
+    bool joining() const { return joining_; }   // a join sent: neither its game nor an error came yet
     void cancelOutgoing();
     struct Incoming {                           // a challenge received
         uint32_t id = 0;
@@ -290,6 +291,7 @@ private:
     Queue queue_;
     Outgoing outgoing_;
     std::vector<Outgoing> cancelledEarly_;      // cancelled before the server named them: cancelled then
+    bool joining_ = false;
     std::vector<Incoming> incoming_;
     double cooldownUntilMs_ = 0, bannedUntilMs_ = 0;
     std::string autoQueue_;                     // --start-online

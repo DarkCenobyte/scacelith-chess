@@ -283,6 +283,7 @@ void OnlineSession::applyServer() {
     queue_ = Queue();
     outgoing_ = Outgoing();
     cancelledEarly_.clear();
+    joining_ = false;
     incoming_.clear();
     answers_.setServer(ep.origin());
     ratingRestored_ = live::HeldNotice();  // points of the previous server's account
@@ -486,7 +487,10 @@ void OnlineSession::createPrivateGame(int baseSec, int incSec, bool rated, int c
     outgoing_.rated = rated;
 }
 
-void OnlineSession::joinPrivateGame(const std::string& code) { api().joinPrivateGame(code); }
+void OnlineSession::joinPrivateGame(const std::string& code) {
+    api().joinPrivateGame(code);
+    joining_ = true;
+}
 
 void OnlineSession::cancelOutgoing() {
     if (!outgoing_.active) return;
@@ -752,7 +756,10 @@ void OnlineSession::handleServer(net::Event& e) {
         } else if (e.state == net::ConnState::Incompatible) {
             ui::notify(onlineErrorText("incompatible"), 6.0f);
         }
-        if (e.state != net::ConnState::Online) queue_.searching = false;
+        if (e.state != net::ConnState::Online) {
+            queue_.searching = false;
+            joining_ = false;
+        }
         break;
     case Kind::Welcome:
         if (!e.account.username.empty()) {
@@ -845,6 +852,7 @@ void OnlineSession::handleServer(net::Event& e) {
         }
         break;
     case Kind::ServerError:
+        joining_ = false;  // a join is answered by its game or by an error (AlreadyInGame: a game error)
         if ((e.gameId != 0 && e.gameId == gameId_) || isGameError(e.code)) {
             routeGame(e, LinkKind::Server);
             break;
@@ -882,6 +890,7 @@ void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
         gameEvents_.clear();
         queue_.searching = false;
         outgoing_ = Outgoing();
+        joining_ = false;
         LOGI("online: game %llu ready (%s)", (unsigned long long)id, from == LinkKind::Direct ? "direct" : "server");
         return;
     }
