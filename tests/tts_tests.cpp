@@ -671,6 +671,54 @@ TEST(tts_ops_pad_reduce) {
     Tensor pads2 = I({6}, {0, 1, 0, 0, 0, 0});
     pad.mode = "constant";
     CHECK(runOp(pad, {&x, &pads2}, o) && equalF(o[0], {1, 3, 3}, {0, 0, 0, 1, 2, 3, 4, 5, 6}));
+    // Random shapes against a per-element reference: negative pads (crops), edge mode, an empty
+    // last dimension, and 1-, 4- and 8-byte elements, with or without a fill value.
+    {
+        std::mt19937 rp(21);
+        bool same = true;
+        for (int round = 0; round < 600 && same; ++round) {
+            const DType types[] = {DType::U8, DType::F32, DType::I64};
+            DType type = types[round % 3];
+            size_t es = tts::dtypeSize(type);
+            bool edge = round % 2 == 1;
+            int r = 1 + int(rp() % 3);
+            Dims d(static_cast<size_t>(r)), od(static_cast<size_t>(r));
+            std::vector<int64_t> pv(size_t(2 * r));
+            for (int k = 0; k < r; ++k) {
+                d[size_t(k)] = (edge || k + 1 < r ? 1 : 0) + int64_t(rp() % 6);
+                pv[size_t(k)] = int64_t(rp() % 9) - 3;
+                pv[size_t(k + r)] = int64_t(rp() % 9) - 3;
+                if (d[size_t(k)] + pv[size_t(k)] + pv[size_t(k + r)] < 0) pv[size_t(k + r)] = -d[size_t(k)] - pv[size_t(k)];
+                od[size_t(k)] = d[size_t(k)] + pv[size_t(k)] + pv[size_t(k + r)];
+            }
+            Tensor xr = Tensor::alloc(type, d), padsR = I({2 * r}, pv), val = Tensor::alloc(type, {});
+            for (size_t i = 0; i < xr.bytes(); ++i) xr.mut<uint8_t>()[i] = uint8_t(rp());
+            for (size_t i = 0; i < es; ++i) val.mut<uint8_t>()[i] = uint8_t(rp());
+            bool hasValue = !edge && rp() % 2 == 0;
+            pad.mode = edge ? "edge" : "constant";
+            same = runOp(pad, {&xr, &padsR, hasValue ? &val : nullptr}, o) && o[0].dims == od;
+            for (int64_t e = 0; same && e < o[0].count(); ++e) {
+                std::vector<int64_t> c(static_cast<size_t>(r));
+                for (int k = r - 1, rem = int(e); k >= 0; --k) {
+                    c[size_t(k)] = rem % od[size_t(k)] - pv[size_t(k)];
+                    rem /= int(od[size_t(k)]);
+                }
+                bool in = true;
+                int64_t off = 0;
+                for (int k = 0; k < r && in; ++k) {
+                    if (c[size_t(k)] < 0 || c[size_t(k)] >= d[size_t(k)]) {
+                        if (!edge) in = false;
+                        else c[size_t(k)] = std::clamp<int64_t>(c[size_t(k)], 0, d[size_t(k)] - 1);
+                    }
+                    off = off * d[size_t(k)] + c[size_t(k)];
+                }
+                static const uint8_t zero[8] = {0};
+                const uint8_t* want = in ? xr.as<uint8_t>() + off * int64_t(es) : hasValue ? val.as<uint8_t>() : zero;
+                same = std::memcmp(o[0].as<uint8_t>() + e * int64_t(es), want, es) == 0;
+            }
+        }
+        CHECK(same);
+    }
     tts::Node rs = node(tts::Op::ReduceSum);
     rs.i0 = 1;
     Tensor ax = I({1}, {2});

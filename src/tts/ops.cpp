@@ -738,6 +738,8 @@ bool opPad(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tenso
     // Constant fill value (in the input type).
     uint8_t fill[8] = {0};
     if (!edge && valueT && valueT->valid() && valueT->count() > 0) std::memcpy(fill, valueT->data, dtypeSize(valueT->type));
+    uint32_t fill4;
+    std::memcpy(&fill4, fill, 4);
     int64_t n = out.count();
     if (n == 0) return true;
     Dims is = stridesOf(x.dims);
@@ -755,6 +757,7 @@ bool opPad(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tenso
         }
         for (int64_t o = o0; o < o1; ++o) {
             uint8_t* row = dst + o * inner * int64_t(es);
+            uint32_t* row4 = reinterpret_cast<uint32_t*>(row);   // 4-byte elements: whole runs, no per-element memcpy
             bool inside = true;
             int64_t off = 0;
             for (int64_t d = 0; d + 1 < r; ++d) {
@@ -766,15 +769,29 @@ bool opPad(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tenso
                 off += c * is[size_t(d)];
             }
             if (!inside || lastDim == 0) {
-                for (int64_t i = 0; i < inner; ++i) std::memcpy(row + i * int64_t(es), fill, es);
+                if (es == 4) std::fill(row4, row4 + inner, fill4);
+                else
+                    for (int64_t i = 0; i < inner; ++i) std::memcpy(row + i * int64_t(es), fill, es);
             } else {
                 const uint8_t* s = src + off * int64_t(es);
                 int64_t i0 = std::max<int64_t>(0, lastLo), i1 = std::min<int64_t>(inner, lastLo + lastDim);
-                for (int64_t i = 0; i < inner; ++i) {
-                    if (i >= i0 && i < i1) continue;
-                    int64_t c = i - lastLo;
-                    const uint8_t* v = edge ? s + std::clamp<int64_t>(c, 0, lastDim - 1) * int64_t(es) : fill;
-                    std::memcpy(row + i * int64_t(es), v, es);
+                if (es == 4) {
+                    // Before the copied run c < 0, after it c >= lastDim (crops included).
+                    uint32_t left = fill4, right = fill4;
+                    if (edge) {
+                        std::memcpy(&left, s, 4);
+                        std::memcpy(&right, s + (lastDim - 1) * 4, 4);
+                    }
+                    int64_t a = std::min(i0, inner), b = std::max(i1, a);
+                    std::fill(row4, row4 + a, left);
+                    std::fill(row4 + b, row4 + inner, right);
+                } else {
+                    for (int64_t i = 0; i < inner; ++i) {
+                        if (i >= i0 && i < i1) continue;
+                        int64_t c = i - lastLo;
+                        const uint8_t* v = edge ? s + std::clamp<int64_t>(c, 0, lastDim - 1) * int64_t(es) : fill;
+                        std::memcpy(row + i * int64_t(es), v, es);
+                    }
                 }
                 if (i1 > i0) std::memcpy(row + i0 * int64_t(es), s + (i0 - lastLo) * int64_t(es), size_t(i1 - i0) * es);
             }
