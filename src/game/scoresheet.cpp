@@ -593,8 +593,10 @@ std::vector<GlyphInk> inks(const std::vector<InkGlyph>& g) {
 
 }  // namespace
 
+using EntryParts = std::vector<std::pair<WriteBox, std::string>>;
+
 // Builds an entry from (field box, text) parts written in order; returns false when empty.
-static bool composeEntry(Entry& e, const std::vector<std::pair<WriteBox, std::string>>& parts, int style, uint32_t seed) {
+static bool composeEntry(Entry& e, const EntryParts& parts, int style, uint32_t seed) {
     PathKey last;
     bool any = false;
     for (size_t i = 0; i < parts.size(); ++i) {
@@ -634,6 +636,33 @@ static std::vector<anim::PenKey> worldPath(const PadFrame& f, const PenPath& p) 
 
 static std::string pageLabel(int page) { return std::to_string(page + 1); }
 
+// The parts and seeds of the header, move and field entries, one copy for the animated (begin*)
+// and the instant (write*Instant) writes: a sheet restored at once looks like one written live.
+static EntryParts headerParts(const Scoresheet::Header& h, bool pageNo) {
+    EntryParts parts = {
+        {fieldBox(Field::Event), h.event},         {fieldBox(Field::Date), h.date},
+        {fieldBox(Field::Round), h.round},         {fieldBox(Field::Board), h.board},
+        {fieldBox(Field::WhiteName), h.white},     {fieldBox(Field::WhiteElo), h.whiteElo},
+        {fieldBox(Field::BlackName), h.black},     {fieldBox(Field::BlackElo), h.blackElo},
+    };
+    if (!h.note.empty()) parts.push_back({fieldBox(Field::Note), h.note});
+    if (!h.reference.empty()) parts.push_back({fieldBox(Field::Reference), h.reference});
+    if (pageNo) parts.push_back({fieldBox(Field::Page), pageLabel(0)});
+    return parts;
+}
+
+// 'pageNo': the first move of a page also writes that page's number.
+static EntryParts moveParts(int ply, const std::string& san, const PieceLetters& letters, int page, bool pageNo) {
+    EntryParts parts;
+    if (pageNo) parts.push_back({fieldBox(Field::Page), pageLabel(page)});
+    parts.push_back({moveBox(ply), localizeSan(san, letters)});
+    return parts;
+}
+
+static uint32_t headerSeed(uint32_t seed) { return mix32(seed, 0x4EADu); }
+static uint32_t moveSeed(uint32_t seed, int ply) { return mix32(seed, 0x10000u + uint32_t(ply)); }
+static uint32_t fieldSeed(uint32_t seed, Field f, int page) { return mix32(seed, 0x20000u + uint32_t(f) * 131u + uint32_t(page)); }
+
 // Nothing drawable (a glyph no font has): the entry is queued all the same, without ink, so that
 // the Write task begun for it (its WritingDone, finishEntry) completes it and not the next one.
 static std::vector<anim::PenKey> queueEmpty(std::deque<Entry>& entries, Entry&& e) {
@@ -645,16 +674,8 @@ std::vector<anim::PenKey> Scoresheet::beginHeader(const Header& h) {
     Impl& I = *impl_;
     Entry e;
     e.page = 0;
-    std::vector<std::pair<WriteBox, std::string>> parts = {
-        {fieldBox(Field::Event), h.event},         {fieldBox(Field::Date), h.date},
-        {fieldBox(Field::Round), h.round},         {fieldBox(Field::Board), h.board},
-        {fieldBox(Field::WhiteName), h.white},     {fieldBox(Field::WhiteElo), h.whiteElo},
-        {fieldBox(Field::BlackName), h.black},     {fieldBox(Field::BlackElo), h.blackElo},
-    };
-    if (!h.note.empty()) parts.push_back({fieldBox(Field::Note), h.note});
-    if (!h.reference.empty()) parts.push_back({fieldBox(Field::Reference), h.reference});
-    if (!I.taken(0, Field::Page)) parts.push_back({fieldBox(Field::Page), pageLabel(0)});
-    if (!composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x4EADu))) return queueEmpty(I.entries, std::move(e));
+    if (!composeEntry(e, headerParts(h, !I.taken(0, Field::Page)), cfg_.handStyle, headerSeed(cfg_.seed)))
+        return queueEmpty(I.entries, std::move(e));
     for (int f = 0; f <= int(Field::Page); ++f) I.taken(0, Field(f)) = true;
     I.taken(0, Field::Note) = I.taken(0, Field::Reference) = true;
     I.entries.push_back(std::move(e));
@@ -671,11 +692,8 @@ std::vector<anim::PenKey> Scoresheet::beginMove(int ply, const std::string& san)
     }
     Entry e;
     e.page = page;
-    std::vector<std::pair<WriteBox, std::string>> parts;
     bool pageNo = page > 0 && !I.taken(page, Field::Page);
-    if (pageNo) parts.push_back({fieldBox(Field::Page), pageLabel(page)});
-    parts.push_back({moveBox(ply), localizeSan(san, cfg_.letters)});
-    if (!composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x10000u + uint32_t(ply))))
+    if (!composeEntry(e, moveParts(ply, san, cfg_.letters, page, pageNo), cfg_.handStyle, moveSeed(cfg_.seed, ply)))
         return queueEmpty(I.entries, std::move(e));
     if (pageNo) I.taken(page, Field::Page) = true;
     I.entries.push_back(std::move(e));
@@ -687,7 +705,7 @@ std::vector<anim::PenKey> Scoresheet::beginField(Field f, const std::string& tex
     int page = isHeaderField(f) ? 0 : page_ + pendingTurns_;
     Entry e;
     e.page = page;
-    if (!composeEntry(e, {{fieldBox(f), text}}, cfg_.handStyle, mix32(cfg_.seed, 0x20000u + uint32_t(f) * 131u + uint32_t(page))))
+    if (!composeEntry(e, {{fieldBox(f), text}}, cfg_.handStyle, fieldSeed(cfg_.seed, f, page)))
         return queueEmpty(I.entries, std::move(e));
     I.taken(page, f) = true;
     I.entries.push_back(std::move(e));
@@ -718,16 +736,8 @@ const sheet::PenPath* Scoresheet::writingPath() const {
 void Scoresheet::writeHeaderInstant(const Header& h) {
     Impl& I = *impl_;
     Entry e;
-    std::vector<std::pair<WriteBox, std::string>> parts = {
-        {fieldBox(Field::Event), h.event},     {fieldBox(Field::Date), h.date},
-        {fieldBox(Field::Round), h.round},     {fieldBox(Field::Board), h.board},
-        {fieldBox(Field::WhiteName), h.white}, {fieldBox(Field::WhiteElo), h.whiteElo},
-        {fieldBox(Field::BlackName), h.black}, {fieldBox(Field::BlackElo), h.blackElo},
-    };
-    if (!h.note.empty()) parts.push_back({fieldBox(Field::Note), h.note});
-    if (!h.reference.empty()) parts.push_back({fieldBox(Field::Reference), h.reference});
-    if (!I.taken(0, Field::Page)) parts.push_back({fieldBox(Field::Page), pageLabel(0)});
-    if (composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x4EADu))) I.addInk(0, e.glyphs);
+    if (composeEntry(e, headerParts(h, !I.taken(0, Field::Page)), cfg_.handStyle, headerSeed(cfg_.seed)))
+        I.addInk(0, e.glyphs);
     for (int f = 0; f <= int(Field::Page); ++f) I.taken(0, Field(f)) = true;
     I.taken(0, Field::Note) = I.taken(0, Field::Reference) = true;
 }
@@ -740,11 +750,9 @@ void Scoresheet::writeMoveInstant(int ply, const std::string& san) {
         finishPageTurn();
     }
     Entry e;
-    std::vector<std::pair<WriteBox, std::string>> parts;
     bool pageNo = page > 0 && !I.taken(page, Field::Page);
-    if (pageNo) parts.push_back({fieldBox(Field::Page), pageLabel(page)});
-    parts.push_back({moveBox(ply), localizeSan(san, cfg_.letters)});
-    if (composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x10000u + uint32_t(ply)))) I.addInk(page, e.glyphs);
+    if (composeEntry(e, moveParts(ply, san, cfg_.letters, page, pageNo), cfg_.handStyle, moveSeed(cfg_.seed, ply)))
+        I.addInk(page, e.glyphs);
     if (pageNo) I.taken(page, Field::Page) = true;
 }
 
@@ -752,8 +760,7 @@ void Scoresheet::writeFieldInstant(Field f, const std::string& text) {
     Impl& I = *impl_;
     int page = isHeaderField(f) ? 0 : page_ + pendingTurns_;
     Entry e;
-    if (composeEntry(e, {{fieldBox(f), text}}, cfg_.handStyle, mix32(cfg_.seed, 0x20000u + uint32_t(f) * 131u + uint32_t(page))))
-        I.addInk(page, e.glyphs);
+    if (composeEntry(e, {{fieldBox(f), text}}, cfg_.handStyle, fieldSeed(cfg_.seed, f, page))) I.addInk(page, e.glyphs);
     I.taken(page, f) = true;
 }
 
