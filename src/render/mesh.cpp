@@ -88,11 +88,6 @@ void MeshData::computeTangents() {
     }
 }
 
-void MeshData::flipWinding() {
-    for (size_t i = 0; i < indices.size(); i += 3) std::swap(indices[i + 1], indices[i + 2]);
-    for (auto& v : vertices) v.normal = -v.normal;
-}
-
 void Mesh::upload(const MeshData& d, const char* debugName) {
     destroy();
     if (debugName) name = debugName;

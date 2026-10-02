@@ -285,7 +285,6 @@ public:
 
     // Draws the submitted items with one pass type into the currently bound framebuffer.
     // Used internally and by lighting code (probe capture, planar reflections).
-    void drawScene(PassId pass, bool transparents, uint32_t skipFlags);
     void drawScene(PassId pass, bool transparents, const DrawFilter& filter);
     // Uploads a modified copy of the frame UBO (e.g. reflected camera) for sub-passes.
     void uploadFrameUBO(const FrameUBOData& data);

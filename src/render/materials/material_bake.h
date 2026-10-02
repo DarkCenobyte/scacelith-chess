@@ -17,6 +17,5 @@ struct BakedTextures {
 
 // Bakes every texture (GL context required). Missing/failed bakes get neutral 1x1 fallbacks.
 BakedTextures bakeAll();
-void destroy(BakedTextures& t);
 
 }  // namespace materials

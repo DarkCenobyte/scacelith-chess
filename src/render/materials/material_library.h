@@ -84,7 +84,6 @@ enum class MaterialId : int {
 namespace materials {
 // Builds every material (bakes procedural textures with compute shaders). GL context required.
 bool init();
-void shutdown();
 const Material& get(MaterialId id);
 Material& getMutable(MaterialId id);
 const char* name(MaterialId id);

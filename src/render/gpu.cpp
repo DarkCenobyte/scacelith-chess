@@ -109,10 +109,6 @@ void setAnisotropy(const Texture& t, float a) {
     glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxA);
     glTextureParameterf(t.id, GL_TEXTURE_MAX_ANISOTROPY, std::min(a, maxA));
 }
-void setDepthCompare(const Texture& t, bool enable) {
-    glTextureParameteri(t.id, GL_TEXTURE_COMPARE_MODE, enable ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
-    glTextureParameteri(t.id, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-}
 
 Framebuffer createFramebuffer(std::initializer_list<const Texture*> colors, const Texture* depth, int level) {
     Framebuffer fb;
@@ -211,13 +207,12 @@ int profileMode() {
     }();
     return mode;
 }
+bool profilingEnabled() { return profileMode() > 0; }
 double nowMs() {
     using namespace std::chrono;
     return double(duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count()) * 1e-3;
 }
 }  // namespace
-
-bool profilingEnabled() { return profileMode() > 0; }
 
 ProfileScope::ProfileScope(const char* name) : name_(name) {
     if (!profilingEnabled()) return;

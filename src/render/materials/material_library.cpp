@@ -389,13 +389,6 @@ bool init() {
     return true;
 }
 
-void shutdown() {
-    destroy(g_tex);
-    if (g_blankPage) glDeleteTextures(1, &g_blankPage);
-    if (g_blankEntry) glDeleteTextures(1, &g_blankEntry);
-    g_blankPage = g_blankEntry = 0;
-    g_initialized = false;
-}
 const Material& get(MaterialId id) { return g_mats[int(id)]; }
 Material& getMutable(MaterialId id) { return g_mats[int(id)]; }
 const char* name(MaterialId id) { return g_names[int(id)]; }

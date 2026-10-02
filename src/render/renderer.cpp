@@ -406,12 +406,6 @@ void Renderer::bindGlobalTextures() {
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_LIGHTING, lightingUbo_.id);
 }
 
-void Renderer::drawScene(PassId pass, bool transparents, uint32_t skipFlags) {
-    DrawFilter f;
-    f.skipFlags = skipFlags;
-    drawScene(pass, transparents, f);
-}
-
 void Renderer::drawScene(PassId pass, bool transparents, const DrawFilter& flt) {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_DRAWS, drawSsbo_.id);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_LIGHTS, lightSsbo_.id);
