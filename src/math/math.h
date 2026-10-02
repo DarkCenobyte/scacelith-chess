@@ -13,6 +13,7 @@
 #include <cmath>
 #include <cstdint>
 #include <algorithm>
+#include <type_traits>
 
 namespace m {
 
@@ -57,6 +58,11 @@ struct vec4 {
     float operator[](int i) const { return (&x)[i]; }
     vec3 xyz() const { return {x, y, z}; }
 };
+// operator[] indexes the components from &x, and mat4::data() and the GL uploads read a matrix as
+// one float array: these layouts are relied upon.
+static_assert(sizeof(vec2) == 2 * sizeof(float) && std::is_standard_layout<vec2>::value, "vec2: 2 packed floats");
+static_assert(sizeof(vec3) == 3 * sizeof(float) && std::is_standard_layout<vec3>::value, "vec3: 3 packed floats");
+static_assert(sizeof(vec4) == 4 * sizeof(float) && std::is_standard_layout<vec4>::value, "vec4: 4 packed floats");
 struct ivec2 { int x = 0, y = 0; ivec2() = default; constexpr ivec2(int a, int b) : x(a), y(b) {} };
 
 #define M_VEC_OPS(T, N)                                                                          \
@@ -106,6 +112,7 @@ struct mat3 {
     vec3& operator[](int i) { return c[i]; }
     const vec3& operator[](int i) const { return c[i]; }
 };
+static_assert(sizeof(mat3) == 9 * sizeof(float) && std::is_standard_layout<mat3>::value, "mat3: 9 packed floats");
 inline vec3 operator*(const mat3& m, vec3 v) { return m.c[0] * v.x + m.c[1] * v.y + m.c[2] * v.z; }
 inline mat3 operator*(const mat3& a, const mat3& b) { return {a * b.c[0], a * b.c[1], a * b.c[2]}; }
 inline mat3 transpose(const mat3& m) {
@@ -129,6 +136,7 @@ struct mat4 {
     mat3 upper3() const { return {c[0].xyz(), c[1].xyz(), c[2].xyz()}; }
     vec3 translation() const { return c[3].xyz(); }
 };
+static_assert(sizeof(mat4) == 16 * sizeof(float) && std::is_standard_layout<mat4>::value, "mat4: 16 packed floats");
 inline vec4 operator*(const mat4& m, vec4 v) { return m.c[0] * v.x + m.c[1] * v.y + m.c[2] * v.z + m.c[3] * v.w; }
 inline mat4 operator*(const mat4& a, const mat4& b) { return {a * b.c[0], a * b.c[1], a * b.c[2], a * b.c[3]}; }
 inline vec3 transformPoint(const mat4& m, vec3 p) { return (m * vec4(p, 1.0f)).xyz(); }
