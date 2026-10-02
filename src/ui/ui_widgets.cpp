@@ -868,7 +868,10 @@ bool editField(const std::string& label, std::string& text, const Rect& r, int m
             }
             std::u32string typed;
             int room = maxChars - int(u.size());
-            bool ctrl = in.keyDown[plat::KEY_LCTRL] || in.keyDown[plat::KEY_RCTRL];
+            // Ctrl without Alt: Windows sends AltGr as Ctrl + right Alt, and AltGr+V types '@' on the
+            // Czech, Slovak, Hungarian and Croatian layouts.
+            bool ctrl = (in.keyDown[plat::KEY_LCTRL] || in.keyDown[plat::KEY_RCTRL]) && !in.keyDown[plat::KEY_LALT] &&
+                        !in.keyDown[plat::KEY_RALT];
             if (ctrl && in.keyPressed['V']) {
                 // Decoded only as far as it fits: a huge clipboard costs no more than a name.
                 const std::string clip = room > 0 ? plat::clipboardText() : std::string();
