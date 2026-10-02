@@ -52,6 +52,8 @@
 
 namespace net {
 
+namespace proto { struct GameSnapshot; }   // protocol_gen.h
+
 // Where the server is. The official server (if the build defines SCACELITH_OFFICIAL_SERVER) is
 // the default; players may enter a community server instead (Options > Online).
 struct ServerEndpoint {
@@ -216,6 +218,8 @@ inline int moveTo(uint16_t m) { return (m >> 6) & 63; }
 inline int movePromo(uint16_t m) { return (m >> 12) & 7; }
 // FNV-1a 32 of the first four FEN fields (chess::Position::fen() prefix): the posHash of Move.
 uint32_t positionDigest(const std::string& fen);
+// The game of a decoded GameSnapshot (OnlineClient; DirectMatch with the host's messages).
+OnlineGame onlineGameFromSnapshot(const proto::GameSnapshot& s);
 
 enum class ConnState {
     Offline,        // no realtime connection

@@ -1,6 +1,6 @@
 #include "direct_authority.h"
 #include "direct_crypto.h"
-#include "online_client.h"   // packMove helpers
+#include "online_client.h"   // packMove helpers, positionDigest
 #include "protocol_gen.h"
 
 #include <algorithm>
@@ -15,6 +15,7 @@ namespace P = net::proto;
 namespace {
 constexpr double kInf = std::numeric_limits<double>::infinity();
 constexpr int kNone = 2;
+constexpr int kMaxPlies = 1200;   // Move.ply <= 1199 (schema.js), as room.js MAX_PLIES
 
 uint32_t u32ms(int64_t ms) { return uint32_t(std::max<int64_t>(0, std::min<int64_t>(ms, 0xFFFFFFFFll))); }
 
@@ -25,40 +26,35 @@ uint32_t seqOf(const uint8_t* p, size_t n) {
 }
 }  // namespace
 
-uint32_t fenDigest(const std::string& fen) {
-    // The first four fields: placement, side, castling, en passant (up to the fourth space).
-    size_t end = fen.size();
-    int spaces = 0;
-    for (size_t i = 0; i < fen.size(); ++i)
-        if (fen[i] == ' ' && ++spaces == 4) { end = i; break; }
-    uint32_t h = 2166136261u;
-    for (size_t i = 0; i < end; ++i) {
-        h ^= (unsigned char)fen[i];
-        h *= 16777619u;
-    }
-    return h;
-}
+uint32_t fenDigest(const std::string& fen) { return positionDigest(fen); }
 
 uint32_t positionHash(const chess::Position& pos) { return fenDigest(pos.fen()); }
 
-std::string sanitizeName(const std::string& in, const char* fallback) {
-    // Keep printable UTF-8; drop control characters and malformed sequences.
+std::string sanitizeName(const std::string& in, const char* fallback, size_t maxBytes) {
+    // Keep printable UTF-8; drop control characters and malformed sequences, overlong forms,
+    // surrogates and code points above U+10FFFF included (the protocol's decoder refuses them).
+    static const uint32_t kMinCodePoint[5] = {0, 0, 0x80, 0x800, 0x10000};
     std::string s;
     for (size_t i = 0; i < in.size();) {
         unsigned char c = (unsigned char)in[i];
         size_t len = c < 0x80 ? 1 : (c >> 5) == 6 ? 2 : (c >> 4) == 14 ? 3 : (c >> 3) == 30 ? 4 : 0;
         bool ok = len && i + len <= in.size();
-        for (size_t k = 1; ok && k < len; ++k) ok = ((unsigned char)in[i + k] >> 6) == 2;
+        uint32_t cp = c & (0x7F >> len);
+        for (size_t k = 1; ok && k < len; ++k) {
+            ok = ((unsigned char)in[i + k] >> 6) == 2;
+            cp = cp << 6 | ((unsigned char)in[i + k] & 0x3F);
+        }
+        ok = ok && cp >= kMinCodePoint[len] && cp <= 0x10FFFF && (cp < 0xD800 || cp > 0xDFFF);
         if (!ok) { ++i; continue; }
         if (len == 1 && (c < 0x20 || c == 0x7F)) { ++i; continue; }
         s.append(in, i, len);
         i += len;
     }
-    // Trim spaces, then cut to 24 bytes on a character boundary.
+    // Trim spaces, then cut to maxBytes on a character boundary.
     size_t a = s.find_first_not_of(' '), b = s.find_last_not_of(' ');
     s = a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
-    if (s.size() > 24) {
-        size_t cut = 24;
+    if (s.size() > maxBytes) {
+        size_t cut = maxBytes;
         while (cut > 0 && ((unsigned char)s[cut] >> 6) == 2) --cut;
         s.resize(cut);
         size_t e = s.find_last_not_of(' ');
@@ -469,6 +465,7 @@ void Authority::onMove(Side side, const uint8_t* p, size_t n, double now, Output
     if (declined) gameEvent(out, int(P::GameEventKind::DrawDeclined), c, 0);
     if (offerRefused) error(out, side, m.seq, int(P::ErrorCode::DrawOfferLimit), id_);
     if (game_.isOver()) finishFromChess(now, out);
+    else if (plies() >= kMaxPlies) finish(int(P::GameStatus::Aborted), int(P::EndReason::ServerAborted), now, out);
 }
 
 void Authority::onDisconnect(Side side, double now, Output& out) {

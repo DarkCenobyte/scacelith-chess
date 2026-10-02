@@ -53,8 +53,9 @@ bool directMatchRecord(const net::OnlineGame& og, DirectRecord& out) {
     if (og.you < 0 || og.you > 1) return false;
     // An abort by the authority (before the first moves) is not a game. The guest that lost the
     // host for good ends the game itself as ServerAborted (direct_match.cpp, endLocally) at any
-    // point: kept unfinished ("*") once both players have moved, the point before which the
-    // authority aborts a game that loses a player (NoShow).
+    // point, and the authority ends a game that reaches 1200 plies as ServerAborted too
+    // (direct_authority.cpp, kMaxPlies): kept unfinished ("*") once both players have moved, the
+    // point before which the authority aborts a game that loses a player (NoShow).
     if (og.status == StAborted && (og.reason != kReasonServerAborted || og.moves.size() < 2)) return false;
     out.game.reset();
     for (const net::OnlineGame::MoveRec& m : og.moves) {

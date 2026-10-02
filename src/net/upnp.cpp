@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
@@ -11,6 +12,11 @@ namespace net {
 namespace upnp {
 
 namespace {
+
+// Any LAN host can answer an M-SEARCH: real networks have one to three gateways, and every answer
+// kept costs an HTTP fetch.
+constexpr size_t kMaxSsdpAnswers = 16;     // distinct LOCATIONs
+constexpr int kMaxDatagramsPerPoll = 64;   // read from one socket before the deadline is checked again
 
 std::string lower(std::string s) {
     for (char& c : s) c = char(std::tolower((unsigned char)c));
@@ -176,8 +182,10 @@ std::string headerValue(const std::string& lowerHeaders, const char* name) {
     return trim(lowerHeaders.substr(p + key.size(), e == std::string::npos ? std::string::npos : e - p - key.size()));
 }
 
+// cfg.cancel stops the exchange, or only until the whole request is sent when finishOnceSent (the
+// router may have acted on it: its answer says what it did).
 bool httpExchange(const Config& cfg, const std::string& host, uint16_t port, const std::string& request, HttpResponse& resp,
-                  std::string* localIp, Error& err) {
+                  std::string* localIp, Error& err, bool finishOnceSent = false) {
     sock::Endpoint ep;
     if (!sock::Endpoint::parse(host, port, ep) || !ep.isV4()) { err.text = "bad_url"; return false; }
     const int64_t deadline = sock::steadyMs() + cfg.httpTimeoutMs;
@@ -195,7 +203,7 @@ bool httpExchange(const Config& cfg, const std::string& host, uint16_t port, con
     bool closed = false;
     size_t headerEnd = std::string::npos;
     for (;;) {
-        if (cfg.cancel && cfg.cancel->load()) { err.text = "cancelled"; return false; }
+        if (cfg.cancel && cfg.cancel->load() && !(finishOnceSent && sent == request.size())) { err.text = "cancelled"; return false; }
         int64_t left = deadline - sock::steadyMs();
         if (left <= 0) { err.text = "timeout"; return false; }
         sock::PollSet ps;
@@ -302,7 +310,6 @@ bool parseSsdpResponse(const std::string& text, SsdpResponse& out) {
         if (key == "location") out.location = val;
         else if (key == "server") out.server = val;
         else if (key == "usn") out.usn = val;
-        else if (key == "st") out.st = val;
     }
     return !out.location.empty();
 }
@@ -365,7 +372,7 @@ std::string resolveUrl(const std::string& base, const std::string& ref) {
     std::string path = pathStart == std::string::npos ? "/" : base.substr(pathStart);
     size_t q = path.find_first_of("?#");
     if (q != std::string::npos) path.resize(q);
-    path = path.substr(0, path.rfind('/') + 1);
+    path.resize(path.rfind('/') + 1);
     return origin + path + ref;
 }
 
@@ -392,6 +399,9 @@ bool cgnatSuspected(const std::string& ip) {
     if (a == 100 && b >= 64 && b <= 127) return true;       // RFC 6598 shared address space (CGNAT)
     if (a == 169 && b == 254) return true;                  // link-local
     if (a == 127 || a == 0) return true;                    // loopback, unspecified
+    if (a == 192 && b == 0 && c == 0) return true;          // IETF protocol assignments (DS-Lite B4 192.0.0.0/29)
+    if (a == 198 && (b == 18 || b == 19)) return true;      // benchmarking
+    if (a >= 224) return true;                              // multicast, reserved, broadcast
     return false;
 }
 
@@ -463,8 +473,8 @@ bool Client::discover(Gateway& out, Error& err) {
             if (!ps.readable(h)) continue;
             uint8_t buf[2048];
             sock::Endpoint from;
-            int r;
-            while ((r = sock::recvFrom(h, buf, sizeof buf - 1, from)) > 0) {
+            int r, n = 0;
+            while (n++ < kMaxDatagramsPerPoll && (r = sock::recvFrom(h, buf, sizeof buf - 1, from)) > 0) {
                 SsdpResponse resp;
                 if (!parseSsdpResponse(std::string(reinterpret_cast<char*>(buf), size_t(r)), resp)) continue;
                 resp.from = from.ip();
@@ -476,7 +486,7 @@ bool Client::discover(Gateway& out, Error& err) {
                 }
                 bool dup = false;
                 for (auto& a : answers) dup = dup || a.location == resp.location;
-                if (dup) continue;
+                if (dup || answers.size() >= kMaxSsdpAnswers) continue;
                 answers.push_back(resp);
                 if (answers.size() == 1) deadline = std::min(deadline, sock::steadyMs() + cfg_.settleMs);
             }
@@ -501,11 +511,8 @@ bool Client::discover(Gateway& out, Error& err) {
         const Service* svc = pickService(d);
         if (!svc) continue;
         Gateway g;
-        g.location = a.location;
         g.server = a.server;
-        g.usn = a.usn;
         g.friendlyName = d.friendlyName;
-        g.deviceType = d.deviceType;
         g.serviceType = svc->serviceType;
         g.controlUrl = resolveUrl(d.urlBase.empty() ? a.location : d.urlBase, svc->controlUrl);
         g.localAddress = localIp;
@@ -535,7 +542,7 @@ bool Client::discover(Gateway& out, Error& err) {
 }
 
 bool Client::soap(const Gateway& gw, const char* action, const std::vector<std::pair<std::string, std::string>>& args,
-                  std::string& body, Error& err) {
+                  std::string& body, Error& err, bool finishOnceSent) {
     err = Error();
     std::string xml = "<?xml version=\"1.0\"?>\r\n"
                       "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\" "
@@ -550,7 +557,7 @@ bool Client::soap(const Gateway& gw, const char* action, const std::vector<std::
                       "\r\nContent-Type: text/xml; charset=\"utf-8\"\r\nSOAPAction: \"" + gw.serviceType + "#" + action +
                       "\"\r\nContent-Length: " + std::to_string(xml.size()) + "\r\nConnection: close\r\n\r\n" + xml;
     HttpResponse resp;
-    if (!httpExchange(cfg_, gw.host, gw.port, req, resp, nullptr, err)) return false;
+    if (!httpExchange(cfg_, gw.host, gw.port, req, resp, nullptr, err, finishOnceSent)) return false;
     body = resp.body;
     if (resp.status == 200) return true;
     int code = 0;
@@ -585,7 +592,7 @@ bool Client::addPortMapping(const Gateway& gw, const Mapping& m, Error& err) {
                  {"NewEnabled", "1"},
                  {"NewPortMappingDescription", m.description},
                  {"NewLeaseDuration", std::to_string(m.leaseSec)}},
-                body, err);
+                body, err, true);   // awaited once sent, despite a cancel: a mapping made is known (and deleted)
 }
 
 bool Client::deletePortMapping(const Gateway& gw, uint16_t externalPort, Error& err) {
@@ -605,6 +612,7 @@ bool Client::mapPort(const Gateway& gw, uint16_t port, const std::function<bool(
             out = m;
             return true;
         }
+        if (cancelled()) break;   // cancelled meanwhile: no other port is claimed or asked
         if (err.upnpCode == 725 && m.leaseSec != 0) {
             m.leaseSec = 0;   // OnlyPermanentLeasesSupported: the mapping is deleted when the match ends
             continue;
@@ -632,6 +640,35 @@ bool Client::mapPort(const Gateway& gw, uint16_t port, const std::function<bool(
 bool Client::renew(const Gateway& gw, const Mapping& m, Error& err) {
     if (m.leaseSec == 0) return true;
     return addPortMapping(gw, m, err);
+}
+
+void RenewalSchedule::mapped(int64_t now, uint32_t leaseSec) {
+    leaseSec_ = leaseSec;
+    renewAt_ = now + kRenewEveryMs;
+    leaseEnd_ = now + int64_t(leaseSec) * 1000;
+    lost_ = false;
+}
+
+void RenewalSchedule::started(int64_t now) {
+    start_ = now;
+    renewAt_ = now + kRenewEveryMs;
+}
+
+bool RenewalSchedule::finished(int64_t now, bool ok) {
+    if (!ok) {
+        if (now < leaseEnd_) renewAt_ = now + kRenewRetryMs;
+        return false;
+    }
+    leaseEnd_ = start_ + int64_t(leaseSec_) * 1000;   // counted from the renewal's request
+    const bool back = lost_;
+    lost_ = false;
+    return back;
+}
+
+bool RenewalSchedule::lapsed(int64_t now) {
+    if (!leaseSec_ || lost_ || now < leaseEnd_) return false;
+    lost_ = true;
+    return true;
 }
 
 }  // namespace upnp

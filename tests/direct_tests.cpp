@@ -1,9 +1,15 @@
-// Direct match: UPnP client against a fake gateway on 127.0.0.1, the secure channel (vectors
-// and failure cases) and full loopback matches between two DirectMatch instances, gestures
-// included (both ways, paced, never replayed, the first one after a reconnection never dropped,
-// outside the flood limit).
+// Direct match: UPnP client against a fake gateway on 127.0.0.1 (a cancel during AddPortMapping,
+// at most 16 SSDP answers fetched), the carrier-grade NAT ranges and the lease renewal schedule,
+// the secure channel (vectors and failure cases), the authority with synthetic time (names the
+// protocol accepts, the 1200-ply cap) and full loopback matches between two DirectMatch
+// instances, gestures included (both ways, paced, never replayed, the first one after a
+// reconnection never dropped, outside the flood limit). A guest and a host written by hand check
+// the limits: refusals and floods closed without stalling the host, a host flooding the guest
+// dropped, messages out of sequence and connections logged at a bounded rate, a message of an
+// unknown type refused, one more attempt after a close before the host's confirmation.
 #include "test.h"
 #include "chess/chess.h"
+#include "core/log.h"
 #include "net/direct_authority.h"
 #include "net/direct_crypto.h"
 #include "net/direct_match.h"
@@ -21,6 +27,12 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+
+#ifdef _WIN32
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
 
 using namespace net;
 
@@ -58,13 +70,16 @@ struct FakeGateway {
     bool chunked = false;
     std::string externalIp = "203.0.113.7";
     std::deque<int> addResults;           // next AddPortMapping answers: 0 = success, else a UPnP error code
+    int extraLocations = 0;               // more answers to each M-SEARCH, with LOCATIONs that are not found
+    std::atomic<bool>* cancelOnAdd = nullptr;   // set once an AddPortMapping is received...
+    int addDelayMs = 0;                   // ...and its answer comes this much later
     // What the client did.
     std::vector<std::string> searchTargets;
     struct Add { int extPort = 0, intPort = 0, lease = -1; std::string client, desc, proto; };
     std::vector<Add> adds;
     std::vector<int> deletes;
     std::vector<std::string> soapPaths;
-    int getIpCalls = 0;
+    int getIpCalls = 0, httpGets = 0;
 
     ~FakeGateway() { shutdown(); }
 
@@ -124,6 +139,10 @@ struct FakeGateway {
                                        "\r\nUSN: uuid:fake-igd::" + target + "\r\nEXT:\r\nSERVER: Fake/1.0 UPnP/1.1 Test/1.0\r\n"
                                        "LOCATION: http://127.0.0.1:" + std::to_string(httpPort) + "/desc.xml\r\n\r\n";
                     sock::sendTo(udp, reinterpret_cast<const uint8_t*>(resp.data()), resp.size(), from);
+                    for (int k = 0; k < extraLocations; ++k) {
+                        std::string extra = replaceAll(resp, "/desc.xml", "/extra" + std::to_string(k) + ".xml");
+                        sock::sendTo(udp, reinterpret_cast<const uint8_t*>(extra.data()), extra.size(), from);
+                    }
                 }
             }
             if (ps.readable(tcp)) {
@@ -160,6 +179,11 @@ struct FakeGateway {
             if (need != std::string::npos && req.size() >= need) break;
         }
         std::string status = "200 OK", body;
+        int delayMs = 0;
+        if (req.compare(0, 4, "GET ") == 0) {
+            std::lock_guard<std::mutex> lk(m);
+            ++httpGets;
+        }
         if (req.compare(0, 14, "GET /desc.xml ") == 0) {
             std::lock_guard<std::mutex> lk(m);
             body = replaceAll(description, "%HTTP%", std::to_string(httpPort));
@@ -189,6 +213,8 @@ struct FakeGateway {
                 a.desc = field(xml, "NewPortMappingDescription");
                 a.proto = field(xml, "NewProtocol");
                 adds.push_back(a);
+                if (cancelOnAdd) *cancelOnAdd = true;
+                delayMs = addDelayMs;
                 int result = 0;
                 if (!addResults.empty()) { result = addResults.front(); addResults.pop_front(); }
                 if (result == 718) fault(718, "ConflictInMappingEntry");
@@ -206,6 +232,7 @@ struct FakeGateway {
         } else {
             status = "404 Not Found";
         }
+        if (delayMs) std::this_thread::sleep_for(std::chrono::milliseconds(delayMs));
         std::string resp = "HTTP/1.1 " + status + "\r\nContent-Type: text/xml; charset=\"utf-8\"\r\nConnection: close\r\n";
         if (chunked && status[0] == '2') {
             // Two chunks, to exercise the client's chunked decoding.
@@ -342,6 +369,99 @@ TEST(upnp_parsers) {
     CHECK(upnp::cgnatSuspected("0.0.0.0"));
     CHECK(upnp::cgnatSuspected(""));
     CHECK(!upnp::cgnatSuspected("203.0.113.7"));
+    // Other ranges the Internet cannot reach: DS-Lite's B4 side, benchmarking, multicast, reserved.
+    CHECK(upnp::cgnatSuspected("192.0.0.2"));
+    CHECK(upnp::cgnatSuspected("198.18.0.1"));
+    CHECK(upnp::cgnatSuspected("198.19.255.254"));
+    CHECK(upnp::cgnatSuspected("224.0.0.1"));
+    CHECK(upnp::cgnatSuspected("240.0.0.1"));
+    CHECK(upnp::cgnatSuspected("255.255.255.255"));
+    CHECK(!upnp::cgnatSuspected("192.0.1.1"));
+    CHECK(!upnp::cgnatSuspected("198.20.0.1"));
+    CHECK(!upnp::cgnatSuspected("223.255.255.254"));
+}
+
+TEST(upnp_renewal_schedule) {
+    // Synthetic times; each renewal answers 3 s after it is sent.
+    const int64_t lease = int64_t(upnp::kDefaultLeaseSec) * 1000;
+    // Fails every renewal sent before the lease ends: each one comes a minute after the previous
+    // failure. Returns how many were sent.
+    auto failUntilLeaseEnds = [&](upnp::RenewalSchedule& s) {
+        int n = 0;
+        for (int64_t t = s.renewAt(); t < lease; t = s.renewAt(), ++n) {
+            CHECK(!s.lapsed(t));
+            s.started(t);
+            CHECK(!s.finished(t + 3000, false));
+            CHECK_EQ(s.renewAt(), t + 3000 + upnp::kRenewRetryMs);
+        }
+        return n;
+    };
+    {
+        // Every renewal succeeds: one every 30 min, and the lease never ends.
+        upnp::RenewalSchedule s;
+        s.mapped(0, upnp::kDefaultLeaseSec);
+        for (int64_t t = upnp::kRenewEveryMs; t <= 4 * lease; t += upnp::kRenewEveryMs) {
+            CHECK_EQ(s.renewAt(), t);
+            CHECK(!s.lapsed(t));
+            s.started(t);
+            CHECK(!s.finished(t + 3000, true));
+        }
+        CHECK(!s.lapsed(4 * lease + 3000) && !s.lost());
+    }
+    {
+        // Failures until the lease ends: it is lost once; the retry due just after still goes,
+        // then one every 30 min until a renewal maps the port again, its lease counted from then.
+        upnp::RenewalSchedule s;
+        s.mapped(0, upnp::kDefaultLeaseSec);
+        CHECK_EQ(failUntilLeaseEnds(s), 29);
+        CHECK(s.renewAt() > lease && s.renewAt() <= lease + upnp::kRenewRetryMs);
+        CHECK(!s.lost());
+        CHECK(s.lapsed(lease));
+        CHECK(s.lost());
+        CHECK(!s.lapsed(lease + 1000));
+        int64_t t = s.renewAt();
+        s.started(t);
+        CHECK(!s.finished(t + 3000, false));
+        CHECK_EQ(s.renewAt(), t + upnp::kRenewEveryMs);
+        CHECK(s.lost());
+        t = s.renewAt();
+        s.started(t);
+        CHECK(s.finished(t + 3000, true));
+        CHECK(!s.lost());
+        CHECK_EQ(s.renewAt(), t + upnp::kRenewEveryMs);
+        CHECK(!s.lapsed(t + lease - 1));
+        CHECK(s.lapsed(t + lease));
+    }
+    {
+        // The retry due just after the lease has ended succeeds: the port is mapped again.
+        upnp::RenewalSchedule s;
+        s.mapped(0, upnp::kDefaultLeaseSec);
+        failUntilLeaseEnds(s);
+        CHECK(s.lapsed(lease));
+        const int64_t t = s.renewAt();
+        s.started(t);
+        CHECK(s.finished(t + 3000, true));
+        CHECK(!s.lost() && !s.lapsed(t + 3000));
+    }
+    {
+        // One failure, then a retry that succeeds: the lease is never lost.
+        upnp::RenewalSchedule s;
+        s.mapped(0, upnp::kDefaultLeaseSec);
+        s.started(upnp::kRenewEveryMs);
+        CHECK(!s.finished(upnp::kRenewEveryMs + 3000, false));
+        const int64_t t = s.renewAt();
+        CHECK_EQ(t, upnp::kRenewEveryMs + 3000 + upnp::kRenewRetryMs);
+        s.started(t);
+        CHECK(!s.finished(t + 3000, true));
+        CHECK_EQ(s.renewAt(), t + upnp::kRenewEveryMs);
+        CHECK(!s.lapsed(lease) && !s.lost());
+    }
+    {
+        // A permanent lease never ends.
+        upnp::RenewalSchedule s;
+        s.mapped(0, 0);
+        CHECK(!s.lapsed(10 * lease) && !s.lost());
+    }
 }
 
 TEST(upnp_fake_gateway_relative_control_url) {
@@ -426,6 +546,67 @@ TEST(upnp_fake_gateway_conflict_and_permanent_lease) {
         CHECK_EQ(gw.adds[3].extPort, 47103);
         CHECK_EQ(gw.adds[3].lease, 0);
     }
+}
+
+TEST(upnp_fake_gateway_answers_capped) {
+    // A device answering with many distinct LOCATIONs: at most 16 descriptions are fetched (the
+    // first answer, the router's, is among them).
+    FakeGateway gw;
+    gw.description = kDescRelative;
+    gw.extraLocations = 40;
+    CHECK(gw.start());
+    upnp::Client client(gw.clientConfig());
+    upnp::Gateway g;
+    upnp::Error err;
+    CHECK(client.discover(g, err));
+    CHECK_EQ(g.friendlyName, std::string("Fake Box & Co"));
+    std::lock_guard<std::mutex> lk(gw.m);
+    CHECK_EQ(gw.httpGets, 16);
+}
+
+TEST(upnp_fake_gateway_cancel_during_add) {
+    // Cancelled while the router handles an AddPortMapping: its answer is still read, so a mapping
+    // it made is reported (the host deletes it when the match ends), and no other attempt follows.
+    FakeGateway gw;
+    gw.description = kDescRelative;
+    std::atomic<bool> cancel{false};
+    gw.cancelOnAdd = &cancel;
+    gw.addDelayMs = 400;
+    CHECK(gw.start());
+    upnp::Config cfg = gw.clientConfig();
+    cfg.cancel = &cancel;
+    upnp::Client client(cfg);
+    upnp::Gateway g;
+    upnp::Error err;
+    CHECK(client.discover(g, err));
+    upnp::Mapping mp;
+    CHECK(client.mapPort(g, 47100, nullptr, mp, err));
+    CHECK(cancel.load());
+    CHECK_EQ(mp.externalPort, 47100);
+    CHECK_EQ(mp.leaseSec, 3600u);
+    // Refused with 725: no permanent lease is asked after the cancel.
+    cancel = false;
+    {
+        std::lock_guard<std::mutex> lk(gw.m);
+        gw.addResults = {725};
+    }
+    CHECK(!client.mapPort(g, 47100, nullptr, mp, err));
+    CHECK_EQ(err.text, std::string("cancelled"));
+    // Refused with 718: the next port is not claimed here either.
+    cancel = false;
+    {
+        std::lock_guard<std::mutex> lk(gw.m);
+        gw.addResults = {718};
+    }
+    std::vector<uint16_t> claimed;
+    CHECK(!client.mapPort(g, 47100, [&](uint16_t p) { claimed.push_back(p); return true; }, mp, err));
+    CHECK_EQ(err.text, std::string("cancelled"));
+    CHECK(claimed.empty());
+    // Cancelled before anything is sent: nothing is asked.
+    CHECK(!client.mapPort(g, 47100, nullptr, mp, err));
+    CHECK_EQ(err.text, std::string("cancelled"));
+    std::lock_guard<std::mutex> lk(gw.m);
+    CHECK_EQ(gw.adds.size(), size_t(3));
 }
 
 TEST(upnp_fake_gateway_errors) {
@@ -891,6 +1072,45 @@ TEST(direct_authority_snapshot_and_names) {
     CHECK_EQ(direct::sanitizeName("\xFF\xFE", "Guest"), std::string("Guest"));
     // 23 ASCII bytes + a 2-byte character would make 25: the character is dropped whole.
     CHECK_EQ(direct::sanitizeName("abcdefghijklmnopqrstuvw\xC3\xA9", "X"), std::string("abcdefghijklmnopqrstuvw"));
+    // Sequences the protocol's decoder refuses are dropped too: an overlong form, a surrogate,
+    // code points above U+10FFFF. Such a name used to make hosting and joining fail.
+    const char* refused[] = {"Ann\xC0\x80" "e", "Bob\xED\xA0\x80", "Cy\xF5\x80\x80\x80", "Di\xF4\x90\x80\x80", "Ed\xE0\x80\xAF"};
+    const char* kept[] = {"Anne", "Bob", "Cy", "Di", "Ed"};
+    for (int i = 0; i < 5; ++i) {
+        CHECK_EQ(direct::sanitizeName(refused[i], "X"), std::string(kept[i]));
+        // The host's snapshot (its name and the guest's), Welcome and the guest's Hello decode.
+        Authority a(tc(300, 0), refused[i], refused[i], 1);
+        Authority::Output o;
+        a.startGame(1.7e12, o);
+        P::GameSnapshot s;
+        CHECK(o.toHost.size() == 1 && P::decode(o.toHost[0].data(), o.toHost[0].size(), s));
+        P::Welcome w;
+        w.username = a.guestName();
+        w.serverName = direct::sanitizeName(refused[i], "Host");
+        P::Hello h;
+        h.proto = P::kProtocolVersion;
+        h.schema = P::kSchemaHash;
+        h.token = "direct:" + direct::sanitizeName(refused[i], "Guest");
+        h.token.resize(16, ' ');
+        std::vector<uint8_t> buf;
+        P::encode(w, buf);
+        CHECK(P::decode(buf.data(), buf.size(), w));
+        buf.clear();
+        P::encode(h, buf);
+        CHECK(P::decode(buf.data(), buf.size(), h));
+    }
+    // Valid names stay as they are (C1 controls included: the decoder accepts them).
+    for (const char* name : {"\xC3\x89lodie", "\xE6\x97\xA5\xE6\x9C\xAC\xE8\xAA\x9E", "Dee\xC2\x85x", "\xF0\x9F\x98\x80 Max", "\xF4\x8F\xBF\xBF"})
+        CHECK_EQ(direct::sanitizeName(name, "X"), std::string(name));
+    // The router's name (any LAN device may answer the discovery): cleaned, at most 64 bytes.
+    std::string routerName = "  Fake\r\nBox\x01 ";
+    for (int i = 0; i < 20000; ++i) routerName += "\xE6\x97\xA5\x7F\x1B";
+    std::string shown = direct::sanitizeName(routerName, "", 64);
+    CHECK_EQ(shown.substr(0, 7), std::string("FakeBox"));
+    CHECK(shown.size() <= 64 && shown.size() >= 62);
+    CHECK_EQ(direct::sanitizeName(shown, "", 64), shown);   // valid UTF-8 without controls
+    CHECK_EQ(direct::sanitizeName("Livebox 6", "", 64), std::string("Livebox 6"));
+    CHECK_EQ(direct::sanitizeName(" \t", "", 64), std::string(""));
     // The digest covers the first four FEN fields only.
     CHECK_EQ(direct::fenDigest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"),
              direct::fenDigest("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 5 9"));
@@ -1295,6 +1515,45 @@ TEST(direct_authority_auto_press) {
     for (Side s : {HostSide, GuestSide}) {
         auto v = r.recent<P::GameSnapshot>(s);
         CHECK(v.size() == 1 && v[0].game != first && !v[0].autoPress);
+    }
+}
+
+TEST(direct_authority_ply_cap) {
+    // No Move can carry a ply beyond 1199: the game that reaches 1200 plies ends aborted
+    // (ServerAborted) as on the server, instead of leaving the side to move unable to play until
+    // its flag falls. The pieces wander without captures and a pawn steps every 100 plies, so that
+    // neither the 75-move rule nor a fivefold repetition ends the game first.
+    Room r(tc(300, 0), 1);   // host White
+    r.start();
+    uint32_t rng = 12345;
+    while (r.a.plies() < 1200) {
+        const int n = r.a.plies();
+        const std::vector<chess::Move> moves = r.mirror.position().legalMoves();
+        const bool pawnTurn = n % 100 == 99;
+        rng = rng * 1103515245u + 12345u;
+        chess::Move pick;
+        for (int pass = 0; pass < 2 && !pick.valid(); ++pass) {
+            for (size_t k = 0; k < moves.size() && !pick.valid(); ++k) {
+                const chess::Move& mv = moves[(k + rng / 65536) % moves.size()];
+                const bool pawn = r.mirror.position().at(mv.from).type == chess::Pawn;
+                if (pass == 0 && ((mv.flags & chess::MoveCapture) || pawn != pawnTurn)) continue;
+                chess::Game probe = r.mirror;
+                probe.play(mv);
+                if (!probe.isOver()) pick = mv;
+            }
+        }
+        CHECK(pick.valid());
+        if (!pick.valid()) return;
+        r.move(n % 2 == 0 ? HostSide : GuestSide, r.mirror.position().toUCI(pick).c_str());
+        CHECK_EQ(r.a.plies(), n + 1);
+        if (r.a.plies() != n + 1) return;
+        if (n + 1 < 1200) CHECK(!r.a.isOver());
+    }
+    auto mm = r.recent<P::MoveMade>(GuestSide);
+    CHECK(mm.size() == 1 && mm[0].ply == 1199);
+    for (Side s : {HostSide, GuestSide}) {
+        auto e = r.recent<P::GameEnd>(s);
+        CHECK(e.size() == 1 && e[0].status == P::GameStatus::Aborted && e[0].reason == P::EndReason::ServerAborted);
     }
 }
 
@@ -1869,6 +2128,20 @@ struct RawChannel {
             if (!pumpOnce() || std::chrono::steady_clock::now() > end) return false;
         }
     }
+    // True when the other side closes the connection within ms (what it sends meanwhile is
+    // read and dropped).
+    bool waitClosed(int ms) {
+        auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
+        while (std::chrono::steady_clock::now() < end) {
+            sock::PollSet ps;
+            ps.add(h, true, false);
+            ps.wait(10);
+            uint8_t buf[4096];
+            bool closed = false;
+            if (ps.readable(h) && sock::recvSome(h, buf, sizeof buf, closed) < 0) return true;
+        }
+        return false;
+    }
 
 protected:
     // The channel's handshake over the connected socket 'h', within 5 s.
@@ -1946,7 +2219,38 @@ struct RawHost : RawChannel {
         return true;
     }
     // The guest's next connection, through the channel's handshake, within ms.
-    bool accept(int ms) {
+    bool accept(int ms) { return acceptSocket(ms) && handshake(); }
+    // The guest's next connection through the handshake up to the guest's confirmation, then
+    // closed before the host's: what the guest sees when the host refuses its code, or when the
+    // link fails at that moment.
+    bool acceptUnconfirmed(int ms) {
+        if (!acceptSocket(ms) || !ch->start()) return false;
+        auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
+        while (!ch->established()) {
+            if (!flush() || std::chrono::steady_clock::now() > end) return false;
+            sock::PollSet ps;
+            ps.add(h, true, false);
+            ps.wait(10);
+            uint8_t buf[4096];
+            bool closed = false;
+            int r = ps.readable(h) ? sock::recvSome(h, buf, sizeof buf, closed) : 0;
+            if (r < 0 || (r > 0 && !ch->receive(buf, size_t(r)))) return false;
+        }
+        drop();   // the host's confirmation, in the outbox, is never sent
+        return true;
+    }
+    void drop() {
+        sock::closeSocket(h);
+        h = sock::kInvalid;
+    }
+    template <class T> bool send(const T& m) {
+        std::vector<uint8_t> buf;
+        P::encode(m, buf);
+        return sendBytes(buf);
+    }
+
+private:
+    bool acceptSocket(int ms) {
         drop();
         auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(ms);
         while (h == sock::kInvalid) {
@@ -1957,16 +2261,7 @@ struct RawHost : RawChannel {
             if (ps.readable(listener)) h = sock::acceptOne(listener, nullptr);
         }
         ch = std::make_unique<direct::SecureChannel>(direct::SecureChannel::Role::Host, code);
-        return handshake();
-    }
-    void drop() {
-        sock::closeSocket(h);
-        h = sock::kInvalid;
-    }
-    template <class T> bool send(const T& m) {
-        std::vector<uint8_t> buf;
-        P::encode(m, buf);
-        return sendBytes(buf);
+        return true;
     }
 };
 
@@ -2091,4 +2386,268 @@ TEST(direct_gestures_outside_flood_limit) {
     CHECK(e && e->gameId == s.game && e->gesture.touch == 52);
     CHECK(e && e->gesture.ply >= 20 && e->gesture.ply <= 25);   // + what refilled meanwhile
     CHECK(host.dm.currentGame() && host.dm.currentGame()->blackConnected);
+}
+
+namespace {
+
+// The Welcome a host written by hand sends for the game of 'auth'.
+bool sendWelcome(RawHost& raw, const direct::Authority& auth) {
+    P::Welcome w;
+    w.proto = P::kProtocolVersion;
+    w.serverTime = sock::epochMs();
+    w.userId = 2;
+    w.username = "Bob";
+    w.serverName = "Alice";
+    w.heartbeatMs = 2000;
+    w.clientPingMs = 2000;
+    w.maxMsgPerSec = 40;
+    w.activeGame = auth.gameId();
+    w.gestureRate = 10;
+    w.gestureBurst = 20;
+    return raw.send(w);
+}
+
+// Hosts a match and joins it with a guest written by hand (its Hello, then the host's Welcome and
+// snapshot).
+bool joinRaw(Peer& host, RawGuest& raw, P::GameSnapshot& snap) {
+    Peer nobody;
+    host.dm.host(hostOptions(300, 0, 1, "Alice"));
+    if (!waitUntil(host, nobody, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; })) return false;
+    DirectInvite inv = host.dm.invite();
+    P::Hello hello;
+    hello.proto = P::kProtocolVersion;
+    hello.schema = P::kSchemaHash;
+    hello.client = "Scacelith test";
+    hello.token = "direct:Raw      ";
+    P::Welcome w;
+    return raw.connect(inv.port, inv.code) && raw.send(hello) && raw.waitFor(w, 5000) && raw.waitFor(snap, 5000);
+}
+
+// Copies the log while it lives (logx writes every line to this file too, flushed at once). One
+// file per process: test runs at the same time never share it.
+struct LogCapture {
+    std::string path;
+    LogCapture() {
+#ifdef _WIN32
+        const unsigned pid = unsigned(_getpid());
+#else
+        const unsigned pid = unsigned(getpid());
+#endif
+        path = "/tmp/scacelith_direct_log_test_" + std::to_string(pid) + ".txt";
+        logx::init(path.c_str());
+    }
+    ~LogCapture() {
+        logx::shutdown();
+        std::remove(path.c_str());
+    }
+    LogCapture(const LogCapture&) = delete;
+    LogCapture& operator=(const LogCapture&) = delete;
+    // Lines written so far that contain 'text'.
+    int count(const char* text) const {
+        int n = 0;
+        if (FILE* f = std::fopen(path.c_str(), "rb")) {
+            char line[4300];
+            while (std::fgets(line, sizeof line, f)) n += std::strstr(line, text) != nullptr;
+            std::fclose(f);
+        }
+        return n;
+    }
+};
+
+// Milliseconds the host takes to answer its own Resync with a snapshot.
+double hostResyncMs(Peer& host) {
+    Peer nobody;
+    host.drain();
+    const int before = host.count(Event::Kind::GameSnapshot);
+    auto t0 = std::chrono::steady_clock::now();
+    host.dm.requestResync();
+    waitUntil(host, nobody, [&] { return host.count(Event::Kind::GameSnapshot) > before; }, 3000);
+    return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+}
+
+}  // namespace
+
+TEST(direct_guest_drops_a_flooding_host) {
+    // A host that sends faster than the guest's game thread polls cannot grow its event queue
+    // (every event holds the whole game) without limit: the guest drops the link and comes back.
+    RawHost raw;
+    CHECK(raw.listen());
+    direct::Authority auth(direct::AuthorityConfig(), "Alice", "Bob", 1);
+    direct::Authority::Output out;
+    auth.startGame(sock::epochMs(), out);
+    CHECK(out.toGuest.size() == 1);
+    if (out.toGuest.size() != 1) return;
+    Peer guest;
+    guest.dm.join("127.0.0.1", raw.port, raw.code, "Bob");
+    P::Hello hello;
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    CHECK(sendWelcome(raw, auth) && raw.sendBytes(out.toGuest[0]));
+    // 6000 Errors while the game thread polls nothing (the link may drop meanwhile).
+    P::Error e;
+    e.code = P::ErrorCode::NotYourTurn;
+    e.game = auth.gameId();
+    std::vector<uint8_t> err;
+    P::encode(e, err);
+    for (int i = 0; i < 6000 && raw.sendBytes(err); ++i) {}
+    CHECK(raw.waitClosed(3000));
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));   // the guest comes back
+    guest.drain();
+    CHECK(guest.count(Event::Kind::ServerError) > 1000);
+    CHECK(guest.count(Event::Kind::ServerError) <= 4096);
+    CHECK(guest.hasConn(ConnState::Reconnecting));
+}
+
+TEST(direct_host_refuses_without_stalling) {
+    // A refused connection gets its Error, then the host half-closes it and waits up to 300 ms
+    // (200 ms after a flood) for the peer to close. A peer that keeps it open no longer holds the
+    // host's loop for that time: the host's own commands are handled meanwhile.
+    Peer host;
+    RawGuest guest;
+    P::GameSnapshot snap;
+    CHECK(joinRaw(host, guest, snap));
+    // Another connection with the code and an incompatible Hello, never closed by its side.
+    RawGuest other;
+    CHECK(other.connect(host.dm.invite().port, host.dm.invite().code));
+    P::Hello hello;
+    hello.proto = P::kProtocolVersion;
+    hello.schema = P::kSchemaHash ^ 1u;
+    hello.token = "direct:Other    ";
+    CHECK(other.send(hello));
+    P::Error e;
+    CHECK(other.waitFor(e, 5000));
+    CHECK(e.code == P::ErrorCode::UnsupportedProtocol && e.fatal);
+    CHECK(hostResyncMs(host) < 100);
+    CHECK(other.waitClosed(2000));
+    // The guest floods: Error{Flood} and its link closes, the same way.
+    P::C_Ping ping;
+    for (uint32_t i = 0; i < 50; ++i) {
+        ping.nonce = i;
+        CHECK(guest.send(ping));
+    }
+    CHECK(guest.waitFor(e, 5000));
+    CHECK(e.code == P::ErrorCode::Flood && e.fatal);
+    CHECK(hostResyncMs(host) < 100);
+    CHECK(guest.waitClosed(2000));
+    CHECK(host.dm.currentGame() && !host.dm.currentGame()->blackConnected);
+}
+
+TEST(direct_guest_message_out_of_sequence_logged_once) {
+    // Guest messages out of sequence are dropped and the link stays; the first one is logged,
+    // not each of them (every log line is written and flushed to the log file at once).
+    Peer host;
+    RawGuest raw;
+    P::GameSnapshot snap;
+    CHECK(joinRaw(host, raw, snap));
+    LogCapture log;
+    P::C_Ping ping;
+    std::vector<uint8_t> stale;
+    for (uint32_t i = 0; i < 200; ++i) {
+        ping.seq = 1;
+        ping.nonce = i;
+        stale.clear();
+        P::encode(ping, stale);
+        CHECK(raw.sendBytes(stale));
+    }
+    ping.nonce = 4242;
+    CHECK(raw.send(ping));
+    P::S_Pong pong;
+    CHECK(raw.waitFor(pong, 5000));
+    CHECK_EQ(pong.nonce, 4242u);
+    CHECK_EQ(raw.errors, 0);
+    CHECK_EQ(log.count("dropped (expected"), 1);
+}
+
+TEST(direct_guest_message_of_unknown_type) {
+    // A guest message, in sequence, whose type id the schema does not define: always
+    // Error{Malformed} (also right after a Gesture), and the link stays.
+    Peer host;
+    RawGuest raw;
+    P::GameSnapshot snap;
+    CHECK(joinRaw(host, raw, snap));
+    P::C_Gesture g;
+    g.game = snap.game;
+    for (uint8_t type : {uint8_t(0x04), uint8_t(0x17), uint8_t(0x7F)}) {
+        CHECK(raw.send(g));
+        const uint32_t seq = ++raw.seq;
+        std::vector<uint8_t> msg = {type, uint8_t(seq), uint8_t(seq >> 8), uint8_t(seq >> 16), uint8_t(seq >> 24)};
+        CHECK(raw.sendBytes(msg));
+        P::Error e;
+        CHECK(raw.waitFor(e, 5000));
+        CHECK(e.code == P::ErrorCode::Malformed && e.ref == seq && !e.fatal);
+    }
+    P::C_Ping ping;
+    ping.nonce = 7;
+    CHECK(raw.send(ping));
+    P::S_Pong pong;
+    CHECK(raw.waitFor(pong, 5000));
+    CHECK_EQ(pong.nonce, 7u);
+}
+
+TEST(direct_connection_log_paced) {
+    // Anyone who finds the open port can connect as fast as they like (here: 50 connections that
+    // send garbage, each refused at once): at most 10 "connection from" lines a second, then the
+    // count of the others. The guest still gets in.
+    Peer host, guest;
+    host.dm.host(hostOptions(300, 0, 1, "Alice"));
+    CHECK(waitUntil(host, guest, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
+    DirectInvite inv = host.dm.invite();
+    LogCapture log;
+    sock::Endpoint ep;
+    CHECK(sock::Endpoint::parse("127.0.0.1", inv.port, ep));
+    static const char junk[] = "GET / HTTP/1.1\r\n\r\n";
+    int refused = 0;
+    auto t0 = std::chrono::steady_clock::now();
+    for (int i = 0; i < 50; ++i) {
+        RawChannel c;
+        std::string err;
+        c.h = sock::connectWithTimeout(ep, 2000, err);
+        sock::sendSome(c.h, reinterpret_cast<const uint8_t*>(junk), sizeof junk - 1);
+        refused += c.waitClosed(2000);
+    }
+    const double seconds = std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count();
+    CHECK_EQ(refused, 50);
+    guest.dm.join("127.0.0.1", inv.port, inv.code, "Bob");
+    CHECK(waitUntil(host, guest, [&] { return host.count(Event::Kind::GameSnapshot) && guest.count(Event::Kind::GameSnapshot); }));
+    const int lines = log.count("direct: connection from");
+    CHECK(lines >= 10 && lines <= 10 * (int(seconds) + 1) + 1);
+    CHECK(waitUntil(host, guest, [&] { return log.count("more connections") > 0; }, 4000));
+}
+
+TEST(direct_guest_retries_once_without_host_confirmation) {
+    // On a reconnection the code is known to be right: a connection closed before the host's
+    // confirmation (the link failing at that moment) is tried once more and the guest is back. A
+    // second one during the same reconnection means the host refuses the code (it hosts another
+    // match): it gives up.
+    RawHost raw;
+    CHECK(raw.listen());
+    direct::Authority auth(direct::AuthorityConfig(), "Alice", "Bob", 1);
+    direct::Authority::Output out;
+    auth.startGame(sock::epochMs(), out);
+    CHECK(out.toGuest.size() == 1);
+    if (out.toGuest.size() != 1) return;
+    Peer guest, nobody;
+    auto conns = [&](ConnState s) {
+        int n = 0;
+        for (auto& e : guest.events) n += e.kind == Event::Kind::ConnectionChanged && e.state == s;
+        return n;
+    };
+    guest.dm.join("127.0.0.1", raw.port, raw.code, "Bob");
+    P::Hello hello;
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    CHECK(sendWelcome(raw, auth) && raw.sendBytes(out.toGuest[0]));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(Event::Kind::GameSnapshot) == 1; }));
+    raw.drop();
+    CHECK(waitUntil(guest, nobody, [&] { return conns(ConnState::Reconnecting) == 1; }));
+    CHECK(raw.acceptUnconfirmed(5000));
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    CHECK(sendWelcome(raw, auth));
+    CHECK(waitUntil(guest, nobody, [&] { return conns(ConnState::Online) == 2; }));
+    raw.drop();
+    CHECK(waitUntil(guest, nobody, [&] { return conns(ConnState::Reconnecting) == 2; }));
+    CHECK(raw.acceptUnconfirmed(5000));
+    CHECK(raw.acceptUnconfirmed(5000));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(Event::Kind::GameEnd) == 1; }));
+    CHECK_EQ(guest.dm.lastError(), std::string("host_left"));
+    const Event* end = guest.last(Event::Kind::GameEnd);
+    CHECK(end && end->game.reason == int(P::EndReason::ServerAborted));
 }
