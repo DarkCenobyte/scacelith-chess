@@ -5,9 +5,9 @@
 //   * game thread(s): play() -> lock-free MPMC queue, volumes -> atomics, setListener() -> mutex
 //     + version (the audio thread only try_locks it)
 //   * audio thread (backend): drains commands, installs bank buffers, runs the Mixer
-//   * builder thread (low priority): synthesises the initial bank (kVariants per Sfx), then
-//     re-synthesises each variant right after it is played (fresh seed), and frees retired
-//     buffers so the audio thread never allocates or frees.
+//   * builder thread (low priority): synthesises the initial bank (bankVariants(s) per Sfx, up to
+//     kVariants), then re-synthesises each variant right after it is played (fresh seed), and
+//     frees retired buffers so the audio thread never allocates or frees.
 //
 // Speech voices (openVoice ...): the ordered operations that carry data (open, append) go through
 // their own command queue, without the 250 ms staleness rule of play() (an append must never be

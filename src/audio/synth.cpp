@@ -228,7 +228,7 @@ void servo(Buf& out, Rng& r, float t0, float dur, float f0, float amp, const std
 }
 
 // Removes DC (and optionally rumble below hpHz), trims the tail below -66 dB, fades the end
-// (fadeSec, raised cosine) and normalises the peak to 1.
+// (fadeSec, smoothstep) and normalises the peak to 1.
 std::vector<float> finish(Buf& b, float hpHz = 0.0f, float fadeSec = 0.004f) {
     DcBlock dc;
     dc.set(12.0f, FS);
@@ -596,9 +596,9 @@ Modes padModes(Rng& r) {
 
 // Ballpoint writing: the ball rolls in its socket over the paper fibres. The friction noise is
 // broadband with a stick-slip grain whose density and brightness follow the tip speed; handwriting
-// moves the tip in quick strokes (~5-8 per second) with speed minima at the direction reversals,
-// where the ball ticks faintly as it changes direction. A sustained ~3 s texture: the mixer plays
-// a window of it per pen-down stroke.
+// moves the tip in quick strokes (60-170 ms each, ~9 per second) with speed minima at the
+// direction reversals, where the ball ticks faintly as it changes direction. A sustained ~3 s
+// texture: the mixer plays a window of it per pen-down stroke.
 std::vector<float> penWrite(Rng& r) {
     const float T = r.range(2.9f, 3.3f);
     Buf out(T + 0.1f);
