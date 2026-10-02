@@ -420,6 +420,37 @@ TEST(coach_director_pause_holds_everything) {
     CHECK_EQ(rig.voiceStarts(), 2);
 }
 
+TEST(coach_director_pause_released_after_clear) {
+    // Paused while a line is heard, then cleared (the pause menu's Take back or Resign): the pause
+    // is released on resuming, so the next line is heard to its end.
+    Rig rig;
+    rig.dir.play({say("lesson.welcome.hello")});
+    CHECK(rig.until([&] { return rig.voiceStarts() > 0; }, 5.0f));
+    rig.run(0.3f);
+    rig.dir.setPaused(true);
+    rig.dir.clear();
+    rig.step();
+    rig.dir.setPaused(false);
+    CHECK(!rig.stage.all("voice.pause").back().flag);
+    rig.dir.play({say("event.your_move")});
+    CHECK(rig.settle());
+    CHECK_EQ(rig.voiceStarts(), 2);
+    CHECK_EQ(rig.stage.count("voice.end"), 1);
+
+    // Back to the main menu while paused: the next game's reset() releases it.
+    Rig rig2;
+    rig2.dir.play({say("lesson.welcome.hello")});
+    CHECK(rig2.until([&] { return rig2.voiceStarts() > 0; }, 5.0f));
+    rig2.run(0.3f);
+    rig2.dir.setPaused(true);
+    rig2.dir.clear();
+    rig2.dir.reset(&rig2.stage, DirectorConfig());
+    rig2.dir.play({say("event.your_move")});
+    CHECK(rig2.settle());
+    CHECK_EQ(rig2.voiceStarts(), 2);
+    CHECK_EQ(rig2.stage.count("voice.end"), 1);
+}
+
 TEST(coach_director_without_voice) {
     // No voice: nothing is synthesised, every line is shown for its reading time and the
     // gestures are timed on it.

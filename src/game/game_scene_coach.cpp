@@ -293,7 +293,8 @@ public:
         r.voiceStarted = true;
         r.voiceQueued = seconds;
         r.voiceGameT = 0.0;
-        if (r.voicePausedByDirector || r.voicePausedByScene) audio::setVoicePaused(id, true);
+        r.voicePausedByDirector = false;   // the director starts no voice while it holds a pause
+        if (r.voicePausedByScene) audio::setVoicePaused(id, true);
         return true;
     }
     void stopVoice() override {

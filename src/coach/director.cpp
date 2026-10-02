@@ -204,6 +204,7 @@ struct Director::Impl {
     int ply = 0;
     int demoDepth = 0;                     // demonstration moves on the table, not rewound yet
     bool paused = false;
+    bool voicePaused = false;              // the stage was told pauseVoice(true), not released yet
     bool hint = false;                     // skip hint shown
     float level = 0.0f;
 
@@ -837,6 +838,7 @@ void Director::reset(Stage* stage, const DirectorConfig& config) {
     if (stage && stage == d_->stage) {
         clear();
         for (Impl::Cached& c : d_->cache) d_->cancel(c.speech);
+        if (d_->voicePaused) stage->pauseVoice(false);   // left paused (back to the menu from the pause menu)
     }
     auto observer = std::move(d_->observer);
     delete d_;
@@ -910,7 +912,14 @@ void Director::setPaused(bool paused) {
     Impl& d = *d_;
     if (d.paused == paused) return;
     d.paused = paused;
-    if (d.stage && d.run.active && d.run.voiced && d.run.lineStarted && !d.run.lineDone) d.stage->pauseVoice(paused);
+    if (!d.stage) return;
+    if (paused && d.run.active && d.run.voiced && d.run.lineStarted && !d.run.lineDone) {
+        d.stage->pauseVoice(true);
+        d.voicePaused = true;
+    } else if (!paused && d.voicePaused) {
+        d.stage->pauseVoice(false);   // also when the paused line was stopped meanwhile (clear)
+        d.voicePaused = false;
+    }
 }
 
 void Director::skip() { d_->skip(); }

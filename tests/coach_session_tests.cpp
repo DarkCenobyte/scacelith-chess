@@ -308,6 +308,28 @@ TEST(coach_session_takeback_requested) {
     checkRenders(t.lines);
 }
 
+TEST(coach_session_pause_menu_takeback_keeps_the_voice) {
+    // Esc while the coach speaks, then the pause menu's Take back: once resumed, the coach is heard
+    // again (its pause does not outlive the line it held).
+    Table t;
+    hangTable(t);
+    t.start(levelConfig(2));
+    CHECK(t.quiet());
+    t.move("g1f1");
+    CHECK(t.reply("g8f8"));
+    CHECK(t.quiet());
+    t.session.onDrawAnswer(false);
+    CHECK(t.until([&] { return t.session.director().speaking(); }, 5.0f));
+    t.session.setPaused(true);
+    t.step();
+    t.session.onTakeBackRequested(t.game);
+    t.session.setPaused(false);
+    const int heard = t.stage.count("voice.end");
+    CHECK(t.quiet());
+    CHECK(t.said("event.takeback.taken"));
+    CHECK_EQ(t.stage.count("voice.end"), heard + 1);   // heard to its end
+}
+
 TEST(coach_session_openings_and_turn_taking) {
     // The opening is named once it is settled (level 1: the Italian after 3.Bc4).
     Table t;

@@ -35,6 +35,8 @@ public:
     // it this frame: the director keeps the PCM and retries on the next update.
     virtual bool startVoice(std::vector<float>&& pcm) = 0;
     virtual void stopVoice() = 0;                             // short fade; the utterance is over
+    // Pause or resume the voice. The director starts no utterance while it holds a pause, and always
+    // releases it with pauseVoice(false), even when the paused line was stopped meanwhile.
     virtual void pauseVoice(bool paused) = 0;
     // Seconds of the current utterance heard so far (the speech clock, output latency removed), or a
     // negative value when no utterance plays. *finished is set once it has been heard to the end
