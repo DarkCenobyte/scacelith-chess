@@ -111,7 +111,7 @@ public:
     }
 
 private:
-    enum class End { Quit, Changed, Lost, Stalled };
+    using End = StreamEnd;
 
     void closeEvents() {
         if (quitEvent_) CloseHandle(quitEvent_);
@@ -155,23 +155,20 @@ private:
             bool opened = enumr && open(enumr, !loggedNoDevice);
             reportFirst(opened);
             End end = End::Stalled;
+            bool healthy = false;
             if (opened) {
                 loggedNoDevice = false;
-                end = stream();
+                end = stream(healthy);
                 close();
                 if (end == End::Quit) break;
                 status.restarts.fetch_add(1);
-                if (end != End::Stalled) {
-                    failures = 0;
-                    continue;  // device lost / default changed: reopen right away
-                }
             } else {
                 loggedNoDevice = true;
             }
-            DWORD waitMs = DWORD(std::min(5000, 250 << std::min(failures, 5)));
-            ++failures;
+            const int waitMs = reopenWaitMs(opened, end, healthy, failures);
+            if (waitMs == 0) continue;  // default changed / working device lost: reopen right away
             HANDLE hs[2] = {quitEvent_, changeEvent_};
-            WaitForMultipleObjects(2, hs, FALSE, waitMs);
+            WaitForMultipleObjects(2, hs, FALSE, DWORD(waitMs));
         }
         reportFirst(false);
         if (enumr && notifier) enumr->UnregisterEndpointNotificationCallback(notifier);
@@ -292,7 +289,9 @@ private:
         audioEvent_ = nullptr;
     }
 
-    End stream() {
+    // 'healthy': the stream delivered at least a second of audio before it ended.
+    End stream(bool& healthy) {
+        healthy = false;
         HRESULT hr = client_->Start();
         if (FAILED(hr)) {
             LOGW("audio: IAudioClient::Start failed (hr=0x%08lx)", (unsigned long)hr);
@@ -300,6 +299,7 @@ private:
         }
         HANDLE hs[3] = {quitEvent_, changeEvent_, audioEvent_};
         int timeouts = 0;
+        uint64_t rendered = 0;
         unsigned dryBuffers = 0;  // the first 4 of each stream are tolerated: not counted, no adaptation
         End end = End::Quit;
         for (;;) {
@@ -345,8 +345,10 @@ private:
             convert(scratch_.data(), data, int(avail));
             hr = render_->ReleaseBuffer(avail, 0);
             if (FAILED(hr)) { end = End::Lost; break; }
+            rendered += avail;
         }
         client_->Stop();
+        healthy = rendered >= uint64_t(rate_);
         return end;
     }
 

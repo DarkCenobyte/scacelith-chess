@@ -696,6 +696,26 @@ TEST(audio_backend_fallback_rate) {
     for (unsigned long rate : {0ul, 4000ul, 7999ul, 384001ul, 705600ul, 768000ul}) CHECK_EQ(fallbackDeviceRate(rate), 48000);
 }
 
+// WASAPI reopen back-off: it grows over consecutive failures, a stream that played resets it, and a
+// device that fails right after opening is not reopened in a tight loop.
+TEST(audio_backend_reopen_policy) {
+    using namespace audio;
+    int failures = 0;
+    // No device at start-up: the back-off grows to 5 s.
+    for (int ms : {250, 500, 1000, 2000, 4000, 5000, 5000}) CHECK_EQ(reopenWaitMs(false, StreamEnd::Stalled, false, failures), ms);
+    // The device came back and played, then stalled: 250 ms, not the 5 s left by the earlier failures.
+    CHECK_EQ(reopenWaitMs(true, StreamEnd::Stalled, true, failures), 250);
+    CHECK_EQ(reopenWaitMs(true, StreamEnd::Stalled, false, failures), 500);  // stalled again at once
+    // A working device lost: at once, back-off reset.
+    CHECK_EQ(reopenWaitMs(true, StreamEnd::Lost, true, failures), 0);
+    CHECK_EQ(failures, 0);
+    // A device that opens but fails at once backs off like a failed open...
+    for (int ms : {250, 500, 1000}) CHECK_EQ(reopenWaitMs(true, StreamEnd::Lost, false, failures), ms);
+    // ...while a default-device change reopens at once, even right after an open.
+    CHECK_EQ(reopenWaitMs(true, StreamEnd::Changed, false, failures), 0);
+    CHECK_EQ(failures, 0);
+}
+
 TEST(audio_live_engine_init_shutdown) {
     audio::setMasterVolume(0.9f);
     audio::setAmbienceEnabled(true);
