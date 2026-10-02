@@ -130,12 +130,13 @@ static int runApp(std::vector<std::string> args) {
         if (plat::width() > 0 && plat::height() > 0) renderer.resize(plat::width(), plat::height());
 
         running = scene->update(ctx, dt);
-        if (plat::width() > 0 && plat::height() > 0) {
+        bool visible = plat::width() > 0 && plat::height() > 0;  // 0 x 0 while minimised
+        if (visible) {
             scene->render(ctx, dt);
             scene->renderOverlay(ctx, dt);
         }
         ++frame;
-        bool f12 = in.keyPressed[plat::KEY_F12] && !f12Held;
+        bool f12 = in.keyPressed[plat::KEY_F12] && !f12Held && visible;
         f12Held = in.keyDown[plat::KEY_F12];
         if ((ctx.screenshotMode && frame >= shotFrames) || f12) {
             std::vector<uint8_t> px;
@@ -147,7 +148,8 @@ static int runApp(std::vector<std::string> args) {
             else LOGE("could not write %s", out.c_str());
             if (ctx.screenshotMode) running = false;
         }
-        plat::swapBuffers();
+        if (visible) plat::swapBuffers();
+        else plat::sleepMs(10);  // nothing to present, and no vsync to pace the loop
     }
     scene->shutdown(ctx);
     scene.reset();
