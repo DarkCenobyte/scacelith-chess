@@ -2,23 +2,23 @@
 #include "lighting_data.h"
 #include "../renderer.h"
 #include "../shader.h"
-#include "../../core/log.h"
 
 using namespace m;
 
 namespace render {
 namespace lighting {
 
-void PlanarReflections::resize(int w, int h) {
+void PlanarReflections::resize(int w, int h, int layers) {
     shutdown();
     w_ = std::max(1, w);
     h_ = std::max(1, h);
     levels_ = std::min(6, gpu::mipCount(w_, h_));
-    color_ = gpu::createTexture2DArray(w_, h_, 4, GL_RGBA16F, levels_);
-    temp_ = gpu::createTexture2DArray(w_, h_, 4, GL_RGBA16F, levels_);
-    depth_ = gpu::createTexture2DArray(w_, h_, 4, GL_DEPTH_COMPONENT32F);
+    if (layers <= 0) return;
+    color_ = gpu::createTexture2DArray(w_, h_, layers, GL_RGBA16F, levels_);
+    temp_ = gpu::createTexture2DArray(w_, h_, layers, GL_RGBA16F, levels_);
+    depth_ = gpu::createTexture2DArray(w_, h_, layers, GL_DEPTH_COMPONENT32F);
     glObjectLabel(GL_TEXTURE, color_.id, -1, "planar.color");
-    for (int i = 0; i < 4; ++i) fbs_.push_back(gpu::createFramebufferLayer(&color_, i, &depth_, i));
+    for (int i = 0; i < layers; ++i) fbs_.push_back(gpu::createFramebufferLayer(&color_, i, &depth_, i));
 }
 
 void PlanarReflections::shutdown() {
@@ -42,7 +42,7 @@ void PlanarReflections::prepare(Renderer& r) {
         vec3 n = normalize(pr.normal);
         float d = -dot(n, pr.point);
         f.planarPlanes[i] = vec4(n, d);
-        if (!pr.enabled || !r.settings_.planarReflections || !color_.id) continue;
+        if (!pr.enabled || !r.settings_.planarReflections || int(i) >= layers()) continue;
         if (dot(n, cam) + d <= 1e-3f) continue;  // camera behind the mirror
         float x0 = 0, y0 = 0, x1 = 1, y1 = 1;
         if (pr.bounds.valid()) {
@@ -88,7 +88,6 @@ void PlanarReflections::render(Renderer& r) {
     gpu::DebugGroup g("planar");
     gpu::ProfileScope prof("planar");
     FrameUBOData& f = r.frame_;
-    glEnable(GL_CLIP_DISTANCE0);
     for (int i = 0; i < 4; ++i) {
         if (!active_[i]) continue;
         const PlanarReflector& pr = r.planar_[size_t(i)];
@@ -136,13 +135,16 @@ void PlanarReflections::render(Renderer& r) {
         flt.eye = eye;
         flt.minSize = pr.minObjectSize;
         glFrontFace(GL_CW);  // mirrored winding
+        // Mesh shaders write gl_ClipDistance[0] (the mirror plane); the sky's fullscreen.vert
+        // does not, and lies at infinity anyway: clip the scene only.
+        glEnable(GL_CLIP_DISTANCE0);
         r.drawScene(PassId::Planar, false, flt);
+        glDisable(GL_CLIP_DISTANCE0);
         glFrontFace(GL_CCW);
         r.renderSky();
         glDisable(GL_SCISSOR_TEST);
     }
     f.passInfo.y = 0;
-    glDisable(GL_CLIP_DISTANCE0);
 
     // Gaussian mip chain.
     gpu::DebugGroup bg("planar.blur");
@@ -154,17 +156,17 @@ void PlanarReflections::render(Renderer& r) {
         for (int lv = 1; lv < levels_; ++lv) {
             int sw = std::max(1, w_ >> lv), sh = std::max(1, h_ >> lv);
             ph.use();
-            ph.set("uLevel", lv);
-            ph.set("uLayer", i);
-            glProgramUniform2i(ph.id, ph.loc("uSize"), sw, sh);
+            glProgramUniform1i(ph.id, 1, lv);  // uLevel, uLayer, uSize: explicit locations 1..3
+            glProgramUniform1i(ph.id, 2, i);
+            glProgramUniform2i(ph.id, 3, sw, sh);
             glBindTextureUnit(0, color_.id);
             glBindImageTexture(0, temp_.id, lv, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
             gpu::dispatch2D(sw, sh);
             glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
             pv.use();
-            pv.set("uLevel", lv);
-            pv.set("uLayer", i);
-            glProgramUniform2i(pv.id, pv.loc("uSize"), sw, sh);
+            glProgramUniform1i(pv.id, 1, lv);
+            glProgramUniform1i(pv.id, 2, i);
+            glProgramUniform2i(pv.id, 3, sw, sh);
             glBindTextureUnit(0, temp_.id);
             glBindImageTexture(0, color_.id, lv, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
             gpu::dispatch2D(sw, sh);

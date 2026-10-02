@@ -116,6 +116,8 @@ class PostFX {
 public:
     PostFX();
     ~PostFX();
+    PostFX(const PostFX&) = delete;  // owns impl_ and its GL objects
+    PostFX& operator=(const PostFX&) = delete;
     bool init();
     void shutdown();
     void resize(int renderW, int renderH);

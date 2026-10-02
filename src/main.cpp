@@ -36,7 +36,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <shellapi.h>
 // Prefer the discrete GPU on hybrid laptops.
 extern "C" {
 __declspec(dllexport) unsigned long NvOptimusEnablement = 1;
@@ -106,7 +105,11 @@ static int runApp(std::vector<std::string> args) {
     wd.vsync = ctx.screenshotMode ? false : settings.vsync;
     wd.debugContext = ctx.hasArg("--debug-gl");
     if (!plat::init(wd)) {
+#ifdef _WIN32
+        LOGE("could not initialise OpenGL 4.6");  // plat::init has shown the reason in a message box
+#else
         plat::messageBox("Scacelith", "Could not initialise OpenGL 4.6. Please update your graphics driver.");
+#endif
         return 1;
     }
 
@@ -134,6 +137,7 @@ static int runApp(std::vector<std::string> args) {
     double last = plat::time();
     int frame = 0;
     bool running = true;
+    bool f5Held = false, f12Held = false;  // F5 and F12 act once per press, not on auto-repeat
     while (running) {
         if (!plat::pumpEvents()) break;
         double now = plat::time();
@@ -141,16 +145,20 @@ static int runApp(std::vector<std::string> args) {
         ctx.clockDt = ctx.screenshotMode ? dt : float(std::min(now - last, 2.0));
         last = now;
         const plat::Input& in = plat::input();
-        if (in.keyPressed[plat::KEY_F5]) shaders::reloadAll();
+        // Shader sources only change on disk (--data-dir); the embedded ones would rebuild as they are.
+        if (!dataDir.empty() && in.keyPressed[plat::KEY_F5] && !f5Held) shaders::reloadAll();
+        f5Held = in.keyDown[plat::KEY_F5];
         if (plat::width() > 0 && plat::height() > 0) renderer.resize(plat::width(), plat::height());
 
         running = scene->update(ctx, dt);
-        if (plat::width() > 0 && plat::height() > 0) {
+        bool visible = plat::width() > 0 && plat::height() > 0;  // 0 x 0 while minimised
+        if (visible) {
             scene->render(ctx, dt);
             scene->renderOverlay(ctx, dt);
         }
         ++frame;
-        bool f12 = in.keyPressed[plat::KEY_F12];
+        bool f12 = in.keyPressed[plat::KEY_F12] && !f12Held && visible;
+        f12Held = in.keyDown[plat::KEY_F12];
         if ((ctx.screenshotMode && frame >= shotFrames) || f12) {
             std::vector<uint8_t> px;
             int sw, sh;
@@ -161,7 +169,8 @@ static int runApp(std::vector<std::string> args) {
             else LOGE("could not write %s", out.c_str());
             if (ctx.screenshotMode) running = false;
         }
-        plat::swapBuffers();
+        if (visible) plat::swapBuffers();
+        else plat::sleepMs(10);  // nothing to present, and no vsync to pace the loop
     }
     scene->shutdown(ctx);
     scene.reset();
@@ -173,18 +182,7 @@ static int runApp(std::vector<std::string> args) {
 }
 
 #ifdef _WIN32
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
-    int argc = 0;
-    LPWSTR* wargv = CommandLineToArgvW(GetCommandLineW(), &argc);
-    std::vector<std::string> args;
-    for (int i = 1; i < argc; ++i) {
-        char buf[4096];
-        WideCharToMultiByte(CP_UTF8, 0, wargv[i], -1, buf, sizeof(buf), nullptr, nullptr);
-        args.push_back(buf);
-    }
-    LocalFree(wargv);
-    return runApp(args);
-}
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) { return runApp(plat::commandLine()); }
 int main(int argc, char** argv) {
     (void)argc; (void)argv;
     return WinMain(GetModuleHandle(nullptr), nullptr, nullptr, SW_SHOWDEFAULT);

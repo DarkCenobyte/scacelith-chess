@@ -94,6 +94,11 @@ void setButton(int b, bool down) {
     if (!down && g_input.mouseDown[b]) g_input.mouseReleased[b] = true;
     g_input.mouseDown[b] = down;
 }
+// A button went up (wp = WM_xBUTTONUP's key state): the window keeps the pointer (SetCapture)
+// while another button is still held.
+void releaseCapture(WPARAM wp) {
+    if (!(wp & (MK_LBUTTON | MK_RBUTTON | MK_MBUTTON))) ReleaseCapture();
+}
 
 void applyCursor() {
     // ShowCursor keeps a counter; drive it to the wanted state.
@@ -172,11 +177,11 @@ LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
             g_input.mouseInWindow = pointerOverClient();
             return 0;
         case WM_LBUTTONDOWN: SetCapture(h); setButton(MOUSE_LEFT, true); return 0;
-        case WM_LBUTTONUP: ReleaseCapture(); setButton(MOUSE_LEFT, false); return 0;
+        case WM_LBUTTONUP: releaseCapture(wp); setButton(MOUSE_LEFT, false); return 0;
         case WM_RBUTTONDOWN: SetCapture(h); setButton(MOUSE_RIGHT, true); return 0;
-        case WM_RBUTTONUP: ReleaseCapture(); setButton(MOUSE_RIGHT, false); return 0;
-        case WM_MBUTTONDOWN: setButton(MOUSE_MIDDLE, true); return 0;
-        case WM_MBUTTONUP: setButton(MOUSE_MIDDLE, false); return 0;
+        case WM_RBUTTONUP: releaseCapture(wp); setButton(MOUSE_RIGHT, false); return 0;
+        case WM_MBUTTONDOWN: SetCapture(h); setButton(MOUSE_MIDDLE, true); return 0;
+        case WM_MBUTTONUP: releaseCapture(wp); setButton(MOUSE_MIDDLE, false); return 0;
         case WM_MOUSEWHEEL: g_input.wheel += float(GET_WHEEL_DELTA_WPARAM(wp)) / WHEEL_DELTA; return 0;
         case WM_INPUT: {
             RAWINPUT ri;
@@ -272,7 +277,8 @@ bool init(const WindowDesc& desc) {
     ReleaseDC(dummy, ddc);
     DestroyWindow(dummy);
     if (!createContextAttribs || !choosePixelFormat) {
-        messageBox("Scacelith", "This graphics driver does not support modern OpenGL contexts.\nOpenGL 4.6 is required.");
+        messageBox("Scacelith", "This graphics driver does not support modern OpenGL contexts.\nOpenGL 4.6 is required.\n"
+                                "Please update your graphics driver.");
         return false;
     }
 
@@ -294,7 +300,7 @@ bool init(const WindowDesc& desc) {
     int format = 0;
     UINT count = 0;
     if (!choosePixelFormat(g_hdc, pfAttribs, nullptr, 1, &format, &count) || count == 0) {
-        messageBox("Scacelith", "No suitable pixel format.");
+        messageBox("Scacelith", "No suitable pixel format.\nPlease update your graphics driver.");
         return false;
     }
     DescribePixelFormat(g_hdc, format, sizeof(pfd), &pfd);
@@ -313,7 +319,8 @@ bool init(const WindowDesc& desc) {
     int nMissing = gl46::load(getProc, &missing);
     if (nMissing) {
         char buf[256];
-        std::snprintf(buf, sizeof(buf), "The OpenGL driver is missing %d required 4.6 functions (first: %s).", nMissing, missing);
+        std::snprintf(buf, sizeof(buf), "The OpenGL driver is missing %d required 4.6 functions (first: %s).\n"
+                      "Please update your graphics driver.", nMissing, missing);
         messageBox("Scacelith", buf);
         return false;
     }
@@ -370,12 +377,6 @@ void setDisplayMode(DisplayMode mode, int w, int h) {
     RECT r = windowRectFor(mode, g_windowedW, g_windowedH, style);
     SetWindowLongPtrW(g_hwnd, GWL_STYLE, style);
     SetWindowPos(g_hwnd, HWND_TOP, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
-}
-
-void setTitle(const char* title) {
-    wchar_t w[256];
-    MultiByteToWideChar(CP_UTF8, 0, title, -1, w, 256);
-    SetWindowTextW(g_hwnd, w);
 }
 
 int width() { return g_width; }

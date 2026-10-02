@@ -4,7 +4,7 @@
 //   1. upload FrameUBO, LightingUBO, DrawData SSBO, lights
 //   2. atmosphere: sky-view LUT when the sun moved, sky cubemap + sky SH   (render-lighting)
 //   3. sun shadow cascades (static cache + dynamic casters)                (render-lighting)
-//   4. light probes / IBL bake when dirty (2 bounces)                      (render-lighting)
+//   4. light probes / IBL bake when dirty (probeBounces: 1-3 by preset)    (render-lighting)
 //   5. planar reflection passes + Gaussian mip chain                       (render-lighting)
 //   6. depth + normal + velocity prepass (frustum culled)
 //   7. PostFX::computeAO                                                   (render-post)
@@ -19,6 +19,7 @@
 #include "material.h"
 #include "mesh.h"
 #include <memory>
+#include <type_traits>
 #include <vector>
 
 class PostFX;
@@ -83,7 +84,6 @@ enum DrawFlags : uint32_t {
     DRAW_STATIC = 1u << 1,          // never moves (shadow caches and light probes rely on it)
     DRAW_NO_REFLECTION = 1u << 2,   // skipped in planar reflection and probe passes
     DRAW_HIDDEN_MAIN = 1u << 3,     // skipped in the main camera pass (e.g. the player's own head)
-    DRAW_NO_VELOCITY = 1u << 4,
     DRAW_NO_CULL = 1u << 5,         // never frustum culled (e.g. displacement beyond mesh bounds)
 };
 
@@ -127,13 +127,14 @@ struct PointLight {
         spotCosOuter = std::cos(outerAngle);
     }
 };
+static_assert(sizeof(PointLight) == 64 && std::is_trivially_copyable_v<PointLight>, "PointLight mirrors PointLightData");
 
 // Planar reflector (floor, table top, board): renders the mirrored scene into a layer of the
-// planar reflection texture array (TEXUNIT_PLANAR). Materials pick a layer via planarReflector.
+// planar reflection texture array (TEXUNIT_PLANAR, half the render resolution for every
+// reflector). Materials pick a layer via planarReflector.
 struct PlanarReflector {
     m::vec3 point{0, 0, 0};
     m::vec3 normal{0, 1, 0};
-    float resolutionScale = 0.5f;
     bool enabled = true;
     // Optional world bounds of the reflecting surface. When valid, the reflection is skipped
     // when off screen and rendered only inside the reflector's screen rectangle (scissor).
@@ -198,6 +199,7 @@ struct FrameUBOData {
     m::vec4 planarPlanes[4];     // planar reflector planes (xyz n, w d)
     m::mat4 planarViewProj[4];   // reflected view-proj of each planar reflector (for projective lookup)
 };
+static_assert(sizeof(FrameUBOData) == 1344 && std::is_trivially_copyable_v<FrameUBOData>, "FrameUBOData mirrors FrameUBO");
 
 // Mirrors DrawData in shaders/include/common.glsl (std430).
 struct DrawDataGPU {
@@ -210,6 +212,7 @@ struct DrawDataGPU {
     m::vec4 fade;           // x = screen-door opacity, y = 1 when the dither changes every frame (TAA), zw unused
     m::vec4 highlight;      // DrawItem::highlight
 };
+static_assert(sizeof(DrawDataGPU) == 432 && std::is_trivially_copyable_v<DrawDataGPU>, "DrawDataGPU mirrors DrawData");
 
 enum class PassId { Main = 0, Prepass = 1, Shadow = 2, Planar = 3, Probe = 4 };
 
@@ -245,6 +248,9 @@ public:
 
     // Marks the static environment as changed (re-bake probes / static shadows).
     void invalidateStatic() { staticDirty_ = true; }
+    // Compiles now the program a material uses in a pass, for materials that first appear during
+    // play (otherwise their first draw waits for the compile). GL context required.
+    void warmProgram(const Material& mat, PassId pass) { programFor(mat, pass); }
 
     // --- Lighting configuration (render-lighting). Defaults follow game/layout.h (the hall). ---
     // World bounds of the scene: shadow casters range and default probe parallax box.
@@ -254,9 +260,6 @@ public:
     void setShadowRegions(const m::AABB* regions, int count);
     // Light probe layout (<= 16). Default: one priority probe above the table + a 3x4 hall grid.
     void setLightProbes(const std::vector<LightProbeDesc>& probes);
-    // Global textures shared by several materials (units TEXUNIT_GLOBAL0 + slot, slot 0..4).
-    void setGlobalTexture(int slot, GLuint texture);
-    GLuint skyCubemap() const;           // TEXUNIT_SKY: sky radiance (pre-exposed, no sun disk)
     GLuint specularProbes() const;       // TEXUNIT_SPECULAR: prefiltered probe cube array
     GLuint lightingUBO() const { return lightingUbo_.id; }
     GLuint brdfLut() const { return brdfLut_.id; }
@@ -289,7 +292,6 @@ public:
 
     // Draws the submitted items with one pass type into the currently bound framebuffer.
     // Used internally and by lighting code (probe capture, planar reflections).
-    void drawScene(PassId pass, bool transparents, uint32_t skipFlags);
     void drawScene(PassId pass, bool transparents, const DrawFilter& filter);
     // Uploads a modified copy of the frame UBO (e.g. reflected camera) for sub-passes.
     void uploadFrameUBO(const FrameUBOData& data);
@@ -311,6 +313,7 @@ private:
     const ::ShaderProgram* programFor(const Material& mat, PassId pass, bool allowTess = true);
     void createTargets(int w, int h);
     void destroyTargets();
+    void allocatePlanar();
     void bindGlobalTextures();
     void updateLightingUBO();
     void defaultLightingLayout();
@@ -339,12 +342,11 @@ private:
     std::unique_ptr<lighting::PlanarReflections> planarRefl_;
     gpu::Texture brdfLut_;
     m::AABB sceneBounds_;
-    GLuint globalTex_[5] = {};
     float skyKey_[9] = {};     // sky capture inputs of the last capture
     float bakeKey_[6] = {};    // probe bake inputs of the last bake
     bool skyKeyValid_ = false;
     // Default textures bound to unused units so samplers are always complete
-    gpu::Texture dummy2D_, dummyArray_, dummyCube_, dummyCubeArray_, dummy3D_, dummyShadow_;
+    gpu::Texture dummy2D_, dummyArray_, dummyCubeArray_;
     std::unique_ptr<PostFX> post_;
 };
 

@@ -222,7 +222,6 @@ bool World::loadStep() {
         w.frameCoordMat.name = "BoardFrameCoordinates";
         w.frameCoordMat.defines.push_back("BOARD_COORDINATES");
         w.frameCoordMat.textures[1] = w.coordTex;
-        w.frameCoordMat.textureTargets[1] = GL_TEXTURE_2D;
         break;
     case 4:
         for (int t = Pawn; t <= King; ++t) {
@@ -251,19 +250,16 @@ void World::setupRenderer(render::Renderer& r) {
     Impl& w = *impl_;
     render::PlanarReflector floor;
     floor.point = vec3(0, 0, 0);
-    floor.resolutionScale = 0.5f;
     floor.bounds.add(vec3(layout::HALL_MIN_X, 0.0f, layout::HALL_MIN_Z));
     floor.bounds.add(vec3(layout::HALL_MAX_X, 0.0f, layout::HALL_MAX_Z));
     w.reflFloor = r.addPlanarReflector(floor);
     render::PlanarReflector table;
     table.point = vec3(0, layout::TABLE_TOP_Y, 0);
-    table.resolutionScale = 0.5f;
     table.bounds.add(vec3(-layout::TABLE_WIDTH * 0.5f, layout::TABLE_TOP_Y, -layout::TABLE_DEPTH * 0.5f));
     table.bounds.add(vec3(layout::TABLE_WIDTH * 0.5f, layout::TABLE_TOP_Y, layout::TABLE_DEPTH * 0.5f));
     w.reflTable = r.addPlanarReflector(table);
     render::PlanarReflector board;
     board.point = vec3(0, layout::BOARD_TOP_Y, 0);
-    board.resolutionScale = 0.5f;
     board.bounds.add(vec3(-layout::BOARD_SIZE * 0.5f, layout::BOARD_TOP_Y, -layout::BOARD_SIZE * 0.5f));
     board.bounds.add(vec3(layout::BOARD_SIZE * 0.5f, layout::BOARD_TOP_Y, layout::BOARD_SIZE * 0.5f));
     w.reflBoard = r.addPlanarReflector(board);
@@ -273,6 +269,9 @@ void World::setupRenderer(render::Renderer& r) {
     materials::getMutable(MaterialId::BoardSquareLight).planarReflector = w.reflBoard;
     materials::getMutable(MaterialId::BoardSquareDark).planarReflector = w.reflBoard;
     materials::getMutable(MaterialId::BoardFrame).planarReflector = w.reflBoard;
+    // Markers and coach marks (transparent, main view only) first show during play.
+    r.warmProgram(w.markerMat, render::PassId::Main);
+    r.warmProgram(w.coachMarkMat, render::PassId::Main);
 }
 
 void World::setClockSide(bool positiveX) {
@@ -430,7 +429,7 @@ void World::submitMarkers(render::Renderer& r, const std::vector<Marker>& marker
         d.material = &w.markerMat;
         d.model = translate(layout::squareCenter(mk.square) + vec3(0, 0.0004f, 0));
         d.inst[0] = vec4(float(mk.kind), mk.strength, 0, 0);
-        d.flags = render::DRAW_NO_REFLECTION | render::DRAW_NO_VELOCITY;
+        d.flags = render::DRAW_NO_REFLECTION;
         d.objectId = OBJ_MARKER + uint32_t(mk.square);
         r.submit(d);
     }
@@ -460,7 +459,7 @@ void World::submitCoachMarks(render::Renderer& r, const std::vector<CoachMark>& 
         render::DrawItem d;
         d.mesh = &w.coachQuad;
         d.material = &w.coachMarkMat;
-        d.flags = render::DRAW_NO_REFLECTION | render::DRAW_NO_VELOCITY;
+        d.flags = render::DRAW_NO_REFLECTION;
         d.objectId = OBJ_COACH_MARK + n;
         float strength = std::min(mk.strength, 1.0f), age = std::max(mk.age, 0.0f);
         if (mk.kind == CoachMark::Square) {

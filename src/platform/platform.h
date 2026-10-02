@@ -28,7 +28,6 @@ bool pumpEvents();
 void swapBuffers();
 void setVsync(bool on);
 void setDisplayMode(DisplayMode mode, int width, int height);
-void setTitle(const char* title);
 int width();   // current framebuffer size in pixels
 int height();
 bool hasFocus();

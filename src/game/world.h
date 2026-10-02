@@ -62,7 +62,8 @@ public:
     const char* loadLabel() const;
     bool loaded() const;
 
-    // Must be called once after loading (registers planar reflectors on the renderer).
+    // Must be called once after loading (registers planar reflectors on the renderer, compiles
+    // the markers' programs).
     void setupRenderer(render::Renderer& r);
 
     // The chess clock stands at the human player's right (layout.h).

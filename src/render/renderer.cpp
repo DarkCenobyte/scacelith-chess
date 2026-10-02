@@ -6,7 +6,6 @@
 #include "lighting/shadows.h"
 #include "post/postfx.h"
 #include "shader.h"
-#include "../core/log.h"
 #include "../game/layout.h"
 #include <algorithm>
 #include <cstring>
@@ -92,10 +91,6 @@ bool Renderer::init(const RenderSettings& s) {
     fill(dummy2D_, black, GL_RGBA, GL_FLOAT);
     dummyArray_ = gpu::createTexture2DArray(1, 1, 1, GL_RGBA16F);
     fill(dummyArray_, black, GL_RGBA, GL_FLOAT);
-    dummy3D_ = gpu::createTexture3D(1, 1, 1, GL_RGBA16F);
-    glTextureSubImage3D(dummy3D_.id, 0, 0, 0, 0, 1, 1, 1, GL_RGBA, GL_FLOAT, black);
-    dummyCube_ = gpu::createCubemap(1, GL_RGBA16F);
-    fill(dummyCube_, black, GL_RGBA, GL_FLOAT);
     dummyCubeArray_ = gpu::createCubemapArray(1, 1, GL_RGBA16F);
     fill(dummyCubeArray_, black, GL_RGBA, GL_FLOAT);
 
@@ -198,11 +193,6 @@ void Renderer::setLightProbes(const std::vector<LightProbeDesc>& probes) {
     staticDirty_ = true;
 }
 
-void Renderer::setGlobalTexture(int slot, GLuint texture) {
-    if (slot >= 0 && slot < 5) globalTex_[slot] = texture;
-}
-
-GLuint Renderer::skyCubemap() const { return atmosphere_->skyCube(); }
 GLuint Renderer::specularProbes() const { return probes_->baked() ? probes_->specularArray() : dummyCubeArray_.id; }
 
 void Renderer::shutdown() {
@@ -214,7 +204,7 @@ void Renderer::shutdown() {
     planarRefl_->shutdown();
     atmosphere_->shutdown();
     brdfLut_.destroy();
-    for (auto* t : {&dummy2D_, &dummyArray_, &dummyCube_, &dummyCubeArray_, &dummy3D_, &dummyShadow_}) t->destroy();
+    for (auto* t : {&dummy2D_, &dummyArray_, &dummyCubeArray_}) t->destroy();
     frameUbo_.destroy();
     drawSsbo_.destroy();
     lightSsbo_.destroy();
@@ -231,6 +221,7 @@ void Renderer::setSettings(const RenderSettings& s) {
                           s.staticShadowCache != settings_.staticShadowCache;
     bool probesChanged = s.probeResolution != settings_.probeResolution || s.probeBounces != settings_.probeBounces ||
                          s.lightProbes != settings_.lightProbes;
+    bool planarChanged = s.planarReflections != settings_.planarReflections;
     settings_ = s;
     if (shadowsChanged && frameUbo_.id) shadows_->init(settings_.shadowMapSize, settings_.shadowCascades, settings_.staticShadowCache);
     if (probesChanged && frameUbo_.id) {
@@ -239,6 +230,7 @@ void Renderer::setSettings(const RenderSettings& s) {
         probes_->setProbes(keep);
     }
     if (resizeNeeded && width_ > 0) { int w = width_, h = height_; width_ = 0; resize(w, h); }
+    else if (planarChanged && width_ > 0) allocatePlanar();
 }
 
 void Renderer::createTargets(int w, int h) {
@@ -271,9 +263,15 @@ void Renderer::resize(int w, int h) {
     int rw = std::max(1, int(float(w) * settings_.renderScale)), rh = std::max(1, int(float(h) * settings_.renderScale));
     destroyTargets();
     createTargets(rw, rh);
-    // Planar reflections: half resolution, one array layer per reflector (up to 4).
-    planarRefl_->resize(std::max(1, rw / 2), std::max(1, rh / 2));
+    allocatePlanar();
     post_->resize(rw, rh);
+}
+
+// Planar reflections: half resolution, one array layer per reflector (up to 4), no targets
+// while they are off (Low preset).
+void Renderer::allocatePlanar() {
+    int layers = settings_.planarReflections ? std::max(1, int(planar_.size())) : 0;
+    planarRefl_->resize(std::max(1, rt_.w / 2), std::max(1, rt_.h / 2), layers);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -329,7 +327,8 @@ void Renderer::beginFrame(const Camera& cam, const Environment& env, float dt) {
     f.sunDirection = vec4(sunDir, 0.00465f);
     f.sunRadiance = vec4(sunLux * exposure, sunLum);
     float skyLux = env.physicalSky ? std::max(sunLum * 0.2f, 2000.0f) * env.skyIntensity : env.skyIlluminance;
-    f.skyParams = vec4(env.turbidity, skyLux * exposure, env.exposureEV100, float(frameIndex_));
+    // Frame index wrapped below 2^24 (exact as a float; a multiple of 64 for its &7, >>3 and mod-64 readers).
+    f.skyParams = vec4(env.turbidity, skyLux * exposure, env.exposureEV100, float(frameIndex_ & 0xFFFFFFu));
     // Fallback hemisphere ambient (only used when light probes are off / not baked yet).
     f.ambientSky = vec4(vec3(0.55f, 0.65f, 0.85f) * (skyLux * 0.12f / PI) * exposure, 0);
     f.ambientGround = vec4(vec3(0.85f, 0.78f, 0.68f) * (sunLum * 0.035f / PI) * exposure, 0);
@@ -370,6 +369,7 @@ void Renderer::addLight(const PointLight& l) { lights_.push_back(l); }
 int Renderer::addPlanarReflector(const PlanarReflector& r) {
     if (planar_.size() >= 4) return -1;
     planar_.push_back(r);
+    if (planarRefl_->colorArray() && int(planar_.size()) > planarRefl_->layers()) allocatePlanar();
     return int(planar_.size() - 1);
 }
 
@@ -404,34 +404,25 @@ const ShaderProgram* Renderer::programFor(const Material& mat, PassId pass, bool
 }
 
 void Renderer::bindGlobalTextures() {
-    // Keep every reserved unit complete with a dummy of the right type.
-    for (int u = TEXUNIT_SHADOW; u < TEXUNIT_COUNT; ++u) glBindTextureUnit(GLuint(u), dummy2D_.id);
+    // Keep every unit the lighting samples (8..15) complete with a dummy of the right type.
+    for (int u = TEXUNIT_SHADOW; u <= TEXUNIT_SSR; ++u) glBindTextureUnit(GLuint(u), dummy2D_.id);
     glBindTextureUnit(TEXUNIT_SHADOW, shadows_->depthArray());
     glBindSampler(TEXUNIT_SHADOW, g_samplerShadowCmp);
     glBindTextureUnit(TEXUNIT_SHADOW_DEPTH, shadows_->depthArray());
     glBindSampler(TEXUNIT_SHADOW_DEPTH, g_samplerShadowRaw);
-    glBindTextureUnit(TEXUNIT_IRRADIANCE, dummy2D_.id);  // irradiance SH lives in the LightingUBO
     glBindTextureUnit(TEXUNIT_SPECULAR, specularProbes());
     glBindTextureUnit(TEXUNIT_PLANAR, planarRefl_->colorArray() ? planarRefl_->colorArray() : dummyArray_.id);
     glBindTextureUnit(TEXUNIT_BRDF_LUT, brdfLut_.id);
-    glBindTextureUnit(TEXUNIT_SKY, atmosphere_->skyCube() ? atmosphere_->skyCube() : dummyCube_.id);
-    glBindTextureUnit(TEXUNIT_VOLUMETRIC, dummy3D_.id);
-    glBindTextureUnit(TEXUNIT_NOISE, dummyArray_.id);
-    for (int i = 0; i < 5; ++i)
-        if (globalTex_[i]) glBindTextureUnit(GLuint(TEXUNIT_GLOBAL0 + i), globalTex_[i]);
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_LIGHTING, lightingUbo_.id);
-}
-
-void Renderer::drawScene(PassId pass, bool transparents, uint32_t skipFlags) {
-    DrawFilter f;
-    f.skipFlags = skipFlags;
-    drawScene(pass, transparents, f);
 }
 
 void Renderer::drawScene(PassId pass, bool transparents, const DrawFilter& flt) {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_DRAWS, drawSsbo_.id);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, SSBO_LIGHTS, lightSsbo_.id);
     const ShaderProgram* current = nullptr;
+    // Opaques are sorted by material: look its program up once per run of items, not per draw.
+    const Material* memoMat = nullptr;
+    const ShaderProgram* memoProg = nullptr;
     int planarLayer = pass == PassId::Planar ? int(frame_.passInfo.y) : -2;
     for (const Item& it : items_) {
         const Material& mat = *it.d.material;
@@ -449,7 +440,11 @@ void Renderer::drawScene(PassId pass, bool transparents, const DrawFilter& flt) 
                 if (c.x >= b.lo.x && c.y >= b.lo.y && c.z >= b.lo.z && c.x <= b.hi.x && c.y <= b.hi.y && c.z <= b.hi.z) continue;
             }
         }
-        const ShaderProgram* p = programFor(mat, pass, flt.allowTessellation);
+        if (&mat != memoMat) {
+            memoProg = programFor(mat, pass, flt.allowTessellation);
+            memoMat = &mat;
+        }
+        const ShaderProgram* p = memoProg;
         if (!p) continue;
         if (p != current) { p->use(); current = p; }
         glProgramUniform1i(p->id, 0, int(it.drawIndex));

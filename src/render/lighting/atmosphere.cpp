@@ -2,7 +2,6 @@
 #include "lighting_data.h"
 #include "../material.h"
 #include "../shader.h"
-#include "../../core/log.h"
 
 using namespace m;
 

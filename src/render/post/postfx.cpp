@@ -17,6 +17,7 @@ struct PostUBOData {
     vec4 renderSize, halfSize, outputSize, timing;
     vec4 ao, aoB, ssr, ssrB, vol, volB, volC, taa, mb, dof, bloom, expo, expoB, display, grade, misc;
 };
+static_assert(sizeof(PostUBOData) == 20 * 16 && std::is_trivially_copyable_v<PostUBOData>, "PostUBOData mirrors PostUBO");
 
 constexpr int kBloomLevels = 6;
 constexpr int kNoiseUnit = 7;
@@ -81,8 +82,32 @@ struct PostFX::Impl {
         fbChainA.destroy();
     }
     void invalidateHistories() { aoValid = ssrValid = volValid = taaValid = false; }
+    // Targets of the optional effects, created on first use (resize destroys them): nothing is
+    // allocated for what the quality preset leaves off.
+    void ensureSSR() {
+        if (ssrHist[0].id) return;
+        for (int i = 0; i < 2; ++i) ssrHist[i] = gpu::createTexture2D(w, h, GL_RGBA16F);
+        hiz = gpu::createTexture2D(w, h, GL_RG32F, 0);
+        gpu::setFilter(hiz, GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST);
+        colorPyr = gpu::createTexture2D(w, h, GL_RGBA16F, std::min(gpu::mipCount(w, h), 8));
+        ssrRays = gpu::createTexture2D(hw, hh, GL_RGBA32F);
+        ssrResolved = gpu::createTexture2D(w, h, GL_RGBA16F);
+    }
+    void ensureVolumetrics() {
+        if (volRaw.id) return;
+        for (int i = 0; i < 2; ++i) volHist[i] = gpu::createTexture2D(hw, hh, GL_RGBA16F);
+        volRaw = gpu::createTexture2D(hw, hh, GL_RGBA16F);
+    }
+    void ensureDOF() {
+        if (dofHalf.id) return;
+        dofHalf = gpu::createTexture2D(hw, hh, GL_RGBA16F);
+        dofTiles = gpu::createTexture2D(divUp(hw, 8), divUp(hh, 8), GL_R16F);
+        dofBlur = gpu::createTexture2D(hw, hh, GL_RGBA16F);
+    }
+    // A texture to bind where an optional target does not exist (its pass is off: never sampled).
+    GLuint orNone(const gpu::Texture& t) const { return t.id ? t.id : ssrNone.id; }
     void beginFrame(PostSettings& s, const PostInputs& in);
-    void prepareDepth(const PostInputs& in);
+    void prepareDepth(const PostInputs& in, bool hiz0);
     void runGTAO(const PostInputs& in);
     void runSSR(const PostInputs& in);
     void runVolumetrics(const PostInputs& in);
@@ -163,24 +188,13 @@ void PostFX::resize(int renderW, int renderH) {
         I.linDepth[i] = gpu::createTexture2D(w, h, GL_R32F);
         I.halfDepth[i] = gpu::createTexture2D(hw, hh, GL_R32F);
         I.aoHist[i] = gpu::createTexture2D(hw, hh, GL_RGBA16F);
-        I.ssrHist[i] = gpu::createTexture2D(w, h, GL_RGBA16F);
-        I.volHist[i] = gpu::createTexture2D(hw, hh, GL_RGBA16F);
         I.taaHist[i] = gpu::createTexture2D(w, h, GL_RGBA16F);
     }
     I.halfNormal = gpu::createTexture2D(hw, hh, GL_RGBA8);
-    I.hiz = gpu::createTexture2D(w, h, GL_RG32F, 0);
-    gpu::setFilter(I.hiz, GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST);
     I.aoRaw = gpu::createTexture2D(hw, hh, GL_RGBA16F);
     I.aoOut = gpu::createTexture2D(w, h, GL_RGBA8);
-    I.colorPyr = gpu::createTexture2D(w, h, GL_RGBA16F, std::min(gpu::mipCount(w, h), 8));
-    I.ssrRays = gpu::createTexture2D(hw, hh, GL_RGBA32F);
-    I.ssrResolved = gpu::createTexture2D(w, h, GL_RGBA16F);
-    I.volRaw = gpu::createTexture2D(hw, hh, GL_RGBA16F);
     I.scene = gpu::createTexture2D(w, h, GL_RGBA16F);
     I.chainA = gpu::createTexture2D(w, h, GL_RGBA16F);
-    I.dofHalf = gpu::createTexture2D(hw, hh, GL_RGBA16F);
-    I.dofTiles = gpu::createTexture2D(divUp(hw, 8), divUp(hh, 8), GL_R16F);
-    I.dofBlur = gpu::createTexture2D(hw, hh, GL_RGBA16F);
     I.mbTile = std::clamp(int(std::lround(20.0 * double(h) / 1080.0)), 8, 32);
     I.mbTiles = gpu::createTexture2D(divUp(w, I.mbTile), divUp(h, I.mbTile), GL_RG16F);
     I.mbNeighbor = gpu::createTexture2D(divUp(w, I.mbTile), divUp(h, I.mbTile), GL_RG16F);
@@ -203,6 +217,10 @@ void PostFX::Impl::beginFrame(PostSettings& s, const PostInputs& in) {
     if (s.resetHistory || s.fade >= 0.999f) invalidateHistories();
     if (s.resetHistory) expoValid = false;
     s.resetHistory = false;
+    // A debug view shows its target even while the effect is off, as it did before targets were lazy.
+    if (s.ssr || s.debugView == 2 || s.debugView == 7) ensureSSR();
+    if ((s.volumetrics && in.shadowArray != 0) || s.debugView == 3) ensureVolumetrics();
+    if (s.dof || s.debugView == 4) ensureDOF();
     const QualityParams& q = kQuality[quality];
     const render::FrameUBOData& f = *in.frame;
     int bw = in.backbufferW > 0 ? in.backbufferW : w, bh = in.backbufferH > 0 ? in.backbufferH : h;
@@ -210,11 +228,13 @@ void PostFX::Impl::beginFrame(PostSettings& s, const PostInputs& in) {
     u.renderSize = vec4(float(w), float(h), 1.0f / float(w), 1.0f / float(h));
     u.halfSize = vec4(float(hw), float(hh), 1.0f / float(hw), 1.0f / float(hh));
     u.outputSize = vec4(float(bw), float(bh), 1.0f / float(bw), 1.0f / float(bh));
-    u.timing = vec4(in.dt, float(frameCounter), f.cameraPos.w, res);
+    // The counter is sent wrapped at 2^23: exact as a float, and a multiple of 8 keeps its &7 / &3
+    // readers continuous. The counter itself never wraps.
+    u.timing = vec4(in.dt, float(frameCounter & 0x7FFFFFu), f.cameraPos.w, res);
     u.ao = vec4(s.aoRadius, s.aoPower, 0.22f * float(hh), aoValid ? 1.0f : 0.0f);
     u.aoB = vec4(float(q.aoSlices), float(q.aoSteps), 0.62f, 0.0f);
     u.ssr = vec4(s.ssrMaxRoughness, s.ssrThickness, s.ssrIntensity, float(q.ssrIterations));
-    u.ssrB = vec4(0.08f, float(std::min(hiz.levels - 1, 8)), ssrValid ? 1.0f : 0.0f, 0.3f);
+    u.ssrB = vec4(0.08f, float(std::min(gpu::mipCount(w, h) - 1, 8)), ssrValid ? 1.0f : 0.0f, 0.3f);  // HiZ levels
     u.vol = vec4(s.volumetricDensity, s.volumetricAnisotropy, s.volumetricAmbient, s.volumetricMaxDistance);
     u.volB = vec4(float(q.volSteps), s.volumetricNoise, volValid ? 1.0f : 0.0f, s.dustMotes);
     u.volC = vec4(0.022f, 0.007f, -0.013f, 0.34f);
@@ -237,19 +257,21 @@ void PostFX::Impl::beginFrame(PostSettings& s, const PostInputs& in) {
     u.expoB = vec4(s.autoExposureSpeedUp, s.autoExposureSpeedDown, 0.104f, expoValid ? 1.0f : 0.0f);
     u.display = vec4(s.filmGrain, s.vignette, s.chromaticAberration * res, std::clamp(s.fade, 0.0f, 1.0f));
     u.grade = vec4(s.contrast, s.saturation, s.splitTone, 0.0f);
-    u.misc = vec4(float(s.debugView), s.ssrCompositeInResolve ? 1.0f : 0.0f, std::min(s.volumetricSkyDistance, s.volumetricMaxDistance), 0.0f);
+    u.misc = vec4(float(s.debugView), s.ssrCompositeInResolve ? 1.0f : 0.0f, std::min(s.volumetricSkyDistance, s.volumetricMaxDistance),
+                  postnoise::goldenPhase(frameCounter));
     glNamedBufferSubData(ubo.id, 0, sizeof(PostUBOData), &u);
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_POST, ubo.id);
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_FRAME, in.frameUbo);
     bindTex(kNoiseUnit, blueNoise.id);
 }
 
-void PostFX::Impl::prepareDepth(const PostInputs& in) {
+void PostFX::Impl::prepareDepth(const PostInputs& in, bool hiz0) {
     gpu::DebugGroup g("post.depth");
-    if (compute("shaders/post/depth_prep.comp")) {
+    if (const ShaderProgram* p = compute("shaders/post/depth_prep.comp")) {
         bindTex(0, in.rt->depth.id);
         bindImg(0, linDepth[cur]);
-        bindImg(1, hiz, 0);
+        glProgramUniform1i(p->id, 1, hiz0 ? 1 : 0);  // HiZ level 0: only SSR reads the pyramid
+        if (hiz0) bindImg(1, hiz, 0);
         gpu::dispatch2D(w, h);
     }
     if (compute("shaders/post/half_prep.comp")) {
@@ -395,7 +417,7 @@ void PostFX::computeAO(const PostInputs& in) {
     if (I.w != in.rt->w || I.h != in.rt->h) resize(in.rt->w, in.rt->h);
     gpu::DebugGroup g("post.computeAO");
     I.beginFrame(settings, in);
-    I.prepareDepth(in);
+    I.prepareDepth(in, settings.ssr);
     if (settings.ssao) I.runGTAO(in);
     else I.aoValid = false;
     // Units 0..7 are material units: leave them clean for the forward pass.
@@ -412,7 +434,7 @@ void PostFX::resolve(const PostInputs& in) {
     gpu::DebugGroup g("post.resolve");
     if (!I.frameOpen) {
         I.beginFrame(settings, in);
-        I.prepareDepth(in);
+        I.prepareDepth(in, settings.ssr);
     }
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_POST, I.ubo.id);
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_FRAME, in.frameUbo);
@@ -433,11 +455,11 @@ void PostFX::resolve(const PostInputs& in) {
         int flags = (doSSR && I.ssrValid && settings.ssrCompositeInResolve ? 1 : 0) | (doVol && I.volValid ? 2 : 0);
         glProgramUniform1i(p->id, 1, flags);
         bindTex(0, in.rt->hdr.id);
-        bindTex(1, I.ssrHist[I.cur].id);
+        bindTex(1, I.orNone(I.ssrHist[I.cur]));
         bindTex(2, in.rt->specular.id);
         bindTex(3, in.rt->normalRough.id);
         bindTex(4, I.linDepth[I.cur].id);
-        bindTex(5, I.volHist[I.cur].id);
+        bindTex(5, I.orNone(I.volHist[I.cur]));
         bindTex(6, I.halfDepth[I.cur].id);
         bindImg(0, I.scene);
         gpu::dispatch2D(I.w, I.h);
@@ -533,6 +555,7 @@ void PostFX::resolve(const PostInputs& in) {
         }
         if (settings.bloom || settings.debugView == 6) {
             int last = I.bloomDown.levels - 1;
+            glMemoryBarrier(GL_TEXTURE_UPDATE_BARRIER_BIT);  // the copy reads bloom_down's image stores
             glCopyImageSubData(I.bloomDown.id, GL_TEXTURE_2D, last, 0, 0, 0, I.bloomUp.id, GL_TEXTURE_2D, last, 0, 0, 0,
                                mipSize(I.hw, last), mipSize(I.hh, last), 1);
             if (const ShaderProgram* p = compute("shaders/post/bloom_up.comp")) {

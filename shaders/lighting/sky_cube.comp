@@ -1,4 +1,4 @@
-// Captures the sky (atmosphere + clouds, no sun disk) into the TEXUNIT_SKY cubemap.
+// Captures the sky (atmosphere + clouds, no sun disk) into the sky cubemap.
 #include "shaders/include/common.glsl"
 #include "shaders/lighting/lighting_ubo.glsl"
 #include "shaders/lighting/atmosphere.glsl"

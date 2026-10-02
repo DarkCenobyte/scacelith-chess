@@ -27,7 +27,6 @@ Texture createCubemapArray(int size, int cubes, GLenum internalFormat, int level
 void setFilter(const Texture& t, GLenum minFilter, GLenum magFilter);
 void setWrap(const Texture& t, GLenum wrap);
 void setAnisotropy(const Texture& t, float amount);
-void setDepthCompare(const Texture& t, bool enable);  // for sampler*Shadow (GL_GREATER not implied)
 
 struct Framebuffer {
     GLuint id = 0;
@@ -71,7 +70,6 @@ inline bool sphereVisible(const m::vec4* planes, int n, m::vec3 c, float r) {
 // Opt-in pass profiler (SCACELITH_GPU_PROFILE=1): each scope is bracketed by glFinish and timed on
 // the CPU, which measures real execution time on any driver (including llvmpipe). Zero cost when
 // disabled. Results are logged by profileEndFrame() every 'every' frames.
-bool profilingEnabled();
 struct ProfileScope {
     explicit ProfileScope(const char* name);
     ~ProfileScope();

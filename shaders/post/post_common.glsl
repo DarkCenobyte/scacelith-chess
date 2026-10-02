@@ -6,7 +6,7 @@ layout(std140, binding = 3) uniform PostUBO {
     vec4 renderSize;   // w, h, 1/w, 1/h
     vec4 halfSize;     // hw, hh, 1/hw, 1/hh (checkerboard half resolution)
     vec4 outputSize;   // backbuffer w, h, 1/w, 1/h
-    vec4 timing;       // x dt, y post frame counter, z time (s), w 1080p scale (h / 1080)
+    vec4 timing;       // x dt, y post frame counter (wrapped at 2^23), z time (s), w 1080p scale (h / 1080)
     vec4 ao;           // x radius (m), y power, z max screen radius (px, half res), w history valid
     vec4 aoB;          // x slices, y steps per side, z falloff range fraction, w -
     vec4 ssr;          // x max roughness, y thickness (relative), z intensity, w max iterations
@@ -22,7 +22,7 @@ layout(std140, binding = 3) uniform PostUBO {
     vec4 expoB;        // x speed up, y speed down, z target (pre-exposed middle grey), w history valid
     vec4 display;      // x grain, y vignette, z chromatic aberration (px), w fade
     vec4 grade;        // x contrast, y saturation, z split tone, w -
-    vec4 misc;         // x debug view, y ssr composite in resolve, z volumetric sky march distance, w -
+    vec4 misc;         // x debug view, y ssr composite in resolve, z volumetric sky march distance, w blue-noise phase
 } post;
 
 layout(binding = 7) uniform sampler2D uBlueNoise;
@@ -31,7 +31,7 @@ layout(binding = 7) uniform sampler2D uBlueNoise;
 float blueNoise(ivec2 p, int channel) {
     ivec2 o = ivec2(channel * 19 + 7, channel * 41 + 3);
     float v = texelFetch(uBlueNoise, (p + o) & 63, 0).r;
-    return fract(v + post.timing.y * 0.61803398875 * float(1 + channel));
+    return fract(v + post.misc.w * float(1 + channel));  // misc.w = frac(frame * 0.61803398875)
 }
 float blueNoiseStatic(ivec2 p, int channel) {
     ivec2 o = ivec2(channel * 19 + 7, channel * 41 + 3);

@@ -1,5 +1,4 @@
 #include "mesh.h"
-#include "../core/log.h"
 #include <cstddef>
 
 using namespace m;
@@ -89,11 +88,6 @@ void MeshData::computeTangents() {
     }
 }
 
-void MeshData::flipWinding() {
-    for (size_t i = 0; i < indices.size(); i += 3) std::swap(indices[i + 1], indices[i + 2]);
-    for (auto& v : vertices) v.normal = -v.normal;
-}
-
 void Mesh::upload(const MeshData& d, const char* debugName) {
     destroy();
     if (debugName) name = debugName;
@@ -164,18 +158,12 @@ MeshData roundedBox(vec3 h, float r, int seg) {
         uint32_t base = uint32_t(d.vertices.size());
         for (int j = 0; j <= n; ++j)
             for (int i = 0; i <= n; ++i) {
-                // Place grid lines densely near the edges so the rounded part is well sampled.
-                auto remap = [&](float t) {
-                    float s = t * 2 - 1;
-                    return sign(s) * std::pow(std::fabs(s), 1.0f);
-                };
-                float su = remap(float(i) / n), sv = remap(float(j) / n);
+                // Uniform grid over the face, in [-1, 1].
+                float su = float(i) / n * 2 - 1, sv = float(j) / n * 2 - 1;
                 vec3 p = (f.n + f.u * su + f.v * sv) * h;
-                vec3 c = clamp(p, -1e9f, 1e9f);
                 vec3 q = vec3(clamp(p.x, -inner.x, inner.x), clamp(p.y, -inner.y, inner.y), clamp(p.z, -inner.z, inner.z));
                 vec3 dir = p - q;
                 vec3 nrm = length2(dir) > 1e-12f ? normalize(dir) : f.n;
-                (void)c;
                 Vertex v;
                 v.pos = q + nrm * r;
                 v.normal = nrm;

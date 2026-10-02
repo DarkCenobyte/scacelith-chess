@@ -172,6 +172,9 @@ endif()
 file(GLOB TEST_SOURCES CONFIGURE_DEPENDS ${ROOT}/tests/*.cpp)
 if(TEST_SOURCES)
     add_executable(scacelith_tests ${TEST_SOURCES})
+    # The shader preprocessor's tests: shader.cpp needs the GL entry points only to link (they
+    # stay null, no GL library: the tests never compile a program).
+    target_sources(scacelith_tests PRIVATE ${ROOT}/src/render/shader.cpp ${ROOT}/src/gl/gl46.cpp)
     target_compile_options(scacelith_tests PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
     target_link_libraries(scacelith_tests PRIVATE scacelith_core)
     if(WIN32)

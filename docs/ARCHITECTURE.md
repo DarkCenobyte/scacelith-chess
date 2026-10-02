@@ -91,9 +91,8 @@ Helpers: `shEvalProbe(k * 9, n)`, `shEvalSky(n)`.
 `probeInfo.y`; `TEXUNIT_PLANAR` = RGBA16F 2D array (one layer per reflector, half res, Gaussian mip
 chain; alpha = distance from the mirror plane to the reflected surface, 1000 for the sky);
 `TEXUNIT_BRDF_LUT` = RGBA16F 128²: r,g = split-sum DFG (A, B) indexed by (NoV, perceptual
-roughness), b = Charlie sheen directional albedo; `TEXUNIT_SKY` = RGBA16F cube (64², full mips):
-pre-exposed sky radiance without the sun disk (clouds included). `Renderer::setGlobalTexture(slot,
-tex)` binds `TEXUNIT_GLOBAL0 + slot` (0..4) every pass.
+roughness), b = Charlie sheen directional albedo. Units 16..23 (`TEXUNIT_SKY`, `TEXUNIT_VOLUMETRIC`,
+`TEXUNIT_NOISE`, `TEXUNIT_GLOBAL0`..) are reserved and not bound.
 
 **Sun shadows.** `RenderSettings::shadowCascades` (2 or 3) cascades fitted to fixed receiver
 regions (`Renderer::setShadowRegions`, finest first; default: table + seated players, the area
@@ -152,7 +151,7 @@ shadows.
 
 **Other additive API.** `DRAW_NO_CULL` (items are otherwise frustum culled by their bounding
 sphere in every pass), `DrawFilter` + `Renderer::drawScene(pass, transparents, filter)`,
-`Renderer::renderSky()` (public), `skyCubemap()`, `specularProbes()`, `lightingUBO()`, `brdfLut()`,
+`Renderer::renderSky()` (public), `specularProbes()`, `lightingUBO()`, `brdfLut()`,
 `environment()`, `RenderSettings::{shadowCascades, staticShadowCache, lightProbes,
 probeResolution, probeBounces, specularAA}` (set by the quality presets). GLSL: `sq(vec2/vec3)`,
 `F_Schlick(vec3 f0, vec3 f90, float)`, `gtaoMultiBounce()`, `specularOcclusion()`; the baseline
