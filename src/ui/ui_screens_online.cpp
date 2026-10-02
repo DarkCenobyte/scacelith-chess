@@ -1679,6 +1679,8 @@ void pageDirectWait(float t) {
     if (cancel || im::consumeBack()) {
         s.closeDirect();
         setSub(Sub::DirectHost);
+    } else if (st == DS::Idle) {
+        setSub(Sub::DirectHost);  // closed under the page (a server challenge accepted): back to the form
     }
 }
 
