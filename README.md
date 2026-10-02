@@ -276,9 +276,10 @@ fallback); `--lang <code>` overrides the language for one session.
 
 Requirements: CMake 3.21+, Ninja, GCC with GNU binutils (tested with GCC 13; on Windows,
 MinGW-w64 GCC with POSIX threads; Clang cannot build the embedded Stockfish variants), and
-Python 3 for the instruction-set audits that run at every build (without it they are skipped,
-with a warning). The Linux build also needs the OpenSSL 3, X11 and OpenGL development files (for
-example `libssl-dev`, `libx11-dev` and `libgl-dev`). The Windows build is produced with
+Python 3 for the instruction-set audits and the Windows exception table check that run at every
+build (a Windows Release build, the shipped exe, does not configure without it; other builds skip
+them with a warning). The Linux build also needs the OpenSSL 3, X11 and OpenGL development files
+(for example `libssl-dev`, `libx11-dev` and `libgl-dev`). The Windows build is produced with
 MinGW-w64 (native or cross-compiled from Linux) and is a single self-contained executable
 (Stockfish 19 and its neural network are embedded). Stockfish is compiled once per x86-64
 instruction set, from plain x86-64 to AVX-512, and the game runs the best one the CPU supports;

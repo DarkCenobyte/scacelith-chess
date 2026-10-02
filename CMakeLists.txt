@@ -107,6 +107,11 @@ set_source_files_properties(${ROOT}/src/tts/kernels_avx512.cpp PROPERTIES COMPIL
 # shows an instruction above baseline outside the kernel units, one above a unit's level inside it,
 # or a reference into a unit other than from the dispatcher (src/tts/cpu.cpp).
 find_package(Python3 COMPONENTS Interpreter)
+# The shipped exe (a Windows Release build) is never built without the instruction-set audits and
+# the .pdata check below; other builds skip them with a warning.
+if(WIN32 AND CMAKE_BUILD_TYPE STREQUAL "Release" AND NOT Python3_Interpreter_FOUND)
+    message(FATAL_ERROR "Python 3 not found: a Windows Release build needs it for the instruction-set audits and the .pdata check")
+endif()
 if(Python3_Interpreter_FOUND AND EXISTS ${ROOT}/third_party/stockfish/tools/isa_audit.py)
     add_executable(tts_isa_probe ${ROOT}/tools/tts_isa_probe.cpp)
     target_link_libraries(tts_isa_probe PRIVATE scacelith_core)
