@@ -692,7 +692,6 @@ void GameScene::startCoachGame() {
     c.director.speed = coachLevel_ == 0 ? coach::kLessonSpeechSpeed : 1.0f;
     c.introduceLevel = s.coachHistory.empty() || s.coachHistory.back().level != coachLevel_;
     c.offersEnabled = true;
-    c.seed = rt.seed;
     for (const Settings::CoachGame& g : s.coachHistory) c.history.push_back({g.level, g.result, g.accuracy});
     c.accuracyExplained = s.coachAccuracyExplained;
     c.lessonChapter = s.coachLessonChapter;

@@ -161,7 +161,6 @@ SessionConfig levelConfig(int level, chess::Color human = chess::White) {
     SessionConfig c;
     c.level = level;
     c.human = human;
-    c.seed = 7;
     return c;
 }
 
