@@ -431,9 +431,10 @@ void answered(Sub page, bool ok, const std::string& note, const std::string& err
 }
 
 // Recovery codes just received (shown once): to 'page', which shows them, whatever page the player
-// went to meanwhile, except a direct match's (its host would keep listening unseen).
+// went to meanwhile. The answers are not taken on a direct match's pages (its host would keep
+// listening unseen): they wait there until the player leaves them.
 void showCodes(Sub page) {
-    if (O.sub != page && !isDirect(O.sub) && ses().signedIn()) setSub(page);
+    if (O.sub != page && ses().signedIn()) setSub(page);
 }
 
 void pumpResults() {
@@ -511,7 +512,7 @@ void pumpResults() {
             O.error = game::onlineErrorText(e.error, e.retryAfterSec);
         }
     }
-    if (s.take(Kind::MfaEnableResult, e)) {
+    if (!isDirect(O.sub) && s.take(Kind::MfaEnableResult, e)) {
         if (e.ok) {
             O.codes = e.recoveryCodes;
             O.mfaStep = 2;
@@ -529,7 +530,7 @@ void pumpResults() {
         if (e.ok) clearSecrets();
         answered(Sub::MfaOff, e.ok, T("online.mfa.off_done"), game::onlineErrorText(e.error, e.retryAfterSec));
     }
-    if (s.take(Kind::RecoveryCodesResult, e)) {
+    if (!isDirect(O.sub) && s.take(Kind::RecoveryCodesResult, e)) {
         if (e.ok) {
             O.codes = e.recoveryCodes;
             O.mfaStep = 2;
