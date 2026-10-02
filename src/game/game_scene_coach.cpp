@@ -115,6 +115,7 @@ struct CoachRuntime {
     // Subtitles, HUD
     std::string subText;
     float subAge = 0.0f, subHold = 0.0f;
+    bool subVoiced = false;                           // the line shown is heard (its voice started with it)
     bool offerShown = false, skipHint = false;
     float offerAge = 0.0f;                            // seconds the takeback card has been up
     bool forceSubtitles = false;                      // the stage test shows its line whatever the option
@@ -345,6 +346,8 @@ public:
         r.subText = written;
         r.subAge = 0.0f;
         r.subHold = holdSeconds;
+        // The director starts a line's voice just before its subtitle (Director::begin).
+        r.subVoiced = r.voiceActive && r.voiceGameT == 0.0;
     }
     float readingTime(const std::string& written) const override { return ui::subtitleDuration(written, 0.0f); }
 
@@ -1256,8 +1259,10 @@ void GameScene::drawCoachSubtitles() {
     if (!coach() || !coach_) return;
     CoachRuntime& rt = *coach_;
     const std::string ui = i18n::language();
-    bool shown = rt.forceSubtitles ||
-                 coachSubtitlesShown(settings().subtitles, ui, coach::speechLanguage(ui), rt.stage->voiceAvailable());
+    // A line that is not heard (its synthesis failed, its voice was refused) stays shown, as the
+    // director decided; the setting is checked again for the others (it may change mid-line).
+    bool shown = rt.forceSubtitles || coachSubtitlesShown(settings().subtitles, ui, coach::speechLanguage(ui),
+                                                          rt.stage->voiceAvailable() && rt.subVoiced);
     bool blocked = paused_ || ui::optionsOpen() || turn_ == Turn::HumanPromotion;
     ui::Subtitle sub;
     if (shown && !blocked && !rt.subText.empty()) {
