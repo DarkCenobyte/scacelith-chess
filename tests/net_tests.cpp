@@ -4066,8 +4066,12 @@ TEST(net_account_delete_closes_realtime_first) {
         seen.clear();
         CHECK(waitEvent(c, K::AccountDeleted, ev, 10000, &seen));
         CHECK_EQ(ev.error, std::string("invalid_password"));
-        CHECK(waitEvent(c, K::Welcome, ev, 10000, &seen));
-        // Offline in between (net-rt's event may come before or after AccountDeleted).
+        // net-rt's events may come before or after AccountDeleted, the new Welcome too.
+        const bool welcomed = std::any_of(seen.begin(), seen.end(), [](const net::Event& e) {
+            return e.kind == net::Event::Kind::Welcome;
+        });
+        if (!welcomed) CHECK(waitEvent(c, K::Welcome, ev, 10000, &seen));
+        // Offline in between.
         CHECK(std::any_of(seen.begin(), seen.end(), [](const net::Event& e) {
             return e.kind == net::Event::Kind::ConnectionChanged && e.state == net::ConnState::Offline;
         }));
