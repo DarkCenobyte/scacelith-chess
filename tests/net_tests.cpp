@@ -1177,6 +1177,47 @@ TEST(net_transport_refuses_insecure) {
 // std::bad_alloc out of the transport. The abort action it gave its CancelToken (closing its
 // socket or handle, locals of the call) is taken back all the same, so that a later cancel() (the
 // client's shutdown) never reaches a socket or handle that is gone; the token serves again.
+// A server that accepts the request and says nothing: the request and the WebSocket upgrade end
+// at their timeout (Wine's WinHTTP waits for the response headers with a timeout of its own).
+TEST(net_transport_silent_server_times_out) {
+    if (!net::transportAvailable()) return;
+    fakehttp::Server srv(
+        [](const fakehttp::Request&) {
+            fakehttp::Reply rep;
+            rep.silenceMs = 6000;
+            return rep;
+        },
+        true);
+    CHECK(srv.ok());
+    net::HttpRequest req;
+    req.host = "127.0.0.1";
+    req.port = srv.port();
+    req.tls = false;
+    req.path = "/api/v1/info";
+    req.timeoutMs = 1000;
+    net::HttpResponse resp;
+    auto t0 = std::chrono::steady_clock::now();
+    net::httpRequest(req, resp);
+    double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    std::fprintf(stderr, "  request: %s after %.0f ms\n", resp.error.c_str(), ms);
+    CHECK_EQ(resp.error, std::string("timeout"));
+    CHECK(ms < 4000);
+    net::WsParams p;
+    p.host = "127.0.0.1";
+    p.port = srv.port();
+    p.tls = false;
+    p.subprotocol = "scacelith.v1";
+    p.timeoutMs = 1000;
+    std::string error;
+    int status = 0;
+    t0 = std::chrono::steady_clock::now();
+    std::unique_ptr<net::WebSocket> ws = net::wsConnect(p, error, status, nullptr);
+    ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    std::fprintf(stderr, "  upgrade: %s after %.0f ms\n", error.c_str(), ms);
+    CHECK(!ws);
+    CHECK(ms < 4000);
+}
+
 // Chunked answers to httpRequest: chunk sizes that end the reads anywhere (in a size line, in the
 // data, between CR and LF), a large body in linear time, malformed and truncated codings.
 TEST(net_transport_chunked_answers) {

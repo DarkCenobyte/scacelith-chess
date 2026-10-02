@@ -157,6 +157,10 @@ bool openRequest(const std::string& host, uint16_t port, bool tls, const std::st
                                  WINHTTP_DEFAULT_ACCEPT_TYPES, tls ? WINHTTP_FLAG_SECURE : 0));
     if (!req.get()) { error = "network"; detail = "WinHttpOpenRequest " + std::to_string(GetLastError()); return false; }
     WinHttpSetTimeouts(req.get(), timeoutMs, timeoutMs, timeoutMs, timeoutMs);
+    // The wait for the response headers has its own timeout (90 s by default), which some
+    // WinHTTP implementations (Wine's) apply instead of the receive timeout.
+    DWORD headersTimeout = DWORD(timeoutMs);
+    WinHttpSetOption(req.get(), WINHTTP_OPTION_RECEIVE_RESPONSE_TIMEOUT, &headersTimeout, sizeof(headersTimeout));
     DWORD features = WINHTTP_DISABLE_REDIRECTS | WINHTTP_DISABLE_COOKIES;
     if (!WinHttpSetOption(req.get(), WINHTTP_OPTION_DISABLE_FEATURE, &features, sizeof(features))) {
         features = WINHTTP_DISABLE_REDIRECTS;
@@ -489,10 +493,6 @@ void httpStream(const HttpRequest& r, const std::function<bool(const HttpHead&)>
     Handle conn, req;
     std::string pin = r.tls ? r.pinnedSha256 : std::string();
     if (!openRequest(r.host, r.port, r.tls, r.method, r.path, pin, r.timeoutMs, conn, req, resp.error, resp.detail)) return;
-    // The wait for the response headers has its own timeout (90 s by default), which some
-    // WinHTTP implementations (Wine's) apply instead of the receive timeout.
-    DWORD headersTimeout = DWORD(r.timeoutMs);
-    WinHttpSetOption(req.get(), WINHTTP_OPTION_RECEIVE_RESPONSE_TIMEOUT, &headersTimeout, sizeof(headersTimeout));
     RequestContext ctx;
     ctx.pin = pin;
     ctx.request = &req;
