@@ -895,6 +895,12 @@ void GameScene::coachOfferDraw() {
         ui::notify(i18n::tr("notify.draw_already_offered"), 2.5f);
         return;
     }
+    coachEvaluateDraw();
+}
+
+void GameScene::coachEvaluateDraw() {
+    CoachRuntime& rt = coachRuntime();
+    int ply = int(game_.moves().size());
     drawOfferPly_ = ply;
     // The coach answers from a full-strength evaluation of the position (its own play is weakened).
     ai::AnalysisRequest r;
@@ -989,9 +995,13 @@ void GameScene::updateCoach(float dt) {
             LOGI("coach: draw offer %s (%d cp for the coach)", accept ? "accepted" : "declined", coachCp);
         }
         rt.drawAnalysis = 0;
-        // An offer the game went past lapsed (the player moved or took a move back since; the
-        // coach's own move waits for its answer, see coachHoldsMove): it is answered as declined.
-        if (state_ == State::Playing) {
+        // The player moved or took a move back before the answer (the coach's own move waits for
+        // it, see coachHoldsMove). The offer stands until the coach answers (FIDE 9.1.2.3): it is
+        // evaluated again in the position now on the board.
+        if (state_ == State::Playing && rt.drawPly != int(game_.moves().size())) {
+            LOGI("coach: draw offer of ply %d evaluated again at ply %d", rt.drawPly, int(game_.moves().size()));
+            coachEvaluateDraw();
+        } else if (state_ == State::Playing) {
             ui::notify(i18n::tr(accept ? "notify.draw_accepted" : "notify.draw_declined"), 3.0f);
             if (rt.sessionRunning) rt.session.onDrawAnswer(accept);
             if (accept) {

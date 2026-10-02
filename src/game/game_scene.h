@@ -393,6 +393,7 @@ private:
     void persistCoachResults();               // Settings [coach] from the session (once per game)
     bool coachCanTakeBack() const;            // the Esc menu's "Take back" (session and scoresheets)
     void coachOfferDraw();                    // the Esc menu: the coach answers after an analysis
+    void coachEvaluateDraw();                 // that analysis, of the position on the board
     void coachPauseMenuFrame();               // the Esc menu of a coach game (paused_)
     void coachHudFrame();                     // the takeback card and the skip hint, their answers
     void runCoachTable(float dt);             // the coach's table jobs (demonstrations, takebacks...)
