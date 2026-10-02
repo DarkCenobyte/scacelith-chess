@@ -436,6 +436,33 @@ TextStyle valueStyle(bool enabled, float hover) {
 }
 float centerBaseline(const Rect& r, const TextStyle& st) { return r.cy() + gfx::capHeight(st) * 0.5f; }
 
+// The label of a Primary or Secondary button: Cinzel, shrunk down to 62 % to fit kButtonLabelPad
+// inside each end of the frame, and cut ("…") beyond that, so that it never crosses the frame.
+constexpr float kButtonMinScale = 0.62f, kButtonLabelPad = 14.0f;
+TextStyle buttonLabelStyle() {
+    TextStyle st;
+    st.face = font::FACE_TITLE;
+    st.size = kButton;
+    st.tracking = kTrackTitle;
+    st.align = HAlign::Center;
+    return st;
+}
+std::string elideToFit(const std::string& s, const TextStyle& st, float maxWidth) {
+    // Half a unit of slack: a label fitSize() shrank to the exact width measures a hair over it.
+    if (gfx::textWidth(s, st) <= maxWidth + 0.5f) return s;
+    const char* const ellipsis = "\xE2\x80\xA6";
+    std::u32string cps = uni::decode(s);
+    size_t lo = 0, hi = cps.size();
+    while (lo < hi) {  // the longest start that fits with the ellipsis
+        size_t mid = (lo + hi + 1) / 2;
+        if (gfx::textWidth(uni::encode(cps.substr(0, mid)) + ellipsis, st) <= maxWidth) lo = mid;
+        else hi = mid - 1;
+    }
+    std::u32string head = cps.substr(0, lo);
+    while (!head.empty() && head.back() == U' ') head.pop_back();
+    return uni::encode(head) + ellipsis;
+}
+
 // Info mark: a circled "i" this far after the label (centre), and the room a label leaves for it.
 constexpr float kInfoRadius = 8.5f;
 constexpr float kInfoOffset = 13.0f + kInfoRadius;
@@ -504,14 +531,10 @@ bool menuEntry(const std::string& label, const Rect& r, bool enabled, HAlign ali
 bool button(const std::string& label, const Rect& r, ButtonKind kind, bool enabled, uint32_t extraFlags) {
     uint32_t flags = (extraFlags & ITEM_MOUSE_ONLY) ? 0u : ITEM_FOCUSABLE;
     Item it = item(makeId(label), r, (enabled ? flags : ITEM_DISABLED) | extraFlags);
-    const std::string shown = displayText(label);
+    std::string shown = displayText(label);
     float t = it.hoverT, p = it.pressT;
     gfx::pushAlpha(enabled ? 1.0f : 0.4f);
-    TextStyle st;
-    st.face = font::FACE_TITLE;
-    st.size = kButton;
-    st.tracking = kTrackTitle;
-    st.align = HAlign::Center;
+    TextStyle st = buttonLabelStyle();
     if (kind == ButtonKind::Primary) {
         gfx::shadow(r.offset(0, 4), 3, 18, withAlpha(black, 0.5f));
         vec4 top = theme::mix(velvet, velvetBright, t * 0.8f);
@@ -537,11 +560,29 @@ bool button(const std::string& label, const Rect& r, ButtonKind kind, bool enabl
         float base = centerBaseline(r, st);
         gfx::fillH(Rect(r.cx() - w * 0.5f, gfx::snap(base + 5.0f), w, gfx::px()), withAlpha(gold, 0.6f * t), withAlpha(gold, 0.1f * t));
     }
-    if (kind != ButtonKind::Quiet) st.size = gfx::fitSize(shown, st, r.w - 28.0f, 0.62f);
+    if (kind != ButtonKind::Quiet) {
+        st.size = gfx::fitSize(shown, st, r.w - 2.0f * kButtonLabelPad, kButtonMinScale);
+        shown = elideToFit(shown, st, r.w - 2.0f * kButtonLabelPad);
+    }
     gfx::text(shown, r.cx(), centerBaseline(r, st) + p, st);
     gfx::popAlpha();
     if (it.activated) sound(Sound::Click);
     return it.activated;
+}
+
+bool buttonLabelFits(const std::string& label, float width) {
+    TextStyle st = buttonLabelStyle();
+    st.size *= kButtonMinScale;
+    return gfx::textWidth(displayText(label), st) <= width - 2.0f * kButtonLabelPad;
+}
+
+void disabledButton(const std::string& label, const Rect& r, ButtonKind kind, const std::string& why, const Rect& within) {
+    button(label, r, kind, false);
+    // An item of its own over the disabled one, for the tip only: hovered or focused, it shows a
+    // faint frame (the focus stops there) and the reason; activating it does nothing.
+    Item it = item(makeId(label + "##why"), r, ITEM_FOCUSABLE | ITEM_SILENT);
+    if (it.hoverT > 0.01f) gfx::stroke(r, withAlpha(gold, 0.3f * it.hoverT), 0.0f, 1.5f);
+    tooltip(why, within);
 }
 
 bool toggleRow(const std::string& label, bool& value, const Rect& r, bool enabled) {
@@ -979,8 +1020,10 @@ float formLabel(const std::string& label, const Rect& r, float reserved, bool en
 
 namespace {
 // Floating tip box: at the mouse, or under 'below' from its start side (fromStart) or its end
-// side, above it when there is no room below. 'fade' 0..1.
-void drawTip(const std::string& text, float fade, bool atMouse, const Rect& below, bool fromStart) {
+// side, above it when there is no room below. 'fade' 0..1. 'within' (when not empty, e.g. the
+// page's panel): the tip stays inside it too; when it would cross its bottom edge, it goes above
+// the item ('below') rather than above the mouse, so that the item stays readable.
+void drawTip(const std::string& text, float fade, bool atMouse, const Rect& below, bool fromStart, const Rect& within = Rect()) {
     gfx::Layer prev = gfx::layer();
     gfx::setLayer(gfx::LAYER_TOP);
     TextStyle st;
@@ -998,8 +1041,12 @@ void drawTip(const std::string& text, float fade, bool atMouse, const Rect& belo
     vec2 view = gfx::viewSize();
     vec2 p = atMouse ? mouse() + vec2(rtl() ? -18.0f - w : 18.0f, 26.0f)
                      : vec2(fromStart != rtl() ? below.x : below.r() - w, below.b() + 6.0f);
-    p.x = m::clamp(p.x, 8.0f, view.x - w - 8.0f);
-    if (p.y + h > view.y - 8.0f) p.y = (atMouse ? mouse().y : below.y) - h - 10.0f;
+    const bool bounded = within.w > 0.0f && within.h > 0.0f;
+    const float left = bounded ? std::max(8.0f, within.x + 8.0f) : 8.0f;
+    const float right = std::min(view.x, bounded ? within.r() : view.x) - 8.0f;
+    p.x = m::clamp(p.x, left, std::max(left, right - w));
+    if (bounded && p.y + h > std::min(view.y, within.b()) - 8.0f) p.y = below.y - h - 10.0f;
+    else if (p.y + h > view.y - 8.0f) p.y = (atMouse ? mouse().y : below.y) - h - 10.0f;
     Rect r(p.x, p.y, w, h);
     gfx::shadow(r.offset(0, 6), 3, 24, withAlpha(black, 0.6f * fade));
     gfx::fillV(r, vec4(0.08f, 0.07f, 0.06f, 0.96f * fade), vec4(0.05f, 0.045f, 0.04f, 0.96f * fade), 2.0f);
@@ -1050,13 +1097,15 @@ void infoMark(const std::string& text) {
 }
 }  // namespace
 
-void tooltip(const std::string& text) {
+void tooltip(const std::string& text) { tooltip(text, Rect()); }
+
+void tooltip(const std::string& text, const Rect& within) {
     if (text.empty()) return;
     if (c.infoMarks) {
         if (c.last.hasLabel) {
             infoMark(text);
         } else if (c.kbMode && c.last.id == c.focus && c.last.highlight && c.last.highlightTime >= 0.7f) {
-            drawTip(text, m::saturate((c.last.highlightTime - 0.7f) / 0.15f), false, c.last.r, false);
+            drawTip(text, m::saturate((c.last.highlightTime - 0.7f) / 0.15f), false, c.last.r, false, within);
         }
         return;
     }
@@ -1064,7 +1113,7 @@ void tooltip(const std::string& text) {
     // the hovered one's.
     bool owner = c.kbMode ? c.last.id == c.focus : c.last.hovered;
     if (!owner || !c.last.highlight || c.last.highlightTime < 0.55f) return;
-    drawTip(text, m::saturate((c.last.highlightTime - 0.55f) / 0.15f), !c.kbMode, c.last.r, false);
+    drawTip(text, m::saturate((c.last.highlightTime - 0.55f) / 0.15f), !c.kbMode, c.last.r, false, within);
 }
 
 int confirmDialog(const char* idStr, const std::string& title, const std::string& message, const std::string& confirmLabel,

@@ -17,12 +17,33 @@
 // placed first and pressed 0.6-1.0 s later. Silent while it is away and once the game is over.
 // The local player's gestures are accepted and ignored.
 //
+// The account API (dedicated-server/docs/API.md) answers like the server: a game history made
+// from the account's name (the same ~45 games every time: legal moves, every kind of ending,
+// clocks that follow the time control, ratings that lead to the account's ones; the games played
+// against the fake are added at the top), served page by page with its filters; the details and
+// the PGN of each game (the server's format: its tags, [%clk]/[%emt] comments, the end reason);
+// four signed-in devices (this one, two others, one without a label); the challenge preference
+// (no demo challenge when it is off); an e-mail change waiting for its link, which the fake
+// "opens" 40 s later; the data export (five attempts an hour, failed ones included, checked
+// before the password as the server's router does) and the deletion of the account. Animated
+// GIFs of the history's games and of PGN texts: a small but valid GIF89a drawn by the fake (a tiny
+// board, a frame per move; the tests decode it), after a render time that grows with the game,
+// with the server's quota per account (four renders a minute, thirty an hour; a GIF asked again
+// costs nothing) and its checks (options, unreadable PGN, more than 600 moves).
+//
 // Special inputs to try the error paths: user name "banned", "unverified" or "ratelimited",
 // password "wrong", a user name containing "mfa" (asks for a code), a custom server host
 // containing "offline", "badcert" or "old" (network, certificate, incompatible version); direct
 // match: address "refused.test", "timeout.test" or "unknown.test", a code that is not 12
 // characters, a code starting with "2222" (wrong code), host port 47199 (no UPnP router) or
-// 47198 (carrier-grade NAT).
+// 47198 (carrier-grade NAT). Account API: a user name containing "newbie" (no games yet),
+// password "wrong" when changing the e-mail, exporting or deleting (invalid_password), with
+// two-factor on no code (mfa_code_required) or "000000" (invalid_code), a new address equal to
+// the current one (same_email) or without "@" and a dot (invalid_email), a host containing
+// "noverify" (a server without e-mail confirmation: the address changes at once; one containing
+// "taken" is refused, email_taken). GIFs: game id 429 (rate_limited, retry after 2 min 30 s) or
+// 503 (server_busy, retry after 8 s), a PGN whose White or Black is "ratelimited" or "serverbusy"
+// (the same), a host containing "nogif" (gif_disabled).
 //
 // Used by src/game/online_stub.cpp (the OnlineClient / DirectMatch implementation of builds
 // without the real network layer, i.e. without SCACELITH_NET_REAL) and meant to back a
@@ -85,6 +106,17 @@ public:
     void mfaDisable(const std::string& password, const std::string& codeOrRecovery);
     void regenerateRecoveryCodes(const std::string& password, const std::string& code);
     void report(uint64_t gameId, const std::string& username, const std::string& category, const std::string& comment);
+    void fetchMyGames(uint64_t before, int limit, const GamesFilter& filter);
+    void fetchGame(uint64_t gameId);
+    void downloadPgn(uint64_t gameId);
+    void fetchSessions();
+    void revokeSession(int64_t sessionId);
+    void setAcceptChallenges(bool accept);
+    void changeEmail(const std::string& newEmail, const std::string& password, const std::string& codeOrRecovery);
+    void exportAccount(const std::string& password, const std::string& codeOrRecovery);
+    void deleteAccount(const std::string& password, const std::string& codeOrRecovery);
+    void downloadGameGif(uint64_t gameId, const GifOptions& options);
+    void renderPgnGif(const std::string& pgn, const GifOptions& options);
 
     void connect();
     void disconnect();

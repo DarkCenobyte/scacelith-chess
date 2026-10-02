@@ -17,7 +17,7 @@ endif()
 
 option(SCACELITH_CONSOLE "Windows: build a console-subsystem exe (logs visible)" OFF)
 option(SCACELITH_STOCKFISH "Embed the Stockfish engine" ON)
-set(SCACELITH_OFFICIAL_SERVER "" CACHE STRING "Official online server: host[:apiPort[:wsPort]] (empty = caissa.scacelith.com:44664, none = no official server)")
+set(SCACELITH_OFFICIAL_SERVER "" CACHE STRING "Official online server: host[:apiPort[:wsPort]] (empty = caissa.scacelith.com:443, apiPort 443 when omitted, none = no official server)")
 
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 if(WIN32)
@@ -50,11 +50,12 @@ file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS
     ${ROOT}/src/i18n/*.cpp ${ROOT}/src/net/*.cpp ${ROOT}/src/coach/*.cpp ${ROOT}/src/tts/*.cpp)
 # Engine-free parts of src/game (Elo, observer camera, camera flights, hot-seat handover, scoresheet
 # layout, physical board, the [coach] and [tts] settings, saved games, what the scene saves and their
-# replay): in the core library so the unit tests can use them, and left out of the game sources below.
+# replay, the account pages' data, the in-process fake server): in the core library so the unit tests
+# can use them, and left out of the game sources below.
 set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cpp ${ROOT}/src/game/observer_camera.cpp
     ${ROOT}/src/game/hotseat.cpp ${ROOT}/src/game/scoresheet_layout.cpp ${ROOT}/src/game/physical_board.cpp
     ${ROOT}/src/game/settings_coach.cpp ${ROOT}/src/game/game_archive.cpp ${ROOT}/src/game/game_saving.cpp
-    ${ROOT}/src/game/replay.cpp)
+    ${ROOT}/src/game/replay.cpp ${ROOT}/src/game/online_account.cpp ${ROOT}/src/game/online_mock.cpp)
 list(APPEND CORE_SOURCES ${GAME_CORE_SOURCES})
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
 target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party)

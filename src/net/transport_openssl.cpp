@@ -93,9 +93,9 @@ public:
     bool open(const std::string& host, uint16_t port, bool tls, const std::string& pin, int timeoutMs, CancelToken* cancel) {
         Deadline dl(timeoutMs);
         cancel_ = cancel;
-        if (cancel) cancel->setAbort([this] { abortSocket(); });
+        AbortGuard abortGuard(cancel, [this] { abortSocket(); });
         bool ok = connectTcp(host, port, dl) && (!tls || handshake(host, pin, dl));
-        if (cancel) cancel->setAbort(nullptr);
+        abortGuard.clear();
         if (!ok && cancel && cancel->cancelled()) error = "cancelled";
         return ok;
     }
@@ -692,13 +692,13 @@ void httpRequest(const HttpRequest& req, HttpResponse& resp, CancelToken* cancel
     }
     std::string head = req.method + " " + req.path + " HTTP/1.1\r\n";
     head += "Host: " + hostHeader(req.host, req.port, req.tls) + "\r\n";
-    head += "User-Agent: Scacelith\r\nAccept: application/json\r\nConnection: close\r\n";
+    head += "User-Agent: Scacelith\r\nAccept: " + req.accept + "\r\nConnection: close\r\n";
     bool hasBody = !req.body.empty() || req.method == "POST" || req.method == "PUT";
     if (hasBody) head += "Content-Type: application/json\r\nContent-Length: " + std::to_string(req.body.size()) + "\r\n";
     for (auto& h : req.headers) head += h.first + ": " + h.second + "\r\n";
     head += "\r\n";
 
-    if (cancel) cancel->setAbort([&s] { s.abortSocket(); });
+    AbortGuard abortGuard(cancel, [&s] { s.abortSocket(); });
     Deadline dl(req.timeoutMs);
     bool ok = s.writeAll(head.data(), head.size(), dl) && (req.body.empty() || s.writeAll(req.body.data(), req.body.size(), dl));
     std::string raw;
@@ -744,7 +744,7 @@ void httpRequest(const HttpRequest& req, HttpResponse& resp, CancelToken* cancel
         }
         raw.append(buf, size_t(r));
     }
-    if (cancel) cancel->setAbort(nullptr);
+    abortGuard.clear();
     if (!ok) {
         resp.error = cancel && cancel->cancelled() ? "cancelled" : (s.error.empty() ? "network" : s.error);
         resp.detail = s.detail;
@@ -838,7 +838,7 @@ void httpStream(const HttpRequest& req, const std::function<bool(const HttpHead&
     for (auto& h : req.headers) head += h.first + ": " + h.second + "\r\n";
     head += "\r\n";
 
-    if (cancel) cancel->setAbort([&s] { s.abortSocket(); });
+    AbortGuard abortGuard(cancel, [&s] { s.abortSocket(); });
     std::string err;
     bool ok = s.writeAll(head.data(), head.size(), Deadline(req.timeoutMs));
     // The head (interim 1xx answers skipped); 'raw' keeps what came after it.
@@ -923,7 +923,7 @@ void httpStream(const HttpRequest& req, const std::function<bool(const HttpHead&
             }
         }
     }
-    if (cancel) cancel->setAbort(nullptr);
+    abortGuard.clear();
     if (!ok) {
         resp.error = cancel && cancel->cancelled() ? "cancelled" : !err.empty() ? err : (s.error.empty() ? "network" : s.error);
         resp.detail = s.detail;
@@ -955,7 +955,7 @@ std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int&
     head += "Sec-WebSocket-Protocol: " + p.subprotocol + "\r\n\r\n";
 
     Stream* sp = s.get();
-    if (cancel) cancel->setAbort([sp] { sp->abortSocket(); });
+    AbortGuard abortGuard(cancel, [sp] { sp->abortSocket(); });
     Deadline dl(p.timeoutMs);
     std::string raw;
     size_t end = std::string::npos;
@@ -968,7 +968,7 @@ std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int&
         end = raw.find("\r\n\r\n");
         if (end == std::string::npos && raw.size() > 16384) { ok = false; s->error = "network"; }
     }
-    if (cancel) cancel->setAbort(nullptr);
+    abortGuard.clear();
     if (!ok) {
         error = cancel && cancel->cancelled() ? "cancelled" : s->error;
         return nullptr;

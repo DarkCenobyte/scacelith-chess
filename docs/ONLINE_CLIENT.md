@@ -3,7 +3,8 @@
 How the game shows and plays online games. The network layer itself (`src/net/`: HTTPS API,
 secure WebSocket, credential store, direct match with UPnP) and the server
 (`dedicated-server/`) are described in their own documents; this page covers what sits on top
-of them in `src/game/` and `src/ui/`.
+of them in `src/game/` and `src/ui/`, the server in use and the account API calls of
+`net::OnlineClient`.
 
 ## Pieces
 
@@ -70,13 +71,94 @@ game; the others become toasts. An error with code 0 and `error == "offline"` (a
 while not connected, dropped by the network layer) clears the search and the pending challenge.
 
 The server in use comes from `[online]` in the settings: the official server
-(`net::officialServer()`, `caissa.scacelith.com:44664`, API and WebSocket on that port) unless
+(`net::officialServer()`, `caissa.scacelith.com` on port 443, the HTTPS port: API
+`https://caissa.scacelith.com/api/v1` and WebSocket `wss://caissa.scacelith.com/ws`) unless
 `custom_server = 1`, then `host`, `api_port`, `ws_port` (0 = the API port) and `pinned_sha256`
-(certificate fingerprint of a self-signed server). No token is ever stored there: the network
-layer keeps one session per origin (`host:apiPort`), so switching servers never reuses another
-server's sign-in. `applyServer()` (called when Options are applied with another server) selects
-the new origin and forgets the previous server's state; the page then resumes a session saved
-for that origin, if any.
+(certificate fingerprint of a self-signed server). A build may name another official server with
+the CMake option `SCACELITH_OFFICIAL_SERVER` (`host[:apiPort[:wsPort]]`, port 443 when omitted,
+`none` for none). No token is ever stored there: the network layer keeps one session per origin
+(`host:apiPort`), so switching servers never reuses another server's sign-in. `applyServer()`
+(called when Options are applied with another server) selects the new origin and forgets the
+previous server's state; the page then resumes a session saved for that origin, if any. Each
+answer of the account API names the origin it was asked of (`Event::origin`), and an answer of a
+server left meanwhile is not taken for the new server's (`game::ServerAnswers`): the pages drop
+it, except a PGN (the game page's Save game writes it where the player asked) and a GIF (saved
+where the player asked, by `game::GifSaver`).
+
+The official server used port 44664 before. A player signed in there stays signed in: when the
+credential file has a record for `<official host>:44664` and none for the official origin, the
+record (user name, token, server id, pin) moves to the official origin the first time the file is
+read (`CredentialStore::addOriginMove`; on Windows the token is decrypted for the old origin and
+encrypted again for the new one). Only the official host of the build moves, never a community
+server.
+
+## Account API
+
+Besides the WebSocket, the server has an HTTPS API under `/api/v1` on the same port
+(`dedicated-server/docs/API.md` is the full reference). `net::OnlineClient` uses it for the
+sign-in (register, login with its proof of work, two-factor step, Google sign-in, logout), the
+account (`/account/me`, password, two-factor setup, recovery codes, reports) and the account API
+calls below. Each returns at once; its answer comes back as one event (`ok`, or `error` with the
+server's code, `retryAfterSec` when it gave one).
+
+| Call | Request | Event and what it carries |
+|---|---|---|
+| `fetchMyGames(before, limit, filter)` | `GET /account/games?before=&limit=&category=&rated=&result=` (bearer) | `GamesResult`: `gamesPage` (the games newest first, `next` = the `before` of the next page or 0, `total` = the games matching the filter; `before` and `filter` name the request, errors included) |
+| `fetchGame(id)` | `GET /games/:id` (bearer when signed in) | `GameDetailsResult`: `gameDetails` (players, ratings and changes, result, reason, clocks, the moves as UCI text and `packMove` with each move's time spent and clock; `you` and `reportable` for its players) |
+| `downloadPgn(id)` | `GET /games/:id/pgn` | `PgnResult`: `gameId`, `text` (the PGN as the server wrote it, `[%clk]`/`[%emt]` comments) |
+| `fetchSessions()` | `GET /auth/sessions` (bearer) | `SessionsResult`: `sessions` (id, created, last active, expiry, client label, `current`) |
+| `revokeSession(id)` | `DELETE /auth/sessions/:id` (bearer) | `SessionRevoked`: `sessionId` |
+| `setAcceptChallenges(on)` | `PUT /account/preferences {acceptChallenges: "all"/"none"}` | `PreferencesResult`: `account.acceptChallenges` |
+| `changeEmail(address, password, code)` | `POST /account/email` | `EmailChangeResult`: `status` = `verification_sent` (a link went to the new address) or `email_changed` (`account.email`) |
+| `exportAccount(password, code)` | `POST /account/export` | `AccountExportResult`: `text` (the JSON document) |
+| `deleteAccount(password, code)` | `POST /account/delete` | `AccountDeleted` |
+| `downloadGameGif(id, options)` | `GET /games/:id/gif?size=&orientation=&delay=&coords=0\|1` (bearer, `Accept: image/gif`) | `GifResult`: `gameId`, `text` (the GIF file) |
+| `renderPgnGif(pgn, options)` | `POST /gif {pgn, size, orientation, delayMs, coords}` (bearer, `Accept: image/gif`) | `GifResult`: `gameId` 0, `text` (the GIF file) |
+
+Rules common to these calls:
+
+- The query values are percent-encoded (`3+2` goes as `3%2B2`); `limit` is 1 to 50 (0 or less
+  asks for the server's default, 20).
+- The re-authenticated calls (e-mail, export, deletion) take the password and, when two-factor is
+  on, a code: 6 digits go as `code`, anything else as `recoveryCode`, and nothing is sent for an
+  empty one.
+- A 401 answer to any call that carried the session token means the session is gone (expired,
+  revoked elsewhere, the account deleted): the token is erased (the user name stays), as for
+  `fetchAccount`, unless it is no longer the token that call sent (a sign-in since, on the HTTP
+  thread or the GIF thread: `CredentialStore::clearToken(origin, token)`), and the event carries
+  `sessionLost`. The error is then `unauthorized` whatever
+  the server's code (the server answers `invalid_token` to a bearer it refuses), as for a call
+  that needs the session while none is saved (nothing is sent): the game signs out on that one
+  code. `fetchGame` and `downloadPgn` ask again without the token, since a game is public: their
+  answer may then be ok, with `sessionLost` telling the game that it is signed out.
+- `/account/me` also gives `hasPassword` (false for a Google-only account), `acceptChallenges`,
+  `pendingEmail` (an address change waiting for its link), `createdAt` and `lastLoginAt`.
+- Answers are untrusted: a move that is not UCI text, a game with another id than the one asked
+  for, a PGN that does not start with its tags, an export that is not the export document
+  (`format` `scacelith-account-export`), or a PGN over 4 MiB or an export over 64 MiB come back
+  as `invalid_response`. The export is checked whole but only its top level is kept in memory
+  while checking, and a document with more than 64 top-level members (the server's has about
+  fifteen) is refused there, so a hostile answer can use neither gigabytes of memory nor hours of
+  the HTTP thread. The calls give up after 15 s without an answer, the export after 90 s (the
+  server allows itself 60 s to write it). An allocation failure during an HTTPS call fails that
+  call instead of ending the game: a PGN, an export or a GIF that finds too little memory free
+  still answers, `invalid_response`, so that the page or the GIF saver waiting for it ends (and
+  the transport takes back the abort action of its request, `net::AbortGuard`).
+- The GIFs need the session (each render counts against the account's quota: `rate_limited` and
+  `server_busy` come with `retryAfterSec`, from the JSON body or else the `Retry-After` header of a
+  proxy's page). They run on a thread of their own (`net-gif`), so that a render of up to 45 s on
+  the server never holds up the other calls, and give up after 90 s
+  (`OnlineClient::kGifTimeoutMs`). The server's `busy` (all its renderers at work) and any 503
+  are `server_busy`; `render_failed` is its own code; a 404 from a server without the GIF routes
+  (its router's `not_found` for an unknown path) is `gif_disabled`, as from a server that turned
+  them off (for a game's GIF, a public `GET /games/:id` tells that answer from a game that is not
+  there, `not_found`). Game 0 (`invalid_game_id`) and a PGN text over 64 KiB (`pgn_too_large`)
+  are refused without sending anything. An answer over 16 MiB, or one that does not start with
+  `GIF87a` or `GIF89a`, is `invalid_response`.
+- `deleteAccount` success erases the token and the user name saved for the origin (its server id
+  and pin stay) and stops the realtime connection without reconnecting. `revokeSession` on the
+  session marked `current` in the last `fetchSessions` signs this game out the same way (token
+  erased, connection stopped).
 
 ## The game at the table
 

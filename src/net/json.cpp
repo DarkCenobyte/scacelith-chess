@@ -204,8 +204,9 @@ private:
         ++p_;
         ws();
         if (p_ < n_ && s_[p_] == '}') { ++p_; return true; }
-        for (;;) {
+        for (size_t kept = 0;; ++kept) {
             ws();
+            if (depth <= lim_.keepDepth && kept >= lim_.maxKept) return fail("too many members");
             if (p_ >= n_ || s_[p_] != '"') return fail("expected a member name");
             std::string key;
             if (!string(key)) return false;
@@ -215,7 +216,7 @@ private:
             ws();
             Value v;
             if (!value(v, depth)) return false;
-            out.set(key, std::move(v));   // a duplicate name keeps the last value
+            if (depth <= lim_.keepDepth) out.set(key, std::move(v));   // a duplicate name keeps the last value
             ws();
             if (p_ < n_ && s_[p_] == ',') { ++p_; continue; }
             if (p_ < n_ && s_[p_] == '}') { ++p_; return true; }
@@ -229,11 +230,12 @@ private:
         ++p_;
         ws();
         if (p_ < n_ && s_[p_] == ']') { ++p_; return true; }
-        for (;;) {
+        for (size_t kept = 0;; ++kept) {
             ws();
+            if (depth <= lim_.keepDepth && kept >= lim_.maxKept) return fail("too many items");
             Value v;
             if (!value(v, depth)) return false;
-            out.items_.push_back(std::move(v));
+            if (depth <= lim_.keepDepth) out.items_.push_back(std::move(v));
             ws();
             if (p_ < n_ && s_[p_] == ',') { ++p_; continue; }
             if (p_ < n_ && s_[p_] == ']') { ++p_; return true; }

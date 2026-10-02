@@ -182,7 +182,7 @@ person: your opponent sits in the other chair as a robot that moves with them, l
 piece they touch, holds it over the square they aim at, looks where they look and leans in when
 they do.
 
-- **Server.** The official server is `caissa.scacelith.com` (port 44664, secure web API and
+- **Server.** The official server is `caissa.scacelith.com` (port 443, secure web API and
   secure WebSocket on the same port). Options > Online server > Custom server takes a community
   server instead: host (domain or IP), HTTPS/API port, WSS port (empty = the API port) and, for a
   server with a self-signed certificate, its **Certificate fingerprint (SHA-256)** as its owner
@@ -289,7 +289,15 @@ ninja -C build-win            # -> build-win/Scacelith.exe
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 ninja -C build
 ./build/scacelith_tests
+
+# The Windows tests under Wine (ninja -C build-win scacelith_tests first)
+tools/test_win.sh             # [filter-substring]
 ```
+
+Wine names the Linux files in the character set of the host locale: in the POSIX locale (`LANG`
+unset, common in containers) that is ASCII, a file named after "Élodie" cannot be created and the
+saved games' tests fail although Windows takes the name. `tools/test_win.sh` and
+`tools/shot_win.sh` run Wine in a UTF-8 locale (`LC_ALL=C.UTF-8`) when the current one is not.
 
 Development options: `--scene <name>` runs a viewer scene (`--list-scenes`), `--data-dir .`
 reads shaders from disk and **F5** reloads them, **F12** saves a screenshot,

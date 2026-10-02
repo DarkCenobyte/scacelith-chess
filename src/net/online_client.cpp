@@ -1,6 +1,10 @@
-// OnlineClient: two network threads behind a command/event interface.
+// OnlineClient: three network threads behind a command/event interface.
 //
-//   net-http  HTTPS API calls (account, login, SSO polling, proof of work), one at a time.
+//   net-http  HTTPS API calls (account, login, SSO polling, proof of work, the account API:
+//             history, game details and PGN, devices, e-mail, export, deletion), one at a time.
+//   net-gif   the animated GIFs, one at a time: the server may hold such a request for 45 s
+//             (a render waits for a thread, then runs at the lowest priority), so they wait for
+//             each other but never hold up the calls of net-http (the history, signing out...).
 //   net-rt    the realtime WebSocket: connection, Hello/Welcome, heartbeats, reconnection with
 //             backoff, decoding of the server's messages into Events and the OnlineGame copy.
 //
@@ -35,7 +39,8 @@
 // work) never delays the answer to a server Ping or the sending of a move. The game thread only
 // pushes commands (lambdas) and drains Events with poll(); the credential store has its own
 // lock. Tokens are read from the store for the origin a command was issued for, and every
-// request of a command goes to that origin only.
+// request of a command goes to that origin only; the Events of an HTTPS command name it
+// (Event::origin), so that the game can tell the answers of a server it has left.
 #include "online_client.h"
 #include "credential_store.h"
 #include "crypto.h"
@@ -48,11 +53,15 @@
 #include <algorithm>
 #include <cctype>
 #include <chrono>
+#include <climits>
 #include <cmath>
 #include <condition_variable>
+#include <cstdint>
+#include <cstdlib>
 #include <deque>
 #include <functional>
 #include <mutex>
+#include <new>
 #include <random>
 #include <thread>
 
@@ -63,8 +72,8 @@
 #define SCACELITH_OFFICIAL_SERVER ""
 #endif
 // The official server when the build does not name another one: HTTPS API (/api/v1) and the
-// WebSocket (/ws) share port 44664.
-#define SCACELITH_DEFAULT_OFFICIAL_SERVER "caissa.scacelith.com:44664"
+// WebSocket (/ws) share port 443, the HTTPS port (firewalls and proxies let it through).
+#define SCACELITH_DEFAULT_OFFICIAL_SERVER "caissa.scacelith.com:443"
 
 namespace net {
 
@@ -140,6 +149,19 @@ constexpr size_t kOffsetSamples = 8;            // clock offset: lowest round tr
 constexpr auto kOffsetMaxAge = std::chrono::minutes(5);   // ...taken in the last 5 minutes
 constexpr auto kInfoReuse = std::chrono::minutes(10);     // /info answer reused on reconnection
 constexpr uint16_t kCloseServerFull = 4006;     // 4000 + ErrorCode::ServerFull (no CloseCode entry)
+// The former port of the official server (HTTPS API and WSS): its saved sessions move to the
+// current official origin (CredentialStore::addOriginMove).
+constexpr uint16_t kLegacyOfficialPort = 44664;
+// Answers kept as text (account API): a PGN and the account export, at most this large.
+constexpr size_t kPgnMaxBytes = size_t(4) << 20;
+constexpr size_t kExportMaxBytes = size_t(64) << 20;
+// The account export: the server may take 60 s to prepare it (it answers 503 timeout after that);
+// the other calls keep the transport's 15 s.
+constexpr int kExportTimeoutMs = 90000;
+
+// The origin of the HTTPS command the calling thread runs (net-http, net-gif; null elsewhere):
+// Impl::post() names it in the Events of that command (Event::origin).
+thread_local const std::string* tCommandOrigin = nullptr;
 
 // Milliseconds of the monotonic clock (the Gesture bucket's time).
 double steadyMs() { return std::chrono::duration<double, std::milli>(Clock::now().time_since_epoch()).count(); }
@@ -266,8 +288,14 @@ struct OnlineClient::Impl {
 
     // ---- shared ----
     std::mutex mu;
-    std::condition_variable httpCv, rtCv;
-    std::deque<std::function<void()>> httpQ, rtQ;
+    std::condition_variable httpCv, rtCv, gifCv;
+    // An HTTPS command and the origin of the server in use when it was given (its requests go there).
+    struct HttpCommand {
+        std::string origin;
+        std::function<void()> fn;
+    };
+    std::deque<HttpCommand> httpQ, gifQ;
+    std::deque<std::function<void()>> rtQ;
     std::deque<Event> events;
     bool stopping = false, rtWake = false;
     // The latest Gesture of the game thread, until net-rt sends or drops it (flushGesture).
@@ -278,8 +306,8 @@ struct OnlineClient::Impl {
     std::atomic<double> clockOffset{0.0};
     std::atomic<uint32_t> connectGen{0};
     CredentialStore creds;
-    CancelToken httpCancel, rtCancel;
-    std::thread httpThread, rtThread;
+    CancelToken httpCancel, rtCancel, gifCancel;
+    std::thread httpThread, rtThread, gifThread;
 
     // ---- net-http state ----
     std::string mfaToken, mfaOrigin;
@@ -291,6 +319,10 @@ struct OnlineClient::Impl {
         int pollMs = 2000;
     } sso;
     std::string ssoTicket, ssoTicketOrigin;
+    // The session of this game in the last list of signed-in devices (fetchSessions): revoking it
+    // signs this game out.
+    std::string sessionsOrigin;
+    int64_t currentSession = 0;
 
     // ---- net-rt state ----
     struct Rt {
@@ -330,8 +362,17 @@ struct OnlineClient::Impl {
     } rt;
 
     Impl() {
+        // The official server moved from port 44664 to 443: a session saved for the former
+        // origin of this build's official host moves to the new one (once; never for another host).
+        ServerEndpoint off = officialServer();
+        if (off.valid() && off.apiPort != kLegacyOfficialPort) {
+            ServerEndpoint legacy = off;
+            legacy.apiPort = kLegacyOfficialPort;
+            creds.addOriginMove(legacy.origin(), off.origin());
+        }
         httpThread = std::thread([this] { httpLoop(); });
         rtThread = std::thread([this] { rtLoop(); });
+        gifThread = std::thread([this] { gifLoop(); });
     }
 
     ~Impl() {
@@ -342,13 +383,17 @@ struct OnlineClient::Impl {
         stopFlag.store(true);
         httpCancel.cancel();
         rtCancel.cancel();
+        gifCancel.cancel();
         httpCv.notify_all();
         rtCv.notify_all();
+        gifCv.notify_all();
         if (httpThread.joinable()) httpThread.join();
         if (rtThread.joinable()) rtThread.join();
+        if (gifThread.joinable()) gifThread.join();
     }
 
     void post(Event ev) {
+        if (tCommandOrigin && ev.origin.empty()) ev.origin = *tCommandOrigin;
         std::lock_guard<std::mutex> lk(mu);
         events.push_back(std::move(ev));
     }
@@ -364,12 +409,35 @@ struct OnlineClient::Impl {
         }
         events.push_back(std::move(ev));
     }
+    // An HTTPS command for net-http; one for net-gif (the GIFs). Given on the game thread, like
+    // setServer(): ep is the server its requests go to.
     void http(std::function<void()> fn) {
         {
             std::lock_guard<std::mutex> lk(mu);
-            httpQ.push_back(std::move(fn));
+            httpQ.push_back(HttpCommand{ep.origin(), std::move(fn)});
         }
         httpCv.notify_one();
+    }
+    void gif(std::function<void()> fn) {
+        {
+            std::lock_guard<std::mutex> lk(mu);
+            gifQ.push_back(HttpCommand{ep.origin(), std::move(fn)});
+        }
+        gifCv.notify_one();
+    }
+    // Runs an HTTPS command on the calling worker thread: its Events name its origin.
+    void runCommand(const HttpCommand& cmd) {
+        tCommandOrigin = &cmd.origin;
+        try {
+            cmd.fn();
+        } catch (const std::bad_alloc&) {
+            // Too little memory free. The calls with large answers (a PGN is up to 4 MiB, an
+            // account export 64 MiB, a GIF 16 MiB) catch it themselves and answer with a failure,
+            // so that what waits for them ends; any other call ends here without its answer.
+            // The game goes on.
+            LOGE("net: out of memory in an HTTPS call");
+        }
+        tCommandOrigin = nullptr;
     }
     void realtime(std::function<void()> fn) {
         {
@@ -401,13 +469,43 @@ struct OnlineClient::Impl {
     struct Api {
         int status = 0;
         json::Value body;
+        std::string text;        // Call::rawCap: the body of a 2xx answer as received
         std::string error;       // "" on 2xx
         int retryAfter = 0;
+        bool sessionLost = false;  // the saved token was refused (401) on the way, and erased
         bool ok() const { return error.empty(); }
+    };
+
+    // How a request authenticates and what its answer is.
+    enum class Auth {
+        None,                    // no token
+        Optional,                // the token when one is saved (public reads that tell the signed-in
+                                 // player more); when it is refused (401): erased, asked again without
+        Required                 // "unauthorized" without a saved token (nothing sent)
+    };
+    struct Call {
+        Auth auth = Auth::None;
+        size_t rawCap = 0;       // > 0: a 2xx body comes back as text (Api::text), this large at most
+                                 // ("invalid_response" above); other answers are JSON errors as usual
+        const char* accept = "application/json";
+        int timeoutMs = 0;       // > 0: HttpRequest::timeoutMs (an answer the server may take long
+                                 // to prepare); 0: the transport's own (15 s)
     };
 
     Api api(const ServerEndpoint& e, const std::string& method, const std::string& path, const json::Value* body,
             bool auth, CancelToken& cancel) {
+        Call call;
+        call.auth = auth ? Auth::Required : Auth::None;
+        return request(e, method, path, body, call, cancel);
+    }
+
+    // One API call to e's origin. A 401 answer to a request that carried the token means that the
+    // session is gone (expired, revoked, the account deleted): the token is erased, whatever the call,
+    // Api::sessionLost is set and the error is "unauthorized" whatever the server's code (the real
+    // server says invalid_token): the game has one code for "signed out", the same as for a call
+    // that needs the session while none is saved.
+    Api request(const ServerEndpoint& e, const std::string& method, const std::string& path, const json::Value* body,
+                const Call& call, CancelToken& cancel) {
         Api out;
         if (!e.valid()) { out.error = "invalid_server"; return out; }
         HttpRequest req;
@@ -417,36 +515,70 @@ struct OnlineClient::Impl {
         req.tls = !e.insecureDev;
         req.pinnedSha256 = req.tls ? effectivePin(e) : std::string();
         req.path = "/api/v1" + path;
-        if (auth) {
+        req.accept = call.accept;
+        if (call.rawCap > 0) req.maxResponseBytes = call.rawCap;
+        if (call.timeoutMs > 0) req.timeoutMs = call.timeoutMs;
+        bool sentToken = false;
+        std::string token;
+        if (call.auth != Auth::None) {
             Credential c;
-            if (!creds.get(e.origin(), c) || c.token.empty()) { out.error = "not_logged_in"; return out; }
-            req.headers.emplace_back("Authorization", "Bearer " + c.token);
+            if (creds.get(e.origin(), c) && !c.token.empty()) {
+                token = c.token;
+                req.headers.emplace_back("Authorization", "Bearer " + c.token);
+                sentToken = true;
+            } else if (call.auth == Auth::Required) {
+                out.error = "unauthorized";
+                return out;
+            }
         }
         json::Value payload = body ? *body : json::Value();
-        for (int round = 0; round < 2; ++round) {
+        bool powSolved = false, refused = false;
+        for (;;) {
             req.body = body ? payload.dump() : std::string();
             HttpResponse resp;
             httpRequest(req, resp, &cancel);
             out = Api();
+            out.sessionLost = refused;
             if (!resp.error.empty()) {
-                out.error = resp.error;
-                if (!resp.detail.empty()) LOGW("net: %s %s: %s (%s)", method.c_str(), path.c_str(), resp.error.c_str(), resp.detail.c_str());
+                // Larger than this text answer may be: not what the call expects.
+                out.error = call.rawCap > 0 && resp.error == "too_large" ? "invalid_response" : resp.error;
+                if (!resp.detail.empty() || out.error != resp.error)
+                    LOGW("net: %s %s: %s (%s)", method.c_str(), path.c_str(), resp.error.c_str(), resp.detail.c_str());
                 return out;
             }
             out.status = resp.status;
+            const bool success = resp.status >= 200 && resp.status < 300;
+            if (success && call.rawCap > 0) {
+                out.text = std::move(resp.body);
+                return out;
+            }
             if (!resp.body.empty()) {
                 std::string err;
-                if (!json::parse(resp.body, out.body, &err) && resp.status >= 200 && resp.status < 300) {
+                if (!json::parse(resp.body, out.body, &err) && success) {
                     LOGW("net: %s %s: invalid JSON (%s)", method.c_str(), path.c_str(), err.c_str());
                     out.error = "bad_response";
                     return out;
                 }
             }
             out.retryAfter = int(out.body["retryAfter"].asInt(std::atoi(resp.retryAfter.c_str())));
-            if (resp.status >= 200 && resp.status < 300) return out;
+            if (success) return out;
             out.error = out.body["error"].asString("http_" + std::to_string(resp.status));
+            if (resp.status == 401 && sentToken) {
+                LOGW("net: %s %s: the session was refused (%s); its token is erased", method.c_str(), path.c_str(), out.error.c_str());
+                // That token only: a GIF (net-gif) may be answered while net-http saves a new one.
+                creds.clearToken(e.origin(), token);
+                refused = out.sessionLost = true;
+                out.error = "unauthorized";
+                if (call.auth != Auth::Optional) return out;
+                // A public read: the same request again, without the token that was refused.
+                req.headers.erase(std::remove_if(req.headers.begin(), req.headers.end(),
+                                                 [](const std::pair<std::string, std::string>& h) { return h.first == "Authorization"; }),
+                                  req.headers.end());
+                sentToken = false;
+                continue;
+            }
             // Proof of work (DESIGN 8): solve and repeat the same request once.
-            if (resp.status == 428 && round == 0 && body && payload.isObject() && out.body["pow"].isObject()) {
+            if (resp.status == 428 && !powSolved && body && payload.isObject() && out.body["pow"].isObject()) {
                 std::string challenge = out.body["pow"]["challenge"].asString();
                 int bits = int(out.body["pow"]["bits"].asInt(-1));
                 if (challenge.empty() || challenge.size() > 512 || bits < 0) return out;
@@ -463,17 +595,18 @@ struct OnlineClient::Impl {
                 pow.set("challenge", challenge);
                 pow.set("nonce", nonce);
                 payload.set("pow", pow);
+                powSolved = true;
                 continue;
             }
             return out;
         }
-        return out;
     }
 
     static void fillError(Event& ev, const Api& a) {
         ev.ok = a.ok();
         ev.error = a.error;
         ev.retryAfterSec = a.retryAfter;
+        ev.sessionLost = a.sessionLost;
     }
 
     static RatingInfo parseRating(const json::Value& r) {
@@ -499,6 +632,12 @@ struct OnlineClient::Impl {
         a.emailVerified = u["emailVerified"].asBool();
         a.mfaEnabled = u["mfaEnabled"].asBool();
         a.googleLinked = u["googleLinked"].asBool();
+        a.hasPassword = u["hasPassword"].asBool(true);
+        const json::Value& accept = u["acceptChallenges"];        // "all" | "none"
+        a.acceptChallenges = accept.isString() ? accept.asString() == "all" : accept.asBool(true);
+        a.pendingEmail = u["pendingEmail"].asString();
+        a.createdAtMs = u["createdAt"].asInt(0);
+        a.lastLoginAtMs = u["lastLoginAt"].asInt(0);
         const json::Value& ratings = v["ratings"].isArray() ? v["ratings"] : u["ratings"];
         for (const json::Value& r : ratings.items()) a.ratings.push_back(parseRating(r));
         if (v["ban"].isObject()) a.bannedUntilMs = v["ban"]["until"].isNumber() ? v["ban"]["until"].asInt() : INT64_MAX;
@@ -594,6 +733,8 @@ struct OnlineClient::Impl {
         sso = Sso();
     }
 
+    void stopRealtime();   // account API: the session ended on the server (defined with those calls)
+
     void ssoPollOnce() {
         Event ev;
         ev.kind = Event::Kind::LoginResult;
@@ -636,7 +777,7 @@ struct OnlineClient::Impl {
 
     void httpLoop() {
         for (;;) {
-            std::function<void()> cmd;
+            HttpCommand cmd;
             {
                 std::unique_lock<std::mutex> lk(mu);
                 auto ready = [&] { return stopping || !httpQ.empty() || (sso.active && Clock::now() >= sso.nextPoll); };
@@ -648,8 +789,23 @@ struct OnlineClient::Impl {
                     httpQ.pop_front();
                 }
             }
-            if (cmd) cmd();
-            else if (sso.active && Clock::now() >= sso.nextPoll) ssoPollOnce();
+            if (cmd.fn) runCommand(cmd);
+            else if (sso.active && Clock::now() >= sso.nextPoll) runCommand(HttpCommand{sso.ep.origin(), [this] { ssoPollOnce(); }});
+        }
+    }
+
+    // net-gif: the GIF commands (gif()), one at a time, beside net-http.
+    void gifLoop() {
+        for (;;) {
+            HttpCommand cmd;
+            {
+                std::unique_lock<std::mutex> lk(mu);
+                gifCv.wait(lk, [&] { return stopping || !gifQ.empty(); });
+                if (stopping) return;
+                cmd = std::move(gifQ.front());
+                gifQ.pop_front();
+            }
+            runCommand(cmd);
         }
     }
 
@@ -1538,7 +1694,7 @@ void OnlineClient::logout(bool allSessions) {
         Event ev;
         ev.kind = Event::Kind::LogoutResult;
         Impl::fillError(ev, a);
-        if (a.status == 401 || a.error == "not_logged_in") {
+        if (a.status == 401 || a.error == "unauthorized") {
             ev.ok = true;
             ev.error.clear();
         }
@@ -1550,8 +1706,8 @@ void OnlineClient::fetchAccount() {
     Impl* d = impl_.get();
     ServerEndpoint e = d->ep;
     d->http([d, e] {
+        // A 401 (expired or revoked session) erases the saved token (Impl::request).
         Impl::Api a = d->api(e, "GET", "/account/me", nullptr, true, d->httpCancel);
-        if (a.status == 401) d->creds.clearToken(e.origin());   // expired or revoked session
         Event ev;
         ev.kind = Event::Kind::AccountResult;
         Impl::fillError(ev, a);
@@ -1625,6 +1781,534 @@ void OnlineClient::regenerateRecoveryCodes(const std::string& password, const st
 void OnlineClient::report(uint64_t gameId, const std::string& username, const std::string& category, const std::string& comment) {
     simplePost(impl_.get(), impl_->ep, Event::Kind::ReportResult, "/reports",
                obj({{"gameId", json::Value(gameId)}, {"reported", username}, {"category", category}, {"comment", comment}}), true);
+}
+
+// ---- account API (dedicated-server/docs/API.md) ----
+// The game history, game details, PGN, signed-in devices, preferences, e-mail change, data export
+// and deletion. The answers come from the server, so they are checked like any untrusted input:
+// a missing field keeps its default, a malformed one makes the whole answer "invalid_response".
+namespace {
+
+using Impl = OnlineClient::Impl;
+
+int toInt(const json::Value& v, int def = 0) {
+    if (!v.isNumber()) return def;
+    return int(std::clamp<int64_t>(v.asInt(def), INT32_MIN, INT32_MAX));
+}
+
+// An id the server writes as a JSON number (or as decimal text); 0 when neither.
+uint64_t idOf(const json::Value& v) {
+    if (v.isNumber()) return v.asNumber() >= 1 && v.asNumber() < 9007199254740992.0 ? uint64_t(v.asNumber()) : 0;
+    const std::string& s = v.asString();
+    if (s.empty() || s.size() > 16 || !std::all_of(s.begin(), s.end(), [](char c) { return c >= '0' && c <= '9'; })) return 0;
+    return std::strtoull(s.c_str(), nullptr, 10);
+}
+
+// A 6-digit code of an authenticator app; anything else is taken for a recovery code.
+bool isTotpCode(const std::string& s) {
+    return s.size() == 6 && std::all_of(s.begin(), s.end(), [](char c) { return c >= '0' && c <= '9'; });
+}
+
+// The second factor of a re-authentication: none, "code" or "recoveryCode" (as mfaDisable).
+void setSecondFactor(json::Value& body, const std::string& codeOrRecovery) {
+    if (codeOrRecovery.empty()) return;
+    body.set(isTotpCode(codeOrRecovery) ? "code" : "recoveryCode", codeOrRecovery);
+}
+
+// RFC 3986 percent-encoding of a query value ("3+2" -> "3%2B2": a '+' would read as a space).
+std::string urlEncode(const std::string& s) {
+    static const char hex[] = "0123456789ABCDEF";
+    std::string out;
+    for (unsigned char c : s) {
+        if (std::isalnum(c) || c == '-' || c == '_' || c == '.' || c == '~') {
+            out += char(c);
+        } else {
+            out += '%';
+            out += hex[c >> 4];
+            out += hex[c & 15];
+        }
+    }
+    return out;
+}
+
+// "e2e4", "e7e8q" -> packMove (squares a1 = 0 .. h8 = 63; promotion n b r q = chess::PieceType
+// Knight 2 .. Queen 5, the numbering of the wire and of the server's uciOf).
+bool parseUci(const std::string& u, uint16_t& out) {
+    if (u.size() != 4 && u.size() != 5) return false;
+    auto square = [&u](size_t i, int& sq) {
+        if (u[i] < 'a' || u[i] > 'h' || u[i + 1] < '1' || u[i + 1] > '8') return false;
+        sq = (u[i + 1] - '1') * 8 + (u[i] - 'a');
+        return true;
+    };
+    int from = 0, to = 0, promo = 0;
+    if (!square(0, from) || !square(2, to) || from == to) return false;
+    if (u.size() == 5) {
+        switch (u[4]) {
+        case 'n': promo = 2; break;
+        case 'b': promo = 3; break;
+        case 'r': promo = 4; break;
+        case 'q': promo = 5; break;
+        default: return false;
+        }
+    }
+    out = packMove(from, to, promo);
+    return true;
+}
+
+// "white" / "black" -> 0 / 1, anything else 2 (not one of the players).
+int colorOf(const json::Value& v) {
+    const std::string& s = v.asString();
+    return s == "white" ? 0 : s == "black" ? 1 : 2;
+}
+
+GameSide parseSide(const json::Value& v) {
+    GameSide side;
+    side.name = v["name"].asString();
+    side.rating = std::max(0, toInt(v["rating"]));            // null: unknown
+    if (v["ratingAfter"].isNumber()) {                         // null: the game changed no rating
+        side.ratingChanged = true;
+        side.ratingAfter = toInt(v["ratingAfter"]);
+        side.ratingDiff = v["ratingDiff"].isNumber() ? toInt(v["ratingDiff"]) : side.ratingAfter - side.rating;
+    }
+    return side;
+}
+
+// A game summary (GET /account/games) or the head of GET /games/:id.
+bool parseSummary(const json::Value& v, GameSummary& g) {
+    if (!v.isObject()) return false;
+    g.id = idOf(v["id"]);
+    if (g.id == 0) return false;
+    g.category = v["category"].asString();
+    g.rated = v["rated"].asBool();
+    g.baseMs = v["baseMs"].asInt(-1);
+    g.incMs = v["incMs"].asInt(-1);
+    if (g.baseMs < 0 || g.incMs < 0) {
+        // Only "timeControl" ("180+2", seconds), as in /players/:username/games.
+        const std::string& tc = v["timeControl"].asString();
+        size_t plus = tc.find('+');
+        g.baseMs = plus == std::string::npos ? 0 : int64_t(std::atoi(tc.substr(0, plus).c_str())) * 1000;
+        g.incMs = plus == std::string::npos ? 0 : int64_t(std::atoi(tc.c_str() + plus + 1)) * 1000;
+    }
+    g.white = parseSide(v["white"]);
+    g.black = parseSide(v["black"]);
+    g.you = colorOf(v.has("you") ? v["you"] : v["color"]);
+    g.status = toInt(v["status"]);
+    g.reason = toInt(v["reason"]);
+    g.result = v["result"].asString("*");
+    g.plies = std::max(0, toInt(v["plies"]));
+    g.startedAtMs = v["startedAt"].asInt(0);
+    g.endedAtMs = v["endedAt"].asInt(0);
+    return true;
+}
+
+bool parseGamesPage(const json::Value& b, GamesPage& page) {
+    if (!b["games"].isArray()) return false;
+    for (const json::Value& item : b["games"].items()) {
+        GameSummary g;
+        if (!parseSummary(item, g)) return false;
+        page.games.push_back(std::move(g));
+    }
+    page.next = idOf(b["next"]);
+    page.total = std::max(toInt(b["total"]), int(page.games.size()));
+    return true;
+}
+
+bool parseDetails(const json::Value& b, GameDetails& d) {
+    if (!parseSummary(b, d) || !b["moves"].isArray()) return false;
+    for (const json::Value& m : b["moves"].items()) {
+        GameDetails::Ply p;
+        p.uci = m["uci"].asString();
+        if (!parseUci(p.uci, p.move)) return false;
+        p.spentMs = m["spentMs"].isNumber() ? std::max<int64_t>(0, m["spentMs"].asInt()) : -1;
+        p.clockMs = m["clockMs"].isNumber() ? std::max<int64_t>(0, m["clockMs"].asInt()) : -1;
+        d.moves.push_back(std::move(p));
+    }
+    if (d.plies == 0) d.plies = int(d.moves.size());
+    d.rematchOf = idOf(b["rematchOf"]);
+    d.reportable = b["reportable"].asBool();
+    return true;
+}
+
+bool parseSessions(const json::Value& b, std::vector<SessionInfo>& out) {
+    if (!b["sessions"].isArray()) return false;
+    for (const json::Value& v : b["sessions"].items()) {
+        if (!v.isObject()) return false;
+        SessionInfo s;
+        s.id = int64_t(idOf(v["id"]));
+        if (s.id == 0) return false;
+        s.createdAtMs = v["createdAt"].asInt(0);
+        s.lastSeenAtMs = v["lastSeenAt"].asInt(s.createdAtMs);
+        s.expiresAtMs = v["expiresAt"].asInt(0);
+        s.clientLabel = v["clientLabel"].asString();
+        s.current = v["current"].asBool();
+        out.push_back(std::move(s));
+    }
+    return true;
+}
+
+// A PGN as the server writes it (S2): text that starts with its tag pairs. Anything else (an HTML
+// page of a proxy, binary data) is not handed to the game.
+bool looksLikePgn(const std::string& t) {
+    if (t.empty() || t.find('\0') != std::string::npos) return false;
+    size_t i = t.compare(0, 3, "\xEF\xBB\xBF") == 0 ? 3 : 0;   // a byte order mark
+    while (i < t.size() && (t[i] == ' ' || t[i] == '\t' || t[i] == '\r' || t[i] == '\n')) ++i;
+    return i < t.size() && t[i] == '[';
+}
+
+// The account export (S7): one JSON object, format "scacelith-account-export". The whole document
+// is checked, but only its top level is kept in memory while doing so (it may be large). The
+// server's document has about fifteen top-level members: more than kExportMaxMembers is not the
+// export, and is refused there (a hostile server's million members or items would otherwise all be
+// kept, and their names looked up one by one: gigabytes, or hours of this thread).
+constexpr size_t kExportMaxMembers = 64;
+bool validExport(const std::string& t) {
+    json::Limits lim;
+    lim.maxBytes = kExportMaxBytes;
+    lim.maxElements = SIZE_MAX;
+    lim.keepDepth = 1;
+    lim.maxKept = kExportMaxMembers;
+    json::Value head;
+    std::string err;
+    if (!json::parse(t, head, &err, lim)) {
+        LOGW("net: the account export is not valid JSON (%s)", err.c_str());
+        return false;
+    }
+    return head.isObject() && head["format"].asString() == "scacelith-account-export" && head["version"].asInt(0) >= 1;
+}
+
+// Every answer of the account API: the transport/server error, or what fill() made of the body
+// ("invalid_response" when it returns false).
+void finish(Event& ev, const Impl::Api& a, const std::function<bool()>& fill) {
+    Impl::fillError(ev, a);
+    if (a.ok() && fill && !fill()) {
+        ev.ok = false;
+        ev.error = "invalid_response";
+    }
+}
+
+// The answer of a call whose large answer found no memory (std::bad_alloc): a failure, as for an
+// answer that is not what the call expects.
+Event failedAnswer(Event::Kind kind, uint64_t gameId) {
+    Event ev;
+    ev.kind = kind;
+    ev.gameId = gameId;
+    ev.error = "invalid_response";
+    return ev;
+}
+
+}  // namespace
+
+// Ends the realtime connection for good (no reconnection), from any thread: the account deleted,
+// the session of this game revoked.
+void OnlineClient::Impl::stopRealtime() {
+    connectGen.fetch_add(1);
+    rtCancel.cancel();
+    realtime([this] {
+        rt.wanted = false;
+        dropSocket(1000);
+        setState(ConnState::Offline);
+    });
+}
+
+void OnlineClient::fetchMyGames(uint64_t before, int limit, const GamesFilter& filter) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    std::string path = "/account/games?";
+    if (before) path += "before=" + std::to_string(before) + "&";
+    path += "limit=" + std::to_string(limit <= 0 ? 20 : std::min(limit, 50));
+    if (!filter.category.empty()) path += "&category=" + urlEncode(filter.category);
+    if (filter.rated >= 0) path += filter.rated ? "&rated=true" : "&rated=false";
+    if (!filter.result.empty()) path += "&result=" + urlEncode(filter.result);
+    d->http([d, e, path, before, filter] {
+        Impl::Call call;
+        call.auth = Impl::Auth::Required;
+        Impl::Api a = d->request(e, "GET", path, nullptr, call, d->httpCancel);
+        Event ev;
+        ev.kind = Event::Kind::GamesResult;
+        ev.gamesPage.before = before;
+        ev.gamesPage.filter = filter;
+        finish(ev, a, [&] { return parseGamesPage(a.body, ev.gamesPage); });
+        if (!ev.ok) ev.gamesPage.games.clear();
+        d->post(ev);
+    });
+}
+
+void OnlineClient::fetchGame(uint64_t gameId) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    d->http([d, e, gameId] {
+        Event ev;
+        ev.kind = Event::Kind::GameDetailsResult;
+        ev.gameId = gameId;
+        if (gameId == 0) {
+            ev.error = "invalid_game_id";
+            d->post(ev);
+            return;
+        }
+        Impl::Call call;
+        call.auth = Impl::Auth::Optional;          // the players learn their colour and whether they may report
+        Impl::Api a = d->request(e, "GET", "/games/" + std::to_string(gameId), nullptr, call, d->httpCancel);
+        finish(ev, a, [&] { return parseDetails(a.body, ev.gameDetails) && ev.gameDetails.id == gameId; });
+        if (!ev.ok) ev.gameDetails = GameDetails();
+        d->post(ev);
+    });
+}
+
+void OnlineClient::downloadPgn(uint64_t gameId) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    d->http([d, e, gameId] {
+        Event ev;
+        ev.kind = Event::Kind::PgnResult;
+        ev.gameId = gameId;
+        if (gameId == 0) {
+            ev.error = "invalid_game_id";
+            d->post(ev);
+            return;
+        }
+        try {
+            Impl::Call call;
+            call.auth = Impl::Auth::Optional;
+            call.rawCap = kPgnMaxBytes;
+            call.accept = "application/x-chess-pgn";
+            Impl::Api a = d->request(e, "GET", "/games/" + std::to_string(gameId) + "/pgn", nullptr, call, d->httpCancel);
+            finish(ev, a, [&] { return looksLikePgn(a.text); });
+            if (ev.ok) ev.text = std::move(a.text);
+            d->post(std::move(ev));
+        } catch (const std::bad_alloc&) {
+            // No memory for the text: a failure all the same, so that the game page waiting for
+            // it (Save, Replay) ends.
+            LOGW("net: out of memory for the PGN of game %llu", (unsigned long long)gameId);
+            d->post(failedAnswer(Event::Kind::PgnResult, gameId));
+        }
+    });
+}
+
+void OnlineClient::fetchSessions() {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    d->http([d, e] {
+        Impl::Api a = d->api(e, "GET", "/auth/sessions", nullptr, true, d->httpCancel);
+        Event ev;
+        ev.kind = Event::Kind::SessionsResult;
+        finish(ev, a, [&] { return parseSessions(a.body, ev.sessions); });
+        if (!ev.ok) ev.sessions.clear();
+        if (ev.ok) {
+            d->sessionsOrigin = e.origin();
+            d->currentSession = 0;
+            for (const SessionInfo& s : ev.sessions)
+                if (s.current) d->currentSession = s.id;
+        }
+        d->post(ev);
+    });
+}
+
+void OnlineClient::revokeSession(int64_t sessionId) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    d->http([d, e, sessionId] {
+        Event ev;
+        ev.kind = Event::Kind::SessionRevoked;
+        ev.sessionId = sessionId;
+        if (sessionId <= 0) {
+            ev.error = "not_found";
+            d->post(ev);
+            return;
+        }
+        Impl::Api a = d->api(e, "DELETE", "/auth/sessions/" + std::to_string(sessionId), nullptr, true, d->httpCancel);
+        Impl::fillError(ev, a);
+        if (a.ok() && d->sessionsOrigin == e.origin() && d->currentSession == sessionId) {
+            // The session of this game: signed out here too, as by logout().
+            d->creds.clearToken(e.origin());
+            d->stopRealtime();
+            d->currentSession = 0;
+        }
+        d->post(ev);
+    });
+}
+
+void OnlineClient::setAcceptChallenges(bool accept) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    d->http([d, e, accept] {
+        json::Value b = json::Value::object();
+        b.set("acceptChallenges", accept ? "all" : "none");
+        Impl::Call call;
+        call.auth = Impl::Auth::Required;
+        Impl::Api a = d->request(e, "PUT", "/account/preferences", &b, call, d->httpCancel);
+        Event ev;
+        ev.kind = Event::Kind::PreferencesResult;
+        finish(ev, a, [&] {
+            const json::Value& v = a.body["preferences"]["acceptChallenges"];
+            ev.account.acceptChallenges = v.isString() ? v.asString() == "all" : accept;
+            return true;
+        });
+        d->post(ev);
+    });
+}
+
+void OnlineClient::changeEmail(const std::string& newEmail, const std::string& password, const std::string& codeOrRecovery) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    json::Value b = json::Value::object();
+    b.set("newEmail", newEmail);
+    b.set("password", password);
+    setSecondFactor(b, codeOrRecovery);
+    d->http([d, e, b] {
+        Impl::Api a = d->api(e, "POST", "/account/email", &b, true, d->httpCancel);
+        Event ev;
+        ev.kind = Event::Kind::EmailChangeResult;
+        finish(ev, a, [&] {
+            ev.status = a.body["status"].asString();
+            if (ev.status == "email_changed") ev.account.email = a.body["email"].asString();
+            return !ev.status.empty();
+        });
+        d->post(ev);
+    });
+}
+
+void OnlineClient::exportAccount(const std::string& password, const std::string& codeOrRecovery) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    json::Value b = json::Value::object();
+    b.set("password", password);
+    setSecondFactor(b, codeOrRecovery);
+    d->http([d, e, b] {
+        Event ev;
+        ev.kind = Event::Kind::AccountExportResult;
+        try {
+            Impl::Call call;
+            call.auth = Impl::Auth::Required;
+            call.rawCap = kExportMaxBytes;
+            call.timeoutMs = kExportTimeoutMs;
+            Impl::Api a = d->request(e, "POST", "/account/export", &b, call, d->httpCancel);
+            finish(ev, a, [&] { return validExport(a.text); });
+            if (ev.ok) ev.text = std::move(a.text);   // up to 64 MiB: moved, never copied
+        } catch (const std::bad_alloc&) {
+            LOGW("net: out of memory for the account export");
+            ev.ok = false;
+            ev.error = "invalid_response";
+            ev.text.clear();
+        }
+        d->post(std::move(ev));
+    });
+}
+
+void OnlineClient::deleteAccount(const std::string& password, const std::string& codeOrRecovery) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    json::Value b = json::Value::object();
+    b.set("password", password);
+    setSecondFactor(b, codeOrRecovery);
+    d->http([d, e, b] {
+        Impl::Api a = d->api(e, "POST", "/account/delete", &b, true, d->httpCancel);
+        Event ev;
+        ev.kind = Event::Kind::AccountDeleted;
+        Impl::fillError(ev, a);
+        if (a.ok()) {
+            // Gone on the server (every session revoked): the token is erased here as by logout(),
+            // and the name of the deleted account is forgotten too (the server id and the pin of
+            // the origin stay). The realtime connection stops without reconnecting.
+            Credential c;
+            if (d->creds.get(e.origin(), c)) {
+                c.token.clear();
+                c.username.clear();
+                d->creds.put(c);
+            }
+            d->stopRealtime();
+        }
+        d->post(ev);
+    });
+}
+
+// ---- animated GIFs (dedicated-server/docs/API.md, "GIF of a game") ----
+namespace {
+
+// A GIF file: the signature of either version. Anything else (a proxy's HTML page, a JSON body
+// sent with a 200) is not written to the player's disk as a .gif.
+bool looksLikeGif(const std::string& t) {
+    return t.size() >= 6 && (t.compare(0, 6, "GIF89a") == 0 || t.compare(0, 6, "GIF87a") == 0);
+}
+
+// The answer of either GIF route, as GifResult (net-gif thread). No memory for the picture: a
+// failure all the same, so that the GIF saver waiting for it ends (another GIF may be asked).
+void gifCall(Impl* d, const ServerEndpoint& e, const std::string& method, const std::string& path, const json::Value* body,
+             uint64_t gameId) {
+    try {
+        Impl::Call call;
+        call.auth = Impl::Auth::Required;   // the renders count per account
+        call.rawCap = OnlineClient::kGifMaxBytes;
+        call.accept = "image/gif";
+        call.timeoutMs = OnlineClient::kGifTimeoutMs;
+        Impl::Api a = d->request(e, method, path, body, call, d->gifCancel);
+        Event ev;
+        ev.kind = Event::Kind::GifResult;
+        ev.gameId = gameId;
+        finish(ev, a, [&] { return looksLikeGif(a.text); });
+        if (ev.ok) ev.text = std::move(a.text);   // up to 16 MiB: moved, never copied
+        // The quota and the busy renderer without the server's JSON (a proxy's page): the same
+        // codes. The 503 busy of the game's read (the database stayed locked) is a busy server too.
+        if (ev.error == "http_429") ev.error = "rate_limited";
+        if (ev.error == "http_503" || ev.error == "busy") ev.error = "server_busy";
+        // A server without the GIF routes (an older one) answers 404 not_found, its router's "No
+        // such endpoint": POST /gif has no other not_found; for GET /games/:id/gif, the game's
+        // public details tell whether the game is there (then the route is not).
+        if (ev.error == "not_found" && a.status == 404) {
+            if (method == "POST") {
+                ev.error = "gif_disabled";
+            } else {
+                Impl::Call probe;
+                if (d->request(e, "GET", "/games/" + std::to_string(gameId), nullptr, probe, d->gifCancel).ok())
+                    ev.error = "gif_disabled";
+            }
+        }
+        d->post(std::move(ev));
+    } catch (const std::bad_alloc&) {
+        LOGW("net: out of memory for a GIF (game %llu)", (unsigned long long)gameId);
+        d->post(failedAnswer(Event::Kind::GifResult, gameId));
+    }
+}
+
+}  // namespace
+
+void OnlineClient::downloadGameGif(uint64_t gameId, const GifOptions& options) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    std::string path = "/games/" + std::to_string(gameId) + "/gif?size=" + urlEncode(options.size) +
+                       "&orientation=" + urlEncode(options.orientation) + "&delay=" + std::to_string(options.delayMs) +
+                       "&coords=" + (options.coords ? "1" : "0");
+    d->gif([d, e, path, gameId] {
+        if (gameId == 0) {
+            Event ev;
+            ev.kind = Event::Kind::GifResult;
+            ev.error = "invalid_game_id";
+            d->post(ev);
+            return;
+        }
+        gifCall(d, e, "GET", path, nullptr, gameId);
+    });
+}
+
+void OnlineClient::renderPgnGif(const std::string& pgn, const GifOptions& options) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    if (pgn.size() > kGifMaxPgnBytes) {
+        // Longer than the server takes: said at once, nothing sent.
+        d->gif([d] {
+            Event ev;
+            ev.kind = Event::Kind::GifResult;
+            ev.error = "pgn_too_large";
+            d->post(ev);
+        });
+        return;
+    }
+    json::Value b = json::Value::object();
+    b.set("pgn", pgn);
+    b.set("size", options.size);
+    b.set("orientation", options.orientation);
+    b.set("delayMs", options.delayMs);
+    b.set("coords", options.coords);
+    d->gif([d, e, b] { gifCall(d, e, "POST", "/gif", &b, 0); });
 }
 
 // ---- realtime ----

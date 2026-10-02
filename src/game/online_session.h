@@ -1,8 +1,11 @@
 // Online play on the game's side. One OnlineSession per process (onlineSession()) sits between
 // the network layer (net::OnlineClient for the Scacelith server, net::DirectMatch for a direct
 // match) and the game, and is the only code that polls them:
-//   - the menus (ui/ui_screens_online*.cpp) read its state (server info, account, connection,
-//     matchmaking, challenges) and send commands through api() / direct();
+//   - the menus (ui/ui_screens_online*.cpp, ui/ui_screens_account.cpp) read its state (server
+//     info, account, connection, matchmaking, challenges, the account API's data: game history,
+//     the game opened from it, signed-in devices) and send commands through api() / direct();
+//     the history's game page and the saved games (ui/ui_library.cpp) ask for animated GIFs here
+//     (saveGameGif / savePgnGif), whose files the session writes when the server answers;
 //   - the 3D scene plays the games it announces (gameReady() / takeGame()) through a GameLink and
 //     drains their events with nextGameEvent(), the opponent's live gestures (OpponentGesture)
 //     included: only those of the game being played, the latest one replacing one still queued.
@@ -14,6 +17,7 @@
 #include "../net/direct_match.h"
 #include "../net/online_client.h"
 #include "game_link.h"
+#include "online_account.h"
 #include "online_live.h"
 #include <deque>
 #include <map>
@@ -47,6 +51,17 @@ public:
     virtual void mfaDisable(const std::string& password, const std::string& codeOrRecovery) = 0;
     virtual void regenerateRecoveryCodes(const std::string& password, const std::string& code) = 0;
     virtual void report(uint64_t gameId, const std::string& username, const std::string& category, const std::string& comment) = 0;
+    virtual void fetchMyGames(uint64_t before, int limit, const net::GamesFilter& filter) = 0;
+    virtual void fetchGame(uint64_t gameId) = 0;
+    virtual void downloadPgn(uint64_t gameId) = 0;
+    virtual void fetchSessions() = 0;
+    virtual void revokeSession(int64_t sessionId) = 0;
+    virtual void setAcceptChallenges(bool accept) = 0;
+    virtual void changeEmail(const std::string& newEmail, const std::string& password, const std::string& codeOrRecovery) = 0;
+    virtual void exportAccount(const std::string& password, const std::string& codeOrRecovery) = 0;
+    virtual void deleteAccount(const std::string& password, const std::string& codeOrRecovery) = 0;
+    virtual void downloadGameGif(uint64_t gameId, const net::GifOptions& options) = 0;
+    virtual void renderPgnGif(const std::string& pgn, const net::GifOptions& options) = 0;
     virtual void connect() = 0;
     virtual void disconnect() = 0;
     virtual net::ConnState state() const = 0;
@@ -123,7 +138,9 @@ public:
     bool serverConfigured() const { return endpoint().valid(); }
     bool officialAvailable() const;            // this build has an official server
     // After the [online] settings changed: selects the server (each keeps its own session) and
-    // forgets what was known of the previous one.
+    // forgets what was known of the previous one. Its answers still on the way are dropped when
+    // they arrive (ServerAnswers), except a GIF (written) and a PGN (saved by the game page), each
+    // as the game it was asked for.
     void applyServer();
     const net::ServerInfo& info() const { return info_; }
     bool infoKnown() const { return infoKnown_; }
@@ -140,6 +157,11 @@ public:
     // Signed in: a login this run, or a session saved for this server (resumed with resume()).
     bool signedIn() const { return signedIn_; }
     void resume();                              // saved session: connect and fetch the account
+    // A session of the configured server saved on this computer, resumed or not (the Online menu
+    // not opened yet this run): the requests that carry the token (the GIFs) work without
+    // resume(). False before init() (nothing is started for it). Its user name, or "".
+    bool hasSavedSession() const;
+    std::string savedUsername() const;
     const net::AccountInfo& account() const { return account_; }
     const net::RatingInfo* rating(const std::string& category) const;
     void signOut(bool everywhere);
@@ -150,6 +172,34 @@ public:
     void expect(net::Event::Kind k);
     bool busy(net::Event::Kind k) const;
     bool take(net::Event::Kind k, net::Event& out);
+
+    // ---- Account API (game history, devices, preferences) -----------------------------------------
+    // What the account pages show, kept from the answers (AccountData::apply). The requests below
+    // send the command and expect() its result, so busy() and take() work as for the others; an
+    // account deleted (AccountDeleted) signs out here, a changed e-mail fetches the account again.
+    const AccountData& accountData() const { return data_; }
+    void loadHistory(const net::GamesFilter& filter);   // its first page
+    void historyNext();
+    void historyPrevious();
+    void historyReload();                               // the page shown, again (after an error)
+    void openGame(uint64_t gameId);                     // accountData().game
+    void loadSessions();
+    void revokeSession(int64_t sessionId);
+    void setAcceptChallenges(bool accept);
+
+    // ---- Animated GIFs (a game of the history, a game of the saved games) -----------------------
+    // The GIF of a game of this server (GET /games/:id/gif) or of any game as PGN text (POST /gif),
+    // written to 'folder' as 'fileName' (gifFileName) when the server's answer arrives, whatever
+    // page shows then (GifSaver; owner = what the page shows its state for). One at a time: false,
+    // nothing sent, while another one is being made. A GIF that ends while no page shows its state
+    // (gifShown() not called for its owner lately) is announced by a notification.
+    bool saveGameGif(const std::string& owner, uint64_t gameId, const net::GifOptions& options, const std::string& folder,
+                     const std::string& fileName);
+    bool savePgnGif(const std::string& owner, const std::string& pgn, const net::GifOptions& options, const std::string& folder,
+                    const std::string& fileName);
+    const GifSaver& gif() const { return gif_; }
+    void gifShown(const std::string& owner);   // a page shows the state of this owner's GIF this frame
+    void clearGif();                           // forget the last GIF's state (not one being made)
 
     // ---- Realtime -------------------------------------------------------------------------------
     net::ConnState conn() const { return conn_; }
@@ -207,11 +257,12 @@ public:
     // --start-online: signs in (mock: any name) and looks for an opponent in 'category' as soon
     // as the connection is up. With the fakes and a virtual clock the game is ready on return.
     void quickStart(const std::string& category, const std::string& username);
-    // Fakes with a virtual clock (UI viewer, screenshots): runs them for 'ms' of virtual time.
+    // Fakes with a virtual clock (UI viewer, screenshots): runs them for 'ms' of virtual time, then
+    // waits for a GIF file being written.
     void runMock(double ms);
 
 private:
-    void handleServer(const net::Event& e);
+    void handleServer(net::Event& e);   // a GIF's bytes are moved out of e (GifSaver::finish)
     void handleDirect(const net::Event& e);
     void routeGame(const net::Event& e, LinkKind from);
     std::unique_ptr<GameLink> makeLink(LinkKind kind, uint64_t id);
@@ -229,9 +280,11 @@ private:
     net::ServerInfo info_;
     bool signedIn_ = false;
     net::AccountInfo account_;
+    AccountData data_;
+    GifSaver gif_;
+    double gifShownAt_ = -1e9;                  // steady seconds of the last gifShown() of gif_'s owner
     std::string serverNameRt_;
-    std::map<int, net::Event> results_;
-    std::map<int, int> pending_;
+    ServerAnswers answers_;                     // for expect(), busy(), take(); the server in use
 
     net::ConnState conn_ = net::ConnState::Offline;
     Queue queue_;
@@ -257,6 +310,11 @@ OnlineSession& onlineSession();
 // "incompatible"...), a realtime net::proto ErrorCode, a direct match error ("refused",
 // "timeout", "wrong_code", "incompatible", "port_in_use"... see net::DirectMatch::lastError()).
 std::string onlineErrorText(const std::string& code, int retryAfterSec = 0, int64_t bannedUntilMs = 0);
+// The error of a GIF in words (GifSaver::error()): the account's quota used up with the wait in
+// minutes and seconds, the renderer busy, signed out, a game too long, a PGN the server cannot
+// read, a render that failed, a server without GIFs, the file not written; the other codes as
+// onlineErrorText().
+std::string gifErrorText(const std::string& code, int retryAfterSec = 0);
 std::string serverErrorText(int code);
 // Text of a ServerError event: its ErrorCode, or its transport error ("offline": a command sent
 // while not connected, which the network layer drops).

@@ -13,9 +13,16 @@
 // the clear. Either way get(origin) only ever returns a token that was saved for that origin.
 //
 // Thread-safe (one mutex); the file is read on first use and rewritten atomically on changes.
+//
+// Origin moves (addOriginMove): a server that changed its port keeps its players signed in. The
+// online client registers one for the official server of the build, which moved from port 44664
+// to 443: on load, a file with a record for "host:44664" and none for "host:443" has that record
+// moved (user name, token re-protected for the new origin, server id, pin) and is saved again, so
+// it happens once. Never for a community server: the client registers no other move.
 #pragma once
 #include <mutex>
 #include <string>
+#include <utility>
 #include <vector>
 
 namespace net {
@@ -43,8 +50,14 @@ public:
 
     bool put(const Credential& c);               // creates or replaces c.origin's record; saves
     bool clearToken(const std::string& origin);  // logout: keeps user name, server id and pin
+    // The same, only while the saved token is 'token' (the one a server refused): a token saved
+    // since (a new sign-in on another thread) is kept.
+    bool clearToken(const std::string& origin, const std::string& token);
     bool erase(const std::string& origin);       // forgets the origin entirely
     std::vector<std::string> origins() const;
+    // When the file has no record for `to` and has one for `from`, that record becomes `to`'s
+    // (applied at every load of a file, at once when one is loaded; see the note above).
+    void addOriginMove(const std::string& from, const std::string& to);
 
 private:
     struct Record {
@@ -54,8 +67,10 @@ private:
     mutable std::string path_;
     mutable bool loaded_ = false;
     mutable std::vector<Record> records_;
+    std::vector<std::pair<std::string, std::string>> moves_;   // from, to
 
     void loadLocked() const;
+    void applyMovesLocked() const;
     bool saveLocked() const;
     Record* findLocked(const std::string& origin) const;
 };

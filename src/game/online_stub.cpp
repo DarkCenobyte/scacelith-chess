@@ -20,19 +20,19 @@ std::string ServerEndpoint::origin() const {
 
 bool ServerEndpoint::valid() const { return !host.empty() && apiPort != 0; }
 
-// The official server: caissa.scacelith.com, HTTPS API and WSS on the same port 44664 (a build
+// The official server: caissa.scacelith.com, HTTPS API and WSS on the same port 443 (a build
 // may name another with SCACELITH_OFFICIAL_SERVER "host[:apiPort[:wsPort]]", "" = none).
 ServerEndpoint officialServer() {
     ServerEndpoint ep;
 #ifdef SCACELITH_OFFICIAL_SERVER
     std::string spec = SCACELITH_OFFICIAL_SERVER;
 #else
-    std::string spec = "caissa.scacelith.com:44664";
+    std::string spec = "caissa.scacelith.com:443";
 #endif
     if (spec.empty()) return ep;
     size_t a = spec.find(':');
     ep.host = spec.substr(0, a);
-    ep.apiPort = 44664;
+    ep.apiPort = 443;
     ep.wsPort = 0;  // = the API port
     if (a != std::string::npos) {
         size_t b = spec.find(':', a + 1);
@@ -77,6 +77,17 @@ void OnlineClient::regenerateRecoveryCodes(const std::string& p, const std::stri
 void OnlineClient::report(uint64_t id, const std::string& u, const std::string& cat, const std::string& comment) {
     impl_->fake.report(id, u, cat, comment);
 }
+void OnlineClient::fetchMyGames(uint64_t before, int limit, const GamesFilter& f) { impl_->fake.fetchMyGames(before, limit, f); }
+void OnlineClient::fetchGame(uint64_t id) { impl_->fake.fetchGame(id); }
+void OnlineClient::downloadPgn(uint64_t id) { impl_->fake.downloadPgn(id); }
+void OnlineClient::fetchSessions() { impl_->fake.fetchSessions(); }
+void OnlineClient::revokeSession(int64_t id) { impl_->fake.revokeSession(id); }
+void OnlineClient::setAcceptChallenges(bool accept) { impl_->fake.setAcceptChallenges(accept); }
+void OnlineClient::changeEmail(const std::string& e, const std::string& p, const std::string& c) { impl_->fake.changeEmail(e, p, c); }
+void OnlineClient::exportAccount(const std::string& p, const std::string& c) { impl_->fake.exportAccount(p, c); }
+void OnlineClient::deleteAccount(const std::string& p, const std::string& c) { impl_->fake.deleteAccount(p, c); }
+void OnlineClient::downloadGameGif(uint64_t id, const GifOptions& o) { impl_->fake.downloadGameGif(id, o); }
+void OnlineClient::renderPgnGif(const std::string& pgn, const GifOptions& o) { impl_->fake.renderPgnGif(pgn, o); }
 void OnlineClient::connect() { impl_->fake.connect(); }
 void OnlineClient::disconnect() { impl_->fake.disconnect(); }
 ConnState OnlineClient::state() const { return impl_->fake.state(); }

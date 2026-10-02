@@ -381,9 +381,9 @@ void perform(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel) {
     RequestContext ctx;
     ctx.pin = r.tls ? r.pinnedSha256 : std::string();
     ctx.request = &req;
-    if (cancel) cancel->setAbort([&req] { req.close(); });
+    AbortGuard abortGuard(cancel, [&req] { req.close(); });
 
-    std::wstring headers = L"Accept: application/json\r\n";
+    std::wstring headers = L"Accept: " + widen(r.accept) + L"\r\n";
     bool hasBody = !r.body.empty() || r.method == "POST" || r.method == "PUT";
     if (hasBody) headers += L"Content-Type: application/json\r\n";
     for (auto& h : r.headers) headers += widen(h.first) + L": " + widen(h.second) + L"\r\n";
@@ -420,10 +420,8 @@ void perform(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel) {
             if (got == 0) break;
         }
     }
-    if (cancel) {
-        cancel->setAbort(nullptr);
-        if (cancel->cancelled()) { resp.error = "cancelled"; ok = false; }
-    }
+    abortGuard.clear();
+    if (cancel && cancel->cancelled()) { resp.error = "cancelled"; ok = false; }
     if (!ok) {
         resp.status = 0;
         resp.body.clear();
@@ -503,7 +501,7 @@ void httpStream(const HttpRequest& r, const std::function<bool(const HttpHead&)>
     RequestContext ctx;
     ctx.pin = pin;
     ctx.request = &req;
-    if (cancel) cancel->setAbort([&req] { req.close(); });
+    AbortGuard abortGuard(cancel, [&req] { req.close(); });
 
     // The session's agent ("Scacelith") is only added when the request has none.
     std::wstring headers = L"Accept: */*\r\n";
@@ -553,10 +551,8 @@ void httpStream(const HttpRequest& r, const std::function<bool(const HttpHead&)>
             if (!onBody(buf.data(), got)) { err = "aborted"; ok = false; break; }
         }
     }
-    if (cancel) {
-        cancel->setAbort(nullptr);
-        if (cancel->cancelled()) { err = "cancelled"; ok = false; }
-    }
+    abortGuard.clear();
+    if (cancel && cancel->cancelled()) { err = "cancelled"; ok = false; }
     if (!ok && !err.empty()) resp.error = err;
     if (!ok && resp.error.empty()) resp.error = "network";
 }
@@ -579,13 +575,11 @@ std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int&
     RequestContext ctx;
     ctx.pin = pin;
     ctx.request = &req;
-    if (cancel) cancel->setAbort([&req] { req.close(); });
+    AbortGuard abortGuard(cancel, [&req] { req.close(); });
     std::wstring headers = L"Sec-WebSocket-Protocol: " + widen(p.subprotocol) + L"\r\n";
     bool ok = exchange(req, ctx, headers, std::string(), error, detail);
-    if (cancel) {
-        cancel->setAbort(nullptr);
-        if (cancel->cancelled()) { error = "cancelled"; ok = false; }
-    }
+    abortGuard.clear();
+    if (cancel && cancel->cancelled()) { error = "cancelled"; ok = false; }
     if (!ok) {
         if (!detail.empty()) LOGW("net: websocket connect to %s:%u: %s", p.host.c_str(), p.port, detail.c_str());
         return nullptr;
