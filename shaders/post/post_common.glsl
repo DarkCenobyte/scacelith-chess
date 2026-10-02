@@ -14,15 +14,15 @@ layout(std140, binding = 3) uniform PostUBO {
     vec4 vol;          // x scattering (1/m), y HG g, z ambient amount, w max distance
     vec4 volB;         // x steps, y noise amount, z history valid, w motes intensity
     vec4 volC;         // xyz dust drift (m/s), w noise frequency (1/m)
-    vec4 taa;          // x history valid, y sharpen, z variance gamma, w -
+    vec4 taa;          // x history valid, y sharpen, z - (taa.comp's variance gamma is speed-adaptive), w -
     vec4 mb;           // x shutter, y max radius (px), z samples, w tile size (px)
     vec4 dof;          // x focus distance (m), y CoC scale (full-res px radius), z max radius (full px), w radius step
-    vec4 bloom;        // x intensity, y scatter, z levels, w -
-    vec4 expo;         // x compensation EV, y auto on, z min EV, w max EV
+    vec4 bloom;        // x intensity, y scatter, z levels (not read by shaders), w -
+    vec4 expo;         // x compensation EV, y auto on (not read by shaders), z min EV, w max EV
     vec4 expoB;        // x speed up, y speed down, z target (pre-exposed middle grey), w history valid
     vec4 display;      // x grain, y vignette, z chromatic aberration (px), w fade
     vec4 grade;        // x contrast, y saturation, z split tone, w -
-    vec4 misc;         // x debug view, y ssr composite in resolve, z volumetric sky march distance, w -
+    vec4 misc;         // x debug view, y ssr composite in resolve (not read by shaders), z volumetric sky march distance, w -
 } post;
 
 layout(binding = 7) uniform sampler2D uBlueNoise;
