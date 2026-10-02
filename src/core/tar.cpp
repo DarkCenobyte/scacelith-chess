@@ -184,12 +184,12 @@ bool Reader::next(Entry& e) {
                     std::string key = rec.substr(0, eq), value = rec.substr(eq + 1);
                     if (key == "path") paxPath = value;
                     else if (key == "linkpath") paxLink = value;
-                    else if (key == "size") {
-                        if (!decimal(value, 0, value.size(), kMaxPaxSize, paxSize)) {
+                    else if (key == "size") {   // an empty value deletes it: the header's size again
+                        if (value.empty()) hasPaxSize = false;
+                        else if (!decimal(value, 0, value.size(), kMaxPaxSize, paxSize)) {
                             error_ = "bad pax header";
                             return false;
-                        }
-                        hasPaxSize = true;
+                        } else hasPaxSize = true;
                     }
                 }
                 pos += size_t(len);
