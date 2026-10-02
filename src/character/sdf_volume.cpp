@@ -120,6 +120,9 @@ struct Decimator {
         nrm.resize(pos.size());
         for (size_t i = 0; i < pos.size(); ++i) nrm[i] = normalize(gradient(f, pos[i], o.gradientStep));
         for (uint32_t fi = 0; fi < nf; ++fi) {
+            // A zero-area face has no plane to add, but it stays listed at its corners: collapses
+            // re-index, kill and check only the faces they find there.
+            for (int k = 0; k < 3; ++k) vfaces[tri[fi * 3 + k]].push_back(fi);
             vec3 n = faceNormal(fi);
             float len = length(n);
             if (len < 1e-20f) continue;
@@ -127,10 +130,7 @@ struct Decimator {
             vec3 p0 = (pos[tri[fi * 3]] - centre) * scale;
             double d = -dot(n, p0);
             double area = double(len) * 0.5 * double(scale) * double(scale);
-            for (int k = 0; k < 3; ++k) {
-                vfaces[tri[fi * 3 + k]].push_back(fi);
-                Q[tri[fi * 3 + k]].addPlane(n.x, n.y, n.z, d, area);
-            }
+            for (int k = 0; k < 3; ++k) Q[tri[fi * 3 + k]].addPlane(n.x, n.y, n.z, d, area);
         }
         bulk = true;
         heap.reserve(tri.size() * 2);
