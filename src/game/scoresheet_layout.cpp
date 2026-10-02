@@ -321,8 +321,12 @@ bool hasMarkAbove(uint32_t cp) {
 
 namespace {
 
+// Whether the mark stands above a capital's height. Latin Extended-A puts its capitals on even code
+// points, except from U+0139 to U+0148 and from U+0179 to U+017E (odd ones); there the small l
+// with acute or caron counts too: its mark stands as high, beside the ascender.
 bool isUpperWithMark(uint32_t cp) {
     if (cp >= 0xC0 && cp <= 0xDE) return true;
+    if ((cp >= 0x139 && cp <= 0x148) || (cp >= 0x179 && cp <= 0x17E)) return (cp & 1u) == 1u || cp == 0x13A || cp == 0x13E;
     if (cp >= 0x100 && cp <= 0x17F) return (cp & 1u) == 0u;
     return cp == 0x419 || cp == 0x401 || cp == 0x407 || cp == 0x406 || cp == 0x40E;
 }
