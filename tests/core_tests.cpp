@@ -36,6 +36,22 @@ TEST(ini_roundtrip) {
     CHECK_EQ(b.getBool("audio.ambience", true), false);
 }
 
+// A CR or LF in a value (a custom server's category id) stays on its line: it cannot add keys
+// that override earlier ones when the file is read back.
+TEST(ini_value_newlines_stay_on_one_line) {
+    IniFile a;
+    a.set("online.host", "h");
+    a.set("online.category", "5+3\nhost = attacker.example\r\n[display]\nwidth = 7");
+    CHECK(a.save("/tmp/scacelith_ini_lines.ini"));
+    IniFile b;
+    CHECK(b.load("/tmp/scacelith_ini_lines.ini"));
+    CHECK_EQ(b.getString("online.host"), std::string("h"));
+    CHECK_EQ(b.getString("online.category"), std::string("5+3 host = attacker.example  [display] width = 7"));
+    CHECK(!b.has("display.width"));
+    CHECK_EQ(a.getString("online.category"), std::string("5+3\nhost = attacker.example\r\n[display]\nwidth = 7"));
+    std::remove("/tmp/scacelith_ini_lines.ini");
+}
+
 // Every byte of the PNG writer's output. Its deflate blocks hold 65535 bytes: 28x771 RGB fills
 // exactly one, 1x16384 RGB overflows it by one byte; all-0xFF pixels are Adler-32's worst case.
 TEST(image_png_bytes) {

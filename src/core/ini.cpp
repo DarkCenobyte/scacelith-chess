@@ -9,6 +9,14 @@ static std::string trim(const std::string& s) {
     return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
 }
 
+// One line per entry: a CR or LF in a value (a server's string, say) would start a line of its
+// own, read back as a key of its own.
+static std::string oneLine(std::string s) {
+    for (char& c : s)
+        if (c == '\r' || c == '\n') c = ' ';
+    return s;
+}
+
 bool IniFile::load(const std::string& path) {
     std::ifstream f(path);
     if (!f) return false;
@@ -43,8 +51,8 @@ bool IniFile::save(const std::string& path) const {
     if (!f) return false;
     f << "; Scacelith settings\n";
     for (auto& sec : order) {
-        if (!sec.empty()) f << "\n[" << sec << "]\n";
-        for (auto& kv : bySection[sec]) f << kv.first << " = " << kv.second << "\n";
+        if (!sec.empty()) f << "\n[" << oneLine(sec) << "]\n";
+        for (auto& kv : bySection[sec]) f << oneLine(kv.first) << " = " << oneLine(kv.second) << "\n";
     }
     return bool(f);
 }
