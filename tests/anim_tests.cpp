@@ -227,6 +227,42 @@ TEST(anim_writing_sequence) {
     CHECK(std::fabs(clock - clockRef) < 1e-6f);
 }
 
+// A Write with an empty path (nothing to write): the pen tip stays near the writing rest, and
+// WritingDone still fires on time, there.
+TEST(anim_write_empty_path_stays_at_the_rest) {
+    anim::Animator an;
+    initWhite(an);
+    const m::vec3 rest(-layout::SCORESHEET_X, layout::TABLE_TOP_Y + layout::SCORESHEET_THICKNESS, layout::SCORESHEET_Z);
+    an.setWritingRest(rest);
+    std::vector<WriteTask> w(2);
+    w[0].type = WriteTaskType::PickPen;
+    w[0].frame = penFrame();
+    w[1].type = WriteTaskType::Write;
+    an.enqueueWriting(w);
+    const float tWrite = anim::Timing::PickPen, tEnd = tWrite + anim::writeTaskDuration(w[1]);
+    const float dt = 1.0f / 120.0f;
+    std::vector<anim::Event> ev;
+    float done = -1.0f, far = 0.0f;
+    m::vec3 donePos(0.0f);
+    while (an.time() < tEnd + 0.1f) {
+        ev.clear();
+        an.update(dt, ev);
+        for (const anim::Event& e : ev)
+            if (e.type == anim::EventType::WritingDone) {
+                done = e.time;
+                donePos = e.position;
+            }
+        m::mat4 px;
+        if (an.time() > tWrite && an.time() < tEnd && an.penTransform(px)) far = std::max(far, m::length(px.translation() - rest));
+    }
+    std::fprintf(stderr, "  empty Write: tip up to %.1f mm from the rest, WritingDone %.1f mm from it\n", far * 1000.0f,
+                 m::length(donePos - rest) * 1000.0f);
+    CHECK(std::fabs(done - (tWrite + anim::Timing::WriteApproach)) < 1e-4f);
+    CHECK(m::length(donePos - rest) < 0.006f);
+    CHECK(far < 0.03f);
+    CHECK(!an.writingBusy());
+}
+
 // Black left-handed (clock at +X) against Black right-handed in the mirrored world: the same motion
 // bone for bone, the same events at the same instants, the pen mirrored.
 TEST(anim_left_handed_mirror) {

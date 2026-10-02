@@ -733,15 +733,18 @@ void Animator::Impl::planWrite(const WriteTask& t, float start, float T) {
     auto data = std::make_shared<std::vector<PenKey>>(t.path);
     std::vector<PenKey>& path = *data;
     for (PenKey& k : path) k.tip = toChar(k.tip);
+    // Nothing to write: the tip goes just over the writing rest and back (the events still fire).
+    const bool noPath = path.empty();
+    if (noPath) path.push_back({0.0f, wr.rest + vec3(0.0f, 0.004f, 0.0f), false});
     wr.path = path;
-    const float P = path.empty() ? 0.0f : std::max(0.0f, path.back().t);
+    const float P = std::max(0.0f, path.back().t);
     const float tA = Timing::WriteApproach, tR = std::max(1e-3f, T - tA - P);
     wr.pathStart = start + tA;
     wr.pathEnd = start + tA + P;
     float paper = 1e9f;
     for (const PenKey& k : path)
         if (k.down) paper = std::min(paper, k.tip.y);
-    if (paper > 1e8f)
+    if (paper > 1e8f && !noPath)
         for (const PenKey& k : path) paper = std::min(paper, k.tip.y);
     if (paper > 1e8f) paper = paperY;
     paperY = paper;

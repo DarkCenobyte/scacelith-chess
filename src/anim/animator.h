@@ -212,7 +212,7 @@ struct PenKey {
 
 enum class WriteTaskType {
     PickPen,    // pick up the pen lying at 'frame'
-    Write,      // follow 'path' with the pen tip (pen held)
+    Write,      // follow 'path' with the pen tip (pen held; an empty path: just over the writing rest)
     TurnPage,   // pinch the page corner and follow it while the page flips (pen held in the palm)
     PutPen,     // lay the pen down at 'frame'
     Wait        // hold for 'duration'
