@@ -49,11 +49,6 @@ vec3 viewPosFromLinear(vec2 uv, float z) {
     return vec3((ndc.x + frame.proj[2][0]) * z / frame.proj[0][0], (ndc.y + frame.proj[2][1]) * z / frame.proj[1][1], -z);
 }
 vec3 worldPosFromLinear(vec2 uv, float z) { return (frame.invView * vec4(viewPosFromLinear(uv, z), 1.0)).xyz; }
-// View-space -> screen uv (current, jittered projection).
-vec2 uvFromView(vec3 p) {
-    vec2 ndc = vec2(frame.proj[0][0] * p.x + frame.proj[2][0] * p.z, frame.proj[1][1] * p.y + frame.proj[2][1] * p.z) / -p.z;
-    return ndc * 0.5 + 0.5;
-}
 
 bool badValue(vec3 c) { return any(isnan(c)) || any(isinf(c)); }
 vec3 sanitize(vec3 c) { return badValue(c) ? vec3(0.0) : clamp(c, vec3(0.0), vec3(60000.0)); }

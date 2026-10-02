@@ -3,7 +3,6 @@
 // Entry points used by shaders/passes/forward.frag:
 //   vec3 shadeSurface(SurfaceInput i, Surface s, float planarLayer)   lit, pre-exposed radiance
 //   vec3 transmittanceOf(SurfaceInput i, Surface s)                   transparent: dst multiplier
-// Also kept for other passes: sunShadow(), hemisphereAmbient(), f0Of().
 //
 // Features: sun with 3 fitted cascades + PCSS contact-hardening soft shadows (receiver-plane
 // depth bias), point/spot lights, clear coat (with base F0 correction), sheen (Charlie + energy
@@ -149,8 +148,6 @@ SunShadowResult evalSunShadow(vec3 posWS, vec3 nGeom, vec2 pixel, float extraBlu
 #endif
 }
 
-float sunShadow(vec3 posWS, vec3 nGeom, vec2 pixel) { return evalSunShadow(posWS, nGeom, pixel, 0.0, false).visibility; }
-
 // ------------------------------------------------------------------------------------------------
 // Shading parameters
 
@@ -295,12 +292,6 @@ vec3 evalLight(Shading sh, vec3 L, float visibility, float thicknessM, float src
         color += sh.diffColor * sh.sssColor * (back * INV_PI * exp(-sh.thinThickness * 40.0) * max(sh.sss, 0.25) * visibility);
     }
     return color;
-}
-
-// Kept for compatibility with code written against the baseline lighting.
-vec3 evalDirect(SurfaceInput i, Surface s, vec3 L, vec3 radiance, float shadow) {
-    Shading sh = prepareShading(i, s);
-    return evalLight(sh, L, shadow, -1.0, 0.0) * radiance;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -466,12 +457,6 @@ vec3 indirectSpecular(ProbeBlend pb, SurfaceInput i, vec3 N, vec3 R, float rough
     }
 #endif
     return probe;
-}
-
-// Kept for compatibility: specular ambient along R.
-vec3 ambientSpecular(SurfaceInput i, Surface s, vec3 R, float planarLayer) {
-    ProbeBlend pb = gatherProbes(i.positionWS, s.normalWS);
-    return indirectSpecular(pb, i, s.normalWS, R, s.roughness, planarLayer, int(lighting.probeInfo.w));
 }
 
 // ------------------------------------------------------------------------------------------------

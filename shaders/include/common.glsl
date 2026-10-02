@@ -68,16 +68,9 @@ float sq(float x) { return x * x; }
 vec2 sq(vec2 x) { return x * x; }
 vec3 sq(vec3 x) { return x * x; }
 float luminance(vec3 c) { return dot(c, vec3(0.2126, 0.7152, 0.0722)); }
-float time() { return frame.cameraPos.w; }
 
-// Reverse-Z infinite projection: view-space distance along -Z from a depth buffer value.
-float linearDepth(float d) { return frame.exposure.z / max(d, 1e-7); }
 vec3 worldFromDepth(vec2 uv, float d) {
     vec4 p = frame.invViewProj * vec4(uv * 2.0 - 1.0, d, 1.0);
-    return p.xyz / p.w;
-}
-vec3 viewFromDepth(vec2 uv, float d) {
-    vec4 p = frame.invProj * vec4(uv * 2.0 - 1.0, d, 1.0);
     return p.xyz / p.w;
 }
 
@@ -90,18 +83,4 @@ float hash13(vec3 p) { return float(hashU(floatBitsToUint(p.x) ^ hashU(floatBits
 float ign(vec2 pixel) {
     pixel += 5.588238 * mod(frame.skyParams.w, 64.0);
     return fract(52.9829189 * fract(dot(pixel, vec2(0.06711056, 0.00583715))));
-}
-
-vec2 octEncode(vec3 n) {
-    n /= (abs(n.x) + abs(n.y) + abs(n.z));
-    vec2 p = n.xy;
-    if (n.z < 0.0) p = (1.0 - abs(n.yx)) * vec2(n.x >= 0.0 ? 1.0 : -1.0, n.y >= 0.0 ? 1.0 : -1.0);
-    return p;
-}
-vec3 octDecode(vec2 p) {
-    vec3 n = vec3(p, 1.0 - abs(p.x) - abs(p.y));
-    float t = max(-n.z, 0.0);
-    n.x += n.x >= 0.0 ? -t : t;
-    n.y += n.y >= 0.0 ? -t : t;
-    return normalize(n);
 }

@@ -3,7 +3,6 @@
 #include "shaders/include/noise.glsl"
 in vec2 vUV;
 uniform vec2 uResolution;
-uniform float uTime;
 out vec4 outColor;
 
 void main() {

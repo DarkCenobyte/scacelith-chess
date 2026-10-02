@@ -291,8 +291,7 @@ public:
         }
     }
 
-    bool update(AppContext& ctx, float dt) override {
-        time_ += dt;
+    bool update(AppContext& ctx, float) override {
         const plat::Input& in = plat::input();
         for (int i = 0; i < 10; ++i) {
             int key = i == 9 ? '0' : '1' + i;
@@ -314,7 +313,6 @@ public:
         if (p.valid()) {
             p.use();
             p.set("uResolution", float(w), float(h));
-            p.set("uTime", time_);
             gpu::drawFullscreenTriangle();
         } else {
             glClearColor(0.03f, 0.028f, 0.025f, 1.0f);
@@ -530,7 +528,6 @@ private:
     int tab_ = 0;
     bool black_ = false, drawn_ = false, kb_ = false, quit_ = false;
     bool online_ = false, menu_ = false;
-    float time_ = 0.0f;
     int frames_ = 0;
     std::vector<std::string> script_;
     size_t step_ = 0;

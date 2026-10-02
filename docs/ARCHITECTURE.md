@@ -155,8 +155,7 @@ sphere in every pass), `DrawFilter` + `Renderer::drawScene(pass, transparents, f
 `Renderer::renderSky()` (public), `skyCubemap()`, `specularProbes()`, `lightingUBO()`, `brdfLut()`,
 `environment()`, `RenderSettings::{shadowCascades, staticShadowCache, lightProbes,
 probeResolution, probeBounces, specularAA}` (set by the quality presets). GLSL: `sq(vec2/vec3)`,
-`F_Schlick(vec3 f0, vec3 f90, float)`, `gtaoMultiBounce()`, `specularOcclusion()`; the baseline
-helpers `evalDirect()`, `ambientSpecular()`, `sunShadow()`, `hemisphereAmbient()` still exist.
+`F_Schlick(vec3 f0, vec3 f90, float)`, `gtaoMultiBounce()`, `specularOcclusion()`.
 `SCACELITH_GPU_PROFILE=1` logs per-pass CPU+glFinish timings each frame (opt-in, stalls the GPU).
 Test scenes: `lightbox` (hall of boxes per layout.h: `--view 0..4`, `--sun az,el`, `--ev`) and
 `testbed` (outdoor material spheres: `--view 0..2`, `--dusk`, `--sun`, `--ev`).
