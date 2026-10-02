@@ -786,6 +786,23 @@ TEST(audio_backend_reopen_policy) {
     CHECK_EQ(b.waitMs(true, StreamEnd::Stalled, false), 250);
 }
 
+// WASAPI underruns: every dry buffer counts (and raises the latency) once the first 4 audio events
+// of the stream have passed, the first glitch included; a new stream has its own grace.
+TEST(audio_backend_underrun_detection) {
+    using namespace audio;
+    // Padding (frames still queued in the device) seen by each audio event of a stream.
+    auto underruns = [](std::initializer_list<unsigned> paddings) {
+        UnderrunDetector d;
+        int n = 0;
+        for (unsigned p : paddings) n += d.onEvent(p) ? 1 : 0;
+        return n;
+    };
+    CHECK_EQ(underruns({0, 0, 0, 0}), 0);                         // a stream that settles
+    CHECK_EQ(underruns({480, 480, 480, 480, 480, 0, 480}), 1);    // the first glitch after it
+    CHECK_EQ(underruns({480, 480, 480, 480, 0, 0, 480, 0}), 3);   // and every one after that
+    CHECK_EQ(underruns({0, 480, 480, 480, 0}), 1);                // a dry start, then a glitch
+}
+
 TEST(audio_live_engine_init_shutdown) {
     audio::setMasterVolume(0.9f);
     audio::setAmbienceEnabled(true);
