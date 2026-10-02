@@ -83,7 +83,6 @@ void beginFrame(int width, int height, float dt) {
 
 void endFrame() {
     if (!g_inFrame) return;
-    detail::screensEndFrame();
     im::endFrame();
     if (g_inited) gfx::endFrame();
     g_inFrame = false;

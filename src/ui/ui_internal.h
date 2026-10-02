@@ -16,9 +16,8 @@ struct Data {
 };
 Data& data();
 
-// Called from ui::beginFrame / ui::endFrame.
+// Called from ui::beginFrame.
 void screensBeginFrame(float dt);
-void screensEndFrame();
 void screensReset();
 // The coach voice download (ui_model_download.cpp): the modal block of its prompt, called from
 // ui::beginFrame, and the title page's Coach entry (setCoachEntryHook).

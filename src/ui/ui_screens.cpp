@@ -59,7 +59,6 @@ struct State {
     int forcedPage = -1;
     float pageT = 0.0f;
     bool pageFresh = false;
-    uint64_t menuFrame = 0;
     float presetScroll = 0.0f, presetScrollTarget = 0.0f;
     float creditsScroll = 0.0f, creditsScrollTarget = 0.0f;
     bool resumeOnline = false;      // an online game started from the online page: back to it after
@@ -1517,7 +1516,6 @@ void screensBeginFrame(float dt) {
     S.optionsVisiblePrev = S.optionsVisible;
     S.optionsVisible = false;
 }
-void screensEndFrame() {}
 }  // namespace detail
 
 namespace debug {
@@ -1649,8 +1647,7 @@ MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& re
         return act;
     }
     a.v[5] = appear ? 0.0f : std::min(1.0f, a.v[5] + im::dt() / 0.3f);
-    float t = ease(appear ? 0.0f : a.v[5]);
-    if (appear) t = 0.0f;
+    float t = ease(a.v[5]);
     vec2 v = view();
     dimScene(std::max(t, 0.001f));
     float w = 560.0f, h = 640.0f;
@@ -2001,7 +1998,6 @@ void loadingScreen(float progress, const std::string& label) {
     if (S.loadFrame + 1 < f) S.loadShown = 0.0f;
     S.loadFrame = f;
     progress = m::saturate(progress);
-    S.loadShown = std::max(S.loadShown, 0.0f);
     S.loadShown = progress < S.loadShown ? progress : im::approach(S.loadShown, progress, 8.0f);
     im::captureMouseAll();
     im::captureKeyboard();
