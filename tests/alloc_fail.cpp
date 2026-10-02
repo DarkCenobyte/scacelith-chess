@@ -35,6 +35,7 @@ thread_local size_t tCounted = 0;
 
 void rearm() { gArmed.store(gFailFrom.load() != 0 || gCountFrom.load() != 0 || gFailNext.load() != 0); }
 
+#if !defined(SCACELITH_ALLOCFAIL_ASAN)
 void check(size_t n) {
     if (tFailNext) {
         tFailNext = false;
@@ -47,6 +48,7 @@ void check(size_t n) {
     const size_t count = gCountFrom.load();
     if (count != 0 && n >= count) tCounted += n;
 }
+#endif
 
 }  // namespace
 
