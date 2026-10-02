@@ -68,6 +68,11 @@ bool materialLost(const Ctx& c) {
     return c.j.delta >= 10.0 || (c.gain > 0 && c.gain <= c.b.lookahead + 4);
 }
 
+// c's castling rights (both wings).
+constexpr uint8_t castlingOf(Color c) {
+    return c == White ? uint8_t(WhiteKingSide | WhiteQueenSide) : uint8_t(BlackKingSide | BlackQueenSide);
+}
+
 // Squares next to a king that are empty (the "escape squares" a mate or a stalemate takes away).
 std::vector<Square> kingNeighbours(const Position& p, Square k) {
     std::vector<Square> out;
@@ -705,7 +710,7 @@ bool kingSafety(const Ctx& c, Explanation& out) {
     const bool walk = c.f.piece == King && !c.f.castleKing && !c.f.castleQueen && !c.p0.inCheck() &&
                       c.p0.pieces(c.human, Queen) && c.p0.pieces(c.coach, Queen);
     const bool centre = c.ply >= 20 && fileOf(k) == 4 && rankOf(k) == home &&
-                        (c.p0.castling() & (c.human == White ? 3 : 12));
+                        (c.p0.castling() & castlingOf(c.human));
     if (!shield && !walk && !centre && !zone) return false;
     Explanation ex;
     ex.type = ExType::KingSafety;
@@ -919,7 +924,7 @@ bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out) {
     if (fresh(Castle) && c.ply >= 20 && !(c.f.castleKing || c.f.castleQueen)) {
         const Square k = c.p0.kingSquare(H);
         const int home = H == White ? 0 : 7;
-        const bool rights = c.p0.castling() & (H == White ? 3 : 12);
+        const bool rights = c.p0.castling() & castlingOf(H);
         bool openCentre = false;
         for (int f : {3, 4}) {
             bool pawn = false;

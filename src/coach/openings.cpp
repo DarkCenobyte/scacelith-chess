@@ -295,8 +295,8 @@ bool OpeningBook::build(const std::vector<std::string>& tsvFiles, const std::str
             if (v.row != lastRow) {   // count each line once, even if it passed twice
                 lastRow = v.row;
                 const uint8_t t = teachTier[rowName[v.row]];
-                if (t >= 1 && t <= 1) ++teach1;
-                if (t >= 1 && t <= 2) ++teach2;
+                if (t == 1) ++teach1;
+                if (t == 1 || t == 2) ++teach2;
             }
         }
         // A position whose own name is not a teaching line (a gambit named inside a sound family, such as the
