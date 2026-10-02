@@ -2645,7 +2645,6 @@ void FakeServer::rematch(uint64_t id, bool accept) {
     if (I.room && I.room->g.id == id) I.room->rematch(accept, I.lastNow);
 }
 void FakeServer::sendGesture(uint64_t, const Gesture&) {}   // the fake opponent does not watch
-const OnlineGame* FakeServer::currentGame() const { return impl_->hasDelivered ? &impl_->delivered : nullptr; }
 
 bool FakeServer::poll(Event& out) {
     Impl& I = *impl_;

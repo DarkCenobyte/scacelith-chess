@@ -141,7 +141,6 @@ public:
     void requestResync(uint64_t gameId);
     void rematch(uint64_t gameId, bool accept);
     void sendGesture(uint64_t gameId, const Gesture& g);
-    const OnlineGame* currentGame() const;
     bool poll(Event& out);
 
     struct Impl;
