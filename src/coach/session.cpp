@@ -549,8 +549,13 @@ struct Session::Impl {
         g.chatScripts.clear();
         g.coachMovedPly = -1;
         g.announcerWaiting = false;
-        for (auto it = g.jobs.begin(); it != g.jobs.end();) {   // no human turn follows
-            if (it->kind == JobKind::A0 || it->kind == JobKind::A3) {
+        // No human turn follows: its analyses go, except the review's own input (the A0 / A3 of the
+        // last move's root, stopped when it was played). A resignation abandons the review: A1 / A2 too.
+        const bool reviewing = g.review == ReviewState::WaitA0 || g.review == ReviewState::WaitA12;
+        for (auto it = g.jobs.begin(); it != g.jobs.end();) {
+            const bool turn = it->kind == JobKind::A0 || it->kind == JobKind::A3;
+            const bool review = it->kind == JobKind::A1 || it->kind == JobKind::A2;
+            if ((turn && !(reviewing && it->fen == g.reviewRoot)) || (review && humanResigned)) {
                 analyst->cancelAnalysis(it->id);
                 it = g.jobs.erase(it);
             } else {

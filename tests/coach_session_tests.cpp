@@ -493,6 +493,37 @@ TEST(coach_session_game_over_drops_the_greeting) {
     CHECK(!t.said("event.colour.white"));
 }
 
+// The human's mate before the turn's A0 is in: the review of that move uses the A0 stopped when
+// it was played, not a fresh full search asked once the game is over.
+TEST(coach_session_game_over_keeps_the_review_analyses) {
+    Table t;
+    t.game.resetFromFEN(kMateFen);
+    t.analyst.delay = 150;
+    t.start(levelConfig(3));
+    t.run(0.2f);
+    const std::string root = fenOf(kMateFen);
+    CHECK_EQ(t.analyst.count("A0", root), 1);
+    CHECK_EQ(t.analyst.count("A3", root), 1);
+    t.move("a1a8");
+    t.session.onGameOver(t.game, false);
+    CHECK(t.until([&] { return t.session.handshakeWanted(); }, 60.0f));
+    CHECK(t.said("event.end.win"));
+    CHECK_EQ(t.analyst.count("A0", root), 1);
+
+    // A resignation abandons the review: its A1 / A2 go too.
+    Table u;
+    hangTable(u);
+    u.analyst.delay = 150;
+    u.start(levelConfig(4));
+    CHECK(u.quiet());
+    u.move("g2g3");   // not among A0's lines: A1, and A2 at level 4
+    CHECK(u.until([&] { return u.analyst.count("A1") == 1 && u.analyst.count("A2") == 1; }, 10.0f));
+    u.session.onGameOver(u.game, true);
+    for (const fake::Analyst::Job& j : u.analyst.jobs) CHECK(j.shape != "A1" && j.shape != "A2");
+    CHECK(u.until([&] { return u.session.handshakeWanted(); }, 60.0f));
+    CHECK(u.said("event.end.resigned"));
+}
+
 TEST(coach_session_rules_lesson_chapter) {
     Table t;
     SessionConfig cfg = levelConfig(0);
