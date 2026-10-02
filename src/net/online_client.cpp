@@ -1513,6 +1513,10 @@ void OnlineClient::setServer(const ServerEndpoint& ep) {
     }
 }
 
+void OnlineClient::forgetSavedPin() {
+    if (impl_->ep.valid()) impl_->creds.clearPin(impl_->ep.origin());
+}
+
 const ServerEndpoint& OnlineClient::server() const { return impl_->ep; }
 
 void OnlineClient::fetchServerInfo() {

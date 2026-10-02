@@ -1004,6 +1004,47 @@ TEST(net_credentials_put_reports_what_it_kept) {
     CHECK(!stored);
 }
 
+// The pin saved at sign-in applies while the endpoint gives none; forgetSavedPin() (the pin field
+// of Options emptied for that server) removes it, so that the system's certificates are trusted
+// again, and keeps the session.
+TEST(net_credentials_forget_saved_pin) {
+    std::string path = tempCredentialPath("forget-pin");
+    const std::string token = "sct_" + std::string(43, 'P'), pin(64, 'b');
+    net::ServerEndpoint ep;
+    ep.host = "chess.example.org";
+    ep.apiPort = 8443;
+    {
+        net::CredentialStore s(path);
+        net::Credential c;
+        c.origin = ep.origin();
+        c.username = "alice";
+        c.token = token;
+        c.serverId = "srv-1";
+        c.pinnedSha256 = pin;
+        CHECK(s.put(c));
+        c.origin = "other.example.org:8443";       // another server's pin stays
+        CHECK(s.put(c));
+    }
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(path);
+        c.setServer(ep);
+        CHECK(c.hasSavedSession());
+        c.forgetSavedPin();
+        CHECK(c.hasSavedSession());
+    }
+    net::CredentialStore s(path);
+    net::Credential out;
+    CHECK(s.get(ep.origin(), out));
+    CHECK(out.pinnedSha256.empty());
+    CHECK_EQ(out.token, token);
+    CHECK_EQ(out.username, std::string("alice"));
+    CHECK_EQ(out.serverId, std::string("srv-1"));
+    CHECK_EQ(s.pin("other.example.org:8443"), pin);
+    CHECK(s.clearPin("nowhere.example.org:443"));   // nothing saved there: nothing to do
+    net::sys::removeFile(path);
+}
+
 // A token refused by the server is erased only while it is still the one saved: a GIF (on its own
 // thread) may be refused while a new sign-in saves another token.
 TEST(net_credentials_clear_that_token) {

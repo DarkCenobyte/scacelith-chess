@@ -271,6 +271,15 @@ bool CredentialStore::clearToken(const std::string& origin, const std::string& t
     return saveLocked();
 }
 
+bool CredentialStore::clearPin(const std::string& origin) {
+    std::lock_guard<std::mutex> lk(mu_);
+    loadLocked();
+    Record* r = findLocked(origin);
+    if (!r || r->pin.empty()) return true;
+    r->pin.clear();
+    return saveLocked();
+}
+
 bool CredentialStore::erase(const std::string& origin) {
     std::lock_guard<std::mutex> lk(mu_);
     loadLocked();

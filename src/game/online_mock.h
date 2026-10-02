@@ -86,6 +86,7 @@ public:
     FakeServer& operator=(const FakeServer&) = delete;
 
     void setServer(const ServerEndpoint& ep);
+    void forgetSavedPin() {}          // the fakes have no certificates
     const ServerEndpoint& server() const;
     void fetchServerInfo();
     bool hasSavedSession() const;

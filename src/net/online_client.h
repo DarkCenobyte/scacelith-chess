@@ -21,7 +21,8 @@
 //     directory of the --ini file. Tests use it to work in a temporary file.
 //   - ServerEndpoint::origin() brackets IPv6 literals ("[::1]:8443") so an origin is unambiguous.
 //   - ServerEndpoint::pinnedSha256 accepts "AB:CD:..." too (setServer normalises it to 64 lower-case
-//     hex digits). When it is empty, the pin saved for the origin at the last login applies.
+//     hex digits). When it is empty, the pin saved for the origin at the last login applies,
+//     until forgetSavedPin() (Options: the pin field of that server emptied).
 //   - Commands that need the realtime connection while it is not Online produce a ServerError
 //     event with code 0 and error "offline" ("invalid_request" for out-of-range arguments).
 //   - ServerEndpoint::wsPort defaults to 0 = the API port (one port for HTTPS and /ws, as on the
@@ -358,6 +359,9 @@ public:
     // ---- server and account (HTTPS) ----
     void setCredentialsFile(const std::string& path);  // optional; see the note at the top
     void setServer(const ServerEndpoint& ep);    // disconnects if the origin changes
+    // Forgets the pin saved for the current origin at sign-in (the session stays): with no pin in
+    // the endpoint, its requests trust the system's certificates again.
+    void forgetSavedPin();
     const ServerEndpoint& server() const;
     void fetchServerInfo();
     bool hasSavedSession() const;                // a token is stored for the current origin

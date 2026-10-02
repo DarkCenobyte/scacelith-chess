@@ -25,6 +25,7 @@ public:
     explicit ServerApiOf(C& c) : c_(&c) {}
     explicit ServerApiOf(std::unique_ptr<C> own) : own_(std::move(own)), c_(own_.get()) {}
     void setServer(const net::ServerEndpoint& ep) override { c_->setServer(ep); }
+    void forgetSavedPin() override { c_->forgetSavedPin(); }
     void fetchServerInfo() override { c_->fetchServerInfo(); }
     bool hasSavedSession() const override { return c_->hasSavedSession(); }
     std::string savedUsername() const override { return c_->savedUsername(); }
@@ -272,6 +273,13 @@ void OnlineSession::applyServer() {
     if (!ep.valid()) return;
     if (queue_.searching) api_->leaveQueue();
     api_->setServer(ep);
+    // The pin field of this server emptied (same host and port): the pin saved with its session at
+    // sign-in goes too, or it would still apply where the field's help promises the system's
+    // certificates.
+    const bool custom = settings().onlineCustomServer || !officialAvailable();
+    if (custom && ep.origin() == applied_.origin() && !applied_.pinnedSha256.empty() && ep.pinnedSha256.empty())
+        api_->forgetSavedPin();
+    applied_ = ep;
     info_ = net::ServerInfo();
     infoKnown_ = false;
     infoError_.clear();

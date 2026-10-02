@@ -59,6 +59,7 @@ public:
     // The same, only while the saved token is 'token' (the one a server refused): a token saved
     // since (a new sign-in on another thread) is kept.
     bool clearToken(const std::string& origin, const std::string& token);
+    bool clearPin(const std::string& origin);    // forgets the pin only (keeps the session)
     bool erase(const std::string& origin);       // forgets the origin entirely
     std::vector<std::string> origins() const;
     // When the file has no record for `to` and has one for `from`, that record becomes `to`'s

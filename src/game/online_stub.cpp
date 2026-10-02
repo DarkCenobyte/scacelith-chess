@@ -55,6 +55,7 @@ OnlineClient::OnlineClient() : impl_(new Impl()) {}
 OnlineClient::~OnlineClient() = default;
 
 void OnlineClient::setServer(const ServerEndpoint& ep) { impl_->fake.setServer(ep); }
+void OnlineClient::forgetSavedPin() { impl_->fake.forgetSavedPin(); }
 const ServerEndpoint& OnlineClient::server() const { return impl_->fake.server(); }
 void OnlineClient::fetchServerInfo() { impl_->fake.fetchServerInfo(); }
 bool OnlineClient::hasSavedSession() const { return impl_->fake.hasSavedSession(); }
