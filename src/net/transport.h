@@ -77,7 +77,10 @@ struct HttpRequest {
     std::string body;                         // JSON; sent with Content-Type application/json
     std::string accept = "application/json";  // the Accept header (a PGN download asks for its type)
     std::vector<std::pair<std::string, std::string>> headers;   // e.g. Authorization
-    int timeoutMs = 15000;                    // for each of connect, send and receive
+    // Windows (WinHTTP): for each of resolve, connect, send and receive. Linux: one deadline for
+    // the connection and its TLS handshake, then one for the whole exchange (httpStream: for each
+    // write and each read).
+    int timeoutMs = 15000;
     size_t maxResponseBytes = 1 << 20;
 };
 
