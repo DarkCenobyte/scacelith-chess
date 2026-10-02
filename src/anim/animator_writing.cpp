@@ -1235,7 +1235,6 @@ void Animator::enqueueWriting(const std::vector<WriteTask>& tasks) {
     for (auto& t : tasks) enqueueWriting(t);
 }
 bool Animator::writingBusy() const { return impl_->wr.running || !impl_->wr.queue.empty(); }
-void Animator::clearWritingQueue() { impl_->wr.queue.clear(); }
 float Animator::writingRemainingTime() const {
     const Impl& I = *impl_;
     float r = I.wr.running ? std::max(0.0f, I.wr.start + I.wr.T - I.time) : 0.0f;

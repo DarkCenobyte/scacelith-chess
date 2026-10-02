@@ -262,12 +262,10 @@ public:
               character::Side playHand = character::Side::Right);
     character::Side playHand() const;
     character::Side writingHand() const;
-    // Where the playing hand / the other hand rests on the table (the other one has a default in
-    // front of the body). A spot next to pieces standing on the table (spare or captured pieces) is
-    // shifted back or outwards until the hand is clear of them. (Named after the right-handed
-    // default: setRestHand = playing hand, setLeftRestHand = writing hand.)
+    // Where the playing hand rests on the table (the other one rests in front of the body). A spot
+    // next to pieces standing on the table (spare or captured pieces) is shifted back or outwards
+    // until the hand is clear of them.
     void setRestHand(m::vec3 worldPos);
-    void setLeftRestHand(m::vec3 worldPos);              // optional
     // Game callback: world transform of a piece object (base centre at the origin, +Y up).
     // When neither obstacle callback is set, the animator also calls it (and pieceGripInfo) for
     // the ids 0, 1, 2... when a task starts, to see which pieces stand on the board and the table,
@@ -305,7 +303,6 @@ public:
     void enqueueWriting(const WriteTask& t);
     void enqueueWriting(const std::vector<WriteTask>& tasks);
     bool writingBusy() const;                            // writing-hand tasks pending or running
-    void clearWritingQueue();                            // drops pending writing tasks (running one finishes)
     float writingRemainingTime() const;                  // running writing task remainder + pending durations
     // Time along the running Write path in seconds (-1 when no path is being followed): the ink
     // is laid down wherever the tip has been with down = true up to this time.
@@ -315,7 +312,6 @@ public:
     // World transform of the pen while the hand holds it (pen frame as in WriteTask::frame).
     bool penTransform(m::mat4& out) const;
     bool holdsPen() const;
-    void clearQueue();                                   // drops pending tasks (running one finishes)
     // Drops the pending tasks and cuts the running one short, without its remaining events (a
     // handshake cut short leaves its partner to finish alone): the playing hand lets go of what it
     // holds where it is, and the game puts those pieces back itself. The next task starts from

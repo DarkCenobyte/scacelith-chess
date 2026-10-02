@@ -1330,22 +1330,6 @@ void Animator::setRestHand(vec3 worldPos) {
     }
 }
 
-void Animator::setLeftRestHand(vec3 worldPos) {
-    Impl& I = *impl_;
-    if (!I.sk) return;
-    Impl::Hand& h = I.left();
-    h.restContact = I.toChar(I.mw(worldPos));
-    h.rest = I.safeRest(Side::Left, h.restContact);
-    I.restsDirty = true;
-    if (!h.chinFollow && I.writingHandFree()) {
-        HandSample from = h.motion.sample(I.time);
-        Motion mo;
-        mo.start = I.time;
-        mo.segs.push_back(I.makeSeg(from, 0.6f, h.rest.p, vec3(0), h.rest.q, h.rest.f));
-        h.motion = mo;
-    }
-}
-
 void Animator::enqueue(const Task& t) {
     Task c = t;
     c.position = impl_->mw(t.position);   // into the solver's world
@@ -1357,7 +1341,6 @@ void Animator::enqueue(const std::vector<Task>& tasks) {
 }
 bool Animator::busy() const { return impl_->running || !impl_->queue.empty(); }
 bool Animator::runningTask(TaskType type) const { return impl_->running && impl_->cur.type == type; }
-void Animator::clearQueue() { impl_->queue.clear(); }
 void Animator::cancelTasks() {
     Impl& I = *impl_;
     I.queue.clear();
