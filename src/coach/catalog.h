@@ -91,7 +91,8 @@ public:
     std::vector<std::string> keys(const std::string& lang, const std::string& topic) const;
     const std::vector<std::string>& problems() const { return problems_; }
 
-    // Every codepoint the written lines of a language can show (subtitle glyph prewarm).
+    // Every codepoint the written lines of a language can show (subtitle glyph prewarm), Arabic
+    // as the presentation forms the text shaper draws.
     std::vector<uint32_t> codepoints(const std::string& lang) const;
 
     // Opening names the catalog cannot resolve from the opening files alone ("line:<component>"

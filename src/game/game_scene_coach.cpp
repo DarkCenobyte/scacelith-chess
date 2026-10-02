@@ -514,7 +514,7 @@ public:
     void showSkipHint(bool shown) override { rt().skipHint = shown; }
     void prewarmGlyphs(const std::string& written) override {
         std::vector<std::pair<int, uint32_t>> glyphs;
-        for (char32_t c : uni::decode(written))
+        for (char32_t c : uni::shapeArabic(uni::decode(written)).text)  // the forms the shaper draws
             if (c > 0x20) glyphs.push_back({ui::font::FACE_TEXT, uint32_t(c)});
         if (!glyphs.empty()) ui::font::prewarm(glyphs);
     }
@@ -703,7 +703,8 @@ void GameScene::startCoachGame() {
         rt.prewarmedLanguages.insert(ui);
         std::vector<std::pair<int, uint32_t>> glyphs;
         for (uint32_t cp : coach::Catalog::shared().codepoints(ui)) glyphs.push_back({ui::font::FACE_TEXT, cp});
-        for (char32_t cp : uni::decode(i18n::tr("coach.speaker"))) glyphs.push_back({ui::font::FACE_TITLE, uint32_t(cp)});
+        for (char32_t cp : uni::shapeArabic(uni::decode(i18n::tr("coach.speaker"))).text)
+            glyphs.push_back({ui::font::FACE_TITLE, uint32_t(cp)});
         ui::font::prewarm(glyphs);
     }
     if (rt.test) {

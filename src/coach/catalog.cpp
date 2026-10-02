@@ -305,7 +305,7 @@ std::vector<std::string> Catalog::keys(const std::string& lang, const std::strin
 std::vector<uint32_t> Catalog::codepoints(const std::string& lang) const {
     std::set<uint32_t> cps;
     auto addText = [&](const std::string& s) {
-        for (char32_t c : uni::decode(s))
+        for (char32_t c : uni::shapeArabic(uni::decode(s)).text)
             if (c >= 0x20) cps.insert(uint32_t(c));
     };
     if (const Language* L = language(lang))
