@@ -188,17 +188,22 @@ inline Bone armBone(Side s, Bone leftBone) { return sideBone(leftBone, s); }
 inline float palmSign(Side s) { return s == Side::Right ? 1.0f : -1.0f; }   // palm normal = (palmSign,0,0)
 inline float sideX(Side s) { return s == Side::Right ? -1.0f : 1.0f; }      // the arm's side along X
 
-inline void fingerLocals(Side side, const FingerPose& fp, quat out[5][3]) {
-    vec3 curl = fingerCurlAxis(side);
-    float ps = palmSign(side);
-    out[0][0] = qy(ps * fp.v[0][0]) * qx(fp.v[0][1]);
-    out[0][1] = qx(fp.v[0][2]);
-    out[0][2] = qx(fp.v[0][3]);
-    for (int f = 1; f < 5; ++f) {
-        out[f][0] = qx(-fp.v[f][0]) * axisAngle(curl, fp.v[f][1]);
-        out[f][1] = axisAngle(curl, fp.v[f][2]);
-        out[f][2] = axisAngle(curl, fp.v[f][3]);
+// Local rotations of the three joints of finger f.
+inline void fingerLocal(Side side, const FingerPose& fp, int f, quat out[3]) {
+    if (f == Thumb) {
+        float ps = palmSign(side);
+        out[0] = qy(ps * fp.v[0][0]) * qx(fp.v[0][1]);
+        out[1] = qx(fp.v[0][2]);
+        out[2] = qx(fp.v[0][3]);
+        return;
     }
+    vec3 curl = fingerCurlAxis(side);
+    out[0] = qx(-fp.v[f][0]) * axisAngle(curl, fp.v[f][1]);
+    out[1] = axisAngle(curl, fp.v[f][2]);
+    out[2] = axisAngle(curl, fp.v[f][3]);
+}
+inline void fingerLocals(Side side, const FingerPose& fp, quat out[5][3]) {
+    for (int f = 0; f < 5; ++f) fingerLocal(side, fp, f, out[f]);
 }
 inline void applyFingers(const Skeleton&, Pose& pose, Side side, const FingerPose& fp) {
     quat q[5][3];
@@ -212,12 +217,12 @@ constexpr float kPalmHalf = 0.0135f;    // half thickness of the palm
 
 // Hand-local frames of the three phalanges of finger f.
 inline void fingerFrames(const Skeleton& sk, Side side, const FingerPose& fp, int f, mat4 out[3]) {
-    quat q[5][3];
-    fingerLocals(side, fp, q);
+    quat q[3];
+    fingerLocal(side, fp, f, q);
     mat4 m;
     for (int j = 0; j < 3; ++j) {
         Bone b = fingerBone(side, f, j);
-        m = m * toMat4(q[f][j], sk.restOffset[b]);
+        m = m * toMat4(q[j], sk.restOffset[b]);
         out[j] = m;
     }
 }
