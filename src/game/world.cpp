@@ -426,7 +426,7 @@ void World::submitMarkers(render::Renderer& r, const std::vector<Marker>& marker
         d.material = &w.markerMat;
         d.model = translate(layout::squareCenter(mk.square) + vec3(0, 0.0004f, 0));
         d.inst[0] = vec4(float(mk.kind), mk.strength, 0, 0);
-        d.flags = render::DRAW_NO_REFLECTION | render::DRAW_NO_VELOCITY;
+        d.flags = render::DRAW_NO_REFLECTION;
         d.objectId = OBJ_MARKER + uint32_t(mk.square);
         r.submit(d);
     }
@@ -456,7 +456,7 @@ void World::submitCoachMarks(render::Renderer& r, const std::vector<CoachMark>& 
         render::DrawItem d;
         d.mesh = &w.coachQuad;
         d.material = &w.coachMarkMat;
-        d.flags = render::DRAW_NO_REFLECTION | render::DRAW_NO_VELOCITY;
+        d.flags = render::DRAW_NO_REFLECTION;
         d.objectId = OBJ_COACH_MARK + n;
         float strength = std::min(mk.strength, 1.0f), age = std::max(mk.age, 0.0f);
         if (mk.kind == CoachMark::Square) {

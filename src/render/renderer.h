@@ -83,7 +83,6 @@ enum DrawFlags : uint32_t {
     DRAW_STATIC = 1u << 1,          // never moves (shadow caches and light probes rely on it)
     DRAW_NO_REFLECTION = 1u << 2,   // skipped in planar reflection and probe passes
     DRAW_HIDDEN_MAIN = 1u << 3,     // skipped in the main camera pass (e.g. the player's own head)
-    DRAW_NO_VELOCITY = 1u << 4,
     DRAW_NO_CULL = 1u << 5,         // never frustum culled (e.g. displacement beyond mesh bounds)
 };
 
