@@ -218,12 +218,12 @@ widens; a cut lets it end while the view darkens).
 ## What the seat refactor already provides
 
 - `Seat` (`game_scene.h`): colour, `Controller` (Human / Stockfish), name, Elo, provisional flag,
-  preset and engine settings, playing hand and `writingHand()`. `GameScene::seat(i)` exposes it.
+  preset and engine settings, playing hand and `writingHand()`.
 - `isHumanSeat(seat)` decides who acts in `beginTurn()`; `configureSeats()` builds the seats for
   each game from the mode (`GameMode::Play` / `Watch`).
 - Per-seat engine settings, and one Stockfish serving both sides with a hash clear whenever the
   settings change (`ai::Engine`, about 10 ms with 64 MB).
-- `setClockFrozen()` / `clockFrozen()`, honoured by `updatePlaying()`.
+- `setClockFrozen()`, honoured by `updatePlaying()`.
 - `CameraPose`, `CameraFlight` (flight, retarget, `handoverShape()`), `ObserverCamera` (flights,
   free movement kept inside the hall). These are engine-free and unit-tested
   (`tests/game_mode_tests.cpp`).
