@@ -123,7 +123,6 @@ Place placeNew(const std::string& tmp, const std::string& dst, std::string& err)
 }
 bool deleteFile(const std::string& path) { return DeleteFileW(widen(path).c_str()) != 0; }
 unsigned processId() { return unsigned(GetCurrentProcessId()); }
-bool localTime(std::time_t t, std::tm& out) { return localtime_s(&out, &t) == 0; }
 const char kSeparator = '\\';
 #else
 int listFolder(const std::string& dir, std::vector<FileInfo>& out, std::string& err) {
@@ -177,7 +176,6 @@ Place placeNew(const std::string& tmp, const std::string& dst, std::string& err)
 }
 bool deleteFile(const std::string& path) { return unlink(path.c_str()) == 0; }
 unsigned processId() { return unsigned(getpid()); }
-bool localTime(std::time_t t, std::tm& out) { return localtime_r(&t, &out) != nullptr; }
 const char kSeparator = '/';
 #endif
 
@@ -819,21 +817,16 @@ RemoveResult remove(const Entry& entry) {
     return res;
 }
 
-// ---- Games of an online server ----------------------------------------------------------------------------
+// ---- Dates ------------------------------------------------------------------------------------------------
 
-namespace {
-
-// Days from 1970-01-01 to a date of the proleptic Gregorian calendar (H. Hinnant's days_from_civil).
-int64_t daysFromCivil(int64_t y, int m, int d) {
-    y -= m <= 2 ? 1 : 0;
-    const int64_t era = (y >= 0 ? y : y - 399) / 400;
-    const int64_t yoe = y - era * 400;
-    const int64_t doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + d - 1;
-    const int64_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
-    return era * 146097 + doe - 719468;
+bool localTime(std::time_t t, std::tm& out) {
+#ifdef _WIN32
+    return localtime_s(&out, &t) == 0;
+#else
+    return localtime_r(&t, &out) != nullptr;
+#endif
 }
 
-// Digits of s at [at, at + n) as a number; -1 when one of them is not a digit.
 int digitsAt(const std::string& s, size_t at, size_t n) {
     if (s.size() < at + n) return -1;
     int v = 0;
@@ -843,6 +836,19 @@ int digitsAt(const std::string& s, size_t at, size_t n) {
     }
     return v;
 }
+
+int64_t daysFromCivil(int64_t y, int m, int d) {
+    y -= m <= 2 ? 1 : 0;
+    const int64_t era = (y >= 0 ? y : y - 399) / 400;
+    const int64_t yoe = y - era * 400;
+    const int64_t doy = (153 * (m + (m > 2 ? -3 : 9)) + 2) / 5 + d - 1;
+    const int64_t doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    return era * 146097 + doe - 719468;
+}
+
+// ---- Games of an online server ----------------------------------------------------------------------------
+
+namespace {
 
 // "2026.09.28" and "14:03:07", in UTC, as a time_t; false unless both are complete and valid.
 bool utcInstant(const std::string& date, const std::string& time, std::time_t& out) {

@@ -320,11 +320,7 @@ std::string timeControlLabel(int64_t baseMs, int64_t incMs) {
 
 std::string exportFileName(const std::string& host, const std::string& username, std::time_t when) {
     std::tm tm{};
-#ifdef _WIN32
-    const bool have = localtime_s(&tm, &when) == 0;
-#else
-    const bool have = localtime_r(&when, &tm) != nullptr;
-#endif
+    const bool have = archive::localTime(when, tm);
     char date[32] = "0000-00-00";
     if (have) std::snprintf(date, sizeof date, "%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
     return archive::sanitizeName(host, 64) + "_" + archive::sanitizeName(username, 40) + "_" + date + ".json";
@@ -334,11 +330,7 @@ std::string exportFileName(const std::string& host, const std::string& username,
 
 std::string gifFileName(std::time_t started, const std::string& white, const std::string& black, uint64_t gameId) {
     std::tm tm{};
-#ifdef _WIN32
-    const bool have = started > 0 && localtime_s(&tm, &started) == 0;
-#else
-    const bool have = started > 0 && localtime_r(&started, &tm) != nullptr;
-#endif
+    const bool have = started > 0 && archive::localTime(started, tm);
     char stamp[64] = "0000-00-00_000000";
     if (have)
         std::snprintf(stamp, sizeof stamp, "%04d-%02d-%02d_%02d%02d%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,
@@ -380,27 +372,14 @@ std::time_t pgnLocalTime(const std::string& date, const std::string& time, std::
 
 std::time_t pgnGameStart(const std::string& date, const std::string& time, const std::string& utcDate, const std::string& utcTime,
                          std::time_t fallback) {
-    auto num = [](const std::string& s, size_t at, size_t n) {
-        int v = 0;
-        for (size_t i = at; i < at + n; ++i) {
-            if (i >= s.size() || s[i] < '0' || s[i] > '9') return -1;
-            v = v * 10 + (s[i] - '0');
-        }
-        return v;
-    };
-    const bool hasTime = num(time, 0, 2) >= 0 && time.size() >= 5 && time[2] == ':' && num(time, 3, 2) >= 0;
+    using archive::digitsAt;
+    const bool hasTime = digitsAt(time, 0, 2) >= 0 && time.size() >= 5 && time[2] == ':' && digitsAt(time, 3, 2) >= 0;
     if (hasTime) return pgnLocalTime(date, time, fallback);
-    const int y = num(utcDate, 0, 4), mo = num(utcDate, 5, 2), d = num(utcDate, 8, 2);
-    const int h = num(utcTime, 0, 2), mi = num(utcTime, 3, 2), se = num(utcTime, 6, 2);
+    const int y = digitsAt(utcDate, 0, 4), mo = digitsAt(utcDate, 5, 2), d = digitsAt(utcDate, 8, 2);
+    const int h = digitsAt(utcTime, 0, 2), mi = digitsAt(utcTime, 3, 2), se = digitsAt(utcTime, 6, 2);
     if (y >= 1970 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31 && h >= 0 && h <= 23 && mi >= 0 && mi <= 59 && se >= 0 && se <= 60 &&
-        utcTime.size() >= 8 && utcTime[2] == ':' && utcTime[5] == ':') {
-        // Days since 1970-01-01 of a proleptic Gregorian date (H. Hinnant's days_from_civil).
-        const int yy = mo <= 2 ? y - 1 : y;
-        const int era = yy / 400, yoe = yy - era * 400;
-        const int doy = (153 * (mo + (mo > 2 ? -3 : 9)) + 2) / 5 + d - 1;
-        const long long days = static_cast<long long>(era) * 146097 + yoe * 365 + yoe / 4 - yoe / 100 + doy - 719468;
-        return std::time_t(days * 86400 + h * 3600 + mi * 60 + se);
-    }
+        utcTime.size() >= 8 && utcTime[2] == ':' && utcTime[5] == ':')
+        return std::time_t(archive::daysFromCivil(y, mo, d) * 86400 + h * 3600 + mi * 60 + se);
     return pgnLocalTime(date, std::string(), fallback);
 }
 
