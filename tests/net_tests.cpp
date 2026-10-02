@@ -945,6 +945,44 @@ TEST(net_credentials_isolation) {
     net::sys::removeFile(path);
 }
 
+// A saved token that cannot be decrypted here (a portable install copied to another PC or Windows
+// account) is no saved session once a read found it so: the game offers to sign in instead of
+// resuming a session that fails at every opening. The file keeps it (it may be another account's).
+TEST(net_credentials_undecryptable_token) {
+    std::string path = tempCredentialPath("undecryptable");
+    const std::string A = "a.example.org:443", B = "b.example.org:443";
+    const std::string tokenA = "sct_" + std::string(43, 'A'), tokenB = "sct_" + std::string(43, 'B');
+    const std::string blob = net::protectToken(A, tokenA);   // bound to A: never decrypts for B
+    Value rec = Value::object();
+    rec.set("origin", B);
+    rec.set("username", "bob");
+    rec.set("token", blob);
+    Value doc = Value::object();
+    doc.set("version", 1);
+    doc.set("records", Value::array()).push(rec);
+    CHECK(net::sys::writeFileAtomic(path, doc.dump(), true));
+    {
+        net::CredentialStore s(path);
+        CHECK(s.hasToken(B));                       // not read yet
+        net::Credential out;
+        CHECK(s.get(B, out));
+        CHECK(out.token.empty());
+        CHECK_EQ(out.username, std::string("bob"));
+        CHECK(!s.hasToken(B));                      // no saved session there from now on
+        CHECK(s.get(B, out) && out.token.empty());
+        CHECK(!s.hasToken(B));
+        std::string text;
+        CHECK(net::sys::readFile(path, text, 1 << 20));
+        CHECK(text.find(blob) != std::string::npos);   // the file is left as it is
+        // A new sign-in there replaces it.
+        out.token = tokenB;
+        CHECK(s.put(out));
+        CHECK(s.hasToken(B));
+        CHECK(s.get(B, out) && out.token == tokenB);
+    }
+    net::sys::removeFile(path);
+}
+
 // A token refused by the server is erased only while it is still the one saved: a GIF (on its own
 // thread) may be refused while a new sign-in saves another token.
 TEST(net_credentials_clear_that_token) {

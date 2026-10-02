@@ -189,15 +189,19 @@ CredentialStore::Record* CredentialStore::findLocked(const std::string& origin) 
 bool CredentialStore::get(const std::string& origin, Credential& out) const {
     std::lock_guard<std::mutex> lk(mu_);
     loadLocked();
-    const Record* r = findLocked(origin);
+    Record* r = findLocked(origin);
     if (!r) return false;
     out = Credential();
     out.origin = r->origin;
     out.username = r->username;
     out.serverId = r->serverId;
     out.pinnedSha256 = r->pin;
-    if (!r->tokenBlob.empty() && !unprotectToken(origin, r->tokenBlob, out.token))
-        LOGW("net: the saved session of %s cannot be decrypted here", origin.c_str());
+    if (!r->tokenBlob.empty()) {
+        // Said once; from then on hasToken() is false (the game offers to sign in, not to resume).
+        bool readable = unprotectToken(origin, r->tokenBlob, out.token);
+        if (!readable && !r->unreadable) LOGW("net: the saved session of %s cannot be decrypted here", origin.c_str());
+        r->unreadable = !readable;
+    }
     return true;
 }
 
@@ -205,7 +209,7 @@ bool CredentialStore::hasToken(const std::string& origin) const {
     std::lock_guard<std::mutex> lk(mu_);
     loadLocked();
     const Record* r = findLocked(origin);
-    return r && !r->tokenBlob.empty();
+    return r && !r->tokenBlob.empty() && !r->unreadable;
 }
 
 std::string CredentialStore::username(const std::string& origin) const {
@@ -241,6 +245,7 @@ bool CredentialStore::put(const Credential& c) {
     r->serverId = c.serverId;
     r->pin = c.pinnedSha256;
     r->tokenBlob = blob;
+    r->unreadable = false;
     return saveLocked();
 }
 
