@@ -382,6 +382,26 @@ TEST(elo_ini_records) {
     CHECK_EQ(b.peak, elo::kFloor);
     CHECK_EQ(b.unratedGames, elo::kUnratedGames - 1);
     CHECK_EQ(b.unratedHalfPoints, 2 * (elo::kUnratedGames - 1));
+    // Values far beyond any game are bounded: the next game cannot overflow the sums or counters.
+    IniFile huge;
+    huge.setInt("player.elo", 2147483647);
+    huge.setInt("player.games", 2147483647);
+    huge.setInt("player.wins", 2147483647);
+    huge.setBool("player.rated", true);
+    elo::Record h = elo::readRecord(huge, "player");
+    elo::Change hc = elo::applyResult(h, 1500, 1.0);
+    CHECK_EQ(hc.delta(), 1);  // K = 10, PD 0.92 at the 400-point cap
+    CHECK(h.games > 0 && h.wins > 0);
+    IniFile hugeSum;
+    hugeSum.setInt("player.games", 4);
+    hugeSum.setBool("player.rated", false);
+    hugeSum.setInt("player.unrated_games", 4);
+    hugeSum.setInt("player.unrated_half_points", 8);
+    hugeSum.setInt("player.unrated_opponents", 2147483647);
+    elo::Record hs = elo::readRecord(hugeSum, "player");
+    elo::applyResult(hs, 1500, 1.0);
+    CHECK(hs.rated);
+    CHECK_EQ(hs.rating, elo::kMaxInitialRating);
     IniFile sums;
     sums.setInt("player.games", 40);
     sums.setBool("player.rated", true);

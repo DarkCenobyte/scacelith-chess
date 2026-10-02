@@ -125,7 +125,8 @@ PairChange applyPair(Record& white, Record& black, double whiteScore);
 // keys take the defaults; a file written before the unrated phase existed has no 'rated' key, and
 // its record is rated when it has games (they were rated then); a rated record without
 // 'counted_games' counts all its games. Values are made consistent (floor, counts >= 0, peak >=
-// rating, counted games at most the games, no unrated sums on a rated record).
+// rating, counted games at most the games, no unrated sums on a rated record) and bounded far above
+// anything a game can reach (no overflow in the next game, whatever the file holds).
 Record readRecord(const IniFile& ini, const std::string& section);
 void writeRecord(IniFile& ini, const std::string& section, const Record& r);
 
