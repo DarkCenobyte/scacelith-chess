@@ -297,8 +297,10 @@ public:
     bool runningTask(TaskType type) const;               // a task of that type is under way
 
     // Writing hand. setWritingRest: where the writing hand waits while it holds the pen, e.g.
-    // resting on the scoresheet beside the next row (world point on the paper). Its events come
-    // out of update() like the others.
+    // resting on the scoresheet beside the next row (world point on the paper). The idle hand
+    // glides there at once; a busy one (writing tasks running or queued) once they are done, unless
+    // they took it there (the tasks that start afterwards end on it). Its events come out of
+    // update() like the others.
     void setWritingRest(m::vec3 worldPos);
     void enqueueWriting(const WriteTask& t);
     void enqueueWriting(const std::vector<WriteTask>& tasks);

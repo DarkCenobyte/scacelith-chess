@@ -1143,11 +1143,31 @@ void Animator::Impl::finishWriteTask(std::vector<Event>& ev) {
     wr.turnStart = -1.0f;
     wr.corner = nullptr;
     if (wr.queue.empty()) {
+        // A writing rest asked for meanwhile: the hand goes there now, unless a task took it there.
+        if (wr.restPending && wr.penHeld && time >= wr.suspendUntil) {
+            wr.restPending = false;
+            if (length(left().motion.sample(time).p - writingRestSample().p) > 5e-4f) glideToWritingRest();
+        }
         Event e;
         e.type = EventType::WritingQueueEmpty;
         e.time = time;
         ev.push_back(e);
     }
+}
+
+void Animator::Impl::glideToWritingRest() {
+    Hand& h = left();
+    HandSample from = h.motion.sample(time);
+    HandSample r = writingRestSample();
+    Motion mo;
+    mo.start = time;
+    Segment sg = makeSeg(from, 0.5f, r.p, vec3(0), r.q, r.f);
+    sg.arcH = 0.01f;
+    sg.pen.keys.clear();
+    sg.pen.add(0.0f, from.pen);
+    sg.pen.add(1.0f, r.pen);
+    mo.segs.push_back(sg);
+    h.motion = mo;
 }
 
 // A handshake needs the writing hand (left-handed player): the running writing task stops here.
@@ -1205,19 +1225,12 @@ void Animator::setWritingRest(vec3 worldPos) {
     I.wr.rest = I.toChar(I.mw(worldPos));
     I.wr.restYaw = I.choosePenYaw(I.wr.rest);
     I.paperY = I.wr.rest.y;
+    // The idle hand glides there now, a busy one once it is free (finishWriteTask).
     if (I.wr.penHeld && !I.wr.running && I.wr.queue.empty() && I.time >= I.wr.suspendUntil) {
-        Impl::Hand& h = I.left();
-        HandSample from = h.motion.sample(I.time);
-        HandSample r = I.writingRestSample();
-        Motion mo;
-        mo.start = I.time;
-        Segment sg = I.makeSeg(from, 0.5f, r.p, vec3(0), r.q, r.f);
-        sg.arcH = 0.01f;
-        sg.pen.keys.clear();
-        sg.pen.add(0.0f, from.pen);
-        sg.pen.add(1.0f, r.pen);
-        mo.segs.push_back(sg);
-        h.motion = mo;
+        I.wr.restPending = false;
+        I.glideToWritingRest();
+    } else {
+        I.wr.restPending = true;
     }
 }
 

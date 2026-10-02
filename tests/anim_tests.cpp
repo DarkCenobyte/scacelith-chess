@@ -263,6 +263,66 @@ TEST(anim_write_empty_path_stays_at_the_rest) {
     CHECK(!an.writingBusy());
 }
 
+// The writing rest asked for while the hand is busy: the scoresheet asks for the next row right after
+// queueing the move's Write, and the hand goes aside while its owner reads the sheet (S) even in the
+// middle of an entry. Either way the hand ends where it would have glided had it been asked once
+// idle, and it does not move again when asked for the spot it is already going to.
+TEST(anim_writing_rest_asked_while_busy) {
+    const float paper = layout::TABLE_TOP_Y + layout::SCORESHEET_THICKNESS;
+    const m::vec3 row(-0.28f, paper, 0.36f), aside(-0.36f, paper, 0.40f);
+    std::vector<PenKey> path;
+    for (int i = 0; i <= 30; ++i) path.push_back({float(i) / 60.0f, row + m::vec3(0.0003f * float(i), 0, -0.002f), i > 2 && i < 28});
+    // when: 0 = aside once the hand is idle again (the reference), 1 = aside at WritingDone, 2 = the
+    // same row again at WritingDone, 3 = aside right after queueing the Write.
+    auto run = [&](int when, float& movedAfter) {
+        anim::Animator an;
+        initWhite(an);
+        an.setWritingRest(row);
+        std::vector<WriteTask> w(2);
+        w[0].type = WriteTaskType::PickPen;
+        w[0].frame = penFrame();
+        w[1].type = WriteTaskType::Write;
+        w[1].path = path;
+        an.enqueueWriting(w);
+        if (when == 3) an.setWritingRest(aside);
+        const float tEnd = anim::Timing::PickPen + anim::writeTaskDuration(w[1]);
+        std::vector<anim::Event> ev;
+        bool asked = when == 3;
+        m::vec3 atEnd(0.0f);
+        movedAfter = 0.0f;
+        for (int step = 0; step < 600; ++step) {
+            ev.clear();
+            an.update(1.0f / 120.0f, ev);
+            for (const anim::Event& e : ev)
+                if (e.type == anim::EventType::WritingDone && (when == 1 || when == 2)) {
+                    CHECK(an.writingBusy());
+                    an.setWritingRest(when == 1 ? aside : row);
+                    asked = true;
+                }
+            if (when == 0 && !asked && !an.writingBusy()) {
+                an.setWritingRest(aside);
+                asked = true;
+            }
+            const m::vec3 hand = an.globals()[character::HandL].translation();
+            if (an.time() < tEnd) atEnd = hand;
+            else movedAfter = std::max(movedAfter, m::length(hand - atEnd));
+        }
+        CHECK(asked);
+        CHECK(an.holdsPen());
+        return an.globals()[character::HandL].translation();
+    };
+    float moved[4];
+    const m::vec3 ref = run(0, moved[0]), atDone = run(1, moved[1]), queued = run(3, moved[3]);
+    run(2, moved[2]);
+    std::fprintf(stderr, "  writing hand: asked aside at WritingDone %.2f mm, right after queueing %.2f mm from where the idle hand glides; "
+                 "asked the same row again: moves %.2f mm after the Write, %.2f mm for aside asked before it\n",
+                 m::length(atDone - ref) * 1000.0f, m::length(queued - ref) * 1000.0f, moved[2] * 1000.0f, moved[3] * 1000.0f);
+    CHECK(m::length(atDone - ref) < 1e-4f);
+    CHECK(m::length(queued - ref) < 1e-4f);
+    CHECK(moved[2] < 1e-4f);
+    CHECK(moved[3] < 1e-4f);
+}
+
 // A very short page turn (0.1 s, where the approach would end after the pinch): the writing hand
 // still moves without a jump, and the page events keep their instants.
 TEST(anim_very_short_page_turn_stays_continuous) {

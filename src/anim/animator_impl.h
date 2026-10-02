@@ -1513,6 +1513,7 @@ struct Animator::Impl {
         mat4 penTable;              // where the pen lies (solver world): initial / last pick / put frame
         vec3 rest{0, 0, 0};         // writing rest point on the paper (character space)
         float restYaw = 0.3f;       // pen azimuth there (see choosePenYaw)
+        bool restPending = false;   // set while the hand was busy: it goes there once free
         float suspendUntil = -1.0f; // the writing hand is busy shaking hands (left-handed player)
         std::function<vec3(float s)> corner;   // running page turn: corner (solver world)
         float lean = 0.0f;          // 0..1: the body leans towards the sheet while writing
@@ -1538,6 +1539,7 @@ struct Animator::Impl {
     quat penBase(vec3 anchor, float yawIn) const;
     float choosePenYaw(vec3 anchor);
     HandSample writingRestSample() const;
+    void glideToWritingRest();      // the idle writing hand, pen in hand, to the writing rest
     float paperY = 0.0f;            // last paper height seen (character space)
     PenPose evalPen;                // pen in the writing hand at the last evaluate() (tip lock applied)
     mat4 toCharM(const mat4& worldSolver) const { return toMat4(qToChar(rotOf(worldSolver)), toChar(worldSolver.translation())); }

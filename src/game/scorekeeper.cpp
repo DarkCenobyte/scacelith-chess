@@ -192,6 +192,7 @@ void Scorekeeper::beginMoveEntry(int seat, int ply, const std::string& san) {
     }
     anim_[seat].enqueueWriting(w);
     ledger_.begin(seat, ply);
+    refreshRest(seat);   // beside the next row: where this entry's Write takes the hand back
 }
 
 void Scorekeeper::setHold(int seat, bool hold) {
@@ -284,7 +285,6 @@ void Scorekeeper::onEvent(int seat, const anim::Event& e) {
     }
     case anim::EventType::WritingDone:
         sh.finishEntry();
-        refreshRest(seat);
         break;
     case anim::EventType::PageGripped: audio::play(audio::Sfx::PageTurn, sh.pageCorner(0.0f), 0.9f); break;
     case anim::EventType::PageTurned:
