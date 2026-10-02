@@ -143,6 +143,11 @@ bool plausibleToken(const std::string& t) {
     return true;
 }
 
+// A 6-digit code of an authenticator app; anything else is taken for a recovery code.
+bool isTotpCode(const std::string& s) {
+    return s.size() == 6 && std::all_of(s.begin(), s.end(), [](char c) { return c >= '0' && c <= '9'; });
+}
+
 constexpr int kPingBurst = 3;                   // quick pings after the one sent at Welcome
 constexpr int kPingBurstGapMs = 1100;           // the server answers one Ping per 950 ms at most
 constexpr size_t kOffsetSamples = 8;            // clock offset: lowest round trip of the last 8
@@ -1589,8 +1594,7 @@ void OnlineClient::loginMfa(const std::string& code) {
         }
         json::Value b = json::Value::object();
         b.set("mfaToken", d->mfaToken);
-        bool digits = code.size() == 6 && std::all_of(code.begin(), code.end(), [](char c) { return c >= '0' && c <= '9'; });
-        b.set(digits ? "code" : "recoveryCode", code);
+        b.set(isTotpCode(code) ? "code" : "recoveryCode", code);
         Impl::Api a = d->api(e, "POST", "/auth/login/mfa", &b, false, d->httpCancel);
         d->finishLogin(e, a, ev);
         d->post(ev);
@@ -1772,10 +1776,8 @@ void OnlineClient::mfaEnable(const std::string& code) {
 }
 
 void OnlineClient::mfaDisable(const std::string& password, const std::string& codeOrRecovery) {
-    bool digits = codeOrRecovery.size() == 6 &&
-                  std::all_of(codeOrRecovery.begin(), codeOrRecovery.end(), [](char c) { return c >= '0' && c <= '9'; });
     simplePost(impl_.get(), impl_->ep, Event::Kind::MfaDisableResult, "/account/mfa/totp/disable",
-               obj({{"password", password}, {digits ? "code" : "recoveryCode", codeOrRecovery}}), true);
+               obj({{"password", password}, {isTotpCode(codeOrRecovery) ? "code" : "recoveryCode", codeOrRecovery}}), true);
 }
 
 void OnlineClient::regenerateRecoveryCodes(const std::string& password, const std::string& code) {
@@ -1807,11 +1809,6 @@ uint64_t idOf(const json::Value& v) {
     const std::string& s = v.asString();
     if (s.empty() || s.size() > 16 || !std::all_of(s.begin(), s.end(), [](char c) { return c >= '0' && c <= '9'; })) return 0;
     return std::strtoull(s.c_str(), nullptr, 10);
-}
-
-// A 6-digit code of an authenticator app; anything else is taken for a recovery code.
-bool isTotpCode(const std::string& s) {
-    return s.size() == 6 && std::all_of(s.begin(), s.end(), [](char c) { return c >= '0' && c <= '9'; });
 }
 
 // The second factor of a re-authentication: none, "code" or "recoveryCode" (as mfaDisable).
