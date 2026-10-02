@@ -17,7 +17,8 @@
 //
 // Writer. Tags in a stable order (tagRank), movetext wrapped at 80 columns with move numbers
 // (and "N..." for Black after a comment), NAGs, per-ply comments {[%clk ...] [%emt ...] text},
-// the result. write() then read() gives back the same moves, tags, clocks, times and comments.
+// the result. write() then read() gives back the same moves, tags, clocks, times and comments
+// (braces in comment text are written as parentheses).
 // chess::Game::pgn() stays the quick export of the scoresheets; this writer is the archive's.
 #pragma once
 #include "chess.h"
