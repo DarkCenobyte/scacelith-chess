@@ -300,13 +300,15 @@ bool hasMarkAbove(uint32_t cp) {
         }
     }
     if (cp >= 0x100 && cp <= 0x17F) {
-        // Latin Extended-A: most letters carry a mark above; the ones below (cedilla, ogonek) and
-        // the plain ones are excluded.
+        // Latin Extended-A: most letters carry a mark above; the ones below (cedilla, ogonek), the
+        // ones with a stroke or a middle dot, and the plain ones are excluded (not ģ, whose comma
+        // stands above, nor į, which keeps the dot of i).
         switch (cp) {
-        case 0x104: case 0x105: case 0x118: case 0x119: case 0x122: case 0x123: case 0x12E: case 0x12F:
-        case 0x131: case 0x136: case 0x137: case 0x138: case 0x13B: case 0x13C: case 0x141: case 0x142:
-        case 0x145: case 0x146: case 0x14A: case 0x14B: case 0x152: case 0x153: case 0x156: case 0x157:
-        case 0x15E: case 0x15F: case 0x162: case 0x163: case 0x166: case 0x167: case 0x172: case 0x173: return false;
+        case 0x104: case 0x105: case 0x110: case 0x111: case 0x118: case 0x119: case 0x122: case 0x126:
+        case 0x127: case 0x12E: case 0x131: case 0x132: case 0x136: case 0x137: case 0x138: case 0x13B:
+        case 0x13C: case 0x13F: case 0x140: case 0x141: case 0x142: case 0x145: case 0x146: case 0x14A:
+        case 0x14B: case 0x152: case 0x153: case 0x156: case 0x157: case 0x15E: case 0x15F: case 0x162:
+        case 0x163: case 0x166: case 0x167: case 0x172: case 0x173: case 0x17F: return false;
         default: return true;
         }
     }

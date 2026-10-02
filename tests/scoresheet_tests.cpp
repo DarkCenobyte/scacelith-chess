@@ -266,6 +266,10 @@ TEST(scoresheet_pen_path) {
     PenPath cp = buildPenPath(placeHandwriting(cjk, box, 3), 3);
     CHECK(cp.duration / 3.0f > 0.3f && cp.duration / 3.0f < 0.5f);
     CHECK(isCjk(0x674E) && !isCjk('A') && hasMarkAbove(0xE9) && !hasMarkAbove(0xE7) && hasMarkAbove(0x439));
+    // Latin Extended-A: a stroke, a middle dot, the long s and the dotless IJ are no marks above;
+    // the comma of g with cedilla stands above, and i with ogonek keeps its dot.
+    for (uint32_t cp : {0x110u, 0x111u, 0x126u, 0x127u, 0x132u, 0x13Fu, 0x140u, 0x141u, 0x17Fu}) CHECK(!hasMarkAbove(cp));
+    for (uint32_t cp : {0x107u, 0x123u, 0x12Fu, 0x133u, 0x15Bu, 0x17Cu}) CHECK(hasMarkAbove(cp));
 }
 
 TEST(scoresheet_pad_placement) {
