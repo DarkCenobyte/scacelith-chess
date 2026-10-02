@@ -834,7 +834,7 @@ struct Animator::Impl {
     }
     void fkAll(const Pose& p) { fkChain(p, 0, BoneCount - 1); }
 
-    // Shoulder of 'side' for given spine params and clavicle rotation (character space).
+    // Local rotations of the pelvis, the spine and the legs for spine params s.
     void applySpine(Pose& p, const SpineParams& s) const {
         float fp = s.flex * 0.24f, f1 = s.flex * 0.42f, f2 = s.flex * 0.34f;
         p.local[Pelvis] = qx(fp);
@@ -864,6 +864,7 @@ struct Animator::Impl {
         float prot = clamp(0.55f * std::max(0.0f, reach - 0.62f) * (0.4f + fwd) + 0.20f * crossAmt, 0.0f, 0.34f);
         return qy(prot * -sx) * qz(elev * sx);
     }
+    // Shoulder of 'side' for given spine params and clavicle rotation (character space).
     vec3 shoulderFor(Pose& p, Side s, const SpineParams& sp, vec3 wrist) {
         applySpine(p, sp);
         mat4 pel = localMat(p, Pelvis);
@@ -1156,7 +1157,8 @@ struct Animator::Impl {
         return std::max(known, layout::TABLE_TOP_Y);
     }
     // Highest obstacle (character Y) under the wrist and the fingertips moving between two hand
-    // poses of the right hand.
+    // poses of hand s (the right one by default; the finger geometry is the right hand's, mirrored by
+    // handPoint).
     float pathTop(const HandSample& a, vec3 pb, quat qb, const FingerPose& fb, Side s = Side::Right) const {
         vec3 ta = a.p + rotate(a.q, handPoint(s, fingerTip(*sk, Side::Right, a.f, Middle)));
         vec3 tb = pb + rotate(qb, handPoint(s, fingerTip(*sk, Side::Right, fb, Middle)));
@@ -1175,16 +1177,19 @@ struct Animator::Impl {
         // Starting from the table among pieces: up first, then across.
         if (from.p.y - tableC < 0.12f && length(from.v) < 0.05f) sg.hs = std::max(sg.hs, 0.10f);
     }
-    // How far the lowest fingertip pad hangs below the wrist (right hand, rotation q).
+    // How far the lowest fingertip pad hangs below the wrist (hand s, the right one by default;
+    // rotation q).
     float handBelow(quat q, const FingerPose& f, Side s = Side::Right) const {
         float below = 0.0f;
         for (int i = 0; i < 5; ++i) below = std::max(below, -rotate(q, handPoint(s, fingerTip(*sk, Side::Right, f, i))).y + kPadRadius);
         return below;
     }
-    // Highest piece top (world Y) whose base comes within 'radius' of pW (world), ignoring piece
-    // ignoreId when the game supports it.
+    // The obstacle queries know where the pieces stand (the game's callbacks, or the pieces read when
+    // the task started) / know at least one piece (also one this animator sets down off the board).
     bool knowsPieces() const { return (owner && (owner->obstacleTopNear || owner->pathObstacleTop)) || sceneKnown; }
     bool knowsAnyPiece() const { return knowsPieces() || !tableLeft.empty() || !pending.empty(); }
+    // Highest piece top (world Y) whose base comes within 'radius' of pW (world), ignoring piece
+    // ignoreId when the game supports it.
     float topNear(vec3 pW, float radius, int ignoreId) const {
         float fr = freshTop(pW, pW, radius, ignoreId);
         if (owner && owner->obstacleTopNear) return std::max(owner->obstacleTopNear(mw(pW), radius, ignoreId), fr);
