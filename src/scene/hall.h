@@ -28,10 +28,10 @@
 //     reserved for a painting mode that ceiling.glsl does not implement (it ignores instParams).
 //   * WindowGlass: two thin faces per window (transparent, no shadow casting); uv = (distance along
 //     the wall from the opening's left edge seen from inside, height above the sill) in meters.
-//   * Tapestry: one part per tapestry, inst[0] = (colour 0 blue / 1 red, pattern seed, width m,
-//     height m). uv spans [0,1]^2 over the woven area: (0,0) = bottom-left seen from the front,
-//     (1,1) = top-right; aspect = width / height = inst[0].z / inst[0].w (all hall tapestries are
-//     TAPESTRY_W x TAPESTRY_H except the two narrower ones of the -Z wall, TAPESTRY_NARROW_W).
+//   * Tapestry: one part per tapestry, in tapestry.glsl's layout: inst[0] = (colour 0 blue / 1 red,
+//     pattern seed, extra seed, 0), inst[1] = (width m, height m, 0, 0). uv spans [0,1]^2 over the
+//     woven area: (0,0) = bottom-left seen from the front, (1,1) = top-right (all hall tapestries
+//     are TAPESTRY_W x TAPESTRY_H except the two narrower ones of the -Z wall, TAPESTRY_NARROW_W).
 //     The back face (towards the wall) reuses the same uv.
 #pragma once
 #include "../game/layout.h"

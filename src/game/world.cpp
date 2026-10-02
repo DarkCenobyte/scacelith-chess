@@ -193,16 +193,7 @@ bool World::loadStep() {
         break;
     }
     case 1: {
-        Model hallModel = hall::buildHall();
-        for (ModelPart& p : hallModel.parts) {
-            if (p.material != MaterialId::Tapestry) continue;
-            // hall: inst[0] = (colour, seed, width, height); tapestry.glsl: inst[0] = (colour,
-            // pattern seed, extra seed), inst[1].xy = size.
-            vec4 h = p.inst[0];
-            p.inst[1] = vec4(h.z, h.w, 0.0f, 0.0f);
-            p.inst[0] = vec4(h.x, h.y, std::fmod(h.y * 7.31f, 1.0f), 0.0f);
-        }
-        w.hall.upload(hallModel);
+        w.hall.upload(hall::buildHall());
         // Floor tile grids aligned with the hall's layout (field tiles start at the field corner;
         // the inlay grid is offset so its joints miss the cabochons at the tile corners).
         materials::getMutable(MaterialId::FloorMarble).params[4] =

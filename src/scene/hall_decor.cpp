@@ -156,7 +156,9 @@ void buildTapestries(Accum& a, std::vector<ModelPart>& parts) {
         p.name = "hall_tapestry_" + std::to_string(idx);
         p.material = MaterialId::Tapestry;
         p.flags = render::DRAW_STATIC | render::DRAW_CAST_SHADOW;
-        p.inst[0] = vec4(t.color, float(idx) * 0.137f + 0.21f, Wt, Ht);
+        const float seed = float(idx) * 0.137f + 0.21f;
+        p.inst[0] = vec4(t.color, seed, std::fmod(seed * 7.31f, 1.0f), 0.0f);  // tapestry.glsl: colour, seeds
+        p.inst[1] = vec4(Wt, Ht, 0.0f, 0.0f);                                      // size in m
         surface(p.mesh, 72, 44, [&](float s, float tt) { return fn(s, tt, 0.0f); }, false, UVMode::Param);
         surface(p.mesh, 72, 44, [&](float s, float tt) { return fn(s, tt, 0.008f); }, true, UVMode::Param);
         parts.push_back(std::move(p));
