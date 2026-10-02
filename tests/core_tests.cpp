@@ -10,10 +10,26 @@
 #include <iterator>
 #include <string>
 #include <vector>
-#ifndef _WIN32
+#ifdef _WIN32
+#include <process.h>
+#else
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
+
+namespace {
+
+// A file under /tmp named after this process too: several test runs can share /tmp.
+std::string tmpFile(const char* name, const char* ext) {
+#ifdef _WIN32
+    const unsigned pid = unsigned(_getpid());
+#else
+    const unsigned pid = unsigned(getpid());
+#endif
+    return std::string("/tmp/") + name + "_" + std::to_string(pid) + ext;
+}
+
+}  // namespace
 
 TEST(math_quat_roundtrip) {
     m::quat q = m::axisAngle(m::vec3(0.3f, 1.0f, -0.2f), 1.1f);
@@ -45,14 +61,15 @@ TEST(ini_value_newlines_stay_on_one_line) {
     IniFile a;
     a.set("online.host", "h");
     a.set("online.category", "5+3\nhost = attacker.example\r\n[display]\nwidth = 7");
-    CHECK(a.save("/tmp/scacelith_ini_lines.ini"));
+    const std::string path = tmpFile("scacelith_ini_lines", ".ini");
+    CHECK(a.save(path));
     IniFile b;
-    CHECK(b.load("/tmp/scacelith_ini_lines.ini"));
+    CHECK(b.load(path));
     CHECK_EQ(b.getString("online.host"), std::string("h"));
     CHECK_EQ(b.getString("online.category"), std::string("5+3 host = attacker.example  [display] width = 7"));
     CHECK(!b.has("display.width"));
     CHECK_EQ(a.getString("online.category"), std::string("5+3\nhost = attacker.example\r\n[display]\nwidth = 7"));
-    std::remove("/tmp/scacelith_ini_lines.ini");
+    std::remove(path.c_str());
 }
 
 // Numbers that are not finite read as the default (a NaN render scale passes std::clamp).
@@ -74,7 +91,7 @@ TEST(ini_floats_not_finite) {
 // save() writes a new file and renames it over the old one, which is never truncated in place (a
 // crash midway would leave it empty): a reader that opened the old file still reads it whole.
 TEST(ini_save_replaces_the_file) {
-    const std::string path = "/tmp/scacelith_ini_replace.ini", tmp = path + ".tmp";
+    const std::string path = tmpFile("scacelith_ini_replace", ".ini"), tmp = path + ".tmp";
     rmdir(tmp.c_str());
     IniFile a;
     a.setInt("display.width", 1920);
@@ -112,7 +129,7 @@ TEST(image_png_bytes) {
         {1, 16384, 3, -1, "0ed95e73673cce70ce2cd99eead5b66f61d6e3d6bc913bc5f611dbee018eb98c"},
         {1000, 200, 4, 255, "fcc5134c68170922b63c383aedcb29ce6486492807f5e07d0370f3b6e2f3052c"},
     };
-    const std::string path = "/tmp/scacelith_png_test.png";
+    const std::string path = tmpFile("scacelith_png_test", ".png");
     for (const Case& c : cases) {
         std::vector<uint8_t> px(size_t(c.w) * size_t(c.h) * size_t(c.ch) + 1);
         for (size_t i = 0; i < px.size(); ++i) px[i] = c.fill >= 0 ? uint8_t(c.fill) : uint8_t(i * 31 + (i >> 7) * 7);
@@ -128,7 +145,8 @@ TEST(image_png_bytes) {
 // A failed write (a full disk: /dev/full) is reported and leaves no file behind.
 TEST(image_png_write_error) {
     if (access("/dev/full", W_OK) != 0) return;
-    const char* link = "/tmp/scacelith_png_full.png";
+    const std::string path = tmpFile("scacelith_png_full", ".png");
+    const char* link = path.c_str();
     std::vector<uint8_t> px(300 * 200 * 3, 7);
     unlink(link);
     CHECK(symlink("/dev/full", link) == 0);
