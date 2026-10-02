@@ -42,6 +42,8 @@ float blueNoiseStatic(ivec2 p, int channel) {
 float linearFromRaw(float d) { return frame.exposure.z / max(d, 1e-7); }
 float rawFromLinear(float z) { return frame.exposure.z / max(z, 1e-7); }
 const float SKY_DEPTH = 6.0e4;  // fits in fp16 (history alpha)
+// Log2-luminance range of the auto-exposure histogram (exposure_histogram / exposure_average).
+const float EXPO_MIN_LOG = -14.0, EXPO_RANGE_LOG = 20.0;
 
 // View-space position from uv and positive linear depth (current, jittered projection).
 vec3 viewPosFromLinear(vec2 uv, float z) {

@@ -2,21 +2,11 @@
 // (motes behind it would be wasted), drifting with the air; only the ones inside a sun beam (shadow-cascade test) get a sprite. Tumbling flakes flash
 // when they catch the sun. Drawn after TAA with the unjittered projection (no history smearing).
 #include "shaders/post/post_common.glsl"
-layout(binding = 5) uniform sampler2DArrayShadow uShadow;
+#include "shaders/post/sun_visibility.glsl"
 layout(location = 1) uniform float uBoxSize;
 out vec2 vLocal;
 out vec3 vColor;
 out float vDepth;
-
-float sunVisibility(vec3 p) {
-    int n = int(frame.shadowParams.x);
-    for (int c = 0; c < n; ++c) {
-        vec3 s = (frame.shadowMatrix[c] * vec4(p, 1.0)).xyz;
-        if (all(greaterThan(s.xy, vec2(0.005))) && all(lessThan(s.xy, vec2(0.995))) && s.z > 0.0 && s.z < 1.0)
-            return texture(uShadow, vec4(s.xy, float(c), s.z - 0.0002));
-    }
-    return 1.0;
-}
 
 void main() {
     uint id = uint(gl_InstanceID);
