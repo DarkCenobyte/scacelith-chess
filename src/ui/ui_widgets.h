@@ -117,10 +117,10 @@ bool menuEntry(const std::string& label, const Rect& r, bool enabled = true, gfx
 // most), and is cut ("…") when it still does not fit.
 bool button(const std::string& label, const Rect& r, ButtonKind kind = ButtonKind::Secondary, bool enabled = true,
             uint32_t extraFlags = 0);
-// Whether a Primary or Secondary button 'width' wide shows this label whole (shrunk or not).
-bool buttonLabelFits(const std::string& label, float width);
 // The width of a Primary or Secondary button that shows this label at its full size.
 float buttonWidthFor(const std::string& label);
+// Whether a Primary or Secondary button 'width' wide shows this label whole (shrunk or not).
+bool buttonLabelFits(const std::string& label, float width);
 // A button that is off for a reason: drawn like a disabled button, but the mouse resting on it (or
 // the keyboard focus, which stops on it) shows 'why' as its tooltip, kept inside 'within' when
 // given (the page's panel: above the button near its bottom edge). Never activates.
