@@ -13,7 +13,6 @@ constexpr float BOTTOM = 6360.0f, TOP = 6460.0f;
 const vec3 RAYLEIGH(5.802e-3f, 13.558e-3f, 33.1e-3f);
 constexpr float RAYLEIGH_H = 8.0f, MIE_EXT = 4.440e-3f, MIE_H = 1.2f;
 const vec3 OZONE(0.650e-3f, 1.881e-3f, 0.085e-3f);
-constexpr int SKY_CUBE_SIZE = 64;
 
 float raySphere(vec3 ro, vec3 rd, float radius) {
     float b = dot(ro, rd), c = dot(ro, ro) - radius * radius;
@@ -75,15 +74,13 @@ bool Atmosphere::init() {
     transmittance_ = gpu::createTexture2D(256, 64, GL_RGBA16F);
     multiScat_ = gpu::createTexture2D(32, 32, GL_RGBA16F);
     skyView_ = gpu::createTexture2D(192, 108, GL_RGBA16F);
-    skyCube_ = gpu::createCubemap(SKY_CUBE_SIZE, GL_RGBA16F, 0);
     glObjectLabel(GL_TEXTURE, transmittance_.id, -1, "atmo.transmittance");
     glObjectLabel(GL_TEXTURE, skyView_.id, -1, "atmo.skyview");
-    glObjectLabel(GL_TEXTURE, skyCube_.id, -1, "sky.cube");
     return true;
 }
 
 void Atmosphere::shutdown() {
-    for (auto* t : {&transmittance_, &multiScat_, &skyView_, &skyCube_}) t->destroy();
+    for (auto* t : {&transmittance_, &multiScat_, &skyView_}) t->destroy();
     lutMie_ = -1.0f;
 }
 
@@ -117,19 +114,6 @@ void Atmosphere::updateLuts(vec3 sunDir, float mieScale, float altitudeKm) {
 void Atmosphere::bindSkyTextures() const {
     glBindTextureUnit(0, transmittance_.id);
     glBindTextureUnit(1, skyView_.id);
-}
-
-void Atmosphere::captureSky() {
-    gpu::DebugGroup g("sky.capture");
-    const ShaderProgram& p = shaders::compute("shaders/lighting/sky_cube.comp");
-    if (!p.valid()) return;
-    p.use();
-    p.set("uSize", SKY_CUBE_SIZE);
-    bindSkyTextures();
-    glBindImageTexture(0, skyCube_.id, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16F);
-    glDispatchCompute(SKY_CUBE_SIZE / 8, SKY_CUBE_SIZE / 8, 6);
-    glMemoryBarrier(GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_UPDATE_BARRIER_BIT);
-    glGenerateTextureMipmap(skyCube_.id);
 }
 
 }  // namespace lighting

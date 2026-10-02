@@ -21,7 +21,6 @@ int mipCount(int w, int h, int d = 1);
 Texture createTexture2D(int w, int h, GLenum internalFormat, int levels = 1);
 Texture createTexture2DArray(int w, int h, int layers, GLenum internalFormat, int levels = 1);
 Texture createTexture3D(int w, int h, int d, GLenum internalFormat, int levels = 1);
-Texture createCubemap(int size, GLenum internalFormat, int levels = 1);
 Texture createCubemapArray(int size, int cubes, GLenum internalFormat, int levels = 1);
 // Sampler state stored on the texture object itself.
 void setFilter(const Texture& t, GLenum minFilter, GLenum magFilter);

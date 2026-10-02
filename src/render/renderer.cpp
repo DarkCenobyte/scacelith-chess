@@ -510,7 +510,7 @@ void Renderer::endFrame() {
     glFrontFace(GL_CCW);
     glDisable(GL_BLEND);
 
-    // ---- Lighting: atmosphere, sky capture, shadows, probes, planar reflections --------------
+    // ---- Lighting: atmosphere, shadows, probes, planar reflections ---------------------------
     vec3 sunDir = frame_.sunDirection.xyz();
     float mie = mieScaleOf(env_);
     {
@@ -519,14 +519,6 @@ void Renderer::endFrame() {
         updateLightingUBO();
         uploadFrameUBO(frame_);
         bindGlobalTextures();
-        // Sky cubemap: when the sun / exposure / clouds changed (clouds drift: every 2 s).
-        const float key[9] = {sunDir.x, sunDir.y, sunDir.z, frame_.exposure.x, env_.cloudCoverage, std::floor(env_.time * 0.5f),
-                              mie, env_.skyIntensity * env_.sunIntensityScale, env_.altitudeKm};
-        if (!skyKeyValid_ || std::memcmp(key, skyKey_, sizeof(key)) != 0) {
-            atmosphere_->captureSky();
-            std::memcpy(skyKey_, key, sizeof(key));
-            skyKeyValid_ = true;
-        }
     }
     // A frame with nothing submitted (the game's loading screen) bakes neither the static shadow
     // cache nor the probes: they would hold an empty world. staticDirty_ stays set until a frame

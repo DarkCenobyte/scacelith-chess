@@ -342,9 +342,7 @@ private:
     std::unique_ptr<lighting::PlanarReflections> planarRefl_;
     gpu::Texture brdfLut_;
     m::AABB sceneBounds_;
-    float skyKey_[9] = {};     // sky capture inputs of the last capture
     float bakeKey_[6] = {};    // probe bake inputs of the last bake
-    bool skyKeyValid_ = false;
     // Default textures bound to unused units so samplers are always complete
     gpu::Texture dummy2D_, dummyArray_, dummyCubeArray_;
     std::unique_ptr<PostFX> post_;

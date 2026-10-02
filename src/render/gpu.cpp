@@ -69,19 +69,6 @@ Texture createTexture3D(int w, int h, int d, GLenum fmt, int levels) {
     return t;
 }
 
-Texture createCubemap(int size, GLenum fmt, int levels) {
-    Texture t;
-    t.target = GL_TEXTURE_CUBE_MAP;
-    t.format = fmt;
-    t.width = t.height = size;
-    t.depth = 6;
-    t.levels = levels <= 0 ? mipCount(size, size) : levels;
-    glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &t.id);
-    glTextureStorage2D(t.id, t.levels, fmt, size, size);
-    defaultSampling(t);
-    return t;
-}
-
 Texture createCubemapArray(int size, int cubes, GLenum fmt, int levels) {
     Texture t;
     t.target = GL_TEXTURE_CUBE_MAP_ARRAY;

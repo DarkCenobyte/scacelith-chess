@@ -61,9 +61,9 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 
 ### Lighting (render-lighting: `src/render/lighting`, `shaders/lighting`, `shaders/include/lighting.glsl`)
 
-Frame order in `Renderer::endFrame`: upload draws/lights, sort → atmosphere LUTs + sky cubemap
-capture (only when the sun / sky changed) → sun cascades → light probe bake (when dirty) → planar
-reflections → prepass → `PostFX::computeAO` → opaque → sky → transparents → `PostFX::resolve`.
+Frame order in `Renderer::endFrame`: upload draws/lights, sort → atmosphere LUTs (only when the
+sun / sky changed) → sun cascades → light probe bake (when dirty) → planar reflections → prepass →
+`PostFX::computeAO` → opaque → sky → transparents → `PostFX::resolve`.
 
 **Units / exposure.** Photometric: sun in lux, sky and emission in nits, point lights in candela.
 Default `Environment::exposureEV100` is 12.3 (daylight interior with the board in the sun; was
