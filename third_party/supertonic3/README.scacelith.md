@@ -135,7 +135,7 @@ runs with `--coach-dir build/coach`. The game itself never reads that folder unl
 |---|---|---|
 | `SCACELITH_SUPERTONIC_DIR` | `$ENV{SCACELITH_SUPERTONIC_DIR}` | Folder of the extracted release (used as is when set) |
 | `SCACELITH_SUPERTONIC_ARCHIVE` | `$ENV{SCACELITH_SUPERTONIC_ARCHIVE}` | Local copy of the `.tar.bz2` (else `build/_deps/`) |
-| `SCACELITH_SUPERTONIC_DOWNLOAD` | `ON` | Download the archive from GitHub when no local copy is given (`EXPECTED_HASH SHA256`) |
+| `SCACELITH_SUPERTONIC_DOWNLOAD` | `ON` | Download the archive from GitHub when no local copy is given (checked against its SHA-256) |
 
 Without the files the configure step warns, the build succeeds and the TTS tests that need the
 model are skipped. There is no option to embed the model in the executable any more.
