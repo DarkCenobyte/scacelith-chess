@@ -598,7 +598,7 @@ void OnlineSession::quickStart(const std::string& category, const std::string& u
     if (!signedIn_) {
         if (api_->hasSavedSession()) {
             resume();
-        } else if (mock_ || !net::officialServer().valid()) {
+        } else if (mock_) {
             api_->login(username, "mock-password");
             expect(Kind::LoginResult);
         }

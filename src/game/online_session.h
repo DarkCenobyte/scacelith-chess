@@ -252,8 +252,9 @@ public:
     bool nextGameEvent(net::Event& e);
     // The scene left the game (back to the menu): a direct match is closed.
     void leaveGame();
-    // --start-online: signs in (mock: any name) and looks for an opponent in 'category' as soon
-    // as the connection is up. With the fakes and a virtual clock the game is ready on return.
+    // --start-online: signs in (the saved session; with the fakes, any name) and looks for an
+    // opponent in 'category' as soon as the connection is up. With the fakes and a virtual clock
+    // the game is ready on return.
     void quickStart(const std::string& category, const std::string& username);
     // Fakes with a virtual clock (UI viewer, screenshots): runs them for 'ms' of virtual time, then
     // waits for a GIF file being written.
