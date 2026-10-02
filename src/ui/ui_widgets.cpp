@@ -867,9 +867,13 @@ bool editField(const std::string& label, std::string& text, const Rect& r, int m
                 modified = true;
             }
             std::u32string typed;
+            int room = maxChars - int(u.size());
             bool ctrl = in.keyDown[plat::KEY_LCTRL] || in.keyDown[plat::KEY_RCTRL];
             if (ctrl && in.keyPressed['V']) {
-                for (char32_t ch : uni::decode(plat::clipboardText())) {
+                // Decoded only as far as it fits: a huge clipboard costs no more than a name.
+                const std::string clip = room > 0 ? plat::clipboardText() : std::string();
+                for (size_t i = 0; i < clip.size() && int(typed.size()) < room;) {
+                    char32_t ch = uni::decodeAt(clip, i);
                     if (ch == '\n' || ch == '\r' || ch == '\t') ch = ' ';
                     if (ch >= 32 && ch != 127 && !(ch >= 0x80 && ch < 0xA0)) typed += ch;
                 }
@@ -877,7 +881,6 @@ bool editField(const std::string& label, std::string& text, const Rect& r, int m
                 for (int i = 0; i < in.textCount; ++i)
                     if (in.text[i] >= 32 && in.text[i] != 127) typed += char32_t(in.text[i]);
             }
-            int room = maxChars - int(u.size());
             if (!typed.empty() && room > 0) {
                 if (int(typed.size()) > room) typed.resize(size_t(room));
                 u.insert(size_t(c.caret), typed);
