@@ -815,8 +815,8 @@ void GameScene::endGame() {
     // Both players write the result and lay their pen down before shaking hands (an aborted
     // online game has no result).
     endPending_ = false;
-    if (coach()) scorekeeper_.setWriteLimit(-1);  // the last moves are written with the result
     bool noResult = (online() && og_.status == 4) || (replaying() && replayRecord_.result == "*");
+    // The moves still owed (the coach's write limit included) are written before the result.
     scorekeeper_.finishGame(noResult ? std::string() : resultText_);
     audio::playUI(audio::Sfx::GameEnd, 0.7f);
     if (coach()) coachGameOver();  // the coach's closing words, then the handshake (simulate)
