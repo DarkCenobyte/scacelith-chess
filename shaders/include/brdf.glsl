@@ -12,11 +12,11 @@ float V_SmithGGXCorrelated(float NoV, float NoL, float a) {
     return 0.5 / max(gv + gl, 1e-7);
 }
 vec3 F_Schlick(vec3 f0, float VoH) {
-    float f = pow(1.0 - VoH, 5.0);
+    float f = pow(max(1.0 - VoH, 0.0), 5.0);
     return f + f0 * (1.0 - f);
 }
-vec3 F_Schlick(vec3 f0, vec3 f90, float VoH) { return f0 + (f90 - f0) * pow(1.0 - VoH, 5.0); }
-float F_Schlick(float f0, float f90, float VoH) { return f0 + (f90 - f0) * pow(1.0 - VoH, 5.0); }
+vec3 F_Schlick(vec3 f0, vec3 f90, float VoH) { return f0 + (f90 - f0) * pow(max(1.0 - VoH, 0.0), 5.0); }
+float F_Schlick(float f0, float f90, float VoH) { return f0 + (f90 - f0) * pow(max(1.0 - VoH, 0.0), 5.0); }
 float Fd_Burley(float NoV, float NoL, float LoH, float roughness) {
     float f90 = 0.5 + 2.0 * roughness * LoH * LoH;
     return F_Schlick(1.0, f90, NoL) * F_Schlick(1.0, f90, NoV) * INV_PI;

@@ -25,7 +25,7 @@ void main() {
         float NoL = L.z, NoH = max(H.z, 0.0), VoH = max(dot(V, H), 0.0);
         if (NoL > 0.0) {
             float Gv = V_SmithGGXCorrelated(NoV, NoL, a) * 4.0 * NoL * VoH / max(NoH, 1e-5);
-            float Fc = pow(1.0 - VoH, 5.0);
+            float Fc = pow(max(1.0 - VoH, 0.0), 5.0);
             A += (1.0 - Fc) * Gv;
             B += Fc * Gv;
         }
