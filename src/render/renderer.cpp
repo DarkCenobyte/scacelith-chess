@@ -535,27 +535,32 @@ void Renderer::endFrame() {
             skyKeyValid_ = true;
         }
     }
-    shadows_->render(*this, sunDir, std::max(env_.sunSoftness, 0.05f), staticDirty_);
+    // A frame with nothing submitted (the game's loading screen) bakes neither the static shadow
+    // cache nor the probes: they would hold an empty world. staticDirty_ stays set until a frame
+    // draws the scene.
+    const bool drawsScene = !items_.empty();
+    const bool bakeStatic = staticDirty_ && drawsScene;
+    shadows_->render(*this, sunDir, std::max(env_.sunSoftness, 0.05f), bakeStatic);
     planarRefl_->prepare(*this);
     updateLightingUBO();
     uploadFrameUBO(frame_);
     bindGlobalTextures();
 
     // Light probes: bake at startup, on invalidateStatic() and when the sun / sky changed a lot.
-    if (settings_.lightProbes) {
+    if (settings_.lightProbes && drawsScene) {
         const float key[6] = {sunDir.x, sunDir.y, sunDir.z, mie, env_.cloudCoverage, env_.skyIntensity * env_.sunIntensityScale};
         const float* b = bakeKey_;
         bool sunMoved = key[0] * b[0] + key[1] * b[1] + key[2] * b[2] < std::cos(1.0f * DEG);
         bool skyChanged = std::fabs(key[3] - b[3]) > 0.05f || std::fabs(key[4] - b[4]) > 0.05f ||
                           std::fabs(key[5] - b[5]) > 0.02f * std::max(b[5], 1e-3f);
-        if (staticDirty_ || !probes_->baked() || sunMoved || skyChanged) {
+        if (bakeStatic || !probes_->baked() || sunMoved || skyChanged) {
             probes_->bake(*this, settings_.probeBounces);
             std::memcpy(bakeKey_, key, sizeof(key));
             updateLightingUBO();
             bindGlobalTextures();
         }
     }
-    staticDirty_ = false;
+    if (drawsScene) staticDirty_ = false;
     planarRefl_->render(*this);
     bindGlobalTextures();
 

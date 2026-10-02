@@ -222,6 +222,9 @@ bool GameScene::init(AppContext& ctx) {
 
 void GameScene::finishLoading() {
     world_.setupRenderer(*ctx_->renderer);
+    // The loading screen's frames went through the renderer with an empty scene: the static sun
+    // shadows and the light probes are baked again from the world, on the first frame that draws it.
+    ctx_->renderer->invalidateStatic();
     if (!scorekeeper_.init(true)) LOGW("scoresheets unavailable");
     ai::Engine::setArchLimit(settings().engineArch);
     engineOk_ = engine_.start();
