@@ -300,7 +300,7 @@ private:
         }
         HANDLE hs[3] = {quitEvent_, changeEvent_, audioEvent_};
         int timeouts = 0;
-        unsigned events = 0;
+        unsigned dryBuffers = 0;  // the first 4 of each stream are tolerated: not counted, no adaptation
         End end = End::Quit;
         for (;;) {
             DWORD w = WaitForMultipleObjects(3, hs, FALSE, 200);
@@ -327,7 +327,7 @@ private:
                 end = End::Lost;
                 break;
             }
-            if (padding == 0 && ++events > 4) {  // buffer ran dry: glitch -> allow more latency
+            if (padding == 0 && ++dryBuffers > 4) {  // buffer ran dry: glitch -> allow more latency
                 status.underruns.fetch_add(1);
                 targetFrames_ = std::min(bufferFrames_, targetFrames_ + UINT32(rate_ / 400));
                 status.bufferFrames = int(targetFrames_);
