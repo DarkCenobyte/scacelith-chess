@@ -1,7 +1,7 @@
-// The coach's words around the game (research-pedagogy §6): greetings per level, who starts, level
-// introductions, turn-taking, takebacks, encouragement, draw answers, the end of a game and the
-// rules lesson's resume/next/skip. Each helper returns a short Script (coach/script.h) whose lines
-// are in assets/coach/speech/<lang>/events.lang; the director performs it like any other script.
+// The coach's words around the game: greetings per level, who starts, level introductions,
+// turn-taking, takebacks, encouragement, draw answers, the end of a game and the rules lesson's
+// resume/next/skip. Each helper returns a short Script (coach/script.h) whose lines are in
+// assets/coach/speech/<lang>/events.lang; the director performs it like any other script.
 // Check, checkmate and praise of good moves belong to the review (review.lang).
 //
 // Gaze rule: these lines are about the game with the player, so the coach looks at the player

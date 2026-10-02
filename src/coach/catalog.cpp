@@ -325,8 +325,8 @@ int Catalog::pickVariant(const std::string& key, uint32_t seed) const {
     History& h = history_[key];
     for (auto& p : h.bySeed)
         if (p.first == seed) return p.second;
-    // Keys with three phrasings or more skip the last two picks, two phrasings alternate
-    // (research-pedagogy §7 item 18: "well done" three times in five moves is what players notice).
+    // Keys with three phrasings or more skip the last two picks, two phrasings alternate ("well
+    // done" three times in five moves is what players notice).
     size_t avoid = n >= 3 ? 2 : 1;
     std::vector<int> candidates;
     for (int v = 1; v <= n; ++v) {
@@ -697,8 +697,9 @@ std::string Catalog::renderEval(Ctx& c, const Arg& a) const {
     return c.ltrWrap && !c.spoken && !s.empty() ? kLrm + s + kLrm : s;
 }
 
-// Opening names (W10's files): "family:<id>" -> opening.family.<id>[.<form>], "variation:<id>" ->
-// opening.variation.<id>[.<form>]; "line:<component>" needs the composing resolver (W10).
+// Opening names (the openings files): "family:<id>" -> opening.family.<id>[.<form>],
+// "variation:<id>" -> opening.variation.<id>[.<form>]; "line:<component>" needs the composing
+// resolver (OpeningTexts).
 std::string Catalog::renderOpening(Ctx& c, const std::string& ref, const std::string& form) const {
     if (openingResolver_) {
         std::string r = openingResolver_(ref, form, c.lang, c.spoken);

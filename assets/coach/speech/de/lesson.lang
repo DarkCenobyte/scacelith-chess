@@ -1,4 +1,4 @@
-# Coach speech: the rules lesson (level 0, src/coach/lesson.cpp; research-pedagogy §3). German.
+# Coach speech: the rules lesson (level 0, src/coach/lesson.cpp). German.
 # Every language has exactly the English keys (and the same variants).
 #
 # Placeholders: {your} / {my} = a piece of the player / of the coach ("dein Turm", "mein Springer");

@@ -1,6 +1,6 @@
 // A Coach-mode game or the rules lesson, seen from the coach (session.h). The flows follow the
-// integrator notes of the brain's headers: coach/review.h (W11a), coach/appraisal.h, coach/openings.h
-// (W10), coach/lesson.h and coach/events.h (W11b).
+// integrator notes of the brain's headers: coach/review.h, coach/appraisal.h, coach/openings.h,
+// coach/lesson.h and coach/events.h.
 //
 // Analyses (all through the Analyst, full strength):
 //   A0  when the human's turn begins: MultiPV 3 of the position (cached by FEN, so the retry after a
@@ -37,8 +37,8 @@ constexpr int kWellMoves = 4;             // "playing well": this many Best/Exce
 constexpr int kWellGap = 8;               // ... spaced by this many human moves
 constexpr size_t kCacheRoots = 32;
 
-// W10's texts resolve the opening names the catalog cannot compose itself (line: references),
-// and give the spoken forms of every name.
+// The opening texts (OpeningTexts) resolve the opening names the catalog cannot compose itself
+// (line: references), and give the spoken forms of every name.
 void installOpeningResolver() {
     static std::once_flag once;
     std::call_once(once, [] {

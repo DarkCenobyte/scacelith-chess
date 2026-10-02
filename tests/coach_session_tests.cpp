@@ -165,7 +165,7 @@ SessionConfig levelConfig(int level, chess::Color human = chess::White) {
     return c;
 }
 
-// The hanging-knight position with its A0 (research-pedagogy's level-1 example).
+// The hanging-knight position with its A0 (the level-1 example of a hanging piece).
 void hangTable(Table& t, int level = 1) {
     t.game.resetFromFEN(kHangFen);
     t.analyst.results[fenOf(kHangFen) + "|A0"] = analysisOf({pvl(20, "g1f1 g8f8"), pvl(-330, "c3d5 e6d5 g1f1")});

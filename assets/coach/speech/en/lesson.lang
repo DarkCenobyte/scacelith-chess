@@ -1,4 +1,4 @@
-# Coach speech: the rules lesson (level 0, src/coach/lesson.cpp; research-pedagogy §3).
+# Coach speech: the rules lesson (level 0, src/coach/lesson.cpp).
 # English is the reference; every language has exactly these keys (and the same variants).
 #
 # Placeholders: {your} / {my} = a piece of the player / of the coach ("your rook", "my knight");

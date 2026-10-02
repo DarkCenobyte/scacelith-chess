@@ -1,6 +1,6 @@
 // The rules lesson: chapters, exercises and the reactions to the player's moves.
 //
-// Integrator notes (the director in game_scene, W9), research-pedagogy §3.0:
+// Integrator notes (coach/session.cpp and the game scene):
 // - The player is White, the coach Black. Legal-move hints are forced on, so illegal placements
 //   are refused before the arbiter: report each refused (from, to) to explainIllegal().
 // - Touch-move is relaxed: a piece put back on its square is released (Arbiter::reset(game)).
@@ -493,7 +493,7 @@ Lesson::Lesson() {
     LessonBuilder b(*this);
     const char* kStart = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-    // ---- Chapter 0: welcome and the board (§3.1) ----
+    // ---- Chapter 0: welcome and the board ----
     b.begin("welcome");
     b.set("4k3/8/8/8/8/8/8/4K3 w - - 0 1");
     b.say(line("lesson.welcome.hello"), {nod()});
@@ -520,7 +520,7 @@ Lesson::Lesson() {
         w.ask = askLine;
     }
 
-    // ---- Chapter 1: how the pieces move and capture (§3.2) ----
+    // ---- Chapter 1: how the pieces move and capture ----
     b.begin("pieces");
     // 1.1 Rook
     b.set("7k/8/n7/8/8/8/8/R3K3 w - - 0 1");
@@ -648,7 +648,7 @@ Lesson::Lesson() {
         b.wait(e, {pointPiece("g1", "sq"), pointSquare("f3", "sq2")}, {markSquare("f3", "sq2")});
     }
 
-    // ---- Chapter 2: safe and unsafe captures (§3.3) ----
+    // ---- Chapter 2: safe and unsafe captures ----
     b.begin("safety");
     b.set("7k/8/4p3/3n4/b7/8/8/3QK3 w - - 0 1");
     b.say(line("lesson.safety.defended"), {beatG()});
@@ -669,7 +669,7 @@ Lesson::Lesson() {
         b.wait(e);
     }
 
-    // ---- Chapter 3: check and getting out of check (§3.4) ----
+    // ---- Chapter 3: check and getting out of check ----
     b.begin("check");
     // 3.1 The king never steps into danger
     b.set("7k/8/8/8/8/8/r7/4K3 w - - 0 1");
@@ -725,7 +725,7 @@ Lesson::Lesson() {
         b.wait(e);
     }
 
-    // ---- Chapter 4: checkmate (§3.5) ----
+    // ---- Chapter 4: checkmate ----
     b.begin("mate");
     // 4.1 Back-rank mate
     b.set("6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1");
@@ -789,7 +789,7 @@ Lesson::Lesson() {
         b.wait(e, {pointPiece("b1", "your")});
     }
 
-    // ---- Chapter 5: castling (§3.6) ----
+    // ---- Chapter 5: castling ----
     b.begin("castling");
     // 5.1 King-side castling
     b.set("r3k2r/pppppppp/8/8/8/8/PPPPPPPP/R3K2R w KQkq - 0 1");
@@ -822,7 +822,7 @@ Lesson::Lesson() {
         b.wait(e);
     }
 
-    // ---- Chapter 6: en passant (§3.7) ----
+    // ---- Chapter 6: en passant ----
     b.begin("en_passant");
     b.set("4k3/3p4/8/4P3/8/8/8/4K3 b - - 0 1");
     b.say(line("lesson.ep.what"), {pointPiece("e5")});
@@ -837,7 +837,7 @@ Lesson::Lesson() {
         b.wait(e);
     }
 
-    // ---- Chapter 7: promotion (§3.8) ----
+    // ---- Chapter 7: promotion ----
     b.begin("promotion");
     b.set("8/4P2k/8/8/8/8/8/4K3 w - - 0 1");
     b.say(line("lesson.promo.what"), {pointPiece("e7")}, {markSquare("e8")});
@@ -853,7 +853,7 @@ Lesson::Lesson() {
         b.wait(e);
     }
 
-    // ---- Chapter 8: stalemate and draws (§3.9) ----
+    // ---- Chapter 8: stalemate and draws ----
     b.begin("draws");
     // 8.1 Stalemate (demonstration; the game is drawn on load)
     b.set("7k/5Q2/6K1/8/8/8/8/8 b - - 0 1");
@@ -882,7 +882,7 @@ Lesson::Lesson() {
     b.say(line("lesson.draws.agree"));
     b.say(line("lesson.draws.repeat"));
 
-    // ---- Chapter 9: real games (§3.10; no moves, the start position as a backdrop) ----
+    // ---- Chapter 9: real games (no moves, the start position as a backdrop) ----
     b.begin("etiquette");
     b.set(kStart);
     b.say(line("lesson.talk.rules"), {nod()});
@@ -1155,7 +1155,7 @@ Script Lesson::explainIllegal(int expect, const Position& pos, Square from, Squa
         m.push_back(mk);
     }
     Beat b = say(l, g.empty() && m.empty() ? Look::Player : Look::Target, g, m);
-    b.priority = Priority::Urgent;   // research-pedagogy §6.5: the L0 illegal-move explanation is P1
+    b.priority = Priority::Urgent;   // the lesson's illegal-move explanation goes first
     s.push_back(b);
     return s;
 }
