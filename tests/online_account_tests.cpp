@@ -934,6 +934,7 @@ TEST(account_gif_saver_writes_never_over_a_file) {
 // left, no thread) is a write_failed, never a saver left busy nor an exception out of the frame.
 TEST(account_gif_saver_takes_the_bytes) {
     using Stage = GifSaver::Stage;
+    if (!allocfail::available()) SKIP("AddressSanitizer build: no simulated out of memory");
     allocfail::Reset reset;
     GifFolder f("saver-take");
     {

@@ -1018,6 +1018,7 @@ TEST(net_transport_refuses_insecure) {
 // client's shutdown) never reaches a socket or handle that is gone; the token serves again.
 TEST(net_transport_cancel_cleared_when_out_of_memory) {
     if (!net::transportAvailable()) SKIP("transport unavailable");
+    if (!allocfail::available()) SKIP("AddressSanitizer build: no simulated out of memory");
     allocfail::Reset reset;
     const std::string big(size_t(12) << 20, 'x');
     fakehttp::Server srv([&](const fakehttp::Request& q) {
@@ -3196,6 +3197,7 @@ TEST(net_account_gif_beside_other_calls) {
 TEST(net_account_large_answers_out_of_memory) {
     if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
+    if (!allocfail::available()) SKIP("AddressSanitizer build: no simulated out of memory");
     allocfail::Reset reset;
     const std::string gif = "GIF89a" + std::string(size_t(12) << 20, '\0');
     std::string pgn = "[Event \"x\"]\n\n{";
