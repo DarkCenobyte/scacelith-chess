@@ -214,8 +214,10 @@ public:
     // gameId = the GifResult's gameId awaited (0 for a PGN text). False (nothing changes) while
     // another GIF is being made: one at a time.
     bool begin(const std::string& owner, uint64_t gameId, const std::string& folder, const std::string& fileName);
-    // The server's answer: false when it is not the one awaited (nothing asked, another game).
-    bool finish(const net::Event& e);
+    // The server's answer: false when it is not the one awaited (nothing asked, another game), e
+    // then left as it was. The one awaited gives its file (e.text) to the write: moved, never
+    // copied on the calling thread; a write that cannot start is a write_failed.
+    bool finish(net::Event&& e);
     // The write in progress ended (wait: until it has): true on the call that moved to Saved or Failed.
     bool poll(bool wait = false);
     void clear();                         // back to Idle (a write in progress is waited for)

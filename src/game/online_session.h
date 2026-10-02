@@ -262,7 +262,7 @@ public:
     void runMock(double ms);
 
 private:
-    void handleServer(const net::Event& e);
+    void handleServer(net::Event& e);   // a GIF's bytes are moved out of e (GifSaver::finish)
     void handleDirect(const net::Event& e);
     void routeGame(const net::Event& e, LinkKind from);
     std::unique_ptr<GameLink> makeLink(LinkKind kind, uint64_t id);

@@ -10,6 +10,7 @@
 // their file names, the PGN date and time, the wait in words, and the GifSaver (the answer awaited
 // only, the file written never over another, the errors kept with their wait).
 #include "test.h"
+#include "alloc_fail.h"
 #include "game/game_archive.h"
 #include "game/online_account.h"
 #include "i18n/i18n.h"
@@ -891,7 +892,7 @@ TEST(account_gif_saver_writes_never_over_a_file) {
         net::Event no = event(Kind::GifResult, false, "rate_limited");
         no.gameId = 9;
         no.retryAfterSec = 150;
-        CHECK(g.finish(no));
+        CHECK(g.finish(std::move(no)));
         CHECK(g.stage() == Stage::Failed);
         CHECK(!g.busy());
         CHECK_EQ(g.error(), std::string("rate_limited"));
@@ -903,7 +904,7 @@ TEST(account_gif_saver_writes_never_over_a_file) {
         CHECK_EQ(g.retryAfterSec(), 0);
         net::Event bare = event(Kind::GifResult, false, "");
         bare.gameId = 9;
-        CHECK(g.finish(bare));
+        CHECK(g.finish(std::move(bare)));
         CHECK_EQ(g.error(), std::string("server_error"));
 
         // A folder that cannot be made (under a file): write_failed.
@@ -926,6 +927,49 @@ TEST(account_gif_saver_writes_never_over_a_file) {
     CHECK_EQ(readAll(game::archive::joinPath(f.path, "game_3.gif")), other);
     f.remove({"game.gif", "game_2.gif", "game_3.gif"});
     CHECK(!net::sys::fileExists(game::archive::joinPath(f.path, "game.gif")));
+}
+
+// The file's bytes (a GIF of up to 16 MiB) go from the answer to the thread that writes them
+// without a copy on the calling thread (the game's frame); a write that cannot start (no memory
+// left, no thread) is a write_failed, never a saver left busy nor an exception out of the frame.
+TEST(account_gif_saver_takes_the_bytes) {
+    using Stage = GifSaver::Stage;
+    allocfail::Reset reset;
+    GifFolder f("saver-take");
+    {
+        GifSaver g;
+        CHECK(g.begin("history:812", 812, f.path, "big.gif"));
+        net::Event e = gifEvent(812, "GIF89a" + std::string(net::OnlineClient::kGifMaxBytes - 6, '\x01'));
+        allocfail::countFrom(size_t(1) << 20);
+        CHECK(g.finish(std::move(e)));
+        const size_t copied = allocfail::countedHere();
+        allocfail::countFrom(0);
+        CHECK_EQ(copied, size_t(0));
+        CHECK(g.poll(true));
+        CHECK(g.stage() == Stage::Saved);
+        uint64_t size = 0;
+        CHECK(net::sys::fileSize(g.path(), size));
+        CHECK_EQ(size, uint64_t(net::OnlineClient::kGifMaxBytes));
+
+        CHECK(g.begin("history:812", 812, f.path, "late.gif"));
+        net::Event small = gifEvent(812, std::string("GIF89a;"));
+        bool threw = false;
+        allocfail::failNextHere();
+        try {
+            CHECK(g.finish(std::move(small)));
+        } catch (const std::bad_alloc&) {
+            threw = true;
+        }
+        CHECK(!threw);
+        CHECK(g.stage() == Stage::Failed);
+        CHECK(!g.busy());
+        CHECK_EQ(g.error(), std::string("write_failed"));
+        CHECK(!g.poll(true));
+        CHECK(!net::sys::fileExists(game::archive::joinPath(f.path, "late.gif")));
+        CHECK(g.begin("history:812", 812, f.path, "late.gif"));   // the next GIF may start
+    }
+    f.remove({"big.gif"});
+    CHECK(!net::sys::fileExists(game::archive::joinPath(f.path, "big.gif")));
 }
 
 // The GIF routes need the session. Their answers follow the network layer's one convention, as

@@ -988,13 +988,14 @@ TEST(mock_account_gif_saved_by_the_saver) {
     Event e;
     CHECK(await(srv, Kind::GifResult, e));
     CHECK(data.apply(e, account, signedIn));
-    CHECK(saver.finish(e));
+    const std::string sent = e.text;
+    CHECK(saver.finish(std::move(e)));   // the bytes go to the write
     CHECK(saver.poll(true));
     CHECK(saver.stage() == game::GifSaver::Stage::Saved);
     CHECK_EQ(saver.path(), game::archive::joinPath(folder, name));
     std::string bytes;
     CHECK(net::sys::readFile(saver.path(), bytes, net::OnlineClient::kGifMaxBytes));
-    CHECK_EQ(bytes, e.text);
+    CHECK_EQ(bytes, sent);
     CHECK(decodeGif(bytes).error.empty());
     CHECK(name.find("_" + std::to_string(s.id) + ".gif") != std::string::npos);
     // The quota's answer for the next one: kept with its wait.
@@ -1003,7 +1004,7 @@ TEST(mock_account_gif_saved_by_the_saver) {
     CHECK(await(srv, Kind::GifResult, e));
     CHECK(data.apply(e, account, signedIn));
     CHECK(signedIn);
-    CHECK(saver.finish(e));
+    CHECK(saver.finish(std::move(e)));
     CHECK_EQ(saver.error(), std::string("rate_limited"));
     CHECK_EQ(saver.retryAfterSec(), 150);
     net::sys::removeFile(game::archive::joinPath(folder, name));

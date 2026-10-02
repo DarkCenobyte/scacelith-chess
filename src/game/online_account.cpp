@@ -426,7 +426,7 @@ bool GifSaver::begin(const std::string& owner, uint64_t gameId, const std::strin
     return true;
 }
 
-bool GifSaver::finish(const net::Event& e) {
+bool GifSaver::finish(net::Event&& e) {
     if (e.kind != Kind::GifResult || stage_ != Stage::Rendering || e.gameId != gameId_) return false;
     if (!e.ok) {
         stage_ = Stage::Failed;
@@ -435,16 +435,24 @@ bool GifSaver::finish(const net::Event& e) {
         LOGI("online: no GIF for %s: %s", owner_.c_str(), error_.c_str());
         return true;
     }
+    // The bytes (up to 16 MiB) move to the write thread: no copy on the game's frame.
+    try {
+        job_ = std::async(std::launch::async, [folder = folder_, name = fileName_, bytes = std::move(e.text)]() {
+            try {
+                return archive::saveFile(folder, name, bytes);
+            } catch (const std::exception& ex) {   // out of memory
+                archive::SaveResult r;
+                r.error = ex.what();
+                return r;
+            }
+        });
+    } catch (const std::exception& ex) {   // no memory or no thread to start the write
+        stage_ = Stage::Failed;
+        error_ = "write_failed";
+        LOGW("online: the GIF could not be written: %s", ex.what());
+        return true;
+    }
     stage_ = Stage::Writing;
-    job_ = std::async(std::launch::async, [folder = folder_, name = fileName_, bytes = e.text]() {
-        try {
-            return archive::saveFile(folder, name, bytes);
-        } catch (const std::exception& ex) {   // out of memory, a thread refused
-            archive::SaveResult r;
-            r.error = ex.what();
-            return r;
-        }
-    });
     return true;
 }
 
