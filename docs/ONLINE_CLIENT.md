@@ -159,9 +159,9 @@ Rules common to these calls:
 - `deleteAccount` closes the realtime connection before its request: the server closes every
   connection of the account it deletes, which would show a revoked session and refusals. Its
   success erases the token and the user name saved for the origin (its server id and pin stay),
-  and the connection stays closed; a failure opens it again if it was open. `revokeSession` on the
-  session marked `current` in the last `fetchSessions` signs this game out the same way (token
-  erased, connection stopped).
+  and the connection stays closed; a failure other than a refused session (`unauthorized`) opens
+  it again if it was open. `revokeSession` on the session marked `current` in the last
+  `fetchSessions` signs this game out the same way (token erased, connection stopped).
 - `logout(true)` (`POST /auth/logout-all`, Sign out everywhere) is ok only when the server did it.
   A refused session (401) revoked nothing: `unauthorized`, its token erased. Any other failure
   (the server unreachable, `rate_limited`, maintenance...) keeps the token, so that the player can

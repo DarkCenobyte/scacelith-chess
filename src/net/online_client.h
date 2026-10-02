@@ -415,7 +415,8 @@ public:
     void exportAccount(const std::string& password, const std::string& codeOrRecovery);   // text = the JSON
     // The realtime connection closes first (the server closes every connection of the account it
     // deletes). On success the token and the user name saved for the origin are erased and it stays
-    // closed; AccountDeleted then comes with ok. On a failure it opens again if it was open.
+    // closed; AccountDeleted then comes with ok. A failure other than a refused session
+    // ("unauthorized") opens it again if it was open.
     void deleteAccount(const std::string& password, const std::string& codeOrRecovery);
 
     // ---- animated GIFs (HTTPS; dedicated-server/docs/API.md) ----
