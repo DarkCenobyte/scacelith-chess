@@ -45,15 +45,6 @@ constexpr size_t kTokenMin = 16;
 
 // ---- the game as one player sees it ------------------------------------------------------------
 
-PlayerInfo playerInfo(const P::PlayerInfo& p) {
-    PlayerInfo o;
-    o.userId = p.userId;
-    o.name = p.name;
-    o.rating = p.rating;
-    o.provisional = p.provisional;
-    return o;
-}
-
 // Rebuilds OnlineGame from the server->client messages and turns them into Events, exactly as
 // OnlineClient does with the dedicated server's messages. Used by the guest (messages from the
 // channel) and by the host (the authority's messages for the host, decoded locally).
@@ -70,30 +61,7 @@ struct ClientView {
         case P::MsgType::GameSnapshot: {
             P::GameSnapshot s;
             if (!P::decode(p, n, s)) return false;
-            OnlineGame g;
-            g.id = s.game;
-            g.category = s.category;
-            g.baseMs = s.baseMs;
-            g.incMs = s.incMs;
-            g.rated = s.rated;
-            g.white = playerInfo(s.white);
-            g.black = playerInfo(s.black);
-            g.you = int(s.you);
-            for (auto& m : s.moves) g.moves.push_back({m.move, m.spentMs, m.clockMs});
-            g.running = int(s.running);
-            g.whiteMs = s.whiteMs;
-            g.blackMs = s.blackMs;
-            g.serverTimeMs = s.serverTime;
-            g.drawOfferBy = int(s.drawOffer);
-            g.status = int(s.status);
-            g.reason = int(s.reason);
-            g.whiteConnected = s.whiteConnected;
-            g.blackConnected = s.blackConnected;
-            g.graceMs = s.graceMs;
-            g.firstMoveMs = s.firstMoveMs;
-            g.rematchBy = int(s.rematch);
-            g.autoPress = s.autoPress;
-            game = g;
+            game = onlineGameFromSnapshot(s);
             have = true;
             needResync = false;
             ev.kind = Event::Kind::GameSnapshot;

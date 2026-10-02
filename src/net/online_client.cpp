@@ -250,6 +250,33 @@ uint32_t positionDigest(const std::string& fen) {
     return h;
 }
 
+OnlineGame onlineGameFromSnapshot(const pr::GameSnapshot& s) {
+    OnlineGame g;
+    g.id = s.game;
+    g.category = s.category;
+    g.baseMs = s.baseMs;
+    g.incMs = s.incMs;
+    g.rated = s.rated;
+    g.white = {s.white.userId, s.white.name, s.white.rating, s.white.provisional};
+    g.black = {s.black.userId, s.black.name, s.black.rating, s.black.provisional};
+    g.you = int(s.you);
+    for (const pr::MoveRec& m : s.moves) g.moves.push_back({m.move, m.spentMs, m.clockMs});
+    g.running = int(s.running);
+    g.whiteMs = s.whiteMs;
+    g.blackMs = s.blackMs;
+    g.serverTimeMs = s.serverTime;
+    g.drawOfferBy = int(s.drawOffer);
+    g.status = int(s.status);
+    g.reason = int(s.reason);
+    g.whiteConnected = s.whiteConnected;
+    g.blackConnected = s.blackConnected;
+    g.graceMs = s.graceMs;
+    g.firstMoveMs = s.firstMoveMs;
+    g.rematchBy = int(s.rematch);
+    g.autoPress = s.autoPress;
+    return g;
+}
+
 uint32_t reconnectDelayMs(int attempt, RetryCause cause, double u, bool gameInProgress, uint32_t retryAfterMs) {
     if (!(u >= 0.0)) u = 0.0;                   // NaN too
     if (u > 1.0) u = 1.0;
@@ -1033,33 +1060,6 @@ struct OnlineClient::Impl {
         rt.haveOffset = true;
     }
 
-    static OnlineGame fromSnapshot(const pr::GameSnapshot& s) {
-        OnlineGame g;
-        g.id = s.game;
-        g.category = s.category;
-        g.baseMs = s.baseMs;
-        g.incMs = s.incMs;
-        g.rated = s.rated;
-        g.white = {s.white.userId, s.white.name, s.white.rating, s.white.provisional};
-        g.black = {s.black.userId, s.black.name, s.black.rating, s.black.provisional};
-        g.you = int(s.you);
-        for (const pr::MoveRec& m : s.moves) g.moves.push_back({m.move, m.spentMs, m.clockMs});
-        g.running = int(s.running);
-        g.whiteMs = s.whiteMs;
-        g.blackMs = s.blackMs;
-        g.serverTimeMs = s.serverTime;
-        g.drawOfferBy = int(s.drawOffer);
-        g.status = int(s.status);
-        g.reason = int(s.reason);
-        g.whiteConnected = s.whiteConnected;
-        g.blackConnected = s.blackConnected;
-        g.graceMs = s.graceMs;
-        g.firstMoveMs = s.firstMoveMs;
-        g.rematchBy = int(s.rematch);
-        g.autoPress = s.autoPress;
-        return g;
-    }
-
     void resync(uint64_t gameId) {
         if (!rt.welcomed || gameId == 0) return;
         pr::Resync r;
@@ -1207,7 +1207,7 @@ struct OnlineClient::Impl {
         case pr::MsgType::GameSnapshot: {
             pr::GameSnapshot m;
             if (!pr::decode(p, n, m)) return bad();
-            rt.game = fromSnapshot(m);
+            rt.game = onlineGameFromSnapshot(m);
             rt.lastGseq = m.gseq;
             if (rt.pending.game == m.game && rt.pending.ply < int(rt.game.moves.size())) rt.pending = Rt::Pending();
             post(gameEvent(Event::Kind::GameSnapshot));
