@@ -345,11 +345,14 @@ std::string sortableDate(const std::string& d) {
     return s;
 }
 
-bool newerFirst(const Entry& a, const Entry& b) {
-    const std::string da = sortableDate(a.date()), db = sortableDate(b.date());
-    if (da != db) return da > db;
-    const std::string ta = a.time(), tb = b.time();
-    if (ta != tb) return ta > tb;
+// The listing's sort keys of an entry, found once (its tags are scanned for them).
+struct SortKey {
+    std::string date, time;  // sortableDate(date()), time()
+};
+
+bool newerFirst(const Entry& a, const SortKey& ka, const Entry& b, const SortKey& kb) {
+    if (ka.date != kb.date) return ka.date > kb.date;
+    if (ka.time != kb.time) return ka.time > kb.time;
     if (a.fileTimeMs != b.fileTimeMs) return a.fileTimeMs > b.fileTimeMs;
     if (a.path != b.path) return a.path < b.path;
     return a.index < b.index;
@@ -678,7 +681,18 @@ std::vector<Entry> list(const std::string& folder, ListStats* stats, const std::
         if (part->games.size() > room) st.truncated = true;
         out.insert(out.end(), part->games.begin(), part->games.begin() + long(std::min(room, part->games.size())));
     }
-    std::stable_sort(out.begin(), out.end(), newerFirst);
+    std::vector<SortKey> keys(out.size());
+    std::vector<size_t> order(out.size());
+    for (size_t i = 0; i < out.size(); ++i) {
+        keys[i].date = sortableDate(out[i].date());
+        keys[i].time = out[i].time();
+        order[i] = i;
+    }
+    std::stable_sort(order.begin(), order.end(), [&](size_t a, size_t b) { return newerFirst(out[a], keys[a], out[b], keys[b]); });
+    std::vector<Entry> sorted;
+    sorted.reserve(out.size());
+    for (size_t i : order) sorted.push_back(std::move(out[i]));
+    out = std::move(sorted);
     if (r == 2) LOGW("archive: %s: %s", folder.c_str(), st.error.c_str());
     if (st.truncated && st.read > 0)  // once per change, not at every listing of the library's page
         LOGW("archive: %s holds more than %d games: the oldest files are not listed", folder.c_str(), kMaxListed);
