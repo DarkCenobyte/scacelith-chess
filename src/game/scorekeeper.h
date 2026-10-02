@@ -61,19 +61,15 @@ public:
     // "1-0", "0-1" or "½-½": written after the moves still owed (holds and the write limit are
     // lifted), then the pens go back on the table.
     void finishGame(const std::string& result);
-    // Pads back to blank, pens on the table, nothing queued (menu, abandoned game).
-    void clear();
     // Hot-seat: while a seat is held, its writing hand starts no new entry; the moves completed
     // meanwhile wait and are written in order once it is released. The player to move records the
     // opponent's move at the start of their turn, unless they touch a piece first: it is then
     // written after their own move (FIDE 8.1.2). finishGame() releases every hold.
     void setHold(int seat, bool hold);
-    bool held(int seat) const { return ledger_.held(seat); }
     // Coach mode: the moves from ply 'plies' on are recorded but neither sheet writes them yet
     // (the human's move while the coach may still take it back); -1 lifts the limit. Lifting or
     // raising it lets both sheets catch up, in order. A demonstration is never recorded at all.
     void setWriteLimit(int plies);
-    int writeLimit() const { return ledger_.writeLimit(); }
     // A takeback: forgets the moves recorded from 'fromPly' on, provided neither sheet has begun
     // writing any of them (a limit or holds keep them off the sheets until then); the move played
     // instead, recorded at 'fromPly', is written normally. False (nothing changes) when a sheet
@@ -85,11 +81,9 @@ public:
     void onEvent(int seat, const anim::Event& e);
     void update();                            // after the animators' update (GL: page textures)
     void submit(render::Renderer& r);         // pads, pages and pens
-    bool writing(int seat) const;             // entries or page turns still pending
     // The sheet's owner is reading it (GameScene, key S): between entries the writing hand waits
     // off the page, beside it towards its owner, instead of resting on the next row.
     void setHandAside(int seat, bool aside);
-    int backlog(int seat) const;              // entries begun and not finished yet
 
 private:
     Scoresheet::Header header() const;

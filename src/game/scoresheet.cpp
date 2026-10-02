@@ -703,8 +703,6 @@ void Scoresheet::finishEntry() {
     I.now = -1.0f;
 }
 
-int Scoresheet::pendingEntries() const { return int(impl_->entries.size()); }
-
 const sheet::PenPath* Scoresheet::writingPath() const {
     return impl_->entries.empty() ? nullptr : &impl_->entries.front().path;
 }

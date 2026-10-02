@@ -102,15 +102,6 @@ void Scorekeeper::newGame(anim::Animator* anim, bool clockOnPositiveX, const Pla
     }
 }
 
-void Scorekeeper::clear() {
-    recording_ = headerWritten_ = finished_ = false;
-    ledger_.reset();
-    for (int s = 0; s < 2; ++s) {
-        hasPrevPen_[s] = false;
-        if (ready_) sheets_[s].reset();
-    }
-}
-
 Scoresheet::Header Scorekeeper::header() const {
     Scoresheet::Header h;
     h.date = date_;
@@ -326,11 +317,5 @@ void Scorekeeper::submit(render::Renderer& r) {
         hasPrevPen_[s] = true;
     }
 }
-
-bool Scorekeeper::writing(int seat) const {
-    return (anim_ && anim_[seat & 1].writingBusy()) || (ready_ && sheets_[seat & 1].pendingEntries() > 0);
-}
-
-int Scorekeeper::backlog(int seat) const { return ready_ ? sheets_[seat & 1].pendingEntries() : 0; }
 
 }  // namespace game

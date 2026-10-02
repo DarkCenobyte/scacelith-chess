@@ -89,7 +89,6 @@ public:
     // Time along the oldest unfinished entry's path (animator.writingPathTime()); t < 0 is ignored.
     void setWritingTime(float t);
     void finishEntry();                   // completes the oldest unfinished entry
-    int pendingEntries() const;
     // Pen path of the entry being written (the oldest unfinished one; page mm and path seconds, as
     // setWritingTime() counts them), nullptr when none: sizes the writing sound on PenDown
     // (sheet::penStrokeSound).
