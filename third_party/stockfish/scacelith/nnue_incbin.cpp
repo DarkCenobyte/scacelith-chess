@@ -4,6 +4,11 @@
 // gEmbeddedNNUEEnd / gEmbeddedNNUESize, which each variant's nnue/network.cpp, compiled with
 // UNIVERSAL_BINARY, only declares.
 #include "evaluate.h"
+// On Windows, the read-only data section, as cmake/embed.cmake does: INCBIN's default ".rodata" is
+// a writable data section in PE/COFF.
+#if defined(_WIN32)
+#define INCBIN_OUTPUT_SECTION ".rdata,\"dr\""
+#endif
 #include "incbin/incbin.h"
 
 INCBIN(EmbeddedNNUE, EvalFileDefaultName);
