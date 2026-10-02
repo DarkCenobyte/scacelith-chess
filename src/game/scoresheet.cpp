@@ -46,8 +46,9 @@ const char* MIPS_CS = "shaders/materials/bake/scoresheet_mips.comp";
 // A glyph ready to be drawn into a page field: its placement, atlas quad and distance scale.
 struct InkGlyph {
     GlyphInk ink;
+    int face = 0;         // the face that supplied the glyph (ink.cp): its atlas place, looked up again
     vec2 q0, q1;          // quad bounds, glyph-local mm (SDF padding included)
-    vec2 uv0, uv1;        // atlas
+    vec2 uv0, uv1;        // atlas (font::atlasGeneration() Impl::atlasGen)
     float distScale = 1;  // page mm per unit of atlas value
     float dilation = 0;   // mm
     float pressure = 1;
@@ -258,6 +259,7 @@ struct Scoresheet::Impl {
     int layerPage[2] = {-1, -1};
     std::vector<InkGlyph> layerPending[2];
     std::string language;
+    int atlasGen = -1;           // the font atlas generation the ink's coordinates belong to
     // Finished ink per page, and the fields written (or queued) per page.
     std::vector<std::vector<InkGlyph>> pageInk;
     std::vector<std::array<bool, size_t(Field::Count)>> fieldTaken;
@@ -290,6 +292,24 @@ struct Scoresheet::Impl {
         dst.insert(dst.end(), glyphs.begin(), glyphs.end());
         int L = page % 2;
         if (layerPage[L] == page) layerPending[L].insert(layerPending[L].end(), glyphs.begin(), glyphs.end());
+    }
+    // The font atlas was cleared (ui_font.h): every glyph of the ink is looked up at its new place
+    // (same face, same distance field: only the atlas coordinates change), and the pages and the
+    // entry are drawn again.
+    static void lookUpAgain(std::vector<InkGlyph>& glyphs) {
+        for (InkGlyph& g : glyphs) {
+            const font::Glyph* G = font::glyph(g.face, g.ink.cp);
+            if (!G || !G->hasQuad) continue;
+            g.uv0 = vec2(G->u0, G->v0);
+            g.uv1 = vec2(G->u1, G->v1);
+        }
+    }
+    void atlasCleared() {
+        for (std::vector<InkGlyph>& ink : pageInk) lookUpAgain(ink);
+        for (std::vector<InkGlyph>& ink : layerPending) lookUpAgain(ink);
+        for (Entry& e : entries) lookUpAgain(e.glyphs);
+        layerPage[0] = layerPage[1] = -1;
+        entryReady = false;
     }
 
     void drawVertices(const std::vector<InkVertex>& v) {
@@ -570,6 +590,7 @@ std::vector<InkGlyph> handwrite(const std::string& text, const WriteBox& box, in
         gi.joinNext = style == font::HAND_MARCK && !gi.wordEnd;
         InkGlyph ig;
         ig.ink = gi;
+        ig.face = pg.face;
         ig.q0 = vec2(G.x0, G.y0) * emMm;
         ig.q1 = vec2(G.x1, G.y1) * emMm;
         ig.uv0 = vec2(G.u0, G.v0);
@@ -822,6 +843,10 @@ void Scoresheet::update() {
     if (lang != I.language) {
         I.language = lang;
         I.layerPage[0] = I.layerPage[1] = -1;
+    }
+    if (font::atlasGeneration() != I.atlasGen) {
+        I.atlasGen = font::atlasGeneration();
+        I.atlasCleared();
     }
     bool work = I.layerPage[page_ % 2] != page_ || I.layerPage[(page_ + 1) % 2] != page_ + 1 ||
                 !I.layerPending[0].empty() || !I.layerPending[1].empty() || (!I.entries.empty() && !I.entryReady);
