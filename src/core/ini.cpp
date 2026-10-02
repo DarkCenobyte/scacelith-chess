@@ -1,4 +1,6 @@
 #include "ini.h"
+#include <algorithm>
+#include <climits>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
@@ -66,7 +68,8 @@ int IniFile::getInt(const std::string& key, int def) const {
     if (s.empty()) return def;
     char* end = nullptr;
     long v = std::strtol(s.c_str(), &end, 10);
-    return end == s.c_str() ? def : int(v);
+    // Saturated to the int range, as strtol does where long is 32-bit (Windows): never wrapped.
+    return end == s.c_str() ? def : int(std::clamp(v, long(INT_MIN), long(INT_MAX)));
 }
 float IniFile::getFloat(const std::string& key, float def) const {
     std::string s = getString(key);

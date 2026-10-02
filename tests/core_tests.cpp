@@ -2,6 +2,7 @@
 #include "math/math.h"
 #include "core/ini.h"
 #include "net/net_sys.h"
+#include <climits>
 
 TEST(math_quat_roundtrip) {
     m::quat q = m::axisAngle(m::vec3(0.3f, 1.0f, -0.2f), 1.1f);
@@ -25,6 +26,20 @@ TEST(ini_roundtrip) {
     CHECK(b.load("/tmp/scacelith_ini_test.ini"));
     CHECK_EQ(b.getInt("display.width"), 1920);
     CHECK_EQ(b.getBool("audio.ambience", true), false);
+}
+
+// Out-of-range integers saturate on every platform, as on Windows where long is 32-bit: never
+// wrapped modulo 2^32 to a plausible value (4294969216 is 1920 + 2^32).
+TEST(ini_int_out_of_range) {
+    IniFile a;
+    a.set("display.width", "4294969216");
+    a.set("display.height", "-99999999999");
+    a.set("online.api_port", "4294967739");
+    a.set("engine.elo", "2147483647");
+    CHECK_EQ(a.getInt("display.width"), INT_MAX);
+    CHECK_EQ(a.getInt("display.height"), INT_MIN);
+    CHECK_EQ(a.getInt("online.api_port"), INT_MAX);
+    CHECK_EQ(a.getInt("engine.elo"), INT_MAX);
 }
 
 // A file saved by an editor as "UTF-8 with BOM" keeps its first section; a BOM elsewhere is text.
