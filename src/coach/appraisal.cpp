@@ -535,9 +535,9 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
             const Piece cap = p0.at(captureSquare(p0, m));
             if (!cap.empty() && cap.color != human_) b.line.with("my", Arg::ofPiece(cap.type, cap.color, false));
             else b.line.with("my", Arg::ofPiece(Pawn, opposite(human_), false));
-            const Piece moved = p0.at(m.from);
+            const PieceType landed = m.promotion != NoPiece ? m.promotion : p0.at(m.from).type;
             const Piece now = g.position().at(m.to);
-            if (now.color == human_ && (now.type == moved.type || m.promotion != NoPiece)) {
+            if (!now.empty() && now.color == human_ && now.type == landed) {
                 detail::pointPiece(b, m.to, "move");
                 b.look = Look::Target;
             }
