@@ -62,6 +62,7 @@ options.depth_of_field = Profondeur de champ
 options.depth_of_field.help = Adoucit ce qui se trouve loin devant ou derrière ce que vous regardez, comme le fait un objectif photo.
 options.brightness = Luminosité
 options.brightness.neutral = Neutre
+options.brightness.value = {0} EV
 options.brightness.help = Correction d’exposition de la caméra. L’étalonnage du premier lancement la règle pour que les ombres les plus sombres soient à peine visibles.
 
 options.master_volume = Volume général

@@ -61,6 +61,7 @@ options.depth_of_field = Profundidad de campo
 options.depth_of_field.help = Suaviza lo que queda muy por delante o por detrás de lo que mira, como el objetivo de una cámara.
 options.brightness = Brillo
 options.brightness.neutral = Neutro
+options.brightness.value = {0} EV
 options.brightness.help = Compensación de exposición de la cámara. La calibración del primer inicio la ajusta para que las sombras más oscuras apenas se vean.
 
 options.master_volume = Volumen general

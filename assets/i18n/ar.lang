@@ -64,6 +64,7 @@ options.depth_of_field = عمق الميدان
 options.depth_of_field.help = يليّن ما يقع بعيدًا أمام ما تنظر إليه أو خلفه، كما تفعل عدسة الكاميرا.
 options.brightness = السطوع
 options.brightness.neutral = محايد
+options.brightness.value = {0} EV
 options.brightness.help = تعويض تعريض الكاميرا. تضبطه المعايرة عند التشغيل الأول بحيث تكون أحلك الظلال بالكاد مرئية.
 
 options.master_volume = مستوى الصوت العام

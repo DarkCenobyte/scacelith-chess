@@ -69,6 +69,7 @@ options.depth_of_field = Depth of field
 options.depth_of_field.help = Softens what lies well in front of or behind what you look at, as a camera lens does.
 options.brightness = Brightness
 options.brightness.neutral = Neutral
+options.brightness.value = {0} EV
 options.brightness.help = Exposure compensation of the camera. The calibration of the first start sets it so that the darkest shadows are barely visible.
 
 options.master_volume = Master volume

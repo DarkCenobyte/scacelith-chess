@@ -61,6 +61,7 @@ options.depth_of_field = 景深
 options.depth_of_field.help = 像相机镜头一样，柔化远在你所看之处前方或后方的物体。
 options.brightness = 亮度
 options.brightness.neutral = 标准
+options.brightness.value = {0} EV
 options.brightness.help = 相机的曝光补偿。首次启动时的校准会将其设为最暗的阴影刚好可见。
 
 options.master_volume = 总音量

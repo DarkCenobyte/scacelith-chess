@@ -61,6 +61,7 @@ options.depth_of_field = Tiefenschärfe
 options.depth_of_field.help = Zeichnet weich, was weit vor oder hinter dem liegt, was Sie ansehen, wie ein Kameraobjektiv.
 options.brightness = Helligkeit
 options.brightness.neutral = Neutral
+options.brightness.value = {0} EV
 options.brightness.help = Belichtungskorrektur der Kamera. Die Kalibrierung beim ersten Start stellt sie so ein, dass die dunkelsten Schatten gerade noch sichtbar sind.
 
 options.master_volume = Gesamtlautstärke

@@ -61,6 +61,7 @@ options.depth_of_field = 被写界深度
 options.depth_of_field.help = カメラのレンズのように、見ているものよりずっと手前や奥にあるものをぼかします。
 options.brightness = 明るさ
 options.brightness.neutral = 標準
+options.brightness.value = {0} EV
 options.brightness.help = カメラの露出補正。初回起動時の調整で、最も暗い影がかろうじて見えるように設定されます。
 
 options.master_volume = 全体の音量

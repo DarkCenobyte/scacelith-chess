@@ -134,7 +134,7 @@ std::string percent(float x) { return i18n::trf("number.percent", {decimal(x * 1
 // Brightness (exposure compensation) as Options > Graphics and the calibration show it.
 std::string brightnessText(float ev) {
     if (std::fabs(ev) < 0.05f) return T("options.brightness.neutral");
-    return std::string(ev > 0.0f ? "+" : "\xE2\x88\x92") + decimal(std::fabs(ev), 1) + " EV";
+    return i18n::trf("options.brightness.value", {std::string(ev > 0.0f ? "+" : "\xE2\x88\x92") + decimal(std::fabs(ev), 1)});
 }
 
 // Whole screen, for mirroring page layouts in a right-to-left language.

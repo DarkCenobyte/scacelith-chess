@@ -62,6 +62,7 @@ options.depth_of_field = Глибина різкості
 options.depth_of_field.help = Пом’якшує те, що значно ближче або далі за те, на що ви дивитеся, як це робить об’єктив камери.
 options.brightness = Яскравість
 options.brightness.neutral = Нейтральна
+options.brightness.value = {0} EV
 options.brightness.help = Корекція експозиції камери. Калібрування під час першого запуску встановлює її так, щоб найтемніші тіні було ледь видно.
 
 options.master_volume = Загальна гучність
