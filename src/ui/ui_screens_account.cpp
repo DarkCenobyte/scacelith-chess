@@ -980,9 +980,9 @@ AccountNav pageExport(float t) {
         y += paragraph(T("online.export.saved"), p, y, p.w - 220.0f, ivory, kBody, font::FACE_TEXT) + 22.0f;
         TextStyle ps = style(font::FACE_TEXT, 22.0f, goldBright, HAlign::Center);
         ps.dir = 0;
-        std::string path = s.exportPath;
-        fitOrElide(path, ps, p.w - 160.0f, 0.7f);
-        gfx::text(path, p.cx(), y + 6.0f, ps);
+        // Cut at its start when too long: the file's name matters more than the folder's.
+        ps.size = gfx::fitSize(s.exportPath, ps, p.w - 160.0f, 0.7f);
+        gfx::text(elideStart(s.exportPath, ps, p.w - 160.0f), p.cx(), y + 6.0f, ps);
         y += 44.0f;
         const float bw = 260.0f;
         if (im::button(L("library.open_folder"), Rect(p.cx() - bw * 0.5f, y, bw, 52.0f), im::ButtonKind::Secondary)) {
