@@ -16,9 +16,8 @@ struct Data {
 };
 Data& data();
 
-// Called from ui::beginFrame / ui::endFrame.
+// Called from ui::beginFrame.
 void screensBeginFrame(float dt);
-void screensEndFrame();
 void screensReset();
 // The coach voice download (ui_model_download.cpp): the modal block of its prompt, called from
 // ui::beginFrame, and the title page's Coach entry (setCoachEntryHook).
@@ -32,7 +31,7 @@ namespace debug {
 // Same order as the menu's own page list (cast by value): new pages go at the end.
 enum class MenuPage {
     Title = 0, NewGame = 1, Options = 2, Credits = 3, Watch = 4, Online = 5, Calibration = 6, Coach = 7, Licences = 8,
-    Library = 9  // "Saved games" (needs mainMenu() with a LibrarySetup)
+    Library = 9  // "Saved games" (needs a LibrarySetup::folder)
 };
 void openMenuPage(MenuPage page);   // next mainMenu() call starts on this page
 // Next mainMenu() call starts on the online page's sub-page 'sub' (see debug::openOnlinePage).

@@ -1867,7 +1867,8 @@ GameSide parseSide(const json::Value& v) {
     if (v["ratingAfter"].isNumber()) {                         // null: the game changed no rating
         side.ratingChanged = true;
         side.ratingAfter = toInt(v["ratingAfter"]);
-        side.ratingDiff = v["ratingDiff"].isNumber() ? toInt(v["ratingDiff"]) : side.ratingAfter - side.rating;
+        side.ratingDiff = v["ratingDiff"].isNumber() ? toInt(v["ratingDiff"])
+                                                     : int(std::clamp<int64_t>(int64_t(side.ratingAfter) - side.rating, INT32_MIN, INT32_MAX));
     }
     return side;
 }

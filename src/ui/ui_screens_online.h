@@ -38,17 +38,19 @@ constexpr int kOnlineOptionsTab = 5;   // Display, Graphics, Audio, Gameplay, Pl
 // QR code of 'text' (byte mode, error correction M) drawn dark on light paper in 'r' (square,
 // with its quiet zone). False when the text does not fit a QR code.
 bool drawQrCode(const std::string& text, const gfx::Rect& r);
+// Forgets the last code drawn (the two-factor secret is in its text).
+void clearQrCache();
 // Puts UTF-8 text on the system clipboard (Windows). False where unavailable (X11 test builds).
 bool setClipboardText(const std::string& text);
 
 }  // namespace detail
 
 namespace debug {
-// Viewer: opens the online page on a sub-page ("signin", "register", "mfa", "account",
-// "mfa-setup", "play", "search", "challenge", "private", "direct", "direct-host",
-// "direct-wait", "direct-join", "noserver"; the account API's pages: "history", "game",
-// "game-gif", "game-gif-making", "game-saving", "game-saved", "devices", "email", "email-sent",
-// "export", "export-done", "delete").
+// Viewer: opens the online page on a sub-page ("signin", "register", "check-email", "forgot",
+// "mfa", "account", "password", "mfa-setup", "mfa-off", "recovery", "play", "search",
+// "challenge", "private", "direct", "direct-host", "direct-wait", "direct-join", "noserver";
+// the account API's pages: "history", "game", "game-gif", "game-gif-making", "game-saving",
+// "game-saved", "devices", "email", "email-sent", "export", "export-done", "delete").
 void openOnlinePage(const std::string& sub);
 }  // namespace debug
 

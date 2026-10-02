@@ -27,9 +27,7 @@
 #include "ui_online_pages.h"
 #include "ui.h"
 #include "ui_draw.h"
-#include "ui_internal.h"
 #include "ui_online.h"
-#include "ui_screens_game.h"
 #include "ui_theme.h"
 #include "ui_widgets.h"
 #include "../coach/catalog.h"
@@ -44,6 +42,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <cstdio>
 #include <ctime>
 #include <exception>
@@ -135,7 +134,7 @@ vec4 outcomeColor(game::Outcome o) {
 // "+9", "−12", "±0".
 std::string diffText(int d) {
     if (d > 0) return i18n::ltr("+" + num(d));
-    if (d < 0) return i18n::ltr("\xE2\x88\x92" + num(-d));
+    if (d < 0) return i18n::ltr("\xE2\x88\x92" + num(-static_cast<long long>(d)));
     return i18n::ltr("\xC2\xB1" "0");
 }
 vec4 diffColor(int d) { return d > 0 ? kWon : d < 0 ? danger : muted; }
@@ -175,28 +174,6 @@ void colourMark(vec2 c, int colour, float size = 15.0f) {
         gfx::fill(r, vec4(0.07f, 0.06f, 0.055f, 1.0f), 2.0f);
         gfx::stroke(r, withAlpha(ivory, 0.55f), 2.0f, 1.2f);
     }
-}
-
-// Scroll of a clipped area by the wheel over it (and PageUp / PageDown when 'keys').
-float wheelScroll(float& scroll, float& target, const Rect& area, float contentH, float step, bool opened, bool keys) {
-    float maxScroll = std::max(0.0f, contentH - area.h);
-    if (area.contains(im::mouse()) && im::wheel() != 0.0f) target -= im::wheel() * step;
-    if (keys && im::keyPressed(plat::KEY_PAGEDOWN)) target += area.h * 0.8f;
-    if (keys && im::keyPressed(plat::KEY_PAGEUP)) target -= area.h * 0.8f;
-    target = m::clamp(target, 0.0f, maxScroll);
-    scroll = opened ? target : std::min(im::approach(scroll, target, 16.0f), maxScroll);
-    return scroll;
-}
-// Scroll bar on the end side and fades at the edges (panel colour), as the saved games.
-void scrollDecor(const Rect& area, float scroll, float contentH) {
-    float maxScroll = contentH - area.h;
-    if (maxScroll <= 0.5f) return;
-    float bh = std::max(24.0f, area.h * area.h / contentH);
-    Rect bar = im::flip(area, Rect(area.r() + 10.0f, area.y + (area.h - bh) * (scroll / maxScroll), 2.0f, bh));
-    gfx::fill(bar, withAlpha(gold, 0.35f), 1.0f);
-    vec4 pc(0.05f, 0.043f, 0.039f, 0.95f), pz(0.05f, 0.043f, 0.039f, 0.0f);
-    if (scroll > 0.5f) gfx::fillV(Rect(area.x, area.y, area.w, 22.0f), pc, pz);
-    if (scroll < maxScroll - 0.5f) gfx::fillV(Rect(area.x, area.b() - 22.0f, area.w, 22.0f), pz, pc);
 }
 
 // A centred message in an area: a heading and a wrapped text under it.
@@ -241,6 +218,11 @@ struct State : game::GameSaveState {
     std::string reportComment;
     std::vector<uint64_t> reported;
     float movesScroll = 0.0f, movesTarget = 0.0f;
+    // the moves as listed: replayed again only for another game, or more of it (movesN: none yet)
+    std::vector<game::MoveLine> moveLines;
+    bool movesComplete = true;
+    uint64_t movesId = 0;
+    size_t movesN = SIZE_MAX;
     // devices
     bool reloadDevices = true;
     int64_t revoking = 0;
@@ -249,6 +231,7 @@ struct State : game::GameSaveState {
     std::string newEmail, password, code, confirmName;
     std::string error, note;
     std::string sentTo;              // e-mail change: the link went to this address
+    std::string emailRequested;      // e-mail change: the address of the last request sent
     std::future<archive::SaveResult> exportJob;
     bool exportWriting = false;
     std::string exportPath;          // the data export: the file written
@@ -306,20 +289,6 @@ net::GamesFilter filterOf(const State& s) {
 // The GifSaver's owner of a game of this server, and where its GIFs go.
 std::string gifOwner(const net::GameDetails& g) { return "history:" + ses().endpoint().origin() + "#" + num((long long)g.id); }
 std::string gifFolder() { return plat::appDataDirectory() + "gif/"; }
-
-// The end of a path that fits maxWidth ("…/gif/2026-09-26_164700_Magnus_T-vs-bob_812.gif"): the
-// file's name matters more than the folder's.
-std::string elideStart(const std::string& s, const TextStyle& st, float maxWidth) {
-    if (gfx::textWidth(s, st) <= maxWidth) return s;
-    std::u32string cps = uni::decode(s);
-    size_t lo = 0, hi = cps.size();
-    while (lo < hi) {  // the fewest characters cut from the start
-        size_t mid = (lo + hi) / 2;
-        if (gfx::textWidth(kEllipsis + uni::encode(cps.substr(mid)), st) <= maxWidth) hi = mid;
-        else lo = mid + 1;
-    }
-    return kEllipsis + uni::encode(cps.substr(lo));
-}
 
 std::string folderOf(const std::string& path) {
     const size_t cut = path.find_last_of("/\\");
@@ -446,7 +415,9 @@ AccountNav pageHistory(float t, bool fresh) {
                 T(filtered ? "online.history.empty_filter" : "online.history.empty"), goldBright);
     } else {
         gfx::pushAlpha(h.waiting() ? 0.45f : 1.0f);
-        for (size_t i = 0; i < page.games.size(); ++i) {
+        // The rows the list has room for: a server sending more than the page asked for shows no more.
+        const size_t rows = std::min(page.games.size(), size_t(game::HistoryPager::kPageSize));
+        for (size_t i = 0; i < rows; ++i) {
             const net::GameSummary& g = page.games[i];
             const Rect r(x0, list.y + float(i) * rowH, cw, rowH - 6.0f);
             im::Item it = im::item(im::makeId(std::to_string(g.id)), r, h.waiting() ? im::ITEM_DISABLED : im::ITEM_FOCUSABLE);
@@ -581,6 +552,7 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
     const bool canSave = library && !library->folder.empty();
     if (fresh) {
         s.movesScroll = s.movesTarget = 0.0f;
+        s.movesN = SIZE_MAX;
         s.reportOpen = false;
         if (!loaded && data.gameWanted && !se.busy(Kind::GameDetailsResult)) se.openGame(data.gameWanted);
         s.opened(s.saveJob.valid());
@@ -732,11 +704,16 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         im::sectionLabel(T("online.game.moves"), rx, top + 8.0f, rightW);
         {
             TextStyle cs = style(font::FACE_ITALIC, 21.0f, ivoryDim, im::endAlign());
-            std::string count = i18n::trn("online.game.move_count", (g.plies + 1) / 2);
+            std::string count = i18n::trn("online.game.move_count", (static_cast<long long>(g.plies) + 1) / 2);
             gfx::text(count, im::flipX(rcol, rx + rightW), top + 8.0f, cs);
         }
-        bool complete = true;
-        const std::vector<game::MoveLine> lines = game::gameMoves(g, &complete);
+        if (g.id != s.movesId || g.moves.size() != s.movesN) {
+            s.moveLines = game::gameMoves(g, &s.movesComplete);
+            s.movesId = g.id;
+            s.movesN = g.moves.size();
+        }
+        const bool complete = s.movesComplete;
+        const std::vector<game::MoveLine>& lines = s.moveLines;
         const Rect area(rx, top + 40.0f, rightW, bottom - top - 40.0f);
         if (lines.empty()) {
             TextStyle es = style(font::FACE_ITALIC, 22.0f, muted, im::startAlign());
@@ -818,6 +795,7 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
             se.api().report(g.id, opp.name, cats[std::clamp(s.reportCategory, 0, 2)], s.reportComment);
             se.expect(Kind::ReportResult);
             s.reported.push_back(g.id);
+            notify(T("online.report.sent"), 3.5f);   // as a report from the game itself
         }
         if (r >= 0) s.reportOpen = false;
         return AccountNav::Stay;
@@ -919,9 +897,9 @@ AccountNav pageDevices(float t, bool fresh, std::string& navNote) {
         int r = im::confirmDialog("##online.devices.all", T("online.devices.all.title"), T("online.account.sign_out_all.help"),
                                   T("online.account.sign_out_all"), T("common.cancel"), true);
         if (r == 1) {
-            se.signOut(true);
+            signOutEverywhere();
             clearSecrets();
-            navNote = T("online.account.signed_out_all");
+            navNote = T("online.account.signing_out_all");
             nav = AccountNav::SignIn;
         }
         if (r >= 0) s.confirmAll = false;
@@ -974,7 +952,8 @@ AccountNav pageEmail(float t) {
     if (send) {
         s.error.clear();
         s.note.clear();
-        se.api().changeEmail(trim(s.newEmail), s.password, reauthCode());
+        s.emailRequested = trim(s.newEmail);
+        se.api().changeEmail(s.emailRequested, s.password, reauthCode());
         se.expect(Kind::EmailChangeResult);
     }
     if (done || back || im::consumeBack()) {
@@ -1003,9 +982,9 @@ AccountNav pageExport(float t) {
         y += paragraph(T("online.export.saved"), p, y, p.w - 220.0f, ivory, kBody, font::FACE_TEXT) + 22.0f;
         TextStyle ps = style(font::FACE_TEXT, 22.0f, goldBright, HAlign::Center);
         ps.dir = 0;
-        std::string path = s.exportPath;
-        fitOrElide(path, ps, p.w - 160.0f, 0.7f);
-        gfx::text(path, p.cx(), y + 6.0f, ps);
+        // Cut at its start when too long: the file's name matters more than the folder's.
+        ps.size = gfx::fitSize(s.exportPath, ps, p.w - 160.0f, 0.7f);
+        gfx::text(elideStart(s.exportPath, ps, p.w - 160.0f), p.cx(), y + 6.0f, ps);
         y += 44.0f;
         const float bw = 260.0f;
         if (im::button(L("library.open_folder"), Rect(p.cx() - bw * 0.5f, y, bw, 52.0f), im::ButtonKind::Secondary)) {
@@ -1082,6 +1061,38 @@ AccountNav pageDelete(float t) {
 
 }  // namespace
 
+// ---- Shared with the saved games (ui_library.cpp) ---------------------------------------------------
+float wheelScroll(float& scroll, float& target, const Rect& area, float contentH, float step, bool opened, bool keys) {
+    float maxScroll = std::max(0.0f, contentH - area.h);
+    if (area.contains(im::mouse()) && im::wheel() != 0.0f) target -= im::wheel() * step;
+    if (keys && im::keyPressed(plat::KEY_PAGEDOWN)) target += area.h * 0.8f;
+    if (keys && im::keyPressed(plat::KEY_PAGEUP)) target -= area.h * 0.8f;
+    target = m::clamp(target, 0.0f, maxScroll);
+    scroll = opened ? target : std::min(im::approach(scroll, target, 16.0f), maxScroll);
+    return scroll;
+}
+void scrollDecor(const Rect& area, float scroll, float contentH) {
+    float maxScroll = contentH - area.h;
+    if (maxScroll <= 0.5f) return;
+    float bh = std::max(24.0f, area.h * area.h / contentH);
+    Rect bar = im::flip(area, Rect(area.r() + 10.0f, area.y + (area.h - bh) * (scroll / maxScroll), 2.0f, bh));
+    gfx::fill(bar, withAlpha(gold, 0.35f), 1.0f);
+    vec4 pc(0.05f, 0.043f, 0.039f, 0.95f), pz(0.05f, 0.043f, 0.039f, 0.0f);
+    if (scroll > 0.5f) gfx::fillV(Rect(area.x, area.y, area.w, 22.0f), pc, pz);
+    if (scroll < maxScroll - 0.5f) gfx::fillV(Rect(area.x, area.b() - 22.0f, area.w, 22.0f), pz, pc);
+}
+std::string elideStart(const std::string& s, const TextStyle& st, float maxWidth) {
+    if (gfx::textWidth(s, st) <= maxWidth) return s;
+    std::u32string cps = uni::decode(s);
+    size_t lo = 0, hi = cps.size();
+    while (lo < hi) {  // the fewest characters cut from the start
+        size_t mid = (lo + hi) / 2;
+        if (gfx::textWidth(kEllipsis + uni::encode(cps.substr(mid)), st) <= maxWidth) hi = mid;
+        else lo = mid + 1;
+    }
+    return kEllipsis + uni::encode(cps.substr(lo));
+}
+
 // ==== The account pages' entry points ==================================================================
 void accountReset(AccountPage page) {
     State& s = st();
@@ -1101,7 +1112,10 @@ void accountReset(AccountPage page) {
         break;
     case AccountPage::Export: s.exportPath.clear(); break;
     case AccountPage::Delete: s.confirmName.clear(); break;
-    case AccountPage::Game: s.gifGame = 0; break;   // a game opened from the history: a new visit
+    case AccountPage::Game:   // a game opened from the history: a new visit
+        s.gifGame = 0;
+        s.movesN = SIZE_MAX;
+        break;
     }
 }
 
@@ -1111,6 +1125,11 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
     net::Event e;
     AccountNav nav = AccountNav::Stay;
     auto on = [&](AccountPage p) { return current && *current == p; };
+    // An answer's error on the page that asked, else (the player went elsewhere meanwhile) a notice.
+    auto fail = [&](AccountPage p, const std::string& text) {
+        if (on(p)) s.error = text;
+        else notify(text, 4.0f);
+    };
     // The pages read these from the session (accountData). A token refused on the way signs out
     // (the session forgot it): the sign-in page says so.
     for (Kind k : {Kind::GamesResult, Kind::GameDetailsResult, Kind::SessionsResult, Kind::ReportResult})
@@ -1143,11 +1162,11 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
             if (on(AccountPage::Email)) nav = AccountNav::Account;
             else notify(note, 4.0f);
         } else if (e.ok) {
-            s.sentTo = trim(s.newEmail);
+            s.sentTo = s.emailRequested;   // not the form's: it may have been opened again since
             clearSecrets();
             if (!on(AccountPage::Email)) notify(i18n::trf("online.email.sent", {i18n::ltr(s.sentTo)}), 6.0f);
         } else if (e.error != "unauthorized") {
-            s.error = errorText(e);
+            fail(AccountPage::Email, errorText(e));
         }
     }
     if (se.take(Kind::AccountExportResult, e)) {
@@ -1167,7 +1186,7 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
                 }
             });
         } else if (e.error != "unauthorized") {
-            s.error = errorText(e);
+            fail(AccountPage::Export, errorText(e));
         }
     }
     if (se.take(Kind::AccountDeleted, e)) {
@@ -1178,7 +1197,7 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
             note = T("online.delete.done");
             nav = AccountNav::SignIn;
         } else if (e.error != "unauthorized") {
-            s.error = errorText(e);
+            fail(AccountPage::Delete, errorText(e));
         }
     }
     // Work done off the UI thread.
@@ -1218,7 +1237,7 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
             LOGI("online: account data saved in %s", r.path.c_str());
             if (!on(AccountPage::Export)) notify(T("online.export.saved"), 4.0f);
         } else {
-            s.error = T("online.export.failed");
+            fail(AccountPage::Export, T("online.export.failed"));
             LOGW("online: the account data could not be written: %s", r.error.c_str());
         }
     }

@@ -7,6 +7,7 @@
 #include "online_mock.h"
 #include "settings.h"
 #include <algorithm>
+#include <cctype>
 #include <chrono>
 #include <cmath>
 #include <cstdio>
@@ -299,6 +300,8 @@ void OnlineSession::applyServer() {
     conn_ = api_->state();
     queue_ = Queue();
     outgoing_ = Outgoing();
+    cancelledEarly_.clear();
+    joining_ = false;
     incoming_.clear();
     answers_.setServer(ep.origin());
     serverNameRt_.clear();
@@ -512,11 +515,15 @@ void OnlineSession::createPrivateGame(int baseSec, int incSec, bool rated, int c
     outgoing_.rated = rated;
 }
 
-void OnlineSession::joinPrivateGame(const std::string& code) { api().joinPrivateGame(code); }
+void OnlineSession::joinPrivateGame(const std::string& code) {
+    api().joinPrivateGame(code);
+    joining_ = true;
+}
 
 void OnlineSession::cancelOutgoing() {
     if (!outgoing_.active) return;
     if (outgoing_.id) api().cancelChallenge(outgoing_.id);
+    else cancelledEarly_.push_back(outgoing_);  // its id comes with its Pending status
     outgoing_ = Outgoing();
     quietNotFound_ = false;  // a ChallengeNotFound now may answer this cancel
 }
@@ -806,7 +813,10 @@ void OnlineSession::handleServer(net::Event& e) {
         } else if (e.state == net::ConnState::Incompatible) {
             ui::notify(onlineErrorText("incompatible"), 6.0f);
         }
-        if (e.state != net::ConnState::Online) queue_.searching = false;
+        if (e.state != net::ConnState::Online) {
+            queue_.searching = false;
+            joining_ = false;
+        }
         break;
     case Kind::Welcome:
         if (!e.account.username.empty()) {
@@ -869,6 +879,20 @@ void OnlineSession::handleServer(net::Event& e) {
             incoming_.erase(std::remove_if(incoming_.begin(), incoming_.end(),
                                            [&](const Incoming& c) { return c.id == e.challengeId; }),
                             incoming_.end());
+            // Only its creator is told Pending: a challenge of ours cancelled before the server named
+            // it (same target and terms) is cancelled now, not left live for an acceptance.
+            if (e.challengeState == ChPending) {
+                auto same = [&](const Outgoing& o) {
+                    return o.baseSec == e.challengeBaseSec && o.incSec == e.challengeIncSec && o.rated == e.challengeRated &&
+                           std::equal(o.target.begin(), o.target.end(), e.challengeTarget.begin(), e.challengeTarget.end(),
+                                      [](char a, char b) { return std::tolower(uint8_t(a)) == std::tolower(uint8_t(b)); });
+                };
+                auto early = std::find_if(cancelledEarly_.begin(), cancelledEarly_.end(), same);
+                if (early != cancelledEarly_.end()) {
+                    api().cancelChallenge(e.challengeId);
+                    cancelledEarly_.erase(early);
+                }
+            }
         }
         break;
     }
@@ -898,6 +922,7 @@ void OnlineSession::handleServer(net::Event& e) {
         }
         break;
     case Kind::ServerError:
+        joining_ = false;  // a join is answered by its game or by an error
         if ((e.gameId != 0 && e.gameId == gameId_) || live::gameError(e.code)) {
             routeGame(e, LinkKind::Server);
             break;
@@ -941,6 +966,7 @@ void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
         gameEvents_.clear();
         queue_.searching = false;
         outgoing_ = Outgoing();
+        joining_ = false;
         LOGI("online: game %llu ready (%s)", (unsigned long long)id, from == LinkKind::Direct ? "direct" : "server");
         return;
     }

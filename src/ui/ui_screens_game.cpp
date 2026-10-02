@@ -51,42 +51,15 @@ Rect g_viewerControls;
 std::string num(int v) { return std::to_string(v); }
 
 // ---- Values (same steps as the New Game page) ----------------------------------------------------
-const std::vector<int>& baseTimeValues() {
-    static std::vector<int> v = [] {
-        std::vector<int> r;
-        for (int s = 15; s < 180; s += 15) r.push_back(s);
-        for (int s = 180; s < 600; s += 30) r.push_back(s);
-        for (int s = 600; s < 3600; s += 60) r.push_back(s);
-        for (int s = 3600; s <= 10800; s += 300) r.push_back(s);
-        return r;
-    }();
-    return v;
-}
-int nearestIndex(const std::vector<int>& v, int value) {
-    int best = 0;
-    for (int i = 0; i < int(v.size()); ++i)
-        if (std::abs(v[size_t(i)] - value) < std::abs(v[size_t(best)] - value)) best = i;
-    return best;
-}
-std::string clockText(int seconds) {
-    char buf[32];
-    std::snprintf(buf, sizeof(buf), "%d:%02d", seconds / 60, seconds % 60);
-    return buf;
-}
-std::string spacedPlus(const std::string& label) {
-    size_t p = label.find('+');
-    if (p == std::string::npos) return label;
-    return label.substr(0, p) + "\xE2\x80\x89+\xE2\x80\x89" + label.substr(p + 1);
-}
+using detail::baseTimeValues;
+using detail::clockText;
+using detail::nearestIndex;
+using detail::spacedPlus;
 // "3+2" -> category (Lichess-style estimate: base + 40 x increment), as on the New Game page.
 const char* categoryKey(const std::string& label) {
     int base = 0, inc = 0;
-    if (std::sscanf(label.c_str(), "%d+%d", &base, &inc) != 2) return "viewer.tc.none";
-    int est = base * 60 + 40 * inc;
-    if (est < 180) return "viewer.tc.bullet";
-    if (est < 480) return "viewer.tc.blitz";
-    if (est < 1500) return "viewer.tc.rapid";
-    return "viewer.tc.classical";
+    if (std::sscanf(label.c_str(), "%d+%d", &base, &inc) != 2) return "tc.no_clock";
+    return detail::tcCategoryKey(int64_t(base) * 60, inc);
 }
 std::string customClockSummary(const WatchSetup& s) {
     int b = s.customBaseSeconds;

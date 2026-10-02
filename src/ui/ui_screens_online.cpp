@@ -22,7 +22,6 @@
 // game starts by itself when the session announces one (the scene watches gameReady()).
 #include "ui.h"
 #include "ui_draw.h"
-#include "ui_internal.h"
 #include "ui_online.h"
 #include "ui_online_pages.h"
 #include "ui_screens_game.h"
@@ -66,11 +65,6 @@ std::string T(const char* key) { return i18n::tr(key); }
 std::string L(const char* key) { return std::string(i18n::tr(key)) + "##" + key; }
 game::OnlineSession& ses() { return game::onlineSession(); }
 
-std::string spacedPlus(const std::string& label) {
-    size_t p = label.find('+');
-    if (p == std::string::npos) return label;
-    return label.substr(0, p) + "\xE2\x80\x89+\xE2\x80\x89" + label.substr(p + 1);
-}
 std::string trim(const std::string& s) {
     size_t a = s.find_first_not_of(" \t"), b = s.find_last_not_of(" \t");
     return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
@@ -114,6 +108,7 @@ void serverLine(const Rect& p, bool showConnection) {
     std::string server = s.serverName();
     if (server.empty()) return;
     std::string line = i18n::ltr(server);
+    const size_t named = line.size();
     vec4 dot = withAlpha(muted, 0.8f);
     if (showConnection) {
         switch (s.conn()) {
@@ -126,6 +121,10 @@ void serverLine(const Rect& p, bool showConnection) {
     }
     TextStyle ts = style(font::FACE_ITALIC, kCaption, withAlpha(muted, 0.95f), im::startAlign());
     ts.size = gfx::fitSize(line, ts, p.w * 0.3f, 0.75f);
+    if (gfx::textWidth(line, ts) > p.w * 0.3f + 0.5f) {  // a long server name is cut, not the connection
+        const std::string state = line.substr(named);
+        line = i18n::ltr(im::elideToFit(server, ts, p.w * 0.3f - gfx::textWidth(state, ts))) + state;
+    }
     // Above the page title's height, so a long title never meets it.
     gfx::diamond(vec2(im::flipX(p, p.x + 40.0f), p.y + 31.0f), 3.5f, dot);
     gfx::text(line, im::flipX(p, p.x + 54.0f), p.y + 37.0f, ts);
@@ -166,7 +165,7 @@ void infoLine(const std::string& label, const std::string& value, const Rect& co
     gfx::text(label, im::flipX(col, col.x), y, ls);
     TextStyle vs = style(font::FACE_TEXT, kBody, valueColor, im::startAlign());
     vs.size = gfx::fitSize(value, vs, col.w - 10.0f, 0.7f);
-    gfx::text(value, im::flipX(col, col.x), y + 34.0f, vs);
+    gfx::text(im::elideToFit(value, vs, col.w - 10.0f), im::flipX(col, col.x), y + 34.0f, vs);
 }
 
 }  // namespace onl
@@ -175,6 +174,10 @@ void infoLine(const std::string& label, const std::string& value, const Rect& co
 namespace {
 
 using namespace detail::onl;
+using detail::baseTimeValues;
+using detail::clockText;
+using detail::nearestIndex;
+using detail::spacedPlus;
 using Kind = net::Event::Kind;
 
 // ---- Helpers ---------------------------------------------------------------------------------------
@@ -188,28 +191,6 @@ std::string tcLabel(int baseSec, int incSec) {
         return std::string(b);
     }();
     return base + "+" + std::to_string(incSec);
-}
-const std::vector<int>& baseTimeValues() {
-    static std::vector<int> v = [] {
-        std::vector<int> r;
-        for (int s = 15; s < 180; s += 15) r.push_back(s);
-        for (int s = 180; s < 600; s += 30) r.push_back(s);
-        for (int s = 600; s < 3600; s += 60) r.push_back(s);
-        for (int s = 3600; s <= 10800; s += 300) r.push_back(s);
-        return r;
-    }();
-    return v;
-}
-int nearestIndex(const std::vector<int>& v, int value) {
-    int best = 0;
-    for (int i = 0; i < int(v.size()); ++i)
-        if (std::abs(v[size_t(i)] - value) < std::abs(v[size_t(best)] - value)) best = i;
-    return best;
-}
-std::string clockText(int seconds) {
-    char buf[32];
-    std::snprintf(buf, sizeof(buf), "%d:%02d", seconds / 60, seconds % 60);
-    return buf;
 }
 std::string ratingText(const net::RatingInfo* r) {
     if (!r) return "1500?";
@@ -246,8 +227,6 @@ bool isOfficialCategory(int baseSec, int incSec) {
         if (c.baseSec == baseSec && c.incSec == incSec) return true;
     return false;
 }
-
-
 
 // ---- State -----------------------------------------------------------------------------------------
 enum class Sub {
@@ -314,6 +293,9 @@ struct State {
     int mfaStep = 0;
     std::string mfaSecret, mfaUri;
     std::vector<std::string> codes;
+    // sign out
+    bool confirmAll = false;    // the account page's Sign out everywhere dialog is open
+    bool everywhere = false;    // the last sign-out was everywhere: its answer is told
     // challenge / private game
     Terms terms;
     bool privateCreated = false;
@@ -323,6 +305,7 @@ struct State {
     float copiedAt = -100.0f;
     // Options > Online
     bool testShown = false, testOk = false;
+    net::ServerEndpoint testedEp;    // the endpoint of the last test sent
     std::string testLine, testDetail;
 };
 State O;
@@ -351,17 +334,12 @@ void openAccountPage(Sub sub) {
 }
 
 // ---- Page chrome -------------------------------------------------------------------------------------
-
-
 // Error (red) or note (ivory) under a form, centered; returns the height used.
 float messageLine(const Rect& p, float y) {
     if (!O.error.empty()) return paragraph(O.error, p, y, p.w - 200.0f, danger, kSmall + 1.0f);
     if (!O.note.empty()) return paragraph(O.note, p, y, p.w - 200.0f, ivoryDim, kSmall + 1.0f);
     return 0.0f;
 }
-
-
-
 
 // A large choice: title and a one-line description (Play page, direct match).
 bool choiceRow(const char* key, const char* descKey, const Rect& r, bool enabled = true) {
@@ -406,25 +384,54 @@ bool tcTile(int id, const Rect& r, const std::string& label, const std::string& 
     return hit;
 }
 
-
 // ---- Result handling (HTTPS answers of the pages) ----------------------------------------------------
+// The answer of an account form ('page'): there, the account page with 'note' or the error under the
+// form; on any other page (the player went on meanwhile), a notice.
+void answered(Sub page, bool ok, const std::string& note, const std::string& error) {
+    if (O.sub != page) {
+        notify(ok ? note : error, 4.0f);
+    } else if (ok) {
+        setSub(Sub::Account);
+        O.note = note;
+    } else {
+        O.error = error;
+    }
+}
+
+// Recovery codes just received (shown once): to 'page', which shows them, whatever page the player
+// went to meanwhile. The answers are not taken on a direct match's pages (its host would keep
+// listening unseen): they wait there until the player leaves them.
+void showCodes(Sub page) {
+    if (O.sub != page && ses().signedIn()) setSub(page);
+}
+
 void pumpResults() {
     game::OnlineSession& s = ses();
     net::Event e;
     if (s.take(Kind::LoginResult, e)) {
+        // The answer moves the player on only from the pages of signing in (and, when it signs in or
+        // asks for a code, from the other signed-out forms); on a page opened meanwhile (a direct
+        // match's host would keep listening unseen) it is only told.
+        const bool signingIn = O.sub == Sub::SignIn || O.sub == Sub::Mfa || O.sub == Sub::SsoWait || O.sub == Sub::SsoName;
+        const bool signedOutForm = signingIn || O.sub == Sub::Register || O.sub == Sub::CheckEmail || O.sub == Sub::Forgot;
         if (e.ok) {
             clearSecrets();
-            setSub(Sub::Play);
+            if (signedOutForm) setSub(Sub::Play);
+            else notify(i18n::trf("online.play.signed_in", {s.account().username}), 4.0f);
         } else if (e.mfaRequired) {
-            O.code.clear();
-            setSub(Sub::Mfa);
-        } else {
+            if (signedOutForm) {
+                O.code.clear();
+                setSub(Sub::Mfa);
+            }
+        } else if (signingIn) {
             Sub back = O.sub == Sub::SsoName ? Sub::SsoName
                        : (O.sub == Sub::Mfa && e.error == "invalid_code") ? Sub::Mfa
                                                                            : Sub::SignIn;
             if (O.sub != back) setSub(back);
             O.error = game::onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs);
             O.offerResend = e.error == "email_unverified";
+        } else if (e.error != "cancelled") {
+            notify(game::onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs), 4.0f);
         }
     }
     if (s.take(Kind::SsoBrowserOpened, e) && !e.ok) {
@@ -459,13 +466,8 @@ void pumpResults() {
         else O.error = game::onlineErrorText(e.error, e.retryAfterSec);
     }
     if (s.take(Kind::PasswordChanged, e)) {
-        if (e.ok) {
-            clearSecrets();
-            setSub(Sub::Account);
-            O.note = T("online.password.changed");
-        } else {
-            O.error = game::onlineErrorText(e.error, e.retryAfterSec);
-        }
+        if (e.ok) clearSecrets();
+        answered(Sub::Password, e.ok, T("online.password.changed"), game::onlineErrorText(e.error, e.retryAfterSec));
     }
     if (s.take(Kind::MfaSetupResult, e)) {
         if (e.ok) {
@@ -478,40 +480,51 @@ void pumpResults() {
             O.error = game::onlineErrorText(e.error, e.retryAfterSec);
         }
     }
-    if (s.take(Kind::MfaEnableResult, e)) {
+    if (!isDirect(O.sub) && s.take(Kind::MfaEnableResult, e)) {
         if (e.ok) {
             O.codes = e.recoveryCodes;
             O.mfaStep = 2;
             O.mfaSecret.clear();
             O.mfaUri.clear();
+            detail::clearQrCache();
             clearSecrets();
             O.error.clear();
+            showCodes(Sub::MfaSetup);
         } else {
             O.error = game::onlineErrorText(e.error, e.retryAfterSec);
         }
     }
     if (s.take(Kind::MfaDisableResult, e)) {
-        if (e.ok) {
-            clearSecrets();
-            setSub(Sub::Account);
-            O.note = T("online.mfa.off_done");
-        } else {
-            O.error = game::onlineErrorText(e.error, e.retryAfterSec);
-        }
+        if (e.ok) clearSecrets();
+        answered(Sub::MfaOff, e.ok, T("online.mfa.off_done"), game::onlineErrorText(e.error, e.retryAfterSec));
     }
-    if (s.take(Kind::RecoveryCodesResult, e)) {
+    if (!isDirect(O.sub) && s.take(Kind::RecoveryCodesResult, e)) {
         if (e.ok) {
             O.codes = e.recoveryCodes;
             O.mfaStep = 2;
             clearSecrets();
             O.error.clear();
+            showCodes(Sub::Recovery);
         } else {
             O.error = game::onlineErrorText(e.error, e.retryAfterSec);
         }
     }
     if (s.take(Kind::AccountResult, e) && !e.ok && e.error != "unauthorized" && O.sub == Sub::Account)
         O.error = game::onlineErrorText(e.error, e.retryAfterSec);
-    s.take(Kind::LogoutResult, e);
+    // Sign out everywhere: done only when the server says so (this computer is signed out anyway).
+    if (s.take(Kind::LogoutResult, e) && O.everywhere) {
+        O.everywhere = false;
+        const std::string text = e.ok ? T("online.account.signed_out_all")
+                                      : i18n::trf("online.account.sign_out_all_failed", {game::onlineErrorText(e.error, e.retryAfterSec)});
+        if (O.sub != Sub::SignIn) {
+            notify(text, 6.0f);
+        } else if (e.ok) {
+            O.note = text;
+        } else {
+            O.note.clear();
+            O.error = text;
+        }
+    }
 }
 
 // ---- Sub-pages: server, sign in ------------------------------------------------------------------------
@@ -594,7 +607,7 @@ void pageSignIn(float t) {
         if (O.user.find('@') != std::string::npos) O.email = O.user;
         setSub(Sub::Forgot);
     }
-    if (linkButton("online.direct.button", p.r() - 100.0f - third * 0.5f, linkY)) setSub(Sub::Direct);
+    if (linkButton("online.direct.button", p.r() - 100.0f - third * 0.5f, linkY, !busy)) setSub(Sub::Direct);
     footerRule(p);
     if (backButton(p)) O.leave = true;
     if (primaryButton(p, "online.signin.button", usable && !trim(O.user).empty() && !O.password.empty(), busy)) {
@@ -759,13 +772,36 @@ void pageSsoName(float t) {
 }
 
 // ---- Sub-pages: account ----------------------------------------------------------------------------------
+// An e-mail address that, followed by 'tail', fits maxWidth in st: whole when it does, else cut in
+// the middle of its name ("jean-bapt…@example.com") so that its domain stays, or at its end when not
+// even a letter of the name fits with the domain ('tail' is always kept).
+std::string fitAddress(const std::string& email, const std::string& tail, const TextStyle& st, float maxWidth) {
+    auto fits = [&](const std::string& address) { return gfx::textWidth(i18n::ltr(address) + tail, st) <= maxWidth + 0.5f; };
+    if (fits(email)) return email;
+    const size_t at = email.rfind('@');
+    if (at != std::string::npos && at > 0) {
+        const std::u32string name = uni::decode(email.substr(0, at));
+        const std::string domain = "\xE2\x80\xA6" + email.substr(at);
+        size_t lo = 0, hi = name.size();
+        while (lo < hi) {  // the longest start of the name that fits
+            size_t mid = (lo + hi + 1) / 2;
+            if (fits(uni::encode(name.substr(0, mid)) + domain)) lo = mid;
+            else hi = mid - 1;
+        }
+        if (lo > 0) return uni::encode(name.substr(0, lo)) + domain;
+    }
+    return im::elideToFit(email, st, maxWidth - gfx::textWidth(tail, st));
+}
+
 void pageAccount(float t) {
     game::OnlineSession& s = ses();
     const net::AccountInfo& a = s.account();
     if (O.fresh) {
         s.api().fetchAccount();
         s.expect(Kind::AccountResult);
+        O.confirmAll = false;
     }
+    if (O.confirmAll) im::pushBlock();
     Rect p = beginPage(t, 1720.0f, 960.0f, T("online.account.title"));
     serverLine(p, true);
     im::pushId("account");
@@ -786,14 +822,19 @@ void pageAccount(float t) {
     float y = top + 56.0f;
     infoLine(T("online.account.username"), a.username.empty() ? "\xE2\x80\x94" : a.username, col, y);
     y += 72.0f;
-    std::string mail = a.email.empty() ? std::string("\xE2\x80\x94") : i18n::ltr(a.email);
-    if (!a.email.empty() && !a.emailVerified) mail += "  " + T("online.account.unverified");
+    // A long address loses the middle of its name, not its domain or the tag after it (measured as
+    // infoLine draws it at its smallest).
+    const std::string unverified = a.email.empty() || a.emailVerified ? std::string() : "  " + T("online.account.unverified");
+    const std::string mail = a.email.empty() ? std::string("\xE2\x80\x94")
+                                             : i18n::ltr(fitAddress(a.email, unverified, style(font::FACE_TEXT, kBody * 0.7f, ivory), colW - 10.0f)) +
+                                                   unverified;
     infoLine(T("online.account.email"), mail, col, y);
     y += 72.0f;
     if (!a.pendingEmail.empty()) {
         // An e-mail change waiting for its link.
         TextStyle ps = style(font::FACE_ITALIC, kCaption, gold, im::startAlign());
-        std::string line = i18n::trf("online.account.pending_email", {i18n::ltr(a.pendingEmail)});
+        // The address on a line of its own at most (a line breaks only at spaces).
+        std::string line = i18n::trf("online.account.pending_email", {i18n::ltr(fitAddress(a.pendingEmail, std::string(), ps, colW - 10.0f))});
         int n = gfx::textWrapped(line, im::flipX(col, lx), y - 6.0f, colW - 10.0f, ps, 26.0f);
         y += float(n) * 26.0f + 8.0f;
     }
@@ -903,15 +944,31 @@ void pageAccount(float t) {
     bool history = im::button(L("online.account.history"), hb, im::ButtonKind::Primary);
     im::popId();
     endPage();
+    if (O.confirmAll) im::popBlock();
     if (history) {
         openAccountPage(Sub::History);
         return;
     }
-    if (signOut || signOutAll) {
-        s.signOut(signOutAll);
+    // Every computer only once confirmed, as on the signed-in devices page.
+    if (signOutAll) O.confirmAll = true;
+    if (O.confirmAll) {
+        int r = im::confirmDialog("##online.account.all", T("online.devices.all.title"), T("online.account.sign_out_all.help"),
+                                  T("online.account.sign_out_all"), T("common.cancel"), true);
+        if (r == 1) {
+            signOutEverywhere();
+            clearSecrets();
+            setSub(Sub::SignIn);
+            O.note = T("online.account.signing_out_all");
+        }
+        if (r >= 0) O.confirmAll = false;
+        return;
+    }
+    if (signOut) {
+        s.signOut(false);
+        O.everywhere = false;
         clearSecrets();
         setSub(Sub::SignIn);
-        O.note = T(signOutAll ? "online.account.signed_out_all" : "online.account.signed_out");
+        O.note = T("online.account.signed_out");
         return;
     }
     if (back || im::consumeBack()) setSub(Sub::Play);
@@ -1042,6 +1099,7 @@ void pageMfaSetup(float t) {
         clearSecrets();
         O.mfaSecret.clear();
         O.mfaUri.clear();
+        detail::clearQrCache();
         setSub(Sub::Account);
     }
 }
@@ -1089,8 +1147,8 @@ void pageMfaOff(float t, bool regenerate) {
 }
 
 // ---- Sub-pages: play -------------------------------------------------------------------------------------
-// Grid of the server's categories; returns the chosen id ("" = none known yet). With 'custom' a
-// "Custom" tile is added (terms.tc = -1).
+// Grid of the server's categories (a spinner while none is known); 'index' is the selected one,
+// -1 = the "Custom" tile when 'custom'. Returns the height used.
 float categoryGrid(const Rect& col, float y, int& index, bool custom, bool withRatings) {
     game::OnlineSession& s = ses();
     const std::vector<net::Category>& cats = s.info().categories;
@@ -1108,10 +1166,7 @@ float categoryGrid(const Rect& col, float y, int& index, bool custom, bool withR
         bool sel = isCustom ? index < 0 : index == i;
         std::string label = isCustom ? T("tc.custom") : spacedPlus(cats[size_t(i)].id);
         std::string sub = isCustom ? T("online.casual_only") : withRatings ? ratingText(s.rating(cats[size_t(i)].id)) : std::string();
-        if (!withRatings && !isCustom) {
-            int est = cats[size_t(i)].baseSec + 40 * cats[size_t(i)].incSec;
-            sub = T(est < 180 ? "viewer.tc.bullet" : est < 480 ? "viewer.tc.blitz" : est < 1500 ? "viewer.tc.rapid" : "viewer.tc.classical");
-        }
+        if (!withRatings && !isCustom) sub = T(detail::tcCategoryKey(cats[size_t(i)].baseSec, cats[size_t(i)].incSec));
         if (tcTile(i, r, isCustom ? label : i18n::ltr(label), i18n::ltr(sub), sel)) index = isCustom ? -1 : i;
     }
     im::popId();
@@ -1189,7 +1244,10 @@ void outgoingCard(const Rect& col, float y) {
             gfx::text(i18n::ltr(o.code), im::flipX(r, r.x + 24.0f), r.y + 100.0f, cs);
         }
         gfx::text(terms, im::flipX(r, r.x + 24.0f), r.y + 138.0f, ts);
-        gfx::text(T("online.outgoing.private_hint"), im::flipX(r, r.x + 24.0f), r.y + 170.0f, ts);
+        const std::string hint = T("online.outgoing.private_hint");
+        TextStyle hs = ts;
+        hs.size = gfx::fitSize(hint, hs, r.w - 48.0f, 0.7f);
+        gfx::text(hint, im::flipX(r, r.x + 24.0f), r.y + 170.0f, hs);
     }
     float bw = 150.0f;
     if (im::button(L("common.cancel"), im::flip(r, Rect(r.r() - bw - 18.0f, r.y + 16.0f, bw, 44.0f)), im::ButtonKind::Quiet))
@@ -1393,11 +1451,15 @@ void pageChallenge(float t, bool privateGame) {
         std::string code = O.joinCode;
         if (im::formField(L("online.field.private_code"), code, Rect(rx, y, colW, 56.0f), 12, im::FIELD_LTR, "ABC123")) O.joinCode = upperCode(code);
         y += 70.0f;
-        if (im::button(L("online.private.join"), Rect(rx, y, colW, 56.0f), im::ButtonKind::Secondary, online && O.joinCode.size() >= 4)) join = true;
-        if (!O.note.empty()) {
+        // A code has 4 to 12 letters and digits (the dashes do not count).
+        const auto chars = std::count_if(O.joinCode.begin(), O.joinCode.end(), [](char c) { return c != '-'; });
+        if (im::button(L("online.private.join"), Rect(rx, y, colW, 56.0f), im::ButtonKind::Secondary, online && !s.joining() && chars >= 4))
+            join = true;
+        if (s.joining()) {
+            const std::string note = T("online.private.joining");
             TextStyle js = style(font::FACE_ITALIC, kSmall, ivoryDim, HAlign::Center);
-            gfx::text(O.note, rx + colW * 0.5f, y + 96.0f, js);
-            spinner(vec2(rx + colW * 0.5f - gfx::textWidth(O.note, js) * 0.5f - 28.0f, y + 88.0f));
+            gfx::text(note, rx + colW * 0.5f, y + 96.0f, js);
+            spinner(vec2(rx + colW * 0.5f - gfx::textWidth(note, js) * 0.5f - 28.0f, y + 88.0f));
         }
     }
     footerRule(p);
@@ -1420,7 +1482,6 @@ void pageChallenge(float t, bool privateGame) {
     }
     if (join) {
         s.joinPrivateGame(O.joinCode);
-        O.note = T("online.private.joining");
         return;
     }
     if (back || im::consumeBack()) setSub(Sub::Play);
@@ -1476,7 +1537,7 @@ void pageDirectHost(float t) {
     float cg = 12.0f, cw = (colW - cg * float(cols - 1)) / float(cols), ch = 66.0f;
     float gy = top + 30.0f;
     int sel = gs.directTimeControl;
-    if (sel == 0 || sel >= n) sel = 7 < n ? 7 : n - 1;
+    if (sel == 0 || sel >= n) sel = std::min(game::Settings::kDefaultDirectTimeControl, n - 1);
     im::pushId("tc");
     for (int i = 1; i <= n; ++i) {
         bool isCustom = i == n;
@@ -1486,10 +1547,7 @@ void pageDirectHost(float t) {
         std::string label = isCustom ? T("tc.custom") : i18n::ltr(spacedPlus(presets[size_t(i)].label()));
         std::string sub;
         if (isCustom) sub = T("tc.your_own");
-        else {
-            int64_t est = presets[size_t(i)].baseMs / 1000 + 40 * presets[size_t(i)].incrementMs / 1000;
-            sub = T(est < 180 ? "viewer.tc.bullet" : est < 480 ? "viewer.tc.blitz" : est < 1500 ? "viewer.tc.rapid" : "viewer.tc.classical");
-        }
+        else sub = T(detail::tcCategoryKey(presets[size_t(i)].baseMs / 1000, presets[size_t(i)].incrementMs / 1000));
         if (tcTile(i, r, label, sub, on)) sel = isCustom ? -1 : i;
     }
     im::popId();
@@ -1718,17 +1776,25 @@ void pageDirectJoin(float t) {
     }
     footerRule(p);
     bool back = backButton(p, connecting ? "common.cancel" : "common.back");
-    int portNum = std::atoi(O.directPort.c_str());
+    // The address may carry the port and the code (pasted from the host's Copy): they go to their
+    // fields when Join is pressed.
+    const net::DirectAddress to = net::splitDirectAddress(O.directAddress, O.directCode.empty());
+    const std::string portText = to.port.empty() ? O.directPort : to.port;
+    const std::string codeText = to.code.empty() ? O.directCode : to.code;
+    int portNum = std::atoi(portText.c_str());
     std::string raw;
-    for (char c : O.directCode)
+    for (char c : codeText)
         if (c != '-') raw += c;
-    bool ready = !trim(O.directAddress).empty() && portNum > 0 && portNum <= 65535 && raw.size() == 12;
+    bool ready = !to.host.empty() && portNum > 0 && portNum <= 65535 && raw.size() == 12;
     if (primaryButton(p, "online.direct.join_button", ready && !connecting, connecting)) {
-        gs.directAddress = trim(O.directAddress);
+        if (to.host != trim(O.directAddress)) O.directAddress = to.host;
+        O.directPort = portText;
+        O.directCode = codeText;
+        gs.directAddress = to.host;
         gs.directJoinPort = portNum;
         gs.save();
         O.error.clear();
-        s.joinDirect(trim(O.directAddress), uint16_t(portNum), O.directCode);
+        s.joinDirect(to.host, uint16_t(portNum), O.directCode);
         O.directJoining = true;
     }
     im::popId();
@@ -1747,6 +1813,13 @@ void pageDirectJoin(float t) {
 
 // ==== Hooks ================================================================================================
 namespace detail {
+
+namespace onl {
+void signOutEverywhere() {
+    ses().signOut(true);
+    O.everywhere = true;
+}
+}  // namespace onl
 
 bool onlineGameStarting() { return game::onlineSession().gameReady(); }
 
@@ -1986,12 +2059,17 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
         ep = off;
     } else {
         ep.host = s.onlineHost;
-        ep.apiPort = uint16_t(std::clamp(s.onlineApiPort, 0, 65535));
+        ep.apiPort = uint16_t(s.onlineApiPort > 0 ? std::min(s.onlineApiPort, 65535) : 443);  // empty: 443, as Apply stores it
         ep.wsPort = s.onlineWsPort > 0 ? uint16_t(s.onlineWsPort) : ep.apiPort;
         ep.pinnedSha256 = s.onlinePin;
     }
+    // A result is shown only for the endpoint it tested (not for fields edited during the test).
+    auto tested = [&](const net::ServerEndpoint& t) {
+        return t.host == ep.host && t.apiPort == ep.apiPort && t.wsPort == ep.wsPort && t.pinnedSha256 == ep.pinnedSha256 &&
+               t.insecureDev == ep.insecureDev;
+    };
     net::Event e;
-    if (ses.takeTest(e)) {
+    if (ses.takeTest(e) && tested(O.testedEp)) {
         O.testShown = true;
         O.testOk = e.ok && e.info.compatible;
         if (e.ok) {
@@ -2009,6 +2087,7 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
     if (im::button(L("options.online.test"), im::flip(tr, Rect(tr.x, tr.y + 2.0f, bw, 52.0f)), im::ButtonKind::Secondary,
                    ep.valid() && !testing && !inGame)) {
         O.testShown = false;
+        O.testedEp = ep;
         ses.testServer(ep);
     }
     float tx = tr.x + bw + 26.0f, tw = rw - bw - 30.0f;
@@ -2019,12 +2098,12 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
     } else if (O.testShown) {
         TextStyle rs = style(font::FACE_TEXT, kSmall, O.testOk ? vec4(0.62f, 0.78f, 0.55f, 1.0f) : danger, im::startAlign());
         rs.size = gfx::fitSize(O.testLine, rs, tw, 0.7f);
-        gfx::text(O.testLine, im::flipX(tcolF, tcolF.x), tr.y + (O.testDetail.empty() ? 36.0f : 24.0f), rs);
+        gfx::text(im::elideToFit(O.testLine, rs, tw), im::flipX(tcolF, tcolF.x), tr.y + (O.testDetail.empty() ? 36.0f : 24.0f), rs);
         if (!O.testDetail.empty()) {
             TextStyle ms = style(font::FACE_ITALIC, kCaption, ivoryDim, im::startAlign());
             std::string motd = O.testDetail.substr(0, O.testDetail.find('\n'));
             ms.size = gfx::fitSize(motd, ms, tw, 0.7f);
-            gfx::text(motd, im::flipX(tcolF, tcolF.x), tr.y + 52.0f, ms);
+            gfx::text(im::elideToFit(motd, ms, tw), im::flipX(tcolF, tcolF.x), tr.y + 52.0f, ms);
         }
     } else if (inGame) {
         TextStyle gs = style(font::FACE_ITALIC, kCaption, muted, im::startAlign());

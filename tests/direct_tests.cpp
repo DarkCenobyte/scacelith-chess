@@ -771,6 +771,50 @@ TEST(direct_join_codes) {
     CHECK(!direct::normalizeJoinCode("K7Q2_M9XH_3PTR", n));
 }
 
+// The guest's address field, as the host's Copy writes it or as a player types it.
+TEST(direct_address_field) {
+    struct Case {
+        const char* field;
+        bool withCode;
+        const char *host, *port, *code;
+    };
+    const Case cases[] = {
+        {"[::1]", true, "::1", "", ""},
+        {"[::1]:47100 K7Q2-M9XH-3PTR", true, "::1", "47100", "K7Q2-M9XH-3PTR"},
+        {"[2001:db8::1]:47100", true, "2001:db8::1", "47100", ""},
+        {"1.2.3.4:5000", true, "1.2.3.4", "5000", ""},
+        {"203.0.113.47:47100 k7q2-m9xh-3ptr", true, "203.0.113.47", "47100", "K7Q2-M9XH-3PTR"},
+        {"  203.0.113.47:47100   K7Q2-M9XH-3PTR  ", true, "203.0.113.47", "47100", "K7Q2-M9XH-3PTR"},
+        {"203.0.113.47:47100\tK7Q2.M9XH", true, "203.0.113.47", "47100", "K7Q2M9XH"},
+        {"203.0.113.47", true, "203.0.113.47", "", ""},
+        {"2001:db8::1", true, "2001:db8::1", "", ""},   // a bare IPv6 address: several ':'
+        {"fe80::1%eth0", true, "fe80::1%eth0", "", ""},
+        {"::1", true, "::1", "", ""},
+        {"example.org", true, "example.org", "", ""},
+        {"example.org:47100", true, "example.org", "47100", ""},
+        {"1.2.3.4 K7Q2-M9XH-3PTR", false, "1.2.3.4 K7Q2-M9XH-3PTR", "", ""},   // the code field is not empty
+        {"1.2.3.4:5000 K7Q2-M9XH-3PTR", false, "1.2.3.4:5000 K7Q2-M9XH-3PTR", "", ""},
+        {"[::1]x", true, "[::1]x", "", ""},
+        {"[::1]:", true, "[::1]:", "", ""},
+        {"[::1]:4x", true, "[::1]:4x", "", ""},
+        {"host:", true, "host:", "", ""},
+        {":80", true, ":80", "", ""},
+        {"host:123456", true, "host:123456", "", ""},  // six digits
+        {"host:12a", true, "host:12a", "", ""},
+        {"host:abc", true, "host:abc", "", ""},
+        {"", true, "", "", ""},
+    };
+    for (const Case& c : cases) {
+        const DirectAddress a = splitDirectAddress(c.field, c.withCode);
+        if (a.host != c.host || a.port != c.port || a.code != c.code)
+            std::fprintf(stderr, "  field \"%s\"%s: host \"%s\" port \"%s\" code \"%s\"\n", c.field, c.withCode ? " +code" : "",
+                         a.host.c_str(), a.port.c_str(), a.code.c_str());
+        CHECK_EQ(a.host, std::string(c.host));
+        CHECK_EQ(a.port, std::string(c.port));
+        CHECK_EQ(a.code, std::string(c.code));
+    }
+}
+
 // ---- secure channel -----------------------------------------------------------------------------
 
 namespace {

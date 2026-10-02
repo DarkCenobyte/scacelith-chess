@@ -19,7 +19,6 @@ gfx::TextStyle style(int face, float size, m::vec4 color, gfx::HAlign align = gf
 std::string T(const char* key);                  // i18n::tr
 std::string L(const char* key);                  // a button label with its key as id ("Text##key")
 game::OnlineSession& ses();
-std::string spacedPlus(const std::string& label);  // "3 + 2" with thin spaces
 std::string trim(const std::string& s);
 // Rotating dots (a request in flight).
 void spinner(m::vec2 c, float r = 12.0f, float alpha = 1.0f);
@@ -43,6 +42,18 @@ void footerRule(const gfx::Rect& p);
 bool linkButton(const char* key, float cx, float y, bool enabled = true);
 // Label / value line of the account page (label above, value under it).
 void infoLine(const std::string& label, const std::string& value, const gfx::Rect& col, float y, m::vec4 valueColor = theme::ivory);
+// Sign out everywhere (the account page, signed-in devices): the sign-in page tells the server's
+// answer when it comes, a refusal included (the other computers then stay signed in).
+void signOutEverywhere();
+
+// ---- ui_screens_account.cpp: helpers shared with the saved games (ui_library.cpp) ---------------
+// Scroll of a clipped area by the wheel over it (and PageUp / PageDown when 'keys'); returns the offset.
+float wheelScroll(float& scroll, float& target, const gfx::Rect& area, float contentH, float step, bool opened, bool keys = false);
+// Scroll bar on the end side and fades at the edges (panel colour) of a scrolled area.
+void scrollDecor(const gfx::Rect& area, float scroll, float contentH);
+// The end of s that fits maxWidth in st ("…" and the end): for a path, whose file's name matters
+// more than the folder's.
+std::string elideStart(const std::string& s, const gfx::TextStyle& st, float maxWidth);
 
 // ---- ui_screens_account.cpp: the account API's pages --------------------------------------------
 enum class AccountPage { History, Game, Devices, Email, Export, Delete };

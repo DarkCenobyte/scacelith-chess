@@ -2668,6 +2668,27 @@ TEST(net_account_games_history) {
     CHECK_EQ(r.count(), before);
 }
 
+// A rating change the server leaves out is computed as ratingAfter - rating, clamped to the int
+// range: a buggy or hostile server's extreme ratingAfter must not overflow it.
+TEST(net_account_games_rating_change_clamped) {
+    if (!net::transportAvailable()) return;
+    AccountRig r("acct-games-clamp", [](const fakehttp::Request& q) {
+        if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
+        return jsonReply(200, R"({"games":[{"id":5,"category":"3+2","rated":true,"timeControl":"180+2",
+            "white":{"name":"alice","rating":1500,"ratingAfter":-2147483648},
+            "black":{"name":"bob","rating":1490,"ratingAfter":1482},
+            "color":"white","status":1,"reason":1,"result":"1-0","plies":2}],"next":null,"total":1})");
+    });
+    r.c->fetchMyGames(0, 20, net::GamesFilter());
+    net::Event ev = r.wait(net::Event::Kind::GamesResult);
+    CHECK(ev.ok);
+    CHECK_EQ(ev.gamesPage.games.size(), size_t(1));
+    if (ev.gamesPage.games.size() == 1) {
+        CHECK_EQ(ev.gamesPage.games[0].white.ratingDiff, int(INT32_MIN));
+        CHECK_EQ(ev.gamesPage.games[0].black.ratingDiff, -8);
+    }
+}
+
 // The real server refuses a session it no longer accepts (expired, revoked, the account gone)
 // with 401 invalid_token. The game, fed the client's events, must then show the player signed out:
 // on an account call, on a public read asked again without the token (its answer is ok), and on a

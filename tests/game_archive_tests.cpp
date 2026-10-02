@@ -419,6 +419,39 @@ TEST(archive_remove_rules) {
     CHECK_EQ(int(archive::list(folder).size()), 2);
 }
 
+// hasKey(e, key) is entryKey(e) == key, for keys of other games and keys a little off.
+TEST(archive_entry_keys) {
+    archive::Entry e;
+    e.path = "/home/a/pgn/x.pgn";
+    e.index = 12;
+    CHECK_EQ(archive::entryKey(e), std::string("/home/a/pgn/x.pgn#12"));
+    std::vector<archive::Entry> entries;
+    const char* paths[] = {"", "a", "a#1", "a#", "/home/a/pgn/x.pgn", "C:\\Jeux\\\xC3\x89lodie.pgn"};
+    const int indexes[] = {0, 1, 2, 9, 10, 12, 123, 2147483647, -1, -2147483647 - 1};
+    for (const char* p : paths)
+        for (int i : indexes) {
+            e.path = p;
+            e.index = i;
+            entries.push_back(e);
+        }
+    std::vector<std::string> keys = {"", "#", "#0", "a", "a#", "a#01", "a#+1", "a# 1", "a#1#", "a#1#0"};
+    for (const archive::Entry& x : entries) {
+        const std::string k = archive::entryKey(x);
+        keys.push_back(k);
+        keys.push_back(k + "0");
+        keys.push_back(k.substr(0, k.size() - 1));
+        keys.push_back("x" + k);
+        std::string at = k;
+        at[x.path.size()] = '@';
+        keys.push_back(at);
+    }
+    int mismatches = 0;
+    for (const archive::Entry& x : entries)
+        for (const std::string& k : keys)
+            if (archive::hasKey(x, k) != (archive::entryKey(x) == k)) ++mismatches;
+    CHECK_EQ(mismatches, 0);
+}
+
 TEST(archive_lists_thousands_quickly) {
     TempFolder tmp("many");
     const std::string folder = tmp.path;
