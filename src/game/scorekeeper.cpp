@@ -184,7 +184,8 @@ void Scorekeeper::beginMoveEntry(int seat, int ply, const std::string& san) {
     anim::WriteTask w = writeTask(anim::WriteTaskType::Write);
     w.path = sh.beginMove(ply, san);
     if (w.path.empty()) {
-        // Nothing drawable (a glyph no font has): keep the entry queue in step with the tasks.
+        // Nothing drawable (a glyph no font has): the sheet queued an empty entry, which this
+        // task's WritingDone completes (the entry queue stays in step with the tasks).
         anim::PenKey k;
         k.tip = sh.writingRest(ply) + vec3(0, 0.004f, 0);
         w.path.push_back(k);

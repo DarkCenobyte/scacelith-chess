@@ -634,6 +634,13 @@ static std::vector<anim::PenKey> worldPath(const PadFrame& f, const PenPath& p) 
 
 static std::string pageLabel(int page) { return std::to_string(page + 1); }
 
+// Nothing drawable (a glyph no font has): the entry is queued all the same, without ink, so that
+// the Write task begun for it (its WritingDone, finishEntry) completes it and not the next one.
+static std::vector<anim::PenKey> queueEmpty(std::deque<Entry>& entries, Entry&& e) {
+    entries.push_back(std::move(e));
+    return {};
+}
+
 std::vector<anim::PenKey> Scoresheet::beginHeader(const Header& h) {
     Impl& I = *impl_;
     Entry e;
@@ -647,7 +654,7 @@ std::vector<anim::PenKey> Scoresheet::beginHeader(const Header& h) {
     if (!h.note.empty()) parts.push_back({fieldBox(Field::Note), h.note});
     if (!h.reference.empty()) parts.push_back({fieldBox(Field::Reference), h.reference});
     if (!I.taken(0, Field::Page)) parts.push_back({fieldBox(Field::Page), pageLabel(0)});
-    if (!composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x4EADu))) return {};
+    if (!composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x4EADu))) return queueEmpty(I.entries, std::move(e));
     for (int f = 0; f <= int(Field::Page); ++f) I.taken(0, Field(f)) = true;
     I.taken(0, Field::Note) = I.taken(0, Field::Reference) = true;
     I.entries.push_back(std::move(e));
@@ -668,7 +675,8 @@ std::vector<anim::PenKey> Scoresheet::beginMove(int ply, const std::string& san)
     bool pageNo = page > 0 && !I.taken(page, Field::Page);
     if (pageNo) parts.push_back({fieldBox(Field::Page), pageLabel(page)});
     parts.push_back({moveBox(ply), localizeSan(san, cfg_.letters)});
-    if (!composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x10000u + uint32_t(ply)))) return {};
+    if (!composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x10000u + uint32_t(ply))))
+        return queueEmpty(I.entries, std::move(e));
     if (pageNo) I.taken(page, Field::Page) = true;
     I.entries.push_back(std::move(e));
     return worldPath(frame_, I.entries.back().path);
@@ -680,7 +688,7 @@ std::vector<anim::PenKey> Scoresheet::beginField(Field f, const std::string& tex
     Entry e;
     e.page = page;
     if (!composeEntry(e, {{fieldBox(f), text}}, cfg_.handStyle, mix32(cfg_.seed, 0x20000u + uint32_t(f) * 131u + uint32_t(page))))
-        return {};
+        return queueEmpty(I.entries, std::move(e));
     I.taken(page, f) = true;
     I.entries.push_back(std::move(e));
     return worldPath(frame_, I.entries.back().path);
