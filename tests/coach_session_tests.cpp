@@ -308,6 +308,29 @@ TEST(coach_session_takeback_requested) {
     checkRenders(t.lines);
 }
 
+TEST(coach_session_no_turn_while_a_takeback_waits) {
+    // The pause menu's Take back after the coach's reply: until the table undoes the moves, the
+    // position on the board is going away, so no human turn begins on it (no A0 nor A3 asked).
+    Table t;
+    hangTable(t);
+    t.stage.takeBackWait = 30;
+    t.analyst.delay = 150;
+    t.start(levelConfig(3));
+    CHECK(t.quiet());
+    t.move("g1f1");
+    CHECK(t.reply("g8f8"));
+    t.step();
+    const std::string doomed = t.game.position().fen();
+    CHECK_EQ(t.analyst.count("A0", doomed), 1);
+    CHECK_EQ(t.analyst.count("A3", doomed), 1);
+    t.session.onTakeBackRequested(t.game);
+    CHECK(t.until([&] { return !t.stage.tableBusy(); }, 10.0f));
+    CHECK_EQ(t.game.moves().size(), size_t(0));
+    CHECK_EQ(t.analyst.count("A0", doomed), 1);
+    CHECK_EQ(t.analyst.count("A3", doomed), 1);
+    CHECK(t.until([&] { return t.session.playerMayMove(t.game); }, 10.0f));
+}
+
 TEST(coach_session_pause_menu_takeback_keeps_the_voice) {
     // Esc while the coach speaks, then the pause menu's Take back: once resumed, the coach is heard
     // again (its pause does not outlive the line it held).

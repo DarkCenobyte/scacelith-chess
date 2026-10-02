@@ -484,7 +484,9 @@ struct Session::Impl {
         const size_t n = game.moves().size();
         if (g.takebackTo >= 0 && int(n) <= g.takebackTo) g.takebackTo = -1;
         const bool humanTurn = game.position().sideToMove() == g.human;
-        if (!g.over && humanTurn && g.review == ReviewState::None && g.turnPly != int(n) && !game.isOver())
+        // Not on a position a takeback asked of the stage is about to undo.
+        if (!g.over && humanTurn && g.review == ReviewState::None && g.turnPly != int(n) && !game.isOver() &&
+            g.takebackTo < 0)
             beginHumanTurn(game);
 
         // The coach's remarks on its own move (threats), once that turn's A0 is in.
