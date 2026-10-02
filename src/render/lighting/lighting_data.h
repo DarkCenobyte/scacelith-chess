@@ -22,14 +22,13 @@ struct LightingUBOData {
     m::vec4 lightingMisc;                       // x specular AA, y cascade blend band (uv), z ambient intensity
     // Written on the GPU (compute), copied from the SH storage buffer.
     m::vec4 probeSH[MAX_LIGHT_PROBES * 9];
-    m::vec4 skySH[9];
+    m::vec4 skySH[9];                           // unused (nothing projects the sky any more), keeps the layout
 };
 
 constexpr size_t LIGHTING_UBO_CPU_SIZE = offsetof(LightingUBOData, probeSH);
 constexpr size_t LIGHTING_UBO_PROBE_SH_OFFSET = offsetof(LightingUBOData, probeSH);
 constexpr size_t LIGHTING_UBO_SKY_SH_OFFSET = offsetof(LightingUBOData, skySH);
-// SH storage buffer layout (SSBO_USER while computing): probe k at [k * 9], the sky at [MAX_LIGHT_PROBES * 9].
-constexpr int SH_SLOT_SKY = MAX_LIGHT_PROBES;
-constexpr size_t SH_BUFFER_VEC4S = (MAX_LIGHT_PROBES + 1) * 9;
+// SH storage buffer layout (SSBO_USER while computing): probe k at [k * 9].
+constexpr size_t SH_BUFFER_VEC4S = MAX_LIGHT_PROBES * 9;
 
 }  // namespace render

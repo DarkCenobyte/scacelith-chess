@@ -524,13 +524,11 @@ void Renderer::endFrame() {
         updateLightingUBO();
         uploadFrameUBO(frame_);
         bindGlobalTextures();
-        // Sky cubemap + SH: when the sun / exposure / clouds changed (clouds drift: every 2 s).
+        // Sky cubemap: when the sun / exposure / clouds changed (clouds drift: every 2 s).
         const float key[9] = {sunDir.x, sunDir.y, sunDir.z, frame_.exposure.x, env_.cloudCoverage, std::floor(env_.time * 0.5f),
                               mie, env_.skyIntensity * env_.sunIntensityScale, env_.altitudeKm};
         if (!skyKeyValid_ || std::memcmp(key, skyKey_, sizeof(key)) != 0) {
-            atmosphere_->captureSky(probes_->shBuffer());
-            glCopyNamedBufferSubData(probes_->shBuffer(), lightingUbo_.id, GLintptr(sizeof(vec4) * 9 * SH_SLOT_SKY),
-                                     GLintptr(LIGHTING_UBO_SKY_SH_OFFSET), GLsizeiptr(sizeof(vec4) * 9));
+            atmosphere_->captureSky();
             std::memcpy(skyKey_, key, sizeof(key));
             skyKeyValid_ = true;
         }

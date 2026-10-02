@@ -31,7 +31,6 @@ public:
     // Probe section of the LightingUBO (mode: 1 when baked, else 0 = hemisphere fallback).
     void fillUBO(LightingUBOData& lub, float exposure, bool enabled) const;
     GLuint specularArray() const { return specular_.id; }
-    GLuint shBuffer() const { return sh_.id; }
     int resolution() const { return res_; }
     int specularLevels() const { return levels_; }
     float bakeExposure() const { return bakeExposure_; }

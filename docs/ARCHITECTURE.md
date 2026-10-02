@@ -76,13 +76,13 @@ only a fallback (probes off or not baked yet).
 
 **LightingUBO** (`UBO_LIGHTING` = 2, `shaders/lighting/lighting_ubo.glsl` ↔
 `render::LightingUBOData` in `src/render/lighting/lighting_data.h`, std140, bound for every pass
-including post): probe positions / radii / parallax boxes, L2 SH irradiance of each probe and of the
-sky (cosine-convolved, divided by π, windowed), per-cascade shadow scales (`shadowScale[c]` = xy
+including post): probe positions / radii / parallax boxes, L2 SH irradiance of each probe
+(cosine-convolved, divided by π, windowed), per-cascade shadow scales (`shadowScale[c]` = xy
 metres per shadow uv, z metres per depth unit, w texel size), sun (`sunParams`, `sunTOA`), sky
 (`skyParams2`: cloud coverage, time, Mie scale, sky intensity), planar info (enabled, max lod,
 size) and misc (specular AA strength, cascade blend band, ambient intensity). Probe data are
 pre-exposed with the exposure of the bake: multiply by `probeInfo.z` (the lighting code does it).
-Helpers: `shEvalProbe(k * 9, n)`, `shEvalSky(n)`.
+Helper: `shEvalProbe(k * 9, n)`.
 
 **Texture units** (material.h numbering, bound by `Renderer::bindGlobalTextures`):
 `TEXUNIT_SHADOW` / `TEXUNIT_SHADOW_DEPTH` = D16 2D array, one layer per cascade (compare / raw);
