@@ -1819,20 +1819,9 @@ void GameScene::playRobotMove(int seat, const Move& mv) {
     Color side = colorOfSeat(seat);
     arbiter_.touch(game_, mv.from);
     arbiter_.place(game_, mv.to, mv.promotion);
-    int moverId = board_.idAt(mv.from);
-    int victimId = board_.idAt(mv.to);
-    if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
-    Square rookFrom = NoSquare, rookTo = NoSquare;
-    if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
-        int rank = rankOf(mv.from);
-        bool king = (mv.flags & MoveCastleKing) != 0;
-        rookFrom = makeSquare(king ? 7 : 0, rank);
-        rookTo = makeSquare(king ? 5 : 3, rank);
-    }
     std::vector<anim::Task> tasks;
-    tasks.push_back(task(anim::TaskType::Reach, moverId));
-    planPlacement(tasks, moverId, mv.to, victimId, rookFrom, rookTo);
-    if (mv.promotion != NoPiece) planPromotionSwap(tasks, moverId, mv.to, mv.promotion);
+    tasks.push_back(task(anim::TaskType::Reach, board_.idAt(mv.from)));
+    planMove(tasks, mv, side);
     if (!untimed()) {  // untimed: completed as the last piece is released (updatePlaying)
         int half = world_.clockHalfForSeat(seat == 0 ? 1.0f : -1.0f);
         tasks.push_back(task(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)));
@@ -1863,6 +1852,21 @@ float GameScene::carryHeight(vec3 from, vec3 to, int ignoreA, int ignoreB) const
         if (d < layout::PIECE_BASE_RADIUS[p.type] + 0.024f) top = std::max(top, layout::PIECE_HEIGHT[p.type]);
     }
     return std::max(0.022f, top + 0.014f);
+}
+
+void GameScene::planMove(std::vector<anim::Task>& tasks, const Move& mv, Color side, bool lifted) {
+    int moverId = board_.idAt(mv.from);
+    int victimId = board_.idAt(mv.to);
+    if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
+    Square rookFrom = NoSquare, rookTo = NoSquare;
+    if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
+        int rank = rankOf(mv.from);
+        bool king = (mv.flags & MoveCastleKing) != 0;
+        rookFrom = makeSquare(king ? 7 : 0, rank);
+        rookTo = makeSquare(king ? 5 : 3, rank);
+    }
+    planPlacement(tasks, moverId, mv.to, victimId, rookFrom, rookTo, lifted);
+    if (mv.promotion != NoPiece) planPromotionSwap(tasks, moverId, mv.to, mv.promotion);
 }
 
 void GameScene::planPlacement(std::vector<anim::Task>& tasks, int moverId, Square to, int victimId, Square rookFrom,

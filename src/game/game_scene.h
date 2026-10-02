@@ -228,6 +228,9 @@ private:
     // already in the air (an online opponent's piece held live), no Lift.
     void planPlacement(std::vector<anim::Task>& tasks, int moverId, chess::Square to, int victimId,
                        chess::Square rookFrom, chess::Square rookTo, bool lifted = false);
+    // The move 'mv' of 'side' from the piece in hand to the board (placement, capture, castling
+    // rook, promotion swap), without the clock press; 'lifted' as for planPlacement.
+    void planMove(std::vector<anim::Task>& tasks, const chess::Move& mv, chess::Color side, bool lifted = false);
     void planPromotionSwap(std::vector<anim::Task>& tasks, int pawnId, chess::Square sq, chess::PieceType newType);
     float carryHeight(m::vec3 from, m::vec3 to, int ignoreA, int ignoreB) const;
     m::vec3 jitteredSquare(chess::Square sq);
@@ -323,9 +326,6 @@ private:
     void onlineGameEvent(const net::Event& e);
     void rebuildOnline();                     // board, game and sheets from og_ (no animation)
     void startRemoteMove();
-    // The opponent's move 'mv' from the piece in hand to the board (placement, capture, castling
-    // rook, promotion swap), without the clock press; 'lifted': the piece is already in the air.
-    void planRemoteMove(std::vector<anim::Task>& tasks, const chess::Move& mv, bool lifted);
     // My move chosen: sent at once when the robots press the clock by themselves, otherwise staged
     // on the board until my clock press sends it (pressOnlineClock, at the lever contact).
     void placeOnlineMove(const chess::Move& mv);

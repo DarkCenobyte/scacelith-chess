@@ -1540,21 +1540,9 @@ void GameScene::runCoachTable(float dt) {
                 finish();
                 return;
             }
-            Color side = game_.position().sideToMove();
-            int moverId = board_.idAt(mv.from);
-            int victimId = board_.idAt(mv.to);
-            if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
-            Square rookFrom = NoSquare, rookTo = NoSquare;
-            if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
-                int rank = rankOf(mv.from);
-                bool king = (mv.flags & MoveCastleKing) != 0;
-                rookFrom = makeSquare(king ? 7 : 0, rank);
-                rookTo = makeSquare(king ? 5 : 3, rank);
-            }
             std::vector<anim::Task> ts;
-            ts.push_back(task(anim::TaskType::Reach, moverId));
-            planPlacement(ts, moverId, mv.to, victimId, rookFrom, rookTo);
-            if (mv.promotion != NoPiece) planPromotionSwap(ts, moverId, mv.to, mv.promotion);
+            ts.push_back(task(anim::TaskType::Reach, board_.idAt(mv.from)));
+            planMove(ts, mv, game_.position().sideToMove());
             ts.push_back(task(anim::TaskType::Retract));
             coachHand.enqueue(ts);
             rt.lessonMove = mv;

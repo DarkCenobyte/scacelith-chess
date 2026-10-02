@@ -512,22 +512,6 @@ void GameScene::sendOnlineMove(const Move& mv) {
     LOGI("online: move %d %s sent (%u ms)", ply + 1, game_.sanMoves().back().c_str(), pendingThinkMs_);
 }
 
-void GameScene::planRemoteMove(std::vector<anim::Task>& tasks, const Move& mv, bool lifted) {
-    Color side = game_.position().sideToMove();
-    int moverId = board_.idAt(mv.from);
-    int victimId = board_.idAt(mv.to);
-    if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
-    Square rookFrom = NoSquare, rookTo = NoSquare;
-    if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
-        int rank = rankOf(mv.from);
-        bool king = (mv.flags & MoveCastleKing) != 0;
-        rookFrom = makeSquare(king ? 7 : 0, rank);
-        rookTo = makeSquare(king ? 5 : 3, rank);
-    }
-    planPlacement(tasks, moverId, mv.to, victimId, rookFrom, rookTo, lifted);
-    if (mv.promotion != NoPiece) planPromotionSwap(tasks, moverId, mv.to, mv.promotion);
-}
-
 void GameScene::startRemoteMove() {
     RemoteMove r = remoteQueue_.front();
     remoteQueue_.erase(remoteQueue_.begin());
@@ -570,7 +554,7 @@ void GameScene::startRemoteMove() {
     std::vector<anim::Task> tasks;
     if (start != live::LiveStart::Placed) {
         if (start != live::LiveStart::Held) tasks.push_back(task(anim::TaskType::Reach, board_.idAt(mv.from)));
-        planRemoteMove(tasks, mv, start == live::LiveStart::Held);
+        planMove(tasks, mv, game_.position().sideToMove(), start == live::LiveStart::Held);
     }
     remoteLive_ = RemoteLive();
     remoteAim_.reset();
@@ -777,7 +761,7 @@ void GameScene::placeRemoteLive(uint16_t move) {
     // Their move stands on the board before their clock press: the placement, not the press, and
     // not in game_ (their MoveMade confirms it, startRemoteMove).
     std::vector<anim::Task> tasks;
-    planRemoteMove(tasks, mv, true);
+    planMove(tasks, mv, game_.position().sideToMove(), true);
     tasks.push_back(task(anim::TaskType::Retract));
     enqueueRemoteLive(tasks);
     L.placed = move;
