@@ -356,6 +356,7 @@ private:
     void updateOnlineGameOver();              // game over card, rematch, report, challenges
     bool updateReportDialog();                // the report dialog, while it is open (true)
     void leaveOnlineGame();                   // back to the menu
+    void leaveOngoingOnlineGame();            // aborts before my first move, else resigns
     void drawOnlineHud();                     // ping, banners, first-move countdown
     ClockDisplay onlineClockDisplay() const;
     ui::GameOverExtras onlineGameOverExtras() const;

@@ -952,10 +952,11 @@ void GameScene::applySettings(bool displayToo) {
 }
 
 void GameScene::shutdown(AppContext& ctx) {
-    // Closing the game in the middle of a rated game resigns it, like leaving to the menu
-    // (screenshot runs excepted: they stop wherever the capture happens).
+    // Closing the game in the middle of a game leaves it like the menu does: an online game is
+    // resigned (aborted before my first move), a rated game resigned (screenshot runs excepted:
+    // they stop wherever the capture happens).
     if (!ctx.screenshotMode && online() && link_ && state_ == State::Playing && og_.status == 0) {
-        link_->resign();
+        leaveOngoingOnlineGame();
     } else if (!ctx.screenshotMode && !watching() && !hotSeat() && !coach() && state_ == State::Playing &&
                game_.status() == GameStatus::Ongoing) {
         game_.resign(humanColor_);

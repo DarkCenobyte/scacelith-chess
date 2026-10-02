@@ -997,11 +997,7 @@ void GameScene::updateOnlineInput() {
             break;
         case ui::MenuAction::BackToMainMenu:
             paused_ = false;
-            // Leaving resigns (or aborts, before my first move).
-            if (og_.status == StOngoing) {
-                if (p.canAbort) link_->abortGame();
-                else link_->resign();
-            }
+            if (og_.status == StOngoing) leaveOngoingOnlineGame();
             leaveOnlineGame();
             break;
         case ui::MenuAction::OptionsChanged: applySettings(true); break;
@@ -1040,6 +1036,13 @@ void GameScene::updateOnlineGameOver() {
     if (in.keyPressed[plat::KEY_TAB] && !ui::wantsKeyboard()) showMoveList_ = !showMoveList_;
     // Challenges received between two games.
     if (link_ && link_->kind() == LinkKind::Server) ui::onlineChallenges();
+}
+
+void GameScene::leaveOngoingOnlineGame() {
+    // Leaving resigns, or aborts before my first move (unrated), the same way from the menu and
+    // when the window is closed.
+    if (!myFirstMoveMade()) link_->abortGame();
+    else link_->resign();
 }
 
 void GameScene::leaveOnlineGame() {
