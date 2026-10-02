@@ -2087,7 +2087,7 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
         ep = off;
     } else {
         ep.host = s.onlineHost;
-        ep.apiPort = uint16_t(std::clamp(s.onlineApiPort, 0, 65535));
+        ep.apiPort = uint16_t(s.onlineApiPort > 0 ? std::min(s.onlineApiPort, 65535) : 443);  // empty: 443, as Apply stores it
         ep.wsPort = s.onlineWsPort > 0 ? uint16_t(s.onlineWsPort) : ep.apiPort;
         ep.pinnedSha256 = s.onlinePin;
     }
