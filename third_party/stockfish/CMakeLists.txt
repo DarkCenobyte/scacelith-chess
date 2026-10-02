@@ -14,7 +14,7 @@
 #    so no code of one instruction set can be reached from the game or from another variant.
 #  * The default network is embedded once for all variants with Stockfish's own INCBIN (assembler
 #    .incbin, scacelith/nnue_incbin.cpp), so the engine never reads a file.
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 
 # Build Stockfish like upstream does: without the game's global definitions (UNICODE,
 # WIN32_LEAN_AND_MEAN, NOMINMAX on Windows) inherited from the parent directory.

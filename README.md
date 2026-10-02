@@ -273,7 +273,7 @@ fallback); `--lang <code>` overrides the language for one session.
 
 ## Building
 
-Requirements: CMake 3.20+, Ninja, a C++17 compiler. The Windows build is produced with
+Requirements: CMake 3.21+, Ninja, a C++17 compiler. The Windows build is produced with
 MinGW-w64 (native or cross-compiled from Linux) and is a single self-contained executable
 (Stockfish 19 and its neural network are embedded). Stockfish is compiled once per x86-64
 instruction set, from plain x86-64 to AVX-512, and the game runs the best one the CPU supports;
