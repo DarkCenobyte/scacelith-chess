@@ -150,8 +150,6 @@ bool init() {
     g.prog = &shaders::get(d);
     if (!g.prog->valid()) LOGE("ui: shader compilation failed");
     glCreateVertexArrays(1, &g.vao);
-    const GLuint stride = sizeof(Vertex);
-    (void)stride;
     glEnableVertexArrayAttrib(g.vao, 0);
     glVertexArrayAttribFormat(g.vao, 0, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, x));
     glEnableVertexArrayAttrib(g.vao, 1);

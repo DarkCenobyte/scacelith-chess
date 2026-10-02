@@ -206,7 +206,6 @@ public:
             ui::notify(i18n::tr("notify.draw_declined"), 30.0f);
             ui::notify(i18n::tr("arbiter.illegal") + std::string(" ") + i18n::tr("arbiter.restored_two_minutes.black"), 30.0f);
         }
-        frames_ = 0;
     }
 
     // Online screens: the in-process mock server with a virtual clock that only moves here (the
@@ -468,7 +467,6 @@ public:
             if (a == ui::MenuAction::Quit) quit_ = true;
         }
         ui::endFrame();
-        ++frames_;
     }
 
     // The coach voice download's prompt and progress panel with sample figures (nothing is
@@ -531,7 +529,6 @@ private:
     bool black_ = false, drawn_ = false, kb_ = false, quit_ = false;
     bool online_ = false, menu_ = false;
     float time_ = 0.0f;
-    int frames_ = 0;
     std::vector<std::string> script_;
     size_t step_ = 0;
     plat::Input fake_;
