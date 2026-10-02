@@ -163,9 +163,10 @@ enum class EventType {
     PageTurned,        // the page lies flipped over the top edge
     WritingQueueEmpty,
     // Coach gestures ('position' = the target: the aimed point of a Point, the waypoint of a Trace,
-    // the presented point / the listener of a Gesture)
+    // the presented point / the listener of a Present / Open, the stroke point of a Beat)
     PointReached,      // the finger points at the target (a Trace: its tip is over the first waypoint)
-    PointReleased,     // the gesture ends (at the task's end, or when endHold() cuts it short)
+    PointReleased,     // a Point / Trace ends (at the task's end, or when endHold() cuts it short); a
+                       // Gesture only reports GestureBeat
     TraceCorner,       // the tip is over an inner waypoint of the path
     TraceDone,         // the tip is over the last waypoint
     GestureBeat        // the stroke of a Gesture (arrival of Present / Open, each Beat down-stroke)
@@ -317,9 +318,9 @@ public:
 
     // ---- Coach gestures and speech (see TaskType::Point / Trace / Gesture)
     // Cuts the hold of the running Point / Trace / Gesture short: it ends now, but never before it
-    // has arrived (a Trace: before its path is done; a Beat: before its last stroke is over).
-    // PointReleased fires then, and the next queued task starts from the held pose. No effect on
-    // other tasks.
+    // has arrived (a Trace: before its path is done; a Beat: before its last stroke is over). A
+    // Point / Trace fires PointReleased then, and the next queued task starts from the held pose.
+    // No effect on other tasks.
     void endHold();
     // World position of the playing hand's index fingertip (after the last update); false before
     // init. A highlight can follow it during a Trace.
