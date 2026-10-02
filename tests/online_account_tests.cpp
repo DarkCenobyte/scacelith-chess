@@ -5,13 +5,25 @@
 // on a game of the history (GameSaveState: a Replay given up with its page, the PGN of a game left
 // still saved as that game, the saved games looked at again on each visit), the result from the
 // player's side, the moves of a server game with their clocks, the time control labels and the
-// file name of an account export.
+// file name of an account export; the GIFs of games: their file names, the PGN date and time, the
+// wait in words, and the GifSaver (the answer awaited only, the file written never over another,
+// the errors kept with their wait).
 #include "test.h"
+#include "game/game_archive.h"
 #include "game/online_account.h"
+#include "i18n/i18n.h"
+#include "net/net_sys.h"
 
+#include <cstdio>
 #include <ctime>
 #include <string>
 #include <vector>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
 
 using namespace game;
 using Kind = net::Event::Kind;
@@ -570,4 +582,240 @@ TEST(account_export_file_name) {
     CHECK(odd.find('\\') == std::string::npos);
     CHECK(odd.find(':') == std::string::npos);
     CHECK(odd.size() > 16 && odd.compare(odd.size() - 16, 16, "_2026-10-01.json") == 0);
+}
+
+// ---- GIFs of games ------------------------------------------------------------------------------------
+
+namespace {
+
+std::time_t localTime(int y, int mo, int d, int h, int mi, int s) {
+    std::tm tm{};
+    tm.tm_year = y - 1900;
+    tm.tm_mon = mo - 1;
+    tm.tm_mday = d;
+    tm.tm_hour = h;
+    tm.tm_min = mi;
+    tm.tm_sec = s;
+    tm.tm_isdst = -1;
+    return std::mktime(&tm);
+}
+
+net::Event gifEvent(uint64_t gameId, const std::string& bytes) {
+    net::Event e = event(Kind::GifResult);
+    e.gameId = gameId;
+    e.text = bytes;
+    return e;
+}
+
+std::string readAll(const std::string& path) {
+    std::string text;
+    net::sys::readFile(path, text, 1 << 20);
+    return text;
+}
+
+// A fresh folder beside the test executable; the files named are removed with it.
+struct GifFolder {
+    std::string path;
+    explicit GifFolder(const char* tag) {
+#ifdef _WIN32
+        const unsigned pid = unsigned(GetCurrentProcessId());
+#else
+        const unsigned pid = unsigned(getpid());
+#endif
+        path = net::sys::exeDirectory() + "gif-test-" + tag + "-" + std::to_string(pid);
+    }
+    void remove(const std::vector<std::string>& names) const {
+        for (const std::string& n : names) std::remove(game::archive::joinPath(path, n).c_str());
+#ifdef _WIN32
+        RemoveDirectoryA(path.c_str());
+#else
+        rmdir(path.c_str());
+#endif
+    }
+};
+
+}  // namespace
+
+TEST(account_gif_file_names) {
+    const std::time_t when = localTime(2026, 9, 27, 21, 47, 5);
+    CHECK_EQ(gifFileName(when, "Magnus_T", "bob", 812), std::string("2026-09-27_214705_Magnus_T-vs-bob_812.gif"));
+    CHECK_EQ(gifFileName(when, "Magnus_T", "bob", 0), std::string("2026-09-27_214705_Magnus_T-vs-bob.gif"));  // not a server's
+    CHECK_EQ(gifFileName(0, "", "", 0), std::string("0000-00-00_000000_Unknown-vs-Unknown.gif"));
+    CHECK_EQ(gifFileName(-5, "a", "b", 4100000000123ull), std::string("0000-00-00_000000_a-vs-b_4100000000123.gif"));
+    const std::string odd = gifFileName(when, "a/b:c*?", "..\\x<y>|\"", 9);
+    for (char c : std::string("/\\:*?<>|\"")) CHECK(odd.find(c) == std::string::npos);
+    CHECK(odd.compare(0, 18, "2026-09-27_214705_") == 0);
+    CHECK(odd.size() > 6 && odd.compare(odd.size() - 6, 6, "_9.gif") == 0);
+    const std::string longName = gifFileName(when, std::string(300, 'w'), std::string(300, 'b'), 1);
+    CHECK(longName.size() < 120);  // each name cut to 40 bytes
+
+    // The start of a saved game, from its Date and Time tags.
+    CHECK_EQ(pgnLocalTime("2026.09.27", "21:47:05", 77), when);
+    CHECK_EQ(pgnLocalTime("2026.09.27", "21:47", 77), when - 5);
+    CHECK_EQ(pgnLocalTime("2026.09.27", "", 77), localTime(2026, 9, 27, 0, 0, 0));
+    CHECK_EQ(pgnLocalTime("2026.09.27", "??:??:??", 77), localTime(2026, 9, 27, 0, 0, 0));
+    CHECK_EQ(pgnLocalTime("2026.??.??", "21:47:05", 77), std::time_t(77));
+    CHECK_EQ(pgnLocalTime("2026.13.01", "", 77), std::time_t(77));
+    CHECK_EQ(pgnLocalTime("", "", 77), std::time_t(77));
+    CHECK_EQ(gifFileName(pgnLocalTime("2026.09.27", "21:47:05", 0), "Magnus_T", "bob", 812),
+             std::string("2026-09-27_214705_Magnus_T-vs-bob_812.gif"));
+
+    // The local Time first, else the server's UTC tags, else the local Date at midnight.
+    CHECK_EQ(pgnGameStart("2026.09.27", "21:47:05", "2026.09.27", "19:47:05", 77), when);
+    CHECK_EQ(pgnGameStart("2026.09.27", "", "2026.09.27", "21:47:12", 77), std::time_t(1790545632));
+    CHECK_EQ(pgnGameStart("2026.09.27", "??:??:??", "2000.02.29", "00:00:00", 77), std::time_t(951782400));
+    CHECK_EQ(pgnGameStart("????.??.??", "", "1970.01.01", "00:00:01", 77), std::time_t(1));
+    CHECK_EQ(pgnGameStart("2026.09.27", "", "2026.09.27", "21:47", 77), localTime(2026, 9, 27, 0, 0, 0));
+    CHECK_EQ(pgnGameStart("2026.09.27", "", "", "", 77), localTime(2026, 9, 27, 0, 0, 0));
+    CHECK_EQ(pgnGameStart("", "", "2026.13.27", "21:47:12", 77), std::time_t(77));
+    CHECK_EQ(pgnGameStart("", "", "", "", 77), std::time_t(77));
+}
+
+TEST(account_gif_wait_in_words) {
+    CHECK(i18n::setLanguage("en"));
+    CHECK_EQ(waitText(0), std::string("1 second"));
+    CHECK_EQ(waitText(1), std::string("1 second"));
+    CHECK_EQ(waitText(45), std::string("45 seconds"));
+    CHECK_EQ(waitText(60), std::string("1 minute"));
+    CHECK_EQ(waitText(61), std::string("1 minute and 1 second"));
+    CHECK_EQ(waitText(150), std::string("2 minutes and 30 seconds"));
+    CHECK_EQ(waitText(240), std::string("4 minutes"));
+    CHECK_EQ(waitText(299), std::string("4 minutes and 59 seconds"));
+    CHECK_EQ(waitText(300), std::string("5 minutes"));
+    CHECK_EQ(waitText(301), std::string("6 minutes"));  // whole minutes, rounded up
+    CHECK_EQ(waitText(3540), std::string("59 minutes"));
+    CHECK(i18n::setLanguage("fr"));
+    CHECK_EQ(waitText(150), std::string("2 minutes et 30 secondes"));
+    CHECK_EQ(waitText(1), std::string("1 seconde"));
+    for (const char* lang : {"de", "es", "uk", "ru", "ar", "ja", "zh-Hans", "zh-Hant"}) {
+        CHECK(i18n::setLanguage(lang));
+        for (int s : {1, 2, 3, 11, 59, 61, 150, 299, 1800}) {
+            const std::string w = waitText(s);
+            CHECK(!w.empty());
+            CHECK(w.find('{') == std::string::npos);
+        }
+        CHECK(waitText(150).find("30") != std::string::npos);
+        CHECK(waitText(1800).find("30") != std::string::npos);
+    }
+    CHECK(i18n::setLanguage("en"));
+}
+
+TEST(account_gif_saver_writes_never_over_a_file) {
+    using Stage = GifSaver::Stage;
+    GifFolder f("saver");
+    const std::string bytes("GIF89a\0\x01\x02\xFF;", 11), other("GIF87a-other", 12);
+    {
+        GifSaver g;
+        CHECK(g.stage() == Stage::Idle);
+        CHECK(!g.busy());
+        CHECK(!g.poll(true));
+        CHECK(!g.finish(gifEvent(812, bytes)));  // nothing asked
+        CHECK(g.begin("history:812", 812, f.path, "game.gif"));
+        CHECK(g.busy());
+        CHECK(g.stage() == Stage::Rendering);
+        CHECK_EQ(g.owner(), std::string("history:812"));
+        CHECK(!g.begin("library:k", 0, f.path, "other.gif"));  // one at a time
+        CHECK_EQ(g.owner(), std::string("history:812"));
+        CHECK(!g.finish(gifEvent(5, bytes)));  // another game's answer
+        CHECK(!g.finish(gifEvent(0, bytes)));  // a PGN text's
+        CHECK(!g.finish(event(Kind::PgnResult)));
+        CHECK(g.stage() == Stage::Rendering);
+        CHECK(g.finish(gifEvent(812, bytes)));
+        CHECK(!g.finish(gifEvent(812, bytes)));  // once
+        CHECK(g.busy());                         // being written
+        CHECK(!g.begin("library:k", 0, f.path, "other.gif"));
+        CHECK(g.poll(true));
+        CHECK(g.stage() == Stage::Saved);
+        CHECK(!g.busy());
+        CHECK(!g.poll(true));  // said once
+        CHECK_EQ(g.path(), game::archive::joinPath(f.path, "game.gif"));
+        CHECK_EQ(readAll(g.path()), bytes);  // byte for byte
+        const std::string first = g.path();
+
+        // The same name again: beside the first file, which stays as it was.
+        CHECK(g.begin("library:k", 0, f.path, "game.gif"));
+        CHECK(g.path().empty());
+        CHECK(g.finish(gifEvent(0, other)));
+        CHECK(g.poll(true));
+        CHECK_EQ(g.path(), game::archive::joinPath(f.path, "game_2.gif"));
+        CHECK_EQ(readAll(g.path()), other);
+        CHECK_EQ(readAll(first), bytes);
+
+        // The server's refusal, kept with its wait; nothing written.
+        CHECK(g.begin("history:9", 9, f.path, "late.gif"));
+        net::Event no = event(Kind::GifResult, false, "rate_limited");
+        no.gameId = 9;
+        no.retryAfterSec = 150;
+        CHECK(g.finish(no));
+        CHECK(g.stage() == Stage::Failed);
+        CHECK(!g.busy());
+        CHECK_EQ(g.error(), std::string("rate_limited"));
+        CHECK_EQ(g.retryAfterSec(), 150);
+        CHECK_EQ(g.owner(), std::string("history:9"));
+        CHECK(!net::sys::fileExists(game::archive::joinPath(f.path, "late.gif")));
+        CHECK(g.begin("history:9", 9, f.path, "late.gif"));  // asked again: the error forgotten
+        CHECK(g.error().empty());
+        CHECK_EQ(g.retryAfterSec(), 0);
+        net::Event bare = event(Kind::GifResult, false, "");
+        bare.gameId = 9;
+        CHECK(g.finish(bare));
+        CHECK_EQ(g.error(), std::string("server_error"));
+
+        // A folder that cannot be made (under a file): write_failed.
+        CHECK(g.begin("library:k", 0, game::archive::joinPath(first, "sub"), "x.gif"));
+        CHECK(g.finish(gifEvent(0, bytes)));
+        CHECK(g.poll(true));
+        CHECK(g.stage() == Stage::Failed);
+        CHECK_EQ(g.error(), std::string("write_failed"));
+        CHECK(g.path().empty());
+
+        g.clear();
+        CHECK(g.stage() == Stage::Idle);
+        CHECK(g.owner().empty());
+        CHECK(g.error().empty());
+
+        // Destroyed while writing: the write ends first.
+        CHECK(g.begin("library:k", 0, f.path, "game.gif"));
+        CHECK(g.finish(gifEvent(0, other)));
+    }
+    CHECK_EQ(readAll(game::archive::joinPath(f.path, "game_3.gif")), other);
+    f.remove({"game.gif", "game_2.gif", "game_3.gif"});
+    CHECK(!net::sys::fileExists(game::archive::joinPath(f.path, "game.gif")));
+}
+
+// The GIF routes need the session. Their answers follow the network layer's one convention, as
+// every account call: a session refused by the server is "unauthorized" with sessionLost, none
+// saved is "unauthorized" (nothing sent); both sign out. The GIF's own errors keep the player in.
+TEST(account_apply_gif_result) {
+    AccountData d;
+    net::AccountInfo account;
+    account.username = "Paul_M";
+    bool signedIn = true;
+    CHECK(d.apply(gifEvent(812, "GIF89a"), account, signedIn));
+    CHECK(signedIn);
+    for (const char* kept : {"rate_limited", "server_busy", "game_too_long", "not_found", "network", "gif_disabled", "invalid_pgn",
+                             "pgn_too_large", "invalid_game_id", "invalid_response"}) {
+        CHECK(d.apply(event(Kind::GifResult, false, kept), account, signedIn));
+        CHECK(signedIn);
+    }
+    CHECK_EQ(account.username, std::string("Paul_M"));
+    // Refused by the server (its 401 erased the token).
+    net::Event refused = event(Kind::GifResult, false, "unauthorized");
+    refused.gameId = 812;
+    refused.sessionLost = true;
+    CHECK(d.apply(refused, account, signedIn));
+    CHECK(!signedIn);
+    // No session saved.
+    signedIn = true;
+    CHECK(d.apply(event(Kind::GifResult, false, "unauthorized"), account, signedIn));
+    CHECK(!signedIn);
+    // The server's code for a refused bearer and the old local code are not the network layer's:
+    // neither a GIF nor any other answer has a sign-out rule of its own for them.
+    for (const char* code : {"invalid_token", "not_logged_in"}) {
+        signedIn = true;
+        CHECK(d.apply(event(Kind::GifResult, false, code), account, signedIn));
+        CHECK(signedIn);
+        CHECK(d.apply(event(Kind::PgnResult, false, code), account, signedIn));
+        CHECK(signedIn);
+    }
 }

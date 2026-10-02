@@ -1159,3 +1159,26 @@ replay.tip.pause = إيقاف مؤقت (K)
 replay.tip.resume = استئناف (K)
 replay.tip.forward = نقلة إلى الأمام (L)
 replay.tip.end = نهاية المباراة (End)
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = حفظ بصيغة GIF
+gif.making = جارٍ إنشاء صورة GIF: الخادم يرسم المباراة…
+gif.saved = حُفظت صورة GIF:
+gif.saved_as = حُفظت صورة GIF: {0}
+gif.sign_in_first = يُرجى تسجيل الدخول إلى خادم على الإنترنت لإنشاء صور GIF، فالخادم هو الذي يرسمها.
+gif.busy_other = يجري إنشاء صورة GIF أخرى. يُرجى الانتظار حتى تجهز.
+gif.err.rate_limited_for = أُنشئت صور GIF كثيرة في وقت قصير. يمكن إنشاء الصورة التالية بعد {0}.
+gif.err.rate_limited = أُنشئت صور GIF كثيرة في وقت قصير. يُرجى المحاولة لاحقًا.
+gif.err.server_busy_for = الخادم مشغول برسم صور GIF أخرى. يُرجى المحاولة مجددًا بعد {0}.
+gif.err.server_busy = الخادم مشغول برسم صور GIF أخرى. يُرجى المحاولة مجددًا بعد قليل.
+gif.err.signed_out = انتهت جلستك. يُرجى تسجيل الدخول من جديد لإنشاء صورة GIF.
+gif.err.game_too_long = هذه المباراة أطول من أن تُحوَّل إلى صورة GIF.
+gif.err.pgn_too_large = هذه المباراة أطول من أن تُحوَّل إلى صورة GIF.
+gif.err.invalid_pgn = تعذّر على الخادم قراءة هذه المباراة.
+gif.err.gif_disabled = هذا الخادم لا يُنشئ صور GIF.
+gif.err.write_failed = تعذّر حفظ صورة GIF على هذا الحاسوب.
+gif.err.not_found = لم تعد هذه المباراة موجودة على الخادم.
+gif.wait.seconds = {0} ثانية|ثانية واحدة|ثانيتين|{0} ثوانٍ|{0} ثانية|{0} ثانية
+gif.wait.minutes = {0} دقيقة|دقيقة واحدة|دقيقتين|{0} دقائق|{0} دقيقة|{0} دقيقة
+gif.wait.both = {0} و{1}

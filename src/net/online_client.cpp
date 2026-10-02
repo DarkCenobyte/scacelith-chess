@@ -2143,6 +2143,76 @@ void OnlineClient::deleteAccount(const std::string& password, const std::string&
     });
 }
 
+// ---- animated GIFs (dedicated-server/docs/API.md, "GIF of a game") ----
+namespace {
+
+// A GIF file: the signature of either version. Anything else (a proxy's HTML page, a JSON body
+// sent with a 200) is not written to the player's disk as a .gif.
+bool looksLikeGif(const std::string& t) {
+    return t.size() >= 6 && (t.compare(0, 6, "GIF89a") == 0 || t.compare(0, 6, "GIF87a") == 0);
+}
+
+// The answer of either GIF route, as GifResult.
+void gifCall(Impl* d, const ServerEndpoint& e, const std::string& method, const std::string& path, const json::Value* body,
+             uint64_t gameId) {
+    Impl::Call call;
+    call.auth = Impl::Auth::Required;   // the renders count per account
+    call.rawCap = OnlineClient::kGifMaxBytes;
+    call.accept = "image/gif";
+    Impl::Api a = d->request(e, method, path, body, call, d->httpCancel);
+    Event ev;
+    ev.kind = Event::Kind::GifResult;
+    ev.gameId = gameId;
+    finish(ev, a, [&] { return looksLikeGif(a.text); });
+    if (ev.ok) ev.text = std::move(a.text);   // up to 16 MiB: moved, never copied
+    // The quota and the busy renderer without the server's JSON (a proxy's page): the same codes.
+    if (ev.error == "http_429") ev.error = "rate_limited";
+    if (ev.error == "http_503") ev.error = "server_busy";
+    d->post(std::move(ev));
+}
+
+}  // namespace
+
+void OnlineClient::downloadGameGif(uint64_t gameId, const GifOptions& options) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    std::string path = "/games/" + std::to_string(gameId) + "/gif?size=" + urlEncode(options.size) +
+                       "&orientation=" + urlEncode(options.orientation) + "&delay=" + std::to_string(options.delayMs) +
+                       "&coords=" + (options.coords ? "1" : "0");
+    d->http([d, e, path, gameId] {
+        if (gameId == 0) {
+            Event ev;
+            ev.kind = Event::Kind::GifResult;
+            ev.error = "invalid_game_id";
+            d->post(ev);
+            return;
+        }
+        gifCall(d, e, "GET", path, nullptr, gameId);
+    });
+}
+
+void OnlineClient::renderPgnGif(const std::string& pgn, const GifOptions& options) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    if (pgn.size() > kGifMaxPgnBytes) {
+        // Longer than the server takes: said at once, nothing sent.
+        d->http([d] {
+            Event ev;
+            ev.kind = Event::Kind::GifResult;
+            ev.error = "pgn_too_large";
+            d->post(ev);
+        });
+        return;
+    }
+    json::Value b = json::Value::object();
+    b.set("pgn", pgn);
+    b.set("size", options.size);
+    b.set("orientation", options.orientation);
+    b.set("delayMs", options.delayMs);
+    b.set("coords", options.coords);
+    d->http([d, e, b] { gifCall(d, e, "POST", "/gif", &b, 0); });
+}
+
 // ---- realtime ----
 
 void OnlineClient::connect() {

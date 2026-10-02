@@ -1164,3 +1164,26 @@ replay.tip.pause = Pause (K)
 replay.tip.resume = Resume (K)
 replay.tip.forward = One move forward (L)
 replay.tip.end = End of the game (End)
+
+# ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
+#      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
+gif.save = Save as GIF
+gif.making = Making the GIF: the server is drawing the game…
+gif.saved = The GIF has been saved:
+gif.saved_as = GIF saved: {0}
+gif.sign_in_first = Sign in to an online server to make GIFs: the server draws them.
+gif.busy_other = Another GIF is being made. Please wait until it is ready.
+gif.err.rate_limited_for = You have made many GIFs in a short time. You can make the next one in {0}.
+gif.err.rate_limited = You have made many GIFs in a short time. Please try again later.
+gif.err.server_busy_for = The server is busy drawing other GIFs. Please try again in {0}.
+gif.err.server_busy = The server is busy drawing other GIFs. Please try again in a moment.
+gif.err.signed_out = Your session has ended. Please sign in again to make a GIF.
+gif.err.game_too_long = This game is too long to be made into a GIF.
+gif.err.pgn_too_large = This game is too long to be made into a GIF.
+gif.err.invalid_pgn = The server could not read this game.
+gif.err.gif_disabled = This server does not make GIFs.
+gif.err.write_failed = The GIF could not be saved on this computer.
+gif.err.not_found = This game is no longer on the server.
+gif.wait.seconds = {0} second|{0} seconds
+gif.wait.minutes = {0} minute|{0} minutes
+gif.wait.both = {0} and {1}

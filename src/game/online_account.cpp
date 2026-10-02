@@ -1,9 +1,13 @@
 // The account pages' data (see online_account.h).
 #include "online_account.h"
 #include "../chess/chess.h"
+#include "../core/log.h"
+#include "../i18n/i18n.h"
 #include "game_archive.h"
 #include <algorithm>
+#include <chrono>
 #include <cstdio>
+#include <exception>
 
 namespace game {
 
@@ -159,6 +163,7 @@ bool AccountData::apply(const net::Event& e, net::AccountInfo& account, bool& si
             clear();
         }
         break;
+    case Kind::GifResult:   // for the GifSaver (the GIF routes need the session: refused, see below)
     case Kind::PgnResult:
     case Kind::EmailChangeResult:
     case Kind::AccountExportResult: break;  // for the page that asked
@@ -267,6 +272,154 @@ std::string exportFileName(const std::string& host, const std::string& username,
     char date[32] = "0000-00-00";
     if (have) std::snprintf(date, sizeof date, "%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
     return archive::sanitizeName(host, 64) + "_" + archive::sanitizeName(username, 40) + "_" + date + ".json";
+}
+
+// ---- Animated GIFs ------------------------------------------------------------------------------------
+
+std::string gifFileName(std::time_t started, const std::string& white, const std::string& black, uint64_t gameId) {
+    std::tm tm{};
+#ifdef _WIN32
+    const bool have = started > 0 && localtime_s(&tm, &started) == 0;
+#else
+    const bool have = started > 0 && localtime_r(&started, &tm) != nullptr;
+#endif
+    char stamp[64] = "0000-00-00_000000";
+    if (have)
+        std::snprintf(stamp, sizeof stamp, "%04d-%02d-%02d_%02d%02d%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,
+                      tm.tm_min, tm.tm_sec);
+    std::string name = std::string(stamp) + "_" + archive::sanitizeName(white) + "-vs-" + archive::sanitizeName(black);
+    if (gameId) name += "_" + std::to_string(gameId);
+    return name + ".gif";
+}
+
+std::time_t pgnLocalTime(const std::string& date, const std::string& time, std::time_t fallback) {
+    auto digits = [](const std::string& s, size_t at, size_t n, int& out) {
+        if (s.size() < at + n) return false;
+        out = 0;
+        for (size_t i = at; i < at + n; ++i) {
+            if (s[i] < '0' || s[i] > '9') return false;
+            out = out * 10 + (s[i] - '0');
+        }
+        return true;
+    };
+    int y = 0, mo = 0, d = 0, h = 0, mi = 0, se = 0;
+    if (!digits(date, 0, 4, y) || !digits(date, 5, 2, mo) || !digits(date, 8, 2, d) || mo < 1 || mo > 12 || d < 1 || d > 31)
+        return fallback;
+    if (digits(time, 0, 2, h) && time.size() >= 5 && time[2] == ':' && digits(time, 3, 2, mi)) {
+        if (time.size() >= 8 && time[5] == ':') digits(time, 6, 2, se);
+    } else {
+        h = mi = se = 0;
+    }
+    std::tm tm{};
+    tm.tm_year = y - 1900;
+    tm.tm_mon = mo - 1;
+    tm.tm_mday = d;
+    tm.tm_hour = std::clamp(h, 0, 23);
+    tm.tm_min = std::clamp(mi, 0, 59);
+    tm.tm_sec = std::clamp(se, 0, 59);
+    tm.tm_isdst = -1;
+    const std::time_t t = std::mktime(&tm);
+    return t == std::time_t(-1) ? fallback : t;
+}
+
+std::time_t pgnGameStart(const std::string& date, const std::string& time, const std::string& utcDate, const std::string& utcTime,
+                         std::time_t fallback) {
+    auto num = [](const std::string& s, size_t at, size_t n) {
+        int v = 0;
+        for (size_t i = at; i < at + n; ++i) {
+            if (i >= s.size() || s[i] < '0' || s[i] > '9') return -1;
+            v = v * 10 + (s[i] - '0');
+        }
+        return v;
+    };
+    const bool hasTime = num(time, 0, 2) >= 0 && time.size() >= 5 && time[2] == ':' && num(time, 3, 2) >= 0;
+    if (hasTime) return pgnLocalTime(date, time, fallback);
+    const int y = num(utcDate, 0, 4), mo = num(utcDate, 5, 2), d = num(utcDate, 8, 2);
+    const int h = num(utcTime, 0, 2), mi = num(utcTime, 3, 2), se = num(utcTime, 6, 2);
+    if (y >= 1970 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31 && h >= 0 && h <= 23 && mi >= 0 && mi <= 59 && se >= 0 && se <= 60 &&
+        utcTime.size() >= 8 && utcTime[2] == ':' && utcTime[5] == ':') {
+        // Days since 1970-01-01 of a proleptic Gregorian date (H. Hinnant's days_from_civil).
+        const int yy = mo <= 2 ? y - 1 : y;
+        const int era = yy / 400, yoe = yy - era * 400;
+        const int doy = (153 * (mo + (mo > 2 ? -3 : 9)) + 2) / 5 + d - 1;
+        const long long days = static_cast<long long>(era) * 146097 + yoe * 365 + yoe / 4 - yoe / 100 + doy - 719468;
+        return std::time_t(days * 86400 + h * 3600 + mi * 60 + se);
+    }
+    return pgnLocalTime(date, std::string(), fallback);
+}
+
+std::string waitText(int seconds) {
+    const int s = std::max(1, seconds);
+    if (s < 60) return i18n::trn("gif.wait.seconds", s);
+    if (s >= 300) return i18n::trn("gif.wait.minutes", (s + 59) / 60);
+    if (s % 60 == 0) return i18n::trn("gif.wait.minutes", s / 60);
+    return i18n::trf("gif.wait.both", {i18n::trn("gif.wait.minutes", s / 60), i18n::trn("gif.wait.seconds", s % 60)});
+}
+
+GifSaver::~GifSaver() {
+    if (job_.valid()) job_.wait();
+}
+
+bool GifSaver::begin(const std::string& owner, uint64_t gameId, const std::string& folder, const std::string& fileName) {
+    if (busy()) return false;
+    stage_ = Stage::Rendering;
+    owner_ = owner;
+    gameId_ = gameId;
+    folder_ = folder;
+    fileName_ = fileName;
+    path_.clear();
+    error_.clear();
+    retryAfterSec_ = 0;
+    return true;
+}
+
+bool GifSaver::finish(const net::Event& e) {
+    if (e.kind != Kind::GifResult || stage_ != Stage::Rendering || e.gameId != gameId_) return false;
+    if (!e.ok) {
+        stage_ = Stage::Failed;
+        error_ = e.error.empty() ? std::string("server_error") : e.error;
+        retryAfterSec_ = e.retryAfterSec;
+        LOGI("online: no GIF for %s: %s", owner_.c_str(), error_.c_str());
+        return true;
+    }
+    stage_ = Stage::Writing;
+    job_ = std::async(std::launch::async, [folder = folder_, name = fileName_, bytes = e.text]() {
+        try {
+            return archive::saveFile(folder, name, bytes);
+        } catch (const std::exception& ex) {   // out of memory, a thread refused
+            archive::SaveResult r;
+            r.error = ex.what();
+            return r;
+        }
+    });
+    return true;
+}
+
+bool GifSaver::poll(bool wait) {
+    if (stage_ != Stage::Writing || !job_.valid()) return false;
+    if (!wait && job_.wait_for(std::chrono::seconds(0)) != std::future_status::ready) return false;
+    const archive::SaveResult r = job_.get();
+    if (r.ok) {
+        stage_ = Stage::Saved;
+        path_ = r.path;
+        LOGI("online: GIF saved as %s", r.path.c_str());
+    } else {
+        stage_ = Stage::Failed;
+        error_ = "write_failed";
+        LOGW("online: the GIF could not be written: %s", r.error.c_str());
+    }
+    return true;
+}
+
+void GifSaver::clear() {
+    if (job_.valid()) job_.wait();
+    job_ = std::future<archive::SaveResult>();
+    stage_ = Stage::Idle;
+    owner_.clear();
+    path_.clear();
+    error_.clear();
+    gameId_ = 0;
+    retryAfterSec_ = 0;
 }
 
 }  // namespace game

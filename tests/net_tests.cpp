@@ -5,9 +5,10 @@
 // Welcome, ping and clock offset, queue, moves, reconnection, 4003 and logout; the pacing of the
 // client Ping (Welcome.clientPingMs) and of the reconnections (full server, shutdown, /info reuse);
 // live gestures (wire units, pacing, the opponent's); the account API (history, game details, PGN,
-// signed-in devices, preferences, e-mail change, export, deletion) against a scripted server
-// (tests/http_fake.h), a refused session signing the game out (game::AccountData fed the client's
-// events), and the move of the official server's saved session from port 44664 to 443.
+// signed-in devices, preferences, e-mail change, export, deletion, animated GIFs) against a
+// scripted server (tests/http_fake.h), a refused session signing the game out (game::AccountData
+// fed the client's events), and the move of the official server's saved session from port 44664
+// to 443.
 //
 // Vectors: tests/data/net-protocol-vectors.json (dedicated-server/tools/gen-cpp-test-vectors.js)
 // and, when present, dedicated-server/test/fixtures/protocol-vectors.json. The files are looked
@@ -2640,6 +2641,24 @@ TEST(net_account_refused_session_signs_the_game_out) {
         CHECK(data.gameLoaded);
         CHECK(!signedIn);
     }
+    // The GIFs need the session (no anonymous retry): refused on either route, it signs out like
+    // any account call.
+    for (int route = 0; route < 2; ++route) {
+        AccountRig r(route == 0 ? "acct-refused-gif" : "acct-refused-gif-pgn", handler);
+        net::AccountInfo account;
+        bool signedIn = true;
+        game::AccountData data;
+        if (route == 0) r.c->downloadGameGif(812, net::GifOptions());
+        else r.c->renderPgnGif("[Event \"x\"]\n[Result \"*\"]\n\n1. e4 *\n", net::GifOptions());
+        net::Event ev = r.wait(K::GifResult);
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string("unauthorized"));
+        CHECK(ev.sessionLost);
+        CHECK_EQ(r.count(), size_t(1));
+        CHECK(!r.c->hasSavedSession());
+        CHECK(data.apply(ev, account, signedIn));
+        CHECK(!signedIn);
+    }
 }
 
 TEST(net_account_game_details) {
@@ -2811,6 +2830,205 @@ TEST(net_account_pgn) {
     CHECK_EQ(ev.error, std::string("not_found"));
     CHECK_EQ(ev.gameId, uint64_t(5));
     CHECK(r.c->hasSavedSession());
+}
+
+// Animated GIFs: GET /games/:id/gif with the options in the query, POST /gif with the PGN text in
+// JSON; signed in only (the renders count per account); the picture byte for byte, 16 MiB at
+// most and only when it starts as a GIF does; the quota (429) and the busy renderer (503) with
+// their wait; a refused or missing session is "unauthorized" (sessionLost when refused), as for
+// every account call.
+TEST(net_account_gif) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    // A 2x2 GIF (one frame, two colours): zero bytes inside, to see the body kept as binary.
+    const unsigned char kTiny[] = {'G', 'I', 'F', '8', '9', 'a', 2, 0, 2, 0, 0x80, 0, 0, 0, 0, 0, 255, 255, 255,
+                                   0x2C, 0, 0, 0, 0, 2, 0, 2, 0, 0, 2, 2, 0x44, 0x01, 0, 0x3B};
+    const std::string gif(reinterpret_cast<const char*>(kTiny), sizeof(kTiny));
+    std::string big = gif.substr(0, 6);
+    big += std::string(net::OnlineClient::kGifMaxBytes - big.size(), '\0');
+    std::atomic<int> mode{0};
+    AccountRig r("acct-gif", [&](const fakehttp::Request& q) {
+        if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
+        const bool get = q.method == "GET" && q.path.compare(0, 22, "/api/v1/games/812/gif?") == 0;
+        const bool post = q.method == "POST" && q.path == "/api/v1/gif";
+        if (!get && !post) return jsonReply(404, R"({"error":"not_found","message":"No such game."})");
+        fakehttp::Reply rep;
+        rep.headers.emplace_back("Content-Type", "image/gif");
+        switch (mode.load()) {
+        case 1: rep.body = big; break;                                    // 16 MiB exactly
+        case 2: rep.body = big + "!"; break;                              // one byte over
+        case 3: rep.body = "<html><body>Proxy error</body></html>"; break;
+        case 4: rep.body = "GIF87a" + gif.substr(6); break;
+        case 5: {
+            fakehttp::Reply busy = jsonReply(429, R"({"error":"rate_limited","message":"30 GIFs an hour.","retryAfter":95})");
+            busy.headers.emplace_back("Retry-After", "95");
+            return busy;
+        }
+        case 6: {                                                         // a proxy's page: the header only
+            fakehttp::Reply busy;
+            busy.status = 503;
+            busy.headers.emplace_back("Content-Type", "text/html");
+            busy.headers.emplace_back("Retry-After", "8");
+            busy.body = "<html>Busy</html>";
+            return busy;
+        }
+        case 7: {
+            fakehttp::Reply busy = jsonReply(503, R"({"error":"server_busy","retryAfter":12})");
+            return busy;
+        }
+        case 8: return jsonReply(422, R"({"error":"game_too_long","message":"Over 600 plies."})");
+        case 9: return jsonReply(401, R"({"error":"invalid_token"})");
+        default: rep.body = gif; break;
+        }
+        return rep;
+    });
+    CHECK(r.srv.ok());
+
+    // GET with the defaults: medium, white, 500 ms, coordinates.
+    r.c->downloadGameGif(812, net::GifOptions());
+    net::Event ev = r.wait(K::GifResult);
+    fakehttp::Request q = r.last();
+    CHECK_EQ(q.method, std::string("GET"));
+    CHECK_EQ(q.path, std::string("/api/v1/games/812/gif?size=medium&orientation=white&delay=500&coords=1"));
+    CHECK_EQ(q.get("accept"), std::string("image/gif"));
+    CHECK(hasBearer(q));
+    CHECK(q.body.empty());
+    CHECK(ev.ok);
+    CHECK_EQ(ev.gameId, uint64_t(812));
+    CHECK_EQ(ev.text, gif);                             // byte for byte, zero bytes included
+    net::GifOptions o;
+    o.size = "small";
+    o.orientation = "black";
+    o.delayMs = 1500;
+    o.coords = false;
+    r.c->downloadGameGif(812, o);
+    ev = r.wait(K::GifResult);
+    CHECK(ev.ok);
+    CHECK_EQ(r.last().path, std::string("/api/v1/games/812/gif?size=small&orientation=black&delay=1500&coords=0"));
+    r.c->downloadGameGif(5, o);                         // not a game of the server
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("not_found"));
+    CHECK_EQ(ev.gameId, uint64_t(5));
+    CHECK(ev.text.empty());
+
+    // POST: the PGN text and the options in JSON.
+    const std::string pgn = "[Event \"Casual\"]\n[White \"alice\"]\n[Black \"\xC3\x89lodie\"]\n[Result \"*\"]\n\n1. e4 e5 *\n";
+    r.c->renderPgnGif(pgn, o);
+    ev = r.wait(K::GifResult);
+    q = r.last();
+    CHECK_EQ(q.method, std::string("POST"));
+    CHECK_EQ(q.path, std::string("/api/v1/gif"));
+    CHECK_EQ(q.get("accept"), std::string("image/gif"));
+    CHECK(hasBearer(q));
+    Value b = bodyOf(q);
+    CHECK_EQ(b["pgn"].asString(), pgn);
+    CHECK_EQ(b["size"].asString(), std::string("small"));
+    CHECK_EQ(b["orientation"].asString(), std::string("black"));
+    CHECK_EQ(b["delayMs"].asInt(), 1500);
+    CHECK(b["coords"].isBool());
+    CHECK(!b["coords"].asBool(true));
+    CHECK(ev.ok);
+    CHECK_EQ(ev.gameId, uint64_t(0));
+    CHECK_EQ(ev.text, gif);
+    r.c->renderPgnGif(pgn, net::GifOptions());
+    r.wait(K::GifResult);
+    b = bodyOf(r.last());
+    CHECK_EQ(b["size"].asString(), std::string("medium"));
+    CHECK_EQ(b["orientation"].asString(), std::string("white"));
+    CHECK_EQ(b["delayMs"].asInt(), 500);
+    CHECK(b["coords"].asBool(false));
+
+    // What the client refuses without asking: game 0, a PGN text over 64 KiB.
+    size_t before = r.count();
+    r.c->downloadGameGif(0, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("invalid_game_id"));
+    std::string longPgn = "[Event \"x\"]\n\n{" + std::string(net::OnlineClient::kGifMaxPgnBytes, 'a') + "} *\n";
+    r.c->renderPgnGif(longPgn, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("pgn_too_large"));
+    CHECK_EQ(r.count(), before);
+    std::string exactPgn = "[Event \"x\"]\n\n{";
+    exactPgn += std::string(net::OnlineClient::kGifMaxPgnBytes - exactPgn.size() - 4, 'a') + "} *\n";
+    CHECK_EQ(exactPgn.size(), net::OnlineClient::kGifMaxPgnBytes);
+    r.c->renderPgnGif(exactPgn, o);                     // 64 KiB exactly: sent
+    ev = r.wait(K::GifResult);
+    CHECK(ev.ok);
+    CHECK_EQ(r.count(), before + 1);
+
+    // The cap and the signature.
+    mode = 1;
+    r.c->downloadGameGif(812, o);
+    ev = r.wait(K::GifResult);
+    CHECK(ev.ok);
+    CHECK_EQ(ev.text.size(), net::OnlineClient::kGifMaxBytes);
+    mode = 4;                                           // GIF87a: a GIF too
+    r.c->renderPgnGif(pgn, o);
+    ev = r.wait(K::GifResult);
+    CHECK(ev.ok);
+    CHECK_EQ(ev.text.compare(0, 6, "GIF87a"), 0);
+    for (int m : {2, 3}) {                              // too large; not a GIF
+        mode = m;
+        for (int route = 0; route < 2; ++route) {
+            if (route == 0) r.c->downloadGameGif(812, o);
+            else r.c->renderPgnGif(pgn, o);
+            ev = r.wait(K::GifResult);
+            CHECK(!ev.ok);
+            CHECK_EQ(ev.error, std::string("invalid_response"));
+            CHECK(ev.text.empty());
+        }
+    }
+
+    // The quota and the busy renderer, with how long to wait (the body's, else the header's).
+    mode = 5;
+    r.c->downloadGameGif(812, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("rate_limited"));
+    CHECK_EQ(ev.retryAfterSec, 95);
+    CHECK_EQ(ev.gameId, uint64_t(812));
+    r.c->renderPgnGif(pgn, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("rate_limited"));
+    CHECK_EQ(ev.retryAfterSec, 95);
+    mode = 6;
+    r.c->renderPgnGif(pgn, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("server_busy"));
+    CHECK_EQ(ev.retryAfterSec, 8);
+    mode = 7;
+    r.c->downloadGameGif(812, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("server_busy"));
+    CHECK_EQ(ev.retryAfterSec, 12);
+    mode = 8;
+    r.c->downloadGameGif(812, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("game_too_long"));
+    CHECK(!ev.sessionLost);
+    CHECK(r.c->hasSavedSession());
+
+    // A refused token is forgotten, and the answer has the one code of a session gone (the server
+    // said invalid_token) with sessionLost; signed out, nothing is sent and the code is the same.
+    mode = 9;
+    r.c->downloadGameGif(812, o);
+    ev = r.wait(K::GifResult);
+    CHECK(!ev.ok);
+    CHECK_EQ(ev.error, std::string("unauthorized"));
+    CHECK(ev.sessionLost);
+    CHECK_EQ(ev.gameId, uint64_t(812));
+    CHECK(ev.text.empty());
+    CHECK(!r.c->hasSavedSession());
+    before = r.count();
+    r.c->downloadGameGif(812, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("unauthorized"));
+    CHECK(!ev.sessionLost);
+    CHECK_EQ(ev.gameId, uint64_t(812));
+    r.c->renderPgnGif(pgn, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("unauthorized"));
+    CHECK(!ev.sessionLost);
+    CHECK_EQ(r.count(), before);
 }
 
 TEST(net_account_sessions) {
