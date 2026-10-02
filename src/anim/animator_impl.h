@@ -1,5 +1,6 @@
 // Internal header of the animation package: shared by animator.cpp (playing hand, body, gaze,
-// task machine) and animator_writing.cpp (writing hand, pen, page turns, left-handed mirror).
+// task machine), animator_gesture.cpp (the coach's gestures, speech, nods and head shakes) and
+// animator_writing.cpp (writing hand, pen, page turns, left-handed mirror).
 // Not part of the public API (see animator.h).
 //
 // Everything is planned in CHARACTER space (+Y up, +Z forward, +X = character's left, origin at

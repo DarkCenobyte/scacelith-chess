@@ -6,7 +6,10 @@
 //     the Impl state
 //   animator.cpp (this file): body solver (torso lean/twist, clavicle, analytic two-bone arm IK,
 //     wrist limits), gaze, blinks, idle life, thinking poses, task planning (one case per
-//     TaskType) and the task/event machine
+//     TaskType; the coach's gestures are planned in animator_gesture.cpp) and the task/event
+//     machine
+//   animator_gesture.cpp: the coach's gestures (Point, Trace, speaking gestures), speech-driven
+//     head motion, nods and head shakes, and their public API
 //   animator_writing.cpp: the writing hand (pen, paths, page turns), the left-handed mirror layer
 //     and the public writing API
 //
