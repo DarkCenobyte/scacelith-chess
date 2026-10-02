@@ -905,6 +905,33 @@ TEST(coach_review_no_praise_for_a_quicker_mate) {
     }
 }
 
+TEST(coach_review_pin_defender_freed_by_the_capture) {
+    // The knight on e4 is pinned by the rook, but ...Rxd6 leaves the e-file and Nxd6 takes back: the
+    // pin does not stop it defending d6, so the coach must not say it does.
+    const char* fen = "6k1/pp6/3Br3/8/4N3/8/P6P/4K3 w - - 0 1";
+    for (int level : {1, 3, 5}) {
+        Game g = gameOf(fen, {"a3"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const ai::Analysis a0 = analysisOf({pvl(0, "d6c5 e6e4"), pvl(-400, "a2a3 e6d6 e4d6 b7b6")});
+        const Review r = reviewOf(rv, g, a0);
+        CHECK(r.verdict.exType != ExType::Pin);
+        for (const std::string& k : keysOf(r.script)) CHECK(!startsWith(k, "ex.pin_defender"));
+        checkScript(r.script, "pin defender");
+    }
+    // ...Bxc5 instead: the rook stays on the e-file, the knight still cannot take back.
+    for (int level : {1, 3, 5}) {
+        Game g = gameOf("4rbk1/8/8/2B5/4N3/8/P7/4K3 w - - 0 1", {"a3"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const ai::Analysis a0 = analysisOf({pvl(0, "c5f8 e8f8"), pvl(-330, "a2a3 f8c5 e1d1")});
+        const Review r = reviewOf(rv, g, a0);
+        CHECK(r.verdict.exType == ExType::Pin);
+        CHECK(hasKey(r.script, "ex.pin_defender.b" + std::to_string(level)));
+        checkScript(r.script, "pin defender held");
+    }
+}
+
 TEST(coach_review_repetition_tip_is_not_a_stalemate) {
     // A winning player repeats the position (level 1): the repetition tip is said, but the move is
     // not recorded as a stalemate fault, so the appraisal gives no stalemate advice about it.
