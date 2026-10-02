@@ -859,7 +859,8 @@ void GameScene::rateGame() {
 }
 
 void GameScene::archiveGame(bool finished) {
-    if (archived_) return;
+    // Screenshot runs leave the player's saved games alone.
+    if (archived_ || ctx_->screenshotMode) return;
     archived_ = true;
     const archive::Mode mode = saving::archiveMode(mode_, directMatch_);
     // A direct match: the authority's moves, times and ending (the local game may lag behind).

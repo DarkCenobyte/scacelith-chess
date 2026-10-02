@@ -2,7 +2,8 @@
 //
 // Command line:
 //   --scene <name>        run a registered scene (default: game). --list-scenes prints them.
-//   --shot <file.png>     render --frames N frames with a fixed 60 Hz step, save, exit.
+//   --shot <file.png>     render --frames N frames with a fixed 60 Hz step, save, exit (the
+//                         settings file and the saved games are left as they are).
 //   --frames <N>          frame count for --shot (default 30).
 //   --size <WxH>          window/backbuffer size (default from the .ini).
 //   --time <seconds>      start time for deterministic scenes.
@@ -70,6 +71,8 @@ static int runApp(std::vector<std::string> args) {
     std::string shotPath = ctx.argValue("--shot");
     int shotFrames = std::atoi(ctx.argValue("--frames", "30").c_str());
     ctx.screenshotMode = !shotPath.empty();
+    // Screenshot runs leave the player's settings (Elo, next colour...) and saved games alone.
+    settings.readOnly = ctx.screenshotMode;
     std::string size = ctx.argValue("--size");
     int w = settings.displayWidth, h = settings.displayHeight;
     if (!size.empty()) std::sscanf(size.c_str(), "%dx%d", &w, &h);

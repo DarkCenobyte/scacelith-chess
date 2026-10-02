@@ -210,6 +210,7 @@ void Settings::applyLanguage() {
 }
 
 bool Settings::save() const {
+    if (readOnly) return true;
     IniFile ini;
     ini.setInt("display.width", displayWidth);
     ini.setInt("display.height", displayHeight);

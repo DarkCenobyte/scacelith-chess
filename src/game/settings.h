@@ -187,6 +187,8 @@ struct Settings {
     bool load(const std::string& path);
     bool save() const;
     std::string path;
+    // Screenshot runs (--shot) leave the settings file as it is: save() writes nothing.
+    bool readOnly = false;
 };
 
 Settings& settings();
