@@ -433,13 +433,13 @@ bool opReshape(const Tensor& x, const Tensor& shape, bool allowZero, Tensor& out
         if (s[i] == -1) {
             if (infer >= 0) return fail(err, "Reshape with two -1");
             infer = int(i);
-        } else {
-            known *= s[i];
+        } else if (s[i] < 0 || __builtin_mul_overflow(known, s[i], &known)) {
+            return fail(err, "Reshape to " + dimsStr(s));
         }
     }
     int64_t total = x.count();
     if (infer >= 0) s[size_t(infer)] = known ? total / known : 0;
-    if (elementCount(s) != total) return fail(err, "Reshape " + dimsStr(x.dims) + " to " + dimsStr(s));
+    if (!validDims(s) || elementCount(s) != total) return fail(err, "Reshape " + dimsStr(x.dims) + " to " + dimsStr(s));
     out = alias(x, s);
     return true;
 }
@@ -689,9 +689,11 @@ bool opSqueeze(const Tensor& x, const Tensor* axesT, Tensor& out, std::string* e
 bool opExpand(const Tensor& x0, const Tensor& shape, Tensor& out, std::string* err) {
     Tensor x = materialize(x0);
     Dims s = shape.toInts();
+    if (!validDims(s)) return fail(err, "Expand shape " + dimsStr(s));
     const Dims* ins[2] = {&x.dims, &s};
     Bcast bc;
     if (!bc.init(ins, 2, err)) return false;
+    if (!validDims(bc.out)) return fail(err, "Expand shape " + dimsStr(bc.out));
     out = Tensor::alloc(x.type, bc.out);
     size_t es = dtypeSize(x.type);
     const uint8_t* src = x.as<uint8_t>();
@@ -712,7 +714,9 @@ bool opTile(const Tensor& x0, const Tensor& repeats, Tensor& out, std::string* e
     std::vector<int64_t> rep = repeats.toInts();
     if (int64_t(rep.size()) != x.rank()) return fail(err, "Tile repeats rank");
     Dims od = x.dims;
-    for (size_t d = 0; d < od.size(); ++d) od[d] *= rep[d];
+    for (size_t d = 0; d < od.size(); ++d)
+        if (rep[d] < 0 || __builtin_mul_overflow(od[d], rep[d], &od[d])) return fail(err, "Tile repeats");
+    if (!validDims(od)) return fail(err, "Tile output " + dimsStr(od));
     out = Tensor::alloc(x.type, od);
     int64_t n = out.count();
     size_t es = dtypeSize(x.type);
@@ -758,9 +762,12 @@ bool opPad(const ExecContext& ctx, const Node& nd, const Tensor& x0, const Tenso
     // Negative pads crop (the relative-position attention of the text encoders uses them).
     Dims od = x.dims;
     for (int64_t d = 0; d < r; ++d) {
-        od[size_t(d)] += lo[size_t(d)] + hi[size_t(d)];
-        if (od[size_t(d)] < 0) return fail(err, "Pad crops more than the dimension");
+        int64_t& v = od[size_t(d)];
+        if (__builtin_add_overflow(v, lo[size_t(d)], &v) || __builtin_add_overflow(v, hi[size_t(d)], &v))
+            return fail(err, "Pad pads");
+        if (v < 0) return fail(err, "Pad crops more than the dimension");
     }
+    if (!validDims(od)) return fail(err, "Pad output " + dimsStr(od));
     out = Tensor::alloc(x.type, od);
     size_t es = dtypeSize(x.type);
     bool edge = nd.mode == "edge";
@@ -1501,6 +1508,7 @@ bool execNode(const Node& n, const Tensor* const* in, Tensor* out, const ExecCon
     case Op::ConstantOfShape: {
         if (!need(1)) return false;
         Dims d = in[0]->toInts();
+        if (!validDims(d) || n.value.count() < 1) return fail(error, "ConstantOfShape shape or value");
         out[0] = Tensor::alloc(n.value.type, d);
         size_t es = dtypeSize(n.value.type);
         for (int64_t i = 0; i < out[0].count(); ++i) std::memcpy(out[0].mut<uint8_t>() + i * int64_t(es), n.value.data, es);

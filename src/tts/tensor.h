@@ -17,6 +17,9 @@ const char* dtypeName(DType t);
 
 using Dims = std::vector<int64_t>;
 int64_t elementCount(const Dims& d);
+// Every dimension >= 0 and at most 2^40 elements (non-zero dimensions multiplied without
+// overflow): the check for shapes computed from data.
+bool validDims(const Dims& d);
 
 struct Buffer {
     void* data = nullptr;

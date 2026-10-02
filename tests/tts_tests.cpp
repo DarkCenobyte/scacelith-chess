@@ -863,6 +863,31 @@ TEST(tts_ops_bad_attributes) {
         if (field == 3) bad.i0 = 0;               // group
         CHECK(!runOp(bad, {&cx, &cw}, o));
     }
+    // Shapes computed from data: negative or overflowing dimensions are refused, and a wrapped
+    // allocation size throws instead of handing out a tiny block.
+    const int64_t huge = int64_t(1) << 40;
+    Tensor negShape = I({2}, {-2, -3}), hugeShape = I({2}, {huge, huge}), minus1 = I({1}, {-1});
+    CHECK(!runOp(node(tts::Op::Reshape), {&x, &negShape}, o));
+    tts::Node cos = node(tts::Op::ConstantOfShape);
+    cos.value = F({1}, {1.0f});
+    CHECK(!runOp(cos, {&minus1}, o));
+    CHECK(!runOp(cos, {&hugeShape}, o));
+    Tensor one = F({1}, {1.0f});
+    CHECK(!runOp(node(tts::Op::Expand), {&one, &minus1}, o));
+    CHECK(!runOp(node(tts::Op::Expand), {&one, &hugeShape}, o));
+    Tensor tiles = I({2}, {1, -1}), hugeTiles = I({2}, {huge, huge});
+    CHECK(!runOp(node(tts::Op::Tile), {&x, &tiles}, o));
+    CHECK(!runOp(node(tts::Op::Tile), {&x, &hugeTiles}, o));
+    Tensor hugePads = I({4}, {0, std::numeric_limits<int64_t>::max(), 0, 1});
+    pad.mode = "constant";
+    CHECK(!runOp(pad, {&x, &hugePads}, o));
+    bool threw = false;
+    try {
+        Tensor::alloc(DType::F32, {-1});
+    } catch (const std::bad_alloc&) {
+        threw = true;
+    }
+    CHECK(threw);
 }
 
 // Operand types and parameter sizes are checked, and the operators that read an input as float
