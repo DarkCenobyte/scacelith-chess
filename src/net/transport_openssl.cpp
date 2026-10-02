@@ -351,11 +351,12 @@ bool parseHead(const std::string& head, ParsedHead& out) {
     return true;
 }
 
-// Decodes a complete chunked body; false when incomplete or malformed (done tells which).
-bool dechunk(const std::string& in, std::string& out, bool& complete) {
-    out.clear();
+// Decodes the chunks of a chunked body that are whole from 'pos' on, as more of it arrives: their
+// data goes to the end of 'out' and 'pos' moves past them (it stays at the start of a chunk that
+// is not whole yet). False when malformed; otherwise 'complete' tells whether the last chunk (size
+// 0) and the line end after it have arrived.
+bool dechunk(const std::string& in, size_t& pos, std::string& out, bool& complete) {
     complete = false;
-    size_t pos = 0;
     for (;;) {
         size_t e = in.find("\r\n", pos);
         if (e == std::string::npos) return true;
@@ -367,16 +368,16 @@ bool dechunk(const std::string& in, std::string& out, bool& complete) {
         char* end = nullptr;
         unsigned long n = std::strtoul(sizeLine.c_str(), &end, 16);
         if (*end) return false;
-        pos = e + 2;
+        size_t data = e + 2;
         if (n == 0) {
             // Trailers end with an empty line.
-            complete = in.find("\r\n", pos) != std::string::npos;
+            complete = in.find("\r\n", data) != std::string::npos;
             return true;
         }
-        if (in.size() < pos + n + 2) return true;
-        out.append(in, pos, n);
-        if (in.compare(pos + n, 2, "\r\n") != 0) return false;
-        pos += n + 2;
+        if (in.size() < data + n + 2) return true;
+        if (in.compare(data + n, 2, "\r\n") != 0) return false;
+        out.append(in, data, n);
+        pos = data + n + 2;
     }
 }
 
@@ -704,6 +705,10 @@ void httpRequest(const HttpRequest& req, HttpResponse& resp, CancelToken* cancel
     std::string raw;
     ParsedHead ph;
     size_t bodyAt = std::string::npos;
+    bool chunked = false;
+    std::string cl;
+    size_t chunkAt = 0;   // the first chunk not decoded yet (chunked)
+    std::string decoded;
     char buf[16384];
     while (ok) {
         if (bodyAt == std::string::npos) {
@@ -711,18 +716,18 @@ void httpRequest(const HttpRequest& req, HttpResponse& resp, CancelToken* cancel
             if (e != std::string::npos) {
                 if (!parseHead(raw.substr(0, e), ph)) { s.error = "network"; s.detail = "bad HTTP response"; ok = false; break; }
                 if (ph.status >= 100 && ph.status < 200) { raw.erase(0, e + 4); continue; }   // interim answer
-                bodyAt = e + 4;
+                bodyAt = chunkAt = e + 4;
+                chunked = lower(ph.get("transfer-encoding")).find("chunked") != std::string::npos;
+                cl = ph.get("content-length");
             } else if (raw.size() > 65536) {
                 s.error = "network"; s.detail = "response header too large"; ok = false; break;
             }
         }
         if (bodyAt != std::string::npos) {
-            std::string te = lower(ph.get("transfer-encoding")), cl = ph.get("content-length");
-            if (te.find("chunked") != std::string::npos) {
+            if (chunked) {
                 bool complete;
-                std::string body;
-                if (!dechunk(raw.substr(bodyAt), body, complete)) { s.error = "network"; s.detail = "bad chunked body"; ok = false; break; }
-                if (complete) { resp.body = body; break; }
+                if (!dechunk(raw, chunkAt, decoded, complete)) { s.error = "network"; s.detail = "bad chunked body"; ok = false; break; }
+                if (complete) { resp.body = std::move(decoded); break; }
             } else if (!cl.empty()) {
                 size_t want = size_t(std::strtoull(cl.c_str(), nullptr, 10));
                 if (want > req.maxResponseBytes) { s.error = "too_large"; ok = false; break; }
@@ -735,8 +740,7 @@ void httpRequest(const HttpRequest& req, HttpResponse& resp, CancelToken* cancel
         if (r == 0) {
             // End of stream: the body runs to the end when no length was given.
             if (bodyAt == std::string::npos) { s.error = "network"; s.detail = "connection closed before the response"; ok = false; break; }
-            std::string te = lower(ph.get("transfer-encoding"));
-            if (te.find("chunked") != std::string::npos || !ph.get("content-length").empty()) {
+            if (chunked || !cl.empty()) {
                 s.error = "network"; s.detail = "truncated response"; ok = false; break;
             }
             resp.body = raw.substr(bodyAt);

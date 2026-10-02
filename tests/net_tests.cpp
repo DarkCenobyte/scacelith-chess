@@ -1177,6 +1177,73 @@ TEST(net_transport_refuses_insecure) {
 // std::bad_alloc out of the transport. The abort action it gave its CancelToken (closing its
 // socket or handle, locals of the call) is taken back all the same, so that a later cancel() (the
 // client's shutdown) never reaches a socket or handle that is gone; the token serves again.
+// Chunked answers to httpRequest: chunk sizes that end the reads anywhere (in a size line, in the
+// data, between CR and LF), a large body in linear time, malformed and truncated codings.
+TEST(net_transport_chunked_answers) {
+    if (!net::transportAvailable()) return;
+    std::string body, coded;
+    for (size_t i = 0, k = 1; body.size() < (size_t(1) << 20); ++i, k = k % 997 + 1) {
+        std::string part(k, char('a' + i % 26));
+        char size[16];
+        std::snprintf(size, sizeof size, "%zx\r\n", k);
+        coded += size + part + "\r\n";
+        body += part;
+    }
+    coded += "0\r\n\r\n";
+    std::string large(size_t(16) << 20, '\0');
+    for (size_t i = 0; i < large.size(); ++i) large[i] = char('A' + (i * 7) % 61);
+    fakehttp::Server srv([&](const fakehttp::Request& q) {
+        fakehttp::Reply rep;
+        if (q.path == "/large") {
+            rep.chunked = true;   // chunks of 16 KiB
+            rep.body = large;
+            return rep;
+        }
+        rep.noLength = true;
+        rep.headers.emplace_back("Transfer-Encoding", "chunked");
+        if (q.path == "/pieces") {
+            rep.body = coded;
+            rep.pieceDelayMs = 10;   // 16 KiB pieces, a read each
+        } else if (q.path == "/bad-line-end") {
+            rep.body = "5\r\nhelloXX0\r\n\r\n";
+        } else if (q.path == "/bad-size") {
+            rep.body = "000000005\r\nhello\r\n0\r\n\r\n";
+        } else if (q.path == "/bare-lf") {
+            rep.body = "5\nhello\r\n0\r\n\r\n";
+        } else {
+            rep.body = coded.substr(0, coded.size() / 2);   // the connection ends there
+        }
+        return rep;
+    });
+    CHECK(srv.ok());
+    auto get = [&](const char* path, net::HttpResponse& resp) {
+        net::HttpRequest req;
+        req.host = "127.0.0.1";
+        req.port = srv.port();
+        req.tls = false;
+        req.path = path;
+        req.timeoutMs = 60000;
+        req.maxResponseBytes = size_t(32) << 20;
+        auto t0 = std::chrono::steady_clock::now();
+        net::httpRequest(req, resp);
+        return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    };
+    net::HttpResponse resp;
+    get("/pieces", resp);
+    CHECK(resp.error.empty());
+    CHECK(resp.body == body);
+    double ms = get("/large", resp);
+    std::fprintf(stderr, "  16 MiB chunked: %.0f ms\n", ms);
+    CHECK(resp.error.empty());
+    CHECK(resp.body == large);
+    CHECK(ms < 5000);
+    for (const char* bad : {"/bad-line-end", "/bad-size", "/bare-lf", "/truncated"}) {
+        get(bad, resp);
+        CHECK_EQ(resp.error, std::string("network"));
+        CHECK(resp.body.empty());
+    }
+}
+
 // An operation that ends while another thread runs its abort action waits for that action: what
 // the action uses (the operation's socket or handle) is still there.
 TEST(net_transport_cancel_waits_for_a_running_abort) {
