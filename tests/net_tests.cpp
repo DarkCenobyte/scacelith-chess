@@ -28,6 +28,7 @@
 #include "test.h"
 #include "alloc_fail.h"
 #include "http_fake.h"
+#include "repo_files.h"
 #include "chess/chess.h"
 #include "game/online_account.h"
 #include "net/credential_store.h"
@@ -58,27 +59,6 @@ namespace pr = net::proto;
 using net::json::Value;
 
 namespace {
-
-// ---- files ----
-
-std::string readRepoFile(const std::string& rel, std::string* foundAt = nullptr) {
-    std::vector<std::string> roots;
-    if (const char* env = std::getenv("SCACELITH_SOURCE_DIR")) roots.push_back(std::string(env) + "/");
-    roots.push_back("");
-    roots.push_back("../");
-    roots.push_back("../../");
-    std::string exe = net::sys::exeDirectory();
-    roots.push_back(exe + "../");
-    roots.push_back(exe + "../../");
-    for (auto& r : roots) {
-        std::string text;
-        if (net::sys::readFile(r + rel, text, 64 << 20)) {
-            if (foundAt) *foundAt = r + rel;
-            return text;
-        }
-    }
-    return std::string();
-}
 
 std::vector<uint8_t> unhex(const std::string& s) {
     std::vector<uint8_t> v;
@@ -278,7 +258,7 @@ TEST(net_protocol_constants) {
 
 TEST(net_protocol_vectors) {
     std::string path;
-    std::string text = readRepoFile("tests/data/net-protocol-vectors.json", &path);
+    std::string text = readRepoFile("tests/data/net-protocol-vectors.json", size_t(64) << 20, &path);
     CHECK(!text.empty());
     if (text.empty()) {
         std::fprintf(stderr, "  tests/data/net-protocol-vectors.json not found (run from the repository root)\n");
@@ -313,7 +293,7 @@ TEST(net_protocol_vectors) {
 // Golden vectors of the protocol owner, when that file exists (format read tolerantly).
 TEST(net_protocol_shared_fixture) {
     std::string path;
-    std::string text = readRepoFile("dedicated-server/test/fixtures/protocol-vectors.json", &path);
+    std::string text = readRepoFile("dedicated-server/test/fixtures/protocol-vectors.json", size_t(64) << 20, &path);
     if (text.empty()) {
         std::fprintf(stderr, "  (dedicated-server/test/fixtures/protocol-vectors.json not present: skipped)\n");
         return;

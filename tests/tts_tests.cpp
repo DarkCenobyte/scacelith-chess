@@ -13,6 +13,7 @@
 #include "test.h"
 #include "audio/offline.h"
 #include "net/net_sys.h"
+#include "repo_files.h"
 #include "tts/gemm.h"
 #include "tts/graph.h"
 #include "tts/model.h"
@@ -252,22 +253,6 @@ struct Dump {
         return true;
     }
 };
-
-std::string readRepoFile(const std::string& rel) {
-    std::vector<std::string> roots;
-    if (const char* env = std::getenv("SCACELITH_SOURCE_DIR")) roots.push_back(std::string(env) + "/");
-    roots.push_back("");
-    roots.push_back("../");
-    roots.push_back("../../");
-    std::string exe = net::sys::exeDirectory();
-    roots.push_back(exe + "../");
-    roots.push_back(exe + "../../");
-    for (auto& r : roots) {
-        std::string text;
-        if (net::sys::readFile(r + rel, text, 64 << 20)) return text;
-    }
-    return std::string();
-}
 
 bool loadDump(const std::string& rel, Dump& d) {
     std::string bytes = readRepoFile(rel);

@@ -10,6 +10,7 @@
 #include "game/game_archive.h"
 #include "net/json.h"
 #include "net/net_sys.h"
+#include "repo_files.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -84,15 +85,7 @@ std::string readAll(const std::string& path) {
 
 // The folder of the server's PGN fixtures ("" when it cannot be found).
 std::string fixtureFolder() {
-    std::vector<std::string> roots;
-    if (const char* env = std::getenv("SCACELITH_SOURCE_DIR")) roots.push_back(std::string(env) + "/");
-    roots.push_back("");
-    roots.push_back("../");
-    roots.push_back("../../");
-    const std::string exe = net::sys::exeDirectory();
-    roots.push_back(exe + "../");
-    roots.push_back(exe + "../../");
-    for (const std::string& r : roots) {
+    for (const std::string& r : repoRoots()) {
         const std::string dir = r + "tests/data/server-pgn";
         if (!archive::list(dir).empty()) return dir;
     }
