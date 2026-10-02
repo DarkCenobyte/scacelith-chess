@@ -710,10 +710,15 @@ void Animator::Impl::planPutPen(const WriteTask& t, float start, float T) {
     mo.start = start;
     FingerPose open;
     penPutSegments(Fc, from, tA, mo, &open);
-    HandSample s = mo.segs.back().sample(tA);
+    mo.segs.push_back(penLetGo(mo.segs.back().sample(tA), T - tA, open));
+    h.motion = mo;
+    wr.events.push_back({start + tA, EventType::PenPut, WActPut, false});
+}
+
+Segment Animator::Impl::penLetGo(const HandSample& s, float T, const FingerPose& open) const {
     // Let go, lift off the pen and back to the resting spot.
-    const HandSample& r = h.rest;
-    Segment b = makeSeg(s, T - tA, r.p, vec3(0), r.q, r.f);
+    const HandSample& r = hands[0].rest;
+    Segment b = makeSeg(s, T, r.p, vec3(0), r.q, r.f);
     b.hs = 0.22f;
     b.arcH = 0.025f;
     b.arcPeak = 0.35f;
@@ -721,9 +726,7 @@ void Animator::Impl::planPutPen(const WriteTask& t, float start, float T) {
     b.fing.add(0.0f, s.f);
     b.fing.add(0.25f, open);
     b.fing.add(1.0f, r.f);
-    mo.segs.push_back(b);
-    h.motion = mo;
-    wr.events.push_back({start + tA, EventType::PenPut, WActPut, false});
+    return b;
 }
 
 void Animator::Impl::planWrite(const WriteTask& t, float start, float T) {
@@ -1179,7 +1182,8 @@ void Animator::Impl::writingSpine(SpineParams& sp, const HandSample& hl) {
         sp.flex += 0.045f * w;
         sp.twist += 0.06f * w;
     }
-    if (!wr.running && !wr.penHeld && !(mirrored && running && cur.type == TaskType::Handshake)) return;
+    // (A handshake has the hand until wr.suspendUntil when cut short: it is on its way back.)
+    if (!wr.running && !wr.penHeld && !(mirrored && running && cur.type == TaskType::Handshake) && time >= wr.suspendUntil) return;
     Pose tmp;
     const float comfy = 0.84f * (L1 + L2);
     for (int it = 0; it < 3; ++it) {

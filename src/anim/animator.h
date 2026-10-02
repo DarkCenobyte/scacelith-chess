@@ -315,7 +315,10 @@ public:
     // Drops the pending tasks and cuts the running one short, without its remaining events (a
     // handshake cut short leaves its partner to finish alone): the playing hand lets go of what it
     // holds where it is, and the game puts those pieces back itself. The next task starts from
-    // wherever the hand is (queue one, a Retract at least).
+    // wherever the hand is (queue one, a Retract at least). A handshake cut short no longer draws
+    // the eyes; a left-handed player's writing hand, which shakes, goes back to its rest within
+    // Timing::Retract (a pen it is laying down is laid down first, PenPut at its own instant) and
+    // the queued writing tasks wait until it is there.
     void cancelTasks();
     // Running task remainder + pending durations, including the waits for their notBefore.
     float remainingTime() const;

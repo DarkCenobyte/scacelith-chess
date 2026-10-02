@@ -1497,6 +1497,9 @@ struct Animator::Impl {
     TablePinch tablePinch(const mat4& frameC, float aperture);
     // One segment laying the held pen on the table at frameC (character space), pinched at the end.
     void penPutSegments(const mat4& frameC, const HandSample& from, float T, Motion& mo, FingerPose* openOut);
+    // The one after it: lets go of the pen (pinched at s; 'open': the fingers letting go), lifts off
+    // it and goes back to the resting spot in T.
+    Segment penLetGo(const HandSample& s, float T, const FingerPose& open) const;
     struct Writing {
         std::deque<WriteTask> queue;
         bool running = false;
@@ -1542,6 +1545,11 @@ struct Animator::Impl {
     // the pen down if it holds it).
     void planHandshake(const Task& t, float start, float T, HandSample from, Motion& mo);
     bool shakeTookPut = false;      // the handshake took over a queued PutPen
+    Segment shakeRetract(const HandSample& s, float T);   // the shaking hand from s back to its rest
+    // cancelTasks() during a handshake (see cutHandshake). shakeCutW: the torso's blend on the
+    // shaking hand then (left-handed player), faded out until wr.suspendUntil.
+    void cutHandshake();
+    float shakeCutW = 0.0f;
     void writingSpine(SpineParams& sp, const HandSample& hl);
 };
 

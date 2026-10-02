@@ -447,7 +447,6 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
 // mirror image of the right-handed one. A writing hand still holding the pen lays it down first.
 void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSample from, Motion& mo) {
     const Side R = shakeSide();
-    Hand& h = shakeHand();
     const float tableC = layout::TABLE_TOP_Y - pelvisWorld.y;
     partner = t.partner;
     shakeStart = start;
@@ -547,22 +546,65 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
     mo.segs.push_back(d);
     s = d.sample(d.T);
     // 5. back to rest
-    HandSample r = h.rest;
-    Segment e = makeSeg(s, T - t4, r.p, vec3(0), r.q, r.f);
+    mo.segs.push_back(shakeRetract(s, T - t4));
+    curEvents.push_back({start + t2, EventType::HandshakeClasp, ActNone, false});
+    curEvents.push_back({start + t3, EventType::HandshakeRelease, ActNone, false});
+    curTargetWorld = cW;
+}
+
+Segment Animator::Impl::shakeRetract(const HandSample& s, float T) {
+    const HandSample r = shakeHand().rest;
+    Segment e = makeSeg(s, T, r.p, vec3(0), r.q, r.f);
     e.arcH = 0.03f;
     e.arcPeak = 0.35f;
     e.rot.keys.clear();
     e.rot.add(0.0f, s.q);
     e.rot.add(0.80f, r.q);
-    clearPath(e, s, poseRelaxed(), tableC, R);
+    clearPath(e, s, poseRelaxed(), layout::TABLE_TOP_Y - pelvisWorld.y, shakeSide());
     e.fing.keys.clear();
     e.fing.add(0.0f, s.f);
     e.fing.add(0.4f, poseRelaxed());
     e.fing.add(1.0f, r.f);
-    mo.segs.push_back(e);
-    curEvents.push_back({start + t2, EventType::HandshakeClasp, ActNone, false});
-    curEvents.push_back({start + t3, EventType::HandshakeRelease, ActNone, false});
-    curTargetWorld = cW;
+    return e;
+}
+
+// cancelTasks() during a handshake: the eyes leave the partner at once. A right-handed player's
+// shaking hand is the playing one, which goes on with the next task. A left-handed player's is its
+// writing hand: it goes back to its rest within Timing::Retract, and the queued writing tasks wait
+// until it is there (wr.suspendUntil), while the torso lets go of it. A pen it is laying down is
+// laid down first, as the handshake planned it, and PenPut fires at its own instant: the rest of
+// that becomes a PutPen of the writing hand.
+void Animator::Impl::cutHandshake() {
+    shakeStart = -100.0f;
+    if (!mirrored) return;
+    const float u = time - curStart;
+    shakeCutW = smoothstep(0.0f, 0.3f, u) * (1.0f - smoothstep(curT - 0.3f, curT, u));
+    Hand& h = left();
+    const TimedEvent* put = nullptr;
+    for (const TimedEvent& e : curEvents)
+        if (e.action == ActPutPen && !e.done) put = &e;
+    Motion mo;
+    if (!put) {
+        mo.start = time;
+        mo.segs.push_back(shakeRetract(h.motion.sample(time), Timing::Retract));
+        h.motion = mo;
+        wr.suspendUntil = time + Timing::Retract;
+        return;
+    }
+    const Segment laying = h.motion.segs.front();   // the pen put down (planHandshake)
+    mo.start = h.motion.start;
+    mo.segs.push_back(laying);
+    mo.segs.push_back(penLetGo(laying.sample(laying.T), Timing::Retract, tablePinch(toCharM(shakePutFrame), 0.8f).open));
+    h.motion = mo;
+    wr.suspendUntil = put->t + Timing::Retract;
+    wr.cur = WriteTask();
+    wr.cur.type = WriteTaskType::PutPen;
+    wr.cur.frame = shakePutFrame;
+    wr.running = true;
+    wr.start = time;
+    wr.T = wr.suspendUntil - time;
+    wr.events.clear();
+    wr.events.push_back({put->t, EventType::PenPut, WActPut, false});
 }
 
 // Resting spots clear of the pieces on the table, including the one the current task is about to
@@ -755,10 +797,14 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
     // leans in a little more, a touch further on the stressed syllables.
     const float flex = thinkLean + 0.2f * lean + 0.022f * speechEnv + 0.02f * speechStress;
     SpineParams sp = solveSpine(pose, hr.p, flex, idleFlex, idleTwist, idleSide);
-    if (mirrored && running && cur.type == TaskType::Handshake) {
+    const bool shaking = mirrored && running && cur.type == TaskType::Handshake;
+    if (shaking || (mirrored && t < wr.suspendUntil)) {
         // Left-handed player shaking hands with the solver's left hand: the torso follows that
-        // hand the way it follows the right one (mirror image of the solve), blended in and out.
-        const float u = t - curStart, w = smoothstep(0.0f, 0.3f, u) * (1.0f - smoothstep(curT - 0.3f, curT, u));
+        // hand the way it follows the right one (mirror image of the solve), blended in and out
+        // (cut short: out while the hand goes back, see cutHandshake).
+        const float u = t - curStart;
+        const float w = shaking ? smoothstep(0.0f, 0.3f, u) * (1.0f - smoothstep(curT - 0.3f, curT, u))
+                                : shakeCutW * (1.0f - smoothstep(wr.suspendUntil - Timing::Retract, wr.suspendUntil, t));
         if (w > 0.0f) {
             SpineParams sl = solveSpine(pose, mirrorX(hlMotion.p), flex, idleFlex, -idleTwist, -idleSide);
             sp.flex = lerp(sp.flex, sl.flex, w);
@@ -1343,6 +1389,7 @@ bool Animator::busy() const { return impl_->running || !impl_->queue.empty(); }
 bool Animator::runningTask(TaskType type) const { return impl_->running && impl_->cur.type == type; }
 void Animator::cancelTasks() {
     Impl& I = *impl_;
+    if (I.running && I.cur.type == TaskType::Handshake) I.cutHandshake();
     I.queue.clear();
     I.running = false;
     I.curEvents.clear();
