@@ -1,4 +1,5 @@
 #include "ini.h"
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -101,7 +102,7 @@ float IniFile::getFloat(const std::string& key, float def) const {
     if (s.empty()) return def;
     char* end = nullptr;
     float v = std::strtof(s.c_str(), &end);
-    return end == s.c_str() ? def : v;
+    return end == s.c_str() || !std::isfinite(v) ? def : v;   // "nan", "inf", "1e999": def
 }
 bool IniFile::getBool(const std::string& key, bool def) const {
     std::string s = getString(key);

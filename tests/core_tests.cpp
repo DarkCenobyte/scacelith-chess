@@ -55,6 +55,21 @@ TEST(ini_value_newlines_stay_on_one_line) {
     std::remove("/tmp/scacelith_ini_lines.ini");
 }
 
+// Numbers that are not finite read as the default (a NaN render scale passes std::clamp).
+TEST(ini_floats_not_finite) {
+    IniFile a;
+    a.set("a.nan", "nan");
+    a.set("a.inf", "-inf");
+    a.set("a.huge", "1e999");
+    a.set("a.text", "x");
+    a.set("a.ok", "1.5");
+    CHECK_EQ(a.getFloat("a.nan", 1.0f), 1.0f);
+    CHECK_EQ(a.getFloat("a.inf", 1.0f), 1.0f);
+    CHECK_EQ(a.getFloat("a.huge", 1.0f), 1.0f);
+    CHECK_EQ(a.getFloat("a.text", 1.0f), 1.0f);
+    CHECK_EQ(a.getFloat("a.ok", 1.0f), 1.5f);
+}
+
 #ifndef _WIN32
 // save() writes a new file and renames it over the old one, which is never truncated in place (a
 // crash midway would leave it empty): a reader that opened the old file still reads it whole.
