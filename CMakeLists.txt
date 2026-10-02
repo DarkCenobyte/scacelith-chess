@@ -42,6 +42,11 @@ if(SCACELITH_STOCKFISH)
     if(NOT EXISTS ${ROOT}/third_party/stockfish/CMakeLists.txt)
         message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but third_party/stockfish is missing (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
     endif()
+    # The variants take GCC-only options and are isolated with GNU binutils (their isolate.cmake):
+    # another compiler would fail deep in the build instead of here.
+    if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but the compiler is ${CMAKE_CXX_COMPILER_ID}: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
+    endif()
     add_subdirectory(third_party/stockfish)
 endif()
 
