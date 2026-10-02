@@ -299,8 +299,7 @@ float Animator::Impl::armStrainSide(Side s, vec3 wristC, quat q) {
     applySpine(tmp, sp);
     fkChain(tmp, Pelvis, Spine2);
     solveArm(tmp, s, wristC, q);
-    float soft = std::max(0.0f, std::fabs(lastFlex) - 1.10f) + std::max(0.0f, lastDev - 0.35f) + std::max(0.0f, -lastDev - 0.55f) +
-                 std::max(0.0f, std::fabs(lastPron) - 1.60f);
+    float soft = softWristStrain(lastFlex, lastDev, lastPron);
     float r = wristClamp + pronClamp + reachShort * 10.0f + 0.5f * soft;
     diagSide = keep;
     reachShort = wristClamp = pronClamp = 0;

@@ -440,28 +440,21 @@ struct Track {
     std::vector<Key> keys;
     void add(float u, const T& v) { keys.push_back({u, v}); }
 };
-inline quat evalTrack(const Track<quat>& tr, float u) {
+// Track value at u: 'lerpFn' between the keys around u (minimum jerk), empty() without keys.
+template <class T, class Empty, class Lerp>
+inline T evalTrack(const Track<T>& tr, float u, Empty empty, Lerp lerpFn) {
     const auto& k = tr.keys;
-    if (k.empty()) return quat();
+    if (k.empty()) return empty();
     if (u <= k.front().u) return k.front().v;
     for (size_t i = 1; i < k.size(); ++i)
         if (u <= k[i].u) {
             float s = (u - k[i - 1].u) / std::max(1e-6f, k[i].u - k[i - 1].u);
-            return qslerp(k[i - 1].v, k[i].v, minJerk(s));
+            return lerpFn(k[i - 1].v, k[i].v, minJerk(s));
         }
     return k.back().v;
 }
-inline FingerPose evalTrack(const Track<FingerPose>& tr, float u) {
-    const auto& k = tr.keys;
-    if (k.empty()) return poseRelaxed();
-    if (u <= k.front().u) return k.front().v;
-    for (size_t i = 1; i < k.size(); ++i)
-        if (u <= k[i].u) {
-            float s = (u - k[i - 1].u) / std::max(1e-6f, k[i].u - k[i - 1].u);
-            return fpLerp(k[i - 1].v, k[i].v, minJerk(s));
-        }
-    return k.back().v;
-}
+inline quat evalTrack(const Track<quat>& tr, float u) { return evalTrack(tr, u, [] { return quat(); }, qslerp); }
+inline FingerPose evalTrack(const Track<FingerPose>& tr, float u) { return evalTrack(tr, u, poseRelaxed, fpLerp); }
 
 // Pen frame (tip at the origin, +Y along the barrel to the back end) in the hand bone's frame.
 struct PenPose {
@@ -469,17 +462,7 @@ struct PenPose {
     vec3 p{0, 0, 0};
 };
 inline PenPose penLerp(const PenPose& a, const PenPose& b, float t) { return {qslerp(a.q, b.q, t), lerp(a.p, b.p, t)}; }
-inline PenPose evalTrack(const Track<PenPose>& tr, float u) {
-    const auto& k = tr.keys;
-    if (k.empty()) return PenPose();
-    if (u <= k.front().u) return k.front().v;
-    for (size_t i = 1; i < k.size(); ++i)
-        if (u <= k[i].u) {
-            float s = (u - k[i - 1].u) / std::max(1e-6f, k[i].u - k[i - 1].u);
-            return penLerp(k[i - 1].v, k[i].v, minJerk(s));
-        }
-    return k.back().v;
-}
+inline PenPose evalTrack(const Track<PenPose>& tr, float u) { return evalTrack(tr, u, [] { return PenPose(); }, penLerp); }
 
 struct HandSample {
     vec3 p{0, 0, 0}, v{0, 0, 0}, a{0, 0, 0};   // wrist (character space)
@@ -702,6 +685,12 @@ inline TraceSchedule traceSchedule(const std::vector<vec3>& path, float T) {
 struct SpineParams {
     float flex = 0, twist = 0, side = 0;   // radians: forward flexion, twist to the left, bend to the right
 };
+// Soft strain penalty of an arm solve near the wrist and forearm limits (wrist flexion and
+// deviation, forearm pronation; radians).
+inline float softWristStrain(float flex, float dev, float pron) {
+    return std::max(0.0f, std::fabs(flex) - 1.10f) + std::max(0.0f, dev - 0.35f) + std::max(0.0f, -dev - 0.55f) +
+           std::max(0.0f, std::fabs(pron) - 1.60f);
+}
 
 }  // namespace detail
 using namespace detail;
@@ -1258,8 +1247,7 @@ struct Animator::Impl {
         fkChain(tmp, Pelvis, Spine2);
         solveArm(tmp, Side::Right, wristC, q);
         if (achieved) *achieved = rotOf(G[HandR]);
-        float soft = std::max(0.0f, std::fabs(lastFlex) - 1.10f) + std::max(0.0f, lastDev - 0.35f) + std::max(0.0f, -lastDev - 0.55f) +
-                     std::max(0.0f, std::fabs(lastPron) - 1.60f);
+        float soft = softWristStrain(lastFlex, lastDev, lastPron);
         return wristClamp + pronClamp + reachShort * 10.0f + 0.5f * soft;
     }
     // Grip orientation for piece 'pieceId' pinched at g: the natural one, turned and pitched
