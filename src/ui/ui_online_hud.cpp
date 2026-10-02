@@ -118,12 +118,14 @@ OnlineHudAction onlineHud(const OnlineHud& hud) {
         gfx::text(T("online.draw.card_text"), r.cx(), r.y + 82.0f, ts);
         float bw = 170.0f, bh = 48.0f, gap = 20.0f;
         float y = r.b() - 26.0f - bh;
+        // Answers only once the card is readable: a press as it appears was aimed at something else.
+        bool ready = da.v[0] >= 0.9f;
         im::pushId("drawcard");
         if (im::button(L("online.draw.decline"), im::flip(r, Rect(r.cx() - gap * 0.5f - bw, y, bw, bh)), im::ButtonKind::Secondary, true,
-                       im::ITEM_MOUSE_ONLY))
+                       im::ITEM_MOUSE_ONLY) && ready)
             act = OnlineHudAction::DeclineDraw;
         if (im::button(L("online.draw.accept"), im::flip(r, Rect(r.cx() + gap * 0.5f, y, bw, bh)), im::ButtonKind::Primary, true,
-                       im::ITEM_MOUSE_ONLY))
+                       im::ITEM_MOUSE_ONLY) && ready)
             act = OnlineHudAction::AcceptDraw;
         im::popId();
         if (!hud.drawOffer) im::popBlock();
@@ -320,8 +322,10 @@ void onlineChallenges() {
                                  true, im::ITEM_MOUSE_ONLY);
         im::popId();
         gfx::popAlpha();
-        if (accept) s.answerChallenge(c.id, true);
-        else if (decline) s.answerChallenge(c.id, false);
+        // Answers only once the card is readable: a press as it appears was aimed at another card.
+        bool ready = a.v[0] >= 0.9f;
+        if (ready && accept) s.answerChallenge(c.id, true);
+        else if (ready && decline) s.answerChallenge(c.id, false);
     }
     gfx::setLayer(prev);
 }
