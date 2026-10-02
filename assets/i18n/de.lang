@@ -1175,7 +1175,8 @@ gif.wait.seconds = {0} Sekunde|{0} Sekunden
 gif.wait.minutes = {0} Minute|{0} Minuten
 gif.wait.both = {0} und {1}
 
-# ---- Startup errors (src/main.cpp: message boxes before the game starts; {0} = the log file) ----
-error.opengl = OpenGL 4.6 konnte nicht gestartet werden. Bitte aktualisieren Sie Ihren Grafiktreiber.\n\nEinzelheiten stehen in der Protokolldatei: {0}
-error.renderer = Der Renderer konnte nicht gestartet werden.\n\nEinzelheiten stehen in der Protokolldatei: {0}
-error.scene = Die Szene konnte nicht geladen werden.\n\nEinzelheiten stehen in der Protokolldatei: {0}
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = OpenGL 4.6 konnte nicht gestartet werden. Bitte aktualisieren Sie Ihren Grafiktreiber.
+error.renderer = Der Renderer konnte nicht gestartet werden.
+error.scene = Die Szene konnte nicht geladen werden.
+error.log_file = Einzelheiten stehen in der Protokolldatei: {0}

@@ -1176,7 +1176,8 @@ gif.wait.seconds = {0} seconde|{0} secondes
 gif.wait.minutes = {0} minute|{0} minutes
 gif.wait.both = {0} et {1}
 
-# ---- Startup errors (src/main.cpp: message boxes before the game starts; {0} = the log file) ----
-error.opengl = Impossible de démarrer OpenGL 4.6. Veuillez mettre à jour le pilote de votre carte graphique.\n\nLes détails se trouvent dans le fichier journal : {0}
-error.renderer = Le moteur de rendu n’a pas pu démarrer.\n\nLes détails se trouvent dans le fichier journal : {0}
-error.scene = La scène n’a pas pu être chargée.\n\nLes détails se trouvent dans le fichier journal : {0}
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Impossible de démarrer OpenGL 4.6. Veuillez mettre à jour le pilote de votre carte graphique.
+error.renderer = Le moteur de rendu n’a pas pu démarrer.
+error.scene = La scène n’a pas pu être chargée.
+error.log_file = Les détails se trouvent dans le fichier journal : {0}

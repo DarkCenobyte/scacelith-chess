@@ -61,9 +61,12 @@ static std::string timestamp() {
 }
 
 // The one message box of a failure before the game can show anything, in the player's language
-// (Settings::load has set it), naming the log file that holds the details.
+// (Settings::load has set it), naming the log file that holds the details unless none could be
+// opened (logPath "").
 static void startupError(const char* key, const std::string& logPath) {
-    plat::messageBox("Scacelith", i18n::trf(key, {i18n::ltr(logPath)}).c_str());
+    std::string text = i18n::tr(key);
+    if (!logPath.empty()) text += "\n\n" + i18n::trf("error.log_file", {i18n::ltr(logPath)});
+    plat::messageBox("Scacelith", text.c_str());
 }
 
 static int runApp(std::vector<std::string> args) {
@@ -74,7 +77,7 @@ static int runApp(std::vector<std::string> args) {
     std::string logPath = exeDir + "scacelith.log";
     if (!logx::init(logPath.c_str())) {
         logPath = plat::userDataDirectory() + "scacelith.log";
-        logx::init(logPath.c_str());
+        if (!logx::init(logPath.c_str())) logPath.clear();
     }
     LOGI("Scacelith " SCACELITH_VERSION " starting");
 

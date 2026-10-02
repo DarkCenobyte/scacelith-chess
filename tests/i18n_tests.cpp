@@ -210,16 +210,16 @@ TEST(i18n_coach_texts) {
 }
 
 // The three failures before the game starts (src/main.cpp: OpenGL 4.6, the renderer, the scene)
-// are told in the player's language, naming the log file.
+// are told in the player's language, followed by the log file's name (error.log_file).
 TEST(i18n_startup_errors) {
     const std::string log = "C:\\Games\\Scacelith\\scacelith.log";
     for (const i18n::Language& lang : i18n::languages()) {
         CHECK(i18n::setLanguage(lang.code));
-        for (const char* key : {"error.opengl", "error.renderer", "error.scene"}) {
+        for (const char* key : {"error.opengl", "error.renderer", "error.scene", "error.log_file"}) {
             CHECK(i18n::has(key));
-            CHECK(i18n::trf(key, {log}).find(log) != std::string::npos);
             if (std::string(lang.code) != "en") CHECK(std::string(i18n::tr(key)) != i18n::english(key));
         }
+        CHECK(i18n::trf("error.log_file", {log}).find(log) != std::string::npos);
     }
     i18n::setLanguage("en");
 }

@@ -435,10 +435,8 @@ std::string userDataDirectory() { return net::sys::userDataDirectory(); }
 std::string appDataDirectory() { return net::sys::appDataDirectory(); }
 
 void messageBox(const char* title, const char* text) {
-    wchar_t wt[256], wx[2048];
-    MultiByteToWideChar(CP_UTF8, 0, title, -1, wt, 256);
-    MultiByteToWideChar(CP_UTF8, 0, text, -1, wx, 2048);
-    MessageBoxW(g_hwnd, wx, wt, MB_OK | MB_ICONERROR);
+    // Any length: the text may name a path of up to 32767 characters.
+    MessageBoxW(g_hwnd, net::sys::widen(text).c_str(), net::sys::widen(title).c_str(), MB_OK | MB_ICONERROR);
 }
 
 bool openClipboard(void* owner) {
