@@ -1976,12 +1976,44 @@ TEST(tts_synthesizer_output) {
     o.seed = 5;
     std::vector<float> two = s->synthesize(std::string(200, 'a') + ". " + std::string(150, 'b') + ".", "en", o);
     CHECK_EQ(s->lastStats().chunks, 2);
+    size_t run = 0, longest = 0, longestEnd = 0;
+    for (size_t i = 0; i < two.size(); ++i) {
+        run = two[i] == 0.0f ? run + 1 : 0;
+        if (run > longest) {
+            longest = run;
+            longestEnd = i + 1;
+        }
+    }
+    CHECK(longest >= 13230 && longestEnd - longest > 441 && longestEnd + 441 < two.size());
     // Cancelled before starting: nothing.
     std::atomic<bool> cancel{true};
     CHECK(s->synthesize("Hello.", "en", o, &cancel).empty());
-    // Unknown language: English; unsupported characters are dropped and counted.
+    // Unknown language: English; known CJK characters are kept, unsupported ones (U+E000, a
+    // private-use code point) are dropped and counted.
     CHECK(!s->synthesize("Hello 世.", "zz", o).empty());
-    CHECK(s->lastStats().droppedCharacters >= 0);
+    CHECK_EQ(s->lastStats().droppedCharacters, 0);
+    CHECK(!s->synthesize("Hello \xEE\x80\x80.", "zz", o).empty());
+    CHECK_EQ(s->lastStats().droppedCharacters, 1);
+}
+
+// Non-finite samples (a damaged model) become silence instead of skipping the loudness and peak
+// normalisation and reaching the mixer.
+TEST(tts_finish_pcm_non_finite) {
+    std::vector<float> pcm(44100);
+    for (size_t i = 0; i < pcm.size(); ++i) pcm[i] = 0.5f * std::sin(0.05f * float(i));
+    pcm[1000] = std::nanf("");
+    pcm[20000] = INFINITY;
+    pcm[30000] = -INFINITY;
+    tts::finishPcm(pcm);
+    bool finite = true;
+    float peak = 0.0f;
+    for (float v : pcm) {
+        finite = finite && std::isfinite(v);
+        peak = std::max(peak, std::fabs(v));
+    }
+    CHECK(finite);
+    CHECK(pcm[1000] == 0.0f && pcm[20000] == 0.0f);
+    CHECK(peak > 0.1f && peak <= 0.8913f);
 }
 
 TEST(tts_worker) {

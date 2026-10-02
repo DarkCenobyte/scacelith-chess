@@ -23,6 +23,9 @@ struct Blob {
     size_t size = 0;
 };
 
+// The loudness normalisation and fades of a synthesized line (tts.cpp).
+void finishPcm(std::vector<float>& pcm);
+
 class Engine {
 public:
     static const char* const kFiles[kFileCount];

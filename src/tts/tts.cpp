@@ -13,12 +13,13 @@ namespace tts {
 namespace {
 
 constexpr int kDefaultVoice = 7;              // M3 in voice.bin (F1..F5, M1..M5), chosen by listening
-constexpr int kSilenceSamples = 13230;        // 0.3 s between chunks (official helper)
+constexpr int kSilenceSamples = kSampleRate * 3 / 10;   // 0.3 s between chunks (official helper)
 constexpr float kMinChunkSeconds = 0.1f;      // shortest chunk (sherpa-onnx kMinDuration)
 constexpr int64_t kMaxLatentFrames = 10000;   // longest chunk (sherpa-onnx kMaxLatentLen)
 constexpr float kTargetRms = 0.1f;            // -20 dBFS
 constexpr float kPeakLimit = 0.891251f;       // -1 dBFS
-constexpr int kFadeSamples = 441;             // 10 ms
+constexpr int kFadeSamples = kSampleRate / 100;         // 10 ms
+constexpr size_t kLoudnessBlock = kSampleRate / 50;     // 20 ms
 
 using Clock = std::chrono::steady_clock;
 double since(Clock::time_point t) { return std::chrono::duration<double>(Clock::now() - t).count(); }
@@ -67,15 +68,20 @@ uint32_t textSeed(const std::string& text, const std::string& lang, int voice) {
     return h ? h : 1u;
 }
 
+}  // namespace
+
 // Loudness: gain to about -20 dBFS RMS over the active part (20 ms blocks within 40 dB of the
-// loudest block), capped so the peak stays at -1 dBFS; then 10 ms raised-cosine fades.
+// loudest block), capped so the peak stays at -1 dBFS; then 10 ms raised-cosine fades. A
+// non-finite sample (a damaged model) becomes silence first: it would skip the measures and reach
+// the mixer.
 void finishPcm(std::vector<float>& pcm) {
     if (pcm.empty()) return;
-    const size_t block = 882;
+    for (float& v : pcm)
+        if (!std::isfinite(v)) v = 0.0f;
     std::vector<double> ms;
     double loudest = 0.0;
-    for (size_t b = 0; b < pcm.size(); b += block) {
-        size_t e = std::min(pcm.size(), b + block);
+    for (size_t b = 0; b < pcm.size(); b += kLoudnessBlock) {
+        size_t e = std::min(pcm.size(), b + kLoudnessBlock);
         double s = 0.0;
         for (size_t i = b; i < e; ++i) s += double(pcm[i]) * pcm[i];
         ms.push_back(s / double(e - b));
@@ -102,6 +108,8 @@ void finishPcm(std::vector<float>& pcm) {
         pcm[pcm.size() - 1 - i] *= w;
     }
 }
+
+namespace {
 
 std::string modelTag(const std::string& lang) {
     std::string l = lang.substr(0, lang.find_first_of("-_"));
@@ -205,7 +213,11 @@ std::vector<float> Synthesizer::synthesize(const std::string& textIn, const std:
         if (!eng.duration(ids, voice, ctx, &seconds, &err, cancel)) break;
         stats_.duration += since(t);
         seconds = std::max(seconds / speed, kMinChunkSeconds);
-        int64_t wavLen = int64_t(double(seconds) * kSampleRate);
+        if (!std::isfinite(seconds)) {
+            err = "duration predictor: non-finite duration";
+            break;
+        }
+        int64_t wavLen = int64_t(std::min(double(seconds) * kSampleRate, double(kMaxLatentFrames) * kFrameSamples));
         int64_t frames = std::min<int64_t>((wavLen + kFrameSamples - 1) / kFrameSamples, kMaxLatentFrames);
         wavLen = std::min<int64_t>(wavLen, frames * kFrameSamples);
         Tensor noise = Tensor::alloc(DType::F32, {1, kLatentChannels, frames});
