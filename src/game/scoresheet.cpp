@@ -51,10 +51,6 @@ struct InkGlyph {
     float distScale = 1;  // page mm per unit of atlas value
     float dilation = 0;   // mm
     float pressure = 1;
-    // The atlas glyph, looked up again when the atlas was cleared since (refreshInk).
-    int face = 0;
-    uint32_t cp = 0;      // the codepoint rasterised ('?' for a substitute)
-    int gen = -1;         // atlas generation of uv0 / uv1; -1: the glyph had no quad yet
 };
 
 struct Entry {
@@ -218,27 +214,6 @@ void glyphQuad(std::vector<InkVertex>& out, const InkGlyph& g, float ly0, float 
     pushQuad(out, p, uv, vec4(0.0f, g.distScale, g.dilation, g.pressure), p1);
 }
 
-// Looks the glyphs of 'ink' up again where an atlas clear moved them (font::atlasGeneration()) or
-// they had no quad when written. False while one still has none: the atlas is full until the next
-// frame's clear, and the ink waits for it.
-bool refreshInk(std::vector<InkGlyph>& ink) {
-    const int gen = font::atlasGeneration();
-    bool ready = true;
-    for (InkGlyph& g : ink) {
-        if (g.gen == gen || g.q1.x <= g.q0.x) continue;  // current, or a blank (nothing to draw)
-        const font::Glyph* G = font::glyph(g.face, g.cp);
-        if (!G) continue;
-        if (!G->hasQuad) {
-            ready = false;
-            continue;
-        }
-        g.uv0 = vec2(G->u0, G->v0);
-        g.uv1 = vec2(G->u1, G->v1);
-        g.gen = gen;
-    }
-    return ready;
-}
-
 void printedFormVertices(int page, std::vector<InkVertex>& out) {
     Form f = printedForm(page);
     const float margin = (SPREAD + 1.0f) / DENSITY;
@@ -350,7 +325,6 @@ struct Scoresheet::Impl {
     void renderLayer(int layer, int page, bool full) {
         std::vector<InkVertex> v;
         if (full) printedFormVertices(page, v);
-        font::flushUploads();  // the form's glyphs packed just now (after an atlas clear) go up first
         const std::vector<InkGlyph>& ink = full ? inkOf(page) : layerPending[layer];
         for (const InkGlyph& g : ink) glyphQuad(v, g, -1e9f, 1e9f, vec4(0.0f));
         layerPending[layer].clear();
@@ -605,9 +579,6 @@ std::vector<InkGlyph> handwrite(const std::string& text, const WriteBox& box, in
         ig.dilation = dil;
         h = mix32(h, gi.cp);
         ig.pressure = 0.72f + 0.28f * unit(h);
-        ig.face = pg.face;
-        ig.cp = font::glyph(pg.face, pg.cp) == pg.glyph ? pg.cp : uint32_t('?');  // or a '?' stand-in
-        ig.gen = G.hasQuad ? font::atlasGeneration() : -1;
         out.push_back(ig);
     }
     return out;
@@ -834,23 +805,13 @@ void Scoresheet::update() {
     }
     bool work = I.layerPage[page_ % 2] != page_ || I.layerPage[(page_ + 1) % 2] != page_ + 1 ||
                 !I.layerPending[0].empty() || !I.layerPending[1].empty() || (!I.entries.empty() && !I.entryReady);
-    // The ink about to be drawn, with its atlas quads up to date; a layer or an entry whose ink
-    // is not all packed yet waits for a later frame.
-    bool inkReady[2] = {true, true};
-    for (int p : {page_, page_ + 1}) {
-        int L = p % 2;
-        if (I.layerPage[L] != p) inkReady[L] = refreshInk(I.inkOf(p));
-        else if (!I.layerPending[L].empty()) inkReady[L] = refreshInk(I.layerPending[L]);
-    }
-    bool entryInkReady = I.entries.empty() || I.entryReady || refreshInk(I.entries.front().glyphs);
     if (work) font::flushUploads();
     for (int p : {page_, page_ + 1}) {
         int L = p % 2;
-        if (!inkReady[L]) continue;
         if (I.layerPage[L] != p) I.renderLayer(L, p, true);
         else if (!I.layerPending[L].empty()) I.renderLayer(L, p, false);
     }
-    if (!I.entries.empty() && !I.entryReady && entryInkReady) {
+    if (!I.entries.empty() && !I.entryReady) {
         I.renderEntry(I.entries.front());
         I.entryReady = true;
     }
