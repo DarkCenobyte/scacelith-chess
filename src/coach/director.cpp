@@ -538,7 +538,7 @@ struct Director::Impl {
             run.lineStarted = true;
             const bool voiceOk = stage->voiceAvailable() && run.voiced;
             if (subtitlesShown(config.subtitles, config.uiLanguage, speechLang(), voiceOk))
-                stage->showSubtitle(s.written.text, run.voiced ? run.duration : stage->readingTime(s.written.text));
+                stage->showSubtitle(s.written.text, run.duration);
         }
         stage->look(b.look, targetOf(b));
 
