@@ -4,6 +4,7 @@
 // outside the flood limit).
 #include "test.h"
 #include "chess/chess.h"
+#include "core/log.h"
 #include "net/direct_authority.h"
 #include "net/direct_crypto.h"
 #include "net/direct_match.h"
@@ -2214,6 +2215,55 @@ bool sendWelcome(RawHost& raw, const direct::Authority& auth) {
     return raw.send(w);
 }
 
+// Hosts a match and joins it with a guest written by hand (its Hello, then the host's Welcome and
+// snapshot).
+bool joinRaw(Peer& host, RawGuest& raw, P::GameSnapshot& snap) {
+    Peer nobody;
+    host.dm.host(hostOptions(300, 0, 1, "Alice"));
+    if (!waitUntil(host, nobody, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; })) return false;
+    DirectInvite inv = host.dm.invite();
+    P::Hello hello;
+    hello.proto = P::kProtocolVersion;
+    hello.schema = P::kSchemaHash;
+    hello.client = "Scacelith test";
+    hello.token = "direct:Raw      ";
+    P::Welcome w;
+    return raw.connect(inv.port, inv.code) && raw.send(hello) && raw.waitFor(w, 5000) && raw.waitFor(snap, 5000);
+}
+
+// Copies the log while it lives (logx writes every line to this file too, flushed at once).
+struct LogCapture {
+    const char* path = "/tmp/scacelith_direct_log_test.txt";
+    LogCapture() { logx::init(path); }
+    ~LogCapture() {
+        logx::shutdown();
+        std::remove(path);
+    }
+    LogCapture(const LogCapture&) = delete;
+    LogCapture& operator=(const LogCapture&) = delete;
+    // Lines written so far that contain 'text'.
+    int count(const char* text) const {
+        int n = 0;
+        if (FILE* f = std::fopen(path, "rb")) {
+            char line[4300];
+            while (std::fgets(line, sizeof line, f)) n += std::strstr(line, text) != nullptr;
+            std::fclose(f);
+        }
+        return n;
+    }
+};
+
+// Milliseconds the host takes to answer its own Resync with a snapshot.
+double hostResyncMs(Peer& host) {
+    Peer nobody;
+    host.drain();
+    const int before = host.count(Event::Kind::GameSnapshot);
+    auto t0 = std::chrono::steady_clock::now();
+    host.dm.requestResync();
+    waitUntil(host, nobody, [&] { return host.count(Event::Kind::GameSnapshot) > before; }, 3000);
+    return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+}
+
 }  // namespace
 
 TEST(direct_guest_drops_a_flooding_host) {
@@ -2244,4 +2294,38 @@ TEST(direct_guest_drops_a_flooding_host) {
     CHECK(guest.count(Event::Kind::ServerError) > 1000);
     CHECK(guest.count(Event::Kind::ServerError) <= 4096);
     CHECK(guest.hasConn(ConnState::Reconnecting));
+}
+
+TEST(direct_host_refuses_without_stalling) {
+    // A refused connection gets its Error, then the host half-closes it and waits up to 300 ms
+    // (200 ms after a flood) for the peer to close. A peer that keeps it open no longer holds the
+    // host's loop for that time: the host's own commands are handled meanwhile.
+    Peer host;
+    RawGuest guest;
+    P::GameSnapshot snap;
+    CHECK(joinRaw(host, guest, snap));
+    // Another connection with the code and an incompatible Hello, never closed by its side.
+    RawGuest other;
+    CHECK(other.connect(host.dm.invite().port, host.dm.invite().code));
+    P::Hello hello;
+    hello.proto = P::kProtocolVersion;
+    hello.schema = P::kSchemaHash ^ 1u;
+    hello.token = "direct:Other    ";
+    CHECK(other.send(hello));
+    P::Error e;
+    CHECK(other.waitFor(e, 5000));
+    CHECK(e.code == P::ErrorCode::UnsupportedProtocol && e.fatal);
+    CHECK(hostResyncMs(host) < 100);
+    CHECK(other.waitClosed(2000));
+    // The guest floods: Error{Flood} and its link closes, the same way.
+    P::C_Ping ping;
+    for (uint32_t i = 0; i < 50; ++i) {
+        ping.nonce = i;
+        CHECK(guest.send(ping));
+    }
+    CHECK(guest.waitFor(e, 5000));
+    CHECK(e.code == P::ErrorCode::Flood && e.fatal);
+    CHECK(hostResyncMs(host) < 100);
+    CHECK(guest.waitClosed(2000));
+    CHECK(host.dm.currentGame() && !host.dm.currentGame()->blackConnected);
 }

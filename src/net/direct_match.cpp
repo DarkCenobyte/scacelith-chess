@@ -31,6 +31,7 @@ constexpr int kHandshakeMs = 10000;        // handshake, then Hello -> Welcome
 constexpr int kPingEveryMs = 2000;         // both sides measure the round trip
 constexpr int kSilenceMs = 10000;          // nothing received for this long: the link is dead
 constexpr int kMaxPendingHandshakes = 4;
+constexpr size_t kMaxClosing = 4;          // refused or flooding links lingering (beyond, the oldest is closed)
 constexpr int kMaxFailedHandshakes = 10;   // wrong codes per hosted game, then the host stops listening
 constexpr int kMaxMsgPerSec = 20;          // announced in Welcome; twice as many closes the link (Gestures aside)
 constexpr int kGestureRate = 10;           // Gestures per second each way (Welcome.gestureRate)...
@@ -229,10 +230,11 @@ std::string nameFromToken(const std::string& token) {
 struct Conn {
     sock::Handle h = sock::kInvalid;
     std::unique_ptr<SecureChannel> ch;
-    int64_t deadline = 0;    // steady ms: end of the handshake / Hello
+    int64_t deadline = 0;    // steady ms: end of the handshake / Hello, or of a closeStep() close
     int64_t lastRecv = 0;
     uint32_t lastSeq = 0;    // host: last seq received from the guest
     bool peerClosed = false;
+    bool halfClosed = false; // closeStep(): the sending side is shut down
 
     Conn() = default;
     Conn(const Conn&) = delete;
@@ -297,6 +299,26 @@ struct Conn {
         }
         sock::closeSocket(h);
         h = sock::kInvalid;
+    }
+
+    // The same close without blocking (the host's loop): called whenever the socket may be ready
+    // until it returns true (closed); 'deadline' ends it, like the delay of flushAndClose.
+    bool closeStep(int64_t now) {
+        if (!halfClosed) {
+            if (wantsWrite() && now < deadline && write() && wantsWrite()) return false;
+            sock::shutdownSend(h);
+            halfClosed = true;
+        }
+        uint8_t buf[4096];
+        for (int i = 0; now < deadline; ++i) {
+            bool closed = false;
+            int r = sock::recvSome(h, buf, sizeof buf, closed);
+            if (r < 0) break;
+            if (r == 0 || i == 63) return false;
+        }
+        sock::closeSocket(h);
+        h = sock::kInvalid;
+        return true;
     }
 };
 
@@ -480,6 +502,7 @@ private:
     sock::Handle listener_ = sock::kInvalid;
     uint16_t port_ = 0;
     std::vector<std::unique_ptr<Conn>> pending_;
+    std::vector<std::unique_ptr<Conn>> closing_;   // refused or flooding links (closeLater)
     std::unique_ptr<Conn> guest_;
     std::unique_ptr<direct::Authority> auth_;
     ClientView view_;
@@ -609,6 +632,7 @@ private:
                 if (std::isfinite(d)) until(now + int64_t(std::ceil(d - sock::epochMs())) + 1);
             }
             for (auto& c : pending_) until(c->deadline);
+            for (auto& c : closing_) until(c->deadline);
             if (guest_) {
                 until(nextPing_);
                 until(guest_->lastRecv + kSilenceMs + 1);
@@ -619,6 +643,7 @@ private:
             ps.add(waker.handle(), true, false);
             if (listener_ != sock::kInvalid) ps.add(listener_, true, false);
             for (auto& c : pending_) ps.add(c->h, true, c->wantsWrite());
+            for (auto& c : closing_) ps.add(c->h, true, !c->halfClosed && c->wantsWrite());
             if (guest_) ps.add(guest_->h, true, guest_->wantsWrite());
             ps.wait(int(wait));
             if (ps.readable(waker.handle())) waker.drain();
@@ -636,6 +661,10 @@ private:
             if (listener_ != sock::kInvalid && ps.readable(listener_)) acceptAll(now);
             serviceHandshakes(now, ps, out);
             if (guest_) serviceGuest(now, ps, out);
+            for (size_t i = 0; i < closing_.size();) {
+                if (closing_[i]->closeStep(now)) closing_.erase(closing_.begin() + long(i));
+                else ++i;
+            }
             if (auth_) {
                 auth_->tick(sock::epochMs(), out);
                 dispatch(out);
@@ -717,7 +746,7 @@ private:
             std::vector<uint8_t> buf;
             P::encode(e, buf);
             c.send(buf);
-            c.flushAndClose(300);
+            closeLater(std::move(cp), 300);
             LOGW("direct: guest refused (%s)", P::enumName(code));
         };
         P::MsgType t;
@@ -813,7 +842,7 @@ private:
             std::vector<uint8_t> buf;
             P::encode(e, buf);
             guest_->send(buf);
-            guest_->flushAndClose(200);
+            closeLater(std::move(guest_), 200);
             dropGuest(out, "flood");
             return;
         }
@@ -883,6 +912,15 @@ private:
         guest_->send(buf);
     }
 
+    // Closes c like flushAndClose(ms) without blocking the loop (a peer that keeps the connection
+    // open would hold it for the whole delay): the loop flushes it, half-closes it and closes it
+    // once the peer has closed too, or after ms.
+    void closeLater(std::unique_ptr<Conn> c, int ms) {
+        c->deadline = sock::steadyMs() + ms;
+        if (closing_.size() >= kMaxClosing) closing_.erase(closing_.begin());
+        closing_.push_back(std::move(c));
+    }
+
     void dropGuest(direct::Authority::Output& out, const char* why) {
         LOGI("direct: guest connection lost (%s)", why);
         gestureLinkDown();
@@ -921,6 +959,8 @@ private:
         gestureLinkDown();
         if (guest_) guest_->flushAndClose(1000);
         guest_.reset();
+        for (auto& c : closing_) c->flushAndClose(int(std::max<int64_t>(0, c->deadline - sock::steadyMs())));
+        closing_.clear();
         pending_.clear();
         sock::closeSocket(listener_);
         listener_ = sock::kInvalid;
