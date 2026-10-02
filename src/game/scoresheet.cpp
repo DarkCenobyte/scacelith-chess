@@ -535,7 +535,7 @@ namespace {
 std::vector<InkGlyph> handwrite(const std::string& text, const WriteBox& box, int style, uint32_t seed) {
     std::vector<InkGlyph> out;
     if (text.empty()) return out;
-    ui::text::Run shaped = ui::text::shapeLine(text, [style](uint32_t cp) { return font::handwritingFace(style, cp); });
+    ui::text::Run shaped = ui::text::shapeHandwriting(text, style);
     if (shaped.glyphs.empty()) return out;
     const font::Metrics& mt = font::metrics(font::handwritingFace(style, 'A'));
     Run run;
