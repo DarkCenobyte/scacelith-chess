@@ -782,7 +782,8 @@ struct Animator::Impl {
     };
     PointChoice choosePoint(vec3 aim, float topAim, float hover, const vec3* fixedTip, const quat* prevQ, const FingerPose& fp);
     // How deep the hand (wrist at w, rotation q, fingers f) dips into the space 'margin' above the
-    // standing pieces (m, the worst point); ignoreId is not an obstacle.
+    // standing pieces (m, the worst point; >= 0: planGesture's orientation searches rely on it);
+    // ignoreId is not an obstacle.
     float handDepth(vec3 w, quat q, const FingerPose& f, float margin, int ignoreId) const;
     bool gestureBlocked(const HandSample& from, float T, Motion& mo);
     Segment pointApproach(const HandSample& from, float Ta, vec3 w, quat q, const FingerPose& fp, vec3 tipL) const;

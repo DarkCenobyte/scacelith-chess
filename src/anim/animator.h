@@ -200,9 +200,9 @@ struct Event {
 // Left-handed player (init with Side::Left): the right hand writes, and the handshake needs it: a
 // running writing task is cut short when the handshake starts (the events already due fire at their
 // own instants, its remaining path / page events at once), a held pen is laid down first (at the
-// frame of the next queued PutPen, which is
-// then dropped, or where it was picked up; PenPut fires as usual) and the queued writing tasks
-// wait for the end of the handshake. Its rest (setRestHand) is on the clock side as well.
+// frame of the next queued PutPen, which is then dropped, or where it was picked up; PenPut fires as
+// usual) and the queued writing tasks wait for the end of the handshake. Its rest (setRestHand) is
+// on the clock side as well.
 // Idle: the writing hand never goes to the chin while it holds the pen or has work queued.
 struct PenKey {
     float t = 0.0f;           // seconds from the start of the path (increasing)
