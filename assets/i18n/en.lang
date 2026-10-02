@@ -1181,6 +1181,7 @@ gif.err.signed_out = Your session has ended. Please sign in again to make a GIF.
 gif.err.game_too_long = This game is too long to be made into a GIF.
 gif.err.pgn_too_large = This game is too long to be made into a GIF.
 gif.err.invalid_pgn = The server could not read this game.
+gif.err.render_failed = The server could not make this GIF. Please try again.
 gif.err.gif_disabled = This server does not make GIFs.
 gif.err.write_failed = The GIF could not be saved on this computer.
 gif.err.not_found = This game is no longer on the server.

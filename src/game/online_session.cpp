@@ -282,8 +282,7 @@ void OnlineSession::applyServer() {
     queue_ = Queue();
     outgoing_ = Outgoing();
     incoming_.clear();
-    results_.clear();
-    pending_.clear();
+    answers_.setServer(ep.origin());
     ratingRestored_ = live::HeldNotice();  // points of the previous server's account
     LOGI("online: server %s", ep.origin().c_str());
 }
@@ -354,23 +353,11 @@ void OnlineSession::signOut(bool everywhere) {
 
 // ---- Requests -------------------------------------------------------------------------------------
 
-void OnlineSession::expect(Kind k) {
-    pending_[int(k)]++;
-    results_.erase(int(k));
-}
+void OnlineSession::expect(Kind k) { answers_.expect(k); }
 
-bool OnlineSession::busy(Kind k) const {
-    auto it = pending_.find(int(k));
-    return it != pending_.end() && it->second > 0;
-}
+bool OnlineSession::busy(Kind k) const { return answers_.busy(k); }
 
-bool OnlineSession::take(Kind k, net::Event& out) {
-    auto it = results_.find(int(k));
-    if (it == results_.end()) return false;
-    out = it->second;
-    results_.erase(it);
-    return true;
-}
+bool OnlineSession::take(Kind k, net::Event& out) { return answers_.take(k, out); }
 
 // ---- Account API ----------------------------------------------------------------------------------
 
@@ -407,12 +394,14 @@ void OnlineSession::openGame(uint64_t gameId) {
     }
     data_.gameWanted = gameId;
     data_.gameError.clear();
+    data_.gameRetryAfter = 0;
     api().fetchGame(gameId);
     expect(Kind::GameDetailsResult);
 }
 
 void OnlineSession::loadSessions() {
     data_.sessionsError.clear();
+    data_.sessionsRetryAfter = 0;
     api().fetchSessions();
     expect(Kind::SessionsResult);
 }
@@ -646,6 +635,15 @@ void OnlineSession::handleServer(const net::Event& e) {
         routeGame(e, LinkKind::Server);
         return;
     }
+    // An answer of the server used before the last applyServer(): not this server's history, game,
+    // devices, account or session. Its GIF is still written and its PGN still saved (ServerAnswers
+    // keeps it for the game page), each as the game it was asked for. (The info of the server being
+    // tested in Options names that server.)
+    if (answers_.foreign(e) && !(e.kind == Kind::ServerInfoResult && testing_)) {
+        if (e.kind == Kind::GifResult) gif_.finish(e);
+        else if (!answers_.keep(e)) LOGI("online: an answer of %s dropped (another server since)", e.origin.c_str());
+        return;
+    }
     // A call that found the saved session refused (expired, revoked): the network layer erased the
     // token, whatever the call (net::Event::sessionLost).
     if (e.sessionLost && signedIn_) {
@@ -653,11 +651,7 @@ void OnlineSession::handleServer(const net::Event& e) {
         LOGI("online: session refused, signed out");
     }
     // HTTPS results are kept for the page that asked.
-    auto store = [&]() {
-        auto it = pending_.find(int(e.kind));
-        if (it != pending_.end() && it->second > 0) it->second--;
-        results_[int(e.kind)] = e;
-    };
+    auto store = [&]() { answers_.keep(e); };
     switch (e.kind) {
     case Kind::ServerInfoResult:
         if (testing_) {
@@ -732,8 +726,8 @@ void OnlineSession::handleServer(const net::Event& e) {
         break;
     }
     case Kind::GifResult: {
-        // The GifSaver writes the file (not kept in results_: up to 16 MiB); a refused token
-        // signs out like any account API answer.
+        // The GifSaver writes the file (not kept with the other answers: up to 16 MiB); a refused
+        // token signs out like any account API answer.
         const bool wasSignedIn = signedIn_;
         data_.apply(e, account_, signedIn_);
         gif_.finish(e);
@@ -952,7 +946,8 @@ std::string gifErrorText(const std::string& code, int retryAfterSec) {
     // Signed out: the token was refused (expired, revoked), or there is none (the network layer
     // says "unauthorized" for both).
     if (code == "unauthorized") return i18n::tr("gif.err.signed_out");
-    static const char* known[] = {"game_too_long", "pgn_too_large", "invalid_pgn", "gif_disabled", "write_failed", "not_found"};
+    static const char* known[] = {"game_too_long", "pgn_too_large", "invalid_pgn", "render_failed", "gif_disabled", "write_failed",
+                                  "not_found"};
     for (const char* k : known)
         if (code == k) return i18n::tr(std::string("gif.err.") + k);
     return onlineErrorText(code, retryAfterSec);

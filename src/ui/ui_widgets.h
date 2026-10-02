@@ -112,8 +112,12 @@ void setSoundCallback(std::function<void(Sound)> cb);
 enum class ButtonKind { Primary, Secondary, Quiet };
 // Large Cinzel entry of the title / pause menus (text only, gold rule on hover).
 bool menuEntry(const std::string& label, const Rect& r, bool enabled = true, gfx::HAlign align = gfx::HAlign::Left);
+// The label of a Primary or Secondary button shrinks to fit its frame (to 62 % of its size at
+// most), and is cut ("…") when it still does not fit.
 bool button(const std::string& label, const Rect& r, ButtonKind kind = ButtonKind::Secondary, bool enabled = true,
             uint32_t extraFlags = 0);
+// Whether a Primary or Secondary button 'width' wide shows this label whole (shrunk or not).
+bool buttonLabelFits(const std::string& label, float width);
 // A button that is off for a reason: drawn like a disabled button, but the mouse resting on it (or
 // the keyboard focus, which stops on it) shows 'why' as its tooltip, kept inside 'within' when
 // given (the page's panel: above the button near its bottom edge). Never activates.

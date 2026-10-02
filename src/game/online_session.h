@@ -138,7 +138,9 @@ public:
     bool serverConfigured() const { return endpoint().valid(); }
     bool officialAvailable() const;            // this build has an official server
     // After the [online] settings changed: selects the server (each keeps its own session) and
-    // forgets what was known of the previous one.
+    // forgets what was known of the previous one. Its answers still on the way are dropped when
+    // they arrive (ServerAnswers), except a GIF (written) and a PGN (saved by the game page), each
+    // as the game it was asked for.
     void applyServer();
     const net::ServerInfo& info() const { return info_; }
     bool infoKnown() const { return infoKnown_; }
@@ -282,8 +284,7 @@ private:
     GifSaver gif_;
     double gifShownAt_ = -1e9;                  // steady seconds of the last gifShown() of gif_'s owner
     std::string serverNameRt_;
-    std::map<int, net::Event> results_;
-    std::map<int, int> pending_;
+    ServerAnswers answers_;                     // for expect(), busy(), take(); the server in use
 
     net::ConnState conn_ = net::ConnState::Offline;
     Queue queue_;
@@ -311,7 +312,8 @@ OnlineSession& onlineSession();
 std::string onlineErrorText(const std::string& code, int retryAfterSec = 0, int64_t bannedUntilMs = 0);
 // The error of a GIF in words (GifSaver::error()): the account's quota used up with the wait in
 // minutes and seconds, the renderer busy, signed out, a game too long, a PGN the server cannot
-// read, a server without GIFs, the file not written; the other codes as onlineErrorText().
+// read, a render that failed, a server without GIFs, the file not written; the other codes as
+// onlineErrorText().
 std::string gifErrorText(const std::string& code, int retryAfterSec = 0);
 std::string serverErrorText(int code);
 // Text of a ServerError event: its ErrorCode, or its transport error ("offline": a command sent

@@ -821,7 +821,10 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
     const float dx = im::flip(p, Rect(p.x + pad + listW + gap, 0, detW, 0)).x;
     const Rect lcol(lx, 0, listW, 0), dcol(dx, 0, detW, 0);
     const float top = p.y + 150.0f;
-    const float bw = 236.0f, bh = 58.0f, bgap = 20.0f;
+    // The footer's five buttons (Back, Open folder, Save as GIF, Delete, Replay): 236 wide, or as
+    // wide as five can be in a narrower window (5:4), so that Save as GIF keeps its gaps.
+    const float bh = 58.0f, bgap = 20.0f;
+    const float bw = std::min(236.0f, std::floor((p.w - 2.0f * pad - 4.0f * bgap) / 5.0f));
     const float by = p.b() - 52.0f - bh;
     const float bottom = by - 76.0f;  // under the columns: the folder line, then the footer rule
     im::Id defaultFocus = 0;
@@ -1006,7 +1009,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         // Save as GIF, between Open folder and Delete: the server draws it, so it needs an account of
         // an online server signed in (the disabled button's tooltip says so), and one GIF at a time.
         const float leftEnd = p.x + pad + 2.0f * bw + bgap, rightStart = p.r() - pad - 2.0f * bw - bgap;
-        const float gw = std::max(150.0f, std::min(bw, rightStart - leftEnd - 2.0f * bgap));
+        const float gw = std::min(bw, rightStart - leftEnd - 2.0f * bgap);
         const Rect gifR = im::flip(p, Rect((leftEnd + rightStart) * 0.5f - gw * 0.5f, by, gw, bh));
         const bool signedIn = se.signedIn() || se.hasSavedSession();   // signed in on an earlier run too
         bool pressed = false;

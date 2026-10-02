@@ -1171,6 +1171,7 @@ gif.err.signed_out = Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut a
 gif.err.game_too_long = Diese Partie ist zu lang für ein GIF.
 gif.err.pgn_too_large = Diese Partie ist zu lang für ein GIF.
 gif.err.invalid_pgn = Der Server konnte diese Partie nicht lesen.
+gif.err.render_failed = Der Server konnte dieses GIF nicht erstellen. Bitte versuchen Sie es noch einmal.
 gif.err.gif_disabled = Dieser Server erstellt keine GIFs.
 gif.err.write_failed = Das GIF konnte nicht auf diesem Computer gespeichert werden.
 gif.err.not_found = Diese Partie ist nicht mehr auf dem Server.

@@ -1172,6 +1172,7 @@ gif.err.signed_out = セッションが終了しました。GIFを作成する�
 gif.err.game_too_long = この対局は長すぎるため、GIFにできません。
 gif.err.pgn_too_large = この対局は長すぎるため、GIFにできません。
 gif.err.invalid_pgn = サーバーはこの対局を読み取れませんでした。
+gif.err.render_failed = サーバーはこのGIFを作成できませんでした。もう一度お試しください。
 gif.err.gif_disabled = このサーバーはGIFを作成しません。
 gif.err.write_failed = GIFをこのコンピューターに保存できませんでした。
 gif.err.not_found = この対局はサーバー上にもうありません。

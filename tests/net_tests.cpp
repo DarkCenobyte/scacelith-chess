@@ -909,6 +909,29 @@ TEST(net_credentials_isolation) {
     net::sys::removeFile(path);
 }
 
+// A token refused by the server is erased only while it is still the one saved: a GIF (on its own
+// thread) may be refused while a new sign-in saves another token.
+TEST(net_credentials_clear_that_token) {
+    std::string path = tempCredentialPath("clear-that");
+    const std::string A = "a.example.org:443";
+    const std::string oldToken = "sct_" + std::string(43, 'O'), newToken = "sct_" + std::string(43, 'N');
+    net::CredentialStore s(path);
+    net::Credential c;
+    c.origin = A;
+    c.username = "alice";
+    c.token = newToken;
+    CHECK(s.put(c));
+    CHECK(s.clearToken(A, oldToken));   // another one since: kept
+    net::Credential out;
+    CHECK(s.get(A, out));
+    CHECK_EQ(out.token, newToken);
+    CHECK(s.clearToken(A, newToken));   // that one: erased, the name kept
+    CHECK(!s.hasToken(A));
+    CHECK_EQ(s.username(A), std::string("alice"));
+    CHECK(s.clearToken("b.example.org:443", oldToken));   // nothing saved there: nothing to do
+    net::sys::removeFile(path);
+}
+
 // =============================================================================================
 // Endpoints and transport rules
 // =============================================================================================
@@ -2403,13 +2426,15 @@ Value bodyOf(const fakehttp::Request& r) {
 
 // One OnlineClient on its own scripted server (plain HTTP to 127.0.0.1), signed in as "alice"
 // unless told otherwise: the token is in the credential file before the client reads it.
+// concurrent: the server answers several connections at once (fakehttp::Server).
 struct AccountRig {
     fakehttp::Server srv;
     std::string credPath;
     net::ServerEndpoint ep;
     std::unique_ptr<net::OnlineClient> c;
 
-    AccountRig(const char* tag, fakehttp::Server::Handler h, bool signedIn = true) : srv(std::move(h)) {
+    AccountRig(const char* tag, fakehttp::Server::Handler h, bool signedIn = true, bool concurrent = false)
+        : srv(std::move(h), concurrent) {
         credPath = tempCredentialPath(tag);
         ep.host = "127.0.0.1";
         ep.apiPort = srv.port();
@@ -2848,6 +2873,13 @@ TEST(net_account_gif) {
     big += std::string(net::OnlineClient::kGifMaxBytes - big.size(), '\0');
     std::atomic<int> mode{0};
     AccountRig r("acct-gif", [&](const fakehttp::Request& q) {
+        // A game's public details (no session needed): game 812 is there, no other.
+        if (q.method == "GET" && q.path.compare(0, 14, "/api/v1/games/") == 0 && q.path.find('/', 14) == std::string::npos) {
+            if (q.path == "/api/v1/games/812") return jsonReply(200, kGameDetails);
+            return jsonReply(404, R"({"error":"not_found","message":"No such game."})");
+        }
+        // A server without the GIF routes: its router's answer, before any session check.
+        if (mode.load() == 10) return jsonReply(404, R"({"error":"not_found","message":"No such endpoint."})");
         if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
         const bool get = q.method == "GET" && q.path.compare(0, 22, "/api/v1/games/812/gif?") == 0;
         const bool post = q.method == "POST" && q.path == "/api/v1/gif";
@@ -2878,6 +2910,8 @@ TEST(net_account_gif) {
         }
         case 8: return jsonReply(422, R"({"error":"game_too_long","message":"Over 600 plies."})");
         case 9: return jsonReply(401, R"({"error":"invalid_token"})");
+        case 11: return jsonReply(500, R"({"error":"render_failed","message":"The GIF could not be made."})");
+        case 12: return jsonReply(503, R"({"error":"busy","message":"Try again shortly.","retryAfter":1})");
         default: rep.body = gif; break;
         }
         return rep;
@@ -2910,6 +2944,7 @@ TEST(net_account_gif) {
     CHECK_EQ(ev.error, std::string("not_found"));
     CHECK_EQ(ev.gameId, uint64_t(5));
     CHECK(ev.text.empty());
+    CHECK_EQ(r.last().path, std::string("/api/v1/games/5"));   // its details: not there either
 
     // POST: the PGN text and the options in JSON.
     const std::string pgn = "[Event \"Casual\"]\n[White \"alice\"]\n[Black \"\xC3\x89lodie\"]\n[Result \"*\"]\n\n1. e4 e5 *\n";
@@ -3006,6 +3041,35 @@ TEST(net_account_gif) {
     CHECK_EQ(ev.error, std::string("game_too_long"));
     CHECK(!ev.sessionLost);
     CHECK(r.c->hasSavedSession());
+    // The other documented answers: a render that failed; the 503 busy of a locked database, a
+    // busy server like the renderer's, with its wait.
+    mode = 11;
+    r.c->downloadGameGif(812, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("render_failed"));
+    CHECK(!ev.sessionLost);
+    mode = 12;
+    r.c->downloadGameGif(812, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("server_busy"));
+    CHECK_EQ(ev.retryAfterSec, 1);
+    CHECK(!ev.sessionLost);
+    // A server without the GIF routes (an older one) answers 404 not_found: a server without GIFs
+    // for POST /gif, which has no other not_found, and for GET when the game itself is there.
+    mode = 10;
+    r.c->renderPgnGif(pgn, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("gif_disabled"));
+    r.c->downloadGameGif(812, o);
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("gif_disabled"));
+    CHECK_EQ(ev.gameId, uint64_t(812));
+    CHECK_EQ(r.last().path, std::string("/api/v1/games/812"));
+    CHECK(!r.last().has("authorization"));              // a public read
+    r.c->downloadGameGif(5, o);                         // the game is not there: not_found still
+    ev = r.wait(K::GifResult);
+    CHECK_EQ(ev.error, std::string("not_found"));
+    CHECK(r.c->hasSavedSession());
 
     // A refused token is forgotten, and the answer has the one code of a session gone (the server
     // said invalid_token) with sessionLost; signed out, nothing is sent and the code is the same.
@@ -3029,6 +3093,75 @@ TEST(net_account_gif) {
     CHECK_EQ(ev.error, std::string("unauthorized"));
     CHECK(!ev.sessionLost);
     CHECK_EQ(r.count(), before);
+}
+
+// A GIF the server takes long to make (its rendering queue, then a render at the lowest priority:
+// up to 45 s with its default settings, after which it answers 503 timeout) has a thread and a time
+// limit of its own: the history asked for meanwhile is answered at once, the GIF when it is ready.
+// Every answer names the server its command went to, the one in use when it was given.
+TEST(net_account_gif_beside_other_calls) {
+    if (!net::transportAvailable()) return;
+    using K = net::Event::Kind;
+    using SteadyClock = std::chrono::steady_clock;
+    CHECK(net::OnlineClient::kGifTimeoutMs >= 2 * 45000);   // twice the server's default bound
+    const int renderMs = 2500;
+    AccountRig r(
+        "acct-gif-slow",
+        [&](const fakehttp::Request& q) {
+            if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
+            if (q.path.compare(0, 22, "/api/v1/games/812/gif?") == 0) {
+                fakehttp::Reply rep;
+                rep.headers.emplace_back("Content-Type", "image/gif");
+                rep.body = "GIF89a" + std::string(64, 'x');
+                rep.silenceMs = renderMs;
+                return rep;
+            }
+            if (q.path.compare(0, 21, "/api/v1/account/games") == 0) return jsonReply(200, kGamesPage);
+            return jsonReply(404, R"({"error":"not_found","message":"No such endpoint."})");
+        },
+        true, true);
+    CHECK(r.srv.ok());
+    const std::string origin = r.ep.origin();
+    const SteadyClock::time_point t0 = SteadyClock::now();
+    r.c->downloadGameGif(812, net::GifOptions());
+    r.c->fetchMyGames(0, 10, net::GamesFilter());
+    // Another server chosen meanwhile: its own requests go there (nothing listens on port 1), the
+    // GIF's answer still names the server it came from.
+    net::ServerEndpoint other = r.ep;
+    other.apiPort = 1;
+    r.c->setServer(other);
+    r.c->fetchSessions();
+    net::Event gif, games, sessions;
+    double gifAt = -1, gamesAt = -1, sessionsAt = -1;
+    while (SteadyClock::now() - t0 < std::chrono::seconds(20) && (gifAt < 0 || gamesAt < 0 || sessionsAt < 0)) {
+        net::Event ev;
+        while (r.c->poll(ev)) {
+            const double at = std::chrono::duration<double, std::milli>(SteadyClock::now() - t0).count();
+            if (ev.kind == K::GifResult) {
+                gif = ev;
+                gifAt = at;
+            } else if (ev.kind == K::GamesResult) {
+                games = ev;
+                gamesAt = at;
+            } else if (ev.kind == K::SessionsResult) {
+                sessions = ev;
+                sessionsAt = at;
+            }
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+    CHECK(gamesAt >= 0 && gamesAt < renderMs - 500);        // never behind the GIF
+    CHECK(games.ok);
+    CHECK_EQ(games.gamesPage.games.size(), size_t(2));
+    CHECK_EQ(games.origin, origin);
+    CHECK(sessionsAt >= 0);
+    CHECK(!sessions.ok);
+    CHECK_EQ(sessions.origin, other.origin());
+    CHECK(gifAt >= renderMs);
+    CHECK(gif.ok);
+    CHECK_EQ(gif.gameId, uint64_t(812));
+    CHECK_EQ(gif.text.compare(0, 6, "GIF89a"), 0);
+    CHECK_EQ(gif.origin, origin);
 }
 
 TEST(net_account_sessions) {

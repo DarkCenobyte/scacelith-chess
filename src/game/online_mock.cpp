@@ -1455,7 +1455,9 @@ struct FakeServer::Impl {
     bool online() const { return conn == ConnState::Online; }
     bool hostHas(const char* w) const { return contains(ep.host, w); }
 
+    // An HTTPS result, named after the server in use when its command was given (Event::origin).
     void http(Event e, double extraMs = 0.0) {
+        if (e.origin.empty()) e.origin = ep.origin();
         out.push(lastNow + extraMs + double(rng.range(float(kHttpMin), float(kHttpMax))), std::move(e));
     }
     Event result(Event::Kind k, bool ok, const std::string& err = "") {

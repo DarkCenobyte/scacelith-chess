@@ -1171,6 +1171,7 @@ gif.err.signed_out = Su sesión ha terminado. Vuelva a iniciar sesión para crea
 gif.err.game_too_long = Esta partida es demasiado larga para convertirla en GIF.
 gif.err.pgn_too_large = Esta partida es demasiado larga para convertirla en GIF.
 gif.err.invalid_pgn = El servidor no ha podido leer esta partida.
+gif.err.render_failed = El servidor no ha podido crear este GIF. Vuelva a intentarlo.
 gif.err.gif_disabled = Este servidor no crea GIF.
 gif.err.write_failed = No se ha podido guardar el GIF en este ordenador.
 gif.err.not_found = Esta partida ya no está en el servidor.

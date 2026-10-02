@@ -1172,6 +1172,7 @@ gif.err.signed_out = Ваш сеанс завершён. Пожалуйста, �
 gif.err.game_too_long = Эта партия слишком длинная для GIF.
 gif.err.pgn_too_large = Эта партия слишком длинная для GIF.
 gif.err.invalid_pgn = Сервер не смог прочитать эту партию.
+gif.err.render_failed = Серверу не удалось создать этот GIF. Пожалуйста, повторите попытку.
 gif.err.gif_disabled = Этот сервер не создаёт GIF.
 gif.err.write_failed = Не удалось сохранить GIF на этом компьютере.
 gif.err.not_found = Этой партии больше нет на сервере.

@@ -2,9 +2,9 @@
 // repository; protocol in dedicated-server/src/protocol/schema.js, design in
 // dedicated-server/docs/DESIGN.md).
 //
-// OnlineClient owns a network thread. Every command below returns at once and queues work for
-// that thread; results and server pushes come back as Events that the game thread drains with
-// poll() once per frame. No command blocks, no callback runs on the game thread by surprise.
+// OnlineClient owns network threads. Every command below returns at once and queues work for
+// them; results and server pushes come back as Events that the game thread drains with poll()
+// once per frame. No command blocks, no callback runs on the game thread by surprise.
 //
 // Trust boundary: each server is identified by its origin ServerEndpoint::origin()
 // ("host:apiPort"). The session token, the pinned certificate and the remembered user name are
@@ -42,6 +42,7 @@
 //     game of its own (GET /games/:id/gif) or of any game given as PGN text (POST /gif); the file
 //     comes back in Event::Kind::GifResult (signed-in players only: the renders count against the
 //     account's quota; a refused or missing session is "unauthorized", as above).
+//   - Event::origin (additive): the HTTPS results name the server their command went to.
 #pragma once
 #include "gesture.h"
 #include <cstdint>
@@ -341,12 +342,16 @@ struct Event {
     // is signed out. The error is then "unauthorized", or none when a public read was asked again
     // without the token and answered (fetchGame, downloadPgn).
     bool sessionLost = false;
+    // HTTPS results: the origin (ServerEndpoint::origin()) of the server the command went to, the
+    // one in use when it was given; "" for the realtime events. An answer that arrives after
+    // setServer() chose another server names the previous one.
+    std::string origin;
 };
 
 class OnlineClient {
 public:
     OnlineClient();
-    ~OnlineClient();                  // closes the connection and joins the network thread
+    ~OnlineClient();                  // closes the connection and joins the network threads
     OnlineClient(const OnlineClient&) = delete;
     OnlineClient& operator=(const OnlineClient&) = delete;
 
@@ -405,8 +410,13 @@ public:
     // a saved token, nothing sent; "unauthorized" with sessionLost when the server refuses the
     // saved session, its token erased): each render counts against the account's quota (429
     // "rate_limited" with retryAfterSec; a GIF the server rendered before costs nothing), and a
-    // busy renderer answers 503 "server_busy" with retryAfterSec. "game_too_long" over the
-    // server's limit of moves (GIF_MAX_PLIES), "gif_disabled" on a server without GIFs.
+    // busy renderer answers 503 "server_busy" with retryAfterSec (so does the 503 "busy" of a
+    // locked database). "game_too_long" over the server's limit of moves (GIF_MAX_PLIES),
+    // "render_failed" when the server could not make it, "gif_disabled" on a server without GIFs:
+    // turned off, or an older server without these routes (its 404 "not_found" for POST /gif, and
+    // for GET /games/:id/gif when GET /games/:id finds the game). The GIFs have a thread of their
+    // own (one at a time, the other calls never wait for them) and kGifTimeoutMs: the server may
+    // hold the request for 45 s with its default settings before it answers 503 "timeout".
     // A game of the server: GET /games/:id/gif?size=&orientation=&delay=&coords=0|1 (gameId 0:
     // "invalid_game_id", nothing sent).
     void downloadGameGif(uint64_t gameId, const GifOptions& options);
@@ -416,6 +426,10 @@ public:
     void renderPgnGif(const std::string& pgn, const GifOptions& options);
     static constexpr size_t kGifMaxPgnBytes = 65536;   // the server's limit of the pgn field
     static constexpr size_t kGifMaxBytes = size_t(16) << 20;
+    // How long a GIF request may take, answer included: twice the server's own bound (queue
+    // GIF_QUEUE_TIMEOUT_MS 10 s + render GIF_RENDER_TIMEOUT_MS 30 s + 5 s), against the 15 s of the
+    // other calls ("timeout" after it).
+    static constexpr int kGifTimeoutMs = 90000;
 
     // ---- realtime (WSS) ----
     void connect();                              // uses the saved session; reconnects automatically until disconnect()

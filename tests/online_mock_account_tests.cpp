@@ -218,6 +218,53 @@ TEST(mock_account_history_filter_changed_while_loading) {
     CHECK_EQ(e.gamesPage.filter.result, std::string("aborted"));
 }
 
+// Every answer names the server its command went to (net::Event::origin), as net::OnlineClient's
+// do: the history asked for before another server was chosen names the first one, and the game
+// (game::ServerAnswers) drops it.
+TEST(mock_account_answers_name_their_server) {
+    VirtualClock vc;
+    mock::FakeServer srv;
+    signIn(srv, "Paul_M");
+    const std::string first = srv.server().origin();
+    game::ServerAnswers answers;
+    answers.setServer(first);
+    srv.fetchMyGames(0, game::HistoryPager::kPageSize, net::GamesFilter());
+    answers.expect(Kind::GamesResult);
+    net::ServerEndpoint ep;
+    ep.host = "other.example.org";
+    srv.setServer(ep);
+    answers.setServer(ep.origin());
+    srv.fetchMyGames(0, game::HistoryPager::kPageSize, net::GamesFilter());   // signed out there
+    answers.expect(Kind::GamesResult);
+    std::vector<Event> got;
+    for (int guard = 0; guard < 1200 && got.size() < 2; ++guard) {
+        Event e;
+        while (srv.poll(e))
+            if (e.kind == Kind::GamesResult) got.push_back(e);
+        mock::advance(50.0);
+    }
+    CHECK_EQ(got.size(), size_t(2));
+    int dropped = 0, kept = 0;
+    for (const Event& e : got) {
+        if (e.ok) {
+            CHECK_EQ(e.origin, first);
+            CHECK(!e.gamesPage.games.empty());
+            CHECK(!answers.keep(e));
+            ++dropped;
+        } else {
+            CHECK_EQ(e.origin, std::string("other.example.org:443"));
+            CHECK_EQ(e.error, std::string("unauthorized"));
+            CHECK(answers.keep(e));
+            ++kept;
+        }
+    }
+    CHECK_EQ(dropped, 1);
+    CHECK_EQ(kept, 1);
+    Event e;
+    CHECK(answers.take(Kind::GamesResult, e));
+    CHECK_EQ(e.origin, std::string("other.example.org:443"));
+}
+
 TEST(mock_account_games_are_legal_and_consistent) {
     VirtualClock vc;
     mock::FakeServer srv;

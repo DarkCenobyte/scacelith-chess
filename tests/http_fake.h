@@ -1,8 +1,9 @@
 // A small scripted HTTP/1.1 server on the loopback interface for the download and account API
 // tests (plain HTTP is allowed to loopback hosts only, net/transport.h). One thread, one
-// connection at a time; the handler decides every answer, so a test can play a file host
-// (redirects, Range, a connection cut in the middle of a body, a slow or silent server) or the
-// dedicated server's HTTP API (requests are recorded with their body).
+// connection at a time (or, made concurrent, a thread per connection: a slow answer then holds up
+// no other); the handler decides every answer, so a test can play a file host (redirects, Range,
+// a connection cut in the middle of a body, a slow or silent server) or the dedicated server's
+// HTTP API (requests are recorded with their body).
 #pragma once
 #include "net/socket_util.h"
 
@@ -77,7 +78,7 @@ class Server {
 public:
     using Handler = std::function<Reply(const Request&)>;
 
-    explicit Server(Handler h) : handler_(std::move(h)) {
+    explicit Server(Handler h, bool concurrent = false) : handler_(std::move(h)), concurrent_(concurrent) {
         bool dual = false;
         std::string err;
         listener_ = net::sock::listenTcp(0, dual, err);
@@ -90,6 +91,7 @@ public:
         stop_ = true;
         waker_.wake();
         if (thread_.joinable()) thread_.join();
+        for (std::thread& w : workers_) w.join();
         net::sock::closeSocket(listener_);
     }
     Server(const Server&) = delete;
@@ -109,6 +111,8 @@ public:
 
 private:
     Handler handler_;
+    bool concurrent_ = false;
+    std::vector<std::thread> workers_;   // concurrent: a thread per connection (run()'s only)
     net::sock::Handle listener_ = net::sock::kInvalid;
     net::sock::Waker waker_;
     uint16_t port_ = 0;
@@ -128,6 +132,13 @@ private:
             if (!ps.readable(listener_)) continue;
             net::sock::Handle c = net::sock::acceptOne(listener_, nullptr);
             if (c == net::sock::kInvalid) continue;
+            if (concurrent_) {
+                workers_.emplace_back([this, c] {
+                    serve(c);
+                    net::sock::closeSocket(c);
+                });
+                continue;
+            }
             serve(c);
             net::sock::closeSocket(c);
         }

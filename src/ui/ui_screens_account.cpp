@@ -436,7 +436,7 @@ AccountNav pageHistory(float t, bool fresh) {
         if (!h.error().empty()) {
             const bool missing = h.error() == "not_found" || h.error() == "not_implemented";
             message(list, T(missing ? "online.history.unavailable" : "online.history.error"),
-                    missing ? std::string() : game::onlineErrorText(h.error()), danger);
+                    missing ? std::string() : game::onlineErrorText(h.error(), h.retryAfterSec()), danger);
             if (!missing && linkButton("online.retry", list.cx(), list.y + list.h * 0.42f + 150.0f)) se.historyReload();
         } else {
             spinner(vec2(list.cx(), list.y + 120.0f), 16.0f);
@@ -511,7 +511,7 @@ AccountNav pageHistory(float t, bool fresh) {
     const float infoY = list.b() + 40.0f;
     if (h.loaded() && !h.error().empty()) {
         TextStyle es = style(font::FACE_ITALIC, kSmall, danger, HAlign::Center);
-        std::string line = game::onlineErrorText(h.error());
+        std::string line = game::onlineErrorText(h.error(), h.retryAfterSec());
         es.size = gfx::fitSize(line, es, cw - 300.0f, 0.75f);
         gfx::text(line, p.cx(), infoY, es);
         if (linkButton("online.retry", p.cx(), infoY + 14.0f)) se.historyReload();
@@ -621,7 +621,7 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         Rect area(p.x + pad, top, p.w - 2.0f * pad, bottom - top);
         if (!data.gameError.empty())
             message(area, T(data.gameError == "not_found" ? "online.game.not_found" : "online.game.error"),
-                    data.gameError == "not_found" ? std::string() : game::onlineErrorText(data.gameError), danger);
+                    data.gameError == "not_found" ? std::string() : game::onlineErrorText(data.gameError, data.gameRetryAfter), danger);
         else
             spinner(vec2(area.cx(), area.y + 160.0f), 16.0f);
     } else {
@@ -664,10 +664,8 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         }
         y += 82.0f;
         // Actions: Save game and Save as GIF side by side (the GIF alone without saved games), Replay,
-        // Report opponent. A spinner follows the button whose work it shows, on its end side: the
-        // save's in the gap between Save game and Save as GIF (or after Replay, for a replay), the
-        // GIF's after its button (when the line under the buttons tells of the save rather than of
-        // the GIF).
+        // Report opponent. A spinner follows the button whose work it shows, on its end side: in the
+        // gap after a button with another on its row, else after the button.
         const float bh = 52.0f, bstep = 62.0f, bgap = 40.0f, spinAfter = 22.0f;
         const bool hasMoves = !g.moves.empty();
         const bool working = s.save == Save::Checking || s.save == Save::Downloading || s.save == Save::Writing;
@@ -677,25 +675,44 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         // The line under the buttons: the GIF's when it was the last action, unless the save of
         // this game failed since (Save game, then Save as GIF before the PGN was written).
         const bool gifBelow = s.gifLast && s.error.empty() && gifMine && gif.stage() != game::GifSaver::Stage::Idle;
-        const float halfW = std::floor((leftW - bgap) * 0.5f);
-        const Rect gb = canSave ? im::flip(lcol, Rect(lx + halfW + bgap, y, leftW - halfW - bgap, bh)) : Rect(lx, y, leftW, bh);
+        // The rows: Save game | Save as GIF, then Replay, when those labels fit their halves; else
+        // Save game alone, then Save as GIF | Replay (at 5:4, "Sauvegarder la partie" needs more than
+        // half the column), the same number of rows, so the line under the buttons stays above the
+        // footer; else one button a row.
+        enum class Rows { SaveAndGif, GifAndReplay, OneEach };
+        const float halfW = std::floor((leftW - bgap) * 0.5f), endW = leftW - halfW - bgap;
+        Rows rows = Rows::OneEach;
+        if (canSave && im::buttonLabelFits(L("online.game.save"), halfW) &&
+            im::buttonLabelFits(L("online.game.saved_button"), halfW) && im::buttonLabelFits(L("gif.save"), endW))
+            rows = Rows::SaveAndGif;
+        else if (canSave && im::buttonLabelFits(L("gif.save"), halfW) && im::buttonLabelFits(L("online.game.replay"), endW))
+            rows = Rows::GifAndReplay;
+        auto startHalf = [&](float at) { return im::flip(lcol, Rect(lx, at, halfW, bh)); };
+        auto endHalf = [&](float at) { return im::flip(lcol, Rect(lx + halfW + bgap, at, endW, bh)); };
+        const float inGap = lx + halfW + bgap * 0.5f, afterRow = lx + leftW + spinAfter;
         if (canSave) {
             const bool saved = s.save == Save::Saved && s.saveId == g.id;
-            const Rect b = im::flip(lcol, Rect(lx, y, halfW, bh));
+            const bool paired = rows == Rows::SaveAndGif;
+            const Rect b = paired ? startHalf(y) : Rect(lx, y, leftW, bh);
             save = im::button(L(saved ? "online.game.saved_button" : "online.game.save"), b, im::ButtonKind::Secondary,
                               hasMoves && !saved && !working);
-            if (working && !s.replayWanted) spinner(vec2(im::flipX(lcol, lx + halfW + bgap * 0.5f), b.cy()), 10.0f);
+            if (working && !s.replayWanted) spinner(vec2(im::flipX(lcol, paired ? inGap : afterRow), b.cy()), 10.0f);
+            if (!paired) y += bstep;
         }
+        const Rect gb = rows == Rows::SaveAndGif     ? endHalf(y)
+                        : rows == Rows::GifAndReplay ? startHalf(y)
+                                                     : Rect(lx, y, leftW, bh);
         // Off: the reason as the tip, kept inside the page.
         if (!se.signedIn()) im::disabledButton(L("gif.save"), gb, im::ButtonKind::Secondary, T("gif.err.signed_out"), p);
         else if (gif.busy() && !gifMine) im::disabledButton(L("gif.save"), gb, im::ButtonKind::Secondary, T("gif.busy_other"), p);
         else gifPressed = im::button(L("gif.save"), gb, im::ButtonKind::Secondary, !gif.busy());
-        if (gif.busy() && gifMine && !gifBelow) spinner(vec2(im::flipX(lcol, lx + leftW + spinAfter), gb.cy()), 10.0f);
-        y += bstep;
+        if (gif.busy() && gifMine && !gifBelow)
+            spinner(vec2(im::flipX(lcol, rows == Rows::GifAndReplay ? inGap : afterRow), gb.cy()), 10.0f);
+        if (rows != Rows::GifAndReplay) y += bstep;
         if (canSave) {
-            Rect rb(lx, y, leftW, bh);
+            const Rect rb = rows == Rows::GifAndReplay ? endHalf(y) : Rect(lx, y, leftW, bh);
             replay = im::button(L("online.game.replay"), rb, im::ButtonKind::Primary, hasMoves && !working);
-            if (working && s.replayWanted) spinner(vec2(im::flipX(lcol, lx + leftW + spinAfter), rb.cy()), 10.0f);
+            if (working && s.replayWanted) spinner(vec2(im::flipX(lcol, afterRow), rb.cy()), 10.0f);
             y += bstep;
         }
         const bool reported = std::find(s.reported.begin(), s.reported.end(), g.id) != s.reported.end();
@@ -830,7 +847,7 @@ AccountNav pageDevices(float t, bool fresh, std::string& navNote) {
     const Rect area(x0, y, w, footerY(p) - 70.0f - y);
     if (!data.sessionsLoaded) {
         if (!data.sessionsError.empty()) {
-            message(area, T("online.devices.error"), game::onlineErrorText(data.sessionsError), danger);
+            message(area, T("online.devices.error"), game::onlineErrorText(data.sessionsError, data.sessionsRetryAfter), danger);
             if (linkButton("online.retry", area.cx(), area.y + area.h * 0.42f + 150.0f)) se.loadSessions();
         } else {
             spinner(vec2(area.cx(), area.y + 80.0f), 16.0f);

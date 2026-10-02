@@ -1,13 +1,14 @@
 // The account pages' data (src/game/online_account.h): the history pager (the cursors of the pages
-// seen, Previous / Next, an answer kept only when it is the one awaited, errors, the page count),
-// what the answers of the account API change (AccountData::apply: the game asked for, the devices
-// sorted and signed out, the preference, the account deleted, the token refused), Save and Replay
-// on a game of the history (GameSaveState: a Replay given up with its page, the PGN of a game left
-// still saved as that game, the saved games looked at again on each visit), the result from the
-// player's side, the moves of a server game with their clocks, the time control labels and the
-// file name of an account export; the GIFs of games: their file names, the PGN date and time, the
-// wait in words, and the GifSaver (the answer awaited only, the file written never over another,
-// the errors kept with their wait).
+// seen, Previous / Next, an answer kept only when it is the one awaited, errors with the server's
+// wait, the page count), what the answers of the account API change (AccountData::apply: the game
+// asked for, the devices sorted and signed out, the preference, the account deleted, the token
+// refused), the answers awaited (ServerAnswers: those of a server left dropped, except a PGN), Save
+// and Replay on a game of the history (GameSaveState: a Replay given up with its page, the PGN of a
+// game left still saved as that game, also through a change of server, the saved games looked at
+// again on each visit), the result from the player's side, the moves of a server game with their
+// clocks, the time control labels and the file name of an account export; the GIFs of games:
+// their file names, the PGN date and time, the wait in words, and the GifSaver (the answer awaited
+// only, the file written never over another, the errors kept with their wait).
 #include "test.h"
 #include "game/game_archive.h"
 #include "game/online_account.h"
@@ -227,6 +228,62 @@ TEST(account_history_errors_and_reload) {
     h.clear();
     CHECK(!h.loaded());
     CHECK(!h.waiting());
+}
+
+// A refusal that ends with time (rate_limited: the account's budget of the server) keeps the
+// server's wait with the error, for the history, the game and the devices pages; an answer or a
+// new request forgets it.
+TEST(account_errors_keep_the_server_wait) {
+    HistoryPager h;
+    h.restart(net::GamesFilter());
+    h.fail(pageOf(0, 0, 0, 0, 0), "rate_limited", 60);
+    CHECK_EQ(h.error(), std::string("rate_limited"));
+    CHECK_EQ(h.retryAfterSec(), 60);
+    CHECK_EQ(h.reload(), uint64_t(0));
+    CHECK_EQ(h.retryAfterSec(), 0);
+    CHECK(h.accept(pageOf(0, 900, 30, 10, 1000)));
+    uint64_t before = 0;
+    CHECK(h.next(before));
+    h.fail(pageOf(900, 0, 0, 0, 0), "rate_limited", 45);
+    CHECK_EQ(h.retryAfterSec(), 45);          // the page shown stays, with the error and its wait
+    CHECK(h.loaded());
+    h.fail(pageOf(900, 0, 0, 0, 0), "network");   // not awaited any more: nothing changes
+    CHECK_EQ(h.retryAfterSec(), 45);
+    CHECK_EQ(h.reload(), uint64_t(0));
+    CHECK(h.accept(pageOf(0, 900, 30, 10, 1000)));
+    CHECK(h.error().empty());
+    CHECK_EQ(h.retryAfterSec(), 0);
+
+    AccountData d;
+    net::AccountInfo account;
+    bool signedIn = true;
+    d.history.restart(net::GamesFilter());
+    net::Event games = event(Kind::GamesResult, false, "rate_limited");
+    games.retryAfterSec = 60;
+    CHECK(d.apply(games, account, signedIn));
+    CHECK_EQ(d.history.error(), std::string("rate_limited"));
+    CHECK_EQ(d.history.retryAfterSec(), 60);
+    d.gameWanted = 42;
+    net::Event game = event(Kind::GameDetailsResult, false, "rate_limited");
+    game.gameId = 42;
+    game.retryAfterSec = 30;
+    CHECK(d.apply(game, account, signedIn));
+    CHECK_EQ(d.gameError, std::string("rate_limited"));
+    CHECK_EQ(d.gameRetryAfter, 30);
+    game = event(Kind::GameDetailsResult);
+    game.gameDetails.id = 42;
+    CHECK(d.apply(game, account, signedIn));
+    CHECK(d.gameError.empty());
+    CHECK_EQ(d.gameRetryAfter, 0);
+    net::Event sessions = event(Kind::SessionsResult, false, "rate_limited");
+    sessions.retryAfterSec = 75;
+    CHECK(d.apply(sessions, account, signedIn));
+    CHECK_EQ(d.sessionsError, std::string("rate_limited"));
+    CHECK_EQ(d.sessionsRetryAfter, 75);
+    CHECK(d.apply(event(Kind::SessionsResult), account, signedIn));
+    CHECK(d.sessionsError.empty());
+    CHECK_EQ(d.sessionsRetryAfter, 0);
+    CHECK(signedIn);
 }
 
 TEST(account_history_page_count_never_below_the_pages_seen) {
@@ -474,6 +531,94 @@ TEST(account_game_save_of_a_game_left_still_saved) {
     CHECK(s.lookupDue(200, false));       // then B's turn
     CHECK_EQ(s.saveId, uint64_t(200));
     CHECK(s.savedPath.empty());
+}
+
+// Another server chosen (Options > Online) while the first one's answers are on their way: they are
+// not the new server's (its history page, its devices, its session), and the new server's own
+// answers are still awaited and kept.
+TEST(account_answers_of_a_server_left) {
+    const std::string s1 = "first.example:443", s2 = "second.example:443";
+    auto from = [](net::Event e, const std::string& origin) {
+        e.origin = origin;
+        return e;
+    };
+    ServerAnswers a;
+    a.setServer(s1);
+    a.expect(Kind::GamesResult);
+    a.expect(Kind::SessionsResult);
+    CHECK(a.keep(from(event(Kind::SessionsResult), s1)));
+    CHECK(!a.busy(Kind::SessionsResult));
+    a.setServer(s2);                     // forgets what was awaited and kept
+    CHECK(!a.busy(Kind::GamesResult));
+    net::Event out;
+    CHECK(!a.take(Kind::SessionsResult, out));
+    a.expect(Kind::GamesResult);         // the new server's first page
+    net::Event old = from(event(Kind::GamesResult), s1);
+    old.gamesPage = pageOf(0, 0, 1, 1, 111111);
+    CHECK(a.foreign(old));
+    CHECK(!a.keep(old));                 // S1's page: dropped, the wait goes on
+    CHECK(a.busy(Kind::GamesResult));
+    CHECK(!a.take(Kind::GamesResult, out));
+    CHECK(!a.keep(from(event(Kind::GamesResult, false, "timeout"), s1)));   // nor its failure
+    CHECK(!a.keep(from(event(Kind::AccountResult, false, "unauthorized"), s1)));
+    net::Event mine = from(event(Kind::GamesResult), s2);
+    mine.gamesPage = pageOf(0, 0, 1, 1, 222222);
+    CHECK(!a.foreign(mine));
+    CHECK(a.keep(mine));
+    CHECK(!a.busy(Kind::GamesResult));
+    CHECK(a.take(Kind::GamesResult, out));
+    CHECK_EQ(out.gamesPage.games[0].id, uint64_t(222222));
+    CHECK(!a.take(Kind::GamesResult, out));   // handed over once
+    // The realtime events name no server: never foreign.
+    CHECK(!a.foreign(event(Kind::Welcome)));
+
+    // What the history page does with them (OnlineSession::handleServer applies only the kept ones).
+    AccountData d;
+    net::AccountInfo account;
+    bool signedIn = true;
+    d.history.restart(net::GamesFilter());
+    d.clear();                           // applyServer()
+    d.history.restart(net::GamesFilter());
+    if (!a.foreign(old)) d.apply(old, account, signedIn);
+    CHECK(!d.history.loaded());
+    CHECK(d.history.waiting());
+    if (!a.foreign(mine)) d.apply(mine, account, signedIn);
+    CHECK(d.history.loaded());
+    CHECK_EQ(d.history.page().games[0].id, uint64_t(222222));
+}
+
+// Save game pressed, then another server chosen before the PGN was taken by the game page (the
+// Online menu left meanwhile, or the answer still on its way): the PGN is kept through the change,
+// saved as the game it was asked for, and the page is free for the new server's games after it.
+TEST(account_game_save_through_a_change_of_server) {
+    const std::string s1 = "caissa.scacelith.com:443", s2 = "second.example:443";
+    for (int arrivedFirst = 0; arrivedFirst < 2; ++arrivedFirst) {
+        ServerAnswers a;
+        a.setServer(s1);
+        GameSaveState s;
+        s.opened(false);
+        CHECK(s.lookupDue(100, false));
+        s.save = Save::NotSaved;
+        CHECK(s.request(serverGame(100), false));
+        a.expect(Kind::PgnResult);
+        net::Event pgn = pgnOf(100);
+        pgn.origin = s1;
+        if (arrivedFirst) CHECK(a.keep(pgn));
+        a.setServer(s2);
+        if (!arrivedFirst) {
+            CHECK(a.busy(Kind::PgnResult));   // still awaited
+            CHECK(a.foreign(pgn));
+            CHECK(a.keep(pgn));               // and kept, though of the server left
+        }
+        CHECK(!a.busy(Kind::PgnResult));
+        net::Event e;
+        CHECK(a.take(Kind::PgnResult, e));    // the game page's pump
+        CHECK(s.pgnArrived(e));
+        CHECK_EQ(s.saveGame.server, s1);      // saved under the server it came from
+        written(s, "/saved/2026-09-28.pgn");
+        s.opened(false);                      // a game of the new server
+        CHECK(s.lookupDue(300, false));
+    }
 }
 
 // The saved games are looked at again on each visit: a file deleted meanwhile (or a replay of it

@@ -1176,6 +1176,7 @@ gif.err.signed_out = انتهت جلستك. يُرجى تسجيل الدخول �
 gif.err.game_too_long = هذه المباراة أطول من أن تُحوَّل إلى صورة GIF.
 gif.err.pgn_too_large = هذه المباراة أطول من أن تُحوَّل إلى صورة GIF.
 gif.err.invalid_pgn = تعذّر على الخادم قراءة هذه المباراة.
+gif.err.render_failed = تعذّر على الخادم إنشاء صورة GIF هذه. يُرجى المحاولة مجددًا.
 gif.err.gif_disabled = هذا الخادم لا يُنشئ صور GIF.
 gif.err.write_failed = تعذّر حفظ صورة GIF على هذا الحاسوب.
 gif.err.not_found = لم تعد هذه المباراة موجودة على الخادم.

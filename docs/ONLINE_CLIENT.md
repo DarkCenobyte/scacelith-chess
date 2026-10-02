@@ -79,7 +79,11 @@ the CMake option `SCACELITH_OFFICIAL_SERVER` (`host[:apiPort[:wsPort]]`, port 44
 `none` for none). No token is ever stored there: the network layer keeps one session per origin
 (`host:apiPort`), so switching servers never reuses another server's sign-in. `applyServer()`
 (called when Options are applied with another server) selects the new origin and forgets the
-previous server's state; the page then resumes a session saved for that origin, if any.
+previous server's state; the page then resumes a session saved for that origin, if any. Each
+answer of the account API names the origin it was asked of (`Event::origin`), and an answer of a
+server left meanwhile is not taken for the new server's (`game::ServerAnswers`): the pages drop
+it, except a PGN (the game page's Save game writes it where the player asked) and a GIF (saved
+where the player asked, by `game::GifSaver`).
 
 The official server used port 44664 before. A player signed in there stays signed in: when the
 credential file has a record for `<official host>:44664` and none for the official origin, the
@@ -120,7 +124,9 @@ Rules common to these calls:
   empty one.
 - A 401 answer to any call that carried the session token means the session is gone (expired,
   revoked elsewhere, the account deleted): the token is erased (the user name stays), as for
-  `fetchAccount`, and the event carries `sessionLost`. The error is then `unauthorized` whatever
+  `fetchAccount`, unless it is no longer the token that call sent (a sign-in since, on the HTTP
+  thread or the GIF thread: `CredentialStore::clearToken(origin, token)`), and the event carries
+  `sessionLost`. The error is then `unauthorized` whatever
   the server's code (the server answers `invalid_token` to a bearer it refuses), as for a call
   that needs the session while none is saved (nothing is sent): the game signs out on that one
   code. `fetchGame` and `downloadPgn` ask again without the token, since a game is public: their
@@ -133,12 +139,19 @@ Rules common to these calls:
   as `invalid_response`. The export is checked whole but only its top level is kept in memory
   while checking, and a document with more than 64 top-level members (the server's has about
   fifteen) is refused there, so a hostile answer can use neither gigabytes of memory nor hours of
-  the HTTP thread. An allocation failure during an HTTPS call fails that call instead of ending
+  the HTTP thread. The calls give up after 15 s without an answer, the export after 90 s (the
+  server allows itself 60 s to write it). An allocation failure during an HTTPS call fails that call instead of ending
   the game.
 - The GIFs need the session (each render counts against the account's quota: `rate_limited` and
   `server_busy` come with `retryAfterSec`, from the JSON body or else the `Retry-After` header of a
-  proxy's page). Game 0 (`invalid_game_id`) and a PGN text over 64 KiB (`pgn_too_large`) are
-  refused without sending anything. An answer over 16 MiB, or one that does not start with
+  proxy's page). They run on a thread of their own (`net-gif`), so that a render of up to 45 s on
+  the server never holds up the other calls, and give up after 90 s
+  (`OnlineClient::kGifTimeoutMs`). The server's `busy` (all its renderers at work) and any 503
+  are `server_busy`; `render_failed` is its own code; a 404 from a server without the GIF routes
+  (its router's `not_found` for an unknown path) is `gif_disabled`, as from a server that turned
+  them off (for a game's GIF, a public `GET /games/:id` tells that answer from a game that is not
+  there, `not_found`). Game 0 (`invalid_game_id`) and a PGN text over 64 KiB (`pgn_too_large`)
+  are refused without sending anything. An answer over 16 MiB, or one that does not start with
   `GIF87a` or `GIF89a`, is `invalid_response`.
 - `deleteAccount` success erases the token and the user name saved for the origin (its server id
   and pin stay) and stops the realtime connection without reconnecting. `revokeSession` on the

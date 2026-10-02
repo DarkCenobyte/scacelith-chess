@@ -436,6 +436,33 @@ TextStyle valueStyle(bool enabled, float hover) {
 }
 float centerBaseline(const Rect& r, const TextStyle& st) { return r.cy() + gfx::capHeight(st) * 0.5f; }
 
+// The label of a Primary or Secondary button: Cinzel, shrunk down to 62 % to fit kButtonLabelPad
+// inside each end of the frame, and cut ("…") beyond that, so that it never crosses the frame.
+constexpr float kButtonMinScale = 0.62f, kButtonLabelPad = 14.0f;
+TextStyle buttonLabelStyle() {
+    TextStyle st;
+    st.face = font::FACE_TITLE;
+    st.size = kButton;
+    st.tracking = kTrackTitle;
+    st.align = HAlign::Center;
+    return st;
+}
+std::string elideToFit(const std::string& s, const TextStyle& st, float maxWidth) {
+    // Half a unit of slack: a label fitSize() shrank to the exact width measures a hair over it.
+    if (gfx::textWidth(s, st) <= maxWidth + 0.5f) return s;
+    const char* const ellipsis = "\xE2\x80\xA6";
+    std::u32string cps = uni::decode(s);
+    size_t lo = 0, hi = cps.size();
+    while (lo < hi) {  // the longest start that fits with the ellipsis
+        size_t mid = (lo + hi + 1) / 2;
+        if (gfx::textWidth(uni::encode(cps.substr(0, mid)) + ellipsis, st) <= maxWidth) lo = mid;
+        else hi = mid - 1;
+    }
+    std::u32string head = cps.substr(0, lo);
+    while (!head.empty() && head.back() == U' ') head.pop_back();
+    return uni::encode(head) + ellipsis;
+}
+
 // Info mark: a circled "i" this far after the label (centre), and the room a label leaves for it.
 constexpr float kInfoRadius = 8.5f;
 constexpr float kInfoOffset = 13.0f + kInfoRadius;
@@ -504,14 +531,10 @@ bool menuEntry(const std::string& label, const Rect& r, bool enabled, HAlign ali
 bool button(const std::string& label, const Rect& r, ButtonKind kind, bool enabled, uint32_t extraFlags) {
     uint32_t flags = (extraFlags & ITEM_MOUSE_ONLY) ? 0u : ITEM_FOCUSABLE;
     Item it = item(makeId(label), r, (enabled ? flags : ITEM_DISABLED) | extraFlags);
-    const std::string shown = displayText(label);
+    std::string shown = displayText(label);
     float t = it.hoverT, p = it.pressT;
     gfx::pushAlpha(enabled ? 1.0f : 0.4f);
-    TextStyle st;
-    st.face = font::FACE_TITLE;
-    st.size = kButton;
-    st.tracking = kTrackTitle;
-    st.align = HAlign::Center;
+    TextStyle st = buttonLabelStyle();
     if (kind == ButtonKind::Primary) {
         gfx::shadow(r.offset(0, 4), 3, 18, withAlpha(black, 0.5f));
         vec4 top = theme::mix(velvet, velvetBright, t * 0.8f);
@@ -537,11 +560,20 @@ bool button(const std::string& label, const Rect& r, ButtonKind kind, bool enabl
         float base = centerBaseline(r, st);
         gfx::fillH(Rect(r.cx() - w * 0.5f, gfx::snap(base + 5.0f), w, gfx::px()), withAlpha(gold, 0.6f * t), withAlpha(gold, 0.1f * t));
     }
-    if (kind != ButtonKind::Quiet) st.size = gfx::fitSize(shown, st, r.w - 28.0f, 0.62f);
+    if (kind != ButtonKind::Quiet) {
+        st.size = gfx::fitSize(shown, st, r.w - 2.0f * kButtonLabelPad, kButtonMinScale);
+        shown = elideToFit(shown, st, r.w - 2.0f * kButtonLabelPad);
+    }
     gfx::text(shown, r.cx(), centerBaseline(r, st) + p, st);
     gfx::popAlpha();
     if (it.activated) sound(Sound::Click);
     return it.activated;
+}
+
+bool buttonLabelFits(const std::string& label, float width) {
+    TextStyle st = buttonLabelStyle();
+    st.size *= kButtonMinScale;
+    return gfx::textWidth(displayText(label), st) <= width - 2.0f * kButtonLabelPad;
 }
 
 void disabledButton(const std::string& label, const Rect& r, ButtonKind kind, const std::string& why, const Rect& within) {

@@ -1,7 +1,8 @@
 // The account pages' data on the game's side (the account API of the dedicated server,
 // dedicated-server/docs/API.md): the pages of the player's game history, the game opened from it,
-// the signed-in devices, and what the answers change in the account. game::OnlineSession keeps one
-// AccountData and routes the answers of net::OnlineClient to it (AccountData::apply); the pages
+// the signed-in devices, and what the answers change in the account. game::OnlineSession keeps the
+// answers the menus wait for in a ServerAnswers (those of a server left meanwhile dropped) and one
+// AccountData, and routes the answers of net::OnlineClient to it (AccountData::apply); the pages
 // (ui/ui_screens_account.cpp) read it. The animated GIFs of games (a game of the history, a game
 // of the saved games: ui/ui_library.cpp) go through one GifSaver, which writes each file to the
 // GIF folder. Engine-free (no GL, no UI): unit-tested in tests/online_account_tests.cpp.
@@ -11,10 +12,37 @@
 #include <cstdint>
 #include <ctime>
 #include <future>
+#include <map>
 #include <string>
 #include <vector>
 
 namespace game {
+
+// The answers of the HTTPS requests the menus wait for (OnlineSession::expect, busy and take), for
+// the server in use. Every answer names the server its request went to (net::Event::origin): the
+// answers of a server left meanwhile (Options > Online, applyServer) are not this server's history,
+// game, devices, account or refused session, and are dropped, except a PGN: the game page saves it
+// as the game it asked for, under the server that game came from (GameSaveState::saveGame), so a
+// Save game pressed before the change still ends (never left waiting for an answer thrown away).
+class ServerAnswers {
+public:
+    // The server in use (its origin). Any call forgets what was awaited and kept, except the PGN.
+    void setServer(const std::string& origin);
+    const std::string& origin() const { return origin_; }
+    // An answer of another server than the one in use ("" origin: a realtime event, never foreign).
+    bool foreign(const net::Event& e) const { return !e.origin.empty() && e.origin != origin_; }
+    void expect(net::Event::Kind k);              // a request was sent: busy() until its answer
+    bool busy(net::Event::Kind k) const;
+    bool take(net::Event::Kind k, net::Event& out);   // the answer arrived, handed over once
+    // An answer arrived: kept for take() (the latest of its kind), one fewer awaited. False, and
+    // nothing changes, for a foreign one other than a PGN.
+    bool keep(const net::Event& e);
+
+private:
+    std::string origin_;
+    std::map<int, net::Event> results_;
+    std::map<int, int> pending_;
+};
 
 // The game history, page by page, newest first: the server's cursor (GamesPage::next) leads to the
 // next page; the cursors of the pages already seen are kept, so that Previous needs none of its own.
@@ -38,8 +66,8 @@ public:
     // An answer (page: GamesPage::before and filter name its request): true when it was kept.
     bool accept(const net::GamesPage& page);
     // A request failed (request: its GamesPage::before and filter): when it is the one awaited, the
-    // page shown stays with the error.
-    void fail(const net::GamesPage& request, const std::string& error);
+    // page shown stays with the error (and the server's wait, rate_limited: Event::retryAfterSec).
+    void fail(const net::GamesPage& request, const std::string& error, int retryAfterSec = 0);
     void clear();                          // nothing loaded (signed out, another server)
 
     const net::GamesFilter& filter() const { return filter_; }
@@ -47,6 +75,7 @@ public:
     bool loaded() const { return loaded_; }          // a page of this filter arrived
     bool waiting() const { return waiting_; }        // a request is in flight
     const std::string& error() const { return error_; }
+    int retryAfterSec() const { return retryAfter_; } // with error(): the server's wait, 0 = none
     int pageIndex() const { return index_; }         // 0 = the newest games
     int pageCount() const;                           // from the total, at least 1
     bool hasNext() const { return loaded_ && page_.next != 0; }
@@ -61,6 +90,7 @@ private:
     uint64_t wantBefore_ = 0;
     int wantIndex_ = 0;
     std::string error_;
+    int retryAfter_ = 0;
     struct Request {
         uint64_t before;
         net::GamesFilter filter;
@@ -77,10 +107,12 @@ struct AccountData {
     bool gameLoaded = false;          // 'game' is the one asked for
     net::GameDetails game;
     std::string gameError;
+    int gameRetryAfter = 0;           // with gameError: the server's wait (rate_limited), 0 = none
     // The signed-in devices (GET /auth/sessions).
     bool sessionsLoaded = false;
     std::vector<net::SessionInfo> sessions;
     std::string sessionsError;
+    int sessionsRetryAfter = 0;       // with sessionsError, as gameRetryAfter
 
     void clear();
     // Applies an answer of the account API: keeps what the pages show (the history page awaited,

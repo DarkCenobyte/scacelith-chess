@@ -13,6 +13,49 @@ namespace game {
 
 using Kind = net::Event::Kind;
 
+// ---- Answers awaited ------------------------------------------------------------------------------------
+
+void ServerAnswers::setServer(const std::string& origin) {
+    const int pgn = int(Kind::PgnResult);
+    const auto awaited = pending_.find(pgn);
+    const int pgnPending = awaited == pending_.end() ? 0 : awaited->second;
+    const auto arrived = results_.find(pgn);
+    net::Event pgnResult;
+    const bool pgnArrived = arrived != results_.end();
+    if (pgnArrived) pgnResult = arrived->second;
+    origin_ = origin;
+    results_.clear();
+    pending_.clear();
+    if (pgnPending > 0) pending_[pgn] = pgnPending;
+    if (pgnArrived) results_[pgn] = pgnResult;
+}
+
+void ServerAnswers::expect(Kind k) {
+    pending_[int(k)]++;
+    results_.erase(int(k));
+}
+
+bool ServerAnswers::busy(Kind k) const {
+    auto it = pending_.find(int(k));
+    return it != pending_.end() && it->second > 0;
+}
+
+bool ServerAnswers::take(Kind k, net::Event& out) {
+    auto it = results_.find(int(k));
+    if (it == results_.end()) return false;
+    out = it->second;
+    results_.erase(it);
+    return true;
+}
+
+bool ServerAnswers::keep(const net::Event& e) {
+    if (foreign(e) && e.kind != Kind::PgnResult) return false;
+    auto it = pending_.find(int(e.kind));
+    if (it != pending_.end() && it->second > 0) it->second--;
+    results_[int(e.kind)] = e;
+    return true;
+}
+
 // ---- History pages ------------------------------------------------------------------------------------
 
 namespace {
@@ -28,6 +71,7 @@ uint64_t HistoryPager::restart(const net::GamesFilter& filter) {
     index_ = 0;
     loaded_ = false;
     error_.clear();
+    retryAfter_ = 0;
     waiting_ = true;
     wantBefore_ = 0;
     wantIndex_ = 0;
@@ -41,6 +85,7 @@ bool HistoryPager::next(uint64_t& before) {
     wantBefore_ = before = page_.next;
     wantIndex_ = index_ + 1;
     error_.clear();
+    retryAfter_ = 0;
     sent();
     return true;
 }
@@ -51,6 +96,7 @@ bool HistoryPager::previous(uint64_t& before) {
     wantBefore_ = before = cursors_[size_t(index_ - 1)];
     wantIndex_ = index_ - 1;
     error_.clear();
+    retryAfter_ = 0;
     sent();
     return true;
 }
@@ -60,6 +106,7 @@ uint64_t HistoryPager::reload() {
     wantIndex_ = loaded_ ? index_ : 0;
     wantBefore_ = loaded_ && size_t(index_) < cursors_.size() ? cursors_[size_t(index_)] : 0;
     error_.clear();
+    retryAfter_ = 0;
     sent();
     return wantBefore_;
 }
@@ -89,16 +136,18 @@ bool HistoryPager::accept(const net::GamesPage& page) {
     cursors_.resize(size_t(index_) + 1);  // the pages after it are found again from its cursor
     loaded_ = true;
     error_.clear();
+    retryAfter_ = 0;
     return true;
 }
 
-void HistoryPager::fail(const net::GamesPage& request, const std::string& error) {
+void HistoryPager::fail(const net::GamesPage& request, const std::string& error, int retryAfterSec) {
     if (!answered(request)) return;
     // The same request asked again meanwhile (the page opened again): its answer is awaited.
     for (const Request& r : inFlight_)
         if (r.before == wantBefore_ && sameFilter(r.filter, filter_)) return;
     waiting_ = false;
     error_ = error.empty() ? std::string("server_error") : error;
+    retryAfter_ = std::max(0, retryAfterSec);
 }
 
 void HistoryPager::clear() {
@@ -122,15 +171,17 @@ bool AccountData::apply(const net::Event& e, net::AccountInfo& account, bool& si
     switch (e.kind) {
     case Kind::GamesResult:
         if (e.ok) history.accept(e.gamesPage);
-        else history.fail(e.gamesPage, e.error);
+        else history.fail(e.gamesPage, e.error, e.retryAfterSec);
         break;
     case Kind::GameDetailsResult:
         if (e.ok && e.gameDetails.id == gameWanted) {
             game = e.gameDetails;
             gameLoaded = true;
             gameError.clear();
+            gameRetryAfter = 0;
         } else if (!e.ok && e.gameId == gameWanted) {
             gameError = e.error;   // not the failure of a game left meanwhile
+            gameRetryAfter = std::max(0, e.retryAfterSec);
         }
         break;
     case Kind::SessionsResult:
@@ -143,8 +194,10 @@ bool AccountData::apply(const net::Event& e, net::AccountInfo& account, bool& si
             });
             sessionsLoaded = true;
             sessionsError.clear();
+            sessionsRetryAfter = 0;
         } else {
             sessionsError = e.error;
+            sessionsRetryAfter = std::max(0, e.retryAfterSec);
         }
         break;
     case Kind::SessionRevoked:

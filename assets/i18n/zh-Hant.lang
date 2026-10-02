@@ -1171,6 +1171,7 @@ gif.err.signed_out = 工作階段已結束。請重新登入後再製作 GIF。
 gif.err.game_too_long = 該對局過長，無法製作成 GIF。
 gif.err.pgn_too_large = 該對局過長，無法製作成 GIF。
 gif.err.invalid_pgn = 伺服器無法讀取該對局。
+gif.err.render_failed = 伺服器無法製作此 GIF。請再試一次。
 gif.err.gif_disabled = 此伺服器不提供 GIF 製作。
 gif.err.write_failed = 無法將 GIF 儲存到這台電腦。
 gif.err.not_found = 伺服器上已沒有該對局。
