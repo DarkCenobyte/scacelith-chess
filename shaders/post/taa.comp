@@ -46,7 +46,8 @@ void main() {
     float speed = length(vel * post.renderSize.xy);
     vec3 outT = cur;
     if (post.taa.x > 0.5 && all(greaterThanEqual(prevUV, vec2(0.0))) && all(lessThan(prevUV, vec2(1.0)))) {
-        vec3 hist = max(sampleCatmullRom(uHistory, prevUV, post.renderSize.xy, post.renderSize.zw).rgb, vec3(0.0));
+        vec3 histRaw = sampleCatmullRom(uHistory, prevUV, post.renderSize.xy, post.renderSize.zw).rgb;
+        vec3 hist = max(histRaw, vec3(0.0));
         // History depths of the bilinear footprint: an edge pixel sees both sides of the edge
         // there, a disoccluded pixel sees only the occluder that moved away.
         vec4 hz = textureGather(uHistory, prevUV, 3);
@@ -60,10 +61,11 @@ void main() {
         } else if (max(max(hz.x, hz.y), max(hz.z, hz.w)) < SKY_DEPTH * 0.25) {
             alpha = max(alpha, 0.5);  // sky revealed behind something that moved
         }
-        if (badValue(hist)) alpha = 1.0;
         float gamma = mix(1.25, 0.8, saturate(speed / 8.0));
         vec3 hy = clipAABB(rgbToYCoCg(tmForward(hist)), mean - gamma * sigma, mean + gamma * sigma);
-        outT = mix(yCoCgToRgb(hy), cur, alpha);
+        // A NaN / Inf history keeps the current colour: mix() with alpha 1 would still carry it
+        // (NaN * 0), and max() above may already have turned a NaN into 0.
+        if (!badValue(histRaw)) outT = mix(yCoCgToRgb(hy), cur, alpha);
     }
     vec3 outC = sanitize(tmInverse(max(outT, vec3(0.0))));
     imageStore(oHistory, p, vec4(outC, zOwn));
