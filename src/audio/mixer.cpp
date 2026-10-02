@@ -208,14 +208,6 @@ void Mixer::dropRetired() {
     std::memmove(retired_, retired_ + 1, sizeof(retired_[0]) * size_t(retiredCount_));
 }
 
-bool Mixer::hasSound(Sfx s) const {
-    int i = int(s);
-    if (i < 0 || i >= int(Sfx::Count)) return false;
-    for (const Slot& sl : slots_[i])
-        if (sl.buf) return true;
-    return false;
-}
-
 int Mixer::activeVoices() const {
     int n = 0;
     for (int i = 0; i < kMaxVoices; ++i) n += voices_[i].active ? 1 : 0;

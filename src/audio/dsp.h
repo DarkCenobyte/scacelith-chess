@@ -16,7 +16,6 @@ constexpr float kPi = 3.14159265358979323846f;
 constexpr float kTau = 6.28318530717958647692f;
 
 inline float dbToGain(float db) { return std::pow(10.0f, db * 0.05f); }
-inline float gainToDb(float g) { return 20.0f * std::log10(std::max(g, 1e-12f)); }
 inline float clampf(float x, float a, float b) { return x < a ? a : (x > b ? b : x); }
 
 // Flush-to-zero / denormals-are-zero for the current thread (restored on destruction).
@@ -56,7 +55,6 @@ struct Rng {
     float range(float a, float b) { return a + (b - a) * uni(); }
     float jit(float x, float rel) { return x * (1.0f + rel * bi()); }              // x * (1 +- rel)
     float logRange(float a, float b) { return a * std::pow(b / a, uni()); }        // log-uniform
-    float gauss() { return (uni() + uni() + uni() + uni() - 2.0f) * 1.7320508f; }  // ~N(0,1)
     bool chance(float p) { return uni() < p; }
     int below(int n) { return int((uint64_t(next()) * uint64_t(n)) >> 32); }
     float expo(float mean) { return -mean * std::log(1.0f - uni() * 0.999999f); }  // exponential
@@ -125,7 +123,6 @@ struct Svf {
         high = v0 - k * v1 - v2;
     }
     float lp(float x) { float l, b, h; tick(x, l, b, h); return l; }
-    float bp(float x) { float l, b, h; tick(x, l, b, h); return b; }
     float bpNorm(float x) { float l, b, h; tick(x, l, b, h); return b * k; }  // unity gain at fc
     float hp(float x) { float l, b, h; tick(x, l, b, h); return h; }
     void reset() { ic1 = ic2 = 0; }
@@ -165,12 +162,6 @@ struct DelayLine {
     void push(float x) { buf[w & mask] = x; ++w; }
     // d = 1 returns the most recently pushed sample.
     float tap(int d) const { return buf[(w - uint32_t(d)) & mask]; }
-    float tapFrac(float d) const {
-        int i = int(d);
-        float f = d - float(i);
-        float a = tap(i), b = tap(i + 1);
-        return a + (b - a) * f;
-    }
 };
 
 // Schroeder all-pass diffuser built on a DelayLine.

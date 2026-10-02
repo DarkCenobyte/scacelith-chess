@@ -98,7 +98,6 @@ public:
     void install(SoundBuffer* b);
     SoundBuffer* peekRetired() const { return retiredCount_ ? retired_[0] : nullptr; }
     void dropRetired();
-    bool hasSound(Sfx s) const;
     void setRefreshHook(RefreshFn fn, void* user) { refreshFn_ = fn; refreshUser_ = user; }
 
     int activeVoices() const;  // effect voices only
