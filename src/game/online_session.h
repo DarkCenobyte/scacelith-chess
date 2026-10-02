@@ -289,6 +289,7 @@ private:
     net::ConnState conn_ = net::ConnState::Offline;
     Queue queue_;
     Outgoing outgoing_;
+    std::vector<Outgoing> cancelledEarly_;      // cancelled before the server named them: cancelled then
     std::vector<Incoming> incoming_;
     double cooldownUntilMs_ = 0, bannedUntilMs_ = 0;
     std::string autoQueue_;                     // --start-online

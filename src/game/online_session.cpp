@@ -6,6 +6,7 @@
 #include "online_mock.h"
 #include "settings.h"
 #include <algorithm>
+#include <cctype>
 #include <chrono>
 #include <cmath>
 #include <cstdio>
@@ -281,6 +282,7 @@ void OnlineSession::applyServer() {
     conn_ = api_->state();
     queue_ = Queue();
     outgoing_ = Outgoing();
+    cancelledEarly_.clear();
     incoming_.clear();
     answers_.setServer(ep.origin());
     ratingRestored_ = live::HeldNotice();  // points of the previous server's account
@@ -489,6 +491,7 @@ void OnlineSession::joinPrivateGame(const std::string& code) { api().joinPrivate
 void OnlineSession::cancelOutgoing() {
     if (!outgoing_.active) return;
     if (outgoing_.id) api().cancelChallenge(outgoing_.id);
+    else cancelledEarly_.push_back(outgoing_);  // its id comes with its Pending status
     outgoing_ = Outgoing();
 }
 
@@ -799,6 +802,20 @@ void OnlineSession::handleServer(net::Event& e) {
             incoming_.erase(std::remove_if(incoming_.begin(), incoming_.end(),
                                            [&](const Incoming& c) { return c.id == e.challengeId; }),
                             incoming_.end());
+            // Only its creator is told Pending: a challenge of ours cancelled before the server named
+            // it (same target and terms) is cancelled now, not left live for an acceptance.
+            if (e.challengeState == ChPending) {
+                auto same = [&](const Outgoing& o) {
+                    return o.baseSec == e.challengeBaseSec && o.incSec == e.challengeIncSec && o.rated == e.challengeRated &&
+                           std::equal(o.target.begin(), o.target.end(), e.challengeTarget.begin(), e.challengeTarget.end(),
+                                      [](char a, char b) { return std::tolower(uint8_t(a)) == std::tolower(uint8_t(b)); });
+                };
+                auto early = std::find_if(cancelledEarly_.begin(), cancelledEarly_.end(), same);
+                if (early != cancelledEarly_.end()) {
+                    api().cancelChallenge(e.challengeId);
+                    cancelledEarly_.erase(early);
+                }
+            }
         }
         break;
     }
