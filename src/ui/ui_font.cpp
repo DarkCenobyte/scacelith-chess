@@ -1,7 +1,7 @@
-// SDF font atlas. Each glyph is rasterised by stb_truetype at 4x the atlas resolution, converted
-// to an exact Euclidean distance field (Felzenszwalb-Huttenlocher) and box-filtered down. The
-// high resolution raster uses the non-zero winding rule, so variable fonts with overlapping
-// contours (Cinzel) produce clean fields.
+// SDF font atlas. Each glyph is rasterised by stb_truetype at 4x (2x for the CJK faces, see
+// kFaces) the atlas resolution, converted to an exact Euclidean distance field
+// (Felzenszwalb-Huttenlocher) and box-filtered down. The high resolution raster uses the non-zero
+// winding rule, so variable fonts with overlapping contours (Cinzel) produce clean fields.
 #include "ui_font.h"
 #include "../core/embedded.h"
 #include "../core/log.h"
@@ -700,7 +700,7 @@ bool renderLineSdf(int face, const std::string& utf8, float capPx, int spread, f
     }
     int bx0, by0, bx1, by1;
     if (!stbtt_GetCodepointBox(&info, 'H', &bx0, &by0, &bx1, &by1) || by1 <= 0) return false;
-    constexpr int O = 4;  // rasterisation oversampling, as the atlas
+    constexpr int O = 4;  // rasterisation oversampling, as the atlas (non-CJK faces)
     const int W = w * O, H = h * O;
     const float s = capPx * float(O) / float(by1);          // font units -> high resolution pixels
     const float emHi = s / stbtt_ScaleForMappingEmToPixels(&info, 1.0f);  // high resolution pixels per em

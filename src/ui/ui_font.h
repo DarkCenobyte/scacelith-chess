@@ -44,8 +44,9 @@ enum Face : int {
 // have different styles on the same scoresheet.
 enum HandStyle : int { HAND_CAVEAT = 0, HAND_MARCK = 1, HAND_BADSCRIPT = 2, HAND_STYLE_COUNT };
 const char* handStyleName(int style);   // "Caveat", "Marck Script", ...
-// Face that writes 'cp' in the given hand: the style's face when it has the glyph, then the
-// script faces, then the UI text face. Never returns a face without the glyph unless none has it.
+// Face that writes 'cp' in the given hand: the handwriting face of its script first (Arabic, kana,
+// Han, CJK punctuation), then the style's face, then Caveat, Klee One and LXGW WenKai, then the UI
+// text face; the style's face when none of them has the glyph.
 int handwritingFace(int style, uint32_t cp);
 bool isHandwritingFace(int face);
 

@@ -409,7 +409,8 @@ float fitSize(const std::string& s, const TextStyle& st, float maxWidth, float m
 }
 
 float capHeight(const TextStyle& st) {
-    // Scripts without capitals are centred on the height of their own ink.
+    // The cap height of the style's face (the handwriting face for a hand); scripts without
+    // capitals use the same value.
     int face = st.face;
     if (st.hand >= 0) face = font::FACE_HAND_CAVEAT + st.hand;
     return font::metrics(face).capHeight * st.size;
