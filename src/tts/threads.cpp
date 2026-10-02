@@ -4,6 +4,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #else
+#include <cerrno>
 #include <sys/resource.h>
 #include <sys/syscall.h>
 #include <unistd.h>
@@ -15,8 +16,11 @@ void lowerThreadPriority() {
 #ifdef _WIN32
     SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
 #else
-    // Linux: the nice value of a thread id applies to that thread only.
-    setpriority(PRIO_PROCESS, id_t(syscall(SYS_gettid)), 5);
+    // Linux: the nice value of a thread id applies to that thread only. +5 from the process's
+    // (its main thread's) value, so helpers started by an already lowered thread get the same.
+    errno = 0;
+    int base = getpriority(PRIO_PROCESS, id_t(getpid()));
+    if (errno == 0) setpriority(PRIO_PROCESS, id_t(syscall(SYS_gettid)), std::min(base + 5, 19));
 #endif
 }
 
