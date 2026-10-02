@@ -32,12 +32,12 @@ void main() {
     vec3 local = (fract(h + (drift - boxCentre) / uBoxSize) - 0.5) * uBoxSize;
     vec3 pos = boxCentre + local;
     vec4 clip = frame.viewProjNoJitter * vec4(pos, 1.0);
-    vec3 toCam = pos - cam;
-    float dist = length(toCam);
+    vec3 camToMote = pos - cam;
+    float dist = length(camToMote);
     float vis = clip.w > frame.exposure.z * 4.0 ? sunVisibility(pos) : 0.0;
     // Fade near the box boundary so wrapping motes do not pop.
     float edge = 1.0 - smoothstep(0.35, 0.5, max(abs(local.x), max(abs(local.y), abs(local.z))) / uBoxSize);
-    vec3 dir = toCam / max(dist, 1e-4);
+    vec3 dir = camToMote / max(dist, 1e-4);
     float phase = phaseHG(dot(dir, frame.sunDirection.xyz), 0.7);
     float spin = t * (0.8 + 2.5 * h.z) + h.x * 50.0;
     float glint = pow(saturate(sin(spin) * sin(spin * 0.37 + h.y * 9.0)), 24.0) * 30.0;
