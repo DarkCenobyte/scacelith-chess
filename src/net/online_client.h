@@ -361,7 +361,8 @@ public:
     void setCredentialsFile(const std::string& path);  // optional; see the note at the top
     void setServer(const ServerEndpoint& ep);    // disconnects if the origin changes
     // Forgets the pin saved for the current origin at sign-in (the session stays): with no pin in
-    // the endpoint, its requests trust the system's certificates again.
+    // the endpoint, its requests trust the system's certificates again. Done on net-http, after the
+    // commands already queued (a sign-in queued before would save the pin again).
     void forgetSavedPin();
     const ServerEndpoint& server() const;
     void fetchServerInfo();

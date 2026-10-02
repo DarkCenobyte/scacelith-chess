@@ -1561,7 +1561,16 @@ void OnlineClient::setServer(const ServerEndpoint& ep) {
 }
 
 void OnlineClient::forgetSavedPin() {
-    if (impl_->ep.valid()) impl_->creds.clearPin(impl_->ep.origin());
+    Impl* d = impl_.get();
+    if (!d->ep.valid()) return;
+    std::string origin = d->ep.origin();
+    // On net-http, behind the sign-ins already queued: they save the pin of the endpoint they were
+    // given (the one forgotten here). A Google sign-in under way polls and saves with its own
+    // endpoint, whose pin goes too.
+    d->http([d, origin] {
+        if (d->sso.active && d->sso.ep.origin() == origin) d->sso.ep.pinnedSha256.clear();
+        d->creds.clearPin(origin);
+    });
 }
 
 const ServerEndpoint& OnlineClient::server() const { return impl_->ep; }

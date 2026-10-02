@@ -1038,7 +1038,10 @@ TEST(net_credentials_forget_saved_pin) {
         c.setCredentialsFile(path);
         c.setServer(ep);
         CHECK(c.hasSavedSession());
-        c.forgetSavedPin();
+        c.forgetSavedPin();   // on net-http
+        auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (!net::CredentialStore(path).pin(ep.origin()).empty() && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
         CHECK(c.hasSavedSession());
     }
     net::CredentialStore s(path);
@@ -4143,6 +4146,48 @@ TEST(net_pow_abandoned_on_server_switch) {
         double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
         std::fprintf(stderr, "  the next server answered %.0f ms after setServer()\n", ms);
         CHECK_EQ(logins.load(), 1);
+    }
+    net::sys::removeFile(credPath);
+}
+
+// The pin field emptied (Options applied) while a sign-in runs: that sign-in saves the pin of the
+// endpoint it was given, so the pin is forgotten after it, not before.
+TEST(net_forget_saved_pin_after_a_sign_in_under_way) {
+    if (!net::transportAvailable()) return;
+    std::atomic<int> logins{0};
+    fakehttp::Server srv([&](const fakehttp::Request& q) {
+        if (q.path != "/api/v1/auth/login") return jsonReply(404, "{\"error\":\"not_found\"}");
+        ++logins;
+        fakehttp::Reply rep = jsonReply(200, "{\"token\":\"" + kRigToken + "\",\"username\":\"alice\"}");
+        rep.silenceMs = 300;
+        return rep;
+    });
+    CHECK(srv.ok());
+    std::string credPath = tempCredentialPath("forget-pin-late");
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = srv.port();
+    ep.insecureDev = true;
+    ep.pinnedSha256 = std::string(64, 'c');   // saved at sign-in (plain HTTP here: never checked)
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        c.login("alice", "pw");
+        auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (logins.load() == 0 && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK_EQ(logins.load(), 1);
+        ep.pinnedSha256.clear();
+        c.setServer(ep);
+        c.forgetSavedPin();
+        net::Event ev;
+        CHECK(waitEvent(c, net::Event::Kind::LoginResult, ev, 10000) && ev.ok);
+        until = std::chrono::steady_clock::now() + std::chrono::seconds(2);
+        while (!net::CredentialStore(credPath).pin(ep.origin()).empty() && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK(net::CredentialStore(credPath).pin(ep.origin()).empty());
+        CHECK(c.hasSavedSession());
     }
     net::sys::removeFile(credPath);
 }
