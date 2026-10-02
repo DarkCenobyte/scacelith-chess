@@ -310,6 +310,7 @@ private:
     const ::ShaderProgram* programFor(const Material& mat, PassId pass, bool allowTess = true);
     void createTargets(int w, int h);
     void destroyTargets();
+    void allocatePlanar();
     void bindGlobalTextures();
     void updateLightingUBO();
     void defaultLightingLayout();

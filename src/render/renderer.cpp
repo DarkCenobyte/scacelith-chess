@@ -221,6 +221,7 @@ void Renderer::setSettings(const RenderSettings& s) {
                           s.staticShadowCache != settings_.staticShadowCache;
     bool probesChanged = s.probeResolution != settings_.probeResolution || s.probeBounces != settings_.probeBounces ||
                          s.lightProbes != settings_.lightProbes;
+    bool planarChanged = s.planarReflections != settings_.planarReflections;
     settings_ = s;
     if (shadowsChanged && frameUbo_.id) shadows_->init(settings_.shadowMapSize, settings_.shadowCascades, settings_.staticShadowCache);
     if (probesChanged && frameUbo_.id) {
@@ -229,6 +230,7 @@ void Renderer::setSettings(const RenderSettings& s) {
         probes_->setProbes(keep);
     }
     if (resizeNeeded && width_ > 0) { int w = width_, h = height_; width_ = 0; resize(w, h); }
+    else if (planarChanged && width_ > 0) allocatePlanar();
 }
 
 void Renderer::createTargets(int w, int h) {
@@ -261,9 +263,15 @@ void Renderer::resize(int w, int h) {
     int rw = std::max(1, int(float(w) * settings_.renderScale)), rh = std::max(1, int(float(h) * settings_.renderScale));
     destroyTargets();
     createTargets(rw, rh);
-    // Planar reflections: half resolution, one array layer per reflector (up to 4).
-    planarRefl_->resize(std::max(1, rw / 2), std::max(1, rh / 2));
+    allocatePlanar();
     post_->resize(rw, rh);
+}
+
+// Planar reflections: half resolution, one array layer per reflector (up to 4), no targets
+// while they are off (Low preset).
+void Renderer::allocatePlanar() {
+    int layers = settings_.planarReflections ? std::max(1, int(planar_.size())) : 0;
+    planarRefl_->resize(std::max(1, rt_.w / 2), std::max(1, rt_.h / 2), layers);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -360,6 +368,7 @@ void Renderer::addLight(const PointLight& l) { lights_.push_back(l); }
 int Renderer::addPlanarReflector(const PlanarReflector& r) {
     if (planar_.size() >= 4) return -1;
     planar_.push_back(r);
+    if (planarRefl_->colorArray() && int(planar_.size()) > planarRefl_->layers()) allocatePlanar();
     return int(planar_.size() - 1);
 }
 

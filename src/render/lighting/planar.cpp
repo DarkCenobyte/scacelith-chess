@@ -8,16 +8,17 @@ using namespace m;
 namespace render {
 namespace lighting {
 
-void PlanarReflections::resize(int w, int h) {
+void PlanarReflections::resize(int w, int h, int layers) {
     shutdown();
     w_ = std::max(1, w);
     h_ = std::max(1, h);
     levels_ = std::min(6, gpu::mipCount(w_, h_));
-    color_ = gpu::createTexture2DArray(w_, h_, 4, GL_RGBA16F, levels_);
-    temp_ = gpu::createTexture2DArray(w_, h_, 4, GL_RGBA16F, levels_);
-    depth_ = gpu::createTexture2DArray(w_, h_, 4, GL_DEPTH_COMPONENT32F);
+    if (layers <= 0) return;
+    color_ = gpu::createTexture2DArray(w_, h_, layers, GL_RGBA16F, levels_);
+    temp_ = gpu::createTexture2DArray(w_, h_, layers, GL_RGBA16F, levels_);
+    depth_ = gpu::createTexture2DArray(w_, h_, layers, GL_DEPTH_COMPONENT32F);
     glObjectLabel(GL_TEXTURE, color_.id, -1, "planar.color");
-    for (int i = 0; i < 4; ++i) fbs_.push_back(gpu::createFramebufferLayer(&color_, i, &depth_, i));
+    for (int i = 0; i < layers; ++i) fbs_.push_back(gpu::createFramebufferLayer(&color_, i, &depth_, i));
 }
 
 void PlanarReflections::shutdown() {
@@ -41,7 +42,7 @@ void PlanarReflections::prepare(Renderer& r) {
         vec3 n = normalize(pr.normal);
         float d = -dot(n, pr.point);
         f.planarPlanes[i] = vec4(n, d);
-        if (!pr.enabled || !r.settings_.planarReflections || !color_.id) continue;
+        if (!pr.enabled || !r.settings_.planarReflections || int(i) >= layers()) continue;
         if (dot(n, cam) + d <= 1e-3f) continue;  // camera behind the mirror
         float x0 = 0, y0 = 0, x1 = 1, y1 = 1;
         if (pr.bounds.valid()) {
