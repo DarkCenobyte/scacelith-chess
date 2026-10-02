@@ -72,7 +72,9 @@ struct Input {
 };
 const Input& input();
 void setCursorVisible(bool visible);
-// When captured the cursor is hidden and locked in place; only mouseDX/DY change.
+// When captured the cursor is hidden and locked in place; only mouseDX/DY change. On Windows, a
+// mouse that reports positions (Remote Desktop, a tablet) moves the hidden cursor inside the
+// window instead, so mouseX/Y change too; it is put back where the capture began when it ends.
 void setMouseCaptured(bool captured);
 
 // ---- Paths & misc ----------------------------------------------------------------------------

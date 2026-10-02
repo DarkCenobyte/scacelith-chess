@@ -1,7 +1,7 @@
 // Internal to the Win32 layer: the motion of a captured mouse that reports positions only (Remote
 // Desktop, VirtualBox/VMware mouse integration, a tablet in absolute mode). The layer reads the
 // motion of relative raw input packets, and such a mouse sends none: the right-button look and the
-// orbit cameras would not move. Header-only, for the unit tests.
+// watch camera would not move. Header-only, for the unit tests.
 #pragma once
 #include <algorithm>
 
