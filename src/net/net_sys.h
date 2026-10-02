@@ -9,6 +9,10 @@
 namespace net {
 namespace sys {
 
+#ifdef _WIN32
+std::wstring widen(const std::string& utf8);   // to UTF-16, for the W functions of Windows
+#endif
+
 std::string exeDirectory();        // directory of the running executable, trailing separator
 std::string userDataDirectory();   // %APPDATA%\scacelith\ or ~/.config/scacelith/ (created)
 // The per-user folder of the game's data files (created), the rule of plat::appDataDirectory():

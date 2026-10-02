@@ -5,7 +5,7 @@
 // obtained, and the pinned certificate fingerprint (hex SHA-256) if the player set one.
 //
 // The file (Scacelith.credentials, JSON) lives next to the executable like Scacelith.ini, or in
-// the user data directory (%APPDATA%\Scacelith\, ~/.config/scacelith/) when the executable's
+// the user data directory (%APPDATA%\scacelith\, ~/.config/scacelith/) when the executable's
 // directory is not writable. Tokens are never stored in clear on Windows: DPAPI
 // (CryptProtectData, current user, CRYPTPROTECT_UI_FORBIDDEN) with the origin as additional
 // entropy, so a token blob moved to another origin's record cannot be decrypted there. Linux
@@ -43,16 +43,24 @@ public:
     std::string path() const;
 
     // The record of this exact origin, token decrypted. A token that cannot be decrypted for
-    // this origin (other user, other machine, blob copied from another origin) comes back empty.
+    // this origin (other user, other machine, blob copied from another origin) comes back empty
+    // and is no token for hasToken(), this run (the file keeps it: another Windows account
+    // sharing a portable install may own it).
     bool get(const std::string& origin, Credential& out) const;
-    bool hasToken(const std::string& origin) const;   // without decrypting
+    // A token is saved and can be decrypted here (tried once per record and run).
+    bool hasToken(const std::string& origin) const;
     std::string username(const std::string& origin) const;
+    std::string pin(const std::string& origin) const;   // the saved pin (without decrypting the token)
 
-    bool put(const Credential& c);               // creates or replaces c.origin's record; saves
+    // Creates or replaces c.origin's record and saves the file. False when the token could not be
+    // protected (nothing changed: *stored false) or the file not written (*stored true: the record
+    // holds for this run).
+    bool put(const Credential& c, bool* stored = nullptr);
     bool clearToken(const std::string& origin);  // logout: keeps user name, server id and pin
     // The same, only while the saved token is 'token' (the one a server refused): a token saved
     // since (a new sign-in on another thread) is kept.
     bool clearToken(const std::string& origin, const std::string& token);
+    bool clearPin(const std::string& origin);    // forgets the pin only (keeps the session)
     bool erase(const std::string& origin);       // forgets the origin entirely
     std::vector<std::string> origins() const;
     // When the file has no record for `to` and has one for `from`, that record becomes `to`'s
@@ -62,6 +70,8 @@ public:
 private:
     struct Record {
         std::string origin, username, serverId, pin, tokenBlob;
+        bool checked = false;      // whether tokenBlob decrypts here is known (get, hasToken, put)
+        bool unreadable = false;   // tokenBlob could not be decrypted here
     };
     mutable std::mutex mu_;
     mutable std::string path_;
@@ -73,6 +83,7 @@ private:
     void applyMovesLocked() const;
     bool saveLocked() const;
     Record* findLocked(const std::string& origin) const;
+    bool readLocked(Record& r, std::string& token) const;   // decrypts r's token, notes the outcome
 };
 
 // Token protection used by the store (exposed for the unit tests).

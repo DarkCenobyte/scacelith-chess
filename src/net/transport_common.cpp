@@ -4,14 +4,12 @@
 
 namespace net {
 
+// The abort action runs under mu_: setAbort(nullptr), when the operation ends, waits for one that
+// is running, which therefore never outlives the socket or handle it closes.
 void CancelToken::cancel() {
-    std::function<void()> fn;
-    {
-        std::lock_guard<std::mutex> lk(mu_);
-        cancelled_.store(true);
-        fn = abort_;
-    }
-    if (fn) fn();
+    std::lock_guard<std::mutex> lk(mu_);
+    cancelled_.store(true);
+    if (abort_) abort_();
 }
 
 void CancelToken::reset() {
@@ -26,13 +24,9 @@ bool CancelToken::hasAbort() {
 }
 
 void CancelToken::setAbort(std::function<void()> fn) {
-    bool runNow;
-    {
-        std::lock_guard<std::mutex> lk(mu_);
-        abort_ = fn;
-        runNow = cancelled_.load() && fn;
-    }
-    if (runNow) fn();
+    std::lock_guard<std::mutex> lk(mu_);
+    abort_ = std::move(fn);
+    if (cancelled_.load() && abort_) abort_();
 }
 
 static std::string lower(const std::string& s) {

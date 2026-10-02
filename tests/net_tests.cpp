@@ -30,6 +30,7 @@
 #include "http_fake.h"
 #include "repo_files.h"
 #include "chess/chess.h"
+#include "core/log.h"
 #include "game/online_account.h"
 #include "net/credential_store.h"
 #include "net/crypto.h"
@@ -617,6 +618,39 @@ TEST(net_json_parse) {
     CHECK(net::json::parse("{\"k\":1,\"k\":2}", v) && v["k"].asInt() == 2 && v.size() == 1);
 }
 
+// A large object is read in time proportional to its size (a hostile server's answer of 1 MiB,
+// up to 100000 members, must not keep a network thread busy), with the same rule for duplicate
+// names however many members come before them: the last value, at the position of the first.
+TEST(net_json_large_object) {
+    std::string doc = "{";
+    for (int i = 0; i < 90000; ++i) {
+        char member[16];
+        std::snprintf(member, sizeof member, "%s\"%05x\":%d", i ? "," : "", i, i % 10);
+        doc += member;
+    }
+    doc += "}";
+    Value v;
+    auto t0 = std::chrono::steady_clock::now();
+    CHECK(net::json::parse(doc, v));
+    double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    std::fprintf(stderr, "  %zu bytes, 90000 members: %.1f ms\n", doc.size(), ms);
+    CHECK(ms < 2000);   // seconds before (a scan of the kept members per member)
+    CHECK_EQ(v.size(), size_t(90000));
+    CHECK_EQ(v["15f8f"].asInt(), int64_t(89999 % 10));
+
+    std::string dup = "{";
+    for (int i = 0; i < 30; ++i) dup += (i ? ",\"a" : "\"a") + std::to_string(i) + "\":" + std::to_string(i);
+    dup += ",\"a3\":\"x\",\"a20\":\"y\",\"a29\":null,\"a3\":\"z\",\"b\":1}";
+    CHECK(net::json::parse(dup, v));
+    CHECK_EQ(v.size(), size_t(31));
+    CHECK_EQ(v.members()[3].first, std::string("a3"));
+    CHECK_EQ(v.members()[3].second.asString(), std::string("z"));
+    CHECK_EQ(v.members()[20].second.asString(), std::string("y"));
+    CHECK(v.members()[29].second.isNull());
+    CHECK_EQ(v.members()[30].first, std::string("b"));
+    CHECK_EQ(v.dump().substr(0, 32), std::string("{\"a0\":0,\"a1\":1,\"a2\":2,\"a3\":\"z\",\""));
+}
+
 TEST(net_json_rejects) {
     const char* bad[] = {"", "{", "[1,]", "{\"a\":1,}", "01", "1.", ".5", "+1", "-", "1e", "tru", "nul", "NaN", "Infinity",
                          "\"abc", "\"a\\x\"", "\"\\ud800\"", "\"\\udc00\"", "\"\\ud800\\u0041\"", "\"a\tb\"", "\"\xC3\x28\"",
@@ -847,6 +881,8 @@ TEST(net_credentials_isolation) {
         CHECK(s.get(A, out));
         CHECK_EQ(out.token, tokenA);
         CHECK_EQ(out.pinnedSha256, std::string(64, 'a'));
+        CHECK_EQ(s.pin(A), std::string(64, 'a'));
+        CHECK(s.pin(B).empty());
     }
     std::string text;
     CHECK(net::sys::readFile(path, text, 1 << 20));
@@ -889,6 +925,116 @@ TEST(net_credentials_isolation) {
     CHECK(!net::unprotectToken(B, blob, back));
     CHECK(back.empty());
     CHECK(!net::unprotectToken(A, "garbage", back));
+    net::sys::removeFile(path);
+}
+
+// A saved token that cannot be decrypted here (a portable install copied to another PC or Windows
+// account) is no saved session, from the first look of the run: the game offers to sign in instead
+// of resuming a session that fails at every opening. The file keeps it (it may be another account's).
+TEST(net_credentials_undecryptable_token) {
+    std::string path = tempCredentialPath("undecryptable");
+    const std::string A = "a.example.org:443", B = "b.example.org:443";
+    const std::string tokenA = "sct_" + std::string(43, 'A'), tokenB = "sct_" + std::string(43, 'B');
+    const std::string blob = net::protectToken(A, tokenA);   // bound to A: never decrypts for B
+    Value rec = Value::object();
+    rec.set("origin", B);
+    rec.set("username", "bob");
+    rec.set("token", blob);
+    Value good = Value::object();
+    good.set("origin", A);
+    good.set("username", "alice");
+    good.set("token", blob);
+    Value doc = Value::object();
+    doc.set("version", 1);
+    Value& records = doc.set("records", Value::array());
+    records.push(rec);
+    records.push(good);
+    CHECK(net::sys::writeFileAtomic(path, doc.dump(), true));
+    {
+        net::CredentialStore s(path);
+        CHECK(!s.hasToken(B));                      // before any get()
+        CHECK(s.hasToken(A));
+        net::Credential out;
+        CHECK(s.get(B, out));
+        CHECK(out.token.empty());
+        CHECK_EQ(out.username, std::string("bob"));
+        CHECK(!s.hasToken(B));                      // no saved session there from now on
+        CHECK(s.get(B, out) && out.token.empty());
+        CHECK(!s.hasToken(B));
+        std::string text;
+        CHECK(net::sys::readFile(path, text, 1 << 20));
+        CHECK(text.find(blob) != std::string::npos);   // the file is left as it is
+        // A new sign-in there replaces it.
+        out.token = tokenB;
+        CHECK(s.put(out));
+        CHECK(s.hasToken(B));
+        CHECK(s.get(B, out) && out.token == tokenB);
+    }
+    net::sys::removeFile(path);
+}
+
+// put() tells a record it could not keep at all (no origin, or a token the OS could not protect:
+// a sign-in must not look successful then) from a file it could not write (the record holds for
+// this run, the session works until the game quits).
+TEST(net_credentials_put_reports_what_it_kept) {
+    const std::string A = "a.example.org:443", token = "sct_" + std::string(43, 'K');
+    net::CredentialStore s(net::sys::exeDirectory() + "net-test-no-such-folder/x.credentials");
+    net::Credential c;
+    c.origin = A;
+    c.username = "alice";
+    c.token = token;
+    bool stored = false;
+    CHECK(!s.put(c, &stored));                      // the file cannot be written...
+    CHECK(stored);                                  // ...the record is kept all the same
+    CHECK(s.hasToken(A));
+    net::Credential out;
+    CHECK(s.get(A, out) && out.token == token);
+    c.origin.clear();
+    CHECK(!s.put(c, &stored));
+    CHECK(!stored);
+}
+
+// The pin saved at sign-in applies while the endpoint gives none; forgetSavedPin() (the pin field
+// of Options emptied for that server) removes it, so that the system's certificates are trusted
+// again, and keeps the session.
+TEST(net_credentials_forget_saved_pin) {
+    std::string path = tempCredentialPath("forget-pin");
+    const std::string token = "sct_" + std::string(43, 'P'), pin(64, 'b');
+    net::ServerEndpoint ep;
+    ep.host = "chess.example.org";
+    ep.apiPort = 8443;
+    {
+        net::CredentialStore s(path);
+        net::Credential c;
+        c.origin = ep.origin();
+        c.username = "alice";
+        c.token = token;
+        c.serverId = "srv-1";
+        c.pinnedSha256 = pin;
+        CHECK(s.put(c));
+        c.origin = "other.example.org:8443";       // another server's pin stays
+        CHECK(s.put(c));
+    }
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(path);
+        c.setServer(ep);
+        CHECK(c.hasSavedSession());
+        c.forgetSavedPin();   // on net-http
+        auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (!net::CredentialStore(path).pin(ep.origin()).empty() && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK(c.hasSavedSession());
+    }
+    net::CredentialStore s(path);
+    net::Credential out;
+    CHECK(s.get(ep.origin(), out));
+    CHECK(out.pinnedSha256.empty());
+    CHECK_EQ(out.token, token);
+    CHECK_EQ(out.username, std::string("alice"));
+    CHECK_EQ(out.serverId, std::string("srv-1"));
+    CHECK_EQ(s.pin("other.example.org:8443"), pin);
+    CHECK(s.clearPin("nowhere.example.org:443"));   // nothing saved there: nothing to do
     net::sys::removeFile(path);
 }
 
@@ -1019,6 +1165,141 @@ TEST(net_transport_refuses_insecure) {
     CHECK(ran);
 }
 
+// A server that accepts the request and says nothing: the request and the WebSocket upgrade end
+// at their timeout (Wine's WinHTTP waits for the response headers with a timeout of its own).
+TEST(net_transport_silent_server_times_out) {
+    if (!net::transportAvailable()) return;
+    fakehttp::Server srv(
+        [](const fakehttp::Request&) {
+            fakehttp::Reply rep;
+            rep.silenceMs = 6000;
+            return rep;
+        },
+        true);
+    CHECK(srv.ok());
+    net::HttpRequest req;
+    req.host = "127.0.0.1";
+    req.port = srv.port();
+    req.tls = false;
+    req.path = "/api/v1/info";
+    req.timeoutMs = 1000;
+    net::HttpResponse resp;
+    auto t0 = std::chrono::steady_clock::now();
+    net::httpRequest(req, resp);
+    double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    std::fprintf(stderr, "  request: %s after %.0f ms\n", resp.error.c_str(), ms);
+    CHECK_EQ(resp.error, std::string("timeout"));
+    CHECK(ms < 4000);
+    net::WsParams p;
+    p.host = "127.0.0.1";
+    p.port = srv.port();
+    p.tls = false;
+    p.subprotocol = "scacelith.v1";
+    p.timeoutMs = 1000;
+    std::string error;
+    int status = 0;
+    t0 = std::chrono::steady_clock::now();
+    std::unique_ptr<net::WebSocket> ws = net::wsConnect(p, error, status, nullptr);
+    ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    std::fprintf(stderr, "  upgrade: %s after %.0f ms\n", error.c_str(), ms);
+    CHECK(!ws);
+    CHECK(ms < 4000);
+}
+
+// Chunked answers to httpRequest: chunk sizes that end the reads anywhere (in a size line, in the
+// data, between CR and LF), a large body in linear time, malformed and truncated codings (the
+// OpenSSL transport's own decoder; WinHTTP decodes the coding itself).
+TEST(net_transport_chunked_answers) {
+    if (!net::transportAvailable()) return;
+    std::string body, coded;
+    for (size_t i = 0, k = 1; body.size() < (size_t(1) << 20); ++i, k = k % 997 + 1) {
+        std::string part(k, char('a' + i % 26));
+        char size[16];
+        std::snprintf(size, sizeof size, "%zx\r\n", k);
+        coded += size + part + "\r\n";
+        body += part;
+    }
+    coded += "0\r\n\r\n";
+    std::string large(size_t(16) << 20, '\0');
+    for (size_t i = 0; i < large.size(); ++i) large[i] = char('A' + (i * 7) % 61);
+    fakehttp::Server srv([&](const fakehttp::Request& q) {
+        fakehttp::Reply rep;
+        if (q.path == "/large") {
+            rep.chunked = true;   // chunks of 16 KiB
+            rep.body = large;
+            return rep;
+        }
+        rep.noLength = true;
+        rep.headers.emplace_back("Transfer-Encoding", "chunked");
+        if (q.path == "/pieces") {
+            rep.body = coded;
+            rep.pieceDelayMs = 10;   // 16 KiB pieces, a read each
+        } else if (q.path == "/bad-line-end") {
+            rep.body = "5\r\nhelloXX0\r\n\r\n";
+        } else if (q.path == "/bad-size") {
+            rep.body = "000000005\r\nhello\r\n0\r\n\r\n";
+        } else if (q.path == "/bare-lf") {
+            rep.body = "5\nhello\r\n0\r\n\r\n";
+        } else {
+            rep.body = coded.substr(0, coded.size() / 2);   // the connection ends there
+        }
+        return rep;
+    });
+    CHECK(srv.ok());
+    auto get = [&](const char* path, net::HttpResponse& resp) {
+        net::HttpRequest req;
+        req.host = "127.0.0.1";
+        req.port = srv.port();
+        req.tls = false;
+        req.path = path;
+        req.timeoutMs = 60000;
+        req.maxResponseBytes = size_t(32) << 20;
+        auto t0 = std::chrono::steady_clock::now();
+        net::httpRequest(req, resp);
+        return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    };
+    net::HttpResponse resp;
+    get("/pieces", resp);
+    CHECK(resp.error.empty());
+    CHECK(resp.body == body);
+    double ms = get("/large", resp);
+    std::fprintf(stderr, "  16 MiB chunked: %.0f ms\n", ms);
+    CHECK(resp.error.empty());
+    CHECK(resp.body == large);
+    CHECK(ms < 5000);
+#ifndef _WIN32
+    for (const char* bad : {"/bad-line-end", "/bad-size", "/bare-lf", "/truncated"}) {
+        get(bad, resp);
+        CHECK_EQ(resp.error, std::string("network"));
+        CHECK(resp.body.empty());
+    }
+#endif
+}
+
+// An operation that ends while another thread runs its abort action waits for that action: what
+// the action uses (the operation's socket or handle) is still there.
+TEST(net_transport_cancel_waits_for_a_running_abort) {
+    struct Target { int closed = 0; };
+    auto* target = new Target;
+    std::atomic<bool> inside{false};
+    net::CancelToken tok;
+    tok.setAbort([&] {
+        inside.store(true);
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        target->closed = 1;
+        inside.store(false);
+    });
+    std::thread canceller([&] { tok.cancel(); });
+    while (!inside.load()) std::this_thread::yield();
+    tok.setAbort(nullptr);   // the operation ends
+    CHECK(!inside.load());
+    CHECK_EQ(target->closed, 1);
+    canceller.join();
+    delete target;
+    CHECK(tok.cancelled());
+    CHECK(!tok.hasAbort());
+}
+
 // A request that runs out of memory (a large answer while the system has none left) throws
 // std::bad_alloc out of the transport. The abort action it gave its CancelToken (closing its
 // socket or handle, locals of the call) is taken back all the same, so that a later cancel() (the
@@ -1124,6 +1405,7 @@ class FakeServer {
 public:
     uint16_t port = 0;
     const std::string token = "sct_" + std::string(43, 'T');
+    const std::string token2 = "sct_" + std::string(43, 'U');
     const std::string powChallenge = "fake-challenge-0123456789abcdef";
     static constexpr double kSkewMs = 5000;         // the server clock runs 5 s ahead
     std::atomic<int> loginAttempts{0}, powAccepted{0}, hellos{0}, pings{0}, moves{0}, logouts{0};
@@ -1139,6 +1421,7 @@ public:
     std::atomic<uint16_t> gestureRate{0}, gestureBurst{0};   // Welcome.gestureRate / gestureBurst
     std::atomic<bool> autoPress{true};                        // GameSnapshot.autoPress
     std::atomic<bool> seqOk{true};                            // every client message came numbered in order
+    std::atomic<bool> loginToken2{false};                     // sign-ins answer token2 (another session)
 
     // The C_Gesture frames received, with their arrival time.
     struct GestureIn {
@@ -1222,10 +1505,32 @@ public:
         }
     }
 
+    // Notice{SessionRevoked} on every WebSocket (the session of that connection was revoked).
+    void noticeRevoked() {
+        std::lock_guard<std::mutex> lk(mu_);
+        for (Sock s : ws_) {
+            pr::Notice n;
+            n.code = pr::NoticeCode::SessionRevoked;
+            sendMsg(s, n);
+        }
+    }
+
     // The opponent's gesture (S_Gesture) on every WebSocket.
     void sendGesture(const pr::S_Gesture& g) {
         std::lock_guard<std::mutex> lk(mu_);
         for (Sock s : ws_) sendMsg(s, g);
+    }
+
+    // Frames the client ignores on every WebSocket, count of each kind: a client message type,
+    // and a Welcome without its fields.
+    void sendBadFrames(int count) {
+        std::lock_guard<std::mutex> lk(mu_);
+        const uint8_t clientType[1] = {0x01}, shortWelcome[1] = {uint8_t(pr::MsgType::Welcome)};
+        for (Sock s : ws_)
+            for (int i = 0; i < count; ++i) {
+                sendFrame(s, 0x2, clientType, 1);
+                sendFrame(s, 0x2, shortWelcome, 1);
+            }
     }
 
 private:
@@ -1355,7 +1660,7 @@ private:
             } else if (body["pow"]["challenge"].asString() == powChallenge &&
                        net::crypto::powCheck(powChallenge, body["pow"]["nonce"].asString(), 10)) {
                 ++powAccepted;
-                respond(s, 200, "{\"token\":\"" + token + "\",\"expiresAt\":1,\"user\":{\"id\":7,\"username\":\"alice\","
+                respond(s, 200, "{\"token\":\"" + (loginToken2.load() ? token2 : token) + "\",\"expiresAt\":1,\"user\":{\"id\":7,\"username\":\"alice\","
                                     "\"email\":\"a@example.org\",\"emailVerified\":true,\"mfaEnabled\":false,\"googleLinked\":false}}");
             } else {
                 respond(s, 428, "{\"error\":\"pow_required\",\"pow\":{\"challenge\":\"x\",\"bits\":40}}");
@@ -1647,7 +1952,6 @@ TEST(net_online_client_loopback) {
         c.setServer(ep);
         CHECK_EQ(c.server().origin(), "127.0.0.1:" + std::to_string(srv.port));
         CHECK(!c.hasSavedSession());
-        CHECK(c.currentGame() == nullptr);
 
         net::Event ev;
         c.fetchServerInfo();
@@ -1708,10 +2012,8 @@ TEST(net_online_client_loopback) {
         CHECK_EQ(ev.queueCategory, std::string("3+2"));
         CHECK(waitEvent(c, K::GameSnapshot, ev, 5000));
         CHECK_EQ(ev.game.id, uint64_t(77));
-        REQUIRE(c.currentGame());
-        CHECK(c.currentGame()->id == 77);
-        CHECK_EQ(c.currentGame()->black.name, std::string("bob"));
-        CHECK_EQ(c.currentGame()->you, 0);
+        CHECK_EQ(ev.game.black.name, std::string("bob"));
+        CHECK_EQ(ev.game.you, 0);
         chess::Position pos;
         c.sendMove(77, 0, net::packMove(12, 28, 0), pos.fen(), 1500, false);
         CHECK(waitEvent(c, K::MoveMade, ev, 5000));
@@ -1724,8 +2026,8 @@ TEST(net_online_client_loopback) {
         CHECK_EQ(ev.game.running, 0);          // White's clock runs from White's second move
         CHECK(waitEvent(c, K::GameEvent, ev, 5000));
         CHECK_EQ(ev.gameEventKind, int(pr::GameEventKind::DrawOffered));
-        CHECK_EQ(c.currentGame()->moves.size(), size_t(2));
-        CHECK_EQ(c.currentGame()->drawOfferBy, 1);
+        CHECK_EQ(ev.game.moves.size(), size_t(2));
+        CHECK_EQ(ev.game.drawOfferBy, 1);
         // A move with a wrong position digest is refused.
         c.sendMove(77, 2, net::packMove(6, 21, 0), "8/8/8/8/8/8/8/K6k w - - 0 1", 100, false);
         CHECK(waitEvent(c, K::MoveRejected, ev, 5000));
@@ -1736,20 +2038,19 @@ TEST(net_online_client_loopback) {
         int hellosBefore = srv.hellos.load(), infosBefore = srv.infos.load();
         srv.dropWebSockets();
         CHECK(waitState(c, net::ConnState::Reconnecting, 5000));
-        REQUIRE(c.currentGame());
-        CHECK(c.currentGame()->id == 77);
         CHECK(waitEvent(c, K::GameSnapshot, ev, 10000));   // Welcome.activeGame, then the snapshot
+        CHECK_EQ(ev.game.id, uint64_t(77));
         CHECK(c.state() == net::ConnState::Online);
         CHECK_EQ(srv.hellos.load(), hellosBefore + 1);
         CHECK_EQ(srv.infos.load(), infosBefore);
         CHECK_EQ(ev.game.moves.size(), size_t(2));
         CHECK_EQ(ev.game.running, 0);
-        CHECK_EQ(c.currentGame()->drawOfferBy, 2);
+        CHECK_EQ(ev.game.drawOfferBy, 2);
 
         c.resign(77);
         CHECK(waitEvent(c, K::GameEnd, ev, 5000));
-        CHECK_EQ(c.currentGame()->status, int(pr::GameStatus::BlackWins));
-        CHECK_EQ(c.currentGame()->reason, int(pr::EndReason::Resignation));
+        CHECK_EQ(ev.game.status, int(pr::GameStatus::BlackWins));
+        CHECK_EQ(ev.game.reason, int(pr::EndReason::Resignation));
 
         // Banned: the Notice's end of ban comes with the state; no retry.
         srv.kick(pr::CloseCode::Banned, true);
@@ -1777,7 +2078,6 @@ TEST(net_online_client_loopback) {
         other.host = "localhost";
         c.setServer(other);
         CHECK(!c.hasSavedSession());
-        CHECK(c.currentGame() == nullptr);
         c.setServer(ep);
         CHECK(c.hasSavedSession());
 
@@ -2224,7 +2524,7 @@ void gestureScenario(PacingRig& r) {
     using K = net::Event::Kind;
     net::Event ev;
     if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
-    r.expect(!ev.game.autoPress && r.c->currentGame() && !r.c->currentGame()->autoPress, "GameSnapshot.autoPress reaches OnlineGame");
+    r.expect(!ev.game.autoPress, "GameSnapshot.autoPress reaches OnlineGame");
 
     const int kRate = 10, kCapacity = net::gestureSendCapacity(6);
     auto t0 = std::chrono::steady_clock::now();
@@ -2429,6 +2729,62 @@ TEST(net_online_client_gestures) {
     const char* tags[kRigs] = {"gesture", "gesture-off", "gesture-down"};
     void (*scenarios[kRigs])(PacingRig&) = {gestureScenario, gestureOffScenario, gestureDownScenario};
     runRigs(rigs, tags, scenarios, kRigs);
+}
+
+// Frames the client ignores (a client message type, a server message that does not decode): the
+// first ones of a connection are logged, the others counted in one line when it ends; it stays up.
+TEST(net_online_client_bad_frames_logged_once) {
+    if (!net::transportAvailable()) return;
+    PacingRig r;
+    CHECK(r.start("bad-frames"));
+    if (!r.c) return;
+    std::string logPath = tempCredentialPath("bad-frames-log");
+    logx::init(logPath.c_str());
+    const int ups = r.srv.upgrades.load();
+    r.srv.sendBadFrames(5000);
+    CHECK(r.always([&] { return r.c->state() == net::ConnState::Online; }, 500));
+    r.srv.kick(1000);   // after the bad frames: the client has read them all when it sees the close
+    CHECK(r.stateIs(net::ConnState::Reconnecting, 5000));
+    logx::shutdown();
+    CHECK_EQ(r.srv.upgrades.load(), ups);
+    std::string text;
+    CHECK(net::sys::readFile(logPath, text, 1 << 20));
+    net::sys::removeFile(logPath);
+    int perFrame = 0, summaries = 0;
+    for (size_t at = 0; at < text.size();) {
+        size_t end = text.find('\n', at);
+        if (end == std::string::npos) end = text.size();
+        std::string line = text.substr(at, end - at);
+        at = end + 1;
+        if (line.find("ignoring a frame") != std::string::npos || line.find("malformed Welcome") != std::string::npos) ++perFrame;
+        if (line.find("9995 more frames from the server ignored or malformed") != std::string::npos) ++summaries;
+    }
+    CHECK_EQ(perFrame, 5);
+    CHECK_EQ(summaries, 1);
+}
+
+// The session a connection sent is the one erased when the server revokes it (Notice) or refuses
+// it (close 4003): one saved since, by a sign-in on net-http, stays.
+TEST(net_online_client_refusal_keeps_a_newer_session) {
+    if (!net::transportAvailable()) return;
+    for (bool refused : {false, true}) {
+        PacingRig r;
+        bool started = r.start(refused ? "refused-newer" : "revoked-newer");
+        CHECK(started);
+        if (!started) continue;
+        r.srv.loginToken2.store(true);
+        r.c->login("alice", "pw");
+        net::Event ev;
+        CHECK(waitEvent(*r.c, net::Event::Kind::LoginResult, ev, 20000) && ev.ok);
+        if (refused) {
+            r.srv.kick(pr::CloseCode::Unauthorized);
+            CHECK(r.stateIs(net::ConnState::Unauthorized, 5000));
+        } else {
+            r.srv.noticeRevoked();
+            CHECK(waitEvent(*r.c, net::Event::Kind::Notice, ev, 5000));
+        }
+        CHECK(r.c->hasSavedSession());
+    }
 }
 
 // =============================================================================================
@@ -3618,6 +3974,264 @@ TEST(net_account_delete_stops_realtime) {
     net::sys::removeFile(credPath);
 }
 
+namespace {
+bool runningUnderWine() {
+#ifdef _WIN32
+    HMODULE ntdll = GetModuleHandleA("ntdll.dll");
+    return ntdll && GetProcAddress(ntdll, "wine_get_version");
+#else
+    return false;
+#endif
+}
+}  // namespace
+
+// Signing out while a connection attempt waits for a slow server (here /info, answered after 10 s)
+// cancels that attempt, as disconnect() does: the state is Offline at once, not when the server
+// answers or the request times out.
+TEST(net_logout_cancels_a_connection_attempt) {
+    if (!net::transportAvailable()) return;
+    std::atomic<int> infos{0};
+    fakehttp::Server srv(
+        [&](const fakehttp::Request& q) {
+            fakehttp::Reply rep;
+            rep.headers.emplace_back("Content-Type", "application/json");
+            if (q.path == "/api/v1/info") {
+                ++infos;
+                rep.silenceMs = 10000;
+                rep.body = "{}";
+            } else {
+                rep.body = "{\"status\":\"logged_out\"}";
+            }
+            return rep;
+        },
+        true);
+    CHECK(srv.ok());
+    std::string credPath = tempCredentialPath("logout-attempt");
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = srv.port();
+    ep.insecureDev = true;
+    {
+        net::CredentialStore s(credPath);
+        net::Credential cr;
+        cr.origin = ep.origin();
+        cr.username = "alice";
+        cr.token = "sct_" + std::string(43, 'L');
+        CHECK(s.put(cr));
+    }
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        c.connect();
+        CHECK(waitState(c, net::ConnState::Connecting, 5000));
+        auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (infos.load() == 0 && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK_EQ(infos.load(), 1);
+        auto t0 = std::chrono::steady_clock::now();
+        c.logout();
+        std::vector<net::Event> seen;
+        // Wine's WinHTTP does not end a blocking call when another thread closes its handle: the
+        // cancelled call ends when the server answers or the call times out, not at once.
+        CHECK(waitState(c, net::ConnState::Offline, runningUnderWine() ? 15000 : 3000, &seen));
+        double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+        std::fprintf(stderr, "  Offline %.0f ms after logout()\n", ms);
+        net::Event ev;
+        CHECK(std::any_of(seen.begin(), seen.end(), [](const net::Event& e) { return e.kind == net::Event::Kind::LogoutResult; }) ||
+              waitEvent(c, net::Event::Kind::LogoutResult, ev, 10000));
+        CHECK(!c.hasSavedSession());
+    }
+    net::sys::removeFile(credPath);
+}
+
+// A disconnect() that comes as net-rt starts a connection attempt (after it took its queue, before
+// the attempt resets its cancel token) stops that attempt too: Offline at once, not when the server
+// answers /info (here after 3 s). The window is a few instructions wide, so it is tried at many
+// delays after connect().
+TEST(net_disconnect_as_an_attempt_starts) {
+    if (!net::transportAvailable()) return;
+    if (runningUnderWine()) {
+        std::fprintf(stderr, "  (Wine: a cancelled call ends with the server's answer: skipped)\n");
+        return;
+    }
+    fakehttp::Server srv(
+        [&](const fakehttp::Request&) {
+            fakehttp::Reply rep;
+            rep.headers.emplace_back("Content-Type", "application/json");
+            rep.silenceMs = 3000;
+            rep.body = "{}";
+            return rep;
+        },
+        true);
+    CHECK(srv.ok());
+    std::string credPath = tempCredentialPath("stop-attempt");
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = srv.port();
+    ep.insecureDev = true;
+    {
+        net::CredentialStore s(credPath);
+        net::Credential cr;
+        cr.origin = ep.origin();
+        cr.username = "alice";
+        cr.token = "sct_" + std::string(43, 'S');
+        CHECK(s.put(cr));
+    }
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        int tries = 0, late = 0;
+        for (; tries < 600 && late == 0; ++tries) {
+            c.connect();
+            const auto t0 = std::chrono::steady_clock::now();
+            const auto delay = std::chrono::nanoseconds((tries * 7919) % 100000);   // 0 to 100 us
+            while (std::chrono::steady_clock::now() - t0 < delay) {
+            }
+            c.disconnect();
+            std::this_thread::sleep_for(std::chrono::milliseconds(2));
+            const auto until = std::chrono::steady_clock::now() + std::chrono::milliseconds(1000);
+            while (c.state() != net::ConnState::Offline && std::chrono::steady_clock::now() < until)
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            if (c.state() != net::ConnState::Offline) ++late;
+            net::Event ev;
+            while (c.poll(ev)) {
+            }
+        }
+        std::fprintf(stderr, "  %d tries, %d attempts still running 1 s after disconnect()\n", tries, late);
+        CHECK_EQ(late, 0);
+    }
+    net::sys::removeFile(credPath);
+}
+
+// A proof of work for a server that was left stops at once: net-http is free for the next one.
+TEST(net_pow_abandoned_on_server_switch) {
+    if (!net::transportAvailable()) return;
+    // No 30-bit nonce below 300 000 000 for this challenge (tens of seconds of hashing).
+    std::atomic<int> logins{0}, infos{0};
+    fakehttp::Server hard([&](const fakehttp::Request& q) {
+        if (q.path == "/api/v1/auth/login") ++logins;
+        return jsonReply(428, "{\"error\":\"pow_required\",\"pow\":{\"challenge\":\"abandoned\",\"bits\":30}}");
+    });
+    fakehttp::Server next([&](const fakehttp::Request& q) {
+        if (q.path == "/api/v1/info") ++infos;
+        return jsonReply(200, "{}");
+    });
+    CHECK(hard.ok());
+    CHECK(next.ok());
+    std::string credPath = tempCredentialPath("pow-switch");
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = hard.port();
+    ep.insecureDev = true;
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        c.login("alice", "pw");
+        auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (logins.load() == 0 && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK_EQ(logins.load(), 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));   // the puzzle is being solved
+        auto t0 = std::chrono::steady_clock::now();
+        ep.apiPort = next.port();
+        c.setServer(ep);
+        c.fetchServerInfo();
+        net::Event ev;
+        CHECK(waitEvent(c, net::Event::Kind::LoginResult, ev, 3000));
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string("cancelled"));
+        CHECK(waitEvent(c, net::Event::Kind::ServerInfoResult, ev, 3000));
+        CHECK_EQ(infos.load(), 1);
+        double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+        std::fprintf(stderr, "  the next server answered %.0f ms after setServer()\n", ms);
+        CHECK_EQ(logins.load(), 1);
+    }
+    net::sys::removeFile(credPath);
+}
+
+// The pin field emptied (Options applied) while a sign-in runs: that sign-in saves the pin of the
+// endpoint it was given, so the pin is forgotten after it, not before.
+TEST(net_forget_saved_pin_after_a_sign_in_under_way) {
+    if (!net::transportAvailable()) return;
+    std::atomic<int> logins{0};
+    fakehttp::Server srv([&](const fakehttp::Request& q) {
+        if (q.path != "/api/v1/auth/login") return jsonReply(404, "{\"error\":\"not_found\"}");
+        ++logins;
+        fakehttp::Reply rep = jsonReply(200, "{\"token\":\"" + kRigToken + "\",\"username\":\"alice\"}");
+        rep.silenceMs = 300;
+        return rep;
+    });
+    CHECK(srv.ok());
+    std::string credPath = tempCredentialPath("forget-pin-late");
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = srv.port();
+    ep.insecureDev = true;
+    ep.pinnedSha256 = std::string(64, 'c');   // saved at sign-in (plain HTTP here: never checked)
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        c.login("alice", "pw");
+        auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (logins.load() == 0 && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK_EQ(logins.load(), 1);
+        ep.pinnedSha256.clear();
+        c.setServer(ep);
+        c.forgetSavedPin();
+        net::Event ev;
+        CHECK(waitEvent(c, net::Event::Kind::LoginResult, ev, 10000) && ev.ok);
+        until = std::chrono::steady_clock::now() + std::chrono::seconds(2);
+        while (!net::CredentialStore(credPath).pin(ep.origin()).empty() && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK(net::CredentialStore(credPath).pin(ep.origin()).empty());
+        CHECK(c.hasSavedSession());
+    }
+    net::sys::removeFile(credPath);
+}
+
+// POST /auth/sso/google/start carries what the server's schema declares, nothing else (it refuses
+// an unknown field).
+TEST(net_sso_start_body) {
+    if (!net::transportAvailable()) return;
+    std::mutex mu;
+    std::vector<std::string> keys;
+    std::string challenge;
+    fakehttp::Server srv([&](const fakehttp::Request& q) {
+        if (q.path != "/api/v1/auth/sso/google/start") return jsonReply(404, "{\"error\":\"not_found\"}");
+        Value b = bodyOf(q);
+        std::lock_guard<std::mutex> lk(mu);
+        for (const auto& m : b.members()) keys.push_back(m.first);
+        challenge = b["codeChallenge"].asString();
+        if (keys.size() != 1 || keys[0] != "codeChallenge") return jsonReply(400, "{\"error\":\"invalid_request\"}");
+        // Not https: the client refuses it without starting a browser.
+        return jsonReply(200, "{\"attemptId\":\"sso_x\",\"authUrl\":\"http://127.0.0.1/\",\"pollMs\":2000,\"expiresIn\":600}");
+    });
+    CHECK(srv.ok());
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = srv.port();
+    ep.insecureDev = true;
+    std::string credPath = tempCredentialPath("sso-start");
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        c.startGoogleSso();
+        net::Event ev;
+        CHECK(waitEvent(c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+        CHECK_EQ(ev.error, std::string("bad_response"));   // past the schema, refused for its URL
+    }
+    std::lock_guard<std::mutex> lk(mu);
+    CHECK_EQ(keys.size(), size_t(1));
+    CHECK_EQ(challenge.size(), size_t(43));
+    net::sys::removeFile(credPath);
+}
+
 // The official server moved from port 44664 to 443: a saved session moves with it, once; other
 // origins never move.
 TEST(net_credentials_origin_move) {
@@ -3721,17 +4335,6 @@ TEST(net_credentials_origin_move) {
 //   SCACELITH_NET_TLS_TEST=PORT:<hex SHA-256 of the DER certificate> ./scacelith_tests net_tls
 // The server log must hold no request with "pin=<wrong prefix>" (printed by the test): nothing is
 // sent to a server whose certificate differs from the pin.
-namespace {
-bool runningUnderWine() {
-#ifdef _WIN32
-    HMODULE ntdll = GetModuleHandleA("ntdll.dll");
-    return ntdll && GetProcAddress(ntdll, "wine_get_version");
-#else
-    return false;
-#endif
-}
-}  // namespace
-
 TEST(net_tls_pinning_manual) {
     const char* env = std::getenv("SCACELITH_NET_TLS_TEST");
     if (!env) SKIP("SCACELITH_NET_TLS_TEST not set");

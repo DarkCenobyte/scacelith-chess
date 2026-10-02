@@ -78,7 +78,9 @@ the CMake option `SCACELITH_OFFICIAL_SERVER` (`host[:apiPort[:wsPort]]`, port 44
 `none` for none). No token is ever stored there: the network layer keeps one session per origin
 (`host:apiPort`), so switching servers never reuses another server's sign-in. `applyServer()`
 (called when Options are applied with another server) selects the new origin and forgets the
-previous server's state; the page then resumes a session saved for that origin, if any. Each
+previous server's state; the page then resumes a session saved for that origin, if any. The
+fingerprint of the server in use emptied (same host and port) also forgets the one saved with its
+session at sign-in (`OnlineClient::forgetSavedPin`): the system's certificates apply again. Each
 answer of the account API names the origin it was asked of (`Event::origin`), and an answer of a
 server left meanwhile is not taken for the new server's (`game::ServerAnswers`): the pages drop
 it, except a PGN (the game page's Save game writes it where the player asked) and a GIF (saved

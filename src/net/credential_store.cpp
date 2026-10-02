@@ -189,23 +189,37 @@ CredentialStore::Record* CredentialStore::findLocked(const std::string& origin) 
 bool CredentialStore::get(const std::string& origin, Credential& out) const {
     std::lock_guard<std::mutex> lk(mu_);
     loadLocked();
-    const Record* r = findLocked(origin);
+    Record* r = findLocked(origin);
     if (!r) return false;
     out = Credential();
     out.origin = r->origin;
     out.username = r->username;
     out.serverId = r->serverId;
     out.pinnedSha256 = r->pin;
-    if (!r->tokenBlob.empty() && !unprotectToken(origin, r->tokenBlob, out.token))
-        LOGW("net: the saved session of %s cannot be decrypted here", origin.c_str());
+    if (!r->tokenBlob.empty()) readLocked(*r, out.token);
     return true;
 }
 
 bool CredentialStore::hasToken(const std::string& origin) const {
     std::lock_guard<std::mutex> lk(mu_);
     loadLocked();
-    const Record* r = findLocked(origin);
-    return r && !r->tokenBlob.empty();
+    Record* r = findLocked(origin);
+    if (!r || r->tokenBlob.empty()) return false;
+    if (!r->checked) {
+        std::string token;
+        readLocked(*r, token);
+        wipe(token);
+    }
+    return !r->unreadable;
+}
+
+bool CredentialStore::readLocked(Record& r, std::string& token) const {
+    // Said once; from then on hasToken() is false (the game offers to sign in, not to resume).
+    bool readable = unprotectToken(r.origin, r.tokenBlob, token);
+    if (!readable && !r.unreadable) LOGW("net: the saved session of %s cannot be decrypted here", r.origin.c_str());
+    r.unreadable = !readable;
+    r.checked = true;
+    return readable;
 }
 
 std::string CredentialStore::username(const std::string& origin) const {
@@ -215,13 +229,22 @@ std::string CredentialStore::username(const std::string& origin) const {
     return r ? r->username : std::string();
 }
 
-bool CredentialStore::put(const Credential& c) {
+std::string CredentialStore::pin(const std::string& origin) const {
+    std::lock_guard<std::mutex> lk(mu_);
+    loadLocked();
+    const Record* r = findLocked(origin);
+    return r ? r->pin : std::string();
+}
+
+bool CredentialStore::put(const Credential& c, bool* stored) {
+    if (stored) *stored = false;
     if (c.origin.empty()) return false;
     std::string blob;
     if (!c.token.empty()) {
         blob = protectToken(c.origin, c.token);
         if (blob.empty()) return false;
     }
+    if (stored) *stored = true;
     std::lock_guard<std::mutex> lk(mu_);
     loadLocked();
     Record* r = findLocked(c.origin);
@@ -234,6 +257,8 @@ bool CredentialStore::put(const Credential& c) {
     r->serverId = c.serverId;
     r->pin = c.pinnedSha256;
     r->tokenBlob = blob;
+    r->unreadable = false;
+    r->checked = true;
     return saveLocked();
 }
 
@@ -254,6 +279,15 @@ bool CredentialStore::clearToken(const std::string& origin, const std::string& t
     std::string saved;
     if (unprotectToken(origin, r->tokenBlob, saved) && saved != token) return true;   // another one since
     r->tokenBlob.clear();
+    return saveLocked();
+}
+
+bool CredentialStore::clearPin(const std::string& origin) {
+    std::lock_guard<std::mutex> lk(mu_);
+    loadLocked();
+    Record* r = findLocked(origin);
+    if (!r || r->pin.empty()) return true;
+    r->pin.clear();
     return saveLocked();
 }
 

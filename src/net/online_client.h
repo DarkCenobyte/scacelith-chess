@@ -21,7 +21,8 @@
 //     directory of the --ini file. Tests use it to work in a temporary file.
 //   - ServerEndpoint::origin() brackets IPv6 literals ("[::1]:8443") so an origin is unambiguous.
 //   - ServerEndpoint::pinnedSha256 accepts "AB:CD:..." too (setServer normalises it to 64 lower-case
-//     hex digits). When it is empty, the pin saved for the origin at the last login applies.
+//     hex digits). When it is empty, the pin saved for the origin at the last login applies,
+//     until forgetSavedPin() (Options: the pin field of that server emptied).
 //   - Commands that need the realtime connection while it is not Online produce a ServerError
 //     event with code 0 and error "offline" ("invalid_request" for out-of-range arguments).
 //   - ServerEndpoint::wsPort defaults to 0 = the API port (one port for HTTPS and /ws, as on the
@@ -165,7 +166,8 @@ struct GamesPage {
 struct SessionInfo {                  // a signed-in device (GET /auth/sessions)
     int64_t id = 0;
     int64_t createdAtMs = 0, lastSeenAtMs = 0, expiresAtMs = 0;
-    std::string clientLabel;          // "Scacelith 0.1.0 (Windows)", "" when the client gave none
+    std::string clientLabel;          // as the signing-in client gave it, e.g. "Scacelith/0.1.0 win64"
+                                      // (clientString() of this game); "" when it gave none
     bool current = false;             // the session of this game
 };
 
@@ -362,9 +364,13 @@ public:
     // ---- server and account (HTTPS) ----
     void setCredentialsFile(const std::string& path);  // optional; see the note at the top
     void setServer(const ServerEndpoint& ep);    // disconnects if the origin changes
+    // Forgets the pin saved for the current origin at sign-in (the session stays): with no pin in
+    // the endpoint, its requests trust the system's certificates again. Done on net-http, after the
+    // commands already queued (a sign-in queued before would save the pin again).
+    void forgetSavedPin();
     const ServerEndpoint& server() const;
     void fetchServerInfo();
-    bool hasSavedSession() const;                // a token is stored for the current origin
+    bool hasSavedSession() const;                // a token is stored for the current origin and decrypts here
     std::string savedUsername() const;           // last user name used on this origin
     void registerAccount(const std::string& username, const std::string& email, const std::string& password);
     void login(const std::string& usernameOrEmail, const std::string& password);
@@ -464,7 +470,6 @@ public:
     // Dropped while not Online (never queued for a reconnection) and when gameId is not the game
     // of the last GameSnapshot. Cheap enough to call every frame.
     void sendGesture(uint64_t gameId, const Gesture& g);
-    const OnlineGame* currentGame() const;       // game thread view (updated by poll())
 
     // Drains one event; call until it returns false, once per frame.
     bool poll(Event& out);

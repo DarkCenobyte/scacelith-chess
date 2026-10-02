@@ -141,11 +141,18 @@ bool plausibleToken(const std::string& t) {
     return true;
 }
 
+// A 6-digit code of an authenticator app; anything else is taken for a recovery code.
+bool isTotpCode(const std::string& s) {
+    return s.size() == 6 && std::all_of(s.begin(), s.end(), [](char c) { return c >= '0' && c <= '9'; });
+}
+
 constexpr int kPingBurst = 3;                   // quick pings after the one sent at Welcome
 constexpr int kPingBurstGapMs = 1100;           // the server answers one Ping per 950 ms at most
 constexpr size_t kOffsetSamples = 8;            // clock offset: lowest round trip of the last 8
 constexpr auto kOffsetMaxAge = std::chrono::minutes(5);   // ...taken in the last 5 minutes
 constexpr auto kInfoReuse = std::chrono::minutes(10);     // /info answer reused on reconnection
+constexpr int kLoggedBadFrames = 5;             // frames ignored or malformed: logged per connection,
+                                                // the others counted when it ends
 // The former port of the official server (HTTPS API and WSS): its saved sessions move to the
 // current official origin (CredentialStore::addOriginMove).
 constexpr uint16_t kLegacyOfficialPort = 44664;
@@ -159,6 +166,9 @@ constexpr int kExportTimeoutMs = 90000;
 // The origin of the HTTPS command the calling thread runs (net-http, net-gif; null elsewhere):
 // Impl::post() names it in the Events of that command (Event::origin).
 thread_local const std::string* tCommandOrigin = nullptr;
+// That command's Impl::originGen, and the flag that stops a proof of work on this thread.
+thread_local uint32_t tCommandGen = 0;
+thread_local std::atomic<bool>* tPowAbort = nullptr;
 
 // Milliseconds of the monotonic clock (the Gesture bucket's time).
 double steadyMs() { return std::chrono::duration<double, std::milli>(Clock::now().time_since_epoch()).count(); }
@@ -307,8 +317,6 @@ uint32_t clientPingIntervalMs(uint32_t announced) {
 struct OnlineClient::Impl {
     // ---- game thread ----
     ServerEndpoint ep;
-    OnlineGame view;
-    bool hasView = false;
 
     // ---- shared ----
     std::mutex mu;
@@ -316,6 +324,7 @@ struct OnlineClient::Impl {
     // An HTTPS command and the origin of the server in use when it was given (its requests go there).
     struct HttpCommand {
         std::string origin;
+        uint32_t gen = 0;   // originGen then
         std::function<void()> fn;
     };
     std::deque<HttpCommand> httpQ, gifQ;
@@ -329,6 +338,12 @@ struct OnlineClient::Impl {
     std::atomic<int> ping{-1};
     std::atomic<double> clockOffset{0.0};
     std::atomic<uint32_t> connectGen{0};
+    // Bumped by setServer() when the origin changes: a proof of work for a server that is no
+    // longer the one in use is abandoned (request()). Then the flags of net-http and net-gif are
+    // raised (by ~Impl too): each stops the proof of work in progress on its thread, and each proof
+    // of work lowers its own when it starts.
+    std::atomic<uint32_t> originGen{0};
+    std::atomic<bool> httpPowAbort{false}, gifPowAbort{false};
     CredentialStore creds;
     CancelToken httpCancel, rtCancel, gifCancel;
     std::thread httpThread, rtThread, gifThread;
@@ -371,6 +386,8 @@ struct OnlineClient::Impl {
         int lastFatal = 0;                                // ErrorCode of the last fatal Error
         bool shutdownNotice = false;                      // Notice{ServerShutdown} on this connection
         bool restarting = false;                          // lost to a shutdown, no Welcome or 503 since
+        int badFrames = 0;                                // ignored or malformed on this connection
+        std::string helloToken;                           // the session this connection's Hello sent
         // The /api/v1/info answer the last connection attempt used. proven: a connection built on
         // it reached Welcome; at: when it was read, or when such a connection last ended.
         struct Info {
@@ -380,7 +397,6 @@ struct OnlineClient::Impl {
         } info;
         double banUntil = 0;
         OnlineGame game;
-        uint32_t lastGseq = 0;
         struct Pending { uint64_t game = 0; int ply = -1; uint16_t move = 0; } pending;
         GestureBucket gestures;                           // Welcome.gestureRate / gestureBurst
     } rt;
@@ -405,6 +421,8 @@ struct OnlineClient::Impl {
             stopping = true;
         }
         stopFlag.store(true);
+        httpPowAbort.store(true);
+        gifPowAbort.store(true);
         httpCancel.cancel();
         rtCancel.cancel();
         gifCancel.cancel();
@@ -438,20 +456,21 @@ struct OnlineClient::Impl {
     void http(std::function<void()> fn) {
         {
             std::lock_guard<std::mutex> lk(mu);
-            httpQ.push_back(HttpCommand{ep.origin(), std::move(fn)});
+            httpQ.push_back(HttpCommand{ep.origin(), originGen.load(), std::move(fn)});
         }
         httpCv.notify_one();
     }
     void gif(std::function<void()> fn) {
         {
             std::lock_guard<std::mutex> lk(mu);
-            gifQ.push_back(HttpCommand{ep.origin(), std::move(fn)});
+            gifQ.push_back(HttpCommand{ep.origin(), originGen.load(), std::move(fn)});
         }
         gifCv.notify_one();
     }
     // Runs an HTTPS command on the calling worker thread: its Events name its origin.
     void runCommand(const HttpCommand& cmd) {
         tCommandOrigin = &cmd.origin;
+        tCommandGen = cmd.gen;
         try {
             cmd.fn();
         } catch (const std::bad_alloc&) {
@@ -482,8 +501,7 @@ struct OnlineClient::Impl {
     std::string effectivePin(const ServerEndpoint& e) {
         std::string p = normalizePin(e.pinnedSha256);
         if (!p.empty()) return p;
-        Credential c;
-        return creds.get(e.origin(), c) ? c.pinnedSha256 : std::string();
+        return creds.pin(e.origin());
     }
 
     // =========================================================================================
@@ -610,8 +628,17 @@ struct OnlineClient::Impl {
                 std::string nonce;
                 crypto::PowStats st;
                 std::atomic<bool>* stop = &stopFlag;
+                if (tPowAbort) {
+                    // Lowered before the check: a setServer() that raised it already bumped originGen.
+                    stop = tPowAbort;
+                    stop->store(false);
+                }
+                if (tCommandGen != originGen.load() || stopFlag.load()) {
+                    out.error = "cancelled";
+                    return out;
+                }
                 if (!crypto::powSolve(challenge, bits, nonce, stop, &st)) {
-                    out.error = stopFlag.load() ? "cancelled" : "pow_failed";
+                    out.error = stop->load() ? "cancelled" : "pow_failed";
                     return out;
                 }
                 LOGI("net: proof of work %d bits: %llu hashes in %.2f s", bits, (unsigned long long)st.hashes, st.seconds);
@@ -747,8 +774,16 @@ struct OnlineClient::Impl {
         if (!pin.empty()) c.pinnedSha256 = pin;
         ServerInfo info;
         if (fetchInfo(e, info, httpCancel).ok() && !info.serverId.empty()) c.serverId = info.serverId;
-        if (!creds.put(c)) LOGW("net: the session could not be saved (%s)", creds.path().c_str());
+        bool stored = false;
+        if (!creds.put(c, &stored)) LOGW("net: the session could not be saved (%s)", creds.path().c_str());
         mfaToken.clear();
+        if (!stored) {
+            // The token could not be protected (DPAPI): kept nowhere, the session would end at the
+            // first connection (not_logged_in). Only an unwritable file still signs in, this run.
+            ev.ok = false;
+            ev.error = "storage";
+            return;
+        }
         ev.ok = true;
         ev.error.clear();
     }
@@ -774,7 +809,6 @@ struct OnlineClient::Impl {
         b.set("clientLabel", clientString());
         ServerEndpoint e = sso.ep;
         Api a = api(e, "POST", "/auth/sso/google/poll", &b, false, httpCancel);
-        if (!sso.active) return;
         if (a.ok() && a.body["status"].asString() == "pending") {
             sso.nextPoll = Clock::now() + std::chrono::milliseconds(sso.pollMs);
             return;
@@ -800,6 +834,7 @@ struct OnlineClient::Impl {
     }
 
     void httpLoop() {
+        tPowAbort = &httpPowAbort;
         for (;;) {
             HttpCommand cmd;
             {
@@ -814,12 +849,14 @@ struct OnlineClient::Impl {
                 }
             }
             if (cmd.fn) runCommand(cmd);
-            else if (sso.active && Clock::now() >= sso.nextPoll) runCommand(HttpCommand{sso.ep.origin(), [this] { ssoPollOnce(); }});
+            else if (sso.active && Clock::now() >= sso.nextPoll)
+                runCommand(HttpCommand{sso.ep.origin(), originGen.load(), [this] { ssoPollOnce(); }});
         }
     }
 
     // net-gif: the GIF commands (gif()), one at a time, beside net-http.
     void gifLoop() {
+        tPowAbort = &gifPowAbort;
         for (;;) {
             HttpCommand cmd;
             {
@@ -879,6 +916,10 @@ struct OnlineClient::Impl {
             std::unique_ptr<WebSocket> ws = std::move(rt.ws);
             ws->close(code);
         }
+        if (rt.badFrames > kLoggedBadFrames)
+            LOGW("net: %d more frames from the server ignored or malformed", rt.badFrames - kLoggedBadFrames);
+        rt.badFrames = 0;
+        rt.helloToken.clear();
         rt.welcomed = false;
         rt.samples.clear();
         rt.rttEma = -1;
@@ -919,6 +960,14 @@ struct OnlineClient::Impl {
     void tryConnect() {
         uint32_t gen = connectGen.load();
         rtCancel.reset();
+        // A command that came since rtLoop took the queue may stop this attempt (disconnect(),
+        // setServer()...), and its cancel() may have come before the reset above: it waits in
+        // rtQ (pushed before the cancel), so the attempt makes way for it. One pushed after this
+        // check is followed by a cancel() that the reset can no longer undo.
+        {
+            std::lock_guard<std::mutex> lk(mu);
+            if (stopping || !rtQ.empty()) return;
+        }
         const ServerEndpoint e = rt.ep;
         if (!e.valid()) { stopWanting(ConnState::Offline, "invalid_server"); return; }
         if (connState.load() != int(ConnState::Reconnecting)) setState(ConnState::Connecting);
@@ -1016,6 +1065,7 @@ struct OnlineClient::Impl {
         h.schema = pr::kSchemaHash;
         h.client = clientString();
         h.token = c.token;
+        rt.helloToken = c.token;
         send(h);
     }
 
@@ -1078,11 +1128,14 @@ struct OnlineClient::Impl {
         const uint8_t* p = b.data();
         size_t n = b.size();
         if (!pr::peekType(p, n, t) || pr::isClientType(uint8_t(t))) {
-            LOGW("net: ignoring a frame of unknown type (%u bytes)", unsigned(n));
+            if (++rt.badFrames <= kLoggedBadFrames) LOGW("net: ignoring a frame of unknown type (%u bytes)", unsigned(n));
             return;
         }
         rt.lastRecv = Clock::now();
-        auto bad = [&] { LOGW("net: malformed %s from the server (%u bytes)", pr::messageName(t), unsigned(n)); };
+        auto bad = [&] {
+            if (++rt.badFrames <= kLoggedBadFrames)
+                LOGW("net: malformed %s from the server (%u bytes)", pr::messageName(t), unsigned(n));
+        };
         switch (t) {
         case pr::MsgType::Welcome: {
             pr::Welcome m;
@@ -1144,7 +1197,8 @@ struct OnlineClient::Impl {
             if (!pr::decode(p, n, m)) return bad();
             if (m.code == pr::NoticeCode::Banned) rt.banUntil = m.arg;
             if (m.code == pr::NoticeCode::ServerShutdown) rt.shutdownNotice = true;
-            if (m.code == pr::NoticeCode::SessionRevoked) creds.clearToken(rt.ep.origin());
+            // That session only (like onClosed): net-http may have saved another one since the Hello.
+            if (m.code == pr::NoticeCode::SessionRevoked) creds.clearToken(rt.ep.origin(), rt.helloToken);
             if (m.code == pr::NoticeCode::ReplacedByNewConnection) rt.lastFatal = int(pr::ErrorCode::Replaced);
             Event ev;
             ev.kind = Event::Kind::Notice;
@@ -1205,7 +1259,6 @@ struct OnlineClient::Impl {
             pr::GameSnapshot m;
             if (!pr::decode(p, n, m)) return bad();
             rt.game = onlineGameFromSnapshot(m);
-            rt.lastGseq = m.gseq;
             if (rt.pending.game == m.game && rt.pending.ply < int(rt.game.moves.size())) rt.pending = Rt::Pending();
             post(gameEvent(Event::Kind::GameSnapshot));
             break;
@@ -1227,7 +1280,6 @@ struct OnlineClient::Impl {
             g.running = g.status != int(pr::GameStatus::Ongoing) || m.ply == 0 ? 2 : (m.ply + 1) & 1;
             if (m.drawOffer) g.drawOfferBy = mover;
             else if (g.drawOfferBy == (mover ^ 1)) g.drawOfferBy = 2;   // a move declines the opponent's offer
-            rt.lastGseq = std::max(rt.lastGseq, m.gseq);
             Event ev = gameEvent(Event::Kind::MoveMade);
             ev.ply = m.ply;
             ev.move = m.move;
@@ -1275,7 +1327,6 @@ struct OnlineClient::Impl {
                 case pr::GameEventKind::RematchDeclined: g.rematchBy = 2; break;
                 default: break;
                 }
-                rt.lastGseq = std::max(rt.lastGseq, m.gseq);
             }
             Event ev = gameEvent(Event::Kind::GameEvent);
             ev.gameId = m.game;
@@ -1297,7 +1348,6 @@ struct OnlineClient::Impl {
                 g.serverTimeMs = m.serverTime;
                 g.running = 2;
                 g.drawOfferBy = 2;
-                rt.lastGseq = std::max(rt.lastGseq, m.gseq);
             }
             Event ev = gameEvent(Event::Kind::GameEnd);
             ev.gameId = m.game;
@@ -1355,13 +1405,15 @@ struct OnlineClient::Impl {
     void onClosed(uint16_t code, const std::string& reason) {
         LOGI("net: realtime connection closed (%u %s)", code, reason.c_str());
         const bool wasOnline = rt.welcomed;
+        const std::string token = rt.helloToken;   // dropSocket forgets it
         dropSocket(1000);
         if (wasOnline && rt.info.proven) rt.info.at = Clock::now();   // the /info answer worked until now
         int fatal = rt.lastFatal;
         if (code == pr::CloseCode::UnsupportedProtocol || fatal == int(pr::ErrorCode::UnsupportedProtocol)) {
             stopWanting(ConnState::Incompatible, "incompatible");
         } else if (code == pr::CloseCode::Unauthorized || fatal == int(pr::ErrorCode::Unauthorized)) {
-            creds.clearToken(rt.ep.origin());
+            // The token this connection sent: a sign-in on net-http may have saved another one since.
+            creds.clearToken(rt.ep.origin(), token);
             stopWanting(ConnState::Unauthorized, "unauthorized");
         } else if (fatal == int(pr::ErrorCode::EmailUnverified)) {
             stopWanting(ConnState::Unauthorized, "email_unverified");
@@ -1477,9 +1529,12 @@ void OnlineClient::setServer(const ServerEndpoint& ep) {
     impl_->ep = e;
     Impl* d = impl_.get();
     if (originChanged) {
-        // Nothing of the previous server survives: connection, game view, SSO, MFA step.
+        // Nothing of the previous server survives: proof of work, connection, game, SSO, MFA step.
+        // (The command goes before the cancel: see tryConnect.)
+        d->originGen.fetch_add(1);
+        d->httpPowAbort.store(true);
+        d->gifPowAbort.store(true);
         d->connectGen.fetch_add(1);
-        d->rtCancel.cancel();
         d->realtime([d, e] {
             d->rt.wanted = false;
             d->dropSocket(1000);
@@ -1491,16 +1546,28 @@ void OnlineClient::setServer(const ServerEndpoint& ep) {
             d->rt.banUntil = 0;
             d->setState(ConnState::Offline);
         });
+        d->rtCancel.cancel();
         d->http([d] {
             d->ssoFinished();
             d->mfaToken.clear();
             d->ssoTicket.clear();
         });
-        d->view = OnlineGame();
-        d->hasView = false;
     } else {
         d->realtime([d, e] { d->rt.ep = e; });
     }
+}
+
+void OnlineClient::forgetSavedPin() {
+    Impl* d = impl_.get();
+    if (!d->ep.valid()) return;
+    std::string origin = d->ep.origin();
+    // On net-http, behind the sign-ins already queued: they save the pin of the endpoint they were
+    // given (the one forgotten here). A Google sign-in under way polls and saves with its own
+    // endpoint, whose pin goes too.
+    d->http([d, origin] {
+        if (d->sso.active && d->sso.ep.origin() == origin) d->sso.ep.pinnedSha256.clear();
+        d->creds.clearPin(origin);
+    });
 }
 
 const ServerEndpoint& OnlineClient::server() const { return impl_->ep; }
@@ -1581,8 +1648,7 @@ void OnlineClient::loginMfa(const std::string& code) {
         }
         json::Value b = json::Value::object();
         b.set("mfaToken", d->mfaToken);
-        bool digits = code.size() == 6 && std::all_of(code.begin(), code.end(), [](char c) { return c >= '0' && c <= '9'; });
-        b.set(digits ? "code" : "recoveryCode", code);
+        b.set(isTotpCode(code) ? "code" : "recoveryCode", code);
         Impl::Api a = d->api(e, "POST", "/auth/login/mfa", &b, false, d->httpCancel);
         d->finishLogin(e, a, ev);
         d->post(ev);
@@ -1603,8 +1669,7 @@ void OnlineClient::startGoogleSso() {
             return;
         }
         json::Value b = json::Value::object();
-        b.set("codeChallenge", pkce.challenge);
-        b.set("codeChallengeMethod", "S256");
+        b.set("codeChallenge", pkce.challenge);   // S256, the only method (API.md)
         Impl::Api a = d->api(e, "POST", "/auth/sso/google/start", &b, false, d->httpCancel);
         Impl::fillError(ev, a);
         if (!a.ok()) { d->post(ev); return; }
@@ -1678,12 +1743,7 @@ void OnlineClient::cancelSso() {
 void OnlineClient::logout(bool allSessions) {
     Impl* d = impl_.get();
     ServerEndpoint e = d->ep;
-    d->connectGen.fetch_add(1);
-    d->realtime([d] {
-        d->rt.wanted = false;
-        d->dropSocket(1000);
-        d->setState(ConnState::Offline);
-    });
+    d->stopRealtime();   // an attempt in progress too (fetchInfo, wsConnect): Offline at once
     d->http([d, e, allSessions] {
         json::Value b = json::Value::object();
         Impl::Api a = d->api(e, "POST", allSessions ? "/auth/logout-all" : "/auth/logout", &b, true, d->httpCancel);
@@ -1764,10 +1824,8 @@ void OnlineClient::mfaEnable(const std::string& code) {
 }
 
 void OnlineClient::mfaDisable(const std::string& password, const std::string& codeOrRecovery) {
-    bool digits = codeOrRecovery.size() == 6 &&
-                  std::all_of(codeOrRecovery.begin(), codeOrRecovery.end(), [](char c) { return c >= '0' && c <= '9'; });
     simplePost(impl_.get(), impl_->ep, Event::Kind::MfaDisableResult, "/account/mfa/totp/disable",
-               obj({{"password", password}, {digits ? "code" : "recoveryCode", codeOrRecovery}}), true);
+               obj({{"password", password}, {isTotpCode(codeOrRecovery) ? "code" : "recoveryCode", codeOrRecovery}}), true);
 }
 
 void OnlineClient::regenerateRecoveryCodes(const std::string& password, const std::string& code) {
@@ -1799,11 +1857,6 @@ uint64_t idOf(const json::Value& v) {
     const std::string& s = v.asString();
     if (s.empty() || s.size() > 16 || !std::all_of(s.begin(), s.end(), [](char c) { return c >= '0' && c <= '9'; })) return 0;
     return std::strtoull(s.c_str(), nullptr, 10);
-}
-
-// A 6-digit code of an authenticator app; anything else is taken for a recovery code.
-bool isTotpCode(const std::string& s) {
-    return s.size() == 6 && std::all_of(s.begin(), s.end(), [](char c) { return c >= '0' && c <= '9'; });
 }
 
 // The second factor of a re-authentication: none, "code" or "recoveryCode" (as mfaDisable).
@@ -1944,8 +1997,9 @@ bool parseSessions(const json::Value& b, std::vector<SessionInfo>& out) {
     return true;
 }
 
-// A PGN as the server writes it (S2): text that starts with its tag pairs. Anything else (an HTML
-// page of a proxy, binary data) is not handed to the game.
+// A PGN as the server writes it (dedicated-server/docs/API.md section 11, GET /games/:id/pgn): text
+// that starts with its tag pairs. Anything else (an HTML page of a proxy, binary data) is not
+// handed to the game.
 bool looksLikePgn(const std::string& t) {
     if (t.empty() || t.find('\0') != std::string::npos) return false;
     size_t i = t.compare(0, 3, "\xEF\xBB\xBF") == 0 ? 3 : 0;   // a byte order mark
@@ -1953,11 +2007,11 @@ bool looksLikePgn(const std::string& t) {
     return i < t.size() && t[i] == '[';
 }
 
-// The account export (S7): one JSON object, format "scacelith-account-export". The whole document
-// is checked, but only its top level is kept in memory while doing so (it may be large). The
-// server's document has about fifteen top-level members: more than kExportMaxMembers is not the
-// export, and is refused there (a hostile server's million members or items would otherwise all be
-// kept, and their names looked up one by one: gigabytes, or hours of this thread).
+// The account export (API.md section 8, POST /account/export): one JSON object, format
+// "scacelith-account-export". The whole document is checked, but only its top level is kept in
+// memory while doing so (it may be large). The server's document has about fifteen top-level
+// members: more than kExportMaxMembers is not the export, and is refused there (a hostile server's
+// million members or items would otherwise all be kept: gigabytes).
 constexpr size_t kExportMaxMembers = 64;
 bool validExport(const std::string& t) {
     json::Limits lim;
@@ -2000,12 +2054,12 @@ Event failedAnswer(Event::Kind kind, uint64_t gameId) {
 // the session of this game revoked.
 void OnlineClient::Impl::stopRealtime() {
     connectGen.fetch_add(1);
-    rtCancel.cancel();
     realtime([this] {
         rt.wanted = false;
         dropSocket(1000);
         setState(ConnState::Offline);
     });
+    rtCancel.cancel();   // after the command (see tryConnect)
 }
 
 void OnlineClient::fetchMyGames(uint64_t before, int limit, const GamesFilter& filter) {
@@ -2219,7 +2273,7 @@ void OnlineClient::deleteAccount(const std::string& password, const std::string&
     });
 }
 
-// ---- animated GIFs (dedicated-server/docs/API.md, "GIF of a game") ----
+// ---- animated GIFs (dedicated-server/docs/API.md section 11, GET /games/:id/gif and POST /gif) ----
 namespace {
 
 // A GIF file: the signature of either version. Anything else (a proxy's HTML page, a JSON body
@@ -2331,12 +2385,12 @@ void OnlineClient::connect() {
 void OnlineClient::disconnect() {
     Impl* d = impl_.get();
     d->connectGen.fetch_add(1);
-    d->rtCancel.cancel();
     d->realtime([d] {
         d->rt.wanted = false;
         d->dropSocket(1000);
         d->setState(ConnState::Offline);
     });
+    d->rtCancel.cancel();   // after the command (see tryConnect)
 }
 
 ConnState OnlineClient::state() const { return ConnState(impl_->connState.load()); }
@@ -2501,29 +2555,12 @@ void OnlineClient::sendGesture(uint64_t gameId, const Gesture& g) {
     if (wake) d->rtCv.notify_one();
 }
 
-const OnlineGame* OnlineClient::currentGame() const { return impl_->hasView ? &impl_->view : nullptr; }
-
 bool OnlineClient::poll(Event& out) {
     {
         std::lock_guard<std::mutex> lk(impl_->mu);
         if (impl_->events.empty()) return false;
         out = std::move(impl_->events.front());
         impl_->events.pop_front();
-    }
-    switch (out.kind) {
-    case Event::Kind::GameSnapshot:
-    case Event::Kind::MoveMade:
-    case Event::Kind::MoveRejected:
-    case Event::Kind::GameEvent:
-    case Event::Kind::GameEnd:
-    case Event::Kind::RatingUpdate:
-        if (out.game.id != 0) {
-            impl_->view = out.game;
-            impl_->hasView = true;
-        }
-        break;
-    default:
-        break;
     }
     return true;
 }

@@ -27,6 +27,11 @@
 #include <memory>
 #include <mutex>
 #include <thread>
+#ifndef _WIN32
+#include <fcntl.h>
+#include <sys/resource.h>
+#include <unistd.h>
+#endif
 
 #ifdef _WIN32
 #include <process.h>
@@ -314,6 +319,45 @@ const char* kDescForeign = R"(<?xml version="1.0"?>
 <controlURL>http://10.9.8.7:5000/ctl/IPConn</controlURL></service></serviceList></device></root>)";
 
 }  // namespace
+
+// ---- sockets ------------------------------------------------------------------------------------
+
+#ifndef _WIN32
+// PollSet on a descriptor past FD_SETSIZE (1024), which select() cannot take: nothing until the
+// timeout when idle, then readable when a datagram waits (and writable).
+TEST(sock_poll_set_high_descriptor) {
+    rlimit rl{};
+    if (getrlimit(RLIMIT_NOFILE, &rl) != 0 || rl.rlim_cur <= 1500) {
+        std::fprintf(stderr, "  (fewer than 1501 descriptors allowed: skipped)\n");
+        return;
+    }
+    CHECK(sock::startup());
+    sock::Handle a = sock::openUdpV4(), b = sock::openUdpV4();
+    CHECK(a != sock::kInvalid && b != sock::kInvalid);
+    sock::Endpoint loop, at;
+    CHECK(sock::Endpoint::parse("127.0.0.1", 0, loop));
+    CHECK(sock::bindTo(a, loop, false));
+    CHECK(sock::localEndpoint(a, at));
+    const sock::Handle high = fcntl(a, F_DUPFD, 1500);   // the lowest free descriptor from 1500
+    CHECK(high >= 1500);
+    sock::PollSet ps;
+    ps.add(high, true, false);
+    auto t0 = std::chrono::steady_clock::now();
+    CHECK_EQ(ps.wait(100), 0);
+    CHECK(std::chrono::steady_clock::now() - t0 >= std::chrono::milliseconds(90));
+    CHECK(!ps.readable(high));
+    const uint8_t one[1] = {7};
+    CHECK_EQ(sock::sendTo(b, one, 1, at), 1);
+    ps.clear();
+    ps.add(high, true, true);
+    CHECK_EQ(ps.wait(2000), 1);
+    CHECK(ps.readable(high));
+    CHECK(ps.writable(high));
+    sock::closeSocket(high);
+    sock::closeSocket(a);
+    sock::closeSocket(b);
+}
+#endif
 
 // ---- UPnP ---------------------------------------------------------------------------------------
 

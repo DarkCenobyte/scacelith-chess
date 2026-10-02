@@ -4,19 +4,23 @@
 //   - Redirects and cookies disabled on every request.
 //   - Pinned servers: SECURITY_FLAG_IGNORE_UNKNOWN_CA for that request only, and the leaf
 //     certificate (WINHTTP_OPTION_SERVER_CERT_CONTEXT, CERT_SHA256_HASH_PROP_ID) is compared
-//     with the pin in the WINHTTP_CALLBACK_STATUS_SENDING_REQUEST notification, after the TLS
+//     with the pin in every WINHTTP_CALLBACK_STATUS_SENDING_REQUEST notification, after the TLS
 //     handshake and before the request is written; a mismatch closes the request handle there,
 //     which aborts the send (the approach of .NET's WinHttpHandler). The pin is checked again
 //     once the response has arrived. Wine's WinHTTP sends the request anyway after that close,
 //     so a pinned request that carries anything (Authorization header, body) is preceded by a
-//     "HEAD /" probe without either: a server that fails the pin never receives the secret, and
-//     the real request normally reuses the probe's verified keep-alive connection.
+//     "HEAD /" probe without either: a server that fails the pin gets the probe only, and the
+//     real request normally reuses the probe's verified keep-alive connection. Under Wine that
+//     reuse is all the protection: an active attacker that relays the probe to the real server,
+//     then closes that connection, receives the real request (header and body) on the new one
+//     WinHTTP opens, before the check after the answer refuses it.
 //   - WebSocket: WinHttpWebSocketCompleteUpgrade / Send / Receive / Shutdown. A reader thread
 //     owned by the socket object blocks in WinHttpWebSocketReceive (WinHTTP allows one send and
 //     one receive in flight at the same time) and queues complete binary messages.
 #ifdef _WIN32
 #include "transport.h"
 #include "crypto.h"
+#include "net_sys.h"
 #include "../core/log.h"
 
 #include <windows.h>
@@ -35,13 +39,7 @@ namespace net {
 
 namespace {
 
-std::wstring widen(const std::string& s) {
-    if (s.empty()) return std::wstring();
-    int n = MultiByteToWideChar(CP_UTF8, 0, s.data(), int(s.size()), nullptr, 0);
-    std::wstring w(size_t(n > 0 ? n : 0), L'\0');
-    if (n > 0) MultiByteToWideChar(CP_UTF8, 0, s.data(), int(s.size()), &w[0], n);
-    return w;
-}
+using sys::widen;
 
 std::string narrow(const wchar_t* w, size_t len) {
     if (!len) return std::string();
@@ -109,7 +107,7 @@ std::string leafSha256(HINTERNET request) {
 struct RequestContext {
     std::string pin;
     Handle* request = nullptr;
-    std::atomic<bool> pinChecked{false}, pinMismatch{false};
+    std::atomic<bool> pinMismatch{false};
     std::atomic<DWORD> secureFlags{0};
 };
 
@@ -118,9 +116,9 @@ void CALLBACK statusCallback(HINTERNET h, DWORD_PTR ctx, DWORD status, LPVOID in
     if (!c) return;
     if (status == WINHTTP_CALLBACK_STATUS_SECURE_FAILURE && info && len >= sizeof(DWORD)) {
         c->secureFlags.store(*static_cast<DWORD*>(info));
-    } else if (status == WINHTTP_CALLBACK_STATUS_SENDING_REQUEST && !c->pin.empty() && !c->pinChecked.load()) {
+    } else if (status == WINHTTP_CALLBACK_STATUS_SENDING_REQUEST && !c->pin.empty()) {
+        // Every time: WinHTTP may send the request more than once (again on another connection).
         std::string got = leafSha256(h);
-        c->pinChecked.store(true);
         if (got.empty() || !crypto::constantTimeEqual(got, c->pin)) {
             LOGW("net: pinned certificate mismatch (server presents %s)", got.empty() ? "?" : got.c_str());
             c->pinMismatch.store(true);
@@ -162,6 +160,10 @@ bool openRequest(const std::string& host, uint16_t port, bool tls, const std::st
                                  WINHTTP_DEFAULT_ACCEPT_TYPES, tls ? WINHTTP_FLAG_SECURE : 0));
     if (!req.get()) { error = "network"; detail = "WinHttpOpenRequest " + std::to_string(GetLastError()); return false; }
     WinHttpSetTimeouts(req.get(), timeoutMs, timeoutMs, timeoutMs, timeoutMs);
+    // The wait for the response headers has its own timeout (90 s by default), which some
+    // WinHTTP implementations (Wine's) apply instead of the receive timeout.
+    DWORD headersTimeout = DWORD(timeoutMs);
+    WinHttpSetOption(req.get(), WINHTTP_OPTION_RECEIVE_RESPONSE_TIMEOUT, &headersTimeout, sizeof(headersTimeout));
     DWORD features = WINHTTP_DISABLE_REDIRECTS | WINHTTP_DISABLE_COOKIES;
     if (!WinHttpSetOption(req.get(), WINHTTP_OPTION_DISABLE_FEATURE, &features, sizeof(features))) {
         features = WINHTTP_DISABLE_REDIRECTS;
@@ -494,10 +496,6 @@ void httpStream(const HttpRequest& r, const std::function<bool(const HttpHead&)>
     Handle conn, req;
     std::string pin = r.tls ? r.pinnedSha256 : std::string();
     if (!openRequest(r.host, r.port, r.tls, r.method, r.path, pin, r.timeoutMs, conn, req, resp.error, resp.detail)) return;
-    // The wait for the response headers has its own timeout (90 s by default), which some
-    // WinHTTP implementations (Wine's) apply instead of the receive timeout.
-    DWORD headersTimeout = DWORD(r.timeoutMs);
-    WinHttpSetOption(req.get(), WINHTTP_OPTION_RECEIVE_RESPONSE_TIMEOUT, &headersTimeout, sizeof(headersTimeout));
     RequestContext ctx;
     ctx.pin = pin;
     ctx.request = &req;

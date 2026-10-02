@@ -30,6 +30,7 @@ class ServerApi {
 public:
     virtual ~ServerApi() = default;
     virtual void setServer(const net::ServerEndpoint& ep) = 0;
+    virtual void forgetSavedPin() = 0;
     virtual void fetchServerInfo() = 0;
     virtual bool hasSavedSession() const = 0;
     virtual std::string savedUsername() const = 0;
@@ -287,6 +288,7 @@ private:
     double gifShownAt_ = -1e9;                  // steady seconds of the last gifShown() of gif_'s owner
     std::string serverNameRt_;
     ServerAnswers answers_;                     // for expect(), busy(), take(); the server in use
+    net::ServerEndpoint applied_;               // the last applyServer()'s
 
     net::ConnState conn_ = net::ConnState::Offline;
     Queue queue_;

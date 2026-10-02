@@ -9,7 +9,8 @@
 //     including the host name. With a pin (hex SHA-256 of the leaf certificate's DER), an
 //     unknown issuer is tolerated for that connection only and the leaf must match the pin;
 //     no header or body given by the caller (token, password) reaches a server that fails the
-//     pin (OpenSSL: checked right after the handshake; WinHTTP: see transport_win32.cpp).
+//     pin (OpenSSL: checked right after the handshake; WinHTTP: see transport_win32.cpp, which
+//     also says what an active attacker can still get under Wine).
 //   - Plain HTTP / WS only for loopback hosts (localhost, 127.0.0.1, ::1).
 //   - HTTP redirects are never followed (a 3xx comes back as it is), cookies are not kept.
 //     (net/download.h follows the redirects of public file hosts itself, with its own rules.)
@@ -35,7 +36,8 @@ public:
     void reset();
     // The blocking operation in progress registers how to abort it (closing its handle or
     // socket); cleared with setAbort(nullptr) when it ends (AbortGuard below does both). Runs at
-    // once when already cancelled.
+    // once when already cancelled. The action runs under the token's lock (it must neither block
+    // nor call the token): setAbort(nullptr) returns once a running one has finished.
     void setAbort(std::function<void()> fn);
     bool hasAbort();                          // an abort action is registered (an operation runs)
 
@@ -76,7 +78,10 @@ struct HttpRequest {
     std::string body;                         // JSON; sent with Content-Type application/json
     std::string accept = "application/json";  // the Accept header (a PGN download asks for its type)
     std::vector<std::pair<std::string, std::string>> headers;   // e.g. Authorization
-    int timeoutMs = 15000;                    // for each of connect, send and receive
+    // Windows (WinHTTP): for each of resolve, connect, send and receive. Linux: one deadline for
+    // the connection and its TLS handshake, then one for the whole exchange (httpStream: for each
+    // write and each read).
+    int timeoutMs = 15000;
     size_t maxResponseBytes = 1 << 20;
 };
 
