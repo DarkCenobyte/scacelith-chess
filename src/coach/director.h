@@ -54,7 +54,7 @@ public:
     // Insert a script right after the running beat, ahead of everything queued, without cutting
     // the running beat (the rules lesson's reactions before a WaitMove waits again).
     void playNext(const Script& script);
-    // Synthesise these lines ahead of time (the next lesson chapter, frequent event lines).
+    // Synthesise these lines ahead of time (the next lesson chapter).
     void prefetch(const std::vector<Line>& lines);
 
     // Every frame while the game runs. 'ply' = the number of moves played in the game now (for

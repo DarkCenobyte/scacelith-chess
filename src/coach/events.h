@@ -17,7 +17,7 @@ class Lesson;
 
 enum class Encouragement : uint8_t {
     AfterMistake,   // after the player's mistake has been explained
-    Behind,         // the player is behind (material or evaluation)
+    Behind,         // the evaluation below -3 pawns for three of the player's moves in a row
     PlayingWell     // several good moves in a row
 };
 
@@ -44,7 +44,8 @@ Script playOnScript(int ply = -1);
 Script encouragementScript(Encouragement kind, int ply = -1);
 // The coach's answer to the player's draw offer.
 Script drawAnswerScript(bool accepted);
-// The coach's closing words, then "Let's shake hands." (the director plays the handshake after it).
+// The coach's closing words, then "Let's shake hands." (the scene plays the handshake once it is
+// said: Session::handshakeWanted).
 Script gameEndScript(GameEnd end);
 
 // The rules lesson: resuming at 'chapter' (the chapter is named), going on to it, or skipping the
@@ -53,8 +54,7 @@ Script lessonResumeScript(const Lesson& lesson, int chapter);
 Script lessonNextScript(const Lesson& lesson, int chapter);
 Script lessonSkipScript();
 
-// Every catalog key the helpers above may say (base keys; the catalog adds the variants), for
-// tests and for pre-synthesising the common lines.
+// Every catalog key the helpers above may say (base keys; the catalog adds the variants): tests.
 std::vector<std::string> eventKeys();
 
 }  // namespace coach
