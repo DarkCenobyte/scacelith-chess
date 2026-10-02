@@ -59,6 +59,7 @@ struct FakeGateway {
     bool chunked = false;
     std::string externalIp = "203.0.113.7";
     std::deque<int> addResults;           // next AddPortMapping answers: 0 = success, else a UPnP error code
+    int extraLocations = 0;               // more answers to each M-SEARCH, with LOCATIONs that are not found
     std::atomic<bool>* cancelOnAdd = nullptr;   // set once an AddPortMapping is received...
     int addDelayMs = 0;                   // ...and its answer comes this much later
     // What the client did.
@@ -67,7 +68,7 @@ struct FakeGateway {
     std::vector<Add> adds;
     std::vector<int> deletes;
     std::vector<std::string> soapPaths;
-    int getIpCalls = 0;
+    int getIpCalls = 0, httpGets = 0;
 
     ~FakeGateway() { shutdown(); }
 
@@ -127,6 +128,10 @@ struct FakeGateway {
                                        "\r\nUSN: uuid:fake-igd::" + target + "\r\nEXT:\r\nSERVER: Fake/1.0 UPnP/1.1 Test/1.0\r\n"
                                        "LOCATION: http://127.0.0.1:" + std::to_string(httpPort) + "/desc.xml\r\n\r\n";
                     sock::sendTo(udp, reinterpret_cast<const uint8_t*>(resp.data()), resp.size(), from);
+                    for (int k = 0; k < extraLocations; ++k) {
+                        std::string extra = replaceAll(resp, "/desc.xml", "/extra" + std::to_string(k) + ".xml");
+                        sock::sendTo(udp, reinterpret_cast<const uint8_t*>(extra.data()), extra.size(), from);
+                    }
                 }
             }
             if (ps.readable(tcp)) {
@@ -164,6 +169,10 @@ struct FakeGateway {
         }
         std::string status = "200 OK", body;
         int delayMs = 0;
+        if (req.compare(0, 4, "GET ") == 0) {
+            std::lock_guard<std::mutex> lk(m);
+            ++httpGets;
+        }
         if (req.compare(0, 14, "GET /desc.xml ") == 0) {
             std::lock_guard<std::mutex> lk(m);
             body = replaceAll(description, "%HTTP%", std::to_string(httpPort));
@@ -443,6 +452,22 @@ TEST(upnp_fake_gateway_conflict_and_permanent_lease) {
         CHECK_EQ(gw.adds[3].extPort, 47103);
         CHECK_EQ(gw.adds[3].lease, 0);
     }
+}
+
+TEST(upnp_fake_gateway_answers_capped) {
+    // A device answering with many distinct LOCATIONs: at most 16 descriptions are fetched (the
+    // first answer, the router's, is among them).
+    FakeGateway gw;
+    gw.description = kDescRelative;
+    gw.extraLocations = 40;
+    CHECK(gw.start());
+    upnp::Client client(gw.clientConfig());
+    upnp::Gateway g;
+    upnp::Error err;
+    CHECK(client.discover(g, err));
+    CHECK_EQ(g.friendlyName, std::string("Fake Box & Co"));
+    std::lock_guard<std::mutex> lk(gw.m);
+    CHECK_EQ(gw.httpGets, 16);
 }
 
 TEST(upnp_fake_gateway_cancel_during_add) {

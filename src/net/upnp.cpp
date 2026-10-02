@@ -13,6 +13,11 @@ namespace upnp {
 
 namespace {
 
+// Any LAN host can answer an M-SEARCH: real networks have one to three gateways, and every answer
+// kept costs an HTTP fetch.
+constexpr size_t kMaxSsdpAnswers = 16;     // distinct LOCATIONs
+constexpr int kMaxDatagramsPerPoll = 64;   // read from one socket before the deadline is checked again
+
 std::string lower(std::string s) {
     for (char& c : s) c = char(std::tolower((unsigned char)c));
     return s;
@@ -468,8 +473,8 @@ bool Client::discover(Gateway& out, Error& err) {
             if (!ps.readable(h)) continue;
             uint8_t buf[2048];
             sock::Endpoint from;
-            int r;
-            while ((r = sock::recvFrom(h, buf, sizeof buf - 1, from)) > 0) {
+            int r, n = 0;
+            while (n++ < kMaxDatagramsPerPoll && (r = sock::recvFrom(h, buf, sizeof buf - 1, from)) > 0) {
                 SsdpResponse resp;
                 if (!parseSsdpResponse(std::string(reinterpret_cast<char*>(buf), size_t(r)), resp)) continue;
                 resp.from = from.ip();
@@ -481,7 +486,7 @@ bool Client::discover(Gateway& out, Error& err) {
                 }
                 bool dup = false;
                 for (auto& a : answers) dup = dup || a.location == resp.location;
-                if (dup) continue;
+                if (dup || answers.size() >= kMaxSsdpAnswers) continue;
                 answers.push_back(resp);
                 if (answers.size() == 1) deadline = std::min(deadline, sock::steadyMs() + cfg_.settleMs);
             }

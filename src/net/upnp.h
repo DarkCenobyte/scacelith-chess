@@ -3,9 +3,9 @@
 //
 //   discover()          SSDP M-SEARCH (UDP to 239.255.255.250:1900, MX 2, ST
 //                       InternetGatewayDevice:1, :2 and WANIPConnection:1, sent from every IPv4
-//                       interface), then HTTP GET of each answering device's description and a
-//                       scan for its WAN connection service (WANIPConnection:2, :1, then
-//                       WANPPPConnection:1) and control URL.
+//                       interface), then HTTP GET of each answering device's description (16
+//                       at most) and a scan for its WAN connection service (WANIPConnection:2,
+//                       :1, then WANPPPConnection:1) and control URL.
 //   getExternalIp()     SOAP GetExternalIPAddress.
 //   addPortMapping()    SOAP AddPortMapping (NewRemoteHost empty = any remote, TCP).
 //   mapPort()           the mapping policy: lease 3600 s, a permanent lease (0) after error 725
