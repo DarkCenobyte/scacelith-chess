@@ -75,9 +75,8 @@ PieceObject* PhysicalBoard::byId(int id) { return id >= 0 && id < int(pieces_.si
 const PieceObject* PhysicalBoard::byId(int id) const { return const_cast<PhysicalBoard*>(this)->byId(id); }
 
 int PhysicalBoard::idAt(Square sq) const {
-    for (auto& p : pieces_)
-        if (p.square == sq && !p.captured && !p.inReserve) return p.id;
-    return -1;
+    const PieceObject* p = at(sq);
+    return p ? p->id : -1;
 }
 
 vec3 PhysicalBoard::squareBase(Square sq) const { return layout::squareCenter(sq); }
