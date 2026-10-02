@@ -1450,21 +1450,21 @@ void DirectMatch::sendMove(int ply, uint16_t move, const std::string& fen, uint3
     impl_->post(c);
 }
 
-static void postSimple(DirectMatch::Impl& impl, std::mutex& m, int kind, bool flag) {
+static void postSimple(DirectMatch::Impl& impl, Command::Kind kind, bool flag) {
     Command c;
-    c.kind = Command::Kind(kind);
+    c.kind = kind;
     c.flag = flag;
-    std::lock_guard<std::mutex> lk(m);
+    std::lock_guard<std::mutex> lk(impl.m);
     impl.post(c);
 }
 
-void DirectMatch::resign() { postSimple(*impl_, impl_->m, int(Command::Kind::Resign), false); }
-void DirectMatch::offerDraw() { postSimple(*impl_, impl_->m, int(Command::Kind::OfferDraw), false); }
-void DirectMatch::answerDraw(bool accept) { postSimple(*impl_, impl_->m, int(Command::Kind::AnswerDraw), accept); }
-void DirectMatch::claimDraw() { postSimple(*impl_, impl_->m, int(Command::Kind::ClaimDraw), false); }
-void DirectMatch::abortGame() { postSimple(*impl_, impl_->m, int(Command::Kind::Abort), false); }
-void DirectMatch::requestResync() { postSimple(*impl_, impl_->m, int(Command::Kind::Resync), false); }
-void DirectMatch::rematch(bool accept) { postSimple(*impl_, impl_->m, int(Command::Kind::Rematch), accept); }
+void DirectMatch::resign() { postSimple(*impl_, Command::Kind::Resign, false); }
+void DirectMatch::offerDraw() { postSimple(*impl_, Command::Kind::OfferDraw, false); }
+void DirectMatch::answerDraw(bool accept) { postSimple(*impl_, Command::Kind::AnswerDraw, accept); }
+void DirectMatch::claimDraw() { postSimple(*impl_, Command::Kind::ClaimDraw, false); }
+void DirectMatch::abortGame() { postSimple(*impl_, Command::Kind::Abort, false); }
+void DirectMatch::requestResync() { postSimple(*impl_, Command::Kind::Resync, false); }
+void DirectMatch::rematch(bool accept) { postSimple(*impl_, Command::Kind::Rematch, accept); }
 
 void DirectMatch::sendGesture(const Gesture& g) {
     std::lock_guard<std::mutex> lk(impl_->m);
