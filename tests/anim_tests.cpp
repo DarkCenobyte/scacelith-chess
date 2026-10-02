@@ -546,6 +546,49 @@ TEST(anim_left_handed_handshake_after_pen_put_mid_frame) {
     CHECK(m::length(putPos - laid.translation()) < 1e-5f);
 }
 
+// A handshake given its own duration (1.5 times the default): the look at the joined hands with
+// the nod comes at the clasp, and the eyes stay on the partner until the end, as with the default
+// duration (unchanged: the deepest pitch 0.02 s before the clasp).
+TEST(anim_handshake_gaze_follows_its_duration) {
+    const character::Skeleton& sk = character::robotSkeleton();
+    for (float scale : {1.0f, 1.5f}) {
+        anim::Animator W, B;
+        W.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
+        B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f);
+        anim::Task h;
+        h.type = anim::TaskType::Handshake;
+        h.duration = scale == 1.0f ? 0.0f : scale * anim::Timing::Handshake;
+        h.partner = &B;
+        W.enqueue(h);
+        h.partner = &W;
+        B.enqueue(h);
+        const float T = scale * anim::Timing::Handshake;
+        std::vector<anim::Event> ev;
+        float clasp = -1.0f, deepest = 1e9f, deepestAt = -1.0f, downAt = -1.0f;
+        while (W.time() < T + 0.5f) {
+            ev.clear();
+            W.update(1.0f / 120.0f, ev);
+            for (const anim::Event& e : ev)
+                if (e.type == anim::EventType::HandshakeClasp) clasp = e.time;
+            ev.clear();
+            B.update(1.0f / 120.0f, ev);
+            float yaw, pitch;
+            W.headAngles(yaw, pitch);
+            const float t = W.time();
+            if (t >= 0.5f * scale && t <= anim::Timing::HandshakeClaspAt * scale + 0.3f * scale && pitch < deepest) {
+                deepest = pitch;
+                deepestAt = t;
+            }
+            if (clasp > 0.0f && downAt < 0.0f && pitch < -0.1f) downAt = t;   // back to the board
+        }
+        std::fprintf(stderr, "  handshake of %.2f s: clasp %.3f s, deepest pitch %.3f s, looks down at %.3f s\n", T, clasp, deepestAt, downAt);
+        CHECK(std::fabs(clasp - anim::Timing::HandshakeClaspAt * scale) < 1e-4f);
+        CHECK(std::fabs(deepestAt - clasp) < 0.15f);
+        CHECK(downAt > T - 0.5f * scale);
+        if (scale == 1.0f) CHECK(std::fabs(deepestAt - 0.90f) < 1.5f / 120.0f);
+    }
+}
+
 // Tasks cut short (cancelTasks: the online opponent's move comes while its robot still plays their
 // live gestures): the piece in hand is let go without its release, and the next task starts at once
 // from where the hand is, with its usual duration.
