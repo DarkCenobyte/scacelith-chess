@@ -10,7 +10,8 @@ namespace build {
 
 // Porcelain per-part parameters (DrawItem::inst, see shaders/materials/robot_porcelain.glsl):
 //   inst[0] = (variant, clearcoat scale, roughness offset, seam half-width in m)
-//             variant 0 = glazed shell, 1 = soft-touch pad region on the positive side of seam 0
+//             variant 0 = glazed shell, 1 = soft-touch pad region on the positive side of seam 0,
+//             2 = face (closed-mouth line)
 //   inst[1..3] = panel seam planes in bone space (xyz unit normal, w offset: dot(n,p) + w = 0);
 //                zero vector = unused.
 struct PorcelainLook {

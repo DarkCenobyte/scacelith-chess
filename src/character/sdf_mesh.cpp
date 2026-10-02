@@ -1,6 +1,9 @@
 // SDF shrink-wrap mesher: capsule-parametrised base grid projected radially onto the zero set,
-// then longest-edge (Rivara) bisection wherever edges are too long or bend too much. Midpoints are
-// Newton-projected back onto the surface, normals come from the SDF gradient.
+// then adaptive refinement: edges are marked where they are too long, bend too much or deviate
+// from the surface, a closure pass also marks a triangle's longest edge when its squared length
+// exceeds 2.6x the shortest marked one, and triangles with 1, 2 or 3 marked edges are split
+// (red/green). Midpoints are Newton-projected back onto the surface, normals come from the SDF
+// gradient.
 #include "sdf.h"
 #include "../core/log.h"
 #include <cstdlib>

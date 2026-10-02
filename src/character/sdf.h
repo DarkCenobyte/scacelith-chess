@@ -99,7 +99,7 @@ struct VolumeOptions {
     float gradientStep = 4e-5f;
 };
 MeshData meshVolume(const Fn& f, const std::vector<m::vec3>& seeds, const VolumeOptions& o);
-// Adaptive refinement of an existing mesh lying on f's zero set (longest-edge bisection).
+// Adaptive refinement of an existing mesh lying on f's zero set (red/green splits of the marked edges).
 void refine(MeshData& mesh, const Fn& f, const MeshOptions& o);
 // Recomputes normals from the SDF gradient and tangents from o.tangentAxis.
 void surfaceFrames(MeshData& mesh, const Fn& f, const MeshOptions& o);
