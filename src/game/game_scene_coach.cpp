@@ -988,7 +988,8 @@ void GameScene::updateCoach(float dt) {
             LOGI("coach: draw offer %s (%d cp for the coach)", accept ? "accepted" : "declined", coachCp);
         }
         rt.drawAnalysis = 0;
-        if (state_ == State::Playing && rt.drawPly == int(game_.moves().size())) {
+        // An offer the game went past (a move made since) lapsed: it is answered as declined.
+        if (state_ == State::Playing) {
             ui::notify(i18n::tr(accept ? "notify.draw_accepted" : "notify.draw_declined"), 3.0f);
             if (rt.sessionRunning) rt.session.onDrawAnswer(accept);
             if (accept) {
