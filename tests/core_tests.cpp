@@ -42,6 +42,29 @@ TEST(ini_int_out_of_range) {
     CHECK_EQ(a.getInt("engine.elo"), INT_MAX);
 }
 
+// Booleans are recognised in any case (a hand-edited "True"); anything else is still false.
+TEST(ini_bool_any_case) {
+    IniFile a;
+    a.set("a.t1", "True");
+    a.set("a.t2", "YES");
+    a.set("a.t3", "On");
+    a.set("a.t4", "1");
+    a.set("a.f1", "FALSE");
+    a.set("a.f2", "off");
+    a.set("a.f3", "bogus");
+    a.set("a.f4", "true ; comment");
+    CHECK(a.getBool("a.t1"));
+    CHECK(a.getBool("a.t2"));
+    CHECK(a.getBool("a.t3"));
+    CHECK(a.getBool("a.t4"));
+    CHECK(!a.getBool("a.f1", true));
+    CHECK(!a.getBool("a.f2", true));
+    CHECK(!a.getBool("a.f3", true));
+    CHECK(!a.getBool("a.f4", true));
+    CHECK(a.getBool("a.missing", true));
+    CHECK_EQ(a.getString("a.t1"), std::string("True"));
+}
+
 // A file saved by an editor as "UTF-8 with BOM" keeps its first section; a BOM elsewhere is text.
 TEST(ini_utf8_bom) {
     const std::string path = net::sys::exeDirectory() + "ini-test-bom.ini";

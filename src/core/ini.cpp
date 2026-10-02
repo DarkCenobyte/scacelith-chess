@@ -1,5 +1,6 @@
 #include "ini.h"
 #include <algorithm>
+#include <cctype>
 #include <climits>
 #include <cstdio>
 #include <cstdlib>
@@ -81,6 +82,8 @@ float IniFile::getFloat(const std::string& key, float def) const {
 bool IniFile::getBool(const std::string& key, bool def) const {
     std::string s = getString(key);
     if (s.empty()) return def;
+    // Any case: a hand-edited "True" or "YES" is true too.
+    for (char& c : s) c = char(std::tolower((unsigned char)c));
     return s == "1" || s == "true" || s == "yes" || s == "on";
 }
 void IniFile::set(const std::string& key, const std::string& value) {
