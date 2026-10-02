@@ -35,9 +35,11 @@
 //                   coachhand | coachhands | coachhandt (Black's playing hand close up, from the front /
 //                   from its outside / from its thumb side)
 //   --robot         draw the real porcelain robot instead of the capsule robots (slower start)
+//   --solo          draw only the pieces held or within 6 cm of a playing index fingertip
 //   --selftest      numeric checks of the IK/grasp/timing/writing/mirroring and of the coach demo (results in
 //                   the log)
-// Keys: Space pause, R restart, V next view, S slow motion, arrows = player's head (White).
+// Keys: Space pause, R restart, V next view, S slow motion, Escape quit (White's head follows the
+// action by itself).
 #include "../app/orbit_camera.h"
 #include "../app/scene.h"
 #include "../character/robot.h"
