@@ -350,6 +350,7 @@ struct Scoresheet::Impl {
         layerPending[layer].clear();
         layerPage[layer] = page;
         if (v.empty() && !full) return;
+        if (full) font::flushUploads();   // glyphs the printed form packed just now (a cleared atlas)
         ProgramDesc d;
         d.vs = PAGE_VS;
         d.fs = PAGE_FS;
