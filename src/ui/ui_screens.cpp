@@ -1632,7 +1632,7 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, L
 
 MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw) { return pauseMenu(canClaimDraw, canOfferDraw, std::string()); }
 
-MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& resignQuestion) {
+MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& resignQuestion, bool canResign) {
     im::Id id = im::makeId("##pause");
     im::Anim& a = im::anim(id);
     bool appear = a.firstFrame == im::frame();
@@ -1655,6 +1655,7 @@ MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& re
     dimScene(std::max(t, 0.001f));
     float w = 560.0f, h = 640.0f;
     Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 12.0f, w, h);
+    if (S.pauseConfirm == 1 && !canResign) S.pauseConfirm = 0;   // a move set off meanwhile: greyed again
     if (S.pauseConfirm) im::pushBlock();
     gfx::pushAlpha(t);
     im::panel(p);
@@ -1667,7 +1668,7 @@ MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& re
     if (im::menuEntry(L("pause.offer_draw"), er.offset(0, step), canOfferDraw, HAlign::Center)) act = MenuAction::OfferDraw;
     if (im::menuEntry(L("pause.claim_draw"), er.offset(0, 2 * step), canClaimDraw, HAlign::Center)) act = MenuAction::ClaimDraw;
     im::tooltip(T("pause.claim_draw.help"));
-    if (im::menuEntry(L("pause.resign"), er.offset(0, 3 * step), true, HAlign::Center)) S.pauseConfirm = 1;
+    if (im::menuEntry(L("pause.resign"), er.offset(0, 3 * step), canResign, HAlign::Center)) S.pauseConfirm = 1;
     if (im::menuEntry(L("menu.options"), er.offset(0, 4 * step), true, HAlign::Center)) {
         S.pauseOptions = true;
         openOptions();

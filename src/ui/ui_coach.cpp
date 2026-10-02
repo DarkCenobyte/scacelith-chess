@@ -454,6 +454,7 @@ MenuAction coachPauseMenu(const CoachPause& cp) {
     float step = 70.0f, eh = 58.0f;
     float w = 580.0f, h = 170.0f + step * float(entries) + 20.0f;
     Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 12.0f, w, h);
+    if (g_pause.confirm == 1 && !cp.canResign) g_pause.confirm = 0;   // a move set off meanwhile: no entry
     if (g_pause.confirm) im::pushBlock();
     gfx::pushAlpha(t);
     im::panel(p);
