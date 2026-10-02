@@ -14,6 +14,8 @@
 #include "../chess/chess.h"
 #include "../core/embedded.h"
 #include "../game/online_session.h"
+#include "../game/scorekeeper.h"
+#include "../game/scoresheet_layout.h"
 #include "../game/settings.h"
 #include "../i18n/i18n.h"
 #include "../i18n/unicode.h"
@@ -377,13 +379,22 @@ void handwritingPreview(const std::string& name, int hand, const Rect& area) {
     float left = im::rtl() ? paper.x + 24.0f : paper.x + margin + 20.0f;
     float right = im::rtl() ? paper.r() - margin - 20.0f : paper.r() - 24.0f;
     gfx::text(name, nameRtl ? right : left, paper.y + lineGap - 20.0f, ns);
-    // A line of moves as they will be written (figurine-free algebraic notation).
+    // A line of moves as they will be written (figurine-free algebraic notation, with the piece
+    // letters of the language as on the scoresheets).
+    static std::string moves;
+    static int movesGen = -1;
+    if (movesGen != i18n::generation()) {
+        const game::sheet::PieceLetters letters = game::localizedPieceLetters();
+        auto san = [&letters](const char* s) { return game::sheet::localizeSan(s, letters); };
+        moves = "1. " + san("e4") + "  " + san("e5") + "   2. " + san("Nf3") + "  " + san("Nc6") + "   3. " + san("Bb5") + "  " + san("a6");
+        movesGen = i18n::generation();
+    }
     TextStyle ms = ns;
     ms.size = 38.0f;
     ms.align = HAlign::Left;
     ms.dir = 0;
     ms.color = vec4(0.10f, 0.13f, 0.30f, 0.85f);
-    gfx::text("1. e4  e5   2. Nf3  Nc6   3. Bb5  a6", left, paper.y + 2.0f * lineGap - 20.0f, ms);
+    gfx::text(moves, left, paper.y + 2.0f * lineGap - 20.0f, ms);
 }
 
 // ---- Options page -----------------------------------------------------------------------------------
