@@ -1056,16 +1056,7 @@ std::string normalizeResult(const std::string& s) {
     return std::string();
 }
 
-const char* terminationValue(GameStatus status, GameEndReason reason) {
-    if (status == GameStatus::Ongoing) return "unterminated";
-    switch (reason) {
-    case GameEndReason::Timeout:
-    case GameEndReason::TimeoutVsInsufficient: return "time forfeit";
-    case GameEndReason::IllegalMoves:
-    case GameEndReason::IllegalMovesVsInsufficient: return "rules infraction";
-    default: return "normal";
-    }
-}
+const char* terminationValue(GameStatus status, GameEndReason reason) { return terminationTag(status, reason); }
 
 }  // namespace pgn
 }  // namespace chess

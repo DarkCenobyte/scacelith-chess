@@ -188,6 +188,8 @@ std::string todayUtc() {
     return buf;
 }
 
+}  // namespace
+
 const char* terminationTag(GameStatus st, GameEndReason r) {
     if (st == GameStatus::Ongoing) return "unterminated";
     switch (r) {
@@ -198,8 +200,6 @@ const char* terminationTag(GameStatus st, GameEndReason r) {
     default: return "normal";
     }
 }
-
-}  // namespace
 
 std::string Game::pgn(const std::string& whiteName, const std::string& blackName) const {
     return pgn(whiteName, blackName, PgnTags{});

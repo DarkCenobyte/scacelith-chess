@@ -172,6 +172,8 @@ enum class GameEndReason : uint8_t {
 const char* endReasonKey(GameEndReason r);
 // The reason in the current UI language (i18n): "Checkmate", "Threefold repetition (claimed)", ...
 const char* endReasonText(GameEndReason r);
+// PGN Termination value ("normal", "time forfeit", "rules infraction"; "unterminated" while ongoing).
+const char* terminationTag(GameStatus status, GameEndReason reason);
 
 // Optional PGN header values (the Seven Tag Roster is always written).
 struct PgnTags {
