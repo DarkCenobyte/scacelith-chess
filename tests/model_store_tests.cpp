@@ -254,6 +254,7 @@ struct FakeHosts {
     std::mutex mu;
     std::set<std::string> corrupt, cut, insecure, missing;   // per file name, on the hub
     std::set<std::string> cutDone;
+    bool cutEvery = false;   // cut every transfer of a 'cut' file, not only the first
     bool archiveMissing = false;
     int pieceDelayMs = 0;
     std::string archive = blob(kFakeArchive, sizeof(kFakeArchive));
@@ -302,7 +303,7 @@ struct FakeHosts {
                 if (sha != kHashes[i]) continue;
                 rep = fakehttp::fileReply(content(i, kNames[i]), r);
                 rep.pieceDelayMs = pieceDelayMs;
-                if (cut.count(kNames[i]) && !cutDone.count(kNames[i])) {
+                if (cut.count(kNames[i]) && (cutEvery || !cutDone.count(kNames[i]))) {
                     cutDone.insert(kNames[i]);
                     rep.cutAfter = rep.body.size() / 3;
                 }
@@ -607,7 +608,7 @@ TEST(model_store_falls_back_to_the_archive) {
     CHECK(r.last.fromArchive);
     CHECK_EQ(r.last.hubError, std::string("network"));
     CHECK(allGood(t));
-    // Both sources fail: a clear error, no file left half-way.
+    // Both sources fail: a clear error (the 404 wrote nothing).
     FakeHosts dead;
     dead.missing.insert("LICENSE");
     dead.archiveMissing = true;
@@ -645,6 +646,33 @@ TEST(model_store_resumes_and_cancels) {
         if (q.path.find(kHashes[6]) != std::string::npos && q.get("range") == "bytes=" + std::to_string(kSizes[6] / 3) + "-")
             ranged = true;
     CHECK(ranged);
+
+    // The hub keeps breaking off and the archive is missing: the job fails, the hub's .part stays
+    // and the next job continues it.
+    FakeHosts flaky;
+    flaky.cut.insert("vector_estimator.int8.onnx");
+    flaky.cutEvery = true;
+    flaky.archiveMissing = true;
+    TempFolder t4("keeppart");
+    tts::ModelDownloader d4(flaky.manifest(), t4.dir);
+    r = runJob(d4);
+    CHECK_EQ(int(r.last.phase), int(Phase::Failed));
+    CHECK_EQ(r.last.hubError, std::string("truncated"));
+    uint64_t kept = 0;
+    CHECK(net::sys::fileSize(t4.dir + "vector_estimator.int8.onnx.part", kept) && kept > 0 && kept < kSizes[6]);
+    {
+        std::lock_guard<std::mutex> lk(flaky.mu);
+        flaky.cut.clear();
+        flaky.archiveMissing = false;
+    }
+    r = runJob(d4);
+    CHECK_EQ(int(r.last.phase), int(Phase::Done));
+    CHECK(!r.last.fromArchive);
+    CHECK(allGood(t4));
+    bool fromKept = false;
+    for (const fakehttp::Request& q : flaky.srv.requests())
+        if (q.path.find(kHashes[6]) != std::string::npos && q.get("range") == "bytes=" + std::to_string(kept) + "-") fromKept = true;
+    CHECK(fromKept);
 
     // Cancel while a slow file comes in: Cancelled at once, the .part kept, then continued.
     FakeHosts slow;

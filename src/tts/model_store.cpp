@@ -430,7 +430,6 @@ void ModelDownloader::run(Options o) {
             hubError = r.error == "http" ? "http " + std::to_string(r.status) : r.error;
             hubDetail = f->name + ": " + (r.detail.empty() ? r.error : r.detail);
             LOGW("tts: the hub failed (%s), switching to the release archive", hubDetail.c_str());
-            net::sys::removeFile(folder_ + f->name + ".part");
             still.push_back(f);
         }
         if (still.size() < missing.size()) sources.push_back("hub");
