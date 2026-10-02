@@ -19,7 +19,6 @@
 #include "online_account.h"
 #include "online_live.h"
 #include <deque>
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -207,7 +206,7 @@ public:
         bool searching = false;
         std::string category;
         bool rated = false;
-        double sinceMs = 0;                     // mock::nowMs() when the search began (elapsed time)
+        double sinceMs = 0;                     // nowMs() when the search began (elapsed time)
         uint32_t window = 0, queued = 0;
     };
     const Queue& queue() const { return queue_; }
