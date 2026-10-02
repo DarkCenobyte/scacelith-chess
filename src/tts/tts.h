@@ -33,7 +33,7 @@ struct Options {
 };
 
 // Speech languages for a UI language code: en fr de es ru uk ar ja (false for zh-Hans, zh-Hant and
-// anything else the coach does not speak).
+// anything else the coach does not speak). The one list: coach::speechSupported asks it.
 bool languageSupported(const std::string& uiCode);
 
 // Voice used when Options::voice is -1 (M3, the male "teacher" voice chosen by listening; M2, deeper, is
