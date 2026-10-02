@@ -623,7 +623,7 @@ float wheelScroll(float& scroll, float& target, const Rect& area, float contentH
     scroll = opened ? target : std::min(im::approach(scroll, target, 16.0f), maxScroll);
     return scroll;
 }
-// Scroll bar on the end side and fades at the edges (panel colour), as the credits.
+// Scroll bar on the end side and fades at the edges (panel colour), as on the account pages.
 void scrollDecor(const Rect& area, float scroll, float contentH) {
     float maxScroll = contentH - area.h;
     if (maxScroll <= 0.5f) return;
@@ -635,7 +635,8 @@ void scrollDecor(const Rect& area, float scroll, float contentH) {
     if (scroll < maxScroll - 0.5f) gfx::fillV(Rect(area.x, area.b() - 22.0f, area.w, 22.0f), pz, pc);
 }
 
-// A centred message in an area: an italic heading and a wrapped text under it.
+// A centred message in an area: a heading in the title face (upper-cased) and an italic wrapped text
+// under it.
 void message(const Rect& area, const std::string& head, const std::string& text, vec4 headColor) {
     TextStyle hs = style(font::FACE_TITLE, 24.0f, headColor, HAlign::Center, 0.14f);
     TextStyle ts = style(font::FACE_ITALIC, 23.0f, ivoryDim, HAlign::Center);

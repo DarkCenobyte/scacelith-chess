@@ -247,8 +247,6 @@ bool isOfficialCategory(int baseSec, int incSec) {
     return false;
 }
 
-
-
 // ---- State -----------------------------------------------------------------------------------------
 enum class Sub {
     NoServer, SignIn, Mfa, Register, CheckEmail, Forgot, SsoWait, SsoName,
@@ -351,17 +349,12 @@ void openAccountPage(Sub sub) {
 }
 
 // ---- Page chrome -------------------------------------------------------------------------------------
-
-
 // Error (red) or note (ivory) under a form, centered; returns the height used.
 float messageLine(const Rect& p, float y) {
     if (!O.error.empty()) return paragraph(O.error, p, y, p.w - 200.0f, danger, kSmall + 1.0f);
     if (!O.note.empty()) return paragraph(O.note, p, y, p.w - 200.0f, ivoryDim, kSmall + 1.0f);
     return 0.0f;
 }
-
-
-
 
 // A large choice: title and a one-line description (Play page, direct match).
 bool choiceRow(const char* key, const char* descKey, const Rect& r, bool enabled = true) {
@@ -405,7 +398,6 @@ bool tcTile(int id, const Rect& r, const std::string& label, const std::string& 
     if (hit) im::sound(Sound::Toggle);
     return hit;
 }
-
 
 // ---- Result handling (HTTPS answers of the pages) ----------------------------------------------------
 void pumpResults() {
@@ -1089,8 +1081,8 @@ void pageMfaOff(float t, bool regenerate) {
 }
 
 // ---- Sub-pages: play -------------------------------------------------------------------------------------
-// Grid of the server's categories; returns the chosen id ("" = none known yet). With 'custom' a
-// "Custom" tile is added (terms.tc = -1).
+// Grid of the server's categories (a spinner while none is known); 'index' is the selected one,
+// -1 = the "Custom" tile when 'custom'. Returns the height used.
 float categoryGrid(const Rect& col, float y, int& index, bool custom, bool withRatings) {
     game::OnlineSession& s = ses();
     const std::vector<net::Category>& cats = s.info().categories;
