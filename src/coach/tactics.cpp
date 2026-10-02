@@ -1,5 +1,5 @@
 // Board facts for the coach's explanations (see tactics.h). The motif rules follow the lichess
-// puzzle tagger (lichess-puzzler tagger/cook.py, util.py) where research-pedagogy §2 cites it.
+// puzzle tagger (lichess-puzzler tagger/cook.py, util.py) for the motifs it tags.
 #include "coach/tactics.h"
 
 #include <algorithm>

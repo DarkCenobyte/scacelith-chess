@@ -4,7 +4,7 @@
 // scripts use exists, every placeholder has an argument, every gesture and mark anchor is a
 // placeholder of every variant, at most three pointing gestures, the sentence budget per level),
 // praise only for the best moves and its rate limit, takebacks, announcements, threat warnings,
-// analysis requests; and, with the embedded engine, the worked example of research-pedagogy §2.0.
+// analysis requests; and, with the embedded engine, the worked example (the fork of 4...Qg5).
 #include "test.h"
 
 #include "ai/analysis.h"
@@ -316,7 +316,7 @@ TEST(coach_review_classification_thresholds) {
 }
 
 TEST(coach_review_bands) {
-    // Demonstration depth per level (design §1): 1 at level 1 ... 8 at level 6.
+    // Demonstration depth per level: 1 at level 1 ... 8 at level 6.
     const int demo[6] = {1, 2, 3, 4, 6, 8};
     for (int l = 1; l <= 6; ++l) {
         CHECK_EQ(band(l).level, l);
@@ -375,7 +375,7 @@ TEST(coach_review_fork_worked_example) {
         char where[32];
         std::snprintf(where, sizeof where, "fork b%d", level);
         CHECK_EQ(r.verdict.cls, MoveClass::Blunder);
-        CHECK_EQ(r.verdict.exType, ExType::Fork);   // before king safety / positional (§2.0 order)
+        CHECK_EQ(r.verdict.exType, ExType::Fork);   // before king safety / positional (ExType order)
         CHECK(r.verdict.voiced);
         checkScript(r.script, where);
         const std::string key = "ex.fork.b" + std::to_string(level);
@@ -412,7 +412,7 @@ TEST(coach_review_fork_worked_example) {
 }
 
 TEST(coach_review_mate_allowed_first) {
-    // 3...Nf6?? allows Qxf7#: a capture of a pawn too, but the mate explains it (§2.0 order).
+    // 3...Nf6?? allows Qxf7#: a capture of a pawn too, but the mate explains it (ExType order).
     Game g = gameOf(nullptr, {"e4", "e5", "Bc4", "Nc6", "Qh5", "Nf6"});
     const ai::Analysis a0 =
         analysisOf({pvl(-30, "g7g6 h5f3 g8f6"), pvl(-40, "d8e7 g1f3"), pvl(0, "g8f6 h5f7", -1)});

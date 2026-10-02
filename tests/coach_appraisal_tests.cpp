@@ -187,7 +187,7 @@ Appraisal wonAppraisal(const Game& g, int level) {
 // ---- Accuracy ------------------------------------------------------------------------------------------
 
 TEST(coach_appraisal_accuracy_vectors) {
-    // lila AccuracyPercentTest.scala, and the values of the port in research-pedagogy §1.3.
+    // lila AccuracyPercentTest.scala (the loose bounds), and the values of this port (the tight ones).
     SideAccuracy a = gameAccuracy({-900});   // White blunders on the first move
     CHECK(std::fabs(a.white - 10.0) <= 5.0);
     CHECK(std::fabs(a.white - 10.7) < 0.1);
@@ -613,7 +613,7 @@ TEST(coach_appraisal_every_key_exists) {
         if (!en.count(k)) std::fprintf(stderr, "  missing %s\n", k.c_str());
         CHECK(en.count(k) == 1);
     }
-    // The counted nouns the lines use exist in W11b's common.lang.
+    // The counted nouns the lines use exist in common.lang.
     const std::set<std::string> nouns = {"move", "point", "pawn", "piece", "mistake", "blunder", "inaccuracy",
                                          "game", "time", "square"};
     for (const auto& kv : en)

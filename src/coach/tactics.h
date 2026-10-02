@@ -4,7 +4,7 @@
 // facts about a move and the path a finger traces for it.
 //
 // Stockfish decides whether a move is good or bad (review.h); these helpers say *why*, and every
-// sentence the coach speaks about the board is checked with them first (research-pedagogy §2).
+// sentence the coach speaks about the board is checked with them first.
 // Engine-free pure functions of chess::Position: no i18n, no allocation in the hot ones, safe from
 // any thread. Square sets are bitboards (chess::squaresOf lists them).
 #pragma once

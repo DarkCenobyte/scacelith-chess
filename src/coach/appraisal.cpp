@@ -1,5 +1,5 @@
-// The coach's end-of-game appraisal (see appraisal.h): lichess game accuracy, the statistics of
-// research-pedagogy §5.2 and the appraisal script of §5.3-5.5.
+// The coach's end-of-game appraisal (see appraisal.h): lichess game accuracy, the statistics and
+// the appraisal script.
 #include "coach/appraisal.h"
 
 #include "coach/review_internal.h"
@@ -502,7 +502,7 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
         b.line.with("eval", Arg::ofEval(cp, 0));
         parts.push_back({b, 3});
     }
-    // The opening (levels 3+, W10).
+    // The opening (levels 3+).
     if (!ctx.opening.empty() && L >= 3) {
         Beat b = say(bandKey("appraisal.opening", L), Look::Player);
         b.line.with("opening", Arg::ofOpening(ctx.opening));

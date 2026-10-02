@@ -175,7 +175,7 @@ OpeningState classify(const chess::Game& game, const OpeningBook& book = Opening
 
 // ---- What the coach says -----------------------------------------------------------------------------------------
 // A line of the coach's speech: a catalog key plus named, typed arguments. Maps 1:1 onto coach::Line / coach::Arg
-// of the speech catalog (design §3.2): Kind::Opening -> Arg::Kind::Opening with the same text, Kind::Number ->
+// of the speech catalog: Kind::Opening -> Arg::Kind::Opening with the same text, Kind::Number ->
 // Arg::Kind::Number. An Opening argument is a reference: "family:<id>", "variation:<id>" or "line:<lichess
 // component>" (a lichess variation name composed per language, see OpeningTexts::arg).
 struct OpeningArg {
@@ -192,7 +192,7 @@ struct OpeningLine {
 // Decides what the coach says about the opening, from the game record alone (demonstration moves never reach the
 // Game, so they never reach it either).
 //
-// Policy (level = coach level 0..6, design §1):
+// Policy (level = coach level 0..6):
 //   0      the rules lesson: silent.
 //   all    once the opening is determined, both sides' openings in one sentence ("You opened with the Queen's
 //          Gambit, and I declined it."), then one comment on what the opening leads to (once per opening per
@@ -214,7 +214,7 @@ public:
 
     void setLevel(int level);                        // 0..6
     void setHumanColor(chess::Color c);              // the listener's side ("You opened with ...")
-    // Languages of the subtitles and of the voice (design §1): composed lichess names are only used when both
+    // Languages of the subtitles and of the voice: composed lichess names are only used when both
     // can render them. Default: "en", "en".
     void setLanguages(const std::string& subtitle, const std::string& speech);
     int level() const { return level_; }
