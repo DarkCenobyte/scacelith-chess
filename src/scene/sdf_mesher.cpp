@@ -166,10 +166,9 @@ MeshData meshSurfaceNets(const Field& fIn, const AABB& box, const MeshOptions& o
     auto cidx = [&](int i, int j, int k) { return (size_t(k) * size_t(ny - 1) + size_t(j)) * size_t(nx - 1) + size_t(i); };
     auto P = [&](int i, int j, int k) { return box.lo + vec3(float(i), float(j), float(k)) * h; };
 
-    std::vector<float> val(size_t(nx) * size_t(ny) * size_t(nz), 0.0f);
+    std::vector<float> val(size_t(nx) * size_t(ny) * size_t(nz), 0.0f);  // valid where done[] is set
     std::vector<uint8_t> done(val.size(), 0);
-    std::vector<float> blockVal(size_t(bx) * size_t(by) * size_t(bz));
-    std::vector<uint8_t> active(blockVal.size(), 0);
+    std::vector<uint8_t> active(size_t(bx) * size_t(by) * size_t(bz), 0);
     const float halfDiag = 0.5f * float(B) * h * std::sqrt(3.0f);
     for (int k = 0; k < bz; ++k)
         for (int j = 0; j < by; ++j)
@@ -177,7 +176,6 @@ MeshData meshSurfaceNets(const Field& fIn, const AABB& box, const MeshOptions& o
                 vec3 c = box.lo + (vec3(float(i), float(j), float(k)) + vec3(0.5f)) * (float(B) * h);
                 float v = f(c);
                 size_t bi = (size_t(k) * size_t(by) + size_t(j)) * size_t(bx) + size_t(i);
-                blockVal[bi] = v;
                 active[bi] = std::fabs(v) <= halfDiag * o.lipschitz + h;
             }
     for (int k = 0; k < bz; ++k)
@@ -193,14 +191,7 @@ MeshData meshSurfaceNets(const Field& fIn, const AABB& box, const MeshOptions& o
                             done[id] = 1;
                         }
             }
-    for (int z = 0; z < nz; ++z)
-        for (int y = 0; y < ny; ++y)
-            for (int x = 0; x < nx; ++x) {
-                size_t id = pidx(x, y, z);
-                if (done[id]) continue;
-                int i = std::min(x / B, bx - 1), j = std::min(y / B, by - 1), k = std::min(z / B, bz - 1);
-                val[id] = blockVal[(size_t(k) * size_t(by) + size_t(j)) * size_t(bx) + size_t(i)];
-            }
+    // Only cells of active blocks are meshed below, and every corner they read is evaluated.
 
     // Gradient (tetrahedral differences), unnormalised scale 4e.
     const float e = h * 0.12f;
