@@ -22,6 +22,7 @@
 #include <mutex>
 #include <thread>
 #ifndef _WIN32
+#include <fcntl.h>
 #include <sys/resource.h>
 #include <unistd.h>
 #endif
@@ -292,7 +293,7 @@ const char* kDescForeign = R"(<?xml version="1.0"?>
 
 }  // namespace
 
-// ---- UPnP ---------------------------------------------------------------------------------------
+// ---- sockets ------------------------------------------------------------------------------------
 
 #ifndef _WIN32
 // PollSet on a descriptor past FD_SETSIZE (1024), which select() cannot take: nothing until the
@@ -310,8 +311,8 @@ TEST(sock_poll_set_high_descriptor) {
     CHECK(sock::Endpoint::parse("127.0.0.1", 0, loop));
     CHECK(sock::bindTo(a, loop, false));
     CHECK(sock::localEndpoint(a, at));
-    const sock::Handle high = 1500;
-    CHECK_EQ(dup2(a, high), high);
+    const sock::Handle high = fcntl(a, F_DUPFD, 1500);   // the lowest free descriptor from 1500
+    CHECK(high >= 1500);
     sock::PollSet ps;
     ps.add(high, true, false);
     auto t0 = std::chrono::steady_clock::now();
@@ -330,6 +331,8 @@ TEST(sock_poll_set_high_descriptor) {
     sock::closeSocket(b);
 }
 #endif
+
+// ---- UPnP ---------------------------------------------------------------------------------------
 
 TEST(upnp_parsers) {
     upnp::SsdpResponse r;
