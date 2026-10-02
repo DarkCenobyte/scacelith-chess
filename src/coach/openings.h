@@ -209,7 +209,8 @@ struct OpeningLine {
 // transposition, a new variation) is dropped once more than 4 plies old, the first summary never is.
 class OpeningAnnouncer {
 public:
-    explicit OpeningAnnouncer(const OpeningBook& book = OpeningBook::instance());
+    OpeningAnnouncer() = default;   // OpeningBook::instance(), resolved on first use (not on the constructing thread)
+    explicit OpeningAnnouncer(const OpeningBook& book);
 
     void setLevel(int level);                        // 0..6
     void setHumanColor(chess::Color c);              // the listener's side ("You opened with ...")
@@ -235,7 +236,7 @@ public:
     int utterances() const { return utterances_; }   // opening utterances this game
 
 private:
-    const OpeningBook& book_;
+    const OpeningBook* book_ = nullptr;   // nullptr: OpeningBook::instance()
     int level_ = 1;
     chess::Color human_ = chess::White;
     std::string subtitleLang_ = "en", speechLang_ = "en";
@@ -247,6 +248,7 @@ private:
     int lastTalkPly_ = -100;
     int lastPlies_ = 0;
 
+    const OpeningBook& book() const { return book_ ? *book_ : OpeningBook::instance(); }
     struct Plan;
     Plan plan(const OpeningState& st) const;
     std::vector<OpeningLine> lines(const Plan& p, bool first) const;
