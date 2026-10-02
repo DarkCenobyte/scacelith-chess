@@ -30,6 +30,27 @@ const OpEntry kOps[] = {
     {"Identity", Op::Identity},
 };
 
+// The leading inputs a node of the operator cannot do without (their names must not be empty)
+// and the outputs it writes. Later inputs are optional; extra ones are ignored.
+struct Arity {
+    size_t inputs, outputs;
+};
+
+Arity arityOf(Op op) {
+    switch (op) {
+    case Op::Constant: return {0, 1};
+    case Op::DynamicQuantize: return {1, 3};
+    case Op::Add: case Op::Sub: case Op::Mul: case Op::Div: case Op::Pow: case Op::Equal: case Op::PRelu:
+    case Op::Gather: case Op::Reshape: case Op::Unsqueeze: case Op::Expand: case Op::Tile: case Op::Pad:
+    case Op::LayerNorm: case Op::MatMul: case Op::Gemm: case Op::Conv: case Op::MatMulInteger: case Op::Quantize:
+    case Op::Dequantize:
+        return {2, 1};
+    case Op::Where: case Op::Slice: return {3, 1};
+    case Op::BatchNorm: return {5, 1};
+    default: return {1, 1};
+    }
+}
+
 DType dtypeOf(int onnxType) {
     switch (onnxType) {
     case onnx::kFloat: return DType::F32;
@@ -285,6 +306,13 @@ bool Graph::load(const uint8_t* data, size_t size, const std::string& label,
             byName[s] = v;
             n.out.push_back(v);
         }
+        Arity ar = arityOf(n.op);
+        bool arityOk = n.in.size() >= ar.inputs && n.out.size() >= ar.outputs;
+        for (size_t i = 0; arityOk && i < ar.inputs; ++i) arityOk = n.in[i] >= 0;
+        if (!arityOk) {
+            if (error) *error = label + ": " + pn.opType + " " + pn.name + ": wrong number of inputs or outputs";
+            return false;
+        }
         nodes_.push_back(std::move(n));
     }
     for (const onnx::ValueInfo& vi : model.outputs) {
@@ -396,17 +424,17 @@ void Graph::fusePatterns() {
             int e = single(n.out[0]);
             if (e < 0 || nodes_[size_t(e)].op != Op::Erf) continue;
             int a = single(nodes_[size_t(e)].out[0]);
-            if (a < 0 || nodes_[size_t(a)].op != Op::Add) continue;
+            if (a < 0 || nodes_[size_t(a)].op != Op::Add || nodes_[size_t(a)].in.size() != 2) continue;
             const Node& add = nodes_[size_t(a)];
             int other = add.in[0] == nodes_[size_t(e)].out[0] ? add.in[1] : add.in[0];
             if (!constIs(other, 1.0f)) continue;
             int m1 = single(add.out[0]);
-            if (m1 < 0 || nodes_[size_t(m1)].op != Op::Mul) continue;
+            if (m1 < 0 || nodes_[size_t(m1)].op != Op::Mul || nodes_[size_t(m1)].in.size() != 2) continue;
             const Node& mul1 = nodes_[size_t(m1)];
             int o1 = mul1.in[0] == add.out[0] ? mul1.in[1] : mul1.in[0];
             if (o1 != x) continue;
             int m2 = single(mul1.out[0]);
-            if (m2 < 0 || nodes_[size_t(m2)].op != Op::Mul) continue;
+            if (m2 < 0 || nodes_[size_t(m2)].op != Op::Mul || nodes_[size_t(m2)].in.size() != 2) continue;
             const Node& mul2 = nodes_[size_t(m2)];
             int o2 = mul2.in[0] == mul1.out[0] ? mul2.in[1] : mul2.in[0];
             if (!constIs(o2, 0.5f)) continue;
@@ -452,13 +480,13 @@ void Graph::fusePatterns() {
             int c = single(n.out[0]);
             if (c < 0 || nodes_[size_t(c)].op != Op::Cast || nodes_[size_t(c)].i0 != onnx::kFloat) continue;
             int m = single(nodes_[size_t(c)].out[0]);
-            if (m < 0 || nodes_[size_t(m)].op != Op::Mul) continue;
+            if (m < 0 || nodes_[size_t(m)].op != Op::Mul || nodes_[size_t(m)].in.size() != 2) continue;
             const Node& mul = nodes_[size_t(m)];
             int scale = mul.in[0] == nodes_[size_t(c)].out[0] ? mul.in[1] : mul.in[0];
             int outV = mul.out[0];
             int bias = -1, last = m;
             int a = single(outV);
-            if (a >= 0 && nodes_[size_t(a)].op == Op::Add) {
+            if (a >= 0 && nodes_[size_t(a)].op == Op::Add && nodes_[size_t(a)].in.size() == 2) {
                 const Node& add = nodes_[size_t(a)];
                 int b = add.in[0] == outV ? add.in[1] : add.in[0];
                 const Value& bv = values_[size_t(b)];

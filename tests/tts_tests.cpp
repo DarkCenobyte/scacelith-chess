@@ -545,6 +545,25 @@ TEST(tts_onnx_reader_malformed) {
     CHECK(parses(modelPb({nodePb("Transpose", {"x"}, {"y"}, {perm})}, {}, {"x"}, {"y"})));
 }
 
+// Nodes with fewer inputs or outputs than their operator needs are refused at load, before
+// constant folding or a run writes past the outputs or reads a missing input.
+TEST(tts_graph_arity) {
+    std::string err;
+    auto loads = [&](const Pb& node, const std::vector<std::string>& outs) {
+        tts::Graph g;
+        return loadModel(modelPb({node}, {}, {"x"}, outs), g, &err);
+    };
+    CHECK(loads(nodePb("DynamicQuantizeLinear", {"x"}, {"q", "s", "z"}), {"q"}));
+    CHECK(!loads(nodePb("DynamicQuantizeLinear", {"x"}, {"q"}), {"q"}) && err.find("wrong number") != std::string::npos);
+    CHECK(loads(nodePb("Add", {"x", "x"}, {"y"}), {"y"}));
+    CHECK(!loads(nodePb("Add", {"x"}, {"y"}), {"y"}));
+    CHECK(!loads(nodePb("DequantizeLinear", {"x", ""}, {"y"}), {"y"}));
+    CHECK(loads(nodePb("Clip", {"x", "", ""}, {"y"}), {"y"}));   // optional inputs may be empty
+    Pb noOutput;
+    noOutput.s(1, "x").s(3, "r").s(4, "Relu");
+    CHECK(!loads(noOutput, {}));
+}
+
 // ------------------------------------------------------------------------------------------------
 // Operators (numpy / ONNX semantics)
 // ------------------------------------------------------------------------------------------------
