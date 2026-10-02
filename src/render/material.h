@@ -23,7 +23,7 @@ enum TextureUnit : int {
     TEXUNIT_SHADOW_DEPTH = 9,     // sampler2DArray: same cascades, raw depth (PCSS blocker search)
     TEXUNIT_IRRADIANCE = 10,      // light-probe irradiance (render-lighting defines the format)
     TEXUNIT_SPECULAR = 11,        // samplerCubeArray: prefiltered specular probes
-    TEXUNIT_AO = 12,              // sampler2D: screen-space ambient occlusion (r) + bent cone (gba)
+    TEXUNIT_AO = 12,              // sampler2D: screen-space ambient occlusion (r)
     TEXUNIT_PLANAR = 13,          // sampler2DArray: planar reflections, one layer per reflector
     TEXUNIT_BRDF_LUT = 14,        // sampler2D: split-sum DFG LUT (rg) + sheen/cloth (b)
     TEXUNIT_SSR = 15,             // sampler2D: screen-space reflection result (rgb, a = confidence)

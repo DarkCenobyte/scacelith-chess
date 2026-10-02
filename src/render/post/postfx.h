@@ -8,8 +8,8 @@
 //
 // Frame graph (render resolution W x H, "half" = W/2 x H/2, all compute unless noted):
 //   computeAO:  depth prep (linear depth, HiZ level 0, checkerboard half-res depth + normal)
-//               -> GTAO (half, 1-3 slices, bent normal) -> temporal + edge-aware denoise (half)
-//               -> joint-bilateral upsample (full, RGBA8) bound on TEXUNIT_AO
+//               -> GTAO (half, 1-3 slices) -> temporal + edge-aware denoise (half)
+//               -> joint-bilateral upsample (full, R8) bound on TEXUNIT_AO
 //               also binds the previous frame's SSR (rgb radiance, a confidence) on TEXUNIT_SSR.
 //   resolve:    HiZ min/max pyramid -> colour pyramid -> SSR trace (half, HiZ, GGX VNDF)
 //               -> SSR resolve (full, 4-ray reuse) -> SSR temporal
@@ -20,8 +20,7 @@
 //               backbuffer, AgX + grade + grain + CA + vignette + fade).
 //
 // Output contracts for other packages:
-//   TEXUNIT_AO  (sampler2D, render resolution): r = GTAO visibility (1 = open),
-//               gba = world-space bent normal * 0.5 + 0.5 ((0.5,0.5,0.5) = unavailable -> use N).
+//   TEXUNIT_AO  (sampler2D, render resolution): r = GTAO visibility (1 = open).
 //               Multi-bounce is left to the lighting (it knows the albedo).
 //   TEXUNIT_SSR (sampler2D, render resolution): previous frame's temporally filtered SSR,
 //               rgb = pre-exposed reflected radiance (not multiplied by F), a = confidence.
