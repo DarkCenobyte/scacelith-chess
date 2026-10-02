@@ -40,6 +40,8 @@
 #ifdef _WIN32
 #include <direct.h>
 #else
+#include <sys/resource.h>
+#include <sys/syscall.h>
 #include <unistd.h>
 #endif
 
@@ -1674,6 +1676,24 @@ TEST(tts_thread_pool) {
             CHECK_EQ(count.load(), 64);
         }
     }
+#ifndef _WIN32
+    // Linux: a lowered thread runs at the process's nice + 5 (at most 19), and so does one started
+    // by an already lowered thread.
+    auto threadNice = [] { return getpriority(PRIO_PROCESS, id_t(syscall(SYS_gettid))); };
+    int base = getpriority(PRIO_PROCESS, id_t(getpid()));
+    int lowered = 0, nested = 0;
+    std::thread([&] {
+        tts::lowerThreadPriority();
+        lowered = threadNice();
+        std::thread([&] {
+            tts::lowerThreadPriority();
+            nested = threadNice();
+        }).join();
+    }).join();
+    CHECK_EQ(lowered, std::min(base + 5, 19));
+    CHECK_EQ(nested, std::min(base + 5, 19));
+    CHECK_EQ(getpriority(PRIO_PROCESS, id_t(getpid())), base);
+#endif
 }
 
 // ------------------------------------------------------------------------------------------------
