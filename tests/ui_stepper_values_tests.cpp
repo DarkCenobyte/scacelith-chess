@@ -1,6 +1,6 @@
 // The values of the custom time control and engine limit steppers (src/ui/ui_stepper_values.h): a
-// value from a hand-edited .ini is snapped to the one its stepper shows when the New Game,
-// challenge and direct match pages open, so that the game uses what the page shows.
+// value from a hand-edited .ini is snapped to the one its stepper shows when the New Game, Watch a
+// Game, challenge and direct match pages open, so that the game uses what the page shows.
 #include "test.h"
 #include "ui/ui_stepper_values.h"
 #include <climits>
@@ -13,8 +13,8 @@ TEST(ui_stepper_values_snap_hand_edited_values) {
     // The values the pages write themselves stay as they are.
     for (const std::vector<int>* t : {&bv, &moveTimeValues(), &nodeValues()})
         for (int v : *t) CHECK_EQ(nearestValue(*t, v), v);
-    // newgame.custom_base_seconds = 100: the stepper shows 1:45 (between 1:30 and 1:45), and so
-    // does the game now, not 1:40; 1000 s plays 17:00.
+    // newgame.custom_base_seconds = 100 (or viewer.custom_base_seconds): the stepper shows 1:45
+    // (between 1:30 and 1:45), and so does the game now, not 1:40; 1000 s plays 17:00.
     CHECK_EQ(nearestValue(bv, 100), 105);
     CHECK_EQ(nearestValue(bv, 1000), 1020);
     // direct.base_seconds = 0 (or any number below the table): 0:15, not a one-second game.

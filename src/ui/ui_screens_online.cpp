@@ -2,8 +2,10 @@
 //   - no server configured (a build without an official server): community server settings or
 //     a direct match;
 //   - sign in (user name or e-mail + password, Google), the two-factor code step, create an
-//     account (then "check your e-mail" with Resend), forgot password, Google first login
-//     (choose a user name);
+//     account (then "check your e-mail" with Resend), forgot password, Google sign-in (waiting
+//     for the browser, then finishing; first login: choose a user name; the address of an
+//     existing account: its password once, then its code when two-factor is on, to add Google
+//     sign-in to it);
 //   - account, in three columns: the account (user name, e-mail and an e-mail change waiting
 //     for its link, two-factor, Google, the "Accept challenges" preference, sign out here /
 //     everywhere), security and data (change password, change e-mail, two-factor setup (QR
@@ -818,7 +820,8 @@ void pageSsoName(float t) {
     im::formField(L("online.field.username"), O.ssoName, formRow(p, y), 24, im::FIELD_LTR, T("online.field.username.hint"));
     messageLine(p, y + 20.0f);
     footerRule(p);
-    bool cancel = backButton(p, "common.cancel");
+    // Not while the user name is sent: its answer would come to the page left.
+    bool cancel = backButton(p, "common.cancel", !busy);
     if (primaryButton(p, "online.sso.continue", !trim(O.ssoName).empty(), busy)) {
         O.error.clear();
         s.api().completeSso(trim(O.ssoName));
@@ -826,7 +829,7 @@ void pageSsoName(float t) {
     }
     im::popId();
     endPage();
-    if (cancel || im::consumeBack()) {
+    if (cancel || (im::consumeBack() && !busy)) {
         s.api().cancelSso();
         setSub(Sub::SignIn);
     }
@@ -1008,7 +1011,11 @@ void pageAccount(float t) {
     }
     ty += 14.0f;
     gfx::hlineFade(rx, rx + col2W, ty, withAlpha(gold, 0.3f), 0.2f);
-    float rowH = std::min(46.0f, (footerY(p) - 100.0f - ty) / float(std::max<size_t>(cats.size(), 1)));
+    // The rows share what the note under them leaves (two lines in some languages), so that its
+    // last line stays clear of the message line.
+    TextStyle ns = style(font::FACE_ITALIC, kCaption, muted, im::startAlign());
+    const int noteLines = gfx::wrapLineCount(T("online.account.provisional"), col2W, ns);
+    float rowH = std::min(46.0f, (footerY(p) - 100.0f - 26.0f * float(noteLines) - ty) / float(std::max<size_t>(cats.size(), 1)));
     TextStyle vs = style(font::FACE_TEXT, 25.0f, ivory, HAlign::Center);
     for (size_t i = 0; i < cats.size(); ++i) {
         const net::RatingInfo* r = s.rating(cats[i]);
@@ -1028,7 +1035,6 @@ void pageAccount(float t) {
         gfx::text(rec, im::flipX(tcol, cx[3] + col2W * 0.1f), by, gs);
     }
     if (cats.empty()) spinner(vec2(rx + col2W * 0.5f, ty + 40.0f));
-    TextStyle ns = style(font::FACE_ITALIC, kCaption, muted, im::startAlign());
     float noteY = ty + rowH * float(cats.size()) + 38.0f;
     gfx::textWrapped(T("online.account.provisional"), im::flipX(tcol, rx), noteY, col2W, ns, 26.0f);
     float my = footerY(p) - 50.0f;

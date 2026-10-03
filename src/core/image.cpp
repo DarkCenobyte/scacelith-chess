@@ -1,6 +1,7 @@
 #include "image.h"
 #include <algorithm>
 #include <cstdio>
+#include <filesystem>
 
 namespace image {
 namespace {
@@ -34,8 +35,14 @@ bool chunk(FILE* f, const char* type, const std::vector<uint8_t>& data) {
 }
 }  // namespace
 
+// The path is UTF-8: opened as a wide path on Windows (u8path), whatever the process code page.
 bool writePNG(const std::string& path, int w, int h, int ch, const uint8_t* px) {
+    const std::filesystem::path file = std::filesystem::u8path(path);
+#ifdef _WIN32
+    FILE* f = _wfopen(file.c_str(), L"wb");
+#else
     FILE* f = std::fopen(path.c_str(), "wb");
+#endif
     if (!f) return false;
     const uint8_t sig[8] = {137, 80, 78, 71, 13, 10, 26, 10};
     bool ok = std::fwrite(sig, 1, 8, f) == 8;
@@ -79,7 +86,10 @@ bool writePNG(const std::string& path, int w, int h, int ch, const uint8_t* px) 
     ok = ok && chunk(f, "IDAT", z);
     ok = ok && chunk(f, "IEND", {});
     ok = std::fclose(f) == 0 && ok;
-    if (!ok) std::remove(path.c_str());   // a full disk: no truncated file left behind
+    if (!ok) {   // a full disk: no truncated file left behind
+        std::error_code ec;
+        std::filesystem::remove(file, ec);
+    }
     return ok;
 }
 }  // namespace image

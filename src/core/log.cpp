@@ -3,6 +3,7 @@
 #include <mutex>
 #include <chrono>
 #ifdef _WIN32
+#include <filesystem>
 #include <windows.h>
 #endif
 
@@ -11,9 +12,14 @@ static std::mutex g_mutex;
 static FILE* g_file = nullptr;
 static auto g_start = std::chrono::steady_clock::now();
 
+// The path is UTF-8: opened as a wide path on Windows (u8path), whatever the process code page.
 bool init(const char* path) {
     std::lock_guard<std::mutex> lk(g_mutex);
+#ifdef _WIN32
+    if (path) g_file = _wfopen(std::filesystem::u8path(path).c_str(), L"w");
+#else
     if (path) g_file = std::fopen(path, "w");
+#endif
     return g_file != nullptr;
 }
 
