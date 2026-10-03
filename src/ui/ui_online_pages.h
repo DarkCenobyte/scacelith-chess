@@ -26,7 +26,8 @@ void spinner(m::vec2 c, float r = 12.0f, float alpha = 1.0f);
 float paragraph(const std::string& s, const gfx::Rect& p, float y, float width, m::vec4 color = theme::ivoryDim,
                 float size = theme::kBody, int face = font::FACE_ITALIC);
 // The panel of a sub-page (dimmed hall, panel, title), w x h at most; endPage() after it.
-gfx::Rect beginPage(float t, float w, float h, const std::string& title);
+// fitTitle: a title longer than the panel is drawn smaller, inside its frame.
+gfx::Rect beginPage(float t, float w, float h, const std::string& title, bool fitTitle = false);
 void endPage();
 // The server's name and the connection state in the panel's top corner (start side).
 void serverLine(const gfx::Rect& p, bool showConnection);
@@ -35,8 +36,8 @@ gfx::Rect formRow(const gfx::Rect& p, float& y, float inset = 90.0f);
 // The footer: Back on the start side, the primary action on the end side, a rule above them.
 constexpr float kBtnW = 260.0f, kBtnH = 56.0f;
 float footerY(const gfx::Rect& p);
-bool backButton(const gfx::Rect& p, const char* key = "common.back");
-bool primaryButton(const gfx::Rect& p, const char* key, bool enabled, bool busy = false);
+bool backButton(const gfx::Rect& p, const char* key = "common.back", bool enabled = true);
+bool primaryButton(const gfx::Rect& p, const char* key, bool enabled, bool busy = false, float width = kBtnW);
 void footerRule(const gfx::Rect& p);
 // A quiet link-like button centered at cx.
 bool linkButton(const char* key, float cx, float y, bool enabled = true);

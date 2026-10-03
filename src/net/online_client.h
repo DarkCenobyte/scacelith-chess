@@ -44,9 +44,19 @@
 //     comes back in Event::Kind::GifResult (signed-in players only: the renders count against the
 //     account's quota; a refused or missing session is "unauthorized", as above).
 //   - Event::origin (additive): the HTTPS results name the server their command went to.
+//   - Google sign-in by loopback redirect (decisions 36a and 35A; dedicated-server/docs/API.md):
+//     startGoogleSso(page) listens on 127.0.0.1 (net/loopback_redirect.h) before it starts, opens
+//     Google's page only when it is Google's (its redirect URI names this listener and the origin
+//     of the server in use), and Google sends the browser back to the game: no polling. The game
+//     then finishes with the server (SsoCodeReceived, then LoginResult, SsoNeedsUsername or the new
+//     SsoNeedsPassword). linkSso(password) adds Google sign-in to the existing account of that
+//     address once its password (then its code, loginMfa()) is entered in the game.
+//     setBrowserOpener() and setSsoMinWaitMs() are for the tests.
 #pragma once
 #include "gesture.h"
+#include "loopback_redirect.h"
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
@@ -278,8 +288,12 @@ struct Event {
         MfaSetupResult,       // mfaSecret (base32), mfaUri (otpauth://...)
         MfaEnableResult,      // recoveryCodes
         MfaDisableResult, RecoveryCodesResult /* recoveryCodes */,
-        SsoBrowserOpened,     // the system browser shows the provider's page; polling
+        SsoBrowserOpened,     // the system browser shows Google's page, which sends it back to the
+                              // game's loopback redirect on 127.0.0.1 (no polling)
         SsoNeedsUsername,     // first Google login: choose a username, then completeSso()
+        SsoCodeReceived,      // Google sent the browser back: the game finishes with the server
+        SsoNeedsPassword,     // the Google address is the one of an account with a password
+                              // (account.username): enter that password with linkSso()
         ReportResult,
         // ---- HTTPS, account API ----
         GamesResult,          // gamesPage (fetchMyGames)
@@ -376,9 +390,22 @@ public:
     void registerAccount(const std::string& username, const std::string& email, const std::string& password);
     void login(const std::string& usernameOrEmail, const std::string& password);
     void loginMfa(const std::string& code);      // 6 digits, or a recovery code (xxxx-xxxx-xx)
-    void startGoogleSso();                       // PKCE + system browser + polling
+    // PKCE + the loopback redirect on 127.0.0.1 + the system browser; page = the texts of the page
+    // the browser shows when Google sends it back (made on the game thread).
+    void startGoogleSso(const SsoBrowserPage& page);
     void completeSso(const std::string& username);
+    // After SsoNeedsPassword: the account's password (POST /auth/sso/google/link). A wrong password
+    // ("invalid_credentials") or too many ("too_many_attempts") keep the step for another try;
+    // mfaRequired continues with loginMfa(), which adds Google sign-in once the code is accepted.
+    void linkSso(const std::string& password);
+    // Stops the Google sign-in under way (its listener, a password step): LoginResult "cancelled"
+    // when there was one. A start still waiting for the server opens no browser and answers
+    // SsoBrowserOpened "cancelled".
     void cancelSso();
+    // Tests: what opens Google's page (default net::sys::openBrowser; false = it could not), and the
+    // shortest wait for Google's redirect (30 s by default, whatever expiresIn the server gives).
+    void setBrowserOpener(std::function<bool(const std::string& url)> opener);
+    void setSsoMinWaitMs(int ms);
     // Server-side revocation + local token erase. This session: erased whatever the server says
     // (LogoutResult ok, a refused token included). Every session (allSessions): ok only when the
     // server did it; the token is kept when it failed, except a refused one (401, "unauthorized").

@@ -303,10 +303,45 @@ Handle listenTcp(uint16_t port, bool& dualStack, std::string& err) {
     return h;
 }
 
-Handle acceptOne(Handle listener, Endpoint* peer) {
+Handle listenLoopbackV4(uint16_t& port, std::string& err) {
+    startup();
+    port = 0;
+    err.clear();
+#ifdef _WIN32
+    // Not inherited from its creation (Windows 7 SP1 and later); SetHandleInformation as well, in
+    // case a layered service provider ignores the flag (best effort, like SO_EXCLUSIVEADDRUSE:
+    // safe here, unlike the hosting socket of bindTo, because the port is a fresh one).
+    Handle h = Handle(WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, 0, WSA_FLAG_OVERLAPPED | WSA_FLAG_NO_HANDLE_INHERIT));
+    if (h == kInvalid) { err = errorName(lastError()); return kInvalid; }
+    SetHandleInformation(reinterpret_cast<HANDLE>(h), HANDLE_FLAG_INHERIT, 0);
+    BOOL on = TRUE;
+    setsockopt(S(h), SOL_SOCKET, SO_EXCLUSIVEADDRUSE, reinterpret_cast<const char*>(&on), sizeof on);
+#else
+    // Close-on-exec from its creation: posix_spawnp (net::sys) would hand it to the browser.
+    Handle h = Handle(socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, IPPROTO_TCP));
+    if (h == kInvalid) { err = errorName(lastError()); return kInvalid; }
+#endif
+    Endpoint lo, local;
+    if (!setNonBlocking(h) || !Endpoint::parse("127.0.0.1", 0, lo) || ::bind(S(h), SA(lo), socklen(lo.len)) != 0 ||
+        ::listen(S(h), 8) != 0 || !localEndpoint(h, local) || local.port() == 0) {
+        err = errorName(lastError());
+        closeSocket(h);
+        return kInvalid;
+    }
+    setNoDelay(h);
+    port = local.port();
+    return h;
+}
+
+Handle acceptOne(Handle listener, Endpoint* peer, bool noInherit) {
     Endpoint tmp;
     socklen l = socklen(sizeof tmp.storage);
+#ifdef _WIN32
     Handle h = Handle(::accept(S(listener), SA(tmp), &l));
+    if (h != kInvalid && noInherit) SetHandleInformation(reinterpret_cast<HANDLE>(h), HANDLE_FLAG_INHERIT, 0);
+#else
+    Handle h = Handle(::accept4(listener, SA(tmp), &l, noInherit ? SOCK_CLOEXEC : 0));
+#endif
     if (h == kInvalid) return kInvalid;
     tmp.len = int(l);
     if (!setNonBlocking(h)) { closeSocket(h); return kInvalid; }

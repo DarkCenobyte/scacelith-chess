@@ -50,6 +50,7 @@ namespace debug {
 // Viewer: opens the online page on a sub-page ("signin", "register", "check-email", "forgot",
 // "mfa", "account", "password", "mfa-setup", "mfa-off", "recovery", "play", "search",
 // "challenge", "private", "direct", "direct-host", "direct-wait", "direct-join", "noserver";
+// Google sign-in: "sso-wait", "sso-name", "sso-link" (the password step), "sso-mfa" (its code step);
 // the account API's pages: "history", "game", "game-gif", "game-gif-making", "game-saving",
 // "game-saved", "devices", "email", "email-sent", "export", "export-done", "delete").
 void openOnlinePage(const std::string& sub);

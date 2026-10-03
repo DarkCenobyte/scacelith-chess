@@ -390,13 +390,14 @@ void ornamentRule(float cx, float y, float halfWidth, float al) {
     gfx::diamond(vec2(cx, yy + px * 0.5f), 2.6f, withAlpha(goldBright, 0.9f * al));
 }
 
-void pageTitle(const std::string& title, float cx, float y) {
+void pageTitle(const std::string& title, float cx, float y, float maxWidth) {
     TextStyle st;
     st.face = font::FACE_TITLE;
     st.size = kPageTitle;
     st.color = ivory;
     st.align = HAlign::Center;
     st.tracking = 0.2f;
+    if (maxWidth > 0.0f) st.size = gfx::fitSize(title, st, maxWidth);
     float w = gfx::textWidth(title, st);
     gfx::text(title, cx, y, st);
     ornamentRule(cx, y + 24.0f, w * 0.5f + 70.0f);

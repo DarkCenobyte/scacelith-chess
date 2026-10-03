@@ -26,6 +26,7 @@
 #include "ui_online_pages.h"
 #include "ui_screens_game.h"
 #include "ui_screens_online.h"
+#include "ui_sign_in_answer.h"
 #include "ui_theme.h"
 #include "ui_widgets.h"
 #include "../chess/chess.h"
@@ -89,7 +90,7 @@ float paragraph(const std::string& s, const Rect& p, float y, float width, vec4 
     return float(n) * lh;
 }
 
-Rect beginPage(float t, float w, float h, const std::string& title) {
+Rect beginPage(float t, float w, float h, const std::string& title, bool fitTitle) {
     vec2 v = gfx::viewSize();
     detail::dimBackground(t);
     w = std::min(w, v.x - 80.0f);
@@ -97,7 +98,7 @@ Rect beginPage(float t, float w, float h, const std::string& title) {
     Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 14.0f, w, h);
     gfx::pushAlpha(t);
     im::panel(p);
-    im::pageTitle(title, p.cx(), p.y + 80.0f);
+    im::pageTitle(title, p.cx(), p.y + 80.0f, fitTitle ? p.w - 120.0f : 0.0f);
     return p;
 }
 void endPage() { gfx::popAlpha(); }
@@ -137,11 +138,11 @@ Rect formRow(const Rect& p, float& y, float inset) {
 }
 
 float footerY(const Rect& p) { return p.b() - 48.0f - kBtnH; }
-bool backButton(const Rect& p, const char* key) {
-    return im::button(L(key), im::flip(p, Rect(p.x + 60.0f, footerY(p), kBtnW, kBtnH)), im::ButtonKind::Secondary);
+bool backButton(const Rect& p, const char* key, bool enabled) {
+    return im::button(L(key), im::flip(p, Rect(p.x + 60.0f, footerY(p), kBtnW, kBtnH)), im::ButtonKind::Secondary, enabled);
 }
-bool primaryButton(const Rect& p, const char* key, bool enabled, bool busy) {
-    Rect r = im::flip(p, Rect(p.r() - 60.0f - kBtnW, footerY(p), kBtnW, kBtnH));
+bool primaryButton(const Rect& p, const char* key, bool enabled, bool busy, float width) {
+    Rect r = im::flip(p, Rect(p.r() - 60.0f - width, footerY(p), width, kBtnH));
     im::Id id = im::makeId(std::string("##") + key);
     bool hit = im::button(L(key), r, im::ButtonKind::Primary, enabled && !busy);
     if (busy) spinner(vec2(im::flipX(p, r.x - 34.0f), r.cy()));
@@ -231,7 +232,7 @@ bool isOfficialCategory(int baseSec, int incSec) {
 
 // ---- State -----------------------------------------------------------------------------------------
 enum class Sub {
-    NoServer, SignIn, Mfa, Register, CheckEmail, Forgot, SsoWait, SsoName,
+    NoServer, SignIn, Mfa, Register, CheckEmail, Forgot, SsoWait, SsoName, SsoLink,
     Account, Password, MfaSetup, MfaOff, Recovery,
     History, Game, Devices, Email, Export, Delete,   // the account API's pages (ui_screens_account.cpp)
     Play, Challenge, Private,
@@ -268,6 +269,7 @@ bool needsAccount(Sub s) {
            s == Sub::Play || s == Sub::Challenge || s == Sub::Private || accountSub(s, page);
 }
 bool isDirect(Sub s) { return s == Sub::Direct || s == Sub::DirectHost || s == Sub::DirectWait || s == Sub::DirectJoin; }
+bool isSso(Sub s) { return s == Sub::SsoWait || s == Sub::SsoName || s == Sub::SsoLink; }
 
 // Terms of a challenge or a private game.
 struct Terms {
@@ -288,6 +290,10 @@ struct State {
     // forms
     std::string user, email, password, password2, newPassword, code, ssoName, target, joinCode;
     std::string error, note;
+    // Google sign-in: the account of the password step (SsoLink), Google sent the browser back
+    // (the sign-in is finishing), the code step that adds Google sign-in once accepted.
+    std::string ssoLinkUser;
+    bool ssoFinishing = false, mfaForLink = false;
     bool offerResend = false;
     std::string resendEmail;
     std::string resendUser;     // the username of the registration resendEmail comes from
@@ -421,18 +427,25 @@ void pumpResults() {
         // The answer moves the player on only from the pages of signing in (and, when it signs in or
         // asks for a code, from the other signed-out forms); on a page opened meanwhile (a direct
         // match's host would keep listening unseen) it is only told.
-        const bool signingIn = O.sub == Sub::SignIn || O.sub == Sub::Mfa || O.sub == Sub::SsoWait || O.sub == Sub::SsoName;
+        const bool signingIn = O.sub == Sub::SignIn || O.sub == Sub::Mfa || isSso(O.sub);
         const bool signedOutForm = signingIn || O.sub == Sub::Register || O.sub == Sub::CheckEmail || O.sub == Sub::Forgot;
+        const detail::RefusedSignIn refused = detail::refusedSignIn(O.sub == Sub::SsoLink, e.mfaRequired, e.error);
         if (e.ok) {
             clearSecrets();
             O.resendEmail.clear();
             if (signedOutForm) setSub(Sub::Play);
             else notify(i18n::trf("online.play.signed_in", {s.account().username}), 4.0f);
-        } else if (e.mfaRequired) {
+        } else if (refused == detail::RefusedSignIn::Code) {
             if (signedOutForm) {
                 O.code.clear();
+                O.mfaForLink = O.sub == Sub::SsoLink;   // Google is added once the code is accepted
                 setSub(Sub::Mfa);
             }
+        } else if (refused == detail::RefusedSignIn::Silent) {
+            // A Google sign-in stopped by the player.
+        } else if (refused == detail::RefusedSignIn::StayOnLink) {
+            O.password.clear();
+            O.error = e.error == "invalid_credentials" ? T("online.err.invalid_password") : game::onlineErrorText(e.error, e.retryAfterSec);
         } else if (signingIn) {
             Sub back = O.sub == Sub::SsoName ? Sub::SsoName
                        : (O.sub == Sub::Mfa && e.error == "invalid_code") ? Sub::Mfa
@@ -446,17 +459,23 @@ void pumpResults() {
             O.offerResend = e.error == "email_unverified" ||
                             (e.error == "invalid_credentials" && !O.resendEmail.empty() &&
                              (sameAscii(who, O.resendUser) || sameAscii(who, trim(O.resendEmail))));
-        } else if (e.error != "cancelled") {
+        } else {
             notify(game::onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs), 4.0f);
         }
     }
-    if (s.take(Kind::SsoBrowserOpened, e) && !e.ok) {
+    if (s.take(Kind::SsoBrowserOpened, e) && !e.ok && e.error != "cancelled") {
         setSub(Sub::SignIn);
         O.error = game::onlineErrorText(e.error, e.retryAfterSec);
     }
+    if (s.take(Kind::SsoCodeReceived, e)) O.ssoFinishing = true;
     if (s.take(Kind::SsoNeedsUsername, e)) {
-        O.ssoName.clear();
+        O.ssoName = e.account.username;   // the server's suggestion
         setSub(Sub::SsoName);
+    }
+    if (s.take(Kind::SsoNeedsPassword, e)) {
+        O.ssoLinkUser = e.account.username;
+        O.password.clear();
+        setSub(Sub::SsoLink);
     }
     if (s.take(Kind::RegisterResult, e)) {
         if (e.ok) {
@@ -611,8 +630,11 @@ void pageSignIn(float t) {
     if (sso) {
         float gw = 380.0f;
         if (im::button(L("online.signin.google"), Rect(lx - gw * 0.5f, linkY, gw, 52.0f), im::ButtonKind::Secondary, usable && !busy)) {
-            s.api().startGoogleSso();
-            s.expect(Kind::SsoNeedsUsername);
+            s.api().startGoogleSso(game::ssoBrowserPage());
+            // Answered once, whatever follows (a LoginResult may never come: a new account's name,
+            // the password step).
+            s.expect(Kind::SsoBrowserOpened);
+            O.ssoFinishing = false;
             setSub(Sub::SsoWait);
         }
         linkY += 66.0f;
@@ -645,6 +667,7 @@ void pageMfa(float t) {
     im::pushId("mfa");
     float y = p.y + 160.0f;
     y += paragraph(T("online.mfa.lead"), p, y, p.w - 200.0f, ivoryDim, kSmall + 2.0f) + 14.0f;
+    if (O.mfaForLink) y += paragraph(T("online.sso.link_mfa"), p, y, p.w - 200.0f, ivoryDim, kSmall + 1.0f) + 10.0f;
     bool busy = s.busy(Kind::LoginResult);
     im::formField(L("online.field.code"), O.code, formRow(p, y), 14, im::FIELD_LTR, T("online.field.code.hint"));
     messageLine(p, y + 20.0f);
@@ -658,7 +681,10 @@ void pageMfa(float t) {
     im::popId();
     endPage();
     if (back || im::consumeBack()) {
+        // The code step of adding Google sign-in ends with the page (the server forgets it anyway).
+        if (O.mfaForLink) s.api().cancelSso();
         O.code.clear();
+        O.mfaForLink = false;
         setSub(Sub::SignIn);
     }
 }
@@ -752,13 +778,14 @@ void pageSsoWait(float t) {
     Rect p = beginPage(t, 900.0f, 520.0f, T("online.sso.title"));
     im::pushId("ssowait");
     float y = p.y + 170.0f;
-    y += paragraph(T("online.sso.wait"), p, y, p.w - 200.0f, ivoryDim) + 30.0f;
+    y += paragraph(T(O.ssoFinishing ? "online.sso.finishing" : "online.sso.wait"), p, y, p.w - 200.0f, ivoryDim) + 30.0f;
     spinner(vec2(p.cx(), y + 10.0f), 16.0f);
     footerRule(p);
-    bool cancel = backButton(p, "common.cancel");
+    // Once Google sent the browser back, the server is finishing: nothing left to cancel.
+    bool cancel = backButton(p, "common.cancel", !O.ssoFinishing);
     im::popId();
     endPage();
-    if (cancel || im::consumeBack()) {
+    if (cancel || (im::consumeBack() && !O.ssoFinishing)) {
         s.api().cancelSso();
         setSub(Sub::SignIn);
     }
@@ -785,6 +812,41 @@ void pageSsoName(float t) {
     if (cancel || im::consumeBack()) {
         s.api().cancelSso();
         setSub(Sub::SignIn);
+    }
+}
+
+// The Google address is the one of an existing account: its password, once, before Google sign-in
+// is added to it (then its code when two-factor is on).
+void pageSsoLink(float t) {
+    game::OnlineSession& s = ses();
+    Rect p = beginPage(t, 1040.0f, 640.0f, T("online.sso.link_title"), true);   // long in de, es, fr
+    serverLine(p, false);
+    im::pushId("ssolink");
+    float y = p.y + 160.0f;
+    y += paragraph(i18n::trf("online.sso.link_lead", {i18n::ltr(O.ssoLinkUser), i18n::ltr(s.serverName())}), p, y, p.w - 200.0f,
+                   ivoryDim, kSmall + 2.0f) +
+         14.0f;
+    bool busy = s.busy(Kind::LoginResult);
+    im::formField(L("online.field.password"), O.password, formRow(p, y), 128, im::FIELD_SECRET);
+    y += 8.0f;
+    y += messageLine(p, y + 16.0f) + 14.0f;
+    bool notMine = linkButton("online.sso.not_mine", p.cx(), std::max(y, footerY(p) - 64.0f), !busy);
+    footerRule(p);
+    // Not while the password is checked: its answer would come to the page left.
+    bool cancel = backButton(p, "common.cancel", !busy);
+    // Wider than the others: "Add Google sign-in" is long in most languages.
+    if (primaryButton(p, "online.sso.link_button", !O.password.empty(), busy, 400.0f)) {
+        O.error.clear();
+        s.api().linkSso(O.password);
+        s.expect(Kind::LoginResult);
+    }
+    im::popId();
+    endPage();
+    if (notMine || cancel || (im::consumeBack() && !busy)) {
+        s.api().cancelSso();
+        clearSecrets();
+        setSub(Sub::SignIn);
+        if (notMine) O.note = T("online.sso.not_mine_note");
     }
 }
 
@@ -1851,6 +1913,8 @@ MenuAction onlinePage(LibrarySetup* library, float t, bool opened, bool& back) {
     MenuAction act = MenuAction::None;
     if (opened) {
         O.leave = false;
+        // A Google sign-in of an earlier visit never outlives the screen.
+        if (!s.signedIn()) s.api().cancelSso();
         if (!O.forced.empty()) {
             // set by debug::openOnlinePage
         } else if (O.haveAfterGame) {
@@ -1908,6 +1972,7 @@ MenuAction onlinePage(LibrarySetup* library, float t, bool opened, bool& back) {
     case Sub::Forgot: pageForgot(pt); break;
     case Sub::SsoWait: pageSsoWait(pt); break;
     case Sub::SsoName: pageSsoName(pt); break;
+    case Sub::SsoLink: pageSsoLink(pt); break;
     case Sub::Account: pageAccount(pt); break;
     case Sub::Password: pagePassword(pt); break;
     case Sub::MfaSetup: pageMfaSetup(pt); break;
@@ -1960,6 +2025,7 @@ MenuAction onlinePage(LibrarySetup* library, float t, bool opened, bool& back) {
     if (fresh && O.fresh) O.fresh = false;
     if (O.leave) {
         O.leave = false;
+        if (isSso(O.sub) && !s.signedIn()) s.api().cancelSso();
         s.cancelSearch();
         im::sound(Sound::Back);
         back = true;
@@ -2167,6 +2233,7 @@ void openOnlinePage(const std::string& sub) {
         {"mfa-setup", Sub::MfaSetup}, {"mfa-off", Sub::MfaOff},     {"recovery", Sub::Recovery}, {"play", Sub::Play},
         {"search", Sub::Play},        {"challenge", Sub::Challenge}, {"private", Sub::Private},  {"direct", Sub::Direct},
         {"direct-host", Sub::DirectHost}, {"direct-wait", Sub::DirectWait}, {"direct-join", Sub::DirectJoin},
+        {"sso-wait", Sub::SsoWait},   {"sso-name", Sub::SsoName},   {"sso-link", Sub::SsoLink},  {"sso-mfa", Sub::Mfa},
     };
     for (const auto& n : names) {
         if (sub != n.name) continue;
@@ -2180,6 +2247,9 @@ void openOnlinePage(const std::string& sub) {
             if (n.sub == Sub::Challenge) O.target = "Eleonora_V";
         }
         if (n.sub == Sub::DirectHost) O.hostPortText = std::to_string(gs.directPort);
+        if (n.sub == Sub::SsoName) O.ssoName = "Guillaume_G";
+        if (n.sub == Sub::SsoLink) O.ssoLinkUser = "Guillaume_Gaultier_1987X";   // 24 characters, the most
+        O.mfaForLink = sub == "sso-mfa";
         if (n.sub == Sub::DirectJoin) {
             O.directAddress = "203.0.113.47";
             O.directPort = "47100";

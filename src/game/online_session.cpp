@@ -33,8 +33,9 @@ public:
     void registerAccount(const std::string& u, const std::string& e, const std::string& p) override { c_->registerAccount(u, e, p); }
     void login(const std::string& u, const std::string& p) override { c_->login(u, p); }
     void loginMfa(const std::string& code) override { c_->loginMfa(code); }
-    void startGoogleSso() override { c_->startGoogleSso(); }
+    void startGoogleSso(const net::SsoBrowserPage& page) override { c_->startGoogleSso(page); }
     void completeSso(const std::string& u) override { c_->completeSso(u); }
+    void linkSso(const std::string& p) override { c_->linkSso(p); }
     void cancelSso() override { c_->cancelSso(); }
     void logout(bool all) override { c_->logout(all); }
     void fetchAccount() override { c_->fetchAccount(); }
@@ -1016,14 +1017,34 @@ std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t 
         if (bannedUntilMs > 0) return i18n::trf("online.err.banned_until", {localTimeText(double(bannedUntilMs))});
         return i18n::tr("online.err.banned");
     }
+    // The Google sign-in's own failures: a verifier the server refused, or no random numbers here,
+    // read as a failed sign-in; a start answer that is not Google's page as an invalid answer.
+    if (code == "invalid_verifier" || code == "random") return i18n::tr("online.err.sso_failed");
+    if (code == "bad_response") return i18n::tr("online.err.invalid_response");
     static const char* known[] = {"invalid_credentials", "email_unverified", "network", "tls", "certificate", "incompatible",
                                   "unauthorized", "username_taken", "email_taken", "invalid_username", "invalid_email",
                                   "weak_password", "invalid_code", "expired", "registration_closed", "sso_cancelled",
                                   "server_error", "timeout", "offline", "invalid_password", "mfa_code_required",
-                                  "password_not_set", "same_email", "not_found", "invalid_response"};
+                                  "password_not_set", "same_email", "not_found", "invalid_response", "sso_expired",
+                                  "sso_failed", "sso_listen", "sso_origin", "browser", "sso_email_unverified",
+                                  "sso_account_exists", "sso_already_linked", "account_disabled"};
     for (const char* k : known)
         if (code == k) return i18n::tr(std::string("online.err.") + k);
     return i18n::trf("online.err.other", {code});
+}
+
+net::SsoBrowserPage ssoBrowserPage() {
+    net::SsoBrowserPage p;
+    p.lang = i18n::language();
+    p.rtl = i18n::rtl();
+    p.title = i18n::tr("online.sso.page.title");
+    p.doneHeading = i18n::tr("online.sso.page.done_heading");
+    p.done = i18n::tr("online.sso.page.done");
+    p.cancelledHeading = i18n::tr("online.sso.page.cancelled_heading");
+    p.cancelled = i18n::tr("online.sso.page.cancelled");
+    p.foreignHeading = i18n::tr("online.sso.page.foreign_heading");
+    p.foreign = i18n::tr("online.sso.page.foreign");
+    return p;
 }
 
 std::string gifErrorText(const std::string& code, int retryAfterSec) {

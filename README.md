@@ -188,8 +188,9 @@ they do.
   server with a self-signed certificate, its **Certificate fingerprint (SHA-256)** as its owner
   gives it (64 hexadecimal characters, colons allowed; empty = the Windows certificate store).
   **Test connection** shows the server's name, message and whether it runs a compatible
-  version. You sign in separately on each server: an account and its sign-in are never shared
-  between servers, and nothing secret is written to `Scacelith.ini`.
+  version. Google sign-in works only when the server is added under the public host name and API
+  port its owner gives. You sign in separately on each server: an account and its sign-in are
+  never shared between servers, and nothing secret is written to `Scacelith.ini`.
 - **Account.** Sign in with your user name or e-mail and password (and the code of your
   authenticator app once two-factor authentication is on), or with Google. New accounts confirm
   their e-mail address (the page can send the link again); a forgotten password is reset by

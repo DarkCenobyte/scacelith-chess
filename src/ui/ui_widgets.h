@@ -178,7 +178,8 @@ float formLabel(const std::string& label, const Rect& r, float reserved, bool en
 // Decorations.
 void panel(const Rect& r, float alpha = 1.0f);
 void ornamentRule(float cx, float y, float halfWidth, float alpha = 1.0f);
-void pageTitle(const std::string& title, float cx, float y);
+// maxWidth > 0: a longer title is drawn smaller to fit it (gfx::fitSize).
+void pageTitle(const std::string& title, float cx, float y, float maxWidth = 0.0f);
 void sectionLabel(const std::string& text, float x, float y, float width);
 void rowHighlight(const Rect& r, float t);
 

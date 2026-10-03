@@ -167,6 +167,49 @@ Rules common to these calls:
   (the server unreachable, `rate_limited`, maintenance...) keeps the token, so that the player can
   try again. A plain `logout()` erases the token whatever the answer.
 
+### Google sign-in
+
+Offered when `GET /info` says `sso.google`. Google sends the browser back to the game itself, on
+127.0.0.1 (RFC 8252 loopback redirect); nothing is polled (`dedicated-server/docs/API.md` has the
+server's side).
+
+1. `startGoogleSso(page)` makes the PKCE pair and opens the listener first
+   (`net::LoopbackRedirect`, `src/net/loopback_redirect.h`: 127.0.0.1 on a port the system picks,
+   exclusive on Windows, never inherited by another process), then sends
+   `POST /auth/sso/google/start {codeChallenge, redirectPort}`. Google's page is opened in the
+   system browser only when the answer's `authUrl` is Google's
+   (`https://accounts.google.com/o/oauth2/v2/auth?`) and names this listener as its redirect URI,
+   `http://127.0.0.1:<port>/oauth2/google/<tag>`, where the tag is made from the origin of the
+   server in use (`net::ssoOriginTag`), with the answer's `state`, S256 and the challenge: another
+   tag is `sso_origin` (the server is reached under another name than its public one), anything
+   else `bad_response` (shown as an invalid answer); nothing is opened then. `SsoBrowserOpened`
+   answers the start, ok or not (`sso_listen`, `browser`, `random`, the server's errors).
+2. The listener takes one strict `GET` of that path with `Host: 127.0.0.1:<port>`, from the
+   loopback only. A request with another `state` (a link someone else sent) gets a 400 page that
+   says so and the listener keeps waiting; Google's answer gets a page in the player's language
+   (`online.sso.page.*`, made on the game thread: `game::ssoBrowserPage()`) and closes the
+   listener. Nothing is told to the browser about the account. It waits the attempt's
+   `expiresIn` (30 s to 10 minutes), then `sso_expired`; `error=access_denied` is `sso_cancelled`,
+   another error `sso_failed`.
+3. With the code, `SsoCodeReceived`, then
+   `POST /auth/sso/google/finish {attemptId, codeVerifier, state, code, iss, clientLabel}`: a
+   `LoginResult` (signed in, or `mfaRequired`), `SsoNeedsUsername` (a new player: `account.username`
+   is the server's suggestion, then `completeSso(name)`) or `SsoNeedsPassword` (the address is the
+   one of an account with a password, `account.username`).
+4. `linkSso(password)` (`POST /auth/sso/google/link {linkTicket, password, clientLabel}`) adds
+   Google sign-in to that account: a `LoginResult`, signed in, or `mfaRequired` (the code then goes
+   to `loginMfa()`, and Google is added once it is accepted). `invalid_credentials` and
+   `too_many_attempts` keep the step for another try; any other answer ends it (`sso_expired`
+   afterwards).
+
+`cancelSso()` stops it at any step (listener closed, password step forgotten) and answers
+`LoginResult` `cancelled` when something was under way; a start still waiting for the server's
+answer opens no browser and answers `SsoBrowserOpened` `cancelled`. The online page calls it
+when it opens and when the player leaves a Google page while signed out. Changing servers stops
+it too (a start still waiting for the server's answer opens no browser either), and a code that
+arrives for the server left is dropped. The listener runs on its own thread (`net-sso`) and hands
+the code to `net-http` as a command.
+
 ## The game at the table
 
 The opponent sits in the other chair as a robot (`Controller::Remote`); the physical game is the

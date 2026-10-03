@@ -50,9 +50,11 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <condition_variable>
 #include <cstring>
 #include <ctime>
 #include <deque>
+#include <functional>
 #include <map>
 #include <mutex>
 #include <thread>
@@ -4508,42 +4510,734 @@ TEST(net_forget_saved_pin_at_exit) {
     net::sys::removeFile(credPath);
 }
 
-// POST /auth/sso/google/start carries what the server's schema declares, nothing else (it refuses
-// an unknown field).
-TEST(net_sso_start_body) {
-    if (!net::transportAvailable()) return;
+// ---- Google sign-in (loopback redirect, dedicated-server/docs/API.md) --------------------------------
+// The scripted server plays start / finish / link / complete / login/mfa; the browser opener seam
+// plays the browser and Google: it reads the redirect URI and the state of the Google page the
+// client was given, and sends the redirect to the game's own listener on 127.0.0.1.
+
+namespace {
+
+const std::string kSsoAttempt = "sso_" + std::string(43, 'A');
+const std::string kSsoState = "St4te_" + std::string(37, 's');
+const std::string kSsoLinkTicket = "sso_" + std::string(43, 'L');
+const std::string kSsoUserJson =
+    R"({"id":7,"username":"alice","email":"a@example.org","emailVerified":true,"mfaEnabled":false,"googleLinked":true})";
+
+std::string pctEncode(const std::string& s) {
+    static const char hex[] = "0123456789ABCDEF";
+    std::string out;
+    for (unsigned char ch : s) {
+        if (std::isalnum(ch) || ch == '-' || ch == '_' || ch == '.' || ch == '~') {
+            out += char(ch);
+        } else {
+            out += '%';
+            out += hex[ch >> 4];
+            out += hex[ch & 15];
+        }
+    }
+    return out;
+}
+
+// What a server answers to start: Google's page for the redirect URI on 'port' with 'tag'.
+// 'tweak' edits the parameters before they are joined (a lookalike page, another redirect...).
+std::string googleAuthUrl(uint16_t port, const std::string& tag, const std::string& state,
+                          const std::function<void(std::vector<std::pair<std::string, std::string>>&)>& tweak = nullptr) {
+    std::vector<std::pair<std::string, std::string>> q = {
+        {"client_id", "1234-abc.apps.googleusercontent.com"},
+        {"redirect_uri", "http://127.0.0.1:" + std::to_string(port) + "/oauth2/google/" + tag},
+        {"response_type", "code"},
+        {"scope", "openid email profile"},
+        {"state", state},
+        {"nonce", std::string(43, 'n')},
+        {"code_challenge", std::string(43, 'G')},
+        {"code_challenge_method", "S256"},
+        {"prompt", "select_account"},
+    };
+    if (tweak) tweak(q);
+    std::string url = "https://accounts.google.com/o/oauth2/v2/auth?";
+    for (size_t i = 0; i < q.size(); ++i) url += (i ? "&" : "") + q[i].first + "=" + pctEncode(q[i].second);
+    return url;
+}
+
+std::string authParam(const std::string& url, const std::string& name) {
+    std::vector<std::pair<std::string, std::string>> q;
+    size_t at = url.find('?');
+    if (at == std::string::npos || !net::loopback::queryParams(url.substr(at + 1), q)) return std::string();
+    for (auto& p : q)
+        if (p.first == name) return p.second;
+    return std::string();
+}
+
+uint16_t redirectPortOf(const std::string& redirectUri) {
+    const std::string pre = "http://127.0.0.1:";
+    if (redirectUri.compare(0, pre.size(), pre) != 0) return 0;
+    return uint16_t(std::atoi(redirectUri.c_str() + pre.size()));
+}
+
+// One GET on 127.0.0.1:port, the whole answer ("" when the connection is refused).
+std::string loopbackGet(uint16_t port, const std::string& target) {
+    net::sock::Endpoint ep;
+    std::string err;
+    if (!net::sock::Endpoint::parse("127.0.0.1", port, ep)) return std::string();
+    net::sock::Handle h = net::sock::connectWithTimeout(ep, 2000, err);
+    if (h == net::sock::kInvalid) return std::string();
+    std::string req = "GET " + target + " HTTP/1.1\r\nHost: 127.0.0.1:" + std::to_string(port) + "\r\nAccept: text/html\r\n\r\n";
+    size_t off = 0;
+    auto end = std::chrono::steady_clock::now() + std::chrono::seconds(3);
+    std::string ans;
+    while (std::chrono::steady_clock::now() < end) {
+        if (off < req.size()) {
+            int r = net::sock::sendSome(h, reinterpret_cast<const uint8_t*>(req.data()) + off, req.size() - off);
+            if (r < 0) break;
+            off += size_t(r);
+        }
+        net::sock::PollSet ps;
+        ps.add(h, true, false);
+        ps.wait(20);
+        uint8_t buf[4096];
+        bool closed = false;
+        int r = net::sock::recvSome(h, buf, sizeof buf, closed);
+        if (r > 0) ans.append(reinterpret_cast<char*>(buf), size_t(r));
+        else if (r < 0) break;
+    }
+    net::sock::closeSocket(h);
+    return ans;
+}
+
+// The browser after Google: the redirect of a Google page to the listener it names, with 'query'
+// (its state added unless 'state' says otherwise).
+std::string googleRedirect(const std::string& authUrl, const std::string& query, const char* state = nullptr) {
+    const std::string uri = authParam(authUrl, "redirect_uri");
+    const uint16_t port = redirectPortOf(uri);
+    const std::string path = uri.substr(uri.find('/', 8));
+    return loopbackGet(port, path + "?state=" + (state ? std::string(state) : authParam(authUrl, "state")) + "&" + query);
+}
+
+bool portRefused(uint16_t port) {
+    net::sock::Endpoint ep;
+    std::string err;
+    if (!net::sock::Endpoint::parse("127.0.0.1", port, ep)) return false;
+    net::sock::Handle h = net::sock::connectWithTimeout(ep, 1000, err);
+    if (h == net::sock::kInvalid) return true;
+    net::sock::closeSocket(h);
+    return false;
+}
+
+// A client on a scripted server. The handlers answer each route ('start' by default: Google's page
+// for the posted port, the tag of this server, kSsoState); 'browser' runs as the opener, on net-http.
+struct SsoRig {
     std::mutex mu;
-    std::vector<std::string> keys;
-    std::string challenge;
-    fakehttp::Server srv([&](const fakehttp::Request& q) {
-        if (q.path != "/api/v1/auth/sso/google/start") return jsonReply(404, "{\"error\":\"not_found\"}");
+    std::function<fakehttp::Reply(const Value&)> start, finish, link, complete, mfa;
+    std::string challenge;            // of the last start
+    uint16_t port = 0;                // redirectPort of the last start
+    std::vector<std::string> opened;  // the URLs handed to the opener
+    std::function<bool(const std::string&)> browser;
+    fakehttp::Server srv;
+    std::string credPath;
+    net::ServerEndpoint ep;
+    std::unique_ptr<net::OnlineClient> c;
+
+    explicit SsoRig(const char* tag)
+        : srv([this](const fakehttp::Request& q) { return handle(q); }), credPath(tempCredentialPath(tag)) {
+        ep.host = "127.0.0.1";
+        ep.apiPort = srv.port();
+        ep.insecureDev = true;
+        start = [this](const Value& b) {
+            return jsonReply(200, "{\"attemptId\":\"" + kSsoAttempt + "\",\"authUrl\":\"" +
+                                      googleAuthUrl(uint16_t(b["redirectPort"].asInt(0)), net::ssoOriginTag(ep.origin()), kSsoState) +
+                                      "\",\"state\":\"" + kSsoState + "\",\"expiresIn\":600}");
+        };
+        c = std::make_unique<net::OnlineClient>();
+        c->setCredentialsFile(credPath);
+        c->setServer(ep);
+        c->setBrowserOpener([this](const std::string& url) {
+            std::function<bool(const std::string&)> b;
+            {
+                std::lock_guard<std::mutex> lk(mu);
+                opened.push_back(url);
+                b = browser;
+            }
+            return b ? b(url) : true;
+        });
+    }
+    ~SsoRig() {
+        c.reset();
+        net::sys::removeFile(credPath);
+    }
+
+    fakehttp::Reply handle(const fakehttp::Request& q) {
         Value b = bodyOf(q);
+        std::function<fakehttp::Reply(const Value&)> h;
+        {
+            std::lock_guard<std::mutex> lk(mu);
+            if (q.path == "/api/v1/auth/sso/google/start") {
+                challenge = b["codeChallenge"].asString();
+                port = uint16_t(b["redirectPort"].asInt(0));
+                h = start;
+            } else if (q.path == "/api/v1/auth/sso/google/finish") {
+                h = finish;
+            } else if (q.path == "/api/v1/auth/sso/google/link") {
+                h = link;
+            } else if (q.path == "/api/v1/auth/sso/complete") {
+                h = complete;
+            } else if (q.path == "/api/v1/auth/login/mfa") {
+                h = mfa;
+            }
+        }
+        return h ? h(b) : jsonReply(404, R"({"error":"not_found"})");
+    }
+    std::vector<fakehttp::Request> requests(const std::string& path) {
+        std::vector<fakehttp::Request> out;
+        for (auto& r : srv.requests())
+            if (r.path == path) out.push_back(r);
+        return out;
+    }
+    size_t openedCount() {
         std::lock_guard<std::mutex> lk(mu);
-        for (const auto& m : b.members()) keys.push_back(m.first);
-        challenge = b["codeChallenge"].asString();
-        if (keys.size() != 1 || keys[0] != "codeChallenge") return jsonReply(400, "{\"error\":\"invalid_request\"}");
-        // Not https: the client refuses it without starting a browser.
-        return jsonReply(200, "{\"attemptId\":\"sso_x\",\"authUrl\":\"http://127.0.0.1/\",\"pollMs\":2000,\"expiresIn\":600}");
+        return opened.size();
+    }
+    std::string lastOpened() {
+        std::lock_guard<std::mutex> lk(mu);
+        return opened.empty() ? std::string() : opened.back();
+    }
+};
+
+fakehttp::Reply signedInReply() {
+    return jsonReply(200, "{\"token\":\"" + kRigToken + "\",\"expiresAt\":1900000000000,\"user\":" + kSsoUserJson + "}");
+}
+
+std::vector<std::string> keysOf(const Value& v) {
+    std::vector<std::string> k;
+    for (const auto& m : v.members()) k.push_back(m.first);
+    std::sort(k.begin(), k.end());
+    return k;
+}
+
+}  // namespace
+
+// Start: the body is exactly { codeChallenge, redirectPort } with the port of the listener bound
+// before it; a start answer that is not Google's page for this listener, this server and this state
+// opens nothing and closes the listener.
+TEST(net_sso_start_body) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig rig("sso-start");
+    REQUIRE(rig.srv.ok());
+    struct Case {
+        const char* what;
+        std::function<std::string(uint16_t port, const std::string& tag)> answer;
+        const char* error;
+    };
+    auto reply = [](const std::string& url, const std::string& state, const std::string& attempt = kSsoAttempt) {
+        return "{\"attemptId\":\"" + attempt + "\",\"authUrl\":\"" + url + "\",\"state\":\"" + state + "\",\"expiresIn\":600}";
+    };
+    using Params = std::vector<std::pair<std::string, std::string>>;
+    auto edit = [](const char* name, const char* value) {
+        return [name, value](Params& q) {
+            for (auto& p : q)
+                if (p.first == name) p.second = value;
+        };
+    };
+    auto drop = [](const char* name) {
+        return [name](Params& q) { q.erase(std::remove_if(q.begin(), q.end(), [name](const auto& p) { return p.first == name; }), q.end()); };
+    };
+    const std::vector<Case> cases = {
+        {"plain http", [&](uint16_t port, const std::string& tag) {
+             std::string u = googleAuthUrl(port, tag, kSsoState);
+             return reply("http://" + u.substr(8), kSsoState);
+         }, "bad_response"},
+        {"lookalike host", [&](uint16_t port, const std::string& tag) {
+             std::string u = googleAuthUrl(port, tag, kSsoState);
+             return reply("https://accounts.google.com.evil.example/o/oauth2/v2/auth?" + u.substr(u.find('?') + 1), kSsoState);
+         }, "bad_response"},
+        {"another redirect port", [&](uint16_t port, const std::string& tag) {
+             return reply(googleAuthUrl(uint16_t(port == 65535 ? 1024 : port + 1), tag, kSsoState), kSsoState);
+         }, "bad_response"},
+        {"another redirect path", [&](uint16_t port, const std::string& tag) {
+             return reply(googleAuthUrl(port, tag, kSsoState, [&](Params& q) {
+                              q[1].second = "http://127.0.0.1:" + std::to_string(port) + "/sso/google";
+                          }),
+                          kSsoState);
+         }, "bad_response"},
+        {"localhost redirect", [&](uint16_t port, const std::string& tag) {
+             return reply(googleAuthUrl(port, tag, kSsoState, [&](Params& q) {
+                              q[1].second = "http://localhost:" + std::to_string(port) + "/oauth2/google/" + tag;
+                          }),
+                          kSsoState);
+         }, "bad_response"},
+        {"state mismatch", [&](uint16_t port, const std::string& tag) {
+             return reply(googleAuthUrl(port, tag, kSsoState), "Other_" + std::string(37, 's'));
+         }, "bad_response"},
+        {"state missing", [&](uint16_t port, const std::string& tag) {
+             return reply(googleAuthUrl(port, tag, kSsoState, drop("state")), kSsoState);
+         }, "bad_response"},
+        {"two states", [&](uint16_t port, const std::string& tag) {
+             return reply(googleAuthUrl(port, tag, kSsoState, [](Params& q) { q.push_back({"state", kSsoState}); }), kSsoState);
+         }, "bad_response"},
+        {"no code_challenge_method", [&](uint16_t port, const std::string& tag) {
+             return reply(googleAuthUrl(port, tag, kSsoState, drop("code_challenge_method")), kSsoState);
+         }, "bad_response"},
+        {"plain challenge", [&](uint16_t port, const std::string& tag) {
+             return reply(googleAuthUrl(port, tag, kSsoState, edit("code_challenge_method", "plain")), kSsoState);
+         }, "bad_response"},
+        {"implicit flow", [&](uint16_t port, const std::string& tag) {
+             return reply(googleAuthUrl(port, tag, kSsoState, edit("response_type", "token")), kSsoState);
+         }, "bad_response"},
+        {"short attempt id", [&](uint16_t port, const std::string& tag) {
+             return reply(googleAuthUrl(port, tag, kSsoState), kSsoState, "sso_x");
+         }, "bad_response"},
+        {"another server's tag", [&](uint16_t port, const std::string&) {
+             return reply(googleAuthUrl(port, net::ssoOriginTag("caissa.scacelith.com:443"), kSsoState), kSsoState);
+         }, "sso_origin"},
+    };
+    for (const Case& k : cases) {
+        std::fprintf(stderr, "  -- %s\n", k.what);
+        {
+            std::lock_guard<std::mutex> lk(rig.mu);
+            rig.start = [&rig, &k](const Value& b) {
+                return jsonReply(200, k.answer(uint16_t(b["redirectPort"].asInt(0)), net::ssoOriginTag(rig.ep.origin())));
+            };
+        }
+        const size_t before = rig.srv.requests().size();
+        rig.c->startGoogleSso(net::SsoBrowserPage());
+        net::Event ev;
+        CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string(k.error));
+        CHECK_EQ(rig.openedCount(), size_t(0));
+        REQUIRE(rig.srv.requests().size() == before + 1);
+        const fakehttp::Request q = rig.srv.requests().back();
+        CHECK_EQ(q.path, std::string("/api/v1/auth/sso/google/start"));
+        Value b = bodyOf(q);
+        CHECK(keysOf(b) == (std::vector<std::string>{"codeChallenge", "redirectPort"}));
+        CHECK_EQ(b["codeChallenge"].asString().size(), size_t(43));
+        const int64_t port = b["redirectPort"].asInt(0);
+        CHECK(port >= 1024 && port <= 65535);
+        CHECK(portRefused(uint16_t(port)));   // the listener is closed
+    }
+}
+
+// A hostile community server relays the game's start to another server (the official one): that
+// server's Google page names its own tag, so the game opens nothing.
+TEST(net_sso_relay_refused) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig official("sso-official");
+    REQUIRE(official.srv.ok());
+    std::atomic<int> relayed{0};
+    fakehttp::Server hostile([&](const fakehttp::Request& q) {
+        if (q.path != "/api/v1/auth/sso/google/start") return jsonReply(404, R"({"error":"not_found"})");
+        ++relayed;
+        // The official server's answer, as it gives it to anyone who calls start with this body.
+        return official.start(bodyOf(q));
     });
-    CHECK(srv.ok());
+    REQUIRE(hostile.ok());
     net::ServerEndpoint ep;
     ep.host = "127.0.0.1";
-    ep.apiPort = srv.port();
+    ep.apiPort = hostile.port();
     ep.insecureDev = true;
-    std::string credPath = tempCredentialPath("sso-start");
-    {
-        net::OnlineClient c;
-        c.setCredentialsFile(credPath);
-        c.setServer(ep);
-        c.startGoogleSso();
-        net::Event ev;
-        CHECK(waitEvent(c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
-        CHECK_EQ(ev.error, std::string("bad_response"));   // past the schema, refused for its URL
+    std::string credPath = tempCredentialPath("sso-relay");
+    RemovedAtEnd cleanup{credPath};
+    std::atomic<int> opens{0};
+    net::OnlineClient c;
+    c.setCredentialsFile(credPath);
+    c.setServer(ep);
+    c.setBrowserOpener([&](const std::string&) {
+        ++opens;
+        return true;
+    });
+    c.startGoogleSso(net::SsoBrowserPage());
+    net::Event ev;
+    CHECK(waitEvent(c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+    CHECK_EQ(relayed.load(), 1);
+    CHECK_EQ(ev.error, std::string("sso_origin"));
+    CHECK_EQ(opens.load(), 0);
+}
+
+// The code: SsoCodeReceived, then finish carries { attemptId, codeVerifier, state, code, iss,
+// clientLabel } (S256 of the verifier is the start's challenge) to the server that answered start;
+// a session signs in and is saved. The browser got the 'done' page, and the port is closed after it.
+TEST(net_sso_finish_login) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig rig("sso-finish");
+    REQUIRE(rig.srv.ok());
+    std::string page;
+    rig.finish = [](const Value&) { return signedInReply(); };
+    rig.browser = [&](const std::string& url) {
+        page = googleRedirect(url, "iss=https%3A%2F%2Faccounts.google.com&code=4%2F0AbCd-Ef&scope=email+profile+openid&authuser=0");
+        return true;
+    };
+    net::SsoBrowserPage texts;
+    texts.doneHeading = "Back to Scacelith (test)";
+    rig.c->startGoogleSso(texts);
+    net::Event ev;
+    std::vector<net::Event> seen;
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000, &seen));
+    CHECK(ev.ok);
+    CHECK_EQ(ev.account.username, std::string("alice"));
+    CHECK(rig.c->hasSavedSession());
+    CHECK(page.find("<h1>Back to Scacelith (test)</h1>") != std::string::npos);
+    bool opened = false, code = false;
+    for (const net::Event& e : seen) {
+        if (e.kind == net::Event::Kind::SsoBrowserOpened) opened = e.ok;
+        if (e.kind == net::Event::Kind::SsoCodeReceived) code = opened;
     }
-    std::lock_guard<std::mutex> lk(mu);
-    CHECK_EQ(keys.size(), size_t(1));
-    CHECK_EQ(challenge.size(), size_t(43));
-    net::sys::removeFile(credPath);
+    CHECK(code);
+    auto fin = rig.requests("/api/v1/auth/sso/google/finish");
+    REQUIRE(fin.size() == 1);
+    Value b = bodyOf(fin[0]);
+    CHECK(keysOf(b) == (std::vector<std::string>{"attemptId", "clientLabel", "code", "codeVerifier", "iss", "state"}));
+    CHECK_EQ(b["attemptId"].asString(), kSsoAttempt);
+    CHECK_EQ(b["state"].asString(), kSsoState);
+    CHECK_EQ(b["code"].asString(), std::string("4/0AbCd-Ef"));
+    CHECK_EQ(b["iss"].asString(), std::string("https://accounts.google.com"));
+    CHECK_EQ(net::crypto::pkceChallenge(b["codeVerifier"].asString()), rig.challenge);
+    CHECK(b["clientLabel"].asString().compare(0, 10, "Scacelith/") == 0);
+    CHECK(portRefused(rig.port));
+}
+
+// An existing link with two-factor: mfaRequired, then loginMfa() signs in. No iss in the redirect:
+// none in finish.
+TEST(net_sso_finish_mfa) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig rig("sso-mfa");
+    REQUIRE(rig.srv.ok());
+    const std::string mfaToken = "mfa_" + std::string(43, 'M');
+    rig.finish = [&](const Value&) { return jsonReply(200, "{\"mfaRequired\":true,\"mfaToken\":\"" + mfaToken + "\",\"expiresIn\":300}"); };
+    rig.mfa = [&](const Value& b) {
+        if (b["mfaToken"].asString() != mfaToken || b["code"].asString() != "123456") return jsonReply(401, R"({"error":"invalid_code"})");
+        return signedInReply();
+    };
+    rig.browser = [](const std::string& url) {
+        googleRedirect(url, "code=4%2F0Mfa");
+        return true;
+    };
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    net::Event ev;
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK(!ev.ok && ev.mfaRequired);
+    auto fin = rig.requests("/api/v1/auth/sso/google/finish");
+    REQUIRE(fin.size() == 1);
+    CHECK(!bodyOf(fin[0]).has("iss"));
+    rig.c->loginMfa("123456");
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK(ev.ok);
+    CHECK(rig.c->hasSavedSession());
+}
+
+// A new Google account: SsoNeedsUsername with the server's suggestion, then completeSso().
+TEST(net_sso_needs_username) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig rig("sso-name");
+    REQUIRE(rig.srv.ok());
+    const std::string ticket = "sso_" + std::string(43, 'T');
+    rig.finish = [&](const Value&) {
+        return jsonReply(200, "{\"needsUsername\":true,\"ssoTicket\":\"" + ticket + "\",\"suggestedUsername\":\"alice_g\"}");
+    };
+    rig.complete = [&](const Value& b) {
+        if (b["ssoTicket"].asString() != ticket || b["username"].asString() != "alice") return jsonReply(400, R"({"error":"invalid_request"})");
+        return signedInReply();
+    };
+    rig.browser = [](const std::string& url) {
+        googleRedirect(url, "code=4%2F0New");
+        return true;
+    };
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    net::Event ev;
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoNeedsUsername, ev, 10000));
+    CHECK_EQ(ev.account.username, std::string("alice_g"));
+    rig.c->completeSso("alice");
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK(ev.ok);
+}
+
+// The address of an account with a password: SsoNeedsPassword with its name, then linkSso(). A
+// wrong password, or too many, keeps the step (the same ticket goes again), a proof of work is
+// solved and the request repeated once, mfaRequired continues with loginMfa(); a 410 ends the step,
+// and so does another server chosen at that step (nothing is sent to either server).
+TEST(net_sso_link) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig rig("sso-link");
+    REQUIRE(rig.srv.ok());
+    const std::string mfaToken = "mfa_" + std::string(43, 'N');
+    rig.finish = [&](const Value&) {
+        return jsonReply(200, "{\"needsPassword\":true,\"linkTicket\":\"" + kSsoLinkTicket + "\",\"username\":\"alice\",\"expiresIn\":600}");
+    };
+    std::atomic<int> links{0};
+    rig.link = [&](const Value& b) {
+        const int n = ++links;
+        if (b["linkTicket"].asString() != kSsoLinkTicket) return jsonReply(410, R"({"error":"sso_expired"})");
+        if (n == 1) return jsonReply(401, R"({"error":"invalid_credentials","message":"Wrong password."})");
+        if (n == 2) return jsonReply(429, R"({"error":"too_many_attempts","retryAfter":1})");
+        if (n == 3) return jsonReply(428, R"({"error":"pow_required","pow":{"challenge":"sso-link-test","bits":4}})");
+        if (!b["pow"].isObject() || b["password"].asString() != "right password") return jsonReply(400, R"({"error":"invalid_request"})");
+        return jsonReply(200, "{\"mfaRequired\":true,\"mfaToken\":\"" + mfaToken + "\",\"expiresIn\":300}");
+    };
+    rig.mfa = [&](const Value& b) { return b["mfaToken"].asString() == mfaToken ? signedInReply() : jsonReply(410, R"({"error":"sso_expired"})"); };
+    rig.browser = [](const std::string& url) {
+        googleRedirect(url, "code=4%2F0Link");
+        return true;
+    };
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    net::Event ev;
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoNeedsPassword, ev, 10000));
+    CHECK(ev.ok);
+    CHECK_EQ(ev.account.username, std::string("alice"));
+    rig.c->linkSso("wrong password");
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK_EQ(ev.error, std::string("invalid_credentials"));
+    rig.c->linkSso("right password");
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK_EQ(ev.error, std::string("too_many_attempts"));
+    rig.c->linkSso("right password");
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 15000));
+    CHECK(ev.mfaRequired);
+    CHECK_EQ(links.load(), 4);
+    auto sent = rig.requests("/api/v1/auth/sso/google/link");
+    REQUIRE(sent.size() == 4);
+    for (auto& r : sent) {
+        Value b = bodyOf(r);
+        CHECK_EQ(b["linkTicket"].asString(), kSsoLinkTicket);
+        CHECK(b["clientLabel"].isString());
+    }
+    CHECK(keysOf(bodyOf(sent[0])) == (std::vector<std::string>{"clientLabel", "linkTicket", "password"}));
+    CHECK(bodyOf(sent[3])["pow"]["nonce"].isString());
+    rig.c->loginMfa("654321");
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK(ev.ok);
+
+    // Another sign-in; the server says the step expired: it ends, and a second try sends nothing.
+    rig.link = [](const Value&) { return jsonReply(410, R"({"error":"sso_expired"})"); };
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoNeedsPassword, ev, 10000));
+    rig.c->linkSso("right password");
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK_EQ(ev.error, std::string("sso_expired"));
+    const size_t sentBefore = rig.requests("/api/v1/auth/sso/google/link").size();
+    rig.c->linkSso("right password");
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK_EQ(ev.error, std::string("sso_expired"));
+    CHECK_EQ(rig.requests("/api/v1/auth/sso/google/link").size(), sentBefore);
+
+    // Another sign-in; the player switches servers at the password step ("localhost" reaches the same
+    // fake server under another origin): the step ends there.
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoNeedsPassword, ev, 10000));
+    net::ServerEndpoint other = rig.ep;
+    other.host = "localhost";
+    rig.c->setServer(other);
+    rig.c->linkSso("right password");
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK_EQ(ev.error, std::string("sso_expired"));
+    CHECK_EQ(rig.requests("/api/v1/auth/sso/google/link").size(), sentBefore);
+}
+
+// Cancelled at Google (error=access_denied): sso_cancelled, the browser's 'cancelled' page, and no
+// finish. Another error: sso_failed.
+TEST(net_sso_provider_cancel) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig rig("sso-denied");
+    REQUIRE(rig.srv.ok());
+    std::string page;
+    rig.browser = [&](const std::string& url) {
+        page = googleRedirect(url, "error=access_denied");
+        return true;
+    };
+    net::SsoBrowserPage texts;
+    texts.cancelledHeading = "Cancelled (test)";
+    rig.c->startGoogleSso(texts);
+    net::Event ev;
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK_EQ(ev.error, std::string("sso_cancelled"));
+    CHECK(page.find("<h1>Cancelled (test)</h1>") != std::string::npos);
+    rig.browser = [](const std::string& url) {
+        googleRedirect(url, "error=server_error");
+        return true;
+    };
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK_EQ(ev.error, std::string("sso_failed"));
+    CHECK(rig.requests("/api/v1/auth/sso/google/finish").empty());
+}
+
+// The player cancels while Google's page is open: LoginResult "cancelled", the port closed (the
+// redirect that comes later is refused); a link sent by someone else (another state) never ends
+// the wait.
+TEST(net_sso_cancel) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig rig("sso-cancel");
+    REQUIRE(rig.srv.ok());
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    net::Event ev;
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+    CHECK(ev.ok);
+    const std::string url = rig.lastOpened();
+    const std::string foreign = googleRedirect(url, "code=4%2F0Stranger", ("Other_" + std::string(37, 'x')).c_str());
+    CHECK(foreign.compare(0, 12, "HTTP/1.1 400") == 0);
+    CHECK(!waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 300));
+    rig.c->cancelSso();
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK_EQ(ev.error, std::string("cancelled"));
+    CHECK(portRefused(rig.port));
+    CHECK(googleRedirect(url, "code=4%2F0Late").empty());
+    CHECK(rig.requests("/api/v1/auth/sso/google/finish").empty());
+    // Nothing under way: no answer.
+    rig.c->cancelSso();
+    CHECK(!waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 300));
+}
+
+// Cancelled while the server answers the start: no browser, the listener closed, the start
+// answered "cancelled" and nothing else. The same when another server is chosen meanwhile (that
+// Google page is for the previous one).
+TEST(net_sso_cancel_during_start) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig rig("sso-cancel-start");
+    REQUIRE(rig.srv.ok());
+    std::mutex m;
+    std::condition_variable cv;
+    bool asked = false, release = false;
+    rig.start = [&](const Value& b) {
+        {
+            std::unique_lock<std::mutex> lk(m);
+            asked = true;
+            cv.notify_all();
+            cv.wait_for(lk, std::chrono::seconds(5), [&] { return release; });
+        }
+        return jsonReply(200, "{\"attemptId\":\"" + kSsoAttempt + "\",\"authUrl\":\"" +
+                                  googleAuthUrl(uint16_t(b["redirectPort"].asInt(0)), net::ssoOriginTag(rig.ep.origin()), kSsoState) +
+                                  "\",\"state\":\"" + kSsoState + "\",\"expiresIn\":600}");
+    };
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    {
+        std::unique_lock<std::mutex> lk(m);
+        CHECK(cv.wait_for(lk, std::chrono::seconds(5), [&] { return asked; }));
+    }
+    rig.c->cancelSso();
+    {
+        std::lock_guard<std::mutex> lk(m);
+        release = true;
+    }
+    cv.notify_all();
+    net::Event ev;
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+    CHECK(!ev.ok);
+    CHECK_EQ(ev.error, std::string("cancelled"));
+    CHECK_EQ(rig.openedCount(), size_t(0));
+    CHECK(portRefused(rig.port));
+    CHECK(!waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 300));   // the cancel finds nothing under way
+    // The next sign-in is not affected.
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+    CHECK(ev.ok);
+    CHECK_EQ(rig.openedCount(), size_t(1));
+    rig.c->cancelSso();
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+
+    {
+        std::lock_guard<std::mutex> lk(m);
+        asked = release = false;
+    }
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    {
+        std::unique_lock<std::mutex> lk(m);
+        CHECK(cv.wait_for(lk, std::chrono::seconds(5), [&] { return asked; }));
+    }
+    net::ServerEndpoint other = rig.ep;
+    other.host = "localhost";
+    rig.c->setServer(other);
+    {
+        std::lock_guard<std::mutex> lk(m);
+        release = true;
+    }
+    cv.notify_all();
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+    CHECK(!ev.ok);
+    CHECK_EQ(ev.error, std::string("cancelled"));
+    CHECK_EQ(rig.openedCount(), size_t(1));
+    CHECK(portRefused(rig.port));
+}
+
+// Another server chosen while Google's page is open: the listener stops, and a code that reached it
+// just before is never sent (to either server).
+TEST(net_sso_origin_change) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig rig("sso-origin");
+    REQUIRE(rig.srv.ok());
+    rig.finish = [](const Value&) { return signedInReply(); };
+    std::mutex m;
+    std::condition_variable cv;
+    bool switched = false;
+    // The code arrives while net-http still runs the start; the game switches servers before it runs.
+    rig.browser = [&](const std::string& url) {
+        googleRedirect(url, "code=4%2F0Meanwhile");
+        std::unique_lock<std::mutex> lk(m);
+        cv.wait_for(lk, std::chrono::seconds(5), [&] { return switched; });
+        return true;
+    };
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+    while (rig.openedCount() == 0 && std::chrono::steady_clock::now() < until) std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    net::ServerEndpoint other = rig.ep;
+    other.host = "localhost";
+    rig.c->setServer(other);
+    {
+        std::lock_guard<std::mutex> lk(m);
+        switched = true;
+    }
+    cv.notify_all();
+    net::Event ev;
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+    CHECK(!waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 500));
+    CHECK(rig.requests("/api/v1/auth/sso/google/finish").empty());
+    CHECK(portRefused(rig.port));
+
+    // The same with the page open and nothing received yet: the port closes with the switch.
+    rig.c->setServer(rig.ep);
+    rig.browser = nullptr;
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+    CHECK(ev.ok);
+    const uint16_t port = rig.port;
+    CHECK(!portRefused(port));
+    rig.c->setServer(other);
+    until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+    while (!portRefused(port) && std::chrono::steady_clock::now() < until) std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    CHECK(portRefused(port));
+    CHECK(rig.requests("/api/v1/auth/sso/google/finish").empty());
+}
+
+// Nothing comes back from Google before the attempt's time is up: sso_expired, the port closed.
+// (The shortest wait is 30 s; the test hook shortens it.)
+TEST(net_sso_expiry) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig rig("sso-expiry");
+    REQUIRE(rig.srv.ok());
+    rig.start = [&rig](const Value& b) {
+        return jsonReply(200, "{\"attemptId\":\"" + kSsoAttempt + "\",\"authUrl\":\"" +
+                                  googleAuthUrl(uint16_t(b["redirectPort"].asInt(0)), net::ssoOriginTag(rig.ep.origin()), kSsoState) +
+                                  "\",\"state\":\"" + kSsoState + "\",\"expiresIn\":0}");
+    };
+    rig.c->setSsoMinWaitMs(300);
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    net::Event ev;
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+    CHECK(ev.ok);
+    auto t0 = std::chrono::steady_clock::now();
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK_EQ(ev.error, std::string("sso_expired"));
+    CHECK(std::chrono::steady_clock::now() - t0 < std::chrono::seconds(5));
+    CHECK(portRefused(rig.port));
+}
+
+// The browser could not be opened: "browser", the listener closed.
+TEST(net_sso_browser_fails) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig rig("sso-nobrowser");
+    REQUIRE(rig.srv.ok());
+    rig.browser = [](const std::string&) { return false; };
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    net::Event ev;
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+    CHECK_EQ(ev.error, std::string("browser"));
+    CHECK(portRefused(rig.port));
 }
 
 // The official server moved from port 44664 to 443: a saved session moves with it, once; other

@@ -219,7 +219,7 @@ public:
             s.runMock(1000.0);
         }
         bool account = screen != "online" && screen != "online-register" && screen != "online-mfa" && screen != "online-noserver" &&
-                       screen.compare(0, 6, "direct") != 0;
+                       screen.compare(0, 6, "direct") != 0 && screen.compare(0, 10, "online-sso") != 0;
         if (account && !s.signedIn()) {
             s.api().login("Magnus_T", "viewer-password");
             s.expect(net::Event::Kind::LoginResult);
@@ -238,6 +238,8 @@ public:
             {"online-game-saving", "game-saving"}, {"online-game-saved", "game-saved"},
             {"online-devices", "devices"}, {"online-email", "email"}, {"online-email-sent", "email-sent"},
             {"online-export", "export"}, {"online-export-done", "export-done"}, {"online-delete", "delete"},
+            {"online-sso-wait", "sso-wait"}, {"online-sso-name", "sso-name"}, {"online-sso-link", "sso-link"},
+            {"online-sso-mfa", "sso-mfa"},
         };
         for (const auto& p : pages)
             if (screen == p.screen) {

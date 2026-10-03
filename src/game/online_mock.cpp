@@ -1457,8 +1457,14 @@ struct FakeServer::Impl {
     AccountInfo account;
     bool signedIn = false;
     std::string mfaUser;              // waiting for loginMfa()
+    // Google sign-in: Google "sends the browser back" at ssoCodeAt, the server answers at ssoAt
+    // (signed in when Google is linked already, the password step for the account the fake holds,
+    // or a new account's name). ssoLinkUser: the account of the password step (linkSso); mfaLink:
+    // the code step that adds Google once accepted.
     bool ssoActive = false, ssoKnown = false;
-    double ssoAt = -1;
+    double ssoCodeAt = -1, ssoAt = -1;
+    std::string ssoUser = "Guillaume_G", ssoLinkUser;
+    bool mfaLink = false;
     bool mfaEnabled = false;
     // realtime
     ConnState conn = ConnState::Offline;
@@ -1549,6 +1555,7 @@ struct FakeServer::Impl {
         a.emailVerified = true;
         a.mfaEnabled = mfaEnabled;
         a.hasPassword = true;
+        a.googleLinked = ssoKnown && lower(name) == lower(ssoUser);
         a.acceptChallenges = true;
         a.createdAtMs = int64_t(lastNow) - int64_t(212.0 * 86400000.0);
         a.lastLoginAtMs = int64_t(lastNow);
@@ -1724,13 +1731,26 @@ struct FakeServer::Impl {
     void tick(double now) {
         lastNow = now;
         pingPhase += 1.0;
+        if (ssoActive && ssoCodeAt >= 0 && now >= ssoCodeAt) {
+            ssoCodeAt = -1;
+            ssoAt = now + 800.0;
+            http(result(Event::Kind::SsoCodeReceived, true));
+        }
         if (ssoActive && ssoAt >= 0 && now >= ssoAt) {
             ssoAt = -1;
             if (ssoKnown) {
                 ssoActive = false;
-                signIn("Guillaume_G");
+                signIn(ssoUser);
+            } else if (!account.username.empty() && account.hasPassword) {
+                ssoActive = false;
+                ssoLinkUser = account.username;
+                Event e = result(Event::Kind::SsoNeedsPassword, true);
+                e.account.username = ssoLinkUser;
+                http(e);
             } else {
-                http(result(Event::Kind::SsoNeedsUsername, true));
+                Event e = result(Event::Kind::SsoNeedsUsername, true);
+                e.account.username = ssoUser;   // the server's suggestion
+                http(e);
             }
         }
         if (g_connectionDrop > 0 && online()) {
@@ -1889,6 +1909,7 @@ void FakeServer::login(const std::string& user, const std::string& password) {
     }
     if (contains(name, "mfa") || I.mfaEnabled) {
         I.mfaUser = name;
+        I.mfaLink = false;
         Event e = I.result(Event::Kind::LoginResult, false);
         e.mfaRequired = true;
         return I.http(e);
@@ -1904,13 +1925,20 @@ void FakeServer::loginMfa(const std::string& code) {
     std::string name = I.mfaUser;
     I.mfaUser.clear();
     I.mfaEnabled = true;
+    if (I.mfaLink) {   // the code step of adding Google sign-in
+        I.mfaLink = false;
+        I.ssoKnown = true;
+        I.ssoUser = name;
+    }
     I.signIn(name);
 }
-void FakeServer::startGoogleSso() {
+void FakeServer::startGoogleSso(const SsoBrowserPage&) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
     I.ssoActive = true;
-    I.ssoAt = I.lastNow + 3500.0;
+    I.ssoLinkUser.clear();
+    I.ssoCodeAt = I.lastNow + 1500.0;
+    I.ssoAt = -1;
     I.http(I.result(Event::Kind::SsoBrowserOpened, true));
 }
 void FakeServer::completeSso(const std::string& username) {
@@ -1922,12 +1950,39 @@ void FakeServer::completeSso(const std::string& username) {
     }
     I.ssoActive = false;
     I.ssoKnown = true;
+    I.ssoUser = username;
     I.signIn(username);
     I.account.googleLinked = true;
 }
+// The password of the account the fake holds: any but "wrong" (as for login()); then its code when
+// two-factor is on, which adds Google once accepted.
+void FakeServer::linkSso(const std::string& password) {
+    Impl& I = *impl_;
+    I.lastNow = nowMs();
+    if (I.ssoLinkUser.empty()) return I.http(I.result(Event::Kind::LoginResult, false, "sso_expired"));
+    if (password == "wrong" || password.empty()) return I.http(I.result(Event::Kind::LoginResult, false, "invalid_credentials"));
+    const std::string name = I.ssoLinkUser;
+    I.ssoLinkUser.clear();
+    if (contains(name, "mfa") || I.mfaEnabled) {
+        I.mfaUser = name;
+        I.mfaLink = true;
+        Event e = I.result(Event::Kind::LoginResult, false);
+        e.mfaRequired = true;
+        return I.http(e);
+    }
+    I.ssoKnown = true;
+    I.ssoUser = name;
+    I.signIn(name);   // googleLinked from now on (makeAccount)
+}
 void FakeServer::cancelSso() {
-    impl_->ssoActive = false;
-    impl_->ssoAt = -1;
+    Impl& I = *impl_;
+    const bool was = I.ssoActive || !I.ssoLinkUser.empty();
+    I.ssoActive = false;
+    I.ssoCodeAt = I.ssoAt = -1;
+    I.ssoLinkUser.clear();
+    if (I.mfaLink) I.mfaUser.clear();   // the code step of adding Google ends with it
+    I.mfaLink = false;
+    if (was) I.http(I.result(Event::Kind::LoginResult, false, "cancelled"));
 }
 void FakeServer::logout(bool) {
     Impl& I = *impl_;

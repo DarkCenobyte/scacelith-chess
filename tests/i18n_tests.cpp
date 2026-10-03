@@ -224,6 +224,40 @@ TEST(i18n_startup_errors) {
     i18n::setLanguage("en");
 }
 
+// Google sign-in by loopback redirect: every language has the game's texts and the page the browser
+// shows, translated; the link page names the account ({0}) and the server ({1}); the texts that send
+// the player to "Forgot password?" quote that link's own label.
+TEST(i18n_sso_texts) {
+    const char* keys[] = {
+        "online.sso.wait", "online.sso.finishing", "online.sso.link_title", "online.sso.link_lead",
+        "online.sso.link_button", "online.sso.link_mfa", "online.sso.not_mine", "online.sso.not_mine_note",
+        "online.sso.page.title", "online.sso.page.done_heading", "online.sso.page.done",
+        "online.sso.page.cancelled_heading", "online.sso.page.cancelled", "online.sso.page.foreign_heading",
+        "online.sso.page.foreign", "online.err.sso_expired", "online.err.sso_failed", "online.err.sso_listen",
+        "online.err.sso_origin", "online.err.browser", "online.err.sso_email_unverified",
+        "online.err.sso_account_exists", "online.err.sso_already_linked", "online.err.account_disabled"};
+    for (const i18n::Language& lang : i18n::languages()) {
+        CHECK(i18n::setLanguage(lang.code));
+        for (const char* key : keys) {
+            CHECK(i18n::has(key));
+            if (std::string(lang.code) != "en" && std::string(i18n::tr(key)) == i18n::english(key)) {
+                std::fprintf(stderr, "  %s: %s is not translated\n", lang.code, key);
+                CHECK(false);
+            }
+        }
+        std::string lead = i18n::trf("online.sso.link_lead", {"Guillaume_G", "play.example"});
+        CHECK(lead.find("Guillaume_G") != std::string::npos);
+        CHECK(lead.find("play.example") != std::string::npos);
+        const std::string forgot = i18n::tr("online.signin.forgot");
+        for (const char* key : {"online.sso.not_mine_note", "online.err.sso_account_exists"}) {
+            bool ok = std::string(i18n::tr(key)).find(forgot) != std::string::npos;
+            if (!ok) std::fprintf(stderr, "  %s: %s should quote \"%s\"\n", lang.code, key, forgot.c_str());
+            CHECK(ok);
+        }
+    }
+    i18n::setLanguage("en");
+}
+
 TEST(i18n_tr_fallback_and_format) {
     CHECK(i18n::setLanguage("fr"));
     CHECK_EQ(i18n::language(), std::string("fr"));
