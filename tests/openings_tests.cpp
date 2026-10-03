@@ -826,7 +826,7 @@ TEST(openings_texts_name_the_scotch_and_danish_components) {
         {"Scotch Gambit", {{"fr", "gambit écossais"}, {"de", "Schottisches Gambit"}, {"es", "gambito escocés"}}},
         {"Scotch Variation",
          {{"fr", "variante écossaise"}, {"de", "Schottische Variante"}, {"es", "variante escocesa"}}},
-        {"Danish Variation", {{"fr", "variante danoise"}, {"de", "Dänische Variante"}, {"es", "variante danesa"}}},
+        {"Danish Variation", {{"fr", "variante danoise"}, {"de", "Nordische Variante"}, {"es", "variante danesa"}}},
     };
     for (const std::string name : {"Italian Game: Scotch Gambit", "Italian Game: Scotch Gambit, Canal Variation",
                                    "Four Knights Game: Scotch Variation",
