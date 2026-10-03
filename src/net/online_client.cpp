@@ -1,7 +1,11 @@
-// OnlineClient: three network threads behind a command/event interface.
+// OnlineClient: three network threads behind a command/event interface (and a fourth one while a
+// Google sign-in waits).
 //
-//   net-http  HTTPS API calls (account, login, SSO polling, proof of work, the account API:
+//   net-http  HTTPS API calls (account, login, the Google sign-in, proof of work, the account API:
 //             history, game details and PGN, devices, e-mail, export, deletion), one at a time.
+//   net-sso   the loopback redirect of a Google sign-in (net/loopback_redirect.h), from its start
+//             until Google sends the browser back to 127.0.0.1 (no polling): it hands the code to
+//             net-http as a command, which finishes the sign-in with the server.
 //   net-gif   the animated GIFs, one at a time: the server may hold such a request for 45 s
 //             (a render waits for a thread, then runs at the lowest priority), so they wait for
 //             each other but never hold up the calls of net-http (the history, signing out...).
@@ -144,6 +148,38 @@ bool plausibleToken(const std::string& t) {
 // A 6-digit code of an authenticator app; anything else is taken for a recovery code.
 bool isTotpCode(const std::string& s) {
     return s.size() == 6 && std::all_of(s.begin(), s.end(), [](char c) { return c >= '0' && c <= '9'; });
+}
+
+bool isBase64url(const std::string& s, size_t n) {
+    return s.size() == n && std::all_of(s.begin(), s.end(), [](char c) { return std::isalnum((unsigned char)c) || c == '-' || c == '_'; });
+}
+
+// The Google page a sign-in's start answered, checked before anything is opened (a community
+// server could otherwise show any page as Google's, or relay the sign-in of another server): "" when
+// it is Google's authorization page for this listener's redirect URI and this state, "sso_origin"
+// when only the origin tag of its redirect URI differs (the sign-in of another server), otherwise
+// "bad_response".
+std::string checkAuthUrl(const std::string& url, uint16_t port, const std::string& tag, const std::string& state) {
+    static const std::string kGoogle = "https://accounts.google.com/o/oauth2/v2/auth?";
+    if (url.compare(0, kGoogle.size(), kGoogle) != 0 || url.size() >= 4096) return "bad_response";
+    for (char c : url)
+        if (c <= ' ' || c > '~' || c == '"' || c == '\\') return "bad_response";
+    std::vector<std::pair<std::string, std::string>> params;
+    if (!loopback::queryParams(url.substr(kGoogle.size()), params)) return "bad_response";
+    auto only = [&params](const char* name, std::string& value) {
+        int n = 0;
+        for (const auto& p : params)
+            if (p.first == name && ++n == 1) value = p.second;
+        return n == 1;
+    };
+    std::string responseType, redirect, urlState, method, challenge;
+    if (!only("response_type", responseType) || responseType != "code" || !only("state", urlState) || urlState != state ||
+        !only("code_challenge_method", method) || method != "S256" || !only("code_challenge", challenge) || !isBase64url(challenge, 43) ||
+        !only("redirect_uri", redirect))
+        return "bad_response";
+    const std::string base = "http://127.0.0.1:" + std::to_string(port) + "/oauth2/google/";
+    if (redirect == base + tag) return "";
+    return redirect.compare(0, base.size(), base) == 0 && isBase64url(redirect.substr(base.size()), 22) ? "sso_origin" : "bad_response";
 }
 
 constexpr int kPingBurst = 3;                   // quick pings after the one sent at Welcome
@@ -351,14 +387,22 @@ struct OnlineClient::Impl {
 
     // ---- net-http state ----
     std::string mfaToken, mfaOrigin;
+    // The Google sign-in under way: what the server's start answered, and the listener Google sends
+    // the browser back to. Its redirect comes to net-http as a command (ssoRedirected), dropped when
+    // gen moved on (cancelled, another sign-in) or the server changed. Never cancel or reset the
+    // listener while holding mu: its callback takes mu.
     struct Sso {
         bool active = false;
+        uint32_t gen = 0;
         ServerEndpoint ep;
-        std::string attemptId, verifier;
-        Clock::time_point nextPoll, expires;
-        int pollMs = 2000;
+        uint32_t originGen = 0;
+        std::string attemptId, verifier, state;
+        std::unique_ptr<LoopbackRedirect> listener;
     } sso;
     std::string ssoTicket, ssoTicketOrigin;
+    std::string linkTicket, linkOrigin;           // SsoNeedsPassword: the step of linkSso()
+    std::function<bool(const std::string&)> browserOpener = sys::openBrowser;
+    int ssoMinWaitMs = 30000;
     // The session of this game in the last list of signed-in devices (fetchSessions): revoking it
     // signs this game out.
     std::string sessionsOrigin;
@@ -433,6 +477,7 @@ struct OnlineClient::Impl {
         if (httpThread.joinable()) httpThread.join();
         if (rtThread.joinable()) rtThread.join();
         if (gifThread.joinable()) gifThread.join();
+        sso.listener.reset();   // joins net-sso (its redirect, if any, is dropped with the queue)
         // The other queued commands are dropped; these change only the credential file (a saved
         // pin the player cleared, behind a request under way when the game quit).
         for (const HttpCommand& cmd : httpQ)
@@ -800,8 +845,13 @@ struct OnlineClient::Impl {
         ev.error.clear();
     }
 
+    // Ends the Google sign-in under way: its listener stops (net-sso joined) and a redirect of it
+    // still queued is dropped.
     void ssoFinished() {
+        sso.listener.reset();
+        const uint32_t gen = sso.gen + 1;
         sso = Sso();
+        sso.gen = gen;
     }
 
     // Account API: the session ended on the server, or an account deletion under way (defined with
@@ -809,30 +859,44 @@ struct OnlineClient::Impl {
     uint32_t stopRealtime(std::shared_ptr<bool> wasOpen = nullptr);
     void resumeRealtime(uint32_t gen, std::shared_ptr<bool> wasOpen);
 
-    void ssoPollOnce() {
+    // net-sso: Google's redirect (or the deadline) becomes a command of net-http, for the sign-in
+    // 'gen' on the server it started with.
+    void ssoRedirect(uint32_t gen, const std::string& origin, uint32_t oGen, const RedirectResult& r) {
+        {
+            std::lock_guard<std::mutex> lk(mu);
+            if (stopping) return;
+            httpQ.push_back(HttpCommand{origin, oGen, [this, gen, oGen, r] { ssoRedirected(gen, oGen, r); }});
+        }
+        httpCv.notify_one();
+    }
+
+    // net-http: the redirect of the sign-in 'gen'. The code goes to the server that answered the
+    // start, once (the attempt is single-use: no retry).
+    void ssoRedirected(uint32_t gen, uint32_t oGen, const RedirectResult& r) {
+        if (!sso.active || gen != sso.gen || oGen != originGen.load()) return;   // cancelled, or another server since
         Event ev;
         ev.kind = Event::Kind::LoginResult;
-        if (Clock::now() >= sso.expires) {
-            ev.error = "sso_expired";
+        if (r.kind != RedirectResult::Kind::Code) {
             ssoFinished();
+            ev.error = r.kind == RedirectResult::Kind::Expired ? "sso_expired"
+                       : r.error == "access_denied"            ? "sso_cancelled"
+                                                               : "sso_failed";
             post(ev);
             return;
         }
+        Event got;
+        got.kind = Event::Kind::SsoCodeReceived;
+        got.ok = true;
+        post(got);
         json::Value b = json::Value::object();
         b.set("attemptId", sso.attemptId);
         b.set("codeVerifier", sso.verifier);
+        b.set("state", sso.state);
+        b.set("code", r.code);
+        if (!r.iss.empty()) b.set("iss", r.iss);
         b.set("clientLabel", clientString());
-        ServerEndpoint e = sso.ep;
-        Api a = api(e, "POST", "/auth/sso/google/poll", &b, false, httpCancel);
-        if (a.ok() && a.body["status"].asString() == "pending") {
-            sso.nextPoll = Clock::now() + std::chrono::milliseconds(sso.pollMs);
-            return;
-        }
-        if (!a.ok() && a.status == 0 && a.error != "cancelled") {
-            // Transport trouble: keep polling until the attempt expires.
-            sso.nextPoll = Clock::now() + std::chrono::milliseconds(sso.pollMs * 2);
-            return;
-        }
+        const ServerEndpoint e = sso.ep;
+        Api a = api(e, "POST", "/auth/sso/google/finish", &b, false, httpCancel);
         ssoFinished();
         if (a.ok() && a.body["needsUsername"].asBool()) {
             ssoTicket = a.body["ssoTicket"].asString();
@@ -841,6 +905,24 @@ struct OnlineClient::Impl {
             n.kind = Event::Kind::SsoNeedsUsername;
             n.ok = true;
             n.account.username = a.body["suggestedUsername"].asString();
+            post(n);
+            return;
+        }
+        if (a.ok() && a.body["needsPassword"].asBool()) {
+            // The address is the one of an account with a password: Google is added to it only after
+            // that password (linkSso), in the game.
+            Event n;
+            n.kind = Event::Kind::SsoNeedsPassword;
+            n.account.username = a.body["username"].asString();
+            linkTicket = a.body["linkTicket"].asString();
+            linkOrigin = e.origin();
+            if (linkTicket.empty() || n.account.username.empty()) {
+                linkTicket.clear();
+                ev.error = "bad_response";
+                post(ev);
+                return;
+            }
+            n.ok = true;
             post(n);
             return;
         }
@@ -854,18 +936,12 @@ struct OnlineClient::Impl {
             HttpCommand cmd;
             {
                 std::unique_lock<std::mutex> lk(mu);
-                auto ready = [&] { return stopping || !httpQ.empty() || (sso.active && Clock::now() >= sso.nextPoll); };
-                if (sso.active) httpCv.wait_until(lk, sso.nextPoll, ready);
-                else httpCv.wait(lk, ready);
+                httpCv.wait(lk, [&] { return stopping || !httpQ.empty(); });
                 if (stopping) return;
-                if (!httpQ.empty()) {
-                    cmd = std::move(httpQ.front());
-                    httpQ.pop_front();
-                }
+                cmd = std::move(httpQ.front());
+                httpQ.pop_front();
             }
-            if (cmd.fn) runCommand(cmd);
-            else if (sso.active && Clock::now() >= sso.nextPoll)
-                runCommand(HttpCommand{sso.ep.origin(), originGen.load(), [this] { ssoPollOnce(); }});
+            runCommand(cmd);
         }
     }
 
@@ -1566,6 +1642,8 @@ void OnlineClient::setServer(const ServerEndpoint& ep) {
             d->ssoFinished();
             d->mfaToken.clear();
             d->ssoTicket.clear();
+            d->linkTicket.clear();
+            d->linkOrigin.clear();
         });
     } else {
         d->realtime([d, e] { d->rt.ep = e; });
@@ -1577,7 +1655,7 @@ void OnlineClient::forgetSavedPin() {
     if (!d->ep.valid()) return;
     std::string origin = d->ep.origin();
     // On net-http, behind the sign-ins already queued: they save the pin of the endpoint they were
-    // given (the one forgotten here). A Google sign-in under way polls and saves with its own
+    // given (the one forgotten here). A Google sign-in under way finishes and saves with its own
     // endpoint, whose pin goes too. Done even when the game quits first (atExit): the next start
     // would use the old pin again, and Options could no longer clear it.
     d->http(
@@ -1673,10 +1751,10 @@ void OnlineClient::loginMfa(const std::string& code) {
     });
 }
 
-void OnlineClient::startGoogleSso() {
+void OnlineClient::startGoogleSso(const SsoBrowserPage& page) {
     Impl* d = impl_.get();
     ServerEndpoint e = d->ep;
-    d->http([d, e] {
+    d->http([d, e, page] {
         d->ssoFinished();
         Event ev;
         ev.kind = Event::Kind::SsoBrowserOpened;
@@ -1686,35 +1764,54 @@ void OnlineClient::startGoogleSso() {
             d->post(ev);
             return;
         }
-        json::Value b = json::Value::object();
-        b.set("codeChallenge", pkce.challenge);   // S256, the only method (API.md)
-        Impl::Api a = d->api(e, "POST", "/auth/sso/google/start", &b, false, d->httpCancel);
-        Impl::fillError(ev, a);
-        if (!a.ok()) { d->post(ev); return; }
-        std::string url = a.body["authUrl"].asString();
-        // Only an https page is handed to the shell (a hostile server must not start programs).
-        bool urlOk = url.compare(0, 8, "https://") == 0 && url.size() < 4096;
-        for (char c : url) urlOk = urlOk && c > ' ' && c <= '~' && c != '"' && c != '\\';
-        if (!urlOk || a.body["attemptId"].asString().empty()) {
-            ev.ok = false;
-            ev.error = "bad_response";
+        // The port Google sends the browser back to is bound before the server hears of it.
+        auto listener = std::make_unique<LoopbackRedirect>();
+        std::string err;
+        if (!listener->open(err)) {
+            LOGW("net: Google sign-in: no loopback listener (%s)", err.c_str());
+            ev.error = "sso_listen";
             d->post(ev);
             return;
         }
-        if (!sys::openBrowser(url)) {
+        const uint16_t port = listener->port();
+        json::Value b = json::Value::object();
+        b.set("codeChallenge", pkce.challenge);   // S256, the only method (API.md)
+        b.set("redirectPort", int64_t(port));
+        Impl::Api a = d->api(e, "POST", "/auth/sso/google/start", &b, false, d->httpCancel);
+        Impl::fillError(ev, a);
+        if (!a.ok()) { d->post(ev); return; }
+        // Only Google's page, for this listener, this server and this state, is handed to the shell.
+        const std::string url = a.body["authUrl"].asString(), state = a.body["state"].asString();
+        const std::string attemptId = a.body["attemptId"].asString();
+        std::string bad = attemptId.compare(0, 4, "sso_") == 0 && isBase64url(attemptId.substr(4), 43) && isBase64url(state, 43)
+                              ? checkAuthUrl(url, port, ssoOriginTag(e.origin()), state)
+                              : std::string("bad_response");
+        if (!bad.empty()) {
+            if (bad == "sso_origin") LOGW("net: Google sign-in: %s answered for another server's name", e.origin().c_str());
+            ev.ok = false;
+            ev.error = bad;
+            d->post(ev);
+            return;
+        }
+        const int64_t waitMs = std::clamp<int64_t>(a.body["expiresIn"].asInt(600) * 1000, d->ssoMinWaitMs, 600000);
+        d->sso.ep = e;
+        d->sso.originGen = tCommandGen;
+        d->sso.attemptId = attemptId;
+        d->sso.verifier = pkce.verifier;
+        d->sso.state = state;
+        listener->start(ssoRedirectPath(e.origin()), state, int64_t(steadyMs()) + waitMs, page,
+                        [d, gen = d->sso.gen, origin = e.origin(), oGen = d->sso.originGen](const RedirectResult& r) {
+                            d->ssoRedirect(gen, origin, oGen, r);
+                        });
+        d->sso.listener = std::move(listener);
+        if (!d->browserOpener(url)) {
+            d->ssoFinished();
             ev.ok = false;
             ev.error = "browser";
             d->post(ev);
             return;
         }
         d->sso.active = true;
-        d->sso.ep = e;
-        d->sso.attemptId = a.body["attemptId"].asString();
-        d->sso.verifier = pkce.verifier;
-        d->sso.pollMs = int(std::clamp<int64_t>(a.body["pollMs"].asInt(2000), 1000, 10000));
-        int64_t expires = std::clamp<int64_t>(a.body["expiresIn"].asInt(600), 30, 1800);
-        d->sso.nextPoll = Clock::now() + std::chrono::milliseconds(d->sso.pollMs);
-        d->sso.expires = Clock::now() + std::chrono::seconds(expires);
         ev.ok = true;
         d->post(ev);
     });
@@ -1743,12 +1840,41 @@ void OnlineClient::completeSso(const std::string& username) {
     });
 }
 
+void OnlineClient::linkSso(const std::string& password) {
+    Impl* d = impl_.get();
+    ServerEndpoint e = d->ep;
+    d->http([d, e, password = std::string(password)]() mutable {
+        Event ev;
+        ev.kind = Event::Kind::LoginResult;
+        if (d->linkTicket.empty() || d->linkOrigin != e.origin()) {
+            ev.error = "sso_expired";
+            d->post(ev);
+            return;
+        }
+        json::Value b = json::Value::object();
+        b.set("linkTicket", d->linkTicket);
+        b.set("password", password);
+        b.set("clientLabel", clientString());
+        Impl::Api a = d->api(e, "POST", "/auth/sso/google/link", &b, false, d->httpCancel);   // a 428 pow is solved there
+        // A wrong password, or too many, keeps the step for another try; anything else ends it.
+        if (a.error != "invalid_credentials" && a.error != "too_many_attempts") {
+            d->linkTicket.clear();
+            d->linkOrigin.clear();
+        }
+        d->finishLogin(e, a, ev);
+        d->post(ev);
+        std::fill(password.begin(), password.end(), '\0');
+    });
+}
+
 void OnlineClient::cancelSso() {
     Impl* d = impl_.get();
     d->http([d] {
-        bool was = d->sso.active;
+        bool was = d->sso.active || !d->linkTicket.empty();
         d->ssoFinished();
         d->ssoTicket.clear();
+        d->linkTicket.clear();
+        d->linkOrigin.clear();
         if (was) {
             Event ev;
             ev.kind = Event::Kind::LoginResult;
@@ -1756,6 +1882,17 @@ void OnlineClient::cancelSso() {
             d->post(ev);
         }
     });
+}
+
+// On net-http, in order with the sign-ins (net-http alone reads them).
+void OnlineClient::setBrowserOpener(std::function<bool(const std::string& url)> opener) {
+    Impl* d = impl_.get();
+    d->http([d, opener] { d->browserOpener = opener ? opener : sys::openBrowser; });
+}
+
+void OnlineClient::setSsoMinWaitMs(int ms) {
+    Impl* d = impl_.get();
+    d->http([d, ms] { d->ssoMinWaitMs = std::clamp(ms, 1, 30000); });
 }
 
 void OnlineClient::logout(bool allSessions) {

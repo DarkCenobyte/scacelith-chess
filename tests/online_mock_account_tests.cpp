@@ -17,6 +17,7 @@
 #include "net/json.h"
 #include "net/net_sys.h"
 #include "net/protocol_gen.h"
+#include "ui/ui_sign_in_answer.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -501,6 +502,94 @@ TEST(mock_account_devices_and_preferences) {
     CHECK(!e.account.acceptChallenges);
     CHECK(e.account.hasPassword);
     CHECK(e.account.createdAtMs > 0 && e.account.lastLoginAtMs >= e.account.createdAtMs);
+}
+
+// Google sign-in on the fake (the pages and their screenshots): the browser comes back
+// (SsoCodeReceived) before the server's answer; a new account chooses its name (the server's
+// suggestion given); the address of the account the fake holds asks for its password once
+// (wrong passwords keep the step), then its code when two-factor is on; a cancel is told. The
+// answers as the sign-in pages read them (ui/ui_sign_in_answer.h): the password step stays after a
+// wrong password, goes to the code page when one is asked, and a cancel is not told.
+TEST(mock_sso_paths) {
+    using ui::detail::RefusedSignIn;
+    using ui::detail::refusedSignIn;
+    VirtualClock vc;
+    net::ServerEndpoint ep;
+    ep.host = "fake.example.org";
+    Event e;
+
+    mock::FakeServer fresh;
+    fresh.setServer(ep);
+    fresh.startGoogleSso(net::SsoBrowserPage());
+    CHECK(await(fresh, Kind::SsoBrowserOpened, e));
+    CHECK(e.ok);
+    CHECK(await(fresh, Kind::SsoCodeReceived, e));
+    CHECK(await(fresh, Kind::SsoNeedsUsername, e));
+    CHECK_EQ(e.account.username, std::string("Guillaume_G"));
+    fresh.completeSso("Guillaume_G");
+    CHECK(await(fresh, Kind::LoginResult, e));
+    CHECK(e.ok && e.account.googleLinked);
+    fresh.logout(false);
+    fresh.startGoogleSso(net::SsoBrowserPage());   // linked now: straight in
+    CHECK(await(fresh, Kind::LoginResult, e));
+    CHECK(e.ok);
+    CHECK_EQ(e.account.username, std::string("Guillaume_G"));
+
+    mock::FakeServer held;
+    signIn(held, "Paul_M");
+    held.logout(false);
+    held.startGoogleSso(net::SsoBrowserPage());
+    CHECK(await(held, Kind::SsoNeedsPassword, e));
+    CHECK_EQ(e.account.username, std::string("Paul_M"));
+    held.linkSso("wrong");
+    CHECK(await(held, Kind::LoginResult, e));
+    CHECK_EQ(e.error, std::string("invalid_credentials"));
+    CHECK(refusedSignIn(true, e.mfaRequired, e.error) == RefusedSignIn::StayOnLink);
+    CHECK(refusedSignIn(false, e.mfaRequired, e.error) == RefusedSignIn::Other);   // a password sign-in's
+    CHECK(refusedSignIn(true, false, "too_many_attempts") == RefusedSignIn::StayOnLink);
+    held.linkSso("correct horse battery");
+    CHECK(await(held, Kind::LoginResult, e));
+    CHECK(e.ok && e.account.googleLinked);
+    CHECK_EQ(e.account.username, std::string("Paul_M"));
+    held.linkSso("correct horse battery");   // used once
+    CHECK(await(held, Kind::LoginResult, e));
+    CHECK_EQ(e.error, std::string("sso_expired"));
+    CHECK(refusedSignIn(true, e.mfaRequired, e.error) == RefusedSignIn::Other);   // back to signing in
+
+    mock::FakeServer mfa;
+    signIn(mfa, "mfa_tester");
+    mfa.logout(false);
+    mfa.startGoogleSso(net::SsoBrowserPage());
+    CHECK(await(mfa, Kind::SsoNeedsPassword, e));
+    mfa.linkSso("correct horse battery");
+    CHECK(await(mfa, Kind::LoginResult, e));
+    CHECK(!e.ok && e.mfaRequired);
+    CHECK(refusedSignIn(true, e.mfaRequired, e.error) == RefusedSignIn::Code);
+    mfa.loginMfa("123456");
+    CHECK(await(mfa, Kind::LoginResult, e));
+    CHECK(e.ok && e.account.googleLinked);
+    mfa.logout(false);
+    mfa.startGoogleSso(net::SsoBrowserPage());   // linked by the code step
+    CHECK(await(mfa, Kind::LoginResult, e));
+    CHECK(e.ok);
+    CHECK_EQ(e.account.username, std::string("mfa_tester"));
+
+    mock::FakeServer cancel;
+    cancel.setServer(ep);
+    cancel.cancelSso();   // nothing to cancel: nothing told
+    cancel.startGoogleSso(net::SsoBrowserPage());
+    CHECK(await(cancel, Kind::SsoBrowserOpened, e));
+    cancel.cancelSso();
+    CHECK(await(cancel, Kind::LoginResult, e));
+    CHECK_EQ(e.error, std::string("cancelled"));
+    CHECK(refusedSignIn(false, e.mfaRequired, e.error) == RefusedSignIn::Silent);
+    CHECK(refusedSignIn(true, e.mfaRequired, e.error) == RefusedSignIn::Silent);
+    bool late = false;
+    for (int i = 0; i < 200; ++i) {   // ten seconds: the attempt is gone
+        while (cancel.poll(e)) late = true;
+        mock::advance(50.0);
+    }
+    CHECK(!late);
 }
 
 TEST(mock_account_email_change) {

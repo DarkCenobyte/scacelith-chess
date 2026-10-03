@@ -92,8 +92,9 @@ public:
     void registerAccount(const std::string& username, const std::string& email, const std::string& password);
     void login(const std::string& usernameOrEmail, const std::string& password);
     void loginMfa(const std::string& code);
-    void startGoogleSso();
+    void startGoogleSso(const SsoBrowserPage& page);
     void completeSso(const std::string& username);
+    void linkSso(const std::string& password);
     void cancelSso();
     void logout(bool allSessions);
     void fetchAccount();

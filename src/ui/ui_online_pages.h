@@ -35,7 +35,7 @@ gfx::Rect formRow(const gfx::Rect& p, float& y, float inset = 90.0f);
 // The footer: Back on the start side, the primary action on the end side, a rule above them.
 constexpr float kBtnW = 260.0f, kBtnH = 56.0f;
 float footerY(const gfx::Rect& p);
-bool backButton(const gfx::Rect& p, const char* key = "common.back");
+bool backButton(const gfx::Rect& p, const char* key = "common.back", bool enabled = true);
 bool primaryButton(const gfx::Rect& p, const char* key, bool enabled, bool busy = false);
 void footerRule(const gfx::Rect& p);
 // A quiet link-like button centered at cx.

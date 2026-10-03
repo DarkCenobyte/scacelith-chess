@@ -37,8 +37,9 @@ public:
     virtual void registerAccount(const std::string& username, const std::string& email, const std::string& password) = 0;
     virtual void login(const std::string& usernameOrEmail, const std::string& password) = 0;
     virtual void loginMfa(const std::string& code) = 0;
-    virtual void startGoogleSso() = 0;
+    virtual void startGoogleSso(const net::SsoBrowserPage& page) = 0;
     virtual void completeSso(const std::string& username) = 0;
+    virtual void linkSso(const std::string& password) = 0;
     virtual void cancelSso() = 0;
     virtual void logout(bool allSessions) = 0;
     virtual void fetchAccount() = 0;
@@ -317,6 +318,9 @@ OnlineSession& onlineSession();
 // "incompatible"...), a realtime net::proto ErrorCode, a direct match error ("refused",
 // "timeout", "wrong_code", "incompatible", "port_in_use"... see net::DirectMatch::lastError()).
 std::string onlineErrorText(const std::string& code, int retryAfterSec = 0, int64_t bannedUntilMs = 0);
+// The page the browser shows when Google sends it back to the game (net::LoopbackRedirect), in the
+// current language: made here, on the game thread, as the network threads never use i18n.
+net::SsoBrowserPage ssoBrowserPage();
 // The error of a GIF in words (GifSaver::error()): the account's quota used up with the wait in
 // minutes and seconds, the renderer busy, signed out, a game too long, a PGN the server cannot
 // read, a render that failed, a server without GIFs, the file not written; the other codes as
