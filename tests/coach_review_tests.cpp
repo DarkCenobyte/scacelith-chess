@@ -1023,6 +1023,26 @@ TEST(coach_review_promotion_race_checks_the_square) {
     }
 }
 
+TEST(coach_review_promotion_race_counts_the_double_step) {
+    // The a7 pawn is six ranks from a1 but needs five moves (a7-a5 first); the king on g2 needs six.
+    // The line's numbers are the ones the rule of the square compares: 5 and 6, not 6 and 6.
+    for (int level : {5, 6}) {   // a1=Q is the ninth ply: lookahead 7 and up
+        Game g = gameOf("7k/p7/8/8/8/8/8/6K1 w - - 0 1", {"Kg2"});
+        Reviewer rv;
+        rv.reset(level, White);
+        const ai::Analysis a0 = analysisOf(
+            {pvl(0, "g1f2"), pvl(-800, "g1g2 a7a5 g2f3 a5a4 f3e3 a4a3 e3d3 a3a2 d3c2 a2a1q")});
+        const Review r = reviewOf(rv, g, a0);
+        CHECK(r.verdict.exType == ExType::PromotionRace);
+        const Beat* b = beatWithKey(r.script, "ex.promotion.b" + std::to_string(level));
+        CHECK(b != nullptr);
+        if (!b) continue;
+        CHECK(b->line.arg("n") && b->line.arg("n")->number == 5);
+        CHECK(b->line.arg("n2") && b->line.arg("n2")->number == 6);
+        checkScript(r.script, "promotion double step");
+    }
+}
+
 TEST(coach_review_repetition_tip_is_not_a_stalemate) {
     // A winning player repeats the position (level 1): the repetition tip is said, but the move is
     // not recorded as a stalemate fault, so the appraisal gives no stalemate advice about it.

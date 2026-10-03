@@ -684,7 +684,7 @@ bool promotionRace(const Ctx& c, Explanation& out) {
         put(b.line, "sq", Arg::ofSquare(prom));
         put(b.line, "your", pieceArg(c.p1, hk, c.human));
         put(b.line, "my", pieceArg(c.p1, pawn, c.human));
-        put(b.line, "n", Arg::ofNumber(std::abs(rankOf(prom) - rankOf(pawn))));
+        put(b.line, "n", Arg::ofNumber(pawnSteps));
         put(b.line, "n2", Arg::ofNumber(kingSteps));
         traceMove(b, Rook, pawn, prom, "sq");   // a straight stroke from the pawn to the square
         pointPiece(b, hk, "your");
