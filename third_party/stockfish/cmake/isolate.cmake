@@ -25,7 +25,7 @@
 # undefined, no COMDAT left, on Windows no unwind table that ld -r has broken (step 1), and no
 # section this scheme does not handle (initialiser priorities, destructor tables, thread-local
 # storage).
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 string(REPLACE "|" ";" INPUTS "${INPUTS}")
 
 # A failure removes the output, so that the next build runs the script again.

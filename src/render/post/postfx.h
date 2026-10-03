@@ -7,11 +7,12 @@
 //                display-referred image to framebuffer 0 (the backbuffer) in sRGB-encoded 8-bit.
 //
 // Frame graph (render resolution W x H, "half" = W/2 x H/2, all compute unless noted):
-//   computeAO:  depth prep (linear depth, HiZ level 0, checkerboard half-res depth + normal)
+//   computeAO:  depth prep (linear depth, HiZ level 0 when SSR is on, checkerboard half-res
+//               depth + normal)
 //               -> GTAO (half, 1-3 slices) -> temporal + edge-aware denoise (half)
 //               -> joint-bilateral upsample (full, R8) bound on TEXUNIT_AO
 //               also binds the previous frame's SSR (rgb radiance, a confidence) on TEXUNIT_SSR.
-//   resolve:    HiZ min/max pyramid -> colour pyramid -> SSR trace (half, HiZ, GGX VNDF)
+//   resolve:    HiZ min/max pyramid (SSR only) -> colour pyramid -> SSR trace (half, HiZ, GGX VNDF)
 //               -> SSR resolve (full, 4-ray reuse) -> SSR temporal
 //               -> volumetric sun shafts (half, shadow-cascade raymarch) -> temporal
 //               -> combine (HDR + SSR + volumetrics, NaN guard)
