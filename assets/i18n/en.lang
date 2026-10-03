@@ -543,10 +543,26 @@ online.forgot.lead = Enter the e-mail address of your account: we will send you 
 online.forgot.button = Send the link
 online.forgot.sent = If an account uses this address, a link is on its way.
 online.sso.title = SIGN IN WITH GOOGLE
-online.sso.wait = Continue in your web browser: sign in with Google in the window that opened. This page follows along.
+online.sso.wait = Continue in your web browser: choose your Google account in the window that opened. Scacelith takes over as soon as Google sends you back.
 online.sso.name_title = CHOOSE YOUR NAME
 online.sso.name_lead = This is your first time here with Google. Choose the name other players will see.
 online.sso.continue = Continue
+online.sso.finishing = Google sent you back. Finishing the sign-in…
+online.sso.link_title = ADD GOOGLE SIGN-IN
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = The account {0} on {1} already uses the e-mail address of this Google account. Enter this account's password to add Google sign-in to it. You only need to do this once.
+online.sso.link_button = Add Google sign-in
+online.sso.link_mfa = Google sign-in is added to this account once the code is accepted.
+online.sso.not_mine = This is not my account
+online.sso.not_mine_note = Google sign-in was not added. If this e-mail address is yours, use "Forgot password?" with it: the link goes to that mailbox. If the account also asks for a two-factor code you do not have, contact the server's operator.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: Google sign-in
+online.sso.page.done_heading = Back to Scacelith
+online.sso.page.done = Google has sent you back to Scacelith. Return to the game to finish signing in; you can close this tab.
+online.sso.page.cancelled_heading = Sign-in cancelled
+online.sso.page.cancelled = Google sign-in was cancelled. You can close this tab and go back to Scacelith.
+online.sso.page.foreign_heading = This page is not for you
+online.sso.page.foreign = This page does not match the sign-in Scacelith is waiting for on this computer. If you did not just start a Google sign-in in Scacelith, someone may have sent you this link: close this tab.
 
 # Account
 online.account.button = Account
@@ -741,6 +757,15 @@ online.err.invalid_code = This code is not right.
 online.err.expired = This request has expired: please start again.
 online.err.registration_closed = This server does not accept new accounts.
 online.err.sso_cancelled = Google sign-in was cancelled.
+online.err.sso_expired = Google sign-in took too long or was already used. Please start again.
+online.err.sso_failed = Google sign-in did not work. Please try again.
+online.err.sso_listen = Scacelith could not receive Google's answer on this computer. Please try again.
+online.err.sso_origin = Google sign-in does not work through this server address. Add the server under the public name its operator gives, then try again.
+online.err.browser = The web browser could not be opened.
+online.err.sso_email_unverified = Google has not confirmed the e-mail address of this Google account.
+online.err.sso_account_exists = An account already uses this e-mail address and cannot be linked to Google sign-in: sign in with its password, or use "Forgot password?".
+online.err.sso_already_linked = This Google account is already linked to another account.
+online.err.account_disabled = This account can no longer be used.
 online.err.server_error = The server had a problem. Please try again.
 online.err.timeout = The server did not answer in time.
 online.err.offline = Not connected to the server: try again once connected.
