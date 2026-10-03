@@ -2,8 +2,9 @@
 // server, every call of the account API batch (dedicated-server/docs/API.md sections 5 to 11,
 // net/online_client.h "account API" and "animated GIFs").
 //
-// dedicated-server/tools/live-cpp-check.js (part "account") starts the server (one shard, e-mail
-// confirmation on, the mails read from its log transport), registers the accounts, plays the games
+// The live-check harness (dedicated-server/tools/live-check, see its README), part "account",
+// starts the server (one shard, e-mail confirmation on, the mails read from its log transport),
+// registers the accounts, plays the games
 // of the C++ player's account through the realtime protocol, then runs, from the root of the source
 // tree:
 //   SCACELITH_NET_LIVE_ACCOUNT=host:port:<pin hex>:<control port> ./scacelith_tests net_live_account
@@ -1320,8 +1321,9 @@ TEST(net_live_account_api) {
 // Other server settings: without e-mail confirmation (REQUIRE_EMAIL_VERIFICATION=false) the
 // address changes at once (200 email_changed with the new address) and an address another account
 // uses is refused (409 email_taken); with GIFs turned off (GIF_ENABLED=false) both GIF routes
-// answer 404 gif_disabled. live-cpp-check.js runs it in its "game" part, on that part's server,
-// after net_live_server_game registered the player and played its game:
+// answer 404 gif_disabled. The live-check harness (dedicated-server/tools/live-check, see its
+// README) runs it in its "game" part, on that part's server, after net_live_server_game
+// registered the player and played its game:
 //   SCACELITH_NET_LIVE_SETTINGS=host:port:<pin hex>:<username>:<password>:<an address in use>:<game id>
 // The harness then finds the notice mailed to the former address in the server's log.
 TEST(net_live_account_server_settings) {
@@ -1395,8 +1397,9 @@ TEST(net_live_account_server_settings) {
 }
 
 // ---- Google sign-in by loopback redirect (opt-in) -------------------------------------------------
-// dedicated-server/tools/live-cpp-check.js (part "sso") serves the account API in its process with
-// a fake Google (the provider's endpoints injected), e-mail confirmation on, and runs
+// The live-check harness (dedicated-server/tools/live-check, see its README), part "sso", serves
+// the account API with a fake Google (the provider's endpoints injected), e-mail confirmation on,
+// and runs
 //   SCACELITH_NET_LIVE_SSO=host:port:<control port> ./scacelith_tests net_live_sso
 // over native TLS when it gives its certificate's SHA-256 in SCACELITH_NET_LIVE_SSO_PIN (the client
 // pins it), else in plain HTTP on the loopback (a development client: insecureDev).
