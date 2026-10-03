@@ -119,6 +119,7 @@ struct RequestContext {
     std::string pin;
     Handle* request = nullptr;
     std::atomic<bool> pinMismatch{false};
+    std::atomic<bool> sending{false};   // a pinned request's SENDING_REQUEST came: it may be written
     std::atomic<DWORD> secureFlags{0};
 };
 
@@ -130,6 +131,7 @@ void CALLBACK statusCallback(HINTERNET h, DWORD_PTR ctx, DWORD status, LPVOID in
     } else if (status == WINHTTP_CALLBACK_STATUS_SENDING_REQUEST && !c->pin.empty()) {
         // Every time: WinHTTP may send the request more than once (again on another connection).
         // One before the TLS connection exists (a proxy's CONNECT to come) waits for the next.
+        c->sending.store(true);
         bool noTlsYet = false;
         std::string got = leafSha256(h, &noTlsYet);
         if (pinCheckAtSend(c->pin, got, noTlsYet) == PinCheck::Mismatch) {
@@ -399,8 +401,10 @@ bool underWine() {
 }
 
 // One request on handles of its own. anyIssuer: a pinned request accepts a certificate of an
-// unknown issuer (the pin decides); pinFailed (optional): set when the certificate failed the pin.
-void perform(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel, bool anyIssuer = true, bool* pinFailed = nullptr) {
+// unknown issuer (the pin decides); pinFailed (optional): set when the certificate failed the pin;
+// sending (optional): set when a pinned request reached its SENDING_REQUEST (it may be written).
+void perform(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel, bool anyIssuer = true, bool* pinFailed = nullptr,
+             bool* sending = nullptr) {
     resp = HttpResponse();
     Handle conn, req;
     const std::string pin = r.tls ? r.pinnedSha256 : std::string();
@@ -459,6 +463,7 @@ void perform(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel, bool
     }
     abortGuard.clear();
     if (pinFailed) *pinFailed = ctx.pinMismatch.load();
+    if (sending) *sending = ctx.sending.load();
     if (cancel && cancel->cancelled()) { resp.error = "cancelled"; ok = false; }
     if (!ok) {
         resp.status = 0;
@@ -487,15 +492,16 @@ void httpRequest(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel) 
         // connection the probe verified (WinHTTP's pool), and a new connection to a self-signed
         // server fails its handshake before anything is written. When that happens (the server
         // closed the probe's connection meanwhile) the probe and the request go once more; never
-        // after a pin mismatch.
+        // after a pin mismatch, nor once the request may have been written (its SENDING_REQUEST
+        // came, which Wine sends after the handshake: never on a connection that refused the issuer).
         const bool wine = underWine();
         for (int round = 0;; ++round) {
             perform(probe, resp, cancel);
             if (!resp.error.empty()) return;   // any HTTP status will do: the pin held
             resp = HttpResponse();
-            bool pinFailed = false;
-            perform(r, resp, cancel, !wine, &pinFailed);
-            const bool refused = resp.status == 0 && (resp.error == "tls" || resp.error == "certificate") && !pinFailed;
+            bool pinFailed = false, sending = false;
+            perform(r, resp, cancel, !wine, &pinFailed, &sending);
+            const bool refused = resp.status == 0 && (resp.error == "tls" || resp.error == "certificate") && !pinFailed && !sending;
             if (!wine || !refused || round > 0) return;
             LOGI("net: %s:%u: a new connection refused its unknown issuer, checking the pin again", r.host.c_str(), unsigned(r.port));
         }
