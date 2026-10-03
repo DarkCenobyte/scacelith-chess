@@ -718,6 +718,7 @@ online.err.server_busy = サーバーが混み合っています。しばらく�
 online.err.banned_until = このアカウントは{0}まで利用停止中です。
 online.err.banned = このアカウントは利用停止中です。
 online.err.invalid_credentials = ユーザー名またはパスワードが違います。
+online.err.invalid_credentials_pending = ユーザー名またはパスワードが違います。アカウントを作成したばかりの場合は、先にお送りしたリンクを開いてください。
 online.err.email_unverified = メールアドレスがまだ確認されていません。お送りしたリンクを開いてください。
 online.err.network = サーバーに接続できません。インターネット接続とサーバーのアドレスを確認してください。
 online.err.tls = サーバーとの安全な接続を確立できませんでした。

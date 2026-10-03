@@ -438,14 +438,14 @@ void pumpResults() {
                        : (O.sub == Sub::Mfa && e.error == "invalid_code") ? Sub::Mfa
                                                                            : Sub::SignIn;
             if (O.sub != back) setSub(back);
-            O.error = game::onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs);
             // After a registration from this screen the account exists only once the mailed link is
-            // used; before that the server answers as for a wrong password, so the e-mail can be
-            // sent again from here as well (when signing in to that account).
+            // used; before that the server answers as for a wrong password, so the text says to open
+            // the link first and the e-mail can be sent again from here as well (when signing in to
+            // that account).
             const std::string who = trim(O.user);
-            O.offerResend = e.error == "email_unverified" ||
-                            (e.error == "invalid_credentials" && !O.resendEmail.empty() &&
-                             (sameAscii(who, O.resendUser) || sameAscii(who, trim(O.resendEmail))));
+            const bool registered = !O.resendEmail.empty() && (sameAscii(who, O.resendUser) || sameAscii(who, trim(O.resendEmail)));
+            O.error = game::signInErrorText(e, registered);
+            O.offerResend = e.error == "email_unverified" || (e.error == "invalid_credentials" && registered);
         } else if (e.error != "cancelled") {
             notify(game::onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs), 4.0f);
         }

@@ -717,6 +717,7 @@ online.err.server_busy = El servidor está ocupado. Vuelva a intentarlo en un mo
 online.err.banned_until = Esta cuenta está suspendida hasta {0}.
 online.err.banned = Esta cuenta está suspendida.
 online.err.invalid_credentials = Nombre de usuario o contraseña incorrectos.
+online.err.invalid_credentials_pending = Nombre de usuario o contraseña incorrectos. Si acaba de crear su cuenta, abra primero el enlace que le hemos enviado.
 online.err.email_unverified = Su dirección de correo aún no está verificada: abra el enlace que le hemos enviado.
 online.err.network = No se puede contactar con el servidor. Compruebe su conexión y la dirección del servidor.
 online.err.tls = No se ha podido establecer una conexión segura con el servidor.

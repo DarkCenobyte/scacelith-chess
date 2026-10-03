@@ -722,6 +722,7 @@ online.err.server_busy = الخادم مشغول. حاول مجددًا بعد �
 online.err.banned_until = هذا الحساب موقوف حتى {0}.
 online.err.banned = هذا الحساب موقوف.
 online.err.invalid_credentials = اسم المستخدم أو كلمة المرور غير صحيحة.
+online.err.invalid_credentials_pending = اسم المستخدم أو كلمة المرور غير صحيحة. إن كنت قد أنشأت حسابك للتو، فافتح أولًا الرابط الذي أرسلناه إليك.
 online.err.email_unverified = لم يُؤكَّد عنوان بريدك الإلكتروني بعد: افتح الرابط الذي أرسلناه إليك.
 online.err.network = تعذّر الوصول إلى الخادم. تحقّق من اتصالك ومن عنوان الخادم.
 online.err.tls = تعذّر إنشاء اتصال آمن بالخادم.

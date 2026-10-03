@@ -365,6 +365,11 @@ std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t 
     return i18n::trf("online.err.other", {code});
 }
 
+std::string signInErrorText(const net::Event& e, bool justRegistered) {
+    if (justRegistered && e.error == "invalid_credentials") return i18n::tr("online.err.invalid_credentials_pending");
+    return onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs);
+}
+
 std::string signOutEverywhereText(const net::Event& e) {
     if (e.ok) return i18n::tr("online.account.signed_out_all");
     const char* key = e.error == "unauthorized" ? "online.account.sign_out_all_failed" : "online.account.sign_out_all_retry";

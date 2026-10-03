@@ -780,6 +780,41 @@ TEST(account_sign_out_everywhere_text) {
     CHECK(i18n::setLanguage("en"));
 }
 
+// A refused sign-in: only to the account just registered from the sign-in pages does a wrong
+// password say to open the mailed link first (the account exists only once it is used); every
+// other refusal, and that one otherwise, keeps its plain text.
+TEST(account_sign_in_error_text) {
+    CHECK(i18n::setLanguage("en"));
+    net::Event e;
+    e.kind = Kind::LoginResult;
+    e.error = "invalid_credentials";
+    CHECK_EQ(signInErrorText(e, false), std::string("Wrong user name or password."));
+    CHECK_EQ(signInErrorText(e, true),
+             std::string("Wrong user name or password. If you have just signed up, open the link we sent you first."));
+    e.error = "rate_limited";
+    e.retryAfterSec = 30;
+    CHECK_EQ(signInErrorText(e, true), onlineErrorText("rate_limited", 30));
+    e.retryAfterSec = 0;
+    e.error = "banned";
+    e.account.bannedUntilMs = 4102444800000;
+    CHECK_EQ(signInErrorText(e, true), onlineErrorText("banned", 0, 4102444800000));
+    for (const char* error : {"email_unverified", "network", "invalid_code", "too_many_attempts"}) {
+        e.error = error;
+        CHECK_EQ(signInErrorText(e, true), onlineErrorText(error));
+        CHECK_EQ(signInErrorText(e, false), onlineErrorText(error));
+    }
+    e.error = "invalid_credentials";
+    for (const i18n::Language& lang : i18n::languages()) {
+        CHECK(i18n::setLanguage(lang.code));
+        CHECK_EQ(signInErrorText(e, false), onlineErrorText("invalid_credentials"));
+        CHECK_EQ(signInErrorText(e, true), std::string(i18n::tr("online.err.invalid_credentials_pending")));
+        CHECK(signInErrorText(e, true) != signInErrorText(e, false));
+        if (std::string(lang.code) != "en")
+            CHECK(std::string(i18n::tr("online.err.invalid_credentials_pending")) != i18n::english("online.err.invalid_credentials_pending"));
+    }
+    CHECK(i18n::setLanguage("en"));
+}
+
 TEST(account_export_file_name) {
     std::tm tm{};
     tm.tm_year = 2026 - 1900;

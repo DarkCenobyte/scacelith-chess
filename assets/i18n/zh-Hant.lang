@@ -717,6 +717,7 @@ online.err.server_busy = 伺服器忙碌中。請稍後再試一次。
 online.err.banned_until = 此帳號已被停權，直到 {0}。
 online.err.banned = 此帳號已被停權。
 online.err.invalid_credentials = 使用者名稱或密碼錯誤。
+online.err.invalid_credentials_pending = 使用者名稱或密碼錯誤。如果你剛剛建立帳號，請先開啟我們寄給你的連結。
 online.err.email_unverified = 你的電子郵件地址尚未驗證：請開啟我們寄給你的連結。
 online.err.network = 無法連線到伺服器。請檢查你的網路連線與伺服器位址。
 online.err.tls = 無法與伺服器建立安全連線。

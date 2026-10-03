@@ -181,6 +181,11 @@ std::string durationText(double ms);
 // "rate_limited" with the retry delay, "banned" with its end, "network", "tls", "certificate",
 // "incompatible"...); game::OnlineSession's other error texts (online_session.h) build on it.
 std::string onlineErrorText(const std::string& code, int retryAfterSec = 0, int64_t bannedUntilMs = 0);
+// A refused sign-in (LoginResult) in words. justRegistered: the player signs in to the account they
+// registered from the sign-in pages, which exists only once its mailed link is used: until then the
+// server refuses it as a wrong password (invalid_credentials), and the text says to open the link
+// first (told here only: the server never tells a waiting signup apart).
+std::string signInErrorText(const net::Event& e, bool justRegistered);
 // The answer to Sign out everywhere (LogoutResult of logout(true)) in words: done; refused with the
 // session ("unauthorized": this computer is signed out too, so the player signs in again and signs
 // the others out from the signed-in devices); or failed otherwise (network, a cut answer, 429,

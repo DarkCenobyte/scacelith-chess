@@ -717,6 +717,7 @@ online.err.server_busy = Der Server ist ausgelastet. Versuchen Sie es gleich ern
 online.err.banned_until = Dieses Konto ist bis {0} gesperrt.
 online.err.banned = Dieses Konto ist gesperrt.
 online.err.invalid_credentials = Falscher Benutzername oder falsches Passwort.
+online.err.invalid_credentials_pending = Falscher Benutzername oder falsches Passwort. Wenn Sie Ihr Konto gerade erstellt haben, öffnen Sie zuerst den Link, den wir Ihnen gesendet haben.
 online.err.email_unverified = Ihre E-Mail-Adresse ist noch nicht bestätigt: Öffnen Sie den Link, den wir Ihnen gesendet haben.
 online.err.network = Der Server ist nicht erreichbar. Prüfen Sie Ihre Verbindung und die Serveradresse.
 online.err.tls = Es konnte keine sichere Verbindung zum Server aufgebaut werden.
