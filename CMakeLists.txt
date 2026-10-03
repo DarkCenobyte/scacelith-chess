@@ -43,11 +43,11 @@ if(SCACELITH_STOCKFISH)
         message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but third_party/stockfish is missing (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
     endif()
     # The variants take GCC-only options and are isolated with GNU binutils (their isolate.cmake):
-    # another compiler, or LLVM's objcopy/objdump/nm, would fail deep in the build instead of here.
+    # another compiler, or LLVM's ld/objcopy/objdump/nm, would fail deep in the build instead of here.
     if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but the compiler is ${CMAKE_CXX_COMPILER_ID}: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
     endif()
-    foreach(tool OBJCOPY OBJDUMP NM)
+    foreach(tool LINKER OBJCOPY OBJDUMP NM)
         if(CMAKE_${tool})   # a missing one is reported by third_party/stockfish
             execute_process(COMMAND ${CMAKE_${tool}} --version OUTPUT_VARIABLE tool_version ERROR_QUIET)
             if(NOT tool_version MATCHES "^GNU ")
