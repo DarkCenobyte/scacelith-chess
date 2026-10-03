@@ -378,6 +378,7 @@ void ModelDownloader::run(Options o) {
             }
         }
     }
+    const int fetched = int(missing.size());
     std::vector<std::string> sources;
 
     // 2. The hub, file by file.
@@ -532,6 +533,7 @@ void ModelDownloader::run(Options o) {
         source = "They were already in this folder when Scacelith checked it; they are published on Hugging Face (" + hubUrl +
                  ") and in the sherpa-onnx release archive on GitHub (" + manifest_.archiveUrl + ").";
     if (!writeFolderNotices(folder_, source)) LOGW("tts: cannot write the notices in %s", folder_.c_str());
+    update([&](DownloadProgress& p) { p.fetched = fetched; });
     finish(Phase::Done, std::string(), std::string());
 }
 

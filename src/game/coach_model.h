@@ -17,7 +17,10 @@
 //          game::coachModelInit();
 //   2. Every frame, menus and table alike, after the menus and the HUD, before ui::endFrame():
 //          game::drawModelDownload();
-//          if (game::coachModelInstalled()) refreshCoachVoice();   // the voice is there now
+//          int fetched = 0;
+//          if (game::coachModelInstalled(&fetched)) coachModelDownloaded(fetched);   // the voice is there now
+//      where coachModelDownloaded stops a TTS worker that failed when coachVoiceRetry() says so,
+//      then calls refreshCoachVoice().
 //   3. Where the scene decides whether the coach can be heard (GameScene::refreshCoachVoice and
 //      initCoachArgs):
 //          coachVoiceFiles_ = game::coachVoiceWanted();   // in place of tts::modelFilesPresent()
@@ -27,6 +30,8 @@
 //   4. When the TTS worker failed to load, or its warm-up failed (tts::Worker::failed()),
 //      although coachVoiceWanted():
 //          game::coachModelLoadFailed();
+//      The download it offers checks every file; when it replaced some, the worker gets one more
+//      try (step 2).
 //   5. On exit (GameScene::shutdown; the ui viewer's coach-flow screen likewise):
 //          game::coachModelShutdown();
 //      The download stops; its .part files stay and the next download continues them.
@@ -47,8 +52,14 @@ void openModelPrompt();
 // The prompt (modal), the progress panel (top end corner) and the notices; also notices that the
 // Coach voice option was switched on. Every frame, after the menus / HUD, before ui::endFrame().
 void drawModelDownload();
-// True once after a download that ended with every file checked.
-bool coachModelInstalled();
+// True once after a download that ended with every file checked. 'fetched' (optional) receives
+// how many files it wrote (0: they were all there and right).
+bool coachModelInstalled(int* fetched = nullptr);
+// After such a download: whether a TTS worker that failed (to load, or its warm-up) is stopped so
+// that a new one starts, one more warm-up. Only when the download wrote at least one file: files
+// that all checked out would fail the same way. A worker whose new warm-up fails waits for the
+// next download that writes files (one try per such download, never a loop).
+inline bool coachVoiceRetry(bool workerFailed, int fetched) { return workerFailed && fetched > 0; }
 bool coachModelDownloading();
 // The coach can be heard as far as the option and the files go: [coach] voice on, every file
 // present (tts::modelFilesPresent) and no download running.

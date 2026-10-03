@@ -2608,7 +2608,8 @@ void GameScene::renderOverlay(AppContext&, float) {
     if (coach() && (inGame || state_ == State::Handshake)) drawCoachSubtitles();
     // The coach's voice model: its download prompt, progress panel and notices (coach_model.h).
     drawModelDownload();
-    if (coachModelInstalled()) refreshCoachVoice();   // heard from the coach's next line on
+    int fetched = 0;
+    if (coachModelInstalled(&fetched)) coachModelDownloaded(fetched);   // heard from the coach's next line on
     ui::drawNotifications();
     // No pointer while the view goes over to the other player (hot-seat): the arrow stays hidden.
     if (osCursorHidden_ && !(hotSeat() && handover_.active()) &&
