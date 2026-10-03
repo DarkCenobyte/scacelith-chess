@@ -1033,6 +1033,87 @@ TEST(net_sys_user_data_directory_private) {
 #endif
 
 // =============================================================================================
+// Files (net::sys)
+// =============================================================================================
+
+// A file another thread keeps reading (the game reading the logins while net-http saves them) is
+// still replaced at every write, and every read gets one whole version. On Windows a replace fails
+// while the file is open: the write tries again until the reader has closed it.
+TEST(net_sys_write_file_atomic_while_read) {
+    const std::string path = net::sys::exeDirectory() + "net-test-atomic-read.txt";
+    struct Removed {
+        std::string path;
+        ~Removed() { net::sys::removeFile(path); }
+    } removed{path};
+    auto version = [](int i) { return std::string(2000 + i, char('a' + i % 26)); };
+    REQUIRE(net::sys::writeFileAtomic(path, version(0), false));
+    std::atomic<bool> stop{false};
+    std::atomic<int> reads{0}, torn{0};
+    std::thread reader([&] {
+        while (!stop.load()) {
+            std::string got;
+            if (net::sys::readFile(path, got, 1 << 20)) {
+                ++reads;
+                if (got.empty() || got != version(int(got.size()) - 2000)) ++torn;
+            }
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    });
+    int failed = 0;
+    for (int i = 1; i <= 100; ++i) {
+        if (!net::sys::writeFileAtomic(path, version(i), false)) ++failed;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    stop.store(true);
+    reader.join();
+    std::fprintf(stderr, "  100 writes, %d reads beside them\n", reads.load());
+    CHECK_EQ(failed, 0);
+    CHECK_EQ(torn.load(), 0);
+    CHECK(reads.load() > 0);
+    std::string last;
+    CHECK(net::sys::readFile(path, last, 1 << 20) && last == version(100));
+}
+
+#ifdef _WIN32
+// Another program holding the file open without delete sharing for a moment (an antivirus scan,
+// a backup tool) delays the write instead of failing it; one that keeps it open fails it in the
+// end, leaving the old content.
+TEST(net_sys_write_file_atomic_waits_for_another_program) {
+    const std::string path = net::sys::exeDirectory() + "net-test-atomic-held.txt";
+    struct Removed {
+        std::string path;
+        ~Removed() { net::sys::removeFile(path); }
+    } removed{path};
+    REQUIRE(net::sys::writeFileAtomic(path, "old", false));
+    const std::wstring wide = net::sys::widen(path);
+    auto hold = [&] {
+        return CreateFileW(wide.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING,
+                           FILE_ATTRIBUTE_NORMAL, nullptr);
+    };
+    HANDLE h = hold();
+    REQUIRE(h != INVALID_HANDLE_VALUE);
+    std::thread release([h] {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        CloseHandle(h);
+    });
+    auto t0 = std::chrono::steady_clock::now();
+    CHECK(net::sys::writeFileAtomic(path, "new", false));
+    double ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    release.join();
+    std::fprintf(stderr, "  written %.0f ms after the first try\n", ms);
+    CHECK(ms >= 150);
+    std::string got;
+    CHECK(net::sys::readFile(path, got, 64) && got == "new");
+    h = hold();
+    REQUIRE(h != INVALID_HANDLE_VALUE);
+    CHECK(!net::sys::writeFileAtomic(path, "newer", false));
+    CloseHandle(h);
+    CHECK(net::sys::readFile(path, got, 64) && got == "new");
+    CHECK(!net::sys::fileExists(path + ".tmp"));
+}
+#endif
+
+// =============================================================================================
 // Credential store
 // =============================================================================================
 
