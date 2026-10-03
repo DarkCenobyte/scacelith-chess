@@ -4690,6 +4690,20 @@ TEST(net_credentials_origin_move) {
     net::sys::removeFile(path);
 }
 
+// WinHTTP's pin check at each SENDING_REQUEST (transport_win32.cpp): a notification that comes
+// before the TLS connection exists (through a proxy whose CONNECT is still to be made) is left for
+// the next one; anything else without the pinned leaf aborts the request.
+TEST(net_pin_check_at_send) {
+    const std::string pin(64, 'a'), other(64, 'b');
+    CHECK(net::pinCheckAtSend(pin, pin, false) == net::PinCheck::Match);
+    CHECK(net::pinCheckAtSend(pin, other, false) == net::PinCheck::Mismatch);
+    CHECK(net::pinCheckAtSend(pin, pin.substr(0, 63), false) == net::PinCheck::Mismatch);
+    CHECK(net::pinCheckAtSend(pin, "", false) == net::PinCheck::Mismatch);     // no certificate: refused
+    CHECK(net::pinCheckAtSend(pin, "", true) == net::PinCheck::Later);         // no TLS yet: the next one decides
+    CHECK(net::pinCheckAtSend(pin, other, true) == net::PinCheck::Mismatch);   // a certificate read decides
+    CHECK(net::pinCheckAtSend(pin, pin, true) == net::PinCheck::Match);
+}
+
 // TLS certificate rules against a real TLS server, opt-in because the test cannot start one on
 // every platform by itself. Needs a self-signed certificate for localhost and 127.0.0.1:
 //   openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:P-256 -nodes -days 2 -subj /CN=localhost

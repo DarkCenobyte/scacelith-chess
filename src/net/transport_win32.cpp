@@ -6,9 +6,10 @@
 //     certificate (WINHTTP_OPTION_SERVER_CERT_CONTEXT, CERT_SHA256_HASH_PROP_ID) is compared
 //     with the pin in every WINHTTP_CALLBACK_STATUS_SENDING_REQUEST notification, after the TLS
 //     handshake and before the request is written; a mismatch closes the request handle there,
-//     which aborts the send (the approach of .NET's WinHttpHandler). The pin is checked again
-//     once the response has arrived. Wine's WinHTTP sends the request anyway after that close,
-//     so a pinned request that carries anything (Authorization header, body) is preceded by a
+//     which aborts the send (the approach of .NET's WinHttpHandler). Through a proxy, one can come
+//     before its CONNECT has made the TLS connection: it is left for the next one, as .NET does
+//     (pinCheckAtSend, transport.h). The pin is checked again once the response has arrived.
+//     Wine's WinHTTP sends the request anyway after that close, so a pinned request that carries anything (Authorization header, body) is preceded by a
 //     "HEAD /" probe without either: a server that fails the pin gets the probe only, and the
 //     real request normally reuses the probe's verified keep-alive connection. Under Wine that
 //     reuse is all the protection: an active attacker that relays the probe to the real server,
@@ -89,10 +90,16 @@ private:
     std::atomic<HINTERNET> h_;
 };
 
-std::string leafSha256(HINTERNET request) {
+// The SHA-256 (hex) of the server's leaf certificate, "" when it cannot be read; noTlsYet then tells
+// whether that is because the request has no TLS connection yet (a proxy's CONNECT to come).
+std::string leafSha256(HINTERNET request, bool* noTlsYet = nullptr) {
     PCCERT_CONTEXT cert = nullptr;
     DWORD size = sizeof(cert);
-    if (!WinHttpQueryOption(request, WINHTTP_OPTION_SERVER_CERT_CONTEXT, &cert, &size) || !cert) return std::string();
+    SetLastError(ERROR_SUCCESS);   // Wine's WinHTTP fails this query without setting an error
+    if (!WinHttpQueryOption(request, WINHTTP_OPTION_SERVER_CERT_CONTEXT, &cert, &size) || !cert) {
+        if (noTlsYet) *noTlsYet = GetLastError() == ERROR_WINHTTP_INCORRECT_HANDLE_STATE;
+        return std::string();
+    }
     BYTE hash[32];
     DWORD len = sizeof(hash);
     std::string out;
@@ -118,8 +125,10 @@ void CALLBACK statusCallback(HINTERNET h, DWORD_PTR ctx, DWORD status, LPVOID in
         c->secureFlags.store(*static_cast<DWORD*>(info));
     } else if (status == WINHTTP_CALLBACK_STATUS_SENDING_REQUEST && !c->pin.empty()) {
         // Every time: WinHTTP may send the request more than once (again on another connection).
-        std::string got = leafSha256(h);
-        if (got.empty() || !crypto::constantTimeEqual(got, c->pin)) {
+        // One before the TLS connection exists (a proxy's CONNECT to come) waits for the next.
+        bool noTlsYet = false;
+        std::string got = leafSha256(h, &noTlsYet);
+        if (pinCheckAtSend(c->pin, got, noTlsYet) == PinCheck::Mismatch) {
             LOGW("net: pinned certificate mismatch (server presents %s)", got.empty() ? "?" : got.c_str());
             c->pinMismatch.store(true);
             c->request->close();   // abort before the request (headers, token, body) is written

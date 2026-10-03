@@ -1,5 +1,6 @@
 // Platform-independent parts of transport.h.
 #include "transport.h"
+#include "crypto.h"
 #include <cctype>
 
 namespace net {
@@ -99,6 +100,11 @@ std::string hostHeader(const std::string& host, uint16_t port, bool tls) {
     std::string h = host.find(':') != std::string::npos ? "[" + host + "]" : host;
     if ((tls && port == 443) || (!tls && port == 80)) return h;
     return h + ":" + std::to_string(port);
+}
+
+PinCheck pinCheckAtSend(const std::string& pin, const std::string& leaf, bool noTlsYet) {
+    if (leaf.empty()) return noTlsYet ? PinCheck::Later : PinCheck::Mismatch;
+    return crypto::constantTimeEqual(leaf, pin) ? PinCheck::Match : PinCheck::Mismatch;
 }
 
 }  // namespace net
