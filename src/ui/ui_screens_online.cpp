@@ -1008,7 +1008,11 @@ void pageAccount(float t) {
     }
     ty += 14.0f;
     gfx::hlineFade(rx, rx + col2W, ty, withAlpha(gold, 0.3f), 0.2f);
-    float rowH = std::min(46.0f, (footerY(p) - 100.0f - ty) / float(std::max<size_t>(cats.size(), 1)));
+    // The rows share what the note under them leaves (two lines in some languages), so that its
+    // last line stays clear of the message line.
+    TextStyle ns = style(font::FACE_ITALIC, kCaption, muted, im::startAlign());
+    const int noteLines = gfx::wrapLineCount(T("online.account.provisional"), col2W, ns);
+    float rowH = std::min(46.0f, (footerY(p) - 100.0f - 26.0f * float(noteLines) - ty) / float(std::max<size_t>(cats.size(), 1)));
     TextStyle vs = style(font::FACE_TEXT, 25.0f, ivory, HAlign::Center);
     for (size_t i = 0; i < cats.size(); ++i) {
         const net::RatingInfo* r = s.rating(cats[i]);
@@ -1028,7 +1032,6 @@ void pageAccount(float t) {
         gfx::text(rec, im::flipX(tcol, cx[3] + col2W * 0.1f), by, gs);
     }
     if (cats.empty()) spinner(vec2(rx + col2W * 0.5f, ty + 40.0f));
-    TextStyle ns = style(font::FACE_ITALIC, kCaption, muted, im::startAlign());
     float noteY = ty + rowH * float(cats.size()) + 38.0f;
     gfx::textWrapped(T("online.account.provisional"), im::flipX(tcol, rx), noteY, col2W, ns, 26.0f);
     float my = footerY(p) - 50.0f;
