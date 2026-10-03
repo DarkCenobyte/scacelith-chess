@@ -192,8 +192,9 @@ public:
         if (!s_.coachVoiceFiles_) return;
         // A worker that failed to load is tried again (the model files may have arrived since),
         // between lines (nothing queued would be lost). One whose warm-up failed is not: files that
-        // load but cannot speak would be loaded again for every line. One such failure per session,
-        // then subtitles (the files are offered for a check once, coachModelLoadFailed).
+        // load but cannot speak would be loaded again for every line. One such failure, then
+        // subtitles (the files are offered for a check once, coachModelLoadFailed), until a download
+        // replaces model files (GameScene::coachModelDownloaded).
         if (r.workerStarted && (!r.worker.failed() || r.worker.warmUpFailed())) return;
         if (r.workerStarted && (!r.speechIds.empty() || r.worker.pending() > 0)) return;
         const Settings& st = settings();
@@ -596,6 +597,19 @@ void GameScene::refreshCoachVoice() {
     // speech only once the voice is available).
     if (coachVoiceFiles_ && coach() && coach_ && coach_->sessionRunning && !coach_->workerStarted)
         coach_->stage->ensureWorker();
+}
+
+void GameScene::coachModelDownloaded(int fetched) {
+    // Model files replaced by the download: a worker that failed, its warm-up included, gets one
+    // more try (ensureWorker starts a new one now in a coach game, else with the next one). Its
+    // requests fail meanwhile (subtitles).
+    if (coach_ && coach_->workerStarted && coachVoiceRetry(coach_->worker.failed(), fetched)) {
+        coach_->stage->cancelSpeech(0);
+        coach_->worker.stop();
+        coach_->workerStarted = false;
+        LOGI("coach: %d voice model file(s) replaced, the voice is tried again", fetched);
+    }
+    refreshCoachVoice();
 }
 
 bool GameScene::coachVoiceExpected() const {

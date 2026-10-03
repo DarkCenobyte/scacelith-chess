@@ -2167,6 +2167,7 @@ TEST(tts_worker_warm_up_failure) {
     }
     std::string ix;
     CHECK(net::sys::readFile(modelDir() + tts::Engine::kFiles[tts::kFileIndexer], ix, size_t(1) << 20));
+    const std::string intact = ix;
     for (size_t i = 0; i + 4 <= ix.size(); i += 4) {
         int32_t id;
         std::memcpy(&id, ix.data() + i, 4);
@@ -2187,6 +2188,14 @@ TEST(tts_worker_warm_up_failure) {
         settle(w);
         CHECK(w.failed() && w.warmUpFailed() && !w.ready());
         CHECK_EQ(w.request("Hello.", "en"), 0u);
+        // A download replaced the damaged file: the same worker started again warms up and speaks
+        // (GameScene::coachModelDownloaded gives it that one more try). Stopped first, as in the
+        // game, so its thread has unmapped the files before the replacement.
+        w.stop();
+        CHECK(net::sys::writeFileAtomic(dir + tts::Engine::kFiles[tts::kFileIndexer], intact, false));
+        CHECK(w.start(tts::Options()));
+        settle(w);
+        CHECK(w.ready() && !w.failed() && !w.warmUpFailed());
     }
     tts::setModelFolder(dir + "missing/");
     {

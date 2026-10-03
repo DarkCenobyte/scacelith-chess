@@ -20,6 +20,7 @@ struct ModelUi {
     bool promptOpen = false;
     bool lastVoice = true;         // [coach] voice as last seen (switched on: offer the download)
     bool installed = false;        // coachModelInstalled() not yet read
+    int fetched = 0;               // the files the last finished download wrote
     bool suspect = false;          // the worker could not load files that looked complete
     bool checked = false;          // a download job checked every file this session
     bool watching = false;         // a job's end has not been handled yet
@@ -67,6 +68,7 @@ void finishJob(const tts::DownloadProgress& p) {
     switch (p.phase) {
         case Phase::Done:
             u.installed = true;
+            u.fetched = p.fetched;
             u.checked = true;
             u.suspect = false;
             ui::notify(i18n::tr("coach.download.done"), 5.0f);
@@ -138,10 +140,11 @@ bool coachModelNeedsPrompt() {
 
 void openModelPrompt() { state().promptOpen = true; }
 
-bool coachModelInstalled() {
+bool coachModelInstalled(int* fetched) {
     ModelUi& u = state();
     bool r = u.installed;
     u.installed = false;
+    if (fetched) *fetched = r ? u.fetched : 0;
     return r;
 }
 

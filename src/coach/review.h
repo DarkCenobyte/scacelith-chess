@@ -98,6 +98,7 @@ struct PlyVerdict {
     bool check = false;
     bool only = false, brilliant = false, great = false, goodCapture = false;
     bool mateMissed = false, mateAllowed = false;
+    bool hastensMate = false;        // lost to a mate either way, but sooner than after the best move
     bool voiced = false, offered = false, praised = false;
 };
 

@@ -193,7 +193,8 @@ director's marks (`World::submitCoachMarks`, piece highlights through `submitPie
 
 * **Voice.** One `tts::Worker` (started when the coach mode is first used; each line carries its
   own speed, so the lesson's slower rate needs no reload; a worker whose load failed is tried
-  again between lines, one whose warm-up failed not for the rest of the session; stopped before
+  again between lines, one whose warm-up failed is tried once more only after a download that
+  replaced model files (`GameScene::coachModelDownloaded`, `game::coachVoiceRetry`); stopped before
   `audio::shutdown`). The director requests each line's synthesis ahead of time; the scene plays
   the PCM as one streamed audio voice from the coach's mouth. The speech clock is the audio
   engine's (`played` minus the output latency) while a device plays it, else the game's time; a
@@ -206,7 +207,9 @@ director's marks (`World::submitCoachMarks`, piece highlights through `submitPie
   (`src/net/download.h`) streams each file, follows the hosts' redirects (the online client never
   does) and resumes with `Range`.
   The scene calls `drawModelDownload()` every frame and re-reads `coachVoiceWanted()`
-  (`refreshCoachVoice`) after a download or an options change.
+  (`refreshCoachVoice`) after an options change. After a download it calls
+  `coachModelDownloaded(fetched)`, which stops a failed worker when the download wrote at least one
+  file (`DownloadProgress::fetched`), then calls `refreshCoachVoice`.
 * **Body.** Gestures become animator tasks on the coach's playing arm (`Point`, `Trace`,
   `Gesture`) scheduled with `notBefore` so that their apex lands on the word (`anchorTime`); nods
   and head shakes are timed separately; the speech level drives the mouth and a blink ends each

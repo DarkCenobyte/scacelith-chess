@@ -366,6 +366,7 @@ private:
     bool legalHints() const;
     void initCoachArgs();                     // command line: --coach and its options
     void refreshCoachVoice();                 // are the voice's model files there (tts::modelFilesPresent)
+    void coachModelDownloaded(int fetched);   // a download ended: a failed voice may get one more try
     CoachRuntime& coachRuntime();             // created on first use: the voice starts loading
     bool coachVoiceExpected() const;          // the voice files are there (the coach page's notice)
     void setupCoachGame();                    // part of setupNewGame() for a coach game

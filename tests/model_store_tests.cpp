@@ -6,6 +6,7 @@
 #include "test.h"
 #include "http_fake.h"
 #include "core/ini.h"
+#include "game/coach_model.h"
 #include "game/settings.h"
 #include "net/crypto.h"
 #include "net/net_sys.h"
@@ -526,6 +527,7 @@ TEST(model_store_downloads_from_the_hub) {
     CHECK(!r.last.fromArchive && r.last.hubError.empty());
     CHECK(!r.phases.count(int(Phase::Archive)) && !r.phases.count(int(Phase::Extracting)));
     CHECK_EQ(r.last.sourceLabel, std::string("127.0.0.1/csukuangfj2/repo"));
+    CHECK_EQ(r.last.fetched, 9);
     CHECK(allGood(t));
     CHECK_EQ(int(tts::verifyModel(hosts.manifest(), t.dir)), int(tts::ModelStatus::Ready));
     // The notices: where the files came from, the licences.
@@ -546,6 +548,7 @@ TEST(model_store_downloads_from_the_hub) {
     CHECK_EQ(int(r.last.phase), int(Phase::Done));
     CHECK(!r.phases.count(int(Phase::Hub)) && !r.phases.count(int(Phase::Archive)));
     CHECK_EQ(hosts.srv.requests().size(), before);
+    CHECK_EQ(r.last.fetched, 0);
     CHECK(slurp(t.dir + "README.txt").find("already in this folder") != std::string::npos);
     // A damaged file and a missing one: only those two are fetched again.
     std::string c = fakeContent(3);
@@ -555,6 +558,7 @@ TEST(model_store_downloads_from_the_hub) {
     r = runJob(d);
     CHECK_EQ(int(r.last.phase), int(Phase::Done));
     CHECK(allGood(t));
+    CHECK_EQ(r.last.fetched, 2);
     auto reqs = hosts.srv.requests();
     CHECK(reqs.size() > before);
     for (size_t i = before; i < reqs.size(); ++i) {
@@ -587,6 +591,7 @@ TEST(model_store_falls_back_to_the_archive) {
         CHECK_EQ(r.last.hubError, std::string(c.hubError));
         CHECK_EQ(r.last.sourceLabel, std::string("127.0.0.1 (release archive)"));
         CHECK(allGood(t));
+        CHECK_EQ(r.last.fetched, 9);   // from the hub and from the archive alike
         CHECK(!t.has(std::string(kFolder) + ".tar.bz2") && !t.has(std::string(kFolder) + ".tar.bz2.part"));   // deleted
         CHECK(!t.has("extra-notes.txt"));
         std::string readme = slurp(t.dir + "README.txt");
@@ -717,6 +722,16 @@ TEST(model_store_resumes_and_cancels) {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
     CHECK(std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() < 1.5);
+}
+
+TEST(coach_voice_retry_after_a_download) {
+    // A worker that failed (to load, or its warm-up) gets one more try after a download that wrote
+    // files; one that found every file right changes nothing, and a working voice is left alone.
+    CHECK(game::coachVoiceRetry(true, 1));
+    CHECK(game::coachVoiceRetry(true, 9));
+    CHECK(!game::coachVoiceRetry(true, 0));
+    CHECK(!game::coachVoiceRetry(false, 2));
+    CHECK(!game::coachVoiceRetry(false, 0));
 }
 
 // [coach] voice: on by default, kept off once the player declined the download.
