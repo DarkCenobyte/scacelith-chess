@@ -26,7 +26,7 @@ public:
     const std::vector<LightProbeDesc>& probes() const { return probes_; }
     bool baked() const { return baked_; }
     void invalidate() { baked_ = false; }
-    // Full synchronous bake. Needs the sun shadows rendered and the sky captured this frame.
+    // Full synchronous bake. Needs the sun shadows rendered and the atmosphere LUTs updated this frame.
     void bake(Renderer& r, int bounces);
     // Probe section of the LightingUBO (mode: 1 when baked, else 0 = hemisphere fallback).
     void fillUBO(LightingUBOData& lub, float exposure, bool enabled) const;
