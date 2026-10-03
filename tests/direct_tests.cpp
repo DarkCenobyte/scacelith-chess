@@ -2391,6 +2391,83 @@ struct StderrHold {
 
 }  // namespace
 
+TEST(direct_guest_orders_game_events_by_gseq) {
+    // The guest applies the host's game events in gseq order (PROTOCOL.md, "Ordering: gseq"), the
+    // authority's messages relayed by hand: the next event applies; one its state already holds (a
+    // repeated confirmation, an event its snapshot includes) is ignored; one beyond the next is not
+    // applied and the guest asks for a Resync; so is a MoveMade of the next gseq for a later ply.
+    using K = Event::Kind;
+    Room r(tc(300, 0), 1);   // the host plays White
+    r.start();
+    const std::vector<std::vector<uint8_t>>& toGuest = r.msgs[GuestSide];
+    RawHost raw;
+    CHECK(raw.listen());
+    Peer guest, nobody;
+    guest.dm.join("127.0.0.1", raw.port, raw.code, "Bob");
+    P::Hello hello;
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    P::Welcome w;
+    w.proto = P::kProtocolVersion;
+    w.serverTime = sock::epochMs();
+    w.userId = 2;
+    w.username = "Bob";
+    w.serverName = "Alice";
+    w.heartbeatMs = 2000;
+    w.clientPingMs = 2000;
+    w.maxMsgPerSec = 40;
+    w.activeGame = r.a.gameId();
+    CHECK(raw.send(w));
+    auto relay = [&](size_t i) { return i < toGuest.size() && raw.sendBytes(toGuest[i]); };
+    CHECK(relay(0));                                    // the snapshot, gseq 0
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(K::GameSnapshot) == 1; }));
+
+    r.move(HostSide, "e2e4");                           // MoveMade, gseq 1
+    CHECK(relay(1));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.hasMove(0); }));
+    CHECK(guest.last(K::MoveMade) && guest.last(K::MoveMade)->game.gseq == 1);
+    // The repeated confirmation, then the next event: only the latter shows.
+    P::DrawOffer offer;
+    offer.game = r.a.gameId();
+    r.send(HostSide, offer);                            // GameEvent DrawOffered, gseq 2
+    CHECK(relay(1) && relay(2));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(K::GameEvent) == 1; }));
+    CHECK_EQ(guest.count(K::MoveMade), 1);
+    CHECK(guest.dm.currentGame() && guest.dm.currentGame()->gseq == 2 && guest.dm.currentGame()->drawOfferBy == 0);
+
+    // The guest moves: MoveMade (gseq 3), then DrawDeclined (gseq 4, the move declines the offer).
+    // Only the second reaches it: not applied, a Resync instead.
+    r.move(GuestSide, "e7e5");
+    CHECK_EQ(toGuest.size(), size_t(5));
+    CHECK(relay(4));
+    P::Resync rs;
+    CHECK(raw.waitFor(rs, 5000) && rs.game == r.a.gameId());
+    r.send(GuestSide, rs);                              // the snapshot, gseq 4
+    CHECK(relay(5));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(K::GameSnapshot) == 2; }));
+    const Event* snap = guest.last(K::GameSnapshot);
+    CHECK(snap && snap->game.gseq == 4 && snap->game.moves.size() == 2 && snap->game.drawOfferBy == 2);
+    CHECK_EQ(guest.count(K::GameEvent), 1);            // the DrawDeclined was not applied
+
+    // What the snapshot holds is ignored; the next event applies.
+    r.move(HostSide, "g1f3");                           // MoveMade, gseq 5
+    CHECK(relay(3) && relay(4) && relay(6));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.hasMove(2); }));
+    CHECK_EQ(guest.count(K::MoveMade), 2);             // plies 0 and 2: the confirmation of ply 1 (gseq 3) was ignored
+    CHECK_EQ(guest.count(K::GameEvent), 1);
+    CHECK(guest.last(K::MoveMade) && guest.last(K::MoveMade)->game.gseq == 5);
+
+    // The next gseq for a later ply than the next: a Resync too, nothing applied.
+    P::MoveMade ahead;
+    CHECK(toGuest.size() == 7 && P::decode(toGuest[6].data(), toGuest[6].size(), ahead));
+    ahead.gseq = 6;
+    ahead.ply = 4;
+    CHECK(raw.send(ahead));
+    CHECK(raw.waitFor(rs, 5000) && rs.game == r.a.gameId());
+    guest.drain();
+    CHECK_EQ(guest.count(K::MoveMade), 2);
+    CHECK(guest.dm.currentGame() && guest.dm.currentGame()->gseq == 5 && guest.dm.currentGame()->moves.size() == 3);
+}
+
 TEST(direct_guest_gesture_at_once_after_reconnecting) {
     // The guest's game thread sends a Gesture the moment it sees Online again after a
     // reconnection (the scene does: the host waits for one sent after the return). The link is up

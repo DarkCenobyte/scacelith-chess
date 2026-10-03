@@ -300,6 +300,7 @@ uint32_t positionDigest(const std::string& fen) {
 OnlineGame onlineGameFromSnapshot(const pr::GameSnapshot& s) {
     OnlineGame g;
     g.id = s.game;
+    g.gseq = s.gseq;
     g.category = s.category;
     g.baseMs = s.baseMs;
     g.incMs = s.incMs;
@@ -1244,6 +1245,18 @@ struct OnlineClient::Impl {
         return ev;
     }
 
+    // Whether a game event numbered gseq is the next one of the game shown (PROTOCOL.md, "Ordering:
+    // gseq"). One the state already holds (a MoveMade sent again, an event the snapshot includes)
+    // is ignored; one beyond the next means an event was missed, and the state is asked again.
+    bool nextEvent(uint32_t gseq) {
+        if (gseq <= rt.game.gseq) return false;
+        if (gseq != rt.game.gseq + 1) {
+            resync(rt.game.id);
+            return false;
+        }
+        return true;
+    }
+
     void handleMessage(const std::vector<uint8_t>& b) {
         pr::MsgType t;
         const uint8_t* p = b.data();
@@ -1397,8 +1410,9 @@ struct OnlineClient::Impl {
             if (!pr::decode(p, n, m)) return bad();
             OnlineGame& g = rt.game;
             if (m.game != g.id) { resync(m.game); return; }
-            if (m.ply < g.moves.size()) return;                     // already known (resent)
-            if (m.ply > g.moves.size()) { resync(m.game); return; } // missed something
+            if (!nextEvent(m.gseq)) return;
+            if (m.ply != g.moves.size()) { resync(m.game); return; }   // the next event, not the next ply
+            g.gseq = m.gseq;
             int mover = m.ply & 1;
             g.moves.push_back({m.move, m.spentMs, mover == 0 ? m.whiteMs : m.blackMs});
             g.whiteMs = m.whiteMs;
@@ -1439,6 +1453,8 @@ struct OnlineClient::Impl {
             if (!pr::decode(p, n, m)) return bad();
             OnlineGame& g = rt.game;
             if (m.game == g.id) {
+                if (!nextEvent(m.gseq)) return;
+                g.gseq = m.gseq;
                 int c = int(m.color);
                 switch (m.kind) {
                 case pr::GameEventKind::DrawOffered: g.drawOfferBy = c; break;
@@ -1470,6 +1486,8 @@ struct OnlineClient::Impl {
             if (!pr::decode(p, n, m)) return bad();
             OnlineGame& g = rt.game;
             if (m.game == g.id) {
+                if (!nextEvent(m.gseq)) return;
+                g.gseq = m.gseq;
                 g.status = int(m.status);
                 g.reason = int(m.reason);
                 g.whiteMs = m.whiteMs;

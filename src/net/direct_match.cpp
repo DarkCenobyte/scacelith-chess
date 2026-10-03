@@ -59,6 +59,17 @@ struct ClientView {
     bool have = false;
     bool needResync = false;
 
+    // Whether a game event numbered gseq is the next one (PROTOCOL.md, "Ordering: gseq"): one the
+    // state already holds is ignored, one beyond the next means an event was missed (Resync).
+    bool nextEvent(uint32_t gseq) {
+        if (gseq <= game.gseq) return false;
+        if (gseq != game.gseq + 1) {
+            needResync = true;
+            return false;
+        }
+        return true;
+    }
+
     bool apply(const uint8_t* p, size_t n, Event& ev) {
         P::MsgType t;
         if (!P::peekType(p, n, t)) return false;
@@ -75,9 +86,9 @@ struct ClientView {
         }
         case P::MsgType::MoveMade: {
             P::MoveMade m;
-            if (!P::decode(p, n, m) || !have || m.game != game.id) return false;
-            if (size_t(m.ply) < game.moves.size()) return false;                    // a repeated confirmation
-            if (size_t(m.ply) > game.moves.size()) { needResync = true; return false; }
+            if (!P::decode(p, n, m) || !have || m.game != game.id || !nextEvent(m.gseq)) return false;
+            if (size_t(m.ply) != game.moves.size()) { needResync = true; return false; }   // the next event, not the next ply
+            game.gseq = m.gseq;
             const int mover = m.ply % 2;
             game.moves.push_back({m.move, m.spentMs, mover == 0 ? m.whiteMs : m.blackMs});
             game.whiteMs = m.whiteMs;
@@ -106,7 +117,8 @@ struct ClientView {
         }
         case P::MsgType::GameEvent: {
             P::GameEvent e;
-            if (!P::decode(p, n, e) || !have || e.game != game.id) return false;
+            if (!P::decode(p, n, e) || !have || e.game != game.id || !nextEvent(e.gseq)) return false;
+            game.gseq = e.gseq;
             const int color = int(e.color);
             switch (e.kind) {
             case P::GameEventKind::DrawOffered: game.drawOfferBy = color; break;
@@ -128,7 +140,8 @@ struct ClientView {
         }
         case P::MsgType::GameEnd: {
             P::GameEnd e;
-            if (!P::decode(p, n, e) || !have || e.game != game.id) return false;
+            if (!P::decode(p, n, e) || !have || e.game != game.id || !nextEvent(e.gseq)) return false;
+            game.gseq = e.gseq;
             game.status = int(e.status);
             game.reason = int(e.reason);
             game.whiteMs = e.whiteMs;

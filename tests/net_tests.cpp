@@ -1616,6 +1616,7 @@ public:
     std::atomic<bool> autoPress{true};                        // GameSnapshot.autoPress
     std::atomic<bool> seqOk{true};                            // every client message came numbered in order
     std::atomic<bool> loginToken2{false};                     // sign-ins answer token2 (another session)
+    std::atomic<int> resyncs{0};                              // Resync requests (each answered with a snapshot)
 
     // The C_Gesture frames received, with their arrival time.
     struct GestureIn {
@@ -1636,6 +1637,14 @@ public:
         script_.assign(steps.begin(), steps.end());
     }
     std::string serverId() const { return "srv-" + std::to_string(serverNo.load()); }
+    // The gseq of the game's last event, which the next snapshot carries (the events a test sends
+    // with sendToClients do not change it).
+    void setGseq(uint32_t gseq) { gseq_.store(gseq); }
+    // A server message on every WebSocket.
+    template <class M> void sendToClients(const M& m) {
+        std::lock_guard<std::mutex> lk(mu_);
+        for (Sock s : ws_) sendMsg(s, m);
+    }
 
     bool start() {
 #ifdef _WIN32
@@ -2090,6 +2099,11 @@ private:
                 if (!pr::decode(p, n, m)) return;
                 std::lock_guard<std::mutex> lk(gestureMu_);
                 gestures_.push_back({m, std::chrono::steady_clock::now()});
+            } else if (t == pr::MsgType::Resync) {
+                pr::Resync m;
+                if (!pr::decode(p, n, m)) return;
+                ++resyncs;
+                sendSnapshot(s, gseq);
             } else if (t == pr::MsgType::Resign) {
                 pr::Resign m;
                 if (!pr::decode(p, n, m)) return;
@@ -2986,6 +3000,89 @@ void gestureDownScenario(PacingRig& r) {
              "online again: the next one goes");
 }
 
+// Game events apply in gseq order (PROTOCOL.md, "Ordering: gseq"): the next one applies and its
+// gseq becomes the state's; one the state already holds (an event of the snapshot, a MoveMade sent
+// again) is ignored, without a Resync; one beyond the next is not applied, and the client asks for
+// a Resync, which the server answers with a snapshot. A MoveMade of the next gseq for another ply
+// than the next one asks for a Resync too.
+void gseqScenario(PacingRig& r) {
+    using K = net::Event::Kind;
+    net::Event ev;
+    r.srv.setGseq(40);
+    if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    r.expect(ev.game.gseq == 40, "the snapshot's gseq (" + std::to_string(ev.game.gseq) + ")");
+    auto gameEvent = [&](uint32_t gseq, pr::GameEventKind kind) {
+        pr::GameEvent e;
+        e.game = 77;
+        e.gseq = gseq;
+        e.kind = kind;
+        e.color = pr::Color::Black;
+        r.srv.sendToClients(e);
+    };
+    auto moveMade = [&](uint32_t gseq, uint16_t ply) {
+        pr::MoveMade m;
+        m.game = 77;
+        m.gseq = gseq;
+        m.ply = ply;
+        m.move = ply % 2 == 0 ? net::packMove(12, 28, 0) : net::packMove(52, 36, 0);
+        m.whiteMs = m.blackMs = 180000;
+        m.serverTime = epochMs() + FakeServer::kSkewMs;
+        r.srv.sendToClients(m);
+    };
+    auto gameEnd = [&](uint32_t gseq) {
+        pr::GameEnd e;
+        e.game = 77;
+        e.gseq = gseq;
+        e.status = pr::GameStatus::Draw;
+        e.reason = pr::EndReason::Agreement;
+        e.serverTime = epochMs() + FakeServer::kSkewMs;
+        r.srv.sendToClients(e);
+    };
+    // The game events among those polled.
+    auto shown = [](const std::vector<net::Event>& seen) {
+        int n = 0;
+        for (const net::Event& e : seen)
+            n += e.kind == K::GameSnapshot || e.kind == K::MoveMade || e.kind == K::GameEvent || e.kind == K::GameEnd;
+        return n;
+    };
+    std::vector<net::Event> seen;
+
+    gameEvent(41, pr::GameEventKind::DrawOffered);
+    r.expect(waitEvent(*r.c, K::GameEvent, ev, 3000) && ev.game.drawOfferBy == 1 && ev.game.gseq == 41, "41: applied");
+    gameEvent(41, pr::GameEventKind::DrawDeclined);
+    moveMade(40, 0);
+    gameEnd(39);
+    moveMade(42, 0);
+    r.expect(waitEvent(*r.c, K::MoveMade, ev, 3000, &seen) && ev.ply == 0 && ev.game.gseq == 42 && ev.game.moves.size() == 1 &&
+                 ev.game.status == int(pr::GameStatus::Ongoing),
+             "42: applied");
+    r.expect(shown(seen) == 1, "41, 40 and 39 again: ignored (" + std::to_string(shown(seen)) + " game events)");
+    r.sleepMs(300);
+    r.expect(r.srv.resyncs.load() == 0, "no Resync for what the state holds");
+
+    // 44 after 42: 43 was missed.
+    r.srv.setGseq(50);
+    seen.clear();
+    gameEnd(44);
+    r.expect(r.until([&] { return r.srv.resyncs.load() == 1; }, 3000), "44 after 42: a Resync");
+    r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 3000, &seen) && ev.game.gseq == 50 && ev.game.moves.empty() &&
+                 ev.game.status == int(pr::GameStatus::Ongoing),
+             "44 after 42: the snapshot of the Resync");
+    r.expect(shown(seen) == 1, "44 after 42: not applied");
+
+    // 52 after 50, at the next ply: 51 was missed. Then 51 for ply 1 at ply 0: not the next ply.
+    seen.clear();
+    moveMade(52, 0);
+    r.expect(r.until([&] { return r.srv.resyncs.load() == 2; }, 3000), "52 after 50: a Resync");
+    r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 3000, &seen) && ev.game.gseq == 50, "52 after 50: the snapshot");
+    moveMade(51, 1);
+    r.expect(r.until([&] { return r.srv.resyncs.load() == 3; }, 3000), "51 for ply 1 at ply 0: a Resync");
+    r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 3000, &seen) && ev.game.gseq == 50, "51 for ply 1: the snapshot");
+    r.expect(shown(seen) == 2, "neither MoveMade applied (" + std::to_string(shown(seen)) + " game events)");
+    moveMade(51, 0);
+    r.expect(waitEvent(*r.c, K::MoveMade, ev, 3000) && ev.ply == 0 && ev.game.gseq == 51, "51 for ply 0: applied");
+}
+
 // Starts each rig and runs its scenario on a thread of its own, then reports every failure.
 void runRigs(PacingRig* rigs, const char* const* tags, void (*const* scenarios)(PacingRig&), int n) {
     std::vector<std::thread> threads;
@@ -3044,6 +3141,15 @@ TEST(net_online_client_gestures) {
     const char* tags[kRigs] = {"gesture", "gesture-off", "gesture-down"};
     void (*scenarios[kRigs])(PacingRig&) = {gestureScenario, gestureOffScenario, gestureDownScenario};
     runRigs(rigs, tags, scenarios, kRigs);
+}
+
+// Game events in gseq order: the next one applies, an old one is ignored, a gap asks for a Resync.
+TEST(net_online_client_game_events_in_gseq_order) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    PacingRig rigs[1];
+    const char* tags[1] = {"gseq"};
+    void (*scenarios[1])(PacingRig&) = {gseqScenario};
+    runRigs(rigs, tags, scenarios, 1);
 }
 
 // Frames the client ignores (a client message type, a server message that does not decode): the

@@ -209,6 +209,9 @@ struct PlayerInfo {
 // Authoritative game state as last received from the server (GameSnapshot + later events).
 struct OnlineGame {
     uint64_t id = 0;
+    // The gseq of the last game event this state holds (GameSnapshot.gseq, then each MoveMade,
+    // GameEvent and GameEnd applied): events apply in gseq order (PROTOCOL.md, "Ordering: gseq").
+    uint32_t gseq = 0;
     std::string category;             // "3+2" or "custom"
     int64_t baseMs = 0, incMs = 0;
     bool rated = false;
