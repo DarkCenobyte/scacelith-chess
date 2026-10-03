@@ -767,6 +767,7 @@ online.err.rated_official_tc = Only the official time controls can be rated.
 online.err.cooldown = Matchmaking is paused for you for a moment.
 online.err.invalid_tc = This time control is not allowed.
 online.err.rematch_unavailable = A rematch is no longer possible.
+online.err.rated_repeat_limit = You have played enough rated games against this player for now. Play a casual game, or try again later.
 online.err.cheat_detected = The game was stopped by the server's fair-play checks.
 online.err.invalid_password = Wrong password.
 online.err.mfa_code_required = Enter a code from your authenticator app (or a recovery code).

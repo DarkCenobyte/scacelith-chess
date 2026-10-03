@@ -235,7 +235,7 @@ describe('control plane: matchmaking', () => {
         assert.equal(shards.requests[0].shard, 1);
     });
 
-    it('colours alternate over queue games, a failed creation gives them back, challenges and rematches count', async () => {
+    it('colours alternate over queue games, a failed creation gives them back, challenges and rematches do not count', async () => {
         const { cp, shards, mm, clock, online } = setup({ realMatchmaker: true });
         const a = online(1, 'alice', 0), b = online(2, 'bob', 1);
         const whites = [];
@@ -262,21 +262,47 @@ describe('control plane: matchmaking', () => {
         cp.mmLeave({ userId: 1 }); cp.mmLeave({ userId: 2 });
         shards.create = null;
         clock.advance(PAIR_RETRY_DELAY_MS);
-        // Alice White in a challenge: Black in the next queue game.
+        // Alice White in a challenge: the balances do not move, the next queue game is drawn.
         const c = cp.challengeCreate({ from: a, target: 'bob', baseSec: 300, incSec: 0, rated: false, color: enums.ColorPref.White });
         const acc = await cp.challengeAccept({ id: c.id, by: b });
         assert.equal(acc.ok, true);
-        assert.deepEqual([mm.colorBalanceOf(1), mm.colorBalanceOf(2)], [1, -1]);
+        assert.deepEqual([mm.colorBalanceOf(1), mm.colorBalanceOf(2)], [0, 0]);
         cp.gameEnded({ gameId: acc.gameId, whiteId: 1, blackId: 2 });
         await playQueueGame();
-        assert.equal(whites.at(-1), 2);
-        // Alice Black in a rematch: White in the next queue game.
+        assert.equal(whites.at(-1), 1);
+        // Alice Black in a rematch: no count either, the next queue game gives her Black after her White.
         const rm = await cp.gameRematch({ gameId: acc.gameId, white: 2, black: 1, category: '5+0', baseMs: 300000, incMs: 0, rated: false });
         assert.equal(rm.ok, true);
-        assert.deepEqual([mm.colorBalanceOf(1), mm.colorBalanceOf(2)], [-1, 1]);
+        assert.deepEqual([mm.colorBalanceOf(1), mm.colorBalanceOf(2)], [1, -1]);
         cp.gameEnded({ gameId: rm.gameId, whiteId: 2, blackId: 1 });
         await playQueueGame();
-        assert.equal(whites.at(-1), 1);
+        assert.equal(whites.at(-1), 2);
+    });
+
+    it('a player who took White in many challenges still alternates colours in the queue', async () => {
+        const { cp, shards, clock, online } = setup({ realMatchmaker: true });
+        const a = online(1, 'alice', 0), b = online(2, 'bob', 1);
+        for (let i = 0; i < 5; i++) {
+            const c = cp.challengeCreate({ from: a, target: 'bob', baseSec: 300, incSec: 0, rated: false, color: enums.ColorPref.White });
+            const acc = await cp.challengeAccept({ id: c.id, by: b });
+            assert.equal(acc.ok, true);
+            cp.gameEnded({ gameId: acc.gameId, whiteId: 1, blackId: 2 });
+        }
+        // Fresh opponents each time (balance 0): a draw, then the other colour, and so on.
+        let colours = '';
+        for (let i = 0; i < 6; i++) {
+            const fresh = online(10 + i, `fresh${i}`, 1);
+            cp.mmJoin({ ...a, category: '5+0', rated: false, rating: 1500 }, 0);
+            cp.mmJoin({ ...fresh, category: '5+0', rated: false, rating: 1500 }, 1);
+            clock.advance(250);
+            shards.clear();
+            cp.matchTick();
+            await tick();
+            const { white, black } = shards.requests[0].payload.spec;
+            colours += white.userId === 1 ? 'W' : 'B';
+            cp.gameEnded({ gameId: shards.of('game.attach')[0].payload.gameId, whiteId: white.userId, blackId: black.userId });
+        }
+        assert.equal(colours, 'WBWBWB');
     });
 
     it('a rated pairing counts toward MATCH_REPEAT_LIMIT only once its game exists', async () => {
@@ -330,7 +356,8 @@ describe('control plane: matchmaking', () => {
     });
 
     it('MATCH_REPEAT_LIMIT counts rated challenges, private games and rematches, and refuses them past it; unrated games stay free', async () => {
-        const { cp, ch, shards, mm, clock, online } = setup({ realMatchmaker: true });
+        let bobAccepts = true;
+        const { cp, ch, shards, mm, clock, online } = setup({ realMatchmaker: true, acceptsChallenges: (u) => u !== 2 || bobAccepts });
         const a = online(1, 'alice', 0), b = online(2, 'bob', 1), c = online(3, 'carl', 1);
         const tc = { baseSec: 300, incSec: 0 }, rated = { ...tc, rated: true };
         const end = (gameId) => cp.gameEnded({ gameId, whiteId: 1, blackId: 2 });
@@ -355,17 +382,24 @@ describe('control plane: matchmaking', () => {
         end(g3.gameId);
         // The limit is reached: no more rated games between them, however made.
         shards.clear();
-        assert.deepEqual(await cp.challengeAccept({ id: pending.id, by: a }), { error: E.UserUnavailable }, 'offered before, accepted after');
+        assert.deepEqual(await cp.challengeAccept({ id: pending.id, by: a }), { error: E.RatedRepeatLimit }, 'offered before, accepted after');
         assert.deepEqual(shards.frames().map((f) => [f.connId, f.name, f.msg.state]), [[20, 'ChallengeStatus', CS.Unavailable]]);
         shards.clear();
-        assert.deepEqual(cp.challengeCreate({ from: a, target: 'bob', ...rated }), { error: E.UserUnavailable });
+        assert.deepEqual(cp.challengeCreate({ from: a, target: 'bob', ...rated }), { error: E.RatedRepeatLimit });
         assert.deepEqual(shards.frames(), [], 'nothing reaches the target');
+        // A target who refuses challenges answers as an offline one: the limit does not reveal presence.
+        bobAccepts = false;
+        assert.deepEqual(cp.challengeCreate({ from: a, target: 'bob', ...rated }), { error: E.UserUnavailable });
+        bobAccepts = true;
+        cp.presenceRelease({ userId: 2, connId: 20 }, 1);
+        assert.deepEqual(cp.challengeCreate({ from: a, target: 'bob', ...rated }), { error: E.UserUnavailable }, 'offline');
+        online(2, 'bob', 1);
         // A wrong time control keeps its own error.
         assert.deepEqual(cp.challengeCreate({ from: a, target: 'bob', baseSec: 420, incSec: 1, rated: true }), { error: E.RatedRequiresOfficialTc });
         assert.deepEqual(cp.challengeCreate({ from: a, target: 'bob', baseSec: 5, incSec: 0, rated: true }), { error: E.InvalidTimeControl });
         const p4 = cp.challengeCreate({ from: b, target: '', ...rated });
         shards.clear();
-        assert.deepEqual(await cp.challengeJoinCode({ code: p4.code, by: a }), { error: E.UserUnavailable });
+        assert.deepEqual(await cp.challengeJoinCode({ code: p4.code, by: a }), { error: E.RatedRepeatLimit });
         assert.equal(ch.getCode(p4.code)?.id, p4.id, 'the private game stays pending');
         assert.deepEqual(shards.frames(), [], 'and its creator is told nothing');
         assert.equal(cp.limiter.peek('joincode:u1'), 0, 'not a wrong code');

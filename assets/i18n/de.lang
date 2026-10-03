@@ -757,6 +757,7 @@ online.err.rated_official_tc = Nur die offiziellen Bedenkzeiten können gewertet
 online.err.cooldown = Die Gegnersuche ist für Sie kurz pausiert.
 online.err.invalid_tc = Diese Bedenkzeit ist nicht erlaubt.
 online.err.rematch_unavailable = Eine Revanche ist nicht mehr möglich.
+online.err.rated_repeat_limit = Sie haben vorerst genug gewertete Partien gegen diesen Spieler gespielt. Spielen Sie eine ungewertete Partie oder versuchen Sie es später erneut.
 online.err.cheat_detected = Die Partie wurde von den Fairplay-Prüfungen des Servers gestoppt.
 online.err.invalid_password = Falsches Passwort.
 online.err.mfa_code_required = Geben Sie einen Code aus Ihrer Authenticator-App (oder einen Wiederherstellungscode) ein.

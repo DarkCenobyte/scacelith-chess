@@ -26,9 +26,9 @@
 namespace net {
 namespace proto {
 
-constexpr uint16_t kProtocolVersion = 2;
-constexpr uint16_t kProtocolMin = 2;
-constexpr uint32_t kSchemaHash = 0x77977684u;
+constexpr uint16_t kProtocolVersion = 3;
+constexpr uint16_t kProtocolMin = 3;
+constexpr uint32_t kSchemaHash = 0xf7825229u;
 constexpr const char* kWsSubprotocol = "scacelith.v1";
 constexpr uint64_t kId53Limit = 1ull << 53;   // id53 values are below 2^53
 
@@ -64,7 +64,8 @@ enum class ErrorCode : uint8_t {
     QueueNotAllowed = 200, ChallengeNotFound = 201, UserUnavailable = 202, ChallengeLimit = 203,
     CannotChallengeSelf = 204, CodeInvalid = 205, RatedRequiresOfficialTc = 206,
     MatchmakingCooldown = 207, InvalidTimeControl = 208, RematchUnavailable = 209,
-    ProtocolViolation = 240, Flood = 241, CheatDetected = 242, SlowConsumer = 243,
+    RatedRepeatLimit = 210, ProtocolViolation = 240, Flood = 241, CheatDetected = 242,
+    SlowConsumer = 243,
 };
 
 // Membership of the schema enums, and their value names ("?" when not a member).

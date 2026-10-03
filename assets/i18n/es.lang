@@ -757,6 +757,7 @@ online.err.rated_official_tc = Solo los ritmos de juego oficiales pueden ser pun
 online.err.cooldown = La búsqueda de rival está en pausa para usted durante un momento.
 online.err.invalid_tc = Este ritmo de juego no está permitido.
 online.err.rematch_unavailable = La revancha ya no es posible.
+online.err.rated_repeat_limit = Por ahora ya ha jugado suficientes partidas puntuables contra este jugador. Juegue una partida amistosa o vuelva a intentarlo más tarde.
 online.err.cheat_detected = Los controles de juego limpio del servidor han detenido la partida.
 online.err.invalid_password = Contraseña incorrecta.
 online.err.mfa_code_required = Introduzca un código de su aplicación de autenticación (o un código de recuperación).

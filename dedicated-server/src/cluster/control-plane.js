@@ -32,8 +32,9 @@
 // AUTO_PRESS_CLOCK, for the queue, the challenges and the private games alike; a rematch keeps the
 // value of the game it follows, so a change of the setting applies to the games created after it.
 //
-// Colours: the matchmaker keeps each player's colour balance (DESIGN 5.4). A queue game counts at
-// its pairing (given back when the game cannot be created), any other game once it is created.
+// Colours: the matchmaker keeps each player's colour balance (DESIGN 5.4) over the queue games
+// only. A queue game counts at its pairing (given back when the game cannot be created); the
+// challenges, private codes and rematches do not count (their colours are chosen, drawn or swapped).
 //
 // A queue pairing whose game cannot be created puts both players back in the queue with their
 // waiting time, and the matchmaker does not pair the same two again for PAIR_RETRY_DELAY_MS.
@@ -42,8 +43,9 @@
 // it (queue, direct challenge, private code, rematch), in the matchmaker's counts (in memory: a
 // restart forgets them). Two players who reached it within MATCH_REPEAT_WINDOW_MS are no longer
 // paired by the rated queue, and their rated challenges and private games are refused with
-// UserUnavailable (a private game's joiner before the code is used: the game stays pending), their
-// rated rematches with RematchUnavailable; unrated games stay free.
+// RatedRepeatLimit (a private game's joiner before the code is used: the game stays pending; a
+// target who refuses challenges still answers UserUnavailable, as an offline one), their rated
+// rematches with RematchUnavailable; unrated games stay free.
 //
 // Notifications (QueueStatus, ChallengeReceived, ChallengeStatus, Notice) are encoded here and
 // written by the shard of the user's live connection ('conn.send'); waiting players get a fresh
@@ -284,7 +286,7 @@ export class ControlPlane {
 
     _busy(userId) { return this.activeGames.has(userId) || this.starting.has(userId); }
 
-    // The matchmaker's colour balances (DESIGN 5.4) count the games made outside the queue too.
+    // Records colours in the matchmaker's balances (header, colours): gives back a failed pairing.
     _recordColors(whiteId, blackId) {
         try { this.mm.recordColors?.(whiteId, blackId); } catch (e) { this.log?.error?.('mm.recordColors failed', { err: e }); }
     }
@@ -367,7 +369,6 @@ export class ControlPlane {
         }
         const gameId = r.gameId;
         this._created.labels(source).inc();
-        if (source !== 'queue') this._recordColors(spec.white.userId, spec.black.userId);   // the pairing counted a queue game
         if (spec.rated) {
             try { this.mm.recordPairing?.(spec.white.userId, spec.black.userId, this.now()); } catch (e) { this.log?.error?.('mm.recordPairing failed', { err: e }); }
         }
@@ -546,9 +547,10 @@ export class ControlPlane {
                 }
                 targetUser = { userId: tid, username: this.presence.get(tid).username, online: true, acceptChallenges: accepts };
                 // Past MATCH_REPEAT_LIMIT (header), for a time control ch.create takes as rated: a
-                // wrong one keeps its own error.
-                if (rated && categoryOf(baseSec * 1000, incSec * 1000, this.config) !== 'custom'
-                    && this._repeatLimited(from.userId, tid, now)) return { error: E.UserUnavailable };
+                // wrong one keeps its own error, and a target who refuses challenges keeps
+                // ch.create's UserUnavailable (nothing leaks: an offline target answers the same).
+                if (rated && accepts && categoryOf(baseSec * 1000, incSec * 1000, this.config) !== 'custom'
+                    && this._repeatLimited(from.userId, tid, now)) return { error: E.RatedRepeatLimit };
             }
         }
         let r;
@@ -588,7 +590,7 @@ export class ControlPlane {
         // Past MATCH_REPEAT_LIMIT (header): refused before the code is used, so the creator's
         // private game stays pending.
         const pending = this.ch.getCode?.(code, now);
-        if (pending?.rated && this._repeatLimited(pending.from.userId, by.userId, now)) return { error: E.UserUnavailable };
+        if (pending?.rated && this._repeatLimited(pending.from.userId, by.userId, now)) return { error: E.RatedRepeatLimit };
         let r;
         try { r = this.ch.joinCode(code, by, now); } catch (e) { this.log?.error?.('challenge.joinCode failed', { err: e }); return { error: E.Internal }; }
         if (!r || r.error || !r.challenge) {
@@ -621,7 +623,7 @@ export class ControlPlane {
         };
         if (spec.rated && this._repeatLimited(spec.white.userId, spec.black.userId, now)) {
             this._sendUser(c.from.userId, [this._statusFrame(c, CS.Unavailable)]);
-            return { error: E.UserUnavailable };
+            return { error: E.RatedRepeatLimit };
         }
         const preferred = this.presence.get(c.from.userId)?.shard;
         const r = await this.createGame(spec, preferred, 'challenge');
