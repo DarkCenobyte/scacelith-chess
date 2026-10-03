@@ -46,7 +46,8 @@ const char* MIPS_CS = "shaders/materials/bake/scoresheet_mips.comp";
 // A glyph ready to be drawn into a page field: its placement, atlas quad and distance scale.
 struct InkGlyph {
     GlyphInk ink;
-    int face = 0;         // the face that supplied the glyph (ink.cp): its atlas place, looked up again
+    int face = 0;         // the face that supplied the glyph (cp): its atlas place, looked up again
+    uint32_t cp = 0;      // the codepoint rasterised: ink.cp, or '?' for the stand-in of one no face has
     vec2 q0, q1;          // quad bounds, glyph-local mm (SDF padding included)
     vec2 uv0, uv1;        // atlas (font::atlasGeneration() Impl::atlasGen)
     float distScale = 1;  // page mm per unit of atlas value
@@ -298,7 +299,7 @@ struct Scoresheet::Impl {
     // entry are drawn again.
     static void lookUpAgain(std::vector<InkGlyph>& glyphs) {
         for (InkGlyph& g : glyphs) {
-            const font::Glyph* G = font::glyph(g.face, g.ink.cp);
+            const font::Glyph* G = font::glyph(g.face, g.cp);
             if (!G || !G->hasQuad) continue;
             g.uv0 = vec2(G->u0, G->v0);
             g.uv1 = vec2(G->u1, G->v1);
@@ -590,6 +591,7 @@ std::vector<InkGlyph> handwrite(const std::string& text, const WriteBox& box, in
         InkGlyph ig;
         ig.ink = gi;
         ig.face = pg.face;
+        ig.cp = font::glyph(pg.face, pg.cp) == pg.glyph ? pg.cp : uint32_t('?');
         ig.q0 = vec2(G.x0, G.y0) * emMm;
         ig.q1 = vec2(G.x1, G.y1) * emMm;
         ig.uv0 = vec2(G.u0, G.v0);

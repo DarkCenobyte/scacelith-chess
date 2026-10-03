@@ -1,9 +1,11 @@
 // Small OS services used by the online client (internal to src/net): directories, files with
-// UTF-8 paths, the system browser. The game's platform layer lives in the executable, not in the
-// core library the network code belongs to, hence these few duplicates.
+// UTF-8 paths, the system browser. The game's platform layer (src/platform, in the executable)
+// returns these same directories: its exeDirectory(), userDataDirectory() and appDataDirectory()
+// call the ones below.
 #pragma once
 #include <cstdint>
 #include <cstdio>
+#include <functional>
 #include <string>
 
 namespace net {
@@ -11,10 +13,14 @@ namespace sys {
 
 #ifdef _WIN32
 std::wstring widen(const std::string& utf8);   // to UTF-16, for the W functions of Windows
+// The path 'get' writes as GetModuleFileNameW does (it returns the characters written, the buffer
+// size when the path was cut, 0 on failure), read again into a larger buffer while it is cut, up to
+// the 32767 characters of the longest path; "" on failure. exeDirectory() passes GetModuleFileNameW.
+std::wstring moduleFileName(const std::function<unsigned long(wchar_t* buffer, unsigned long size)>& get);
 #endif
 
 std::string exeDirectory();        // directory of the running executable, trailing separator
-std::string userDataDirectory();   // %APPDATA%\scacelith\ or ~/.config/scacelith/ (created)
+std::string userDataDirectory();   // %APPDATA%\scacelith\ or ~/.config/scacelith/ (created, 0700)
 // The per-user folder of the game's data files (created), the rule of plat::appDataDirectory():
 // %APPDATA%\scacelith\ on Windows, $XDG_DATA_HOME/scacelith/ (default ~/.local/share/scacelith/)
 // on Linux. The coach's voice model lives in its "coach" subfolder (src/tts/model_store.h).

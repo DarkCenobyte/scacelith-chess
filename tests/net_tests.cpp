@@ -1,6 +1,7 @@
 // Online client tests: protocol codec against the JavaScript codec's vectors, position digest,
-// JSON, crypto (hash / base64 / PKCE / proof of work), credential store isolation, endpoint
-// validation, and OnlineClient end to end against a fake server on the loopback interface
+// JSON, crypto (hash / base64 / PKCE / proof of work), the folders of net::sys (also the platform
+// layer's exeDirectory, userDataDirectory and appDataDirectory), credential store isolation,
+// endpoint validation, and OnlineClient end to end against a fake server on the loopback interface
 // (plain HTTP + WebSocket, the insecureDev mode): login with a proof of work, account, Hello /
 // Welcome, ping and clock offset, queue, moves, reconnection, 4003 and logout; the pacing of the
 // client Ping (Welcome.clientPingMs) and of the reconnections (full server, shutdown, /info reuse);
@@ -22,6 +23,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #endif
 
@@ -43,6 +45,7 @@
 #include <algorithm>
 #include <atomic>
 #include <cctype>
+#include <cerrno>
 #include <chrono>
 #include <cmath>
 #include <cstdio>
@@ -841,6 +844,91 @@ TEST(net_crypto_pow) {
     CHECK(!powSolve("x", kPowMaxBits + 1, nonce));
     CHECK(!powSolve("x", -1, nonce));
 }
+
+// =============================================================================================
+// Folders (net::sys; plat::exeDirectory, userDataDirectory and appDataDirectory return them)
+// =============================================================================================
+
+// The executable's folder is the absolute path of the folder that holds this program (a long exe
+// path on Windows: net_sys_module_file_name_long_paths).
+TEST(net_sys_exe_directory) {
+    std::string d = net::sys::exeDirectory();
+    REQUIRE(d.size() > 1);
+#ifdef _WIN32
+    CHECK((d[1] == ':' && d.size() >= 3) || d.compare(0, 2, "\\\\") == 0);
+    CHECK_EQ(d.back(), '\\');
+    CHECK(net::sys::fileExists(d + "scacelith_tests.exe"));
+#else
+    CHECK_EQ(d[0], '/');
+    CHECK_EQ(d.back(), '/');
+    CHECK(net::sys::fileExists(d + "scacelith_tests"));
+#endif
+}
+
+#ifdef _WIN32
+// An exe path of MAX_PATH characters or more (long paths enabled) is read whole into a larger
+// buffer instead of giving ".\\" (the working directory, where the settings and the log would then
+// go). Wine cannot start an exe from such a path: a fake GetModuleFileNameW cuts the path as
+// Windows does (the buffer size returned, the copy cut and terminated).
+TEST(net_sys_module_file_name_long_paths) {
+    int calls = 0;
+    std::wstring path;
+    auto get = [&](wchar_t* buffer, unsigned long size) -> unsigned long {
+        ++calls;
+        if (path.empty()) return 0;
+        size_t n = std::min<size_t>(path.size(), size - 1);
+        std::copy(path.begin(), path.begin() + n, buffer);
+        buffer[n] = L'\0';
+        return path.size() < size ? (unsigned long)path.size() : size;
+    };
+    // A short path: one read.
+    path = L"C:\\Games\\Scacelith\\Scacelith.exe";
+    CHECK(net::sys::moduleFileName(get) == path);
+    CHECK_EQ(calls, 1);
+    // 300, 1000 and 32767 characters (the longest path): read again until the buffer holds it.
+    for (size_t length : {size_t(300), size_t(1000), size_t(32767)}) {
+        path = L"C:\\" + std::wstring(length - 17, L'a') + L"\\Scacelith.exe";
+        REQUIRE(path.size() == length);
+        calls = 0;
+        CHECK(net::sys::moduleFileName(get) == path);
+        CHECK(calls > 1);
+    }
+    // Exactly MAX_PATH characters fill the first buffer with no room for the terminator: cut.
+    path = L"C:\\" + std::wstring(260 - 17, L'b') + L"\\Scacelith.exe";
+    calls = 0;
+    CHECK(net::sys::moduleFileName(get) == path);
+    CHECK_EQ(calls, 2);
+    // A failure, and a path no buffer holds (the reads stop past 32767 characters): "".
+    path.clear();
+    CHECK(net::sys::moduleFileName(get).empty());
+    path = std::wstring(40000, L'c');
+    calls = 0;
+    CHECK(net::sys::moduleFileName(get).empty());
+    CHECK(calls < 10);
+}
+#endif
+
+#ifndef _WIN32
+// The user data folder (the settings and log fallback, the default place of the logins) is
+// created private, 0700, under $HOME/.config.
+TEST(net_sys_user_data_directory_private) {
+    const std::string home = net::sys::exeDirectory() + "net-test-home-" + std::to_string(getpid());
+    REQUIRE(mkdir(home.c_str(), 0755) == 0 || errno == EEXIST);
+    const char* was = std::getenv("HOME");
+    const std::string saved = was ? was : "";
+    setenv("HOME", home.c_str(), 1);
+    std::string d = net::sys::userDataDirectory();
+    if (was) setenv("HOME", saved.c_str(), 1);
+    else unsetenv("HOME");
+    CHECK_EQ(d, home + "/.config/scacelith/");
+    struct stat st {};
+    CHECK(stat(d.c_str(), &st) == 0 && S_ISDIR(st.st_mode));
+    CHECK_EQ(int(st.st_mode & 0777), 0700);
+    rmdir(d.c_str());
+    rmdir((home + "/.config").c_str());
+    rmdir(home.c_str());
+}
+#endif
 
 // =============================================================================================
 // Credential store

@@ -4,6 +4,7 @@
 #pragma once
 #include "../i18n/i18n.h"
 #include "ui.h"
+#include "ui_stepper_values.h"
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -35,10 +36,7 @@ void gameOverDetail(const std::string& text, float cx, float y);
 bool runOptionsPage(MenuAction& act);  // the options page; true once it is closed
 void openOptionsPage();
 void dimBackground(float a);           // full-screen dim behind menu panels
-// The custom time control's steppers (New Game, Watch a Game, challenges, direct match): the base
-// times offered (15 s to 3 h), the index of the value nearest to 'value', a base time as "m:ss".
-const std::vector<int>& baseTimeValues();
-int nearestIndex(const std::vector<int>& v, int value);
+// A base time of the custom time control's steppers (ui_stepper_values.h) as "m:ss".
 std::string clockText(int seconds);
 std::string spacedPlus(const std::string& label);  // "3+2" -> "3 + 2" with thin spaces
 // The category of a time control (Lichess-style estimate: base + 40 x increment, in seconds):

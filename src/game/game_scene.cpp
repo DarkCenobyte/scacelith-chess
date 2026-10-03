@@ -183,7 +183,7 @@ bool GameScene::init(AppContext& ctx) {
     for (const TimeControl& tc : timeControlPresets()) tcs.push_back(tc.label());
     ui::setTimeControlList(tcs);
     ui::setResolutionList({{1280, 720}, {1366, 768}, {1600, 900}, {1920, 1080}, {2560, 1440}, {3840, 2160}});
-    ui::setVersionString("Scacelith " SCACELITH_VERSION_SHORT);
+    ui::setVersionString("Scacelith " SCACELITH_VERSION);
     initOnline();
     ui::setSoundCallback([](ui::Sound snd) {
         switch (snd) {

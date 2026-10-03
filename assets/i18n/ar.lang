@@ -1181,3 +1181,9 @@ gif.err.not_found = لم تعد هذه المباراة موجودة على ال
 gif.wait.seconds = {0} ثانية|ثانية واحدة|ثانيتين|{0} ثوانٍ|{0} ثانية|{0} ثانية
 gif.wait.minutes = {0} دقيقة|دقيقة واحدة|دقيقتين|{0} دقائق|{0} دقيقة|{0} دقيقة
 gif.wait.both = {0} و{1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = تعذّر تشغيل OpenGL 4.6. يُرجى تحديث برنامج تشغيل بطاقة الرسوميات.
+error.renderer = تعذّر تشغيل محرّك العرض.
+error.scene = تعذّر تحميل المشهد.
+error.log_file = التفاصيل في ملف السجل: {0}

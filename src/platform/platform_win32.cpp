@@ -1,16 +1,16 @@
 #ifdef _WIN32
 #include "platform.h"
+#include "absolute_mouse.h"
 #include "../gl/gl46.h"
 #include "../gl/gl_context.h"
 #include "../core/log.h"
+#include "../net/net_sys.h"
 
 #include <windows.h>
 #include <mmsystem.h>
 #include <shellapi.h>
-#include <shlobj.h>
 #include <algorithm>
 #include <cstring>
-#include <cstdio>
 #include <cwchar>
 
 // WGL_ARB_create_context / WGL_ARB_pixel_format / WGL_EXT_swap_control tokens.
@@ -55,6 +55,7 @@ wchar_t g_highSurrogate = 0;  // first half of a UTF-16 pair waiting for its sec
 LARGE_INTEGER g_freq, g_t0;
 PFN_wglSwapIntervalEXT g_swapInterval;
 POINT g_captureCenter;
+AbsoluteMouse g_absMouse;  // a captured mouse that reports positions only
 bool g_leaveTracked = false;  // a WM_MOUSELEAVE is asked for (TrackMouseEvent)
 
 int mapVK(WPARAM vk, LPARAM lp) {
@@ -189,9 +190,20 @@ LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
             RAWINPUT ri;
             UINT size = sizeof(ri);
             if (GetRawInputData((HRAWINPUT)lp, RID_INPUT, &ri, &size, sizeof(RAWINPUTHEADER)) != (UINT)-1 &&
-                ri.header.dwType == RIM_TYPEMOUSE && !(ri.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)) {
-                g_input.mouseDX += float(ri.data.mouse.lLastX);
-                g_input.mouseDY += float(ri.data.mouse.lLastY);
+                ri.header.dwType == RIM_TYPEMOUSE) {
+                const RAWMOUSE& m = ri.data.mouse;
+                if (!(m.usFlags & MOUSE_MOVE_ABSOLUTE)) {
+                    g_input.mouseDX += float(m.lLastX);
+                    g_input.mouseDY += float(m.lLastY);
+                    if (m.lLastX || m.lLastY) g_absMouse.relativeMotion();
+                } else if (g_captured) {
+                    // Positions (Remote Desktop, a tablet in absolute mode): their steps move the
+                    // look while it holds the mouse (absolute_mouse.h).
+                    bool desktop = (m.usFlags & MOUSE_VIRTUAL_DESKTOP) != 0;
+                    g_absMouse.packet(m.lLastX, m.lLastY, GetSystemMetrics(desktop ? SM_CXVIRTUALSCREEN : SM_CXSCREEN),
+                                      GetSystemMetrics(desktop ? SM_CYVIRTUALSCREEN : SM_CYSCREEN),
+                                      g_input.mouseDX, g_input.mouseDY);
+                }
             }
             break;
         }
@@ -278,9 +290,9 @@ bool init(const WindowDesc& desc) {
     wglDeleteContext(drc);
     ReleaseDC(dummy, ddc);
     DestroyWindow(dummy);
+    // Failures are logged here; main.cpp tells the player, in their language.
     if (!createContextAttribs || !choosePixelFormat) {
-        messageBox("Scacelith", "This graphics driver does not support modern OpenGL contexts.\nOpenGL 4.6 is required.\n"
-                                "Please update your graphics driver.");
+        LOGE("this graphics driver does not support modern OpenGL contexts (WGL_ARB_create_context)");
         return false;
     }
 
@@ -302,7 +314,7 @@ bool init(const WindowDesc& desc) {
     int format = 0;
     UINT count = 0;
     if (!choosePixelFormat(g_hdc, pfAttribs, nullptr, 1, &format, &count) || count == 0) {
-        messageBox("Scacelith", "No suitable pixel format.\nPlease update your graphics driver.");
+        LOGE("no suitable pixel format");
         return false;
     }
     DescribePixelFormat(g_hdc, format, sizeof(pfd), &pfd);
@@ -313,17 +325,14 @@ bool init(const WindowDesc& desc) {
                               WGL_CONTEXT_FLAGS_ARB, desc.debugContext ? WGL_CONTEXT_DEBUG_BIT_ARB : 0, 0};
     g_glrc = createContextAttribs(g_hdc, nullptr, ctxAttribs);
     if (!g_glrc) {
-        messageBox("Scacelith", "Could not create an OpenGL 4.6 core context.\nPlease update your graphics driver.");
+        LOGE("could not create an OpenGL 4.6 core context");
         return false;
     }
     wglMakeCurrent(g_hdc, g_glrc);
     const char* missing = nullptr;
     int nMissing = gl46::load(getProc, &missing);
     if (nMissing) {
-        char buf[256];
-        std::snprintf(buf, sizeof(buf), "The OpenGL driver is missing %d required 4.6 functions (first: %s).\n"
-                      "Please update your graphics driver.", nMissing, missing);
-        messageBox("Scacelith", buf);
+        LOGE("the OpenGL driver is missing %d required 4.6 functions (first: %s)", nMissing, missing);
         return false;
     }
     gl46::afterContextCreated(desc.debugContext);
@@ -363,7 +372,8 @@ bool pumpEvents() {
         TranslateMessage(&msg);
         DispatchMessageW(&msg);
     }
-    if (g_captured && g_focus) {
+    // A mouse that reports positions stays where it goes (ClipCursor keeps it in the window).
+    if (g_captured && g_focus && !g_absMouse.active()) {
         SetCursorPos(g_captureCenter.x, g_captureCenter.y);
     }
     return !g_quit;
@@ -401,6 +411,7 @@ void setMouseCaptured(bool c) {
     if (c == g_captured) return;
     g_captured = c;
     if (c) {
+        g_absMouse.reset();
         GetCursorPos(&g_captureCenter);
         RECT r;
         GetClientRect(g_hwnd, &r);
@@ -411,41 +422,21 @@ void setMouseCaptured(bool c) {
         ClipCursor(&clip);
     } else {
         ClipCursor(nullptr);
+        // Back where the press was, where the re-centring leaves a relative mouse.
+        if (g_absMouse.active()) SetCursorPos(g_captureCenter.x, g_captureCenter.y);
     }
     applyCursor();
 }
 
-std::string exeDirectory() {
-    wchar_t w[MAX_PATH];
-    DWORD n = GetModuleFileNameW(nullptr, w, MAX_PATH);
-    char buf[MAX_PATH * 3];
-    int len = WideCharToMultiByte(CP_UTF8, 0, w, int(n), buf, int(sizeof(buf)) - 1, nullptr, nullptr);
-    buf[len > 0 ? len : 0] = 0;
-    std::string s(buf);
-    size_t p = s.find_last_of("\\/");
-    return p == std::string::npos ? std::string(".\\") : s.substr(0, p + 1);
-}
-
-std::string userDataDirectory() {
-    wchar_t w[MAX_PATH];
-    if (SUCCEEDED(SHGetFolderPathW(nullptr, CSIDL_APPDATA, nullptr, 0, w))) {
-        std::wstring dir = std::wstring(w) + L"\\scacelith";
-        CreateDirectoryW(dir.c_str(), nullptr);
-        char buf[MAX_PATH * 3];
-        int n = WideCharToMultiByte(CP_UTF8, 0, dir.c_str(), -1, buf, sizeof(buf), nullptr, nullptr);
-        if (n > 0) return std::string(buf) + "\\";
-    }
-    return exeDirectory();
-}
-
-// The same folder as userDataDirectory() on Windows (Roaming application data).
-std::string appDataDirectory() { return userDataDirectory(); }
+// The core library's folders (net::sys), so both layers agree, an exe path of MAX_PATH characters
+// or more included. appDataDirectory() is the same folder as userDataDirectory() (Roaming).
+std::string exeDirectory() { return net::sys::exeDirectory(); }
+std::string userDataDirectory() { return net::sys::userDataDirectory(); }
+std::string appDataDirectory() { return net::sys::appDataDirectory(); }
 
 void messageBox(const char* title, const char* text) {
-    wchar_t wt[256], wx[2048];
-    MultiByteToWideChar(CP_UTF8, 0, title, -1, wt, 256);
-    MultiByteToWideChar(CP_UTF8, 0, text, -1, wx, 2048);
-    MessageBoxW(g_hwnd, wx, wt, MB_OK | MB_ICONERROR);
+    // Any length: the text may name a path of up to 32767 characters.
+    MessageBoxW(g_hwnd, net::sys::widen(text).c_str(), net::sys::widen(title).c_str(), MB_OK | MB_ICONERROR);
 }
 
 bool openClipboard(void* owner) {

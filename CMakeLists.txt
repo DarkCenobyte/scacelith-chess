@@ -42,6 +42,19 @@ if(SCACELITH_STOCKFISH)
     if(NOT EXISTS ${ROOT}/third_party/stockfish/CMakeLists.txt)
         message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but third_party/stockfish is missing (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
     endif()
+    # The variants take GCC-only options and are isolated with GNU binutils (their isolate.cmake):
+    # another compiler, or LLVM's objcopy/objdump/nm, would fail deep in the build instead of here.
+    if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but the compiler is ${CMAKE_CXX_COMPILER_ID}: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
+    endif()
+    foreach(tool OBJCOPY OBJDUMP NM)
+        if(CMAKE_${tool})   # a missing one is reported by third_party/stockfish
+            execute_process(COMMAND ${CMAKE_${tool}} --version OUTPUT_VARIABLE tool_version ERROR_QUIET)
+            if(NOT tool_version MATCHES "^GNU ")
+                message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but ${CMAKE_${tool}} is not from GNU binutils: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
+            endif()
+        endif()
+    endforeach()
     add_subdirectory(third_party/stockfish)
 endif()
 
@@ -102,6 +115,12 @@ set_source_files_properties(${ROOT}/src/tts/kernels_avx512.cpp PROPERTIES COMPIL
 # shows an instruction above baseline outside the kernel units, one above a unit's level inside it,
 # or a reference into a unit other than from the dispatcher (src/tts/cpu.cpp).
 find_package(Python3 COMPONENTS Interpreter)
+# The shipped exe (a Windows Release build) is never built without the instruction-set audits and
+# the .pdata check below; other builds skip them with a warning.
+string(TOUPPER "${CMAKE_BUILD_TYPE}" build_type)   # as $<CONFIG:Release> compares it
+if(WIN32 AND build_type STREQUAL "RELEASE" AND NOT Python3_Interpreter_FOUND)
+    message(FATAL_ERROR "Python 3 not found: a Windows Release build needs it for the instruction-set audits and the .pdata check")
+endif()
 if(Python3_Interpreter_FOUND AND EXISTS ${ROOT}/third_party/stockfish/tools/isa_audit.py)
     add_executable(tts_isa_probe ${ROOT}/tools/tts_isa_probe.cpp)
     target_link_libraries(tts_isa_probe PRIVATE scacelith_core)
@@ -138,10 +157,6 @@ else()
     target_link_libraries(scacelith_core PUBLIC OpenSSL::SSL OpenSSL::Crypto)
     target_compile_definitions(scacelith_core PRIVATE SCACELITH_HAS_OPENSSL=1)
 endif()
-# Every build has the real network layer (the offline stand-in that SCACELITH_NET_REAL left out
-# is gone; nothing tests the definition any more); the in-process fakes stay available with
-# --online-mock.
-target_compile_definitions(scacelith_core PUBLIC SCACELITH_NET_REAL=1)
 
 # ---------------------------------------------------------------------------------------------
 # Game executable. Every .cpp under src/ (except the core modules above) is compiled directly

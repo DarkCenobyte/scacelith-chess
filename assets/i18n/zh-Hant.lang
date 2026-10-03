@@ -1176,3 +1176,9 @@ gif.err.not_found = 伺服器上已沒有該對局。
 gif.wait.seconds = {0} 秒
 gif.wait.minutes = {0} 分鐘
 gif.wait.both = {0} {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = 無法啟動 OpenGL 4.6。請更新顯示卡驅動程式。
+error.renderer = 無法啟動繪圖引擎。
+error.scene = 無法載入場景。
+error.log_file = 詳細資訊請見記錄檔：{0}
