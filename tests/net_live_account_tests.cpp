@@ -39,6 +39,7 @@
 #include <cstring>
 #include <ctime>
 #include <functional>
+#include <mutex>
 #include <string>
 #include <thread>
 #include <vector>
@@ -78,7 +79,8 @@ std::string queryEncode(const std::string& s) {
 // The harness's control server (plain HTTP on the loopback).
 struct Control {
     uint16_t port = 0;
-    json::Value call(const std::string& method, const std::string& target, int* statusOut = nullptr) const {
+    json::Value call(const std::string& method, const std::string& target, int* statusOut = nullptr,
+                     const std::string& body = "{}") const {
         net::HttpRequest req;
         req.method = method;
         req.host = "127.0.0.1";
@@ -86,7 +88,7 @@ struct Control {
         req.tls = false;
         req.path = target;
         req.timeoutMs = 20000;
-        if (method == "POST") req.body = "{}";
+        if (method == "POST") req.body = body;
         net::HttpResponse resp;
         net::httpRequest(req, resp);
         if (statusOut) *statusOut = resp.status;
@@ -1353,6 +1355,301 @@ TEST(net_live_account_server_settings) {
         CHECK(c.hasSavedSession());
         ev = ask(c, Kind::LogoutResult, [&] { c.logout(); });
         CHECK(ev.ok);
+    }
+    std::remove(credPath);
+}
+
+// ---- Google sign-in by loopback redirect (opt-in) -------------------------------------------------
+// dedicated-server/tools/live-cpp-check.js (part "sso") serves an in-process server on 127.0.0.1
+// in plain HTTP with a fake Google (its OIDC endpoints injected), e-mail confirmation on, and runs
+//   SCACELITH_NET_LIVE_SSO=host:port:<control port> ./scacelith_tests net_live_sso
+// The test is the game's browser: its opener keeps Google's URL; the control route
+// GET /fake-authorize?url=<authUrl>&sub=<Google subject>&email=<address> answers what Google
+// would (a 302 to the redirect URI with code, state and iss; or {"location": ...}), and the test
+// GETs that address on the game's 127.0.0.1 listener. The other control routes:
+// POST /seed-password-account {username, email, password, mfa} (its answer gives "totpSecret" when
+// mfa is on), GET /totp?secret= (a code the server has not seen used) and GET /links (the
+// sso_identities rows, [{userId, subject, email}...] or {"links": [...]}).
+// Written from the server instruction (36a, its point 13) before the server's part existed: the
+// sub and email parameters of /fake-authorize, "totpSecret" and the shape of /links are this
+// test's assumptions, to be aligned with the harness when it is written.
+namespace {
+
+struct SsoBrowser {
+    std::mutex mu;
+    std::string url;
+    std::string take() {
+        std::lock_guard<std::mutex> lock(mu);
+        std::string u = url;
+        url.clear();
+        return u;
+    }
+};
+
+// Google's answer from the fake: the Location of its 302 (or of a JSON answer), "" when none.
+std::string fakeAuthorize(const Control& ctl, const std::string& authUrl, const std::string& sub, const std::string& email) {
+    net::HttpRequest req;
+    req.host = "127.0.0.1";
+    req.port = ctl.port;
+    req.tls = false;
+    req.path = "/fake-authorize?url=" + queryEncode(authUrl) + "&sub=" + queryEncode(sub) + "&email=" + queryEncode(email);
+    req.timeoutMs = 20000;
+    std::string location, body;
+    net::HttpResponse resp;
+    net::httpStream(req, [&](const net::HttpHead& h) {
+        location = h.get("location");
+        return location.empty();
+    }, [&](const char* d, size_t n) {
+        body.append(d, n);
+        return body.size() < 65536;
+    }, resp);
+    if (location.empty()) {
+        json::Value v;
+        if (json::parse(body, v)) location = v["location"].asString();
+    }
+    if (location.empty()) std::fprintf(stderr, "  fake-authorize: %d %s %s\n", resp.status, resp.error.c_str(), body.substr(0, 200).c_str());
+    return location;
+}
+
+// The browser following Google's redirect: a GET of "http://127.0.0.1:<port>/..." (on `port`
+// instead when given: a link someone else got, opened against the game's listener).
+int browserGet(const std::string& url, std::string* page = nullptr, uint16_t port = 0) {
+    const std::string prefix = "http://127.0.0.1:";
+    const size_t slash = url.find('/', prefix.size());
+    if (url.compare(0, prefix.size(), prefix) != 0 || slash == std::string::npos) return -1;
+    net::HttpRequest req;
+    req.host = "127.0.0.1";
+    req.port = port ? port : uint16_t(std::atoi(url.substr(prefix.size(), slash - prefix.size()).c_str()));
+    req.tls = false;
+    req.path = url.substr(slash);
+    req.accept = "text/html";
+    req.timeoutMs = 10000;
+    net::HttpResponse resp;
+    net::httpRequest(req, resp);
+    if (page) *page = resp.body;
+    return resp.status;
+}
+
+// The listener's port named by a URL: Google's (its redirect_uri, percent-encoded) or Google's
+// redirect.
+uint16_t listenerPort(const std::string& url) {
+    for (const std::string key : {"127.0.0.1%3A", "127.0.0.1:"}) {
+        const size_t at = url.find(key);
+        if (at != std::string::npos) return uint16_t(std::atoi(url.c_str() + at + key.size()));
+    }
+    return 0;
+}
+
+// One Google sign-in of `c` up to the server's answer: the start, the fake Google for (sub,
+// email), the browser's GET on the listener, then a LoginResult, SsoNeedsUsername or
+// SsoNeedsPassword.
+net::Event googleSignIn(net::OnlineClient& c, SsoBrowser& b, const Control& ctl, const std::string& sub, const std::string& email) {
+    net::Event ev = ask(c, Kind::SsoBrowserOpened, [&] { c.startGoogleSso(net::SsoBrowserPage()); });
+    report("start", ev);
+    CHECK(ev.ok);
+    if (!ev.ok) return ev;
+    const std::string location = fakeAuthorize(ctl, b.take(), sub, email);
+    CHECK(!location.empty());
+    std::string page;
+    const int status = browserGet(location, &page);
+    CHECK_EQ(status, 200);
+    CHECK(page.find("<html") != std::string::npos);
+    net::Event code;
+    CHECK(waitFor(c, Kind::SsoCodeReceived, code));
+    auto end = std::chrono::steady_clock::now() + std::chrono::seconds(20);
+    while (std::chrono::steady_clock::now() < end) {
+        while (c.poll(ev))
+            if (ev.kind == Kind::LoginResult || ev.kind == Kind::SsoNeedsUsername || ev.kind == Kind::SsoNeedsPassword) return ev;
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+    ev = net::Event();
+    ev.error = "no_event";
+    return ev;
+}
+
+// The sso_identities rows of a Google subject.
+int linksOf(const Control& ctl, const std::string& sub) {
+    const json::Value v = ctl.call("GET", "/links");
+    const json::Value& rows = v.isArray() ? v : v["links"];
+    int n = 0;
+    for (const json::Value& r : rows.items()) n += r["subject"].asString() == sub;
+    return n;
+}
+
+json::Value seedPasswordAccount(const Control& ctl, const std::string& username, const std::string& email,
+                                const std::string& password, bool mfa) {
+    json::Value b = json::Value::object();
+    b.set("username", username);
+    b.set("email", email);
+    b.set("password", password);
+    b.set("mfa", mfa);
+    int status = 0;
+    json::Value v = ctl.call("POST", "/seed-password-account", &status, b.dump());
+    CHECK(status >= 200 && status < 300);
+    return v;
+}
+
+}  // namespace
+
+TEST(net_live_sso) {
+    const char* env = std::getenv("SCACELITH_NET_LIVE_SSO");
+    if (!env) SKIP("SCACELITH_NET_LIVE_SSO not set");
+    REQUIRE(net::transportAvailable());  // asked for, so it must not pass without running
+    std::vector<std::string> f;
+    {
+        std::string s = env, cur;
+        for (char ch : s) {
+            if (ch == ':') {
+                f.push_back(cur);
+                cur.clear();
+            } else {
+                cur += ch;
+            }
+        }
+        f.push_back(cur);
+    }
+    CHECK_EQ(int(f.size()), 3);
+    if (f.size() != 3) return;
+    Control ctl;
+    ctl.port = uint16_t(std::atoi(f[2].c_str()));
+    const std::string run = std::to_string(int(std::time(nullptr) % 100000));
+    char credPath[256];
+    std::snprintf(credPath, sizeof credPath, "scacelith-live-sso-%s.credentials", run.c_str());
+    net::ServerEndpoint ep;
+    ep.host = f[0];
+    ep.apiPort = uint16_t(std::atoi(f[1].c_str()));
+    ep.wsPort = 0;
+    ep.insecureDev = true;   // the harness serves plain HTTP on the loopback
+    SsoBrowser browser;
+    auto opener = [&browser](const std::string& url) {
+        std::lock_guard<std::mutex> lock(browser.mu);
+        browser.url = url;
+        return true;
+    };
+    net::OnlineClient c;
+    c.setCredentialsFile(credPath);
+    c.setServer(ep);
+    c.setBrowserOpener(opener);
+    net::Event ev = ask(c, Kind::ServerInfoResult, [&] { c.fetchServerInfo(); });
+    CHECK(ev.ok);
+    auto logout = [&] {
+        net::Event l = ask(c, Kind::LogoutResult, [&] { c.logout(); });
+        CHECK(l.ok);
+    };
+
+    const std::string newSub = "live-sso-new-" + run, newEmail = "sso.new." + run + "@example.org", newName = "SsoNew_" + run;
+    {
+        Scenario s("a new Google account: SsoNeedsUsername, then completeSso");
+        ev = googleSignIn(c, browser, ctl, newSub, newEmail);
+        CHECK(ev.kind == Kind::SsoNeedsUsername);
+        std::fprintf(stderr, "  suggested '%s'\n", ev.account.username.c_str());
+        ev = ask(c, Kind::LoginResult, [&] { c.completeSso(newName); });
+        report("complete", ev);
+        CHECK(ev.ok);
+        CHECK_EQ(ev.account.username, newName);
+        CHECK(ev.account.googleLinked);
+        CHECK(!ev.account.hasPassword);
+        CHECK_EQ(linksOf(ctl, newSub), 1);
+        logout();
+    }
+    {
+        Scenario s("a login by Google subject");
+        ev = googleSignIn(c, browser, ctl, newSub, newEmail);
+        report("login", ev);
+        CHECK(ev.kind == Kind::LoginResult && ev.ok);
+        CHECK_EQ(ev.account.username, newName);
+        logout();
+    }
+    {
+        Scenario s("link to a password account: a wrong password, the right one, then no password");
+        const std::string sub = "live-sso-pw-" + run, email = "sso.pw." + run + "@example.org", user = "SsoPw_" + run;
+        const std::string pass = "Correct horse " + run;
+        seedPasswordAccount(ctl, user, email, pass, false);
+        ev = googleSignIn(c, browser, ctl, sub, email);
+        CHECK(ev.kind == Kind::SsoNeedsPassword);
+        CHECK_EQ(ev.account.username, user);
+        ev = ask(c, Kind::LoginResult, [&] { c.linkSso("not the password"); }, 60000);
+        report("wrong password", ev);
+        CHECK_EQ(ev.error, std::string("invalid_credentials"));
+        CHECK_EQ(linksOf(ctl, sub), 0);
+        ev = ask(c, Kind::LoginResult, [&] { c.linkSso(pass); }, 60000);
+        report("password", ev);
+        CHECK(ev.ok);
+        CHECK_EQ(ev.account.username, user);
+        CHECK_EQ(linksOf(ctl, sub), 1);
+        logout();
+        ev = googleSignIn(c, browser, ctl, sub, email);
+        report("next sign-in", ev);
+        CHECK(ev.kind == Kind::LoginResult && ev.ok);
+        CHECK_EQ(ev.account.username, user);
+        logout();
+    }
+    {
+        Scenario s("link with two-factor: a wrong code links nothing, the right one links");
+        const std::string sub = "live-sso-mfa-" + run, email = "sso.mfa." + run + "@example.org", user = "SsoMfa_" + run;
+        const std::string pass = "Battery staple " + run;
+        const json::Value seeded = seedPasswordAccount(ctl, user, email, pass, true);
+        const std::string secret = seeded["totpSecret"].asString();
+        CHECK(!secret.empty());
+        ev = googleSignIn(c, browser, ctl, sub, email);
+        CHECK(ev.kind == Kind::SsoNeedsPassword);
+        ev = ask(c, Kind::LoginResult, [&] { c.linkSso(pass); }, 60000);
+        report("password", ev);
+        CHECK(!ev.ok && ev.mfaRequired);
+        const std::string code = ctl.call("GET", "/totp?secret=" + queryEncode(secret))["code"].asString();
+        const std::string wrong = code == "000000" ? "000001" : "000000";
+        ev = ask(c, Kind::LoginResult, [&] { c.loginMfa(wrong); });
+        report("wrong code", ev);
+        CHECK_EQ(ev.error, std::string("invalid_code"));
+        CHECK_EQ(linksOf(ctl, sub), 0);
+        ev = ask(c, Kind::LoginResult, [&] { c.loginMfa(code); });
+        report("code", ev);
+        CHECK(ev.ok);
+        CHECK_EQ(ev.account.username, user);
+        CHECK_EQ(linksOf(ctl, sub), 1);
+        logout();
+    }
+    {
+        Scenario s("another Google account with the address of a password-less account: sso_account_exists");
+        ev = googleSignIn(c, browser, ctl, "live-sso-other-" + run, newEmail);
+        report("sign-in", ev);
+        CHECK(ev.kind == Kind::LoginResult && !ev.ok);
+        CHECK_EQ(ev.error, std::string("sso_account_exists"));
+    }
+    {
+        Scenario s("a stranger's Google link opened against the game's listener: the foreign page, then the game's own");
+        SsoBrowser strangerBrowser;
+        char strangerCred[256];
+        std::snprintf(strangerCred, sizeof strangerCred, "scacelith-live-sso-stranger-%s.credentials", run.c_str());
+        net::OnlineClient stranger;
+        stranger.setCredentialsFile(strangerCred);
+        stranger.setServer(ep);
+        stranger.setBrowserOpener([&strangerBrowser](const std::string& url) {
+            std::lock_guard<std::mutex> lock(strangerBrowser.mu);
+            strangerBrowser.url = url;
+            return true;
+        });
+        ev = ask(c, Kind::SsoBrowserOpened, [&] { c.startGoogleSso(net::SsoBrowserPage()); });
+        CHECK(ev.ok);
+        const std::string mine = browser.take();
+        ev = ask(stranger, Kind::SsoBrowserOpened, [&] { stranger.startGoogleSso(net::SsoBrowserPage()); });
+        CHECK(ev.ok);
+        const std::string theirs = fakeAuthorize(ctl, strangerBrowser.take(), newSub, newEmail);
+        CHECK(!theirs.empty());
+        const uint16_t port = listenerPort(mine);
+        CHECK(port != 0 && port != listenerPort(theirs));
+        std::string page;
+        CHECK_EQ(browserGet(theirs, &page, port), 400);
+        CHECK(page.find("<html") != std::string::npos);
+        const std::string location = fakeAuthorize(ctl, mine, newSub, newEmail);
+        CHECK_EQ(browserGet(location, &page), 200);
+        CHECK(waitFor(c, Kind::LoginResult, ev));
+        report("own sign-in", ev);
+        CHECK(ev.ok);
+        CHECK_EQ(ev.account.username, newName);
+        stranger.cancelSso();
+        logout();
+        std::remove(strangerCred);
     }
     std::remove(credPath);
 }
