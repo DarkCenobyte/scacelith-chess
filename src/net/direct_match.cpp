@@ -782,11 +782,13 @@ private:
         P::MsgType t;
         P::HelloPrefix pre;
         P::Hello h;
-        if (!P::peekType(msg.data(), msg.size(), t) || t != P::MsgType::Hello) { refuse(P::ErrorCode::HelloRequired, 0); return false; }
-        if (!P::readHelloPrefix(msg.data(), msg.size(), pre)) { refuse(P::ErrorCode::Malformed, 0); return false; }
-        if (pre.proto != P::kProtocolVersion) { refuse(P::ErrorCode::UnsupportedProtocol, pre.seq); return false; }
-        if (!P::decodeHello(msg.data(), msg.size(), h)) { refuse(P::ErrorCode::Malformed, pre.seq); return false; }
-        if (h.seq != 1) { refuse(P::ErrorCode::ProtocolViolation, h.seq); return false; }
+        uint32_t ref = 0;   // Error.ref: the seq of the message refused, when it has one
+        P::peekSeq(msg.data(), msg.size(), ref);
+        if (!P::peekType(msg.data(), msg.size(), t) || t != P::MsgType::Hello) { refuse(P::ErrorCode::HelloRequired, ref); return false; }
+        if (!P::readHelloPrefix(msg.data(), msg.size(), pre)) { refuse(P::ErrorCode::Malformed, ref); return false; }
+        if (pre.proto != P::kProtocolVersion) { refuse(P::ErrorCode::UnsupportedProtocol, ref); return false; }
+        if (!P::decodeHello(msg.data(), msg.size(), h)) { refuse(P::ErrorCode::Malformed, ref); return false; }
+        if (h.seq != 1) { refuse(P::ErrorCode::ProtocolViolation, ref); return false; }
         // Accepted: this connection is the guest from now on (it replaces a stale one).
         if (guest_) LOGI("direct: the guest's new connection replaces the previous one");
         guest_ = std::move(cp);
