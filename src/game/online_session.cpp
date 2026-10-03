@@ -196,7 +196,8 @@ bool isGameEvent(Kind k) {
            k == Kind::GameEnd || k == Kind::RatingUpdate || k == Kind::OpponentGesture;
 }
 
-// Protocol values (dedicated-server/src/protocol/schema.js).
+// Protocol values (realtime protocol v1: dedicated-server/protocol/scacelith-v1.json,
+// dedicated-server/docs/PROTOCOL.md).
 enum ChallengeState { ChPending = 0, ChAccepted = 1, ChDeclined = 2, ChCancelled = 3, ChExpired = 4, ChUnavailable = 5 };
 enum QueueState { QLeft = 0, QSearching = 1, QMatched = 2 };
 enum NoticeCode { NShutdown = 1, NBanned = 2, NRevoked = 3, NCooldown = 4, NReplaced = 5, NRatingRestored = 7 };

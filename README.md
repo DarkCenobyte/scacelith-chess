@@ -226,6 +226,11 @@ they do.
   router opened the port, when to forward it by hand, and when the internet provider shares the
   address (carrier-grade NAT: try IPv6 or a VPN).
 
+Anyone can run a server: it is in `dedicated-server/`, a Rust program (one binary,
+`scacelith-server`) that serves the HTTPS API and the realtime protocol v1
+(`dedicated-server/docs/PROTOCOL.md`) on one port, 443 by default. Its README covers the
+configuration, and `dedicated-server/docs/DEPLOY.md` the installation as a systemd service on Linux.
+
 Development: `--online-mock` replaces the network with an in-process fake server and a fake
 direct-match friend (any password works; see `src/game/online_mock.h` for the inputs that try
 error paths), and `--start-online [category]` goes straight to a game (with `--online-mock` the
