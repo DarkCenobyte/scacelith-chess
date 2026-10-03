@@ -1,6 +1,7 @@
 # Scacelith builds
 
-Prebuilt Windows binaries. This branch only holds binaries; the source code is on `master`.
+Prebuilt binaries: the game for Windows in `windows/`, the dedicated server for Linux in
+`linux-server/`. This branch only holds binaries; the source code is on `master`.
 
 ## windows/Scacelith-2026-09-28-offline.exe
 
@@ -110,4 +111,41 @@ Prebuilt Windows binaries. This branch only holds binaries; the source code is o
 - SHA-256 of the exe: `0c184bac8b60922c745f21804f4a050b7d80e17a72c060a9dca5789afd242258`
 - SHA-256 of the zip: `9b9ffd2651c5d8ce10ff476c794e4ee788555dd22086b03e7eef59d184cf0369`
 
-Licence: GPL-3.0 (see `LICENSE` on `master`); the source of each build is the commit named above.
+## windows/Scacelith-2026-10-03-serveur-rust.zip
+
+- Holds `Scacelith-2026-10-03-serveur-rust.exe` (132 MB, zipped to 95 MB).
+- Source: branch `claude/rust-dedicated-server-9t6idc` at commit `cf9ecd9` (pull request #9, not
+  merged yet), based on `master` at `7531830` (pull request #8 merged).
+- Contents: everything above, moved to the realtime protocol version 1 of the Rust dedicated
+  server. The game waits as long as a full or restarting server asks (`Retry-After`), applies the
+  events of a game in order and asks for the game's state again when one is missing, and follows
+  the gesture rate and keepalive the server announces.
+- Protocol version 1 (`scacelith.rt1`, frozen): it plays online only on a server of this pull
+  request or later (the Linux server below), and earlier exes cannot connect to such a server. Two
+  exes on either side of the change cannot play a direct match.
+- Windows x64, self-contained otherwise (Stockfish 19 in five builds and its NNUE network are
+  embedded; the coach's voice is downloaded by the game). Needs a GPU with OpenGL 4.6.
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (723 tests, one known
+  Wine timing flake that passes when run again), and its online client played a rated game, used
+  the Account page and signed in with Google (simulated) against the Linux server below, under Wine
+  and on Linux; it has not been run on real Windows hardware by the build.
+- SHA-256 of the exe: `282ad6719ec8aedf081ffc2b2d070119bd019f23c1809b5984f0eb1780ac0d00`
+- SHA-256 of the zip: `2e9622146c1e91251bce195bd5be5ab371e6ad2de4139ad0ab688cec79f036fc`
+
+## linux-server/scacelith-server-2026-10-03
+
+- The dedicated server, rewritten in Rust (`scacelith-server` 1.0.0, 13.5 MB): a static x86-64
+  executable (musl) that runs on any x86-64 Linux, whatever its C library, with SQLite built in.
+- Source: branch `claude/rust-dedicated-server-9t6idc` at commit `cf9ecd9` (pull request #9, not
+  merged yet), directory `dedicated-server/`.
+- Install it as `/usr/local/bin/scacelith-server` and follow `dedicated-server/docs/DEPLOY.md`;
+  the systemd unit and the other example files are in `dedicated-server/deploy/systemd/`. It
+  starts from an empty database (a database or journal of the former Node server is not opened)
+  and speaks realtime protocol version 1 only, so players need the game exe above or later.
+- Built with Rust 1.99.0 (`cargo build --release --locked -p scacelith-server --target
+  x86_64-unknown-linux-musl`). Its test suites pass (1,468 Rust tests), and the game's client
+  passed the live checks against this very binary, on Linux and under Wine.
+- SHA-256: `ab406fc8eeeaf62c09b4b84643577f0cb6022eadcbcc58b30e889898e1ef995e`
+
+Licence: GPL-3.0 (see `LICENSE` on `master`; the dedicated server is GPL-3.0-or-later); the source of
+each build is the commit named above.
