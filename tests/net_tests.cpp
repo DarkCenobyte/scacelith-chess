@@ -2319,6 +2319,56 @@ TEST(net_reconnect_delay_policy) {
     }
 }
 
+// The attempt count across connections (a fake clock in ms; u = 1, the top of each range). A server
+// that closes every connection soon after Welcome is tried again with growing delays, up to the
+// caps (30 s, 8 s during a game); only a connection that stayed up for a minute starts again from
+// the shortest. A shutdown keeps its spread first attempt after a connection that reached Welcome.
+TEST(net_reconnect_backoff_across_connections) {
+    using net::RetryCause;
+    net::ReconnectBackoff b;
+    double now = 5000.0;
+    auto shortConnection = [&](RetryCause why, bool inGame) {
+        b.welcomed(now);
+        now += 3000.0;                                 // closed 3 s after Welcome
+        uint32_t ms = b.next(now, why, 1.0, inGame, 0);
+        now += ms;
+        return ms;
+    };
+    for (uint32_t want : {2000u, 4000u, 8000u, 16000u, 30000u, 30000u})
+        CHECK_EQ(shortConnection(RetryCause::Failure, false), want);
+    // Up for a minute: from the shortest again; failed attempts (no Welcome) then grow it.
+    b.welcomed(now);
+    now += 60000.0;
+    CHECK_EQ(b.next(now, RetryCause::Failure, 1.0, false, 0), 2000u);
+    CHECK_EQ(b.next(now += 2000.0, RetryCause::Failure, 1.0, false, 0), 4000u);
+    // 59.9 s is not long enough.
+    b.welcomed(now);
+    now += 59900.0;
+    CHECK_EQ(b.next(now, RetryCause::Failure, 1.0, false, 0), 8000u);
+    // A shutdown after a short connection: the spread first attempt (5 s to 35 s, 1 s to 8 s in
+    // game) whatever the count, which goes on growing for the attempts after it.
+    b.welcomed(now);
+    CHECK_EQ(b.next(now += 3000.0, RetryCause::Shutdown, 0.0, false, 0), 5000u);
+    CHECK_EQ(b.next(now += 5000.0, RetryCause::Shutdown, 1.0, false, 0), 30000u);   // no Welcome since: as a failure
+    b.welcomed(now);
+    CHECK_EQ(b.next(now += 3000.0, RetryCause::Shutdown, 1.0, true, 0), 8000u);
+    CHECK_EQ(b.next(now += 8000.0, RetryCause::Failure, 0.0, true, 0), 500u);
+    // During a game: 8 s at most between attempts, still growing up to it.
+    b.reset();
+    for (uint32_t want : {2000u, 4000u, 8000u, 8000u})
+        CHECK_EQ(shortConnection(RetryCause::Failure, true), want);
+    // A full server waits its minute whatever the count; a Retry-After still applies.
+    CHECK_EQ(shortConnection(RetryCause::ServerFull, false), 120000u);
+    b.welcomed(now);
+    CHECK_EQ(b.next(now += 61000.0, RetryCause::Failure, 0.0, false, 20000), 20000u);
+    // connect() (asked by the player): from the shortest at once.
+    shortConnection(RetryCause::Failure, false);
+    b.reset();
+    CHECK_EQ(b.next(now, RetryCause::Failure, 1.0, false, 0), 2000u);
+    b.reset();
+    CHECK_EQ(b.next(now, RetryCause::Shutdown, 0.0, false, 0), 5000u);   // a shutdown at the first attempt: spread
+}
+
 TEST(net_client_ping_interval) {
     CHECK_EQ(net::clientPingIntervalMs(0), 10000u);            // not announced: the default
     CHECK_EQ(net::clientPingIntervalMs(1), 1000u);

@@ -27,7 +27,9 @@
 //     of the 101 answer is checked against the saved session before Hello (a reinstall), and a
 //     refused upgrade (404, 426: another path or subprotocol) makes the next attempt read /info
 //     again. A connect() asked by the player always reads /info again and never waits for the
-//     backoff.
+//     backoff. The delay starts again from the shortest only after a connection that stayed up for
+//     a minute (ReconnectBackoff): a server that closes right after Welcome is not redialled every
+//     second or two.
 //   - Gestures (sendGesture, net/gesture.h) follow Welcome.gestureRate / gestureBurst, the
 //     server's relay bucket: only the latest one waits, and it goes when a token of a bucket one
 //     message smaller than the server's allows (none when the rate is 0): the server then drops
@@ -306,6 +308,17 @@ uint32_t reconnectDelayMs(int attempt, RetryCause cause, double u, bool gameInPr
     return uint32_t(ms);
 }
 
+uint32_t ReconnectBackoff::next(double nowMs, RetryCause cause, double u, bool gameInProgress, uint32_t retryAfterMs) {
+    const bool welcomed = welcomedAtMs_ >= 0.0;
+    if (welcomed && nowMs - welcomedAtMs_ >= kStableMs) attempt_ = 0;
+    welcomedAtMs_ = -1.0;
+    // A shutdown spreads its first attempt after any connection that reached Welcome, whatever the count.
+    const uint32_t ms = reconnectDelayMs(welcomed && cause == RetryCause::Shutdown ? 0 : attempt_, cause, u, gameInProgress,
+                                         retryAfterMs);
+    ++attempt_;
+    return ms;
+}
+
 uint32_t clientPingIntervalMs(uint32_t announced) {
     return announced == 0 ? 10000u : std::clamp<uint32_t>(announced, 1000u, 60000u);
 }
@@ -368,7 +381,7 @@ struct OnlineClient::Impl {
     struct Rt {
         bool wanted = false;
         ServerEndpoint ep;
-        int attempt = 0;
+        ReconnectBackoff backoff;
         Clock::time_point nextAttempt{}, connectedAt{}, lastRecv{}, nextPing{};
         Clock::time_point probedAt{};                     // lastRecv when the silence probe went
         std::unique_ptr<WebSocket> ws;
@@ -943,8 +956,7 @@ struct OnlineClient::Impl {
 
     void scheduleRetry(RetryCause why, uint32_t retryAfterMs = 0) {
         const bool inGame = rt.game.id != 0 && rt.game.status == int(pr::GameStatus::Ongoing);
-        uint32_t delay = reconnectDelayMs(rt.attempt, why, jitterUniform(), inGame, retryAfterMs);
-        ++rt.attempt;
+        uint32_t delay = rt.backoff.next(steadyMs(), why, jitterUniform(), inGame, retryAfterMs);
         rt.nextAttempt = Clock::now() + std::chrono::milliseconds(delay);
         LOGI("net: next connection attempt in %.1f s", delay / 1000.0);
         setState(ConnState::Reconnecting);
@@ -1156,7 +1168,7 @@ struct OnlineClient::Impl {
             pr::Welcome m;
             if (!pr::decode(p, n, m)) return bad();
             rt.welcomed = true;
-            rt.attempt = 0;
+            rt.backoff.welcomed(steadyMs());
             rt.heartbeatMs = m.heartbeatMs;
             rt.pingEveryMs = clientPingIntervalMs(m.clientPingMs);
             rt.pingBurst = kPingBurst;
@@ -2101,7 +2113,7 @@ void OnlineClient::Impl::resumeRealtime(uint32_t gen, std::shared_ptr<bool> wasO
     realtime([this, gen, wasOpen] {
         if (!*wasOpen || gen != connectGen.load() || rt.wanted) return;
         rt.wanted = true;
-        rt.attempt = 0;
+        rt.backoff.reset();
         rt.nextAttempt = Clock::now();
     });
 }
@@ -2428,7 +2440,7 @@ void OnlineClient::connect() {
         if (!d->rt.ws) {
             // Asked by the player: at once (never behind the backoff), with a fresh /info. A 503
             // now means a full server, whatever happened before.
-            d->rt.attempt = 0;
+            d->rt.backoff.reset();
             d->rt.nextAttempt = Clock::now();
             d->rt.info = Impl::Rt::Info();
             d->rt.restarting = false;
