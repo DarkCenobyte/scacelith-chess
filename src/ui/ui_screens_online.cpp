@@ -818,7 +818,8 @@ void pageSsoName(float t) {
     im::formField(L("online.field.username"), O.ssoName, formRow(p, y), 24, im::FIELD_LTR, T("online.field.username.hint"));
     messageLine(p, y + 20.0f);
     footerRule(p);
-    bool cancel = backButton(p, "common.cancel");
+    // Not while the user name is sent: its answer would come to the page left.
+    bool cancel = backButton(p, "common.cancel", !busy);
     if (primaryButton(p, "online.sso.continue", !trim(O.ssoName).empty(), busy)) {
         O.error.clear();
         s.api().completeSso(trim(O.ssoName));
@@ -826,7 +827,7 @@ void pageSsoName(float t) {
     }
     im::popId();
     endPage();
-    if (cancel || im::consumeBack()) {
+    if (cancel || (im::consumeBack() && !busy)) {
         s.api().cancelSso();
         setSub(Sub::SignIn);
     }
