@@ -623,3 +623,29 @@ TEST(live_test_answer_comes_from_the_tested_server) {
     e.kind = net::Event::Kind::AccountResult;
     CHECK(!live::testAnswer(e, true, "other.test:443"));
 }
+
+// Options' pin field emptied for the custom server applied: Apply forgets the pin saved at sign-in,
+// and "Test connection" goes without it (one rule for both, so that the test tells what Apply gives).
+TEST(live_saved_pin_dropped_with_the_pin_field) {
+    const std::string pin(64, 'a');
+    net::ServerEndpoint applied;
+    applied.host = "chess.example.org";
+    applied.apiPort = 8443;
+    applied.pinnedSha256 = pin;
+    net::ServerEndpoint ep = applied;
+    ep.pinnedSha256.clear();
+    CHECK(live::savedPinDropped(ep, applied, true));
+    ep.host = "CHESS.example.org";              // the same origin
+    CHECK(live::savedPinDropped(ep, applied, true));
+    // The official server chosen, a pin still given, another server, or none applied with a pin:
+    // the saved pin stays.
+    CHECK(!live::savedPinDropped(ep, applied, false));
+    ep.pinnedSha256 = std::string(64, 'b');
+    CHECK(!live::savedPinDropped(ep, applied, true));
+    ep.pinnedSha256.clear();
+    ep.apiPort = 443;
+    CHECK(!live::savedPinDropped(ep, applied, true));
+    ep.apiPort = 8443;
+    applied.pinnedSha256.clear();
+    CHECK(!live::savedPinDropped(ep, applied, true));
+}

@@ -563,10 +563,11 @@ struct OnlineClient::Impl {
         rtCv.notify_one();
     }
 
-    // The pin in effect for an endpoint: the one given, else the one saved for its origin.
-    std::string effectivePin(const ServerEndpoint& e) {
+    // The pin in effect for an endpoint: the one given, else the one saved for its origin (unless
+    // savedPin is false).
+    std::string effectivePin(const ServerEndpoint& e, bool savedPin = true) {
         std::string p = normalizePin(e.pinnedSha256);
-        if (!p.empty()) return p;
+        if (!p.empty() || !savedPin) return p;
         return creds.pin(e.origin());
     }
 
@@ -598,6 +599,7 @@ struct OnlineClient::Impl {
         const char* accept = "application/json";
         int timeoutMs = 0;       // > 0: HttpRequest::timeoutMs (an answer the server may take long
                                  // to prepare); 0: the transport's own (15 s)
+        bool savedPin = true;    // false: the endpoint's pin only, not the one saved for its origin
     };
 
     Api api(const ServerEndpoint& e, const std::string& method, const std::string& path, const json::Value* body,
@@ -621,7 +623,7 @@ struct OnlineClient::Impl {
         req.host = e.host;
         req.port = e.apiPort;
         req.tls = !e.insecureDev;
-        req.pinnedSha256 = req.tls ? effectivePin(e) : std::string();
+        req.pinnedSha256 = req.tls ? effectivePin(e, call.savedPin) : std::string();
         req.path = "/api/v1" + path;
         req.accept = call.accept;
         if (call.rawCap > 0) req.maxResponseBytes = call.rawCap;
@@ -804,8 +806,10 @@ struct OnlineClient::Impl {
 
     // Fetches /info and applies the per-origin identity rule: a saved session whose server id
     // differs from the one announced now belongs to another server: it is dropped, never sent.
-    Api fetchInfo(const ServerEndpoint& e, ServerInfo& info, CancelToken& cancel) {
-        Api a = api(e, "GET", "/info", nullptr, false, cancel);
+    Api fetchInfo(const ServerEndpoint& e, ServerInfo& info, CancelToken& cancel, bool savedPin = true) {
+        Call call;
+        call.savedPin = savedPin;
+        Api a = request(e, "GET", "/info", nullptr, call, cancel);
         if (!a.ok()) return a;
         info = parseInfo(a.body);
         Credential c;
@@ -1683,13 +1687,13 @@ void OnlineClient::forgetSavedPin() {
 
 const ServerEndpoint& OnlineClient::server() const { return impl_->ep; }
 
-void OnlineClient::fetchServerInfo() {
+void OnlineClient::fetchServerInfo(bool ignoreSavedPin) {
     Impl* d = impl_.get();
     ServerEndpoint e = d->ep;
-    d->http([d, e] {
+    d->http([d, e, ignoreSavedPin] {
         Event ev;
         ev.kind = Event::Kind::ServerInfoResult;
-        Impl::Api a = d->fetchInfo(e, ev.info, d->httpCancel);
+        Impl::Api a = d->fetchInfo(e, ev.info, d->httpCancel, !ignoreSavedPin);
         Impl::fillError(ev, a);
         if (a.ok() && !ev.info.compatible) {
             ev.ok = false;

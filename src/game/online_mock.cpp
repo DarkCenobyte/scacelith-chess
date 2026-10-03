@@ -1853,7 +1853,7 @@ void FakeServer::setServer(const ServerEndpoint& ep) {
 }
 const ServerEndpoint& FakeServer::server() const { return impl_->ep; }
 
-void FakeServer::fetchServerInfo() {
+void FakeServer::fetchServerInfo(bool) {
     Impl& I = *impl_;
     I.lastNow = nowMs();
     if (I.transportError(Event::Kind::ServerInfoResult)) return;

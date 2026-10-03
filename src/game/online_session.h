@@ -31,7 +31,7 @@ public:
     virtual ~ServerApi() = default;
     virtual void setServer(const net::ServerEndpoint& ep) = 0;
     virtual void forgetSavedPin() = 0;
-    virtual void fetchServerInfo() = 0;
+    virtual void fetchServerInfo(bool ignoreSavedPin = false) = 0;
     virtual bool hasSavedSession() const = 0;
     virtual std::string savedUsername() const = 0;
     virtual void registerAccount(const std::string& username, const std::string& email, const std::string& password) = 0;
@@ -148,8 +148,9 @@ public:
     void refreshInfo();                         // fetchServerInfo(), result in info()
     std::string serverName() const;             // info().name, or the host
     // Options > Online "Test connection": fetches the info of 'ep' (the values being edited,
-    // not applied yet) and comes back to the current server. The result: takeTest().
-    void testServer(const net::ServerEndpoint& ep);
+    // not applied yet; custom: a community server is chosen there) and comes back to the current
+    // server, with the trust that applying them would give. The result: takeTest().
+    void testServer(const net::ServerEndpoint& ep, bool custom);
     bool testing() const { return testing_; }
     bool takeTest(net::Event& out);
 

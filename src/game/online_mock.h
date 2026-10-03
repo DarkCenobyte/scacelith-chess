@@ -86,7 +86,7 @@ public:
     void setServer(const ServerEndpoint& ep);
     void forgetSavedPin() {}          // the fakes have no certificates
     const ServerEndpoint& server() const;
-    void fetchServerInfo();
+    void fetchServerInfo(bool ignoreSavedPin = false);   // ignoreSavedPin: no effect (no certificates)
     bool hasSavedSession() const;
     std::string savedUsername() const;
     void registerAccount(const std::string& username, const std::string& email, const std::string& password);

@@ -4647,6 +4647,46 @@ TEST(net_forget_saved_pin_at_exit) {
     net::sys::removeFile(credPath);
 }
 
+// Options' "Test connection" of a server whose pin field was emptied asks for its info without the
+// pin saved at sign-in (fetchServerInfo(true)), and forgets nothing: that pin and the session stay
+// until Apply. Plain HTTP here (no pin is checked); the live check (net_live_account_api) sees the
+// self-signed certificate refused over TLS.
+TEST(net_info_without_the_saved_pin_keeps_it) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    FakeServer srv;
+    CHECK(srv.start());
+    std::string credPath = tempCredentialPath("info-no-saved-pin");
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = srv.port;
+    ep.insecureDev = true;
+    const std::string pin(64, 'c');
+    {
+        net::CredentialStore s(credPath);
+        net::Credential cr;
+        cr.origin = ep.origin();
+        cr.username = "alice";
+        cr.token = srv.token;
+        cr.pinnedSha256 = pin;
+        CHECK(s.put(cr));
+    }
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        c.fetchServerInfo(true);
+        net::Event ev;
+        CHECK(waitEvent(c, net::Event::Kind::ServerInfoResult, ev, 10000));
+        CHECK(ev.ok);
+        CHECK_EQ(srv.infos.load(), 1);
+        CHECK(c.hasSavedSession());
+    }
+    net::CredentialStore after(credPath);
+    CHECK_EQ(after.pin(ep.origin()), pin);
+    CHECK(after.hasToken(ep.origin()));
+    net::sys::removeFile(credPath);
+}
+
 // ---- Google sign-in (loopback redirect, dedicated-server/docs/API.md) --------------------------------
 // The scripted server plays start / finish / link / complete / login/mfa; the browser opener seam
 // plays the browser and Google: it reads the redirect URI and the state of the Google page the

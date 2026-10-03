@@ -403,7 +403,9 @@ public:
     // ends if it ends first.
     void forgetSavedPin();
     const ServerEndpoint& server() const;
-    void fetchServerInfo();
+    // ignoreSavedPin: this request goes without the pin saved for the origin (the endpoint's own
+    // still applies), as every request will after forgetSavedPin() (Options' "Test connection").
+    void fetchServerInfo(bool ignoreSavedPin = false);
     bool hasSavedSession() const;                // a token is stored for the current origin and decrypts here
     std::string savedUsername() const;           // last user name used on this origin
     void registerAccount(const std::string& username, const std::string& email, const std::string& password);
