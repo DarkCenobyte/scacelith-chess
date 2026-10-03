@@ -5,7 +5,8 @@
 // AccountData, and routes the answers of net::OnlineClient to it (AccountData::apply); the pages
 // (ui/ui_screens_account.cpp) read it. The animated GIFs of games (a game of the history, a game
 // of the saved games: ui/ui_library.cpp) go through one GifSaver, which writes each file to the
-// GIF folder. Engine-free (no GL, no UI): unit-tested in tests/online_account_tests.cpp.
+// GIF folder. The HTTPS errors in words (onlineErrorText) are here too. Engine-free (no GL, no UI):
+// unit-tested in tests/online_account_tests.cpp.
 #pragma once
 #include "../net/online_client.h"
 #include "game_archive.h"
@@ -174,6 +175,12 @@ std::string timeControlLabel(int64_t baseMs, int64_t incMs);
 // "14:32": the local time of an epoch-ms instant (the end of a ban or of a matchmaking cooldown),
 // "17.10.2026 14:32" when it is not today.
 std::string localTimeText(double epochMs);
+// "0:45" (a duration).
+std::string durationText(double ms);
+// Friendly texts (i18n) of the network layer's HTTPS errors: an error code ("invalid_credentials",
+// "rate_limited" with the retry delay, "banned" with its end, "network", "tls", "certificate",
+// "incompatible"...); game::OnlineSession's other error texts (online_session.h) build on it.
+std::string onlineErrorText(const std::string& code, int retryAfterSec = 0, int64_t bannedUntilMs = 0);
 
 // The file of an account export: "<host>_<username>_<YYYY-MM-DD>.json", the date in local time, the
 // host and the user name made safe for a file name (game::archive::sanitizeName).

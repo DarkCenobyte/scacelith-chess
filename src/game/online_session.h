@@ -312,11 +312,9 @@ private:
 
 OnlineSession& onlineSession();
 
-// Friendly texts (i18n) of the network layer's errors: an HTTPS error code ("invalid_credentials",
-// "rate_limited" with the retry delay, "banned" with its end, "network", "tls", "certificate",
-// "incompatible"...), a realtime net::proto ErrorCode, a direct match error ("refused",
+// Friendly texts (i18n) of the network layer's errors: an HTTPS error code is onlineErrorText()
+// (online_account.h); a realtime net::proto ErrorCode, a direct match error ("refused",
 // "timeout", "wrong_code", "incompatible", "port_in_use"... see net::DirectMatch::lastError()).
-std::string onlineErrorText(const std::string& code, int retryAfterSec = 0, int64_t bannedUntilMs = 0);
 // The error of a GIF in words (GifSaver::error()): the account's quota used up with the wait in
 // minutes and seconds, the renderer busy, signed out, a game too long, a PGN the server cannot
 // read, a render that failed, a server without GIFs, the file not written; the other codes as
@@ -327,7 +325,5 @@ std::string serverErrorText(int code);
 // while not connected, which the network layer drops).
 std::string eventErrorText(const net::Event& e);
 std::string directErrorText(const std::string& code);
-// "0:45" (a duration); the local time of an instant is localTimeText (online_account.h).
-std::string durationText(double ms);
 
 }  // namespace game

@@ -6,6 +6,7 @@
 #include "game_archive.h"
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <exception>
 
@@ -325,6 +326,43 @@ std::string localTimeText(double epochMs) {
         else std::snprintf(buf, sizeof buf, "%02d.%02d.%04d %02d:%02d", when.tm_mday, when.tm_mon + 1, when.tm_year + 1900, when.tm_hour, when.tm_min);
     }
     return i18n::ltr(buf);
+}
+
+std::string durationText(double ms) {
+    long long s = std::max(0LL, (long long)std::ceil(ms / 1000.0));
+    char buf[32];
+    if (s >= 3600) std::snprintf(buf, sizeof buf, "%lld:%02lld:%02lld", s / 3600, (s / 60) % 60, s % 60);
+    else std::snprintf(buf, sizeof buf, "%lld:%02lld", s / 60, s % 60);
+    return i18n::ltr(buf);
+}
+
+std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t bannedUntilMs) {
+    if (code.empty()) return "";
+    if (code == "rate_limited") {
+        if (retryAfterSec > 0) return i18n::trf("online.err.rate_limited_for", {durationText(retryAfterSec * 1000.0)});
+        return i18n::tr("online.err.rate_limited");
+    }
+    if (code == "server_busy") {
+        // Too many password checks at once on the server (its hash queue is full): not the player's fault.
+        if (retryAfterSec > 0) return i18n::trf("online.err.server_busy_for", {durationText(retryAfterSec * 1000.0)});
+        return i18n::tr("online.err.server_busy");
+    }
+    if (code == "too_many_attempts") {
+        if (retryAfterSec > 0) return i18n::trf("online.err.too_many_attempts_for", {durationText(retryAfterSec * 1000.0)});
+        return i18n::tr("online.err.too_many_attempts");
+    }
+    if (code == "banned") {
+        if (bannedUntilMs > 0) return i18n::trf("online.err.banned_until", {localTimeText(double(bannedUntilMs))});
+        return i18n::tr("online.err.banned");
+    }
+    static const char* known[] = {"invalid_credentials", "email_unverified", "network", "tls", "certificate", "incompatible",
+                                  "unauthorized", "username_taken", "email_taken", "invalid_username", "invalid_email",
+                                  "weak_password", "invalid_code", "expired", "registration_closed", "sso_cancelled",
+                                  "server_error", "timeout", "offline", "invalid_password", "mfa_code_required",
+                                  "password_not_set", "same_email", "not_found", "invalid_response"};
+    for (const char* k : known)
+        if (code == k) return i18n::tr(std::string("online.err.") + k);
+    return i18n::trf("online.err.other", {code});
 }
 
 std::string exportFileName(const std::string& host, const std::string& username, std::time_t when) {
