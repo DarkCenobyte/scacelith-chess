@@ -240,8 +240,8 @@ bool checkMalformed(const std::string& name, const std::vector<uint8_t>& bytes, 
 // =============================================================================================
 
 TEST(net_protocol_constants) {
-    CHECK_EQ(pr::kProtocolVersion, 2);
-    CHECK_EQ(pr::kProtocolMin, 2);
+    CHECK_EQ(pr::kProtocolVersion, 3);
+    CHECK_EQ(pr::kProtocolMin, 3);
     CHECK_EQ(std::string(pr::kWsSubprotocol), std::string("scacelith.v1"));
     CHECK_EQ(int(pr::MsgType::Move), 0x20);
     CHECK_EQ(int(pr::MsgType::C_Ping), 0x02);
