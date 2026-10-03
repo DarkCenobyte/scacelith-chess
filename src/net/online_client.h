@@ -37,8 +37,9 @@
 //     values of open enums are ignored or kept, never refused. A close code of the error rule
 //     (4000 + code, 4300 + code - 240) without its fatal Error acts as that Error.
 //   - Gestures (additive): sendGesture() and Event::Kind::OpponentGesture relay the live
-//     gestures of the two players (net/gesture.h), and OnlineGame::autoPress tells whether the
-//     robots press the clock by themselves in the game.
+//     gestures of the two players (net/gesture.h), gestureKeepaliveMs() gives the interval of
+//     their keepalive (Welcome.gestureIdleMs), and OnlineGame::autoPress tells whether the robots
+//     press the clock by themselves in the game.
 //   - Account API (additive): the game history, a game's details and PGN, the signed-in devices,
 //     the challenge preference, the e-mail change, the data export and the account deletion
 //     (fetchMyGames ... deleteAccount below; dedicated-server/docs/API.md). A 401 answer to any
@@ -531,6 +532,10 @@ public:
     // Dropped while not Online (never queued for a reconnection) and when gameId is not the game
     // of the last GameSnapshot. Cheap enough to call every frame.
     void sendGesture(uint64_t gameId, const Gesture& g);
+    // The gesture keepalive of the server (ms): Welcome.gestureIdleMs of the last Welcome, clamped
+    // (gestureKeepaliveMs); kGestureKeepaliveMinMs before any. The scene sends a Gesture at least
+    // this often and counts the opponent's timeouts in it (game/online_live.h).
+    int gestureKeepaliveMs() const;
 
     // Drains one event; call until it returns false, once per frame.
     bool poll(Event& out);

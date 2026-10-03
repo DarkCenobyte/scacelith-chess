@@ -2391,7 +2391,8 @@ TEST(direct_guest_gesture_at_once_after_reconnecting) {
     // reconnection (the scene does: the host waits for one sent after the return). The link is up
     // for Gestures before that event, so the Gesture reaches the host. The guest's worker is held
     // at the log line that follows the event, so a link brought up only after it would still be
-    // down when the Gesture is sent.
+    // down when the Gesture is sent. The guest's keepalive is the one of the host's last Welcome
+    // (gestureIdleMs, clamped to 1 s .. 10 s).
     RawHost raw;
     CHECK(raw.listen());
     direct::Authority auth(direct::AuthorityConfig(), "Alice", "Bob", 1);
@@ -2399,7 +2400,7 @@ TEST(direct_guest_gesture_at_once_after_reconnecting) {
     auth.startGame(sock::epochMs(), out);
     CHECK(out.toGuest.size() == 1);
     if (out.toGuest.size() != 1) return;
-    auto welcome = [&] {
+    auto welcome = [&](uint16_t gestureIdleMs) {
         P::Welcome w;
         w.proto = P::kProtocolVersion;
         w.serverTime = sock::epochMs();
@@ -2412,14 +2413,17 @@ TEST(direct_guest_gesture_at_once_after_reconnecting) {
         w.activeGame = auth.gameId();
         w.gestureRate = 10;
         w.gestureBurst = 20;
+        w.gestureIdleMs = gestureIdleMs;
         return raw.send(w);
     };
     Peer guest, nobody;
+    CHECK_EQ(guest.dm.gestureKeepaliveMs(), 1000);   // no match yet
     guest.dm.join("127.0.0.1", raw.port, raw.code, "Bob");
     P::Hello hello;
     CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
-    CHECK(welcome() && raw.sendBytes(out.toGuest[0]));
+    CHECK(welcome(4000) && raw.sendBytes(out.toGuest[0]));
     CHECK(waitUntil(guest, nobody, [&] { return guest.count(Event::Kind::GameSnapshot) == 1; }));
+    CHECK_EQ(guest.dm.gestureKeepaliveMs(), 4000);
     raw.drop();   // the network fails: the guest comes back by itself
     CHECK(waitUntil(guest, nobody, [&] { return guest.hasConn(ConnState::Reconnecting); }));
     CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
@@ -2428,7 +2432,7 @@ TEST(direct_guest_gesture_at_once_after_reconnecting) {
     bool online = false;
     {
         StderrHold hold;
-        CHECK(welcome());
+        CHECK(welcome(30000));
         auto end = std::chrono::steady_clock::now() + std::chrono::seconds(5);
         while (!online && std::chrono::steady_clock::now() < end) {
             Event e;
@@ -2440,6 +2444,7 @@ TEST(direct_guest_gesture_at_once_after_reconnecting) {
     P::C_Gesture got;
     CHECK(raw.waitFor(got, 3000));
     CHECK(got.game == auth.gameId() && got.touch == 12);
+    CHECK_EQ(guest.dm.gestureKeepaliveMs(), 10000);   // 30 s announced: clamped
 }
 
 TEST(direct_gestures_outside_flood_limit) {
@@ -2461,6 +2466,8 @@ TEST(direct_gestures_outside_flood_limit) {
     CHECK(raw.waitFor(w, 5000));
     CHECK_EQ(int(w.gestureRate), 10);
     CHECK_EQ(int(w.gestureBurst), 20);
+    CHECK_EQ(int(w.gestureIdleMs), 1000);
+    CHECK_EQ(host.dm.gestureKeepaliveMs(), 1000);   // the host's own scene sends at that interval too
     CHECK_EQ(int(w.maxMsgPerSec), 20);
     CHECK_EQ(int(w.msgBurst), 20);
     P::GameSnapshot s;
@@ -2510,6 +2517,7 @@ bool sendWelcome(RawHost& raw, const direct::Authority& auth) {
     w.activeGame = auth.gameId();
     w.gestureRate = 10;
     w.gestureBurst = 20;
+    w.gestureIdleMs = 1000;
     return raw.send(w);
 }
 

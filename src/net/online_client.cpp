@@ -39,7 +39,9 @@
 //     message smaller than the server's allows (none when the rate is 0): the server then drops
 //     none unless a stall of the link delivers more than its burst at once (gestureSendCapacity).
 //     A Gesture made while the connection is down, or for another game than the one of the last
-//     GameSnapshot, is dropped: the next one carries the whole state again.
+//     GameSnapshot, is dropped: the next one carries the whole state again. Welcome.gestureIdleMs
+//     (the server's GESTURE_IDLE_MS), clamped to 1 s .. 10 s, is the scene's keepalive
+//     (gestureKeepaliveMs()).
 //
 // Keeping the realtime connection on its own thread means a slow HTTPS call (or a proof of
 // work) never delays the answer to a server Ping or the sending of a move. The game thread only
@@ -386,6 +388,7 @@ struct OnlineClient::Impl {
     std::atomic<bool> stopFlag{false};
     std::atomic<int> connState{int(ConnState::Offline)};
     std::atomic<int> ping{-1};
+    std::atomic<int> gestureKeepalive{kGestureKeepaliveMinMs};   // gestureKeepaliveMs(Welcome.gestureIdleMs)
     std::atomic<double> clockOffset{0.0};
     std::atomic<uint32_t> connectGen{0};
     // Bumped by setServer() when the origin changes: a proof of work for a server that is no
@@ -1267,6 +1270,7 @@ struct OnlineClient::Impl {
             rt.pingBurst = kPingBurst;
             rt.restarting = false;
             rt.gestures.reset(steadyMs(), m.gestureRate, gestureSendCapacity(m.gestureBurst));
+            gestureKeepalive.store(net::gestureKeepaliveMs(m.gestureIdleMs));
             if (rt.info.valid) rt.info.proven = true;
             if (!rt.haveOffset) clockOffset.store(m.serverTime - localEpochMs());
             setState(ConnState::Online);
@@ -2639,6 +2643,7 @@ void OnlineClient::disconnect() {
 
 ConnState OnlineClient::state() const { return ConnState(impl_->connState.load()); }
 int OnlineClient::pingMs() const { return impl_->ping.load(); }
+int OnlineClient::gestureKeepaliveMs() const { return impl_->gestureKeepalive.load(); }
 double OnlineClient::serverNowMs() const { return localEpochMs() + impl_->clockOffset.load(); }
 
 void OnlineClient::joinQueue(const std::string& category, bool rated) {

@@ -39,6 +39,7 @@ constexpr int kMaxMsgPerSec = 20;          // Welcome.maxMsgPerSec...
 constexpr int kMsgBurst = 20;              // ...and msgBurst: more within a second closes the link (Gestures aside)
 constexpr int kGestureRate = 10;           // Gestures per second each way (Welcome.gestureRate)...
 constexpr int kGestureBurst = 20;          // ...with bursts up to this many (Welcome.gestureBurst)
+constexpr int kGestureIdleMs = 1000;       // a Gesture at least this often while nothing changes (Welcome.gestureIdleMs)
 constexpr size_t kMaxOutbox = 1 << 20;
 constexpr int64_t kDefaultGraceMs = 60000;
 constexpr size_t kMaxQueuedCommands = 32;
@@ -387,6 +388,7 @@ public:
     std::deque<Command> commands;
     struct GestureOut { bool pending = false; uint64_t game = 0; Gesture g; } gestureOut;
     bool gestureLink = false;   // the other player is connected (the worker sets it)
+    int gestureKeepalive = kGestureKeepaliveMinMs;   // ms, gestureKeepaliveMs of the host's Welcome (the worker sets it)
     int pingMs = -1;
     double clockOffset = 0;   // guest: host clock - local clock
     const bool isHost;
@@ -426,15 +428,17 @@ protected:
         }
         events.push_back(std::move(ev));
     }
-    // The link to the other player came up (paced for the receiver's bucket of rate / burst) or
-    // went down (the Gesture waiting is dropped: none is kept for the reconnection). It comes up
-    // before any event that tells the game thread the other player is there (the snapshot,
-    // Online), so the first Gesture the game thread sends on that news is never dropped.
-    void gestureLinkUp(int rate, int burst) {
+    // The link to the other player came up (paced for the receiver's bucket of rate / burst, the
+    // scene's keepalive set to keepaliveMs) or went down (the Gesture waiting is dropped: none is
+    // kept for the reconnection). It comes up before any event that tells the game thread the
+    // other player is there (the snapshot, Online), so the first Gesture the game thread sends on
+    // that news is never dropped.
+    void gestureLinkUp(int rate, int burst, int keepaliveMs) {
         std::lock_guard<std::mutex> lk(m);
         gestureBucket_.reset(double(sock::steadyMs()), rate, gestureSendCapacity(burst));
         gestureOut.pending = false;
         gestureLink = true;
+        gestureKeepalive = keepaliveMs;
     }
     void gestureLinkDown() {
         std::lock_guard<std::mutex> lk(m);
@@ -825,10 +829,12 @@ private:
         w.activeGame = auth_->gameId();
         w.gestureRate = kGestureRate;
         w.gestureBurst = kGestureBurst;
+        w.gestureIdleMs = kGestureIdleMs;
         std::vector<uint8_t> buf;
         P::encode(w, buf);
         guest_->send(buf);   // before the snapshot in 'out'
-        gestureLinkUp(kGestureRate, kGestureBurst);   // the host's Gestures still go after the snapshot
+        // The host's Gestures still go after the snapshot.
+        gestureLinkUp(kGestureRate, kGestureBurst, gestureKeepaliveMs(kGestureIdleMs));
         dispatch(out);
         LOGI("direct: guest \"%s\" %s", auth_->guestName().c_str(), first ? "joined" : "reconnected");
         if (first) {
@@ -1305,7 +1311,7 @@ private:
             clockOffset = offset_;
         }
         nextPing_ = now;
-        gestureLinkUp(w.gestureRate, w.gestureBurst);
+        gestureLinkUp(w.gestureRate, w.gestureBurst, gestureKeepaliveMs(w.gestureIdleMs));
         if (first) setState(DirectMatch::State::Playing);
         connectionEvent(ConnState::Online);
         LOGI("direct: %s the match of \"%s\"", first ? "joined" : "rejoined", w.serverName.c_str());
@@ -1572,6 +1578,13 @@ int DirectMatch::pingMs() const {
     if (!impl_->cur) return -1;
     std::lock_guard<std::mutex> lk2(impl_->cur->m);
     return impl_->cur->pingMs;
+}
+
+int DirectMatch::gestureKeepaliveMs() const {
+    std::lock_guard<std::mutex> lk(impl_->m);
+    if (!impl_->cur) return kGestureKeepaliveMinMs;
+    std::lock_guard<std::mutex> lk2(impl_->cur->m);
+    return impl_->cur->gestureKeepalive;
 }
 
 double DirectMatch::serverNowMs() const {
