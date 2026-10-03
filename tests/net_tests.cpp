@@ -4950,8 +4950,9 @@ TEST(net_sso_needs_username) {
 }
 
 // The address of an account with a password: SsoNeedsPassword with its name, then linkSso(). A
-// wrong password keeps the step (the same ticket goes again), a proof of work is solved and the
-// request repeated once, mfaRequired continues with loginMfa(); a 410 ends the step.
+// wrong password, or too many, keeps the step (the same ticket goes again), a proof of work is
+// solved and the request repeated once, mfaRequired continues with loginMfa(); a 410 ends the step,
+// and so does another server chosen at that step (nothing is sent to either server).
 TEST(net_sso_link) {
     if (!net::transportAvailable()) SKIP("transport unavailable");
     SsoRig rig("sso-link");
@@ -4965,7 +4966,8 @@ TEST(net_sso_link) {
         const int n = ++links;
         if (b["linkTicket"].asString() != kSsoLinkTicket) return jsonReply(410, R"({"error":"sso_expired"})");
         if (n == 1) return jsonReply(401, R"({"error":"invalid_credentials","message":"Wrong password."})");
-        if (n == 2) return jsonReply(428, R"({"error":"pow_required","pow":{"challenge":"sso-link-test","bits":4}})");
+        if (n == 2) return jsonReply(429, R"({"error":"too_many_attempts","retryAfter":1})");
+        if (n == 3) return jsonReply(428, R"({"error":"pow_required","pow":{"challenge":"sso-link-test","bits":4}})");
         if (!b["pow"].isObject() || b["password"].asString() != "right password") return jsonReply(400, R"({"error":"invalid_request"})");
         return jsonReply(200, "{\"mfaRequired\":true,\"mfaToken\":\"" + mfaToken + "\",\"expiresIn\":300}");
     };
@@ -4983,18 +4985,21 @@ TEST(net_sso_link) {
     CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
     CHECK_EQ(ev.error, std::string("invalid_credentials"));
     rig.c->linkSso("right password");
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK_EQ(ev.error, std::string("too_many_attempts"));
+    rig.c->linkSso("right password");
     CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 15000));
     CHECK(ev.mfaRequired);
-    CHECK_EQ(links.load(), 3);
+    CHECK_EQ(links.load(), 4);
     auto sent = rig.requests("/api/v1/auth/sso/google/link");
-    REQUIRE(sent.size() == 3);
+    REQUIRE(sent.size() == 4);
     for (auto& r : sent) {
         Value b = bodyOf(r);
         CHECK_EQ(b["linkTicket"].asString(), kSsoLinkTicket);
         CHECK(b["clientLabel"].isString());
     }
     CHECK(keysOf(bodyOf(sent[0])) == (std::vector<std::string>{"clientLabel", "linkTicket", "password"}));
-    CHECK(bodyOf(sent[2])["pow"]["nonce"].isString());
+    CHECK(bodyOf(sent[3])["pow"]["nonce"].isString());
     rig.c->loginMfa("654321");
     CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
     CHECK(ev.ok);
@@ -5007,6 +5012,18 @@ TEST(net_sso_link) {
     CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
     CHECK_EQ(ev.error, std::string("sso_expired"));
     const size_t sentBefore = rig.requests("/api/v1/auth/sso/google/link").size();
+    rig.c->linkSso("right password");
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+    CHECK_EQ(ev.error, std::string("sso_expired"));
+    CHECK_EQ(rig.requests("/api/v1/auth/sso/google/link").size(), sentBefore);
+
+    // Another sign-in; the player switches servers at the password step ("localhost" reaches the same
+    // fake server under another origin): the step ends there.
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoNeedsPassword, ev, 10000));
+    net::ServerEndpoint other = rig.ep;
+    other.host = "localhost";
+    rig.c->setServer(other);
     rig.c->linkSso("right password");
     CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
     CHECK_EQ(ev.error, std::string("sso_expired"));

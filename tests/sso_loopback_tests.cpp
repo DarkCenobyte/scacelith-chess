@@ -3,8 +3,8 @@
 // the pages and their headers, the origin tag's contract vectors; then the listener on real
 // sockets: bound to 127.0.0.1 only, one redirect served and the port closed after it, a request of
 // another sign-in answered 'foreign' while it goes on waiting, Google's error, idle sockets of a
-// browser's preconnect (one beside the request, the slots all taken), the deadline, and cancel()
-// (before anything, and racing a request). The same file runs on Linux and under Wine
+// browser's preconnect (one beside the request, the slots all taken), a head that never ends and
+// one too long, the deadline, and cancel() (before anything, and racing a request). The same file runs on Linux and under Wine
 // (tools/test_win.sh sso_loopback).
 #include "test.h"
 #include "net/loopback_redirect.h"
@@ -411,6 +411,34 @@ TEST(sso_loopback_idle_slots_evicted) {
     CHECK(ans.find("<h1>Back to Scacelith</h1>") != std::string::npos);
     CHECK(o.wait(3000));
     for (sock::Handle h : idle) sock::closeSocket(h);
+}
+
+// A head that never ends is closed unanswered after its 5 s; one longer than 64 KiB is answered
+// 431. Neither ends the wait: the redirect that comes next gets its page.
+TEST(sso_loopback_slow_and_long_heads) {
+    Outcome o;
+    LoopbackRedirect l;
+    std::string err;
+    REQUIRE(l.open(err));
+    const uint16_t port = l.port();
+    startListener(l, o, 20000);
+    const std::string host = "Host: 127.0.0.1:" + std::to_string(port) + "\r\n";
+    sock::Handle slow = connectTo(port);
+    REQUIRE(slow != sock::kInvalid);
+    const int64_t t0 = sock::steadyMs();
+    CHECK(sendAll(slow, "GET " + redirectTarget(kState) + " HTTP/1.1\r\n" + host));   // no blank line
+    const std::string longHead = "GET " + kPath + " HTTP/1.1\r\n" + host + "X-Pad: " + std::string(loopback::kMaxHead, 'a');
+    CHECK_EQ(request(port, longHead).compare(0, 12, "HTTP/1.1 431"), 0);
+    bool closed = false;
+    const std::string ans = readAll(slow, 8000, &closed);
+    const int64_t took = sock::steadyMs() - t0;
+    sock::closeSocket(slow);
+    CHECK(closed);
+    CHECK(ans.empty());
+    CHECK(took >= 4500 && took < 7500);
+    CHECK_EQ(o.count(), size_t(0));
+    CHECK(request(port, get(redirectTarget(kState), port)).find("<h1>Back to Scacelith</h1>") != std::string::npos);
+    CHECK(o.wait(3000));
 }
 
 TEST(sso_loopback_deadline_expires) {
