@@ -50,7 +50,7 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 | `src/net` | Online play, engine-free (in the core library, unit-tested): the client of the dedicated server (`online_client.h`: HTTPS API and secure WebSocket, WinHTTP on Windows, OpenSSL in Linux builds), the realtime protocol v1 codec generated from `protocol/scacelith-v1.json` (`protocol_gen.h`), per-server credentials, the Google sign-in's loopback redirect, direct matches (secure channel, the host's authority, UPnP) and file downloads; see [ONLINE_CLIENT.md](ONLINE_CLIENT.md) and [DIRECT_MATCH.md](DIRECT_MATCH.md) |
 | `src/app` | Scene registry (`--scene`), test scenes |
 | `protocol/` | The realtime protocol v1 shared with the online server: copies of its schema, frozen manifests, specification (`PROTOCOL.md`) and golden vectors, written by the server's `protogen` (the server itself is [DarkCenobyte/scacelith-chess-server](https://github.com/DarkCenobyte/scacelith-chess-server)) |
-| `.github/` | Continuous integration and releases (GitHub Actions), Dependabot |
+| `.github/` | Continuous integration, releases and CodeQL scanning (GitHub Actions), Dependabot; see the README's "Continuous integration and releases" |
 
 ## Rendering contracts
 
