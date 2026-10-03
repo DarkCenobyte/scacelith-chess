@@ -45,9 +45,11 @@ LANGS = ['en', 'fr', 'de', 'es', 'ru', 'uk', 'ar', 'ja', 'zh-Hans', 'zh-Hant']
 # Types of lichess variation names that compose ("<Proper> <Type>"), with their catalog slug.
 COMPOSE_TYPES = ['Variation', 'Attack', 'Gambit', 'Defense', 'System', 'Countergambit', 'Counterattack', 'Line',
                  'Trap', 'Opening']
-# Whole lichess components translated as such (from the glossary).
+# Whole lichess components translated as such (from the glossary). The Scotch and Danish ones are the frequent
+# components whose English adjective (a common word below) would otherwise leave them unsaid in fr, de and es.
 FIXED_COMPONENTS = ['Exchange Variation', 'Advance Variation', 'Classical Variation', 'Modern Variation',
-                    'Open Variation', 'Closed Variation', 'Fianchetto Variation', 'Symmetrical Variation']
+                    'Open Variation', 'Closed Variation', 'Fianchetto Variation', 'Symmetrical Variation',
+                    'Scotch Gambit', 'Scotch Variation', 'Danish Variation']
 
 # Words of lichess variation names that are ordinary English (adjectives, nouns, nationalities, cities with a
 # name of their own in other languages). French, German and Spanish only compose "<Proper> <Type>" when no word of

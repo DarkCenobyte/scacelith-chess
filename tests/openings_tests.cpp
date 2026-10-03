@@ -809,13 +809,48 @@ TEST(openings_texts_render_and_speak) {
     CHECK(!t.arg("line:Paulsen Attack", "", "ru", false).empty());   // through the eponym table
     CHECK_EQ(t.arg("line:English Attack", "", "fr", false), std::string());   // a common word: not composed
     CHECK_EQ(t.arg("line:English Attack", "", "zh-Hans", false), std::string("English Attack"));
-    for (const char* line : {"line:Scotch Gambit", "line:Scotch Variation", "line:Danish Variation",
-                             "line:Catalan Defense", "line:Kazakh Variation", "line:Florentine Gambit",
+    for (const char* line : {"line:Catalan Defense", "line:Kazakh Variation", "line:Florentine Gambit",
                              "line:Netherlands Variation"})
         for (const char* lang : {"fr", "de", "es"}) CHECK_EQ(t.arg(line, "", lang, false), std::string());
     CHECK_EQ(t.arg("line:Exchange Variation", "", "fr", false), *t.find("fr", "opening.component.exchange_variation"));
     // The rare, unnamed case renders everywhere.
     for (const std::string& lang : langs()) CHECK(!t.render(OpeningLine{"opening.say.rare", {}}, lang, true).empty());
+}
+
+TEST(openings_texts_name_the_scotch_and_danish_components) {
+    // Frequent components whose English adjective is a common word have translations of their own, so French,
+    // German and Spanish name them instead of leaving them out.
+    const OpeningBook& b = book();
+    const OpeningTexts& t = OpeningTexts::instance();
+    const std::map<std::string, std::map<std::string, std::string>> expected = {
+        {"Scotch Gambit", {{"fr", "gambit écossais"}, {"de", "Schottisches Gambit"}, {"es", "gambito escocés"}}},
+        {"Scotch Variation",
+         {{"fr", "variante écossaise"}, {"de", "Schottische Variante"}, {"es", "variante escocesa"}}},
+        {"Danish Variation", {{"fr", "variante danoise"}, {"de", "Dänische Variante"}, {"es", "variante danesa"}}},
+    };
+    for (const std::string name : {"Italian Game: Scotch Gambit", "Italian Game: Scotch Gambit, Canal Variation",
+                                   "Four Knights Game: Scotch Variation",
+                                   "Four Knights Game: Scotch Variation, Belgrade Gambit",
+                                   "Sicilian Defense: Smith-Morra Gambit Accepted, Danish Variation"}) {
+        int n = 0;
+        while (n < int(b.names()) && b.name(n) != name) ++n;
+        CHECK(n < int(b.names()));
+        if (n == int(b.names())) continue;
+        const std::vector<std::string> comps = b.extraComponents(n);
+        auto c = std::find_if(comps.begin(), comps.end(), [&](const std::string& s) { return expected.count(s); });
+        CHECK(c != comps.end());
+        if (c == comps.end()) continue;
+        for (const std::string& lang : langs()) {
+            const std::string said = t.arg("line:" + *c, "", lang, true);
+            CHECK(!said.empty());
+            if (expected.at(*c).count(lang)) CHECK_EQ(said, expected.at(*c).at(lang));
+        }
+    }
+    // The level 6 sentence that says them.
+    const OpeningLine deep{"opening.say.deep", {{"line", {OpeningArg::Kind::Opening, "line:Scotch Gambit", 0}}}};
+    CHECK_EQ(t.render(deep, "fr", true), std::string("La ligne exacte\xC2\xA0: gambit écossais."));
+    CHECK_EQ(t.render(deep, "de", true), std::string("Die genaue Variante: Schottisches Gambit."));
+    CHECK_EQ(t.render(deep, "es", true), std::string("La línea exacta: gambito escocés."));
 }
 
 TEST(openings_texts_speech_forms) {

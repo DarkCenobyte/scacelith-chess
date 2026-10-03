@@ -1690,7 +1690,10 @@
   "Open Variation": "open_variation",
   "Closed Variation": "closed_variation",
   "Fianchetto Variation": "fianchetto_variation",
-  "Symmetrical Variation": "symmetrical_variation"
+  "Symmetrical Variation": "symmetrical_variation",
+  "Scotch Gambit": "scotch_gambit",
+  "Scotch Variation": "scotch_variation",
+  "Danish Variation": "danish_variation"
  },
  "eponyms": {
   "Steinitz": "steinitz",
