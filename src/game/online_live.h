@@ -17,6 +17,8 @@
 //   - Which game a realtime message is about, whether a RatingUpdate rates the game shown, and
 //     which ServerInfoResult answers Options' "Test connection" (OnlineSession's routing); the
 //     late messages of an earlier game the scene ignores all the same.
+//   - When the pin saved at sign-in no longer applies (Options' pin field emptied): on Apply and
+//     for "Test connection" alike.
 #pragma once
 #include "../chess/chess.h"
 #include "../math/math.h"
@@ -411,6 +413,13 @@ inline const std::string& ratingCategory(const net::Event& e) {
 // of the server in use, asked before the test, may come first).
 inline bool testAnswer(const net::Event& e, bool testing, const std::string& testOrigin) {
     return e.kind == net::Event::Kind::ServerInfoResult && testing && e.origin == testOrigin;
+}
+
+// The pin field of the server applied emptied (a custom server, same host and port): Apply
+// forgets the pin saved with its session at sign-in (OnlineSession::applyServer), and "Test
+// connection" goes without it, so that the test tells what Apply will give.
+inline bool savedPinDropped(const net::ServerEndpoint& ep, const net::ServerEndpoint& applied, bool custom) {
+    return custom && ep.origin() == applied.origin() && !applied.pinnedSha256.empty() && ep.pinnedSha256.empty();
 }
 
 }  // namespace live

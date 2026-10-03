@@ -403,7 +403,9 @@ public:
     // ends if it ends first.
     void forgetSavedPin();
     const ServerEndpoint& server() const;
-    void fetchServerInfo();
+    // ignoreSavedPin: this request goes without the pin saved for the origin (the endpoint's own
+    // still applies), as every request will after forgetSavedPin() (Options' "Test connection").
+    void fetchServerInfo(bool ignoreSavedPin = false);
     bool hasSavedSession() const;                // a token is stored for the current origin and decrypts here
     std::string savedUsername() const;           // last user name used on this origin
     void registerAccount(const std::string& username, const std::string& email, const std::string& password);
@@ -452,7 +454,8 @@ public:
     void downloadPgn(uint64_t gameId);                                  // GET /games/:id/pgn (text)
     void fetchSessions();                                               // GET /auth/sessions
     // DELETE /auth/sessions/:id. Revoking the session marked current in the last fetchSessions()
-    // signs this game out (token erased, realtime connection stopped), as logout() would.
+    // signs this game out (token erased, realtime connection stopped), as logout() would: its
+    // realtime connection closes first, and opens again as deleteAccount()'s on a failure.
     void revokeSession(int64_t sessionId);
     void setAcceptChallenges(bool accept);                              // PUT /account/preferences
     // Re-authenticated changes. codeOrRecovery: "" when two-factor is off (no field sent), a

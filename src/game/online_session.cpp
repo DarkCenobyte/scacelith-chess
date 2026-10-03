@@ -27,7 +27,7 @@ public:
     explicit ServerApiOf(std::unique_ptr<C> own) : own_(std::move(own)), c_(own_.get()) {}
     void setServer(const net::ServerEndpoint& ep) override { c_->setServer(ep); }
     void forgetSavedPin() override { c_->forgetSavedPin(); }
-    void fetchServerInfo() override { c_->fetchServerInfo(); }
+    void fetchServerInfo(bool ignoreSavedPin) override { c_->fetchServerInfo(ignoreSavedPin); }
     bool hasSavedSession() const override { return c_->hasSavedSession(); }
     std::string savedUsername() const override { return c_->savedUsername(); }
     void registerAccount(const std::string& u, const std::string& e, const std::string& p) override { c_->registerAccount(u, e, p); }
@@ -295,8 +295,7 @@ void OnlineSession::applyServer() {
     // sign-in goes too, or it would still apply where the field's help promises the system's
     // certificates.
     const bool custom = settings().onlineCustomServer || !officialAvailable();
-    if (custom && ep.origin() == applied_.origin() && !applied_.pinnedSha256.empty() && ep.pinnedSha256.empty())
-        api_->forgetSavedPin();
+    if (live::savedPinDropped(ep, applied_, custom)) api_->forgetSavedPin();
     applied_ = ep;
     info_ = net::ServerInfo();
     infoKnown_ = false;
@@ -322,13 +321,14 @@ void OnlineSession::refreshInfo() {
     expect(Kind::ServerInfoResult);
 }
 
-void OnlineSession::testServer(const net::ServerEndpoint& ep) {
+void OnlineSession::testServer(const net::ServerEndpoint& ep, bool custom) {
     if (!ep.valid() || testing_) return;
     ServerApi& a = api();
     net::ServerEndpoint cur = endpoint();
     testSwitched_ = !(ep.origin() == cur.origin() && ep.wsPort == cur.wsPort && ep.pinnedSha256 == cur.pinnedSha256);
     if (testSwitched_) a.setServer(ep);
-    a.fetchServerInfo();
+    // Without the pin saved at sign-in when Apply would forget it (its field emptied).
+    a.fetchServerInfo(live::savedPinDropped(ep, applied_, custom));
     testing_ = true;
     testOrigin_ = ep.origin();
     testDone_ = false;

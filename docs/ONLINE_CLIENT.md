@@ -80,7 +80,9 @@ the CMake option `SCACELITH_OFFICIAL_SERVER` (`host[:apiPort[:wsPort]]`, port 44
 (called when Options are applied with another server) selects the new origin and forgets the
 previous server's state; the page then resumes a session saved for that origin, if any. The
 fingerprint of the server in use emptied (same host and port) also forgets the one saved with its
-session at sign-in (`OnlineClient::forgetSavedPin`): the system's certificates apply again. Each
+session at sign-in (`OnlineClient::forgetSavedPin`): the system's certificates apply again. Options'
+Test connection of those values goes without that pin too (`fetchServerInfo(true)`), so that it
+tells what applying them will give, and forgets nothing (`game::live::savedPinDropped`). Each
 answer of the account API names the origin it was asked of (`Event::origin`), and an answer of a
 server left meanwhile is not taken for the new server's (`game::ServerAnswers`): the pages drop
 it, except a PGN (the game page's Save game writes it where the player asked) and a GIF (saved
@@ -161,7 +163,9 @@ Rules common to these calls:
   success erases the token and the user name saved for the origin (its server id and pin stay),
   and the connection stays closed; a failure other than a refused session (`unauthorized`) opens
   it again if it was open. `revokeSession` on the session marked `current` in the last
-  `fetchSessions` signs this game out the same way (token erased, connection stopped).
+  `fetchSessions` signs this game out the same way (the server closes that session's connection):
+  the connection closes first, its success erases the token and keeps it closed, and a failure
+  other than `unauthorized` opens it again if it was open.
 - `logout(true)` (`POST /auth/logout-all`, Sign out everywhere) is ok only when the server did it.
   A refused session (401) revoked nothing: `unauthorized`, its token erased. Any other failure
   (the server unreachable, `rate_limited`, maintenance...) keeps the token, so that the player can

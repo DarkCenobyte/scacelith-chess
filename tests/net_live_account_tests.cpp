@@ -14,6 +14,7 @@
 //
 // Each scenario prints "== <scenario>: ok" or "== <scenario>: FAILED (n checks)" so that the run
 // reads as a report. The scenarios run in order on one account, which they finally delete:
+//   the pin saved at sign-in (left out by fetchServerInfo(true): the certificate refused),
 //   history (fetchMyGames: every game, filters, paging, errors), game details (fetchGame: own
 //   games, another players' game, unknown ids), PGN (downloadPgn: tags in order, [%clk] / [%emt]
 //   read back by chess::pgn against the record's clocks, the result and the termination), GIFs
@@ -27,6 +28,7 @@
 #include "test.h"
 #include "chess/chess.h"
 #include "chess/pgn.h"
+#include "net/credential_store.h"
 #include "net/json.h"
 #include "net/online_client.h"
 #include "net/protocol_gen.h"
@@ -441,6 +443,34 @@ TEST(net_live_account_api) {
         std::fprintf(stderr, "  account %u %s <%s>, created %lld, last login %lld, %zu rating record(s)\n", ev.account.userId,
                      ev.account.username.c_str(), ev.account.email.c_str(), (long long)ev.account.createdAtMs,
                      (long long)ev.account.lastLoginAtMs, ev.account.ratings.size());
+    }
+    {
+        Scenario s("the pin saved at sign-in: used while the endpoint gives none, left out of one info request (Options' test of an emptied pin field)");
+        CHECK(!net::CredentialStore(credPath).pin(origin).empty());
+        net::ServerEndpoint bare = ep;
+        bare.pinnedSha256.clear();
+        c.setServer(bare);
+        ev = ask(c, Kind::ServerInfoResult, [&] { c.fetchServerInfo(); });
+        report("fetchServerInfo with the saved pin", ev);
+        CHECK(ev.ok);
+#ifdef _WIN32
+        // WinHTTP would hand the next request the connection pooled by this one, whose certificate
+        // the pin let through: past the server's keep-alive (5 s), it opens a new one.
+        std::this_thread::sleep_for(std::chrono::milliseconds(6000));
+#endif
+        ev = ask(c, Kind::ServerInfoResult, [&] { c.fetchServerInfo(true); });
+        report("fetchServerInfo without the saved pin", ev);
+        CHECK(!ev.ok);
+#ifdef _WIN32
+        CHECK(ev.error == "certificate" || ev.error == "tls");   // Wine's WinHTTP: "tls" (net_tls_pinning_manual)
+#else
+        CHECK_EQ(ev.error, std::string("certificate"));
+#endif
+        CHECK(!net::CredentialStore(credPath).pin(origin).empty());   // nothing forgotten
+        ev = ask(c, Kind::AccountResult, [&] { c.fetchAccount(); });
+        report("fetchAccount with the saved pin", ev);
+        CHECK(ev.ok);
+        c.setServer(ep);
     }
 
     // ---- history: GET /account/games ----
@@ -1243,14 +1273,19 @@ TEST(net_live_account_api) {
         Scenario s("deleteAccount: wrong password, then with an authenticator code: signed out, realtime stopped, games anonymized");
         c.connect();
         CHECK(waitFor(c, Kind::Welcome, ev, 15000));
-        ev = ask(c, Kind::AccountDeleted, [&] { c.deleteAccount("wrong password 123", "000000"); });
+        std::vector<net::Event> seen;
+        ev = ask(c, Kind::AccountDeleted, [&] { c.deleteAccount("wrong password 123", "000000"); }, 20000, &seen);
         report("deleteAccount(wrong password)", ev);
         CHECK(!ev.ok);
         CHECK_EQ(ev.error, std::string("invalid_password"));
         CHECK(c.hasSavedSession());
+        // Closed for the request, open again once it was refused (its Welcome may come before or after the answer).
+        net::Event welcome;
+        const bool welcomed = std::any_of(seen.begin(), seen.end(), [](const net::Event& e) { return e.kind == Kind::Welcome; });
+        CHECK(welcomed || waitFor(c, Kind::Welcome, welcome, 15000));
         CHECK(c.state() == net::ConnState::Online);
         json::Value code = ctl.call("GET", "/totp?secret=" + queryEncode(secret));
-        std::vector<net::Event> seen;
+        seen.clear();
         ev = ask(c, Kind::AccountDeleted, [&] { c.deleteAccount(pass, code["code"].asString()); }, 20000, &seen);
         report("deleteAccount", ev);
         CHECK(ev.ok);

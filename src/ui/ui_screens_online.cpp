@@ -2194,7 +2194,7 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
                    ep.valid() && !testing && !inGame)) {
         O.testShown = false;
         O.testedEp = ep;
-        ses.testServer(ep);
+        ses.testServer(ep, custom);
     }
     float tx = tr.x + bw + 26.0f, tw = rw - bw - 30.0f;
     Rect tcol(tx, 0, tw, 0);
