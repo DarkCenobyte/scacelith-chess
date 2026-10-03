@@ -529,7 +529,8 @@ void pumpResults() {
     if (s.take(Kind::AccountResult, e) && !e.ok && e.error != "unauthorized" && O.sub == Sub::Account)
         O.error = game::onlineErrorText(e.error, e.retryAfterSec);
     // Sign out everywhere: done only when the server says so. A failure short of a 401 keeps this
-    // computer's saved session, to try again: the next opening of these pages resumes it.
+    // computer's saved session, to try again: on the sign-in page (no other sign-in asked since) it
+    // is resumed at once and the failure told on the account page, its button at hand.
     if (s.take(Kind::LogoutResult, e) && O.everywhere) {
         O.everywhere = false;
         const std::string text = game::signOutEverywhereText(e);
@@ -538,6 +539,13 @@ void pumpResults() {
         } else if (e.ok) {
             O.note = text;
         } else {
+            if (e.error != "unauthorized" && !s.busy(Kind::LoginResult)) {
+                s.resume();
+                if (s.signedIn()) {
+                    clearSecrets();
+                    setSub(Sub::Account);
+                }
+            }
             O.note.clear();
             O.error = text;
         }
