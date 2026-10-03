@@ -4781,6 +4781,61 @@ TEST(net_tls_pinning_manual) {
     CHECK_EQ(err, std::string("http_200"));
 }
 
+// A pinned request that carries secrets (httpRequest(): on Windows a "HEAD /" probe without them
+// first, transport_win32.cpp) against a TLS server that misbehaves after the probe, opt-in like the
+// test above: the same certificate, plus a second self-signed one for localhost made the same way.
+// The server listens on 127.0.0.1:PORT, answers HEAD / (any status) and POST /api/v1/auth/login
+// (200, body {"ok":true} with its Content-Length), and logs each TLS connection with its
+// certificate and each request on it (request line, Authorization header, body). Started in one
+// of these behaviours, then:
+//   SCACELITH_NET_TLS_POST_TEST=PORT:<hex SHA-256 of the first certificate>:<behaviour>
+//       ./scacelith_tests net_tls_pinned_post
+//   keepalive  keeps every connection open. 200. Under Wine the log shows the HEAD and the POST on
+//              one connection (the probe's verified one, which WinHTTP's pool hands over).
+//   headclose  closes the connection of its first HEAD once it is answered, keeps the later ones.
+//              200. Under Wine: a second connection with no request on it (the client refuses its
+//              unknown issuer), then a HEAD and the POST on a third one.
+//   switch     closes the connection of its first HEAD once it is answered and presents the second
+//              certificate on every later connection. "certificate" (Wine: "tls" or
+//              "certificate"). The log must hold no POST, no Authorization header and no body on a
+//              connection with the second certificate (a HEAD may reach it under Wine).
+// Elsewhere the pin is checked in the handshake, before anything is sent: keepalive only.
+TEST(net_tls_pinned_post_manual) {
+    const char* env = std::getenv("SCACELITH_NET_TLS_POST_TEST");
+    if (!env) SKIP("SCACELITH_NET_TLS_POST_TEST not set");
+    REQUIRE(net::transportAvailable());  // asked for, so it must not pass without running
+    const std::string spec = env;
+    const size_t a = spec.find(':'), b = a == std::string::npos ? a : spec.find(':', a + 1);
+    REQUIRE(b != std::string::npos);
+    const uint16_t port = uint16_t(std::atoi(spec.substr(0, a).c_str()));
+    const std::string pin = spec.substr(a + 1, b - a - 1), mode = spec.substr(b + 1);
+    REQUIRE(mode == "keepalive" || mode == "headclose" || mode == "switch");
+#ifndef _WIN32
+    if (mode != "keepalive") SKIP("no probe here: the pin is checked in the handshake");
+#endif
+    net::HttpRequest r;
+    r.method = "POST";
+    r.host = "localhost";
+    r.port = port;
+    r.pinnedSha256 = pin;
+    r.path = "/api/v1/auth/login";
+    r.headers.emplace_back("Authorization", "Bearer tls-post-secret");
+    r.body = "{\"login\":\"tls-post\",\"password\":\"tls-post-password\"}";
+    r.timeoutMs = 3000;
+    net::HttpResponse resp;
+    net::httpRequest(r, resp);
+    std::fprintf(stderr, "  %s: POST -> status %d error '%s' (%s)\n", mode.c_str(), resp.status, resp.error.c_str(), resp.detail.c_str());
+    if (mode == "switch") {
+        CHECK_EQ(resp.status, 0);
+        CHECK(resp.error == "certificate" || (runningUnderWine() && resp.error == "tls"));
+        std::fprintf(stderr, "  the server log must hold nothing of the POST on a connection with the second certificate\n");
+    } else {
+        CHECK_EQ(resp.status, 200);
+        CHECK(resp.error.empty());
+        CHECK_EQ(resp.body, std::string("{\"ok\":true}"));
+    }
+}
+
 // =============================================================================================
 // Live check against a real dedicated server (opt-in). dedicated-server/tools/live-cpp-check.js
 // starts a server (self-signed certificate, HTTPS API and WSS on one port, proof of work for
