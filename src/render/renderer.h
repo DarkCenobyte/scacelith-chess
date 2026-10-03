@@ -2,7 +2,7 @@
 //
 // Frame outline (Renderer::endFrame):
 //   1. upload FrameUBO, LightingUBO, DrawData SSBO, lights
-//   2. atmosphere: sky-view LUT when the sun moved, sky cubemap + sky SH   (render-lighting)
+//   2. atmosphere: sky-view LUT when the sun moved                         (render-lighting)
 //   3. sun shadow cascades (static cache + dynamic casters)                (render-lighting)
 //   4. light probes / IBL bake when dirty (probeBounces: 1-3 by preset)    (render-lighting)
 //   5. planar reflection passes + Gaussian mip chain                       (render-lighting)
@@ -342,9 +342,7 @@ private:
     std::unique_ptr<lighting::PlanarReflections> planarRefl_;
     gpu::Texture brdfLut_;
     m::AABB sceneBounds_;
-    float skyKey_[9] = {};     // sky capture inputs of the last capture
     float bakeKey_[6] = {};    // probe bake inputs of the last bake
-    bool skyKeyValid_ = false;
     // Default textures bound to unused units so samplers are always complete
     gpu::Texture dummy2D_, dummyArray_, dummyCubeArray_;
     std::unique_ptr<PostFX> post_;

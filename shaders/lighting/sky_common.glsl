@@ -1,5 +1,5 @@
 // Sky radiance seen from the hall: atmosphere (sky-view LUT), sun disk with limb darkening and a
-// soft procedural cloud layer. Used by the sky pass and by the sky cubemap capture.
+// soft procedural cloud layer. Used by the sky pass.
 // Requires common.glsl, lighting_ubo.glsl and atmosphere.glsl.
 
 float cloudHash(ivec2 c) { return float(hashU(uint(c.x) * 1597334673u ^ hashU(uint(c.y) * 3812015801u))) * (1.0 / 4294967296.0); }

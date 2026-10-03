@@ -200,6 +200,9 @@ if(TEST_SOURCES)
     # The shader preprocessor's tests: shader.cpp needs the GL entry points only to link (they
     # stay null, no GL library: the tests never compile a program).
     target_sources(scacelith_tests PRIVATE ${ROOT}/src/render/shader.cpp ${ROOT}/src/gl/gl46.cpp)
+    # The hall ceiling's geometry tests: CPU meshes only (mesh.cpp's upload is never called).
+    target_sources(scacelith_tests PRIVATE ${ROOT}/src/scene/hall_ceiling.cpp ${ROOT}/src/scene/hall_geom.cpp
+                   ${ROOT}/src/scene/hall_ornament.cpp ${ROOT}/src/render/mesh.cpp)
     target_compile_options(scacelith_tests PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
     target_link_libraries(scacelith_tests PRIVATE scacelith_core)
     if(WIN32)

@@ -1,6 +1,6 @@
 // Physically based sky (Hillaire 2020): transmittance / multiple-scattering / sky-view LUTs on the
-// GPU, the sky cubemap, and a CPU evaluation of the
-// sun's transmittance so the sun colour and illuminance follow its elevation.
+// GPU, and a CPU evaluation of the sun's transmittance so the sun colour and illuminance follow
+// its elevation.
 #pragma once
 #include "../gpu.h"
 
@@ -19,19 +19,14 @@ public:
 
     // Recomputes the LUTs that depend on the given parameters (cheap when nothing changed).
     void updateLuts(m::vec3 sunDir, float mieScale, float altitudeKm);
-    // Renders the sky cubemap (no sun disk, with clouds). Needs FrameUBO + LightingUBO bound and
-    // current.
-    void captureSky();
     // Binds the LUTs used by shaders/passes/sky.frag (units 0 and 1).
     void bindSkyTextures() const;
 
-    GLuint skyCube() const { return skyCube_.id; }
     GLuint transmittanceLut() const { return transmittance_.id; }
     GLuint skyViewLut() const { return skyView_.id; }
-    int skyCubeSize() const { return skyCube_.width; }
 
 private:
-    gpu::Texture transmittance_, multiScat_, skyView_, skyCube_;
+    gpu::Texture transmittance_, multiScat_, skyView_;
     float lutMie_ = -1.0f;
     m::vec3 viewSun_{0, -2, 0};
     float viewAlt_ = -1.0f;
