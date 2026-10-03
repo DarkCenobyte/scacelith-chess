@@ -1,0 +1,229 @@
+# Release: on a version tag (v1.0.0, v1.0.0-beta.1, ...), the CI runs again on the tagged commit,
+# the Windows game is built from scratch (no cache), its build provenance is attested
+# (actions/attest) and a GitHub release is published with the files. A manual run builds the
+# branch or tag it is started on; it publishes only from a tag and when asked to, and otherwise
+# keeps the files as workflow artifacts (a dry run).
+name: Release
+
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+*"]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the GitHub release (run from a tag only)
+        type: boolean
+        default: false
+
+permissions: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  version:
+    name: Version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      prerelease: ${{ steps.version.outputs.prerelease }}
+      publish: ${{ steps.version.outputs.publish }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Read the version and check the tag
+        id: version
+        env:
+          REF_TYPE: ${{ github.ref_type }}
+          REF_NAME: ${{ github.ref_name }}
+          PUBLISH_INPUT: ${{ github.event_name == 'push' || inputs.publish }}
+        run: |
+          version=$(cmake -P cmake/version.cmake)
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::cmake/version.cmake gives '$version', not a SemVer version"
+            exit 1
+          fi
+          publish=false
+          if [[ "$REF_TYPE" == tag ]]; then
+            if [[ "$REF_NAME" != "v$version" ]]; then
+              echo "::error::tag $REF_NAME does not match the version in cmake/version.cmake (v$version)"
+              exit 1
+            fi
+            publish=$PUBLISH_INPUT
+          elif [[ "$PUBLISH_INPUT" == true ]]; then
+            echo "::error::a release is only published from a tag (this run is on $REF_NAME)"
+            exit 1
+          fi
+          prerelease=false
+          [[ "$version" == *-* ]] && prerelease=true
+          {
+            echo "version=$version"
+            echo "prerelease=$prerelease"
+            echo "publish=$publish"
+          } >> "$GITHUB_OUTPUT"
+          echo "Version $version (pre-release: $prerelease, publish: $publish)" >> "$GITHUB_STEP_SUMMARY"
+
+  ci:
+    name: CI
+    needs: version
+    permissions:
+      contents: read
+    uses: $/.github/workflows/ci.yml
+
+  build:
+    name: Windows release build
+    needs: version
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install the cross-compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build \
+            g++-mingw-w64-x86-64-posix gcc-mingw-w64-x86-64-posix binutils-mingw-w64-x86-64
+
+      # A clean build: no compiler cache, and no voice model (the game downloads it itself; the
+      # release holds the executable only).
+      - name: Configure
+        run: >-
+          cmake -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake
+          -DCMAKE_BUILD_TYPE=Release -DSCACELITH_SUPERTONIC_DOWNLOAD=OFF
+
+      - name: Build
+        run: ninja -C build-win
+
+      - name: Check the version of the executable
+        run: |
+          grep -q "#define SCACELITH_VERSION \"$VERSION\"" build-win/generated/scacelith_version.h
+          grep -aq "Scacelith $VERSION" build-win/Scacelith.exe
+
+      # The archive holds the executable, the licence and the licence texts of what it embeds (the
+      # fonts, Stockfish's authors, the QR code generator and the opening names), as README.md's
+      # "Licence" section lists them.
+      - name: Package
+        env:
+          COMMIT: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          name="Scacelith-$VERSION-windows-x64"
+          dir="dist/$name"
+          mkdir -p "$dir/licences/fonts"
+          cp build-win/Scacelith.exe "$dir/"
+          cp LICENSE "$dir/LICENSE.txt"
+          cp assets/fonts/*.txt assets/fonts/hand/*.txt "$dir/licences/fonts/"
+          cp third_party/stockfish/AUTHORS "$dir/licences/Stockfish-AUTHORS.txt"
+          cp third_party/qrcodegen/LICENSE "$dir/licences/qrcodegen-MIT.txt"
+          cp assets/licences/lichess-chess-openings-CC0.txt "$dir/licences/"
+          cat > "$dir/README.txt" <<EOF
+          Scacelith $VERSION for Windows x64
+
+          A photorealistic chess game played in first person against a porcelain robot driven by
+          Stockfish 19 (embedded), or online. Needs a GPU with OpenGL 4.6. Run Scacelith.exe.
+
+          Source: $REPOSITORY ($REF_NAME, commit $COMMIT).
+          Scacelith is free software under the GNU General Public License v3.0 (LICENSE.txt). The licence
+          texts of the fonts, of Stockfish's authors and of the other parts it embeds are in licences/.
+
+          The coach's voice model (Supertonic 3, BigScience Open RAIL-M licence) is not included: the
+          game offers to download it from its publishers the first time Coach mode needs it.
+
+          To check this download with the GitHub CLI:
+            gh attestation verify $name.zip --repo $GITHUB_REPOSITORY
+          EOF
+          # Text files with Windows line endings.
+          find "$dir" -name '*.txt' -exec sed -i 's/\r\?$/\r/' {} +
+          (cd dist && zip -9 -r -X "$name.zip" "$name")
+          cp "$dir/Scacelith.exe" "dist/$name.exe"
+          rm -r "${dir:?}"
+          (cd dist && sha256sum -- * > SHA256SUMS)
+          {
+            echo '```'
+            cat dist/SHA256SUMS
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload the release files
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-files
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
+
+  attest:
+    name: Attest the build provenance
+    needs: [version, build]
+    if: needs.version.outputs.publish == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write # the OIDC token that Sigstore signs the attestation with
+      attestations: write # to store the attestation in the repository
+    steps:
+      - name: Download the release files
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-files
+          path: dist
+
+      - name: Attest the archive and the executable
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: |
+            dist/*.zip
+            dist/*.exe
+
+  publish:
+    name: Publish the GitHub release
+    needs: [version, ci, attest]
+    if: needs.version.outputs.publish == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write # to create the release and upload its files
+    steps:
+      - name: Download the release files
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: release-files
+          path: dist
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ needs.version.outputs.version }}
+          PRERELEASE: ${{ needs.version.outputs.prerelease }}
+        run: |
+          cat > notes.md <<EOF
+          Windows x64, self-contained (Stockfish 19 and its network are embedded); needs a GPU with
+          OpenGL 4.6. Download \`Scacelith-$VERSION-windows-x64.zip\` (the executable with its licence)
+          or the executable alone.
+
+          Every file is built by the release workflow from tag \`$TAG\`, and its build provenance is
+          attested. To check a download with the GitHub CLI:
+
+          \`\`\`sh
+          gh attestation verify Scacelith-$VERSION-windows-x64.zip --repo $GH_REPO
+          \`\`\`
+          EOF
+          flags=(--verify-tag --title "Scacelith $VERSION" --notes-file notes.md --generate-notes)
+          if [[ "$PRERELEASE" == true ]]; then flags+=(--prerelease); else flags+=(--latest); fi
+          gh release create "$TAG" "${flags[@]}" dist/*

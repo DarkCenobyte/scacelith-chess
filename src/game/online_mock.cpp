@@ -35,8 +35,8 @@ double wallMs() {
     return double(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
 }
 
-// Protocol values (realtime protocol v1: dedicated-server/protocol/scacelith-v1.json,
-// dedicated-server/docs/PROTOCOL.md).
+// Protocol values (realtime protocol v1: protocol/scacelith-v1.json,
+// protocol/PROTOCOL.md).
 enum Status { Ongoing = 0, WhiteWins = 1, BlackWins = 2, Draw = 3, Aborted = 4 };
 enum Reason {
     RNone = 0, RResignation = 2, RTimeout = 3, RAgreement = 12, RThreefoldClaim = 10, RFiftyClaim = 11,
@@ -205,7 +205,7 @@ const char* const kRepetitionLines[] = {
     "c2c4 e7e5 b1c3 g8f6 c3b1 f6g8 b1c3 g8f6 c3b1 f6g8",
 };
 
-// The server's end reason texts (EndReason::text in dedicated-server/crates/chess/src/types.rs), the
+// The server's end reason texts (EndReason::text in the server's crates/chess/src/types.rs), the
 // comment after the last move of its PGN.
 const char* serverReasonText(int reason) {
     switch (reason) {
@@ -271,8 +271,8 @@ std::string pgnClock(int64_t ms) {
 
 std::string ratingDiffText(int d) { return (d >= 0 ? "+" : "") + std::to_string(d); }
 
-// The server's PGN of a stored game (GET /games/:id/pgn, dedicated-server/docs/API.md; written with
-// dedicated-server/crates/chess/src/pgn/writer.rs, which reproduces tests/data/server-pgn,
+// The server's PGN of a stored game (GET /games/:id/pgn, the server's docs/API.md; written with
+// the server's crates/chess/src/pgn/writer.rs, which reproduces tests/data/server-pgn,
 // crates/chess/tests/pgn_write.rs): its tags in its order, a {[%clk] [%emt]} comment after each
 // move, the end reason as a comment, movetext wrapped under 80 columns.
 std::string serverPgn(const GameDetails& g, const std::string& serverName, const std::string& site) {
@@ -1708,7 +1708,7 @@ struct FakeServer::Impl {
     void setConn(ConnState s, const std::string& err = "") {
         conn = s;
         // The server drops the challenges of a user whose connection closed, telling only the other
-        // party (Challenges::drop_user, dedicated-server/crates/server/src/matching/challenges.rs).
+        // party (Challenges::drop_user, the server's crates/server/src/matching/challenges.rs).
         if (s != ConnState::Online) {
             outgoing.active = false;
             incoming.active = false;
@@ -2063,7 +2063,7 @@ void FakeServer::report(uint64_t gameId, const std::string&, const std::string&,
     impl_->http(impl_->result(Event::Kind::ReportResult, true));
 }
 
-// ---- account API (dedicated-server/docs/API.md) ----
+// ---- account API (the server's docs/API.md) ----
 // Re-authentication of the account changes (e-mail, export, deletion): the password, and the
 // second factor when two-factor is on (6 digits, or a recovery code). Answers the error itself.
 bool FakeServer::Impl::reauth(Event::Kind k, const std::string& password, const std::string& code) {
@@ -2479,7 +2479,7 @@ void FakeServer::deleteAccount(const std::string& password, const std::string& c
     I.http(I.result(k, true));
 }
 
-// Animated GIFs (dedicated-server/docs/API.md): the options checked like the server's, its quota
+// Animated GIFs (the server's docs/API.md): the options checked like the server's, its quota
 // per account (4 renders a minute, 30 an hour; a GIF rendered before costs nothing), the render
 // time (a little longer for long games), the answer the fake GIF of gameGif().
 void FakeServer::Impl::gif(uint64_t gameId, const std::string& key, const std::vector<uint16_t>& moves, const std::string& fen,

@@ -1,6 +1,7 @@
-// Online play: the game's side of the Scacelith dedicated server (dedicated-server/ in this
-// repository; realtime protocol v1 in dedicated-server/docs/PROTOCOL.md, generated from
-// dedicated-server/protocol/scacelith-v1.json into net/protocol_gen.h).
+// Online play: the game's side of the Scacelith dedicated server (its own repository,
+// https://github.com/DarkCenobyte/scacelith-chess-server, whose docs/ are "the server's docs/" in
+// the comments of this folder; realtime protocol v1 in protocol/PROTOCOL.md, generated from
+// protocol/scacelith-v1.json into net/protocol_gen.h by the server's protogen).
 //
 // OnlineClient owns network threads. Every command below returns at once and queues work for
 // them; results and server pushes come back as Events that the game thread drains with poll()
@@ -42,7 +43,7 @@
 //     press the clock by themselves in the game.
 //   - Account API (additive): the game history, a game's details and PGN, the signed-in devices,
 //     the challenge preference, the e-mail change, the data export and the account deletion
-//     (fetchMyGames ... deleteAccount below; dedicated-server/docs/API.md). A 401 answer to any
+//     (fetchMyGames ... deleteAccount below; the server's docs/API.md). A 401 answer to any
 //     call that carried the session token erases that token (the session expired or was revoked)
 //     and sets Event::sessionLost; such a call, or one that needs the session while none is saved,
 //     fails with "unauthorized" whatever the server's code (it says invalid_token).
@@ -51,7 +52,7 @@
 //     comes back in Event::Kind::GifResult (signed-in players only: the renders count against the
 //     account's quota; a refused or missing session is "unauthorized", as above).
 //   - Event::origin (additive): the HTTPS results name the server their command went to.
-//   - Google sign-in by loopback redirect (decisions 36a and 35A; dedicated-server/docs/API.md):
+//   - Google sign-in by loopback redirect (decisions 36a and 35A; the server's docs/API.md):
 //     startGoogleSso(page) listens on 127.0.0.1 (net/loopback_redirect.h) before it starts, opens
 //     Google's page only when it is Google's (its redirect URI names this listener and the origin
 //     of the server in use), and Google sends the browser back to the game: no polling. The game
@@ -451,7 +452,7 @@ public:
     void regenerateRecoveryCodes(const std::string& password, const std::string& code);
     void report(uint64_t gameId, const std::string& username, const std::string& category, const std::string& comment);
 
-    // ---- account API (HTTPS; dedicated-server/docs/API.md) ----
+    // ---- account API (HTTPS; the server's docs/API.md) ----
     // Answers that do not have the documented shape (a move that is not UCI text, a PGN that does
     // not start with its tags, an export that is not the export document...) come back with error
     // "invalid_response", like a PGN over 4 MiB or an export over 64 MiB.
@@ -478,7 +479,7 @@ public:
     // ("unauthorized") opens it again if it was open.
     void deleteAccount(const std::string& password, const std::string& codeOrRecovery);
 
-    // ---- animated GIFs (HTTPS; dedicated-server/docs/API.md) ----
+    // ---- animated GIFs (HTTPS; the server's docs/API.md) ----
     // The server draws the game (a 2D board seen from above, a frame per move) and answers with the
     // .gif file: GifResult, text = the file (16 MiB at most; an answer that does not start with
     // "GIF87a" or "GIF89a" is "invalid_response"). Signed-in players only ("unauthorized" without

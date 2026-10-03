@@ -17,7 +17,7 @@
 // placed first and pressed 0.6-1.0 s later. Silent while it is away and once the game is over.
 // The local player's gestures are accepted and ignored.
 //
-// The account API (dedicated-server/docs/API.md) answers like the server: a game history made
+// The account API (the server's docs/API.md) answers like the server: a game history made
 // from the account's name (the same ~45 games every time: legal moves, every kind of ending,
 // clocks that follow the time control, ratings that lead to the account's ones; the games played
 // against the fake are added at the top), served page by page with its filters; the details and

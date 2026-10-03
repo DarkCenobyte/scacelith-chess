@@ -1,9 +1,9 @@
 // Elo rating (src/game/elo.h): FIDE's tables 8.1.1 and 8.1.2, the K formula, the unrated phase and
 // the first rating (with the zero-score rule for both players), games against unrated players, the
 // counted games (K, provisional), the .ini records,
-// and the vectors of the dedicated server's rating (dedicated-server/test/fixtures/elo-vectors.json,
-// written and checked by the elo_vectors test of dedicated-server/crates/server/src/matching/elo/
-// tests.rs from matching/elo.rs): the game and the server must give the same numbers to the last
+// and the vectors of the dedicated server's rating (tests/data/elo-vectors.json, a copy of the
+// server's test/fixtures/elo-vectors.json, written and checked by the elo_vectors test of its
+// crates/server/src/matching/elo/tests.rs from matching/elo.rs): the game and the server must give the same numbers to the last
 // point. The vectors file is looked up from the
 // current directory (run from the repository root), $SCACELITH_SOURCE_DIR and the executable's
 // parent directories.
@@ -404,7 +404,7 @@ TEST(elo_ini_records) {
 }
 
 TEST(elo_matches_server_vectors) {
-    const std::string rel = "dedicated-server/test/fixtures/elo-vectors.json";
+    const std::string rel = "tests/data/elo-vectors.json";
     std::string text = readRepoFile(rel, size_t(16) << 20);
     CHECK(!text.empty());
     if (text.empty()) {

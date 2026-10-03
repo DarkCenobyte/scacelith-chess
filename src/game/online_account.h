@@ -1,5 +1,5 @@
 // The account pages' data on the game's side (the account API of the dedicated server,
-// dedicated-server/docs/API.md): the pages of the player's game history, the game opened from it,
+// the server's docs/API.md): the pages of the player's game history, the game opened from it,
 // the signed-in devices, and what the answers change in the account. game::OnlineSession keeps the
 // answers the menus wait for in a ServerAnswers (those of a server left meanwhile dropped) and one
 // AccountData, and routes the answers of net::OnlineClient to it (AccountData::apply); the pages

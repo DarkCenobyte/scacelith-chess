@@ -2070,7 +2070,7 @@ void OnlineClient::report(uint64_t gameId, const std::string& username, const st
                obj({{"gameId", json::Value(gameId)}, {"reported", username}, {"category", category}, {"comment", comment}}), true);
 }
 
-// ---- account API (dedicated-server/docs/API.md) ----
+// ---- account API (the server's docs/API.md) ----
 // The game history, game details, PGN, signed-in devices, preferences, e-mail change, data export
 // and deletion. The answers come from the server, so they are checked like any untrusted input:
 // a missing field keeps its default, a malformed one makes the whole answer "invalid_response".
@@ -2229,7 +2229,7 @@ bool parseSessions(const json::Value& b, std::vector<SessionInfo>& out) {
     return true;
 }
 
-// A PGN as the server writes it (dedicated-server/docs/API.md section 11, GET /games/:id/pgn): text
+// A PGN as the server writes it (the server's docs/API.md section 11, GET /games/:id/pgn): text
 // that starts with its tag pairs. Anything else (an HTML page of a proxy, binary data) is not
 // handed to the game.
 bool looksLikePgn(const std::string& t) {
@@ -2544,7 +2544,7 @@ void OnlineClient::deleteAccount(const std::string& password, const std::string&
     });
 }
 
-// ---- animated GIFs (dedicated-server/docs/API.md section 11, GET /games/:id/gif and POST /gif) ----
+// ---- animated GIFs (the server's docs/API.md section 11, GET /games/:id/gif and POST /gif) ----
 namespace {
 
 // A GIF file: the signature of either version. Anything else (a proxy's HTML page, a JSON body

@@ -1,5 +1,5 @@
 {
-  "generator": "the former Node.js server (tools/gen-pgn-fixtures.js, GET /api/v1/games/:id/pgn); reproduced byte for byte by dedicated-server/crates/chess/tests/pgn_write.rs",
+  "generator": "the former Node.js server (tools/gen-pgn-fixtures.js, GET /api/v1/games/:id/pgn); reproduced byte for byte by crates/chess/tests/pgn_write.rs of scacelith-chess-server",
   "games": [
     {"file":"01-checkmate.pgn","gameId":"4100000000007","white":"Alice","black":"Bob","result":"1-0","termination":"normal","timeControl":"180+2","plies":7,"uci":["e2e4","e7e5","f1c4","b8c6","d1h5","g8f6","h5f7"],"clockMs":[180000,180000,178600,177700,179400,177700,178500],"elapsedMs":[0,0,3300,4200,1100,2000,2900]},
     {"file":"02-resignation-castling.pgn","gameId":"4100000001020","white":"Carol","black":"Dave","result":"1-0","termination":"normal","timeControl":"300+3","plies":17,"uci":["e2e4","e7e5","g1f3","b8c6","f1c4","f8c5","e1g1","d7d6","d2d3","c8g4","b1c3","d8d7","c1e3","e8c8","e3c5","d6c5","c3d5"],"clockMs":[300000,300000,299600,298700,301400,299700,301500,297600,298500,297700,297700,296000,299100,296500,297500,294100,299300],"elapsedMs":[0,0,3300,4200,1100,2000,2900,5000,5900,2900,3700,4600,1600,2400,4600,5400,1100]},

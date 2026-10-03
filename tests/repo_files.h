@@ -1,4 +1,4 @@
-// Files of the repository for the tests (tests/data, the server's fixtures), wherever the tests
+// Files of the repository for the tests (tests/data, protocol/), wherever the tests
 // run from: under SCACELITH_SOURCE_DIR when it is set, then the working directory, its parent and
 // grandparent, then the parent and grandparent of the executable's folder (build/, build-win/).
 #pragma once
