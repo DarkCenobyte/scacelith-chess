@@ -1515,7 +1515,8 @@ TEST(direct_authority_disconnection_grace) {
         auto ev = r.recent<P::GameEvent>(HostSide);
         CHECK(ev.size() == 1 && ev[0].kind == P::GameEventKind::PlayerDisconnected && ev[0].color == P::Color::Black &&
               ev[0].arg == 60000);
-        // Back within the grace: a snapshot for the guest, the news for the host.
+        // Back within the grace: a snapshot for the guest, the news for the host. The snapshot
+        // carries the gseq of that news, which it shows: the guest's next event follows it.
         r.now += 30000;
         r.a.onReconnect(GuestSide, r.now, r.out);
         r.collect();
@@ -1523,6 +1524,10 @@ TEST(direct_authority_disconnection_grace) {
         CHECK(s.size() == 1 && s[0].moves.size() == 2 && s[0].blackConnected);
         ev = r.recent<P::GameEvent>(HostSide);
         CHECK(ev.size() == 1 && ev[0].kind == P::GameEventKind::PlayerReconnected);
+        CHECK(s.size() == 1 && ev.size() == 1 && s[0].gseq == ev[0].gseq);
+        r.move(HostSide, "g1f3");
+        auto mm = r.recent<P::MoveMade>(GuestSide);
+        CHECK(s.size() == 1 && mm.size() == 1 && mm[0].gseq == s[0].gseq + 1);
         // Gone again for the whole grace: the guest loses.
         r.a.onDisconnect(GuestSide, r.now, r.out);
         r.collect();

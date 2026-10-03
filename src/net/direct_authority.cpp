@@ -488,8 +488,10 @@ void Authority::onReconnect(Side side, double now, Output& out) {
     sideConnected_[GuestSide] = true;
     if (!started_) return;
     graceDeadline_ = kInf;
-    sendSnapshot(GuestSide, now, out);
+    // The event first: the guest's snapshot, which shows it back, then carries the event's gseq,
+    // and the guest's next event follows it without a gap.
     if (!was && !isOver()) gameEvent(out, int(P::GameEventKind::PlayerReconnected), colorOf(GuestSide), 0, false);
+    sendSnapshot(GuestSide, now, out);
 }
 
 void Authority::onRtt(Side side, double rttMs) {
