@@ -494,7 +494,8 @@ TEST(net_protocol_valid_checks) {
 }
 
 TEST(net_position_digest) {
-    // Values of fnv1a32() in dedicated-server/src/protocol/index.js.
+    // The protocol's posHash (dedicated-server/docs/PROTOCOL.md, "Moves and positions"): values of
+    // fnv1a32() in dedicated-server/crates/chess/src/types.rs.
     const std::string start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     CHECK_EQ(net::positionDigest(start), 923150620u);
     CHECK_EQ(net::positionDigest("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"), 1150555523u);
@@ -5757,9 +5758,9 @@ TEST(net_tls_pinned_post_manual) {
 }
 
 // =============================================================================================
-// Live check against a real dedicated server (opt-in). dedicated-server/tools/live-cpp-check.js
-// starts a server (self-signed certificate, HTTPS API and WSS on one port, proof of work for
-// registration), a Node bot queued in 3+2, then runs:
+// Live check against a real dedicated server (opt-in). The live-check harness
+// (dedicated-server/tools/live-check, see its README) starts a server (self-signed certificate,
+// HTTPS API and WSS on one port, proof of work for registration), a bot queued in 3+2, then runs:
 //   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password> ./scacelith_tests net_live_server_game
 // This client registers, logs in, connects, queues rated 3+2, plays legal moves for 12 plies
 // (posHash from its own chess::Position FEN) and resigns; the result and the rating update must
