@@ -17,6 +17,7 @@
 #include "net/socket_util.h"
 #include "net/upnp.h"
 
+#include <algorithm>
 #include <atomic>
 #include <chrono>
 #include <cmath>
@@ -324,13 +325,18 @@ const char* kDescForeign = R"(<?xml version="1.0"?>
 
 #ifndef _WIN32
 // PollSet on a descriptor past FD_SETSIZE (1024), which select() cannot take: nothing until the
-// timeout when idle, then readable when a datagram waits (and writable).
+// timeout when idle, then readable when a datagram waits (and writable). The usual soft limit of
+// 1024 descriptors is raised for the test (as far as the hard limit allows), then restored.
 TEST(sock_poll_set_high_descriptor) {
-    rlimit rl{};
-    if (getrlimit(RLIMIT_NOFILE, &rl) != 0 || rl.rlim_cur <= 1500) {
-        std::fprintf(stderr, "  (fewer than 1501 descriptors allowed: skipped)\n");
-        return;
+    rlimit old{}, raised{};
+    if (getrlimit(RLIMIT_NOFILE, &old) == 0) {
+        raised = old;
+        if (old.rlim_cur <= 1500 && old.rlim_max > 1500) {
+            raised.rlim_cur = std::min<rlim_t>(old.rlim_max, 4096);
+            if (setrlimit(RLIMIT_NOFILE, &raised) != 0) raised = old;
+        }
     }
+    if (raised.rlim_cur <= 1500) SKIP("fewer than 1501 descriptors allowed");
     CHECK(sock::startup());
     sock::Handle a = sock::openUdpV4(), b = sock::openUdpV4();
     CHECK(a != sock::kInvalid && b != sock::kInvalid);
@@ -356,6 +362,7 @@ TEST(sock_poll_set_high_descriptor) {
     sock::closeSocket(high);
     sock::closeSocket(a);
     sock::closeSocket(b);
+    setrlimit(RLIMIT_NOFILE, &old);
 }
 #endif
 
