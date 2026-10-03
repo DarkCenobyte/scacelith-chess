@@ -2257,8 +2257,9 @@ uint32_t OnlineClient::Impl::stopRealtime(std::shared_ptr<bool> wasOpen) {
 }
 
 // Opens again the realtime connection that stopRealtime() ended for a call that failed (the
-// account is still there): when it was open or opening then, and nothing stopped it or changed the
-// server since (connectGen still 'gen'). An automatic reconnection: the last /info answer may serve.
+// account or the session is still there): when it was open or opening then, and nothing stopped it
+// or changed the server since (connectGen still 'gen'). An automatic reconnection: the last /info
+// answer may serve.
 void OnlineClient::Impl::resumeRealtime(uint32_t gen, std::shared_ptr<bool> wasOpen) {
     realtime([this, gen, wasOpen] {
         if (!*wasOpen || gen != connectGen.load() || rt.wanted) return;
@@ -2373,13 +2374,22 @@ void OnlineClient::revokeSession(int64_t sessionId) {
             d->post(ev);
             return;
         }
+        // The session of this game: the server closes its connection before it answers. That
+        // connection is closed first, as by deleteAccount(), so that the revoked-session notice and
+        // the refusal do not reach the game.
+        const bool mine = d->sessionsOrigin == e.origin() && d->currentSession == sessionId;
+        auto wasOpen = std::make_shared<bool>(false);
+        const uint32_t gen = mine ? d->stopRealtime(wasOpen) : 0;
         Impl::Api a = d->api(e, "DELETE", "/auth/sessions/" + std::to_string(sessionId), nullptr, true, d->httpCancel);
         Impl::fillError(ev, a);
-        if (a.ok() && d->sessionsOrigin == e.origin() && d->currentSession == sessionId) {
-            // The session of this game: signed out here too, as by logout().
+        if (a.ok() && mine) {
+            // Signed out here too, as by logout(); the connection stays closed (a connect() since included).
             d->creds.clearToken(e.origin());
             d->stopRealtime();
             d->currentSession = 0;
+        } else if (mine && a.error != "unauthorized") {
+            // Still signed in (the server unreachable...): the connection opens again if it was open.
+            d->resumeRealtime(gen, wasOpen);
         }
         d->post(ev);
     });

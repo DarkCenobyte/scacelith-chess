@@ -452,7 +452,8 @@ public:
     void downloadPgn(uint64_t gameId);                                  // GET /games/:id/pgn (text)
     void fetchSessions();                                               // GET /auth/sessions
     // DELETE /auth/sessions/:id. Revoking the session marked current in the last fetchSessions()
-    // signs this game out (token erased, realtime connection stopped), as logout() would.
+    // signs this game out (token erased, realtime connection stopped), as logout() would: its
+    // realtime connection closes first, and opens again as deleteAccount()'s on a failure.
     void revokeSession(int64_t sessionId);
     void setAcceptChallenges(bool accept);                              // PUT /account/preferences
     // Re-authenticated changes. codeOrRecovery: "" when two-factor is off (no field sent), a

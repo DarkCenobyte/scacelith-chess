@@ -1500,6 +1500,7 @@ public:
     static constexpr double kSkewMs = 5000;         // the server clock runs 5 s ahead
     std::atomic<int> loginAttempts{0}, powAccepted{0}, hellos{0}, pings{0}, moves{0}, logouts{0};
     std::atomic<int> deletes{0};                    // POST /api/v1/account/delete accepted
+    std::atomic<int> revokeStatus{0};               // != 0: DELETE /api/v1/auth/sessions/42 (this session) answers it
     std::atomic<int> infos{0}, upgrades{0};         // GET /api/v1/info, WebSocket upgrade requests
     std::atomic<int> upgradeStatus{0};              // != 0: upgrades are refused with this HTTP status
     std::atomic<uint32_t> clientPingMs{0};          // Welcome.clientPingMs
@@ -1792,6 +1793,22 @@ private:
             revokeSessions();
             std::this_thread::sleep_for(std::chrono::milliseconds(300));
             respond(s, 200, "{\"status\":\"deleted\"}");
+        } else if (method == "GET" && path == "/api/v1/auth/sessions") {
+            if (!authed) return respond(s, 401, "{\"error\":\"unauthorized\"}");
+            respond(s, 200, "{\"sessions\":[{\"id\":41,\"createdAt\":1789000000000,\"lastSeenAt\":1790000000000,\"expiresAt\":1792000000000,"
+                            "\"clientLabel\":null,\"current\":false},{\"id\":42,\"createdAt\":1789500000000,\"lastSeenAt\":1790000500000,"
+                            "\"expiresAt\":1792500000000,\"clientLabel\":null,\"current\":true}]}");
+        } else if (method == "DELETE" && path == "/api/v1/auth/sessions/41") {
+            respond(s, authed ? 200 : 401, authed ? "{\"status\":\"revoked\"}" : "{\"error\":\"unauthorized\"}");
+        } else if (method == "DELETE" && path == "/api/v1/auth/sessions/42") {
+            if (!authed) return respond(s, 401, "{\"error\":\"unauthorized\"}");
+            if (int st = revokeStatus.load()) return respond(s, st, "{\"error\":\"maintenance\"}");
+            // As the server, the connection of the revoked session is closed before the answer: its
+            // frames reach the client first.
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            revokeSessions();
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            respond(s, 200, "{\"status\":\"revoked\"}");
         } else {
             respond(s, 404, "{\"error\":\"not_found\"}");
         }
@@ -4231,6 +4248,76 @@ TEST(net_account_delete_closes_realtime_first) {
         }));
         CHECK(c.state() == net::ConnState::Offline);
         CHECK_EQ(srv.hellos.load(), 3);
+    }
+    net::sys::removeFile(credPath);
+}
+
+// Revoking this game's own session closes the realtime connection before the request, so that the
+// server's closing of that session's connection brings no revoked-session notice, refusal or
+// Unauthorized state. A revocation that fails opens it again; another device's leaves it alone.
+TEST(net_revoke_own_session_closes_realtime_first) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    FakeServer srv;
+    CHECK(srv.start());
+    std::string credPath = tempCredentialPath("revoke-own-first");
+    using K = net::Event::Kind;
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        net::ServerEndpoint ep;
+        ep.host = "127.0.0.1";
+        ep.apiPort = srv.port;
+        ep.insecureDev = true;
+        c.setServer(ep);
+        net::Event ev;
+        c.login("alice", "pw");
+        CHECK(waitEvent(c, K::LoginResult, ev, 20000) && ev.ok);
+        c.connect();
+        CHECK(waitEvent(c, K::Welcome, ev, 10000));
+        c.fetchSessions();
+        CHECK(waitEvent(c, K::SessionsResult, ev, 10000) && ev.ok);
+        // Another device's session: the connection stays open.
+        c.revokeSession(41);
+        std::vector<net::Event> seen;
+        CHECK(waitEvent(c, K::SessionRevoked, ev, 10000, &seen));
+        CHECK(ev.ok);
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        while (c.poll(ev)) seen.push_back(ev);
+        CHECK(std::none_of(seen.begin(), seen.end(), [](const net::Event& e) { return e.kind == net::Event::Kind::ConnectionChanged; }));
+        CHECK(c.state() == net::ConnState::Online);
+        CHECK_EQ(srv.hellos.load(), 1);
+        // This one, refused: closed for the request, open again once it failed.
+        srv.revokeStatus = 503;
+        c.revokeSession(42);
+        seen.clear();
+        CHECK(waitEvent(c, K::SessionRevoked, ev, 10000, &seen));
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string("maintenance"));
+        // net-rt's events may come before or after SessionRevoked, the new Welcome too.
+        const bool welcomed = std::any_of(seen.begin(), seen.end(), [](const net::Event& e) {
+            return e.kind == net::Event::Kind::Welcome;
+        });
+        if (!welcomed) CHECK(waitEvent(c, K::Welcome, ev, 10000, &seen));
+        CHECK(std::any_of(seen.begin(), seen.end(), [](const net::Event& e) {
+            return e.kind == net::Event::Kind::ConnectionChanged && e.state == net::ConnState::Offline;
+        }));
+        CHECK_EQ(srv.hellos.load(), 2);
+        CHECK(c.hasSavedSession());
+        // Revoked: the connection was closed before, and stays so.
+        srv.revokeStatus = 0;
+        seen.clear();
+        c.revokeSession(42);
+        CHECK(waitEvent(c, K::SessionRevoked, ev, 10000, &seen));
+        CHECK(ev.ok);
+        CHECK(!c.hasSavedSession());
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        while (c.poll(ev)) seen.push_back(ev);
+        CHECK(std::none_of(seen.begin(), seen.end(), [](const net::Event& e) {
+            return e.kind == net::Event::Kind::Notice || e.kind == net::Event::Kind::ServerError ||
+                   (e.kind == net::Event::Kind::ConnectionChanged && e.state != net::ConnState::Offline);
+        }));
+        CHECK(c.state() == net::ConnState::Offline);
+        CHECK_EQ(srv.hellos.load(), 2);
     }
     net::sys::removeFile(credPath);
 }
