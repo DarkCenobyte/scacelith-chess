@@ -317,14 +317,15 @@ OnlineSession& onlineSession();
 // The page the browser shows when Google sends it back to the game (net::LoopbackRedirect), in the
 // current language: made here, on the game thread, as the network threads never use i18n.
 net::SsoBrowserPage ssoBrowserPage();
-// Friendly texts (i18n) of the network layer's errors: an HTTPS error code is onlineErrorText()
-// (online_account.h); a realtime net::proto ErrorCode, a direct match error ("refused",
-// "timeout", "wrong_code", "incompatible", "port_in_use"... see net::DirectMatch::lastError()).
 // The error of a GIF in words (GifSaver::error()): the account's quota used up with the wait in
 // minutes and seconds, the renderer busy, signed out, a game too long, a PGN the server cannot
 // read, a render that failed, a server without GIFs, the file not written; the other codes as
 // onlineErrorText().
 std::string gifErrorText(const std::string& code, int retryAfterSec = 0);
+// Friendly texts (i18n) of the network layer's errors (an HTTPS error code: onlineErrorText() in
+// online_account.h): a realtime net::proto ErrorCode (serverErrorText), a ServerError event
+// (eventErrorText), a direct match error ("refused", "timeout", "wrong_code", "incompatible",
+// "port_in_use"... see net::DirectMatch::lastError(); directErrorText).
 std::string serverErrorText(int code);
 // Text of a ServerError event: its ErrorCode, or its transport error ("offline": a command sent
 // while not connected, which the network layer drops).
