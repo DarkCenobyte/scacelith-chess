@@ -1085,7 +1085,7 @@ TEST(net_sys_write_file_atomic_waits_for_another_program) {
         ~Removed() { net::sys::removeFile(path); }
     } removed{path};
     REQUIRE(net::sys::writeFileAtomic(path, "old", false));
-    const std::wstring wide(path.begin(), path.end());
+    const std::wstring wide = net::sys::widen(path);
     auto hold = [&] {
         return CreateFileW(wide.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING,
                            FILE_ATTRIBUTE_NORMAL, nullptr);

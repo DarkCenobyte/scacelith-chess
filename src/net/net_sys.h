@@ -28,7 +28,9 @@ std::string appDataDirectory();
 bool fileExists(const std::string& path);
 bool directoryWritable(const std::string& dir);
 bool readFile(const std::string& path, std::string& out, size_t maxBytes);
-// Writes to path.tmp then replaces path. privateFile: mode 0600 on POSIX systems.
+// Writes to path.tmp then replaces path. privateFile: mode 0600 on POSIX systems. On Windows a
+// path open elsewhere for a moment (another thread reading it, an antivirus scan) is tried again
+// for up to a second, as by renameFile().
 bool writeFileAtomic(const std::string& path, const std::string& data, bool privateFile);
 bool removeFile(const std::string& path);
 // Opens an https:// URL in the default browser (ShellExecuteW / xdg-open). The caller checks
