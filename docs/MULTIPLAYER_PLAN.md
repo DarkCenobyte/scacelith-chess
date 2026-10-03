@@ -135,8 +135,8 @@ so skipping it in time trouble brings nothing; the sheets stay complete.
 ## Players: names, handwriting, profiles and Elo
 
 - **Names.** Each seat has `Seat::name`. For a human it comes from `Settings::playerName`
-  through `localPlayerName()` in `game_scene.cpp`. Hot-seat needs a second name: the setup page
-  asks for both players, and each can pick a saved profile.
+  through `localPlayerName()` in `game_scene_detail.h`. Hot-seat needs a second name: the setup
+  page asks for both players, and each can pick a saved profile.
 - **Handwriting fonts.** Each name is written in a font that covers its script, so the two
   players may use two different fonts on the same scoresheet (for example a Japanese name and
   an Arabic name). The scoresheet takes the font per player, not per sheet.
