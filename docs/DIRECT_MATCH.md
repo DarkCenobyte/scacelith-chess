@@ -111,7 +111,8 @@ the host itself:
   game is gone), when the host refuses the code a second time during the reconnection or at once
   when it speaks another protocol (it hosts a new match), and the game then ends as *aborted by
   the server* on the guest's side.
-- **Leaving** a running game (either side) resigns it, as online.
+- **Leaving** a running game (either side) resigns it, or aborts it before one's own first move,
+  as online.
 - **Rematch** within 60 s after the end, colours swapped, when both accept.
 - **Clock presses**: whether the robots press the clock by themselves is the host's choice
   (`DirectHostOptions::autoPress`, on by default). It is in every `GameSnapshot`
