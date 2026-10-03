@@ -610,9 +610,9 @@ void httpStream(const HttpRequest& r, const std::function<bool(const HttpHead&)>
     if (!ok && resp.error.empty()) resp.error = "network";
 }
 
-std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int& httpStatus, CancelToken* cancel) {
+std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, WsAnswer& answer, CancelToken* cancel) {
     error.clear();
-    httpStatus = 0;
+    answer = WsAnswer();
     if (!p.tls && !isLoopbackHost(p.host)) {
         error = "insecure";
         return nullptr;
@@ -637,9 +637,10 @@ std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int&
         if (!detail.empty()) LOGW("net: websocket connect to %s:%u: %s", p.host.c_str(), p.port, detail.c_str());
         return nullptr;
     }
-    httpStatus = int(queryStatus(req.get()));
-    if (httpStatus != 101) {
-        error = "http_" + std::to_string(httpStatus);
+    answer.status = int(queryStatus(req.get()));
+    answer.retryAfter = queryHeader(req.get(), WINHTTP_QUERY_RETRY_AFTER, nullptr);
+    if (answer.status != 101) {
+        error = "http_" + std::to_string(answer.status);
         return nullptr;
     }
     if (queryHeader(req.get(), WINHTTP_QUERY_CUSTOM, L"Sec-WebSocket-Protocol") != p.subprotocol) {

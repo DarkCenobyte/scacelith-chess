@@ -1344,9 +1344,10 @@ TEST(net_transport_refuses_insecure) {
     p.host = "10.1.2.3";
     p.tls = false;
     std::string err;
-    int status = 0;
-    CHECK(net::wsConnect(p, err, status) == nullptr);
+    net::WsAnswer answer;
+    CHECK(net::wsConnect(p, err, answer) == nullptr);
     CHECK_EQ(err, expect);
+    CHECK_EQ(answer.status, 0);
     // A cancelled token aborts before anything happens.
     net::CancelToken tok;
     tok.cancel();
@@ -1387,9 +1388,9 @@ TEST(net_transport_silent_server_times_out) {
     p.subprotocol = pr::kWsSubprotocol;
     p.timeoutMs = 1000;
     std::string error;
-    int status = 0;
+    net::WsAnswer answer;
     t0 = std::chrono::steady_clock::now();
-    std::unique_ptr<net::WebSocket> ws = net::wsConnect(p, error, status, nullptr);
+    std::unique_ptr<net::WebSocket> ws = net::wsConnect(p, error, answer, nullptr);
     ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
     std::fprintf(stderr, "  upgrade: %s after %.0f ms\n", error.c_str(), ms);
     CHECK(!ws);
@@ -1603,6 +1604,7 @@ public:
     std::atomic<int> revokeStatus{0};               // != 0: DELETE /api/v1/auth/sessions/42 (this session) answers it
     std::atomic<int> infos{0}, upgrades{0};         // GET /api/v1/info, WebSocket upgrade requests
     std::atomic<int> upgradeStatus{0};              // != 0: upgrades are refused with this HTTP status
+    std::atomic<int> upgradeRetryAfter{0};          // != 0: refused upgrades carry Retry-After: <n>
     std::atomic<uint32_t> clientPingMs{0};          // Welcome.clientPingMs
     std::atomic<uint32_t> heartbeatMs{15000};       // Welcome.heartbeatMs (no S_Ping follows the first one)
     std::atomic<bool> answerPings{true};            // false: C_Ping gets no S_Pong
@@ -1614,6 +1616,7 @@ public:
     std::atomic<bool> autoPress{true};                        // GameSnapshot.autoPress
     std::atomic<bool> seqOk{true};                            // every client message came numbered in order
     std::atomic<bool> loginToken2{false};                     // sign-ins answer token2 (another session)
+    std::atomic<int> resyncs{0};                              // Resync requests (each answered with a snapshot)
 
     // The C_Gesture frames received, with their arrival time.
     struct GestureIn {
@@ -1634,6 +1637,14 @@ public:
         script_.assign(steps.begin(), steps.end());
     }
     std::string serverId() const { return "srv-" + std::to_string(serverNo.load()); }
+    // The gseq of the game's last event, which the next snapshot carries (the events a test sends
+    // with sendToClients do not change it).
+    void setGseq(uint32_t gseq) { gseq_.store(gseq); }
+    // A server message on every WebSocket.
+    template <class M> void sendToClients(const M& m) {
+        std::lock_guard<std::mutex> lk(mu_);
+        for (Sock s : ws_) sendMsg(s, m);
+    }
 
     bool start() {
 #ifdef _WIN32
@@ -1803,9 +1814,9 @@ private:
         sendFrame(s, 0x2, b.data(), b.size());
     }
 
-    void respond(Sock s, int status, const std::string& body) {
+    void respond(Sock s, int status, const std::string& body, const std::string& headers = std::string()) {
         std::string r = "HTTP/1.1 " + std::to_string(status) + " X\r\nContent-Type: application/json\r\nContent-Length: " +
-                        std::to_string(body.size()) + "\r\nConnection: close\r\n\r\n" + body;
+                        std::to_string(body.size()) + "\r\nConnection: close\r\n" + headers + "\r\n" + body;
         sendAll(s, r.data(), r.size());
     }
 
@@ -1926,7 +1937,8 @@ private:
             }
         }
         if (step > 0) {
-            respond(s, step, "{\"error\":\"server_full\"}");
+            const int retryAfter = upgradeRetryAfter.load();
+            respond(s, step, "{\"error\":\"server_full\"}", retryAfter ? "Retry-After: " + std::to_string(retryAfter) + "\r\n" : "");
             return;
         }
         std::string key = h["sec-websocket-key"];
@@ -2087,6 +2099,11 @@ private:
                 if (!pr::decode(p, n, m)) return;
                 std::lock_guard<std::mutex> lk(gestureMu_);
                 gestures_.push_back({m, std::chrono::steady_clock::now()});
+            } else if (t == pr::MsgType::Resync) {
+                pr::Resync m;
+                if (!pr::decode(p, n, m)) return;
+                ++resyncs;
+                sendSnapshot(s, gseq);
             } else if (t == pr::MsgType::Resign) {
                 pr::Resign m;
                 if (!pr::decode(p, n, m)) return;
@@ -2746,6 +2763,23 @@ void restartServerChangedScenario(PacingRig& r) {
              "4008, another server id: no further attempt");
 }
 
+// 429 at the upgrade with Retry-After: 5 (too many connections from this address): the next
+// attempt waits at least those 5 s (where a failure's second attempt comes within 4 s), with the
+// same /info answer.
+void retryAfterScenario(PacingRig& r) {
+    int ups = r.srv.upgrades.load(), infos = r.srv.infos.load();
+    r.srv.upgradeRetryAfter.store(5);
+    r.srv.scriptUpgrades({429});
+    r.srv.dropWebSockets();
+    r.expect(r.until([&] { return r.srv.upgrades.load() == ups + 1; }, 4000), "429: tried");
+    auto t0 = std::chrono::steady_clock::now();
+    r.expect(r.until([&] { return r.srv.upgrades.load() == ups + 2; }, 10000), "429: tried again");
+    double gap = r.msSince(t0);
+    r.expect(gap >= 4900 && gap <= 9000, "429: after its Retry-After (" + std::to_string(int(gap)) + " ms)");
+    r.expect(r.stateIs(net::ConnState::Online, 5000), "429: online again");
+    r.expect(r.srv.infos.load() == infos, "429: the /info answer is kept (" + std::to_string(r.srv.infos.load() - infos) + " reads)");
+}
+
 // A reverse proxy answering 502 at the upgrade (its backend restarts): retried like a network
 // failure, with the same /info answer.
 void badGatewayScenario(PacingRig& r) {
@@ -2966,6 +3000,89 @@ void gestureDownScenario(PacingRig& r) {
              "online again: the next one goes");
 }
 
+// Game events apply in gseq order (PROTOCOL.md, "Ordering: gseq"): the next one applies and its
+// gseq becomes the state's; one the state already holds (an event of the snapshot, a MoveMade sent
+// again) is ignored, without a Resync; one beyond the next is not applied, and the client asks for
+// a Resync, which the server answers with a snapshot. A MoveMade of the next gseq for another ply
+// than the next one asks for a Resync too.
+void gseqScenario(PacingRig& r) {
+    using K = net::Event::Kind;
+    net::Event ev;
+    r.srv.setGseq(40);
+    if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    r.expect(ev.game.gseq == 40, "the snapshot's gseq (" + std::to_string(ev.game.gseq) + ")");
+    auto gameEvent = [&](uint32_t gseq, pr::GameEventKind kind) {
+        pr::GameEvent e;
+        e.game = 77;
+        e.gseq = gseq;
+        e.kind = kind;
+        e.color = pr::Color::Black;
+        r.srv.sendToClients(e);
+    };
+    auto moveMade = [&](uint32_t gseq, uint16_t ply) {
+        pr::MoveMade m;
+        m.game = 77;
+        m.gseq = gseq;
+        m.ply = ply;
+        m.move = ply % 2 == 0 ? net::packMove(12, 28, 0) : net::packMove(52, 36, 0);
+        m.whiteMs = m.blackMs = 180000;
+        m.serverTime = epochMs() + FakeServer::kSkewMs;
+        r.srv.sendToClients(m);
+    };
+    auto gameEnd = [&](uint32_t gseq) {
+        pr::GameEnd e;
+        e.game = 77;
+        e.gseq = gseq;
+        e.status = pr::GameStatus::Draw;
+        e.reason = pr::EndReason::Agreement;
+        e.serverTime = epochMs() + FakeServer::kSkewMs;
+        r.srv.sendToClients(e);
+    };
+    // The game events among those polled.
+    auto shown = [](const std::vector<net::Event>& seen) {
+        int n = 0;
+        for (const net::Event& e : seen)
+            n += e.kind == K::GameSnapshot || e.kind == K::MoveMade || e.kind == K::GameEvent || e.kind == K::GameEnd;
+        return n;
+    };
+    std::vector<net::Event> seen;
+
+    gameEvent(41, pr::GameEventKind::DrawOffered);
+    r.expect(waitEvent(*r.c, K::GameEvent, ev, 3000) && ev.game.drawOfferBy == 1 && ev.game.gseq == 41, "41: applied");
+    gameEvent(41, pr::GameEventKind::DrawDeclined);
+    moveMade(40, 0);
+    gameEnd(39);
+    moveMade(42, 0);
+    r.expect(waitEvent(*r.c, K::MoveMade, ev, 3000, &seen) && ev.ply == 0 && ev.game.gseq == 42 && ev.game.moves.size() == 1 &&
+                 ev.game.status == int(pr::GameStatus::Ongoing),
+             "42: applied");
+    r.expect(shown(seen) == 1, "41, 40 and 39 again: ignored (" + std::to_string(shown(seen)) + " game events)");
+    r.sleepMs(300);
+    r.expect(r.srv.resyncs.load() == 0, "no Resync for what the state holds");
+
+    // 44 after 42: 43 was missed.
+    r.srv.setGseq(50);
+    seen.clear();
+    gameEnd(44);
+    r.expect(r.until([&] { return r.srv.resyncs.load() == 1; }, 3000), "44 after 42: a Resync");
+    r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 3000, &seen) && ev.game.gseq == 50 && ev.game.moves.empty() &&
+                 ev.game.status == int(pr::GameStatus::Ongoing),
+             "44 after 42: the snapshot of the Resync");
+    r.expect(shown(seen) == 1, "44 after 42: not applied");
+
+    // 52 after 50, at the next ply: 51 was missed. Then 51 for ply 1 at ply 0: not the next ply.
+    seen.clear();
+    moveMade(52, 0);
+    r.expect(r.until([&] { return r.srv.resyncs.load() == 2; }, 3000), "52 after 50: a Resync");
+    r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 3000, &seen) && ev.game.gseq == 50, "52 after 50: the snapshot");
+    moveMade(51, 1);
+    r.expect(r.until([&] { return r.srv.resyncs.load() == 3; }, 3000), "51 for ply 1 at ply 0: a Resync");
+    r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 3000, &seen) && ev.game.gseq == 50, "51 for ply 1: the snapshot");
+    r.expect(shown(seen) == 2, "neither MoveMade applied (" + std::to_string(shown(seen)) + " game events)");
+    moveMade(51, 0);
+    r.expect(waitEvent(*r.c, K::MoveMade, ev, 3000) && ev.ply == 0 && ev.game.gseq == 51, "51 for ply 0: applied");
+}
+
 // Starts each rig and runs its scenario on a thread of its own, then reports every failure.
 void runRigs(PacingRig* rigs, const char* const* tags, void (*const* scenarios)(PacingRig&), int n) {
     std::vector<std::thread> threads;
@@ -2989,7 +3106,7 @@ void runRigs(PacingRig* rigs, const char* const* tags, void (*const* scenarios)(
 
 TEST(net_online_client_pacing) {
     if (!net::transportAvailable()) SKIP("transport unavailable");
-    constexpr int kRigs = 14;
+    constexpr int kRigs = 15;
     PacingRig rigs[kRigs];
     rigs[0].srv.clientPingMs.store(60000);
     rigs[5].srv.clientPingMs.store(3500);
@@ -2999,11 +3116,11 @@ TEST(net_online_client_pacing) {
     }
     const char* tags[kRigs] = {"pace-ping",     "pace-full",  "pace-shutdown", "pace-notice", "pace-ingame",
                                "pace-interval", "pace-probe", "pace-probe2",   "pace-502",    "pace-404",
-                               "pace-srvid",    "pace-cheat", "pace-restart-full", "pace-srvid-restart"};
+                               "pace-srvid",    "pace-cheat", "pace-restart-full", "pace-srvid-restart", "pace-429"};
     void (*scenarios[kRigs])(PacingRig&) = {
         pingPacingScenario,   serverFullScenario, shutdownScenario,        shutdownNoticeScenario, inGameScenario,
         pingIntervalScenario, probeScenario,      probeUnansweredScenario, badGatewayScenario,     notFoundScenario,
-        serverChangedScenario, cheatScenario,     restartFullScenario,     restartServerChangedScenario};
+        serverChangedScenario, cheatScenario,     restartFullScenario,     restartServerChangedScenario, retryAfterScenario};
     runRigs(rigs, tags, scenarios, kRigs);
 }
 
@@ -3024,6 +3141,15 @@ TEST(net_online_client_gestures) {
     const char* tags[kRigs] = {"gesture", "gesture-off", "gesture-down"};
     void (*scenarios[kRigs])(PacingRig&) = {gestureScenario, gestureOffScenario, gestureDownScenario};
     runRigs(rigs, tags, scenarios, kRigs);
+}
+
+// Game events in gseq order: the next one applies, an old one is ignored, a gap asks for a Resync.
+TEST(net_online_client_game_events_in_gseq_order) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    PacingRig rigs[1];
+    const char* tags[1] = {"gseq"};
+    void (*scenarios[1])(PacingRig&) = {gseqScenario};
+    runRigs(rigs, tags, scenarios, 1);
 }
 
 // Frames the client ignores (a client message type, a server message that does not decode): the
@@ -5702,15 +5828,15 @@ TEST(net_tls_pinning_manual) {
     w.subprotocol = pr::kWsSubprotocol;
     w.timeoutMs = 3000;
     std::string err;
-    int status = 0;
+    net::WsAnswer answer;
     w.path = "/ws?pin=" + wrong.substr(0, 8);
     w.pinnedSha256 = wrong;
-    CHECK(net::wsConnect(w, err, status) == nullptr);
+    CHECK(net::wsConnect(w, err, answer) == nullptr);
     CHECK(certError(err));
     w.path = "/ws?pin=" + pin.substr(0, 8);
     w.pinnedSha256 = pin;                             // TLS accepted; the test server does not upgrade
-    CHECK(net::wsConnect(w, err, status) == nullptr);
-    std::fprintf(stderr, "  wss pinned -> error '%s' status %d\n", err.c_str(), status);
+    CHECK(net::wsConnect(w, err, answer) == nullptr);
+    std::fprintf(stderr, "  wss pinned -> error '%s' status %d\n", err.c_str(), answer.status);
     CHECK_EQ(err, std::string("http_200"));
 }
 

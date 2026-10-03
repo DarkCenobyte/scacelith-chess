@@ -151,9 +151,15 @@ protected:
     std::string serverId_;
 };
 
+// The server's HTTP answer to an upgrade.
+struct WsAnswer {
+    int status = 0;                           // 0 when no HTTP answer was received, 101 when upgraded
+    std::string retryAfter;                   // Retry-After header of a refusal (429, 503), if any
+};
+
 // Connects (TCP, TLS, HTTP upgrade). nullptr on failure with error as for HttpResponse, or
 // "http_<status>" when the server answered without upgrading, or "subprotocol".
-std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int& httpStatus, CancelToken* cancel = nullptr);
+std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, WsAnswer& answer, CancelToken* cancel = nullptr);
 
 // The pin check of a WinHTTP request at each SENDING_REQUEST notification (transport_win32.cpp),
 // here so that the tests reach it on every platform. leaf: the hex SHA-256 of the server's

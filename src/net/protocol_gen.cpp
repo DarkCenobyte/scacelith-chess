@@ -1474,9 +1474,9 @@ bool valid(const S_Gesture& m) {
 bool decodeHello(const uint8_t* p, size_t n, Hello& out) {
     HelloPrefix prefix;
     if (!readHelloPrefix(p, n, prefix)) return false;
-    if (prefix.minor <= kMinor) return decode(p, n, out);   // no field of a later minor
+    if (prefix.minor <= kMinor) return decode(p, n, out);   // strict
     Reader r(p, n, false);
-    return r.type(MsgType::Hello) && getFields(r, out);   // fields of a later minor follow
+    return r.type(MsgType::Hello) && getFields(r, out);   // trailing bytes ignored
 }
 
 }  // namespace proto
