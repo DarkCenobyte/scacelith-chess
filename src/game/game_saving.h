@@ -22,7 +22,7 @@ namespace saving {
 archive::Mode archiveMode(GameMode mode, bool directMatch);
 
 // The ending of an online game as its authority reports it (net::OnlineGame status and reason, the
-// values of dedicated-server/src/protocol/schema.js): "1-0", "0-1", "1/2-1/2", or "*" while it is
+// values of dedicated-server/protocol/scacelith-v1.json): "1-0", "0-1", "1/2-1/2", or "*" while it is
 // ongoing and for an aborted game; the i18n key of the reason ("reason.checkmate" for the chess
 // reasons 1..13, "reason.online.abandonment"... from 20), "" for none.
 std::string onlineResult(int status);

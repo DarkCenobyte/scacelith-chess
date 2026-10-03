@@ -1,10 +1,11 @@
 # Online play: the client side
 
 How the game shows and plays online games. The network layer itself (`src/net/`: HTTPS API,
-secure WebSocket, credential store, direct match with UPnP) and the server
-(`dedicated-server/`) are described in their own documents; this page covers what sits on top
-of them in `src/game/` and `src/ui/`, the server in use and the account API calls of
-`net::OnlineClient`.
+secure WebSocket, credential store, direct match with UPnP) and the server (`dedicated-server/`,
+written in Rust; its realtime protocol v1 is specified in `dedicated-server/docs/PROTOCOL.md` and
+its HTTPS API in `dedicated-server/docs/API.md`) are described in their own documents; this page
+covers what sits on top of them in `src/game/` and `src/ui/`, the server in use and the account
+API calls of `net::OnlineClient`.
 
 ## Pieces
 
@@ -303,10 +304,10 @@ same as against Stockfish, with these differences:
   client comes back by itself after a random delay, longer when the server is full or restarting
   but 8 s at most during a game unless the server asked to wait longer (a `Retry-After`): the
   server keeps the game for the reconnection grace, at least 15 s by default and 90 s after a
-  restart (`dedicated-server/docs/PROTOCOL.md`, lifecycle step 6). The delay grows with each
-  attempt and starts again from the shortest only after a connection that stayed up for a
-  minute, so a server that closes right after letting the player in is not called again every
-  second or two. After a restart the server
+  restart (`dedicated-server/docs/PROTOCOL.md`, "Connection lifecycle", steps 8 and 9). The
+  delay grows with each attempt and starts again from the shortest only after a connection that
+  stayed up for a minute, so a server that closes right after letting the player in is not called
+  again every second or two. After a restart the server
   also holds the clock of the side to move until that player is back, 20 s at most by default:
   its snapshots then name no running clock, so both clocks stay frozen, and the snapshot that
   follows when the held clock starts (sent to the opponent too) sets them running again. The

@@ -2,8 +2,9 @@
 // the first rating (with the zero-score rule for both players), games against unrated players, the
 // counted games (K, provisional), the .ini records,
 // and the vectors of the dedicated server's rating (dedicated-server/test/fixtures/elo-vectors.json,
-// written by dedicated-server/tools/gen-elo-vectors.js from src/match/elo.js): the game and the
-// server must give the same numbers to the last point. The vectors file is looked up from the
+// written and checked by the elo_vectors test of dedicated-server/crates/server/src/matching/elo/
+// tests.rs from matching/elo.rs): the game and the server must give the same numbers to the last
+// point. The vectors file is looked up from the
 // current directory (run from the repository root), $SCACELITH_SOURCE_DIR and the executable's
 // parent directories.
 #include "test.h"

@@ -736,9 +736,9 @@ TEST(mock_account_deletion_closes_the_connection_first) {
     CHECK(srv.state() == net::ConnState::Offline);
 }
 
-// The export's limit as on the server (account-export.js: rate [account_export 5/h, reauth],
-// checked by the router before the handler): every attempt counts, failed ones included, and the
-// limit is checked before the password.
+// The export's limit as on the server (dedicated-server/docs/API.md, POST /account/export: rates
+// account_export 5/h then reauth, checked by the router before the handler): every attempt counts,
+// failed ones included, and the limit is checked before the password.
 TEST(mock_account_export_limit_counts_every_attempt) {
     VirtualClock vc;
     mock::FakeServer srv;
