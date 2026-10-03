@@ -453,6 +453,11 @@ TEST(net_live_account_api) {
         ev = ask(c, Kind::ServerInfoResult, [&] { c.fetchServerInfo(); });
         report("fetchServerInfo with the saved pin", ev);
         CHECK(ev.ok);
+#ifdef _WIN32
+        // WinHTTP would hand the next request the connection pooled by this one, whose certificate
+        // the pin let through: past the server's keep-alive (5 s), it opens a new one.
+        std::this_thread::sleep_for(std::chrono::milliseconds(6000));
+#endif
         ev = ask(c, Kind::ServerInfoResult, [&] { c.fetchServerInfo(true); });
         report("fetchServerInfo without the saved pin", ev);
         CHECK(!ev.ok);
