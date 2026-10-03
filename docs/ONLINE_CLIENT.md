@@ -206,8 +206,9 @@ server's side).
 `LoginResult` `cancelled` when something was under way; a start still waiting for the server's
 answer opens no browser and answers `SsoBrowserOpened` `cancelled`. The online page calls it
 when it opens and when the player leaves a Google page while signed out. Changing servers stops
-it too, and a code that arrives for the server left is dropped. The listener runs on its own
-thread (`net-sso`) and hands the code to `net-http` as a command.
+it too (a start still waiting for the server's answer opens no browser either), and a code that
+arrives for the server left is dropped. The listener runs on its own thread (`net-sso`) and hands
+the code to `net-http` as a command.
 
 ## The game at the table
 
