@@ -961,7 +961,18 @@ TEST(direct_channel_bad_hello) {
         CHECK(host.start() && guest.start());
         std::vector<uint8_t> gh;
         gh.swap(guest.outbox());
-        gh[4] = 2;   // a future version
+        gh[4] = uint8_t(Chan::kVersion + 1);   // a future version
+        CHECK(!host.receive(gh.data(), gh.size()));
+        CHECK(host.failure() == Chan::Failure::BadVersion);
+    }
+    {
+        // Version 1 carried the protocol before v1: refused the same way.
+        Chan guest(Chan::Role::Guest, "K7Q2M9XH3PTR"), host(Chan::Role::Host, "K7Q2M9XH3PTR");
+        CHECK(host.start() && guest.start());
+        std::vector<uint8_t> gh;
+        gh.swap(guest.outbox());
+        CHECK_EQ(int(gh[4]), 2);
+        gh[4] = 1;
         CHECK(!host.receive(gh.data(), gh.size()));
         CHECK(host.failure() == Chan::Failure::BadVersion);
     }
@@ -1184,7 +1195,6 @@ TEST(direct_authority_snapshot_and_names) {
         w.serverName = direct::sanitizeName(refused[i], "Host");
         P::Hello h;
         h.proto = P::kProtocolVersion;
-        h.schema = P::kSchemaHash;
         h.token = "direct:" + direct::sanitizeName(refused[i], "Guest");
         h.token.resize(16, ' ');
         std::vector<uint8_t> buf;
@@ -2444,7 +2454,6 @@ TEST(direct_gestures_outside_flood_limit) {
     CHECK(raw.connect(inv.port, inv.code));
     P::Hello hello;
     hello.proto = P::kProtocolVersion;
-    hello.schema = P::kSchemaHash;
     hello.client = "Scacelith test";
     hello.token = "direct:Raw      ";
     CHECK(raw.send(hello));
@@ -2452,6 +2461,8 @@ TEST(direct_gestures_outside_flood_limit) {
     CHECK(raw.waitFor(w, 5000));
     CHECK_EQ(int(w.gestureRate), 10);
     CHECK_EQ(int(w.gestureBurst), 20);
+    CHECK_EQ(int(w.maxMsgPerSec), 20);
+    CHECK_EQ(int(w.msgBurst), 20);
     P::GameSnapshot s;
     CHECK(raw.waitFor(s, 5000));
     CHECK(s.game != 0 && s.game == w.activeGame && s.autoPress);
@@ -2511,7 +2522,6 @@ bool joinRaw(Peer& host, RawGuest& raw, P::GameSnapshot& snap) {
     DirectInvite inv = host.dm.invite();
     P::Hello hello;
     hello.proto = P::kProtocolVersion;
-    hello.schema = P::kSchemaHash;
     hello.client = "Scacelith test";
     hello.token = "direct:Raw      ";
     P::Welcome w;
@@ -2604,8 +2614,7 @@ TEST(direct_host_refuses_without_stalling) {
     RawGuest other;
     CHECK(other.connect(host.dm.invite().port, host.dm.invite().code));
     P::Hello hello;
-    hello.proto = P::kProtocolVersion;
-    hello.schema = P::kSchemaHash ^ 1u;
+    hello.proto = uint16_t(P::kProtocolVersion + 1);
     hello.token = "direct:Other    ";
     CHECK(other.send(hello));
     P::Error e;
@@ -2624,6 +2633,35 @@ TEST(direct_host_refuses_without_stalling) {
     CHECK(hostResyncMs(host) < 100);
     CHECK(guest.waitClosed(2000));
     CHECK(host.dm.currentGame() && !host.dm.currentGame()->blackConnected);
+}
+
+TEST(direct_host_takes_later_minor_hello) {
+    // A guest of a later minor: its Hello announces unknown caps and carries a field the host does
+    // not know. The host takes it and answers with the minor and the caps both sides speak.
+    Peer host, nobody;
+    host.dm.host(hostOptions(300, 0, 1, "Alice"));
+    CHECK(waitUntil(host, nobody, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
+    DirectInvite inv = host.dm.invite();
+    RawGuest raw;
+    CHECK(raw.connect(inv.port, inv.code));
+    P::Hello hello;
+    hello.seq = ++raw.seq;
+    hello.proto = P::kProtocolVersion;
+    hello.minor = uint16_t(P::kMinor + 2);
+    hello.caps = ~uint64_t(0);
+    hello.client = "Scacelith later";
+    hello.token = "direct:Later    ";
+    std::vector<uint8_t> buf;
+    P::encode(hello, buf);
+    buf.push_back(7);   // the field of that minor
+    CHECK(raw.sendBytes(buf));
+    P::Welcome w;
+    CHECK(raw.waitFor(w, 5000));
+    CHECK(w.proto == P::kProtocolVersion && w.minor == P::kMinor && w.caps == P::kCaps);
+    P::GameSnapshot s;
+    CHECK(raw.waitFor(s, 5000));
+    CHECK(s.game != 0 && s.game == w.activeGame);
+    CHECK_EQ(raw.errors, 0);
 }
 
 TEST(direct_guest_message_out_of_sequence_logged_once) {

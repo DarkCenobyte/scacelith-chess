@@ -772,14 +772,16 @@ struct OnlineClient::Impl {
         i.protocolMin = int(p["min"].asInt(0));
         i.protocolMax = int(p["max"].asInt(0));
         if (p["schema"].isNumber()) {
-            i.schemaHash = uint32_t(p["schema"].asInt(0));
+            i.fingerprint = uint32_t(p["schema"].asInt(0));
         } else {
             std::string s = p["schema"].asString();
             if (s.compare(0, 2, "0x") == 0) s.erase(0, 2);
-            i.schemaHash = uint32_t(std::strtoul(s.c_str(), nullptr, 16));
+            i.fingerprint = uint32_t(std::strtoul(s.c_str(), nullptr, 16));
         }
+        // Protocol 1 evolves by minor versions negotiated at Hello: the major version and the
+        // subprotocol token decide, the schema fingerprint does not.
         i.compatible = int(pr::kProtocolVersion) >= i.protocolMin && int(pr::kProtocolVersion) <= i.protocolMax &&
-                       i.schemaHash == pr::kSchemaHash && p["subprotocol"].asString(pr::kWsSubprotocol) == pr::kWsSubprotocol;
+                       p["subprotocol"].asString(pr::kWsSubprotocol) == pr::kWsSubprotocol;
         int64_t ws = v["wsPort"].asInt(0);
         i.wsPort = ws > 0 && ws < 65536 ? uint16_t(ws) : 0;
         const json::Value& reg = v["registration"];
@@ -1172,7 +1174,8 @@ struct OnlineClient::Impl {
         rt.probedAt = Clock::time_point{};
         pr::Hello h;
         h.proto = pr::kProtocolVersion;
-        h.schema = pr::kSchemaHash;
+        h.minor = pr::kMinor;
+        h.caps = pr::kCaps;
         h.client = clientString();
         h.token = c.token;
         rt.helloToken = c.token;
@@ -1237,11 +1240,13 @@ struct OnlineClient::Impl {
         pr::MsgType t;
         const uint8_t* p = b.data();
         size_t n = b.size();
+        rt.lastRecv = Clock::now();   // anything the server sends shows that the connection lives
         if (!pr::peekType(p, n, t) || pr::isClientType(uint8_t(t))) {
-            if (++rt.badFrames <= kLoggedBadFrames) LOGW("net: ignoring a frame of unknown type (%u bytes)", unsigned(n));
+            // A server message of a later minor is ignored without a word; anything else is odd.
+            if ((n == 0 || pr::isClientType(p[0])) && ++rt.badFrames <= kLoggedBadFrames)
+                LOGW("net: ignoring a frame that is no server message (%u bytes)", unsigned(n));
             return;
         }
-        rt.lastRecv = Clock::now();
         auto bad = [&] {
             if (++rt.badFrames <= kLoggedBadFrames)
                 LOGW("net: malformed %s from the server (%u bytes)", pr::messageName(t), unsigned(n));
@@ -1250,6 +1255,11 @@ struct OnlineClient::Impl {
         case pr::MsgType::Welcome: {
             pr::Welcome m;
             if (!pr::decode(p, n, m)) return bad();
+            if (m.proto != pr::kProtocolVersion) {
+                dropSocket(pr::CloseCode::ProtocolError);
+                stopWanting(ConnState::Incompatible, "incompatible");
+                return;
+            }
             rt.welcomed = true;
             rt.backoff.welcomed(steadyMs());
             rt.heartbeatMs = m.heartbeatMs;
@@ -1518,28 +1528,32 @@ struct OnlineClient::Impl {
         const std::string token = rt.helloToken;   // dropSocket forgets it
         dropSocket(1000);
         if (wasOnline && rt.info.proven) rt.info.at = Clock::now();   // the /info answer worked until now
+        // The fatal Error, or the error the close code stands for when the Error did not arrive
+        // (close 4000 + code, 4300 + code - 240).
         int fatal = rt.lastFatal;
-        if (code == pr::CloseCode::UnsupportedProtocol || fatal == int(pr::ErrorCode::UnsupportedProtocol)) {
+        pr::ErrorCode closed{};
+        if (fatal == 0 && pr::errorCodeForClose(code, closed)) fatal = int(closed);
+        if (fatal == int(pr::ErrorCode::UnsupportedProtocol)) {
             stopWanting(ConnState::Incompatible, "incompatible");
-        } else if (code == pr::CloseCode::Unauthorized || fatal == int(pr::ErrorCode::Unauthorized)) {
+        } else if (fatal == int(pr::ErrorCode::Unauthorized)) {
             // The token this connection sent: a sign-in on net-http may have saved another one since.
             creds.clearToken(rt.ep.origin(), token);
             stopWanting(ConnState::Unauthorized, "unauthorized");
         } else if (fatal == int(pr::ErrorCode::EmailUnverified)) {
             stopWanting(ConnState::Unauthorized, "email_unverified");
-        } else if (code == pr::CloseCode::Banned || fatal == int(pr::ErrorCode::Banned)) {
+        } else if (fatal == int(pr::ErrorCode::Banned)) {
             stopWanting(ConnState::Banned, "banned");
-        } else if (code == pr::CloseCode::Replaced || fatal == int(pr::ErrorCode::Replaced)) {
+        } else if (fatal == int(pr::ErrorCode::Replaced)) {
             // Another client of this account took over: fighting back would loop forever.
             stopWanting(ConnState::Offline, "replaced");
-        } else if (code == pr::CloseCode::CheatDetected || fatal == int(pr::ErrorCode::CheatDetected)) {
+        } else if (fatal == int(pr::ErrorCode::CheatDetected)) {
             // The server's fair-play checks stopped this client: the player decides what comes next.
             stopWanting(ConnState::Offline, "cheat_detected");
         } else if (rt.wanted) {
             RetryCause why = RetryCause::Failure;
-            if (code == pr::CloseCode::ServerFull || fatal == int(pr::ErrorCode::ServerFull)) {
+            if (fatal == int(pr::ErrorCode::ServerFull)) {
                 why = RetryCause::ServerFull;
-            } else if (code == pr::CloseCode::ShuttingDown || fatal == int(pr::ErrorCode::ShuttingDown) || rt.shutdownNotice) {
+            } else if (fatal == int(pr::ErrorCode::ShuttingDown) || rt.shutdownNotice) {
                 why = RetryCause::Shutdown;
                 rt.restarting = true;
             }

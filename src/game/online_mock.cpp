@@ -1862,8 +1862,9 @@ void FakeServer::fetchServerInfo(bool) {
     s.name = contains(I.ep.host, "official") ? "Scacelith" : "Scacelith (mock server)";
     s.serverId = "mock-" + lower(I.ep.host);
     s.motd = "A local stand-in for the real server: every password works, and your opponents play at random.";
-    s.protocolMin = proto::kProtocolMin;
-    s.protocolMax = I.hostHas("old") ? proto::kProtocolMin - 1 : proto::kProtocolVersion;
+    // An "old" host stands for a server from before protocol 1: no version this game speaks.
+    s.protocolMin = s.protocolMax = I.hostHas("old") ? 0 : int(proto::kProtocolVersion);
+    s.fingerprint = I.hostHas("old") ? 0 : proto::kFingerprint;
     s.compatible = !I.hostHas("old");
     s.wsPort = I.ep.wsPort ? I.ep.wsPort : I.ep.apiPort;
     s.registrationOpen = true;

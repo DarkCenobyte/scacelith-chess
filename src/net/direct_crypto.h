@@ -3,8 +3,8 @@
 // net::proto messages. Windows: BCrypt only; Linux dev/test builds: OpenSSL libcrypto.
 //
 // Handshake (TCP, the guest speaks first):
-//   guest -> host   GuestHello = "SCDM" | version 1 | 32-byte nonce Ng | P-256 public key Qg (65 bytes, uncompressed)
-//   host  -> guest  HostHello  = "SCDM" | version 1 | 32-byte nonce Nh | P-256 public key Qh
+//   guest -> host   GuestHello = "SCDM" | version 2 | 32-byte nonce Ng | P-256 public key Qg (65 bytes, uncompressed)
+//   host  -> guest  HostHello  = "SCDM" | version 2 | 32-byte nonce Nh | P-256 public key Qh
 //   both            Z   = ECDH(own private key, peer public key), X coordinate, 32 bytes big-endian
 //                   OKM = HKDF-SHA256(salt = Ng || Nh, ikm = Z || code (12 ASCII chars),
 //                                     info = "scacelith direct match v1", 128 bytes)
@@ -17,7 +17,7 @@
 // Frames (both directions): u16 length (little-endian, = ciphertext + 16) | ciphertext | 16-byte
 // tag, AES-256-GCM with the direction's key, nonce = 4 zero bytes || u64 counter (big-endian,
 // 0, 1, 2... per direction), aad = the two length bytes. Plaintext = one net::proto message of
-// 1..16384 bytes (a GameSnapshot carries 10 bytes per ply, up to 1200 plies: about 12.2 KB). Any
+// 1..16384 bytes (a GameSnapshot carries 10 bytes per ply, up to 1200 plies: at most 12137 bytes). Any
 // tag failure, a length out of range or a counter overflow fails the channel for good (the
 // connection must be closed): no replay, reordering, truncation or splicing.
 #pragma once
@@ -103,7 +103,10 @@ public:
     static constexpr size_t kHelloLen = 4 + 1 + 32 + 65;
     static constexpr size_t kConfirmLen = 32 + 16;
     static constexpr size_t kMaxPlaintext = 16384;
-    static constexpr uint8_t kVersion = 1;
+    // 2 since the channel carries realtime protocol v1 (version 1 carried the earlier protocol):
+    // the two never meet past the handshake, which fails with BadVersion on the side that reads
+    // the other's hello.
+    static constexpr uint8_t kVersion = 2;
 
     // code: the normalised 12-character join code.
     SecureChannel(Role role, const std::string& code);

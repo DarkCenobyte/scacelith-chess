@@ -15,7 +15,7 @@ namespace P = net::proto;
 namespace {
 constexpr double kInf = std::numeric_limits<double>::infinity();
 constexpr int kNone = 2;
-constexpr int kMaxPlies = 1200;   // Move.ply <= 1199 (schema.js), as room.js MAX_PLIES
+constexpr int kMaxPlies = 1200;   // Move.ply <= 1199, the protocol's MAX_PLIES
 
 uint32_t u32ms(int64_t ms) { return uint32_t(std::max<int64_t>(0, std::min<int64_t>(ms, 0xFFFFFFFFll))); }
 
@@ -235,7 +235,7 @@ void Authority::finish(int status, int reason, double now, Output& out) {
 }
 
 void Authority::finishFromChess(double now, Output& out) {
-    // chess::GameStatus and GameEndReason share the protocol's numbering (schema.js EndReason).
+    // chess::GameStatus and GameEndReason share the protocol's numbering (EndReason).
     finish(int(game_.status()), int(game_.endReason()), now, out);
 }
 
