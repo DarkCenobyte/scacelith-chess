@@ -67,23 +67,38 @@ void Grid2D::build(const std::vector<vec2>& poly, float cell, float band) {
         s += len;
     }
     perimeter_ = s;
-    // ...then propagated over the whole grid by closest-point dead reckoning (two sweeps).
-    auto relax = [&](int i, int j, int di, int dj) {
-        int ni = i + di, nj = j + dj;
-        if (ni < 0 || nj < 0 || ni >= w_ || nj >= h_) return;
-        size_t a = size_t(j) * size_t(w_) + size_t(i), b = size_t(nj) * size_t(w_) + size_t(ni);
+    // ...then propagated over the whole grid by closest-point dead reckoning (two sweeps). Cell a
+    // (centre p) takes neighbour b's closest point when it is nearer. The neighbour order must not
+    // change: ties keep the first candidate, which decides d_, t_ and cp.
+    auto relax = [&](size_t a, size_t b, vec2 p) {
         if (d_[b] >= INF) return;
-        vec2 p = origin_ + vec2(float(i), float(j)) * cell;
         float d = length(p - cp[b]);
         if (d < d_[a]) { d_[a] = d; cp[a] = cp[b]; t_[a] = t_[b]; }
     };
+    const size_t W = size_t(w_);
     for (int j = 0; j < h_; ++j) {
-        for (int i = 0; i < w_; ++i) { relax(i, j, -1, 0); relax(i, j, -1, -1); relax(i, j, 0, -1); relax(i, j, 1, -1); }
-        for (int i = w_ - 1; i >= 0; --i) relax(i, j, 1, 0);
+        const size_t row = size_t(j) * W;
+        for (int i = 0; i < w_; ++i) {  // W, SW, S, SE
+            const size_t a = row + size_t(i);
+            const vec2 p = origin_ + vec2(float(i), float(j)) * cell;
+            if (i > 0) relax(a, a - 1, p);
+            if (i > 0 && j > 0) relax(a, a - W - 1, p);
+            if (j > 0) relax(a, a - W, p);
+            if (i + 1 < w_ && j > 0) relax(a, a - W + 1, p);
+        }
+        for (int i = w_ - 2; i >= 0; --i) relax(row + size_t(i), row + size_t(i) + 1, origin_ + vec2(float(i), float(j)) * cell);  // E
     }
     for (int j = h_ - 1; j >= 0; --j) {
-        for (int i = w_ - 1; i >= 0; --i) { relax(i, j, 1, 0); relax(i, j, 1, 1); relax(i, j, 0, 1); relax(i, j, -1, 1); }
-        for (int i = 0; i < w_; ++i) relax(i, j, -1, 0);
+        const size_t row = size_t(j) * W;
+        for (int i = w_ - 1; i >= 0; --i) {  // E, NE, N, NW
+            const size_t a = row + size_t(i);
+            const vec2 p = origin_ + vec2(float(i), float(j)) * cell;
+            if (i + 1 < w_) relax(a, a + 1, p);
+            if (i + 1 < w_ && j + 1 < h_) relax(a, a + W + 1, p);
+            if (j + 1 < h_) relax(a, a + W, p);
+            if (i > 0 && j + 1 < h_) relax(a, a + W - 1, p);
+        }
+        for (int i = 1; i < w_; ++i) relax(row + size_t(i), row + size_t(i) - 1, origin_ + vec2(float(i), float(j)) * cell);  // W
     }
     // Sign: even-odd scanline fill.
     std::vector<float> xs;
@@ -151,10 +166,9 @@ MeshData meshSurfaceNets(const Field& fIn, const AABB& box, const MeshOptions& o
     auto cidx = [&](int i, int j, int k) { return (size_t(k) * size_t(ny - 1) + size_t(j)) * size_t(nx - 1) + size_t(i); };
     auto P = [&](int i, int j, int k) { return box.lo + vec3(float(i), float(j), float(k)) * h; };
 
-    std::vector<float> val(size_t(nx) * size_t(ny) * size_t(nz), 0.0f);
+    std::vector<float> val(size_t(nx) * size_t(ny) * size_t(nz), 0.0f);  // valid where done[] is set
     std::vector<uint8_t> done(val.size(), 0);
-    std::vector<float> blockVal(size_t(bx) * size_t(by) * size_t(bz));
-    std::vector<uint8_t> active(blockVal.size(), 0);
+    std::vector<uint8_t> active(size_t(bx) * size_t(by) * size_t(bz), 0);
     const float halfDiag = 0.5f * float(B) * h * std::sqrt(3.0f);
     for (int k = 0; k < bz; ++k)
         for (int j = 0; j < by; ++j)
@@ -162,7 +176,6 @@ MeshData meshSurfaceNets(const Field& fIn, const AABB& box, const MeshOptions& o
                 vec3 c = box.lo + (vec3(float(i), float(j), float(k)) + vec3(0.5f)) * (float(B) * h);
                 float v = f(c);
                 size_t bi = (size_t(k) * size_t(by) + size_t(j)) * size_t(bx) + size_t(i);
-                blockVal[bi] = v;
                 active[bi] = std::fabs(v) <= halfDiag * o.lipschitz + h;
             }
     for (int k = 0; k < bz; ++k)
@@ -178,14 +191,7 @@ MeshData meshSurfaceNets(const Field& fIn, const AABB& box, const MeshOptions& o
                             done[id] = 1;
                         }
             }
-    for (int z = 0; z < nz; ++z)
-        for (int y = 0; y < ny; ++y)
-            for (int x = 0; x < nx; ++x) {
-                size_t id = pidx(x, y, z);
-                if (done[id]) continue;
-                int i = std::min(x / B, bx - 1), j = std::min(y / B, by - 1), k = std::min(z / B, bz - 1);
-                val[id] = blockVal[(size_t(k) * size_t(by) + size_t(j)) * size_t(bx) + size_t(i)];
-            }
+    // Only cells of active blocks are meshed below, and every corner they read is evaluated.
 
     // Gradient (tetrahedral differences), unnormalised scale 4e.
     const float e = h * 0.12f;

@@ -316,22 +316,12 @@ int verifyCallback(int ok, X509_STORE_CTX* st) {
 
 // ---- HTTP/1.1 ----
 
-struct ParsedHead {
-    int status = 0;
-    std::vector<std::pair<std::string, std::string>> headers;   // names lower-case
-    std::string get(const std::string& name) const {
-        for (auto& h : headers)
-            if (h.first == name) return h.second;
-        return std::string();
-    }
-};
-
 std::string trim(const std::string& s) {
     size_t a = s.find_first_not_of(" \t"), b = s.find_last_not_of(" \t");
     return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
 }
 
-bool parseHead(const std::string& head, ParsedHead& out) {
+bool parseHead(const std::string& head, HttpHead& out) {
     size_t eol = head.find("\r\n");
     std::string line = head.substr(0, eol);
     if (line.compare(0, 5, "HTTP/") != 0) return false;
@@ -351,11 +341,12 @@ bool parseHead(const std::string& head, ParsedHead& out) {
     return true;
 }
 
-// Decodes a complete chunked body; false when incomplete or malformed (done tells which).
-bool dechunk(const std::string& in, std::string& out, bool& complete) {
-    out.clear();
+// Decodes the chunks of a chunked body that are whole from 'pos' on, as more of it arrives: their
+// data goes to the end of 'out' and 'pos' moves past them (it stays at the start of a chunk that
+// is not whole yet). False when malformed; otherwise 'complete' tells whether the last chunk (size
+// 0) and the line end after it have arrived.
+bool dechunk(const std::string& in, size_t& pos, std::string& out, bool& complete) {
     complete = false;
-    size_t pos = 0;
     for (;;) {
         size_t e = in.find("\r\n", pos);
         if (e == std::string::npos) return true;
@@ -367,16 +358,16 @@ bool dechunk(const std::string& in, std::string& out, bool& complete) {
         char* end = nullptr;
         unsigned long n = std::strtoul(sizeLine.c_str(), &end, 16);
         if (*end) return false;
-        pos = e + 2;
+        size_t data = e + 2;
         if (n == 0) {
             // Trailers end with an empty line.
-            complete = in.find("\r\n", pos) != std::string::npos;
+            complete = in.find("\r\n", data) != std::string::npos;
             return true;
         }
-        if (in.size() < pos + n + 2) return true;
-        out.append(in, pos, n);
-        if (in.compare(pos + n, 2, "\r\n") != 0) return false;
-        pos += n + 2;
+        if (in.size() < data + n + 2) return true;
+        if (in.compare(data + n, 2, "\r\n") != 0) return false;
+        out.append(in, data, n);
+        pos = data + n + 2;
     }
 }
 
@@ -702,8 +693,12 @@ void httpRequest(const HttpRequest& req, HttpResponse& resp, CancelToken* cancel
     Deadline dl(req.timeoutMs);
     bool ok = s.writeAll(head.data(), head.size(), dl) && (req.body.empty() || s.writeAll(req.body.data(), req.body.size(), dl));
     std::string raw;
-    ParsedHead ph;
+    HttpHead ph;
     size_t bodyAt = std::string::npos;
+    bool chunked = false;
+    std::string cl;
+    size_t chunkAt = 0;   // the first chunk not decoded yet (chunked)
+    std::string decoded;
     char buf[16384];
     while (ok) {
         if (bodyAt == std::string::npos) {
@@ -711,18 +706,18 @@ void httpRequest(const HttpRequest& req, HttpResponse& resp, CancelToken* cancel
             if (e != std::string::npos) {
                 if (!parseHead(raw.substr(0, e), ph)) { s.error = "network"; s.detail = "bad HTTP response"; ok = false; break; }
                 if (ph.status >= 100 && ph.status < 200) { raw.erase(0, e + 4); continue; }   // interim answer
-                bodyAt = e + 4;
+                bodyAt = chunkAt = e + 4;
+                chunked = lower(ph.get("transfer-encoding")).find("chunked") != std::string::npos;
+                cl = ph.get("content-length");
             } else if (raw.size() > 65536) {
                 s.error = "network"; s.detail = "response header too large"; ok = false; break;
             }
         }
         if (bodyAt != std::string::npos) {
-            std::string te = lower(ph.get("transfer-encoding")), cl = ph.get("content-length");
-            if (te.find("chunked") != std::string::npos) {
+            if (chunked) {
                 bool complete;
-                std::string body;
-                if (!dechunk(raw.substr(bodyAt), body, complete)) { s.error = "network"; s.detail = "bad chunked body"; ok = false; break; }
-                if (complete) { resp.body = body; break; }
+                if (!dechunk(raw, chunkAt, decoded, complete)) { s.error = "network"; s.detail = "bad chunked body"; ok = false; break; }
+                if (complete) { resp.body = std::move(decoded); break; }
             } else if (!cl.empty()) {
                 size_t want = size_t(std::strtoull(cl.c_str(), nullptr, 10));
                 if (want > req.maxResponseBytes) { s.error = "too_large"; ok = false; break; }
@@ -735,8 +730,7 @@ void httpRequest(const HttpRequest& req, HttpResponse& resp, CancelToken* cancel
         if (r == 0) {
             // End of stream: the body runs to the end when no length was given.
             if (bodyAt == std::string::npos) { s.error = "network"; s.detail = "connection closed before the response"; ok = false; break; }
-            std::string te = lower(ph.get("transfer-encoding"));
-            if (te.find("chunked") != std::string::npos || !ph.get("content-length").empty()) {
+            if (chunked || !cl.empty()) {
                 s.error = "network"; s.detail = "truncated response"; ok = false; break;
             }
             resp.body = raw.substr(bodyAt);
@@ -843,7 +837,7 @@ void httpStream(const HttpRequest& req, const std::function<bool(const HttpHead&
     bool ok = s.writeAll(head.data(), head.size(), Deadline(req.timeoutMs));
     // The head (interim 1xx answers skipped); 'raw' keeps what came after it.
     std::string raw;
-    ParsedHead ph;
+    HttpHead ph;
     std::vector<char> buf(64 * 1024);
     for (bool haveHead = false; ok && !haveHead;) {
         size_t e = raw.find("\r\n\r\n");
@@ -858,7 +852,7 @@ void httpStream(const HttpRequest& req, const std::function<bool(const HttpHead&
             raw.append(buf.data(), size_t(r));
             continue;
         }
-        ph = ParsedHead();
+        ph = HttpHead();
         if (!parseHead(raw.substr(0, e), ph)) { s.error = "network"; s.detail = "bad HTTP response"; ok = false; break; }
         raw.erase(0, e + 4);
         haveHead = ph.status >= 200;
@@ -866,10 +860,7 @@ void httpStream(const HttpRequest& req, const std::function<bool(const HttpHead&
     if (ok) {
         resp.status = ph.status;
         resp.retryAfter = ph.get("retry-after");
-        HttpHead hh;
-        hh.status = ph.status;
-        hh.headers = ph.headers;
-        bool wantBody = onHead(hh) && req.method != "HEAD" && ph.status != 204 && ph.status != 304;
+        bool wantBody = onHead(ph) && req.method != "HEAD" && ph.status != 204 && ph.status != 304;
         if (wantBody) {
             const bool chunked = lower(ph.get("transfer-encoding")).find("chunked") != std::string::npos;
             const std::string cl = ph.get("content-length");
@@ -973,7 +964,7 @@ std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int&
         error = cancel && cancel->cancelled() ? "cancelled" : s->error;
         return nullptr;
     }
-    ParsedHead ph;
+    HttpHead ph;
     if (!parseHead(raw.substr(0, end), ph)) { error = "network"; return nullptr; }
     httpStatus = ph.status;
     if (ph.status != 101) { error = "http_" + std::to_string(ph.status); return nullptr; }

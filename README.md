@@ -188,8 +188,9 @@ they do.
   server with a self-signed certificate, its **Certificate fingerprint (SHA-256)** as its owner
   gives it (64 hexadecimal characters, colons allowed; empty = the Windows certificate store).
   **Test connection** shows the server's name, message and whether it runs a compatible
-  version. You sign in separately on each server: an account and its sign-in are never shared
-  between servers, and nothing secret is written to `Scacelith.ini`.
+  version. Google sign-in works only when the server is added under the public host name and API
+  port its owner gives. You sign in separately on each server: an account and its sign-in are
+  never shared between servers, and nothing secret is written to `Scacelith.ini`.
 - **Account.** Sign in with your user name or e-mail and password (and the code of your
   authenticator app once two-factor authentication is on), or with Google. New accounts confirm
   their e-mail address (the page can send the link again); a forgotten password is reset by
@@ -212,7 +213,8 @@ they do.
   head movements is on (the robot then looks around by itself, as against Stockfish; it still
   moves the pieces with them). The clocks are the server's (they never stop, not even in the Esc
   menu). The ping to the server is in the top right corner. Esc: offer or claim a draw, resign,
-  abort before your first move, report the opponent, leave (which resigns). If your opponent loses
+  abort before your first move, report the opponent, leave (which resigns, or aborts before your
+  first move; closing the window does the same). If your opponent loses
   the connection a banner counts down the time they have to come back; if yours drops, the game
   waits behind a "Reconnecting…" veil and picks up where the server is. The scoresheets are headed
   with the server's name, "Online", the time control, rated or casual, both players with their
@@ -238,8 +240,9 @@ Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-librar
 
 ## Options
 
-Settings are stored in `Scacelith.ini` next to the executable when that folder is writable,
-otherwise in `%APPDATA%\scacelith\` (`~/.config/scacelith/` on Linux; read back from there); a
+Settings are stored in `Scacelith.ini` next to the executable when that file can be written,
+otherwise in `%APPDATA%\scacelith\` (`~/.config/scacelith/` on Linux) and read back from there: a
+read-only `Scacelith.ini` left next to the executable is then ignored once that copy exists. A
 file given with `--ini <file>` is read and written there only (the log warns when it cannot be written). All of them are
 editable from the Options page: display mode and resolution, V-sync, render scale, quality
 preset, motion blur, depth of field, brightness, volumes, ambience, legal-move hints, auto-press
@@ -273,12 +276,22 @@ fallback); `--lang <code>` overrides the language for one session.
 
 ## Building
 
-Requirements: CMake 3.20+, Ninja, a C++17 compiler. The Windows build is produced with
+Requirements: CMake 3.21+, Ninja, GCC with GNU binutils (tested with GCC 13; on Windows,
+MinGW-w64 GCC with POSIX threads; Clang cannot build the embedded Stockfish variants), and
+Python 3 for the instruction-set audits and the Windows exception table check that run at every
+build (a Windows Release build, the shipped exe, does not configure without it; other builds skip
+them with a warning). The Linux build also needs the OpenSSL 3, X11 and OpenGL development files
+(for example `libssl-dev`, `libx11-dev` and `libgl-dev`). The Windows build is produced with
 MinGW-w64 (native or cross-compiled from Linux) and is a single self-contained executable
 (Stockfish 19 and its neural network are embedded). Stockfish is compiled once per x86-64
 instruction set, from plain x86-64 to AVX-512, and the game runs the best one the CPU supports;
 `-DSCACELITH_SF_VARIANTS=x86-64-avx2` (or another variant the CPU runs) builds a single one, for
-quicker local builds (see `third_party/stockfish/README.scacelith.md`).
+quicker local builds (see `third_party/stockfish/README.scacelith.md`). The first configure also
+downloads the coach's voice model archive (129 MB, from the sherpa-onnx release on GitHub) into
+the build folder, for the unit tests and `--coach-dir build/coach`:
+`-DSCACELITH_SUPERTONIC_DIR=<extracted folder>` or `-DSCACELITH_SUPERTONIC_ARCHIVE=<.tar.bz2>`
+take a local copy instead, and `-DSCACELITH_SUPERTONIC_DOWNLOAD=OFF` does without it (the tests
+that need the model are then skipped; see `third_party/supertonic3/README.scacelith.md`).
 
 ```sh
 # Windows x64 (cross-compiled from Linux)
@@ -301,8 +314,11 @@ saved games' tests fail although Windows takes the name. `tools/test_win.sh` and
 
 Development options: `--scene <name>` runs a viewer scene (`--list-scenes`), `--data-dir .`
 reads shaders from disk and **F5** reloads them, **F12** saves a screenshot,
-`--shot out.png --frames N --size 1280x720` renders headlessly. `tools/shot.sh` and
-`tools/shot_win.sh` do this under Xvfb (Linux build and Windows build through Wine).
+`--shot out.png --frames N --size 1280x720` renders headlessly (leaving the settings file and the
+saved games as they are). `tools/shot.sh` and `tools/shot_win.sh` do this under Xvfb (Linux build
+and Windows build through Wine). The Windows exe has no console: redirect what it prints
+(`Scacelith.exe --list-scenes > scenes.txt`, or `| more`), or configure with
+`-DSCACELITH_CONSOLE=ON` for a console build.
 
 The game itself (`--scene game`, the default) takes `--start` (a game against Stockfish at once;
 `--human white|black`), `--viewer` (a watched game at once; `--white-preset N --black-preset N`
@@ -310,7 +326,7 @@ with N an index of the preset list, `--viewpoint 0..9`), `--tc N` (time control 
 x,y,z [--look x,y,z] [--fov deg]` (initial observer camera when watching; a detached camera in a
 normal game), `--handover-preview` (watching through the players' eyes with the clock frozen during
 each camera handover, the same hand-over as [hot-seat](docs/MULTIPLAYER_PLAN.md)), `--no-intro`,
-`--warp <seconds>` (simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
+`--warp <seconds>` (with `--shot`: simulate before the first frame), `--moves e2e4,e7e5,...`, `--touch <square>`,
 `--mouse fx,fy` (pointer position as fractions of the window; the view follows it, `0.5,0.03` looks
 up at the opponent), `--glance` (start looking at the scoresheet), `--calibrate` (the brightness
 calibration before the title page, as on a first start) and `--ini <file>`.
@@ -348,10 +364,11 @@ data provided by the Leela Chess Zero project, which is made available under the
 License (ODbL). The Cinzel, EB Garamond and Amiri (Khaled Hosny) interface fonts and the handwriting
 fonts Caveat (Impallari Type), Marck Script (Denis Masharov), Bad Script (Gaslight), Aref Ruqaa
 (Abdullah Aref, Khaled Hosny), Klee One (Fontworks) and LXGW WenKai / WenKai TC (LXGW) are under the
-SIL Open Font License 1.1; the subsets shipped here are rebuilt from the upstream files by
-`tools/prepare_fonts.py`. The chess figures of the promotion picker come from a subset of GNU
-FreeFont FreeSerif (GPL-3.0+ with the font exception). All licence texts are in `assets/fonts/` and
-`assets/fonts/hand/`. The coach's voice model (Supertonic 3) is not part of the program nor of its
-release package: the game downloads it from its publishers at the player's request. It has its own
-licence (BigScience Open RAIL-M), whose use restrictions the download prompt shows; see
+SIL Open Font License 1.1; the Arabic and CJK fonts (Amiri, Aref Ruqaa, Klee One, LXGW WenKai /
+WenKai TC) are subset and renamed from the upstream files by `tools/prepare_fonts.py`, the others
+are the upstream files unchanged. The chess figures of the promotion picker come from a subset of
+GNU FreeFont FreeSerif (GPL-3.0+ with the font exception). All licence texts are in `assets/fonts/`
+and `assets/fonts/hand/`. The coach's voice model (Supertonic 3) is not part of the program nor of
+its release package: the game downloads it from its publishers at the player's request. It has its
+own licence (BigScience Open RAIL-M), whose use restrictions the download prompt shows; see
 `third_party/supertonic3/README.scacelith.md`.

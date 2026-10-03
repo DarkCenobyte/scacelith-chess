@@ -12,6 +12,7 @@
 // untimed game completes any AiMoving move once its pieces are down).
 #include "game_scene.h"
 #include "coach_model.h"
+#include "game_scene_detail.h"
 #include "../audio/audio.h"
 #include "../character/skeleton.h"
 #include "../coach/catalog.h"
@@ -28,7 +29,6 @@
 #include "../tts/tts.h"
 #include "../ui/ui_font.h"
 #include "layout.h"
-#include "look_up.h"
 #include "settings.h"
 #include <algorithm>
 #include <cmath>
@@ -41,6 +41,8 @@ using namespace chess;
 
 namespace game {
 
+using namespace scene_detail;
+
 namespace {
 
 // Demonstration moves: slower than a move in play (anim::Timing), so the player can follow them.
@@ -52,27 +54,15 @@ constexpr float kSetupFadeOut = 0.30f, kSetupFadeIn = 0.45f;
 constexpr float kGestureApproach = anim::Timing::PointApproach;
 constexpr float kBeatDuration = 1.35f;    // three strokes; the first one lands after 0.27 s
 constexpr float kNodApex = 0.2f;          // a nod is at its lowest this long after it starts
-// The view's lift to the coach's face (lead decision §4.1): after the pointer has rested this long.
+// The view's lift to the coach's face: after the pointer has rested this long.
 constexpr float kFaceLiftIdle = 1.5f;
 // Failsafes of the end of a coach game, should the session never get there.
 constexpr float kHandshakeFailsafe = 45.0f, kEndCardFailsafe = 300.0f;
 
-anim::Task task(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0), float height = 0.0f, float duration = 0.0f) {
-    anim::Task k;
-    k.type = t;
-    k.pieceId = pieceId;
-    k.position = pos;
-    k.height = height;
-    k.duration = duration;
-    return k;
-}
-
-std::string playerName() {
-    const std::string& n = settings().playerName;
-    return n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
-}
-
 float smooth01(float x) { return x <= 0.0f ? 0.0f : x >= 1.0f ? 1.0f : x * x * (3.0f - 2.0f * x); }
+
+// The TTS speed of a coach game's lines: the rules lesson speaks slower.
+float speechSpeed(int level) { return level == 0 ? coach::kLessonSpeechSpeed : 1.0f; }
 
 }  // namespace
 
@@ -106,11 +96,10 @@ struct CoachRuntime {
     bool sessionRunning = false;
     uint64_t seed = 1;
 
-    // The voice: the TTS worker (restarted when the lesson's slower speed is wanted) and the one
-    // utterance playing from the coach's mouth.
+    // The voice: the TTS worker (each line asks for its own speed) and the one utterance playing
+    // from the coach's mouth.
     tts::Worker worker;
     bool workerStarted = false;
-    float workerSpeed = 1.0f;
     std::set<uint32_t> speechIds;                     // requested, not taken nor cancelled
     std::map<uint32_t, std::vector<float>> speechDone;   // finished, not taken yet (empty = failed)
     audio::VoiceId voice;
@@ -124,6 +113,7 @@ struct CoachRuntime {
 
     // Subtitles, HUD
     std::string subText;
+    bool subUnheard = false;                          // its line has no voice: shown whatever the option
     float subAge = 0.0f, subHold = 0.0f;
     bool offerShown = false, skipHint = false;
     float offerAge = 0.0f;                            // seconds the takeback card has been up
@@ -134,7 +124,7 @@ struct CoachRuntime {
     Square lookSquare = NoSquare;
     float lookHold = 0.0f;                            // the look holds while the coach talks, then this long
     bool handOut = false;                             // gestures given since the last retract
-    std::vector<std::pair<float, bool>> headMoves;    // (game time, nod?) still to come
+    std::vector<std::pair<float, bool>> headMoves;    // (the coach's animator time, nod?) still to come
     vec2 lastPointer{-1.0f, -1.0f};
     float pointerIdle = 0.0f;
 
@@ -197,13 +187,15 @@ public:
         audio::Stats a = audio::stats();
         return a.running && a.deviceOpen;
     }
-    void ensureWorker(float speed) {
+    void ensureWorker() {
         CoachRuntime& r = rt();
         if (!s_.coachVoiceFiles_) return;
-        // A worker that failed to load is tried again (the model files may have arrived since).
-        bool retry = r.workerStarted && r.worker.failed();
-        if (r.workerStarted && !retry && std::fabs(speed - r.workerSpeed) < 0.005f) return;
-        // A new speed restarts the worker: only between lines (nothing queued would be lost).
+        // A worker that failed to load is tried again (the model files may have arrived since),
+        // between lines (nothing queued would be lost). One whose warm-up failed is not: files that
+        // load but cannot speak would be loaded again for every line. One such failure, then
+        // subtitles (the files are offered for a check once, coachModelLoadFailed), until a download
+        // replaces model files (GameScene::coachModelDownloaded).
+        if (r.workerStarted && (!r.worker.failed() || r.worker.warmUpFailed())) return;
         if (r.workerStarted && (!r.speechIds.empty() || r.worker.pending() > 0)) return;
         const Settings& st = settings();
         tts::setArchCap(st.ttsArch.c_str());
@@ -211,19 +203,18 @@ public:
         o.threads = st.ttsThreads > 0 ? st.ttsThreads : 2;
         o.voice = st.ttsVoice;
         o.steps = st.ttsSteps;
-        o.speed = speed;
         r.worker.stop();
         r.worker.start(o);
         r.workerStarted = true;
-        r.workerSpeed = speed;
-        LOGI("coach: voice worker started (%s, %d threads, speed %.2f, voice %d, %d steps)", tts::modelDirectory().c_str(),
-             o.threads, speed, o.voice, o.steps);
+        LOGI("coach: voice worker started (%s, %d threads, voice %d, %d steps)", tts::modelDirectory().c_str(), o.threads,
+             o.voice, o.steps);
     }
     uint32_t requestSpeech(const std::string& text, const std::string& lang, float speed, int priority) override {
         CoachRuntime& r = rt();
-        ensureWorker(speed);
+        ensureWorker();
         if (!r.workerStarted || r.worker.failed() || text.empty()) return 0;
-        uint32_t id = r.worker.request(text, lang, priority);
+        // The speed goes with the line (the rules lesson speaks slower): never a reload of the model.
+        uint32_t id = r.worker.request(text, lang, priority, 0, speed);
         if (id) r.speechIds.insert(id);
         return id;
     }
@@ -293,7 +284,8 @@ public:
         r.voiceStarted = true;
         r.voiceQueued = seconds;
         r.voiceGameT = 0.0;
-        if (r.voicePausedByDirector || r.voicePausedByScene) audio::setVoicePaused(id, true);
+        r.voicePausedByDirector = false;   // the director starts no voice while it holds a pause
+        if (r.voicePausedByScene) audio::setVoicePaused(id, true);
         return true;
     }
     void stopVoice() override {
@@ -349,10 +341,11 @@ public:
     }
 
     // ---- Subtitles
-    void showSubtitle(const std::string& written, float holdSeconds) override {
+    void showSubtitle(const std::string& written, float holdSeconds, bool unheard) override {
         CoachRuntime& r = rt();
         LOGD("coach: subtitle \"%s\" (%.1f s)", written.c_str(), holdSeconds);
         r.subText = written;
+        r.subUnheard = unheard;
         r.subAge = 0.0f;
         r.subHold = holdSeconds;
     }
@@ -440,7 +433,8 @@ public:
             break;
         case coach::GestureKind::Nod:
         case coach::GestureKind::ShakeHead:
-            r.headMoves.push_back({s_.time_ + std::max(0.0f, apexIn - kNodApex), g.kind == coach::GestureKind::Nod});
+            // On the animator's clock, like the hand: it stops with the pause menu, and so does the voice.
+            r.headMoves.push_back({now + std::max(0.0f, apexIn - kNodApex), g.kind == coach::GestureKind::Nod});
             return;
         }
         a.enqueue(t);
@@ -596,9 +590,26 @@ void GameScene::initCoachArgs() {
 void GameScene::refreshCoachVoice() {
     // The model files may come and go while the game runs (downloaded from the menu), and the
     // voice can be switched off (Options > Audio > Coach voice). Files that are all there but do
-    // not load are checked by the next download (coach_model.h).
+    // not load, or cannot speak, are checked by the next download (coach_model.h).
     if (coachVoiceFiles_ && coach_ && coach_->workerStarted && coach_->worker.failed()) coachModelLoadFailed();
     coachVoiceFiles_ = coachVoiceWanted();
+    // Switched on, or downloaded, during a coach game: its worker starts now (the director asks for
+    // speech only once the voice is available).
+    if (coachVoiceFiles_ && coach() && coach_ && coach_->sessionRunning && !coach_->workerStarted)
+        coach_->stage->ensureWorker();
+}
+
+void GameScene::coachModelDownloaded(int fetched) {
+    // Model files replaced by the download: a worker that failed, its warm-up included, gets one
+    // more try (ensureWorker starts a new one now in a coach game, else with the next one). Its
+    // requests fail meanwhile (subtitles).
+    if (coach_ && coach_->workerStarted && coachVoiceRetry(coach_->worker.failed(), fetched)) {
+        coach_->stage->cancelSpeech(0);
+        coach_->worker.stop();
+        coach_->workerStarted = false;
+        LOGI("coach: %d voice model file(s) replaced, the voice is tried again", fetched);
+    }
+    refreshCoachVoice();
 }
 
 bool GameScene::coachVoiceExpected() const {
@@ -617,7 +628,6 @@ CoachRuntime& GameScene::coachRuntime() {
         coach::OpeningBook::instance();
         coach::OpeningTexts::instance();
     });
-    rt.stage->ensureWorker(1.0f);   // the voice loads while the lights go down
     return rt;
 }
 
@@ -627,6 +637,8 @@ void GameScene::setupCoachGame() {
     leaveCoachGame();
     const Settings& s = settings();
     coachLevel_ = coachArgs_.level >= 0 ? coachArgs_.level : std::clamp(s.coachLevel, 0, ai::kCoachLevels - 1);
+    // The voice loads while the lights go down.
+    rt.stage->ensureWorker();
     int colour = coachArgs_.colour >= 0 ? coachArgs_.colour
                  : s.coachColour == 0 || s.coachColour == 1 ? s.coachColour
                                                              : (s.coachNextColour == 1 ? 1 : 0);
@@ -654,7 +666,7 @@ void GameScene::configureCoachSeats() {
         st.playHand = hand;
         if (st.color == humanColor_) {
             st.controller = Controller::Human;
-            st.name = playerName();
+            st.name = localPlayerName();
             st.elo = s.playerElo;
             st.provisional = s.playerRecord().provisional();
         } else {
@@ -689,14 +701,13 @@ void GameScene::startCoachGame() {
     c.human = humanColor_;
     c.director.uiLanguage = i18n::language();
     c.director.subtitles = s.subtitles;
-    c.director.speed = coachLevel_ == 0 ? coach::kLessonSpeechSpeed : 1.0f;
+    c.director.speed = speechSpeed(coachLevel_);
     c.introduceLevel = s.coachHistory.empty() || s.coachHistory.back().level != coachLevel_;
     c.offersEnabled = true;
-    c.seed = rt.seed;
     for (const Settings::CoachGame& g : s.coachHistory) c.history.push_back({g.level, g.result, g.accuracy});
     c.accuracyExplained = s.coachAccuracyExplained;
     c.lessonChapter = s.coachLessonChapter;
-    rt.stage->ensureWorker(c.director.speed);
+    rt.stage->ensureWorker();
     // Every glyph the coach's lines can show in this language, once (subtitles never wait).
     std::string ui = i18n::language();
     if (!rt.prewarmedLanguages.count(ui)) {
@@ -851,6 +862,7 @@ bool GameScene::coachHoldsMove() const {
     if (rt.test) return true;   // the stage test owns the table
     if (rt.sessionRunning && !rt.session.coachMayMove()) return true;
     if (rt.jobRunning || !rt.jobs.empty()) return true;
+    if (rt.drawAnalysis) return true;   // it answers a draw offer before it plays on
     // Its hand first finishes what it shows (a gesture's hold ends with the line, see updateCoach).
     return anim_[aiSeat()].busy();
 }
@@ -881,8 +893,7 @@ bool GameScene::coachCanTakeBack() const {
         turn_ == Turn::HumanPromotion || turn_ == Turn::HumanPlaced || !rt.session.canTakeBack(game_))
         return false;
     // Back to the player's last move: possible only while neither scoresheet has begun writing it
-    // (the write limit keeps it and the coach's reply off the sheets until the player's next move;
-    // lead decision §4.2).
+    // (the write limit keeps it and the coach's reply off the sheets until the player's next move).
     int n = int(game_.moves().size());
     int last = n - 1;
     if (last >= 0 && game_.positionAt(size_t(last)).sideToMove() != humanColor_) --last;
@@ -898,6 +909,12 @@ void GameScene::coachOfferDraw() {
         ui::notify(i18n::tr("notify.draw_already_offered"), 2.5f);
         return;
     }
+    coachEvaluateDraw();
+}
+
+void GameScene::coachEvaluateDraw() {
+    CoachRuntime& rt = coachRuntime();
+    int ply = int(game_.moves().size());
     drawOfferPly_ = ply;
     // The coach answers from a full-strength evaluation of the position (its own play is weakened).
     ai::AnalysisRequest r;
@@ -928,7 +945,7 @@ void GameScene::updateCoach(float dt) {
     const bool hold = frozen || focusLost;
     if (hold != rt.held) {
         // The pause menu, or the window in the background: the voice pauses, the director holds
-        // between beats (the game has no clock to stop; lead decision §4.3).
+        // between beats (the game has no clock to stop).
         rt.held = hold;
         if (rt.sessionRunning) rt.session.setPaused(hold);
         rt.voicePausedByScene = hold;
@@ -978,11 +995,13 @@ void GameScene::updateCoach(float dt) {
         if (rt.sessionRunning) rt.session.onOfferAnswer(game_, coachArgs_.autoAnswer == 1);
     }
 
-    // The draw offer's evaluation.
-    if (rt.drawAnalysis && engine_.analysisReady(rt.drawAnalysis)) {
+    // The draw offer's evaluation, answered once no move is on its way (turn.h, coachDrawStep).
+    const int ply = int(game_.moves().size());
+    const CoachDrawStep drawStep = coachDrawStep(state_ == State::Playing, turn_, rt.drawPly, ply);
+    if (rt.drawAnalysis && drawStep != CoachDrawStep::Wait && engine_.analysisReady(rt.drawAnalysis)) {
         ai::Analysis a;
         bool accept = false;
-        if (engine_.takeAnalysis(rt.drawAnalysis, a) && a.ok && !a.lines.empty() && rt.drawPly == int(game_.moves().size())) {
+        if (engine_.takeAnalysis(rt.drawAnalysis, a) && a.ok && !a.lines.empty() && drawStep == CoachDrawStep::Answer) {
             const ai::Score& sc = a.lines[0].score;
             bool coachToMove = game_.position().sideToMove() != humanColor_;
             int cp = sc.mate != 0 ? (sc.mate > 0 ? 100000 : -100000) : sc.cp;
@@ -992,7 +1011,12 @@ void GameScene::updateCoach(float dt) {
             LOGI("coach: draw offer %s (%d cp for the coach)", accept ? "accepted" : "declined", coachCp);
         }
         rt.drawAnalysis = 0;
-        if (state_ == State::Playing && rt.drawPly == int(game_.moves().size())) {
+        // The player moved or took a move back before the answer (the coach's own move waits for
+        // it, see coachHoldsMove): one more analysis, of the position now on the board.
+        if (drawStep == CoachDrawStep::EvaluateAgain) {
+            LOGI("coach: draw offer of ply %d evaluated again at ply %d", rt.drawPly, ply);
+            coachEvaluateDraw();
+        } else if (drawStep == CoachDrawStep::Answer) {
             ui::notify(i18n::tr(accept ? "notify.draw_accepted" : "notify.draw_declined"), 3.0f);
             if (rt.sessionRunning) rt.session.onDrawAnswer(accept);
             if (accept) {
@@ -1005,7 +1029,7 @@ void GameScene::updateCoach(float dt) {
     // The coach's body: head gestures on their word, a blink at each phrase end, the look.
     anim::Animator& a = anim_[aiSeat()];
     for (size_t i = 0; i < rt.headMoves.size();) {
-        if (time_ >= rt.headMoves[i].first) {
+        if (a.time() >= rt.headMoves[i].first) {
             if (rt.headMoves[i].second) a.nod();
             else a.shakeHead();
             rt.headMoves.erase(rt.headMoves.begin() + long(i));
@@ -1030,7 +1054,7 @@ void GameScene::updateCoach(float dt) {
         stage.endGestures();
 
     // The view rises gently to the coach's face while it talks to the player, once the pointer has
-    // rested for a moment and nothing is in hand (lead decision §4.1).
+    // rested for a moment and nothing is in hand.
     const plat::Input& in = plat::input();
     vec2 p = cursorPixels();
     if (length(p - rt.lastPointer) > 2.0f || in.mouseDown[plat::MOUSE_RIGHT]) rt.pointerIdle = 0.0f;
@@ -1047,7 +1071,7 @@ void GameScene::updateCoach(float dt) {
         stage.mouth(pos, facing);
         audio::setVoicePose(rt.voice, pos, facing);
     }
-    // Board coordinates: the option, forced on for the lesson and the first levels (§4.4).
+    // Board coordinates: the option, forced on for the lesson and the first levels.
     world_.setBoardCoordinates(settings().showCoordinates || coachLevel_ <= 2);
 
     // The end of the game: the handshake once wanted (simulate enqueues it), then the appraisal.
@@ -1123,9 +1147,11 @@ void GameScene::coachPauseMenuFrame() {
     CoachRuntime& rt = coachRuntime();
     ui::CoachPause cp;
     cp.canTakeBack = coachCanTakeBack();
-    cp.canOfferDraw = !lesson() && drawOfferPly_ != int(game_.moves().size()) && !rt.drawAnalysis;
+    cp.canOfferDraw = !lesson() && drawOfferPly_ != int(game_.moves().size()) && !rt.drawAnalysis && quietTurn();
     cp.canClaimDraw = !lesson() && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
     cp.canResign = !lesson();
+    // Greyed while a move is on its way (or taken back), which the end of the game would cut off.
+    cp.mayEndGame = quietTurn();
     switch (menuChoice(ui::coachPauseMenu(cp))) {
     case ui::MenuAction::Resume: paused_ = false; break;
     case ui::MenuAction::TakeBack:
@@ -1259,7 +1285,7 @@ void GameScene::drawCoachSubtitles() {
     if (!coach() || !coach_) return;
     CoachRuntime& rt = *coach_;
     const std::string ui = i18n::language();
-    bool shown = rt.forceSubtitles ||
+    bool shown = rt.forceSubtitles || rt.subUnheard ||
                  coachSubtitlesShown(settings().subtitles, ui, coach::speechLanguage(ui), rt.stage->voiceAvailable());
     bool blocked = paused_ || ui::optionsOpen() || turn_ == Turn::HumanPromotion;
     ui::Subtitle sub;
@@ -1417,7 +1443,7 @@ void GameScene::runCoachTable(float dt) {
             }
             if (job.kind == TableJob::Kind::TakeBack) {
                 int n = int(game_.moves().size());
-                int k = std::min(job.plies, lesson() ? n : n);
+                int k = std::min(job.plies, n);
                 if (k <= 0) {
                     finish();
                     return;
@@ -1428,7 +1454,7 @@ void GameScene::runCoachTable(float dt) {
                     back.push_back({before, seatOf(before.sideToMove()), false});
                 }
                 // Game: the record as if the moves had never been played; the sheets forget them
-                // (they were never written: the write limit, §4.2).
+                // (they were never written: the write limit).
                 if (turn_ == Turn::HumanTouched) humanRelease();
                 game_.undo(k);
                 // The saved game's move times follow the game: one per move played.
@@ -1554,21 +1580,9 @@ void GameScene::runCoachTable(float dt) {
                 finish();
                 return;
             }
-            Color side = game_.position().sideToMove();
-            int moverId = board_.idAt(mv.from);
-            int victimId = board_.idAt(mv.to);
-            if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
-            Square rookFrom = NoSquare, rookTo = NoSquare;
-            if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
-                int rank = rankOf(mv.from);
-                bool king = (mv.flags & MoveCastleKing) != 0;
-                rookFrom = makeSquare(king ? 7 : 0, rank);
-                rookTo = makeSquare(king ? 5 : 3, rank);
-            }
             std::vector<anim::Task> ts;
-            ts.push_back(task(anim::TaskType::Reach, moverId));
-            planPlacement(ts, moverId, mv.to, victimId, rookFrom, rookTo);
-            if (mv.promotion != NoPiece) planPromotionSwap(ts, moverId, mv.to, mv.promotion);
+            ts.push_back(task(anim::TaskType::Reach, board_.idAt(mv.from)));
+            planMove(ts, mv, game_.position().sideToMove());
             ts.push_back(task(anim::TaskType::Retract));
             coachHand.enqueue(ts);
             rt.lessonMove = mv;
@@ -1663,7 +1677,7 @@ void GameScene::runStageTest(float dt) {
             rt.testSq = 0.35f * duration;
             rt.testSq2 = 0.7f * duration;
         }
-        st.showSubtitle(rt.testWritten.text, ui::subtitleDuration(rt.testWritten.text, duration));
+        st.showSubtitle(rt.testWritten.text, ui::subtitleDuration(rt.testWritten.text, duration), rt.testSpeech == 0);
         st.look(coach::Look::Target, parseSquare("g1"));
         coach::Gesture point;
         point.kind = coach::GestureKind::PointPiece;

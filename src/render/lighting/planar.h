@@ -13,13 +13,15 @@ namespace lighting {
 
 class PlanarReflections {
 public:
-    void resize(int w, int h);
+    // (Re)creates the targets: w x h, one layer per reflector; nothing while layers == 0 (off).
+    void resize(int w, int h, int layers);
     void shutdown();
     // Computes planes, mirrored matrices and which reflectors are visible (FrameUBO + LightingUBO).
     void prepare(Renderer& r);
     // Renders the visible reflectors and builds their Gaussian mip chains.
     void render(Renderer& r);
     GLuint colorArray() const { return color_.id; }
+    int layers() const { return int(fbs_.size()); }
 
 private:
     gpu::Texture color_, temp_, depth_;

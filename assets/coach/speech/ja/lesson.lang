@@ -1,4 +1,4 @@
-# Coach speech (Japanese): the rules lesson (level 0, src/coach/lesson.cpp; research-pedagogy §3).
+# Coach speech (Japanese): the rules lesson (level 0, src/coach/lesson.cpp).
 # Same keys and variants as assets/coach/speech/en/lesson.lang.
 #
 # Placeholders: {your} / {my} = a piece of the player / of the coach ("あなたのルーク", "私のナイト");

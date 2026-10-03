@@ -7,6 +7,10 @@
 
 namespace allocfail {
 
+// false in AddressSanitizer builds: the operators are not replaced there (tests/alloc_fail.cpp), the
+// functions below have no effect, and the tests that need them skip.
+bool available();
+
 // From now on (0: no more), every allocation of at least 'bytes' throws std::bad_alloc on every
 // thread that was not spared: the network threads of the client under test fail, the test's
 // fake server (spareThisThread() in its handler) does not.

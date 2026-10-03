@@ -32,6 +32,11 @@ constexpr int kDpTable[] = {
     72,  65,  57,  50,  43,  36,  29,  21,  14,  7,   0,
 };
 
+// Bounds of the values readRecord accepts, far above anything a game can reach: a hand-edited or
+// corrupted .ini then cannot overflow the sums and counters of the next game.
+constexpr int kMaxStoredRating = 100000;
+constexpr int kMaxStoredCount = 100000000;
+
 // a / b rounded to the nearest integer, halves away from zero (b > 0).
 long long divRound(long long a, long long b) {
     return a < 0 ? -((-2 * a + b) / (2 * b)) : (2 * a + b) / (2 * b);
@@ -141,19 +146,20 @@ PairChange applyPair(Record& white, Record& black, double whiteScore) {
 Record readRecord(const IniFile& ini, const std::string& section) {
     const std::string k = section + ".";
     Record r;
-    r.rating = std::max(kFloor, ini.getInt(k + "elo", kInitialRating));
-    r.games = std::max(0, ini.getInt(k + "games", 0));
-    r.wins = std::max(0, ini.getInt(k + "wins", 0));
-    r.draws = std::max(0, ini.getInt(k + "draws", 0));
-    r.losses = std::max(0, ini.getInt(k + "losses", 0));
-    r.peak = std::max(r.rating, ini.getInt(k + "peak", r.rating));
+    r.rating = std::clamp(ini.getInt(k + "elo", kInitialRating), kFloor, kMaxStoredRating);
+    r.games = std::clamp(ini.getInt(k + "games", 0), 0, kMaxStoredCount);
+    r.wins = std::clamp(ini.getInt(k + "wins", 0), 0, kMaxStoredCount);
+    r.draws = std::clamp(ini.getInt(k + "draws", 0), 0, kMaxStoredCount);
+    r.losses = std::clamp(ini.getInt(k + "losses", 0), 0, kMaxStoredCount);
+    r.peak = std::clamp(ini.getInt(k + "peak", r.rating), r.rating, kMaxStoredRating);
     r.rated = ini.getBool(k + "rated", r.games > 0);
     if (r.rated) {
         r.countedGames = std::clamp(ini.getInt(k + "counted_games", r.games), 0, r.games);
     } else {
         // The phase ends at its kUnratedGames-th game: a record never waits with that many.
         r.unratedGames = std::clamp(ini.getInt(k + "unrated_games", 0), 0, kUnratedGames - 1);
-        r.unratedOpponents = std::max(0, ini.getInt(k + "unrated_opponents", 0));
+        r.unratedOpponents =
+            std::clamp(ini.getInt(k + "unrated_opponents", 0), 0, (kUnratedGames - 1) * kMaxStoredRating);
         r.unratedHalfPoints = std::clamp(ini.getInt(k + "unrated_half_points", 0), 0, 2 * r.unratedGames);
         r.countedGames = r.unratedGames;
     }

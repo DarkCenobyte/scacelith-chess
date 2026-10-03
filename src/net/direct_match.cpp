@@ -11,11 +11,11 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cctype>
 #include <chrono>
 #include <cmath>
 #include <cstring>
 #include <deque>
-#include <limits>
 #include <map>
 #include <mutex>
 #include <thread>
@@ -32,28 +32,22 @@ constexpr int kHandshakeMs = 10000;        // handshake, then Hello -> Welcome
 constexpr int kPingEveryMs = 2000;         // both sides measure the round trip
 constexpr int kSilenceMs = 10000;          // nothing received for this long: the link is dead
 constexpr int kMaxPendingHandshakes = 4;
+constexpr size_t kMaxClosing = 4;          // refused or flooding links lingering (beyond, the oldest is closed)
 constexpr int kMaxFailedHandshakes = 10;   // wrong codes per hosted game, then the host stops listening
+constexpr int kMaxConnectionLogs = 10;     // "connection from" lines a second (anyone may connect), then a count
 constexpr int kMaxMsgPerSec = 20;          // announced in Welcome; twice as many closes the link (Gestures aside)
 constexpr int kGestureRate = 10;           // Gestures per second each way (Welcome.gestureRate)...
 constexpr int kGestureBurst = 20;          // ...with bursts up to this many (Welcome.gestureBurst)
-constexpr int64_t kRenewEveryMs = 30 * 60 * 1000;
 constexpr size_t kMaxOutbox = 1 << 20;
 constexpr int64_t kDefaultGraceMs = 60000;
 constexpr size_t kMaxQueuedCommands = 32;
+constexpr size_t kMaxQueuedEvents = 4096;  // guest: events not polled yet (each holds the whole game)
 constexpr const char* kClientString = "Scacelith direct";
 constexpr const char* kTokenPrefix = "direct:";
 constexpr size_t kTokenMin = 16;
+constexpr size_t kMaxRouterName = 64;      // bytes of the router's friendlyName shown on the hosting page
 
 // ---- the game as one player sees it ------------------------------------------------------------
-
-PlayerInfo playerInfo(const P::PlayerInfo& p) {
-    PlayerInfo o;
-    o.userId = p.userId;
-    o.name = p.name;
-    o.rating = p.rating;
-    o.provisional = p.provisional;
-    return o;
-}
 
 // Rebuilds OnlineGame from the server->client messages and turns them into Events, exactly as
 // OnlineClient does with the dedicated server's messages. Used by the guest (messages from the
@@ -71,30 +65,7 @@ struct ClientView {
         case P::MsgType::GameSnapshot: {
             P::GameSnapshot s;
             if (!P::decode(p, n, s)) return false;
-            OnlineGame g;
-            g.id = s.game;
-            g.category = s.category;
-            g.baseMs = s.baseMs;
-            g.incMs = s.incMs;
-            g.rated = s.rated;
-            g.white = playerInfo(s.white);
-            g.black = playerInfo(s.black);
-            g.you = int(s.you);
-            for (auto& m : s.moves) g.moves.push_back({m.move, m.spentMs, m.clockMs});
-            g.running = int(s.running);
-            g.whiteMs = s.whiteMs;
-            g.blackMs = s.blackMs;
-            g.serverTimeMs = s.serverTime;
-            g.drawOfferBy = int(s.drawOffer);
-            g.status = int(s.status);
-            g.reason = int(s.reason);
-            g.whiteConnected = s.whiteConnected;
-            g.blackConnected = s.blackConnected;
-            g.graceMs = s.graceMs;
-            g.firstMoveMs = s.firstMoveMs;
-            g.rematchBy = int(s.rematch);
-            g.autoPress = s.autoPress;
-            game = g;
+            game = onlineGameFromSnapshot(s);
             have = true;
             needResync = false;
             ev.kind = Event::Kind::GameSnapshot;
@@ -260,10 +231,12 @@ std::string nameFromToken(const std::string& token) {
 struct Conn {
     sock::Handle h = sock::kInvalid;
     std::unique_ptr<SecureChannel> ch;
-    int64_t deadline = 0;    // steady ms: end of the handshake / Hello
+    int64_t deadline = 0;    // steady ms: end of the handshake / Hello, or of a closeStep() close
     int64_t lastRecv = 0;
     uint32_t lastSeq = 0;    // host: last seq received from the guest
+    bool badSeqReported = false;   // host: a guest message out of sequence was logged
     bool peerClosed = false;
+    bool halfClosed = false; // closeStep(): the sending side is shut down
 
     Conn() = default;
     Conn(const Conn&) = delete;
@@ -328,6 +301,26 @@ struct Conn {
         }
         sock::closeSocket(h);
         h = sock::kInvalid;
+    }
+
+    // The same close without blocking (the host's loop): called whenever the socket may be ready
+    // until it returns true (closed); 'deadline' ends it, like the delay of flushAndClose.
+    bool closeStep(int64_t now) {
+        if (!halfClosed) {
+            if (wantsWrite() && now < deadline && write() && wantsWrite()) return false;
+            sock::shutdownSend(h);
+            halfClosed = true;
+        }
+        uint8_t buf[4096];
+        for (int i = 0; now < deadline; ++i) {
+            bool closed = false;
+            int r = sock::recvSome(h, buf, sizeof buf, closed);
+            if (r < 0) break;
+            if (r == 0 || i == 63) return false;
+        }
+        sock::closeSocket(h);
+        h = sock::kInvalid;
+        return true;
     }
 };
 
@@ -410,6 +403,10 @@ protected:
     void pushEvent(Event ev) {
         std::lock_guard<std::mutex> lk(m);
         events.push_back(std::move(ev));
+    }
+    size_t queuedEvents() const {
+        std::lock_guard<std::mutex> lk(m);
+        return events.size();
     }
     // The other player's Gesture: it replaces the one of the same game still waiting to be
     // polled (only the latest state matters), so the queue holds at most one per game.
@@ -507,10 +504,13 @@ private:
     sock::Handle listener_ = sock::kInvalid;
     uint16_t port_ = 0;
     std::vector<std::unique_ptr<Conn>> pending_;
+    std::vector<std::unique_ptr<Conn>> closing_;   // refused or flooding links (closeLater)
     std::unique_ptr<Conn> guest_;
     std::unique_ptr<direct::Authority> auth_;
     ClientView view_;
     int failedHandshakes_ = 0;
+    int64_t connLogWindow_ = 0;     // the second the "connection from" lines are counted in
+    int connLogged_ = 0, connUnlogged_ = 0;
     bool quit_ = false;
     uint32_t pingNonce_ = 0;
     std::map<uint32_t, int64_t> pingSent_;
@@ -522,7 +522,9 @@ private:
     bool mapped_ = false;
     upnp::Gateway gw_;
     upnp::Mapping mapping_;
-    int64_t renewAt_ = 0;
+    upnp::RenewalSchedule lease_;
+    enum RenewResult : int { RenewPending, RenewOk, RenewFailed };
+    std::atomic<int> renewResult_{RenewPending};   // set by renewThread_
     std::thread renewThread_;
 
     void run() override {
@@ -592,8 +594,10 @@ private:
         };
         upnp::Mapping mp;
         bool ok = client.mapPort(gw_, port_, claim, mp, e);
+        // Any device of the LAN may answer the discovery: its name is cleaned like a player's.
+        const std::string routerName = direct::sanitizeName(gw_.friendlyName, "", kMaxRouterName);
         std::lock_guard<std::mutex> lk(m);
-        upnpStatus.gatewayName = gw_.friendlyName;
+        upnpStatus.gatewayName = routerName;
         upnpStatus.externalIp = ip;
         upnpStatus.cgnatSuspected = !ip.empty() && upnp::cgnatSuspected(ip);
         if (ok) {
@@ -601,8 +605,8 @@ private:
             upnpStatus.externalPort = mp.externalPort;
             mapped_ = true;
             mapping_ = mp;
-            renewAt_ = sock::steadyMs() + kRenewEveryMs;
-            LOGI("direct: UPnP: %s maps %s:%u -> %s:%u (lease %u s)", gw_.friendlyName.c_str(), ip.c_str(), unsigned(mp.externalPort),
+            lease_.mapped(sock::steadyMs(), mp.leaseSec);
+            LOGI("direct: UPnP: %s maps %s:%u -> %s:%u (lease %u s)", routerName.c_str(), ip.c_str(), unsigned(mp.externalPort),
                  mp.internalClient.c_str(), unsigned(mp.internalPort), unsigned(mp.leaseSec));
         } else {
             upnpStatus.state = UpnpStatus::State::Failed;
@@ -634,16 +638,18 @@ private:
                 if (std::isfinite(d)) until(now + int64_t(std::ceil(d - sock::epochMs())) + 1);
             }
             for (auto& c : pending_) until(c->deadline);
+            for (auto& c : closing_) until(c->deadline);
             if (guest_) {
                 until(nextPing_);
                 until(guest_->lastRecv + kSilenceMs + 1);
                 until(gestureDeadline(now));
             }
-            if (mapped_ && mapping_.leaseSec) until(renewAt_);
+            if (mapped_ && mapping_.leaseSec) until(lease_.renewAt());
             sock::PollSet ps;
             ps.add(waker.handle(), true, false);
             if (listener_ != sock::kInvalid) ps.add(listener_, true, false);
             for (auto& c : pending_) ps.add(c->h, true, c->wantsWrite());
+            for (auto& c : closing_) ps.add(c->h, true, !c->halfClosed && c->wantsWrite());
             if (guest_) ps.add(guest_->h, true, guest_->wantsWrite());
             ps.wait(int(wait));
             if (ps.readable(waker.handle())) waker.drain();
@@ -659,15 +665,21 @@ private:
                 dispatch(out);
             }
             if (listener_ != sock::kInvalid && ps.readable(listener_)) acceptAll(now);
+            if (connUnlogged_) endConnectionLog(now);
             serviceHandshakes(now, ps, out);
             if (guest_) serviceGuest(now, ps, out);
+            for (size_t i = 0; i < closing_.size();) {
+                if (closing_[i]->closeStep(now)) closing_.erase(closing_.begin() + long(i));
+                else ++i;
+            }
             if (auth_) {
                 auth_->tick(sock::epochMs(), out);
                 dispatch(out);
             }
             if (guest_ && now >= nextPing_) sendPing(now);
             sendGesture(now);
-            if (mapped_ && mapping_.leaseSec && now >= renewAt_) renew(now);
+            if (mapped_ && mapping_.leaseSec) renewed(now);
+            if (mapped_ && mapping_.leaseSec && now >= lease_.renewAt()) renew(now);
             if (guest_ && !guest_->write()) dropGuest(out, "write failed");
             if (!auth_) {
                 std::lock_guard<std::mutex> lk(m);
@@ -692,9 +704,28 @@ private:
             c->ch->start();
             c->deadline = now + kHandshakeMs;
             c->lastRecv = now;
-            LOGI("direct: connection from %s", peer.toString().c_str());
+            if (logConnection(now)) LOGI("direct: connection from %s", peer.toString().c_str());
             pending_.push_back(std::move(c));
         }
+    }
+
+    // Anyone who finds the open port can connect as fast as they like: at most
+    // kMaxConnectionLogs "connection from" lines a second; the others are counted, and the count
+    // is logged once that second is over.
+    bool logConnection(int64_t now) {
+        endConnectionLog(now);
+        if (connLogged_ >= kMaxConnectionLogs) {
+            ++connUnlogged_;
+            return false;
+        }
+        ++connLogged_;
+        return true;
+    }
+    void endConnectionLog(int64_t now) {
+        if (now - connLogWindow_ < 1000) return;
+        if (connUnlogged_) LOGI("direct: %d more connections", connUnlogged_);
+        connLogWindow_ = now;
+        connLogged_ = connUnlogged_ = 0;
     }
 
     void serviceHandshakes(int64_t now, const sock::PollSet& ps, direct::Authority::Output& out) {
@@ -742,7 +773,7 @@ private:
             std::vector<uint8_t> buf;
             P::encode(e, buf);
             c.send(buf);
-            c.flushAndClose(300);
+            closeLater(std::move(cp), 300);
             LOGW("direct: guest refused (%s)", P::enumName(code));
         };
         P::MsgType t;
@@ -812,11 +843,13 @@ private:
         if (msg.size() < 5 || !P::isClientType(msg[0])) return;
         const uint32_t seq = uint32_t(msg[1]) | uint32_t(msg[2]) << 8 | uint32_t(msg[3]) << 16 | uint32_t(msg[4]) << 24;
         if (seq != guest_->lastSeq + 1) {
-            LOGW("direct: guest message with seq %u dropped (expected %u)", seq, guest_->lastSeq + 1);
+            // Logged once per connection (as the server does), not for every such message.
+            if (!guest_->badSeqReported) LOGW("direct: guest message with seq %u dropped (expected %u)", seq, guest_->lastSeq + 1);
+            guest_->badSeqReported = true;
             return;
         }
         guest_->lastSeq = seq;
-        P::MsgType t;
+        P::MsgType t{};   // 0 (no such type) for an id the schema does not define: the authority answers Malformed
         P::peekType(msg.data(), msg.size(), t);
         // Gestures have their own bucket and never count towards the flood limit: one beyond the
         // announced rate is dropped (the next one carries the whole state again).
@@ -838,7 +871,7 @@ private:
             std::vector<uint8_t> buf;
             P::encode(e, buf);
             guest_->send(buf);
-            guest_->flushAndClose(200);
+            closeLater(std::move(guest_), 200);
             dropGuest(out, "flood");
             return;
         }
@@ -908,6 +941,15 @@ private:
         guest_->send(buf);
     }
 
+    // Closes c like flushAndClose(ms) without blocking the loop (a peer that keeps the connection
+    // open would hold it for the whole delay): the loop flushes it, half-closes it and closes it
+    // once the peer has closed too, or after ms.
+    void closeLater(std::unique_ptr<Conn> c, int ms) {
+        c->deadline = sock::steadyMs() + ms;
+        if (closing_.size() >= kMaxClosing) closing_.erase(closing_.begin());
+        closing_.push_back(std::move(c));
+    }
+
     void dropGuest(direct::Authority::Output& out, const char* why) {
         LOGI("direct: guest connection lost (%s)", why);
         gestureLinkDown();
@@ -923,7 +965,7 @@ private:
 
     void renew(int64_t now) {
         if (renewThread_.joinable()) renewThread_.join();
-        renewAt_ = now + kRenewEveryMs;
+        lease_.started(now);
         upnp::Gateway gw = gw_;
         upnp::Mapping mp = mapping_;
         renewThread_ = std::thread([this, gw, mp] {
@@ -931,10 +973,36 @@ private:
             upnp::Error e;
             if (!client.renew(gw, mp, e)) {
                 LOGW("direct: UPnP lease renewal failed: %s", e.text.c_str());
-                std::lock_guard<std::mutex> lk(m);
-                upnpStatus.error = "renewal: " + e.text;
+                {
+                    std::lock_guard<std::mutex> lk(m);
+                    upnpStatus.error = "renewal: " + e.text;
+                }
+                renewResult_ = RenewFailed;
+            } else {
+                renewResult_ = RenewOk;
             }
         });
+    }
+
+    // The last renewal's outcome: after a failure, lease_ has the next one sent a minute later,
+    // until the lease has ended. Once it has, the page shows that the mapping is lost, until a
+    // renewal (still every 30 min) maps the port again.
+    void renewed(int64_t now) {
+        const int r = renewResult_.exchange(RenewPending);
+        if (r == RenewOk) {
+            const bool back = lease_.finished(now, true);
+            std::lock_guard<std::mutex> lk(m);
+            if (back) LOGI("direct: UPnP: the port is mapped again");
+            upnpStatus.state = UpnpStatus::State::Mapped;
+            upnpStatus.error.clear();
+        } else if (r == RenewFailed) {
+            lease_.finished(now, false);
+        }
+        if (lease_.lapsed(now)) {
+            LOGW("direct: UPnP: the lease has ended without renewal");
+            std::lock_guard<std::mutex> lk(m);
+            upnpStatus.state = UpnpStatus::State::Failed;
+        }
     }
 
     void cleanup() {
@@ -946,6 +1014,8 @@ private:
         gestureLinkDown();
         if (guest_) guest_->flushAndClose(1000);
         guest_.reset();
+        for (auto& c : closing_) c->flushAndClose(int(std::max<int64_t>(0, c->deadline - sock::steadyMs())));
+        closing_.clear();
         pending_.clear();
         sock::closeSocket(listener_);
         listener_ = sock::kInvalid;
@@ -981,7 +1051,7 @@ private:
     std::unique_ptr<Conn> conn_;
     int64_t phaseDeadline_ = 0, retryAt_ = 0, reconnectDeadline_ = 0;
     bool everOnline_ = false, reconnecting_ = false;
-    int refused_ = 0, attempt_ = 0;
+    int refused_ = 0, unconfirmed_ = 0, attempt_ = 0;
     uint32_t seq_ = 0;
     ClientView view_;
     std::deque<Command> queued_;
@@ -1124,8 +1194,11 @@ private:
             return;
         }
         if (!alive) {
+            // Closed before the host's confirmation: a refused code on a first join; on a
+            // reconnection (the code was right) possibly the link failing at that moment.
+            const bool unconfirmed = phase_ == Phase::Handshake && conn_->ch->awaitingHostConfirm();
             if (phase_ == Phase::Online) lost(now);
-            else attemptFailed(phase_ == Phase::Handshake && conn_->ch->awaitingHostConfirm() ? "wrong_code" : "closed", now);
+            else attemptFailed(unconfirmed ? (everOnline_ ? "unconfirmed" : "wrong_code") : "closed", now);
             return;
         }
         if ((phase_ == Phase::Handshake || phase_ == Phase::Hello) && now >= phaseDeadline_) {
@@ -1197,6 +1270,13 @@ private:
             return;
         }
         default: {
+            // A host that sends faster than the game thread polls cannot grow the queue without
+            // limit: the link is dropped instead (the reconnection brings a snapshot).
+            if (queuedEvents() >= kMaxQueuedEvents) {
+                LOGW("direct: the host floods events");
+                lost(now);
+                return;
+            }
             Event ev;
             if (view_.apply(msg.data(), msg.size(), ev)) pushEvent(std::move(ev));
             return;
@@ -1209,7 +1289,7 @@ private:
         const bool first = !everOnline_;
         everOnline_ = true;
         reconnecting_ = false;
-        refused_ = attempt_ = 0;
+        refused_ = unconfirmed_ = attempt_ = 0;
         if (!haveRttOffset_) {
             std::lock_guard<std::mutex> lk(m);
             offset_ = w.serverTime - sock::epochMs();
@@ -1260,7 +1340,7 @@ private:
         if (view_.have && view_.game.status == int(P::GameStatus::Ongoing)) {
             LOGI("direct: connection to the host lost, reconnecting");
             reconnecting_ = true;
-            refused_ = attempt_ = 0;
+            refused_ = unconfirmed_ = attempt_ = 0;
             int64_t grace = view_.game.graceMs ? int64_t(view_.game.graceMs) : kDefaultGraceMs;
             reconnectDeadline_ = now + grace + 5000;
             connectionEvent(ConnState::Reconnecting);
@@ -1285,7 +1365,8 @@ private:
             return;
         }
         if (reason == "refused") ++refused_;
-        if (reason == "wrong_code" || reason == "incompatible" || refused_ >= 3 || now >= reconnectDeadline_) {
+        if (reason == "unconfirmed") ++unconfirmed_;   // tried once more; twice is a refused code
+        if (reason == "wrong_code" || reason == "incompatible" || refused_ >= 3 || unconfirmed_ >= 2 || now >= reconnectDeadline_) {
             giveUp();
             return;
         }
@@ -1451,21 +1532,21 @@ void DirectMatch::sendMove(int ply, uint16_t move, const std::string& fen, uint3
     impl_->post(c);
 }
 
-static void postSimple(DirectMatch::Impl& impl, std::mutex& m, int kind, bool flag) {
+static void postSimple(DirectMatch::Impl& impl, Command::Kind kind, bool flag) {
     Command c;
-    c.kind = Command::Kind(kind);
+    c.kind = kind;
     c.flag = flag;
-    std::lock_guard<std::mutex> lk(m);
+    std::lock_guard<std::mutex> lk(impl.m);
     impl.post(c);
 }
 
-void DirectMatch::resign() { postSimple(*impl_, impl_->m, int(Command::Kind::Resign), false); }
-void DirectMatch::offerDraw() { postSimple(*impl_, impl_->m, int(Command::Kind::OfferDraw), false); }
-void DirectMatch::answerDraw(bool accept) { postSimple(*impl_, impl_->m, int(Command::Kind::AnswerDraw), accept); }
-void DirectMatch::claimDraw() { postSimple(*impl_, impl_->m, int(Command::Kind::ClaimDraw), false); }
-void DirectMatch::abortGame() { postSimple(*impl_, impl_->m, int(Command::Kind::Abort), false); }
-void DirectMatch::requestResync() { postSimple(*impl_, impl_->m, int(Command::Kind::Resync), false); }
-void DirectMatch::rematch(bool accept) { postSimple(*impl_, impl_->m, int(Command::Kind::Rematch), accept); }
+void DirectMatch::resign() { postSimple(*impl_, Command::Kind::Resign, false); }
+void DirectMatch::offerDraw() { postSimple(*impl_, Command::Kind::OfferDraw, false); }
+void DirectMatch::answerDraw(bool accept) { postSimple(*impl_, Command::Kind::AnswerDraw, accept); }
+void DirectMatch::claimDraw() { postSimple(*impl_, Command::Kind::ClaimDraw, false); }
+void DirectMatch::abortGame() { postSimple(*impl_, Command::Kind::Abort, false); }
+void DirectMatch::requestResync() { postSimple(*impl_, Command::Kind::Resync, false); }
+void DirectMatch::rematch(bool accept) { postSimple(*impl_, Command::Kind::Rematch, accept); }
 
 void DirectMatch::sendGesture(const Gesture& g) {
     std::lock_guard<std::mutex> lk(impl_->m);
@@ -1508,6 +1589,39 @@ bool DirectMatch::poll(Event& out) {
 DirectMatch& directMatch() {
     static DirectMatch instance;
     return instance;
+}
+
+DirectAddress splitDirectAddress(const std::string& field, bool withCode) {
+    auto trim = [](const std::string& s) {
+        size_t a = s.find_first_not_of(" \t"), b = s.find_last_not_of(" \t");
+        return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
+    };
+    DirectAddress a;
+    std::string s = trim(field);
+    const size_t space = s.find_last_of(" \t");
+    if (withCode && space != std::string::npos) {
+        for (char c : s.substr(space + 1))
+            if (std::isalnum(static_cast<unsigned char>(c)) || c == '-') a.code += char(std::toupper(static_cast<unsigned char>(c)));
+        s = trim(s.substr(0, space));
+    }
+    auto isPort = [](const std::string& p) {
+        return !p.empty() && p.size() <= 5 && std::all_of(p.begin(), p.end(), [](char c) { return c >= '0' && c <= '9'; });
+    };
+    const size_t close = s.find(']'), colon = s.find(':');
+    if (s.size() > 2 && s[0] == '[' && close != std::string::npos) {
+        const std::string rest = s.substr(close + 1);
+        if (rest.empty() || (rest[0] == ':' && isPort(rest.substr(1)))) {
+            a.host = s.substr(1, close - 1);
+            if (!rest.empty()) a.port = rest.substr(1);
+            return a;
+        }
+    } else if (colon != std::string::npos && colon > 0 && s.find(':', colon + 1) == std::string::npos && isPort(s.substr(colon + 1))) {
+        a.host = s.substr(0, colon);
+        a.port = s.substr(colon + 1);
+        return a;
+    }
+    a.host = s;
+    return a;
 }
 
 }  // namespace net

@@ -4,8 +4,6 @@
 # zero|one|two|few (3-10)|many (11-99)|other (100, 101, 102...).
 # U+200F (right-to-left mark) keeps a parenthesis after a Latin word on the Arabic side.
 
-language.name = العربية
-
 # ---- Common words ------------------------------------------------------------------------------
 common.on = تشغيل
 common.off = إيقاف
@@ -64,6 +62,7 @@ options.depth_of_field = عمق الميدان
 options.depth_of_field.help = يليّن ما يقع بعيدًا أمام ما تنظر إليه أو خلفه، كما تفعل عدسة الكاميرا.
 options.brightness = السطوع
 options.brightness.neutral = محايد
+options.brightness.value = {0} EV
 options.brightness.help = تعويض تعريض الكاميرا. تضبطه المعايرة عند التشغيل الأول بحيث تكون أحلك الظلال بالكاد مرئية.
 
 options.master_volume = مستوى الصوت العام
@@ -349,11 +348,6 @@ viewer.note = كلا اللاعبين هو Stockfish. تنقّل بحرية في
 viewer.summary = {0} ضد {1}
 viewer.custom = مخصّص
 viewer.tc.custom = حسب رغبتك
-viewer.tc.none = بلا ساعة
-viewer.tc.bullet = رصاصي
-viewer.tc.blitz = خاطف
-viewer.tc.rapid = سريع
-viewer.tc.classical = كلاسيكي
 viewer.base_time = الوقت الأساسي
 viewer.increment = الزيادة
 viewer.delay = التأخير
@@ -544,10 +538,24 @@ online.forgot.lead = أدخل عنوان البريد الإلكتروني لح�
 online.forgot.button = إرسال الرابط
 online.forgot.sent = إن كان هناك حساب يستخدم هذا العنوان، فالرابط في طريقه إليه.
 online.sso.title = الدخول عبر Google
-online.sso.wait = تابع في متصفح الويب: سجّل الدخول باستخدام Google في النافذة التي فُتحت. ستتابع هذه الصفحة التقدّم تلقائيًا.
+online.sso.wait = تابع في متصفح الويب: اختر حساب Google في النافذة التي فُتحت. سيتابع Scacelith تلقائيًا فور أن يعيدك Google.
 online.sso.name_title = اختر اسمك
 online.sso.name_lead = هذه أول مرة تدخل فيها هنا باستخدام Google. اختر الاسم الذي سيراه اللاعبون الآخرون.
 online.sso.continue = متابعة
+online.sso.finishing = أعادك Google. جارٍ إكمال تسجيل الدخول…
+online.sso.link_title = إضافة الدخول عبر Google
+online.sso.link_lead = الحساب {0} على {1} يستخدم بالفعل عنوان البريد الإلكتروني لحساب Google هذا. أدخل كلمة مرور هذا الحساب لإضافة الدخول عبر Google إليه. لن تحتاج إلى ذلك إلا مرة واحدة.
+online.sso.link_button = إضافة الدخول عبر Google
+online.sso.link_mfa = يُضاف الدخول عبر Google إلى هذا الحساب بمجرد قبول الرمز.
+online.sso.not_mine = هذا ليس حسابي
+online.sso.not_mine_note = لم يُضَف الدخول عبر Google. إذا كان عنوان البريد الإلكتروني هذا لك، فاستخدم معه «نسيت كلمة المرور؟»: سيصل الرابط إلى ذلك البريد. وإذا طلب الحساب أيضًا رمز تحقق لا تملكه، فاتصل بمشغّل الخادم.
+online.sso.page.title = Scacelith: الدخول عبر Google
+online.sso.page.done_heading = العودة إلى Scacelith
+online.sso.page.done = أعادك Google إلى Scacelith. ارجع إلى اللعبة لإكمال تسجيل الدخول؛ يمكنك إغلاق علامة التبويب هذه.
+online.sso.page.cancelled_heading = أُلغي تسجيل الدخول
+online.sso.page.cancelled = أُلغي تسجيل الدخول باستخدام Google. يمكنك إغلاق علامة التبويب هذه والعودة إلى Scacelith.
+online.sso.page.foreign_heading = هذه الصفحة ليست لك
+online.sso.page.foreign = لا تتوافق هذه الصفحة مع تسجيل الدخول الذي ينتظره Scacelith على هذا الحاسوب. إذا لم تبدأ للتو تسجيل دخول عبر Google في Scacelith، فربما أرسل إليك أحدهم هذا الرابط: أغلق علامة التبويب هذه.
 
 # Account
 online.account.button = الحساب
@@ -570,6 +578,9 @@ online.account.sign_out_all = الخروج من كل الأجهزة
 online.account.sign_out_all.help = يسجّل خروج هذا الحساب من كل الحواسيب، بما فيها هذا الحاسوب.
 online.account.signed_out = لقد سجّلت الخروج.
 online.account.signed_out_all = لقد سجّلت الخروج من كل الحواسيب.
+online.account.signing_out_all = جارٍ تسجيل الخروج من كل الحواسيب…
+online.account.sign_out_all_failed = قد تظل حواسيبك الأخرى مسجَّلة الدخول: سجّل الدخول من جديد، ثم سجّل خروجها من «الأجهزة المسجَّل الدخول منها». {0}
+online.account.sign_out_all_retry = قد تظل حواسيبك الأخرى مسجَّلة الدخول. حاول «الخروج من كل الأجهزة» مجددًا. {0}
 online.account.ratings = التصنيفات
 online.account.col.tc = نظام الوقت
 online.account.col.rating = التصنيف
@@ -656,6 +667,7 @@ online.challenge.you_random = الألوان بالقرعة
 online.challenge.declined = رفض {0} تحدّيك.
 online.challenge.expired = انتهت مهلة تحدّيك دون رد.
 online.challenge.unavailable = {0} غير متاح الآن.
+online.challenge.lost = انقطع الاتصال: أُلغي تحدّيك.
 
 # At the table
 online.pause.clock_runs = المباراة مستمرة: ساعتك ما زالت تعمل.
@@ -697,6 +709,7 @@ online.report.comment = تعليق
 online.report.comment.hint = اختياري
 online.report.send = إرسال البلاغ
 online.report.sent = أُرسل البلاغ. شكرًا لك.
+online.report.queued = سيُرسَل بلاغك عند انتهاء المباراة.
 # Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
 online.sheet.note = عبر الإنترنت، {0} {1}
 online.sheet.rated = محتسبة
@@ -723,6 +736,7 @@ online.err.server_busy = الخادم مشغول. حاول مجددًا بعد �
 online.err.banned_until = هذا الحساب موقوف حتى {0}.
 online.err.banned = هذا الحساب موقوف.
 online.err.invalid_credentials = اسم المستخدم أو كلمة المرور غير صحيحة.
+online.err.invalid_credentials_pending = اسم المستخدم أو كلمة المرور غير صحيحة. إن كنت قد أنشأت حسابك للتو، فافتح أولًا الرابط الذي أرسلناه إليك.
 online.err.email_unverified = لم يُؤكَّد عنوان بريدك الإلكتروني بعد: افتح الرابط الذي أرسلناه إليك.
 online.err.network = تعذّر الوصول إلى الخادم. تحقّق من اتصالك ومن عنوان الخادم.
 online.err.tls = تعذّر إنشاء اتصال آمن بالخادم.
@@ -738,6 +752,15 @@ online.err.invalid_code = هذا الرمز غير صحيح.
 online.err.expired = انتهت صلاحية هذا الطلب: يُرجى البدء من جديد.
 online.err.registration_closed = لا يقبل هذا الخادم حسابات جديدة.
 online.err.sso_cancelled = أُلغي تسجيل الدخول باستخدام Google.
+online.err.sso_expired = استغرق تسجيل الدخول عبر Google وقتًا طويلًا أو استُخدم من قبل. ابدأ من جديد.
+online.err.sso_failed = تعذّر تسجيل الدخول عبر Google. حاول مرة أخرى.
+online.err.sso_listen = تعذّر على Scacelith تلقي رد Google على هذا الحاسوب. حاول مرة أخرى.
+online.err.sso_origin = لا يعمل الدخول عبر Google من خلال عنوان الخادم هذا. أضف الخادم باسمه العام الذي يقدّمه مشغّله، ثم حاول مرة أخرى.
+online.err.browser = تعذّر فتح متصفح الويب.
+online.err.sso_email_unverified = لم يؤكد Google عنوان البريد الإلكتروني لحساب Google هذا.
+online.err.sso_account_exists = هناك حساب يستخدم عنوان البريد الإلكتروني هذا بالفعل ولا يمكن ربطه بالدخول عبر Google: سجّل الدخول بكلمة مروره، أو استخدم «نسيت كلمة المرور؟».
+online.err.sso_already_linked = حساب Google هذا مرتبط بالفعل بحساب آخر.
+online.err.account_disabled = لم يعد بالإمكان استخدام هذا الحساب.
 online.err.server_error = واجه الخادم مشكلة. يُرجى المحاولة مجددًا.
 online.err.timeout = لم يردّ الخادم في الوقت المحدد.
 online.err.offline = غير متصل بالخادم: حاول مجددًا بعد الاتصال.
@@ -757,13 +780,14 @@ online.err.flag_fell = انتهى وقتك.
 online.err.queue_not_allowed = لا يمكنك البحث عن خصم الآن.
 online.err.challenge_not_found = هذا التحدي لم يعد موجودًا.
 online.err.user_unavailable = هذا اللاعب غير متاح.
-online.err.challenge_limit = تحديات كثيرة جدًا في وقت واحد.
+online.err.challenge_limit = تحديات كثيرة جدًا حاليًا. حاول مجددًا لاحقًا.
 online.err.challenge_self = لا يمكنك تحدّي نفسك.
 online.err.code_invalid = لا توجد مباراة بهذا الرمز.
 online.err.rated_official_tc = لا تُحتسب إلا أنظمة الوقت الرسمية.
 online.err.cooldown = البحث عن خصم متوقف مؤقتًا بالنسبة إليك.
 online.err.invalid_tc = نظام الوقت هذا غير مسموح به.
 online.err.rematch_unavailable = لم تعد المباراة الأخرى ممكنة.
+online.err.rated_repeat_limit = لقد لعبت ما يكفي من المباريات المحتسبة ضد هذا اللاعب في الوقت الحالي. العب مباراة ودية أو حاول مجددًا لاحقًا.
 online.err.cheat_detected = أوقفت فحوص اللعب النظيف في الخادم هذه المباراة.
 online.err.invalid_password = كلمة المرور غير صحيحة.
 online.err.mfa_code_required = أدخل رمزًا من تطبيق المصادقة (أو رمز استرداد).
@@ -773,6 +797,7 @@ online.err.too_many_attempts_for = محاولات خاطئة كثيرة جدًا
 online.err.same_email = هذا هو عنوان بريدك الإلكتروني الحالي.
 online.err.not_found = غير موجود على الخادم.
 online.err.invalid_response = تعذّرت قراءة ردّ الخادم.
+online.err.storage = تعذّر حفظ الجلسة على هذا الحاسوب.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = سجل المباريات
@@ -1183,3 +1208,9 @@ gif.err.not_found = لم تعد هذه المباراة موجودة على ال
 gif.wait.seconds = {0} ثانية|ثانية واحدة|ثانيتين|{0} ثوانٍ|{0} ثانية|{0} ثانية
 gif.wait.minutes = {0} دقيقة|دقيقة واحدة|دقيقتين|{0} دقائق|{0} دقيقة|{0} دقيقة
 gif.wait.both = {0} و{1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = تعذّر تشغيل OpenGL 4.6. يُرجى تحديث برنامج تشغيل بطاقة الرسوميات.
+error.renderer = تعذّر تشغيل محرّك العرض.
+error.scene = تعذّر تحميل المشهد.
+error.log_file = التفاصيل في ملف السجل: {0}

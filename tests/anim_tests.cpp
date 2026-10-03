@@ -61,7 +61,7 @@ m::vec3 pageCorner(float s, float xMirror = 1.0f) {
 
 void initWhite(anim::Animator& an) {
     an.init(character::robotSkeleton(), m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
-    an.setRestHand(m::vec3(0.24f, layout::TABLE_TOP_Y, 0.34f));
+    an.setRestHand(m::vec3(layout::REST_HAND_X, layout::TABLE_TOP_Y, layout::REST_HAND_Z));
 }
 
 anim::Task pressClock(float xMirror, float zSign) {
@@ -227,6 +227,146 @@ TEST(anim_writing_sequence) {
     CHECK(std::fabs(clock - clockRef) < 1e-6f);
 }
 
+// A Write with an empty path (nothing to write): the pen tip stays near the writing rest, and
+// WritingDone still fires on time, there.
+TEST(anim_write_empty_path_stays_at_the_rest) {
+    anim::Animator an;
+    initWhite(an);
+    const m::vec3 rest(-layout::SCORESHEET_X, layout::TABLE_TOP_Y + layout::SCORESHEET_THICKNESS, layout::SCORESHEET_Z);
+    an.setWritingRest(rest);
+    std::vector<WriteTask> w(2);
+    w[0].type = WriteTaskType::PickPen;
+    w[0].frame = penFrame();
+    w[1].type = WriteTaskType::Write;
+    an.enqueueWriting(w);
+    const float tWrite = anim::Timing::PickPen, tEnd = tWrite + anim::writeTaskDuration(w[1]);
+    const float dt = 1.0f / 120.0f;
+    std::vector<anim::Event> ev;
+    float done = -1.0f, far = 0.0f;
+    m::vec3 donePos(0.0f);
+    while (an.time() < tEnd + 0.1f) {
+        ev.clear();
+        an.update(dt, ev);
+        for (const anim::Event& e : ev)
+            if (e.type == anim::EventType::WritingDone) {
+                done = e.time;
+                donePos = e.position;
+            }
+        m::mat4 px;
+        if (an.time() > tWrite && an.time() < tEnd && an.penTransform(px)) far = std::max(far, m::length(px.translation() - rest));
+    }
+    std::fprintf(stderr, "  empty Write: tip up to %.1f mm from the rest, WritingDone %.1f mm from it\n", far * 1000.0f,
+                 m::length(donePos - rest) * 1000.0f);
+    CHECK(std::fabs(done - (tWrite + anim::Timing::WriteApproach)) < 1e-4f);
+    CHECK(m::length(donePos - rest) < 0.006f);
+    CHECK(far < 0.03f);
+    CHECK(!an.writingBusy());
+}
+
+// The writing rest asked for while the hand is busy: the scoresheet asks for the next row right after
+// queueing the move's Write, and the hand goes aside while its owner reads the sheet (S) even in the
+// middle of an entry. Either way the hand ends where it would have glided had it been asked once
+// idle, and it does not move again when asked for the spot it is already going to.
+TEST(anim_writing_rest_asked_while_busy) {
+    const float paper = layout::TABLE_TOP_Y + layout::SCORESHEET_THICKNESS;
+    const m::vec3 row(-0.28f, paper, 0.36f), aside(-0.36f, paper, 0.40f);
+    std::vector<PenKey> path;
+    for (int i = 0; i <= 30; ++i) path.push_back({float(i) / 60.0f, row + m::vec3(0.0003f * float(i), 0, -0.002f), i > 2 && i < 28});
+    // when: 0 = aside once the hand is idle again (the reference), 1 = aside at WritingDone, 2 = the
+    // same row again at WritingDone, 3 = aside right after queueing the Write.
+    auto run = [&](int when, float& movedAfter) {
+        anim::Animator an;
+        initWhite(an);
+        an.setWritingRest(row);
+        std::vector<WriteTask> w(2);
+        w[0].type = WriteTaskType::PickPen;
+        w[0].frame = penFrame();
+        w[1].type = WriteTaskType::Write;
+        w[1].path = path;
+        an.enqueueWriting(w);
+        if (when == 3) an.setWritingRest(aside);
+        const float tEnd = anim::Timing::PickPen + anim::writeTaskDuration(w[1]);
+        std::vector<anim::Event> ev;
+        bool asked = when == 3;
+        m::vec3 atEnd(0.0f);
+        movedAfter = 0.0f;
+        for (int step = 0; step < 600; ++step) {
+            ev.clear();
+            an.update(1.0f / 120.0f, ev);
+            for (const anim::Event& e : ev)
+                if (e.type == anim::EventType::WritingDone && (when == 1 || when == 2)) {
+                    CHECK(an.writingBusy());
+                    an.setWritingRest(when == 1 ? aside : row);
+                    asked = true;
+                }
+            if (when == 0 && !asked && !an.writingBusy()) {
+                an.setWritingRest(aside);
+                asked = true;
+            }
+            const m::vec3 hand = an.globals()[character::HandL].translation();
+            if (an.time() < tEnd) atEnd = hand;
+            else movedAfter = std::max(movedAfter, m::length(hand - atEnd));
+        }
+        CHECK(asked);
+        CHECK(an.holdsPen());
+        return an.globals()[character::HandL].translation();
+    };
+    float moved[4];
+    const m::vec3 ref = run(0, moved[0]), atDone = run(1, moved[1]), queued = run(3, moved[3]);
+    run(2, moved[2]);
+    std::fprintf(stderr, "  writing hand: asked aside at WritingDone %.2f mm, right after queueing %.2f mm from where the idle hand glides; "
+                 "asked the same row again: moves %.2f mm after the Write, %.2f mm for aside asked before it\n",
+                 m::length(atDone - ref) * 1000.0f, m::length(queued - ref) * 1000.0f, moved[2] * 1000.0f, moved[3] * 1000.0f);
+    CHECK(m::length(atDone - ref) < 1e-4f);
+    CHECK(m::length(queued - ref) < 1e-4f);
+    CHECK(moved[2] < 1e-4f);
+    CHECK(moved[3] < 1e-4f);
+}
+
+// A very short page turn (0.1 s, where the approach would end after the pinch): the writing hand
+// still moves without a jump, and the page events keep their instants.
+TEST(anim_very_short_page_turn_stays_continuous) {
+    anim::Animator an;
+    initWhite(an);
+    std::vector<WriteTask> w(2);
+    w[0].type = WriteTaskType::PickPen;
+    w[0].frame = penFrame();
+    w[1].type = WriteTaskType::TurnPage;   // the default page geometry
+    w[1].duration = 0.1f;
+    an.enqueueWriting(w);
+    const float tTurn = anim::Timing::PickPen, T = w[1].duration;
+    // 1 ms frames: the wrist flips the page at up to about 50 m/s here, but a jump shows as a step
+    // much longer than the one before it.
+    const float dt = 0.001f;
+    std::vector<anim::Event> ev;
+    float gripped = -1.0f, turned = -1.0f, step = 0.0f, prevStep = 0.0f, jump = 0.0f;
+    bool finite = true;
+    m::vec3 prev = an.globals()[character::HandL].translation();
+    while (an.time() < tTurn + T + 0.3f) {
+        ev.clear();
+        an.update(dt, ev);
+        for (const anim::Event& e : ev) {
+            if (e.type == anim::EventType::PageGripped) gripped = e.time;
+            if (e.type == anim::EventType::PageTurned) turned = e.time;
+        }
+        for (int b = 0; b < character::BoneCount; ++b) {
+            const m::vec3 p = an.globals()[b].translation();
+            if (!std::isfinite(p.x) || !std::isfinite(p.y) || !std::isfinite(p.z)) finite = false;
+        }
+        const m::vec3 p = an.globals()[character::HandL].translation();
+        step = m::length(p - prev);
+        if (an.time() > tTurn) jump = std::max(jump, step - prevStep);
+        prev = p;
+        prevStep = step;
+    }
+    std::fprintf(stderr, "  0.1 s page turn: the wrist's step grows by up to %.1f mm from one 1 ms frame to the next\n", jump * 1000.0f);
+    CHECK(finite);
+    CHECK(std::fabs(gripped - (tTurn + 0.33f * T)) < 1e-4f);
+    CHECK(std::fabs(turned - (tTurn + 0.90f * T)) < 1e-4f);
+    CHECK(jump < 0.025f);
+    CHECK(!an.writingBusy());
+}
+
 // Black left-handed (clock at +X) against Black right-handed in the mirrored world: the same motion
 // bone for bone, the same events at the same instants, the pen mirrored.
 TEST(anim_left_handed_mirror) {
@@ -239,8 +379,8 @@ TEST(anim_left_handed_mirror) {
     CHECK(L.playHand() == Side::Left);
     CHECK(L.writingHand() == Side::Right);
     CHECK(R.writingHand() == Side::Left);
-    L.setRestHand(m::vec3(0.24f, layout::TABLE_TOP_Y, -0.34f));
-    R.setRestHand(m::vec3(-0.24f, layout::TABLE_TOP_Y, -0.34f));
+    L.setRestHand(m::vec3(layout::REST_HAND_X, layout::TABLE_TOP_Y, -layout::REST_HAND_Z));
+    R.setRestHand(m::vec3(-layout::REST_HAND_X, layout::TABLE_TOP_Y, -layout::REST_HAND_Z));
     const m::mat4 S = m::scale(m::vec3(-1, 1, 1));
     for (int k = 0; k < 2; ++k) {
         anim::Animator& a = k == 0 ? L : R;
@@ -308,6 +448,207 @@ TEST(anim_left_handed_mirror) {
     CHECK(penDiff < 1e-4f);
 }
 
+// A seat off the X = 0 plane: the left-handed player is still the mirror image of a right-handed
+// one seated at the mirrored spot, and sets the piece down where it was asked to.
+TEST(anim_left_handed_seat_off_centre) {
+    using namespace character;
+    const character::Skeleton& sk = robotSkeleton();
+    anim::Animator L, R;
+    L.init(sk, m::vec3(0.05f, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, Side::Left);
+    R.init(sk, m::vec3(-0.05f, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, Side::Right);
+    L.setRestHand(m::vec3(0.29f, layout::TABLE_TOP_Y, -0.34f));
+    R.setRestHand(m::vec3(-0.29f, layout::TABLE_TOP_Y, -0.34f));
+    // L: a pawn from f7 to f5 (on its playing hand's side); R: the mirror image.
+    const m::vec3 from = layout::squareCenter(5, 6), to = layout::squareCenter(5, 4);
+    auto mirror = [](m::vec3 p) { return m::vec3(-p.x, p.y, p.z); };
+    for (int k = 0; k < 2; ++k) {
+        anim::Animator& a = k == 0 ? L : R;
+        const m::vec3 f = k == 0 ? from : mirror(from), t = k == 0 ? to : mirror(to);
+        a.pieceTransform = [f](int id) { return id == 0 ? m::translate(f) : m::mat4(); };
+        a.pieceGripInfo = [](int) { return m::vec3(layout::PIECE_HEIGHT[1], layout::PIECE_GRIP_HEIGHT[1], layout::PIECE_GRIP_RADIUS[1]); };
+        std::vector<anim::Task> ts(5);
+        ts[0].type = anim::TaskType::Reach;
+        ts[0].pieceId = 0;
+        ts[1].type = anim::TaskType::Lift;
+        ts[2].type = anim::TaskType::Carry;
+        ts[2].position = t;
+        ts[3].type = anim::TaskType::Place;
+        ts[3].position = t;
+        ts[4].type = anim::TaskType::Retract;
+        a.enqueue(ts);
+    }
+    auto mirrorBone = [](int b) {
+        if (b >= ClavicleL && b <= PinkyL3) return b + (ClavicleR - ClavicleL);
+        if (b >= ClavicleR && b <= PinkyR3) return b - (ClavicleR - ClavicleL);
+        if (b >= ThighL && b <= FootL) return b + (ThighR - ThighL);
+        if (b >= ThighR && b <= FootR) return b - (ThighR - ThighL);
+        if (b == EyeL) return int(EyeR);
+        if (b == EyeR) return int(EyeL);
+        if (b == LidUpperL) return int(LidUpperR);
+        if (b == LidUpperR) return int(LidUpperL);
+        if (b == LidLowerL) return int(LidLowerR);
+        if (b == LidLowerR) return int(LidLowerL);
+        return b;
+    };
+    const m::mat4 S = m::scale(m::vec3(-1, 1, 1));
+    float worst = 0.0f, placeErr = -1.0f;
+    int evBad = 0, released = 0;
+    m::mat4 held;
+    std::vector<anim::Event> evL, evR;
+    const float dt = 1.0f / 120.0f;
+    for (int step = 0; step < int(1.6f / dt); ++step) {
+        evL.clear();
+        evR.clear();
+        L.update(dt, evL);
+        R.update(dt, evR);
+        if (evL.size() != evR.size()) ++evBad;
+        for (size_t i = 0; i < std::min(evL.size(), evR.size()); ++i) {
+            if (evL[i].type != evR[i].type || m::length(evL[i].position - mirror(evR[i].position)) > 1e-4f) ++evBad;
+            if (evL[i].type == anim::EventType::PieceReleased) {
+                ++released;
+                placeErr = m::length(held.translation() - to);   // where the hand held it the frame before
+            }
+        }
+        L.heldPieceTransform(0, held);
+        for (int b = 0; b < BoneCount; ++b) {
+            const m::mat4 want = S * R.globals()[mirrorBone(b)] * S;
+            worst = std::max(worst, m::length(L.globals()[b].translation() - want.translation()));
+        }
+    }
+    CHECK_EQ(released, 1);
+    CHECK_EQ(evBad, 0);
+    CHECK(worst < 1e-4f);
+    CHECK(placeErr >= 0.0f && placeErr < 0.004f);
+}
+
+// A left-handed player's handshake needs its writing hand: it cuts a page turn short, even while
+// the hand follows the page corner (the page is reported turned when the handshake starts).
+TEST(anim_left_handed_handshake_cuts_page_turn) {
+    const character::Skeleton& sk = character::robotSkeleton();
+    anim::Animator B, W;
+    W.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
+    B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, character::Side::Left);
+    WriteTask turn;
+    turn.type = WriteTaskType::TurnPage;   // the default page geometry
+    B.enqueueWriting(turn);
+    std::vector<anim::Event> ev;
+    const float dt = 1.0f / 120.0f;
+    float start = -1.0f, turned = -1.0f, clasp = -1.0f;
+    while (B.time() < 4.0f) {
+        if (start < 0.0f && B.time() >= 0.6f) {   // the hand is on the corner, lifting the page
+            CHECK(B.pageTurnProgress() > 0.0f);
+            anim::Task h;
+            h.type = anim::TaskType::Handshake;
+            h.partner = &W;
+            B.enqueue(h);
+            h.partner = &B;
+            W.enqueue(h);
+            start = B.time();
+        }
+        ev.clear();
+        W.update(dt, ev);
+        ev.clear();
+        B.update(dt, ev);
+        for (const anim::Event& e : ev) {
+            if (e.type == anim::EventType::PageTurned) turned = e.time;
+            if (e.type == anim::EventType::HandshakeClasp) clasp = e.time;
+        }
+    }
+    CHECK(start > 0.0f);
+    CHECK(std::fabs(turned - start) < 1e-4f);
+    CHECK(std::fabs(clasp - (start + anim::Timing::HandshakeClaspAt)) < 1e-4f);
+}
+
+// A handshake starting in the middle of a frame, just after the writing hand laid its pen down:
+// PenPut fires once, at its own instant and where the PutPen put it (the handshake has no pen to
+// lay down).
+TEST(anim_left_handed_handshake_after_pen_put_mid_frame) {
+    const character::Skeleton& sk = character::robotSkeleton();
+    anim::Animator B, W;
+    W.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
+    B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, character::Side::Left);
+    const m::mat4 taken = m::rotateY(3.1415927f) * penFrame(-1.0f);   // beside Black's pad
+    const m::mat4 laid = m::translate(m::vec3(0, 0, -0.03f)) * taken;
+    WriteTask pick, put;
+    pick.type = WriteTaskType::PickPen;
+    pick.frame = taken;
+    put.type = WriteTaskType::PutPen;
+    put.frame = laid;
+    B.enqueueWriting(pick);
+    B.enqueueWriting(put);
+    const float putAt = anim::Timing::PickPen + 0.34f;   // PenPut, 0.34 s into the PutPen
+    anim::Task h;
+    h.type = anim::TaskType::Handshake;
+    h.notBefore = putAt + 0.005f;                        // within the same 1/60 s frame
+    h.partner = &W;
+    B.enqueue(h);
+    h.partner = &B;
+    W.enqueue(h);
+    std::vector<anim::Event> ev;
+    const float dt = 1.0f / 60.0f;
+    int puts = 0;
+    float putTime = -1.0f;
+    m::vec3 putPos(0.0f);
+    while (B.time() < 3.5f) {
+        ev.clear();
+        W.update(dt, ev);
+        ev.clear();
+        B.update(dt, ev);
+        for (const anim::Event& e : ev)
+            if (e.type == anim::EventType::PenPut) {
+                ++puts;
+                putTime = e.time;
+                putPos = e.position;
+            }
+    }
+    CHECK_EQ(puts, 1);
+    CHECK(std::fabs(putTime - putAt) < 1e-4f);
+    CHECK(m::length(putPos - laid.translation()) < 1e-5f);
+}
+
+// A handshake given its own duration (1.5 times the default): the look at the joined hands with
+// the nod comes at the clasp, and the eyes stay on the partner until the end, as with the default
+// duration (unchanged: the deepest pitch 0.02 s before the clasp).
+TEST(anim_handshake_gaze_follows_its_duration) {
+    const character::Skeleton& sk = character::robotSkeleton();
+    for (float scale : {1.0f, 1.5f}) {
+        anim::Animator W, B;
+        W.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
+        B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f);
+        anim::Task h;
+        h.type = anim::TaskType::Handshake;
+        h.duration = scale == 1.0f ? 0.0f : scale * anim::Timing::Handshake;
+        h.partner = &B;
+        W.enqueue(h);
+        h.partner = &W;
+        B.enqueue(h);
+        const float T = scale * anim::Timing::Handshake;
+        std::vector<anim::Event> ev;
+        float clasp = -1.0f, deepest = 1e9f, deepestAt = -1.0f, downAt = -1.0f;
+        while (W.time() < T + 0.5f) {
+            ev.clear();
+            W.update(1.0f / 120.0f, ev);
+            for (const anim::Event& e : ev)
+                if (e.type == anim::EventType::HandshakeClasp) clasp = e.time;
+            ev.clear();
+            B.update(1.0f / 120.0f, ev);
+            float yaw, pitch;
+            W.headAngles(yaw, pitch);
+            const float t = W.time();
+            if (t >= 0.5f * scale && t <= anim::Timing::HandshakeClaspAt * scale + 0.3f * scale && pitch < deepest) {
+                deepest = pitch;
+                deepestAt = t;
+            }
+            if (clasp > 0.0f && downAt < 0.0f && pitch < -0.1f) downAt = t;   // back to the board
+        }
+        std::fprintf(stderr, "  handshake of %.2f s: clasp %.3f s, deepest pitch %.3f s, looks down at %.3f s\n", T, clasp, deepestAt, downAt);
+        CHECK(std::fabs(clasp - anim::Timing::HandshakeClaspAt * scale) < 1e-4f);
+        CHECK(std::fabs(deepestAt - clasp) < 0.15f);
+        CHECK(downAt > T - 0.5f * scale);
+        if (scale == 1.0f) CHECK(std::fabs(deepestAt - 0.90f) < 1.5f / 120.0f);
+    }
+}
+
 // Tasks cut short (cancelTasks: the online opponent's move comes while its robot still plays their
 // live gestures): the piece in hand is let go without its release, and the next task starts at once
 // from where the hand is, with its usual duration.
@@ -361,6 +702,276 @@ TEST(anim_cancel_tasks_lets_go_and_goes_on_from_the_hand) {
     CHECK(!an.holding(1));
     CHECK(!an.busy());
 }
+
+// A handshake cut short (cancelTasks: the online opponent's move comes during the opening handshake),
+// right- and left-handed: the eyes leave the partner, the shaking hand (a left-handed player's
+// writing hand) is back at its rest within Timing::Retract while the playing hand goes on, and the
+// body does not jump.
+TEST(anim_cancel_handshake_lets_go_of_the_partner) {
+    const character::Skeleton& sk = character::robotSkeleton();
+    for (character::Side play : {character::Side::Right, character::Side::Left}) {
+        anim::Animator W, B, idle;   // B shakes hands with W and is cut short; idle never shakes
+        W.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
+        B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, play);
+        idle.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, play);
+        anim::Task h;
+        h.type = anim::TaskType::Handshake;
+        h.partner = &B;
+        W.enqueue(h);
+        h.partner = &W;
+        B.enqueue(h);
+        const float dt = 1.0f / 120.0f, cut = 1.2f;   // the hands are clasped
+        std::vector<anim::Event> ev;
+        bool cutDone = false;
+        float handErr = -1.0f, gazeErr = 0.0f, jerkBefore = 0.0f, jerkAfter = 0.0f;
+        m::vec3 chest = B.globals()[character::Spine2].translation(), step(0.0f);
+        while (B.time() < anim::Timing::Handshake + 0.3f) {
+            if (!cutDone && B.time() >= cut - 1e-4f) {
+                B.cancelTasks();
+                anim::Task back;
+                back.type = anim::TaskType::Retract;
+                B.enqueue(back);
+                cutDone = true;
+            }
+            for (anim::Animator* a : {&W, &B, &idle}) {
+                ev.clear();
+                a->update(dt, ev);
+            }
+            const float t = B.time();
+            // A jump of the chest: its step from one frame to the next changes abruptly.
+            const m::vec3 c = B.globals()[character::Spine2].translation();
+            const float jerk = m::length((c - chest) - step);
+            if (t > cut - 0.3f && t <= cut) jerkBefore = std::max(jerkBefore, jerk);
+            if (t > cut && t < cut + anim::Timing::Retract + 0.1f) jerkAfter = std::max(jerkAfter, jerk);
+            step = c - chest;
+            chest = c;
+            // The real right hand shakes for both: back where the idle robot's rests.
+            if (handErr < 0.0f && t >= cut + anim::Timing::Retract + 0.05f)
+                handErr = m::length(B.globals()[character::HandR].translation() - idle.globals()[character::HandR].translation());
+            if (t >= cut + 0.6f) {
+                float by, bp, iy, ip;
+                B.headAngles(by, bp);
+                idle.headAngles(iy, ip);
+                gazeErr = std::max(gazeErr, std::max(std::fabs(by - iy), std::fabs(bp - ip)));
+            }
+        }
+        std::fprintf(stderr, "  %s-handed, cut at %.1f s: right hand %.1f mm from its rest after %.2f s, head %.3f rad from the idle robot's, chest step change %.3f mm (before %.3f mm)\n",
+                     play == character::Side::Right ? "right" : "left", cut, handErr * 1000.0f, anim::Timing::Retract + 0.05f, gazeErr,
+                     jerkAfter * 1000.0f, jerkBefore * 1000.0f);
+        CHECK(handErr >= 0.0f && handErr < 0.002f);
+        CHECK(gazeErr < 0.02f);
+        CHECK(jerkAfter < 0.005f);   // (dropping the torso's hold on that hand at once: 17 mm)
+        CHECK(!B.busy());
+        CHECK(!B.writingBusy());
+        CHECK(!B.holdsPen());
+    }
+}
+
+// A left-handed player's handshake cut short while its writing hand lays the pen down first: the pen
+// is laid down all the same (PenPut once, at its own instant, where the queued PutPen wanted it),
+// the hand is back at its rest a Timing::Retract later, and the writing queue goes on from there.
+TEST(anim_cancel_handshake_lays_the_pen_down) {
+    const character::Skeleton& sk = character::robotSkeleton();
+    anim::Animator B, W, idle;
+    W.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
+    B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, character::Side::Left);
+    idle.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, character::Side::Left);
+    const m::mat4 taken = m::rotateY(3.1415927f) * penFrame(-1.0f);   // beside Black's pad
+    const m::mat4 laid = m::translate(m::vec3(0, 0, -0.03f)) * taken;
+    WriteTask pick;
+    pick.type = WriteTaskType::PickPen;
+    pick.frame = taken;
+    B.enqueueWriting(pick);
+    const float dt = 1.0f / 120.0f;
+    std::vector<anim::Event> ev;
+    float start = -1.0f, cut = -1.0f, putAt = -1.0f, emptyAt = -1.0f, handErr = -1.0f;
+    int puts = 0;
+    m::vec3 putPos(0.0f);
+    bool heldOk = true;
+    while (B.time() < 2.5f) {
+        if (start < 0.0f && B.time() >= 0.8f) {
+            // The pen in hand, the game ends: PutPen and the handshake together (the handshake
+            // takes the PutPen over and lays the pen down first).
+            CHECK(B.holdsPen());
+            WriteTask put;
+            put.type = WriteTaskType::PutPen;
+            put.frame = laid;
+            B.enqueueWriting(put);
+            anim::Task h;
+            h.type = anim::TaskType::Handshake;
+            h.partner = &W;
+            B.enqueue(h);
+            h.partner = &B;
+            W.enqueue(h);
+            start = B.time();
+        }
+        if (start >= 0.0f && cut < 0.0f && B.time() >= start + 0.15f) {   // halfway to the table
+            CHECK(B.holdsPen());
+            B.cancelTasks();
+            cut = B.time();
+        }
+        for (anim::Animator* a : {&W, &idle}) {
+            ev.clear();
+            a->update(dt, ev);
+        }
+        ev.clear();
+        B.update(dt, ev);
+        for (const anim::Event& e : ev) {
+            if (e.type == anim::EventType::PenPut) {
+                ++puts;
+                putAt = e.time;
+                putPos = e.position;
+            }
+            if (e.type == anim::EventType::WritingQueueEmpty && putAt >= 0.0f) emptyAt = e.time;
+        }
+        if (putAt < 0.0f && cut >= 0.0f && !B.holdsPen()) heldOk = false;
+        if (putAt >= 0.0f && B.holdsPen()) heldOk = false;
+        if (putAt >= 0.0f && handErr < 0.0f && B.time() >= putAt + anim::Timing::Retract + 0.05f)
+            handErr = m::length(B.globals()[character::HandR].translation() - idle.globals()[character::HandR].translation());
+    }
+    std::fprintf(stderr, "  cut %.3f s into the handshake: PenPut %.3f s in, hand %.1f mm from its rest %.2f s later\n", cut - start,
+                 putAt - start, handErr * 1000.0f, anim::Timing::Retract + 0.05f);
+    CHECK_EQ(puts, 1);
+    CHECK(std::fabs(putAt - (start + 0.30f)) < 1e-4f);
+    CHECK(m::length(putPos - laid.translation()) < 1e-5f);
+    CHECK(heldOk);
+    CHECK(std::fabs(emptyAt - (putAt + anim::Timing::Retract)) < 1e-3f);
+    CHECK(handErr >= 0.0f && handErr < 0.002f);
+    CHECK(!B.writingBusy());
+}
+
+// A piece the robot set down on the table beside its resting hand, which the game later puts back
+// on the board by itself (a board set back after an illegal move, a lesson reset): with the game's
+// obstacle callbacks, the resting hand keeps clear of the piece while it stands there, and rests
+// where a fresh animator does once it is gone.
+TEST(anim_rest_forgets_a_piece_the_game_moved) {
+    using anim::TaskType;
+    const m::vec3 e2 = layout::squareCenter(12), spot(0.29f, layout::TABLE_TOP_Y, 0.30f);
+    m::vec3 pawn = e2;   // where the game has piece 0
+    auto wire = [&pawn](anim::Animator& a) {
+        initWhite(a);
+        a.pieceTransform = [&pawn](int id) { return id == 0 ? m::translate(pawn) : m::mat4(); };
+        a.pieceGripInfo = [](int) { return m::vec3(layout::PIECE_HEIGHT[1], layout::PIECE_GRIP_HEIGHT[1], layout::PIECE_GRIP_RADIUS[1]); };
+        const anim::Animator* self = &a;
+        auto top = [&pawn, self](m::vec3 f, m::vec3 t, float r) {
+            if (self->holding(0)) return layout::BOARD_TOP_Y;
+            const m::vec3 d(t.x - f.x, 0, t.z - f.z);
+            const float s = m::clamp(m::dot(m::vec3(pawn.x - f.x, 0, pawn.z - f.z), d) / std::max(1e-8f, m::length2(d)), 0.0f, 1.0f);
+            const m::vec3 c = f + d * s;
+            return m::length(m::vec3(pawn.x - c.x, 0, pawn.z - c.z)) < r + layout::PIECE_BASE_RADIUS[1] ? pawn.y + layout::PIECE_HEIGHT[1]
+                                                                                                         : layout::BOARD_TOP_Y;
+        };
+        a.pathObstacleTop = [top](m::vec3 f, m::vec3 t) { return top(f, t, 0.02f); };
+        a.obstacleTopNear = [top](m::vec3 p, float r, int ignoreId) { return ignoreId == 0 ? layout::BOARD_TOP_Y : top(p, p, r); };
+    };
+    anim::Animator an, fresh;
+    wire(an);
+    auto task = [](TaskType type, int id, m::vec3 pos = m::vec3(0)) {
+        anim::Task t;
+        t.type = type;
+        t.pieceId = id;
+        t.position = pos;
+        return t;
+    };
+    const float dt = 1.0f / 120.0f;
+    std::vector<anim::Event> ev;
+    int frames = 0;
+    auto run = [&](float seconds) {
+        for (int i = 0; i < int(seconds / dt); ++i, ++frames) {
+            ev.clear();
+            an.update(dt, ev);
+            for (const anim::Event& e : ev)
+                if (e.type == anim::EventType::PieceReleased && e.pieceId == 0) pawn = e.transform.translation();
+        }
+    };
+    an.enqueue({task(TaskType::Reach, 0), task(TaskType::Lift, 0), task(TaskType::Carry, 0, spot), task(TaskType::Place, 0, spot),
+                task(TaskType::Retract, -1)});
+    run(2.0f);
+    CHECK(m::length(pawn - spot) < 0.004f);
+    const m::vec3 beside = an.globals()[character::HandR].translation();
+    // The game puts the pawn back on e2; the next task (a Retract) checks the resting spot again.
+    pawn = e2;
+    an.enqueue(task(TaskType::Retract, -1));
+    run(1.0f);
+    wire(fresh);
+    for (int i = 0; i < frames; ++i) {
+        ev.clear();
+        fresh.update(dt, ev);
+    }
+    const m::vec3 rest = fresh.globals()[character::HandR].translation(), now = an.globals()[character::HandR].translation();
+    std::fprintf(stderr, "  resting wrist: %.1f mm from the free spot beside the pawn, %.2f mm once the game took it away\n",
+                 m::length(beside - rest) * 1000.0f, m::length(now - rest) * 1000.0f);
+    CHECK(m::length(beside - rest) > 0.01f);
+    CHECK(m::length(now - rest) < 0.001f);
+}
+
+// A hand holding a piece does not gesture, Beat included: the task only holds the piece still, its
+// beats still fire on time.
+TEST(anim_beat_while_holding_only_holds) {
+    anim::Animator an;
+    initWhite(an);
+    const m::vec3 e2 = layout::squareCenter(12);
+    an.pieceTransform = [&](int id) { return id == 0 ? m::translate(e2) : m::mat4(); };
+    an.pieceGripInfo = [](int) { return m::vec3(layout::PIECE_HEIGHT[1], layout::PIECE_GRIP_HEIGHT[1], layout::PIECE_GRIP_RADIUS[1]); };
+    anim::Task reach, beat;
+    reach.type = anim::TaskType::Reach;
+    reach.pieceId = 0;
+    beat.type = anim::TaskType::Gesture;
+    beat.shape = anim::HandShape::Beat;
+    beat.duration = 0.9f;   // two strokes
+    an.enqueue({reach, beat});
+    const float dt = 1.0f / 120.0f;
+    std::vector<anim::Event> ev;
+    std::vector<float> beats;
+    m::mat4 held0;
+    float moved = 0.0f;
+    bool held = true;
+    for (int step = 0; step < int((anim::Timing::Reach + 1.0f) / dt); ++step) {
+        ev.clear();
+        an.update(dt, ev);
+        for (const anim::Event& e : ev)
+            if (e.type == anim::EventType::GestureBeat) beats.push_back(e.time);
+        if (an.time() < anim::Timing::Reach) continue;
+        m::mat4 p;
+        held = held && an.heldPieceTransform(0, p);
+        if (an.time() - anim::Timing::Reach < dt) held0 = p;
+        else moved = std::max(moved, m::length(p.translation() - held0.translation()));
+    }
+    CHECK(held);
+    CHECK(moved < 0.002f);
+    CHECK_EQ(int(beats.size()), 2);
+    for (size_t k = 0; k < beats.size(); ++k) CHECK(std::fabs(beats[k] - (anim::Timing::Reach + (float(k) + 0.6f) * 0.45f)) < 1e-4f);
+}
+
+// A long session (the clock near 3 hours, where a float sum of 1/120 s frames runs 5% fast): the
+// clock keeps its rate, and a task still lasts its duration in frames.
+TEST(anim_clock_keeps_its_rate_in_a_long_session) {
+    anim::Animator an;
+    initWhite(an);
+    std::vector<anim::Event> ev;
+    an.update(10000.0f, ev);
+    const float t0 = an.time();
+    anim::Task wait;
+    wait.type = anim::TaskType::Wait;
+    wait.duration = 5.0f;
+    an.enqueue(wait);
+    int frames = 0, doneAt = -1;
+    while (frames < 1200) {
+        ev.clear();
+        an.update(1.0f / 120.0f, ev);
+        ++frames;
+        for (const anim::Event& e : ev)
+            if (e.type == anim::EventType::QueueEmpty && doneAt < 0) doneAt = frames;
+    }
+    CHECK(t0 == 10000.0f);
+    CHECK(doneAt >= 599 && doneAt <= 601);
+    CHECK(std::fabs(an.time() - (t0 + 10.0f)) < 1e-3f);
+}
+
+// An animator is not copyable (a copy would drive the same character state); the game resets one
+// by moving a fresh one in.
+static_assert(!std::is_copy_constructible_v<anim::Animator> && !std::is_copy_assignable_v<anim::Animator>);
+static_assert(std::is_move_constructible_v<anim::Animator> && std::is_move_assignable_v<anim::Animator>);
 
 // ---- The first-person player's own scoresheet ----------------------------------------------------
 namespace {
@@ -456,7 +1067,7 @@ TEST(anim_own_scoresheet_writing_heard_first_person) {
             an[seat].init(character::robotSkeleton(), m::vec3(0, layout::PLAYER_PELVIS_Y, zs * layout::PLAYER_PELVIS_Z), zs,
                           clockOnRight ? character::Side::Right : character::Side::Left);
             const float side = an[seat].playHand() == character::Side::Right ? zs : -zs;
-            an[seat].setRestHand(m::vec3(side * 0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
+            an[seat].setRestHand(m::vec3(side * layout::REST_HAND_X, layout::TABLE_TOP_Y, zs * layout::REST_HAND_Z));
             // Scorekeeper: pads, pen on the table, the writing rest beside the first row, 1. e4 Nf6.
             pad[seat] = sh::padFrame(seat, clockPosX);
             const float restX = pad[seat].outerSign > 0.0f ? sh::PAGE_W - 4.0f : 4.0f;
@@ -734,7 +1345,7 @@ struct CoachBoard {
 void initCoach(anim::Animator& an, float mirror = 1.0f) {
     an.init(character::robotSkeleton(), m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f,
             mirror > 0.0f ? Side::Left : Side::Right);
-    an.setRestHand(m::vec3(mirror * 0.24f, layout::TABLE_TOP_Y, -0.34f));
+    an.setRestHand(m::vec3(mirror * layout::REST_HAND_X, layout::TABLE_TOP_Y, -layout::REST_HAND_Z));
 }
 
 anim::Task coachTask(anim::TaskType type, int pieceId = -1, m::vec3 pos = m::vec3(0), int tag = 0) {
@@ -825,6 +1436,38 @@ TEST(anim_point_reaches_every_square_left_handed) {
     CHECK(worstAbove > -0.001f);
     CHECK(worstHold < 0.0005f);
     CHECK(worstOverlap < 0.001f);
+}
+
+// The point lock lets go without a jump: pointing at e8 / f8 (close to the coach, where the wrist
+// clamps and the lock shifts the hand), then a Retract. Both seats' handedness.
+TEST(anim_point_lock_lets_go_smoothly) {
+    float worst = 0.0f;
+    for (float mirror : {1.0f, -1.0f})
+        for (int sq : {60, 61}) {
+            anim::Animator an;
+            initCoach(an, mirror);
+            CoachBoard b;
+            b.startPosition();
+            b.wire(an);
+            an.enqueue({coachTask(anim::TaskType::Point, -1, layout::squareCenter(sq)), coachTask(anim::TaskType::Retract, -1, m::vec3(0), 1)});
+            const character::Bone hand = an.playHand() == Side::Left ? character::HandL : character::HandR;
+            std::vector<anim::Event> ev;
+            m::vec3 prev = an.globals()[hand].translation();
+            int after = -1;   // frames since the Retract started
+            while (an.time() < 3.0f) {
+                ev.clear();
+                an.update(1.0f / 120.0f, ev);
+                for (const anim::Event& e : ev)
+                    if (e.type == anim::EventType::TaskStarted && e.tag == 1) after = 0;
+                const m::vec3 cur = an.globals()[hand].translation();
+                if (after >= 0 && after < 3) worst = std::max(worst, m::length(cur - prev));   // the boundary frame and the next two
+                if (after >= 0) ++after;
+                prev = cur;
+            }
+            CHECK(after > 0);
+        }
+    std::fprintf(stderr, "  point lock let go: largest wrist step around the boundary %.2f mm\n", worst * 1000.0f);
+    CHECK(worst < 0.001f);
 }
 
 // Point, Trace and the three gesture shapes, a nod, a head shake and speech on the left-handed

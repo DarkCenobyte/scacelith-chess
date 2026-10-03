@@ -43,7 +43,7 @@ void surface(in SurfaceInput i, inout Surface s) {
     vec4 bh = mat_hash4(blockId.x * 17.0 + blockId.y * 71.0 + 3.0);
 
     // ---- Stone body ---------------------------------------------------------------------------
-    vec3 q = p * vec3(1.0, 1.0, 1.0);
+    vec3 q = p;
     float clouds = mat_fbm(q * 1.3 + bh.x * 5.0, 4);
     float bedding = mat_fbm(vec3(wp.x * 1.5, wp.y * 9.0, bh.y * 3.0), 3);
     float fine = mat_fbm(q * 40.0, 3);
@@ -68,7 +68,7 @@ void surface(in SurfaceInput i, inout Surface s) {
     float pit = smoothstep(0.78, 0.9, mat_gnoise(q * 260.0)) * (1.0 - mat_subpixel(0.0008, fp)) * P4.y;
     col *= 1.0 - pit * 0.35;
 #else
-    float pit = 0.0, shell = 0.0;
+    float pit = 0.0;
 #endif
     // Dust settles on upward faces and on ledges.
     float dust = saturate(N.y) * P4.z;

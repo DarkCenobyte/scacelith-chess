@@ -1,7 +1,6 @@
 #include "shadows.h"
 #include "lighting_data.h"
 #include "../renderer.h"
-#include "../../core/log.h"
 #include <cstring>
 
 using namespace m;

@@ -1,9 +1,9 @@
 // Stone hall reverb (~14 x 22 x 9 m): early reflections (image-source taps for a listener seated
 // at the table: robots/table clutter, side walls, vault, end walls, plus diffuse clusters) and a
 // 16-line feedback delay network (Hadamard matrix, 22-76 ms lines, per-line frequency-dependent
-// absorption for RT60 ~2.5 s low / ~1.5 s at 8 kHz, slow delay modulation against metallic
-// ringing), 24 ms pre-delay, input diffusion and a decorrelated diffuse onset so the late field
-// starts right at the pre-delay. Mono in, stereo out.
+// absorption for RT60 ~2.5 s low / ~1.8 s at 4 kHz / ~1.0 s at 8 kHz, slow delay modulation
+// against metallic ringing), 24 ms pre-delay, input diffusion and a decorrelated diffuse onset so
+// the late field starts right at the pre-delay. Mono in, stereo out.
 #pragma once
 #include "dsp.h"
 

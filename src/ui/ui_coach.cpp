@@ -21,23 +21,9 @@ using gfx::TextStyle;
 using m::vec2;
 using m::vec4;
 using namespace theme;
+using namespace detail::helpers;
 
 namespace {
-
-TextStyle style(int face, float size, vec4 color, HAlign align = HAlign::Left, float tracking = 0.0f) {
-    TextStyle st;
-    st.face = face;
-    st.size = size;
-    st.color = color;
-    st.align = align;
-    st.tracking = tracking;
-    return st;
-}
-float ease(float t) { return m::smootherstep(t); }
-std::string T(const char* key) { return i18n::tr(key); }
-std::string T(const std::string& key) { return i18n::tr(key); }
-std::string L(const char* key) { return std::string(i18n::tr(key)) + "##" + key; }
-std::string num(int v) { return std::to_string(v); }
 
 // ---- Levels ---------------------------------------------------------------------------------------
 int levelCount() { return int(detail::data().coachLevels.size()); }
@@ -332,13 +318,7 @@ void subtitles(const Subtitle& s) {
     float bottom = lastBottom > 0.0f ? lastBottom : v.y - 96.0f;
     Rect plate(v.x * 0.5f - pw * 0.5f, bottom - ph + (1.0f - a) * 6.0f, pw, ph);
     // The band of the notifications: a dark core fading at both ends, two gold hairlines.
-    float edge = std::min(0.22f, 140.0f / pw);
-    vec4 d(0.02f, 0.017f, 0.015f, 0.74f * a), z(0.02f, 0.017f, 0.015f, 0.0f);
-    gfx::fillH(Rect(plate.x, plate.y, plate.w * edge, ph), z, d);
-    gfx::fill(Rect(plate.x + plate.w * edge, plate.y, plate.w * (1.0f - 2.0f * edge), ph), d);
-    gfx::fillH(Rect(plate.r() - plate.w * edge, plate.y, plate.w * edge, ph), d, z);
-    gfx::hlineFade(plate.x + 40.0f, plate.r() - 40.0f, plate.y, withAlpha(gold, 0.55f * a), 0.45f);
-    gfx::hlineFade(plate.x + 40.0f, plate.r() - 40.0f, plate.b() - 1.0f, withAlpha(gold, 0.55f * a), 0.45f);
+    band(plate, a, 0.74f, std::min(0.22f, 140.0f / pw));
     if (lastSpeaker) {  // "COACH", as printed on the robot's torso, set into the top hairline
         std::string tag = T("coach.speaker");
         // Capitals carry the Latin and Cyrillic tag at 16; Arabic and CJK, without them, need more.
@@ -347,6 +327,7 @@ void subtitles(const Subtitle& s) {
             if (c >= 0x0600) caps = false;
         TextStyle sp = style(font::FACE_TITLE, caps ? 16.0f : 19.0f, withAlpha(gold, a), HAlign::Center, caps ? 0.24f : 0.1f);
         float tw = gfx::textWidth(tag, sp);
+        vec4 d(0.02f, 0.017f, 0.015f, 0.74f * a);  // the band's core, over the top hairline
         gfx::fill(Rect(plate.cx() - tw * 0.5f - 18.0f, plate.y - 1.0f, tw + 36.0f, 3.0f), d);
         gfx::text(tag, plate.cx(), plate.y + gfx::capHeight(sp) * 0.5f, sp);
     }
@@ -401,6 +382,7 @@ CoachHudAction coachHud(const CoachHud& hud) {
         float h = 190.0f + 28.0f * float(lines);
         Rect r = im::flip(screen, Rect(v.x - w - 40.0f + (1.0f - t) * 30.0f, v.y * 0.5f - h * 0.5f + 60.0f, w, h));
         im::captureMouseRect(r);
+        im::occlude(r);
         gfx::pushAlpha(t);
         if (!hud.offer) im::pushBlock();
         im::panel(r);
@@ -415,13 +397,17 @@ CoachHudAction coachHud(const CoachHud& hud) {
         gfx::text(T("coach.offer.hint"), r.cx(), y + 4.0f, hs);
         float bw = 190.0f, bh = 48.0f, gap = 20.0f;
         float by = r.b() - 24.0f - bh;
+        // Live only once the card is readable: a press as it appears was aimed at something else.
+        bool ready = oa.v[0] >= 0.9f;
         im::pushId("coachoffer");
+        if (!ready) im::pushBlock();
         if (im::button(L("coach.offer.decline"), im::flip(r, Rect(r.cx() - gap * 0.5f - bw, by, bw, bh)), im::ButtonKind::Secondary, true,
                        im::ITEM_MOUSE_ONLY))
             act = CoachHudAction::PlayOn;
         if (im::button(L("coach.offer.accept"), im::flip(r, Rect(r.cx() + gap * 0.5f, by, bw, bh)), im::ButtonKind::Primary, true,
                        im::ITEM_MOUSE_ONLY))
             act = CoachHudAction::TakeBack;
+        if (!ready) im::popBlock();
         im::popId();
         if (!hud.offer) im::popBlock();
         gfx::popAlpha();
@@ -470,10 +456,10 @@ MenuAction coachPauseMenu(const CoachPause& cp) {
     }
     if (cp.canOfferDraw && im::menuEntry(L("pause.offer_draw"), next(), true, HAlign::Center)) act = MenuAction::OfferDraw;
     if (cp.canClaimDraw) {
-        if (im::menuEntry(L("pause.claim_draw"), next(), true, HAlign::Center)) act = MenuAction::ClaimDraw;
+        if (im::menuEntry(L("pause.claim_draw"), next(), cp.mayEndGame, HAlign::Center)) act = MenuAction::ClaimDraw;
         im::tooltip(T("pause.claim_draw.help"));
     }
-    if (cp.canResign && im::menuEntry(L("pause.resign"), next(), true, HAlign::Center)) g_pause.confirm = 1;
+    if (cp.canResign && im::menuEntry(L("pause.resign"), next(), cp.mayEndGame, HAlign::Center)) g_pause.confirm = 1;
     if (im::menuEntry(L("menu.options"), next(), true, HAlign::Center)) {
         g_pause.options = true;
         detail::openOptionsPage();

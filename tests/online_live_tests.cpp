@@ -3,7 +3,8 @@
 // opponent's gestures (when their piece fields apply, which squares and moves are valid, the pace
 // of their robot's hand and its live work at their move, even under a flood of gestures, the
 // timeouts, the head's spring), my clock's freeze and the resend of my move after a
-// reconnection, and the RatingRestored notice held back during a game.
+// reconnection, the RatingRestored notice held back during a game, and the realtime errors that
+// belong to a game or refuse a challenge being created.
 #include "test.h"
 #include "anim/animator.h"
 #include "chess/chess.h"
@@ -526,4 +527,125 @@ TEST(live_rating_restored_waits_for_the_end_of_the_game) {
     CHECK(n.take(false, points));
     CHECK(near(float(points), 20.0f));
     CHECK(!n.take(false, points));
+}
+
+// ---- Realtime errors -------------------------------------------------------------------------
+
+TEST(live_game_errors_leave_the_menus_refusals_out) {
+    for (int code = 100; code <= 112; ++code)
+        if (code != 106 && code != 107) CHECK(live::gameError(code));
+    // AlreadyInGame and InvalidCategory answer a QueueJoin or a challenge (no game): the menus show them.
+    CHECK(!live::gameError(106));
+    CHECK(!live::gameError(107));
+    CHECK(!live::gameError(0));
+    CHECK(!live::gameError(11));
+    CHECK(!live::gameError(113));
+    CHECK(!live::gameError(201));
+    CHECK(!live::gameError(207));
+}
+
+TEST(live_challenge_refusals_are_only_those_of_its_creation) {
+    for (int code : {202, 203, 204, 206, 208, 210}) CHECK(live::challengeRefused(code));
+    // QueueNotAllowed and MatchmakingCooldown answer a QueueJoin, ChallengeNotFound an accept, a
+    // decline or a cancel, CodeInvalid a code joined, RematchUnavailable a rematch.
+    for (int code : {200, 201, 205, 207, 209}) CHECK(!live::challengeRefused(code));
+    CHECK(!live::challengeRefused(0));
+    CHECK(!live::challengeRefused(106));
+}
+
+TEST(live_queue_refusals_end_the_search) {
+    // QueueNotAllowed, MatchmakingCooldown, AlreadyInGame and InvalidCategory refuse a QueueJoin.
+    for (int code : {200, 207, 106, 107}) CHECK(live::queueRefused(code));
+    // The refusals of a challenge, a code joined, a rematch and the game errors leave it.
+    for (int code : {0, 100, 105, 108, 201, 202, 203, 204, 205, 206, 208, 209, 210}) CHECK(!live::queueRefused(code));
+}
+
+TEST(live_routing_follows_the_game_a_message_names) {
+    using K = net::Event::Kind;
+    net::Event e;
+    e.kind = K::MoveMade;
+    e.gameId = 7;
+    e.game.id = 7;
+    CHECK_EQ(live::eventGameId(e), uint64_t(7));
+    // A late message of game 7 while the rematch 8 is shown: game 7's.
+    e.game.id = 8;
+    CHECK_EQ(live::eventGameId(e), uint64_t(7));
+    // No game named: the one its snapshot carries.
+    e.gameId = 0;
+    CHECK_EQ(live::eventGameId(e), uint64_t(8));
+
+    // A RatingUpdate of the game shown changes the account in place, in its queue's category or
+    // else (a challenge) the game's; one of an earlier game does not.
+    net::Event r;
+    r.kind = K::RatingUpdate;
+    r.gameId = 8;
+    r.game.id = 8;
+    r.game.category = "5+3";
+    CHECK(live::ratesShownGame(r));
+    CHECK_EQ(live::ratingCategory(r), std::string("5+3"));
+    r.queueCategory = "3+2";
+    CHECK_EQ(live::ratingCategory(r), std::string("3+2"));
+    r.gameId = 7;
+    CHECK(!live::ratesShownGame(r));
+}
+
+// The scene's own guard, should a late message of an earlier game ever be routed to it: its
+// GameEvent (a rematch refused or offered), GameEnd and RatingUpdate change nothing in game 8.
+TEST(live_scene_ignores_another_games_events) {
+    using K = net::Event::Kind;
+    net::Event e;
+    e.game.id = 8;   // what the client fills in: the game shown
+    for (K k : {K::GameEvent, K::GameEnd, K::RatingUpdate}) {
+        e.kind = k;
+        e.gameId = 7;
+        CHECK(live::aboutAnotherGame(e, 8));
+        e.gameId = 8;
+        CHECK(!live::aboutAnotherGame(e, 8));
+        e.gameId = 0;   // no game named: the one played
+        CHECK(!live::aboutAnotherGame(e, 8));
+    }
+    // Only those three: the other kinds are left to the session's routing.
+    for (K k : {K::GameSnapshot, K::MoveMade, K::OpponentGesture, K::ServerError}) {
+        e.kind = k;
+        e.gameId = 7;
+        CHECK(!live::aboutAnotherGame(e, 8));
+    }
+}
+
+TEST(live_test_answer_comes_from_the_tested_server) {
+    net::Event e;
+    e.kind = net::Event::Kind::ServerInfoResult;
+    e.origin = "other.test:443";
+    CHECK(live::testAnswer(e, true, "other.test:443"));
+    // The info of the server in use (asked before the test), or no test going on.
+    CHECK(!live::testAnswer(e, true, "play.example:443"));
+    CHECK(!live::testAnswer(e, false, "other.test:443"));
+    e.kind = net::Event::Kind::AccountResult;
+    CHECK(!live::testAnswer(e, true, "other.test:443"));
+}
+
+// Options' pin field emptied for the custom server applied: Apply forgets the pin saved at sign-in,
+// and "Test connection" goes without it (one rule for both, so that the test tells what Apply gives).
+TEST(live_saved_pin_dropped_with_the_pin_field) {
+    const std::string pin(64, 'a');
+    net::ServerEndpoint applied;
+    applied.host = "chess.example.org";
+    applied.apiPort = 8443;
+    applied.pinnedSha256 = pin;
+    net::ServerEndpoint ep = applied;
+    ep.pinnedSha256.clear();
+    CHECK(live::savedPinDropped(ep, applied, true));
+    ep.host = "CHESS.example.org";              // the same origin
+    CHECK(live::savedPinDropped(ep, applied, true));
+    // The official server chosen, a pin still given, another server, or none applied with a pin:
+    // the saved pin stays.
+    CHECK(!live::savedPinDropped(ep, applied, false));
+    ep.pinnedSha256 = std::string(64, 'b');
+    CHECK(!live::savedPinDropped(ep, applied, true));
+    ep.pinnedSha256.clear();
+    ep.apiPort = 443;
+    CHECK(!live::savedPinDropped(ep, applied, true));
+    ep.apiPort = 8443;
+    applied.pinnedSha256.clear();
+    CHECK(!live::savedPinDropped(ep, applied, true));
 }

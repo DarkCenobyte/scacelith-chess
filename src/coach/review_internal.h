@@ -45,13 +45,22 @@ struct Explanation {
     int demoPlies = 0;         // plies of Ctx::r shown on the table
     bool offer = false;        // the takeback is offered whatever the class (mates, stalemate, missed pieces)
     bool concrete = false;     // the cause lies within the band's reach (the level 1-2 voice threshold)
-    bool isTip = false;        // a principle, never a fault claim: Low priority, once per game
     int tipBit = -1;           // which principle (Reviewer::tipsSaid_)
     bool includesBest = false; // the cause already names the better move
     bool missed = false;       // the human missed something (no demonstration: the table shows p1)
-    int mateMoves = 0;         // MateAllowed / MateMissed: N
     chess::Square hintSquare = chess::NoSquare;   // takeback hint (levels 1-2): the piece at risk, on p0
 };
+
+// ---- Engine requests and figures (shared with the appraisal) ----
+// The start position as sent to the engine: "" for the standard start, else its FEN.
+std::string startFenOf(const chess::Game& g);
+// A request on the position after the first 'plies' moves of g (search settings left to the caller).
+ai::AnalysisRequest requestAt(const chess::Game& g, size_t plies);
+// A score (the side to move's view) as White's centipawns, mates as +-1000, clamped.
+int whiteCp(const ai::Score& s, bool whiteToMove);
+Arg evalArg(const ai::Score& s);
+inline int points(chess::PieceType t) { return kPiecePoints[t]; }
+inline bool hasBit(uint64_t set, chess::Square s) { return s != chess::NoSquare && (set & chess::squareBit(s)); }
 
 // ---- Beats ----
 std::string bandKey(const std::string& family, int level);   // family + ".b" + level
@@ -66,13 +75,12 @@ void traceMove(Beat& b, chess::PieceType t, chess::Square from, chess::Square to
 void markSquare(Beat& b, chess::Square s, const std::string& anchor);
 void markPiece(Beat& b, chess::Square s, const std::string& anchor);
 void markArrow(Beat& b, chess::PieceType t, chess::Square from, chess::Square to, const std::string& anchor);
-// Research-pedagogy R6: at most three pointing gestures per line; the others keep only their marks.
+// At most three pointing gestures per line; the others keep only their marks.
 void limitPointing(Beat& b);
-int pointingCount(const Beat& b);
 
-// ---- Explanation choice (research-pedagogy §2.0 table, first match wins) ----
+// ---- Explanation choice (in ExType order, first match wins) ----
 bool findExplanation(const Ctx& c, Explanation& out);
-// Opening principles and endgame technique tips (§2.16, §2.17), for moves that are not faults.
+// Opening principles and endgame technique tips, for moves that are not faults.
 bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out);
 
 // Demonstration beats for the first 'plies' plies of c.r (stops before a promotion of the human's

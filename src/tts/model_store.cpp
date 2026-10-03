@@ -6,14 +6,11 @@
 #include "net/crypto.h"
 #include "net/download.h"
 #include "net/net_sys.h"
+#include "scacelith_version.h"
 
 #include <algorithm>
 #include <chrono>
 #include <cstdio>
-
-#ifndef SCACELITH_VERSION_STRING
-#define SCACELITH_VERSION_STRING "0.1.0"
-#endif
 
 namespace tts {
 
@@ -102,9 +99,9 @@ void setModelFolder(const std::string& dir) {
 
 std::string downloadUserAgent() {
 #ifdef _WIN32
-    return std::string("Scacelith/") + SCACELITH_VERSION_STRING + " (Windows)";
+    return std::string("Scacelith/") + SCACELITH_VERSION + " (Windows)";
 #else
-    return std::string("Scacelith/") + SCACELITH_VERSION_STRING + " (Linux)";
+    return std::string("Scacelith/") + SCACELITH_VERSION + " (Linux)";
 #endif
 }
 
@@ -381,6 +378,7 @@ void ModelDownloader::run(Options o) {
             }
         }
     }
+    const int fetched = int(missing.size());
     std::vector<std::string> sources;
 
     // 2. The hub, file by file.
@@ -430,7 +428,6 @@ void ModelDownloader::run(Options o) {
             hubError = r.error == "http" ? "http " + std::to_string(r.status) : r.error;
             hubDetail = f->name + ": " + (r.detail.empty() ? r.error : r.detail);
             LOGW("tts: the hub failed (%s), switching to the release archive", hubDetail.c_str());
-            net::sys::removeFile(folder_ + f->name + ".part");
             still.push_back(f);
         }
         if (still.size() < missing.size()) sources.push_back("hub");
@@ -453,7 +450,8 @@ void ModelDownloader::run(Options o) {
             p.total = manifest_.archiveSize;
         });
         LOGI("tts: fetching the release archive %s", manifest_.archiveUrl.c_str());
-        // A complete archive left by a cancelled extraction is used as it is (checked by download()).
+        // A complete archive left by a cancelled extraction is used as it is once its size and SHA-256
+        // match (checked just below; download() itself only continues a .part).
         net::DownloadRequest rq;
         rq.url = manifest_.archiveUrl;
         rq.path = archive;
@@ -535,6 +533,7 @@ void ModelDownloader::run(Options o) {
         source = "They were already in this folder when Scacelith checked it; they are published on Hugging Face (" + hubUrl +
                  ") and in the sherpa-onnx release archive on GitHub (" + manifest_.archiveUrl + ").";
     if (!writeFolderNotices(folder_, source)) LOGW("tts: cannot write the notices in %s", folder_.c_str());
+    update([&](DownloadProgress& p) { p.fetched = fetched; });
     finish(Phase::Done, std::string(), std::string());
 }
 

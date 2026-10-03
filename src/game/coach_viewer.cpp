@@ -61,7 +61,7 @@ class CoachViewerScene : public Scene {
 public:
     bool init(AppContext& ctx) override {
         ctx_ = &ctx;
-        while (!world_.loadStep()) {}
+        while (!world_.loadStep(true)) {}
         world_.setupRenderer(*ctx.renderer);
         world_.setClockSide(true);
         human_ = std::atoi(ctx.argValue("--human", "0").c_str()) == 1 ? 1 : 0;
@@ -127,7 +127,7 @@ public:
         for (int seat = 0; seat < 2; ++seat) {
             float zs = seat == 0 ? 1.0f : -1.0f;
             anim_[seat].init(sk, vec3(0, layout::PLAYER_PELVIS_Y, zs * layout::PLAYER_PELVIS_Z), zs, character::Side::Right);
-            anim_[seat].setRestHand(vec3(zs * 0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
+            anim_[seat].setRestHand(vec3(zs * layout::REST_HAND_X, layout::TABLE_TOP_Y, zs * layout::REST_HAND_Z));
             anim_[seat].pieceTransform = [this](int id) {
                 const game::PieceObject* p = board_.byId(id);
                 return p ? p->transform : mat4();
@@ -184,7 +184,7 @@ public:
         cam_.update(plat::input());
         std::vector<anim::Event> events;
         for (int seat = 0; seat < 2; ++seat) {
-            // Both look at the board, the coach a little towards the human.
+            // Both look at the board centre.
             anim_[seat].lookAt(vec3(0.0f, layout::BOARD_TOP_Y, 0.0f));
             anim_[seat].update(dt, events);
         }

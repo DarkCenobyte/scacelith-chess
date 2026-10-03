@@ -32,6 +32,7 @@
 #pragma once
 #include "../chess/pgn.h"
 #include <atomic>
+#include <charconv>
 #include <cstdint>
 #include <ctime>
 #include <string>
@@ -113,6 +114,14 @@ SaveResult save(const std::string& folder, const chess::pgn::Record& record, std
 // "name_3.ext"... on a collision. The account page's data export is written this way.
 SaveResult saveFile(const std::string& folder, const std::string& name, const std::string& text);
 
+// ---- Dates (the account pages' file names use them too) ------------------------------------------
+// 't' in local time (localtime_s / localtime_r: no shared buffer); false when it has none.
+bool localTime(std::time_t t, std::tm& out);
+// The digits of s at [at, at + n) as a number; -1 when one of them is missing or not a digit.
+int digitsAt(const std::string& s, size_t at, size_t n);
+// Days from 1970-01-01 to a date of the proleptic Gregorian calendar (H. Hinnant's days_from_civil).
+int64_t daysFromCivil(int64_t y, int m, int d);
+
 // ---- Listing ---------------------------------------------------------------------------------------
 struct Entry {
     std::string path;                  // the file
@@ -142,6 +151,18 @@ struct Entry {
     int coachLevel() const;            // CoachLevel tag, -1 = none
     bool removable() const { return games == 1 && !fileError; }
 };
+// An entry's game from one listing to the next: "<path>#<index>" (the library page keeps its
+// selection by it).
+inline std::string entryKey(const Entry& e) { return e.path + "#" + std::to_string(e.index); }
+// entryKey(e) == key without building the key: the library page looks for its selection among
+// every listed game on each frame.
+inline bool hasKey(const Entry& e, const std::string& key) {
+    const size_t n = e.path.size();
+    if (key.size() <= n + 1 || key.compare(0, n, e.path) != 0 || key[n] != '#') return false;
+    char digits[24];
+    const std::to_chars_result r = std::to_chars(digits, digits + sizeof(digits), e.index);
+    return key.compare(n + 1, std::string::npos, digits, size_t(r.ptr - digits)) == 0;
+}
 
 struct ListStats {
     int files = 0;                     // *.pgn files in the folder

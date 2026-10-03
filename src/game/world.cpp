@@ -12,7 +12,8 @@
 #include "../ui/ui_font.h"
 #include "layout.h"
 #include <algorithm>
-#include <cmath>
+#include <chrono>
+#include <future>
 
 using namespace m;
 using namespace chess;
@@ -128,6 +129,9 @@ struct World::Impl {
     GLuint coordTex = 0;
     bool boardCoords = false;
     int reflFloor = -1, reflTable = -1, reflBoard = -1;
+    // The robot's meshes being built on a worker thread (loading.porcelain) and when it started.
+    std::future<std::vector<character::RobotPart>> robotParts;
+    double robotStart = 0.0;
 };
 
 // Translation keys (assets/i18n, section "Loading").
@@ -160,7 +164,7 @@ bool World::loaded() const { return impl_->step >= kStepCount; }
 float World::loadProgress() const { return float(impl_->step) / float(kStepCount); }
 const char* World::loadLabel() const { return i18n::tr(kStepLabels[impl_->step < kStepCount ? impl_->step : kStepCount]); }
 
-bool World::loadStep() {
+bool World::loadStep(bool wait) {
     Impl& w = *impl_;
     if (loaded()) return true;
     double t0 = plat::time();
@@ -193,16 +197,7 @@ bool World::loadStep() {
         break;
     }
     case 1: {
-        Model hallModel = hall::buildHall();
-        for (ModelPart& p : hallModel.parts) {
-            if (p.material != MaterialId::Tapestry) continue;
-            // hall: inst[0] = (colour, seed, width, height); tapestry.glsl: inst[0] = (colour,
-            // pattern seed, extra seed), inst[1].xy = size.
-            vec4 h = p.inst[0];
-            p.inst[1] = vec4(h.z, h.w, 0.0f, 0.0f);
-            p.inst[0] = vec4(h.x, h.y, std::fmod(h.y * 7.31f, 1.0f), 0.0f);
-        }
-        w.hall.upload(hallModel);
+        w.hall.upload(hall::buildHall());
         // Floor tile grids aligned with the hall's layout (field tiles start at the field corner;
         // the inlay grid is offset so its joints miss the cabochons at the tile corners).
         materials::getMutable(MaterialId::FloorMarble).params[4] =
@@ -222,7 +217,6 @@ bool World::loadStep() {
         w.frameCoordMat.name = "BoardFrameCoordinates";
         w.frameCoordMat.defines.push_back("BOARD_COORDINATES");
         w.frameCoordMat.textures[1] = w.coordTex;
-        w.frameCoordMat.textureTargets[1] = GL_TEXTURE_2D;
         break;
     case 4:
         for (int t = Pawn; t <= King; ++t) {
@@ -237,7 +231,20 @@ bool World::loadStep() {
         w.clockLever.upload(w.clockDesc.lever);
         break;
     case 6:
-        w.robot.upload(character::buildRobot());
+        // Built on a worker thread (pure CPU) while the loading screen keeps drawing and pumping
+        // messages; uploaded here, on the GL thread, once ready. Each loading frame waits up to
+        // 10 ms for it, so that with vsync off the loading screen does not take the build's CPU.
+        if (!wait && !w.robotParts.valid()) {
+            w.robotParts = std::async(std::launch::async, character::buildRobot);
+            w.robotStart = t0;
+        }
+        if (w.robotParts.valid()) {
+            if (!wait && w.robotParts.wait_for(std::chrono::milliseconds(10)) != std::future_status::ready) return false;
+            t0 = w.robotStart;
+            w.robot.upload(w.robotParts.get());
+        } else {
+            w.robot.upload(character::buildRobot());
+        }
         w.coachMarking.create("COACH");
         break;
     default: break;
@@ -251,19 +258,16 @@ void World::setupRenderer(render::Renderer& r) {
     Impl& w = *impl_;
     render::PlanarReflector floor;
     floor.point = vec3(0, 0, 0);
-    floor.resolutionScale = 0.5f;
     floor.bounds.add(vec3(layout::HALL_MIN_X, 0.0f, layout::HALL_MIN_Z));
     floor.bounds.add(vec3(layout::HALL_MAX_X, 0.0f, layout::HALL_MAX_Z));
     w.reflFloor = r.addPlanarReflector(floor);
     render::PlanarReflector table;
     table.point = vec3(0, layout::TABLE_TOP_Y, 0);
-    table.resolutionScale = 0.5f;
     table.bounds.add(vec3(-layout::TABLE_WIDTH * 0.5f, layout::TABLE_TOP_Y, -layout::TABLE_DEPTH * 0.5f));
     table.bounds.add(vec3(layout::TABLE_WIDTH * 0.5f, layout::TABLE_TOP_Y, layout::TABLE_DEPTH * 0.5f));
     w.reflTable = r.addPlanarReflector(table);
     render::PlanarReflector board;
     board.point = vec3(0, layout::BOARD_TOP_Y, 0);
-    board.resolutionScale = 0.5f;
     board.bounds.add(vec3(-layout::BOARD_SIZE * 0.5f, layout::BOARD_TOP_Y, -layout::BOARD_SIZE * 0.5f));
     board.bounds.add(vec3(layout::BOARD_SIZE * 0.5f, layout::BOARD_TOP_Y, layout::BOARD_SIZE * 0.5f));
     w.reflBoard = r.addPlanarReflector(board);
@@ -273,6 +277,9 @@ void World::setupRenderer(render::Renderer& r) {
     materials::getMutable(MaterialId::BoardSquareLight).planarReflector = w.reflBoard;
     materials::getMutable(MaterialId::BoardSquareDark).planarReflector = w.reflBoard;
     materials::getMutable(MaterialId::BoardFrame).planarReflector = w.reflBoard;
+    // Markers and coach marks (transparent, main view only) first show during play.
+    r.warmProgram(w.markerMat, render::PassId::Main);
+    r.warmProgram(w.coachMarkMat, render::PassId::Main);
 }
 
 void World::setClockSide(bool positiveX) {
@@ -353,9 +360,6 @@ void World::submitPieces(render::Renderer& r, const PhysicalBoard& board, const 
     Impl& w = *impl_;
     for (const PieceObject& p : board.pieces()) {
         if (p.type == NoPiece) continue;
-        if (p.inReserve && !p.held) {
-            // Spare pieces are only shown once they have been brought to the table.
-        }
         render::DrawItem d;
         d.mesh = &w.pieceBody[p.type];
         d.material = &materials::get(p.color == White ? MaterialId::MarbleWhitePiece : MaterialId::MarbleBlackPiece);
@@ -430,7 +434,7 @@ void World::submitMarkers(render::Renderer& r, const std::vector<Marker>& marker
         d.material = &w.markerMat;
         d.model = translate(layout::squareCenter(mk.square) + vec3(0, 0.0004f, 0));
         d.inst[0] = vec4(float(mk.kind), mk.strength, 0, 0);
-        d.flags = render::DRAW_NO_REFLECTION | render::DRAW_NO_VELOCITY;
+        d.flags = render::DRAW_NO_REFLECTION;
         d.objectId = OBJ_MARKER + uint32_t(mk.square);
         r.submit(d);
     }
@@ -440,8 +444,6 @@ void World::submitMarkers(render::Renderer& r, const std::vector<Marker>& marker
 
 void World::setCoachSeat(int seat) { impl_->coachSeat = seat == 0 || seat == 1 ? seat : -1; }
 void World::setBoardCoordinates(bool on) { impl_->boardCoords = on; }
-bool World::boardCoordinates() const { return impl_->boardCoords; }
-int World::coachSeat() const { return impl_->coachSeat; }
 
 void World::submitPieces(render::Renderer& r, const PhysicalBoard& board) { submitPieces(r, board, nullptr); }
 
@@ -460,7 +462,7 @@ void World::submitCoachMarks(render::Renderer& r, const std::vector<CoachMark>& 
         render::DrawItem d;
         d.mesh = &w.coachQuad;
         d.material = &w.coachMarkMat;
-        d.flags = render::DRAW_NO_REFLECTION | render::DRAW_NO_VELOCITY;
+        d.flags = render::DRAW_NO_REFLECTION;
         d.objectId = OBJ_COACH_MARK + n;
         float strength = std::min(mk.strength, 1.0f), age = std::max(mk.age, 0.0f);
         if (mk.kind == CoachMark::Square) {
@@ -500,8 +502,5 @@ void World::submitCoachMarks(render::Renderer& r, const std::vector<CoachMark>& 
         ++n;
     }
 }
-
-float World::pieceHeight(PieceType t) { return layout::PIECE_HEIGHT[t]; }
-float World::pieceRadius(PieceType t) { return layout::PIECE_BASE_RADIUS[t]; }
 
 }  // namespace game

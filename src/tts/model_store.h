@@ -116,6 +116,7 @@ struct DownloadProgress {
     int fileIndex = 0, fileCount = 0;   // Hub: 1-based index of the file among those to fetch
     std::string sourceLabel;      // the host / repository in use (ModelManifest::hubLabel or archiveLabel)
     bool fromArchive = false;     // the release archive is in use (the hub failed or was skipped)
+    int fetched = 0;              // Done: the files the job wrote (0 = every file was already there and right)
     std::string hubError;         // why the hub was given up ("" = it was not)
     // Failed: a short code ("network", "timeout", "http", "hash", "size", "io", "archive",
     // "verify", "unavailable", ...) and a detail for the log.

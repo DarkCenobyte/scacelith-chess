@@ -2,8 +2,10 @@
 
 In-house engine on OpenGL 4.6 core (DSA only), C++17, no third-party engine. The shipping target
 is a single self-contained Windows x64 executable (MinGW-w64, static). Everything (shaders,
-fonts, the Stockfish NNUE network) is embedded; only `Scacelith.ini` lives next to the exe. The
-coach's voice model is never shipped: the game downloads it, at the player's request, into its
+fonts, the Stockfish NNUE network) is embedded; only the settings (`Scacelith.ini`), the online
+sign-ins (`Scacelith.credentials`) and the log (`scacelith.log`) live next to the exe (when that
+folder is read-only, all three go to the user data folder).
+The coach's voice model is never shipped: the game downloads it, at the player's request, into its
 per-user application folder (`plat::appDataDirectory()`: `%APPDATA%\scacelith\` on Windows,
 `$XDG_DATA_HOME/scacelith/` or `~/.local/share/scacelith/` on Linux, and
 `~/Library/Application Support/scacelith/` for a future macOS port), subfolder `coach/`.
@@ -59,9 +61,9 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 
 ### Lighting (render-lighting: `src/render/lighting`, `shaders/lighting`, `shaders/include/lighting.glsl`)
 
-Frame order in `Renderer::endFrame`: upload draws/lights, sort → atmosphere LUTs + sky cubemap
-capture (only when the sun / sky changed) → sun cascades → light probe bake (when dirty) → planar
-reflections → prepass → `PostFX::computeAO` → opaque → sky → transparents → `PostFX::resolve`.
+Frame order in `Renderer::endFrame`: upload draws/lights, sort → atmosphere LUTs (only when the
+sun / sky changed) → sun cascades → light probe bake (when dirty) → planar reflections → prepass →
+`PostFX::computeAO` → opaque → sky → transparents → `PostFX::resolve`.
 
 **Units / exposure.** Photometric: sun in lux, sky and emission in nits, point lights in candela.
 Default `Environment::exposureEV100` is 12.3 (daylight interior with the board in the sun; was
@@ -76,13 +78,13 @@ only a fallback (probes off or not baked yet).
 
 **LightingUBO** (`UBO_LIGHTING` = 2, `shaders/lighting/lighting_ubo.glsl` ↔
 `render::LightingUBOData` in `src/render/lighting/lighting_data.h`, std140, bound for every pass
-including post): probe positions / radii / parallax boxes, L2 SH irradiance of each probe and of the
-sky (cosine-convolved, divided by π, windowed), per-cascade shadow scales (`shadowScale[c]` = xy
+including post): probe positions / radii / parallax boxes, L2 SH irradiance of each probe
+(cosine-convolved, divided by π, windowed), per-cascade shadow scales (`shadowScale[c]` = xy
 metres per shadow uv, z metres per depth unit, w texel size), sun (`sunParams`, `sunTOA`), sky
 (`skyParams2`: cloud coverage, time, Mie scale, sky intensity), planar info (enabled, max lod,
 size) and misc (specular AA strength, cascade blend band, ambient intensity). Probe data are
 pre-exposed with the exposure of the bake: multiply by `probeInfo.z` (the lighting code does it).
-Helpers: `shEvalProbe(k * 9, n)`, `shEvalSky(n)`.
+Helper: `shEvalProbe(k * 9, n)`.
 
 **Texture units** (material.h numbering, bound by `Renderer::bindGlobalTextures`):
 `TEXUNIT_SHADOW` / `TEXUNIT_SHADOW_DEPTH` = D16 2D array, one layer per cascade (compare / raw);
@@ -91,9 +93,8 @@ Helpers: `shEvalProbe(k * 9, n)`, `shEvalSky(n)`.
 `probeInfo.y`; `TEXUNIT_PLANAR` = RGBA16F 2D array (one layer per reflector, half res, Gaussian mip
 chain; alpha = distance from the mirror plane to the reflected surface, 1000 for the sky);
 `TEXUNIT_BRDF_LUT` = RGBA16F 128²: r,g = split-sum DFG (A, B) indexed by (NoV, perceptual
-roughness), b = Charlie sheen directional albedo; `TEXUNIT_SKY` = RGBA16F cube (64², full mips):
-pre-exposed sky radiance without the sun disk (clouds included). `Renderer::setGlobalTexture(slot,
-tex)` binds `TEXUNIT_GLOBAL0 + slot` (0..4) every pass.
+roughness), b = Charlie sheen directional albedo. Units 16..23 (`TEXUNIT_SKY`, `TEXUNIT_VOLUMETRIC`,
+`TEXUNIT_NOISE`, `TEXUNIT_GLOBAL0`..) are reserved and not bound.
 
 **Sun shadows.** `RenderSettings::shadowCascades` (2 or 3) cascades fitted to fixed receiver
 regions (`Renderer::setShadowRegions`, finest first; default: table + seated players, the area
@@ -108,10 +109,11 @@ dithered (TAA resolves them). `evalSunShadow()` also returns the matter thicknes
 
 **Light probes.** `Renderer::setLightProbes` (≤ 16 `LightProbeDesc`; default: a priority probe
 above the table + a 3×4 grid at 1.8 m + 3 high probes). Probes capture **`DRAW_STATIC` geometry
-only** with `PassId::Probe` (no tessellation, `DRAW_NO_REFLECTION` skipped, sky drawn), 2 bounces
-(`probeBounces`; bounce 0 has no ambient), `probeResolution`² faces. They re-bake at startup, on
-`invalidateStatic()`, when the sun moves by more than 1° or the sky changes (≈ 1.3 s for 16 probes
-× 2 bounces at 128² on llvmpipe). Shading blends priority probes first, then the grid with
+only** with `PassId::Probe` (no tessellation, `DRAW_NO_REFLECTION` skipped, sky drawn), 1 to 3 bounces
+(`probeBounces`, by quality preset; bounce 0 has no ambient), `probeResolution`² faces. They bake on the first frame
+that submits draw items (empty loading frames are skipped), on `invalidateStatic()`, when the sun
+moves by more than 1° or the sky changes (≈ 1.3 s for 16 probes
+× 2 bounces at 128², the High preset, on llvmpipe). Shading blends priority probes first, then the grid with
 normalised radial kernels (continuous everywhere), box-projected specular from the two strongest.
 
 **Planar reflections.** `PlanarReflector` gains `bounds` (skip when off screen + scissor to its
@@ -133,7 +135,9 @@ are alpha tested in the prepass and the shadow pass too.
 dual-source blending `dst = src0 + dst × src1`. Glass contract (`s.transmission > 0`): the colour
 output is the full shading (specular reflection never scaled by alpha; diffuse weighted by
 1 − transmission), the background is multiplied by `transmission × (1 − F)² × albedo`
-(`transmittanceOf()`). Without transmission, plain coverage blending by `s.alpha`.
+(`transmittanceOf()`). Without transmission, plain coverage blending by `s.alpha`. Transparents
+take neither the GTAO nor the SSR: both come from the prepass and describe the opaque surface
+behind them.
 
 **Screen-door fade.** `DrawItem::opacity` < 1 (`DrawData.fade.x`) makes an opaque draw
 see-through in the main view and the planar reflections: `screenDoorHidden()`
@@ -152,11 +156,10 @@ shadows.
 
 **Other additive API.** `DRAW_NO_CULL` (items are otherwise frustum culled by their bounding
 sphere in every pass), `DrawFilter` + `Renderer::drawScene(pass, transparents, filter)`,
-`Renderer::renderSky()` (public), `skyCubemap()`, `specularProbes()`, `lightingUBO()`, `brdfLut()`,
+`Renderer::renderSky()` (public), `specularProbes()`, `lightingUBO()`, `brdfLut()`,
 `environment()`, `RenderSettings::{shadowCascades, staticShadowCache, lightProbes,
 probeResolution, probeBounces, specularAA}` (set by the quality presets). GLSL: `sq(vec2/vec3)`,
-`F_Schlick(vec3 f0, vec3 f90, float)`, `gtaoMultiBounce()`, `specularOcclusion()`; the baseline
-helpers `evalDirect()`, `ambientSpecular()`, `sunShadow()`, `hemisphereAmbient()` still exist.
+`F_Schlick(vec3 f0, vec3 f90, float)`, `gtaoMultiBounce()`, `specularOcclusion()`.
 `SCACELITH_GPU_PROFILE=1` logs per-pass CPU+glFinish timings each frame (opt-in, stalls the GPU).
 Test scenes: `lightbox` (hall of boxes per layout.h: `--view 0..4`, `--sun az,el`, `--ev`) and
 `testbed` (outdoor material spheres: `--view 0..2`, `--dusk`, `--sun`, `--ev`).
@@ -189,19 +192,25 @@ coach's mouth (`audio::setVoicePose`) and drives the end of the game. `render` d
 director's marks (`World::submitCoachMarks`, piece highlights through `submitPieces`) and
 `renderOverlay` the subtitles.
 
-* **Voice.** One `tts::Worker` (started when the coach mode is first used, restarted when the
-  lesson's slower speed is wanted, stopped before `audio::shutdown`). The director requests each
-  line's synthesis ahead of time; the scene plays the PCM as one streamed audio voice from the
-  coach's mouth. The speech clock is the audio engine's (`played` minus the output latency) while
-  a device plays it, else the game's time; a voice that never starts is ended by a watchdog.
-  Glyphs of a line are put in the font atlas when its synthesis is requested.
+* **Voice.** One `tts::Worker` (started when the coach mode is first used; each line carries its
+  own speed, so the lesson's slower rate needs no reload; a worker whose load failed is tried
+  again between lines, one whose warm-up failed is tried once more only after a download that
+  replaced model files (`GameScene::coachModelDownloaded`, `game::coachVoiceRetry`); stopped before
+  `audio::shutdown`). The director requests each line's synthesis ahead of time; the scene plays
+  the PCM as one streamed audio voice from the coach's mouth. The speech clock is the audio
+  engine's (`played` minus the output latency) while a device plays it, else the game's time; a
+  voice that never starts is ended by a watchdog. Glyphs of a line are put in the font atlas when
+  its synthesis is requested.
 * **Voice model download.** `src/game/coach_model.h` decides when to offer the model (the Coach
   entry of the title page, through `ui::setCoachEntryHook`; Options > Audio > Coach voice switched
-  on; files that did not load), runs the `tts::ModelDownloader` and draws the prompt and the
-  progress panel (`src/ui/ui_model_download.cpp`); `net::download` (`src/net/download.h`) streams
-  each file, follows the hosts' redirects (the online client never does) and resumes with `Range`.
+  on; files that did not load or could not speak), runs the `tts::ModelDownloader` and draws the
+  prompt and the progress panel (`src/ui/ui_model_download.cpp`); `net::download`
+  (`src/net/download.h`) streams each file, follows the hosts' redirects (the online client never
+  does) and resumes with `Range`.
   The scene calls `drawModelDownload()` every frame and re-reads `coachVoiceWanted()`
-  (`refreshCoachVoice`) after a download or an options change.
+  (`refreshCoachVoice`) after an options change. After a download it calls
+  `coachModelDownloaded(fetched)`, which stops a failed worker when the download wrote at least one
+  file (`DownloadProgress::fetched`), then calls `refreshCoachVoice`.
 * **Body.** Gestures become animator tasks on the coach's playing arm (`Point`, `Trace`,
   `Gesture`) scheduled with `notBefore` so that their apex lands on the word (`anchorTime`); nods
   and head shakes are timed separately; the speech level drives the mouth and a blink ends each

@@ -29,7 +29,6 @@ struct Phalanx {
     float t0, t1;                  // half thickness (pad direction) at the proximal / distal end
     float w0, w1;                  // half width (hinge direction)
     bool tip = false;              // distal phalanx: rounded fingertip, no distal joint
-    bool ballBase = false;         // proximal joint is a ball (MCP/CMC) instead of a hinge
     float base0 = 0.0f;            // radius of this segment's dark base
     float base1 = 0.0f;            // radius of the next segment's dark base (socket = base1 + gap)
     bool ball1 = false;            // next joint is a ball
@@ -79,7 +78,6 @@ sdf::MeshOptions handOptions(vec3 tangentAxis) {
     o.maxAngleDeg = 25.0f;
     o.nu = 24;
     o.nv = 18;
-    o.capInset = 0.8f;
     o.tangentAxis = tangentAxis;
     return o;
 }
@@ -106,7 +104,6 @@ MeshData meshBase(vec3 hinge, float r, float halfLen, bool ball) {
     o.minEdge = 0.0005f;
     o.nu = 16;
     o.nv = 8;
-    o.capInset = 0.0f;
     o.name = "base";
     if (ball) return sdf::meshSegment([r](const vec3& p) { return sdf::sphere(p, r); }, vec3(0), vec3(0), o, hinge);
     // Hinge barrel: a cylinder with 1.2 mm filleted ends, built analytically as a lathe (exact
@@ -194,7 +191,6 @@ void buildHand(Sink& s) {
             ph.width = vec3(0, 0, 1);
             ph.len = sk.boneLength[b];
             ph.tip = seg == 2;
-            ph.ballBase = seg == 0;
             ph.t0 = T[seg][0] * sc;
             ph.t1 = T[seg][1] * sc;
             ph.w0 = W[seg][0] * sc;
@@ -227,7 +223,6 @@ void buildHand(Sink& s) {
         mc.pad = padOf(a1);
         mc.width = vec3(1, 0, 0);
         mc.len = length(o2);
-        mc.ballBase = true;
         mc.t0 = 0.0100f; mc.t1 = 0.0084f;
         mc.w0 = 0.0112f; mc.w1 = 0.0094f;
         mc.base0 = cmcBall;
@@ -276,8 +271,7 @@ void buildHand(Sink& s) {
             sock[f] = mcpBall[f] + kGap;
         }
         vec3 cmc = sk.restOffset[ThumbR1];
-        const float wristR = 0.0205f;
-        auto palm = [mcp, sock, cmc, cmcBall, wristR](const vec3& p) {
+        auto palm = [mcp, sock, cmc, cmcBall](const vec3& p) {
             // Metacarpal slab: superelliptic cross-section, arched back, wider at the knuckles.
             float y = p.y;
             float t = smoothstep(-0.012f, -0.070f, y);  // 0 at the wrist .. 1 at the knuckles
@@ -295,7 +289,7 @@ void buildHand(Sink& s) {
             float hyp = sdf::ellipsoid(p - vec3(0.0078f, -0.045f, -0.021f), vec3(0.0068f, 0.025f, 0.0115f));
             d = sdf::smin(d, hyp, 0.006f);
             // Carpal dome: sphere around the wrist pivot (slides inside the forearm socket).
-            float ball = sdf::sphere(p, wristR);
+            float ball = sdf::sphere(p, kWristDome);
             float dome = sdf::smax(ball, std::fabs(p.x + 0.0008f) - 0.0150f, 0.004f);
             d = sdf::smin(d, dome, 0.008f);
             // Near the wrist everything stays inside the ball, so the hand can bend freely.
@@ -316,7 +310,7 @@ void buildHand(Sink& s) {
         look.variant = 1.0f;
         look.seams[0] = seamPlane(vec3(1, 0, 0), vec3(0.0040f, 0, 0));
         look.seams[1] = seamPlane(vec3(0, -1, 0.10f), vec3(0, -0.066f, 0));
-        look.seams[2] = seamPlane(vec3(0, 1, 0), vec3(0, -0.0205f, 0));
+        look.seams[2] = seamPlane(vec3(0, 1, 0), vec3(0, -kWristDome, 0));
         sdf::VolumeOptions o = handVolume(vec3(0, -1, 0), "palm");
         o.cell = 0.0006f;
         o.maxError = 0.00005f;
@@ -327,7 +321,6 @@ void buildHand(Sink& s) {
         oj.nv = 10;
         oj.maxDeviation = 0.00015f;
         oj.maxAngleDeg = 30.0f;
-        oj.capInset = 0.0f;
         s.addJoint("wrist", HandR, [oj] { return sdf::meshSegment([](const vec3& p) { return sdf::sphere(p, 0.0148f); }, vec3(0), vec3(0), oj); }, false);
     }
     s.mirrorFrom(first);

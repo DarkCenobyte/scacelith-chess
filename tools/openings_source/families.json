@@ -6811,6 +6811,42 @@
    "zh-Hans": "对称变例",
    "zh-Hant": "對稱變例"
   },
+  "Scotch Gambit": {
+   "en": "Scotch Gambit",
+   "fr": "gambit écossais",
+   "de": "Schottisches Gambit",
+   "es": "gambito escocés",
+   "ru": "шотландский гамбит",
+   "uk": "шотландський гамбіт",
+   "ar": "الجامبيت الاسكتلندي",
+   "ja": "スコッチ・ギャンビット",
+   "zh-Hans": "苏格兰弃兵",
+   "zh-Hant": "蘇格蘭棄兵"
+  },
+  "Scotch Variation": {
+   "en": "Scotch Variation",
+   "fr": "variante écossaise",
+   "de": "Schottische Variante",
+   "es": "variante escocesa",
+   "ru": "шотландский вариант",
+   "uk": "шотландський варіант",
+   "ar": "المتغير الاسكتلندي",
+   "ja": "スコッチ・バリエーション",
+   "zh-Hans": "苏格兰变例",
+   "zh-Hant": "蘇格蘭變例"
+  },
+  "Danish Variation": {
+   "en": "Danish Variation",
+   "fr": "variante danoise",
+   "de": "Nordische Variante",
+   "es": "variante danesa",
+   "ru": "датский вариант",
+   "uk": "данський варіант",
+   "ar": "المتغير الدنماركي",
+   "ja": "デニッシュ・バリエーション",
+   "zh-Hans": "丹麦变例",
+   "zh-Hant": "丹麥變例"
+  },
   "Main Line": {
    "en": "Main Line",
    "fr": "ligne principale",

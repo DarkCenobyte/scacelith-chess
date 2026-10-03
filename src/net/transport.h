@@ -2,15 +2,15 @@
 //   Windows:  WinHTTP (transport_win32.cpp): OS TLS stack and trust store, system proxy,
 //             WinHTTP WebSocket API.
 //   Linux:    OpenSSL (transport_openssl.cpp, development and test builds) with a minimal
-//             HTTP/1.1 and RFC 6455 client; transport_none.cpp when OpenSSL is missing
-//             (every call fails with "unavailable").
+//             HTTP/1.1 and RFC 6455 client.
 //
 // Security rules applied here, whatever the caller asks:
 //   - TLS certificates are validated by the OS trust store (Linux: OpenSSL default paths),
 //     including the host name. With a pin (hex SHA-256 of the leaf certificate's DER), an
 //     unknown issuer is tolerated for that connection only and the leaf must match the pin;
 //     no header or body given by the caller (token, password) reaches a server that fails the
-//     pin (OpenSSL: checked right after the handshake; WinHTTP: see transport_win32.cpp).
+//     pin (OpenSSL: checked right after the handshake; WinHTTP: see transport_win32.cpp, which
+//     also says what an active attacker can still get under Wine).
 //   - Plain HTTP / WS only for loopback hosts (localhost, 127.0.0.1, ::1).
 //   - HTTP redirects are never followed (a 3xx comes back as it is), cookies are not kept.
 //     (net/download.h follows the redirects of public file hosts itself, with its own rules.)
@@ -36,7 +36,8 @@ public:
     void reset();
     // The blocking operation in progress registers how to abort it (closing its handle or
     // socket); cleared with setAbort(nullptr) when it ends (AbortGuard below does both). Runs at
-    // once when already cancelled.
+    // once when already cancelled. The action runs under the token's lock (it must neither block
+    // nor call the token): setAbort(nullptr) returns once a running one has finished.
     void setAbort(std::function<void()> fn);
     bool hasAbort();                          // an abort action is registered (an operation runs)
 
@@ -77,7 +78,10 @@ struct HttpRequest {
     std::string body;                         // JSON; sent with Content-Type application/json
     std::string accept = "application/json";  // the Accept header (a PGN download asks for its type)
     std::vector<std::pair<std::string, std::string>> headers;   // e.g. Authorization
-    int timeoutMs = 15000;                    // for each of connect, send and receive
+    // Windows (WinHTTP): for each of resolve, connect, send and receive. Linux: one deadline for
+    // the connection and its TLS handshake, then one for the whole exchange (httpStream: for each
+    // write and each read).
+    int timeoutMs = 15000;
     size_t maxResponseBytes = 1 << 20;
 };
 
@@ -151,7 +155,17 @@ protected:
 // "http_<status>" when the server answered without upgrading, or "subprotocol".
 std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int& httpStatus, CancelToken* cancel = nullptr);
 
-bool transportAvailable();                    // false in Linux builds without OpenSSL
+// The pin check of a WinHTTP request at each SENDING_REQUEST notification (transport_win32.cpp),
+// here so that the tests reach it on every platform. leaf: the hex SHA-256 of the server's
+// certificate, "" when it could not be read; noTlsYet: the request has no TLS connection yet
+// (ERROR_WINHTTP_INCORRECT_HANDLE_STATE: through a proxy whose CONNECT is still to be made), which
+// leaves the decision to the next notification, sent once the connection through the proxy is
+// made (as .NET's WinHttpHandler does). Fail-closed otherwise: no leaf, or another one, is a
+// mismatch, and the check once the answer has arrived still needs the pinned leaf.
+enum class PinCheck { Later, Match, Mismatch };
+PinCheck pinCheckAtSend(const std::string& pin, const std::string& leaf, bool noTlsYet);
+
+bool transportAvailable();                    // false when the WinHTTP session or the OpenSSL context fails
 bool isLoopbackHost(const std::string& host); // localhost, 127.0.0.1, ::1 (any case)
 bool isIpLiteral(const std::string& host);
 // "host" or "[v6]" followed by ":port" unless it is the scheme's default port.

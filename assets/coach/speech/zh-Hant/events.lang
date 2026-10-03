@@ -31,7 +31,6 @@ event.colour.black = 我執白，所以我先走。
 event.colour.black.2 = 這次你下黑棋：我先走。
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
-event.level.l0 = 西洋棋規則：我們透過小練習，一步一步學會下棋。
 event.level.l1 = 入門第一步：我下得溫和，用淺顯的話講解每個錯誤。
 event.level.l2 = 初學者：我下得稍強一點，並點出捉雙、牽制這類簡單戰術。
 event.level.l3 = 中級棋手：我會講計畫和兵形，並示範簡短的變化。
@@ -99,8 +98,6 @@ event.end.draw.3 = 很公平的結果。這盤下得很好。
 event.end.resigned = 你認輸了。不過這盤你下得很頑強。
 event.end.resigned.2 = 好的。謝謝你陪我下棋。
 event.end.handshake = 我們握個手吧。
-event.end.handshake.2 = 謝謝你陪我下這盤棋。
-event.end.handshake.3 = 下得不錯。謝謝你。
 
 # ---- The rules lesson -----------------------------------------------------------------------------------------
 # {chapter} = the chapter's title (lesson.title.* in lesson.lang), in 「」 inside a sentence.
@@ -108,5 +105,3 @@ event.lesson.resume = 歡迎回來！我們繼續學「{chapter}」。
 event.lesson.resume.2 = 又見面了！我們上次學到「{chapter}」。
 event.lesson.next = 下一課：{chapter}。
 event.lesson.next.2 = 現在來學「{chapter}」。
-event.lesson.skip = 好，我們往下學。
-event.lesson.skip.2 = 好吧，我們跳到後面。

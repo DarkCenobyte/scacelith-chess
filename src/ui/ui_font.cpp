@@ -1,7 +1,7 @@
-// SDF font atlas. Each glyph is rasterised by stb_truetype at 4x the atlas resolution, converted
-// to an exact Euclidean distance field (Felzenszwalb-Huttenlocher) and box-filtered down. The
-// high resolution raster uses the non-zero winding rule, so variable fonts with overlapping
-// contours (Cinzel) produce clean fields.
+// SDF font atlas. Each glyph is rasterised by stb_truetype at 4x (2x for the CJK faces, see
+// kFaces) the atlas resolution, converted to an exact Euclidean distance field
+// (Felzenszwalb-Huttenlocher) and box-filtered down. The high resolution raster uses the non-zero
+// winding rule, so variable fonts with overlapping contours (Cinzel) produce clean fields.
 #include "ui_font.h"
 #include "../core/embedded.h"
 #include "../core/log.h"
@@ -86,13 +86,15 @@ struct FaceData {
 };
 
 struct Shelf { int y, h, x; };
+struct Box { int x, y, w, h; };
 
 struct Atlas {
     GLuint tex = 0;
     std::vector<uint8_t> pixels;
     std::vector<Shelf> shelves;
     int nextY = 0;
-    int dirtyY0 = kAtlasH, dirtyY1 = 0;
+    int dirtyY0 = kAtlasH, dirtyY1 = 0;  // rows to upload whole (init, an atlas clear)
+    std::vector<Box> dirty;              // glyphs packed since the last upload
     int gen = 0;
     bool resetPending = false;
 };
@@ -162,6 +164,42 @@ void edt2d(Scratch& s, std::vector<float>& grid, int w, int h) {
     }
 }
 
+// Coverage at O x the output resolution (sc.cov, W x H) -> exact inside / outside distances,
+// box-filtered down to w x h bytes: 0.5 + d / (2 * spread), d in output texels (inside > 0).
+void coverageToSdf(Scratch& sc, int W, int H, int w, int h, int O, int spread, uint8_t* dst) {
+    size_t N = size_t(W) * size_t(H);
+    sc.in.resize(N);
+    sc.out.resize(N);
+    for (size_t i = 0; i < N; ++i) {
+        bool inside = sc.cov[i] >= 128;
+        sc.out[i] = inside ? 0.0f : float(kInf);  // distance to the nearest inside pixel
+        sc.in[i] = inside ? float(kInf) : 0.0f;   // distance to the nearest outside pixel
+    }
+    edt2d(sc, sc.out, W, H);
+    edt2d(sc, sc.in, W, H);
+    const float invO = 1.0f / float(O);
+    const float norm = 1.0f / (2.0f * float(spread));
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            float sum = 0.0f;
+            for (int sy = 0; sy < O; ++sy) {
+                size_t row = size_t(y * O + sy) * size_t(W);
+                for (int sx = 0; sx < O; ++sx) {
+                    size_t i = row + size_t(x * O + sx);
+                    // Refine boundary pixels with the anti-aliased coverage.
+                    float d;
+                    if (sc.cov[i] >= 128) d = std::sqrt(sc.in[i]) - 0.5f;
+                    else d = -(std::sqrt(sc.out[i]) - 0.5f);
+                    if (std::fabs(d) <= 1.0f) d = float(sc.cov[i]) / 255.0f - 0.5f;
+                    sum += d;
+                }
+            }
+            float v = 0.5f + sum * invO * invO * invO * norm;  // average, then hi-res px -> output px
+            dst[size_t(y) * size_t(w) + size_t(x)] = uint8_t(std::lround(std::clamp(v, 0.0f, 1.0f) * 255.0f));
+        }
+    }
+}
+
 struct SdfGlyph {
     uint32_t cp = 0;
     Glyph g;
@@ -201,42 +239,10 @@ void buildGlyph(const FaceData& fd, const FaceDesc& desc, uint32_t cp, int gi, S
     if (rw > 0 && rh > 0)
         stbtt_MakeGlyphBitmap(&fd.info, &sc.cov[size_t(oy) * size_t(W) + size_t(ox)], rw, rh, W, hs, hs, gi);
 
-    size_t N = size_t(W) * size_t(H);
-    sc.in.resize(N);
-    sc.out.resize(N);
-    for (size_t i = 0; i < N; ++i) {
-        bool inside = sc.cov[i] >= 128;
-        sc.out[i] = inside ? 0.0f : float(kInf);  // distance to the nearest inside pixel
-        sc.in[i] = inside ? float(kInf) : 0.0f;   // distance to the nearest outside pixel
-    }
-    edt2d(sc, sc.out, W, H);
-    edt2d(sc, sc.in, W, H);
-
     out.w = w;
     out.h = h;
     out.px.resize(size_t(w) * size_t(h));
-    const float invO = 1.0f / float(O);
-    const float norm = 1.0f / (2.0f * float(desc.spread));
-    for (int y = 0; y < h; ++y) {
-        for (int x = 0; x < w; ++x) {
-            float sum = 0.0f;
-            for (int sy = 0; sy < O; ++sy) {
-                size_t row = size_t(y * O + sy) * size_t(W);
-                for (int sx = 0; sx < O; ++sx) {
-                    size_t i = row + size_t(x * O + sx);
-                    // Refine boundary pixels with the anti-aliased coverage.
-                    float d;
-                    if (sc.cov[i] >= 128) d = std::sqrt(sc.in[i]) - 0.5f;
-                    else d = -(std::sqrt(sc.out[i]) - 0.5f);
-                    if (std::fabs(d) <= 1.0f) d = float(sc.cov[i]) / 255.0f - 0.5f;
-                    sum += d;
-                }
-            }
-            float sd = sum * invO * invO * invO;  // average, then hi-res px -> atlas px
-            float v = 0.5f + sd * norm;
-            out.px[size_t(y) * size_t(w) + size_t(x)] = uint8_t(std::lround(std::clamp(v, 0.0f, 1.0f) * 255.0f));
-        }
-    }
+    coverageToSdf(sc, W, H, w, h, O, desc.spread, out.px.data());
     float inv = 1.0f / desc.emPx;
     out.g.hasQuad = true;
     out.g.x0 = float(bx0) * inv;
@@ -281,8 +287,7 @@ void place(Slot& s, uint32_t cp) {
     }
     for (int y = 0; y < s.h; ++y)
         std::copy_n(&s.px[size_t(y) * size_t(s.w)], size_t(s.w), &g_atlas.pixels[size_t(oy + y) * kAtlasW + size_t(ox)]);
-    g_atlas.dirtyY0 = std::min(g_atlas.dirtyY0, oy);
-    g_atlas.dirtyY1 = std::max(g_atlas.dirtyY1, oy + s.h);
+    g_atlas.dirty.push_back({ox, oy, s.w, s.h});
     s.g.u0 = float(ox) / kAtlasW;
     s.g.v0 = float(oy) / kAtlasH;
     s.g.u1 = float(ox + s.w) / kAtlasW;
@@ -392,6 +397,7 @@ void resetAtlas() {
     g_atlas.resetPending = false;
     g_atlas.dirtyY0 = 0;
     g_atlas.dirtyY1 = kAtlasH;
+    g_atlas.dirty.clear();
     for (auto& fd : g_faces)
         for (auto& kv : fd.glyphs) {
             kv.second.g.hasQuad = false;
@@ -424,31 +430,6 @@ void prewarmLanguage() {
 }
 
 }  // namespace
-
-uint32_t decodeUtf8(const std::string& s, size_t& i) {
-    unsigned char c = static_cast<unsigned char>(s[i]);
-    auto cont = [&](size_t k) -> int {
-        if (i + k >= s.size()) return -1;
-        unsigned char b = static_cast<unsigned char>(s[i + k]);
-        return (b & 0xC0) == 0x80 ? (b & 0x3F) : -1;
-    };
-    if (c < 0x80) { i += 1; return c; }
-    if ((c & 0xE0) == 0xC0) {
-        int b1 = cont(1);
-        if (b1 >= 0) { i += 2; return (uint32_t(c & 0x1F) << 6) | uint32_t(b1); }
-    } else if ((c & 0xF0) == 0xE0) {
-        int b1 = cont(1), b2 = cont(2);
-        if (b1 >= 0 && b2 >= 0) { i += 3; return (uint32_t(c & 0x0F) << 12) | (uint32_t(b1) << 6) | uint32_t(b2); }
-    } else if ((c & 0xF8) == 0xF0) {
-        int b1 = cont(1), b2 = cont(2), b3 = cont(3);
-        if (b1 >= 0 && b2 >= 0 && b3 >= 0) {
-            i += 4;
-            return (uint32_t(c & 0x07) << 18) | (uint32_t(b1) << 12) | (uint32_t(b2) << 6) | uint32_t(b3);
-        }
-    }
-    i += 1;
-    return 0xFFFD;
-}
 
 bool init() {
     if (g_ready) return true;
@@ -569,7 +550,7 @@ void prewarm(const std::vector<std::pair<int, uint32_t>>& list) {
     if (jobs.empty()) return;
     std::vector<SdfGlyph> results(jobs.size());
     unsigned hw = std::thread::hardware_concurrency();
-    int threads = int(std::clamp(hw == 0 ? 2u : hw, 1u, 4u));
+    int threads = int(std::clamp(hw == 0 ? 2u : hw, 1u, 8u));
     threads = std::min(threads, int(jobs.size()));
     auto work = [&](int t) {
         Scratch sc;
@@ -588,23 +569,47 @@ void prewarm(const std::vector<std::pair<int, uint32_t>>& list) {
 }
 
 void flushUploads() {
-    if (!g_atlas.tex || g_atlas.dirtyY1 <= g_atlas.dirtyY0) return;
-    int y0 = g_atlas.dirtyY0, y1 = g_atlas.dirtyY1;
+    if (!g_atlas.tex) return;
+    // New glyphs go up one rectangle each; many at once (a language's glyphs), or with rows that
+    // go up whole anyway, as the band of rows that holds them.
+    if (g_atlas.dirty.size() > 64 || (g_atlas.dirtyY1 > g_atlas.dirtyY0 && !g_atlas.dirty.empty())) {
+        for (const Box& b : g_atlas.dirty) {
+            g_atlas.dirtyY0 = std::min(g_atlas.dirtyY0, b.y);
+            g_atlas.dirtyY1 = std::max(g_atlas.dirtyY1, b.y + b.h);
+        }
+        g_atlas.dirty.clear();
+    }
+    if (g_atlas.dirtyY1 <= g_atlas.dirtyY0 && g_atlas.dirty.empty()) return;
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glTextureSubImage2D(g_atlas.tex, 0, 0, y0, kAtlasW, y1 - y0, GL_RED, GL_UNSIGNED_BYTE,
-                        &g_atlas.pixels[size_t(y0) * kAtlasW]);
+    if (g_atlas.dirtyY1 > g_atlas.dirtyY0) {
+        int y0 = g_atlas.dirtyY0, y1 = g_atlas.dirtyY1;
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+        glTextureSubImage2D(g_atlas.tex, 0, 0, y0, kAtlasW, y1 - y0, GL_RED, GL_UNSIGNED_BYTE,
+                            &g_atlas.pixels[size_t(y0) * kAtlasW]);
+    } else {
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, kAtlasW);
+        for (const Box& b : g_atlas.dirty)
+            glTextureSubImage2D(g_atlas.tex, 0, b.x, b.y, b.w, b.h, GL_RED, GL_UNSIGNED_BYTE,
+                                &g_atlas.pixels[size_t(b.y) * kAtlasW + size_t(b.x)]);
+        glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+    }
     glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
     glGenerateTextureMipmap(g_atlas.tex);
     g_atlas.dirtyY0 = kAtlasH;
     g_atlas.dirtyY1 = 0;
+    g_atlas.dirty.clear();
 }
 
 const Glyph* glyph(int face, uint32_t cp, int* usedFace) {
     if (face < 0 || face >= FACE_COUNT) face = FACE_TEXT;
+    // The requested face draws nearly every character: try it before building the chain.
+    if (const Glyph* g = lookupOrBuild(face, cp)) {
+        if (usedFace) *usedFace = face;
+        return g;
+    }
     int chain[FACE_COUNT + 4];
     int n = fallbackChain(face, cp, chain);
-    for (int i = 0; i < n; ++i) {
+    for (int i = 1; i < n; ++i) {  // chain[0] is 'face', tried above
         if (const Glyph* g = lookupOrBuild(chain[i], cp)) {
             if (usedFace) *usedFace = chain[i];
             return g;
@@ -700,7 +705,7 @@ bool renderLineSdf(int face, const std::string& utf8, float capPx, int spread, f
     }
     int bx0, by0, bx1, by1;
     if (!stbtt_GetCodepointBox(&info, 'H', &bx0, &by0, &bx1, &by1) || by1 <= 0) return false;
-    constexpr int O = 4;  // rasterisation oversampling, as the atlas
+    constexpr int O = 4;  // rasterisation oversampling, as the atlas (non-CJK faces)
     const int W = w * O, H = h * O;
     const float s = capPx * float(O) / float(by1);          // font units -> high resolution pixels
     const float emHi = s / stbtt_ScaleForMappingEmToPixels(&info, 1.0f);  // high resolution pixels per em
@@ -712,7 +717,7 @@ bool renderLineSdf(int face, const std::string& utf8, float capPx, int spread, f
     int prev = 0;
     int inkX0 = 1 << 30, inkX1 = -(1 << 30);
     for (size_t i = 0; i < utf8.size();) {
-        uint32_t cp = decodeUtf8(utf8, i);
+        uint32_t cp = uni::decodeAt(utf8, i);
         int gi = stbtt_FindGlyphIndex(&info, int(cp));
         if (prev && gi) pen += float(stbtt_GetGlyphKernAdvance(&info, prev, gi)) * s;
         Placed p{gi, pen, 0, 0, 0, 0};
@@ -761,38 +766,9 @@ bool renderLineSdf(int face, const std::string& utf8, float capPx, int spread, f
     }
 
     // Exact inside / outside distances, box-filtered to the output resolution (as buildGlyph).
-    size_t N = size_t(W) * size_t(H);
-    sc.in.resize(N);
-    sc.out.resize(N);
-    for (size_t i = 0; i < N; ++i) {
-        bool inside = sc.cov[i] >= 128;
-        sc.out[i] = inside ? 0.0f : float(kInf);
-        sc.in[i] = inside ? float(kInf) : 0.0f;
-    }
-    edt2d(sc, sc.out, W, H);
-    edt2d(sc, sc.in, W, H);
     out.resize(size_t(w) * size_t(h));
-    const float invO = 1.0f / float(O);
-    const float norm = 1.0f / (2.0f * float(spread));
-    for (int y = 0; y < h; ++y) {
-        for (int x = 0; x < w; ++x) {
-            float sum = 0.0f;
-            for (int sy = 0; sy < O; ++sy) {
-                size_t row = size_t(y * O + sy) * size_t(W);
-                for (int sx = 0; sx < O; ++sx) {
-                    size_t i = row + size_t(x * O + sx);
-                    float d;
-                    if (sc.cov[i] >= 128) d = std::sqrt(sc.in[i]) - 0.5f;
-                    else d = -(std::sqrt(sc.out[i]) - 0.5f);
-                    if (std::fabs(d) <= 1.0f) d = float(sc.cov[i]) / 255.0f - 0.5f;
-                    sum += d;
-                }
-            }
-            float v = 0.5f + sum * invO * invO * invO * norm;
-            out[size_t(y) * size_t(w) + size_t(x)] = uint8_t(std::lround(std::clamp(v, 0.0f, 1.0f) * 255.0f));
-        }
-    }
-    if (inkWidthPx) *inkWidthPx = float(inkX1 - inkX0) * invO;
+    coverageToSdf(sc, W, H, w, h, O, spread, out.data());
+    if (inkWidthPx) *inkWidthPx = float(inkX1 - inkX0) / float(O);
     return true;
 }
 

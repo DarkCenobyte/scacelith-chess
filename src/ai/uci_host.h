@@ -32,7 +32,8 @@ public:
     // engine.arch): "auto" (the default) or a Stockfish ARCH name such as "x86-64-avx2", never
     // above what the CPU runs. An unknown name is logged and leaves the limit unchanged.
     void setArchLimit(const std::string& arch);
-    // Variant of the running or last session (e.g. "x86-64-avx2"), "none" before the first one.
+    // Variant chosen by the last start attempt (e.g. "x86-64-avx2"); "none" before the first one
+    // or when the last attempt found no variant within engine.arch.
     const char* arch() const;
     // Variants built into this executable, from the baseline up (empty without the engine).
     std::vector<std::string> variants() const;

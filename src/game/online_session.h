@@ -9,10 +9,9 @@
 //   - the 3D scene plays the games it announces (gameReady() / takeGame()) through a GameLink and
 //     drains their events with nextGameEvent(), the opponent's live gestures (OpponentGesture)
 //     included: only those of the game being played, the latest one replacing one still queued.
-// With --online-mock the in-process fakes of online_mock.h replace the network layer (builds
-// without it use them anyway, see online_stub.cpp); --online-manual-clock then makes their games
-// autoPress = false (the moves wait for a clock press). Tokens never pass through here: the
-// network layer stores them per server.
+// With --online-mock the in-process fakes of online_mock.h replace the network layer;
+// --online-manual-clock then makes their games autoPress = false (the moves wait for a clock
+// press). Tokens never pass through here: the network layer stores them per server.
 #pragma once
 #include "../net/direct_match.h"
 #include "../net/online_client.h"
@@ -20,7 +19,6 @@
 #include "online_account.h"
 #include "online_live.h"
 #include <deque>
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -32,14 +30,16 @@ class ServerApi {
 public:
     virtual ~ServerApi() = default;
     virtual void setServer(const net::ServerEndpoint& ep) = 0;
-    virtual void fetchServerInfo() = 0;
+    virtual void forgetSavedPin() = 0;
+    virtual void fetchServerInfo(bool ignoreSavedPin = false) = 0;
     virtual bool hasSavedSession() const = 0;
     virtual std::string savedUsername() const = 0;
     virtual void registerAccount(const std::string& username, const std::string& email, const std::string& password) = 0;
     virtual void login(const std::string& usernameOrEmail, const std::string& password) = 0;
     virtual void loginMfa(const std::string& code) = 0;
-    virtual void startGoogleSso() = 0;
+    virtual void startGoogleSso(const net::SsoBrowserPage& page) = 0;
     virtual void completeSso(const std::string& username) = 0;
+    virtual void linkSso(const std::string& password) = 0;
     virtual void cancelSso() = 0;
     virtual void logout(bool allSessions) = 0;
     virtual void fetchAccount() = 0;
@@ -148,8 +148,9 @@ public:
     void refreshInfo();                         // fetchServerInfo(), result in info()
     std::string serverName() const;             // info().name, or the host
     // Options > Online "Test connection": fetches the info of 'ep' (the values being edited,
-    // not applied yet) and comes back to the current server. The result: takeTest().
-    void testServer(const net::ServerEndpoint& ep);
+    // not applied yet; custom: a community server is chosen there) and comes back to the current
+    // server, with the trust that applying them would give. The result: takeTest().
+    void testServer(const net::ServerEndpoint& ep, bool custom);
     bool testing() const { return testing_; }
     bool takeTest(net::Event& out);
 
@@ -208,7 +209,7 @@ public:
         bool searching = false;
         std::string category;
         bool rated = false;
-        double sinceMs = 0;                     // mock::nowMs() when the search began (elapsed time)
+        double sinceMs = 0;                     // nowMs() when the search began (elapsed time)
         uint32_t window = 0, queued = 0;
     };
     const Queue& queue() const { return queue_; }
@@ -225,6 +226,7 @@ public:
     void challenge(const std::string& username, int baseSec, int incSec, bool rated, int colorPref);
     void createPrivateGame(int baseSec, int incSec, bool rated, int colorPref);
     void joinPrivateGame(const std::string& code);
+    bool joining() const { return joining_; }   // a join sent: neither its game nor an error came yet
     void cancelOutgoing();
     struct Incoming {                           // a challenge received
         uint32_t id = 0;
@@ -254,8 +256,9 @@ public:
     bool nextGameEvent(net::Event& e);
     // The scene left the game (back to the menu): a direct match is closed.
     void leaveGame();
-    // --start-online: signs in (mock: any name) and looks for an opponent in 'category' as soon
-    // as the connection is up. With the fakes and a virtual clock the game is ready on return.
+    // --start-online: signs in (the saved session; with the fakes, any name) and looks for an
+    // opponent in 'category' as soon as the connection is up. With the fakes and a virtual clock
+    // the game is ready on return.
     void quickStart(const std::string& category, const std::string& username);
     // Fakes with a virtual clock (UI viewer, screenshots): runs them for 'ms' of virtual time, then
     // waits for a GIF file being written.
@@ -266,6 +269,7 @@ private:
     void handleDirect(const net::Event& e);
     void routeGame(const net::Event& e, LinkKind from);
     std::unique_ptr<GameLink> makeLink(LinkKind kind, uint64_t id);
+    void resetAccountState();
 
     bool mock_ = false, virtual_ = false, ready_ = false;
     std::unique_ptr<ServerApi> api_;
@@ -275,6 +279,7 @@ private:
 
     bool infoKnown_ = false;
     bool testing_ = false, testSwitched_ = false, testDone_ = false;
+    std::string testOrigin_;                    // of the server being tested
     net::Event testResult_;
     std::string infoError_;
     net::ServerInfo info_;
@@ -285,11 +290,15 @@ private:
     double gifShownAt_ = -1e9;                  // steady seconds of the last gifShown() of gif_'s owner
     std::string serverNameRt_;
     ServerAnswers answers_;                     // for expect(), busy(), take(); the server in use
+    net::ServerEndpoint applied_;               // the last applyServer()'s
 
     net::ConnState conn_ = net::ConnState::Offline;
     Queue queue_;
     Outgoing outgoing_;
+    std::vector<Outgoing> cancelledEarly_;      // cancelled before the server named them: cancelled then
+    bool joining_ = false;
     std::vector<Incoming> incoming_;
+    bool quietNotFound_ = false;                // the next ChallengeNotFound answers a reconnection's cancel
     double cooldownUntilMs_ = 0, bannedUntilMs_ = 0;
     std::string autoQueue_;                     // --start-online
     bool inGame_ = false;
@@ -305,23 +314,22 @@ private:
 
 OnlineSession& onlineSession();
 
-// Friendly texts (i18n) of the network layer's errors: an HTTPS error code ("invalid_credentials",
-// "rate_limited" with the retry delay, "banned" with its end, "network", "tls", "certificate",
-// "incompatible"...), a realtime net::proto ErrorCode, a direct match error ("refused",
-// "timeout", "wrong_code", "incompatible", "port_in_use"... see net::DirectMatch::lastError()).
-std::string onlineErrorText(const std::string& code, int retryAfterSec = 0, int64_t bannedUntilMs = 0);
+// The page the browser shows when Google sends it back to the game (net::LoopbackRedirect), in the
+// current language: made here, on the game thread, as the network threads never use i18n.
+net::SsoBrowserPage ssoBrowserPage();
 // The error of a GIF in words (GifSaver::error()): the account's quota used up with the wait in
 // minutes and seconds, the renderer busy, signed out, a game too long, a PGN the server cannot
 // read, a render that failed, a server without GIFs, the file not written; the other codes as
 // onlineErrorText().
 std::string gifErrorText(const std::string& code, int retryAfterSec = 0);
+// Friendly texts (i18n) of the network layer's errors (an HTTPS error code: onlineErrorText() in
+// online_account.h): a realtime net::proto ErrorCode (serverErrorText), a ServerError event
+// (eventErrorText), a direct match error ("refused", "timeout", "wrong_code", "incompatible",
+// "port_in_use"... see net::DirectMatch::lastError(); directErrorText).
 std::string serverErrorText(int code);
 // Text of a ServerError event: its ErrorCode, or its transport error ("offline": a command sent
 // while not connected, which the network layer drops).
 std::string eventErrorText(const net::Event& e);
 std::string directErrorText(const std::string& code);
-// "14:32" (local time of an epoch-ms instant) and "0:45" (a duration).
-std::string localTimeText(double epochMs);
-std::string durationText(double ms);
 
 }  // namespace game

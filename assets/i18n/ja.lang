@@ -1,7 +1,5 @@
 # Scacelith - 日本語
-# assets/i18n/en.lang の翻訳（同じキー、同じ {n}）。複数形なし（1形式）。
-
-language.name = 日本語
+# Translation of assets/i18n/en.lang (same keys, same {n}). No plural forms (a single form).
 
 # ---- Common words ------------------------------------------------------------------------------
 common.on = オン
@@ -61,6 +59,7 @@ options.depth_of_field = 被写界深度
 options.depth_of_field.help = カメラのレンズのように、見ているものよりずっと手前や奥にあるものをぼかします。
 options.brightness = 明るさ
 options.brightness.neutral = 標準
+options.brightness.value = {0} EV
 options.brightness.help = カメラの露出補正。初回起動時の調整で、最も暗い影がかろうじて見えるように設定されます。
 
 options.master_volume = 全体の音量
@@ -346,11 +345,6 @@ viewer.note = 両者ともStockfishです。対局中はホールを自由に飛
 viewer.summary = {0} 対 {1}
 viewer.custom = カスタム
 viewer.tc.custom = 自由設定
-viewer.tc.none = 時計なし
-viewer.tc.bullet = バレット
-viewer.tc.blitz = ブリッツ
-viewer.tc.rapid = ラピッド
-viewer.tc.classical = クラシカル
 viewer.base_time = 持ち時間
 viewer.increment = 加算
 viewer.delay = 遅延
@@ -540,10 +534,24 @@ online.forgot.lead = アカウントのメールアドレスを入力してく�
 online.forgot.button = リンクを送信
 online.forgot.sent = このアドレスを使うアカウントがあれば、リンクを送信しました。
 online.sso.title = Googleでログイン
-online.sso.wait = Webブラウザーで続けてください。開いたウィンドウでGoogleにログインします。このページは自動的に進みます。
+online.sso.wait = Webブラウザーで続けてください。開いたウィンドウでGoogleアカウントを選びます。Googleから戻ると、Scacelithが自動的に続きを行います。
 online.sso.name_title = 名前を選んでください
 online.sso.name_lead = Googleでここに来るのは初めてです。他のプレイヤーに表示される名前を選んでください。
 online.sso.continue = 続ける
+online.sso.finishing = Googleから戻りました。ログインを完了しています…
+online.sso.link_title = Googleログインを追加
+online.sso.link_lead = {1}のアカウント「{0}」は、このGoogleアカウントと同じメールアドレスを使っています。このアカウントにGoogleログインを追加するには、そのパスワードを入力してください。この操作は一度だけです。
+online.sso.link_button = Googleログインを追加
+online.sso.link_mfa = コードが受け付けられると、このアカウントにGoogleログインが追加されます。
+online.sso.not_mine = これは自分のアカウントではありません
+online.sso.not_mine_note = Googleログインは追加されませんでした。このメールアドレスがあなたのものなら、そのアドレスで「パスワードをお忘れですか？」を使ってください。リンクはそのメールボックスに届きます。さらに手元にない確認コードを求められる場合は、サーバーの運営者に連絡してください。
+online.sso.page.title = Scacelith：Googleログイン
+online.sso.page.done_heading = Scacelithに戻る
+online.sso.page.done = GoogleからScacelithに戻りました。ゲームに戻ってログインを完了してください。このタブは閉じてかまいません。
+online.sso.page.cancelled_heading = ログインはキャンセルされました
+online.sso.page.cancelled = Googleでのログインがキャンセルされました。このタブを閉じてScacelithに戻ってください。
+online.sso.page.foreign_heading = このページはあなた宛てではありません
+online.sso.page.foreign = このページは、このコンピューターでScacelithが待っているログインのものではありません。Scacelithで今Googleログインを始めていないなら、誰かがこのリンクを送ってきた可能性があります。このタブを閉じてください。
 
 # Account
 online.account.button = アカウント
@@ -566,6 +574,9 @@ online.account.sign_out_all = すべてログアウト
 online.account.sign_out_all.help = このコンピューターを含む、すべてのコンピューターでこのアカウントからログアウトします。
 online.account.signed_out = ログアウトしました。
 online.account.signed_out_all = すべてのコンピューターでログアウトしました。
+online.account.signing_out_all = すべてのコンピューターでログアウトしています…
+online.account.sign_out_all_failed = ほかのコンピューターはまだログインしたままの可能性があります。もう一度ログインし、「ログイン中のデバイス」からログアウトさせてください。{0}
+online.account.sign_out_all_retry = ほかのコンピューターはまだログインしたままの可能性があります。もう一度「すべてログアウト」をお試しください。{0}
 online.account.ratings = レーティング
 online.account.col.tc = 持ち時間
 online.account.col.rating = レーティング
@@ -652,6 +663,7 @@ online.challenge.you_random = 先後は抽選
 online.challenge.declined = {0}が申し込みを断りました。
 online.challenge.expired = 返事がないまま申し込みの期限が切れました。
 online.challenge.unavailable = {0}は現在対局できません。
+online.challenge.lost = 接続が切れたため、申し込みは取り消されました。
 
 # At the table
 online.pause.clock_runs = 対局は続いています。あなたの時計は動いたままです。
@@ -693,6 +705,7 @@ online.report.comment = コメント
 online.report.comment.hint = 任意
 online.report.send = 報告を送信
 online.report.sent = 報告を送信しました。ありがとうございます。
+online.report.queued = 報告は対局の終了後に送信されます。
 # Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
 online.sheet.note = オンライン、{0} {1}
 online.sheet.rated = レーティング戦
@@ -719,6 +732,7 @@ online.err.server_busy = サーバーが混み合っています。しばらく�
 online.err.banned_until = このアカウントは{0}まで利用停止中です。
 online.err.banned = このアカウントは利用停止中です。
 online.err.invalid_credentials = ユーザー名またはパスワードが違います。
+online.err.invalid_credentials_pending = ユーザー名またはパスワードが違います。アカウントを作成したばかりの場合は、先にお送りしたリンクを開いてください。
 online.err.email_unverified = メールアドレスがまだ確認されていません。お送りしたリンクを開いてください。
 online.err.network = サーバーに接続できません。インターネット接続とサーバーのアドレスを確認してください。
 online.err.tls = サーバーとの安全な接続を確立できませんでした。
@@ -734,6 +748,15 @@ online.err.invalid_code = コードが正しくありません。
 online.err.expired = このリクエストは期限切れです。最初からやり直してください。
 online.err.registration_closed = このサーバーは新しいアカウントを受け付けていません。
 online.err.sso_cancelled = Googleでのログインがキャンセルされました。
+online.err.sso_expired = Googleでのログインに時間がかかりすぎたか、すでに使われています。もう一度始めてください。
+online.err.sso_failed = Googleでログインできませんでした。もう一度お試しください。
+online.err.sso_listen = このコンピューターでGoogleからの応答を受け取れませんでした。もう一度お試しください。
+online.err.sso_origin = このサーバーアドレスではGoogleログインを使えません。運営者が示す公開名でサーバーを追加してから、もう一度お試しください。
+online.err.browser = Webブラウザーを開けませんでした。
+online.err.sso_email_unverified = このGoogleアカウントのメールアドレスはGoogleで確認されていません。
+online.err.sso_account_exists = このメールアドレスはすでに別のアカウントで使われており、Googleログインと連携できません。そのアカウントのパスワードでログインするか、「パスワードをお忘れですか？」を使ってください。
+online.err.sso_already_linked = このGoogleアカウントはすでに別のアカウントと連携しています。
+online.err.account_disabled = このアカウントはもう使えません。
 online.err.server_error = サーバーで問題が発生しました。もう一度お試しください。
 online.err.timeout = サーバーが時間内に応答しませんでした。
 online.err.offline = サーバーに接続されていません。接続してからもう一度お試しください。
@@ -753,13 +776,14 @@ online.err.flag_fell = 時間切れです。
 online.err.queue_not_allowed = 今は対戦相手を探せません。
 online.err.challenge_not_found = この申し込みはもう存在しません。
 online.err.user_unavailable = このプレイヤーは対局できません。
-online.err.challenge_limit = 同時に申し込める数を超えています。
+online.err.challenge_limit = 現在、申し込みが多すぎます。後でもう一度お試しください。
 online.err.challenge_self = 自分自身には申し込めません。
 online.err.code_invalid = このコードの対局はありません。
 online.err.rated_official_tc = レーティング戦にできるのは公式の持ち時間だけです。
 online.err.cooldown = 対戦相手の検索はしばらく停止されています。
 online.err.invalid_tc = この持ち時間は使用できません。
 online.err.rematch_unavailable = 再戦はもうできません。
+online.err.rated_repeat_limit = このプレイヤーとのレーティング戦は当面これ以上できません。カジュアル戦で対局するか、後でもう一度お試しください。
 online.err.cheat_detected = サーバーのフェアプレー検査により対局が停止されました。
 online.err.invalid_password = パスワードが違います。
 online.err.mfa_code_required = 認証アプリのコード（またはリカバリーコード）を入力してください。
@@ -769,6 +793,7 @@ online.err.too_many_attempts_for = 失敗した試行が多すぎます。{0}後
 online.err.same_email = すでにこのメールアドレスを使用しています。
 online.err.not_found = サーバー上に見つかりません。
 online.err.invalid_response = サーバーの応答を読み取れませんでした。
+online.err.storage = このコンピューターにセッションを保存できませんでした。
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = 対局履歴
@@ -1179,3 +1204,9 @@ gif.err.not_found = この対局はサーバー上にもうありません。
 gif.wait.seconds = {0}秒
 gif.wait.minutes = {0}分
 gif.wait.both = {0}{1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = OpenGL 4.6 を起動できませんでした。グラフィックドライバーを更新してください。
+error.renderer = レンダラーを起動できませんでした。
+error.scene = シーンを読み込めませんでした。
+error.log_file = 詳細はログファイルに記録されています：{0}

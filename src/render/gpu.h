@@ -21,13 +21,11 @@ int mipCount(int w, int h, int d = 1);
 Texture createTexture2D(int w, int h, GLenum internalFormat, int levels = 1);
 Texture createTexture2DArray(int w, int h, int layers, GLenum internalFormat, int levels = 1);
 Texture createTexture3D(int w, int h, int d, GLenum internalFormat, int levels = 1);
-Texture createCubemap(int size, GLenum internalFormat, int levels = 1);
 Texture createCubemapArray(int size, int cubes, GLenum internalFormat, int levels = 1);
 // Sampler state stored on the texture object itself.
 void setFilter(const Texture& t, GLenum minFilter, GLenum magFilter);
 void setWrap(const Texture& t, GLenum wrap);
 void setAnisotropy(const Texture& t, float amount);
-void setDepthCompare(const Texture& t, bool enable);  // for sampler*Shadow (GL_GREATER not implied)
 
 struct Framebuffer {
     GLuint id = 0;
@@ -71,7 +69,6 @@ inline bool sphereVisible(const m::vec4* planes, int n, m::vec3 c, float r) {
 // Opt-in pass profiler (SCACELITH_GPU_PROFILE=1): each scope is bracketed by glFinish and timed on
 // the CPU, which measures real execution time on any driver (including llvmpipe). Zero cost when
 // disabled. Results are logged by profileEndFrame() every 'every' frames.
-bool profilingEnabled();
 struct ProfileScope {
     explicit ProfileScope(const char* name);
     ~ProfileScope();

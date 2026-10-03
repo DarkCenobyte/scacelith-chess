@@ -32,9 +32,11 @@
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
+#include <cstring>
 #include <ctime>
 #include <exception>
 #include <future>
+#include <iterator>
 #include <unordered_map>
 
 namespace ui {
@@ -86,20 +88,25 @@ void fitOrElide(std::string& s, TextStyle& st, float maxWidth, float minScale = 
 }
 
 // ---- What the rows and the details say -----------------------------------------------------------
-std::string entryKey(const archive::Entry& e) { return e.path + "#" + num(e.index); }
+using archive::entryKey;
+using archive::hasKey;
 // The key of the entry's content: changes when its file changes.
 std::string contentKey(const archive::Entry& e) {
     return entryKey(e) + "@" + num(e.fileTimeMs) + "@" + num(static_cast<long long>(e.fileSize));
 }
 
-// Filter of the list: 0 every game, then one mode each.
+// Filter of the list: 0 every game, then one mode each (their labels in the same order).
 const archive::Mode kFilterModes[] = {archive::Mode::Play, archive::Mode::Coach, archive::Mode::HotSeat,
                                       archive::Mode::Direct, archive::Mode::Server, archive::Mode::Imported};
-constexpr int kFilterCount = 7;
+const char* const kFilterKeys[] = {"library.filter.all", "library.filter.play", "library.filter.coach", "library.filter.hotseat",
+                                   "library.filter.direct", "library.filter.server", "library.filter.imported"};
+constexpr int kFilterCount = 1 + int(std::size(kFilterModes));
+static_assert(std::size(kFilterKeys) == size_t(kFilterCount), "one label per filter");
 bool passes(int filter, archive::Mode m) { return filter <= 0 || filter >= kFilterCount || kFilterModes[filter - 1] == m; }
 std::vector<std::string> filterLabels() {
-    return {T("library.filter.all"), T("library.filter.play"), T("library.filter.coach"), T("library.filter.hotseat"),
-            T("library.filter.direct"), T("library.filter.server"), T("library.filter.imported")};
+    std::vector<std::string> labels;
+    for (const char* key : kFilterKeys) labels.push_back(T(key));
+    return labels;
 }
 
 std::string modeLabel(archive::Mode m) {
@@ -267,12 +274,67 @@ struct Listing {
     std::string folder;
     std::vector<archive::Entry> entries;
     archive::ListStats stats;
+    uint64_t gen = 0;                  // LibraryState::gen when it was asked for
+    uint64_t print = 0;                // listingPrint(): equal for the same games, files and errors
+    bool unchanged = false;            // the same print as the listing shown: 'entries' left empty
 };
-Listing listFolder(std::string folder, const std::atomic<bool>* cancel) {
+// A 64-bit hash of all a listing holds but its counts of files read and cached (8 bytes a step).
+uint64_t listingPrint(const Listing& l) {
+    uint64_t h = 0xcbf29ce484222325ull;
+    auto val = [&h](uint64_t v) {
+        h = (h ^ v) * 0x9e3779b97f4a7c15ull;
+        h ^= h >> 29;
+    };
+    auto str = [&val](const std::string& s) {
+        val(s.size());
+        for (size_t i = 0; i < s.size(); i += 8) {
+            uint64_t w = 0;
+            std::memcpy(&w, s.data() + i, std::min<size_t>(8, s.size() - i));
+            val(w);
+        }
+    };
+    str(l.folder);
+    val(uint64_t(l.stats.files));
+    val(l.stats.truncated);
+    str(l.stats.error);
+    val(l.entries.size());
+    for (const archive::Entry& e : l.entries) {
+        str(e.path);
+        str(e.file);
+        val(uint64_t(e.index));
+        val(uint64_t(e.games));
+        val(e.fileSize);
+        val(uint64_t(e.fileTimeMs));
+        val(e.offset);
+        val(e.length);
+        val(uint64_t(e.line));
+        val(uint64_t(e.column));
+        val(e.tags.size());
+        for (const chess::pgn::Tag& t : e.tags) {
+            str(t.name);
+            str(t.value);
+        }
+        val(uint64_t(e.plies));
+        str(e.result);
+        val(uint64_t(e.mode));
+        str(e.error);
+        val(e.fileError);
+    }
+    return h;
+}
+// 'shownPrint' is the print of the listing shown (0: none): when this one is the same, its entries
+// are freed here rather than in a frame (up to kMaxListed games every kRelistSeconds).
+Listing listFolder(std::string folder, const std::atomic<bool>* cancel, uint64_t gen, uint64_t shownPrint) {
     Listing l;
     l.folder = folder;
+    l.gen = gen;
     l.entries = archive::list(folder, &l.stats, cancel);
     if (l.stats.cancelled) return l;
+    l.print = listingPrint(l);
+    if (shownPrint != 0 && l.print == shownPrint) {
+        l.entries = std::vector<archive::Entry>();
+        l.unchanged = true;
+    }
     // The opening book and texts are built on first use (~40 ms): here rather than in a frame.
     coach::OpeningBook::instance();
     coach::OpeningTexts::instance();
@@ -306,6 +368,7 @@ struct LibraryState {
     std::atomic<bool> cancel{false};   // set by libraryShutdown()
     std::future<Listing> pending;
     double lastList = -1e9;            // im::time() of the last listing
+    uint64_t gen = 0;                  // games deleted: a listing asked for before may still hold one
     int filter = 0;
     std::string selected;              // entryKey of the selected game
     float scroll = 0.0f, target = 0.0f;
@@ -331,7 +394,7 @@ constexpr double kRelistSeconds = 2.0;
 void requestListing(LibraryState& s) {
     if (s.pending.valid()) return;
     s.cancel = false;
-    s.pending = std::async(std::launch::async, listFolder, s.folder, &s.cancel);
+    s.pending = std::async(std::launch::async, listFolder, s.folder, &s.cancel, s.gen, s.listed ? s.listing.print : 0);
 }
 // Takes the listing once it is ready (waiting up to waitMs for it).
 void pollListing(LibraryState& s, int waitMs) {
@@ -343,23 +406,31 @@ void pollListing(LibraryState& s, int waitMs) {
     } catch (const std::exception& ex) {  // out of memory on a huge folder: shown as a folder error
         l.folder = s.folder;
         l.stats.error = ex.what();
+        l.gen = s.gen;
+    }
+    // Asked for before a game was deleted, it may still list that game: listed again at once.
+    if (l.folder == s.folder && !l.stats.cancelled && l.gen != s.gen) {
+        requestListing(s);
+        return;
     }
     s.lastList = im::time();
     if (l.folder != s.folder || l.stats.cancelled) return;  // the folder changed meanwhile, or stopped
-    if (!s.listed || l.stats.read > 0 || l.entries.size() != s.listing.entries.size())
-        LOGI("library: %d games in %d files (%d read, %d cached)%s%s", int(l.entries.size()), l.stats.files, l.stats.read,
+    const size_t games = l.unchanged ? s.listing.entries.size() : l.entries.size();
+    if (!s.listed || l.stats.read > 0 || games != s.listing.entries.size())
+        LOGI("library: %d games in %d files (%d read, %d cached)%s%s", int(games), l.stats.files, l.stats.read,
              l.stats.cached, l.stats.error.empty() ? "" : ": ", l.stats.error.c_str());
     if (l.stats.truncated && !s.truncatedShown) {
         notify(i18n::trf("library.truncated", {num(archive::kMaxListed)}), 6.0f);
         s.truncatedShown = true;
     }
-    s.listing = std::move(l);
+    if (l.unchanged) s.listing.stats = l.stats;  // the games shown are kept
+    else s.listing = std::move(l);
     s.listed = true;
 }
 
 const archive::Entry* findEntry(const LibraryState& s, const std::string& key) {
     for (const archive::Entry& e : s.listing.entries)
-        if (entryKey(e) == key) return &e;
+        if (hasKey(e, key)) return &e;
     return nullptr;
 }
 
@@ -615,27 +686,8 @@ float detailsBody(const archive::Entry& e, Details& d, const Rect& area, const R
     return y - y0 + 10.0f;
 }
 
-// Scroll of a clipped area by the wheel over it.
-float wheelScroll(float& scroll, float& target, const Rect& area, float contentH, float step, bool opened) {
-    float maxScroll = std::max(0.0f, contentH - area.h);
-    if (area.contains(im::mouse()) && im::wheel() != 0.0f) target -= im::wheel() * step;
-    target = m::clamp(target, 0.0f, maxScroll);
-    scroll = opened ? target : std::min(im::approach(scroll, target, 16.0f), maxScroll);
-    return scroll;
-}
-// Scroll bar on the end side and fades at the edges (panel colour), as the credits.
-void scrollDecor(const Rect& area, float scroll, float contentH) {
-    float maxScroll = contentH - area.h;
-    if (maxScroll <= 0.5f) return;
-    float bh = std::max(24.0f, area.h * area.h / contentH);
-    Rect bar = im::flip(area, Rect(area.r() + 10.0f, area.y + (area.h - bh) * (scroll / maxScroll), 2.0f, bh));
-    gfx::fill(bar, withAlpha(gold, 0.35f), 1.0f);
-    vec4 pc(0.05f, 0.043f, 0.039f, 0.95f), pz(0.05f, 0.043f, 0.039f, 0.0f);
-    if (scroll > 0.5f) gfx::fillV(Rect(area.x, area.y, area.w, 22.0f), pc, pz);
-    if (scroll < maxScroll - 0.5f) gfx::fillV(Rect(area.x, area.b() - 22.0f, area.w, 22.0f), pz, pc);
-}
-
-// A centred message in an area: an italic heading and a wrapped text under it.
+// A centred message in an area: a heading in the title face (upper-cased) and an italic wrapped text
+// under it.
 void message(const Rect& area, const std::string& head, const std::string& text, vec4 headColor) {
     TextStyle hs = style(font::FACE_TITLE, 24.0f, headColor, HAlign::Center, 0.14f);
     TextStyle ts = style(font::FACE_ITALIC, 23.0f, ivoryDim, HAlign::Center);
@@ -652,14 +704,24 @@ void message(const Rect& area, const std::string& head, const std::string& text,
 
 // ---- Save as GIF -----------------------------------------------------------------------------------------
 // The online server draws the GIF of the selected game from its PGN text (POST /gif): the record
-// written again by the archive's writer without its comments, NAGs and clocks (the picture does not
-// use them, and the text stays far under the server's 64 KiB), seen from the side of the player
+// written again by the archive's writer with only the tags the server reads and without its
+// comments, NAGs and clocks (the picture uses none of the rest, and an imported game's other tags
+// could take the text past the server's 64 KiB or 128 tags), seen from the side of the player
 // (the signed-in account or this computer's player named as Black: Black at the bottom), saved to
 // <app data>/gif/ under the name of its date, players and server game number (never over a file).
 std::string gifOwner(const archive::Entry& e) { return "library:" + contentKey(e); }
 
 std::string gifPgn(const chess::pgn::Record& record) {
     chess::pgn::Record r = record;
+    // The server's names, ratings and ending, and the reader's Chess960 start (the writer gives
+    // Result, SetUp and FEN from the record itself).
+    static const char* const kGifTags[] = {"White", "Black", "WhiteElo", "BlackElo", "Termination", "Variant"};
+    r.tags.erase(std::remove_if(r.tags.begin(), r.tags.end(),
+                                [](const chess::pgn::Tag& t) {
+                                    return std::none_of(std::begin(kGifTags), std::end(kGifTags),
+                                                        [&t](const char* name) { return t.name == name; });
+                                }),
+                 r.tags.end());
     r.comment.clear();
     for (chess::pgn::Ply& ply : r.plies) {
         ply.comment.clear();
@@ -688,19 +750,6 @@ std::string gifFileOf(const archive::Entry& e, const chess::pgn::Record& r) {
         game::pgnGameStart(r.tag("Date"), r.tag("Time"), r.tag("UTCDate"), r.tag("UTCTime"), std::time_t(e.fileTimeMs / 1000));
     const uint64_t id = std::strtoull(r.tag("ScacelithGameId").c_str(), nullptr, 10);
     return game::gifFileName(when, r.tag("White"), r.tag("Black"), id);
-}
-
-// The end of a path that fits maxWidth: the file's name matters more than the folder's.
-std::string elideStart(const std::string& s, const TextStyle& st, float maxWidth) {
-    if (gfx::textWidth(s, st) <= maxWidth) return s;
-    std::u32string cps = uni::decode(s);
-    size_t lo = 0, hi = cps.size();
-    while (lo < hi) {  // the fewest characters cut from the start
-        size_t mid = (lo + hi) / 2;
-        if (gfx::textWidth(kEllipsis + uni::encode(cps.substr(mid)), st) <= maxWidth) hi = mid;
-        else lo = mid + 1;
-    }
-    return kEllipsis + uni::encode(cps.substr(lo));
 }
 
 // The GIF's line in place of the folder's, centred at y: being made (spinner), saved (its path and
@@ -732,7 +781,7 @@ void gifLine(const game::GifSaver& gif, const Rect& p, float maxW, float y) {
     TextStyle ps = style(font::FACE_ITALIC, 20.0f, goldBright, im::startAlign());
     ps.dir = 0;
     const float leadW = gfx::textWidth(lead, ts);
-    const std::string path = elideStart(gif.path(), ps, std::max(80.0f, maxW - linkW - gap - leadW));
+    const std::string path = detail::onl::elideStart(gif.path(), ps, std::max(80.0f, maxW - linkW - gap - leadW));
     const float pathW = gfx::textWidth(path, ps), total = leadW + pathW + gap + linkW;
     // The note then its path in the reading direction, Open folder at the end.
     const float x0 = p.cx() - total * 0.5f;
@@ -794,7 +843,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
         if (passes(s.filter, all[size_t(i)].mode)) shown.push_back(i);
     int sel = -1;
     for (int i = 0; i < int(shown.size()); ++i)
-        if (entryKey(all[size_t(shown[size_t(i)])]) == s.selected) sel = i;
+        if (hasKey(all[size_t(shown[size_t(i)])], s.selected)) sel = i;
     if (sel < 0 && !shown.empty()) {
         sel = 0;
         s.selected = entryKey(all[size_t(shown[0])]);
@@ -893,7 +942,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
                 }
             }
             const float contentH = float(n) * rowH;
-            wheelScroll(s.scroll, s.target, area, contentH, rowH * 1.5f, opened);
+            detail::onl::wheelScroll(s.scroll, s.target, area, contentH, rowH * 1.5f, opened);
             // Rows on screen, and one more on each side so that the arrows can reach them.
             int first = std::max(0, int(std::floor(s.scroll / rowH)) - 1);
             int last = std::min(n - 1, int(std::ceil((s.scroll + area.h) / rowH)));
@@ -941,10 +990,10 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
             for (int i : {sel - 1, sel, sel + 1})
                 if (sel >= 0 && i >= 0 && i < n && (i < first || i > last)) row(i);
             gfx::popClip();
-            scrollDecor(area, s.scroll, contentH);
+            detail::onl::scrollDecor(area, s.scroll, contentH);
             if (!newSel.empty()) {
                 for (int i = 0; i < n; ++i)
-                    if (entryKey(all[size_t(shown[size_t(i)])]) == newSel) select(i, false);
+                    if (hasKey(all[size_t(shown[size_t(i)])], newSel)) select(i, false);
                 im::sound(clickedRow ? Sound::Toggle : Sound::Tick);
             }
             if (sel >= 0) defaultFocus = im::makeId(s.selected);
@@ -967,12 +1016,12 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
                     measuredKey = s.details.key;
                     measured = 0.0f;
                 }
-                float scroll = wheelScroll(s.dScroll, s.dTarget, body, measured, 31.0f * 3.0f, false);
+                float scroll = detail::onl::wheelScroll(s.dScroll, s.dTarget, body, measured, 31.0f * 3.0f, false);
                 gfx::pushClip(body);
                 contentH = detailsBody(*cur, s.details, body, dcol, scroll);
                 gfx::popClip();
                 measured = contentH;
-                scrollDecor(body, scroll, contentH);
+                detail::onl::scrollDecor(body, scroll, contentH);
             }
         } else if (!cur) {
             TextStyle es = style(font::FACE_ITALIC, 22.0f, muted, im::startAlign());
@@ -1067,6 +1116,7 @@ MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back) {
             archive::RemoveResult rr = archive::remove(*e);
             if (rr.ok()) {
                 LOGI("library: deleted %s", e->path.c_str());
+                ++s.gen;
                 const std::string path = e->path;
                 // Off the list at once (the next listing agrees); the next game is selected.
                 int at = -1;

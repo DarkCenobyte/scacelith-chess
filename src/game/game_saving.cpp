@@ -1,6 +1,7 @@
 // What the game scene saves (see game_saving.h).
 #include "game_saving.h"
 #include "../core/log.h"
+#include "../net/protocol_gen.h"
 
 namespace game {
 namespace saving {
@@ -10,6 +11,12 @@ namespace {
 // Protocol values (dedicated-server/src/protocol/schema.js), as game_scene_online.cpp names them.
 enum Status { StOngoing = 0, StWhiteWins = 1, StBlackWins = 2, StDraw = 3, StAborted = 4 };
 constexpr int kReasonServerAborted = 25;
+// The names above are the generated ones (net/protocol_gen.h): a schema change fails here.
+static_assert(StOngoing == int(net::proto::GameStatus::Ongoing) && StWhiteWins == int(net::proto::GameStatus::WhiteWins) &&
+                  StBlackWins == int(net::proto::GameStatus::BlackWins) && StDraw == int(net::proto::GameStatus::Draw) &&
+                  StAborted == int(net::proto::GameStatus::Aborted),
+              "GameStatus");
+static_assert(kReasonServerAborted == int(net::proto::EndReason::ServerAborted), "EndReason");
 
 }  // namespace
 
@@ -53,8 +60,9 @@ bool directMatchRecord(const net::OnlineGame& og, DirectRecord& out) {
     if (og.you < 0 || og.you > 1) return false;
     // An abort by the authority (before the first moves) is not a game. The guest that lost the
     // host for good ends the game itself as ServerAborted (direct_match.cpp, endLocally) at any
-    // point: kept unfinished ("*") once both players have moved, the point before which the
-    // authority aborts a game that loses a player (NoShow).
+    // point, and the authority ends a game that reaches 1200 plies as ServerAborted too
+    // (direct_authority.cpp, kMaxPlies): kept unfinished ("*") once both players have moved, the
+    // point before which the authority aborts a game that loses a player (NoShow).
     if (og.status == StAborted && (og.reason != kReasonServerAborted || og.moves.size() < 2)) return false;
     out.game.reset();
     for (const net::OnlineGame::MoveRec& m : og.moves) {
@@ -77,7 +85,9 @@ bool directMatchRecord(const net::OnlineGame& og, DirectRecord& out) {
     info.timeControl = tc.pgnTag();
     if (og.status == StOngoing) {
         // Left before the authority answered: aborted before the player's first move, otherwise
-        // resigned.
+        // resigned. A first move sent but not confirmed yet is not in og.moves: the scene resigns
+        // then (GameScene::myFirstMoveMade), but nothing is saved rather than a record without
+        // the move the authority may have applied before the resignation.
         const bool firstMoveMade = int(og.moves.size()) > og.you;
         if (!firstMoveMade) return false;
         info.result = og.you == 0 ? "0-1" : "1-0";

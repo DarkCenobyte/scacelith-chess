@@ -7,7 +7,6 @@
 #include "ui.h"
 #include "ui_draw.h"
 #include "ui_internal.h"
-#include "ui_online.h"
 #include "ui_screens_game.h"
 #include "ui_screens_online.h"
 #include "ui_theme.h"
@@ -15,6 +14,8 @@
 #include "../chess/chess.h"
 #include "../core/embedded.h"
 #include "../game/online_session.h"
+#include "../game/scorekeeper.h"
+#include "../game/scoresheet_layout.h"
 #include "../game/settings.h"
 #include "../i18n/i18n.h"
 #include "../i18n/unicode.h"
@@ -59,7 +60,6 @@ struct State {
     int forcedPage = -1;
     float pageT = 0.0f;
     bool pageFresh = false;
-    uint64_t menuFrame = 0;
     float presetScroll = 0.0f, presetScrollTarget = 0.0f;
     float creditsScroll = 0.0f, creditsScrollTarget = 0.0f;
     bool resumeOnline = false;      // an online game started from the online page: back to it after
@@ -136,7 +136,7 @@ std::string percent(float x) { return i18n::trf("number.percent", {decimal(x * 1
 // Brightness (exposure compensation) as Options > Graphics and the calibration show it.
 std::string brightnessText(float ev) {
     if (std::fabs(ev) < 0.05f) return T("options.brightness.neutral");
-    return std::string(ev > 0.0f ? "+" : "\xE2\x88\x92") + decimal(std::fabs(ev), 1) + " EV";
+    return i18n::trf("options.brightness.value", {std::string(ev > 0.0f ? "+" : "\xE2\x88\x92") + decimal(std::fabs(ev), 1)});
 }
 
 // Whole screen, for mirroring page layouts in a right-to-left language.
@@ -180,40 +180,17 @@ void glyphCentered(uint32_t cp, vec2 c, float size, const TextStyle& base) {
 }
 
 // ---- Value tables -----------------------------------------------------------------------------------
-const std::vector<int>& baseTimeValues() {
-    static std::vector<int> v = [] {
-        std::vector<int> r;
-        for (int s = 15; s < 180; s += 15) r.push_back(s);
-        for (int s = 180; s < 600; s += 30) r.push_back(s);
-        for (int s = 600; s < 3600; s += 60) r.push_back(s);
-        for (int s = 3600; s <= 10800; s += 300) r.push_back(s);
-        return r;
-    }();
-    return v;
-}
-const std::vector<int>& moveTimeValues() {
-    static const std::vector<int> v = {0, 100, 200, 300, 500, 750, 1000, 1500, 2000, 3000, 5000, 7500, 10000, 15000, 20000, 30000};
-    return v;
-}
-const std::vector<int>& nodeValues() {
-    static const std::vector<int> v = {0, 1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 500000,
-                                       1000000, 2000000, 5000000, 10000000, 20000000, 50000000};
-    return v;
-}
-int nearestIndex(const std::vector<int>& v, int value) {
-    int best = 0;
-    for (int i = 0; i < int(v.size()); ++i)
-        if (std::abs(v[size_t(i)] - value) < std::abs(v[size_t(best)] - value)) best = i;
-    return best;
-}
-std::string clockText(int seconds) {
-    char buf[32];
-    std::snprintf(buf, sizeof(buf), "%d:%02d", seconds / 60, seconds % 60);
-    return buf;
-}
+using detail::baseTimeValues;
+using detail::clockText;
+using detail::moveTimeValues;
+using detail::nearestIndex;
+using detail::nearestValue;
+using detail::nodeValues;
+using detail::spacedPlus;
 std::string moveTimeText(int ms) {
     if (ms <= 0) return T("engine.no_limit");
-    return i18n::trf("tc.seconds", {decimal(ms / 1000.0, ms % 1000 ? 1 : 0)});
+    const int digits = ms % 1000 == 0 ? 0 : ms % 100 == 0 ? 1 : 2;   // 750 ms: "0.75 s", not "0.8 s"
+    return i18n::trf("tc.seconds", {decimal(ms / 1000.0, digits)});
 }
 std::string nodesText(int n) {
     if (n <= 0) return T("engine.no_limit");
@@ -225,11 +202,7 @@ std::string nodesText(int n) {
 std::string timeCategory(const std::string& label) {
     int base = 0, inc = 0;
     if (std::sscanf(label.c_str(), "%d+%d", &base, &inc) != 2) return T("tc.no_clock");
-    int est = base * 60 + 40 * inc;
-    if (est < 180) return T("tc.bullet");
-    if (est < 480) return T("tc.blitz");
-    if (est < 1500) return T("tc.rapid");
-    return T("tc.classical");
+    return T(detail::tcCategoryKey(int64_t(base) * 60, inc));
 }
 std::string customClockSummary(const NewGameSetup& s) {
     int b = s.customBaseSeconds;
@@ -237,11 +210,6 @@ std::string customClockSummary(const NewGameSetup& s) {
     if (s.customIncrementSeconds > 0) r = i18n::trf("tc.summary_increment", {r, std::to_string(s.customIncrementSeconds)});
     if (s.customDelaySeconds > 0) r = i18n::trf("tc.summary_delay", {r, std::to_string(s.customDelaySeconds)});
     return r;
-}
-std::string spacedPlus(const std::string& label) {
-    size_t p = label.find('+');
-    if (p == std::string::npos) return label;
-    return label.substr(0, p) + "\xE2\x80\x89+\xE2\x80\x89" + label.substr(p + 1);
 }
 
 // ---- Settings helpers -------------------------------------------------------------------------------
@@ -322,15 +290,17 @@ void loadSetupFromSettings(NewGameSetup& s) {
     int tcn = int(detail::data().timeControls.size());
     s.difficulty = std::clamp(g.difficultyPreset, 0, std::max(0, n - 1));
     s.timeControl = g.timeControlPreset < 0 || g.timeControlPreset >= tcn ? -1 : g.timeControlPreset;
-    s.customBaseSeconds = std::clamp(g.customBaseSeconds, 15, 10800);
+    // The base time, the move time and the nodes as their steppers show them: a hand-edited .ini may
+    // hold others (it is rewritten only when a game starts from the page).
+    s.customBaseSeconds = nearestValue(baseTimeValues(), g.customBaseSeconds);
     s.customIncrementSeconds = std::clamp(g.customIncrementSeconds, 0, 60);
     s.customDelaySeconds = std::clamp(g.customDelaySeconds, 0, 60);
     s.skillLevel = std::clamp(g.customSkillLevel, 0, 20);
     s.limitElo = g.customLimitElo;
     s.elo = std::clamp(g.customElo, 1320, 3190);
     s.depth = std::clamp(g.customDepth, 0, 30);
-    s.moveTimeMs = std::max(0, g.customMoveTimeMs);
-    s.nodes = std::max(0, g.customNodes);
+    s.moveTimeMs = nearestValue(moveTimeValues(), g.customMoveTimeMs);
+    s.nodes = nearestValue(nodeValues(), g.customNodes);
     // Hot-seat: the names and hands of the last two-player game, else Options > Player for White
     // and "Player 2" in another hand for Black.
     s.opponent = std::clamp(g.opponent, 0, 1);
@@ -405,13 +375,22 @@ void handwritingPreview(const std::string& name, int hand, const Rect& area) {
     float left = im::rtl() ? paper.x + 24.0f : paper.x + margin + 20.0f;
     float right = im::rtl() ? paper.r() - margin - 20.0f : paper.r() - 24.0f;
     gfx::text(name, nameRtl ? right : left, paper.y + lineGap - 20.0f, ns);
-    // A line of moves as they will be written (figurine-free algebraic notation).
+    // A line of moves as they will be written (figurine-free algebraic notation, with the piece
+    // letters of the language as on the scoresheets).
+    static std::string moves;
+    static int movesGen = -1;
+    if (movesGen != i18n::generation()) {
+        const game::sheet::PieceLetters letters = game::localizedPieceLetters();
+        auto san = [&letters](const char* s) { return game::sheet::localizeSan(s, letters); };
+        moves = "1. " + san("e4") + "  " + san("e5") + "   2. " + san("Nf3") + "  " + san("Nc6") + "   3. " + san("Bb5") + "  " + san("a6");
+        movesGen = i18n::generation();
+    }
     TextStyle ms = ns;
     ms.size = 38.0f;
     ms.align = HAlign::Left;
     ms.dir = 0;
     ms.color = vec4(0.10f, 0.13f, 0.30f, 0.85f);
-    gfx::text("1. e4  e5   2. Nf3  Nc6   3. Bb5  a6", left, paper.y + 2.0f * lineGap - 20.0f, ms);
+    gfx::text(moves, left, paper.y + 2.0f * lineGap - 20.0f, ms);
 }
 
 // ---- Options page -----------------------------------------------------------------------------------
@@ -666,7 +645,7 @@ bool optionsPage(MenuAction& act) {
 }
 
 // ---- Title page -----------------------------------------------------------------------------------
-// library: the "Saved games" entry (mainMenu() with a LibrarySetup).
+// library: the "Saved games" entry (a LibrarySetup::folder was given).
 MenuAction titlePage(float t, bool library) {
     vec2 v = view();
     MenuAction act = MenuAction::None;
@@ -1510,6 +1489,24 @@ void openOptionsOnTab(int tab) {
 void openOptionsPage() { openOptions(); }
 void dimBackground(float a) { dimScene(a); }
 
+std::string clockText(int seconds) {
+    char buf[32];
+    std::snprintf(buf, sizeof(buf), "%d:%02d", seconds / 60, seconds % 60);
+    return buf;
+}
+std::string spacedPlus(const std::string& label) {
+    size_t p = label.find('+');
+    if (p == std::string::npos) return label;
+    return label.substr(0, p) + "\xE2\x80\x89+\xE2\x80\x89" + label.substr(p + 1);
+}
+const char* tcCategoryKey(int64_t baseSec, int64_t incSec) {
+    const int64_t est = baseSec + 40 * incSec;
+    if (est < 180) return "tc.bullet";
+    if (est < 480) return "tc.blitz";
+    if (est < 1500) return "tc.rapid";
+    return "tc.classical";
+}
+
 void screensBeginFrame(float dt) {
     for (auto& t : S.toasts) t.age += dt;
     S.toasts.erase(std::remove_if(S.toasts.begin(), S.toasts.end(), [](const Toast& t) { return t.age > t.duration + 0.6f; }),
@@ -1517,7 +1514,6 @@ void screensBeginFrame(float dt) {
     S.optionsVisiblePrev = S.optionsVisible;
     S.optionsVisible = false;
 }
-void screensEndFrame() {}
 }  // namespace detail
 
 namespace debug {
@@ -1538,22 +1534,6 @@ void openBrightnessCalibration() { S.forcedPage = int(Page::Calibration); }
 void openSavedGames() {
     S.forcedPage = int(S.replayFromOnline ? Page::Online : Page::Library);
     S.replayFromOnline = false;
-}
-
-MenuAction mainMenu(NewGameSetup& setup) {
-    static WatchSetup watch;
-    return mainMenu(setup, watch);
-}
-
-MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch) {
-    static CoachSetup coach;
-    return mainMenu(setup, watch, coach);
-}
-
-MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach) {
-    static LibrarySetup none;  // no folder: no "Saved games" entry
-    none.folder.clear();
-    return mainMenu(setup, watch, coach, none);
 }
 
 MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, LibrarySetup& library) {
@@ -1631,7 +1611,7 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, L
 
 MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw) { return pauseMenu(canClaimDraw, canOfferDraw, std::string()); }
 
-MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& resignQuestion) {
+MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& resignQuestion, bool canResign) {
     im::Id id = im::makeId("##pause");
     im::Anim& a = im::anim(id);
     bool appear = a.firstFrame == im::frame();
@@ -1649,8 +1629,7 @@ MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& re
         return act;
     }
     a.v[5] = appear ? 0.0f : std::min(1.0f, a.v[5] + im::dt() / 0.3f);
-    float t = ease(appear ? 0.0f : a.v[5]);
-    if (appear) t = 0.0f;
+    float t = ease(a.v[5]);
     vec2 v = view();
     dimScene(std::max(t, 0.001f));
     float w = 560.0f, h = 640.0f;
@@ -1667,7 +1646,7 @@ MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& re
     if (im::menuEntry(L("pause.offer_draw"), er.offset(0, step), canOfferDraw, HAlign::Center)) act = MenuAction::OfferDraw;
     if (im::menuEntry(L("pause.claim_draw"), er.offset(0, 2 * step), canClaimDraw, HAlign::Center)) act = MenuAction::ClaimDraw;
     im::tooltip(T("pause.claim_draw.help"));
-    if (im::menuEntry(L("pause.resign"), er.offset(0, 3 * step), true, HAlign::Center)) S.pauseConfirm = 1;
+    if (im::menuEntry(L("pause.resign"), er.offset(0, 3 * step), canResign, HAlign::Center)) S.pauseConfirm = 1;
     if (im::menuEntry(L("menu.options"), er.offset(0, 4 * step), true, HAlign::Center)) {
         S.pauseOptions = true;
         openOptions();
@@ -1802,7 +1781,17 @@ void drawNotifications() {
         float out = m::saturate((t.duration + 0.6f - t.age) / 0.6f);
         float a = ease(in) * ease(out);
         if (a <= 0.001f) continue;
-        float tw = gfx::textWidth(t.text, ts);
+        // The band (the text and 130 px each side) stays 20 px inside the view: a longer text is
+        // shrunk (to 80 % at most), then cut.
+        TextStyle st = ts;
+        std::string text = t.text;
+        float tw = gfx::textWidth(text, st);
+        const float maxTw = v.x - 300.0f;
+        if (tw > maxTw) {
+            st.size = gfx::fitSize(text, st, maxTw, 0.8f);
+            text = im::elideToFit(text, st, maxTw);
+            tw = gfx::textWidth(text, st);
+        }
         float bw = tw + 260.0f, bh = 58.0f;
         float yy = y - (1.0f - ease(in)) * 8.0f;
         Rect band(v.x * 0.5f - bw * 0.5f, yy, bw, bh);
@@ -1813,8 +1802,8 @@ void drawNotifications() {
         gfx::fillH(Rect(band.r() - band.w * edge, band.y, band.w * edge, bh), d, z);
         gfx::hlineFade(band.x + 40.0f, band.r() - 40.0f, band.y, withAlpha(gold, 0.6f * a), 0.45f);
         gfx::hlineFade(band.x + 40.0f, band.r() - 40.0f, band.b() - 1.0f, withAlpha(gold, 0.6f * a), 0.45f);
-        ts.color = withAlpha(ivory, a);
-        gfx::text(t.text, band.cx(), band.cy() + 8.0f, ts);
+        st.color = withAlpha(ivory, a);
+        gfx::text(text, band.cx(), band.cy() + 8.0f, st);
         y += bh + 12.0f;
     }
     gfx::setLayer(prev);
@@ -2001,7 +1990,6 @@ void loadingScreen(float progress, const std::string& label) {
     if (S.loadFrame + 1 < f) S.loadShown = 0.0f;
     S.loadFrame = f;
     progress = m::saturate(progress);
-    S.loadShown = std::max(S.loadShown, 0.0f);
     S.loadShown = progress < S.loadShown ? progress : im::approach(S.loadShown, progress, 8.0f);
     im::captureMouseAll();
     im::captureKeyboard();

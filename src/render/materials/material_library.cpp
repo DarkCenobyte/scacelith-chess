@@ -4,7 +4,6 @@
 // top of that file; the per-object conventions are summarised in material_library.h.
 #include "material_library.h"
 #include "material_bake.h"
-#include "../../core/log.h"
 
 using namespace m;
 
@@ -31,7 +30,8 @@ vec3 srgb(float r, float g, float b) {
 }
 
 // Placeholder standard.glsl setup (kept for ids owned by other packages and Default).
-void std(MaterialId id, vec3 albedo, float rough, float metal = 0, float clearcoat = 0, float ccRough = 0.05f, float sss = 0) {
+void placeholderStandard(MaterialId id, vec3 albedo, float rough, float metal = 0, float clearcoat = 0, float ccRough = 0.05f,
+                         float sss = 0) {
     Material& m = g_mats[int(id)];
     m.name = g_names[int(id)];
     m.surface = "shaders/materials/standard.glsl";
@@ -204,7 +204,6 @@ void defineFabrics() {
         m.params[4] = vec4(0.34f, 0.26f, 800.0f, 500.0f);
         m.params[5] = vec4(2.4f, 3.6f, 0.7f, 0.0015f);
         m.textures[0] = g_tex.tapestry.id;
-        m.textureTargets[0] = GL_TEXTURE_2D_ARRAY;
     }
     {
         Material& m = def(MaterialId::ChairVelvet, "shaders/materials/cloth.glsl", {"CLOTH_VELVET"});
@@ -337,7 +336,6 @@ void defineScoresheet() {
         m.params[3] = vec4(1.0f, 1.0f, 4.0f, 1.0f);
         m.params[4] = vec4(1.0f, 1.0f, 148.0f, 210.0f);
         m.textures[0] = g_blankPage;
-        m.textureTargets[0] = GL_TEXTURE_2D_ARRAY;
         m.textures[1] = g_blankEntry;
     }
     {
@@ -367,7 +365,7 @@ void defineScoresheet() {
 
 bool init() {
     if (g_initialized) return true;
-    for (int i = 0; i < int(MaterialId::Count); ++i) std(MaterialId(i), vec3(0.5f), 0.5f);
+    for (int i = 0; i < int(MaterialId::Count); ++i) placeholderStandard(MaterialId(i), vec3(0.5f), 0.5f);
     g_tex = bakeAll();
 
     defineMarbles();
@@ -378,26 +376,19 @@ bool init() {
     defineScoresheet();
 
     // Owned by other packages: placeholders kept as before.
-    std(MaterialId::ClockDisplay, vec3(0.45f, 0.48f, 0.40f), 0.2f, 0, 1, 0.02f);
-    std(MaterialId::RobotPorcelain, vec3(0.92f, 0.91f, 0.89f), 0.3f, 0, 1, 0.05f, 0.4f);
-    std(MaterialId::RobotJoint, vec3(0.03f), 0.45f, 0.6f);
-    std(MaterialId::RobotEyeSclera, vec3(0.85f, 0.82f, 0.80f), 0.1f, 0, 1, 0.02f, 0.5f);
-    std(MaterialId::RobotEyeIris, vec3(0.20f, 0.30f, 0.35f), 0.3f, 0, 1, 0.02f);
-    std(MaterialId::RobotEyeCornea, vec3(1.0f), 0.02f);
+    placeholderStandard(MaterialId::ClockDisplay, vec3(0.45f, 0.48f, 0.40f), 0.2f, 0, 1, 0.02f);
+    placeholderStandard(MaterialId::RobotPorcelain, vec3(0.92f, 0.91f, 0.89f), 0.3f, 0, 1, 0.05f, 0.4f);
+    placeholderStandard(MaterialId::RobotJoint, vec3(0.03f), 0.45f, 0.6f);
+    placeholderStandard(MaterialId::RobotEyeSclera, vec3(0.85f, 0.82f, 0.80f), 0.1f, 0, 1, 0.02f, 0.5f);
+    placeholderStandard(MaterialId::RobotEyeIris, vec3(0.20f, 0.30f, 0.35f), 0.3f, 0, 1, 0.02f);
+    placeholderStandard(MaterialId::RobotEyeCornea, vec3(1.0f), 0.02f);
     g_mats[int(MaterialId::RobotEyeCornea)].transparent = true;
-    std(MaterialId::RobotLid, vec3(0.92f, 0.91f, 0.89f), 0.3f, 0, 1, 0.05f, 0.4f);
-    std(MaterialId::Default, vec3(0.5f), 0.5f);
+    placeholderStandard(MaterialId::RobotLid, vec3(0.92f, 0.91f, 0.89f), 0.3f, 0, 1, 0.05f, 0.4f);
+    placeholderStandard(MaterialId::Default, vec3(0.5f), 0.5f);
     g_initialized = true;
     return true;
 }
 
-void shutdown() {
-    destroy(g_tex);
-    if (g_blankPage) glDeleteTextures(1, &g_blankPage);
-    if (g_blankEntry) glDeleteTextures(1, &g_blankEntry);
-    g_blankPage = g_blankEntry = 0;
-    g_initialized = false;
-}
 const Material& get(MaterialId id) { return g_mats[int(id)]; }
 Material& getMutable(MaterialId id) { return g_mats[int(id)]; }
 const char* name(MaterialId id) { return g_names[int(id)]; }

@@ -1,6 +1,5 @@
 #include "tar.h"
 #include <algorithm>
-#include <cstdlib>
 #include <cstring>
 
 namespace tar {
@@ -9,6 +8,7 @@ namespace {
 
 constexpr size_t kBlock = 512;
 constexpr uint64_t kMaxText = 1 << 20;   // long names and pax headers: far below this
+constexpr uint64_t kMaxPaxSize = uint64_t(1) << 62;   // so that left_ + padding_ cannot wrap
 
 // An octal number field (spaces or NULs around it), or GNU base-256 when its top bit is set.
 bool number(const uint8_t* f, size_t len, uint64_t& out) {
@@ -37,6 +37,20 @@ std::string field(const uint8_t* f, size_t len) {
     size_t n = 0;
     while (n < len && f[n]) ++n;
     return std::string(reinterpret_cast<const char*>(f), n);
+}
+
+// A pax decimal in s[from, to): digits only (strtoull would also take spaces and a sign), at
+// most max. False when empty, malformed or too large.
+bool decimal(const std::string& s, size_t from, size_t to, uint64_t max, uint64_t& out) {
+    out = 0;
+    if (from >= to) return false;
+    for (size_t i = from; i < to; ++i) {
+        if (s[i] < '0' || s[i] > '9') return false;
+        uint64_t d = uint64_t(s[i] - '0');
+        if (out > (max - d) / 10) return false;
+        out = out * 10 + d;
+    }
+    return true;
 }
 
 }  // namespace
@@ -158,8 +172,9 @@ bool Reader::next(Entry& e) {
             while (pos < text.size()) {
                 size_t sp = text.find(' ', pos);
                 if (sp == std::string::npos) break;
-                uint64_t len = std::strtoull(text.c_str() + pos, nullptr, 10);
-                if (len < sp - pos + 2 || pos + len > text.size() || text[pos + len - 1] != '\n') {
+                uint64_t len = 0;
+                if (!decimal(text, pos, sp, kMaxText, len) || len < sp - pos + 2 || len > text.size() - pos ||
+                    text[pos + len - 1] != '\n') {
                     error_ = "bad pax header";
                     return false;
                 }
@@ -169,9 +184,12 @@ bool Reader::next(Entry& e) {
                     std::string key = rec.substr(0, eq), value = rec.substr(eq + 1);
                     if (key == "path") paxPath = value;
                     else if (key == "linkpath") paxLink = value;
-                    else if (key == "size") {
-                        paxSize = std::strtoull(value.c_str(), nullptr, 10);
-                        hasPaxSize = true;
+                    else if (key == "size") {   // an empty value deletes it: the header's size again
+                        if (value.empty()) hasPaxSize = false;
+                        else if (!decimal(value, 0, value.size(), kMaxPaxSize, paxSize)) {
+                            error_ = "bad pax header";
+                            return false;
+                        } else hasPaxSize = true;
                     }
                 }
                 pos += size_t(len);

@@ -17,7 +17,7 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
-#include <sys/select.h>
+#include <poll.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -273,14 +273,6 @@ bool localEndpoint(Handle h, Endpoint& out) {
     return true;
 }
 
-bool peerEndpoint(Handle h, Endpoint& out) {
-    out = Endpoint();
-    socklen l = socklen(sizeof out.storage);
-    if (getpeername(S(h), SA(out), &l) != 0) return false;
-    out.len = int(l);
-    return true;
-}
-
 Handle listenTcp(uint16_t port, bool& dualStack, std::string& err) {
     startup();
     dualStack = false;
@@ -311,10 +303,45 @@ Handle listenTcp(uint16_t port, bool& dualStack, std::string& err) {
     return h;
 }
 
-Handle acceptOne(Handle listener, Endpoint* peer) {
+Handle listenLoopbackV4(uint16_t& port, std::string& err) {
+    startup();
+    port = 0;
+    err.clear();
+#ifdef _WIN32
+    // Not inherited from its creation (Windows 7 SP1 and later); SetHandleInformation as well, in
+    // case a layered service provider ignores the flag (best effort, like SO_EXCLUSIVEADDRUSE:
+    // safe here, unlike the hosting socket of bindTo, because the port is a fresh one).
+    Handle h = Handle(WSASocketW(AF_INET, SOCK_STREAM, IPPROTO_TCP, nullptr, 0, WSA_FLAG_OVERLAPPED | WSA_FLAG_NO_HANDLE_INHERIT));
+    if (h == kInvalid) { err = errorName(lastError()); return kInvalid; }
+    SetHandleInformation(reinterpret_cast<HANDLE>(h), HANDLE_FLAG_INHERIT, 0);
+    BOOL on = TRUE;
+    setsockopt(S(h), SOL_SOCKET, SO_EXCLUSIVEADDRUSE, reinterpret_cast<const char*>(&on), sizeof on);
+#else
+    // Close-on-exec from its creation: posix_spawnp (net::sys) would hand it to the browser.
+    Handle h = Handle(socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, IPPROTO_TCP));
+    if (h == kInvalid) { err = errorName(lastError()); return kInvalid; }
+#endif
+    Endpoint lo, local;
+    if (!setNonBlocking(h) || !Endpoint::parse("127.0.0.1", 0, lo) || ::bind(S(h), SA(lo), socklen(lo.len)) != 0 ||
+        ::listen(S(h), 8) != 0 || !localEndpoint(h, local) || local.port() == 0) {
+        err = errorName(lastError());
+        closeSocket(h);
+        return kInvalid;
+    }
+    setNoDelay(h);
+    port = local.port();
+    return h;
+}
+
+Handle acceptOne(Handle listener, Endpoint* peer, bool noInherit) {
     Endpoint tmp;
     socklen l = socklen(sizeof tmp.storage);
+#ifdef _WIN32
     Handle h = Handle(::accept(S(listener), SA(tmp), &l));
+    if (h != kInvalid && noInherit) SetHandleInformation(reinterpret_cast<HANDLE>(h), HANDLE_FLAG_INHERIT, 0);
+#else
+    Handle h = Handle(::accept4(listener, SA(tmp), &l, noInherit ? SOCK_CLOEXEC : 0));
+#endif
     if (h == kInvalid) return kInvalid;
     tmp.len = int(l);
     if (!setNonBlocking(h)) { closeSocket(h); return kInvalid; }
@@ -447,17 +474,14 @@ int PollSet::wait(int timeoutMs) {
         if (timeoutMs > 0) std::this_thread::sleep_for(std::chrono::milliseconds(timeoutMs));
         return 0;
     }
+#ifdef _WIN32
     fd_set rs, ws, es;
     FD_ZERO(&rs);
     FD_ZERO(&ws);
     FD_ZERO(&es);
-    int maxfd = 0;
     for (auto& it : items_) {
         if (it.r) FD_SET(S(it.h), &rs);
         if (it.w) { FD_SET(S(it.h), &ws); FD_SET(S(it.h), &es); }
-#ifndef _WIN32
-        maxfd = std::max(maxfd, it.h);
-#endif
     }
     timeval tv{};
     timeval* ptv = nullptr;
@@ -466,7 +490,7 @@ int PollSet::wait(int timeoutMs) {
         tv.tv_usec = (timeoutMs % 1000) * 1000;
         ptv = &tv;
     }
-    int n = ::select(maxfd + 1, &rs, &ws, &es, ptv);
+    int n = ::select(0, &rs, &ws, &es, ptv);   // nfds: ignored by Winsock
     if (n <= 0) return n < 0 ? -1 : 0;
     int ready = 0;
     for (auto& it : items_) {
@@ -476,6 +500,32 @@ int PollSet::wait(int timeoutMs) {
         if (it.rr || it.ww) ++ready;
     }
     return ready;
+#else
+    // poll(): FD_SET is undefined for a descriptor of FD_SETSIZE (1024) or more. What select() on
+    // Linux reports: the read set is POLLIN, RDNORM, RDBAND, HUP and ERR; the write set is POLLOUT,
+    // WRNORM, WRBAND and ERR; the exception set (with the write one, as on Windows) is POLLPRI; a
+    // descriptor that is not open fails the whole call (EBADF).
+    const short readEvents = POLLIN | POLLRDNORM | POLLRDBAND;
+    const short writeEvents = POLLOUT | POLLWRNORM | POLLWRBAND | POLLPRI;
+    std::vector<pollfd> fds(items_.size());
+    for (size_t i = 0; i < items_.size(); ++i) {
+        fds[i].fd = items_[i].h;
+        fds[i].events = short((items_[i].r ? readEvents : 0) | (items_[i].w ? writeEvents : 0));
+    }
+    int n = ::poll(fds.data(), nfds_t(fds.size()), timeoutMs < 0 ? -1 : timeoutMs);
+    if (n <= 0) return n < 0 ? -1 : 0;
+    for (const pollfd& p : fds)
+        if (p.revents & POLLNVAL) return -1;
+    int ready = 0;
+    for (size_t i = 0; i < items_.size(); ++i) {
+        Item& it = items_[i];
+        const short re = fds[i].revents;
+        it.rr = it.r && (re & (readEvents | POLLHUP | POLLERR));
+        it.ww = it.w && (re & (writeEvents | POLLERR));
+        if (it.rr || it.ww) ++ready;
+    }
+    return ready;
+#endif
 }
 
 bool PollSet::readable(Handle h) const {

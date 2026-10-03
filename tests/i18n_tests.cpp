@@ -209,6 +209,55 @@ TEST(i18n_coach_texts) {
     i18n::setLanguage("en");
 }
 
+// The three failures before the game starts (src/main.cpp: OpenGL 4.6, the renderer, the scene)
+// are told in the player's language, followed by the log file's name (error.log_file).
+TEST(i18n_startup_errors) {
+    const std::string log = "C:\\Games\\Scacelith\\scacelith.log";
+    for (const i18n::Language& lang : i18n::languages()) {
+        CHECK(i18n::setLanguage(lang.code));
+        for (const char* key : {"error.opengl", "error.renderer", "error.scene", "error.log_file"}) {
+            CHECK(i18n::has(key));
+            if (std::string(lang.code) != "en") CHECK(std::string(i18n::tr(key)) != i18n::english(key));
+        }
+        CHECK(i18n::trf("error.log_file", {log}).find(log) != std::string::npos);
+    }
+    i18n::setLanguage("en");
+}
+
+// Google sign-in by loopback redirect: every language has the game's texts and the page the browser
+// shows, translated; the link page names the account ({0}) and the server ({1}); the texts that send
+// the player to "Forgot password?" quote that link's own label.
+TEST(i18n_sso_texts) {
+    const char* keys[] = {
+        "online.sso.wait", "online.sso.finishing", "online.sso.link_title", "online.sso.link_lead",
+        "online.sso.link_button", "online.sso.link_mfa", "online.sso.not_mine", "online.sso.not_mine_note",
+        "online.sso.page.title", "online.sso.page.done_heading", "online.sso.page.done",
+        "online.sso.page.cancelled_heading", "online.sso.page.cancelled", "online.sso.page.foreign_heading",
+        "online.sso.page.foreign", "online.err.sso_expired", "online.err.sso_failed", "online.err.sso_listen",
+        "online.err.sso_origin", "online.err.browser", "online.err.sso_email_unverified",
+        "online.err.sso_account_exists", "online.err.sso_already_linked", "online.err.account_disabled"};
+    for (const i18n::Language& lang : i18n::languages()) {
+        CHECK(i18n::setLanguage(lang.code));
+        for (const char* key : keys) {
+            CHECK(i18n::has(key));
+            if (std::string(lang.code) != "en" && std::string(i18n::tr(key)) == i18n::english(key)) {
+                std::fprintf(stderr, "  %s: %s is not translated\n", lang.code, key);
+                CHECK(false);
+            }
+        }
+        std::string lead = i18n::trf("online.sso.link_lead", {"Guillaume_G", "play.example"});
+        CHECK(lead.find("Guillaume_G") != std::string::npos);
+        CHECK(lead.find("play.example") != std::string::npos);
+        const std::string forgot = i18n::tr("online.signin.forgot");
+        for (const char* key : {"online.sso.not_mine_note", "online.err.sso_account_exists"}) {
+            bool ok = std::string(i18n::tr(key)).find(forgot) != std::string::npos;
+            if (!ok) std::fprintf(stderr, "  %s: %s should quote \"%s\"\n", lang.code, key, forgot.c_str());
+            CHECK(ok);
+        }
+    }
+    i18n::setLanguage("en");
+}
+
 TEST(i18n_tr_fallback_and_format) {
     CHECK(i18n::setLanguage("fr"));
     CHECK_EQ(i18n::language(), std::string("fr"));
@@ -297,9 +346,35 @@ TEST(unicode_utf8_roundtrip) {
     std::u32string u = U(s);
     CHECK_EQ(int(u.size()), 18);
     CHECK_EQ(uni::encode(u), std::string(s));
-    CHECK_EQ(int(uni::length(s)), 18);
     CHECK(U("\xC3")[0] == 0xFFFD);          // truncated sequence
     CHECK(U("\xC0\xAF")[0] == 0xFFFD);      // overlong
+}
+
+TEST(unicode_decode_at_steps_like_decode) {
+    // Text wrapping walks a paragraph with decodeAt and the shaper decodes it with decode(): both
+    // must read malformed bytes alike (C0 A0 is no space, a surrogate no character).
+    std::string s = "ab\xC0\xA0" "cd";
+    size_t i = 2;
+    CHECK(uni::decodeAt(s, i) == 0xFFFD);
+    CHECK_EQ(int(i), 3);
+    const char* samples[] = {"Fran\xC3\xA7" "ais \xF0\x9F\x98\x80", "ab\xC0\xA0" "cd", "\xED\xA0\x80", "\xF4\x90\x80\x80",
+                             "\xE0\x80\xAF", "\xF0\x80\x80\xAF", "\xC3", "x\xE2\x82", "\xC1\xBF\xF8\x88\x80\x80\x80"};
+    uint32_t seed = 12345;
+    std::vector<std::string> all(std::begin(samples), std::end(samples));
+    for (int k = 0; k < 2000; ++k) {  // random bytes biased towards lead and continuation bytes
+        std::string r;
+        for (int n = 0; n < 12; ++n) {
+            seed = seed * 1664525u + 1013904223u;
+            unsigned b = seed >> 24;
+            r += char((b & 1) ? (0x80 | (b >> 2)) : b);
+        }
+        all.push_back(r);
+    }
+    for (const std::string& t : all) {
+        std::u32string stepped;
+        for (size_t j = 0; j < t.size();) stepped += uni::decodeAt(t, j);
+        CHECK(stepped == uni::decode(t));
+    }
 }
 
 TEST(unicode_arabic_joining_forms) {

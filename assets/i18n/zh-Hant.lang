@@ -1,7 +1,5 @@
 # Scacelith - 繁體中文
-# assets/i18n/en.lang 的翻譯（相同的鍵，相同的 {n}）。無複數形式（1 種形式）。
-
-language.name = 繁體中文
+# Translation of assets/i18n/en.lang (same keys, same {n}). No plural forms (a single form).
 
 # ---- Common words ------------------------------------------------------------------------------
 common.on = 開
@@ -61,6 +59,7 @@ options.depth_of_field = 景深
 options.depth_of_field.help = 像相機鏡頭一樣，柔化遠在你所看之處前方或後方的物體。
 options.brightness = 亮度
 options.brightness.neutral = 標準
+options.brightness.value = {0} EV
 options.brightness.help = 攝影機的曝光補償。首次啟動時的校準會將其設為最暗的陰影剛好可見。
 
 options.master_volume = 主音量
@@ -346,11 +345,6 @@ viewer.note = 雙方棋手都是 Stockfish。對局期間可以在大廳裡自�
 viewer.summary = {0} 對 {1}
 viewer.custom = 自訂
 viewer.tc.custom = 自行設定
-viewer.tc.none = 不用棋鐘
-viewer.tc.bullet = 子彈棋
-viewer.tc.blitz = 超快棋
-viewer.tc.rapid = 快棋
-viewer.tc.classical = 慢棋
 viewer.base_time = 基本時間
 viewer.increment = 加秒
 viewer.delay = 延時
@@ -539,10 +533,24 @@ online.forgot.lead = 請輸入你帳號的電子郵件地址：我們會寄給�
 online.forgot.button = 寄送連結
 online.forgot.sent = 如果有帳號使用此地址，連結已寄出。
 online.sso.title = 使用 Google 登入
-online.sso.wait = 請在網頁瀏覽器中繼續：在開啟的視窗中使用 Google 登入。此頁面會自動跟進。
+online.sso.wait = 請在網頁瀏覽器中繼續：在開啟的視窗中選擇你的 Google 帳號。Google 將你送回後，Scacelith 會自動接手完成。
 online.sso.name_title = 選擇你的名字
 online.sso.name_lead = 這是你第一次使用 Google 登入這裡。請選擇其他棋手會看到的名字。
 online.sso.continue = 繼續
+online.sso.finishing = Google 已將你送回。正在完成登入…
+online.sso.link_title = 新增 Google 登入
+online.sso.link_lead = {1} 上的帳號 {0} 已在使用此 Google 帳號的電子郵件地址。輸入該帳號的密碼，即可為它新增 Google 登入。這個步驟只需一次。
+online.sso.link_button = 新增 Google 登入
+online.sso.link_mfa = 驗證碼通過後，Google 登入就會新增到此帳號。
+online.sso.not_mine = 這不是我的帳號
+online.sso.not_mine_note = 未新增 Google 登入。如果這個電子郵件地址屬於你，請用它進行「忘記密碼？」：連結會寄到該信箱。如果該帳號還要求你沒有的雙重驗證碼，請聯絡伺服器營運者。
+online.sso.page.title = Scacelith：Google 登入
+online.sso.page.done_heading = 返回 Scacelith
+online.sso.page.done = Google 已將你送回 Scacelith。請回到遊戲完成登入；你可以關閉此分頁。
+online.sso.page.cancelled_heading = 登入已取消
+online.sso.page.cancelled = Google 登入已取消。你可以關閉此分頁並返回 Scacelith。
+online.sso.page.foreign_heading = 此頁面不是給你的
+online.sso.page.foreign = 此頁面與 Scacelith 在這台電腦上等待的登入不符。如果你剛才沒有在 Scacelith 中開始 Google 登入，可能有人把這個連結傳給了你：請關閉此分頁。
 
 # Account
 online.account.button = 帳號
@@ -565,6 +573,9 @@ online.account.sign_out_all = 全部登出
 online.account.sign_out_all.help = 在所有電腦上登出此帳號，包括這台電腦。
 online.account.signed_out = 你已登出。
 online.account.signed_out_all = 你已在所有電腦上登出。
+online.account.signing_out_all = 正在所有電腦上登出…
+online.account.sign_out_all_failed = 你的其他電腦可能仍處於登入狀態：請重新登入，然後在「已登入的裝置」中將其登出。{0}
+online.account.sign_out_all_retry = 你的其他電腦可能仍處於登入狀態。請再次嘗試「全部登出」。{0}
 online.account.ratings = 等級分
 online.account.col.tc = 時限
 online.account.col.rating = 等級分
@@ -651,6 +662,7 @@ online.challenge.you_random = 抽籤決定先後
 online.challenge.declined = {0} 拒絕了你的挑戰。
 online.challenge.expired = 你的挑戰已逾時，未獲回應。
 online.challenge.unavailable = {0} 目前無法對局。
+online.challenge.lost = 連線已中斷，你的挑戰已取消。
 
 # At the table
 online.pause.clock_runs = 對局仍在進行：你的棋鐘仍在走。
@@ -692,6 +704,7 @@ online.report.comment = 備註
 online.report.comment.hint = 選填
 online.report.send = 送出檢舉
 online.report.sent = 檢舉已送出。謝謝。
+online.report.queued = 檢舉將在對局結束後送出。
 # Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
 online.sheet.note = 線上，{0} {1}
 online.sheet.rated = 計分
@@ -718,6 +731,7 @@ online.err.server_busy = 伺服器忙碌中。請稍後再試一次。
 online.err.banned_until = 此帳號已被停權，直到 {0}。
 online.err.banned = 此帳號已被停權。
 online.err.invalid_credentials = 使用者名稱或密碼錯誤。
+online.err.invalid_credentials_pending = 使用者名稱或密碼錯誤。如果你剛剛建立帳號，請先開啟我們寄給你的連結。
 online.err.email_unverified = 你的電子郵件地址尚未驗證：請開啟我們寄給你的連結。
 online.err.network = 無法連線到伺服器。請檢查你的網路連線與伺服器位址。
 online.err.tls = 無法與伺服器建立安全連線。
@@ -733,6 +747,15 @@ online.err.invalid_code = 驗證碼不正確。
 online.err.expired = 此要求已過期：請重新開始。
 online.err.registration_closed = 此伺服器不接受新帳號。
 online.err.sso_cancelled = Google 登入已取消。
+online.err.sso_expired = Google 登入耗時過久或已被使用。請重新開始。
+online.err.sso_failed = Google 登入未成功。請再試一次。
+online.err.sso_listen = Scacelith 無法在這台電腦上接收 Google 的回應。請再試一次。
+online.err.sso_origin = 透過此伺服器位址無法使用 Google 登入。請以其營運者提供的公開名稱新增伺服器，然後再試一次。
+online.err.browser = 無法開啟網頁瀏覽器。
+online.err.sso_email_unverified = Google 尚未確認此 Google 帳號的電子郵件地址。
+online.err.sso_account_exists = 已有帳號使用此電子郵件地址，且無法連結 Google 登入：請用它的密碼登入，或使用「忘記密碼？」。
+online.err.sso_already_linked = 此 Google 帳號已連結到另一個帳號。
+online.err.account_disabled = 此帳號已無法使用。
 online.err.server_error = 伺服器發生問題。請再試一次。
 online.err.timeout = 伺服器未及時回應。
 online.err.offline = 未連線到伺服器：請在連線後再試一次。
@@ -752,13 +775,14 @@ online.err.flag_fell = 你的時間已用完。
 online.err.queue_not_allowed = 你現在無法尋找對手。
 online.err.challenge_not_found = 此挑戰已不存在。
 online.err.user_unavailable = 此棋手無法對局。
-online.err.challenge_limit = 同時送出的挑戰過多。
+online.err.challenge_limit = 目前送出的挑戰過多。請稍後再試。
 online.err.challenge_self = 你不能挑戰自己。
 online.err.code_invalid = 沒有使用此代碼的對局。
 online.err.rated_official_tc = 只有官方時限才能計分。
 online.err.cooldown = 你的配對暫時被暫停。
 online.err.invalid_tc = 不允許使用這種時限。
 online.err.rematch_unavailable = 已無法再戰。
+online.err.rated_repeat_limit = 你與此棋手的計分對局暫時已達上限。請改下不計分對局，或稍後再試。
 online.err.cheat_detected = 對局已被伺服器的公平對弈檢查終止。
 online.err.invalid_password = 密碼錯誤。
 online.err.mfa_code_required = 請輸入驗證器應用程式中的驗證碼（或復原碼）。
@@ -768,6 +792,7 @@ online.err.too_many_attempts_for = 錯誤嘗試次數過多。請在 {0} 後再�
 online.err.same_email = 這已經是你的電子郵件地址。
 online.err.not_found = 伺服器上找不到。
 online.err.invalid_response = 無法讀取伺服器的回應。
+online.err.storage = 無法在這台電腦上儲存工作階段。
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = 對局紀錄
@@ -1178,3 +1203,9 @@ gif.err.not_found = 伺服器上已沒有該對局。
 gif.wait.seconds = {0} 秒
 gif.wait.minutes = {0} 分鐘
 gif.wait.both = {0} {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = 無法啟動 OpenGL 4.6。請更新顯示卡驅動程式。
+error.renderer = 無法啟動繪圖引擎。
+error.scene = 無法載入場景。
+error.log_file = 詳細資訊請見記錄檔：{0}

@@ -35,6 +35,8 @@ public:
     // it this frame: the director keeps the PCM and retries on the next update.
     virtual bool startVoice(std::vector<float>&& pcm) = 0;
     virtual void stopVoice() = 0;                             // short fade; the utterance is over
+    // Pause or resume the voice. The director starts no utterance while it holds a pause, and always
+    // releases it with pauseVoice(false), even when the paused line was stopped meanwhile.
     virtual void pauseVoice(bool paused) = 0;
     // Seconds of the current utterance heard so far (the speech clock, output latency removed), or a
     // negative value when no utterance plays. *finished is set once it has been heard to the end
@@ -43,7 +45,9 @@ public:
 
     // ---- Subtitles --------------------------------------------------------------------------------
     // Show the written rendering of the line being said for 'holdSeconds' ("" hides the subtitle).
-    virtual void showSubtitle(const std::string& written, float holdSeconds) = 0;
+    // unheard: the line has no voice (none available, its synthesis failed, the audio refused it),
+    // so it is shown whatever the subtitle option.
+    virtual void showSubtitle(const std::string& written, float holdSeconds, bool unheard) = 0;
     // How long a subtitle stays when nothing is heard (ui::subtitleDuration(text, 0)).
     virtual float readingTime(const std::string& written) const = 0;
 
@@ -70,6 +74,7 @@ public:
     virtual void rewindDemo(int plies, bool fast) = 0;
     // Take real moves of the game back: Game::undo, the pieces back by hand, the scoresheets
     // (Scorekeeper::dropMoves). Used for an accepted takeback offer and for the lesson's reactions.
+    // The game is undone when the action starts (a later frame, after the table actions before it).
     virtual void takeBack(int plies) = 0;
     // Rules lesson: set up 'fen' (fade, physical re-sync, game reset from the FEN).
     virtual void setPosition(const std::string& fen) = 0;
@@ -99,7 +104,7 @@ public:
     virtual uint32_t analyse(const ai::AnalysisRequest& request) = 0;   // 0 = no engine
     // The result once ready (true once). Calling it also pumps the engine's queue.
     virtual bool takeAnalysis(uint32_t id, ai::Analysis& out) = 0;
-    virtual void stopAnalysis(uint32_t id) = 0;     // finish now with what it has (never stopSearch)
+    virtual void stopAnalysis(uint32_t id) = 0;     // finish now with what it has (this analysis only)
     virtual void cancelAnalysis(uint32_t id) = 0;   // 0 = all of the coach's analyses
     virtual bool idle() const = 0;                  // nothing running or queued
 };

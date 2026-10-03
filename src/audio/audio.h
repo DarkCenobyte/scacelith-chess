@@ -2,14 +2,16 @@
 // 3D panning. Backends: WASAPI shared mode (Windows), null (elsewhere: real-time pace, output
 // discarded, or streamed to a WAV file when SCACELITH_AUDIO_DUMP=<path.wav> is set).
 // Implemented by the audio work package. Thread-safe API (the mixer runs on its own thread):
-// play/playUI/setListener/volumes may be called from any thread at any time (they are no-ops
-// before init()); init() and shutdown() must not race with the other calls.
+// play/playUI/setListener/volumes may be called from any thread at any time. play/playUI are no-ops
+// before init(); setListener and the volume/ambience setters (setVoiceVolume too) are stored and
+// apply from the first block. init() and shutdown() must not race with the other calls.
 //
 // Signal flow (mixer thread, 48 kHz or the device rate, float stereo):
 //   voices (32, 3D: inverse distance with 0.15 m min distance, equal-power pan, ITD, head
 //   shadow, behind/air low-pass) + speech (2, same 3D chain, talker directivity) + ambience
 //   (ducked under speech) -> hall (early reflections + 16-line FDN,
-//   RT60 ~2.3 s, 24 ms pre-delay) -> master volume -> DC blocker -> look-ahead limiter (-1.2 dBFS).
+//   RT60 ~2.3 s, 24 ms pre-delay) -> master volume -> DC blocker -> look-ahead limiter (threshold
+//   -1.4 dBFS, soft ceiling below -1.0 dBFS).
 // Every one-shot is synthesised (modal/noise models) by a low-priority builder thread into a
 // small pool of variants per Sfx; each trigger additionally randomises pitch (+-3 %), level and
 // tone, and the variant just played is re-synthesised with a new seed, so no two plays match.
@@ -37,7 +39,7 @@ enum class Sfx {
     TablePlace,      // a (captured) piece set down on the waxed wooden table (woody knock)
     // Additive: scoresheet and pen.
     PenWrite,        // ballpoint rolling on paper over the pad: a sustained texture, played as a
-                     // window of the stroke's length (playFor / playPenStroke)
+                     // window of the stroke's length (playPenStroke)
     PenTap,          // ballpoint tip touching the paper (tiny tick through the pad)
     PageTurn,        // page pinched at its corner, lifted and swung over the top edge (~1 s)
     PageFlap,        // the turned page landing face down on the stack
@@ -63,9 +65,6 @@ m::vec3 listenerPosition();
 // pitch for pieces: heavier pieces slightly lower (king ~0.94, pawn ~1.05).
 void play(Sfx s, m::vec3 position, float gain = 1.0f, float pitch = 1.0f);
 void playUI(Sfx s, float gain = 1.0f);
-// Additive: plays only 'seconds' of a sustained sound (a window at a random place inside it,
-// with short fades), e.g. PenWrite for one pen-down stroke.
-void playFor(Sfx s, m::vec3 position, float seconds, float gain = 1.0f, float pitch = 1.0f);
 // One pen-down stroke at the pen tip: the touch-down tick and 'seconds' of ballpoint friction.
 // Call it on anim::Animator's PenDown event with game::sheet::penStrokeSound()'s position,
 // length and gain (the writer's own pen is heard from his posture, not at the tip).
@@ -131,7 +130,9 @@ VoiceId openVoice(const VoiceParams& p);
 // Moves 'mono' (at the voice's sampleRate) in and returns the chunk's start on the speech clock
 // (source seconds), or -1 when refused: invalid/stale/terminal id, voice closed or stopped, engine
 // not running, or FIFO full (64 chunks in flight, or the command queue: retry next frame). On
-// refusal 'mono' keeps its content. An empty chunk is not queued (returns the current end).
+// refusal 'mono' keeps its content (except that its non-finite samples may already have been
+// replaced with silence). An empty chunk is not queued (returns the current end).
+// Non-finite samples (NaN, Inf) are replaced with silence.
 // Give phrase edges a few ms of fade or silence (the TTS does); the voice adds 4 ms edge fades when
 // it starts and when it resumes after starving. Use the returned start to schedule gestures and
 // subtitles on phrase boundaries.

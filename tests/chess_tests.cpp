@@ -375,6 +375,15 @@ TEST(chess_san_parse_tolerant) {
     CHECK_EQ(parsedUCI(queens, "Qe1"), "invalid");
     CHECK_EQ(parsedUCI(queens, "Qhe1"), "invalid");  // h4 and h1
     CHECK_EQ(parsedUCI(queens, "Q1e1"), "h1e1");
+    // Legal UCI comes before the lowercase piece letter: "b1d2" is the knight, not "B1d2".
+    const char* bfile = "rnbqkbnr/ppp1pppp/8/3p4/2PP4/8/PP2PPPP/RNBQKBNR b KQkq - 0 2";
+    CHECK_EQ(parsedUCI(bfile, "b8d7"), "b8d7");
+    CHECK_EQ(parsedUCI(bfile, "bd7"), "c8d7");
+    CHECK_EQ(parsedUCI(bfile, "B8d7"), "c8d7");
+    const char* bfileWhite = "rnbqkbnr/ppp1pppp/8/3p4/3P4/8/PPP1PPPP/RNBQKBNR w KQkq - 0 2";
+    CHECK_EQ(parsedUCI(bfileWhite, "b1d2"), "b1d2");
+    CHECK_EQ(parsedUCI(bfileWhite, "bd2"), "c1d2");
+    CHECK_EQ(parsedUCI("4k3/8/8/8/8/8/8/2B1K3 w - - 0 1", "b1d2"), "c1d2");  // not UCI here: no piece on b1
     // UCI parsing strictness.
     Position p;
     CHECK(p.parseUCI("e2e4").valid());
@@ -1164,6 +1173,24 @@ TEST(chess_arbiter_piece_without_legal_move) {
     CHECK(c.touch(sq("d2")));
     CHECK(c.place(g, sq("d4"), NoPiece));
     CHECK(c.clockPressed(g, preset("5+3")).legal);
+}
+
+// The rules lesson relaxes touch-move: a piece that can move, put back on its square, is
+// released with reset(game) (GameScene::humanRelease); cancelTouch() keeps it committed.
+TEST(chess_arbiter_lesson_release) {
+    Game g;
+    Arbiter a;
+    a.reset(g);
+    CHECK(a.touch(g, sq("e2")));
+    CHECK(a.touchedHasLegalMove(g));
+    a.cancelTouch();                      // touch-move applies: still e2
+    CHECK_EQ(a.touchedSquare(), sq("e2"));
+    CHECK(!a.touch(g, sq("g1")));
+    a.reset(g);                           // the lesson's release
+    CHECK_EQ(a.touchedSquare(), NoSquare);
+    CHECK(a.touch(g, sq("g1")));
+    CHECK(a.place(g, sq("f3"), NoPiece));
+    CHECK(a.clockPressed(g, preset("5+3")).legal);
 }
 
 TEST(chess_arbiter_illegal_move_penalties) {

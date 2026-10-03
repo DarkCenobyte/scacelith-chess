@@ -709,7 +709,7 @@ TEST(capture_slots_every_synced_state_reachable_by_calls) {
         rebuildWithCalls(calls, want);
         CHECK(sameState(calls, want));
     }
-    std::printf("  %d jumps, %d spares back in the reserve, %d pieces brought\n", jumps, toReserve, created);
+    std::fprintf(stderr, "  %d jumps, %d spares back in the reserve, %d pieces brought\n", jumps, toReserve, created);
     CHECK(jumps > 800);
     CHECK(created >= 4);
     CHECK(toReserve > 20);
@@ -784,4 +784,29 @@ TEST(capture_slots_victim_beside_its_owner) {
     b.byId(knight)->capturedBesideOwner = true;
     b.setInReserve(knight, b.reserveSlot(Black));
     CHECK(!b.byId(knight)->capturedBesideOwner);
+}
+
+// A resync teleports pieces (an illegal move put back, the 7.5.2 correction, a replay jump): it is
+// not motion, so each piece's previous transform is its new one and the motion blur draws no
+// streak for that frame (as after reset()).
+TEST(capture_slots_sync_snaps_without_motion) {
+    Position before, after;
+    CHECK(before.setFEN("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 2"));
+    CHECK(after.setFEN("rnbqkbnr/pppp1ppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2"));  // e5 gone
+    PhysicalBoard b;
+    b.reset(true);
+    b.syncTo(before);
+    b.beginFrame();
+    int pawn = b.idAt(Square(36));  // e5
+    vec3 was = b.byId(pawn)->basePos;
+    b.syncTo(after);
+    const PieceObject& p = *b.byId(pawn);
+    CHECK(p.captured);
+    CHECK(length(p.basePos - was) > 0.1f);
+    int moving = 0;
+    for (const PieceObject& q : b.pieces())
+        for (int c = 0; c < 4; ++c)
+            for (int r = 0; r < 4; ++r)
+                if (q.prevTransform.c[c][r] != q.transform.c[c][r]) ++moving;
+    CHECK_EQ(moving, 0);
 }

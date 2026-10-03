@@ -2,21 +2,11 @@
 // (motes behind it would be wasted), drifting with the air; only the ones inside a sun beam (shadow-cascade test) get a sprite. Tumbling flakes flash
 // when they catch the sun. Drawn after TAA with the unjittered projection (no history smearing).
 #include "shaders/post/post_common.glsl"
-layout(binding = 5) uniform sampler2DArrayShadow uShadow;
+#include "shaders/post/sun_visibility.glsl"
 layout(location = 1) uniform float uBoxSize;
 out vec2 vLocal;
 out vec3 vColor;
 out float vDepth;
-
-float sunVisibility(vec3 p) {
-    int n = int(frame.shadowParams.x);
-    for (int c = 0; c < n; ++c) {
-        vec3 s = (frame.shadowMatrix[c] * vec4(p, 1.0)).xyz;
-        if (all(greaterThan(s.xy, vec2(0.005))) && all(lessThan(s.xy, vec2(0.995))) && s.z > 0.0 && s.z < 1.0)
-            return texture(uShadow, vec4(s.xy, float(c), s.z - 0.0002));
-    }
-    return 1.0;
-}
 
 void main() {
     uint id = uint(gl_InstanceID);
@@ -32,12 +22,12 @@ void main() {
     vec3 local = (fract(h + (drift - boxCentre) / uBoxSize) - 0.5) * uBoxSize;
     vec3 pos = boxCentre + local;
     vec4 clip = frame.viewProjNoJitter * vec4(pos, 1.0);
-    vec3 toCam = pos - cam;
-    float dist = length(toCam);
+    vec3 camToMote = pos - cam;
+    float dist = length(camToMote);
     float vis = clip.w > frame.exposure.z * 4.0 ? sunVisibility(pos) : 0.0;
     // Fade near the box boundary so wrapping motes do not pop.
     float edge = 1.0 - smoothstep(0.35, 0.5, max(abs(local.x), max(abs(local.y), abs(local.z))) / uBoxSize);
-    vec3 dir = toCam / max(dist, 1e-4);
+    vec3 dir = camToMote / max(dist, 1e-4);
     float phase = phaseHG(dot(dir, frame.sunDirection.xyz), 0.7);
     float spin = t * (0.8 + 2.5 * h.z) + h.x * 50.0;
     float glint = pow(saturate(sin(spin) * sin(spin * 0.37 + h.y * 9.0)), 24.0) * 30.0;

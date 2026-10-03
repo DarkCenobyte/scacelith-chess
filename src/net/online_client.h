@@ -21,14 +21,15 @@
 //     directory of the --ini file. Tests use it to work in a temporary file.
 //   - ServerEndpoint::origin() brackets IPv6 literals ("[::1]:8443") so an origin is unambiguous.
 //   - ServerEndpoint::pinnedSha256 accepts "AB:CD:..." too (setServer normalises it to 64 lower-case
-//     hex digits). When it is empty, the pin saved for the origin at the last login applies.
+//     hex digits). When it is empty, the pin saved for the origin at the last login applies,
+//     until forgetSavedPin() (Options: the pin field of that server emptied).
 //   - Commands that need the realtime connection while it is not Online produce a ServerError
 //     event with code 0 and error "offline" ("invalid_request" for out-of-range arguments).
 //   - ServerEndpoint::wsPort defaults to 0 = the API port (one port for HTTPS and /ws, as on the
 //     official server); effectiveWsPort() resolves it. /api/v1/info's wsPort is informative only.
 //     TLS is always used unless insecureDev is set (and insecureDev is refused off loopback).
-//   - RetryCause, reconnectDelayMs() and clientPingIntervalMs() (additive): the reconnection and
-//     client Ping pacing rules as pure functions, so the tests can check them.
+//   - RetryCause, reconnectDelayMs(), ReconnectBackoff and clientPingIntervalMs() (additive): the
+//     reconnection and client Ping pacing rules, pure, so the tests can check them.
 //   - Protocol v2 (additive): sendGesture() and Event::Kind::OpponentGesture relay the live
 //     gestures of the two players (net/gesture.h), and OnlineGame::autoPress tells whether the
 //     robots press the clock by themselves in the game.
@@ -43,17 +44,29 @@
 //     comes back in Event::Kind::GifResult (signed-in players only: the renders count against the
 //     account's quota; a refused or missing session is "unauthorized", as above).
 //   - Event::origin (additive): the HTTPS results name the server their command went to.
+//   - Google sign-in by loopback redirect (decisions 36a and 35A; dedicated-server/docs/API.md):
+//     startGoogleSso(page) listens on 127.0.0.1 (net/loopback_redirect.h) before it starts, opens
+//     Google's page only when it is Google's (its redirect URI names this listener and the origin
+//     of the server in use), and Google sends the browser back to the game: no polling. The game
+//     then finishes with the server (SsoCodeReceived, then LoginResult, SsoNeedsUsername or the new
+//     SsoNeedsPassword). linkSso(password) adds Google sign-in to the existing account of that
+//     address once its password (then its code, loginMfa()) is entered in the game.
+//     setBrowserOpener() and setSsoMinWaitMs() are for the tests.
 #pragma once
 #include "gesture.h"
+#include "loopback_redirect.h"
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <string>
 #include <vector>
 
 namespace net {
 
-// Where the server is. The official server (if the build defines SCACELITH_OFFICIAL_SERVER) is
-// the default; players may enter a community server instead (Options > Online).
+namespace proto { struct GameSnapshot; }   // protocol_gen.h
+
+// Where the server is. The build's official server (officialServer() below) is the default;
+// players may enter a community server instead (Options > Online).
 struct ServerEndpoint {
     std::string host;                 // DNS name or IP literal (IPv6 without brackets)
     uint16_t apiPort = 443;           // HTTPS API
@@ -163,7 +176,8 @@ struct GamesPage {
 struct SessionInfo {                  // a signed-in device (GET /auth/sessions)
     int64_t id = 0;
     int64_t createdAtMs = 0, lastSeenAtMs = 0, expiresAtMs = 0;
-    std::string clientLabel;          // "Scacelith 0.1.0 (Windows)", "" when the client gave none
+    std::string clientLabel;          // as the signing-in client gave it, e.g. "Scacelith/0.1.0 win64"
+                                      // (clientString() of this game); "" when it gave none
     bool current = false;             // the session of this game
 };
 
@@ -216,6 +230,8 @@ inline int moveTo(uint16_t m) { return (m >> 6) & 63; }
 inline int movePromo(uint16_t m) { return (m >> 12) & 7; }
 // FNV-1a 32 of the first four FEN fields (chess::Position::fen() prefix): the posHash of Move.
 uint32_t positionDigest(const std::string& fen);
+// The game of a decoded GameSnapshot (OnlineClient; DirectMatch with the host's messages).
+OnlineGame onlineGameFromSnapshot(const proto::GameSnapshot& s);
 
 enum class ConnState {
     Offline,        // no realtime connection
@@ -237,8 +253,8 @@ enum class RetryCause {
     Shutdown        // close 4008, a fatal Error{ShuttingDown} or a Notice{ServerShutdown} before the drop
 };
 
-// Delay before automatic reconnection attempt number `attempt` (0 = the first one since the last
-// Welcome). u is a uniform random number in [0, 1).
+// Delay before automatic reconnection attempt number `attempt` (0 = the first one, counted by
+// ReconnectBackoff below). u is a uniform random number in [0, 1).
 //   Failure     full jitter: uniform in [0.5 s, min(30 s, 2 s x 2^attempt)]
 //   ServerFull  uniform in [60 s, 120 s]
 //   Shutdown    attempt 0: uniform in [5 s, 35 s], which spreads the reconnection wave of a
@@ -254,6 +270,25 @@ enum class RetryCause {
 // most), even during a game (the 8 s bound above does not apply then). User-initiated
 // connections (connect(), a server change) never wait for any of this.
 uint32_t reconnectDelayMs(int attempt, RetryCause cause, double u, bool gameInProgress, uint32_t retryAfterMs);
+
+// The attempt number of reconnectDelayMs() across connections. A connection that reached Welcome
+// sets it back to 0 only once it has stayed up for kStableMs: a server that closes right after
+// Welcome (a crash loop, a refusal of every connection) is tried again with growing delays, not
+// every 0.5 s to 2 s for ever. The spread first attempt of a shutdown stays apart from the count:
+// it follows any connection that reached Welcome. Times are steady-clock milliseconds (the tests
+// give their own).
+class ReconnectBackoff {
+public:
+    static constexpr double kStableMs = 60000.0;
+    void reset() { attempt_ = 0; welcomedAtMs_ = -1.0; }   // connect(): from the shortest delay
+    void welcomed(double nowMs) { welcomedAtMs_ = nowMs; }  // the connection reached Welcome
+    // The delay before the next attempt, after a failed attempt or a lost connection at nowMs.
+    uint32_t next(double nowMs, RetryCause cause, double u, bool gameInProgress, uint32_t retryAfterMs);
+
+private:
+    int attempt_ = 0;
+    double welcomedAtMs_ = -1.0;   // Welcome of the connection lost next; -1 = none since the last next()
+};
 
 // Interval of the client's own Ping for Welcome.clientPingMs (the server's
 // CLIENT_PING_INTERVAL_MS): 0 (not announced) = 10 s, otherwise clamped to 1 s .. 60 s.
@@ -272,8 +307,12 @@ struct Event {
         MfaSetupResult,       // mfaSecret (base32), mfaUri (otpauth://...)
         MfaEnableResult,      // recoveryCodes
         MfaDisableResult, RecoveryCodesResult /* recoveryCodes */,
-        SsoBrowserOpened,     // the system browser shows the provider's page; polling
+        SsoBrowserOpened,     // the system browser shows Google's page, which sends it back to the
+                              // game's loopback redirect on 127.0.0.1 (no polling)
         SsoNeedsUsername,     // first Google login: choose a username, then completeSso()
+        SsoCodeReceived,      // Google sent the browser back: the game finishes with the server
+        SsoNeedsPassword,     // the Google address is the one of an account with a password
+                              // (account.username): enter that password with linkSso()
         ReportResult,
         // ---- HTTPS, account API ----
         GamesResult,          // gamesPage (fetchMyGames)
@@ -358,17 +397,40 @@ public:
     // ---- server and account (HTTPS) ----
     void setCredentialsFile(const std::string& path);  // optional; see the note at the top
     void setServer(const ServerEndpoint& ep);    // disconnects if the origin changes
+    // Forgets the pin saved for the current origin at sign-in (the session stays): with no pin in
+    // the endpoint, its requests trust the system's certificates again. Done on net-http, after the
+    // commands already queued (a sign-in queued before would save the pin again), or as the client
+    // ends if it ends first.
+    void forgetSavedPin();
     const ServerEndpoint& server() const;
-    void fetchServerInfo();
-    bool hasSavedSession() const;                // a token is stored for the current origin
+    // ignoreSavedPin: this request goes without the pin saved for the origin (the endpoint's own
+    // still applies), as every request will after forgetSavedPin() (Options' "Test connection").
+    void fetchServerInfo(bool ignoreSavedPin = false);
+    bool hasSavedSession() const;                // a token is stored for the current origin and decrypts here
     std::string savedUsername() const;           // last user name used on this origin
     void registerAccount(const std::string& username, const std::string& email, const std::string& password);
     void login(const std::string& usernameOrEmail, const std::string& password);
     void loginMfa(const std::string& code);      // 6 digits, or a recovery code (xxxx-xxxx-xx)
-    void startGoogleSso();                       // PKCE + system browser + polling
+    // PKCE + the loopback redirect on 127.0.0.1 + the system browser; page = the texts of the page
+    // the browser shows when Google sends it back (made on the game thread).
+    void startGoogleSso(const SsoBrowserPage& page);
     void completeSso(const std::string& username);
+    // After SsoNeedsPassword: the account's password (POST /auth/sso/google/link). A wrong password
+    // ("invalid_credentials") or too many ("too_many_attempts") keep the step for another try;
+    // mfaRequired continues with loginMfa(), which adds Google sign-in once the code is accepted.
+    void linkSso(const std::string& password);
+    // Stops the Google sign-in under way (its listener, a password step): LoginResult "cancelled"
+    // when there was one. A start still waiting for the server opens no browser and answers
+    // SsoBrowserOpened "cancelled".
     void cancelSso();
-    void logout(bool allSessions = false);       // server-side revocation + local token erase
+    // Tests: what opens Google's page (default net::sys::openBrowser; false = it could not), and the
+    // shortest wait for Google's redirect (30 s by default, whatever expiresIn the server gives).
+    void setBrowserOpener(std::function<bool(const std::string& url)> opener);
+    void setSsoMinWaitMs(int ms);
+    // Server-side revocation + local token erase. This session: erased whatever the server says
+    // (LogoutResult ok, a refused token included). Every session (allSessions): ok only when the
+    // server did it; the token is kept when it failed, except a refused one (401, "unauthorized").
+    void logout(bool allSessions = false);
     void fetchAccount();
     void resendVerification(const std::string& email);
     void forgotPassword(const std::string& email);
@@ -392,15 +454,18 @@ public:
     void downloadPgn(uint64_t gameId);                                  // GET /games/:id/pgn (text)
     void fetchSessions();                                               // GET /auth/sessions
     // DELETE /auth/sessions/:id. Revoking the session marked current in the last fetchSessions()
-    // signs this game out (token erased, realtime connection stopped), as logout() would.
+    // signs this game out (token erased, realtime connection stopped), as logout() would: its
+    // realtime connection closes first, and opens again as deleteAccount()'s on a failure.
     void revokeSession(int64_t sessionId);
     void setAcceptChallenges(bool accept);                              // PUT /account/preferences
     // Re-authenticated changes. codeOrRecovery: "" when two-factor is off (no field sent), a
     // 6-digit code ("code") or a recovery code ("recoveryCode").
     void changeEmail(const std::string& newEmail, const std::string& password, const std::string& codeOrRecovery);
     void exportAccount(const std::string& password, const std::string& codeOrRecovery);   // text = the JSON
-    // On success the token and the user name saved for the origin are erased and the realtime
-    // connection stops (no reconnection); AccountDeleted then comes with ok.
+    // The realtime connection closes first (the server closes every connection of the account it
+    // deletes). On success the token and the user name saved for the origin are erased and it stays
+    // closed; AccountDeleted then comes with ok. A failure other than a refused session
+    // ("unauthorized") opens it again if it was open.
     void deleteAccount(const std::string& password, const std::string& codeOrRecovery);
 
     // ---- animated GIFs (HTTPS; dedicated-server/docs/API.md) ----
@@ -460,7 +525,6 @@ public:
     // Dropped while not Online (never queued for a reconnection) and when gameId is not the game
     // of the last GameSnapshot. Cheap enough to call every frame.
     void sendGesture(uint64_t gameId, const Gesture& g);
-    const OnlineGame* currentGame() const;       // game thread view (updated by poll())
 
     // Drains one event; call until it returns false, once per frame.
     bool poll(Event& out);

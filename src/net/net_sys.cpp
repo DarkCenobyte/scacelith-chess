@@ -3,6 +3,7 @@
 #include <cstdlib>
 
 #ifdef _WIN32
+#include <io.h>
 #include <windows.h>
 #include <shellapi.h>
 #include <shlobj.h>
@@ -21,7 +22,6 @@ namespace net {
 namespace sys {
 
 #ifdef _WIN32
-namespace {
 std::wstring widen(const std::string& s) {
     if (s.empty()) return std::wstring();
     int n = MultiByteToWideChar(CP_UTF8, 0, s.data(), int(s.size()), nullptr, 0);
@@ -29,6 +29,8 @@ std::wstring widen(const std::string& s) {
     if (n > 0) MultiByteToWideChar(CP_UTF8, 0, s.data(), int(s.size()), &w[0], n);
     return w;
 }
+
+namespace {
 std::string narrow(const wchar_t* w) {
     int n = WideCharToMultiByte(CP_UTF8, 0, w, -1, nullptr, 0, nullptr, nullptr);
     if (n <= 1) return std::string();
@@ -38,12 +40,26 @@ std::string narrow(const wchar_t* w) {
 }
 }  // namespace
 
+std::wstring moduleFileName(const std::function<unsigned long(wchar_t*, unsigned long)>& get) {
+    // A path of MAX_PATH characters or more (long paths enabled) is read again into a larger
+    // buffer, up to the 32767 characters of the longest path.
+    std::wstring w(MAX_PATH, L'\0');
+    DWORD n = get(&w[0], DWORD(w.size()));
+    while (n >= w.size() && w.size() <= 32767) {
+        w.resize(w.size() * 2);
+        n = get(&w[0], DWORD(w.size()));
+    }
+    if (n == 0 || n >= w.size()) return std::wstring();
+    w.resize(n);
+    return w;
+}
+
 std::string exeDirectory() {
-    wchar_t w[MAX_PATH];
-    DWORD n = GetModuleFileNameW(nullptr, w, MAX_PATH);
-    if (n == 0 || n >= MAX_PATH) return ".\\";
-    w[n] = 0;
-    std::string s = narrow(w);
+    std::wstring w = moduleFileName([](wchar_t* buffer, unsigned long size) {
+        return GetModuleFileNameW(nullptr, buffer, size);
+    });
+    if (w.empty()) return ".\\";
+    std::string s = narrow(w.c_str());
     size_t p = s.find_last_of("\\/");
     return p == std::string::npos ? std::string(".\\") : s.substr(0, p + 1);
 }
@@ -58,7 +74,7 @@ std::string userDataDirectory() {
     return exeDirectory();
 }
 
-std::string appDataDirectory() { return userDataDirectory(); }   // Roaming, as plat::appDataDirectory()
+std::string appDataDirectory() { return userDataDirectory(); }   // Roaming
 
 bool fileExists(const std::string& path) {
     DWORD a = GetFileAttributesW(widen(path).c_str());
@@ -95,6 +111,10 @@ bool writeFileAtomic(const std::string& path, const std::string& data, bool) {
     if (!f) return false;
     bool ok = fwrite(data.data(), 1, data.size(), f) == data.size();
     ok = fflush(f) == 0 && ok;
+    // The data on the disk before the rename, as fsync() on POSIX (MOVEFILE_WRITE_THROUGH covers the
+    // rename only). Best effort: a file system that cannot flush (some network drives) does not fail
+    // the save.
+    if (ok) _commit(_fileno(f));
     fclose(f);
     if (ok) ok = MoveFileExW(tmp.c_str(), dst.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
     if (!ok) DeleteFileW(tmp.c_str());

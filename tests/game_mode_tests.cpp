@@ -1,10 +1,11 @@
-// Game modes: camera flights, the viewer's observer camera, untimed games (the Elo rating:
-// elo_tests.cpp).
+// Game modes: camera flights, the viewer's observer camera, untimed games, the pause menu and the
+// coach's answer to a draw offer turn by turn (the Elo rating: elo_tests.cpp).
 #include "test.h"
 #include "game/camera_flight.h"
 #include "game/clock_rules.h"
 #include "game/layout.h"
 #include "game/observer_camera.h"
+#include "game/turn.h"
 #include <cmath>
 
 using namespace m;
@@ -213,4 +214,48 @@ TEST(untimed_clock_keeps_used_time_without_press) {
     CHECK_EQ(c.remainingMs(chess::Black), int64_t(1300));
     CHECK(c.running() == chess::White);
     CHECK(!c.flagged(chess::White) && !c.flagged(chess::Black));
+}
+
+// ---- The turn and the pause menu ----------------------------------------------------------------
+
+// The pause menu's Offer draw, Claim draw and Resign, turn by turn: never while a hand, the human's
+// or the robot's, carries out a move (the end of the game would cut it off), still while my move
+// waits for the clock press. The coach's menu keeps to the quiet turns (it has no clock to press).
+TEST(turn_pause_menu_may_end_game) {
+    using game::Turn;
+    struct Case {
+        Turn turn;
+        bool quiet, menu;
+    };
+    const Case cases[] = {
+        {Turn::None, false, false},          {Turn::HumanIdle, true, true},       {Turn::HumanTouched, true, true},
+        {Turn::HumanPlacing, false, false},  {Turn::HumanPromotion, false, false}, {Turn::HumanPlaced, false, true},
+        {Turn::HumanPressing, false, false}, {Turn::AiThinking, true, true},      {Turn::AiMoving, false, false},
+        {Turn::RemoteWaiting, false, false}, {Turn::RemoteMoving, false, false},  {Turn::CoachTable, false, false},
+        {Turn::LessonWait, false, false},
+    };
+    for (const Case& c : cases) {
+        CHECK_EQ(game::quietTurn(c.turn), c.quiet);
+        CHECK_EQ(game::menuMayEndGame(c.turn), c.menu);
+    }
+}
+
+// The coach's answer to a draw offer: never while a move is on its way, and from the position on
+// the board. An offer the game went past (the player moved, or took a move back) is evaluated
+// again, never declined unseen.
+TEST(turn_coach_draw_offer_step) {
+    using game::CoachDrawStep;
+    using game::Turn;
+    CHECK(game::coachDrawStep(true, Turn::HumanIdle, 4, 4) == CoachDrawStep::Answer);
+    CHECK(game::coachDrawStep(true, Turn::AiThinking, 4, 4) == CoachDrawStep::Answer);
+    CHECK(game::coachDrawStep(true, Turn::AiThinking, 4, 5) == CoachDrawStep::EvaluateAgain);   // moved
+    CHECK(game::coachDrawStep(true, Turn::HumanIdle, 4, 2) == CoachDrawStep::EvaluateAgain);    // took back
+    CHECK(game::coachDrawStep(true, Turn::HumanTouched, 0, 1) == CoachDrawStep::EvaluateAgain);
+    for (Turn t : {Turn::HumanPlacing, Turn::HumanPlaced, Turn::HumanPressing, Turn::AiMoving, Turn::CoachTable}) {
+        CHECK(game::coachDrawStep(true, t, 4, 4) == CoachDrawStep::Wait);
+        CHECK(game::coachDrawStep(true, t, 4, 5) == CoachDrawStep::Wait);
+    }
+    // The game ended meanwhile: nothing to answer.
+    CHECK(game::coachDrawStep(false, Turn::None, 4, 4) == CoachDrawStep::NoAnswer);
+    CHECK(game::coachDrawStep(false, Turn::AiMoving, 4, 5) == CoachDrawStep::NoAnswer);
 }

@@ -8,8 +8,8 @@
 //   [4] x = seam darkening, y = seam bevel width (m), z = smudge amount, w = albedo variation
 //   [5..7] ROBOT_MARKING only (see robotMarking below)
 // instParams (per part, see src/character/robot_build.h):
-//   [0] x = variant (0 shell, 1 pad region on the positive side of seam 0), y = clearcoat scale,
-//       z = roughness offset, w = seam half width (m)
+//   [0] x = variant (0 shell, 1 pad region on the positive side of seam 0, 2 face: closed-mouth
+//       line), y = clearcoat scale, z = roughness offset, w = seam half width (m)
 //   [1..3] seam planes in bone space: xyz unit normal, w offset (dot(n,p) + w = 0), 0 = unused
 // Positions are bone-local (positionOS), so every pattern is glued to the part while it moves.
 //

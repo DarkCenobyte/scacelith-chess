@@ -5,7 +5,8 @@
 // AccountData, and routes the answers of net::OnlineClient to it (AccountData::apply); the pages
 // (ui/ui_screens_account.cpp) read it. The animated GIFs of games (a game of the history, a game
 // of the saved games: ui/ui_library.cpp) go through one GifSaver, which writes each file to the
-// GIF folder. Engine-free (no GL, no UI): unit-tested in tests/online_account_tests.cpp.
+// GIF folder. The HTTPS errors in words (onlineErrorText) are here too. Engine-free (no GL, no UI):
+// unit-tested in tests/online_account_tests.cpp.
 #pragma once
 #include "../net/online_client.h"
 #include "game_archive.h"
@@ -35,8 +36,10 @@ public:
     bool busy(net::Event::Kind k) const;
     bool take(net::Event::Kind k, net::Event& out);   // the answer arrived, handed over once
     // An answer arrived: kept for take() (the latest of its kind), one fewer awaited. False, and
-    // nothing changes, for a foreign one other than a PGN.
+    // nothing changes, for a foreign one other than a PGN. The rvalue form moves the answer (an
+    // export or a PGN may be megabytes), and leaves it untouched when it returns false.
     bool keep(const net::Event& e);
+    bool keep(net::Event&& e);
 
 private:
     std::string origin_;
@@ -68,7 +71,6 @@ public:
     // A request failed (request: its GamesPage::before and filter): when it is the one awaited, the
     // page shown stays with the error (and the server's wait, rate_limited: Event::retryAfterSec).
     void fail(const net::GamesPage& request, const std::string& error, int retryAfterSec = 0);
-    void clear();                          // nothing loaded (signed out, another server)
 
     const net::GamesFilter& filter() const { return filter_; }
     const net::GamesPage& page() const { return page_; }
@@ -169,6 +171,26 @@ std::vector<MoveLine> gameMoves(const net::GameDetails& g, bool* complete = null
 
 // "3+2", "7+3", "1:30+1": a time control as the history shows it (base in minutes, or m:ss).
 std::string timeControlLabel(int64_t baseMs, int64_t incMs);
+
+// "14:32": the local time of an epoch-ms instant (the end of a ban or of a matchmaking cooldown),
+// "17.10.2026 14:32" when it is not today.
+std::string localTimeText(double epochMs);
+// "0:45" (a duration).
+std::string durationText(double ms);
+// Friendly texts (i18n) of the network layer's HTTPS errors: an error code ("invalid_credentials",
+// "rate_limited" with the retry delay, "banned" with its end, "network", "tls", "certificate",
+// "incompatible"...); game::OnlineSession's other error texts (online_session.h) build on it.
+std::string onlineErrorText(const std::string& code, int retryAfterSec = 0, int64_t bannedUntilMs = 0);
+// A refused sign-in (LoginResult) in words. justRegistered: the player signs in to the account they
+// registered from the sign-in pages, which exists only once its mailed link is used: until then the
+// server refuses it as a wrong password (invalid_credentials), and the text says to open the link
+// first (told here only: the server never tells a waiting signup apart).
+std::string signInErrorText(const net::Event& e, bool justRegistered);
+// The answer to Sign out everywhere (LogoutResult of logout(true)) in words: done; refused with the
+// session ("unauthorized": this computer is signed out too, so the player signs in again and signs
+// the others out from the signed-in devices); or failed otherwise (network, a cut answer, 429,
+// 503), which keeps this computer signed in to try again.
+std::string signOutEverywhereText(const net::Event& e);
 
 // The file of an account export: "<host>_<username>_<YYYY-MM-DD>.json", the date in local time, the
 // host and the user name made safe for a file name (game::archive::sanitizeName).

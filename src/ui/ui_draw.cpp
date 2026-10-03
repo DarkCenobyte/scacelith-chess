@@ -150,8 +150,6 @@ bool init() {
     g.prog = &shaders::get(d);
     if (!g.prog->valid()) LOGE("ui: shader compilation failed");
     glCreateVertexArrays(1, &g.vao);
-    const GLuint stride = sizeof(Vertex);
-    (void)stride;
     glEnableVertexArrayAttrib(g.vao, 0);
     glVertexArrayAttribFormat(g.vao, 0, 2, GL_FLOAT, GL_FALSE, offsetof(Vertex, x));
     glEnableVertexArrayAttrib(g.vao, 1);
@@ -283,7 +281,6 @@ void popAlpha() {
     g.alpha = g.alphas.back();
     g.alphas.pop_back();
 }
-float alpha() { return g.alpha; }
 
 // ---- Shapes -------------------------------------------------------------------------------------
 void fill(const Rect& r, vec4 c, float radius) {
@@ -296,10 +293,6 @@ void fillV(const Rect& r, vec4 top, vec4 bottom, float radius) {
 }
 void fillH(const Rect& r, vec4 left, vec4 right, float radius) {
     vec4 col[4] = {left, right, left, right};
-    boxRef(r, radius, 0.0f, col);
-}
-void fill4(const Rect& r, vec4 tl, vec4 tr, vec4 bl, vec4 br, float radius) {
-    vec4 col[4] = {tl, tr, bl, br};
     boxRef(r, radius, 0.0f, col);
 }
 void stroke(const Rect& r, vec4 c, float thickness, float radius) {
@@ -416,7 +409,8 @@ float fitSize(const std::string& s, const TextStyle& st, float maxWidth, float m
 }
 
 float capHeight(const TextStyle& st) {
-    // Scripts without capitals are centred on the height of their own ink.
+    // The cap height of the style's face (the handwriting face for a hand); scripts without
+    // capitals use the same value.
     int face = st.face;
     if (st.hand >= 0) face = font::FACE_HAND_CAVEAT + st.hand;
     return font::metrics(face).capHeight * st.size;
@@ -453,12 +447,6 @@ float text(const std::string& s, float x, float baseline, const TextStyle& st) {
     return w;
 }
 
-void textIn(const std::string& s, const Rect& r, const TextStyle& st) {
-    float base = r.cy() + capHeight(st) * 0.5f;
-    float x = st.align == HAlign::Left ? r.x : st.align == HAlign::Center ? r.cx() : r.r();
-    text(s, x, base, st);
-}
-
 namespace {
 struct Line {
     std::string text;
@@ -468,7 +456,8 @@ struct Line {
 
 // Splits into wrapped lines: at spaces (dropped at the break) and between CJK characters. Widths
 // are the sum of the shaped pieces (nothing joins across a break opportunity). Results are cached
-// per frame-independent key since paragraphs are drawn every frame.
+// per frame-independent key since paragraphs are drawn every frame; the returned reference stays
+// valid until the next wrap() call.
 const std::vector<Line>& wrap(const std::string& s, float maxWidth, const TextStyle& st) {
     struct Cache {
         std::unordered_map<std::string, std::vector<Line>> map;
@@ -501,7 +490,7 @@ const std::vector<Line>& wrap(const std::string& s, float maxWidth, const TextSt
         uint32_t prev = 0;
         for (size_t i = 0; i < para.size();) {
             size_t at = i;
-            uint32_t cp = font::decodeUtf8(para, i);
+            uint32_t cp = uni::decodeAt(para, i);
             if (cp == ' ' || cp == 0x3000 || cp == '\t') {
                 pendingSpace = true;
                 prev = cp;
@@ -545,7 +534,7 @@ const std::vector<Line>& wrap(const std::string& s, float maxWidth, const TextSt
 
 int textWrapped(const std::string& s, float x, float baseline, float maxWidth, const TextStyle& st, float lineHeight) {
     if (lineHeight <= 0.0f) lineHeight = st.size * 1.3f;
-    std::vector<Line> lines = wrap(s, maxWidth, st);  // copy: text() may clear the cache
+    const std::vector<Line>& lines = wrap(s, maxWidth, st);  // text() never calls wrap()
     float y = baseline;
     for (auto& l : lines) {
         TextStyle ls = st;

@@ -33,7 +33,7 @@ struct Options {
 };
 
 // Speech languages for a UI language code: en fr de es ru uk ar ja (false for zh-Hans, zh-Hant and
-// anything else the coach does not speak).
+// anything else the coach does not speak). The one list: coach::speechSupported asks it.
 bool languageSupported(const std::string& uiCode);
 
 // Voice used when Options::voice is -1 (M3, the male "teacher" voice chosen by listening; M2, deeper, is
@@ -41,10 +41,11 @@ bool languageSupported(const std::string& uiCode);
 int defaultVoice();
 
 // Caps the instruction set of the compute kernels ("auto", "avx512", "avxvnni", "avx2", "sse2",
-// "scalar"), for troubleshooting (a settings entry or a command-line switch). Applies to
-// synthesizers loaded afterwards. Returns false (and logs) for an unknown name.
+// "scalar"), for troubleshooting (a settings entry or a command-line switch). Applies from the
+// next synthesis (and to the constant folding of later loads). Returns false (and logs) for an
+// unknown name.
 bool setArchCap(const char* arch);
-// Name of the kernel set the next load would use ("avx2", ...).
+// Name of the kernel set the next synthesis will use ("avx2", ...).
 const char* activeArch();
 
 // Folder Synthesizer::load() reads the model files from: tts::modelFolder() of the model store
@@ -100,6 +101,7 @@ private:
 
     std::unique_ptr<Engine> engine_;
     std::unique_ptr<ThreadPool> pool_;
+    int poolThreads_ = 0;   // the count pool_ was made for (it runs fewer if helpers failed to start)
     Stats stats_;
 };
 
@@ -114,15 +116,21 @@ public:
 
     // Starts the thread, which loads the models and then synthesises a short warm-up sentence
     // (pages the weights in) before ready() turns true. Requests made meanwhile are queued.
+    // Returns false (and logs) when the thread cannot be created.
     bool start(const Options& o);
     // Cancels everything and joins the thread (call before audio::shutdown()).
     void stop();
     bool ready() const { return ready_.load(); }
-    bool failed() const { return failed_.load(); }   // load failed: speech is unavailable
+    bool failed() const { return failed_.load(); }   // load or warm-up failed: speech is unavailable
+    // The models loaded but the warm-up gave no samples (failed() is true too): files that load and
+    // still cannot speak, which loading them again would not change.
+    bool warmUpFailed() const { return warmUpFailed_.load(); }
 
     // Queues a text; returns its id, or 0 when the worker is stopped or failed. 'seed' 0 derives
-    // the noise seed from the text (Options::seed).
-    uint32_t request(const std::string& text, const std::string& lang, int priority = 0, uint32_t seed = 0);
+    // the noise seed from the text (Options::seed). 'speed' > 0 is this text's speaking rate in
+    // place of the one given to start() (the rules lesson speaks slower; the models stay loaded).
+    uint32_t request(const std::string& text, const std::string& lang, int priority = 0, uint32_t seed = 0,
+                     float speed = 0.0f);
     // True once the request is finished (also when synthesis failed: take() then gives no samples).
     bool done(uint32_t id) const;
     // Moves the samples out and forgets the request. False if not done or unknown.
@@ -138,6 +146,7 @@ private:
         int priority;
         uint64_t order;
         uint32_t seed;
+        float speed;   // 0 = opts_.speed
         std::string text, lang;
     };
     void run();
@@ -152,7 +161,7 @@ private:
     uint64_t order_ = 0;
     uint32_t running_ = 0;               // id in progress, 0 = none
     std::atomic<bool> cancelRunning_{false};
-    std::atomic<bool> ready_{false}, failed_{false};
+    std::atomic<bool> ready_{false}, failed_{false}, warmUpFailed_{false};
     bool quit_ = false;
     bool started_ = false;
 };

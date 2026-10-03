@@ -6,6 +6,7 @@
 #include "test.h"
 #include "http_fake.h"
 #include "core/ini.h"
+#include "game/coach_model.h"
 #include "game/settings.h"
 #include "net/crypto.h"
 #include "net/net_sys.h"
@@ -254,6 +255,7 @@ struct FakeHosts {
     std::mutex mu;
     std::set<std::string> corrupt, cut, insecure, missing;   // per file name, on the hub
     std::set<std::string> cutDone;
+    bool cutEvery = false;   // cut every transfer of a 'cut' file, not only the first
     bool archiveMissing = false;
     int pieceDelayMs = 0;
     std::string archive = blob(kFakeArchive, sizeof(kFakeArchive));
@@ -302,7 +304,7 @@ struct FakeHosts {
                 if (sha != kHashes[i]) continue;
                 rep = fakehttp::fileReply(content(i, kNames[i]), r);
                 rep.pieceDelayMs = pieceDelayMs;
-                if (cut.count(kNames[i]) && !cutDone.count(kNames[i])) {
+                if (cut.count(kNames[i]) && (cutEvery || !cutDone.count(kNames[i]))) {
                     cutDone.insert(kNames[i]);
                     rep.cutAfter = rep.body.size() / 3;
                 }
@@ -525,6 +527,7 @@ TEST(model_store_downloads_from_the_hub) {
     CHECK(!r.last.fromArchive && r.last.hubError.empty());
     CHECK(!r.phases.count(int(Phase::Archive)) && !r.phases.count(int(Phase::Extracting)));
     CHECK_EQ(r.last.sourceLabel, std::string("127.0.0.1/csukuangfj2/repo"));
+    CHECK_EQ(r.last.fetched, 9);
     CHECK(allGood(t));
     CHECK_EQ(int(tts::verifyModel(hosts.manifest(), t.dir)), int(tts::ModelStatus::Ready));
     // The notices: where the files came from, the licences.
@@ -545,6 +548,7 @@ TEST(model_store_downloads_from_the_hub) {
     CHECK_EQ(int(r.last.phase), int(Phase::Done));
     CHECK(!r.phases.count(int(Phase::Hub)) && !r.phases.count(int(Phase::Archive)));
     CHECK_EQ(hosts.srv.requests().size(), before);
+    CHECK_EQ(r.last.fetched, 0);
     CHECK(slurp(t.dir + "README.txt").find("already in this folder") != std::string::npos);
     // A damaged file and a missing one: only those two are fetched again.
     std::string c = fakeContent(3);
@@ -554,6 +558,7 @@ TEST(model_store_downloads_from_the_hub) {
     r = runJob(d);
     CHECK_EQ(int(r.last.phase), int(Phase::Done));
     CHECK(allGood(t));
+    CHECK_EQ(r.last.fetched, 2);
     auto reqs = hosts.srv.requests();
     CHECK(reqs.size() > before);
     for (size_t i = before; i < reqs.size(); ++i) {
@@ -586,6 +591,7 @@ TEST(model_store_falls_back_to_the_archive) {
         CHECK_EQ(r.last.hubError, std::string(c.hubError));
         CHECK_EQ(r.last.sourceLabel, std::string("127.0.0.1 (release archive)"));
         CHECK(allGood(t));
+        CHECK_EQ(r.last.fetched, 9);   // from the hub and from the archive alike
         CHECK(!t.has(std::string(kFolder) + ".tar.bz2") && !t.has(std::string(kFolder) + ".tar.bz2.part"));   // deleted
         CHECK(!t.has("extra-notes.txt"));
         std::string readme = slurp(t.dir + "README.txt");
@@ -607,7 +613,7 @@ TEST(model_store_falls_back_to_the_archive) {
     CHECK(r.last.fromArchive);
     CHECK_EQ(r.last.hubError, std::string("network"));
     CHECK(allGood(t));
-    // Both sources fail: a clear error, no file left half-way.
+    // Both sources fail: a clear error (the 404 wrote nothing).
     FakeHosts dead;
     dead.missing.insert("LICENSE");
     dead.archiveMissing = true;
@@ -645,6 +651,33 @@ TEST(model_store_resumes_and_cancels) {
         if (q.path.find(kHashes[6]) != std::string::npos && q.get("range") == "bytes=" + std::to_string(kSizes[6] / 3) + "-")
             ranged = true;
     CHECK(ranged);
+
+    // The hub keeps breaking off and the archive is missing: the job fails, the hub's .part stays
+    // and the next job continues it.
+    FakeHosts flaky;
+    flaky.cut.insert("vector_estimator.int8.onnx");
+    flaky.cutEvery = true;
+    flaky.archiveMissing = true;
+    TempFolder t4("keeppart");
+    tts::ModelDownloader d4(flaky.manifest(), t4.dir);
+    r = runJob(d4);
+    CHECK_EQ(int(r.last.phase), int(Phase::Failed));
+    CHECK_EQ(r.last.hubError, std::string("truncated"));
+    uint64_t kept = 0;
+    CHECK(net::sys::fileSize(t4.dir + "vector_estimator.int8.onnx.part", kept) && kept > 0 && kept < kSizes[6]);
+    {
+        std::lock_guard<std::mutex> lk(flaky.mu);
+        flaky.cut.clear();
+        flaky.archiveMissing = false;
+    }
+    r = runJob(d4);
+    CHECK_EQ(int(r.last.phase), int(Phase::Done));
+    CHECK(!r.last.fromArchive);
+    CHECK(allGood(t4));
+    bool fromKept = false;
+    for (const fakehttp::Request& q : flaky.srv.requests())
+        if (q.path.find(kHashes[6]) != std::string::npos && q.get("range") == "bytes=" + std::to_string(kept) + "-") fromKept = true;
+    CHECK(fromKept);
 
     // Cancel while a slow file comes in: Cancelled at once, the .part kept, then continued.
     FakeHosts slow;
@@ -691,6 +724,16 @@ TEST(model_store_resumes_and_cancels) {
     CHECK(std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() < 1.5);
 }
 
+TEST(coach_voice_retry_after_a_download) {
+    // A worker that failed (to load, or its warm-up) gets one more try after a download that wrote
+    // files; one that found every file right changes nothing, and a working voice is left alone.
+    CHECK(game::coachVoiceRetry(true, 1));
+    CHECK(game::coachVoiceRetry(true, 9));
+    CHECK(!game::coachVoiceRetry(true, 0));
+    CHECK(!game::coachVoiceRetry(false, 2));
+    CHECK(!game::coachVoiceRetry(false, 0));
+}
+
 // [coach] voice: on by default, kept off once the player declined the download.
 TEST(coach_voice_setting_round_trip) {
     game::Settings fresh;
@@ -714,10 +757,7 @@ TEST(coach_voice_setting_round_trip) {
 // extracts and checks the nine files. SCACELITH_NET_TESTS=hub tries Hugging Face first.
 TEST(model_store_real_github) {
     const char* env = std::getenv("SCACELITH_NET_TESTS");
-    if (!env || !*env) {
-        std::fprintf(stderr, "  skipped (SCACELITH_NET_TESTS not set)\n");
-        return;
-    }
+    if (!env || !*env) SKIP("SCACELITH_NET_TESTS not set");
     TempFolder t("real");
     tts::ModelDownloader d(tts::supertonicManifest(), t.dir);
     tts::ModelDownloader::Options o;
@@ -753,10 +793,7 @@ TEST(model_store_real_github) {
 //   SCACELITH_SUPERTONIC_ARCHIVE=/path/to/sherpa-onnx-supertonic-3-tts-int8-2026-05-11.tar.bz2
 TEST(model_store_real_archive) {
     const char* archive = std::getenv("SCACELITH_SUPERTONIC_ARCHIVE");
-    if (!archive || !net::sys::fileExists(archive)) {
-        std::fprintf(stderr, "  skipped (SCACELITH_SUPERTONIC_ARCHIVE not set)\n");
-        return;
-    }
+    if (!archive || !net::sys::fileExists(archive)) SKIP("SCACELITH_SUPERTONIC_ARCHIVE not set");
     TempFolder t("realarchive");
     const tts::ModelManifest& m = tts::supertonicManifest();
     std::vector<std::string> names;

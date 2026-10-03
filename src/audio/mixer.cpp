@@ -208,14 +208,6 @@ void Mixer::dropRetired() {
     std::memmove(retired_, retired_ + 1, sizeof(retired_[0]) * size_t(retiredCount_));
 }
 
-bool Mixer::hasSound(Sfx s) const {
-    int i = int(s);
-    if (i < 0 || i >= int(Sfx::Count)) return false;
-    for (const Slot& sl : slots_[i])
-        if (sl.buf) return true;
-    return false;
-}
-
 int Mixer::activeVoices() const {
     int n = 0;
     for (int i = 0; i < kMaxVoices; ++i) n += voices_[i].active ? 1 : 0;
@@ -241,6 +233,8 @@ void Mixer::releaseVoice(Voice& v) {
     v.active = false;
     Slot& s = slots_[v.sfx][v.variant];
     if (s.users > 0) --s.users;
+    // install() only parks a pending buffer while the slot has users: it takes over here, as the
+    // last of them ends (so a slot never holds a pending buffer without users).
     if (s.users == 0 && s.pending) {
         retire(s.buf);
         s.buf = s.pending;
@@ -292,7 +286,7 @@ bool Mixer::play(const PlayRequest& r) {
         v->fadeOut = std::min(0.012f * v->rate * float(kBankRate), float(0.4 * win));
         double room = len - win - 0.002 * kBankRate;
         double start = 0.0;
-        if (room > 0.0) start = r.offset >= 0.0f ? std::min(room, double(r.offset) * kBankRate) : double(rng_.uni()) * room;
+        if (room > 0.0) start = double(rng_.uni()) * room;
         v->pos = v->winStart = start;
         v->winEnd = std::min(len, start + win);
     }
@@ -320,11 +314,12 @@ void Mixer::renderVoice(Voice& v, int n, float bg) {
     const int len = v.length;
     const bool windowed = v.winEnd > 0.0;
     for (int i = 0; i < n; ++i) {
-        int ip = int(v.pos);
-        if (ip >= len || (windowed && v.pos >= v.winEnd)) {
+        // Tested on the double: a huge pitch would overflow the int conversion.
+        if (v.pos >= double(len) || (windowed && v.pos >= v.winEnd)) {
             releaseVoice(v);
             return;
         }
+        int ip = int(v.pos);
         float f = float(v.pos - double(ip));
         float s;
         if (ip >= 1 && ip + 2 < len) {
@@ -538,7 +533,7 @@ void Mixer::renderSpeech(Speech& s, int n) {
             dirLp = (1.0f - w) * OnePole::coefFor(3000.0f, fs_);
         }
     }
-    const float g = kSpeechLevel * s.p.gain * voice_;
+    const float g = kSpeechLevel * s.p.gain * busGain(Bus::Voice);
     s.chain.begin(spatialTarget(basis_, s.p.spatial, s.p.pos, fs_, g * dirGain, s.p.send / dirGain, dirLp), n);
     const double step = double(s.p.srcRate) / double(fs_);
     const float tailK = std::exp(-1.0f / (0.0012f * fs_));
@@ -577,15 +572,6 @@ void Mixer::updateDuck(float blockSec) {
 }
 
 void Mixer::block(float* out, int n) {
-    // Pending bank swaps whose voices ended.
-    for (auto& row : slots_)
-        for (Slot& s : row)
-            if (s.pending && s.users == 0) {
-                retire(s.buf);
-                s.buf = s.pending;
-                s.pending = nullptr;
-            }
-
     const float blockSec = float(n) / fs_;
     const float kv = first_ ? 1.0f : 1.0f - std::exp(-blockSec / 0.05f);
     master_ += (masterT_ - master_) * kv;

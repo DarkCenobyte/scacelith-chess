@@ -1,15 +1,11 @@
-// Projects a cubemap (sky cubemap or one probe of the capture cube array) onto L2 spherical
+// Projects a cubemap (one probe of the capture cube array) onto L2 spherical
 // harmonics, convolved with the clamped cosine lobe and divided by PI (so that evaluating the SH
 // in direction n gives irradiance(n) / PI, ready to multiply by the diffuse albedo). A mild
 // Hanning window reduces ringing from the very bright window directions.
 #include "shaders/include/common.glsl"
 #include "shaders/lighting/cubemap.glsl"
 layout(local_size_x = 64) in;
-#ifdef SH_SKY
-layout(binding = 0) uniform samplerCube uSrc;
-#else
 layout(binding = 0) uniform samplerCubeArray uSrc;
-#endif
 layout(std430, binding = 5) buffer SHOut { vec4 shOut[]; };
 uniform int uLayer;
 uniform int uOutSlot;
@@ -34,11 +30,7 @@ void main() {
         vec2 uv = (vec2(x, y) + 0.5) * h;
         vec3 d = cubeDir(face, uv);
         float w = cubeTexelSolidAngle(uv * 2.0 - 1.0, h);
-#ifdef SH_SKY
-        vec3 L = textureLod(uSrc, d, uLod).rgb;
-#else
         vec3 L = textureLod(uSrc, vec4(d, float(uLayer)), uLod).rgb;
-#endif
         L = min(L, vec3(1000.0)) * w;
         wsum += w;
         c[0] += L * 0.282095;

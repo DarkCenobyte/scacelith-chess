@@ -3,21 +3,11 @@
 // 2015), slowly drifting tiling 3D dust density, blue-noise start offset (integrated by the
 // temporal pass). Output: rgb = pre-exposed in-scattered radiance, a = transmittance.
 #include "shaders/post/post_common.glsl"
+#include "shaders/post/sun_visibility.glsl"
 layout(local_size_x = 8, local_size_y = 8) in;
 layout(binding = 0) uniform sampler2D uHalfDepth;
-layout(binding = 5) uniform sampler2DArrayShadow uShadow;  // compare sampler (LEQUAL), standard depth
 layout(binding = 6) uniform sampler3D uDust;
 layout(binding = 0, rgba16f) uniform writeonly image2D oVol;
-
-float sunVisibility(vec3 p) {
-    int n = int(frame.shadowParams.x);
-    for (int c = 0; c < n; ++c) {
-        vec3 s = (frame.shadowMatrix[c] * vec4(p, 1.0)).xyz;
-        if (all(greaterThan(s.xy, vec2(0.005))) && all(lessThan(s.xy, vec2(0.995))) && s.z > 0.0 && s.z < 1.0)
-            return texture(uShadow, vec4(s.xy, float(c), s.z - 0.0002));
-    }
-    return 1.0;
-}
 
 float dustDensity(vec3 p) {
     float t = post.timing.z;

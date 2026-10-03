@@ -31,7 +31,6 @@ event.colour.black = Ich habe Weiß, also fange ich an.
 event.colour.black.2 = Diesmal spielst du mit Schwarz: Ich ziehe zuerst.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
-event.level.l0 = Die Schachregeln: Wir lernen das Spiel Schritt für Schritt, mit kleinen Übungen.
 event.level.l1 = Erste Schritte: Ich spiele behutsam und erkläre jeden Fehler mit einfachen Worten.
 event.level.l2 = Anfänger: Ich spiele etwas stärker und benenne einfache Taktik wie Gabel und Fesselung.
 event.level.l3 = Hobbyspieler: Ich spreche über Pläne und Bauernstruktur und zeige kurze Varianten.
@@ -99,8 +98,6 @@ event.end.draw.3 = Ein gerechtes Ergebnis. Gute Partie.
 event.end.resigned = Du hast aufgegeben. Trotzdem gut gekämpft.
 event.end.resigned.2 = In Ordnung. Danke für die Partie.
 event.end.handshake = Geben wir uns die Hand.
-event.end.handshake.2 = Danke fürs Spielen.
-event.end.handshake.3 = Gute Partie. Danke schön.
 
 # ---- The rules lesson -----------------------------------------------------------------------------------------
 # {chapter} = the chapter's title (lesson.title.* in lesson.lang). German titles are dative noun phrases
@@ -109,5 +106,3 @@ event.lesson.resume = Willkommen zurück! Machen wir weiter mit {chapter}.
 event.lesson.resume.2 = Da bist du ja wieder! Wir waren gerade mit {chapter} beschäftigt.
 event.lesson.next = Weiter geht's mit {chapter}.
 event.lesson.next.2 = Jetzt beschäftigen wir uns mit {chapter}.
-event.lesson.skip = In Ordnung, gehen wir weiter.
-event.lesson.skip.2 = Gut, das überspringen wir.

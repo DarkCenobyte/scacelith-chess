@@ -245,6 +245,7 @@ bool isValid(ErrorCode v) {
     case ErrorCode::MatchmakingCooldown:
     case ErrorCode::InvalidTimeControl:
     case ErrorCode::RematchUnavailable:
+    case ErrorCode::RatedRepeatLimit:
     case ErrorCode::ProtocolViolation:
     case ErrorCode::Flood:
     case ErrorCode::CheatDetected:
@@ -289,6 +290,7 @@ const char* enumName(ErrorCode v) {
     case ErrorCode::MatchmakingCooldown: return "MatchmakingCooldown";
     case ErrorCode::InvalidTimeControl: return "InvalidTimeControl";
     case ErrorCode::RematchUnavailable: return "RematchUnavailable";
+    case ErrorCode::RatedRepeatLimit: return "RatedRepeatLimit";
     case ErrorCode::ProtocolViolation: return "ProtocolViolation";
     case ErrorCode::Flood: return "Flood";
     case ErrorCode::CheatDetected: return "CheatDetected";

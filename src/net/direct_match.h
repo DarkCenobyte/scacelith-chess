@@ -2,9 +2,9 @@
 // player hosts (listens on a TCP port, opened on the home router with UPnP when possible), the
 // other joins with the host's address, port and a short code the host reads to them.
 //
-// Implementation notes (the API below is unchanged; these points refine or amend the first draft):
-//   - Frame plaintext limit: 16 KiB, not 1024 bytes. A GameSnapshot carries 10 bytes per ply (up
-//     to 1200 plies, about 12.2 KB), so 1024 could not hold the snapshot of a long game.
+// Implementation notes:
+//   - Frame plaintext limit: 16 KiB. A GameSnapshot carries 10 bytes per ply (up to 1200 plies,
+//     about 12.2 KB).
 //   - The host runs up to 4 handshakes at a time (10 s each). A new connection that proves the
 //     code and sends a valid Hello replaces the current guest link: that is how a guest whose old
 //     connection is half-open gets back in. The 10-failure limit counts wrong codes only (garbage
@@ -17,10 +17,10 @@
 //   - Time control: baseSec is clamped to 1..10800, incSec to 0..180.
 //   - Hello from the guest: token = "direct:" + player name, padded with spaces to the schema's
 //     16-byte minimum; the host strips both and sanitises the name (1..24 bytes of UTF-8).
-//   - lastError(): "port_in_use", "network", "too_many_attempts" (host); "invalid_code",
-//     "bad_address", "not_found" (DNS), "refused", "timeout", "unreachable", "reset", "closed",
-//     "wrong_code", "incompatible", "host_left" (guest). After ConnectionChanged(Offline) the
-//     commands have no effect; close() and start again.
+//   - lastError(): "network" (both); "port_in_use", "too_many_attempts" (host); "invalid_code",
+//     "bad_address", "not_found" (DNS), "refused", "timeout", "unreachable", "reset", "in_use",
+//     "closed", "wrong_code", "incompatible", "host_left" (guest). After ConnectionChanged(Offline)
+//     the commands have no effect; close() and start again.
 //   - DirectHostOptions::autoPress reaches both players in every GameSnapshot (OnlineGame::
 //     autoPress): at the start, after a reconnection and in every rematch.
 //   - Gestures (sendGesture, net/gesture.h) go straight to the other player, never through the
@@ -59,8 +59,9 @@
 // device description over HTTP, WANIPConnection (v2, v1) or WANPPPConnection control URL, SOAP
 // GetExternalIPAddress / AddPortMapping (TCP, lease 3600 s renewed every 30 min; falls back to a
 // permanent lease on error 725 and to the next port on 718) / DeletePortMapping when the match
-// ends or the game closes. When the router's external address is private or in 100.64.0.0/10
-// the host is probably behind carrier-grade NAT: the page says so and suggests IPv6 or a VPN.
+// ends or the game closes. When the router's external address is private, in 100.64.0.0/10 or
+// another range the Internet cannot reach (upnp::cgnatSuspected), the host is probably behind
+// carrier-grade NAT: the page says so and suggests IPv6 or a VPN.
 //
 // Engine-free (no GL, no UI); compiled into scacelith_core and unit-tested (tests/direct_tests.cpp).
 #pragma once
@@ -86,7 +87,7 @@ struct UpnpStatus {
     std::string gatewayName;          // friendlyName of the router, if known
     std::string externalIp;           // from GetExternalIPAddress
     uint16_t externalPort = 0;
-    bool cgnatSuspected = false;      // external address private / shared (100.64.0.0/10)
+    bool cgnatSuspected = false;      // external address private / shared (100.64.0.0/10) / not global
     std::string error;                // UPnP error code/description when Failed
 };
 
@@ -98,11 +99,22 @@ struct DirectInvite {
     std::string code;                 // "K7Q2-M9XH-3PTR"
 };
 
+// The guest's address field read as the host's Copy writes it ("[v6]:port CODE",
+// "a.b.c.d:port CODE"): its host, and the port and code it carries ("" when none). The code is a
+// last word after a space, looked for only when 'withCode' (upper-cased; letters, digits and
+// dashes kept); "host:port" is split only with a single ':' (a bare IPv6 address has several) and
+// a port of 1 to 5 digits, "[v6]" only with nothing or ":port" after it. Spaces and tabs around
+// the field and the code are ignored; anything else is the host as typed.
+struct DirectAddress {
+    std::string host, port, code;
+};
+DirectAddress splitDirectAddress(const std::string& field, bool withCode);
+
 class DirectMatch {
 public:
     enum class State {
         Idle,
-        OpeningPort,     // host: UPnP in progress
+        OpeningPort,     // host: opening the port (and UPnP when enabled)
         WaitingForGuest, // host: listening
         Connecting,      // guest: TCP connect
         Handshake,       // both: secure channel being established

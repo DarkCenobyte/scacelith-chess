@@ -6,6 +6,7 @@
 #include "game_archive.h"
 #include <algorithm>
 #include <chrono>
+#include <cmath>
 #include <cstdio>
 #include <exception>
 
@@ -22,12 +23,12 @@ void ServerAnswers::setServer(const std::string& origin) {
     const auto arrived = results_.find(pgn);
     net::Event pgnResult;
     const bool pgnArrived = arrived != results_.end();
-    if (pgnArrived) pgnResult = arrived->second;
+    if (pgnArrived) pgnResult = std::move(arrived->second);
     origin_ = origin;
     results_.clear();
     pending_.clear();
     if (pgnPending > 0) pending_[pgn] = pgnPending;
-    if (pgnArrived) results_[pgn] = pgnResult;
+    if (pgnArrived) results_[pgn] = std::move(pgnResult);
 }
 
 void ServerAnswers::expect(Kind k) {
@@ -43,16 +44,19 @@ bool ServerAnswers::busy(Kind k) const {
 bool ServerAnswers::take(Kind k, net::Event& out) {
     auto it = results_.find(int(k));
     if (it == results_.end()) return false;
-    out = it->second;
+    out = std::move(it->second);
     results_.erase(it);
     return true;
 }
 
-bool ServerAnswers::keep(const net::Event& e) {
+bool ServerAnswers::keep(const net::Event& e) { return keep(net::Event(e)); }
+
+bool ServerAnswers::keep(net::Event&& e) {
     if (foreign(e) && e.kind != Kind::PgnResult) return false;
-    auto it = pending_.find(int(e.kind));
+    const int k = int(e.kind);
+    auto it = pending_.find(k);
     if (it != pending_.end() && it->second > 0) it->second--;
-    results_[int(e.kind)] = e;
+    results_[k] = std::move(e);
     return true;
 }
 
@@ -148,10 +152,6 @@ void HistoryPager::fail(const net::GamesPage& request, const std::string& error,
     waiting_ = false;
     error_ = error.empty() ? std::string("server_error") : error;
     retryAfter_ = std::max(0, retryAfterSec);
-}
-
-void HistoryPager::clear() {
-    *this = HistoryPager();
 }
 
 int HistoryPager::pageCount() const {
@@ -315,13 +315,76 @@ std::string timeControlLabel(int64_t baseMs, int64_t incMs) {
     return buf;
 }
 
+std::string localTimeText(double epochMs) {
+    const std::time_t t = std::time_t(epochMs / 1000.0), now = std::time(nullptr);
+    std::tm when{}, today{};
+    char buf[64] = "";
+    if (archive::localTime(t, when)) {
+        // Two separate results: std::localtime would hand out one shared buffer for both.
+        bool sameDay = archive::localTime(now, today) && today.tm_yday == when.tm_yday && today.tm_year == when.tm_year;
+        if (sameDay) std::snprintf(buf, sizeof buf, "%02d:%02d", when.tm_hour, when.tm_min);
+        else std::snprintf(buf, sizeof buf, "%02d.%02d.%04d %02d:%02d", when.tm_mday, when.tm_mon + 1, when.tm_year + 1900, when.tm_hour, when.tm_min);
+    }
+    return i18n::ltr(buf);
+}
+
+std::string durationText(double ms) {
+    long long s = std::max(0LL, (long long)std::ceil(ms / 1000.0));
+    char buf[32];
+    if (s >= 3600) std::snprintf(buf, sizeof buf, "%lld:%02lld:%02lld", s / 3600, (s / 60) % 60, s % 60);
+    else std::snprintf(buf, sizeof buf, "%lld:%02lld", s / 60, s % 60);
+    return i18n::ltr(buf);
+}
+
+std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t bannedUntilMs) {
+    if (code.empty()) return "";
+    if (code == "rate_limited") {
+        if (retryAfterSec > 0) return i18n::trf("online.err.rate_limited_for", {durationText(retryAfterSec * 1000.0)});
+        return i18n::tr("online.err.rate_limited");
+    }
+    if (code == "server_busy") {
+        // Too many password checks at once on the server (its hash queue is full): not the player's fault.
+        if (retryAfterSec > 0) return i18n::trf("online.err.server_busy_for", {durationText(retryAfterSec * 1000.0)});
+        return i18n::tr("online.err.server_busy");
+    }
+    if (code == "too_many_attempts") {
+        if (retryAfterSec > 0) return i18n::trf("online.err.too_many_attempts_for", {durationText(retryAfterSec * 1000.0)});
+        return i18n::tr("online.err.too_many_attempts");
+    }
+    if (code == "banned") {
+        if (bannedUntilMs > 0) return i18n::trf("online.err.banned_until", {localTimeText(double(bannedUntilMs))});
+        return i18n::tr("online.err.banned");
+    }
+    // The Google sign-in's own failures: a verifier the server refused, or no random numbers here,
+    // read as a failed sign-in; a start answer that is not Google's page as an invalid answer.
+    if (code == "invalid_verifier" || code == "random") return i18n::tr("online.err.sso_failed");
+    if (code == "bad_response") return i18n::tr("online.err.invalid_response");
+    static const char* known[] = {"invalid_credentials", "email_unverified", "network", "tls", "certificate", "incompatible",
+                                  "unauthorized", "username_taken", "email_taken", "invalid_username", "invalid_email",
+                                  "weak_password", "invalid_code", "expired", "registration_closed", "sso_cancelled",
+                                  "server_error", "timeout", "offline", "invalid_password", "mfa_code_required",
+                                  "password_not_set", "same_email", "not_found", "invalid_response", "sso_expired",
+                                  "sso_failed", "sso_listen", "sso_origin", "browser", "sso_email_unverified",
+                                  "sso_account_exists", "sso_already_linked", "account_disabled", "storage"};
+    for (const char* k : known)
+        if (code == k) return i18n::tr(std::string("online.err.") + k);
+    return i18n::trf("online.err.other", {code});
+}
+
+std::string signInErrorText(const net::Event& e, bool justRegistered) {
+    if (justRegistered && e.error == "invalid_credentials") return i18n::tr("online.err.invalid_credentials_pending");
+    return onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs);
+}
+
+std::string signOutEverywhereText(const net::Event& e) {
+    if (e.ok) return i18n::tr("online.account.signed_out_all");
+    const char* key = e.error == "unauthorized" ? "online.account.sign_out_all_failed" : "online.account.sign_out_all_retry";
+    return i18n::trf(key, {onlineErrorText(e.error, e.retryAfterSec)});
+}
+
 std::string exportFileName(const std::string& host, const std::string& username, std::time_t when) {
     std::tm tm{};
-#ifdef _WIN32
-    const bool have = localtime_s(&tm, &when) == 0;
-#else
-    const bool have = localtime_r(&when, &tm) != nullptr;
-#endif
+    const bool have = archive::localTime(when, tm);
     char date[32] = "0000-00-00";
     if (have) std::snprintf(date, sizeof date, "%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
     return archive::sanitizeName(host, 64) + "_" + archive::sanitizeName(username, 40) + "_" + date + ".json";
@@ -331,11 +394,7 @@ std::string exportFileName(const std::string& host, const std::string& username,
 
 std::string gifFileName(std::time_t started, const std::string& white, const std::string& black, uint64_t gameId) {
     std::tm tm{};
-#ifdef _WIN32
-    const bool have = started > 0 && localtime_s(&tm, &started) == 0;
-#else
-    const bool have = started > 0 && localtime_r(&started, &tm) != nullptr;
-#endif
+    const bool have = started > 0 && archive::localTime(started, tm);
     char stamp[64] = "0000-00-00_000000";
     if (have)
         std::snprintf(stamp, sizeof stamp, "%04d-%02d-%02d_%02d%02d%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,
@@ -377,27 +436,14 @@ std::time_t pgnLocalTime(const std::string& date, const std::string& time, std::
 
 std::time_t pgnGameStart(const std::string& date, const std::string& time, const std::string& utcDate, const std::string& utcTime,
                          std::time_t fallback) {
-    auto num = [](const std::string& s, size_t at, size_t n) {
-        int v = 0;
-        for (size_t i = at; i < at + n; ++i) {
-            if (i >= s.size() || s[i] < '0' || s[i] > '9') return -1;
-            v = v * 10 + (s[i] - '0');
-        }
-        return v;
-    };
-    const bool hasTime = num(time, 0, 2) >= 0 && time.size() >= 5 && time[2] == ':' && num(time, 3, 2) >= 0;
+    using archive::digitsAt;
+    const bool hasTime = digitsAt(time, 0, 2) >= 0 && time.size() >= 5 && time[2] == ':' && digitsAt(time, 3, 2) >= 0;
     if (hasTime) return pgnLocalTime(date, time, fallback);
-    const int y = num(utcDate, 0, 4), mo = num(utcDate, 5, 2), d = num(utcDate, 8, 2);
-    const int h = num(utcTime, 0, 2), mi = num(utcTime, 3, 2), se = num(utcTime, 6, 2);
+    const int y = digitsAt(utcDate, 0, 4), mo = digitsAt(utcDate, 5, 2), d = digitsAt(utcDate, 8, 2);
+    const int h = digitsAt(utcTime, 0, 2), mi = digitsAt(utcTime, 3, 2), se = digitsAt(utcTime, 6, 2);
     if (y >= 1970 && mo >= 1 && mo <= 12 && d >= 1 && d <= 31 && h >= 0 && h <= 23 && mi >= 0 && mi <= 59 && se >= 0 && se <= 60 &&
-        utcTime.size() >= 8 && utcTime[2] == ':' && utcTime[5] == ':') {
-        // Days since 1970-01-01 of a proleptic Gregorian date (H. Hinnant's days_from_civil).
-        const int yy = mo <= 2 ? y - 1 : y;
-        const int era = yy / 400, yoe = yy - era * 400;
-        const int doy = (153 * (mo + (mo > 2 ? -3 : 9)) + 2) / 5 + d - 1;
-        const long long days = static_cast<long long>(era) * 146097 + yoe * 365 + yoe / 4 - yoe / 100 + doy - 719468;
-        return std::time_t(days * 86400 + h * 3600 + mi * 60 + se);
-    }
+        utcTime.size() >= 8 && utcTime[2] == ':' && utcTime[5] == ':')
+        return std::time_t(archive::daysFromCivil(y, mo, d) * 86400 + h * 3600 + mi * 60 + se);
     return pgnLocalTime(date, std::string(), fallback);
 }
 

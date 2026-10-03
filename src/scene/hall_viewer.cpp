@@ -3,6 +3,7 @@
 //
 //   scacelith --scene hall [--view player|wide|windows|ceiling|table|orbit]
 //             [--cam x,y,z --target x,y,z] [--fov deg] [--sun x,y,z] [--ev EV100]
+//             [--noglass] [--skip <substring>]
 #include "furniture.h"
 #include "hall.h"
 #include "../app/orbit_camera.h"
@@ -56,7 +57,7 @@ public:
             vec3 s;
             if (parseVec3(sun, s)) sunDir_ = normalize(s);
         }
-        noGlass_ = ctx.hasArg("--noglass");  // debug: hide the (placeholder, opaque) window glass
+        noGlass_ = ctx.hasArg("--noglass");  // debug: hide the window glass (transparent pass)
         skip_ = ctx.argValue("--skip");       // debug: hide parts whose name contains this text
         std::string ev = ctx.argValue("--ev");
         if (!ev.empty()) ev_ = float(std::atof(ev.c_str()));

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.21)
 project(Scacelith VERSION 0.1.0 LANGUAGES C CXX)
 
 # ---------------------------------------------------------------------------------------------
@@ -38,7 +38,23 @@ scacelith_embed_files(${EMBED_CPP} ${ROOT} shaders assets)
 # ---------------------------------------------------------------------------------------------
 # Stockfish (GPL-3.0), compiled into the executable. See third_party/stockfish/README.scacelith.md
 # ---------------------------------------------------------------------------------------------
-if(SCACELITH_STOCKFISH AND EXISTS ${ROOT}/third_party/stockfish/CMakeLists.txt)
+if(SCACELITH_STOCKFISH)
+    if(NOT EXISTS ${ROOT}/third_party/stockfish/CMakeLists.txt)
+        message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but third_party/stockfish is missing (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
+    endif()
+    # The variants take GCC-only options and are isolated with GNU binutils (their isolate.cmake):
+    # another compiler, or LLVM's ld/objcopy/objdump/nm, would fail deep in the build instead of here.
+    if(NOT CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but the compiler is ${CMAKE_CXX_COMPILER_ID}: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
+    endif()
+    foreach(tool LINKER OBJCOPY OBJDUMP NM)
+        if(CMAKE_${tool})   # a missing one is reported by third_party/stockfish
+            execute_process(COMMAND ${CMAKE_${tool}} --version OUTPUT_VARIABLE tool_version ERROR_QUIET)
+            if(NOT tool_version MATCHES "^GNU ")
+                message(FATAL_ERROR "SCACELITH_STOCKFISH is ON but ${CMAKE_${tool}} is not from GNU binutils: the embedded Stockfish variants need GCC with GNU binutils (-DSCACELITH_STOCKFISH=OFF builds without the engine)")
+            endif()
+        endif()
+    endforeach()
     add_subdirectory(third_party/stockfish)
 endif()
 
@@ -58,14 +74,19 @@ set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cp
     ${ROOT}/src/game/replay.cpp ${ROOT}/src/game/online_account.cpp ${ROOT}/src/game/online_mock.cpp)
 list(APPEND CORE_SOURCES ${GAME_CORE_SOURCES})
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
-target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party)
+# The version of project() above, for every module (generated/scacelith_version.h).
+configure_file(${ROOT}/cmake/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith_version.h @ONLY)
+target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party ${CMAKE_CURRENT_BINARY_DIR}/generated)
+# <KHR/khrplatform.h> of third_party/khronos/GL/glcorearb.h (src/gl/gl46.h): the bundled copy, not
+# the system's (libgl-dev), which a tests-only build may lack.
+target_include_directories(scacelith_core SYSTEM PUBLIC ${ROOT}/third_party/khronos)
 target_compile_options(scacelith_core PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
 if(TARGET stockfish_embedded)
     target_link_libraries(scacelith_core PUBLIC stockfish_embedded)
     target_compile_definitions(scacelith_core PUBLIC SCACELITH_HAS_STOCKFISH=1)
 endif()
 if(WIN32)
-    target_link_libraries(scacelith_core PUBLIC ole32 uuid winmm avrt ksuser)
+    target_link_libraries(scacelith_core PUBLIC ole32 winmm avrt)
 else()
     find_package(Threads REQUIRED)
     target_link_libraries(scacelith_core PUBLIC Threads::Threads)
@@ -83,6 +104,9 @@ if(WIN32)
     endforeach()
 endif()
 set_source_files_properties(${ROOT}/src/tts/kernels_sse2.cpp PROPERTIES COMPILE_OPTIONS "-O3")
+# The interpreter's element-wise loops: at -O2 GCC's vectorizer refuses every loop that needs a
+# run-time alias check. Never add fast-math options: the bit-exact audio depends on their absence.
+set_source_files_properties(${ROOT}/src/tts/ops.cpp PROPERTIES COMPILE_OPTIONS "-O3")
 set_source_files_properties(${ROOT}/src/tts/kernels_avx2.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVX2_FLAGS}")
 set_source_files_properties(${ROOT}/src/tts/kernels_avxvnni.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVXVNNI_FLAGS}")
 set_source_files_properties(${ROOT}/src/tts/kernels_avx512.cpp PROPERTIES COMPILE_OPTIONS "${TTS_AVX512_FLAGS}")
@@ -91,6 +115,12 @@ set_source_files_properties(${ROOT}/src/tts/kernels_avx512.cpp PROPERTIES COMPIL
 # shows an instruction above baseline outside the kernel units, one above a unit's level inside it,
 # or a reference into a unit other than from the dispatcher (src/tts/cpu.cpp).
 find_package(Python3 COMPONENTS Interpreter)
+# The shipped exe (a Windows Release build) is never built without the instruction-set audits and
+# the .pdata check below; other builds skip them with a warning.
+string(TOUPPER "${CMAKE_BUILD_TYPE}" build_type)   # as $<CONFIG:Release> compares it
+if(WIN32 AND build_type STREQUAL "RELEASE" AND NOT Python3_Interpreter_FOUND)
+    message(FATAL_ERROR "Python 3 not found: a Windows Release build needs it for the instruction-set audits and the .pdata check")
+endif()
 if(Python3_Interpreter_FOUND AND EXISTS ${ROOT}/third_party/stockfish/tools/isa_audit.py)
     add_executable(tts_isa_probe ${ROOT}/tools/tts_isa_probe.cpp)
     target_link_libraries(tts_isa_probe PRIVATE scacelith_core)
@@ -110,30 +140,23 @@ if(Python3_Interpreter_FOUND AND EXISTS ${ROOT}/third_party/stockfish/tools/isa_
         COMMENT "Auditing the instruction sets of the TTS kernels" VERBATIM)
     add_custom_target(tts_isa_audit ALL DEPENDS ${stamp})
 else()
-    message(STATUS "Python 3 not found: the TTS instruction-set audit is skipped")
+    message(WARNING "Python 3 not found: the TTS instruction-set audit is skipped")
 endif()
 include(third_party/supertonic3/supertonic3.cmake)
 # Networking (src/net): online client (WinHTTP, DPAPI, the shell for SSO), direct match (Winsock,
 # BCrypt ECDH P-256 / AES-GCM / SHA-256, adapter list for iphlpapi) and UPnP on Windows. Linux
-# development builds use OpenSSL: required by the direct match; the online client also builds
-# without it (online play then reports "unavailable").
+# development builds require OpenSSL 3 (online client and direct match).
 set_source_files_properties(${ROOT}/src/net/online_client.cpp PROPERTIES COMPILE_DEFINITIONS
-    "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\";SCACELITH_VERSION_STRING=\"${PROJECT_VERSION}\"")
-# The User-Agent of the voice model downloads ("Scacelith/<version>").
-set_source_files_properties(${ROOT}/src/tts/model_store.cpp PROPERTIES COMPILE_DEFINITIONS
-    "SCACELITH_VERSION_STRING=\"${PROJECT_VERSION}\"")
+    "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\"")
 set_source_files_properties(${ROOT}/tests/net_tests.cpp PROPERTIES COMPILE_DEFINITIONS
     "SCACELITH_OFFICIAL_SERVER=\"${SCACELITH_OFFICIAL_SERVER}\"")
 if(WIN32)
     target_link_libraries(scacelith_core PUBLIC winhttp crypt32 bcrypt ws2_32 iphlpapi shell32)
 else()
-    find_package(OpenSSL REQUIRED)
+    find_package(OpenSSL 3.0 REQUIRED)
     target_link_libraries(scacelith_core PUBLIC OpenSSL::SSL OpenSSL::Crypto)
     target_compile_definitions(scacelith_core PRIVATE SCACELITH_HAS_OPENSSL=1)
 endif()
-# The real network layer replaces the game's offline stand-in (src/game/online_stub.cpp); the
-# in-process fakes stay available with --online-mock.
-target_compile_definitions(scacelith_core PUBLIC SCACELITH_NET_REAL=1)
 
 # ---------------------------------------------------------------------------------------------
 # Game executable. Every .cpp under src/ (except the core modules above) is compiled directly
@@ -146,7 +169,10 @@ file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS
 list(REMOVE_ITEM GAME_SOURCES ${GAME_CORE_SOURCES})
 set(GAME_EXTRA)
 if(WIN32)
-    list(APPEND GAME_EXTRA ${ROOT}/res/scacelith.rc)
+    # The version resource and the manifest, with the version of project().
+    configure_file(${ROOT}/res/scacelith.rc.in ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.rc @ONLY)
+    configure_file(${ROOT}/res/scacelith.manifest.in ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.manifest @ONLY)
+    list(APPEND GAME_EXTRA ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.rc)
 endif()
 add_executable(scacelith ${ROOT}/src/main.cpp ${GAME_SOURCES} ${GAME_EXTRA})
 target_compile_options(scacelith PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
@@ -154,6 +180,8 @@ target_link_libraries(scacelith PRIVATE scacelith_core)
 if(WIN32)
     target_link_libraries(scacelith PRIVATE opengl32 gdi32 user32 shell32 dwmapi)
     target_link_options(scacelith PRIVATE -static -static-libgcc -static-libstdc++)
+    # The release exe without its symbol table and debug sections: nothing reads them at run time.
+    target_link_options(scacelith PRIVATE $<$<CONFIG:Release>:-s>)
     if(NOT SCACELITH_CONSOLE)
         target_link_options(scacelith PRIVATE -mwindows)
     endif()
@@ -169,9 +197,31 @@ endif()
 file(GLOB TEST_SOURCES CONFIGURE_DEPENDS ${ROOT}/tests/*.cpp)
 if(TEST_SOURCES)
     add_executable(scacelith_tests ${TEST_SOURCES})
+    # The shader preprocessor's tests: shader.cpp needs the GL entry points only to link (they
+    # stay null, no GL library: the tests never compile a program).
+    target_sources(scacelith_tests PRIVATE ${ROOT}/src/render/shader.cpp ${ROOT}/src/gl/gl46.cpp)
+    # The hall ceiling's geometry tests: CPU meshes only (mesh.cpp's upload is never called).
+    target_sources(scacelith_tests PRIVATE ${ROOT}/src/scene/hall_ceiling.cpp ${ROOT}/src/scene/hall_geom.cpp
+                   ${ROOT}/src/scene/hall_ornament.cpp ${ROOT}/src/render/mesh.cpp)
     target_compile_options(scacelith_tests PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
     target_link_libraries(scacelith_tests PRIVATE scacelith_core)
     if(WIN32)
         target_link_options(scacelith_tests PRIVATE -static -static-libgcc -static-libstdc++)
     endif()
+endif()
+
+# Windows: the exception table (.pdata) of each exe is checked after its link when Python is
+# available (tools/check_pdata.py). Windows and Wine binary-search it to unwind every C++ throw:
+# the build fails if its entries are unsorted, overlap or point at bad unwind data, or if libgcc's
+# unwinder would find another function's entry (a throw would then loop forever or crash).
+# A Release scacelith.exe is linked stripped (-s): only its table is checked, while scacelith_tests,
+# which keeps its symbols, also gets the per-function check.
+if(WIN32 AND Python3_Interpreter_FOUND)
+    foreach(exe scacelith scacelith_tests)
+        if(TARGET ${exe})
+            add_custom_command(TARGET ${exe} POST_BUILD
+                COMMAND ${Python3_EXECUTABLE} ${ROOT}/tools/check_pdata.py --quiet $<TARGET_FILE:${exe}>
+                VERBATIM)
+        endif()
+    endforeach()
 endif()

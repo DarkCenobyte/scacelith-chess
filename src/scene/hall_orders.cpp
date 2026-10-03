@@ -161,6 +161,7 @@ void buildOrders(Accum& a) {
         astragal.push_back({0.018f * std::cos(th), CAPITAL_BOTTOM - 0.035f + 0.018f * std::sin(th)});
     }
     astragal.push_back({0.0f, CAPITAL_BOTTOM});
+    CapitalCache capitals;
     for (int wid = 0; wid < 4; ++wid) {
         const WallDef& w = wall(wid);
         for (float up : w.pilasters) {
@@ -170,7 +171,7 @@ void buildOrders(Accum& a) {
             // Filler between the astragal and the capital's bell.
             quadFlat(stone, w.P(up - HW, CAPITAL_BOTTOM - 0.035f, PP), w.P(up + HW, CAPITAL_BOTTOM - 0.035f, PP),
                      w.P(up + HW, CAPITAL_BOTTOM, PP), w.P(up - HW, CAPITAL_BOTTOM, PP), w.N, w.U);
-            corinthianCapital(gilt, w, up, CAPITAL_BOTTOM, ENTABLATURE_BOTTOM, HW, PP);
+            corinthianCapital(gilt, w, up, CAPITAL_BOTTOM, ENTABLATURE_BOTTOM, HW, PP, &capitals);
         }
     }
 

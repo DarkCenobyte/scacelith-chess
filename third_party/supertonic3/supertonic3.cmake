@@ -49,10 +49,16 @@ function(supertonic3_prepare)
             set(archive ${deps}/${SUPERTONIC3_NAME}.tar.bz2)
             if(NOT EXISTS ${archive} AND SCACELITH_SUPERTONIC_DOWNLOAD)
                 message(STATUS "Supertonic 3: downloading ${SUPERTONIC3_URL}")
-                file(DOWNLOAD ${SUPERTONIC3_URL} ${archive}.part STATUS status
-                     EXPECTED_HASH SHA256=${SUPERTONIC3_SHA256} TLS_VERIFY ON)
+                # No EXPECTED_HASH: it makes a failed transfer a configure error instead of the warning
+                # below. The digest is checked once the file is complete.
+                file(DOWNLOAD ${SUPERTONIC3_URL} ${archive}.part STATUS status TLS_VERIFY ON)
                 list(GET status 0 code)
                 if(code EQUAL 0)
+                    file(SHA256 ${archive}.part hash)
+                    if(NOT hash STREQUAL SUPERTONIC3_SHA256)
+                        file(REMOVE ${archive}.part)
+                        message(FATAL_ERROR "Supertonic 3: the downloaded archive has SHA-256 ${hash}, expected ${SUPERTONIC3_SHA256}")
+                    endif()
                     file(RENAME ${archive}.part ${archive})
                 else()
                     file(REMOVE ${archive}.part)

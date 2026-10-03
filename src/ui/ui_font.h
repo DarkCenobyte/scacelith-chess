@@ -44,8 +44,9 @@ enum Face : int {
 // have different styles on the same scoresheet.
 enum HandStyle : int { HAND_CAVEAT = 0, HAND_MARCK = 1, HAND_BADSCRIPT = 2, HAND_STYLE_COUNT };
 const char* handStyleName(int style);   // "Caveat", "Marck Script", ...
-// Face that writes 'cp' in the given hand: the style's face when it has the glyph, then the
-// script faces, then the UI text face. Never returns a face without the glyph unless none has it.
+// Face that writes 'cp' in the given hand: the handwriting face of its script first (Arabic, kana,
+// Han, CJK punctuation), then the style's face, then Caveat, Klee One and LXGW WenKai, then the UI
+// text face; the style's face when none of them has the glyph.
 int handwritingFace(int style, uint32_t cp);
 bool isHandwritingFace(int face);
 
@@ -92,9 +93,6 @@ int atlasGeneration();
 void prewarm(const std::vector<std::pair<int, uint32_t>>& glyphs);
 // Call once per frame before drawing: uploads glyphs added since the last call.
 void flushUploads();
-
-// UTF-8 decoding helper: returns the codepoint at s[i] and advances i (invalid bytes -> U+FFFD).
-uint32_t decodeUtf8(const std::string& s, size_t& i);
 
 // Renders one line of text in 'face' into a standalone single-channel distance field, independent
 // of the atlas (for markings baked into 3D material textures). No shaping: left to right, with the

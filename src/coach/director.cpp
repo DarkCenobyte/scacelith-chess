@@ -11,6 +11,7 @@
 #include "director.h"
 #include "catalog.h"
 #include "pacing.h"
+#include "subtitles.h"
 #include "../core/log.h"
 #include <algorithm>
 #include <cmath>
@@ -28,7 +29,6 @@ constexpr float kDemoPause = 0.4f;       // stillness after a demonstration move
 constexpr float kRefusedVoice = 1.0f;    // startVoice refused this long: the line is only shown
 constexpr float kWatchdog = 1.5f;        // a heard line never reported finished: over after this
 constexpr float kLevelWindow = 0.05f;    // RMS window of the mouth's speech level
-constexpr float kEarlyBias = 0.10f;      // pacing's bias, for the lines shown without a voice
 constexpr size_t kPrefetchMax = 64;      // lines synthesised ahead by prefetch() kept at most
 constexpr int kMaxSteps = 32;            // beats started in one update at most
 
@@ -55,16 +55,6 @@ bool hasHandGesture(const Beat& b) {
 }
 
 bool movesHand(const Beat& b) { return tableBeat(b.kind) || hasHandGesture(b); }
-
-// The rule of game::coachSubtitlesShown (game/settings.h), which src/coach cannot include (the
-// settings header pulls the renderer in). Keep both identical: no voice -> shown; On; Off;
-// Automatic -> shown when the voice speaks another language than the UI.
-bool subtitlesShown(int mode, const std::string& uiLanguage, const std::string& speechLang, bool voiceAvailable) {
-    if (!voiceAvailable) return true;
-    if (mode == 1) return true;
-    if (mode == 2) return false;
-    return speechLang != uiLanguage;
-}
 
 // Beat serials are process-wide (main thread): the catalog remembers its variant picks by seed, so
 // seeds must not start again with every game.
@@ -119,7 +109,7 @@ float readingAnchor(const Catalog::Rendered& spoken, const std::string& name, fl
     const float total = textWeight(spoken.text, 0, spoken.text.size());
     float frac = std::min(1.0f, std::max(0.0f, fallback));
     if (off >= 0 && total > 0.0f) frac = textWeight(spoken.text, 0, size_t(off)) / total;
-    return std::max(0.0f, frac * duration - kEarlyBias);
+    return std::max(0.0f, frac * duration - PacingOptions().earlyBias);   // pacing's bias
 }
 
 // The mouth: RMS of the voice over ~50 ms around 't' (seconds into the PCM), 0..1.
@@ -184,7 +174,7 @@ struct Director::Impl {
         Phase phase = Phase::Prepare;
         bool line = false;                 // a line is said
         bool voiced = false;               // ... and heard
-        bool lineStarted = false, lineDone = false, cut = false;
+        bool lineStarted = false, lineDone = false;
         float lineTime = 0.0f;             // seconds since the line started (not paused)
         float clock = 0.0f;                // line time: the voice clock, or lineTime without a voice
         float duration = 0.0f;             // audio length, or reading time
@@ -214,6 +204,7 @@ struct Director::Impl {
     int ply = 0;
     int demoDepth = 0;                     // demonstration moves on the table, not rewound yet
     bool paused = false;
+    bool voicePaused = false;              // the stage was told pauseVoice(true), not released yet
     bool hint = false;                     // skip hint shown
     float level = 0.0f;
 
@@ -232,7 +223,8 @@ struct Director::Impl {
             if (s.pcm.empty()) s.failed = true;   // synthesis failed: shown only
         } else if (stage->speechFailed(s.request)) {
             s.failed = true;
-            LOGW("coach: speech of %s failed, shown only", s.written.text.c_str());
+            const std::string& text = s.written.text.empty() ? s.spoken.text : s.written.text;   // prefetched: spoken only
+            LOGW("coach: speech of %s failed, shown only", text.c_str());
         }
     }
 
@@ -351,7 +343,8 @@ struct Director::Impl {
     }
 
     // An Urgent beat waits at the head of the queue: a Normal/Low beat not started yet goes back
-    // behind it, a running Normal/Low line is cut at its next sentence boundary, a pause ends.
+    // behind it, a running Normal/Low line is cut at its next pause at a punctuation mark, a pause
+    // ends.
     void preempt() {
         if (!run.active || queue.empty() || queue.front().beat.priority != Priority::Urgent) return;
         const Beat& b = run.item.beat;
@@ -372,7 +365,8 @@ struct Director::Impl {
         run.cutAt = nextBoundary();
     }
 
-    // Line time of the next sentence boundary after the running line's clock (-2: none).
+    // Line time of the next pause at a punctuation mark (comma, colon, dash or sentence end) after
+    // the running line's clock (-2: none).
     float nextBoundary() const {
         const float t = run.clock + 0.02f;
         if (run.voiced) {
@@ -440,9 +434,9 @@ struct Director::Impl {
         if (now) m.fading = true;
     }
 
-    void releaseAll(bool untilRewindOnly) {
+    void releaseUntilRewind() {
         for (LiveMark& m : live) {
-            if (untilRewindOnly && !m.untilRewind) continue;
+            if (!m.untilRewind) continue;
             if (!m.lit) light(m, m.onAt);
             release(m, false);
             m.holdLeft = 0.0f;
@@ -513,7 +507,7 @@ struct Director::Impl {
             if (count <= 0) {   // nothing of the demonstration is on the table (skipped)
                 run.line = false;
                 run.table = false;
-                releaseAll(true);
+                releaseUntilRewind();
                 return true;
             }
         }
@@ -538,7 +532,7 @@ struct Director::Impl {
             run.lineStarted = true;
             const bool voiceOk = stage->voiceAvailable() && run.voiced;
             if (subtitlesShown(config.subtitles, config.uiLanguage, speechLang(), voiceOk))
-                stage->showSubtitle(s.written.text, run.voiced ? run.duration : stage->readingTime(s.written.text));
+                stage->showSubtitle(s.written.text, run.duration, !voiceOk);
         }
         stage->look(b.look, targetOf(b));
 
@@ -563,7 +557,7 @@ struct Director::Impl {
             break;
         case BeatKind::Rewind: {
             const int count = std::min(b.count, demoDepth);
-            releaseAll(true);
+            releaseUntilRewind();
             stage->rewindDemo(count, run.fast);
             demoDepth -= count;
             run.table = true;
@@ -590,13 +584,12 @@ struct Director::Impl {
     // The running line is over (heard, cut or skipped).
     void lineOver(bool cut) {
         run.lineDone = true;
-        run.cut = cut;
         releaseMarks(run.item.serial, cut);
         if (run.gestures) {
             stage->endGestures();
             run.gestures = false;
         }
-        if (cut) stage->showSubtitle("", 0.0f);
+        if (cut) stage->showSubtitle("", 0.0f, false);
     }
 
     // Advances the running beat by dt. True once it is over.
@@ -661,23 +654,29 @@ struct Director::Impl {
         run = Run();
     }
 
-    // Stops the running beat now (skip, clear, jump): voice, subtitle, hand, marks.
+    // Stops the started beat's line now: voice, subtitle, hand, marks.
+    void stopLine(bool keepUntilRewind) {
+        if (run.line && !run.lineDone) {
+            if (run.voiced) stage->stopVoice();
+            stage->showSubtitle("", 0.0f, false);
+            run.lineDone = true;
+        }
+        for (LiveMark& m : live) {
+            if (m.serial != run.item.serial) continue;
+            if (!m.lit) light(m, m.onAt);
+            if (!(keepUntilRewind && m.untilRewind)) release(m, true);
+        }
+        if (run.gestures) stage->endGestures();
+        run.gestures = false;
+    }
+
+    // Stops the running beat now (skip, clear, jump): its line, the takeback card.
     void stopRun(bool keepUntilRewind) {
         if (!run.active) return;
         if (run.phase == Phase::Prepare) {
             drop(run.item);
         } else {
-            if (run.line && !run.lineDone) {
-                if (run.voiced) stage->stopVoice();
-                stage->showSubtitle("", 0.0f);
-                run.lineDone = true;
-            }
-            for (LiveMark& m : live) {
-                if (m.serial != run.item.serial) continue;
-                if (!m.lit) light(m, m.onAt);
-                if (!(keepUntilRewind && m.untilRewind)) release(m, true);
-            }
-            if (run.gestures) stage->endGestures();
+            stopLine(keepUntilRewind);
             if (run.card) stage->showTakebackOffer(false);
         }
         run = Run();
@@ -710,7 +709,7 @@ struct Director::Impl {
             step = 0.0f;
         }
         pump(true);   // the beats just started or moved up
-        if (!run.active && queue.empty() && held.empty() && !waiting) releaseAll(true);
+        if (!run.active && queue.empty() && held.empty() && !waiting) releaseUntilRewind();
         rebuildShown();
 
         float lv = 0.0f;
@@ -733,7 +732,8 @@ struct Director::Impl {
         return b.skippable;
     }
 
-    void skip() {
+    // Space: the running beat, and with 'rest' the skippable beats of its script queued after it.
+    void skip(bool rest) {
         if (!stage || !run.active) return;
         const Beat& b = run.item.beat;
         const uint64_t script = run.item.script;
@@ -747,7 +747,7 @@ struct Director::Impl {
         if (!b.skippable || run.phase == Phase::Offer) return;
         // The rest of the script: skippable beats go; an offer stays (its card only); a rewind
         // stays and goes briskly.
-        for (auto it = queue.begin(); it != queue.end();) {
+        for (auto it = queue.begin(); rest && it != queue.end();) {
             if (it->script != script) {
                 ++it;
                 continue;
@@ -770,7 +770,7 @@ struct Director::Impl {
             // The offer's line: the card shows at once.
             if (run.phase == Phase::Running && run.line && !run.lineDone) {
                 if (run.voiced) stage->stopVoice();
-                stage->showSubtitle("", 0.0f);
+                stage->showSubtitle("", 0.0f, false);
                 run.lineDone = true;
                 if (run.gestures) {
                     stage->endGestures();
@@ -783,13 +783,26 @@ struct Director::Impl {
             }
             return;
         }
+        if (!rest && b.kind == BeatKind::DemoMove) {
+            // Its narration only: the move is still played, the lines kept after it speak of it.
+            if (run.phase == Phase::Prepare) {
+                drop(run.item);
+                run.item.silent = true;
+                run.line = false;
+                return;
+            }
+            if (run.line && !run.lineDone) {
+                stopLine(rewindQueued(script));
+                return;
+            }
+        }
         stopRun(rewindQueued(script));
     }
 
     void clear() {
         if (!stage) return;
         stopRun(false);
-        stage->showSubtitle("", 0.0f);
+        stage->showSubtitle("", 0.0f, false);
         for (Item& it : queue) drop(it);
         for (Item& it : held) drop(it);
         queue.clear();
@@ -845,6 +858,7 @@ void Director::reset(Stage* stage, const DirectorConfig& config) {
     if (stage && stage == d_->stage) {
         clear();
         for (Impl::Cached& c : d_->cache) d_->cancel(c.speech);
+        if (d_->voicePaused) stage->pauseVoice(false);   // left paused (back to the menu from the pause menu)
     }
     auto observer = std::move(d_->observer);
     delete d_;
@@ -918,10 +932,19 @@ void Director::setPaused(bool paused) {
     Impl& d = *d_;
     if (d.paused == paused) return;
     d.paused = paused;
-    if (d.stage && d.run.active && d.run.voiced && d.run.lineStarted && !d.run.lineDone) d.stage->pauseVoice(paused);
+    if (!d.stage) return;
+    if (paused && d.run.active && d.run.voiced && d.run.lineStarted && !d.run.lineDone) {
+        d.stage->pauseVoice(true);
+        d.voicePaused = true;
+    } else if (!paused && d.voicePaused) {
+        d.stage->pauseVoice(false);   // also when the paused line was stopped meanwhile (clear)
+        d.voicePaused = false;
+    }
 }
 
-void Director::skip() { d_->skip(); }
+void Director::skip() { d_->skip(true); }
+
+void Director::skipCurrent() { d_->skip(false); }
 
 void Director::playerActed() {
     Impl& d = *d_;
@@ -945,6 +968,11 @@ bool Director::speaking() const {
     return d.run.active && d.run.line && d.run.lineStarted && !d.run.lineDone;
 }
 
+const std::string* Director::runningKey() const {
+    const Impl& d = *d_;
+    return d.run.active && d.run.line && d.run.lineStarted ? &d.run.item.beat.line.key : nullptr;
+}
+
 bool Director::skippable() const { return d_->skippable(); }
 
 bool Director::waitingMove(int* expect) const {
@@ -964,19 +992,20 @@ void Director::endWait() {
 
 bool Director::offerOpen() const { return d_->run.active && d_->run.phase == Impl::Phase::Offer; }
 
-void Director::closeOffer() {
+bool Director::closeOffer() {
     Impl& d = *d_;
-    if (!d.stage) return;
+    if (!d.stage) return false;
     if (d.run.active && d.run.item.beat.kind == BeatKind::OfferTakeback) {
         d.stopRun(false);
-        return;
+        return true;
     }
     for (auto it = d.queue.begin(); it != d.queue.end(); ++it) {
         if (it->beat.kind != BeatKind::OfferTakeback) continue;
         d.drop(*it);
         d.queue.erase(it);
-        return;
+        return true;
     }
+    return false;
 }
 
 const std::vector<ShownMark>& Director::marks() const { return d_->shown; }

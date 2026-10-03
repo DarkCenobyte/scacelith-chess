@@ -8,8 +8,6 @@
 # the title face (Cinzel) is an inscriptional capital face.
 # Keep the sections: other parts of the game add their keys in sections of their own.
 
-language.name = English
-
 # ---- Common words ------------------------------------------------------------------------------
 common.on = On
 common.off = Off
@@ -69,6 +67,7 @@ options.depth_of_field = Depth of field
 options.depth_of_field.help = Softens what lies well in front of or behind what you look at, as a camera lens does.
 options.brightness = Brightness
 options.brightness.neutral = Neutral
+options.brightness.value = {0} EV
 options.brightness.help = Exposure compensation of the camera. The calibration of the first start sets it so that the darkest shadows are barely visible.
 
 options.master_volume = Master volume
@@ -356,11 +355,6 @@ viewer.note = Both players are Stockfish. Fly freely around the hall while they 
 viewer.summary = {0} vs {1}
 viewer.custom = Custom
 viewer.tc.custom = Your own
-viewer.tc.none = No clock
-viewer.tc.bullet = Bullet
-viewer.tc.blitz = Blitz
-viewer.tc.rapid = Rapid
-viewer.tc.classical = Classical
 viewer.base_time = Base time
 viewer.increment = Increment
 viewer.delay = Delay
@@ -549,10 +543,26 @@ online.forgot.lead = Enter the e-mail address of your account: we will send you 
 online.forgot.button = Send the link
 online.forgot.sent = If an account uses this address, a link is on its way.
 online.sso.title = SIGN IN WITH GOOGLE
-online.sso.wait = Continue in your web browser: sign in with Google in the window that opened. This page follows along.
+online.sso.wait = Continue in your web browser: choose your Google account in the window that opened. Scacelith takes over as soon as Google sends you back.
 online.sso.name_title = CHOOSE YOUR NAME
 online.sso.name_lead = This is your first time here with Google. Choose the name other players will see.
 online.sso.continue = Continue
+online.sso.finishing = Google sent you back. Finishing the sign-in…
+online.sso.link_title = ADD GOOGLE SIGN-IN
+# {0} = the account's user name, {1} = the server's name
+online.sso.link_lead = The account {0} on {1} already uses the e-mail address of this Google account. Enter this account's password to add Google sign-in to it. You only need to do this once.
+online.sso.link_button = Add Google sign-in
+online.sso.link_mfa = Google sign-in is added to this account once the code is accepted.
+online.sso.not_mine = This is not my account
+online.sso.not_mine_note = Google sign-in was not added. If this e-mail address is yours, use "Forgot password?" with it: the link goes to that mailbox. If the account also asks for a two-factor code you do not have, contact the server's operator.
+# The page the browser shows when Google sends it back to the game (127.0.0.1)
+online.sso.page.title = Scacelith: Google sign-in
+online.sso.page.done_heading = Back to Scacelith
+online.sso.page.done = Google has sent you back to Scacelith. Return to the game to finish signing in; you can close this tab.
+online.sso.page.cancelled_heading = Sign-in cancelled
+online.sso.page.cancelled = Google sign-in was cancelled. You can close this tab and go back to Scacelith.
+online.sso.page.foreign_heading = This page is not for you
+online.sso.page.foreign = This page does not match the sign-in Scacelith is waiting for on this computer. If you did not just start a Google sign-in in Scacelith, someone may have sent you this link: close this tab.
 
 # Account
 online.account.button = Account
@@ -575,6 +585,9 @@ online.account.sign_out_all = Sign out everywhere
 online.account.sign_out_all.help = Signs this account out on every computer, this one included.
 online.account.signed_out = You are signed out.
 online.account.signed_out_all = You are signed out on every computer.
+online.account.signing_out_all = Signing out every computer…
+online.account.sign_out_all_failed = Your other computers may still be signed in: sign in again, then sign them out from Signed-in devices. {0}
+online.account.sign_out_all_retry = Your other computers may still be signed in. Try Sign out everywhere again. {0}
 online.account.ratings = RATINGS
 online.account.col.tc = TIME CONTROL
 online.account.col.rating = RATING
@@ -661,6 +674,7 @@ online.challenge.you_random = colours by lot
 online.challenge.declined = {0} declined your challenge.
 online.challenge.expired = Your challenge expired without an answer.
 online.challenge.unavailable = {0} is not available right now.
+online.challenge.lost = Connection lost: your challenge was cancelled.
 
 # At the table
 online.pause.clock_runs = The game goes on: your clock keeps running.
@@ -702,6 +716,7 @@ online.report.comment = Comment
 online.report.comment.hint = optional
 online.report.send = Send report
 online.report.sent = Report sent. Thank you.
+online.report.queued = Your report will be sent when the game ends.
 # Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
 online.sheet.note = Online, {0} {1}
 online.sheet.rated = rated
@@ -728,6 +743,7 @@ online.err.server_busy = The server is busy. Try again in a moment.
 online.err.banned_until = This account is suspended until {0}.
 online.err.banned = This account is suspended.
 online.err.invalid_credentials = Wrong user name or password.
+online.err.invalid_credentials_pending = Wrong user name or password. If you have just signed up, open the link we sent you first.
 online.err.email_unverified = Your e-mail address is not verified yet: open the link we sent you.
 online.err.network = The server cannot be reached. Check your connection and the server address.
 online.err.tls = A secure connection to the server could not be set up.
@@ -743,6 +759,15 @@ online.err.invalid_code = This code is not right.
 online.err.expired = This request has expired: please start again.
 online.err.registration_closed = This server does not accept new accounts.
 online.err.sso_cancelled = Google sign-in was cancelled.
+online.err.sso_expired = Google sign-in took too long or was already used. Please start again.
+online.err.sso_failed = Google sign-in did not work. Please try again.
+online.err.sso_listen = Scacelith could not receive Google's answer on this computer. Please try again.
+online.err.sso_origin = Google sign-in does not work through this server address. Add the server under the public name its operator gives, then try again.
+online.err.browser = The web browser could not be opened.
+online.err.sso_email_unverified = Google has not confirmed the e-mail address of this Google account.
+online.err.sso_account_exists = An account already uses this e-mail address and cannot be linked to Google sign-in: sign in with its password, or use "Forgot password?".
+online.err.sso_already_linked = This Google account is already linked to another account.
+online.err.account_disabled = This account can no longer be used.
 online.err.server_error = The server had a problem. Please try again.
 online.err.timeout = The server did not answer in time.
 online.err.offline = Not connected to the server: try again once connected.
@@ -762,13 +787,14 @@ online.err.flag_fell = Your time ran out.
 online.err.queue_not_allowed = You cannot look for an opponent right now.
 online.err.challenge_not_found = This challenge no longer exists.
 online.err.user_unavailable = This player is not available.
-online.err.challenge_limit = Too many challenges at once.
+online.err.challenge_limit = Too many challenges for now. Try again later.
 online.err.challenge_self = You cannot challenge yourself.
 online.err.code_invalid = No game has this code.
 online.err.rated_official_tc = Only the official time controls can be rated.
 online.err.cooldown = Matchmaking is paused for you for a moment.
 online.err.invalid_tc = This time control is not allowed.
 online.err.rematch_unavailable = A rematch is no longer possible.
+online.err.rated_repeat_limit = You have played enough rated games against this player for now. Play a casual game, or try again later.
 online.err.cheat_detected = The game was stopped by the server's fair-play checks.
 online.err.invalid_password = Wrong password.
 online.err.mfa_code_required = Enter a code from your authenticator app (or a recovery code).
@@ -778,6 +804,7 @@ online.err.too_many_attempts_for = Too many wrong attempts. Try again in {0}.
 online.err.same_email = This is already your e-mail address.
 online.err.not_found = Not found on the server.
 online.err.invalid_response = The server's answer could not be read.
+online.err.storage = The session could not be saved on this computer.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = GAME HISTORY
@@ -1188,3 +1215,9 @@ gif.err.not_found = This game is no longer on the server.
 gif.wait.seconds = {0} second|{0} seconds
 gif.wait.minutes = {0} minute|{0} minutes
 gif.wait.both = {0} and {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Could not start OpenGL 4.6. Please update your graphics driver.
+error.renderer = The renderer could not be started.
+error.scene = The scene could not be loaded.
+error.log_file = Details are in the log file: {0}

@@ -6,7 +6,6 @@ layout(binding = 0) uniform sampler2D uSrc;
 layout(location = 1) uniform int uLod;
 layout(std430, binding = 5) buffer Histogram { uint bins[256]; };
 shared uint sBins[256];
-const float MIN_LOG = -14.0, RANGE_LOG = 20.0;
 
 void main() {
     uint lid = gl_LocalInvocationIndex;
@@ -18,7 +17,7 @@ void main() {
         vec3 c = texelFetch(uSrc, p, uLod).rgb;
         float L = luminance(c);
         uint bin = 0u;
-        if (L > 1e-7 && !isnan(L) && !isinf(L)) bin = 1u + uint(saturate((log2(L) - MIN_LOG) / RANGE_LOG) * 254.0 + 0.5);
+        if (L > 1e-7 && !isnan(L) && !isinf(L)) bin = 1u + uint(saturate((log2(L) - EXPO_MIN_LOG) / EXPO_RANGE_LOG) * 254.0 + 0.5);
         vec2 d = (vec2(p) + 0.5) / vec2(size) - 0.5;
         d.x *= float(size.x) / float(size.y);
         float w = mix(0.25, 1.0, exp(-dot(d, d) * 6.0));

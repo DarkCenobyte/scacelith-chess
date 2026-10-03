@@ -29,16 +29,12 @@ void quad(MeshData& d, uint32_t a, uint32_t b, uint32_t c, uint32_t e);  // ring
 
 // Flat quad a-b-c-e (any winding) facing n. uv = planar projection in meters (axis uAxis).
 void quadFlat(MeshData& d, vec3 a, vec3 b, vec3 c, vec3 e, vec3 n, vec3 uAxis);
-// Flat convex polygon (fan from the first vertex), facing n.
-void polygon(MeshData& d, const std::vector<vec3>& pts, vec3 n, vec3 uAxis);
 
 enum BoxFace : unsigned { F_PX = 1, F_NX = 2, F_PY = 4, F_NY = 8, F_PZ = 16, F_NZ = 32, F_ALL = 63 };
 // Axis-aligned box, uv = world meters per face.
 void boxAA(MeshData& d, vec3 lo, vec3 hi, unsigned faces = F_ALL);
 // Oriented box: centre c, orthonormal axes, half extents h (faces mask uses the local axes).
 void box(MeshData& d, vec3 c, vec3 ax, vec3 ay, vec3 az, vec3 h, unsigned faces = F_ALL);
-// Box transformed by an arbitrary affine matrix (unit cube [-1,1]^3 scaled by h first).
-void boxXf(MeshData& d, const mat4& xf, vec3 h, unsigned faces = F_ALL);
 
 // ---- Parametric surfaces ----------------------------------------------------------------------
 using SurfFn = std::function<vec3(float, float)>;
@@ -96,6 +92,5 @@ struct Accum {
 
 inline vec3 lerp3(vec3 a, vec3 b, float t) { return a + (b - a) * t; }
 inline float sq(float x) { return x * x; }
-size_t triangleCount(const MeshData& d);
 
 }  // namespace hallgeo

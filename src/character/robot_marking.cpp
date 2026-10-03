@@ -58,7 +58,6 @@ bool ChestMarking::create(const std::string& text) {
     material.name = "RobotPorcelainMarked";
     material.defines.push_back("ROBOT_MARKING");
     material.textures[0] = texture;
-    material.textureTargets[0] = GL_TEXTURE_2D;
     material.params[5] = vec4(0.0f, kCentreY, float(kTexW) * texel, float(kTexH) * texel);
     material.params[6] = vec4(kPigment, 2.0f * float(kSpread));
     material.params[7] = vec4(kDilation / texel, kTranslucencyUnderInk, kMinNormalZ, kBleed / texel);

@@ -46,8 +46,10 @@ const char* MIPS_CS = "shaders/materials/bake/scoresheet_mips.comp";
 // A glyph ready to be drawn into a page field: its placement, atlas quad and distance scale.
 struct InkGlyph {
     GlyphInk ink;
+    int face = 0;         // the face that supplied the glyph (cp): its atlas place, looked up again
+    uint32_t cp = 0;      // the codepoint rasterised: ink.cp, or '?' for the stand-in of one no face has
     vec2 q0, q1;          // quad bounds, glyph-local mm (SDF padding included)
-    vec2 uv0, uv1;        // atlas
+    vec2 uv0, uv1;        // atlas (font::atlasGeneration() Impl::atlasGen)
     float distScale = 1;  // page mm per unit of atlas value
     float dilation = 0;   // mm
     float pressure = 1;
@@ -149,7 +151,7 @@ uint32_t mix32(uint32_t a, uint32_t b) { return hash32(a * 0x9E3779B9u ^ (b + 0x
 float unit(uint32_t h) { return float(h & 0xFFFFFF) / 16777216.0f; }
 
 // Distance-field thickness correction of the handwriting faces towards a ballpoint line
-// (~0.35 mm): mm added to the glyph outline at the move size.
+// (about 0.45 mm): mm added to the glyph outline at the move size.
 float styleDilation(int style) {
     // Brings each face to the line of a medium ballpoint (about 0.45 mm): thinner lines fell
     // below a pixel at the player's reading distance and the writing turned pale grey.
@@ -258,6 +260,7 @@ struct Scoresheet::Impl {
     int layerPage[2] = {-1, -1};
     std::vector<InkGlyph> layerPending[2];
     std::string language;
+    int atlasGen = -1;           // the font atlas generation the ink's coordinates belong to
     // Finished ink per page, and the fields written (or queued) per page.
     std::vector<std::vector<InkGlyph>> pageInk;
     std::vector<std::array<bool, size_t(Field::Count)>> fieldTaken;
@@ -290,6 +293,24 @@ struct Scoresheet::Impl {
         dst.insert(dst.end(), glyphs.begin(), glyphs.end());
         int L = page % 2;
         if (layerPage[L] == page) layerPending[L].insert(layerPending[L].end(), glyphs.begin(), glyphs.end());
+    }
+    // The font atlas was cleared (ui_font.h): every glyph of the ink is looked up at its new place
+    // (same face, same distance field: only the atlas coordinates change), and the pages and the
+    // entry are drawn again.
+    static void lookUpAgain(std::vector<InkGlyph>& glyphs) {
+        for (InkGlyph& g : glyphs) {
+            const font::Glyph* G = font::glyph(g.face, g.cp);
+            if (!G || !G->hasQuad) continue;
+            g.uv0 = vec2(G->u0, G->v0);
+            g.uv1 = vec2(G->u1, G->v1);
+        }
+    }
+    void atlasCleared() {
+        for (std::vector<InkGlyph>& ink : pageInk) lookUpAgain(ink);
+        for (std::vector<InkGlyph>& ink : layerPending) lookUpAgain(ink);
+        for (Entry& e : entries) lookUpAgain(e.glyphs);
+        layerPage[0] = layerPage[1] = -1;
+        entryReady = false;
     }
 
     void drawVertices(const std::vector<InkVertex>& v) {
@@ -330,6 +351,7 @@ struct Scoresheet::Impl {
         layerPending[layer].clear();
         layerPage[layer] = page;
         if (v.empty() && !full) return;
+        if (full) font::flushUploads();   // glyphs the printed form packed just now (a cleared atlas)
         ProgramDesc d;
         d.vs = PAGE_VS;
         d.fs = PAGE_FS;
@@ -445,9 +467,7 @@ bool Scoresheet::init(const Config& c) {
     I.paper.params[3] = vec4(float(PAGE_TEX_W), float(PAGE_TEX_H), SPREAD, 1.0f);
     I.paper.params[4] = vec4(float(ENTRY_TEX_W), float(ENTRY_TEX_H), PAGE_W, PAGE_H);
     I.paper.textures[0] = I.pageTex.id;
-    I.paper.textureTargets[0] = GL_TEXTURE_2D_ARRAY;
     I.paper.textures[1] = I.entryTex.id;
-    I.paper.textureTargets[1] = GL_TEXTURE_2D;
     pageGridSamples(I.gx, I.gy);
     // Turning page: a dynamic mesh (updated in place), bounds = everywhere the page can go.
     flipGrid(I.gx, I.gy, 0.0f, FlipParams{0, frame_.outerSign}, I.grid);
@@ -535,7 +555,7 @@ namespace {
 std::vector<InkGlyph> handwrite(const std::string& text, const WriteBox& box, int style, uint32_t seed) {
     std::vector<InkGlyph> out;
     if (text.empty()) return out;
-    ui::text::Run shaped = ui::text::shapeLine(text, [style](uint32_t cp) { return font::handwritingFace(style, cp); });
+    ui::text::Run shaped = ui::text::shapeHandwriting(text, style);
     if (shaped.glyphs.empty()) return out;
     const font::Metrics& mt = font::metrics(font::handwritingFace(style, 'A'));
     Run run;
@@ -570,6 +590,8 @@ std::vector<InkGlyph> handwrite(const std::string& text, const WriteBox& box, in
         gi.joinNext = style == font::HAND_MARCK && !gi.wordEnd;
         InkGlyph ig;
         ig.ink = gi;
+        ig.face = pg.face;
+        ig.cp = font::glyph(pg.face, pg.cp) == pg.glyph ? pg.cp : uint32_t('?');
         ig.q0 = vec2(G.x0, G.y0) * emMm;
         ig.q1 = vec2(G.x1, G.y1) * emMm;
         ig.uv0 = vec2(G.u0, G.v0);
@@ -593,29 +615,37 @@ std::vector<GlyphInk> inks(const std::vector<InkGlyph>& g) {
 
 }  // namespace
 
+using EntryParts = std::vector<std::pair<WriteBox, std::string>>;
+
 // Builds an entry from (field box, text) parts written in order; returns false when empty.
-static bool composeEntry(Entry& e, const std::vector<std::pair<WriteBox, std::string>>& parts, int style, uint32_t seed) {
+// !withPath: the ink alone (an instant write), without the pen path and the entry texture's top;
+// the glyphs are the same (a non-empty glyph list always gives a path: every glyph has a stroke).
+static bool composeEntry(Entry& e, const EntryParts& parts, int style, uint32_t seed, bool withPath = true) {
     PathKey last;
     bool any = false;
     for (size_t i = 0; i < parts.size(); ++i) {
         uint32_t s = mix32(seed, uint32_t(i) + 1u);
         std::vector<InkGlyph> g = handwrite(parts[i].second, parts[i].first, style, s);
         if (g.empty()) continue;
-        PenPath p = buildPenPath(inks(g), s);
-        if (p.keys.empty()) continue;
-        float gap = 0.0f;
-        if (any) {
-            float d = length(vec2(p.keys.front().x - last.x, p.keys.front().y - last.y));
-            gap = 0.12f + 0.004f * d;  // pen carried in the air to the next field
+        if (withPath) {
+            PenPath p = buildPenPath(inks(g), s);
+            if (p.keys.empty()) continue;
+            float gap = 0.0f;
+            if (any) {
+                float d = length(vec2(p.keys.front().x - last.x, p.keys.front().y - last.y));
+                gap = 0.12f + 0.004f * d;  // pen carried in the air to the next field
+            }
+            appendPath(e.path, p, gap, int(e.glyphs.size()));
         }
-        appendPath(e.path, p, gap, int(e.glyphs.size()));
         e.glyphs.insert(e.glyphs.end(), g.begin(), g.end());
-        last = e.path.keys.back();
+        if (withPath) last = e.path.keys.back();
         any = true;
     }
     if (!any) return false;
-    Rect r = inkBounds(inks(e.glyphs));
-    e.top = std::max(0.0f, r.y0 - 3.0f);
+    if (withPath) {
+        Rect r = inkBounds(inks(e.glyphs));
+        e.top = std::max(0.0f, r.y0 - 3.0f);
+    }
     return true;
 }
 
@@ -634,11 +664,10 @@ static std::vector<anim::PenKey> worldPath(const PadFrame& f, const PenPath& p) 
 
 static std::string pageLabel(int page) { return std::to_string(page + 1); }
 
-std::vector<anim::PenKey> Scoresheet::beginHeader(const Header& h) {
-    Impl& I = *impl_;
-    Entry e;
-    e.page = 0;
-    std::vector<std::pair<WriteBox, std::string>> parts = {
+// The parts and seeds of the header, move and field entries, one copy for the animated (begin*)
+// and the instant (write*Instant) writes: a sheet restored at once looks like one written live.
+static EntryParts headerParts(const Scoresheet::Header& h, bool pageNo) {
+    EntryParts parts = {
         {fieldBox(Field::Event), h.event},         {fieldBox(Field::Date), h.date},
         {fieldBox(Field::Round), h.round},         {fieldBox(Field::Board), h.board},
         {fieldBox(Field::WhiteName), h.white},     {fieldBox(Field::WhiteElo), h.whiteElo},
@@ -646,8 +675,35 @@ std::vector<anim::PenKey> Scoresheet::beginHeader(const Header& h) {
     };
     if (!h.note.empty()) parts.push_back({fieldBox(Field::Note), h.note});
     if (!h.reference.empty()) parts.push_back({fieldBox(Field::Reference), h.reference});
-    if (!I.taken(0, Field::Page)) parts.push_back({fieldBox(Field::Page), pageLabel(0)});
-    if (!composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x4EADu))) return {};
+    if (pageNo) parts.push_back({fieldBox(Field::Page), pageLabel(0)});
+    return parts;
+}
+
+// 'pageNo': the first move of a page also writes that page's number.
+static EntryParts moveParts(int ply, const std::string& san, const PieceLetters& letters, int page, bool pageNo) {
+    EntryParts parts;
+    if (pageNo) parts.push_back({fieldBox(Field::Page), pageLabel(page)});
+    parts.push_back({moveBox(ply), localizeSan(san, letters)});
+    return parts;
+}
+
+static uint32_t headerSeed(uint32_t seed) { return mix32(seed, 0x4EADu); }
+static uint32_t moveSeed(uint32_t seed, int ply) { return mix32(seed, 0x10000u + uint32_t(ply)); }
+static uint32_t fieldSeed(uint32_t seed, Field f, int page) { return mix32(seed, 0x20000u + uint32_t(f) * 131u + uint32_t(page)); }
+
+// Nothing drawable (a glyph no font has): the entry is queued all the same, without ink, so that
+// the Write task begun for it (its WritingDone, finishEntry) completes it and not the next one.
+static std::vector<anim::PenKey> queueEmpty(std::deque<Entry>& entries, Entry&& e) {
+    entries.push_back(std::move(e));
+    return {};
+}
+
+std::vector<anim::PenKey> Scoresheet::beginHeader(const Header& h) {
+    Impl& I = *impl_;
+    Entry e;
+    e.page = 0;
+    if (!composeEntry(e, headerParts(h, !I.taken(0, Field::Page)), cfg_.handStyle, headerSeed(cfg_.seed)))
+        return queueEmpty(I.entries, std::move(e));
     for (int f = 0; f <= int(Field::Page); ++f) I.taken(0, Field(f)) = true;
     I.taken(0, Field::Note) = I.taken(0, Field::Reference) = true;
     I.entries.push_back(std::move(e));
@@ -664,11 +720,9 @@ std::vector<anim::PenKey> Scoresheet::beginMove(int ply, const std::string& san)
     }
     Entry e;
     e.page = page;
-    std::vector<std::pair<WriteBox, std::string>> parts;
     bool pageNo = page > 0 && !I.taken(page, Field::Page);
-    if (pageNo) parts.push_back({fieldBox(Field::Page), pageLabel(page)});
-    parts.push_back({moveBox(ply), localizeSan(san, cfg_.letters)});
-    if (!composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x10000u + uint32_t(ply)))) return {};
+    if (!composeEntry(e, moveParts(ply, san, cfg_.letters, page, pageNo), cfg_.handStyle, moveSeed(cfg_.seed, ply)))
+        return queueEmpty(I.entries, std::move(e));
     if (pageNo) I.taken(page, Field::Page) = true;
     I.entries.push_back(std::move(e));
     return worldPath(frame_, I.entries.back().path);
@@ -679,8 +733,8 @@ std::vector<anim::PenKey> Scoresheet::beginField(Field f, const std::string& tex
     int page = isHeaderField(f) ? 0 : page_ + pendingTurns_;
     Entry e;
     e.page = page;
-    if (!composeEntry(e, {{fieldBox(f), text}}, cfg_.handStyle, mix32(cfg_.seed, 0x20000u + uint32_t(f) * 131u + uint32_t(page))))
-        return {};
+    if (!composeEntry(e, {{fieldBox(f), text}}, cfg_.handStyle, fieldSeed(cfg_.seed, f, page)))
+        return queueEmpty(I.entries, std::move(e));
     I.taken(page, f) = true;
     I.entries.push_back(std::move(e));
     return worldPath(frame_, I.entries.back().path);
@@ -703,8 +757,6 @@ void Scoresheet::finishEntry() {
     I.now = -1.0f;
 }
 
-int Scoresheet::pendingEntries() const { return int(impl_->entries.size()); }
-
 const sheet::PenPath* Scoresheet::writingPath() const {
     return impl_->entries.empty() ? nullptr : &impl_->entries.front().path;
 }
@@ -712,16 +764,8 @@ const sheet::PenPath* Scoresheet::writingPath() const {
 void Scoresheet::writeHeaderInstant(const Header& h) {
     Impl& I = *impl_;
     Entry e;
-    std::vector<std::pair<WriteBox, std::string>> parts = {
-        {fieldBox(Field::Event), h.event},     {fieldBox(Field::Date), h.date},
-        {fieldBox(Field::Round), h.round},     {fieldBox(Field::Board), h.board},
-        {fieldBox(Field::WhiteName), h.white}, {fieldBox(Field::WhiteElo), h.whiteElo},
-        {fieldBox(Field::BlackName), h.black}, {fieldBox(Field::BlackElo), h.blackElo},
-    };
-    if (!h.note.empty()) parts.push_back({fieldBox(Field::Note), h.note});
-    if (!h.reference.empty()) parts.push_back({fieldBox(Field::Reference), h.reference});
-    if (!I.taken(0, Field::Page)) parts.push_back({fieldBox(Field::Page), pageLabel(0)});
-    if (composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x4EADu))) I.addInk(0, e.glyphs);
+    if (composeEntry(e, headerParts(h, !I.taken(0, Field::Page)), cfg_.handStyle, headerSeed(cfg_.seed), false))
+        I.addInk(0, e.glyphs);
     for (int f = 0; f <= int(Field::Page); ++f) I.taken(0, Field(f)) = true;
     I.taken(0, Field::Note) = I.taken(0, Field::Reference) = true;
 }
@@ -734,11 +778,9 @@ void Scoresheet::writeMoveInstant(int ply, const std::string& san) {
         finishPageTurn();
     }
     Entry e;
-    std::vector<std::pair<WriteBox, std::string>> parts;
     bool pageNo = page > 0 && !I.taken(page, Field::Page);
-    if (pageNo) parts.push_back({fieldBox(Field::Page), pageLabel(page)});
-    parts.push_back({moveBox(ply), localizeSan(san, cfg_.letters)});
-    if (composeEntry(e, parts, cfg_.handStyle, mix32(cfg_.seed, 0x10000u + uint32_t(ply)))) I.addInk(page, e.glyphs);
+    if (composeEntry(e, moveParts(ply, san, cfg_.letters, page, pageNo), cfg_.handStyle, moveSeed(cfg_.seed, ply), false))
+        I.addInk(page, e.glyphs);
     if (pageNo) I.taken(page, Field::Page) = true;
 }
 
@@ -746,7 +788,7 @@ void Scoresheet::writeFieldInstant(Field f, const std::string& text) {
     Impl& I = *impl_;
     int page = isHeaderField(f) ? 0 : page_ + pendingTurns_;
     Entry e;
-    if (composeEntry(e, {{fieldBox(f), text}}, cfg_.handStyle, mix32(cfg_.seed, 0x20000u + uint32_t(f) * 131u + uint32_t(page))))
+    if (composeEntry(e, {{fieldBox(f), text}}, cfg_.handStyle, fieldSeed(cfg_.seed, f, page), false))
         I.addInk(page, e.glyphs);
     I.taken(page, f) = true;
 }
@@ -802,6 +844,10 @@ void Scoresheet::update() {
     if (lang != I.language) {
         I.language = lang;
         I.layerPage[0] = I.layerPage[1] = -1;
+    }
+    if (font::atlasGeneration() != I.atlasGen) {
+        I.atlasGen = font::atlasGeneration();
+        I.atlasCleared();
     }
     bool work = I.layerPage[page_ % 2] != page_ || I.layerPage[(page_ + 1) % 2] != page_ + 1 ||
                 !I.layerPending[0].empty() || !I.layerPending[1].empty() || (!I.entries.empty() && !I.entryReady);

@@ -134,10 +134,9 @@ so skipping it in time trouble brings nothing; the sheets stay complete.
 
 ## Players: names, handwriting, profiles and Elo
 
-- **Names.** Each seat has `Seat::name`. For a human it currently comes from
-  `localPlayerName()` in `game_scene.cpp`, which the integrator replaces with
-  `Settings::playerName`. Hot-seat needs a second name: the setup page asks for both players, and
-  each can pick a saved profile.
+- **Names.** Each seat has `Seat::name`. For a human it comes from `Settings::playerName`
+  through `localPlayerName()` in `game_scene_detail.h`. Hot-seat needs a second name: the setup
+  page asks for both players, and each can pick a saved profile.
 - **Handwriting fonts.** Each name is written in a font that covers its script, so the two
   players may use two different fonts on the same scoresheet (for example a Japanese name and
   an Arabic name). The scoresheet takes the font per player, not per sheet.
@@ -218,12 +217,13 @@ widens; a cut lets it end while the view darkens).
 ## What the seat refactor already provides
 
 - `Seat` (`game_scene.h`): colour, `Controller` (Human / Stockfish), name, Elo, provisional flag,
-  preset and engine settings, playing hand and `writingHand()`. `GameScene::seat(i)` exposes it.
+  preset and engine settings, playing hand and `writingHand()`.
 - `isHumanSeat(seat)` decides who acts in `beginTurn()`; `configureSeats()` builds the seats for
-  each game from the mode (`GameMode::Play` / `Watch`).
+  each game from the mode (`GameMode::Play` / `Watch`; the hot-seat, online, coach and replay
+  seats come from their own `configure*Seats()`).
 - Per-seat engine settings, and one Stockfish serving both sides with a hash clear whenever the
   settings change (`ai::Engine`, about 10 ms with 64 MB).
-- `setClockFrozen()` / `clockFrozen()`, honoured by `updatePlaying()`.
+- `setClockFrozen()` (the `clockFrozen_` flag), honoured by `updatePlaying()`.
 - `CameraPose`, `CameraFlight` (flight, retarget, `handoverShape()`), `ObserverCamera` (flights,
   free movement kept inside the hall). These are engine-free and unit-tested
   (`tests/game_mode_tests.cpp`).
@@ -259,8 +259,8 @@ later. The UI viewer has `--ui-screen newgame-hotseat|hotseat-hud|hotseat-confir
 - No profile picker: a typo in a name starts a new rating.
 - FIDE 8.4 (no recording in the last 5 minutes) is not applied (see above).
 - The stricter clock mode (next clock started at mid-flight) is not offered.
-- The hold logic of the scoresheets needs the GL scene, so it is checked with scripted headless
-  games, not unit tests.
+- The hold rules of the scoresheets are unit-tested (`scoresheet_ledger_*`); the writing animation
+  is checked with scripted headless games.
 
 ## Risks
 
@@ -268,7 +268,7 @@ later. The UI viewer has `--ui-screen newgame-hotseat|hotseat-hud|hotseat-confir
   Keep the ease-in/ease-out, the level horizon and the look at the board, and offer the instant
   cut.
 - **Fairness of the freeze.** Free thinking time during the flights (see above). This is minor in
-  casual games, and a stricter mode exists if needed.
+  casual games, and a stricter mode could be added if needed (not implemented, see Known gaps).
 - **Hidden-head artefacts.** The camera passes close to the robots' heads when it leaves and
   lands. The head is hidden only within about 16 cm of its centre, so near-plane clipping of the
   neck or shoulders may show for a frame or two. It can be tuned with the near plane and the

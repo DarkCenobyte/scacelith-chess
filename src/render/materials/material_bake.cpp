@@ -113,11 +113,4 @@ BakedTextures bakeAll() {
     return b;
 }
 
-void destroy(BakedTextures& t) {
-    t.marbleSlab.destroy();
-    t.polish.destroy();
-    t.tapestry.destroy();
-    t.ok = false;
-}
-
 }  // namespace materials

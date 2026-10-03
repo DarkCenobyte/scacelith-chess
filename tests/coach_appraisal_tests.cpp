@@ -187,7 +187,7 @@ Appraisal wonAppraisal(const Game& g, int level) {
 // ---- Accuracy ------------------------------------------------------------------------------------------
 
 TEST(coach_appraisal_accuracy_vectors) {
-    // lila AccuracyPercentTest.scala, and the values of the port in research-pedagogy §1.3.
+    // lila AccuracyPercentTest.scala (the loose bounds), and the values of this port (the tight ones).
     SideAccuracy a = gameAccuracy({-900});   // White blunders on the first move
     CHECK(std::fabs(a.white - 10.0) <= 5.0);
     CHECK(std::fabs(a.white - 10.7) < 0.1);
@@ -373,8 +373,9 @@ TEST(coach_appraisal_won_game) {
         std::snprintf(where, sizeof where, "won b%d", level);
         checkAppraisal(s, level, where);
         const std::string lv = ".b" + std::to_string(level);
-        CHECK(!s.empty() && s.front().line.key == "appraisal.open.win" + lv);
-        CHECK(!s.empty() && s.back().line.key == "appraisal.end" + lv);
+        REQUIRE(!s.empty());
+        CHECK(s.front().line.key == "appraisal.open.win" + lv);
+        CHECK(s.back().line.key == "appraisal.end" + lv);
         CHECK(s.front().look == Look::Player);
         CHECK(hasPrefix(s, "appraisal.improve."));
         if (level == 1) CHECK(hasKey(s, "appraisal.improve.clean.b1"));   // level 1: blunders only
@@ -540,6 +541,35 @@ TEST(coach_appraisal_highlight_points_at_the_piece) {
         }
         CHECK(hl->look == Look::Target);
     }
+    // A brilliant promotion: pointed at only while the queen stands on its square (an empty square
+    // reads as a white Piece{}, which must not count as the human's piece).
+    auto promotionHighlight = [](const std::vector<const char*>& sans) {
+        Game p = playSans("k7/4P3/2K5/8/8/8/8/8 w - - 0 1", sans);
+        p.resign(Black);
+        Appraisal ap;
+        ap.reset(2, White);
+        for (int ply = 0; ply < int(p.moves().size()); ply += 2) {
+            Review r = reviewAt(p, ply, MoveClass::Best, 900, 900);
+            r.verdict.brilliant = ply == 0;
+            ap.add(r);
+        }
+        const Script ps = ap.script(p, AppraisalContext{});
+        checkAppraisal(ps, 2, "promotion");
+        for (const Beat& b : ps)
+            if (b.line.key == "appraisal.best.brilliant.b2") return b;
+        CHECK(false);
+        return Beat{};
+    };
+    const Beat left = promotionHighlight({"e8=Q+", "Ka7", "Qe4", "Ka8", "Qd5"});   // e8 is empty at the end
+    CHECK(left.gestures.empty());
+    CHECK(left.look == Look::Board);
+    const Beat stays = promotionHighlight({"e8=Q+", "Ka7"});
+    CHECK_EQ(stays.gestures.size(), size_t(1));
+    if (!stays.gestures.empty()) {
+        CHECK(stays.gestures[0].kind == GestureKind::PointPiece);
+        CHECK_EQ(stays.gestures[0].square, parseSquare("e8"));
+    }
+    CHECK(stays.look == Look::Target);
 }
 
 TEST(coach_appraisal_every_key_exists) {
@@ -583,7 +613,7 @@ TEST(coach_appraisal_every_key_exists) {
         if (!en.count(k)) std::fprintf(stderr, "  missing %s\n", k.c_str());
         CHECK(en.count(k) == 1);
     }
-    // The counted nouns the lines use exist in W11b's common.lang.
+    // The counted nouns the lines use exist in common.lang.
     const std::set<std::string> nouns = {"move", "point", "pawn", "piece", "mistake", "blunder", "inaccuracy",
                                          "game", "time", "square"};
     for (const auto& kv : en)

@@ -1,5 +1,5 @@
 // Board facts for the coach's explanations (see tactics.h). The motif rules follow the lichess
-// puzzle tagger (lichess-puzzler tagger/cook.py, util.py) where research-pedagogy §2 cites it.
+// puzzle tagger (lichess-puzzler tagger/cook.py, util.py) for the motifs it tags.
 #include "coach/tactics.h"
 
 #include <algorithm>
@@ -389,17 +389,6 @@ MatePattern classifyMate(const Position& mated) {
 
 // ---- Pieces and pawns ---------------------------------------------------------------------------
 
-int mobility(const Position& p, Color c) {
-    int n = 0;
-    U64 b = p.pieces(c) & (p.pieces(Knight) | p.pieces(Bishop) | p.pieces(Rook) | p.pieces(Queen));
-    while (b) {
-        const Square s = lowest(b);
-        b &= b - 1;
-        n += squareCount(p.attacksFrom(s) & ~p.pieces(c));
-    }
-    return n;
-}
-
 bool isTrapped(const Position& p, Square s) {
     const Piece x = p.at(s);
     if (x.empty() || x.type == Pawn || x.type == King) return false;
@@ -436,8 +425,6 @@ int undevelopedMinors(const Position& p, Color c) {
         if (p.at(makeSquare(f, r)) == Piece{Bishop, c}) ++n;
     return n;
 }
-
-U64 attackedSquares(const Position& p, Color c) { return attacksBy(p, c); }
 
 bool isForced(const Position& p) { return p.legalMoves().size() == 1; }
 
@@ -522,7 +509,6 @@ MoveFacts analyzeMove(const Position& before, const Move& m) {
     Position after = before;
     after.makeMove(m);
     f.check = after.inCheck();
-    f.mate = f.check && !after.hasLegalMove();
     f.stalemate = !f.check && !after.hasLegalMove();
     const U64 checkers = after.checkers();
     f.doubleCheck = several(checkers);
@@ -530,8 +516,6 @@ MoveFacts analyzeMove(const Position& before, const Move& m) {
     f.seeCp = see(before, m);
     f.newlyAttacked = (attacksBy(after, us) & after.pieces(them)) & ~(attacksBy(before, us) & before.pieces(them));
     f.forks = forkTargets(after, m.to);
-    for (const Discovery& d : discoveredAttacks(before, m)) f.discovered |= bit(d.target);
-    f.leftHanging = hangingPieces(after, us, false) & ~hangingPieces(before, us, false);
     const U64 guarded = attacksOf(pc.type, us, m.from, before.occupancy()) & before.pieces(us) & ~before.pieces(King);
     const U64 guardedAfter = after.attacksFrom(m.to) & after.pieces(us);
     f.undefended = guarded & ~guardedAfter & ~bit(m.to);

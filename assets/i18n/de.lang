@@ -1,7 +1,5 @@
 # Scacelith - Deutsch
-# Übersetzung von assets/i18n/en.lang (gleiche Schlüssel, gleiche {n}). Plural: eins|mehrere.
-
-language.name = Deutsch
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other.
 
 # ---- Common words ------------------------------------------------------------------------------
 common.on = Ein
@@ -61,6 +59,7 @@ options.depth_of_field = Tiefenschärfe
 options.depth_of_field.help = Zeichnet weich, was weit vor oder hinter dem liegt, was Sie ansehen, wie ein Kameraobjektiv.
 options.brightness = Helligkeit
 options.brightness.neutral = Neutral
+options.brightness.value = {0} EV
 options.brightness.help = Belichtungskorrektur der Kamera. Die Kalibrierung beim ersten Start stellt sie so ein, dass die dunkelsten Schatten gerade noch sichtbar sind.
 
 options.master_volume = Gesamtlautstärke
@@ -346,11 +345,6 @@ viewer.note = Beide Spieler sind Stockfish. Fliegen Sie frei durch den Saal, wä
 viewer.summary = {0} gegen {1}
 viewer.custom = Eigene
 viewer.tc.custom = Nach Wahl
-viewer.tc.none = Ohne Uhr
-viewer.tc.bullet = Bullet
-viewer.tc.blitz = Blitz
-viewer.tc.rapid = Schnellschach
-viewer.tc.classical = Klassisch
 viewer.base_time = Grundzeit
 viewer.increment = Inkrement
 viewer.delay = Verzögerung
@@ -539,10 +533,24 @@ online.forgot.lead = Geben Sie die E-Mail-Adresse Ihres Kontos ein: Wir senden I
 online.forgot.button = Link senden
 online.forgot.sent = Falls ein Konto diese Adresse verwendet, ist ein Link unterwegs.
 online.sso.title = MIT GOOGLE ANMELDEN
-online.sso.wait = Fahren Sie in Ihrem Webbrowser fort: Melden Sie sich im geöffneten Fenster bei Google an. Diese Seite folgt automatisch.
+online.sso.wait = Fahren Sie in Ihrem Webbrowser fort: Wählen Sie im geöffneten Fenster Ihr Google-Konto. Scacelith übernimmt, sobald Google Sie zurückschickt.
 online.sso.name_title = WÄHLEN SIE IHREN NAMEN
 online.sso.name_lead = Sie sind zum ersten Mal mit Google hier. Wählen Sie den Namen, den andere Spieler sehen.
 online.sso.continue = Weiter
+online.sso.finishing = Google hat Sie zurückgeschickt. Die Anmeldung wird abgeschlossen…
+online.sso.link_title = GOOGLE-ANMELDUNG HINZUFÜGEN
+online.sso.link_lead = Das Konto {0} auf {1} verwendet bereits die E-Mail-Adresse dieses Google-Kontos. Geben Sie das Passwort dieses Kontos ein, um ihm die Anmeldung mit Google hinzuzufügen. Das ist nur einmal nötig.
+online.sso.link_button = Google-Anmeldung hinzufügen
+online.sso.link_mfa = Die Google-Anmeldung wird diesem Konto hinzugefügt, sobald der Code akzeptiert ist.
+online.sso.not_mine = Das ist nicht mein Konto
+online.sso.not_mine_note = Die Google-Anmeldung wurde nicht hinzugefügt. Wenn diese E-Mail-Adresse Ihnen gehört, verwenden Sie damit „Passwort vergessen?“: Der Link geht an dieses Postfach. Verlangt das Konto außerdem einen Bestätigungscode, den Sie nicht haben, wenden Sie sich an den Betreiber des Servers.
+online.sso.page.title = Scacelith: Anmeldung mit Google
+online.sso.page.done_heading = Zurück zu Scacelith
+online.sso.page.done = Google hat Sie zu Scacelith zurückgeschickt. Kehren Sie ins Spiel zurück, um die Anmeldung abzuschließen; Sie können diesen Tab schließen.
+online.sso.page.cancelled_heading = Anmeldung abgebrochen
+online.sso.page.cancelled = Die Anmeldung mit Google wurde abgebrochen. Sie können diesen Tab schließen und zu Scacelith zurückkehren.
+online.sso.page.foreign_heading = Diese Seite ist nicht für Sie bestimmt
+online.sso.page.foreign = Diese Seite gehört nicht zu der Anmeldung, auf die Scacelith auf diesem Computer wartet. Wenn Sie nicht gerade in Scacelith eine Anmeldung mit Google begonnen haben, hat Ihnen vielleicht jemand diesen Link geschickt: Schließen Sie diesen Tab.
 
 # Account
 online.account.button = Konto
@@ -565,6 +573,9 @@ online.account.sign_out_all = Überall abmelden
 online.account.sign_out_all.help = Meldet dieses Konto auf allen Computern ab, auch auf diesem.
 online.account.signed_out = Sie sind abgemeldet.
 online.account.signed_out_all = Sie sind auf allen Computern abgemeldet.
+online.account.signing_out_all = Abmeldung auf allen Computern…
+online.account.sign_out_all_failed = Ihre anderen Computer sind möglicherweise noch angemeldet: Melden Sie sich erneut an und melden Sie sie unter „Angemeldete Geräte“ ab. {0}
+online.account.sign_out_all_retry = Ihre anderen Computer sind möglicherweise noch angemeldet. Versuchen Sie „Überall abmelden“ erneut. {0}
 online.account.ratings = WERTUNGEN
 online.account.col.tc = BEDENKZEIT
 online.account.col.rating = WERTUNG
@@ -651,6 +662,7 @@ online.challenge.you_random = Farben ausgelost
 online.challenge.declined = {0} hat Ihre Herausforderung abgelehnt.
 online.challenge.expired = Ihre Herausforderung ist ohne Antwort abgelaufen.
 online.challenge.unavailable = {0} ist gerade nicht verfügbar.
+online.challenge.lost = Verbindung verloren: Ihre Herausforderung wurde abgebrochen.
 
 # At the table
 online.pause.clock_runs = Die Partie läuft weiter: Ihre Uhr läuft.
@@ -692,6 +704,7 @@ online.report.comment = Kommentar
 online.report.comment.hint = optional
 online.report.send = Meldung senden
 online.report.sent = Meldung gesendet. Danke.
+online.report.queued = Ihre Meldung wird nach dem Ende der Partie gesendet.
 # Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
 online.sheet.note = Online, {0} {1}
 online.sheet.rated = gewertet
@@ -718,6 +731,7 @@ online.err.server_busy = Der Server ist ausgelastet. Versuchen Sie es gleich ern
 online.err.banned_until = Dieses Konto ist bis {0} gesperrt.
 online.err.banned = Dieses Konto ist gesperrt.
 online.err.invalid_credentials = Falscher Benutzername oder falsches Passwort.
+online.err.invalid_credentials_pending = Falscher Benutzername oder falsches Passwort. Wenn Sie Ihr Konto gerade erstellt haben, öffnen Sie zuerst den Link, den wir Ihnen gesendet haben.
 online.err.email_unverified = Ihre E-Mail-Adresse ist noch nicht bestätigt: Öffnen Sie den Link, den wir Ihnen gesendet haben.
 online.err.network = Der Server ist nicht erreichbar. Prüfen Sie Ihre Verbindung und die Serveradresse.
 online.err.tls = Es konnte keine sichere Verbindung zum Server aufgebaut werden.
@@ -733,6 +747,15 @@ online.err.invalid_code = Dieser Code ist nicht richtig.
 online.err.expired = Diese Anfrage ist abgelaufen: Bitte beginnen Sie von vorn.
 online.err.registration_closed = Dieser Server nimmt keine neuen Konten an.
 online.err.sso_cancelled = Die Anmeldung mit Google wurde abgebrochen.
+online.err.sso_expired = Die Anmeldung mit Google hat zu lange gedauert oder wurde schon verwendet. Bitte beginnen Sie erneut.
+online.err.sso_failed = Die Anmeldung mit Google hat nicht funktioniert. Bitte versuchen Sie es erneut.
+online.err.sso_listen = Scacelith konnte die Antwort von Google auf diesem Computer nicht empfangen. Bitte versuchen Sie es erneut.
+online.err.sso_origin = Die Anmeldung mit Google funktioniert nicht über diese Serveradresse. Fügen Sie den Server unter dem öffentlichen Namen hinzu, den sein Betreiber angibt, und versuchen Sie es erneut.
+online.err.browser = Der Webbrowser konnte nicht geöffnet werden.
+online.err.sso_email_unverified = Google hat die E-Mail-Adresse dieses Google-Kontos nicht bestätigt.
+online.err.sso_account_exists = Ein Konto verwendet bereits diese E-Mail-Adresse und kann nicht mit der Google-Anmeldung verknüpft werden: Melden Sie sich mit seinem Passwort an oder verwenden Sie „Passwort vergessen?“.
+online.err.sso_already_linked = Dieses Google-Konto ist bereits mit einem anderen Konto verknüpft.
+online.err.account_disabled = Dieses Konto kann nicht mehr verwendet werden.
 online.err.server_error = Der Server hatte ein Problem. Bitte versuchen Sie es erneut.
 online.err.timeout = Der Server hat nicht rechtzeitig geantwortet.
 online.err.offline = Nicht mit dem Server verbunden: Versuchen Sie es erneut, sobald die Verbindung steht.
@@ -752,13 +775,14 @@ online.err.flag_fell = Ihre Zeit ist abgelaufen.
 online.err.queue_not_allowed = Sie können gerade keinen Gegner suchen.
 online.err.challenge_not_found = Diese Herausforderung existiert nicht mehr.
 online.err.user_unavailable = Dieser Spieler ist nicht verfügbar.
-online.err.challenge_limit = Zu viele Herausforderungen gleichzeitig.
+online.err.challenge_limit = Im Moment zu viele Herausforderungen. Versuchen Sie es später erneut.
 online.err.challenge_self = Sie können sich nicht selbst herausfordern.
 online.err.code_invalid = Keine Partie hat diesen Code.
 online.err.rated_official_tc = Nur die offiziellen Bedenkzeiten können gewertet werden.
 online.err.cooldown = Die Gegnersuche ist für Sie kurz pausiert.
 online.err.invalid_tc = Diese Bedenkzeit ist nicht erlaubt.
 online.err.rematch_unavailable = Eine Revanche ist nicht mehr möglich.
+online.err.rated_repeat_limit = Sie haben vorerst genug gewertete Partien gegen diesen Spieler gespielt. Spielen Sie eine ungewertete Partie oder versuchen Sie es später erneut.
 online.err.cheat_detected = Die Partie wurde von den Fairplay-Prüfungen des Servers gestoppt.
 online.err.invalid_password = Falsches Passwort.
 online.err.mfa_code_required = Geben Sie einen Code aus Ihrer Authenticator-App (oder einen Wiederherstellungscode) ein.
@@ -768,6 +792,7 @@ online.err.too_many_attempts_for = Zu viele Fehlversuche. Versuchen Sie es in {0
 online.err.same_email = Das ist bereits Ihre E-Mail-Adresse.
 online.err.not_found = Auf dem Server nicht gefunden.
 online.err.invalid_response = Die Antwort des Servers konnte nicht gelesen werden.
+online.err.storage = Die Sitzung konnte auf diesem Computer nicht gespeichert werden.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = PARTIEVERLAUF
@@ -1178,3 +1203,9 @@ gif.err.not_found = Diese Partie ist nicht mehr auf dem Server.
 gif.wait.seconds = {0} Sekunde|{0} Sekunden
 gif.wait.minutes = {0} Minute|{0} Minuten
 gif.wait.both = {0} und {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = OpenGL 4.6 konnte nicht gestartet werden. Bitte aktualisieren Sie Ihren Grafiktreiber.
+error.renderer = Der Renderer konnte nicht gestartet werden.
+error.scene = Die Szene konnte nicht geladen werden.
+error.log_file = Einzelheiten stehen in der Protokolldatei: {0}

@@ -21,8 +21,8 @@ namespace ai::detail {
 namespace {
 
 // std::cin replacement: a blocking queue of command lines. underflow() hands the engine one line
-// (plus '\n') at a time and blocks until the client pushes the next one; close() makes it report
-// end of input, which Stockfish's UCI loop treats like "quit".
+// (plus '\n') at a time and blocks until the client pushes the next one; a session ends with the
+// "quit" command pushed by UciHost::releaseAny().
 class LineInputBuf final : public std::streambuf {
 public:
     void push(std::string line) {
@@ -32,17 +32,9 @@ public:
         }
         cv_.notify_one();
     }
-    void close() {
-        {
-            std::lock_guard<std::mutex> lk(m_);
-            closed_ = true;
-        }
-        cv_.notify_all();
-    }
     void reset() {
         std::lock_guard<std::mutex> lk(m_);
         q_.clear();
-        closed_ = false;
         cur_.clear();
         setg(nullptr, nullptr, nullptr);
     }
@@ -51,8 +43,7 @@ protected:
     int_type underflow() override {
         if (gptr() < egptr()) return traits_type::to_int_type(*gptr());
         std::unique_lock<std::mutex> lk(m_);
-        cv_.wait(lk, [this] { return !q_.empty() || closed_; });
-        if (q_.empty()) return traits_type::eof();
+        cv_.wait(lk, [this] { return !q_.empty(); });
         cur_ = std::move(q_.front());
         q_.pop_front();
         cur_ += '\n';
@@ -65,7 +56,6 @@ private:
     std::condition_variable cv_;
     std::deque<std::string> q_;
     std::string cur_;
-    bool closed_ = false;
 };
 
 // std::cout replacement: splits the byte stream into complete lines and queues them for the

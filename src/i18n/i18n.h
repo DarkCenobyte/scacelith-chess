@@ -5,7 +5,7 @@
 //
 // Code uses keys, never English literals, for anything shown to the player:
 //     ui::text(i18n::tr("menu.new_game"), ...);
-//     ui::notify(i18n::trf("arbiter.touch_move", {squareName(sq)}));
+//     ui::notify(i18n::trf("notify.touched_square", {squareName(sq)}));
 //
 // Plurals: a value whose forms are separated by '|' is chosen by trn() with the CLDR plural rule
 // of the language, in this order: English/German/Spanish "one|other", French "one|other" (0 and 1

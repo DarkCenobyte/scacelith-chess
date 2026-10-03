@@ -206,7 +206,6 @@ public:
             ui::notify(i18n::tr("notify.draw_declined"), 30.0f);
             ui::notify(i18n::tr("arbiter.illegal") + std::string(" ") + i18n::tr("arbiter.restored_two_minutes.black"), 30.0f);
         }
-        frames_ = 0;
     }
 
     // Online screens: the in-process mock server with a virtual clock that only moves here (the
@@ -220,7 +219,7 @@ public:
             s.runMock(1000.0);
         }
         bool account = screen != "online" && screen != "online-register" && screen != "online-mfa" && screen != "online-noserver" &&
-                       screen.compare(0, 6, "direct") != 0;
+                       screen.compare(0, 6, "direct") != 0 && screen.compare(0, 10, "online-sso") != 0;
         if (account && !s.signedIn()) {
             s.api().login("Magnus_T", "viewer-password");
             s.expect(net::Event::Kind::LoginResult);
@@ -239,6 +238,8 @@ public:
             {"online-game-saving", "game-saving"}, {"online-game-saved", "game-saved"},
             {"online-devices", "devices"}, {"online-email", "email"}, {"online-email-sent", "email-sent"},
             {"online-export", "export"}, {"online-export-done", "export-done"}, {"online-delete", "delete"},
+            {"online-sso-wait", "sso-wait"}, {"online-sso-name", "sso-name"}, {"online-sso-link", "sso-link"},
+            {"online-sso-mfa", "sso-mfa"},
         };
         for (const auto& p : pages)
             if (screen == p.screen) {
@@ -291,8 +292,7 @@ public:
         }
     }
 
-    bool update(AppContext& ctx, float dt) override {
-        time_ += dt;
+    bool update(AppContext& ctx, float) override {
         const plat::Input& in = plat::input();
         for (int i = 0; i < 10; ++i) {
             int key = i == 9 ? '0' : '1' + i;
@@ -314,7 +314,6 @@ public:
         if (p.valid()) {
             p.use();
             p.set("uResolution", float(w), float(h));
-            p.set("uTime", time_);
             gpu::drawFullscreenTriangle();
         } else {
             glClearColor(0.03f, 0.028f, 0.025f, 1.0f);
@@ -468,7 +467,6 @@ public:
             if (a == ui::MenuAction::Quit) quit_ = true;
         }
         ui::endFrame();
-        ++frames_;
     }
 
     // The coach voice download's prompt and progress panel with sample figures (nothing is
@@ -530,8 +528,6 @@ private:
     int tab_ = 0;
     bool black_ = false, drawn_ = false, kb_ = false, quit_ = false;
     bool online_ = false, menu_ = false;
-    float time_ = 0.0f;
-    int frames_ = 0;
     std::vector<std::string> script_;
     size_t step_ = 0;
     plat::Input fake_;

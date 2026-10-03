@@ -22,15 +22,18 @@
 //   * WallStone, WallPanelWood, GildedTrim, WindowFrame, Brass, Curtain: uv in meters along the
 //     surface (planar faces: world-aligned projection; sweeps: (length along path, length along
 //     profile)); positionOS == world position (the hall model is in world space).
-//   * CeilingPainted: coffer panels and the plafond face down at y = COFFER_TOP / PLAFOND_TOP with
-//     uv = world (x, z) in meters. Paintings (framed canvases on the walls) are a separate part
-//     "hall_paintings" (CeilingPainted, inst[0].x = 1) with uv in [0,1] over each canvas.
+//   * CeilingPainted: coffer panels and the plafond face down at y = COFFER_TOP / PLAFOND_TOP. Each
+//     coffer panel has uv = (column, row) of the coffer + position in the panel in [0,1] (one motif
+//     per panel); the plafond panel keeps uv = world (x, z) in meters, and its cove (a sweep) uv in
+//     meters along path and profile. Paintings (framed canvases on the walls) are a separate part
+//     "hall_paintings" (CeilingPainted) with uv in [0,1] over each canvas; its inst[0].x = 1 is
+//     reserved for a painting mode that ceiling.glsl does not implement (it ignores instParams).
 //   * WindowGlass: two thin faces per window (transparent, no shadow casting); uv = (distance along
 //     the wall from the opening's left edge seen from inside, height above the sill) in meters.
-//   * Tapestry: one part per tapestry, inst[0] = (colour 0 blue / 1 red, pattern seed, width m,
-//     height m). uv spans [0,1]^2 over the woven area: (0,0) = bottom-left seen from the front,
-//     (1,1) = top-right; aspect = width / height = inst[0].z / inst[0].w (all hall tapestries are
-//     TAPESTRY_W x TAPESTRY_H except the two narrower ones of the -Z wall, TAPESTRY_NARROW_W).
+//   * Tapestry: one part per tapestry, in tapestry.glsl's layout: inst[0] = (colour 0 blue / 1 red,
+//     pattern seed, extra seed, 0), inst[1] = (width m, height m, 0, 0). uv spans [0,1]^2 over the
+//     woven area: (0,0) = bottom-left seen from the front, (1,1) = top-right (all hall tapestries
+//     are TAPESTRY_W x TAPESTRY_H except the two narrower ones of the -Z wall, TAPESTRY_NARROW_W).
 //     The back face (towards the wall) reuses the same uv.
 #pragma once
 #include "../game/layout.h"
@@ -77,7 +80,8 @@ constexpr int FLOOR_TILES_X = 15, FLOOR_TILES_Z = 25;
 //   [BAND0, BAND1)    FloorMarbleInlay outer band
 //   [BAND1, BAND2)    FloorMarble inner border (joints every FLOOR_TILE, aligned with the field)
 //   [BAND2, BAND3)    FloorMarbleInlay fillet; BAND3 = the field edge
-// The door threshold (x in +-DOOR_WIDTH/2, z in [HALL_MIN_Z - 0.12, HALL_MIN_Z]) is FloorMarbleInlay.
+// The door threshold (x in +-DOOR_WIDTH/2, z in [HALL_MIN_Z - 0.2, HALL_MIN_Z], extending under the
+// closed leaves at HALL_MIN_Z - 0.12) is FloorMarbleInlay.
 constexpr float FLOOR_BAND0 = 0.30f, FLOOR_BAND1 = 0.55f, FLOOR_BAND2 = 0.90f, FLOOR_BAND3 = 1.00f;
 constexpr float FLOOR_BORDER_SLAB = 1.20f;
 

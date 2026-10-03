@@ -154,10 +154,13 @@ void surface(in SurfaceInput i, inout Surface s) {
             if (I0.y >= 0.0 && !back) {
                 float dens = P4.x / pageMm.x;  // entry texels per mm (the page's density)
                 vec2 etc = vec2(p.x, p.y - I0.z) * dens;
+                // Sampled before the per-pixel range test, so its derivatives see whole quads
+                // (the texture clamps to its edge; the value is unused outside the range).
+                vec4 e = texture(uEntry, etc / P4.xy);
+                float efw = paper_fw(etc);
                 if (etc.y >= 0.0 && etc.y <= P4.y) {
-                    vec4 e = texture(uEntry, etc / P4.xy);
                     float shown = smoothstep(0.0, 0.025, I0.y - e.g);
-                    float ec = paper_cov(e.r, paper_fw(etc), S) * shown;
+                    float ec = paper_cov(e.r, efw, S) * shown;
                     pressure = mix(pressure, e.b, step(hand, ec));
                     hand = max(hand, ec);
                 }
@@ -189,7 +192,10 @@ void surface(in SurfaceInput i, inout Surface s) {
     s.subsurfaceColor = vec3(1.0, 0.97, 0.9);
     s.subsurfaceRadius = 0.0005;
     s.thickness = 0.0001;
-    if (heightUm != 0.0) s.normalWS = bumpFromHeight(i.positionWS, i.normalWS, heightUm * 1e-6, 1.0);
+    // Derivatives in uniform control flow: heightUm is 0 on some pixels of a quad where the
+    // detail fades out. Where it is 0 the normal stays as it is (the stack edge sets its own).
+    vec3 nb = bumpFromHeight(i.positionWS, i.normalWS, heightUm * 1e-6, 1.0);
+    if (heightUm != 0.0) s.normalWS = nb;
 #endif
     mat_debugAlbedo(s);
 }

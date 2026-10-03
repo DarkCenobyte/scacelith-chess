@@ -13,7 +13,10 @@ using namespace m;
 namespace game {
 
 namespace {
-constexpr uint32_t kSheetObjectId = 3000;   // + 16 per seat (Scoresheet::submit uses 16 ids)
+// + 16 per seat: Scoresheet::submit uses 5 ids plus one per turned page, so 16 cover 11 turned
+// pages; later pages may share ids with the other seat's pad, which is harmless (the paper
+// material reads neither objectSeed nor objectId).
+constexpr uint32_t kSheetObjectId = 3000;
 constexpr uint32_t kPenObjectId = 3100;     // + 2 per seat
 const vec3 kBlackInk(0.010f, 0.010f, 0.013f);
 
@@ -102,15 +105,6 @@ void Scorekeeper::newGame(anim::Animator* anim, bool clockOnPositiveX, const Pla
     }
 }
 
-void Scorekeeper::clear() {
-    recording_ = headerWritten_ = finished_ = false;
-    ledger_.reset();
-    for (int s = 0; s < 2; ++s) {
-        hasPrevPen_[s] = false;
-        if (ready_) sheets_[s].reset();
-    }
-}
-
 Scoresheet::Header Scorekeeper::header() const {
     Scoresheet::Header h;
     h.date = date_;
@@ -190,13 +184,15 @@ void Scorekeeper::beginMoveEntry(int seat, int ply, const std::string& san) {
     anim::WriteTask w = writeTask(anim::WriteTaskType::Write);
     w.path = sh.beginMove(ply, san);
     if (w.path.empty()) {
-        // Nothing drawable (a glyph no font has): keep the entry queue in step with the tasks.
+        // Nothing drawable (a glyph no font has): the sheet queued an empty entry, which this
+        // task's WritingDone completes (the entry queue stays in step with the tasks).
         anim::PenKey k;
         k.tip = sh.writingRest(ply) + vec3(0, 0.004f, 0);
         w.path.push_back(k);
     }
     anim_[seat].enqueueWriting(w);
     ledger_.begin(seat, ply);
+    refreshRest(seat);   // beside the next row: where this entry's Write takes the hand back
 }
 
 void Scorekeeper::setHold(int seat, bool hold) {
@@ -289,7 +285,6 @@ void Scorekeeper::onEvent(int seat, const anim::Event& e) {
     }
     case anim::EventType::WritingDone:
         sh.finishEntry();
-        refreshRest(seat);
         break;
     case anim::EventType::PageGripped: audio::play(audio::Sfx::PageTurn, sh.pageCorner(0.0f), 0.9f); break;
     case anim::EventType::PageTurned:
@@ -326,11 +321,5 @@ void Scorekeeper::submit(render::Renderer& r) {
         hasPrevPen_[s] = true;
     }
 }
-
-bool Scorekeeper::writing(int seat) const {
-    return (anim_ && anim_[seat & 1].writingBusy()) || (ready_ && sheets_[seat & 1].pendingEntries() > 0);
-}
-
-int Scorekeeper::backlog(int seat) const { return ready_ ? sheets_[seat & 1].pendingEntries() : 0; }
 
 }  // namespace game

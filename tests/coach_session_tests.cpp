@@ -5,7 +5,8 @@
 // names, turn-taking lines, the end of a game (closing words, handshake, appraisal, Space skipping
 // it), and a chapter of the rules lesson (a wrong move answered and taken back, an illegal attempt
 // explained, the right move, an idle hint). Every line the session emits renders, in every
-// language that has its key, without a leftover placeholder.
+// language that has its key, without a leftover placeholder. A game without an engine: the
+// blunder unjudged, the coach's reply not held.
 #include "test.h"
 #include "coach_fakes.h"
 
@@ -161,11 +162,10 @@ SessionConfig levelConfig(int level, chess::Color human = chess::White) {
     SessionConfig c;
     c.level = level;
     c.human = human;
-    c.seed = 7;
     return c;
 }
 
-// The hanging-knight position with its A0 (research-pedagogy's level-1 example).
+// The hanging-knight position with its A0 (the level-1 example of a hanging piece).
 void hangTable(Table& t, int level = 1) {
     t.game.resetFromFEN(kHangFen);
     t.analyst.results[fenOf(kHangFen) + "|A0"] = analysisOf({pvl(20, "g1f1 g8f8"), pvl(-330, "c3d5 e6d5 g1f1")});
@@ -208,9 +208,10 @@ TEST(coach_session_blunder_offer_accepted_and_retried) {
     t.session.onOfferAnswer(t.game, true);
     const auto tb = t.stage.all("takeBack");
     CHECK(tb.size() == 1 && tb[0].n == 1);
-    CHECK_EQ(t.game.moves().size(), size_t(0));
     CHECK(!t.session.offerOpen());
     CHECK(!t.stage.all("offer").back().flag);
+    CHECK(t.until([&] { return !t.stage.tableBusy(); }, 5.0f));   // undone when the table action starts
+    CHECK_EQ(t.game.moves().size(), size_t(0));
     CHECK(t.quiet());
     CHECK(t.said("event.takeback.taken"));
     CHECK(t.queuedPrefix("tb.hint"));
@@ -224,6 +225,23 @@ TEST(coach_session_blunder_offer_accepted_and_retried) {
     CHECK(t.reply("g8f8"));
     CHECK(t.until([&] { return t.analyst.count("A0", t.game.position().fen()) == 1; }, 5.0f));
     CHECK(t.session.canTakeBack(t.game));
+
+    // The retry taken back from the pause menu: a plain takeback, the offered move is gone (no
+    // second hint, and the next move is not judged against it).
+    auto count = [&](const std::string& prefix) {
+        int n = 0;
+        for (const Line& l : t.lines) n += l.key.rfind(prefix, 0) == 0 ? 1 : 0;
+        return n;
+    };
+    CHECK_EQ(count("tb.hint"), 1);
+    t.session.onTakeBackRequested(t.game);
+    CHECK(t.until([&] { return t.game.moves().empty() && t.session.playerMayMove(t.game); }, 10.0f));
+    CHECK(t.quiet());
+    CHECK_EQ(count("event.takeback.taken"), 2);
+    CHECK_EQ(count("tb.hint"), 1);
+    t.move("g1f1");
+    CHECK(t.until([&] { return t.session.coachMayMove() && t.session.director().idle(); }, 60.0f));
+    CHECK_EQ(count("tb."), 2);   // the hint and the first retry's "fixed"
     checkRenders(t.lines);
 }
 
@@ -299,12 +317,92 @@ TEST(coach_session_takeback_requested) {
     t.session.onTakeBackRequested(t.game);
     const auto tb = t.stage.all("takeBack");
     CHECK(tb.size() == 1 && tb[0].n == 2);   // the reply and the human's move
+    CHECK(t.until([&] { return !t.stage.tableBusy(); }, 5.0f));
     CHECK_EQ(t.game.moves().size(), size_t(0));
     CHECK(t.quiet());
     CHECK(t.said("event.takeback.taken"));
     CHECK_EQ(t.analyst.count("A0", fenOf(kHangFen)), 1);
     CHECK(!t.session.canTakeBack(t.game));
     checkRenders(t.lines);
+}
+
+TEST(coach_session_menu_takeback_of_an_offered_move) {
+    // The offer declined, then that move taken back from the pause menu: the hint follows, and the
+    // replay is judged against the move taken back (not reviewed and offered again).
+    Table t;
+    hangTable(t);
+    t.start(levelConfig(1));
+    CHECK(t.quiet());
+    t.move("c3d5");
+    CHECK(t.until([&] { return t.session.offerOpen(); }, 60.0f));
+    t.session.onOfferAnswer(t.game, false);
+    CHECK(t.reply("e6d5"));
+    CHECK(t.quiet());
+    CHECK(t.session.canTakeBack(t.game));
+    t.session.onTakeBackRequested(t.game);
+    CHECK(t.queuedPrefix("tb.hint"));
+    CHECK(t.until([&] { return t.game.moves().empty() && t.session.playerMayMove(t.game); }, 10.0f));
+    CHECK(t.quiet());
+    auto offers = [&] {
+        int n = 0;
+        for (const Line& l : t.lines) n += l.key == "ex.offer.b1" ? 1 : 0;
+        return n;
+    };
+    CHECK_EQ(offers(), 1);
+    t.move("c3d5");
+    CHECK(t.until([&] { return t.session.coachMayMove() && t.session.director().idle(); }, 60.0f));
+    CHECK(t.queued("tb.same"));
+    CHECK_EQ(offers(), 1);
+    checkRenders(t.lines);
+}
+
+TEST(coach_session_no_turn_while_a_takeback_waits) {
+    // The pause menu's Take back after the coach's reply: until the table undoes the moves, the
+    // positions on the board are going away, so no human turn begins on them (no A0 nor A3 asked)
+    // and no background evaluation is asked of them.
+    Table t;
+    hangTable(t);
+    t.stage.takeBackWait = 30;
+    t.analyst.delay = 150;
+    t.start(levelConfig(3));
+    CHECK(t.quiet());
+    t.move("g1f1");
+    const std::string played = t.game.position().fen();
+    CHECK(t.reply("g8f8"));
+    t.step();
+    const std::string doomed = t.game.position().fen();
+    CHECK_EQ(t.analyst.count("A0", doomed), 1);
+    CHECK_EQ(t.analyst.count("A3", doomed), 1);
+    CHECK_EQ(t.analyst.count("E", played), 0);
+    t.session.onTakeBackRequested(t.game);
+    CHECK(t.until([&] { return !t.stage.tableBusy(); }, 10.0f));
+    CHECK_EQ(t.game.moves().size(), size_t(0));
+    CHECK_EQ(t.analyst.count("A0", doomed), 1);
+    CHECK_EQ(t.analyst.count("A3", doomed), 1);
+    CHECK_EQ(t.analyst.count("E", played), 0);
+    CHECK(t.until([&] { return t.session.playerMayMove(t.game); }, 10.0f));
+}
+
+TEST(coach_session_pause_menu_takeback_keeps_the_voice) {
+    // Esc while the coach speaks, then the pause menu's Take back: once resumed, the coach is heard
+    // again (its pause does not outlive the line it held).
+    Table t;
+    hangTable(t);
+    t.start(levelConfig(2));
+    CHECK(t.quiet());
+    t.move("g1f1");
+    CHECK(t.reply("g8f8"));
+    CHECK(t.quiet());
+    t.session.onDrawAnswer(false);
+    CHECK(t.until([&] { return t.session.director().speaking(); }, 5.0f));
+    t.session.setPaused(true);
+    t.step();
+    t.session.onTakeBackRequested(t.game);
+    t.session.setPaused(false);
+    const int heard = t.stage.count("voice.end");
+    CHECK(t.quiet());
+    CHECK(t.said("event.takeback.taken"));
+    CHECK_EQ(t.stage.count("voice.end"), heard + 1);   // heard to its end
 }
 
 TEST(coach_session_openings_and_turn_taking) {
@@ -355,6 +453,27 @@ TEST(coach_session_background_evaluations) {
     const int evals = t.analyst.count("E");
     t.run(5.0f);
     CHECK_EQ(t.analyst.count("E"), evals);   // asked once
+    checkRenders(t.lines);
+}
+
+TEST(coach_session_without_engine) {
+    // No engine (every analysis refused): the blunder goes unjudged, without an offer, and the
+    // coach's reply is not held for a review.
+    Table t;
+    hangTable(t);
+    t.analyst.engine = false;
+    t.start(levelConfig(1));
+    CHECK(t.quiet());
+    CHECK(t.session.playerMayMove(t.game));
+    t.move("c3d5");
+    CHECK(t.until([&] { return t.session.coachMayMove(); }, 1.0f));
+    CHECK(!t.session.offerOpen());
+    CHECK(t.stage.all("offer").empty());
+    CHECK(!t.queuedPrefix("ex."));
+    CHECK(t.reply("e6d5"));
+    CHECK(t.quiet());
+    CHECK(t.session.playerMayMove(t.game));
+    CHECK(t.analyst.asked.empty());
     checkRenders(t.lines);
 }
 
@@ -417,6 +536,179 @@ TEST(coach_session_game_over_drops_the_greeting) {
     CHECK(!t.said("event.colour.white"));
 }
 
+// The lesson plays a chapter as one script: Space skips the line being said, never the lines after
+// it (the instructions of the exercises that follow, the talk of the last chapter).
+TEST(coach_session_lesson_space_skips_one_line) {
+    Table t;
+    SessionConfig cfg = levelConfig(0);
+    cfg.lessonChapter = 1;   // "pieces": the rook first
+    t.start(cfg);
+    CHECK(t.until([&] { return t.said("lesson.rook.intro"); }, 60.0f));
+    t.step();
+    CHECK(t.session.director().skippable());
+    t.session.skip();
+    CHECK(t.until([&] { return t.session.playerMayMove(t.game); }, 120.0f));
+    CHECK(t.said("lesson.rook.lines"));
+    CHECK(t.said("lesson.rook.ask"));
+    t.move("a1a6");
+    CHECK(t.until([&] { return t.said("lesson.bishop.ask"); }, 120.0f));
+    CHECK(t.said("lesson.jump.blocked"));
+    CHECK(t.said("lesson.bishop.intro"));
+
+    Table u;
+    SessionConfig last = levelConfig(0);
+    last.lessonChapter = 9;   // the talk, no exercise
+    u.start(last);
+    CHECK(u.until([&] { return u.said("lesson.talk.rules"); }, 60.0f));
+    u.step();
+    u.session.skip();
+    CHECK(u.until([&] { return u.said("lesson.talk.real"); }, 60.0f));
+    CHECK(!u.session.lessonCompleted());
+}
+
+// The appraisal explains what accuracy is once (level 3): it counts as explained when that line is
+// said, not when it is only queued (Space on the appraisal skips it, and it comes again next time).
+TEST(coach_session_accuracy_explained_when_said) {
+    for (bool space : {false, true}) {
+        Table t;
+        t.start(levelConfig(3));
+        CHECK(t.quiet());
+        const char* moves[] = {"e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5", "c2c3", "g8f6", "d2d3", "d7d6",
+                               "e1g1", "e8g8", "h2h3", "h7h6", "b1d2", "a7a6", "f1e1", "b7b5", "c4b3", "c8e6"};
+        for (size_t i = 0; i < sizeof moves / sizeof *moves; i += 2) {
+            CHECK(t.until([&] { return t.session.playerMayMove(t.game); }, 10.0f));
+            t.move(moves[i]);
+            CHECK(t.reply(moves[i + 1]));
+        }
+        CHECK(t.quiet());
+        t.game.agreeDraw();
+        t.session.onGameOver(t.game, false);
+        CHECK(t.until([&] { return t.session.handshakeWanted(); }, 60.0f));
+        t.session.onHandshakeDone(t.game);
+        CHECK(t.queued("appraisal.num.acc_explain.b3"));
+        CHECK(!t.session.accuracyExplained());
+        if (space) {
+            CHECK(t.until([&] { return t.session.director().speaking(); }, 10.0f));
+            t.session.skip();
+        }
+        CHECK(t.until([&] { return t.session.finished(); }, 120.0f));
+        CHECK_EQ(t.session.accuracyExplained(), !space);
+        CHECK_EQ(t.said("appraisal.num.acc_explain.b3"), !space);
+    }
+}
+
+// No takeback is offered for a finished game: stalemate while winning by the human's own move is
+// explained, then the closing words and the handshake follow; an offer open or still queued when a
+// draw is agreed closes without a word; and an answer that comes after the end takes nothing back
+// and says nothing.
+TEST(coach_session_no_offer_once_the_game_is_over) {
+    Table t;
+    const char* fen = "7k/5K2/8/6Q1/8/8/8/8 w - - 0 1";
+    t.game.resetFromFEN(fen);
+    t.analyst.results[fenOf(fen) + "|A0"] = analysisOf({pvl(0, "g5g7", 1), pvl(900, "g5h6 h8g8")});
+    t.start(levelConfig(1));
+    CHECK(t.quiet());
+    t.move("g5g6");
+    CHECK(t.game.isOver());
+    t.session.onGameOver(t.game, false);
+    bool offered = false;
+    CHECK(t.until([&] {
+        offered = offered || t.session.offerOpen();
+        return t.session.handshakeWanted();
+    }, 60.0f));
+    CHECK(!offered);
+    CHECK(!t.queued("ex.offer.b1"));
+    CHECK(t.queuedPrefix("ex.stalemate"));
+    CHECK(t.said("event.end.draw"));
+    CHECK(t.stage.all("takeBack").empty());
+    CHECK_EQ(t.game.moves().size(), size_t(1));
+    checkRenders(t.lines);
+
+    Table u;
+    hangTable(u);
+    u.start(levelConfig(1));
+    CHECK(u.quiet());
+    u.move("c3d5");
+    CHECK(u.until([&] { return u.session.offerOpen(); }, 60.0f));
+    u.game.agreeDraw();
+    u.session.onGameOver(u.game, false);
+    CHECK(!u.session.offerOpen());
+    CHECK(u.until([&] { return u.session.handshakeWanted(); }, 60.0f));
+    CHECK(u.said("event.end.draw"));
+    CHECK(!u.queued("event.takeback.declined") && !u.queued("event.play_on"));
+
+    Table v;   // the offer still queued behind the explanation
+    hangTable(v);
+    v.start(levelConfig(1));
+    CHECK(v.quiet());
+    v.move("c3d5");
+    CHECK(v.until([&] {
+        const std::string* key = v.session.director().runningKey();
+        return v.queued("ex.offer.b1") && v.session.director().speaking() && key && *key != "ex.offer.b1";
+    }, 60.0f));
+    v.game.agreeDraw();
+    v.session.onGameOver(v.game, false);
+    offered = false;
+    CHECK(v.until([&] {
+        offered = offered || v.session.offerOpen();
+        return v.session.handshakeWanted();
+    }, 60.0f));
+    CHECK(!offered);
+    CHECK(v.said("event.end.draw"));
+    CHECK(!v.said("ex.offer.b1"));
+    CHECK(v.stage.all("takeBack").empty());
+    CHECK(!v.queued("event.takeback.declined") && !v.queued("event.play_on"));
+
+    for (bool accept : {true, false}) {
+        Table w;
+        hangTable(w);
+        w.start(levelConfig(1));
+        CHECK(w.quiet());
+        w.move("c3d5");
+        CHECK(w.until([&] { return w.session.offerOpen(); }, 60.0f));
+        w.game.agreeDraw();
+        w.session.onOfferAnswer(w.game, accept);
+        CHECK(!w.session.offerOpen());
+        CHECK(w.stage.all("takeBack").empty());
+        CHECK(w.quiet());
+        CHECK(!w.queued("event.takeback.taken"));
+        CHECK(!w.queued("event.takeback.declined") && !w.queued("event.play_on"));   // no "we play on" either
+        CHECK(!w.queued("event.encourage.mistake"));
+    }
+}
+
+// The human's mate before the turn's A0 is in: the review of that move uses the A0 stopped when
+// it was played, not a fresh full search asked once the game is over.
+TEST(coach_session_game_over_keeps_the_review_analyses) {
+    Table t;
+    t.game.resetFromFEN(kMateFen);
+    t.analyst.delay = 150;
+    t.start(levelConfig(3));
+    t.run(0.2f);
+    const std::string root = fenOf(kMateFen);
+    CHECK_EQ(t.analyst.count("A0", root), 1);
+    CHECK_EQ(t.analyst.count("A3", root), 1);
+    t.move("a1a8");
+    t.session.onGameOver(t.game, false);
+    CHECK(t.until([&] { return t.session.handshakeWanted(); }, 60.0f));
+    CHECK(t.said("event.end.win"));
+    CHECK_EQ(t.analyst.count("A0", root), 1);
+    CHECK_EQ(t.analyst.count("A3", root), 1);
+
+    // A resignation abandons the review: its A1 / A2 go too.
+    Table u;
+    hangTable(u);
+    u.analyst.delay = 150;
+    u.start(levelConfig(4));
+    CHECK(u.quiet());
+    u.move("g2g3");   // not among A0's lines: A1, and A2 at level 4
+    CHECK(u.until([&] { return u.analyst.count("A1") == 1 && u.analyst.count("A2") == 1; }, 10.0f));
+    u.session.onGameOver(u.game, true);
+    for (const fake::Analyst::Job& j : u.analyst.jobs) CHECK(j.shape != "A1" && j.shape != "A2");
+    CHECK(u.until([&] { return u.session.handshakeWanted(); }, 60.0f));
+    CHECK(u.said("event.end.resigned"));
+}
+
 TEST(coach_session_rules_lesson_chapter) {
     Table t;
     SessionConfig cfg = levelConfig(0);
@@ -444,6 +736,7 @@ TEST(coach_session_rules_lesson_chapter) {
     CHECK(t.until([&] { return t.stage.count("takeBack") == 1; }, 30.0f));
     CHECK(t.said("lesson.rook.short"));
     CHECK(t.saidAt("lesson.rook.short") < t.stage.all("takeBack").front().t);
+    CHECK(t.until([&] { return !t.stage.tableBusy(); }, 5.0f));
     CHECK_EQ(t.game.moves().size(), size_t(0));
     int again = -1;
     CHECK(t.until([&] { return t.session.playerMayMove(t.game); }, 30.0f));

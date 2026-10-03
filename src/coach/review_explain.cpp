@@ -1,6 +1,6 @@
-// Explanation detectors of the coach's review (research-pedagogy §2): each one checks its motif on
-// the board (tactics.h) along the engine's refutation or best line, and builds the lines that say
-// it, with their pointing and marks. findExplanation() tries them in the §2.0 order; findTip() the
+// Explanation detectors of the coach's review: each one checks its motif on the board (tactics.h)
+// along the engine's refutation or best line, and builds the lines that say it, with their pointing
+// and marks. findExplanation() tries them in the order of the numbered sections below; findTip() the
 // principles (opening, technique) that are said as tips, never as faults.
 #include "coach/review_internal.h"
 
@@ -13,10 +13,6 @@ namespace detail {
 using namespace chess;
 
 namespace {
-
-int pts(PieceType t) { return kPiecePoints[t]; }
-bool has(uint64_t set, Square s) { return s != NoSquare && (set & squareBit(s)); }
-Arg evalArg(const ai::Score& s) { return Arg::ofEval(s.cp, s.matesNow ? 1 : s.matedNow ? -1 : s.mate); }
 
 // Replaces an argument already set on the line (the common ones below), or adds it.
 void put(Line& l, const std::string& name, const Arg& a) {
@@ -58,7 +54,7 @@ const char* replyAnchor(const Ctx& c) { return c.level <= 2 ? "my" : "reply"; }
 // Where a human piece of the table (p1) stood before the move under review.
 Square squareOnP0(const Ctx& c, Square onP1) { return onP1 == c.played.to ? c.played.from : onP1; }
 
-// Motifs 4-9 of the §2.0 table: "R wins material with R[0]". A motif pays off after the threat, the
+// Motifs 4-9 below: "R wins material with R[0]". A motif pays off after the threat, the
 // escape and the capture (3 plies at least, more with an intermediate check), so the gain is not
 // bounded by the band's lookahead: the motif itself stands on the board after R[0] (that is what
 // the lines show), the engine's loss confirms it works, and the PV must capture one of its targets
@@ -66,6 +62,11 @@ Square squareOnP0(const Ctx& c, Square onP1) { return onP1 == c.played.to ? c.pl
 int motifReach(const Ctx& c) { return std::max(6, c.b.lookahead + 2); }
 bool materialLost(const Ctx& c) {
     return c.j.delta >= 10.0 || (c.gain > 0 && c.gain <= c.b.lookahead + 4);
+}
+
+// c's castling rights (both wings).
+constexpr uint8_t castlingOf(Color c) {
+    return c == White ? uint8_t(WhiteKingSide | WhiteQueenSide) : uint8_t(BlackKingSide | BlackQueenSide);
 }
 
 // Squares next to a king that are empty (the "escape squares" a mate or a stalemate takes away).
@@ -93,7 +94,7 @@ std::vector<Square> byValue(const Position& p, uint64_t set) {
     return v;
 }
 
-// ---- 1. Mate allowed (§2.9) ----
+// ---- 1. Mate allowed ----
 bool mateAllowed(const Ctx& c, Explanation& out) {
     if (c.j.mate != MateChange::Created) return false;
     const ai::Score& s = c.lp->score;
@@ -103,7 +104,6 @@ bool mateAllowed(const Ctx& c, Explanation& out) {
     const bool lineKnown = int(c.r.size()) >= plies && c.r[size_t(plies - 1)].mate;
     Explanation ex;
     ex.type = ExType::MateAllowed;
-    ex.mateMoves = n;
     ex.concrete = plies <= c.b.lookahead;
     if (c.level <= 2 && (!ex.concrete || !lineKnown)) return false;   // too deep for the band: not this cause
     static const int kMateLimit[6] = {1, 2, 2, 3, 3, 4};
@@ -156,7 +156,7 @@ bool mateAllowed(const Ctx& c, Explanation& out) {
     return true;
 }
 
-// ---- 2. Mate missed (§2.10) ----
+// ---- 2. Mate missed ----
 bool mateMissed(const Ctx& c, Explanation& out) {
     const bool lost = c.j.mate == MateChange::Lost;
     const bool delayed = c.j.mate == MateChange::Delayed && c.level >= 5;
@@ -171,7 +171,6 @@ bool mateMissed(const Ctx& c, Explanation& out) {
     ex.concrete = true;
     ex.includesBest = true;
     ex.offer = lost;
-    ex.mateMoves = n;
     Beat b = bandLine(c, delayed ? "ex.mate_delayed" : "ex.mate_missed");
     put(b.line, "m", Arg::ofNumber(n));
     put(b.line, "line", Arg::ofMoves(sanLine(c.best, 0, size_t(2 * n - 1))));
@@ -185,7 +184,7 @@ bool mateMissed(const Ctx& c, Explanation& out) {
     return true;
 }
 
-// ---- 3. Stalemate when winning (§2.14) ----
+// ---- 3. Stalemate when winning ----
 bool stalemate(const Ctx& c, Explanation& out) {
     Explanation ex;
     ex.type = ExType::Stalemate;
@@ -219,7 +218,7 @@ bool stalemate(const Ctx& c, Explanation& out) {
     return false;
 }
 
-// ---- 4. Fork (§2.4) ----
+// ---- 4. Fork ----
 bool fork(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
     const LineStep& r0 = c.r[0];
@@ -274,7 +273,7 @@ bool fork(const Ctx& c, Explanation& out) {
     return true;
 }
 
-// ---- 5. Discovered attack (§2.7) ----
+// ---- 5. Discovered attack ----
 bool discovered(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
     const LineStep& r0 = c.r[0];
@@ -305,7 +304,7 @@ bool discovered(const Ctx& c, Explanation& out) {
     return false;
 }
 
-// ---- 6. Skewer (§2.6) ----
+// ---- 6. Skewer ----
 bool skewer(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
     const LineStep& r0 = c.r[0];
@@ -335,7 +334,7 @@ bool skewer(const Ctx& c, Explanation& out) {
     return false;
 }
 
-// ---- 7. Pin (§2.5) ----
+// ---- 7. Pin ----
 bool pin(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
     const LineStep& r0 = c.r[0];
@@ -373,12 +372,16 @@ bool pin(const Ctx& c, Explanation& out) {
         out = ex;
         return true;
     }
-    // (b) A pinned piece is a bad defender: the only defender of the captured piece is pinned.
+    // (b) A pinned piece is a bad defender: the only defender of the captured piece is pinned, and
+    // still cannot take back after the reply (a pinner that captured off the line freed it).
     if (r0.captured != NoPiece) {
         const Square s = r0.move.to;
         const uint64_t defenders = c.p1.attackersTo(s, c.human);
         const uint64_t pinnedSet = c.p1.pinned(c.human);
-        if (defenders && (defenders & ~pinnedSet) == 0) {
+        bool canRetake = false;
+        for (Square d : squaresOf(defenders))
+            if (p2.findLegal(d, s, Queen).valid()) canRetake = true;
+        if (defenders && (defenders & ~pinnedSet) == 0 && !canRetake) {
             const Square d = squaresOf(defenders)[0];
             for (const Pin& pn : before) {
                 if (pn.pinned != d) continue;
@@ -405,7 +408,7 @@ bool pin(const Ctx& c, Explanation& out) {
     return false;
 }
 
-// ---- 8. Trapped piece (§2.12) ----
+// ---- 8. Trapped piece ----
 bool trapped(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
     Position p2 = c.p1;
@@ -422,12 +425,12 @@ bool trapped(const Ctx& c, Explanation& out) {
             x = s;
             break;
         }
-    // The special pattern of §2.12: a bishop grabs a rim pawn (Bxa7? b6, Bxh7? g6) and a pawn push
+    // A special pattern: a bishop grabs a rim pawn (Bxa7? b6, Bxh7? g6) and a pawn push
     // closes its retreat. Nothing attacks it yet (the king comes later), so isTrapped() does not see it.
     const bool rimGrab = c.f.piece == Bishop && c.f.captured == Pawn &&
                          (fileOf(c.played.to) == 0 || fileOf(c.played.to) == 7) && c.r[0].piece == Pawn;
     if (x == NoSquare && rimGrab && p2.at(c.played.to).type == Bishop && lostLater(Bishop)) {
-        bool boxed = !p2.inCheck() && p2.sideToMove() == c.human;
+        bool boxed = !p2.inCheck();
         if (boxed)
             for (const Move& m : p2.legalMovesFrom(c.played.to))
                 if (see(p2, m) >= 0) boxed = false;
@@ -442,16 +445,14 @@ bool trapped(const Ctx& c, Explanation& out) {
     Beat b = bandLine(c, "ex.trapped");
     put(b.line, "your", pieceArg(c.p1, x, c.human));
     pointPiece(b, x, "your", true);
-    Position q = p2;
-    if (q.sideToMove() == c.human)
-        for (const Move& m : q.legalMovesFrom(x)) markSquare(b, m.to, "your");
+    for (const Move& m : p2.legalMovesFrom(x)) markSquare(b, m.to, "your");
     ex.cause.push_back(b);
     if (c.level == 1) ex.tip.push_back(line(c, "ex.trapped.tip.b1", Look::Player));
     out = ex;
     return true;
 }
 
-// ---- 9. Back rank (§2.8), material won through it ----
+// ---- 9. Back rank, material won through it ----
 bool backRank(const Ctx& c, Explanation& out) {
     if (!backRankWeak(c.p1, c.human)) return false;
     const int home = c.human == White ? 0 : 7;
@@ -479,7 +480,7 @@ bool backRank(const Ctx& c, Explanation& out) {
     return false;
 }
 
-// ---- 10. Hanging piece, removal of the guard, a threat not seen (§2.1) ----
+// ---- 10. Hanging piece, removal of the guard, a threat not seen ----
 bool hanging(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach || c.r[0].captured == NoPiece) return false;
     const LineStep& r0 = c.r[0];
@@ -489,11 +490,11 @@ bool hanging(const Ctx& c, Explanation& out) {
     if (c.lossWithin(c.b.lookahead) < (c.level <= 2 ? 2 : 1)) return false;
     if (see(c.p1, r0.move) < kPieceValueCp[x] - 50) return false;
     if (c.level <= 2 ? !isUndefended(c.p1, s) : seeSquare(c.p1, s, c.coach) <= 0) return false;
-    const bool guard = has(c.f.undefended, s) && c.level <= 4;
+    const bool guard = hasBit(c.f.undefended, s) && c.level <= 4;
     bool threat = false;
     if (!guard && s != c.played.to && c.level <= 3 && c.ply > 0 && seeSquare(c.p0, s, c.coach) > 0) {
         const Position& before = c.g->positionAt(size_t(c.ply - 1));   // before the coach's last move
-        threat = !has(hangingPieces(before, c.human, false), s);
+        threat = !hasBit(hangingPieces(before, c.human, false), s);
     }
     Explanation ex;
     ex.type = ExType::Hanging;
@@ -504,7 +505,7 @@ bool hanging(const Ctx& c, Explanation& out) {
     put(b.line, "your", pieceArg(c.p1, s, c.human));
     put(b.line, "sq", Arg::ofSquare(s));
     put(b.line, "my", pieceArg(c.p1, r0.move.from, c.human));
-    put(b.line, "pts", Arg::ofNumber(pts(x)));
+    put(b.line, "pts", Arg::ofNumber(points(x)));
     if (guard) {
         put(b.line, "your2", Arg::ofPiece(c.f.piece, c.human, true, c.played.to));
         pointSquare(b, c.played.from, "your2");
@@ -523,7 +524,7 @@ bool hanging(const Ctx& c, Explanation& out) {
     return true;
 }
 
-// ---- 11. Lost in an exchange (§2.2) ----
+// ---- 11. Lost in an exchange ----
 bool exchange(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
     if (c.lossWithin(c.b.lookahead) < 2) return false;
@@ -550,8 +551,8 @@ bool exchange(const Ctx& c, Explanation& out) {
     put(b.line, "your", pieceArg(c.p1, s, c.human));
     put(b.line, "my", pieceArg(c.p1, r0.move.from, c.human));
     if (badCapture) {
-        put(b.line, "n", Arg::ofNumber(pts(victim)));
-        put(b.line, "n2", Arg::ofNumber(pts(c.f.captured)));
+        put(b.line, "n", Arg::ofNumber(points(victim)));
+        put(b.line, "n2", Arg::ofNumber(points(c.f.captured)));
         pointPiece(b, s, "your", true);
         traceMove(b, r0.piece, r0.move.from, s, c.level <= 2 ? "my" : "sq");
     } else if (family == "ex.exchange_count") {
@@ -561,8 +562,8 @@ bool exchange(const Ctx& c, Explanation& out) {
         for (Square a : squaresOf(att)) markPiece(b, a, "sq");
         for (Square d : squaresOf(def)) markPiece(b, d, "sq");
     } else {
-        put(b.line, "n", Arg::ofNumber(pts(victim)));
-        put(b.line, "n2", Arg::ofNumber(pts(r0.piece)));
+        put(b.line, "n", Arg::ofNumber(points(victim)));
+        put(b.line, "n2", Arg::ofNumber(points(r0.piece)));
         pointPiece(b, s, "your", true);
         traceMove(b, r0.piece, r0.move.from, s, c.level <= 2 ? "my" : "sq");
     }
@@ -571,7 +572,7 @@ bool exchange(const Ctx& c, Explanation& out) {
     return true;
 }
 
-// ---- 12. Missed capture of a free piece (§2.3) and missed fork (§2.4) ----
+// ---- 12. Missed capture of a free piece and missed fork ----
 bool missedCapture(const Ctx& c, Explanation& out) {
     if (c.best.empty() || c.isBest) return false;
     const LineStep& b0 = c.best[0];
@@ -581,7 +582,7 @@ bool missedCapture(const Ctx& c, Explanation& out) {
     if (see(c.p0, b0.move) < kPieceValueCp[yt] - 50) return false;
     if (c.p1.at(y).empty() || c.p1.at(y).color != c.coach) return false;   // taken after all, or moved
     if (c.f.captured != NoPiece && c.f.seeCp >= kPieceValueCp[yt] - 150) return false;   // took as much elsewhere
-    const bool bigPiece = pts(yt) >= 3;
+    const bool bigPiece = points(yt) >= 3;
     const bool fault = c.j.delta >= 5.0;
     if (!fault && !(c.level <= 2 && bigPiece)) return false;
     if (c.level <= 2 && !isUndefended(c.p0, y)) return false;   // "free": the lines say it had no protector
@@ -641,7 +642,18 @@ bool endgamePhase(const Ctx& c) {
     return phaseOfPly(dividePhases(*c.g), c.ply) == 2 || majorsAndMinors(c.p1) <= 4;
 }
 
-// ---- 13. Pawn promotion race (§2.13) ----
+// Where the pawn that moves at line[i] stood when the line began: its earlier moves (its side's plies)
+// traced back, since it may have captured on its way.
+Square pawnOrigin(const std::vector<LineStep>& line, int i) {
+    Square from = line[size_t(i)].move.from;
+    for (int j = i - 2; j >= 0; j -= 2) {
+        const LineStep& prev = line[size_t(j)];
+        if (prev.mover == line[size_t(i)].mover && prev.piece == Pawn && prev.move.to == from) from = prev.move.from;
+    }
+    return from;
+}
+
+// ---- 13. Pawn promotion race ----
 bool promotionRace(const Ctx& c, Explanation& out) {
     if (!endgamePhase(c) || c.j.delta < 5.0) return false;
     const Square hk = c.p1.kingSquare(c.human);
@@ -650,11 +662,20 @@ bool promotionRace(const Ctx& c, Explanation& out) {
         const LineStep& st = c.r[size_t(i)];
         if (st.mover != c.coach || st.promotion == NoPiece) continue;
         const Square prom = st.move.to;
-        Square pawn = NoSquare;   // the coach's pawn on that file on the table now
-        for (Square s : squaresOf(c.p1.pieces(c.coach, Pawn)))
-            if (fileOf(s) == fileOf(st.move.from) && (pawn == NoSquare || std::abs(rankOf(s) - rankOf(prom)) < std::abs(rankOf(pawn) - rankOf(prom))))
-                pawn = s;
+        // The coach's pawn on the table now: the one that queens, else the nearest one on that file.
+        const Square from = pawnOrigin(c.r, i);
+        Square pawn = c.p1.at(from) == Piece{Pawn, c.coach} ? from : NoSquare;
+        if (pawn == NoSquare)
+            for (Square s : squaresOf(c.p1.pieces(c.coach, Pawn)))
+                if (fileOf(s) == fileOf(st.move.from) && (pawn == NoSquare || std::abs(rankOf(s) - rankOf(prom)) < std::abs(rankOf(pawn) - rankOf(prom))))
+                    pawn = s;
         if (pawn == NoSquare) continue;
+        // Every line says the king is too far: the rule of the square on the square the line queens on
+        // (the coach to move, as outsideSquare()). Inside it, the pawn queens for another reason.
+        const int kingSteps = std::max(std::abs(fileOf(hk) - fileOf(prom)), std::abs(rankOf(hk) - rankOf(prom)));
+        int pawnSteps = std::abs(rankOf(prom) - rankOf(pawn));
+        if (rankOf(pawn) == (c.coach == White ? 1 : 6)) pawnSteps -= 1;   // the double step saves a move
+        if (kingSteps <= pawnSteps) continue;
         Explanation ex;
         ex.type = ExType::PromotionRace;
         ex.concrete = true;
@@ -663,9 +684,9 @@ bool promotionRace(const Ctx& c, Explanation& out) {
         put(b.line, "sq", Arg::ofSquare(prom));
         put(b.line, "your", pieceArg(c.p1, hk, c.human));
         put(b.line, "my", pieceArg(c.p1, pawn, c.human));
-        put(b.line, "n", Arg::ofNumber(std::abs(rankOf(prom) - rankOf(pawn))));
-        put(b.line, "n2", Arg::ofNumber(std::max(std::abs(fileOf(hk) - fileOf(prom)), std::abs(rankOf(hk) - rankOf(prom)))));
-        traceMove(b, Rook, pawn, prom, "sq");   // a straight stroke up the file
+        put(b.line, "n", Arg::ofNumber(pawnSteps));
+        put(b.line, "n2", Arg::ofNumber(kingSteps));
+        traceMove(b, Rook, pawn, prom, "sq");   // a straight stroke from the pawn to the square
         pointPiece(b, hk, "your");
         ex.includesBest = c.level == 6;
         ex.cause.push_back(b);
@@ -676,7 +697,10 @@ bool promotionRace(const Ctx& c, Explanation& out) {
     for (int i = 0; i < int(c.best.size()) && i < c.b.lookahead + 2; ++i) {
         const LineStep& st = c.best[size_t(i)];
         if (st.mover != c.human || st.promotion == NoPiece) continue;
-        if (c.f.piece == Pawn && fileOf(c.played.from) == fileOf(st.move.to)) return false;
+        // The human did move that pawn, or one on its file.
+        if (c.f.piece == Pawn &&
+            (c.played.from == pawnOrigin(c.best, i) || fileOf(c.played.from) == fileOf(st.move.to)))
+            return false;
         Explanation ex;
         ex.type = ExType::PromotionRace;
         ex.missed = true;
@@ -693,7 +717,7 @@ bool promotionRace(const Ctx& c, Explanation& out) {
     return false;
 }
 
-// ---- 14. King safety (§2.11) ----
+// ---- 14. King safety ----
 bool kingSafety(const Ctx& c, Explanation& out) {
     if (c.j.delta < 5.0 || c.lossWithin(c.b.lookahead) >= 2 || c.r.empty()) return false;
     int checks = 0;
@@ -709,7 +733,7 @@ bool kingSafety(const Ctx& c, Explanation& out) {
     const bool walk = c.f.piece == King && !c.f.castleKing && !c.f.castleQueen && !c.p0.inCheck() &&
                       c.p0.pieces(c.human, Queen) && c.p0.pieces(c.coach, Queen);
     const bool centre = c.ply >= 20 && fileOf(k) == 4 && rankOf(k) == home &&
-                        (c.p0.castling() & (c.human == White ? 3 : 12));
+                        (c.p0.castling() & castlingOf(c.human));
     if (!shield && !walk && !centre && !zone) return false;
     Explanation ex;
     ex.type = ExType::KingSafety;
@@ -726,7 +750,7 @@ bool kingSafety(const Ctx& c, Explanation& out) {
     return true;
 }
 
-// ---- 15. Bad trade (§2.15): into a lost pawn ending; the bishop pair ----
+// ---- 15. Bad trade: into a lost pawn ending; the bishop pair ----
 bool badTrade(const Ctx& c, Explanation& out) {
     if (c.level < 3 || c.j.delta < 5.0) return false;
     // A trade needs pieces on both sides (a piece simply lost is another explanation).
@@ -769,7 +793,7 @@ bool badTrade(const Ctx& c, Explanation& out) {
     return false;
 }
 
-// ---- 17. Endgame technique (§2.17) ----
+// ---- 17. Endgame technique ----
 bool endgame(const Ctx& c, Explanation& out) {
     if (!endgamePhase(c) || c.best.empty() || c.isBest || c.j.delta < 5.0) return false;
     const LineStep& b0 = c.best[0];
@@ -813,7 +837,7 @@ bool endgame(const Ctx& c, Explanation& out) {
     return true;
 }
 
-// ---- 18. Positional fallback (§2.19, levels 4-6) ----
+// ---- 18. Positional fallback (levels 4-6) ----
 bool positional(const Ctx& c, Explanation& out) {
     if (c.level < 4 || c.best.empty() || c.isBest) return false;
     Explanation ex;
@@ -828,7 +852,7 @@ bool positional(const Ctx& c, Explanation& out) {
     return true;
 }
 
-// ---- Tips (§2.16, §2.17, §2.14 c) ----
+// ---- Tips ----
 enum TipBit { EarlyQueen, SamePiece, Castle, QueenGrab, Centre, Flank, KnightRim, MateTechnique, Fifty, Repetition };
 
 // The coach's reply develops a piece with an attack on the human's queen (a tempo).
@@ -847,7 +871,7 @@ Beat tipBeat(const Ctx& c, const char* name) { return line(c, bandKey(std::strin
 
 bool findExplanation(const Ctx& c, Explanation& out) {
     // A move that stalemates ends the game: that is what the player must hear, even when it also
-    // missed a mate (§2.14 before §2.10 in this one case).
+    // missed a mate (the stalemate before the missed mate in this one case).
     if (c.f.stalemate && stalemate(c, out)) return true;
     if (mateAllowed(c, out) || mateMissed(c, out) || stalemate(c, out)) return true;
     if (materialLost(c) && (fork(c, out) || discovered(c, out) || skewer(c, out) || pin(c, out) || trapped(c, out) ||
@@ -864,7 +888,6 @@ bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out) {
     auto done = [&](TipBit bit, Beat b, ExType type) {
         out = Explanation{};
         out.type = type;
-        out.isTip = true;
         out.tipBit = bit;
         out.cause.push_back(b);
         return true;
@@ -882,8 +905,9 @@ bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out) {
     }
     if (c.level <= 3 && fresh(Fifty) && c.p1.halfmoveClock() >= 80 && c.j.wBest >= 70.0)
         return done(Fifty, line(c, "tip.fifty.b1", Look::Player), ExType::Endgame);
+    // No explanation type: a repetition is not a stalemate fault (the appraisal's themes).
     if (c.level <= 3 && fresh(Repetition) && c.j.wBest >= 85.0 && c.g->repetitionCount() == 2)
-        return done(Repetition, line(c, "tip.repetition.b1", Look::Player), ExType::Stalemate);
+        return done(Repetition, line(c, "tip.repetition.b1", Look::Player), ExType::None);
 
     // Opening principles (levels 1-3; level 4 only the costly pawn grab), before move 12.
     if (c.ply >= 24 || !worth) return false;
@@ -924,7 +948,7 @@ bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out) {
     if (fresh(Castle) && c.ply >= 20 && !(c.f.castleKing || c.f.castleQueen)) {
         const Square k = c.p0.kingSquare(H);
         const int home = H == White ? 0 : 7;
-        const bool rights = c.p0.castling() & (H == White ? 3 : 12);
+        const bool rights = c.p0.castling() & castlingOf(H);
         bool openCentre = false;
         for (int f : {3, 4}) {
             bool pawn = false;

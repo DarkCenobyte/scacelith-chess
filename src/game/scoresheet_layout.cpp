@@ -1,5 +1,6 @@
 #include "scoresheet_layout.h"
 #include "../i18n/i18n.h"
+#include "../i18n/unicode.h"
 #include <algorithm>
 #include <cmath>
 
@@ -45,20 +46,6 @@ constexpr float LINE_BELOW_BASELINE = 0.7f;  // the writing line sits just under
 
 float blockX0(int block) { return BLOCK_X0 + float(block) * (BLOCK_W + BLOCK_GAP); }
 
-std::string utf8(uint32_t cp) {
-    std::string s;
-    if (cp < 0x80) s += char(cp);
-    else if (cp < 0x800) { s += char(0xC0 | (cp >> 6)); s += char(0x80 | (cp & 0x3F)); }
-    else if (cp < 0x10000) { s += char(0xE0 | (cp >> 12)); s += char(0x80 | ((cp >> 6) & 0x3F)); s += char(0x80 | (cp & 0x3F)); }
-    else {
-        s += char(0xF0 | (cp >> 18));
-        s += char(0x80 | ((cp >> 12) & 0x3F));
-        s += char(0x80 | ((cp >> 6) & 0x3F));
-        s += char(0x80 | (cp & 0x3F));
-    }
-    return s;
-}
-
 }  // namespace
 
 // ---- Form ---------------------------------------------------------------------------------------
@@ -85,7 +72,9 @@ Form printedForm(int page) {
     };
 
     // Title: a knight figure and the form's name, double rule underneath.
-    text(utf8(0x265E), PRINT_SYMBOL, BLOCK_X0, 16.1f, 4.4f, 0);
+    std::string knight;
+    uni::append(knight, 0x265E);
+    text(knight, PRINT_SYMBOL, BLOCK_X0, 16.1f, 4.4f, 0);
     // Labels fit their room in every language: the title ends before "Page", a field label before
     // its writing line, column titles inside their column.
     const float titleX = BLOCK_X0 + 6.3f;
@@ -311,13 +300,15 @@ bool hasMarkAbove(uint32_t cp) {
         }
     }
     if (cp >= 0x100 && cp <= 0x17F) {
-        // Latin Extended-A: most letters carry a mark above; the ones below (cedilla, ogonek) and
-        // the plain ones are excluded.
+        // Latin Extended-A: most letters carry a mark above; the ones below (cedilla, ogonek), the
+        // ones with a stroke or a middle dot, and the plain ones are excluded (not ģ, whose comma
+        // stands above, nor į, which keeps the dot of i).
         switch (cp) {
-        case 0x104: case 0x105: case 0x118: case 0x119: case 0x122: case 0x123: case 0x12E: case 0x12F:
-        case 0x131: case 0x136: case 0x137: case 0x138: case 0x13B: case 0x13C: case 0x141: case 0x142:
-        case 0x145: case 0x146: case 0x14A: case 0x14B: case 0x152: case 0x153: case 0x156: case 0x157:
-        case 0x15E: case 0x15F: case 0x162: case 0x163: case 0x166: case 0x167: case 0x172: case 0x173: return false;
+        case 0x104: case 0x105: case 0x110: case 0x111: case 0x118: case 0x119: case 0x122: case 0x126:
+        case 0x127: case 0x12E: case 0x131: case 0x132: case 0x136: case 0x137: case 0x138: case 0x13B:
+        case 0x13C: case 0x13F: case 0x140: case 0x141: case 0x142: case 0x145: case 0x146: case 0x14A:
+        case 0x14B: case 0x152: case 0x153: case 0x156: case 0x157: case 0x15E: case 0x15F: case 0x162:
+        case 0x163: case 0x166: case 0x167: case 0x172: case 0x173: case 0x17F: return false;
         default: return true;
         }
     }
@@ -330,8 +321,12 @@ bool hasMarkAbove(uint32_t cp) {
 
 namespace {
 
+// Whether the mark stands above a capital's height. Latin Extended-A puts its capitals on even code
+// points, except from U+0139 to U+0148 and from U+0179 to U+017E (odd ones); there the small l
+// with acute or caron counts too: its mark stands as high, beside the ascender.
 bool isUpperWithMark(uint32_t cp) {
     if (cp >= 0xC0 && cp <= 0xDE) return true;
+    if ((cp >= 0x139 && cp <= 0x148) || (cp >= 0x179 && cp <= 0x17E)) return (cp & 1u) == 1u || cp == 0x13A || cp == 0x13E;
     if (cp >= 0x100 && cp <= 0x17F) return (cp & 1u) == 0u;
     return cp == 0x419 || cp == 0x401 || cp == 0x407 || cp == 0x406 || cp == 0x40E;
 }

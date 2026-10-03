@@ -28,7 +28,8 @@
 // opening, arcs, elbow lift, resting spots). The animator learns where they stand from the
 // optional obstacle callbacks (pathObstacleTop, obstacleTopNear); without them it reads
 // pieceTransform for the ids 0, 1, 2... when a task starts (see pieceTransform). Diagnostics:
-// SCACELITH_ANIM_DEBUG=1 logs the planning, SCACELITH_ANIM_ARMTRACE=1 logs joint-limit clamps.
+// SCACELITH_ANIM_DEBUG (set to any value) logs the planning, SCACELITH_ANIM_ARMTRACE (set) logs
+// joint-limit clamps.
 #pragma once
 #include "../character/skeleton.h"
 #include "../math/math.h"
@@ -162,9 +163,10 @@ enum class EventType {
     PageTurned,        // the page lies flipped over the top edge
     WritingQueueEmpty,
     // Coach gestures ('position' = the target: the aimed point of a Point, the waypoint of a Trace,
-    // the presented point / the listener of a Gesture)
+    // the presented point / the listener of a Present / Open, the stroke point of a Beat)
     PointReached,      // the finger points at the target (a Trace: its tip is over the first waypoint)
-    PointReleased,     // the gesture ends (at the task's end, or when endHold() cuts it short)
+    PointReleased,     // a Point / Trace ends (at the task's end, or when endHold() cuts it short); a
+                       // Gesture only reports GestureBeat
     TraceCorner,       // the tip is over an inner waypoint of the path
     TraceDone,         // the tip is over the last waypoint
     GestureBeat        // the stroke of a Gesture (arrival of Present / Open, each Beat down-stroke)
@@ -190,15 +192,17 @@ struct Event {
 //   each move  : setWritingRest(start of the next row), Write(path of the move's text)
 //   page full  : TurnPage(pageCorner), then write on the fresh page
 //   game end   : PutPen(frame), wait for WritingQueueEmpty, then the Handshake
-// Write and TurnPage expect the pen in the hand (PickPen first). Event instants: PenPicked 0.36 s
-// and PenPut 0.34 s after their task starts (scaled with a custom duration), PenDown / PenUp /
-// WritingDone at the path key times + WriteApproach, PageGripped / PageTurned at 0.33 / 0.90 of the
-// TurnPage duration. The pageCorner callback is called during the whole task, keep it valid.
+// Write and TurnPage expect the pen in the hand (PickPen first). PickPen and PutPen always take
+// Timing::PickPen / Timing::PutPen. Event instants: PenPicked 0.36 s and PenPut 0.34 s after their
+// task starts, PenDown / PenUp / WritingDone at the path key times + WriteApproach, PageGripped /
+// PageTurned at 0.33 / 0.90 of the TurnPage duration. The pageCorner callback is called during the
+// whole task, keep it valid.
 // Left-handed player (init with Side::Left): the right hand writes, and the handshake needs it: a
-// running writing task is cut short when the handshake starts (its remaining path / page events
-// fire at once), a held pen is laid down first (at the frame of the next queued PutPen, which is
-// then dropped, or where it was picked up; PenPut fires as usual) and the queued writing tasks
-// wait for the end of the handshake. Its rest (setRestHand) is on the clock side as well.
+// running writing task is cut short when the handshake starts (the events already due fire at their
+// own instants, its remaining path / page events at once), a held pen is laid down first (at the
+// frame of the next queued PutPen, which is then dropped, or where it was picked up; PenPut fires as
+// usual) and the queued writing tasks wait for the end of the handshake. Its rest (setRestHand) is
+// on the clock side as well.
 // Idle: the writing hand never goes to the chin while it holds the pen or has work queued.
 struct PenKey {
     float t = 0.0f;           // seconds from the start of the path (increasing)
@@ -208,7 +212,7 @@ struct PenKey {
 
 enum class WriteTaskType {
     PickPen,    // pick up the pen lying at 'frame'
-    Write,      // follow 'path' with the pen tip (pen held)
+    Write,      // follow 'path' with the pen tip (pen held; an empty path: just over the writing rest)
     TurnPage,   // pinch the page corner and follow it while the page flips (pen held in the palm)
     PutPen,     // lay the pen down at 'frame'
     Wait        // hold for 'duration'
@@ -244,6 +248,12 @@ bool penPathDown(const std::vector<PenKey>& path, float t);   // tip on the pape
 class Animator {
 public:
     Animator();
+    // Not copyable (a copy would drive the same character state); movable, e.g. to start afresh
+    // with 'a = Animator()'. A moved-from animator needs init() before any other call.
+    Animator(const Animator&) = delete;
+    Animator& operator=(const Animator&) = delete;
+    Animator(Animator&&) = default;
+    Animator& operator=(Animator&&) = default;
     // pelvisWorld: hip joint centre in the world; facing: +1 = faces -Z (White, sitting at +Z),
     // -1 = faces +Z (Black). playHand: the hand that plays and presses the clock (the one on the
     // clock side); the other hand writes (WriteTask). With Side::Left every playing-hand task is
@@ -252,12 +262,10 @@ public:
               character::Side playHand = character::Side::Right);
     character::Side playHand() const;
     character::Side writingHand() const;
-    // Where the playing hand / the other hand rests on the table (the other one has a default in
-    // front of the body). A spot next to pieces standing on the table (spare or captured pieces) is
-    // shifted back or outwards until the hand is clear of them. (Named after the right-handed
-    // default: setRestHand = playing hand, setLeftRestHand = writing hand.)
+    // Where the playing hand rests on the table (the other one rests in front of the body). A spot
+    // next to pieces standing on the table (spare or captured pieces) is shifted back or outwards
+    // until the hand is clear of them.
     void setRestHand(m::vec3 worldPos);
-    void setLeftRestHand(m::vec3 worldPos);              // optional
     // Game callback: world transform of a piece object (base centre at the origin, +Y up).
     // When neither obstacle callback is set, the animator also calls it (and pieceGripInfo) for
     // the ids 0, 1, 2... when a task starts, to see which pieces stand on the board and the table,
@@ -289,13 +297,14 @@ public:
     bool runningTask(TaskType type) const;               // a task of that type is under way
 
     // Writing hand. setWritingRest: where the writing hand waits while it holds the pen, e.g.
-    // resting on the scoresheet beside the next row (world point on the paper). Its events come
-    // out of update() like the others.
+    // resting on the scoresheet beside the next row (world point on the paper). The idle hand
+    // glides there at once; a busy one (writing tasks running or queued) once they are done, unless
+    // they took it there (the tasks that start afterwards end on it). Its events come out of
+    // update() like the others.
     void setWritingRest(m::vec3 worldPos);
     void enqueueWriting(const WriteTask& t);
     void enqueueWriting(const std::vector<WriteTask>& tasks);
     bool writingBusy() const;                            // writing-hand tasks pending or running
-    void clearWritingQueue();                            // drops pending writing tasks (running one finishes)
     float writingRemainingTime() const;                  // running writing task remainder + pending durations
     // Time along the running Write path in seconds (-1 when no path is being followed): the ink
     // is laid down wherever the tip has been with down = true up to this time.
@@ -305,20 +314,22 @@ public:
     // World transform of the pen while the hand holds it (pen frame as in WriteTask::frame).
     bool penTransform(m::mat4& out) const;
     bool holdsPen() const;
-    void clearQueue();                                   // drops pending tasks (running one finishes)
     // Drops the pending tasks and cuts the running one short, without its remaining events (a
     // handshake cut short leaves its partner to finish alone): the playing hand lets go of what it
     // holds where it is, and the game puts those pieces back itself. The next task starts from
-    // wherever the hand is (queue one, a Retract at least).
+    // wherever the hand is (queue one, a Retract at least). A handshake cut short no longer draws
+    // the eyes; a left-handed player's writing hand, which shakes, goes back to its rest within
+    // Timing::Retract (a pen it is laying down is laid down first, PenPut at its own instant) and
+    // the queued writing tasks wait until it is there.
     void cancelTasks();
     // Running task remainder + pending durations, including the waits for their notBefore.
     float remainingTime() const;
 
     // ---- Coach gestures and speech (see TaskType::Point / Trace / Gesture)
     // Cuts the hold of the running Point / Trace / Gesture short: it ends now, but never before it
-    // has arrived (a Trace: before its path is done; a Beat: before its last stroke is over).
-    // PointReleased fires then, and the next queued task starts from the held pose. No effect on
-    // other tasks.
+    // has arrived (a Trace: before its path is done; a Beat: before its last stroke is over). A
+    // Point / Trace fires PointReleased then, and the next queued task starts from the held pose.
+    // No effect on other tasks.
     void endHold();
     // World position of the playing hand's index fingertip (after the last update); false before
     // init. A highlight can follow it during a Trace.

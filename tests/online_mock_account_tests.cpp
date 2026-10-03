@@ -6,7 +6,8 @@
 // signed-in devices, the preference, the e-mail change, the data export and the deletion, with the
 // special inputs of the re-authentication; the animated GIFs (decoded by a reader of the test's
 // own: sizes, frames, delays, the pieces, the last move, the check, either side), their quota, their
-// special inputs and their route to the file. On the fakes' virtual clock (deterministic).
+// special inputs and their route to the file. And the challenges that a dropped realtime
+// connection takes away. On the fakes' virtual clock (deterministic).
 #include "test.h"
 #include "chess/chess.h"
 #include "chess/pgn.h"
@@ -15,7 +16,10 @@
 #include "game/online_mock.h"
 #include "net/json.h"
 #include "net/net_sys.h"
+#include "net/protocol_gen.h"
+#include "ui/ui_sign_in_answer.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <ctime>
 #include <set>
@@ -403,11 +407,58 @@ TEST(mock_account_game_played_goes_into_the_history) {
     int after = 0;
     std::vector<net::GameSummary> games = allGames(srv, net::GamesFilter(), 10, &after);
     CHECK_EQ(after, before + 1);
-    CHECK(!games.empty() && games[0].id == id);
+    REQUIRE(!games.empty());
+    CHECK(games[0].id == id);
     CHECK_EQ(games[0].reason, 2);
     CHECK(games[0].rated);
     CHECK((games[0].you == 0 ? games[0].white : games[0].black).ratingChanged);
     CHECK(game::outcomeOf(games[0]) == game::Outcome::Loss);
+}
+
+// As the server, the fake drops our challenges when our realtime connection drops: once we are
+// back, the one received can no longer be accepted, and ours finds nothing to cancel (the session
+// cancels it at the reconnection and does not show that ChallengeNotFound) and never starts a game.
+// One still held is cancelled with its status.
+TEST(mock_challenges_go_with_a_dropped_connection) {
+    VirtualClock vc;
+    mock::FakeServer srv;
+    signIn(srv, "Paul_M");
+    srv.connect();
+    Event e;
+    CHECK(await(srv, Kind::Welcome, e));
+    CHECK(await(srv, Kind::ChallengeReceived, e));  // the fake's demo challenge, after 25 s idle
+    const uint32_t received = e.challengeId;
+    mock::connectionDrop(1);
+    CHECK(await(srv, Kind::ConnectionChanged, e));
+    CHECK(e.state == net::ConnState::Reconnecting);
+    CHECK(await(srv, Kind::Welcome, e));
+    srv.acceptChallenge(received);
+    CHECK(await(srv, Kind::ServerError, e));
+    CHECK_EQ(e.code, int(net::proto::ErrorCode::ChallengeNotFound));
+
+    srv.challenge("Bob_K", 300, 3, false, 0);
+    CHECK(await(srv, Kind::ChallengeStatus, e));
+    CHECK_EQ(e.challengeState, int(net::proto::ChallengeState::Pending));
+    const uint32_t sent = e.challengeId;
+    mock::connectionDrop(1);
+    CHECK(await(srv, Kind::Welcome, e));
+    srv.cancelChallenge(sent);
+    bool notFound = false, started = false;
+    for (int i = 0; i < 100; ++i) {  // 5 s: Bob_K would have accepted after 2.5 s
+        while (srv.poll(e)) {
+            notFound = notFound || (e.kind == Kind::ServerError && e.code == int(net::proto::ErrorCode::ChallengeNotFound));
+            started = started || e.kind == Kind::GameSnapshot;
+        }
+        mock::advance(50.0);
+    }
+    CHECK(notFound);
+    CHECK(!started);
+
+    srv.challenge("Bob_K", 300, 3, false, 0);
+    CHECK(await(srv, Kind::ChallengeStatus, e));
+    srv.cancelChallenge(e.challengeId);
+    CHECK(await(srv, Kind::ChallengeStatus, e));
+    CHECK_EQ(e.challengeState, int(net::proto::ChallengeState::Cancelled));
 }
 
 TEST(mock_account_devices_and_preferences) {
@@ -451,6 +502,94 @@ TEST(mock_account_devices_and_preferences) {
     CHECK(!e.account.acceptChallenges);
     CHECK(e.account.hasPassword);
     CHECK(e.account.createdAtMs > 0 && e.account.lastLoginAtMs >= e.account.createdAtMs);
+}
+
+// Google sign-in on the fake (the pages and their screenshots): the browser comes back
+// (SsoCodeReceived) before the server's answer; a new account chooses its name (the server's
+// suggestion given); the address of the account the fake holds asks for its password once
+// (wrong passwords keep the step), then its code when two-factor is on; a cancel is told. The
+// answers as the sign-in pages read them (ui/ui_sign_in_answer.h): the password step stays after a
+// wrong password, goes to the code page when one is asked, and a cancel is not told.
+TEST(mock_sso_paths) {
+    using ui::detail::RefusedSignIn;
+    using ui::detail::refusedSignIn;
+    VirtualClock vc;
+    net::ServerEndpoint ep;
+    ep.host = "fake.example.org";
+    Event e;
+
+    mock::FakeServer fresh;
+    fresh.setServer(ep);
+    fresh.startGoogleSso(net::SsoBrowserPage());
+    CHECK(await(fresh, Kind::SsoBrowserOpened, e));
+    CHECK(e.ok);
+    CHECK(await(fresh, Kind::SsoCodeReceived, e));
+    CHECK(await(fresh, Kind::SsoNeedsUsername, e));
+    CHECK_EQ(e.account.username, std::string("Guillaume_G"));
+    fresh.completeSso("Guillaume_G");
+    CHECK(await(fresh, Kind::LoginResult, e));
+    CHECK(e.ok && e.account.googleLinked);
+    fresh.logout(false);
+    fresh.startGoogleSso(net::SsoBrowserPage());   // linked now: straight in
+    CHECK(await(fresh, Kind::LoginResult, e));
+    CHECK(e.ok);
+    CHECK_EQ(e.account.username, std::string("Guillaume_G"));
+
+    mock::FakeServer held;
+    signIn(held, "Paul_M");
+    held.logout(false);
+    held.startGoogleSso(net::SsoBrowserPage());
+    CHECK(await(held, Kind::SsoNeedsPassword, e));
+    CHECK_EQ(e.account.username, std::string("Paul_M"));
+    held.linkSso("wrong");
+    CHECK(await(held, Kind::LoginResult, e));
+    CHECK_EQ(e.error, std::string("invalid_credentials"));
+    CHECK(refusedSignIn(true, e.mfaRequired, e.error) == RefusedSignIn::StayOnLink);
+    CHECK(refusedSignIn(false, e.mfaRequired, e.error) == RefusedSignIn::Other);   // a password sign-in's
+    CHECK(refusedSignIn(true, false, "too_many_attempts") == RefusedSignIn::StayOnLink);
+    held.linkSso("correct horse battery");
+    CHECK(await(held, Kind::LoginResult, e));
+    CHECK(e.ok && e.account.googleLinked);
+    CHECK_EQ(e.account.username, std::string("Paul_M"));
+    held.linkSso("correct horse battery");   // used once
+    CHECK(await(held, Kind::LoginResult, e));
+    CHECK_EQ(e.error, std::string("sso_expired"));
+    CHECK(refusedSignIn(true, e.mfaRequired, e.error) == RefusedSignIn::Other);   // back to signing in
+
+    mock::FakeServer mfa;
+    signIn(mfa, "mfa_tester");
+    mfa.logout(false);
+    mfa.startGoogleSso(net::SsoBrowserPage());
+    CHECK(await(mfa, Kind::SsoNeedsPassword, e));
+    mfa.linkSso("correct horse battery");
+    CHECK(await(mfa, Kind::LoginResult, e));
+    CHECK(!e.ok && e.mfaRequired);
+    CHECK(refusedSignIn(true, e.mfaRequired, e.error) == RefusedSignIn::Code);
+    mfa.loginMfa("123456");
+    CHECK(await(mfa, Kind::LoginResult, e));
+    CHECK(e.ok && e.account.googleLinked);
+    mfa.logout(false);
+    mfa.startGoogleSso(net::SsoBrowserPage());   // linked by the code step
+    CHECK(await(mfa, Kind::LoginResult, e));
+    CHECK(e.ok);
+    CHECK_EQ(e.account.username, std::string("mfa_tester"));
+
+    mock::FakeServer cancel;
+    cancel.setServer(ep);
+    cancel.cancelSso();   // nothing to cancel: nothing told
+    cancel.startGoogleSso(net::SsoBrowserPage());
+    CHECK(await(cancel, Kind::SsoBrowserOpened, e));
+    cancel.cancelSso();
+    CHECK(await(cancel, Kind::LoginResult, e));
+    CHECK_EQ(e.error, std::string("cancelled"));
+    CHECK(refusedSignIn(false, e.mfaRequired, e.error) == RefusedSignIn::Silent);
+    CHECK(refusedSignIn(true, e.mfaRequired, e.error) == RefusedSignIn::Silent);
+    bool late = false;
+    for (int i = 0; i < 200; ++i) {   // ten seconds: the attempt is gone
+        while (cancel.poll(e)) late = true;
+        mock::advance(50.0);
+    }
+    CHECK(!late);
 }
 
 TEST(mock_account_email_change) {
@@ -558,6 +697,43 @@ TEST(mock_account_export_and_deletion) {
     srv.fetchMyGames(0, 10, net::GamesFilter());
     CHECK(await(srv, Kind::GamesResult, e));
     CHECK_EQ(e.error, std::string("unauthorized"));
+}
+
+// As the network layer: the deletion closes the realtime connection first, opens it again when it
+// fails, and leaves it closed once the account is gone.
+TEST(mock_account_deletion_closes_the_connection_first) {
+    VirtualClock vc;
+    mock::FakeServer srv;
+    signIn(srv, "Paul_M");
+    srv.connect();
+    Event e;
+    CHECK(await(srv, Kind::Welcome, e));
+    auto events = [&] {   // 2 s of the fake
+        std::vector<Event> seen;
+        for (int i = 0; i < 40; ++i) {
+            while (srv.poll(e)) seen.push_back(e);
+            mock::advance(50.0);
+        }
+        return seen;
+    };
+    srv.deleteAccount("wrong", "");
+    std::vector<Event> seen = events();
+    size_t offline = seen.size(), welcome = seen.size(), answer = seen.size();
+    for (size_t i = 0; i < seen.size(); ++i) {
+        if (seen[i].kind == Kind::ConnectionChanged && seen[i].state == net::ConnState::Offline) offline = i;
+        if (seen[i].kind == Kind::Welcome) welcome = i;
+        if (seen[i].kind == Kind::AccountDeleted) answer = i;
+    }
+    CHECK(offline < welcome && welcome < seen.size());
+    CHECK(answer < seen.size() && seen[answer].error == "invalid_password");
+    CHECK(srv.state() == net::ConnState::Online);
+
+    srv.deleteAccount("pw", "");
+    CHECK(srv.state() == net::ConnState::Offline);
+    seen = events();
+    CHECK(std::any_of(seen.begin(), seen.end(), [](const Event& ev) { return ev.kind == Kind::AccountDeleted && ev.ok; }));
+    CHECK(std::none_of(seen.begin(), seen.end(), [](const Event& ev) { return ev.kind == Kind::Welcome; }));
+    CHECK(srv.state() == net::ConnState::Offline);
 }
 
 // The export's limit as on the server (account-export.js: rate [account_export 5/h, reauth],

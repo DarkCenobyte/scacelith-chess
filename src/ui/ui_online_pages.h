@@ -19,7 +19,6 @@ gfx::TextStyle style(int face, float size, m::vec4 color, gfx::HAlign align = gf
 std::string T(const char* key);                  // i18n::tr
 std::string L(const char* key);                  // a button label with its key as id ("Text##key")
 game::OnlineSession& ses();
-std::string spacedPlus(const std::string& label);  // "3 + 2" with thin spaces
 std::string trim(const std::string& s);
 // Rotating dots (a request in flight).
 void spinner(m::vec2 c, float r = 12.0f, float alpha = 1.0f);
@@ -27,7 +26,8 @@ void spinner(m::vec2 c, float r = 12.0f, float alpha = 1.0f);
 float paragraph(const std::string& s, const gfx::Rect& p, float y, float width, m::vec4 color = theme::ivoryDim,
                 float size = theme::kBody, int face = font::FACE_ITALIC);
 // The panel of a sub-page (dimmed hall, panel, title), w x h at most; endPage() after it.
-gfx::Rect beginPage(float t, float w, float h, const std::string& title);
+// fitTitle: a title longer than the panel is drawn smaller, inside its frame.
+gfx::Rect beginPage(float t, float w, float h, const std::string& title, bool fitTitle = false);
 void endPage();
 // The server's name and the connection state in the panel's top corner (start side).
 void serverLine(const gfx::Rect& p, bool showConnection);
@@ -36,13 +36,26 @@ gfx::Rect formRow(const gfx::Rect& p, float& y, float inset = 90.0f);
 // The footer: Back on the start side, the primary action on the end side, a rule above them.
 constexpr float kBtnW = 260.0f, kBtnH = 56.0f;
 float footerY(const gfx::Rect& p);
-bool backButton(const gfx::Rect& p, const char* key = "common.back");
-bool primaryButton(const gfx::Rect& p, const char* key, bool enabled, bool busy = false);
+bool backButton(const gfx::Rect& p, const char* key = "common.back", bool enabled = true);
+bool primaryButton(const gfx::Rect& p, const char* key, bool enabled, bool busy = false, float width = kBtnW);
 void footerRule(const gfx::Rect& p);
 // A quiet link-like button centered at cx.
 bool linkButton(const char* key, float cx, float y, bool enabled = true);
 // Label / value line of the account page (label above, value under it).
 void infoLine(const std::string& label, const std::string& value, const gfx::Rect& col, float y, m::vec4 valueColor = theme::ivory);
+// Sign out everywhere (the account page, signed-in devices): the sign-in page tells the server's
+// answer when it comes, a refusal included (the other computers then stay signed in); a failure
+// that keeps this computer's session goes back to the account page with it, to try again.
+void signOutEverywhere();
+
+// ---- ui_screens_account.cpp: helpers shared with the saved games (ui_library.cpp) ---------------
+// Scroll of a clipped area by the wheel over it (and PageUp / PageDown when 'keys'); returns the offset.
+float wheelScroll(float& scroll, float& target, const gfx::Rect& area, float contentH, float step, bool opened, bool keys = false);
+// Scroll bar on the end side and fades at the edges (panel colour) of a scrolled area.
+void scrollDecor(const gfx::Rect& area, float scroll, float contentH);
+// The end of s that fits maxWidth in st ("…" and the end): for a path, whose file's name matters
+// more than the folder's.
+std::string elideStart(const std::string& s, const gfx::TextStyle& st, float maxWidth);
 
 // ---- ui_screens_account.cpp: the account API's pages --------------------------------------------
 enum class AccountPage { History, Game, Devices, Email, Export, Delete };

@@ -1,17 +1,16 @@
 // Platform-independent parts of transport.h.
 #include "transport.h"
+#include "crypto.h"
 #include <cctype>
 
 namespace net {
 
+// The abort action runs under mu_: setAbort(nullptr), when the operation ends, waits for one that
+// is running, which therefore never outlives the socket or handle it closes.
 void CancelToken::cancel() {
-    std::function<void()> fn;
-    {
-        std::lock_guard<std::mutex> lk(mu_);
-        cancelled_.store(true);
-        fn = abort_;
-    }
-    if (fn) fn();
+    std::lock_guard<std::mutex> lk(mu_);
+    cancelled_.store(true);
+    if (abort_) abort_();
 }
 
 void CancelToken::reset() {
@@ -26,13 +25,9 @@ bool CancelToken::hasAbort() {
 }
 
 void CancelToken::setAbort(std::function<void()> fn) {
-    bool runNow;
-    {
-        std::lock_guard<std::mutex> lk(mu_);
-        abort_ = fn;
-        runNow = cancelled_.load() && fn;
-    }
-    if (runNow) fn();
+    std::lock_guard<std::mutex> lk(mu_);
+    abort_ = std::move(fn);
+    if (cancelled_.load() && abort_) abort_();
 }
 
 static std::string lower(const std::string& s) {
@@ -105,6 +100,11 @@ std::string hostHeader(const std::string& host, uint16_t port, bool tls) {
     std::string h = host.find(':') != std::string::npos ? "[" + host + "]" : host;
     if ((tls && port == 443) || (!tls && port == 80)) return h;
     return h + ":" + std::to_string(port);
+}
+
+PinCheck pinCheckAtSend(const std::string& pin, const std::string& leaf, bool noTlsYet) {
+    if (leaf.empty()) return noTlsYet ? PinCheck::Later : PinCheck::Mismatch;
+    return crypto::constantTimeEqual(leaf, pin) ? PinCheck::Match : PinCheck::Mismatch;
 }
 
 }  // namespace net

@@ -5,8 +5,10 @@
 #include "coach/catalog.h"
 #include "core/embedded.h"
 #include "i18n/i18n.h"
+#include "tts/tts.h"
 #include <algorithm>
 #include <chrono>
+#include <cstring>
 #include <map>
 #include <regex>
 #include <set>
@@ -44,7 +46,7 @@ bool startsWith(const std::string& s, const std::string& pre) { return s.compare
 std::vector<std::string> parityProblems(const Catalog& c, const std::string& lang) {
     std::vector<std::string> out;
     for (const std::string& topic : c.topics("en")) {
-        if (topic == "openings") continue;   // W10's files, tested by tests/openings_tests.cpp
+        if (topic == "openings") continue;   // the openings files, tested by tests/openings_tests.cpp
         std::vector<std::string> enKeys = c.keys("en", topic), keys = c.keys(lang, topic);
         std::set<std::string> have(keys.begin(), keys.end());
         std::set<std::string> want;
@@ -147,6 +149,19 @@ TEST(coach_catalog_speech_language) {
     CHECK_EQ(coach::speechLanguage("zh-Hant"), std::string("en"));
     CHECK_EQ(coach::speechLanguage("pt"), std::string("en"));
     CHECK(!coach::speechSupported("zh-Hans"));
+}
+
+// The coach speaks the voice's languages (tts::languageSupported, the one list): the same answer
+// for every interface language and for codes beyond them.
+TEST(coach_catalog_speech_supported_is_the_voice_list) {
+    std::vector<std::string> codes = {"", "pt", "EN", "en-GB", "zh"};
+    for (const i18n::Language& l : i18n::languages()) codes.push_back(l.code);
+    int spoken = 0;
+    for (const std::string& c : codes) {
+        CHECK_EQ(coach::speechSupported(c), tts::languageSupported(c));
+        spoken += coach::speechSupported(c) ? 1 : 0;
+    }
+    CHECK_EQ(spoken, 8);   // en fr de es ru uk ar ja: every interface language but the two Chinese
 }
 
 TEST(coach_catalog_loads_every_topic) {
@@ -417,7 +432,7 @@ TEST(coach_catalog_openings) {
     Line d = line("d");
     d.with("line", Arg::ofOpening("line:English Attack"));
     CHECK_EQ(written(c, d), std::string("English Attack"));
-    // The composing resolver (W10's OpeningTexts::arg) is asked first.
+    // The composing resolver (OpeningTexts::arg) is asked first.
     c.setOpeningResolver([](const std::string& ref, const std::string& form, const std::string& lang, bool sp) {
         return ref == "line:English Attack" ? std::string(sp ? "the English attack (spoken)" : "the English attack")
                                             : std::string();
@@ -434,7 +449,7 @@ TEST(coach_catalog_language_parity) {
     CHECK(c.load());
     for (const std::string& lang : c.languages()) {
         if (lang == "en") continue;
-        // A language with only its openings file (W10) has no speech lines yet: it falls back to
+        // A language with only its openings file has no speech lines yet: it falls back to
         // English as a whole, which is consistent. Once it has one speech file it needs them all.
         std::vector<std::string> topics = c.topics(lang);
         if (std::all_of(topics.begin(), topics.end(), [](const std::string& t) { return t == "openings"; })) continue;
@@ -471,6 +486,59 @@ TEST(coach_catalog_language_parity) {
     CHECK(!has("b.spoken"));        // nor is a language's own
     CHECK(!has("piece.pawn.acc"));  // grammar keys may be added
     CHECK_EQ(int(p.size()), 5);
+}
+
+// The closing words of a game are followed by the handshake line (gameEndScript), each variant
+// picked on its own: no sentence of a handshake line is already in a closing line, in any language
+// ("All right. Thank you for the game." then "Thank you for the game.").
+TEST(coach_catalog_closing_words_do_not_repeat_the_handshake) {
+    Catalog c;
+    CHECK(c.load());
+    auto variantKey = [](const std::string& key, int v) { return v == 1 ? key : key + "." + std::to_string(v); };
+    // The sentences of a line, without their end punctuation.
+    auto sentences = [](const std::string& s) {
+        std::vector<std::string> out;
+        std::string cur;
+        auto flush = [&] {
+            size_t b = cur.find_first_not_of(' '), e = cur.find_last_not_of(' ');
+            if (b != std::string::npos) out.push_back(cur.substr(b, e - b + 1));
+            cur.clear();
+        };
+        for (size_t i = 0; i < s.size();) {
+            size_t len = 0;   // . ! ? and the full-width and Arabic marks
+            for (const char* end : {".", "!", "?", "\xE3\x80\x82", "\xEF\xBC\x81", "\xEF\xBC\x9F", "\xD8\x9F"})
+                if (s.compare(i, std::strlen(end), end) == 0) len = std::strlen(end);
+            if (len) {
+                flush();
+                i += len;
+            } else {
+                cur += s[i++];
+            }
+        }
+        flush();
+        return out;
+    };
+    int pairs = 0;
+    for (const std::string& lang : c.languages()) {
+        for (int h = 1; h <= c.variants("event.end.handshake"); ++h) {
+            const std::string* hands = c.find(lang, variantKey("event.end.handshake", h));
+            if (!hands) continue;
+            for (const char* key : {"event.end.win", "event.end.loss", "event.end.draw", "event.end.resigned"}) {
+                for (int v = 1; v <= c.variants(key); ++v) {
+                    const std::string* closing = c.find(lang, variantKey(key, v));
+                    if (!closing) continue;
+                    ++pairs;
+                    for (const std::string& s : sentences(*hands)) {
+                        if (closing->find(s) == std::string::npos) continue;
+                        std::fprintf(stderr, "  %s: \"%s\" then \"%s\"\n", lang.c_str(), closing->c_str(),
+                                     hands->c_str());
+                        CHECK(false);
+                    }
+                }
+            }
+        }
+    }
+    CHECK(pairs >= 10 * 11);   // 11 closing lines in each of the 10 languages
 }
 
 // The English lines of this package render cleanly: no placeholder left, no bare square or SAN

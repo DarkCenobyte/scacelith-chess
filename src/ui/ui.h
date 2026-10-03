@@ -32,13 +32,10 @@ bool wantsKeyboard();
 enum class Align { Left, Center, Right };
 // Regular = EB Garamond, Title = Cinzel display capitals, Italic = EB Garamond Italic.
 enum class FontStyle { Regular, Title, Italic };
-// pos is the left/centre/right point (per align) of the top of the line box; the line box is
-// measure().y tall. tracking = extra letter spacing in em (Cinzel titles look best at ~0.15).
+// pos is the left/centre/right point (per align) of the top of the line box (the face's ascent +
+// descent). tracking = extra letter spacing in em (Cinzel titles look best at ~0.15).
 void text(const std::string& s, m::vec2 pos, float sizePx, m::vec4 color, Align align = Align::Left,
           FontStyle st = FontStyle::Regular, float tracking = 0.0f);
-m::vec2 measure(const std::string& s, float sizePx, FontStyle st = FontStyle::Regular, float tracking = 0.0f);
-void rect(m::vec2 pos, m::vec2 size, m::vec4 color, float radius = 0.0f);
-void fullscreenTint(m::vec4 color);
 m::vec2 viewSize();   // canvas size in reference pixels (height is always 1080)
 float pixelScale();   // physical pixels per reference pixel (window height / 1080)
 // The standard translucent panel (black velvet, gold double hairline) and a button in the same
@@ -67,8 +64,8 @@ void setTimeControlList(const std::vector<std::string>& labels);
 void setResolutionList(const std::vector<m::ivec2>& sizes);
 void setVersionString(const std::string& version);  // bottom line of the main menu
 
-// UI sound hooks (the game forwards them to audio::playUI).
-enum class Sound { Hover, Click, Back, Toggle, Tick, Open, Close, Confirm };
+// UI sound hooks (the game forwards them to audio::playUI). Count is the number of sounds.
+enum class Sound { Hover, Click, Back, Toggle, Tick, Open, Close, Confirm, Count };
 void setSoundCallback(std::function<void(Sound)> callback);
 
 // ---- Screens ----------------------------------------------------------------------------------
@@ -109,25 +106,12 @@ struct WatchSetup {
     int customBaseSeconds = 300, customIncrementSeconds = 3, customDelaySeconds = 0;
 };
 
-// Title screen over the 3D hall. Handles its sub-pages (New Game, Options, Credits) itself.
-// The New Game page starts from the last choices saved in game::settings() and writes them back
-// (and saves the .ini) when the player presses Start; 'setup' then holds the choice.
-// OptionsChanged is returned on the frame the player applies new options (already stored in
-// game::settings() and saved); the game re-applies display/graphics/audio settings.
-// The title page also shows the player's Elo (game::settings() [player]) and the New Game page
-// shows it next to the opponent list.
-MenuAction mainMenu(NewGameSetup& setup);
-// Same, with the "Watch a Game" entry filling 'watch' (returns StartWatching on its Start).
-MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch);
-// Same, with the "Coach" entry filling 'coach' (returns StartCoach on its Start; see CoachSetup).
-struct CoachSetup;
-MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach);
 // In-game pause menu (Esc). canClaimDraw enables the claim entry; canOfferDraw = false greys out
 // "Offer draw" (e.g. an offer is already pending). Esc resumes.
 MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw = true);
 // Same, for a hot-seat game: 'resignQuestion' replaces the text of the resignation confirmation
-// (it names the player to move).
-MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& resignQuestion);
+// (it names the player to move). canResign = false greys out "Resign" (a move is on its way).
+MenuAction pauseMenu(bool canClaimDraw, bool canOfferDraw, const std::string& resignQuestion, bool canResign = true);
 // Pawn promotion: returns 0 while choosing, else chess::PieceType (Queen, Rook, Bishop, Knight).
 int promotionPicker(bool playerIsWhite);
 // Transient message (arbiter, "Draw offer declined", ...), shown for 'seconds'.
@@ -226,16 +210,15 @@ struct CoachLevelInfo {
 // Replaces the default list (0 rules, 600-900, 900-1200, 1200-1500, 1500-1800, 1800-2100, 2100+).
 // A level without translated texts shows its band only.
 void setCoachLevels(const std::vector<CoachLevelInfo>& levels);
-const std::vector<CoachLevelInfo>& coachLevels();
 
 // Choices of the coach page. The page starts from game::settings() [coach] and writes them back
 // (and saves the .ini) on Start.
 struct CoachSetup {
-    int level = 1;               // index into coachLevels(): 0 = the rules lesson
+    int level = 1;               // index into the coach levels: 0 = the rules lesson
     int colour = 2;              // the player's colour: 0 White, 1 Black, 2 alternate (the rules
                                  // lesson is always played with White: Settings::coachPlayerColour)
-    // Set by the game before mainMenu(): false when the coach's voice files (the coach/ folder
-    // beside the executable) are missing or failed to load. The page then says in one line that
+    // Set by the game before mainMenu(): false when the coach's voice files (tts::modelFolder(),
+    // <application data>/coach/) are missing or failed to load. The page then says in one line that
     // the coach will speak through subtitles only.
     bool voiceAvailable = true;
 };
@@ -279,6 +262,7 @@ struct CoachPause {
     bool canOfferDraw = false;
     bool canClaimDraw = false;
     bool canResign = true;       // false in the rules lesson
+    bool mayEndGame = true;      // false while a move is on its way: Claim draw and Resign greyed
 };
 MenuAction coachPauseMenu(const CoachPause& p);
 
@@ -331,8 +315,17 @@ struct LibrarySetup {
                                  // "Saved games" entry on the title page
     ReplaySetup replay;          // the game to replay when mainMenu() returns StartReplay
 };
-// mainMenu() with the "Saved games" entry: returns StartReplay on Replay ('library.replay' then
-// names the game). The overloads above have no such entry.
+// Title screen over the 3D hall. Handles its sub-pages (New Game, Options, Credits) itself.
+// The New Game page starts from the last choices saved in game::settings() and writes them back
+// (and saves the .ini) when the player presses Start; 'setup' then holds the choice.
+// OptionsChanged is returned on the frame the player applies new options (already stored in
+// game::settings() and saved); the game re-applies display/graphics/audio settings.
+// The title page also shows the player's Elo (game::settings() [player]) and the New Game page
+// shows it next to the opponent list.
+// The "Watch a Game" entry fills 'watch' (returns StartWatching on its Start), the "Coach" entry
+// fills 'coach' (returns StartCoach on its Start; see CoachSetup), and the "Saved games" entry
+// returns StartReplay on Replay ('library.replay' then names the game; no such entry when
+// library.folder is empty).
 MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, LibrarySetup& library);
 
 // ---- In-game pointer (ui_screens_game.cpp) -------------------------------------------------------

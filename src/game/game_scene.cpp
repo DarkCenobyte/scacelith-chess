@@ -9,12 +9,13 @@
 #include "elo.h"
 #include "game_archive.h"
 #include "game_saving.h"
+#include "game_scene_detail.h"
 #include "../ui/ui_font.h"
-#include "../ui/ui_online.h"
 #include "layout.h"
 #include "look_up.h"
 #include "scoresheet_layout.h"
 #include "settings.h"
+#include "scacelith_version.h"
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
@@ -22,11 +23,9 @@
 using namespace m;
 using namespace chess;
 
-#ifndef SCACELITH_VERSION_STRING
-#define SCACELITH_VERSION_STRING "Scacelith 0.1"
-#endif
-
 namespace game {
+
+using namespace scene_detail;
 
 namespace {
 
@@ -35,17 +34,7 @@ constexpr float kFadeIn = 1.6f;           // black -> seated at the table
 constexpr float kFov = 52.0f * DEG;
 constexpr float kEyeLimit = 18.0f * DEG;
 constexpr float kGlanceFov = 24.0f * DEG;  // looking at one's own scoresheet (S): a closer look
-constexpr float kGlanceTime = 0.45f;       // seconds to turn to the scoresheet and back
 constexpr float kEyeFStop = 11.0f;         // the player's eyes at kFov: a 2.2 mm pupil in a bright hall
-
-anim::Task task(anim::TaskType t, int pieceId = -1, vec3 pos = vec3(0), float height = 0.0f) {
-    anim::Task k;
-    k.type = t;
-    k.pieceId = pieceId;
-    k.position = pos;
-    k.height = height;
-    return k;
-}
 
 std::vector<std::string> split(const std::string& s, char sep) {
     std::vector<std::string> out;
@@ -117,12 +106,7 @@ std::string trimmed(const std::string& s) {
     return a == std::string::npos ? std::string() : s.substr(a, b - a + 1);
 }
 
-// The human's name and handwriting on the scoresheets (Options > Player; "Human" by default, written
-// in the interface language).
-std::string localPlayerName() {
-    const std::string& n = settings().playerName;
-    return n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
-}
+// The human's handwriting style on the scoresheets (Options > Player; the name: localPlayerName).
 int humanHandStyle() { return int(settings().handStyle); }
 
 const char* sideKey(Color c) { return c == White ? "viewer.side.white" : "viewer.side.black"; }
@@ -199,7 +183,7 @@ bool GameScene::init(AppContext& ctx) {
     for (const TimeControl& tc : timeControlPresets()) tcs.push_back(tc.label());
     ui::setTimeControlList(tcs);
     ui::setResolutionList({{1280, 720}, {1366, 768}, {1600, 900}, {1920, 1080}, {2560, 1440}, {3840, 2160}});
-    ui::setVersionString(SCACELITH_VERSION_STRING);
+    ui::setVersionString("Scacelith " SCACELITH_VERSION);
     initOnline();
     ui::setSoundCallback([](ui::Sound snd) {
         switch (snd) {
@@ -214,7 +198,7 @@ bool GameScene::init(AppContext& ctx) {
     fade_ = 1.0f;
     if (ctx.screenshotMode) {
         // Deterministic runs load everything up front.
-        while (!world_.loadStep()) {}
+        while (!world_.loadStep(true)) {}
         finishLoading();
     }
     return true;
@@ -222,6 +206,9 @@ bool GameScene::init(AppContext& ctx) {
 
 void GameScene::finishLoading() {
     world_.setupRenderer(*ctx_->renderer);
+    // The loading screen's frames went through the renderer with an empty scene: the static sun
+    // shadows and the light probes are baked again from the world, on the first frame that draws it.
+    ctx_->renderer->invalidateStatic();
     if (!scorekeeper_.init(true)) LOGW("scoresheets unavailable");
     ai::Engine::setArchLimit(settings().engineArch);
     engineOk_ = engine_.start();
@@ -306,7 +293,7 @@ void GameScene::initAnimators() {
         // The playing hand rests on the table beside the board, on the clock side (White's right
         // is +X, Black's is -X).
         float side = anim_[seat].playHand() == character::Side::Right ? zs : -zs;
-        anim_[seat].setRestHand(vec3(side * 0.24f, layout::TABLE_TOP_Y, zs * 0.34f));
+        anim_[seat].setRestHand(vec3(side * layout::REST_HAND_X, layout::TABLE_TOP_Y, zs * layout::REST_HAND_Z));
         anim_[seat].pieceTransform = [this](int id) {
             const PieceObject* p = board_.byId(id);
             return p ? p->transform : mat4();
@@ -346,6 +333,7 @@ bool GameScene::pieceInHand(const PieceObject& p) const {
 }
 
 void GameScene::enterMenu() {
+    cancelAiSearch();
     // A game still unsaved (the window of a game left in an unusual way): saved now, while link_
     // and the game are still there (archiveGame does nothing when it ran already).
     archiveGame(game_.isOver());
@@ -517,6 +505,7 @@ void GameScene::setupNewGame() {
     touchedId_ = -1;
     touchedSq_ = placedTo_ = NoSquare;
     pressQueued_ = false;
+    drawOfferPending_ = false;
     drawOfferPly_ = -1;
     lastAiEval_ = 0;
     for (int i = 0; i < 2; ++i) {
@@ -558,10 +547,7 @@ void GameScene::setupNewGame() {
         anim_[humanSeat()].setHeadOverride(true, 0.0f, kBaseGazePitch);
         anim_[aiSeat()].setHeadOverride(false);
     }
-    for (Look& l : look_) {
-        l = Look();
-        l.gazePitch = kBaseGazePitch;
-    }
+    for (Look& l : look_) l = Look();
     cameraCut_ = true;
     handover_.cancel();
     inputGate_.reset();
@@ -749,7 +735,12 @@ void GameScene::beginTurn() {
     }
 }
 
+void GameScene::cancelAiSearch() {
+    if (engineOk_ && !coach() && turn_ == Turn::AiThinking && aiRequested_ && !aiHasMove_) engine_.cancelMove();
+}
+
 void GameScene::endGame() {
+    cancelAiSearch();
     // A piece still gripped on its square is let go.
     if (turn_ == Turn::HumanTouched && touchedId_ >= 0) {
         PieceObject* p = board_.byId(touchedId_);
@@ -805,6 +796,7 @@ void GameScene::endGame() {
         LOGI("Game over: %s (%s)\n%s", resultText_.c_str(), reasonText_.c_str(), game_.pgn(seats_[0].name, seats_[1].name).c_str());
     }
     pendingOffer_ = -1;
+    drawOfferPending_ = false;
     clockFrozen_ = false;
     drawOfferBy_ = drawCardFor_ = -1;
     writeGrace_ = 0.0f;
@@ -815,8 +807,8 @@ void GameScene::endGame() {
     // Both players write the result and lay their pen down before shaking hands (an aborted
     // online game has no result).
     endPending_ = false;
-    if (coach()) scorekeeper_.setWriteLimit(-1);  // the last moves are written with the result
     bool noResult = (online() && og_.status == 4) || (replaying() && replayRecord_.result == "*");
+    // The moves still owed (the coach's write limit included) are written before the result.
     scorekeeper_.finishGame(noResult ? std::string() : resultText_);
     audio::playUI(audio::Sfx::GameEnd, 0.7f);
     if (coach()) coachGameOver();  // the coach's closing words, then the handshake (simulate)
@@ -853,7 +845,8 @@ void GameScene::rateGame() {
 }
 
 void GameScene::archiveGame(bool finished) {
-    if (archived_) return;
+    // Screenshot runs leave the player's saved games alone.
+    if (archived_ || ctx_->screenshotMode) return;
     archived_ = true;
     const archive::Mode mode = saving::archiveMode(mode_, directMatch_);
     // A direct match: the authority's moves, times and ending (the local game may lag behind).
@@ -928,8 +921,7 @@ ui::GameOverExtras GameScene::gameOverExtras() const {
         return x;
     }
     if (eloCounted_) {
-        int d = eloAfter_ - eloBefore_;
-        std::string delta = (d > 0 ? "+" : d < 0 ? "\xE2\x88\x92" : "\xC2\xB1") + std::to_string(std::abs(d));
+        std::string delta = signedDelta(eloAfter_ - eloBefore_);
         x.detail = i18n::trf("elo.change", {std::to_string(eloBefore_), std::to_string(eloAfter_), i18n::ltr(delta)});
     } else if (rated_) {
         x.detail = i18n::trf("elo.unrated", {std::to_string(eloBefore_)});
@@ -942,10 +934,9 @@ void GameScene::applySettings(bool displayToo) {
     if (ctx_ && ctx_->renderer) {
         ctx_->renderer->setSettings(s.renderSettings());
         PostSettings& ps = ctx_->renderer->post().settings;
-        ps.exposureCompensation = s.brightness;
-        // A seated player's eyes: gentle depth of field, only far objects soften.
+        // A seated player's eyes: gentle depth of field, only far objects soften (the exposure and
+        // the f-number are set each frame by render()).
         applyDofPreset(ps, s.depthOfField ? DofPreset::Subtle : DofPreset::Off);
-        ps.dofFStop = kEyeFStop;
         ps.dofMaxRadius = 8.0f;
     }
     audio::setMasterVolume(s.masterVolume);
@@ -959,16 +950,16 @@ void GameScene::applySettings(bool displayToo) {
         plat::setDisplayMode(s.fullscreen ? plat::DisplayMode::Borderless : plat::DisplayMode::Windowed, s.displayWidth,
                              s.displayHeight);
         plat::setVsync(s.vsync);
-        s.save();
     }
     refreshCoachVoice();   // Options > Audio > Coach voice
 }
 
 void GameScene::shutdown(AppContext& ctx) {
-    // Closing the game in the middle of a rated game resigns it, like leaving to the menu
-    // (screenshot runs excepted: they stop wherever the capture happens).
+    // Closing the window during a game leaves it the way the menu does: an online game is resigned
+    // (aborted before my first move), a game against Stockfish resigned and rated (screenshot runs
+    // excepted: they stop wherever the capture happens).
     if (!ctx.screenshotMode && online() && link_ && state_ == State::Playing && og_.status == 0) {
-        link_->resign();
+        leaveOngoingOnlineGame();
     } else if (!ctx.screenshotMode && !watching() && !hotSeat() && !coach() && state_ == State::Playing &&
                game_.status() == GameStatus::Ongoing) {
         game_.resign(humanColor_);
@@ -1005,6 +996,9 @@ bool GameScene::update(AppContext& ctx, float dt) {
     const plat::Input& in = plat::input();
     ui::beginFrame(plat::width(), plat::height(), dt);
     bool keepRunning = true;
+    // Hot-seat: nobody acts during the handover, and buttons still held by the previous player
+    // are ignored until released (in every state: a game can end while the view goes over).
+    if (hotSeat()) inputBlocked_ = handover_.active() ? true : inputGate_.blocked(anyInputHeld());
 
     switch (state_) {
     case State::Loading:
@@ -1040,19 +1034,6 @@ bool GameScene::update(AppContext& ctx, float dt) {
         } else if (a == ui::MenuAction::StartGame) {
             // Against Stockfish, or two players on this PC (the page saved its choices).
             mode_ = setup_.opponent == 1 ? GameMode::HotSeat : GameMode::Play;
-            Settings& s = settings();
-            s.difficultyPreset = setup_.difficulty;
-            s.timeControlPreset = setup_.timeControl;
-            s.customBaseSeconds = setup_.customBaseSeconds;
-            s.customIncrementSeconds = setup_.customIncrementSeconds;
-            s.customDelaySeconds = setup_.customDelaySeconds;
-            s.customSkillLevel = setup_.skillLevel;
-            s.customLimitElo = setup_.limitElo;
-            s.customElo = setup_.elo;
-            s.customDepth = setup_.depth;
-            s.customMoveTimeMs = setup_.moveTimeMs;
-            s.customNodes = setup_.nodes;
-            s.save();
             state_ = State::FadeToGame;
             stateTime_ = 0.0f;
         } else if (a == ui::MenuAction::Quit) {
@@ -1081,9 +1062,6 @@ bool GameScene::update(AppContext& ctx, float dt) {
             updateCoachInput();
             break;
         }
-        // Hot-seat: nobody acts during the handover, and buttons still held by the previous player
-        // are ignored until released.
-        if (hotSeat()) inputBlocked_ = handover_.active() ? true : inputGate_.blocked(anyInputHeld());
         // Esc opens the pause menu; once open, the menu handles Esc itself (back / resume).
         if (!paused_ && in.keyPressed[plat::KEY_ESCAPE] && turn_ != Turn::HumanPromotion) {
             paused_ = true;
@@ -1093,15 +1071,21 @@ bool GameScene::update(AppContext& ctx, float dt) {
             }
         }
         if (paused_) {
-            bool canClaim = game_.canClaimThreefold() || game_.canClaimFiftyMove();
+            // Not while a hand carries out a move, which the end of the game would cut off (turn.h).
+            const bool mayEnd = menuMayEndGame(turn_);
+            bool canClaim = mayEnd && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
             bool canOffer = drawOfferPly_ != int(game_.moves().size());
             // Hot-seat: the menu belongs to the player to move (resignation named, offer with the move).
             std::string resignQuestion;
             if (hotSeat()) {
                 canOffer = canOffer && drawOfferBy_ < 0 && drawCardFor_ < 0;
                 resignQuestion = i18n::trf("hotseat.confirm.resign", {seats_[inputSeat()].name, seats_[1 - inputSeat()].name});
+            } else {
+                // Answered at once, so not with a move on its way, except my move made on the board
+                // and waiting for the clock press: the offer goes with it (FIDE 9.1.2).
+                canOffer = canOffer && !drawOfferPending_ && mayEnd;
             }
-            switch (menuChoice(ui::pauseMenu(canClaim, canOffer, resignQuestion))) {
+            switch (menuChoice(ui::pauseMenu(canClaim, canOffer, resignQuestion, mayEnd))) {
             case ui::MenuAction::Resume: paused_ = false; break;
             case ui::MenuAction::Resign:
                 paused_ = false;
@@ -1111,6 +1095,7 @@ bool GameScene::update(AppContext& ctx, float dt) {
             case ui::MenuAction::OfferDraw:
                 paused_ = false;
                 if (hotSeat()) offerDrawHotSeat();
+                else if (turn_ == Turn::HumanPlaced) drawOfferPending_ = true;
                 else offerDraw();
                 break;
             case ui::MenuAction::ClaimDraw:
@@ -1178,7 +1163,9 @@ bool GameScene::update(AppContext& ctx, float dt) {
                 stateTime_ = 0.0f;
             }
         }
-        if (in.keyPressed[plat::KEY_TAB] && !ui::wantsKeyboard()) showMoveList_ = !showMoveList_;
+        // The card holds the keyboard even folded ("View the board"): Tab works once it is folded.
+        if (in.keyPressed[plat::KEY_TAB] && (gameOverShown_ ? ui::gameOverFolded() : !ui::wantsKeyboard()))
+            showMoveList_ = !showMoveList_;
         break;
     default: break;
     }
@@ -1200,6 +1187,7 @@ bool GameScene::update(AppContext& ctx, float dt) {
         osCursorHidden_ = hideArrow;
     }
 
+    clockDt_ = ctx.clockDt;
     simulate(dt);
     return keepRunning;
 }
@@ -1223,12 +1211,14 @@ void GameScene::runWarp(float seconds) {
         if (state_ == State::GameOver && stateTime_ > 1.0f && (!coach() || coachEndCardReady()) &&
             !(replaying() && replayKeysPos_ < replayKeys_.size()))
             break;
+        clockDt_ = step;
         simulate(step);
     }
 }
 
 void GameScene::simulate(float dt) {
-    time_ += dt;
+    timeSum_ += dt;
+    time_ = float(timeSum_);
     stateTime_ += dt;
     board_.beginFrame();
     updateOnline(dt);
@@ -1308,7 +1298,6 @@ void GameScene::simulate(float dt) {
     // Characters (frozen while the game is paused).
     bool frozen = paused_ && state_ == State::Playing && !online();
     bool firstPerson = state_ != State::Menu && state_ != State::Loading && state_ != State::FadeToGame;
-    if (state_ == State::FadeToGame) firstPerson = false;
     updateCamera(dt, firstPerson);  // sets the player's head override before the animation update
     updateGaze(dt);
     // Reading one's own scoresheet (S): the writing hand waits off the page meanwhile (the sheet
@@ -1372,10 +1361,10 @@ void GameScene::updatePlaying(float dt) {
         updateReplay(dt);
         return;
     }
-    // Clock (online: the server's, see onlineClockDisplay())
+    // Clock (online: the server's, see onlineClockDisplay()): the real time, not the capped dt
     if (clock_.isRunning() && !online()) {
-        hotseat::advanceClock(clock_, clockAccumMs_, dt, clockFrozen_);
-        plyElapsedMs_ += double(dt) * 1000.0;  // what the clock counted: the move's time (saved games)
+        hotseat::advanceClock(clock_, clockAccumMs_, clockDt_, clockFrozen_);
+        plyElapsedMs_ += double(clockDt_) * 1000.0;  // what the clock counted: the move's time (saved games)
         Color r = clock_.running();
         if (!clock_.timeControl().unlimited && clock_.flagged(r)) {
             game_.flagFall(r);
@@ -1421,6 +1410,10 @@ void GameScene::updatePlaying(float dt) {
             // Online the piece is chosen before the pawn moves: the move goes out complete.
             Square to = promoTo_;
             promoTo_ = NoSquare;
+            if (endPending_ || resync_ || og_.status != 0) {   // too late: the game ended, or a resync
+                humanRelease();
+                break;
+            }
             Move mv = game_.position().findLegal(touchedSq_, to, PieceType(choice));
             if (!mv.valid()) break;
             PieceObject* occupant = board_.at(to);
@@ -1619,7 +1612,9 @@ void GameScene::humanRelease() {
     vec3 pos = board_.squareBase(touchedSq_);
     dest_[p->id].push_back({touchedSq_, pos, false});
     anim_[inputSeat()].enqueue({task(anim::TaskType::Place, p->id, pos), task(anim::TaskType::Retract)});
-    arbiter_.cancelTouch();
+    // The rules lesson relaxes touch-move (lesson.cpp): a piece put back is released for real.
+    if (lesson()) arbiter_.reset(game_);
+    else arbiter_.cancelTouch();
     touchedId_ = -1;
     touchedSq_ = NoSquare;
     turn_ = Turn::HumanIdle;
@@ -1832,20 +1827,9 @@ void GameScene::playRobotMove(int seat, const Move& mv) {
     Color side = colorOfSeat(seat);
     arbiter_.touch(game_, mv.from);
     arbiter_.place(game_, mv.to, mv.promotion);
-    int moverId = board_.idAt(mv.from);
-    int victimId = board_.idAt(mv.to);
-    if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
-    Square rookFrom = NoSquare, rookTo = NoSquare;
-    if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
-        int rank = rankOf(mv.from);
-        bool king = (mv.flags & MoveCastleKing) != 0;
-        rookFrom = makeSquare(king ? 7 : 0, rank);
-        rookTo = makeSquare(king ? 5 : 3, rank);
-    }
     std::vector<anim::Task> tasks;
-    tasks.push_back(task(anim::TaskType::Reach, moverId));
-    planPlacement(tasks, moverId, mv.to, victimId, rookFrom, rookTo);
-    if (mv.promotion != NoPiece) planPromotionSwap(tasks, moverId, mv.to, mv.promotion);
+    tasks.push_back(task(anim::TaskType::Reach, board_.idAt(mv.from)));
+    planMove(tasks, mv, side);
     if (!untimed()) {  // untimed: completed as the last piece is released (updatePlaying)
         int half = world_.clockHalfForSeat(seat == 0 ? 1.0f : -1.0f);
         tasks.push_back(task(anim::TaskType::PressClock, -1, world_.clockPressPoint(half)));
@@ -1876,6 +1860,21 @@ float GameScene::carryHeight(vec3 from, vec3 to, int ignoreA, int ignoreB) const
         if (d < layout::PIECE_BASE_RADIUS[p.type] + 0.024f) top = std::max(top, layout::PIECE_HEIGHT[p.type]);
     }
     return std::max(0.022f, top + 0.014f);
+}
+
+void GameScene::planMove(std::vector<anim::Task>& tasks, const Move& mv, Color side, bool lifted) {
+    int moverId = board_.idAt(mv.from);
+    int victimId = board_.idAt(mv.to);
+    if (mv.flags & MoveEnPassant) victimId = board_.idAt(Square(mv.to + (side == White ? -8 : 8)));
+    Square rookFrom = NoSquare, rookTo = NoSquare;
+    if (mv.flags & (MoveCastleKing | MoveCastleQueen)) {
+        int rank = rankOf(mv.from);
+        bool king = (mv.flags & MoveCastleKing) != 0;
+        rookFrom = makeSquare(king ? 7 : 0, rank);
+        rookTo = makeSquare(king ? 5 : 3, rank);
+    }
+    planPlacement(tasks, moverId, mv.to, victimId, rookFrom, rookTo, lifted);
+    if (mv.promotion != NoPiece) planPromotionSwap(tasks, moverId, mv.to, mv.promotion);
 }
 
 void GameScene::planPlacement(std::vector<anim::Task>& tasks, int moverId, Square to, int victimId, Square rookFrom,
@@ -2057,8 +2056,8 @@ void GameScene::completeMove(int seat) {
         }
         // Both players record the move on their scoresheet (their writing hands, off the clock).
         // Coach mode: the player's move and the coach's reply stay off the sheets until the
-        // player's next move, while the coach may still take them back (lead decision 4.2); the
-        // rules lesson records nothing.
+        // player's next move, while the coach may still take them back; the rules lesson records
+        // nothing.
         int ply = int(game_.moves().size()) - 1;
         if (coach() && !lesson() && mover == humanColor_) scorekeeper_.setWriteLimit(ply);
         if (!lesson()) scorekeeper_.recordMove(ply, game_.sanMoves().back());
@@ -2084,6 +2083,12 @@ void GameScene::completeMove(int seat) {
             answerAiDrawOffer(seat);
             if (game_.status() != GameStatus::Ongoing) return;
         }
+        // My draw offer made with this move: the opponent answers now that the clock is pressed.
+        if (drawOfferPending_) {
+            drawOfferPending_ = false;
+            offerDraw();
+            if (game_.status() != GameStatus::Ongoing) return;
+        }
         // Hot-seat: a draw offered with this move (FIDE 9.1.2) is put to the opponent once the view
         // has reached them.
         if (hotSeat() && drawOfferBy_ == seat) {
@@ -2098,7 +2103,9 @@ void GameScene::completeMove(int seat) {
         followEyesAfterMove(seat);
         return;
     }
-    // Illegal move completed: the arbiter restores the position and applies the penalty.
+    // Illegal move completed: the arbiter restores the position and applies the penalty. A draw
+    // offered with it goes with it.
+    drawOfferPending_ = false;
     ui::notify(v.message.empty() ? std::string(i18n::tr("notify.illegal")) : v.message, 6.0f);
     if (v.forfeit) {
         game_.forfeitIllegal(mover);
@@ -2202,7 +2209,11 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     bool handingOver = hotSeat() && handover_.active();
     bool canLook = (state_ == State::Playing || state_ == State::Intro || state_ == State::Handshake || state_ == State::GameOver) &&
                    !handingOver && !(hotSeat() && inputBlocked_);
-    bool uiBlocks = paused_ || gameOverShown_ || turn_ == Turn::HumanPromotion;
+    // The game over card stops the look until it is folded ("View the board"); it keeps the
+    // keyboard even folded.
+    bool cardUp = state_ == State::GameOver && gameOverShown_ && !ui::gameOverFolded();
+    bool uiBlocks = paused_ || cardUp || turn_ == Turn::HumanPromotion;
+    bool keys = state_ == State::GameOver && gameOverShown_ ? ui::gameOverFolded() : !ui::wantsKeyboard();
     if (canLook && !uiBlocks) {
         if (in.mouseDown[plat::MOUSE_RIGHT] && !dragging_ && !ui::wantsMouse()) {
             dragging_ = true;
@@ -2212,14 +2223,14 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
             L.lookUpLift = 0.0f;
             L.lookUpArmed = false;
         }
-        if (in.mousePressed[plat::MOUSE_MIDDLE] || (in.keyPressed['C'] && !ui::wantsKeyboard())) {
+        if (in.mousePressed[plat::MOUSE_MIDDLE] || (in.keyPressed['C'] && keys)) {
             L.yaw = L.pitch = 0.0f;
             L.lookUpArmed = false;
             glance_ = false;
         }
         if (!ui::wantsMouse()) L.lean = clamp(L.lean + in.wheel * 0.2f, 0.0f, 1.0f);
         // S: a look at your own scoresheet, out of sight on the table beside you, and back.
-        if (!watching() && in.keyPressed['S'] && !ui::wantsKeyboard()) glance_ = !glance_;
+        if (!watching() && in.keyPressed['S'] && keys) glance_ = !glance_;
     }
     if (dragging_ && glanceBlend_ > 0.0f) {
         // Looking around from the scoresheet starts from where the eyes are.
@@ -2261,7 +2272,7 @@ void GameScene::updateCamera(float dt, bool firstPerson) {
     float basePitch = kBaseGazePitch + L.pitch - cy * 0.08f;
     L.lookUpLift = lookUpLift(up, basePitch, L.leanSmooth);
     // The coach talking to the player: the view rises to its face as the pointer rests (the
-    // weight is coachFaceLift_, eased in updateCoach; lead decision 4.1).
+    // weight is coachFaceLift_, eased in updateCoach).
     if (coach() && coachFaceLift_ > 0.0f && !dragging_)
         L.lookUpLift = std::max(L.lookUpLift, lookUpLift(smootherstep(coachFaceLift_), basePitch, L.leanSmooth));
     float targetPitch = basePitch + L.lookUpLift;
@@ -2443,6 +2454,11 @@ vec3 GameScene::glanceTarget(int seat) const {
 }
 
 ClockDisplay GameScene::clockDisplay() const {
+    if (online() && !link_ && state_ == State::FadeToMenu) {
+        ClockDisplay d = leaveClock_;   // the game just left (leaveOnlineGame)
+        d.leverSide = leverSide_;
+        return d;
+    }
     if (online() && link_) return onlineClockDisplay();
     if (replaying() && state_ != State::Menu && state_ != State::Loading) return replayClockDisplay();
     ClockDisplay d;
@@ -2592,7 +2608,8 @@ void GameScene::renderOverlay(AppContext&, float) {
     if (coach() && (inGame || state_ == State::Handshake)) drawCoachSubtitles();
     // The coach's voice model: its download prompt, progress panel and notices (coach_model.h).
     drawModelDownload();
-    if (coachModelInstalled()) refreshCoachVoice();   // heard from the coach's next line on
+    int fetched = 0;
+    if (coachModelInstalled(&fetched)) coachModelDownloaded(fetched);   // heard from the coach's next line on
     ui::drawNotifications();
     // No pointer while the view goes over to the other player (hot-seat): the arrow stays hidden.
     if (osCursorHidden_ && !(hotSeat() && handover_.active()) &&

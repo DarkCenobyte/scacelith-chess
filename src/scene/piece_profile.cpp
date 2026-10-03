@@ -66,13 +66,6 @@ Profile& Profile::spline(const std::vector<vec2>& through) {
     return *this;
 }
 
-Profile& Profile::scaled(float sx, float sy) {
-    for (auto& p : pts) p = vec2(p.x * sx, p.y * sy);
-    for (auto& r : radius)
-        if (r > 0) r *= std::min(sx, sy);
-    return *this;
-}
-
 // ---------------------------------------------------------------------------------------------
 static std::vector<vec2> roundOpen(const std::vector<vec2>& pts, const std::vector<float>& rad, float fillet, float maxSeg,
                                    float minAngleDeg) {

@@ -7,7 +7,7 @@
 //   assets/coach/speech/<code>/<topic>.lang   common (pieces and their grammatical forms, squares,
 //                                             moves and numbers spoken), events, lesson, review,
 //                                             appraisal; every file of a language shares one key space
-//   assets/coach/openings/<code>.lang         opening names and sentences (W10)
+//   assets/coach/openings/<code>.lang         opening names and sentences (coach/openings.h)
 // English is the reference; a key missing in a language falls back to English.
 //
 // Template syntax:
@@ -18,8 +18,8 @@
 //                           grammatical form, see common.lang)
 //   {@}, {@2} ...           zero-width anchors of static lines (removed from the text): the
 //                           director times a gesture on the word that follows
-// Renderings (design §3.1): written = squares "e4", figurine SAN "♘f3", digits, and in Arabic the
-// Latin fragments wrapped in left-to-right marks; spoken = squares, moves and numbers in words.
+// Renderings: written = squares "e4", figurine SAN "♘f3", digits, and in Arabic the Latin
+// fragments wrapped in left-to-right marks; spoken = squares, moves and numbers in words.
 //
 // Thread safety: load() once before any use (not concurrently with rendering); render() may then
 // be called from any thread (the variant history is locked). Everything else is read-only.
@@ -39,13 +39,13 @@ namespace coach {
 // ru uk ar ja), else English (Supertonic 3 has no Chinese: Chinese UIs get English speech and
 // Chinese subtitles).
 std::string speechLanguage(const std::string& uiLanguage);
-// True when the coach's voice speaks this language.
+// True when the coach's voice speaks this language (the voice's own list, tts::languageSupported).
 bool speechSupported(const std::string& lang);
 
 class Catalog {
 public:
     // Byte offset, in Rendered::text, of the first character of a placeholder's rendering or of a
-    // {@} marker (research-pedagogy §6.4): the director estimates when that word is heard.
+    // {@} marker: the director estimates when that word is heard (coach/pacing.h).
     struct Anchor {
         std::string name;   // placeholder name ("sq", "your") or marker name ("@", "@2")
         int offset = 0;
@@ -95,7 +95,7 @@ public:
     std::vector<uint32_t> codepoints(const std::string& lang) const;
 
     // Opening names the catalog cannot resolve from the opening files alone ("line:<component>"
-    // references, W10's OpeningTexts::arg composes them). Returns "" when it cannot say it.
+    // references, OpeningTexts::arg composes them). Returns "" when it cannot say it.
     using OpeningResolver = std::function<std::string(const std::string& ref, const std::string& form,
                                                       const std::string& lang, bool spoken)>;
     void setOpeningResolver(OpeningResolver r) { openingResolver_ = std::move(r); }

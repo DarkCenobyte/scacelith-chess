@@ -1,10 +1,9 @@
 #include "settings.h"
-#include "../core/ini.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
 #include "../platform/platform.h"
 #include <algorithm>
-#include <cstdio>
+#include <cmath>
 
 namespace game {
 
@@ -36,9 +35,12 @@ std::string fallbackFor(const std::string& p) {
 bool Settings::load(const std::string& p) {
     path = p;
     IniFile ini;
-    if (!ini.load(p)) {
-        // Where save() wrote when p could not be written; 'path' stays its first choice.
-        std::string alt = fallbackFor(p);
+    // Where save() writes when p cannot be written (none next to the executable in a read-only
+    // folder, a read-only one there): that copy is the one read back. 'path' stays the first choice.
+    std::string alt = fallbackFor(p);
+    if (!alt.empty() && !IniFile::writable(p) && ini.load(alt)) {
+        LOGI("settings read from %s (%s cannot be written)", alt.c_str(), p.c_str());
+    } else if (!ini.load(p)) {
         if (!alt.empty() && ini.load(alt)) {
             LOGI("settings read from %s", alt.c_str());
         } else {
@@ -53,6 +55,7 @@ bool Settings::load(const std::string& p) {
     fullscreen = ini.getBool("display.fullscreen", fullscreen);
     vsync = ini.getBool("display.vsync", vsync);
     renderScale = ini.getFloat("display.render_scale", renderScale);
+    if (std::isnan(renderScale)) renderScale = 1.0f;  // passes std::clamp, then int(w * NaN) is undefined
     quality = ini.getInt("graphics.quality", quality);
     motionBlur = ini.getBool("graphics.motion_blur", motionBlur);
     depthOfField = ini.getBool("graphics.depth_of_field", depthOfField);
@@ -100,9 +103,15 @@ bool Settings::load(const std::string& p) {
     hotseatClockRightOf = std::clamp(ini.getInt("hotseat.clock_right_of", hotseatClockRightOf), 0, 1);
     hotseatRated = ini.getBool("hotseat.rated", hotseatRated);
     localPlayers.clear();
-    for (int n = 1; n <= 256; ++n) {
+    // Every player save() wrote. A section removed by hand leaves a gap: skipped within the first
+    // 256 entries (beyond, the entries are read as long as they follow one another, as save()
+    // writes them). The bound only stops a hand-edited file: the duplicate check is linear.
+    for (int n = 1; n <= 10000; ++n) {
         std::string sec = "local_player_" + std::to_string(n) + ".";
-        if (!ini.has(sec + "name")) break;
+        if (!ini.has(sec + "name")) {
+            if (n <= 256) continue;
+            break;
+        }
         LocalPlayer p;
         p.name = ini.getString(sec + "name");
         p.record = elo::readRecord(ini, "local_player_" + std::to_string(n));
@@ -210,6 +219,7 @@ void Settings::applyLanguage() {
 }
 
 bool Settings::save() const {
+    if (readOnly) return true;
     IniFile ini;
     ini.setInt("display.width", displayWidth);
     ini.setInt("display.height", displayHeight);

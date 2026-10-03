@@ -1,5 +1,6 @@
-// A small scripted HTTP/1.1 server on the loopback interface for the download and account API
-// tests (plain HTTP is allowed to loopback hosts only, net/transport.h). One thread, one
+// A small scripted HTTP/1.1 server for the download and account API tests (plain HTTP is allowed
+// to loopback hosts only, net/transport.h): it listens on every interface (127.0.0.1 and localhost
+// both reach it) but serves loopback peers only, closing any other connection. One thread, one
 // connection at a time (or, made concurrent, a thread per connection: a slow answer then holds up
 // no other); the handler decides every answer, so a test can play a file host (redirects, Range,
 // a connection cut in the middle of a body, a slow or silent server) or the dedicated server's
@@ -130,8 +131,14 @@ private:
             if (waker_.valid() && ps.readable(waker_.handle())) waker_.drain();
             if (stop_) break;
             if (!ps.readable(listener_)) continue;
-            net::sock::Handle c = net::sock::acceptOne(listener_, nullptr);
+            net::sock::Endpoint peer;
+            net::sock::Handle c = net::sock::acceptOne(listener_, &peer);
             if (c == net::sock::kInvalid) continue;
+            const std::string ip = peer.ip();
+            if (ip.compare(0, 4, "127.") != 0 && ip != "::1") {   // another machine: not served
+                net::sock::closeSocket(c);
+                continue;
+            }
             if (concurrent_) {
                 workers_.emplace_back([this, c] {
                     serve(c);

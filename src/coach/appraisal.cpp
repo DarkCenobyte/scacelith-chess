@@ -1,5 +1,5 @@
-// The coach's end-of-game appraisal (see appraisal.h): lichess game accuracy, the statistics of
-// research-pedagogy §5.2 and the appraisal script of §5.3-5.5.
+// The coach's end-of-game appraisal (see appraisal.h): lichess game accuracy, the statistics and
+// the appraisal script.
 #include "coach/appraisal.h"
 
 #include "coach/review_internal.h"
@@ -12,6 +12,7 @@
 namespace coach {
 
 using namespace chess;
+using detail::bandKey;
 
 // ---- Accuracy -------------------------------------------------------------------------------------
 
@@ -114,21 +115,6 @@ int suggestLevel(int level, const std::vector<GameRecord>& games) {
 
 // ---- Collection -------------------------------------------------------------------------------------
 
-namespace {
-
-std::string startFenOf(const Game& g) {
-    const Position& s = g.startPosition();
-    const Position standard;
-    return s.samePosition(standard) && s.fullmoveNumber() == 1 && s.halfmoveClock() == 0 ? std::string() : s.fen();
-}
-
-int whiteCp(const ai::Score& s, bool whiteToMove) {
-    int cp = s.mate > 0 || s.matesNow ? 1000 : s.mate < 0 || s.matedNow ? -1000 : std::clamp(s.cp, -1000, 1000);
-    return whiteToMove ? cp : -cp;
-}
-
-}  // namespace
-
 void Appraisal::reset(int level, Color human) {
     *this = Appraisal();
     level_ = std::clamp(level, 1, 6);
@@ -163,7 +149,7 @@ void Appraisal::add(const Review& r) {
 void Appraisal::addEval(size_t plies, const ai::Analysis& a) {
     // A position without a legal move has no line: the final position is scored from the result.
     if (!a.ok || a.lines.empty()) return;
-    setEval(plies, whiteCp(a.lines[0].score, a.whiteToMove), 1);
+    setEval(plies, detail::whiteCp(a.lines[0].score, a.whiteToMove), 1);
 }
 
 void Appraisal::truncate(size_t plies) {
@@ -185,11 +171,7 @@ std::vector<size_t> Appraisal::missingEvals(const Game& g) const {
 }
 
 ai::AnalysisRequest Appraisal::evalRequest(const Game& g, size_t plies) const {
-    ai::AnalysisRequest r;
-    r.startFen = startFenOf(g);
-    std::vector<std::string> moves = g.uciMoves();
-    moves.resize(std::min(plies, moves.size()));
-    r.moves = moves;
+    ai::AnalysisRequest r = detail::requestAt(g, plies);
     r.multiPV = 1;
     r.depth = 14;
     r.moveTimeMs = 400;
@@ -223,7 +205,7 @@ std::vector<int> evalSeries(const Game& g, const std::vector<int>& eval, const s
         out[n] = 0;
         m[n] = true;
     }
-    if (!m[0]) out[0] = startFenOf(g).empty() ? 15 : 0;
+    if (!m[0]) out[0] = detail::startFenOf(g).empty() ? 15 : 0;
     for (size_t k = 1; k <= n; ++k)
         if (!m[k]) out[k] = out[k - 1];
     if (measured) *measured = m;
@@ -339,23 +321,17 @@ AppraisalStats Appraisal::stats(const Game& g) const {
     const int unjudged = st.human.unjudged;
     st.numbers = st.humanMoves >= 10 && double(unjudged) <= 0.2 * double(st.humanMoves) && st.human.accuracy >= 0.0;
 
-    // The human's moves: specials, streak, critical moment, turning point, theme.
-    int streak = 0, bestStreakEnd = -1;
+    // The human's moves: streak, critical moment, turning point, theme.
+    int streak = 0;
     double critDelta = 10.0;
     double prevPlayed = -1.0;
     std::map<ExType, int> faults;
     std::vector<ExType> faultOrder;
     for (const PlyVerdict& v : vs) {
         if (!v.human) continue;
-        if (v.only) ++st.onlyMoves;
-        if (v.brilliant) ++st.brilliant;
-        if (v.great) ++st.great;
         if (v.cls == MoveClass::Best || v.cls == MoveClass::Excellent) {
             ++streak;
-            if (streak > st.bestStreak) {
-                st.bestStreak = streak;
-                bestStreakEnd = v.ply;
-            }
+            if (streak > st.bestStreak) st.bestStreak = streak;
         } else if (v.cls != MoveClass::Book && v.cls != MoveClass::Forced && v.cls != MoveClass::Unjudged) {
             streak = 0;
         }
@@ -366,10 +342,7 @@ AppraisalStats Appraisal::stats(const Game& g) const {
         }
         if (judgedMove && st.turningPly < 0) {
             if (v.wBest >= 50.0 && v.wPlayed < 40.0) st.turningPly = v.ply;
-            else if (prevPlayed >= 0.0 && prevPlayed <= 50.0 && v.wPlayed > 60.0) {
-                st.turningPly = v.ply;
-                st.comeback = true;
-            }
+            else if (prevPlayed >= 0.0 && prevPlayed <= 50.0 && v.wPlayed > 60.0) st.turningPly = v.ply;
         }
         if (v.cls != MoveClass::Unjudged) prevPlayed = v.wPlayed;
         if ((v.cls == MoveClass::Mistake || v.cls == MoveClass::Blunder) && v.exType != ExType::None) {
@@ -377,7 +350,6 @@ AppraisalStats Appraisal::stats(const Game& g) const {
             faults[v.exType]++;
         }
     }
-    (void)bestStreakEnd;
     int themeCount = 1;
     for (ExType t : faultOrder)
         if (faults[t] > themeCount) {
@@ -388,10 +360,11 @@ AppraisalStats Appraisal::stats(const Game& g) const {
     if (!st.themeRecurring && st.criticalPly >= 0) st.theme = vs[size_t(st.criticalPly)].exType;
 
     // Best moment: brilliant > great > only move > best move winning 3+ points > streak >= 5 >
-    // good capture > the highest-accuracy phase.
+    // good capture > the highest-accuracy phase. A move that only hastens a mate against the human
+    // is never one (the review does not praise it either).
     auto firstHuman = [&](auto pred) {
         for (const PlyVerdict& v : vs)
-            if (v.human && pred(v)) return v.ply;
+            if (v.human && !v.hastensMate && pred(v)) return v.ply;
         return -1;
     };
     int ply;
@@ -441,7 +414,6 @@ AppraisalStats Appraisal::stats(const Game& g) const {
         if (x.empty() || x.color == human_ || kPiecePoints[x.type] < 3) continue;
         st.coachHungPly = v.ply - 1;
         st.coachHungType = x.type;
-        st.coachHungSquare = bm.to;
         break;
     }
     return st;
@@ -457,8 +429,6 @@ struct Part {
 };
 
 int sentenceCap(int level) { return level <= 2 ? 5 : level <= 4 ? 6 : 4; }
-
-std::string lv(const std::string& family, int level) { return family + ".b" + std::to_string(level); }
 
 Beat say(const std::string& key, Look look) {
     Beat b;
@@ -519,23 +489,23 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
         else if ((L == 3 || L == 4) && st.turningPly >= 0 && moveNumberOf(g, st.turningPly) >= 15)
             family = "appraisal.open.loss_close";
         else family = "appraisal.open.loss";
-        Beat b = say(lv(family, L), Look::Player);
+        Beat b = say(bandKey(family, L), Look::Player);
         b.line.with("moves", Arg::ofNumber(st.fullMoves)).with("text", Arg::ofText(reasonKey(st.reason)));
         if (st.result > 0) b.gestures.push_back(simple(GestureKind::Nod));
         parts.push_back({b, 10});
     }
     // A resignation that came early (levels 3+).
     if (ctx.humanResigned && st.result < 0 && L >= 3 && st.humanWinAtEnd >= 40.0) {
-        Beat b = say(lv("appraisal.resign_early", L), Look::Player);
+        Beat b = say(bandKey("appraisal.resign_early", L), Look::Player);
         const double w = std::clamp(st.humanWinAtEnd, 0.1, 99.9);
         // Back from W% to centipawns (the inverse of the lichess curve), the listener's view.
         const int cp = int(std::lround(std::log(100.0 / w - 1.0) / -0.00368208));
         b.line.with("eval", Arg::ofEval(cp, 0));
         parts.push_back({b, 3});
     }
-    // The opening (levels 3+, W10).
+    // The opening (levels 3+).
     if (!ctx.opening.empty() && L >= 3) {
-        Beat b = say(lv("appraisal.opening", L), Look::Player);
+        Beat b = say(bandKey("appraisal.opening", L), Look::Player);
         b.line.with("opening", Arg::ofOpening(ctx.opening));
         parts.push_back({b, 1});
     }
@@ -553,7 +523,7 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
         case BestMoment::Phase: family = "appraisal.best.phase"; break;
         case BestMoment::None: break;
         }
-        Beat b = say(lv(family, L), Look::Board);
+        Beat b = say(bandKey(family, L), Look::Board);
         if (st.bestPly >= 0) {
             const PlyVerdict& v = vs[size_t(st.bestPly)];
             const Move m = g.moves()[size_t(st.bestPly)];
@@ -563,9 +533,9 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
             const Piece cap = p0.at(captureSquare(p0, m));
             if (!cap.empty() && cap.color != human_) b.line.with("my", Arg::ofPiece(cap.type, cap.color, false));
             else b.line.with("my", Arg::ofPiece(Pawn, opposite(human_), false));
-            const Piece moved = p0.at(m.from);
+            const PieceType landed = m.promotion != NoPiece ? m.promotion : p0.at(m.from).type;
             const Piece now = g.position().at(m.to);
-            if (now.color == human_ && (now.type == moved.type || m.promotion != NoPiece)) {
+            if (!now.empty() && now.color == human_ && now.type == landed) {
                 detail::pointPiece(b, m.to, "move");
                 b.look = Look::Target;
             }
@@ -583,18 +553,18 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
     const int inaccuracies = st.human.count(MoveClass::Inaccuracy);
     if (!engine || (shortGame && L >= 3)) {
         if (!engine) {
-            Beat b = say(lv(st.human.checks > 0 ? "appraisal.num.material" : "appraisal.num.material_nochecks", L),
+            Beat b = say(bandKey(st.human.checks > 0 ? "appraisal.num.material" : "appraisal.num.material_nochecks", L),
                          Look::Player);
             b.line.with("n", Arg::ofNumber(st.human.piecesCaptured)).with("m", Arg::ofNumber(st.human.checks));
             parts.push_back({b, 4});
         }
     } else if (L <= 3 && st.takebacks > 0 && st.fixed > 0) {
-        Beat b = say(lv("appraisal.num.takebacks", L), Look::Player);
+        Beat b = say(bandKey("appraisal.num.takebacks", L), Look::Player);
         b.line.with("n", Arg::ofNumber(st.takebacks)).with("m", Arg::ofNumber(st.fixed));
         parts.push_back({b, 4});
     } else if (L == 1) {
         if (st.human.piecesCaptured > 0) {
-            Beat b = say(lv(st.human.checks > 0 ? "appraisal.num.material" : "appraisal.num.material_nochecks", L),
+            Beat b = say(bandKey(st.human.checks > 0 ? "appraisal.num.material" : "appraisal.num.material_nochecks", L),
                          Look::Player);
             b.line.with("n", Arg::ofNumber(st.human.piecesCaptured)).with("m", Arg::ofNumber(st.human.checks));
             parts.push_back({b, 4});
@@ -660,12 +630,12 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
         if (crit && L == 1 && crit->cls != MoveClass::Blunder) crit = nullptr;   // level 1: blunders only
         Beat b;
         if (stalemated) {
-            b = say(lv("appraisal.improve.stalemate", L), Look::Player);
+            b = say(bandKey("appraisal.improve.stalemate", L), Look::Player);
         } else if (crit) {
             const bool wasWinning = crit->wBest >= 70.0;
-            b = say(lv(wasWinning ? "appraisal.improve.was_winning"
-                                  : (L == 1 ? "appraisal.improve.theme" : "appraisal.improve.critical"),
-                       L),
+            b = say(bandKey(wasWinning ? "appraisal.improve.was_winning"
+                                       : (L == 1 ? "appraisal.improve.theme" : "appraisal.improve.critical"),
+                            L),
                     Look::Player);
             const int sign = human_ == White ? 1 : -1;
             b.line.with("crit_no", Arg::ofNumber(moveNumberOf(g, crit->ply)))
@@ -674,14 +644,14 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
                 .with("theme", Arg::ofText(themeKey(crit->exType)))
                 .with("eval", Arg::ofEval(sign * crit->cpWhiteBefore, 0));
         } else if (st.themeRecurring) {
-            b = say(lv("appraisal.improve.theme", L), Look::Player);
+            b = say(bandKey("appraisal.improve.theme", L), Look::Player);
             b.line.with("theme", Arg::ofText(themeKey(st.theme)));
         } else if (st.coachHungPly >= 0 && L <= 3) {
-            b = say(lv("appraisal.improve.coach_hung", L), Look::Player);
+            b = say(bandKey("appraisal.improve.coach_hung", L), Look::Player);
             b.line.with("my", Arg::ofPiece(st.coachHungType, opposite(human_), false))
                 .with("n", Arg::ofNumber(moveNumberOf(g, st.coachHungPly)));
         } else {
-            b = say(lv("appraisal.improve.clean", L), Look::Player);
+            b = say(bandKey("appraisal.improve.clean", L), Look::Player);
         }
         parts.push_back({b, 8});
         // Level 4: the recurring theme too, when the critical moment was about something else.
@@ -698,7 +668,7 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
         std::string family = "appraisal.end";
         if (sug > L) family = "appraisal.end.up";
         else if (sug > 0 && sug < L && st.result <= 0) family = "appraisal.end.down";
-        Beat b = say(lv(family, L), Look::Player);
+        Beat b = say(bandKey(family, L), Look::Player);
         if (family != "appraisal.end") {
             b.line.with("level", Arg::ofText("appraisal.level.l" + std::to_string(std::clamp(sug, 1, 6))));
             b.gestures.push_back(simple(GestureKind::Open));

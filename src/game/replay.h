@@ -20,7 +20,7 @@
 // Control. Pause/resume, the speed, one move forward (the next move is played now, animated),
 // one move back and a jump to any ply (the board is set at once: SetPosition). Stepping pauses.
 //
-// Scene loop (Phase B):
+// Scene loop (GameScene, replay mode):
 //     clock.update(dt);
 //     replay::Event e;
 //     while (clock.poll(e)) {

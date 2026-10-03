@@ -25,20 +25,10 @@ using i18n::trf;
 using m::vec2;
 using m::vec4;
 using namespace theme;
+using namespace detail::helpers;
 
 namespace {
 
-TextStyle style(int face, float size, vec4 color, HAlign align = HAlign::Left, float tracking = 0.0f) {
-    TextStyle st;
-    st.face = face;
-    st.size = size;
-    st.color = color;
-    st.align = align;
-    st.tracking = tracking;
-    return st;
-}
-
-float ease(float t) { return m::smootherstep(t); }
 float baselineCentered(const Rect& r, const TextStyle& st) { return r.cy() + gfx::capHeight(st) * 0.5f; }
 
 // The replay's bar (replayBar): its height, its gap to the bottom edge, and the room the
@@ -48,45 +38,18 @@ constexpr float kReplayBarClear = kReplayBarBottom + kReplayBarH + 76.0f;
 // Where the viewer's controls panel was drawn this frame (empty when hidden): the replay's bar,
 // drawn after it, keeps clear of it.
 Rect g_viewerControls;
-std::string num(int v) { return std::to_string(v); }
 
 // ---- Values (same steps as the New Game page) ----------------------------------------------------
-const std::vector<int>& baseTimeValues() {
-    static std::vector<int> v = [] {
-        std::vector<int> r;
-        for (int s = 15; s < 180; s += 15) r.push_back(s);
-        for (int s = 180; s < 600; s += 30) r.push_back(s);
-        for (int s = 600; s < 3600; s += 60) r.push_back(s);
-        for (int s = 3600; s <= 10800; s += 300) r.push_back(s);
-        return r;
-    }();
-    return v;
-}
-int nearestIndex(const std::vector<int>& v, int value) {
-    int best = 0;
-    for (int i = 0; i < int(v.size()); ++i)
-        if (std::abs(v[size_t(i)] - value) < std::abs(v[size_t(best)] - value)) best = i;
-    return best;
-}
-std::string clockText(int seconds) {
-    char buf[32];
-    std::snprintf(buf, sizeof(buf), "%d:%02d", seconds / 60, seconds % 60);
-    return buf;
-}
-std::string spacedPlus(const std::string& label) {
-    size_t p = label.find('+');
-    if (p == std::string::npos) return label;
-    return label.substr(0, p) + "\xE2\x80\x89+\xE2\x80\x89" + label.substr(p + 1);
-}
+using detail::baseTimeValues;
+using detail::clockText;
+using detail::nearestIndex;
+using detail::nearestValue;
+using detail::spacedPlus;
 // "3+2" -> category (Lichess-style estimate: base + 40 x increment), as on the New Game page.
 const char* categoryKey(const std::string& label) {
     int base = 0, inc = 0;
-    if (std::sscanf(label.c_str(), "%d+%d", &base, &inc) != 2) return "viewer.tc.none";
-    int est = base * 60 + 40 * inc;
-    if (est < 180) return "viewer.tc.bullet";
-    if (est < 480) return "viewer.tc.blitz";
-    if (est < 1500) return "viewer.tc.rapid";
-    return "viewer.tc.classical";
+    if (std::sscanf(label.c_str(), "%d+%d", &base, &inc) != 2) return "tc.no_clock";
+    return detail::tcCategoryKey(int64_t(base) * 60, inc);
 }
 std::string customClockSummary(const WatchSetup& s) {
     int b = s.customBaseSeconds;
@@ -128,7 +91,8 @@ void loadWatch(WatchSetup& w) {
     w.whitePreset = std::clamp(g.viewerWhitePreset, 0, n - 1);
     w.blackPreset = std::clamp(g.viewerBlackPreset, 0, n - 1);
     w.timeControl = g.viewerTimeControl < 0 || g.viewerTimeControl >= tcn ? -1 : g.viewerTimeControl;
-    w.customBaseSeconds = std::clamp(g.viewerCustomBaseSeconds, 15, 10800);
+    // The base time as its stepper shows it: a hand-edited .ini may hold another.
+    w.customBaseSeconds = nearestValue(baseTimeValues(), g.viewerCustomBaseSeconds);
     w.customIncrementSeconds = std::clamp(g.viewerCustomIncrementSeconds, 0, 60);
     w.customDelaySeconds = std::clamp(g.viewerCustomDelaySeconds, 0, 60);
 }

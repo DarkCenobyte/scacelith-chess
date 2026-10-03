@@ -266,6 +266,32 @@ TEST(scoresheet_pen_path) {
     PenPath cp = buildPenPath(placeHandwriting(cjk, box, 3), 3);
     CHECK(cp.duration / 3.0f > 0.3f && cp.duration / 3.0f < 0.5f);
     CHECK(isCjk(0x674E) && !isCjk('A') && hasMarkAbove(0xE9) && !hasMarkAbove(0xE7) && hasMarkAbove(0x439));
+    // Latin Extended-A: a stroke, a middle dot, the long s and the dotless IJ are no marks above;
+    // the comma of g with cedilla stands above, and i with ogonek keeps its dot.
+    for (uint32_t cp : {0x110u, 0x111u, 0x126u, 0x127u, 0x132u, 0x13Fu, 0x140u, 0x141u, 0x17Fu}) CHECK(!hasMarkAbove(cp));
+    for (uint32_t cp : {0x107u, 0x123u, 0x12Fu, 0x133u, 0x15Bu, 0x17Cu}) CHECK(hasMarkAbove(cp));
+    // The body of a letter with a mark above ends at a capital's height for a capital, at the
+    // x-height for a small letter, also where Latin Extended-A puts its capitals on odd code
+    // points (Ń ń Ž ž); l with caron keeps the capital's (its mark stands beside the ascender).
+    auto markSplit = [](uint32_t cp, float inkTop) {
+        GlyphInk g;
+        g.cp = cp;
+        g.x0 = 0.2f;
+        g.x1 = 2.2f;
+        g.y0 = inkTop;
+        g.y1 = 0.0f;
+        g.xHeight = 2.0f;
+        g.capHeight = 2.8f;
+        PenPath p = buildPenPath({g}, 1);
+        for (const InkBand& b : p.bands)
+            if (b.glyph == 0 && b.ly1 > 1000.0f) return b.ly0;  // the body: from the split down
+        return 0.0f;
+    };
+    const float capSplit = -2.8f * 1.04f, smallSplit = -2.0f * 1.1f;
+    for (uint32_t cp : {0x100u, 0x143u, 0x147u, 0x179u, 0x17Bu, 0x17Du, 0x13Eu})
+        CHECK(std::fabs(markSplit(cp, -3.8f) - capSplit) < 1e-4f);
+    for (uint32_t cp : {0x101u, 0x144u, 0x148u, 0x17Au, 0x17Cu, 0x17Eu})
+        CHECK(std::fabs(markSplit(cp, -2.9f) - smallSplit) < 1e-4f);
 }
 
 TEST(scoresheet_pad_placement) {

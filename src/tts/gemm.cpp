@@ -78,14 +78,18 @@ void sgemm(const kern::Table& k, ThreadPool* pool, int M, int N, int K, const Ge
         const int kcMax = std::min(K, kKc);
         Buffer abuf(size_t(mr) * size_t(kcMax) * 4);
         float* Ap = static_cast<float*>(abuf.data);
-        // Blocked output: each row panel is computed into a small buffer, then scattered.
-        std::vector<float> rowBuf(cBlocked ? size_t(mr) * size_t(N) : 0);
-        for (int rp = rp0; rp < rp1; ++rp) {
-            int i0 = rp * mr, rows = std::min(mr, M - i0);
-            float* Cp = cBlocked ? rowBuf.data() : C + i0 * ldc;
-            ptrdiff_t ldcp = cBlocked ? N : ldc;
-            for (int kb = 0; kb < K; kb += kKc) {
-                int kc = std::min(kKc, K - kb);
+        // k blocks outermost: every row panel of the task reuses the same kc x N slice of the packed B.
+        // Blocked output: rows are computed into a buffer (the task's rows when there are several k
+        // blocks, one row panel otherwise), then scattered after their last k block.
+        const int r0 = rp0 * mr;
+        const bool oneBlock = K <= kKc;
+        std::vector<float> rowBuf(cBlocked ? size_t(oneBlock ? mr : std::min(M, rp1 * mr) - r0) * size_t(N) : 0);
+        for (int kb = 0; kb < K; kb += kKc) {
+            int kc = std::min(kKc, K - kb);
+            for (int rp = rp0; rp < rp1; ++rp) {
+                int i0 = rp * mr, rows = std::min(mr, M - i0);
+                float* Cp = cBlocked ? rowBuf.data() + (oneBlock ? 0 : size_t(i0 - r0) * size_t(N)) : C + i0 * ldc;
+                ptrdiff_t ldcp = cBlocked ? N : ldc;
                 if (a.i8)
                     k.packAi8(a.i8 + i0 * a.ld + kb, a.ld, rows, kc, a.scale + i0, a.zp ? a.zp + i0 : nullptr, Ap);
                 else
@@ -96,9 +100,9 @@ void sgemm(const kern::Table& k, ThreadPool* pool, int M, int N, int K, const Ge
                     k.sgemmTile(kc, Ap, Bp + (size_t(p) * size_t(K) + size_t(kb)) * size_t(nr), Cp + j0, ldcp, rows,
                                 cols, kb > 0);
                 }
+                if (cBlocked && kb + kc == K)
+                    for (int i = 0; i < rows; ++i) storeRow(i0 + i, Cp + size_t(i) * size_t(N));
             }
-            if (cBlocked)
-                for (int i = 0; i < rows; ++i) storeRow(i0 + i, rowBuf.data() + size_t(i) * size_t(N));
         }
     });
 }

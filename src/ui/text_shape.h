@@ -17,9 +17,12 @@ namespace text {
 
 struct PlacedGlyph {
     uint32_t cp = 0;                 // codepoint drawn (Arabic: the contextual presentation form;
-                                     // mirrored bracket in right-to-left runs)
+                                     // mirrored bracket in right-to-left runs; the uppercase letter
+                                     // of a synthesised small capital); for a '?' substitute, the
+                                     // codepoint it stands for
     int face = 0;                    // face that provides the glyph
-    const font::Glyph* glyph = nullptr;  // never null in a Run (missing glyphs are dropped)
+    const font::Glyph* glyph = nullptr;  // never null in a Run: a codepoint no face has is drawn
+                                         // as '?' (dropped only when '?' is missing too)
     float x = 0.0f;                  // pen position of the glyph origin, em, from the run's left edge
     int source = 0;                  // index of the source character (logical order, 0-based):
                                      // writing order for progressive reveal

@@ -29,6 +29,8 @@
 //     pending is an agreement; claims (threefold, fifty moves) via chess::Game; automatic
 //     endings (mate, stalemate, insufficient material, fivefold, 75 moves) via chess::Game.
 //   - Resignation at any time while the game runs; abort only before one's own first move.
+//   - A game that reaches 1200 plies (no Move can carry a later ply) ends aborted
+//     (ServerAborted), as on the server.
 //   - Guest disconnected: its clock keeps running; after graceMs (60 s) it loses by
 //     Abandonment (draw when the host cannot mate; aborted NoShow before 2 plies).
 //   - Rematch within 60 s after the end, both must accept, colours swapped; a decline, the
@@ -61,12 +63,14 @@ struct AuthorityConfig {
     bool autoPress = true;            // GameSnapshot.autoPress (DirectHostOptions::autoPress)
 };
 
-// FNV-1a 32 of the first four FEN fields (the Move.posHash of schema.js).
+// FNV-1a 32 of the first four FEN fields (the Move.posHash of schema.js): net::positionDigest,
+// the digest of online play.
 uint32_t fenDigest(const std::string& fen);
 uint32_t positionHash(const chess::Position& pos);
-// A player name for PlayerInfo: trimmed, control characters removed, at most 24 bytes of valid
-// UTF-8, 'fallback' when empty.
-std::string sanitizeName(const std::string& name, const char* fallback);
+// A player name for PlayerInfo: trimmed, ASCII control characters removed, at most maxBytes of
+// UTF-8 the protocol accepts (no overlong forms, surrogates or code points above U+10FFFF),
+// 'fallback' when empty. Also cleans the router's name before the hosting page shows it.
+std::string sanitizeName(const std::string& name, const char* fallback, size_t maxBytes = 24);
 
 class Authority {
 public:
@@ -90,14 +94,11 @@ public:
     void sendSnapshot(Side side, double now, Output& out);
     void hostLeaves(double now, Output& out);                // resigns the host's running game
 
-    bool hasGame() const { return started_; }
     bool isOver() const;
     uint64_t gameId() const { return id_; }
     int colorOf(Side side) const { return side == HostSide ? hostColor_ : 1 - hostColor_; }
     int plies() const { return int(recs_.size()); }
-    const chess::Game& game() const { return game_; }
     const std::string& guestName() const { return names_[GuestSide]; }
-    int64_t remainingMs(int color, double now) const { return clockAt(color, now); }
 
 private:
     AuthorityConfig cfg_;

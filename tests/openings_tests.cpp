@@ -558,6 +558,58 @@ TEST(openings_announcer_deterministic_and_silent_after_takeback) {
     CHECK(s3.find("opening.family.sicilian.beginner") == std::string::npos);
 }
 
+TEST(openings_announcer_sees_a_replaced_move_as_a_takeback) {
+    // The human's move taken back and another played before the next update (an accepted takeback offer): the same
+    // ply count, but the new opening is summed up again rather than worded as a transposition.
+    OpeningAnnouncer a;
+    a.setLevel(3);
+    a.setHumanColor(chess::Black);
+    chess::Game g;
+    std::string said;
+    for (const char* m : {"c4", "Nc6", "d4", "Nf6"}) {
+        playMore(g, m);
+        said += describe(a.update(g));
+    }
+    CHECK(said.find("opening.say.pb.") != std::string::npos);
+    chess::Game back = takeBack(g, 1);
+    playMore(back, "d5");
+    const std::vector<OpeningLine> lines = a.update(back);
+    CHECK(!lines.empty());
+    if (!lines.empty()) CHECK(lines[0].key.rfind("opening.say.pb.", 0) == 0);
+    CHECK(!hasKey(lines, "opening.say.transposed"));
+    CHECK(describe(lines).find("family:chigorin") != std::string::npos);
+}
+
+TEST(openings_announcer_keeps_the_comment_of_stale_news) {
+    // News that went stale while speech was busy is never said, and neither is its comment: a later game can still
+    // say it.
+    const std::string najdorf = "e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be3 e5 Nb3 Be6 f3 Be7";
+    const std::string dragon = "e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6";
+    auto run = [](OpeningAnnouncer& a, chess::Game& g, const std::string& sans, bool canSpeak) {
+        std::string out;
+        std::istringstream in(sans);
+        std::string t;
+        while (in >> t) {
+            playMore(g, t);
+            out += describe(a.update(g, canSpeak));
+        }
+        return out;
+    };
+    OpeningAnnouncer a;
+    a.setLevel(4);
+    a.setHumanColor(chess::White);
+    chess::Game g;
+    CHECK(run(a, g, najdorf, true).find("opening.variation.najdorf.advanced") != std::string::npos);
+    // Back to 5.Nc3, then the Dragon while speech is busy: the news is stale when speech is free.
+    chess::Game back = takeBack(g, int(g.moves().size()) - 9);
+    CHECK(a.update(back, false).empty());
+    CHECK_EQ(run(a, back, "g6 Be3 Bg7 f3 O-O Qd2 Nc6", false), std::string());
+    CHECK(a.update(back, true).empty());
+    a.newGame();
+    chess::Game h;
+    CHECK(run(a, h, dragon, true).find("opening.variation.dragon.advanced") != std::string::npos);
+}
+
 TEST(openings_announcer_waits_for_speech_and_catches_up_silently) {
     OpeningAnnouncer a;
     a.setLevel(1);
@@ -757,9 +809,48 @@ TEST(openings_texts_render_and_speak) {
     CHECK(!t.arg("line:Paulsen Attack", "", "ru", false).empty());   // through the eponym table
     CHECK_EQ(t.arg("line:English Attack", "", "fr", false), std::string());   // a common word: not composed
     CHECK_EQ(t.arg("line:English Attack", "", "zh-Hans", false), std::string("English Attack"));
+    for (const char* line : {"line:Catalan Defense", "line:Kazakh Variation", "line:Florentine Gambit",
+                             "line:Netherlands Variation"})
+        for (const char* lang : {"fr", "de", "es"}) CHECK_EQ(t.arg(line, "", lang, false), std::string());
     CHECK_EQ(t.arg("line:Exchange Variation", "", "fr", false), *t.find("fr", "opening.component.exchange_variation"));
     // The rare, unnamed case renders everywhere.
     for (const std::string& lang : langs()) CHECK(!t.render(OpeningLine{"opening.say.rare", {}}, lang, true).empty());
+}
+
+TEST(openings_texts_name_the_scotch_and_danish_components) {
+    // Frequent components whose English adjective is a common word have translations of their own, so French,
+    // German and Spanish name them instead of leaving them out.
+    const OpeningBook& b = book();
+    const OpeningTexts& t = OpeningTexts::instance();
+    const std::map<std::string, std::map<std::string, std::string>> expected = {
+        {"Scotch Gambit", {{"fr", "gambit écossais"}, {"de", "Schottisches Gambit"}, {"es", "gambito escocés"}}},
+        {"Scotch Variation",
+         {{"fr", "variante écossaise"}, {"de", "Schottische Variante"}, {"es", "variante escocesa"}}},
+        {"Danish Variation", {{"fr", "variante danoise"}, {"de", "Nordische Variante"}, {"es", "variante danesa"}}},
+    };
+    for (const std::string name : {"Italian Game: Scotch Gambit", "Italian Game: Scotch Gambit, Canal Variation",
+                                   "Four Knights Game: Scotch Variation",
+                                   "Four Knights Game: Scotch Variation, Belgrade Gambit",
+                                   "Sicilian Defense: Smith-Morra Gambit Accepted, Danish Variation"}) {
+        int n = 0;
+        while (n < int(b.names()) && b.name(n) != name) ++n;
+        CHECK(n < int(b.names()));
+        if (n == int(b.names())) continue;
+        const std::vector<std::string> comps = b.extraComponents(n);
+        auto c = std::find_if(comps.begin(), comps.end(), [&](const std::string& s) { return expected.count(s); });
+        CHECK(c != comps.end());
+        if (c == comps.end()) continue;
+        for (const std::string& lang : langs()) {
+            const std::string said = t.arg("line:" + *c, "", lang, true);
+            CHECK(!said.empty());
+            if (expected.at(*c).count(lang)) CHECK_EQ(said, expected.at(*c).at(lang));
+        }
+    }
+    // The level 6 sentence that says them.
+    const OpeningLine deep{"opening.say.deep", {{"line", {OpeningArg::Kind::Opening, "line:Scotch Gambit", 0}}}};
+    CHECK_EQ(t.render(deep, "fr", true), std::string("La ligne exacte\xC2\xA0: gambit écossais."));
+    CHECK_EQ(t.render(deep, "de", true), std::string("Die genaue Variante: Schottisches Gambit."));
+    CHECK_EQ(t.render(deep, "es", true), std::string("La línea exacta: gambito escocés."));
 }
 
 TEST(openings_texts_speech_forms) {

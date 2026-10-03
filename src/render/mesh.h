@@ -25,7 +25,6 @@ struct MeshData {
     void transform(const m::mat4& m);
     void computeNormals(bool smooth = true);  // area-weighted
     void computeTangents();                   // from uvs; needs normals
-    void flipWinding();
 };
 
 struct Mesh {

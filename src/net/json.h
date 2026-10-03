@@ -5,7 +5,7 @@
 // client allocate without bound (input size, nesting depth, element count).
 //
 // Numbers are doubles (integers up to 2^53 are exact, which covers every id the server sends).
-// Objects keep their member order; lookups are linear (API bodies are small).
+// Objects keep their member order; lookups (operator[], has) are linear (API bodies are small).
 #pragma once
 #include <cstdint>
 #include <string>
@@ -85,8 +85,7 @@ struct Limits {
     int keepDepth = 1 << 30;
     // Members (items) an object (array) whose elements are kept (keepDepth) may have; more is an
     // error, found before the next one is read. With keepDepth and maxElements unbounded, this
-    // bounds what a large document keeps in memory, and the time spent looking a member name up
-    // among the kept ones (linear, so quadratic over a whole object).
+    // bounds what a large document keeps in memory.
     size_t maxKept = SIZE_MAX;
 };
 

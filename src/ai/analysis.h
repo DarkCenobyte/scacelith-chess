@@ -54,8 +54,8 @@ struct AnalysisRequest {
     // Restrict the root to these moves (UCI). Each must be legal in the analysed position, else the
     // request fails: Stockfish would silently ignore it and search every move instead.
     std::vector<std::string> searchMoves;
-    // Higher runs first among queued requests (moves and evaluations have priority 0; background
-    // work such as an end-of-game review should use a negative priority). A request never
+    // Higher runs first among queued requests (moves have priority 0; background work such as an
+    // end-of-game review should use a negative priority). A request never
     // overtakes one of equal or higher priority, a running search, or a queued ucinewgame / hash clear.
     int priority = 0;
 };

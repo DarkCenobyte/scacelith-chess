@@ -19,7 +19,9 @@ struct WindowDesc {
     bool hidden = false;             // create without showing (tests)
 };
 
-bool init(const WindowDesc& desc);   // creates window + GL 4.6 core context and loads GL
+// Creates the window and a GL 4.6 core context, and loads GL. False on failure, with the reason in
+// the log only: the caller tells the player (main.cpp).
+bool init(const WindowDesc& desc);
 void shutdown();
 
 // Processes pending OS events and refreshes the input state. Returns false once the user asked
@@ -28,7 +30,6 @@ bool pumpEvents();
 void swapBuffers();
 void setVsync(bool on);
 void setDisplayMode(DisplayMode mode, int width, int height);
-void setTitle(const char* title);
 int width();   // current framebuffer size in pixels
 int height();
 bool hasFocus();
@@ -71,23 +72,31 @@ struct Input {
 };
 const Input& input();
 void setCursorVisible(bool visible);
-// When captured the cursor is hidden and locked in place; only mouseDX/DY change.
+// When captured the cursor is hidden and locked in place; only mouseDX/DY change. On Windows, a
+// mouse that reports positions (Remote Desktop, a tablet) moves the hidden cursor inside the
+// window instead, so mouseX/Y change too; it is put back where the capture began when it ends.
 void setMouseCaptured(bool captured);
 
 // ---- Paths & misc ----------------------------------------------------------------------------
+// The three folders are net::sys's (src/net/net_sys.h), the one implementation the core library
+// uses too.
 std::string exeDirectory();      // with trailing separator
 std::string userDataDirectory(); // writable (e.g. %APPDATA%/scacelith/), with trailing separator
 // The per-user folder of the game's data files, "scacelith", created if missing, with trailing
 // separator; each kind of data has its subfolder there ("coach" = the coach's voice model).
 // Windows: %APPDATA%\scacelith\ (Roaming). Linux: $XDG_DATA_HOME/scacelith/, by default
 // ~/.local/share/scacelith/ (the settings fallback stays in ~/.config/scacelith/). A macOS port
-// would use ~/Library/Application Support/scacelith/. net::sys::appDataDirectory() is the same
-// rule for the core library.
+// would use ~/Library/Application Support/scacelith/.
 std::string appDataDirectory();
-void messageBox(const char* title, const char* text);
+void messageBox(const char* title, const char* text, bool rtl = false);  // rtl: right-to-left text (Arabic)
 uint64_t randomSeed();           // non-deterministic seed from the OS
 // Text on the system clipboard as UTF-8 ("" when there is none; the X11 layer always returns "").
 std::string clipboardText();
+#ifdef _WIN32
+// OpenClipboard for 'owner' (an HWND), tried up to 5 times 5 ms apart: a clipboard manager or the
+// clipboard history may hold the clipboard for a moment. CloseClipboard() after a success.
+bool openClipboard(void* owner);
+#endif
 // The user's interface language as a locale tag ("fr-FR", "zh-TW", "de_DE.UTF-8"), "" when
 // unknown. Windows: GetUserDefaultUILanguage; X11: LC_ALL, LC_MESSAGES, LANG.
 std::string systemLanguage();

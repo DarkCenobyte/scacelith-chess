@@ -14,7 +14,6 @@ of them in `src/game/` and `src/ui/`, the server in use and the account API call
 | `src/game/game_link.h` | `GameLink`: the commands of one game (move, resign, draw, abort, resync, rematch, live gestures, report, ping, server clock), for a server game or a direct match alike. |
 | `src/game/game_scene_online.cpp` | `GameMode::Online` in the 3D scene: the remote player's robot, move sending, server clocks, resync, end of game. |
 | `src/game/online_mock.h/.cpp` | In-process fakes of the server and of a direct-match friend (`--online-mock`). |
-| `src/game/online_stub.cpp` | `net::OnlineClient` / `net::DirectMatch` backed by the fakes, compiled only without `SCACELITH_NET_REAL` (builds without the real network layer). |
 | `src/ui/ui_screens_online.cpp` | The "Play Online" page and its sub-pages, Options > Online server. |
 | `src/ui/ui_online_hud.cpp` | Ping indicator, in-game overlay, online Esc menu, report dialog, challenge cards. |
 | `src/ui/ui_qr.cpp`, `ui_clipboard.cpp` | QR code of the two-factor setup (`third_party/qrcodegen`), copy to the Windows clipboard. |
@@ -79,7 +78,11 @@ the CMake option `SCACELITH_OFFICIAL_SERVER` (`host[:apiPort[:wsPort]]`, port 44
 `none` for none). No token is ever stored there: the network layer keeps one session per origin
 (`host:apiPort`), so switching servers never reuses another server's sign-in. `applyServer()`
 (called when Options are applied with another server) selects the new origin and forgets the
-previous server's state; the page then resumes a session saved for that origin, if any. Each
+previous server's state; the page then resumes a session saved for that origin, if any. The
+fingerprint of the server in use emptied (same host and port) also forgets the one saved with its
+session at sign-in (`OnlineClient::forgetSavedPin`): the system's certificates apply again. Options'
+Test connection of those values goes without that pin too (`fetchServerInfo(true)`), so that it
+tells what applying them will give, and forgets nothing (`game::live::savedPinDropped`). Each
 answer of the account API names the origin it was asked of (`Event::origin`), and an answer of a
 server left meanwhile is not taken for the new server's (`game::ServerAnswers`): the pages drop
 it, except a PGN (the game page's Save game writes it where the player asked) and a GIF (saved
@@ -155,10 +158,61 @@ Rules common to these calls:
   there, `not_found`). Game 0 (`invalid_game_id`) and a PGN text over 64 KiB (`pgn_too_large`)
   are refused without sending anything. An answer over 16 MiB, or one that does not start with
   `GIF87a` or `GIF89a`, is `invalid_response`.
-- `deleteAccount` success erases the token and the user name saved for the origin (its server id
-  and pin stay) and stops the realtime connection without reconnecting. `revokeSession` on the
-  session marked `current` in the last `fetchSessions` signs this game out the same way (token
-  erased, connection stopped).
+- `deleteAccount` closes the realtime connection before its request: the server closes every
+  connection of the account it deletes, which would show a revoked session and refusals. Its
+  success erases the token and the user name saved for the origin (its server id and pin stay),
+  and the connection stays closed; a failure other than a refused session (`unauthorized`) opens
+  it again if it was open. `revokeSession` on the session marked `current` in the last
+  `fetchSessions` signs this game out the same way (the server closes that session's connection):
+  the connection closes first, its success erases the token and keeps it closed, and a failure
+  other than `unauthorized` opens it again if it was open.
+- `logout(true)` (`POST /auth/logout-all`, Sign out everywhere) is ok only when the server did it.
+  A refused session (401) revoked nothing: `unauthorized`, its token erased. Any other failure
+  (the server unreachable, `rate_limited`, maintenance...) keeps the token, so that the player can
+  try again. A plain `logout()` erases the token whatever the answer.
+
+### Google sign-in
+
+Offered when `GET /info` says `sso.google`. Google sends the browser back to the game itself, on
+127.0.0.1 (RFC 8252 loopback redirect); nothing is polled (`dedicated-server/docs/API.md` has the
+server's side).
+
+1. `startGoogleSso(page)` makes the PKCE pair and opens the listener first
+   (`net::LoopbackRedirect`, `src/net/loopback_redirect.h`: 127.0.0.1 on a port the system picks,
+   exclusive on Windows, never inherited by another process), then sends
+   `POST /auth/sso/google/start {codeChallenge, redirectPort}`. Google's page is opened in the
+   system browser only when the answer's `authUrl` is Google's
+   (`https://accounts.google.com/o/oauth2/v2/auth?`) and names this listener as its redirect URI,
+   `http://127.0.0.1:<port>/oauth2/google/<tag>`, where the tag is made from the origin of the
+   server in use (`net::ssoOriginTag`), with the answer's `state`, S256 and the challenge: another
+   tag is `sso_origin` (the server is reached under another name than its public one), anything
+   else `bad_response` (shown as an invalid answer); nothing is opened then. `SsoBrowserOpened`
+   answers the start, ok or not (`sso_listen`, `browser`, `random`, the server's errors).
+2. The listener takes one strict `GET` of that path with `Host: 127.0.0.1:<port>`, from the
+   loopback only. A request with another `state` (a link someone else sent) gets a 400 page that
+   says so and the listener keeps waiting; Google's answer gets a page in the player's language
+   (`online.sso.page.*`, made on the game thread: `game::ssoBrowserPage()`) and closes the
+   listener. Nothing is told to the browser about the account. It waits the attempt's
+   `expiresIn` (30 s to 10 minutes), then `sso_expired`; `error=access_denied` is `sso_cancelled`,
+   another error `sso_failed`.
+3. With the code, `SsoCodeReceived`, then
+   `POST /auth/sso/google/finish {attemptId, codeVerifier, state, code, iss, clientLabel}`: a
+   `LoginResult` (signed in, or `mfaRequired`), `SsoNeedsUsername` (a new player: `account.username`
+   is the server's suggestion, then `completeSso(name)`) or `SsoNeedsPassword` (the address is the
+   one of an account with a password, `account.username`).
+4. `linkSso(password)` (`POST /auth/sso/google/link {linkTicket, password, clientLabel}`) adds
+   Google sign-in to that account: a `LoginResult`, signed in, or `mfaRequired` (the code then goes
+   to `loginMfa()`, and Google is added once it is accepted). `invalid_credentials` and
+   `too_many_attempts` keep the step for another try; any other answer ends it (`sso_expired`
+   afterwards).
+
+`cancelSso()` stops it at any step (listener closed, password step forgotten) and answers
+`LoginResult` `cancelled` when something was under way; a start still waiting for the server's
+answer opens no browser and answers `SsoBrowserOpened` `cancelled`. The online page calls it
+when it opens and when the player leaves a Google page while signed out. Changing servers stops
+it too (a start still waiting for the server's answer opens no browser either), and a code that
+arrives for the server left is dropped. The listener runs on its own thread (`net-sso`) and hands
+the code to `net-http` as a command.
 
 ## The game at the table
 
@@ -249,7 +303,10 @@ same as against Stockfish, with these differences:
   client comes back by itself after a random delay, longer when the server is full or restarting
   but 8 s at most during a game unless the server asked to wait longer (a `Retry-After`): the
   server keeps the game for the reconnection grace, at least 15 s by default and 90 s after a
-  restart (`dedicated-server/docs/PROTOCOL.md`, lifecycle step 6). After a restart the server
+  restart (`dedicated-server/docs/PROTOCOL.md`, lifecycle step 6). The delay grows with each
+  attempt and starts again from the shortest only after a connection that stayed up for a
+  minute, so a server that closes right after letting the player in is not called again every
+  second or two. After a restart the server
   also holds the clock of the side to move until that player is back, 20 s at most by default:
   its snapshots then name no running clock, so both clocks stay frozen, and the snapshot that
   follows when the held clock starts (sent to the opponent too) sets them running again. The
@@ -258,8 +315,9 @@ same as against Stockfish, with these differences:
   another server id in the WebSocket's `101` answer) ends the session as "unauthorized" instead,
   and the saved sign-in is dropped without being sent.
 - **Esc menu.** Resume, offer draw, claim draw, abort (before my first move, in place of
-  resign), resign, report opponent (server games), options, leave (confirmed: resigns, or aborts
-  before my first move). The clock keeps running behind it.
+  resign), resign, report opponent (server games; sent once the game has ended, the server only
+  taking reports of finished games: a notice says so when it is made during the game), options,
+  leave (confirmed: resigns, or aborts before my first move). The clock keeps running behind it.
 - **End.** `GameEnd` waits for the last move to be on the board, then the usual end (result on
   the scoresheets, handshake, game over card) with the online reasons (abandonment, no show,
   aborted...), the rating change from `RatingUpdate` ("Rating: …" until it arrives), rematch and

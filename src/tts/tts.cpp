@@ -8,17 +8,19 @@
 #include <cctype>
 #include <chrono>
 #include <cmath>
+#include <system_error>
 
 namespace tts {
 namespace {
 
 constexpr int kDefaultVoice = 7;              // M3 in voice.bin (F1..F5, M1..M5), chosen by listening
-constexpr int kSilenceSamples = 13230;        // 0.3 s between chunks (official helper)
+constexpr int kSilenceSamples = kSampleRate * 3 / 10;   // 0.3 s between chunks (official helper)
 constexpr float kMinChunkSeconds = 0.1f;      // shortest chunk (sherpa-onnx kMinDuration)
 constexpr int64_t kMaxLatentFrames = 10000;   // longest chunk (sherpa-onnx kMaxLatentLen)
 constexpr float kTargetRms = 0.1f;            // -20 dBFS
 constexpr float kPeakLimit = 0.891251f;       // -1 dBFS
-constexpr int kFadeSamples = 441;             // 10 ms
+constexpr int kFadeSamples = kSampleRate / 100;         // 10 ms
+constexpr size_t kLoudnessBlock = kSampleRate / 50;     // 20 ms
 
 using Clock = std::chrono::steady_clock;
 double since(Clock::time_point t) { return std::chrono::duration<double>(Clock::now() - t).count(); }
@@ -67,15 +69,20 @@ uint32_t textSeed(const std::string& text, const std::string& lang, int voice) {
     return h ? h : 1u;
 }
 
+}  // namespace
+
 // Loudness: gain to about -20 dBFS RMS over the active part (20 ms blocks within 40 dB of the
-// loudest block), capped so the peak stays at -1 dBFS; then 10 ms raised-cosine fades.
+// loudest block), capped so the peak stays at -1 dBFS; then 10 ms raised-cosine fades. A
+// non-finite sample (a damaged model) becomes silence first: it would skip the measures and reach
+// the mixer.
 void finishPcm(std::vector<float>& pcm) {
     if (pcm.empty()) return;
-    const size_t block = 882;
+    for (float& v : pcm)
+        if (!std::isfinite(v)) v = 0.0f;
     std::vector<double> ms;
     double loudest = 0.0;
-    for (size_t b = 0; b < pcm.size(); b += block) {
-        size_t e = std::min(pcm.size(), b + block);
+    for (size_t b = 0; b < pcm.size(); b += kLoudnessBlock) {
+        size_t e = std::min(pcm.size(), b + kLoudnessBlock);
         double s = 0.0;
         for (size_t i = b; i < e; ++i) s += double(pcm[i]) * pcm[i];
         ms.push_back(s / double(e - b));
@@ -102,6 +109,8 @@ void finishPcm(std::vector<float>& pcm) {
         pcm[pcm.size() - 1 - i] *= w;
     }
 }
+
+namespace {
 
 std::string modelTag(const std::string& lang) {
     std::string l = lang.substr(0, lang.find_first_of("-_"));
@@ -150,8 +159,8 @@ bool Synthesizer::loadFrom(const std::string& dir, std::string* error) {
         return false;
     }
     engine_ = std::move(e);
-    LOGI("tts: models loaded from %s (%.0f MB, %s kernels, %.0f ms)", dir.c_str(), engine_->modelBytes() / 1048576.0,
-         kern::active().name, since(t0) * 1000.0);
+    LOGI("tts: models loaded from %s (%.0f MB, %s kernels at load, %.0f ms)", dir.c_str(),
+         engine_->modelBytes() / 1048576.0, kern::active().name, since(t0) * 1000.0);
     return true;
 }
 
@@ -166,7 +175,10 @@ bool Synthesizer::load(std::string* error) {
 ThreadPool* Synthesizer::pool(int threads) {
     threads = std::max(1, std::min(threads, 16));
     if (threads == 1) return nullptr;
-    if (!pool_ || pool_->size() != threads) pool_ = std::make_unique<ThreadPool>(threads);
+    if (!pool_ || poolThreads_ != threads) {
+        pool_ = std::make_unique<ThreadPool>(threads);
+        poolThreads_ = threads;
+    }
     return pool_.get();
 }
 
@@ -202,10 +214,14 @@ std::vector<float> Synthesizer::synthesize(const std::string& textIn, const std:
         if (ids.empty()) continue;
         auto t = Clock::now();
         float seconds = 0.0f;
-        if (!eng.duration(ids, voice, ctx, &seconds, &err)) break;
+        if (!eng.duration(ids, voice, ctx, &seconds, &err, cancel)) break;
         stats_.duration += since(t);
         seconds = std::max(seconds / speed, kMinChunkSeconds);
-        int64_t wavLen = int64_t(double(seconds) * kSampleRate);
+        if (!std::isfinite(seconds)) {
+            err = "duration predictor: non-finite duration";
+            break;
+        }
+        int64_t wavLen = int64_t(std::min(double(seconds) * kSampleRate, double(kMaxLatentFrames) * kFrameSamples));
         int64_t frames = std::min<int64_t>((wavLen + kFrameSamples - 1) / kFrameSamples, kMaxLatentFrames);
         wavLen = std::min<int64_t>(wavLen, frames * kFrameSamples);
         Tensor noise = Tensor::alloc(DType::F32, {1, kLatentChannels, frames});
@@ -213,7 +229,7 @@ std::vector<float> Synthesizer::synthesize(const std::string& textIn, const std:
 
         t = Clock::now();
         Tensor emb;
-        if (!eng.encode(ids, voice, ctx, &emb, &err)) break;
+        if (!eng.encode(ids, voice, ctx, &emb, &err, cancel)) break;
         stats_.textEncoder += since(t);
         t = Clock::now();
         Tensor latent;
@@ -221,7 +237,7 @@ std::vector<float> Synthesizer::synthesize(const std::string& textIn, const std:
         stats_.vectorEstimator += since(t);
         t = Clock::now();
         Tensor wav;
-        if (!eng.vocode(latent, ctx, &wav, &err)) break;
+        if (!eng.vocode(latent, ctx, &wav, &err, cancel)) break;
         stats_.vocoder += since(t);
         wavLen = std::min<int64_t>(wavLen, wav.count());
         if (!out.empty()) out.resize(out.size() + kSilenceSamples, 0.0f);
@@ -252,8 +268,15 @@ bool Worker::start(const Options& o) {
     started_ = true;
     ready_ = false;
     failed_ = false;
+    warmUpFailed_ = false;
     cancelRunning_ = false;
-    thread_ = std::thread([this] { run(); });
+    try {
+        thread_ = std::thread([this] { run(); });
+    } catch (const std::system_error& e) {
+        LOGE("tts: cannot start the speech thread (%s)", e.what());
+        started_ = false;
+        return false;
+    }
     return true;
 }
 
@@ -274,12 +297,12 @@ void Worker::stop() {
     ready_ = false;
 }
 
-uint32_t Worker::request(const std::string& text, const std::string& lang, int priority, uint32_t seed) {
+uint32_t Worker::request(const std::string& text, const std::string& lang, int priority, uint32_t seed, float speed) {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!started_ || quit_ || failed_) return 0;
     uint32_t id = nextId_++;
     if (nextId_ == 0) nextId_ = 1;
-    queue_.push_back(Job{id, priority, order_++, seed, text, lang});
+    queue_.push_back(Job{id, priority, order_++, seed, speed > 0.0f ? speed : 0.0f, text, lang});
     wake_.notify_all();
     return id;
 }
@@ -320,12 +343,26 @@ void Worker::run() {
     lowerThreadPriority();
     Synthesizer synth;
     std::string err;
-    bool ok = synth.load(&err);
-    if (ok) {
-        // Warm-up: pages the weights in and sizes the allocator before the first real line.
-        Options w = opts_;
-        w.seed = 1;
-        synth.synthesize("Hello.", "en", w, &cancelRunning_);
+    bool ok = false;
+    // An exception (std::bad_alloc, std::system_error) must not leave the thread: it would end the
+    // game. The load then fails, a line ends with no samples (subtitles), as on any other error.
+    try {
+        ok = synth.load(&err);
+        if (ok) {
+            // Warm-up: pages the weights in and starts the thread pool before the first real line
+            // (the buffer cache is trimmed after every line). Intact files always give it samples:
+            // none (unless stop() cancelled it) means damaged files that still load.
+            Options w = opts_;
+            w.seed = 1;
+            if (synth.synthesize("Hello.", "en", w, &cancelRunning_).empty() && !cancelRunning_.load()) {
+                LOGE("tts: speech unavailable (the warm-up synthesis failed)");
+                warmUpFailed_ = true;
+                ok = false;
+            }
+        }
+    } catch (const std::exception& e) {
+        LOGE("tts: speech unavailable (%s)", e.what());
+        ok = false;
     }
     {
         std::lock_guard<std::mutex> lock(mutex_);
@@ -351,7 +388,14 @@ void Worker::run() {
         lock.unlock();
         Options o = opts_;
         o.seed = job.seed;
-        std::vector<float> pcm = synth.synthesize(job.text, job.lang, o, &cancelRunning_);
+        if (job.speed > 0.0f) o.speed = job.speed;
+        std::vector<float> pcm;
+        try {
+            pcm = synth.synthesize(job.text, job.lang, o, &cancelRunning_);
+        } catch (const std::exception& e) {
+            LOGE("tts: synthesis failed: %s", e.what());
+            pcm.clear();
+        }
         lock.lock();
         if (!cancelRunning_ && !quit_) results_[job.id] = std::move(pcm);
         running_ = 0;

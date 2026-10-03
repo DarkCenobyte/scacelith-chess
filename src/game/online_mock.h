@@ -45,10 +45,8 @@
 // 503 (server_busy, retry after 8 s), a PGN whose White or Black is "ratelimited" or "serverbusy"
 // (the same), a host containing "nogif" (gif_disabled).
 //
-// Used by src/game/online_stub.cpp (the OnlineClient / DirectMatch implementation of builds
-// without the real network layer, i.e. without SCACELITH_NET_REAL) and meant to back a
-// --online-mock developer mode next to the real implementation. Engine-free, single-threaded:
-// everything happens inside poll().
+// Backs the --online-mock developer mode (game::OnlineSession::init) and the tests. Engine-free,
+// single-threaded: everything happens inside poll().
 #pragma once
 #include "../net/direct_match.h"
 #include "../net/online_client.h"
@@ -86,15 +84,17 @@ public:
     FakeServer& operator=(const FakeServer&) = delete;
 
     void setServer(const ServerEndpoint& ep);
+    void forgetSavedPin() {}          // the fakes have no certificates
     const ServerEndpoint& server() const;
-    void fetchServerInfo();
+    void fetchServerInfo(bool ignoreSavedPin = false);   // ignoreSavedPin: no effect (no certificates)
     bool hasSavedSession() const;
     std::string savedUsername() const;
     void registerAccount(const std::string& username, const std::string& email, const std::string& password);
     void login(const std::string& usernameOrEmail, const std::string& password);
     void loginMfa(const std::string& code);
-    void startGoogleSso();
+    void startGoogleSso(const SsoBrowserPage& page);
     void completeSso(const std::string& username);
+    void linkSso(const std::string& password);
     void cancelSso();
     void logout(bool allSessions);
     void fetchAccount();
@@ -140,7 +140,6 @@ public:
     void requestResync(uint64_t gameId);
     void rematch(uint64_t gameId, bool accept);
     void sendGesture(uint64_t gameId, const Gesture& g);
-    const OnlineGame* currentGame() const;
     bool poll(Event& out);
 
     struct Impl;

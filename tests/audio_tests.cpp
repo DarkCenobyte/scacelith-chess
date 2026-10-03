@@ -7,6 +7,7 @@
 // WAV files for listening are written to /tmp/audio_out/ (Windows: %TEMP%\scacelith_audio_out).
 #include "test.h"
 #include "audio/audio.h"
+#include "audio/backend.h"
 #include "audio/mixer.h"
 #include "audio/offline.h"
 #include "audio/queue.h"
@@ -218,6 +219,7 @@ TEST(audio_synth_variants_sane) {
         for (uint32_t seed = 1; seed <= 5; ++seed) {
             std::vector<float> v = audio::synthesize(ex.sfx, seed * 7777u);
             CHECK(v.size() > 64);
+            CHECK_EQ(v.capacity(), v.size());  // the bank keeps no synthesis scratch capacity
             float peak = 0.0f;
             bool finite = true;
             int den = 0;
@@ -441,6 +443,68 @@ TEST(audio_spatial_pan_itd_behind_distance) {
     CHECK(std::fabs(l01 - l015) < 0.5);
 }
 
+// A device running at 176.4 / 192 kHz (Windows' "Default Format" can be one) up to the 384 kHz limit:
+// a far-lateral source still gets the full interaural delay, about 0.66 ms.
+TEST(audio_spatial_itd_at_high_device_rates) {
+    using namespace audio;
+    ListenerPose lis;
+    lis.pos = m::vec3(0, 1.2f, 0);
+    lis.fwd = m::vec3(0, 0, -1);
+    lis.up = m::vec3(0, 1, 0);
+    const m::vec3 right(0.5f, 1.2f, 0.0f);
+    // The chain alone at 384 kHz, dry and with no head shadow: an impulse reaches the far ear
+    // exactly the ITD later (251.8 samples, between two samples).
+    const SpatialParams sp = computeSpatial(makeBasis(lis), right, 384000.0f);
+    SpatialTarget t;
+    t.gL = t.gR = 1.0f;
+    t.itd = sp.itd;
+    SpatialChain chain;
+    chain.begin(t, 512);
+    double sum = 0.0, moment = 0.0;
+    for (int i = 0; i < 512; ++i) {
+        float l = 0.0f, r = 0.0f, room = 0.0f;
+        chain.tick(i == 0 ? 1.0f : 0.0f, l, r, room);
+        sum += l;
+        moment += double(i) * l;
+    }
+    const double arrival = sum > 0.0 ? moment / sum : -1.0;
+    std::fprintf(stderr, "  384 kHz: ITD %.2f samples, impulse at the far ear after %.2f samples\n", sp.itd, arrival);
+    CHECK(sp.itd > 250.0f);
+    CHECK(std::fabs(arrival - double(sp.itd)) < 0.01);
+    // The whole mixer at 192 kHz: the left ear lags by ~126 samples (plus the far-ear shadow's delay).
+    Mixer mx(3u);
+    mx.prepare(192000.0f);
+    mx.setVolumes(1.0f, 1.0f, 1.0f);
+    mx.setAmbienceEnabled(false, true);
+    mx.setRoomEnabled(false);
+    mx.setListener(lis);
+    for (int v = 0; v < bankVariants(Sfx::PiecePlace); ++v) {
+        SoundBuffer* b = new SoundBuffer();
+        b->samples = synthesize(Sfx::PiecePlace, 3u + uint32_t(v));
+        b->sfx = int(Sfx::PiecePlace);
+        b->variant = v;
+        mx.install(b);
+    }
+    PlayRequest req;
+    req.sfx = Sfx::PiecePlace;
+    req.pos = right;
+    CHECK(mx.play(req));
+    std::vector<float> out(size_t(0.3f * 192000.0f) * 2);
+    mx.process(out.data(), int(out.size() / 2));
+    int bestLag = 0;
+    double best = -1e30;
+    for (int lag = -160; lag <= 160; ++lag) {
+        double s = 0;
+        for (size_t i = 200; i + 200 < out.size() / 2; ++i) s += double(out[2 * i + 1]) * out[2 * (size_t(long(i) + lag))];
+        if (s > best) {
+            best = s;
+            bestLag = lag;
+        }
+    }
+    std::fprintf(stderr, "  192 kHz mixer: left-ear lag %d samples\n", bestLag);
+    CHECK(bestLag >= 120 && bestLag <= 140);
+}
+
 TEST(audio_repeated_triggers_differ) {
     using namespace audio;
     Mixer m(42u);
@@ -512,6 +576,35 @@ TEST(audio_windowed_play) {
         CHECK(peak > 1e-3f);
         CHECK(first < 0.02f * peak);                                    // faded in
         CHECK(heard > dur * 0.85f && heard < dur * 1.1f + 0.003f);    // pitch jitter +-4 %
+    }
+}
+
+// A huge pitch (only finiteness is checked) moves the read position past INT_MAX after one sample:
+// the voice must end there instead of reading silence until it is stolen.
+TEST(audio_huge_pitch_voice_ends) {
+    using namespace audio;
+    Mixer m(7u);
+    m.prepare(kFs);
+    m.setAmbienceEnabled(false, true);
+    for (int v = 0; v < kVariants; ++v) {
+        SoundBuffer* b = new SoundBuffer();
+        b->samples = synthesize(Sfx::PiecePlace, 500u + uint32_t(v));
+        b->sfx = int(Sfx::PiecePlace);
+        b->variant = v;
+        m.install(b);
+    }
+    for (float pitch : {3e9f, 1e12f, 1e30f}) {
+        PlayRequest r;
+        r.sfx = Sfx::PiecePlace;
+        r.pos = m::vec3(0.0f, 0.78f, 0.0f);
+        r.pitch = pitch;
+        CHECK(m.play(r));
+        std::vector<float> out(size_t(0.1f * kFs) * 2);
+        m.process(out.data(), int(out.size() / 2));
+        CHECK_EQ(m.activeVoices(), 0);
+        bool finite = true;
+        for (float x : out) finite = finite && std::isfinite(x);
+        CHECK(finite);
     }
 }
 
@@ -655,6 +748,59 @@ TEST(audio_mixer_cpu_cost) {
     CHECK_EQ(m.activeSpeech(), 1);  // the speech sounded through both phases
     CHECK(typical < 0.02f);
     CHECK(stress < 0.10f);
+}
+
+// WASAPI: a mix format the mixer cannot run at is handed to the engine as float32 stereo at a
+// rate the mixer can run at (the engine converts), never at the unusable device rate.
+TEST(audio_backend_fallback_rate) {
+    using namespace audio;
+    for (unsigned long rate : {8000ul, 44100ul, 48000ul, 192000ul, 384000ul}) CHECK_EQ(fallbackDeviceRate(rate), int(rate));
+    for (unsigned long rate : {0ul, 4000ul, 7999ul, 384001ul, 705600ul, 768000ul}) CHECK_EQ(fallbackDeviceRate(rate), 48000);
+}
+
+// WASAPI reopen back-off: it grows over consecutive failures, a stream that played or a device that
+// comes back restarts it, and a device that fails right after opening is not reopened in a tight loop.
+TEST(audio_backend_reopen_policy) {
+    using namespace audio;
+    ReopenBackoff b;
+    // No device at start-up: the back-off grows to 5 s.
+    for (int ms : {250, 500, 1000, 2000, 4000, 5000, 5000}) CHECK_EQ(b.waitMs(false, StreamEnd::Stalled, false), ms);
+    // The device came back and played, then stalled: 250 ms, not the 5 s left by the earlier failures.
+    CHECK_EQ(b.waitMs(true, StreamEnd::Stalled, true), 250);
+    CHECK_EQ(b.waitMs(true, StreamEnd::Stalled, false), 500);  // stalled again at once
+    // A working device lost: at once, back-off reset.
+    CHECK_EQ(b.waitMs(true, StreamEnd::Lost, true), 0);
+    CHECK_EQ(b.failures, 0);
+    // A device that opens but fails at once backs off like a failed open...
+    for (int ms : {250, 500, 1000}) CHECK_EQ(b.waitMs(true, StreamEnd::Lost, false), ms);
+    // ...while a default-device change reopens at once, even right after an open.
+    CHECK_EQ(b.waitMs(true, StreamEnd::Changed, false), 0);
+    CHECK_EQ(b.failures, 0);
+    // No device for a while, then it comes back but flaps right after opening (a waking HDMI sink):
+    // the back-off restarts at 250 ms instead of the 5 s left by the failed opens, then grows again.
+    for (int ms : {250, 500, 1000, 2000, 4000, 5000, 5000}) CHECK_EQ(b.waitMs(false, StreamEnd::Stalled, false), ms);
+    for (int ms : {250, 500, 1000}) CHECK_EQ(b.waitMs(true, StreamEnd::Lost, false), ms);
+    // Failed opens go on with that back-off; a stream that stalls right after the device came back
+    // restarts it too.
+    for (int ms : {2000, 4000}) CHECK_EQ(b.waitMs(false, StreamEnd::Stalled, false), ms);
+    CHECK_EQ(b.waitMs(true, StreamEnd::Stalled, false), 250);
+}
+
+// WASAPI underruns: every dry buffer counts (and raises the latency) once the first 4 audio events
+// of the stream have passed, the first glitch included; a new stream has its own grace.
+TEST(audio_backend_underrun_detection) {
+    using namespace audio;
+    // Padding (frames still queued in the device) seen by each audio event of a stream.
+    auto underruns = [](std::initializer_list<unsigned> paddings) {
+        UnderrunDetector d;
+        int n = 0;
+        for (unsigned p : paddings) n += d.onEvent(p) ? 1 : 0;
+        return n;
+    };
+    CHECK_EQ(underruns({0, 0, 0, 0}), 0);                         // a stream that settles
+    CHECK_EQ(underruns({480, 480, 480, 480, 480, 0, 480}), 1);    // the first glitch after it
+    CHECK_EQ(underruns({480, 480, 480, 480, 0, 0, 480, 0}), 3);   // and every one after that
+    CHECK_EQ(underruns({0, 480, 480, 480, 0}), 1);                // a dry start, then a glitch
 }
 
 TEST(audio_live_engine_init_shutdown) {
@@ -1660,4 +1806,41 @@ TEST(audio_voice_live_engine) {
         }
     }
 #endif
+}
+
+// A non-finite sample in the coach's PCM (a TTS numeric blow-up) is silenced on the way in: it
+// must not latch NaN into the hall reverb and the DC blockers, which would mute every later sound.
+TEST(audio_voice_non_finite_samples) {
+    using namespace audio;
+    using namespace std::chrono_literals;
+    setAmbienceEnabled(false);
+    if (!init()) {  // Windows without a device: nothing plays
+        shutdown();
+        setAmbienceEnabled(true);
+        return;
+    }
+    const ListenerPose lis = whiteSeatListener();
+    setListener(lis.pos, lis.fwd, lis.up);
+    std::this_thread::sleep_for(400ms);  // bank synthesis
+    VoiceParams vp;
+    vp.position = coachMouthDefault();
+    vp.sampleRate = kSrcRate;
+    std::vector<float> pcm = speechLike(0.3f, kSrcRate, 50u);
+    pcm[1000] = NAN;
+    pcm[2000] = INFINITY;
+    pcm[3000] = -INFINITY;
+    VoiceId v = playVoice(std::move(pcm), vp);
+    CHECK(bool(v));
+    CHECK_EQ(waitVoice(v, 2.0f, [](const VoiceStatus& s) { return isState(s, VoiceState::Finished); }).state,
+             VoiceState::Finished);
+    std::this_thread::sleep_for(100ms);
+    debugTakeOutputPeak();
+    play(Sfx::PiecePlace, m::vec3(0.0f, 0.78f, 0.0f));
+    std::this_thread::sleep_for(300ms);
+    const float peak = debugTakeOutputPeak();  // NaN output would leave it at 0
+    std::fprintf(stderr, "  live: piece placed after a non-finite voice: peak %.1f dBFS\n", db(peak));
+    CHECK(std::isfinite(peak) && peak > 0.001f && peak <= kMinus1dB);
+    shutdown();
+    CHECK_EQ(debugSpeechChunksAlive(), 0);
+    setAmbienceEnabled(true);
 }

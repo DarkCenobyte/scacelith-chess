@@ -4,7 +4,6 @@
 #include "ui_font.h"
 #include "ui_internal.h"
 #include "ui_screens_game.h"
-#include "ui_theme.h"
 #include "ui_widgets.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
@@ -83,7 +82,6 @@ void beginFrame(int width, int height, float dt) {
 
 void endFrame() {
     if (!g_inFrame) return;
-    detail::screensEndFrame();
     im::endFrame();
     if (g_inited) gfx::endFrame();
     g_inFrame = false;
@@ -100,25 +98,6 @@ void text(const std::string& s, m::vec2 pos, float sizePx, m::vec4 color, Align 
     ts.align = halign(align);
     ts.tracking = tracking;
     gfx::text(s, pos.x, pos.y + font::metrics(ts.face).ascent * sizePx, ts);
-}
-
-m::vec2 measure(const std::string& s, float sizePx, FontStyle st, float tracking) {
-    gfx::TextStyle ts;
-    ts.face = faceOf(st);
-    ts.size = sizePx;
-    ts.tracking = tracking;
-    const font::Metrics& mt = font::metrics(ts.face);
-    return {gfx::textWidth(s, ts), (mt.ascent + mt.descent) * sizePx};
-}
-
-void rect(m::vec2 pos, m::vec2 size, m::vec4 color, float radius) { gfx::fill(gfx::Rect(pos.x, pos.y, size.x, size.y), color, radius); }
-
-void fullscreenTint(m::vec4 color) {
-    gfx::Layer prev = gfx::layer();
-    gfx::setLayer(gfx::LAYER_BACK);
-    m::vec2 v = gfx::viewSize();
-    gfx::fill(gfx::Rect(0, 0, v.x, v.y), color);
-    gfx::setLayer(prev);
 }
 
 m::vec2 viewSize() { return gfx::viewSize(); }
@@ -149,7 +128,6 @@ void setVersionString(const std::string& v) { detail::data().version = v; }
 void setCoachLevels(const std::vector<CoachLevelInfo>& levels) {
     if (!levels.empty()) detail::data().coachLevels = levels;
 }
-const std::vector<CoachLevelInfo>& coachLevels() { return detail::data().coachLevels; }
 
 namespace {
 // "Club Player" -> "preset.club_player" (the section "Opponent presets" of the .lang files).

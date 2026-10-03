@@ -1,14 +1,16 @@
 // The director performs coach scripts (coach/script.h) on the Stage: it renders each line twice
 // (written for the subtitle, spoken for the voice, same variant), has it synthesised ahead of time,
 // plays it, times the gestures and marks on the words they refer to (coach/pacing.h), runs the
-// demonstrations and rewinds, and applies the turn-taking rules of research-pedagogy §6.5:
+// demonstrations and rewinds, and applies the turn-taking rules:
 //   - Urgent beats go before everything queued and cut a running Normal/Low line at its next
-//     sentence boundary (a pause of the synthesised audio);
+//     pause at a punctuation mark (comma, colon, dash or sentence end; a pause of the synthesised
+//     audio);
 //   - Normal and Low beats queue behind beats of the same or a higher priority;
 //   - Low beats are dropped when stale (their ply is more than two plies old) or once the player
 //     acts (playerActed);
-//   - Space skips the running skippable beat and the skippable beats of the same script after it;
-//     a Rewind is never skipped, it only goes faster.
+//   - Space skips the running skippable beat and the skippable beats of the same script after it
+//     (skipCurrent(): the running beat only, and of a demonstration move only its narration); a
+//     Rewind is never skipped, it only goes faster.
 // Engine-free and GL-free: the world is reached through coach::Stage only.
 #pragma once
 #include "script.h"
@@ -53,7 +55,7 @@ public:
     // Insert a script right after the running beat, ahead of everything queued, without cutting
     // the running beat (the rules lesson's reactions before a WaitMove waits again).
     void playNext(const Script& script);
-    // Synthesise these lines ahead of time (the next lesson chapter, frequent event lines).
+    // Synthesise these lines ahead of time (the next lesson chapter).
     void prefetch(const std::vector<Line>& lines);
 
     // Every frame while the game runs. 'ply' = the number of moves played in the game now (for
@@ -61,6 +63,7 @@ public:
     void update(float dt, int ply);
     void setPaused(bool paused);     // focus lost, pause menu: the voice pauses, nothing starts
     void skip();                     // Space
+    void skipCurrent();              // Space in the rules lesson: the running beat only
     void playerActed();              // the player touched a piece: queued Low beats are dropped
     // Stop now: voice, subtitle, gestures, marks, the offer card and every queued beat (a takeback,
     // leaving the game). Table actions already running finish in the scene.
@@ -68,6 +71,9 @@ public:
 
     bool idle() const;               // nothing running, nothing queued
     bool speaking() const;           // a line is being heard (or read, without voice)
+    // Key of the line the running beat says once it has started (heard, or shown without a voice);
+    // nullptr otherwise.
+    const std::string* runningKey() const;
     bool skippable() const;          // Space would skip something now
     // The running beat is a WaitMove (rules lesson); *expect = its expectation index.
     bool waitingMove(int* expect = nullptr) const;
@@ -75,7 +81,9 @@ public:
     // The running beat is an OfferTakeback whose line has been said: the card is shown and the
     // director waits for closeOffer().
     bool offerOpen() const;
-    void closeOffer();               // answered: hide the card, go on (the session drops beats if taken back)
+    // Answered: hide the card, go on (the session drops beats if taken back). An offer not shown yet
+    // is dropped. False when there was no offer.
+    bool closeOffer();
 
     const std::vector<ShownMark>& marks() const;
 

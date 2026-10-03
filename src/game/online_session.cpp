@@ -1,15 +1,16 @@
 #include "online_session.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
+#include "../net/protocol_gen.h"
 #include "../platform/platform.h"
 #include "../ui/ui.h"
 #include "online_mock.h"
 #include "settings.h"
 #include <algorithm>
+#include <cctype>
 #include <chrono>
 #include <cmath>
 #include <cstdio>
-#include <ctime>
 
 namespace game {
 
@@ -25,14 +26,16 @@ public:
     explicit ServerApiOf(C& c) : c_(&c) {}
     explicit ServerApiOf(std::unique_ptr<C> own) : own_(std::move(own)), c_(own_.get()) {}
     void setServer(const net::ServerEndpoint& ep) override { c_->setServer(ep); }
-    void fetchServerInfo() override { c_->fetchServerInfo(); }
+    void forgetSavedPin() override { c_->forgetSavedPin(); }
+    void fetchServerInfo(bool ignoreSavedPin) override { c_->fetchServerInfo(ignoreSavedPin); }
     bool hasSavedSession() const override { return c_->hasSavedSession(); }
     std::string savedUsername() const override { return c_->savedUsername(); }
     void registerAccount(const std::string& u, const std::string& e, const std::string& p) override { c_->registerAccount(u, e, p); }
     void login(const std::string& u, const std::string& p) override { c_->login(u, p); }
     void loginMfa(const std::string& code) override { c_->loginMfa(code); }
-    void startGoogleSso() override { c_->startGoogleSso(); }
+    void startGoogleSso(const net::SsoBrowserPage& page) override { c_->startGoogleSso(page); }
     void completeSso(const std::string& u) override { c_->completeSso(u); }
+    void linkSso(const std::string& p) override { c_->linkSso(p); }
     void cancelSso() override { c_->cancelSso(); }
     void logout(bool all) override { c_->logout(all); }
     void fetchAccount() override { c_->fetchAccount(); }
@@ -193,14 +196,30 @@ bool isGameEvent(Kind k) {
            k == Kind::GameEnd || k == Kind::RatingUpdate || k == Kind::OpponentGesture;
 }
 
-// Realtime error codes that belong to a game (net::proto ErrorCode 100..112).
-bool isGameError(int code) { return code >= 100 && code <= 112; }
-
 // Protocol values (dedicated-server/src/protocol/schema.js).
 enum ChallengeState { ChPending = 0, ChAccepted = 1, ChDeclined = 2, ChCancelled = 3, ChExpired = 4, ChUnavailable = 5 };
 enum QueueState { QLeft = 0, QSearching = 1, QMatched = 2 };
 enum NoticeCode { NShutdown = 1, NBanned = 2, NRevoked = 3, NCooldown = 4, NReplaced = 5, NRatingRestored = 7 };
-constexpr int kErrMatchmakingCooldown = 207;
+constexpr int kErrChallengeNotFound = 201, kErrMatchmakingCooldown = 207;
+// The names above are the generated ones (net/protocol_gen.h): a schema change fails here.
+static_assert(ChPending == int(net::proto::ChallengeState::Pending) && ChAccepted == int(net::proto::ChallengeState::Accepted) &&
+                  ChDeclined == int(net::proto::ChallengeState::Declined) &&
+                  ChCancelled == int(net::proto::ChallengeState::Cancelled) &&
+                  ChExpired == int(net::proto::ChallengeState::Expired) &&
+                  ChUnavailable == int(net::proto::ChallengeState::Unavailable),
+              "ChallengeState");
+static_assert(QLeft == int(net::proto::QueueState::Left) && QSearching == int(net::proto::QueueState::Searching) &&
+                  QMatched == int(net::proto::QueueState::Matched),
+              "QueueState");
+static_assert(NShutdown == int(net::proto::NoticeCode::ServerShutdown) && NBanned == int(net::proto::NoticeCode::Banned) &&
+                  NRevoked == int(net::proto::NoticeCode::SessionRevoked) &&
+                  NCooldown == int(net::proto::NoticeCode::MatchmakingCooldown) &&
+                  NReplaced == int(net::proto::NoticeCode::ReplacedByNewConnection) &&
+                  NRatingRestored == int(net::proto::NoticeCode::RatingRestored),
+              "NoticeCode");
+static_assert(kErrChallengeNotFound == int(net::proto::ErrorCode::ChallengeNotFound) &&
+                  kErrMatchmakingCooldown == int(net::proto::ErrorCode::MatchmakingCooldown),
+              "ErrorCode");
 
 // Seconds of the monotonic clock: when a page last showed the state of the GIF being made.
 double gifClock() { return std::chrono::duration<double>(std::chrono::steady_clock::now().time_since_epoch()).count(); }
@@ -272,6 +291,12 @@ void OnlineSession::applyServer() {
     if (!ep.valid()) return;
     if (queue_.searching) api_->leaveQueue();
     api_->setServer(ep);
+    // The pin field of this server emptied (same host and port): the pin saved with its session at
+    // sign-in goes too, or it would still apply where the field's help promises the system's
+    // certificates.
+    const bool custom = settings().onlineCustomServer || !officialAvailable();
+    if (live::savedPinDropped(ep, applied_, custom)) api_->forgetSavedPin();
+    applied_ = ep;
     info_ = net::ServerInfo();
     infoKnown_ = false;
     infoError_.clear();
@@ -281,9 +306,12 @@ void OnlineSession::applyServer() {
     conn_ = api_->state();
     queue_ = Queue();
     outgoing_ = Outgoing();
+    cancelledEarly_.clear();
+    joining_ = false;
     incoming_.clear();
     answers_.setServer(ep.origin());
-    ratingRestored_ = live::HeldNotice();  // points of the previous server's account
+    serverNameRt_.clear();
+    resetAccountState();  // of the previous server's account
     LOGI("online: server %s", ep.origin().c_str());
 }
 
@@ -293,14 +321,16 @@ void OnlineSession::refreshInfo() {
     expect(Kind::ServerInfoResult);
 }
 
-void OnlineSession::testServer(const net::ServerEndpoint& ep) {
+void OnlineSession::testServer(const net::ServerEndpoint& ep, bool custom) {
     if (!ep.valid() || testing_) return;
     ServerApi& a = api();
     net::ServerEndpoint cur = endpoint();
     testSwitched_ = !(ep.origin() == cur.origin() && ep.wsPort == cur.wsPort && ep.pinnedSha256 == cur.pinnedSha256);
     if (testSwitched_) a.setServer(ep);
-    a.fetchServerInfo();
+    // Without the pin saved at sign-in when Apply would forget it (its field emptied).
+    a.fetchServerInfo(live::savedPinDropped(ep, applied_, custom));
     testing_ = true;
+    testOrigin_ = ep.origin();
     testDone_ = false;
 }
 
@@ -349,6 +379,14 @@ void OnlineSession::signOut(bool everywhere) {
     account_ = net::AccountInfo();
     data_.clear();
     incoming_.clear();
+    resetAccountState();
+}
+
+// The ban, the matchmaking cooldown and the RatingRestored points known of the account signed in
+// until now: not those of the next one (or of the next server's).
+void OnlineSession::resetAccountState() {
+    bannedUntilMs_ = cooldownUntilMs_ = 0;
+    ratingRestored_ = live::HeldNotice();
 }
 
 // ---- Requests -------------------------------------------------------------------------------------
@@ -484,17 +522,27 @@ void OnlineSession::createPrivateGame(int baseSec, int incSec, bool rated, int c
     outgoing_.rated = rated;
 }
 
-void OnlineSession::joinPrivateGame(const std::string& code) { api().joinPrivateGame(code); }
+void OnlineSession::joinPrivateGame(const std::string& code) {
+    api().joinPrivateGame(code);
+    joining_ = true;
+}
 
 void OnlineSession::cancelOutgoing() {
     if (!outgoing_.active) return;
     if (outgoing_.id) api().cancelChallenge(outgoing_.id);
+    else cancelledEarly_.push_back(outgoing_);  // its id comes with its Pending status
     outgoing_ = Outgoing();
+    quietNotFound_ = false;  // a ChallengeNotFound now may answer this cancel
 }
 
 void OnlineSession::answerChallenge(uint32_t id, bool accept) {
+    quietNotFound_ = false;  // a ChallengeNotFound now may answer this
     if (accept) {
         cancelSearch();
+        // A direct match being hosted or joined would start a second game over this one.
+        using DS = net::DirectMatch::State;
+        const DS st = directUsed_ ? direct_->state() : DS::Idle;
+        if (st == DS::OpeningPort || st == DS::WaitingForGuest || st == DS::Connecting || st == DS::Handshake) closeDirect();
         api().acceptChallenge(id);
     } else {
         api().declineChallenge(id);
@@ -507,12 +555,16 @@ void OnlineSession::answerChallenge(uint32_t id, bool accept) {
 
 void OnlineSession::hostDirect(const net::DirectHostOptions& opt) {
     cancelSearch();
+    // Accepted during the direct match, our challenge would start a server game over it. Offline,
+    // the next Welcome cancels it (a cancel now would only be refused as not connected).
+    if (conn_ == net::ConnState::Online) cancelOutgoing();
     direct().host(opt);
     directConn_ = net::ConnState::Offline;
 }
 
 void OnlineSession::joinDirect(const std::string& address, uint16_t port, const std::string& code) {
     cancelSearch();
+    if (conn_ == net::ConnState::Online) cancelOutgoing();
     const std::string& n = settings().playerName;
     std::string name = n.empty() || n == "Human" ? std::string(i18n::tr("player.default_name")) : n;
     direct().join(address, port, code, name);
@@ -553,7 +605,7 @@ GameLink* OnlineSession::takeGame(net::OnlineGame& snapshot) {
 
 bool OnlineSession::nextGameEvent(net::Event& e) {
     if (gameReady_ || gameEvents_.empty()) return false;  // a new game waits for takeGame()
-    e = gameEvents_.front();
+    e = std::move(gameEvents_.front());
     gameEvents_.pop_front();
     return true;
 }
@@ -572,7 +624,7 @@ void OnlineSession::quickStart(const std::string& category, const std::string& u
     if (!signedIn_) {
         if (api_->hasSavedSession()) {
             resume();
-        } else if (mock_ || !net::officialServer().valid()) {
+        } else if (mock_) {
             api_->login(username, "mock-password");
             expect(Kind::LoginResult);
         }
@@ -609,6 +661,12 @@ void OnlineSession::update(float dt) {
             ui::notify(gifErrorText(gif_.error(), gif_.retryAfterSec()), 6.0f);
         }
     }
+    // A challenge received is gone at its expiry, its Expired status missed or not (offline then).
+    if (!incoming_.empty()) {
+        const double now = nowMs();
+        incoming_.erase(std::remove_if(incoming_.begin(), incoming_.end(), [now](const Incoming& c) { return c.expiresMs <= now; }),
+                        incoming_.end());
+    }
     double restored = 0.0;
     if (ratingRestored_.take(inGame_, restored))
         ui::notify(i18n::trn("online.notice.rating_restored", std::lround(restored)), 8.0f);
@@ -621,10 +679,18 @@ void OnlineSession::update(float dt) {
 
 void OnlineSession::handleServer(net::Event& e) {
     if (isGameEvent(e.kind)) {
-        if (e.kind == Kind::RatingUpdate && !e.game.category.empty()) {
+        if (e.kind == Kind::RatingUpdate && !live::ratesShownGame(e)) {
+            // The update of an earlier game (it follows the game's commit: a rematch may have
+            // started meanwhile). e.game is the game shown now, not our side in that one.
+            if (signedIn_) {
+                api_->fetchAccount();
+                expect(Kind::AccountResult);
+            }
+        } else if (e.kind == Kind::RatingUpdate) {
             // The account page shows the new rating at once.
+            const std::string& category = live::ratingCategory(e);
             for (net::RatingInfo& r : account_.ratings) {
-                if (r.category != e.game.category) continue;
+                if (category.empty() || r.category != category) continue;
                 const net::Event::Rating& mine = e.game.you == 1 ? e.ratingBlack : e.ratingWhite;
                 r.rating = mine.after;
                 r.games = mine.games;
@@ -639,9 +705,10 @@ void OnlineSession::handleServer(net::Event& e) {
     // devices, account or session. Its GIF is still written and its PGN still saved (ServerAnswers
     // keeps it for the game page), each as the game it was asked for. (The info of the server being
     // tested in Options names that server.)
-    if (answers_.foreign(e) && !(e.kind == Kind::ServerInfoResult && testing_)) {
+    const bool testAnswer = live::testAnswer(e, testing_, testOrigin_);
+    if (answers_.foreign(e) && !testAnswer) {
         if (e.kind == Kind::GifResult) gif_.finish(std::move(e));
-        else if (!answers_.keep(e)) LOGI("online: an answer of %s dropped (another server since)", e.origin.c_str());
+        else if (!answers_.keep(std::move(e))) LOGI("online: an answer of %s dropped (another server since)", e.origin.c_str());
         return;
     }
     // A call that found the saved session refused (expired, revoked): the network layer erased the
@@ -650,11 +717,13 @@ void OnlineSession::handleServer(net::Event& e) {
         signedIn_ = false;
         LOGI("online: session refused, signed out");
     }
-    // HTTPS results are kept for the page that asked.
-    auto store = [&]() { answers_.keep(e); };
+    // HTTPS results are kept for the page that asked (moved: store() is the last use of e).
+    auto store = [&]() { answers_.keep(std::move(e)); };
     switch (e.kind) {
     case Kind::ServerInfoResult:
-        if (testing_) {
+        // The test's answer comes from the tested server (a refreshInfo() sent before the test is
+        // answered first: not the test's).
+        if (testAnswer) {
             testing_ = false;
             testDone_ = true;
             testResult_ = e;
@@ -667,6 +736,7 @@ void OnlineSession::handleServer(net::Event& e) {
                 }
                 break;
             }
+            if (answers_.foreign(e)) break;  // another server applied since the test began
         }
         infoKnown_ = e.ok;
         infoError_ = e.ok ? std::string() : e.error;
@@ -678,6 +748,7 @@ void OnlineSession::handleServer(net::Event& e) {
             signedIn_ = true;
             account_ = e.account;
             data_.clear();  // the history and devices of whoever was signed in before
+            resetAccountState();
             api_->connect();
             LOGI("online: signed in as %s", account_.username.c_str());
         }
@@ -714,7 +785,7 @@ void OnlineSession::handleServer(net::Event& e) {
             queue_ = Queue();
             outgoing_ = Outgoing();
             incoming_.clear();
-            ratingRestored_ = live::HeldNotice();
+            resetAccountState();
             LOGI("online: account deleted");
         } else if (e.kind == Kind::EmailChangeResult && e.ok && signedIn_) {
             // The pending change (or the new address) shows on the account page.
@@ -749,7 +820,10 @@ void OnlineSession::handleServer(net::Event& e) {
         } else if (e.state == net::ConnState::Incompatible) {
             ui::notify(onlineErrorText("incompatible"), 6.0f);
         }
-        if (e.state != net::ConnState::Online) queue_.searching = false;
+        if (e.state != net::ConnState::Online) {
+            queue_.searching = false;
+            joining_ = false;
+        }
         break;
     case Kind::Welcome:
         if (!e.account.username.empty()) {
@@ -759,6 +833,19 @@ void OnlineSession::handleServer(net::Event& e) {
         }
         serverNameRt_ = e.serverName;
         conn_ = net::ConnState::Online;
+        // A new connection: the server dropped our challenges when it saw the previous one close
+        // (telling only the other party), unless we came back first. Ours is cancelled either way,
+        // the ChallengeNotFound of one already dropped not shown; the ones received just expire
+        // for their challengers.
+        if (outgoing_.active) {
+            if (outgoing_.id) {
+                api_->cancelChallenge(outgoing_.id);
+                quietNotFound_ = true;
+            }
+            outgoing_ = Outgoing();
+            ui::notify(i18n::tr("online.challenge.lost"), 4.0f);
+        }
+        incoming_.clear();
         break;
     case Kind::QueueStatus:
         if (e.queueState == QSearching) {
@@ -799,6 +886,20 @@ void OnlineSession::handleServer(net::Event& e) {
             incoming_.erase(std::remove_if(incoming_.begin(), incoming_.end(),
                                            [&](const Incoming& c) { return c.id == e.challengeId; }),
                             incoming_.end());
+            // Only its creator is told Pending: a challenge of ours cancelled before the server named
+            // it (same target and terms) is cancelled now, not left live for an acceptance.
+            if (e.challengeState == ChPending) {
+                auto same = [&](const Outgoing& o) {
+                    return o.baseSec == e.challengeBaseSec && o.incSec == e.challengeIncSec && o.rated == e.challengeRated &&
+                           std::equal(o.target.begin(), o.target.end(), e.challengeTarget.begin(), e.challengeTarget.end(),
+                                      [](char a, char b) { return std::tolower(uint8_t(a)) == std::tolower(uint8_t(b)); });
+                };
+                auto early = std::find_if(cancelledEarly_.begin(), cancelledEarly_.end(), same);
+                if (early != cancelledEarly_.end()) {
+                    api().cancelChallenge(e.challengeId);
+                    cancelledEarly_.erase(early);
+                }
+            }
         }
         break;
     }
@@ -828,13 +929,18 @@ void OnlineSession::handleServer(net::Event& e) {
         }
         break;
     case Kind::ServerError:
-        if ((e.gameId != 0 && e.gameId == gameId_) || isGameError(e.code)) {
+        joining_ = false;  // a join is answered by its game or by an error
+        if ((e.gameId != 0 && e.gameId == gameId_) || live::gameError(e.code)) {
             routeGame(e, LinkKind::Server);
             break;
         }
+        if (e.code == kErrChallengeNotFound && quietNotFound_) {
+            quietNotFound_ = false;
+            break;
+        }
         if (e.code == kErrMatchmakingCooldown && cooldownUntilMs_ < nowMs()) cooldownUntilMs_ = nowMs() + 60000.0;
-        queue_.searching = queue_.searching && e.code != kErrMatchmakingCooldown;
-        if (e.code >= 200 && e.code < 210) outgoing_ = Outgoing();
+        if (live::queueRefused(e.code)) queue_.searching = false;  // a QueueJoin refused: no search
+        if (outgoing_.active && outgoing_.id == 0 && live::challengeRefused(e.code)) outgoing_ = Outgoing();
         if (e.code == 0 && e.error == "offline") {  // a command sent while not connected: dropped
             queue_.searching = false;
             outgoing_ = Outgoing();
@@ -846,7 +952,7 @@ void OnlineSession::handleServer(net::Event& e) {
 }
 
 void OnlineSession::handleDirect(const net::Event& e) {
-    if (isGameEvent(e.kind) || (e.kind == Kind::ServerError && (e.gameId != 0 || isGameError(e.code)))) {
+    if (isGameEvent(e.kind) || (e.kind == Kind::ServerError && (e.gameId != 0 || live::gameError(e.code)))) {
         routeGame(e, LinkKind::Direct);
         return;
     }
@@ -855,7 +961,7 @@ void OnlineSession::handleDirect(const net::Event& e) {
 }
 
 void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
-    uint64_t id = e.game.id ? e.game.id : e.gameId;
+    uint64_t id = live::eventGameId(e);
     if (e.kind == Kind::GameSnapshot && id != gameId_ && e.game.status == 0) {
         // A new game: matchmaking, a challenge, a rematch, a direct match.
         gameId_ = id;
@@ -865,6 +971,7 @@ void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
         gameEvents_.clear();
         queue_.searching = false;
         outgoing_ = Outgoing();
+        joining_ = false;
         LOGI("online: game %llu ready (%s)", (unsigned long long)id, from == LinkKind::Direct ? "direct" : "server");
         return;
     }
@@ -883,55 +990,18 @@ void OnlineSession::routeGame(const net::Event& e, LinkKind from) {
 // Texts
 // =============================================================================================
 
-std::string localTimeText(double epochMs) {
-    std::time_t t = std::time_t(epochMs / 1000.0);
-    char buf[64] = "";
-    if (const std::tm* tm = std::localtime(&t)) {
-        std::time_t now = std::time(nullptr);
-        const std::tm* today = std::localtime(&now);
-        bool sameDay = today && today->tm_yday == tm->tm_yday && today->tm_year == tm->tm_year;
-        std::tm copy = *tm;
-        if (sameDay) std::snprintf(buf, sizeof buf, "%02d:%02d", copy.tm_hour, copy.tm_min);
-        else std::snprintf(buf, sizeof buf, "%02d.%02d.%04d %02d:%02d", copy.tm_mday, copy.tm_mon + 1, copy.tm_year + 1900, copy.tm_hour, copy.tm_min);
-    }
-    return i18n::ltr(buf);
-}
-
-std::string durationText(double ms) {
-    long long s = std::max(0LL, (long long)std::ceil(ms / 1000.0));
-    char buf[32];
-    if (s >= 3600) std::snprintf(buf, sizeof buf, "%lld:%02lld:%02lld", s / 3600, (s / 60) % 60, s % 60);
-    else std::snprintf(buf, sizeof buf, "%lld:%02lld", s / 60, s % 60);
-    return i18n::ltr(buf);
-}
-
-std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t bannedUntilMs) {
-    if (code.empty()) return "";
-    if (code == "rate_limited") {
-        if (retryAfterSec > 0) return i18n::trf("online.err.rate_limited_for", {durationText(retryAfterSec * 1000.0)});
-        return i18n::tr("online.err.rate_limited");
-    }
-    if (code == "server_busy") {
-        // Too many password checks at once on the server (its hash queue is full): not the player's fault.
-        if (retryAfterSec > 0) return i18n::trf("online.err.server_busy_for", {durationText(retryAfterSec * 1000.0)});
-        return i18n::tr("online.err.server_busy");
-    }
-    if (code == "too_many_attempts") {
-        if (retryAfterSec > 0) return i18n::trf("online.err.too_many_attempts_for", {durationText(retryAfterSec * 1000.0)});
-        return i18n::tr("online.err.too_many_attempts");
-    }
-    if (code == "banned") {
-        if (bannedUntilMs > 0) return i18n::trf("online.err.banned_until", {localTimeText(double(bannedUntilMs))});
-        return i18n::tr("online.err.banned");
-    }
-    static const char* known[] = {"invalid_credentials", "email_unverified", "network", "tls", "certificate", "incompatible",
-                                  "unauthorized", "username_taken", "email_taken", "invalid_username", "invalid_email",
-                                  "weak_password", "invalid_code", "expired", "registration_closed", "sso_cancelled",
-                                  "server_error", "timeout", "offline", "invalid_password", "mfa_code_required",
-                                  "password_not_set", "same_email", "not_found", "invalid_response"};
-    for (const char* k : known)
-        if (code == k) return i18n::tr(std::string("online.err.") + k);
-    return i18n::trf("online.err.other", {code});
+net::SsoBrowserPage ssoBrowserPage() {
+    net::SsoBrowserPage p;
+    p.lang = i18n::language();
+    p.rtl = i18n::rtl();
+    p.title = i18n::tr("online.sso.page.title");
+    p.doneHeading = i18n::tr("online.sso.page.done_heading");
+    p.done = i18n::tr("online.sso.page.done");
+    p.cancelledHeading = i18n::tr("online.sso.page.cancelled_heading");
+    p.cancelled = i18n::tr("online.sso.page.cancelled");
+    p.foreignHeading = i18n::tr("online.sso.page.foreign_heading");
+    p.foreign = i18n::tr("online.sso.page.foreign");
+    return p;
 }
 
 std::string gifErrorText(const std::string& code, int retryAfterSec) {
@@ -970,6 +1040,7 @@ std::string serverErrorText(int code) {
         {204, "online.err.challenge_self"},    {205, "online.err.code_invalid"},
         {206, "online.err.rated_official_tc"}, {207, "online.err.cooldown"},
         {208, "online.err.invalid_tc"},        {209, "online.err.rematch_unavailable"},
+        {210, "online.err.rated_repeat_limit"},
         {241, "online.err.slow_down"},         {242, "online.err.cheat_detected"},
     };
     for (const Entry& e : entries)

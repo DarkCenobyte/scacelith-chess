@@ -34,7 +34,6 @@ event.colour.black.2 = هذه المرة لك الأسود: أنا أبدأ.
 
 # ---- Level introductions (the first game at a level, or when the player changes it) -------------
 # The level names are those of the Coach page (assets/i18n/ar.lang, coach.level.<n>.name).
-event.level.l0 = قواعد الشطرنج: نتعلّم اللعبة خطوة خطوة، بتمارين صغيرة.
 event.level.l1 = الخطوات الأولى: ألعب بلطف وأشرح كل خطأ بكلمات بسيطة.
 event.level.l2 = مبتدئ: ألعب بقوة أكبر قليلًا، وأسمّي التكتيكات البسيطة كالشوكة والتثبيت.
 event.level.l3 = متوسط: أتحدث عن الخطط وبنية البيادق، وأعرض تفريعات قصيرة.
@@ -102,8 +101,6 @@ event.end.draw.3 = نتيجة منصفة. مباراة ممتعة.
 event.end.resigned = انتهت المباراة باستسلامك. لكن مقاومتك كانت جيدة.
 event.end.resigned.2 = حسنًا. شكرًا على المباراة.
 event.end.handshake = لنتصافح.
-event.end.handshake.2 = شكرًا لك على هذه المباراة.
-event.end.handshake.3 = مباراة جيدة. شكرًا لك.
 
 # ---- The rules lesson -----------------------------------------------------------------------------------------
 # {chapter} = the chapter's title (lesson.title.* in lesson.lang, definite noun phrases: "مع التبييت").
@@ -111,5 +108,3 @@ event.lesson.resume = أهلًا بعودتك! لنواصل مع {chapter}.
 event.lesson.resume.2 = مرحبًا من جديد! توقفنا عند {chapter}.
 event.lesson.next = التالي: {chapter}.
 event.lesson.next.2 = والآن، {chapter}.
-event.lesson.skip = حسنًا، لننتقل إلى ما يلي.
-event.lesson.skip.2 = لا بأس، نتجاوز هذا الجزء.

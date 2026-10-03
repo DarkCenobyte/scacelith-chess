@@ -5,14 +5,12 @@
 // moves played on the table and taken back, the takeback offer. Also the "Check!" / "Checkmate!"
 // announcements (either side) and the coach's threat warnings to beginners.
 //
-// Specification: research-pedagogy.md §1 (bands, classification, praise, takebacks), §2 (the
-// explanation taxonomy, demonstrations, sentence assembly), §2.20 (announcements), §6.3/§6.5
-// (gesture density, priorities). Lines are catalog keys of assets/coach/speech/<lang>/review.lang;
-// every pointing target is a placeholder of the line (the gesture's anchor), so translations keep
-// the timing.
+// Lines are catalog keys of assets/coach/speech/<lang>/review.lang; every pointing target is a
+// placeholder of the line (the gesture's anchor), so translations keep the timing.
 //
-// Engine-free: the director (W9) runs the analyses this file asks for (Reviewer::*Request) and hands
-// the results back as ai::Analysis values; tests build those by hand.
+// Engine-free: coach::Session (session.cpp) runs the analyses this file asks for (Reviewer::*Request)
+// through the coach::Analyst interface (stage.h) and hands the results back as ai::Analysis values;
+// tests build those by hand.
 #pragma once
 #include "../ai/analysis.h"
 #include "../chess/chess.h"
@@ -24,7 +22,7 @@
 
 namespace coach {
 
-// ---- Win percentage and move classes (research-pedagogy §1.3) ------------------------------------
+// ---- Win percentage and move classes -------------------------------------------------------------
 // Lichess: W% = 50 + 50 * (2 / (1 + e^(-0.00368208 cp)) - 1), cp clamped to +-1000; mates count
 // as +-1000 cp. Scores are the mover's view (Stockfish reports the side to move's).
 double winPercent(int cp);
@@ -53,32 +51,32 @@ struct Judgement {
 Judgement judge(const ai::Score& best, const ai::Score& played, bool playedIsBest);
 MoveClass classifyDelta(double delta, bool playedIsBest);
 
-// ---- Explanation types (research-pedagogy §2, in the order they are tried) -----------------------
+// ---- Explanation types (in the order they are tried) ---------------------------------------------
 enum class ExType : uint8_t {
     None,
-    MateAllowed,    // §2.9
-    MateMissed,     // §2.10
-    Stalemate,      // §2.14
-    Fork,           // §2.4
-    Discovered,     // §2.7
-    Skewer,         // §2.6
-    Pin,            // §2.5
-    Trapped,        // §2.12
-    BackRank,       // §2.8
-    Hanging,        // §2.1
-    Exchange,       // §2.2
-    MissedCapture,  // §2.3
-    MissedFork,     // §2.4 (the human's fork not played)
-    PromotionRace,  // §2.13
-    KingSafety,     // §2.11
-    BadTrade,       // §2.15
-    Opening,        // §2.16
-    Endgame,        // §2.17
-    Positional      // §2.19
+    MateAllowed,
+    MateMissed,
+    Stalemate,
+    Fork,
+    Discovered,
+    Skewer,
+    Pin,
+    Trapped,
+    BackRank,
+    Hanging,
+    Exchange,
+    MissedCapture,
+    MissedFork,     // the human's fork not played
+    PromotionRace,
+    KingSafety,
+    BadTrade,
+    Opening,
+    Endgame,
+    Positional
 };
 const char* exTypeName(ExType t);   // "fork", "hanging", ...: key part of ex.<name>.b<n> and theme.<name>
 
-// ---- Per-ply verdicts (research-pedagogy §5.1), collected for the end-of-game appraisal ---------
+// ---- Per-ply verdicts, collected for the end-of-game appraisal ----------------------------------
 struct PlyVerdict {
     int ply = -1;                    // index in Game::moves() (0 = White's first move)
     chess::Color mover = chess::White;
@@ -100,22 +98,19 @@ struct PlyVerdict {
     bool check = false;
     bool only = false, brilliant = false, great = false, goodCapture = false;
     bool mateMissed = false, mateAllowed = false;
+    bool hastensMate = false;        // lost to a mate either way, but sooner than after the best move
     bool voiced = false, offered = false, praised = false;
-    bool coachHungPiece = false;     // coach move: left a piece of 3+ points hanging (for "did you see it?")
-    chess::PieceType hungType = chess::NoPiece;
-    chess::Square hungSquare = chess::NoSquare;
 };
 
 struct TakebackRecord {
     int ply = -1;
-    std::string firstUci, firstSan;  // the move taken back
-    MoveClass firstClass = MoveClass::Unjudged;
+    std::string firstUci;            // the move taken back
     ExType firstType = ExType::None;
     bool fixed = false;              // the replacement lost less than 5 W% points
     bool same = false;               // the same move was played again
 };
 
-// ---- Level parameters (design §1, research-pedagogy §1.4) ---------------------------------------
+// ---- Level parameters ---------------------------------------------------------------------------
 struct Band {
     int level = 1;
     int demoPlies = 1;          // deepest demonstration moved on the table
@@ -126,7 +121,7 @@ struct Band {
     int remarksPer10 = 5;       // unsolicited remarks (praise, tips, mistakes) per 10 human moves
     int praiseEvery = 3;        // at most one praise per this many human moves
     int offerCap = -1;          // takeback offers per game (-1: no cap)
-    float demoPause = 0.8f;     // pause after a demonstration move lands (research-pedagogy §6.2)
+    float demoPause = 0.8f;     // pause after a demonstration move lands
 };
 Band band(int level);           // clamped to 1..6
 
@@ -137,7 +132,7 @@ struct ReviewInput {
     const ai::Analysis* played = nullptr;    // A1: the played move re-scored at the same root (when A0 lacks it)
     const ai::Analysis* after = nullptr;     // A2 (optional): the position after the move, for a longer refutation
     const ai::Analysis* shallow = nullptr;   // A3 (optional): a shallow search of the same root ("tricky" praise)
-    bool inBook = false;                     // the position after the move is in the openings book (W10)
+    bool inBook = false;                     // the position after the move is in the openings book
 };
 
 struct Review {
@@ -165,7 +160,8 @@ public:
     // ...and A2 (optional) on the position after the move, for a refutation longer than A0's PV.
     ai::AnalysisRequest afterRequest(const chess::Game& g) const;
     // A3 (optional, levels 3-4): a shallow search (depth 6) of A0's root, requested with A0. When its
-    // move differs from the engine's best, the best move is "not easy to see" (praise at levels 3-4).
+    // move differs from the move played (a top move), that move was "not easy to see" (praise at
+    // levels 3-4).
     ai::AnalysisRequest shallowRequest(const chess::Game& g) const;
 
     // Right after any move is completed (either side): "Check!", "Checkmate!" (Urgent beats).
@@ -203,7 +199,7 @@ private:
     bool coachCheckExplained_ = false;
     bool punishHintDone_ = false;
     uint32_t tipsSaid_ = 0;           // opening principles and endgame tips already voiced (bits)
-    double lastHumanWPlayed_ = -1.0;  // the human's W% after their previous move (their view)
+    std::vector<double> humanW_;      // the human's W% after each judged move on the board (index = ply, -1: none)
     // The last offer, and a takeback in progress.
     TakebackRecord offered_;          // the move the last offer was about
     chess::Square offeredHint_ = chess::NoSquare;

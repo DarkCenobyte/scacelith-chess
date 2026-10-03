@@ -1,8 +1,6 @@
 # Scacelith - Українська
-# Переклад assets/i18n/en.lang (ті самі ключі, ті самі {n}). Множина: один|кілька|багато
-# (1 хід | 2 ходи | 5 ходів).
-
-language.name = Українська
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals have three forms:
+# one (1, 21, 31...)|few (2-4, 22-24...)|many (0, 5-20, 25-30...).
 
 # ---- Common words ------------------------------------------------------------------------------
 common.on = Увімк.
@@ -62,6 +60,7 @@ options.depth_of_field = Глибина різкості
 options.depth_of_field.help = Пом’якшує те, що значно ближче або далі за те, на що ви дивитеся, як це робить об’єктив камери.
 options.brightness = Яскравість
 options.brightness.neutral = Нейтральна
+options.brightness.value = {0} EV
 options.brightness.help = Корекція експозиції камери. Калібрування під час першого запуску встановлює її так, щоб найтемніші тіні було ледь видно.
 
 options.master_volume = Загальна гучність
@@ -347,11 +346,6 @@ viewer.note = Обидва гравці — Stockfish. Вільно літайт
 viewer.summary = {0} проти {1}
 viewer.custom = Свій
 viewer.tc.custom = На вибір
-viewer.tc.none = Без годинника
-viewer.tc.bullet = Кулі
-viewer.tc.blitz = Бліц
-viewer.tc.rapid = Рапід
-viewer.tc.classical = Класика
 viewer.base_time = Основний час
 viewer.increment = Додавання
 viewer.delay = Затримка
@@ -540,10 +534,24 @@ online.forgot.lead = Введіть адресу електронної пошт
 online.forgot.button = Надіслати посилання
 online.forgot.sent = Якщо ця адреса прив’язана до облікового запису, посилання вже в дорозі.
 online.sso.title = ВХІД ЧЕРЕЗ GOOGLE
-online.sso.wait = Продовжте в браузері: увійдіть через Google у вікні, що відкрилося. Ця сторінка оновиться сама.
+online.sso.wait = Продовжте в браузері: виберіть обліковий запис Google у вікні, що відкрилося. Scacelith продовжить сам, щойно Google поверне вас назад.
 online.sso.name_title = ОБЕРІТЬ ІМ’Я
 online.sso.name_lead = Ви вперше входите сюди через Google. Оберіть ім’я, яке бачитимуть інші гравці.
 online.sso.continue = Продовжити
+online.sso.finishing = Google повернув вас назад. Завершуємо вхід…
+online.sso.link_title = ДОДАТИ ВХІД ЧЕРЕЗ GOOGLE
+online.sso.link_lead = Обліковий запис {0} на сервері {1} уже використовує адресу електронної пошти цього облікового запису Google. Введіть пароль цього облікового запису, щоб додати до нього вхід через Google. Це потрібно зробити лише один раз.
+online.sso.link_button = Додати вхід через Google
+online.sso.link_mfa = Вхід через Google буде додано до цього облікового запису, щойно код буде прийнято.
+online.sso.not_mine = Це не мій обліковий запис
+online.sso.not_mine_note = Вхід через Google не додано. Якщо ця адреса електронної пошти ваша, скористайтеся з нею «Забули пароль?»: посилання прийде на цю поштову скриньку. Якщо обліковий запис також вимагає код підтвердження, якого у вас немає, зверніться до адміністратора сервера.
+online.sso.page.title = Scacelith: вхід через Google
+online.sso.page.done_heading = Назад до Scacelith
+online.sso.page.done = Google повернув вас до Scacelith. Поверніться в гру, щоб завершити вхід; цю вкладку можна закрити.
+online.sso.page.cancelled_heading = Вхід скасовано
+online.sso.page.cancelled = Вхід через Google скасовано. Цю вкладку можна закрити й повернутися до Scacelith.
+online.sso.page.foreign_heading = Ця сторінка не для вас
+online.sso.page.foreign = Ця сторінка не стосується входу, на який Scacelith чекає на цьому комп’ютері. Якщо ви щойно не починали вхід через Google у Scacelith, можливо, хтось надіслав вам це посилання: закрийте вкладку.
 
 # Account
 online.account.button = Обліковий запис
@@ -566,6 +574,9 @@ online.account.sign_out_all = Вийти всюди
 online.account.sign_out_all.help = Виконує вихід з облікового запису на всіх комп’ютерах, зокрема на цьому.
 online.account.signed_out = Ви вийшли з облікового запису.
 online.account.signed_out_all = Ви вийшли з облікового запису на всіх комп’ютерах.
+online.account.signing_out_all = Вихід з облікового запису на всіх комп’ютерах…
+online.account.sign_out_all_failed = Сеанси на інших комп’ютерах, можливо, ще не завершено: увійдіть знову й завершіть їх у розділі «Активні сеанси». {0}
+online.account.sign_out_all_retry = Сеанси на інших комп’ютерах, можливо, ще не завершено. Спробуйте «Вийти всюди» ще раз. {0}
 online.account.ratings = РЕЙТИНГИ
 online.account.col.tc = КОНТРОЛЬ
 online.account.col.rating = РЕЙТИНГ
@@ -652,6 +663,7 @@ online.challenge.you_random = колір жеребом
 online.challenge.declined = {0} відхиляє ваш виклик.
 online.challenge.expired = Ваш виклик минув без відповіді.
 online.challenge.unavailable = Гравець {0} зараз недоступний.
+online.challenge.lost = З’єднання втрачено: ваш виклик скасовано.
 
 # At the table
 online.pause.clock_runs = Партія триває: ваш годинник іде.
@@ -693,6 +705,7 @@ online.report.comment = Коментар
 online.report.comment.hint = необов’язково
 online.report.send = Надіслати скаргу
 online.report.sent = Скаргу надіслано. Дякуємо.
+online.report.queued = Скаргу буде надіслано після завершення партії.
 # Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
 online.sheet.note = Онлайн, {0}, {1}
 online.sheet.rated = рейтингова
@@ -719,6 +732,7 @@ online.err.server_busy = Сервер перевантажений. Повтор
 online.err.banned_until = Обліковий запис заблоковано до {0}.
 online.err.banned = Обліковий запис заблоковано.
 online.err.invalid_credentials = Неправильне ім’я користувача або пароль.
+online.err.invalid_credentials_pending = Неправильне ім’я користувача або пароль. Якщо ви щойно створили обліковий запис, спершу відкрийте посилання з нашого листа.
 online.err.email_unverified = Адресу електронної пошти ще не підтверджено: відкрийте посилання з нашого листа.
 online.err.network = Сервер недоступний. Перевірте підключення та адресу сервера.
 online.err.tls = Не вдалося встановити захищене з’єднання із сервером.
@@ -734,6 +748,15 @@ online.err.invalid_code = Неправильний код.
 online.err.expired = Термін дії запиту минув: почніть знову.
 online.err.registration_closed = Цей сервер не приймає нових облікових записів.
 online.err.sso_cancelled = Вхід через Google скасовано.
+online.err.sso_expired = Вхід через Google тривав надто довго або вже був використаний. Почніть знову.
+online.err.sso_failed = Не вдалося увійти через Google. Спробуйте ще раз.
+online.err.sso_listen = Scacelith не зміг отримати відповідь Google на цьому комп’ютері. Спробуйте ще раз.
+online.err.sso_origin = Вхід через Google не працює з цією адресою сервера. Додайте сервер під публічним ім’ям, яке вказав його адміністратор, і спробуйте ще раз.
+online.err.browser = Не вдалося відкрити браузер.
+online.err.sso_email_unverified = Google не підтвердив адресу електронної пошти цього облікового запису Google.
+online.err.sso_account_exists = Цю адресу електронної пошти вже використовує обліковий запис, який не можна прив’язати до входу через Google: увійдіть з його паролем або скористайтеся «Забули пароль?».
+online.err.sso_already_linked = Цей обліковий запис Google уже прив’язано до іншого облікового запису.
+online.err.account_disabled = Цей обліковий запис більше не можна використовувати.
 online.err.server_error = На сервері виникла проблема. Спробуйте ще раз.
 online.err.timeout = Сервер не відповів вчасно.
 online.err.offline = Немає підключення до сервера: повторіть, коли підключення відновиться.
@@ -753,13 +776,14 @@ online.err.flag_fell = Ваш час вичерпано.
 online.err.queue_not_allowed = Зараз не можна шукати суперника.
 online.err.challenge_not_found = Цього виклику більше немає.
 online.err.user_unavailable = Цей гравець недоступний.
-online.err.challenge_limit = Забагато викликів одночасно.
+online.err.challenge_limit = Поки забагато викликів. Спробуйте пізніше.
 online.err.challenge_self = Не можна викликати самого себе.
 online.err.code_invalid = Партії з таким кодом немає.
 online.err.rated_official_tc = Рейтинговими можуть бути лише офіційні контролі часу.
 online.err.cooldown = Пошук суперника для вас ненадовго призупинено.
 online.err.invalid_tc = Цей контроль часу не дозволено.
 online.err.rematch_unavailable = Реванш уже неможливий.
+online.err.rated_repeat_limit = Ліміт рейтингових партій із цим гравцем поки вичерпано. Зіграйте товариську партію або спробуйте пізніше.
 online.err.cheat_detected = Партію зупинила система чесної гри сервера.
 online.err.invalid_password = Неправильний пароль.
 online.err.mfa_code_required = Введіть код із застосунку-автентифікатора (або код відновлення).
@@ -769,6 +793,7 @@ online.err.too_many_attempts_for = Забагато невдалих спроб.
 online.err.same_email = Це вже ваша адреса електронної пошти.
 online.err.not_found = Не знайдено на сервері.
 online.err.invalid_response = Не вдалося прочитати відповідь сервера.
+online.err.storage = Не вдалося зберегти сеанс на цьому комп’ютері.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = ІСТОРІЯ ПАРТІЙ
@@ -1179,3 +1204,9 @@ gif.err.not_found = Цієї партії вже немає на сервері.
 gif.wait.seconds = {0} секунду|{0} секунди|{0} секунд
 gif.wait.minutes = {0} хвилину|{0} хвилини|{0} хвилин
 gif.wait.both = {0} і {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Не вдалося запустити OpenGL 4.6. Оновіть драйвер відеокарти.
+error.renderer = Не вдалося запустити рендерер.
+error.scene = Не вдалося завантажити сцену.
+error.log_file = Подробиці у файлі журналу: {0}

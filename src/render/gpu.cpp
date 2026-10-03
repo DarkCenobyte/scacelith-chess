@@ -69,19 +69,6 @@ Texture createTexture3D(int w, int h, int d, GLenum fmt, int levels) {
     return t;
 }
 
-Texture createCubemap(int size, GLenum fmt, int levels) {
-    Texture t;
-    t.target = GL_TEXTURE_CUBE_MAP;
-    t.format = fmt;
-    t.width = t.height = size;
-    t.depth = 6;
-    t.levels = levels <= 0 ? mipCount(size, size) : levels;
-    glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &t.id);
-    glTextureStorage2D(t.id, t.levels, fmt, size, size);
-    defaultSampling(t);
-    return t;
-}
-
 Texture createCubemapArray(int size, int cubes, GLenum fmt, int levels) {
     Texture t;
     t.target = GL_TEXTURE_CUBE_MAP_ARRAY;
@@ -108,10 +95,6 @@ void setAnisotropy(const Texture& t, float a) {
     float maxA = 1.0f;
     glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY, &maxA);
     glTextureParameterf(t.id, GL_TEXTURE_MAX_ANISOTROPY, std::min(a, maxA));
-}
-void setDepthCompare(const Texture& t, bool enable) {
-    glTextureParameteri(t.id, GL_TEXTURE_COMPARE_MODE, enable ? GL_COMPARE_REF_TO_TEXTURE : GL_NONE);
-    glTextureParameteri(t.id, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 }
 
 Framebuffer createFramebuffer(std::initializer_list<const Texture*> colors, const Texture* depth, int level) {
@@ -211,13 +194,12 @@ int profileMode() {
     }();
     return mode;
 }
+bool profilingEnabled() { return profileMode() > 0; }
 double nowMs() {
     using namespace std::chrono;
     return double(duration_cast<microseconds>(steady_clock::now().time_since_epoch()).count()) * 1e-3;
 }
 }  // namespace
-
-bool profilingEnabled() { return profileMode() > 0; }
 
 ProfileScope::ProfileScope(const char* name) : name_(name) {
     if (!profilingEnabled()) return;

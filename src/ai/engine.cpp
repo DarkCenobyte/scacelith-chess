@@ -5,9 +5,8 @@
 // serialised as a queue of tasks; while a search is running only "stop" is sent, everything else
 // waits for its "bestmove", so Stockfish never sees setoption/position/ucinewgame mid-search.
 //  * A new move request supersedes the previous one (queued: dropped; running: stopped and its
-//    bestmove discarded); the same for evaluation requests. Move and eval requests queue behind
-//    each other. Analyses (full strength, MultiPV, see analysis.h) never supersede anything: each
-//    has an id and its own result slot, and runs in turn by priority (moves and evaluations have
+//    bestmove discarded). Analyses (full strength, MultiPV, see analysis.h) never supersede
+//    anything: each has an id and its own result slot, and runs in turn by priority (moves have
 //    priority 0, so a move request overtakes queued background analyses).
 //  * UCI options are sent lazily before each "go", only when they differ from what the engine has.
 //    Every value is clamped to its range first: Stockfish silently ignores an out-of-range value,
@@ -43,8 +42,6 @@ namespace {
 using SteadyClock = std::chrono::steady_clock;
 
 constexpr int kMateScore = 100000;
-constexpr int kEvalDepth = 12;          // requestEval: fixed depth, full strength ...
-constexpr int kEvalMaxMs = 1500;        // ... capped in time
 // Untimed game and no depth/nodes/movetime in the settings: search time per move. The humanised
 // thinking time (2..12 s) runs concurrently, so this rarely delays the game.
 constexpr int kUntimedFullMs = 3000;    // full strength
@@ -149,7 +146,7 @@ bool isRecaptureFrom(const std::string& startFen, const std::vector<std::string>
 }
 
 struct Job {
-    enum Kind { Move, Eval, Analyse } kind = Move;
+    enum Kind { Move, Analyse } kind = Move;
     std::string startFen;        // "" = standard start position
     std::vector<std::string> moves;
     ClockInfo clock;
@@ -188,14 +185,11 @@ struct Engine::Impl {
     bool moveReady = false;
     std::string move;
     int moveEval = 0;
-    int lastSearchMs = 0;
-    bool evalReady = false;
-    int evalCp = 0;
 
     uint32_t nextAnalysisId = 1;
     std::map<uint32_t, Analysis> analyses;  // ready, not taken yet
 
-    bool hashWarmedByEval = false;       // an eval or analysis search ran since the last move search
+    bool hashWarmedByAnalysis = false;   // an analysis search ran since the last move search
     bool haveLastMoveSettings = false;   // settings of the last move search (side switches)
     EngineSettings lastMoveSettings;
     int hashClears = 0;
@@ -306,13 +300,9 @@ struct Engine::Impl {
             moveReady = true;
             move = best;
             moveEval = eval;
-            lastSearchMs = msSince(job->sentAt);
             lastStartFen = std::move(job->startFen);
             lastMoves = std::move(job->moves);
             lastBest = best;
-        } else if (job->kind == Job::Eval) {
-            evalReady = true;
-            evalCp = eval;
         } else {
             Analysis& a = job->result;
             a.ok = true;
@@ -357,10 +347,10 @@ struct Engine::Impl {
         // changing either between jobs would resize the pool / table and clear the hash.
         setOption("Threads", std::to_string(threads));
         setOption("Hash", std::to_string(std::clamp(s.hashMB, 1, 4096)));
-        // "wdl W D L" in every info line: analyses use it, the move / eval parser skips it.
+        // "wdl W D L" in every info line: analyses use it, the move parser skips it.
         setOption("UCI_ShowWDL", "true");
-        if (job.kind != Job::Move) {  // honest, full-strength evaluation / analysis
-            const int multiPV = job.kind == Job::Eval ? 1 : std::clamp(job.req.multiPV, 1, kMaxMultiPV);
+        if (job.kind != Job::Move) {  // honest, full-strength analysis
+            const int multiPV = std::clamp(job.req.multiPV, 1, kMaxMultiPV);
             setOption("Skill Level", "20");
             setOption("UCI_LimitStrength", "false");
             setOption("MultiPV", std::to_string(multiPV));
@@ -376,10 +366,6 @@ struct Engine::Impl {
     std::string goCommand(const Job& job) const {
         std::ostringstream go;
         go << "go";
-        if (job.kind == Job::Eval) {
-            go << " depth " << kEvalDepth << " movetime " << kEvalMaxMs;
-            return go.str();
-        }
         if (job.kind == Job::Analyse) {  // limits checked and clamped by requestAnalysis
             const AnalysisRequest& r = job.req;
             if (r.depth > 0) go << " depth " << r.depth;
@@ -426,13 +412,9 @@ struct Engine::Impl {
             moveReady = true;
             move.clear();
             moveEval = 0;
-            lastSearchMs = 0;
             lastStartFen = job.startFen;
             lastMoves = job.moves;
             lastBest.clear();
-        } else if (job.kind == Job::Eval) {
-            evalReady = true;
-            evalCp = 0;
         } else {
             Analysis a;
             a.id = job.result.id;
@@ -449,18 +431,18 @@ struct Engine::Impl {
         }
         syncOptions(*job);
         if (job->kind != Job::Move) {
-            hashWarmedByEval = true;
+            hashWarmedByAnalysis = true;
         } else {
             // Depth-capped handicaps were calibrated with a hash table that only ever saw their own
-            // shallow searches; a deep evaluation in between would make the next move stronger.
-            bool clear = hashWarmedByEval && settings.depth > 0 && detail::skillLevel(settings) >= 0.0;
+            // shallow searches; a deep analysis in between would make the next move stronger.
+            bool clear = hashWarmedByAnalysis && settings.depth > 0 && detail::skillLevel(settings) >= 0.0;
             // The other side of an AI vs AI game searched last: start from a clean table.
             if (haveLastMoveSettings && !detail::sameStrength(lastMoveSettings, settings)) clear = true;
             if (clear) {
                 send("setoption name Clear Hash");
                 ++hashClears;
             }
-            hashWarmedByEval = false;
+            hashWarmedByAnalysis = false;
             haveLastMoveSettings = true;
             lastMoveSettings = settings;
         }
@@ -542,8 +524,8 @@ struct Engine::Impl {
         sentOptions.clear();
         outbox.clear();
         inFlight.reset();
-        moveReady = evalReady = false;
-        hashWarmedByEval = false;
+        moveReady = false;
+        hashWarmedByAnalysis = false;
         haveLastMoveSettings = false;
         readySent = readyOks = 0;
         move.clear();
@@ -600,14 +582,13 @@ void Engine::newGame() {
     Impl& d = *impl_;
     if (!d.started) return;
     d.cancel(Job::Move);
-    d.cancel(Job::Eval);
     d.cancelAnalysis(0);
-    d.moveReady = d.evalReady = false;
+    d.moveReady = false;
     d.lastStartFen.clear();
     d.lastMoves.clear();
     d.lastBest.clear();
     d.haveLastMoveSettings = false;  // ucinewgame clears the hash anyway
-    d.hashWarmedByEval = false;
+    d.hashWarmedByAnalysis = false;
     Task task;
     task.lines = {"ucinewgame", "isready"};
     d.outbox.push_back(std::move(task));
@@ -671,49 +652,12 @@ std::string Engine::takeMove(int* evalCp) {
     return std::move(d.move);
 }
 
-void Engine::stopSearch() {
+void Engine::cancelMove() {
     Impl& d = *impl_;
-    d.pump();
-    for (auto& t : d.outbox)
-        if (t.job) t.job->stopRequested = true;
-    if (d.inFlight && !d.inFlight->superseded) {
-        Job& j = *d.inFlight;
-        j.stopRequested = true;
-        // Never stop before one iteration completed: Stockfish would answer with an unsearched
-        // (possibly absurd) move. parseInfo() sends the stop once depth 1 has been reported.
-        if (!j.stopSent && j.depthSeen >= 1) {
-            d.send("stop");
-            j.stopSent = true;
-        }
-    }
-}
-
-int Engine::lastSearchMs() const { return impl_->lastSearchMs; }
-
-void Engine::requestEval(const std::vector<std::string>& uciMoves) {
-    Impl& d = *impl_;
-    if (!d.started) {  // fail at once with a neutral 0
-        d.evalReady = true;
-        d.evalCp = 0;
-        return;
-    }
-    d.cancel(Job::Eval);
-    d.evalReady = false;
-    d.enqueue(Job::Eval, std::string(), uciMoves, ClockInfo{});
-    d.pump();
-}
-
-bool Engine::evalReady() const {
-    impl_->pump();
-    return impl_->evalReady;
-}
-
-int Engine::takeEval() {
-    Impl& d = *impl_;
-    d.pump();
-    if (!d.evalReady) return 0;
-    d.evalReady = false;
-    return d.evalCp;
+    if (!d.started) return;
+    d.cancel(Job::Move);
+    d.moveReady = false;
+    d.move.clear();
 }
 
 int Engine::thinkTimeMs(const ClockInfo& clock, int plyCount, int legalMoveCount, bool inCheck) const {

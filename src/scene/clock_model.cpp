@@ -3,7 +3,6 @@
 #include "clock_model.h"
 #include "piece_profile.h"
 #include "../core/log.h"
-#include "../game/layout.h"
 #include <algorithm>
 #include <cmath>
 

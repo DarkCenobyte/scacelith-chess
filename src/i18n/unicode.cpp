@@ -4,42 +4,49 @@
 namespace uni {
 
 // ---- UTF-8 ------------------------------------------------------------------------------------------
+namespace {
+// One codepoint (decode() and decodeAt(); inline so that decode() keeps a tight loop).
+inline char32_t decodeOne(const std::string& s, size_t& i) {
+    unsigned char c = static_cast<unsigned char>(s[i]);
+    auto cont = [&](size_t k) -> int {
+        if (i + k >= s.size()) return -1;
+        unsigned char b = static_cast<unsigned char>(s[i + k]);
+        return (b & 0xC0) == 0x80 ? (b & 0x3F) : -1;
+    };
+    char32_t cp = 0xFFFD;
+    size_t n = 1;
+    if (c < 0x80) {
+        cp = c;
+    } else if ((c & 0xE0) == 0xC0) {
+        int b1 = cont(1);
+        if (b1 >= 0 && c >= 0xC2) cp = (char32_t(c & 0x1F) << 6) | char32_t(b1), n = 2;
+    } else if ((c & 0xF0) == 0xE0) {
+        int b1 = cont(1), b2 = cont(2);
+        if (b1 >= 0 && b2 >= 0) {
+            char32_t v = (char32_t(c & 0x0F) << 12) | (char32_t(b1) << 6) | char32_t(b2);
+            if (v >= 0x800 && (v < 0xD800 || v > 0xDFFF)) cp = v, n = 3;
+        }
+    } else if ((c & 0xF8) == 0xF0) {
+        int b1 = cont(1), b2 = cont(2), b3 = cont(3);
+        if (b1 >= 0 && b2 >= 0 && b3 >= 0) {
+            char32_t v = (char32_t(c & 0x07) << 18) | (char32_t(b1) << 12) | (char32_t(b2) << 6) | char32_t(b3);
+            if (v >= 0x10000 && v <= 0x10FFFF) cp = v, n = 4;
+        }
+    }
+    i += n;
+    return cp;
+}
+}  // namespace
+
 std::u32string decode(const std::string& s) {
     std::u32string out;
     out.reserve(s.size());
     size_t i = 0;
-    while (i < s.size()) {
-        unsigned char c = static_cast<unsigned char>(s[i]);
-        auto cont = [&](size_t k) -> int {
-            if (i + k >= s.size()) return -1;
-            unsigned char b = static_cast<unsigned char>(s[i + k]);
-            return (b & 0xC0) == 0x80 ? (b & 0x3F) : -1;
-        };
-        char32_t cp = 0xFFFD;
-        size_t n = 1;
-        if (c < 0x80) {
-            cp = c;
-        } else if ((c & 0xE0) == 0xC0) {
-            int b1 = cont(1);
-            if (b1 >= 0 && c >= 0xC2) cp = (char32_t(c & 0x1F) << 6) | char32_t(b1), n = 2;
-        } else if ((c & 0xF0) == 0xE0) {
-            int b1 = cont(1), b2 = cont(2);
-            if (b1 >= 0 && b2 >= 0) {
-                char32_t v = (char32_t(c & 0x0F) << 12) | (char32_t(b1) << 6) | char32_t(b2);
-                if (v >= 0x800 && (v < 0xD800 || v > 0xDFFF)) cp = v, n = 3;
-            }
-        } else if ((c & 0xF8) == 0xF0) {
-            int b1 = cont(1), b2 = cont(2), b3 = cont(3);
-            if (b1 >= 0 && b2 >= 0 && b3 >= 0) {
-                char32_t v = (char32_t(c & 0x07) << 18) | (char32_t(b1) << 12) | (char32_t(b2) << 6) | char32_t(b3);
-                if (v >= 0x10000 && v <= 0x10FFFF) cp = v, n = 4;
-            }
-        }
-        out += cp;
-        i += n;
-    }
+    while (i < s.size()) out += decodeOne(s, i);
     return out;
 }
+
+char32_t decodeAt(const std::string& s, size_t& i) { return decodeOne(s, i); }
 
 void append(std::string& out, char32_t cp) {
     if (cp < 0x80) {
@@ -64,13 +71,6 @@ std::string encode(const std::u32string& t) {
     out.reserve(t.size());
     for (char32_t c : t) append(out, c);
     return out;
-}
-
-size_t length(const std::string& s) {
-    size_t n = 0;
-    for (char c : s)
-        if ((static_cast<unsigned char>(c) & 0xC0) != 0x80) ++n;
-    return n;
 }
 
 // ---- Scripts ----------------------------------------------------------------------------------------

@@ -1,12 +1,11 @@
-// The coach's end-of-game appraisal (research-pedagogy §5): one verdict per ply collected during
-// the game (the human's from the review, the coach's from the neighbouring evaluations, background
-// analyses for the gaps), the statistics of §5.2 (lichess game accuracy, phase accuracy, class
-// counts, best streak, critical moment, turning point, best moment, recurring theme, takebacks,
-// material), and the appraisal Script of §5.3-5.5: opener, highlight, numbers, one improvement,
-// encouragement and level suggestion. Every beat is skippable. Lines are catalog keys of
-// assets/coach/speech/<lang>/appraisal.lang.
+// The coach's end-of-game appraisal: one verdict per ply collected during the game (the human's
+// from the review, the coach's from the neighbouring evaluations, background analyses for the
+// gaps), the statistics (lichess game accuracy, phase accuracy, class counts, best streak, critical
+// moment, turning point, best moment, recurring theme, takebacks, material), and the appraisal
+// Script: opener, highlight, numbers, one improvement, encouragement and level suggestion. Every
+// beat is skippable. Lines are catalog keys of assets/coach/speech/<lang>/appraisal.lang.
 //
-// Engine-free: the director hands in the analyses; nothing is searched at the end of the game.
+// Engine-free: coach::Session hands in the analyses; nothing is searched at the end of the game.
 #pragma once
 #include "../ai/analysis.h"
 #include "../chess/chess.h"
@@ -35,7 +34,7 @@ SideAccuracy gameAccuracy(const std::vector<int>& cpsWhiteAfterEachPly, chess::C
 double typicalAccuracy(int rating);
 int levelRating(int level);   // 750, 1050, 1350, 1650, 1950, 2250
 
-// One finished Coach game, for the level suggestion (research-pedagogy §1.8).
+// One finished Coach game, for the level suggestion.
 struct GameRecord {
     int level = 1;
     int result = 0;          // +1 the human won, 0 draw, -1 lost
@@ -47,7 +46,7 @@ struct GameRecord {
 // Never down right after a win. Returns 1..6.
 int suggestLevel(int level, const std::vector<GameRecord>& games);
 
-// ---- Statistics (research-pedagogy §5.2) ------------------------------------------------------------
+// ---- Statistics ------------------------------------------------------------------------------------
 enum class BestMoment : uint8_t { None, Brilliant, Great, OnlyMove, WonMaterial, Streak, GoodCapture, Phase };
 
 struct SideStats {
@@ -70,11 +69,9 @@ struct AppraisalStats {
     SideStats human, coach;
     int humanMoves = 0;
     bool numbers = false;                          // accuracy may be voiced: >= 10 human moves, <= 20 % unjudged
-    int onlyMoves = 0, brilliant = 0, great = 0;
     int bestStreak = 0;                            // longest run of Best / Excellent (book / forced skipped)
     int criticalPly = -1;                          // the human ply with the largest Δ >= 10 (earliest on ties)
     int turningPly = -1;                           // first human ply from W% >= 50 to < 40 (or a comeback <= 50 to > 60)
-    bool comeback = false;                         // the turning point is a comeback
     BestMoment bestMoment = BestMoment::None;
     int bestPly = -1;                              // the best moment's ply (-1: streak / phase)
     int bestPhase = -1;                            // BestMoment::Phase: 0..2
@@ -83,7 +80,6 @@ struct AppraisalStats {
     int offers = 0, takebacks = 0, fixed = 0;      // takeback offers, taken, replayed with Δ < 5
     int coachHungPly = -1;                         // a coach move that hung a piece of 3+ the human did not take
     chess::PieceType coachHungType = chess::NoPiece;
-    chess::Square coachHungSquare = chess::NoSquare;
     double humanWinAtEnd = -1.0;                   // the human's W% at the last evaluated position (resignation)
 };
 
@@ -91,7 +87,7 @@ struct AppraisalStats {
 struct AppraisalContext {
     bool humanResigned = false;
     bool explainAccuracy = false;   // first appraisal with numbers: say what accuracy means (level 3)
-    std::string opening;            // W10 opening id for Arg::ofOpening ("" = none): said from level 3
+    std::string opening;            // opening id for Arg::ofOpening ("" = none): said from level 3
     int outOfBookMove = 0;          // the move number the game left the book (level 5), 0 = unknown
     int suggestedLevel = 0;         // suggestLevel() result; 0 or the current level = no suggestion
 };

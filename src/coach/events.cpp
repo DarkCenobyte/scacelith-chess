@@ -57,7 +57,7 @@ Script greetingScript(int level, chess::Color human, bool introduceLevel) {
 }
 
 Script levelIntroScript(int level) {
-    level = std::max(0, std::min(6, level));
+    level = std::max(1, std::min(6, level));
     return one(sayBeat("event.level.l" + std::to_string(level)));
 }
 
@@ -104,17 +104,15 @@ Script lessonResumeScript(const Lesson& lesson, int chapter) { return lessonLine
 
 Script lessonNextScript(const Lesson& lesson, int chapter) { return lessonLine("event.lesson.next", lesson, chapter); }
 
-Script lessonSkipScript() { return one(sayBeat("event.lesson.skip", {gesture(GestureKind::Nod)})); }
-
 std::vector<std::string> eventKeys() {
     std::vector<std::string> k;
     for (int l = 1; l <= 6; ++l) k.push_back("event.greet.l" + std::to_string(l));
-    for (int l = 0; l <= 6; ++l) k.push_back("event.level.l" + std::to_string(l));
+    for (int l = 1; l <= 6; ++l) k.push_back("event.level.l" + std::to_string(l));
     for (const char* s : {"event.colour.white", "event.colour.black", "event.your_move", "event.take_time", "event.filler",
                           "event.takeback.taken", "event.takeback.declined", "event.play_on", "event.encourage.mistake",
                           "event.encourage.behind", "event.encourage.well", "event.draw.accepted", "event.draw.declined",
                           "event.end.win", "event.end.loss", "event.end.draw", "event.end.resigned", "event.end.handshake",
-                          "event.lesson.resume", "event.lesson.next", "event.lesson.skip"})
+                          "event.lesson.resume", "event.lesson.next"})
         k.push_back(s);
     return k;
 }

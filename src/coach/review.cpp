@@ -213,13 +213,6 @@ void traceMove(Beat& b, PieceType t, Square from, Square to, const std::string& 
     markArrow(b, t, from, to, anchor);
 }
 
-int pointingCount(const Beat& b) {
-    int n = 0;
-    for (const Gesture& g : b.gestures)
-        if (isPointing(g.kind)) ++n;
-    return n;
-}
-
 void limitPointing(Beat& b) {
     int n = 0;
     std::vector<Gesture> kept;
@@ -320,12 +313,11 @@ void appendDemo(const Ctx& c, const Explanation& ex, Script& s) {
 
 // ---- Reviewer ------------------------------------------------------------------------------------
 
-namespace {
+namespace detail {
 
 std::string startFenOf(const Game& g) {
     const Position& s = g.startPosition();
-    const Position standard;
-    return s.samePosition(standard) && s.fullmoveNumber() == 1 && s.halfmoveClock() == 0 ? std::string() : s.fen();
+    return s.isStandardStart() ? std::string() : s.fen();
 }
 
 ai::AnalysisRequest requestAt(const Game& g, size_t plies) {
@@ -337,11 +329,16 @@ ai::AnalysisRequest requestAt(const Game& g, size_t plies) {
     return r;
 }
 
-int points(PieceType t) { return kPiecePoints[t]; }
-
-bool hasBit(uint64_t set, Square s) { return s != NoSquare && (set & squareBit(s)); }
+int whiteCp(const ai::Score& s, bool whiteToMove) {
+    const int cp = mates(s) ? 1000 : mated(s) ? -1000 : std::clamp(s.cp, -1000, 1000);
+    return whiteToMove ? cp : -cp;
+}
 
 Arg evalArg(const ai::Score& s) { return Arg::ofEval(s.cp, s.matesNow ? 1 : s.matedNow ? -1 : s.mate); }
+
+}  // namespace detail
+
+namespace {
 
 // A synthetic line for a move that ends the game (the engine has nothing to search after it).
 ai::PvLine terminalLine(const Position& p1, const std::string& uci) {
@@ -468,6 +465,8 @@ Review Reviewer::review(const ReviewInput& in) {
     c.playedSan = g.sanMoves()[size_t(c.ply)];
     c.f = analyzeMove(c.p0, c.played);
     c.base = materialBalance(c.p0, human_);
+    // Moves taken back (an offer accepted or not) leave the W% history.
+    humanW_.resize(size_t(c.ply), -1.0);
 
     PlyVerdict& v = out.verdict;
     v.ply = c.ply;
@@ -504,8 +503,8 @@ Review Reviewer::review(const ReviewInput& in) {
         }
     }
     if (!c.l1 || c.l1->pv.empty() || !c.lp) {
-        // No judgement without the engine (research-pedagogy §1.6.8): the announcements and the
-        // threat warnings are rules-based and run anyway.
+        // No judgement without the engine: the announcements and the threat warnings are
+        // rules-based and run anyway.
         if (retry) out.takeback.fixed = false;
         return out;
     }
@@ -521,16 +520,10 @@ Review Reviewer::review(const ReviewInput& in) {
     v.wPlayed = c.j.wPlayed;
     v.delta = c.j.delta;
     v.accuracy = moveAccuracy(c.j.wBest, c.j.wPlayed);
-    {
-        auto whiteCp = [&](const ai::Score& sc) {
-            const int cp = mates(sc) ? 1000 : mated(sc) ? -1000 : std::clamp(sc.cp, -1000, 1000);
-            return c.p0.sideToMove() == White ? cp : -cp;
-        };
-        v.cpWhiteAfter = whiteCp(c.lp->score);
-        v.hasEvalAfter = true;
-        v.cpWhiteBefore = whiteCp(c.l1->score);
-        v.hasEvalBefore = true;
-    }
+    v.cpWhiteAfter = whiteCp(c.lp->score, c.p0.sideToMove() == White);
+    v.hasEvalAfter = true;
+    v.cpWhiteBefore = whiteCp(c.l1->score, c.p0.sideToMove() == White);
+    v.hasEvalBefore = true;
     v.bestUci = c.l1->pv[0];
     {
         const Move bm = c.p0.parseUCI(v.bestUci);
@@ -538,6 +531,8 @@ Review Reviewer::review(const ReviewInput& in) {
     }
     v.mateAllowed = c.j.mate == MateChange::Created;
     v.mateMissed = c.j.mate == MateChange::Lost;
+    // Lost to a mate either way, but sooner after this move: Best by the numbers, never praised or highlighted.
+    v.hastensMate = mated(c.lp->score) && mated(c.l1->score) && mateMoves(c.lp->score) < mateMoves(c.l1->score);
 
     // ---- Lines replayed on the board ----
     std::vector<std::string> refutation(c.lp->pv.begin() + (c.lp->pv.empty() ? 0 : 1), c.lp->pv.end());
@@ -627,15 +622,16 @@ Review Reviewer::review(const ReviewInput& in) {
     if (voice) {
         v.voiced = true;
         if (isRemark) noteRemark();
-        // Offer policy (research-pedagogy §1.4, §1.6, §2.9, §2.10): every voiced blunder, and the
-        // cases the detector flags per level (a mate within the band's limit, stalemate when
-        // winning, a free piece of 3+ points missed at levels 1-2).
+        // Offer policy: every voiced blunder, and the cases the detector flags per level (a mate
+        // within the band's limit, stalemate when winning, a free piece of 3+ points missed at
+        // levels 1-2).
         bool offer = cls == MoveClass::Blunder || ex.offer;
         if (bd.offerCap >= 0 && offers_ >= bd.offerCap && !(ex.type == ExType::MateAllowed || ex.type == ExType::MateMissed))
             offer = false;
         if (!offersEnabled_) offer = false;
         if (retry && out.takeback.same) offer = false;
         if (offered_.ply == ply && offersAtPly_ >= 2) offer = false;
+        if (g.isOver()) offer = false;   // the move (or a draw meanwhile) ended the game: nothing to take back
 
         // Sentence budget: verdict, cause, tail, tip, better move (demo narration, rewind and offer excluded).
         const bool wantBetter = level_ >= 3 && !ex.includesBest && !c.isBest && !c.best.empty() &&
@@ -729,8 +725,6 @@ Review Reviewer::review(const ReviewInput& in) {
             offered_ = TakebackRecord{};
             offered_.ply = ply;
             offered_.firstUci = c.playedUci;
-            offered_.firstSan = c.playedSan;
-            offered_.firstClass = cls;
             offered_.firstType = ex.type;
             offeredHint_ = ex.hintSquare;
             out.offersTakeback = true;
@@ -748,7 +742,7 @@ Review Reviewer::review(const ReviewInput& in) {
         v.voiced = true;
         if (v.exType == ExType::None) v.exType = tipEx.type;
     } else if (topMove && !(retry && !s.empty())) {
-        // ---- Praise (research-pedagogy §1.5): top moves only ----
+        // ---- Praise: top moves only ----
         const int legal = int(c.p0.legalMoves().size());
         const double w1 = c.j.wBest, w2 = c.l2 ? winPercent(c.l2->score) : w1;
         const bool decided = w1 >= 90.0 && !(c.p1.isCheckmate() || (c.l1->score.mate > 0 && c.isBest));
@@ -769,14 +763,16 @@ Review Reviewer::review(const ReviewInput& in) {
         const bool sacrifice = !promoSoon && (c.f.seeCp <= -200 ||
                                               (c.playedLine.size() >= 2 && c.playedLine[1].balance <= c.base - 2));
         const bool only = c.isBest && legal >= 2 && c.l2 && w1 - w2 >= 15.0 && w1 >= 25.0 && !(c.p0.inCheck() && legal <= 2);
+        double lastW = -1.0;   // the human's W% after their previous judged move
+        for (size_t i = humanW_.size(); i-- > 0 && lastW < 0.0;) lastW = humanW_[i];
         std::string key;
-        if (!c.p1.isCheckmate() && !recapture && !decided && cls != MoveClass::Forced) {
+        if (!c.p1.isCheckmate() && !recapture && !decided && !v.hastensMate && cls != MoveClass::Forced) {
             if (!brilliantDone_ && c.j.delta < 2.0 && sacrifice && w1 <= 85.0 && c.j.wPlayed >= 50.0) {
                 key = level_ <= 2 ? "praise.sacrifice" : bandKey("praise.brilliant", level_);
                 brilliantDone_ = true;
                 v.brilliant = true;
-            } else if (level_ >= 2 && c.isBest && w1 >= 60.0 && c.l2 && w1 - w2 >= 20.0 && lastHumanWPlayed_ >= 0.0 &&
-                       lastHumanWPlayed_ <= 45.0) {
+            } else if (level_ >= 2 && c.isBest && w1 >= 60.0 && c.l2 && w1 - w2 >= 20.0 && lastW >= 0.0 &&
+                       lastW <= 45.0) {
                 key = bandKey("praise.great", level_);
                 v.great = true;
             } else if (level_ >= 2 && only) {
@@ -818,7 +814,7 @@ Review Reviewer::review(const ReviewInput& in) {
         }
     }
 
-    lastHumanWPlayed_ = c.j.wPlayed;
+    humanW_.push_back(c.j.wPlayed);
     out.script = s;
     return out;
 }

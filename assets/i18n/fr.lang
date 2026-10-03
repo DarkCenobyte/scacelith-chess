@@ -1,8 +1,6 @@
 # Scacelith - Français
-# Traduction de assets/i18n/en.lang (mêmes clés, mêmes {n}). Pluriel : un|plusieurs (0 et 1 au
-# singulier).
-
-language.name = Français
+# Translation of assets/i18n/en.lang (same keys, same {n}). Plurals: one|other (0 and 1 are
+# singular).
 
 # ---- Common words ------------------------------------------------------------------------------
 common.on = Activé
@@ -62,6 +60,7 @@ options.depth_of_field = Profondeur de champ
 options.depth_of_field.help = Adoucit ce qui se trouve loin devant ou derrière ce que vous regardez, comme le fait un objectif photo.
 options.brightness = Luminosité
 options.brightness.neutral = Neutre
+options.brightness.value = {0} EV
 options.brightness.help = Correction d’exposition de la caméra. L’étalonnage du premier lancement la règle pour que les ombres les plus sombres soient à peine visibles.
 
 options.master_volume = Volume général
@@ -347,11 +346,6 @@ viewer.note = Les deux joueurs sont Stockfish. Volez librement dans la salle pen
 viewer.summary = {0} contre {1}
 viewer.custom = Libre
 viewer.tc.custom = À votre guise
-viewer.tc.none = Sans pendule
-viewer.tc.bullet = Bullet
-viewer.tc.blitz = Blitz
-viewer.tc.rapid = Rapide
-viewer.tc.classical = Classique
 viewer.base_time = Temps de base
 viewer.increment = Incrément
 viewer.delay = Délai
@@ -540,10 +534,24 @@ online.forgot.lead = Saisissez l’adresse e-mail de votre compte : nous vous e
 online.forgot.button = Envoyer le lien
 online.forgot.sent = Si un compte utilise cette adresse, un lien est en route.
 online.sso.title = CONNEXION AVEC GOOGLE
-online.sso.wait = Continuez dans votre navigateur : connectez-vous avec Google dans la fenêtre qui s’est ouverte. Cette page suit la progression.
+online.sso.wait = Continuez dans votre navigateur : choisissez votre compte Google dans la fenêtre qui s’est ouverte. Scacelith reprend la main dès que Google vous renvoie.
 online.sso.name_title = CHOISISSEZ VOTRE NOM
 online.sso.name_lead = C’est votre première connexion ici avec Google. Choisissez le nom que verront les autres joueurs.
 online.sso.continue = Continuer
+online.sso.finishing = Google vous a renvoyé. Finalisation de la connexion…
+online.sso.link_title = AJOUTER LA CONNEXION GOOGLE
+online.sso.link_lead = Le compte {0} sur {1} utilise déjà l’adresse e-mail de ce compte Google. Saisissez le mot de passe de ce compte pour lui ajouter la connexion avec Google. Vous ne le ferez qu’une fois.
+online.sso.link_button = Ajouter la connexion Google
+online.sso.link_mfa = La connexion Google est ajoutée à ce compte dès que le code est accepté.
+online.sso.not_mine = Ce n’est pas mon compte
+online.sso.not_mine_note = La connexion Google n’a pas été ajoutée. Si cette adresse e-mail est la vôtre, utilisez « Mot de passe oublié ? » avec elle : le lien arrive dans cette boîte. Si le compte demande aussi un code de vérification que vous n’avez pas, contactez l’opérateur du serveur.
+online.sso.page.title = Scacelith : connexion Google
+online.sso.page.done_heading = Retour à Scacelith
+online.sso.page.done = Google vous a renvoyé vers Scacelith. Revenez dans le jeu pour terminer la connexion ; vous pouvez fermer cet onglet.
+online.sso.page.cancelled_heading = Connexion annulée
+online.sso.page.cancelled = La connexion avec Google a été annulée. Vous pouvez fermer cet onglet et revenir à Scacelith.
+online.sso.page.foreign_heading = Cette page ne vous est pas destinée
+online.sso.page.foreign = Cette page ne correspond pas à la connexion que Scacelith attend sur cet ordinateur. Si vous ne venez pas de lancer une connexion Google dans Scacelith, quelqu’un vous a peut-être envoyé ce lien : fermez cet onglet.
 
 # Account
 online.account.button = Compte
@@ -566,6 +574,9 @@ online.account.sign_out_all = Se déconnecter partout
 online.account.sign_out_all.help = Déconnecte ce compte sur tous les ordinateurs, y compris celui-ci.
 online.account.signed_out = Vous êtes déconnecté.
 online.account.signed_out_all = Vous êtes déconnecté sur tous les ordinateurs.
+online.account.signing_out_all = Déconnexion de tous les ordinateurs…
+online.account.sign_out_all_failed = Vos autres ordinateurs sont peut-être encore connectés : reconnectez-vous, puis déconnectez-les depuis Appareils connectés. {0}
+online.account.sign_out_all_retry = Vos autres ordinateurs sont peut-être encore connectés. Réessayez « Se déconnecter partout ». {0}
 online.account.ratings = CLASSEMENTS
 online.account.col.tc = CADENCE
 online.account.col.rating = CLASSEMENT
@@ -652,6 +663,7 @@ online.challenge.you_random = couleurs tirées au sort
 online.challenge.declined = {0} a refusé votre défi.
 online.challenge.expired = Votre défi a expiré sans réponse.
 online.challenge.unavailable = {0} n’est pas disponible pour le moment.
+online.challenge.lost = Connexion perdue : votre défi a été annulé.
 
 # At the table
 online.pause.clock_runs = La partie continue : votre pendule tourne toujours.
@@ -693,6 +705,7 @@ online.report.comment = Commentaire
 online.report.comment.hint = facultatif
 online.report.send = Envoyer
 online.report.sent = Signalement envoyé. Merci.
+online.report.queued = Votre signalement sera envoyé à la fin de la partie.
 # Scoresheet header of an online game: Site, time control, rated or casual; the game's number.
 online.sheet.note = En ligne, {0} {1}
 online.sheet.rated = classée
@@ -719,6 +732,7 @@ online.err.server_busy = Le serveur est occupé. Réessayez dans un instant.
 online.err.banned_until = Ce compte est suspendu jusqu’à {0}.
 online.err.banned = Ce compte est suspendu.
 online.err.invalid_credentials = Nom d’utilisateur ou mot de passe incorrect.
+online.err.invalid_credentials_pending = Nom d’utilisateur ou mot de passe incorrect. Si vous venez de créer votre compte, ouvrez d’abord le lien que nous vous avons envoyé.
 online.err.email_unverified = Votre adresse e-mail n’est pas encore vérifiée : ouvrez le lien que nous vous avons envoyé.
 online.err.network = Le serveur est injoignable. Vérifiez votre connexion et l’adresse du serveur.
 online.err.tls = Impossible d’établir une connexion sécurisée avec le serveur.
@@ -734,6 +748,15 @@ online.err.invalid_code = Ce code est incorrect.
 online.err.expired = Cette demande a expiré : veuillez recommencer.
 online.err.registration_closed = Ce serveur n’accepte pas de nouveaux comptes.
 online.err.sso_cancelled = La connexion avec Google a été annulée.
+online.err.sso_expired = La connexion avec Google a pris trop de temps ou a déjà servi. Recommencez.
+online.err.sso_failed = La connexion avec Google n’a pas abouti. Réessayez.
+online.err.sso_listen = Scacelith n’a pas pu recevoir la réponse de Google sur cet ordinateur. Réessayez.
+online.err.sso_origin = La connexion Google ne fonctionne pas avec cette adresse de serveur. Ajoutez le serveur sous le nom public donné par son opérateur, puis réessayez.
+online.err.browser = Le navigateur web n’a pas pu être ouvert.
+online.err.sso_email_unverified = Google n’a pas confirmé l’adresse e-mail de ce compte Google.
+online.err.sso_account_exists = Un compte utilise déjà cette adresse e-mail et ne peut pas être lié à la connexion Google : connectez-vous avec son mot de passe, ou utilisez « Mot de passe oublié ? ».
+online.err.sso_already_linked = Ce compte Google est déjà lié à un autre compte.
+online.err.account_disabled = Ce compte ne peut plus être utilisé.
 online.err.server_error = Le serveur a rencontré un problème. Veuillez réessayer.
 online.err.timeout = Le serveur n’a pas répondu à temps.
 online.err.offline = Non connecté au serveur : réessayez une fois connecté.
@@ -753,13 +776,14 @@ online.err.flag_fell = Votre temps est écoulé.
 online.err.queue_not_allowed = Vous ne pouvez pas chercher d’adversaire pour le moment.
 online.err.challenge_not_found = Ce défi n’existe plus.
 online.err.user_unavailable = Ce joueur n’est pas disponible.
-online.err.challenge_limit = Trop de défis à la fois.
+online.err.challenge_limit = Trop de défis pour le moment. Réessayez plus tard.
 online.err.challenge_self = Vous ne pouvez pas vous défier vous-même.
 online.err.code_invalid = Aucune partie n’a ce code.
 online.err.rated_official_tc = Seules les cadences officielles peuvent être classées.
 online.err.cooldown = La recherche d’adversaire est suspendue pour vous un moment.
 online.err.invalid_tc = Cette cadence n’est pas autorisée.
 online.err.rematch_unavailable = Une revanche n’est plus possible.
+online.err.rated_repeat_limit = Vous avez assez joué de parties classées contre ce joueur pour le moment. Jouez une partie amicale ou réessayez plus tard.
 online.err.cheat_detected = La partie a été arrêtée par les contrôles de fair-play du serveur.
 online.err.invalid_password = Mot de passe incorrect.
 online.err.mfa_code_required = Saisissez un code de votre application d’authentification (ou un code de récupération).
@@ -769,6 +793,7 @@ online.err.too_many_attempts_for = Trop de tentatives erronées. Réessayez dans
 online.err.same_email = C’est déjà votre adresse e-mail.
 online.err.not_found = Introuvable sur le serveur.
 online.err.invalid_response = La réponse du serveur est illisible.
+online.err.storage = La session n’a pas pu être enregistrée sur cet ordinateur.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = HISTORIQUE DES PARTIES
@@ -1179,3 +1204,9 @@ gif.err.not_found = Cette partie n’est plus sur le serveur.
 gif.wait.seconds = {0} seconde|{0} secondes
 gif.wait.minutes = {0} minute|{0} minutes
 gif.wait.both = {0} et {1}
+
+# ---- Startup errors (src/main.cpp: message boxes before the game starts; error.log_file: {0} = the log file) ----
+error.opengl = Impossible de démarrer OpenGL 4.6. Veuillez mettre à jour le pilote de votre carte graphique.
+error.renderer = Le moteur de rendu n’a pas pu démarrer.
+error.scene = La scène n’a pas pu être chargée.
+error.log_file = Les détails se trouvent dans le fichier journal : {0}

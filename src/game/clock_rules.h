@@ -11,9 +11,10 @@
 
 namespace game {
 
-// Only an offline game without a time control is untimed: Play, HotSeat and Watch with "No clock"
-// (and Coach, which is always untimed). Online and direct games are always timed: the authority
-// needs a base time, and the direct host page does not offer "No clock".
+// Only an offline game without a time control is untimed: Play, HotSeat and Watch with "No clock",
+// a Replay of a record without TimeControl or clocks (and Coach, which is always untimed). Online
+// and direct games are always timed: the authority needs a base time, and the direct host page
+// does not offer "No clock".
 inline bool untimedGame(bool online, const chess::TimeControl& tc) { return !online && tc.unlimited; }
 
 }  // namespace game

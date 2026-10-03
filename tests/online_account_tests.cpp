@@ -6,9 +6,10 @@
 // and Replay on a game of the history (GameSaveState: a Replay given up with its page, the PGN of a
 // game left still saved as that game, also through a change of server, the saved games looked at
 // again on each visit), the result from the player's side, the moves of a server game with their
-// clocks, the time control labels and the file name of an account export; the GIFs of games:
-// their file names, the PGN date and time, the wait in words, and the GifSaver (the answer awaited
-// only, the file written never over another, the errors kept with their wait).
+// clocks, the time control labels, the file name of an account export and the HTTPS errors in
+// words; the GIFs of games: their file names, the PGN date and time, the wait in words, and the
+// GifSaver (the answer awaited only, the file written never over another, the errors kept with
+// their wait).
 #include "test.h"
 #include "alloc_fail.h"
 #include "game/game_archive.h"
@@ -226,9 +227,6 @@ TEST(account_history_errors_and_reload) {
     CHECK_EQ(h.reload(), uint64_t(900));
     CHECK(h.accept(pageOf(900, 800, 30, 10, 899)));
     CHECK_EQ(h.pageIndex(), 1);
-    h.clear();
-    CHECK(!h.loaded());
-    CHECK(!h.waiting());
 }
 
 // A refusal that ends with time (rate_limited: the account's budget of the server) keeps the
@@ -714,6 +712,109 @@ TEST(account_time_control_labels) {
     CHECK_EQ(timeControlLabel(-5, -5), std::string("0+0"));
 }
 
+// The end of a ban or a cooldown: its own time (std::localtime's shared buffer once made every
+// instant read as now), with the date when it is another day.
+TEST(account_local_time_text) {
+    const std::time_t now = std::time(nullptr), later = now + 3 * 86400 + 5 * 3600 + 17 * 60;
+    std::tm tm{};
+    CHECK(archive::localTime(later, tm));
+    char want[64];
+    std::snprintf(want, sizeof want, "%02d.%02d.%04d %02d:%02d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min);
+    CHECK_EQ(localTimeText(double(later) * 1000.0), i18n::ltr(want));
+    CHECK(archive::localTime(now, tm));
+    std::snprintf(want, sizeof want, "%02d:%02d", tm.tm_hour, tm.tm_min);
+    CHECK_EQ(localTimeText(double(now) * 1000.0), i18n::ltr(want));
+}
+
+// A sign-in whose session could not be saved here (net: its token not protected by DPAPI, error
+// "storage") is told as this computer's failure, not as the server's refusal (online.err.other).
+TEST(account_error_text_of_a_session_not_saved) {
+    for (const i18n::Language& lang : i18n::languages()) {
+        CHECK(i18n::setLanguage(lang.code));
+        const std::string text = onlineErrorText("storage");
+        CHECK(i18n::has("online.err.storage"));
+        CHECK_EQ(text, std::string(i18n::tr("online.err.storage")));
+        CHECK(text != i18n::trf("online.err.other", {"storage"}));
+        if (std::string(lang.code) != "en") CHECK(text != i18n::english("online.err.storage"));
+    }
+    CHECK(i18n::setLanguage("en"));
+    CHECK_EQ(onlineErrorText("storage"), std::string("The session could not be saved on this computer."));
+    CHECK_EQ(onlineErrorText("disk_full"), std::string("The server refused (disk_full)."));
+}
+
+// Sign out everywhere: done; refused with the session (401, "unauthorized": this computer is signed
+// out too, so the player signs in again first); or failed otherwise (network, a cut answer, 429,
+// 503), which keeps this computer signed in: the player tries again.
+TEST(account_sign_out_everywhere_text) {
+    CHECK(i18n::setLanguage("en"));
+    net::Event e;
+    e.kind = Kind::LogoutResult;
+    e.ok = true;
+    CHECK_EQ(signOutEverywhereText(e), std::string("You are signed out on every computer."));
+    e.ok = false;
+    e.error = "unauthorized";
+    CHECK_EQ(signOutEverywhereText(e), std::string("Your other computers may still be signed in: sign in again, then sign them out "
+                                                   "from Signed-in devices. Your session has ended: please sign in again."));
+    e.error = "network";
+    CHECK_EQ(signOutEverywhereText(e), std::string("Your other computers may still be signed in. Try Sign out everywhere again. "
+                                                   "The server cannot be reached. Check your connection and the server address."));
+    e.error = "rate_limited";
+    e.retryAfterSec = 30;
+    CHECK_EQ(signOutEverywhereText(e), i18n::trf("online.account.sign_out_all_retry", {onlineErrorText("rate_limited", 30)}));
+    e.retryAfterSec = 0;
+    for (const char* error : {"invalid_response", "maintenance", "server_error", "timeout"}) {
+        e.error = error;
+        CHECK_EQ(signOutEverywhereText(e), i18n::trf("online.account.sign_out_all_retry", {onlineErrorText(error)}));
+    }
+    for (const i18n::Language& lang : i18n::languages()) {
+        CHECK(i18n::setLanguage(lang.code));
+        e.error = "unauthorized";
+        const std::string signedOut = signOutEverywhereText(e);
+        e.error = "network";
+        const std::string retry = signOutEverywhereText(e);
+        CHECK(signedOut != retry);
+        CHECK(retry.find(onlineErrorText("network")) != std::string::npos);
+        if (std::string(lang.code) != "en")
+            CHECK(std::string(i18n::tr("online.account.sign_out_all_retry")) != i18n::english("online.account.sign_out_all_retry"));
+    }
+    CHECK(i18n::setLanguage("en"));
+}
+
+// A refused sign-in: only to the account just registered from the sign-in pages does a wrong
+// password say to open the mailed link first (the account exists only once it is used); every
+// other refusal, and that one otherwise, keeps its plain text.
+TEST(account_sign_in_error_text) {
+    CHECK(i18n::setLanguage("en"));
+    net::Event e;
+    e.kind = Kind::LoginResult;
+    e.error = "invalid_credentials";
+    CHECK_EQ(signInErrorText(e, false), std::string("Wrong user name or password."));
+    CHECK_EQ(signInErrorText(e, true),
+             std::string("Wrong user name or password. If you have just signed up, open the link we sent you first."));
+    e.error = "rate_limited";
+    e.retryAfterSec = 30;
+    CHECK_EQ(signInErrorText(e, true), onlineErrorText("rate_limited", 30));
+    e.retryAfterSec = 0;
+    e.error = "banned";
+    e.account.bannedUntilMs = 4102444800000;
+    CHECK_EQ(signInErrorText(e, true), onlineErrorText("banned", 0, 4102444800000));
+    for (const char* error : {"email_unverified", "network", "invalid_code", "too_many_attempts"}) {
+        e.error = error;
+        CHECK_EQ(signInErrorText(e, true), onlineErrorText(error));
+        CHECK_EQ(signInErrorText(e, false), onlineErrorText(error));
+    }
+    e.error = "invalid_credentials";
+    for (const i18n::Language& lang : i18n::languages()) {
+        CHECK(i18n::setLanguage(lang.code));
+        CHECK_EQ(signInErrorText(e, false), onlineErrorText("invalid_credentials"));
+        CHECK_EQ(signInErrorText(e, true), std::string(i18n::tr("online.err.invalid_credentials_pending")));
+        CHECK(signInErrorText(e, true) != signInErrorText(e, false));
+        if (std::string(lang.code) != "en")
+            CHECK(std::string(i18n::tr("online.err.invalid_credentials_pending")) != i18n::english("online.err.invalid_credentials_pending"));
+    }
+    CHECK(i18n::setLanguage("en"));
+}
+
 TEST(account_export_file_name) {
     std::tm tm{};
     tm.tm_year = 2026 - 1900;
@@ -934,6 +1035,7 @@ TEST(account_gif_saver_writes_never_over_a_file) {
 // left, no thread) is a write_failed, never a saver left busy nor an exception out of the frame.
 TEST(account_gif_saver_takes_the_bytes) {
     using Stage = GifSaver::Stage;
+    if (!allocfail::available()) SKIP("AddressSanitizer build: no simulated out of memory");
     allocfail::Reset reset;
     GifFolder f("saver-take");
     {

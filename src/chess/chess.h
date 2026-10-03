@@ -1,6 +1,8 @@
 // Chess rules engine (standard FIDE rules) + tournament arbitration + clock.
-// Pure C++, no GL, no global state (all tables are compile-time constants), thread-safe by
-// construction: independent objects may be used from different threads.
+// Pure C++, no GL, no global state of its own (all tables are compile-time constants), thread-safe
+// by construction: independent objects may be used from different threads. Only the texts read the
+// i18n tables (main thread): endReasonText() and the Arbiter's verdict messages in the current UI
+// language, Game::pgn()'s end-reason comment in English (i18n::english).
 //
 // Layers (kept independent from presentation so that local/online multiplayer can reuse them):
 //   Position  - board state, legal move generation (bitboards), SAN/UCI/FEN, perft.
@@ -96,8 +98,9 @@ public:
     Square kingSquare(Color c) const;
     void makeMove(const Move& m);                 // m must be legal (use findLegal); flags are re-derived
     bool hasInsufficientMaterial() const;         // dead position: K v K, K+B v K, K+N v K, only same-coloured bishops
-    // FIDE 6.9 / 7.5.5 approximation: false when c has a bare king, when c has a single minor
-    // piece and the opponent a bare king, or when the position is dead; true otherwise.
+    // FIDE 6.9 / 7.5.5 approximation: false when c has a bare king or when the position is dead
+    // (hasInsufficientMaterial(), which covers a single minor piece against a bare king); true
+    // otherwise.
     bool canColorMate(Color c) const;
 
     bool hasLegalMove() const;                    // false = checkmate or stalemate
@@ -105,6 +108,7 @@ public:
     bool isStalemate() const { return !inCheck() && !hasLegalMove(); }
     // Repetition identity (FIDE 9.2.3): placement, side to move, castling rights, en passant.
     bool samePosition(const Position& o) const;
+    bool isStandardStart() const;                 // the standard starting position at move 1, halfmove clock 0
 
     // ---- Board queries for explanations (the coach's tactics, src/coach/tactics.h) ----------------
     // Square sets are bitboards: bit s stands for square s (a1 = bit 0); squaresOf() lists them.
@@ -130,7 +134,7 @@ public:
     std::string toUCI(const Move& m) const;       // "e7e8q"
     Move parseUCI(const std::string& s) const;    // invalid Move if not legal here
     // Tolerant: "0-0", "O-O", missing or extra "+"/"#"/"!?", "e8Q", "e8=Q", "e8(Q)", "exd6e.p.",
-    // "Ng1f3", "Ng1-f3", "1.e4", lowercase piece letters, and plain UCI ("e2e4").
+    // "Ng1f3", "Ng1-f3", "1.e4", plain UCI ("e2e4"), then lowercase piece letters ("nf3"; a legal "b1d2" stays UCI).
     Move parseSAN(const std::string& s) const;
     uint64_t perft(int depth) const;
 
@@ -144,7 +148,6 @@ private:
     uint64_t colorBB_[2] = {0, 0};                 // occupancy per colour
     uint64_t typeBB_[7] = {0, 0, 0, 0, 0, 0, 0};   // occupancy per piece type (index = PieceType)
     void recomputeHash();
-    void pseudoMoves(std::vector<Move>& out) const;
     void clear();
     void putPiece(Square s, Piece p);
     void removePiece(Square s);
@@ -170,6 +173,8 @@ enum class GameEndReason : uint8_t {
 const char* endReasonKey(GameEndReason r);
 // The reason in the current UI language (i18n): "Checkmate", "Threefold repetition (claimed)", ...
 const char* endReasonText(GameEndReason r);
+// PGN Termination value ("normal", "time forfeit", "rules infraction"; "unterminated" while ongoing).
+const char* terminationTag(GameStatus status, GameEndReason reason);
 
 // Optional PGN header values (the Seven Tag Roster is always written).
 struct PgnTags {
@@ -333,7 +338,8 @@ public:
         // Art. 7.5.2: a pawn moved to the last rank without being replaced counts as an illegal
         // move (penalised) but the move stands with a queen: play 'move' and press the clock.
         bool moveStands = false;
-        std::string message;           // English, shown to the player ("" for a legal move)
+        // In the UI language (i18n, section "Arbiter"), shown to the player ("" for a legal move).
+        std::string message;
     };
     Verdict clockPressed(const Game& game, const TimeControl& tc);
     void cancelTouch();                 // for touched pieces with no legal move only

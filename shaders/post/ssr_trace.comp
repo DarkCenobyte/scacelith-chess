@@ -55,7 +55,7 @@ void main() {
 
     // Importance-sample the visible normals (tangent frame around N).
     float alpha = max(rough * rough, 1e-3);
-    vec3 tx = normalize(abs(N.z) < 0.999 ? cross(vec3(0, 0, 1), N) : vec3(1, 0, 0));
+    vec3 tx = abs(N.z) < 0.999 ? normalize(cross(vec3(0, 0, 1), N)) : normalize(cross(vec3(1, 0, 0), N));
     vec3 ty = cross(N, tx);
     vec3 Vt = vec3(dot(V, tx), dot(V, ty), NoV);
     vec2 u = vec2(blueNoise(hp, 2), blueNoise(hp, 3));

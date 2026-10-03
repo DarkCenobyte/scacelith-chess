@@ -1,4 +1,4 @@
-// Level 0: the interactive rules lesson (research-pedagogy §3). Ten chapters of scripted beats
+// Level 0: the interactive rules lesson. Ten chapters of scripted beats
 // (coach/script.h): the coach sets up small positions, explains, points, demonstrates, and waits
 // for the player's move (WaitMove) that an Expectation judges. A wrong move is answered and taken
 // back, an illegal one is refused and explained (why it is illegal, computed from the position),
@@ -16,7 +16,7 @@
 
 namespace coach {
 
-constexpr float kLessonSpeechSpeed = 0.92f;   // TTS speed of the lesson (research-pedagogy §6.1)
+constexpr float kLessonSpeechSpeed = 0.92f;   // TTS speed of the lesson (a little slower)
 constexpr float kLessonIdleHint1 = 20.0f;     // seconds without a touch before the first hint
 constexpr float kLessonIdleHint2 = 45.0f;     // ... and the second one (with pointing)
 

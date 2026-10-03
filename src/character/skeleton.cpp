@@ -16,7 +16,7 @@ static const char* kNames[BoneCount] = {
 
 const char* boneName(Bone b) { return b < BoneCount ? kNames[b] : "?"; }
 
-static Skeleton buildRobot() {
+static Skeleton buildRobotSkeleton() {
     Skeleton s;
     for (int i = 0; i < BoneCount; ++i) { s.parent[i] = -1; s.restOffset[i] = vec3(0); s.boneLength[i] = 0.0f; }
     auto set = [&](Bone b, Bone parent, vec3 off, float len) {
@@ -27,7 +27,7 @@ static Skeleton buildRobot() {
     s.parent[Pelvis] = -1;
     s.boneLength[Pelvis] = 0.10f;
     // Spine: seated eye height ~0.765 m above the seat (pelvis joint is 0.10 m above the seat),
-    // i.e. eyes at ~1.225 m with SEAT_HEIGHT = 0.46; shoulders ~0.56 m above the seat.
+    // i.e. eyes at ~1.225 m with SEAT_HEIGHT = 0.46; shoulders ~0.57 m above the seat.
     set(Spine1, Pelvis, {0, 0.10f, -0.01f}, 0.10f);
     set(Spine2, Spine1, {0, 0.14f, 0.0f}, 0.25f);
     set(Neck, Spine2, {0, 0.25f, -0.005f}, 0.095f);
@@ -39,7 +39,7 @@ static Skeleton buildRobot() {
     set(LidUpperR, Head, {-0.032f, 0.080f, 0.075f}, 0.013f);
     set(LidLowerL, Head, {0.032f, 0.080f, 0.075f}, 0.013f);
     set(LidLowerR, Head, {-0.032f, 0.080f, 0.075f}, 0.013f);
-    // Arms (left = +X). Shoulder joint 0.19 m from the midline, ~0.59 m above the seat.
+    // Arms (left = +X). Shoulder joint 0.19 m from the midline, ~0.57 m above the seat.
     for (int side = 0; side < 2; ++side) {
         float sx = side == 0 ? 1.0f : -1.0f;
         Bone o = side == 0 ? ClavicleL : ClavicleR;
@@ -75,7 +75,7 @@ static Skeleton buildRobot() {
 }
 
 const Skeleton& robotSkeleton() {
-    static Skeleton s = buildRobot();
+    static Skeleton s = buildRobotSkeleton();
     return s;
 }
 

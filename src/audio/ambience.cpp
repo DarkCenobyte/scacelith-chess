@@ -64,7 +64,7 @@ void Ambience::prepare(float sampleRate, uint32_t seed) {
         w.lp.set(1500.0f, 0.7f, fs_);
         w.lag = int(rng_.range(0.0f, 0.6f) * fs_ / 256.0f);
         w.fcOffset = rng_.range(0.85f, 1.15f);
-        w.zL = w.zR = w.ampPrev = 0.0f;
+        w.z = w.ampPrev = 0.0f;
     }
     whistle_.reset();
     whistle_.set(800.0f, 28.0f, fs_);
@@ -159,7 +159,7 @@ void Ambience::startPhrase(int windowHint, int species) {
     b.glass2.setCutoff(r.range(2600.0f, 3400.0f), fs_);
     b.glass1.reset();
     b.glass2.reset();
-    b.lpZL = b.lpZR = 0.0f;
+    b.lpZ = 0.0f;
     b.active = b.count > 0;
     if (b.active && repeatBird_ < 0 && r.chance(0.45f)) {
         repeatBird_ = slot;
@@ -188,8 +188,7 @@ void Ambience::controlUpdate(const Basis& lis, float dt) {
         emitterGains(sp, w.gL, w.gR);
         w.lp1 = sp.lp;
     }
-    whistleF_ = 650.0f + 350.0f * I;
-    whistle_.set(whistleF_, 28.0f, fs_);
+    whistle_.set(650.0f + 350.0f * I, 28.0f, fs_);
     whistleAmpPrev_ = whistleAmp_;
     float ws = clampf((I - 0.6f) / 0.4f, 0.0f, 1.0f);
     whistleAmp_ = kWhistle * ws * ws;
@@ -254,10 +253,10 @@ void Ambience::process(float* L, float* R, float* room, int n, const Basis& lis,
             float x = w.noise.next();
             float v = w.bp.bpNorm(0.6f * x + w.brown.tick(x));
             v = w.lp.lp(v) * (windPrev[i] + (windAmp[i] - windPrev[i]) * a) * gain;
-            w.zL = v + w.lp1 * (w.zL - v);
-            outL += w.zL * w.gL;
-            outR += w.zL * w.gR;
-            send += w.zL;
+            w.z = v + w.lp1 * (w.z - v);
+            outL += w.z * w.gL;
+            outR += w.z * w.gR;
+            send += w.z;
             if (i == 1) {
                 float wh = whistle_.bpNorm(x) * (whistleAmpPrev_ + (whistleAmp_ - whistleAmpPrev_) * a) * gain;
                 outL += wh * w.gL;
@@ -295,10 +294,10 @@ void Ambience::process(float* L, float* R, float* room, int n, const Basis& lis,
                 v *= e * s->amp;
             }
             v = b.glass2.lp(b.glass1.lp(v)) * b.amp * kBird * gain;
-            b.lpZL = v + b.lp * (b.lpZL - v);
-            outL += b.lpZL * b.gL;
-            outR += b.lpZL * b.gR;
-            send += b.lpZL * kBirdSend;
+            b.lpZ = v + b.lp * (b.lpZ - v);
+            outL += b.lpZ * b.gL;
+            outR += b.lpZ * b.gR;
+            send += b.lpZ * kBirdSend;
         }
         L[k] += outL;
         R[k] += outR;
