@@ -17,7 +17,7 @@ void main() {
     vec4 p = frame.invViewProj * vec4(vUV * 2.0 - 1.0, 0.5, 1.0);
     vec3 d = normalize(p.xyz / p.w - frame.cameraPos.xyz);
     int pass = int(frame.passInfo.x);
-    vec3 c = skyRadiance(uSkyTransmittance, uSkyView, d, pass == PASS_ID_MAIN, true);
+    vec3 c = skyRadiance(uSkyTransmittance, uSkyView, d, pass == PASS_ID_MAIN);
     // Planar reflections store the reflected hit distance (m) in alpha: the sky is "far".
     outColor = vec4(min(c, vec3(60000.0)), pass == PASS_ID_PLANAR ? 1000.0 : 1.0);
     outNormalRough = vec4(0.0, 0.0, 0.0, 1.0);

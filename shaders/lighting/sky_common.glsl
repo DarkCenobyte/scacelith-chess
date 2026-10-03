@@ -62,7 +62,7 @@ vec3 skyViewLookup(sampler2D skyView, vec3 d, vec3 sunDir) {
 }
 
 // Pre-exposed sky radiance along world direction d.
-vec3 skyRadiance(sampler2D tLut, sampler2D skyView, vec3 d, bool sunDisk, bool clouds) {
+vec3 skyRadiance(sampler2D tLut, sampler2D skyView, vec3 d, bool sunDisk) {
     vec3 sunDir = frame.sunDirection.xyz;
     vec3 E = lighting.sunTOA.rgb * lighting.skyParams2.w;
     vec3 c = skyViewLookup(skyView, d, sunDir) * E;
@@ -83,11 +83,9 @@ vec3 skyRadiance(sampler2D tLut, sampler2D skyView, vec3 d, bool sunDisk, bool c
             sun = lighting.sunTOA.rgb * T * limb / (PI * th * th);
         }
     }
-    if (clouds) {
-        vec3 amb = skyViewLookup(skyView, normalize(vec3(0.3, 1.0, 0.2)), sunDir) * E;
-        vec4 cl = cloudLayer(d, sunDir, frame.sunRadiance.rgb, amb, lighting.skyParams2.x, lighting.skyParams2.y);
-        c = c * cl.a + cl.rgb;
-        sun *= cl.a;
-    }
+    vec3 amb = skyViewLookup(skyView, normalize(vec3(0.3, 1.0, 0.2)), sunDir) * E;
+    vec4 cl = cloudLayer(d, sunDir, frame.sunRadiance.rgb, amb, lighting.skyParams2.x, lighting.skyParams2.y);
+    c = c * cl.a + cl.rgb;
+    sun *= cl.a;
     return c + sun;
 }

@@ -531,7 +531,8 @@ void Renderer::endFrame() {
     uploadFrameUBO(frame_);
     bindGlobalTextures();
 
-    // Light probes: bake at startup, on invalidateStatic() and when the sun / sky changed a lot.
+    // Light probes: bake on the first frame that draws items, on invalidateStatic() and when the
+    // sun / sky changed a lot.
     if (settings_.lightProbes && drawsScene) {
         const float key[6] = {sunDir.x, sunDir.y, sunDir.z, mie, env_.cloudCoverage, env_.skyIntensity * env_.sunIntensityScale};
         const float* b = bakeKey_;
