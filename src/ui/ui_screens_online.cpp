@@ -691,7 +691,8 @@ void pageMfa(float t) {
     im::formField(L("online.field.code"), O.code, formRow(p, y), 14, im::FIELD_LTR, T("online.field.code.hint"));
     messageLine(p, y + 20.0f);
     footerRule(p);
-    bool back = backButton(p);
+    // Not while the code is checked: its answer would come to the page left.
+    bool back = backButton(p, "common.back", !busy);
     if (primaryButton(p, "online.mfa.verify", trim(O.code).size() >= 6, busy)) {
         O.error.clear();
         s.api().loginMfa(trim(O.code));
@@ -699,7 +700,7 @@ void pageMfa(float t) {
     }
     im::popId();
     endPage();
-    if (back || im::consumeBack()) {
+    if (back || (im::consumeBack() && !busy)) {
         // The code step of adding Google sign-in ends with the page (the server forgets it anyway).
         if (O.mfaForLink) s.api().cancelSso();
         O.code.clear();
