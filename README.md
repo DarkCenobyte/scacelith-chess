@@ -365,8 +365,8 @@ GitHub Actions builds and tests every push to master and every pull request
 (`.github/workflows/ci.yml`): the Linux build and its unit tests, the Windows build cross-compiled
 with MinGW-w64 and its unit tests under Wine (both as above), and a lint of the workflows
 (actionlint and zizmor). The Windows executable of each run is kept for 14 days as a workflow
-artifact, for testing. CodeQL (`.github/workflows/codeql.yml`) scans the C++ code, without
-`third_party/`, and the workflows; its alerts are in the Security tab.
+artifact, for testing. CodeQL (`.github/workflows/codeql.yml`) scans the shipped C++ code
+(without `third_party/` and `tests/`) and the workflows; its alerts are in the Security tab.
 
 The version is set in `cmake/version.cmake`: `SCACELITH_VERSION_CORE` (`1.0.0`) and, for a
 pre-release, `SCACELITH_VERSION_PRERELEASE` (`beta.1`); `cmake -P cmake/version.cmake` prints it

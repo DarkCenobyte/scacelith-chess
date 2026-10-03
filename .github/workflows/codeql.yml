@@ -1,5 +1,6 @@
 # CodeQL code scanning of the game's C++ code (without a build) and of the workflows; the alerts
-# are in the repository's Security tab. The vendored code (third_party/) is left out.
+# are in the repository's Security tab. The vendored code (third_party/) and the tests (tests/),
+# which are not shipped, are left out.
 name: CodeQL
 
 on:
@@ -42,6 +43,7 @@ jobs:
           config: |
             paths-ignore:
               - third_party
+              - tests
               - build
               - build-win
 
