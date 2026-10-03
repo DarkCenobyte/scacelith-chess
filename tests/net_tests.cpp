@@ -1258,7 +1258,7 @@ TEST(net_transport_refuses_insecure) {
 // A server that accepts the request and says nothing: the request and the WebSocket upgrade end
 // at their timeout (Wine's WinHTTP waits for the response headers with a timeout of its own).
 TEST(net_transport_silent_server_times_out) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     fakehttp::Server srv(
         [](const fakehttp::Request&) {
             fakehttp::Reply rep;
@@ -1300,7 +1300,7 @@ TEST(net_transport_silent_server_times_out) {
 // data, between CR and LF), a large body in linear time, malformed and truncated codings (the
 // OpenSSL transport's own decoder; WinHTTP decodes the coding itself).
 TEST(net_transport_chunked_answers) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     std::string body, coded;
     for (size_t i = 0, k = 1; body.size() < (size_t(1) << 20); ++i, k = k % 997 + 1) {
         std::string part(k, char('a' + i % 26));
@@ -2897,7 +2897,7 @@ TEST(net_online_client_gestures) {
 // Frames the client ignores (a client message type, a server message that does not decode): the
 // first ones of a connection are logged, the others counted in one line when it ends; it stays up.
 TEST(net_online_client_bad_frames_logged_once) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     PacingRig r;
     CHECK(r.start("bad-frames"));
     if (!r.c) return;
@@ -2929,7 +2929,7 @@ TEST(net_online_client_bad_frames_logged_once) {
 // The session a connection sent is the one erased when the server revokes it (Notice) or refuses
 // it (close 4003): one saved since, by a sign-in on net-http, stays.
 TEST(net_online_client_refusal_keeps_a_newer_session) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     for (bool refused : {false, true}) {
         PacingRig r;
         bool started = r.start(refused ? "refused-newer" : "revoked-newer");
@@ -3171,7 +3171,7 @@ TEST(net_account_games_history) {
 // A rating change the server leaves out is computed as ratingAfter - rating, clamped to the int
 // range: a buggy or hostile server's extreme ratingAfter must not overflow it.
 TEST(net_account_games_rating_change_clamped) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     AccountRig r("acct-games-clamp", [](const fakehttp::Request& q) {
         if (!hasBearer(q)) return jsonReply(401, R"({"error":"unauthorized"})");
         return jsonReply(200, R"({"games":[{"id":5,"category":"3+2","rated":true,"timeControl":"180+2",
@@ -4311,7 +4311,7 @@ bool runningUnderWine() {
 // cancels that attempt, as disconnect() does: the state is Offline at once, not when the server
 // answers or the request times out.
 TEST(net_logout_cancels_a_connection_attempt) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     std::atomic<int> infos{0};
     fakehttp::Server srv(
         [&](const fakehttp::Request& q) {
@@ -4372,11 +4372,8 @@ TEST(net_logout_cancels_a_connection_attempt) {
 // answers /info (here after 3 s). The window is a few instructions wide, so it is tried at many
 // delays after connect().
 TEST(net_disconnect_as_an_attempt_starts) {
-    if (!net::transportAvailable()) return;
-    if (runningUnderWine()) {
-        std::fprintf(stderr, "  (Wine: a cancelled call ends with the server's answer: skipped)\n");
-        return;
-    }
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    if (runningUnderWine()) SKIP("Wine: a cancelled call ends with the server's answer");
     fakehttp::Server srv(
         [&](const fakehttp::Request&) {
             fakehttp::Reply rep;
@@ -4429,7 +4426,7 @@ TEST(net_disconnect_as_an_attempt_starts) {
 
 // A proof of work for a server that was left stops at once: net-http is free for the next one.
 TEST(net_pow_abandoned_on_server_switch) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     // No 30-bit nonce below 300 000 000 for this challenge (tens of seconds of hashing).
     std::atomic<int> logins{0}, infos{0};
     fakehttp::Server hard([&](const fakehttp::Request& q) {
@@ -4477,7 +4474,7 @@ TEST(net_pow_abandoned_on_server_switch) {
 // The pin field emptied (Options applied) while a sign-in runs: that sign-in saves the pin of the
 // endpoint it was given, so the pin is forgotten after it, not before.
 TEST(net_forget_saved_pin_after_a_sign_in_under_way) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     std::atomic<int> logins{0};
     fakehttp::Server srv([&](const fakehttp::Request& q) {
         if (q.path != "/api/v1/auth/login") return jsonReply(404, "{\"error\":\"not_found\"}");
@@ -4520,7 +4517,7 @@ TEST(net_forget_saved_pin_after_a_sign_in_under_way) {
 // net-http: the pin is forgotten all the same (else the next start would use it again, and
 // Options could no longer clear it). The session stays.
 TEST(net_forget_saved_pin_at_exit) {
-    if (!net::transportAvailable()) return;
+    if (!net::transportAvailable()) SKIP("transport unavailable");
     std::atomic<int> infos{0};
     fakehttp::Server srv([&](const fakehttp::Request& q) {
         if (q.path == "/api/v1/info") ++infos;
