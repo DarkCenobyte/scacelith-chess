@@ -202,7 +202,7 @@ TEST(image_png_bytes) {
 #ifndef _WIN32
 // A failed write (a full disk: /dev/full) is reported and leaves no file behind.
 TEST(image_png_write_error) {
-    if (access("/dev/full", W_OK) != 0) return;
+    if (access("/dev/full", W_OK) != 0) SKIP("/dev/full not writable");
     const std::string path = tmpFile("scacelith_png_full", ".png");
     const char* link = path.c_str();
     std::vector<uint8_t> px(300 * 200 * 3, 7);
