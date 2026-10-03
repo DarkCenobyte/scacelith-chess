@@ -1,6 +1,4 @@
 #include "atmosphere.h"
-#include "lighting_data.h"
-#include "../material.h"
 #include "../shader.h"
 
 using namespace m;
