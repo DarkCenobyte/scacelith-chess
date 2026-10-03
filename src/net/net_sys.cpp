@@ -105,6 +105,22 @@ bool readFile(const std::string& path, std::string& out, size_t maxBytes) {
     return ok;
 }
 
+// Replaces 'to' with 'from'. Windows refuses to replace a file that is open, even for a moment:
+// the game reading it on another thread, an antivirus scan, a backup tool. Such a refusal is tried
+// again for up to a second before the replace fails.
+static bool replaceFile(const std::wstring& from, const std::wstring& to) {
+    const ULONGLONG start = GetTickCount64();
+    DWORD wait = 2;
+    for (;;) {
+        if (MoveFileExW(from.c_str(), to.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH)) return true;
+        DWORD err = GetLastError();
+        if (err != ERROR_SHARING_VIOLATION && err != ERROR_ACCESS_DENIED && err != ERROR_LOCK_VIOLATION) return false;
+        if (GetTickCount64() - start >= 1000) return false;
+        Sleep(wait);
+        wait = wait < 64 ? wait * 2 : 64;
+    }
+}
+
 bool writeFileAtomic(const std::string& path, const std::string& data, bool) {
     std::wstring tmp = widen(path + ".tmp"), dst = widen(path);
     FILE* f = _wfopen(tmp.c_str(), L"wb");
@@ -116,7 +132,7 @@ bool writeFileAtomic(const std::string& path, const std::string& data, bool) {
     // the save.
     if (ok) _commit(_fileno(f));
     fclose(f);
-    if (ok) ok = MoveFileExW(tmp.c_str(), dst.c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
+    if (ok) ok = replaceFile(tmp, dst);
     if (!ok) DeleteFileW(tmp.c_str());
     return ok;
 }
@@ -139,9 +155,7 @@ bool fileSize(const std::string& path, uint64_t& size) {
     return true;
 }
 
-bool renameFile(const std::string& from, const std::string& to) {
-    return MoveFileExW(widen(from).c_str(), widen(to).c_str(), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) != 0;
-}
+bool renameFile(const std::string& from, const std::string& to) { return replaceFile(widen(from), widen(to)); }
 
 bool directoryExists(const std::string& dir) {
     DWORD a = GetFileAttributesW(widen(dir).c_str());
