@@ -1243,14 +1243,19 @@ TEST(net_live_account_api) {
         Scenario s("deleteAccount: wrong password, then with an authenticator code: signed out, realtime stopped, games anonymized");
         c.connect();
         CHECK(waitFor(c, Kind::Welcome, ev, 15000));
-        ev = ask(c, Kind::AccountDeleted, [&] { c.deleteAccount("wrong password 123", "000000"); });
+        std::vector<net::Event> seen;
+        ev = ask(c, Kind::AccountDeleted, [&] { c.deleteAccount("wrong password 123", "000000"); }, 20000, &seen);
         report("deleteAccount(wrong password)", ev);
         CHECK(!ev.ok);
         CHECK_EQ(ev.error, std::string("invalid_password"));
         CHECK(c.hasSavedSession());
+        // Closed for the request, open again once it was refused (its Welcome may come before or after the answer).
+        net::Event welcome;
+        const bool welcomed = std::any_of(seen.begin(), seen.end(), [](const net::Event& e) { return e.kind == Kind::Welcome; });
+        CHECK(welcomed || waitFor(c, Kind::Welcome, welcome, 15000));
         CHECK(c.state() == net::ConnState::Online);
         json::Value code = ctl.call("GET", "/totp?secret=" + queryEncode(secret));
-        std::vector<net::Event> seen;
+        seen.clear();
         ev = ask(c, Kind::AccountDeleted, [&] { c.deleteAccount(pass, code["code"].asString()); }, 20000, &seen);
         report("deleteAccount", ev);
         CHECK(ev.ok);
