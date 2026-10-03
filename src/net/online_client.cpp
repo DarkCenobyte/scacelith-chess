@@ -1797,13 +1797,15 @@ void OnlineClient::startGoogleSso(const SsoBrowserPage& page) {
             d->post(ev);
             return;
         }
-        if (d->ssoCancels.load() != cancels) {   // cancelled while the server answered
+        // Cancelled, or another server chosen (its Google page is not this one), while the server answered.
+        if (d->ssoCancels.load() != cancels || tCommandGen != d->originGen.load()) {
             ev.ok = false;
             ev.error = "cancelled";
             d->post(ev);
             return;
         }
-        const int64_t waitMs = std::clamp<int64_t>(a.body["expiresIn"].asInt(600) * 1000, d->ssoMinWaitMs, 600000);
+        // The seconds are clamped before the product: a huge expiresIn cannot overflow it.
+        const int64_t waitMs = std::max<int64_t>(std::clamp<int64_t>(a.body["expiresIn"].asInt(600), 0, 600) * 1000, d->ssoMinWaitMs);
         d->sso.ep = e;
         d->sso.originGen = tCommandGen;
         d->sso.attemptId = attemptId;

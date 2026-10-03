@@ -5068,7 +5068,8 @@ TEST(net_sso_cancel) {
 }
 
 // Cancelled while the server answers the start: no browser, the listener closed, the start
-// answered "cancelled" and nothing else.
+// answered "cancelled" and nothing else. The same when another server is chosen meanwhile (that
+// Google page is for the previous one).
 TEST(net_sso_cancel_during_start) {
     if (!net::transportAvailable()) SKIP("transport unavailable");
     SsoRig rig("sso-cancel-start");
@@ -5110,6 +5111,31 @@ TEST(net_sso_cancel_during_start) {
     CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
     CHECK(ev.ok);
     CHECK_EQ(rig.openedCount(), size_t(1));
+    rig.c->cancelSso();
+    CHECK(waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 10000));
+
+    {
+        std::lock_guard<std::mutex> lk(m);
+        asked = release = false;
+    }
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    {
+        std::unique_lock<std::mutex> lk(m);
+        CHECK(cv.wait_for(lk, std::chrono::seconds(5), [&] { return asked; }));
+    }
+    net::ServerEndpoint other = rig.ep;
+    other.host = "localhost";
+    rig.c->setServer(other);
+    {
+        std::lock_guard<std::mutex> lk(m);
+        release = true;
+    }
+    cv.notify_all();
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+    CHECK(!ev.ok);
+    CHECK_EQ(ev.error, std::string("cancelled"));
+    CHECK_EQ(rig.openedCount(), size_t(1));
+    CHECK(portRefused(rig.port));
 }
 
 // Another server chosen while Google's page is open: the listener stops, and a code that reached it
