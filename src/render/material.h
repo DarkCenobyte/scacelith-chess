@@ -27,7 +27,7 @@ enum TextureUnit : int {
     TEXUNIT_PLANAR = 13,          // sampler2DArray: planar reflections, one layer per reflector
     TEXUNIT_BRDF_LUT = 14,        // sampler2D: split-sum DFG LUT (rg) + sheen/cloth (b)
     TEXUNIT_SSR = 15,             // sampler2D: screen-space reflection result (rgb, a = confidence)
-    TEXUNIT_SKY = 16,             // reserved, not bound (sky radiance cube)
+    TEXUNIT_SKY = 16,             // reserved, not bound
     TEXUNIT_VOLUMETRIC = 17,      // reserved, not bound
     TEXUNIT_NOISE = 18,           // reserved, not bound
     TEXUNIT_GLOBAL0 = 19,         // .. 23: reserved, not bound

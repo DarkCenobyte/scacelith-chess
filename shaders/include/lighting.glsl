@@ -448,7 +448,7 @@ vec3 indirectSpecular(ProbeBlend pb, SurfaceInput i, vec3 N, vec3 R, float rough
 #if defined(PASS_MAIN) && !defined(MATERIAL_TRANSPARENT)
     // Screen-space reflections replace the probe where they found a hit (planar reflectors
     // already have exact reflections). History is reprojected with last frame's camera.
-    // Transparent surfaces are not in the prepass: the SSR there is the opaque surface's behind.
+    // Transparent surfaces are not in the prepass: the SSR at their pixels belongs to the opaque surface behind them.
     if (planarLayer < 0.0 || frame.passInfo.w <= planarLayer) {
         vec4 pc = frame.prevViewProj * vec4(i.positionWS, 1.0);
         vec2 uvPrev = pc.xy / max(pc.w, 1e-6) * 0.5 + 0.5;
