@@ -697,7 +697,8 @@ bool getFields(Reader& r, Welcome& out) {
            r.u16(out.msgBurst, 0u, 65535u) &&
            r.id53(out.activeGame) &&
            r.u16(out.gestureRate, 0u, 60u) &&
-           r.u16(out.gestureBurst, 0u, 120u);
+           r.u16(out.gestureBurst, 0u, 120u) &&
+           r.u16(out.gestureIdleMs, 0u, 65535u);
 }
 bool getFields(Reader& r, Error& out) {
     return r.u32(out.ref, 0u, 0xffffffffu) &&
@@ -1145,6 +1146,7 @@ void encode(const Welcome& m, std::vector<uint8_t>& out) {
     w.u64(m.activeGame);
     w.u16(m.gestureRate);
     w.u16(m.gestureBurst);
+    w.u16(m.gestureIdleMs);
 }
 bool decode(const uint8_t* p, size_t n, Welcome& out) {
     Reader r(p, n, true);

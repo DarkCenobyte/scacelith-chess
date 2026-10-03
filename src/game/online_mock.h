@@ -140,6 +140,7 @@ public:
     void requestResync(uint64_t gameId);
     void rematch(uint64_t gameId, bool accept);
     void sendGesture(uint64_t gameId, const Gesture& g);
+    int gestureKeepaliveMs() const { return kGestureKeepaliveMinMs; }   // a Welcome with gestureIdleMs 1000
     bool poll(Event& out);
 
     struct Impl;
@@ -175,6 +176,7 @@ public:
     const OnlineGame* currentGame() const;
     int pingMs() const;
     double serverNowMs() const;
+    int gestureKeepaliveMs() const { return kGestureKeepaliveMinMs; }   // the real host's, 1 s
     bool poll(Event& out);
 
     struct Impl;

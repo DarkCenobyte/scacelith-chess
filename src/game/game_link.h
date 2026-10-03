@@ -31,6 +31,9 @@ public:
     // the latest one is kept and the network layer paces them, so it may be called every frame.
     // The opponent's come back as OpponentGesture events of this game.
     virtual void sendGesture(const net::Gesture& g) = 0;
+    // The gesture keepalive (ms, net::gestureKeepaliveMs of the authority's Welcome.gestureIdleMs):
+    // the scene sends a gesture at least this often, and so does the opponent's client.
+    virtual int gestureKeepaliveMs() const = 0;
     // Report the opponent (server games only): category "cheating", "abuse" or "other".
     virtual bool canReport() const = 0;
     virtual void report(const std::string& username, const std::string& category, const std::string& comment) = 0;

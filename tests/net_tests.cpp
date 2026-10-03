@@ -1610,6 +1610,7 @@ public:
     std::atomic<bool> helloTokenOk{false};
     std::atomic<uint64_t> activeGame{0};
     std::atomic<uint16_t> gestureRate{0}, gestureBurst{0};   // Welcome.gestureRate / gestureBurst
+    std::atomic<uint16_t> gestureIdleMs{0};                   // Welcome.gestureIdleMs
     std::atomic<bool> autoPress{true};                        // GameSnapshot.autoPress
     std::atomic<bool> seqOk{true};                            // every client message came numbered in order
     std::atomic<bool> loginToken2{false};                     // sign-ins answer token2 (another session)
@@ -2009,6 +2010,7 @@ private:
                 w.activeGame = activeGame.load();
                 w.gestureRate = gestureRate.load();
                 w.gestureBurst = gestureBurst.load();
+                w.gestureIdleMs = gestureIdleMs.load();
                 sendMsg(s, w);
                 if (w.activeGame) sendSnapshot(s, gseq);
                 pr::S_Ping sp;
@@ -2185,6 +2187,7 @@ TEST(net_online_client_loopback) {
         c.setServer(ep);
         CHECK_EQ(c.server().origin(), "127.0.0.1:" + std::to_string(srv.port));
         CHECK(!c.hasSavedSession());
+        CHECK_EQ(c.gestureKeepaliveMs(), 1000);   // before any Welcome: the shortest
 
         net::Event ev;
         c.fetchServerInfo();
@@ -2798,16 +2801,17 @@ bool enterGame(PacingRig& r, net::Event& snapshot) {
     return waitEvent(*r.c, net::Event::Kind::GameSnapshot, snapshot, 5000) && snapshot.game.id == 77;
 }
 
-// Welcome.gestureRate 10, gestureBurst 6, GameSnapshot.autoPress false. A call every 2 ms for
-// 1.5 s: only the latest Gesture waits and they go at the pace of a bucket one smaller than the
-// server's, the very latest last; the numbering stays shared with the other messages. Nothing
-// goes for another game. The opponent's S_Gesture become one OpponentGesture (the latest; 'game'
-// not filled in), for the current game only.
+// Welcome.gestureRate 10, gestureBurst 6, gestureIdleMs 4000, GameSnapshot.autoPress false. A
+// call every 2 ms for 1.5 s: only the latest Gesture waits and they go at the pace of a bucket one
+// smaller than the server's, the very latest last; the numbering stays shared with the other
+// messages. Nothing goes for another game. The opponent's S_Gesture become one OpponentGesture
+// (the latest; 'game' not filled in), for the current game only.
 void gestureScenario(PacingRig& r) {
     using K = net::Event::Kind;
     net::Event ev;
     if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
     r.expect(!ev.game.autoPress, "GameSnapshot.autoPress reaches OnlineGame");
+    r.expect(r.c->gestureKeepaliveMs() == 4000, "Welcome.gestureIdleMs is the keepalive");
 
     const int kRate = 10, kCapacity = net::gestureSendCapacity(6);
     auto t0 = std::chrono::steady_clock::now();
@@ -2900,11 +2904,12 @@ void gestureScenario(PacingRig& r) {
              "the latest head");
 }
 
-// Welcome.gestureRate 0 (no relay on this server): no Gesture ever goes.
+// Welcome.gestureRate 0 (no relay on this server, gestureIdleMs 0): no Gesture ever goes.
 void gestureOffScenario(PacingRig& r) {
     net::Event ev;
     if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
     r.expect(ev.game.autoPress, "GameSnapshot.autoPress true by default");
+    r.expect(r.c->gestureKeepaliveMs() == 1000, "gestureIdleMs 0: the shortest keepalive");
     net::Gesture g;
     for (int i = 0; i < 60; ++i) {
         g.ply = i;
@@ -2916,11 +2921,14 @@ void gestureOffScenario(PacingRig& r) {
     r.expect(r.c->state() == net::ConnState::Online, "still online");
 }
 
-// A Gesture made while Reconnecting or Offline is never sent after the next Welcome.
+// A Gesture made while Reconnecting or Offline is never sent after the next Welcome. The keepalive
+// is the one of the last Welcome, clamped (gestureIdleMs 30000, then 500).
 void gestureDownScenario(PacingRig& r) {
     using K = net::Event::Kind;
     net::Event ev;
     if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    r.expect(r.c->gestureKeepaliveMs() == 10000, "gestureIdleMs above 10 s: 10 s");
+    r.srv.gestureIdleMs.store(500);   // the next Welcome
     net::Gesture g;
     g.touch = 12;
     r.c->sendGesture(77, g);
@@ -2938,6 +2946,7 @@ void gestureDownScenario(PacingRig& r) {
     r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 15000), "back in the game");
     r.sleepMs(500);
     r.expect(r.srv.gestures().size() == 1, "nothing of the reconnection sent");
+    r.expect(r.c->gestureKeepaliveMs() == 1000, "the new Welcome's gestureIdleMs, below 1 s: 1 s");
 
     r.c->disconnect();
     r.expect(r.stateIs(net::ConnState::Offline, 3000), "offline");
@@ -2999,16 +3008,19 @@ TEST(net_online_client_pacing) {
 }
 
 // Live gestures through OnlineClient: paced and coalesced at Welcome's rate, for the current game
-// only, none without a relay (rate 0) or while the connection is down; the opponent's.
+// only, none without a relay (rate 0) or while the connection is down; the opponent's; the
+// keepalive of Welcome.gestureIdleMs, clamped.
 TEST(net_online_client_gestures) {
     if (!net::transportAvailable()) SKIP("transport unavailable");
     constexpr int kRigs = 3;
     PacingRig rigs[kRigs];
     rigs[0].srv.gestureRate.store(10);
     rigs[0].srv.gestureBurst.store(6);
+    rigs[0].srv.gestureIdleMs.store(4000);
     rigs[0].srv.autoPress.store(false);
     rigs[2].srv.gestureRate.store(10);
     rigs[2].srv.gestureBurst.store(20);
+    rigs[2].srv.gestureIdleMs.store(30000);
     const char* tags[kRigs] = {"gesture", "gesture-off", "gesture-down"};
     void (*scenarios[kRigs])(PacingRig&) = {gestureScenario, gestureOffScenario, gestureDownScenario};
     runRigs(rigs, tags, scenarios, kRigs);
@@ -5761,11 +5773,11 @@ TEST(net_tls_pinned_post_manual) {
 // Live check against a real dedicated server (opt-in). The live-check harness
 // (dedicated-server/tools/live-check, see its README) starts a server (self-signed certificate,
 // HTTPS API and WSS on one port, proof of work for registration), a bot queued in 3+2, then runs:
-//   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password> ./scacelith_tests net_live_server_game
-// This client registers, logs in, connects, queues rated 3+2, plays legal moves for 12 plies
-// (posHash from its own chess::Position FEN) and resigns; the result and the rating update must
-// come back from the server. The account API has its own live check
-// (tests/net_live_account_tests.cpp).
+//   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password>[:<keepalive ms>] ./scacelith_tests net_live_server_game
+// This client registers, logs in, connects (the gesture keepalive of the server's Welcome must be
+// <keepalive ms> when given), queues rated 3+2, plays legal moves for 12 plies (posHash from its
+// own chess::Position FEN) and resigns; the result and the rating update must come back from the
+// server. The account API has its own live check (tests/net_live_account_tests.cpp).
 // =============================================================================================
 TEST(net_live_server_game) {
     const char* env = std::getenv("SCACELITH_NET_LIVE");
@@ -5777,8 +5789,8 @@ TEST(net_live_server_game) {
         for (char ch : s) { if (ch == ':') { f.push_back(cur); cur.clear(); } else cur += ch; }
         f.push_back(cur);
     }
-    CHECK_EQ(int(f.size()), 5);
-    if (f.size() != 5) return;
+    CHECK(f.size() == 5 || f.size() == 6);
+    if (f.size() != 5 && f.size() != 6) return;
     char credPath[256];
     std::snprintf(credPath, sizeof credPath, "scacelith-live-%d.credentials", int(std::time(nullptr) % 100000));
     net::OnlineClient c;
@@ -5804,7 +5816,9 @@ TEST(net_live_server_game) {
     if (!ev.ok) { std::remove(credPath); return; }
     c.connect();
     CHECK(waitEvent(c, net::Event::Kind::Welcome, ev, 15000, &seen));
-    std::fprintf(stderr, "  welcome from '%s' as %s\n", ev.serverName.c_str(), ev.account.username.c_str());
+    std::fprintf(stderr, "  welcome from '%s' as %s, gesture keepalive %d ms\n", ev.serverName.c_str(),
+                 ev.account.username.c_str(), c.gestureKeepaliveMs());
+    if (f.size() == 6) CHECK_EQ(c.gestureKeepaliveMs(), std::atoi(f[5].c_str()));
     c.joinQueue("3+2", true);
     CHECK(waitEvent(c, net::Event::Kind::GameSnapshot, ev, 20000, &seen));
     const uint64_t gameId = ev.game.id;

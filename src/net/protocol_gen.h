@@ -34,7 +34,7 @@ namespace proto {
 constexpr uint16_t kProtocolVersion = 1;   // Hello.proto, Welcome.proto
 constexpr uint16_t kMinor = 0;             // the minor this codec speaks
 constexpr uint64_t kCaps = 0x0ull;           // capability bits this codec knows
-constexpr uint32_t kFingerprint = 0x498a5fd9u;   // schema fingerprint (informational)
+constexpr uint32_t kFingerprint = 0x05d4f428u;   // schema fingerprint (informational)
 constexpr const char* kWsSubprotocol = "scacelith.rt1";
 constexpr uint64_t kId53Limit = 1ull << 53;   // id53 values are below 2^53
 // Largest client message, in bytes (type byte included). The server refuses a larger WebSocket message from
@@ -377,8 +377,8 @@ struct Rematch {
     bool accept = false;
 };
 // The player's live, cosmetic state in game `game`, relayed to the opponent byte for byte (server Gesture)
-// and never answered, stored or looked at beyond decoding. Sent when it changes and at least once a second,
-// paced by Welcome.gestureRate and gestureBurst.
+// and never answered, stored or looked at beyond decoding. Sent when it changes and at least every
+// Welcome.gestureIdleMs, paced by Welcome.gestureRate and gestureBurst.
 struct C_Gesture {
     static constexpr MsgType kType = MsgType::C_Gesture;
     static constexpr bool kClientToServer = true;
@@ -412,6 +412,7 @@ struct Welcome {
     uint64_t activeGame = 0;
     uint16_t gestureRate = 0;  // max 60
     uint16_t gestureBurst = 0;  // max 120
+    uint16_t gestureIdleMs = 0;
 };
 // A request was refused. Frozen layout for every version. fatal: the server closes the connection right after
 // it (close code 4000 + code or 4300 + (code - 240)).
@@ -950,6 +951,7 @@ template <class V> void visitFields(Welcome& m, V&& v) {
     v("activeGame", m.activeGame);
     v("gestureRate", m.gestureRate);
     v("gestureBurst", m.gestureBurst);
+    v("gestureIdleMs", m.gestureIdleMs);
 }
 template <class V> void visitFields(const Welcome& m, V&& v) {
     v("proto", m.proto);
@@ -966,6 +968,7 @@ template <class V> void visitFields(const Welcome& m, V&& v) {
     v("activeGame", m.activeGame);
     v("gestureRate", m.gestureRate);
     v("gestureBurst", m.gestureBurst);
+    v("gestureIdleMs", m.gestureIdleMs);
 }
 template <class V> void visitFields(Error& m, V&& v) {
     v("ref", m.ref);

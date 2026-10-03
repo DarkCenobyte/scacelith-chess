@@ -142,37 +142,77 @@ TEST(live_gesture_flags_and_head) {
 }
 
 TEST(live_gesture_due_on_change_head_turn_and_keepalive) {
+    constexpr int kKeepalive = 1000;   // Welcome.gestureIdleMs at the default
     net::Gesture last = handGesture(8, E2);
     last.yaw = 0.1f;
     last.pitch = -0.3f;
     last.lean = 0.2f;
     net::Gesture now = last;
-    CHECK(!live::gestureDue(last, now, 100.0));
-    CHECK(!live::gestureDue(last, now, 999.0));
-    CHECK(live::gestureDue(last, now, live::kKeepaliveMs));
+    CHECK(!live::gestureDue(last, now, 100.0, kKeepalive));
+    CHECK(!live::gestureDue(last, now, 999.0, kKeepalive));
+    CHECK(live::gestureDue(last, now, 1000.0, kKeepalive));
     // The head: about a degree, or 0.05 of lean.
     now.yaw = last.yaw + 0.5f * DEG;
-    CHECK(!live::gestureDue(last, now, 100.0));
+    CHECK(!live::gestureDue(last, now, 100.0, kKeepalive));
     now.yaw = last.yaw - 1.5f * DEG;
-    CHECK(live::gestureDue(last, now, 100.0));
+    CHECK(live::gestureDue(last, now, 100.0, kKeepalive));
     now = last;
     now.pitch = last.pitch + 1.5f * DEG;
-    CHECK(live::gestureDue(last, now, 100.0));
+    CHECK(live::gestureDue(last, now, 100.0, kKeepalive));
     now = last;
     now.lean = last.lean + 0.04f;
-    CHECK(!live::gestureDue(last, now, 100.0));
+    CHECK(!live::gestureDue(last, now, 100.0, kKeepalive));
     now.lean = last.lean + 0.06f;
-    CHECK(live::gestureDue(last, now, 100.0));
+    CHECK(live::gestureDue(last, now, 100.0, kKeepalive));
     // The state: hand, ply, flags.
     now = last;
     now.aim = E4;
-    CHECK(live::gestureDue(last, now, 0.0));
+    CHECK(live::gestureDue(last, now, 0.0, kKeepalive));
     now = last;
     now.ply = 9;
-    CHECK(live::gestureDue(last, now, 0.0));
+    CHECK(live::gestureDue(last, now, 0.0, kKeepalive));
     now = last;
     now.flags = flag::Side;
-    CHECK(live::gestureDue(last, now, 0.0));
+    CHECK(live::gestureDue(last, now, 0.0, kKeepalive));
+}
+
+// The keepalive follows the link's (Welcome.gestureIdleMs, clamped to 1 s .. 10 s): a player who
+// sits still sends one gesture per interval, and a change still goes at once whatever it is.
+TEST(live_gesture_keepalive_follows_the_link) {
+    CHECK_EQ(net::gestureKeepaliveMs(0), 1000);   // no relay announced: the minimum
+    CHECK_EQ(net::gestureKeepaliveMs(1), 1000);
+    CHECK_EQ(net::gestureKeepaliveMs(999), 1000);
+    CHECK_EQ(net::gestureKeepaliveMs(1000), 1000);
+    CHECK_EQ(net::gestureKeepaliveMs(4000), 4000);
+    CHECK_EQ(net::gestureKeepaliveMs(10000), 10000);
+    CHECK_EQ(net::gestureKeepaliveMs(10001), 10000);
+    CHECK_EQ(net::gestureKeepaliveMs(65535), 10000);   // the widest u16
+
+    const net::Gesture still = handGesture(8, E2);
+    CHECK(!live::gestureDue(still, still, 3999.0, 4000));
+    CHECK(live::gestureDue(still, still, 4000.0, 4000));
+    CHECK(!live::gestureDue(still, still, 999.0, 500));    // below the range: 1 s
+    CHECK(live::gestureDue(still, still, 1000.0, 500));
+    CHECK(!live::gestureDue(still, still, 9999.0, 30000));  // above it: 10 s
+    CHECK(live::gestureDue(still, still, 10000.0, 30000));
+    net::Gesture moved = still;
+    moved.aim = E4;
+    CHECK(live::gestureDue(still, moved, 0.0, 10000));
+
+    // A still player, a frame every 1/60 s for a minute: one gesture per interval (each one at
+    // the first frame past it).
+    for (int keepalive : {1000, 2500, 4000, 10000}) {
+        double since = 0.0;
+        int sent = 0;
+        for (int frame = 0; frame < 3600; ++frame) {
+            since += 1000.0 / 60.0;
+            if (!live::gestureDue(still, still, since, keepalive)) continue;
+            ++sent;
+            since = 0.0;
+        }
+        CHECK(sent <= 60000 / keepalive);
+        CHECK(sent >= 60000 / (keepalive + 17));
+    }
 }
 
 TEST(live_side_look_falls_on_the_table_beside_the_board) {
@@ -424,17 +464,58 @@ TEST(live_gesture_flood_never_delays_the_opponents_move) {
 }
 
 TEST(live_head_and_hold_timeouts) {
-    CHECK(live::headActive(0.0f, true, false, false, false));
-    CHECK(live::headActive(2.4f, true, false, false, false));
-    CHECK(!live::headActive(live::kHeadTimeout, true, false, false, false));
-    CHECK(!live::headActive(0.0f, false, false, false, false));  // stale
-    CHECK(!live::headActive(0.0f, true, true, false, false));    // the option ignores it
-    CHECK(!live::headActive(0.0f, true, false, true, false));    // the opponent is away
-    CHECK(!live::headActive(0.0f, true, false, false, true));    // we are reconnecting
-    CHECK(!live::holdExpired(4.9f));
-    CHECK(live::holdExpired(live::kHoldTimeout));
+    constexpr int kKeepalive = 1000;   // Welcome.gestureIdleMs at the default
+    CHECK(live::headActive(0.0f, true, false, false, false, kKeepalive));
+    CHECK(live::headActive(2.4f, true, false, false, false, kKeepalive));
+    CHECK(!live::headActive(2.5f, true, false, false, false, kKeepalive));
+    CHECK(!live::headActive(0.0f, false, false, false, false, kKeepalive));  // stale
+    CHECK(!live::headActive(0.0f, true, true, false, false, kKeepalive));    // the option ignores it
+    CHECK(!live::headActive(0.0f, true, false, true, false, kKeepalive));    // the opponent is away
+    CHECK(!live::headActive(0.0f, true, false, false, true, kKeepalive));    // we are reconnecting
+    CHECK(!live::holdExpired(4.9f, kKeepalive));
+    CHECK(live::holdExpired(5.0f, kKeepalive));
     // A keepalive a second never lets a held piece go.
-    CHECK(!live::holdExpired(float(live::kKeepaliveMs) / 1000.0f + 1.0f));
+    CHECK(!live::holdExpired(1.0f + 1.0f, kKeepalive));
+}
+
+// The timeouts of the opponent's gestures count in keepalives (their client sends at the link's
+// interval too): 2.5, 5 and 5 of them, today's 2.5 s, 5 s and 5 s at the 1 s default and never
+// less, whatever the link says.
+TEST(live_gesture_timeouts_scale_with_the_keepalive) {
+    CHECK(near(live::headTimeout(1000), 2.5f));
+    CHECK(near(live::holdTimeout(1000), 5.0f));
+    CHECK(near(live::placedTimeout(1000), 5.0f));
+    CHECK(near(live::headTimeout(4000), 10.0f));
+    CHECK(near(live::holdTimeout(4000), 20.0f));
+    CHECK(near(live::placedTimeout(4000), 20.0f));
+    CHECK(near(live::headTimeout(10000), 25.0f));
+    CHECK(near(live::holdTimeout(10000), 50.0f));
+    CHECK(near(live::placedTimeout(10000), 50.0f));
+    for (int raw : {0, 1, 500, 999}) {   // below the range: today's values
+        CHECK(near(live::headTimeout(raw), 2.5f));
+        CHECK(near(live::holdTimeout(raw), 5.0f));
+        CHECK(near(live::placedTimeout(raw), 5.0f));
+    }
+    CHECK(near(live::holdTimeout(65535), 50.0f));   // above it: those of 10 s
+    for (int keepalive = 0; keepalive <= 12000; keepalive += 250) {
+        CHECK(live::headTimeout(keepalive) >= 2.5f);
+        CHECK(live::holdTimeout(keepalive) >= 5.0f);
+        CHECK(live::placedTimeout(keepalive) >= 5.0f);
+    }
+
+    // At 4 s a gesture 9.9 s old still drives the head and a piece held 19.9 s without one stays;
+    // past each timeout they no longer do.
+    CHECK(live::headActive(9.9f, true, false, false, false, 4000));
+    CHECK(!live::headActive(10.0f, true, false, false, false, 4000));
+    CHECK(!live::holdExpired(19.9f, 4000));
+    CHECK(live::holdExpired(20.0f, 4000));
+    // A keepalive two intervals late is never a timeout, at any interval.
+    for (int keepalive : {1000, 2500, 4000, 10000}) {
+        const float twoLate = 2.0f * float(keepalive) / 1000.0f;
+        CHECK(live::headActive(twoLate, true, false, false, false, keepalive));
+        CHECK(!live::holdExpired(twoLate, keepalive));
+        CHECK(twoLate < live::placedTimeout(keepalive));
+    }
 }
 
 TEST(live_head_spring_follows_without_overshoot) {

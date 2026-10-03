@@ -3,12 +3,12 @@
 // (tests/online_live_tests.cpp) reach them without the scene.
 //   - My gesture (net/gesture.h): built from what my hand and my head do, with a short dwell before
 //     an aimed square counts and the Side test of the look; sent when it changed, when the head
-//     moved noticeably, and once a second at least.
+//     moved noticeably, and at least once per keepalive (Welcome.gestureIdleMs, 1 s by default).
 //   - The opponent's gestures: when their piece fields may move the opponent's robot, which of
 //     their squares and moves are valid here (gestures are untrusted and cosmetic), how long they
-//     stay valid, the pace of the robot's hand (one step at a time, whatever their rate), what
-//     becomes of its live work when their move comes, and the spring the robot's head follows
-//     them with.
+//     stay valid (in keepalives: their client sends at the same interval), the pace of the robot's
+//     hand (one step at a time, whatever their rate), what becomes of its live work when their
+//     move comes, and the spring the robot's head follows them with.
 //   - My clock display while my move is on its way, and the resend of a move the authority never
 //     got (a connection lost at the wrong moment).
 //   - The RatingRestored notice, held back while a game is being played.
@@ -42,7 +42,6 @@ constexpr int kNoSquare = net::Gesture::kNoSquare;
 // =============================================================================================
 
 constexpr float kAimDwell = 0.12f;          // s the pointer rests on a square before the aim counts
-constexpr double kKeepaliveMs = 1000.0;     // a gesture at least this often, even when nothing moved
 constexpr float kPoseStep = 1.0f * m::DEG;  // a head turn worth a message
 constexpr float kLeanStep = 0.05f;          // a lean change worth a message
 
@@ -110,9 +109,11 @@ inline net::Gesture buildGesture(const Hand& hand, int plies, float yaw, float p
 }
 
 // Whether 'now' is worth sending after 'last' went 'sinceLastMs' ago: the state changed (hand,
-// ply, Glance, Side), the head turned by about a degree or leaned, or the keepalive is due.
-inline bool gestureDue(const net::Gesture& last, const net::Gesture& now, double sinceLastMs) {
-    if (!last.sameState(now) || sinceLastMs >= kKeepaliveMs) return true;
+// ply, Glance, Side), the head turned by about a degree or leaned, or the keepalive is due: a
+// gesture goes at least every 'keepaliveMs' (GameLink::gestureKeepaliveMs, clamped here too), even
+// when nothing moved.
+inline bool gestureDue(const net::Gesture& last, const net::Gesture& now, double sinceLastMs, int keepaliveMs) {
+    if (!last.sameState(now) || sinceLastMs >= double(net::gestureKeepaliveMs(keepaliveMs))) return true;
     return std::fabs(now.yaw - last.yaw) > kPoseStep || std::fabs(now.pitch - last.pitch) > kPoseStep ||
            std::fabs(now.lean - last.lean) > kLeanStep;
 }
@@ -132,12 +133,22 @@ inline bool lookBesideBoard(m::vec3 origin, m::vec3 dir) {
 // The opponent's gestures
 // =============================================================================================
 
-constexpr float kHeadTimeout = 2.5f;    // s: an older gesture no longer drives the robot's head
-constexpr float kHoldTimeout = 5.0f;    // s without a gesture: a piece held live is put back
-constexpr float kPlacedTimeout = 5.0f;  // s a move put down waits for its MoveMade once the gestures left it
+// Their client sends a gesture at least once per keepalive (both clients read the same
+// Welcome.gestureIdleMs), so the timeouts of their gestures count in keepalives: 2.5 s, 5 s and
+// 5 s at the shortest keepalive (1 s, the default), never less.
+constexpr float kHeadTimeoutKeepalives = 2.5f;    // an older gesture no longer drives the robot's head
+constexpr float kHoldTimeoutKeepalives = 5.0f;    // without a gesture: a piece held live is put back
+constexpr float kPlacedTimeoutKeepalives = 5.0f;  // a move put down waits for its MoveMade once the gestures left it
 constexpr float kFollowDwell = 0.15f;   // s an aim holds before the robot carries the piece over it
 constexpr float kAimLost = 0.6f;        // s without an aim before the piece goes back over its square
 constexpr float kHandSlack = 0.05f;     // s of work left to the robot's hand when it may take its next step
+
+// Those timeouts in seconds, for the keepalive of the link (ms, GameLink::gestureKeepaliveMs,
+// clamped here too).
+inline float keepaliveSeconds(int keepaliveMs) { return float(net::gestureKeepaliveMs(keepaliveMs)) / 1000.0f; }
+inline float headTimeout(int keepaliveMs) { return kHeadTimeoutKeepalives * keepaliveSeconds(keepaliveMs); }
+inline float holdTimeout(int keepaliveMs) { return kHoldTimeoutKeepalives * keepaliveSeconds(keepaliveMs); }
+inline float placedTimeout(int keepaliveMs) { return kPlacedTimeoutKeepalives * keepaliveSeconds(keepaliveMs); }
 
 // The local state that decides whether the piece fields of the opponent's latest gesture apply
 // (touch, aim, placed): only to the move being prepared, never to one already known.
@@ -252,13 +263,13 @@ inline LiveStart liveStart(const LiveWork& w, int ply, uint16_t move) {
 }
 
 // The opponent's head drives their robot: the option to ignore it is off, the last gesture is
-// recent and fresh, the opponent is connected and so are we.
-inline bool headActive(float gestureAge, bool fresh, bool ignored, bool opponentAway, bool reconnecting) {
-    return fresh && !ignored && !opponentAway && !reconnecting && gestureAge < kHeadTimeout;
+// recent (under headTimeout) and fresh, the opponent is connected and so are we.
+inline bool headActive(float gestureAge, bool fresh, bool ignored, bool opponentAway, bool reconnecting, int keepaliveMs) {
+    return fresh && !ignored && !opponentAway && !reconnecting && gestureAge < headTimeout(keepaliveMs);
 }
 
-// A piece held live is put back when the gestures stopped coming (the keepalive is once a second).
-inline bool holdExpired(float gestureAge) { return gestureAge >= kHoldTimeout; }
+// A piece held live is put back when the gestures stopped coming (five keepalives without one).
+inline bool holdExpired(float gestureAge, int keepaliveMs) { return gestureAge >= holdTimeout(keepaliveMs); }
 
 // A critically damped spring towards the latest head angles (radians), sub-stepped: the robot's
 // head follows the opponent's samples (a few per second) smoothly, without overshoot.

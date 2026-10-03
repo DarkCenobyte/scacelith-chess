@@ -21,14 +21,15 @@
 //   - Live gestures (net/gesture.h; the rules are in online_live.h). Mine: the piece in hand, the
 //     square it is aimed at (after a short dwell), the promotion picker, a staged move, and my
 //     head (look, lean, the glance at my scoresheet, a look beside the board) go to the opponent
-//     when they change, once a second at least, while the game is played. The opponent's drive
-//     their robot: it takes the piece they touch, carries it over the square they aim at, puts a
-//     staged move down before their press, lets go of the piece when they do, and its head and
-//     lean follow theirs (unless Options > Gameplay ignores the opponent's head). Gestures are
-//     cosmetic and come from the other client: their squares are checked, they apply only to the
-//     move being prepared, and they never touch the game, the arbiter, the clocks or og_. Nor my
-//     turn: the robot's hand takes one step at a time from their latest gesture however fast they
-//     come, and their MoveMade drops at once whatever it has left that is not that move.
+//     when they change, once per keepalive at least (GameLink::gestureKeepaliveMs, 1 s by
+//     default), while the game is played. The opponent's drive their robot: it takes the piece
+//     they touch, carries it over the square they aim at, puts a staged move down before their
+//     press, lets go of the piece when they do, and its head and lean follow theirs (unless
+//     Options > Gameplay ignores the opponent's head). Gestures are cosmetic and come from the
+//     other client: their squares are checked, they apply only to the move being prepared, and
+//     they never touch the game, the arbiter, the clocks or og_. Nor my turn: the robot's hand
+//     takes one step at a time from their latest gesture however fast they come, and their
+//     MoveMade drops at once whatever it has left that is not that move.
 //   - The clock shows the server's times (extrapolated with serverNowMs()), never flags locally
 //     (it stops at 0.0 until the server's GameEnd).
 //   - MoveRejected / a snapshot that disagrees: once the robots are idle the board, the game and
@@ -664,7 +665,7 @@ void GameScene::sendOnlineGesture(float dt) {
     if (over) {
         gestureFinal_ = true;
         if (gestureSentAny_ && live::sameHand(gestureSent_, g)) return;  // idle already
-    } else if (gestureSentAny_ && !live::gestureDue(gestureSent_, g, gestureSinceMs_)) {
+    } else if (gestureSentAny_ && !live::gestureDue(gestureSent_, g, gestureSinceMs_, link_->gestureKeepaliveMs())) {
         return;
     }
     link_->sendGesture(g);
@@ -684,9 +685,10 @@ bool GameScene::remoteMoveQueued(int ply) const {
 void GameScene::updateRemoteLive(float dt) {
     RemoteLive& L = remoteLive_;
     if (L.takeBack) return;
-    // Their gestures stopped coming (the keepalive is once a second): the piece goes back (a move
-    // put down is taken back), and their next gesture takes it again.
-    if (L.pieceId >= 0 && live::holdExpired(remoteAge_)) {
+    // Their gestures stopped coming (five keepalives without one): the piece goes back (a move put
+    // down is taken back), and their next gesture takes it again.
+    const int keepaliveMs = link_->gestureKeepaliveMs();
+    if (L.pieceId >= 0 && live::holdExpired(remoteAge_, keepaliveMs)) {
         cancelRemoteLive();
         remoteFresh_ = false;
         return;
@@ -707,7 +709,7 @@ void GameScene::updateRemoteLive(float dt) {
         // The move put down stays until its MoveMade, or until the gestures have shown something
         // else for a while (the move then never came: the board is set back).
         L.placedAway = in.placed == L.placed ? 0.0f : L.placedAway + dt;
-        if (L.placedAway >= live::kPlacedTimeout) L.takeBack = true;
+        if (L.placedAway >= live::placedTimeout(keepaliveMs)) L.takeBack = true;
         return;
     }
     // One step at a time, from their latest gesture (live::handStep).
@@ -820,7 +822,8 @@ bool GameScene::driveRemoteHead(float dt) {
     int r = aiSeat();
     const net::Gesture& g = remoteGesture_;
     bool following = (state_ == State::Intro || state_ == State::Handshake || state_ == State::Playing || state_ == State::GameOver) &&
-                     link_ && live::headActive(remoteAge_, remoteFresh_, settings().ignoreOpponentHead, opponentAway_, link_->reconnecting());
+                     link_ && live::headActive(remoteAge_, remoteFresh_, settings().ignoreOpponentHead, opponentAway_, link_->reconnecting(),
+                                               link_->gestureKeepaliveMs());
     // Their clock stands at their right on their screen, not here: the robot's own look follows its
     // hand to this clock.
     bool active = following && !anim_[r].runningTask(anim::TaskType::PressClock);

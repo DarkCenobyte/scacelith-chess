@@ -127,9 +127,12 @@ Players appear as user 1 (host) and 2 (guest) with the names they chose, no rati
 before the clock press, the head; `src/net/gesture.h`) are cosmetic and go straight to the other
 player, never through the authority nor the command queue: the host sends `S_Gesture`, the guest
 `C_Gesture` (numbered with its other messages). The host's `Welcome` announces the bucket each
-side receives with: `gestureRate` 10 per second, `gestureBurst` 20. `DirectMatch::sendGesture()`
-keeps only the latest gesture and sends it when a bucket one smaller than that (19) allows;
-nothing is kept while the link is down and nothing made then is sent after the reconnection. The
+side receives with, `gestureRate` 10 per second and `gestureBurst` 20, and the keepalive of both
+scenes, `gestureIdleMs` 1000: a gesture at least every second while nothing changes, the unit of
+the timeouts of the opponent's gestures (`DirectMatch::gestureKeepaliveMs()`; a guest clamps the
+value to 1 s .. 10 s, as for a server). `DirectMatch::sendGesture()` keeps only the latest
+gesture and sends it when a bucket one smaller than that (19) allows; nothing is kept while the
+link is down and nothing made then is sent after the reconnection. The
 link takes gestures again before the game hears that the other player is there (the snapshot,
 `Online` after a reconnection), so the first gesture sent on that news is never dropped. The host
 checks the guest's gestures with a bucket of its own (one beyond the rate, or for another game
@@ -245,9 +248,10 @@ grace, rematch, `autoPress` in every snapshot, the 1200-ply cap), and full match
 code, reconnection through a relay that cuts the connection, the host vanishing, a flag with a
 1 s clock, leaving; `autoPress` off through a rematch, gestures both ways and their pacing, none
 replayed after a reconnection; the "connection from" log paced under 50 junk connections), a
-guest written by hand (`Welcome`'s gesture values, 100 gestures at once without tripping the
-flood limit, the host keeping its bucket's worth, a refused connection and a flood closed without
-stalling the host, messages out of sequence logged once, a message of an unknown type answered
-`Malformed`) and a host written by hand (a guest's gesture sent the moment it is back online after
-a reconnection arrives, a host flooding the guest with events dropped, one more attempt after a
-close before the host's confirmation, and giving up after a second one).
+guest written by hand (`Welcome`'s gesture values and keepalive, 100 gestures at once without
+tripping the flood limit, the host keeping its bucket's worth, a refused connection and a flood
+closed without stalling the host, messages out of sequence logged once, a message of an unknown
+type answered `Malformed`) and a host written by hand (a guest's gesture sent the moment it is
+back online after a reconnection arrives, the guest's keepalive taken from the host's `Welcome`
+and clamped, a host flooding the guest with events dropped, one more attempt after a close before
+the host's confirmation, and giving up after a second one).
