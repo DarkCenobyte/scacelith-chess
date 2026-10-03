@@ -4,7 +4,7 @@ A friendly game between two players by direct connection: no server, no account,
 One player **hosts** (the game opens a TCP port and asks the home router to forward it), the other
 **joins** with the host's address, port and a 12-character code. The host's game is the authority
 of the match, exactly like the dedicated server is for online games, and both sides speak the same
-realtime protocol as online play (version 1, `dedicated-server/docs/PROTOCOL.md`) inside an
+realtime protocol as online play (version 1, [protocol/PROTOCOL.md](../protocol/PROTOCOL.md)) inside an
 encrypted channel, so the 3D scene plays a direct match with the online game code.
 
 Code: `src/net/direct_match.h` (API), `direct_match.cpp` (sessions and threads),
@@ -83,7 +83,7 @@ and above): nobody can reach you on IPv4 then, whatever the router does. What wo
 
 ## The game
 
-The host's game applies the rules of the dedicated server (`dedicated-server/docs/DESIGN.md`
+The host's game applies the rules of the dedicated server (its [DESIGN.md](https://github.com/DarkCenobyte/scacelith-chess-server/blob/master/docs/DESIGN.md)
 6.1 to 6.4) in a simplified, unrated form, with its own values below and no credit for stalls of
 the host itself:
 

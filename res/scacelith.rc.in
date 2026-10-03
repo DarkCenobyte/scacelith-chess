@@ -15,12 +15,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "Scacelith"
             VALUE "FileDescription", "Scacelith - photorealistic chess"
-            VALUE "FileVersion", "@PROJECT_VERSION@"
+            VALUE "FileVersion", "@SCACELITH_VERSION@"
             VALUE "InternalName", "Scacelith"
             VALUE "LegalCopyright", "GPL-3.0-or-later"
             VALUE "OriginalFilename", "Scacelith.exe"
             VALUE "ProductName", "Scacelith"
-            VALUE "ProductVersion", "@PROJECT_VERSION@"
+            VALUE "ProductVersion", "@SCACELITH_VERSION@"
         END
     END
     BLOCK "VarFileInfo"

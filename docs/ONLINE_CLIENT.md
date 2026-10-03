@@ -1,11 +1,12 @@
 # Online play: the client side
 
 How the game shows and plays online games. The network layer itself (`src/net/`: HTTPS API,
-secure WebSocket, credential store, direct match with UPnP) and the server (`dedicated-server/`,
-written in Rust; its realtime protocol v1 is specified in `dedicated-server/docs/PROTOCOL.md` and
-its HTTPS API in `dedicated-server/docs/API.md`) are described in their own documents; this page
-covers what sits on top of them in `src/game/` and `src/ui/`, the server in use and the account
-API calls of `net::OnlineClient`.
+secure WebSocket, credential store, direct match with UPnP) is described in the code, and the
+realtime protocol v1 the game speaks in [protocol/PROTOCOL.md](../protocol/PROTOCOL.md). The server
+is not part of this repository: it lives in
+[DarkCenobyte/scacelith-chess-server](https://github.com/DarkCenobyte/scacelith-chess-server), whose
+[API.md](https://github.com/DarkCenobyte/scacelith-chess-server/blob/master/docs/API.md) is the reference of its HTTPS API. This page covers what sits on top of the network layer in
+`src/game/` and `src/ui/`, the server in use and the account API calls of `net::OnlineClient`.
 
 ## Pieces
 
@@ -105,7 +106,7 @@ server.
 ## Account API
 
 Besides the WebSocket, the server has an HTTPS API under `/api/v1` on the same port
-(`dedicated-server/docs/API.md` is the full reference). `net::OnlineClient` uses it for the
+(the server's [API.md](https://github.com/DarkCenobyte/scacelith-chess-server/blob/master/docs/API.md) is the full reference). `net::OnlineClient` uses it for the
 sign-in (register, login with its proof of work, two-factor step, Google sign-in, logout), the
 account (`/account/me`, password, two-factor setup, recovery codes, reports) and the account API
 calls below. Each returns at once; its answer comes back as one event (`ok`, or `error` with the
@@ -181,7 +182,7 @@ Rules common to these calls:
 ### Google sign-in
 
 Offered when `GET /info` says `sso.google`. Google sends the browser back to the game itself, on
-127.0.0.1 (RFC 8252 loopback redirect); nothing is polled (`dedicated-server/docs/API.md` has the
+127.0.0.1 (RFC 8252 loopback redirect); nothing is polled (the server's [API.md](https://github.com/DarkCenobyte/scacelith-chess-server/blob/master/docs/API.md) has the
 server's side).
 
 1. `startGoogleSso(page)` makes the PKCE pair and opens the listener first
@@ -311,7 +312,7 @@ same as against Stockfish, with these differences:
   client comes back by itself after a random delay, longer when the server is full or restarting
   but 8 s at most during a game unless the server asked to wait longer (a `Retry-After`): the
   server keeps the game for the reconnection grace, at least 15 s by default and 90 s after a
-  restart (`dedicated-server/docs/PROTOCOL.md`, "Connection lifecycle", steps 8 and 9). The
+  restart ([protocol/PROTOCOL.md](../protocol/PROTOCOL.md), "Connection lifecycle", steps 8 and 9). The
   delay grows with each attempt and starts again from the shortest only after a connection that
   stayed up for a minute, so a server that closes right after letting the player in is not called
   again every second or two. After a restart the server

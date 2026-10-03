@@ -11,8 +11,8 @@
 // fed the client's events), and the move of the official server's saved session from port 44664
 // to 443.
 //
-// Vectors: dedicated-server/test/fixtures/protocol-vectors.json, written by the server's protogen
-// from dedicated-server/protocol/scacelith-v1.json, like net/protocol_gen.h. The file is looked up
+// Vectors: protocol/protocol-vectors.json, written by the server's protogen from
+// protocol/scacelith-v1.json, like net/protocol_gen.h. The file is looked up
 // from the current directory (run from the repository root), $SCACELITH_SOURCE_DIR and the
 // executable's parent directories.
 #ifdef _WIN32
@@ -349,11 +349,11 @@ TEST(net_protocol_constants) {
     }
 }
 
-// The shared golden vectors: dedicated-server/test/fixtures/protocol-vectors.json, written by
+// The shared golden vectors: protocol/protocol-vectors.json, written by the server's
 // protogen from the schema independently of the codecs it checks (format in its "about" key).
 TEST(net_protocol_vectors) {
     std::string path;
-    std::string text = readRepoFile("dedicated-server/test/fixtures/protocol-vectors.json", size_t(64) << 20, &path);
+    std::string text = readRepoFile("protocol/protocol-vectors.json", size_t(64) << 20, &path);
     REQUIRE(!text.empty());
     Value doc;
     std::string err;
@@ -494,8 +494,8 @@ TEST(net_protocol_valid_checks) {
 }
 
 TEST(net_position_digest) {
-    // The protocol's posHash (dedicated-server/docs/PROTOCOL.md, "Moves and positions"): values of
-    // fnv1a32() in dedicated-server/crates/chess/src/types.rs.
+    // The protocol's posHash (protocol/PROTOCOL.md, "Moves and positions"): values of
+    // fnv1a32() in the server's crates/chess/src/types.rs.
     const std::string start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     CHECK_EQ(net::positionDigest(start), 923150620u);
     CHECK_EQ(net::positionDigest("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"), 1150555523u);
@@ -4925,7 +4925,7 @@ TEST(net_info_without_the_saved_pin_keeps_it) {
     net::sys::removeFile(credPath);
 }
 
-// ---- Google sign-in (loopback redirect, dedicated-server/docs/API.md) --------------------------------
+// ---- Google sign-in (loopback redirect, the server's docs/API.md) --------------------------------
 // The scripted server plays start / finish / link / complete / login/mfa; the browser opener seam
 // plays the browser and Google: it reads the redirect URI and the state of the Google page the
 // client was given, and sends the redirect to the game's own listener on 127.0.0.1.
@@ -5897,7 +5897,7 @@ TEST(net_tls_pinned_post_manual) {
 
 // =============================================================================================
 // Live check against a real dedicated server (opt-in). The live-check harness
-// (dedicated-server/tools/live-check, see its README) starts a server (self-signed certificate,
+// (the server's tools/live-check, see its README) starts a server (self-signed certificate,
 // HTTPS API and WSS on one port, proof of work for registration), a bot queued in 3+2, then runs:
 //   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password>[:<keepalive ms>] ./scacelith_tests net_live_server_game
 // This client registers, logs in, connects (the gesture keepalive of the server's Welcome must be
@@ -6012,7 +6012,7 @@ TEST(net_live_server_game) {
     const net::Event::Rating& mine = you == 0 ? ev.ratingWhite : ev.ratingBlack;
     std::fprintf(stderr, "  rating %d -> %d (games %d)\n", mine.before, mine.after, mine.games);
     // A new account's loss before its first draw or win counts for neither player's rating
-    // (dedicated-server/docs/DESIGN.md, ratings, "Zero score"): the update comes, the game is
+    // (the server's docs/DESIGN.md, ratings, "Zero score"): the update comes, the game is
     // counted, the rating stays.
     CHECK_EQ(mine.games, 1);
     CHECK_EQ(mine.after, mine.before);

@@ -60,8 +60,8 @@ namespace {
 
 using Kind = net::Event::Kind;
 
-// Protocol values (realtime protocol v1: dedicated-server/protocol/scacelith-v1.json,
-// dedicated-server/docs/PROTOCOL.md).
+// Protocol values (realtime protocol v1: protocol/scacelith-v1.json,
+// protocol/PROTOCOL.md).
 enum Status { StOngoing = 0, StWhiteWins = 1, StBlackWins = 2, StDraw = 3, StAborted = 4 };
 enum GameEventKind { EvDrawOffered = 1, EvDrawDeclined = 2, EvDisconnected = 3, EvReconnected = 4, EvRematchOffered = 5, EvRematchDeclined = 6 };
 constexpr int kErrDrawOfferLimit = 108;

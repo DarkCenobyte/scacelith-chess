@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
-project(Scacelith VERSION 0.1.0 LANGUAGES C CXX)
+# The version: cmake/version.cmake (SCACELITH_VERSION_CORE for project(), SCACELITH_VERSION in full).
+include(cmake/version.cmake)
+project(Scacelith VERSION ${SCACELITH_VERSION_CORE} LANGUAGES C CXX)
 
 # ---------------------------------------------------------------------------------------------
 # Build configuration
@@ -74,7 +76,7 @@ set(GAME_CORE_SOURCES ${ROOT}/src/game/elo.cpp ${ROOT}/src/game/camera_flight.cp
     ${ROOT}/src/game/replay.cpp ${ROOT}/src/game/online_account.cpp ${ROOT}/src/game/online_mock.cpp)
 list(APPEND CORE_SOURCES ${GAME_CORE_SOURCES})
 add_library(scacelith_core STATIC ${CORE_SOURCES} ${EMBED_CPP})
-# The version of project() above, for every module (generated/scacelith_version.h).
+# The full version (cmake/version.cmake), for every module (generated/scacelith_version.h).
 configure_file(${ROOT}/cmake/version.h.in ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith_version.h @ONLY)
 target_include_directories(scacelith_core PUBLIC ${ROOT}/src ${ROOT}/third_party ${CMAKE_CURRENT_BINARY_DIR}/generated)
 # <KHR/khrplatform.h> of third_party/khronos/GL/glcorearb.h (src/gl/gl46.h): the bundled copy, not
@@ -169,7 +171,7 @@ file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS
 list(REMOVE_ITEM GAME_SOURCES ${GAME_CORE_SOURCES})
 set(GAME_EXTRA)
 if(WIN32)
-    # The version resource and the manifest, with the version of project().
+    # The version resource and the manifest, with the version of cmake/version.cmake.
     configure_file(${ROOT}/res/scacelith.rc.in ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.rc @ONLY)
     configure_file(${ROOT}/res/scacelith.manifest.in ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.manifest @ONLY)
     list(APPEND GAME_EXTRA ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.rc)

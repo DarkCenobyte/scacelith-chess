@@ -1,5 +1,5 @@
 // Live gestures of a player in an online game (server or direct match): the protocol's Gesture
-// message (dedicated-server/docs/PROTOCOL.md). Cosmetic only: the opponent's robot mirrors
+// message (protocol/PROTOCOL.md). Cosmetic only: the opponent's robot mirrors
 // them (head, the piece in hand, where it is aimed, the move placed before the clock press), but
 // they never change the game, the clocks or the board state. The whole state travels every time,
 // so a message that is lost or rate-limited heals with the next one.

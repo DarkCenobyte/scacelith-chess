@@ -3,10 +3,10 @@
 // Scacelith.ini ([player] elo, games, wins, draws, losses, peak, rated, counted_games,
 // unrated_games, unrated_opponents, unrated_half_points; readRecord / writeRecord) and updated
 // after every rated game against Stockfish; games watched in the viewer never change it. The
-// dedicated server's dedicated-server/crates/server/src/matching/elo.rs is a mirror of this file:
-// both are checked against the same vectors (dedicated-server/test/fixtures/elo-vectors.json,
-// written and checked by the server's elo_vectors test in matching/elo/tests.rs, read by
-// tests/elo_tests.cpp), so a player's offline and online ratings follow the same rules to the last
+// dedicated server's crates/server/src/matching/elo.rs (scacelith-chess-server) is a mirror of this
+// file: both are checked against the same vectors (tests/data/elo-vectors.json, a copy of the
+// server's test/fixtures/elo-vectors.json written and checked by its elo_vectors test in
+// matching/elo/tests.rs, read by tests/elo_tests.cpp), so a player's offline and online ratings follow the same rules to the last
 // point.
 //
 //   expected score  PD from FIDE's table 8.1.2 for the rating difference D, D counting at most 400

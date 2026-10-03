@@ -1,5 +1,5 @@
 // The host's game authority for a direct match: a small C++ counterpart of the dedicated
-// server's GameRoom (dedicated-server/docs/DESIGN.md sections 6.1 to 6.4) in a simplified,
+// server's GameRoom (the server's docs/DESIGN.md sections 6.1 to 6.4) in a simplified,
 // unrated form. Deterministic: time is always passed in (epoch milliseconds that advance with
 // the monotonic clock, sock::epochMs()), no timer inside; the caller asks nextDeadline() and
 // calls tick().

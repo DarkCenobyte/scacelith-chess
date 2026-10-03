@@ -226,10 +226,9 @@ they do.
   router opened the port, when to forward it by hand, and when the internet provider shares the
   address (carrier-grade NAT: try IPv6 or a VPN).
 
-Anyone can run a server: it is in `dedicated-server/`, a Rust program (one binary,
-`scacelith-server`) that serves the HTTPS API and the realtime protocol v1
-(`dedicated-server/docs/PROTOCOL.md`) on one port, 443 by default. Its README covers the
-configuration, and `dedicated-server/docs/DEPLOY.md` the installation as a systemd service on Linux.
+Anyone can run a server: see [DarkCenobyte/scacelith-chess-server](https://github.com/DarkCenobyte/scacelith-chess-server). The game speaks
+the realtime protocol v1 with it, whose specification is kept in this repository too, in
+[protocol/](protocol/README.md).
 
 Development: `--online-mock` replaces the network with an in-process fake server and a fake
 direct-match friend (any password works; see `src/game/online_mock.h` for the inputs that try
@@ -359,6 +358,33 @@ position); its log gives the time of each step, for `--warp`. `--coach-auto-answ
 the takeback card by itself after 1.5 s, for runs with `--play`.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised.
+
+### Continuous integration and releases
+
+GitHub Actions builds and tests every push to master and every pull request
+(`.github/workflows/ci.yml`): the Linux build and its unit tests, the Windows build cross-compiled
+with MinGW-w64 and its unit tests under Wine (both as above), and a lint of the workflows
+(actionlint and zizmor). The Windows executable of each run is kept for 14 days as a workflow
+artifact, for testing. CodeQL (`.github/workflows/codeql.yml`) scans the shipped C++ code
+(without `third_party/` and `tests/`) and the workflows; its alerts are in the Security tab.
+
+The version is set in `cmake/version.cmake`: `SCACELITH_VERSION_CORE` (`1.0.0`) and, for a
+pre-release, `SCACELITH_VERSION_PRERELEASE` (`beta.1`); `cmake -P cmake/version.cmake` prints it
+in full. Pushing the tag `v` + that version (`v1.0.0-beta.1`) publishes a release: the release
+workflow (`.github/workflows/release.yml`) checks that the tag matches the version, runs the CI
+again on the tagged commit, builds the Windows game from scratch (no compiler cache), attests its
+build provenance with actions/attest and publishes a GitHub release (a pre-release when the version
+has a suffix) with `Scacelith-<version>-windows-x64.zip` (the executable, its licence and the
+licence texts of what it embeds), the executable alone and `SHA256SUMS`. Started by hand, the
+workflow builds the same files and keeps them as workflow artifacts without publishing anything,
+unless it runs on a tag with "Publish" ticked. To check a downloaded file with the GitHub CLI:
+
+```sh
+gh attestation verify Scacelith-1.0.0-beta.1-windows-x64.zip --repo DarkCenobyte/scacelith-chess
+```
+
+Dependabot (`.github/dependabot.yml`) keeps the actions the workflows use up to date (pinned by
+commit SHA); the code vendored in `third_party/` is updated by hand.
 
 ## Licence
 

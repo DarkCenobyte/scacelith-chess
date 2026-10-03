@@ -8,7 +8,7 @@ namespace saving {
 
 namespace {
 
-// Protocol values (realtime protocol v1: dedicated-server/protocol/scacelith-v1.json), as
+// Protocol values (realtime protocol v1: protocol/scacelith-v1.json), as
 // game_scene_online.cpp names them.
 enum Status { StOngoing = 0, StWhiteWins = 1, StBlackWins = 2, StDraw = 3, StAborted = 4 };
 constexpr int kReasonServerAborted = 25;

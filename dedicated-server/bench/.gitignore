@@ -1,3 +1,0 @@
-# Run outputs (reports, logs, databases, keys): only each run's summary is kept.
-results/*/*
-!results/*/summary.md

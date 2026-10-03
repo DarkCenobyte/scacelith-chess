@@ -1,7 +1,7 @@
 // The Google sign-in's loopback redirect (RFC 8252 section 7.3): Google sends the browser back to
 // the game itself, http://127.0.0.1:<port>/oauth2/google/<origin tag>?code=..&state=.., and the
 // game hands the code to the server it started the sign-in with (POST /auth/sso/google/finish,
-// dedicated-server/docs/API.md). A link to Google's page sent by someone else therefore leads
+// the server's docs/API.md). A link to Google's page sent by someone else therefore leads
 // nowhere: the code lands on the victim's own computer, where nothing waits for it (or a sign-in
 // of the game whose state it does not match).
 //

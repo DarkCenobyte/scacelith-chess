@@ -1,8 +1,8 @@
 // Live check of the account API (opt-in): the game's net::OnlineClient against a real dedicated
-// server, every call of the account API batch (dedicated-server/docs/API.md sections 5 to 11,
+// server, every call of the account API batch (the server's docs/API.md sections 5 to 11,
 // net/online_client.h "account API" and "animated GIFs").
 //
-// The live-check harness (dedicated-server/tools/live-check, see its README), part "account",
+// The live-check harness (the server's tools/live-check, see its README), part "account",
 // starts the server (one shard, e-mail confirmation on, the mails read from its log transport),
 // registers the accounts, plays the games
 // of the C++ player's account through the realtime protocol, then runs, from the root of the source
@@ -1321,7 +1321,7 @@ TEST(net_live_account_api) {
 // Other server settings: without e-mail confirmation (REQUIRE_EMAIL_VERIFICATION=false) the
 // address changes at once (200 email_changed with the new address) and an address another account
 // uses is refused (409 email_taken); with GIFs turned off (GIF_ENABLED=false) both GIF routes
-// answer 404 gif_disabled. The live-check harness (dedicated-server/tools/live-check, see its
+// answer 404 gif_disabled. The live-check harness (the server's tools/live-check, see its
 // README) runs it in its "game" part, on that part's server, after net_live_server_game
 // registered the player and played its game:
 //   SCACELITH_NET_LIVE_SETTINGS=host:port:<pin hex>:<username>:<password>:<an address in use>:<game id>
@@ -1397,7 +1397,7 @@ TEST(net_live_account_server_settings) {
 }
 
 // ---- Google sign-in by loopback redirect (opt-in) -------------------------------------------------
-// The live-check harness (dedicated-server/tools/live-check, see its README), part "sso", serves
+// The live-check harness (the server's tools/live-check, see its README), part "sso", serves
 // the account API with a fake Google (the provider's endpoints injected), e-mail confirmation on,
 // and runs
 //   SCACELITH_NET_LIVE_SSO=host:port:<control port> ./scacelith_tests net_live_sso
