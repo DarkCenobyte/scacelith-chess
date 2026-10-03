@@ -88,7 +88,7 @@ std::string userDataDirectory(); // writable (e.g. %APPDATA%/scacelith/), with t
 // ~/.local/share/scacelith/ (the settings fallback stays in ~/.config/scacelith/). A macOS port
 // would use ~/Library/Application Support/scacelith/.
 std::string appDataDirectory();
-void messageBox(const char* title, const char* text);
+void messageBox(const char* title, const char* text, bool rtl = false);  // rtl: right-to-left text (Arabic)
 uint64_t randomSeed();           // non-deterministic seed from the OS
 // Text on the system clipboard as UTF-8 ("" when there is none; the X11 layer always returns "").
 std::string clipboardText();

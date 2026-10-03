@@ -262,7 +262,7 @@ void setMouseCaptured(bool c) {
 std::string exeDirectory() { return net::sys::exeDirectory(); }
 std::string userDataDirectory() { return net::sys::userDataDirectory(); }
 std::string appDataDirectory() { return net::sys::appDataDirectory(); }
-void messageBox(const char* title, const char* text) { LOGE("%s: %s", title, text); }
+void messageBox(const char* title, const char* text, bool) { LOGE("%s: %s", title, text); }
 uint64_t randomSeed() {
     timespec t;
     clock_gettime(CLOCK_REALTIME, &t);

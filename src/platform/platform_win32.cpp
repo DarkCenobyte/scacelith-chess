@@ -434,9 +434,10 @@ std::string exeDirectory() { return net::sys::exeDirectory(); }
 std::string userDataDirectory() { return net::sys::userDataDirectory(); }
 std::string appDataDirectory() { return net::sys::appDataDirectory(); }
 
-void messageBox(const char* title, const char* text) {
+void messageBox(const char* title, const char* text, bool rtl) {
     // Any length: the text may name a path of up to 32767 characters.
-    MessageBoxW(g_hwnd, net::sys::widen(text).c_str(), net::sys::widen(title).c_str(), MB_OK | MB_ICONERROR);
+    MessageBoxW(g_hwnd, net::sys::widen(text).c_str(), net::sys::widen(title).c_str(),
+                MB_OK | MB_ICONERROR | (rtl ? MB_RTLREADING | MB_RIGHT : 0));
 }
 
 bool openClipboard(void* owner) {

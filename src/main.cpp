@@ -66,7 +66,7 @@ static std::string timestamp() {
 static void startupError(const char* key, const std::string& logPath) {
     std::string text = i18n::tr(key);
     if (!logPath.empty()) text += "\n\n" + i18n::trf("error.log_file", {i18n::ltr(logPath)});
-    plat::messageBox("Scacelith", text.c_str());
+    plat::messageBox("Scacelith", text.c_str(), i18n::rtl());
 }
 
 static int runApp(std::vector<std::string> args) {
