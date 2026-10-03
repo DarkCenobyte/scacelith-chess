@@ -336,11 +336,20 @@ void openAccountPage(Sub sub) {
 }
 
 // ---- Page chrome -------------------------------------------------------------------------------------
-// Error (red) or note (ivory) under a form, centered; returns the height used.
-float messageLine(const Rect& p, float y) {
-    if (!O.error.empty()) return paragraph(O.error, p, y, p.w - 200.0f, danger, kSmall + 1.0f);
-    if (!O.note.empty()) return paragraph(O.note, p, y, p.w - 200.0f, ivoryDim, kSmall + 1.0f);
-    return 0.0f;
+// Error (red) or note (ivory) under a form, centered; returns the height used. oneLine: where
+// there is room for one line only, a longer message is made smaller (to 70 % at most).
+float messageLine(const Rect& p, float y, bool oneLine = false) {
+    const std::string& s = !O.error.empty() ? O.error : O.note;
+    if (s.empty()) return 0.0f;
+    const vec4 color = !O.error.empty() ? danger : ivoryDim;
+    float size = kSmall + 1.0f;
+    if (oneLine) {
+        TextStyle st = style(font::FACE_ITALIC, size, color);
+        for (const float least = size * 0.7f; st.size > least && gfx::wrapLineCount(s, p.w - 200.0f, st) > 1;)
+            st.size = std::max(least, st.size - 0.5f);
+        size = st.size;
+    }
+    return paragraph(s, p, y, p.w - 200.0f, color, size);
 }
 
 // A large choice: title and a one-line description (Play page, direct match).
@@ -961,7 +970,7 @@ void pageAccount(float t) {
     float noteY = ty + rowH * float(cats.size()) + 38.0f;
     gfx::textWrapped(T("online.account.provisional"), im::flipX(tcol, rx), noteY, col2W, ns, 26.0f);
     float my = footerY(p) - 50.0f;
-    if (!O.error.empty() || !O.note.empty()) messageLine(p, my);
+    if (!O.error.empty() || !O.note.empty()) messageLine(p, my, true);   // between the ratings' note and the footer
     footerRule(p);
     bool back = backButton(p);
     // The game history, from the ratings (end side).
