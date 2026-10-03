@@ -43,6 +43,7 @@ Rect g_viewerControls;
 using detail::baseTimeValues;
 using detail::clockText;
 using detail::nearestIndex;
+using detail::nearestValue;
 using detail::spacedPlus;
 // "3+2" -> category (Lichess-style estimate: base + 40 x increment), as on the New Game page.
 const char* categoryKey(const std::string& label) {
@@ -90,7 +91,8 @@ void loadWatch(WatchSetup& w) {
     w.whitePreset = std::clamp(g.viewerWhitePreset, 0, n - 1);
     w.blackPreset = std::clamp(g.viewerBlackPreset, 0, n - 1);
     w.timeControl = g.viewerTimeControl < 0 || g.viewerTimeControl >= tcn ? -1 : g.viewerTimeControl;
-    w.customBaseSeconds = std::clamp(g.viewerCustomBaseSeconds, 15, 10800);
+    // The base time as its stepper shows it: a hand-edited .ini may hold another.
+    w.customBaseSeconds = nearestValue(baseTimeValues(), g.viewerCustomBaseSeconds);
     w.customIncrementSeconds = std::clamp(g.viewerCustomIncrementSeconds, 0, 60);
     w.customDelaySeconds = std::clamp(g.viewerCustomDelaySeconds, 0, 60);
 }
