@@ -58,7 +58,14 @@ bool localEndpoint(Handle h, Endpoint& out);
 // Listening socket on 'port' (0 = any): IPv6 dual-stack when the system allows it, IPv4
 // otherwise. err = errorName() of the failure ("in_use" when the port is taken).
 Handle listenTcp(uint16_t port, bool& dualStack, std::string& err);
-Handle acceptOne(Handle listener, Endpoint* peer);   // kInvalid when nothing is pending
+// Listening socket on 127.0.0.1 only, on a port the system picks (returned in 'port'): the
+// loopback redirect of the Google sign-in (net/loopback_redirect.h). Never another interface (no
+// firewall prompt, nothing reachable from the LAN), exclusive on Windows, and never inherited by
+// the processes the game starts (the browser). err = errorName() of the failure.
+Handle listenLoopbackV4(uint16_t& port, std::string& err);
+// kInvalid when nothing is pending. noInherit: the accepted socket is not inherited by child
+// processes either (the sockets of listenLoopbackV4).
+Handle acceptOne(Handle listener, Endpoint* peer, bool noInherit = false);
 
 // Non-blocking connect: 1 = connected, 0 = in progress (wait for writability, then
 // connectResult), -1 = failed (err set).
