@@ -156,10 +156,16 @@ Rules common to these calls:
   there, `not_found`). Game 0 (`invalid_game_id`) and a PGN text over 64 KiB (`pgn_too_large`)
   are refused without sending anything. An answer over 16 MiB, or one that does not start with
   `GIF87a` or `GIF89a`, is `invalid_response`.
-- `deleteAccount` success erases the token and the user name saved for the origin (its server id
-  and pin stay) and stops the realtime connection without reconnecting. `revokeSession` on the
-  session marked `current` in the last `fetchSessions` signs this game out the same way (token
-  erased, connection stopped).
+- `deleteAccount` closes the realtime connection before its request: the server closes every
+  connection of the account it deletes, which would show a revoked session and refusals. Its
+  success erases the token and the user name saved for the origin (its server id and pin stay),
+  and the connection stays closed; a failure other than a refused session (`unauthorized`) opens
+  it again if it was open. `revokeSession` on the session marked `current` in the last
+  `fetchSessions` signs this game out the same way (token erased, connection stopped).
+- `logout(true)` (`POST /auth/logout-all`, Sign out everywhere) is ok only when the server did it.
+  A refused session (401) revoked nothing: `unauthorized`, its token erased. Any other failure
+  (the server unreachable, `rate_limited`, maintenance...) keeps the token, so that the player can
+  try again. A plain `logout()` erases the token whatever the answer.
 
 ## The game at the table
 

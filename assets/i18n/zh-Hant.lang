@@ -647,6 +647,7 @@ online.challenge.you_random = 抽籤決定先後
 online.challenge.declined = {0} 拒絕了你的挑戰。
 online.challenge.expired = 你的挑戰已逾時，未獲回應。
 online.challenge.unavailable = {0} 目前無法對局。
+online.challenge.lost = 連線已中斷，你的挑戰已取消。
 
 # At the table
 online.pause.clock_runs = 對局仍在進行：你的棋鐘仍在走。

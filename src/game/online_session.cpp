@@ -199,7 +199,7 @@ bool isGameEvent(Kind k) {
 enum ChallengeState { ChPending = 0, ChAccepted = 1, ChDeclined = 2, ChCancelled = 3, ChExpired = 4, ChUnavailable = 5 };
 enum QueueState { QLeft = 0, QSearching = 1, QMatched = 2 };
 enum NoticeCode { NShutdown = 1, NBanned = 2, NRevoked = 3, NCooldown = 4, NReplaced = 5, NRatingRestored = 7 };
-constexpr int kErrAlreadyInGame = 106, kErrInvalidCategory = 107, kErrChallengeNotFound = 201, kErrMatchmakingCooldown = 207;
+constexpr int kErrChallengeNotFound = 201, kErrMatchmakingCooldown = 207;
 // The names above are the generated ones (net/protocol_gen.h): a schema change fails here.
 static_assert(ChPending == int(net::proto::ChallengeState::Pending) && ChAccepted == int(net::proto::ChallengeState::Accepted) &&
                   ChDeclined == int(net::proto::ChallengeState::Declined) &&
@@ -216,9 +216,7 @@ static_assert(NShutdown == int(net::proto::NoticeCode::ServerShutdown) && NBanne
                   NReplaced == int(net::proto::NoticeCode::ReplacedByNewConnection) &&
                   NRatingRestored == int(net::proto::NoticeCode::RatingRestored),
               "NoticeCode");
-static_assert(kErrAlreadyInGame == int(net::proto::ErrorCode::AlreadyInGame) &&
-                  kErrInvalidCategory == int(net::proto::ErrorCode::InvalidCategory) &&
-                  kErrChallengeNotFound == int(net::proto::ErrorCode::ChallengeNotFound) &&
+static_assert(kErrChallengeNotFound == int(net::proto::ErrorCode::ChallengeNotFound) &&
                   kErrMatchmakingCooldown == int(net::proto::ErrorCode::MatchmakingCooldown),
               "ErrorCode");
 
@@ -844,7 +842,7 @@ void OnlineSession::handleServer(net::Event& e) {
                 quietNotFound_ = true;
             }
             outgoing_ = Outgoing();
-            ui::notify(i18n::tr("online.err.challenge_not_found"), 4.0f);
+            ui::notify(i18n::tr("online.challenge.lost"), 4.0f);
         }
         incoming_.clear();
         break;
@@ -940,9 +938,7 @@ void OnlineSession::handleServer(net::Event& e) {
             break;
         }
         if (e.code == kErrMatchmakingCooldown && cooldownUntilMs_ < nowMs()) cooldownUntilMs_ = nowMs() + 60000.0;
-        // A QueueJoin refused: no search (106 and 107 may also answer a challenge accepted or joined).
-        queue_.searching = queue_.searching && e.code != kErrMatchmakingCooldown && e.code != kErrAlreadyInGame &&
-                           e.code != kErrInvalidCategory;
+        if (live::queueRefused(e.code)) queue_.searching = false;  // a QueueJoin refused: no search
         if (outgoing_.active && outgoing_.id == 0 && live::challengeRefused(e.code)) outgoing_ = Outgoing();
         if (e.code == 0 && e.error == "offline") {  // a command sent while not connected: dropped
             queue_.searching = false;

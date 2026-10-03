@@ -648,6 +648,7 @@ online.challenge.you_random = couleurs tirées au sort
 online.challenge.declined = {0} a refusé votre défi.
 online.challenge.expired = Votre défi a expiré sans réponse.
 online.challenge.unavailable = {0} n’est pas disponible pour le moment.
+online.challenge.lost = Connexion perdue : votre défi a été annulé.
 
 # At the table
 online.pause.clock_runs = La partie continue : votre pendule tourne toujours.

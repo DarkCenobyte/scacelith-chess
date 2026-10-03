@@ -648,6 +648,7 @@ online.challenge.you_random = цвет по жребию
 online.challenge.declined = {0} отклоняет ваш вызов.
 online.challenge.expired = Ваш вызов истёк без ответа.
 online.challenge.unavailable = Игрок {0} сейчас недоступен.
+online.challenge.lost = Соединение потеряно: ваш вызов отменён.
 
 # At the table
 online.pause.clock_runs = Партия продолжается: ваши часы идут.

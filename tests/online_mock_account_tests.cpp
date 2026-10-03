@@ -18,6 +18,7 @@
 #include "net/net_sys.h"
 #include "net/protocol_gen.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <ctime>
 #include <set>
@@ -607,6 +608,43 @@ TEST(mock_account_export_and_deletion) {
     srv.fetchMyGames(0, 10, net::GamesFilter());
     CHECK(await(srv, Kind::GamesResult, e));
     CHECK_EQ(e.error, std::string("unauthorized"));
+}
+
+// As the network layer: the deletion closes the realtime connection first, opens it again when it
+// fails, and leaves it closed once the account is gone.
+TEST(mock_account_deletion_closes_the_connection_first) {
+    VirtualClock vc;
+    mock::FakeServer srv;
+    signIn(srv, "Paul_M");
+    srv.connect();
+    Event e;
+    CHECK(await(srv, Kind::Welcome, e));
+    auto events = [&] {   // 2 s of the fake
+        std::vector<Event> seen;
+        for (int i = 0; i < 40; ++i) {
+            while (srv.poll(e)) seen.push_back(e);
+            mock::advance(50.0);
+        }
+        return seen;
+    };
+    srv.deleteAccount("wrong", "");
+    std::vector<Event> seen = events();
+    size_t offline = seen.size(), welcome = seen.size(), answer = seen.size();
+    for (size_t i = 0; i < seen.size(); ++i) {
+        if (seen[i].kind == Kind::ConnectionChanged && seen[i].state == net::ConnState::Offline) offline = i;
+        if (seen[i].kind == Kind::Welcome) welcome = i;
+        if (seen[i].kind == Kind::AccountDeleted) answer = i;
+    }
+    CHECK(offline < welcome && welcome < seen.size());
+    CHECK(answer < seen.size() && seen[answer].error == "invalid_password");
+    CHECK(srv.state() == net::ConnState::Online);
+
+    srv.deleteAccount("pw", "");
+    CHECK(srv.state() == net::ConnState::Offline);
+    seen = events();
+    CHECK(std::any_of(seen.begin(), seen.end(), [](const Event& ev) { return ev.kind == Kind::AccountDeleted && ev.ok; }));
+    CHECK(std::none_of(seen.begin(), seen.end(), [](const Event& ev) { return ev.kind == Kind::Welcome; }));
+    CHECK(srv.state() == net::ConnState::Offline);
 }
 
 // The export's limit as on the server (account-export.js: rate [account_export 5/h, reauth],

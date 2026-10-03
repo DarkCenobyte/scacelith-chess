@@ -657,6 +657,7 @@ online.challenge.you_random = colours by lot
 online.challenge.declined = {0} declined your challenge.
 online.challenge.expired = Your challenge expired without an answer.
 online.challenge.unavailable = {0} is not available right now.
+online.challenge.lost = Connection lost: your challenge was cancelled.
 
 # At the table
 online.pause.clock_runs = The game goes on: your clock keeps running.

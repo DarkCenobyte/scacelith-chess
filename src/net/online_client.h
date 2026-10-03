@@ -366,7 +366,8 @@ public:
     void setServer(const ServerEndpoint& ep);    // disconnects if the origin changes
     // Forgets the pin saved for the current origin at sign-in (the session stays): with no pin in
     // the endpoint, its requests trust the system's certificates again. Done on net-http, after the
-    // commands already queued (a sign-in queued before would save the pin again).
+    // commands already queued (a sign-in queued before would save the pin again), or as the client
+    // ends if it ends first.
     void forgetSavedPin();
     const ServerEndpoint& server() const;
     void fetchServerInfo();
@@ -378,7 +379,10 @@ public:
     void startGoogleSso();                       // PKCE + system browser + polling
     void completeSso(const std::string& username);
     void cancelSso();
-    void logout(bool allSessions = false);       // server-side revocation + local token erase
+    // Server-side revocation + local token erase. This session: erased whatever the server says
+    // (LogoutResult ok, a refused token included). Every session (allSessions): ok only when the
+    // server did it; the token is kept when it failed, except a refused one (401, "unauthorized").
+    void logout(bool allSessions = false);
     void fetchAccount();
     void resendVerification(const std::string& email);
     void forgotPassword(const std::string& email);
@@ -409,8 +413,10 @@ public:
     // 6-digit code ("code") or a recovery code ("recoveryCode").
     void changeEmail(const std::string& newEmail, const std::string& password, const std::string& codeOrRecovery);
     void exportAccount(const std::string& password, const std::string& codeOrRecovery);   // text = the JSON
-    // On success the token and the user name saved for the origin are erased and the realtime
-    // connection stops (no reconnection); AccountDeleted then comes with ok.
+    // The realtime connection closes first (the server closes every connection of the account it
+    // deletes). On success the token and the user name saved for the origin are erased and it stays
+    // closed; AccountDeleted then comes with ok. A failure other than a refused session
+    // ("unauthorized") opens it again if it was open.
     void deleteAccount(const std::string& password, const std::string& codeOrRecovery);
 
     // ---- animated GIFs (HTTPS; dedicated-server/docs/API.md) ----

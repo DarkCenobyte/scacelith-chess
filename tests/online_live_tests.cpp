@@ -553,6 +553,13 @@ TEST(live_challenge_refusals_are_only_those_of_its_creation) {
     CHECK(!live::challengeRefused(106));
 }
 
+TEST(live_queue_refusals_end_the_search) {
+    // QueueNotAllowed, MatchmakingCooldown, AlreadyInGame and InvalidCategory refuse a QueueJoin.
+    for (int code : {200, 207, 106, 107}) CHECK(live::queueRefused(code));
+    // The refusals of a challenge, a code joined, a rematch and the game errors leave it.
+    for (int code : {0, 100, 105, 108, 201, 202, 203, 204, 205, 206, 208, 209}) CHECK(!live::queueRefused(code));
+}
+
 TEST(live_routing_follows_the_game_a_message_names) {
     using K = net::Event::Kind;
     net::Event e;

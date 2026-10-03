@@ -1515,6 +1515,23 @@ public:
         }
     }
 
+    // What the server does to the connections of the sessions it revokes (all of an account deleted):
+    // Notice{SessionRevoked}, a fatal Error{Unauthorized} and close 4003, on every WebSocket.
+    void revokeSessions() {
+        std::lock_guard<std::mutex> lk(mu_);
+        for (Sock s : ws_) {
+            pr::Notice n;
+            n.code = pr::NoticeCode::SessionRevoked;
+            sendMsg(s, n);
+            pr::Error e;
+            e.code = pr::ErrorCode::Unauthorized;
+            e.fatal = true;
+            sendMsg(s, e);
+            uint8_t payload[2] = {uint8_t(pr::CloseCode::Unauthorized >> 8), uint8_t(pr::CloseCode::Unauthorized & 0xFF)};
+            sendFrame(s, 0x8, payload, 2);
+        }
+    }
+
     // The opponent's gesture (S_Gesture) on every WebSocket.
     void sendGesture(const pr::S_Gesture& g) {
         std::lock_guard<std::mutex> lk(mu_);
@@ -1678,6 +1695,12 @@ private:
             if (!authed) return respond(s, 401, "{\"error\":\"unauthorized\"}");
             if (body["password"].asString() != "pw") return respond(s, 403, "{\"error\":\"invalid_password\"}");
             ++deletes;
+            // As the server, the account's connections are closed once it is gone (after its
+            // database work: 100 ms here) and before the answer, which comes later still: their
+            // frames reach the client first.
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+            revokeSessions();
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
             respond(s, 200, "{\"status\":\"deleted\"}");
         } else {
             respond(s, 404, "{\"error\":\"not_found\"}");
@@ -3760,6 +3783,25 @@ TEST(net_account_me_and_preferences) {
     CHECK(ev.account.acceptChallenges);
 }
 
+// The categories of /info: an id longer than the protocol carries (7 bytes) or with a control
+// character is dropped; any other one is kept, the official "digits+digits" form or not.
+TEST(net_info_category_ids) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    AccountRig r("info-categories", [&](const fakehttp::Request& q) {
+        if (q.path != "/api/v1/info") return jsonReply(404, R"({"error":"not_found"})");
+        return jsonReply(200, R"({"name":"Fake","categories":[{"id":"3+2","baseSec":180,"incSec":2},{"id":"1234567"},
+          {"id":"blitz"},{"id":"é+1"},{"id":"12345678"},{"id":"éééé"},{"id":"5+\n3"},
+          {"id":"5+\t3"},{"id":"5+3\u007f"},{"id":""}]})");
+    }, false);
+    CHECK(r.srv.ok());
+    r.c->fetchServerInfo();
+    net::Event ev = r.wait(net::Event::Kind::ServerInfoResult);
+    std::vector<std::string> ids;
+    for (const net::Category& c : ev.info.categories) ids.push_back(c.id);
+    CHECK(ids == std::vector<std::string>({"3+2", "1234567", "blitz", "\xC3\xA9+1"}));
+    CHECK_EQ(ev.info.categories.size() > 0 ? ev.info.categories[0].baseSec : 0, 180);
+}
+
 TEST(net_account_email_change) {
     if (!net::transportAvailable()) SKIP("transport unavailable");
     using K = net::Event::Kind;
@@ -3972,6 +4014,146 @@ TEST(net_account_delete_stops_realtime) {
         CHECK_EQ(srv.hellos.load(), hellos);        // no reconnection
     }
     net::sys::removeFile(credPath);
+}
+
+// The realtime connection closes before the deletion is asked for, so that the server's closing
+// of the deleted account's connections brings no revoked-session notice, refusal or Unauthorized
+// state. A deletion that fails opens it again, if it was open; a stopped state stays.
+TEST(net_account_delete_closes_realtime_first) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    FakeServer srv;
+    CHECK(srv.start());
+    std::string credPath = tempCredentialPath("acct-delete-first");
+    using K = net::Event::Kind;
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        net::ServerEndpoint ep;
+        ep.host = "127.0.0.1";
+        ep.apiPort = srv.port;
+        ep.insecureDev = true;
+        c.setServer(ep);
+        net::Event ev;
+        c.login("alice", "pw");
+        CHECK(waitEvent(c, K::LoginResult, ev, 20000) && ev.ok);
+        // Not connected: a deletion refused opens nothing.
+        c.deleteAccount("wrong", "");
+        CHECK(waitEvent(c, K::AccountDeleted, ev, 10000));
+        CHECK_EQ(ev.error, std::string("invalid_password"));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        CHECK(c.state() == net::ConnState::Offline);
+        CHECK_EQ(srv.hellos.load(), 0);
+        // Stopped (Incompatible here): the state stays, nothing opens.
+        c.connect();
+        CHECK(waitEvent(c, K::Welcome, ev, 10000));
+        srv.kick(pr::CloseCode::UnsupportedProtocol);
+        CHECK(waitState(c, net::ConnState::Incompatible, 10000));
+        c.deleteAccount("wrong", "");
+        std::vector<net::Event> seen;
+        CHECK(waitEvent(c, K::AccountDeleted, ev, 10000, &seen));
+        CHECK_EQ(ev.error, std::string("invalid_password"));
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        while (c.poll(ev)) seen.push_back(ev);
+        CHECK(std::none_of(seen.begin(), seen.end(), [](const net::Event& e) {
+            return e.kind == net::Event::Kind::ConnectionChanged;
+        }));
+        CHECK(c.state() == net::ConnState::Incompatible);
+        CHECK_EQ(srv.hellos.load(), 1);
+        // Connected: closed for the request, open again once it is refused.
+        c.connect();
+        CHECK(waitEvent(c, K::Welcome, ev, 10000));
+        c.deleteAccount("wrong", "");
+        seen.clear();
+        CHECK(waitEvent(c, K::AccountDeleted, ev, 10000, &seen));
+        CHECK_EQ(ev.error, std::string("invalid_password"));
+        // net-rt's events may come before or after AccountDeleted, the new Welcome too.
+        const bool welcomed = std::any_of(seen.begin(), seen.end(), [](const net::Event& e) {
+            return e.kind == net::Event::Kind::Welcome;
+        });
+        if (!welcomed) CHECK(waitEvent(c, K::Welcome, ev, 10000, &seen));
+        // Offline in between.
+        CHECK(std::any_of(seen.begin(), seen.end(), [](const net::Event& e) {
+            return e.kind == net::Event::Kind::ConnectionChanged && e.state == net::ConnState::Offline;
+        }));
+        CHECK_EQ(srv.hellos.load(), 3);
+        CHECK(c.hasSavedSession());
+        // Deleted: the connection was closed before, and stays so.
+        seen.clear();
+        c.deleteAccount("pw", "");
+        CHECK(waitEvent(c, K::AccountDeleted, ev, 10000, &seen));
+        CHECK(ev.ok);
+        CHECK_EQ(srv.deletes.load(), 1);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        while (c.poll(ev)) seen.push_back(ev);
+        CHECK(std::none_of(seen.begin(), seen.end(), [](const net::Event& e) {
+            return e.kind == net::Event::Kind::Notice || e.kind == net::Event::Kind::ServerError ||
+                   (e.kind == net::Event::Kind::ConnectionChanged && e.state != net::ConnState::Offline);
+        }));
+        CHECK(c.state() == net::ConnState::Offline);
+        CHECK_EQ(srv.hellos.load(), 3);
+    }
+    net::sys::removeFile(credPath);
+}
+
+// Signing out everywhere succeeds only when the server says it did. A refused token (401) revoked
+// nothing: a failure, the token erased all the same (it is dead). Any other failure keeps the
+// token, so that the player can try again. Signing out here erases it whatever the answer.
+TEST(net_logout_all_verdict) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    using K = net::Event::Kind;
+    std::atomic<int> mode{0};
+    auto handler = [&](const fakehttp::Request& q) {
+        if (q.method != "POST" || (q.path != "/api/v1/auth/logout-all" && q.path != "/api/v1/auth/logout"))
+            return jsonReply(404, R"({"error":"not_found"})");
+        if (!hasBearer(q)) return jsonReply(401, R"({"error":"invalid_token"})");
+        fakehttp::Reply cut = jsonReply(200, R"({"status":"logged_out"})");
+        cut.cutAfter = 5;                             // the connection lost in the middle of the answer
+        switch (mode.load()) {
+        case 1: return jsonReply(429, R"({"error":"rate_limited","retryAfter":30})");
+        case 2: return jsonReply(503, R"({"error":"maintenance"})");
+        case 3: return cut;
+        case 4: return jsonReply(401, R"({"error":"invalid_token"})");
+        default: return jsonReply(200, R"({"status":"logged_out"})");
+        }
+    };
+    {
+        AccountRig r("logout-all-fails", handler);
+        CHECK(r.srv.ok());
+        for (int m : {1, 2, 3}) {
+            mode = m;
+            r.c->logout(true);
+            net::Event ev = r.wait(K::LogoutResult);
+            CHECK_EQ(r.last().path, std::string("/api/v1/auth/logout-all"));
+            CHECK(!ev.ok);
+            CHECK(!ev.error.empty());
+            CHECK(r.c->hasSavedSession());
+        }
+        mode = 4;
+        r.c->logout(true);
+        net::Event ev = r.wait(K::LogoutResult);
+        CHECK(!ev.ok);
+        CHECK_EQ(ev.error, std::string("unauthorized"));
+        CHECK(!r.c->hasSavedSession());
+    }
+    {
+        AccountRig r("logout-all-ok", handler);
+        CHECK(r.srv.ok());
+        mode = 0;
+        r.c->logout(true);
+        net::Event ev = r.wait(K::LogoutResult);
+        CHECK(ev.ok);
+        CHECK(!r.c->hasSavedSession());
+    }
+    {
+        AccountRig r("logout-fails", handler);
+        CHECK(r.srv.ok());
+        mode = 2;
+        r.c->logout(false);
+        net::Event ev = r.wait(K::LogoutResult);
+        CHECK_EQ(r.last().path, std::string("/api/v1/auth/logout"));
+        CHECK_EQ(ev.error, std::string("maintenance"));
+        CHECK(!r.c->hasSavedSession());
+    }
 }
 
 namespace {
@@ -4191,6 +4373,50 @@ TEST(net_forget_saved_pin_after_a_sign_in_under_way) {
         CHECK(net::CredentialStore(credPath).pin(ep.origin()).empty());
         CHECK(c.hasSavedSession());
     }
+    net::sys::removeFile(credPath);
+}
+
+// The pin field emptied, then the game quits while a request still runs ahead of the clear on
+// net-http: the pin is forgotten all the same (else the next start would use it again, and
+// Options could no longer clear it). The session stays.
+TEST(net_forget_saved_pin_at_exit) {
+    if (!net::transportAvailable()) return;
+    std::atomic<int> infos{0};
+    fakehttp::Server srv([&](const fakehttp::Request& q) {
+        if (q.path == "/api/v1/info") ++infos;
+        fakehttp::Reply rep = jsonReply(200, "{}");
+        rep.silenceMs = 1500;
+        return rep;
+    });
+    CHECK(srv.ok());
+    std::string credPath = tempCredentialPath("forget-pin-exit");
+    net::ServerEndpoint ep;
+    ep.host = "127.0.0.1";
+    ep.apiPort = srv.port();
+    ep.insecureDev = true;
+    {
+        net::CredentialStore s(credPath);
+        net::Credential cr;
+        cr.origin = ep.origin();
+        cr.username = "alice";
+        cr.token = kRigToken;
+        cr.pinnedSha256 = std::string(64, 'c');
+        CHECK(s.put(cr));
+    }
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(credPath);
+        c.setServer(ep);
+        c.fetchServerInfo();
+        auto until = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+        while (infos.load() == 0 && std::chrono::steady_clock::now() < until)
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        CHECK_EQ(infos.load(), 1);
+        c.forgetSavedPin();
+    }
+    net::CredentialStore after(credPath);
+    CHECK(after.pin(ep.origin()).empty());
+    CHECK(after.hasToken(ep.origin()));
     net::sys::removeFile(credPath);
 }
 
