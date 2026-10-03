@@ -13,7 +13,7 @@
 //                         a later minor) are ignored and open enums keep the values this codec
 //                         does not know (isValid() is false for them).
 //   decodeHello(p, n, h)  a Hello as a server reads it: strict, except that a Hello of a later
-//                         minor may carry fields this codec does not know.
+//                         minor may have trailing bytes, which are ignored.
 //   valid(m)              true when m holds only values a sender may send (decode(encode(m))
 //                         then gives m back).
 //   peekType(p, n, t)     type of a message (false when empty or unknown).
