@@ -5067,6 +5067,51 @@ TEST(net_sso_cancel) {
     CHECK(!waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 300));
 }
 
+// Cancelled while the server answers the start: no browser, the listener closed, the start
+// answered "cancelled" and nothing else.
+TEST(net_sso_cancel_during_start) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    SsoRig rig("sso-cancel-start");
+    REQUIRE(rig.srv.ok());
+    std::mutex m;
+    std::condition_variable cv;
+    bool asked = false, release = false;
+    rig.start = [&](const Value& b) {
+        {
+            std::unique_lock<std::mutex> lk(m);
+            asked = true;
+            cv.notify_all();
+            cv.wait_for(lk, std::chrono::seconds(5), [&] { return release; });
+        }
+        return jsonReply(200, "{\"attemptId\":\"" + kSsoAttempt + "\",\"authUrl\":\"" +
+                                  googleAuthUrl(uint16_t(b["redirectPort"].asInt(0)), net::ssoOriginTag(rig.ep.origin()), kSsoState) +
+                                  "\",\"state\":\"" + kSsoState + "\",\"expiresIn\":600}");
+    };
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    {
+        std::unique_lock<std::mutex> lk(m);
+        CHECK(cv.wait_for(lk, std::chrono::seconds(5), [&] { return asked; }));
+    }
+    rig.c->cancelSso();
+    {
+        std::lock_guard<std::mutex> lk(m);
+        release = true;
+    }
+    cv.notify_all();
+    net::Event ev;
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+    CHECK(!ev.ok);
+    CHECK_EQ(ev.error, std::string("cancelled"));
+    CHECK_EQ(rig.openedCount(), size_t(0));
+    CHECK(portRefused(rig.port));
+    CHECK(!waitEvent(*rig.c, net::Event::Kind::LoginResult, ev, 300));   // the cancel finds nothing under way
+    // The next sign-in is not affected.
+    rig.c->startGoogleSso(net::SsoBrowserPage());
+    CHECK(waitEvent(*rig.c, net::Event::Kind::SsoBrowserOpened, ev, 10000));
+    CHECK(ev.ok);
+    CHECK_EQ(rig.openedCount(), size_t(1));
+}
+
 // Another server chosen while Google's page is open: the listener stops, and a code that reached it
 // just before is never sent (to either server).
 TEST(net_sso_origin_change) {

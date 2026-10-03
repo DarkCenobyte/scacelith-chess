@@ -401,6 +401,9 @@ struct OnlineClient::Impl {
     } sso;
     std::string ssoTicket, ssoTicketOrigin;
     std::string linkTicket, linkOrigin;           // SsoNeedsPassword: the step of linkSso()
+    // cancelSso() calls, counted on the caller's thread: a start whose request was in flight when
+    // the player cancelled opens no browser.
+    std::atomic<uint32_t> ssoCancels{0};
     std::function<bool(const std::string&)> browserOpener = sys::openBrowser;
     int ssoMinWaitMs = 30000;
     // The session of this game in the last list of signed-in devices (fetchSessions): revoking it
@@ -1754,7 +1757,8 @@ void OnlineClient::loginMfa(const std::string& code) {
 void OnlineClient::startGoogleSso(const SsoBrowserPage& page) {
     Impl* d = impl_.get();
     ServerEndpoint e = d->ep;
-    d->http([d, e, page] {
+    const uint32_t cancels = d->ssoCancels.load();
+    d->http([d, e, page, cancels] {
         d->ssoFinished();
         Event ev;
         ev.kind = Event::Kind::SsoBrowserOpened;
@@ -1790,6 +1794,12 @@ void OnlineClient::startGoogleSso(const SsoBrowserPage& page) {
             if (bad == "sso_origin") LOGW("net: Google sign-in: %s answered for another server's name", e.origin().c_str());
             ev.ok = false;
             ev.error = bad;
+            d->post(ev);
+            return;
+        }
+        if (d->ssoCancels.load() != cancels) {   // cancelled while the server answered
+            ev.ok = false;
+            ev.error = "cancelled";
             d->post(ev);
             return;
         }
@@ -1869,6 +1879,7 @@ void OnlineClient::linkSso(const std::string& password) {
 
 void OnlineClient::cancelSso() {
     Impl* d = impl_.get();
+    d->ssoCancels.fetch_add(1);
     d->http([d] {
         bool was = d->sso.active || !d->linkTicket.empty();
         d->ssoFinished();

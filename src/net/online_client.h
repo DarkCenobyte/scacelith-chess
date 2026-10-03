@@ -399,7 +399,8 @@ public:
     // mfaRequired continues with loginMfa(), which adds Google sign-in once the code is accepted.
     void linkSso(const std::string& password);
     // Stops the Google sign-in under way (its listener, a password step): LoginResult "cancelled"
-    // when there was one.
+    // when there was one. A start still waiting for the server opens no browser and answers
+    // SsoBrowserOpened "cancelled".
     void cancelSso();
     // Tests: what opens Google's page (default net::sys::openBrowser; false = it could not), and the
     // shortest wait for Google's redirect (30 s by default, whatever expiresIn the server gives).

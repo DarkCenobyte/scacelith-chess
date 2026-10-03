@@ -463,7 +463,7 @@ void pumpResults() {
             notify(game::onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs), 4.0f);
         }
     }
-    if (s.take(Kind::SsoBrowserOpened, e) && !e.ok) {
+    if (s.take(Kind::SsoBrowserOpened, e) && !e.ok && e.error != "cancelled") {
         setSub(Sub::SignIn);
         O.error = game::onlineErrorText(e.error, e.retryAfterSec);
     }
