@@ -90,7 +90,7 @@ float paragraph(const std::string& s, const Rect& p, float y, float width, vec4 
     return float(n) * lh;
 }
 
-Rect beginPage(float t, float w, float h, const std::string& title) {
+Rect beginPage(float t, float w, float h, const std::string& title, bool fitTitle) {
     vec2 v = gfx::viewSize();
     detail::dimBackground(t);
     w = std::min(w, v.x - 80.0f);
@@ -98,7 +98,7 @@ Rect beginPage(float t, float w, float h, const std::string& title) {
     Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 14.0f, w, h);
     gfx::pushAlpha(t);
     im::panel(p);
-    im::pageTitle(title, p.cx(), p.y + 80.0f, p.w - 120.0f);   // inside the frame in every language
+    im::pageTitle(title, p.cx(), p.y + 80.0f, fitTitle ? p.w - 120.0f : 0.0f);
     return p;
 }
 void endPage() { gfx::popAlpha(); }
@@ -819,7 +819,7 @@ void pageSsoName(float t) {
 // is added to it (then its code when two-factor is on).
 void pageSsoLink(float t) {
     game::OnlineSession& s = ses();
-    Rect p = beginPage(t, 1040.0f, 640.0f, T("online.sso.link_title"));
+    Rect p = beginPage(t, 1040.0f, 640.0f, T("online.sso.link_title"), true);   // long in de, es, fr
     serverLine(p, false);
     im::pushId("ssolink");
     float y = p.y + 160.0f;
@@ -832,7 +832,8 @@ void pageSsoLink(float t) {
     y += messageLine(p, y + 16.0f) + 14.0f;
     bool notMine = linkButton("online.sso.not_mine", p.cx(), std::max(y, footerY(p) - 64.0f), !busy);
     footerRule(p);
-    bool cancel = backButton(p, "common.cancel");
+    // Not while the password is checked: its answer would come to the page left.
+    bool cancel = backButton(p, "common.cancel", !busy);
     // Wider than the others: "Add Google sign-in" is long in most languages.
     if (primaryButton(p, "online.sso.link_button", !O.password.empty(), busy, 400.0f)) {
         O.error.clear();
@@ -841,7 +842,7 @@ void pageSsoLink(float t) {
     }
     im::popId();
     endPage();
-    if (notMine || cancel || im::consumeBack()) {
+    if (notMine || cancel || (im::consumeBack() && !busy)) {
         s.api().cancelSso();
         clearSecrets();
         setSub(Sub::SignIn);

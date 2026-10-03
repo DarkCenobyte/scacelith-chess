@@ -26,7 +26,8 @@ void spinner(m::vec2 c, float r = 12.0f, float alpha = 1.0f);
 float paragraph(const std::string& s, const gfx::Rect& p, float y, float width, m::vec4 color = theme::ivoryDim,
                 float size = theme::kBody, int face = font::FACE_ITALIC);
 // The panel of a sub-page (dimmed hall, panel, title), w x h at most; endPage() after it.
-gfx::Rect beginPage(float t, float w, float h, const std::string& title);
+// fitTitle: a title longer than the panel is drawn smaller, inside its frame.
+gfx::Rect beginPage(float t, float w, float h, const std::string& title, bool fitTitle = false);
 void endPage();
 // The server's name and the connection state in the panel's top corner (start side).
 void serverLine(const gfx::Rect& p, bool showConnection);
