@@ -1,6 +1,7 @@
 #include "embedded.h"
 #include "log.h"
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 
@@ -21,7 +22,8 @@ const File* find(const char* path) {
 
 std::string text(const char* path) {
     if (!g_overrideDir.empty()) {
-        std::ifstream f(g_overrideDir + "/" + path, std::ios::binary);
+        // A UTF-8 path: a wide one on Windows (u8path), whatever the process code page.
+        std::ifstream f(std::filesystem::u8path(g_overrideDir + "/" + path), std::ios::binary);
         if (f) {
             std::stringstream ss;
             ss << f.rdbuf();

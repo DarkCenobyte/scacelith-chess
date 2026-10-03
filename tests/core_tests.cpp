@@ -1,7 +1,9 @@
 #include "test.h"
 #include "math/math.h"
+#include "core/embedded.h"
 #include "core/image.h"
 #include "core/ini.h"
+#include "core/log.h"
 #include "net/crypto.h"
 #include "net/net_sys.h"
 
@@ -285,6 +287,41 @@ TEST(ini_utf8_path) {
     CHECK(b.load(path));
     CHECK_EQ(b.getInt("display.width"), 1280);
     CHECK(net::sys::removeFile(path));
+}
+
+// The same for the log (next to the exe or in the user profile), an F12 screenshot (in the user
+// profile) and the files of --data-dir: in a folder "\xC3\x89checs" they were opened under the
+// mangled name, or not at all.
+TEST(log_utf8_path) {
+    const std::string path = net::sys::exeDirectory() + "log-test-\xC3\x89" "checs.log";
+    CHECK(logx::init(path.c_str()));
+    LOGI("log test line");
+    logx::shutdown();
+    std::string text;
+    CHECK(net::sys::readFile(path, text, 1 << 16));
+    CHECK(text.find("log test line") != std::string::npos);
+    CHECK(net::sys::removeFile(path));
+}
+
+TEST(image_png_utf8_path) {
+    const std::string path = net::sys::exeDirectory() + "png-test-\xC3\x89" "checs.png";
+    std::vector<uint8_t> px(4 * 4 * 3, 200);
+    CHECK(image::writePNG(path, 4, 4, 3, px.data()));
+    CHECK(net::sys::fileExists(path));
+    CHECK(net::sys::removeFile(path));
+}
+
+TEST(embedded_override_dir_utf8_path) {
+    const std::string dir = net::sys::exeDirectory() + "data-test-\xC3\x89" "checs";
+    const std::string file = dir + "/override-test.txt";
+    CHECK(net::sys::makeDirectories(dir));
+    CHECK(net::sys::writeFileAtomic(file, "read from the folder", false));
+    embedded::setOverrideDir(dir);
+    CHECK_EQ(embedded::text("override-test.txt"), std::string("read from the folder"));
+    embedded::setOverrideDir(std::string());
+    CHECK(net::sys::removeFile(file));
+    std::error_code ec;
+    CHECK(std::filesystem::remove(std::filesystem::u8path(dir), ec));
 }
 
 // A PNG that cannot be written whole is reported (a --shot run then fails), and no truncated file
