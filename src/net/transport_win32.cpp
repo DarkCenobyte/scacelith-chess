@@ -9,12 +9,16 @@
 //     which aborts the send (the approach of .NET's WinHttpHandler). Through a proxy, one can come
 //     before its CONNECT has made the TLS connection: it is left for the next one, as .NET does
 //     (pinCheckAtSend, transport.h). The pin is checked again once the response has arrived.
-//     Wine's WinHTTP sends the request anyway after that close, so a pinned request that carries anything (Authorization header, body) is preceded by a
-//     "HEAD /" probe without either: a server that fails the pin gets the probe only, and the
-//     real request normally reuses the probe's verified keep-alive connection. Under Wine that
-//     reuse is all the protection: an active attacker that relays the probe to the real server,
-//     then closes that connection, receives the real request (header and body) on the new one
-//     WinHTTP opens, before the check after the answer refuses it.
+//     Wine's WinHTTP sends the request anyway after that close, so a pinned request that
+//     carries anything (Authorization header, body) is preceded by a "HEAD /" probe without
+//     either: a server that fails the pin gets the probe only. On Windows the real request then
+//     goes as above. Under Wine (Proton) it goes without IGNORE_UNKNOWN_CA, so it can only
+//     succeed on the connection the probe verified, which WinHTTP's pool hands over (Wine pools
+//     it from a last WinHttpReadData): a new connection to a self-signed server fails its
+//     handshake before anything is written, and the probe and the request then go once more.
+//     What an active attacker can still get under Wine: the real request on a new connection
+//     with a certificate for the name from an issuer Windows trusts; and a Wine that hides
+//     wine_get_version is taken for Windows (a relayed probe, then the request on a new one).
 //   - WebSocket: WinHttpWebSocketCompleteUpgrade / Send / Receive / Shutdown. A reader thread
 //     owned by the socket object blocks in WinHttpWebSocketReceive (WinHTTP allows one send and
 //     one receive in flight at the same time) and queues complete binary messages.
@@ -160,8 +164,9 @@ std::string mapError(DWORD e, const RequestContext& c) {
 }
 
 // Opens connect + request handles with the security options; false with resp-style error.
+// anyIssuer: a certificate of an unknown issuer is accepted (a pinned server: the pin decides).
 bool openRequest(const std::string& host, uint16_t port, bool tls, const std::string& method, const std::string& path,
-                 const std::string& pin, int timeoutMs, Handle& conn, Handle& req, std::string& error, std::string& detail) {
+                 bool anyIssuer, int timeoutMs, Handle& conn, Handle& req, std::string& error, std::string& detail) {
     if (!session()) { error = "unavailable"; return false; }
     conn.reset(WinHttpConnect(session(), widen(host).c_str(), port, 0));
     if (!conn.get()) { error = "network"; detail = "WinHttpConnect " + std::to_string(GetLastError()); return false; }
@@ -185,7 +190,7 @@ bool openRequest(const std::string& host, uint16_t port, bool tls, const std::st
             }
         }
     }
-    if (tls && !pin.empty()) {
+    if (tls && anyIssuer) {
         DWORD flags = SECURITY_FLAG_IGNORE_UNKNOWN_CA;
         WinHttpSetOption(req.get(), WINHTTP_OPTION_SECURITY_FLAGS, &flags, sizeof(flags));
     }
@@ -210,6 +215,7 @@ bool exchange(Handle& req, RequestContext& ctx, const std::wstring& headers, con
         // Defence in depth: the leaf must match the pin (also when no SENDING_REQUEST came).
         std::string got = leafSha256(req.get());
         if (got.empty() || !crypto::constantTimeEqual(got, ctx.pin)) {
+            ctx.pinMismatch.store(true);
             error = "certificate";
             detail = "pinned certificate mismatch";
             return false;
@@ -383,14 +389,26 @@ bool transportAvailable() { return session() != nullptr; }
 
 namespace {
 
-void perform(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel) {
+// Wine or Proton (ntdll exports wine_get_version; a build that hides it is taken for Windows).
+bool underWine() {
+    static const bool wine = [] {
+        HMODULE ntdll = GetModuleHandleW(L"ntdll.dll");
+        return ntdll && GetProcAddress(ntdll, "wine_get_version");
+    }();
+    return wine;
+}
+
+// One request on handles of its own. anyIssuer: a pinned request accepts a certificate of an
+// unknown issuer (the pin decides); pinFailed (optional): set when the certificate failed the pin.
+void perform(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel, bool anyIssuer = true, bool* pinFailed = nullptr) {
     resp = HttpResponse();
     Handle conn, req;
-    if (!openRequest(r.host, r.port, r.tls, r.method, r.path, r.tls ? r.pinnedSha256 : std::string(), r.timeoutMs, conn, req,
-                     resp.error, resp.detail))
+    const std::string pin = r.tls ? r.pinnedSha256 : std::string();
+    if (!openRequest(r.host, r.port, r.tls, r.method, r.path, !pin.empty() && anyIssuer, r.timeoutMs, conn, req, resp.error,
+                     resp.detail))
         return;
     RequestContext ctx;
-    ctx.pin = r.tls ? r.pinnedSha256 : std::string();
+    ctx.pin = pin;
     ctx.request = &req;
     AbortGuard abortGuard(cancel, [&req] { req.close(); });
 
@@ -430,8 +448,17 @@ void perform(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel) {
             resp.body.resize(at + got);
             if (got == 0) break;
         }
+        // Wine's WinHTTP gives a connection back to its pool only from WinHttpReadData at the end
+        // of the answer: without this read the probe's verified connection (an answer without a
+        // body) would be closed, and the real request would need a new one (httpRequest).
+        if (ok && r.method == "HEAD" && underWine()) {
+            char none = 0;
+            DWORD got = 0;
+            WinHttpReadData(req.get(), &none, 1, &got);
+        }
     }
     abortGuard.clear();
+    if (pinFailed) *pinFailed = ctx.pinMismatch.load();
     if (cancel && cancel->cancelled()) { resp.error = "cancelled"; ok = false; }
     if (!ok) {
         resp.status = 0;
@@ -456,9 +483,22 @@ void httpRequest(const HttpRequest& r, HttpResponse& resp, CancelToken* cancel) 
         probe.path = "/";
         probe.timeoutMs = r.timeoutMs;
         probe.maxResponseBytes = 64 * 1024;
-        perform(probe, resp, cancel);
-        if (!resp.error.empty()) return;   // any HTTP status will do: the pin held
-        resp = HttpResponse();
+        // Under Wine the real request accepts no unknown issuer: it can then only succeed on the
+        // connection the probe verified (WinHTTP's pool), and a new connection to a self-signed
+        // server fails its handshake before anything is written. When that happens (the server
+        // closed the probe's connection meanwhile) the probe and the request go once more; never
+        // after a pin mismatch.
+        const bool wine = underWine();
+        for (int round = 0;; ++round) {
+            perform(probe, resp, cancel);
+            if (!resp.error.empty()) return;   // any HTTP status will do: the pin held
+            resp = HttpResponse();
+            bool pinFailed = false;
+            perform(r, resp, cancel, !wine, &pinFailed);
+            const bool refused = resp.status == 0 && (resp.error == "tls" || resp.error == "certificate") && !pinFailed;
+            if (!wine || !refused || round > 0) return;
+            LOGI("net: %s:%u: a new connection refused its unknown issuer, checking the pin again", r.host.c_str(), unsigned(r.port));
+        }
     }
     perform(r, resp, cancel);
 }
@@ -504,7 +544,7 @@ void httpStream(const HttpRequest& r, const std::function<bool(const HttpHead&)>
     }
     Handle conn, req;
     std::string pin = r.tls ? r.pinnedSha256 : std::string();
-    if (!openRequest(r.host, r.port, r.tls, r.method, r.path, pin, r.timeoutMs, conn, req, resp.error, resp.detail)) return;
+    if (!openRequest(r.host, r.port, r.tls, r.method, r.path, !pin.empty(), r.timeoutMs, conn, req, resp.error, resp.detail)) return;
     RequestContext ctx;
     ctx.pin = pin;
     ctx.request = &req;
@@ -574,7 +614,7 @@ std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int&
     Handle conn, req;
     std::string detail;
     std::string pin = p.tls ? p.pinnedSha256 : std::string();
-    if (!openRequest(p.host, p.port, p.tls, "GET", p.path, pin, p.timeoutMs, conn, req, error, detail)) return nullptr;
+    if (!openRequest(p.host, p.port, p.tls, "GET", p.path, !pin.empty(), p.timeoutMs, conn, req, error, detail)) return nullptr;
     if (!WinHttpSetOption(req.get(), WINHTTP_OPTION_UPGRADE_TO_WEB_SOCKET, nullptr, 0)) {
         error = "unavailable";   // Windows 7 has no WinHTTP WebSocket
         return nullptr;
