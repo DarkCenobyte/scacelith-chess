@@ -2189,9 +2189,10 @@ TEST(tts_worker_warm_up_failure) {
         CHECK(w.failed() && w.warmUpFailed() && !w.ready());
         CHECK_EQ(w.request("Hello.", "en"), 0u);
         // A download replaced the damaged file: the same worker started again warms up and speaks
-        // (GameScene::coachModelDownloaded gives it that one more try).
-        CHECK(net::sys::writeFileAtomic(dir + tts::Engine::kFiles[tts::kFileIndexer], intact, false));
+        // (GameScene::coachModelDownloaded gives it that one more try). Stopped first, as in the
+        // game, so its thread has unmapped the files before the replacement.
         w.stop();
+        CHECK(net::sys::writeFileAtomic(dir + tts::Engine::kFiles[tts::kFileIndexer], intact, false));
         CHECK(w.start(tts::Options()));
         settle(w);
         CHECK(w.ready() && !w.failed() && !w.warmUpFailed());

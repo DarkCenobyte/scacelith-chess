@@ -724,7 +724,6 @@ TEST(model_store_resumes_and_cancels) {
     CHECK(std::chrono::duration<double>(std::chrono::steady_clock::now() - t0).count() < 1.5);
 }
 
-// [coach] voice: on by default, kept off once the player declined the download.
 TEST(coach_voice_retry_after_a_download) {
     // A worker that failed (to load, or its warm-up) gets one more try after a download that wrote
     // files; one that found every file right changes nothing, and a working voice is left alone.
@@ -735,6 +734,7 @@ TEST(coach_voice_retry_after_a_download) {
     CHECK(!game::coachVoiceRetry(false, 0));
 }
 
+// [coach] voice: on by default, kept off once the player declined the download.
 TEST(coach_voice_setting_round_trip) {
     game::Settings fresh;
     CHECK(fresh.coachVoice);
