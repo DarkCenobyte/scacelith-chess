@@ -301,6 +301,18 @@ uint16_t closeCodeFor(ErrorCode code) {
     return 0;
 }
 
+bool errorCodeForClose(uint16_t close, ErrorCode& code) {
+    if (close >= 4001 && close <= 4099) {
+        code = ErrorCode(close - 4000);
+        return true;
+    }
+    if (close >= 4300 && close <= 4315) {
+        code = ErrorCode(240 + (close - 4300));
+        return true;
+    }
+    return false;
+}
+
 const char* messageName(MsgType t) {
     switch (t) {
     case MsgType::Hello: return "Hello";
@@ -744,7 +756,7 @@ bool getFields(Reader& r, GameSnapshot& out) {
            get(r, out.white) &&
            get(r, out.black) &&
            r.enumeration(out.you, false) &&
-           r.list(out.moves, 1200, 10, [](Reader& r, MoveRec& x) { return get(r, x); }) &&
+           r.list(out.moves, 1200, 10, [](Reader& in, MoveRec& x) { return get(in, x); }) &&
            r.enumeration(out.running, false) &&
            r.u32(out.whiteMs, 0u, 0xffffffffu) &&
            r.u32(out.blackMs, 0u, 0xffffffffu) &&

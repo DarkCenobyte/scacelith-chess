@@ -1,4 +1,4 @@
-// Online client tests: protocol codec against the JavaScript codec's vectors, position digest,
+// Online client tests: protocol codec against the shared golden vectors, position digest,
 // JSON, crypto (hash / base64 / PKCE / proof of work), the folders of net::sys (also the platform
 // layer's exeDirectory, userDataDirectory and appDataDirectory), credential store isolation,
 // endpoint validation, and OnlineClient end to end against a fake server on the loopback interface
@@ -11,9 +11,9 @@
 // fed the client's events), and the move of the official server's saved session from port 44664
 // to 443.
 //
-// Vectors: tests/data/net-protocol-vectors.json (dedicated-server/tools/gen-cpp-test-vectors.js)
-// and, when present, dedicated-server/test/fixtures/protocol-vectors.json. The files are looked
-// up from the current directory (run from the repository root), $SCACELITH_SOURCE_DIR and the
+// Vectors: dedicated-server/test/fixtures/protocol-vectors.json, written by the server's protogen
+// from dedicated-server/protocol/scacelith-v1.json, like net/protocol_gen.h. The file is looked up
+// from the current directory (run from the repository root), $SCACELITH_SOURCE_DIR and the
 // executable's parent directories.
 #ifdef _WIN32
 #include <winsock2.h>
@@ -235,6 +235,63 @@ bool checkMalformed(const std::string& name, const std::vector<uint8_t>& bytes, 
     return ok;
 }
 
+// A lenient vector: bytes a strict receiver refuses and a lenient one takes.
+// dir "s2c" (received by a client): fields null means the client ignores the frame (a type it
+// does not know, or a client message); otherwise the typed decoder gives fields (trailing bytes
+// of a later minor dropped, unknown open-enum values kept). dir "c2s": a server reading a Hello
+// of a later minor, which decodeHello takes and the strict decoder refuses.
+bool checkLenientVector(const std::string& name, const std::string& dir, const Value& fields, const std::vector<uint8_t>& bytes) {
+    pr::MsgType t;
+    const bool known = pr::peekType(bytes.data(), bytes.size(), t);
+    if (dir == "c2s") {
+        pr::Hello h;
+        bool ok = known && t == pr::MsgType::Hello && !pr::decode(bytes.data(), bytes.size(), h);
+        ok = ok && pr::decodeHello(bytes.data(), bytes.size(), h) && sameJson(toJson(h), fields);
+        if (!ok) std::fprintf(stderr, "  lenient vector %s: not a later minor's Hello\n", name.c_str());
+        return ok;
+    }
+    if (fields.isNull()) {
+        // Ignored: no server message decoder takes it, and the client sees why from the type.
+        const bool ignored = !known || pr::isClientType(uint8_t(t));
+        if (!ignored) std::fprintf(stderr, "  lenient vector %s: a server type the client would decode\n", name.c_str());
+        return ignored && checkMalformed(name, bytes, "s2c");
+    }
+    bool ok = known && !pr::isClientType(uint8_t(t));
+    if (ok) {
+        pr::withMessage(t, [&](auto& m) {
+            if (!pr::decode(bytes.data(), bytes.size(), m)) {
+                std::fprintf(stderr, "  lenient vector %s: refused\n", name.c_str());
+                ok = false;
+            } else if (!sameJson(toJson(m), fields)) {
+                std::fprintf(stderr, "  lenient vector %s: decoded %s\n    expected %s\n", name.c_str(), toJson(m).dump().c_str(),
+                             fields.dump().c_str());
+                ok = false;
+            }
+        });
+    }
+    return ok;
+}
+
+// "e2e4", "e7e8q" -> squares (a1 = 0 .. h8 = 63) and promotion piece (n b r q = 2..5); false when
+// the text is not a move. The protocol's own parser (Rust uci_to_move) also takes upper case.
+bool splitUci(const std::string& uci, int& from, int& to, int& promo) {
+    auto square = [&uci](size_t i, int& sq) {
+        const int file = std::tolower(static_cast<unsigned char>(uci[i])) - 'a', rank = uci[i + 1] - '1';
+        if (file < 0 || file > 7 || rank < 0 || rank > 7) return false;
+        sq = rank * 8 + file;
+        return true;
+    };
+    if ((uci.size() != 4 && uci.size() != 5) || !square(0, from) || !square(2, to)) return false;
+    promo = 0;
+    if (uci.size() == 5) {
+        const char* pieces = "nbrq";
+        const char* p = std::strchr(pieces, std::tolower(static_cast<unsigned char>(uci[4])));
+        if (!p || !*p) return false;
+        promo = int(p - pieces) + 2;
+    }
+    return true;
+}
+
 }  // namespace
 
 // =============================================================================================
@@ -242,9 +299,14 @@ bool checkMalformed(const std::string& name, const std::vector<uint8_t>& bytes, 
 // =============================================================================================
 
 TEST(net_protocol_constants) {
-    CHECK_EQ(pr::kProtocolVersion, 3);
-    CHECK_EQ(pr::kProtocolMin, 3);
-    CHECK_EQ(std::string(pr::kWsSubprotocol), std::string("scacelith.v1"));
+    CHECK_EQ(pr::kProtocolVersion, 1);
+    CHECK_EQ(pr::kMinor, 0);
+    CHECK_EQ(pr::kCaps, uint64_t(0));
+    CHECK_EQ(std::string(pr::kWsSubprotocol), std::string("scacelith.rt1"));
+    CHECK_EQ(pr::kHelloPrefixSize, size_t(17));
+    CHECK_EQ(int(pr::MsgType::Hello), 0x01);
+    CHECK_EQ(int(pr::MsgType::Welcome), 0x80);
+    CHECK_EQ(int(pr::MsgType::Error), 0x81);
     CHECK_EQ(int(pr::MsgType::Move), 0x20);
     CHECK_EQ(int(pr::MsgType::C_Ping), 0x02);
     CHECK_EQ(int(pr::MsgType::S_Ping), 0x82);
@@ -259,97 +321,134 @@ TEST(net_protocol_constants) {
     CHECK(pr::isValid(pr::EndReason::BothDisconnected));
     CHECK(!pr::isValid(pr::EndReason(14)));
     CHECK_EQ(std::string(pr::enumName(pr::ErrorCode::IllegalMove)), std::string("IllegalMove"));
+    CHECK(!pr::isValid(pr::ErrorCode(243)));   // retired (SlowConsumer comes with no Error)
+
+    // Close codes: a fatal Error with code c is followed by 4000 + c (c < 100) or 4300 + (c - 240).
+    CHECK_EQ(pr::CloseCode::Malformed, 4001);
     CHECK_EQ(pr::CloseCode::Unauthorized, 4003);
     CHECK_EQ(pr::CloseCode::ServerFull, 4000 + int(pr::ErrorCode::ServerFull));
+    CHECK_EQ(pr::CloseCode::Internal, 4009);
+    CHECK_EQ(pr::CloseCode::HelloRequired, 4010);
+    CHECK_EQ(pr::CloseCode::EmailUnverified, 4011);
+    CHECK_EQ(pr::CloseCode::ProtocolViolation, 4300);
+    CHECK_EQ(pr::CloseCode::SlowConsumer, 4303);
+    CHECK_EQ(pr::closeCodeFor(pr::ErrorCode::Banned), pr::CloseCode::Banned);
+    CHECK_EQ(pr::closeCodeFor(pr::ErrorCode::Flood), pr::CloseCode::Flood);
+    CHECK_EQ(pr::closeCodeFor(pr::ErrorCode::IllegalMove), uint16_t(0));   // never fatal
+    pr::ErrorCode code = pr::ErrorCode::Malformed;
+    CHECK(pr::errorCodeForClose(4004, code) && code == pr::ErrorCode::Banned);
+    CHECK(pr::errorCodeForClose(4302, code) && code == pr::ErrorCode::CheatDetected);
+    CHECK(pr::errorCodeForClose(4303, code) && int(code) == 243 && !pr::isValid(code));
+    CHECK(!pr::errorCodeForClose(pr::CloseCode::GoingAway, code));
+    CHECK(!pr::errorCodeForClose(4100, code));
+    CHECK(!pr::errorCodeForClose(4000, code));
+    for (int c = 0; c < 256; ++c) {
+        const uint16_t close = pr::closeCodeFor(pr::ErrorCode(c));
+        if (close == 0) continue;
+        CHECK(pr::errorCodeForClose(close, code) && int(code) == c);
+    }
 }
 
+// The shared golden vectors: dedicated-server/test/fixtures/protocol-vectors.json, written by
+// protogen from the schema independently of the codecs it checks (format in its "about" key).
 TEST(net_protocol_vectors) {
     std::string path;
-    std::string text = readRepoFile("tests/data/net-protocol-vectors.json", size_t(64) << 20, &path);
-    CHECK(!text.empty());
-    if (text.empty()) {
-        std::fprintf(stderr, "  tests/data/net-protocol-vectors.json not found (run from the repository root)\n");
-        return;
-    }
+    std::string text = readRepoFile("dedicated-server/test/fixtures/protocol-vectors.json", size_t(64) << 20, &path);
+    REQUIRE(!text.empty());
     Value doc;
     std::string err;
     net::json::Limits lim;
     lim.maxBytes = 64 << 20;
     lim.maxElements = 10000000;
-    CHECK(net::json::parse(text, doc, &err, lim));
-    CHECK_EQ(uint32_t(doc["schemaHash"].asInt()), pr::kSchemaHash);   // regenerate the vectors after a schema change
-    int valid = 0, malformed = 0;
+    REQUIRE(net::json::parse(text, doc, &err, lim));
+    // Regenerate with protogen after a schema change.
+    CHECK_EQ(int(doc["protocol"].asInt()), int(pr::kProtocolVersion));
+    CHECK_EQ(int(doc["minor"].asInt()), int(pr::kMinor));
+    CHECK_EQ(uint32_t(doc["fingerprint"].asInt()), pr::kFingerprint);
+    CHECK_EQ(doc["subprotocol"].asString(), std::string(pr::kWsSubprotocol));
+
+    int valid = 0, malformed = 0, lenient = 0, digests = 0, moves = 0;
     for (const Value& v : doc["valid"].items()) {
-        CHECK(checkValidVector(v["name"].asString(), &v["msg"], unhex(v["hex"].asString())));
+        CHECK(checkValidVector(v["name"].asString() + " (" + v["note"].asString() + ")", &v["fields"], unhex(v["hex"].asString())));
         ++valid;
     }
     for (const Value& v : doc["malformed"].items()) {
-        CHECK(checkMalformed(v["name"].asString(), unhex(v["hex"].asString())));
+        const std::string name = v["note"].asString(), dir = v["dir"].asString();
+        const std::vector<uint8_t> bytes = unhex(v["hex"].asString());
+        CHECK(checkMalformed(name, bytes, dir));
+        pr::Hello h;
+        if (dir == "c2s" && pr::decodeHello(bytes.data(), bytes.size(), h))
+            std::fprintf(stderr, "  malformed vector accepted by decodeHello: %s\n", name.c_str());
+        CHECK(dir != "c2s" || !pr::decodeHello(bytes.data(), bytes.size(), h));
         ++malformed;
     }
+    for (const Value& v : doc["lenient"].items()) {
+        CHECK(checkLenientVector(v["note"].asString(), v["dir"].asString(), v["fields"], unhex(v["hex"].asString())));
+        ++lenient;
+    }
     for (const Value& v : doc["fnv1a32"].items()) {
-        // positionDigest of a FEN prefix is FNV-1a of that very text.
-        std::string t = v["text"].asString();
-        if (!t.empty()) CHECK_EQ(net::positionDigest(t + " 0 1"), uint32_t(v["hash"].asInt()));
+        // positionDigest of a full FEN is FNV-1a of its first four fields, the vector's text.
+        const std::string t = v["text"].asString();
+        CHECK_EQ(net::positionDigest(t.empty() ? t : t + " 0 1"), uint32_t(v["hash"].asInt()));
+        ++digests;
+    }
+    for (const Value& v : doc["moves"].items()) {
+        int from = 0, to = 0, promo = 0;
+        const bool move = splitUci(v["uci"].asString(), from, to, promo);
+        CHECK_EQ(move, v["value"].isNumber());
+        if (move && v["value"].isNumber()) {
+            const uint16_t packed = net::packMove(from, to, promo);
+            CHECK_EQ(int(packed), int(v["value"].asInt()));
+            CHECK(net::moveFrom(packed) == from && net::moveTo(packed) == to && net::movePromo(packed) == promo);
+        }
+        ++moves;
     }
     CHECK(valid >= 40);
     CHECK(malformed >= 150);
-    std::fprintf(stderr, "  %s: %d valid, %d malformed\n", path.c_str(), valid, malformed);
+    CHECK(lenient >= 20);
+    CHECK(digests >= 5 && moves >= 10);
+    std::fprintf(stderr, "  %s: %d valid, %d malformed, %d lenient, %d digests, %d moves\n", path.c_str(), valid, malformed,
+                 lenient, digests, moves);
 }
 
-// Golden vectors of the protocol owner, when that file exists (format read tolerantly).
-TEST(net_protocol_shared_fixture) {
-    std::string path;
-    std::string text = readRepoFile("dedicated-server/test/fixtures/protocol-vectors.json", size_t(64) << 20, &path);
-    if (text.empty()) SKIP("dedicated-server/test/fixtures/protocol-vectors.json not present");
-    Value doc;
-    net::json::Limits lim;
-    lim.maxBytes = 64 << 20;
-    lim.maxElements = 10000000;
-    CHECK(net::json::parse(text, doc, nullptr, lim));
-    for (const char* k : {"schemaHash", "schema_hash", "SCHEMA_HASH"})
-        if (doc[k].isNumber() && uint32_t(doc[k].asInt()) != pr::kSchemaHash)
-            SKIP("the shared fixture has another schema hash");
-    auto hexOf = [](const Value& e) {
-        for (const char* k : {"hex", "bytes", "encoded", "frame"})
-            if (e[k].isString()) return e[k].asString();
-        return std::string();
-    };
-    auto msgOf = [](const Value& e) -> const Value* {
-        for (const char* k : {"msg", "message", "object", "value", "fields", "decoded"})
-            if (e[k].isObject()) return &e[k];
-        return nullptr;
-    };
-    int valid = 0, malformed = 0;
-    auto validList = [&](const Value& list) {
-        for (const Value& e : list.items()) {
-            std::string h = hexOf(e);
-            if (h.empty()) continue;
-            const Value* m = msgOf(e);
-            Value stripped;
-            if (m) {   // drop keys that are not fields ("type")
-                stripped = Value::object();
-                for (auto& kv : m->members())
-                    if (kv.first != "type") stripped.set(kv.first, kv.second);
-            }
-            CHECK(checkValidVector("shared:" + e["name"].asString(), m ? &stripped : nullptr, unhex(h)));
-            ++valid;
-        }
-    };
-    auto badList = [&](const Value& list) {
-        for (const Value& e : list.items()) {
-            std::string h = e.isString() ? e.asString() : hexOf(e);
-            if (e.isObject() && h.empty()) continue;
-            CHECK(checkMalformed("shared:" + e["name"].asString(), unhex(h), e["dir"].isString() ? e["dir"].asString() : ""));
-            ++malformed;
-        }
-    };
-    if (doc.isArray()) validList(doc);
-    for (const char* k : {"valid", "vectors", "messages", "golden"})
-        if (doc[k].isArray()) validList(doc[k]);
-    for (const char* k : {"malformed", "invalid", "bad", "reject", "rejected"})
-        if (doc[k].isArray()) badList(doc[k]);
-    std::fprintf(stderr, "  %s: %d valid, %d malformed\n", path.c_str(), valid, malformed);
+// Later minors: a client takes the fields it knows from a longer server message and the values of
+// an open enum it does not know; a server takes a longer Hello; the strict decoders refuse both.
+TEST(net_protocol_later_minor) {
+    pr::Ack a;
+    a.ref = 9;
+    std::vector<uint8_t> buf;
+    pr::encode(a, buf);
+    buf.push_back(0x5A);
+    pr::Ack d;
+    CHECK(pr::decode(buf.data(), buf.size(), d) && d.ref == 9);
+
+    pr::Hello h;
+    h.seq = 1;
+    h.proto = pr::kProtocolVersion;
+    h.minor = 3;
+    h.caps = ~uint64_t(0);
+    h.client = "test";
+    h.token = std::string(20, 't');
+    CHECK(pr::valid(h));
+    buf.clear();
+    pr::encode(h, buf);
+    pr::Hello strict;
+    CHECK(pr::decode(buf.data(), buf.size(), strict) && strict.caps == ~uint64_t(0));
+    buf.push_back(1);   // a field of minor 3
+    CHECK(!pr::decode(buf.data(), buf.size(), strict));
+    pr::Hello later;
+    CHECK(pr::decodeHello(buf.data(), buf.size(), later) && later.minor == 3 && later.token == h.token);
+    pr::HelloPrefix pre;
+    CHECK(pr::readHelloPrefix(buf.data(), buf.size(), pre));
+    CHECK(pre.seq == 1 && pre.proto == pr::kProtocolVersion && pre.minor == 3 && pre.caps == ~uint64_t(0));
+    CHECK(!pr::readHelloPrefix(buf.data(), pr::kHelloPrefixSize - 1, pre));
+    uint32_t seq = 0;
+    CHECK(pr::peekSeq(buf.data(), buf.size(), seq) && seq == 1);
+
+    // The fields it knows still obey the schema: a 3-byte token (the rest then counts as trailing
+    // bytes) is refused.
+    buf[pr::kHelloPrefixSize + 1 + h.client.size()] = 3;
+    CHECK(!pr::decodeHello(buf.data(), buf.size(), later));
 }
 
 TEST(net_protocol_valid_checks) {
@@ -1284,7 +1383,7 @@ TEST(net_transport_silent_server_times_out) {
     p.host = "127.0.0.1";
     p.port = srv.port();
     p.tls = false;
-    p.subprotocol = "scacelith.v1";
+    p.subprotocol = pr::kWsSubprotocol;
     p.timeoutMs = 1000;
     std::string error;
     int status = 0;
@@ -1752,11 +1851,11 @@ private:
             char info[512];
             std::snprintf(info, sizeof(info),
                           "{\"name\":\"Fake\",\"serverId\":\"%s\",\"motd\":\"hi\",\"protocol\":{\"min\":%u,\"max\":%u,\"schema\":%u,"
-                          "\"subprotocol\":\"scacelith.v1\"},\"wsPort\":%u,\"wsPath\":\"/ws\",\"registration\":\"open\","
+                          "\"subprotocol\":\"%s\"},\"wsPort\":%u,\"wsPath\":\"/ws\",\"registration\":\"open\","
                           "\"emailVerification\":true,\"sso\":{\"google\":false},\"mfa\":true,\"pow\":{\"register\":10},"
                           "\"categories\":[{\"id\":\"3+2\",\"baseSec\":180,\"incSec\":2}]}",
-                          serverId().c_str(), unsigned(pr::kProtocolMin), unsigned(pr::kProtocolVersion), unsigned(pr::kSchemaHash),
-                          unsigned(port));
+                          serverId().c_str(), unsigned(pr::kProtocolVersion), unsigned(pr::kProtocolVersion), unsigned(pr::kFingerprint),
+                          pr::kWsSubprotocol, unsigned(port));
             respond(s, 200, info);
         } else if (method == "POST" && path == "/api/v1/auth/login") {
             ++loginAttempts;
@@ -1881,10 +1980,10 @@ private:
             }
             if (t == pr::MsgType::Hello) {
                 pr::Hello m;
-                if (!pr::decode(p, n, m)) return;
+                if (!pr::decodeHello(p, n, m)) return;
                 ++hellos;
-                helloTokenOk.store(m.seq == 1 && m.token == token && m.schema == pr::kSchemaHash && m.proto == pr::kProtocolVersion &&
-                                   m.client.compare(0, 10, "Scacelith/") == 0);
+                helloTokenOk.store(m.seq == 1 && m.token == token && m.proto == pr::kProtocolVersion && m.minor == pr::kMinor &&
+                                   m.caps == pr::kCaps && m.client.compare(0, 10, "Scacelith/") == 0);
                 if (step == kShutdownAtHello) {
                     pr::Error e;
                     e.code = pr::ErrorCode::ShuttingDown;
@@ -1896,6 +1995,8 @@ private:
                 }
                 pr::Welcome w;
                 w.proto = pr::kProtocolVersion;
+                w.minor = std::min(m.minor, pr::kMinor);
+                w.caps = m.caps & pr::kCaps;
                 w.serverTime = epochMs() + kSkewMs;
                 w.userId = 7;
                 w.username = "alice";
@@ -1903,6 +2004,7 @@ private:
                 w.heartbeatMs = heartbeatMs.load();
                 w.clientPingMs = clientPingMs.load();
                 w.maxMsgPerSec = 20;
+                w.msgBurst = 40;
                 w.activeGame = activeGame.load();
                 w.gestureRate = gestureRate.load();
                 w.gestureBurst = gestureBurst.load();

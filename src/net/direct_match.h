@@ -35,7 +35,7 @@
 // The host's game is the authority, exactly like the dedicated server is for online games: it
 // validates the guest's move intents with chess::Position, runs the clocks and decides the
 // result. Both sides then speak the same binary protocol as online play (net::proto messages,
-// dedicated-server/src/protocol/schema.js) inside an encrypted channel, and DirectMatch emits
+// dedicated-server/docs/PROTOCOL.md) inside an encrypted channel, and DirectMatch emits
 // the same net::Event values as OnlineClient (GameSnapshot, MoveMade, MoveRejected, GameEvent,
 // GameEnd, ConnectionChanged, ServerError, OpponentGesture), so the 3D scene plays a direct match
 // with the online game code. The host's own moves go through the same authority (no special path).

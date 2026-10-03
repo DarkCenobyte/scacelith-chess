@@ -150,6 +150,9 @@ constexpr uint16_t SlowConsumer = 4303;
 }  // namespace CloseCode
 // Close code that follows a fatal Error with this code (0 when this code is never fatal).
 uint16_t closeCodeFor(ErrorCode code);
+// The error code a close code of that rule stands for (false for other close codes). The code
+// may be one this codec does not know (isValid() false), such as 243 for 4303.
+bool errorCodeForClose(uint16_t close, ErrorCode& code);
 
 // ---- message types (0x01-0x7F client -> server, 0x80-0xFF server -> client) ----
 enum class MsgType : uint8_t {
