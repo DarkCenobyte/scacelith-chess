@@ -289,6 +289,7 @@ struct State {
     std::string error, note;
     bool offerResend = false;
     std::string resendEmail;
+    std::string resendUser;     // the username of the registration resendEmail comes from
     // two-factor
     int mfaStep = 0;
     std::string mfaSecret, mfaUri;
@@ -405,6 +406,13 @@ void showCodes(Sub page) {
     if (O.sub != page && ses().signedIn()) setSub(page);
 }
 
+// ASCII case-insensitive equality (the server's for usernames and addresses).
+bool sameAscii(const std::string& a, const std::string& b) {
+    return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(), [](char x, char y) {
+        return std::tolower(static_cast<unsigned char>(x)) == std::tolower(static_cast<unsigned char>(y));
+    });
+}
+
 void pumpResults() {
     game::OnlineSession& s = ses();
     net::Event e;
@@ -416,6 +424,7 @@ void pumpResults() {
         const bool signedOutForm = signingIn || O.sub == Sub::Register || O.sub == Sub::CheckEmail || O.sub == Sub::Forgot;
         if (e.ok) {
             clearSecrets();
+            O.resendEmail.clear();
             if (signedOutForm) setSub(Sub::Play);
             else notify(i18n::trf("online.play.signed_in", {s.account().username}), 4.0f);
         } else if (e.mfaRequired) {
@@ -429,7 +438,13 @@ void pumpResults() {
                                                                            : Sub::SignIn;
             if (O.sub != back) setSub(back);
             O.error = game::onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs);
-            O.offerResend = e.error == "email_unverified";
+            // After a registration from this screen the account exists only once the mailed link is
+            // used; before that the server answers as for a wrong password, so the e-mail can be
+            // sent again from here as well (when signing in to that account).
+            const std::string who = trim(O.user);
+            O.offerResend = e.error == "email_unverified" ||
+                            (e.error == "invalid_credentials" && !O.resendEmail.empty() &&
+                             (sameAscii(who, O.resendUser) || sameAscii(who, trim(O.resendEmail))));
         } else if (e.error != "cancelled") {
             notify(game::onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs), 4.0f);
         }
@@ -447,6 +462,7 @@ void pumpResults() {
             O.password.clear();
             O.password2.clear();
             O.resendEmail = O.email;
+            O.resendUser = trim(O.user);
             if (s.info().emailVerification || !s.infoKnown()) {
                 setSub(Sub::CheckEmail);
             } else {
