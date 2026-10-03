@@ -39,7 +39,9 @@
 //     message smaller than the server's allows (none when the rate is 0): the server then drops
 //     none unless a stall of the link delivers more than its burst at once (gestureSendCapacity).
 //     A Gesture made while the connection is down, or for another game than the one of the last
-//     GameSnapshot, is dropped: the next one carries the whole state again.
+//     GameSnapshot, is dropped: the next one carries the whole state again. Welcome.gestureIdleMs
+//     (the server's GESTURE_IDLE_MS), clamped to 1 s .. 10 s, is the scene's keepalive
+//     (gestureKeepaliveMs()).
 //
 // Keeping the realtime connection on its own thread means a slow HTTPS call (or a proof of
 // work) never delays the answer to a server Ping or the sending of a move. The game thread only
@@ -298,6 +300,7 @@ uint32_t positionDigest(const std::string& fen) {
 OnlineGame onlineGameFromSnapshot(const pr::GameSnapshot& s) {
     OnlineGame g;
     g.id = s.game;
+    g.gseq = s.gseq;
     g.category = s.category;
     g.baseMs = s.baseMs;
     g.incMs = s.incMs;
@@ -386,6 +389,7 @@ struct OnlineClient::Impl {
     std::atomic<bool> stopFlag{false};
     std::atomic<int> connState{int(ConnState::Offline)};
     std::atomic<int> ping{-1};
+    std::atomic<int> gestureKeepalive{kGestureKeepaliveMinMs};   // gestureKeepaliveMs(Welcome.gestureIdleMs)
     std::atomic<double> clockOffset{0.0};
     std::atomic<uint32_t> connectGen{0};
     // Bumped by setServer() when the origin changes: a proof of work for a server that is no
@@ -772,14 +776,16 @@ struct OnlineClient::Impl {
         i.protocolMin = int(p["min"].asInt(0));
         i.protocolMax = int(p["max"].asInt(0));
         if (p["schema"].isNumber()) {
-            i.schemaHash = uint32_t(p["schema"].asInt(0));
+            i.fingerprint = uint32_t(p["schema"].asInt(0));
         } else {
             std::string s = p["schema"].asString();
             if (s.compare(0, 2, "0x") == 0) s.erase(0, 2);
-            i.schemaHash = uint32_t(std::strtoul(s.c_str(), nullptr, 16));
+            i.fingerprint = uint32_t(std::strtoul(s.c_str(), nullptr, 16));
         }
+        // Protocol 1 evolves by minor versions negotiated at Hello: the major version and the
+        // subprotocol token decide, the schema fingerprint does not.
         i.compatible = int(pr::kProtocolVersion) >= i.protocolMin && int(pr::kProtocolVersion) <= i.protocolMax &&
-                       i.schemaHash == pr::kSchemaHash && p["subprotocol"].asString(pr::kWsSubprotocol) == pr::kWsSubprotocol;
+                       p["subprotocol"].asString(pr::kWsSubprotocol) == pr::kWsSubprotocol;
         int64_t ws = v["wsPort"].asInt(0);
         i.wsPort = ws > 0 && ws < 65536 ? uint16_t(ws) : 0;
         const json::Value& reg = v["registration"];
@@ -1123,8 +1129,8 @@ struct OnlineClient::Impl {
         p.maxMessageBytes = 256 * 1024;
         p.onActivity = [this] { wakeRt(); };
         std::string err;
-        int httpStatus = 0;
-        std::unique_ptr<WebSocket> ws = wsConnect(p, err, httpStatus, &rtCancel);
+        WsAnswer answer;
+        std::unique_ptr<WebSocket> ws = wsConnect(p, err, answer, &rtCancel);
         if (gen != connectGen.load() || stopFlag.load()) {
             if (ws) ws->close(1001);
             return;
@@ -1133,8 +1139,13 @@ struct OnlineClient::Impl {
             LOGW("net: websocket %s:%u failed: %s", p.host.c_str(), p.port, err.c_str());
             // A 4xx other than 429 (404, 426...) is this server refusing the request as made. A 5xx
             // is a server (or its reverse proxy: 502, 504) that cannot answer now: retried like a
-            // network failure, with the same /info answer.
+            // network failure, with the same /info answer. A 429 (too many connections or requests
+            // from this address) or a 503 (full, draining) waits at least its Retry-After.
+            const int httpStatus = answer.status;
             const bool refused = httpStatus >= 400 && httpStatus < 500 && httpStatus != 429;
+            const bool busy = httpStatus == 429 || httpStatus == 503;
+            const long retryAfterSec = busy ? std::strtol(answer.retryAfter.c_str(), nullptr, 10) : 0;
+            const uint32_t retryAfterMs = uint32_t(std::clamp(retryAfterSec, 0L, 600L)) * 1000u;
             if (err == "certificate" || err == "insecure" || err == "unavailable") {
                 stopWanting(ConnState::Offline, err);
             } else if (reused && (err == "subprotocol" || refused)) {
@@ -1148,9 +1159,9 @@ struct OnlineClient::Impl {
                 // upgrades with 503): later ones mean that the server came back full.
                 const bool restart = rt.restarting;
                 rt.restarting = false;
-                scheduleRetry(restart ? RetryCause::Failure : RetryCause::ServerFull);
+                scheduleRetry(restart ? RetryCause::Failure : RetryCause::ServerFull, retryAfterMs);
             } else {
-                scheduleRetry(RetryCause::Failure);
+                scheduleRetry(RetryCause::Failure, retryAfterMs);
             }
             return;
         }
@@ -1172,7 +1183,8 @@ struct OnlineClient::Impl {
         rt.probedAt = Clock::time_point{};
         pr::Hello h;
         h.proto = pr::kProtocolVersion;
-        h.schema = pr::kSchemaHash;
+        h.minor = pr::kMinor;
+        h.caps = pr::kCaps;
         h.client = clientString();
         h.token = c.token;
         rt.helloToken = c.token;
@@ -1233,15 +1245,29 @@ struct OnlineClient::Impl {
         return ev;
     }
 
+    // Whether a game event numbered gseq is the next one of the game shown (PROTOCOL.md, "Ordering:
+    // gseq"). One the state already holds (a MoveMade sent again, an event the snapshot includes)
+    // is ignored; one beyond the next means an event was missed, and the state is asked again.
+    bool nextEvent(uint32_t gseq) {
+        if (gseq <= rt.game.gseq) return false;
+        if (gseq != rt.game.gseq + 1) {
+            resync(rt.game.id);
+            return false;
+        }
+        return true;
+    }
+
     void handleMessage(const std::vector<uint8_t>& b) {
         pr::MsgType t;
         const uint8_t* p = b.data();
         size_t n = b.size();
+        rt.lastRecv = Clock::now();   // anything the server sends shows that the connection lives
         if (!pr::peekType(p, n, t) || pr::isClientType(uint8_t(t))) {
-            if (++rt.badFrames <= kLoggedBadFrames) LOGW("net: ignoring a frame of unknown type (%u bytes)", unsigned(n));
+            // A server message of a later minor is ignored without a word; anything else is odd.
+            if ((n == 0 || pr::isClientType(p[0])) && ++rt.badFrames <= kLoggedBadFrames)
+                LOGW("net: ignoring a frame that is no server message (%u bytes)", unsigned(n));
             return;
         }
-        rt.lastRecv = Clock::now();
         auto bad = [&] {
             if (++rt.badFrames <= kLoggedBadFrames)
                 LOGW("net: malformed %s from the server (%u bytes)", pr::messageName(t), unsigned(n));
@@ -1250,6 +1276,11 @@ struct OnlineClient::Impl {
         case pr::MsgType::Welcome: {
             pr::Welcome m;
             if (!pr::decode(p, n, m)) return bad();
+            if (m.proto != pr::kProtocolVersion) {
+                dropSocket(pr::CloseCode::ProtocolError);
+                stopWanting(ConnState::Incompatible, "incompatible");
+                return;
+            }
             rt.welcomed = true;
             rt.backoff.welcomed(steadyMs());
             rt.heartbeatMs = m.heartbeatMs;
@@ -1257,6 +1288,7 @@ struct OnlineClient::Impl {
             rt.pingBurst = kPingBurst;
             rt.restarting = false;
             rt.gestures.reset(steadyMs(), m.gestureRate, gestureSendCapacity(m.gestureBurst));
+            gestureKeepalive.store(net::gestureKeepaliveMs(m.gestureIdleMs));
             if (rt.info.valid) rt.info.proven = true;
             if (!rt.haveOffset) clockOffset.store(m.serverTime - localEpochMs());
             setState(ConnState::Online);
@@ -1378,8 +1410,9 @@ struct OnlineClient::Impl {
             if (!pr::decode(p, n, m)) return bad();
             OnlineGame& g = rt.game;
             if (m.game != g.id) { resync(m.game); return; }
-            if (m.ply < g.moves.size()) return;                     // already known (resent)
-            if (m.ply > g.moves.size()) { resync(m.game); return; } // missed something
+            if (!nextEvent(m.gseq)) return;
+            if (m.ply != g.moves.size()) { resync(m.game); return; }   // the next event, not the next ply
+            g.gseq = m.gseq;
             int mover = m.ply & 1;
             g.moves.push_back({m.move, m.spentMs, mover == 0 ? m.whiteMs : m.blackMs});
             g.whiteMs = m.whiteMs;
@@ -1420,6 +1453,8 @@ struct OnlineClient::Impl {
             if (!pr::decode(p, n, m)) return bad();
             OnlineGame& g = rt.game;
             if (m.game == g.id) {
+                if (!nextEvent(m.gseq)) return;
+                g.gseq = m.gseq;
                 int c = int(m.color);
                 switch (m.kind) {
                 case pr::GameEventKind::DrawOffered: g.drawOfferBy = c; break;
@@ -1451,6 +1486,8 @@ struct OnlineClient::Impl {
             if (!pr::decode(p, n, m)) return bad();
             OnlineGame& g = rt.game;
             if (m.game == g.id) {
+                if (!nextEvent(m.gseq)) return;
+                g.gseq = m.gseq;
                 g.status = int(m.status);
                 g.reason = int(m.reason);
                 g.whiteMs = m.whiteMs;
@@ -1518,28 +1555,32 @@ struct OnlineClient::Impl {
         const std::string token = rt.helloToken;   // dropSocket forgets it
         dropSocket(1000);
         if (wasOnline && rt.info.proven) rt.info.at = Clock::now();   // the /info answer worked until now
+        // The fatal Error, or the error the close code stands for when the Error did not arrive
+        // (close 4000 + code, 4300 + code - 240).
         int fatal = rt.lastFatal;
-        if (code == pr::CloseCode::UnsupportedProtocol || fatal == int(pr::ErrorCode::UnsupportedProtocol)) {
+        pr::ErrorCode closed{};
+        if (fatal == 0 && pr::errorCodeForClose(code, closed)) fatal = int(closed);
+        if (fatal == int(pr::ErrorCode::UnsupportedProtocol)) {
             stopWanting(ConnState::Incompatible, "incompatible");
-        } else if (code == pr::CloseCode::Unauthorized || fatal == int(pr::ErrorCode::Unauthorized)) {
+        } else if (fatal == int(pr::ErrorCode::Unauthorized)) {
             // The token this connection sent: a sign-in on net-http may have saved another one since.
             creds.clearToken(rt.ep.origin(), token);
             stopWanting(ConnState::Unauthorized, "unauthorized");
         } else if (fatal == int(pr::ErrorCode::EmailUnverified)) {
             stopWanting(ConnState::Unauthorized, "email_unverified");
-        } else if (code == pr::CloseCode::Banned || fatal == int(pr::ErrorCode::Banned)) {
+        } else if (fatal == int(pr::ErrorCode::Banned)) {
             stopWanting(ConnState::Banned, "banned");
-        } else if (code == pr::CloseCode::Replaced || fatal == int(pr::ErrorCode::Replaced)) {
+        } else if (fatal == int(pr::ErrorCode::Replaced)) {
             // Another client of this account took over: fighting back would loop forever.
             stopWanting(ConnState::Offline, "replaced");
-        } else if (code == pr::CloseCode::CheatDetected || fatal == int(pr::ErrorCode::CheatDetected)) {
+        } else if (fatal == int(pr::ErrorCode::CheatDetected)) {
             // The server's fair-play checks stopped this client: the player decides what comes next.
             stopWanting(ConnState::Offline, "cheat_detected");
         } else if (rt.wanted) {
             RetryCause why = RetryCause::Failure;
-            if (code == pr::CloseCode::ServerFull || fatal == int(pr::ErrorCode::ServerFull)) {
+            if (fatal == int(pr::ErrorCode::ServerFull)) {
                 why = RetryCause::ServerFull;
-            } else if (code == pr::CloseCode::ShuttingDown || fatal == int(pr::ErrorCode::ShuttingDown) || rt.shutdownNotice) {
+            } else if (fatal == int(pr::ErrorCode::ShuttingDown) || rt.shutdownNotice) {
                 why = RetryCause::Shutdown;
                 rt.restarting = true;
             }
@@ -2625,6 +2666,7 @@ void OnlineClient::disconnect() {
 
 ConnState OnlineClient::state() const { return ConnState(impl_->connState.load()); }
 int OnlineClient::pingMs() const { return impl_->ping.load(); }
+int OnlineClient::gestureKeepaliveMs() const { return impl_->gestureKeepalive.load(); }
 double OnlineClient::serverNowMs() const { return localEpochMs() + impl_->clockOffset.load(); }
 
 void OnlineClient::joinQueue(const std::string& category, bool rated) {

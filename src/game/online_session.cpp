@@ -84,6 +84,7 @@ public:
     void requestResync(uint64_t id) override { c_->requestResync(id); }
     void rematch(uint64_t id, bool accept) override { c_->rematch(id, accept); }
     void sendGesture(uint64_t id, const net::Gesture& g) override { c_->sendGesture(id, g); }
+    int gestureKeepaliveMs() const override { return c_->gestureKeepaliveMs(); }
     bool poll(net::Event& out) override { return c_->poll(out); }
 
 private:
@@ -119,6 +120,7 @@ public:
     void sendGesture(const net::Gesture& g) override { d_->sendGesture(g); }
     int pingMs() const override { return d_->pingMs(); }
     double serverNowMs() const override { return d_->serverNowMs(); }
+    int gestureKeepaliveMs() const override { return d_->gestureKeepaliveMs(); }
     bool poll(net::Event& out) override { return d_->poll(out); }
 
 private:
@@ -143,6 +145,7 @@ public:
     void requestResync() override { api_.requestResync(id_); }
     void rematch(bool accept) override { api_.rematch(id_, accept); }
     void sendGesture(const net::Gesture& g) override { api_.sendGesture(id_, g); }
+    int gestureKeepaliveMs() const override { return api_.gestureKeepaliveMs(); }
     bool canReport() const override { return true; }
     void report(const std::string& u, const std::string& cat, const std::string& comment) override {
         api_.report(id_, u, cat, comment);
@@ -176,6 +179,7 @@ public:
     void requestResync() override { d_.requestResync(); }
     void rematch(bool accept) override { d_.rematch(accept); }
     void sendGesture(const net::Gesture& g) override { d_.sendGesture(g); }
+    int gestureKeepaliveMs() const override { return d_.gestureKeepaliveMs(); }
     bool canReport() const override { return false; }
     void report(const std::string&, const std::string&, const std::string&) override {}
     int pingMs() const override { return d_.pingMs(); }
@@ -196,7 +200,8 @@ bool isGameEvent(Kind k) {
            k == Kind::GameEnd || k == Kind::RatingUpdate || k == Kind::OpponentGesture;
 }
 
-// Protocol values (dedicated-server/src/protocol/schema.js).
+// Protocol values (realtime protocol v1: dedicated-server/protocol/scacelith-v1.json,
+// dedicated-server/docs/PROTOCOL.md).
 enum ChallengeState { ChPending = 0, ChAccepted = 1, ChDeclined = 2, ChCancelled = 3, ChExpired = 4, ChUnavailable = 5 };
 enum QueueState { QLeft = 0, QSearching = 1, QMatched = 2 };
 enum NoticeCode { NShutdown = 1, NBanned = 2, NRevoked = 3, NCooldown = 4, NReplaced = 5, NRatingRestored = 7 };

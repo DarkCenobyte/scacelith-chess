@@ -1,10 +1,11 @@
 # Online play: the client side
 
 How the game shows and plays online games. The network layer itself (`src/net/`: HTTPS API,
-secure WebSocket, credential store, direct match with UPnP) and the server
-(`dedicated-server/`) are described in their own documents; this page covers what sits on top
-of them in `src/game/` and `src/ui/`, the server in use and the account API calls of
-`net::OnlineClient`.
+secure WebSocket, credential store, direct match with UPnP) and the server (`dedicated-server/`,
+written in Rust; its realtime protocol v1 is specified in `dedicated-server/docs/PROTOCOL.md` and
+its HTTPS API in `dedicated-server/docs/API.md`) are described in their own documents; this page
+covers what sits on top of them in `src/game/` and `src/ui/`, the server in use and the account
+API calls of `net::OnlineClient`.
 
 ## Pieces
 
@@ -53,13 +54,19 @@ frame is fine): the network layer keeps only the latest one and paces them.
   `GESTURE_BURST`). The client's own bucket holds one message less than the burst: the server
   takes every gesture while the network delays vary by less than one interval (250 ms at the
   defaults); after a longer stall it drops what arrives at once beyond its burst, the latest state
-  included, which the next gesture (at the latest the keepalive, a second later) brings back
-  (`net/gesture.h`). Nothing is sent when the rate is 0 (a server without the relay), while not
-  `Online` (connecting, reconnecting, offline: a gesture is never kept for the reconnection), or
-  for another game than the one of the last `GameSnapshot`. `C_Gesture` shares the message
-  numbering of the other commands.
+  included, which the next gesture (at the latest the keepalive) brings back (`net/gesture.h`).
+  Nothing is sent when the rate is 0 (a server without the relay), while not `Online`
+  (connecting, reconnecting, offline: a gesture is never kept for the reconnection), or for
+  another game than the one of the last `GameSnapshot`. `C_Gesture` shares the message numbering
+  of the other commands.
+- The keepalive: `Welcome.gestureIdleMs` (the server's `GESTURE_IDLE_MS`, 1 s by default),
+  clamped to 1 s .. 10 s (`net::gestureKeepaliveMs`; 1 s before any `Welcome` and when a server
+  without the relay announces 0), is `OnlineClient::gestureKeepaliveMs()` and
+  `GameLink::gestureKeepaliveMs()`. The scene sends a gesture at least that often while its
+  player sits still, and counts the timeouts of the opponent's gestures in it (below): both
+  clients read the same `Welcome`, so the opponent's keepalive is the same.
 - Direct matches (`DirectMatch::sendGesture(g)`): the same, at the host's 10 per second, bursts of
-  20 (`docs/DIRECT_MATCH.md`).
+  20, keepalive 1 s (`DirectMatch::gestureKeepaliveMs()`; `docs/DIRECT_MATCH.md`).
 - The opponent's gestures arrive as `OpponentGesture` events with `gesture` and `gameId` (`game`
   is not filled in: a gesture never changes the game state). Only those of the current game are
   kept, and a newer one replaces one the scene has not taken yet, in the network layer and in the
@@ -264,8 +271,9 @@ same as against Stockfish, with these differences:
     beside the board (clock, captured pieces, scoresheets). `ply` is the number of plies played
     when the hand's state began (at most the plies played now: a board rebuilt after a refused
     move starts it again). It goes to `GameLink::sendGesture` when that state changes, when
-    the head turns by about a degree or the lean by 0.05, and once a second at least; after the
-    end of the game, one last idle gesture and nothing more.
+    the head turns by about a degree or the lean by 0.05, and once per keepalive at least
+    (`GameLink::gestureKeepaliveMs()`, 1 s by default); after the end of the game, one last idle
+    gesture and nothing more.
   - The opponent's (`OpponentGesture`) are cosmetic and untrusted: they never touch the game,
     the arbiter, the clocks or `og_`. Their piece fields move the robot only while the local
     game has exactly `ply` plies, it is their turn, my robot is done with my move, their
@@ -275,20 +283,20 @@ same as against Stockfish, with these differences:
     the piece (reach, lift), carries it over the square aimed at once the aim has held for
     150 ms (back over its own square after 0.6 s without one), puts a `placed` move down (the
     placement without the press; the game is not changed), and puts the piece back when their
-    hand is empty again, when their gestures stop for 5 s (our own connection lost included),
-    when they disconnect and at the end of the game. Its hand takes one step at a time: a carry
-    or a change of piece (taking one, going on to another, letting go) waits until it has at
-    most 50 ms left of the previous one, then follows their latest gesture, so gestures that
-    come faster than it can play them (a modified client may send any) never pile up. A move put
-    down that its `MoveMade` does not confirm (another move, at once as above; a rebuild, the
-    end, or 5 s of gestures showing something else) is taken back: once the hands are idle the
-    board is set up from the game again, behind a short dip.
-  - Their head: while their last gesture is under 2.5 s old and both players are connected,
-    the robot's head follows their look with a critically damped spring and leans with them. A
-    `Side` look turns the other way here (each client puts the clock at its own player's
-    right, so what lies beside the board is mirrored), and a `Glance` turns the head to the
-    robot's own scoresheet on this table, its writing hand waiting aside meanwhile. While it
-    presses the clock, its eyes follow its hand. Otherwise the automatic gaze of a game
+    hand is empty again, when their gestures stop for 5 keepalives (5 s by default; our own
+    connection lost included), when they disconnect and at the end of the game. Its hand takes
+    one step at a time: a carry or a change of piece (taking one, going on to another, letting
+    go) waits until it has at most 50 ms left of the previous one, then follows their latest
+    gesture, so gestures that come faster than it can play them (a modified client may send any)
+    never pile up. A move put down that its `MoveMade` does not confirm (another move, at once as
+    above; a rebuild, the end, or 5 keepalives of gestures showing something else) is taken
+    back: once the hands are idle the board is set up from the game again, behind a short dip.
+  - Their head: while their last gesture is under 2.5 keepalives old (2.5 s by default) and both
+    players are connected, the robot's head follows their look with a critically damped spring
+    and leans with them. A `Side` look turns the other way here (each client puts the clock at
+    its own player's right, so what lies beside the board is mirrored), and a `Glance` turns the
+    head to the robot's own scoresheet on this table, its writing hand waiting aside meanwhile.
+    While it presses the clock, its eyes follow its hand. Otherwise the automatic gaze of a game
     against Stockfish returns, looking at the piece their robot holds, if any. Options >
     Gameplay > "Ignore opponent's head movements" turns the head and the lean off; the piece
     gestures still play.
@@ -303,10 +311,10 @@ same as against Stockfish, with these differences:
   client comes back by itself after a random delay, longer when the server is full or restarting
   but 8 s at most during a game unless the server asked to wait longer (a `Retry-After`): the
   server keeps the game for the reconnection grace, at least 15 s by default and 90 s after a
-  restart (`dedicated-server/docs/PROTOCOL.md`, lifecycle step 6). The delay grows with each
-  attempt and starts again from the shortest only after a connection that stayed up for a
-  minute, so a server that closes right after letting the player in is not called again every
-  second or two. After a restart the server
+  restart (`dedicated-server/docs/PROTOCOL.md`, "Connection lifecycle", steps 8 and 9). The
+  delay grows with each attempt and starts again from the shortest only after a connection that
+  stayed up for a minute, so a server that closes right after letting the player in is not called
+  again every second or two. After a restart the server
   also holds the clock of the side to move until that player is back, 20 s at most by default:
   its snapshots then name no running clock, so both clocks stay frozen, and the snapshot that
   follows when the held clock starts (sent to the opponent too) sets them running again. The

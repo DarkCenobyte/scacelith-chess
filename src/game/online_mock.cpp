@@ -35,7 +35,8 @@ double wallMs() {
     return double(duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count());
 }
 
-// Protocol values (dedicated-server/src/protocol/schema.js).
+// Protocol values (realtime protocol v1: dedicated-server/protocol/scacelith-v1.json,
+// dedicated-server/docs/PROTOCOL.md).
 enum Status { Ongoing = 0, WhiteWins = 1, BlackWins = 2, Draw = 3, Aborted = 4 };
 enum Reason {
     RNone = 0, RResignation = 2, RTimeout = 3, RAgreement = 12, RThreefoldClaim = 10, RFiftyClaim = 11,
@@ -89,7 +90,7 @@ static_assert(FCheck == proto::MoveFlag::Check && FMate == proto::MoveFlag::Mate
 constexpr double kHttpMin = 250.0, kHttpMax = 520.0;  // HTTPS round trip
 constexpr double kOneWay = 17.0;                      // realtime one-way latency
 constexpr double kFirstMoveMs = 30000.0;              // FIRST_MOVE_TIMEOUT_MS
-constexpr double kIdEpochMs = 1767225600000.0;        // 2026-01-01 (ids.js)
+constexpr double kIdEpochMs = 1767225600000.0;        // 2026-01-01 (the server's ids.rs ID_EPOCH_MS)
 
 const char* const kOpponents[] = {"Wilhelmina", "orlov_b", "Kasparilla", "MarieCurieux", "Tal_Returns",
                                   "quietbishop", "Nimzo_fan", "Aurelien_P", "sveta.k", "RookLift"};
@@ -204,8 +205,8 @@ const char* const kRepetitionLines[] = {
     "c2c4 e7e5 b1c3 g8f6 c3b1 f6g8 b1c3 g8f6 c3b1 f6g8",
 };
 
-// The server's end reason texts (dedicated-server/src/chess/game.js REASON_TEXT), the comment after
-// the last move of its PGN.
+// The server's end reason texts (EndReason::text in dedicated-server/crates/chess/src/types.rs), the
+// comment after the last move of its PGN.
 const char* serverReasonText(int reason) {
     switch (reason) {
     case 1: return "Checkmate";
@@ -270,9 +271,10 @@ std::string pgnClock(int64_t ms) {
 
 std::string ratingDiffText(int d) { return (d >= 0 ? "+" : "") + std::to_string(d); }
 
-// The server's PGN of a stored game (GET /games/:id/pgn, dedicated-server/src/http/routes/players.js
-// gamePgn): its tags in its order, a {[%clk] [%emt]} comment after each move, the end reason as a
-// comment, movetext wrapped under 80 columns.
+// The server's PGN of a stored game (GET /games/:id/pgn, dedicated-server/docs/API.md; written with
+// dedicated-server/crates/chess/src/pgn/writer.rs, which reproduces tests/data/server-pgn,
+// crates/chess/tests/pgn_write.rs): its tags in its order, a {[%clk] [%emt]} comment after each
+// move, the end reason as a comment, movetext wrapped under 80 columns.
 std::string serverPgn(const GameDetails& g, const std::string& serverName, const std::string& site) {
     std::string out;
     auto tag = [&](const char* name, const std::string& value) {
@@ -1706,7 +1708,7 @@ struct FakeServer::Impl {
     void setConn(ConnState s, const std::string& err = "") {
         conn = s;
         // The server drops the challenges of a user whose connection closed, telling only the other
-        // party (control-plane.js _dropChallengesOf).
+        // party (Challenges::drop_user, dedicated-server/crates/server/src/matching/challenges.rs).
         if (s != ConnState::Online) {
             outgoing.active = false;
             incoming.active = false;
@@ -1862,8 +1864,9 @@ void FakeServer::fetchServerInfo(bool) {
     s.name = contains(I.ep.host, "official") ? "Scacelith" : "Scacelith (mock server)";
     s.serverId = "mock-" + lower(I.ep.host);
     s.motd = "A local stand-in for the real server: every password works, and your opponents play at random.";
-    s.protocolMin = proto::kProtocolMin;
-    s.protocolMax = I.hostHas("old") ? proto::kProtocolMin - 1 : proto::kProtocolVersion;
+    // An "old" host stands for a server from before protocol 1: no version this game speaks.
+    s.protocolMin = s.protocolMax = I.hostHas("old") ? 0 : int(proto::kProtocolVersion);
+    s.fingerprint = I.hostHas("old") ? 0 : proto::kFingerprint;
     s.compatible = !I.hostHas("old");
     s.wsPort = I.ep.wsPort ? I.ep.wsPort : I.ep.apiPort;
     s.registrationOpen = true;

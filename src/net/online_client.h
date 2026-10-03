@@ -1,6 +1,6 @@
 // Online play: the game's side of the Scacelith dedicated server (dedicated-server/ in this
-// repository; protocol in dedicated-server/src/protocol/schema.js, design in
-// dedicated-server/docs/DESIGN.md).
+// repository; realtime protocol v1 in dedicated-server/docs/PROTOCOL.md, generated from
+// dedicated-server/protocol/scacelith-v1.json into net/protocol_gen.h).
 //
 // OnlineClient owns network threads. Every command below returns at once and queues work for
 // them; results and server pushes come back as Events that the game thread drains with poll()
@@ -30,9 +30,16 @@
 //     TLS is always used unless insecureDev is set (and insecureDev is refused off loopback).
 //   - RetryCause, reconnectDelayMs(), ReconnectBackoff and clientPingIntervalMs() (additive): the
 //     reconnection and client Ping pacing rules, pure, so the tests can check them.
-//   - Protocol v2 (additive): sendGesture() and Event::Kind::OpponentGesture relay the live
-//     gestures of the two players (net/gesture.h), and OnlineGame::autoPress tells whether the
-//     robots press the clock by themselves in the game.
+//   - Realtime protocol v1 (subprotocol scacelith.rt1): Hello announces the codec's minor and caps,
+//     and a server is compatible when /api/v1/info's [min, max] holds protocol 1 with the same
+//     subprotocol (the schema fingerprint is informational, ServerInfo::fingerprint). Server
+//     messages decode leniently: unknown types, fields appended by a later minor and unknown
+//     values of open enums are ignored or kept, never refused. A close code of the error rule
+//     (4000 + code, 4300 + code - 240) without its fatal Error acts as that Error.
+//   - Gestures (additive): sendGesture() and Event::Kind::OpponentGesture relay the live
+//     gestures of the two players (net/gesture.h), gestureKeepaliveMs() gives the interval of
+//     their keepalive (Welcome.gestureIdleMs), and OnlineGame::autoPress tells whether the robots
+//     press the clock by themselves in the game.
 //   - Account API (additive): the game history, a game's details and PGN, the signed-in devices,
 //     the challenge preference, the e-mail change, the data export and the account deletion
 //     (fetchMyGames ... deleteAccount below; dedicated-server/docs/API.md). A 401 answer to any
@@ -96,8 +103,8 @@ struct Category {                     // an official (rated) time control
 struct ServerInfo {
     std::string name, serverId, motd;
     int protocolMin = 0, protocolMax = 0;
-    uint32_t schemaHash = 0;
-    bool compatible = false;          // our protocol version is within [min, max] and schema matches
+    uint32_t fingerprint = 0;         // the server's schema fingerprint: informational, never compared
+    bool compatible = false;          // our protocol version is within [min, max], same subprotocol
     uint16_t wsPort = 0;
     bool registrationOpen = false, emailVerification = false, googleSso = false;
     int powRegisterBits = 0;
@@ -202,6 +209,9 @@ struct PlayerInfo {
 // Authoritative game state as last received from the server (GameSnapshot + later events).
 struct OnlineGame {
     uint64_t id = 0;
+    // The gseq of the last game event this state holds (GameSnapshot.gseq, then each MoveMade,
+    // GameEvent and GameEnd applied): events apply in gseq order (PROTOCOL.md, "Ordering: gseq").
+    uint32_t gseq = 0;
     std::string category;             // "3+2" or "custom"
     int64_t baseMs = 0, incMs = 0;
     bool rated = false;
@@ -525,6 +535,10 @@ public:
     // Dropped while not Online (never queued for a reconnection) and when gameId is not the game
     // of the last GameSnapshot. Cheap enough to call every frame.
     void sendGesture(uint64_t gameId, const Gesture& g);
+    // The gesture keepalive of the server (ms): Welcome.gestureIdleMs of the last Welcome, clamped
+    // (gestureKeepaliveMs); kGestureKeepaliveMinMs before any. The scene sends a Gesture at least
+    // this often and counts the opponent's timeouts in it (game/online_live.h).
+    int gestureKeepaliveMs() const;
 
     // Drains one event; call until it returns false, once per frame.
     bool poll(Event& out);

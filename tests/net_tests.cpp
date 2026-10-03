@@ -1,4 +1,4 @@
-// Online client tests: protocol codec against the JavaScript codec's vectors, position digest,
+// Online client tests: protocol codec against the shared golden vectors, position digest,
 // JSON, crypto (hash / base64 / PKCE / proof of work), the folders of net::sys (also the platform
 // layer's exeDirectory, userDataDirectory and appDataDirectory), credential store isolation,
 // endpoint validation, and OnlineClient end to end against a fake server on the loopback interface
@@ -11,9 +11,9 @@
 // fed the client's events), and the move of the official server's saved session from port 44664
 // to 443.
 //
-// Vectors: tests/data/net-protocol-vectors.json (dedicated-server/tools/gen-cpp-test-vectors.js)
-// and, when present, dedicated-server/test/fixtures/protocol-vectors.json. The files are looked
-// up from the current directory (run from the repository root), $SCACELITH_SOURCE_DIR and the
+// Vectors: dedicated-server/test/fixtures/protocol-vectors.json, written by the server's protogen
+// from dedicated-server/protocol/scacelith-v1.json, like net/protocol_gen.h. The file is looked up
+// from the current directory (run from the repository root), $SCACELITH_SOURCE_DIR and the
 // executable's parent directories.
 #ifdef _WIN32
 #include <winsock2.h>
@@ -235,6 +235,63 @@ bool checkMalformed(const std::string& name, const std::vector<uint8_t>& bytes, 
     return ok;
 }
 
+// A lenient vector: bytes a strict receiver refuses and a lenient one takes.
+// dir "s2c" (received by a client): fields null means the client ignores the frame (a type it
+// does not know, or a client message); otherwise the typed decoder gives fields (trailing bytes
+// of a later minor dropped, unknown open-enum values kept). dir "c2s": a server reading a Hello
+// of a later minor, which decodeHello takes and the strict decoder refuses.
+bool checkLenientVector(const std::string& name, const std::string& dir, const Value& fields, const std::vector<uint8_t>& bytes) {
+    pr::MsgType t;
+    const bool known = pr::peekType(bytes.data(), bytes.size(), t);
+    if (dir == "c2s") {
+        pr::Hello h;
+        bool ok = known && t == pr::MsgType::Hello && !pr::decode(bytes.data(), bytes.size(), h);
+        ok = ok && pr::decodeHello(bytes.data(), bytes.size(), h) && sameJson(toJson(h), fields);
+        if (!ok) std::fprintf(stderr, "  lenient vector %s: not a later minor's Hello\n", name.c_str());
+        return ok;
+    }
+    if (fields.isNull()) {
+        // Ignored: no server message decoder takes it, and the client sees why from the type.
+        const bool ignored = !known || pr::isClientType(uint8_t(t));
+        if (!ignored) std::fprintf(stderr, "  lenient vector %s: a server type the client would decode\n", name.c_str());
+        return ignored && checkMalformed(name, bytes, "s2c");
+    }
+    bool ok = known && !pr::isClientType(uint8_t(t));
+    if (ok) {
+        pr::withMessage(t, [&](auto& m) {
+            if (!pr::decode(bytes.data(), bytes.size(), m)) {
+                std::fprintf(stderr, "  lenient vector %s: refused\n", name.c_str());
+                ok = false;
+            } else if (!sameJson(toJson(m), fields)) {
+                std::fprintf(stderr, "  lenient vector %s: decoded %s\n    expected %s\n", name.c_str(), toJson(m).dump().c_str(),
+                             fields.dump().c_str());
+                ok = false;
+            }
+        });
+    }
+    return ok;
+}
+
+// "e2e4", "e7e8q" -> squares (a1 = 0 .. h8 = 63) and promotion piece (n b r q = 2..5); false when
+// the text is not a move. The protocol's own parser (Rust uci_to_move) also takes upper case.
+bool splitUci(const std::string& uci, int& from, int& to, int& promo) {
+    auto square = [&uci](size_t i, int& sq) {
+        const int file = std::tolower(static_cast<unsigned char>(uci[i])) - 'a', rank = uci[i + 1] - '1';
+        if (file < 0 || file > 7 || rank < 0 || rank > 7) return false;
+        sq = rank * 8 + file;
+        return true;
+    };
+    if ((uci.size() != 4 && uci.size() != 5) || !square(0, from) || !square(2, to)) return false;
+    promo = 0;
+    if (uci.size() == 5) {
+        const char* pieces = "nbrq";
+        const char* p = std::strchr(pieces, std::tolower(static_cast<unsigned char>(uci[4])));
+        if (!p || !*p) return false;
+        promo = int(p - pieces) + 2;
+    }
+    return true;
+}
+
 }  // namespace
 
 // =============================================================================================
@@ -242,9 +299,14 @@ bool checkMalformed(const std::string& name, const std::vector<uint8_t>& bytes, 
 // =============================================================================================
 
 TEST(net_protocol_constants) {
-    CHECK_EQ(pr::kProtocolVersion, 3);
-    CHECK_EQ(pr::kProtocolMin, 3);
-    CHECK_EQ(std::string(pr::kWsSubprotocol), std::string("scacelith.v1"));
+    CHECK_EQ(pr::kProtocolVersion, 1);
+    CHECK_EQ(pr::kMinor, 0);
+    CHECK_EQ(pr::kCaps, uint64_t(0));
+    CHECK_EQ(std::string(pr::kWsSubprotocol), std::string("scacelith.rt1"));
+    CHECK_EQ(pr::kHelloPrefixSize, size_t(17));
+    CHECK_EQ(int(pr::MsgType::Hello), 0x01);
+    CHECK_EQ(int(pr::MsgType::Welcome), 0x80);
+    CHECK_EQ(int(pr::MsgType::Error), 0x81);
     CHECK_EQ(int(pr::MsgType::Move), 0x20);
     CHECK_EQ(int(pr::MsgType::C_Ping), 0x02);
     CHECK_EQ(int(pr::MsgType::S_Ping), 0x82);
@@ -259,97 +321,134 @@ TEST(net_protocol_constants) {
     CHECK(pr::isValid(pr::EndReason::BothDisconnected));
     CHECK(!pr::isValid(pr::EndReason(14)));
     CHECK_EQ(std::string(pr::enumName(pr::ErrorCode::IllegalMove)), std::string("IllegalMove"));
+    CHECK(!pr::isValid(pr::ErrorCode(243)));   // retired (SlowConsumer comes with no Error)
+
+    // Close codes: a fatal Error with code c is followed by 4000 + c (c < 100) or 4300 + (c - 240).
+    CHECK_EQ(pr::CloseCode::Malformed, 4001);
     CHECK_EQ(pr::CloseCode::Unauthorized, 4003);
     CHECK_EQ(pr::CloseCode::ServerFull, 4000 + int(pr::ErrorCode::ServerFull));
+    CHECK_EQ(pr::CloseCode::Internal, 4009);
+    CHECK_EQ(pr::CloseCode::HelloRequired, 4010);
+    CHECK_EQ(pr::CloseCode::EmailUnverified, 4011);
+    CHECK_EQ(pr::CloseCode::ProtocolViolation, 4300);
+    CHECK_EQ(pr::CloseCode::SlowConsumer, 4303);
+    CHECK_EQ(pr::closeCodeFor(pr::ErrorCode::Banned), pr::CloseCode::Banned);
+    CHECK_EQ(pr::closeCodeFor(pr::ErrorCode::Flood), pr::CloseCode::Flood);
+    CHECK_EQ(pr::closeCodeFor(pr::ErrorCode::IllegalMove), uint16_t(0));   // never fatal
+    pr::ErrorCode code = pr::ErrorCode::Malformed;
+    CHECK(pr::errorCodeForClose(4004, code) && code == pr::ErrorCode::Banned);
+    CHECK(pr::errorCodeForClose(4302, code) && code == pr::ErrorCode::CheatDetected);
+    CHECK(pr::errorCodeForClose(4303, code) && int(code) == 243 && !pr::isValid(code));
+    CHECK(!pr::errorCodeForClose(pr::CloseCode::GoingAway, code));
+    CHECK(!pr::errorCodeForClose(4100, code));
+    CHECK(!pr::errorCodeForClose(4000, code));
+    for (int c = 0; c < 256; ++c) {
+        const uint16_t close = pr::closeCodeFor(pr::ErrorCode(c));
+        if (close == 0) continue;
+        CHECK(pr::errorCodeForClose(close, code) && int(code) == c);
+    }
 }
 
+// The shared golden vectors: dedicated-server/test/fixtures/protocol-vectors.json, written by
+// protogen from the schema independently of the codecs it checks (format in its "about" key).
 TEST(net_protocol_vectors) {
     std::string path;
-    std::string text = readRepoFile("tests/data/net-protocol-vectors.json", size_t(64) << 20, &path);
-    CHECK(!text.empty());
-    if (text.empty()) {
-        std::fprintf(stderr, "  tests/data/net-protocol-vectors.json not found (run from the repository root)\n");
-        return;
-    }
+    std::string text = readRepoFile("dedicated-server/test/fixtures/protocol-vectors.json", size_t(64) << 20, &path);
+    REQUIRE(!text.empty());
     Value doc;
     std::string err;
     net::json::Limits lim;
     lim.maxBytes = 64 << 20;
     lim.maxElements = 10000000;
-    CHECK(net::json::parse(text, doc, &err, lim));
-    CHECK_EQ(uint32_t(doc["schemaHash"].asInt()), pr::kSchemaHash);   // regenerate the vectors after a schema change
-    int valid = 0, malformed = 0;
+    REQUIRE(net::json::parse(text, doc, &err, lim));
+    // Regenerate with protogen after a schema change.
+    CHECK_EQ(int(doc["protocol"].asInt()), int(pr::kProtocolVersion));
+    CHECK_EQ(int(doc["minor"].asInt()), int(pr::kMinor));
+    CHECK_EQ(uint32_t(doc["fingerprint"].asInt()), pr::kFingerprint);
+    CHECK_EQ(doc["subprotocol"].asString(), std::string(pr::kWsSubprotocol));
+
+    int valid = 0, malformed = 0, lenient = 0, digests = 0, moves = 0;
     for (const Value& v : doc["valid"].items()) {
-        CHECK(checkValidVector(v["name"].asString(), &v["msg"], unhex(v["hex"].asString())));
+        CHECK(checkValidVector(v["name"].asString() + " (" + v["note"].asString() + ")", &v["fields"], unhex(v["hex"].asString())));
         ++valid;
     }
     for (const Value& v : doc["malformed"].items()) {
-        CHECK(checkMalformed(v["name"].asString(), unhex(v["hex"].asString())));
+        const std::string name = v["note"].asString(), dir = v["dir"].asString();
+        const std::vector<uint8_t> bytes = unhex(v["hex"].asString());
+        CHECK(checkMalformed(name, bytes, dir));
+        pr::Hello h;
+        if (dir == "c2s" && pr::decodeHello(bytes.data(), bytes.size(), h))
+            std::fprintf(stderr, "  malformed vector accepted by decodeHello: %s\n", name.c_str());
+        CHECK(dir != "c2s" || !pr::decodeHello(bytes.data(), bytes.size(), h));
         ++malformed;
     }
+    for (const Value& v : doc["lenient"].items()) {
+        CHECK(checkLenientVector(v["note"].asString(), v["dir"].asString(), v["fields"], unhex(v["hex"].asString())));
+        ++lenient;
+    }
     for (const Value& v : doc["fnv1a32"].items()) {
-        // positionDigest of a FEN prefix is FNV-1a of that very text.
-        std::string t = v["text"].asString();
-        if (!t.empty()) CHECK_EQ(net::positionDigest(t + " 0 1"), uint32_t(v["hash"].asInt()));
+        // positionDigest of a full FEN is FNV-1a of its first four fields, the vector's text.
+        const std::string t = v["text"].asString();
+        CHECK_EQ(net::positionDigest(t.empty() ? t : t + " 0 1"), uint32_t(v["hash"].asInt()));
+        ++digests;
+    }
+    for (const Value& v : doc["moves"].items()) {
+        int from = 0, to = 0, promo = 0;
+        const bool move = splitUci(v["uci"].asString(), from, to, promo);
+        CHECK_EQ(move, v["value"].isNumber());
+        if (move && v["value"].isNumber()) {
+            const uint16_t packed = net::packMove(from, to, promo);
+            CHECK_EQ(int(packed), int(v["value"].asInt()));
+            CHECK(net::moveFrom(packed) == from && net::moveTo(packed) == to && net::movePromo(packed) == promo);
+        }
+        ++moves;
     }
     CHECK(valid >= 40);
     CHECK(malformed >= 150);
-    std::fprintf(stderr, "  %s: %d valid, %d malformed\n", path.c_str(), valid, malformed);
+    CHECK(lenient >= 20);
+    CHECK(digests >= 5 && moves >= 10);
+    std::fprintf(stderr, "  %s: %d valid, %d malformed, %d lenient, %d digests, %d moves\n", path.c_str(), valid, malformed,
+                 lenient, digests, moves);
 }
 
-// Golden vectors of the protocol owner, when that file exists (format read tolerantly).
-TEST(net_protocol_shared_fixture) {
-    std::string path;
-    std::string text = readRepoFile("dedicated-server/test/fixtures/protocol-vectors.json", size_t(64) << 20, &path);
-    if (text.empty()) SKIP("dedicated-server/test/fixtures/protocol-vectors.json not present");
-    Value doc;
-    net::json::Limits lim;
-    lim.maxBytes = 64 << 20;
-    lim.maxElements = 10000000;
-    CHECK(net::json::parse(text, doc, nullptr, lim));
-    for (const char* k : {"schemaHash", "schema_hash", "SCHEMA_HASH"})
-        if (doc[k].isNumber() && uint32_t(doc[k].asInt()) != pr::kSchemaHash)
-            SKIP("the shared fixture has another schema hash");
-    auto hexOf = [](const Value& e) {
-        for (const char* k : {"hex", "bytes", "encoded", "frame"})
-            if (e[k].isString()) return e[k].asString();
-        return std::string();
-    };
-    auto msgOf = [](const Value& e) -> const Value* {
-        for (const char* k : {"msg", "message", "object", "value", "fields", "decoded"})
-            if (e[k].isObject()) return &e[k];
-        return nullptr;
-    };
-    int valid = 0, malformed = 0;
-    auto validList = [&](const Value& list) {
-        for (const Value& e : list.items()) {
-            std::string h = hexOf(e);
-            if (h.empty()) continue;
-            const Value* m = msgOf(e);
-            Value stripped;
-            if (m) {   // drop keys that are not fields ("type")
-                stripped = Value::object();
-                for (auto& kv : m->members())
-                    if (kv.first != "type") stripped.set(kv.first, kv.second);
-            }
-            CHECK(checkValidVector("shared:" + e["name"].asString(), m ? &stripped : nullptr, unhex(h)));
-            ++valid;
-        }
-    };
-    auto badList = [&](const Value& list) {
-        for (const Value& e : list.items()) {
-            std::string h = e.isString() ? e.asString() : hexOf(e);
-            if (e.isObject() && h.empty()) continue;
-            CHECK(checkMalformed("shared:" + e["name"].asString(), unhex(h), e["dir"].isString() ? e["dir"].asString() : ""));
-            ++malformed;
-        }
-    };
-    if (doc.isArray()) validList(doc);
-    for (const char* k : {"valid", "vectors", "messages", "golden"})
-        if (doc[k].isArray()) validList(doc[k]);
-    for (const char* k : {"malformed", "invalid", "bad", "reject", "rejected"})
-        if (doc[k].isArray()) badList(doc[k]);
-    std::fprintf(stderr, "  %s: %d valid, %d malformed\n", path.c_str(), valid, malformed);
+// Later minors: a client takes the fields it knows from a longer server message and the values of
+// an open enum it does not know; a server takes a longer Hello; the strict decoders refuse both.
+TEST(net_protocol_later_minor) {
+    pr::Ack a;
+    a.ref = 9;
+    std::vector<uint8_t> buf;
+    pr::encode(a, buf);
+    buf.push_back(0x5A);
+    pr::Ack d;
+    CHECK(pr::decode(buf.data(), buf.size(), d) && d.ref == 9);
+
+    pr::Hello h;
+    h.seq = 1;
+    h.proto = pr::kProtocolVersion;
+    h.minor = 3;
+    h.caps = ~uint64_t(0);
+    h.client = "test";
+    h.token = std::string(20, 't');
+    CHECK(pr::valid(h));
+    buf.clear();
+    pr::encode(h, buf);
+    pr::Hello strict;
+    CHECK(pr::decode(buf.data(), buf.size(), strict) && strict.caps == ~uint64_t(0));
+    buf.push_back(1);   // a field of minor 3
+    CHECK(!pr::decode(buf.data(), buf.size(), strict));
+    pr::Hello later;
+    CHECK(pr::decodeHello(buf.data(), buf.size(), later) && later.minor == 3 && later.token == h.token);
+    pr::HelloPrefix pre;
+    CHECK(pr::readHelloPrefix(buf.data(), buf.size(), pre));
+    CHECK(pre.seq == 1 && pre.proto == pr::kProtocolVersion && pre.minor == 3 && pre.caps == ~uint64_t(0));
+    CHECK(!pr::readHelloPrefix(buf.data(), pr::kHelloPrefixSize - 1, pre));
+    uint32_t seq = 0;
+    CHECK(pr::peekSeq(buf.data(), buf.size(), seq) && seq == 1);
+
+    // The fields it knows still obey the schema: a 3-byte token (the rest then counts as trailing
+    // bytes) is refused.
+    buf[pr::kHelloPrefixSize + 1 + h.client.size()] = 3;
+    CHECK(!pr::decodeHello(buf.data(), buf.size(), later));
 }
 
 TEST(net_protocol_valid_checks) {
@@ -395,7 +494,8 @@ TEST(net_protocol_valid_checks) {
 }
 
 TEST(net_position_digest) {
-    // Values of fnv1a32() in dedicated-server/src/protocol/index.js.
+    // The protocol's posHash (dedicated-server/docs/PROTOCOL.md, "Moves and positions"): values of
+    // fnv1a32() in dedicated-server/crates/chess/src/types.rs.
     const std::string start = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     CHECK_EQ(net::positionDigest(start), 923150620u);
     CHECK_EQ(net::positionDigest("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1"), 1150555523u);
@@ -1244,9 +1344,10 @@ TEST(net_transport_refuses_insecure) {
     p.host = "10.1.2.3";
     p.tls = false;
     std::string err;
-    int status = 0;
-    CHECK(net::wsConnect(p, err, status) == nullptr);
+    net::WsAnswer answer;
+    CHECK(net::wsConnect(p, err, answer) == nullptr);
     CHECK_EQ(err, expect);
+    CHECK_EQ(answer.status, 0);
     // A cancelled token aborts before anything happens.
     net::CancelToken tok;
     tok.cancel();
@@ -1284,12 +1385,12 @@ TEST(net_transport_silent_server_times_out) {
     p.host = "127.0.0.1";
     p.port = srv.port();
     p.tls = false;
-    p.subprotocol = "scacelith.v1";
+    p.subprotocol = pr::kWsSubprotocol;
     p.timeoutMs = 1000;
     std::string error;
-    int status = 0;
+    net::WsAnswer answer;
     t0 = std::chrono::steady_clock::now();
-    std::unique_ptr<net::WebSocket> ws = net::wsConnect(p, error, status, nullptr);
+    std::unique_ptr<net::WebSocket> ws = net::wsConnect(p, error, answer, nullptr);
     ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
     std::fprintf(stderr, "  upgrade: %s after %.0f ms\n", error.c_str(), ms);
     CHECK(!ws);
@@ -1503,6 +1604,7 @@ public:
     std::atomic<int> revokeStatus{0};               // != 0: DELETE /api/v1/auth/sessions/42 (this session) answers it
     std::atomic<int> infos{0}, upgrades{0};         // GET /api/v1/info, WebSocket upgrade requests
     std::atomic<int> upgradeStatus{0};              // != 0: upgrades are refused with this HTTP status
+    std::atomic<int> upgradeRetryAfter{0};          // != 0: refused upgrades carry Retry-After: <n>
     std::atomic<uint32_t> clientPingMs{0};          // Welcome.clientPingMs
     std::atomic<uint32_t> heartbeatMs{15000};       // Welcome.heartbeatMs (no S_Ping follows the first one)
     std::atomic<bool> answerPings{true};            // false: C_Ping gets no S_Pong
@@ -1510,9 +1612,11 @@ public:
     std::atomic<bool> helloTokenOk{false};
     std::atomic<uint64_t> activeGame{0};
     std::atomic<uint16_t> gestureRate{0}, gestureBurst{0};   // Welcome.gestureRate / gestureBurst
+    std::atomic<uint16_t> gestureIdleMs{0};                   // Welcome.gestureIdleMs
     std::atomic<bool> autoPress{true};                        // GameSnapshot.autoPress
     std::atomic<bool> seqOk{true};                            // every client message came numbered in order
     std::atomic<bool> loginToken2{false};                     // sign-ins answer token2 (another session)
+    std::atomic<int> resyncs{0};                              // Resync requests (each answered with a snapshot)
 
     // The C_Gesture frames received, with their arrival time.
     struct GestureIn {
@@ -1533,6 +1637,14 @@ public:
         script_.assign(steps.begin(), steps.end());
     }
     std::string serverId() const { return "srv-" + std::to_string(serverNo.load()); }
+    // The gseq of the game's last event, which the next snapshot carries (the events a test sends
+    // with sendToClients do not change it).
+    void setGseq(uint32_t gseq) { gseq_.store(gseq); }
+    // A server message on every WebSocket.
+    template <class M> void sendToClients(const M& m) {
+        std::lock_guard<std::mutex> lk(mu_);
+        for (Sock s : ws_) sendMsg(s, m);
+    }
 
     bool start() {
 #ifdef _WIN32
@@ -1702,9 +1814,9 @@ private:
         sendFrame(s, 0x2, b.data(), b.size());
     }
 
-    void respond(Sock s, int status, const std::string& body) {
+    void respond(Sock s, int status, const std::string& body, const std::string& headers = std::string()) {
         std::string r = "HTTP/1.1 " + std::to_string(status) + " X\r\nContent-Type: application/json\r\nContent-Length: " +
-                        std::to_string(body.size()) + "\r\nConnection: close\r\n\r\n" + body;
+                        std::to_string(body.size()) + "\r\nConnection: close\r\n" + headers + "\r\n" + body;
         sendAll(s, r.data(), r.size());
     }
 
@@ -1752,11 +1864,11 @@ private:
             char info[512];
             std::snprintf(info, sizeof(info),
                           "{\"name\":\"Fake\",\"serverId\":\"%s\",\"motd\":\"hi\",\"protocol\":{\"min\":%u,\"max\":%u,\"schema\":%u,"
-                          "\"subprotocol\":\"scacelith.v1\"},\"wsPort\":%u,\"wsPath\":\"/ws\",\"registration\":\"open\","
+                          "\"subprotocol\":\"%s\"},\"wsPort\":%u,\"wsPath\":\"/ws\",\"registration\":\"open\","
                           "\"emailVerification\":true,\"sso\":{\"google\":false},\"mfa\":true,\"pow\":{\"register\":10},"
                           "\"categories\":[{\"id\":\"3+2\",\"baseSec\":180,\"incSec\":2}]}",
-                          serverId().c_str(), unsigned(pr::kProtocolMin), unsigned(pr::kProtocolVersion), unsigned(pr::kSchemaHash),
-                          unsigned(port));
+                          serverId().c_str(), unsigned(pr::kProtocolVersion), unsigned(pr::kProtocolVersion), unsigned(pr::kFingerprint),
+                          pr::kWsSubprotocol, unsigned(port));
             respond(s, 200, info);
         } else if (method == "POST" && path == "/api/v1/auth/login") {
             ++loginAttempts;
@@ -1825,7 +1937,8 @@ private:
             }
         }
         if (step > 0) {
-            respond(s, step, "{\"error\":\"server_full\"}");
+            const int retryAfter = upgradeRetryAfter.load();
+            respond(s, step, "{\"error\":\"server_full\"}", retryAfter ? "Retry-After: " + std::to_string(retryAfter) + "\r\n" : "");
             return;
         }
         std::string key = h["sec-websocket-key"];
@@ -1881,10 +1994,10 @@ private:
             }
             if (t == pr::MsgType::Hello) {
                 pr::Hello m;
-                if (!pr::decode(p, n, m)) return;
+                if (!pr::decodeHello(p, n, m)) return;
                 ++hellos;
-                helloTokenOk.store(m.seq == 1 && m.token == token && m.schema == pr::kSchemaHash && m.proto == pr::kProtocolVersion &&
-                                   m.client.compare(0, 10, "Scacelith/") == 0);
+                helloTokenOk.store(m.seq == 1 && m.token == token && m.proto == pr::kProtocolVersion && m.minor == pr::kMinor &&
+                                   m.caps == pr::kCaps && m.client.compare(0, 10, "Scacelith/") == 0);
                 if (step == kShutdownAtHello) {
                     pr::Error e;
                     e.code = pr::ErrorCode::ShuttingDown;
@@ -1896,6 +2009,8 @@ private:
                 }
                 pr::Welcome w;
                 w.proto = pr::kProtocolVersion;
+                w.minor = std::min(m.minor, pr::kMinor);
+                w.caps = m.caps & pr::kCaps;
                 w.serverTime = epochMs() + kSkewMs;
                 w.userId = 7;
                 w.username = "alice";
@@ -1903,9 +2018,11 @@ private:
                 w.heartbeatMs = heartbeatMs.load();
                 w.clientPingMs = clientPingMs.load();
                 w.maxMsgPerSec = 20;
+                w.msgBurst = 40;
                 w.activeGame = activeGame.load();
                 w.gestureRate = gestureRate.load();
                 w.gestureBurst = gestureBurst.load();
+                w.gestureIdleMs = gestureIdleMs.load();
                 sendMsg(s, w);
                 if (w.activeGame) sendSnapshot(s, gseq);
                 pr::S_Ping sp;
@@ -1982,6 +2099,11 @@ private:
                 if (!pr::decode(p, n, m)) return;
                 std::lock_guard<std::mutex> lk(gestureMu_);
                 gestures_.push_back({m, std::chrono::steady_clock::now()});
+            } else if (t == pr::MsgType::Resync) {
+                pr::Resync m;
+                if (!pr::decode(p, n, m)) return;
+                ++resyncs;
+                sendSnapshot(s, gseq);
             } else if (t == pr::MsgType::Resign) {
                 pr::Resign m;
                 if (!pr::decode(p, n, m)) return;
@@ -2082,6 +2204,7 @@ TEST(net_online_client_loopback) {
         c.setServer(ep);
         CHECK_EQ(c.server().origin(), "127.0.0.1:" + std::to_string(srv.port));
         CHECK(!c.hasSavedSession());
+        CHECK_EQ(c.gestureKeepaliveMs(), 1000);   // before any Welcome: the shortest
 
         net::Event ev;
         c.fetchServerInfo();
@@ -2640,6 +2763,23 @@ void restartServerChangedScenario(PacingRig& r) {
              "4008, another server id: no further attempt");
 }
 
+// 429 at the upgrade with Retry-After: 5 (too many connections from this address): the next
+// attempt waits at least those 5 s (where a failure's second attempt comes within 4 s), with the
+// same /info answer.
+void retryAfterScenario(PacingRig& r) {
+    int ups = r.srv.upgrades.load(), infos = r.srv.infos.load();
+    r.srv.upgradeRetryAfter.store(5);
+    r.srv.scriptUpgrades({429});
+    r.srv.dropWebSockets();
+    r.expect(r.until([&] { return r.srv.upgrades.load() == ups + 1; }, 4000), "429: tried");
+    auto t0 = std::chrono::steady_clock::now();
+    r.expect(r.until([&] { return r.srv.upgrades.load() == ups + 2; }, 10000), "429: tried again");
+    double gap = r.msSince(t0);
+    r.expect(gap >= 4900 && gap <= 9000, "429: after its Retry-After (" + std::to_string(int(gap)) + " ms)");
+    r.expect(r.stateIs(net::ConnState::Online, 5000), "429: online again");
+    r.expect(r.srv.infos.load() == infos, "429: the /info answer is kept (" + std::to_string(r.srv.infos.load() - infos) + " reads)");
+}
+
 // A reverse proxy answering 502 at the upgrade (its backend restarts): retried like a network
 // failure, with the same /info answer.
 void badGatewayScenario(PacingRig& r) {
@@ -2695,16 +2835,17 @@ bool enterGame(PacingRig& r, net::Event& snapshot) {
     return waitEvent(*r.c, net::Event::Kind::GameSnapshot, snapshot, 5000) && snapshot.game.id == 77;
 }
 
-// Welcome.gestureRate 10, gestureBurst 6, GameSnapshot.autoPress false. A call every 2 ms for
-// 1.5 s: only the latest Gesture waits and they go at the pace of a bucket one smaller than the
-// server's, the very latest last; the numbering stays shared with the other messages. Nothing
-// goes for another game. The opponent's S_Gesture become one OpponentGesture (the latest; 'game'
-// not filled in), for the current game only.
+// Welcome.gestureRate 10, gestureBurst 6, gestureIdleMs 4000, GameSnapshot.autoPress false. A
+// call every 2 ms for 1.5 s: only the latest Gesture waits and they go at the pace of a bucket one
+// smaller than the server's, the very latest last; the numbering stays shared with the other
+// messages. Nothing goes for another game. The opponent's S_Gesture become one OpponentGesture
+// (the latest; 'game' not filled in), for the current game only.
 void gestureScenario(PacingRig& r) {
     using K = net::Event::Kind;
     net::Event ev;
     if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
     r.expect(!ev.game.autoPress, "GameSnapshot.autoPress reaches OnlineGame");
+    r.expect(r.c->gestureKeepaliveMs() == 4000, "Welcome.gestureIdleMs is the keepalive");
 
     const int kRate = 10, kCapacity = net::gestureSendCapacity(6);
     auto t0 = std::chrono::steady_clock::now();
@@ -2797,11 +2938,12 @@ void gestureScenario(PacingRig& r) {
              "the latest head");
 }
 
-// Welcome.gestureRate 0 (no relay on this server): no Gesture ever goes.
+// Welcome.gestureRate 0 (no relay on this server, gestureIdleMs 0): no Gesture ever goes.
 void gestureOffScenario(PacingRig& r) {
     net::Event ev;
     if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
     r.expect(ev.game.autoPress, "GameSnapshot.autoPress true by default");
+    r.expect(r.c->gestureKeepaliveMs() == 1000, "gestureIdleMs 0: the shortest keepalive");
     net::Gesture g;
     for (int i = 0; i < 60; ++i) {
         g.ply = i;
@@ -2813,11 +2955,14 @@ void gestureOffScenario(PacingRig& r) {
     r.expect(r.c->state() == net::ConnState::Online, "still online");
 }
 
-// A Gesture made while Reconnecting or Offline is never sent after the next Welcome.
+// A Gesture made while Reconnecting or Offline is never sent after the next Welcome. The keepalive
+// is the one of the last Welcome, clamped (gestureIdleMs 30000, then 500).
 void gestureDownScenario(PacingRig& r) {
     using K = net::Event::Kind;
     net::Event ev;
     if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    r.expect(r.c->gestureKeepaliveMs() == 10000, "gestureIdleMs above 10 s: 10 s");
+    r.srv.gestureIdleMs.store(500);   // the next Welcome
     net::Gesture g;
     g.touch = 12;
     r.c->sendGesture(77, g);
@@ -2835,6 +2980,7 @@ void gestureDownScenario(PacingRig& r) {
     r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 15000), "back in the game");
     r.sleepMs(500);
     r.expect(r.srv.gestures().size() == 1, "nothing of the reconnection sent");
+    r.expect(r.c->gestureKeepaliveMs() == 1000, "the new Welcome's gestureIdleMs, below 1 s: 1 s");
 
     r.c->disconnect();
     r.expect(r.stateIs(net::ConnState::Offline, 3000), "offline");
@@ -2852,6 +2998,89 @@ void gestureDownScenario(PacingRig& r) {
                  return v.size() == 2 && v.back().m.touch == 15;
              }, 1000),
              "online again: the next one goes");
+}
+
+// Game events apply in gseq order (PROTOCOL.md, "Ordering: gseq"): the next one applies and its
+// gseq becomes the state's; one the state already holds (an event of the snapshot, a MoveMade sent
+// again) is ignored, without a Resync; one beyond the next is not applied, and the client asks for
+// a Resync, which the server answers with a snapshot. A MoveMade of the next gseq for another ply
+// than the next one asks for a Resync too.
+void gseqScenario(PacingRig& r) {
+    using K = net::Event::Kind;
+    net::Event ev;
+    r.srv.setGseq(40);
+    if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    r.expect(ev.game.gseq == 40, "the snapshot's gseq (" + std::to_string(ev.game.gseq) + ")");
+    auto gameEvent = [&](uint32_t gseq, pr::GameEventKind kind) {
+        pr::GameEvent e;
+        e.game = 77;
+        e.gseq = gseq;
+        e.kind = kind;
+        e.color = pr::Color::Black;
+        r.srv.sendToClients(e);
+    };
+    auto moveMade = [&](uint32_t gseq, uint16_t ply) {
+        pr::MoveMade m;
+        m.game = 77;
+        m.gseq = gseq;
+        m.ply = ply;
+        m.move = ply % 2 == 0 ? net::packMove(12, 28, 0) : net::packMove(52, 36, 0);
+        m.whiteMs = m.blackMs = 180000;
+        m.serverTime = epochMs() + FakeServer::kSkewMs;
+        r.srv.sendToClients(m);
+    };
+    auto gameEnd = [&](uint32_t gseq) {
+        pr::GameEnd e;
+        e.game = 77;
+        e.gseq = gseq;
+        e.status = pr::GameStatus::Draw;
+        e.reason = pr::EndReason::Agreement;
+        e.serverTime = epochMs() + FakeServer::kSkewMs;
+        r.srv.sendToClients(e);
+    };
+    // The game events among those polled.
+    auto shown = [](const std::vector<net::Event>& seen) {
+        int n = 0;
+        for (const net::Event& e : seen)
+            n += e.kind == K::GameSnapshot || e.kind == K::MoveMade || e.kind == K::GameEvent || e.kind == K::GameEnd;
+        return n;
+    };
+    std::vector<net::Event> seen;
+
+    gameEvent(41, pr::GameEventKind::DrawOffered);
+    r.expect(waitEvent(*r.c, K::GameEvent, ev, 3000) && ev.game.drawOfferBy == 1 && ev.game.gseq == 41, "41: applied");
+    gameEvent(41, pr::GameEventKind::DrawDeclined);
+    moveMade(40, 0);
+    gameEnd(39);
+    moveMade(42, 0);
+    r.expect(waitEvent(*r.c, K::MoveMade, ev, 3000, &seen) && ev.ply == 0 && ev.game.gseq == 42 && ev.game.moves.size() == 1 &&
+                 ev.game.status == int(pr::GameStatus::Ongoing),
+             "42: applied");
+    r.expect(shown(seen) == 1, "41, 40 and 39 again: ignored (" + std::to_string(shown(seen)) + " game events)");
+    r.sleepMs(300);
+    r.expect(r.srv.resyncs.load() == 0, "no Resync for what the state holds");
+
+    // 44 after 42: 43 was missed.
+    r.srv.setGseq(50);
+    seen.clear();
+    gameEnd(44);
+    r.expect(r.until([&] { return r.srv.resyncs.load() == 1; }, 3000), "44 after 42: a Resync");
+    r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 3000, &seen) && ev.game.gseq == 50 && ev.game.moves.empty() &&
+                 ev.game.status == int(pr::GameStatus::Ongoing),
+             "44 after 42: the snapshot of the Resync");
+    r.expect(shown(seen) == 1, "44 after 42: not applied");
+
+    // 52 after 50, at the next ply: 51 was missed. Then 51 for ply 1 at ply 0: not the next ply.
+    seen.clear();
+    moveMade(52, 0);
+    r.expect(r.until([&] { return r.srv.resyncs.load() == 2; }, 3000), "52 after 50: a Resync");
+    r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 3000, &seen) && ev.game.gseq == 50, "52 after 50: the snapshot");
+    moveMade(51, 1);
+    r.expect(r.until([&] { return r.srv.resyncs.load() == 3; }, 3000), "51 for ply 1 at ply 0: a Resync");
+    r.expect(waitEvent(*r.c, K::GameSnapshot, ev, 3000, &seen) && ev.game.gseq == 50, "51 for ply 1: the snapshot");
+    r.expect(shown(seen) == 2, "neither MoveMade applied (" + std::to_string(shown(seen)) + " game events)");
+    moveMade(51, 0);
+    r.expect(waitEvent(*r.c, K::MoveMade, ev, 3000) && ev.ply == 0 && ev.game.gseq == 51, "51 for ply 0: applied");
 }
 
 // Starts each rig and runs its scenario on a thread of its own, then reports every failure.
@@ -2877,7 +3106,7 @@ void runRigs(PacingRig* rigs, const char* const* tags, void (*const* scenarios)(
 
 TEST(net_online_client_pacing) {
     if (!net::transportAvailable()) SKIP("transport unavailable");
-    constexpr int kRigs = 14;
+    constexpr int kRigs = 15;
     PacingRig rigs[kRigs];
     rigs[0].srv.clientPingMs.store(60000);
     rigs[5].srv.clientPingMs.store(3500);
@@ -2887,28 +3116,40 @@ TEST(net_online_client_pacing) {
     }
     const char* tags[kRigs] = {"pace-ping",     "pace-full",  "pace-shutdown", "pace-notice", "pace-ingame",
                                "pace-interval", "pace-probe", "pace-probe2",   "pace-502",    "pace-404",
-                               "pace-srvid",    "pace-cheat", "pace-restart-full", "pace-srvid-restart"};
+                               "pace-srvid",    "pace-cheat", "pace-restart-full", "pace-srvid-restart", "pace-429"};
     void (*scenarios[kRigs])(PacingRig&) = {
         pingPacingScenario,   serverFullScenario, shutdownScenario,        shutdownNoticeScenario, inGameScenario,
         pingIntervalScenario, probeScenario,      probeUnansweredScenario, badGatewayScenario,     notFoundScenario,
-        serverChangedScenario, cheatScenario,     restartFullScenario,     restartServerChangedScenario};
+        serverChangedScenario, cheatScenario,     restartFullScenario,     restartServerChangedScenario, retryAfterScenario};
     runRigs(rigs, tags, scenarios, kRigs);
 }
 
 // Live gestures through OnlineClient: paced and coalesced at Welcome's rate, for the current game
-// only, none without a relay (rate 0) or while the connection is down; the opponent's.
+// only, none without a relay (rate 0) or while the connection is down; the opponent's; the
+// keepalive of Welcome.gestureIdleMs, clamped.
 TEST(net_online_client_gestures) {
     if (!net::transportAvailable()) SKIP("transport unavailable");
     constexpr int kRigs = 3;
     PacingRig rigs[kRigs];
     rigs[0].srv.gestureRate.store(10);
     rigs[0].srv.gestureBurst.store(6);
+    rigs[0].srv.gestureIdleMs.store(4000);
     rigs[0].srv.autoPress.store(false);
     rigs[2].srv.gestureRate.store(10);
     rigs[2].srv.gestureBurst.store(20);
+    rigs[2].srv.gestureIdleMs.store(30000);
     const char* tags[kRigs] = {"gesture", "gesture-off", "gesture-down"};
     void (*scenarios[kRigs])(PacingRig&) = {gestureScenario, gestureOffScenario, gestureDownScenario};
     runRigs(rigs, tags, scenarios, kRigs);
+}
+
+// Game events in gseq order: the next one applies, an old one is ignored, a gap asks for a Resync.
+TEST(net_online_client_game_events_in_gseq_order) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    PacingRig rigs[1];
+    const char* tags[1] = {"gseq"};
+    void (*scenarios[1])(PacingRig&) = {gseqScenario};
+    runRigs(rigs, tags, scenarios, 1);
 }
 
 // Frames the client ignores (a client message type, a server message that does not decode): the
@@ -5587,15 +5828,15 @@ TEST(net_tls_pinning_manual) {
     w.subprotocol = pr::kWsSubprotocol;
     w.timeoutMs = 3000;
     std::string err;
-    int status = 0;
+    net::WsAnswer answer;
     w.path = "/ws?pin=" + wrong.substr(0, 8);
     w.pinnedSha256 = wrong;
-    CHECK(net::wsConnect(w, err, status) == nullptr);
+    CHECK(net::wsConnect(w, err, answer) == nullptr);
     CHECK(certError(err));
     w.path = "/ws?pin=" + pin.substr(0, 8);
     w.pinnedSha256 = pin;                             // TLS accepted; the test server does not upgrade
-    CHECK(net::wsConnect(w, err, status) == nullptr);
-    std::fprintf(stderr, "  wss pinned -> error '%s' status %d\n", err.c_str(), status);
+    CHECK(net::wsConnect(w, err, answer) == nullptr);
+    std::fprintf(stderr, "  wss pinned -> error '%s' status %d\n", err.c_str(), answer.status);
     CHECK_EQ(err, std::string("http_200"));
 }
 
@@ -5655,14 +5896,14 @@ TEST(net_tls_pinned_post_manual) {
 }
 
 // =============================================================================================
-// Live check against a real dedicated server (opt-in). dedicated-server/tools/live-cpp-check.js
-// starts a server (self-signed certificate, HTTPS API and WSS on one port, proof of work for
-// registration), a Node bot queued in 3+2, then runs:
-//   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password> ./scacelith_tests net_live_server_game
-// This client registers, logs in, connects, queues rated 3+2, plays legal moves for 12 plies
-// (posHash from its own chess::Position FEN) and resigns; the result and the rating update must
-// come back from the server. The account API has its own live check
-// (tests/net_live_account_tests.cpp).
+// Live check against a real dedicated server (opt-in). The live-check harness
+// (dedicated-server/tools/live-check, see its README) starts a server (self-signed certificate,
+// HTTPS API and WSS on one port, proof of work for registration), a bot queued in 3+2, then runs:
+//   SCACELITH_NET_LIVE=host:port:<pin hex>:<username>:<password>[:<keepalive ms>] ./scacelith_tests net_live_server_game
+// This client registers, logs in, connects (the gesture keepalive of the server's Welcome must be
+// <keepalive ms> when given), queues rated 3+2, plays legal moves for 12 plies (posHash from its
+// own chess::Position FEN) and resigns; the result and the rating update must come back from the
+// server. The account API has its own live check (tests/net_live_account_tests.cpp).
 // =============================================================================================
 TEST(net_live_server_game) {
     const char* env = std::getenv("SCACELITH_NET_LIVE");
@@ -5674,8 +5915,8 @@ TEST(net_live_server_game) {
         for (char ch : s) { if (ch == ':') { f.push_back(cur); cur.clear(); } else cur += ch; }
         f.push_back(cur);
     }
-    CHECK_EQ(int(f.size()), 5);
-    if (f.size() != 5) return;
+    CHECK(f.size() == 5 || f.size() == 6);
+    if (f.size() != 5 && f.size() != 6) return;
     char credPath[256];
     std::snprintf(credPath, sizeof credPath, "scacelith-live-%d.credentials", int(std::time(nullptr) % 100000));
     net::OnlineClient c;
@@ -5701,7 +5942,9 @@ TEST(net_live_server_game) {
     if (!ev.ok) { std::remove(credPath); return; }
     c.connect();
     CHECK(waitEvent(c, net::Event::Kind::Welcome, ev, 15000, &seen));
-    std::fprintf(stderr, "  welcome from '%s' as %s\n", ev.serverName.c_str(), ev.account.username.c_str());
+    std::fprintf(stderr, "  welcome from '%s' as %s, gesture keepalive %d ms\n", ev.serverName.c_str(),
+                 ev.account.username.c_str(), c.gestureKeepaliveMs());
+    if (f.size() == 6) CHECK_EQ(c.gestureKeepaliveMs(), std::atoi(f[5].c_str()));
     c.joinQueue("3+2", true);
     CHECK(waitEvent(c, net::Event::Kind::GameSnapshot, ev, 20000, &seen));
     const uint64_t gameId = ev.game.id;

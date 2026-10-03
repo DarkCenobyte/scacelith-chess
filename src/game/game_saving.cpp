@@ -8,7 +8,8 @@ namespace saving {
 
 namespace {
 
-// Protocol values (dedicated-server/src/protocol/schema.js), as game_scene_online.cpp names them.
+// Protocol values (realtime protocol v1: dedicated-server/protocol/scacelith-v1.json), as
+// game_scene_online.cpp names them.
 enum Status { StOngoing = 0, StWhiteWins = 1, StBlackWins = 2, StDraw = 3, StAborted = 4 };
 constexpr int kReasonServerAborted = 25;
 // The names above are the generated ones (net/protocol_gen.h): a schema change fails here.

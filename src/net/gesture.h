@@ -1,5 +1,5 @@
 // Live gestures of a player in an online game (server or direct match): the protocol's Gesture
-// message (dedicated-server/src/protocol/schema.js). Cosmetic only: the opponent's robot mirrors
+// message (dedicated-server/docs/PROTOCOL.md). Cosmetic only: the opponent's robot mirrors
 // them (head, the piece in hand, where it is aimed, the move placed before the clock press), but
 // they never change the game, the clocks or the board state. The whole state travels every time,
 // so a message that is lost or rate-limited heals with the next one.
@@ -25,7 +25,8 @@
 //   scoresheet, Glance included). Each client puts the clock at its own player's right, so what
 //   lies beside the board is mirrored between the two clients: the receiver negates the yaw of
 //   a Side look (or aims the head at its own copy of the thing looked at).
-// A client sends a Gesture when this state changes, and when the head moved noticeably; the
+// A client sends a Gesture when this state changes, when the head moved noticeably, and at least
+// once per keepalive while nothing changes (Welcome.gestureIdleMs, gestureKeepaliveMs below); the
 // network layer keeps only the latest one and paces them (OnlineClient::sendGesture,
 // DirectMatch::sendGesture), so calling it every frame costs nothing.
 //
@@ -34,7 +35,9 @@
 // being prepared: they apply only while the local game has exactly 'ply' plies and it is the
 // sender's turn (a gesture of an earlier ply is stale: the move it prepared is already known),
 // and only to the sender's own pieces and legal destinations. A move 'placed' is shown on the
-// board until the MoveMade that confirms it (or a newer gesture that takes it back).
+// board until the MoveMade that confirms it (or a newer gesture that takes it back). The
+// receiver's timeouts count in keepalives (game/online_live.h): the sender's interval is the same,
+// both clients reading it from the same Welcome.
 #pragma once
 #include <cmath>
 #include <cstdint>
@@ -144,7 +147,19 @@ private:
 // interval (1000 / gestureRate ms), within which the receiver never has to drop a Gesture. A
 // longer stall of the link delivers what was sent meanwhile in one bunch, and the receiver drops
 // the part beyond its burst, the latest state included: the next Gesture, at the latest the
-// scene's keepalive a second later (game/online_live.h), brings the whole state again.
+// scene's keepalive (game/online_live.h), brings the whole state again.
 inline int gestureSendCapacity(int burst) { return burst > 1 ? burst - 1 : 1; }
+
+// The keepalive for Welcome.gestureIdleMs (the server's GESTURE_IDLE_MS): the longest a sender
+// lets pass without a Gesture for its game in progress while nothing changes, in milliseconds,
+// clamped to kGestureKeepaliveMinMs .. kGestureKeepaliveMaxMs (the range of GESTURE_IDLE_MS), so
+// that both players of a game derive the same interval whatever the server announced. 0, which a
+// server without the relay announces, reads as the minimum.
+constexpr int kGestureKeepaliveMinMs = 1000;
+constexpr int kGestureKeepaliveMaxMs = 10000;
+inline int gestureKeepaliveMs(int announced) {
+    return announced < kGestureKeepaliveMinMs ? kGestureKeepaliveMinMs
+                                              : announced > kGestureKeepaliveMaxMs ? kGestureKeepaliveMaxMs : announced;
+}
 
 }  // namespace net

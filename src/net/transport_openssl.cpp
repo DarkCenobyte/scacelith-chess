@@ -923,9 +923,9 @@ void httpStream(const HttpRequest& req, const std::function<bool(const HttpHead&
     s.shutdownTls();
 }
 
-std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int& httpStatus, CancelToken* cancel) {
+std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, WsAnswer& answer, CancelToken* cancel) {
     error.clear();
-    httpStatus = 0;
+    answer = WsAnswer();
     if (!p.tls && !isLoopbackHost(p.host)) {
         error = "insecure";
         return nullptr;
@@ -966,7 +966,8 @@ std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int&
     }
     HttpHead ph;
     if (!parseHead(raw.substr(0, end), ph)) { error = "network"; return nullptr; }
-    httpStatus = ph.status;
+    answer.status = ph.status;
+    answer.retryAfter = ph.get("retry-after");
     if (ph.status != 101) { error = "http_" + std::to_string(ph.status); return nullptr; }
     crypto::Sha1 acc = crypto::sha1((key + kWsGuid).data(), key.size() + sizeof(kWsGuid) - 1);
     if (lower(ph.get("upgrade")) != "websocket" || lower(ph.get("connection")).find("upgrade") == std::string::npos ||

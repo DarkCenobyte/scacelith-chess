@@ -27,7 +27,8 @@
 //     authority nor the command queue: the host sends S_Gesture, the guest C_Gesture (numbered
 //     with its other messages). Each side keeps only the latest one and paces them at 10 per
 //     second, bursts of 20 (the host's Welcome.gestureRate / gestureBurst; the sender's bucket
-//     is one smaller, see gestureSendCapacity); nothing is kept while the link is down. The host
+//     is one smaller, see gestureSendCapacity); nothing is kept while the link is down. The
+//     scenes' keepalive is the host's Welcome.gestureIdleMs, 1 s (gestureKeepaliveMs()). The host
 //     drops a guest's Gesture beyond that rate or for another game; Gestures never count towards
 //     the flood limit. A received one becomes an OpponentGesture event (the latest replaces one
 //     still queued).
@@ -35,7 +36,7 @@
 // The host's game is the authority, exactly like the dedicated server is for online games: it
 // validates the guest's move intents with chess::Position, runs the clocks and decides the
 // result. Both sides then speak the same binary protocol as online play (net::proto messages,
-// dedicated-server/src/protocol/schema.js) inside an encrypted channel, and DirectMatch emits
+// dedicated-server/docs/PROTOCOL.md) inside an encrypted channel, and DirectMatch emits
 // the same net::Event values as OnlineClient (GameSnapshot, MoveMade, MoveRejected, GameEvent,
 // GameEnd, ConnectionChanged, ServerError, OpponentGesture), so the 3D scene plays a direct match
 // with the online game code. The host's own moves go through the same authority (no special path).
@@ -154,6 +155,7 @@ public:
     const OnlineGame* currentGame() const;
     int pingMs() const;
     double serverNowMs() const;       // the host's clock (the host: its own)
+    int gestureKeepaliveMs() const;   // ms: the host's Welcome.gestureIdleMs, clamped (net/gesture.h)
 
     bool poll(Event& out);            // drains one event (game thread, once per frame)
 

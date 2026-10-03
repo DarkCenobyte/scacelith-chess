@@ -961,7 +961,18 @@ TEST(direct_channel_bad_hello) {
         CHECK(host.start() && guest.start());
         std::vector<uint8_t> gh;
         gh.swap(guest.outbox());
-        gh[4] = 2;   // a future version
+        gh[4] = uint8_t(Chan::kVersion + 1);   // a future version
+        CHECK(!host.receive(gh.data(), gh.size()));
+        CHECK(host.failure() == Chan::Failure::BadVersion);
+    }
+    {
+        // Version 1 carried the protocol before v1: refused the same way.
+        Chan guest(Chan::Role::Guest, "K7Q2M9XH3PTR"), host(Chan::Role::Host, "K7Q2M9XH3PTR");
+        CHECK(host.start() && guest.start());
+        std::vector<uint8_t> gh;
+        gh.swap(guest.outbox());
+        CHECK_EQ(int(gh[4]), 2);
+        gh[4] = 1;
         CHECK(!host.receive(gh.data(), gh.size()));
         CHECK(host.failure() == Chan::Failure::BadVersion);
     }
@@ -1184,7 +1195,6 @@ TEST(direct_authority_snapshot_and_names) {
         w.serverName = direct::sanitizeName(refused[i], "Host");
         P::Hello h;
         h.proto = P::kProtocolVersion;
-        h.schema = P::kSchemaHash;
         h.token = "direct:" + direct::sanitizeName(refused[i], "Guest");
         h.token.resize(16, ' ');
         std::vector<uint8_t> buf;
@@ -1505,7 +1515,8 @@ TEST(direct_authority_disconnection_grace) {
         auto ev = r.recent<P::GameEvent>(HostSide);
         CHECK(ev.size() == 1 && ev[0].kind == P::GameEventKind::PlayerDisconnected && ev[0].color == P::Color::Black &&
               ev[0].arg == 60000);
-        // Back within the grace: a snapshot for the guest, the news for the host.
+        // Back within the grace: a snapshot for the guest, the news for the host. The snapshot
+        // carries the gseq of that news, which it shows: the guest's next event follows it.
         r.now += 30000;
         r.a.onReconnect(GuestSide, r.now, r.out);
         r.collect();
@@ -1513,6 +1524,10 @@ TEST(direct_authority_disconnection_grace) {
         CHECK(s.size() == 1 && s[0].moves.size() == 2 && s[0].blackConnected);
         ev = r.recent<P::GameEvent>(HostSide);
         CHECK(ev.size() == 1 && ev[0].kind == P::GameEventKind::PlayerReconnected);
+        CHECK(s.size() == 1 && ev.size() == 1 && s[0].gseq == ev[0].gseq);
+        r.move(HostSide, "g1f3");
+        auto mm = r.recent<P::MoveMade>(GuestSide);
+        CHECK(s.size() == 1 && mm.size() == 1 && mm[0].gseq == s[0].gseq + 1);
         // Gone again for the whole grace: the guest loses.
         r.a.onDisconnect(GuestSide, r.now, r.out);
         r.collect();
@@ -2376,12 +2391,90 @@ struct StderrHold {
 
 }  // namespace
 
+TEST(direct_guest_orders_game_events_by_gseq) {
+    // The guest applies the host's game events in gseq order (PROTOCOL.md, "Ordering: gseq"), the
+    // authority's messages relayed by hand: the next event applies; one its state already holds (a
+    // repeated confirmation, an event its snapshot includes) is ignored; one beyond the next is not
+    // applied and the guest asks for a Resync; so is a MoveMade of the next gseq for a later ply.
+    using K = Event::Kind;
+    Room r(tc(300, 0), 1);   // the host plays White
+    r.start();
+    const std::vector<std::vector<uint8_t>>& toGuest = r.msgs[GuestSide];
+    RawHost raw;
+    CHECK(raw.listen());
+    Peer guest, nobody;
+    guest.dm.join("127.0.0.1", raw.port, raw.code, "Bob");
+    P::Hello hello;
+    CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
+    P::Welcome w;
+    w.proto = P::kProtocolVersion;
+    w.serverTime = sock::epochMs();
+    w.userId = 2;
+    w.username = "Bob";
+    w.serverName = "Alice";
+    w.heartbeatMs = 2000;
+    w.clientPingMs = 2000;
+    w.maxMsgPerSec = 40;
+    w.activeGame = r.a.gameId();
+    CHECK(raw.send(w));
+    auto relay = [&](size_t i) { return i < toGuest.size() && raw.sendBytes(toGuest[i]); };
+    CHECK(relay(0));                                    // the snapshot, gseq 0
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(K::GameSnapshot) == 1; }));
+
+    r.move(HostSide, "e2e4");                           // MoveMade, gseq 1
+    CHECK(relay(1));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.hasMove(0); }));
+    CHECK(guest.last(K::MoveMade) && guest.last(K::MoveMade)->game.gseq == 1);
+    // The repeated confirmation, then the next event: only the latter shows.
+    P::DrawOffer offer;
+    offer.game = r.a.gameId();
+    r.send(HostSide, offer);                            // GameEvent DrawOffered, gseq 2
+    CHECK(relay(1) && relay(2));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(K::GameEvent) == 1; }));
+    CHECK_EQ(guest.count(K::MoveMade), 1);
+    CHECK(guest.dm.currentGame() && guest.dm.currentGame()->gseq == 2 && guest.dm.currentGame()->drawOfferBy == 0);
+
+    // The guest moves: MoveMade (gseq 3), then DrawDeclined (gseq 4, the move declines the offer).
+    // Only the second reaches it: not applied, a Resync instead.
+    r.move(GuestSide, "e7e5");
+    CHECK_EQ(toGuest.size(), size_t(5));
+    CHECK(relay(4));
+    P::Resync rs;
+    CHECK(raw.waitFor(rs, 5000) && rs.game == r.a.gameId());
+    r.send(GuestSide, rs);                              // the snapshot, gseq 4
+    CHECK(relay(5));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.count(K::GameSnapshot) == 2; }));
+    const Event* snap = guest.last(K::GameSnapshot);
+    CHECK(snap && snap->game.gseq == 4 && snap->game.moves.size() == 2 && snap->game.drawOfferBy == 2);
+    CHECK_EQ(guest.count(K::GameEvent), 1);            // the DrawDeclined was not applied
+
+    // What the snapshot holds is ignored; the next event applies.
+    r.move(HostSide, "g1f3");                           // MoveMade, gseq 5
+    CHECK(relay(3) && relay(4) && relay(6));
+    CHECK(waitUntil(guest, nobody, [&] { return guest.hasMove(2); }));
+    CHECK_EQ(guest.count(K::MoveMade), 2);             // plies 0 and 2: the confirmation of ply 1 (gseq 3) was ignored
+    CHECK_EQ(guest.count(K::GameEvent), 1);
+    CHECK(guest.last(K::MoveMade) && guest.last(K::MoveMade)->game.gseq == 5);
+
+    // The next gseq for a later ply than the next: a Resync too, nothing applied.
+    P::MoveMade ahead;
+    CHECK(toGuest.size() == 7 && P::decode(toGuest[6].data(), toGuest[6].size(), ahead));
+    ahead.gseq = 6;
+    ahead.ply = 4;
+    CHECK(raw.send(ahead));
+    CHECK(raw.waitFor(rs, 5000) && rs.game == r.a.gameId());
+    guest.drain();
+    CHECK_EQ(guest.count(K::MoveMade), 2);
+    CHECK(guest.dm.currentGame() && guest.dm.currentGame()->gseq == 5 && guest.dm.currentGame()->moves.size() == 3);
+}
+
 TEST(direct_guest_gesture_at_once_after_reconnecting) {
     // The guest's game thread sends a Gesture the moment it sees Online again after a
     // reconnection (the scene does: the host waits for one sent after the return). The link is up
     // for Gestures before that event, so the Gesture reaches the host. The guest's worker is held
     // at the log line that follows the event, so a link brought up only after it would still be
-    // down when the Gesture is sent.
+    // down when the Gesture is sent. The guest's keepalive is the one of the host's last Welcome
+    // (gestureIdleMs, clamped to 1 s .. 10 s).
     RawHost raw;
     CHECK(raw.listen());
     direct::Authority auth(direct::AuthorityConfig(), "Alice", "Bob", 1);
@@ -2389,7 +2482,7 @@ TEST(direct_guest_gesture_at_once_after_reconnecting) {
     auth.startGame(sock::epochMs(), out);
     CHECK(out.toGuest.size() == 1);
     if (out.toGuest.size() != 1) return;
-    auto welcome = [&] {
+    auto welcome = [&](uint16_t gestureIdleMs) {
         P::Welcome w;
         w.proto = P::kProtocolVersion;
         w.serverTime = sock::epochMs();
@@ -2402,14 +2495,17 @@ TEST(direct_guest_gesture_at_once_after_reconnecting) {
         w.activeGame = auth.gameId();
         w.gestureRate = 10;
         w.gestureBurst = 20;
+        w.gestureIdleMs = gestureIdleMs;
         return raw.send(w);
     };
     Peer guest, nobody;
+    CHECK_EQ(guest.dm.gestureKeepaliveMs(), 1000);   // no match yet
     guest.dm.join("127.0.0.1", raw.port, raw.code, "Bob");
     P::Hello hello;
     CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
-    CHECK(welcome() && raw.sendBytes(out.toGuest[0]));
+    CHECK(welcome(4000) && raw.sendBytes(out.toGuest[0]));
     CHECK(waitUntil(guest, nobody, [&] { return guest.count(Event::Kind::GameSnapshot) == 1; }));
+    CHECK_EQ(guest.dm.gestureKeepaliveMs(), 4000);
     raw.drop();   // the network fails: the guest comes back by itself
     CHECK(waitUntil(guest, nobody, [&] { return guest.hasConn(ConnState::Reconnecting); }));
     CHECK(raw.accept(5000) && raw.waitFor(hello, 5000));
@@ -2418,7 +2514,7 @@ TEST(direct_guest_gesture_at_once_after_reconnecting) {
     bool online = false;
     {
         StderrHold hold;
-        CHECK(welcome());
+        CHECK(welcome(30000));
         auto end = std::chrono::steady_clock::now() + std::chrono::seconds(5);
         while (!online && std::chrono::steady_clock::now() < end) {
             Event e;
@@ -2430,6 +2526,7 @@ TEST(direct_guest_gesture_at_once_after_reconnecting) {
     P::C_Gesture got;
     CHECK(raw.waitFor(got, 3000));
     CHECK(got.game == auth.gameId() && got.touch == 12);
+    CHECK_EQ(guest.dm.gestureKeepaliveMs(), 10000);   // 30 s announced: clamped
 }
 
 TEST(direct_gestures_outside_flood_limit) {
@@ -2444,7 +2541,6 @@ TEST(direct_gestures_outside_flood_limit) {
     CHECK(raw.connect(inv.port, inv.code));
     P::Hello hello;
     hello.proto = P::kProtocolVersion;
-    hello.schema = P::kSchemaHash;
     hello.client = "Scacelith test";
     hello.token = "direct:Raw      ";
     CHECK(raw.send(hello));
@@ -2452,6 +2548,10 @@ TEST(direct_gestures_outside_flood_limit) {
     CHECK(raw.waitFor(w, 5000));
     CHECK_EQ(int(w.gestureRate), 10);
     CHECK_EQ(int(w.gestureBurst), 20);
+    CHECK_EQ(int(w.gestureIdleMs), 1000);
+    CHECK_EQ(host.dm.gestureKeepaliveMs(), 1000);   // the host's own scene sends at that interval too
+    CHECK_EQ(int(w.maxMsgPerSec), 20);
+    CHECK_EQ(int(w.msgBurst), 20);
     P::GameSnapshot s;
     CHECK(raw.waitFor(s, 5000));
     CHECK(s.game != 0 && s.game == w.activeGame && s.autoPress);
@@ -2499,6 +2599,7 @@ bool sendWelcome(RawHost& raw, const direct::Authority& auth) {
     w.activeGame = auth.gameId();
     w.gestureRate = 10;
     w.gestureBurst = 20;
+    w.gestureIdleMs = 1000;
     return raw.send(w);
 }
 
@@ -2511,7 +2612,6 @@ bool joinRaw(Peer& host, RawGuest& raw, P::GameSnapshot& snap) {
     DirectInvite inv = host.dm.invite();
     P::Hello hello;
     hello.proto = P::kProtocolVersion;
-    hello.schema = P::kSchemaHash;
     hello.client = "Scacelith test";
     hello.token = "direct:Raw      ";
     P::Welcome w;
@@ -2604,8 +2704,7 @@ TEST(direct_host_refuses_without_stalling) {
     RawGuest other;
     CHECK(other.connect(host.dm.invite().port, host.dm.invite().code));
     P::Hello hello;
-    hello.proto = P::kProtocolVersion;
-    hello.schema = P::kSchemaHash ^ 1u;
+    hello.proto = uint16_t(P::kProtocolVersion + 1);
     hello.token = "direct:Other    ";
     CHECK(other.send(hello));
     P::Error e;
@@ -2624,6 +2723,35 @@ TEST(direct_host_refuses_without_stalling) {
     CHECK(hostResyncMs(host) < 100);
     CHECK(guest.waitClosed(2000));
     CHECK(host.dm.currentGame() && !host.dm.currentGame()->blackConnected);
+}
+
+TEST(direct_host_takes_later_minor_hello) {
+    // A guest of a later minor: its Hello announces unknown caps and carries a field the host does
+    // not know. The host takes it and answers with the minor and the caps both sides speak.
+    Peer host, nobody;
+    host.dm.host(hostOptions(300, 0, 1, "Alice"));
+    CHECK(waitUntil(host, nobody, [&] { return host.dm.state() == DirectMatch::State::WaitingForGuest; }));
+    DirectInvite inv = host.dm.invite();
+    RawGuest raw;
+    CHECK(raw.connect(inv.port, inv.code));
+    P::Hello hello;
+    hello.seq = ++raw.seq;
+    hello.proto = P::kProtocolVersion;
+    hello.minor = uint16_t(P::kMinor + 2);
+    hello.caps = ~uint64_t(0);
+    hello.client = "Scacelith later";
+    hello.token = "direct:Later    ";
+    std::vector<uint8_t> buf;
+    P::encode(hello, buf);
+    buf.push_back(7);   // the field of that minor
+    CHECK(raw.sendBytes(buf));
+    P::Welcome w;
+    CHECK(raw.waitFor(w, 5000));
+    CHECK(w.proto == P::kProtocolVersion && w.minor == P::kMinor && w.caps == P::kCaps);
+    P::GameSnapshot s;
+    CHECK(raw.waitFor(s, 5000));
+    CHECK(s.game != 0 && s.game == w.activeGame);
+    CHECK_EQ(raw.errors, 0);
 }
 
 TEST(direct_guest_message_out_of_sequence_logged_once) {

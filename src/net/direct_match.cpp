@@ -35,9 +35,11 @@ constexpr int kMaxPendingHandshakes = 4;
 constexpr size_t kMaxClosing = 4;          // refused or flooding links lingering (beyond, the oldest is closed)
 constexpr int kMaxFailedHandshakes = 10;   // wrong codes per hosted game, then the host stops listening
 constexpr int kMaxConnectionLogs = 10;     // "connection from" lines a second (anyone may connect), then a count
-constexpr int kMaxMsgPerSec = 20;          // announced in Welcome; twice as many closes the link (Gestures aside)
+constexpr int kMaxMsgPerSec = 20;          // Welcome.maxMsgPerSec...
+constexpr int kMsgBurst = 20;              // ...and msgBurst: more within a second closes the link (Gestures aside)
 constexpr int kGestureRate = 10;           // Gestures per second each way (Welcome.gestureRate)...
 constexpr int kGestureBurst = 20;          // ...with bursts up to this many (Welcome.gestureBurst)
+constexpr int kGestureIdleMs = 1000;       // a Gesture at least this often while nothing changes (Welcome.gestureIdleMs)
 constexpr size_t kMaxOutbox = 1 << 20;
 constexpr int64_t kDefaultGraceMs = 60000;
 constexpr size_t kMaxQueuedCommands = 32;
@@ -57,6 +59,17 @@ struct ClientView {
     bool have = false;
     bool needResync = false;
 
+    // Whether a game event numbered gseq is the next one (PROTOCOL.md, "Ordering: gseq"): one the
+    // state already holds is ignored, one beyond the next means an event was missed (Resync).
+    bool nextEvent(uint32_t gseq) {
+        if (gseq <= game.gseq) return false;
+        if (gseq != game.gseq + 1) {
+            needResync = true;
+            return false;
+        }
+        return true;
+    }
+
     bool apply(const uint8_t* p, size_t n, Event& ev) {
         P::MsgType t;
         if (!P::peekType(p, n, t)) return false;
@@ -73,9 +86,9 @@ struct ClientView {
         }
         case P::MsgType::MoveMade: {
             P::MoveMade m;
-            if (!P::decode(p, n, m) || !have || m.game != game.id) return false;
-            if (size_t(m.ply) < game.moves.size()) return false;                    // a repeated confirmation
-            if (size_t(m.ply) > game.moves.size()) { needResync = true; return false; }
+            if (!P::decode(p, n, m) || !have || m.game != game.id || !nextEvent(m.gseq)) return false;
+            if (size_t(m.ply) != game.moves.size()) { needResync = true; return false; }   // the next event, not the next ply
+            game.gseq = m.gseq;
             const int mover = m.ply % 2;
             game.moves.push_back({m.move, m.spentMs, mover == 0 ? m.whiteMs : m.blackMs});
             game.whiteMs = m.whiteMs;
@@ -104,7 +117,8 @@ struct ClientView {
         }
         case P::MsgType::GameEvent: {
             P::GameEvent e;
-            if (!P::decode(p, n, e) || !have || e.game != game.id) return false;
+            if (!P::decode(p, n, e) || !have || e.game != game.id || !nextEvent(e.gseq)) return false;
+            game.gseq = e.gseq;
             const int color = int(e.color);
             switch (e.kind) {
             case P::GameEventKind::DrawOffered: game.drawOfferBy = color; break;
@@ -126,7 +140,8 @@ struct ClientView {
         }
         case P::MsgType::GameEnd: {
             P::GameEnd e;
-            if (!P::decode(p, n, e) || !have || e.game != game.id) return false;
+            if (!P::decode(p, n, e) || !have || e.game != game.id || !nextEvent(e.gseq)) return false;
+            game.gseq = e.gseq;
             game.status = int(e.status);
             game.reason = int(e.reason);
             game.whiteMs = e.whiteMs;
@@ -386,6 +401,7 @@ public:
     std::deque<Command> commands;
     struct GestureOut { bool pending = false; uint64_t game = 0; Gesture g; } gestureOut;
     bool gestureLink = false;   // the other player is connected (the worker sets it)
+    int gestureKeepalive = kGestureKeepaliveMinMs;   // ms, gestureKeepaliveMs of the host's Welcome (the worker sets it)
     int pingMs = -1;
     double clockOffset = 0;   // guest: host clock - local clock
     const bool isHost;
@@ -425,15 +441,17 @@ protected:
         }
         events.push_back(std::move(ev));
     }
-    // The link to the other player came up (paced for the receiver's bucket of rate / burst) or
-    // went down (the Gesture waiting is dropped: none is kept for the reconnection). It comes up
-    // before any event that tells the game thread the other player is there (the snapshot,
-    // Online), so the first Gesture the game thread sends on that news is never dropped.
-    void gestureLinkUp(int rate, int burst) {
+    // The link to the other player came up (paced for the receiver's bucket of rate / burst, the
+    // scene's keepalive set to keepaliveMs) or went down (the Gesture waiting is dropped: none is
+    // kept for the reconnection). It comes up before any event that tells the game thread the
+    // other player is there (the snapshot, Online), so the first Gesture the game thread sends on
+    // that news is never dropped.
+    void gestureLinkUp(int rate, int burst, int keepaliveMs) {
         std::lock_guard<std::mutex> lk(m);
         gestureBucket_.reset(double(sock::steadyMs()), rate, gestureSendCapacity(burst));
         gestureOut.pending = false;
         gestureLink = true;
+        gestureKeepalive = keepaliveMs;
     }
     void gestureLinkDown() {
         std::lock_guard<std::mutex> lk(m);
@@ -776,14 +794,18 @@ private:
             closeLater(std::move(cp), 300);
             LOGW("direct: guest refused (%s)", P::enumName(code));
         };
+        // The order of the checks is the server's (docs PROTOCOL.md, "Connection lifecycle"): the
+        // frozen 17-byte prefix first, so a guest of another protocol version learns that.
         P::MsgType t;
+        P::HelloPrefix pre;
         P::Hello h;
-        if (!P::peekType(msg.data(), msg.size(), t) || t != P::MsgType::Hello) { refuse(P::ErrorCode::HelloRequired, 0); return false; }
-        if (!P::decode(msg.data(), msg.size(), h) || h.seq != 1) { refuse(P::ErrorCode::Malformed, h.seq); return false; }
-        if (h.proto < P::kProtocolMin || h.proto > P::kProtocolVersion || h.schema != P::kSchemaHash) {
-            refuse(P::ErrorCode::UnsupportedProtocol, h.seq);
-            return false;
-        }
+        uint32_t ref = 0;   // Error.ref: the seq of the message refused, when it has one
+        P::peekSeq(msg.data(), msg.size(), ref);
+        if (!P::peekType(msg.data(), msg.size(), t) || t != P::MsgType::Hello) { refuse(P::ErrorCode::HelloRequired, ref); return false; }
+        if (!P::readHelloPrefix(msg.data(), msg.size(), pre)) { refuse(P::ErrorCode::Malformed, ref); return false; }
+        if (pre.proto != P::kProtocolVersion) { refuse(P::ErrorCode::UnsupportedProtocol, ref); return false; }
+        if (!P::decodeHello(msg.data(), msg.size(), h)) { refuse(P::ErrorCode::Malformed, ref); return false; }
+        if (h.seq != 1) { refuse(P::ErrorCode::ProtocolViolation, ref); return false; }
         // Accepted: this connection is the guest from now on (it replaces a stale one).
         if (guest_) LOGI("direct: the guest's new connection replaces the previous one");
         guest_ = std::move(cp);
@@ -807,6 +829,8 @@ private:
         }
         P::Welcome w;
         w.proto = P::kProtocolVersion;
+        w.minor = std::min(h.minor, P::kMinor);
+        w.caps = h.caps & P::kCaps;
         w.serverTime = enow;
         w.userId = 2;
         w.username = auth_->guestName();
@@ -814,13 +838,16 @@ private:
         w.heartbeatMs = kPingEveryMs;
         w.clientPingMs = kPingEveryMs;
         w.maxMsgPerSec = kMaxMsgPerSec;
+        w.msgBurst = kMsgBurst;
         w.activeGame = auth_->gameId();
         w.gestureRate = kGestureRate;
         w.gestureBurst = kGestureBurst;
+        w.gestureIdleMs = kGestureIdleMs;
         std::vector<uint8_t> buf;
         P::encode(w, buf);
         guest_->send(buf);   // before the snapshot in 'out'
-        gestureLinkUp(kGestureRate, kGestureBurst);   // the host's Gestures still go after the snapshot
+        // The host's Gestures still go after the snapshot.
+        gestureLinkUp(kGestureRate, kGestureBurst, gestureKeepaliveMs(kGestureIdleMs));
         dispatch(out);
         LOGI("direct: guest \"%s\" %s", auth_->guestName().c_str(), first ? "joined" : "reconnected");
         if (first) {
@@ -863,7 +890,7 @@ private:
             rateWindow_ = now;
             rateCount_ = 0;
         }
-        if (++rateCount_ > 2 * kMaxMsgPerSec) {
+        if (++rateCount_ > kMaxMsgPerSec + kMsgBurst) {
             P::Error e;
             e.ref = seq;
             e.code = P::ErrorCode::Flood;
@@ -1177,7 +1204,8 @@ private:
         if (phase_ == Phase::Handshake && conn_->ch->established()) {
             P::Hello h;
             h.proto = P::kProtocolVersion;
-            h.schema = P::kSchemaHash;
+            h.minor = P::kMinor;
+            h.caps = P::kCaps;
             h.client = kClientString;
             h.token = tokenFor(name_);
             seq_ = 0;
@@ -1228,7 +1256,7 @@ private:
         if (phase_ == Phase::Hello) {
             if (t == P::MsgType::Welcome) {
                 P::Welcome w;
-                if (!P::decode(msg.data(), msg.size(), w)) { attemptFailed("incompatible", now); return; }
+                if (!P::decode(msg.data(), msg.size(), w) || w.proto != P::kProtocolVersion) { attemptFailed("incompatible", now); return; }
                 online(now, w);
             } else if (t == P::MsgType::Error) {
                 P::Error e;
@@ -1296,7 +1324,7 @@ private:
             clockOffset = offset_;
         }
         nextPing_ = now;
-        gestureLinkUp(w.gestureRate, w.gestureBurst);
+        gestureLinkUp(w.gestureRate, w.gestureBurst, gestureKeepaliveMs(w.gestureIdleMs));
         if (first) setState(DirectMatch::State::Playing);
         connectionEvent(ConnState::Online);
         LOGI("direct: %s the match of \"%s\"", first ? "joined" : "rejoined", w.serverName.c_str());
@@ -1563,6 +1591,13 @@ int DirectMatch::pingMs() const {
     if (!impl_->cur) return -1;
     std::lock_guard<std::mutex> lk2(impl_->cur->m);
     return impl_->cur->pingMs;
+}
+
+int DirectMatch::gestureKeepaliveMs() const {
+    std::lock_guard<std::mutex> lk(impl_->m);
+    if (!impl_->cur) return kGestureKeepaliveMinMs;
+    std::lock_guard<std::mutex> lk2(impl_->cur->m);
+    return impl_->cur->gestureKeepalive;
 }
 
 double DirectMatch::serverNowMs() const {
