@@ -575,6 +575,7 @@ online.account.signed_out = Sie sind abgemeldet.
 online.account.signed_out_all = Sie sind auf allen Computern abgemeldet.
 online.account.signing_out_all = Abmeldung auf allen Computern…
 online.account.sign_out_all_failed = Ihre anderen Computer sind möglicherweise noch angemeldet: Melden Sie sich erneut an und melden Sie sie unter „Angemeldete Geräte“ ab. {0}
+online.account.sign_out_all_retry = Ihre anderen Computer sind möglicherweise noch angemeldet. Versuchen Sie „Überall abmelden“ erneut. {0}
 online.account.ratings = WERTUNGEN
 online.account.col.tc = BEDENKZEIT
 online.account.col.rating = WERTUNG
@@ -730,6 +731,7 @@ online.err.server_busy = Der Server ist ausgelastet. Versuchen Sie es gleich ern
 online.err.banned_until = Dieses Konto ist bis {0} gesperrt.
 online.err.banned = Dieses Konto ist gesperrt.
 online.err.invalid_credentials = Falscher Benutzername oder falsches Passwort.
+online.err.invalid_credentials_pending = Falscher Benutzername oder falsches Passwort. Wenn Sie Ihr Konto gerade erstellt haben, öffnen Sie zuerst den Link, den wir Ihnen gesendet haben.
 online.err.email_unverified = Ihre E-Mail-Adresse ist noch nicht bestätigt: Öffnen Sie den Link, den wir Ihnen gesendet haben.
 online.err.network = Der Server ist nicht erreichbar. Prüfen Sie Ihre Verbindung und die Serveradresse.
 online.err.tls = Es konnte keine sichere Verbindung zum Server aufgebaut werden.
@@ -790,6 +792,7 @@ online.err.too_many_attempts_for = Zu viele Fehlversuche. Versuchen Sie es in {0
 online.err.same_email = Das ist bereits Ihre E-Mail-Adresse.
 online.err.not_found = Auf dem Server nicht gefunden.
 online.err.invalid_response = Die Antwort des Servers konnte nicht gelesen werden.
+online.err.storage = Die Sitzung konnte auf diesem Computer nicht gespeichert werden.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = PARTIEVERLAUF

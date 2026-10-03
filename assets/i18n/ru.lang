@@ -576,6 +576,7 @@ online.account.signed_out = Вы вышли из аккаунта.
 online.account.signed_out_all = Вы вышли из аккаунта на всех компьютерах.
 online.account.signing_out_all = Выход из аккаунта на всех компьютерах…
 online.account.sign_out_all_failed = Сеансы на других компьютерах, возможно, ещё не завершены: войдите снова и завершите их в разделе «Активные сеансы». {0}
+online.account.sign_out_all_retry = Сеансы на других компьютерах, возможно, ещё не завершены. Попробуйте «Выйти везде» ещё раз. {0}
 online.account.ratings = РЕЙТИНГИ
 online.account.col.tc = КОНТРОЛЬ
 online.account.col.rating = РЕЙТИНГ
@@ -731,6 +732,7 @@ online.err.server_busy = Сервер перегружен. Повторите �
 online.err.banned_until = Аккаунт заблокирован до {0}.
 online.err.banned = Аккаунт заблокирован.
 online.err.invalid_credentials = Неверное имя пользователя или пароль.
+online.err.invalid_credentials_pending = Неверное имя пользователя или пароль. Если вы только что создали аккаунт, сначала откройте ссылку из нашего письма.
 online.err.email_unverified = Адрес электронной почты ещё не подтверждён: откройте ссылку из нашего письма.
 online.err.network = Сервер недоступен. Проверьте подключение и адрес сервера.
 online.err.tls = Не удалось установить защищённое соединение с сервером.
@@ -791,6 +793,7 @@ online.err.too_many_attempts_for = Слишком много неудачных 
 online.err.same_email = Это уже ваш адрес электронной почты.
 online.err.not_found = Не найдено на сервере.
 online.err.invalid_response = Не удалось прочитать ответ сервера.
+online.err.storage = Не удалось сохранить сеанс на этом компьютере.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = ИСТОРИЯ ПАРТИЙ

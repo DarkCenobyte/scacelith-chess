@@ -575,6 +575,7 @@ online.account.signed_out = Ha cerrado la sesión.
 online.account.signed_out_all = Ha cerrado la sesión en todos los ordenadores.
 online.account.signing_out_all = Cerrando la sesión en todos los ordenadores…
 online.account.sign_out_all_failed = Puede que sus otros ordenadores sigan con la sesión iniciada: vuelva a iniciar sesión y ciérrela desde Dispositivos con sesión iniciada. {0}
+online.account.sign_out_all_retry = Puede que sus otros ordenadores sigan con la sesión iniciada. Vuelva a intentar «Cerrar todas las sesiones». {0}
 online.account.ratings = PUNTUACIONES
 online.account.col.tc = RITMO
 online.account.col.rating = PUNTUACIÓN
@@ -730,6 +731,7 @@ online.err.server_busy = El servidor está ocupado. Vuelva a intentarlo en un mo
 online.err.banned_until = Esta cuenta está suspendida hasta {0}.
 online.err.banned = Esta cuenta está suspendida.
 online.err.invalid_credentials = Nombre de usuario o contraseña incorrectos.
+online.err.invalid_credentials_pending = Nombre de usuario o contraseña incorrectos. Si acaba de crear su cuenta, abra primero el enlace que le hemos enviado.
 online.err.email_unverified = Su dirección de correo aún no está verificada: abra el enlace que le hemos enviado.
 online.err.network = No se puede contactar con el servidor. Compruebe su conexión y la dirección del servidor.
 online.err.tls = No se ha podido establecer una conexión segura con el servidor.
@@ -790,6 +792,7 @@ online.err.too_many_attempts_for = Demasiados intentos fallidos. Vuelva a intent
 online.err.same_email = Esa ya es su dirección de correo.
 online.err.not_found = No se encuentra en el servidor.
 online.err.invalid_response = No se ha podido leer la respuesta del servidor.
+online.err.storage = No se ha podido guardar la sesión en este ordenador.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = HISTORIAL DE PARTIDAS

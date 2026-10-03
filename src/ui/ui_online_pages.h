@@ -44,7 +44,8 @@ bool linkButton(const char* key, float cx, float y, bool enabled = true);
 // Label / value line of the account page (label above, value under it).
 void infoLine(const std::string& label, const std::string& value, const gfx::Rect& col, float y, m::vec4 valueColor = theme::ivory);
 // Sign out everywhere (the account page, signed-in devices): the sign-in page tells the server's
-// answer when it comes, a refusal included (the other computers then stay signed in).
+// answer when it comes, a refusal included (the other computers then stay signed in); a failure
+// that keeps this computer's session goes back to the account page with it, to try again.
 void signOutEverywhere();
 
 // ---- ui_screens_account.cpp: helpers shared with the saved games (ui_library.cpp) ---------------

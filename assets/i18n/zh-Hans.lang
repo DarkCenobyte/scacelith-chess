@@ -575,6 +575,7 @@ online.account.signed_out = 你已退出登录。
 online.account.signed_out_all = 你已在所有电脑上退出登录。
 online.account.signing_out_all = 正在所有电脑上退出登录…
 online.account.sign_out_all_failed = 你的其他电脑可能仍处于登录状态：请重新登录，然后在“已登录的设备”中将其退出登录。{0}
+online.account.sign_out_all_retry = 你的其他电脑可能仍处于登录状态。请再次尝试“全部退出登录”。{0}
 online.account.ratings = 等级分
 online.account.col.tc = 用时
 online.account.col.rating = 等级分
@@ -730,6 +731,7 @@ online.err.server_busy = 服务器繁忙。请稍后重试。
 online.err.banned_until = 此账号已被暂停使用，直至 {0}。
 online.err.banned = 此账号已被暂停使用。
 online.err.invalid_credentials = 用户名或密码错误。
+online.err.invalid_credentials_pending = 用户名或密码错误。如果你刚刚创建账号，请先打开我们发送给你的链接。
 online.err.email_unverified = 你的邮箱地址尚未验证：请打开我们发送给你的链接。
 online.err.network = 无法连接到服务器。请检查你的网络连接和服务器地址。
 online.err.tls = 无法与服务器建立安全连接。
@@ -790,6 +792,7 @@ online.err.too_many_attempts_for = 错误尝试次数过多。请在 {0} 后重�
 online.err.same_email = 这已经是你的邮箱地址。
 online.err.not_found = 服务器上找不到。
 online.err.invalid_response = 无法读取服务器的响应。
+online.err.storage = 无法在这台电脑上保存会话。
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = 对局记录

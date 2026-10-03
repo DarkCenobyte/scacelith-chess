@@ -28,8 +28,8 @@
 //   - ServerEndpoint::wsPort defaults to 0 = the API port (one port for HTTPS and /ws, as on the
 //     official server); effectiveWsPort() resolves it. /api/v1/info's wsPort is informative only.
 //     TLS is always used unless insecureDev is set (and insecureDev is refused off loopback).
-//   - RetryCause, reconnectDelayMs() and clientPingIntervalMs() (additive): the reconnection and
-//     client Ping pacing rules as pure functions, so the tests can check them.
+//   - RetryCause, reconnectDelayMs(), ReconnectBackoff and clientPingIntervalMs() (additive): the
+//     reconnection and client Ping pacing rules, pure, so the tests can check them.
 //   - Protocol v2 (additive): sendGesture() and Event::Kind::OpponentGesture relay the live
 //     gestures of the two players (net/gesture.h), and OnlineGame::autoPress tells whether the
 //     robots press the clock by themselves in the game.
@@ -253,8 +253,8 @@ enum class RetryCause {
     Shutdown        // close 4008, a fatal Error{ShuttingDown} or a Notice{ServerShutdown} before the drop
 };
 
-// Delay before automatic reconnection attempt number `attempt` (0 = the first one since the last
-// Welcome). u is a uniform random number in [0, 1).
+// Delay before automatic reconnection attempt number `attempt` (0 = the first one, counted by
+// ReconnectBackoff below). u is a uniform random number in [0, 1).
 //   Failure     full jitter: uniform in [0.5 s, min(30 s, 2 s x 2^attempt)]
 //   ServerFull  uniform in [60 s, 120 s]
 //   Shutdown    attempt 0: uniform in [5 s, 35 s], which spreads the reconnection wave of a
@@ -270,6 +270,25 @@ enum class RetryCause {
 // most), even during a game (the 8 s bound above does not apply then). User-initiated
 // connections (connect(), a server change) never wait for any of this.
 uint32_t reconnectDelayMs(int attempt, RetryCause cause, double u, bool gameInProgress, uint32_t retryAfterMs);
+
+// The attempt number of reconnectDelayMs() across connections. A connection that reached Welcome
+// sets it back to 0 only once it has stayed up for kStableMs: a server that closes right after
+// Welcome (a crash loop, a refusal of every connection) is tried again with growing delays, not
+// every 0.5 s to 2 s for ever. The spread first attempt of a shutdown stays apart from the count:
+// it follows any connection that reached Welcome. Times are steady-clock milliseconds (the tests
+// give their own).
+class ReconnectBackoff {
+public:
+    static constexpr double kStableMs = 60000.0;
+    void reset() { attempt_ = 0; welcomedAtMs_ = -1.0; }   // connect(): from the shortest delay
+    void welcomed(double nowMs) { welcomedAtMs_ = nowMs; }  // the connection reached Welcome
+    // The delay before the next attempt, after a failed attempt or a lost connection at nowMs.
+    uint32_t next(double nowMs, RetryCause cause, double u, bool gameInProgress, uint32_t retryAfterMs);
+
+private:
+    int attempt_ = 0;
+    double welcomedAtMs_ = -1.0;   // Welcome of the connection lost next; -1 = none since the last next()
+};
 
 // Interval of the client's own Ping for Welcome.clientPingMs (the server's
 // CLIENT_PING_INTERVAL_MS): 0 (not announced) = 10 s, otherwise clamped to 1 s .. 60 s.

@@ -2321,6 +2321,56 @@ TEST(net_reconnect_delay_policy) {
     }
 }
 
+// The attempt count across connections (a fake clock in ms; u = 1, the top of each range). A server
+// that closes every connection soon after Welcome is tried again with growing delays, up to the
+// caps (30 s, 8 s during a game); only a connection that stayed up for a minute starts again from
+// the shortest. A shutdown keeps its spread first attempt after a connection that reached Welcome.
+TEST(net_reconnect_backoff_across_connections) {
+    using net::RetryCause;
+    net::ReconnectBackoff b;
+    double now = 5000.0;
+    auto shortConnection = [&](RetryCause why, bool inGame) {
+        b.welcomed(now);
+        now += 3000.0;                                 // closed 3 s after Welcome
+        uint32_t ms = b.next(now, why, 1.0, inGame, 0);
+        now += ms;
+        return ms;
+    };
+    for (uint32_t want : {2000u, 4000u, 8000u, 16000u, 30000u, 30000u})
+        CHECK_EQ(shortConnection(RetryCause::Failure, false), want);
+    // Up for a minute: from the shortest again; failed attempts (no Welcome) then grow it.
+    b.welcomed(now);
+    now += 60000.0;
+    CHECK_EQ(b.next(now, RetryCause::Failure, 1.0, false, 0), 2000u);
+    CHECK_EQ(b.next(now += 2000.0, RetryCause::Failure, 1.0, false, 0), 4000u);
+    // 59.9 s is not long enough.
+    b.welcomed(now);
+    now += 59900.0;
+    CHECK_EQ(b.next(now, RetryCause::Failure, 1.0, false, 0), 8000u);
+    // A shutdown after a short connection: the spread first attempt (5 s to 35 s, 1 s to 8 s in
+    // game) whatever the count, which goes on growing for the attempts after it.
+    b.welcomed(now);
+    CHECK_EQ(b.next(now += 3000.0, RetryCause::Shutdown, 0.0, false, 0), 5000u);
+    CHECK_EQ(b.next(now += 5000.0, RetryCause::Shutdown, 1.0, false, 0), 30000u);   // no Welcome since: as a failure
+    b.welcomed(now);
+    CHECK_EQ(b.next(now += 3000.0, RetryCause::Shutdown, 1.0, true, 0), 8000u);
+    CHECK_EQ(b.next(now += 8000.0, RetryCause::Failure, 0.0, true, 0), 500u);
+    // During a game: 8 s at most between attempts, still growing up to it.
+    b.reset();
+    for (uint32_t want : {2000u, 4000u, 8000u, 8000u})
+        CHECK_EQ(shortConnection(RetryCause::Failure, true), want);
+    // A full server waits its minute whatever the count; a Retry-After still applies.
+    CHECK_EQ(shortConnection(RetryCause::ServerFull, false), 120000u);
+    b.welcomed(now);
+    CHECK_EQ(b.next(now += 61000.0, RetryCause::Failure, 0.0, false, 20000), 20000u);
+    // connect() (asked by the player): from the shortest at once.
+    shortConnection(RetryCause::Failure, false);
+    b.reset();
+    CHECK_EQ(b.next(now, RetryCause::Failure, 1.0, false, 0), 2000u);
+    b.reset();
+    CHECK_EQ(b.next(now, RetryCause::Shutdown, 0.0, false, 0), 5000u);   // a shutdown at the first attempt: spread
+}
+
 TEST(net_client_ping_interval) {
     CHECK_EQ(net::clientPingIntervalMs(0), 10000u);            // not announced: the default
     CHECK_EQ(net::clientPingIntervalMs(1), 1000u);
@@ -5334,6 +5384,20 @@ TEST(net_credentials_origin_move) {
     net::sys::removeFile(path);
 }
 
+// WinHTTP's pin check at each SENDING_REQUEST (transport_win32.cpp): a notification that comes
+// before the TLS connection exists (through a proxy whose CONNECT is still to be made) is left for
+// the next one; anything else without the pinned leaf aborts the request.
+TEST(net_pin_check_at_send) {
+    const std::string pin(64, 'a'), other(64, 'b');
+    CHECK(net::pinCheckAtSend(pin, pin, false) == net::PinCheck::Match);
+    CHECK(net::pinCheckAtSend(pin, other, false) == net::PinCheck::Mismatch);
+    CHECK(net::pinCheckAtSend(pin, pin.substr(0, 63), false) == net::PinCheck::Mismatch);
+    CHECK(net::pinCheckAtSend(pin, "", false) == net::PinCheck::Mismatch);     // no certificate: refused
+    CHECK(net::pinCheckAtSend(pin, "", true) == net::PinCheck::Later);         // no TLS yet: the next one decides
+    CHECK(net::pinCheckAtSend(pin, other, true) == net::PinCheck::Mismatch);   // a certificate read decides
+    CHECK(net::pinCheckAtSend(pin, pin, true) == net::PinCheck::Match);
+}
+
 // TLS certificate rules against a real TLS server, opt-in because the test cannot start one on
 // every platform by itself. Needs a self-signed certificate for localhost and 127.0.0.1:
 //   openssl req -x509 -newkey ec -pkeyopt ec_paramgen_curve:P-256 -nodes -days 2 -subj /CN=localhost
@@ -5409,6 +5473,61 @@ TEST(net_tls_pinning_manual) {
     CHECK(net::wsConnect(w, err, status) == nullptr);
     std::fprintf(stderr, "  wss pinned -> error '%s' status %d\n", err.c_str(), status);
     CHECK_EQ(err, std::string("http_200"));
+}
+
+// A pinned request that carries secrets (httpRequest(): on Windows a "HEAD /" probe without them
+// first, transport_win32.cpp) against a TLS server that misbehaves after the probe, opt-in like the
+// test above: the same certificate, plus a second self-signed one for localhost made the same way.
+// The server listens on 127.0.0.1:PORT, answers HEAD / (any status) and POST /api/v1/auth/login
+// (200, body {"ok":true} with its Content-Length), and logs each TLS connection with its
+// certificate and each request on it (request line, Authorization header, body). Started in one
+// of these behaviours, then:
+//   SCACELITH_NET_TLS_POST_TEST=PORT:<hex SHA-256 of the first certificate>:<behaviour>
+//       ./scacelith_tests net_tls_pinned_post
+//   keepalive  keeps every connection open. 200. Under Wine the log shows the HEAD and the POST on
+//              one connection (the probe's verified one, which WinHTTP's pool hands over).
+//   headclose  closes the connection of its first HEAD once it is answered, keeps the later ones.
+//              200. Under Wine: a second connection with no request on it (the client refuses its
+//              unknown issuer), then a HEAD and the POST on a third one.
+//   switch     closes the connection of its first HEAD once it is answered and presents the second
+//              certificate on every later connection. "certificate" (Wine: "tls" or
+//              "certificate"). The log must hold no POST, no Authorization header and no body on a
+//              connection with the second certificate (a HEAD may reach it under Wine).
+// Elsewhere the pin is checked in the handshake, before anything is sent: keepalive only.
+TEST(net_tls_pinned_post_manual) {
+    const char* env = std::getenv("SCACELITH_NET_TLS_POST_TEST");
+    if (!env) SKIP("SCACELITH_NET_TLS_POST_TEST not set");
+    REQUIRE(net::transportAvailable());  // asked for, so it must not pass without running
+    const std::string spec = env;
+    const size_t a = spec.find(':'), b = a == std::string::npos ? a : spec.find(':', a + 1);
+    REQUIRE(b != std::string::npos);
+    const uint16_t port = uint16_t(std::atoi(spec.substr(0, a).c_str()));
+    const std::string pin = spec.substr(a + 1, b - a - 1), mode = spec.substr(b + 1);
+    REQUIRE(mode == "keepalive" || mode == "headclose" || mode == "switch");
+#ifndef _WIN32
+    if (mode != "keepalive") SKIP("no probe here: the pin is checked in the handshake");
+#endif
+    net::HttpRequest r;
+    r.method = "POST";
+    r.host = "localhost";
+    r.port = port;
+    r.pinnedSha256 = pin;
+    r.path = "/api/v1/auth/login";
+    r.headers.emplace_back("Authorization", "Bearer tls-post-secret");
+    r.body = "{\"login\":\"tls-post\",\"password\":\"tls-post-password\"}";
+    r.timeoutMs = 3000;
+    net::HttpResponse resp;
+    net::httpRequest(r, resp);
+    std::fprintf(stderr, "  %s: POST -> status %d error '%s' (%s)\n", mode.c_str(), resp.status, resp.error.c_str(), resp.detail.c_str());
+    if (mode == "switch") {
+        CHECK_EQ(resp.status, 0);
+        CHECK(resp.error == "certificate" || (runningUnderWine() && resp.error == "tls"));
+        std::fprintf(stderr, "  the server log must hold nothing of the POST on a connection with the second certificate\n");
+    } else {
+        CHECK_EQ(resp.status, 200);
+        CHECK(resp.error.empty());
+        CHECK_EQ(resp.body, std::string("{\"ok\":true}"));
+    }
 }
 
 // =============================================================================================

@@ -299,7 +299,10 @@ same as against Stockfish, with these differences:
   client comes back by itself after a random delay, longer when the server is full or restarting
   but 8 s at most during a game unless the server asked to wait longer (a `Retry-After`): the
   server keeps the game for the reconnection grace, at least 15 s by default and 90 s after a
-  restart (`dedicated-server/docs/PROTOCOL.md`, lifecycle step 6). After a restart the server
+  restart (`dedicated-server/docs/PROTOCOL.md`, lifecycle step 6). The delay grows with each
+  attempt and starts again from the shortest only after a connection that stayed up for a
+  minute, so a server that closes right after letting the player in is not called again every
+  second or two. After a restart the server
   also holds the clock of the side to move until that player is back, 20 s at most by default:
   its snapshots then name no running clock, so both clocks stay frozen, and the snapshot that
   follows when the held clock starts (sent to the opponent too) sets them running again. The

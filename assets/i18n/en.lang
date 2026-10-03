@@ -587,6 +587,7 @@ online.account.signed_out = You are signed out.
 online.account.signed_out_all = You are signed out on every computer.
 online.account.signing_out_all = Signing out every computer…
 online.account.sign_out_all_failed = Your other computers may still be signed in: sign in again, then sign them out from Signed-in devices. {0}
+online.account.sign_out_all_retry = Your other computers may still be signed in. Try Sign out everywhere again. {0}
 online.account.ratings = RATINGS
 online.account.col.tc = TIME CONTROL
 online.account.col.rating = RATING
@@ -742,6 +743,7 @@ online.err.server_busy = The server is busy. Try again in a moment.
 online.err.banned_until = This account is suspended until {0}.
 online.err.banned = This account is suspended.
 online.err.invalid_credentials = Wrong user name or password.
+online.err.invalid_credentials_pending = Wrong user name or password. If you have just signed up, open the link we sent you first.
 online.err.email_unverified = Your e-mail address is not verified yet: open the link we sent you.
 online.err.network = The server cannot be reached. Check your connection and the server address.
 online.err.tls = A secure connection to the server could not be set up.
@@ -802,6 +804,7 @@ online.err.too_many_attempts_for = Too many wrong attempts. Try again in {0}.
 online.err.same_email = This is already your e-mail address.
 online.err.not_found = Not found on the server.
 online.err.invalid_response = The server's answer could not be read.
+online.err.storage = The session could not be saved on this computer.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = GAME HISTORY

@@ -342,11 +342,20 @@ void openAccountPage(Sub sub) {
 }
 
 // ---- Page chrome -------------------------------------------------------------------------------------
-// Error (red) or note (ivory) under a form, centered; returns the height used.
-float messageLine(const Rect& p, float y) {
-    if (!O.error.empty()) return paragraph(O.error, p, y, p.w - 200.0f, danger, kSmall + 1.0f);
-    if (!O.note.empty()) return paragraph(O.note, p, y, p.w - 200.0f, ivoryDim, kSmall + 1.0f);
-    return 0.0f;
+// Error (red) or note (ivory) under a form, centered; returns the height used. oneLine: where
+// there is room for one line only, a longer message is made smaller (to 70 % at most).
+float messageLine(const Rect& p, float y, bool oneLine = false) {
+    const std::string& s = !O.error.empty() ? O.error : O.note;
+    if (s.empty()) return 0.0f;
+    const vec4 color = !O.error.empty() ? danger : ivoryDim;
+    float size = kSmall + 1.0f;
+    if (oneLine) {
+        TextStyle st = style(font::FACE_ITALIC, size, color);
+        for (const float least = size * 0.7f; st.size > least && gfx::wrapLineCount(s, p.w - 200.0f, st) > 1;)
+            st.size = std::max(least, st.size - 0.5f);
+        size = st.size;
+    }
+    return paragraph(s, p, y, p.w - 200.0f, color, size);
 }
 
 // A large choice: title and a one-line description (Play page, direct match).
@@ -451,14 +460,14 @@ void pumpResults() {
                        : (O.sub == Sub::Mfa && e.error == "invalid_code") ? Sub::Mfa
                                                                            : Sub::SignIn;
             if (O.sub != back) setSub(back);
-            O.error = game::onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs);
             // After a registration from this screen the account exists only once the mailed link is
-            // used; before that the server answers as for a wrong password, so the e-mail can be
-            // sent again from here as well (when signing in to that account).
+            // used; before that the server answers as for a wrong password, so the text says to open
+            // the link first and the e-mail can be sent again from here as well (when signing in to
+            // that account).
             const std::string who = trim(O.user);
-            O.offerResend = e.error == "email_unverified" ||
-                            (e.error == "invalid_credentials" && !O.resendEmail.empty() &&
-                             (sameAscii(who, O.resendUser) || sameAscii(who, trim(O.resendEmail))));
+            const bool registered = !O.resendEmail.empty() && (sameAscii(who, O.resendUser) || sameAscii(who, trim(O.resendEmail)));
+            O.error = game::signInErrorText(e, registered);
+            O.offerResend = e.error == "email_unverified" || (e.error == "invalid_credentials" && registered);
         } else {
             notify(game::onlineErrorText(e.error, e.retryAfterSec, e.account.bannedUntilMs), 4.0f);
         }
@@ -547,16 +556,24 @@ void pumpResults() {
     }
     if (s.take(Kind::AccountResult, e) && !e.ok && e.error != "unauthorized" && O.sub == Sub::Account)
         O.error = game::onlineErrorText(e.error, e.retryAfterSec);
-    // Sign out everywhere: done only when the server says so (this computer is signed out anyway).
+    // Sign out everywhere: done only when the server says so. A failure short of a 401 keeps this
+    // computer's saved session, to try again: on the sign-in page (no other sign-in asked since) it
+    // is resumed at once and the failure told on the account page, its button at hand.
     if (s.take(Kind::LogoutResult, e) && O.everywhere) {
         O.everywhere = false;
-        const std::string text = e.ok ? T("online.account.signed_out_all")
-                                      : i18n::trf("online.account.sign_out_all_failed", {game::onlineErrorText(e.error, e.retryAfterSec)});
+        const std::string text = game::signOutEverywhereText(e);
         if (O.sub != Sub::SignIn) {
             notify(text, 6.0f);
         } else if (e.ok) {
             O.note = text;
         } else {
+            if (e.error != "unauthorized" && !s.busy(Kind::LoginResult)) {
+                s.resume();
+                if (s.signedIn()) {
+                    clearSecrets();
+                    setSub(Sub::Account);
+                }
+            }
             O.note.clear();
             O.error = text;
         }
@@ -1015,7 +1032,7 @@ void pageAccount(float t) {
     float noteY = ty + rowH * float(cats.size()) + 38.0f;
     gfx::textWrapped(T("online.account.provisional"), im::flipX(tcol, rx), noteY, col2W, ns, 26.0f);
     float my = footerY(p) - 50.0f;
-    if (!O.error.empty() || !O.note.empty()) messageLine(p, my);
+    if (!O.error.empty() || !O.note.empty()) messageLine(p, my, true);   // between the ratings' note and the footer
     footerRule(p);
     bool back = backButton(p);
     // The game history, from the ratings (end side).

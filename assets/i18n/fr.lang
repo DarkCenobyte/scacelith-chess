@@ -576,6 +576,7 @@ online.account.signed_out = Vous êtes déconnecté.
 online.account.signed_out_all = Vous êtes déconnecté sur tous les ordinateurs.
 online.account.signing_out_all = Déconnexion de tous les ordinateurs…
 online.account.sign_out_all_failed = Vos autres ordinateurs sont peut-être encore connectés : reconnectez-vous, puis déconnectez-les depuis Appareils connectés. {0}
+online.account.sign_out_all_retry = Vos autres ordinateurs sont peut-être encore connectés. Réessayez « Se déconnecter partout ». {0}
 online.account.ratings = CLASSEMENTS
 online.account.col.tc = CADENCE
 online.account.col.rating = CLASSEMENT
@@ -731,6 +732,7 @@ online.err.server_busy = Le serveur est occupé. Réessayez dans un instant.
 online.err.banned_until = Ce compte est suspendu jusqu’à {0}.
 online.err.banned = Ce compte est suspendu.
 online.err.invalid_credentials = Nom d’utilisateur ou mot de passe incorrect.
+online.err.invalid_credentials_pending = Nom d’utilisateur ou mot de passe incorrect. Si vous venez de créer votre compte, ouvrez d’abord le lien que nous vous avons envoyé.
 online.err.email_unverified = Votre adresse e-mail n’est pas encore vérifiée : ouvrez le lien que nous vous avons envoyé.
 online.err.network = Le serveur est injoignable. Vérifiez votre connexion et l’adresse du serveur.
 online.err.tls = Impossible d’établir une connexion sécurisée avec le serveur.
@@ -791,6 +793,7 @@ online.err.too_many_attempts_for = Trop de tentatives erronées. Réessayez dans
 online.err.same_email = C’est déjà votre adresse e-mail.
 online.err.not_found = Introuvable sur le serveur.
 online.err.invalid_response = La réponse du serveur est illisible.
+online.err.storage = La session n’a pas pu être enregistrée sur cet ordinateur.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = HISTORIQUE DES PARTIES

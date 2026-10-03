@@ -575,6 +575,7 @@ online.account.signed_out = 你已登出。
 online.account.signed_out_all = 你已在所有電腦上登出。
 online.account.signing_out_all = 正在所有電腦上登出…
 online.account.sign_out_all_failed = 你的其他電腦可能仍處於登入狀態：請重新登入，然後在「已登入的裝置」中將其登出。{0}
+online.account.sign_out_all_retry = 你的其他電腦可能仍處於登入狀態。請再次嘗試「全部登出」。{0}
 online.account.ratings = 等級分
 online.account.col.tc = 時限
 online.account.col.rating = 等級分
@@ -730,6 +731,7 @@ online.err.server_busy = 伺服器忙碌中。請稍後再試一次。
 online.err.banned_until = 此帳號已被停權，直到 {0}。
 online.err.banned = 此帳號已被停權。
 online.err.invalid_credentials = 使用者名稱或密碼錯誤。
+online.err.invalid_credentials_pending = 使用者名稱或密碼錯誤。如果你剛剛建立帳號，請先開啟我們寄給你的連結。
 online.err.email_unverified = 你的電子郵件地址尚未驗證：請開啟我們寄給你的連結。
 online.err.network = 無法連線到伺服器。請檢查你的網路連線與伺服器位址。
 online.err.tls = 無法與伺服器建立安全連線。
@@ -790,6 +792,7 @@ online.err.too_many_attempts_for = 錯誤嘗試次數過多。請在 {0} 後再�
 online.err.same_email = 這已經是你的電子郵件地址。
 online.err.not_found = 伺服器上找不到。
 online.err.invalid_response = 無法讀取伺服器的回應。
+online.err.storage = 無法在這台電腦上儲存工作階段。
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = 對局紀錄

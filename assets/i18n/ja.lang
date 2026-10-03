@@ -576,6 +576,7 @@ online.account.signed_out = ログアウトしました。
 online.account.signed_out_all = すべてのコンピューターでログアウトしました。
 online.account.signing_out_all = すべてのコンピューターでログアウトしています…
 online.account.sign_out_all_failed = ほかのコンピューターはまだログインしたままの可能性があります。もう一度ログインし、「ログイン中のデバイス」からログアウトさせてください。{0}
+online.account.sign_out_all_retry = ほかのコンピューターはまだログインしたままの可能性があります。もう一度「すべてログアウト」をお試しください。{0}
 online.account.ratings = レーティング
 online.account.col.tc = 持ち時間
 online.account.col.rating = レーティング
@@ -731,6 +732,7 @@ online.err.server_busy = サーバーが混み合っています。しばらく�
 online.err.banned_until = このアカウントは{0}まで利用停止中です。
 online.err.banned = このアカウントは利用停止中です。
 online.err.invalid_credentials = ユーザー名またはパスワードが違います。
+online.err.invalid_credentials_pending = ユーザー名またはパスワードが違います。アカウントを作成したばかりの場合は、先にお送りしたリンクを開いてください。
 online.err.email_unverified = メールアドレスがまだ確認されていません。お送りしたリンクを開いてください。
 online.err.network = サーバーに接続できません。インターネット接続とサーバーのアドレスを確認してください。
 online.err.tls = サーバーとの安全な接続を確立できませんでした。
@@ -791,6 +793,7 @@ online.err.too_many_attempts_for = 失敗した試行が多すぎます。{0}後
 online.err.same_email = すでにこのメールアドレスを使用しています。
 online.err.not_found = サーバー上に見つかりません。
 online.err.invalid_response = サーバーの応答を読み取れませんでした。
+online.err.storage = このコンピューターにセッションを保存できませんでした。
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = 対局履歴

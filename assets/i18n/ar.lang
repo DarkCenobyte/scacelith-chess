@@ -580,6 +580,7 @@ online.account.signed_out = لقد سجّلت الخروج.
 online.account.signed_out_all = لقد سجّلت الخروج من كل الحواسيب.
 online.account.signing_out_all = جارٍ تسجيل الخروج من كل الحواسيب…
 online.account.sign_out_all_failed = قد تظل حواسيبك الأخرى مسجَّلة الدخول: سجّل الدخول من جديد، ثم سجّل خروجها من «الأجهزة المسجَّل الدخول منها». {0}
+online.account.sign_out_all_retry = قد تظل حواسيبك الأخرى مسجَّلة الدخول. حاول «الخروج من كل الأجهزة» مجددًا. {0}
 online.account.ratings = التصنيفات
 online.account.col.tc = نظام الوقت
 online.account.col.rating = التصنيف
@@ -735,6 +736,7 @@ online.err.server_busy = الخادم مشغول. حاول مجددًا بعد �
 online.err.banned_until = هذا الحساب موقوف حتى {0}.
 online.err.banned = هذا الحساب موقوف.
 online.err.invalid_credentials = اسم المستخدم أو كلمة المرور غير صحيحة.
+online.err.invalid_credentials_pending = اسم المستخدم أو كلمة المرور غير صحيحة. إن كنت قد أنشأت حسابك للتو، فافتح أولًا الرابط الذي أرسلناه إليك.
 online.err.email_unverified = لم يُؤكَّد عنوان بريدك الإلكتروني بعد: افتح الرابط الذي أرسلناه إليك.
 online.err.network = تعذّر الوصول إلى الخادم. تحقّق من اتصالك ومن عنوان الخادم.
 online.err.tls = تعذّر إنشاء اتصال آمن بالخادم.
@@ -795,6 +797,7 @@ online.err.too_many_attempts_for = محاولات خاطئة كثيرة جدًا
 online.err.same_email = هذا هو عنوان بريدك الإلكتروني الحالي.
 online.err.not_found = غير موجود على الخادم.
 online.err.invalid_response = تعذّرت قراءة ردّ الخادم.
+online.err.storage = تعذّر حفظ الجلسة على هذا الحاسوب.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = سجل المباريات

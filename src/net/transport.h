@@ -155,6 +155,16 @@ protected:
 // "http_<status>" when the server answered without upgrading, or "subprotocol".
 std::unique_ptr<WebSocket> wsConnect(const WsParams& p, std::string& error, int& httpStatus, CancelToken* cancel = nullptr);
 
+// The pin check of a WinHTTP request at each SENDING_REQUEST notification (transport_win32.cpp),
+// here so that the tests reach it on every platform. leaf: the hex SHA-256 of the server's
+// certificate, "" when it could not be read; noTlsYet: the request has no TLS connection yet
+// (ERROR_WINHTTP_INCORRECT_HANDLE_STATE: through a proxy whose CONNECT is still to be made), which
+// leaves the decision to the next notification, sent once the connection through the proxy is
+// made (as .NET's WinHttpHandler does). Fail-closed otherwise: no leaf, or another one, is a
+// mismatch, and the check once the answer has arrived still needs the pinned leaf.
+enum class PinCheck { Later, Match, Mismatch };
+PinCheck pinCheckAtSend(const std::string& pin, const std::string& leaf, bool noTlsYet);
+
 bool transportAvailable();                    // false when the WinHTTP session or the OpenSSL context fails
 bool isLoopbackHost(const std::string& host); // localhost, 127.0.0.1, ::1 (any case)
 bool isIpLiteral(const std::string& host);
