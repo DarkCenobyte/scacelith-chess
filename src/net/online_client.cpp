@@ -1128,8 +1128,8 @@ struct OnlineClient::Impl {
         p.maxMessageBytes = 256 * 1024;
         p.onActivity = [this] { wakeRt(); };
         std::string err;
-        int httpStatus = 0;
-        std::unique_ptr<WebSocket> ws = wsConnect(p, err, httpStatus, &rtCancel);
+        WsAnswer answer;
+        std::unique_ptr<WebSocket> ws = wsConnect(p, err, answer, &rtCancel);
         if (gen != connectGen.load() || stopFlag.load()) {
             if (ws) ws->close(1001);
             return;
@@ -1138,8 +1138,13 @@ struct OnlineClient::Impl {
             LOGW("net: websocket %s:%u failed: %s", p.host.c_str(), p.port, err.c_str());
             // A 4xx other than 429 (404, 426...) is this server refusing the request as made. A 5xx
             // is a server (or its reverse proxy: 502, 504) that cannot answer now: retried like a
-            // network failure, with the same /info answer.
+            // network failure, with the same /info answer. A 429 (too many connections or requests
+            // from this address) or a 503 (full, draining) waits at least its Retry-After.
+            const int httpStatus = answer.status;
             const bool refused = httpStatus >= 400 && httpStatus < 500 && httpStatus != 429;
+            const bool busy = httpStatus == 429 || httpStatus == 503;
+            const long retryAfterSec = busy ? std::strtol(answer.retryAfter.c_str(), nullptr, 10) : 0;
+            const uint32_t retryAfterMs = uint32_t(std::clamp(retryAfterSec, 0L, 600L)) * 1000u;
             if (err == "certificate" || err == "insecure" || err == "unavailable") {
                 stopWanting(ConnState::Offline, err);
             } else if (reused && (err == "subprotocol" || refused)) {
@@ -1153,9 +1158,9 @@ struct OnlineClient::Impl {
                 // upgrades with 503): later ones mean that the server came back full.
                 const bool restart = rt.restarting;
                 rt.restarting = false;
-                scheduleRetry(restart ? RetryCause::Failure : RetryCause::ServerFull);
+                scheduleRetry(restart ? RetryCause::Failure : RetryCause::ServerFull, retryAfterMs);
             } else {
-                scheduleRetry(RetryCause::Failure);
+                scheduleRetry(RetryCause::Failure, retryAfterMs);
             }
             return;
         }

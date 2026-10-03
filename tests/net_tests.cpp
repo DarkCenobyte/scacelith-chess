@@ -1344,9 +1344,10 @@ TEST(net_transport_refuses_insecure) {
     p.host = "10.1.2.3";
     p.tls = false;
     std::string err;
-    int status = 0;
-    CHECK(net::wsConnect(p, err, status) == nullptr);
+    net::WsAnswer answer;
+    CHECK(net::wsConnect(p, err, answer) == nullptr);
     CHECK_EQ(err, expect);
+    CHECK_EQ(answer.status, 0);
     // A cancelled token aborts before anything happens.
     net::CancelToken tok;
     tok.cancel();
@@ -1387,9 +1388,9 @@ TEST(net_transport_silent_server_times_out) {
     p.subprotocol = pr::kWsSubprotocol;
     p.timeoutMs = 1000;
     std::string error;
-    int status = 0;
+    net::WsAnswer answer;
     t0 = std::chrono::steady_clock::now();
-    std::unique_ptr<net::WebSocket> ws = net::wsConnect(p, error, status, nullptr);
+    std::unique_ptr<net::WebSocket> ws = net::wsConnect(p, error, answer, nullptr);
     ms = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
     std::fprintf(stderr, "  upgrade: %s after %.0f ms\n", error.c_str(), ms);
     CHECK(!ws);
@@ -1603,6 +1604,7 @@ public:
     std::atomic<int> revokeStatus{0};               // != 0: DELETE /api/v1/auth/sessions/42 (this session) answers it
     std::atomic<int> infos{0}, upgrades{0};         // GET /api/v1/info, WebSocket upgrade requests
     std::atomic<int> upgradeStatus{0};              // != 0: upgrades are refused with this HTTP status
+    std::atomic<int> upgradeRetryAfter{0};          // != 0: refused upgrades carry Retry-After: <n>
     std::atomic<uint32_t> clientPingMs{0};          // Welcome.clientPingMs
     std::atomic<uint32_t> heartbeatMs{15000};       // Welcome.heartbeatMs (no S_Ping follows the first one)
     std::atomic<bool> answerPings{true};            // false: C_Ping gets no S_Pong
@@ -1803,9 +1805,9 @@ private:
         sendFrame(s, 0x2, b.data(), b.size());
     }
 
-    void respond(Sock s, int status, const std::string& body) {
+    void respond(Sock s, int status, const std::string& body, const std::string& headers = std::string()) {
         std::string r = "HTTP/1.1 " + std::to_string(status) + " X\r\nContent-Type: application/json\r\nContent-Length: " +
-                        std::to_string(body.size()) + "\r\nConnection: close\r\n\r\n" + body;
+                        std::to_string(body.size()) + "\r\nConnection: close\r\n" + headers + "\r\n" + body;
         sendAll(s, r.data(), r.size());
     }
 
@@ -1926,7 +1928,8 @@ private:
             }
         }
         if (step > 0) {
-            respond(s, step, "{\"error\":\"server_full\"}");
+            const int retryAfter = upgradeRetryAfter.load();
+            respond(s, step, "{\"error\":\"server_full\"}", retryAfter ? "Retry-After: " + std::to_string(retryAfter) + "\r\n" : "");
             return;
         }
         std::string key = h["sec-websocket-key"];
@@ -2746,6 +2749,23 @@ void restartServerChangedScenario(PacingRig& r) {
              "4008, another server id: no further attempt");
 }
 
+// 429 at the upgrade with Retry-After: 5 (too many connections from this address): the next
+// attempt waits at least those 5 s (where a failure's second attempt comes within 4 s), with the
+// same /info answer.
+void retryAfterScenario(PacingRig& r) {
+    int ups = r.srv.upgrades.load(), infos = r.srv.infos.load();
+    r.srv.upgradeRetryAfter.store(5);
+    r.srv.scriptUpgrades({429});
+    r.srv.dropWebSockets();
+    r.expect(r.until([&] { return r.srv.upgrades.load() == ups + 1; }, 4000), "429: tried");
+    auto t0 = std::chrono::steady_clock::now();
+    r.expect(r.until([&] { return r.srv.upgrades.load() == ups + 2; }, 10000), "429: tried again");
+    double gap = r.msSince(t0);
+    r.expect(gap >= 4900 && gap <= 9000, "429: after its Retry-After (" + std::to_string(int(gap)) + " ms)");
+    r.expect(r.stateIs(net::ConnState::Online, 5000), "429: online again");
+    r.expect(r.srv.infos.load() == infos, "429: the /info answer is kept (" + std::to_string(r.srv.infos.load() - infos) + " reads)");
+}
+
 // A reverse proxy answering 502 at the upgrade (its backend restarts): retried like a network
 // failure, with the same /info answer.
 void badGatewayScenario(PacingRig& r) {
@@ -2989,7 +3009,7 @@ void runRigs(PacingRig* rigs, const char* const* tags, void (*const* scenarios)(
 
 TEST(net_online_client_pacing) {
     if (!net::transportAvailable()) SKIP("transport unavailable");
-    constexpr int kRigs = 14;
+    constexpr int kRigs = 15;
     PacingRig rigs[kRigs];
     rigs[0].srv.clientPingMs.store(60000);
     rigs[5].srv.clientPingMs.store(3500);
@@ -2999,11 +3019,11 @@ TEST(net_online_client_pacing) {
     }
     const char* tags[kRigs] = {"pace-ping",     "pace-full",  "pace-shutdown", "pace-notice", "pace-ingame",
                                "pace-interval", "pace-probe", "pace-probe2",   "pace-502",    "pace-404",
-                               "pace-srvid",    "pace-cheat", "pace-restart-full", "pace-srvid-restart"};
+                               "pace-srvid",    "pace-cheat", "pace-restart-full", "pace-srvid-restart", "pace-429"};
     void (*scenarios[kRigs])(PacingRig&) = {
         pingPacingScenario,   serverFullScenario, shutdownScenario,        shutdownNoticeScenario, inGameScenario,
         pingIntervalScenario, probeScenario,      probeUnansweredScenario, badGatewayScenario,     notFoundScenario,
-        serverChangedScenario, cheatScenario,     restartFullScenario,     restartServerChangedScenario};
+        serverChangedScenario, cheatScenario,     restartFullScenario,     restartServerChangedScenario, retryAfterScenario};
     runRigs(rigs, tags, scenarios, kRigs);
 }
 
@@ -5702,15 +5722,15 @@ TEST(net_tls_pinning_manual) {
     w.subprotocol = pr::kWsSubprotocol;
     w.timeoutMs = 3000;
     std::string err;
-    int status = 0;
+    net::WsAnswer answer;
     w.path = "/ws?pin=" + wrong.substr(0, 8);
     w.pinnedSha256 = wrong;
-    CHECK(net::wsConnect(w, err, status) == nullptr);
+    CHECK(net::wsConnect(w, err, answer) == nullptr);
     CHECK(certError(err));
     w.path = "/ws?pin=" + pin.substr(0, 8);
     w.pinnedSha256 = pin;                             // TLS accepted; the test server does not upgrade
-    CHECK(net::wsConnect(w, err, status) == nullptr);
-    std::fprintf(stderr, "  wss pinned -> error '%s' status %d\n", err.c_str(), status);
+    CHECK(net::wsConnect(w, err, answer) == nullptr);
+    std::fprintf(stderr, "  wss pinned -> error '%s' status %d\n", err.c_str(), answer.status);
     CHECK_EQ(err, std::string("http_200"));
 }
 
