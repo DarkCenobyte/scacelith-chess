@@ -98,7 +98,7 @@ Rect beginPage(float t, float w, float h, const std::string& title) {
     Rect p(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 14.0f, w, h);
     gfx::pushAlpha(t);
     im::panel(p);
-    im::pageTitle(title, p.cx(), p.y + 80.0f);
+    im::pageTitle(title, p.cx(), p.y + 80.0f, p.w - 120.0f);   // inside the frame in every language
     return p;
 }
 void endPage() { gfx::popAlpha(); }
@@ -141,8 +141,8 @@ float footerY(const Rect& p) { return p.b() - 48.0f - kBtnH; }
 bool backButton(const Rect& p, const char* key, bool enabled) {
     return im::button(L(key), im::flip(p, Rect(p.x + 60.0f, footerY(p), kBtnW, kBtnH)), im::ButtonKind::Secondary, enabled);
 }
-bool primaryButton(const Rect& p, const char* key, bool enabled, bool busy) {
-    Rect r = im::flip(p, Rect(p.r() - 60.0f - kBtnW, footerY(p), kBtnW, kBtnH));
+bool primaryButton(const Rect& p, const char* key, bool enabled, bool busy, float width) {
+    Rect r = im::flip(p, Rect(p.r() - 60.0f - width, footerY(p), width, kBtnH));
     im::Id id = im::makeId(std::string("##") + key);
     bool hit = im::button(L(key), r, im::ButtonKind::Primary, enabled && !busy);
     if (busy) spinner(vec2(im::flipX(p, r.x - 34.0f), r.cy()));
@@ -819,7 +819,7 @@ void pageSsoName(float t) {
 // is added to it (then its code when two-factor is on).
 void pageSsoLink(float t) {
     game::OnlineSession& s = ses();
-    Rect p = beginPage(t, 940.0f, 640.0f, T("online.sso.link_title"));
+    Rect p = beginPage(t, 1040.0f, 640.0f, T("online.sso.link_title"));
     serverLine(p, false);
     im::pushId("ssolink");
     float y = p.y + 160.0f;
@@ -833,7 +833,8 @@ void pageSsoLink(float t) {
     bool notMine = linkButton("online.sso.not_mine", p.cx(), std::max(y, footerY(p) - 64.0f), !busy);
     footerRule(p);
     bool cancel = backButton(p, "common.cancel");
-    if (primaryButton(p, "online.sso.link_button", !O.password.empty(), busy)) {
+    // Wider than the others: "Add Google sign-in" is long in most languages.
+    if (primaryButton(p, "online.sso.link_button", !O.password.empty(), busy, 400.0f)) {
         O.error.clear();
         s.api().linkSso(O.password);
         s.expect(Kind::LoginResult);
