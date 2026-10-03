@@ -767,6 +767,7 @@ online.err.too_many_attempts_for = Забагато невдалих спроб.
 online.err.same_email = Це вже ваша адреса електронної пошти.
 online.err.not_found = Не знайдено на сервері.
 online.err.invalid_response = Не вдалося прочитати відповідь сервера.
+online.err.storage = Не вдалося зберегти сеанс на цьому комп’ютері.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = ІСТОРІЯ ПАРТІЙ

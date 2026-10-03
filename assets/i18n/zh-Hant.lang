@@ -766,6 +766,7 @@ online.err.too_many_attempts_for = 錯誤嘗試次數過多。請在 {0} 後再�
 online.err.same_email = 這已經是你的電子郵件地址。
 online.err.not_found = 伺服器上找不到。
 online.err.invalid_response = 無法讀取伺服器的回應。
+online.err.storage = 無法在這台電腦上儲存工作階段。
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = 對局紀錄

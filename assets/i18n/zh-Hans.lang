@@ -766,6 +766,7 @@ online.err.too_many_attempts_for = 错误尝试次数过多。请在 {0} 后重�
 online.err.same_email = 这已经是你的邮箱地址。
 online.err.not_found = 服务器上找不到。
 online.err.invalid_response = 无法读取服务器的响应。
+online.err.storage = 无法在这台电脑上保存会话。
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = 对局记录

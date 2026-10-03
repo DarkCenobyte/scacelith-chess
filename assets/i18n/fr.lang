@@ -767,6 +767,7 @@ online.err.too_many_attempts_for = Trop de tentatives erronées. Réessayez dans
 online.err.same_email = C’est déjà votre adresse e-mail.
 online.err.not_found = Introuvable sur le serveur.
 online.err.invalid_response = La réponse du serveur est illisible.
+online.err.storage = La session n’a pas pu être enregistrée sur cet ordinateur.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = HISTORIQUE DES PARTIES

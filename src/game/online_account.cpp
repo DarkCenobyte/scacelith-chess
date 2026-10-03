@@ -359,7 +359,7 @@ std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t 
                                   "unauthorized", "username_taken", "email_taken", "invalid_username", "invalid_email",
                                   "weak_password", "invalid_code", "expired", "registration_closed", "sso_cancelled",
                                   "server_error", "timeout", "offline", "invalid_password", "mfa_code_required",
-                                  "password_not_set", "same_email", "not_found", "invalid_response"};
+                                  "password_not_set", "same_email", "not_found", "invalid_response", "storage"};
     for (const char* k : known)
         if (code == k) return i18n::tr(std::string("online.err.") + k);
     return i18n::trf("online.err.other", {code});

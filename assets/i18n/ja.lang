@@ -767,6 +767,7 @@ online.err.too_many_attempts_for = 失敗した試行が多すぎます。{0}後
 online.err.same_email = すでにこのメールアドレスを使用しています。
 online.err.not_found = サーバー上に見つかりません。
 online.err.invalid_response = サーバーの応答を読み取れませんでした。
+online.err.storage = このコンピューターにセッションを保存できませんでした。
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = 対局履歴

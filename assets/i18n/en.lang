@@ -776,6 +776,7 @@ online.err.too_many_attempts_for = Too many wrong attempts. Try again in {0}.
 online.err.same_email = This is already your e-mail address.
 online.err.not_found = Not found on the server.
 online.err.invalid_response = The server's answer could not be read.
+online.err.storage = The session could not be saved on this computer.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = GAME HISTORY

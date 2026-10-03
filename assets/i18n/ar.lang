@@ -771,6 +771,7 @@ online.err.too_many_attempts_for = محاولات خاطئة كثيرة جدًا
 online.err.same_email = هذا هو عنوان بريدك الإلكتروني الحالي.
 online.err.not_found = غير موجود على الخادم.
 online.err.invalid_response = تعذّرت قراءة ردّ الخادم.
+online.err.storage = تعذّر حفظ الجلسة على هذا الحاسوب.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = سجل المباريات

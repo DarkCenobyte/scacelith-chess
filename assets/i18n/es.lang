@@ -766,6 +766,7 @@ online.err.too_many_attempts_for = Demasiados intentos fallidos. Vuelva a intent
 online.err.same_email = Esa ya es su dirección de correo.
 online.err.not_found = No se encuentra en el servidor.
 online.err.invalid_response = No se ha podido leer la respuesta del servidor.
+online.err.storage = No se ha podido guardar la sesión en este ordenador.
 
 # ---- Online: the account API's pages (src/ui/ui_screens_account.cpp) -------------------------------
 online.history.title = HISTORIAL DE PARTIDAS

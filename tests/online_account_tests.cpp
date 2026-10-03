@@ -6,9 +6,10 @@
 // and Replay on a game of the history (GameSaveState: a Replay given up with its page, the PGN of a
 // game left still saved as that game, also through a change of server, the saved games looked at
 // again on each visit), the result from the player's side, the moves of a server game with their
-// clocks, the time control labels and the file name of an account export; the GIFs of games:
-// their file names, the PGN date and time, the wait in words, and the GifSaver (the answer awaited
-// only, the file written never over another, the errors kept with their wait).
+// clocks, the time control labels, the file name of an account export and the HTTPS errors in
+// words; the GIFs of games: their file names, the PGN date and time, the wait in words, and the
+// GifSaver (the answer awaited only, the file written never over another, the errors kept with
+// their wait).
 #include "test.h"
 #include "alloc_fail.h"
 #include "game/game_archive.h"
@@ -723,6 +724,22 @@ TEST(account_local_time_text) {
     CHECK(archive::localTime(now, tm));
     std::snprintf(want, sizeof want, "%02d:%02d", tm.tm_hour, tm.tm_min);
     CHECK_EQ(localTimeText(double(now) * 1000.0), i18n::ltr(want));
+}
+
+// A sign-in whose session could not be saved here (net: its token not protected by DPAPI, error
+// "storage") is told as this computer's failure, not as the server's refusal (online.err.other).
+TEST(account_error_text_of_a_session_not_saved) {
+    for (const i18n::Language& lang : i18n::languages()) {
+        CHECK(i18n::setLanguage(lang.code));
+        const std::string text = onlineErrorText("storage");
+        CHECK(i18n::has("online.err.storage"));
+        CHECK_EQ(text, std::string(i18n::tr("online.err.storage")));
+        CHECK(text != i18n::trf("online.err.other", {"storage"}));
+        if (std::string(lang.code) != "en") CHECK(text != i18n::english("online.err.storage"));
+    }
+    CHECK(i18n::setLanguage("en"));
+    CHECK_EQ(onlineErrorText("storage"), std::string("The session could not be saved on this computer."));
+    CHECK_EQ(onlineErrorText("disk_full"), std::string("The server refused (disk_full)."));
 }
 
 TEST(account_export_file_name) {
