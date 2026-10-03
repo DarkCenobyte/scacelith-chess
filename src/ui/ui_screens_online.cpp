@@ -2,8 +2,10 @@
 //   - no server configured (a build without an official server): community server settings or
 //     a direct match;
 //   - sign in (user name or e-mail + password, Google), the two-factor code step, create an
-//     account (then "check your e-mail" with Resend), forgot password, Google first login
-//     (choose a user name);
+//     account (then "check your e-mail" with Resend), forgot password, Google sign-in (waiting
+//     for the browser, then finishing; first login: choose a user name; the address of an
+//     existing account: its password once, then its code when two-factor is on, to add Google
+//     sign-in to it);
 //   - account, in three columns: the account (user name, e-mail and an e-mail change waiting
 //     for its link, two-factor, Google, the "Accept challenges" preference, sign out here /
 //     everywhere), security and data (change password, change e-mail, two-factor setup (QR
