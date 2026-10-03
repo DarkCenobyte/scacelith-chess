@@ -1,7 +1,7 @@
 /build*/
 *.log
 Scacelith.ini
-Scacelith.credentials
+*.credentials
 /out/
 .vscode/
 .idea/
