@@ -360,10 +360,11 @@ AppraisalStats Appraisal::stats(const Game& g) const {
     if (!st.themeRecurring && st.criticalPly >= 0) st.theme = vs[size_t(st.criticalPly)].exType;
 
     // Best moment: brilliant > great > only move > best move winning 3+ points > streak >= 5 >
-    // good capture > the highest-accuracy phase.
+    // good capture > the highest-accuracy phase. A move that only hastens a mate against the human
+    // is never one (the review does not praise it either).
     auto firstHuman = [&](auto pred) {
         for (const PlyVerdict& v : vs)
-            if (v.human && pred(v)) return v.ply;
+            if (v.human && !v.hastensMate && pred(v)) return v.ply;
         return -1;
     };
     int ply;

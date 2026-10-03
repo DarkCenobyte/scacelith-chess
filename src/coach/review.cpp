@@ -531,6 +531,8 @@ Review Reviewer::review(const ReviewInput& in) {
     }
     v.mateAllowed = c.j.mate == MateChange::Created;
     v.mateMissed = c.j.mate == MateChange::Lost;
+    // Lost to a mate either way, but sooner after this move: Best by the numbers, never praised or highlighted.
+    v.hastensMate = mated(c.lp->score) && mated(c.l1->score) && mateMoves(c.lp->score) < mateMoves(c.l1->score);
 
     // ---- Lines replayed on the board ----
     std::vector<std::string> refutation(c.lp->pv.begin() + (c.lp->pv.empty() ? 0 : 1), c.lp->pv.end());
@@ -763,11 +765,8 @@ Review Reviewer::review(const ReviewInput& in) {
         const bool only = c.isBest && legal >= 2 && c.l2 && w1 - w2 >= 15.0 && w1 >= 25.0 && !(c.p0.inCheck() && legal <= 2);
         double lastW = -1.0;   // the human's W% after their previous judged move
         for (size_t i = humanW_.size(); i-- > 0 && lastW < 0.0;) lastW = humanW_[i];
-        // Lost to a mate either way, but sooner after this move: Best by the numbers, never praised.
-        const bool hastensMate =
-            mated(c.lp->score) && mated(c.l1->score) && mateMoves(c.lp->score) < mateMoves(c.l1->score);
         std::string key;
-        if (!c.p1.isCheckmate() && !recapture && !decided && !hastensMate && cls != MoveClass::Forced) {
+        if (!c.p1.isCheckmate() && !recapture && !decided && !v.hastensMate && cls != MoveClass::Forced) {
             if (!brilliantDone_ && c.j.delta < 2.0 && sacrifice && w1 <= 85.0 && c.j.wPlayed >= 50.0) {
                 key = level_ <= 2 ? "praise.sacrifice" : bandKey("praise.brilliant", level_);
                 brilliantDone_ = true;

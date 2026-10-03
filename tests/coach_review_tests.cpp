@@ -905,6 +905,33 @@ TEST(coach_review_no_praise_for_a_quicker_mate) {
     }
 }
 
+TEST(coach_review_quicker_mate_is_no_best_moment) {
+    // Nxb4 wins the rook and allows ...Qb1# at once, where Ne3 would have lasted a move longer: the
+    // appraisal does not make that capture the best moment either. At the same distance it does.
+    const char* fen = "6k1/5ppp/8/3N4/1r6/8/q5PP/7K w - - 0 1";
+    for (int bestMate : {-2, -1}) {
+        Game g = gameOf(fen, {"Nxb4"});
+        Reviewer rv;
+        rv.reset(1, White);
+        Appraisal ap;
+        ap.reset(1, White);
+        const ai::Analysis a0 = analysisOf({pvl(0, "d5e3 a2a1 e3f1 a1f1", bestMate), pvl(0, "d5b4 a2b1", -1)});
+        const Review r = reviewOf(rv, g, a0);
+        CHECK_EQ(r.verdict.cls, MoveClass::Best);
+        CHECK_EQ(r.verdict.hastensMate, bestMate == -2);
+        ap.add(r);
+        g.play(g.position().parseSAN("Qb1#"));
+        CHECK(g.isOver());
+        const AppraisalStats st = ap.stats(g);
+        CHECK_EQ(st.bestMoment == BestMoment::None, bestMate == -2);
+        CHECK_EQ(st.bestPly, bestMate == -2 ? -1 : 0);
+        bool highlight = false;
+        for (const std::string& k : keysOf(ap.script(g, AppraisalContext{})))
+            highlight = highlight || startsWith(k, "appraisal.best.");
+        CHECK_EQ(highlight, bestMate == -1);
+    }
+}
+
 TEST(coach_review_pin_defender_freed_by_the_capture) {
     // The knight on e4 is pinned by the rook, but ...Rxd6 leaves the e-file and Nxd6 takes back: the
     // pin does not stop it defending d6, so the coach must not say it does.
