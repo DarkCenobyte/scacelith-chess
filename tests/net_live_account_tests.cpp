@@ -1360,19 +1360,18 @@ TEST(net_live_account_server_settings) {
 }
 
 // ---- Google sign-in by loopback redirect (opt-in) -------------------------------------------------
-// dedicated-server/tools/live-cpp-check.js (part "sso") serves an in-process server on 127.0.0.1
-// in plain HTTP with a fake Google (its OIDC endpoints injected), e-mail confirmation on, and runs
+// dedicated-server/tools/live-cpp-check.js (part "sso") serves the account API in its process with
+// a fake Google (the provider's endpoints injected), e-mail confirmation on, and runs
 //   SCACELITH_NET_LIVE_SSO=host:port:<control port> ./scacelith_tests net_live_sso
+// over native TLS when it gives its certificate's SHA-256 in SCACELITH_NET_LIVE_SSO_PIN (the client
+// pins it), else in plain HTTP on the loopback (a development client: insecureDev).
 // The test is the game's browser: its opener keeps Google's URL; the control route
 // GET /fake-authorize?url=<authUrl>&sub=<Google subject>&email=<address> answers what Google
-// would (a 302 to the redirect URI with code, state and iss; or {"location": ...}), and the test
-// GETs that address on the game's 127.0.0.1 listener. The other control routes:
-// POST /seed-password-account {username, email, password, mfa} (its answer gives "totpSecret" when
-// mfa is on), GET /totp?secret= (a code the server has not seen used) and GET /links (the
-// sso_identities rows, [{userId, subject, email}...] or {"links": [...]}).
-// Written from the server instruction (36a, its point 13) before the server's part existed: the
-// sub and email parameters of /fake-authorize, "totpSecret" and the shape of /links are this
-// test's assumptions, to be aligned with the harness when it is written.
+// would (a 302 to the redirect URI with code, state and iss, its Location also as {"location"}),
+// and the test GETs that address on the game's 127.0.0.1 listener. The other control routes:
+// POST /seed-password-account {username, email, password, mfa}, GET /totp?username= (a code of an
+// account seeded with mfa that the server has not seen used) and GET /links (the Google links
+// stored: {"links": [{provider, subject, userId, username, email, createdAt}...]}).
 namespace {
 
 struct SsoBrowser {
@@ -1467,12 +1466,11 @@ net::Event googleSignIn(net::OnlineClient& c, SsoBrowser& b, const Control& ctl,
     return ev;
 }
 
-// The sso_identities rows of a Google subject.
+// The Google links stored for a Google subject.
 int linksOf(const Control& ctl, const std::string& sub) {
     const json::Value v = ctl.call("GET", "/links");
-    const json::Value& rows = v.isArray() ? v : v["links"];
     int n = 0;
-    for (const json::Value& r : rows.items()) n += r["subject"].asString() == sub;
+    for (const json::Value& r : v["links"].items()) n += r["subject"].asString() == sub;
     return n;
 }
 
@@ -1519,7 +1517,9 @@ TEST(net_live_sso) {
     ep.host = f[0];
     ep.apiPort = uint16_t(std::atoi(f[1].c_str()));
     ep.wsPort = 0;
-    ep.insecureDev = true;   // the harness serves plain HTTP on the loopback
+    const char* pin = std::getenv("SCACELITH_NET_LIVE_SSO_PIN");
+    if (pin && *pin) ep.pinnedSha256 = pin;
+    else ep.insecureDev = true;   // plain HTTP on the loopback
     SsoBrowser browser;
     auto opener = [&browser](const std::string& url) {
         std::lock_guard<std::mutex> lock(browser.mu);
@@ -1588,15 +1588,14 @@ TEST(net_live_sso) {
         Scenario s("link with two-factor: a wrong code links nothing, the right one links");
         const std::string sub = "live-sso-mfa-" + run, email = "sso.mfa." + run + "@example.org", user = "SsoMfa_" + run;
         const std::string pass = "Battery staple " + run;
-        const json::Value seeded = seedPasswordAccount(ctl, user, email, pass, true);
-        const std::string secret = seeded["totpSecret"].asString();
-        CHECK(!secret.empty());
+        seedPasswordAccount(ctl, user, email, pass, true);
         ev = googleSignIn(c, browser, ctl, sub, email);
         CHECK(ev.kind == Kind::SsoNeedsPassword);
         ev = ask(c, Kind::LoginResult, [&] { c.linkSso(pass); }, 60000);
         report("password", ev);
         CHECK(!ev.ok && ev.mfaRequired);
-        const std::string code = ctl.call("GET", "/totp?secret=" + queryEncode(secret))["code"].asString();
+        const std::string code = ctl.call("GET", "/totp?username=" + queryEncode(user))["code"].asString();
+        CHECK(!code.empty());
         const std::string wrong = code == "000000" ? "000001" : "000000";
         ev = ask(c, Kind::LoginResult, [&] { c.loginMfa(wrong); });
         report("wrong code", ev);
