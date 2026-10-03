@@ -74,4 +74,40 @@ Prebuilt Windows binaries. This branch only holds binaries; the source code is o
 - SHA-256 of the exe: `573090297946ea6d6282c0e263e8eb4b59c16d68ce54bb838209865f59acd7e3`
 - SHA-256 of the zip: `c80a2befb7eed7764c997cd37a33b97e13c97e61660c44a434f4097674cb323a`
 
+## windows/Scacelith-2026-10-02-compte.zip
+
+- Holds `Scacelith-2026-10-02-compte.exe` (135 MB, zipped to 96 MB).
+- Source: branch `claude/account-api-j0hobz` at commit `6f5485d` (pull request #7, merged into
+  `master` as `0f59ca2`).
+- Contents: everything above, plus an Account page in the game for an online server: game history
+  with filters, game details, PGN download, an animated GIF of a game made by the server, account
+  details, e-mail and password change, two-factor authentication on or off, data export and
+  account deletion. Servers are reached on port 443 by default (entries with the old port 44664
+  still work).
+- Windows x64, self-contained otherwise (Stockfish 19 in five builds and its NNUE network are
+  embedded; the coach's voice is downloaded by the game). Needs a GPU with OpenGL 4.6.
+- Cross-compiled with MinGW-w64 (Release); it has not been run on real Windows hardware by the
+  build.
+- SHA-256 of the exe: `6f91371723ab218c7bb57b35bfa615df8cf8579bb4d55cf58f4e25e7f781b417`
+- SHA-256 of the zip: `f35986976f7aec3e906839e2ec6bee2c0b3e5806214a102373417b873e32ec15`
+
+## windows/Scacelith-2026-10-03-qualite.zip
+
+- Holds `Scacelith-2026-10-03-qualite.exe` (132 MB, zipped to 95 MB).
+- Source: branch `claude/quality-pass-wzqsae` at commit `936a2fe` (pull request #8, not merged yet),
+  based on `master` at `0f59ca2` (pull request #7 merged).
+- Contents: everything above after a quality and optimisation pass over the game and the dedicated
+  server: faster loading, lighting baked from the loaded hall (sun shadows from the first frame),
+  a repaired Windows exception table, Google sign-in through a redirect to the game on 127.0.0.1,
+  safer settings saves, and many fixes listed in the pull request.
+- Protocol version 3: it plays online only on a server running this branch or later, and older
+  clients are refused by such a server. Two exes on either side of the change cannot play a
+  direct match.
+- Windows x64, self-contained otherwise (Stockfish 19 in five builds and its NNUE network are
+  embedded; the coach's voice is downloaded by the game). Needs a GPU with OpenGL 4.6.
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (718 tests); it has
+  not been run on real Windows hardware by the build.
+- SHA-256 of the exe: `0c184bac8b60922c745f21804f4a050b7d80e17a72c060a9dca5789afd242258`
+- SHA-256 of the zip: `9b9ffd2651c5d8ce10ff476c794e4ee788555dd22086b03e7eef59d184cf0369`
+
 Licence: GPL-3.0 (see `LICENSE` on `master`); the source of each build is the commit named above.
