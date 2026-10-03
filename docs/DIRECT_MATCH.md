@@ -4,8 +4,8 @@ A friendly game between two players by direct connection: no server, no account,
 One player **hosts** (the game opens a TCP port and asks the home router to forward it), the other
 **joins** with the host's address, port and a 12-character code. The host's game is the authority
 of the match, exactly like the dedicated server is for online games, and both sides speak the same
-protocol as online play inside an encrypted channel, so the 3D scene plays a direct match with the
-online game code.
+realtime protocol as online play (version 1, `dedicated-server/docs/PROTOCOL.md`) inside an
+encrypted channel, so the 3D scene plays a direct match with the online game code.
 
 Code: `src/net/direct_match.h` (API), `direct_match.cpp` (sessions and threads),
 `direct_authority.*` (the host's game rules), `direct_crypto.*` (codes, handshake, frames),
@@ -40,7 +40,7 @@ Dashes, spaces and letter case in the code do not matter; the code only uses
 | `refused` | nothing listens there: wrong address or port, or the host stopped |
 | `timeout` / `unreachable` | the port is not forwarded, a firewall drops it, or the address is wrong |
 | `wrong_code` | the host refused the code (or someone in the middle tried to impersonate it) |
-| `incompatible` | the other game speaks another protocol version: update both |
+| `incompatible` | the other game speaks another version of the channel or of the realtime protocol: update both |
 | `not_found` | the DNS name does not resolve |
 | `invalid_code` | the code is not 12 characters of the alphabet above |
 
@@ -149,20 +149,30 @@ The code is the only secret: it authenticates both players to each other and key
 
 | step | bytes |
 |---|---|
-| guest -> host `GuestHello` | `"SCDM"` \| version `1` \| nonce Ng (32 random bytes) \| P-256 public key Qg (65, uncompressed) |
-| host -> guest `HostHello` | `"SCDM"` \| `1` \| Nh \| Qh |
+| guest -> host `GuestHello` | `"SCDM"` \| version `2` \| nonce Ng (32 random bytes) \| P-256 public key Qg (65, uncompressed) |
+| host -> guest `HostHello` | `"SCDM"` \| `2` \| Nh \| Qh |
 | both | Z = ECDH X coordinate (32 bytes, big-endian); OKM = HKDF-SHA256(salt = Ng \|\| Nh, ikm = Z \|\| code (12 ASCII), info = `"scacelith direct match v1"`, 128 bytes) = K guest->host \| K host->guest \| K guest confirm \| K host confirm; TH = SHA-256(GuestHello \|\| HostHello) |
 | guest -> host `GuestConfirm` | AES-256-GCM(K guest confirm, nonce 0, aad `"SCDM guest confirm"`, TH): 48 bytes |
 | host | checks it (tag and TH, constant time); on failure closes the connection without a word |
 | host -> guest `HostConfirm` | AES-256-GCM(K host confirm, nonce 0, aad `"SCDM host confirm"`, TH): 48 bytes |
 
+Version 2 of the channel carries realtime protocol v1; version 1 carried the protocol of earlier
+releases (the HKDF info string did not change). The two versions never get past the handshake: the
+side that reads the other's hello stops at its version byte, before any key is derived (a guest
+then reports `incompatible`).
+
 **Frames**: u16 length (= ciphertext + 16) | ciphertext | 16-byte tag, AES-256-GCM with the
 direction's key, nonce = 4 zero bytes || 64-bit counter (big-endian; 0, 1, 2... per direction),
 aad = the two length bytes. One frame = one protocol message of 1 to 16384 bytes. Any tag failure
-or out-of-range length ends the connection. The first message of the guest is a protocol `Hello`
-(protocol version, schema hash, token `"direct:" + name` padded to 16 bytes); the host answers
-`Welcome` then the `GameSnapshot`, or `Error{UnsupportedProtocol}` and closes. Windows uses BCrypt
-(ECDH P-256, AES-GCM, SHA-256/HMAC, system RNG); the Linux test build uses OpenSSL.
+or out-of-range length ends the connection. The first message of the guest is a protocol v1
+`Hello`: `proto` 1 with the guest's `minor` version and capability bits `caps`, the client name
+`Scacelith direct`, and the token `"direct:" + name` padded to 16 bytes. The host checks it in the
+server's order (`PROTOCOL.md`, "Connection lifecycle": `HelloRequired`, `Malformed`,
+`UnsupportedProtocol` for another `proto`, `ProtocolViolation` for a `seq` other than 1); a
+refusal is a fatal `Error`, then the host closes. Otherwise it answers `Welcome`, with the
+negotiated minor (the lower of the two) and capabilities (the bits both sides know), then the
+`GameSnapshot`. Windows uses BCrypt (ECDH P-256, AES-GCM, SHA-256/HMAC, system RNG); the Linux
+test build uses OpenSSL.
 
 What this gives:
 
