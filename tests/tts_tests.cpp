@@ -2160,6 +2160,10 @@ TEST(tts_worker_warm_up_failure) {
         const std::filesystem::path from = std::filesystem::u8path(modelDir() + tts::Engine::kFiles[i]);
         const std::filesystem::path to = std::filesystem::u8path(dir + tts::Engine::kFiles[i]);
         std::error_code ec;
+        // A link left by an earlier run is kept: Wine refuses to delete it while the shared model
+        // maps the same file, so the cleanup at the end of this test cannot remove it there.
+        if (std::filesystem::equivalent(from, to, ec)) continue;
+        ec.clear();
         std::filesystem::remove(to, ec);
         std::filesystem::create_hard_link(from, to, ec);
         if (ec) std::filesystem::copy_file(from, to, ec);
