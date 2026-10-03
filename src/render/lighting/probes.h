@@ -6,9 +6,10 @@
 //   * GGX-prefiltered specular mips (compute, filtered importance sampling) -> cube array bound on
 //     TEXUNIT_SPECULAR, box-projected in the shader against the probe's proxy box.
 // Multiple bounces: bounce 0 is captured without ambient light; each further bounce re-captures
-// with the previous bounce's probes active. Baked at startup, on invalidateStatic() and when the
-// sun or the sky changes noticeably. Radiance is stored pre-exposed with the bake exposure and
-// rescaled in the shader (LightingUBO.probeInfo.z) when the exposure changes.
+// with the previous bounce's probes active. Baked on the first frame that draws items, on
+// invalidateStatic() and when the sun or the sky changes noticeably. Radiance is stored
+// pre-exposed with the bake exposure and rescaled in the shader (LightingUBO.probeInfo.z) when the
+// exposure changes.
 #pragma once
 #include "../gpu.h"
 #include "../renderer.h"

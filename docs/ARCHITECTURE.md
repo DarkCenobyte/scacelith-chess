@@ -110,8 +110,9 @@ dithered (TAA resolves them). `evalSunShadow()` also returns the matter thicknes
 **Light probes.** `Renderer::setLightProbes` (≤ 16 `LightProbeDesc`; default: a priority probe
 above the table + a 3×4 grid at 1.8 m + 3 high probes). Probes capture **`DRAW_STATIC` geometry
 only** with `PassId::Probe` (no tessellation, `DRAW_NO_REFLECTION` skipped, sky drawn), 2 bounces
-(`probeBounces`; bounce 0 has no ambient), `probeResolution`² faces. They re-bake at startup, on
-`invalidateStatic()`, when the sun moves by more than 1° or the sky changes (≈ 1.3 s for 16 probes
+(`probeBounces`; bounce 0 has no ambient), `probeResolution`² faces. They bake on the first frame
+that submits draw items (empty loading frames are skipped), on `invalidateStatic()`, when the sun
+moves by more than 1° or the sky changes (≈ 1.3 s for 16 probes
 × 2 bounces at 128² on llvmpipe). Shading blends priority probes first, then the grid with
 normalised radial kernels (continuous everywhere), box-projected specular from the two strongest.
 
