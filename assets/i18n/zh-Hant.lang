@@ -561,6 +561,7 @@ online.account.signed_out = 你已登出。
 online.account.signed_out_all = 你已在所有電腦上登出。
 online.account.signing_out_all = 正在所有電腦上登出…
 online.account.sign_out_all_failed = 你的其他電腦可能仍處於登入狀態：請重新登入，然後在「已登入的裝置」中將其登出。{0}
+online.account.sign_out_all_retry = 你的其他電腦可能仍處於登入狀態。請再次嘗試「全部登出」。{0}
 online.account.ratings = 等級分
 online.account.col.tc = 時限
 online.account.col.rating = 等級分

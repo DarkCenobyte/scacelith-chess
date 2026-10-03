@@ -561,6 +561,7 @@ online.account.signed_out = Sie sind abgemeldet.
 online.account.signed_out_all = Sie sind auf allen Computern abgemeldet.
 online.account.signing_out_all = Abmeldung auf allen Computern…
 online.account.sign_out_all_failed = Ihre anderen Computer sind möglicherweise noch angemeldet: Melden Sie sich erneut an und melden Sie sie unter „Angemeldete Geräte“ ab. {0}
+online.account.sign_out_all_retry = Ihre anderen Computer sind möglicherweise noch angemeldet. Versuchen Sie „Überall abmelden“ erneut. {0}
 online.account.ratings = WERTUNGEN
 online.account.col.tc = BEDENKZEIT
 online.account.col.rating = WERTUNG

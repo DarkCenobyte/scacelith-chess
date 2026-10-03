@@ -561,6 +561,7 @@ online.account.signed_out = Ha cerrado la sesión.
 online.account.signed_out_all = Ha cerrado la sesión en todos los ordenadores.
 online.account.signing_out_all = Cerrando la sesión en todos los ordenadores…
 online.account.sign_out_all_failed = Puede que sus otros ordenadores sigan con la sesión iniciada: vuelva a iniciar sesión y ciérrela desde Dispositivos con sesión iniciada. {0}
+online.account.sign_out_all_retry = Puede que sus otros ordenadores sigan con la sesión iniciada. Vuelva a intentar «Cerrar todas las sesiones». {0}
 online.account.ratings = PUNTUACIONES
 online.account.col.tc = RITMO
 online.account.col.rating = PUNTUACIÓN

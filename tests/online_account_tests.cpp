@@ -742,6 +742,44 @@ TEST(account_error_text_of_a_session_not_saved) {
     CHECK_EQ(onlineErrorText("disk_full"), std::string("The server refused (disk_full)."));
 }
 
+// Sign out everywhere: done; refused with the session (401, "unauthorized": this computer is signed
+// out too, so the player signs in again first); or failed otherwise (network, a cut answer, 429,
+// 503), which keeps this computer signed in: the player tries again.
+TEST(account_sign_out_everywhere_text) {
+    CHECK(i18n::setLanguage("en"));
+    net::Event e;
+    e.kind = Kind::LogoutResult;
+    e.ok = true;
+    CHECK_EQ(signOutEverywhereText(e), std::string("You are signed out on every computer."));
+    e.ok = false;
+    e.error = "unauthorized";
+    CHECK_EQ(signOutEverywhereText(e), std::string("Your other computers may still be signed in: sign in again, then sign them out "
+                                                   "from Signed-in devices. Your session has ended: please sign in again."));
+    e.error = "network";
+    CHECK_EQ(signOutEverywhereText(e), std::string("Your other computers may still be signed in. Try Sign out everywhere again. "
+                                                   "The server cannot be reached. Check your connection and the server address."));
+    e.error = "rate_limited";
+    e.retryAfterSec = 30;
+    CHECK_EQ(signOutEverywhereText(e), i18n::trf("online.account.sign_out_all_retry", {onlineErrorText("rate_limited", 30)}));
+    e.retryAfterSec = 0;
+    for (const char* error : {"invalid_response", "maintenance", "server_error", "timeout"}) {
+        e.error = error;
+        CHECK_EQ(signOutEverywhereText(e), i18n::trf("online.account.sign_out_all_retry", {onlineErrorText(error)}));
+    }
+    for (const i18n::Language& lang : i18n::languages()) {
+        CHECK(i18n::setLanguage(lang.code));
+        e.error = "unauthorized";
+        const std::string signedOut = signOutEverywhereText(e);
+        e.error = "network";
+        const std::string retry = signOutEverywhereText(e);
+        CHECK(signedOut != retry);
+        CHECK(retry.find(onlineErrorText("network")) != std::string::npos);
+        if (std::string(lang.code) != "en")
+            CHECK(std::string(i18n::tr("online.account.sign_out_all_retry")) != i18n::english("online.account.sign_out_all_retry"));
+    }
+    CHECK(i18n::setLanguage("en"));
+}
+
 TEST(account_export_file_name) {
     std::tm tm{};
     tm.tm_year = 2026 - 1900;

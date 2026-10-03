@@ -365,6 +365,12 @@ std::string onlineErrorText(const std::string& code, int retryAfterSec, int64_t 
     return i18n::trf("online.err.other", {code});
 }
 
+std::string signOutEverywhereText(const net::Event& e) {
+    if (e.ok) return i18n::tr("online.account.signed_out_all");
+    const char* key = e.error == "unauthorized" ? "online.account.sign_out_all_failed" : "online.account.sign_out_all_retry";
+    return i18n::trf(key, {onlineErrorText(e.error, e.retryAfterSec)});
+}
+
 std::string exportFileName(const std::string& host, const std::string& username, std::time_t when) {
     std::tm tm{};
     const bool have = archive::localTime(when, tm);

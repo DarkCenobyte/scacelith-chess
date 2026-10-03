@@ -562,6 +562,7 @@ online.account.signed_out = Ви вийшли з облікового запис
 online.account.signed_out_all = Ви вийшли з облікового запису на всіх комп’ютерах.
 online.account.signing_out_all = Вихід з облікового запису на всіх комп’ютерах…
 online.account.sign_out_all_failed = Сеанси на інших комп’ютерах, можливо, ще не завершено: увійдіть знову й завершіть їх у розділі «Активні сеанси». {0}
+online.account.sign_out_all_retry = Сеанси на інших комп’ютерах, можливо, ще не завершено. Спробуйте «Вийти всюди» ще раз. {0}
 online.account.ratings = РЕЙТИНГИ
 online.account.col.tc = КОНТРОЛЬ
 online.account.col.rating = РЕЙТИНГ

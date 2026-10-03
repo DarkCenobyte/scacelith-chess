@@ -562,6 +562,7 @@ online.account.signed_out = ログアウトしました。
 online.account.signed_out_all = すべてのコンピューターでログアウトしました。
 online.account.signing_out_all = すべてのコンピューターでログアウトしています…
 online.account.sign_out_all_failed = ほかのコンピューターはまだログインしたままの可能性があります。もう一度ログインし、「ログイン中のデバイス」からログアウトさせてください。{0}
+online.account.sign_out_all_retry = ほかのコンピューターはまだログインしたままの可能性があります。もう一度「すべてログアウト」をお試しください。{0}
 online.account.ratings = レーティング
 online.account.col.tc = 持ち時間
 online.account.col.rating = レーティング

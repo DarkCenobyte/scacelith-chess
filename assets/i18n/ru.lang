@@ -562,6 +562,7 @@ online.account.signed_out = Вы вышли из аккаунта.
 online.account.signed_out_all = Вы вышли из аккаунта на всех компьютерах.
 online.account.signing_out_all = Выход из аккаунта на всех компьютерах…
 online.account.sign_out_all_failed = Сеансы на других компьютерах, возможно, ещё не завершены: войдите снова и завершите их в разделе «Активные сеансы». {0}
+online.account.sign_out_all_retry = Сеансы на других компьютерах, возможно, ещё не завершены. Попробуйте «Выйти везде» ещё раз. {0}
 online.account.ratings = РЕЙТИНГИ
 online.account.col.tc = КОНТРОЛЬ
 online.account.col.rating = РЕЙТИНГ

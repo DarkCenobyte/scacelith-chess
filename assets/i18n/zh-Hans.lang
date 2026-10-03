@@ -561,6 +561,7 @@ online.account.signed_out = 你已退出登录。
 online.account.signed_out_all = 你已在所有电脑上退出登录。
 online.account.signing_out_all = 正在所有电脑上退出登录…
 online.account.sign_out_all_failed = 你的其他电脑可能仍处于登录状态：请重新登录，然后在“已登录的设备”中将其退出登录。{0}
+online.account.sign_out_all_retry = 你的其他电脑可能仍处于登录状态。请再次尝试“全部退出登录”。{0}
 online.account.ratings = 等级分
 online.account.col.tc = 用时
 online.account.col.rating = 等级分

@@ -181,6 +181,11 @@ std::string durationText(double ms);
 // "rate_limited" with the retry delay, "banned" with its end, "network", "tls", "certificate",
 // "incompatible"...); game::OnlineSession's other error texts (online_session.h) build on it.
 std::string onlineErrorText(const std::string& code, int retryAfterSec = 0, int64_t bannedUntilMs = 0);
+// The answer to Sign out everywhere (LogoutResult of logout(true)) in words: done; refused with the
+// session ("unauthorized": this computer is signed out too, so the player signs in again and signs
+// the others out from the signed-in devices); or failed otherwise (network, a cut answer, 429,
+// 503), which keeps this computer signed in to try again.
+std::string signOutEverywhereText(const net::Event& e);
 
 // The file of an account export: "<host>_<username>_<YYYY-MM-DD>.json", the date in local time, the
 // host and the user name made safe for a file name (game::archive::sanitizeName).

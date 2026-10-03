@@ -566,6 +566,7 @@ online.account.signed_out = لقد سجّلت الخروج.
 online.account.signed_out_all = لقد سجّلت الخروج من كل الحواسيب.
 online.account.signing_out_all = جارٍ تسجيل الخروج من كل الحواسيب…
 online.account.sign_out_all_failed = قد تظل حواسيبك الأخرى مسجَّلة الدخول: سجّل الدخول من جديد، ثم سجّل خروجها من «الأجهزة المسجَّل الدخول منها». {0}
+online.account.sign_out_all_retry = قد تظل حواسيبك الأخرى مسجَّلة الدخول. حاول «الخروج من كل الأجهزة» مجددًا. {0}
 online.account.ratings = التصنيفات
 online.account.col.tc = نظام الوقت
 online.account.col.rating = التصنيف
