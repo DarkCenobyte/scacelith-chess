@@ -545,7 +545,7 @@ TEST(live_game_errors_leave_the_menus_refusals_out) {
 }
 
 TEST(live_challenge_refusals_are_only_those_of_its_creation) {
-    for (int code : {202, 203, 204, 206, 208}) CHECK(live::challengeRefused(code));
+    for (int code : {202, 203, 204, 206, 208, 210}) CHECK(live::challengeRefused(code));
     // QueueNotAllowed and MatchmakingCooldown answer a QueueJoin, ChallengeNotFound an accept, a
     // decline or a cancel, CodeInvalid a code joined, RematchUnavailable a rematch.
     for (int code : {200, 201, 205, 207, 209}) CHECK(!live::challengeRefused(code));
@@ -557,7 +557,7 @@ TEST(live_queue_refusals_end_the_search) {
     // QueueNotAllowed, MatchmakingCooldown, AlreadyInGame and InvalidCategory refuse a QueueJoin.
     for (int code : {200, 207, 106, 107}) CHECK(live::queueRefused(code));
     // The refusals of a challenge, a code joined, a rematch and the game errors leave it.
-    for (int code : {0, 100, 105, 108, 201, 202, 203, 204, 205, 206, 208, 209}) CHECK(!live::queueRefused(code));
+    for (int code : {0, 100, 105, 108, 201, 202, 203, 204, 205, 206, 208, 209, 210}) CHECK(!live::queueRefused(code));
 }
 
 TEST(live_routing_follows_the_game_a_message_names) {

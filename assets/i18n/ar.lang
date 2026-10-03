@@ -762,6 +762,7 @@ online.err.rated_official_tc = لا تُحتسب إلا أنظمة الوقت ا
 online.err.cooldown = البحث عن خصم متوقف مؤقتًا بالنسبة إليك.
 online.err.invalid_tc = نظام الوقت هذا غير مسموح به.
 online.err.rematch_unavailable = لم تعد المباراة الأخرى ممكنة.
+online.err.rated_repeat_limit = لقد لعبت ما يكفي من المباريات المحتسبة ضد هذا اللاعب في الوقت الحالي. العب مباراة ودية أو حاول مجددًا لاحقًا.
 online.err.cheat_detected = أوقفت فحوص اللعب النظيف في الخادم هذه المباراة.
 online.err.invalid_password = كلمة المرور غير صحيحة.
 online.err.mfa_code_required = أدخل رمزًا من تطبيق المصادقة (أو رمز استرداد).

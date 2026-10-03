@@ -1062,6 +1062,7 @@ std::string serverErrorText(int code) {
         {204, "online.err.challenge_self"},    {205, "online.err.code_invalid"},
         {206, "online.err.rated_official_tc"}, {207, "online.err.cooldown"},
         {208, "online.err.invalid_tc"},        {209, "online.err.rematch_unavailable"},
+        {210, "online.err.rated_repeat_limit"},
         {241, "online.err.slow_down"},         {242, "online.err.cheat_detected"},
     };
     for (const Entry& e : entries)

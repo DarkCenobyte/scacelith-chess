@@ -758,6 +758,7 @@ online.err.rated_official_tc = レーティング戦にできるのは公式の�
 online.err.cooldown = 対戦相手の検索はしばらく停止されています。
 online.err.invalid_tc = この持ち時間は使用できません。
 online.err.rematch_unavailable = 再戦はもうできません。
+online.err.rated_repeat_limit = このプレイヤーとのレーティング戦は当面これ以上できません。カジュアル戦で対局するか、後でもう一度お試しください。
 online.err.cheat_detected = サーバーのフェアプレー検査により対局が停止されました。
 online.err.invalid_password = パスワードが違います。
 online.err.mfa_code_required = 認証アプリのコード（またはリカバリーコード）を入力してください。

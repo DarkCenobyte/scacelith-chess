@@ -758,6 +758,7 @@ online.err.rated_official_tc = Рейтинговыми могут быть то
 online.err.cooldown = Поиск соперника для вас ненадолго приостановлен.
 online.err.invalid_tc = Этот контроль времени не допускается.
 online.err.rematch_unavailable = Реванш уже невозможен.
+online.err.rated_repeat_limit = На данный момент вы сыграли с этим игроком достаточно рейтинговых партий. Сыграйте товарищескую партию или попробуйте позже.
 online.err.cheat_detected = Партия остановлена системой честной игры сервера.
 online.err.invalid_password = Неверный пароль.
 online.err.mfa_code_required = Введите код из приложения-аутентификатора (или код восстановления).
