@@ -716,7 +716,7 @@ reason.online.abandonment = 相手が対局を放棄
 reason.online.abandonment_vs_insufficient = 対局放棄、ただし相手はメイトできない
 reason.online.aborted = 対局中止
 reason.online.no_show = 時間内に最初の一手なし（中止）
-reason.online.forfeit = 不戦敗
+reason.online.forfeit = 不正行為による負け
 reason.online.server_aborted = サーバーにより中止
 reason.online.both_disconnected = 両者の接続が切断
 # Server notices
