@@ -33,7 +33,11 @@
 //                   from the front and from the thumb side) | page | pageb (page corner) | lhand (Black's
 //                   playing hand from its left) | pad | padb (the scoresheet from above) | clock |
 //                   coachhand | coachhands | coachhandt (Black's playing hand close up, from the front /
-//                   from its outside / from its thumb side)
+//                   from its outside / from its thumb side) | shakex | shakexl (the handshake from White's /
+//                   Black's back of hand) | shakeu | shaked (from the thumbs' side above / the little fingers'
+//                   side below) | shakew | shakeb (down White's / Black's forearm) | shakeq (three-quarter view
+//                   from above); the shake* close-ups follow the two clasped hands through the pumps
+//   --only 0|1      draw White's (0) or Black's (1) robot only
 //   --robot         draw the real porcelain robot instead of the capsule robots (slower start)
 //   --solo          draw only the pieces held or within 6 cm of a playing index fingertip
 //   --selftest      numeric checks of the IK/grasp/timing/writing/mirroring and of the coach demo (results in
@@ -47,7 +51,9 @@
 #include "../game/layout.h"
 #include "../render/materials/material_library.h"
 #include "../render/mesh.h"
+#include "../render/post/postfx.h"
 #include "animator.h"
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <deque>
@@ -511,7 +517,8 @@ vec3 pageCorner(int a, float s) {   // the outer corner of the bottom edge (the 
 
 const char* kViews[] = {"side", "sidel", "front", "back", "top", "white", "black", "hand", "handb", "handl", "shake", "orbit",
                         "pinch", "pinchs", "pinchb", "pinchbs", "pen", "pens", "penb", "penbs", "page", "pageb", "lhand", "pad", "padb", "clock",
-                        "coachhand", "coachhands", "coachhandt"};
+                        "coachhand", "coachhands", "coachhandt", "shakex", "shakexl", "shakeu", "shaked", "shakew", "shakeb",
+                        "shakeq"};
 constexpr int kViewCount = int(sizeof(kViews) / sizeof(kViews[0]));
 constexpr int kOrbitView = 11;
 
@@ -543,6 +550,7 @@ public:
             demo_ = keep;
         }
         solo_ = ctx.hasArg("--solo");
+        only_ = std::atoi(ctx.argValue("--only", "-1").c_str());
         reset();
         float t0 = ctx.fixedTime >= 0 ? ctx.fixedTime : 0.0f;
         simulateTo(t0);
@@ -572,6 +580,7 @@ public:
         env.time = simTime_;
         env.sunDirection = normalize(vec3(-0.55f, 0.62f, 0.25f));
         render::Camera cam = camera();
+        r.post().settings.dofFocusDistance = focus_;   // in focus where the view looks
         r.beginFrame(cam, env, dt);
         auto draw = [&](const Mesh& mesh, const Material& m, const mat4& model, uint32_t id, uint32_t flags = render::DRAW_CAST_SHADOW) {
             render::DrawItem d;
@@ -597,12 +606,10 @@ public:
             draw(pieceMesh_[pieces_[i].type], pieces_[i].color ? pieceBlackMat_ : pieceWhiteMat_, pieces_[i].xf, 100 + uint32_t(i));
         }
         if (sheets_) renderSheets(draw);
-        if (robot_) {
-            character::submitRobot(r, gpuRobot_, anim_[0].globals(), view_ == 5, 1000);
-            character::submitRobot(r, gpuRobot_, anim_[1].globals(), view_ == 6, 2000);
-        } else {
-            body_.submit(r, anim_[0].globals(), robotMat_[0], eyeMat_, darkMat_, 1000, view_ == 5);
-            body_.submit(r, anim_[1].globals(), robotMat_[1], eyeMat_, darkMat_, 2000, view_ == 6);
+        for (int a = 0; a < 2; ++a) {
+            if (only_ == 1 - a) continue;
+            if (robot_) character::submitRobot(r, gpuRobot_, anim_[a].globals(), view_ == 5 + a, 1000 * uint32_t(a + 1));
+            else body_.submit(r, anim_[a].globals(), robotMat_[a], eyeMat_, darkMat_, 1000 * uint32_t(a + 1), view_ == 5 + a);
         }
         r.endFrame();
     }
@@ -1459,14 +1466,27 @@ private:
         if (t - simTime_ > 1e-6f) step(t - simTime_);
     }
 
+    // Midpoint of both robots' real right hands (wrist and middle knuckle), world: the handshake's
+    // clasp, followed through the pumps.
+    vec3 claspPoint() const {
+        vec3 p(0, 0, 0);
+        for (int a = 0; a < 2; ++a) {
+            const mat4* g = anim_[a].globals();
+            p = p + (g[HandR].translation() + g[MiddleR1].translation()) * 0.25f;
+        }
+        return p;
+    }
+
     render::Camera camera() const {
         render::Camera c;
         c.fovY = 42.0f * DEG;
         c.nearZ = 0.02f;
-        auto look = [&](vec3 pos, vec3 target, float fov) {
+        focus_ = 0.8f;
+        auto look = [&](vec3 pos, vec3 target, float fov, vec3 up = vec3(0, 1, 0)) {
             c.position = pos;
             c.fovY = fov * DEG;
-            c.lookAt(target);
+            c.lookAt(target, up);
+            focus_ = length(target - pos);
         };
         switch (view_) {
             case 0: look({1.50f, 1.18f, 0.0f}, {0, 0.93f, 0}, 44); break;
@@ -1569,7 +1589,37 @@ private:
                 look(hp + off, hp, 34);
                 break;
             }
-            default: return orbit_.camera();
+            case 29:
+            case 30:
+            case 31:
+            case 32:
+            case 33:
+            case 34:
+            case 35: {
+                // The handshake close up, aimed at the clasp (White sits at +Z, its right is +X).
+                const vec3 p = claspPoint();
+                c.nearZ = 0.01f;
+                switch (view_) {
+                    case 29: look(p + vec3(0.30f, 0.02f, 0), p, 30); break;
+                    case 30: look(p + vec3(-0.30f, 0.02f, 0), p, 30); break;
+                    case 31: look(p + vec3(0, 0.30f, 0.001f), p, 30, vec3(0, 0, -1)); break;
+                    case 32: {   // from below, kept above the board when the pump is low
+                        vec3 e = p + vec3(0, -0.20f, 0.001f);
+                        e.y = std::max(e.y, layout::BOARD_TOP_Y + 0.03f);
+                        look(e, p, 45, vec3(0, 0, -1));
+                        break;
+                    }
+                    case 33: look(p + vec3(0.10f, 0.08f, 0.30f), p, 30); break;
+                    case 34: look(p + vec3(-0.10f, 0.08f, -0.30f), p, 30); break;
+                    default: look(p + vec3(0.22f, 0.18f, 0.12f), p, 30); break;
+                }
+                break;
+            }
+            default: {
+                render::Camera oc = orbit_.camera();
+                focus_ = orbit_.distance;
+                return oc;
+            }
         }
         return c;
     }
@@ -1612,6 +1662,8 @@ private:
     int clockSide_ = -1;
     float headYaw_ = 0, headPitch_ = 0;
     int view_ = 0;
+    int only_ = -1;               // --only: draw this robot only (-1 both)
+    mutable float focus_ = 0.8f;  // depth of field focus distance of the current view (camera())
     bool frozen_ = false, paused_ = false, slow_ = false, solo_ = false;
     OrbitCamera orbit_;
 };
