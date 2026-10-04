@@ -2491,8 +2491,42 @@ void AnimViewer::writingSelfTest() {
         W.enqueue(h);
         h.partner = &W;
         B.enqueue(h);
+        // How the two real right hands hold each other (from the clasp to the end of the pumps): the
+        // palms face each other at palm-on-palm distance, the hands cross at 35..65 degrees (fingers
+        // pitched down, not end to end), each long fingertip pad lies on the other hand's back
+        // (behind its mid-plane, between its wrist + 15 mm and its knuckles: not round its wrist
+        // cuff), the thumb-index webs meet. (The old clasp, palms on one point with the hands nearly
+        // end to end, crossed at 9 degrees with the fingertips past the partner's wrist.)
+        struct Crossed {
+            float facing = -1.0f, planes = 0.0f, crossLo = 1e9f, crossHi = 0.0f, behind = 1e9f, fromWrist = 1e9f, toKnuckles = 1e9f, webs = 0.0f;
+            void add(const Skeleton& sk, const mat4* a, const mat4* b) {
+                const vec3 na = normalize(transformDir(a[HandR], vec3(1, 0, 0))), nb = normalize(transformDir(b[HandR], vec3(1, 0, 0)));
+                facing = std::max(facing, dot(na, nb));
+                planes = std::max(planes, std::fabs(dot(b[HandR].translation() - a[HandR].translation(), na)));
+                vec3 fa = transformDir(a[HandR], vec3(0, -1, 0)), fb = transformDir(b[HandR], vec3(0, -1, 0));
+                fa = normalize(fa - na * dot(fa, na));
+                fb = normalize(fb - na * dot(fb, na));
+                const float cross = std::acos(clamp(std::fabs(dot(fa, fb)), 0.0f, 1.0f));
+                crossLo = std::min(crossLo, cross);
+                crossHi = std::max(crossHi, cross);
+                const mat4 toB = inverseAffine(b[HandR]);
+                for (int f = 1; f <= 4; ++f) {
+                    const Bone b3 = Bone(ThumbR1 + f * 3 + 2);
+                    const vec3 pad = transformPoint(toB, transformPoint(a[b3], vec3(0.0068f, -0.72f * sk.boneLength[b3], 0.0f)));
+                    behind = std::min(behind, -pad.x);
+                    fromWrist = std::min(fromWrist, -pad.y);
+                    toKnuckles = std::min(toKnuckles, pad.y + 0.086f);
+                }
+                auto web = [](const mat4* g) { return (g[ThumbR2].translation() + g[IndexR1].translation()) * 0.5f; };
+                webs = std::max(webs, length(web(a) - web(b)));
+            }
+            bool ok() const {
+                return facing < -0.95f && planes > 0.020f && planes < 0.034f && crossLo > 35.0f * DEG && crossHi < 65.0f * DEG && behind > 0.010f &&
+                       fromWrist > 0.015f && toKnuckles > 0.0f && webs < 0.025f;
+            }
+        } held;
         std::vector<Event> ev;
-        float putAt = -1, claspW = -1, claspB = -1, palmGap = 0;
+        float putAt = -1, claspW = -1, claspB = -1;
         bool heldAtClasp = true;
         for (float t = 0; t < 4.0f; t += 1.0f / 120.0f) {
             ev.clear();
@@ -2506,15 +2540,20 @@ void AnimViewer::writingSelfTest() {
                 if (e.type == EventType::HandshakeClasp) {
                     claspB = e.time;
                     heldAtClasp = B.holdsPen();
-                    auto palm = [&](const mat4* g, Bone hand, float side) { return transformPoint(g[hand], vec3(side * 0.0135f, -0.052f, 0.003f)); };
-                    palmGap = length(palm(W.globals(), HandR, 1.0f) - palm(B.globals(), HandR, 1.0f));
                 }
             }
+            if (claspB > 0.0f && B.time() <= claspB + 0.85f) {   // (the pumps end 0.88 s after the clasp)
+                held.add(robotSkeleton(), W.globals(), B.globals());
+                held.add(robotSkeleton(), B.globals(), W.globals());
+            }
         }
-        const bool fail = putAt < 0.0f || heldAtClasp || std::fabs(claspW - claspB) > 1e-5f || palmGap > 0.05f;
+        const bool fail = putAt < 0.0f || heldAtClasp || std::fabs(claspW - claspB) > 1e-5f || !held.ok();
         ::logx::write(fail ? ::logx::Level::Warn : ::logx::Level::Info,
-                      "selftest handshake with a left-handed player holding the pen: pen put down at t=%.3f, clasp %.3f / %.3f, right palms %.1f mm apart",
-                      putAt, claspW, claspB, palmGap * 1000.0f);
+                      "selftest handshake with a left-handed player holding the pen: pen put down at t=%.3f, clasp %.3f / %.3f; held: palms facing %.3f "
+                      "(< -0.95), mid-planes %.1f mm apart (20..34), crossing %.0f..%.0f deg (35..65), pads %.1f mm behind (> 10), wrist+%.1f mm (> 15), "
+                      "knuckles-%.1f mm (> 0), webs %.1f mm apart (< 25)",
+                      putAt, claspW, claspB, held.facing, held.planes * 1000.0f, held.crossLo / DEG, held.crossHi / DEG, held.behind * 1000.0f,
+                      held.fromWrist * 1000.0f, held.toKnuckles * 1000.0f, held.webs * 1000.0f);
     }
 }
 
