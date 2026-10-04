@@ -15,5 +15,6 @@ if [ -z "$DISPLAY" ]; then
     fi
 fi
 export MESA_GL_VERSION_OVERRIDE=4.6 MESA_GLSL_VERSION_OVERRIDE=460
+export SCACELITH_AUDIO=null   # no sound card needed (and none played on a desktop that has one)
 BUILD="${SCACELITH_BUILD:-$ROOT/build}"
 "$BUILD/scacelith" --scene "$SCENE" --shot "$OUT" --frames "$FRAMES" --size "$SIZE" --data-dir "$ROOT" "$@"

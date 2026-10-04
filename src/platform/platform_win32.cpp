@@ -267,7 +267,9 @@ bool init(const WindowDesc& desc) {
     wc.lpfnWndProc = wndProc;
     wc.hInstance = g_inst;
     wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
-    wc.hIcon = LoadIcon(g_inst, MAKEINTRESOURCE(1));
+    wc.hIcon = LoadIcon(g_inst, MAKEINTRESOURCE(1));   // res/scacelith.rc.in: 1 ICON
+    wc.hIconSm = (HICON)LoadImageW(g_inst, MAKEINTRESOURCEW(1), IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
+                                   GetSystemMetrics(SM_CYSMICON), LR_SHARED);
     wc.lpszClassName = L"ScacelithWindow";
     RegisterClassExW(&wc);
 

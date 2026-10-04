@@ -148,16 +148,43 @@ inline const FingerPose& posePress() {
                                   {-0.06f, 1.05f, 1.25f, 0.65f}, {-0.12f, 1.15f, 1.25f, 0.65f}});
     return p;
 }
+// Handshake: the open hand that slides in (the thumb up, a little over the palm: it passes the
+// partner's thumb, and no finger bone turns more than ~2 rad to the grip, under 1800 deg/s), and the
+// grip it closes to once the palms touch (the fingertips on the partner's skin, the thumb lying
+// flat over the back of its hand). Fitted together with the clasp placement (see planHandshake),
+// not tuned by eye.
 inline const FingerPose& poseShakeOpen() {
-    static FingerPose p = fpMake({{0.18f, -0.12f, 0.10f, 0.08f}, {0.06f, 0.10f, 0.12f, 0.06f}, {0.0f, 0.12f, 0.14f, 0.06f},
+    static FingerPose p = fpMake({{0.606f, -0.448f, -0.037f, 0.342f}, {0.06f, 0.10f, 0.12f, 0.06f}, {0.0f, 0.12f, 0.14f, 0.06f},
                                   {-0.05f, 0.16f, 0.16f, 0.08f}, {-0.10f, 0.20f, 0.18f, 0.08f}});
     return p;
 }
-inline const FingerPose& poseShakeGrip() {
-    static FingerPose p = fpMake({{0.25f, 0.10f, 0.25f, 0.20f}, {0.02f, 0.55f, 0.85f, 0.45f}, {0.0f, 0.60f, 0.90f, 0.45f},
-                                  {-0.03f, 0.65f, 0.92f, 0.45f}, {-0.07f, 0.72f, 0.92f, 0.45f}});
+// The hand reaching out for a handshake: the open hand's fingers, the thumb up (spread from the
+// index in the palm plane, a little in front of it), as people offer their hand.
+inline const FingerPose& poseShakeReach() {
+    static FingerPose p = [] {
+        FingerPose r = poseShakeOpen();
+        const float thumb[4] = {0.45f, -0.55f, 0.10f, 0.05f};
+        for (int j = 0; j < 4; ++j) r.v[Thumb][j] = thumb[j];
+        return r;
+    }();
     return p;
 }
+inline const FingerPose& poseShakeGrip() {
+    static FingerPose p = fpMake({{1.411f, -0.400f, 1.013f, 0.950f}, {-0.080f, 0.166f, 0.942f, 0.284f}, {-0.022f, 0.202f, 1.449f, 0.599f},
+                                  {0.093f, 0.312f, 1.460f, 0.605f}, {0.223f, 0.428f, 0.992f, 0.315f}});
+    return p;
+}
+// Handshake clasp placement (planHandshake), right-hand convention; fitted with the two presets above.
+constexpr float kShakePitch = 0.441f;   // fingers below the horizontal in the vertical palm plane
+constexpr float kShakeYaw = 0.510f;     // palm plane turned across the body from the shoulder-clasp line
+constexpr float kShakeElbow = 0.850f;   // elbow raised about the shoulder-wrist axis while in contact
+constexpr float kShakePump = 0.0285f;   // pump amplitude
+// A handshake cut short (see shakeLetGo): the hand opens in this time, and the robot that was cut is
+// back at its rest this long after the cut (Timing::Retract, and the 50 ms its next Retract waits).
+constexpr float kShakeLetGoOpen = 0.14f;
+constexpr float kShakeLetGoQuick = 0.40f;
+inline vec3 shakeAnchor() { return vec3(0.0137f, -0.0579f, 0.0341f); }   // hand point on the clasp vertical
+inline vec3 shakeSlide() { return vec3(0.0710f, -0.0474f, 0.0f); }      // contact -> pre-contact offset
 inline const FingerPose& poseLooseFist() {
     static FingerPose p = fpMake({{0.75f, 0.30f, 0.40f, 0.30f}, {0.02f, 1.05f, 1.30f, 0.70f}, {0.0f, 1.12f, 1.35f, 0.72f},
                                   {-0.03f, 1.18f, 1.38f, 0.72f}, {-0.06f, 1.24f, 1.40f, 0.72f}});
@@ -496,6 +523,8 @@ struct Segment {
     quat rotCorr;                  // mid-segment bend of the rotation (wrist comfort), bump-weighted
     float corrPeak = 0.5f;
     bool usePivot = false;         // rotate about rotPivot: that hand point follows the clean path
+    bool locked = false;           // path, rotation and elbow kept exactly as planned (the handshake
+                                   // in contact: the partner plans the mirror image of it)
     vec3 rotPivot{0, 0, 0};
     Track<PenPose> pen;            // pen in the hand (regrips); empty = keep the default PenPose
     // Pen lock (see HandSample::lockW): weight lockFrom -> lockTo (min-jerk) over u in [lockU0, lockU1].
@@ -1252,15 +1281,15 @@ struct Animator::Impl {
     // How hard it is for the right arm to put the hand bone at wristC with rotation q (rad): joint
     // limit clamps, plus a soft penalty near the wrist and forearm limits.
     // 'achieved' (optional): the hand rotation the arm really gets to (joint limits).
-    // 'flexOut' (optional): the torso flexion the reach takes.
-    float armStrain(vec3 wristC, quat q, quat* achieved = nullptr, float* flexOut = nullptr) {
+    // 'flexOut' (optional): the torso flexion the reach takes. 'elbow': the elbow lift (HandSample::elbow).
+    float armStrain(vec3 wristC, quat q, quat* achieved = nullptr, float* flexOut = nullptr, float elbow = 0.0f) {
         Pose tmp;
         reachShort = wristClamp = pronClamp = 0;
         SpineParams sp = solveSpine(tmp, wristC, 0.0f, 0.0f, 0.0f, 0.0f);
         if (flexOut) *flexOut = sp.flex;
         applySpine(tmp, sp);
         fkChain(tmp, Pelvis, Spine2);
-        solveArm(tmp, Side::Right, wristC, q);
+        solveArm(tmp, Side::Right, wristC, q, elbow);
         if (achieved) *achieved = rotOf(G[HandR]);
         float soft = softWristStrain(lastFlex, lastDev, lastPron);
         return wristClamp + pronClamp + reachShort * 10.0f + 0.5f * soft;
@@ -1464,7 +1493,7 @@ struct Animator::Impl {
     Hand& shakeHand() { return mirrored ? left() : right(); }
     Side shakeSide() const { return mirrored ? Side::Left : Side::Right; }
     // Side-aware arm strain (armStrain() is the playing hand's).
-    float armStrainSide(Side s, vec3 wristC, quat q);
+    float armStrainSide(Side s, vec3 wristC, quat q, float elbow = 0.0f);
     Side diagSide = Side::Right;   // arm whose solve updates the diagnostics (reachShort, clamps...)
 
     // ==========================================================================================
@@ -1549,9 +1578,22 @@ struct Animator::Impl {
     bool shakeTookPut = false;      // the handshake took over a queued PutPen
     Segment shakeRetract(const HandSample& s, float T);   // the shaking hand from s back to its rest
     // cancelTasks() during a handshake (see cutHandshake). shakeCutW: the torso's blend on the
-    // shaking hand then (left-handed player), faded out until wr.suspendUntil.
+    // shaking hand then (left-handed player), faded out from shakeCutFrom over shakeCutFade.
     void cutHandshake();
-    float shakeCutW = 0.0f;
+    float shakeCutW = 0.0f, shakeCutFrom = -100.0f, shakeCutFade = 0.35f;
+    // Letting go mid-handshake (cut short by either robot): the shaking hand opens where the plan
+    // has it, then backs off along the slide (shakeLetGo). The plan's clasp and pre-contact poses
+    // and its contact window are kept for that; shakeCutAt is when this robot's handshake was cut
+    // (its partner reads it and lets go from the same instant: followPartnerCut), shakeCutSeen the
+    // partner's cut already followed. A right-handed robot's next task waits until its hand is out
+    // of the partner's (shakeClearAt); a Retract keeps the way back the cut planned (shakeRestAt).
+    void shakeLetGo(float tc, float tRest, bool quick, Motion& mo);
+    void followPartnerCut();
+    quat shakeQ;
+    vec3 shakePClasp{0, 0, 0}, shakePPre{0, 0, 0};
+    float shakeBegin = -100.0f, shakeContact0 = 0.0f, shakeContact1 = 0.0f, shakeOpenAt = 0.0f;
+    float shakeCutAt = -100.0f, shakeCutSeen = -100.0f, shakeClearAt = -100.0f, shakeRestAt = -100.0f;
+    float startAfterCut(const Task& t) const { return t.type == TaskType::Retract ? t.notBefore : std::max(t.notBefore, shakeClearAt); }
     void writingSpine(SpineParams& sp, const HandSample& hl);
 };
 

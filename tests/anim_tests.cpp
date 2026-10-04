@@ -1,8 +1,9 @@
 // Animation tests (no GPU): the writing-hand helpers, the writing queue's event instants and pen
 // tip, writing never delaying the playing hand, the left-handed player as the exact mirror image
 // of a right-handed one, the first-person player writing on his own scoresheet as the game
-// wires it (pen, ink, PenDown sounds heard from his head), and the coach's gestures (pointing,
-// tracing a move, speaking gestures, their timing, and a demonstration taken back). The animator
+// wires it (pen, ink, PenDown sounds heard from his head), the coach's gestures (pointing,
+// tracing a move, speaking gestures, their timing, and a demonstration taken back) and the two
+// robots' hands clasped in a handshake without going through each other. The animator
 // is not part of scacelith_core, so its sources are compiled into this file.
 #include "test.h"
 #include "../src/anim/animator.cpp"
@@ -838,6 +839,164 @@ TEST(anim_cancel_handshake_lays_the_pen_down) {
     CHECK(std::fabs(emptyAt - (putAt + anim::Timing::Retract)) < 1e-3f);
     CHECK(handErr >= 0.0f && handErr < 0.002f);
     CHECK(!B.writingBusy());
+}
+
+namespace {
+
+// Two clasped right hands as capsules on their bones, inside the porcelain (robot_hand.cpp,
+// robot_body.cpp): the phalanges (radius = their half thickness; the last one stops a radius short
+// of the rounded tip), the palm (three capsules, 1 mm inside: it thins and rounds off towards both
+// edges), the carpal dome in the forearm's cuff, the forearm.
+namespace shake {
+using namespace m;
+using character::Bone;
+
+float segSeg(vec3 p1, vec3 q1, vec3 p2, vec3 q2) {   // closest distance of two segments (or points)
+    const vec3 d1 = q1 - p1, d2 = q2 - p2, r = p1 - p2;
+    const float a = dot(d1, d1), e = dot(d2, d2), f = dot(d2, r);
+    float s = 0.0f, t = 0.0f;
+    if (a < 1e-12f && e < 1e-12f) return length(r);
+    if (a < 1e-12f) {
+        t = clamp(f / e, 0.0f, 1.0f);
+    } else {
+        const float c = dot(d1, r);
+        if (e < 1e-12f) {
+            s = clamp(-c / a, 0.0f, 1.0f);
+        } else {
+            const float b = dot(d1, d2), den = a * e - b * b;
+            s = den > 1e-12f ? clamp((b * f - c * e) / den, 0.0f, 1.0f) : 0.0f;
+            t = (b * s + f) / e;
+            if (t < 0.0f) {
+                t = 0.0f;
+                s = clamp(-c / a, 0.0f, 1.0f);
+            } else if (t > 1.0f) {
+                t = 1.0f;
+                s = clamp((b - c) / a, 0.0f, 1.0f);
+            }
+        }
+    }
+    return length((p1 + d1 * s) - (p2 + d2 * t));
+}
+struct Capsule {
+    vec3 a, b;
+    float r;
+};
+std::vector<Capsule> phalanges(const character::Skeleton& sk, const mat4* g) {
+    static const float r[5][3] = {{0.0100f, 0.0064f, 0.0050f}, {0.0057f, 0.00475f, 0.00375f}, {0.0059f, 0.00495f, 0.00395f},
+                                  {0.0055f, 0.00455f, 0.00365f}, {0.0047f, 0.00385f, 0.00305f}};
+    std::vector<Capsule> out;
+    for (int f = 0; f < 5; ++f)
+        for (int j = 0; j < 3; ++j) {
+            const Bone b = Bone(character::ThumbR1 + f * 3 + j);
+            const vec3 end = j < 2 ? g[b + 1].translation() : transformPoint(g[b], normalize(sk.restOffset[b]) * (sk.boneLength[b] - r[f][j]));
+            out.push_back({g[b].translation(), end, r[f][j]});
+        }
+    return out;
+}
+std::vector<Capsule> palm(const mat4& hand) {
+    auto cap = [&](float x, float z, float y0, float r) { return Capsule{transformPoint(hand, vec3(x, y0, z)), transformPoint(hand, vec3(x, -0.068f, z)), r}; };
+    return {cap(-0.0010f, 0.002f, -0.030f, 0.0105f), cap(0.0005f, 0.020f, -0.045f, 0.0095f), cap(0.0025f, -0.020f, -0.030f, 0.0095f)};
+}
+struct Margins {
+    float palm = 1e9f, wrist = 1e9f, forearm = 1e9f, fingers = 1e9f;   // clearances (m, < 0 = overlap)
+    float thumbs = 1e9f;                                              // thumb metacarpal axes apart
+    float behind = 1e9f, fromWrist = 1e9f, toKnuckles = 1e9f;         // every long fingertip pad, in the other hand's frame
+    float crossLo = 1e9f, crossHi = 0.0f;                             // hand axes in the palm plane (rad)
+    void keepWorst(const Margins& o) {
+        palm = std::min(palm, o.palm);
+        wrist = std::min(wrist, o.wrist);
+        forearm = std::min(forearm, o.forearm);
+        fingers = std::min(fingers, o.fingers);
+        thumbs = std::min(thumbs, o.thumbs);
+        behind = std::min(behind, o.behind);
+        fromWrist = std::min(fromWrist, o.fromWrist);
+        toKnuckles = std::min(toKnuckles, o.toKnuckles);
+        crossLo = std::min(crossLo, o.crossLo);
+        crossHi = std::max(crossHi, o.crossHi);
+    }
+};
+// Hand A (bone globals a) against hand B (globals b), both the robots' real right hands.
+Margins margins(const character::Skeleton& sk, const mat4* a, const mat4* b) {
+    using namespace character;
+    Margins m;
+    const std::vector<Capsule> pa = phalanges(sk, a), pb = phalanges(sk, b), palmB = palm(b[HandR]);
+    const vec3 wrist = b[HandR].translation(), elbow = b[ForeArmR].translation(), along = normalize(elbow - wrist);
+    for (const Capsule& p : pa) {
+        for (const Capsule& q : palmB) m.palm = std::min(m.palm, segSeg(p.a, p.b, q.a, q.b) - p.r - q.r);
+        m.wrist = std::min(m.wrist, segSeg(p.a, p.b, wrist, wrist) - 0.021f - p.r);
+        m.forearm = std::min(m.forearm, segSeg(p.a, p.b, wrist + along * 0.030f, elbow - along * 0.060f) - 0.023f - p.r);
+        for (const Capsule& q : pb) m.fingers = std::min(m.fingers, segSeg(p.a, p.b, q.a, q.b) - p.r - q.r);
+    }
+    m.thumbs = segSeg(a[ThumbR1].translation(), a[ThumbR2].translation(), b[ThumbR1].translation(), b[ThumbR2].translation());
+    const mat4 toB = inverseAffine(b[HandR]);
+    for (int f = 1; f <= 4; ++f) {
+        const Bone b3 = Bone(ThumbR1 + f * 3 + 2);
+        const vec3 pad = transformPoint(toB, transformPoint(a[b3], vec3(0.0068f, -0.72f * sk.boneLength[b3], 0.0f)));
+        m.behind = std::min(m.behind, -pad.x);              // B's back of hand is its -X side
+        m.fromWrist = std::min(m.fromWrist, -pad.y);
+        m.toKnuckles = std::min(m.toKnuckles, pad.y + 0.086f);
+    }
+    const vec3 n = normalize(transformDir(a[HandR], vec3(1, 0, 0)));
+    vec3 fa = transformDir(a[HandR], vec3(0, -1, 0)), fb = transformDir(b[HandR], vec3(0, -1, 0));
+    fa = normalize(fa - n * dot(fa, n));
+    fb = normalize(fb - n * dot(fb, n));
+    m.crossLo = m.crossHi = std::acos(clamp(std::fabs(dot(fa, fb)), 0.0f, 1.0f));
+    return m;
+}
+}  // namespace shake
+
+}  // namespace
+
+// A handshake, with a right- and a left-handed partner, every 1/120 s from start to end: no part of
+// a hand goes into the other hand's palm, wrist or forearm, nor through its fingers; while the grip
+// is held the hands cross the way two hands shaking do (fingers pitched down), each set of fingers
+// is wrapped round the other hand (the pads behind its mid-plane, between its wrist and its
+// knuckles: on the back of the hand) and the thumbs lie apart (not crossed).
+TEST(anim_handshake_hands_clasp_without_going_through) {
+    const character::Skeleton& sk = character::robotSkeleton();
+    for (character::Side play : {character::Side::Right, character::Side::Left}) {
+        anim::Animator W, B;
+        W.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
+        B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, play);
+        anim::Task h;
+        h.type = anim::TaskType::Handshake;
+        h.partner = &B;
+        W.enqueue(h);
+        h.partner = &W;
+        B.enqueue(h);
+        std::vector<anim::Event> ev;
+        float clasp = -1.0f;
+        shake::Margins all, held;
+        while (W.time() < anim::Timing::Handshake + 0.1f) {
+            ev.clear();
+            W.update(1.0f / 120.0f, ev);
+            for (const anim::Event& e : ev)
+                if (e.type == anim::EventType::HandshakeClasp) clasp = e.time;
+            ev.clear();
+            B.update(1.0f / 120.0f, ev);
+            for (int k = 0; k < 2; ++k) {
+                const shake::Margins mk = k == 0 ? shake::margins(sk, W.globals(), B.globals()) : shake::margins(sk, B.globals(), W.globals());
+                all.keepWorst(mk);
+                if (clasp > 0.0f && W.time() <= clasp + 0.90f) held.keepWorst(mk);
+            }
+        }
+        std::fprintf(stderr,
+                     "  partner %s-handed: clearances palm %.1f wrist %.1f forearm %.1f fingers %.1f mm; held: thumbs %.1f mm apart, pads %.1f mm "
+                     "behind, wrist+%.1f, knuckles-%.1f mm, crossing %.0f..%.0f deg\n",
+                     play == character::Side::Right ? "right" : "left", all.palm * 1000.0f, all.wrist * 1000.0f, all.forearm * 1000.0f,
+                     all.fingers * 1000.0f, held.thumbs * 1000.0f, held.behind * 1000.0f, held.fromWrist * 1000.0f, held.toKnuckles * 1000.0f,
+                     held.crossLo / m::DEG, held.crossHi / m::DEG);
+        CHECK(clasp > 0.0f);
+        CHECK(all.palm > -0.001f);
+        CHECK(all.wrist > -0.001f);
+        CHECK(all.forearm > -0.001f);
+        CHECK(all.fingers > -0.001f);
+        CHECK(held.thumbs > 0.020f);
+        CHECK(held.behind > 0.010f);
+        CHECK(held.fromWrist > 0.015f);
+        CHECK(held.toKnuckles > 0.0f);
+        CHECK(held.crossLo > 35.0f * m::DEG && held.crossHi < 65.0f * m::DEG);
+    }
 }
 
 // A piece the robot set down on the table beside its resting hand, which the game later puts back

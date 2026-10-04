@@ -6,3 +6,4 @@ Scacelith.ini
 .vscode/
 .idea/
 .claude/worktrees/
+__pycache__/

@@ -381,6 +381,13 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
             break;
         }
         case TaskType::Retract: {
+            if (start < shakeRestAt - 1e-4f && shakeRestAt <= start + T + 0.05f + 1e-4f) {
+                // A handshake cut short: the hand already lets go of the partner's and goes back to
+                // its rest in time (cutHandshake).
+                mo = h.motion;
+                curTargetWorld = toWorld(h.rest.p);
+                break;
+            }
             HandSample r = h.rest;
             Segment sg = makeSeg(from, T, r.p, vec3(0), r.q, r.f);
             bool fromBoard = from.p.y - boardC < 0.30f;
@@ -409,6 +416,7 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
                 lm.start = start;
                 planHandshake(t, start, T, left().motion.sample(start), lm);
                 left().motion = lm;
+                relaxWrist(left());   // (its way from the pen or the rest; the contact is locked)
                 const float Tr = std::min(T, 0.5f);
                 mo.segs.push_back(makeSeg(from, Tr, h.rest.p, vec3(0), h.rest.q, h.rest.f));
                 mo.segs.push_back(makeSeg(mo.segs.back().sample(Tr), std::max(1e-3f, T - Tr), h.rest.p, vec3(0), h.rest.q, h.rest.f));
@@ -443,8 +451,21 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
 }
 
 // Handshake with the real right hand: the solver's right hand, or its left one (the writing hand)
-// for a left-handed player. Written for either side, so the left-handed handshake is the exact
-// mirror image of the right-handed one. A writing hand still holding the pen lays it down first.
+// for a left-handed player. Written for either side (every hand-local constant goes through
+// handPoint / handRot / palmSign), so the left-handed hand is the exact mirror image of the
+// right-handed one. A writing hand still holding the pen lays it down first.
+//
+// Both robots plan from shared data only (the clasp centre C, their own seat, constants): the seats
+// are related by a half turn about the vertical through C, so each hand meets the mirror image of
+// itself. The clasp (shakeAnchor/kShakePitch/kShakeYaw/kShakeElbow and the poseShakeOpen /
+// poseShakeGrip presets) was fitted offline on the exact meshes of the hands and arms: CMA-ES over
+// these constants and the finger joints, minimising the depth of either arm's mesh vertices inside
+// the other's signed distance fields at the slide-in, at every step of the fingers closing and at
+// the grip (kept under 0.5 mm), plus costs for the look of a real handshake: palms touching, each
+// set of fingers wrapped round the partner's little-finger edge with the pads on the back of its
+// hand, touching its skin, each thumb lying flat over the back of the partner's hand by its index
+// knuckle, the thumb-index webs together, the hands crossing at about 45 degrees, no wrist strain
+// through the pumps, and the lowest finger above the pieces.
 void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSample from, Motion& mo) {
     const Side R = shakeSide();
     const float tableC = layout::TABLE_TOP_Y - pelvisWorld.y;
@@ -458,40 +479,35 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
         cW = vec3(mid.x, layout::BOARD_TOP_Y + 0.225f, mid.z);
     }
     vec3 C = toChar(cW);
-    // Palm plane: vertical, through C, along the line joining both right shoulders.
+    // Palm plane: vertical, through C, turned across the body from the line joining the shoulder
+    // and C (the forearm comes in from the back of the hand). Fingers towards the partner and
+    // pitched down, thumb up: the two hands cross at twice kShakePitch.
     vec3 S = shoulderRest(R);
     vec3 dirH = safeNormalize(vec3(C.x - S.x, 0, C.z - S.z), vec3(0, 0, 1));
-    float yaw = std::atan2(dirH.x, dirH.z);
-    // Fingers towards the partner, pitched down; thumb up; palm facing the partner's palm.
-    quat qs = handRot(R, yaw, 0.28f, PI * 0.5f);
-    const vec3 palm = handPoint(R, palmCenter(Side::Right) + vec3(0.0015f, 0, 0));
-    const vec3 palmLocalN(palmSign(R), 0, 0);
-    {
-        // Turn about the palm normal (keeps both palms in the same plane) for a comfortable wrist.
-        vec3 pn = rotate(qs, palmLocalN);
-        float best = 1e9f;
-        quat qb = qs;
-        for (int k = -6; k <= 6; ++k) {
-            quat q = normalize(axisAngle(pn, 0.1f * float(k)) * qs);
-            float c = armStrainSide(R, wristFor(C, q, palm), q) + 0.03f * std::fabs(0.1f * float(k));
-            if (c < best) {
-                best = c;
-                qb = q;
-            }
-        }
-        qs = qb;
-    }
-    FingerPose fo = fpHumanize(poseShakeOpen(), 0.2f, 0.03f), fg = fpHumanize(poseShakeGrip(), 0.6f, 0.04f);
-    vec3 pClasp = wristFor(C, qs, palm);
-    // Pre-contact: 7 cm back along the fingers, 1.5 cm off the palm plane.
-    vec3 fingerDir = rotate(qs, vec3(0, -1, 0));
-    vec3 palmN = rotate(qs, palmLocalN);
-    vec3 pPre = pClasp - fingerDir * 0.07f - palmN * 0.015f + vec3(0, 0.01f, 0);
-    float tClasp = Timing::HandshakeClaspAt, tRel = Timing::HandshakeReleaseAt;
-    float scale = T / Timing::Handshake;
+    const float across = R == Side::Right ? kShakeYaw : -kShakeYaw;
+    const quat qs = handRot(R, std::atan2(dirH.x, dirH.z) + across, kShakePitch, PI * 0.5f);
+    const FingerPose fo = poseShakeOpen(), fg = poseShakeGrip();
+    const vec3 pClasp = wristFor(C, qs, handPoint(R, shakeAnchor()));
+    // Pre-contact: backed off the palm plane (and a little back along the hand).
+    const vec3 pPre = pClasp - rotate(qs, handPoint(R, shakeSlide()));
+    const float scale = T / Timing::Handshake;
     shakeScale = scale;
-    float t1 = 0.74f * scale, t2 = tClasp * scale, t3 = tRel * scale;
-    float t4 = t3 + 0.15f * scale;
+    shakeQ = qs;
+    shakePClasp = pClasp;
+    shakePPre = pPre;
+    shakeBegin = start;
+    shakeCutAt = shakeCutSeen = shakeClearAt = shakeRestAt = -100.0f;
+    // Phases: extend to the pre-contact pose; slide in, the hand open, until the palms touch; close
+    // the grip (HandshakeClasp when it is closed); pump twice; open the hand (HandshakeRelease when
+    // it is open); withdraw the open hand the way it came; back to rest.
+    // (The slide takes 0.18 s: the hand comes in at most 0.62 m/s and slows down into the contact.
+    // The withdraw takes 0.14 s and hands over to the way back at full speed: one rise and fall of
+    // the speed, at most 2.1 m/s.)
+    const float t1 = 0.60f * scale, t2 = 0.78f * scale, tc = Timing::HandshakeClaspAt * scale, tp = 1.80f * scale;
+    const float tr = Timing::HandshakeReleaseAt * scale, to = tr, tw = 2.10f * scale;
+    shakeContact0 = start + t1;   // from the slide in to the end of the withdraw: hand near hand
+    shakeContact1 = start + tw;
+    shakeOpenAt = start + tp;
     // 0. The pen first goes back onto the table (where the game wanted it, else where it was taken).
     float t0 = 0.0f;
     FingerPose letGo = from.f;
@@ -510,9 +526,23 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
         from = mo.segs.back().sample(t0);
         curEvents.push_back({start + t0, EventType::PenPut, ActPutPen, false});
     }
-    HandSample s = from;
-    // 1. extend
-    Segment a = makeSeg(s, t1 - t0, pPre, (pClasp - pPre) * (0.8f / (t2 - t1)), qs, fo);
+    // In contact the path, the rotation and the raised elbow stay exactly as planned (the partner
+    // plans the mirror image of them).
+    auto contact = [&](const HandSample& s, float Tseg, vec3 p1, vec3 v1, const FingerPose& f0, const FingerPose& f1) {
+        Segment sg = makeSeg(s, Tseg, p1, v1, qs, f1);
+        sg.fing.keys.clear();
+        sg.fing.add(0.0f, f0);
+        sg.fing.add(1.0f, f1);
+        sg.elbow0 = sg.elbow1 = kShakeElbow;
+        sg.locked = true;
+        mo.segs.push_back(sg);
+        return sg.sample(sg.T);
+    };
+    // 1. extend: arrives at the pre-contact pose already sliding in. The hand reaches out open, the
+    // thumb up, then takes the open hand that slides in (its thumb still up, a little more over the
+    // palm: it slides past the partner's thumb).
+    const vec3 vIn = (pClasp - pPre) * (1.0f / (t2 - t1));
+    Segment a = makeSeg(from, t1 - t0, pPre, vIn, qs, fo);
     a.arcH = 0.05f;
     a.arcPeak = 0.45f;
     a.rot.keys.clear();
@@ -520,35 +550,49 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
     a.rot.add(0.80f, qs);
     a.fing.keys.clear();
     a.fing.add(0.0f, from.f);
-    if (t0 > 0.0f) a.fing.add(0.20f, letGo);   // off the pen
-    a.fing.add(0.60f, fo);
+    if (t0 > 0.0f) {
+        // Off the pen, then out of the writing grip, unhurried (the long fingers halfway open when
+        // the thumb is up).
+        a.fing.add(0.20f, letGo);
+        FingerPose up = fpLerp(letGo, fo, 0.5f);
+        for (int j = 0; j < 4; ++j) up.v[Thumb][j] = poseShakeReach().v[Thumb][j];
+        a.fing.add(0.56f, up);
+    } else {
+        a.fing.add(0.55f, poseShakeReach());
+        a.fing.add(0.68f, poseShakeReach());
+    }
+    a.fing.add(0.92f, fo);
+    a.elbow1 = kShakeElbow;
     clearPath(a, from, fpLerp(from.f, fo, 0.5f), tableC, R);
+    // (Its horizontal motion may end early, then goes on at vIn: still at pPre at the end.)
+    a.p1 = a.p1 - vec3(vIn.x, 0.0f, vIn.z) * ((1.0f - a.he) * a.T);
     mo.segs.push_back(a);
-    s = a.sample(a.T);
-    // 2. slide in and close the grip (clasp event at the end)
-    Segment b = makeSeg(s, t2 - t1, pClasp, vec3(0), qs, fg);
-    b.fing.keys.clear();
-    b.fing.add(0.0f, s.f);
-    b.fing.add(0.15f, s.f);
-    b.fing.add(1.0f, fg);
-    mo.segs.push_back(b);
-    s = b.sample(b.T);
-    // 3. two pumps (both animators compute the same vertical motion)
-    Segment c = makeSeg(s, t3 - t2, pClasp, vec3(0), qs, fg);
-    c.oscAmp = 0.032f;
-    c.oscCycles = 2.0f;
-    c.os = 0.04f;
-    c.oe = 0.92f;
-    mo.segs.push_back(c);
-    s = c.sample(c.T);
-    // 4. release: fingers open, hand slides back a little
-    Segment d = makeSeg(s, t4 - t3, pClasp - fingerDir * 0.02f - palmN * 0.006f, vec3(0), qs, fpLerp(fg, fo, 0.85f));
-    mo.segs.push_back(d);
-    s = d.sample(d.T);
-    // 5. back to rest
-    mo.segs.push_back(shakeRetract(s, T - t4));
-    curEvents.push_back({start + t2, EventType::HandshakeClasp, ActNone, false});
-    curEvents.push_back({start + t3, EventType::HandshakeRelease, ActNone, false});
+    HandSample s = a.sample(a.T);
+    // 2. slide in, open, until the palms touch
+    s = contact(s, t2 - t1, pClasp, vec3(0), fo, fo);
+    // 3. close the grip (clasp event at the end)
+    s = contact(s, tc - t2, pClasp, vec3(0), fo, fg);
+    // 4. two pumps (both animators compute the same vertical motion)
+    {
+        Segment c = makeSeg(s, tp - tc, pClasp, vec3(0), qs, fg);
+        c.oscAmp = kShakePump;
+        c.oscCycles = 2.0f;
+        c.os = 0.04f;
+        c.oe = 1.0f;
+        c.elbow0 = c.elbow1 = kShakeElbow;
+        c.locked = true;
+        mo.segs.push_back(c);
+        s = c.sample(c.T);
+    }
+    // 5. open the hand where it is
+    s = contact(s, to - tp, pClasp, vec3(0), fg, fo);
+    // 6. withdraw it the way it came, gathering speed all the way (2.2 times the mean speed at the
+    // end, its acceleration back to zero): the way back to rest goes on from that speed
+    s = contact(s, tw - to, pPre, (pPre - pClasp) * (2.2f / (tw - to)), fo, fo);
+    // 7. back to rest
+    mo.segs.push_back(shakeRetract(s, T - tw));
+    curEvents.push_back({start + tc, EventType::HandshakeClasp, ActNone, false});
+    curEvents.push_back({start + tr, EventType::HandshakeRelease, ActNone, false});
     curTargetWorld = cW;
 }
 
@@ -568,27 +612,104 @@ Segment Animator::Impl::shakeRetract(const HandSample& s, float T) {
     return e;
 }
 
-// cancelTasks() during a handshake: the eyes leave the partner at once. A right-handed player's
-// shaking hand is the playing one, which goes on with the next task. A left-handed player's is its
-// writing hand: it goes back to its rest within Timing::Retract, and the queued writing tasks wait
-// until it is there (wr.suspendUntil), while the torso lets go of it. A pen it is laying down is
-// laid down first, as the handshake planned it, and PenPut fires at its own instant: the rest of
-// that becomes a PutPen of the writing hand.
+// The shaking hand lets go of the partner's from the instant tc, the handshake cut short (by this
+// robot, or by its partner: followPartnerCut). Both robots build it from the same instant and from
+// their own plan only, so the two hands stay each other's mirror image until they are apart. For
+// kShakeLetGoOpen the hand goes on as planned (the pumps, the slide in: as the partner's does)
+// while the fingers open (no finger bone turns faster than 1800 deg/s); then it backs off along the
+// slide, and back to rest by tRest. 'quick' (the robot that was cut, wanted elsewhere: back at rest
+// kShakeLetGoQuick after the cut): 70% of the slide in 0.05 s, then at once on its way back (fast:
+// up to ~5 m/s); otherwise the whole slide in 0.14 s, as in the release.
+void Animator::Impl::shakeLetGo(float tc, float tRest, bool quick, Motion& mo) {
+    const Motion planned = shakeHand().motion;
+    const FingerPose f0 = planned.sample(tc).f, fo = poseShakeOpen();
+    const float tOpen = kShakeLetGoOpen;
+    mo = Motion();
+    mo.start = tc;
+    Segment a;
+    a.T = tOpen;
+    a.follow = [planned, tc, f0, fo, tOpen](float t) {
+        HandSample s = planned.sample(tc + t);
+        s.f = fpLerp(f0, fo, minJerk(clamp(t / tOpen, 0.0f, 1.0f)));
+        return s;
+    };
+    mo.segs.push_back(a);
+    HandSample s = a.sample(tOpen);
+    const float tw = quick ? 0.05f : 0.14f;
+    const vec3 slide = (shakePPre - shakePClasp) * (quick ? 0.7f : 1.0f);
+    Segment w = makeSeg(s, tw, s.p + slide, slide * (2.2f / tw), shakeQ, fo);
+    w.elbow0 = w.elbow1 = kShakeElbow;
+    w.locked = true;
+    mo.segs.push_back(w);
+    s = w.sample(tw);
+    mo.segs.push_back(shakeRetract(s, std::max(0.12f, tRest - (tc + tOpen + tw))));
+}
+
+// The partner's handshake was cut short (cancelTasks on it: the online opponent's move came): this
+// robot lets go too, from the same instant, and is back at rest by the end of its own handshake.
+// Only the time of the cut is read from the partner, never its motion.
+void Animator::Impl::followPartnerCut() {
+    if (!running || cur.type != TaskType::Handshake || !partner || !partner->impl_) return;
+    const float tc = partner->impl_->shakeCutAt;
+    if (tc < shakeBegin - 1e-4f || tc <= shakeCutSeen + 1e-6f || tc >= shakeOpenAt) return;   // (opening already: as planned)
+    shakeCutSeen = tc;
+    for (TimedEvent& e : curEvents)
+        if (e.type == EventType::HandshakeClasp && !e.done && e.t > tc) e.done = true;   // (no clasp sound)
+    const float tEnd = curStart + curT;
+    Hand& h = shakeHand();
+    Motion mo;
+    if (tc < shakeContact0) {   // before the hands meet: back to rest from where the hand is
+        mo.start = tc;
+        mo.segs.push_back(shakeRetract(h.motion.sample(tc), clamp(tEnd - tc, 0.45f, 0.80f)));
+    } else {
+        shakeLetGo(tc, std::min(tEnd, tc + kShakeLetGoOpen + 0.14f + 0.60f), false, mo);
+    }
+    h.motion = mo;
+}
+
+// cancelTasks() during a handshake: the eyes leave the partner at once. In contact the shaking hand
+// first lets go of the partner's (shakeLetGo; the partner does the same from the same instant) and
+// is back at its rest kShakeLetGoQuick later. A right-handed player's shaking hand is the playing
+// one: a Retract keeps that way back, any other task starts once the hand is out of the partner's
+// (shakeClearAt); not in contact, the next task goes on from where the hand is. A left-handed
+// player's is its writing hand: it goes back to its rest (within Timing::Retract when not in
+// contact), the queued writing tasks wait until it is there (wr.suspendUntil), while the torso lets
+// go of it. A pen it is laying down is laid down first, as the handshake planned it, and PenPut
+// fires at its own instant: the rest of that becomes a PutPen of the writing hand.
 void Animator::Impl::cutHandshake() {
     shakeStart = -100.0f;
-    if (!mirrored) return;
+    shakeCutAt = time;
+    const bool inContact = time >= shakeContact0 && time < shakeContact1;
+    if (!mirrored) {
+        if (inContact) {
+            Motion mo;
+            shakeLetGo(time, time + kShakeLetGoQuick, true, mo);
+            right().motion = mo;
+            shakeRestAt = time + kShakeLetGoQuick;
+            shakeClearAt = time + kShakeLetGoOpen + 0.05f;
+        }
+        return;
+    }
     const float u = time - curStart;
     shakeCutW = smoothstep(0.0f, 0.3f, u) * (1.0f - smoothstep(curT - 0.3f, curT, u));
+    shakeCutFade = Timing::Retract;
     Hand& h = left();
     const TimedEvent* put = nullptr;
     for (const TimedEvent& e : curEvents)
         if (e.action == ActPutPen && !e.done) put = &e;
     Motion mo;
     if (!put) {
-        mo.start = time;
-        mo.segs.push_back(shakeRetract(h.motion.sample(time), Timing::Retract));
+        if (inContact) {
+            // (The torso lets go of the hand while it opens, before the fast way back.)
+            shakeLetGo(time, time + kShakeLetGoQuick, true, mo);
+            shakeCutFade = kShakeLetGoOpen + 0.05f;
+        } else {
+            mo.start = time;
+            mo.segs.push_back(shakeRetract(h.motion.sample(time), Timing::Retract));
+        }
         h.motion = mo;
-        wr.suspendUntil = time + Timing::Retract;
+        wr.suspendUntil = time + (inContact ? kShakeLetGoQuick : Timing::Retract);
+        shakeCutFrom = time;
         return;
     }
     const Segment laying = h.motion.segs.front();   // the pen put down (planHandshake)
@@ -597,6 +718,7 @@ void Animator::Impl::cutHandshake() {
     mo.segs.push_back(penLetGo(laying.sample(laying.T), Timing::Retract, tablePinch(toCharM(shakePutFrame), 0.8f).open));
     h.motion = mo;
     wr.suspendUntil = put->t + Timing::Retract;
+    shakeCutFrom = put->t;
     wr.cur = WriteTask();
     wr.cur.type = WriteTaskType::PutPen;
     wr.cur.frame = shakePutFrame;
@@ -642,15 +764,16 @@ void Animator::Impl::validateRests(const Task* t) {
 void Animator::Impl::relaxWrist(Hand& h) {
     for (auto& sg : h.motion.segs) {
         // (A procedural segment ignores rotCorr; a hold with the fingertip pinned must keep its
-        // rotation, or the pinned tip would move with it.)
-        if (sg.T < 0.12f || sg.usePivot || sg.follow || sg.pinFrom >= 1.0f) continue;
+        // rotation, or the pinned tip would move with it; so must a handshake in contact, whose
+        // partner plans the mirror image of it.)
+        if (sg.T < 0.12f || sg.usePivot || sg.follow || sg.locked || sg.pinFrom >= 1.0f) continue;
         auto worst = [&](float& atU) {
             float w = 0.0f;
             atU = -1.0f;
             for (int k = 0; k <= 14; ++k) {
                 float u = 0.15f + 0.05f * float(k);
                 HandSample s = sg.sample(u * sg.T);
-                float st = armStrain(s.p, s.q);
+                float st = armStrainSide(h.side, s.p, s.q, s.elbow);
                 if (st > w) { w = st; atU = u; }
             }
             return w;
@@ -659,8 +782,8 @@ void Animator::Impl::relaxWrist(Hand& h) {
         float w0 = worst(u0);
         if (w0 < 0.04f || u0 < 0.0f) continue;
         HandSample s = sg.sample(u0 * sg.T);
-        armStrain(s.p, s.q);                      // leaves the solved arm in G
-        quat achieved = rotOf(G[HandR]), neutral = rotOf(G[ForeArmR]);
+        armStrainSide(h.side, s.p, s.q, s.elbow);   // leaves the solved arm in G
+        quat achieved = rotOf(G[armBone(h.side, HandL)]), neutral = rotOf(G[armBone(h.side, ForeArmL)]);
         quat key = qslerp(achieved, neutral, 0.35f);
         quat base = s.q;
         sg.rotCorr = normalize(key * conjugate(base));
@@ -713,7 +836,9 @@ void Animator::Impl::liftForearm(Hand& h) {
     };
     for (size_t i = 0; i < h.motion.segs.size(); ++i) {
         Segment& sg = h.motion.segs[i];
-        if (sg.follow) {   // procedural (a Trace): its plan keeps its own clearance (finishTracePlan)
+        // A procedural segment (a Trace) keeps its own clearance (finishTracePlan); a locked one (a
+        // handshake in contact) must stay the mirror image of the partner's.
+        if (sg.follow || sg.locked) {
             segStart += sg.T;
             continue;
         }
@@ -804,7 +929,7 @@ void Animator::Impl::evaluate(float t, Pose& pose, mat4* worldOut) {
         // (cut short: out while the hand goes back, see cutHandshake).
         const float u = t - curStart;
         const float w = shaking ? smoothstep(0.0f, 0.3f, u) * (1.0f - smoothstep(curT - 0.3f, curT, u))
-                                : shakeCutW * (1.0f - smoothstep(wr.suspendUntil - Timing::Retract, wr.suspendUntil, t));
+                                : shakeCutW * (1.0f - smoothstep(shakeCutFrom, shakeCutFrom + shakeCutFade, t));
         if (w > 0.0f) {
             SpineParams sl = solveSpine(pose, mirrorX(hlMotion.p), flex, idleFlex, -idleTwist, -idleSide);
             sp.flex = lerp(sp.flex, sl.flex, w);
@@ -1403,7 +1528,7 @@ float Animator::remainingTime() const {
     float r = I.running ? std::max(0.0f, I.curStart + I.curT - I.time) : 0.0f;
     float end = I.time + r;
     for (auto& t : I.queue) {
-        const float wait = std::max(0.0f, t.notBefore - end), d = taskDuration(t);
+        const float wait = std::max(0.0f, I.startAfterCut(t) - end), d = taskDuration(t);
         r += wait + d;
         end += wait + d;
     }
@@ -1445,6 +1570,7 @@ void Animator::update(float dt, std::vector<Event>& events) {
     Impl& I = *impl_;
     I.owner = this;
     I.fresh.clear();   // the game has seen the release events of the previous call
+    I.followPartnerCut();
     if (I.restsDirty && !I.running && I.queue.empty() && pieceTransform) {
         // First look at the pieces (spare pieces beside the board): the idle hands make room.
         I.restsDirty = false;
@@ -1461,7 +1587,7 @@ void Animator::update(float dt, std::vector<Event>& events) {
         const float never = 1e30f;
         float tm = never, tw = never;
         if (I.running) tm = I.curStart + I.curT;
-        else if (!I.queue.empty()) tm = std::max(I.time, I.queue.front().notBefore);   // (the hand holds meanwhile)
+        else if (!I.queue.empty()) tm = std::max(I.time, I.startAfterCut(I.queue.front()));   // (the hand holds meanwhile)
         if (!I.nextWriteBoundary(tw)) tw = never;
         const float tn = std::min(tm, tw);
         if (tn > tEnd) break;

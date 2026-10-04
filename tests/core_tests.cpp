@@ -201,6 +201,60 @@ TEST(image_png_bytes) {
     std::remove(path.c_str());
 }
 
+// The icon's entries as the X11 window icon wants them: width, height, then ARGB rows top down.
+TEST(image_ico_entries) {
+    // A 2x2 32-bit DIB entry (bottom-up BGRA rows, then the AND mask) and a PNG entry.
+    std::vector<uint8_t> ico = {0, 0, 1, 0, 2, 0};
+    auto le = [&](std::vector<uint8_t>& v, uint32_t x, int bytes) {
+        for (int i = 0; i < bytes; ++i) v.push_back(uint8_t(x >> (8 * i)));
+    };
+    std::vector<uint8_t> dib;
+    le(dib, 40, 4); le(dib, 2, 4); le(dib, 4, 4); le(dib, 1, 2); le(dib, 32, 2);
+    for (int i = 0; i < 6; ++i) le(dib, 0, 4);
+    const uint8_t pixels[16] = {0x01, 0x02, 0x03, 0x80, 0x04, 0x05, 0x06, 0x81,    // bottom row (y = 1)
+                                0x07, 0x08, 0x09, 0xFF, 0x0A, 0x0B, 0x0C, 0x00};   // top row (y = 0)
+    dib.insert(dib.end(), pixels, pixels + 16);
+    le(dib, 0, 8);   // the AND mask, ignored
+    const std::vector<uint8_t> png = {0x89, 'P', 'N', 'G', 13, 10, 26, 10};
+    const uint32_t dibAt = 6 + 2 * 16, pngAt = dibAt + uint32_t(dib.size());
+    for (int k = 0; k < 2; ++k) {
+        ico.insert(ico.end(), {uint8_t(k ? 0 : 2), uint8_t(k ? 0 : 2), 0, 0, 1, 0, 32, 0});
+        le(ico, k ? uint32_t(png.size()) + 40 : uint32_t(dib.size()), 4);
+        le(ico, k ? pngAt : dibAt, 4);
+    }
+    ico.insert(ico.end(), dib.begin(), dib.end());
+    ico.insert(ico.end(), png.begin(), png.end());
+    ico.resize(ico.size() + 40);   // the PNG entry's claimed length
+    const std::vector<uint32_t> want = {2, 2, 0xFF090807u, 0x000C0B0Au, 0x80030201u, 0x81060504u};
+    CHECK(image::icoImages(ico.data(), ico.size()) == want);
+    // Truncated data: the entry out of bounds is skipped; a bad header gives nothing.
+    CHECK(image::icoImages(ico.data(), dibAt + 20).empty());
+    CHECK(image::icoImages(ico.data(), 5).empty());
+    std::vector<uint8_t> bad = ico;
+    bad[2] = 2;   // type 2 is a cursor
+    CHECK(image::icoImages(bad.data(), bad.size()).empty());
+    CHECK(image::icoImages(nullptr, 0).empty());
+#ifndef _WIN32
+    // The game's icon, embedded for the X11 window: its uncompressed sizes, transparent corners,
+    // a (nearly) opaque centre.
+    const embedded::File* f = embedded::find("res/icons/scacelith.ico");
+    CHECK(f != nullptr);
+    if (f) {
+        const std::vector<uint32_t> px = image::icoImages(f->data, f->size);
+        std::vector<uint32_t> sizes;
+        for (size_t i = 0; i + 1 < px.size(); i += 2 + size_t(px[i]) * px[i + 1]) {
+            const uint32_t w = px[i];
+            sizes.push_back(w);
+            const uint32_t* p = px.data() + i + 2;
+            CHECK_EQ(p[0] >> 24, 0u);
+            CHECK_EQ(p[w * w - 1] >> 24, 0u);
+            CHECK(p[(w / 2) * w + w / 2] >> 24 >= 0xF0u);   // the artwork is 253 there
+        }
+        CHECK(sizes == std::vector<uint32_t>({16, 20, 24, 32, 40, 48, 64, 96, 128}));
+    }
+#endif
+}
+
 #ifndef _WIN32
 // A failed write (a full disk: /dev/full) is reported and leaves no file behind.
 TEST(image_png_write_error) {

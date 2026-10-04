@@ -285,8 +285,8 @@ void Animator::Impl::exportEvents(std::vector<Event>& ev, size_t from) const {
     }
 }
 
-float Animator::Impl::armStrainSide(Side s, vec3 wristC, quat q) {
-    if (s == Side::Right) return armStrain(wristC, q);
+float Animator::Impl::armStrainSide(Side s, vec3 wristC, quat q, float elbow) {
+    if (s == Side::Right) return armStrain(wristC, q, nullptr, nullptr, elbow);
     // The mirror image of armStrain(): the torso leans and turns for this hand the way it does for
     // the right one.
     Pose tmp;
@@ -298,7 +298,7 @@ float Animator::Impl::armStrainSide(Side s, vec3 wristC, quat q) {
     reachShort = wristClamp = pronClamp = 0;
     applySpine(tmp, sp);
     fkChain(tmp, Pelvis, Spine2);
-    solveArm(tmp, s, wristC, q);
+    solveArm(tmp, s, wristC, q, elbow);
     float soft = softWristStrain(lastFlex, lastDev, lastPron);
     float r = wristClamp + pronClamp + reachShort * 10.0f + 0.5f * soft;
     diagSide = keep;
@@ -1206,10 +1206,12 @@ void Animator::Impl::writingSpine(SpineParams& sp, const HandSample& hl) {
     if (!wr.running && !wr.penHeld && !(mirrored && running && cur.type == TaskType::Handshake) && time >= wr.suspendUntil) return;
     Pose tmp;
     const float comfy = 0.84f * (L1 + L2);
+    // (Eased in over the last 4 cm, so a hand coming back fast does not jolt the torso.)
+    const float k = 0.04f;
     for (int it = 0; it < 3; ++it) {
-        float D = length(hl.p - shoulderFor(tmp, Side::Left, sp, hl.p));
-        if (D <= comfy) break;
-        sp.flex = std::min(0.60f, sp.flex + (D - comfy) * 1.6f);
+        float D = length(hl.p - shoulderFor(tmp, Side::Left, sp, hl.p)), x = D - comfy;
+        if (x <= -k) break;
+        sp.flex = std::min(0.60f, sp.flex + (x >= k ? x : (x + k) * (x + k) / (4.0f * k)) * 1.6f);
     }
 }
 

@@ -1,6 +1,7 @@
-// Null backend (Linux/tests): renders 10 ms blocks at real-time pace and discards them, or streams
-// them to a 16-bit stereo WAV file when SCACELITH_AUDIO_DUMP=<path.wav> is set (to hear what the
-// game played, e.g. the coach's speech against its gestures, where there is no device backend).
+// Null backend (no device, the tests, SCACELITH_AUDIO=null): renders 10 ms blocks at real-time
+// pace and discards them, or streams them to a 16-bit stereo WAV file when
+// SCACELITH_AUDIO_DUMP=<path.wav> is set (to hear what the game played, e.g. the coach's speech
+// against its gestures, without a device).
 // Each start() rewrites the file; the header sizes are patched at stop().
 #ifndef _WIN32
 #include "backend.h"
@@ -135,7 +136,11 @@ private:
 
 }  // namespace
 
-std::unique_ptr<Backend> createBackend() { return std::unique_ptr<Backend>(new NullBackend()); }
+std::unique_ptr<Backend> createNullBackend() { return std::unique_ptr<Backend>(new NullBackend()); }
+
+#ifndef __linux__   // Linux: backend_alsa.cpp
+std::unique_ptr<Backend> createBackend() { return createNullBackend(); }
+#endif
 
 }  // namespace audio
 #endif

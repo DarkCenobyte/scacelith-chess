@@ -22,9 +22,10 @@ render::RenderSettings Settings::renderSettings() const {
 }
 
 namespace {
-// The fallback of a settings file, "" when it has none: the default file next to the executable
-// falls back to the user data directory (a read-only install); an explicit --ini file has none,
-// so its reads and writes never go to two different files.
+// The fallback of a settings file, "" when it has none: the file of a portable install, next to
+// the executable, falls back to the user data directory when it cannot be written (a read-only
+// folder); any other file (the user data directory's, an explicit --ini) has none, so its reads
+// and writes never go to two different files.
 std::string fallbackFor(const std::string& p) {
     if (!p.empty() && p != plat::exeDirectory() + "Scacelith.ini") return std::string();
     std::string alt = plat::userDataDirectory() + "Scacelith.ini";

@@ -1,11 +1,17 @@
 // Output device backends. The backend owns the audio thread and calls the render function with
 // interleaved float stereo at the device rate; it converts to the device format itself.
 //   * Windows: WASAPI shared mode, event driven (backend_wasapi.cpp)
-//   * elsewhere: null backend consuming at real-time pace, optionally dumping to a WAV file
-//     (SCACELITH_AUDIO_DUMP, backend_null.cpp)
+//   * Linux: ALSA, libasound.so.2 loaded at run time (also PulseAudio and PipeWire through their
+//     ALSA plugins), the null backend when it is missing or no device opens (backend_alsa.cpp)
+//   * elsewhere, and on request: the null backend, consuming at real-time pace, optionally
+//     dumping to a WAV file (backend_null.cpp)
+// Environment: SCACELITH_AUDIO=null forces the null backend (the unit tests and the screenshot
+// tool set it), SCACELITH_AUDIO_DUMP=<file.wav> too (it records what the null backend plays),
+// SCACELITH_ALSA_DEVICE=<pcm> names the ALSA device ("default" otherwise).
 #pragma once
 #include <algorithm>
 #include <atomic>
+#include <cstring>
 #include <memory>
 
 namespace audio {
@@ -20,14 +26,15 @@ inline int fallbackDeviceRate(unsigned long rate) {
     return rate >= unsigned(kMinDeviceRate) && rate <= unsigned(kMaxDeviceRate) ? int(rate) : 48000;
 }
 
-// How a device stream ended (WASAPI).
+// How a device stream ended.
 enum class StreamEnd { Quit, Changed, Lost, Stalled };
-// WASAPI reopen policy. waitMs() gives the wait in ms before the next open attempt (0 = at once)
-// after a failed open (opened = false) or a stream that ended with 'end'; 'healthy': the stream
-// delivered at least a second of audio. The back-off (250 ms, doubling up to 5 s) restarts after a
-// healthy stream, a default-device change, or an open that follows failed opens (the device came
-// back). A default-device change, or the loss of a healthy device, reopens at once; a device that
-// keeps failing right after opening backs off like a failed open (no tight reopen loop).
+// Device reopen policy (WASAPI, ALSA). waitMs() gives the wait in ms before the next open
+// attempt (0 = at once) after a failed open (opened = false) or a stream that ended with 'end';
+// 'healthy': the stream delivered at least a second of audio. The back-off (250 ms, doubling up to
+// 5 s) restarts after a healthy stream, a default-device change, or an open that follows failed
+// opens (the device came back). A default-device change, or the loss of a healthy device, reopens
+// at once; a device that keeps failing right after opening backs off like a failed open (no tight
+// reopen loop).
 struct ReopenBackoff {
     int failures = 0;         // consecutive attempts that backed off
     bool lastOpened = false;  // the previous attempt opened the device
@@ -74,6 +81,27 @@ public:
     BackendStatus status;
 };
 
+// Which backend createBackend() makes, from SCACELITH_AUDIO and SCACELITH_AUDIO_DUMP (either may
+// be null): a dump, or SCACELITH_AUDIO=null, asks for the null backend; otherwise the platform's
+// device backend, falling back to the null one.
+enum class BackendChoice { Device, Null };
+inline BackendChoice chooseBackend(const char* audioEnv, const char* dumpEnv) {
+    if (dumpEnv && *dumpEnv) return BackendChoice::Null;
+    if (audioEnv && std::strcmp(audioEnv, "null") == 0) return BackendChoice::Null;
+    return BackendChoice::Device;
+}
+
+// A device that takes data faster than it plays it (ALSA's "null" PCM, a broken plugin) would make
+// the mixer run ahead of real time: true when 'written' frames exceed what 'elapsed' seconds of
+// playing at 'rate' could have consumed, with 1 % and 100 ms of margin plus the whole buffer (far
+// above any real clock drift).
+inline bool aheadOfClock(unsigned long long written, double elapsed, int rate, int bufferFrames) {
+    return double(written) > (elapsed * 1.01 + 0.1) * double(rate) + double(bufferFrames);
+}
+
 std::unique_ptr<Backend> createBackend();
+#ifndef _WIN32
+std::unique_ptr<Backend> createNullBackend();
+#endif
 
 }  // namespace audio

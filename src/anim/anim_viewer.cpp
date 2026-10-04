@@ -33,7 +33,11 @@
 //                   from the front and from the thumb side) | page | pageb (page corner) | lhand (Black's
 //                   playing hand from its left) | pad | padb (the scoresheet from above) | clock |
 //                   coachhand | coachhands | coachhandt (Black's playing hand close up, from the front /
-//                   from its outside / from its thumb side)
+//                   from its outside / from its thumb side) | shakex | shakexl (the handshake from White's /
+//                   Black's back of hand) | shakeu | shaked (from the thumbs' side above / the little fingers'
+//                   side below) | shakew | shakeb (down White's / Black's forearm) | shakeq (three-quarter view
+//                   from above); the shake* close-ups follow the two clasped hands through the pumps
+//   --only 0|1      draw White's (0) or Black's (1) robot only
 //   --robot         draw the real porcelain robot instead of the capsule robots (slower start)
 //   --solo          draw only the pieces held or within 6 cm of a playing index fingertip
 //   --selftest      numeric checks of the IK/grasp/timing/writing/mirroring and of the coach demo (results in
@@ -47,7 +51,9 @@
 #include "../game/layout.h"
 #include "../render/materials/material_library.h"
 #include "../render/mesh.h"
+#include "../render/post/postfx.h"
 #include "animator.h"
+#include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <deque>
@@ -511,7 +517,8 @@ vec3 pageCorner(int a, float s) {   // the outer corner of the bottom edge (the 
 
 const char* kViews[] = {"side", "sidel", "front", "back", "top", "white", "black", "hand", "handb", "handl", "shake", "orbit",
                         "pinch", "pinchs", "pinchb", "pinchbs", "pen", "pens", "penb", "penbs", "page", "pageb", "lhand", "pad", "padb", "clock",
-                        "coachhand", "coachhands", "coachhandt"};
+                        "coachhand", "coachhands", "coachhandt", "shakex", "shakexl", "shakeu", "shaked", "shakew", "shakeb",
+                        "shakeq"};
 constexpr int kViewCount = int(sizeof(kViews) / sizeof(kViews[0]));
 constexpr int kOrbitView = 11;
 
@@ -543,6 +550,7 @@ public:
             demo_ = keep;
         }
         solo_ = ctx.hasArg("--solo");
+        only_ = std::atoi(ctx.argValue("--only", "-1").c_str());
         reset();
         float t0 = ctx.fixedTime >= 0 ? ctx.fixedTime : 0.0f;
         simulateTo(t0);
@@ -572,6 +580,7 @@ public:
         env.time = simTime_;
         env.sunDirection = normalize(vec3(-0.55f, 0.62f, 0.25f));
         render::Camera cam = camera();
+        r.post().settings.dofFocusDistance = focus_;   // in focus where the view looks
         r.beginFrame(cam, env, dt);
         auto draw = [&](const Mesh& mesh, const Material& m, const mat4& model, uint32_t id, uint32_t flags = render::DRAW_CAST_SHADOW) {
             render::DrawItem d;
@@ -597,12 +606,10 @@ public:
             draw(pieceMesh_[pieces_[i].type], pieces_[i].color ? pieceBlackMat_ : pieceWhiteMat_, pieces_[i].xf, 100 + uint32_t(i));
         }
         if (sheets_) renderSheets(draw);
-        if (robot_) {
-            character::submitRobot(r, gpuRobot_, anim_[0].globals(), view_ == 5, 1000);
-            character::submitRobot(r, gpuRobot_, anim_[1].globals(), view_ == 6, 2000);
-        } else {
-            body_.submit(r, anim_[0].globals(), robotMat_[0], eyeMat_, darkMat_, 1000, view_ == 5);
-            body_.submit(r, anim_[1].globals(), robotMat_[1], eyeMat_, darkMat_, 2000, view_ == 6);
+        for (int a = 0; a < 2; ++a) {
+            if (only_ == 1 - a) continue;
+            if (robot_) character::submitRobot(r, gpuRobot_, anim_[a].globals(), view_ == 5 + a, 1000 * uint32_t(a + 1));
+            else body_.submit(r, anim_[a].globals(), robotMat_[a], eyeMat_, darkMat_, 1000 * uint32_t(a + 1), view_ == 5 + a);
         }
         r.endFrame();
     }
@@ -1459,14 +1466,27 @@ private:
         if (t - simTime_ > 1e-6f) step(t - simTime_);
     }
 
+    // Midpoint of both robots' real right hands (wrist and middle knuckle), world: the handshake's
+    // clasp, followed through the pumps.
+    vec3 claspPoint() const {
+        vec3 p(0, 0, 0);
+        for (int a = 0; a < 2; ++a) {
+            const mat4* g = anim_[a].globals();
+            p = p + (g[HandR].translation() + g[MiddleR1].translation()) * 0.25f;
+        }
+        return p;
+    }
+
     render::Camera camera() const {
         render::Camera c;
         c.fovY = 42.0f * DEG;
         c.nearZ = 0.02f;
-        auto look = [&](vec3 pos, vec3 target, float fov) {
+        focus_ = 0.8f;
+        auto look = [&](vec3 pos, vec3 target, float fov, vec3 up = vec3(0, 1, 0)) {
             c.position = pos;
             c.fovY = fov * DEG;
-            c.lookAt(target);
+            c.lookAt(target, up);
+            focus_ = length(target - pos);
         };
         switch (view_) {
             case 0: look({1.50f, 1.18f, 0.0f}, {0, 0.93f, 0}, 44); break;
@@ -1569,7 +1589,37 @@ private:
                 look(hp + off, hp, 34);
                 break;
             }
-            default: return orbit_.camera();
+            case 29:
+            case 30:
+            case 31:
+            case 32:
+            case 33:
+            case 34:
+            case 35: {
+                // The handshake close up, aimed at the clasp (White sits at +Z, its right is +X).
+                const vec3 p = claspPoint();
+                c.nearZ = 0.01f;
+                switch (view_) {
+                    case 29: look(p + vec3(0.30f, 0.02f, 0), p, 30); break;
+                    case 30: look(p + vec3(-0.30f, 0.02f, 0), p, 30); break;
+                    case 31: look(p + vec3(0, 0.30f, 0.001f), p, 30, vec3(0, 0, -1)); break;
+                    case 32: {   // from below, kept above the board when the pump is low
+                        vec3 e = p + vec3(0, -0.20f, 0.001f);
+                        e.y = std::max(e.y, layout::BOARD_TOP_Y + 0.03f);
+                        look(e, p, 45, vec3(0, 0, -1));
+                        break;
+                    }
+                    case 33: look(p + vec3(0.10f, 0.08f, 0.30f), p, 30); break;
+                    case 34: look(p + vec3(-0.10f, 0.08f, -0.30f), p, 30); break;
+                    default: look(p + vec3(0.22f, 0.18f, 0.12f), p, 30); break;
+                }
+                break;
+            }
+            default: {
+                render::Camera oc = orbit_.camera();
+                focus_ = orbit_.distance;
+                return oc;
+            }
         }
         return c;
     }
@@ -1612,6 +1662,8 @@ private:
     int clockSide_ = -1;
     float headYaw_ = 0, headPitch_ = 0;
     int view_ = 0;
+    int only_ = -1;               // --only: draw this robot only (-1 both)
+    mutable float focus_ = 0.8f;  // depth of field focus distance of the current view (camera())
     bool frozen_ = false, paused_ = false, slow_ = false, solo_ = false;
     OrbitCamera orbit_;
 };
@@ -2439,8 +2491,42 @@ void AnimViewer::writingSelfTest() {
         W.enqueue(h);
         h.partner = &W;
         B.enqueue(h);
+        // How the two real right hands hold each other (from the clasp to the end of the pumps): the
+        // palms face each other at palm-on-palm distance, the hands cross at 35..65 degrees (fingers
+        // pitched down, not end to end), each long fingertip pad lies on the other hand's back
+        // (behind its mid-plane, between its wrist + 15 mm and its knuckles: not round its wrist
+        // cuff), the thumb-index webs meet. (The old clasp, palms on one point with the hands nearly
+        // end to end, crossed at 9 degrees with the fingertips past the partner's wrist.)
+        struct Crossed {
+            float facing = -1.0f, planes = 0.0f, crossLo = 1e9f, crossHi = 0.0f, behind = 1e9f, fromWrist = 1e9f, toKnuckles = 1e9f, webs = 0.0f;
+            void add(const Skeleton& sk, const mat4* a, const mat4* b) {
+                const vec3 na = normalize(transformDir(a[HandR], vec3(1, 0, 0))), nb = normalize(transformDir(b[HandR], vec3(1, 0, 0)));
+                facing = std::max(facing, dot(na, nb));
+                planes = std::max(planes, std::fabs(dot(b[HandR].translation() - a[HandR].translation(), na)));
+                vec3 fa = transformDir(a[HandR], vec3(0, -1, 0)), fb = transformDir(b[HandR], vec3(0, -1, 0));
+                fa = normalize(fa - na * dot(fa, na));
+                fb = normalize(fb - na * dot(fb, na));
+                const float cross = std::acos(clamp(std::fabs(dot(fa, fb)), 0.0f, 1.0f));
+                crossLo = std::min(crossLo, cross);
+                crossHi = std::max(crossHi, cross);
+                const mat4 toB = inverseAffine(b[HandR]);
+                for (int f = 1; f <= 4; ++f) {
+                    const Bone b3 = Bone(ThumbR1 + f * 3 + 2);
+                    const vec3 pad = transformPoint(toB, transformPoint(a[b3], vec3(0.0068f, -0.72f * sk.boneLength[b3], 0.0f)));
+                    behind = std::min(behind, -pad.x);
+                    fromWrist = std::min(fromWrist, -pad.y);
+                    toKnuckles = std::min(toKnuckles, pad.y + 0.086f);
+                }
+                auto web = [](const mat4* g) { return (g[ThumbR2].translation() + g[IndexR1].translation()) * 0.5f; };
+                webs = std::max(webs, length(web(a) - web(b)));
+            }
+            bool ok() const {
+                return facing < -0.95f && planes > 0.020f && planes < 0.034f && crossLo > 35.0f * DEG && crossHi < 65.0f * DEG && behind > 0.010f &&
+                       fromWrist > 0.015f && toKnuckles > 0.0f && webs < 0.025f;
+            }
+        } held;
         std::vector<Event> ev;
-        float putAt = -1, claspW = -1, claspB = -1, palmGap = 0;
+        float putAt = -1, claspW = -1, claspB = -1;
         bool heldAtClasp = true;
         for (float t = 0; t < 4.0f; t += 1.0f / 120.0f) {
             ev.clear();
@@ -2454,15 +2540,20 @@ void AnimViewer::writingSelfTest() {
                 if (e.type == EventType::HandshakeClasp) {
                     claspB = e.time;
                     heldAtClasp = B.holdsPen();
-                    auto palm = [&](const mat4* g, Bone hand, float side) { return transformPoint(g[hand], vec3(side * 0.0135f, -0.052f, 0.003f)); };
-                    palmGap = length(palm(W.globals(), HandR, 1.0f) - palm(B.globals(), HandR, 1.0f));
                 }
             }
+            if (claspB > 0.0f && B.time() <= claspB + 0.85f) {   // (the pumps end 0.88 s after the clasp)
+                held.add(robotSkeleton(), W.globals(), B.globals());
+                held.add(robotSkeleton(), B.globals(), W.globals());
+            }
         }
-        const bool fail = putAt < 0.0f || heldAtClasp || std::fabs(claspW - claspB) > 1e-5f || palmGap > 0.05f;
+        const bool fail = putAt < 0.0f || heldAtClasp || std::fabs(claspW - claspB) > 1e-5f || !held.ok();
         ::logx::write(fail ? ::logx::Level::Warn : ::logx::Level::Info,
-                      "selftest handshake with a left-handed player holding the pen: pen put down at t=%.3f, clasp %.3f / %.3f, right palms %.1f mm apart",
-                      putAt, claspW, claspB, palmGap * 1000.0f);
+                      "selftest handshake with a left-handed player holding the pen: pen put down at t=%.3f, clasp %.3f / %.3f; held: palms facing %.3f "
+                      "(< -0.95), mid-planes %.1f mm apart (20..34), crossing %.0f..%.0f deg (35..65), pads %.1f mm behind (> 10), wrist+%.1f mm (> 15), "
+                      "knuckles-%.1f mm (> 0), webs %.1f mm apart (< 25)",
+                      putAt, claspW, claspB, held.facing, held.planes * 1000.0f, held.crossLo / DEG, held.crossHi / DEG, held.behind * 1000.0f,
+                      held.fromWrist * 1000.0f, held.toKnuckles * 1000.0f, held.webs * 1000.0f);
     }
 }
 

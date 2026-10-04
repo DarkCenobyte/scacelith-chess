@@ -35,7 +35,11 @@ set(OPT_FLAGS $<$<CONFIG:Release>:-O2> $<$<CONFIG:RelWithDebInfo>:-O2 -g>)
 # Embedded data (shaders, fonts, ...) -> generated incbin table
 # ---------------------------------------------------------------------------------------------
 set(EMBED_CPP ${CMAKE_CURRENT_BINARY_DIR}/embedded_files.cpp)
-scacelith_embed_files(${EMBED_CPP} ${ROOT} shaders assets)
+set(EMBED_ITEMS shaders assets)
+if(NOT WIN32)
+    list(APPEND EMBED_ITEMS res/icons/scacelith.ico)   # the X11 window icon (Windows: the resource)
+endif()
+scacelith_embed_files(${EMBED_CPP} ${ROOT} ${EMBED_ITEMS})
 
 # ---------------------------------------------------------------------------------------------
 # Stockfish (GPL-3.0), compiled into the executable. See third_party/stockfish/README.scacelith.md
@@ -91,7 +95,8 @@ if(WIN32)
     target_link_libraries(scacelith_core PUBLIC ole32 winmm avrt)
 else()
     find_package(Threads REQUIRED)
-    target_link_libraries(scacelith_core PUBLIC Threads::Threads)
+    # dl: libasound.so.2 is loaded at run time (src/audio/backend_alsa.cpp; in libc from glibc 2.34)
+    target_link_libraries(scacelith_core PUBLIC Threads::Threads ${CMAKE_DL_LIBS})
 endif()
 # Text-to-speech (src/tts): the compute kernels are compiled once per instruction set and chosen at
 # run time (src/tts/kernels.h); everything else is baseline x86-64. MinGW does not align the stack
@@ -171,9 +176,13 @@ file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS
 list(REMOVE_ITEM GAME_SOURCES ${GAME_CORE_SOURCES})
 set(GAME_EXTRA)
 if(WIN32)
-    # The version resource and the manifest, with the version of cmake/version.cmake.
+    # The icon, the version resource and the manifest, with the version of cmake/version.cmake.
+    set(SCACELITH_ICON_ICO ${ROOT}/res/icons/scacelith.ico)
     configure_file(${ROOT}/res/scacelith.rc.in ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.rc @ONLY)
     configure_file(${ROOT}/res/scacelith.manifest.in ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.manifest @ONLY)
+    # windres reports no dependencies: a changed icon or manifest must still rebuild the resource.
+    set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.rc PROPERTIES
+        OBJECT_DEPENDS "${SCACELITH_ICON_ICO};${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.manifest")
     list(APPEND GAME_EXTRA ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.rc)
 endif()
 add_executable(scacelith ${ROOT}/src/main.cpp ${GAME_SOURCES} ${GAME_EXTRA})
@@ -191,6 +200,10 @@ if(WIN32)
 else()
     find_package(X11 REQUIRED)
     target_link_libraries(scacelith PRIVATE X11 GL dl)
+    # The release executable runs on other distributions than the one it was built on: libstdc++
+    # and libgcc are linked in (their versions differ between distributions, glibc's are
+    # backward-compatible), and it is stripped like the Windows one.
+    target_link_options(scacelith PRIVATE "$<$<CONFIG:Release>:-static-libgcc;-static-libstdc++;-s>")
 endif()
 
 # ---------------------------------------------------------------------------------------------

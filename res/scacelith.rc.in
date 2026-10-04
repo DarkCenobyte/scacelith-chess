@@ -1,5 +1,9 @@
 #include <windows.h>
 
+// The application icon: Explorer shows the first icon group, the window class loads id 1
+// (src/platform/platform_win32.cpp).
+1 ICON "@SCACELITH_ICON_ICO@"
+
 1 VERSIONINFO
 FILEVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0
 PRODUCTVERSION @PROJECT_VERSION_MAJOR@,@PROJECT_VERSION_MINOR@,@PROJECT_VERSION_PATCH@,0

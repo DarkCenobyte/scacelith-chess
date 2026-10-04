@@ -8,6 +8,7 @@
 #include "test.h"
 #include "audio/audio.h"
 #include "audio/backend.h"
+#include "audio/backend_alsa.h"
 #include "audio/mixer.h"
 #include "audio/offline.h"
 #include "audio/queue.h"
@@ -802,6 +803,159 @@ TEST(audio_backend_underrun_detection) {
     CHECK_EQ(underruns({480, 480, 480, 480, 0, 0, 480, 0}), 3);   // and every one after that
     CHECK_EQ(underruns({0, 480, 480, 480, 0}), 1);                // a dry start, then a glitch
 }
+
+TEST(audio_backend_choice) {
+    using audio::BackendChoice;
+    using audio::chooseBackend;
+    CHECK(chooseBackend(nullptr, nullptr) == BackendChoice::Device);
+    CHECK(chooseBackend("", "") == BackendChoice::Device);
+    CHECK(chooseBackend("alsa", nullptr) == BackendChoice::Device);
+    CHECK(chooseBackend("nul", nullptr) == BackendChoice::Device);
+    CHECK(chooseBackend("nullx", nullptr) == BackendChoice::Device);
+    CHECK(chooseBackend("null", nullptr) == BackendChoice::Null);
+    CHECK(chooseBackend(nullptr, "/tmp/out.wav") == BackendChoice::Null);   // a dump is the null backend's
+    CHECK(chooseBackend("alsa", "/tmp/out.wav") == BackendChoice::Null);
+}
+
+TEST(audio_backend_ahead_of_clock) {
+    using audio::aheadOfClock;
+    // A real device: the buffer filled at once, then the rate.
+    CHECK(!aheadOfClock(960, 0.0, 48000, 960));
+    CHECK(!aheadOfClock(48000 + 960, 1.0, 48000, 960));
+    CHECK(!aheadOfClock(10 * 48000 + 960, 10.0, 48000, 960));
+    // A sink that swallows everything at once.
+    CHECK(aheadOfClock(48000, 0.001, 48000, 960));
+    CHECK(aheadOfClock(12 * 48000, 10.0, 48000, 960));
+}
+
+#ifdef __linux__
+namespace {
+// A scripted ALSA device: 960-frame buffer, 240-frame periods, room for one period every 5 ms of
+// wall time. Failures are injected at given write calls.
+struct FakeAlsa {
+    std::atomic<int> opens{0}, closes{0}, recovers{0}, writes{0};
+    std::atomic<long> frames{0};
+    std::atomic<bool> openFails{false};
+    std::atomic<int> xrunAtWrite{-1}, lostAtWrite{-1};   // write call numbers
+    std::atomic<bool> lost{false};                       // recover fails (the device is gone)
+    int format = -1;
+};
+FakeAlsa* g_fake = nullptr;
+audio::snd_pcm* const kPcm = reinterpret_cast<audio::snd_pcm*>(uintptr_t(0x1234));
+
+audio::AlsaApi fakeApi() {
+    audio::AlsaApi a{};
+    a.open = [](audio::snd_pcm** pcm, const char*, int stream, int mode) {
+        CHECK_EQ(stream, audio::alsa::kStreamPlayback);
+        CHECK_EQ(mode, audio::alsa::kNonBlock);
+        if (g_fake->openFails) return -ENOENT;
+        ++g_fake->opens;
+        g_fake->lost = false;
+        *pcm = kPcm;
+        return 0;
+    };
+    a.close = [](audio::snd_pcm*) { ++g_fake->closes; return 0; };
+    a.setParams = [](audio::snd_pcm*, int format, int access, unsigned channels, unsigned rate, int, unsigned) {
+        CHECK_EQ(access, audio::alsa::kAccessRwInterleaved);
+        CHECK_EQ(channels, 2u);
+        CHECK_EQ(rate, 48000u);
+        g_fake->format = format;
+        return format == audio::alsa::kFormatFloat ? 0 : -EINVAL;
+    };
+    a.getParams = [](audio::snd_pcm*, unsigned long* buffer, unsigned long* period) {
+        *buffer = 960;
+        *period = 240;
+        return 0;
+    };
+    a.writei = [](audio::snd_pcm*, const void*, unsigned long n) -> long {
+        const int k = g_fake->writes++;
+        if (k == g_fake->xrunAtWrite) return -EPIPE;
+        if (k == g_fake->lostAtWrite) {
+            g_fake->lost = true;
+            return -ENODEV;
+        }
+        g_fake->frames += long(n);
+        return long(n);
+    };
+    a.recover = [](audio::snd_pcm*, int err, int) {
+        ++g_fake->recovers;
+        return g_fake->lost ? err : 0;
+    };
+    a.wait = [](audio::snd_pcm*, int) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+        return 1;
+    };
+    a.availUpdate = [](audio::snd_pcm*) -> long { return 240; };
+    a.drop = [](audio::snd_pcm*) { return 0; };
+    a.strerror = [](int) { return "fake error"; };
+    return a;
+}
+
+void countFrames(void* user, float* stereo, int frames, int) {
+    static_cast<std::atomic<long>*>(user)->fetch_add(frames);
+    for (int i = 0; i < 2 * frames; ++i) stereo[i] = 0.0f;
+}
+}  // namespace
+
+// The ALSA backend against a scripted device: format choice, rendering at the device's pace, an
+// xrun recovered in place (counted once the stream settled), a lost device closed and reopened
+// after the back-off, a bounded stop, no render after it; a device that does not open gives none.
+TEST(audio_alsa_backend_fake_device) {
+    FakeAlsa fake;
+    g_fake = &fake;
+    const audio::AlsaApi api = fakeApi();
+    fake.openFails = true;
+    CHECK(audio::createAlsaBackend(api, "default") == nullptr);
+    fake.openFails = false;
+    fake.xrunAtWrite = 150;   // ~0.75 s in: counted
+    fake.lostAtWrite = 250;
+    std::unique_ptr<audio::Backend> b = audio::createAlsaBackend(api, "default");
+    REQUIRE(b != nullptr);
+    CHECK_EQ(fake.format, audio::alsa::kFormatFloat);
+    CHECK_EQ(b->status.sampleRate.load(), 48000);
+    CHECK_EQ(b->status.bufferFrames.load(), 960);
+    std::atomic<long> rendered{0};
+    CHECK(b->start(countFrames, &rendered));
+    // 250 writes of 240 frames at 5 ms, the loss, 250 ms of back-off, the reopen.
+    for (int i = 0; i < 400 && fake.opens.load() < 2; ++i) std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    CHECK_EQ(fake.opens.load(), 2);
+    CHECK_EQ(b->status.restarts.load(), 1u);
+    CHECK_EQ(b->status.underruns.load(), 1u);
+    CHECK(fake.recovers.load() >= 2);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    CHECK(b->status.deviceOpen.load());
+    const auto t0 = std::chrono::steady_clock::now();
+    b->stop();
+    const double stopMs = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+    CHECK(stopMs < 300.0);
+    const long after = rendered.load();
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    CHECK_EQ(rendered.load(), after);   // no render after stop()
+    CHECK(fake.frames.load() > 0);
+    CHECK(rendered.load() >= fake.frames.load());   // what was rendered is written (or still pending)
+    b.reset();
+    CHECK_EQ(fake.closes.load(), fake.opens.load());
+    g_fake = nullptr;
+}
+
+// The real libasound with its "null" PCM (no sound card needed): it swallows data at once, so the
+// backend must pace itself at the real rate.
+TEST(audio_alsa_backend_null_pcm) {
+    const audio::AlsaApi* api = audio::alsaApi();
+    if (!api) SKIP("libasound.so.2 not installed");
+    CHECK(audio::createAlsaBackend(*api, "scacelith_no_such_pcm") == nullptr);
+    std::unique_ptr<audio::Backend> b = audio::createAlsaBackend(*api, "null");
+    if (!b) SKIP("ALSA has no \"null\" PCM here");
+    CHECK_EQ(b->status.sampleRate.load(), 48000);
+    std::atomic<long> rendered{0};
+    CHECK(b->start(countFrames, &rendered));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    b->stop();
+    const double seconds = double(rendered.load()) / 48000.0;
+    std::fprintf(stderr, "  ALSA null PCM: %.3f s rendered in 0.5 s, buffer %d frames\n", seconds, b->status.bufferFrames.load());
+    CHECK(seconds > 0.3 && seconds < 0.75);
+}
+#endif
 
 TEST(audio_live_engine_init_shutdown) {
     audio::setMasterVolume(0.9f);

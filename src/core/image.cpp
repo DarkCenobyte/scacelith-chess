@@ -1,5 +1,6 @@
 #include "image.h"
 #include <algorithm>
+#include <cstring>
 #include <cstdio>
 #include <filesystem>
 
@@ -41,6 +42,7 @@ bool writePNG(const std::string& path, int w, int h, int ch, const uint8_t* px) 
 #ifdef _WIN32
     FILE* f = _wfopen(file.c_str(), L"wb");
 #else
+    // A screenshot, written where the player asked (--shot) or in their own settings folder.
     FILE* f = std::fopen(path.c_str(), "wb");
 #endif
     if (!f) return false;
@@ -91,5 +93,40 @@ bool writePNG(const std::string& path, int w, int h, int ch, const uint8_t* px) 
         std::filesystem::remove(file, ec);
     }
     return ok;
+}
+
+namespace {
+uint32_t le16(const uint8_t* p) { return uint32_t(p[0]) | uint32_t(p[1]) << 8; }
+uint32_t le32(const uint8_t* p) { return le16(p) | le16(p + 2) << 16; }
+}  // namespace
+
+// ICONDIR (reserved 0, type 1, count), ICONDIRENTRY x count (16 bytes: ..., size at 8, offset at
+// 12), then each image: a PNG, or a BITMAPINFOHEADER with the height doubled (the AND mask
+// follows the pixels), bottom-up BGRA rows for 32 bits per pixel.
+std::vector<uint32_t> icoImages(const uint8_t* d, size_t n) {
+    std::vector<uint32_t> out;
+    if (!d || n < 6 || le16(d) != 0 || le16(d + 2) != 1) return out;
+    const size_t count = le16(d + 4);
+    for (size_t i = 0; i < count && 6 + 16 * (i + 1) <= n; ++i) {
+        const uint8_t* e = d + 6 + 16 * i;
+        const size_t len = le32(e + 8), off = le32(e + 12);
+        if (off > n || len > n - off || len < 40) continue;
+        const uint8_t* b = d + off;
+        if (std::memcmp(b, "\x89PNG", 4) == 0) continue;
+        const size_t header = le32(b);
+        const int32_t w = int32_t(le32(b + 4)), h2 = int32_t(le32(b + 8));
+        if (header < 40 || header > len || le16(b + 14) != 32 || le32(b + 16) != 0 || w <= 0 || w > 256 || h2 != 2 * w)
+            continue;
+        const size_t row = size_t(w) * 4;
+        if (size_t(w) * row > len - header) continue;
+        out.push_back(uint32_t(w));
+        out.push_back(uint32_t(w));
+        for (int32_t y = w - 1; y >= 0; --y) {
+            const uint8_t* p = b + header + size_t(y) * row;
+            for (int32_t x = 0; x < w; ++x, p += 4)
+                out.push_back(uint32_t(p[3]) << 24 | uint32_t(p[2]) << 16 | uint32_t(p[1]) << 8 | uint32_t(p[0]));
+        }
+    }
+    return out;
 }
 }  // namespace image

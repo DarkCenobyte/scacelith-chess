@@ -7,6 +7,7 @@
 #include "../render/shader.h"
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <cstdio>
 #include <cstring>
 #include <unordered_map>

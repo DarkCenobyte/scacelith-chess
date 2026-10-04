@@ -1,5 +1,6 @@
 #include "test.h"
 #include <chrono>
+#include <cstdlib>
 #include <cstring>
 #include <exception>
 #include <string>
@@ -61,6 +62,11 @@ int main(int argc, char** argv) {
     note = nonAsciiNamesRefused();
 #endif
     if (note) std::fprintf(stderr, "note: %s\n", note);
+#ifndef _WIN32
+    // Silent and deterministic on a desktop with a sound card: the null audio backend, unless the
+    // run asks for another (SCACELITH_AUDIO=alsa ./scacelith_tests audio_live, to listen).
+    setenv("SCACELITH_AUDIO", "null", 0);
+#endif
     int run = 0, failedCases = 0, skipped = 0;
     for (auto& c : testing::registry()) {
         if (filter && !std::strstr(c.name, filter)) continue;

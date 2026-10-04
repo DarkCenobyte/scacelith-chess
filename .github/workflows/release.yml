@@ -1,8 +1,8 @@
 # Release: on a version tag (v1.0.0, v1.0.0-beta.1, ...), the CI runs again on the tagged commit,
-# the Windows game is built from scratch (no cache), its build provenance is attested
-# (actions/attest) and a GitHub release is published with the files. A manual run builds the
-# branch or tag it is started on; it publishes only from a tag and when asked to, and otherwise
-# keeps the files as workflow artifacts (a dry run).
+# the game is built from scratch (no cache) for Windows x64 and Linux x86-64, the build provenance
+# of the files is attested (actions/attest) and a GitHub release is published with them. A manual
+# run builds the branch or tag it is started on; it publishes only from a tag and when asked to,
+# and otherwise keeps the files as workflow artifacts (a dry run).
 name: Release
 
 on:
@@ -150,6 +150,152 @@ jobs:
           (cd dist && zip -9 -r -X "$name.zip" "$name")
           cp "$dir/Scacelith.exe" "dist/$name.exe"
           rm -r "${dir:?}"
+
+      - name: Upload the Windows files
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: build-windows-x64
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  # Built on the oldest supported Ubuntu (22.04), so that the game runs on the distributions of 2021
+  # onwards: libstdc++ and libgcc are linked in (CMakeLists.txt); glibc, OpenSSL 3, X11 and OpenGL
+  # are the system's (OpenSSL then finds the system's certificates where its distribution put
+  # them), and ALSA is loaded at run time when present.
+  linux:
+    name: Linux x86-64 release build
+    needs: version
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install the build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cmake ninja-build g++ \
+            libssl-dev libx11-dev libgl-dev desktop-file-utils
+
+      # A clean build, as for Windows: no compiler cache, no voice model.
+      - name: Configure
+        run: >-
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DSCACELITH_SUPERTONIC_DOWNLOAD=OFF
+
+      - name: Build
+        run: ninja -C build
+
+      # The tests again: the CI builds on Ubuntu 24.04 (GCC 13), the release with Ubuntu 22.04's
+      # GCC 11, binutils 2.38 and OpenSSL 3.0.2.
+      - name: Unit tests
+        run: ./build/scacelith_tests
+
+      # The version, and what the executable needs from the system: only libraries every desktop
+      # distribution has (no libstdc++, libgcc_s or libasound), and no glibc newer than 2.34 (the
+      # README's requirement).
+      - name: Check the executable
+        run: |
+          grep -q "#define SCACELITH_VERSION \"$VERSION\"" build/generated/scacelith_version.h
+          grep -aq "Scacelith $VERSION" build/scacelith
+          allowed=" libX11.so.6 libGL.so.1 libssl.so.3 libcrypto.so.3 libm.so.6 libc.so.6 ld-linux-x86-64.so.2 "
+          needed=$(readelf -d build/scacelith | sed -n 's/.*(NEEDED).*\[\(.*\)\]/\1/p')
+          for lib in $needed; do
+            echo "needs $lib"
+            if [[ "$allowed" != *" $lib "* ]]; then
+              echo "::error::build/scacelith needs $lib, which is not on the list of system libraries"
+              exit 1
+            fi
+          done
+          glibc=$(objdump -T build/scacelith | grep -o 'GLIBC_[0-9.]*' | sort -uV | tail -n 1)
+          echo "newest glibc symbol version: $glibc"
+          if [[ "$(printf '%s\n' "$glibc" GLIBC_2.34 | sort -V | tail -n 1)" != GLIBC_2.34 ]]; then
+            echo "::error::build/scacelith needs $glibc, newer than the 2.34 the README promises"
+            exit 1
+          fi
+
+      # The archive: the executable, its launcher and icons (share/, laid out like ~/.local/share),
+      # install.sh, the licence and the licence texts of what it embeds, as for Windows.
+      - name: Package
+        env:
+          COMMIT: ${{ github.sha }}
+          REF_NAME: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.server_url }}/${{ github.repository }}
+        run: |
+          name="Scacelith-$VERSION-linux-x86_64"
+          dir="dist/$name"
+          share="$dir/share"
+          install -D -m 755 build/scacelith "$dir/scacelith"
+          install -D -m 755 res/linux/install.sh "$dir/install.sh"
+          desktop-file-validate res/linux/scacelith.desktop
+          install -D -m 644 res/linux/scacelith.desktop "$share/applications/scacelith.desktop"
+          for size in 16 24 32 48 64 96 128 256 512; do
+            install -D -m 644 "res/icons/png/scacelith-$size.png" \
+              "$share/icons/hicolor/${size}x${size}/apps/scacelith.png"
+          done
+          mkdir -p "$dir/licences/fonts"
+          cp LICENSE "$dir/LICENSE"
+          cp assets/fonts/*.txt assets/fonts/hand/*.txt "$dir/licences/fonts/"
+          cp third_party/stockfish/AUTHORS "$dir/licences/Stockfish-AUTHORS.txt"
+          cp third_party/qrcodegen/LICENSE "$dir/licences/qrcodegen-MIT.txt"
+          cp assets/licences/lichess-chess-openings-CC0.txt "$dir/licences/"
+          cat > "$dir/README.txt" <<EOF
+          Scacelith $VERSION for Linux x86-64
+
+          A photorealistic chess game played in first person against a porcelain robot driven by
+          Stockfish 19 (embedded), or online. Needs a GPU with OpenGL 4.6, an X11 desktop or Wayland
+          with XWayland, glibc 2.34 and OpenSSL 3 (Ubuntu 22.04, Debian 12, Fedora 36, RHEL 9 and
+          later); the sound goes through ALSA (libasound2, and PulseAudio or PipeWire through it).
+          Run ./scacelith. ./install.sh adds the game to the applications menu (in ~/.local);
+          ./install.sh --uninstall removes it. The settings, saved logins and log are kept in
+          \$XDG_CONFIG_HOME/scacelith/, by default ~/.config/scacelith/ (next to the executable
+          instead when a Scacelith.ini stands there).
+
+          Source: $REPOSITORY ($REF_NAME, commit $COMMIT).
+          Scacelith is free software under the GNU General Public License v3.0 (LICENSE). The licence
+          texts of the fonts, of Stockfish's authors and of the other parts it embeds are in licences/.
+
+          The coach's voice model (Supertonic 3, BigScience Open RAIL-M licence) is not included: the
+          game offers to download it from its publishers the first time Coach mode needs it.
+
+          To check this download with the GitHub CLI:
+            gh attestation verify $name.tar.gz --repo $GITHUB_REPOSITORY
+          EOF
+          tar --sort=name --owner=0 --group=0 --numeric-owner --mtime="@$(git log -1 --format=%ct)" \
+            -C dist -c "$name" | gzip -9n > "dist/$name.tar.gz"
+          rm -r "${dir:?}"
+
+      - name: Upload the Linux files
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: build-linux-x86_64
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  # The files of every platform together, with their checksums: what is attested and published,
+  # and what a dry run keeps.
+  files:
+    name: Release files
+    needs: [build, linux]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions: {}
+    steps:
+      - name: Download the files of each platform
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: build-*
+          merge-multiple: true
+          path: dist
+
+      - name: Checksums
+        run: |
           (cd dist && sha256sum -- * > SHA256SUMS)
           {
             echo '```'
@@ -167,7 +313,7 @@ jobs:
 
   attest:
     name: Attest the build provenance
-    needs: [version, build]
+    needs: [version, files]
     if: needs.version.outputs.publish == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
@@ -182,12 +328,13 @@ jobs:
           name: release-files
           path: dist
 
-      - name: Attest the archive and the executable
+      - name: Attest the archives and the executable
         uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
         with:
           subject-path: |
             dist/*.zip
             dist/*.exe
+            dist/*.tar.gz
 
   publish:
     name: Publish the GitHub release
@@ -213,9 +360,14 @@ jobs:
           PRERELEASE: ${{ needs.version.outputs.prerelease }}
         run: |
           cat > notes.md <<EOF
-          Windows x64, self-contained (Stockfish 19 and its network are embedded); needs a GPU with
-          OpenGL 4.6. Download \`Scacelith-$VERSION-windows-x64.zip\` (the executable with its licence)
-          or the executable alone.
+          Self-contained (Stockfish 19 and its network are embedded); needs a GPU with OpenGL 4.6.
+
+          - **Windows x64**: \`Scacelith-$VERSION-windows-x64.zip\` (the executable with its licence)
+            or the executable alone.
+          - **Linux x86-64**: \`Scacelith-$VERSION-linux-x86_64.tar.gz\` (the executable, its launcher
+            and icons, \`install.sh\` to add it to the applications menu, and the licences). Needs
+            glibc 2.34 and OpenSSL 3 (Ubuntu 22.04, Debian 12, Fedora 36, RHEL 9 and later) and X11 or
+            XWayland; the sound goes through ALSA (PulseAudio and PipeWire included).
 
           Every file is built by the release workflow from tag \`$TAG\`, and its build provenance is
           attested. To check a download with the GitHub CLI:

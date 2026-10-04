@@ -5,6 +5,20 @@ royal hall, against a porcelain robot driven by Stockfish. Everything is rendere
 engine written for this game on OpenGL 4.6 (no third-party engine): procedural geometry,
 real-time material shaders, physically based lighting.
 
+## Installing
+
+The [releases](https://github.com/DarkCenobyte/scacelith-chess/releases) hold the game for Windows
+x64 and Linux x86-64; both need a GPU with OpenGL 4.6, and Stockfish 19 is built in.
+
+- **Windows**: unpack `Scacelith-<version>-windows-x64.zip` anywhere and run `Scacelith.exe` (or
+  download the executable alone).
+- **Linux**: unpack `Scacelith-<version>-linux-x86_64.tar.gz` and run `./scacelith`;
+  `./install.sh` adds the game to your applications menu (in `~/.local`, no root needed) and
+  `./install.sh --uninstall` removes it. It needs glibc 2.34 and OpenSSL 3 (Ubuntu 22.04,
+  Debian 12, Fedora 36, RHEL 9 and later), X11 or Wayland with XWayland, and plays its sound
+  through ALSA (`libasound2`; PulseAudio and PipeWire through their ALSA plugins). Without
+  `libasound2` or a sound device the game runs silent, the coach in subtitles.
+
 ## Playing
 
 - **Left click** on one of your pieces: your hand reaches for it. Tournament rules apply: a piece
@@ -244,10 +258,12 @@ Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-librar
 
 ## Options
 
-Settings are stored in `Scacelith.ini` next to the executable when that file can be written,
-otherwise in `%APPDATA%\scacelith\` (`~/.config/scacelith/` on Linux) and read back from there: a
-read-only `Scacelith.ini` left next to the executable is then ignored once that copy exists. A
-file given with `--ini <file>` is read and written there only (the log warns when it cannot be written). All of them are
+Settings are stored in `Scacelith.ini` in `%APPDATA%\scacelith\` (on Linux
+`$XDG_CONFIG_HOME/scacelith/`, by default `~/.config/scacelith/`), with the saved logins
+(`Scacelith.credentials`) and the log (`scacelith.log`). A `Scacelith.ini` next to the executable
+makes a portable install (versions up to 1.0.0-beta.1 put it there): the game then keeps all three
+in the executable's folder, as it also does when the user folder cannot be written. A file given with `--ini <file>` is read and written there only, with the
+logins beside it (the log warns when it cannot be written). All of them are
 editable from the Options page: display mode and resolution, V-sync, render scale, quality
 preset, motion blur, depth of field, brightness, volumes, ambience, legal-move hints, auto-press
 clock, the opponent's head movements, mouse sensitivity, the game pointer, and the hand-over
@@ -285,7 +301,9 @@ MinGW-w64 GCC with POSIX threads; Clang cannot build the embedded Stockfish vari
 Python 3 for the instruction-set audits and the Windows exception table check that run at every
 build (a Windows Release build, the shipped exe, does not configure without it; other builds skip
 them with a warning). The Linux build also needs the OpenSSL 3, X11 and OpenGL development files
-(for example `libssl-dev`, `libx11-dev` and `libgl-dev`). The Windows build is produced with
+(for example `libssl-dev`, `libx11-dev` and `libgl-dev`); ALSA is loaded at run time
+(`libasound.so.2`), not linked, and a Linux Release build links libstdc++ and libgcc in, so that
+the executable runs on other distributions than the build machine's. The Windows build is produced with
 MinGW-w64 (native or cross-compiled from Linux) and is a single self-contained executable
 (Stockfish 19 and its neural network are embedded). Stockfish is compiled once per x86-64
 instruction set, from plain x86-64 to AVX-512, and the game runs the best one the CPU supports;
@@ -302,7 +320,7 @@ that need the model are then skipped; see `third_party/supertonic3/README.scacel
 cmake -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake -DCMAKE_BUILD_TYPE=Release
 ninja -C build-win            # -> build-win/Scacelith.exe
 
-# Linux (development, tests and headless screenshots)
+# Linux x86-64 (the game, its tests and headless screenshots)
 cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
 ninja -C build
 ./build/scacelith_tests
@@ -369,18 +387,22 @@ artifact, for testing. CodeQL (`.github/workflows/codeql.yml`) scans the shipped
 (without `third_party/` and `tests/`) and the workflows; its alerts are in the Security tab.
 
 The version is set in `cmake/version.cmake`: `SCACELITH_VERSION_CORE` (`1.0.0`) and, for a
-pre-release, `SCACELITH_VERSION_PRERELEASE` (`beta.1`); `cmake -P cmake/version.cmake` prints it
-in full. Pushing the tag `v` + that version (`v1.0.0-beta.1`) publishes a release: the release
+pre-release, `SCACELITH_VERSION_PRERELEASE` (`beta.2`); `cmake -P cmake/version.cmake` prints it
+in full. Pushing the tag `v` + that version (`v1.0.0-beta.2`) publishes a release: the release
 workflow (`.github/workflows/release.yml`) checks that the tag matches the version, runs the CI
-again on the tagged commit, builds the Windows game from scratch (no compiler cache), attests its
-build provenance with actions/attest and publishes a GitHub release (a pre-release when the version
-has a suffix) with `Scacelith-<version>-windows-x64.zip` (the executable, its licence and the
-licence texts of what it embeds), the executable alone and `SHA256SUMS`. Started by hand, the
+again on the tagged commit, builds the game from scratch (no compiler cache) for Windows x64 and
+for Linux x86-64 (on Ubuntu 22.04, the oldest toolchain supported, where the unit tests run again
+and the executable is checked to need only system libraries and glibc 2.34), attests the build
+provenance of the files with actions/attest and publishes a GitHub release (a pre-release when the
+version has a suffix) with `Scacelith-<version>-windows-x64.zip` (the executable, its licence and
+the licence texts of what it embeds), the Windows executable alone,
+`Scacelith-<version>-linux-x86_64.tar.gz` (the executable, its launcher and icons, `install.sh`
+and the same licences) and `SHA256SUMS`. Started by hand, the
 workflow builds the same files and keeps them as workflow artifacts without publishing anything,
 unless it runs on a tag with "Publish" ticked. To check a downloaded file with the GitHub CLI:
 
 ```sh
-gh attestation verify Scacelith-1.0.0-beta.1-windows-x64.zip --repo DarkCenobyte/scacelith-chess
+gh attestation verify Scacelith-1.0.0-beta.2-windows-x64.zip --repo DarkCenobyte/scacelith-chess
 ```
 
 Dependabot (`.github/dependabot.yml`) keeps the actions the workflows use up to date (pinned by

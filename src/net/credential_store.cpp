@@ -84,12 +84,7 @@ bool unprotectToken(const std::string& origin, const std::string& blob, std::str
 // ---- store ----
 
 std::string CredentialStore::defaultPath() {
-    std::string exe = sys::exeDirectory() + kFileName;
-    std::string data = sys::userDataDirectory() + kFileName;
-    if (sys::fileExists(exe)) return exe;
-    if (sys::fileExists(data)) return data;
-    // Same place as Scacelith.ini: next to the executable when that directory is writable.
-    return sys::directoryWritable(sys::exeDirectory()) ? exe : data;
+    return sys::settingsDirectory() + kFileName;   // with Scacelith.ini
 }
 
 CredentialStore::CredentialStore(std::string path) : path_(std::move(path)) {}

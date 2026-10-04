@@ -1,0 +1,796 @@
+From f60e928d3b8ada13893bb315c20549c7989131d8 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Sun, 4 Oct 2026 12:44:27 +0000
+Subject: [PATCH] Handshake: a real clasp, the hands crossed and wrapped around
+ each other
+
+The two hands of the handshake passed through each other. Both robots
+put the middle of the palm on the same point with the hands nearly end
+to end (9 degrees apart), so each closed hand wrapped the partner's
+wrist cuff and forearm (up to 24 mm inside them), the thumbs crossed in
+an X above the hands, the fingers closed while the hands still slid in
+and opened while they slid out.
+
+The clasp is now computed from the geometry when it is planned:
+
+- Both robots put the web of the thumb on the same clasp point, the
+  palm vertical and the fingers pitched 30 degrees down, so the hands
+  cross at 60 degrees as in a real handshake. Each robot then knows the
+  partner's hand without reading its motion: its own, turned half a
+  turn about the vertical through the clasp point.
+- The palm plane's azimuth and a lift of the elbow are chosen for a
+  comfortable wrist at the clasp and through the pumps (a hand pointing
+  down that far bent the wrist past its limit otherwise). The hands sit
+  a little higher, clear of a king on a central square at the pumps'
+  lowest.
+- The fingers close onto a model of the partner's hand (the palm's
+  section, its knuckles, the wrist cuff, the forearm, the thumb): the
+  three joints close together and a phalanx that touches stops its joint
+  and the ones before it, so they wrap the little-finger edge and rest
+  on the back of the partner's hand. The thumb, turned over the
+  partner's hand, rests on its back, clear of the partner's thumb.
+- Phases: reach out open, slide the palms together, close the grip once
+  they touch (closed just after the clasp event), two pumps, open the
+  grip while the palms stay (release), slide apart, back to rest. The
+  events, the duration and the pen laid down first keep their instants.
+- A left-handed player's shaking hand (its writing hand) gets the same
+  wrist relaxation as a right hand: coming straight from the pen, it
+  flipped through its wrist limits. It stays the exact mirror image of a
+  right-handed robot's hand through the clasp.
+
+On the exact porcelain meshes, every 1/120 s of the whole handshake,
+right- vs right-handed and right- vs left-handed: at most 0.1 mm of
+contact (it was 24 mm). A new test checks the hands with capsules built
+from the bones, which the old clasp fails.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_014Fsb6oyaVPw5TrKUEQpbWr
+---
+ src/anim/animator.cpp         | 171 +++++++++++++--------
+ src/anim/animator_impl.h      | 277 ++++++++++++++++++++++++++++++++--
+ src/anim/animator_writing.cpp |   7 +-
+ tests/anim_tests.cpp          | 108 ++++++++++++-
+ 4 files changed, 483 insertions(+), 80 deletions(-)
+
+diff --git a/src/anim/animator.cpp b/src/anim/animator.cpp
+index 59e17a4..f4e9e14 100644
+--- a/src/anim/animator.cpp
++++ b/src/anim/animator.cpp
+@@ -437,16 +437,27 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
+     if (t.type == TaskType::Reach || t.type == TaskType::PressClock || t.type == TaskType::Retract || t.type == TaskType::Discard ||
+         t.type == TaskType::Handshake || isGesture(t.type))
+         relaxWrist(h);
++    if (t.type == TaskType::Handshake && mirrored) relaxWrist(left());   // the shaking hand
+     if (t.type != TaskType::Wait) liftForearm(h);
+     if (t.type == TaskType::Trace) finishTracePlan(h);
+     h.releasedId = -1;
+ }
+ 
+ // Handshake with the real right hand: the solver's right hand, or its left one (the writing hand)
+-// for a left-handed player. Written for either side, so the left-handed handshake is the exact
+-// mirror image of the right-handed one. A writing hand still holding the pen lays it down first.
++// for a left-handed player. Planned as a right hand would plan it and mirrored for the solver's
++// left hand, so the left-handed handshake is the exact mirror image of the right-handed one. A
++// writing hand still holding the pen lays it down first.
++//
++// The clasp comes from the geometry (see "Handshake grasp" in animator_impl.h): both robots put
++// the web of their thumb on the same clasp point C, palm vertical, fingers pitched down, so each
++// knows the partner's hand at plan time (the half turn of its own about the vertical through C)
++// without reading the partner's motion. The palm plane's azimuth and the elbow's lift give a
++// comfortable wrist through the pumps; the fingers and the thumb are closed onto a model of the
++// partner's hand. Phases: reach out with the hand open, slide the palms together, close the grip
++// (it is complete just after the clasp), two pumps, open the grip (release), back to rest.
+ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSample from, Motion& mo) {
+     const Side R = shakeSide();
++    const bool mirror = R == Side::Left;
+     const float tableC = layout::TABLE_TOP_Y - pelvisWorld.y;
+     partner = t.partner;
+     shakeStart = start;
+@@ -457,41 +468,56 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
+         if (partner && partner->impl_) mid = (pelvisWorld + partnerPoint(partner->impl_->pelvisWorld)) * 0.5f;
+         cW = vec3(mid.x, layout::BOARD_TOP_Y + 0.225f, mid.z);
+     }
+-    vec3 C = toChar(cW);
+-    // Palm plane: vertical, through C, along the line joining both right shoulders.
+-    vec3 S = shoulderRest(R);
+-    vec3 dirH = safeNormalize(vec3(C.x - S.x, 0, C.z - S.z), vec3(0, 0, 1));
+-    float yaw = std::atan2(dirH.x, dirH.z);
+-    // Fingers towards the partner, pitched down; thumb up; palm facing the partner's palm.
+-    quat qs = handRot(R, yaw, 0.28f, PI * 0.5f);
+-    const vec3 palm = handPoint(R, palmCenter(Side::Right) + vec3(0.0015f, 0, 0));
+-    const vec3 palmLocalN(palmSign(R), 0, 0);
+-    {
+-        // Turn about the palm normal (keeps both palms in the same plane) for a comfortable wrist.
+-        vec3 pn = rotate(qs, palmLocalN);
+-        float best = 1e9f;
+-        quat qb = qs;
+-        for (int k = -6; k <= 6; ++k) {
+-            quat q = normalize(axisAngle(pn, 0.1f * float(k)) * qs);
+-            float c = armStrainSide(R, wristFor(C, q, palm), q) + 0.03f * std::fabs(0.1f * float(k));
+-            if (c < best) {
+-                best = c;
+-                qb = q;
++    const vec3 C = toChar(cW);
++    // ---- The clasp of a right hand (Cr: C in the mirror image for the solver's left hand).
++    const vec3 Cr = mirror ? mirrorX(C) : C;
++    const vec3 S = shoulderRest(Side::Right);
++    const vec3 dirH = safeNormalize(vec3(Cr.x - S.x, 0, Cr.z - S.z), vec3(0, 0, 1));
++    const float yaw0 = std::atan2(dirH.x, dirH.z);
++    const vec3 anchor = shakeAnchor();
++    // Palm plane through C along the shoulders' line turned in by yawOff (thumb up, fingers pitched
++    // down by kShakePitch) and elbow lift: the most comfortable wrist at the clasp and at both ends
++    // of the pumps (a strained wrist there would have relaxWrist turn the hand mid-pump).
++    const float pump = 0.032f;
++    float bestCost = 1e9f, yawOff = 0.45f, lift = 1.0f;
++    for (float dy = 0.2f; dy <= 0.801f; dy += 0.1f)
++        for (float el = 0.6f; el <= 1.301f; el += 0.1f) {
++            const quat q = handRot(Side::Right, yaw0 + dy, kShakePitch, PI * 0.5f);
++            const vec3 w = Cr - rotate(q, anchor);
++            float strain = 0.0f;
++            for (float dz : {0.0f, -0.9f * pump, 0.9f * pump}) strain = std::max(strain, armStrain(w + vec3(0, dz, 0), q, nullptr, nullptr, el));
++            const float cost = strain + 0.02f * std::fabs(dy - 0.45f) + 0.02f * el;
++            if (cost < bestCost) {
++                bestCost = cost;
++                yawOff = dy;
++                lift = el;
+             }
+         }
+-        qs = qb;
+-    }
+-    FingerPose fo = fpHumanize(poseShakeOpen(), 0.2f, 0.03f), fg = fpHumanize(poseShakeGrip(), 0.6f, 0.04f);
+-    vec3 pClasp = wristFor(C, qs, palm);
+-    // Pre-contact: 7 cm back along the fingers, 1.5 cm off the palm plane.
+-    vec3 fingerDir = rotate(qs, vec3(0, -1, 0));
+-    vec3 palmN = rotate(qs, palmLocalN);
+-    vec3 pPre = pClasp - fingerDir * 0.07f - palmN * 0.015f + vec3(0, 0.01f, 0);
+-    float tClasp = Timing::HandshakeClaspAt, tRel = Timing::HandshakeReleaseAt;
+-    float scale = T / Timing::Handshake;
++    const quat qr = handRot(Side::Right, yaw0 + yawOff, kShakePitch, PI * 0.5f);
++    const vec3 wristR = Cr - rotate(qr, anchor);
++    armStrain(wristR, qr, nullptr, nullptr, lift);   // leaves the solved arm in G: the forearm at the wrist
++    const vec3 forearm = rotate(conjugate(rotOf(G[HandR])), safeNormalize(G[ForeArmR].translation() - G[HandR].translation(), vec3(0, 1, 0)));
++    // Fingers. 'reach': open, the thumb up; 'raised': the long fingers straight, the thumb opposed
++    // over the partner's hand (as it slides in and out of the grip); 'grip': closed on the partner.
++    const FingerPose reach = fpMake({{0.45f, -0.55f, 0.10f, 0.05f}, {-0.05f, 0.02f, 0.04f, 0.03f}, {-0.01f, 0.02f, 0.04f, 0.03f},
++                                     {0.03f, 0.03f, 0.05f, 0.03f}, {0.06f, 0.04f, 0.06f, 0.04f}});
++    const FingerPose grip = solveShakeGrip(*sk, kShakePitch, anchor, forearm, reach);
++    FingerPose raised = reach;
++    raised.v[Thumb][0] = grip.v[Thumb][0];
++    raised.v[Thumb][1] = grip.v[Thumb][1];
++    raised.v[Thumb][2] = 0.5f * grip.v[Thumb][2];   // half bent: over the partner's hand, not poking past it
++    raised.v[Thumb][3] = 0.0f;
++    // ---- This side's hand.
++    const quat qs = mirror ? mirrorQ(qr) : qr;
++    const vec3 pClasp = mirror ? mirrorX(wristR) : wristR;
++    const vec3 palmN = rotate(qs, vec3(palmSign(R), 0, 0));
++    const vec3 along = rotate(qs, shakeAlong(kShakePitch));   // horizontal, in the palm plane, towards the partner
++    // Before the palms meet: back along the slide and off the palm plane (the partner does the same).
++    const vec3 pPre = pClasp - along * 0.035f - palmN * 0.012f;
++    const float scale = T / Timing::Handshake;
+     shakeScale = scale;
+-    float t1 = 0.74f * scale, t2 = tClasp * scale, t3 = tRel * scale;
+-    float t4 = t3 + 0.15f * scale;
++    const float tA = 0.56f * scale, tC = 0.72f * scale, t2 = Timing::HandshakeClaspAt * scale, t3 = Timing::HandshakeReleaseAt * scale;
++    const float tO = t3 + 0.22f * scale, tE = tO + 0.10f * scale;
+     // 0. The pen first goes back onto the table (where the game wanted it, else where it was taken).
+     float t0 = 0.0f;
+     FingerPose letGo = from.f;
+@@ -511,8 +537,9 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
+         curEvents.push_back({start + t0, EventType::PenPut, ActPutPen, false});
+     }
+     HandSample s = from;
+-    // 1. extend
+-    Segment a = makeSeg(s, t1 - t0, pPre, (pClasp - pPre) * (0.8f / (t2 - t1)), qs, fo);
++    // 1. reach out, the hand open, the elbow rising
++    Segment a = makeSeg(s, tA - t0, pPre, (pClasp - pPre) * (0.6f / (tC - tA)), qs, reach);
++    a.elbow1 = lift;
+     a.arcH = 0.05f;
+     a.arcPeak = 0.45f;
+     a.rot.keys.clear();
+@@ -520,38 +547,53 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
+     a.rot.add(0.80f, qs);
+     a.fing.keys.clear();
+     a.fing.add(0.0f, from.f);
+-    if (t0 > 0.0f) a.fing.add(0.20f, letGo);   // off the pen
+-    a.fing.add(0.60f, fo);
+-    clearPath(a, from, fpLerp(from.f, fo, 0.5f), tableC, R);
++    if (t0 > 0.0f) {   // off the pen (a short reach: the fingers open over most of it)
++        a.fing.add(0.10f, letGo);
++        a.fing.add(0.85f, reach);
++    } else {
++        a.fing.add(0.60f, reach);
++    }
++    clearPath(a, from, fpLerp(from.f, reach, 0.5f), tableC, R);
+     mo.segs.push_back(a);
+     s = a.sample(a.T);
+-    // 2. slide in and close the grip (clasp event at the end)
+-    Segment b = makeSeg(s, t2 - t1, pClasp, vec3(0), qs, fg);
+-    b.fing.keys.clear();
+-    b.fing.add(0.0f, s.f);
+-    b.fing.add(0.15f, s.f);
+-    b.fing.add(1.0f, fg);
++    // 2. slide the palms together, the thumb opposing over the partner's hand
++    Segment b = makeSeg(s, tC - tA, pClasp, vec3(0), qs, raised);
++    b.elbow1 = lift;
+     mo.segs.push_back(b);
+     s = b.sample(b.T);
+-    // 3. two pumps (both animators compute the same vertical motion)
+-    Segment c = makeSeg(s, t3 - t2, pClasp, vec3(0), qs, fg);
+-    c.oscAmp = 0.032f;
++    // 3. the palms together: close the grip (the clasp at t2), then two pumps (both animators
++    // compute the same vertical motion)
++    Segment c = makeSeg(s, t3 - tC, pClasp, vec3(0), qs, grip);
++    c.elbow1 = lift;
++    c.fing.keys.clear();
++    c.fing.add(0.0f, s.f);
++    c.fing.add((t2 + 0.08f * scale - tC) / (t3 - tC), grip);
++    c.oscAmp = pump;
+     c.oscCycles = 2.0f;
+-    c.os = 0.04f;
+-    c.oe = 0.92f;
++    c.os = (t2 + 0.0416f * scale - tC) / (t3 - tC);   // the pumps: from just after the clasp ...
++    c.oe = (t2 + 0.9568f * scale - tC) / (t3 - tC);   // ... to 0.08 s before the release
+     mo.segs.push_back(c);
+     s = c.sample(c.T);
+-    // 4. release: fingers open, hand slides back a little
+-    Segment d = makeSeg(s, t4 - t3, pClasp - fingerDir * 0.02f - palmN * 0.006f, vec3(0), qs, fpLerp(fg, fo, 0.85f));
++    // 4. release: the grip opens (the thumb lifts off the partner's back, the fingers straighten)
++    Segment d = makeSeg(s, tO - t3, pClasp, vec3(0), qs, raised);
++    d.elbow1 = lift;
+     mo.segs.push_back(d);
+     s = d.sample(d.T);
+-    // 5. back to rest
+-    mo.segs.push_back(shakeRetract(s, T - t4));
++    // 5. the palms slide apart the way they came, then back to rest
++    const vec3 pOut = pClasp - along * 0.022f - palmN * 0.010f;
++    Segment e = makeSeg(s, tE - tO, pOut, (pOut - pClasp) * (0.8f / (tE - tO)), qs, raised);
++    e.elbow1 = lift;
++    mo.segs.push_back(e);
++    s = e.sample(e.T);
++    mo.segs.push_back(shakeRetract(s, T - tE));
+     curEvents.push_back({start + t2, EventType::HandshakeClasp, ActNone, false});
+     curEvents.push_back({start + t3, EventType::HandshakeRelease, ActNone, false});
+     curTargetWorld = cW;
+ }
+ 
++// Back to rest from a handshake: the grip opens first if it is still closed (the thumb straightens
++// over the partner's hand, the fingers too) while the hand only starts to leave, the thumb comes
++// back once the hand is out.
+ Segment Animator::Impl::shakeRetract(const HandSample& s, float T) {
+     const HandSample r = shakeHand().rest;
+     Segment e = makeSeg(s, T, r.p, vec3(0), r.q, r.f);
+@@ -561,9 +603,15 @@ Segment Animator::Impl::shakeRetract(const HandSample& s, float T) {
+     e.rot.add(0.0f, s.q);
+     e.rot.add(0.80f, r.q);
+     clearPath(e, s, poseRelaxed(), layout::TABLE_TOP_Y - pelvisWorld.y, shakeSide());
++    FingerPose open = s.f;
++    open.v[Thumb][2] = std::min(open.v[Thumb][2], 0.05f);
++    open.v[Thumb][3] = std::min(open.v[Thumb][3], 0.05f);
++    for (int f = Index; f <= Pinky; ++f)
++        for (int j = 1; j < 4; ++j) open.v[f][j] = std::min(open.v[f][j], 0.10f);
+     e.fing.keys.clear();
+     e.fing.add(0.0f, s.f);
+-    e.fing.add(0.4f, poseRelaxed());
++    e.fing.add(0.25f, open);
++    e.fing.add(0.60f, poseRelaxed());
+     e.fing.add(1.0f, r.f);
+     return e;
+ }
+@@ -638,19 +686,20 @@ void Animator::Impl::validateRests(const Task* t) {
+ 
+ // Between its end rotations a transport's hand rotation is free: where the interpolated rotation
+ // would bend the wrist beyond its limits (long cross-body moves), bend the rotation path towards
+-// what the forearm naturally gives.
++// what the forearm naturally gives. (Either hand: the left one shakes hands for a left-handed player.)
+ void Animator::Impl::relaxWrist(Hand& h) {
++    const Side side = h.side;
+     for (auto& sg : h.motion.segs) {
+         // (A procedural segment ignores rotCorr; a hold with the fingertip pinned must keep its
+-        // rotation, or the pinned tip would move with it.)
+-        if (sg.T < 0.12f || sg.usePivot || sg.follow || sg.pinFrom >= 1.0f) continue;
++        // rotation, or the pinned tip would move with it; so must a pen going to / from its table frame.)
++        if (sg.T < 0.12f || sg.usePivot || sg.follow || sg.pinFrom >= 1.0f || sg.lockFrom != 0.0f || sg.lockTo != 0.0f) continue;
+         auto worst = [&](float& atU) {
+             float w = 0.0f;
+             atU = -1.0f;
+             for (int k = 0; k <= 14; ++k) {
+                 float u = 0.15f + 0.05f * float(k);
+                 HandSample s = sg.sample(u * sg.T);
+-                float st = armStrain(s.p, s.q);
++                float st = armStrainSide(side, s.p, s.q, s.elbow);
+                 if (st > w) { w = st; atU = u; }
+             }
+             return w;
+@@ -659,8 +708,8 @@ void Animator::Impl::relaxWrist(Hand& h) {
+         float w0 = worst(u0);
+         if (w0 < 0.04f || u0 < 0.0f) continue;
+         HandSample s = sg.sample(u0 * sg.T);
+-        armStrain(s.p, s.q);                      // leaves the solved arm in G
+-        quat achieved = rotOf(G[HandR]), neutral = rotOf(G[ForeArmR]);
++        armStrainSide(side, s.p, s.q, s.elbow);   // leaves the solved arm in G
++        quat achieved = rotOf(G[armBone(side, HandL)]), neutral = rotOf(G[armBone(side, ForeArmL)]);
+         quat key = qslerp(achieved, neutral, 0.35f);
+         quat base = s.q;
+         sg.rotCorr = normalize(key * conjugate(base));
+diff --git a/src/anim/animator_impl.h b/src/anim/animator_impl.h
+index 70563f7..6a035e6 100644
+--- a/src/anim/animator_impl.h
++++ b/src/anim/animator_impl.h
+@@ -148,16 +148,6 @@ inline const FingerPose& posePress() {
+                                   {-0.06f, 1.05f, 1.25f, 0.65f}, {-0.12f, 1.15f, 1.25f, 0.65f}});
+     return p;
+ }
+-inline const FingerPose& poseShakeOpen() {
+-    static FingerPose p = fpMake({{0.18f, -0.12f, 0.10f, 0.08f}, {0.06f, 0.10f, 0.12f, 0.06f}, {0.0f, 0.12f, 0.14f, 0.06f},
+-                                  {-0.05f, 0.16f, 0.16f, 0.08f}, {-0.10f, 0.20f, 0.18f, 0.08f}});
+-    return p;
+-}
+-inline const FingerPose& poseShakeGrip() {
+-    static FingerPose p = fpMake({{0.25f, 0.10f, 0.25f, 0.20f}, {0.02f, 0.55f, 0.85f, 0.45f}, {0.0f, 0.60f, 0.90f, 0.45f},
+-                                  {-0.03f, 0.65f, 0.92f, 0.45f}, {-0.07f, 0.72f, 0.92f, 0.45f}});
+-    return p;
+-}
+ inline const FingerPose& poseLooseFist() {
+     static FingerPose p = fpMake({{0.75f, 0.30f, 0.40f, 0.30f}, {0.02f, 1.05f, 1.30f, 0.70f}, {0.0f, 1.12f, 1.35f, 0.72f},
+                                   {-0.03f, 1.18f, 1.38f, 0.72f}, {-0.06f, 1.24f, 1.40f, 0.72f}});
+@@ -335,6 +325,264 @@ inline float solveThumb(const Skeleton& sk, Side side, vec3 target, float out[4]
+     return length(target - padOf(x));
+ }
+ 
++// ---- Handshake grasp -------------------------------------------------------------------------
++// Both robots shake right hands and plan the same clasp from shared data (the clasp point C and
++// these constants), so the partner's hand is the image of one's own under a half turn about the
++// vertical through C. Seen from one's own hand (right-hand convention: palm +X, fingers -Y, thumb
++// +Z) that image only depends on the pitch of the fingers below the horizontal in the vertical
++// palm plane (the two hands cross at twice that) and on the hand point put on C (the anchor).
++// The fingers are then closed onto a simplified model of that partner hand.
++constexpr float kShakePitch = 0.52f;      // fingers 30 deg down: the hands cross at 60 deg
++constexpr float kShakeSlide = 0.115f;     // partner's wrist from one's own, along the palm plane (m)
++constexpr float kShakePalms = 0.0255f;    // between the two hands' mid-planes (the palms just touch)
++constexpr float kShakeLift = 0.007f;      // the hands above C (m): the lowest fingers clear the pieces at the pumps' bottom
++
++inline vec3 shakeUp(float pitch) { return vec3(0, std::sin(pitch), std::cos(pitch)); }        // the vertical, hand frame
++inline vec3 shakeAlong(float pitch) { return vec3(0, -std::cos(pitch), std::sin(pitch)); }    // horizontal, towards the partner
++// Hand point (right-hand convention) put on C: half the palms' distance in front of the palm's
++// mid-plane, half the slide towards the partner (there, the thumb-index web), kShakeLift below.
++inline vec3 shakeAnchor(float pitch = kShakePitch) {
++    return vec3(kShakePalms * 0.5f, 0, 0) + shakeAlong(pitch) * (kShakeSlide * 0.5f) - shakeUp(pitch) * kShakeLift;
++}
++// The partner's hand frame in one's own (right-hand convention): the half turn about the vertical
++// through the anchor.
++inline mat4 shakePartner(float pitch, vec3 anchor) {
++    const vec3 u = shakeUp(pitch);
++    auto turn = [&](vec3 v) { return u * (2.0f * dot(v, u)) - v; };
++    mat4 m;
++    m.c[0] = vec4(turn(vec3(1, 0, 0)), 0.0f);
++    m.c[1] = vec4(turn(vec3(0, 1, 0)), 0.0f);
++    m.c[2] = vec4(turn(vec3(0, 0, 1)), 0.0f);
++    m.c[3] = vec4(anchor + turn(-anchor), 1.0f);
++    return m;
++}
++
++// Porcelain half thickness (m, towards the pad) of each phalanx, from the hand model; for the thumb:
++// the thenar's capsule, then its two phalanges.
++inline float phalanxHalf(int f, int j) {
++    static const float t[5][3] = {{0.0118f, 0.0080f, 0.0065f},
++                                  {0.0057f, 0.00475f, 0.00375f},
++                                  {0.0059f, 0.00495f, 0.00395f},
++                                  {0.0055f, 0.00455f, 0.00365f},
++                                  {0.0047f, 0.00385f, 0.00305f}};
++    return t[f][j];
++}
++
++// What one's fingers close on: a simplified robot hand (right-hand convention, its own frame):
++// the palm with its thickness and rounded, forward-curving edges (the porcelain shell's section),
++// the hypothenar, the knuckles, the carpal dome, the wrist cuff and the forearm along 'forearm',
++// the thenar and the thumb (of finger pose fp).
++struct HandProxy {
++    vec3 mcp[4];
++    vec3 forearm{0, 1, 0};
++    vec3 thumbA[3], thumbB[3];   // thumb bone axes (hand frame)
++};
++inline HandProxy handProxy(const Skeleton& sk, vec3 forearm, const FingerPose& fp) {
++    HandProxy h;
++    for (int f = 0; f < 4; ++f) h.mcp[f] = sk.restOffset[fingerBone(Side::Right, f + 1, 0)];
++    h.forearm = normalize(forearm);
++    mat4 fr[3];
++    fingerFrames(sk, Side::Right, fp, Thumb, fr);
++    for (int j = 0; j < 3; ++j) {
++        h.thumbA[j] = fr[j].translation();
++        h.thumbB[j] = j < 2 ? fr[j + 1].translation() : fingerTipFrom(sk, Side::Right, fr, Thumb);
++    }
++    return h;
++}
++inline float sdCapsule(vec3 p, vec3 a, vec3 b, float r) {
++    vec3 pa = p - a, ba = b - a;
++    float h = clamp(dot(pa, ba) / std::max(1e-12f, dot(ba, ba)), 0.0f, 1.0f);
++    return length(pa - ba * h) - r;
++}
++inline float sminPoly(float a, float b, float k) {
++    float h = clamp(0.5f + 0.5f * (b - a) / k, 0.0f, 1.0f);
++    return lerp(b, a, h) - k * h * (1.0f - h);
++}
++inline float sdEllipsoid(vec3 p, vec3 r) {
++    float k0 = length(vec3(p.x / r.x, p.y / r.y, p.z / r.z)), k1 = length(vec3(p.x / (r.x * r.x), p.y / (r.y * r.y), p.z / (r.z * r.z)));
++    return k1 > 1e-9f ? k0 * (k0 - 1.0f) / k1 : -std::min(r.x, std::min(r.y, r.z));
++}
++inline float handProxyDist(const HandProxy& h, vec3 p, bool withThumb = true) {
++    // Palm: a rounded slab, back at x -0.013, palm at +0.012, its edges curving towards the palm side,
++    // from the carpal dome to the knuckles (distance: the shell's implicit over its gradient).
++    float t = smoothstep(-0.012f, -0.070f, p.y);
++    float halfZ = lerp(0.0214f, 0.0358f, t), zc = lerp(0.0f, 0.0022f, t), halfX = lerp(0.0132f, 0.0117f, t);
++    float z = p.z - zc, xs = p.x + 0.0010f - 4.5f * z * z;
++    float qx = xs / halfX, qz = z / halfZ;
++    float n4 = std::max(1e-4f, std::sqrt(std::sqrt(qx * qx * qx * qx + qz * qz * qz * qz)));
++    float gx = qx * qx * qx / (n4 * n4 * n4), gz = qz * qz * qz / (n4 * n4 * n4);
++    vec3 grad(gx / halfX, 0.0f, gx * (-9.0f * z) / halfX + gz / halfZ);
++    float d = (n4 - 1.0f) / std::max(1e-6f, length(grad));
++    d = std::max(d, -0.0885f - p.y);                                    // knuckle line
++    for (int f = 0; f < 4; ++f) d = sminPoly(d, length(p - h.mcp[f] - vec3(-0.002f, 0.003f, 0)) - 0.0085f, 0.005f);
++    d = sminPoly(d, sdEllipsoid(p - vec3(0.0078f, -0.045f, -0.021f), vec3(0.0068f, 0.025f, 0.0115f)), 0.006f);   // hypothenar
++    d = std::min(d, length(p) - 0.0210f);                               // carpal dome
++    // Wrist cuff and forearm (round cone along the forearm, its end at the wrist).
++    float s = dot(p, h.forearm);
++    vec3 radial = p - h.forearm * clamp(s, 0.0f, 0.25f);
++    float fa = std::max(length(radial) - (0.0262f + 0.03f * clamp(s, 0.0f, 0.25f)), -s - 0.0025f);
++    d = std::min(d, fa);
++    // Thenar and thumb.
++    if (withThumb)
++        for (int j = 0; j < 3; ++j) d = std::min(d, sdCapsule(p, h.thumbA[j], h.thumbB[j], phalanxHalf(Thumb, j)));
++    return d;
++}
++
++// Closes long finger f of fp onto the partner (signed distance 'dist' in one's hand frame): MCP,
++// PIP and DIP close together, the middle joint fastest; a phalanx that comes within 'gap' of the
++// partner stops its joint and the joints before it (the fingers wrap the partner's hand).
++template <class Dist>
++inline void curlOnto(const Skeleton& sk, FingerPose& fp, int f, const Dist& dist, float gap = 0.0008f) {
++    const float rate[3] = {1.0f, 1.5f, 0.9f}, top[3] = {1.50f, 1.75f, 1.15f};
++    auto clearance = [&](const FingerPose& p, int j) {   // phalanx j of finger f: nearest approach
++        mat4 fr[3];
++        fingerFrames(sk, Side::Right, p, f, fr);
++        vec3 a = fr[j].translation(), e = j < 2 ? fr[j + 1].translation() : fingerTipFrom(sk, Side::Right, fr, f);
++        float best = 1e9f;
++        for (int k = 0; k <= 4; ++k) {
++            float u = float(k) / 4.0f;
++            float r = phalanxHalf(f, j) * (j == 2 && k == 4 ? 0.85f : 1.0f);   // (the rounded fingertip)
++            best = std::min(best, dist(a + (e - a) * u) - r);
++        }
++        return best;
++    };
++    bool moving[3] = {true, true, true};
++    for (int it = 0; it < 300; ++it) {
++        if (!moving[0] && !moving[1] && !moving[2]) break;
++        FingerPose t = fp;
++        for (int j = 0; j < 3; ++j)
++            if (moving[j]) t.v[f][j + 1] = std::min(top[j], t.v[f][j + 1] + rate[j] * 0.01f);
++        int hit = -1;
++        for (int j = 0; j < 3; ++j)
++            if (clearance(t, j) < gap) hit = j;
++        if (hit >= 0) {
++            for (int j = 0; j <= hit; ++j) moving[j] = false;
++            continue;
++        }
++        fp = t;
++        for (int j = 0; j < 3; ++j)
++            if (fp.v[f][j + 1] >= top[j]) moving[j] = false;
++    }
++}
++
++// Thumb axis segments (hand frame, right-hand convention) of pose fp.
++inline void thumbSegments(const Skeleton& sk, const FingerPose& fp, vec3 a[3], vec3 b[3]) {
++    mat4 fr[3];
++    fingerFrames(sk, Side::Right, fp, Thumb, fr);
++    for (int j = 0; j < 3; ++j) {
++        a[j] = fr[j].translation();
++        b[j] = j < 2 ? fr[j + 1].translation() : fingerTipFrom(sk, Side::Right, fr, Thumb);
++    }
++}
++inline float segSegDist(vec3 p1, vec3 q1, vec3 p2, vec3 q2) {
++    vec3 d1 = q1 - p1, d2 = q2 - p2, r = p1 - p2;
++    float a = dot(d1, d1), e = dot(d2, d2), f = dot(d2, r), c = dot(d1, r), b = dot(d1, d2), den = a * e - b * b;
++    float s = den > 1e-12f ? clamp((b * f - c * e) / den, 0.0f, 1.0f) : 0.0f;
++    float t = (b * s + f) / e;
++    if (t < 0.0f) { t = 0.0f; s = clamp(-c / a, 0.0f, 1.0f); }
++    else if (t > 1.0f) { t = 1.0f; s = clamp((b - c) / a, 0.0f, 1.0f); }
++    return length((p1 + d1 * s) - (p2 + d2 * t));
++}
++// Smallest gap (m) between one's thumb (pose fp) and the partner's (the same pose, frame 'partner').
++inline float thumbsGap(const Skeleton& sk, const FingerPose& fp, const mat4& partner) {
++    vec3 a[3], b[3];
++    thumbSegments(sk, fp, a, b);
++    float g = 1e9f;
++    for (int i = 0; i < 3; ++i)
++        for (int j = 0; j < 3; ++j)
++            g = std::min(g, segSegDist(a[i], b[i], transformPoint(partner, a[j]), transformPoint(partner, b[j])) - phalanxHalf(Thumb, i) -
++                                phalanxHalf(Thumb, j));
++    return g;
++}
++
++// The thumb over the back of the partner's hand (hand frame 'partner', its distance 'dist' without
++// its thumb). The robot thumb opposes about the hand's long axis and then flexes in a plane at the
++// height of its base, so it reaches the partner's back between its wrist and its knuckles: among
++// the oppositions / CMC flexions whose straight thumb passes over the partner, the MCP and IP
++// flexions that rest the pad on the partner's back (clear of it, and of the partner's thumb: the
++// same pose, so no crossed thumbs), nearest the partner's index knuckle with the least curl, the
++// way down from the straight thumb staying clear too. Returns false (fp unchanged) without one.
++template <class Dist>
++inline bool thumbOnto(const Skeleton& sk, FingerPose& fp, const mat4& partner, const Dist& dist) {
++    const mat4 toPartner = inverseAffine(partner);
++    const vec3 knuckle = sk.restOffset[fingerBone(Side::Right, Index, 0)] + vec3(-0.0135f, 0.0f, -0.004f);   // its back
++    vec3 a[3], b[3];
++    auto clear = [&](const FingerPose& p, int j0, int j1) {   // thumb segments j0..j1 (0 = thenar)
++        thumbSegments(sk, p, a, b);
++        float c = 1e9f;
++        for (int j = j0; j <= j1; ++j)
++            for (int k = 0; k <= 4; ++k) c = std::min(c, dist(a[j] + (b[j] - a[j]) * (float(k) / 4.0f)) - phalanxHalf(Thumb, j));
++        return c;
++    };
++    auto cost = [&](const FingerPose& t, const FingerPose& straight) {   // < 1e9 when it rests on the partner's back
++        if (clear(t, 1, 2) < 0.0005f) return 1e9f;
++        const vec3 padL = fingerPad(sk, Side::Right, t, Thumb), pad = transformPoint(toPartner, padL);
++        if (pad.x > -0.0115f || dist(padL) > 0.003f || thumbsGap(sk, t, partner) < 0.002f) return 1e9f;
++        for (float w : {0.33f, 0.67f})
++            if (clear(fpLerp(straight, t, w), 1, 2) < -0.0005f) return 1e9f;
++        return length(pad - knuckle) + 0.005f * (t.v[0][2] + t.v[0][3]) + 0.004f * std::fabs(t.v[0][0] - 1.2f);
++    };
++    FingerPose best = fp;
++    float bestCost = 1e9f;
++    for (float opp = 1.0f; opp <= 1.501f; opp += 0.10f)
++        for (float cmc = -0.80f; cmc <= -0.299f; cmc += 0.10f) {
++            FingerPose straight = fp;
++            straight.v[0][0] = opp;
++            straight.v[0][1] = cmc;
++            straight.v[0][2] = straight.v[0][3] = 0.0f;
++            // The thenar lies against the partner's palm (it does not move with the MCP and IP; the
++            // model's capsule is a little fat there); the straight phalanges pass over the partner.
++            if (clear(straight, 0, 0) < -0.002f || clear(straight, 1, 2) < 0.0008f) continue;
++            for (float mcp = 0.0f; mcp <= 1.301f; mcp += 0.10f)
++                for (float ip = 0.0f; ip <= 1.201f; ip += 0.10f) {
++                    FingerPose t = straight;
++                    t.v[0][2] = mcp;
++                    t.v[0][3] = ip;
++                    float c = cost(t, straight);
++                    if (c < bestCost) {
++                        bestCost = c;
++                        best = t;
++                    }
++                }
++        }
++    if (bestCost >= 1e8f) return false;
++    // Finer around the best.
++    const FingerPose coarse = best;
++    FingerPose straight = coarse;
++    straight.v[0][2] = straight.v[0][3] = 0.0f;
++    for (float dm = -0.075f; dm <= 0.0751f; dm += 0.025f)
++        for (float di = -0.075f; di <= 0.0751f; di += 0.025f) {
++            FingerPose t = coarse;
++            t.v[0][2] = clamp(coarse.v[0][2] + dm, 0.0f, 1.30f);
++            t.v[0][3] = clamp(coarse.v[0][3] + di, 0.0f, 1.20f);
++            float c = cost(t, straight);
++            if (c < bestCost) {
++                bestCost = c;
++                best = t;
++            }
++        }
++    fp = best;
++    return true;
++}
++
++// The grip of a handshake: the thumb over the partner's back, then the long fingers closed around
++// the little-finger edge of the partner's hand onto its back. 'open': the spreads and the starting
++// flexions; 'forearm': one's forearm direction from the wrist (hand frame), the partner's being the
++// same in its own frame. Right-hand convention (the values suit either hand).
++inline FingerPose solveShakeGrip(const Skeleton& sk, float pitch, vec3 anchor, vec3 forearm, const FingerPose& open) {
++    const mat4 partner = shakePartner(pitch, anchor), toPartner = inverseAffine(partner);
++    FingerPose g = open;
++    HandProxy h = handProxy(sk, forearm, g);
++    if (!thumbOnto(sk, g, partner, [&](vec3 p) { return handProxyDist(h, transformPoint(toPartner, p), false); })) {
++        g.v[Thumb][0] = 1.2f;   // none rests on the partner's back: opposed and straight, over it
++        g.v[Thumb][1] = -0.6f;
++        g.v[Thumb][2] = g.v[Thumb][3] = 0.0f;
++    }
++    h = handProxy(sk, forearm, g);   // the partner's thumb is where one's own is
++    for (int f = Index; f <= Pinky; ++f) curlOnto(sk, g, f, [&](vec3 p) { return handProxyDist(h, transformPoint(toPartner, p)); });
++    return g;
++}
++
+ struct PinchGeo {
+     FingerPose pose;        // fingers closed on a piece of the given grip radius
+     FingerPose open;        // pre-grasp aperture for the same piece
+@@ -414,6 +662,7 @@ inline vec3 pressPoint(const Skeleton& sk, const FingerPose& fp) {
+     return (a + b) * 0.5f;
+ }
+ inline vec3 mirrorX(vec3 v) { return vec3(-v.x, v.y, v.z); }
++inline quat mirrorQ(quat q) { return quat(q.x, -q.y, -q.z, q.w); }   // S R S with S = diag(-1, 1, 1)
+ inline vec3 handPoint(Side s, vec3 rightHandLocal) { return s == Side::Right ? rightHandLocal : mirrorX(rightHandLocal); }
+ 
+ // Hand rotation (character space) from yaw (azimuth of the fingers' horizontal direction,
+@@ -1252,15 +1501,15 @@ struct Animator::Impl {
+     // How hard it is for the right arm to put the hand bone at wristC with rotation q (rad): joint
+     // limit clamps, plus a soft penalty near the wrist and forearm limits.
+     // 'achieved' (optional): the hand rotation the arm really gets to (joint limits).
+-    // 'flexOut' (optional): the torso flexion the reach takes.
+-    float armStrain(vec3 wristC, quat q, quat* achieved = nullptr, float* flexOut = nullptr) {
++    // 'flexOut' (optional): the torso flexion the reach takes. 'elbow': the elbow lift (rad).
++    float armStrain(vec3 wristC, quat q, quat* achieved = nullptr, float* flexOut = nullptr, float elbow = 0.0f) {
+         Pose tmp;
+         reachShort = wristClamp = pronClamp = 0;
+         SpineParams sp = solveSpine(tmp, wristC, 0.0f, 0.0f, 0.0f, 0.0f);
+         if (flexOut) *flexOut = sp.flex;
+         applySpine(tmp, sp);
+         fkChain(tmp, Pelvis, Spine2);
+-        solveArm(tmp, Side::Right, wristC, q);
++        solveArm(tmp, Side::Right, wristC, q, elbow);
+         if (achieved) *achieved = rotOf(G[HandR]);
+         float soft = softWristStrain(lastFlex, lastDev, lastPron);
+         return wristClamp + pronClamp + reachShort * 10.0f + 0.5f * soft;
+@@ -1464,7 +1713,7 @@ struct Animator::Impl {
+     Hand& shakeHand() { return mirrored ? left() : right(); }
+     Side shakeSide() const { return mirrored ? Side::Left : Side::Right; }
+     // Side-aware arm strain (armStrain() is the playing hand's).
+-    float armStrainSide(Side s, vec3 wristC, quat q);
++    float armStrainSide(Side s, vec3 wristC, quat q, float elbow = 0.0f);   // (leaves the solved arm in G)
+     Side diagSide = Side::Right;   // arm whose solve updates the diagnostics (reachShort, clamps...)
+ 
+     // ==========================================================================================
+diff --git a/src/anim/animator_writing.cpp b/src/anim/animator_writing.cpp
+index 4f9f854..3ff7c6a 100644
+--- a/src/anim/animator_writing.cpp
++++ b/src/anim/animator_writing.cpp
+@@ -44,7 +44,6 @@ size_t pathSegment(const std::vector<PenKey>& k, float t) {
+     return lo;
+ }
+ 
+-inline quat mirrorQ(quat q) { return quat(q.x, -q.y, -q.z, q.w); }   // S R S with S = diag(-1, 1, 1)
+ inline PenPose mirrorPen(const PenPose& p) { return {mirrorQ(p.q), mirrorX(p.p)}; }
+ Bone mirrorBone(Bone b) {
+     if (b >= ClavicleL && b <= PinkyL3) return Bone(b + (ClavicleR - ClavicleL));
+@@ -285,8 +284,8 @@ void Animator::Impl::exportEvents(std::vector<Event>& ev, size_t from) const {
+     }
+ }
+ 
+-float Animator::Impl::armStrainSide(Side s, vec3 wristC, quat q) {
+-    if (s == Side::Right) return armStrain(wristC, q);
++float Animator::Impl::armStrainSide(Side s, vec3 wristC, quat q, float elbow) {
++    if (s == Side::Right) return armStrain(wristC, q, nullptr, nullptr, elbow);
+     // The mirror image of armStrain(): the torso leans and turns for this hand the way it does for
+     // the right one.
+     Pose tmp;
+@@ -298,7 +297,7 @@ float Animator::Impl::armStrainSide(Side s, vec3 wristC, quat q) {
+     reachShort = wristClamp = pronClamp = 0;
+     applySpine(tmp, sp);
+     fkChain(tmp, Pelvis, Spine2);
+-    solveArm(tmp, s, wristC, q);
++    solveArm(tmp, s, wristC, q, elbow);
+     float soft = softWristStrain(lastFlex, lastDev, lastPron);
+     float r = wristClamp + pronClamp + reachShort * 10.0f + 0.5f * soft;
+     diagSide = keep;
+diff --git a/tests/anim_tests.cpp b/tests/anim_tests.cpp
+index bca44bd..2459498 100644
+--- a/tests/anim_tests.cpp
++++ b/tests/anim_tests.cpp
+@@ -1,6 +1,7 @@
+ // Animation tests (no GPU): the writing-hand helpers, the writing queue's event instants and pen
+ // tip, writing never delaying the playing hand, the left-handed player as the exact mirror image
+-// of a right-handed one, the first-person player writing on his own scoresheet as the game
++// of a right-handed one, the two hands of a handshake clasping without passing through each other,
++// the first-person player writing on his own scoresheet as the game
+ // wires it (pen, ink, PenDown sounds heard from his head), and the coach's gestures (pointing,
+ // tracing a move, speaking gestures, their timing, and a demonstration taken back). The animator
+ // is not part of scacelith_core, so its sources are compiled into this file.
+@@ -840,6 +841,111 @@ TEST(anim_cancel_handshake_lays_the_pen_down) {
+     CHECK(!B.writingBusy());
+ }
+ 
++// The hands of a handshake, right- vs right-handed and right- vs left-handed (the game always has one
++// left-handed robot), at every step from reaching out to the rest: no phalanx passes through the
++// partner's palm, wrist cuff or forearm. From the bones alone: each phalanx is a capsule of its
++// porcelain half thickness, the partner's palm a slab a little inside its shell, its forearm a
++// round cone inside its shell. Through the grip and the pumps the long fingers' pads rest on the
++// back of the partner's hand between its wrist and its knuckles (not on its cuff), the thumbs stay
++// apart (no crossed thumbs) and the hands cross at an angle (not end to end along the forearms).
++TEST(anim_handshake_hands_clasp_without_passing_through) {
++    using namespace character;
++    using m::vec3;
++    const Skeleton& sk = robotSkeleton();
++    // The palm: a slab inside the porcelain shell (narrower towards the wrist, rounded section, its
++    // edges curving towards the palm side), from the wrist end to the knuckles; signed distance.
++    auto palmSlab = [](vec3 p) {
++        const float hz = 0.019f + 0.012f * m::clamp((-p.y - 0.015f) / 0.045f, 0.0f, 1.0f), rr = 0.007f;
++        const float z = p.z - 0.002f, x = p.x + 0.001f - 4.5f * z * z;
++        const float qx = std::fabs(x) - (0.011f - rr), qz = std::fabs(z) - (hz - rr);
++        const float section = std::sqrt(std::max(qx, 0.0f) * std::max(qx, 0.0f) + std::max(qz, 0.0f) * std::max(qz, 0.0f)) + std::min(std::max(qx, qz), 0.0f) - rr;
++        return std::max(section, std::max(p.y + 0.012f, -0.082f - p.y));
++    };
++    // Porcelain half thickness (m) of each phalanx: thumb (metacarpal on its pad side), index .. pinky.
++    const float half[5][3] = {{0.0080f, 0.0064f, 0.0050f}, {0.0057f, 0.00475f, 0.00375f}, {0.0059f, 0.00495f, 0.00395f},
++                              {0.0055f, 0.00455f, 0.00365f}, {0.0047f, 0.00385f, 0.00305f}};
++    auto segDist = [](vec3 p, vec3 a, vec3 b) {
++        vec3 ab = b - a;
++        float h = m::clamp(m::dot(p - a, ab) / std::max(1e-12f, m::dot(ab, ab)), 0.0f, 1.0f);
++        return m::length(p - (a + ab * h));
++    };
++    for (Side play : {Side::Right, Side::Left}) {
++        anim::Animator W, B;
++        W.init(sk, vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
++        B.init(sk, vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, play);
++        anim::Task h;
++        h.type = anim::TaskType::Handshake;
++        h.partner = &B;
++        W.enqueue(h);
++        h.partner = &W;
++        B.enqueue(h);
++        std::vector<anim::Event> ev;
++        float deepest = 0.0f, deepestT = 0.0f, thumbs = 1e9f, padBack = 1e9f, padYmin = 1e9f, padYmax = -1e9f, crossMin = 1e9f, crossMax = 0.0f;
++        const char* deepestIn = "-";
++        while (W.time() < anim::Timing::Handshake + 0.05f) {
++            ev.clear();
++            W.update(1.0f / 120.0f, ev);
++            ev.clear();
++            B.update(1.0f / 120.0f, ev);
++            const float t = W.time();
++            const bool gripped = t >= 1.0f && t <= 1.9f;   // the grip closed (just after the clasp) to the release
++            const m::mat4* g[2] = {W.globals(), B.globals()};
++            for (int a = 0; a < 2; ++a) {
++                const m::mat4* own = g[a];
++                const m::mat4* par = g[1 - a];
++                const m::mat4 toPartner = m::inverseAffine(par[HandR]);
++                const vec3 elbow = par[ForeArmR].translation(), wrist = par[HandR].translation();
++                const vec3 cuffDir = m::normalize(elbow - wrist);
++                for (int f = 0; f < 5; ++f)
++                    for (int j = 0; j < 3; ++j) {
++                        const Bone b = Bone(ThumbR1 + f * 3 + j);
++                        const vec3 s = own[b].translation();
++                        const vec3 e = j < 2 ? own[b + 1].translation() : m::transformPoint(own[b], m::normalize(sk.restOffset[b]) * sk.boneLength[b]);
++                        const float r = half[f][j];
++                        for (int k = 0; k <= 4; ++k) {
++                            const vec3 p = s + (e - s) * (float(k) / 4.0f), pl = m::transformPoint(toPartner, p);
++                            const float palm = r - palmSlab(pl);
++                            const float fore = r - (segDist(p, wrist + cuffDir * 0.02f, elbow) - 0.023f);
++                            const float cuff = m::dot(p - wrist, cuffDir) > -0.002f ? r - (m::length(p - wrist) - 0.023f) : -1.0f;
++                            const float d = std::max(palm, std::max(fore, cuff));
++                            if (d > deepest) {
++                                deepest = d;
++                                deepestT = t;
++                                deepestIn = palm >= std::max(fore, cuff) ? "palm" : fore >= cuff ? "forearm" : "wrist cuff";
++                            }
++                        }
++                    }
++                if (!gripped) continue;
++                for (int f = 1; f <= 4; ++f) {   // the pad's skin, 72% along the distal phalanx
++                    const Bone b3 = Bone(ThumbR1 + f * 3 + 2);
++                    const vec3 padLocal = m::normalize(sk.restOffset[b3]) * (0.72f * sk.boneLength[b3]) + vec3(half[f][2], 0, 0);
++                    const vec3 pad = m::transformPoint(toPartner, m::transformPoint(own[b3], padLocal));
++                    padBack = std::min(padBack, -pad.x);
++                    padYmin = std::min(padYmin, pad.y);
++                    padYmax = std::max(padYmax, pad.y);
++                }
++                const vec3 a0 = own[ThumbR1].translation(), a1 = own[ThumbR2].translation(), b0 = par[ThumbR1].translation(), b1 = par[ThumbR2].translation();
++                for (int k = 0; k <= 8; ++k) thumbs = std::min(thumbs, segDist(a0 + (a1 - a0) * (float(k) / 8.0f), b0, b1));
++                // Crossing of the hand axes, seen along the palm normal.
++                const vec3 n = m::normalize(own[HandR].c[0].xyz()), fa = -m::normalize(own[HandR].c[1].xyz()), fb = m::normalize(par[HandR].c[1].xyz());
++                const vec3 pa = m::normalize(fa - n * m::dot(fa, n)), pb = m::normalize(fb - n * m::dot(fb, n));
++                const float cross = std::acos(m::clamp(m::dot(pa, pb), -1.0f, 1.0f)) / m::DEG;
++                crossMin = std::min(crossMin, cross);
++                crossMax = std::max(crossMax, cross);
++            }
++        }
++        std::fprintf(stderr, "  right vs %s-handed: deepest phalanx in the partner %.1f mm (%s, t=%.3f s); gripped: pads %.1f mm behind the partner's palm "
++                             "mid-plane, %.0f..%.0f mm from its wrist, thumbs %.1f mm apart, hands crossing at %.0f..%.0f deg\n",
++                     play == Side::Right ? "right" : "left", deepest * 1000.0f, deepestIn, deepestT, padBack * 1000.0f, -padYmax * 1000.0f, -padYmin * 1000.0f,
++                     thumbs * 1000.0f, crossMin, crossMax);
++        CHECK(deepest < 0.001f);
++        CHECK(padBack > 0.008f);
++        CHECK(-padYmax > 0.015f && -padYmin < 0.085f);   // between the wrist (+15 mm) and the knuckles
++        CHECK(thumbs > 0.020f);
++        CHECK(crossMin > 35.0f && crossMax < 65.0f);
++    }
++}
++
+ // A piece the robot set down on the table beside its resting hand, which the game later puts back
+ // on the board by itself (a board set back after an illegal move, a lesson reset): with the game's
+ // obstacle callbacks, the resting hand keeps clear of the piece while it stands there, and rests
+-- 
+2.43.0
+
