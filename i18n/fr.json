@@ -2,7 +2,7 @@
   "pages": {
     "home": {
       "title": "Scacelith — les échecs photoréalistes, à la première personne",
-      "description": "Prenez place dans une salle royale baignée de soleil et jouez aux échecs à la première personne face à un robot de porcelaine animé par Stockfish 19, avec un coach, le jeu en ligne et le classement FIDE. Logiciel libre pour Windows."
+      "description": "Échecs photoréalistes et gratuits pour Windows, à la première personne dans une salle royale : Stockfish 19, un coach et des adversaires en ligne."
     },
     "players": {
       "title": "Classement et joueurs — Scacelith",
@@ -352,6 +352,8 @@
     "title": "GIF animé",
     "preparing": "Préparation du GIF…",
     "download": "Télécharger le GIF",
+    "make": "Créer le GIF",
+    "pause": "Mettre l’animation en pause",
     "back": "Retour à mes parties",
     "options": "Options",
     "size": "Taille",
@@ -638,6 +640,7 @@
       "signin_button": "Se connecter",
       "missing": "Aucune partie n’a été choisie.",
       "retry_in": "Vous pourrez réessayer dans {time}.",
+      "confirm": "Appuyez sur « Créer le GIF » pour que le serveur dessine cette partie avec votre compte.",
       "retry_now": "Vous pouvez réessayer maintenant."
     },
     "home": {

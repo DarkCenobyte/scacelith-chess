@@ -10,14 +10,23 @@
         <span class="spinner" aria-hidden="true" data-gif-spinner></span>
         <span data-gif-status-text>{{t:gif.preparing}}</span>
       </div>
-      <img class="gif-image" data-gif-image alt="" hidden>
+      <img class="gif-image" data-gif-image src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="" hidden>
+      <canvas class="gif-image" data-gif-still hidden></canvas>
     </div>
 
     <div class="gif-actions">
-      <a class="btn btn-gold" data-gif-download hidden download>
+      <button class="btn btn-gold" type="button" data-gif-make hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-film"></use></svg>
+        <span>{{t:gif.make}}</span>
+      </button>
+      <a class="btn btn-gold" href="#" data-gif-download hidden>
         <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>
         <span>{{t:gif.download}}</span>
       </a>
+      <button class="btn btn-ghost" type="button" data-gif-pause aria-pressed="false" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#i-pause"></use></svg>
+        <span>{{t:gif.pause}}</span>
+      </button>
       <a class="btn btn-ghost" href="../account/#games" data-gif-back>{{t:gif.back}}</a>
     </div>
 

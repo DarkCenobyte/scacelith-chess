@@ -85,6 +85,7 @@ export function requestSession(timeoutMs = 800) {
         memory = msg.session;
         store.set(KEY, memory, memory.remember ? "local" : "session");
         done(memory);
+        emit();
       }
     };
     const timer = setTimeout(() => done(null), timeoutMs);
@@ -104,7 +105,8 @@ channel?.addEventListener("message", (event) => {
     emit();
   } else if (msg.type === "login") {
     memory = null;
-    emit();
+    if (getSession()) emit();
+    else requestSession();
   }
 });
 

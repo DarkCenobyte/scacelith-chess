@@ -61,11 +61,20 @@ export function showMessage(el, message) {
   el.hidden = !message;
 }
 
+/**
+ * Marks a button as working. It is not disabled, so that it keeps the keyboard focus: the
+ * handlers check isBusy() and ignore a second press.
+ */
 export function setBusy(button, busy) {
   if (!button) return;
   button.classList.toggle("is-busy", busy);
-  button.disabled = busy;
+  if (busy) button.setAttribute("aria-disabled", "true");
+  else button.removeAttribute("aria-disabled");
   button.setAttribute("aria-busy", busy ? "true" : "false");
+}
+
+export function isBusy(button) {
+  return Boolean(button?.classList.contains("is-busy"));
 }
 
 /* ---------------------------------------------------------------------------- files */
@@ -130,8 +139,8 @@ export function initMenus(root = document) {
   for (const menu of menus) {
     if (menu.dataset.ready) continue;
     menu.dataset.ready = "1";
+    // A disclosure (the native <details>), not an ARIA menu: Tab moves through the links.
     const summary = menu.querySelector("summary");
-    summary?.setAttribute("aria-haspopup", "true");
     const sync = () => summary?.setAttribute("aria-expanded", menu.open ? "true" : "false");
     sync();
     menu.addEventListener("toggle", () => {
@@ -209,8 +218,8 @@ export function initReveal(root = document) {
       const input = button.parentElement.querySelector("input");
       const show = input.type === "password";
       input.type = show ? "text" : "password";
+      // A toggle button keeps its name ("Show the password"); its pressed state says the rest.
       button.setAttribute("aria-pressed", show ? "true" : "false");
-      button.setAttribute("aria-label", t(show ? "js.common.hide_password" : "js.common.show_password"));
     });
   }
 }

@@ -2,7 +2,7 @@
   "pages": {
     "home": {
       "title": "Scacelith — ajedrez fotorrealista, en primera persona",
-      "description": "Tome asiento en una sala real bañada por el sol y juegue al ajedrez en primera persona contra un robot de porcelana impulsado por Stockfish 19, con entrenador, juego en línea y puntuación según las normas de la FIDE. Software libre para Windows."
+      "description": "Ajedrez fotorrealista y gratuito para Windows, en primera persona en una sala real: Stockfish 19, un entrenador y rivales en línea."
     },
     "players": {
       "title": "Clasificación y jugadores — Scacelith",
@@ -352,6 +352,8 @@
     "title": "GIF animado",
     "preparing": "Preparando el GIF…",
     "download": "Descargar el GIF",
+    "make": "Crear el GIF",
+    "pause": "Pausar la animación",
     "back": "Volver a mis partidas",
     "options": "Opciones",
     "size": "Tamaño",
@@ -534,7 +536,7 @@
         "21": "Abandonó la partida, pero el rival no puede dar mate",
         "22": "Partida anulada",
         "23": "Sin primera jugada a tiempo (anulada)",
-        "24": "Incomparecencia (infracción del juego limpio)",
+        "24": "Partida perdida (infracción del juego limpio)",
         "25": "Anulada por el servidor",
         "26": "Ambos jugadores se desconectaron"
       }
@@ -638,6 +640,7 @@
       "signin_button": "Iniciar sesión",
       "missing": "No se ha elegido ninguna partida.",
       "retry_in": "Podrá volver a intentarlo dentro de {time}.",
+      "confirm": "Pulse «Crear el GIF» para que el servidor dibuje esta partida con su cuenta.",
       "retry_now": "Ya puede volver a intentarlo."
     },
     "home": {

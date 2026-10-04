@@ -45,11 +45,13 @@ function isDeleted(name) {
   return /^deleted#\d+$/.test(String(name || ""));
 }
 
-function playerLine(game, side, { me, linkPlayers }) {
+function playerLine(game, side, { me, owner, linkPlayers }) {
   const p = game[side] || {};
   const [ws, bs] = scores(game);
   const score = side === "white" ? ws : bs;
-  const isMe = me && p.name && p.name.toLowerCase() === me.toLowerCase();
+  const same = (a, b) => Boolean(a && b && a.toLowerCase() === b.toLowerCase());
+  const isMe = same(p.name, me);
+  const isOwner = isMe || same(p.name, owner);
   const name = p.name || t("js.common.dash");
   const nameEl = linkPlayers && p.name && !isDeleted(p.name)
     ? h("a", { href: pageUrl("players", { u: p.name }), title: t("js.players.view", { name: p.name }) }, name)
@@ -65,7 +67,7 @@ function playerLine(game, side, { me, linkPlayers }) {
         : null);
   }
   return h("div", {
-    class: `player-line is-${side}${isMe ? " is-me" : ""}${score === "1" ? " is-winner" : ""}`,
+    class: `player-line is-${side}${isOwner ? " is-me" : ""}${score === "1" ? " is-winner" : ""}`,
   },
   h("span", { class: "player-piece", "aria-hidden": "true" }, h("span", { class: "piece" }, "♚")),
   h("span", { class: "player-name" },
@@ -77,8 +79,9 @@ function playerLine(game, side, { me, linkPlayers }) {
 }
 
 function gameRow(game, opts) {
-  const color = game.color || (opts.me && game.white?.name?.toLowerCase() === opts.me.toLowerCase() ? "white"
-    : opts.me && game.black?.name?.toLowerCase() === opts.me.toLowerCase() ? "black" : null);
+  const side = opts.owner || opts.me;
+  const color = game.color || (side && game.white?.name?.toLowerCase() === side.toLowerCase() ? "white"
+    : side && game.black?.name?.toLowerCase() === side.toLowerCase() ? "black" : null);
   const outcome = outcomeFor(game, color);
   let outcomeLabel;
   let outcomeClass = outcome;
@@ -90,7 +93,8 @@ function gameRow(game, opts) {
   }
   const plies = game.plies || 0;
   const moves = Math.ceil(plies / 2);
-  const category = game.category === "custom" ? `${t("js.game.custom")} · ${game.timeControl || ""}`.trim() : game.category || game.timeControl;
+  const custom = game.category === "custom";
+  const category = custom ? game.timeControl || "" : game.category || game.timeControl;
   const ended = game.endedAt || game.startedAt;
   const duration = game.startedAt && game.endedAt ? game.endedAt - game.startedAt : null;
 
@@ -140,11 +144,10 @@ function gameRow(game, opts) {
     actions.append(gif);
   } else {
     actions.append(h("a", {
-      class: "action",
-      href: pageUrl("account", null, null),
+      class: "action is-signin",
+      href: pageUrl("account"),
       title: t("js.game.gif_signin"),
-      "aria-disabled": "true",
-    }, icon("film"), h("span", null, t("js.game.gif"))));
+    }, icon("film"), h("span", null, t("js.game.gif")), h("span", { class: "visually-hidden" }, ` – ${t("js.game.gif_signin")}`)));
   }
 
   return h("li", { class: `game is-${outcomeClass}` },
@@ -157,7 +160,7 @@ function gameRow(game, opts) {
       playerLine(game, "black", opts)),
     h("div", { class: "game-meta" },
       h("span", { class: "meta-cat" },
-        h("bdi", null, category), " · ", t(game.rated ? "js.game.rated" : "js.game.casual")),
+        custom ? `${t("js.game.custom")} · ` : null, h("bdi", { dir: "ltr" }, category), " · ", t(game.rated ? "js.game.rated" : "js.game.casual")),
       h("span", null, t("js.game.moves", { count: moves }), duration !== null ? ` · ${fmt.duration(duration)}` : ""),
       ended ? h("time", { datetime: fmt.isoDate(ended), title: fmt.dateTime(ended) }, fmt.dateTime(ended)) : null),
     actions);
@@ -165,7 +168,8 @@ function gameRow(game, opts) {
 
 /**
  * A paged list of games in `container`. `load(before)` returns { games, next, total? }.
- * Options: me (the user name whose side is highlighted), linkPlayers, empty (message),
+ * Options: owner (the player whose list it is: their side gives the outcome and is highlighted),
+ * me (the signed-in viewer, tagged "you"), linkPlayers, empty (message),
  * limit (show at most this many, without "Show more"), onTotal(total).
  */
 export function gameList(container, load, opts = {}) {
@@ -185,7 +189,13 @@ export function gameList(container, load, opts = {}) {
       const page = await load(more ? before : null);
       if (my !== token) return;
       if (!more) clear(list);
+      const first = list.children.length;
       for (const game of page.games || []) list.append(gameRow(game, opts));
+      // "Show more" goes away or moves: the focus goes to the first new game.
+      if (more && list.children[first]) {
+        list.children[first].tabIndex = -1;
+        list.children[first].focus();
+      }
       next = opts.limit ? null : page.next ?? null;
       if (!more && typeof page.total === "number") opts.onTotal?.(page.total);
       clear(foot);

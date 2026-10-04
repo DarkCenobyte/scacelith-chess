@@ -3,7 +3,7 @@
 import "./site.js";
 import { onReady } from "./site.js";
 import { $, h, clear } from "./lib/dom.js";
-import { t, fmt, pageUrl } from "./lib/i18n.js";
+import { t, fmt, pageUrl, ltr } from "./lib/i18n.js";
 import { api, ApiError } from "./lib/api.js";
 import { getSession } from "./lib/session.js";
 import { errorMessage, showMessage } from "./lib/ui.js";
@@ -11,6 +11,14 @@ import { renderRatings, ratingText } from "./lib/ratings.js";
 import { gameList } from "./lib/games.js";
 
 const USERNAME = /^[A-Za-z0-9_.-]{2,24}$/;
+// The page routes on its query (?u=, ?c=); a fragment such as the skip link's #main changes nothing.
+let lastSearch = location.search;
+
+function setUrl(url, push) {
+  if (push) history.pushState(null, "", url);
+  else history.replaceState(history.state, "", url);
+  lastSearch = location.search;
+}
 const baseTitle = document.title;
 let categories = [];
 let infoPromise = null;
@@ -54,7 +62,7 @@ async function showBoard(category) {
       b.addEventListener("click", () => {
         const url = new URL(location.href);
         url.searchParams.set("c", c);
-        history.replaceState(null, "", url);
+        setUrl(url, false);
         showBoard(c);
       });
       tabs.append(b);
@@ -63,7 +71,7 @@ async function showBoard(category) {
   for (const b of tabs.children) {
     b.setAttribute("aria-pressed", b.dataset.category === category ? "true" : "false");
   }
-  $("[data-board-caption]").textContent = `${t("js.players.board")} ${category}`;
+  $("[data-board-caption]").textContent = `${t("js.players.board")} ${ltr(category)}`;
   try {
     const data = await api("/leaderboard", { query: { category, limit: 100 } });
     if (my !== boardToken) return;
@@ -86,11 +94,11 @@ async function showBoard(category) {
       });
       body.append(h("tr", { class: p.rank <= 3 ? `rank-${p.rank}` : null },
         h("td", { class: "num rank-cell" }, fmt.number(p.rank)),
-        h("td", null, link, me && p.username.toLowerCase() === me ? h("span", { class: "me-tag" }, ` ${t("js.players.you")}`) : null),
+        h("td", { class: "player-cell" }, link, me && p.username.toLowerCase() === me ? h("span", { class: "me-tag" }, ` ${t("js.players.you")}`) : null),
         h("td", { class: "num" }, ratingText(p.rating, false)),
         h("td", { class: "num hide-sm" }, fmt.rating(p.peak ?? p.rating)),
         h("td", { class: "num hide-sm" }, fmt.number(p.games)),
-        h("td", { class: "num wdl-col" }, `${fmt.number(p.wins)} / ${fmt.number(p.draws)} / ${fmt.number(p.losses)}`)));
+        h("td", { class: "num wdl-col hide-xs" }, `${fmt.number(p.wins)} / ${fmt.number(p.draws)} / ${fmt.number(p.losses)}`)));
     }
   } catch (e) {
     if (my !== boardToken) return;
@@ -108,11 +116,6 @@ async function openProfile(username, push) {
   const board = $("[data-leaderboard]");
   const error = $("[data-search-error]");
   showMessage(error, "");
-  if (push) {
-    const url = new URL(location.href);
-    url.searchParams.set("u", username);
-    history.pushState({ u: username }, "", url);
-  }
   const my = ++profileToken;
   panel.hidden = false;
   board.hidden = true;
@@ -139,6 +142,11 @@ async function openProfile(username, push) {
   }
   if (my !== profileToken) return;
   const name = profile.username;
+  // The address and the title use the name as the server writes it (alice, not ALICE).
+  const url = new URL(location.href);
+  url.searchParams.set("u", name);
+  setUrl(url, push);
+  document.title = `${name} — ${baseTitle}`;
   $("[data-profile-name]").textContent = name;
   $("[data-profile-initial]").textContent = name.slice(0, 1);
   $("[data-profile-since]").textContent = t("js.players.since", { date: fmt.date(profile.createdAt) });
@@ -150,7 +158,8 @@ async function openProfile(username, push) {
   renderRatings($("[data-profile-ratings]"), profile.ratings, { order: categories });
   gameList($("[data-profile-games]"), (before) =>
     api(`/players/${encodeURIComponent(name)}/games`, { auth: "optional", query: { before, limit: 20 } }), {
-    me: name,
+    owner: name,
+    me: getSession()?.user?.username,
     linkPlayers: true,
     empty: t("js.game.none_public"),
   });
@@ -159,13 +168,14 @@ async function openProfile(username, push) {
 
 function closeProfile(push) {
   profileToken += 1;
+  showMessage($("[data-search-error]"), "");
   $("[data-profile]").hidden = true;
   $("[data-leaderboard]").hidden = false;
   document.title = baseTitle;
   if (push) {
     const url = new URL(location.href);
     url.searchParams.delete("u");
-    history.pushState(null, "", url);
+    setUrl(url, true);
   }
 }
 
@@ -174,7 +184,8 @@ function route() {
   const u = params.get("u");
   if (u && USERNAME.test(u)) openProfile(u, false);
   else closeProfile(false);
-  showBoard(params.get("c") || "");
+  // A hand-written "?c=1+0" decodes "+" as a space, as the server reads it.
+  showBoard((params.get("c") || "").trim().replace(/ /g, "+"));
 }
 
 onReady(() => {
@@ -201,8 +212,13 @@ onReady(() => {
     event.preventDefault();
     closeProfile(true);
     $("[data-leaderboard]").scrollIntoView({ block: "start" });
+    $("#board-title").focus({ preventScroll: true });
   });
-  window.addEventListener("popstate", route);
+  window.addEventListener("popstate", () => {
+    if (location.search === lastSearch) return;
+    lastSearch = location.search;
+    route();
+  });
   const profile = $("[data-profile]");
   profile.tabIndex = -1;
   route();

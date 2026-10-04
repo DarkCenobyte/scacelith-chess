@@ -4,7 +4,7 @@
 import "./site.js";
 import { onReady, releaseReady } from "./site.js";
 import { $, $$, h, icon, clear } from "./lib/dom.js";
-import { t, fmt, pageUrl } from "./lib/i18n.js";
+import { t, fmt, pageUrl, ltr } from "./lib/i18n.js";
 import { api } from "./lib/api.js";
 import { getSession, onSessionChange } from "./lib/session.js";
 import { detectOS, filesFor, OSES } from "./lib/releases.js";
@@ -95,6 +95,7 @@ function initTrailer() {
   const soon = $("[data-video-soon]", box);
   const note = $("[data-video-note]");
   if (!id) return;
+  for (const link of $$("[data-trailer-link]")) link.hidden = false;
   soon.hidden = true;
   play.hidden = false;
   note.hidden = false;
@@ -147,12 +148,14 @@ async function initServer() {
     clear(board).append(h("li", { class: "placeholder" }, t("js.server.empty")));
     return;
   }
-  for (const c of cats) select.append(h("option", { value: c }, c));
+  for (const c of cats) select.append(h("option", { value: c }, ltr(c)));
   select.disabled = false;
   select.value = cats.includes("3+2") ? "3+2" : cats[0];
 
+  const full = $("[data-full-board]");
   const load = async () => {
     const category = select.value;
+    if (full) full.href = pageUrl("players", { c: category });
     clear(board).append(h("li", { class: "placeholder" }, t("js.common.loading")));
     try {
       const data = await api("/leaderboard", { query: { category, limit: 5 } });

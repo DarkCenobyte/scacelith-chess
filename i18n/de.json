@@ -2,7 +2,7 @@
   "pages": {
     "home": {
       "title": "Scacelith — fotorealistisches Schach aus der Ich-Perspektive",
-      "description": "Nehmen Sie in einem sonnendurchfluteten königlichen Saal Platz und spielen Sie Schach aus der Ich-Perspektive gegen einen von Stockfish 19 gesteuerten Porzellanroboter – mit Trainer, Online-Spiel und Wertungen nach FIDE-Regeln. Freie Software für Windows."
+      "description": "Kostenloses fotorealistisches Schach für Windows, aus der Ich-Perspektive im königlichen Saal: Stockfish 19, Trainer und Online-Gegner erwarten Sie."
     },
     "players": {
       "title": "Rangliste und Spieler — Scacelith",
@@ -352,6 +352,8 @@
     "title": "Animiertes GIF",
     "preparing": "GIF wird vorbereitet…",
     "download": "GIF herunterladen",
+    "make": "GIF erstellen",
+    "pause": "Animation pausieren",
     "back": "Zurück zu meinen Partien",
     "options": "Optionen",
     "size": "Größe",
@@ -634,6 +636,7 @@
       "signin_button": "Anmelden",
       "missing": "Es wurde keine Partie ausgewählt.",
       "retry_in": "Sie können es in {time} erneut versuchen.",
+      "confirm": "Drücken Sie auf „GIF erstellen“, damit der Server diese Partie mit Ihrem Konto zeichnet.",
       "retry_now": "Sie können es jetzt erneut versuchen."
     },
     "home": {

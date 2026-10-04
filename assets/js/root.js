@@ -8,7 +8,7 @@
     try {
       var v = JSON.parse(window.localStorage.getItem("scacelith.lang"));
       return LANGS.indexOf(v) >= 0 ? v : null;
-    } catch (e) {
+    } catch {
       return null;
     }
   }
@@ -40,7 +40,7 @@
       a.addEventListener("click", function (event) {
         try {
           window.localStorage.setItem("scacelith.lang", JSON.stringify(event.currentTarget.getAttribute("data-lang")));
-        } catch (e) { /* not stored */ }
+        } catch { /* not stored */ }
       });
     }
   });

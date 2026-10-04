@@ -23,16 +23,20 @@ function initHeader() {
     window.addEventListener("scroll", update, { passive: true });
   }
 
+  // While the phone menu covers the page, the page behind it can be neither focused nor read.
+  const behind = () => [$("main"), $(".site-footer"), $("[data-toasts]")].filter(Boolean);
   const close = () => {
     nav.classList.remove("is-open");
     toggle?.setAttribute("aria-expanded", "false");
     document.body.classList.remove("nav-open");
+    for (const el of behind()) el.inert = false;
   };
   toggle?.addEventListener("click", () => {
     const open = !nav.classList.contains("is-open");
     nav.classList.toggle("is-open", open);
     toggle.setAttribute("aria-expanded", open ? "true" : "false");
     document.body.classList.toggle("nav-open", open);
+    for (const el of behind()) el.inert = open;
     if (open) nav.querySelector("a")?.focus();
   });
   nav?.addEventListener("click", (event) => {
@@ -72,13 +76,36 @@ function initHeader() {
 
 function initLanguage() {
   for (const link of $$("a[data-lang]")) {
+    const original = link.getAttribute("href");
+    // The same page in the other language, with this page's query and hash, rebuilt at every
+    // click (a Ctrl-click leaves the page, which may then move on).
+    const update = () => {
+      const url = new URL(original, location.href);
+      const query = new URLSearchParams(location.search);
+      if (page === "gif") query.set("dl", "0"); // already downloaded in this language
+      url.search = query.toString();
+      url.hash = location.hash;
+      link.href = url.href;
+    };
     link.addEventListener("click", () => {
       store.set("scacelith.lang", link.dataset.lang);
-      if (location.hash && !link.hash) link.hash = location.hash;
-      if (location.search && !link.search && page !== "gif") link.search = location.search;
+      update();
     });
+    link.addEventListener("auxclick", update);
+    link.addEventListener("contextmenu", update);
   }
   store.set("scacelith.lang", lang);
+}
+
+/** The skip link moves the focus to the content without touching the address (the pages route on it). */
+function initSkipLink() {
+  $(".skip-link")?.addEventListener("click", (event) => {
+    const main = document.getElementById("main");
+    if (!main) return;
+    event.preventDefault();
+    main.focus();
+    main.scrollIntoView();
+  });
 }
 
 /* ---------------------------------------------------------------------------- account link */
@@ -96,8 +123,8 @@ function initAccountLink() {
   render(getSession());
   onSessionChange(render);
   // A tab opened by hand shares the sign-in of another open tab of the site, as a session
-  // cookie would.
-  if (!getSession()) requestSession(350).then((s) => s && render(s));
+  // cookie would (requestSession tells every listener).
+  if (!getSession()) requestSession(350);
 }
 
 /* ---------------------------------------------------------------------------- downloads */
@@ -196,6 +223,7 @@ export function onReady(fn) {
 
 onReady(() => {
   initHeader();
+  initSkipLink();
   initMenus();
   initLanguage();
   initAccountLink();

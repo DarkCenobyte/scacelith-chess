@@ -101,7 +101,10 @@ Downloads: the menus read the newest release of
 [DarkCenobyte/scacelith-chess](https://github.com/DarkCenobyte/scacelith-chess/releases) from the
 GitHub API (`/releases/latest`, or the newest pre-release while there is no stable one) and sort its
 files by system from their names (`…-windows-x64.zip`, `…-linux-….AppImage`, `…-macos-….dmg`...).
-New systems appear by themselves when a release carries their files.
+New systems appear by themselves when a release carries their files. When the GitHub API cannot be
+reached (it allows 60 requests per hour and address), the menus fall back to the release written in
+`tools/site.json` (`fallbackRelease`, the current version when the site was built): update it there
+after a release, then build, so that the fallback stays recent.
 
 ## Publishing
 

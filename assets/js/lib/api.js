@@ -40,7 +40,11 @@ function buildUrl(path, query) {
 export async function api(path, { method = "GET", body, query, auth = "none", as = "json", timeout = 30000, signal } = {}) {
   const headers = { Accept: as === "json" ? "application/json" : "*/*" };
   const session = auth === "none" ? null : getSession();
-  if (auth === "required" && !session) throw new ApiError(401, { error: "unauthorized" });
+  if (auth === "required" && !session) {
+    // The session expired while the page was open: let the page show the sign-in again.
+    clearSession({ broadcast: false });
+    throw new ApiError(401, { error: "invalid_token" });
+  }
   if (session) headers.Authorization = `Bearer ${session.token}`;
   let payload;
   if (body !== undefined) {
@@ -83,6 +87,8 @@ export async function api(path, { method = "GET", body, query, auth = "none", as
     const error = new ApiError(res.status, errorBody, res.headers);
     if (session && (error.code === "invalid_token" || (res.status === 401 && auth === "required"))) {
       clearSession();
+      // A session revoked or expired on the server: a public answer does not need it.
+      if (auth === "optional") return api(path, { method, body, query, auth: "none", as, timeout, signal });
     }
     throw error;
   }

@@ -139,7 +139,7 @@
     <header class="profile-head dashboard-head">
       <div class="medallion" aria-hidden="true"><span data-me-initial></span></div>
       <div class="profile-ident">
-        <h2 class="profile-name" data-me-name></h2>
+        <h2 class="profile-name" data-me-name tabindex="-1"></h2>
         <p class="profile-sub" data-me-since></p>
         <ul class="badges" data-me-badges></ul>
       </div>
@@ -274,7 +274,7 @@
           </div>
           <div class="field" data-needs-mfa hidden>
             <label for="email-code">{{t:account.fields.mfa_code}}</label>
-            <input id="email-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="32">
+            <input id="email-code" name="code" type="text" autocomplete="one-time-code" autocapitalize="none" spellcheck="false" maxlength="32">
           </div>
           <p class="form-error" role="alert" data-error hidden></p>
           <p class="form-success" role="status" data-success hidden></p>
@@ -290,7 +290,7 @@
           </div>
           <div class="field" data-needs-mfa hidden>
             <label for="export-code">{{t:account.fields.mfa_code}}</label>
-            <input id="export-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="32">
+            <input id="export-code" name="code" type="text" autocomplete="one-time-code" autocapitalize="none" spellcheck="false" maxlength="32">
           </div>
           <p class="form-error" role="alert" data-error hidden></p>
           <p class="form-success" role="status" data-success hidden></p>
@@ -310,7 +310,7 @@
           </div>
           <div class="field" data-needs-mfa hidden>
             <label for="delete-code">{{t:account.fields.mfa_code}}</label>
-            <input id="delete-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="32">
+            <input id="delete-code" name="code" type="text" autocomplete="one-time-code" autocapitalize="none" spellcheck="false" maxlength="32">
           </div>
           <p class="form-error" role="alert" data-error hidden></p>
           <button class="btn btn-danger" type="submit" data-submit>{{t:account.settings.delete_submit}}</button>

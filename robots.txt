@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
-Disallow: /*/account/
+# The GIF pages only make sense from a game list; the account pages say noindex themselves.
 Disallow: /*/gif/
 
 Sitemap: https://scacelith.com/sitemap.xml

@@ -45,6 +45,20 @@ PLURALS = {
 # Markup a translation may hold (strings inserted with {{h:...}}); the tags must match English.
 ALLOWED_TAGS = {"em", "strong", "br", "bdi", "code", "abbr", "span"}
 TAG_RE = re.compile(r"</?([a-zA-Z][a-zA-Z0-9]*)(?:\s+[^<>]*)?/?>")
+# The only markup a string may hold: these exact tags, without attributes. Any other "<" or ">"
+# (a tag with attributes, "<svg/onload=...>", "<!--") is refused, since {{h:...}} strings are
+# inserted as HTML and the "js" strings are embedded in a <script> element.
+MARKUP_OK = re.compile(r"</?(?:em|strong|bdi|code|abbr|span)>|<br>")
+
+
+def markup_problem(text: str) -> bool:
+    return bool(re.search(r"[<>]", MARKUP_OK.sub("", text)))
+
+
+def script_json(value) -> str:
+    """JSON for a <script type="application/json"> element: no "<" at all, so no markup can end
+    or reopen the element."""
+    return json.dumps(value, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
 PLACEHOLDER_RE = re.compile(r"\{([a-zA-Z][a-zA-Z0-9_]*)\}")
 TOKEN_RE = re.compile(r"\{\{\s*(?:(>)\s*([a-z0-9_-]+)|([trhv]):([A-Za-z0-9_.-]+))\s*\}\}")
 
@@ -113,9 +127,8 @@ def check_language(code: str, english: dict, tree: dict) -> list:
             holders = set(PLACEHOLDER_RE.findall(text))
             if not holders <= en_holders:
                 problems.append(f"{code}: {key}: unknown placeholders {sorted(holders - en_holders)}")
-            for tag in TAG_RE.findall(text):
-                if tag.lower() not in ALLOWED_TAGS:
-                    problems.append(f"{code}: {key}: tag <{tag}> is not allowed")
+            if markup_problem(text):
+                problems.append(f"{code}: {key}: markup other than <em>, <strong>, <br>... or a stray < >")
         if not is_plural(en_value):
             if tags_of(value) != tags_of(en_value):
                 problems.append(f"{code}: {key}: markup differs from English ({tags_of(en_value)} vs {tags_of(value)})")
@@ -201,9 +214,8 @@ class Site:
             out.extend(check_language(code, english, tree))
         for key, value in english.items():
             for text in strings_of(value):
-                for tag in TAG_RE.findall(text):
-                    if tag.lower() not in ALLOWED_TAGS:
-                        out.append(f"en: {key}: tag <{tag}> is not allowed")
+                if markup_problem(text):
+                    out.append(f"en: {key}: markup other than <em>, <strong>, <br>... or a stray < >")
         return out
 
     def todo(self, code: str) -> dict:
@@ -229,6 +241,11 @@ class Site:
     def page_url(self, code: str, page: dict) -> str:
         return f"{self.base}{code}/{page['path']}"
 
+    def x_default(self, page: dict) -> str:
+        """The address for a visitor whose language is none of the site's: the site root, which
+        sends them to their language, for the home page; the English page otherwise."""
+        return self.base if page["path"] == "" else self.page_url("en", page)
+
     def context(self, code: str, page: dict) -> dict:
         lang = next(lang for lang in self.langs if lang["code"] == code)
         depth = 1 + page["path"].count("/")
@@ -237,7 +254,7 @@ class Site:
         alternates = "\n".join(
             f'<link rel="alternate" hreflang="{other}" href="{attr(self.page_url(other, page))}">'
             for other in self.codes
-        ) + f'\n<link rel="alternate" hreflang="x-default" href="{attr(self.page_url("en", page))}">'
+        ) + f'\n<link rel="alternate" hreflang="x-default" href="{attr(self.x_default(page))}">'
         lang_links = "\n".join(
             f'<li><a href="{root}{other["code"]}/{page["path"]}" hreflang="{other["code"]}" lang="{other["code"]}"'
             f' dir="{other["dir"]}" data-lang="{other["code"]}"'
@@ -253,10 +270,7 @@ class Site:
             for other in self.langs
         )
         runtime = dict(lookup(strings, "js"))
-        runtime_json = json.dumps(
-            {"lang": code, "dir": lang["dir"], "strings": runtime},
-            ensure_ascii=False, separators=(",", ":"),
-        ).replace("</", "<\\/")
+        runtime_json = script_json({"lang": code, "dir": lang["dir"], "strings": runtime})
         title = lookup(strings, f"pages.{page['key']}.title")
         description = lookup(strings, f"pages.{page['key']}.description")
         head_extra = ""
@@ -272,16 +286,23 @@ class Site:
                 "genre": ["Chess"],
                 "gamePlatform": "PC",
                 "operatingSystem": "Windows",
-                "applicationCategory": "Game",
+                "applicationCategory": "GameApplication",
                 "playMode": ["SinglePlayer", "MultiPlayer"],
                 "license": "https://www.gnu.org/licenses/gpl-3.0.html",
-                "codeRepository": f"https://github.com/{self.cfg['releasesRepo']}",
+                "sameAs": [f"https://github.com/{self.cfg['releasesRepo']}"],
+                "downloadUrl": f"https://github.com/{self.cfg['releasesRepo']}/releases",
                 "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
             }
+            version = (self.cfg.get("fallbackRelease") or {}).get("tag", "").lstrip("v")
+            if version:
+                data["softwareVersion"] = version
             head_extra = ('<script type="application/ld+json">'
-                          + json.dumps(data, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+                          + script_json(data)
                           + "</script>")
+        fallback = self.cfg.get("fallbackRelease") or {}
+        release_json = script_json(fallback)
         return {
+            "release_json": release_json,
             "title": title,
             "description": description,
             "head_extra": head_extra,
@@ -365,7 +386,7 @@ class Site:
             }
             for code in self.codes
         }
-        data = json.dumps(messages, ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+        data = script_json(messages)
         # GitHub Pages serves 404.html at any depth: links and assets are absolute from the site root.
         return self.small_page("404.html", {"root": "/", "chooser": self.chooser("/", ""), "notfound_json": data})
 
@@ -380,7 +401,7 @@ class Site:
                 lines.append(f"    <loc>{html.escape(self.page_url(code, page))}</loc>")
                 for other in self.codes:
                     lines.append(f'    <xhtml:link rel="alternate" hreflang="{other}" href="{html.escape(self.page_url(other, page))}"/>')
-                lines.append(f'    <xhtml:link rel="alternate" hreflang="x-default" href="{html.escape(self.page_url("en", page))}"/>')
+                lines.append(f'    <xhtml:link rel="alternate" hreflang="x-default" href="{html.escape(self.x_default(page))}"/>')
                 lines.append("  </url>")
         lines.append("</urlset>")
         return "\n".join(lines) + "\n"

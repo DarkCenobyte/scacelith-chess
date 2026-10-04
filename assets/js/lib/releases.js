@@ -70,29 +70,58 @@ async function github(path) {
 
 let pending = null;
 
-/** The newest release (cached for a quarter of an hour), or throws when GitHub cannot be reached. */
+/**
+ * The release known when the site was built (tools/site.json "fallbackRelease"), used when the
+ * GitHub API cannot be reached or refuses (it allows 60 requests per hour and address). Its
+ * download links stay valid; a newer release may exist.
+ */
+function fallbackRelease() {
+  try {
+    const f = JSON.parse(document.getElementById("release-fallback")?.textContent || "null");
+    if (!f || !f.tag || !Array.isArray(f.assets)) return null;
+    const base = `https://github.com/${REPO}/releases/download/${encodeURIComponent(f.tag)}/`;
+    return {
+      ...normalize({
+        tag_name: f.tag,
+        name: f.name,
+        prerelease: f.prerelease,
+        published_at: f.published,
+        assets: f.assets.map((a) => ({ name: a.name, size: a.size, browser_download_url: base + encodeURIComponent(a.name), state: "uploaded" })),
+      }),
+      fallback: true,
+    };
+  } catch {
+    return null;
+  }
+}
+
+/** The newest release (cached for a quarter of an hour), else the one known at build time. */
 export function latestRelease() {
   if (pending) return pending;
   const cached = store.get(CACHE_KEY);
-  if (cached && cached.at > Date.now() - CACHE_MS && cached.release) return (pending = Promise.resolve(cached.release));
+  if (cached && cached.at > Date.now() - CACHE_MS && cached.release?.tag) return (pending = Promise.resolve(cached.release));
   pending = (async () => {
     let raw = null;
     const latest = await github("/releases/latest");
-    if (latest.ok) raw = await latest.json();
-    else if (latest.status === 404) {
+    if (latest.ok) raw = await latest.json().catch(() => null);
+    else if (latest.status !== 404) throw new Error(`GitHub ${latest.status}`);
+    if (!raw?.tag_name) {
+      // No "latest" release (only pre-releases so far): the newest published one of the list.
       const list = await github("/releases?per_page=10");
       if (!list.ok) throw new Error(`GitHub ${list.status}`);
-      raw = (await list.json()).find((r) => r && !r.draft) || null;
-    } else {
-      throw new Error(`GitHub ${latest.status}`);
+      const all = await list.json().catch(() => null);
+      raw = (Array.isArray(all) ? all : []).find((r) => r && !r.draft && r.tag_name) || null;
     }
     if (!raw) throw new Error("no release");
     const release = normalize(raw);
     store.set(CACHE_KEY, { at: Date.now(), release });
     return release;
   })();
-  pending.catch(() => {
+  pending = pending.catch((e) => {
     pending = null;
+    const fallback = fallbackRelease();
+    if (fallback) return fallback;
+    throw e;
   });
   return pending;
 }

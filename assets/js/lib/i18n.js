@@ -49,6 +49,11 @@ export function t(key, vars = {}) {
   });
 }
 
+/** Text that must read left to right whatever the page's direction: a time control ("3+2"). */
+export function ltr(text) {
+  return dir === "rtl" ? `\u2066${text}\u2069` : String(text);
+}
+
 export function has(key) {
   return lookup(key) !== undefined;
 }

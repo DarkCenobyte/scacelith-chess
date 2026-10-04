@@ -2,7 +2,7 @@
   "pages": {
     "home": {
       "title": "Scacelith — photorealistic chess, played in first person",
-      "description": "Take your seat in a sunlit royal hall and play chess in first person against a porcelain robot driven by Stockfish 19, with a coach, online play and FIDE ratings. Free software for Windows."
+      "description": "Free photorealistic chess for Windows, played in first person in a royal hall: Stockfish 19, a coach and online opponents await you."
     },
     "players": {
       "title": "Leaderboard and players — Scacelith",
@@ -352,6 +352,8 @@
     "title": "Animated GIF",
     "preparing": "Preparing the GIF…",
     "download": "Download the GIF",
+    "make": "Make the GIF",
+    "pause": "Pause the animation",
     "back": "Back to my games",
     "options": "Options",
     "size": "Size",
@@ -634,6 +636,7 @@
       "signin_button": "Sign in",
       "missing": "No game was chosen.",
       "retry_in": "You can try again in {time}.",
+      "confirm": "Press “Make the GIF” to have the server draw this game with your account.",
       "retry_now": "You can try again now."
     },
     "home": {

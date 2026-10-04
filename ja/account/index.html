@@ -59,6 +59,7 @@
 <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.75"/><path d="M4.75 19.75c.9-3.6 3.75-5.5 7.25-5.5s6.35 1.9 7.25 5.5"/></g></symbol>
 <symbol id="i-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></symbol>
 <symbol id="i-close" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="m6 6 12 12M18 6 6 18"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><path fill="currentColor" d="M7.25 5h3v14h-3zm6.5 0h3v14h-3z"/></symbol>
 <symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.6v12.8c0 .78.85 1.26 1.52.86l10.4-6.4a1 1 0 0 0 0-1.72L9.52 4.74A1 1 0 0 0 8 5.6Z"/></symbol>
 <symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="8.25" y="8.25" width="11.5" height="11.5" rx="1.75"/><path d="M15.75 8.25V6a1.75 1.75 0 0 0-1.75-1.75H6A1.75 1.75 0 0 0 4.25 6v8c0 .97.78 1.75 1.75 1.75h2.25"/></g></symbol>
 <symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
@@ -108,9 +109,10 @@
     </nav>
     <div class="header-tools">
       <details class="menu lang-menu" data-menu>
-        <summary class="tool-button" aria-label="言語: 日本語" title="言語">
+        <summary class="tool-button" title="言語">
           <svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>
           <span class="lang-code">ja</span>
+          <span class="visually-hidden">言語: 日本語</span>
         </summary>
         <div class="menu-panel lang-panel">
           <p class="menu-title">言語</p>
@@ -199,7 +201,7 @@
           <button class="btn btn-gold btn-block" type="submit" data-submit>ログイン</button>
           <p class="form-links">
             <a href="#forgot" data-goto="forgot">パスワードをお忘れですか？</a>
-            <a href="#resend" data-goto="resend">確認メールを再送</a>
+            <a href="#resend" data-goto="resend">確認メールを再送信</a>
           </p>
         </form>
         <form class="form" data-form="mfa" novalidate hidden>
@@ -240,7 +242,7 @@
             <label for="register-confirm">パスワード（確認）</label>
             <input id="register-confirm" name="confirm" type="password" autocomplete="new-password" maxlength="1024" required>
           </div>
-          <p class="form-note"><svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg><span>ロボットを防ぐため、登録時にブラウザーが小さなパズルを解きます。数秒かかります。</span></p>
+          <p class="form-note"><svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg><span>ロボットによる登録を防ぐため、ブラウザーが小さなパズルを解きます。数秒かかります。</span></p>
           <div class="progress" data-pow-progress hidden><span class="progress-bar" data-pow-bar></span></div>
           <p class="form-error" role="alert" data-error hidden></p>
           <button class="btn btn-gold btn-block" type="submit" data-submit>アカウントを作成</button>
@@ -248,7 +250,7 @@
         <div class="form-done" data-register-done hidden tabindex="-1">
           <svg class="icon done-icon" aria-hidden="true"><use href="#i-mail"></use></svg>
           <h2 class="form-title">メールを確認してください</h2>
-          <p data-register-done-text>ご登録のアドレスに確認リンクを送信しました。リンクを開いてアカウントを作成してから、ログインしてください。</p>
+          <p data-register-done-text>ご登録のアドレスに確認リンクを送信しました。リンクを開くとアカウントが作成されます。その後、ログインしてください。</p>
           <p class="hint">リンクの有効期限は24時間です。受信トレイに届いていない場合は、迷惑メールフォルダーを確認するか、メールを再送してください。</p>
           <button class="btn btn-ghost btn-block" type="button" data-goto="signin">ログインへ</button>
         </div>
@@ -277,7 +279,7 @@
           </div>
           <p class="form-error" role="alert" data-error hidden></p>
           <p class="form-success" role="status" data-success hidden></p>
-          <button class="btn btn-gold btn-block" type="submit" data-submit>再送</button>
+          <button class="btn btn-gold btn-block" type="submit" data-submit>再送信</button>
           <p class="form-links"><a href="#signin" data-goto="signin">ログインに戻る</a></p>
         </form>
       </section>
@@ -289,7 +291,7 @@
     <header class="profile-head dashboard-head">
       <div class="medallion" aria-hidden="true"><span data-me-initial></span></div>
       <div class="profile-ident">
-        <h2 class="profile-name" data-me-name></h2>
+        <h2 class="profile-name" data-me-name tabindex="-1"></h2>
         <p class="profile-sub" data-me-since></p>
         <ul class="badges" data-me-badges></ul>
       </div>
@@ -317,13 +319,13 @@
         </div>
       </div>
       <div class="panel" data-me-sanctions-panel hidden>
-        <h3 class="block-title">制裁</h3>
+        <h3 class="block-title">ペナルティ</h3>
         <ul class="sanctions" data-me-sanctions></ul>
       </div>
       <div class="panel">
         <div class="panel-head">
           <h3 class="block-title">最近の対局</h3>
-          <a class="text-link" href="#games" data-goto-tab="games">すべての対局 <svg class="icon flip-rtl" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+          <a class="text-link" href="#games" data-goto-tab="games">すべての対局を見る <svg class="icon flip-rtl" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
         </div>
         <div data-recent-games></div>
       </div>
@@ -416,7 +418,7 @@
           </div>
           <div class="field" data-needs-mfa hidden>
             <label for="email-code">確認コード（またはリカバリーコード）</label>
-            <input id="email-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="32">
+            <input id="email-code" name="code" type="text" autocomplete="one-time-code" autocapitalize="none" spellcheck="false" maxlength="32">
           </div>
           <p class="form-error" role="alert" data-error hidden></p>
           <p class="form-success" role="status" data-success hidden></p>
@@ -424,14 +426,14 @@
         </form>
         <form class="panel form" data-form="export" novalidate>
           <h3 class="block-title"><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>データをダウンロード</h3>
-          <p class="panel-note">サーバーがあなたのアカウントについて保持しているすべての情報を、1つのJSONファイルで。</p>
+          <p class="panel-note">サーバーがあなたのアカウントについて保持しているすべての情報を、1つのJSONファイルにまとめてダウンロードできます。</p>
           <div class="field">
             <label for="export-password">パスワード</label>
             <input id="export-password" name="password" type="password" autocomplete="current-password" maxlength="1024" required>
           </div>
           <div class="field" data-needs-mfa hidden>
             <label for="export-code">確認コード（またはリカバリーコード）</label>
-            <input id="export-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="32">
+            <input id="export-code" name="code" type="text" autocomplete="one-time-code" autocapitalize="none" spellcheck="false" maxlength="32">
           </div>
           <p class="form-error" role="alert" data-error hidden></p>
           <p class="form-success" role="status" data-success hidden></p>
@@ -450,7 +452,7 @@
           </div>
           <div class="field" data-needs-mfa hidden>
             <label for="delete-code">確認コード（またはリカバリーコード）</label>
-            <input id="delete-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="32">
+            <input id="delete-code" name="code" type="text" autocomplete="one-time-code" autocapitalize="none" spellcheck="false" maxlength="32">
           </div>
           <p class="form-error" role="alert" data-error hidden></p>
           <button class="btn btn-danger" type="submit" data-submit>アカウントを削除</button>
@@ -468,7 +470,7 @@
         <span class="brand-word">Scacelith</span>
       </a>
       <p class="footer-tagline">王者のゲーム</p>
-      <p class="footer-text">一人称で指すフォトリアルなチェスゲーム。自社開発のOpenGL 4.6エンジンで動作します。GNU GPL v3のフリーソフトウェアです。</p>
+      <p class="footer-text">一人称で指すフォトリアルなチェスゲーム。独自開発のOpenGL 4.6エンジンで動作します。GNU GPL v3のもとで公開されているフリーソフトウェアです。</p>
     </div>
     <nav class="footer-col" aria-labelledby="footer-game">
       <h2 class="footer-head" id="footer-game">ゲーム</h2>
@@ -520,7 +522,8 @@
   </div>
 </footer>
 <div class="toasts" data-toasts aria-live="polite" aria-atomic="false"></div>
-<script type="application/json" id="i18n">{"lang":"ja","dir":"ltr","strings":{"common":{"loading":"読み込み中…","retry":"再試行","close":"閉じる","copy":"コピー","copied":"クリップボードにコピーしました。","copy_failed":"コピーできませんでした。テキストを選択して手動でコピーしてください。","load_more":"さらに表示","show_password":"パスワードを表示","hide_password":"パスワードを隠す","signin_needed":"続けるにはログインしてください。","dash":"—"},"errors":{"network":"サーバーに接続できません。接続を確認して、もう一度お試しください。","timeout":"サーバーの応答に時間がかかりすぎています。もう一度お試しください。","server_busy":"サーバーが混み合っています。しばらくしてからもう一度お試しください。","rate_limited":"リクエストが多すぎます。{time}後にもう一度お試しください。","rate_limited_short":"リクエストが多すぎます。しばらくしてからもう一度お試しください。","internal_error":"サーバーで予期しないエラーが発生しました。後でもう一度お試しください。","invalid_token":"セッションが終了しました。もう一度ログインしてください。","unauthorized":"ログインしてください。","not_found":"見つかりません。","unknown":"問題が発生しました（{code}）。","invalid_credentials":"ユーザー名、メールアドレス、またはパスワードが正しくありません。","too_many_attempts":"試行回数が多すぎます。{time}後にもう一度お試しください。","banned":"このアカウントは{date}まで利用停止されています。","banned_permanent":"このアカウントは利用停止されています。","email_unverified":"メールアドレスがまだ確認されていません。お送りしたリンクを開くか、新しいリンクを請求してください。","invalid_mfa_token":"このログイン手順の有効期限が切れました。もう一度ログインしてください。","invalid_code":"コードが間違っているか、すでに使用されています。","mfa_code_required":"確認コードを入力してください。","invalid_password":"パスワードが正しくありません。","password_not_set":"このアカウントにはまだパスワードがありません。ログインページの「パスワードをお忘れですか？」から設定してください。","registration_closed":"現在、サーバーは新しいアカウントを受け付けていません。","invalid_username":"このユーザー名は使用できません。","username_taken":"このユーザー名はすでに使われています。","invalid_email":"このメールアドレスは無効です。","email_taken":"このメールアドレスはすでに別のアカウントで使われています。","same_email":"現在のメールアドレスと同じです。","weak_password":"このパスワードは弱すぎます。","weak_too_short":"パスワードが短すぎます（{min}文字以上）。","weak_too_long":"パスワードが長すぎます。","weak_contains_username":"パスワードにユーザー名を含めることはできません。","weak_contains_email":"パスワードにメールアドレスを含めることはできません。","weak_too_common":"このパスワードはよく使われすぎています。別のパスワードを選んでください。","pow_failed":"ロボット対策のチェックに失敗しました。もう一度お試しください。","passwords_differ":"2つのパスワードが一致しません。","required":"この項目を入力してください。","email_format":"有効なメールアドレスを入力してください。","username_format":"{min}～{max}文字の英字、数字、_、-。先頭は英字か数字にしてください。","password_length":"{min}文字以上。","confirm_name":"ユーザー名を表示どおりに正確に入力してください。","game_too_long":"この対局は長すぎるため、GIFにできません。","gif_disabled":"このサーバーはGIFを作成しません。","render_failed":"サーバーはこのGIFを描画できませんでした。","invalid_game":"この対局は存在しません。","invalid_player":"ユーザー名を入力してください（英字、数字、_、.、-の2～24文字）。","player_not_found":"この名前のプレイヤーはいません。"},"time":{"seconds":{"other":"{count}秒"},"minutes":{"other":"{count}分"}},"download":{"exe":"実行ファイル","zip":"ZIPアーカイブ","file":"ファイル","unavailable":"利用不可","your_system":"お使いのシステム","eyebrow_beta":"パブリックベータ · {version}","eyebrow_release":"バージョン {version}","published":"{date}公開","unreachable":"現在GitHubに接続できません。リリースページをご覧ください。","available":"利用可能","verify_file":"ファイル","no_build":"現在、{os}版のゲームはありません。","prerelease_short":"ベータ","x64":"64ビット（x64）"},"server":{"online":"オンライン","offline":"接続不可","open":"受付中","closed":"停止中","updated":"更新：{time}","min_games":"この持ち時間で{count}局以上のレーティング戦を指したプレイヤー。","empty":"この持ち時間には、まだランキング入りしたプレイヤーがいません。","error":"現在ランキングを読み込めません。"},"game":{"number":"対局 #{id}","white":"白","black":"黒","you":"あなた","vs":"対","outcome_win":"勝ち","outcome_loss":"負け","outcome_draw":"引き分け","outcome_aborted":"中止","result_white":"白の勝ち","result_black":"黒の勝ち","result_draw":"引き分け","result_aborted":"中止","rated":"レーティング戦","casual":"カジュアル","custom":"カスタム","moves":{"other":"{count}手"},"duration":"所要時間：{time}","rating_diff":"レーティング変動：{diff}","pgn":"PGN","pgn_title":"対局をPGNでダウンロード","copy_pgn":"コピー","copy_pgn_title":"PGNをコピー","gif":"GIF","gif_title":"アニメーションGIFを作成（新しいタブで開きます）","gif_signin":"GIFを作成するにはログインしてください","pgn_copied":"PGNをクリップボードにコピーしました。","pgn_saved":"PGNをダウンロードしました。","none":"まだ対局はありません。オンライン対局はここに表示されます。","none_filtered":"条件に一致する対局はありません。","none_public":"まだ対局はありません。","total":{"other":"{count}局"},"termination_unknown":"終局","reason":{"1":"チェックメイト","2":"投了","3":"時間切れ負け","4":"2回目の反則手（負け）","5":"ステイルメイト","6":"デッドポジション（駒不足）","7":"時間切れ、ただし相手はメイトできない","8":"5回同一局面","9":"75手ルール","10":"3回同一局面（申告）","11":"50手ルール（申告）","12":"合意による引き分け","13":"2回目の反則手、ただし相手はメイトできない","20":"対局放棄（長時間の切断）","21":"対局放棄、ただし相手はメイトできない","22":"対局中止","23":"時間内に最初の一手なし（中止）","24":"不戦敗（フェアプレー違反）","25":"サーバーにより中止","26":"両者の接続が切断"}},"ratings":{"category":"持ち時間","rating":"レーティング","peak":"最高","games":"対局数","wdl":"勝 / 分 / 負","provisional":"暫定レーティング","none":"レーティング対象の対局はまだありません。","unrated_hint":"「?」は暫定レーティング（対局数がまだ少ない）を表します。"},"account":{"member_since":"登録日：{date}","last_login":"最終ログイン","created":"作成日","email":"メールアドレス","pending_email":"確認待ち：{email}","verified":"確認済み","unverified":"未確認","mfa":"二要素認証","mfa_on":"オン","mfa_off":"オフ","google":"Googleログイン","google_on":"連携済み","google_off":"未連携","password":"パスワード","password_set":"設定済み","password_unset":"未設定","challenges":"対局の申し込み","challenges_all":"受け付ける","challenges_none":"受け付けない","badge_verified":"メール確認済み","badge_mfa":"二要素認証オン","badge_google":"Google","ban_until":"あなたのアカウントは{date}まで利用停止されています。","ban_permanent":"あなたのアカウントは利用停止されています。","sanction_ban":"利用停止","sanction_mm_block":"マッチング停止","sanction_warning":"警告","sanction_until":"{date}まで","sanction_permanent":"無期限","devices_current":"このデバイス","devices_unknown":"名前のないデバイス","devices_signed_in":"{date}にログイン","devices_seen":"最終使用：{time}","devices_expires":"有効期限：{date}","devices_revoke":"ログアウト","devices_revoked":"デバイスをログアウトさせました。","devices_none":"他のデバイスはありません。","signout_all_confirm":"このデバイスを含む、すべてのデバイスからログアウトしますか？","signed_out":"ログアウトしました。","signed_in":"ようこそ、{name}さん。","prefs_saved":"保存しました。","password_changed":"パスワードを変更しました。他のデバイスはログアウトされました。","email_sent":"新しいアドレスに確認リンクを送信しました。リンクを開くとアドレスが変更されます。","email_changed":"メールアドレスが{email}に変更されました。","email_current":"現在のアドレス：{email}。","email_pending":"{email}への変更が、確認リンクを開かれるのを待っています。","export_done":"データをダウンロードしました。","deleted":"アカウントを削除しました。","delete_confirm_label":"確認のため「{name}」と入力してください","register_done":"{email}に確認リンクを送信しました。リンクを開いてアカウントを作成してから、ログインしてください。","register_ready":"アカウントの準備ができました。ログインできます。","forgot_done":"このアドレスを使っているアカウントがあれば、新しいパスワードを設定するためのリンクをお送りしました。","resend_done":"このアドレスが確認待ちであれば、新しいリンクをお送りしました。","pow_solving":"ロボット対策のパズルを解いています…","mfa_recovery":"リカバリーコード","mfa_recovery_text":"リカバリーコードのいずれかを入力してください。各コードは1回だけ使えます。","mfa_app":"アプリのコード","mfa_app_text":"認証アプリに表示される6桁のコードを入力してください。","mfa_state_on":"このアカウントでは二要素認証がオンになっています。","mfa_state_off":"このアカウントでは二要素認証がオフになっています。","client_label":"Scacelithウェブサイト（{browser}）","username":"ユーザー名","password_rules":"{min}文字以上で、ユーザー名やメールアドレスを含まないもの。","password_note":"他のデバイスはログアウトされ、このデバイスはログインしたままになります。","signin_label":"ログイン"},"players":{"since":"登録日：{date}","games":"対局数","rated":"レーティング戦","wins":"勝ち","draws":"引き分け","losses":"負け","view":"{name}のプロフィールを見る","you":"あなた","board":"ランキング"},"gif":{"title":"{white} – {black}","subtitle":"対局 #{id} · {date}","preparing":"GIFを準備中…","rendering":"サーバーがGIFを描画しています。長い対局では数秒かかることがあります…","ready":"GIFの準備ができました。ダウンロードを開始しました。","ready_again":"GIFの準備ができました。","signin":"対局のGIFを作成するにはログインしてください。","signin_button":"ログイン","missing":"対局が選択されていません。","retry_in":"{time}後に再試行できます。","retry_now":"今すぐ再試行できます。"},"home":{"create_account":"アカウントを作成","my_account":"マイアカウント","my_games":"自分の対局","signin":"ログイン"},"trailer":{"title":"Scacelithのトレーラー"}}}</script>
+<script type="application/json" id="i18n">{"lang":"ja","dir":"ltr","strings":{"common":{"loading":"読み込み中…","retry":"再試行","close":"閉じる","copy":"コピー","copied":"クリップボードにコピーしました。","copy_failed":"コピーできませんでした。テキストを選択して手動でコピーしてください。","load_more":"さらに表示","show_password":"パスワードを表示","hide_password":"パスワードを隠す","signin_needed":"続けるにはログインしてください。","dash":"—"},"errors":{"network":"サーバーに接続できません。インターネット接続を確認して、もう一度お試しください。","timeout":"サーバーの応答がタイムアウトしました。もう一度お試しください。","server_busy":"サーバーが混み合っています。しばらくしてからもう一度お試しください。","rate_limited":"リクエストが多すぎます。{time}後にもう一度お試しください。","rate_limited_short":"リクエストが多すぎます。しばらくしてからもう一度お試しください。","internal_error":"サーバーで予期しないエラーが発生しました。後でもう一度お試しください。","invalid_token":"セッションが終了しました。もう一度ログインしてください。","unauthorized":"ログインしてください。","not_found":"見つかりません。","unknown":"問題が発生しました（{code}）。","invalid_credentials":"ユーザー名、メールアドレス、またはパスワードが正しくありません。","too_many_attempts":"試行回数が多すぎます。{time}後にもう一度お試しください。","banned":"このアカウントは{date}まで利用停止されています。","banned_permanent":"このアカウントは利用停止されています。","email_unverified":"メールアドレスがまだ確認されていません。お送りしたリンクを開くか、リンクを再送信してください。","invalid_mfa_token":"このログイン手順の有効期限が切れました。もう一度ログインしてください。","invalid_code":"コードが間違っているか、すでに使用されています。","mfa_code_required":"確認コードを入力してください。","invalid_password":"パスワードが正しくありません。","password_not_set":"このアカウントにはまだパスワードがありません。ログインページの「パスワードをお忘れですか？」から設定してください。","registration_closed":"現在、サーバーは新しいアカウントを受け付けていません。","invalid_username":"このユーザー名は使用できません。","username_taken":"このユーザー名はすでに使われています。","invalid_email":"このメールアドレスは無効です。","email_taken":"このメールアドレスはすでに別のアカウントで使われています。","same_email":"現在のメールアドレスと同じです。","weak_password":"このパスワードは弱すぎます。","weak_too_short":"パスワードが短すぎます（{min}文字以上）。","weak_too_long":"パスワードが長すぎます。","weak_contains_username":"パスワードにユーザー名を含めることはできません。","weak_contains_email":"パスワードにメールアドレスを含めることはできません。","weak_too_common":"このパスワードは一般的すぎます。別のパスワードを選んでください。","pow_failed":"ロボット対策のチェックに失敗しました。もう一度お試しください。","passwords_differ":"2つのパスワードが一致しません。","required":"この項目を入力してください。","email_format":"有効なメールアドレスを入力してください。","username_format":"{min}～{max}文字で、英字、数字、_、-が使えます。先頭は英字か数字にしてください。","password_length":"{min}文字以上で入力してください。","confirm_name":"ユーザー名を表示どおりに正確に入力してください。","game_too_long":"この対局は長すぎるため、GIFにできません。","gif_disabled":"このサーバーではGIFを作成できません。","render_failed":"サーバーはこのGIFを描画できませんでした。","invalid_game":"この対局は存在しません。","invalid_player":"ユーザー名を入力してください（英字、数字、_、.、-の2～24文字）。","player_not_found":"この名前のプレイヤーは見つかりません。"},"time":{"seconds":{"other":"{count}秒"},"minutes":{"other":"{count}分"}},"download":{"exe":"実行ファイル","zip":"ZIPアーカイブ","file":"ファイル","unavailable":"未対応","your_system":"お使いのシステム","eyebrow_beta":"パブリックベータ · {version}","eyebrow_release":"バージョン {version}","published":"{date}公開","unreachable":"現在GitHubに接続できません。リリースページをご覧ください。","available":"利用可能","verify_file":"ファイル","no_build":"現在、{os}版のゲームはありません。","prerelease_short":"ベータ","x64":"64ビット（x64）"},"server":{"online":"オンライン","offline":"接続不可","open":"受付中","closed":"停止中","updated":"更新：{time}","min_games":"この持ち時間で{count}局以上のレーティング戦を指したプレイヤー。","empty":"この持ち時間には、まだランキング入りしたプレイヤーがいません。","error":"現在ランキングを読み込めません。"},"game":{"number":"対局 #{id}","white":"白","black":"黒","you":"あなた","vs":"対","outcome_win":"勝ち","outcome_loss":"負け","outcome_draw":"引き分け","outcome_aborted":"中止","result_white":"白の勝ち","result_black":"黒の勝ち","result_draw":"引き分け","result_aborted":"中止","rated":"レーティング戦","casual":"カジュアル","custom":"カスタム","moves":{"other":"{count}手"},"duration":"所要時間：{time}","rating_diff":"レーティング変動：{diff}","pgn":"PGN","pgn_title":"対局をPGNでダウンロード","copy_pgn":"コピー","copy_pgn_title":"PGNをコピー","gif":"GIF","gif_title":"アニメーションGIFを作成（新しいタブで開きます）","gif_signin":"GIFを作成するにはログインしてください","pgn_copied":"PGNをクリップボードにコピーしました。","pgn_saved":"PGNをダウンロードしました。","none":"まだ対局はありません。オンライン対局はここに表示されます。","none_filtered":"条件に一致する対局はありません。","none_public":"まだ対局はありません。","total":{"other":"{count}局"},"termination_unknown":"終局","reason":{"1":"チェックメイト","2":"投了","3":"時間切れ負け","4":"2回目の反則手（負け）","5":"ステイルメイト","6":"デッドポジション（駒不足）","7":"時間切れ、ただし相手はメイトできない","8":"5回同一局面","9":"75手ルール","10":"3回同一局面（申告）","11":"50手ルール（申告）","12":"合意による引き分け","13":"2回目の反則手、ただし相手はメイトできない","20":"対局放棄（長時間の切断）","21":"対局放棄、ただし相手はメイトできない","22":"対局中止","23":"時間内に最初の一手なし（中止）","24":"不戦敗（フェアプレー違反）","25":"サーバーにより中止","26":"両者の接続が切断"}},"ratings":{"category":"持ち時間","rating":"レーティング","peak":"最高","games":"対局数","wdl":"勝 / 分 / 負","provisional":"暫定レーティング","none":"レーティング対象の対局はまだありません。","unrated_hint":"「?」は暫定レーティング（対局数がまだ少ない）を表します。"},"account":{"member_since":"登録日：{date}","last_login":"最終ログイン","created":"作成日","email":"メールアドレス","pending_email":"確認待ち：{email}","verified":"確認済み","unverified":"未確認","mfa":"二要素認証","mfa_on":"オン","mfa_off":"オフ","google":"Googleログイン","google_on":"連携済み","google_off":"未連携","password":"パスワード","password_set":"設定済み","password_unset":"未設定","challenges":"対局の申し込み","challenges_all":"受け付ける","challenges_none":"受け付けない","badge_verified":"メール確認済み","badge_mfa":"二要素認証オン","badge_google":"Google","ban_until":"お使いのアカウントは{date}まで利用停止されています。","ban_permanent":"お使いのアカウントは利用停止されています。","sanction_ban":"利用停止","sanction_mm_block":"マッチング停止","sanction_warning":"警告","sanction_until":"{date}まで","sanction_permanent":"無期限","devices_current":"このデバイス","devices_unknown":"名前のないデバイス","devices_signed_in":"ログイン日：{date}","devices_seen":"最終使用：{time}","devices_expires":"有効期限：{date}","devices_revoke":"ログアウト","devices_revoked":"デバイスをログアウトさせました。","devices_none":"他のデバイスはありません。","signout_all_confirm":"このデバイスを含む、すべてのデバイスからログアウトしますか？","signed_out":"ログアウトしました。","signed_in":"ようこそ、{name}さん。","prefs_saved":"保存しました。","password_changed":"パスワードを変更しました。他のデバイスはログアウトされました。","email_sent":"新しいアドレスに確認リンクを送信しました。リンクを開くとアドレスが変更されます。","email_changed":"メールアドレスが{email}に変更されました。","email_current":"現在のアドレスは{email}です。","email_pending":"{email}への変更は、確認リンクによる確認待ちです。","export_done":"データをダウンロードしました。","deleted":"アカウントを削除しました。","delete_confirm_label":"確認のため「{name}」と入力してください","register_done":"{email}に確認リンクを送信しました。リンクを開くとアカウントが作成されます。その後、ログインしてください。","register_ready":"アカウントの準備ができました。ログインできます。","forgot_done":"このアドレスを使っているアカウントがあれば、新しいパスワードを設定するためのリンクをお送りしました。","resend_done":"このアドレスが確認待ちであれば、新しいリンクをお送りしました。","pow_solving":"ロボット対策のパズルを解いています…","mfa_recovery":"リカバリーコード","mfa_recovery_text":"リカバリーコードのいずれかを入力してください。各コードは1回だけ使えます。","mfa_app":"アプリのコード","mfa_app_text":"認証アプリに表示される6桁のコードを入力してください。","mfa_state_on":"このアカウントでは二要素認証がオンになっています。","mfa_state_off":"このアカウントでは二要素認証がオフになっています。","client_label":"Scacelithウェブサイト（{browser}）","username":"ユーザー名","password_rules":"{min}文字以上で、ユーザー名やメールアドレスを含まないもの。","password_note":"他のデバイスはログアウトされ、このデバイスはログインしたままになります。","signin_label":"ログイン"},"players":{"since":"登録日：{date}","games":"対局数","rated":"レーティング戦","wins":"勝ち","draws":"引き分け","losses":"負け","view":"{name}のプロフィールを見る","you":"あなた","board":"ランキング"},"gif":{"title":"{white} – {black}","subtitle":"対局 #{id} · {date}","preparing":"GIFを準備中…","rendering":"サーバーがGIFを描画しています。長い対局では数秒かかることがあります…","ready":"GIFの準備ができました。ダウンロードを開始しました。","ready_again":"GIFの準備ができました。","signin":"対局のGIFを作成するにはログインしてください。","signin_button":"ログイン","missing":"対局が選択されていません。","retry_in":"{time}後に再試行できます。","confirm":"「GIFを作成」を押すと、あなたのアカウントでサーバーがこの対局を描画します。","retry_now":"今すぐ再試行できます。"},"home":{"create_account":"アカウントを作成","my_account":"マイアカウント","my_games":"自分の対局","signin":"ログイン"},"trailer":{"title":"Scacelithのトレーラー"}}}</script>
+<script type="application/json" id="release-fallback">{"tag":"v1.0.0-beta.1","name":"Scacelith 1.0.0-beta.1","prerelease":true,"published":"2026-10-03T23:14:47Z","assets":[{"name":"Scacelith-1.0.0-beta.1-windows-x64.exe","size":131602944},{"name":"Scacelith-1.0.0-beta.1-windows-x64.zip","size":95159654},{"name":"SHA256SUMS","size":210}]}</script>
 <script src="../../config.js"></script>
 <script type="module" src="../../assets/js/account.js"></script>
 </body>

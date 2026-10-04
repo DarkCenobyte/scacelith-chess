@@ -1,7 +1,7 @@
 <section class="hero" aria-labelledby="hero-title">
   <div class="hero-media">
     <picture>
-      <source type="image/webp" srcset="{{v:root}}assets/img/hero-960.webp 960w, {{v:root}}assets/img/hero.webp 1360w" sizes="(min-width: 960px) 72vw, 100vw">
+      <source type="image/webp" srcset="{{v:root}}assets/img/hero-960.webp 960w, {{v:root}}assets/img/hero.webp 1360w" sizes="(min-width: 901px) 74vw, 100vw">
       <img src="{{v:root}}assets/img/hero.webp" width="1360" height="688" alt="{{t:hero.image_alt}}" fetchpriority="high" decoding="async">
     </picture>
   </div>
@@ -14,7 +14,7 @@
       <p class="hero-lead">{{t:hero.lead}}</p>
       <div class="hero-actions">
 {{> download-menu}}
-        <a class="btn btn-ghost" href="#trailer">
+        <a class="btn btn-ghost" href="#trailer" data-trailer-link hidden>
           <svg class="icon" aria-hidden="true"><use href="#i-play"></use></svg>
           <span>{{t:hero.watch}}</span>
         </a>
@@ -155,7 +155,7 @@
   </div>
   <dialog class="lightbox" data-lightbox aria-label="{{t:gallery.viewer}}">
     <div class="lightbox-frame">
-      <img class="lightbox-image" data-lightbox-image alt="">
+      <img class="lightbox-image" data-lightbox-image src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==" alt="">
       <p class="lightbox-caption" data-lightbox-caption></p>
     </div>
     <button class="lightbox-button lightbox-close" type="button" data-lightbox-close aria-label="{{t:gallery.close}}"><svg class="icon" aria-hidden="true"><use href="#i-close"></use></svg></button>
@@ -230,7 +230,7 @@
         <ol class="mini-board-list" data-mini-board>
           <li class="placeholder">{{t:online.board_loading}}</li>
         </ol>
-        <a class="text-link" href="players/">{{t:online.full_board}} <svg class="icon flip-rtl" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+        <a class="text-link" href="players/" data-full-board>{{t:online.full_board}} <svg class="icon flip-rtl" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
       </div>
     </aside>
   </div>

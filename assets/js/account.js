@@ -5,10 +5,10 @@
 import "./site.js";
 import { onReady } from "./site.js";
 import { $, $$, h, icon, clear, showView } from "./lib/dom.js";
-import { t, fmt, pageUrl } from "./lib/i18n.js";
+import { t, fmt, pageUrl, ltr } from "./lib/i18n.js";
 import { api, withPow, ApiError, fileNameOf } from "./lib/api.js";
 import { getSession, setSession, clearSession, updateUser, onSessionChange, requestSession } from "./lib/session.js";
-import { toast, errorMessage, showMessage, setBusy, initTabs, initReveal, saveBlob, fieldError } from "./lib/ui.js";
+import { toast, errorMessage, showMessage, setBusy, isBusy, initTabs, initReveal, saveBlob, fieldError } from "./lib/ui.js";
 import { renderRatings } from "./lib/ratings.js";
 import { gameList } from "./lib/games.js";
 
@@ -153,6 +153,7 @@ function initAuth() {
   const signin = $('[data-form="signin"]');
   signin.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (isBusy(formParts(signin).submit)) return;
     resetMessages(signin);
     const login = value(signin, "login");
     const password = raw(signin, "password");
@@ -206,6 +207,7 @@ function initAuth() {
   });
   mfa.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (isBusy(formParts(mfa).submit)) return;
     resetMessages(mfa);
     const code = value(mfa, "code");
     if (!code) return fail(mfa, t("js.errors.required"), mfa.elements.code);
@@ -235,6 +237,7 @@ function initAuth() {
   const register = $('[data-form="register"]');
   register.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (isBusy(formParts(register).submit)) return;
     resetMessages(register);
     await loadInfo().catch(() => null);
     const l = limits();
@@ -300,6 +303,7 @@ function initAuth() {
     const form = $(`[data-form="${name}"]`);
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+      if (isBusy(formParts(form).submit)) return;
       resetMessages(form);
       const email = value(form, "email");
       if (!looksLikeEmail(email)) return fail(form, t("js.errors.email_format"), form.elements.email);
@@ -317,20 +321,40 @@ function initAuth() {
   }
 }
 
+// Where the visitor was going before signing in: a dashboard tab (#games) or the GIF page.
+const entry = new URLSearchParams(location.search);
+let pendingTab = ["games", "devices", "settings"].includes(location.hash.slice(1)) ? location.hash.slice(1) : null;
+
 function completeSignIn(res, remember) {
   setSession({ token: res.token, expiresAt: res.expiresAt, user: res.user }, remember);
+  if (entry.get("next") === "gif" && /^\d{1,16}$/.test(entry.get("id") || "")) {
+    location.replace(pageUrl("gif", { id: entry.get("id"), o: entry.get("o") === "black" ? "black" : null }));
+    return;
+  }
   toast(t("js.account.signed_in", { name: res.user?.username || "" }), { type: "ok" });
-  showDashboard();
+  showDashboard({ focus: true });
 }
 
-function showAuth(message) {
+const PERSONAL = ["[data-me-facts]", "[data-me-badges]", "[data-me-ratings]", "[data-me-sanctions]", "[data-devices]",
+  "[data-games-list]", "[data-recent-games]", "[data-games-total]", "[data-me-name]", "[data-me-since]", "[data-me-initial]",
+  "[data-email-note]", "[data-delete-label]", "[data-mfa-state]"];
+
+function showAuth(message, { focus = false } = {}) {
+  const leaving = view === "dashboard";
   view = "auth";
   me = null;
   dashboardReady = {};
+  gamesList = null;
+  // Nothing of the previous account stays in the page.
+  for (const selector of PERSONAL) {
+    const el = $(selector);
+    if (el) clear(el);
+  }
+  for (const form of $$('[data-view="dashboard"] form')) form.reset();
   showView(root(), "auth");
   loadInfo().catch(() => null);
   const name = location.hash.slice(1);
-  showAuthPanel(["register", "forgot", "resend"].includes(name) ? name : "signin", { focus: false });
+  showAuthPanel(["register", "forgot", "resend"].includes(name) ? name : "signin", { focus: focus || leaving });
   if (message) showMessage($('[data-form="signin"] [data-error]'), message);
 }
 
@@ -411,7 +435,7 @@ function initGamesTab() {
   const filters = $("[data-games-filters]");
   const select = $("[data-filter-category]");
   for (const c of info?.categories || []) {
-    select.insertBefore(h("option", { value: c.id }, c.id), select.querySelector('option[value="custom"]'));
+    select.insertBefore(h("option", { value: c.id }, ltr(c.id)), select.querySelector('option[value="custom"]'));
   }
   const total = $("[data-games-total]");
   const query = () => {
@@ -419,8 +443,16 @@ function initGamesTab() {
     return { category: f.get("category"), rated: f.get("rated"), result: f.get("result") };
   };
   const filtered = () => Object.values(query()).some(Boolean);
+  if (!filters.dataset.ready) {
+    filters.dataset.ready = "1";
+    filters.addEventListener("change", () => {
+      total.textContent = "";
+      gamesList?.reload();
+    });
+  }
   gamesList = gameList($("[data-games-list]"), (before) => api("/account/games", { auth: "required", query: { ...query(), before, limit: 20 } }), {
     me: me.user.username,
+    owner: me.user.username,
     linkPlayers: true,
     get empty() {
       return t(filtered() ? "js.game.none_filtered" : "js.game.none");
@@ -428,10 +460,6 @@ function initGamesTab() {
     onTotal: (n) => {
       total.textContent = t("js.game.total", { count: n });
     },
-  });
-  filters.addEventListener("change", () => {
-    total.textContent = "";
-    gamesList.reload();
   });
 }
 
@@ -444,6 +472,7 @@ async function renderDevices() {
     for (const s of sessions) {
       const revoke = h("button", { class: "btn btn-ghost btn-small", type: "button" }, icon("logout"), h("span", null, t("js.account.devices_revoke")));
       revoke.addEventListener("click", async () => {
+        if (isBusy(revoke)) return;
         setBusy(revoke, true);
         try {
           await api(`/auth/sessions/${encodeURIComponent(s.id)}`, { method: "DELETE", auth: "required" });
@@ -477,8 +506,14 @@ async function renderDevices() {
 
 function initSettings() {
   const prefs = $("[data-pref-challenges]");
+  let saving = false;
   prefs.addEventListener("change", async () => {
-    prefs.disabled = true;
+    if (saving) {
+      prefs.checked = !prefs.checked;
+      return;
+    }
+    saving = true;
+    prefs.setAttribute("aria-busy", "true");
     const acceptChallenges = prefs.checked ? "all" : "none";
     try {
       await api("/account/preferences", { method: "PUT", auth: "required", body: { acceptChallenges } });
@@ -489,7 +524,8 @@ function initSettings() {
       prefs.checked = !prefs.checked;
       toast(errorMessage(e), { type: "error" });
     } finally {
-      prefs.disabled = false;
+      saving = false;
+      prefs.removeAttribute("aria-busy");
     }
   });
 
@@ -504,6 +540,7 @@ function initSettings() {
   const password = $('[data-form="password"]');
   password.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (isBusy(formParts(password).submit)) return;
     resetMessages(password);
     const l = limits();
     const current = raw(password, "currentPassword");
@@ -527,6 +564,7 @@ function initSettings() {
   const email = $('[data-form="email"]');
   email.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (isBusy(formParts(email).submit)) return;
     resetMessages(email);
     const newEmail = value(email, "newEmail");
     if (!looksLikeEmail(newEmail)) return fail(email, t("js.errors.email_format"), email.elements.newEmail);
@@ -550,6 +588,7 @@ function initSettings() {
   const exportForm = $('[data-form="export"]');
   exportForm.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (isBusy(formParts(exportForm).submit)) return;
     resetMessages(exportForm);
     if (!raw(exportForm, "password")) return fail(exportForm, t("js.errors.required"), exportForm.elements.password);
     if (needMfa(exportForm)) return fail(exportForm, t("js.errors.mfa_code_required"), exportForm.elements.code);
@@ -572,6 +611,7 @@ function initSettings() {
   const del = $('[data-form="delete"]');
   del.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (isBusy(formParts(del).submit)) return;
     resetMessages(del);
     if (value(del, "confirmName") !== me.user.username) return fail(del, t("js.errors.confirm_name"), del.elements.confirmName);
     if (!raw(del, "password")) return fail(del, t("js.errors.required"), del.elements.password);
@@ -593,6 +633,7 @@ function initSettings() {
 
   $("[data-logout]").addEventListener("click", async (event) => {
     const button = event.currentTarget;
+    if (isBusy(button)) return;
     setBusy(button, true);
     try {
       await api("/auth/logout", { method: "POST", auth: "required" });
@@ -605,8 +646,8 @@ function initSettings() {
     }
   });
   $("[data-logout-all]").addEventListener("click", async (event) => {
-    if (!window.confirm(t("js.account.signout_all_confirm"))) return;
     const button = event.currentTarget;
+    if (isBusy(button) || !window.confirm(t("js.account.signout_all_confirm"))) return;
     setBusy(button, true);
     try {
       await api("/auth/logout-all", { method: "POST", auth: "required" });
@@ -630,6 +671,7 @@ function onDashTab(name) {
   if (name === "overview") {
     gameList($("[data-recent-games]"), () => api("/account/games", { auth: "required", query: { limit: 5 } }), {
       me: me.user.username,
+      owner: me.user.username,
       linkPlayers: true,
       limit: 5,
       empty: t("js.game.none"),
@@ -637,10 +679,12 @@ function onDashTab(name) {
   }
 }
 
-async function showDashboard() {
+async function showDashboard({ focus = false } = {}) {
   view = "dashboard";
   showView(root(), "loading");
   dashboardReady = {};
+  gamesList = null;
+  $("[data-games-total]").textContent = "";
   try {
     await Promise.all([loadInfo().catch(() => null), loadMe()]);
   } catch (e) {
@@ -664,8 +708,10 @@ async function showDashboard() {
   $("[data-games-filters]").reset();
 
   showView(root(), "dashboard");
-  const name = location.hash.slice(1);
+  const name = pendingTab || location.hash.slice(1);
+  pendingTab = null;
   selectDashTab(["games", "devices", "settings"].includes(name) ? name : "overview");
+  if (focus) $("[data-me-name]").focus();
 }
 
 /* ============================================================================ start */
@@ -684,17 +730,24 @@ onReady(() => {
 
   onSessionChange((session) => {
     if (!session && view === "dashboard") {
-      showAuth(signingOut ? "" : t("js.errors.invalid_token"));
+      showAuth(signingOut ? "" : t("js.errors.invalid_token"), { focus: true });
       signingOut = false;
     }
     else if (session && view === "auth" && !signingIn) showDashboard();
   });
   window.addEventListener("hashchange", () => {
     const name = location.hash.slice(1);
+    if (!["", "signin", "register", "forgot", "resend", "overview", "games", "devices", "settings"].includes(name)) return;
     if (view === "auth") showAuthPanel(["register", "forgot", "resend"].includes(name) ? name : "signin");
     else if (view === "dashboard") selectDashTab(["games", "devices", "settings"].includes(name) ? name : "overview");
   });
 
-  if (getSession()) showDashboard();
-  else requestSession(350).then((s) => (s ? showDashboard() : showAuth()));
+  if (getSession()) {
+    showDashboard();
+  } else {
+    showAuth();
+    requestSession(350).then((s) => {
+      if (s && view === "auth" && !signingIn) showDashboard();
+    });
+  }
 });

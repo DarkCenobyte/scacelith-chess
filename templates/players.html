@@ -37,7 +37,7 @@
 
   <section class="panel leaderboard" data-leaderboard aria-labelledby="board-title">
     <header class="panel-head">
-      <h2 class="block-title" id="board-title"><svg class="icon" aria-hidden="true"><use href="#i-trophy"></use></svg>{{t:players.board_title}}</h2>
+      <h2 class="block-title" id="board-title" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-trophy"></use></svg>{{t:players.board_title}}</h2>
       <div class="segmented" role="group" aria-label="{{t:players.category}}" data-board-tabs></div>
     </header>
     <p class="panel-note" data-board-note></p>
@@ -51,7 +51,7 @@
             <th scope="col" class="num">{{t:players.col_rating}}</th>
             <th scope="col" class="num hide-sm">{{t:players.col_peak}}</th>
             <th scope="col" class="num hide-sm">{{t:players.col_games}}</th>
-            <th scope="col" class="num wdl-col">{{t:players.col_wdl}}</th>
+            <th scope="col" class="num wdl-col hide-xs">{{t:players.col_wdl}}</th>
           </tr>
         </thead>
         <tbody data-board-body>
