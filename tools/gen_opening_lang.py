@@ -90,10 +90,12 @@ EPONYM_LATIN = {
            'Averbakh': 'Averbaj', 'Zaitsev': 'Záitsev'},
 }
 
-# Spoken squares and files. Files are said by their letter's name, ranks as number words.
+# Spoken squares and files. Files are said by their letter's name, ranks as number words (as file.*.spoken and
+# rank.*.spoken in assets/coach/speech/<code>/common.lang; French "eu" and "huite": the voice says a lone "e" too
+# briefly and reads "huit" as "hui").
 FILE_WORDS = {
     'en': ['ay', 'bee', 'see', 'dee', 'ee', 'eff', 'gee', 'aitch'],
-    'fr': ['a', 'bé', 'cé', 'dé', 'e', 'effe', 'gé', 'ache'],
+    'fr': ['a', 'bé', 'cé', 'dé', 'eu', 'effe', 'gé', 'ache'],
     'de': ['a', 'be', 'ce', 'de', 'e', 'ef', 'ge', 'ha'],
     'es': ['a', 'be', 'ce', 'de', 'e', 'efe', 'ge', 'hache'],
     'ru': ['а', 'бэ', 'цэ', 'дэ', 'е', 'эф', 'жэ', 'аш'],
@@ -103,7 +105,7 @@ FILE_WORDS = {
 }
 RANK_WORDS = {
     'en': ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'],
-    'fr': ['un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit'],
+    'fr': ['un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huite'],
     'de': ['eins', 'zwei', 'drei', 'vier', 'fünf', 'sechs', 'sieben', 'acht'],
     'es': ['uno', 'dos', 'tres', 'cuatro', 'cinco', 'seis', 'siete', 'ocho'],
     'ru': ['один', 'два', 'три', 'четыре', 'пять', 'шесть', 'семь', 'восемь'],

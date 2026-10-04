@@ -68,13 +68,15 @@ phrase.my.queen.e = e
 phrase.my.king.e =
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
-# Letter names as in the opening texts (tools/gen_opening_lang.py): "e quatre", "dé cinq", "effe trois".
+# Letter names as in the opening texts (tools/gen_opening_lang.py): "eu quatre", "dé cinq", "effe trois".
+# The voice says a lone "e" too briefly: "c’est e quatre" is heard "cé quatre" (c4), hence "eu". A
+# square's eight is "huite": the voice reads "huit" as "hui".
 square.spoken = {file} {rank}
 file.a.spoken = a
 file.b.spoken = bé
 file.c.spoken = cé
 file.d.spoken = dé
-file.e.spoken = e
+file.e.spoken = eu
 file.f.spoken = effe
 file.g.spoken = gé
 file.h.spoken = ache
@@ -85,13 +87,13 @@ rank.4.spoken = quatre
 rank.5.spoken = cinq
 rank.6.spoken = six
 rank.7.spoken = sept
-rank.8.spoken = huit
+rank.8.spoken = huite
 
 # ---- Moves ---------------------------------------------------------------------------------------
 # French scoresheet letters: R(oi) D(ame) T(our) F(ou) C(avalier).
 move.letters = R D T F C
-# Spoken: "cavalier effe trois", "cavalier prend en e cinq", "pion dé prend en e cinq",
-# "pion reprend", "petit roque", "e huit, promotion en dame", "dame gé quatre, échec".
+# Spoken: "cavalier effe trois", "cavalier prend en eu cinq", "pion dé prend en eu cinq",
+# "pion reprend", "petit roque", "eu huite, promotion en dame", "dame gé quatre, échec".
 move.piece.spoken = {piece} {to}
 move.piece_capture.spoken = {piece} prend en {to}
 move.piece_from.spoken = {piece} {from} {to}
@@ -105,6 +107,14 @@ move.promotion.spoken = {move}, promotion en {piece}
 move.check.spoken = {move}, échec
 move.mate.spoken = {move}, échec et mat
 moves.join.spoken = {a}, {b}
+
+# ---- Respellings (spoken) ----------------------------------------------------------------------------
+# Words the voice misreads, respelled in every spoken line (src/coach/catalog.h): "mat" is read like
+# "mât" (no t), "huit" like "hui". "huit" keeps its spelling before the noun it counts ("huit coups",
+# "huit rangées", where the t is silent) and becomes "huite" before a pause ("au coup huit.", "de un à
+# huit."); a lone number followed by another word says "huite" in its own .spoken line.
+respell.mat = matte
+respell.huit.pause = huite
 
 # ---- Numbers -------------------------------------------------------------------------------------
 # Spoken number words. 21-99 compose as "{tens}-{units}" except where French does not (et un,

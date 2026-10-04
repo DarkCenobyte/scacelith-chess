@@ -216,6 +216,15 @@ bool Catalog::addFile(const std::string& lang, const std::string& topic, const s
         }
         L.map.emplace(e.first, Entry{e.second, topic});
         order.push_back(e.first);
+        if (startsWith(e.first, "respell.")) {
+            Respelling r;
+            std::string word = e.first.substr(8);
+            r.pauseOnly = endsWith(word, ".pause");
+            if (r.pauseOnly) word.resize(word.size() - 6);
+            r.word = uni::decode(word);
+            r.spoken = uni::decode(e.second);
+            if (!r.word.empty()) L.respellings.push_back(std::move(r));
+        }
     }
     return ok;
 }
@@ -733,6 +742,72 @@ std::string Catalog::renderText(Ctx& c, const std::string& keyOrText, const std:
     return t ? expand(c, *t, nullptr, false) : std::string();
 }
 
+namespace {
+// A letter or digit of a word ("dix-huit", "l’échec" and "mat." end their words at - ’ and .).
+bool isWordChar(char32_t c) {
+    if (c < 0x80) return std::isalnum(int(c)) != 0;
+    return c >= 0xC0 && c != 0xD7 && c != 0xF7 && !(c >= 0x2000 && c <= 0x206F) && !(c >= 0x3000 && c <= 0x303F);
+}
+}  // namespace
+
+// The language's respell.* words in a spoken line, whole words in any case; the anchors follow.
+void Catalog::respell(const Language& L, Rendered& r) {
+    if (L.respellings.empty()) return;
+    const std::u32string t = uni::decode(r.text);
+    std::u32string out;
+    std::vector<std::pair<int, int>> shifts;   // (byte offset in r.text of a respelled word, size change)
+    int byteAt = 0;                            // byte offset in r.text of t[i]
+    auto bytes = [](const std::u32string& s, size_t from, size_t to) {
+        int n = 0;
+        for (size_t k = from; k < to; ++k) n += s[k] < 0x80 ? 1 : s[k] < 0x800 ? 2 : s[k] < 0x10000 ? 3 : 4;
+        return n;
+    };
+    for (size_t i = 0; i < t.size();) {
+        if (!isWordChar(t[i])) {
+            out.push_back(t[i]);
+            byteAt += bytes(t, i, i + 1);
+            ++i;
+            continue;
+        }
+        size_t end = i;
+        while (end < t.size() && isWordChar(t[end])) ++end;
+        const Respelling* hit = nullptr;
+        for (const Respelling& rs : L.respellings) {
+            if (rs.word.size() != end - i) continue;
+            bool same = true;
+            for (size_t k = 0; k < rs.word.size() && same; ++k) same = uni::toUpper(rs.word[k]) == uni::toUpper(t[i + k]);
+            if (!same) continue;
+            if (rs.pauseOnly) {
+                size_t n = end;
+                while (n < t.size() && uni::isSpace(t[n])) ++n;
+                if (n < t.size() && isWordChar(t[n])) continue;   // a word follows: no pause
+            }
+            hit = &rs;
+            break;
+        }
+        const int wordBytes = bytes(t, i, end);
+        if (hit && !hit->spoken.empty()) {
+            std::u32string s = hit->spoken;
+            if (t[i] != hit->word[0] && t[i] == uni::toUpper(hit->word[0])) s[0] = uni::toUpper(s[0]);   // "Mat !"
+            out += s;
+            shifts.emplace_back(byteAt, bytes(s, 0, s.size()) - wordBytes);
+        } else {
+            out.append(t, i, end - i);
+        }
+        byteAt += wordBytes;
+        i = end;
+    }
+    if (shifts.empty()) return;
+    r.text = uni::encode(out);
+    // An anchor is where a placeholder's rendering starts: it moves by the respellings before it.
+    for (Anchor& a : r.anchors) {
+        int d = 0;
+        for (auto& s : shifts)
+            if (s.first < a.offset) d += s.second;
+        a.offset += d;
+    }
+}
+
 int Catalog::Rendered::anchor(const std::string& name) const {
     for (auto& a : anchors)
         if (a.name == name) return a.offset;
@@ -766,6 +841,7 @@ Catalog::Rendered Catalog::renderWith(const Line& line, const std::string& lang,
         t = lookup(c, line.key);
     }
     if (t) r.text = expand(c, *t, nullptr, true);
+    if (spoken) respell(*c.L, r);
     return r;
 }
 

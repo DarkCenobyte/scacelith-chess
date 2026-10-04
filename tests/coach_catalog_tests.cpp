@@ -391,6 +391,39 @@ TEST(coach_catalog_anchors_land_on_their_words) {
     CHECK_EQ(r.anchor("nothing"), -1);
 }
 
+// The words the voice misreads (respell.* in common.lang) are respelled in speech only: whole words
+// in any case, ".pause" ones only before a pause; the anchors follow the longer words.
+TEST(coach_catalog_respellings) {
+    Catalog c;
+    c.addFile("en", "common", realFile("en", "common"));
+    c.addFile("en", "test", "a = {n:move} {@}x\nb = {n} {@}x\nc = {my} {sq} x\n");
+    c.addFile("fr", "common", realFile("fr", "common"));
+    c.addFile("fr", "test",
+              "a = Mat en {n:move}, puis {@}mat. Matériel, maté, échec et mat\xC2\xA0!\n"
+              "b = Huit coups, au coup {n}. Mon {@}huit, dix-huit\xC2\xA0!\n"
+              "c = {my} va en {sq}, et c’est mat.\n");
+    Line a = line("a");
+    a.with("n", Arg::ofNumber(2));
+    Catalog::Rendered ra = c.renderVariant(a, "fr", true, 1);
+    CHECK_EQ(ra.text, std::string("Matte en deux coups, puis matte. Matériel, maté, échec et matte\xC2\xA0!"));
+    CHECK_EQ(ra.text.substr(size_t(ra.anchor("@")), 6), std::string("matte."));
+    CHECK_EQ(ra.text.substr(size_t(ra.anchor("n")), 4), std::string("deux"));
+    CHECK_EQ(written(c, a, "fr"), std::string("Mat en 2 coups, puis mat. Matériel, maté, échec et mat\xC2\xA0!"));
+    Line b = line("b");
+    b.with("n", Arg::ofNumber(8));
+    Catalog::Rendered rb = c.renderVariant(b, "fr", true, 1);
+    CHECK_EQ(rb.text, std::string("Huit coups, au coup huite. Mon huite, dix-huite\xC2\xA0!"));
+    CHECK_EQ(rb.text.substr(size_t(rb.anchor("@")), 6), std::string("huite,"));
+    Line l = line("c");
+    l.with("my", Arg::ofPiece(chess::Rook, chess::Black, false)).with("sq", Arg::ofSquare(chess::parseSquare("e8")));
+    Catalog::Rendered rc = c.renderVariant(l, "fr", true, 1);
+    CHECK_EQ(rc.text, std::string("Ma tour va en eu huite, et c’est matte."));
+    CHECK_EQ(rc.text.substr(size_t(rc.anchor("sq")), 8), std::string("eu huite"));
+    // Other languages keep their words.
+    c.addFile("de", "test", "a = Matt in {n:move}, {@}mat.\nb = x\nc = x\n");
+    CHECK(spoken(c, a, "de").find(" mat.") != std::string::npos);
+}
+
 TEST(coach_catalog_arabic_and_chinese) {
     Catalog c;
     c.addFile("en", "common", realFile("en", "common"));
