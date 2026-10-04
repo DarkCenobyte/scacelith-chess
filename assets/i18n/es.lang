@@ -715,7 +715,7 @@ reason.online.abandonment = El rival abandonó la partida
 reason.online.abandonment_vs_insufficient = Abandonó la partida, pero el rival no puede dar mate
 reason.online.aborted = Partida anulada
 reason.online.no_show = Sin primera jugada a tiempo (anulada)
-reason.online.forfeit = Incomparecencia
+reason.online.forfeit = Partida perdida
 reason.online.server_aborted = Anulada por el servidor
 reason.online.both_disconnected = Ambos jugadores se desconectaron
 # Server notices

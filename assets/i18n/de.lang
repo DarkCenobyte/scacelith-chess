@@ -715,7 +715,7 @@ reason.online.abandonment = Gegner hat die Partie verlassen
 reason.online.abandonment_vs_insufficient = Partie verlassen, aber der Gegner kann nicht mattsetzen
 reason.online.aborted = Partie abgebrochen
 reason.online.no_show = Kein erster Zug rechtzeitig (abgebrochen)
-reason.online.forfeit = Kampflos verloren
+reason.online.forfeit = Als verloren gewertet
 reason.online.server_aborted = Vom Server abgebrochen
 reason.online.both_disconnected = Beide Spieler getrennt
 # Server notices

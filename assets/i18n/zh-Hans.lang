@@ -715,7 +715,7 @@ reason.online.abandonment = 对手离开了对局
 reason.online.abandonment_vs_insufficient = 离开对局，但对方无法将死
 reason.online.aborted = 对局中止
 reason.online.no_show = 未按时走出第一步（中止）
-reason.online.forfeit = 弃权判负
+reason.online.forfeit = 违规判负
 reason.online.server_aborted = 被服务器中止
 reason.online.both_disconnected = 双方均已断开连接
 # Server notices

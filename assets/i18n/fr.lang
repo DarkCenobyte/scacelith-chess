@@ -716,7 +716,7 @@ reason.online.abandonment = L’adversaire a quitté la partie
 reason.online.abandonment_vs_insufficient = Partie quittée, mais l’adversaire ne peut pas mater
 reason.online.aborted = Partie annulée
 reason.online.no_show = Aucun premier coup à temps (annulée)
-reason.online.forfeit = Forfait
+reason.online.forfeit = Partie perdue pour triche
 reason.online.server_aborted = Annulée par le serveur
 reason.online.both_disconnected = Les deux joueurs se sont déconnectés
 # Server notices
