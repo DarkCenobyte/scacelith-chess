@@ -486,11 +486,13 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
     const float scale = T / Timing::Handshake;
     shakeScale = scale;
     // Phases: extend to the pre-contact pose; slide in, the hand open, until the palms touch; close
-    // the grip (HandshakeClasp when it is closed); pump twice; open the hand (HandshakeRelease
-    // halfway); withdraw the open hand the way it came; back to rest.
-    // (The slide takes 0.18 s: the hand comes in at most 0.62 m/s and slows down into the contact.)
-    const float t1 = 0.60f * scale, t2 = 0.78f * scale, tc = Timing::HandshakeClaspAt * scale, tp = 1.90f * scale;
-    const float tr = Timing::HandshakeReleaseAt * scale, to = 2.08f * scale, tw = 2.18f * scale;
+    // the grip (HandshakeClasp when it is closed); pump twice; open the hand (HandshakeRelease when
+    // it is open); withdraw the open hand the way it came; back to rest.
+    // (The slide takes 0.18 s: the hand comes in at most 0.62 m/s and slows down into the contact.
+    // The withdraw takes 0.14 s and hands over to the way back at full speed: one rise and fall of
+    // the speed, at most 2.1 m/s.)
+    const float t1 = 0.60f * scale, t2 = 0.78f * scale, tc = Timing::HandshakeClaspAt * scale, tp = 1.80f * scale;
+    const float tr = Timing::HandshakeReleaseAt * scale, to = tr, tw = 2.10f * scale;
     // 0. The pen first goes back onto the table (where the game wanted it, else where it was taken).
     float t0 = 0.0f;
     FingerPose letGo = from.f;
@@ -561,7 +563,7 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
         c.oscAmp = kShakePump;
         c.oscCycles = 2.0f;
         c.os = 0.04f;
-        c.oe = 0.96f;
+        c.oe = 1.0f;
         c.elbow0 = c.elbow1 = kShakeElbow;
         c.locked = true;
         mo.segs.push_back(c);
@@ -569,8 +571,9 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
     }
     // 5. open the hand where it is
     s = contact(s, to - tp, pClasp, vec3(0), fg, fo);
-    // 6. withdraw it the way it came, already on its way back to rest
-    s = contact(s, tw - to, pPre, -vIn, fo, fo);
+    // 6. withdraw it the way it came, gathering speed all the way (2.2 times the mean speed at the
+    // end, its acceleration back to zero): the way back to rest goes on from that speed
+    s = contact(s, tw - to, pPre, (pPre - pClasp) * (2.2f / (tw - to)), fo, fo);
     // 7. back to rest
     mo.segs.push_back(shakeRetract(s, T - tw));
     curEvents.push_back({start + tc, EventType::HandshakeClasp, ActNone, false});
