@@ -149,11 +149,12 @@ inline const FingerPose& posePress() {
     return p;
 }
 // Handshake: the open hand that slides in (the thumb up, a little over the palm: it passes the
-// partner's thumb, and no finger bone turns more than ~2.2 rad to the grip, under 1800 deg/s), and
-// the grip it closes to once the palms touch. Fitted together with the clasp placement (see
-// planHandshake), not tuned by eye.
+// partner's thumb, and no finger bone turns more than ~2 rad to the grip, under 1800 deg/s), and the
+// grip it closes to once the palms touch (the fingertips on the partner's skin, the thumb lying
+// flat over the back of its hand). Fitted together with the clasp placement (see planHandshake),
+// not tuned by eye.
 inline const FingerPose& poseShakeOpen() {
-    static FingerPose p = fpMake({{0.57f, -0.44f, -0.05f, 0.31f}, {0.06f, 0.10f, 0.12f, 0.06f}, {0.0f, 0.12f, 0.14f, 0.06f},
+    static FingerPose p = fpMake({{0.606f, -0.448f, -0.037f, 0.342f}, {0.06f, 0.10f, 0.12f, 0.06f}, {0.0f, 0.12f, 0.14f, 0.06f},
                                   {-0.05f, 0.16f, 0.16f, 0.08f}, {-0.10f, 0.20f, 0.18f, 0.08f}});
     return p;
 }
@@ -169,21 +170,21 @@ inline const FingerPose& poseShakeReach() {
     return p;
 }
 inline const FingerPose& poseShakeGrip() {
-    static FingerPose p = fpMake({{1.45f, -0.40f, 0.97f, 1.30f}, {-0.10f, 0.19f, 0.71f, 0.56f}, {-0.07f, 0.23f, 1.27f, 0.91f},
-                                  {0.07f, 0.38f, 1.32f, 0.94f}, {0.21f, 0.48f, 0.72f, 0.57f}});
+    static FingerPose p = fpMake({{1.411f, -0.400f, 1.013f, 0.950f}, {-0.080f, 0.166f, 0.942f, 0.284f}, {-0.022f, 0.202f, 1.449f, 0.599f},
+                                  {0.093f, 0.312f, 1.460f, 0.605f}, {0.223f, 0.428f, 0.992f, 0.315f}});
     return p;
 }
 // Handshake clasp placement (planHandshake), right-hand convention; fitted with the two presets above.
-constexpr float kShakePitch = 0.434f;   // fingers below the horizontal in the vertical palm plane
-constexpr float kShakeYaw = 0.469f;     // palm plane turned across the body from the shoulder-clasp line
+constexpr float kShakePitch = 0.441f;   // fingers below the horizontal in the vertical palm plane
+constexpr float kShakeYaw = 0.510f;     // palm plane turned across the body from the shoulder-clasp line
 constexpr float kShakeElbow = 0.850f;   // elbow raised about the shoulder-wrist axis while in contact
-constexpr float kShakePump = 0.0316f;   // pump amplitude
+constexpr float kShakePump = 0.0285f;   // pump amplitude
 // A handshake cut short (see shakeLetGo): the hand opens in this time, and the robot that was cut is
 // back at its rest this long after the cut (Timing::Retract, and the 50 ms its next Retract waits).
 constexpr float kShakeLetGoOpen = 0.14f;
 constexpr float kShakeLetGoQuick = 0.40f;
-inline vec3 shakeAnchor() { return vec3(0.0127f, -0.0600f, 0.0312f); }   // hand point on the clasp vertical
-inline vec3 shakeSlide() { return vec3(0.0617f, -0.0396f, 0.0f); }      // contact -> pre-contact offset
+inline vec3 shakeAnchor() { return vec3(0.0137f, -0.0579f, 0.0341f); }   // hand point on the clasp vertical
+inline vec3 shakeSlide() { return vec3(0.0710f, -0.0474f, 0.0f); }      // contact -> pre-contact offset
 inline const FingerPose& poseLooseFist() {
     static FingerPose p = fpMake({{0.75f, 0.30f, 0.40f, 0.30f}, {0.02f, 1.05f, 1.30f, 0.70f}, {0.0f, 1.12f, 1.35f, 0.72f},
                                   {-0.03f, 1.18f, 1.38f, 0.72f}, {-0.06f, 1.24f, 1.40f, 0.72f}});

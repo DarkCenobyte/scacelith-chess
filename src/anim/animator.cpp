@@ -463,9 +463,9 @@ void Animator::Impl::planTask(const Task& t, float start, float T) {
 // the other's signed distance fields at the slide-in, at every step of the fingers closing and at
 // the grip (kept under 0.5 mm), plus costs for the look of a real handshake: palms touching, each
 // set of fingers wrapped round the partner's little-finger edge with the pads on the back of its
-// hand, each thumb over the back of the partner's hand by its index knuckle, the thumb-index webs
-// together, the hands crossing at about 45 degrees, no wrist strain through the pumps, and the
-// lowest finger above the pieces.
+// hand, touching its skin, each thumb lying flat over the back of the partner's hand by its index
+// knuckle, the thumb-index webs together, the hands crossing at about 45 degrees, no wrist strain
+// through the pumps, and the lowest finger above the pieces.
 void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSample from, Motion& mo) {
     const Side R = shakeSide();
     const float tableC = layout::TABLE_TOP_Y - pelvisWorld.y;
