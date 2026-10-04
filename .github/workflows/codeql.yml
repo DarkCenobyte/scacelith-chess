@@ -1,8 +1,9 @@
 # CodeQL code scanning of the game's C++ code (without a build) and of the workflows; the alerts
 # are in the repository's Security tab. The vendored code (third_party/), the tests (tests/) and the
-# handshake research tools (tools/handshake/), which are not shipped, are left out. The few alerts
-# that are by design (a file path the player chooses, from their environment or command line) are
-# marked where they occur with a "codeql[<query id>]" comment saying why.
+# handshake research tools (tools/handshake/), which are not shipped, are left out. Alerts that are
+# by design (a file path the player chooses, from their environment or command line: the game runs
+# as that player) are dismissed as false positives in the Security tab; the code says why where
+# they occur.
 name: CodeQL
 
 on:
@@ -42,9 +43,6 @@ jobs:
           languages: ${{ matrix.language }}
           build-mode: none
           queries: security-extended
-          # The alert-suppression query reads the codeql[<query id>] comments (security-extended
-          # leaves it out); the actions analysis has none.
-          packs: ${{ matrix.language == 'c-cpp' && 'codeql/cpp-queries:AlertSuppression.ql' || '' }}
           config: |
             paths-ignore:
               - third_party

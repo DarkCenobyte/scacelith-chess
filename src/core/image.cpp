@@ -43,7 +43,6 @@ bool writePNG(const std::string& path, int w, int h, int ch, const uint8_t* px) 
     FILE* f = _wfopen(file.c_str(), L"wb");
 #else
     // A screenshot, written where the player asked (--shot) or in their own settings folder.
-    // codeql[cpp/path-injection]
     FILE* f = std::fopen(path.c_str(), "wb");
 #endif
     if (!f) return false;

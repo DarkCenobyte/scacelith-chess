@@ -79,10 +79,8 @@ static int runApp(std::vector<std::string> args) {
     const std::string homeDir = net::sys::settingsDirectory();
     // The log goes to a folder of the player's own (their environment: HOME, XDG_CONFIG_HOME, APPDATA).
     std::string logPath = homeDir + "scacelith.log";
-    // codeql[cpp/path-injection]
     if (!logx::init(logPath.c_str())) {
         logPath = plat::userDataDirectory() + "scacelith.log";
-        // codeql[cpp/path-injection]
         if (!logx::init(logPath.c_str())) logPath.clear();
     }
     LOGI("Scacelith " SCACELITH_VERSION " starting");
