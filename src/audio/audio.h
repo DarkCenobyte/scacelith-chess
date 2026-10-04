@@ -1,6 +1,7 @@
 // Audio: software mixer with procedurally synthesised sounds (no sample files), hall reverb and
-// 3D panning. Backends: WASAPI shared mode (Windows), null (elsewhere: real-time pace, output
-// discarded, or streamed to a WAV file when SCACELITH_AUDIO_DUMP=<path.wav> is set).
+// 3D panning. Backends (backend.h): WASAPI shared mode (Windows), ALSA (Linux, libasound loaded at
+// run time), null (no device, or SCACELITH_AUDIO=null: real-time pace, output discarded, or
+// streamed to a WAV file when SCACELITH_AUDIO_DUMP=<path.wav> is set).
 // Implemented by the audio work package. Thread-safe API (the mixer runs on its own thread):
 // play/playUI/setListener/volumes may be called from any thread at any time. play/playUI are no-ops
 // before init(); setListener and the volume/ambience setters (setVoiceVolume too) are stored and
@@ -51,7 +52,8 @@ const char* sfxName(Sfx s);
 
 // Starts the device + mixer thread. Returns false (and stays silent) when no output device could
 // be opened; the API stays safe to call either way. On Windows the backend keeps retrying in the
-// background (device unplugged / default device changed / no device at start-up).
+// background (device unplugged / default device changed / no device at start-up); on Linux the
+// ALSA backend reopens a device it lost, and without any device the null backend runs (silent).
 bool init();
 void shutdown();
 
@@ -165,7 +167,7 @@ struct Stats {
     int activeVoices = 0;
     int activeSpeech = 0;       // speech voices holding a voice (open, not yet Finished/Stopped)
     float cpuLoad = 0.0f;       // mixer time / real time, one core (0.01 = 1 %)
-    unsigned underruns = 0;     // device glitches detected (WASAPI)
+    unsigned underruns = 0;     // device glitches detected (WASAPI, ALSA)
     unsigned deviceRestarts = 0;
 };
 Stats stats();
