@@ -369,8 +369,8 @@ artifact, for testing. CodeQL (`.github/workflows/codeql.yml`) scans the shipped
 (without `third_party/` and `tests/`) and the workflows; its alerts are in the Security tab.
 
 The version is set in `cmake/version.cmake`: `SCACELITH_VERSION_CORE` (`1.0.0`) and, for a
-pre-release, `SCACELITH_VERSION_PRERELEASE` (`beta.1`); `cmake -P cmake/version.cmake` prints it
-in full. Pushing the tag `v` + that version (`v1.0.0-beta.1`) publishes a release: the release
+pre-release, `SCACELITH_VERSION_PRERELEASE` (`beta.2`); `cmake -P cmake/version.cmake` prints it
+in full. Pushing the tag `v` + that version (`v1.0.0-beta.2`) publishes a release: the release
 workflow (`.github/workflows/release.yml`) checks that the tag matches the version, runs the CI
 again on the tagged commit, builds the Windows game from scratch (no compiler cache), attests its
 build provenance with actions/attest and publishes a GitHub release (a pre-release when the version
@@ -380,7 +380,7 @@ workflow builds the same files and keeps them as workflow artifacts without publ
 unless it runs on a tag with "Publish" ticked. To check a downloaded file with the GitHub CLI:
 
 ```sh
-gh attestation verify Scacelith-1.0.0-beta.1-windows-x64.zip --repo DarkCenobyte/scacelith-chess
+gh attestation verify Scacelith-1.0.0-beta.2-windows-x64.zip --repo DarkCenobyte/scacelith-chess
 ```
 
 Dependabot (`.github/dependabot.yml`) keeps the actions the workflows use up to date (pinned by
