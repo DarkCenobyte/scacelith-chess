@@ -1,0 +1,648 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — 照片级写实的第一人称国际象棋",
+      "description": "免费的照片级写实国际象棋，适用于 Windows：在皇家大厅里以第一人称对弈，Stockfish 19、教练和在线对手等你挑战。"
+    },
+    "players": {
+      "title": "排行榜和棋手 — Scacelith",
+      "description": "Scacelith 官方服务器上每种用时的顶尖棋手、他们的等级分和最近的对局。"
+    },
+    "account": {
+      "title": "你的账号 — Scacelith",
+      "description": "登录你的 Scacelith 账号：等级分、对局记录、PGN 和 GIF 下载、已登录的设备以及设置。"
+    },
+    "gif": {
+      "title": "GIF 动图 — Scacelith",
+      "description": "一局 Scacelith 对局的 GIF 动图。"
+    }
+  },
+  "brand": {
+    "tagline": "王者的游戏"
+  },
+  "nav": {
+    "skip": "跳到正文",
+    "home": "首页",
+    "label": "主菜单",
+    "game": "游戏",
+    "modes": "游戏模式",
+    "gallery": "截图",
+    "trailer": "预告片",
+    "online": "在线",
+    "players": "排行榜",
+    "account": "账号",
+    "language": "语言",
+    "menu": "菜单",
+    "download": "下载"
+  },
+  "hero": {
+    "image_alt": "在洒满阳光的大理石大厅里，两个瓷制机器人正在胡桃木桌前下国际象棋。",
+    "eyebrow": "公测版",
+    "lead": "走进洒满阳光的皇家大厅，在打过蜡的胡桃木桌前落座。棋盘对面，一个由 Stockfish 驱动的瓷制机器人正等着你走出第一步。",
+    "watch": "观看预告片",
+    "meta": "自由软件 · Windows 64 位 · 支持 OpenGL 4.6 的显卡",
+    "caption": "游戏内截图：标题画面"
+  },
+  "highlights": {
+    "engine": "自主开发的 OpenGL 4.6 引擎",
+    "stockfish": "内置 Stockfish 19",
+    "rules": "FIDE 等级分",
+    "online": "在线对局",
+    "languages": "十种语言"
+  },
+  "experience": {
+    "eyebrow": "体验",
+    "title": "不是屏幕上的棋盘。<br><em>而是棋桌前的一席之地。</em>",
+    "lead": "Scacelith 重现了真实对局的种种要素：大厅、寂静、棋钟、注视着你的对手，以及锦标赛的仪式感。",
+    "presence": {
+      "title": "第一人称视角",
+      "text": "你透过自己机器人的双眼观看一切。环顾大厅，俯身靠近棋盘，抬头看向对手，或瞥一眼身旁的对局记录表。"
+    },
+    "ritual": {
+      "title": "比赛规则",
+      "text": "摸子即须走子。你的手按下棋钟，这步棋才算完成。一旦走出违例着法，裁判就会出面；第二次违例即判负。"
+    },
+    "scoresheet": {
+      "title": "亲笔记录",
+      "text": "双方棋手都在各自的记录表上记下每一步棋，各有各的笔迹，每满四十回合翻一页。你能听见笔尖在纸上沙沙作响。"
+    },
+    "opponent": {
+      "title": "旗鼓相当的对手",
+      "text": "与你水平相当的 Stockfish 19，从新手（800）到满级（3500），每局结束后都按 FIDE 规则计算等级分。"
+    },
+    "engine": {
+      "title": "为本作量身打造",
+      "text": "从零编写的引擎：基于物理的光照，大理石、打蜡的木材、瓷与黄铜，透窗而入的阳光，柔和的阴影与反射。"
+    },
+    "languages": {
+      "title": "十种语言",
+      "text": "英语、法语、德语、西班牙语、乌克兰语、俄语、阿拉伯语、日语，以及简体和繁体中文。阿拉伯语采用从右到左的排版。"
+    }
+  },
+  "modes": {
+    "eyebrow": "游戏模式",
+    "title": "每一局棋，<br><em>自有一方棋桌。</em>",
+    "lead": "所有对局都在同一座大厅中进行，从标题画面即可开始。即使离线，Stockfish 也随时准备与你对弈。",
+    "new_game": {
+      "name": "新对局",
+      "text": "以你选择的棋力挑战 Stockfish，用时从子弹棋到慢棋任选；也可以在同一台电脑上与朋友对弈，双方各自以自己机器人的视角下棋。"
+    },
+    "coach": {
+      "name": "教练",
+      "text": "一位老师坐在你对面，以你的水平与你对弈，并为你讲解棋局：威胁、好棋、失误。从国际象棋规则到专家水平，配有合成语音（英语发音，附中文字幕）。"
+    },
+    "online": {
+      "name": "在线对局",
+      "text": "通过 Scacelith 服务器与真人对手对弈：计分对局、匹配对手、挑战和私人对局。对手的机器人会实时同步其一举一动。"
+    },
+    "watch": {
+      "name": "观看对局",
+      "text": "两个 Stockfish 相互对弈，而你隐身其间，在大厅中自由穿行，从一个视角切换到另一个视角。"
+    },
+    "saved": {
+      "name": "已保存的对局",
+      "text": "你的对局会保存为 PGN 文件。可以在大厅中重播，还原真实的思考时间和棋钟；也可以导入其他程序中的对局。"
+    }
+  },
+  "gallery": {
+    "eyebrow": "截图",
+    "title": "从<em>大厅之内</em>望去",
+    "lead": "每一幅画面都截取自游戏，由其自身的引擎实时渲染。",
+    "title_screen": {
+      "alt": "标题画面：Scacelith 的菜单旁，两个机器人正在大厅里下国际象棋。",
+      "caption": "标题画面"
+    },
+    "hall": {
+      "alt": "高大的窗户下，两个机器人坐在红色天鹅绒椅子上，隔着棋盘相对。",
+      "caption": "皇家大厅"
+    },
+    "board": {
+      "alt": "俯视棋盘，旁边是棋钟，一只机器人的手正伸向一枚棋子。",
+      "caption": "棋盘前"
+    },
+    "opponent": {
+      "alt": "瓷制机器人对手的特写，它正低头看着棋盘。",
+      "caption": "你的对手"
+    },
+    "scoresheet": {
+      "alt": "一只机器人的手正用钢笔在记录表上写下着法。",
+      "caption": "对局记录表"
+    },
+    "note": "开发版本。图中的界面为法语。",
+    "viewer": "图片查看器",
+    "close": "关闭",
+    "previous": "上一张图片",
+    "next": "下一张图片"
+  },
+  "trailer": {
+    "eyebrow": "预告片",
+    "title": "Scacelith <em>动态影像</em>",
+    "play": "播放预告片",
+    "soon_title": "预告片即将推出",
+    "soon_text": "在那之前，不妨先入座：测试版已可下载。",
+    "privacy": "点击播放后，视频才会由 YouTube（youtube-nocookie.com）播放。",
+    "open_youtube": "在 YouTube 上观看"
+  },
+  "online": {
+    "eyebrow": "在线",
+    "title": "真实的对手，<br><em>同一座大厅。</em>",
+    "lead": "在游戏中登录官方服务器，与来自世界各地的棋手对弈，依然是第一人称视角。",
+    "point_rated": "所有官方用时均可进行计分对局，每种用时各有一个 FIDE 等级分。",
+    "point_match": "匹配对手、按用户名发起挑战、凭代码进行私人对局，以及两台电脑之间的直连对局。",
+    "point_fair": "公平对弈：自动检查、由引擎分析已结束的对局，以及棋手举报。",
+    "point_history": "在本网站查看你的对局记录：每局都可下载为 PGN 或 GIF 动图。",
+    "point_open": "任何人都可以运行社区服务器：服务器及其 API 都是自由软件。",
+    "create": "创建账号",
+    "signin": "登录",
+    "server_title": "官方服务器",
+    "status_checking": "正在检查…",
+    "address": "地址",
+    "registration": "注册",
+    "categories": "计分用时",
+    "top_players": "顶尖棋手",
+    "category": "用时",
+    "board_loading": "正在加载排行榜…",
+    "full_board": "完整排行榜"
+  },
+  "download": {
+    "button": "下载",
+    "choose": "选择你的系统",
+    "see_release": "在 GitHub 上查看发行版",
+    "latest": "Scacelith",
+    "all_releases": "全部发行版",
+    "eyebrow": "下载",
+    "title": "请入座。<br><em>免费，而且开源。</em>",
+    "lead": "无需安装：下载、解压，然后运行 Scacelith.exe。每个文件都由 GitHub Actions 根据对应标签的源代码构建，并附有构建来源证明。",
+    "prerelease": "测试版",
+    "notes": "发行说明",
+    "req_system": "系统",
+    "req_system_value": "Windows 64 位（x64）",
+    "req_gpu": "显卡",
+    "req_gpu_value": "支持 OpenGL 4.6 的显卡及最新驱动程序",
+    "req_included": "内含",
+    "req_included_value": "Stockfish 19 及其神经网络：开箱即可离线对弈",
+    "req_network": "网络",
+    "req_network_value": "用于在线对局、GIF 和教练语音（可选下载，约 145 MB）",
+    "req_licence": "许可证",
+    "req_licence_value": "GNU 通用公共许可证第 3 版",
+    "verify_title": "校验下载的文件",
+    "verify_text": "每个文件的构建来源都经过 GitHub 证明。使用 GitHub CLI 校验：",
+    "checksums": "SHA-256 校验和（SHA256SUMS）"
+  },
+  "credits": {
+    "eyebrow": "制作人员",
+    "title": "制作人员与<em>致谢</em>",
+    "engine_head": "国际象棋引擎",
+    "engine": "Stockfish 19，由 Stockfish 开发者制作（GNU GPL v3）。其神经网络使用 Leela Chess Zero 项目提供的数据训练（开放数据库许可协议）。",
+    "voice_head": "教练语音",
+    "voice": "教练模式的合成语音由 Supertonic 3 生成。Supertonic 3 是 Supertone 公司的模型，依据 OpenRAIL-M 许可证使用。",
+    "fonts_head": "字体",
+    "fonts": "Georg Duffner 设计的 EB Garamond、Natanael Gama 设计的 Cinzel 和 Khaled Hosny 设计的 Amiri，均采用 SIL Open Font License；棋子符号来自 GNU FreeFont。",
+    "openings_head": "开局",
+    "openings": "开局名称来自 lichess.org 的 chess-openings 数据库，已贡献至公有领域（CC0）。",
+    "quote": "“国际象棋是分析的艺术。”",
+    "quote_author": "米哈伊尔·博特温尼克"
+  },
+  "footer": {
+    "about": "一款以第一人称视角游玩的照片级写实国际象棋游戏，运行于自主开发的 OpenGL 4.6 引擎。采用 GNU GPL v3 许可的自由软件。",
+    "game": "游戏",
+    "online": "在线",
+    "api_docs": "服务器 API 文档",
+    "source": "源代码",
+    "game_source": "GitHub 上的游戏",
+    "server_source": "GitHub 上的服务器",
+    "releases": "发行版",
+    "licence": "许可证（GPL v3）",
+    "credits": "Stockfish 是其开发者的商标。YouTube 是 Google LLC 的商标。Windows 是 Microsoft Corporation 的商标。",
+    "legal": "Scacelith",
+    "made": "本网站不使用 Cookie，也不使用任何跟踪器。"
+  },
+  "common": {
+    "copy": "复制",
+    "loading": "正在加载…",
+    "noscript": "此页面需要 JavaScript 才能与 Scacelith 服务器通信。"
+  },
+  "players": {
+    "title": "排行榜和棋手",
+    "lead": "官方服务器上每种计分用时的顶尖棋手。查找任意棋手，即可查看其等级分和最近的对局。",
+    "search_label": "查找棋手",
+    "search_placeholder": "用户名",
+    "search_button": "搜索",
+    "back": "返回排行榜",
+    "recent_games": "最近的对局",
+    "board_title": "排行榜",
+    "category": "用时",
+    "col_rank": "排名",
+    "col_player": "棋手",
+    "col_rating": "等级分",
+    "col_peak": "最高分",
+    "col_games": "局数",
+    "col_wdl": "胜 / 和 / 负",
+    "loading": "正在加载…"
+  },
+  "account": {
+    "title": "你的账号",
+    "auth_foot": "官方服务器上的同一个账号，可同时用于游戏和本网站。在游戏中用 Google 创建了账号？请使用“忘记密码？”为它设置密码。",
+    "common": {
+      "back": "返回登录"
+    },
+    "fields": {
+      "login": "用户名或电子邮箱",
+      "password": "密码",
+      "show_password": "显示密码",
+      "username": "用户名",
+      "email": "电子邮箱",
+      "confirm_password": "确认密码",
+      "current_password": "当前密码",
+      "new_password": "新密码",
+      "new_email": "新的电子邮箱地址",
+      "mfa_code": "双重验证码（或恢复码）"
+    },
+    "signin": {
+      "tab": "登录",
+      "title": "欢迎回来",
+      "remember": "在此设备上保持登录",
+      "submit": "登录",
+      "forgot": "忘记密码？",
+      "resend": "重新发送确认邮件"
+    },
+    "mfa": {
+      "title": "双重验证",
+      "text": "请输入身份验证器应用中的 6 位验证码。",
+      "code": "应用中的验证码",
+      "use_recovery": "改用恢复码",
+      "submit": "确认"
+    },
+    "register": {
+      "tab": "创建账号",
+      "title": "免费账号",
+      "closed": "服务器目前不接受新账号注册。",
+      "username_hint": "可使用字母、数字、_ 和 -，须以字母或数字开头。",
+      "password_hint": "至少 10 个字符，不得包含你的用户名或电子邮箱。",
+      "pow_note": "为防范机器人，你的浏览器会在注册时解一道小谜题，只需几秒钟。",
+      "submit": "创建账号",
+      "done_title": "请查收邮件",
+      "done_text": "我们已向你的邮箱发送了一个确认链接。打开链接即可创建账号，然后登录。",
+      "done_hint": "该链接 24 小时内有效。收件箱里没有？请检查垃圾邮件文件夹，或重新获取邮件。",
+      "go_signin": "前往登录"
+    },
+    "forgot": {
+      "title": "忘记密码",
+      "text": "请输入你账号的电子邮箱地址。如果有账号使用该地址，我们会向你发送一个用于设置新密码的链接，有效期为一小时。",
+      "submit": "发送链接"
+    },
+    "resend": {
+      "title": "确认你的电子邮箱",
+      "text": "没有收到确认邮件，或者链接已过期？输入你的邮箱地址即可获取新的链接。",
+      "submit": "重新发送"
+    },
+    "dash": {
+      "public_profile": "公开资料",
+      "signout": "退出登录",
+      "tab_overview": "概览",
+      "tab_games": "对局",
+      "tab_devices": "设备",
+      "tab_settings": "设置"
+    },
+    "overview": {
+      "info": "你的信息",
+      "ratings": "你的等级分",
+      "sanctions": "处罚",
+      "recent": "最近的对局",
+      "all_games": "你的全部对局"
+    },
+    "games": {
+      "filter_category": "用时",
+      "all": "全部",
+      "custom": "自定义",
+      "filter_rated": "类型",
+      "rated": "计分",
+      "casual": "不计分",
+      "filter_result": "结果",
+      "wins": "胜",
+      "losses": "负",
+      "draws": "和"
+    },
+    "devices": {
+      "title": "已登录的设备",
+      "signout_all": "全部退出登录",
+      "text": "每次登录（无论在游戏中还是在本网站）都算作一台设备。请将你不认识的设备退出登录。"
+    },
+    "settings": {
+      "challenges_title": "挑战",
+      "challenges_text": "其他棋手可以在游戏中按用户名向你发起挑战。",
+      "challenges_label": "接受挑战",
+      "mfa_title": "双重验证",
+      "mfa_text": "请在游戏的账号页面中开启或关闭双重验证，或生成新的恢复码。",
+      "password_title": "修改密码",
+      "password_text": "你的其他设备将退出登录，当前设备保持登录。",
+      "password_submit": "修改密码",
+      "email_title": "修改电子邮箱地址",
+      "email_submit": "发送确认链接",
+      "export_title": "下载我的数据",
+      "export_text": "服务器保存的与你账号有关的全部信息，打包为一个 JSON 文件。",
+      "export_submit": "下载我的数据",
+      "delete_title": "删除账号",
+      "delete_text": "此操作无法撤销。你的对局和等级分将以匿名名称保留；你的电子邮箱地址、密码和设备将被清除。",
+      "delete_confirm": "输入你的用户名以确认",
+      "delete_submit": "删除我的账号"
+    }
+  },
+  "gif": {
+    "title": "GIF 动图",
+    "preparing": "正在准备 GIF…",
+    "download": "下载 GIF",
+    "make": "制作 GIF",
+    "pause": "暂停动画",
+    "back": "返回我的对局",
+    "options": "选项",
+    "size": "尺寸",
+    "size_small": "小（284 × 350）",
+    "size_medium": "中（424 × 515）",
+    "size_large": "大（628 × 762）",
+    "orientation": "棋盘视角",
+    "orientation_white": "白方",
+    "orientation_black": "黑方",
+    "speed": "速度",
+    "speed_fast": "快（每步 0.25 秒）",
+    "speed_normal": "正常（每步 0.5 秒）",
+    "speed_slow": "慢（每步 1 秒）",
+    "speed_very_slow": "很慢（每步 2 秒）",
+    "coords": "显示坐标",
+    "regenerate": "重新生成",
+    "note": "每个 GIF 都由服务器绘制。已生成过的 GIF 会立即返回；新的 GIF 每分钟只能生成几个。"
+  },
+  "notfound": {
+    "title": "页面未找到",
+    "text": "这个格子是空的。页面可能已经移到别处。",
+    "home": "返回 Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "正在加载…",
+      "retry": "重试",
+      "close": "关闭",
+      "copy": "复制",
+      "copied": "已复制到剪贴板。",
+      "copy_failed": "无法复制。请选中文本后手动复制。",
+      "load_more": "显示更多",
+      "show_password": "显示密码",
+      "hide_password": "隐藏密码",
+      "signin_needed": "请登录后继续。",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "无法连接服务器。请检查你的网络连接后重试。",
+      "timeout": "服务器响应超时。请重试。",
+      "server_busy": "服务器繁忙。请稍后重试。",
+      "rate_limited": "请求过多。请在 {time}后重试。",
+      "rate_limited_short": "请求过多。请稍后重试。",
+      "internal_error": "服务器发生意外错误。请稍后再试。",
+      "invalid_token": "你的会话已失效。请重新登录。",
+      "unauthorized": "请先登录。",
+      "not_found": "未找到。",
+      "unknown": "出现问题（{code}）。",
+      "invalid_credentials": "用户名、电子邮箱或密码错误。",
+      "too_many_attempts": "尝试次数过多。请在 {time}后重试。",
+      "banned": "此账号已被封禁至 {date}。",
+      "banned_permanent": "此账号已被封禁。",
+      "email_unverified": "你的电子邮箱地址尚未确认。请打开我们发送给你的链接，或重新获取一个。",
+      "invalid_mfa_token": "此登录步骤已过期。请重新登录。",
+      "invalid_code": "验证码错误或已被使用。",
+      "mfa_code_required": "请输入你的双重验证码。",
+      "invalid_password": "密码错误。",
+      "password_not_set": "此账号尚未设置密码：请在登录页面使用“忘记密码？”来设置。",
+      "registration_closed": "服务器目前不接受新账号注册。",
+      "invalid_username": "不允许使用此用户名。",
+      "username_taken": "此用户名已被占用。",
+      "invalid_email": "此电子邮箱地址无效。",
+      "email_taken": "此电子邮箱地址已被其他账号使用。",
+      "same_email": "这已经是你的电子邮箱地址。",
+      "weak_password": "此密码强度太弱。",
+      "weak_too_short": "密码太短（至少 {min} 个字符）。",
+      "weak_too_long": "密码太长。",
+      "weak_contains_username": "密码不得包含你的用户名。",
+      "weak_contains_email": "密码不得包含你的电子邮箱地址。",
+      "weak_too_common": "此密码太常见。请换一个。",
+      "pow_failed": "人机验证失败。请重试。",
+      "passwords_differ": "两次输入的密码不一致。",
+      "required": "请填写此字段。",
+      "email_format": "请输入有效的电子邮箱地址。",
+      "username_format": "{min} 到 {max} 个字符：字母、数字、_ 和 -，须以字母或数字开头。",
+      "password_length": "至少 {min} 个字符。",
+      "confirm_name": "请完全按照所示输入你的用户名。",
+      "game_too_long": "此对局太长，无法制作成 GIF。",
+      "gif_disabled": "此服务器不提供 GIF 制作。",
+      "render_failed": "服务器无法绘制此 GIF。",
+      "invalid_game": "此对局不存在。",
+      "invalid_player": "请输入用户名：2 到 24 个字符，可使用字母、数字、_、. 或 -。",
+      "player_not_found": "找不到此名称的棋手。"
+    },
+    "time": {
+      "seconds": {
+        "other": "{count} 秒"
+      },
+      "minutes": {
+        "other": "{count} 分钟"
+      }
+    },
+    "download": {
+      "exe": "可执行文件",
+      "zip": "ZIP 压缩包",
+      "file": "文件",
+      "unavailable": "不可用",
+      "your_system": "你的系统",
+      "eyebrow_beta": "公测版 · {version}",
+      "eyebrow_release": "版本 {version}",
+      "published": "发布于 {date}",
+      "unreachable": "目前无法连接 GitHub：请查看发行版页面。",
+      "available": "可下载",
+      "verify_file": "该文件",
+      "no_build": "目前还没有适用于 {os} 的游戏版本。",
+      "prerelease_short": "测试版",
+      "x64": "64 位（x64）"
+    },
+    "server": {
+      "online": "在线",
+      "offline": "无法连接",
+      "open": "开放",
+      "closed": "关闭",
+      "updated": "最后更新：{time}",
+      "min_games": "此用时下计分对局不少于 {count} 局的棋手。",
+      "empty": "此用时下暂无上榜棋手。",
+      "error": "目前无法加载排行榜。"
+    },
+    "game": {
+      "number": "第 {id} 局",
+      "white": "白方",
+      "black": "黑方",
+      "you": "你",
+      "vs": "对",
+      "outcome_win": "胜",
+      "outcome_loss": "负",
+      "outcome_draw": "和",
+      "outcome_aborted": "已中止",
+      "result_white": "白方胜",
+      "result_black": "黑方胜",
+      "result_draw": "和棋",
+      "result_aborted": "已中止",
+      "rated": "计分",
+      "casual": "不计分",
+      "custom": "自定义",
+      "moves": {
+        "other": "{count} 回合"
+      },
+      "duration": "时长 {time}",
+      "rating_diff": "等级分变化 {diff}",
+      "pgn": "PGN",
+      "pgn_title": "下载此对局的 PGN",
+      "copy_pgn": "复制",
+      "copy_pgn_title": "复制 PGN",
+      "gif": "GIF",
+      "gif_title": "制作 GIF 动图（在新标签页中打开）",
+      "gif_signin": "登录后即可制作 GIF",
+      "pgn_copied": "PGN 已复制到剪贴板。",
+      "pgn_saved": "PGN 已下载。",
+      "none": "暂无对局。你的在线对局将显示在这里。",
+      "none_filtered": "没有符合这些筛选条件的对局。",
+      "none_public": "暂无对局。",
+      "total": {
+        "other": "共 {count} 局"
+      },
+      "termination_unknown": "对局结束",
+      "reason": {
+        "1": "将死",
+        "2": "认输",
+        "3": "超时判负",
+        "4": "第二次违例着法（判负）",
+        "5": "逼和",
+        "6": "死局面（子力不足）",
+        "7": "超时，但对方无法将死",
+        "8": "五次重复局面",
+        "9": "七十五回合规则",
+        "10": "三次重复局面（提出要求）",
+        "11": "五十回合规则（提出要求）",
+        "12": "协议和棋",
+        "13": "第二次违例着法，但对方无法将死",
+        "20": "离开对局（断线时间过长）",
+        "21": "离开对局，但对方无法将死",
+        "22": "对局中止",
+        "23": "未按时走出第一步（中止）",
+        "24": "违规判负（违反公平对弈）",
+        "25": "被服务器中止",
+        "26": "双方均已断开连接"
+      }
+    },
+    "ratings": {
+      "category": "用时",
+      "rating": "等级分",
+      "peak": "最高分",
+      "games": "局数",
+      "wdl": "胜 / 和 / 负",
+      "provisional": "暂定等级分",
+      "none": "尚无计分对局。",
+      "unrated_hint": "问号表示暂定等级分（已下对局尚少）。"
+    },
+    "account": {
+      "member_since": "注册于 {date}",
+      "last_login": "上次登录",
+      "created": "创建时间",
+      "email": "电子邮箱",
+      "pending_email": "等待确认：{email}",
+      "verified": "已确认",
+      "unverified": "未确认",
+      "mfa": "双重验证",
+      "mfa_on": "已开启",
+      "mfa_off": "未开启",
+      "google": "Google 登录",
+      "google_on": "已关联",
+      "google_off": "未关联",
+      "password": "密码",
+      "password_set": "已设置",
+      "password_unset": "尚未设置",
+      "challenges": "挑战",
+      "challenges_all": "接受",
+      "challenges_none": "拒绝",
+      "badge_verified": "邮箱已确认",
+      "badge_mfa": "已开启双重验证",
+      "badge_google": "Google",
+      "ban_until": "你的账号已被封禁至 {date}。",
+      "ban_permanent": "你的账号已被封禁。",
+      "sanction_ban": "封禁",
+      "sanction_mm_block": "禁止匹配",
+      "sanction_warning": "警告",
+      "sanction_until": "至 {date}",
+      "sanction_permanent": "永久",
+      "devices_current": "当前设备",
+      "devices_unknown": "未命名设备",
+      "devices_signed_in": "登录于 {date}",
+      "devices_seen": "上次使用：{time}",
+      "devices_expires": "{date}到期",
+      "devices_revoke": "退出登录",
+      "devices_revoked": "该设备已退出登录。",
+      "devices_none": "没有其他设备。",
+      "signout_all_confirm": "要让所有设备（包括当前设备）退出登录吗？",
+      "signed_out": "你已退出登录。",
+      "signed_in": "欢迎，{name}。",
+      "prefs_saved": "已保存。",
+      "password_changed": "你的密码已修改。你的其他设备已退出登录。",
+      "email_sent": "确认链接已发送至新地址。打开链接后，你的地址才会更改。",
+      "email_changed": "你的电子邮箱地址已更改为 {email}。",
+      "email_current": "当前地址：{email}。",
+      "email_pending": "改为 {email} 的请求尚未确认：请打开发送到该地址的链接。",
+      "export_done": "你的数据已下载。",
+      "deleted": "你的账号已删除。",
+      "delete_confirm_label": "输入 {name} 以确认",
+      "register_done": "我们已向 {email} 发送确认链接。打开链接即可创建账号，然后登录。",
+      "register_ready": "你的账号已就绪，现在可以登录了。",
+      "forgot_done": "如果有账号使用此地址，设置新密码的链接已发往该地址。",
+      "resend_done": "如果此地址正在等待确认，新的确认链接已发往该地址。",
+      "pow_solving": "正在解答人机验证谜题…",
+      "mfa_recovery": "恢复码",
+      "mfa_recovery_text": "请输入你的一个恢复码。每个恢复码只能使用一次。",
+      "mfa_app": "应用中的验证码",
+      "mfa_app_text": "请输入身份验证器应用中的 6 位验证码。",
+      "mfa_state_on": "此账号已开启双重验证。",
+      "mfa_state_off": "此账号未开启双重验证。",
+      "client_label": "Scacelith 网站（{browser}）",
+      "username": "用户名",
+      "password_rules": "至少 {min} 个字符，不得包含你的用户名或电子邮箱。",
+      "password_note": "你的其他设备将退出登录，当前设备保持登录。",
+      "signin_label": "登录"
+    },
+    "players": {
+      "since": "注册于 {date}",
+      "games": "局数",
+      "rated": "计分对局",
+      "wins": "胜局",
+      "draws": "和局",
+      "losses": "负局",
+      "view": "查看 {name} 的资料",
+      "you": "你",
+      "board": "排行榜"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "第 {id} 局 · {date}",
+      "preparing": "正在准备 GIF…",
+      "rendering": "服务器正在绘制 GIF。较长的对局可能需要几秒钟…",
+      "ready": "你的 GIF 已就绪，下载已开始。",
+      "ready_again": "你的 GIF 已就绪。",
+      "signin": "登录后即可为你的对局制作 GIF。",
+      "signin_button": "登录",
+      "missing": "未选择对局。",
+      "retry_in": "你可以在 {time}后重试。",
+      "confirm": "点击“制作 GIF”，服务器将以你的账号绘制这局对局。",
+      "retry_now": "现在可以重试了。"
+    },
+    "home": {
+      "create_account": "创建账号",
+      "my_account": "我的账号",
+      "my_games": "我的对局",
+      "signin": "登录"
+    },
+    "trailer": {
+      "title": "Scacelith 预告片"
+    }
+  }
+}

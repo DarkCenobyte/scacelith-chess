@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="{{v:lang}}" dir="{{v:dir}}" class="no-js" data-page="{{v:page}}" data-root="{{v:root}}" data-api="{{v:api}}" data-repo="{{v:repo}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="{{v:csp}}">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#100e0b">
+<title>{{v:title}}</title>
+<meta name="description" content="{{v:description}}">
+<meta name="robots" content="{{v:robots}}">
+<link rel="canonical" href="{{v:canonical}}">
+{{r:alternates}}
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Scacelith">
+<meta property="og:title" content="{{v:title}}">
+<meta property="og:description" content="{{v:description}}">
+<meta property="og:url" content="{{v:canonical}}">
+<meta property="og:image" content="{{v:og_image}}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{t:hero.image_alt}}">
+<meta property="og:locale" content="{{v:og_locale}}">
+{{r:og_alternates}}
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="{{v:root}}assets/icons/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" sizes="192x192" href="{{v:root}}assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="{{v:root}}assets/icons/apple-touch-icon.png">
+<link rel="preload" href="{{v:root}}assets/fonts/cinzel-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{v:root}}assets/css/site.css">
+<script src="{{v:root}}assets/js/boot.js"></script>
+{{r:head_extra}}
+</head>
+<body>
+<a class="skip-link" href="#main">{{t:nav.skip}}</a>
+{{> icons}}
+{{> header}}
+<main id="main" tabindex="-1">
+{{r:content}}
+</main>
+{{> footer}}
+<div class="toasts" data-toasts aria-live="polite" aria-atomic="false"></div>
+<script type="application/json" id="i18n">{{r:i18n_json}}</script>
+<script type="application/json" id="release-fallback">{{r:release_json}}</script>
+<script src="{{v:root}}config.js"></script>
+<script type="module" src="{{v:root}}assets/js/{{v:page}}.js"></script>
+</body>
+</html>

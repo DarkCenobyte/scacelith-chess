@@ -1,0 +1,16 @@
+<details class="menu download-menu" data-menu data-download-menu>
+  <summary class="btn btn-gold download-summary">
+    <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>
+    <span class="download-label">{{t:download.button}}</span>
+    <svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"></use></svg>
+  </summary>
+  <div class="menu-panel download-panel">
+    <p class="menu-title">{{t:download.choose}}</p>
+    <ul class="os-list" data-os-list>
+      <li><a class="os-item" href="{{v:releases_url}}" data-os="windows"><svg class="icon os-icon" aria-hidden="true"><use href="#i-windows"></use></svg><span class="os-text"><span class="os-name">Windows</span><span class="os-meta">{{t:download.see_release}}</span></span></a></li>
+      <li><a class="os-item" href="{{v:releases_url}}" data-os="macos"><svg class="icon os-icon" aria-hidden="true"><use href="#i-apple"></use></svg><span class="os-text"><span class="os-name">macOS</span><span class="os-meta">{{t:download.see_release}}</span></span></a></li>
+      <li><a class="os-item" href="{{v:releases_url}}" data-os="linux"><svg class="icon os-icon" aria-hidden="true"><use href="#i-linux"></use></svg><span class="os-text"><span class="os-name">Linux</span><span class="os-meta">{{t:download.see_release}}</span></span></a></li>
+    </ul>
+    <p class="menu-foot"><span data-release-label>{{t:download.latest}}</span> · <a href="{{v:releases_url}}" data-release-link>{{t:download.all_releases}}</a></p>
+  </div>
+</details>

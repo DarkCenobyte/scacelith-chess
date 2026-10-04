@@ -1,0 +1,652 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — photorealistic chess, played in first person",
+      "description": "Free photorealistic chess for Windows, played in first person in a royal hall: Stockfish 19, a coach and online opponents await you."
+    },
+    "players": {
+      "title": "Leaderboard and players — Scacelith",
+      "description": "The best players of the official Scacelith server in every time control, their ratings and their latest games."
+    },
+    "account": {
+      "title": "Your account — Scacelith",
+      "description": "Sign in to your Scacelith account: ratings, game history, PGN and GIF downloads, signed-in devices and settings."
+    },
+    "gif": {
+      "title": "Animated GIF — Scacelith",
+      "description": "An animated GIF of a Scacelith game."
+    }
+  },
+  "brand": {
+    "tagline": "The Royal Game"
+  },
+  "nav": {
+    "skip": "Skip to content",
+    "home": "Home",
+    "label": "Main menu",
+    "game": "The game",
+    "modes": "Ways to play",
+    "gallery": "Gallery",
+    "trailer": "Trailer",
+    "online": "Online",
+    "players": "Leaderboard",
+    "account": "Account",
+    "language": "Language",
+    "menu": "Menu",
+    "download": "Download"
+  },
+  "hero": {
+    "image_alt": "Two porcelain robots play chess at a walnut table in a sunlit marble hall.",
+    "eyebrow": "Public beta",
+    "lead": "Take your seat at a waxed walnut table in a sunlit royal hall. Across the board, a porcelain robot driven by Stockfish waits for your first move.",
+    "watch": "Watch the trailer",
+    "meta": "Free software · Windows 64-bit · Graphics card with OpenGL 4.6",
+    "caption": "Captured in the game: the title screen"
+  },
+  "highlights": {
+    "engine": "In-house OpenGL 4.6 engine",
+    "stockfish": "Stockfish 19 built in",
+    "rules": "FIDE ratings",
+    "online": "Online play",
+    "languages": "Ten languages"
+  },
+  "experience": {
+    "eyebrow": "The experience",
+    "title": "Not a board on a screen.<br><em>A seat at the table.</em>",
+    "lead": "Scacelith brings back what makes a real game: the hall, the silence, the clock, an opponent who looks at you, and the rituals of the tournament.",
+    "presence": {
+      "title": "In the first person",
+      "text": "You see through your robot's eyes. Look around the hall, lean towards the board, look up at your opponent, or glance at the scoresheet beside you."
+    },
+    "ritual": {
+      "title": "Tournament rules",
+      "text": "A piece you touch must be moved. Your hand presses the clock to complete the move. An illegal move brings the arbiter, and a second one loses the game."
+    },
+    "scoresheet": {
+      "title": "Written by hand",
+      "text": "Both players record every move on their own scoresheet, each in a handwriting of their own, and turn the page every forty moves. You hear the pen on the paper."
+    },
+    "opponent": {
+      "title": "A worthy opponent",
+      "text": "Stockfish 19 at your level, from Novice (800) to full strength (3500), with a rating computed by the FIDE rules after every game."
+    },
+    "engine": {
+      "title": "Built for this game",
+      "text": "An engine written from scratch: physically based light, marble, waxed wood, porcelain and brass, the sun through the windows, soft shadows and reflections."
+    },
+    "languages": {
+      "title": "Ten languages",
+      "text": "English, French, German, Spanish, Ukrainian, Russian, Arabic, Japanese and Chinese, simplified and traditional. Arabic is laid out right to left."
+    }
+  },
+  "modes": {
+    "eyebrow": "Ways to play",
+    "title": "Every game<br><em>has its table.</em>",
+    "lead": "Everything is played in the same hall, from the title screen. Offline, Stockfish is always ready for a game.",
+    "new_game": {
+      "name": "New Game",
+      "text": "Face Stockfish at the strength of your choice, with a time control from bullet to classical, or play a friend on the same computer, each from their own robot's eyes."
+    },
+    "coach": {
+      "name": "Coach",
+      "text": "A teacher sits across from you, plays at your level and talks you through the game: threats, good moves, mistakes. From the rules of chess to expert level, with a synthesised voice."
+    },
+    "online": {
+      "name": "Play Online",
+      "text": "Real opponents through a Scacelith server: rated games, matchmaking, challenges and private games. Your opponent's robot moves with them, live."
+    },
+    "watch": {
+      "name": "Watch a Game",
+      "text": "Two Stockfish players face each other while you move freely around the hall, invisible, from one viewpoint to another."
+    },
+    "saved": {
+      "name": "Saved Games",
+      "text": "Your games are kept as PGN files. Replay them in the hall, with the real thinking times and clocks, or bring in games from other programs."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Gallery",
+    "title": "Seen from <em>inside the hall</em>",
+    "lead": "Every picture is captured in the game, in real time, by its own engine.",
+    "title_screen": {
+      "alt": "The title screen: the Scacelith menu beside two robots playing chess in the hall.",
+      "caption": "The title screen"
+    },
+    "hall": {
+      "alt": "Two robots face each other across the chessboard, in red velvet chairs, under tall windows.",
+      "caption": "The royal hall"
+    },
+    "board": {
+      "alt": "The board seen from above, with the chess clock and a robot's hand reaching for a piece.",
+      "caption": "At the board"
+    },
+    "opponent": {
+      "alt": "Close-up of the porcelain robot opponent, its head lowered towards the board.",
+      "caption": "Your opponent"
+    },
+    "scoresheet": {
+      "alt": "A robot's hand writes the moves on the scoresheet with a fountain pen.",
+      "caption": "The scoresheet"
+    },
+    "note": "Development build. The interface in these pictures is in French.",
+    "viewer": "Picture viewer",
+    "close": "Close",
+    "previous": "Previous picture",
+    "next": "Next picture"
+  },
+  "trailer": {
+    "eyebrow": "Trailer",
+    "title": "Scacelith <em>in motion</em>",
+    "play": "Play the trailer",
+    "soon_title": "The trailer is coming soon",
+    "soon_text": "In the meantime, take a seat: the beta is ready to download.",
+    "privacy": "The video is played by YouTube (youtube-nocookie.com) once you press play.",
+    "open_youtube": "Watch on YouTube"
+  },
+  "online": {
+    "eyebrow": "Online",
+    "title": "Real opponents,<br><em>the same hall.</em>",
+    "lead": "Sign in to the official server from the game and play people from everywhere, still in the first person.",
+    "point_rated": "Rated games in every official time control, with a FIDE rating for each.",
+    "point_match": "Matchmaking, challenges by name, private games with a code, and direct matches between two computers.",
+    "point_fair": "Fair play: automatic checks, engine analysis of finished games and player reports.",
+    "point_history": "Your game history on this site: download each game as PGN or as an animated GIF.",
+    "point_open": "Anyone can run a community server: the server and its API are free software.",
+    "create": "Create an account",
+    "signin": "Sign in",
+    "server_title": "The official server",
+    "status_checking": "Checking…",
+    "address": "Address",
+    "registration": "Sign-up",
+    "categories": "Rated time controls",
+    "top_players": "Top players",
+    "category": "Time control",
+    "board_loading": "Loading the leaderboard…",
+    "full_board": "Full leaderboard"
+  },
+  "download": {
+    "button": "Download",
+    "choose": "Choose your system",
+    "see_release": "See the release on GitHub",
+    "latest": "Scacelith",
+    "all_releases": "All releases",
+    "eyebrow": "Download",
+    "title": "Take your seat.<br><em>Free, and open source.</em>",
+    "lead": "No installer: download, unzip, and run Scacelith.exe. Every file is built from its tagged source by GitHub Actions, with an attested build provenance.",
+    "prerelease": "Beta",
+    "notes": "Release notes",
+    "req_system": "System",
+    "req_system_value": "Windows, 64-bit (x64)",
+    "req_gpu": "Graphics",
+    "req_gpu_value": "A graphics card with OpenGL 4.6 and an up-to-date driver",
+    "req_included": "Included",
+    "req_included_value": "Stockfish 19 and its neural network: play offline right away",
+    "req_network": "Internet",
+    "req_network_value": "For online play, GIFs, and the coach's voice (an optional download of about 145 MB)",
+    "req_licence": "Licence",
+    "req_licence_value": "GNU General Public License v3",
+    "verify_title": "Check your download",
+    "verify_text": "Each file's build provenance is attested by GitHub. With the GitHub CLI:",
+    "checksums": "SHA-256 checksums (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Credits",
+    "title": "Credits and <em>thanks</em>",
+    "engine_head": "Chess engine",
+    "engine": "Stockfish 19, by the Stockfish developers (GNU GPL v3). Its neural network was trained on data provided by the Leela Chess Zero project (Open Database License).",
+    "voice_head": "Coach voice",
+    "voice": "Synthetic speech generated by Supertonic 3 for Coach Mode. Supertonic 3 is a model by Supertone, used under the OpenRAIL-M licence.",
+    "fonts_head": "Typefaces",
+    "fonts": "EB Garamond by Georg Duffner, Cinzel by Natanael Gama and Amiri by Khaled Hosny (SIL Open Font License); chess figures from GNU FreeFont.",
+    "openings_head": "Openings",
+    "openings": "Opening names from the chess-openings database of lichess.org, dedicated to the public domain (CC0).",
+    "quote": "“Chess is the art of analysis.”",
+    "quote_author": "Mikhail Botvinnik"
+  },
+  "footer": {
+    "about": "A photorealistic chess game played in first person, on an in-house OpenGL 4.6 engine. Free software under the GNU GPL v3.",
+    "game": "The game",
+    "online": "Online",
+    "api_docs": "Server API documentation",
+    "source": "Source code",
+    "game_source": "The game on GitHub",
+    "server_source": "The server on GitHub",
+    "releases": "Releases",
+    "licence": "Licence (GPL v3)",
+    "credits": "Stockfish is a trademark of its developers. YouTube is a trademark of Google LLC. Windows is a trademark of Microsoft Corporation.",
+    "legal": "Scacelith",
+    "made": "This site uses no cookies and no trackers."
+  },
+  "common": {
+    "copy": "Copy",
+    "loading": "Loading…",
+    "noscript": "This page needs JavaScript to talk to the Scacelith server."
+  },
+  "players": {
+    "title": "Leaderboard and players",
+    "lead": "The best players of the official server in each rated time control. Look up any player to see their ratings and latest games.",
+    "search_label": "Find a player",
+    "search_placeholder": "User name",
+    "search_button": "Search",
+    "back": "Back to the leaderboard",
+    "recent_games": "Latest games",
+    "board_title": "Leaderboard",
+    "category": "Time control",
+    "col_rank": "Rank",
+    "col_player": "Player",
+    "col_rating": "Rating",
+    "col_peak": "Peak",
+    "col_games": "Games",
+    "col_wdl": "W / D / L",
+    "loading": "Loading…"
+  },
+  "account": {
+    "title": "Your account",
+    "auth_foot": "One account on the official server, for the game and this site. Created your account with Google in the game? Use “Forgot password?” to give it a password.",
+    "common": {
+      "back": "Back to sign-in"
+    },
+    "fields": {
+      "login": "User name or e-mail",
+      "password": "Password",
+      "show_password": "Show the password",
+      "username": "User name",
+      "email": "E-mail",
+      "confirm_password": "Confirm the password",
+      "current_password": "Current password",
+      "new_password": "New password",
+      "new_email": "New e-mail address",
+      "mfa_code": "Two-factor code (or a recovery code)"
+    },
+    "signin": {
+      "tab": "Sign in",
+      "title": "Welcome back",
+      "remember": "Keep me signed in on this device",
+      "submit": "Sign in",
+      "forgot": "Forgot password?",
+      "resend": "Resend the confirmation e-mail"
+    },
+    "mfa": {
+      "title": "Two-factor authentication",
+      "text": "Enter the 6-digit code from your authenticator app.",
+      "code": "Code from the app",
+      "use_recovery": "Use a recovery code instead",
+      "submit": "Confirm"
+    },
+    "register": {
+      "tab": "Create an account",
+      "title": "A free account",
+      "closed": "The server does not accept new accounts at the moment.",
+      "username_hint": "Letters, digits, _ and -, starting with a letter or a digit.",
+      "password_hint": "At least 10 characters, without your user name or e-mail.",
+      "pow_note": "To keep robots out, your browser solves a small puzzle when you sign up. It takes a few seconds.",
+      "submit": "Create account",
+      "done_title": "Check your e-mail",
+      "done_text": "We sent a confirmation link to your address. Open it to create your account, then sign in.",
+      "done_hint": "The link is valid for 24 hours. Nothing in your inbox? Check your spam folder, or ask for the e-mail again.",
+      "go_signin": "Go to sign-in"
+    },
+    "forgot": {
+      "title": "Forgot password",
+      "text": "Enter the e-mail address of your account. If it has one, we send you a link to choose a new password, valid for one hour.",
+      "submit": "Send the link"
+    },
+    "resend": {
+      "title": "Confirm your e-mail",
+      "text": "Did not get the confirmation e-mail, or did the link expire? Enter your address to get a new one.",
+      "submit": "Send again"
+    },
+    "dash": {
+      "public_profile": "Public profile",
+      "signout": "Sign out",
+      "tab_overview": "Overview",
+      "tab_games": "Games",
+      "tab_devices": "Devices",
+      "tab_settings": "Settings"
+    },
+    "overview": {
+      "info": "Your information",
+      "ratings": "Your ratings",
+      "sanctions": "Sanctions",
+      "recent": "Latest games",
+      "all_games": "All your games"
+    },
+    "games": {
+      "filter_category": "Time control",
+      "all": "All",
+      "custom": "Custom",
+      "filter_rated": "Kind",
+      "rated": "Rated",
+      "casual": "Casual",
+      "filter_result": "Result",
+      "wins": "Won",
+      "losses": "Lost",
+      "draws": "Drawn"
+    },
+    "devices": {
+      "title": "Signed-in devices",
+      "signout_all": "Sign out everywhere",
+      "text": "Each sign-in, in the game or on this site, is a device. Sign out the ones you do not recognise."
+    },
+    "settings": {
+      "challenges_title": "Challenges",
+      "challenges_text": "Other players can challenge you by name from the game.",
+      "challenges_label": "Accept challenges",
+      "mfa_title": "Two-factor authentication",
+      "mfa_text": "Turn it on or off, and make new recovery codes, from the account page of the game.",
+      "password_title": "Change the password",
+      "password_text": "Your other devices are signed out, and this one stays signed in.",
+      "password_submit": "Change the password",
+      "email_title": "Change the e-mail address",
+      "email_submit": "Send the confirmation link",
+      "export_title": "Download my data",
+      "export_text": "Everything the server keeps about your account, in one JSON file.",
+      "export_submit": "Download my data",
+      "delete_title": "Delete the account",
+      "delete_text": "This cannot be undone. Your games and ratings stay, under an anonymous name; your e-mail address, password and devices are erased.",
+      "delete_confirm": "Type your user name to confirm",
+      "delete_submit": "Delete my account"
+    }
+  },
+  "gif": {
+    "title": "Animated GIF",
+    "preparing": "Preparing the GIF…",
+    "download": "Download the GIF",
+    "make": "Make the GIF",
+    "pause": "Pause the animation",
+    "back": "Back to my games",
+    "options": "Options",
+    "size": "Size",
+    "size_small": "Small (284 × 350)",
+    "size_medium": "Medium (424 × 515)",
+    "size_large": "Large (628 × 762)",
+    "orientation": "Board seen from",
+    "orientation_white": "White",
+    "orientation_black": "Black",
+    "speed": "Speed",
+    "speed_fast": "Fast (0.25 s per move)",
+    "speed_normal": "Normal (0.5 s per move)",
+    "speed_slow": "Slow (1 s per move)",
+    "speed_very_slow": "Very slow (2 s per move)",
+    "coords": "Show the coordinates",
+    "regenerate": "Make it again",
+    "note": "The server draws each GIF. A GIF you already made comes back at once; new ones are limited to a few per minute."
+  },
+  "notfound": {
+    "title": "Page not found",
+    "text": "This square is empty. The page may have moved.",
+    "home": "Back to Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "Loading…",
+      "retry": "Try again",
+      "close": "Close",
+      "copy": "Copy",
+      "copied": "Copied to the clipboard.",
+      "copy_failed": "Could not copy. Select the text and copy it by hand.",
+      "load_more": "Show more",
+      "show_password": "Show the password",
+      "hide_password": "Hide the password",
+      "signin_needed": "Sign in to continue.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "The server cannot be reached. Check your connection and try again.",
+      "timeout": "The server took too long to answer. Try again.",
+      "server_busy": "The server is busy. Try again in a moment.",
+      "rate_limited": "Too many requests. Try again in {time}.",
+      "rate_limited_short": "Too many requests. Try again in a moment.",
+      "internal_error": "The server met an unexpected error. Try again later.",
+      "invalid_token": "Your session has ended. Please sign in again.",
+      "unauthorized": "Please sign in.",
+      "not_found": "Not found.",
+      "unknown": "Something went wrong ({code}).",
+      "invalid_credentials": "Wrong user name, e-mail or password.",
+      "too_many_attempts": "Too many attempts. Try again in {time}.",
+      "banned": "This account is suspended until {date}.",
+      "banned_permanent": "This account is suspended.",
+      "email_unverified": "Your e-mail address is not confirmed yet. Open the link we sent you, or ask for a new one.",
+      "invalid_mfa_token": "This sign-in step has expired. Please sign in again.",
+      "invalid_code": "Wrong or already used code.",
+      "mfa_code_required": "Enter your two-factor code.",
+      "invalid_password": "Wrong password.",
+      "password_not_set": "This account has no password yet: use “Forgot password?” on the sign-in page to set one.",
+      "registration_closed": "The server does not accept new accounts at the moment.",
+      "invalid_username": "This user name is not allowed.",
+      "username_taken": "This user name is already taken.",
+      "invalid_email": "This e-mail address is not valid.",
+      "email_taken": "This e-mail address is already used by another account.",
+      "same_email": "This is already your e-mail address.",
+      "weak_password": "This password is too weak.",
+      "weak_too_short": "The password is too short ({min} characters at least).",
+      "weak_too_long": "The password is too long.",
+      "weak_contains_username": "The password must not contain your user name.",
+      "weak_contains_email": "The password must not contain your e-mail address.",
+      "weak_too_common": "This password is too common. Choose another one.",
+      "pow_failed": "The anti-robot check failed. Try again.",
+      "passwords_differ": "The two passwords are different.",
+      "required": "Fill in this field.",
+      "email_format": "Enter a valid e-mail address.",
+      "username_format": "{min} to {max} characters: letters, digits, _ and -, starting with a letter or a digit.",
+      "password_length": "At least {min} characters.",
+      "confirm_name": "Type your user name exactly as shown.",
+      "game_too_long": "This game is too long to be made into a GIF.",
+      "gif_disabled": "This server does not make GIFs.",
+      "render_failed": "The server could not draw this GIF.",
+      "invalid_game": "This game does not exist.",
+      "invalid_player": "Enter a user name: 2 to 24 letters, digits, _, . or -.",
+      "player_not_found": "No player with this name."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} second",
+        "other": "{count} seconds"
+      },
+      "minutes": {
+        "one": "{count} minute",
+        "other": "{count} minutes"
+      }
+    },
+    "download": {
+      "exe": "Executable",
+      "zip": "ZIP archive",
+      "file": "File",
+      "unavailable": "Not available",
+      "your_system": "Your system",
+      "eyebrow_beta": "Public beta · {version}",
+      "eyebrow_release": "Version {version}",
+      "published": "Published on {date}",
+      "unreachable": "GitHub cannot be reached right now: see the releases page.",
+      "available": "Available",
+      "verify_file": "the file",
+      "no_build": "No build of the game for {os} at the moment.",
+      "prerelease_short": "beta",
+      "x64": "64-bit (x64)"
+    },
+    "server": {
+      "online": "Online",
+      "offline": "Unreachable",
+      "open": "Open",
+      "closed": "Closed",
+      "updated": "Updated {time}",
+      "min_games": "Players with at least {count} rated games in this time control.",
+      "empty": "No ranked player in this time control yet.",
+      "error": "The leaderboard cannot be loaded right now."
+    },
+    "game": {
+      "number": "Game #{id}",
+      "white": "White",
+      "black": "Black",
+      "you": "you",
+      "vs": "vs",
+      "outcome_win": "Won",
+      "outcome_loss": "Lost",
+      "outcome_draw": "Draw",
+      "outcome_aborted": "Aborted",
+      "result_white": "White wins",
+      "result_black": "Black wins",
+      "result_draw": "Draw",
+      "result_aborted": "Aborted",
+      "rated": "Rated",
+      "casual": "Casual",
+      "custom": "Custom",
+      "moves": {
+        "one": "{count} move",
+        "other": "{count} moves"
+      },
+      "duration": "Duration {time}",
+      "rating_diff": "Rating change {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Download the game as PGN",
+      "copy_pgn": "Copy",
+      "copy_pgn_title": "Copy the PGN",
+      "gif": "GIF",
+      "gif_title": "Make an animated GIF (opens a new tab)",
+      "gif_signin": "Sign in to make GIFs",
+      "pgn_copied": "PGN copied to the clipboard.",
+      "pgn_saved": "PGN downloaded.",
+      "none": "No game yet. Your online games will appear here.",
+      "none_filtered": "No game matches these filters.",
+      "none_public": "No game yet.",
+      "total": {
+        "one": "{count} game",
+        "other": "{count} games"
+      },
+      "termination_unknown": "Game over",
+      "reason": {
+        "1": "Checkmate",
+        "2": "Resignation",
+        "3": "Loss on time",
+        "4": "Second illegal move (forfeit)",
+        "5": "Stalemate",
+        "6": "Dead position (insufficient material)",
+        "7": "Flag fall, but the opponent cannot checkmate",
+        "8": "Fivefold repetition",
+        "9": "75-move rule",
+        "10": "Threefold repetition (claimed)",
+        "11": "50-move rule (claimed)",
+        "12": "Draw by agreement",
+        "13": "Second illegal move, but the opponent cannot checkmate",
+        "20": "Abandoned (disconnected for too long)",
+        "21": "Abandoned, but the opponent cannot checkmate",
+        "22": "Game aborted",
+        "23": "No first move in time (aborted)",
+        "24": "Forfeit (fair-play violation)",
+        "25": "Aborted by the server",
+        "26": "Both players disconnected"
+      }
+    },
+    "ratings": {
+      "category": "Time control",
+      "rating": "Rating",
+      "peak": "Peak",
+      "games": "Games",
+      "wdl": "W / D / L",
+      "provisional": "Provisional rating",
+      "none": "No rated game yet.",
+      "unrated_hint": "A question mark marks a provisional rating (few games played yet)."
+    },
+    "account": {
+      "member_since": "Member since {date}",
+      "last_login": "Last sign-in",
+      "created": "Created",
+      "email": "E-mail",
+      "pending_email": "Waiting for confirmation: {email}",
+      "verified": "Confirmed",
+      "unverified": "Not confirmed",
+      "mfa": "Two-factor authentication",
+      "mfa_on": "On",
+      "mfa_off": "Off",
+      "google": "Google sign-in",
+      "google_on": "Linked",
+      "google_off": "Not linked",
+      "password": "Password",
+      "password_set": "Set",
+      "password_unset": "Not set yet",
+      "challenges": "Challenges",
+      "challenges_all": "Accepted",
+      "challenges_none": "Refused",
+      "badge_verified": "E-mail confirmed",
+      "badge_mfa": "Two-factor on",
+      "badge_google": "Google",
+      "ban_until": "Your account is suspended until {date}.",
+      "ban_permanent": "Your account is suspended.",
+      "sanction_ban": "Suspension",
+      "sanction_mm_block": "Matchmaking blocked",
+      "sanction_warning": "Warning",
+      "sanction_until": "until {date}",
+      "sanction_permanent": "permanent",
+      "devices_current": "This device",
+      "devices_unknown": "Unnamed device",
+      "devices_signed_in": "Signed in {date}",
+      "devices_seen": "Last used {time}",
+      "devices_expires": "Expires {date}",
+      "devices_revoke": "Sign out",
+      "devices_revoked": "The device is signed out.",
+      "devices_none": "No other device.",
+      "signout_all_confirm": "Sign out every device, this one included?",
+      "signed_out": "You are signed out.",
+      "signed_in": "Welcome, {name}.",
+      "prefs_saved": "Saved.",
+      "password_changed": "Your password has been changed. Your other devices are signed out.",
+      "email_sent": "A confirmation link has been sent to the new address. Your address changes when you open it.",
+      "email_changed": "Your e-mail address is now {email}.",
+      "email_current": "Current address: {email}.",
+      "email_pending": "A change to {email} is waiting for its confirmation link.",
+      "export_done": "Your data has been downloaded.",
+      "deleted": "Your account has been deleted.",
+      "delete_confirm_label": "Type {name} to confirm",
+      "register_done": "We sent a confirmation link to {email}. Open it to create your account, then sign in.",
+      "register_ready": "Your account is ready. You can sign in.",
+      "forgot_done": "If an account uses this address, a link to choose a new password is on its way.",
+      "resend_done": "If this address is waiting for its confirmation, a new link is on its way.",
+      "pow_solving": "Solving the anti-robot puzzle…",
+      "mfa_recovery": "Recovery code",
+      "mfa_recovery_text": "Enter one of your recovery codes. Each code works once.",
+      "mfa_app": "Code from the app",
+      "mfa_app_text": "Enter the 6-digit code from your authenticator app.",
+      "mfa_state_on": "Two-factor authentication is on for this account.",
+      "mfa_state_off": "Two-factor authentication is off for this account.",
+      "client_label": "Scacelith website ({browser})",
+      "username": "User name",
+      "password_rules": "At least {min} characters, without your user name or e-mail.",
+      "password_note": "Your other devices are signed out, and this one stays signed in.",
+      "signin_label": "Sign in"
+    },
+    "players": {
+      "since": "Member since {date}",
+      "games": "Games",
+      "rated": "Rated",
+      "wins": "Wins",
+      "draws": "Draws",
+      "losses": "Losses",
+      "view": "See the profile of {name}",
+      "you": "You",
+      "board": "Leaderboard"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Game #{id} · {date}",
+      "preparing": "Preparing the GIF…",
+      "rendering": "The server is drawing the GIF. A long game can take a few seconds…",
+      "ready": "Your GIF is ready. The download has started.",
+      "ready_again": "Your GIF is ready.",
+      "signin": "Sign in to make GIFs of your games.",
+      "signin_button": "Sign in",
+      "missing": "No game was chosen.",
+      "retry_in": "You can try again in {time}.",
+      "confirm": "Press “Make the GIF” to have the server draw this game with your account.",
+      "retry_now": "You can try again now."
+    },
+    "home": {
+      "create_account": "Create an account",
+      "my_account": "My account",
+      "my_games": "My games",
+      "signin": "Sign in"
+    },
+    "trailer": {
+      "title": "Scacelith trailer"
+    }
+  }
+}

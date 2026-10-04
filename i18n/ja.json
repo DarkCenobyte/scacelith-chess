@@ -1,0 +1,648 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — 一人称で指す、フォトリアルなチェス",
+      "description": "Windows用のフォトリアルな無料チェス。王宮の広間で一人称で指せます。Stockfish 19、コーチ、オンラインの対戦相手があなたを待っています。"
+    },
+    "players": {
+      "title": "ランキングとプレイヤー — Scacelith",
+      "description": "Scacelith公式サーバーの持ち時間ごとのトッププレイヤーと、そのレーティングや最近の対局。"
+    },
+    "account": {
+      "title": "アカウント — Scacelith",
+      "description": "Scacelithアカウントにログインして、レーティング、対局履歴、PGNとGIFのダウンロード、ログイン中のデバイス、設定を管理できます。"
+    },
+    "gif": {
+      "title": "アニメーションGIF — Scacelith",
+      "description": "Scacelithの対局のアニメーションGIF。"
+    }
+  },
+  "brand": {
+    "tagline": "王者のゲーム"
+  },
+  "nav": {
+    "skip": "本文へスキップ",
+    "home": "ホーム",
+    "label": "メインメニュー",
+    "game": "ゲーム",
+    "modes": "ゲームモード",
+    "gallery": "ギャラリー",
+    "trailer": "トレーラー",
+    "online": "オンライン",
+    "players": "ランキング",
+    "account": "アカウント",
+    "language": "言語",
+    "menu": "メニュー",
+    "download": "ダウンロード"
+  },
+  "hero": {
+    "image_alt": "陽光の差し込む大理石の広間で、2体の磁器のロボットがクルミ材のテーブルを挟んでチェスを指している。",
+    "eyebrow": "パブリックベータ",
+    "lead": "陽光の差し込む王宮の広間で、蜜蝋で磨かれたクルミ材のテーブルに着きましょう。盤の向こうでは、Stockfishが操る磁器のロボットがあなたの初手を待っています。",
+    "watch": "トレーラーを見る",
+    "meta": "フリーソフトウェア · Windows 64ビット · OpenGL 4.6対応グラフィックカード",
+    "caption": "ゲーム内で撮影：タイトル画面"
+  },
+  "highlights": {
+    "engine": "独自開発のOpenGL 4.6エンジン",
+    "stockfish": "Stockfish 19を内蔵",
+    "rules": "FIDE方式のレーティング",
+    "online": "オンライン対局",
+    "languages": "10言語に対応"
+  },
+  "experience": {
+    "eyebrow": "体験",
+    "title": "画面の中の盤ではなく、<br><em>テーブルの一席を。</em>",
+    "lead": "Scacelithは、本物の対局を形づくるものをよみがえらせます。広間、静寂、対局時計、あなたを見つめる相手、そして大会ならではの作法。",
+    "presence": {
+      "title": "一人称視点",
+      "text": "あなたは自分のロボットの目を通して世界を見ます。広間を見回し、盤に身を乗り出し、顔を上げて相手を見つめ、傍らの棋譜用紙に目をやることもできます。"
+    },
+    "ritual": {
+      "title": "大会のルール",
+      "text": "触れた駒は動かさなければなりません。自分の手で時計を押して、はじめて一手が完了します。反則手を指すとアービターが現れ、2回目の反則手で負けになります。"
+    },
+    "scoresheet": {
+      "title": "手書きの棋譜",
+      "text": "両者がそれぞれ自分の棋譜用紙に、自分だけの筆跡ですべての指し手を書き留め、40手ごとにページをめくります。紙の上を走るペンの音が聞こえます。"
+    },
+    "opponent": {
+      "title": "手ごたえのある相手",
+      "text": "入門（800）から最強（3500）まで、あなたのレベルに合わせたStockfish 19と対局できます。対局のたびに、FIDEの規則に従ってレーティングが計算されます。"
+    },
+    "engine": {
+      "title": "このゲームのために開発",
+      "text": "一から書き上げたエンジン。物理ベースのライティング、大理石、磨き込まれた木、磁器と真鍮、窓から差し込む陽光、柔らかな影と映り込み。"
+    },
+    "languages": {
+      "title": "10言語",
+      "text": "英語、フランス語、ドイツ語、スペイン語、ウクライナ語、ロシア語、アラビア語、日本語、そして中国語（簡体字・繁体字）。アラビア語は右から左に表示されます。"
+    }
+  },
+  "modes": {
+    "eyebrow": "ゲームモード",
+    "title": "対局ごとに、<br><em>ふさわしいテーブルを。</em>",
+    "lead": "すべての対局は、タイトル画面から同じ広間で始まります。オフラインでも、Stockfishはいつでも対局の相手をしてくれます。",
+    "new_game": {
+      "name": "新しい対局",
+      "text": "好きな強さのStockfishと、バレットからクラシカルまでの持ち時間で対局できます。同じコンピューターで友人と対局することもでき、それぞれが自分のロボットの目で盤を見ます。"
+    },
+    "coach": {
+      "name": "コーチ",
+      "text": "先生が向かいに座り、あなたのレベルで指しながら、脅威や好手、ミスを解説してくれます。レベルはチェスのルールからエキスパートまで。声は合成音声です。"
+    },
+    "online": {
+      "name": "オンライン対局",
+      "text": "Scacelithサーバーを通じて本物の相手と対局できます。レーティング戦、マッチング、対局の申し込み、プライベート対局。相手のロボットは、相手の動きに合わせてリアルタイムに動きます。"
+    },
+    "watch": {
+      "name": "対局を観戦",
+      "text": "2体のStockfishが対戦するあいだ、あなたは誰にも見られずに広間を自由に動き回り、視点から視点へと移動できます。"
+    },
+    "saved": {
+      "name": "保存した対局",
+      "text": "対局はPGNファイルとして保存されます。実際の考慮時間と時計を再現して広間で再生したり、他のソフトウェアの対局を取り込んだりできます。"
+    }
+  },
+  "gallery": {
+    "eyebrow": "ギャラリー",
+    "title": "<em>広間の中</em>からの眺め",
+    "lead": "すべての画像は、ゲーム内で専用エンジンによりリアルタイムに描画されたものです。",
+    "title_screen": {
+      "alt": "タイトル画面：広間でチェスを指す2体のロボットの横に、Scacelithのメニュー。",
+      "caption": "タイトル画面"
+    },
+    "hall": {
+      "alt": "高い窓の下、赤いベルベットの椅子に座った2体のロボットが盤を挟んで向かい合っている。",
+      "caption": "王宮の広間"
+    },
+    "board": {
+      "alt": "上から見た盤。対局時計と、駒に手を伸ばすロボットの手。",
+      "caption": "盤の前で"
+    },
+    "opponent": {
+      "alt": "対戦相手の磁器のロボットのクローズアップ。頭を盤のほうに傾けている。",
+      "caption": "対戦相手"
+    },
+    "scoresheet": {
+      "alt": "ロボットの手が万年筆で棋譜用紙に指し手を書き込んでいる。",
+      "caption": "棋譜用紙"
+    },
+    "note": "開発版の画面です。画像のインターフェースはフランス語で表示されています。",
+    "viewer": "画像ビューアー",
+    "close": "閉じる",
+    "previous": "前の画像",
+    "next": "次の画像"
+  },
+  "trailer": {
+    "eyebrow": "トレーラー",
+    "title": "<em>動き出す</em>Scacelith",
+    "play": "トレーラーを再生",
+    "soon_title": "トレーラーは近日公開",
+    "soon_text": "それまでは、どうぞお席へ。ベータ版はすでにダウンロードできます。",
+    "privacy": "動画は、再生ボタンを押した時点でYouTube（youtube-nocookie.com）から再生されます。",
+    "open_youtube": "YouTubeで見る"
+  },
+  "online": {
+    "eyebrow": "オンライン",
+    "title": "本物の相手と、<br><em>同じ広間で。</em>",
+    "lead": "ゲームから公式サーバーにログインし、世界中のプレイヤーと対局しましょう。もちろん一人称のままで。",
+    "point_rated": "公式の持ち時間ごとにレーティング戦があり、それぞれにFIDE方式のレーティングがつきます。",
+    "point_match": "マッチング、名前を指定した対局の申し込み、コードを使ったプライベート対局、2台のコンピューター間のダイレクト対局。",
+    "point_fair": "フェアプレー：自動チェック、終局後のエンジン解析、プレイヤーからの報告。",
+    "point_history": "このサイトで対局履歴を確認でき、各対局をPGNまたはアニメーションGIFでダウンロードできます。",
+    "point_open": "誰でもコミュニティサーバーを運営できます。サーバーとそのAPIはフリーソフトウェアです。",
+    "create": "アカウントを作成",
+    "signin": "ログイン",
+    "server_title": "公式サーバー",
+    "status_checking": "確認中…",
+    "address": "アドレス",
+    "registration": "新規登録",
+    "categories": "レーティング戦の持ち時間",
+    "top_players": "トッププレイヤー",
+    "category": "持ち時間",
+    "board_loading": "ランキングを読み込み中…",
+    "full_board": "ランキングをすべて見る"
+  },
+  "download": {
+    "button": "ダウンロード",
+    "choose": "システムを選択",
+    "see_release": "GitHubでリリースを見る",
+    "latest": "Scacelith",
+    "all_releases": "すべてのリリース",
+    "eyebrow": "ダウンロード",
+    "title": "さあ、席へ。<br><em>無料で、オープンソース。</em>",
+    "lead": "インストールは不要です。ダウンロードして展開し、Scacelith.exeを実行するだけです。すべてのファイルはタグ付きのソースからGitHub Actionsでビルドされ、ビルドの来歴が証明されています。",
+    "prerelease": "ベータ",
+    "notes": "リリースノート",
+    "req_system": "システム",
+    "req_system_value": "Windows 64ビット（x64）",
+    "req_gpu": "グラフィック",
+    "req_gpu_value": "OpenGL 4.6対応のグラフィックカードと最新のドライバー",
+    "req_included": "同梱",
+    "req_included_value": "Stockfish 19とそのニューラルネットワーク：すぐにオフラインで対局できます",
+    "req_network": "インターネット",
+    "req_network_value": "オンライン対局、GIF、コーチの音声に必要（音声は約145MBで、ダウンロードは任意）",
+    "req_licence": "ライセンス",
+    "req_licence_value": "GNU一般公衆利用許諾書 第3版",
+    "verify_title": "ダウンロードを検証",
+    "verify_text": "各ファイルのビルドの来歴はGitHubによって証明されています。GitHub CLIで確認するには：",
+    "checksums": "SHA-256チェックサム（SHA256SUMS）"
+  },
+  "credits": {
+    "eyebrow": "クレジット",
+    "title": "クレジットと<em>謝辞</em>",
+    "engine_head": "チェスエンジン",
+    "engine": "Stockfish 19（Stockfish開発者による。GNU GPL v3）。そのニューラルネットワークは、Leela Chess Zeroプロジェクトが提供するデータ（Open Database License）で学習されています。",
+    "voice_head": "コーチの声",
+    "voice": "コーチモードの合成音声はSupertonic 3で生成しています。Supertonic 3はSupertoneのモデルで、OpenRAIL-Mライセンスの下で使用しています。",
+    "fonts_head": "書体",
+    "fonts": "EB Garamond（Georg Duffner）、Cinzel（Natanael Gama）、Amiri（Khaled Hosny）。いずれもSIL Open Font License。チェスの駒の記号はGNU FreeFontより。",
+    "openings_head": "オープニング",
+    "openings": "オープニング名はlichess.orgのchess-openingsデータベース（CC0、パブリックドメイン）によります。",
+    "quote": "「チェスとは分析の芸術である。」",
+    "quote_author": "ミハイル・ボトヴィニク"
+  },
+  "footer": {
+    "about": "一人称で指すフォトリアルなチェスゲーム。独自開発のOpenGL 4.6エンジンで動作します。GNU GPL v3のもとで公開されているフリーソフトウェアです。",
+    "game": "ゲーム",
+    "online": "オンライン",
+    "api_docs": "サーバーAPIドキュメント",
+    "source": "ソースコード",
+    "game_source": "ゲーム（GitHub）",
+    "server_source": "サーバー（GitHub）",
+    "releases": "リリース",
+    "licence": "ライセンス（GPL v3）",
+    "credits": "StockfishはStockfish開発者の商標です。YouTubeはGoogle LLCの商標です。WindowsはMicrosoft Corporationの商標です。",
+    "legal": "Scacelith",
+    "made": "このサイトはCookieもトラッカーも使用していません。"
+  },
+  "common": {
+    "copy": "コピー",
+    "loading": "読み込み中…",
+    "noscript": "このページでScacelithサーバーと通信するには、JavaScriptが必要です。"
+  },
+  "players": {
+    "title": "ランキングとプレイヤー",
+    "lead": "公式サーバーのトッププレイヤーを、レーティング戦の持ち時間ごとに紹介します。プレイヤーを検索すると、そのレーティングと最近の対局を確認できます。",
+    "search_label": "プレイヤーを検索",
+    "search_placeholder": "ユーザー名",
+    "search_button": "検索",
+    "back": "ランキングに戻る",
+    "recent_games": "最近の対局",
+    "board_title": "ランキング",
+    "category": "持ち時間",
+    "col_rank": "順位",
+    "col_player": "プレイヤー",
+    "col_rating": "レーティング",
+    "col_peak": "最高",
+    "col_games": "対局数",
+    "col_wdl": "勝 / 分 / 負",
+    "loading": "読み込み中…"
+  },
+  "account": {
+    "title": "アカウント",
+    "auth_foot": "公式サーバーのアカウントは1つで、ゲームとこのサイトの両方で使えます。ゲーム内でGoogleを使ってアカウントを作成した場合は、「パスワードをお忘れですか？」からパスワードを設定してください。",
+    "common": {
+      "back": "ログインに戻る"
+    },
+    "fields": {
+      "login": "ユーザー名またはメールアドレス",
+      "password": "パスワード",
+      "show_password": "パスワードを表示",
+      "username": "ユーザー名",
+      "email": "メールアドレス",
+      "confirm_password": "パスワード（確認）",
+      "current_password": "現在のパスワード",
+      "new_password": "新しいパスワード",
+      "new_email": "新しいメールアドレス",
+      "mfa_code": "確認コード（またはリカバリーコード）"
+    },
+    "signin": {
+      "tab": "ログイン",
+      "title": "おかえりなさい",
+      "remember": "このデバイスでログインしたままにする",
+      "submit": "ログイン",
+      "forgot": "パスワードをお忘れですか？",
+      "resend": "確認メールを再送信"
+    },
+    "mfa": {
+      "title": "二要素認証",
+      "text": "認証アプリに表示される6桁のコードを入力してください。",
+      "code": "アプリのコード",
+      "use_recovery": "代わりにリカバリーコードを使う",
+      "submit": "確認"
+    },
+    "register": {
+      "tab": "アカウントを作成",
+      "title": "無料アカウント",
+      "closed": "現在、サーバーは新しいアカウントを受け付けていません。",
+      "username_hint": "英字、数字、_、-が使えます。先頭は英字か数字にしてください。",
+      "password_hint": "10文字以上で、ユーザー名やメールアドレスを含まないもの。",
+      "pow_note": "ロボットによる登録を防ぐため、ブラウザーが小さなパズルを解きます。数秒かかります。",
+      "submit": "アカウントを作成",
+      "done_title": "メールを確認してください",
+      "done_text": "ご登録のアドレスに確認リンクを送信しました。リンクを開くとアカウントが作成されます。その後、ログインしてください。",
+      "done_hint": "リンクの有効期限は24時間です。受信トレイに届いていない場合は、迷惑メールフォルダーを確認するか、メールを再送してください。",
+      "go_signin": "ログインへ"
+    },
+    "forgot": {
+      "title": "パスワードの再設定",
+      "text": "アカウントのメールアドレスを入力してください。そのアドレスのアカウントがあれば、新しいパスワードを設定するためのリンク（有効期限1時間）をお送りします。",
+      "submit": "リンクを送信"
+    },
+    "resend": {
+      "title": "メールアドレスの確認",
+      "text": "確認メールが届かない、またはリンクの有効期限が切れた場合は、アドレスを入力してください。新しいリンクをお送りします。",
+      "submit": "再送信"
+    },
+    "dash": {
+      "public_profile": "公開プロフィール",
+      "signout": "ログアウト",
+      "tab_overview": "概要",
+      "tab_games": "対局",
+      "tab_devices": "デバイス",
+      "tab_settings": "設定"
+    },
+    "overview": {
+      "info": "アカウント情報",
+      "ratings": "レーティング",
+      "sanctions": "ペナルティ",
+      "recent": "最近の対局",
+      "all_games": "すべての対局を見る"
+    },
+    "games": {
+      "filter_category": "持ち時間",
+      "all": "すべて",
+      "custom": "カスタム",
+      "filter_rated": "種類",
+      "rated": "レーティング戦",
+      "casual": "カジュアル",
+      "filter_result": "結果",
+      "wins": "勝ち",
+      "losses": "負け",
+      "draws": "引き分け"
+    },
+    "devices": {
+      "title": "ログイン中のデバイス",
+      "signout_all": "すべてログアウト",
+      "text": "ゲームやこのサイトでのログインは、それぞれ1台のデバイスとして扱われます。心当たりのないものはログアウトさせてください。"
+    },
+    "settings": {
+      "challenges_title": "対局の申し込み",
+      "challenges_text": "他のプレイヤーがゲームから名前を指定して、あなたに対局を申し込めます。",
+      "challenges_label": "対局の申し込みを受け付ける",
+      "mfa_title": "二要素認証",
+      "mfa_text": "オン・オフの切り替えや新しいリカバリーコードの発行は、ゲームのアカウントページから行えます。",
+      "password_title": "パスワードの変更",
+      "password_text": "他のデバイスはログアウトされ、このデバイスはログインしたままになります。",
+      "password_submit": "パスワードを変更",
+      "email_title": "メールアドレスの変更",
+      "email_submit": "確認リンクを送信",
+      "export_title": "データをダウンロード",
+      "export_text": "サーバーがあなたのアカウントについて保持しているすべての情報を、1つのJSONファイルにまとめてダウンロードできます。",
+      "export_submit": "データをダウンロード",
+      "delete_title": "アカウントを削除",
+      "delete_text": "この操作は取り消せません。対局とレーティングは匿名の名前で残り、メールアドレス、パスワード、デバイスは消去されます。",
+      "delete_confirm": "確認のため、ユーザー名を入力してください",
+      "delete_submit": "アカウントを削除"
+    }
+  },
+  "gif": {
+    "title": "アニメーションGIF",
+    "preparing": "GIFを準備中…",
+    "download": "GIFをダウンロード",
+    "make": "GIFを作成",
+    "pause": "アニメーションを一時停止",
+    "back": "自分の対局に戻る",
+    "options": "オプション",
+    "size": "サイズ",
+    "size_small": "小（284 × 350）",
+    "size_medium": "中（424 × 515）",
+    "size_large": "大（628 × 762）",
+    "orientation": "視点",
+    "orientation_white": "白",
+    "orientation_black": "黒",
+    "speed": "速度",
+    "speed_fast": "速い（1手0.25秒）",
+    "speed_normal": "標準（1手0.5秒）",
+    "speed_slow": "遅い（1手1秒）",
+    "speed_very_slow": "とても遅い（1手2秒）",
+    "coords": "座標を表示",
+    "regenerate": "作り直す",
+    "note": "GIFはサーバーが描画します。作成済みのGIFはすぐに表示されますが、新しいGIFの作成は1分あたり数回までに制限されています。"
+  },
+  "notfound": {
+    "title": "ページが見つかりません",
+    "text": "このマスは空いています。ページが移動した可能性があります。",
+    "home": "Scacelithに戻る"
+  },
+  "js": {
+    "common": {
+      "loading": "読み込み中…",
+      "retry": "再試行",
+      "close": "閉じる",
+      "copy": "コピー",
+      "copied": "クリップボードにコピーしました。",
+      "copy_failed": "コピーできませんでした。テキストを選択して手動でコピーしてください。",
+      "load_more": "さらに表示",
+      "show_password": "パスワードを表示",
+      "hide_password": "パスワードを隠す",
+      "signin_needed": "続けるにはログインしてください。",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "サーバーに接続できません。インターネット接続を確認して、もう一度お試しください。",
+      "timeout": "サーバーの応答がタイムアウトしました。もう一度お試しください。",
+      "server_busy": "サーバーが混み合っています。しばらくしてからもう一度お試しください。",
+      "rate_limited": "リクエストが多すぎます。{time}後にもう一度お試しください。",
+      "rate_limited_short": "リクエストが多すぎます。しばらくしてからもう一度お試しください。",
+      "internal_error": "サーバーで予期しないエラーが発生しました。後でもう一度お試しください。",
+      "invalid_token": "セッションが終了しました。もう一度ログインしてください。",
+      "unauthorized": "ログインしてください。",
+      "not_found": "見つかりません。",
+      "unknown": "問題が発生しました（{code}）。",
+      "invalid_credentials": "ユーザー名、メールアドレス、またはパスワードが正しくありません。",
+      "too_many_attempts": "試行回数が多すぎます。{time}後にもう一度お試しください。",
+      "banned": "このアカウントは{date}まで利用停止されています。",
+      "banned_permanent": "このアカウントは利用停止されています。",
+      "email_unverified": "メールアドレスがまだ確認されていません。お送りしたリンクを開くか、リンクを再送信してください。",
+      "invalid_mfa_token": "このログイン手順の有効期限が切れました。もう一度ログインしてください。",
+      "invalid_code": "コードが間違っているか、すでに使用されています。",
+      "mfa_code_required": "確認コードを入力してください。",
+      "invalid_password": "パスワードが正しくありません。",
+      "password_not_set": "このアカウントにはまだパスワードがありません。ログインページの「パスワードをお忘れですか？」から設定してください。",
+      "registration_closed": "現在、サーバーは新しいアカウントを受け付けていません。",
+      "invalid_username": "このユーザー名は使用できません。",
+      "username_taken": "このユーザー名はすでに使われています。",
+      "invalid_email": "このメールアドレスは無効です。",
+      "email_taken": "このメールアドレスはすでに別のアカウントで使われています。",
+      "same_email": "現在のメールアドレスと同じです。",
+      "weak_password": "このパスワードは弱すぎます。",
+      "weak_too_short": "パスワードが短すぎます（{min}文字以上）。",
+      "weak_too_long": "パスワードが長すぎます。",
+      "weak_contains_username": "パスワードにユーザー名を含めることはできません。",
+      "weak_contains_email": "パスワードにメールアドレスを含めることはできません。",
+      "weak_too_common": "このパスワードは一般的すぎます。別のパスワードを選んでください。",
+      "pow_failed": "ロボット対策のチェックに失敗しました。もう一度お試しください。",
+      "passwords_differ": "2つのパスワードが一致しません。",
+      "required": "この項目を入力してください。",
+      "email_format": "有効なメールアドレスを入力してください。",
+      "username_format": "{min}～{max}文字で、英字、数字、_、-が使えます。先頭は英字か数字にしてください。",
+      "password_length": "{min}文字以上で入力してください。",
+      "confirm_name": "ユーザー名を表示どおりに正確に入力してください。",
+      "game_too_long": "この対局は長すぎるため、GIFにできません。",
+      "gif_disabled": "このサーバーではGIFを作成できません。",
+      "render_failed": "サーバーはこのGIFを描画できませんでした。",
+      "invalid_game": "この対局は存在しません。",
+      "invalid_player": "ユーザー名を入力してください（英字、数字、_、.、-の2～24文字）。",
+      "player_not_found": "この名前のプレイヤーは見つかりません。"
+    },
+    "time": {
+      "seconds": {
+        "other": "{count}秒"
+      },
+      "minutes": {
+        "other": "{count}分"
+      }
+    },
+    "download": {
+      "exe": "実行ファイル",
+      "zip": "ZIPアーカイブ",
+      "file": "ファイル",
+      "unavailable": "未対応",
+      "your_system": "お使いのシステム",
+      "eyebrow_beta": "パブリックベータ · {version}",
+      "eyebrow_release": "バージョン {version}",
+      "published": "{date}公開",
+      "unreachable": "現在GitHubに接続できません。リリースページをご覧ください。",
+      "available": "利用可能",
+      "verify_file": "ファイル",
+      "no_build": "現在、{os}版のゲームはありません。",
+      "prerelease_short": "ベータ",
+      "x64": "64ビット（x64）"
+    },
+    "server": {
+      "online": "オンライン",
+      "offline": "接続不可",
+      "open": "受付中",
+      "closed": "停止中",
+      "updated": "更新：{time}",
+      "min_games": "この持ち時間で{count}局以上のレーティング戦を指したプレイヤー。",
+      "empty": "この持ち時間には、まだランキング入りしたプレイヤーがいません。",
+      "error": "現在ランキングを読み込めません。"
+    },
+    "game": {
+      "number": "対局 #{id}",
+      "white": "白",
+      "black": "黒",
+      "you": "あなた",
+      "vs": "対",
+      "outcome_win": "勝ち",
+      "outcome_loss": "負け",
+      "outcome_draw": "引き分け",
+      "outcome_aborted": "中止",
+      "result_white": "白の勝ち",
+      "result_black": "黒の勝ち",
+      "result_draw": "引き分け",
+      "result_aborted": "中止",
+      "rated": "レーティング戦",
+      "casual": "カジュアル",
+      "custom": "カスタム",
+      "moves": {
+        "other": "{count}手"
+      },
+      "duration": "所要時間：{time}",
+      "rating_diff": "レーティング変動：{diff}",
+      "pgn": "PGN",
+      "pgn_title": "対局をPGNでダウンロード",
+      "copy_pgn": "コピー",
+      "copy_pgn_title": "PGNをコピー",
+      "gif": "GIF",
+      "gif_title": "アニメーションGIFを作成（新しいタブで開きます）",
+      "gif_signin": "GIFを作成するにはログインしてください",
+      "pgn_copied": "PGNをクリップボードにコピーしました。",
+      "pgn_saved": "PGNをダウンロードしました。",
+      "none": "まだ対局はありません。オンライン対局はここに表示されます。",
+      "none_filtered": "条件に一致する対局はありません。",
+      "none_public": "まだ対局はありません。",
+      "total": {
+        "other": "{count}局"
+      },
+      "termination_unknown": "終局",
+      "reason": {
+        "1": "チェックメイト",
+        "2": "投了",
+        "3": "時間切れ負け",
+        "4": "2回目の反則手（負け）",
+        "5": "ステイルメイト",
+        "6": "デッドポジション（駒不足）",
+        "7": "時間切れ、ただし相手はメイトできない",
+        "8": "5回同一局面",
+        "9": "75手ルール",
+        "10": "3回同一局面（申告）",
+        "11": "50手ルール（申告）",
+        "12": "合意による引き分け",
+        "13": "2回目の反則手、ただし相手はメイトできない",
+        "20": "対局放棄（長時間の切断）",
+        "21": "対局放棄、ただし相手はメイトできない",
+        "22": "対局中止",
+        "23": "時間内に最初の一手なし（中止）",
+        "24": "不正行為による負け",
+        "25": "サーバーにより中止",
+        "26": "両者の接続が切断"
+      }
+    },
+    "ratings": {
+      "category": "持ち時間",
+      "rating": "レーティング",
+      "peak": "最高",
+      "games": "対局数",
+      "wdl": "勝 / 分 / 負",
+      "provisional": "暫定レーティング",
+      "none": "レーティング対象の対局はまだありません。",
+      "unrated_hint": "「?」は暫定レーティング（対局数がまだ少ない）を表します。"
+    },
+    "account": {
+      "member_since": "登録日：{date}",
+      "last_login": "最終ログイン",
+      "created": "作成日",
+      "email": "メールアドレス",
+      "pending_email": "確認待ち：{email}",
+      "verified": "確認済み",
+      "unverified": "未確認",
+      "mfa": "二要素認証",
+      "mfa_on": "オン",
+      "mfa_off": "オフ",
+      "google": "Googleログイン",
+      "google_on": "連携済み",
+      "google_off": "未連携",
+      "password": "パスワード",
+      "password_set": "設定済み",
+      "password_unset": "未設定",
+      "challenges": "対局の申し込み",
+      "challenges_all": "受け付ける",
+      "challenges_none": "受け付けない",
+      "badge_verified": "メール確認済み",
+      "badge_mfa": "二要素認証オン",
+      "badge_google": "Google",
+      "ban_until": "お使いのアカウントは{date}まで利用停止されています。",
+      "ban_permanent": "お使いのアカウントは利用停止されています。",
+      "sanction_ban": "利用停止",
+      "sanction_mm_block": "マッチング停止",
+      "sanction_warning": "警告",
+      "sanction_until": "{date}まで",
+      "sanction_permanent": "無期限",
+      "devices_current": "このデバイス",
+      "devices_unknown": "名前のないデバイス",
+      "devices_signed_in": "ログイン日：{date}",
+      "devices_seen": "最終使用：{time}",
+      "devices_expires": "有効期限：{date}",
+      "devices_revoke": "ログアウト",
+      "devices_revoked": "デバイスをログアウトさせました。",
+      "devices_none": "他のデバイスはありません。",
+      "signout_all_confirm": "このデバイスを含む、すべてのデバイスからログアウトしますか？",
+      "signed_out": "ログアウトしました。",
+      "signed_in": "ようこそ、{name}さん。",
+      "prefs_saved": "保存しました。",
+      "password_changed": "パスワードを変更しました。他のデバイスはログアウトされました。",
+      "email_sent": "新しいアドレスに確認リンクを送信しました。リンクを開くとアドレスが変更されます。",
+      "email_changed": "メールアドレスが{email}に変更されました。",
+      "email_current": "現在のアドレスは{email}です。",
+      "email_pending": "{email}への変更は、確認リンクによる確認待ちです。",
+      "export_done": "データをダウンロードしました。",
+      "deleted": "アカウントを削除しました。",
+      "delete_confirm_label": "確認のため「{name}」と入力してください",
+      "register_done": "{email}に確認リンクを送信しました。リンクを開くとアカウントが作成されます。その後、ログインしてください。",
+      "register_ready": "アカウントの準備ができました。ログインできます。",
+      "forgot_done": "このアドレスを使っているアカウントがあれば、新しいパスワードを設定するためのリンクをお送りしました。",
+      "resend_done": "このアドレスが確認待ちであれば、新しいリンクをお送りしました。",
+      "pow_solving": "ロボット対策のパズルを解いています…",
+      "mfa_recovery": "リカバリーコード",
+      "mfa_recovery_text": "リカバリーコードのいずれかを入力してください。各コードは1回だけ使えます。",
+      "mfa_app": "アプリのコード",
+      "mfa_app_text": "認証アプリに表示される6桁のコードを入力してください。",
+      "mfa_state_on": "このアカウントでは二要素認証がオンになっています。",
+      "mfa_state_off": "このアカウントでは二要素認証がオフになっています。",
+      "client_label": "Scacelithウェブサイト（{browser}）",
+      "username": "ユーザー名",
+      "password_rules": "{min}文字以上で、ユーザー名やメールアドレスを含まないもの。",
+      "password_note": "他のデバイスはログアウトされ、このデバイスはログインしたままになります。",
+      "signin_label": "ログイン"
+    },
+    "players": {
+      "since": "登録日：{date}",
+      "games": "対局数",
+      "rated": "レーティング戦",
+      "wins": "勝ち",
+      "draws": "引き分け",
+      "losses": "負け",
+      "view": "{name}のプロフィールを見る",
+      "you": "あなた",
+      "board": "ランキング"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "対局 #{id} · {date}",
+      "preparing": "GIFを準備中…",
+      "rendering": "サーバーがGIFを描画しています。長い対局では数秒かかることがあります…",
+      "ready": "GIFの準備ができました。ダウンロードを開始しました。",
+      "ready_again": "GIFの準備ができました。",
+      "signin": "対局のGIFを作成するにはログインしてください。",
+      "signin_button": "ログイン",
+      "missing": "対局が選択されていません。",
+      "retry_in": "{time}後に再試行できます。",
+      "confirm": "「GIFを作成」を押すと、あなたのアカウントでサーバーがこの対局を描画します。",
+      "retry_now": "今すぐ再試行できます。"
+    },
+    "home": {
+      "create_account": "アカウントを作成",
+      "my_account": "マイアカウント",
+      "my_games": "自分の対局",
+      "signin": "ログイン"
+    },
+    "trailer": {
+      "title": "Scacelithのトレーラー"
+    }
+  }
+}

@@ -1,0 +1,50 @@
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="{{v:home}}">
+        <img class="brand-icon" src="{{v:root}}assets/icons/logo-128.webp" width="44" height="44" alt="" loading="lazy">
+        <span class="brand-word">Scacelith</span>
+      </a>
+      <p class="footer-tagline">{{t:brand.tagline}}</p>
+      <p class="footer-text">{{t:footer.about}}</p>
+    </div>
+    <nav class="footer-col" aria-labelledby="footer-game">
+      <h2 class="footer-head" id="footer-game">{{t:footer.game}}</h2>
+      <ul>
+        <li><a href="{{v:home}}#experience">{{t:nav.game}}</a></li>
+        <li><a href="{{v:home}}#modes">{{t:nav.modes}}</a></li>
+        <li><a href="{{v:home}}#gallery">{{t:nav.gallery}}</a></li>
+        <li><a href="{{v:home}}#trailer">{{t:nav.trailer}}</a></li>
+        <li><a href="{{v:home}}#download">{{t:nav.download}}</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-col" aria-labelledby="footer-online">
+      <h2 class="footer-head" id="footer-online">{{t:footer.online}}</h2>
+      <ul>
+        <li><a href="{{v:home}}#online">{{t:nav.online}}</a></li>
+        <li><a href="{{v:home}}players/">{{t:nav.players}}</a></li>
+        <li><a href="{{v:home}}account/">{{t:nav.account}}</a></li>
+        <li><a href="{{v:docs_url}}" rel="noopener">{{t:footer.api_docs}}</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-col" aria-labelledby="footer-source">
+      <h2 class="footer-head" id="footer-source">{{t:footer.source}}</h2>
+      <ul>
+        <li><a href="{{v:repo_url}}" rel="noopener">{{t:footer.game_source}}</a></li>
+        <li><a href="{{v:server_repo_url}}" rel="noopener">{{t:footer.server_source}}</a></li>
+        <li><a href="{{v:releases_url}}" rel="noopener">{{t:footer.releases}}</a></li>
+        <li><a href="{{v:repo_url}}/blob/master/LICENSE" rel="noopener">{{t:footer.licence}}</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-col footer-langs" aria-labelledby="footer-langs">
+      <h2 class="footer-head" id="footer-langs">{{t:nav.language}}</h2>
+      <ul class="lang-columns">
+{{r:footer_langs}}
+      </ul>
+    </nav>
+  </div>
+  <div class="shell footer-credits">
+    <p>{{t:footer.credits}}</p>
+    <p class="footer-legal"><span>{{t:footer.legal}}</span> <span class="diamond" aria-hidden="true"></span> <span>{{t:footer.made}}</span></p>
+  </div>
+</footer>

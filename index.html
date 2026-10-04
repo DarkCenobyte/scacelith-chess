@@ -1,157 +1,65 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" dir="ltr" class="no-js" data-page="root">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#171916">
-  <title>Scacelith — Take your place at the board</title>
-  <meta name="description" content="An ultra-realistic 3D chess experience, capturing the presence of over-the-board play. Solo play with Stockfish. Scacelith is a work in progress.">
-  <link rel="canonical" href="https://scacelith.com/">
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Scacelith — Take your place at the board">
-  <meta property="og:description" content="The timeless game. A new sense of presence. Discover an ultra-realistic chess experience, currently in development.">
-  <meta property="og:url" content="https://scacelith.com/">
-  <meta property="og:site_name" content="Scacelith">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23171916'/%3E%3Cpath d='M32 9v12m-6-6h12M23 27h18l-4 19H27zM23 51h18' stroke='%23c5aa72' stroke-width='4' fill='none' stroke-linejoin='round'/%3E%3C/svg%3E">
-  <link rel="preload" href="assets/fonts/cormorant-regular.woff" as="font" type="font/woff" crossorigin>
-  <link rel="stylesheet" href="assets/styles.css">
-  <script src="assets/site.js" defer></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27;; style-src &#x27;self&#x27;; img-src &#x27;self&#x27; data: blob:; font-src &#x27;self&#x27;; connect-src &#x27;self&#x27; https://caissa.scacelith.com https://api.github.com; frame-src https://www.youtube-nocookie.com; worker-src &#x27;self&#x27;; manifest-src &#x27;self&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;; object-src &#x27;none&#x27;">
+<script src="assets/js/root.js"></script>
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#100e0b">
+<title>Scacelith</title>
+<meta name="description" content="Free photorealistic chess for Windows, played in first person in a royal hall: Stockfish 19, a coach and online opponents await you.">
+<link rel="canonical" href="https://scacelith.com/">
+<link rel="alternate" hreflang="en" href="https://scacelith.com/en/">
+<link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/">
+<link rel="alternate" hreflang="de" href="https://scacelith.com/de/">
+<link rel="alternate" hreflang="es" href="https://scacelith.com/es/">
+<link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/">
+<link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/">
+<link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/">
+<link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/">
+<link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/">
+<link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/">
+<link rel="alternate" hreflang="x-default" href="https://scacelith.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Scacelith">
+<meta property="og:title" content="Scacelith">
+<meta property="og:description" content="Free photorealistic chess for Windows, played in first person in a royal hall: Stockfish 19, a coach and online opponents await you.">
+<meta property="og:url" content="https://scacelith.com/">
+<meta property="og:image" content="https://scacelith.com/assets/img/og-scacelith.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Two porcelain robots play chess at a walnut table in a sunlit marble hall.">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/icons/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+<link rel="stylesheet" href="assets/css/site.css">
+<script src="assets/js/boot.js"></script>
 </head>
-<body id="top">
-  <a class="skip-link" href="#main">Skip to content</a>
-  <header class="site-header shell">
-    <a class="wordmark" href="#top" aria-label="Scacelith home">Scacelith<span class="brand-diamond" aria-hidden="true"></span></a>
-    <nav aria-label="Main navigation">
-      <a href="#experience">The experience</a>
-      <a href="#gallery">Gallery</a>
-      <a href="#development">Development</a>
-    </nav>
-    <span class="status"><span aria-hidden="true">◇</span> Work-in-Progress</span>
-  </header>
-
-  <main id="main">
-    <section class="hero" aria-labelledby="hero-title">
-      <picture class="hero-image">
-        <source srcset="assets/images/at-the-board-1200.webp 1200w, assets/images/at-the-board.webp 2048w" sizes="100vw" type="image/webp">
-        <img src="assets/images/at-the-board.webp" width="2048" height="1151" alt="A marble chessboard and wooden chess clock, with two players seated across a polished table." fetchpriority="high">
-      </picture>
-      <div class="hero-shade" aria-hidden="true"></div>
-      <div class="hero-content shell">
-        <p class="eyebrow"><span class="short-rule" aria-hidden="true"></span> The timeless game, reimagined</p>
-        <h1 id="hero-title">Take your place<br>at the <em>board.</em></h1>
-        <p class="hero-description">The quiet focus. The presence of your opponent.<br class="desktop-break"> The world beyond the sixty-four squares.</p>
-        <a class="button" href="#gallery">Step inside Scacelith <span aria-hidden="true">↗</span></a>
-        <p class="hero-availability">In development. Not yet available to download.</p>
-      </div>
-      <div class="hero-caption"><span class="diamond" aria-hidden="true"></span> Captured in-game · Development build</div>
-      <span class="hero-side-note" aria-hidden="true">THE GAME OF KINGS</span>
-    </section>
-
-    <div class="manifesto-bar shell" aria-label="At a glance">
-      <span>Ultra-realistic 3D chess</span><span class="diamond" aria-hidden="true"></span>
-      <span>The over-the-board feeling</span><span class="diamond" aria-hidden="true"></span>
-      <span>Solo play with Stockfish</span>
-    </div>
-
-    <section class="experience shell section-space" id="experience" aria-labelledby="experience-title">
-      <div class="section-intro">
-        <p class="eyebrow">01 / The experience</p>
-        <h2 id="experience-title">More than a position.<br><em>A sense of presence.</em></h2>
-      </div>
-      <div class="experience-copy">
-        <p class="lead">Chess is more than the next move. It is the feeling of sitting across from someone, with a board between you and a game ahead.</p>
-        <p>Scacelith is being built to bring that feeling to your screen: an ultra-realistic chess experience inspired by over-the-board (OTB) play, in a richly detailed three-dimensional setting.</p>
-      </div>
-      <div class="principles">
-        <article class="principle">
-          <span class="principle-number" aria-hidden="true">I.</span>
-          <h3>A seat at the table</h3>
-          <p>A physical board, an opponent in front of you, and the atmosphere of a real encounter. The familiar ritual of chess, brought into 3D.</p>
-        </article>
-        <article class="principle">
-          <span class="principle-number" aria-hidden="true">II.</span>
-          <h3>Realism in the details</h3>
-          <p>Marble pieces, polished wood, a handwritten scoresheet. From the light in the room to the clock on the table, every detail brings you closer.</p>
-        </article>
-        <article class="principle">
-          <span class="principle-number" aria-hidden="true">III.</span>
-          <h3>A worthy opponent</h3>
-          <p>Stockfish integration powers solo play, bringing a world-class chess engine to the other side of the board.</p>
-        </article>
-      </div>
-    </section>
-
-    <section class="gallery-section section-space" id="gallery" aria-labelledby="gallery-title">
-      <div class="shell">
-        <div class="gallery-heading">
-          <div>
-            <p class="eyebrow">02 / A closer look</p>
-            <h2 id="gallery-title">Inside <em>Scacelith.</em></h2>
-          </div>
-          <p>Real screenshots. A world taking shape.<br><span>All images show a work in progress.</span></p>
-        </div>
-        <div class="gallery-grid">
-          <figure class="gallery-item gallery-main">
-            <a class="shot-link" href="assets/images/the-grand-hall.webp" data-gallery data-title="An encounter in the grand hall" data-caption="Two players, one board, and a sunlit room." aria-label="Enlarge screenshot: an encounter in the grand hall">
-              <div class="shot-frame hall-frame">
-                <img src="assets/images/the-grand-hall-1200.webp" srcset="assets/images/the-grand-hall-1200.webp 1200w, assets/images/the-grand-hall.webp 2048w" sizes="(max-width: 700px) 100vw, 60vw" width="2048" height="1151" loading="lazy" decoding="async" alt="Two ivory-colored humanoid players face each other over a chessboard in a sunlit, ornate hall.">
-              </div>
-              <span class="image-index" aria-hidden="true">01</span>
-              <span class="expand-icon" aria-hidden="true">↗</span>
-            </a>
-            <figcaption><h3>A room for the game.</h3><p>The atmosphere of an over-the-board encounter.</p></figcaption>
-          </figure>
-          <figure class="gallery-item gallery-detail">
-            <a class="shot-link" href="assets/images/the-opponent.webp" data-gallery data-title="Across the board" data-caption="An opponent with a presence in the room." aria-label="Enlarge screenshot: across the board">
-              <div class="shot-frame portrait-frame">
-                <img src="assets/images/the-opponent-1200.webp" srcset="assets/images/the-opponent-1200.webp 1200w, assets/images/the-opponent.webp 2048w" sizes="(max-width: 700px) 100vw, 40vw" width="2048" height="1151" loading="lazy" decoding="async" alt="A close-up of the sculpted ivory-colored opponent, lit by warm sunlight.">
-              </div>
-              <span class="image-index" aria-hidden="true">02</span>
-              <span class="expand-icon" aria-hidden="true">↗</span>
-            </a>
-            <figcaption><h3>Someone across from you.</h3><p>A different perspective on your next move.</p></figcaption>
-          </figure>
-          <figure class="gallery-item gallery-scoresheet">
-            <a class="shot-link" href="assets/images/the-scoresheet.webp" data-gallery data-title="The ritual of the game" data-caption="A pen, a scoresheet, a record of every move." aria-label="Enlarge screenshot: the ritual of the game">
-              <div class="shot-frame scoresheet-frame">
-                <img src="assets/images/the-scoresheet-1200.webp" srcset="assets/images/the-scoresheet-1200.webp 1200w, assets/images/the-scoresheet.webp 2048w" sizes="(max-width: 700px) 100vw, 40vw" width="2048" height="1151" loading="lazy" decoding="async" alt="A player holds a pen above a handwritten chess scoresheet resting on the wooden table.">
-              </div>
-              <span class="image-index" aria-hidden="true">03</span>
-              <span class="expand-icon" aria-hidden="true">↗</span>
-            </a>
-            <figcaption><h3>Every move leaves a trace.</h3><p>The small details that make chess feel real.</p></figcaption>
-          </figure>
-        </div>
-        <p class="gallery-footnote"><span class="diamond" aria-hidden="true"></span> Select a screenshot to see the full frame.</p>
-      </div>
-    </section>
-
-    <section class="development shell section-space" id="development" aria-labelledby="development-title">
-      <div class="development-heading">
-        <p class="eyebrow">03 / In the making</p>
-        <h2 id="development-title">The opening<br><em>is still being written.</em></h2>
-      </div>
-      <div class="development-copy">
-        <span class="status"><span aria-hidden="true">◇</span> Work-in-Progress</span>
-        <p>Scacelith is under active development. The experience is evolving, and the screenshots offer an early look at the game.</p>
-        <p>There is no public download or announced release date yet. For now, consider this your first look across the board.</p>
-        <div class="development-credit">
-          <p class="credit-label">Human vision. AI-assisted development.</p>
-          <p>Developed with the assistance of <strong>Claude Opus 5.5</strong>.</p>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="site-footer shell">
-    <div><a class="wordmark" href="#top">Scacelith<span class="brand-diamond" aria-hidden="true"></span></a><p>The timeless game. A new sense of presence.</p></div>
-    <div class="footer-right"><span>© 2026 Scacelith</span><a href="#top">Back to the board <span aria-hidden="true">↑</span></a></div>
-  </footer>
-
-  <dialog class="lightbox" aria-labelledby="lightbox-title" aria-describedby="lightbox-caption">
-    <div class="lightbox-topbar"><span class="lightbox-brand">Scacelith / In-game gallery</span><button class="lightbox-close icon-button" type="button" aria-label="Close screenshot gallery" autofocus>×</button></div>
-    <div class="lightbox-image-wrap"><img class="lightbox-image" alt="" width="2048" height="1151"></div>
-    <div class="lightbox-bottom"><div class="lightbox-info"><h2 id="lightbox-title"></h2><p id="lightbox-caption"></p></div><div class="lightbox-controls"><button class="lightbox-prev icon-button" type="button" aria-label="Previous screenshot">←</button><span class="lightbox-counter" aria-live="polite"></span><button class="lightbox-next icon-button" type="button" aria-label="Next screenshot">→</button></div></div>
-  </dialog>
+<body class="chooser-page">
+<main class="chooser" id="main">
+  <div class="chooser-backdrop" aria-hidden="true"></div>
+  <div class="chooser-card">
+    <img class="chooser-logo" src="assets/icons/logo-256.webp" width="96" height="96" alt="">
+    <h1 class="chooser-title">Scacelith</h1>
+    <div class="ornament-rule" aria-hidden="true"><span class="diamond"></span></div>
+    <p class="chooser-lead" data-chooser-lead>Choose your language</p>
+    <ul class="chooser-list">
+<li><a href="en/" hreflang="en" lang="en" dir="ltr" data-lang="en"><span class="chooser-name">English</span><span class="chooser-tagline">The Royal Game</span></a></li>
+<li><a href="fr/" hreflang="fr" lang="fr" dir="ltr" data-lang="fr"><span class="chooser-name">Français</span><span class="chooser-tagline">Le jeu des rois</span></a></li>
+<li><a href="de/" hreflang="de" lang="de" dir="ltr" data-lang="de"><span class="chooser-name">Deutsch</span><span class="chooser-tagline">Das königliche Spiel</span></a></li>
+<li><a href="es/" hreflang="es" lang="es" dir="ltr" data-lang="es"><span class="chooser-name">Español</span><span class="chooser-tagline">El juego de los reyes</span></a></li>
+<li><a href="uk/" hreflang="uk" lang="uk" dir="ltr" data-lang="uk"><span class="chooser-name">Українська</span><span class="chooser-tagline">Королівська гра</span></a></li>
+<li><a href="ru/" hreflang="ru" lang="ru" dir="ltr" data-lang="ru"><span class="chooser-name">Русский</span><span class="chooser-tagline">Королевская игра</span></a></li>
+<li><a href="ar/" hreflang="ar" lang="ar" dir="rtl" data-lang="ar"><span class="chooser-name">العربية</span><span class="chooser-tagline">لعبة الملوك</span></a></li>
+<li><a href="ja/" hreflang="ja" lang="ja" dir="ltr" data-lang="ja"><span class="chooser-name">日本語</span><span class="chooser-tagline">王者のゲーム</span></a></li>
+<li><a href="zh-Hans/" hreflang="zh-Hans" lang="zh-Hans" dir="ltr" data-lang="zh-Hans"><span class="chooser-name">简体中文</span><span class="chooser-tagline">王者的游戏</span></a></li>
+<li><a href="zh-Hant/" hreflang="zh-Hant" lang="zh-Hant" dir="ltr" data-lang="zh-Hant"><span class="chooser-name">繁體中文</span><span class="chooser-tagline">王者的遊戲</span></a></li>
+    </ul>
+  </div>
+</main>
 </body>
 </html>

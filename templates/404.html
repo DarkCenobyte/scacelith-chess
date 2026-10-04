@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="no-js" data-page="notfound">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="{{v:csp}}">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#100e0b">
+<meta name="robots" content="noindex">
+<title>{{t:notfound.title}} · Scacelith</title>
+<link rel="icon" href="/assets/icons/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="stylesheet" href="/assets/css/site.css">
+<script src="/assets/js/boot.js"></script>
+</head>
+<body class="chooser-page">
+<main class="chooser" id="main">
+  <div class="chooser-backdrop" aria-hidden="true"></div>
+  <div class="chooser-card">
+    <img class="chooser-logo" src="/assets/icons/logo-256.webp" width="96" height="96" alt="">
+    <p class="chooser-code" aria-hidden="true">404</p>
+    <h1 class="chooser-title chooser-title-small" data-nf-title>{{t:notfound.title}}</h1>
+    <div class="ornament-rule" aria-hidden="true"><span class="diamond"></span></div>
+    <p class="chooser-lead" data-nf-text>{{t:notfound.text}}</p>
+    <p><a class="btn btn-gold" href="/" data-nf-home>{{t:notfound.home}}</a></p>
+    <ul class="chooser-list chooser-list-compact">
+{{r:chooser}}
+    </ul>
+  </div>
+</main>
+<script type="application/json" id="notfound-data">{{r:notfound_json}}</script>
+<script src="/assets/js/notfound.js"></script>
+</body>
+</html>

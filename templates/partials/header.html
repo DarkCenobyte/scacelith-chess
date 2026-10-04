@@ -1,0 +1,51 @@
+<header class="site-header" data-header>
+  <div class="shell header-bar">
+    <a class="brand" href="{{v:home}}">
+      <img class="brand-icon" src="{{v:root}}assets/icons/logo-128.webp" width="34" height="34" alt="">
+      <span class="brand-word">Scacelith</span>
+      <span class="visually-hidden">{{t:nav.home}}</span>
+    </a>
+    <nav class="site-nav" id="site-nav" aria-label="{{t:nav.label}}" data-nav>
+      <ul class="nav-list">
+        <li><a href="{{v:home}}#experience" data-nav-section="experience">{{t:nav.game}}</a></li>
+        <li><a href="{{v:home}}#modes" data-nav-section="modes">{{t:nav.modes}}</a></li>
+        <li><a href="{{v:home}}#gallery" data-nav-section="gallery">{{t:nav.gallery}}</a></li>
+        <li><a href="{{v:home}}#online" data-nav-section="online">{{t:nav.online}}</a></li>
+        <li><a href="{{v:home}}players/" data-nav-page="players">{{t:nav.players}}</a></li>
+      </ul>
+      <div class="nav-extra">
+        <a class="nav-account" href="{{v:home}}account/" data-nav-page="account" data-account-link>
+          <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+          <span data-account-label>{{t:nav.account}}</span>
+        </a>
+      </div>
+    </nav>
+    <div class="header-tools">
+      <details class="menu lang-menu" data-menu>
+        <summary class="tool-button" title="{{t:nav.language}}">
+          <svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>
+          <span class="lang-code">{{v:lang}}</span>
+          <span class="visually-hidden">{{t:nav.language}}: {{v:lang_name}}</span>
+        </summary>
+        <div class="menu-panel lang-panel">
+          <p class="menu-title">{{t:nav.language}}</p>
+          <ul class="lang-list" data-lang-list>
+{{r:lang_links}}
+          </ul>
+        </div>
+      </details>
+      <a class="tool-button account-button" href="{{v:home}}account/" data-account-link data-nav-page="account">
+        <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+        <span class="account-button-label" data-account-label>{{t:nav.account}}</span>
+      </a>
+      <div class="header-download">
+{{> download-menu}}
+      </div>
+      <button class="tool-button nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+        <svg class="icon icon-open" aria-hidden="true"><use href="#i-menu"></use></svg>
+        <svg class="icon icon-close" aria-hidden="true"><use href="#i-close"></use></svg>
+        <span class="visually-hidden">{{t:nav.menu}}</span>
+      </button>
+    </div>
+  </div>
+</header>

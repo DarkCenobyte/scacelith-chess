@@ -1,0 +1,63 @@
+<section class="page-head" aria-labelledby="page-title">
+  <div class="page-head-media" aria-hidden="true"></div>
+  <div class="shell">
+    <p class="eyebrow"><span class="diamond" aria-hidden="true"></span><span data-server-name>caissa.scacelith.com</span></p>
+    <h1 class="page-title" id="page-title">{{t:players.title}}</h1>
+    <p class="page-lead">{{t:players.lead}}</p>
+  </div>
+</section>
+
+<div class="shell page-body players-body">
+  <noscript><p class="notice notice-warning">{{t:common.noscript}}</p></noscript>
+
+  <form class="search-bar" role="search" data-player-search novalidate>
+    <label class="visually-hidden" for="player-query">{{t:players.search_label}}</label>
+    <svg class="icon search-icon" aria-hidden="true"><use href="#i-search"></use></svg>
+    <input id="player-query" name="u" type="search" maxlength="24" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="{{t:players.search_placeholder}}" enterkeyhint="search">
+    <button class="btn btn-gold btn-small" type="submit">{{t:players.search_button}}</button>
+  </form>
+  <p class="form-error" role="alert" data-search-error hidden></p>
+
+  <section class="panel profile" data-profile hidden aria-labelledby="profile-name">
+    <a class="back-link" href="./" data-back-to-board><svg class="icon flip-rtl rotate-180" aria-hidden="true"><use href="#i-arrow"></use></svg>{{t:players.back}}</a>
+    <header class="profile-head">
+      <div class="medallion" aria-hidden="true"><span data-profile-initial></span></div>
+      <div class="profile-ident">
+        <h2 class="profile-name" id="profile-name" data-profile-name></h2>
+        <p class="profile-sub" data-profile-since></p>
+      </div>
+      <dl class="profile-stats" data-profile-stats></dl>
+    </header>
+    <div class="ratings" data-profile-ratings></div>
+    <section class="games-section" aria-labelledby="profile-games-title">
+      <h3 class="block-title" id="profile-games-title">{{t:players.recent_games}}</h3>
+      <div data-profile-games></div>
+    </section>
+  </section>
+
+  <section class="panel leaderboard" data-leaderboard aria-labelledby="board-title">
+    <header class="panel-head">
+      <h2 class="block-title" id="board-title" tabindex="-1"><svg class="icon" aria-hidden="true"><use href="#i-trophy"></use></svg>{{t:players.board_title}}</h2>
+      <div class="segmented" role="group" aria-label="{{t:players.category}}" data-board-tabs></div>
+    </header>
+    <p class="panel-note" data-board-note></p>
+    <div class="table-wrap">
+      <table class="board-table" data-board-table>
+        <caption class="visually-hidden" data-board-caption>{{t:players.board_title}}</caption>
+        <thead>
+          <tr>
+            <th scope="col" class="num">{{t:players.col_rank}}</th>
+            <th scope="col">{{t:players.col_player}}</th>
+            <th scope="col" class="num">{{t:players.col_rating}}</th>
+            <th scope="col" class="num hide-sm">{{t:players.col_peak}}</th>
+            <th scope="col" class="num hide-sm">{{t:players.col_games}}</th>
+            <th scope="col" class="num wdl-col hide-xs">{{t:players.col_wdl}}</th>
+          </tr>
+        </thead>
+        <tbody data-board-body>
+          <tr><td colspan="6" class="placeholder">{{t:players.loading}}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

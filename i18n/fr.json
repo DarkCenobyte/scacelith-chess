@@ -1,0 +1,656 @@
+{
+  "pages": {
+    "home": {
+      "title": "Scacelith — les échecs photoréalistes, à la première personne",
+      "description": "Échecs photoréalistes et gratuits pour Windows, à la première personne dans une salle royale : Stockfish 19, un coach et des adversaires en ligne."
+    },
+    "players": {
+      "title": "Classement et joueurs — Scacelith",
+      "description": "Les meilleurs joueurs du serveur officiel de Scacelith dans chaque cadence, leurs classements et leurs dernières parties."
+    },
+    "account": {
+      "title": "Votre compte — Scacelith",
+      "description": "Connectez-vous à votre compte Scacelith : classements, historique des parties, téléchargements PGN et GIF, appareils connectés et réglages."
+    },
+    "gif": {
+      "title": "GIF animé — Scacelith",
+      "description": "Un GIF animé d’une partie de Scacelith."
+    }
+  },
+  "brand": {
+    "tagline": "Le jeu des rois"
+  },
+  "nav": {
+    "skip": "Aller au contenu",
+    "home": "Accueil",
+    "label": "Menu principal",
+    "game": "Le jeu",
+    "modes": "Modes de jeu",
+    "gallery": "Galerie",
+    "trailer": "Bande-annonce",
+    "online": "En ligne",
+    "players": "Classement",
+    "account": "Compte",
+    "language": "Langue",
+    "menu": "Menu",
+    "download": "Télécharger"
+  },
+  "hero": {
+    "image_alt": "Deux robots de porcelaine jouent aux échecs à une table de noyer, dans une salle de marbre baignée de soleil.",
+    "eyebrow": "Bêta publique",
+    "lead": "Prenez place à une table de noyer ciré, dans une salle royale baignée de soleil. De l’autre côté de l’échiquier, un robot de porcelaine animé par Stockfish attend votre premier coup.",
+    "watch": "Voir la bande-annonce",
+    "meta": "Logiciel libre · Windows 64 bits · Carte graphique OpenGL 4.6",
+    "caption": "Capturé dans le jeu : l’écran titre"
+  },
+  "highlights": {
+    "engine": "Moteur OpenGL 4.6 maison",
+    "stockfish": "Stockfish 19 intégré",
+    "rules": "Classement FIDE",
+    "online": "Jeu en ligne",
+    "languages": "Dix langues"
+  },
+  "experience": {
+    "eyebrow": "L’expérience",
+    "title": "Pas un échiquier sur un écran.<br><em>Une place à la table.</em>",
+    "lead": "Scacelith fait revivre ce qui fait une vraie partie : la salle, le silence, la pendule, un adversaire qui vous regarde, et les rituels du tournoi.",
+    "presence": {
+      "title": "À la première personne",
+      "text": "Vous voyez par les yeux de votre robot. Regardez autour de vous, penchez-vous vers l’échiquier, levez les yeux vers votre adversaire ou jetez un œil à la feuille de partie posée à côté de vous."
+    },
+    "ritual": {
+      "title": "Les règles du tournoi",
+      "text": "Pièce touchée, pièce jouée. Votre main appuie sur la pendule pour terminer le coup. Un coup illégal fait venir l’arbitre, et un second fait perdre la partie."
+    },
+    "scoresheet": {
+      "title": "Écrite à la main",
+      "text": "Chaque joueur note tous les coups sur sa propre feuille de partie, avec son écriture, et tourne la page tous les quarante coups. On entend la plume sur le papier."
+    },
+    "opponent": {
+      "title": "Un adversaire à votre mesure",
+      "text": "Stockfish 19 à votre niveau, du Novice (800) à sa pleine force (3 500), avec un classement calculé selon les règles de la FIDE après chaque partie."
+    },
+    "engine": {
+      "title": "Conçu pour ce jeu",
+      "text": "Un moteur écrit de zéro : éclairage physique, marbre, bois ciré, porcelaine et laiton, le soleil à travers les fenêtres, ombres douces et reflets."
+    },
+    "languages": {
+      "title": "Dix langues",
+      "text": "Anglais, français, allemand, espagnol, ukrainien, russe, arabe, japonais et chinois, simplifié et traditionnel. L’arabe se lit de droite à gauche."
+    }
+  },
+  "modes": {
+    "eyebrow": "Modes de jeu",
+    "title": "À chaque partie<br><em>sa table.</em>",
+    "lead": "Tout se joue dans la même salle, depuis l’écran titre. Hors ligne, Stockfish est toujours prêt pour une partie.",
+    "new_game": {
+      "name": "Nouvelle partie",
+      "text": "Affrontez Stockfish à la force de votre choix, avec une cadence du bullet au classique, ou jouez contre un ami sur le même ordinateur, chacun par les yeux de son robot."
+    },
+    "coach": {
+      "name": "Coach",
+      "text": "Un professeur s’assoit face à vous, joue à votre niveau et commente la partie : menaces, bons coups, erreurs. Des règles des échecs jusqu’au niveau expert, avec une voix de synthèse."
+    },
+    "online": {
+      "name": "Jouer en ligne",
+      "text": "De vrais adversaires via un serveur Scacelith : parties classées, recherche d’adversaire, défis et parties privées. Le robot de votre adversaire bouge avec lui, en direct."
+    },
+    "watch": {
+      "name": "Regarder une partie",
+      "text": "Deux Stockfish s’affrontent pendant que vous circulez librement dans la salle, invisible, d’un point de vue à l’autre."
+    },
+    "saved": {
+      "name": "Parties sauvegardées",
+      "text": "Vos parties sont conservées en fichiers PGN. Revoyez-les dans la salle, avec les vrais temps de réflexion et les pendules, ou importez des parties d’autres logiciels."
+    }
+  },
+  "gallery": {
+    "eyebrow": "Galerie",
+    "title": "Vu <em>depuis la salle</em>",
+    "lead": "Chaque image est capturée dans le jeu, en temps réel, par son propre moteur.",
+    "title_screen": {
+      "alt": "L’écran titre : le menu de Scacelith à côté de deux robots qui jouent aux échecs dans la salle.",
+      "caption": "L’écran titre"
+    },
+    "hall": {
+      "alt": "Deux robots face à face de part et d’autre de l’échiquier, dans des fauteuils de velours rouge, sous de hautes fenêtres.",
+      "caption": "La salle royale"
+    },
+    "board": {
+      "alt": "L’échiquier vu de dessus, avec la pendule et la main d’un robot qui s’avance vers une pièce.",
+      "caption": "À l’échiquier"
+    },
+    "opponent": {
+      "alt": "Gros plan sur l’adversaire, un robot de porcelaine, la tête penchée vers l’échiquier.",
+      "caption": "Votre adversaire"
+    },
+    "scoresheet": {
+      "alt": "La main d’un robot note les coups sur la feuille de partie avec un stylo-plume.",
+      "caption": "La feuille de partie"
+    },
+    "note": "Version de développement. L’interface visible sur ces images est en français.",
+    "viewer": "Visionneuse d’images",
+    "close": "Fermer",
+    "previous": "Image précédente",
+    "next": "Image suivante"
+  },
+  "trailer": {
+    "eyebrow": "Bande-annonce",
+    "title": "Scacelith <em>en mouvement</em>",
+    "play": "Lancer la bande-annonce",
+    "soon_title": "La bande-annonce arrive bientôt",
+    "soon_text": "En attendant, prenez place : la bêta est prête à être téléchargée.",
+    "privacy": "La vidéo est lue par YouTube (youtube-nocookie.com) une fois que vous appuyez sur lecture.",
+    "open_youtube": "Voir sur YouTube"
+  },
+  "online": {
+    "eyebrow": "En ligne",
+    "title": "De vrais adversaires,<br><em>la même salle.</em>",
+    "lead": "Connectez-vous au serveur officiel depuis le jeu et affrontez des joueurs du monde entier, toujours à la première personne.",
+    "point_rated": "Des parties classées dans chaque cadence officielle, avec un classement FIDE pour chacune.",
+    "point_match": "Recherche d’adversaire, défis par nom, parties privées avec un code et parties directes entre deux ordinateurs.",
+    "point_fair": "Fair-play : contrôles automatiques, analyse des parties terminées par un moteur et signalements des joueurs.",
+    "point_history": "Votre historique de parties sur ce site : téléchargez chaque partie en PGN ou en GIF animé.",
+    "point_open": "Chacun peut héberger un serveur communautaire : le serveur et son API sont des logiciels libres.",
+    "create": "Créer un compte",
+    "signin": "Se connecter",
+    "server_title": "Le serveur officiel",
+    "status_checking": "Vérification…",
+    "address": "Adresse",
+    "registration": "Inscriptions",
+    "categories": "Cadences classées",
+    "top_players": "Meilleurs joueurs",
+    "category": "Cadence",
+    "board_loading": "Chargement du classement…",
+    "full_board": "Classement complet"
+  },
+  "download": {
+    "button": "Télécharger",
+    "choose": "Choisissez votre système",
+    "see_release": "Voir la version sur GitHub",
+    "latest": "Scacelith",
+    "all_releases": "Toutes les versions",
+    "eyebrow": "Téléchargement",
+    "title": "Prenez place.<br><em>Gratuit et libre.</em>",
+    "lead": "Pas d’installation : téléchargez, décompressez et lancez Scacelith.exe. Chaque fichier est construit à partir de ses sources étiquetées par GitHub Actions, avec une provenance attestée.",
+    "prerelease": "Bêta",
+    "notes": "Notes de version",
+    "req_system": "Système",
+    "req_system_value": "Windows, 64 bits (x64)",
+    "req_gpu": "Graphismes",
+    "req_gpu_value": "Une carte graphique OpenGL 4.6 avec un pilote à jour",
+    "req_included": "Inclus",
+    "req_included_value": "Stockfish 19 et son réseau neuronal : jouez hors ligne tout de suite",
+    "req_network": "Internet",
+    "req_network_value": "Pour le jeu en ligne, les GIF et la voix du coach (un téléchargement facultatif d’environ 145 Mo)",
+    "req_licence": "Licence",
+    "req_licence_value": "Licence publique générale GNU v3",
+    "verify_title": "Vérifiez votre téléchargement",
+    "verify_text": "La provenance de chaque fichier est attestée par GitHub. Avec GitHub CLI :",
+    "checksums": "Sommes de contrôle SHA-256 (SHA256SUMS)"
+  },
+  "credits": {
+    "eyebrow": "Crédits",
+    "title": "Crédits et <em>remerciements</em>",
+    "engine_head": "Moteur d’échecs",
+    "engine": "Stockfish 19, par les développeurs de Stockfish (GNU GPL v3). Son réseau neuronal a été entraîné sur des données fournies par le projet Leela Chess Zero (Open Database License).",
+    "voice_head": "Voix du coach",
+    "voice": "Synthèse vocale générée par Supertonic 3 pour le mode Coach. Supertonic 3 est un modèle de Supertone, utilisé sous la licence OpenRAIL-M.",
+    "fonts_head": "Polices",
+    "fonts": "EB Garamond par Georg Duffner, Cinzel par Natanael Gama et Amiri par Khaled Hosny (SIL Open Font License) ; figurines d’échecs de GNU FreeFont.",
+    "openings_head": "Ouvertures",
+    "openings": "Noms des ouvertures tirés de la base chess-openings de lichess.org, versée dans le domaine public (CC0).",
+    "quote": "« Les échecs sont l’art de l’analyse. »",
+    "quote_author": "Mikhaïl Botvinnik"
+  },
+  "footer": {
+    "about": "Un jeu d’échecs photoréaliste à la première personne, sur un moteur OpenGL 4.6 maison. Logiciel libre sous licence GNU GPL v3.",
+    "game": "Le jeu",
+    "online": "En ligne",
+    "api_docs": "Documentation de l’API du serveur",
+    "source": "Code source",
+    "game_source": "Le jeu sur GitHub",
+    "server_source": "Le serveur sur GitHub",
+    "releases": "Versions",
+    "licence": "Licence (GPL v3)",
+    "credits": "Stockfish est une marque de ses développeurs. YouTube est une marque de Google LLC. Windows est une marque de Microsoft Corporation.",
+    "legal": "Scacelith",
+    "made": "Ce site n’utilise ni cookies ni traceurs."
+  },
+  "common": {
+    "copy": "Copier",
+    "loading": "Chargement…",
+    "noscript": "Cette page a besoin de JavaScript pour dialoguer avec le serveur Scacelith."
+  },
+  "players": {
+    "title": "Classement et joueurs",
+    "lead": "Les meilleurs joueurs du serveur officiel dans chaque cadence classée. Recherchez un joueur pour voir ses classements et ses dernières parties.",
+    "search_label": "Rechercher un joueur",
+    "search_placeholder": "Nom d’utilisateur",
+    "search_button": "Rechercher",
+    "back": "Retour au classement",
+    "recent_games": "Dernières parties",
+    "board_title": "Classement",
+    "category": "Cadence",
+    "col_rank": "Rang",
+    "col_player": "Joueur",
+    "col_rating": "Elo",
+    "col_peak": "Record",
+    "col_games": "Parties",
+    "col_wdl": "V / N / D",
+    "loading": "Chargement…"
+  },
+  "account": {
+    "title": "Votre compte",
+    "auth_foot": "Un seul compte sur le serveur officiel, pour le jeu et pour ce site. Vous avez créé votre compte avec Google dans le jeu ? Utilisez « Mot de passe oublié ? » pour lui donner un mot de passe.",
+    "common": {
+      "back": "Retour à la connexion"
+    },
+    "fields": {
+      "login": "Nom d’utilisateur ou e-mail",
+      "password": "Mot de passe",
+      "show_password": "Afficher le mot de passe",
+      "username": "Nom d’utilisateur",
+      "email": "E-mail",
+      "confirm_password": "Confirmez le mot de passe",
+      "current_password": "Mot de passe actuel",
+      "new_password": "Nouveau mot de passe",
+      "new_email": "Nouvelle adresse e-mail",
+      "mfa_code": "Code de vérification (ou code de récupération)"
+    },
+    "signin": {
+      "tab": "Se connecter",
+      "title": "Bon retour parmi nous",
+      "remember": "Rester connecté sur cet appareil",
+      "submit": "Se connecter",
+      "forgot": "Mot de passe oublié ?",
+      "resend": "Renvoyer l’e-mail de confirmation"
+    },
+    "mfa": {
+      "title": "Authentification à deux facteurs",
+      "text": "Saisissez le code à 6 chiffres de votre application d’authentification.",
+      "code": "Code de l’application",
+      "use_recovery": "Utiliser plutôt un code de récupération",
+      "submit": "Valider"
+    },
+    "register": {
+      "tab": "Créer un compte",
+      "title": "Un compte gratuit",
+      "closed": "Le serveur n’accepte pas de nouveaux comptes pour le moment.",
+      "username_hint": "Lettres, chiffres, _ et -, en commençant par une lettre ou un chiffre.",
+      "password_hint": "Au moins 10 caractères, sans votre nom d’utilisateur ni votre e-mail.",
+      "pow_note": "Pour écarter les robots, votre navigateur résout une petite énigme lors de l’inscription. Cela prend quelques secondes.",
+      "submit": "Créer le compte",
+      "done_title": "Consultez vos e-mails",
+      "done_text": "Nous avons envoyé un lien de confirmation à votre adresse. Ouvrez-le pour créer votre compte, puis connectez-vous.",
+      "done_hint": "Le lien est valable 24 heures. Rien dans votre boîte de réception ? Regardez dans vos indésirables, ou demandez un nouvel e-mail.",
+      "go_signin": "Aller à la connexion"
+    },
+    "forgot": {
+      "title": "Mot de passe oublié",
+      "text": "Saisissez l’adresse e-mail de votre compte. Si un compte l’utilise, nous vous envoyons un lien pour choisir un nouveau mot de passe, valable une heure.",
+      "submit": "Envoyer le lien"
+    },
+    "resend": {
+      "title": "Confirmez votre e-mail",
+      "text": "Vous n’avez pas reçu l’e-mail de confirmation, ou le lien a expiré ? Saisissez votre adresse pour en recevoir un nouveau.",
+      "submit": "Renvoyer"
+    },
+    "dash": {
+      "public_profile": "Profil public",
+      "signout": "Se déconnecter",
+      "tab_overview": "Aperçu",
+      "tab_games": "Parties",
+      "tab_devices": "Appareils",
+      "tab_settings": "Réglages"
+    },
+    "overview": {
+      "info": "Vos informations",
+      "ratings": "Vos classements",
+      "sanctions": "Sanctions",
+      "recent": "Dernières parties",
+      "all_games": "Toutes vos parties"
+    },
+    "games": {
+      "filter_category": "Cadence",
+      "all": "Toutes",
+      "custom": "Libre",
+      "filter_rated": "Type",
+      "rated": "Classées",
+      "casual": "Amicales",
+      "filter_result": "Résultat",
+      "wins": "Gagnées",
+      "losses": "Perdues",
+      "draws": "Nulles"
+    },
+    "devices": {
+      "title": "Appareils connectés",
+      "signout_all": "Se déconnecter partout",
+      "text": "Chaque connexion, dans le jeu ou sur ce site, est un appareil. Déconnectez ceux que vous ne reconnaissez pas."
+    },
+    "settings": {
+      "challenges_title": "Défis",
+      "challenges_text": "Les autres joueurs peuvent vous défier par votre nom depuis le jeu.",
+      "challenges_label": "Accepter les défis",
+      "mfa_title": "Authentification à deux facteurs",
+      "mfa_text": "Activez-la ou désactivez-la, et générez de nouveaux codes de récupération, depuis la page Compte du jeu.",
+      "password_title": "Changer le mot de passe",
+      "password_text": "Vos autres appareils sont déconnectés ; celui-ci reste connecté.",
+      "password_submit": "Changer le mot de passe",
+      "email_title": "Changer l’adresse e-mail",
+      "email_submit": "Envoyer le lien de confirmation",
+      "export_title": "Télécharger mes données",
+      "export_text": "Tout ce que le serveur conserve sur votre compte, dans un fichier JSON.",
+      "export_submit": "Télécharger mes données",
+      "delete_title": "Supprimer le compte",
+      "delete_text": "Action irréversible. Vos parties et vos classements restent, sous un nom anonyme ; votre adresse e-mail, votre mot de passe et vos appareils sont effacés.",
+      "delete_confirm": "Saisissez votre nom d’utilisateur pour confirmer",
+      "delete_submit": "Supprimer mon compte"
+    }
+  },
+  "gif": {
+    "title": "GIF animé",
+    "preparing": "Préparation du GIF…",
+    "download": "Télécharger le GIF",
+    "make": "Créer le GIF",
+    "pause": "Mettre l’animation en pause",
+    "back": "Retour à mes parties",
+    "options": "Options",
+    "size": "Taille",
+    "size_small": "Petite (284 × 350)",
+    "size_medium": "Moyenne (424 × 515)",
+    "size_large": "Grande (628 × 762)",
+    "orientation": "Échiquier vu des",
+    "orientation_white": "Blancs",
+    "orientation_black": "Noirs",
+    "speed": "Vitesse",
+    "speed_fast": "Rapide (0,25 s par coup)",
+    "speed_normal": "Normale (0,5 s par coup)",
+    "speed_slow": "Lente (1 s par coup)",
+    "speed_very_slow": "Très lente (2 s par coup)",
+    "coords": "Afficher les coordonnées",
+    "regenerate": "Refaire le GIF",
+    "note": "Le serveur dessine chaque GIF. Un GIF déjà réalisé revient aussitôt ; les nouveaux sont limités à quelques-uns par minute."
+  },
+  "notfound": {
+    "title": "Page introuvable",
+    "text": "Cette case est vide. La page a peut-être été déplacée.",
+    "home": "Retour à Scacelith"
+  },
+  "js": {
+    "common": {
+      "loading": "Chargement…",
+      "retry": "Réessayer",
+      "close": "Fermer",
+      "copy": "Copier",
+      "copied": "Copié dans le presse-papiers.",
+      "copy_failed": "Copie impossible. Sélectionnez le texte et copiez-le à la main.",
+      "load_more": "Afficher plus",
+      "show_password": "Afficher le mot de passe",
+      "hide_password": "Masquer le mot de passe",
+      "signin_needed": "Connectez-vous pour continuer.",
+      "dash": "—"
+    },
+    "errors": {
+      "network": "Le serveur est injoignable. Vérifiez votre connexion et réessayez.",
+      "timeout": "Le serveur a mis trop de temps à répondre. Réessayez.",
+      "server_busy": "Le serveur est occupé. Réessayez dans un instant.",
+      "rate_limited": "Trop de requêtes. Réessayez dans {time}.",
+      "rate_limited_short": "Trop de requêtes. Réessayez dans un instant.",
+      "internal_error": "Le serveur a rencontré une erreur inattendue. Réessayez plus tard.",
+      "invalid_token": "Votre session a pris fin. Veuillez vous reconnecter.",
+      "unauthorized": "Veuillez vous connecter.",
+      "not_found": "Introuvable.",
+      "unknown": "Une erreur s’est produite ({code}).",
+      "invalid_credentials": "Nom d’utilisateur, e-mail ou mot de passe incorrect.",
+      "too_many_attempts": "Trop de tentatives. Réessayez dans {time}.",
+      "banned": "Ce compte est suspendu jusqu’au {date}.",
+      "banned_permanent": "Ce compte est suspendu.",
+      "email_unverified": "Votre adresse e-mail n’est pas encore confirmée. Ouvrez le lien que nous vous avons envoyé, ou demandez-en un nouveau.",
+      "invalid_mfa_token": "Cette étape de connexion a expiré. Veuillez vous reconnecter.",
+      "invalid_code": "Code incorrect ou déjà utilisé.",
+      "mfa_code_required": "Saisissez votre code de vérification.",
+      "invalid_password": "Mot de passe incorrect.",
+      "password_not_set": "Ce compte n’a pas encore de mot de passe : utilisez « Mot de passe oublié ? » sur la page de connexion pour en définir un.",
+      "registration_closed": "Le serveur n’accepte pas de nouveaux comptes pour le moment.",
+      "invalid_username": "Ce nom d’utilisateur n’est pas autorisé.",
+      "username_taken": "Ce nom d’utilisateur est déjà pris.",
+      "invalid_email": "Cette adresse e-mail n’est pas valide.",
+      "email_taken": "Cette adresse e-mail est déjà utilisée par un autre compte.",
+      "same_email": "C’est déjà votre adresse e-mail.",
+      "weak_password": "Ce mot de passe est trop faible.",
+      "weak_too_short": "Le mot de passe est trop court ({min} caractères au moins).",
+      "weak_too_long": "Le mot de passe est trop long.",
+      "weak_contains_username": "Le mot de passe ne doit pas contenir votre nom d’utilisateur.",
+      "weak_contains_email": "Le mot de passe ne doit pas contenir votre adresse e-mail.",
+      "weak_too_common": "Ce mot de passe est trop courant. Choisissez-en un autre.",
+      "pow_failed": "La vérification anti-robot a échoué. Réessayez.",
+      "passwords_differ": "Les deux mots de passe sont différents.",
+      "required": "Remplissez ce champ.",
+      "email_format": "Saisissez une adresse e-mail valide.",
+      "username_format": "De {min} à {max} caractères : lettres, chiffres, _ et -, en commençant par une lettre ou un chiffre.",
+      "password_length": "Au moins {min} caractères.",
+      "confirm_name": "Saisissez votre nom d’utilisateur exactement comme il est affiché.",
+      "game_too_long": "Cette partie est trop longue pour être convertie en GIF.",
+      "gif_disabled": "Ce serveur ne fabrique pas de GIF.",
+      "render_failed": "Le serveur n’a pas pu dessiner ce GIF.",
+      "invalid_game": "Cette partie n’existe pas.",
+      "invalid_player": "Saisissez un nom d’utilisateur : de 2 à 24 lettres, chiffres, _, . ou -.",
+      "player_not_found": "Aucun joueur ne porte ce nom."
+    },
+    "time": {
+      "seconds": {
+        "one": "{count} seconde",
+        "many": "{count} de secondes",
+        "other": "{count} secondes"
+      },
+      "minutes": {
+        "one": "{count} minute",
+        "many": "{count} de minutes",
+        "other": "{count} minutes"
+      }
+    },
+    "download": {
+      "exe": "Exécutable",
+      "zip": "Archive ZIP",
+      "file": "Fichier",
+      "unavailable": "Non disponible",
+      "your_system": "Votre système",
+      "eyebrow_beta": "Bêta publique · {version}",
+      "eyebrow_release": "Version {version}",
+      "published": "Publiée le {date}",
+      "unreachable": "GitHub est injoignable pour le moment : consultez la page des versions.",
+      "available": "Disponible",
+      "verify_file": "le fichier",
+      "no_build": "Pas de version du jeu pour {os} pour le moment.",
+      "prerelease_short": "bêta",
+      "x64": "64 bits (x64)"
+    },
+    "server": {
+      "online": "En ligne",
+      "offline": "Injoignable",
+      "open": "Ouvertes",
+      "closed": "Fermées",
+      "updated": "Mis à jour {time}",
+      "min_games": "Joueurs ayant au moins {count} parties classées dans cette cadence.",
+      "empty": "Aucun joueur classé dans cette cadence pour l’instant.",
+      "error": "Le classement ne peut pas être chargé pour le moment."
+    },
+    "game": {
+      "number": "Partie nº {id}",
+      "white": "Blancs",
+      "black": "Noirs",
+      "you": "vous",
+      "vs": "contre",
+      "outcome_win": "Gagnée",
+      "outcome_loss": "Perdue",
+      "outcome_draw": "Nulle",
+      "outcome_aborted": "Annulée",
+      "result_white": "Les Blancs gagnent",
+      "result_black": "Les Noirs gagnent",
+      "result_draw": "Nulle",
+      "result_aborted": "Annulée",
+      "rated": "Classée",
+      "casual": "Amicale",
+      "custom": "Libre",
+      "moves": {
+        "one": "{count} coup",
+        "many": "{count} de coups",
+        "other": "{count} coups"
+      },
+      "duration": "Durée {time}",
+      "rating_diff": "Variation du classement : {diff}",
+      "pgn": "PGN",
+      "pgn_title": "Télécharger la partie en PGN",
+      "copy_pgn": "Copier",
+      "copy_pgn_title": "Copier le PGN",
+      "gif": "GIF",
+      "gif_title": "Créer un GIF animé (ouvre un nouvel onglet)",
+      "gif_signin": "Connectez-vous pour créer des GIF",
+      "pgn_copied": "PGN copié dans le presse-papiers.",
+      "pgn_saved": "PGN téléchargé.",
+      "none": "Aucune partie pour l’instant. Vos parties en ligne apparaîtront ici.",
+      "none_filtered": "Aucune partie ne correspond à ces filtres.",
+      "none_public": "Aucune partie pour l’instant.",
+      "total": {
+        "one": "{count} partie",
+        "many": "{count} de parties",
+        "other": "{count} parties"
+      },
+      "termination_unknown": "Partie terminée",
+      "reason": {
+        "1": "Échec et mat",
+        "2": "Abandon",
+        "3": "Perte au temps",
+        "4": "Second coup illégal (partie perdue)",
+        "5": "Pat",
+        "6": "Position morte (matériel insuffisant)",
+        "7": "Drapeau tombé, mais l’adversaire ne peut pas mater",
+        "8": "Quintuple répétition",
+        "9": "Règle des 75 coups",
+        "10": "Triple répétition (réclamée)",
+        "11": "Règle des 50 coups (réclamée)",
+        "12": "Nulle par accord mutuel",
+        "13": "Second coup illégal, mais l’adversaire ne peut pas mater",
+        "20": "Partie quittée (déconnexion trop longue)",
+        "21": "Partie quittée, mais l’adversaire ne peut pas mater",
+        "22": "Partie annulée",
+        "23": "Aucun premier coup à temps (annulée)",
+        "24": "Partie perdue pour triche",
+        "25": "Annulée par le serveur",
+        "26": "Les deux joueurs se sont déconnectés"
+      }
+    },
+    "ratings": {
+      "category": "Cadence",
+      "rating": "Classement",
+      "peak": "Record",
+      "games": "Parties",
+      "wdl": "V / N / D",
+      "provisional": "Classement provisoire",
+      "none": "Aucune partie classée pour l’instant.",
+      "unrated_hint": "Un point d’interrogation signale un classement provisoire (encore peu de parties jouées)."
+    },
+    "account": {
+      "member_since": "Membre depuis le {date}",
+      "last_login": "Dernière connexion",
+      "created": "Création",
+      "email": "E-mail",
+      "pending_email": "En attente de confirmation : {email}",
+      "verified": "Confirmée",
+      "unverified": "Non confirmée",
+      "mfa": "Authentification à deux facteurs",
+      "mfa_on": "Activée",
+      "mfa_off": "Désactivée",
+      "google": "Connexion Google",
+      "google_on": "Associée",
+      "google_off": "Non associée",
+      "password": "Mot de passe",
+      "password_set": "Défini",
+      "password_unset": "Pas encore défini",
+      "challenges": "Défis",
+      "challenges_all": "Acceptés",
+      "challenges_none": "Refusés",
+      "badge_verified": "E-mail confirmé",
+      "badge_mfa": "Double authentification",
+      "badge_google": "Google",
+      "ban_until": "Votre compte est suspendu jusqu’au {date}.",
+      "ban_permanent": "Votre compte est suspendu.",
+      "sanction_ban": "Suspension",
+      "sanction_mm_block": "Recherche d’adversaire bloquée",
+      "sanction_warning": "Avertissement",
+      "sanction_until": "jusqu’au {date}",
+      "sanction_permanent": "définitive",
+      "devices_current": "Cet appareil",
+      "devices_unknown": "Appareil sans nom",
+      "devices_signed_in": "Connecté le {date}",
+      "devices_seen": "Dernière utilisation {time}",
+      "devices_expires": "Expire le {date}",
+      "devices_revoke": "Déconnecter",
+      "devices_revoked": "L’appareil est déconnecté.",
+      "devices_none": "Aucun autre appareil.",
+      "signout_all_confirm": "Déconnecter tous les appareils, y compris celui-ci ?",
+      "signed_out": "Vous êtes déconnecté.",
+      "signed_in": "Bienvenue, {name}.",
+      "prefs_saved": "Enregistré.",
+      "password_changed": "Votre mot de passe a été changé. Vos autres appareils sont déconnectés.",
+      "email_sent": "Un lien de confirmation a été envoyé à la nouvelle adresse. Votre adresse change quand vous l’ouvrez.",
+      "email_changed": "Votre adresse e-mail est désormais {email}.",
+      "email_current": "Adresse actuelle : {email}.",
+      "email_pending": "Un changement vers {email} attend son lien de confirmation.",
+      "export_done": "Vos données ont été téléchargées.",
+      "deleted": "Votre compte a été supprimé.",
+      "delete_confirm_label": "Saisissez {name} pour confirmer",
+      "register_done": "Nous avons envoyé un lien de confirmation à {email}. Ouvrez-le pour créer votre compte, puis connectez-vous.",
+      "register_ready": "Votre compte est prêt. Vous pouvez vous connecter.",
+      "forgot_done": "Si un compte utilise cette adresse, un lien pour choisir un nouveau mot de passe est en route.",
+      "resend_done": "Si cette adresse attend sa confirmation, un nouveau lien est en route.",
+      "pow_solving": "Résolution de l’énigme anti-robot…",
+      "mfa_recovery": "Code de récupération",
+      "mfa_recovery_text": "Saisissez l’un de vos codes de récupération. Chaque code ne sert qu’une fois.",
+      "mfa_app": "Code de l’application",
+      "mfa_app_text": "Saisissez le code à 6 chiffres de votre application d’authentification.",
+      "mfa_state_on": "L’authentification à deux facteurs est activée pour ce compte.",
+      "mfa_state_off": "L’authentification à deux facteurs est désactivée pour ce compte.",
+      "client_label": "Site Scacelith ({browser})",
+      "username": "Nom d’utilisateur",
+      "password_rules": "Au moins {min} caractères, sans votre nom d’utilisateur ni votre e-mail.",
+      "password_note": "Vos autres appareils sont déconnectés ; celui-ci reste connecté.",
+      "signin_label": "Se connecter"
+    },
+    "players": {
+      "since": "Membre depuis le {date}",
+      "games": "Parties",
+      "rated": "Classées",
+      "wins": "Victoires",
+      "draws": "Nulles",
+      "losses": "Défaites",
+      "view": "Voir le profil de {name}",
+      "you": "Vous",
+      "board": "Classement"
+    },
+    "gif": {
+      "title": "{white} – {black}",
+      "subtitle": "Partie nº {id} · {date}",
+      "preparing": "Préparation du GIF…",
+      "rendering": "Le serveur dessine le GIF. Une longue partie peut prendre quelques secondes…",
+      "ready": "Votre GIF est prêt. Le téléchargement a commencé.",
+      "ready_again": "Votre GIF est prêt.",
+      "signin": "Connectez-vous pour créer des GIF de vos parties.",
+      "signin_button": "Se connecter",
+      "missing": "Aucune partie n’a été choisie.",
+      "retry_in": "Vous pourrez réessayer dans {time}.",
+      "confirm": "Appuyez sur « Créer le GIF » pour que le serveur dessine cette partie avec votre compte.",
+      "retry_now": "Vous pouvez réessayer maintenant."
+    },
+    "home": {
+      "create_account": "Créer un compte",
+      "my_account": "Mon compte",
+      "my_games": "Mes parties",
+      "signin": "Se connecter"
+    },
+    "trailer": {
+      "title": "Bande-annonce de Scacelith"
+    }
+  }
+}
