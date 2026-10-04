@@ -8,6 +8,7 @@
 #include "../scene/clock_model.h"
 #include "../scene/furniture.h"
 #include "../scene/hall.h"
+#include "../scene/piece_silhouette.h"
 #include "../scene/pieces.h"
 #include "../ui/ui_font.h"
 #include "layout.h"
@@ -116,6 +117,7 @@ struct World::Impl {
     GpuModel hall, table, chair, board, clockBody, clockLever;
     ClockModel clockDesc;
     Mesh pieceBody[7], pieceFelt[7];
+    PieceSilhouette pieceSilhouette[7];   // for picking (World::pieceSilhouette)
     character::GpuRobot robot;
     Mesh markerQuad;
     Material markerMat;
@@ -223,6 +225,7 @@ bool World::loadStep(bool wait) {
             PieceMeshes pm = buildPiece(t);
             w.pieceBody[t].upload(pm.body, "piece");
             w.pieceFelt[t].upload(pm.felt, "piece_felt");
+            w.pieceSilhouette[t] = PieceSilhouette::fromMesh(pm.body);
         }
         break;
     case 5:
@@ -303,6 +306,12 @@ int World::clockHalfForSeat(float seatZSign) const {
     // seat); at -X the clock is turned around so half 0 faces White's seat (+Z).
     bool seatPosZ = seatZSign > 0.0f;
     return clockPosX_ ? (seatPosZ ? 1 : 0) : (seatPosZ ? 0 : 1);
+}
+
+const PieceSilhouette* World::pieceSilhouette(chess::PieceType t) const {
+    if (t < Pawn || t > King) return nullptr;
+    const PieceSilhouette& s = impl_->pieceSilhouette[t];
+    return s.empty() ? nullptr : &s;
 }
 
 bool World::rayHitsClock(const Ray& ray, float* t) const {

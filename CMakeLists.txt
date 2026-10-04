@@ -205,6 +205,9 @@ if(TEST_SOURCES)
     # The hall ceiling's geometry tests: CPU meshes only (mesh.cpp's upload is never called).
     target_sources(scacelith_tests PRIVATE ${ROOT}/src/scene/hall_ceiling.cpp ${ROOT}/src/scene/hall_geom.cpp
                    ${ROOT}/src/scene/hall_ornament.cpp ${ROOT}/src/render/mesh.cpp)
+    # The pieces' picking outlines, from the chess set's meshes (CPU only).
+    target_sources(scacelith_tests PRIVATE ${ROOT}/src/scene/piece_silhouette.cpp ${ROOT}/src/scene/pieces.cpp
+                   ${ROOT}/src/scene/piece_profile.cpp ${ROOT}/src/scene/sdf_mesher.cpp)
     target_compile_options(scacelith_tests PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
     target_link_libraries(scacelith_tests PRIVATE scacelith_core)
     if(WIN32)

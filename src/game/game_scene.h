@@ -262,7 +262,12 @@ private:
     ai::EngineSettings engineSettingsFor(int preset) const;
     m::vec2 cursorPixels() const;             // the pointer (physical pixels), or --mouse
     m::Ray mouseRay() const;
+    // The piece under the pointer: the first whose outline the ray meets (rayHitsPiece).
     int pickPiece(const m::Ray& ray, float* tOut = nullptr) const;
+    // Distance along the ray to the outline of a piece standing at its resting place, grown by
+    // 'margin' (World::pieceSilhouette), searched up to maxT; -1 when it misses. Before the chess
+    // set is built: a cylinder around it.
+    float rayHitsPiece(const PieceObject& p, const m::Ray& ray, float margin = 0.0f, float maxT = 1e30f) const;
     chess::Square pickSquare(const m::Ray& ray) const;
     // The square a click designates while a piece is in hand (NoSquare: none). 'castling' is set
     // when it is the king's castling square designated by pointing at the rook.

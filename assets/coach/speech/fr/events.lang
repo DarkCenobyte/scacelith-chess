@@ -88,7 +88,7 @@ event.draw.declined.2 = Je préfère continuer.
 
 # ---- End of the game (the coach's closing words, then the handshake) --------------------------------------
 event.end.win = Bien joué. Félicitations !
-event.end.win.2 = Tu l’as bien mérité. Bravo !
+event.end.win.2 = Bravo, bien mérité !
 event.end.win.3 = Félicitations : tu m’as battu à la régulière.
 event.end.loss = Bonne partie. Tu m’auras la prochaine fois.
 event.end.loss.2 = Merci pour la partie. Chaque défaite t’apprend quelque chose.

@@ -40,7 +40,7 @@ struct Ctx {
 struct Explanation {
     ExType type = ExType::None;
     std::vector<Beat> cause;   // said before the demonstration (the table shows p1)
-    std::vector<Beat> tail;    // said after a demonstration of exactly one ply (pieces where they stand then)
+    std::vector<Beat> tail;    // said after the demonstration, when it shows all demoPlies (pieces where they stand then)
     std::vector<Beat> tip;     // said after the rewind (no pointing at pieces a demonstration moved)
     int demoPlies = 0;         // plies of Ctx::r shown on the table
     bool offer = false;        // the takeback is offered whatever the class (mates, stalemate, missed pieces)
@@ -83,9 +83,15 @@ bool findExplanation(const Ctx& c, Explanation& out);
 // Opening principles and endgame technique tips, for moves that are not faults.
 bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out);
 
-// Demonstration beats for the first 'plies' plies of c.r (stops before a promotion of the human's
-// colour and points at the square instead), followed by the tail lines and the rewind of exactly
-// the moves shown.
+// Plies of c.r a demonstration shows: ex.demoPlies within the line and the band's depth (a mating
+// line within the band's mateLinePlies), ending on what the coach does. A quiet move of the human's
+// is never the last one (one more ply when the band allows it, else one less): stopping there reads
+// as advice ("say you play your queen to e3", then the pieces go back) and hides the point. A
+// recapture or a promotion of the human's may end it.
+int demoLength(const Ctx& c, const Explanation& ex);
+// Demonstration beats for the first demoLength() plies of c.r (stops before a promotion of the
+// human's colour and points at the square instead), followed by the tail lines when every planned
+// ply was shown, and the rewind of exactly the moves shown.
 void appendDemo(const Ctx& c, const Explanation& ex, Script& s);
 
 }  // namespace detail

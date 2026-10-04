@@ -114,9 +114,11 @@ const char* exTypeName(ExType t) {
 Band band(int level) {
     level = std::clamp(level, 1, 6);
     // level, demo, mate line, missed mate, lookahead, sentences, remarks/10, praise every, offer cap, pause
+    // Level 2 shows three plies: the coach's move, the human's best answer and what the coach does
+    // then (two would stop on the human's move), and so a mate in two it announces.
     static const Band kBands[6] = {
         {1, 1, 1, 1, 2, 3, 5, 3, -1, 0.80f},
-        {2, 2, 1, 2, 3, 3, 4, 4, -1, 0.60f},
+        {2, 3, 3, 2, 3, 3, 4, 4, -1, 0.60f},
         {3, 3, 3, 2, 4, 4, 3, 5, -1, 0.50f},
         {4, 4, 3, 3, 5, 4, 3, 6, 5, 0.45f},
         {5, 6, 5, 4, 7, 3, 2, 8, 3, 0.35f},
@@ -266,10 +268,25 @@ Line narration(const Ctx& c, const Position& before, const LineStep& st, int i) 
 
 }  // namespace
 
+int demoLength(const Ctx& c, const Explanation& ex) {
+    const int cap = ex.type == ExType::MateAllowed ? std::max(c.b.demoPlies, c.b.mateLinePlies) : c.b.demoPlies;
+    const int line = int(c.r.size());
+    int n = std::min({ex.demoPlies, line, cap});
+    if (n > 0) {
+        const LineStep& last = c.r[size_t(n - 1)];
+        if (last.mover == c.human && last.captured == NoPiece && last.promotion == NoPiece) {
+            if (n < line && n < cap) ++n;   // the coach's next move (the line alternates)
+            else --n;
+        }
+    }
+    return n;
+}
+
 void appendDemo(const Ctx& c, const Explanation& ex, Script& s) {
     int shown = 0;
     Position pos = c.p1;
-    for (int i = 0; i < ex.demoPlies && i < int(c.r.size()) && i < c.b.demoPlies; ++i) {
+    const int plies = demoLength(c, ex);
+    for (int i = 0; i < plies; ++i) {
         const LineStep& st = c.r[size_t(i)];
         if (st.mover == c.human && st.promotion != NoPiece) {
             // The human's spare queen is out of the coach's reach: point at the square instead.
@@ -295,7 +312,7 @@ void appendDemo(const Ctx& c, const Explanation& ex, Script& s) {
         pos.makeMove(st.move);
         ++shown;
     }
-    if (shown == 1)
+    if (shown > 0 && shown == ex.demoPlies)
         for (const Beat& t : ex.tail) s.push_back(t);
     if (shown > 0) {
         Beat r;
@@ -663,9 +680,13 @@ Review Reviewer::review(const ReviewInput& in) {
         if (better) --budget;
         std::vector<Beat> useCause, useTail, useTip;
         for (size_t i = 0; i < cause.size() && budget > 0 && i < 1; ++i, --budget) useCause.push_back(cause[i]);
-        const bool demoOnePly = std::min({ex.demoPlies, int(c.r.size()), bd.demoPlies}) == 1 &&
-                                !(c.r.size() > 0 && c.r[0].mover == human_);
-        if (demoOnePly)
+        // Tail lines: when the demonstration shows every ply planned (the human's promotion
+        // aside, appendDemo stops there).
+        const int demoShown = demoLength(c, ex);
+        bool demoFull = demoShown > 0 && demoShown == ex.demoPlies && c.r[0].mover != human_;
+        for (int i = 0; demoFull && i < demoShown; ++i)
+            if (c.r[size_t(i)].mover == human_ && c.r[size_t(i)].promotion != NoPiece) demoFull = false;
+        if (demoFull)
             for (size_t i = 0; i < tail.size() && budget > 0; ++i, --budget) useTail.push_back(tail[i]);
         for (size_t i = 1; i < cause.size() && budget > 0; ++i, --budget) useCause.push_back(cause[i]);
         for (size_t i = 0; i < tip.size() && budget > 0; ++i, --budget) useTip.push_back(tip[i]);

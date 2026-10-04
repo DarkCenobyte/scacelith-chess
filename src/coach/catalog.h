@@ -14,6 +14,10 @@
 //   key, key.2, key.3 ...   variants: alternative phrasings of one message
 //   key.spoken              what the voice says instead of 'key' (respellings, digits in words);
 //                           written renderings never use it
+//   respell.<word>          (common.lang) what the voice says instead of a word it misreads, in
+//                           every spoken line of the language: whole words, any case ("mat" ->
+//                           "matte"); respell.<word>.pause only before a pause (punctuation or the
+//                           end of the line: "huit" -> "huite", but "huit coups" unchanged)
 //   {name}, {name:form}     placeholder filled from the Line's argument 'name' (a form selects a
 //                           grammatical form, see common.lang)
 //   {@}, {@2} ...           zero-width anchors of static lines (removed from the text): the
@@ -105,9 +109,15 @@ private:
         std::string value;
         std::string topic;
     };
+    struct Respelling {
+        std::u32string word;     // as written in the key
+        std::u32string spoken;
+        bool pauseOnly = false;
+    };
     struct Language {
         std::unordered_map<std::string, Entry> map;
         std::map<std::string, std::vector<std::string>> topicKeys;   // topic -> keys in file order
+        std::vector<Respelling> respellings;                         // the respell.* keys
     };
     std::map<std::string, Language> langs_;
     std::vector<std::string> problems_;
@@ -137,6 +147,7 @@ private:
     std::string renderOpening(Ctx& c, const std::string& ref, const std::string& form) const;
     std::string renderText(Ctx& c, const std::string& keyOrText, const std::string& form) const;
     std::string pattern(Ctx& c, const std::string& key, const std::vector<Local>& locals) const;
+    static void respell(const Language& L, Rendered& r);
     Rendered renderWith(const Line& line, const std::string& lang, bool spoken, int variant, uint32_t seed) const;
 };
 

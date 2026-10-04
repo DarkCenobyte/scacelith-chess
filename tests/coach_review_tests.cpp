@@ -316,8 +316,9 @@ TEST(coach_review_classification_thresholds) {
 }
 
 TEST(coach_review_bands) {
-    // Demonstration depth per level: 1 at level 1 ... 8 at level 6.
-    const int demo[6] = {1, 2, 3, 4, 6, 8};
+    // Demonstration depth per level: 1 at level 1 ... 8 at level 6 (level 2: the coach's move, the
+    // answer and the coach's next move, never stopping on the human's move).
+    const int demo[6] = {1, 3, 3, 4, 6, 8};
     for (int l = 1; l <= 6; ++l) {
         CHECK_EQ(band(l).level, l);
         CHECK_EQ(band(l).demoPlies, demo[l - 1]);
@@ -517,7 +518,7 @@ TEST(coach_review_demo_stops_before_promotion) {
     CHECK(!s.empty() && s.back().kind == BeatKind::Rewind);
     if (!s.empty()) CHECK_EQ(s.back().count, 1);
 
-    // Never deeper than the level: level 2 shows at most 2 plies of a 4-ply line.
+    // Never deeper than the level: level 2 shows at most 3 plies of a 4-ply line.
     c.level = 2;
     c.b = band(2);
     CHECK(c.p1.setFEN("4k3/8/8/8/8/7r/1P6/4K3 b - - 0 1"));
@@ -525,8 +526,73 @@ TEST(coach_review_demo_stops_before_promotion) {
     Script s2;
     detail::appendDemo(c, ex, s2);
     checkScript(s2, "depth cap");
-    CHECK_EQ(demoMoves(s2), 2);
-    if (!s2.empty()) CHECK_EQ(s2.back().count, 2);
+    CHECK_EQ(demoMoves(s2), 3);
+    if (!s2.empty()) CHECK_EQ(s2.back().count, 3);
+}
+
+TEST(coach_review_demo_ends_on_the_coach_move) {
+    // A demonstration that would stop on a quiet move of the player's ("say you play your queen
+    // there", then the pieces go back) shows the coach's next move when the level allows it, else
+    // stops one move earlier.
+    detail::Ctx c;
+    c.human = White;
+    c.coach = Black;
+    c.ply = 20;
+    CHECK(c.p1.setFEN("4k3/8/8/8/8/7r/1P6/4K3 b - - 0 1"));
+    c.r = replayLine(c.p1, {"h3h4", "b2b4", "e8d7", "b4b5", "d7c7"}, White);
+    CHECK_EQ(c.r.size(), size_t(5));
+    detail::Explanation ex;
+    ex.demoPlies = 4;
+    for (int level : {4, 5}) {
+        c.level = level;
+        c.b = band(level);
+        Script s;
+        detail::appendDemo(c, ex, s);
+        checkScript(s, "ends on the coach");
+        const int want = level == 4 ? 3 : 5;   // level 4: 4 plies at most; level 5: up to 6
+        CHECK_EQ(detail::demoLength(c, ex), want);
+        CHECK_EQ(demoMoves(s), want);
+        if (!s.empty()) CHECK_EQ(s.back().count, want);
+    }
+    // Level 2 never stops after two plies (its depth is three).
+    c.level = 2;
+    c.b = band(2);
+    ex.demoPlies = 2;
+    CHECK_EQ(detail::demoLength(c, ex), 3);
+    // The player's recapture may end it: the exchange is complete.
+    c.level = 4;
+    c.b = band(4);
+    CHECK(c.p1.setFEN("4k3/8/8/8/8/2B4r/1P6/4K3 b - - 0 1"));
+    c.r = replayLine(c.p1, {"h3c3", "b2c3", "e8d7"}, White);
+    CHECK_EQ(c.r.size(), size_t(3));
+    ex.demoPlies = 2;
+    CHECK_EQ(detail::demoLength(c, ex), 2);
+}
+
+TEST(coach_review_mate_in_two_shown_at_level_2) {
+    // 1.a3?? allows 1...Rd1+ 2.Rxd1 Rxd1#: level 2 announces the mate in two, plays it on the
+    // table, names the back-rank mate on the final position, then puts the pieces back.
+    const char* fen = "3r2k1/3r1ppp/8/8/8/8/P4PPP/2R3K1 w - - 0 1";
+    const ai::Analysis a0 =
+        analysisOf({pvl(-20, "h2h3 d7d2"), pvl(-30, "g2g3 d7d2"), pvl(0, "a2a3 d7d1 c1d1 d8d1", -2)});
+    Game g = gameOf(fen, {"a3"});
+    Reviewer rv;
+    rv.reset(2, White);
+    Review r = reviewOf(rv, g, a0);
+    CHECK_EQ(r.verdict.exType, ExType::MateAllowed);
+    checkScript(r.script, "mate in two b2");
+    CHECK_EQ(demoMoves(r.script), 3);
+    const std::vector<std::string> keys = keysOf(r.script);
+    auto at = [&](const std::string& k) {
+        return int(std::find(keys.begin(), keys.end(), k) - keys.begin());
+    };
+    const int cause = at("ex.mate_allowed.b2"), mate = at("demo.my.mate"), name = at("ex.mate_allowed.pattern"),
+              rewind = at("ex.rewind.b2");
+    CHECK(cause < mate && mate < name && name < rewind && rewind < int(keys.size()));
+    if (!(cause < mate && mate < name && name < rewind && rewind < int(keys.size()))) dump(r.script);
+    const Beat* named = beatWithKey(r.script, "ex.mate_allowed.pattern");
+    CHECK(named && named->line.arg("text") && named->line.arg("text")->text == "name.pattern.back_rank");
+    CHECK(r.offersTakeback);
 }
 
 namespace {

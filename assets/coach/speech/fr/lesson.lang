@@ -67,13 +67,16 @@ lesson.welcome.hello = Bonjour ! Je suis ton coach. Apprenons ensemble les règ
 lesson.welcome.board = Voici l’échiquier : soixante-quatre cases, claires et foncées, huit rangées de huit.
 lesson.welcome.light = La case du coin, à ta {@}droite, est toujours claire. Retiens : case claire à droite.
 lesson.welcome.files = Les lignes verticales sont les colonnes. Elles portent des lettres, de {@}a à {@2}h.
-lesson.welcome.files.spoken = Les lignes verticales sont les colonnes. Elles portent des lettres, de {@}a à {@2}ache.
+# Spoken "jusqu’à": the voice runs "a à" together into one "a" ("de a ache").
+lesson.welcome.files.spoken = Les lignes verticales sont les colonnes. Elles portent des lettres, de {@}a jusqu’à {@2}ache.
 lesson.welcome.ranks = Les lignes horizontales sont les rangées, numérotées de {@}un à {@2}huit depuis ton côté.
-lesson.welcome.square = Une case se nomme par sa lettre, puis par son chiffre. Celle-ci, c’est {sq}.
+lesson.welcome.ranks.spoken = Les lignes horizontales sont les rangées, numérotées de {@}un à {@2}huite depuis ton côté.
+lesson.welcome.square = Une case se nomme par sa lettre, puis par son chiffre. Celle-ci, c’est la case {sq}.
 lesson.welcome.square2 = Et celle-là, c’est {sq}.
 lesson.welcome.kings = Voici les deux rois. Le tien est en {sq}, le mien en {sq2}.
 lesson.welcome.ask = À toi : avance ton roi d’une case, en {sq}.
 lesson.welcome.wrong = Ça, c’est {to}. On veut {sq} : la lettre e, le chiffre deux.
+lesson.welcome.wrong.spoken = Ça, c’est {to}. On veut {sq} : la lettre eu, le chiffre deux.
 lesson.welcome.ok = Parfait. Ton roi est en {sq}.
 
 # ---- Chapter 1: how the pieces move and capture -----------------------------------------------------------
