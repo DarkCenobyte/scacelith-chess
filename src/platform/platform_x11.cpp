@@ -1,11 +1,14 @@
-// Linux/X11 + GLX platform layer. Development and test target only (headless screenshots under
+// Linux/X11 + GLX platform layer (also headless screenshots under
 // Xvfb with Mesa llvmpipe: export MESA_GL_VERSION_OVERRIDE=4.6 MESA_GLSL_VERSION_OVERRIDE=460).
 #ifndef _WIN32
 #include "platform.h"
 #include "../gl/gl_context.h"
+#include "../core/embedded.h"
+#include "../core/image.h"
 #include "../core/log.h"
 #include "../net/net_sys.h"
 
+#include <X11/Xatom.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
@@ -18,6 +21,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <thread>
+#include <vector>
 extern char** environ;
 
 typedef GLXContext (*PFN_glXCreateContextAttribsARB)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
@@ -80,6 +84,28 @@ int mapKeysym(KeySym ks) {
 }
 void* getProc(const char* name) { return (void*)glXGetProcAddressARB((const GLubyte*)name); }
 
+// What desktops show of the window before it is mapped: WM_CLASS "scacelith" / "Scacelith" (the
+// launcher res/linux/scacelith.desktop has StartupWMClass=Scacelith), WM_CLIENT_MACHINE (which
+// _NET_WM_PID requires), the title in UTF-8 and the icon (res/icons/scacelith.ico, embedded).
+void setIdentity(const char* title) {
+    XClassHint hint{const_cast<char*>("scacelith"), const_cast<char*>("Scacelith")};
+    XSetWMProperties(g_dpy, g_win, nullptr, nullptr, nullptr, 0, nullptr, nullptr, &hint);
+    const Atom utf8 = XInternAtom(g_dpy, "UTF8_STRING", False);
+    XChangeProperty(g_dpy, g_win, XInternAtom(g_dpy, "_NET_WM_NAME", False), utf8, 8, PropModeReplace,
+                    reinterpret_cast<const unsigned char*>(title), int(std::strlen(title)));
+    const long pid = long(getpid());
+    XChangeProperty(g_dpy, g_win, XInternAtom(g_dpy, "_NET_WM_PID", False), XA_CARDINAL, 32, PropModeReplace,
+                    reinterpret_cast<const unsigned char*>(&pid), 1);
+    if (const embedded::File* f = embedded::find("res/icons/scacelith.ico")) {
+        const std::vector<uint32_t> px = image::icoImages(f->data, f->size);
+        // Format 32 is an array of long, 64 bits on LP64 (143 KB sent: under the 256 KB request limit).
+        const std::vector<unsigned long> icon(px.begin(), px.end());
+        if (!icon.empty())
+            XChangeProperty(g_dpy, g_win, XInternAtom(g_dpy, "_NET_WM_ICON", False), XA_CARDINAL, 32, PropModeReplace,
+                            reinterpret_cast<const unsigned char*>(icon.data()), int(icon.size()));
+    }
+}
+
 }  // namespace
 
 bool init(const WindowDesc& desc) {
@@ -116,6 +142,7 @@ bool init(const WindowDesc& desc) {
     XStoreName(g_dpy, g_win, desc.title);
     g_wmDelete = XInternAtom(g_dpy, "WM_DELETE_WINDOW", False);
     XSetWMProtocols(g_dpy, g_win, &g_wmDelete, 1);
+    setIdentity(desc.title);
     if (!desc.hidden) XMapWindow(g_dpy, g_win);
 
     auto createCtx = (PFN_glXCreateContextAttribsARB)glXGetProcAddressARB((const GLubyte*)"glXCreateContextAttribsARB");

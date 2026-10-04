@@ -1,11 +1,16 @@
-# Embeds every file of the given directories into the executable with the assembler's .incbin
-# directive (no conversion step, fast for large files). Produces ${OUT_CPP} which defines
-# g_embeddedFiles / g_embeddedFileCount (see src/core/embedded.h).
+# Embeds every file of the given directories, and the given single files, into the executable with
+# the assembler's .incbin directive (no conversion step, fast for large files). Paths are relative
+# to ROOT. Produces ${OUT_CPP} which defines g_embeddedFiles / g_embeddedFileCount (see
+# src/core/embedded.h).
 function(scacelith_embed_files OUT_CPP ROOT)
     set(files)
-    foreach(dir ${ARGN})
-        file(GLOB_RECURSE found CONFIGURE_DEPENDS "${ROOT}/${dir}/*")
-        list(APPEND files ${found})
+    foreach(item ${ARGN})
+        if(IS_DIRECTORY "${ROOT}/${item}")
+            file(GLOB_RECURSE found CONFIGURE_DEPENDS "${ROOT}/${item}/*")
+            list(APPEND files ${found})
+        else()
+            list(APPEND files "${ROOT}/${item}")
+        endif()
     endforeach()
     list(SORT files)
     set(asm "")

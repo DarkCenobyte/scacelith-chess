@@ -1,6 +1,7 @@
-// Files embedded into the executable at build time (shaders/, assets/). The build generates a
-// table from every file under shaders/ and assets/ (see cmake/embed.cmake). Paths are relative
-// to the repository root with forward slashes, e.g. "shaders/include/common.glsl".
+// Files embedded into the executable at build time (shaders/, assets/, and outside Windows the
+// icon res/icons/scacelith.ico). The build generates a table from every file under shaders/ and
+// assets/ (see cmake/embed.cmake). Paths are relative to the repository root with forward
+// slashes, e.g. "shaders/include/common.glsl".
 #pragma once
 #include <cstddef>
 #include <string>
