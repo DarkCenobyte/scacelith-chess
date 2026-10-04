@@ -148,11 +148,24 @@ inline const FingerPose& posePress() {
                                   {-0.06f, 1.05f, 1.25f, 0.65f}, {-0.12f, 1.15f, 1.25f, 0.65f}});
     return p;
 }
-// Handshake: the open hand that slides in, and the grip it closes to once the palms touch. Fitted
-// together with the clasp placement (see planHandshake), not tuned by eye.
+// Handshake: the open hand that slides in (the thumb up, a little over the palm: it passes the
+// partner's thumb, and no finger bone turns more than ~2.2 rad to the grip, under 1800 deg/s), and
+// the grip it closes to once the palms touch. Fitted together with the clasp placement (see
+// planHandshake), not tuned by eye.
 inline const FingerPose& poseShakeOpen() {
-    static FingerPose p = fpMake({{1.12f, -0.47f, 0.28f, 0.80f}, {0.06f, 0.10f, 0.12f, 0.06f}, {0.0f, 0.12f, 0.14f, 0.06f},
+    static FingerPose p = fpMake({{0.57f, -0.44f, -0.05f, 0.31f}, {0.06f, 0.10f, 0.12f, 0.06f}, {0.0f, 0.12f, 0.14f, 0.06f},
                                   {-0.05f, 0.16f, 0.16f, 0.08f}, {-0.10f, 0.20f, 0.18f, 0.08f}});
+    return p;
+}
+// The hand reaching out for a handshake: the open hand's fingers, the thumb up (spread from the
+// index in the palm plane, a little in front of it), as people offer their hand.
+inline const FingerPose& poseShakeReach() {
+    static FingerPose p = [] {
+        FingerPose r = poseShakeOpen();
+        const float thumb[4] = {0.45f, -0.55f, 0.10f, 0.05f};
+        for (int j = 0; j < 4; ++j) r.v[Thumb][j] = thumb[j];
+        return r;
+    }();
     return p;
 }
 inline const FingerPose& poseShakeGrip() {

@@ -488,7 +488,8 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
     // Phases: extend to the pre-contact pose; slide in, the hand open, until the palms touch; close
     // the grip (HandshakeClasp when it is closed); pump twice; open the hand (HandshakeRelease
     // halfway); withdraw the open hand the way it came; back to rest.
-    const float t1 = 0.68f * scale, t2 = 0.76f * scale, tc = Timing::HandshakeClaspAt * scale, tp = 1.90f * scale;
+    // (The slide takes 0.18 s: the hand comes in at most 0.62 m/s and slows down into the contact.)
+    const float t1 = 0.60f * scale, t2 = 0.78f * scale, tc = Timing::HandshakeClaspAt * scale, tp = 1.90f * scale;
     const float tr = Timing::HandshakeReleaseAt * scale, to = 2.08f * scale, tw = 2.18f * scale;
     // 0. The pen first goes back onto the table (where the game wanted it, else where it was taken).
     float t0 = 0.0f;
@@ -520,7 +521,9 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
         mo.segs.push_back(sg);
         return sg.sample(sg.T);
     };
-    // 1. extend: arrives at the pre-contact pose already sliding in
+    // 1. extend: arrives at the pre-contact pose already sliding in. The hand reaches out open, the
+    // thumb up, then takes the open hand that slides in (its thumb still up, a little more over the
+    // palm: it slides past the partner's thumb).
     const vec3 vIn = (pClasp - pPre) * (1.0f / (t2 - t1));
     Segment a = makeSeg(from, t1 - t0, pPre, vIn, qs, fo);
     a.arcH = 0.05f;
@@ -530,8 +533,18 @@ void Animator::Impl::planHandshake(const Task& t, float start, float T, HandSamp
     a.rot.add(0.80f, qs);
     a.fing.keys.clear();
     a.fing.add(0.0f, from.f);
-    if (t0 > 0.0f) a.fing.add(0.20f, letGo);   // off the pen (then out of the writing grip, unhurried)
-    a.fing.add(t0 > 0.0f ? 0.90f : 0.60f, fo);
+    if (t0 > 0.0f) {
+        // Off the pen, then out of the writing grip, unhurried (the long fingers halfway open when
+        // the thumb is up).
+        a.fing.add(0.20f, letGo);
+        FingerPose up = fpLerp(letGo, fo, 0.5f);
+        for (int j = 0; j < 4; ++j) up.v[Thumb][j] = poseShakeReach().v[Thumb][j];
+        a.fing.add(0.56f, up);
+    } else {
+        a.fing.add(0.55f, poseShakeReach());
+        a.fing.add(0.68f, poseShakeReach());
+    }
+    a.fing.add(0.92f, fo);
     a.elbow1 = kShakeElbow;
     clearPath(a, from, fpLerp(from.f, fo, 0.5f), tableC, R);
     // (Its horizontal motion may end early, then goes on at vIn: still at pPre at the end.)
