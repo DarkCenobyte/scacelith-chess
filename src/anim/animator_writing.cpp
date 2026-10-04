@@ -285,8 +285,8 @@ void Animator::Impl::exportEvents(std::vector<Event>& ev, size_t from) const {
     }
 }
 
-float Animator::Impl::armStrainSide(Side s, vec3 wristC, quat q) {
-    if (s == Side::Right) return armStrain(wristC, q);
+float Animator::Impl::armStrainSide(Side s, vec3 wristC, quat q, float elbow) {
+    if (s == Side::Right) return armStrain(wristC, q, nullptr, nullptr, elbow);
     // The mirror image of armStrain(): the torso leans and turns for this hand the way it does for
     // the right one.
     Pose tmp;
@@ -298,7 +298,7 @@ float Animator::Impl::armStrainSide(Side s, vec3 wristC, quat q) {
     reachShort = wristClamp = pronClamp = 0;
     applySpine(tmp, sp);
     fkChain(tmp, Pelvis, Spine2);
-    solveArm(tmp, s, wristC, q);
+    solveArm(tmp, s, wristC, q, elbow);
     float soft = softWristStrain(lastFlex, lastDev, lastPron);
     float r = wristClamp + pronClamp + reachShort * 10.0f + 0.5f * soft;
     diagSide = keep;

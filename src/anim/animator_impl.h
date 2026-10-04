@@ -148,16 +148,25 @@ inline const FingerPose& posePress() {
                                   {-0.06f, 1.05f, 1.25f, 0.65f}, {-0.12f, 1.15f, 1.25f, 0.65f}});
     return p;
 }
+// Handshake: the open hand that slides in, and the grip it closes to once the palms touch. Fitted
+// together with the clasp placement (see planHandshake), not tuned by eye.
 inline const FingerPose& poseShakeOpen() {
-    static FingerPose p = fpMake({{0.18f, -0.12f, 0.10f, 0.08f}, {0.06f, 0.10f, 0.12f, 0.06f}, {0.0f, 0.12f, 0.14f, 0.06f},
+    static FingerPose p = fpMake({{1.12f, -0.47f, 0.28f, 0.80f}, {0.06f, 0.10f, 0.12f, 0.06f}, {0.0f, 0.12f, 0.14f, 0.06f},
                                   {-0.05f, 0.16f, 0.16f, 0.08f}, {-0.10f, 0.20f, 0.18f, 0.08f}});
     return p;
 }
 inline const FingerPose& poseShakeGrip() {
-    static FingerPose p = fpMake({{0.25f, 0.10f, 0.25f, 0.20f}, {0.02f, 0.55f, 0.85f, 0.45f}, {0.0f, 0.60f, 0.90f, 0.45f},
-                                  {-0.03f, 0.65f, 0.92f, 0.45f}, {-0.07f, 0.72f, 0.92f, 0.45f}});
+    static FingerPose p = fpMake({{1.45f, -0.40f, 0.97f, 1.30f}, {-0.10f, 0.19f, 0.71f, 0.56f}, {-0.07f, 0.23f, 1.27f, 0.91f},
+                                  {0.07f, 0.38f, 1.32f, 0.94f}, {0.21f, 0.48f, 0.72f, 0.57f}});
     return p;
 }
+// Handshake clasp placement (planHandshake), right-hand convention; fitted with the two presets above.
+constexpr float kShakePitch = 0.434f;   // fingers below the horizontal in the vertical palm plane
+constexpr float kShakeYaw = 0.469f;     // palm plane turned across the body from the shoulder-clasp line
+constexpr float kShakeElbow = 0.850f;   // elbow raised about the shoulder-wrist axis while in contact
+constexpr float kShakePump = 0.0316f;   // pump amplitude
+inline vec3 shakeAnchor() { return vec3(0.0127f, -0.0600f, 0.0312f); }   // hand point on the clasp vertical
+inline vec3 shakeSlide() { return vec3(0.0617f, -0.0396f, 0.0f); }      // contact -> pre-contact offset
 inline const FingerPose& poseLooseFist() {
     static FingerPose p = fpMake({{0.75f, 0.30f, 0.40f, 0.30f}, {0.02f, 1.05f, 1.30f, 0.70f}, {0.0f, 1.12f, 1.35f, 0.72f},
                                   {-0.03f, 1.18f, 1.38f, 0.72f}, {-0.06f, 1.24f, 1.40f, 0.72f}});
@@ -496,6 +505,8 @@ struct Segment {
     quat rotCorr;                  // mid-segment bend of the rotation (wrist comfort), bump-weighted
     float corrPeak = 0.5f;
     bool usePivot = false;         // rotate about rotPivot: that hand point follows the clean path
+    bool locked = false;           // path, rotation and elbow kept exactly as planned (the handshake
+                                   // in contact: the partner plans the mirror image of it)
     vec3 rotPivot{0, 0, 0};
     Track<PenPose> pen;            // pen in the hand (regrips); empty = keep the default PenPose
     // Pen lock (see HandSample::lockW): weight lockFrom -> lockTo (min-jerk) over u in [lockU0, lockU1].
@@ -1252,15 +1263,15 @@ struct Animator::Impl {
     // How hard it is for the right arm to put the hand bone at wristC with rotation q (rad): joint
     // limit clamps, plus a soft penalty near the wrist and forearm limits.
     // 'achieved' (optional): the hand rotation the arm really gets to (joint limits).
-    // 'flexOut' (optional): the torso flexion the reach takes.
-    float armStrain(vec3 wristC, quat q, quat* achieved = nullptr, float* flexOut = nullptr) {
+    // 'flexOut' (optional): the torso flexion the reach takes. 'elbow': the elbow lift (HandSample::elbow).
+    float armStrain(vec3 wristC, quat q, quat* achieved = nullptr, float* flexOut = nullptr, float elbow = 0.0f) {
         Pose tmp;
         reachShort = wristClamp = pronClamp = 0;
         SpineParams sp = solveSpine(tmp, wristC, 0.0f, 0.0f, 0.0f, 0.0f);
         if (flexOut) *flexOut = sp.flex;
         applySpine(tmp, sp);
         fkChain(tmp, Pelvis, Spine2);
-        solveArm(tmp, Side::Right, wristC, q);
+        solveArm(tmp, Side::Right, wristC, q, elbow);
         if (achieved) *achieved = rotOf(G[HandR]);
         float soft = softWristStrain(lastFlex, lastDev, lastPron);
         return wristClamp + pronClamp + reachShort * 10.0f + 0.5f * soft;
@@ -1464,7 +1475,7 @@ struct Animator::Impl {
     Hand& shakeHand() { return mirrored ? left() : right(); }
     Side shakeSide() const { return mirrored ? Side::Left : Side::Right; }
     // Side-aware arm strain (armStrain() is the playing hand's).
-    float armStrainSide(Side s, vec3 wristC, quat q);
+    float armStrainSide(Side s, vec3 wristC, quat q, float elbow = 0.0f);
     Side diagSide = Side::Right;   // arm whose solve updates the diagnostics (reachShort, clamps...)
 
     // ==========================================================================================
