@@ -178,6 +178,10 @@ constexpr float kShakePitch = 0.434f;   // fingers below the horizontal in the v
 constexpr float kShakeYaw = 0.469f;     // palm plane turned across the body from the shoulder-clasp line
 constexpr float kShakeElbow = 0.850f;   // elbow raised about the shoulder-wrist axis while in contact
 constexpr float kShakePump = 0.0316f;   // pump amplitude
+// A handshake cut short (see shakeLetGo): the hand opens in this time, and the robot that was cut is
+// back at its rest this long after the cut (Timing::Retract, and the 50 ms its next Retract waits).
+constexpr float kShakeLetGoOpen = 0.14f;
+constexpr float kShakeLetGoQuick = 0.40f;
 inline vec3 shakeAnchor() { return vec3(0.0127f, -0.0600f, 0.0312f); }   // hand point on the clasp vertical
 inline vec3 shakeSlide() { return vec3(0.0617f, -0.0396f, 0.0f); }      // contact -> pre-contact offset
 inline const FingerPose& poseLooseFist() {
@@ -1573,9 +1577,22 @@ struct Animator::Impl {
     bool shakeTookPut = false;      // the handshake took over a queued PutPen
     Segment shakeRetract(const HandSample& s, float T);   // the shaking hand from s back to its rest
     // cancelTasks() during a handshake (see cutHandshake). shakeCutW: the torso's blend on the
-    // shaking hand then (left-handed player), faded out until wr.suspendUntil.
+    // shaking hand then (left-handed player), faded out from shakeCutFrom over shakeCutFade.
     void cutHandshake();
-    float shakeCutW = 0.0f;
+    float shakeCutW = 0.0f, shakeCutFrom = -100.0f, shakeCutFade = 0.35f;
+    // Letting go mid-handshake (cut short by either robot): the shaking hand opens where the plan
+    // has it, then backs off along the slide (shakeLetGo). The plan's clasp and pre-contact poses
+    // and its contact window are kept for that; shakeCutAt is when this robot's handshake was cut
+    // (its partner reads it and lets go from the same instant: followPartnerCut), shakeCutSeen the
+    // partner's cut already followed. A right-handed robot's next task waits until its hand is out
+    // of the partner's (shakeClearAt); a Retract keeps the way back the cut planned (shakeRestAt).
+    void shakeLetGo(float tc, float tRest, bool quick, Motion& mo);
+    void followPartnerCut();
+    quat shakeQ;
+    vec3 shakePClasp{0, 0, 0}, shakePPre{0, 0, 0};
+    float shakeBegin = -100.0f, shakeContact0 = 0.0f, shakeContact1 = 0.0f, shakeOpenAt = 0.0f;
+    float shakeCutAt = -100.0f, shakeCutSeen = -100.0f, shakeClearAt = -100.0f, shakeRestAt = -100.0f;
+    float startAfterCut(const Task& t) const { return t.type == TaskType::Retract ? t.notBefore : std::max(t.notBefore, shakeClearAt); }
     void writingSpine(SpineParams& sp, const HandSample& hl);
 };
 

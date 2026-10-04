@@ -1206,10 +1206,12 @@ void Animator::Impl::writingSpine(SpineParams& sp, const HandSample& hl) {
     if (!wr.running && !wr.penHeld && !(mirrored && running && cur.type == TaskType::Handshake) && time >= wr.suspendUntil) return;
     Pose tmp;
     const float comfy = 0.84f * (L1 + L2);
+    // (Eased in over the last 4 cm, so a hand coming back fast does not jolt the torso.)
+    const float k = 0.04f;
     for (int it = 0; it < 3; ++it) {
-        float D = length(hl.p - shoulderFor(tmp, Side::Left, sp, hl.p));
-        if (D <= comfy) break;
-        sp.flex = std::min(0.60f, sp.flex + (D - comfy) * 1.6f);
+        float D = length(hl.p - shoulderFor(tmp, Side::Left, sp, hl.p)), x = D - comfy;
+        if (x <= -k) break;
+        sp.flex = std::min(0.60f, sp.flex + (x >= k ? x : (x + k) * (x + k) / (4.0f * k)) * 1.6f);
     }
 }
 
