@@ -145,9 +145,10 @@ bool mateAllowed(const Ctx& c, Explanation& out) {
                            : mp == MatePattern::Epaulette ? "name.pattern.epaulette"
                                                           : nullptr;
         if (name) {
+            // Named on the mate itself when the demonstration plays the whole line.
             Beat t = line(c, "ex.mate_allowed.pattern", Look::Board);
             put(t.line, "text", Arg::ofText(name));
-            if (ex.demoPlies == 1) ex.tail.push_back(t);
+            if (ex.demoPlies == plies) ex.tail.push_back(t);
             else ex.cause.push_back(t);
         }
     }
