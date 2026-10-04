@@ -1,0 +1,57 @@
+<div class="shell page-body gif-body">
+  <noscript><p class="notice notice-warning">{{t:common.noscript}}</p></noscript>
+  <article class="gif-card" aria-labelledby="gif-title">
+    <p class="card-brand" data-server-name>caissa.scacelith.com</p>
+    <h1 class="gif-title" id="gif-title" data-gif-title>{{t:gif.title}}</h1>
+    <p class="gif-players" data-gif-players></p>
+
+    <div class="gif-stage" data-gif-stage>
+      <div class="gif-status" data-gif-status role="status" aria-live="polite">
+        <span class="spinner" aria-hidden="true" data-gif-spinner></span>
+        <span data-gif-status-text>{{t:gif.preparing}}</span>
+      </div>
+      <img class="gif-image" data-gif-image alt="" hidden>
+    </div>
+
+    <div class="gif-actions">
+      <a class="btn btn-gold" data-gif-download hidden download>
+        <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>
+        <span>{{t:gif.download}}</span>
+      </a>
+      <a class="btn btn-ghost" href="../account/#games" data-gif-back>{{t:gif.back}}</a>
+    </div>
+
+    <details class="gif-options-box">
+      <summary>{{t:gif.options}}</summary>
+      <form class="gif-options" data-gif-options>
+        <label class="select-wrap">
+          <span class="select-label">{{t:gif.size}}</span>
+          <select name="size">
+            <option value="small">{{t:gif.size_small}}</option>
+            <option value="medium" selected>{{t:gif.size_medium}}</option>
+            <option value="large">{{t:gif.size_large}}</option>
+          </select>
+        </label>
+        <label class="select-wrap">
+          <span class="select-label">{{t:gif.orientation}}</span>
+          <select name="orientation">
+            <option value="white">{{t:gif.orientation_white}}</option>
+            <option value="black">{{t:gif.orientation_black}}</option>
+          </select>
+        </label>
+        <label class="select-wrap">
+          <span class="select-label">{{t:gif.speed}}</span>
+          <select name="delay">
+            <option value="250">{{t:gif.speed_fast}}</option>
+            <option value="500" selected>{{t:gif.speed_normal}}</option>
+            <option value="1000">{{t:gif.speed_slow}}</option>
+            <option value="2000">{{t:gif.speed_very_slow}}</option>
+          </select>
+        </label>
+        <label class="check"><input type="checkbox" name="coords" checked><span>{{t:gif.coords}}</span></label>
+        <button class="btn btn-ghost btn-small" type="submit"><svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg><span>{{t:gif.regenerate}}</span></button>
+      </form>
+    </details>
+    <p class="hint gif-note">{{t:gif.note}}</p>
+  </article>
+</div>

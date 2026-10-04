@@ -1,0 +1,527 @@
+<!doctype html>
+<html lang="zh-Hans" dir="ltr" class="no-js" data-page="account" data-root="../../" data-api="https://caissa.scacelith.com/api/v1" data-repo="DarkCenobyte/scacelith-chess">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src &#x27;none&#x27;; script-src &#x27;self&#x27;; style-src &#x27;self&#x27;; img-src &#x27;self&#x27; data: blob:; font-src &#x27;self&#x27;; connect-src &#x27;self&#x27; https://caissa.scacelith.com https://api.github.com; frame-src https://www.youtube-nocookie.com; worker-src &#x27;self&#x27;; manifest-src &#x27;self&#x27;; base-uri &#x27;none&#x27;; form-action &#x27;none&#x27;; object-src &#x27;none&#x27;">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#100e0b">
+<title>你的账号 — Scacelith</title>
+<meta name="description" content="登录你的 Scacelith 账号：等级分、对局记录、PGN 和 GIF 下载、已登录的设备以及设置。">
+<meta name="robots" content="noindex, follow">
+<link rel="canonical" href="https://scacelith.com/zh-Hans/account/">
+<link rel="alternate" hreflang="en" href="https://scacelith.com/en/account/">
+<link rel="alternate" hreflang="fr" href="https://scacelith.com/fr/account/">
+<link rel="alternate" hreflang="de" href="https://scacelith.com/de/account/">
+<link rel="alternate" hreflang="es" href="https://scacelith.com/es/account/">
+<link rel="alternate" hreflang="uk" href="https://scacelith.com/uk/account/">
+<link rel="alternate" hreflang="ru" href="https://scacelith.com/ru/account/">
+<link rel="alternate" hreflang="ar" href="https://scacelith.com/ar/account/">
+<link rel="alternate" hreflang="ja" href="https://scacelith.com/ja/account/">
+<link rel="alternate" hreflang="zh-Hans" href="https://scacelith.com/zh-Hans/account/">
+<link rel="alternate" hreflang="zh-Hant" href="https://scacelith.com/zh-Hant/account/">
+<link rel="alternate" hreflang="x-default" href="https://scacelith.com/en/account/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Scacelith">
+<meta property="og:title" content="你的账号 — Scacelith">
+<meta property="og:description" content="登录你的 Scacelith 账号：等级分、对局记录、PGN 和 GIF 下载、已登录的设备以及设置。">
+<meta property="og:url" content="https://scacelith.com/zh-Hans/account/">
+<meta property="og:image" content="https://scacelith.com/assets/img/og-scacelith.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="在阳光洒满的大理石大厅里，两个瓷制机器人正在胡桃木桌前下国际象棋。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:locale:alternate" content="fr_FR">
+<meta property="og:locale:alternate" content="de_DE">
+<meta property="og:locale:alternate" content="es_ES">
+<meta property="og:locale:alternate" content="uk_UA">
+<meta property="og:locale:alternate" content="ru_RU">
+<meta property="og:locale:alternate" content="ar_AR">
+<meta property="og:locale:alternate" content="ja_JP">
+<meta property="og:locale:alternate" content="zh_TW">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../../assets/icons/favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" sizes="192x192" href="../../assets/icons/icon-192.png">
+<link rel="apple-touch-icon" href="../../assets/icons/apple-touch-icon.png">
+<link rel="preload" href="../../assets/fonts/cinzel-latin.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../assets/css/site.css">
+<script src="../../assets/js/boot.js"></script>
+</head>
+<body>
+<a class="skip-link" href="#main">跳到正文</a>
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+<symbol id="i-download" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M12 3.5v11.5m0 0-4.5-4.5M12 15l4.5-4.5M4.5 16.5v2.25c0 .97.78 1.75 1.75 1.75h11.5c.97 0 1.75-.78 1.75-1.75V16.5"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m6.5 9.5 5.5 5.5 5.5-5.5"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M4.5 12h15m0 0-5.5-5.5M19.5 12l-5.5 5.5"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.4 2.3 3.6 5.1 3.6 8.5s-1.2 6.2-3.6 8.5c-2.4-2.3-3.6-5.1-3.6-8.5S9.6 5.8 12 3.5Z"/></g></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.75"/><path d="M4.75 19.75c.9-3.6 3.75-5.5 7.25-5.5s6.35 1.9 7.25 5.5"/></g></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="m6 6 12 12M18 6 6 18"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path fill="currentColor" d="M8 5.6v12.8c0 .78.85 1.26 1.52.86l10.4-6.4a1 1 0 0 0 0-1.72L9.52 4.74A1 1 0 0 0 8 5.6Z"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="8.25" y="8.25" width="11.5" height="11.5" rx="1.75"/><path d="M15.75 8.25V6a1.75 1.75 0 0 0-1.75-1.75H6A1.75 1.75 0 0 0 4.25 6v8c0 .97.78 1.75 1.75 1.75h2.25"/></g></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-film" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="3.75" y="4.75" width="16.5" height="14.5" rx="1.75"/><path d="M7.75 4.75v14.5M16.25 4.75v14.5M3.75 9h4M3.75 15h4M16.25 9h4M16.25 15h4"/></g></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M13.75 3.75H7.5A1.75 1.75 0 0 0 5.75 5.5v13c0 .97.78 1.75 1.75 1.75h9c.97 0 1.75-.78 1.75-1.75V8.25Z"/><path d="M13.75 3.75v4.5h4.5M9 13h6M9 16.25h4"/></g></symbol>
+<symbol id="i-external" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5h6v6M19.5 4.5l-8.25 8.25M17.25 14v4.25c0 .69-.56 1.25-1.25 1.25H5.75c-.69 0-1.25-.56-1.25-1.25V8c0-.69.56-1.25 1.25-1.25H10"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10.75" cy="10.75" r="6.25"/><path d="m15.5 15.5 4.5 4.5"/></g></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" d="M12 3.5 5 6.25v5.5c0 4.2 2.9 7.6 7 8.75 4.1-1.15 7-4.55 7-8.75v-5.5Z"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="m9 12 2.2 2.2L15.2 10"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><rect x="3.75" y="5.75" width="16.5" height="12.5" rx="1.75"/><path d="m4.5 7 7.5 6 7.5-6"/></g></symbol>
+<symbol id="i-device" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"><rect x="3.75" y="4.75" width="16.5" height="11" rx="1.5"/><path d="M9 19.25h6M12 15.75v3.5"/></g></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M14.25 7.5V5.75c0-.97-.78-1.75-1.75-1.75h-6c-.97 0-1.75.78-1.75 1.75v12.5c0 .97.78 1.75 1.75 1.75h6c.97 0 1.75-.78 1.75-1.75V16.5M10 12h10m0 0-3-3m3 3-3 3"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.25"/><path d="M12 7.5V12l3 2"/></g></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M19.25 12a7.25 7.25 0 1 1-2.12-5.13M19.25 4.5v3.75H15.5"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.75 12S6 5.75 12 5.75 21.25 12 21.25 12 18 18.25 12 18.25 2.75 12 2.75 12Z"/><circle cx="12" cy="12" r="2.75"/></g></symbol>
+<symbol id="i-warning" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.4 4.6 3.2 17.5c-.7 1.2.2 2.75 1.6 2.75h14.4c1.4 0 2.3-1.55 1.6-2.75L13.6 4.6c-.7-1.25-2.5-1.25-3.2 0Z"/><path d="M12 9.5v4.25M12 16.75v.01"/></g></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.25"/><path d="M12 11v5.25M12 7.75v.01"/></g></symbol>
+<symbol id="i-windows" viewBox="0 0 24 24"><path fill="currentColor" d="M3.5 5.6 10.25 4.7v6.55H3.5Zm7.75-1.05L20.5 3.25v8H11.25ZM3.5 12.75h6.75v6.55L3.5 18.4Zm7.75 0h9.25v8l-9.25-1.3Z"/></symbol>
+<symbol id="i-apple" viewBox="0 0 24 24"><path fill="currentColor" d="M16.4 12.7c0-2.1 1.7-3.1 1.8-3.2-1-1.5-2.6-1.7-3.1-1.7-1.3-.1-2.6.8-3.3.8-.7 0-1.7-.8-2.9-.8-1.5 0-2.9.9-3.6 2.2-1.6 2.7-.4 6.8 1.1 9 .8 1.1 1.7 2.3 2.8 2.2 1.1 0 1.6-.7 2.9-.7 1.4 0 1.7.7 2.9.7 1.2 0 2-1.1 2.7-2.2.9-1.2 1.2-2.4 1.2-2.5 0 0-2.4-.9-2.5-3.6ZM14.3 6.3c.6-.7 1-1.7.9-2.8-.9 0-2 .6-2.6 1.3-.6.6-1.1 1.7-1 2.7 1 .1 2.1-.5 2.7-1.2Z"/></symbol>
+<symbol id="i-linux" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.75c-2.2 0-3.4 1.8-3.4 4.1 0 1 .1 1.9-.3 2.8-.6 1.3-2.4 3.2-2.9 5.6-.2 1 .1 1.7.5 2.1-.5.4-1.6.6-1.7 1.4-.1.9 1.2 1.2 2.4 1.6 1.1.4 1.9 1 2.7 1 .7 0 1.2-.4 1.5-.9h2.4c.3.5.8.9 1.5.9.8 0 1.6-.6 2.7-1 1.2-.4 2.5-.7 2.4-1.6-.1-.8-1.2-1-1.7-1.4.4-.4.7-1.1.5-2.1-.5-2.4-2.3-4.3-2.9-5.6-.4-.9-.3-1.8-.3-2.8 0-2.3-1.2-4.1-3.4-4.1Zm-1.4 3.4c.4 0 .7.5.7 1.1s-.3 1-.7 1-.7-.4-.7-1 .3-1.1.7-1.1Zm2.8 0c.4 0 .7.5.7 1.1s-.3 1-.7 1-.7-.4-.7-1 .3-1.1.7-1.1ZM12 8.6c.9 0 2 .5 2 .9s-1.1 1.1-2 1.1-2-.7-2-1.1.9-.9 2-.9Zm-2.6 3.1c.7.6 1.6 1 2.6 1s1.9-.4 2.6-1c.6 1.1 1.4 2.4 1.4 4.2 0 .6-.1 1.2-.3 1.7H8.3c-.2-.5-.3-1.1-.3-1.7 0-1.8.8-3.1 1.4-4.2Z"/></symbol>
+<symbol id="i-github" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.5a9.5 9.5 0 0 0-3 18.52c.48.09.65-.2.65-.46v-1.6c-2.64.57-3.2-1.27-3.2-1.27-.43-1.1-1.06-1.39-1.06-1.39-.86-.59.07-.58.07-.58.95.07 1.45.98 1.45.98.85 1.45 2.22 1.03 2.76.79.09-.61.33-1.03.6-1.27-2.1-.24-4.32-1.06-4.32-4.7 0-1.04.37-1.89.98-2.55-.1-.24-.42-1.21.09-2.52 0 0 .8-.26 2.62.97a9.1 9.1 0 0 1 4.77 0c1.82-1.23 2.62-.97 2.62-.97.51 1.31.19 2.28.1 2.52.6.66.97 1.51.97 2.55 0 3.65-2.22 4.45-4.34 4.69.34.29.65.87.65 1.75v2.6c0 .26.17.56.66.46A9.5 9.5 0 0 0 12 2.5Z"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" d="M12 6.5c-1.6-1.2-3.9-1.75-7.25-1.75v13c3.35 0 5.65.55 7.25 1.75 1.6-1.2 3.9-1.75 7.25-1.75v-13c-3.35 0-5.65.55-7.25 1.75Zm0 0v13"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 4.25h9v4.5a4.5 4.5 0 0 1-9 0Z"/><path d="M7.5 6H4.75v1.25A3 3 0 0 0 7.75 10.25M16.5 6h2.75v1.25a3 3 0 0 1-3 3M12 13.25v3M8.75 19.75h6.5l-.75-3.5h-5Z"/></g></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15.5" r="3.75"/><path d="m10.75 12.75 8.5-8.5M16.25 7.25l2.5 2.5M14 9.5l2 2"/></g></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M4.75 6.75h14.5M9.5 6.75V4.75h5v2M6.5 6.75l.85 12.1c.07.9.82 1.65 1.75 1.65h5.8c.93 0 1.68-.75 1.75-1.65l.85-12.1M10 10.5v6M14 10.5v6"/></symbol>
+</svg>
+<header class="site-header" data-header>
+  <div class="shell header-bar">
+    <a class="brand" href="../../zh-Hans/">
+      <img class="brand-icon" src="../../assets/icons/logo-128.webp" width="34" height="34" alt="">
+      <span class="brand-word">Scacelith</span>
+      <span class="visually-hidden">首页</span>
+    </a>
+    <nav class="site-nav" id="site-nav" aria-label="主菜单" data-nav>
+      <ul class="nav-list">
+        <li><a href="../../zh-Hans/#experience" data-nav-section="experience">游戏</a></li>
+        <li><a href="../../zh-Hans/#modes" data-nav-section="modes">游戏模式</a></li>
+        <li><a href="../../zh-Hans/#gallery" data-nav-section="gallery">画廊</a></li>
+        <li><a href="../../zh-Hans/#online" data-nav-section="online">在线</a></li>
+        <li><a href="../../zh-Hans/players/" data-nav-page="players">排行榜</a></li>
+      </ul>
+      <div class="nav-extra">
+        <a class="nav-account" href="../../zh-Hans/account/" data-nav-page="account" data-account-link>
+          <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+          <span data-account-label>账号</span>
+        </a>
+      </div>
+    </nav>
+    <div class="header-tools">
+      <details class="menu lang-menu" data-menu>
+        <summary class="tool-button" aria-label="语言: 简体中文" title="语言">
+          <svg class="icon" aria-hidden="true"><use href="#i-globe"></use></svg>
+          <span class="lang-code">zh-Hans</span>
+        </summary>
+        <div class="menu-panel lang-panel">
+          <p class="menu-title">语言</p>
+          <ul class="lang-list" data-lang-list>
+<li><a href="../../en/account/" hreflang="en" lang="en" dir="ltr" data-lang="en">English</a></li>
+<li><a href="../../fr/account/" hreflang="fr" lang="fr" dir="ltr" data-lang="fr">Français</a></li>
+<li><a href="../../de/account/" hreflang="de" lang="de" dir="ltr" data-lang="de">Deutsch</a></li>
+<li><a href="../../es/account/" hreflang="es" lang="es" dir="ltr" data-lang="es">Español</a></li>
+<li><a href="../../uk/account/" hreflang="uk" lang="uk" dir="ltr" data-lang="uk">Українська</a></li>
+<li><a href="../../ru/account/" hreflang="ru" lang="ru" dir="ltr" data-lang="ru">Русский</a></li>
+<li><a href="../../ar/account/" hreflang="ar" lang="ar" dir="rtl" data-lang="ar">العربية</a></li>
+<li><a href="../../ja/account/" hreflang="ja" lang="ja" dir="ltr" data-lang="ja">日本語</a></li>
+<li><a href="../../zh-Hans/account/" hreflang="zh-Hans" lang="zh-Hans" dir="ltr" data-lang="zh-Hans" aria-current="true">简体中文</a></li>
+<li><a href="../../zh-Hant/account/" hreflang="zh-Hant" lang="zh-Hant" dir="ltr" data-lang="zh-Hant">繁體中文</a></li>
+          </ul>
+        </div>
+      </details>
+      <a class="tool-button account-button" href="../../zh-Hans/account/" data-account-link data-nav-page="account">
+        <svg class="icon" aria-hidden="true"><use href="#i-user"></use></svg>
+        <span class="account-button-label" data-account-label>账号</span>
+      </a>
+      <div class="header-download">
+<details class="menu download-menu" data-menu data-download-menu>
+  <summary class="btn btn-gold download-summary">
+    <svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>
+    <span class="download-label">下载</span>
+    <svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"></use></svg>
+  </summary>
+  <div class="menu-panel download-panel">
+    <p class="menu-title">选择你的系统</p>
+    <ul class="os-list" data-os-list>
+      <li><a class="os-item" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-os="windows"><svg class="icon os-icon" aria-hidden="true"><use href="#i-windows"></use></svg><span class="os-text"><span class="os-name">Windows</span><span class="os-meta">在 GitHub 上查看发行版</span></span></a></li>
+      <li><a class="os-item" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-os="macos"><svg class="icon os-icon" aria-hidden="true"><use href="#i-apple"></use></svg><span class="os-text"><span class="os-name">macOS</span><span class="os-meta">在 GitHub 上查看发行版</span></span></a></li>
+      <li><a class="os-item" href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-os="linux"><svg class="icon os-icon" aria-hidden="true"><use href="#i-linux"></use></svg><span class="os-text"><span class="os-name">Linux</span><span class="os-meta">在 GitHub 上查看发行版</span></span></a></li>
+    </ul>
+    <p class="menu-foot"><span data-release-label>Scacelith</span> · <a href="https://github.com/DarkCenobyte/scacelith-chess/releases" data-release-link>全部发行版</a></p>
+  </div>
+</details>
+      </div>
+      <button class="tool-button nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" data-nav-toggle>
+        <svg class="icon icon-open" aria-hidden="true"><use href="#i-menu"></use></svg>
+        <svg class="icon icon-close" aria-hidden="true"><use href="#i-close"></use></svg>
+        <span class="visually-hidden">菜单</span>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="main" tabindex="-1">
+<section class="page-head page-head-compact" aria-labelledby="page-title">
+  <div class="page-head-media" aria-hidden="true"></div>
+  <div class="shell">
+    <p class="eyebrow"><span class="diamond" aria-hidden="true"></span><span data-server-name>caissa.scacelith.com</span></p>
+    <h1 class="page-title" id="page-title">你的账号</h1>
+  </div>
+</section>
+<div class="shell page-body account-body">
+  <noscript><p class="notice notice-warning">此页面需要 JavaScript 才能与 Scacelith 服务器通信。</p></noscript>
+  <div class="loading-block" data-view="loading">
+    <span class="spinner" aria-hidden="true"></span>
+    <span>正在加载…</span>
+  </div>
+  <!-- Signed out: sign in, create an account, recover a password -->
+  <div class="auth" data-view="auth" hidden>
+    <div class="auth-card">
+      <p class="card-brand" data-server-name>caissa.scacelith.com</p>
+      <div class="tabs auth-tabs" role="tablist" aria-label="你的账号" data-auth-tabs>
+        <button class="tab" type="button" role="tab" id="tab-signin" aria-controls="panel-signin" aria-selected="true" data-tab="signin">登录</button>
+        <button class="tab" type="button" role="tab" id="tab-register" aria-controls="panel-register" aria-selected="false" tabindex="-1" data-tab="register">创建账号</button>
+      </div>
+      <section class="auth-panel" role="tabpanel" id="panel-signin" aria-labelledby="tab-signin" data-panel="signin">
+        <form class="form" data-form="signin" novalidate>
+          <h2 class="form-title">欢迎回来</h2>
+          <div class="field">
+            <label for="signin-login">用户名或电子邮箱</label>
+            <input id="signin-login" name="login" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="254" required>
+          </div>
+          <div class="field">
+            <label for="signin-password">密码</label>
+            <div class="input-with-button">
+              <input id="signin-password" name="password" type="password" autocomplete="current-password" maxlength="1024" required>
+              <button class="reveal" type="button" data-reveal aria-pressed="false" aria-label="显示密码"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></button>
+            </div>
+          </div>
+          <label class="check"><input type="checkbox" name="remember"><span>在此设备上保持登录</span></label>
+          <p class="form-error" role="alert" data-error hidden></p>
+          <button class="btn btn-gold btn-block" type="submit" data-submit>登录</button>
+          <p class="form-links">
+            <a href="#forgot" data-goto="forgot">忘记密码？</a>
+            <a href="#resend" data-goto="resend">重新发送确认邮件</a>
+          </p>
+        </form>
+        <form class="form" data-form="mfa" novalidate hidden>
+          <h2 class="form-title"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>双重验证</h2>
+          <p class="form-text" data-mfa-text>请输入身份验证器应用中的 6 位验证码。</p>
+          <div class="field">
+            <label for="mfa-code" data-mfa-label>应用中的验证码</label>
+            <input id="mfa-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="32" required>
+          </div>
+          <label class="check"><input type="checkbox" name="recovery" data-mfa-recovery><span>改用恢复码</span></label>
+          <p class="form-error" role="alert" data-error hidden></p>
+          <button class="btn btn-gold btn-block" type="submit" data-submit>确认</button>
+          <p class="form-links"><a href="#signin" data-goto="signin">返回登录</a></p>
+        </form>
+      </section>
+      <section class="auth-panel" role="tabpanel" id="panel-register" aria-labelledby="tab-register" data-panel="register" hidden>
+        <form class="form" data-form="register" novalidate>
+          <h2 class="form-title">免费账号</h2>
+          <p class="form-text" data-registration-closed hidden>服务器目前不接受新账号注册。</p>
+          <div class="field">
+            <label for="register-username">用户名</label>
+            <input id="register-username" name="username" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="64" required aria-describedby="register-username-hint">
+            <p class="hint" id="register-username-hint" data-username-hint>可使用字母、数字、_ 和 -，须以字母或数字开头。</p>
+          </div>
+          <div class="field">
+            <label for="register-email">电子邮箱</label>
+            <input id="register-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="254" required>
+          </div>
+          <div class="field">
+            <label for="register-password">密码</label>
+            <div class="input-with-button">
+              <input id="register-password" name="password" type="password" autocomplete="new-password" maxlength="1024" required aria-describedby="register-password-hint">
+              <button class="reveal" type="button" data-reveal aria-pressed="false" aria-label="显示密码"><svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg></button>
+            </div>
+            <p class="hint" id="register-password-hint" data-password-hint>至少 10 个字符，不得包含你的用户名或电子邮箱。</p>
+          </div>
+          <div class="field">
+            <label for="register-confirm">确认密码</label>
+            <input id="register-confirm" name="confirm" type="password" autocomplete="new-password" maxlength="1024" required>
+          </div>
+          <p class="form-note"><svg class="icon" aria-hidden="true"><use href="#i-info"></use></svg><span>为了挡住机器人，你的浏览器会在注册时解一道小谜题，只需几秒钟。</span></p>
+          <div class="progress" data-pow-progress hidden><span class="progress-bar" data-pow-bar></span></div>
+          <p class="form-error" role="alert" data-error hidden></p>
+          <button class="btn btn-gold btn-block" type="submit" data-submit>创建账号</button>
+        </form>
+        <div class="form-done" data-register-done hidden tabindex="-1">
+          <svg class="icon done-icon" aria-hidden="true"><use href="#i-mail"></use></svg>
+          <h2 class="form-title">请查收邮件</h2>
+          <p data-register-done-text>我们已向你的邮箱发送了一个确认链接。打开它即可创建账号，然后登录。</p>
+          <p class="hint">该链接 24 小时内有效。收件箱里没有？请检查垃圾邮件文件夹，或重新获取邮件。</p>
+          <button class="btn btn-ghost btn-block" type="button" data-goto="signin">前往登录</button>
+        </div>
+      </section>
+      <section class="auth-panel" id="panel-forgot" data-panel="forgot" hidden aria-labelledby="forgot-title">
+        <form class="form" data-form="forgot" novalidate>
+          <h2 class="form-title" id="forgot-title">忘记密码</h2>
+          <p class="form-text">请输入你账号的电子邮箱地址。如果有账号使用该地址，我们会向你发送一个用于设置新密码的链接，有效期为一小时。</p>
+          <div class="field">
+            <label for="forgot-email">电子邮箱</label>
+            <input id="forgot-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="254" required>
+          </div>
+          <p class="form-error" role="alert" data-error hidden></p>
+          <p class="form-success" role="status" data-success hidden></p>
+          <button class="btn btn-gold btn-block" type="submit" data-submit>发送链接</button>
+          <p class="form-links"><a href="#signin" data-goto="signin">返回登录</a></p>
+        </form>
+      </section>
+      <section class="auth-panel" id="panel-resend" data-panel="resend" hidden aria-labelledby="resend-title">
+        <form class="form" data-form="resend" novalidate>
+          <h2 class="form-title" id="resend-title">确认你的电子邮箱</h2>
+          <p class="form-text">没有收到确认邮件，或者链接已过期？输入你的邮箱地址即可获取新的链接。</p>
+          <div class="field">
+            <label for="resend-email">电子邮箱</label>
+            <input id="resend-email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="254" required>
+          </div>
+          <p class="form-error" role="alert" data-error hidden></p>
+          <p class="form-success" role="status" data-success hidden></p>
+          <button class="btn btn-gold btn-block" type="submit" data-submit>重新发送</button>
+          <p class="form-links"><a href="#signin" data-goto="signin">返回登录</a></p>
+        </form>
+      </section>
+      <p class="auth-foot">官方服务器上的同一个账号，可同时用于游戏和本网站。在游戏中用 Google 创建了账号？请使用“忘记密码？”为它设置密码。</p>
+    </div>
+  </div>
+  <!-- Signed in -->
+  <div class="dashboard" data-view="dashboard" hidden>
+    <header class="profile-head dashboard-head">
+      <div class="medallion" aria-hidden="true"><span data-me-initial></span></div>
+      <div class="profile-ident">
+        <h2 class="profile-name" data-me-name></h2>
+        <p class="profile-sub" data-me-since></p>
+        <ul class="badges" data-me-badges></ul>
+      </div>
+      <div class="dashboard-actions">
+        <a class="btn btn-ghost btn-small" href="../players/" data-me-public>公开资料</a>
+        <button class="btn btn-ghost btn-small" type="button" data-logout><svg class="icon" aria-hidden="true"><use href="#i-logout"></use></svg><span>退出登录</span></button>
+      </div>
+    </header>
+    <div class="notice notice-danger" data-me-ban hidden></div>
+    <div class="tabs dash-tabs" role="tablist" aria-label="你的账号" data-dash-tabs>
+      <button class="tab" type="button" role="tab" id="dtab-overview" aria-controls="dpanel-overview" aria-selected="true" data-tab="overview">概览</button>
+      <button class="tab" type="button" role="tab" id="dtab-games" aria-controls="dpanel-games" aria-selected="false" tabindex="-1" data-tab="games">对局</button>
+      <button class="tab" type="button" role="tab" id="dtab-devices" aria-controls="dpanel-devices" aria-selected="false" tabindex="-1" data-tab="devices">设备</button>
+      <button class="tab" type="button" role="tab" id="dtab-settings" aria-controls="dpanel-settings" aria-selected="false" tabindex="-1" data-tab="settings">设置</button>
+    </div>
+    <section class="dash-panel" role="tabpanel" id="dpanel-overview" aria-labelledby="dtab-overview" data-panel="overview">
+      <div class="overview-grid">
+        <div class="panel">
+          <h3 class="block-title">你的信息</h3>
+          <dl class="facts" data-me-facts></dl>
+        </div>
+        <div class="panel">
+          <h3 class="block-title">你的等级分</h3>
+          <div class="ratings" data-me-ratings></div>
+        </div>
+      </div>
+      <div class="panel" data-me-sanctions-panel hidden>
+        <h3 class="block-title">处罚</h3>
+        <ul class="sanctions" data-me-sanctions></ul>
+      </div>
+      <div class="panel">
+        <div class="panel-head">
+          <h3 class="block-title">最近的对局</h3>
+          <a class="text-link" href="#games" data-goto-tab="games">你的全部对局 <svg class="icon flip-rtl" aria-hidden="true"><use href="#i-arrow"></use></svg></a>
+        </div>
+        <div data-recent-games></div>
+      </div>
+    </section>
+    <section class="dash-panel" role="tabpanel" id="dpanel-games" aria-labelledby="dtab-games" data-panel="games" hidden>
+      <form class="filters" data-games-filters>
+        <label class="select-wrap">
+          <span class="select-label">用时</span>
+          <select name="category" data-filter-category>
+            <option value="">全部</option>
+            <option value="custom">自定义</option>
+          </select>
+        </label>
+        <label class="select-wrap">
+          <span class="select-label">类型</span>
+          <select name="rated">
+            <option value="">全部</option>
+            <option value="true">计分</option>
+            <option value="false">不计分</option>
+          </select>
+        </label>
+        <label class="select-wrap">
+          <span class="select-label">结果</span>
+          <select name="result">
+            <option value="">全部</option>
+            <option value="win">胜</option>
+            <option value="loss">负</option>
+            <option value="draw">和</option>
+          </select>
+        </label>
+        <p class="filters-total" data-games-total aria-live="polite"></p>
+      </form>
+      <div data-games-list></div>
+    </section>
+    <section class="dash-panel" role="tabpanel" id="dpanel-devices" aria-labelledby="dtab-devices" data-panel="devices" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <h3 class="block-title">已登录的设备</h3>
+          <button class="btn btn-ghost btn-small" type="button" data-logout-all><svg class="icon" aria-hidden="true"><use href="#i-logout"></use></svg><span>全部退出登录</span></button>
+        </div>
+        <p class="panel-note">每次登录（无论在游戏中还是在本网站）都算作一台设备。请将你不认识的设备退出登录。</p>
+        <ul class="devices" data-devices></ul>
+      </div>
+    </section>
+    <section class="dash-panel" role="tabpanel" id="dpanel-settings" aria-labelledby="dtab-settings" data-panel="settings" hidden>
+      <div class="settings-grid">
+        <div class="panel">
+          <h3 class="block-title">挑战</h3>
+          <p class="panel-note">其他棋手可以在游戏中按用户名向你发起挑战。</p>
+          <label class="switch">
+            <input type="checkbox" role="switch" data-pref-challenges>
+            <span class="switch-track" aria-hidden="true"><span class="switch-thumb"></span></span>
+            <span>接受挑战</span>
+          </label>
+        </div>
+        <div class="panel">
+          <h3 class="block-title"><svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>双重验证</h3>
+          <p class="panel-note" data-mfa-state></p>
+          <p class="hint">请在游戏的账号页面中开启或关闭双重验证，或生成新的恢复码。</p>
+        </div>
+        <form class="panel form" data-form="password" novalidate>
+          <h3 class="block-title"><svg class="icon" aria-hidden="true"><use href="#i-key"></use></svg>修改密码</h3>
+          <p class="panel-note" data-password-note>你的其他设备将退出登录，当前设备保持登录。</p>
+          <div class="field">
+            <label for="pw-current">当前密码</label>
+            <input id="pw-current" name="currentPassword" type="password" autocomplete="current-password" maxlength="1024" required>
+          </div>
+          <div class="field">
+            <label for="pw-new">新密码</label>
+            <input id="pw-new" name="newPassword" type="password" autocomplete="new-password" maxlength="1024" required>
+          </div>
+          <div class="field">
+            <label for="pw-confirm">确认密码</label>
+            <input id="pw-confirm" name="confirm" type="password" autocomplete="new-password" maxlength="1024" required>
+          </div>
+          <p class="form-error" role="alert" data-error hidden></p>
+          <p class="form-success" role="status" data-success hidden></p>
+          <button class="btn btn-gold" type="submit" data-submit>修改密码</button>
+        </form>
+        <form class="panel form" data-form="email" novalidate>
+          <h3 class="block-title"><svg class="icon" aria-hidden="true"><use href="#i-mail"></use></svg>更改电子邮箱地址</h3>
+          <p class="panel-note" data-email-note></p>
+          <div class="field">
+            <label for="email-new">新的电子邮箱地址</label>
+            <input id="email-new" name="newEmail" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" maxlength="254" required>
+          </div>
+          <div class="field">
+            <label for="email-password">密码</label>
+            <input id="email-password" name="password" type="password" autocomplete="current-password" maxlength="1024" required>
+          </div>
+          <div class="field" data-needs-mfa hidden>
+            <label for="email-code">双重验证码（或恢复码）</label>
+            <input id="email-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="32">
+          </div>
+          <p class="form-error" role="alert" data-error hidden></p>
+          <p class="form-success" role="status" data-success hidden></p>
+          <button class="btn btn-gold" type="submit" data-submit>发送确认链接</button>
+        </form>
+        <form class="panel form" data-form="export" novalidate>
+          <h3 class="block-title"><svg class="icon" aria-hidden="true"><use href="#i-download"></use></svg>下载我的数据</h3>
+          <p class="panel-note">服务器保存的与你账号有关的全部信息，打包为一个 JSON 文件。</p>
+          <div class="field">
+            <label for="export-password">密码</label>
+            <input id="export-password" name="password" type="password" autocomplete="current-password" maxlength="1024" required>
+          </div>
+          <div class="field" data-needs-mfa hidden>
+            <label for="export-code">双重验证码（或恢复码）</label>
+            <input id="export-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="32">
+          </div>
+          <p class="form-error" role="alert" data-error hidden></p>
+          <p class="form-success" role="status" data-success hidden></p>
+          <button class="btn btn-gold" type="submit" data-submit>下载我的数据</button>
+        </form>
+        <form class="panel form panel-danger" data-form="delete" novalidate>
+          <h3 class="block-title"><svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>删除账号</h3>
+          <p class="panel-note">此操作无法撤销。你的对局和等级分将以匿名名称保留；你的电子邮箱地址、密码和设备将被清除。</p>
+          <div class="field">
+            <label for="delete-confirm" data-delete-label>输入你的用户名以确认</label>
+            <input id="delete-confirm" name="confirmName" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="64" required>
+          </div>
+          <div class="field">
+            <label for="delete-password">密码</label>
+            <input id="delete-password" name="password" type="password" autocomplete="current-password" maxlength="1024" required>
+          </div>
+          <div class="field" data-needs-mfa hidden>
+            <label for="delete-code">双重验证码（或恢复码）</label>
+            <input id="delete-code" name="code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="32">
+          </div>
+          <p class="form-error" role="alert" data-error hidden></p>
+          <button class="btn btn-danger" type="submit" data-submit>删除我的账号</button>
+        </form>
+      </div>
+    </section>
+  </div>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <div class="footer-brand">
+      <a class="brand" href="../../zh-Hans/">
+        <img class="brand-icon" src="../../assets/icons/logo-128.webp" width="44" height="44" alt="" loading="lazy">
+        <span class="brand-word">Scacelith</span>
+      </a>
+      <p class="footer-tagline">王者的游戏</p>
+      <p class="footer-text">一款以第一人称视角游玩的照片级写实国际象棋游戏，运行于自主开发的 OpenGL 4.6 引擎。采用 GNU GPL v3 许可的自由软件。</p>
+    </div>
+    <nav class="footer-col" aria-labelledby="footer-game">
+      <h2 class="footer-head" id="footer-game">游戏</h2>
+      <ul>
+        <li><a href="../../zh-Hans/#experience">游戏</a></li>
+        <li><a href="../../zh-Hans/#modes">游戏模式</a></li>
+        <li><a href="../../zh-Hans/#gallery">画廊</a></li>
+        <li><a href="../../zh-Hans/#trailer">预告片</a></li>
+        <li><a href="../../zh-Hans/#download">下载</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-col" aria-labelledby="footer-online">
+      <h2 class="footer-head" id="footer-online">在线</h2>
+      <ul>
+        <li><a href="../../zh-Hans/#online">在线</a></li>
+        <li><a href="../../zh-Hans/players/">排行榜</a></li>
+        <li><a href="../../zh-Hans/account/">账号</a></li>
+        <li><a href="https://docs.scacelith.com/zh-Hans/" rel="noopener">服务器 API 文档</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-col" aria-labelledby="footer-source">
+      <h2 class="footer-head" id="footer-source">源代码</h2>
+      <ul>
+        <li><a href="https://github.com/DarkCenobyte/scacelith-chess" rel="noopener">GitHub 上的游戏</a></li>
+        <li><a href="https://github.com/DarkCenobyte/scacelith-chess-server" rel="noopener">GitHub 上的服务器</a></li>
+        <li><a href="https://github.com/DarkCenobyte/scacelith-chess/releases" rel="noopener">发行版</a></li>
+        <li><a href="https://github.com/DarkCenobyte/scacelith-chess/blob/master/LICENSE" rel="noopener">许可证（GPL v3）</a></li>
+      </ul>
+    </nav>
+    <nav class="footer-col footer-langs" aria-labelledby="footer-langs">
+      <h2 class="footer-head" id="footer-langs">语言</h2>
+      <ul class="lang-columns">
+<li><a href="../../en/account/" hreflang="en" lang="en" dir="ltr" data-lang="en">English</a></li>
+<li><a href="../../fr/account/" hreflang="fr" lang="fr" dir="ltr" data-lang="fr">Français</a></li>
+<li><a href="../../de/account/" hreflang="de" lang="de" dir="ltr" data-lang="de">Deutsch</a></li>
+<li><a href="../../es/account/" hreflang="es" lang="es" dir="ltr" data-lang="es">Español</a></li>
+<li><a href="../../uk/account/" hreflang="uk" lang="uk" dir="ltr" data-lang="uk">Українська</a></li>
+<li><a href="../../ru/account/" hreflang="ru" lang="ru" dir="ltr" data-lang="ru">Русский</a></li>
+<li><a href="../../ar/account/" hreflang="ar" lang="ar" dir="rtl" data-lang="ar">العربية</a></li>
+<li><a href="../../ja/account/" hreflang="ja" lang="ja" dir="ltr" data-lang="ja">日本語</a></li>
+<li><a href="../../zh-Hans/account/" hreflang="zh-Hans" lang="zh-Hans" dir="ltr" data-lang="zh-Hans" aria-current="true">简体中文</a></li>
+<li><a href="../../zh-Hant/account/" hreflang="zh-Hant" lang="zh-Hant" dir="ltr" data-lang="zh-Hant">繁體中文</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="shell footer-credits">
+    <p>Stockfish 是其开发者的商标。YouTube 是 Google LLC 的商标。Windows 是 Microsoft Corporation 的商标。</p>
+    <p class="footer-legal"><span>Scacelith</span> <span class="diamond" aria-hidden="true"></span> <span>本网站不使用 Cookie，也不使用任何跟踪器。</span></p>
+  </div>
+</footer>
+<div class="toasts" data-toasts aria-live="polite" aria-atomic="false"></div>
+<script type="application/json" id="i18n">{"lang":"zh-Hans","dir":"ltr","strings":{"common":{"loading":"正在加载…","retry":"重试","close":"关闭","copy":"复制","copied":"已复制到剪贴板。","copy_failed":"无法复制。请选中文本后手动复制。","load_more":"显示更多","show_password":"显示密码","hide_password":"隐藏密码","signin_needed":"请登录后继续。","dash":"—"},"errors":{"network":"无法连接服务器。请检查你的网络连接后重试。","timeout":"服务器响应超时。请重试。","server_busy":"服务器繁忙。请稍后重试。","rate_limited":"请求过多。请在 {time}后重试。","rate_limited_short":"请求过多。请稍后重试。","internal_error":"服务器发生意外错误。请稍后再试。","invalid_token":"你的会话已结束。请重新登录。","unauthorized":"请登录。","not_found":"未找到。","unknown":"出现问题（{code}）。","invalid_credentials":"用户名、电子邮箱或密码错误。","too_many_attempts":"尝试次数过多。请在 {time}后重试。","banned":"此账号已被封禁至 {date}。","banned_permanent":"此账号已被封禁。","email_unverified":"你的电子邮箱地址尚未确认。请打开我们发送给你的链接，或重新获取一个。","invalid_mfa_token":"此登录步骤已过期。请重新登录。","invalid_code":"验证码错误或已被使用。","mfa_code_required":"请输入你的双重验证码。","invalid_password":"密码错误。","password_not_set":"此账号尚未设置密码：请在登录页面使用“忘记密码？”来设置。","registration_closed":"服务器目前不接受新账号注册。","invalid_username":"不允许使用此用户名。","username_taken":"此用户名已被占用。","invalid_email":"此电子邮箱地址无效。","email_taken":"此电子邮箱地址已被其他账号使用。","same_email":"这已经是你的电子邮箱地址。","weak_password":"此密码强度太弱。","weak_too_short":"密码太短（至少 {min} 个字符）。","weak_too_long":"密码太长。","weak_contains_username":"密码不得包含你的用户名。","weak_contains_email":"密码不得包含你的电子邮箱地址。","weak_too_common":"此密码太常见。请换一个。","pow_failed":"人机验证失败。请重试。","passwords_differ":"两次输入的密码不一致。","required":"请填写此字段。","email_format":"请输入有效的电子邮箱地址。","username_format":"{min} 到 {max} 个字符：字母、数字、_ 和 -，须以字母或数字开头。","password_length":"至少 {min} 个字符。","confirm_name":"请完全按照所示输入你的用户名。","game_too_long":"此对局太长，无法制作成 GIF。","gif_disabled":"此服务器不提供 GIF 制作。","render_failed":"服务器无法绘制此 GIF。","invalid_game":"此对局不存在。","invalid_player":"请输入用户名：2 到 24 个字母、数字、_、. 或 -。","player_not_found":"没有使用此名称的棋手。"},"time":{"seconds":{"other":"{count} 秒"},"minutes":{"other":"{count} 分钟"}},"download":{"exe":"可执行文件","zip":"ZIP 压缩包","file":"文件","unavailable":"不可用","your_system":"你的系统","eyebrow_beta":"公测版 · {version}","eyebrow_release":"版本 {version}","published":"发布于 {date}","unreachable":"目前无法连接 GitHub：请查看发行版页面。","available":"可用","verify_file":"该文件","no_build":"目前还没有适用于 {os} 的游戏版本。","prerelease_short":"测试版","x64":"64 位（x64）"},"server":{"online":"在线","offline":"无法连接","open":"开放","closed":"关闭","updated":"更新时间：{time}","min_games":"在此用时下至少下过 {count} 局计分对局的棋手。","empty":"此用时下暂无上榜棋手。","error":"目前无法加载排行榜。"},"game":{"number":"第 {id} 局","white":"白方","black":"黑方","you":"你","vs":"对","outcome_win":"胜","outcome_loss":"负","outcome_draw":"和","outcome_aborted":"已中止","result_white":"白方胜","result_black":"黑方胜","result_draw":"和棋","result_aborted":"已中止","rated":"计分","casual":"不计分","custom":"自定义","moves":{"other":"{count} 回合"},"duration":"时长 {time}","rating_diff":"等级分变化 {diff}","pgn":"PGN","pgn_title":"下载此对局的 PGN","copy_pgn":"复制","copy_pgn_title":"复制 PGN","gif":"GIF","gif_title":"制作 GIF 动图（在新标签页中打开）","gif_signin":"登录后即可制作 GIF","pgn_copied":"PGN 已复制到剪贴板。","pgn_saved":"PGN 已下载。","none":"暂无对局。你的在线对局将显示在这里。","none_filtered":"没有符合这些筛选条件的对局。","none_public":"暂无对局。","total":{"other":"共 {count} 局"},"termination_unknown":"对局结束","reason":{"1":"将死","2":"认输","3":"超时判负","4":"第二次违例着法（判负）","5":"逼和","6":"死局面（子力不足）","7":"超时，但对方无法将死","8":"五次重复局面","9":"七十五回合规则","10":"三次重复局面（提出要求）","11":"五十回合规则（提出要求）","12":"协议和棋","13":"第二次违例着法，但对方无法将死","20":"离开对局（断线时间过长）","21":"离开对局，但对方无法将死","22":"对局中止","23":"未按时走出第一步（中止）","24":"弃权判负（违反公平对弈）","25":"被服务器中止","26":"双方均已断开连接"}},"ratings":{"category":"用时","rating":"等级分","peak":"最高","games":"对局","wdl":"胜 / 和 / 负","provisional":"暂定等级分","none":"尚无计分对局。","unrated_hint":"问号表示暂定等级分（已下对局尚少）。"},"account":{"member_since":"注册于 {date}","last_login":"上次登录","created":"创建时间","email":"电子邮箱","pending_email":"等待确认：{email}","verified":"已确认","unverified":"未确认","mfa":"双重验证","mfa_on":"已开启","mfa_off":"已关闭","google":"Google 登录","google_on":"已关联","google_off":"未关联","password":"密码","password_set":"已设置","password_unset":"尚未设置","challenges":"挑战","challenges_all":"接受","challenges_none":"拒绝","badge_verified":"邮箱已确认","badge_mfa":"已开启双重验证","badge_google":"Google","ban_until":"你的账号已被封禁至 {date}。","ban_permanent":"你的账号已被封禁。","sanction_ban":"封禁","sanction_mm_block":"禁止匹配","sanction_warning":"警告","sanction_until":"至 {date}","sanction_permanent":"永久","devices_current":"当前设备","devices_unknown":"未命名设备","devices_signed_in":"登录于 {date}","devices_seen":"上次使用：{time}","devices_expires":"{date}到期","devices_revoke":"退出登录","devices_revoked":"该设备已退出登录。","devices_none":"没有其他设备。","signout_all_confirm":"要让所有设备（包括当前设备）退出登录吗？","signed_out":"你已退出登录。","signed_in":"欢迎，{name}。","prefs_saved":"已保存。","password_changed":"你的密码已修改。你的其他设备已退出登录。","email_sent":"确认链接已发送至新地址。打开链接后，你的地址才会更改。","email_changed":"你的电子邮箱地址已更改为 {email}。","email_current":"当前地址：{email}。","email_pending":"更改为 {email} 的请求正在等待确认链接。","export_done":"你的数据已下载。","deleted":"你的账号已删除。","delete_confirm_label":"输入 {name} 以确认","register_done":"我们已向 {email} 发送确认链接。打开它即可创建账号，然后登录。","register_ready":"你的账号已就绪，现在可以登录了。","forgot_done":"如果有账号使用此地址，用于设置新密码的链接已在发送途中。","resend_done":"如果此地址正在等待确认，新的链接已在发送途中。","pow_solving":"正在解答人机验证谜题…","mfa_recovery":"恢复码","mfa_recovery_text":"请输入你的一个恢复码。每个恢复码只能使用一次。","mfa_app":"应用中的验证码","mfa_app_text":"请输入身份验证器应用中的 6 位验证码。","mfa_state_on":"此账号已开启双重验证。","mfa_state_off":"此账号未开启双重验证。","client_label":"Scacelith 网站（{browser}）","username":"用户名","password_rules":"至少 {min} 个字符，不得包含你的用户名或电子邮箱。","password_note":"你的其他设备将退出登录，当前设备保持登录。","signin_label":"登录"},"players":{"since":"注册于 {date}","games":"对局","rated":"计分对局","wins":"胜局","draws":"和局","losses":"负局","view":"查看 {name} 的资料","you":"你","board":"排行榜"},"gif":{"title":"{white} – {black}","subtitle":"第 {id} 局 · {date}","preparing":"正在准备 GIF…","rendering":"服务器正在绘制 GIF。较长的对局可能需要几秒钟…","ready":"你的 GIF 已就绪，下载已开始。","ready_again":"你的 GIF 已就绪。","signin":"登录后即可为你的对局制作 GIF。","signin_button":"登录","missing":"未选择对局。","retry_in":"你可以在 {time}后重试。","retry_now":"现在可以重试了。"},"home":{"create_account":"创建账号","my_account":"我的账号","my_games":"我的对局","signin":"登录"},"trailer":{"title":"Scacelith 预告片"}}}</script>
+<script src="../../config.js"></script>
+<script type="module" src="../../assets/js/account.js"></script>
+</body>
+</html>
