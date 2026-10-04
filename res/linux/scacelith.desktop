@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Version=1.5
+Version=1.4
 Name=Scacelith
 GenericName=Chess
 GenericName[ar]=شطرنج
@@ -37,5 +37,5 @@ Keywords[uk]=шахи;chess;3D;Stockfish;
 Keywords[zh_CN]=国际象棋;chess;3D;Stockfish;
 Keywords[zh_TW]=西洋棋;chess;3D;Stockfish;
 StartupWMClass=Scacelith
-SingleMainWindow=true
+X-GNOME-SingleWindow=true
 PrefersNonDefaultGPU=true
