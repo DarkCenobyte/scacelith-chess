@@ -42,6 +42,9 @@ jobs:
           languages: ${{ matrix.language }}
           build-mode: none
           queries: security-extended
+          # The alert-suppression query reads the codeql[<query id>] comments (security-extended
+          # leaves it out); the actions analysis has none.
+          packs: ${{ matrix.language == 'c-cpp' && 'codeql/cpp-queries:AlertSuppression.ql' || '' }}
           config: |
             paths-ignore:
               - third_party
