@@ -172,7 +172,7 @@ bool makeDirectories(const std::string& dir) {
     return CreateDirectoryW(widen(d).c_str(), nullptr) != 0 || directoryExists(d);
 }
 
-#else  // POSIX (Linux development builds)
+#else  // POSIX (Linux)
 
 std::string exeDirectory() {
     char buf[PATH_MAX];
@@ -289,6 +289,13 @@ bool makeDirectories(const std::string& dir) {
 }
 
 #endif
+
+std::string settingsDirectory() {
+    const std::string exe = exeDirectory();
+    if (fileExists(exe + "Scacelith.ini")) return exe;   // portable
+    const std::string data = userDataDirectory();
+    return directoryWritable(data) ? data : exe;
+}
 
 }  // namespace sys
 }  // namespace net

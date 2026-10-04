@@ -1030,6 +1030,35 @@ TEST(net_sys_user_data_directory_private) {
     rmdir((home + "/.config").c_str());
     rmdir(home.c_str());
 }
+
+// The settings, logins and log go to the user data folder, unless a Scacelith.ini next to the
+// executable makes a portable install, or the user data folder cannot be written.
+TEST(net_sys_settings_directory) {
+    const std::string exe = net::sys::exeDirectory(), ini = exe + "Scacelith.ini";
+    if (net::sys::fileExists(ini)) SKIP("a Scacelith.ini already stands next to the test executable");
+    const std::string home = exe + "net-test-settings-home-" + std::to_string(getpid());
+    REQUIRE(mkdir(home.c_str(), 0755) == 0 || errno == EEXIST);
+    const char* was = std::getenv("HOME");
+    const std::string saved = was ? was : "";
+    setenv("HOME", home.c_str(), 1);
+    const std::string data = home + "/.config/scacelith/";
+    CHECK_EQ(net::sys::settingsDirectory(), data);
+    CHECK_EQ(net::CredentialStore::defaultPath(), data + "Scacelith.credentials");
+    CHECK(net::sys::writeFileAtomic(ini, "[display]\n", false));
+    CHECK_EQ(net::sys::settingsDirectory(), exe);   // portable
+    CHECK_EQ(net::CredentialStore::defaultPath(), exe + "Scacelith.credentials");
+    std::remove(ini.c_str());
+    if (getuid() != 0) {   // root writes anywhere
+        CHECK(chmod(data.c_str(), 0500) == 0);
+        CHECK_EQ(net::sys::settingsDirectory(), exe);   // the user folder cannot be written
+        chmod(data.c_str(), 0700);
+    }
+    if (was) setenv("HOME", saved.c_str(), 1);
+    else unsetenv("HOME");
+    rmdir(data.c_str());
+    rmdir((home + "/.config").c_str());
+    rmdir(home.c_str());
+}
 #endif
 
 // =============================================================================================

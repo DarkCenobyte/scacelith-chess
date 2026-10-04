@@ -27,6 +27,7 @@
 #include "render/shader.h"
 #include "game/settings.h"
 #include "i18n/i18n.h"
+#include "net/net_sys.h"
 #include "net/online_client.h"
 #include "scacelith_version.h"
 
@@ -72,9 +73,11 @@ static void startupError(const char* key, const std::string& logPath) {
 static int runApp(std::vector<std::string> args) {
     AppContext ctx;
     ctx.args = args;
-    std::string exeDir = plat::exeDirectory();
-    // The log falls back to the user data dir like the settings when the exe dir is read-only.
-    std::string logPath = exeDir + "scacelith.log";
+    // The settings, the saved logins and the log: in the user data directory (%APPDATA%\scacelith\,
+    // ~/.config/scacelith/), or next to the executable for a portable install (a Scacelith.ini
+    // there) or when the user data directory cannot be written (net::sys::settingsDirectory()).
+    const std::string homeDir = net::sys::settingsDirectory();
+    std::string logPath = homeDir + "scacelith.log";
     if (!logx::init(logPath.c_str())) {
         logPath = plat::userDataDirectory() + "scacelith.log";
         if (!logx::init(logPath.c_str())) logPath.clear();
@@ -88,12 +91,12 @@ static int runApp(std::vector<std::string> args) {
     std::string dataDir = ctx.argValue("--data-dir");
     if (!dataDir.empty()) embedded::setOverrideDir(dataDir);
 
-    // Settings (.ini). Falls back to the user data dir when the exe dir is read-only.
-    std::string iniPath = ctx.argValue("--ini", exeDir + "Scacelith.ini");
+    // Settings (.ini), or the file given with --ini.
+    std::string iniPath = ctx.argValue("--ini", homeDir + "Scacelith.ini");
     game::Settings& settings = game::settings();
     settings.load(iniPath);
     // Online logins (one per server, DPAPI-protected) live next to an explicit --ini file;
-    // otherwise next to the exe, or in the user data dir (net::OnlineClient's default).
+    // otherwise in the user data dir (net::OnlineClient's default).
     if (!ctx.argValue("--ini").empty()) {
         size_t slash = iniPath.find_last_of("/\\");
         net::onlineClient().setCredentialsFile((slash == std::string::npos ? std::string() : iniPath.substr(0, slash + 1)) + "Scacelith.credentials");

@@ -4,13 +4,14 @@
 // used there, the session token, the server id announced by /api/v1/info when the token was
 // obtained, and the pinned certificate fingerprint (hex SHA-256) if the player set one.
 //
-// The file (Scacelith.credentials, JSON) lives next to the executable like Scacelith.ini, or in
-// the user data directory (%APPDATA%\scacelith\, ~/.config/scacelith/) when the executable's
-// directory is not writable. Tokens are never stored in clear on Windows: DPAPI
-// (CryptProtectData, current user, CRYPTPROTECT_UI_FORBIDDEN) with the origin as additional
-// entropy, so a token blob moved to another origin's record cannot be decrypted there. Linux
-// builds (development only) write the file with mode 0600 and bind each token to its origin in
-// the clear. Either way get(origin) only ever returns a token that was saved for that origin.
+// The file (Scacelith.credentials, JSON) lives with Scacelith.ini (net::sys::settingsDirectory():
+// the user data directory %APPDATA%\scacelith\ or ~/.config/scacelith/, or the executable's folder
+// of a portable install), or next to an explicit --ini file. Tokens are
+// never stored in clear on Windows: DPAPI (CryptProtectData, current user,
+// CRYPTPROTECT_UI_FORBIDDEN) with the origin as additional entropy, so a token blob moved to
+// another origin's record cannot be decrypted there. Linux builds write the file with mode 0600
+// and bind each token to its origin in the clear. Either way get(origin) only ever returns a token
+// that was saved for that origin.
 //
 // Thread-safe (one mutex); the file is read on first use and rewritten atomically on changes.
 //

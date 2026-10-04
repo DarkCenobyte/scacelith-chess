@@ -25,6 +25,10 @@ std::string userDataDirectory();   // %APPDATA%\scacelith\ or ~/.config/scacelit
 // %APPDATA%\scacelith\ on Windows, $XDG_DATA_HOME/scacelith/ (default ~/.local/share/scacelith/)
 // on Linux. The coach's voice model lives in its "coach" subfolder (src/tts/model_store.h).
 std::string appDataDirectory();
+// Where Scacelith.ini, the saved logins and the log go: userDataDirectory(), unless a Scacelith.ini
+// stands next to the executable (a portable install; also where versions up to 1.0.0-beta.1 put
+// it) or the user data directory cannot be written: then the executable's folder.
+std::string settingsDirectory();
 bool fileExists(const std::string& path);
 bool directoryWritable(const std::string& dir);
 bool readFile(const std::string& path, std::string& out, size_t maxBytes);
