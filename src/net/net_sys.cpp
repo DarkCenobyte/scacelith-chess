@@ -184,10 +184,17 @@ std::string exeDirectory() {
 }
 
 std::string userDataDirectory() {
+    // The XDG base directory rule: $XDG_CONFIG_HOME when it is an absolute path (a relative one is
+    // ignored), else ~/.config. Its scacelith folder is private (it holds the saved logins).
+    const char* xdg = getenv("XDG_CONFIG_HOME");
     const char* home = getenv("HOME");
-    if (!home) return exeDirectory();
-    std::string d = std::string(home) + "/.config/scacelith/";
-    mkdir((std::string(home) + "/.config").c_str(), 0755);
+    std::string base;
+    if (xdg && xdg[0] == '/') base = xdg;
+    else if (home && home[0]) base = std::string(home) + "/.config";
+    else return exeDirectory();
+    if (base.back() != '/') base += '/';
+    makeDirectories(base);
+    std::string d = base + "scacelith/";
     mkdir(d.c_str(), 0700);
     return d;
 }

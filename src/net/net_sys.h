@@ -20,7 +20,9 @@ std::wstring moduleFileName(const std::function<unsigned long(wchar_t* buffer, u
 #endif
 
 std::string exeDirectory();        // directory of the running executable, trailing separator
-std::string userDataDirectory();   // %APPDATA%\scacelith\ or ~/.config/scacelith/ (created, 0700)
+// The per-user folder of the settings (created; private, 0700, on Linux): %APPDATA%\scacelith\ on
+// Windows, $XDG_CONFIG_HOME/scacelith/ (default ~/.config/scacelith/) on Linux.
+std::string userDataDirectory();
 // The per-user folder of the game's data files (created), the rule of plat::appDataDirectory():
 // %APPDATA%\scacelith\ on Windows, $XDG_DATA_HOME/scacelith/ (default ~/.local/share/scacelith/)
 // on Linux. The coach's voice model lives in its "coach" subfolder (src/tts/model_store.h).

@@ -1011,22 +1011,55 @@ TEST(net_sys_module_file_name_long_paths) {
 #endif
 
 #ifndef _WIN32
-// The user data folder (the settings and log fallback, the default place of the logins) is
-// created private, 0700, under $HOME/.config.
+// Sets (or, with nullptr, unsets) an environment variable for a test's scope, restored after it.
+struct ScopedEnv {
+    std::string name, saved;
+    bool had;
+    ScopedEnv(const char* n, const char* value) : name(n) {
+        const char* was = std::getenv(n);
+        had = was != nullptr;
+        if (had) saved = was;
+        if (value) setenv(n, value, 1);
+        else unsetenv(n);
+    }
+    ~ScopedEnv() {
+        if (had) setenv(name.c_str(), saved.c_str(), 1);
+        else unsetenv(name.c_str());
+    }
+};
+
+// The user data folder (the settings, logins and log) follows the XDG base directory rule: it is
+// created private, 0700, in $XDG_CONFIG_HOME when that is an absolute path (its missing parents
+// too), else in $HOME/.config.
 TEST(net_sys_user_data_directory_private) {
     const std::string home = net::sys::exeDirectory() + "net-test-home-" + std::to_string(getpid());
     REQUIRE(mkdir(home.c_str(), 0755) == 0 || errno == EEXIST);
-    const char* was = std::getenv("HOME");
-    const std::string saved = was ? was : "";
-    setenv("HOME", home.c_str(), 1);
-    std::string d = net::sys::userDataDirectory();
-    if (was) setenv("HOME", saved.c_str(), 1);
-    else unsetenv("HOME");
-    CHECK_EQ(d, home + "/.config/scacelith/");
+    ScopedEnv homeEnv("HOME", home.c_str());
     struct stat st {};
-    CHECK(stat(d.c_str(), &st) == 0 && S_ISDIR(st.st_mode));
-    CHECK_EQ(int(st.st_mode & 0777), 0700);
-    rmdir(d.c_str());
+    {
+        ScopedEnv xdg("XDG_CONFIG_HOME", nullptr);
+        const std::string d = net::sys::userDataDirectory();
+        CHECK_EQ(d, home + "/.config/scacelith/");
+        CHECK(stat(d.c_str(), &st) == 0 && S_ISDIR(st.st_mode));
+        CHECK_EQ(int(st.st_mode & 0777), 0700);
+        rmdir(d.c_str());
+    }
+    {
+        ScopedEnv xdg("XDG_CONFIG_HOME", "relative/config");   // not absolute: ignored
+        CHECK_EQ(net::sys::userDataDirectory(), home + "/.config/scacelith/");
+        rmdir((home + "/.config/scacelith").c_str());
+    }
+    {
+        const std::string config = home + "/xdg/config/";
+        ScopedEnv xdg("XDG_CONFIG_HOME", config.c_str());
+        const std::string d = net::sys::userDataDirectory();
+        CHECK_EQ(d, config + "scacelith/");
+        CHECK(stat(d.c_str(), &st) == 0 && S_ISDIR(st.st_mode));
+        CHECK_EQ(int(st.st_mode & 0777), 0700);
+        rmdir(d.c_str());
+        rmdir(config.c_str());
+        rmdir((home + "/xdg").c_str());
+    }
     rmdir((home + "/.config").c_str());
     rmdir(home.c_str());
 }
@@ -1038,9 +1071,8 @@ TEST(net_sys_settings_directory) {
     if (net::sys::fileExists(ini)) SKIP("a Scacelith.ini already stands next to the test executable");
     const std::string home = exe + "net-test-settings-home-" + std::to_string(getpid());
     REQUIRE(mkdir(home.c_str(), 0755) == 0 || errno == EEXIST);
-    const char* was = std::getenv("HOME");
-    const std::string saved = was ? was : "";
-    setenv("HOME", home.c_str(), 1);
+    ScopedEnv homeEnv("HOME", home.c_str());
+    ScopedEnv xdg("XDG_CONFIG_HOME", nullptr);
     const std::string data = home + "/.config/scacelith/";
     CHECK_EQ(net::sys::settingsDirectory(), data);
     CHECK_EQ(net::CredentialStore::defaultPath(), data + "Scacelith.credentials");
@@ -1053,8 +1085,6 @@ TEST(net_sys_settings_directory) {
         CHECK_EQ(net::sys::settingsDirectory(), exe);   // the user folder cannot be written
         chmod(data.c_str(), 0700);
     }
-    if (was) setenv("HOME", saved.c_str(), 1);
-    else unsetenv("HOME");
     rmdir(data.c_str());
     rmdir((home + "/.config").c_str());
     rmdir(home.c_str());

@@ -253,7 +253,8 @@ jobs:
           later); the sound goes through ALSA (libasound2, and PulseAudio or PipeWire through it).
           Run ./scacelith. ./install.sh adds the game to the applications menu (in ~/.local);
           ./install.sh --uninstall removes it. The settings, saved logins and log are kept in
-          ~/.config/scacelith/ (next to the executable instead when a Scacelith.ini stands there).
+          \$XDG_CONFIG_HOME/scacelith/, by default ~/.config/scacelith/ (next to the executable
+          instead when a Scacelith.ini stands there).
 
           Source: $REPOSITORY ($REF_NAME, commit $COMMIT).
           Scacelith is free software under the GNU General Public License v3.0 (LICENSE). The licence

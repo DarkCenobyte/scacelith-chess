@@ -285,7 +285,8 @@ void setMouseCaptured(bool c) {
     setCursorVisible(g_cursorVisible);
 }
 
-// The core library's folders (net::sys), so both layers agree: ~/.config/scacelith/ is private (0700).
+// The core library's folders (net::sys), so both layers agree: $XDG_CONFIG_HOME/scacelith/ (by default
+// ~/.config/scacelith/) is private (0700).
 std::string exeDirectory() { return net::sys::exeDirectory(); }
 std::string userDataDirectory() { return net::sys::userDataDirectory(); }
 std::string appDataDirectory() { return net::sys::appDataDirectory(); }

@@ -5,7 +5,7 @@
 // obtained, and the pinned certificate fingerprint (hex SHA-256) if the player set one.
 //
 // The file (Scacelith.credentials, JSON) lives with Scacelith.ini (net::sys::settingsDirectory():
-// the user data directory %APPDATA%\scacelith\ or ~/.config/scacelith/, or the executable's folder
+// the user data directory %APPDATA%\scacelith\ or $XDG_CONFIG_HOME/scacelith/, or the executable's folder
 // of a portable install), or next to an explicit --ini file. Tokens are
 // never stored in clear on Windows: DPAPI (CryptProtectData, current user,
 // CRYPTPROTECT_UI_FORBIDDEN) with the origin as additional entropy, so a token blob moved to

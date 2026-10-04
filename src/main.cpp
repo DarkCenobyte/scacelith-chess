@@ -74,7 +74,7 @@ static int runApp(std::vector<std::string> args) {
     AppContext ctx;
     ctx.args = args;
     // The settings, the saved logins and the log: in the user data directory (%APPDATA%\scacelith\,
-    // ~/.config/scacelith/), or next to the executable for a portable install (a Scacelith.ini
+    // $XDG_CONFIG_HOME/scacelith/), or next to the executable for a portable install (a Scacelith.ini
     // there) or when the user data directory cannot be written (net::sys::settingsDirectory()).
     const std::string homeDir = net::sys::settingsDirectory();
     std::string logPath = homeDir + "scacelith.log";

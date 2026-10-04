@@ -85,7 +85,7 @@ std::string userDataDirectory(); // writable (e.g. %APPDATA%/scacelith/), with t
 // The per-user folder of the game's data files, "scacelith", created if missing, with trailing
 // separator; each kind of data has its subfolder there ("coach" = the coach's voice model).
 // Windows: %APPDATA%\scacelith\ (Roaming). Linux: $XDG_DATA_HOME/scacelith/, by default
-// ~/.local/share/scacelith/ (the settings fallback stays in ~/.config/scacelith/). A macOS port
+// ~/.local/share/scacelith/ (the settings stay in userDataDirectory(), ~/.config/scacelith/). A macOS port
 // would use ~/Library/Application Support/scacelith/.
 std::string appDataDirectory();
 void messageBox(const char* title, const char* text, bool rtl = false);  // rtl: right-to-left text (Arabic)
