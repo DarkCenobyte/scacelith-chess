@@ -6,6 +6,7 @@
 #include "../i18n/i18n.h"
 #include "../platform/platform.h"
 #include "../render/post/postfx.h"
+#include "../scene/piece_silhouette.h"
 #include "elo.h"
 #include "game_archive.h"
 #include "game_saving.h"
@@ -1563,8 +1564,7 @@ Square GameScene::aimSquare(const Ray& ray, bool* castling) const {
     const PieceObject* p = pid >= 0 && pid != touchedId_ ? board_.byId(pid) : nullptr;
     if (touched) {
         // Pointing at the piece in hand (gripped on its square) designates its own square.
-        float t = rayCylinderY(ray, touched->basePos, layout::PIECE_BASE_RADIUS[touched->type] * 1.12f,
-                               layout::PIECE_HEIGHT[touched->type]);
+        const float t = rayHitsPiece(*touched, ray, 0.003f);
         if (t >= 0.0f && (!p || t < tPiece)) return touchedSq_;
     }
     if (p && p->color == inputColor()) {
@@ -2157,16 +2157,42 @@ Ray GameScene::mouseRay() const {
     return camera_.screenRay(c.x, c.y, std::max(1, plat::width()), std::max(1, plat::height()));
 }
 
+float GameScene::rayHitsPiece(const PieceObject& p, const Ray& ray, float margin, float maxT) const {
+    const PieceSilhouette* outline = world_.pieceSilhouette(p.type);
+    if (!outline) {
+        const float t = rayCylinderY(ray, p.basePos, layout::PIECE_BASE_RADIUS[p.type] * 1.12f, layout::PIECE_HEIGHT[p.type]);
+        return t <= maxT ? t : -1.0f;
+    }
+    // Into the object space of the piece standing at its resting place (distances are kept).
+    const mat4 inv = rotateY(-p.yaw) * translate(-p.basePos);
+    return outline->intersect(transformPoint(inv, ray.o), transformDir(inv, ray.d), margin, maxT);
+}
+
 int GameScene::pickPiece(const Ray& ray, float* tOut) const {
-    int best = -1;
-    float bestT = 1e30f;
+    // The piece whose outline the ray meets first: the one the pointer is on, not one standing in
+    // front of it or behind it. Off every outline, the nearest piece whose outline grown by 3 mm
+    // the ray meets (a thin neck or a crown stays easy to catch).
+    constexpr float kNear = 0.003f;
+    int best = -1, nearBest = -1;
+    float bestT = 1e30f, nearT = 1e30f;
     for (const PieceObject& p : board_.pieces()) {
         if (p.held || p.square == NoSquare) continue;
-        float t = rayCylinderY(ray, p.basePos, layout::PIECE_BASE_RADIUS[p.type] * 1.12f, layout::PIECE_HEIGHT[p.type]);
+        float t = rayHitsPiece(p, ray, 0.0f, bestT);
         if (t >= 0.0f && t < bestT) {
             bestT = t;
             best = p.id;
         }
+        if (best < 0) {
+            t = rayHitsPiece(p, ray, kNear, nearT);
+            if (t >= 0.0f && t < nearT) {
+                nearT = t;
+                nearBest = p.id;
+            }
+        }
+    }
+    if (best < 0 && nearBest >= 0) {
+        best = nearBest;
+        bestT = nearT;
     }
     if (tOut) *tOut = bestT;
     return best;

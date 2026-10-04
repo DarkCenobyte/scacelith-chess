@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+struct PieceSilhouette;
+
 namespace game {
 
 // What the clock shows (see scene/clock_model.h for the display encoding).
@@ -76,6 +78,9 @@ public:
     m::mat4 clockTransform() const;
     m::vec3 clockPressPoint(int half) const;   // world, where a fingertip presses the lever
     bool rayHitsClock(const m::Ray& ray, float* t = nullptr) const;
+    // The outline of a piece type (scene/piece_silhouette.h), for picking; nullptr until the chess
+    // set is built.
+    const PieceSilhouette* pieceSilhouette(chess::PieceType t) const;
     // Clock half used by the player sitting on the given side (+1 = White's seat at +Z).
     int clockHalfForSeat(float seatZSign) const;
 
