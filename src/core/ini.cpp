@@ -30,6 +30,9 @@ static std::string oneLine(std::string s) {
 // Writes text to path as std::ofstream does (text mode: CRLF line ends on Windows). 'created':
 // the file could be opened, whether the writes succeeded or not.
 static bool writeText(const std::string& path, const std::string& text, bool& created) {
+    // The settings file (IniFile's only use): its path is the player's own choice, the settings folder
+    // from their environment (HOME, XDG_CONFIG_HOME, APPDATA) or --ini; nothing crosses a privilege boundary.
+    // codeql[cpp/path-injection]
     std::ofstream f(std::filesystem::u8path(path), std::ios::trunc);
     created = bool(f);
     f << text;
@@ -49,6 +52,8 @@ static bool replaceFile(const std::string& from, const std::string& to) {
 
 // The paths are UTF-8: opened as wide paths on Windows (u8path), whatever the process code page.
 bool IniFile::load(const std::string& path) {
+    // The settings file, at a path of the player's own choice (see writeText).
+    // codeql[cpp/path-injection]
     std::ifstream f(std::filesystem::u8path(path));
     if (!f) return false;
     std::string line, section;

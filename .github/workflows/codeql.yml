@@ -1,6 +1,8 @@
 # CodeQL code scanning of the game's C++ code (without a build) and of the workflows; the alerts
-# are in the repository's Security tab. The vendored code (third_party/) and the tests (tests/),
-# which are not shipped, are left out.
+# are in the repository's Security tab. The vendored code (third_party/), the tests (tests/) and the
+# handshake research tools (tools/handshake/), which are not shipped, are left out. The few alerts
+# that are by design (a file path the player chooses, from their environment or command line) are
+# marked where they occur with a "codeql[<query id>]" comment saying why.
 name: CodeQL
 
 on:
@@ -44,6 +46,7 @@ jobs:
             paths-ignore:
               - third_party
               - tests
+              - tools/handshake
               - build
               - build-win
 
