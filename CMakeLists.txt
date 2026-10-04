@@ -200,6 +200,10 @@ if(WIN32)
 else()
     find_package(X11 REQUIRED)
     target_link_libraries(scacelith PRIVATE X11 GL dl)
+    # The release executable runs on other distributions than the one it was built on: libstdc++
+    # and libgcc are linked in (their versions differ between distributions, glibc's are
+    # backward-compatible), and it is stripped like the Windows one.
+    target_link_options(scacelith PRIVATE "$<$<CONFIG:Release>:-static-libgcc;-static-libstdc++;-s>")
 endif()
 
 # ---------------------------------------------------------------------------------------------
