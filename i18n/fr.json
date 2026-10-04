@@ -536,7 +536,7 @@
         "21": "Partie quittée, mais l’adversaire ne peut pas mater",
         "22": "Partie annulée",
         "23": "Aucun premier coup à temps (annulée)",
-        "24": "Forfait (violation du fair-play)",
+        "24": "Partie perdue pour triche",
         "25": "Annulée par le serveur",
         "26": "Les deux joueurs se sont déconnectés"
       }
