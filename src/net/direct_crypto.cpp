@@ -329,7 +329,7 @@ EcdhP256::~EcdhP256() = default;
 
 static bool exportPublic(EVP_PKEY* key, uint8_t pub[65]) {
     size_t len = 0;
-    return EVP_PKEY_get_octet_string_param(key, OSSL_PKEY_PARAM_PUB_KEY, pub, 65, &len) == 1 && len == 65 && pub[0] == 0x04;
+    return EVP_PKEY_get_octet_string_param(key, OSSL_PKEY_PARAM_ENCODED_PUBLIC_KEY, pub, 65, &len) == 1 && len == 65 && pub[0] == 0x04;
 }
 
 // A P-256 key from its encoded public point (and the private scalar when d is given).

@@ -88,7 +88,9 @@ if(initSection STREQUAL "")
 endif()
 
 # The section stays writable data: read-only would ask the linker for text relocations.
-set(args --rename-section ${initSection}=sfinit_${TAG},contents,alloc,load,data
+# binutils 2.38 drops the section's relocations when --rename-section also sets flags: rename first.
+run(${OBJCOPY} --rename-section ${initSection}=sfinit_${TAG} ${linked} ${renamed}.0)
+set(args --set-section-flags sfinit_${TAG}=contents,alloc,load,data
          --add-symbol sfinit_${TAG}_start=sfinit_${TAG}:0,global
          --add-symbol sfinit_${TAG}_end=sfinit_${TAG}:${initSize},global)
 if(FORMAT STREQUAL "PE")
@@ -100,7 +102,8 @@ if(FORMAT STREQUAL "PE")
          --set-section-flags ".data$*=contents,alloc,load,data"
          --set-section-flags ".bss$*=alloc")
 endif()
-run(${OBJCOPY} ${args} ${linked} ${renamed})
+run(${OBJCOPY} ${args} ${renamed}.0 ${renamed})
+file(REMOVE ${renamed}.0)
 
 # 4. Localise everything else.
 run(${OBJCOPY} --keep-global-symbol=${ENTRY} --keep-global-symbol=sfinit_${TAG}_start
@@ -131,6 +134,15 @@ math(EXPR tableSize "${bound_end} - ${bound_start}")
 math(EXPR expectedSize "${initSize}")
 if(tableSize EQUAL 0 OR NOT tableSize EQUAL expectedSize)
     fail("the initialiser table bounds ${bound_start}..${bound_end} do not span its ${initSize} bytes")
+endif()
+# Every 8-byte entry of the table is relocated: without its relocations the table is zeros and the
+# dispatcher calls address 0 (binutils 2.38 dropped them when --rename-section also set flags).
+run(${OBJDUMP} -r -j sfinit_${TAG} ${OUT})
+string(REGEX MATCHALL "\n[0-9a-f]+ +[^ \n]+ +[^\n]+" relocations "${RUN_OUT}")
+list(LENGTH relocations relocationCount)
+math(EXPR entries "${initSize} / 8")
+if(NOT relocationCount EQUAL entries)
+    fail("the initialiser table has ${relocationCount} relocations for ${entries} entries")
 endif()
 # No symbol both undefined and defined: it would stay unresolved, or bind to another copy.
 run(${NM} ${OUT})
