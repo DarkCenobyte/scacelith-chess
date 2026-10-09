@@ -1,0 +1,79 @@
+[   1.068 I] anim: pen grip solved (tripod fit 12.5 mm, worst pad miss 0.5 mm, pinch at 24.1 mm from the tip)
+bounds dip [-0.600, 0.400]
+bounds lift [0.000, 0.700]
+fitting 30 parameters
+start cost 623.8433
+gen 0 best 623.8433 gen-best 10713.2812 sigma 0.5679 (0 s)
+gen 25 best 623.8433 gen-best 8349.1680 sigma 0.5173 (8 s)
+gen 50 best 623.8433 gen-best 3691.6670 sigma 0.3801 (16 s)
+gen 75 best 623.8433 gen-best 2860.5820 sigma 0.2882 (24 s)
+gen 100 best 623.8433 gen-best 1608.4972 sigma 0.2991 (32 s)
+gen 125 best 623.8433 gen-best 1639.2833 sigma 0.3121 (40 s)
+gen 150 best 623.8433 gen-best 1449.3794 sigma 0.1720 (48 s)
+gen 175 best 623.8433 gen-best 1089.1025 sigma 0.1476 (56 s)
+gen 200 best 623.8433 gen-best 935.5134 sigma 0.0967 (64 s)
+gen 225 best 623.8433 gen-best 858.9924 sigma 0.1403 (72 s)
+gen 250 best 623.8433 gen-best 753.8104 sigma 0.1118 (80 s)
+gen 275 best 623.8433 gen-best 708.9645 sigma 0.0774 (88 s)
+gen 300 best 623.8433 gen-best 663.2141 sigma 0.0494 (97 s)
+gen 325 best 623.8433 gen-best 651.5835 sigma 0.0423 (105 s)
+gen 350 best 623.8433 gen-best 624.3739 sigma 0.0219 (112 s)
+gen 375 best 615.5466 gen-best 617.6256 sigma 0.0143 (119 s)
+gen 400 best 605.3633 gen-best 608.6464 sigma 0.0182 (127 s)
+gen 425 best 601.0599 gen-best 601.0599 sigma 0.0127 (134 s)
+gen 450 best 593.4457 gen-best 594.0308 sigma 0.0159 (141 s)
+gen 475 best 584.6719 gen-best 585.7122 sigma 0.0160 (149 s)
+gen 500 best 577.9831 gen-best 578.6788 sigma 0.0154 (157 s)
+gen 525 best 575.4208 gen-best 575.4208 sigma 0.0137 (165 s)
+gen 550 best 573.1069 gen-best 574.7775 sigma 0.0103 (173 s)
+gen 575 best 572.5455 gen-best 572.9573 sigma 0.0059 (181 s)
+gen 600 best 571.8142 gen-best 572.0907 sigma 0.0048 (188 s)
+gen 625 best 570.9339 gen-best 570.9339 sigma 0.0040 (196 s)
+gen 650 best 570.4525 gen-best 570.4540 sigma 0.0040 (202 s)
+gen 675 best 569.8377 gen-best 569.8422 sigma 0.0033 (207 s)
+gen 699 best 569.2352 gen-best 569.2352 sigma 0.0028 (212 s)
+arm: strain clasp 0.0169 pump top 0.0351 bottom 0.0000 pre 0.0322 (no lift 0.1676) clamps 0.0000 | flex -0.430 dev -0.584 pron -1.059
+  pen slide 2.50     0.00 mm (- in -) soft 0.00
+  pen slide 2.25     0.00 mm (- in -) soft 0.00
+  pen slide 2.00     0.00 mm (- in -) soft 0.00
+  pen slide 1.80     0.00 mm (- in -) soft 0.00
+  pen slide 1.60     0.00 mm (- in -) soft 0.00
+  pen slide 1.45     0.00 mm (- in -) soft 0.00
+  pen slide 1.30     0.00 mm (- in -) soft 0.00
+  pen slide 1.15     0.00 mm (- in -) soft 0.00
+  pen slide 1.00     0.00 mm (- in -) soft 0.00
+  pen slide 0.90     0.00 mm (- in -) soft 0.00
+  pen slide 0.80     0.00 mm (- in -) soft 0.00
+  pen slide 0.70     0.00 mm (- in -) soft 0.00
+  pen slide 0.60     0.00 mm (- in -) soft 0.00
+  pen slide 0.50     0.00 mm (- in -) soft 0.00
+  pen slide 0.40     0.00 mm (- in -) soft 0.00
+  pen slide 0.30     0.00 mm (- in -) soft 0.00
+  pen slide 0.20     0.00 mm (- in -) soft 0.00
+  pen slide 0.10     0.00 mm (- in -) soft 0.00
+  pen slide 0.00     0.00 mm (- in -) soft 0.00
+opt9: open -> grip, largest bone turn 2.16 rad (RingR3)
+  pen close 0.10     0.00 mm (- in -) soft 0.00
+  pen close 0.20     0.00 mm (- in -) soft 0.00
+  pen close 0.30     0.00 mm (- in -) soft 0.00
+  pen close 0.40     0.00 mm (- in -) soft 0.00
+  pen close 0.50     0.00 mm (- in -) soft 0.26
+  pen close 0.60     0.24 mm (ForeArmR in IndexR3) soft 1.24
+  pen close 0.70     0.25 mm (IndexR3 in ForeArmR) soft 1.22
+  pen close 0.80     0.25 mm (ForeArmR in IndexR3) soft 1.23
+  pen close 0.90     0.03 mm (ForeArmR in IndexR3) soft 0.52
+  pen grip           0.29 mm (HandR in RingR3) soft 23.80
+  self (grip) 0.50 mm (RingR2 in MiddleR2)
+opt10: grip in the partner's forearm cuff (pump extremes, turned +-0.13 rad): worst 0.51 mm
+palm gap 0.69 mm, crossing 45.5 deg, self worst 0.50 mm
+  pad 1: behind 11.1 mm, wrist+18.3, knuckles-59.4, gap 4.08 mm (ik miss 0.00); middle phalanx 3.3 mm | -0.27 0.11 1.15 0.12
+  pad 2: behind 12.4 mm, wrist+40.5, knuckles-40.0, gap 1.74 mm (ik miss 0.00); middle phalanx 4.1 mm | -0.17 0.25 1.62 0.40
+  pad 3: behind 11.1 mm, wrist+62.5, knuckles-17.7, gap 1.19 mm (ik miss 0.00); middle phalanx 2.8 mm | -0.04 0.46 1.66 0.43
+  pad 4: behind 12.4 mm, wrist+74.7, knuckles-0.4, gap 0.56 mm (ik miss 0.00); middle phalanx 1.9 mm | 0.11 0.53 1.27 0.19
+  thumb pad: in B (-0.0118 -0.0323 +0.0214) gap 1.09 mm (ik miss 0.00), 54.9 mm from B's index knuckle; metacarpals 49.4 mm apart, webs 19.7 mm | 1.02 -0.22 0.67 1.01
+opt9: skin gaps thumb -0.28 index 1.37 middle 1.20 ring 1.42 pinky 1.22 mm; thumb proximal 6.74 mm; IP 1.01; CMC ball exposed 59%; open thumb out of the palm plane 26.6 deg (reach 24.9)
+lowest hand point 905.1 mm (pump bottom, amplitude 19.3 mm), wrist world y 0.9909
+worst penetration 0.29 mm (grip)
+cost 569.0501: ball 58.696 cross 0.022 cuff 5.426 hug 0.000 ipt 11.132 lift 14.700 low 2.377 pads 20.934 palm 1.695 pen 7.594 pump 32.431 rate 1.075 reg 12.094 self 4.742 side 0.000 skin 15.162 slide 0.259 slidemargin 0.068 strain 10.817 thumb 324.864 thumbs 0.000 tskin 44.963 worstpen 0.000
+params: phi=0.3969 dyaw=0.0726 cx=0.0133 cy=-0.0539 cz=0.0401 lift=0.7000 gI0=-0.2719 gI1=0.1078 gI2=1.1545 gM0=-0.1690 gM1=0.2524 gM2=1.6191 gR0=-0.0392 gR1=0.4634 gR2=1.6643 gP0=0.1055 gP1=0.5284 gP2=1.2684 dip=-0.5998 gT0=1.0172 gT1=-0.2214 gT2=0.6735 gT3=1.0055 oT0=0.4702 oT1=-0.5713 oT2=-0.1099 oT3=0.2196 ox=0.0687 oy=-0.0271 pump=0.0193
+grip pose: {1.017, -0.221, 0.673, 1.006} {-0.272, 0.108, 1.154, 0.116} {-0.169, 0.252, 1.619, 0.404} {-0.039, 0.463, 1.664, 0.432} {0.105, 0.528, 1.268, 0.187}

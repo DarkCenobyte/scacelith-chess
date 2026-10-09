@@ -27,6 +27,8 @@
 // Command line (after --scene anim):
 //   --demo d        default | lefty | lcastle | lpromo | coach
 //   --time t        simulate 0..t with fixed 1/120 s steps, then (in --shot mode) freeze
+//   --play          (--shot mode) keep playing from t instead: the shot is taken --frames later, with
+//                   the temporal filters' history of the motion, as in the game
 //   --view v        side | sidel | front | back | top | white | black | hand | handb | handl | shake | orbit |
 //                   pinch | pinchs | pinchb | pinchbs (close-ups of White's / Black's playing fingers from the
 //                   front and from the side) | pen | pens | penb | penbs (White's / Black's writing hand,
@@ -554,7 +556,7 @@ public:
         reset();
         float t0 = ctx.fixedTime >= 0 ? ctx.fixedTime : 0.0f;
         simulateTo(t0);
-        frozen_ = ctx.screenshotMode && ctx.fixedTime >= 0;
+        frozen_ = ctx.screenshotMode && ctx.fixedTime >= 0 && !ctx.hasArg("--play");
         orbit_.target = vec3(0, 0.95f, 0);
         orbit_.distance = 1.9f;
         orbit_.yaw = 1.2f;
@@ -608,8 +610,13 @@ public:
         if (sheets_) renderSheets(draw);
         for (int a = 0; a < 2; ++a) {
             if (only_ == 1 - a) continue;
-            if (robot_) character::submitRobot(r, gpuRobot_, anim_[a].globals(), view_ == 5 + a, 1000 * uint32_t(a + 1));
-            else body_.submit(r, anim_[a].globals(), robotMat_[a], eyeMat_, darkMat_, 1000 * uint32_t(a + 1), view_ == 5 + a);
+            // Last frame's bones give the moving parts their own motion vectors (as in the game), so
+            // the temporal filters (TAA, GTAO, SSR) keep their history on a moving hand.
+            const mat4* g = anim_[a].globals();
+            if (robot_) character::submitRobot(r, gpuRobot_, g, view_ == 5 + a, 1000 * uint32_t(a + 1), hasPrevGlobals_[a] ? prevGlobals_[a] : nullptr);
+            else body_.submit(r, g, robotMat_[a], eyeMat_, darkMat_, 1000 * uint32_t(a + 1), view_ == 5 + a);
+            std::copy(g, g + character::BoneCount, prevGlobals_[a]);
+            hasPrevGlobals_[a] = true;
         }
         r.endFrame();
     }
@@ -810,6 +817,7 @@ private:
 
     // ---- simulation
     void reset() {
+        hasPrevGlobals_[0] = hasPrevGlobals_[1] = false;
         initialPieces(pieces_);
         const bool lefty = demo_ != "default";   // the game's layout: Black's clock is on its left
         sheets_ = demo_ == "lefty";
@@ -1665,6 +1673,8 @@ private:
     int only_ = -1;               // --only: draw this robot only (-1 both)
     mutable float focus_ = 0.8f;  // depth of field focus distance of the current view (camera())
     bool frozen_ = false, paused_ = false, slow_ = false, solo_ = false;
+    mat4 prevGlobals_[2][character::BoneCount];
+    bool hasPrevGlobals_[2] = {false, false};
     OrbitCamera orbit_;
 };
 
@@ -2498,11 +2508,13 @@ void AnimViewer::writingSelfTest() {
         // cuff), the thumb-index webs meet. (The old clasp, palms on one point with the hands nearly
         // end to end, crossed at 9 degrees with the fingertips past the partner's wrist.)
         struct Crossed {
-            float facing = -1.0f, planes = 0.0f, crossLo = 1e9f, crossHi = 0.0f, behind = 1e9f, fromWrist = 1e9f, toKnuckles = 1e9f, webs = 0.0f;
+            float facing = -1.0f, planesLo = 1e9f, planesHi = 0.0f, crossLo = 1e9f, crossHi = 0.0f, behind = 1e9f, fromWrist = 1e9f, toKnuckles = 1e9f, webs = 0.0f;
             void add(const Skeleton& sk, const mat4* a, const mat4* b) {
                 const vec3 na = normalize(transformDir(a[HandR], vec3(1, 0, 0))), nb = normalize(transformDir(b[HandR], vec3(1, 0, 0)));
                 facing = std::max(facing, dot(na, nb));
-                planes = std::max(planes, std::fabs(dot(b[HandR].translation() - a[HandR].translation(), na)));
+                const float planes = std::fabs(dot(b[HandR].translation() - a[HandR].translation(), na));
+                planesLo = std::min(planesLo, planes);
+                planesHi = std::max(planesHi, planes);
                 vec3 fa = transformDir(a[HandR], vec3(0, -1, 0)), fb = transformDir(b[HandR], vec3(0, -1, 0));
                 fa = normalize(fa - na * dot(fa, na));
                 fb = normalize(fb - na * dot(fb, na));
@@ -2521,7 +2533,7 @@ void AnimViewer::writingSelfTest() {
                 webs = std::max(webs, length(web(a) - web(b)));
             }
             bool ok() const {
-                return facing < -0.95f && planes > 0.020f && planes < 0.034f && crossLo > 35.0f * DEG && crossHi < 65.0f * DEG && behind > 0.010f &&
+                return facing < -0.95f && planesLo > 0.020f && planesHi < 0.034f && crossLo > 35.0f * DEG && crossHi < 65.0f * DEG && behind > 0.010f &&
                        fromWrist > 0.015f && toKnuckles > 0.0f && webs < 0.025f;
             }
         } held;
@@ -2550,9 +2562,9 @@ void AnimViewer::writingSelfTest() {
         const bool fail = putAt < 0.0f || heldAtClasp || std::fabs(claspW - claspB) > 1e-5f || !held.ok();
         ::logx::write(fail ? ::logx::Level::Warn : ::logx::Level::Info,
                       "selftest handshake with a left-handed player holding the pen: pen put down at t=%.3f, clasp %.3f / %.3f; held: palms facing %.3f "
-                      "(< -0.95), mid-planes %.1f mm apart (20..34), crossing %.0f..%.0f deg (35..65), pads %.1f mm behind (> 10), wrist+%.1f mm (> 15), "
+                      "(< -0.95), mid-planes %.1f..%.1f mm apart (20..34), crossing %.0f..%.0f deg (35..65), pads %.1f mm behind (> 10), wrist+%.1f mm (> 15), "
                       "knuckles-%.1f mm (> 0), webs %.1f mm apart (< 25)",
-                      putAt, claspW, claspB, held.facing, held.planes * 1000.0f, held.crossLo / DEG, held.crossHi / DEG, held.behind * 1000.0f,
+                      putAt, claspW, claspB, held.facing, held.planesLo * 1000.0f, held.planesHi * 1000.0f, held.crossLo / DEG, held.crossHi / DEG, held.behind * 1000.0f,
                       held.fromWrist * 1000.0f, held.toKnuckles * 1000.0f, held.webs * 1000.0f);
     }
 }

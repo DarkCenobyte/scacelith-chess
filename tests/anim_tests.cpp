@@ -704,141 +704,81 @@ TEST(anim_cancel_tasks_lets_go_and_goes_on_from_the_hand) {
     CHECK(!an.busy());
 }
 
-// A handshake cut short (cancelTasks: the online opponent's move comes during the opening handshake),
-// right- and left-handed: the eyes leave the partner, the shaking hand (a left-handed player's
-// writing hand) is back at its rest within Timing::Retract while the playing hand goes on, and the
-// body does not jump.
-TEST(anim_cancel_handshake_lets_go_of_the_partner) {
+// A left-handed player's handshake cut short while its writing hand lays the pen down first, by
+// itself or by its partner: the pen is laid down all the same (PenPut once, at its own instant,
+// where the queued PutPen wanted it) and the hand is back at its rest a Timing::Retract later; cut
+// itself, its writing queue goes on from there.
+TEST(anim_cancel_handshake_lays_the_pen_down) {
     const character::Skeleton& sk = character::robotSkeleton();
-    for (character::Side play : {character::Side::Right, character::Side::Left}) {
-        anim::Animator W, B, idle;   // B shakes hands with W and is cut short; idle never shakes
+    for (bool partnerCut : {false, true}) {
+        anim::Animator B, W, idle;
         W.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
-        B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, play);
-        idle.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, play);
-        anim::Task h;
-        h.type = anim::TaskType::Handshake;
-        h.partner = &B;
-        W.enqueue(h);
-        h.partner = &W;
-        B.enqueue(h);
-        const float dt = 1.0f / 120.0f, cut = 1.2f;   // the hands are clasped
+        B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, character::Side::Left);
+        idle.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, character::Side::Left);
+        const m::mat4 taken = m::rotateY(3.1415927f) * penFrame(-1.0f);   // beside Black's pad
+        const m::mat4 laid = m::translate(m::vec3(0, 0, -0.03f)) * taken;
+        WriteTask pick;
+        pick.type = WriteTaskType::PickPen;
+        pick.frame = taken;
+        B.enqueueWriting(pick);
+        const float dt = 1.0f / 120.0f;
         std::vector<anim::Event> ev;
-        bool cutDone = false;
-        float handErr = -1.0f, gazeErr = 0.0f, jerkBefore = 0.0f, jerkAfter = 0.0f;
-        m::vec3 chest = B.globals()[character::Spine2].translation(), step(0.0f);
-        while (B.time() < anim::Timing::Handshake + 0.3f) {
-            if (!cutDone && B.time() >= cut - 1e-4f) {
-                B.cancelTasks();
-                anim::Task back;
-                back.type = anim::TaskType::Retract;
-                B.enqueue(back);
-                cutDone = true;
+        float start = -1.0f, cut = -1.0f, putAt = -1.0f, emptyAt = -1.0f, handErr = -1.0f;
+        int puts = 0;
+        m::vec3 putPos(0.0f);
+        bool heldOk = true;
+        while (B.time() < 3.6f) {
+            if (start < 0.0f && B.time() >= 0.8f) {
+                // The pen in hand, the game ends: PutPen and the handshake together (the handshake
+                // takes the PutPen over and lays the pen down first).
+                CHECK(B.holdsPen());
+                WriteTask put;
+                put.type = WriteTaskType::PutPen;
+                put.frame = laid;
+                B.enqueueWriting(put);
+                anim::Task h;
+                h.type = anim::TaskType::Handshake;
+                h.partner = &W;
+                B.enqueue(h);
+                h.partner = &B;
+                W.enqueue(h);
+                start = B.time();
             }
-            for (anim::Animator* a : {&W, &B, &idle}) {
+            if (start >= 0.0f && cut < 0.0f && B.time() >= start + 0.15f) {   // halfway to the table
+                CHECK(B.holdsPen());
+                (partnerCut ? W : B).cancelTasks();
+                cut = B.time();
+            }
+            for (anim::Animator* a : {&W, &idle}) {
                 ev.clear();
                 a->update(dt, ev);
             }
-            const float t = B.time();
-            // A jump of the chest: its step from one frame to the next changes abruptly.
-            const m::vec3 c = B.globals()[character::Spine2].translation();
-            const float jerk = m::length((c - chest) - step);
-            if (t > cut - 0.3f && t <= cut) jerkBefore = std::max(jerkBefore, jerk);
-            if (t > cut && t < cut + anim::Timing::Retract + 0.1f) jerkAfter = std::max(jerkAfter, jerk);
-            step = c - chest;
-            chest = c;
-            // The real right hand shakes for both: back where the idle robot's rests.
-            if (handErr < 0.0f && t >= cut + anim::Timing::Retract + 0.05f)
-                handErr = m::length(B.globals()[character::HandR].translation() - idle.globals()[character::HandR].translation());
-            if (t >= cut + 0.6f) {
-                float by, bp, iy, ip;
-                B.headAngles(by, bp);
-                idle.headAngles(iy, ip);
-                gazeErr = std::max(gazeErr, std::max(std::fabs(by - iy), std::fabs(bp - ip)));
+            ev.clear();
+            B.update(dt, ev);
+            for (const anim::Event& e : ev) {
+                if (e.type == anim::EventType::PenPut) {
+                    ++puts;
+                    putAt = e.time;
+                    putPos = e.position;
+                }
+                if (e.type == anim::EventType::WritingQueueEmpty && putAt >= 0.0f && emptyAt < 0.0f) emptyAt = e.time;
             }
+            if (putAt < 0.0f && cut >= 0.0f && !B.holdsPen()) heldOk = false;
+            if (putAt >= 0.0f && B.holdsPen()) heldOk = false;
+            if (putAt >= 0.0f && handErr < 0.0f && B.time() >= putAt + anim::Timing::Retract + 0.05f)
+                handErr = m::length(B.globals()[character::HandR].translation() - idle.globals()[character::HandR].translation());
         }
-        std::fprintf(stderr, "  %s-handed, cut at %.1f s: right hand %.1f mm from its rest after %.2f s, head %.3f rad from the idle robot's, chest step change %.3f mm (before %.3f mm)\n",
-                     play == character::Side::Right ? "right" : "left", cut, handErr * 1000.0f, anim::Timing::Retract + 0.05f, gazeErr,
-                     jerkAfter * 1000.0f, jerkBefore * 1000.0f);
+        std::fprintf(stderr, "  %s cut %.3f s into the handshake: PenPut %.3f s in, hand %.1f mm from its rest %.2f s later\n",
+                     partnerCut ? "partner" : "itself", cut - start, putAt - start, handErr * 1000.0f, anim::Timing::Retract + 0.05f);
+        CHECK_EQ(puts, 1);
+        CHECK(std::fabs(putAt - (start + 0.30f)) < 1e-4f);
+        CHECK(m::length(putPos - laid.translation()) < 1e-5f);
+        CHECK(heldOk);
+        if (!partnerCut) CHECK(std::fabs(emptyAt - (putAt + anim::Timing::Retract)) < 1e-3f);
         CHECK(handErr >= 0.0f && handErr < 0.002f);
-        CHECK(gazeErr < 0.02f);
-        CHECK(jerkAfter < 0.005f);   // (dropping the torso's hold on that hand at once: 17 mm)
         CHECK(!B.busy());
         CHECK(!B.writingBusy());
-        CHECK(!B.holdsPen());
     }
-}
-
-// A left-handed player's handshake cut short while its writing hand lays the pen down first: the pen
-// is laid down all the same (PenPut once, at its own instant, where the queued PutPen wanted it),
-// the hand is back at its rest a Timing::Retract later, and the writing queue goes on from there.
-TEST(anim_cancel_handshake_lays_the_pen_down) {
-    const character::Skeleton& sk = character::robotSkeleton();
-    anim::Animator B, W, idle;
-    W.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
-    B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, character::Side::Left);
-    idle.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, character::Side::Left);
-    const m::mat4 taken = m::rotateY(3.1415927f) * penFrame(-1.0f);   // beside Black's pad
-    const m::mat4 laid = m::translate(m::vec3(0, 0, -0.03f)) * taken;
-    WriteTask pick;
-    pick.type = WriteTaskType::PickPen;
-    pick.frame = taken;
-    B.enqueueWriting(pick);
-    const float dt = 1.0f / 120.0f;
-    std::vector<anim::Event> ev;
-    float start = -1.0f, cut = -1.0f, putAt = -1.0f, emptyAt = -1.0f, handErr = -1.0f;
-    int puts = 0;
-    m::vec3 putPos(0.0f);
-    bool heldOk = true;
-    while (B.time() < 2.5f) {
-        if (start < 0.0f && B.time() >= 0.8f) {
-            // The pen in hand, the game ends: PutPen and the handshake together (the handshake
-            // takes the PutPen over and lays the pen down first).
-            CHECK(B.holdsPen());
-            WriteTask put;
-            put.type = WriteTaskType::PutPen;
-            put.frame = laid;
-            B.enqueueWriting(put);
-            anim::Task h;
-            h.type = anim::TaskType::Handshake;
-            h.partner = &W;
-            B.enqueue(h);
-            h.partner = &B;
-            W.enqueue(h);
-            start = B.time();
-        }
-        if (start >= 0.0f && cut < 0.0f && B.time() >= start + 0.15f) {   // halfway to the table
-            CHECK(B.holdsPen());
-            B.cancelTasks();
-            cut = B.time();
-        }
-        for (anim::Animator* a : {&W, &idle}) {
-            ev.clear();
-            a->update(dt, ev);
-        }
-        ev.clear();
-        B.update(dt, ev);
-        for (const anim::Event& e : ev) {
-            if (e.type == anim::EventType::PenPut) {
-                ++puts;
-                putAt = e.time;
-                putPos = e.position;
-            }
-            if (e.type == anim::EventType::WritingQueueEmpty && putAt >= 0.0f) emptyAt = e.time;
-        }
-        if (putAt < 0.0f && cut >= 0.0f && !B.holdsPen()) heldOk = false;
-        if (putAt >= 0.0f && B.holdsPen()) heldOk = false;
-        if (putAt >= 0.0f && handErr < 0.0f && B.time() >= putAt + anim::Timing::Retract + 0.05f)
-            handErr = m::length(B.globals()[character::HandR].translation() - idle.globals()[character::HandR].translation());
-    }
-    std::fprintf(stderr, "  cut %.3f s into the handshake: PenPut %.3f s in, hand %.1f mm from its rest %.2f s later\n", cut - start,
-                 putAt - start, handErr * 1000.0f, anim::Timing::Retract + 0.05f);
-    CHECK_EQ(puts, 1);
-    CHECK(std::fabs(putAt - (start + 0.30f)) < 1e-4f);
-    CHECK(m::length(putPos - laid.translation()) < 1e-5f);
-    CHECK(heldOk);
-    CHECK(std::fabs(emptyAt - (putAt + anim::Timing::Retract)) < 1e-3f);
-    CHECK(handErr >= 0.0f && handErr < 0.002f);
-    CHECK(!B.writingBusy());
 }
 
 namespace {
@@ -902,6 +842,7 @@ struct Margins {
     float thumbs = 1e9f;                                              // thumb metacarpal axes apart
     float behind = 1e9f, fromWrist = 1e9f, toKnuckles = 1e9f;         // every long fingertip pad, in the other hand's frame
     float crossLo = 1e9f, crossHi = 0.0f;                             // hand axes in the palm plane (rad)
+    float deepest[4] = {0, 0, 0, 0};                                  // ... and how far behind, index..pinky (max)
     void keepWorst(const Margins& o) {
         palm = std::min(palm, o.palm);
         wrist = std::min(wrist, o.wrist);
@@ -913,6 +854,7 @@ struct Margins {
         toKnuckles = std::min(toKnuckles, o.toKnuckles);
         crossLo = std::min(crossLo, o.crossLo);
         crossHi = std::max(crossHi, o.crossHi);
+        for (int f = 0; f < 4; ++f) deepest[f] = std::max(deepest[f], o.deepest[f]);
     }
 };
 // Hand A (bone globals a) against hand B (globals b), both the robots' real right hands.
@@ -935,6 +877,7 @@ Margins margins(const character::Skeleton& sk, const mat4* a, const mat4* b) {
         m.behind = std::min(m.behind, -pad.x);              // B's back of hand is its -X side
         m.fromWrist = std::min(m.fromWrist, -pad.y);
         m.toKnuckles = std::min(m.toKnuckles, pad.y + 0.086f);
+        m.deepest[f - 1] = -pad.x;
     }
     const vec3 n = normalize(transformDir(a[HandR], vec3(1, 0, 0)));
     vec3 fa = transformDir(a[HandR], vec3(0, -1, 0)), fb = transformDir(b[HandR], vec3(0, -1, 0));
@@ -950,8 +893,9 @@ Margins margins(const character::Skeleton& sk, const mat4* a, const mat4* b) {
 // A handshake, with a right- and a left-handed partner, every 1/120 s from start to end: no part of
 // a hand goes into the other hand's palm, wrist or forearm, nor through its fingers; while the grip
 // is held the hands cross the way two hands shaking do (fingers pitched down), each set of fingers
-// is wrapped round the other hand (the pads behind its mid-plane, between its wrist and its
-// knuckles: on the back of the hand) and the thumbs lie apart (not crossed).
+// is wrapped round the other hand (the pads 10 - 14 mm behind its mid-plane, between its wrist and
+// its knuckles: on the back of the hand, whose porcelain lies 11 - 12 mm behind it, not off it) and
+// the thumbs lie apart (not crossed).
 TEST(anim_handshake_hands_clasp_without_going_through) {
     const character::Skeleton& sk = character::robotSkeleton();
     for (character::Side play : {character::Side::Right, character::Side::Left}) {
@@ -982,9 +926,10 @@ TEST(anim_handshake_hands_clasp_without_going_through) {
         }
         std::fprintf(stderr,
                      "  partner %s-handed: clearances palm %.1f wrist %.1f forearm %.1f fingers %.1f mm; held: thumbs %.1f mm apart, pads %.1f mm "
-                     "behind, wrist+%.1f, knuckles-%.1f mm, crossing %.0f..%.0f deg\n",
+                     "behind, wrist+%.1f, knuckles-%.1f mm, deepest %.1f / %.1f / %.1f / %.1f mm, crossing %.0f..%.0f deg\n",
                      play == character::Side::Right ? "right" : "left", all.palm * 1000.0f, all.wrist * 1000.0f, all.forearm * 1000.0f,
                      all.fingers * 1000.0f, held.thumbs * 1000.0f, held.behind * 1000.0f, held.fromWrist * 1000.0f, held.toKnuckles * 1000.0f,
+                     held.deepest[0] * 1000.0f, held.deepest[1] * 1000.0f, held.deepest[2] * 1000.0f, held.deepest[3] * 1000.0f,
                      held.crossLo / m::DEG, held.crossHi / m::DEG);
         CHECK(clasp > 0.0f);
         CHECK(all.palm > -0.001f);
@@ -993,10 +938,100 @@ TEST(anim_handshake_hands_clasp_without_going_through) {
         CHECK(all.fingers > -0.001f);
         CHECK(held.thumbs > 0.020f);
         CHECK(held.behind > 0.010f);
+        for (float d : held.deepest) CHECK(d < 0.014f);
         CHECK(held.fromWrist > 0.015f);
         CHECK(held.toKnuckles > 0.0f);
         CHECK(held.crossLo > 35.0f * m::DEG && held.crossHi < 65.0f * m::DEG);
     }
+}
+
+// A handshake cut short (cancelTasks: the online opponent's move comes during the opening handshake)
+// before the hands meet, in the grip, while the hand opens and while it withdraws, right- and
+// left-handed: the eyes leave the partner; both shaking hands (a left-handed player's writing hand)
+// let go without going through each other, at most 2.7 m/s, the partner's clasp and release events
+// no longer fire (unless its hand is opening already), and both are back at their rest: the cut robot's within kShakeLetGoQuick (by the
+// end of the handshake when it was letting go already), while its playing hand goes on; the
+// partner's by the end of its own handshake. The body does not jump.
+TEST(anim_cancel_handshake_lets_go_of_the_partner) {
+    const character::Skeleton& sk = character::robotSkeleton();
+    for (character::Side play : {character::Side::Right, character::Side::Left})
+        for (float cut : {0.40f, 1.2f, 1.85f, 2.05f}) {
+            anim::Animator W, B, idleW, idleB;   // B shakes hands with W and is cut short; the idle ones never shake
+            W.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
+            idleW.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
+            B.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, play);
+            idleB.init(sk, m::vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z), -1.0f, play);
+            anim::Task h;
+            h.type = anim::TaskType::Handshake;
+            h.partner = &B;
+            W.enqueue(h);
+            h.partner = &W;
+            B.enqueue(h);
+            const float dt = 1.0f / 120.0f, bBack = std::max(cut + anim::kShakeLetGoQuick, anim::Timing::Handshake) + 0.05f;
+            std::vector<anim::Event> ev;
+            bool cutDone = false;
+            int eventsAfter = 0;
+            float bErr = -1.0f, wErr = -1.0f, gazeErr = 0.0f, jerkBefore = 0.0f, jerkAfter = 0.0f, speed = 0.0f;
+            shake::Margins after;
+            m::vec3 chest = B.globals()[character::Spine2].translation(), step(0.0f), palm[2];
+            while (B.time() < bBack + 0.1f) {
+                if (!cutDone && B.time() >= cut - 1e-4f) {
+                    B.cancelTasks();
+                    anim::Task back;
+                    back.type = anim::TaskType::Retract;
+                    B.enqueue(back);
+                    cutDone = true;
+                }
+                for (anim::Animator* a : {&W, &B, &idleW, &idleB}) {
+                    ev.clear();
+                    a->update(dt, ev);
+                    if (a == &W && cutDone)
+                        for (const anim::Event& e : ev)
+                            if (e.type == anim::EventType::HandshakeClasp || e.type == anim::EventType::HandshakeRelease) ++eventsAfter;
+                }
+                const float t = B.time();
+                // A jump of the chest: its step from one frame to the next changes abruptly.
+                const m::vec3 c = B.globals()[character::Spine2].translation();
+                const float jerk = m::length((c - chest) - step);
+                if (t > cut - 0.3f && t <= cut) jerkBefore = std::max(jerkBefore, jerk);
+                if (t > cut && t < cut + anim::kShakeLetGoQuick + 0.1f) jerkAfter = std::max(jerkAfter, jerk);
+                step = c - chest;
+                chest = c;
+                // The real right hand shakes for both: back where the idle robots' rest.
+                for (int k = 0; k < 2; ++k) {
+                    const m::vec3 p = m::transformPoint((k ? B : W).globals()[character::HandR], m::vec3(0, -0.05f, 0));
+                    if (t > cut + dt) speed = std::max(speed, m::length(p - palm[k]) / dt);
+                    palm[k] = p;
+                }
+                if (t > cut) after.keepWorst(shake::margins(sk, W.globals(), B.globals()));
+                if (t > cut) after.keepWorst(shake::margins(sk, B.globals(), W.globals()));
+                if (bErr < 0.0f && t >= bBack)
+                    bErr = m::length(B.globals()[character::HandR].translation() - idleB.globals()[character::HandR].translation());
+                if (wErr < 0.0f && t >= anim::Timing::Handshake + 0.05f)
+                    wErr = m::length(W.globals()[character::HandR].translation() - idleW.globals()[character::HandR].translation());
+                if (t >= cut + 0.6f) {
+                    float by, bp, iy, ip;
+                    B.headAngles(by, bp);
+                    idleB.headAngles(iy, ip);
+                    gazeErr = std::max(gazeErr, std::max(std::fabs(by - iy), std::fabs(bp - ip)));
+                }
+            }
+            std::fprintf(stderr,
+                         "  %s-handed, cut at %.2f s: shaking hands %.1f / %.1f mm from their rest, at most %.2f m/s, clearances palm %.1f wrist "
+                         "%.1f forearm %.1f fingers %.1f mm; head %.3f rad from the idle robot's, chest step change %.3f mm (before %.3f mm)\n",
+                         play == character::Side::Right ? "right" : "left", cut, bErr * 1000.0f, wErr * 1000.0f, speed, after.palm * 1000.0f,
+                         after.wrist * 1000.0f, after.forearm * 1000.0f, after.fingers * 1000.0f, gazeErr, jerkAfter * 1000.0f, jerkBefore * 1000.0f);
+            CHECK(bErr >= 0.0f && bErr < 0.002f);
+            CHECK(wErr >= 0.0f && wErr < 0.002f);
+            CHECK(speed < 2.7f);
+            CHECK(after.palm > -0.001f && after.wrist > -0.001f && after.forearm > -0.001f && after.fingers > -0.001f);
+            CHECK_EQ(eventsAfter, cut > 1.80f && cut < anim::Timing::HandshakeReleaseAt ? 1 : 0);   // (opening already: as planned)
+            CHECK(gazeErr < 0.02f);
+            CHECK(jerkAfter < 0.005f);   // (dropping the torso's hold on that hand at once: 17 mm)
+            CHECK(!B.busy());
+            CHECK(!B.writingBusy());
+            CHECK(!B.holdsPen());
+        }
 }
 
 // A piece the robot set down on the table beside its resting hand, which the game later puts back

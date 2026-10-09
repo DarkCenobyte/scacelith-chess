@@ -1,8 +1,10 @@
-// Black right-handed vs Black left-handed (same White): the real right hand's bones (hand + fingers),
-// largest position / rotation difference per phase.
+// Black right-handed vs Black left-handed (same White): the real right hand's bones (hand + fingers;
+// FROMB / TOB: another range of bone indices, e.g. the arm), largest position / rotation difference
+// per phase.
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 #include <deque>
 #include <functional>
 #include <map>
@@ -15,7 +17,10 @@
 #include "anim/animator_writing.cpp"
 using namespace m;
 using namespace character;
+namespace plat { double time() { return 0.0; } }   // (robot_model.cpp's timing logs)
 int main() {
+    const int fromB = std::getenv("FROMB") ? std::atoi(std::getenv("FROMB")) : int(HandR);
+    const int toB = std::getenv("TOB") ? std::atoi(std::getenv("TOB")) : int(PinkyR3);
     const Skeleton& sk = robotSkeleton();
     anim::Animator W1, B1, W2, B2;
     W1.init(sk, vec3(0, layout::PLAYER_PELVIS_Y, layout::PLAYER_PELVIS_Z), 1.0f);
@@ -38,14 +43,14 @@ int main() {
             a->update(1.0f / 120.0f, ev);
         }
         const float u = W1.time();
-        const char* ph = u < 0.68f ? "approach" : u < 2.18f ? "contact (slide-in .. withdraw)" : "retract";
+        const char* ph = u < 0.60f ? "approach" : u <= 2.10f ? "contact (slide-in .. withdraw)" : "retract";
         auto& w = worst[ph];
-        for (int b = HandR; b <= PinkyR3; ++b) {
+        for (int b = fromB; b <= toB; ++b) {
             const mat4 &x = B1.globals()[b], &y = B2.globals()[b];
             w.first = std::max(w.first, length(x.translation() - y.translation()));
             quat qa = fromMat3(x.upper3()), qb = fromMat3(y.upper3());
             w.second = std::max(w.second, 2.0f * std::acos(clamp(std::fabs(dot(qa, qb)), 0.0f, 1.0f)));
         }
     }
-    for (auto& kv : worst) std::printf("%-32s Black's right hand, right- vs left-handed: %.3f mm, %.4f rad\n", kv.first.c_str(), kv.second.first * 1000, kv.second.second);
+    for (auto& kv : worst) std::printf("%-32s Black's bones %d..%d, right- vs left-handed: %.3f mm, %.4f rad\n", kv.first.c_str(), fromB, toB, kv.second.first * 1000, kv.second.second);
 }
