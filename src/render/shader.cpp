@@ -1,5 +1,6 @@
 #include "shader.h"
 #include "../core/embedded.h"
+#include "../core/files.h"
 #include "../core/log.h"
 #include <map>
 #include <memory>
@@ -7,7 +8,10 @@
 #include <sstream>
 #include <cstdio>
 #include <cstdlib>
+#include <exception>
+#include <filesystem>
 #include <functional>
+#include <system_error>
 
 std::string ProgramDesc::key() const {
     std::string k = vs + "|" + tcs + "|" + tes + "|" + gs + "|" + fs + "|" + cs + "|" + material + "|" + displacement;
@@ -78,13 +82,38 @@ void expand(const std::string& path, const std::string& material, const std::str
     included.erase(path);
 }
 
+// SCACELITH_DUMP_SHADERS=<dir>: the folder (an existing one) the preprocessed sources are written
+// to, resolved once to its canonical path (absolute, no "." or ".." parts, no symbolic link), the
+// one the log names; "" = no dump.
+const std::string& dumpDirectory() {
+    static const std::string dir = [] {
+        const char* env = std::getenv("SCACELITH_DUMP_SHADERS");
+        if (!env || !*env) return std::string();
+        std::error_code ec;
+        std::filesystem::path p;
+        try {
+            p = std::filesystem::canonical(std::filesystem::u8path(env), ec);
+        } catch (const std::exception&) {   // not UTF-8 (Windows)
+            ec = std::make_error_code(std::errc::illegal_byte_sequence);
+        }
+        if (ec || !std::filesystem::is_directory(p, ec)) {
+            LOGW("shaders: no dump, %s is not a folder", env);
+            return std::string();
+        }
+        LOGI("shaders: dumping the preprocessed sources to %s", p.u8string().c_str());
+        return p.u8string() + "/";
+    }();
+    return dir;
+}
+
 GLuint compileStage(GLenum type, const std::string& path, const ProgramDesc& d) {
     std::vector<std::string> table;
     std::string src = preprocess(path, d.material, d.displacement, d.defines, &table);
-    if (const char* dump = std::getenv("SCACELITH_DUMP_SHADERS")) {
+    const std::string& dump = dumpDirectory();
+    if (!dump.empty()) {
         std::string name = path;
         for (char& c : name) if (c == '/') c = '_';
-        if (FILE* f = std::fopen((std::string(dump) + "/" + name + "." + std::to_string(std::hash<std::string>()(d.key())) + ".glsl").c_str(), "w")) {
+        if (FILE* f = files::create((dump + name + "." + std::to_string(std::hash<std::string>()(d.key())) + ".glsl").c_str())) {
             std::fputs(src.c_str(), f);
             std::fclose(f);
         }

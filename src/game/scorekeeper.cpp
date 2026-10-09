@@ -2,6 +2,7 @@
 #include "../audio/audio.h"
 #include "../core/log.h"
 #include "../i18n/i18n.h"
+#include "game_archive.h"
 #include "layout.h"
 #include <algorithm>
 #include <cstdio>
@@ -44,11 +45,13 @@ sheet::PieceLetters localizedPieceLetters() {
 std::string scoresheetDate(bool fixedForScreenshots) {
     int d = 28, mo = 9, y = 2026;
     if (!fixedForScreenshots) {
-        std::time_t now = std::time(nullptr);
-        if (const std::tm* tm = std::localtime(&now)) {
-            d = tm->tm_mday;
-            mo = tm->tm_mon + 1;
-            y = tm->tm_year + 1900;
+        // Into our own tm (localtime_r / localtime_s), not std::localtime's buffer shared by every
+        // thread.
+        std::tm tm{};
+        if (archive::localTime(std::time(nullptr), tm)) {
+            d = tm.tm_mday;
+            mo = tm.tm_mon + 1;
+            y = tm.tm_year + 1900;
         }
     }
     char dd[16], mm[16], yy[16];

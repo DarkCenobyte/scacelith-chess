@@ -24,6 +24,7 @@
 #include "offline.h"
 #include "queue.h"
 #include "synth.h"
+#include "../core/files.h"
 #include "../core/log.h"
 #include "../game/layout.h"
 #include <atomic>
@@ -792,9 +793,10 @@ std::vector<float> renderVoiceOffline(const std::vector<float>& mono, int srcRat
     return out;
 }
 
+// The path is UTF-8: opened as a wide path on Windows (u8path), whatever the process code page.
 bool writeWav16(const char* path, const float* data, size_t frames, int channels, int sampleRate) {
     if (!path || !data || channels <= 0) return false;
-    FILE* f = std::fopen(path, "wb");
+    FILE* f = files::create(path);
     if (!f) {
         LOGW("audio: cannot write %s", path);
         return false;

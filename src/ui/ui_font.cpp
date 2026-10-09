@@ -8,22 +8,7 @@
 #include "../i18n/i18n.h"
 #include "../i18n/unicode.h"
 #include "../platform/platform.h"
-
-#if defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
-#pragma GCC diagnostic ignored "-Wsign-compare"
-#pragma GCC diagnostic ignored "-Wmisleading-indentation"
-#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
-#pragma GCC diagnostic ignored "-Wtype-limits"
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-#endif
-#define STB_TRUETYPE_IMPLEMENTATION
-#define STBTT_STATIC
-#include "stb/stb_truetype.h"
-#if defined(__GNUC__)
-#pragma GCC diagnostic pop
-#endif
+#include "stb/stb_truetype.h"  // its implementation: third_party/stb/stb_truetype.cpp
 
 #include <algorithm>
 #include <cmath>

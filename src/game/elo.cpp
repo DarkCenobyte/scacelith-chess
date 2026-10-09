@@ -91,7 +91,9 @@ int initialRating(const Record& r) {
 }
 
 int ratingDelta(const Record& r, int opponent, double score) {
-    return int(divRound(kFactor(r) * (50 * halfPoints(score) - expected100(r.rating, opponent)), 100));
+    // Computed in long long, divRound's type (as in initialRating), not in int then widened; K x
+    // (score - PD) in hundredths is at most 40 x 100 anyway.
+    return int(divRound(kFactor(r) * (50LL * halfPoints(score) - expected100(r.rating, opponent)), 100));
 }
 
 Change applyResult(Record& r, const Record& opponent, double score) {

@@ -1,6 +1,7 @@
 #include "test.h"
 #include "math/math.h"
 #include "core/embedded.h"
+#include "core/files.h"
 #include "core/image.h"
 #include "core/ini.h"
 #include "core/log.h"
@@ -271,6 +272,29 @@ TEST(image_png_write_error) {
     CHECK(!image::writePNG(link, 300, 200, 3, px.data()));   // the IDAT write itself fails
     CHECK(access(link, F_OK) != 0);
     unlink(link);
+}
+#endif
+
+#ifndef _WIN32
+// A file the game creates is never writable by other users, whatever the umask: 0644, or 0600 for
+// a private one (the log), where fopen asked for 0666. A private file made before is set to 0600.
+TEST(files_create_permissions) {
+    const std::string path = tmpFile("scacelith_files_create", ".txt");
+    const mode_t oldMask = umask(0);
+    unlink(path.c_str());
+    struct stat st = {};
+    FILE* f = files::create(path.c_str());
+    CHECK(f != nullptr);
+    if (f) std::fclose(f);
+    CHECK(stat(path.c_str(), &st) == 0);
+    CHECK_EQ(int(st.st_mode & 0777), 0644);
+    f = files::create(path.c_str(), true);
+    CHECK(f != nullptr);
+    if (f) std::fclose(f);
+    CHECK(stat(path.c_str(), &st) == 0);
+    CHECK_EQ(int(st.st_mode & 0777), 0600);
+    umask(oldMask);
+    unlink(path.c_str());
 }
 #endif
 

@@ -25,6 +25,7 @@
 #include "platform/platform.h"
 #include "render/renderer.h"
 #include "render/shader.h"
+#include "game/game_archive.h"
 #include "game/settings.h"
 #include "i18n/i18n.h"
 #include "net/net_sys.h"
@@ -53,8 +54,10 @@ static std::string timestamp() {
     auto now = std::chrono::system_clock::now();
     std::time_t t = std::chrono::system_clock::to_time_t(now);
     int ms = int(std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count() % 1000);
+    // Into our own tm (localtime_r / localtime_s), not std::localtime's buffer shared by every
+    // thread; all zeros, as before, when it fails.
     std::tm tm = {};
-    if (const std::tm* local = std::localtime(&t)) tm = *local;
+    if (!game::archive::localTime(t, tm)) tm = std::tm{};
     char buf[64];
     std::snprintf(buf, sizeof buf, "%04d%02d%02d-%02d%02d%02d-%03d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,
                   tm.tm_min, tm.tm_sec, ms);

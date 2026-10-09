@@ -1,4 +1,5 @@
 #include "log.h"
+#include "files.h"
 #include <cstdio>
 #include <mutex>
 #include <chrono>
@@ -18,7 +19,8 @@ bool init(const char* path) {
 #ifdef _WIN32
     if (path) g_file = _wfopen(std::filesystem::u8path(path).c_str(), L"w");
 #else
-    if (path) g_file = std::fopen(path, "w");
+    // Private (0600): the log names the players met online and their addresses (direct matches).
+    if (path) g_file = files::create(path, true);
 #endif
     return g_file != nullptr;
 }

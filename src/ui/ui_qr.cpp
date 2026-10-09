@@ -1,8 +1,8 @@
 // QR codes (the otpauth:// link of the two-factor setup page), with Nayuki's QR Code generator
-// (third_party/qrcodegen, MIT licence) compiled into this unit.
+// (third_party/qrcodegen, MIT licence), compiled as its own unit (CMakeLists.txt).
 #include "ui_screens_online.h"
 #include "ui_theme.h"
-#include "qrcodegen/qrcodegen.cpp"
+#include "qrcodegen/qrcodegen.hpp"
 #include <cmath>
 #include <vector>
 

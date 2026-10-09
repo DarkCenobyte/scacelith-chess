@@ -1,9 +1,10 @@
 # CodeQL code scanning of the game's C++ code (without a build) and of the workflows; the alerts
 # are in the repository's Security tab. The vendored code (third_party/), the tests (tests/) and the
-# handshake research tools (tools/handshake/), which are not shipped, are left out. Alerts that are
-# by design (a file path the player chooses, from their environment or command line: the game runs
-# as that player) are dismissed as false positives in the Security tab; the code says why where
-# they occur.
+# handshake research tools (tools/handshake/), which are not shipped, are left out. Without a
+# build (build-mode: none), paths-ignore leaves out the source files under those folders, not the
+# code that a scanned file #includes: a vendored library's implementation is compiled in units of
+# its own (Stockfish: third_party/stockfish/CMakeLists.txt; qrcodegen and stb_truetype: GAME_EXTRA
+# in CMakeLists.txt), and the game's code includes only its headers.
 name: CodeQL
 
 on:

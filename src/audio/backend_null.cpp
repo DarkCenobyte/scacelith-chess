@@ -6,11 +6,15 @@
 #ifndef _WIN32
 #include "backend.h"
 #include "dsp.h"
+#include "../core/files.h"
 #include "../core/log.h"
 #include <chrono>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <filesystem>
+#include <string>
+#include <system_error>
 #include <thread>
 #include <vector>
 
@@ -23,7 +27,7 @@ public:
 
     bool open(const char* path, int rate) {
         close();
-        f_ = std::fopen(path, "wb");
+        f_ = files::create(path);
         if (!f_) return false;
         bytes_ = 0;
         header(rate);
@@ -91,9 +95,18 @@ public:
     bool start(RenderFn fn, void* user) override {
         if (thread_.joinable()) return true;
         quit_.store(false);
-        if (const char* path = std::getenv("SCACELITH_AUDIO_DUMP")) {
-            if (*path && dump_.open(path, kRate)) LOGI("audio: dumping the output to %s", path);
-            else if (*path) LOGW("audio: cannot write the output dump %s", path);
+        const char* env = std::getenv("SCACELITH_AUDIO_DUMP");
+        if (env && *env) {
+            // Written under the file name given (a pipe such as /dev/stdout stays one), in its folder
+            // resolved once (weakly_canonical: absolute, no "." or ".." parts, no symbolic link where
+            // it exists): the path the log names.
+            const std::filesystem::path given(env);
+            std::error_code ec;
+            const std::filesystem::path folder =
+                std::filesystem::weakly_canonical(given.has_parent_path() ? given.parent_path() : ".", ec);
+            const std::string path = (folder / given.filename()).string();
+            if (!ec && dump_.open(path.c_str(), kRate)) LOGI("audio: dumping the output to %s", path.c_str());
+            else LOGW("audio: cannot write the output dump %s", env);
         }
         status.sampleRate = kRate;
         status.bufferFrames = kBlock;
