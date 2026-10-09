@@ -113,7 +113,7 @@ read. The game never asks to unlock a keyring: with none (no libsecret, no D-Bus
 default collection), a locked one, or `SCACELITH_KEYRING=off` in the environment, the tokens stay
 in the file in the clear (`bound:`), protected only by its permissions (0600, in a 0700 folder),
 and the log says so once. Logout, a session the server refused and a deleted account remove the
-keyring item with the reference.
+keyring item with the reference (a locked keyring keeps it: the log says so).
 
 ## Account API
 

@@ -10,10 +10,11 @@
 //
 // Never a prompt: an unlock dialog would pop up over the game at any network call, and a dismissed
 // one at the next. A locked default collection, or none, is Unavailable before anything is
-// stored, and searches do not unlock (SECRET_SEARCH_UNLOCK is not given). Without a D-Bus session
-// bus (no DBUS_SESSION_BUS_ADDRESS nor $XDG_RUNTIME_DIR/bus) libsecret is not even called: GLib
-// would start a bus of its own (dbus-launch) for an X11 display. Every call takes the store's
-// CancelToken, which cancels the D-Bus call in progress (GCancellable).
+// stored, searches do not unlock (SECRET_SEARCH_UNLOCK is not given), and an item a locked keyring
+// keeps is not removed (Unavailable). Without a D-Bus session bus (no DBUS_SESSION_BUS_ADDRESS nor
+// $XDG_RUNTIME_DIR/bus) libsecret is not even called: GLib would start a bus of its own
+// (dbus-launch) for an X11 display. Every call takes the store's CancelToken, which cancels the
+// D-Bus call in progress (GCancellable).
 #include "credential_store.h"
 
 #ifndef _WIN32
@@ -74,6 +75,7 @@ struct SecretSchema {
 
 constexpr int kServiceNone = 0;               // SECRET_SERVICE_NONE
 constexpr int kCollectionNone = 0;            // SECRET_COLLECTION_NONE
+constexpr int kSearchNone = 0;                // SECRET_SEARCH_NONE (the first item, locked or not)
 constexpr int kSearchLoadSecrets = 1 << 3;    // SECRET_SEARCH_LOAD_SECRETS (without UNLOCK: no prompt)
 const char kDefaultCollection[] = "default";  // SECRET_COLLECTION_DEFAULT
 
@@ -95,7 +97,7 @@ struct Api {
     void (*valueUnref)(gpointer);
     // GLib and GObject: libsecret's own dependencies, found through its handle.
     GHashTable* (*hashTableNew)(GHashFunc, GEqualFunc);
-    void (*hashTableInsert)(GHashTable*, gpointer key, gpointer value);
+    gboolean (*hashTableInsert)(GHashTable*, gpointer key, gpointer value);
     void (*hashTableUnref)(GHashTable*);
     GHashFunc strHash;
     GEqualFunc strEqual;
@@ -282,8 +284,19 @@ public:
         Result res = Result::Ok;
         if (!call.open(why, res)) return res;
         GError** err = call.error();
-        a_.serviceClearSync(call.service(), &kSchema, call.attributes(), call.cancellable(), err);   // FALSE: nothing matched
-        return *err ? call.failed(why, "not removed") : Result::Ok;
+        a_.serviceClearSync(call.service(), &kSchema, call.attributes(), call.cancellable(), err);   // FALSE: nothing removed
+        if (*err) return call.failed(why, "not removed");
+        // secret_service_clear removes the unlocked items only, and says nothing of a locked one
+        // (FALSE, no error, as when nothing matched): an item still found is one a locked keyring
+        // keeps.
+        err = call.error();
+        GList* items = a_.serviceSearchSync(call.service(), &kSchema, call.attributes(), kSearchNone, call.cancellable(), err);
+        if (*err) return call.failed(why, "not removed");
+        if (!items) return Result::Ok;
+        why = a_.itemGetLocked(static_cast<SecretItem*>(items->data)) ? "the keyring is locked" : "not removed";
+        for (GList* l = items; l; l = l->next) a_.objectUnref(l->data);
+        a_.listFree(items);
+        return Result::Unavailable;
     }
 
 private:
@@ -293,11 +306,13 @@ private:
 }  // namespace
 
 Keyring* secretServiceKeyring() {
+    // Never destroyed: the static objects of the process are destroyed at exit in the reverse order
+    // of their construction, and the online client (net::onlineClient(), made before the first
+    // keyring call) is destroyed after this one, while its network threads may still be in a
+    // keyring call (its destructor interrupts them, then waits for them).
     static Keyring* const keyring = []() -> Keyring* {
         const Api* a = api();
-        if (!a) return nullptr;
-        static SecretServiceKeyring k(*a);
-        return &k;
+        return a ? new SecretServiceKeyring(*a) : nullptr;
     }();
     return keyring;
 }
