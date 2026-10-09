@@ -381,8 +381,13 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised
 
 GitHub Actions builds and tests every push to master and every pull request
 (`.github/workflows/ci.yml`): the Linux build and its unit tests, the Windows build cross-compiled
-with MinGW-w64 and its unit tests under Wine (both as above), and a lint of the workflows
-(actionlint and zizmor). The Windows executable of each run is kept for 14 days as a workflow
+with MinGW-w64 and its unit tests under Wine (both as above), the contract with the dedicated
+server and the live online tests against it, and a lint of the workflows (actionlint and zizmor).
+The server is the commit pinned in `tools/interop/server-revision`, so that a run of a game commit
+always tests the same pair (a manual run of the workflow takes another branch of the server as
+`server-revision`, for a change made on both sides); a weekly run checks the contract against the
+server's master instead. Move the pin forward with every change of the contract; the server pins
+this game the same way. The Windows executable of each run is kept for 14 days as a workflow
 artifact, for testing. CodeQL (`.github/workflows/codeql.yml`) scans the shipped C++ code
 (without `third_party/` and `tests/`) and the workflows; its alerts are in the Security tab.
 
