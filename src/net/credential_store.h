@@ -13,12 +13,23 @@
 //   - Linux: in the system keyring when there is one (Keyring below: the Secret Service, GNOME
 //     Keyring, KWallet, KeePassXC...), one item per token found by its origin and a random id; the
 //     file holds only "keyring:" and that id. A token the file still holds in the format below
-//     moves to the keyring the first time it is read while the keyring works.
-//   - Linux without a usable keyring (none installed or running, no D-Bus session, the keyring
-//     locked: the game never asks to unlock it, SCACELITH_KEYRING=off): in the file, bound to its
-//     origin but in the clear ("bound:", base64url of origin + '\n' + token), protected only by the
-//     file's permissions (0600, in a 0700 folder). Said once in the log.
+//     moves to the keyring the first time it is read while the keyring works (and is unlocked).
+//   - Linux without a usable keyring (none installed or running, no D-Bus session,
+//     SCACELITH_KEYRING=off), or with a locked one the player did not unlock (below): in the file,
+//     bound to its origin but in the clear ("bound:", base64url of origin + '\n' + token),
+//     protected only by the file's permissions (0600, in a 0700 folder). The log says why.
 // Either way get(origin) only ever returns a token that was saved for that origin.
+//
+// A locked keyring (Linux): the store asks the desktop to unlock it (the Secret Service shows its
+// own prompt) when a sign-in saves a token (put), when a token is needed now (get with unlock: a
+// connection, a request that needs the session) and when one is removed (logout, a forgotten
+// server); never for background work (a token moving to the keyring, a token a server refused).
+// The store waits kUnlockTimeoutMs at most for the answer, and stops waiting at interrupt() (the
+// prompt stays on the desktop: answered later, it still unlocks the keyring). One dismissed,
+// unanswered or failing is not shown again this run, except for a new sign-in: that sign-in's token
+// then stays in the file (it moves to the keyring at a read once the keyring is unlocked), a read
+// finds no session this time (the reference stays: hasToken() is false until a read succeeds),
+// and a removal leaves the item (the log says so).
 //
 // Thread-safe. The file is read on first use and rewritten atomically on changes. The calls the
 // game thread makes (hasToken, username, pin, origins) never wait for the keyring: its calls
@@ -47,9 +58,11 @@ class Keyring {
 public:
     enum class Result {
         Ok,
-        Missing,       // lookup: no such item
-        Unavailable,   // no keyring, a locked one, or an error: why says which
-        Cancelled,     // the store was interrupted (CredentialStore::interrupt)
+        Missing,       // lookup, unlock: no such item
+        Locked,        // the item, or the collection a new item goes to, is locked: unlock() opens it
+        Unavailable,   // no keyring, or an error (a dismissed unlock prompt too): why says which
+        Cancelled,     // cancel fired: the store was interrupted (CredentialStore::interrupt), or
+                       // an unlock prompt timed out
     };
     virtual ~Keyring() = default;
     // Keeps secret under (origin, id), replacing an item with the same two.
@@ -57,15 +70,21 @@ public:
                          std::string& why) = 0;
     virtual Result lookup(const std::string& origin, const std::string& id, std::string& secret, CancelToken* cancel,
                           std::string& why) = 0;
-    // Ok also when there was no such item; Unavailable while it is still there (a locked keyring
-    // keeps its items).
+    // Ok also when there was no such item; Locked or Unavailable while it is still there (a locked
+    // keyring keeps its items).
     virtual Result remove(const std::string& origin, const std::string& id, CancelToken* cancel, std::string& why) = 0;
+    // Asks the keyring to unlock the item (origin, id), or the collection new items go to when id is
+    // "": the desktop shows its unlock prompt. Ok once unlocked (or when it was not locked);
+    // Unavailable when the player dismissed the prompt or it failed; Cancelled once cancel fires
+    // (no longer waited for, the prompt may stay). Blocks until then: the store gives it a token
+    // with a timeout.
+    virtual Result unlock(const std::string& origin, const std::string& id, CancelToken* cancel, std::string& why) = 0;
 };
 
 // The Secret Service (org.freedesktop.secrets over the D-Bus session bus) through libsecret,
 // loaded at run time: the game is not linked with it (libsecret-1.so.0, secret_service.cpp).
-// nullptr on Windows and when the library cannot be loaded. It never prompts: a locked keyring,
-// or one without a default collection, is Unavailable.
+// nullptr on Windows and when the library cannot be loaded. Only unlock() prompts: the other calls
+// find a locked keyring Locked, and one without a default collection Unavailable.
 Keyring* secretServiceKeyring();
 // The keyring new stores use: secretServiceKeyring(), or none with SCACELITH_KEYRING=off in the
 // environment (the unit tests run so: tests/test_main.cpp).
@@ -89,8 +108,11 @@ public:
     // The record of this exact origin, token decrypted. A token that cannot be decrypted for
     // this origin (other user, other machine, blob copied from another origin) comes back empty
     // and is no token for hasToken(), this run (the file keeps it: another Windows account
-    // sharing a portable install may own it).
-    bool get(const std::string& origin, Credential& out) const;
+    // sharing a portable install may own it). unlock: the token is needed now (a connection, a
+    // request that needs the session), worth the keyring's unlock prompt when the keyring keeps it
+    // locked (see the note above). Without it such a token comes back empty, and still counts for
+    // hasToken() until a prompt was dismissed or unanswered this run.
+    bool get(const std::string& origin, Credential& out, bool unlock = false) const;
     // A token is saved and can be decrypted here (tried once per record and run).
     bool hasToken(const std::string& origin) const;
     std::string username(const std::string& origin) const;
@@ -116,8 +138,11 @@ public:
 
     // The keyring of the tokens; nullptr: the file only. defaultKeyring() until set.
     void setKeyring(Keyring* keyring);
-    // Ends a keyring call in progress and makes the next ones fail at once, without falling back
-    // to the file (the client is shutting down: OnlineClient's destructor).
+    // How long an unlock prompt waits for the player (kUnlockTimeoutMs; the tests shorten it).
+    void setUnlockTimeout(int ms);
+    static constexpr int kUnlockTimeoutMs = 60000;
+    // Ends a keyring call in progress (an unlock prompt too) and makes the next ones fail at once,
+    // without falling back to the file (the client is shutting down: OnlineClient's destructor).
     void interrupt();
 
 private:
@@ -135,6 +160,17 @@ private:
     mutable bool keyringSet_ = false;
     mutable Keyring* keyring_ = nullptr;
     mutable CancelToken cancel_;   // interrupt()
+    // Under ioMu_: an unlock prompt was dismissed, unanswered or failed this run (only a sign-in
+    // asks again).
+    mutable bool unlockDeclined_ = false;
+    int unlockTimeoutMs_ = kUnlockTimeoutMs;
+
+    // When a keyring call that finds the keyring locked asks the desktop to unlock it.
+    enum class Prompt {
+        Never,   // background work: a token moving to the keyring, a token a server refused
+        Once,    // a token needed now, a removal: not after a prompt declined this run
+        Always,  // a sign-in's token (put): asks again
+    };
 
     void loadLocked() const;
     void applyMovesLocked() const;
@@ -146,10 +182,18 @@ private:
     Keyring* keyring() const;
     std::string protect(const std::string& origin, const std::string& token) const;
     // *itemOrigin: the origin the keyring item was found under (a moved record's is its former one).
-    // *unanswered: false unless the keyring could not say what it keeps (unavailable, locked,
-    // interrupted), as opposed to a token that is not there or cannot be read at all.
-    bool read(const std::string& origin, const std::string& blob, std::string& token, std::string& why,
-              std::string* itemOrigin = nullptr, bool* unanswered = nullptr) const;
+    // *status: Ok with the token; Missing when it is not there or cannot be read at all; Locked,
+    // Unavailable or Cancelled when the keyring could not say what it keeps.
+    bool read(const std::string& origin, const std::string& blob, Prompt prompt, std::string& token, std::string& why,
+              std::string* itemOrigin = nullptr, Keyring::Result* status = nullptr) const;
+    // res: what a keyring call on (origin, id) ("": a new item) gave. When it found the keyring
+    // locked and prompt allows it, asks the desktop to unlock it (unlock()) and returns again(), the
+    // same call once more; else res (Cancelled once interrupted).
+    template <typename Again>
+    Keyring::Result afterUnlock(Keyring& k, Keyring::Result res, const std::string& origin, const std::string& id,
+                                Prompt prompt, Again again) const;
+    // The desktop's unlock prompt, unlockTimeoutMs_ at most. True once unlocked.
+    bool unlock(Keyring& k, const std::string& origin, const std::string& id) const;
     // Stores token in a new keyring item of origin and points the record to it, while it still
     // holds blob; then removes blob's item, if it is one (found under itemOrigin).
     void migrate(const std::string& origin, const std::string& blob, const std::string& token,

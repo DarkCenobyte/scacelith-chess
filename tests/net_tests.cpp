@@ -1399,11 +1399,16 @@ TEST(net_credentials_clear_that_token) {
 namespace {
 
 // A keyring in memory, whose items are found by (origin, id) as the Secret Service's are. It can be
-// made unavailable (a locked or missing keyring), or hold its lookups until released.
+// made unavailable (a missing or failing keyring), or locked, its unlock prompt then answered as
+// told (each one counted), or hold its lookups until released.
 class FakeKeyring final : public net::Keyring {
 public:
+    enum class Answer { Accept, Dismiss, Ignore };   // Ignore: waits until cancelled (or 10 s)
     std::atomic<bool> available{true};
-    std::atomic<int> stores{0}, lookups{0}, removes{0};
+    std::atomic<bool> locked{false};
+    std::atomic<Answer> answer{Answer::Accept};
+    std::atomic<int> stores{0}, lookups{0}, removes{0}, prompts{0};
+    std::atomic<bool> prompting{false};     // an unlock prompt is waiting (Ignore)
     std::atomic<bool> holdLookups{false};   // a lookup waits until released or cancelled
     std::atomic<bool> holding{false};       // a lookup is waiting
 
@@ -1411,7 +1416,8 @@ public:
                  std::string& why) override {
         if (cancel && cancel->cancelled()) return Result::Cancelled;
         ++stores;
-        if (!available) { why = "fake keyring locked"; return Result::Unavailable; }
+        if (!available) { why = "fake keyring unavailable"; return Result::Unavailable; }
+        if (locked) { why = "fake keyring locked"; return Result::Locked; }
         std::lock_guard<std::mutex> lk(m_);
         items_[{origin, id}] = secret;
         return Result::Ok;
@@ -1428,24 +1434,52 @@ public:
             released_ = false;
         }
         if (cancel && cancel->cancelled()) return Result::Cancelled;
-        if (!available) { why = "fake keyring locked"; return Result::Unavailable; }
+        if (!available) { why = "fake keyring unavailable"; return Result::Unavailable; }
         std::lock_guard<std::mutex> lk(m_);
         auto it = items_.find({origin, id});
         if (it == items_.end()) return Result::Missing;
+        if (locked) { why = "fake keyring locked"; return Result::Locked; }
         secret = it->second;
         return Result::Ok;
     }
     Result remove(const std::string& origin, const std::string& id, net::CancelToken* cancel, std::string& why) override {
         if (cancel && cancel->cancelled()) return Result::Cancelled;
         ++removes;
-        if (!available) { why = "fake keyring locked"; return Result::Unavailable; }
+        if (!available) { why = "fake keyring unavailable"; return Result::Unavailable; }
         std::lock_guard<std::mutex> lk(m_);
+        if (locked && items_.count({origin, id})) { why = "fake keyring locked"; return Result::Locked; }
         items_.erase({origin, id});
+        return Result::Ok;
+    }
+    // The desktop's prompt, answered as told.
+    Result unlock(const std::string&, const std::string&, net::CancelToken* cancel, std::string& why) override {
+        if (cancel && cancel->cancelled()) return Result::Cancelled;
+        if (!available) { why = "fake keyring unavailable"; return Result::Unavailable; }
+        if (!locked) return Result::Ok;
+        ++prompts;
+        if (answer == Answer::Dismiss) { why = "fake prompt dismissed"; return Result::Unavailable; }
+        if (answer == Answer::Ignore) {
+            net::AbortGuard guard(cancel, [this] { giveUp(); });   // as the Secret Service's call does
+            std::unique_lock<std::mutex> lk(m_);
+            prompting = true;
+            cv_.wait_for(lk, std::chrono::seconds(10), [this] { return givenUp_; });
+            prompting = false;
+            givenUp_ = false;
+            if (cancel && cancel->cancelled()) return Result::Cancelled;
+            why = "fake prompt never answered";
+            return Result::Unavailable;
+        }
+        locked = false;
         return Result::Ok;
     }
     void release() {
         std::lock_guard<std::mutex> lk(m_);
         released_ = true;
+        cv_.notify_all();
+    }
+    void giveUp() {
+        std::lock_guard<std::mutex> lk(m_);
+        givenUp_ = true;
         cv_.notify_all();
     }
     size_t size() {
@@ -1462,7 +1496,7 @@ public:
 private:
     std::mutex m_;
     std::condition_variable cv_;
-    bool released_ = false;
+    bool released_ = false, givenUp_ = false;
     std::map<std::pair<std::string, std::string>, std::string> items_;
 };
 
@@ -1802,7 +1836,251 @@ TEST(net_credentials_keyring_does_not_block) {
     CHECK(hasPrefix(fileToken(path, A), "keyring:"));
 }
 
+namespace {
+// A sign-in's put of token for origin, which keeps it (in the keyring or the file).
+void signIn(net::CredentialStore& s, const std::string& origin, const std::string& token) {
+    net::Credential c;
+    c.origin = origin;
+    c.username = "alice";
+    c.token = token;
+    bool stored = false;
+    CHECK(s.put(c, &stored));
+    CHECK(stored);
+}
+
+double msSince(std::chrono::steady_clock::time_point t0) {
+    return std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
+}
+}  // namespace
+
+// A locked keyring: a sign-in, a read that needs the token (a connection) and a removal (logout)
+// each ask the desktop to unlock it, and go on in the keyring once it is. A read that does not
+// need the token never asks, and the session still counts for hasToken() (the game resumes it).
+TEST(net_credentials_keyring_unlock_accepted) {
+    std::string path = tempCredentialPath("keyring-unlock");
+    RemovedAtEnd removed{path};
+    const std::string A = "a.example.org:443", token = "sct_" + std::string(43, 'U');
+    FakeKeyring k;
+    k.locked = true;
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        signIn(s, A, token);
+        CHECK_EQ(k.prompts.load(), 1);
+        CHECK(hasPrefix(fileToken(path, A), "keyring:"));
+        CHECK(k.holds(token, A));
+    }
+    k.locked = true;                                // locked again at the next start
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential out;
+        CHECK(s.get(A, out));                       // /info, a public read: not asked
+        CHECK(out.token.empty());
+        CHECK_EQ(out.username, std::string("alice"));
+        CHECK_EQ(k.prompts.load(), 1);
+        CHECK(s.hasToken(A));
+        CHECK(s.get(A, out, true));                 // a connection
+        CHECK_EQ(out.token, token);
+        CHECK_EQ(k.prompts.load(), 2);
+        CHECK(s.hasToken(A));
+        k.locked = true;
+        CHECK(s.clearToken(A));                     // logout: the item goes too
+        CHECK_EQ(k.prompts.load(), 3);
+        CHECK_EQ(k.size(), size_t(0));
+        CHECK(fileToken(path, A).empty());
+    }
+}
+
+// A dismissed prompt: a read finds no session this time but the reference stays, a sign-in's token
+// stays in the file (moved to the keyring at a read once that is unlocked), a removal leaves the
+// item, and nothing asks again this run but a new sign-in (whose prompt, accepted, lets the reads
+// ask again).
+TEST(net_credentials_keyring_unlock_dismissed) {
+    std::string path = tempCredentialPath("keyring-dismissed");
+    RemovedAtEnd removed{path};
+    const std::string A = "a.example.org:443", B = "b.example.org:443", C = "c.example.org:443";
+    const std::string tokenA = "sct_" + std::string(43, 'A'), tokenB = "sct_" + std::string(43, 'B'),
+                      tokenC = "sct_" + std::string(43, 'C');
+    FakeKeyring k;
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        signIn(s, A, tokenA);
+        signIn(s, C, tokenC);
+    }
+    const std::string refA = fileToken(path, A);
+    CHECK(hasPrefix(refA, "keyring:"));
+    k.locked = true;
+    k.answer = FakeKeyring::Answer::Dismiss;
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential out;
+        CHECK(s.get(A, out, true));                 // a connection: asked, dismissed
+        CHECK(out.token.empty());
+        CHECK_EQ(k.prompts.load(), 1);
+        CHECK_EQ(fileToken(path, A), refA);
+        CHECK(!s.hasToken(A));                      // no session this time (the game offers to sign in)
+        CHECK(s.get(A, out, true));                 // a reconnection: not asked again
+        CHECK(out.token.empty());
+        CHECK(s.clearToken(C));                     // logout: not asked either, the item stays
+        CHECK_EQ(k.prompts.load(), 1);
+        CHECK(fileToken(path, C).empty());
+        CHECK(k.holds(tokenC, C));
+        signIn(s, B, tokenB);                       // a new sign-in asks again: dismissed, in the file
+        CHECK_EQ(k.prompts.load(), 2);
+        CHECK(hasPrefix(fileToken(path, B), "bound:"));
+        CHECK(s.get(B, out, true) && out.token == tokenB);   // from the file, no prompt
+        CHECK(s.get(A, out, true));
+        CHECK(out.token.empty());
+        CHECK_EQ(k.prompts.load(), 2);
+        CHECK_EQ(fileToken(path, A), refA);
+    }
+    k.locked = false;                               // unlocked at the next start
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential out;
+        CHECK(s.get(A, out, true) && out.token == tokenA);   // the session is back
+        CHECK(s.get(B, out) && out.token == tokenB);         // and B's token moves to the keyring
+        CHECK(hasPrefix(fileToken(path, B), "keyring:"));
+        CHECK(k.holds(tokenB, B));
+        CHECK_EQ(k.prompts.load(), 2);
+    }
+    k.locked = true;
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential out;
+        CHECK(s.get(A, out, true));                 // dismissed
+        CHECK_EQ(k.prompts.load(), 3);
+        k.answer = FakeKeyring::Answer::Accept;
+        signIn(s, C, tokenC);                       // a sign-in asks again: unlocked
+        CHECK_EQ(k.prompts.load(), 4);
+        CHECK(hasPrefix(fileToken(path, C), "keyring:"));
+        k.locked = true;                            // locked again: reads may ask again
+        CHECK(s.get(A, out, true) && out.token == tokenA);
+        CHECK_EQ(k.prompts.load(), 5);
+        CHECK(s.hasToken(A));
+    }
+}
+
+// An unanswered prompt goes after the store's timeout (the sign-in's token then in the file, and
+// no prompt again for reads), and at once with interrupt() (the client shutting down), which keeps
+// nothing.
+TEST(net_credentials_keyring_unlock_timeout) {
+    std::string path = tempCredentialPath("keyring-timeout");
+    RemovedAtEnd removed{path};
+    const std::string A = "a.example.org:443", B = "b.example.org:443", C = "c.example.org:443";
+    const std::string tokenA = "sct_" + std::string(43, 'A'), tokenB = "sct_" + std::string(43, 'B'),
+                      tokenC = "sct_" + std::string(43, 'C');
+    FakeKeyring k;
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        signIn(s, A, tokenA);
+    }
+    const std::string refA = fileToken(path, A);
+    CHECK(hasPrefix(refA, "keyring:"));
+    k.locked = true;
+    k.answer = FakeKeyring::Answer::Ignore;
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        s.setUnlockTimeout(300);
+        auto t0 = std::chrono::steady_clock::now();
+        signIn(s, B, tokenB);
+        const double ms = msSince(t0);
+        std::fprintf(stderr, "  sign-in after %.0f ms\n", ms);
+        CHECK(ms >= 250 && ms < 3000);
+        CHECK_EQ(k.prompts.load(), 1);
+        CHECK(!k.prompting);
+        CHECK(hasPrefix(fileToken(path, B), "bound:"));
+        t0 = std::chrono::steady_clock::now();
+        net::Credential out;
+        CHECK(s.get(A, out, true));                 // not asked again
+        CHECK(out.token.empty());
+        CHECK(msSince(t0) < 200);
+        CHECK_EQ(k.prompts.load(), 1);
+        CHECK_EQ(fileToken(path, A), refA);
+        CHECK(!s.hasToken(A));
+    }
+    {
+        // A connection's prompt (the default timeout: a minute) when the client shuts down.
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential out;
+        std::thread reader([&] { s.get(A, out, true); });
+        auto t0 = std::chrono::steady_clock::now();
+        while (!k.prompting && msSince(t0) < 5000) std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        CHECK(k.prompting.load());
+        t0 = std::chrono::steady_clock::now();
+        s.interrupt();
+        reader.join();
+        CHECK(msSince(t0) < 500);
+        CHECK(out.token.empty());
+        CHECK_EQ(fileToken(path, A), refA);
+        CHECK_EQ(k.prompts.load(), 2);
+    }
+    {
+        // A sign-in's prompt: interrupted, its token is kept nowhere (never in the file instead).
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential c;
+        c.origin = C;
+        c.username = "carol";
+        c.token = tokenC;
+        bool stored = true, saved = true;
+        std::thread signer([&] { saved = s.put(c, &stored); });
+        auto t0 = std::chrono::steady_clock::now();
+        while (!k.prompting && msSince(t0) < 5000) std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        CHECK(k.prompting.load());
+        t0 = std::chrono::steady_clock::now();
+        s.interrupt();
+        signer.join();
+        CHECK(msSince(t0) < 500);
+        CHECK(!saved);
+        CHECK(!stored);
+        CHECK(fileToken(path, C).empty());
+        CHECK(!k.holds(tokenC));
+    }
+}
+
 #ifndef _WIN32
+namespace {
+// Locks the default collection of the session's Secret Service with libsecret's own call (the game
+// never locks a keyring).
+bool lockDefaultKeyring() {
+    void* lib = dlopen("libsecret-1.so.0", RTLD_NOW | RTLD_LOCAL);
+    if (!lib) return false;
+    using GetService = void* (*)(int flags, void* cancellable, void** error);
+    using ForAlias = void* (*)(void* service, const char* alias, int flags, void* cancellable, void** error);
+    using Append = void* (*)(void* list, void* data);
+    using Lock = int (*)(void* service, void* objects, void* cancellable, void** locked, void** error);
+    using Release = void (*)(void*);
+    auto getService = reinterpret_cast<GetService>(dlsym(lib, "secret_service_get_sync"));
+    auto forAlias = reinterpret_cast<ForAlias>(dlsym(lib, "secret_collection_for_alias_sync"));
+    auto append = reinterpret_cast<Append>(dlsym(lib, "g_list_append"));
+    auto lock = reinterpret_cast<Lock>(dlsym(lib, "secret_service_lock_sync"));
+    auto listFree = reinterpret_cast<Release>(dlsym(lib, "g_list_free"));
+    auto unref = reinterpret_cast<Release>(dlsym(lib, "g_object_unref"));
+    if (!getService || !forAlias || !append || !lock || !listFree || !unref) return false;
+    void* service = getService(0, nullptr, nullptr);
+    if (!service) return false;
+    void* collection = forAlias(service, "default", 0, nullptr, nullptr);
+    int locked = 0;
+    if (collection) {
+        void* objects = append(nullptr, collection);
+        locked = lock(service, objects, nullptr, nullptr, nullptr);
+        listFree(objects);
+        unref(collection);
+    }
+    unref(service);
+    return locked > 0;
+}
+}  // namespace
+
 // The real Secret Service, when this machine has one unlocked (a desktop session; for a headless
 // run: dbus-run-session with gnome-keyring-daemon --unlock given a non-empty password on its
 // standard input: with an empty one it makes no login keyring, so no default collection, and the
@@ -1819,9 +2097,12 @@ TEST(net_credentials_secret_service) {
     CHECK(k->lookup(A, "probe", back, nullptr, why) == net::Keyring::Result::Ok);
     CHECK_EQ(back, std::string("x"));
     CHECK(k->lookup(B, "probe", back, nullptr, why) == net::Keyring::Result::Missing);
+    CHECK(k->unlock(A, "probe", nullptr, why) == net::Keyring::Result::Ok);   // not locked: no prompt
+    CHECK(k->unlock(A, "", nullptr, why) == net::Keyring::Result::Ok);
     CHECK(k->remove(A, "probe", nullptr, why) == net::Keyring::Result::Ok);
     CHECK(k->lookup(A, "probe", back, nullptr, why) == net::Keyring::Result::Missing);
     CHECK(k->remove(A, "probe", nullptr, why) == net::Keyring::Result::Ok);   // nothing there: fine
+    CHECK(k->unlock(A, "probe", nullptr, why) == net::Keyring::Result::Missing);
 
     std::string path = tempCredentialPath("secret-service");
     RemovedAtEnd removed{path};
@@ -1859,10 +2140,14 @@ TEST(net_credentials_secret_service) {
 }
 
 // The real Secret Service once its default collection is locked: nothing is read, stored or
-// removed there, without a prompt, and each call says so (secret_service_clear itself is silent
-// about a locked item); the store keeps a new token in its file instead. It locks the default
-// collection of the session it runs in, which only an unlock prompt opens again: it runs only when
-// SCACELITH_KEYRING_LOCK_TEST=1 says that keyring is a throwaway one, as in
+// removed there but through unlock(), and each call says so (secret_service_clear itself is silent
+// about a locked item). Nobody answers the unlock prompt here: without a display gnome-keyring
+// dismisses it at once (its prompter cannot start); with one it shows it, and the call stops
+// waiting at the test's cancellation or the store's timeout (the prompt stays: it is not
+// dismissed, which would make gnome-keyring-daemon abort, and the next lookups check that it did
+// not). The store then keeps a new token in its file and the reference to the locked item. It locks the default collection of the session it runs in, which
+// only an unlock prompt opens again: it runs only when SCACELITH_KEYRING_LOCK_TEST=1 says that
+// keyring is a throwaway one, as in
 //   dbus-run-session -- sh -c 'printf pw | gnome-keyring-daemon --unlock --components=secrets >/dev/null;
 //       SCACELITH_KEYRING_LOCK_TEST=1 ./build/scacelith_tests net_credentials_secret_service'
 TEST(net_credentials_secret_service_locked) {
@@ -1875,46 +2160,43 @@ TEST(net_credentials_secret_service_locked) {
     std::string why, back;
     if (k->store(A, "kept", "x", nullptr, why) != net::Keyring::Result::Ok) SKIP("no usable Secret Service: " + why);
 
-    // Locked with libsecret's own call (the game never locks nor unlocks a keyring).
-    void* lib = dlopen("libsecret-1.so.0", RTLD_NOW | RTLD_LOCAL);
-    REQUIRE(lib != nullptr);
-    using GetService = void* (*)(int flags, void* cancellable, void** error);
-    using ForAlias = void* (*)(void* service, const char* alias, int flags, void* cancellable, void** error);
-    using Append = void* (*)(void* list, void* data);
-    using Lock = int (*)(void* service, void* objects, void* cancellable, void** locked, void** error);
-    using Release = void (*)(void*);
-    auto getService = reinterpret_cast<GetService>(dlsym(lib, "secret_service_get_sync"));
-    auto forAlias = reinterpret_cast<ForAlias>(dlsym(lib, "secret_collection_for_alias_sync"));
-    auto append = reinterpret_cast<Append>(dlsym(lib, "g_list_append"));
-    auto lock = reinterpret_cast<Lock>(dlsym(lib, "secret_service_lock_sync"));
-    auto listFree = reinterpret_cast<Release>(dlsym(lib, "g_list_free"));
-    auto unref = reinterpret_cast<Release>(dlsym(lib, "g_object_unref"));
-    REQUIRE(getService && forAlias && append && lock && listFree && unref);
-    void* service = getService(0, nullptr, nullptr);
-    REQUIRE(service != nullptr);
-    void* collection = forAlias(service, "default", 0, nullptr, nullptr);
-    REQUIRE(collection != nullptr);
-    void* objects = append(nullptr, collection);
-    const int locked = lock(service, objects, nullptr, nullptr, nullptr);
-    listFree(objects);
-    unref(collection);
-    unref(service);
-    REQUIRE(locked > 0);
+    REQUIRE(lockDefaultKeyring());
 
-    CHECK(k->lookup(A, "kept", back, nullptr, why) == net::Keyring::Result::Unavailable);
+    CHECK(k->lookup(A, "kept", back, nullptr, why) == net::Keyring::Result::Locked);
     CHECK(back.empty());
     CHECK_EQ(why, std::string("the keyring is locked"));
-    CHECK(k->store(A, "new", "y", nullptr, why) == net::Keyring::Result::Unavailable);
-    CHECK(k->remove(A, "kept", nullptr, why) == net::Keyring::Result::Unavailable);   // still there
+    CHECK(k->store(A, "new", "y", nullptr, why) == net::Keyring::Result::Locked);
+    CHECK_EQ(why, std::string("the default keyring is locked"));
+    CHECK(k->remove(A, "kept", nullptr, why) == net::Keyring::Result::Locked);        // still there
     CHECK_EQ(why, std::string("the keyring is locked"));
-    CHECK(k->lookup(A, "kept", back, nullptr, why) == net::Keyring::Result::Unavailable);
+    CHECK(k->lookup(A, "kept", back, nullptr, why) == net::Keyring::Result::Locked);
     CHECK(k->remove(A, "none", nullptr, why) == net::Keyring::Result::Ok);            // nothing there
+    CHECK(k->unlock(A, "none", nullptr, why) == net::Keyring::Result::Missing);
+
+    // The prompt: dismissed at once (no display), or no longer waited for a second later.
+    for (const char* id : {"kept", ""}) {
+        net::CancelToken cancel;
+        std::thread canceller([&] {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            cancel.cancel();
+        });
+        const auto t0 = std::chrono::steady_clock::now();
+        const net::Keyring::Result res = k->unlock(A, id, &cancel, why);
+        const double ms = msSince(t0);
+        canceller.join();
+        std::fprintf(stderr, "  unlock(\"%s\"): %s after %.0f ms (%s)\n", id, res == net::Keyring::Result::Cancelled ? "given up" : "answered",
+                     ms, why.c_str());
+        CHECK(res == net::Keyring::Result::Cancelled || res == net::Keyring::Result::Unavailable);
+        CHECK(ms < 2000);
+        CHECK(k->lookup(A, "kept", back, nullptr, why) == net::Keyring::Result::Locked);
+    }
 
     std::string path = tempCredentialPath("secret-service-locked");
     RemovedAtEnd removed{path};
     {
-        // A reference to the locked item: no token this run, and a logout drops the reference
-        // (the item stays, and the log says so).
+        // A reference to the locked item: no token without the prompt, and none after it (the
+        // reference stays); a logout then drops the reference without asking again (the item
+        // stays, and the log says so).
         Value rec = Value::object();
         rec.set("origin", A);
         rec.set("username", "alice");
@@ -1927,13 +2209,21 @@ TEST(net_credentials_secret_service_locked) {
         CHECK(net::sys::writeFileAtomic(path, doc.dump(), true));
         net::CredentialStore s(path);
         s.setKeyring(k);
+        s.setUnlockTimeout(1000);
         net::Credential out;
         CHECK(s.get(A, out));
         CHECK(out.token.empty());
+        CHECK(s.hasToken(A));
+        auto t0 = std::chrono::steady_clock::now();
+        CHECK(s.get(A, out, true));
+        CHECK(out.token.empty());
         CHECK(!s.hasToken(A));
+        CHECK_EQ(fileToken(path, A), std::string("keyring:kept"));
+        CHECK(msSince(t0) < 4000);
+        t0 = std::chrono::steady_clock::now();
         CHECK(s.clearToken(A));
         CHECK(fileToken(path, A).empty());
-        // A new sign-in while it is locked: in the file, as without a keyring.
+        // A new sign-in while it is locked asks again, then goes to the file, as without a keyring.
         net::Credential c;
         c.origin = A;
         c.username = "alice";
@@ -1941,9 +2231,43 @@ TEST(net_credentials_secret_service_locked) {
         bool stored = false;
         CHECK(s.put(c, &stored));
         CHECK(stored);
+        CHECK(msSince(t0) < 4000);
         CHECK(hasPrefix(fileToken(path, A), "bound:"));
-        CHECK(s.get(A, out) && out.token == token);
+        CHECK(s.get(A, out, true) && out.token == token);
     }
+}
+
+// The real Secret Service's unlock prompt, answered: a sign-in, a read that needs the token and a
+// logout each have the locked default collection unlocked through it, and go on in the keyring.
+// Someone types the keyring's password at each of the three prompts (a person at that desktop, or
+// headless: Xvfb and a tool typing it into gnome-keyring's prompter, as xdotool does): it runs only
+// with SCACELITH_KEYRING_PROMPT_TEST=1 and, as it locks the keyring, SCACELITH_KEYRING_LOCK_TEST=1.
+TEST(net_credentials_secret_service_unlock_answered) {
+    const char* lockOptIn = std::getenv("SCACELITH_KEYRING_LOCK_TEST");
+    const char* promptOptIn = std::getenv("SCACELITH_KEYRING_PROMPT_TEST");
+    if (!lockOptIn || std::strcmp(lockOptIn, "1") != 0 || !promptOptIn || std::strcmp(promptOptIn, "1") != 0)
+        SKIP("SCACELITH_KEYRING_LOCK_TEST and SCACELITH_KEYRING_PROMPT_TEST not set (it needs its prompts answered)");
+    net::Keyring* k = net::secretServiceKeyring();
+    if (!k) SKIP("libsecret-1.so.0 cannot be loaded");
+    const std::string A = "keyring-prompt-test.invalid:" + std::to_string(int(getpid()));
+    const std::string token = "sct_" + std::string(43, 'P');
+    std::string why, back;
+    if (k->store(A, "probe", "x", nullptr, why) != net::Keyring::Result::Ok) SKIP("no usable Secret Service: " + why);
+    CHECK(k->remove(A, "probe", nullptr, why) == net::Keyring::Result::Ok);
+    std::string path = tempCredentialPath("secret-service-prompt");
+    RemovedAtEnd removed{path};
+    net::CredentialStore s(path);
+    s.setKeyring(k);
+    REQUIRE(lockDefaultKeyring());
+    signIn(s, A, token);                            // prompt 1
+    const std::string ref = fileToken(path, A);
+    CHECK(hasPrefix(ref, "keyring:"));
+    REQUIRE(lockDefaultKeyring());
+    net::Credential out;
+    CHECK(s.get(A, out, true) && out.token == token);   // prompt 2
+    REQUIRE(lockDefaultKeyring());
+    CHECK(s.clearToken(A));                         // prompt 3: the item goes
+    CHECK(k->lookup(A, ref.substr(8), back, nullptr, why) == net::Keyring::Result::Missing);
 }
 #endif
 

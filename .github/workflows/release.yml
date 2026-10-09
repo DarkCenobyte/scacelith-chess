@@ -255,8 +255,9 @@ jobs:
           ./install.sh --uninstall removes it. The settings, saved logins and log are kept in
           \$XDG_CONFIG_HOME/scacelith/, by default ~/.config/scacelith/ (next to the executable
           instead when a Scacelith.ini stands there); the logins' session tokens go to the desktop's
-          keyring through libsecret (libsecret-1-0) when one is unlocked, otherwise they stay in that
-          folder, readable by their owner only.
+          keyring through libsecret (libsecret-1-0) when there is one (a locked keyring asks for its
+          password when you sign in or connect), otherwise they stay in that folder, readable by
+          their owner only.
 
           Source: $REPOSITORY ($REF_NAME, commit $COMMIT).
           Scacelith is free software under the GNU General Public License v3.0 (LICENSE). The licence

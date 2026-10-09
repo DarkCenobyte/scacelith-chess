@@ -109,11 +109,28 @@ each token encrypted with DPAPI for the Windows account. On Linux the system key
 tokens when there is one (the Secret Service: GNOME Keyring, KWallet, KeePassXC...; libsecret is
 loaded at run time, `src/net/secret_service.cpp`), and the file only names their items
 (`keyring:`); a token an earlier version wrote in the file moves to the keyring the first time it is
-read. The game never asks to unlock a keyring: with none (no libsecret, no D-Bus session, no
-default collection), a locked one, or `SCACELITH_KEYRING=off` in the environment, the tokens stay
-in the file in the clear (`bound:`), protected only by its permissions (0600, in a 0700 folder),
-and the log says so once. Logout, a session the server refused and a deleted account remove the
-keyring item with the reference (a locked keyring keeps it: the log says so).
+read while the keyring is unlocked. Without a usable keyring (no libsecret, no D-Bus session, no
+Secret Service or default collection) or with `SCACELITH_KEYRING=off` in the environment, the
+tokens stay in the file in the clear (`bound:`), protected only by its permissions (0600, in a 0700
+folder), and the log says why once (the first time a token is saved there or read from there).
+Logout, a session the server refused and a deleted account remove the keyring item with the
+reference.
+
+A locked keyring is unlocked through the desktop's own prompt (libsecret's `secret_service_unlock`:
+the Secret Service shows it), asked from a network thread, never the game's, and one at a time: when
+a sign-in saves its token, when a token is needed now (connecting or resuming a session, a request
+that needs the session) and when one is removed (logout, a forgotten server). Never for background
+work: a token moving to the keyring, a token a server refused, `/info`, a public read (a token such a
+read cannot see still counts as a saved session, so the game offers to resume it). The game waits
+60 s at most for the answer (`CredentialStore::kUnlockTimeoutMs`), and stops waiting when it quits;
+the prompt itself stays on the desktop until answered (withdrawing it with the Secret Service's
+`Dismiss` makes gnome-keyring-daemon abort, up to version 48 at least), and unlocks the keyring if
+answered later. Once a prompt was dismissed, left unanswered or failed (a desktop without a
+prompter dismisses it at once), none is shown again during the run except for a new sign-in. Then
+the sign-in's token stays in the file and moves to the keyring once that is unlocked (a later run),
+a read finds no session this time but keeps the reference (the game offers to sign in; the session
+comes back once the keyring is unlocked), and a removal leaves the item in the keyring (the log
+says so).
 
 ## Account API
 
