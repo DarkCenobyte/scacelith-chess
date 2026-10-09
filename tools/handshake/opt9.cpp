@@ -34,11 +34,20 @@ static bool gFixPump = false;
 //  W_SIDE  open thumb sticking out of the palm plane (deg over SIDE_MAX)
 //  W_LIFT  elbow lift weight (opt8: 12)
 //  STRAIN_T soft strain target (opt8: 0.022), STRAIN_H hard (opt8: 0.032)
+//  W_CUFF  the grip's vertices in the partner's forearm cuff (depth over 0.2 mm) with that forearm
+//          where the pump extremes put it and turned by +-CUFF_ROT rad about the partner's wrist (the
+//          two robots' torsos differ: a left-handed partner's forearm turns ~0.12 rad off its hand's
+//          mirror image), so the whole motion stays as clear as the static clasp
+//  W_SLIDEV slide length over SLIDE_LEN mm (the hand comes in at 1.51 x length / 0.18 s: 82 mm = 0.69 m/s)
 static float envf(const char* k, float d) { const char* e = std::getenv(k); return e ? float(std::atof(e)) : d; }
 static float W_KNUCKLE, W_PALM, PALM_T, W_CROSS, CROSS_T, PADS_BEHIND, PADS_WRIST, PADS_KNUCKLE, W_TIDX;
-static float W_SKIN, W_TSKIN, W_IPT, W_BALL, W_SIDE, SIDE_MAX, W_LIFT, STRAIN_T, STRAIN_H, IP_T, W_RATE, RATE_MAX, SLIDE_MARGIN;
+static float W_SKIN, W_TSKIN, W_IPT, W_BALL, W_SIDE, SIDE_MAX, W_LIFT, STRAIN_T, STRAIN_H, IP_T, W_RATE, RATE_MAX, SLIDE_MARGIN, W_CUFF, CUFF_ROT, W_SLIDEV, SLIDE_LEN;
 static void initWeights() {
     W_RATE = envf("W_RATE", 0.0f);
+    W_CUFF = envf("W_CUFF", 0.0f);
+    CUFF_ROT = envf("CUFF_ROT", 0.13f);
+    W_SLIDEV = envf("W_SLIDEV", 0.0f);
+    SLIDE_LEN = envf("SLIDE_LEN", 82.0f);
     W_CROSS = envf("W_CROSS", 0.04f);
     W_PALM = envf("W_PALM", 6.0f);
     W_KNUCKLE = envf("W_KNUCKLE", 3.0f);
@@ -265,7 +274,8 @@ static void evaluate(Ctx& cx, const float* xin, Report& R, bool full = false, Gr
     float clamps = 0, cl2 = 0, cl3 = 0;
     vec3 fpd;
     float sLift = cx.solve(wrist, q, lift, &clamps, &foreRel, &upperRel, &fpd);
-    float sTop = cx.solve(wrist + vec3(0, pumpHi, 0), q, lift, &cl2), sBot = cx.solve(wrist + vec3(0, pumpLo, 0), q, lift, &cl3);
+    mat4 foreHi, foreLo;
+    float sTop = cx.solve(wrist + vec3(0, pumpHi, 0), q, lift, &cl2, &foreHi), sBot = cx.solve(wrist + vec3(0, pumpLo, 0), q, lift, &cl3, &foreLo);
     float sNo = cx.I->armStrainSide(Side::Right, wrist, q);
     vec3 o(x[P_OX], x[P_OY], 0.0f);
     float sPre = cx.solve(wrist - rotate(q, o), q, lift);
@@ -338,6 +348,25 @@ static void evaluate(Ctx& cx, const float* xin, Report& R, bool full = false, Gr
             R.say("  self (grip) %.2f mm (%s in %s)", sp.depth * 1000.0f, sp.aBone >= 0 ? boneName(Bone(sp.aBone)) : "-", sp.bBone >= 0 ? boneName(Bone(sp.bBone)) : "-");
     }
     R.add("worstpen", 500.0f * sq(over(worstDepth, 0.35f)));
+    if (W_CUFF > 0.0f) {
+        // (FA holds the grip, FB the partner at the clasp.) Only the partner's forearm is kept: the
+        // other parts are moved out of the way.
+        const vec3 wB = FB.frame[2].translation(), axX = normalize(transformDir(FB.frame[2], vec3(1, 0, 0))),
+                   axZ = normalize(transformDir(FB.frame[2], vec3(0, 0, 1)));
+        float worstCuff = 0.0f, cuffCost = 0.0f;
+        for (const mat4* fore : {&foreRel, &foreHi, &foreLo})
+            for (int k = 0; k < 5; ++k) {
+                ArmFrames FC;
+                for (int i = 0; i < kNArm; ++i) FC.frame[i] = translate(vec3(0, 10.0f, 0));
+                const mat4 turn = k == 0 ? mat4() : toMat4(axisAngle(k < 3 ? axX : axZ, (k & 1) ? CUFF_ROT : -CUFF_ROT));
+                FC.frame[1] = translate(wB) * turn * translate(-wB) * T * *fore;
+                const PenResult r = penetrate(G, FA, FC, dec, 0.0f, true);
+                worstCuff = std::max(worstCuff, r.depth * 1000.0f);
+                cuffCost += sq(over(r.depth * 1000.0f, 0.2f));
+            }
+        R.add("cuff", W_CUFF * cuffCost);
+        R.say("opt10: grip in the partner's forearm cuff (pump extremes, turned +-%.2f rad): worst %.2f mm", CUFF_ROT, worstCuff);
+    }
     // --- metrics at the grip (FA holds the grip, FB the partner at the clasp)
     float palmGap = 1e9f;
     {
@@ -433,7 +462,7 @@ static void evaluate(Ctx& cx, const float* xin, Report& R, bool full = false, Gr
     reg += 400.0f * (sq(under(fg.v[0][1], -0.35f)) + sq(under(fo.v[0][1], -0.40f)));
     R.add("reg", reg);
     R.add("lift", W_LIFT * sq(lift));
-    R.add("slide", 0.02f * sq((o.x - 0.045f) * 1000.0f * 0.1f) + 0.02f * sq(o.y * 1000.0f * 0.1f));
+    R.add("slide", 0.02f * sq((o.x - 0.045f) * 1000.0f * 0.1f) + 0.02f * sq(o.y * 1000.0f * 0.1f) + W_SLIDEV * sq(over(length(o) * 1000.0f, SLIDE_LEN)));
     R.say("worst penetration %.2f mm (%s)", worstDepth, worstAt.c_str());
 }
 

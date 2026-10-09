@@ -154,7 +154,7 @@ inline const FingerPose& posePress() {
 // flat over the back of its hand). Fitted together with the clasp placement (see planHandshake),
 // not tuned by eye.
 inline const FingerPose& poseShakeOpen() {
-    static FingerPose p = fpMake({{0.606f, -0.448f, -0.037f, 0.342f}, {0.06f, 0.10f, 0.12f, 0.06f}, {0.0f, 0.12f, 0.14f, 0.06f},
+    static FingerPose p = fpMake({{0.581f, -0.552f, 0.133f, 0.303f}, {0.06f, 0.10f, 0.12f, 0.06f}, {0.0f, 0.12f, 0.14f, 0.06f},
                                   {-0.05f, 0.16f, 0.16f, 0.08f}, {-0.10f, 0.20f, 0.18f, 0.08f}});
     return p;
 }
@@ -170,21 +170,25 @@ inline const FingerPose& poseShakeReach() {
     return p;
 }
 inline const FingerPose& poseShakeGrip() {
-    static FingerPose p = fpMake({{1.411f, -0.400f, 1.013f, 0.950f}, {-0.080f, 0.166f, 0.942f, 0.284f}, {-0.022f, 0.202f, 1.449f, 0.599f},
-                                  {0.093f, 0.312f, 1.460f, 0.605f}, {0.223f, 0.428f, 0.992f, 0.315f}});
+    static FingerPose p = fpMake({{1.289f, -0.333f, 0.887f, 0.999f}, {-0.120f, 0.127f, 1.135f, 0.205f}, {-0.023f, 0.199f, 1.566f, 0.473f},
+                                  {0.090f, 0.322f, 1.573f, 0.477f}, {0.215f, 0.430f, 1.130f, 0.202f}});
     return p;
 }
 // Handshake clasp placement (planHandshake), right-hand convention; fitted with the two presets above.
-constexpr float kShakePitch = 0.441f;   // fingers below the horizontal in the vertical palm plane
-constexpr float kShakeYaw = 0.510f;     // palm plane turned across the body from the shoulder-clasp line
-constexpr float kShakeElbow = 0.850f;   // elbow raised about the shoulder-wrist axis while in contact
-constexpr float kShakePump = 0.0285f;   // pump amplitude
-// A handshake cut short (see shakeLetGo): the hand opens in this time, and the robot that was cut is
-// back at its rest this long after the cut (Timing::Retract, and the 50 ms its next Retract waits).
+constexpr float kShakePitch = 0.442f;   // fingers below the horizontal in the vertical palm plane
+constexpr float kShakeYaw = 0.524f;     // palm plane turned across the body from the shoulder-clasp line
+constexpr float kShakeElbow = 0.843f;   // elbow raised about the shoulder-wrist axis while in contact
+constexpr float kShakePump = 0.0270f;   // pump amplitude
+// A handshake cut short in contact (see shakeLetGo): the hand opens in kShakeLetGoOpen; the robot
+// that was cut then backs its hand off the partner's in kShakeLetGoOut, and is back at its rest
+// kShakeLetGoQuick after the cut (at most 2.2 m/s, 2.6 m/s for a left-handed player's writing hand).
+// Cut short before the hands meet, a hand goes back to its rest in kShakeBackBefore at least.
 constexpr float kShakeLetGoOpen = 0.14f;
-constexpr float kShakeLetGoQuick = 0.40f;
-inline vec3 shakeAnchor() { return vec3(0.0137f, -0.0579f, 0.0341f); }   // hand point on the clasp vertical
-inline vec3 shakeSlide() { return vec3(0.0710f, -0.0474f, 0.0f); }      // contact -> pre-contact offset
+constexpr float kShakeLetGoOut = 0.12f;
+constexpr float kShakeLetGoQuick = 0.70f;
+constexpr float kShakeBackBefore = 0.45f;
+inline vec3 shakeAnchor() { return vec3(0.0135f, -0.0567f, 0.0337f); }   // hand point on the clasp vertical
+inline vec3 shakeSlide() { return vec3(0.0667f, -0.0457f, 0.0f); }      // contact -> pre-contact offset
 inline const FingerPose& poseLooseFist() {
     static FingerPose p = fpMake({{0.75f, 0.30f, 0.40f, 0.30f}, {0.02f, 1.05f, 1.30f, 0.70f}, {0.0f, 1.12f, 1.35f, 0.72f},
                                   {-0.03f, 1.18f, 1.38f, 0.72f}, {-0.06f, 1.24f, 1.40f, 0.72f}});
@@ -1585,15 +1589,23 @@ struct Animator::Impl {
     // has it, then backs off along the slide (shakeLetGo). The plan's clasp and pre-contact poses
     // and its contact window are kept for that; shakeCutAt is when this robot's handshake was cut
     // (its partner reads it and lets go from the same instant: followPartnerCut), shakeCutSeen the
-    // partner's cut already followed. A right-handed robot's next task waits until its hand is out
-    // of the partner's (shakeClearAt); a Retract keeps the way back the cut planned (shakeRestAt).
+    // partner's cut already followed. shakeClearAt / shakeRestAt: when the shaking hand is out of
+    // the partner's and back at its rest, after a cut. A right-handed robot's next task waits until
+    // its hand is out of the partner's; a Retract starts at once, keeps the way back the cut planned
+    // and lasts until the hand is at its rest. (The first task that starts forgets both.)
     void shakeLetGo(float tc, float tRest, bool quick, Motion& mo);
     void followPartnerCut();
     quat shakeQ;
     vec3 shakePClasp{0, 0, 0}, shakePPre{0, 0, 0};
     float shakeBegin = -100.0f, shakeContact0 = 0.0f, shakeContact1 = 0.0f, shakeOpenAt = 0.0f;
     float shakeCutAt = -100.0f, shakeCutSeen = -100.0f, shakeClearAt = -100.0f, shakeRestAt = -100.0f;
-    float startAfterCut(const Task& t) const { return t.type == TaskType::Retract ? t.notBefore : std::max(t.notBefore, shakeClearAt); }
+    float startAfterCut(const Task& t) const {
+        return t.type == TaskType::Retract || mirrored ? t.notBefore : std::max(t.notBefore, shakeClearAt);
+    }
+    bool keepsCutWayBack(const Task& t, float start) const { return !mirrored && t.type == TaskType::Retract && start < shakeRestAt - 1e-4f; }
+    float durationFrom(const Task& t, float start) const {   // task t starting at 'start'
+        return keepsCutWayBack(t, start) ? std::max(taskDuration(t), shakeRestAt - start) : taskDuration(t);
+    }
     void writingSpine(SpineParams& sp, const HandSample& hl);
 };
 

@@ -1206,8 +1206,10 @@ void Animator::Impl::writingSpine(SpineParams& sp, const HandSample& hl) {
     if (!wr.running && !wr.penHeld && !(mirrored && running && cur.type == TaskType::Handshake) && time >= wr.suspendUntil) return;
     Pose tmp;
     const float comfy = 0.84f * (L1 + L2);
-    // (Eased in over the last 4 cm, so a hand coming back fast does not jolt the torso.)
-    const float k = 0.04f;
+    // (While the handshake has the hand, eased in over the last 4 cm, so a hand coming back fast
+    // does not jolt the torso; the writing itself leans only once out of comfortable reach.)
+    const bool shaking = mirrored && ((running && cur.type == TaskType::Handshake) || time < wr.suspendUntil);
+    const float k = shaking ? 0.04f : 0.0f;
     for (int it = 0; it < 3; ++it) {
         float D = length(hl.p - shoulderFor(tmp, Side::Left, sp, hl.p)), x = D - comfy;
         if (x <= -k) break;
