@@ -1,9 +1,9 @@
-# Continuous integration: the game built and tested on Linux and, cross-compiled with MinGW-w64,
-# for Windows (its tests run under Wine), as the README's "Building" section describes; the
-# contract with the dedicated server pinned in tools/interop/server-revision and the live online
-# tests against it; plus the workflows' own lint. The release workflow runs it again on the tagged
-# commit (workflow_call). A weekly run checks the contract against the server's master, to see
-# changes on its side early.
+# Continuous integration: the game built and tested on Linux (also with AddressSanitizer and UBSan)
+# and, cross-compiled with MinGW-w64, for Windows (its tests run under Wine), as the README's
+# "Building" section describes; the contract with the dedicated server pinned in
+# tools/interop/server-revision and the live online tests against it; plus the workflows' own lint.
+# The release workflow runs it again on the tagged commit (workflow_call). A weekly run checks the
+# contract against the server's master, to see changes on its side early.
 name: CI
 
 on:
@@ -88,6 +88,67 @@ jobs:
         with:
           path: .ccache
           key: ccache-linux-${{ github.sha }}
+
+  sanitizers:
+    name: Linux tests under AddressSanitizer and UBSan
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install the build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build ccache libssl-dev libx11-dev libgl-dev
+
+      # The voice model too, so that the coach's voice runs under the sanitizers.
+      - name: Restore the voice model archive
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build-san/_deps/*.tar.bz2
+          key: supertonic3-linux-${{ hashFiles('third_party/supertonic3/supertonic3.cmake') }}
+
+      - name: Restore the compiler cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .ccache
+          key: ccache-sanitizers-${{ github.sha }}
+          restore-keys: ccache-sanitizers-
+
+      # Without Stockfish (its own code, built apart and tested upstream): the game's code and the
+      # unit tests, every finding fatal (CMakeLists.txt, SCACELITH_SANITIZE).
+      - name: Configure
+        run: >-
+          cmake -B build-san -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSCACELITH_STOCKFISH=OFF
+          -DSCACELITH_SANITIZE=address,undefined
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Build
+        run: ninja -C build-san scacelith_tests
+
+      - name: Unit tests
+        env:
+          ASAN_OPTIONS: detect_leaks=1:strict_string_checks=1:detect_stack_use_after_return=1
+          UBSAN_OPTIONS: print_stacktrace=1
+        run: ./build-san/scacelith_tests
+
+      - name: Compiler cache statistics
+        if: always()
+        run: ccache --show-stats
+
+      - name: Save the compiler cache
+        if: always() && env.SAVE_CACHE == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .ccache
+          key: ccache-sanitizers-${{ github.sha }}
 
   windows:
     name: Windows build (MinGW-w64) and tests (Wine)

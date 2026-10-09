@@ -669,6 +669,9 @@ TEST(audio_queue_mpmc_stress) {
 }
 
 TEST(audio_mixer_cpu_cost) {
+#ifdef SCACELITH_SANITIZED
+    SKIP("a sanitizer build: its timings mean nothing");
+#endif
     using namespace audio;
     Mixer m(9u);
     m.prepare(kFs);

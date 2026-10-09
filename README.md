@@ -327,6 +327,11 @@ ninja -C build
 
 # The Windows tests under Wine (ninja -C build-win scacelith_tests first)
 tools/test_win.sh             # [filter-substring]
+
+# The Linux tests under AddressSanitizer and UBSan (every finding fatal; the timing tests skip)
+cmake -B build-san -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSCACELITH_STOCKFISH=OFF \
+      -DSCACELITH_SANITIZE=address,undefined
+ninja -C build-san scacelith_tests && ./build-san/scacelith_tests
 ```
 
 Wine names the Linux files in the character set of the host locale: in the POSIX locale (`LANG`
@@ -380,8 +385,9 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised
 ### Continuous integration and releases
 
 GitHub Actions builds and tests every push to master and every pull request
-(`.github/workflows/ci.yml`): the Linux build and its unit tests, the Windows build cross-compiled
-with MinGW-w64 and its unit tests under Wine (both as above), the contract with the dedicated
+(`.github/workflows/ci.yml`): the Linux build and its unit tests, the same tests built with
+AddressSanitizer and UBSan, the Windows build cross-compiled with MinGW-w64 and its unit tests
+under Wine (all as above), the contract with the dedicated
 server and the live online tests against it, and a lint of the workflows (actionlint and zizmor).
 The server is the commit pinned in `tools/interop/server-revision`, so that a run of a game commit
 always tests the same pair (a manual run of the workflow takes another branch of the server as
