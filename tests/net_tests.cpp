@@ -1512,6 +1512,13 @@ std::string fileToken(const std::string& path, const std::string& origin) {
 
 bool hasPrefix(const std::string& s, const char* prefix) { return s.compare(0, std::strlen(prefix), prefix) == 0; }
 
+// The prefix of a token the file keeps itself.
+#ifdef _WIN32
+const char kFilePrefix[] = "dpapi:";
+#else
+const char kFilePrefix[] = "bound:";
+#endif
+
 }  // namespace
 
 // With a keyring the file holds only a reference to the token's item: a new item for every token,
@@ -1930,7 +1937,7 @@ TEST(net_credentials_keyring_unlock_dismissed) {
         CHECK(k.holds(tokenC, C));
         signIn(s, B, tokenB);                       // a new sign-in asks again: dismissed, in the file
         CHECK_EQ(k.prompts.load(), 2);
-        CHECK(hasPrefix(fileToken(path, B), "bound:"));
+        CHECK(hasPrefix(fileToken(path, B), kFilePrefix));
         CHECK(s.get(B, out, true) && out.token == tokenB);   // from the file, no prompt
         CHECK(s.get(A, out, true));
         CHECK(out.token.empty());
@@ -1996,7 +2003,7 @@ TEST(net_credentials_keyring_unlock_timeout) {
         CHECK(ms >= 250 && ms < 3000);
         CHECK_EQ(k.prompts.load(), 1);
         CHECK(!k.prompting);
-        CHECK(hasPrefix(fileToken(path, B), "bound:"));
+        CHECK(hasPrefix(fileToken(path, B), kFilePrefix));
         t0 = std::chrono::steady_clock::now();
         net::Credential out;
         CHECK(s.get(A, out, true));                 // not asked again
