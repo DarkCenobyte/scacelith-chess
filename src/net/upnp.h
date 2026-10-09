@@ -142,7 +142,7 @@ bool parseSoapFault(const std::string& xml, int& code, std::string& description)
 bool xmlFind(const std::string& xml, const std::string& name, std::string& text);
 // Resolves a controlURL against URLBase or the description location.
 std::string resolveUrl(const std::string& base, const std::string& ref);
-// "http://host[:port]/path" with an IPv4 literal host.
+// "http://host[:port]/path" with an IPv4 literal host, and no space or control character.
 bool splitHttpUrl(const std::string& url, std::string& host, uint16_t& port, std::string& path);
 // The best WAN connection service of a description (nullptr when none).
 const Service* pickService(const Description& d);

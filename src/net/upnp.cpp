@@ -38,6 +38,18 @@ bool startsWithNoCase(const std::string& s, const char* prefix) {
     return true;
 }
 
+// Lower-cased scheme of an absolute "scheme://..." URL (RFC 3986 3.1: a letter, then letters,
+// digits, '+', '-' or '.'; case-insensitive), or "" for a relative reference.
+std::string schemeOf(const std::string& url) {
+    size_t sep = url.find("://");
+    if (sep == std::string::npos || sep == 0 || !std::isalpha((unsigned char)url[0])) return "";
+    for (size_t i = 1; i < sep; ++i) {
+        unsigned char c = (unsigned char)url[i];
+        if (!std::isalnum(c) && c != '+' && c != '-' && c != '.') return "";
+    }
+    return lower(url.substr(0, sep));
+}
+
 std::string xmlEscape(const std::string& s) {
     std::string o;
     for (char c : s) {
@@ -342,8 +354,12 @@ bool parseSoapFault(const std::string& xml, int& code, std::string& description)
 }
 
 bool splitHttpUrl(const std::string& url, std::string& host, uint16_t& port, std::string& path) {
-    if (!startsWithNoCase(url, "http://")) return false;
-    std::string rest = url.substr(7);
+    if (schemeOf(url) != "http") return false;
+    // The path is copied into the request line ("GET <path> HTTP/1.1"): a space, CR or LF from the
+    // network (a bare CR survives the SSDP line split, &#13;&#10; the XML unescaping) would forge
+    // the request. RFC 3986 allows none of them in a URL.
+    if (std::any_of(url.begin(), url.end(), [](char ch) { return (unsigned char)ch <= ' ' || ch == '\x7f'; })) return false;
+    std::string rest = url.substr(7);   // after "http://"
     size_t slash = rest.find('/');
     std::string auth = rest.substr(0, slash);
     path = slash == std::string::npos ? "/" : rest.substr(slash);
@@ -363,7 +379,7 @@ bool splitHttpUrl(const std::string& url, std::string& host, uint16_t& port, std
 }
 
 std::string resolveUrl(const std::string& base, const std::string& ref) {
-    if (startsWithNoCase(ref, "http://") || startsWithNoCase(ref, "https://")) return ref;
+    if (!schemeOf(ref).empty()) return ref;   // absolute: splitHttpUrl() then refuses all but http
     size_t schemeEnd = base.find("://");
     if (schemeEnd == std::string::npos) return ref;
     size_t pathStart = base.find('/', schemeEnd + 3);

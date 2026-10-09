@@ -393,6 +393,8 @@ TEST(upnp_parsers) {
     CHECK_EQ(upnp::resolveUrl("http://192.168.1.1:5000/igd/desc.xml", "ctl/IPConn"), std::string("http://192.168.1.1:5000/igd/ctl/IPConn"));
     CHECK_EQ(upnp::resolveUrl("http://192.168.1.1:5000", "ctl"), std::string("http://192.168.1.1:5000/ctl"));
     CHECK_EQ(upnp::resolveUrl("http://192.168.1.1:5000/a/", "http://192.168.1.1:80/x"), std::string("http://192.168.1.1:80/x"));
+    CHECK_EQ(upnp::resolveUrl("http://192.168.1.1:5000/a/", "ftp://192.168.1.1/x"), std::string("ftp://192.168.1.1/x"));   // then refused
+    CHECK_EQ(upnp::resolveUrl("http://192.168.1.1:5000/a/", "x?u=http://h/"), std::string("http://192.168.1.1:5000/a/x?u=http://h/"));
     std::string host, path;
     uint16_t port = 0;
     CHECK(upnp::splitHttpUrl("http://192.168.1.1:5000/ctl/IPConn", host, port, path));
@@ -401,6 +403,9 @@ TEST(upnp_parsers) {
     CHECK(!upnp::splitHttpUrl("https://192.168.1.1/x", host, port, path));
     CHECK(!upnp::splitHttpUrl("http://router.lan/x", host, port, path));   // IPv4 literals only
     CHECK(!upnp::splitHttpUrl("http://192.168.1.1:99999/x", host, port, path));
+    CHECK(!upnp::splitHttpUrl("ftp://192.168.1.1/x", host, port, path));
+    CHECK(!upnp::splitHttpUrl("http://192.168.1.1/ctl\r\nX-Injected: 1", host, port, path));   // would forge the request
+    CHECK(!upnp::splitHttpUrl("http://192.168.1.1/a b", host, port, path));
 
     int code = 0;
     std::string desc;
