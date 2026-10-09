@@ -249,13 +249,13 @@ jobs:
           elif [[ "$EVENT" == schedule ]]; then ref=master
           else ref=$pinned
           fi
-          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+          echo "revision=$ref" >> "$GITHUB_OUTPUT"
           echo "Server revision: $ref (pinned: $pinned)" >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: DarkCenobyte/scacelith-chess-server
-          ref: ${{ steps.server.outputs.ref }}
+          ref: ${{ steps.server.outputs.revision }}
           path: server
           persist-credentials: false
 
