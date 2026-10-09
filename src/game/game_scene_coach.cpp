@@ -1151,6 +1151,7 @@ void GameScene::coachPauseMenuFrame() {
     cp.canOfferDraw = !lesson() && drawOfferPly_ != int(game_.moves().size()) && !rt.drawAnalysis && quietTurn();
     cp.canClaimDraw = !lesson() && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
     cp.canResign = !lesson();
+    cp.resignDraws = !game_.position().canColorMate(chess::opposite(humanColor_));
     // Greyed while a move is on its way (or taken back), which the end of the game would cut off.
     cp.mayEndGame = quietTurn();
     switch (menuChoice(ui::coachPauseMenu(cp))) {

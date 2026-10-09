@@ -263,6 +263,7 @@ struct CoachPause {
     bool canClaimDraw = false;
     bool canResign = true;       // false in the rules lesson
     bool mayEndGame = true;      // false while a move is on its way: Claim draw and Resign greyed
+    bool resignDraws = false;    // the coach cannot checkmate: resigning draws (FIDE 5.1.2)
 };
 MenuAction coachPauseMenu(const CoachPause& p);
 

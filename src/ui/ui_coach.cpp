@@ -474,8 +474,9 @@ MenuAction coachPauseMenu(const CoachPause& cp) {
         im::sound(Sound::Close);
     }
     if (g_pause.confirm == 1) {
-        int r = im::confirmDialog("##coachresign", T("confirm.resign.title"), T("coach.confirm.resign"), T("confirm.resign.ok"),
-                                  T("common.cancel"), true);
+        int r = im::confirmDialog("##coachresign", T("confirm.resign.title"),
+                                  T(cp.resignDraws ? "coach.confirm.resign_draw" : "coach.confirm.resign"),
+                                  T("confirm.resign.ok"), T("common.cancel"), true);
         if (r == 1) act = MenuAction::Resign;
         if (r >= 0) g_pause.confirm = 0;
     } else if (g_pause.confirm == 2) {

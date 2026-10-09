@@ -1000,6 +1000,7 @@ void GameScene::updateOnlineInput() {
         p.canClaimDraw = game_.canClaimThreefold() || game_.canClaimFiftyMove();
         p.canAbort = !myFirstMoveMade() && og_.status == StOngoing;
         p.canReport = link_ && link_->canReport() && !reported_ && !reportQueued_ && !reportSending_;
+        p.resignDraws = !game_.position().canColorMate(chess::opposite(humanColor_));
         switch (menuChoice(ui::onlinePauseMenu(p))) {
         case ui::MenuAction::Resume: paused_ = false; break;
         case ui::MenuAction::OfferDraw:

@@ -28,6 +28,7 @@ OnlineHudAction onlineHud(const OnlineHud& hud);
 // resumes.
 struct OnlinePause {
     bool canOfferDraw = true, canClaimDraw = false, canAbort = false, canReport = true;
+    bool resignDraws = false;   // the opponent cannot checkmate: resigning draws (FIDE 5.1.2)
 };
 MenuAction onlinePauseMenu(const OnlinePause& p);
 
