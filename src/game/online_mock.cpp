@@ -40,7 +40,7 @@ double wallMs() {
 enum Status { Ongoing = 0, WhiteWins = 1, BlackWins = 2, Draw = 3, Aborted = 4 };
 enum Reason {
     RNone = 0, RResignation = 2, RTimeout = 3, RAgreement = 12, RThreefoldClaim = 10, RFiftyClaim = 11,
-    RAbandonment = 20, RAbandonmentVsInsufficient = 21, RAborted = 22, RNoShow = 23
+    RResignationVsInsufficient = 14, RAbandonment = 20, RAbandonmentVsInsufficient = 21, RAborted = 22, RNoShow = 23
 };
 enum GameEventKind { DrawOffered = 1, DrawDeclined = 2, PlayerDisconnected = 3, PlayerReconnected = 4, RematchOffered = 5, RematchDeclined = 6 };
 enum Err {
@@ -58,6 +58,7 @@ static_assert(Ongoing == int(proto::GameStatus::Ongoing) && WhiteWins == int(pro
 static_assert(RNone == int(proto::EndReason::None) && RResignation == int(proto::EndReason::Resignation) &&
                   RTimeout == int(proto::EndReason::Timeout) && RAgreement == int(proto::EndReason::Agreement) &&
                   RThreefoldClaim == int(proto::EndReason::ThreefoldClaim) && RFiftyClaim == int(proto::EndReason::FiftyMoveClaim) &&
+                  RResignationVsInsufficient == int(proto::EndReason::ResignationVsInsufficient) &&
                   RAbandonment == int(proto::EndReason::Abandonment) &&
                   RAbandonmentVsInsufficient == int(proto::EndReason::AbandonmentVsInsufficient) &&
                   RAborted == int(proto::EndReason::Aborted) && RNoShow == int(proto::EndReason::NoShow),
@@ -222,6 +223,7 @@ const char* serverReasonText(int reason) {
     case 11: return "50-move rule (claimed)";
     case 12: return "Draw by agreement";
     case 13: return "Second illegal move, but the opponent cannot checkmate";
+    case 14: return "Resignation, but the opponent cannot checkmate";
     case 20: return "Abandoned (disconnected for too long)";
     case 21: return "Abandoned, but the opponent cannot checkmate";
     case 22: return "Game aborted";
@@ -481,6 +483,10 @@ GameDetails makePastGame(m::Rng& rng, Ending ending, int64_t endedAt, int baseSe
             const int loser = mw == mb ? toMove : (mw < mb ? 0 : 1);
             d.status = loser == 0 ? BlackWins : WhiteWins;
             d.reason = RResignation;
+            if (!game.position().canColorMate(chess::Color(1 - loser))) {
+                d.status = Draw;
+                d.reason = RResignationVsInsufficient;
+            }
             break;
         }
         case Ending::Flag:
@@ -1159,8 +1165,8 @@ struct Room {
     // ---- commands of the local player ----
     void resign(double now) {
         if (over) return error(ErrGameOver);
-        chess.resign(chess::Color(me));
-        finish(int(chess.status()), RResignation, now);
+        chess.resign(chess::Color(me));   // a draw when the opponent cannot mate
+        finish(int(chess.status()), int(chess.endReason()), now);
     }
     void offerDraw(double now) {
         if (over) return error(ErrGameOver);

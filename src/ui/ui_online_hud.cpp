@@ -211,8 +211,9 @@ MenuAction onlinePauseMenu(const OnlinePause& op) {
         im::sound(Sound::Close);
     }
     if (P.confirm == 1) {
-        int r = im::confirmDialog("##onlineresign", T("confirm.resign.title"), T("online.confirm.resign.text"), T("confirm.resign.ok"),
-                                  T("common.cancel"), true);
+        int r = im::confirmDialog("##onlineresign", T("confirm.resign.title"),
+                                  T(op.resignDraws ? "confirm.resign.draw" : "online.confirm.resign.text"),
+                                  T("confirm.resign.ok"), T("common.cancel"), true);
         if (r == 1) act = MenuAction::Resign;
         if (r >= 0) P.confirm = 0;
     } else if (P.confirm == 2) {

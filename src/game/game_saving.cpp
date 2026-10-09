@@ -12,12 +12,16 @@ namespace {
 // game_scene_online.cpp names them.
 enum Status { StOngoing = 0, StWhiteWins = 1, StBlackWins = 2, StDraw = 3, StAborted = 4 };
 constexpr int kReasonServerAborted = 25;
+// The last chess::GameEndReason (1..14 are the chess reasons, 20 and above the online ones).
+constexpr int kLastChessReason = int(chess::GameEndReason::ResignationVsInsufficient);
 // The names above are the generated ones (net/protocol_gen.h): a schema change fails here.
 static_assert(StOngoing == int(net::proto::GameStatus::Ongoing) && StWhiteWins == int(net::proto::GameStatus::WhiteWins) &&
                   StBlackWins == int(net::proto::GameStatus::BlackWins) && StDraw == int(net::proto::GameStatus::Draw) &&
                   StAborted == int(net::proto::GameStatus::Aborted),
               "GameStatus");
-static_assert(kReasonServerAborted == int(net::proto::EndReason::ServerAborted), "EndReason");
+static_assert(kReasonServerAborted == int(net::proto::EndReason::ServerAborted) &&
+                  kLastChessReason == int(net::proto::EndReason::ResignationVsInsufficient),
+              "EndReason");
 
 }  // namespace
 
@@ -52,7 +56,7 @@ std::string onlineEndKey(int reason) {
     case 24: return "reason.online.forfeit";
     case 25: return "reason.online.server_aborted";
     case 26: return "reason.online.both_disconnected";
-    default: return reason > 0 && reason <= 13 ? chess::endReasonKey(chess::GameEndReason(reason)) : "";
+    default: return reason > 0 && reason <= kLastChessReason ? chess::endReasonKey(chess::GameEndReason(reason)) : "";
     }
 }
 
@@ -86,13 +90,16 @@ bool directMatchRecord(const net::OnlineGame& og, DirectRecord& out) {
     info.timeControl = tc.pgnTag();
     if (og.status == StOngoing) {
         // Left before the authority answered: aborted before the player's first move, otherwise
-        // resigned. A first move sent but not confirmed yet is not in og.moves: the scene resigns
-        // then (GameScene::myFirstMoveMade), but nothing is saved rather than a record without
-        // the move the authority may have applied before the resignation.
+        // resigned (a draw when the opponent cannot mate, as the authority decides it). A first
+        // move sent but not confirmed yet is not in og.moves: the scene resigns then
+        // (GameScene::myFirstMoveMade), but nothing is saved rather than a record without the
+        // move the authority may have applied before the resignation.
         const bool firstMoveMade = int(og.moves.size()) > og.you;
         if (!firstMoveMade) return false;
-        info.result = og.you == 0 ? "0-1" : "1-0";
-        info.endKey = "reason.resignation";
+        chess::Game ended = out.game;
+        ended.resign(chess::Color(og.you));
+        info.result = ended.resultString();
+        info.endKey = chess::endReasonKey(ended.endReason());
         out.finished = true;
         return true;
     }

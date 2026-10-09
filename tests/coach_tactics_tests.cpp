@@ -75,6 +75,46 @@ TEST(coach_tactics_material_and_see) {
     CHECK_EQ(seeSquare(h, sq("a7"), White), 0);   // no attacker
 }
 
+TEST(coach_tactics_points) {
+    // In centipawns a bishop (330) is worth more than a knight (320); in the points the coach
+    // speaks, both are worth 3: a knight taking a defended bishop wins nothing.
+    Position nb = fen("4k3/8/8/2p5/1b6/3N4/8/4K3 w - - 0 1");
+    CHECK_EQ(see(nb, san(nb, "Nxb4")), 10);
+    CHECK_EQ(seePoints(nb, san(nb, "Nxb4")), 0);
+    CHECK_EQ(seeSquare(nb, sq("b4"), White), 10);
+    CHECK_EQ(seeSquarePoints(nb, sq("b4"), White), 0);
+    CHECK_EQ(hangingPieces(nb, Black, false), uint64_t(0));
+    CHECK_EQ(bestCapturePoints(nb, White), 0);
+    Position ruy = afterSan({"e4", "e5", "Nf3", "Nc6", "Bb5", "a6"});
+    CHECK_EQ(seePoints(ruy, san(ruy, "Bxc6")), 0);
+    // The best capture on the board, in points.
+    Position free = fen("4k3/8/8/8/1b6/3N4/8/4K3 w - - 0 1");
+    CHECK_EQ(bestCapturePoints(free, White), 3);
+    CHECK_EQ(bestCapturePoints(free, Black), 0);
+    Position two = fen("4k3/8/2p5/1r1n4/2P1P3/8/8/4K3 w - - 0 1");   // cxb5 wins 4 net, exd5 (cxd5) 2
+    CHECK_EQ(bestCapturePoints(two, White), 4);
+    // The side to move takes back with its legal captures only: in check from the queen on c3, the
+    // bishop cannot take the rook on b8; mated, the knight takes nothing.
+    Position chk = fen("1r4k1/5p1p/6p1/8/5B2/2q5/P4PPP/4K3 w - - 0 1");
+    CHECK_EQ(bestCapturePoints(chk, White), 0);
+    Position mated = fen("6k1/1b3ppp/8/N7/8/8/5PPP/3r2K1 w - - 0 1");
+    CHECK(mated.isCheckmate());
+    CHECK_EQ(bestCapturePoints(mated, White), 0);
+    // Who takes part in an exchange on d5: the rook on d1 behind d2 (x-ray), not the bishop on e6
+    // pinned to its king along the e-file.
+    Position x = fen("4k3/8/4b3/3n4/8/8/3R4/3RR1K1 w - - 0 1");
+    CHECK_EQ(exchangeParticipants(x, sq("d5"), true), bits({"d2", "e6"}));
+    CHECK_EQ(exchangeParticipants(x, sq("d5"), false), bits({"d2", "d1"}));
+    // A knight attacking two defended bishops forks nothing; a bishop "pinning" a knight to a bishop
+    // or "skewering" a bishop in front of a knight wins nothing either.
+    Position f = fen("3k4/2b1b3/8/3N4/8/8/8/4K3 b - - 0 1");
+    CHECK_EQ(forkTargets(f, sq("d5")), uint64_t(0));
+    Position pn = fen("4k3/3b4/2n5/1B6/8/8/8/4K3 b - - 0 1");
+    CHECK(pins(pn, Black).empty());
+    Position sk = fen("4k3/3n4/2b5/1B6/8/8/8/4K3 b - - 0 1");
+    CHECK(skewers(sk, Black).empty());
+}
+
 TEST(coach_tactics_hanging) {
     Position h = afterSan({"e4", "e5", "Nf3", "d5"});
     CHECK_EQ(hangingPieces(h, Black, false), bits({"e5"}));

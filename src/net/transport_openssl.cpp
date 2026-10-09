@@ -1,13 +1,16 @@
-// Linux transport (development and test builds): TCP + OpenSSL, a minimal HTTP/1.1 client
-// (Connection: close, Content-Length or chunked bodies) and an RFC 6455 WebSocket client
-// (masked binary frames, fragmentation, ping/pong, closing handshake) whose socket lives on
-// one I/O thread per connection. Sockets are non-blocking; every wait is a poll() with a
-// deadline and a wake-up pipe, so cancel() and close() never hang.
+// Linux transport: TCP + OpenSSL, a minimal HTTP/1.1 client (Connection: close, Content-Length or
+// chunked bodies) and an RFC 6455 WebSocket client (masked binary frames, fragmentation,
+// ping/pong, closing handshake) whose socket lives on one I/O thread per connection. Sockets are
+// non-blocking; every wait is a poll() with a deadline and a wake-up pipe, so cancel() and close()
+// never hang. Nothing written to a socket raises SIGPIPE (send with MSG_NOSIGNAL, and the same for
+// OpenSSL's writes: noSignalWriteBio), whatever the process does with that signal.
 #if !defined(_WIN32) && defined(SCACELITH_HAS_OPENSSL)
 #include "transport.h"
 #include "crypto.h"
+#include "socket_util.h"
 #include "../core/log.h"
 
+#include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 #include <openssl/x509v3.h>
@@ -15,10 +18,11 @@
 #include <cerrno>
 #include <chrono>
 #include <condition_variable>
+#include <cstdint>
 #include <cstring>
 #include <deque>
 #include <fcntl.h>
-#include <netdb.h>
+#include <mutex>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <poll.h>
@@ -65,6 +69,55 @@ bool unknownIssuerError(int err) {
 }
 
 int verifyCallback(int ok, X509_STORE_CTX* st);
+
+// OpenSSL's socket BIO writes with write(2): on a socket that can no longer send (reset by the
+// peer, or shut down by abortSocket()) the kernel raises SIGPIPE, whose default action ends the
+// process. Every byte OpenSSL writes (the handshake, SSL_write, the close_notify of SSL_shutdown,
+// a key update answered inside SSL_read) goes through this BIO instead, which sends with
+// MSG_NOSIGNAL: such a write fails with EPIPE, whatever the process does with SIGPIPE. Reads keep
+// OpenSSL's socket BIO. The descriptor is the BIO's data; the BIO never closes it.
+int noSignalWrite(BIO* b, const char* data, int n) {
+    BIO_clear_retry_flags(b);
+    const int fd = int(reinterpret_cast<intptr_t>(BIO_get_data(b)));
+    ssize_t r;
+    do { r = ::send(fd, data, size_t(n), MSG_NOSIGNAL); } while (r < 0 && errno == EINTR);
+    if (r < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) BIO_set_retry_write(b);
+    return int(r);
+}
+
+long noSignalCtrl(BIO* b, int cmd, long, void* ptr) {
+    switch (cmd) {
+    case BIO_CTRL_FLUSH: return 1;
+    case BIO_C_GET_FD: {
+        const int fd = int(reinterpret_cast<intptr_t>(BIO_get_data(b)));
+        if (ptr) *static_cast<int*>(ptr) = fd;
+        return fd;
+    }
+    default: return 0;
+    }
+}
+
+BIO* noSignalWriteBio(int fd) {
+    static BIO_METHOD* const method = [] {
+        BIO_METHOD* m = BIO_meth_new(BIO_get_new_index() | BIO_TYPE_SOURCE_SINK | BIO_TYPE_DESCRIPTOR, "socket send (no SIGPIPE)");
+        if (m && (!BIO_meth_set_write(m, noSignalWrite) || !BIO_meth_set_ctrl(m, noSignalCtrl))) {
+            BIO_meth_free(m);
+            m = nullptr;
+        }
+        return m;
+    }();
+    BIO* b = method ? BIO_new(method) : nullptr;
+    if (!b) return nullptr;
+    BIO_set_data(b, reinterpret_cast<void*>(intptr_t(fd)));
+    BIO_set_init(b, 1);
+    return b;
+}
+
+// OpenSSL frees its global state from an atexit handler it registers at its first use, which comes
+// after the online client is built (a function-local static whose destructor ends its network
+// threads): that handler would run first, under threads still inside a TLS call. Asked for before
+// main(), the process ends without it.
+[[maybe_unused]] const bool g_openSslNoAtexit = OPENSSL_init_ssl(OPENSSL_INIT_NO_ATEXIT, nullptr) == 1;
 
 // One client context for the process: system trust store, TLS 1.2+.
 SSL_CTX* clientContext() {
@@ -168,8 +221,14 @@ public:
         }
     }
 
-    // Unblocks a poll() in progress from another thread.
+    // Unblocks a poll() or a name resolution in progress from another thread.
     void abortSocket() {
+        {
+            std::lock_guard<std::mutex> lk(lookupMu_);
+            if (lookup_) lookup_->stop();
+        }
+        // Under fdMu_: a socket closed meanwhile could hand its number to another connection.
+        std::lock_guard<std::mutex> lk(fdMu_);
         int f = fd_.load();
         if (f >= 0) ::shutdown(f, SHUT_RDWR);
     }
@@ -179,8 +238,7 @@ public:
             SSL_free(ssl_);
             ssl_ = nullptr;
         }
-        int f = fd_.exchange(-1);
-        if (f >= 0) ::close(f);
+        closeFd();
     }
 
     void shutdownTls() {
@@ -189,8 +247,17 @@ public:
 
 private:
     std::atomic<int> fd_{-1};
+    std::mutex fdMu_;                     // closing fd_ against abortSocket() on another thread
     SSL* ssl_ = nullptr;
     CancelToken* cancel_ = nullptr;
+    std::mutex lookupMu_;
+    sock::Lookup* lookup_ = nullptr;      // the name resolution open() waits for (abortSocket stops it)
+
+    void closeFd() {
+        std::lock_guard<std::mutex> lk(fdMu_);
+        int f = fd_.exchange(-1);
+        if (f >= 0) ::close(f);
+    }
 
     bool waitFor(short events, const Deadline& dl) {
         if (cancel_ && cancel_->cancelled()) { error = "cancelled"; return false; }
@@ -203,26 +270,33 @@ private:
         return true;
     }
 
+    // The name is resolved within the connection's deadline and given up on cancel (sock::Lookup:
+    // getaddrinfo itself cannot be interrupted), then each address is tried in turn.
     bool connectTcp(const std::string& host, uint16_t port, const Deadline& dl) {
-        addrinfo hints{};
-        hints.ai_family = AF_UNSPEC;
-        hints.ai_socktype = SOCK_STREAM;
-        addrinfo* res = nullptr;
-        std::string portStr = std::to_string(port);
-        int gai = getaddrinfo(host.c_str(), portStr.c_str(), &hints, &res);
-        if (gai != 0) {
-            error = "network";
-            detail = std::string("resolve: ") + gai_strerror(gai);
+        if (cancel_ && cancel_->cancelled()) { error = "cancelled"; return false; }
+        sock::Lookup lookup(host, port, true);
+        {
+            std::lock_guard<std::mutex> lk(lookupMu_);
+            lookup_ = &lookup;
+        }
+        const sock::Lookup::Result found = lookup.wait(dl.remaining(), [this] { return cancel_ && cancel_->cancelled(); });
+        {
+            std::lock_guard<std::mutex> lk(lookupMu_);
+            lookup_ = nullptr;
+        }
+        if (found != sock::Lookup::Result::Found) {
+            error = found == sock::Lookup::Result::TimedOut ? "timeout" : found == sock::Lookup::Result::Stopped ? "cancelled" : "network";
+            detail = found == sock::Lookup::Result::NotFound ? "resolve: " + lookup.error() : std::string("resolve: ") + error;
             return false;
         }
         bool ok = false;
-        for (addrinfo* a = res; a && !ok; a = a->ai_next) {
-            int f = ::socket(a->ai_family, a->ai_socktype | SOCK_NONBLOCK | SOCK_CLOEXEC, a->ai_protocol);
+        for (const sock::Endpoint& a : lookup.endpoints()) {
+            int f = ::socket(a.family(), SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
             if (f < 0) continue;
             fd_.store(f);
             int one = 1;
             setsockopt(f, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
-            int r = ::connect(f, a->ai_addr, a->ai_addrlen);
+            int r = ::connect(f, reinterpret_cast<const sockaddr*>(a.storage), socklen_t(a.len));
             if (r != 0 && errno == EINPROGRESS) {
                 if (waitFor(POLLOUT, dl)) {
                     int err = 0;
@@ -237,11 +311,9 @@ private:
                 detail = std::strerror(errno);
             }
             if (r == 0) { ok = true; break; }
-            fd_.store(-1);
-            ::close(f);
+            closeFd();
             if (error == "timeout" || error == "cancelled") break;
         }
-        freeaddrinfo(res);
         if (!ok && error.empty()) error = "network";
         return ok;
     }
@@ -251,7 +323,16 @@ private:
         if (!ctx || !(ssl_ = SSL_new(ctx))) { error = "tls"; detail = sslErrors(); return false; }
         pinned = !pin.empty();
         SSL_set_app_data(ssl_, this);
-        SSL_set_fd(ssl_, fd());
+        BIO* rbio = BIO_new_socket(fd(), BIO_NOCLOSE);
+        BIO* wbio = noSignalWriteBio(fd());
+        if (!rbio || !wbio) {
+            BIO_free(rbio);
+            BIO_free(wbio);
+            error = "tls";
+            detail = sslErrors();
+            return false;
+        }
+        SSL_set_bio(ssl_, rbio, wbio);   // owned by ssl_ from now on
         SSL_set_mode(ssl_, SSL_MODE_ENABLE_PARTIAL_WRITE | SSL_MODE_ACCEPT_MOVING_WRITE_BUFFER);
         if (isIpLiteral(host)) {
             X509_VERIFY_PARAM_set1_ip_asc(SSL_get0_param(ssl_), host.c_str());

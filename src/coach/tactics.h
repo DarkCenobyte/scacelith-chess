@@ -32,32 +32,46 @@ int see(const chess::Position& p, const chess::Move& m);
 // Best exchange balance for 'by' starting a capture on 'sq' (cp; <= 0 when no capture wins
 // anything; 0 when 'by' has no attacker or the square is empty or holds a piece of 'by').
 int seeSquare(const chess::Position& p, chess::Square sq, chess::Color by);
+// The same two exchanges counted in points (kPiecePoints: a knight and a bishop are worth the
+// same), the unit the coach speaks in. Whatever a sentence says about winning or losing material
+// is decided with these: in centipawns a knight taking a defended bishop "wins" 10.
+int seePoints(const chess::Position& p, const chess::Move& m);
+int seeSquarePoints(const chess::Position& p, chess::Square sq, chess::Color by);
+// The most 'by' wins with one exchange anywhere on the board (points, 0 when nothing pays): what
+// the side to move takes back where a line of moves stops. For the side to move, its legal
+// captures only (nothing when it is mated or stalemated, only an answer to a check).
+int bestCapturePoints(const chess::Position& p, chess::Color by);
+// Pieces of each side that take part in an exchange on 'sq' (it holds a piece): the attackers of
+// the square and the sliders behind them on its lines (x-rays), without a piece pinned to its king
+// off the line to 'sq'. directOnly: the attackers seen at once, pinned or not (what a player counts
+// at first glance).
+uint64_t exchangeParticipants(const chess::Position& p, chess::Square sq, bool directOnly);
 // c's pieces (king excluded) the opponent attacks and can win. undefendedOnly (levels 1-2):
 // attacked and not defended at all ("it has no protector"); otherwise any piece whose capture wins
-// material (seeSquare > 0: also a piece defended but attacked by a cheaper one).
+// material (seeSquarePoints > 0: also a piece defended but attacked by a cheaper one).
 uint64_t hangingPieces(const chess::Position& p, chess::Color c, bool undefendedOnly);
 // The piece on s is attacked and nothing of its own colour defends it.
 bool isUndefended(const chess::Position& p, chess::Square s);
 
 // ---- Tactical motifs ------------------------------------------------------------------------
 // The piece on 'sq' (just moved there) attacks two or more enemy targets that are the king, worth
-// more than it, or winning by SEE, and stands safe there. Returns the targets (0 when fewer than
-// two).
+// more than it in points, or winning by SEE, and stands safe there (no enemy capture of it breaks
+// even). Returns the targets (0 when fewer than two).
 uint64_t forkTargets(const chess::Position& after, chess::Square sq);
 
 struct Pin {
     chess::Square pinner = chess::NoSquare, pinned = chess::NoSquare, behind = chess::NoSquare;
     bool absolute = false;   // behind is the king: the pinned piece may not move off the line
 };
-// Pieces of 'victim' pinned by an enemy slider, to the king or to a more valuable piece. A pinned
-// piece that can capture its pinner along the line is not listed (the pin does not hold).
+// Pieces of 'victim' pinned by an enemy slider, to the king or to a piece worth more points. A
+// pinned piece that can capture its pinner along the line is not listed (the pin does not hold).
 std::vector<Pin> pins(const chess::Position& p, chess::Color victim);
 
 struct Skewer {
     chess::Square attacker = chess::NoSquare, front = chess::NoSquare, behind = chess::NoSquare;
 };
-// An enemy slider attacks a piece of 'victim' (the king, or a piece worth more than the one behind
-// it) and another piece of 'victim' stands behind it on the same line.
+// An enemy slider attacks a piece of 'victim' (the king, or a piece worth more points than the one
+// behind it) and another piece of 'victim' stands behind it on the same line.
 std::vector<Skewer> skewers(const chess::Position& p, chess::Color victim);
 
 struct Discovery {
@@ -85,8 +99,8 @@ MatePattern classifyMate(const chess::Position& mated);   // the side to move is
 
 // ---- Pieces and pawns ------------------------------------------------------------------------
 // The piece on s (knight, bishop, rook or queen) is attacked with a winning capture and every move
-// it has loses by SEE too (lichess-puzzler's is_trapped); false when its side is in check or the
-// piece is pinned. Works for either colour (the turn is passed on a copy when needed).
+// it has loses by SEE too, in points (lichess-puzzler's is_trapped); false when its side is in
+// check or the piece is pinned. Works for either colour (the turn is passed on a copy when needed).
 bool isTrapped(const chess::Position& p, chess::Square s);
 bool isPassed(const chess::Position& p, chess::Square pawn);
 int undevelopedMinors(const chess::Position& p, chess::Color c);   // knights / bishops on b1 c1 f1 g1 (b8 c8 f8 g8)
@@ -119,6 +133,7 @@ struct MoveFacts {
     chess::PieceType promotion = chess::NoPiece;
     bool check = false, doubleCheck = false, discoveredCheck = false, stalemate = false;
     int seeCp = 0;               // exchange balance of the move for the mover (see())
+    int seePts = 0;              // the same in points (seePoints()): what the coach says about it
     uint64_t newlyAttacked = 0;  // enemy pieces attacked after the move and not before
     uint64_t forks = 0;          // forkTargets(after, to)
     uint64_t undefended = 0;     // own pieces the moved piece defended before and no longer does
@@ -135,6 +150,7 @@ struct LineStep {
     chess::PieceType promotion = chess::NoPiece;
     bool check = false, mate = false, stalemate = false;
     int balance = 0;             // materialBalance(after, pov): the listener's material lead after the ply
+    bool guessed = false;        // not the engine's: a natural reply added where its line stopped
 };
 // The legal prefix of 'uci' from 'start' (at most maxPlies), the balance seen by 'pov'.
 std::vector<LineStep> replayLine(const chess::Position& start, const std::vector<std::string>& uci, chess::Color pov,

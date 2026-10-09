@@ -787,7 +787,8 @@ void GameScene::coachMoveCompleted() {
 void GameScene::coachGameOver() {
     CoachRuntime& rt = coachRuntime();
     rt.handshakeReported = false;
-    bool resigned = game_.endReason() == GameEndReason::Resignation;
+    // A resignation is a draw when the coach cannot mate (FIDE 5.1.2): the player resigned all the same.
+    bool resigned = game_.endReason() == GameEndReason::Resignation || game_.endReason() == GameEndReason::ResignationVsInsufficient;
     if (rt.sessionRunning) rt.session.onGameOver(game_, resigned);
 }
 
@@ -1150,6 +1151,7 @@ void GameScene::coachPauseMenuFrame() {
     cp.canOfferDraw = !lesson() && drawOfferPly_ != int(game_.moves().size()) && !rt.drawAnalysis && quietTurn();
     cp.canClaimDraw = !lesson() && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
     cp.canResign = !lesson();
+    cp.resignDraws = !game_.position().canColorMate(chess::opposite(humanColor_));
     // Greyed while a move is on its way (or taken back), which the end of the game would cut off.
     cp.mayEndGame = quietTurn();
     switch (menuChoice(ui::coachPauseMenu(cp))) {

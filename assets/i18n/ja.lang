@@ -230,6 +230,7 @@ pause.claim_draw.help = 3回同一局面、または50手ルール。
 pause.resign = 投了
 confirm.resign.title = 投了
 confirm.resign.text = この対局を投了しますか？相手の勝ちになります。
+confirm.resign.draw = この対局を投了しますか？相手はもうメイトできないため、引き分けになります。
 confirm.resign.ok = 投了する
 confirm.leave.title = 対局を離れる
 confirm.leave.text = メインメニューに戻りますか？現在の対局は放棄されます。
@@ -267,6 +268,7 @@ reason.threefold_claim = 3回同一局面（申告）
 reason.50_moves_claim = 50手ルール（申告）
 reason.agreement = 合意による引き分け
 reason.illegal_vs_insufficient = 2回目の反則手、ただし相手はメイトできない
+reason.resignation_vs_insufficient = 投了、ただし相手はメイトできない
 
 # ---- Move list ---------------------------------------------------------------------------------
 movelist.title = 棋譜
@@ -966,6 +968,7 @@ hotseat.summary = {0} – {1}
 hotseat.your_move = {0}さんの手番です
 hotseat.flag = {0}の時間が切れました。
 hotseat.confirm.resign = {0}が投了しますか？{1}の勝ちになります。
+hotseat.confirm.resign_draw = {0}が投了しますか？{1}はもうメイトできないため、引き分けになります。
 hotseat.draw.offer_noted = 引き分けの提案は指し手とともに伝わります。時計を押した後、{0}に表示されます。
 hotseat.draw.card_title = 引き分けの提案
 hotseat.draw.offered = {0}が引き分けを提案しています。
@@ -1041,6 +1044,7 @@ coach.offer.decline = 続ける
 coach.pause.take_back = 自分の手を戻す
 coach.pause.take_back.help = 最後の手を戻します。コーチがすでに応じていれば、その手も戻します。
 coach.confirm.resign = この対局を投了しますか？コーチの勝ちになります。
+coach.confirm.resign_draw = この対局を投了しますか？コーチはもうメイトできないため、引き分けになります。
 coach.confirm.leave = メインメニューに戻りますか？コーチとのこの対局は放棄されます。
 # Game over card of a coach game, and the end of the lesson on the rules
 coach.gameover.again = もう一局

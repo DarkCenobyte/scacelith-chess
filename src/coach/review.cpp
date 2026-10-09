@@ -225,15 +225,85 @@ void limitPointing(Beat& b) {
     b.gestures.swap(kept);
 }
 
+int Ctx::lossAfter(int plies) const {
+    const int n = std::min<int>(plies, int(r.size()));
+    if (n <= 0) return 0;
+    int l = base - r[size_t(n - 1)].balance;
+    if (n < int(r.size())) l = std::min(l, base - r[size_t(n)].balance);
+    else if (rEnd.sideToMove() == human) l -= bestCapturePoints(rEnd, human);
+    return l;
+}
+
 int Ctx::lossWithin(int plies) const {
     int worst = 0;
     const int n = std::min<int>(plies, int(r.size()));
-    for (int i = 0; i < n; ++i) {
-        int l = base - r[size_t(i)].balance;
-        if (i + 1 < int(r.size())) l = std::min(l, base - r[size_t(i + 1)].balance);
-        worst = std::max(worst, l);
-    }
+    for (int i = 1; i <= n; ++i) worst = std::max(worst, lossAfter(i));
     return worst;
+}
+
+int heldGain(const std::vector<LineStep>& line, size_t plies, int base, Color pov, const Position& end) {
+    const size_t n = std::min(plies, line.size());
+    if (n == 0) return 0;
+    int g = line[n - 1].balance - base;
+    if (n < line.size()) g = std::min(g, line[n].balance - base);
+    else if (end.sideToMove() != pov) g -= bestCapturePoints(end, opposite(pov));
+    return g;
+}
+
+Position lineEnd(const Position& start, const std::vector<LineStep>& line) {
+    Position q = start;
+    for (const LineStep& st : line) q.makeMove(st.move);
+    return q;
+}
+
+int guessLossBound(const ai::Score& best, const ai::Score& played) {
+    // whiteCp(s, true): the side to move's centipawns, mates as +-1000, clamped.
+    const int b = whiteCp(best, true), p = whiteCp(played, true);
+    return (std::max({0, b - p, -p}) + 50) / 100 + 2;
+}
+
+void extendRefutation(std::vector<LineStep>& r, const Position& p1, Color human, size_t want, int base, int maxLoss) {
+    Position q = lineEnd(p1, r);
+    for (int added = 0; added < 3 && r.size() < want; ++added) {
+        if (!r.empty() && (r.back().mate || r.back().stalemate)) return;
+        Move pick;
+        if (q.sideToMove() == human) {
+            // Take back on the square the coach just took on, with the least valuable piece that
+            // does not lose by it.
+            if (r.empty() || r.back().mover == human || r.back().captured == NoPiece) return;
+            const Square s = r.back().move.to;
+            for (const Move& m : q.legalMoves()) {
+                if (m.to != s || (m.promotion != NoPiece && m.promotion != Queen) || seePoints(q, m) < 0) continue;
+                if (!pick.valid() || q.at(m.from).type < q.at(pick.from).type) pick = m;
+            }
+        } else {
+            // The coach's capture that wins the most, 2 points at least.
+            int most = 1;
+            for (const Move& m : q.legalMoves()) {
+                if (q.at(m.to).empty() || (m.promotion != NoPiece && m.promotion != Queen)) continue;
+                const int g = seePoints(q, m);
+                if (g > most) {
+                    most = g;
+                    pick = m;
+                }
+            }
+        }
+        if (!pick.valid()) return;
+        std::vector<LineStep> step = replayLine(q, {q.toUCI(pick)}, human, 1);
+        if (step.empty()) return;
+        Position next = q;
+        next.makeMove(pick);
+        // A capture that leaves the human more down than the engine's score allows is not what the
+        // engine sees: the human had better than the recapture guessed before it (a bigger piece to
+        // save, a counter-attack), or the capture does not work. Neither is guessed.
+        if (step[0].mover != human && base - step[0].balance - bestCapturePoints(next, human) > maxLoss) {
+            if (!r.empty() && r.back().guessed && r.back().mover == human) r.pop_back();
+            return;
+        }
+        step[0].guessed = true;
+        r.push_back(step[0]);
+        q = next;
+    }
 }
 
 namespace {
@@ -256,7 +326,11 @@ Line narration(const Ctx& c, const Position& before, const LineStep& st, int i) 
         else l.key = "demo.my.move";
     } else {
         l.with("your", pieceArg(before, st.move.from, c.human)).with("sq", Arg::ofSquare(st.move.to));
-        if (before.inCheck() && st.piece == King) l.key = "demo.your.king";
+        // "Your king has to move": only when nothing else gets out of the check.
+        bool kingOnly = before.inCheck() && st.piece == King && st.captured == NoPiece;
+        for (const Move& m : kingOnly ? before.legalMoves() : std::vector<Move>())
+            if (before.at(m.from).type != King) kingOnly = false;
+        if (kingOnly) l.key = "demo.your.king";
         else if (st.captured != NoPiece && i > 0 && c.r[size_t(i - 1)].move.to == st.move.to) l.key = "demo.your.back";
         else if (st.captured != NoPiece) {
             l.key = "demo.your.take";
@@ -289,8 +363,9 @@ void appendDemo(const Ctx& c, const Explanation& ex, Script& s) {
     for (int i = 0; i < plies; ++i) {
         const LineStep& st = c.r[size_t(i)];
         if (st.mover == c.human && st.promotion != NoPiece) {
-            // The human's spare queen is out of the coach's reach: point at the square instead.
-            Beat b = sayBeat("demo.promote", Look::Target, c.ply);
+            // The human's spare queen is out of the coach's reach: point at the square instead (the
+            // lines name a queen; an underpromotion is only said as the pawn's move).
+            Beat b = sayBeat(st.promotion == Queen ? "demo.promote" : "demo.your.move", Look::Target, c.ply);
             b.line.with("sq", Arg::ofSquare(st.move.to)).with("your", pieceArg(pos, st.move.from, c.human));
             pointSquare(b, st.move.to, "sq");
             s.push_back(b);
@@ -396,7 +471,10 @@ ai::AnalysisRequest Reviewer::beforeRequest(const Game& g) const {
 }
 
 bool Reviewer::needsPlayedRequest(const ai::Analysis& before, const std::string& playedUci) {
-    return before.ok && !before.noLegalMove && before.line(playedUci) == nullptr;
+    if (!before.ok || before.noLegalMove) return false;
+    const ai::PvLine* l = before.line(playedUci);
+    // The best line is judged against itself whatever its bound (review()): no re-score for it.
+    return l == nullptr || (l->score.bound != ai::Score::Bound::Exact && l != &before.lines.front());
 }
 
 ai::AnalysisRequest Reviewer::playedRequest(const Game& g, const ai::Analysis& before) const {
@@ -511,8 +589,12 @@ Review Reviewer::review(const ReviewInput& in) {
         c.l1 = &a0->lines[0];
         if (a0->lines.size() > 1) c.l2 = &a0->lines[1];
         c.lp = a0->line(c.playedUci);
-        if (!c.lp && in.played && in.played->ok && !in.played->lines.empty() && !in.played->lines[0].pv.empty() &&
-            in.played->lines[0].pv[0] == c.playedUci)
+        // A1 when A0 lacks the move, or holds only a bound for it (a stopped search): the move's
+        // class must not come from a score the engine did not finish. Not for the best line itself:
+        // the move is judged against the very score it is compared with (another search's score
+        // would make the engine's own move a mate missed, or less than accurate).
+        if ((!c.lp || (c.lp->score.bound != ai::Score::Bound::Exact && c.lp != c.l1)) && in.played && in.played->ok &&
+            !in.played->lines.empty() && !in.played->lines[0].pv.empty() && in.played->lines[0].pv[0] == c.playedUci)
             c.lp = &in.played->lines[0];
         if (!c.lp && !c.p1.hasLegalMove()) {
             terminal = terminalLine(c.p1, c.playedUci);
@@ -558,20 +640,19 @@ Review Reviewer::review(const ReviewInput& in) {
         if (pv.size() > refutation.size() && (refutation.empty() || pv[0] == refutation[0])) refutation = pv;
     }
     c.r = replayLine(c.p1, refutation, human_, 16);
+    extendRefutation(c.r, c.p1, human_, size_t(bd.lookahead + 1), c.base, guessLossBound(c.l1->score, c.lp->score));
     c.best = replayLine(c.p0, c.l1->pv, human_, 16);
     c.playedLine = replayLine(c.p0, c.lp->pv, human_, 16);
-    for (size_t i = 0; i < c.r.size(); ++i) {
-        const int l = std::min(c.base - c.r[i].balance, i + 1 < c.r.size() ? c.base - c.r[i + 1].balance : 1 << 20);
-        if (l >= 2) {
+    c.rEnd = lineEnd(c.p1, c.r);
+    c.bestEnd = lineEnd(c.p0, c.best);
+    c.playedEnd = lineEnd(c.p0, c.playedLine);
+    for (size_t i = 0; i < c.r.size(); ++i)
+        if (c.lossAfter(int(i) + 1) >= 2) {
             c.gain = int(i) + 1;
             break;
         }
-    }
     c.loss = c.lossWithin(bd.lookahead);
-    if (!c.playedLine.empty()) {
-        const size_t k = std::min<size_t>(3, c.playedLine.size()) - 1;
-        v.materialSwing = c.playedLine[k].balance - c.base;
-    }
+    v.materialSwing = heldGain(c.playedLine, 3, c.base, human_, c.playedEnd);
 
     // ---- What to say ----
     Explanation ex;
@@ -665,8 +746,9 @@ Review Reviewer::review(const ReviewInput& in) {
         } else if (cls == MoveClass::Mistake) {
             if (level_ >= 3) verdictKey = bandKey("ex.verdict.mistake", level_);   // level 2: one sentence only
         } else if (cls == MoveClass::Inaccuracy) {
+            // Never called a mistake: the appraisal counts it as an inaccuracy.
             if (level_ >= 4 && (!found || ex.type == ExType::Positional)) verdictKey = bandKey("ex.verdict.inaccuracy", level_);
-            else if (level_ >= 4) verdictKey = bandKey("ex.verdict.mistake", level_);
+            else if (level_ >= 4) verdictKey = bandKey("ex.verdict.imprecise", level_);
         }
         const bool verdictNamesBest = verdictKey.rfind("ex.verdict.inaccuracy", 0) == 0;
         int budget = bd.sentences - (verdictKey.empty() ? 0 : 1);
@@ -771,18 +853,20 @@ Review Reviewer::review(const ReviewInput& in) {
         const bool tricky = in.shallow && in.shallow->ok && !in.shallow->bestMove.empty() && in.shallow->bestMove != c.playedUci;
         auto lineGain = [&](size_t plies) {
             int bestGain = 0;
-            for (size_t i = 0; i < c.playedLine.size() && i < plies; ++i) {
-                int gnow = c.playedLine[i].balance - c.base;
-                if (i + 1 < c.playedLine.size()) gnow = std::min(gnow, c.playedLine[i + 1].balance - c.base);
-                bestGain = std::max(bestGain, gnow);
-            }
+            for (size_t i = 1; i <= c.playedLine.size() && i <= plies; ++i)
+                bestGain = std::max(bestGain, heldGain(c.playedLine, i, c.base, human_, c.playedEnd));
             return bestGain;
         };
         bool promoSoon = false;
         for (size_t i = 0; i < c.playedLine.size() && i < 2; ++i)
             if (c.playedLine[i].promotion != NoPiece) promoSoon = true;
-        const bool sacrifice = !promoSoon && (c.f.seeCp <= -200 ||
+        const bool sacrifice = !promoSoon && (c.f.seePts <= -2 ||
                                               (c.playedLine.size() >= 2 && c.playedLine[1].balance <= c.base - 2));
+        // A capture that wins the whole piece ("for free"); at levels 1-2 the lines also say it had
+        // no protector.
+        const bool freeCapture = c.f.captured != NoPiece && points(c.f.captured) >= 3 &&
+                                 c.f.seePts >= points(c.f.captured);
+        const bool unprotected = c.f.captured != NoPiece && !c.p0.attackersTo(c.f.capturedOn, c.coach);
         const bool only = c.isBest && legal >= 2 && c.l2 && w1 - w2 >= 15.0 && w1 >= 25.0 && !(c.p0.inCheck() && legal <= 2);
         double lastW = -1.0;   // the human's W% after their previous judged move
         for (size_t i = humanW_.size(); i-- > 0 && lastW < 0.0;) lastW = humanW_[i];
@@ -800,13 +884,13 @@ Review Reviewer::review(const ReviewInput& in) {
                 key = bandKey("praise.only", level_);
             } else if (level_ >= 2 && squareCount(c.f.forks) >= 2 && lineGain(4) >= 2) {
                 key = level_ == 2 ? "praise.fork.b2" : "praise.fork.b3";
-            } else if (level_ <= 2 && c.f.captured != NoPiece && c.f.seeCp >= 200) {
+            } else if (level_ <= 2 && freeCapture && unprotected) {
                 key = bandKey("praise.capture", level_);
                 v.goodCapture = true;
             } else if (level_ <= 3 && c.isBest && (lineGain(3) >= 2 || c.l1->score.mate > 0 || only) && (level_ < 3 || tricky)) {
                 key = bandKey("praise.best", level_);
             } else if (level_ <= 3 && c.base >= 3 && c.f.captured != NoPiece && points(c.f.captured) >= 3 &&
-                       c.f.seeCp >= 0 && c.f.seeCp < 200) {
+                       c.f.seePts == 0) {
                 key = bandKey("praise.trade", level_);
             } else if ((level_ == 3 || level_ == 4) && c.j.delta < 2.0 && c.f.captured == NoPiece && !c.f.check && tricky) {
                 key = bandKey("praise.excellent", level_);
@@ -822,7 +906,7 @@ Review Reviewer::review(const ReviewInput& in) {
             }
         }
         v.only = only;
-        v.goodCapture = v.goodCapture || (c.f.captured != NoPiece && c.f.seeCp >= 200);
+        v.goodCapture = v.goodCapture || freeCapture;
         if (!key.empty() && humanMoves_ - lastPraise_ >= bd.praiseEvery && remarkAllowed() && !retry) {
             Beat b = sayBeat(key, Look::Player, ply);
             if (c.f.captured != NoPiece) b.line.with("my", Arg::ofPiece(c.f.captured, c.coach, false, NoSquare));

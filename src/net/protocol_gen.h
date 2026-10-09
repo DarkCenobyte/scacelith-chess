@@ -33,9 +33,9 @@ namespace net {
 namespace proto {
 
 constexpr uint16_t kProtocolVersion = 1;   // Hello.proto, Welcome.proto
-constexpr uint16_t kMinor = 0;             // the minor this codec speaks
+constexpr uint16_t kMinor = 1;             // the minor this codec speaks
 constexpr uint64_t kCaps = 0x0ull;           // capability bits this codec knows
-constexpr uint32_t kFingerprint = 0x05d4f428u;   // schema fingerprint (informational)
+constexpr uint32_t kFingerprint = 0x6e6c4989u;   // schema fingerprint (informational)
 constexpr const char* kWsSubprotocol = "scacelith.rt1";
 constexpr uint64_t kId53Limit = 1ull << 53;   // id53 values are below 2^53
 // Largest client message, in bytes (type byte included). The server refuses a larger WebSocket message from
@@ -60,8 +60,8 @@ enum class EndReason : uint8_t {   // open
     None = 0, Checkmate = 1, Resignation = 2, Timeout = 3, IllegalMoves = 4, Stalemate = 5,
     InsufficientMaterial = 6, TimeoutVsInsufficient = 7, FivefoldRepetition = 8, SeventyFiveMoves = 9,
     ThreefoldClaim = 10, FiftyMoveClaim = 11, Agreement = 12, IllegalMovesVsInsufficient = 13,
-    Abandonment = 20, AbandonmentVsInsufficient = 21, Aborted = 22, NoShow = 23, Forfeit = 24,
-    ServerAborted = 25, BothDisconnected = 26,
+    ResignationVsInsufficient = 14, Abandonment = 20, AbandonmentVsInsufficient = 21, Aborted = 22,
+    NoShow = 23, Forfeit = 24, ServerAborted = 25, BothDisconnected = 26,
 };
 enum class GameEventKind : uint8_t {   // open
     DrawOffered = 1, DrawDeclined = 2, PlayerDisconnected = 3, PlayerReconnected = 4,

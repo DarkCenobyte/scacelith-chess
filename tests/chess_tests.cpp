@@ -1,9 +1,12 @@
 // Unit tests for src/chess: move generation (perft), notation, game endings, clock, arbiter.
 #include "test.h"
 #include "chess/chess.h"
+#include "net/json.h"
+#include "repo_files.h"
 
 #include <algorithm>
 #include <chrono>
+#include <cstdio>
 #include <set>
 #include <string>
 #include <vector>
@@ -525,6 +528,34 @@ TEST(chess_can_color_mate) {
     p = fromFEN("4k3/8/8/8/8/8/2b5/2B1K3 w - - 0 1");
     CHECK(p.canColorMate(White));
     CHECK(p.canColorMate(Black));
+    // A lone knight mates only past a blocker that cannot take it: never against queens alone.
+    p = fromFEN("7k/7q/8/8/8/8/8/KN6 w - - 0 1");
+    CHECK(!p.canColorMate(White));  // K+N v K+Q
+    CHECK(p.canColorMate(Black));
+    CHECK(!p.hasInsufficientMaterial());
+    p = fromFEN("7k/5q1q/8/8/8/8/8/KN6 w - - 0 1");
+    CHECK(!p.canColorMate(White));  // K+N v K+2Q
+    p = fromFEN("6rk/8/8/8/8/8/8/KN6 w - - 0 1");
+    CHECK(p.canColorMate(White));   // K+N v K+R: the rook can block (6rk/8/7K/4N3: Nf7#)
+    p = fromFEN("kn5Q/8/8/8/8/8/8/7K w - - 0 1");
+    CHECK(!p.canColorMate(Black));  // the colours swapped: Black's knight against a queen
+    CHECK(p.canColorMate(White));
+    p = fromFEN("7k/7q/8/8/8/8/8/KNN5 w - - 0 1");
+    CHECK(p.canColorMate(White));   // two knights
+    p = fromFEN("7k/7q/8/8/8/8/8/KNB5 w - - 0 1");
+    CHECK(p.canColorMate(White));   // knight and bishop
+    // Bishops alone: a blocker of the other square colour that cannot reach the checking bishop.
+    p = fromFEN("7k/6r1/8/8/8/8/8/KB6 w - - 0 1");
+    CHECK(!p.canColorMate(White));  // K+B v K+R
+    p = fromFEN("6bk/8/8/8/8/8/8/K1B5 w - - 0 1");
+    CHECK(p.canColorMate(White));   // opposite-coloured bishops (6bk/8/6K1: Bb2#)
+    p = fromFEN("5b1k/8/8/8/8/8/8/K1B5 w - - 0 1");
+    CHECK(!p.canColorMate(White));  // bishops on one colour
+    CHECK(!p.canColorMate(Black));
+    CHECK(p.hasInsufficientMaterial());
+    p = fromFEN("7k/7n/8/8/8/8/8/KB6 w - - 0 1");
+    CHECK(p.canColorMate(White));   // K+B v K+N (7k/5K1n/7B: Bg7#)
+    CHECK(p.canColorMate(Black));
 }
 
 TEST(chess_game_repetitions) {
@@ -656,6 +687,113 @@ TEST(chess_game_resign_agree_forfeit) {
     g.forfeitIllegal(White);  // Black cannot checkmate
     CHECK(g.status() == GameStatus::Draw);
     CHECK(g.endReason() == GameEndReason::IllegalMovesVsInsufficient);
+}
+
+TEST(chess_game_resignation_vs_insufficient) {
+    // FIDE 5.1.2: a resignation against a side that cannot mate by any series of legal moves is a
+    // draw, as a flag fall is (6.9); the side that can mate still loses by resigning.
+    Game g;
+    CHECK(g.resetFromFEN("7k/7q/8/8/8/8/8/K7 b - - 0 1"));
+    g.resign(Black);  // White has a bare king
+    CHECK(g.status() == GameStatus::Draw);
+    CHECK(g.endReason() == GameEndReason::ResignationVsInsufficient);
+    CHECK_EQ(std::string(g.resultString()), std::string("1/2-1/2"));
+    CHECK_EQ(std::string(endReasonKey(g.endReason())), std::string("reason.resignation_vs_insufficient"));
+    CHECK_EQ(std::string(terminationTag(g.status(), g.endReason())), std::string("normal"));
+    const std::string pgn = g.pgn("W", "B");
+    CHECK(pgn.find("[Result \"1/2-1/2\"]") != std::string::npos);
+    CHECK(pgn.find("[Termination \"normal\"]") != std::string::npos);
+    CHECK(g.resetFromFEN("7k/7q/8/8/8/8/8/K7 w - - 0 1"));
+    g.resign(White);
+    CHECK(g.status() == GameStatus::BlackWins);
+    CHECK(g.endReason() == GameEndReason::Resignation);
+    CHECK(g.resetFromFEN("7k/7q/8/8/8/8/8/KN6 b - - 0 1"));
+    g.resign(Black);  // K+N v K+Q: the knight cannot mate
+    CHECK(g.status() == GameStatus::Draw);
+    CHECK(g.endReason() == GameEndReason::ResignationVsInsufficient);
+    CHECK(g.resetFromFEN("7k/7p/8/8/8/8/8/KN6 b - - 0 1"));
+    g.resign(Black);  // K+N v K+P: the pawn can block, a mate is possible
+    CHECK(g.status() == GameStatus::WhiteWins);
+    CHECK(g.endReason() == GameEndReason::Resignation);
+    CHECK(g.resetFromFEN("7k/7q/8/8/8/8/8/KN6 w - - 0 1"));
+    g.flagFall(Black);  // the same material decides a flag fall
+    CHECK(g.status() == GameStatus::Draw);
+    CHECK(g.endReason() == GameEndReason::TimeoutVsInsufficient);
+    // Taking the move back reopens a game ended this way, like any resignation.
+    CHECK(g.resetFromFEN("7k/7q/8/8/8/8/8/K7 w - - 0 1"));
+    CHECK(playLine(g, {"Kb2", "Qh6"}));
+    g.resign(Black);
+    CHECK(g.endReason() == GameEndReason::ResignationVsInsufficient);
+    CHECK(g.undo());
+    CHECK(!g.isOver());
+}
+
+TEST(chess_mating_material_vectors) {
+    // Who can still checkmate, and what a resignation or a flag fall gives, on the hand-verified
+    // positions of the server's test/fixtures/mating-material.json, of which tests/data/ keeps a
+    // copy (the server's tools/interop/check-game.sh compares them; the server's tests read the
+    // same file). Each mating line proves its "can mate" independently of the rule.
+    const std::string rel = "tests/data/mating-material.json";
+    const std::string text = readRepoFile(rel, size_t(1) << 20);
+    CHECK(!text.empty());
+    if (text.empty()) {
+        std::fprintf(stderr, "  %s not found (run from the repository root or set SCACELITH_SOURCE_DIR)\n", rel.c_str());
+        return;
+    }
+    using net::json::Value;
+    Value v;
+    std::string err;
+    CHECK(net::json::parse(text, v, &err));
+    const Value& positions = v["positions"];
+    CHECK(positions.size() >= 25);
+    int wrong = 0, mates = 0;
+    auto result = [](const Game& g) { return std::make_pair(int(g.status()), int(g.endReason())); };
+    auto pairOf = [](const Value& x) { return std::make_pair(int(x[0].asInt(-1)), int(x[1].asInt(-1))); };
+    for (const Value& e : positions.items()) {
+        const std::string fen = e["fen"].asString();
+        auto fail = [&](const std::string& what) {
+            std::fprintf(stderr, "  %s (%s): %s\n", e["material"].asString().c_str(), fen.c_str(), what.c_str());
+            ++wrong;
+        };
+        Position p;
+        if (!p.setFEN(fen)) {
+            fail("FEN refused");
+            continue;
+        }
+        const bool can[2] = {e["canMate"][0].asBool(), e["canMate"][1].asBool()};
+        const bool dead = e["dead"].asBool();
+        if (p.canColorMate(White) != can[0] || p.canColorMate(Black) != can[1]) fail("canColorMate");
+        if (p.hasInsufficientMaterial() != dead) fail("hasInsufficientMaterial");
+        if (dead != (!can[0] && !can[1])) fail("dead, yet a side can mate");
+        Game start;
+        start.resetFromFEN(fen);
+        if (dead ? result(start) != std::make_pair(int(GameStatus::Draw), int(GameEndReason::InsufficientMaterial)) : start.isOver())
+            fail("state at the start");
+        for (int i = 0; i < 2; ++i) {
+            Game r = start;
+            r.resign(Color(i));
+            if (result(r) != pairOf(e["resign"][i])) fail(i ? "Black resigns" : "White resigns");
+            Game f = start;
+            f.flagFall(Color(i));
+            if (result(f) != pairOf(e["flag"][i])) fail(i ? "Black loses on time" : "White loses on time");
+        }
+        if (!e.has("mate")) continue;
+        const int by = int(e["mate"]["by"].asInt(-1));
+        if (by < 0 || by > 1 || !can[by]) fail("a mate by a side that cannot mate");
+        Game m = start;
+        for (const Value& uci : e["mate"]["moves"].items()) {
+            const Move mv = m.position().parseUCI(uci.asString());
+            if (!mv.valid() || !m.play(mv)) {
+                fail(uci.asString() + " is not legal");
+                break;
+            }
+        }
+        const GameStatus winner = by == 0 ? GameStatus::WhiteWins : GameStatus::BlackWins;
+        if (m.status() != winner || m.endReason() != GameEndReason::Checkmate) fail("the line does not mate");
+        ++mates;
+    }
+    CHECK(mates >= 10);
+    CHECK_EQ(wrong, 0);
 }
 
 // ---- Taking moves back --------------------------------------------------------------------------

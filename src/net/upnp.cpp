@@ -202,7 +202,7 @@ bool httpExchange(const Config& cfg, const std::string& host, uint16_t port, con
     if (!sock::Endpoint::parse(host, port, ep) || !ep.isV4()) { err.text = "bad_url"; return false; }
     const int64_t deadline = sock::steadyMs() + cfg.httpTimeoutMs;
     std::string cerr;
-    sock::Handle h = sock::connectWithTimeout(ep, cfg.httpTimeoutMs, cerr);
+    sock::Handle h = sock::connectWithTimeout(ep, cfg.httpTimeoutMs, cerr, cfg.cancel);
     if (h == sock::kInvalid) { err.text = cerr; return false; }
     if (localIp) {
         sock::Endpoint le;

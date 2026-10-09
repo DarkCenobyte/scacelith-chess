@@ -5,7 +5,8 @@
 // Analyses (all through the Analyst, full strength):
 //   A0  when the human's turn begins: MultiPV 3 of the position (cached by FEN, so the retry after a
 //       takeback reuses it); A3 with it at levels 3-4. Stopped (finished early) when the human moves.
-//   A1  after the human's move, when A0 does not hold the played move; A2 at levels 4-6.
+//   A1  after the human's move, when A0 does not hold the played move or holds only a bound for it
+//       (Reviewer::needsPlayedRequest); A2 at levels 4-6.
 //   evaluations of the positions the appraisal still lacks, in the background when the Analyst is
 //       idle and no review waits.
 // The review holds the coach's move (coachMayMove) from the human's move until its script is over
@@ -579,9 +580,9 @@ struct Session::Impl {
                 ++it;
             }
         }
-        if (humanResigned) {
+        if (humanResigned && game.status() != chess::GameStatus::Draw) {
             g.end = GameEnd::Resigned;
-        } else {
+        } else {   // a resignation against a coach that cannot mate is a draw (FIDE 5.1.2)
             switch (game.status()) {
             case chess::GameStatus::WhiteWins: g.end = g.human == chess::White ? GameEnd::Win : GameEnd::Loss; break;
             case chess::GameStatus::BlackWins: g.end = g.human == chess::Black ? GameEnd::Win : GameEnd::Loss; break;

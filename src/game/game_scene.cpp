@@ -1077,11 +1077,16 @@ bool GameScene::update(AppContext& ctx, float dt) {
             bool canClaim = mayEnd && (game_.canClaimThreefold() || game_.canClaimFiftyMove());
             bool canOffer = drawOfferPly_ != int(game_.moves().size());
             // Hot-seat: the menu belongs to the player to move (resignation named, offer with the move).
+            // A resignation against a side that cannot checkmate is a draw (FIDE 5.1.2): the
+            // confirmation says so.
+            const bool resignDraws = !game_.position().canColorMate(chess::opposite(inputColor()));
             std::string resignQuestion;
             if (hotSeat()) {
                 canOffer = canOffer && drawOfferBy_ < 0 && drawCardFor_ < 0;
-                resignQuestion = i18n::trf("hotseat.confirm.resign", {seats_[inputSeat()].name, seats_[1 - inputSeat()].name});
+                resignQuestion = i18n::trf(resignDraws ? "hotseat.confirm.resign_draw" : "hotseat.confirm.resign",
+                                           {seats_[inputSeat()].name, seats_[1 - inputSeat()].name});
             } else {
+                if (resignDraws) resignQuestion = i18n::tr("confirm.resign.draw");
                 // Answered at once, so not with a move on its way, except my move made on the board
                 // and waiting for the clock press: the offer goes with it (FIDE 9.1.2).
                 canOffer = canOffer && !drawOfferPending_ && mayEnd;

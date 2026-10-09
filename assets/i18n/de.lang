@@ -230,6 +230,7 @@ pause.claim_draw.help = Dreifache Stellungswiederholung oder 50-Züge-Regel.
 pause.resign = Aufgeben
 confirm.resign.title = AUFGEBEN
 confirm.resign.text = Diese Partie aufgeben? Ihr Gegner wird zum Sieger erklärt.
+confirm.resign.draw = Diese Partie aufgeben? Ihr Gegner kann nicht mehr mattsetzen: Die Partie endet remis.
 confirm.resign.ok = Aufgeben
 confirm.leave.title = PARTIE VERLASSEN
 confirm.leave.text = Zurück zum Hauptmenü? Die laufende Partie wird abgebrochen.
@@ -267,6 +268,7 @@ reason.threefold_claim = Dreifache Stellungswiederholung (reklamiert)
 reason.50_moves_claim = 50-Züge-Regel (reklamiert)
 reason.agreement = Remis durch Vereinbarung
 reason.illegal_vs_insufficient = Zweiter regelwidriger Zug, aber der Gegner kann nicht mattsetzen
+reason.resignation_vs_insufficient = Aufgabe, aber der Gegner kann nicht mattsetzen
 
 # ---- Move list ---------------------------------------------------------------------------------
 movelist.title = ZÜGE
@@ -965,6 +967,7 @@ hotseat.summary = {0} – {1}
 hotseat.your_move = {0}, Sie sind am Zug
 hotseat.flag = Die Zeit von {0} ist abgelaufen.
 hotseat.confirm.resign = Für {0} aufgeben? {1} wird zum Sieger erklärt.
+hotseat.confirm.resign_draw = Für {0} aufgeben? {1} kann nicht mehr mattsetzen: Die Partie endet remis.
 hotseat.draw.offer_noted = Ihr Remisangebot gilt mit Ihrem Zug: {0} sieht es, nachdem Sie die Uhr gedrückt haben.
 hotseat.draw.card_title = REMISANGEBOT
 hotseat.draw.offered = {0} bietet Remis an.
@@ -1040,6 +1043,7 @@ coach.offer.decline = Weiterspielen
 coach.pause.take_back = Meinen Zug zurücknehmen
 coach.pause.take_back.help = Nimmt Ihren letzten Zug zurück, und die Antwort des Trainers, falls er schon gezogen hat.
 coach.confirm.resign = Diese Partie aufgeben? Der Trainer wird zum Sieger erklärt.
+coach.confirm.resign_draw = Diese Partie aufgeben? Der Trainer kann nicht mehr mattsetzen: Die Partie endet remis.
 coach.confirm.leave = Zurück zum Hauptmenü? Diese Partie mit dem Trainer wird abgebrochen.
 # Game over card of a coach game, and the end of the lesson on the rules
 coach.gameover.again = Noch eine Partie

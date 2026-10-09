@@ -231,6 +231,7 @@ pause.claim_draw.help = Triple répétition ou règle des cinquante coups.
 pause.resign = Abandonner
 confirm.resign.title = ABANDON
 confirm.resign.text = Abandonner cette partie ? Votre adversaire sera déclaré vainqueur.
+confirm.resign.draw = Abandonner cette partie ? Votre adversaire ne peut plus mater : la partie sera nulle.
 confirm.resign.ok = Abandonner
 confirm.leave.title = QUITTER LA PARTIE
 confirm.leave.text = Revenir au menu principal ? La partie en cours sera abandonnée.
@@ -268,6 +269,7 @@ reason.threefold_claim = Triple répétition (réclamée)
 reason.50_moves_claim = Règle des 50 coups (réclamée)
 reason.agreement = Nulle par accord mutuel
 reason.illegal_vs_insufficient = Second coup illégal, mais l’adversaire ne peut pas mater
+reason.resignation_vs_insufficient = Abandon, mais l’adversaire ne peut pas mater
 
 # ---- Move list ---------------------------------------------------------------------------------
 movelist.title = COUPS
@@ -966,6 +968,7 @@ hotseat.summary = {0} – {1}
 hotseat.your_move = {0}, à vous de jouer
 hotseat.flag = Le drapeau de {0} est tombé.
 hotseat.confirm.resign = Abandonner pour {0} ? {1} sera déclaré vainqueur.
+hotseat.confirm.resign_draw = Abandonner pour {0} ? {1} ne peut plus mater : la partie sera nulle.
 hotseat.draw.offer_noted = Votre proposition de nulle accompagne votre coup : {0} la verra après votre appui sur la pendule.
 hotseat.draw.card_title = PROPOSITION DE NULLE
 hotseat.draw.offered = {0} propose nulle.
@@ -1041,6 +1044,7 @@ coach.offer.decline = Continuer
 coach.pause.take_back = Reprendre mon coup
 coach.pause.take_back.help = Reprend votre dernier coup, et la réponse du coach s’il l’a déjà jouée.
 coach.confirm.resign = Abandonner cette partie ? Le coach sera déclaré vainqueur.
+coach.confirm.resign_draw = Abandonner cette partie ? Le coach ne peut plus mater : la partie sera nulle.
 coach.confirm.leave = Revenir au menu principal ? Cette partie avec le coach sera abandonnée.
 # Game over card of a coach game, and the end of the lesson on the rules
 coach.gameover.again = Rejouer

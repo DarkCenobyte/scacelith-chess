@@ -16,13 +16,11 @@
 #include <time.h>
 #include <unistd.h>
 #include <sys/wait.h>
-#include <spawn.h>
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
 #include <thread>
 #include <vector>
-extern char** environ;
 
 typedef GLXContext (*PFN_glXCreateContextAttribsARB)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
 typedef void (*PFN_glXSwapIntervalEXT)(Display*, GLXDrawable, int);
@@ -327,9 +325,11 @@ bool openInFileManager(const std::string& path) {
     if (path.empty()) return false;
     // A relative path starting with '-' would read as an option.
     const std::string arg = path[0] == '-' ? "./" + path : path;
-    pid_t pid;
     char* argv[] = {const_cast<char*>("xdg-open"), const_cast<char*>(arg.c_str()), nullptr};
-    if (posix_spawnp(&pid, "xdg-open", nullptr, nullptr, argv, environ) != 0) {
+    // Not posix_spawnp itself: the file manager gets SIGPIPE's default action back (the game
+    // ignores that signal, main.cpp).
+    const pid_t pid = net::sys::spawnProgram(argv);
+    if (pid < 0) {
         LOGW("could not start xdg-open for %s", path.c_str());
         return false;
     }

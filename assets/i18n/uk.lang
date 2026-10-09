@@ -231,6 +231,7 @@ pause.claim_draw.help = Триразове повторення або прав�
 pause.resign = Здатися
 confirm.resign.title = ЗДАТИСЯ
 confirm.resign.text = Здати цю партію? Переможцем буде оголошено суперника.
+confirm.resign.draw = Здати цю партію? Суперник більше не може поставити мат: партія закінчиться внічию.
 confirm.resign.ok = Здатися
 confirm.leave.title = ПОКИНУТИ ПАРТІЮ
 confirm.leave.text = Повернутися до головного меню? Поточну партію буде перервано.
@@ -268,6 +269,7 @@ reason.threefold_claim = Триразове повторення (на вимо�
 reason.50_moves_claim = Правило 50 ходів (на вимогу)
 reason.agreement = Нічия за згодою
 reason.illegal_vs_insufficient = Другий неможливий хід, але суперник не може поставити мат
+reason.resignation_vs_insufficient = Здача, але суперник не може поставити мат
 
 # ---- Move list ---------------------------------------------------------------------------------
 movelist.title = ХОДИ
@@ -966,6 +968,7 @@ hotseat.summary = {0} – {1}
 hotseat.your_move = {0}, ваш хід
 hotseat.flag = Час гравця {0} вичерпано.
 hotseat.confirm.resign = Здатися за гравця {0}? Переможцем буде оголошено гравця {1}.
+hotseat.confirm.resign_draw = Здатися за гравця {0}? Гравець {1} більше не може поставити мат: партія закінчиться внічию.
 hotseat.draw.offer_noted = Пропозицію нічиєї зроблено разом із ходом: гравець {0} побачить її після натискання на годинник.
 hotseat.draw.card_title = ПРОПОЗИЦІЯ НІЧИЄЇ
 hotseat.draw.offered = {0} пропонує нічию.
@@ -1041,6 +1044,7 @@ coach.offer.decline = Грати далі
 coach.pause.take_back = Повернути мій хід
 coach.pause.take_back.help = Скасовує ваш останній хід, а також відповідь тренера, якщо він уже зробив хід.
 coach.confirm.resign = Здати цю партію? Переможцем буде оголошено тренера.
+coach.confirm.resign_draw = Здати цю партію? Тренер більше не може поставити мат: партія закінчиться внічию.
 coach.confirm.leave = Повернутися до головного меню? Цю партію з тренером буде перервано.
 # Game over card of a coach game, and the end of the lesson on the rules
 coach.gameover.again = Зіграти ще

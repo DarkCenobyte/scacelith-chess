@@ -1,13 +1,23 @@
-# Continuous integration: the game built and tested on Linux and, cross-compiled with MinGW-w64,
-# for Windows (its tests run under Wine), as the README's "Building" section describes; plus the
-# workflows' own lint. The release workflow runs it again on the tagged commit (workflow_call).
+# Continuous integration: the game built and tested on Linux (also with AddressSanitizer and UBSan)
+# and, cross-compiled with MinGW-w64, for Windows (its tests run under Wine), as the README's
+# "Building" section describes; the contract with the dedicated server pinned in
+# tools/interop/server-revision and the live online tests against it; plus the workflows' own lint.
+# The release workflow runs it again on the tagged commit (workflow_call). A weekly run checks the
+# contract against the server's master, to see changes on its side early.
 name: CI
 
 on:
   push:
     branches: [master]
   pull_request:
+  schedule:
+    - cron: "41 4 * * 1"
   workflow_dispatch:
+    inputs:
+      server-revision:
+        description: Branch, tag or commit of the server to check the contract against (empty = the pinned one)
+        type: string
+        default: ""
   workflow_call:
 
 permissions: {}
@@ -25,6 +35,7 @@ env:
 jobs:
   linux:
     name: Linux build and tests
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
@@ -78,8 +89,70 @@ jobs:
           path: .ccache
           key: ccache-linux-${{ github.sha }}
 
+  sanitizers:
+    name: Linux tests under AddressSanitizer and UBSan
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install the build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build ccache libssl-dev libx11-dev libgl-dev
+
+      # The voice model too, so that the coach's voice runs under the sanitizers.
+      - name: Restore the voice model archive
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build-san/_deps/*.tar.bz2
+          key: supertonic3-linux-${{ hashFiles('third_party/supertonic3/supertonic3.cmake') }}
+
+      - name: Restore the compiler cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .ccache
+          key: ccache-sanitizers-${{ github.sha }}
+          restore-keys: ccache-sanitizers-
+
+      # Without Stockfish (its own code, built apart and tested upstream): the game's code and the
+      # unit tests, every finding fatal (CMakeLists.txt, SCACELITH_SANITIZE).
+      - name: Configure
+        run: >-
+          cmake -B build-san -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSCACELITH_STOCKFISH=OFF
+          -DSCACELITH_SANITIZE=address,undefined
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Build
+        run: ninja -C build-san scacelith_tests
+
+      - name: Unit tests
+        env:
+          ASAN_OPTIONS: detect_leaks=1:strict_string_checks=1:detect_stack_use_after_return=1
+          UBSAN_OPTIONS: print_stacktrace=1
+        run: ./build-san/scacelith_tests
+
+      - name: Compiler cache statistics
+        if: always()
+        run: ccache --show-stats
+
+      - name: Save the compiler cache
+        if: always() && env.SAVE_CACHE == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .ccache
+          key: ccache-sanitizers-${{ github.sha }}
+
   windows:
     name: Windows build (MinGW-w64) and tests (Wine)
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     permissions:
@@ -145,8 +218,83 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
+  interop:
+    name: Contract and live tests with the server
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: game
+          persist-credentials: false
+
+      # The server's commit pinned in tools/interop/server-revision (the pair known to work
+      # together, so a run of the same game commit always checks the same pair); the server's
+      # master on the weekly run; or what a manual run names (a change made on both sides: run
+      # this workflow on the game's branch with the server's branch).
+      - name: Choose the server's revision
+        id: server
+        env:
+          EVENT: ${{ github.event_name }}
+          REQUESTED: ${{ inputs.server-revision }}
+        run: |
+          pinned=$(grep -Ev '^[[:space:]]*(#|$)' game/tools/interop/server-revision | head -n 1 | tr -d '[:space:]')
+          if [[ ! "$pinned" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "::error::tools/interop/server-revision does not hold a full commit hash"
+            exit 1
+          fi
+          if [[ -n "$REQUESTED" ]]; then ref=$REQUESTED
+          elif [[ "$EVENT" == schedule ]]; then ref=master
+          else ref=$pinned
+          fi
+          echo "revision=$ref" >> "$GITHUB_OUTPUT"
+          echo "Server revision: $ref (pinned: $pinned)" >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: DarkCenobyte/scacelith-chess-server
+          ref: ${{ steps.server.outputs.revision }}
+          path: server
+          persist-credentials: false
+
+      - name: Name the pair under test
+        run: |
+          echo "Game $(git -C game rev-parse HEAD), server $(git -C server rev-parse HEAD)" | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Install the build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build libssl-dev libx11-dev libgl-dev
+
+      - name: Install the server's toolchain (its rust-toolchain.toml)
+        working-directory: server
+        run: rustup toolchain install
+
+      # The C++ codec, the copy of the protocol, the rating vectors, the PGN files and the chess
+      # cross-check vectors, checked by the server's own script.
+      - name: Contract (the server's tools/interop/check-game.sh)
+        run: server/tools/interop/check-game.sh game
+
+      # The live tests need neither Stockfish nor the coach's voice model.
+      - name: Build the tests
+        run: |
+          cmake -S game -B game/build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DSCACELITH_STOCKFISH=OFF -DSCACELITH_SUPERTONIC_DOWNLOAD=OFF
+          ninja -C game/build scacelith_tests
+
+      - name: Build the server and its live-check harness
+        working-directory: server
+        run: cargo build --locked -p scacelith-server -p scacelith-live-check
+
+      - name: Live tests (the online client against that server)
+        working-directory: game
+        run: ../server/target/debug/scacelith-live-check build/scacelith_tests
+
   workflows:
     name: Workflow lint
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

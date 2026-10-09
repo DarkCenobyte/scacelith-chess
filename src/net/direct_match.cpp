@@ -27,6 +27,7 @@ using direct::SecureChannel;
 
 namespace {
 
+constexpr int kResolveMs = 10000;          // the host's name (guest)
 constexpr int kConnectMs = 5000;           // per address tried
 constexpr int kHandshakeMs = 10000;        // handshake, then Hello -> Welcome
 constexpr int kPingEveryMs = 2000;         // both sides measure the round trip
@@ -524,6 +525,7 @@ private:
     std::vector<std::unique_ptr<Conn>> pending_;
     std::vector<std::unique_ptr<Conn>> closing_;   // refused or flooding links (closeLater)
     std::unique_ptr<Conn> guest_;
+    uint16_t guestMinor_ = 0;       // the protocol minor of guest_'s Welcome
     std::unique_ptr<direct::Authority> auth_;
     ClientView view_;
     int failedHandshakes_ = 0;
@@ -640,8 +642,9 @@ private:
             Event ev;
             if (view_.apply(msg.data(), msg.size(), ev)) pushEvent(std::move(ev));
         }
+        std::vector<uint8_t> older;
         if (guest_)
-            for (auto& msg : out.toGuest) guest_->send(msg);
+            for (auto& msg : out.toGuest) guest_->send(direct::frameForMinor(msg.data(), msg.size(), guestMinor_, older) ? older : msg);
         out.clear();
     }
 
@@ -830,6 +833,7 @@ private:
         P::Welcome w;
         w.proto = P::kProtocolVersion;
         w.minor = std::min(h.minor, P::kMinor);
+        guestMinor_ = w.minor;   // what dispatch() may send this connection
         w.caps = h.caps & P::kCaps;
         w.serverTime = enow;
         w.userId = 2;
@@ -1099,7 +1103,15 @@ private:
         sock::startup();
         if (!waker.valid()) { fail("network"); return; }
         connectionEvent(ConnState::Connecting);
-        if (!sock::resolve(address_, port_, true, endpoints_)) { fail("not_found"); return; }
+        // The host's name: given up when the player leaves (close(), the game quitting: their
+        // join waits for this thread) or after kResolveMs (a DNS server that does not answer).
+        sock::Lookup lookup(address_, port_, true);
+        switch (lookup.wait(kResolveMs, [this] { return stopFlag.load(); })) {
+        case sock::Lookup::Result::Found: endpoints_ = lookup.endpoints(); break;
+        case sock::Lookup::Result::Stopped: return;
+        case sock::Lookup::Result::NotFound:
+        case sock::Lookup::Result::TimedOut: fail("not_found"); return;
+        }
         epIndex_ = 0;
         connectNext(sock::steadyMs());
         while (!stopFlag && phase_ != Phase::Done) {

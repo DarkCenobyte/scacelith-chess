@@ -230,6 +230,7 @@ pause.claim_draw.help = Triple repetición o regla de los cincuenta movimientos.
 pause.resign = Abandonar
 confirm.resign.title = ABANDONAR
 confirm.resign.text = ¿Abandonar esta partida? Su rival será declarado ganador.
+confirm.resign.draw = ¿Abandonar esta partida? Su rival ya no puede dar mate: la partida terminará en tablas.
 confirm.resign.ok = Abandonar
 confirm.leave.title = SALIR DE LA PARTIDA
 confirm.leave.text = ¿Volver al menú principal? La partida en curso se perderá.
@@ -267,6 +268,7 @@ reason.threefold_claim = Triple repetición (reclamada)
 reason.50_moves_claim = Regla de los 50 movimientos (reclamada)
 reason.agreement = Tablas de mutuo acuerdo
 reason.illegal_vs_insufficient = Segunda jugada ilegal, pero el rival no puede dar mate
+reason.resignation_vs_insufficient = Abandono, pero el rival no puede dar mate
 
 # ---- Move list ---------------------------------------------------------------------------------
 movelist.title = JUGADAS
@@ -965,6 +967,7 @@ hotseat.summary = {0} – {1}
 hotseat.your_move = {0}, le toca jugar
 hotseat.flag = Ha caído la bandera de {0}.
 hotseat.confirm.resign = ¿Abandonar por {0}? {1} será declarado ganador.
+hotseat.confirm.resign_draw = ¿Abandonar por {0}? {1} ya no puede dar mate: la partida terminará en tablas.
 hotseat.draw.offer_noted = Su oferta de tablas acompaña a su jugada: {0} la verá después de que pulse el reloj.
 hotseat.draw.card_title = OFERTA DE TABLAS
 hotseat.draw.offered = {0} ofrece tablas.
@@ -1040,6 +1043,7 @@ coach.offer.decline = Seguir
 coach.pause.take_back = Deshacer mi jugada
 coach.pause.take_back.help = Deshace su última jugada, y la respuesta del entrenador si ya ha jugado.
 coach.confirm.resign = ¿Abandonar esta partida? El entrenador será declarado ganador.
+coach.confirm.resign_draw = ¿Abandonar esta partida? El entrenador ya no puede dar mate: la partida terminará en tablas.
 coach.confirm.leave = ¿Volver al menú principal? Esta partida con el entrenador se perderá.
 # Game over card of a coach game, and the end of the lesson on the rules
 coach.gameover.again = Jugar otra vez

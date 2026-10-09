@@ -3,6 +3,8 @@
 #include "json.h"
 #include "net_sys.h"
 #include "../core/log.h"
+#include <atomic>
+#include <cstdlib>
 #include <cstring>
 
 #ifdef _WIN32
@@ -21,6 +23,18 @@ const char kPrefix[] = "dpapi:";
 #else
 const char kPrefix[] = "bound:";
 #endif
+// A token the keyring keeps: the file holds this prefix and the id of its item (32 hex digits, a
+// random value that tells nothing about the token).
+const char kKeyringPrefix[] = "keyring:";
+
+bool inKeyring(const std::string& blob) { return blob.compare(0, sizeof(kKeyringPrefix) - 1, kKeyringPrefix) == 0; }
+std::string itemId(const std::string& blob) { return blob.substr(sizeof(kKeyringPrefix) - 1); }
+
+std::string newItemId() {
+    uint8_t b[16];
+    if (!crypto::randomBytes(b, sizeof(b))) return std::string();
+    return crypto::hex(b, sizeof(b));
+}
 
 void wipe(std::string& s) {
     if (s.empty()) return;
@@ -28,7 +42,30 @@ void wipe(std::string& s) {
     for (size_t i = 0; i < s.size(); ++i) p[i] = 0;
     s.clear();
 }
+
+// Linux: why the sessions stay in the file, said once per run.
+void noteFileFallback(const std::string& why, const std::string& path) {
+#ifndef _WIN32
+    static std::atomic<bool> said{false};
+    if (said.exchange(true)) return;
+    LOGW("net: no system keyring for the saved sessions (%s): they are written to %s in the clear, protected only by "
+         "the file's permissions",
+         why.c_str(), path.c_str());
+#else
+    (void)why;
+    (void)path;
+#endif
+}
 }  // namespace
+
+namespace {
+bool keyringOff() {
+    const char* env = std::getenv("SCACELITH_KEYRING");
+    return env && std::strcmp(env, "off") == 0;
+}
+}  // namespace
+
+Keyring* defaultKeyring() { return keyringOff() ? nullptr : secretServiceKeyring(); }
 
 // ---- token protection ----
 
@@ -47,7 +84,8 @@ std::string protectToken(const std::string& origin, const std::string& token) {
     LocalFree(out.pbData);
     return blob;
 #else
-    // Development builds: no OS secret store; the token is bound to its origin in the clear.
+    // The file format of a Linux build without a usable keyring (the store tries the keyring
+    // first): the token is bound to its origin, in the clear. Only the file's permissions protect it.
     std::string plain = origin + '\n' + token;
     std::string blob = kPrefix + crypto::base64url(plain.data(), plain.size());
     wipe(plain);
@@ -134,9 +172,15 @@ void CredentialStore::applyMovesLocked() const {
         Record* r = findLocked(mv.first);
         if (!r) continue;
         // The token is bound to its origin (DPAPI entropy, or the clear binding): unwrap it for the
-        // old origin, wrap it again for the new one. One that cannot be read here moves without it.
+        // old origin, wrap it again for the new one (in the file: the keyring takes it on its first
+        // read). One that cannot be read here moves without it. One the keyring keeps moves as it
+        // is (no keyring call while the file loads, on any thread): its item names the old origin,
+        // where read() finds it through this rule, and get() moves it to an item of the new one.
         std::string token, blob;
-        if (!r->tokenBlob.empty() && unprotectToken(mv.first, r->tokenBlob, token)) blob = protectToken(mv.second, token);
+        if (inKeyring(r->tokenBlob))
+            blob = r->tokenBlob;
+        else if (!r->tokenBlob.empty() && unprotectToken(mv.first, r->tokenBlob, token))
+            blob = protectToken(mv.second, token);
         wipe(token);
         r->origin = mv.second;
         r->tokenBlob = blob;
@@ -182,16 +226,44 @@ CredentialStore::Record* CredentialStore::findLocked(const std::string& origin) 
 }
 
 bool CredentialStore::get(const std::string& origin, Credential& out) const {
-    std::lock_guard<std::mutex> lk(mu_);
-    loadLocked();
-    Record* r = findLocked(origin);
-    if (!r) return false;
-    out = Credential();
-    out.origin = r->origin;
-    out.username = r->username;
-    out.serverId = r->serverId;
-    out.pinnedSha256 = r->pin;
-    if (!r->tokenBlob.empty()) readLocked(*r, out.token);
+    std::lock_guard<std::mutex> io(ioMu_);
+    std::string blob;
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        loadLocked();
+        Record* r = findLocked(origin);
+        if (!r) return false;
+        out = Credential();
+        out.origin = r->origin;
+        out.username = r->username;
+        out.serverId = r->serverId;
+        out.pinnedSha256 = r->pin;
+        if (r->tokenBlob.empty()) return true;
+        if (!inKeyring(r->tokenBlob)) {
+            // In the file: read here. The keyring takes it once that works.
+            if (readLocked(*r, out.token)) blob = r->tokenBlob;
+        } else {
+            blob = r->tokenBlob;
+        }
+    }
+    if (blob.empty()) return true;
+    if (!inKeyring(blob)) {
+        migrate(origin, blob, out.token);
+        return true;
+    }
+    std::string why, itemOrigin;
+    const bool readable = read(origin, blob, out.token, why, &itemOrigin);
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        Record* r = findLocked(origin);
+        if (r && r->tokenBlob == blob) {
+            // Said once; hasToken() follows the last read (an unlocked keyring makes it readable again).
+            if (!readable && !r->unreadable) LOGW("net: the saved session of %s is not readable from the system keyring (%s)", origin.c_str(), why.c_str());
+            r->unreadable = !readable;
+            r->checked = true;
+        }
+    }
+    if (readable && itemOrigin != origin) migrate(origin, blob, out.token, itemOrigin);   // a moved record
     return true;
 }
 
@@ -200,6 +272,9 @@ bool CredentialStore::hasToken(const std::string& origin) const {
     loadLocked();
     Record* r = findLocked(origin);
     if (!r || r->tokenBlob.empty()) return false;
+    // A token the keyring keeps counts until a read fails (get(), on a network thread): the game
+    // thread asks this, and never waits for the keyring.
+    if (inKeyring(r->tokenBlob)) return !r->unreadable;
     if (!r->checked) {
         std::string token;
         readLocked(*r, token);
@@ -215,6 +290,125 @@ bool CredentialStore::readLocked(Record& r, std::string& token) const {
     r.unreadable = !readable;
     r.checked = true;
     return readable;
+}
+
+// ---- the keyring (under ioMu_, never mu_: the game thread's calls do not wait for it) ----
+
+Keyring* CredentialStore::keyring() const {
+    if (!keyringSet_) {
+        keyring_ = defaultKeyring();
+        keyringSet_ = true;
+    }
+    return keyring_;
+}
+
+void CredentialStore::setKeyring(Keyring* keyring) {
+    std::lock_guard<std::mutex> io(ioMu_);
+    keyring_ = keyring;
+    keyringSet_ = true;
+}
+
+void CredentialStore::interrupt() { cancel_.cancel(); }
+
+// The blob that keeps a token: a keyring item when the keyring takes it, else the file's own
+// format. "" when it could not be kept (DPAPI failed, or interrupt()).
+std::string CredentialStore::protect(const std::string& origin, const std::string& token) const {
+    Keyring* k = keyring();
+    std::string why = keyringOff() ? "SCACELITH_KEYRING=off" : "libsecret-1.so.0 cannot be loaded";
+    if (k) {
+        const std::string id = newItemId();
+        const Keyring::Result res = id.empty() ? Keyring::Result::Unavailable : k->store(origin, id, token, &cancel_, why);
+        if (res == Keyring::Result::Ok) return kKeyringPrefix + id;
+        if (res == Keyring::Result::Cancelled) return std::string();
+        if (id.empty()) why = "no random id";
+    }
+    noteFileFallback(why, path());
+    return protectToken(origin, token);
+}
+
+std::vector<std::string> CredentialStore::movedFrom(const std::string& origin) const {
+    std::lock_guard<std::mutex> lk(mu_);
+    std::vector<std::string> from;
+    for (const auto& mv : moves_)
+        if (mv.second == origin && mv.first != origin) from.push_back(mv.first);
+    return from;
+}
+
+bool CredentialStore::read(const std::string& origin, const std::string& blob, std::string& token, std::string& why,
+                           std::string* itemOrigin, bool* unanswered) const {
+    token.clear();
+    if (itemOrigin) *itemOrigin = origin;
+    if (unanswered) *unanswered = false;
+    if (!inKeyring(blob)) return unprotectToken(origin, blob, token);
+    Keyring* k = keyring();
+    if (!k) {
+        why = "no keyring";
+        if (unanswered) *unanswered = true;
+        return false;
+    }
+    const std::string id = itemId(blob);
+    Keyring::Result res = k->lookup(origin, id, token, &cancel_, why);
+    // A record an origin move gave this origin: its item still names the former one. Only there,
+    // so that a reference copied into another record still finds nothing.
+    if (res == Keyring::Result::Missing) {
+        for (const std::string& from : movedFrom(origin)) {
+            res = k->lookup(from, id, token, &cancel_, why);
+            if (res == Keyring::Result::Missing) continue;
+            if (itemOrigin) *itemOrigin = from;
+            break;
+        }
+    }
+    if (res == Keyring::Result::Missing) why = "no such item";
+    if (res == Keyring::Result::Cancelled) why = "interrupted";
+    if (unanswered) *unanswered = res == Keyring::Result::Unavailable || res == Keyring::Result::Cancelled;
+    if (res == Keyring::Result::Ok && !token.empty()) return true;
+    wipe(token);
+    return false;
+}
+
+// A token the file holds goes to the keyring, and a moved record's item becomes one of its new
+// origin: the record then points to the new item. Nothing changes when the keyring does not take
+// it, or when the file cannot be written (the new item is removed).
+void CredentialStore::migrate(const std::string& origin, const std::string& blob, const std::string& token,
+                              const std::string& itemOrigin) const {
+    Keyring* k = keyring();
+    if (!k || cancel_.cancelled()) return;
+    const std::string id = newItemId();
+    std::string why;
+    if (id.empty() || k->store(origin, id, token, &cancel_, why) != Keyring::Result::Ok) return;
+    bool saved = false;
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        Record* r = findLocked(origin);
+        if (r && r->tokenBlob == blob) {
+            r->tokenBlob = kKeyringPrefix + id;
+            saved = saveLocked();
+            if (!saved) r->tokenBlob = blob;   // the file still holds it
+        }
+    }
+    if (!saved) {
+        if (k->remove(origin, id, &cancel_, why) == Keyring::Result::Unavailable)
+            LOGW("net: a copy of the saved session of %s could not be removed from the system keyring (%s)", origin.c_str(), why.c_str());
+    } else if (inKeyring(blob)) {
+        if (k->remove(itemOrigin, itemId(blob), &cancel_, why) == Keyring::Result::Unavailable)
+            LOGW("net: the saved session of %s could not be removed from the system keyring (%s)", itemOrigin.c_str(), why.c_str());
+    } else {
+        LOGI("net: the saved session of %s moved to the system keyring", origin.c_str());
+    }
+}
+
+void CredentialStore::forget(const std::string& origin, const std::string& blob) const {
+    if (!inKeyring(blob)) return;
+    Keyring* k = keyring();
+    if (!k) return;
+    std::string why;
+    if (k->remove(origin, itemId(blob), &cancel_, why) == Keyring::Result::Unavailable)
+        LOGW("net: the saved session of %s could not be removed from the system keyring (%s)", origin.c_str(), why.c_str());
+    // A moved record not read since: its item names the former origin (its id is random: it can
+    // only be this one).
+    for (const std::string& from : movedFrom(origin))
+        if (k->remove(from, itemId(blob), &cancel_, why) == Keyring::Result::Unavailable)
+            LOGW("net: the saved session of %s could not be removed from the system keyring (%s)", from.c_str(), why.c_str());
 }
 
 std::string CredentialStore::username(const std::string& origin) const {
@@ -234,47 +428,84 @@ std::string CredentialStore::pin(const std::string& origin) const {
 bool CredentialStore::put(const Credential& c, bool* stored) {
     if (stored) *stored = false;
     if (c.origin.empty()) return false;
+    std::lock_guard<std::mutex> io(ioMu_);
     std::string blob;
     if (!c.token.empty()) {
-        blob = protectToken(c.origin, c.token);
+        blob = protect(c.origin, c.token);
         if (blob.empty()) return false;
     }
     if (stored) *stored = true;
-    std::lock_guard<std::mutex> lk(mu_);
-    loadLocked();
-    Record* r = findLocked(c.origin);
-    if (!r) {
-        records_.push_back(Record());
-        r = &records_.back();
-        r->origin = c.origin;
+    std::string old;
+    bool saved;
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        loadLocked();
+        Record* r = findLocked(c.origin);
+        if (!r) {
+            records_.push_back(Record());
+            r = &records_.back();
+            r->origin = c.origin;
+        }
+        old = r->tokenBlob;
+        r->username = c.username;
+        r->serverId = c.serverId;
+        r->pin = c.pinnedSha256;
+        r->tokenBlob = blob;
+        r->unreadable = false;
+        r->checked = true;
+        saved = saveLocked();
     }
-    r->username = c.username;
-    r->serverId = c.serverId;
-    r->pin = c.pinnedSha256;
-    r->tokenBlob = blob;
-    r->unreadable = false;
-    r->checked = true;
-    return saveLocked();
+    // The previous token's item, once the file no longer points to it.
+    if (saved && old != blob) forget(c.origin, old);
+    return saved;
 }
 
 bool CredentialStore::clearToken(const std::string& origin) {
-    std::lock_guard<std::mutex> lk(mu_);
-    loadLocked();
-    Record* r = findLocked(origin);
-    if (!r) return true;
-    r->tokenBlob.clear();
-    return saveLocked();
+    std::lock_guard<std::mutex> io(ioMu_);
+    std::string old;
+    bool saved;
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        loadLocked();
+        Record* r = findLocked(origin);
+        if (!r) return true;
+        old = r->tokenBlob;
+        r->tokenBlob.clear();
+        saved = saveLocked();
+    }
+    if (saved) forget(origin, old);
+    return saved;
 }
 
 bool CredentialStore::clearToken(const std::string& origin, const std::string& token) {
-    std::lock_guard<std::mutex> lk(mu_);
-    loadLocked();
-    Record* r = findLocked(origin);
-    if (!r || r->tokenBlob.empty()) return true;
-    std::string saved;
-    if (unprotectToken(origin, r->tokenBlob, saved) && saved != token) return true;   // another one since
-    r->tokenBlob.clear();
-    return saveLocked();
+    std::lock_guard<std::mutex> io(ioMu_);
+    std::string blob;
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        loadLocked();
+        Record* r = findLocked(origin);
+        if (!r || r->tokenBlob.empty()) return true;
+        blob = r->tokenBlob;
+    }
+    std::string saved, why;
+    bool unanswered = false;
+    const bool readable = read(origin, blob, saved, why, nullptr, &unanswered);
+    const bool another = readable && saved != token;
+    wipe(saved);
+    if (another) return true;   // another one since
+    // The keyring cannot say which token it keeps (locked, failing, interrupted): the reference
+    // stays, since it may name one saved since. A refused token is cleared at its next refusal.
+    if (unanswered) return false;
+    bool ok;
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        Record* r = findLocked(origin);
+        if (!r || r->tokenBlob != blob) return true;
+        r->tokenBlob.clear();
+        ok = saveLocked();
+    }
+    if (ok) forget(origin, blob);
+    return ok;
 }
 
 bool CredentialStore::clearPin(const std::string& origin) {
@@ -287,14 +518,22 @@ bool CredentialStore::clearPin(const std::string& origin) {
 }
 
 bool CredentialStore::erase(const std::string& origin) {
-    std::lock_guard<std::mutex> lk(mu_);
-    loadLocked();
-    for (size_t i = 0; i < records_.size(); ++i)
-        if (records_[i].origin == origin) {
-            records_.erase(records_.begin() + std::ptrdiff_t(i));
-            return saveLocked();
-        }
-    return true;
+    std::lock_guard<std::mutex> io(ioMu_);
+    std::string old;
+    bool saved = true;
+    {
+        std::lock_guard<std::mutex> lk(mu_);
+        loadLocked();
+        for (size_t i = 0; i < records_.size(); ++i)
+            if (records_[i].origin == origin) {
+                old = records_[i].tokenBlob;
+                records_.erase(records_.begin() + std::ptrdiff_t(i));
+                saved = saveLocked();
+                break;
+            }
+    }
+    if (saved) forget(origin, old);
+    return saved;
 }
 
 std::vector<std::string> CredentialStore::origins() const {

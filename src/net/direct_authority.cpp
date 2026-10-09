@@ -63,6 +63,30 @@ std::string sanitizeName(const std::string& in, const char* fallback, size_t max
     return s.empty() ? std::string(fallback) : s;
 }
 
+bool frameForMinor(const uint8_t* p, size_t n, uint16_t minor, std::vector<uint8_t>& out) {
+    P::MsgType t{};
+    if (minor >= 1 || !P::peekType(p, n, t)) return false;
+    auto older = [](P::EndReason& r) {
+        if (r != P::EndReason::ResignationVsInsufficient) return false;
+        r = P::EndReason::Resignation;
+        return true;
+    };
+    out.clear();
+    if (t == P::MsgType::GameEnd) {
+        P::GameEnd m;
+        if (!P::decode(p, n, m) || !older(m.reason)) return false;
+        P::encode(m, out);
+        return true;
+    }
+    if (t == P::MsgType::GameSnapshot) {
+        P::GameSnapshot m;
+        if (!P::decode(p, n, m) || !older(m.reason)) return false;
+        P::encode(m, out);
+        return true;
+    }
+    return false;
+}
+
 Authority::Authority(const AuthorityConfig& cfg, const std::string& hostName, const std::string& guestName, int hostColorPref,
                      uint64_t firstGameId)
     : cfg_(cfg), nextId_(firstGameId ? firstGameId : 1) {

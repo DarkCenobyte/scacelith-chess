@@ -450,7 +450,8 @@ const char* reasonKey(GameEndReason r) {
     case GameEndReason::Stalemate: return "appraisal.reason.stalemate";
     case GameEndReason::InsufficientMaterial:
     case GameEndReason::TimeoutVsInsufficient:
-    case GameEndReason::IllegalMovesVsInsufficient: return "appraisal.reason.material";
+    case GameEndReason::IllegalMovesVsInsufficient:
+    case GameEndReason::ResignationVsInsufficient: return "appraisal.reason.material";
     case GameEndReason::FivefoldRepetition:
     case GameEndReason::ThreefoldClaim: return "appraisal.reason.repetition";
     case GameEndReason::SeventyFiveMoves:
@@ -632,7 +633,8 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
         if (stalemated) {
             b = say(bandKey("appraisal.improve.stalemate", L), Look::Player);
         } else if (crit) {
-            const bool wasWinning = crit->wBest >= 70.0;
+            // "You were winning until move {crit_no}": the move threw the win away.
+            const bool wasWinning = crit->wBest >= 70.0 && crit->wPlayed < 50.0;
             b = say(bandKey(wasWinning ? "appraisal.improve.was_winning"
                                        : (L == 1 ? "appraisal.improve.theme" : "appraisal.improve.critical"),
                             L),
@@ -649,7 +651,7 @@ Script Appraisal::script(const Game& g, const AppraisalContext& ctx) const {
         } else if (st.coachHungPly >= 0 && L <= 3) {
             b = say(bandKey("appraisal.improve.coach_hung", L), Look::Player);
             b.line.with("my", Arg::ofPiece(st.coachHungType, opposite(human_), false))
-                .with("n", Arg::ofNumber(moveNumberOf(g, st.coachHungPly)));
+                .with("n", Arg::ofNumber(moveNumberOf(g, st.coachHungPly + 1)));   // the human's move that missed it
         } else {
             b = say(bandKey("appraisal.improve.clean", L), Look::Player);
         }

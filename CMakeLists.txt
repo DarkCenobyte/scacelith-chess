@@ -19,12 +19,23 @@ endif()
 
 option(SCACELITH_CONSOLE "Windows: build a console-subsystem exe (logs visible)" OFF)
 option(SCACELITH_STOCKFISH "Embed the Stockfish engine" ON)
+# Runtime checks for the unit tests on Linux (GCC or Clang): -DSCACELITH_SANITIZE=address,undefined
+# builds everything with those sanitizers, every finding fatal; the tests that measure time skip.
+set(SCACELITH_SANITIZE "" CACHE STRING "Sanitizers for a test build (e.g. address,undefined; empty = none)")
 set(SCACELITH_OFFICIAL_SERVER "" CACHE STRING "Official online server: host[:apiPort[:wsPort]] (empty = caissa.scacelith.com:443, apiPort 443 when omitted, none = no official server)")
 
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 if(WIN32)
     enable_language(RC)
     add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN UNICODE _UNICODE)
+endif()
+if(SCACELITH_SANITIZE)
+    if(WIN32)
+        message(FATAL_ERROR "SCACELITH_SANITIZE is for the Linux test build")
+    endif()
+    add_compile_options(-fsanitize=${SCACELITH_SANITIZE} -fno-sanitize-recover=all -fno-omit-frame-pointer)
+    add_link_options(-fsanitize=${SCACELITH_SANITIZE})
+    add_compile_definitions(SCACELITH_SANITIZED)
 endif()
 include(cmake/embed.cmake)
 
@@ -95,7 +106,8 @@ if(WIN32)
     target_link_libraries(scacelith_core PUBLIC ole32 winmm avrt)
 else()
     find_package(Threads REQUIRED)
-    # dl: libasound.so.2 is loaded at run time (src/audio/backend_alsa.cpp; in libc from glibc 2.34)
+    # dl: libasound.so.2 and libsecret-1.so.0 are loaded at run time (src/audio/backend_alsa.cpp,
+    # src/net/secret_service.cpp; in libc from glibc 2.34)
     target_link_libraries(scacelith_core PUBLIC Threads::Threads ${CMAKE_DL_LIBS})
 endif()
 # Text-to-speech (src/tts): the compute kernels are compiled once per instruction set and chosen at

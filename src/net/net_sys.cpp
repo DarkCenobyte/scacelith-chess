@@ -10,6 +10,7 @@
 #else
 #include <cerrno>
 #include <climits>
+#include <csignal>
 #include <filesystem>
 #include <system_error>
 #include <fcntl.h>
@@ -270,11 +271,28 @@ bool writeFileAtomic(const std::string& path, const std::string& data, bool priv
 
 bool removeFile(const std::string& path) { return unlink(path.c_str()) == 0; }
 
+int spawnProgram(char* const argv[]) {
+    if (!argv || !argv[0]) return -1;
+    // SIGPIPE back to its default action in the child: an ignored signal stays ignored across exec,
+    // and the game ignores it (main.cpp), which xdg-open's pipelines and the browser do not expect.
+    posix_spawnattr_t attr;
+    if (posix_spawnattr_init(&attr) != 0) return -1;
+    sigset_t dfl;
+    sigemptyset(&dfl);
+    sigaddset(&dfl, SIGPIPE);
+    pid_t pid = -1;
+    int spawned = posix_spawnattr_setsigdefault(&attr, &dfl);
+    if (spawned == 0) spawned = posix_spawnattr_setflags(&attr, POSIX_SPAWN_SETSIGDEF);
+    if (spawned == 0) spawned = posix_spawnp(&pid, argv[0], nullptr, &attr, argv, environ);
+    posix_spawnattr_destroy(&attr);
+    return spawned == 0 ? int(pid) : -1;
+}
+
 bool openBrowser(const std::string& url) {
     if (url.compare(0, 8, "https://") != 0 && url.compare(0, 7, "http://") != 0) return false;
-    pid_t pid;
     char* argv[] = {const_cast<char*>("xdg-open"), const_cast<char*>(url.c_str()), nullptr};
-    if (posix_spawnp(&pid, "xdg-open", nullptr, nullptr, argv, environ) != 0) return false;
+    const pid_t pid = spawnProgram(argv);
+    if (pid < 0) return false;
     // xdg-open returns quickly (it detaches the browser); reap it so no zombie stays behind.
     int status = 0;
     waitpid(pid, &status, 0);

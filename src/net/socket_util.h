@@ -1,13 +1,16 @@
-// Small portable socket layer for the direct match and the UPnP client (Winsock2 on Windows,
-// POSIX sockets elsewhere). Internal to src/net: the platform headers stay in socket_util.cpp,
-// addresses travel as an opaque Endpoint.
+// Small portable socket layer for the direct match and the UPnP client, and the name resolution
+// of the Linux transport (Winsock2 on Windows, POSIX sockets elsewhere). Internal to src/net: the
+// platform headers stay in socket_util.cpp, addresses travel as an opaque Endpoint.
 //
 // Every socket used by the direct match is non-blocking and driven by PollSet (select() on
 // Windows, poll() elsewhere), so a worker thread never waits longer than the deadline it chose;
 // nothing here runs on the game thread.
 #pragma once
+#include <atomic>
 #include <cstddef>
 #include <cstdint>
+#include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -47,8 +50,40 @@ struct Endpoint {
     static Endpoint anyV6(uint16_t port);
 };
 
-// getaddrinfo (blocking: worker threads only). Numeric addresses resolve at once.
-bool resolve(const std::string& host, uint16_t port, bool tcp, std::vector<Endpoint>& out);
+// A name resolution its caller can give up. getaddrinfo cannot be interrupted, and a slow or
+// silent DNS server keeps it for tens of seconds: it runs on a thread of its own, detached, which
+// shares its answer with the caller through a state they both own; the caller waits for that
+// answer until its deadline or a stop request and goes on. A lookup still running then finishes
+// alone and its answer is dropped (the thread touches nothing else); with 16 of those still
+// running, a new lookup fails at once (NotFound) rather than start one more. A numeric address
+// resolves at once, on the caller's thread. Used by the Linux transport (transport_openssl.cpp) and the direct
+// match's guest.
+class Lookup {
+public:
+    enum class Result { Found, NotFound, TimedOut, Stopped };
+    Lookup(const std::string& host, uint16_t port, bool tcp);   // starts the lookup
+    ~Lookup();
+    Lookup(const Lookup&) = delete;
+    Lookup& operator=(const Lookup&) = delete;
+    // Waits for the answer at most timeoutMs. Stopped once stop() was called, or as soon as stopped
+    // (optional, checked every 20 ms) returns true; an answer that arrived first is still Found.
+    Result wait(int timeoutMs, const std::function<bool()>& stopped = nullptr);
+    // From any thread: wait() returns Stopped at once. Never blocks (an abort action may call it).
+    void stop();
+    // Once wait() returned Found: the addresses, in getaddrinfo's order, without duplicates.
+    const std::vector<Endpoint>& endpoints() const;
+    // Once wait() returned NotFound: why ("Name or service not known"...).
+    std::string error() const;
+
+    // The name lookup the threads run, getaddrinfo by default; the tests put a slow one in its
+    // place (nullptr: getaddrinfo again). A lookup keeps the one in place when it started.
+    using Fn = bool (*)(const std::string& host, uint16_t port, bool tcp, std::vector<Endpoint>& out, std::string& error);
+    static void setForTests(Fn fn);
+
+private:
+    struct State;
+    std::shared_ptr<State> s_;
+};
 
 Handle openTcp(int family);          // non-blocking
 Handle openUdpV4();                  // non-blocking
@@ -71,8 +106,9 @@ Handle acceptOne(Handle listener, Endpoint* peer, bool noInherit = false);
 // connectResult), -1 = failed (err set).
 int connectStart(Handle h, const Endpoint& ep, int& err);
 int connectResult(Handle h);         // 0 = connected, otherwise the socket error
-// Blocking-with-deadline connect for simple request/response clients (UPnP HTTP).
-Handle connectWithTimeout(const Endpoint& ep, int timeoutMs, std::string& err);
+// Blocking-with-deadline connect for simple request/response clients (UPnP HTTP). cancel
+// (optional, checked every 100 ms) ends the wait early: err "cancelled".
+Handle connectWithTimeout(const Endpoint& ep, int timeoutMs, std::string& err, const std::atomic<bool>* cancel = nullptr);
 
 // >0 bytes moved, 0 = would block, -1 = error or (recv) orderly close: see closed.
 int sendSome(Handle h, const uint8_t* p, size_t n);

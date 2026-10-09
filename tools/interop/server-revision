@@ -1,0 +1,6 @@
+# The commit of the dedicated server (DarkCenobyte/scacelith-chess-server) this game's contract is
+# checked against: the CI's interop job (and the release that runs it) builds that server, runs its
+# tools/interop/check-game.sh on this checkout and the live online tests against it. Move it forward
+# together with every change of the contract (protocol, shared fixtures, chess rules), to a server
+# commit that passes both. The server pins this game the same way (its tools/interop/game-revision).
+d61cf4e8fc6ac665a61d0cfabdf9c655505ba093

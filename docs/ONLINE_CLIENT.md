@@ -100,8 +100,20 @@ The official server used port 44664 before. A player signed in there stays signe
 credential file has a record for `<official host>:44664` and none for the official origin, the
 record (user name, token, server id, pin) moves to the official origin the first time the file is
 read (`CredentialStore::addOriginMove`; on Windows the token is decrypted for the old origin and
-encrypted again for the new one). Only the official host of the build moves, never a community
-server.
+encrypted again for the new one; on Linux a token the system keyring keeps is found under the old
+origin, and moves to an item of the new one the first time it is read). Only the official host of
+the build moves, never a community server.
+
+Where the saved sessions are kept (`net/credential_store.h`): on Windows in `Scacelith.credentials`,
+each token encrypted with DPAPI for the Windows account. On Linux the system keyring keeps the
+tokens when there is one (the Secret Service: GNOME Keyring, KWallet, KeePassXC...; libsecret is
+loaded at run time, `src/net/secret_service.cpp`), and the file only names their items
+(`keyring:`); a token an earlier version wrote in the file moves to the keyring the first time it is
+read. The game never asks to unlock a keyring: with none (no libsecret, no D-Bus session, no
+default collection), a locked one, or `SCACELITH_KEYRING=off` in the environment, the tokens stay
+in the file in the clear (`bound:`), protected only by its permissions (0600, in a 0700 folder),
+and the log says so once. Logout, a session the server refused and a deleted account remove the
+keyring item with the reference (a locked keyring keeps it: the log says so).
 
 ## Account API
 

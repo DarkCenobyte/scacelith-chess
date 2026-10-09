@@ -11,7 +11,9 @@
 // ("host:apiPort"). The session token, the pinned certificate and the remembered user name are
 // stored per origin (CredentialStore) and are only ever sent to that origin: the WebSocket goes
 // to the same host, HTTP redirects are never followed, and switching servers never carries a
-// token over. Tokens are encrypted at rest with DPAPI on Windows.
+// token over. Tokens are encrypted at rest with DPAPI on Windows; on Linux the system keyring
+// (Secret Service) keeps them, or the file in the clear (mode 0600) when there is none
+// (net/credential_store.h).
 //
 // Engine-free (no GL, no UI): compiled into scacelith_core and unit-tested (tests/net_tests.cpp).
 //

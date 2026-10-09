@@ -206,7 +206,7 @@ TEST(image_png_bytes) {
 TEST(image_ico_entries) {
     // A 2x2 32-bit DIB entry (bottom-up BGRA rows, then the AND mask) and a PNG entry.
     std::vector<uint8_t> ico = {0, 0, 1, 0, 2, 0};
-    auto le = [&](std::vector<uint8_t>& v, uint32_t x, int bytes) {
+    auto le = [&](std::vector<uint8_t>& v, uint64_t x, int bytes) {
         for (int i = 0; i < bytes; ++i) v.push_back(uint8_t(x >> (8 * i)));
     };
     std::vector<uint8_t> dib;
