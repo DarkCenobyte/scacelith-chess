@@ -445,14 +445,14 @@ fonts, of Stockfish's authors, of the QR code generator and of the opening names
   `assets/fonts/` and `assets/fonts/hand/`.
 - **The compiler's runtime libraries**, linked into the Windows executable and the Linux release
   build: libstdc++ and libgcc (GPL-3.0-or-later with the GCC Runtime Library Exception; libstdc++
-  includes [Ryu](https://github.com/ulfjack/ryu), Apache-2.0 or BSL-1.0, and
+  includes [Ryu](https://github.com/ulfjack/ryu), Apache-2.0 or BSL-1.0, and, in the Windows build,
   [fast_float](https://github.com/fastfloat/fast_float), Apache-2.0 or MIT). The Windows executable
   also links the [MinGW-w64](https://www.mingw-w64.org) runtime (ZPL-2.1 and other permissive
   licences, parts in the public domain) and winpthreads (MIT and BSD-3-Clause).
 
 ### Code adapted from other projects
 
-These parts of the game's own code follow published code closely (the source files name them):
+These parts of the game's own code follow published code closely:
 
 - Text normalisation of the coach's voice (`src/tts/text.cpp`): Supertone's
   [Supertonic](https://github.com/supertone-inc/supertonic) sample code (`py/helper.py`, v3.0.0),
@@ -467,7 +467,7 @@ These parts of the game's own code follow published code closely (the source fil
   Hillaire's [UnrealEngineSkyAtmosphere](https://github.com/sebh/UnrealEngineSkyAtmosphere), MIT,
   © 2020 Epic Games, Inc., with Eric Bruneton's transmittance parametrisation
   ([precomputed_atmospheric_scattering](https://github.com/ebruneton/precomputed_atmospheric_scattering)),
-  BSD-3-Clause, © 2017 Eric Bruneton.
+  BSD-3-Clause, © 2008 INRIA and 2017 Eric Bruneton.
 - Round cone distance of the chess set and the robot (`src/scene/sdf_mesher.cpp`,
   `src/character/sdf.h`): [Inigo Quilez](https://iquilezles.org/articles/distfunctions/), MIT.
 - History clipping of the temporal anti-aliasing (`shaders/post/post_common.glsl`): Playdead's
@@ -480,7 +480,7 @@ These parts of the game's own code follow published code closely (the source fil
   ([1024cores.net](https://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue)),
   simplified BSD licence, © 2010-2011 Dmitry Vyukov.
 - Huffman decoding tables of the bzip2 reader (`src/core/bzip2.cpp`):
-  [bzip2](https://sourceware.org/bzip2/), bzip2 licence, © 1996-2010 Julian Seward.
+  [bzip2](https://sourceware.org/bzip2/), bzip2 licence, © 1996-2019 Julian Seward.
 
 ### Used from the system, not shipped
 
