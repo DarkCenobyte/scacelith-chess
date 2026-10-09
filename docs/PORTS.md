@@ -35,8 +35,9 @@ other targets, so that the work can start from it.
   `APPIMAGE_EXTRACT_AND_RUN=1` work too. The runtime sets `APPIMAGE` and `APPDIR`.
 - Never bundle libssl (a bundled copy looks for its CA store at the build distribution's path and
   breaks TLS on Fedora, Arch, openSUSE...), libasound (dlopen'd: the host's library, configuration
-  and PulseAudio/PipeWire plugins must be used), libGL or libX11.
-- The game keeps its settings, log and session token in `$XDG_CONFIG_HOME/scacelith/` (by default
+  and PulseAudio/PipeWire plugins must be used), libsecret (dlopen'd: it talks to the host's
+  keyring over D-Bus), libGL or libX11.
+- The game keeps its settings, log and saved logins in `$XDG_CONFIG_HOME/scacelith/` (by default
   `~/.config/scacelith/`) on Linux unless a `Scacelith.ini` stands next to the executable (portable
   mode): in extract-and-run mode the executable lives in `$TMPDIR/appimage_extracted_<hash>/usr/bin`, so the portable mode must never
   apply to an AppImage.

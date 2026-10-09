@@ -95,7 +95,8 @@ if(WIN32)
     target_link_libraries(scacelith_core PUBLIC ole32 winmm avrt)
 else()
     find_package(Threads REQUIRED)
-    # dl: libasound.so.2 is loaded at run time (src/audio/backend_alsa.cpp; in libc from glibc 2.34)
+    # dl: libasound.so.2 and libsecret-1.so.0 are loaded at run time (src/audio/backend_alsa.cpp,
+    # src/net/secret_service.cpp; in libc from glibc 2.34)
     target_link_libraries(scacelith_core PUBLIC Threads::Threads ${CMAKE_DL_LIBS})
 endif()
 # Text-to-speech (src/tts): the compute kernels are compiled once per instruction set and chosen at
