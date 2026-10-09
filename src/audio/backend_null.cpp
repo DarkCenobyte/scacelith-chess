@@ -97,10 +97,14 @@ public:
         quit_.store(false);
         const char* env = std::getenv("SCACELITH_AUDIO_DUMP");
         if (env && *env) {
-            // Written at the path resolved once (weakly_canonical: its existing folders without ".",
-            // ".." or symbolic links), the one the log names.
+            // Written under the file name given (a pipe such as /dev/stdout stays one), in its folder
+            // resolved once (weakly_canonical: absolute, no "." or ".." parts, no symbolic link where
+            // it exists): the path the log names.
+            const std::filesystem::path given(env);
             std::error_code ec;
-            const std::string path = std::filesystem::weakly_canonical(env, ec).string();
+            const std::filesystem::path folder =
+                std::filesystem::weakly_canonical(given.has_parent_path() ? given.parent_path() : ".", ec);
+            const std::string path = (folder / given.filename()).string();
             if (!ec && dump_.open(path.c_str(), kRate)) LOGI("audio: dumping the output to %s", path.c_str());
             else LOGW("audio: cannot write the output dump %s", env);
         }

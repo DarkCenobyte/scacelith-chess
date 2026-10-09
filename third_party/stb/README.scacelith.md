@@ -2,7 +2,8 @@
 
 The game's text is rasterised by [stb_truetype](https://github.com/nothings/stb) (Sean Barrett), a
 single-file TrueType library in the public domain or under the MIT licence, at the user's choice
-(the end of `stb_truetype.h`). `src/ui/ui_font.cpp` turns its glyph rasters into the distance
+(the end of `stb_truetype.h`); the release packages carry no licence text for it, which the
+public-domain alternative allows. `src/ui/ui_font.cpp` turns its glyph rasters into the distance
 fields of the font atlas and of the markings baked by `renderLineSdf()`.
 
 ## Provenance
@@ -33,8 +34,14 @@ file from the player's disk or from the network: keep it that way.
 The game rasterises with `stbtt_MakeGlyphBitmap` and `stbtt_MakeGlyphBitmapSubpixel`, into buffers
 it sizes itself in `size_t`. The functions that allocate or clear a bitmap of an `int` product of
 its sides (`stbtt_GetGlyphBitmap`, `stbtt_GetCodepointBitmap` and their subpixel variants,
-`stbtt_GetGlyphSDF`, `stbtt_BakeFontBitmap`, `stbtt_PackBegin`), which CodeQL reported as
+`stbtt_GetGlyphSDF` and `stbtt_GetCodepointSDF`, `stbtt_BakeFontBitmap`, `stbtt_PackBegin`), which CodeQL reported as
 "Multiplication result converted to larger type" while the header was scanned, are not used.
-Upstream pull request [#1867](https://github.com/nothings/stb/pull/1867) (open, not merged) would
+Upstream pull request [#1867](https://github.com/nothings/stb/pull/1867) (open, not merged, as of 2026-10) would
 add overflow checks to `stbtt_GetGlyphBitmapSubpixel`, behind the bitmap functions, and to
 `stbtt_GetGlyphSDF`.
+
+## Updating
+
+Replace `stb_truetype.h` with the new upstream file and update the blob and commits above. Keep
+`STB_TRUETYPE_IMPLEMENTATION` in `stb_truetype.cpp` only, never in a file under `src/`, or the
+implementation is scanned again.

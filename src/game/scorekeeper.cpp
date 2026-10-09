@@ -45,7 +45,8 @@ sheet::PieceLetters localizedPieceLetters() {
 std::string scoresheetDate(bool fixedForScreenshots) {
     int d = 28, mo = 9, y = 2026;
     if (!fixedForScreenshots) {
-        // Into our own tm (localtime_r / localtime_s), not std::localtime's buffer shared by every thread.
+        // Into our own tm (localtime_r / localtime_s), not std::localtime's buffer shared by every
+        // thread.
         std::tm tm{};
         if (archive::localTime(std::time(nullptr), tm)) {
             d = tm.tm_mday;

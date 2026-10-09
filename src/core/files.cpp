@@ -1,5 +1,6 @@
 #include "files.h"
 #ifdef _WIN32
+#include <exception>
 #include <filesystem>
 #else
 #include <fcntl.h>
@@ -11,12 +12,20 @@ namespace files {
 
 #ifdef _WIN32
 std::FILE* create(const char* path, bool) {
-    return _wfopen(std::filesystem::u8path(path).c_str(), L"wb");
+    std::filesystem::path wide;
+    try {
+        wide = std::filesystem::u8path(path);
+    } catch (const std::exception&) {
+        // Not UTF-8: bytes of the ANSI code page (GetTempPathA's, in the tests), as std::fopen takes
+        // them, rather than u8path's exception.
+        return std::fopen(path, "wb");
+    }
+    return _wfopen(wide.c_str(), L"wb");
 }
 #else
 std::FILE* create(const char* path, bool privateFile) {
-    // The permissions spelled out, as net::sys::writeFileAtomic does: never writable by other users,
-    // whatever the umask (some service managers and containers start programs with 0).
+    // The permissions spelled out, as net::sys::writeFileAtomic does: never writable by other
+    // users, whatever the umask (some service managers and containers start programs with 0).
     int fd = ::open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC, privateFile ? 0600 : 0644);
     if (fd < 0) return nullptr;
     // The mode applies to a new file only: a private one an older version made with fopen loses

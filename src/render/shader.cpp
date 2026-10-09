@@ -8,6 +8,7 @@
 #include <sstream>
 #include <cstdio>
 #include <cstdlib>
+#include <exception>
 #include <filesystem>
 #include <functional>
 #include <system_error>
@@ -89,13 +90,18 @@ const std::string& dumpDirectory() {
         const char* env = std::getenv("SCACELITH_DUMP_SHADERS");
         if (!env || !*env) return std::string();
         std::error_code ec;
-        const std::filesystem::path p = std::filesystem::canonical(env, ec);
+        std::filesystem::path p;
+        try {
+            p = std::filesystem::canonical(std::filesystem::u8path(env), ec);
+        } catch (const std::exception&) {   // not UTF-8 (Windows)
+            ec = std::make_error_code(std::errc::illegal_byte_sequence);
+        }
         if (ec || !std::filesystem::is_directory(p, ec)) {
             LOGW("shaders: no dump, %s is not a folder", env);
             return std::string();
         }
-        LOGI("shaders: dumping the preprocessed sources to %s", p.string().c_str());
-        return p.string() + "/";
+        LOGI("shaders: dumping the preprocessed sources to %s", p.u8string().c_str());
+        return p.u8string() + "/";
     }();
     return dir;
 }

@@ -10,6 +10,8 @@
 #else
 #include <cerrno>
 #include <climits>
+#include <filesystem>
+#include <system_error>
 #include <fcntl.h>
 #include <spawn.h>
 #include <sys/stat.h>
@@ -183,13 +185,17 @@ std::string exeDirectory() {
     return s.substr(0, s.find_last_of('/') + 1);
 }
 
-// A per-user folder from the environment (just created), at its canonical path (absolute, no "." or
-// ".." parts, no symbolic link), the one the game logs and shows; one that could not be created
-// falls back like a missing $HOME.
+// A per-user folder from the environment (just created), resolved once to its canonical path
+// (weakly_canonical: absolute, no "." or ".." parts, no symbolic link where it exists), the one the
+// game logs and shows. One that could not be created stays where it was asked for: writing there
+// fails, as before.
 static std::string canonicalDirectory(const std::string& dir) {
-    char real[PATH_MAX];
-    if (!realpath(dir.c_str(), real)) return exeDirectory();
-    return std::string(real) + "/";
+    std::error_code ec;
+    std::filesystem::path p = std::filesystem::weakly_canonical(dir, ec);
+    if (ec) p = std::filesystem::path(dir).lexically_normal();
+    std::string d = p.string();
+    if (d.empty() || d.back() != '/') d += '/';
+    return d;
 }
 
 std::string userDataDirectory() {
