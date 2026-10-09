@@ -411,17 +411,86 @@ commit SHA); the code vendored in `third_party/` is updated by hand.
 ## Licence
 
 Scacelith is free software under the GNU General Public License v3.0 (see `LICENSE`), because it
-embeds [Stockfish](https://stockfishchess.org) (GPL-3.0), whose source is in
-`third_party/stockfish/` with its own copyright notices. Stockfish's neural network was trained on
-data provided by the Leela Chess Zero project, which is made available under the Open Database
-License (ODbL). The Cinzel, EB Garamond and Amiri (Khaled Hosny) interface fonts and the handwriting
-fonts Caveat (Impallari Type), Marck Script (Denis Masharov), Bad Script (Gaslight), Aref Ruqaa
-(Abdullah Aref, Khaled Hosny), Klee One (Fontworks) and LXGW WenKai / WenKai TC (LXGW) are under the
-SIL Open Font License 1.1; the Arabic and CJK fonts (Amiri, Aref Ruqaa, Klee One, LXGW WenKai /
-WenKai TC) are subset and renamed from the upstream files by `tools/prepare_fonts.py`, the others
-are the upstream files unchanged. The chess figures of the promotion picker come from a subset of
-GNU FreeFont FreeSerif (GPL-3.0+ with the font exception). All licence texts are in `assets/fonts/`
-and `assets/fonts/hand/`. The coach's voice model (Supertonic 3) is not part of the program nor of
-its release package: the game downloads it from its publishers at the player's request. It has its
-own licence (BigScience Open RAIL-M), whose use restrictions the download prompt shows; see
+embeds [Stockfish](https://stockfishchess.org) (GPL-3.0-or-later). The third-party parts it is made
+with are listed below with their licences. The release packages carry the licence texts of the
+fonts, of Stockfish's authors, of the QR code generator and of the opening names (`licences/`).
+
+### Compiled or embedded into the game
+
+- **[Stockfish](https://github.com/official-stockfish/Stockfish) 19** (tag `sf_19`,
+  `third_party/stockfish/`): GPL-3.0-or-later, © the Stockfish developers
+  (`third_party/stockfish/AUTHORS`). Its neural network `nn-1a298aa575a0.nnue` (CC0-1.0,
+  [official-stockfish/networks](https://github.com/official-stockfish/networks)) was trained on data
+  provided by the Leela Chess Zero project, which is made available under the Open Database License
+  (ODbL). It is embedded with Dale Weiler's [incbin](https://github.com/graphitemaster/incbin)
+  (public domain, Unlicense).
+- **[QR Code generator](https://www.nayuki.io/page/qr-code-generator-library)** (C++,
+  `third_party/qrcodegen/`), for the two-factor setup page: MIT, © Project Nayuki
+  (`third_party/qrcodegen/LICENSE`).
+- **[stb_truetype](https://github.com/nothings/stb)** v1.26 (`third_party/stb/`), the font
+  rasteriser: public domain (Unlicense) or MIT, at the user's choice, © Sean Barrett.
+- **OpenGL API headers** of the Khronos Group (`third_party/khronos/`, `glcorearb.h` and
+  `khrplatform.h`; only their declarations are used): MIT, © The Khronos Group Inc.
+- **Opening names** from lichess's [chess-openings](https://github.com/lichess-org/chess-openings)
+  (`assets/coach/openings_data/`): CC0-1.0 (`assets/licences/lichess-chess-openings-CC0.txt`).
+- **Unicode Character Database** 14.0, from which the NFKD table of the coach's voice
+  (`src/tts/nfkd_table.cpp`) is generated: Unicode licence (Unicode-DFS-2016), © Unicode, Inc.
+- **Fonts.** The Cinzel, EB Garamond and Amiri (Khaled Hosny) interface fonts and the handwriting
+  fonts Caveat (Impallari Type), Marck Script (Denis Masharov), Bad Script (Gaslight), Aref Ruqaa
+  (Abdullah Aref, Khaled Hosny), Klee One (Fontworks) and LXGW WenKai / WenKai TC (LXGW) are under
+  the SIL Open Font License 1.1; the Arabic and CJK fonts (Amiri, Aref Ruqaa, Klee One, LXGW WenKai
+  / WenKai TC) are subset and renamed from the upstream files by `tools/prepare_fonts.py`, the
+  others are the upstream files unchanged. The chess figures of the promotion picker come from a
+  subset of GNU FreeFont FreeSerif (GPL-3.0+ with the font exception). All licence texts are in
+  `assets/fonts/` and `assets/fonts/hand/`.
+- **The compiler's runtime libraries**, linked into the Windows executable and the Linux release
+  build: libstdc++ and libgcc (GPL-3.0-or-later with the GCC Runtime Library Exception; libstdc++
+  includes [Ryu](https://github.com/ulfjack/ryu), Apache-2.0 or BSL-1.0, and
+  [fast_float](https://github.com/fastfloat/fast_float), Apache-2.0 or MIT). The Windows executable
+  also links the [MinGW-w64](https://www.mingw-w64.org) runtime (ZPL-2.1 and other permissive
+  licences, parts in the public domain) and winpthreads (MIT and BSD-3-Clause).
+
+### Code adapted from other projects
+
+These parts of the game's own code follow published code closely (the source files name them):
+
+- Text normalisation of the coach's voice (`src/tts/text.cpp`): Supertone's
+  [Supertonic](https://github.com/supertone-inc/supertonic) sample code (`py/helper.py`, v3.0.0),
+  MIT, © 2025 Supertone Inc.
+- Move and game accuracy of the game review (`src/coach/review.cpp`, `src/coach/appraisal.cpp`):
+  lichess's [lila](https://github.com/lichess-org/lila) (`AccuracyPercent`), AGPL-3.0-or-later.
+  Game phases (`src/coach/tactics.cpp`): lichess's
+  [scalachess](https://github.com/lichess-org/scalachess) (`Divider`), MIT, © Thibault Duplessis.
+- AgX tone mapping (`shaders/post/tonemap.frag`, `src/render/post/display_transform.h`):
+  [three.js](https://github.com/mrdoob/three.js), MIT, © three.js authors.
+- Sky and atmosphere (`shaders/lighting/atmosphere.glsl` and `multiscatter_lut.comp`): Sébastien
+  Hillaire's [UnrealEngineSkyAtmosphere](https://github.com/sebh/UnrealEngineSkyAtmosphere), MIT,
+  © 2020 Epic Games, Inc., with Eric Bruneton's transmittance parametrisation
+  ([precomputed_atmospheric_scattering](https://github.com/ebruneton/precomputed_atmospheric_scattering)),
+  BSD-3-Clause, © 2017 Eric Bruneton.
+- Round cone distance of the chess set and the robot (`src/scene/sdf_mesher.cpp`,
+  `src/character/sdf.h`): [Inigo Quilez](https://iquilezles.org/articles/distfunctions/), MIT.
+- History clipping of the temporal anti-aliasing (`shaders/post/post_common.glsl`): Playdead's
+  [temporal](https://github.com/playdeadgames/temporal), MIT, © 2015 Playdead.
+- BRDF details (`shaders/include/brdf.glsl`): Google's
+  [Filament](https://github.com/google/filament), Apache-2.0.
+- PCG32 random numbers (`src/math/math.h`, `src/audio/dsp.h`): Melissa O'Neill's
+  [pcg-c-basic](https://github.com/imneme/pcg-c-basic), Apache-2.0.
+- Audio queue (`src/audio/queue.h`): Dmitry Vyukov's bounded MPMC queue
+  ([1024cores.net](https://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue)),
+  simplified BSD licence, © 2010-2011 Dmitry Vyukov.
+- Huffman decoding tables of the bzip2 reader (`src/core/bzip2.cpp`):
+  [bzip2](https://sourceware.org/bzip2/), bzip2 licence, © 1996-2010 Julian Seward.
+
+### Used from the system, not shipped
+
+On Linux the game uses the system's GNU C Library (LGPL-2.1-or-later), OpenSSL 3 (Apache-2.0),
+libX11 (MIT/X11), OpenGL library (libglvnd, MIT) and graphics driver, and ALSA (libasound,
+LGPL-2.1-or-later, loaded at run time); on Windows, the system's DLLs.
+
+### Downloaded at the player's request
+
+The coach's voice model (Supertonic 3) is not part of the program nor of its release package: the
+game downloads it from its publishers at the player's request. It has its own licence (BigScience
+Open RAIL-M), whose use restrictions the download prompt shows; see
 `third_party/supertonic3/README.scacelith.md`.
