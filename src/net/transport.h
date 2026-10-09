@@ -1,8 +1,7 @@
 // Transports of the online client: HTTPS requests and a binary WebSocket client.
 //   Windows:  WinHTTP (transport_win32.cpp): OS TLS stack and trust store, system proxy,
 //             WinHTTP WebSocket API.
-//   Linux:    OpenSSL (transport_openssl.cpp, development and test builds) with a minimal
-//             HTTP/1.1 and RFC 6455 client.
+//   Linux:    OpenSSL (transport_openssl.cpp) with a minimal HTTP/1.1 and RFC 6455 client.
 //
 // Security rules applied here, whatever the caller asks:
 //   - TLS certificates are validated by the OS trust store (Linux: OpenSSL default paths),
@@ -17,6 +16,9 @@
 //
 // Every function blocks and is called from the client's network threads only. A CancelToken
 // lets another thread abort a blocking call (shutdown).
+//
+// Linux: nothing the transport writes raises SIGPIPE, whatever the process does with that signal
+// (a peer that reset the connection, a socket shut down by a cancellation).
 #pragma once
 #include <atomic>
 #include <cstdint>
