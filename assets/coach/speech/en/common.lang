@@ -129,6 +129,8 @@ count.inaccuracy = {n} inaccuracy|{n} inaccuracies
 count.game = {n} game|{n} games
 count.time = {n} time|{n} times
 count.square = {n} square|{n} squares
+count.attacker = {n} attacker|{n} attackers
+count.defender = {n} defender|{n} defenders
 
 # ---- Evaluations (the strongest levels) ------------------------------------------------------------
 # From the listener's point of view. {x} = pawns with one decimal (number.decimal), {n} = moves.
