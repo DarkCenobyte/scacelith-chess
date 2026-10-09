@@ -331,6 +331,32 @@ TEST(net_sigpipe_ws_close_notify) {
 // (shutdown(SHUT_RDWR)), and the exchange ends with OpenSSL's close_notify on that socket.
 TEST(net_sigpipe_stream_abort) { checkNoSigpipe(Scenario::StreamAbort); }
 
+// The programs the game starts (xdg-open, for the browser and the file manager) get SIGPIPE's
+// default action back, although the game ignores that signal (main.cpp) and an ignored signal
+// stays ignored across exec: a shell that sends itself SIGPIPE dies of it.
+TEST(net_sigpipe_spawned_program_default) {
+    struct sigaction ignore {}, old{};
+    ignore.sa_handler = SIG_IGN;
+    sigemptyset(&ignore.sa_mask);
+    sigaction(SIGPIPE, &ignore, &old);
+    sigset_t pipeSet, oldMask;
+    sigemptyset(&pipeSet);
+    sigaddset(&pipeSet, SIGPIPE);
+    pthread_sigmask(SIG_UNBLOCK, &pipeSet, &oldMask);
+    char* argv[] = {const_cast<char*>("sh"), const_cast<char*>("-c"), const_cast<char*>("kill -s PIPE $$; exit 3"), nullptr};
+    const int pid = net::sys::spawnProgram(argv);
+    int status = 0;
+    const bool reaped = pid > 0 && ::waitpid(pid, &status, 0) == pid;
+    pthread_sigmask(SIG_SETMASK, &oldMask, nullptr);
+    sigaction(SIGPIPE, &old, nullptr);
+    REQUIRE(reaped);
+    CHECK(WIFSIGNALED(status));
+    CHECK_EQ(WIFSIGNALED(status) ? WTERMSIG(status) : (WIFEXITED(status) ? 100 + WEXITSTATUS(status) : -1), SIGPIPE);
+    // A program that is not there: -1, nothing to reap.
+    char* missing[] = {const_cast<char*>("scacelith-no-such-program"), nullptr};
+    CHECK_EQ(net::sys::spawnProgram(missing), -1);
+}
+
 #endif  // !_WIN32
 
 // =============================================================================================

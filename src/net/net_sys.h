@@ -44,6 +44,14 @@ bool removeFile(const std::string& path);
 // Opens an https:// URL in the default browser (ShellExecuteW / xdg-open). The caller checks
 // the URL; this refuses anything that is not http(s) anyway.
 bool openBrowser(const std::string& url);
+#ifndef _WIN32
+// Starts the program argv[0] (found in PATH) with argv and the game's environment, and returns its
+// pid (-1: it could not be started); the caller reaps it. Its SIGPIPE has the default action: the
+// game ignores that signal (main.cpp), an ignored signal stays ignored across exec, and the programs
+// it starts (xdg-open's shell pipelines, a browser, a file manager) do not expect that. Every
+// program the game starts goes through here (openBrowser, plat::openInFileManager).
+int spawnProgram(char* const argv[]);
+#endif
 
 // ---- Files of the downloads (net/download.h, the coach's voice model): UTF-8 paths, 64-bit sizes.
 std::FILE* openFile(const std::string& path, const char* mode);      // fopen / _wfopen ("rb", "wb", "ab")
