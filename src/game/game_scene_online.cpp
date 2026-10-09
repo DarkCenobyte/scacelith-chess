@@ -78,7 +78,8 @@ std::string ratingText(const net::PlayerInfo& p) {
     return std::to_string(p.rating) + (p.provisional ? "?" : "");
 }
 
-// Reason line of the game over card: chess reasons 0..13, online ones from 20.
+// Reason line of the game over card: chess reasons 0..14, online ones from 20 (an unknown value,
+// of a later minor: no line, the result alone).
 std::string reasonText(int reason) {
     switch (reason) {
     case 20: return i18n::tr("reason.online.abandonment");
@@ -88,7 +89,7 @@ std::string reasonText(int reason) {
     case 24: return i18n::tr("reason.online.forfeit");
     case 25: return i18n::tr("reason.online.server_aborted");
     case 26: return i18n::tr("reason.online.both_disconnected");
-    default: return reason > 0 && reason <= 13 ? endReasonText(GameEndReason(reason)) : "";
+    default: return reason > 0 && reason <= int(GameEndReason::ResignationVsInsufficient) ? endReasonText(GameEndReason(reason)) : "";
     }
 }
 

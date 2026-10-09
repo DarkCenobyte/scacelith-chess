@@ -300,7 +300,7 @@ bool splitUci(const std::string& uci, int& from, int& to, int& promo) {
 
 TEST(net_protocol_constants) {
     CHECK_EQ(pr::kProtocolVersion, 1);
-    CHECK_EQ(pr::kMinor, 0);
+    CHECK_EQ(pr::kMinor, 1);   // minor 1: EndReason::ResignationVsInsufficient
     CHECK_EQ(pr::kCaps, uint64_t(0));
     CHECK_EQ(std::string(pr::kWsSubprotocol), std::string("scacelith.rt1"));
     CHECK_EQ(pr::kHelloPrefixSize, size_t(17));
@@ -319,7 +319,9 @@ TEST(net_protocol_constants) {
     CHECK_EQ(std::string(pr::messageName(pr::MsgType::S_Pong)), std::string("S_Pong"));
     CHECK(pr::messageName(pr::MsgType(0x7F)) == nullptr);
     CHECK(pr::isValid(pr::EndReason::BothDisconnected));
-    CHECK(!pr::isValid(pr::EndReason(14)));
+    CHECK(pr::isValid(pr::EndReason::ResignationVsInsufficient));
+    CHECK_EQ(int(pr::EndReason::ResignationVsInsufficient), 14);
+    CHECK(!pr::isValid(pr::EndReason(15)));
     CHECK_EQ(std::string(pr::enumName(pr::ErrorCode::IllegalMove)), std::string("IllegalMove"));
     CHECK(!pr::isValid(pr::ErrorCode(243)));   // retired (SlowConsumer comes with no Error)
 

@@ -787,7 +787,8 @@ void GameScene::coachMoveCompleted() {
 void GameScene::coachGameOver() {
     CoachRuntime& rt = coachRuntime();
     rt.handshakeReported = false;
-    bool resigned = game_.endReason() == GameEndReason::Resignation;
+    // A resignation is a draw when the coach cannot mate (FIDE 5.1.2): the player resigned all the same.
+    bool resigned = game_.endReason() == GameEndReason::Resignation || game_.endReason() == GameEndReason::ResignationVsInsufficient;
     if (rt.sessionRunning) rt.session.onGameOver(game_, resigned);
 }
 

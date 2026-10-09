@@ -2608,8 +2608,8 @@ bool sendWelcome(RawHost& raw, const direct::Authority& auth) {
     return raw.send(w);
 }
 
-// Hosts a match and joins it with a guest written by hand (its Hello, then the host's Welcome and
-// snapshot).
+// Hosts a match and joins it with a guest written by hand (its Hello, of minor 0, then the host's
+// Welcome, of minor 0 too, and snapshot).
 bool joinRaw(Peer& host, RawGuest& raw, P::GameSnapshot& snap) {
     Peer nobody;
     host.dm.host(hostOptions(300, 0, 1, "Alice"));
@@ -2620,7 +2620,7 @@ bool joinRaw(Peer& host, RawGuest& raw, P::GameSnapshot& snap) {
     hello.client = "Scacelith test";
     hello.token = "direct:Raw      ";
     P::Welcome w;
-    return raw.connect(inv.port, inv.code) && raw.send(hello) && raw.waitFor(w, 5000) && raw.waitFor(snap, 5000);
+    return raw.connect(inv.port, inv.code) && raw.send(hello) && raw.waitFor(w, 5000) && w.minor == 0 && raw.waitFor(snap, 5000);
 }
 
 // Copies the log while it lives (logx writes every line to this file too, flushed at once). One
@@ -2756,6 +2756,75 @@ TEST(direct_host_takes_later_minor_hello) {
     P::GameSnapshot s;
     CHECK(raw.waitFor(s, 5000));
     CHECK(s.game != 0 && s.game == w.activeGame);
+    CHECK_EQ(raw.errors, 0);
+}
+
+TEST(direct_frame_for_minor) {
+    // Minor 1 added EndReason::ResignationVsInsufficient: the host gives a guest of minor 0 the
+    // Resignation it knows, with the Draw status (PROTOCOL.md "Minors"); nothing else changes.
+    P::GameEnd end;
+    end.game = 7;
+    end.gseq = 3;
+    end.status = P::GameStatus::Draw;
+    end.reason = P::EndReason::ResignationVsInsufficient;
+    end.whiteMs = 1000;
+    end.blackMs = 2000;
+    end.serverTime = 1.79e12;
+    std::vector<uint8_t> frame, older;
+    P::encode(end, frame);
+    CHECK(direct::frameForMinor(frame.data(), frame.size(), 0, older));
+    CHECK_EQ(older.size(), frame.size());
+    P::GameEnd e;
+    CHECK(P::decode(older.data(), older.size(), e));
+    CHECK(e.reason == P::EndReason::Resignation && e.status == P::GameStatus::Draw);
+    CHECK(e.game == end.game && e.gseq == end.gseq && e.whiteMs == end.whiteMs && e.blackMs == end.blackMs &&
+          e.serverTime == end.serverTime);
+    CHECK(!direct::frameForMinor(frame.data(), frame.size(), 1, older));
+    CHECK(!direct::frameForMinor(frame.data(), frame.size(), P::kMinor, older));
+    CHECK(!direct::frameForMinor(frame.data(), frame.size() - 1, 0, older));   // truncated
+    CHECK(!direct::frameForMinor(nullptr, 0, 0, older));
+    P::GameSnapshot snap;
+    snap.game = 7;
+    snap.category = "custom";
+    snap.white.name = "Alice";
+    snap.black.name = "Bob";
+    snap.moves.push_back({796, 0, 0});
+    snap.status = P::GameStatus::Draw;
+    snap.reason = P::EndReason::ResignationVsInsufficient;
+    frame.clear();
+    P::encode(snap, frame);
+    CHECK(direct::frameForMinor(frame.data(), frame.size(), 0, older));
+    P::GameSnapshot s;
+    CHECK(P::decode(older.data(), older.size(), s));
+    CHECK(s.reason == P::EndReason::Resignation && s.status == P::GameStatus::Draw);
+    CHECK(s.game == 7 && s.category == "custom" && s.white.name == "Alice" && s.black.name == "Bob" && s.moves.size() == 1);
+    // Every other ending, and every other message, suits a guest of minor 0 as it is.
+    for (P::EndReason r : {P::EndReason::Resignation, P::EndReason::TimeoutVsInsufficient, P::EndReason::AbandonmentVsInsufficient}) {
+        end.reason = r;
+        frame.clear();
+        P::encode(end, frame);
+        CHECK(!direct::frameForMinor(frame.data(), frame.size(), 0, older));
+    }
+    P::S_Pong pong;
+    frame.clear();
+    P::encode(pong, frame);
+    CHECK(!direct::frameForMinor(frame.data(), frame.size(), 0, older));
+}
+
+TEST(direct_host_speaks_minor_0_to_a_guest_of_minor_0) {
+    // A guest of minor 0 (a release before EndReason::ResignationVsInsufficient) gets a Welcome
+    // of minor 0, and its games' endings in the values that minor knows.
+    Peer host;
+    RawGuest raw;
+    P::GameSnapshot snap;
+    CHECK(joinRaw(host, raw, snap));   // its Hello announces minor 0
+    P::Resign r;
+    r.game = snap.game;
+    CHECK(raw.send(r));
+    P::GameEnd end;
+    CHECK(raw.waitFor(end, 5000));
+    CHECK(end.game == snap.game && end.reason == P::EndReason::Resignation);
+    CHECK(end.status == (snap.you == P::Color::White ? P::GameStatus::BlackWins : P::GameStatus::WhiteWins));
     CHECK_EQ(raw.errors, 0);
 }
 

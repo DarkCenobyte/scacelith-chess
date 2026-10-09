@@ -79,6 +79,8 @@ TEST(saving_online_results_and_reasons) {
     CHECK_EQ(saving::onlineEndKey(int(chess::GameEndReason::Checkmate)), std::string("reason.checkmate"));
     CHECK_EQ(saving::onlineEndKey(int(chess::GameEndReason::Resignation)), std::string("reason.resignation"));
     CHECK_EQ(saving::onlineEndKey(int(chess::GameEndReason::Timeout)), std::string("reason.timeout"));
+    CHECK_EQ(saving::onlineEndKey(14), std::string("reason.resignation_vs_insufficient"));   // protocol minor 1
+    CHECK_EQ(saving::onlineEndKey(15), std::string());
     CHECK_EQ(saving::onlineEndKey(20), std::string("reason.online.abandonment"));
     CHECK_EQ(saving::onlineEndKey(26), std::string("reason.online.both_disconnected"));
     CHECK_EQ(saving::onlineEndKey(0), std::string());

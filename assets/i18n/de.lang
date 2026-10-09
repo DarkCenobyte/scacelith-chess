@@ -267,6 +267,7 @@ reason.threefold_claim = Dreifache Stellungswiederholung (reklamiert)
 reason.50_moves_claim = 50-Züge-Regel (reklamiert)
 reason.agreement = Remis durch Vereinbarung
 reason.illegal_vs_insufficient = Zweiter regelwidriger Zug, aber der Gegner kann nicht mattsetzen
+reason.resignation_vs_insufficient = Aufgabe, aber der Gegner kann nicht mattsetzen
 
 # ---- Move list ---------------------------------------------------------------------------------
 movelist.title = ZÜGE

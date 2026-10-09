@@ -275,6 +275,7 @@ reason.threefold_claim = Threefold repetition (claimed)
 reason.50_moves_claim = 50-move rule (claimed)
 reason.agreement = Draw by agreement
 reason.illegal_vs_insufficient = Second illegal move, but the opponent cannot checkmate
+reason.resignation_vs_insufficient = Resignation, but the opponent cannot checkmate
 
 # ---- Move list ---------------------------------------------------------------------------------
 movelist.title = MOVES

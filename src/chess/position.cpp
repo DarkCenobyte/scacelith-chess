@@ -571,12 +571,18 @@ bool Position::hasInsufficientMaterial() const {
 }
 
 bool Position::canColorMate(Color c) const {
-    if (hasInsufficientMaterial()) return false;
     const U64 mine = colorBB_[c] & ~typeBB_[King];
-    if (!mine) return false;
-    const U64 theirs = colorBB_[opposite(c)] & ~typeBB_[King];
-    if (!several(mine) && (mine & (typeBB_[Knight] | typeBB_[Bishop])) && !theirs) return false;
-    return true;
+    if (mine & (typeBB_[Pawn] | typeBB_[Rook] | typeBB_[Queen])) return true;
+    if (mine & typeBB_[Knight]) {
+        // A lone knight mates only past a blocker of the opponent that cannot take it: not a queen.
+        return several(mine) || (colorBB_[opposite(c)] & ~typeBB_[King] & ~typeBB_[Queen]);
+    }
+    if (!mine) return false;  // bare king
+    // Bishops alone: an opposing pawn, knight or bishop of the other square colour can block a
+    // flight square without being able to take or block the checking bishop.
+    if (typeBB_[Pawn] | typeBB_[Knight]) return true;
+    const U64 bishops = typeBB_[Bishop];
+    return (bishops & kLightSquares) && (bishops & kDarkSquares);
 }
 
 // ---- Notation -------------------------------------------------------------------------------

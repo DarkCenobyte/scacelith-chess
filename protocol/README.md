@@ -20,12 +20,14 @@ run in a checkout of it:
 cargo run -p scacelith-protocol --features gen --bin protogen -- --client /path/to/scacelith-chess
 ```
 
-The game also keeps copies of two other fixtures of the server, for its tests:
+The game also keeps copies of three other fixtures of the server, for its tests:
 `tests/data/elo-vectors.json` (the server's `test/fixtures/elo-vectors.json`: offline and online
-ratings follow the same rules) and `tests/data/server-pgn/` (the server's
-`test/fixtures/server-pgn/`: the PGN files a server writes). The continuous integration of both
-repositories checks a pinned pair against all of them (the server's `tools/interop/check-game.sh`)
-and plays the game's live online tests against a real server (the server's `tools/live-check`):
-the server's CI takes the game commit of its `tools/interop/game-revision`, the game's CI the
-server commit of `tools/interop/server-revision`, and a weekly run of each checks the other side's
-`master`.
+ratings follow the same rules), `tests/data/mating-material.json` (the server's
+`test/fixtures/mating-material.json`: who can still checkmate, which turns a resignation, a flag
+fall or a second illegal move into a draw, read by `tests/chess_tests.cpp`) and
+`tests/data/server-pgn/` (the server's `test/fixtures/server-pgn/`: the PGN files a server
+writes). The continuous integration of both repositories checks a pinned pair against all of them
+(the server's `tools/interop/check-game.sh`) and plays the game's live online tests against a real
+server (the server's `tools/live-check`): the server's CI takes the game commit of its
+`tools/interop/game-revision`, the game's CI the server commit of `tools/interop/server-revision`,
+and a weekly run of each checks the other side's `master`.

@@ -24,7 +24,8 @@ archive::Mode archiveMode(GameMode mode, bool directMatch);
 // The ending of an online game as its authority reports it (net::OnlineGame status and reason, the
 // values of protocol/scacelith-v1.json): "1-0", "0-1", "1/2-1/2", or "*" while it is
 // ongoing and for an aborted game; the i18n key of the reason ("reason.checkmate" for the chess
-// reasons 1..13, "reason.online.abandonment"... from 20), "" for none.
+// reasons 1..14, "reason.online.abandonment"... from 20), "" for none and for a value of a later
+// protocol minor.
 std::string onlineResult(int status);
 std::string onlineEndKey(int reason);
 
@@ -42,7 +43,7 @@ struct DirectRecord {
 // the abort they just sent is not answered yet. Before their first move the game is aborted and
 // nothing is saved (nor while that move is sent but not confirmed: the scene resigns then, but
 // og.moves lacks the move); after it, it is saved as their resignation, the result the opponent's
-// copy gets. A game the guest ended itself when the host was gone for good (status Aborted, reason
+// copy gets (a draw, ResignationVsInsufficient, when the opponent cannot mate). A game the guest ended itself when the host was gone for good (status Aborted, reason
 // ServerAborted) is saved unfinished ("*") once both players have moved. False when nothing is to
 // be saved: a game aborted by the authority, a spectator, or moves that do not follow one another
 // (never expected from an authority; logged).

@@ -267,6 +267,7 @@ reason.threefold_claim = 三次重複局面（提出要求）
 reason.50_moves_claim = 五十回合規則（提出要求）
 reason.agreement = 協議和棋
 reason.illegal_vs_insufficient = 第二次違例著法，但對方無法將死
+reason.resignation_vs_insufficient = 認輸，但對方無法將死
 
 # ---- Move list ---------------------------------------------------------------------------------
 movelist.title = 著法

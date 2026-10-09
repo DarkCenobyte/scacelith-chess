@@ -100,8 +100,9 @@ the host itself:
   shown to the opponent.
 - Draw offers (with a move or alone; 3 per player per game, not again within 10 plies of a
   decline; a move declines the opponent's offer), claims (threefold repetition, fifty moves),
-  automatic endings (mate, stalemate, insufficient material, fivefold, 75 moves), resignation,
-  abort before one's own first move.
+  automatic endings (mate, stalemate, insufficient material, fivefold, 75 moves), resignation
+  (a draw when the opponent cannot mate, FIDE 5.1.2; the same rule as a flag fall), abort before
+  one's own first move.
 - **Guest disconnected**: the host notices when the connection closes, or after 10 s without any
   data from the guest; the 60 s grace starts then. The guest's clock keeps running, and the guest
   reconnects by itself with the same code. At the end of the grace the guest loses by abandonment
@@ -174,7 +175,9 @@ server's order (`PROTOCOL.md`, "Connection lifecycle": `HelloRequired`, `Malform
 `UnsupportedProtocol` for another `proto`, `ProtocolViolation` for a `seq` other than 1); a
 refusal is a fatal `Error`, then the host closes. Otherwise it answers `Welcome`, with the
 negotiated minor (the lower of the two) and capabilities (the bits both sides know), then the
-`GameSnapshot`. Windows uses BCrypt (ECDH P-256, AES-GCM, SHA-256/HMAC, system RNG); the Linux
+`GameSnapshot`. The host never sends a guest a value its minor does not define: a guest of minor 0
+gets a resignation drawn for want of mating material (`ResignationVsInsufficient`, minor 1) as
+`Resignation` with the `Draw` status (`direct::frameForMinor`), as the server does. Windows uses BCrypt (ECDH P-256, AES-GCM, SHA-256/HMAC, system RNG); the Linux
 test build uses OpenSSL.
 
 What this gives:
