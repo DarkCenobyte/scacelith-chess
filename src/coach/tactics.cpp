@@ -16,7 +16,9 @@ inline U64 bit(Square s) { return squareBit(s); }
 inline Square lowest(U64 b) { return Square(__builtin_ctzll(b)); }
 inline bool several(U64 b) { return (b & (b - 1)) != 0; }
 inline U64 rankMask(int r) { return 0xFFULL << (8 * r); }
-inline int value(PieceType t) { return kPieceValueCp[t]; }
+inline int points(PieceType t) { return kPiecePoints[t]; }
+// Exchange values in points; the king is never given up in an exchange.
+constexpr int kExchangePoints[7] = {0, 1, 3, 3, 5, 9, 1000};
 inline int sign(int v) { return (v > 0) - (v < 0); }
 inline int chebyshev(Square a, Square b) {
     return std::max(std::abs(fileOf(a) - fileOf(b)), std::abs(rankOf(a) - rankOf(b)));
@@ -25,9 +27,10 @@ inline bool isLastRank(Square s) { return rankOf(s) == 0 || rankOf(s) == 7; }
 
 // Swap-list exchange on 'to': the piece of type 'moverType' and colour 'mover' standing on 'from'
 // captures 'victim' (NoPiece for a quiet move), then both sides recapture with their least
-// valuable attacker while it pays. Centipawns for 'mover'.
+// valuable attacker while it pays. In the units of 'values' (kPieceValueCp: centipawns), for 'mover'.
 int exchange(const Position& pos, Square from, Square to, Color mover, PieceType moverType, PieceType victim,
-             bool enPassant, PieceType promotion) {
+             bool enPassant, PieceType promotion, const int* values = kPieceValueCp) {
+    auto value = [values](int t) { return values[t]; };
     U64 occ = pos.occupancy() ^ bit(from);
     int gain[40];
     int d = 0;
@@ -141,7 +144,9 @@ int majorsAndMinors(const Position& p) {
     return squareCount(p.occupancy() & ~(p.pieces(King) | p.pieces(Pawn)));
 }
 
-int see(const Position& p, const Move& m) {
+namespace {
+
+int seeWith(const Position& p, const Move& m, const int* values) {
     if (!m.valid()) return 0;
     const Piece mover = p.at(m.from);
     if (mover.empty()) return 0;
@@ -149,15 +154,16 @@ int see(const Position& p, const Move& m) {
     if (!target.empty() && target.color == mover.color) return 0;  // castling or nonsense
     const bool ep = mover.type == Pawn && fileOf(m.from) != fileOf(m.to) && target.empty();
     const PieceType promo = (mover.type == Pawn && isLastRank(m.to)) ? (m.promotion != NoPiece ? m.promotion : Queen) : NoPiece;
-    return exchange(p, m.from, m.to, mover.color, mover.type, target.type, ep, promo);
+    return exchange(p, m.from, m.to, mover.color, mover.type, target.type, ep, promo, values);
 }
 
-int seeSquare(const Position& p, Square sq, Color by) {
+// The best exchange 'by' can start on 'sq' (*any: whether it has a capture there at all).
+int bestExchangeOn(const Position& p, Square sq, Color by, const int* values, bool* any) {
+    *any = false;
     if (sq < 0 || sq > 63) return 0;
     const Piece target = p.at(sq);
     if (target.empty() || target.color == by) return 0;
     U64 attackers = p.attackersTo(sq, by);
-    bool any = false;
     int best = 0;
     while (attackers) {
         const Square a = lowest(attackers);
@@ -165,11 +171,65 @@ int seeSquare(const Position& p, Square sq, Color by) {
         const PieceType t = p.at(a).type;
         if (t == King && (p.attackersTo(sq, p.occupancy() ^ bit(a)) & p.pieces(opposite(by)))) continue;
         const PieceType promo = (t == Pawn && isLastRank(sq)) ? Queen : NoPiece;
-        const int v = exchange(p, a, sq, by, t, target.type, false, promo);
-        if (!any || v > best) best = v;
-        any = true;
+        const int v = exchange(p, a, sq, by, t, target.type, false, promo, values);
+        if (!*any || v > best) best = v;
+        *any = true;
     }
-    return any ? best : 0;
+    return *any ? best : 0;
+}
+
+}  // namespace
+
+int see(const Position& p, const Move& m) { return seeWith(p, m, kPieceValueCp); }
+
+int seeSquare(const Position& p, Square sq, Color by) {
+    bool any = false;
+    return bestExchangeOn(p, sq, by, kPieceValueCp, &any);
+}
+
+int seePoints(const Position& p, const Move& m) { return seeWith(p, m, kExchangePoints); }
+
+int seeSquarePoints(const Position& p, Square sq, Color by) {
+    bool any = false;
+    return bestExchangeOn(p, sq, by, kExchangePoints, &any);
+}
+
+int bestCapturePoints(const Position& p, Color by) {
+    int best = 0;
+    U64 targets = p.pieces(opposite(by)) & ~p.pieces(King);
+    while (targets) {
+        const Square t = lowest(targets);
+        targets &= targets - 1;
+        best = std::max(best, seeSquarePoints(p, t, by));
+    }
+    return best;
+}
+
+U64 exchangeParticipants(const Position& p, Square sq, bool directOnly) {
+    const U64 direct = p.attackersTo(sq, p.occupancy());
+    if (directOnly) return direct;
+    // The sliders that come in as the pieces in front of them leave the square's lines.
+    U64 occ = p.occupancy(), all = direct, front = direct;
+    const U64 diag = p.pieces(Bishop) | p.pieces(Queen), orth = p.pieces(Rook) | p.pieces(Queen);
+    while (front) {
+        occ &= ~front;
+        const U64 behind = ((attacksOf(Bishop, White, sq, occ) & diag) | (attacksOf(Rook, White, sq, occ) & orth)) & occ & ~all;
+        all |= behind;
+        front = behind;
+    }
+    // A piece pinned to its own king can only take part along the pin's line.
+    U64 out = 0, b = all;
+    while (b) {
+        const Square s = lowest(b);
+        b &= b - 1;
+        const Color c = p.at(s).color;
+        const Square k = p.kingSquare(c);
+        if (k != NoSquare && (p.pinned(c) & bit(s)) && !(squaresBetween(k, sq) & bit(s)) &&
+            !(squaresBetween(s, k) & bit(sq)))
+            continue;
+        out |= bit(s);
+    }
+    return out;
 }
 
 bool isUndefended(const Position& p, Square s) {
@@ -185,7 +245,7 @@ U64 hangingPieces(const Position& p, Color c, bool undefendedOnly) {
         const Square s = lowest(b);
         b &= b - 1;
         if (!p.attackersTo(s, opposite(c))) continue;
-        if (undefendedOnly ? !p.attackersTo(s, c) : seeSquare(p, s, opposite(c)) > 0) out |= bit(s);
+        if (undefendedOnly ? !p.attackersTo(s, c) : seeSquarePoints(p, s, opposite(c)) > 0) out |= bit(s);
     }
     return out;
 }
@@ -202,10 +262,12 @@ U64 forkTargets(const Position& after, Square sq) {
         const Square t = lowest(targets);
         targets &= targets - 1;
         const PieceType tt = after.at(t).type;
-        if (tt == King || value(tt) > value(f.type) || seeSquare(after, t, us) > 0) kept |= bit(t);
+        if (tt == King || points(tt) > points(f.type) || seeSquarePoints(after, t, us) > 0) kept |= bit(t);
     }
     if (!several(kept)) return 0;
-    if (seeSquare(after, sq, them) > 0) return 0;  // the forking piece itself can be won: no fork
+    // The forking piece itself can be won, or traded off: no fork.
+    bool any = false;
+    if (bestExchangeOn(after, sq, them, kExchangePoints, &any) >= 0 && any) return 0;
     return kept;
 }
 
@@ -227,7 +289,7 @@ std::vector<Pin> pins(const Position& p, Color victim) {
             if (!b || several(b) || !(b & p.pieces(victim))) continue;
             const Square pinned = lowest(b);
             const bool absolute = tt == King;
-            if (!absolute && value(tt) <= value(p.at(pinned).type)) continue;
+            if (!absolute && points(tt) <= points(p.at(pinned).type)) continue;
             if (p.attacksFrom(pinned) & bit(s)) continue;  // it can take the pinner along the line
             out.push_back(Pin{s, pinned, t, absolute});
         }
@@ -254,7 +316,7 @@ std::vector<Skewer> skewers(const Position& p, Color victim) {
             const Piece behind = p.at(b);
             if (behind.color != victim || behind.type == Pawn || behind.type == King) continue;
             const PieceType ft = p.at(f).type;
-            if (ft == King || value(ft) > value(behind.type)) out.push_back(Skewer{s, f, b});
+            if (ft == King || points(ft) > points(behind.type)) out.push_back(Skewer{s, f, b});
         }
     }
     return out;
@@ -396,9 +458,9 @@ bool isTrapped(const Position& p, Square s) {
     Position q = p;
     if (q.sideToMove() != c && !q.passTurn()) return false;
     if (q.inCheck() || (q.pinned(c) & bit(s))) return false;
-    if (seeSquare(q, s, opposite(c)) <= 0) return false;
+    if (seeSquarePoints(q, s, opposite(c)) <= 0) return false;
     for (const Move& m : q.legalMovesFrom(s))
-        if (see(q, m) >= 0) return false;  // a safe square, or a capture worth the piece
+        if (seePoints(q, m) >= 0) return false;  // a safe square, an even trade, or a capture worth the piece
     return true;
 }
 
@@ -514,6 +576,7 @@ MoveFacts analyzeMove(const Position& before, const Move& m) {
     f.doubleCheck = several(checkers);
     f.discoveredCheck = f.check && !(checkers & bit(m.to)) && !f.castleKing && !f.castleQueen;
     f.seeCp = see(before, m);
+    f.seePts = seePoints(before, m);
     f.newlyAttacked = (attacksBy(after, us) & after.pieces(them)) & ~(attacksBy(before, us) & before.pieces(them));
     f.forks = forkTargets(after, m.to);
     const U64 guarded = attacksOf(pc.type, us, m.from, before.occupancy()) & before.pieces(us) & ~before.pieces(King);
