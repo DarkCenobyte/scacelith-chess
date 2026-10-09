@@ -129,7 +129,7 @@ Band band(int level);           // clamped to 1..6
 struct ReviewInput {
     const chess::Game* game = nullptr;       // the human's move is the last one played
     const ai::Analysis* before = nullptr;    // A0: MultiPV 3 on the position before the move
-    const ai::Analysis* played = nullptr;    // A1: the played move re-scored at the same root (when A0 lacks it)
+    const ai::Analysis* played = nullptr;    // A1: the played move re-scored at the same root (needsPlayedRequest)
     const ai::Analysis* after = nullptr;     // A2 (optional): the position after the move, for a longer refutation
     const ai::Analysis* shallow = nullptr;   // A3 (optional): a shallow search of the same root ("tricky" praise)
     bool inBook = false;                     // the position after the move is in the openings book
@@ -153,8 +153,8 @@ public:
     // Analyses for a review (full strength; the coach's play settings do not apply):
     // A0 when the human's turn begins (MultiPV 3 on the current position)...
     ai::AnalysisRequest beforeRequest(const chess::Game& g) const;
-    // ...A1 once the human's move is on the Game, only when A0 does not hold the played move
-    // (same root, same depth, searchmoves = the move)...
+    // ...A1 once the human's move is on the Game, only when A0 does not hold the played move or
+    // holds only a bound for it, its best line aside (same root, same depth, searchmoves = the move)...
     static bool needsPlayedRequest(const ai::Analysis& before, const std::string& playedUci);
     ai::AnalysisRequest playedRequest(const chess::Game& g, const ai::Analysis& before) const;
     // ...and A2 (optional) on the position after the move, for a refutation longer than A0's PV.

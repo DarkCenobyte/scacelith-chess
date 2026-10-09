@@ -38,7 +38,8 @@ int seeSquare(const chess::Position& p, chess::Square sq, chess::Color by);
 int seePoints(const chess::Position& p, const chess::Move& m);
 int seeSquarePoints(const chess::Position& p, chess::Square sq, chess::Color by);
 // The most 'by' wins with one exchange anywhere on the board (points, 0 when nothing pays): what
-// the side to move takes back where a line of moves stops.
+// the side to move takes back where a line of moves stops. For the side to move, its legal
+// captures only (nothing when it is mated or stalemated, only an answer to a check).
 int bestCapturePoints(const chess::Position& p, chess::Color by);
 // Pieces of each side that take part in an exchange on 'sq' (it holds a piece): the attackers of
 // the square and the sliders behind them on its lines (x-rays), without a piece pinned to its king

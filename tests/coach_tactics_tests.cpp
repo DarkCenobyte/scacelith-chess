@@ -93,6 +93,13 @@ TEST(coach_tactics_points) {
     CHECK_EQ(bestCapturePoints(free, Black), 0);
     Position two = fen("4k3/8/2p5/1r1n4/2P1P3/8/8/4K3 w - - 0 1");   // cxb5 wins 4 net, exd5 (cxd5) 2
     CHECK_EQ(bestCapturePoints(two, White), 4);
+    // The side to move takes back with its legal captures only: in check from the queen on c3, the
+    // bishop cannot take the rook on b8; mated, the knight takes nothing.
+    Position chk = fen("1r4k1/5p1p/6p1/8/5B2/2q5/P4PPP/4K3 w - - 0 1");
+    CHECK_EQ(bestCapturePoints(chk, White), 0);
+    Position mated = fen("6k1/1b3ppp/8/N7/8/8/5PPP/3r2K1 w - - 0 1");
+    CHECK(mated.isCheckmate());
+    CHECK_EQ(bestCapturePoints(mated, White), 0);
     // Who takes part in an exchange on d5: the rook on d1 behind d2 (x-ray), not the bishop on e6
     // pinned to its king along the e-file.
     Position x = fen("4k3/8/4b3/3n4/8/8/3R4/3RR1K1 w - - 0 1");

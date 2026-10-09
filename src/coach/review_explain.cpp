@@ -620,8 +620,10 @@ bool exchange(const Ctx& c, Explanation& out) {
     if (!shown.proven) return false;
     const int lost = shown.lost + (badCapture ? 0 : materialBalance(c.p1, c.human) - c.base);
     if (lost < 2) return false;
-    const uint64_t seen = exchangeParticipants(c.p1, s, true), all = exchangeParticipants(c.p1, s, false);
-    const uint64_t att = seen & c.p1.pieces(c.coach), def = seen & c.p1.pieces(c.human);
+    // The count says who really takes part: a slider behind another (a battery) counts, a piece pinned
+    // to its king off the line does not.
+    const uint64_t all = exchangeParticipants(c.p1, s, false);
+    const uint64_t att = all & c.p1.pieces(c.coach), def = all & c.p1.pieces(c.human);
     std::string family;
     int n = 0, n2 = 0;
     if (badCapture) {
@@ -630,8 +632,8 @@ bool exchange(const Ctx& c, Explanation& out) {
         family = "ex.exchange_capture";
         n = points(victim);
         n2 = points(c.f.captured);
-    } else if (squareCount(att) > squareCount(def) && def != 0 && all == seen) {
-        // "I attack it {n} times, you defend it {n2} times": no x-ray or pinned piece changes the count.
+    } else if (squareCount(att) > squareCount(def) && def != 0) {
+        // "I attack it {n} times, you defend it {n2} times".
         family = "ex.exchange_count";
         n = squareCount(att);
         n2 = squareCount(def);
