@@ -21,11 +21,13 @@ std::wstring moduleFileName(const std::function<unsigned long(wchar_t* buffer, u
 
 std::string exeDirectory();        // directory of the running executable, trailing separator
 // The per-user folder of the settings (created; private, 0700, on Linux): %APPDATA%\scacelith\ on
-// Windows, $XDG_CONFIG_HOME/scacelith/ (default ~/.config/scacelith/) on Linux.
+// Windows, $XDG_CONFIG_HOME/scacelith/ (default ~/.config/scacelith/) on Linux, as a canonical path
+// there (the executable's folder when it cannot be created).
 std::string userDataDirectory();
 // The per-user folder of the game's data files (created), the rule of plat::appDataDirectory():
 // %APPDATA%\scacelith\ on Windows, $XDG_DATA_HOME/scacelith/ (default ~/.local/share/scacelith/)
-// on Linux. The coach's voice model lives in its "coach" subfolder (src/tts/model_store.h).
+// on Linux, as a canonical path there (the executable's folder when it cannot be created). The
+// coach's voice model lives in its "coach" subfolder (src/tts/model_store.h).
 std::string appDataDirectory();
 // Where Scacelith.ini, the saved logins and the log go: userDataDirectory(), unless a Scacelith.ini
 // stands next to the executable (a portable install; also where versions up to 1.0.0-beta.1 put

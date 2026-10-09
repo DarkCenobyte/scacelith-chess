@@ -183,6 +183,15 @@ std::string exeDirectory() {
     return s.substr(0, s.find_last_of('/') + 1);
 }
 
+// A per-user folder from the environment (just created), at its canonical path (absolute, no "." or
+// ".." parts, no symbolic link), the one the game logs and shows; one that could not be created
+// falls back like a missing $HOME.
+static std::string canonicalDirectory(const std::string& dir) {
+    char real[PATH_MAX];
+    if (!realpath(dir.c_str(), real)) return exeDirectory();
+    return std::string(real) + "/";
+}
+
 std::string userDataDirectory() {
     // The XDG base directory rule: $XDG_CONFIG_HOME when it is an absolute path (a relative one is
     // ignored), else ~/.config. Its scacelith folder is private (it holds the saved logins).
@@ -194,9 +203,9 @@ std::string userDataDirectory() {
     else return exeDirectory();
     if (base.back() != '/') base += '/';
     makeDirectories(base);
-    std::string d = base + "scacelith/";
+    const std::string d = base + "scacelith/";
     mkdir(d.c_str(), 0700);
-    return d;
+    return canonicalDirectory(d);
 }
 
 std::string appDataDirectory() {
@@ -206,9 +215,9 @@ std::string appDataDirectory() {
     if (xdg && xdg[0] == '/') base = xdg;
     else if (home && home[0]) base = std::string(home) + "/.local/share";
     else return exeDirectory();
-    std::string d = base + (base.back() == '/' ? "" : "/") + "scacelith/";
+    const std::string d = base + (base.back() == '/' ? "" : "/") + "scacelith/";
     makeDirectories(d);
-    return d;
+    return canonicalDirectory(d);
 }
 
 bool fileExists(const std::string& path) {

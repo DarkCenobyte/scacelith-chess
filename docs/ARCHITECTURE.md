@@ -22,7 +22,7 @@ cmake -B build-win -G Ninja -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-w64-x86_64.cmake 
 Headless screenshots (Xvfb + Mesa llvmpipe with `MESA_GL_VERSION_OVERRIDE=4.6`):
 `tools/shot.sh <scene> out.png [frames] [WxH]` (Linux build) and `tools/shot_win.sh` (the real
 Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
-`SCACELITH_DUMP_SHADERS=<dir>` to dump preprocessed GLSL.
+`SCACELITH_DUMP_SHADERS=<dir>` (an existing folder) to dump preprocessed GLSL.
 
 ## Modules
 
