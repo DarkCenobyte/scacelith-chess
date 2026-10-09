@@ -174,6 +174,12 @@ void checkScript(const Script& s, const char* where) {
                                  text.c_str(), p.c_str());
                     CHECK(false);
                 }
+            // "you've lost {pts:point}", "{reply} wins {pts:point}": a loss of material, never 0 or less.
+            if (ph.count("pts") && b.line.arg("pts") && b.line.arg("pts")->number < 1) {
+                std::fprintf(stderr, "  %s: %s \"%s\": {pts} is %d\n", where, b.line.key.c_str(), text.c_str(),
+                             b.line.arg("pts")->number);
+                CHECK(false);
+            }
             for (const Gesture& g : b.gestures)
                 if (!g.anchor.empty() && !ph.count(g.anchor)) {
                     std::fprintf(stderr, "  %s: %s \"%s\": gesture anchor {%s} not in the line\n", where,
@@ -379,7 +385,9 @@ TEST(coach_review_fork_worked_example) {
         CHECK_EQ(r.verdict.exType, ExType::Fork);   // before king safety / positional (ExType order)
         CHECK(r.verdict.voiced);
         checkScript(r.script, where);
-        const std::string key = "ex.fork.b" + std::to_string(level);
+        // Level 4's lines say "after {line}, you've lost {pts}": after Qxg2 White is still a pawn up
+        // (the fork wins by mate, later), so level 4 says the fork with level 5's lines.
+        const std::string key = "ex.fork.b" + std::to_string(level == 4 ? 5 : level);
         const Beat* cause = beatWithKey(r.script, key);
         CHECK(cause != nullptr);
         if (!cause) {
@@ -700,6 +708,298 @@ TEST(coach_review_explanation_table) {
             if (guard) CHECK(hasKey(r.script, (level <= 4 ? "ex.hanging_guard" : "ex.hanging") + lv));
             if (threat) CHECK(hasKey(r.script, (level <= 3 ? "ex.hanging_threat" : "ex.hanging") + lv));
         }
+    }
+}
+
+// ---- Claims that hold on the board ---------------------------------------------------------------
+
+namespace {
+
+Game gameOfUci(const char* moves) {
+    Game g;
+    std::istringstream in(moves);
+    std::string u;
+    while (in >> u) {
+        const Move m = g.position().parseUCI(u);
+        if (!m.valid()) std::fprintf(stderr, "  bad UCI in test: %s\n", u.c_str());
+        CHECK(m.valid());
+        if (!m.valid()) break;
+        g.play(m);
+    }
+    return g;
+}
+
+bool hasKeyPrefix(const Script& s, const char* prefix) {
+    for (const std::string& k : keysOf(s))
+        if (startsWith(k, prefix)) return true;
+    return false;
+}
+
+// A game of a student's (coach level 2, White): 11.g3?? opens the long diagonal, and 11...Nxd2 trades
+// the knight for the bishop while uncovering the queen on d5 against the rook on h1.
+const char* kG3Game =
+    "d2d4 d7d5 e2e3 g8f6 f1b5 c8d7 b5d7 b8d7 f2f4 a8c8 c2c4 d5c4 b1a3 d7b6 c1d2 d8d5 b2b3 c4b3 a2b3 f6e4 g2g3";
+ai::Analysis g3A0(const char* played) {
+    return analysisOf({pvl(-60, "g1f3 e4d2 d1d2"), pvl(-90, "g1e2 e4d2 d1d2"), pvl(-620, played)});
+}
+
+}  // namespace
+
+TEST(coach_review_discovered_attack_behind_an_even_trade) {
+    // The engine's full line: Nxd2 Qxd2 Qxh1. The trade on d2 is even (3 points each, whatever the
+    // centipawns say); the rook lost to the discovered attack is the cause, at every level.
+    for (const char* played : {"g2g3 e4d2 d1d2 d5h1 e1f1", "g2g3 e4d2 e1d2 d5h1"}) {
+        for (int level = 1; level <= 6; ++level) {
+            Game g = gameOfUci(kG3Game);
+            Reviewer rv;
+            rv.reset(level, White);
+            Review r = reviewOf(rv, g, g3A0(played));
+            char where[64];
+            std::snprintf(where, sizeof where, "g3 full b%d", level);
+            checkScript(r.script, where);
+            CHECK_EQ(r.verdict.cls, MoveClass::Blunder);
+            if (r.verdict.exType != ExType::Discovered) {
+                std::fprintf(stderr, "  %s: %s\n", where, exTypeName(r.verdict.exType));
+                dump(r.script);
+            }
+            CHECK_EQ(r.verdict.exType, ExType::Discovered);
+            CHECK(r.verdict.voiced);
+            CHECK(!hasKeyPrefix(r.script, "ex.exchange"));
+            const Beat* cause = beatWithKey(r.script, "ex.discovered.b" + std::to_string(level));
+            CHECK(cause != nullptr);
+            if (cause && cause->line.arg("t1")) CHECK_EQ(cause->line.arg("t1")->square, sq("h1"));
+        }
+    }
+}
+
+TEST(coach_review_short_refutation_is_completed_on_the_board) {
+    // A0 stopped when the student moved: its line for 11.g3 ends with 11...Nxd2, before White takes
+    // back. Counting the bishop as lost there made the coach say "your bishop is worth 3 points, my
+    // knight only 3: this exchange costs you a lot". The natural recapture and the capture it allows
+    // are added on the board: the discovered attack on h1 is found, and no exchange is blamed.
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOfUci(kG3Game);
+        Reviewer rv;
+        rv.reset(level, White);
+        Review r = reviewOf(rv, g, g3A0("g2g3 e4d2"));
+        char where[64];
+        std::snprintf(where, sizeof where, "g3 short b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.cls, MoveClass::Blunder);
+        if (r.verdict.exType != ExType::Discovered) {
+            std::fprintf(stderr, "  %s: %s\n", where, exTypeName(r.verdict.exType));
+            dump(r.script);
+        }
+        CHECK_EQ(r.verdict.exType, ExType::Discovered);
+        CHECK(!hasKeyPrefix(r.script, "ex.exchange"));
+    }
+    // Without the capture behind it (no rook on h1), the short line proves nothing: no exchange is
+    // blamed and, at levels 1-2, nothing is said rather than a false cause.
+    const char* noRook = "2r1kb1r/ppp1pppp/1n6/3q4/3PnP2/NP2P3/3B2PP/R2QK1N1 w Qk - 0 11";
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf(noRook, {"g3"});
+        Reviewer rv;
+        rv.reset(level, White);
+        Review r = reviewOf(rv, g, analysisOf({pvl(-60, "g1f3 e4d2 d1d2"), pvl(-300, "g2g3 e4d2")}));
+        char where[64];
+        std::snprintf(where, sizeof where, "no rook b%d", level);
+        checkScript(r.script, where);
+        CHECK(r.verdict.exType != ExType::Exchange);
+        CHECK(!hasKeyPrefix(r.script, "ex.exchange"));
+        if (level <= 2) CHECK(!r.verdict.voiced);
+    }
+}
+
+TEST(coach_review_even_trade_is_no_exchange_loss) {
+    // 1.a3 lets the knight take the bishop on d2, and the king takes back: knight for bishop, 3
+    // points each (330 and 320 centipawns). Whether the engine's line shows the recapture or stops
+    // before it, the coach never says the bishop is lost to a cheaper piece.
+    const char* fen = "6k1/ppp5/8/8/4n3/8/PPPB4/2K5 w - - 0 1";
+    for (const char* played : {"a2a3 e4d2 c1d2 g8f7", "a2a3 e4d2"}) {
+        for (int level = 1; level <= 6; ++level) {
+            Game g = gameOf(fen, {"a3"});
+            Reviewer rv;
+            rv.reset(level, White);
+            Review r = reviewOf(rv, g, analysisOf({pvl(10, "c2c3 g8f7"), pvl(0, "b2b3 g8f7"), pvl(-150, played)}));
+            char where[64];
+            std::snprintf(where, sizeof where, "even trade b%d", level);
+            checkScript(r.script, where);
+            CHECK(r.verdict.cls != MoveClass::Blunder);
+            CHECK(r.verdict.exType != ExType::Exchange);
+            CHECK(!hasKeyPrefix(r.script, "ex.exchange"));
+            CHECK(!hasKeyPrefix(r.script, "ex.hanging"));
+        }
+    }
+}
+
+TEST(coach_review_cheaper_attacker_still_explained) {
+    // 1.Rd4?? puts the rook, defended by the c3 pawn, where the knight takes it: 5 points for 3.
+    const char* fen = "6k1/5ppp/2n5/8/8/2P5/5PPP/3R2K1 w - - 0 1";
+    for (const char* played : {"d1d4 c6d4 c3d4 g8f8", "d1d4 c6d4"}) {
+        for (int level = 1; level <= 6; ++level) {
+            Game g = gameOf(fen, {"Rd4"});
+            Reviewer rv;
+            rv.reset(level, White);
+            Review r = reviewOf(rv, g, analysisOf({pvl(50, "g1f1 g8f8"), pvl(-200, played)}));
+            char where[64];
+            std::snprintf(where, sizeof where, "cheaper attacker b%d", level);
+            checkScript(r.script, where);
+            if (r.verdict.exType != ExType::Exchange) dump(r.script);
+            CHECK_EQ(r.verdict.exType, ExType::Exchange);
+            CHECK(r.verdict.voiced);
+            const Beat* b = beatWithKey(r.script, "ex.exchange_cheap.b" + std::to_string(level));
+            CHECK(b != nullptr);
+            if (!b) continue;
+            CHECK(b->line.arg("n") && b->line.arg("n")->number == 5);
+            CHECK(b->line.arg("n2") && b->line.arg("n2")->number == 3);
+            CHECK(b->line.arg("pts") && b->line.arg("pts")->number == 2);
+        }
+    }
+}
+
+TEST(coach_review_mate_lines_only_when_the_engine_shows_them) {
+    // 1.a3?? allows 1...Rd1+ 2.Rxd1 Rxd1#. A0 stopped after 1...Rd1+: levels 3, 4 and 6 would say
+    // "this allows mate in 2: Rd1+" (or "after a3, Rd1+ is mate"), so they say the mate without moves.
+    const char* fen = "3r2k1/3r1ppp/8/8/8/8/P4PPP/2R3K1 w - - 0 1";
+    for (bool full : {true, false}) {
+        const ai::Analysis a0 = analysisOf(
+            {pvl(-20, "h2h3 d7d2"), pvl(-30, "g2g3 d7d2"), pvl(0, full ? "a2a3 d7d1 c1d1 d8d1" : "a2a3 d7d1", -2)});
+        for (int level = 3; level <= 6; ++level) {
+            Game g = gameOf(fen, {"a3"});
+            Reviewer rv;
+            rv.reset(level, White);
+            Review r = reviewOf(rv, g, a0);
+            char where[48];
+            std::snprintf(where, sizeof where, "mate allowed %s b%d", full ? "full" : "short", level);
+            checkScript(r.script, where);
+            CHECK_EQ(r.verdict.exType, ExType::MateAllowed);
+            CHECK(hasKey(r.script, full ? "ex.mate_allowed.b" + std::to_string(level) : std::string("ex.mate_allowed.b5")));
+        }
+    }
+    // 1.h3 misses 1.Rd8+ Rxd8 2.Rxd8#. With the best line cut after 1.Rd8+, the lines that show the
+    // mate ("{best} mates in 2: Rd8+") give way to those that name its first move only.
+    const char* mateFen = "2r3k1/p4ppp/8/8/8/8/3R1PPP/3R2K1 w - - 0 1";
+    for (bool full : {true, false}) {
+        const ai::Analysis a0 = analysisOf({pvl(0, full ? "d2d8 c8d8 d1d8" : "d2d8", 2), pvl(300, "h2h3 a7a5")});
+        for (int level = 3; level <= 6; ++level) {
+            Game g = gameOf(mateFen, {"h3"});
+            Reviewer rv;
+            rv.reset(level, White);
+            Review r = reviewOf(rv, g, a0);
+            char where[48];
+            std::snprintf(where, sizeof where, "mate missed %s b%d", full ? "full" : "short", level);
+            checkScript(r.script, where);
+            CHECK_EQ(r.verdict.exType, ExType::MateMissed);
+            CHECK(hasKey(r.script, full ? "ex.mate_missed.b" + std::to_string(level) : std::string("ex.mate_missed.b2")));
+        }
+    }
+}
+
+TEST(coach_review_stalemate_trick_needs_the_sacrifice) {
+    // 1.Kd7?? (winning: f7-f8 queens) allows 1...Rc7+ 2.Kxc7, stalemate: the rook given away, the
+    // coach's king has no move. The trick is explained at every level.
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf("2r4k/5P2/4KPP1/8/8/8/8/8 w - - 0 1", {"Kd7"});
+        Reviewer rv;
+        rv.reset(level, White);
+        Review r = reviewOf(rv, g, analysisOf({pvl(900, "e6e7 c8c7 e7e8"), pvl(0, "e6d7 c8c7 d7c7")}));
+        char where[48];
+        std::snprintf(where, sizeof where, "stalemate trick b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.exType, ExType::Stalemate);
+        CHECK(hasKey(r.script, "ex.stalemate_trick.b" + std::to_string(level)));
+    }
+    // A stalemate the human walks into without taking anything ("I can give away my pieces" would be
+    // false): 1.Kf7 b6 2.a3 stalemates the coach's king, nothing sacrificed.
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf("7k/1p2K3/6P1/1P6/8/8/P7/8 w - - 0 1", {"Kf7"});
+        Reviewer rv;
+        rv.reset(level, White);
+        Review r = reviewOf(rv, g, analysisOf({pvl(900, "g6g7 h8g8"), pvl(0, "e7f7 b7b6 a2a3")}));
+        char where[48];
+        std::snprintf(where, sizeof where, "no trick b%d", level);
+        checkScript(r.script, where);
+        CHECK(!hasKeyPrefix(r.script, "ex.stalemate_trick"));
+    }
+}
+
+TEST(coach_review_inaccuracy_is_not_called_a_mistake) {
+    // 1.a4 leaves the b4 pawn to the rook: an inaccuracy (the appraisal counts it so) with a concrete
+    // cause. Level 4 voices it with an "inaccurate" verdict, never the mistake's.
+    const char* fen = "1r4k1/5ppp/8/8/1P6/P7/5PPP/6K1 w - - 0 1";
+    Game g = gameOf(fen, {"a4"});
+    Reviewer rv;
+    rv.reset(4, White);
+    Review r = reviewOf(rv, g, analysisOf({pvl(100, "g1f1 g8f8"), pvl(30, "a3a4 b8b4 g1f1")}));
+    checkScript(r.script, "imprecise b4");
+    CHECK_EQ(r.verdict.cls, MoveClass::Inaccuracy);
+    CHECK_EQ(r.verdict.exType, ExType::Hanging);
+    CHECK(hasKey(r.script, "ex.verdict.imprecise.b4"));
+    CHECK(!hasKeyPrefix(r.script, "ex.verdict.mistake"));
+}
+
+TEST(coach_review_score_bound_is_rescored) {
+    // A0 was stopped when the player moved: its line for the move holds only a bound. The move is
+    // re-scored (A1) and judged on that exact score.
+    Game g = gameOf(nullptr, {"e4", "e5", "Nf3"});
+    ai::Analysis a0 = analysisOf({pvl(30, "g1f3 b8c6"), pvl(20, "b1c3 g8f6"), pvl(-600, "g1f3 b8c6")});
+    a0.lines[2].pv = {"g1f3"};
+    a0.lines[2].score.bound = ai::Score::Bound::Upper;
+    a0.lines[0].pv = {"f1c4", "g8f6"};
+    CHECK(Reviewer::needsPlayedRequest(a0, "g1f3"));
+    CHECK(!Reviewer::needsPlayedRequest(a0, "f1c4"));
+    const ai::Analysis a1 = analysisOf({pvl(25, "g1f3 b8c6")});
+    Reviewer rv;
+    rv.reset(3, White);
+    ReviewInput in;
+    in.game = &g;
+    in.before = &a0;
+    in.played = &a1;
+    Review r = rv.review(in);
+    CHECK(r.verdict.cls != MoveClass::Blunder && r.verdict.cls != MoveClass::Mistake);
+}
+
+TEST(coach_review_praise_capture_only_for_a_free_piece) {
+    // 1.exd5 takes a rook the e6 pawn defends: a good capture, but not "for free".
+    const char* fen = "6k1/5ppp/4p3/3r4/4P3/8/5PPP/6K1 w - - 0 1";
+    for (int level = 1; level <= 2; ++level) {
+        Game g = gameOf(fen, {"exd5"});
+        Reviewer rv;
+        rv.reset(level, White);
+        Review r = reviewOf(rv, g, analysisOf({pvl(400, "e4d5 e6d5"), pvl(0, "g1f1 d5d2")}));
+        checkScript(r.script, "defended rook");
+        CHECK_EQ(r.verdict.cls, MoveClass::Best);
+        CHECK(!hasKeyPrefix(r.script, "praise.capture"));
+        CHECK(!r.verdict.goodCapture);
+    }
+}
+
+TEST(coach_review_demo_names_only_what_happens) {
+    detail::Ctx c;
+    c.level = 2;
+    c.b = band(2);
+    c.human = White;
+    c.coach = Black;
+    c.ply = 20;
+    detail::Explanation ex;
+    ex.demoPlies = 3;
+    // An underpromotion is said as the pawn's move, not as "a new queen".
+    CHECK(c.p1.setFEN("4k3/1P6/8/8/8/7r/8/4K3 b - - 0 1"));
+    c.r = replayLine(c.p1, {"h3h2", "b7b8n", "e8d7"}, White);
+    Script s;
+    detail::appendDemo(c, ex, s);
+    checkScript(s, "underpromotion");
+    CHECK(!hasKey(s, "demo.promote"));
+    CHECK(hasKey(s, "demo.your.move"));
+    // "Your king has to move" only when nothing else answers the check.
+    for (bool knight : {true, false}) {
+        CHECK(c.p1.setFEN(knight ? "3q2k1/8/8/8/8/8/2N3PP/6K1 b - - 0 1" : "3q2k1/8/8/8/8/8/6PP/6K1 b - - 0 1"));
+        c.r = replayLine(c.p1, {"d8d4", "g1h1", "g8f8"}, White);
+        CHECK_EQ(c.r.size(), size_t(3));
+        Script k;
+        detail::appendDemo(c, ex, k);
+        checkScript(k, "king move");
+        CHECK_EQ(hasKey(k, "demo.your.king"), !knight);
     }
 }
 
@@ -1175,6 +1475,7 @@ TEST(coach_review_every_key_exists) {
     struct Family { const char* key; int from, to; };
     const Family families[] = {
         {"ex.verdict.blunder", 1, 6}, {"ex.verdict.mistake", 3, 6}, {"ex.verdict.inaccuracy", 4, 6},
+        {"ex.verdict.imprecise", 4, 6},
         {"ex.verdict.missed", 1, 2}, {"ex.better", 3, 6}, {"ex.rewind", 1, 4}, {"ex.offer", 1, 6},
         {"ex.mate_allowed", 1, 6}, {"ex.mate_missed", 1, 6}, {"ex.mate_delayed", 5, 6}, {"ex.stalemate", 1, 6},
         {"ex.stalemate_trick", 1, 6}, {"ex.fork", 1, 6}, {"ex.discovered", 1, 6}, {"ex.skewer", 1, 6},
