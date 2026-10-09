@@ -113,6 +113,12 @@ BIO* noSignalWriteBio(int fd) {
     return b;
 }
 
+// OpenSSL frees its global state from an atexit handler it registers at its first use, which comes
+// after the online client is built (a function-local static whose destructor ends its network
+// threads): that handler would run first, under threads still inside a TLS call. Asked for before
+// main(), the process ends without it.
+[[maybe_unused]] const bool g_openSslNoAtexit = OPENSSL_init_ssl(OPENSSL_INIT_NO_ATEXIT, nullptr) == 1;
+
 // One client context for the process: system trust store, TLS 1.2+.
 SSL_CTX* clientContext() {
     static SSL_CTX* ctx = [] {
@@ -221,6 +227,8 @@ public:
             std::lock_guard<std::mutex> lk(lookupMu_);
             if (lookup_) lookup_->stop();
         }
+        // Under fdMu_: a socket closed meanwhile could hand its number to another connection.
+        std::lock_guard<std::mutex> lk(fdMu_);
         int f = fd_.load();
         if (f >= 0) ::shutdown(f, SHUT_RDWR);
     }
@@ -230,8 +238,7 @@ public:
             SSL_free(ssl_);
             ssl_ = nullptr;
         }
-        int f = fd_.exchange(-1);
-        if (f >= 0) ::close(f);
+        closeFd();
     }
 
     void shutdownTls() {
@@ -240,10 +247,17 @@ public:
 
 private:
     std::atomic<int> fd_{-1};
+    std::mutex fdMu_;                     // closing fd_ against abortSocket() on another thread
     SSL* ssl_ = nullptr;
     CancelToken* cancel_ = nullptr;
     std::mutex lookupMu_;
     sock::Lookup* lookup_ = nullptr;      // the name resolution open() waits for (abortSocket stops it)
+
+    void closeFd() {
+        std::lock_guard<std::mutex> lk(fdMu_);
+        int f = fd_.exchange(-1);
+        if (f >= 0) ::close(f);
+    }
 
     bool waitFor(short events, const Deadline& dl) {
         if (cancel_ && cancel_->cancelled()) { error = "cancelled"; return false; }
@@ -297,8 +311,7 @@ private:
                 detail = std::strerror(errno);
             }
             if (r == 0) { ok = true; break; }
-            fd_.store(-1);
-            ::close(f);
+            closeFd();
             if (error == "timeout" || error == "cancelled") break;
         }
         if (!ok && error.empty()) error = "network";

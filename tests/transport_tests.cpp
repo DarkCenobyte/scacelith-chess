@@ -30,6 +30,7 @@
 
 #include <atomic>
 #include <chrono>
+#include <memory>
 #include <string>
 #include <thread>
 #include <vector>
@@ -433,6 +434,55 @@ TEST(net_resolve_lookup_bounds) {
     net::sock::Lookup slow("slow.test", 443, true);
     CHECK(slow.wait(5000) == R::NotFound);
     CHECK_EQ(slow.error(), std::string("no answer"));
+}
+
+namespace {
+
+std::atomic<bool> g_dnsGateOpen{false};
+
+// Answers (nothing) once the test opens the gate: a resolver that hangs until then.
+bool gatedLookup(const std::string&, uint16_t, bool, std::vector<net::sock::Endpoint>&, std::string& error) {
+    while (!g_dnsGateOpen.load()) std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    error = "no answer";
+    return false;
+}
+
+}  // namespace
+
+// A resolver that never answers keeps a bounded number of threads: past the limit a lookup fails
+// at once, and once the stuck ones end, lookups get threads again.
+TEST(net_resolve_lookup_threads_bounded) {
+    using R = net::sock::Lookup::Result;
+    const std::string refused = "too many name lookups still running";
+    g_dnsGateOpen = false;
+    net::sock::Lookup::setForTests(gatedLookup);
+    std::vector<std::unique_ptr<net::sock::Lookup>> stuck;
+    bool capped = false;
+    for (int i = 0; i < 64 && !capped; ++i) {
+        auto l = std::make_unique<net::sock::Lookup>("stuck.test", 443, true);
+        const auto t0 = Clock::now();
+        if (l->wait(20) == R::NotFound) {
+            CHECK_EQ(l->error(), refused);
+            CHECK(msSince(t0) < kPromptMs);
+            capped = true;
+        }
+        stuck.push_back(std::move(l));
+    }
+    CHECK(capped);
+    CHECK(stuck.size() <= 16 + 1);   // at most 16 threads, then the refused one
+    g_dnsGateOpen = true;
+    for (auto& l : stuck) l->wait(5000);
+    net::sock::Lookup::setForTests(nullptr);
+    // The threads still ending (this test's, earlier tests' slow ones) give their places back.
+    net::sock::Lookup::setForTests(slowLookup);
+    bool started = false;
+    for (auto t0 = Clock::now(); !started && msSince(t0) < 3000;) {
+        net::sock::Lookup l("slow.test", 443, true);
+        if (l.wait(5000) == R::NotFound && l.error() == "no answer") started = true;
+        else std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+    net::sock::Lookup::setForTests(nullptr);
+    CHECK(started);
 }
 
 // getaddrinfo itself, for a name every system resolves.

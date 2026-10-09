@@ -211,6 +211,9 @@ Endpoint Endpoint::anyV6(uint16_t port) {
 namespace {
 
 std::atomic<Lookup::Fn> g_lookupForTests{nullptr};
+// Lookup threads still running (their callers may have given up on them).
+constexpr int kMaxLookupThreads = 16;
+std::atomic<int> g_lookupThreads{0};
 
 bool systemLookup(const std::string& host, uint16_t port, bool tcp, std::vector<Endpoint>& out, std::string& error) {
     addrinfo hints{};
@@ -262,12 +265,21 @@ Lookup::Lookup(const std::string& host, uint16_t port, bool tcp) : s_(std::make_
     }
     Fn fn = g_lookupForTests.load();
     if (!fn) fn = systemLookup;
+    // A resolver that never answers keeps each thread it was given: past kMaxLookupThreads still
+    // running, a new lookup fails at once instead of adding one more.
+    if (g_lookupThreads.fetch_add(1) >= kMaxLookupThreads) {
+        g_lookupThreads.fetch_sub(1);
+        s_->error = "too many name lookups still running";
+        s_->done = true;
+        return;
+    }
     std::shared_ptr<State> s = s_;
     try {
         std::thread([s, fn, host, port, tcp] {
             std::vector<Endpoint> out;
             std::string error;
             const bool found = fn(host, port, tcp, out, error);
+            g_lookupThreads.fetch_sub(1);
             {
                 std::lock_guard<std::mutex> lk(s->m);
                 s->found = found;
@@ -278,6 +290,7 @@ Lookup::Lookup(const std::string& host, uint16_t port, bool tcp) : s_(std::make_
             s->cv.notify_all();
         }).detach();
     } catch (const std::system_error&) {
+        g_lookupThreads.fetch_sub(1);
         s_->error = "no thread for the lookup";
         s_->done = true;
     }

@@ -54,8 +54,9 @@ struct Endpoint {
 // silent DNS server keeps it for tens of seconds: it runs on a thread of its own, detached, which
 // shares its answer with the caller through a state they both own; the caller waits for that
 // answer until its deadline or a stop request and goes on. A lookup still running then finishes
-// alone and its answer is dropped (the thread touches nothing else). A numeric address resolves at
-// once, on the caller's thread. Used by the Linux transport (transport_openssl.cpp) and the direct
+// alone and its answer is dropped (the thread touches nothing else); with 16 of those still
+// running, a new lookup fails at once (NotFound) rather than start one more. A numeric address
+// resolves at once, on the caller's thread. Used by the Linux transport (transport_openssl.cpp) and the direct
 // match's guest.
 class Lookup {
 public:
