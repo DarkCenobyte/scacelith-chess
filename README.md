@@ -20,7 +20,7 @@ x64 and Linux x86-64; both need a GPU with OpenGL 4.6, and Stockfish 19 is built
   `libasound2` or a sound device the game runs silent, the coach in subtitles. Saved logins go to
   the desktop's keyring through libsecret (`libsecret-1-0`) when it is installed (a locked keyring
   asks for its password when you sign in or connect), otherwise to a file only you can read
-  (the log says why the file is used).
+  (`install.sh` says when libsecret is missing, and the log says why the file is used).
 
 ## Playing
 

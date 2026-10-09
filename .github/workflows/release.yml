@@ -370,7 +370,8 @@ jobs:
           - **Linux x86-64**: \`Scacelith-$VERSION-linux-x86_64.tar.gz\` (the executable, its launcher
             and icons, \`install.sh\` to add it to the applications menu, and the licences). Needs
             glibc 2.34 and OpenSSL 3 (Ubuntu 22.04, Debian 12, Fedora 36, RHEL 9 and later) and X11 or
-            XWayland; the sound goes through ALSA (PulseAudio and PipeWire included).
+            XWayland; the sound goes through ALSA (PulseAudio and PipeWire included), and the saved
+            logins' tokens go to the desktop keyring through libsecret (libsecret-1-0) when available.
 
           Every file is built by the release workflow from tag \`$TAG\`, and its build provenance is
           attested. To check a download with the GitHub CLI:
