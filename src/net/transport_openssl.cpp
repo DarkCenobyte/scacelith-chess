@@ -7,6 +7,7 @@
 #if !defined(_WIN32) && defined(SCACELITH_HAS_OPENSSL)
 #include "transport.h"
 #include "crypto.h"
+#include "socket_util.h"
 #include "../core/log.h"
 
 #include <openssl/bio.h>
@@ -21,7 +22,7 @@
 #include <cstring>
 #include <deque>
 #include <fcntl.h>
-#include <netdb.h>
+#include <mutex>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <poll.h>
@@ -214,8 +215,12 @@ public:
         }
     }
 
-    // Unblocks a poll() in progress from another thread.
+    // Unblocks a poll() or a name resolution in progress from another thread.
     void abortSocket() {
+        {
+            std::lock_guard<std::mutex> lk(lookupMu_);
+            if (lookup_) lookup_->stop();
+        }
         int f = fd_.load();
         if (f >= 0) ::shutdown(f, SHUT_RDWR);
     }
@@ -237,6 +242,8 @@ private:
     std::atomic<int> fd_{-1};
     SSL* ssl_ = nullptr;
     CancelToken* cancel_ = nullptr;
+    std::mutex lookupMu_;
+    sock::Lookup* lookup_ = nullptr;      // the name resolution open() waits for (abortSocket stops it)
 
     bool waitFor(short events, const Deadline& dl) {
         if (cancel_ && cancel_->cancelled()) { error = "cancelled"; return false; }
@@ -249,26 +256,33 @@ private:
         return true;
     }
 
+    // The name is resolved within the connection's deadline and given up on cancel (sock::Lookup:
+    // getaddrinfo itself cannot be interrupted), then each address is tried in turn.
     bool connectTcp(const std::string& host, uint16_t port, const Deadline& dl) {
-        addrinfo hints{};
-        hints.ai_family = AF_UNSPEC;
-        hints.ai_socktype = SOCK_STREAM;
-        addrinfo* res = nullptr;
-        std::string portStr = std::to_string(port);
-        int gai = getaddrinfo(host.c_str(), portStr.c_str(), &hints, &res);
-        if (gai != 0) {
-            error = "network";
-            detail = std::string("resolve: ") + gai_strerror(gai);
+        if (cancel_ && cancel_->cancelled()) { error = "cancelled"; return false; }
+        sock::Lookup lookup(host, port, true);
+        {
+            std::lock_guard<std::mutex> lk(lookupMu_);
+            lookup_ = &lookup;
+        }
+        const sock::Lookup::Result found = lookup.wait(dl.remaining(), [this] { return cancel_ && cancel_->cancelled(); });
+        {
+            std::lock_guard<std::mutex> lk(lookupMu_);
+            lookup_ = nullptr;
+        }
+        if (found != sock::Lookup::Result::Found) {
+            error = found == sock::Lookup::Result::TimedOut ? "timeout" : found == sock::Lookup::Result::Stopped ? "cancelled" : "network";
+            detail = found == sock::Lookup::Result::NotFound ? "resolve: " + lookup.error() : std::string("resolve: ") + error;
             return false;
         }
         bool ok = false;
-        for (addrinfo* a = res; a && !ok; a = a->ai_next) {
-            int f = ::socket(a->ai_family, a->ai_socktype | SOCK_NONBLOCK | SOCK_CLOEXEC, a->ai_protocol);
+        for (const sock::Endpoint& a : lookup.endpoints()) {
+            int f = ::socket(a.family(), SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
             if (f < 0) continue;
             fd_.store(f);
             int one = 1;
             setsockopt(f, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
-            int r = ::connect(f, a->ai_addr, a->ai_addrlen);
+            int r = ::connect(f, reinterpret_cast<const sockaddr*>(a.storage), socklen_t(a.len));
             if (r != 0 && errno == EINPROGRESS) {
                 if (waitFor(POLLOUT, dl)) {
                     int err = 0;
@@ -287,7 +301,6 @@ private:
             ::close(f);
             if (error == "timeout" || error == "cancelled") break;
         }
-        freeaddrinfo(res);
         if (!ok && error.empty()) error = "network";
         return ok;
     }

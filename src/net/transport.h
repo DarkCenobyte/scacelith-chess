@@ -15,7 +15,9 @@
 //     (net/download.h follows the redirects of public file hosts itself, with its own rules.)
 //
 // Every function blocks and is called from the client's network threads only. A CancelToken
-// lets another thread abort a blocking call (shutdown).
+// lets another thread abort a blocking call (shutdown). A slow DNS server holds up neither:
+// Linux resolves names within the timeout and gives them up on cancel (net::sock::Lookup), and
+// WinHTTP gets the timeout for its name resolution too (WinHttpSetTimeouts).
 //
 // Linux: nothing the transport writes raises SIGPIPE, whatever the process does with that signal
 // (a peer that reset the connection, a socket shut down by a cancellation).
@@ -81,8 +83,8 @@ struct HttpRequest {
     std::string accept = "application/json";  // the Accept header (a PGN download asks for its type)
     std::vector<std::pair<std::string, std::string>> headers;   // e.g. Authorization
     // Windows (WinHTTP): for each of resolve, connect, send and receive. Linux: one deadline for
-    // the connection and its TLS handshake, then one for the whole exchange (httpStream: for each
-    // write and each read).
+    // the name resolution, the connection and its TLS handshake, then one for the whole exchange
+    // (httpStream: for each write and each read).
     int timeoutMs = 15000;
     size_t maxResponseBytes = 1 << 20;
 };

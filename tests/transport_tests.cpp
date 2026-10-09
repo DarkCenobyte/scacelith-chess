@@ -1,9 +1,16 @@
 // What the transports owe the process around them (net/transport.h): on Linux no write of the
 // TLS transport may raise SIGPIPE, whatever the disposition of that signal (a child process whose
 // SIGPIPE is left to its default action, death, talks to a local TLS server that resets or closes
-// the connection under it, or cancels its own exchange before OpenSSL's last write).
+// the connection under it, or cancels its own exchange before OpenSSL's last write); and a name
+// that takes long to resolve holds up neither a timeout nor a cancellation (a stand-in for
+// getaddrinfo that answers after a second: net/socket_util.h).
 #include "test.h"
+#include "net/credential_store.h"
 #include "net/crypto.h"
+#include "net/direct_match.h"
+#include "net/net_sys.h"
+#include "net/online_client.h"
+#include "net/socket_util.h"
 #include "net/transport.h"
 
 #ifndef _WIN32
@@ -325,3 +332,198 @@ TEST(net_sigpipe_ws_close_notify) {
 TEST(net_sigpipe_stream_abort) { checkNoSigpipe(Scenario::StreamAbort); }
 
 #endif  // !_WIN32
+
+// =============================================================================================
+// Name resolution: a slow DNS holds up neither a timeout nor a cancellation
+// =============================================================================================
+
+namespace {
+
+std::atomic<int> g_slowLookups{0};
+
+// Answers (nothing) after a second, as a DNS server that does not answer would after much longer.
+bool slowLookup(const std::string&, uint16_t, bool, std::vector<net::sock::Endpoint>&, std::string& error) {
+    ++g_slowLookups;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    error = "no answer";
+    return false;
+}
+
+// The slow lookup in place of getaddrinfo while it lives. The lookups it started run on and end
+// alone: each keeps the function it started with, and its own state.
+struct SlowDns {
+    SlowDns() { net::sock::Lookup::setForTests(slowLookup); }
+    ~SlowDns() { net::sock::Lookup::setForTests(nullptr); }
+};
+
+// How long the wait of a cancelled or timed-out resolution may take at most (the lookup itself
+// takes 1000 ms).
+constexpr int kPromptMs = 400;
+
+}  // namespace
+
+TEST(net_resolve_lookup_bounds) {
+    using R = net::sock::Lookup::Result;
+    SlowDns dns;
+    {
+        net::sock::Lookup l("slow.test", 443, true);
+        const auto t0 = Clock::now();
+        CHECK(l.wait(50) == R::TimedOut);
+        CHECK(msSince(t0) < kPromptMs);
+    }
+    {
+        net::sock::Lookup l("slow.test", 443, true);
+        std::thread stopper([&l] {
+            std::this_thread::sleep_for(std::chrono::milliseconds(30));
+            l.stop();
+        });
+        const auto t0 = Clock::now();
+        CHECK(l.wait(5000) == R::Stopped);
+        CHECK(msSince(t0) < kPromptMs);
+        stopper.join();
+    }
+    {
+        std::atomic<bool> flag{false};
+        net::sock::Lookup l("slow.test", 443, true);
+        std::thread raiser([&flag] {
+            std::this_thread::sleep_for(std::chrono::milliseconds(30));
+            flag = true;
+        });
+        const auto t0 = Clock::now();
+        CHECK(l.wait(5000, [&flag] { return flag.load(); }) == R::Stopped);
+        CHECK(msSince(t0) < kPromptMs);
+        raiser.join();
+    }
+    // An address needs no lookup: it is there at once.
+    const int before = g_slowLookups.load();
+    net::sock::Lookup v4("127.0.0.1", 8443, true);
+    CHECK(v4.wait(0) == R::Found);
+    REQUIRE(v4.endpoints().size() == 1);
+    CHECK_EQ(v4.endpoints()[0].toString(), std::string("127.0.0.1:8443"));
+    net::sock::Lookup v6("::1", 8443, true);
+    CHECK(v6.wait(0) == R::Found);
+    CHECK_EQ(g_slowLookups.load(), before);
+    // The slow one's answer, when waited for.
+    net::sock::Lookup slow("slow.test", 443, true);
+    CHECK(slow.wait(5000) == R::NotFound);
+    CHECK_EQ(slow.error(), std::string("no answer"));
+}
+
+// getaddrinfo itself, for a name every system resolves.
+TEST(net_resolve_localhost) {
+    net::sock::Lookup l("localhost", 80, true);
+    REQUIRE(l.wait(10000) == net::sock::Lookup::Result::Found);
+    CHECK(!l.endpoints().empty());
+    for (const net::sock::Endpoint& e : l.endpoints()) CHECK_EQ(e.port(), uint16_t(80));
+}
+
+// A direct match joined by name: leaving, or the game quitting (the DirectMatch destroyed, which
+// waits for its threads), does not wait for the name.
+TEST(net_resolve_direct_guest_leaves_at_once) {
+    SlowDns dns;
+    const auto t0 = Clock::now();
+    {
+        net::DirectMatch d;
+        d.join("slow.test", 47100, "ABCD-EFGH-JKMN", "Guest");
+        std::this_thread::sleep_for(std::chrono::milliseconds(30));
+        CHECK(d.state() == net::DirectMatch::State::Connecting);
+    }
+    CHECK(msSince(t0) < 30 + kPromptMs);
+}
+
+#ifndef _WIN32
+// The Linux transport: the resolution counts in the connection's deadline, and a cancellation
+// ends it at once (HTTPS, a streamed download, a WebSocket).
+TEST(net_resolve_transport_bounds) {
+    SlowDns dns;
+    net::HttpRequest r;
+    r.host = "slow.test";
+    r.timeoutMs = 50;
+    net::HttpResponse resp;
+    auto t0 = Clock::now();
+    net::httpRequest(r, resp);
+    CHECK_EQ(resp.error, std::string("timeout"));
+    CHECK(msSince(t0) < kPromptMs);
+
+    r.timeoutMs = 5000;
+    auto cancelSoon = [](net::CancelToken& c) {
+        return std::thread([&c] {
+            std::this_thread::sleep_for(std::chrono::milliseconds(30));
+            c.cancel();
+        });
+    };
+    {
+        net::CancelToken cancel;
+        std::thread t = cancelSoon(cancel);
+        t0 = Clock::now();
+        net::httpRequest(r, resp, &cancel);
+        t.join();
+        CHECK_EQ(resp.error, std::string("cancelled"));
+        CHECK(msSince(t0) < kPromptMs);
+    }
+    {
+        net::CancelToken cancel;
+        std::thread t = cancelSoon(cancel);
+        t0 = Clock::now();
+        net::httpStream(r, [](const net::HttpHead&) { return true; }, [](const char*, size_t) { return true; }, resp, &cancel);
+        t.join();
+        CHECK_EQ(resp.error, std::string("cancelled"));
+        CHECK(msSince(t0) < kPromptMs);
+    }
+    {
+        net::CancelToken cancel;
+        net::WsParams p;
+        p.host = "slow.test";
+        p.subprotocol = "scacelith.rt1";
+        p.timeoutMs = 5000;
+        std::string err;
+        net::WsAnswer answer;
+        std::thread t = cancelSoon(cancel);
+        t0 = Clock::now();
+        CHECK(!net::wsConnect(p, err, answer, &cancel));
+        t.join();
+        CHECK_EQ(err, std::string("cancelled"));
+        CHECK(msSince(t0) < kPromptMs);
+    }
+    {
+        net::CancelToken cancel;
+        cancel.cancel();   // before it starts: no lookup at all
+        const int before = g_slowLookups.load();
+        net::httpRequest(r, resp, &cancel);
+        CHECK_EQ(resp.error, std::string("cancelled"));
+        CHECK_EQ(g_slowLookups.load(), before);
+    }
+}
+
+// The online client quits at once while its HTTPS thread and its realtime thread both wait for a
+// name (the game's exit destroys it, which cancels and joins its threads).
+TEST(net_resolve_online_client_quits_at_once) {
+    SlowDns dns;
+    const std::string path = net::sys::exeDirectory() + "net-test-resolve.credentials";
+    net::sys::removeFile(path);
+    net::ServerEndpoint ep;
+    ep.host = "slow.test";
+    {
+        net::CredentialStore s(path);
+        net::Credential c;
+        c.origin = ep.origin();
+        c.username = "alice";
+        c.token = "sct_" + std::string(43, 'R');
+        CHECK(s.put(c));
+    }
+    const int before = g_slowLookups.load();
+    auto t0 = Clock::now();
+    {
+        net::OnlineClient c;
+        c.setCredentialsFile(path);
+        c.setServer(ep);
+        c.fetchServerInfo();   // net-http
+        c.connect();           // net-rt: /info first
+        while (g_slowLookups.load() < before + 2 && msSince(t0) < 2000) std::this_thread::sleep_for(std::chrono::milliseconds(2));
+        CHECK(g_slowLookups.load() >= before + 2);   // both threads are in a lookup
+        t0 = Clock::now();
+    }
+    CHECK(msSince(t0) < kPromptMs);
+    net::sys::removeFile(path);
+}
+#endif
