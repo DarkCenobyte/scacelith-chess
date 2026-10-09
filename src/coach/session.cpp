@@ -5,7 +5,8 @@
 // Analyses (all through the Analyst, full strength):
 //   A0  when the human's turn begins: MultiPV 3 of the position (cached by FEN, so the retry after a
 //       takeback reuses it); A3 with it at levels 3-4. Stopped (finished early) when the human moves.
-//   A1  after the human's move, when A0 does not hold the played move; A2 at levels 4-6.
+//   A1  after the human's move, when A0 does not hold the played move or holds only a bound for it
+//       (Reviewer::needsPlayedRequest); A2 at levels 4-6.
 //   evaluations of the positions the appraisal still lacks, in the background when the Analyst is
 //       idle and no review waits.
 // The review holds the coach's move (coachMayMove) from the human's move until its script is over

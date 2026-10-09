@@ -196,6 +196,14 @@ int seeSquarePoints(const Position& p, Square sq, Color by) {
 
 int bestCapturePoints(const Position& p, Color by) {
     int best = 0;
+    if (p.sideToMove() == by) {
+        // Its legal captures only: none when mated or stalemated, only those that answer a check,
+        // none by a piece pinned off its line; en passant included, a promotion as a queen.
+        for (const Move& m : p.legalMoves())
+            if ((m.flags & MoveCapture) && (m.promotion == NoPiece || m.promotion == Queen))
+                best = std::max(best, seePoints(p, m));
+        return best;
+    }
     U64 targets = p.pieces(opposite(by)) & ~p.pieces(King);
     while (targets) {
         const Square t = lowest(targets);

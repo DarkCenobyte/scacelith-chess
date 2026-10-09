@@ -857,6 +857,82 @@ TEST(coach_review_cheaper_attacker_still_explained) {
     }
 }
 
+TEST(coach_review_battery_counts_in_the_exchange) {
+    // 1.c4?? leaves the bishop on d4 defended by the knight alone, against the bishop on b6 and the
+    // queen behind it: Bxd4 Nxd4 Qxd4 wins it. The count says 2 attackers against 1 defender.
+    const char* fen = "6k1/q4ppp/1b6/8/3B4/1NP5/6PP/6K1 w - - 0 1";
+    for (const char* played : {"c3c4 b6d4 b3d4 a7d4 g1f1", "c3c4 b6d4"}) {
+        for (int level = 1; level <= 6; ++level) {
+            Game g = gameOf(fen, {"c4"});
+            Reviewer rv;
+            rv.reset(level, White);
+            Review r = reviewOf(rv, g, analysisOf({pvl(0, "g1f1 g8f8"), pvl(-10, "h2h3 g8f8"), pvl(-300, played)}));
+            char where[64];
+            std::snprintf(where, sizeof where, "battery b%d", level);
+            checkScript(r.script, where);
+            if (r.verdict.exType != ExType::Exchange) dump(r.script);
+            CHECK_EQ(r.verdict.exType, ExType::Exchange);
+            CHECK(r.verdict.voiced);
+            const Beat* b = beatWithKey(r.script, "ex.exchange_count.b" + std::to_string(level));
+            CHECK(b != nullptr);
+            if (!b) continue;
+            CHECK(b->line.arg("n") && b->line.arg("n")->number == 2);
+            CHECK(b->line.arg("n2") && b->line.arg("n2")->number == 1);
+            CHECK(b->line.arg("pts") && b->line.arg("pts")->number == 3);
+        }
+    }
+}
+
+TEST(coach_review_line_ending_in_check_proves_the_loss) {
+    // 1.Bf4?? (attacking the rook on b8) takes the guard off the knight on c3: 1...Qxc3+ wins it, and
+    // White, in check, cannot take the rook. Where A0's line stops, the bishop's capture is no
+    // answer to the check: the knight is lost, and said so at every level (with the offer at 1-2).
+    const char* fen = "1r4k1/5p1p/6p1/q7/8/2N5/P2B1PPP/4K3 w - - 0 1";
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf(fen, {"Bf4"});
+        Reviewer rv;
+        rv.reset(level, White);
+        Review r = reviewOf(rv, g, analysisOf({pvl(0, "e1f1 g8g7"), pvl(-10, "h2h3 g8g7"), pvl(-300, "d2f4 a5c3")}));
+        char where[48];
+        std::snprintf(where, sizeof where, "loss in check b%d", level);
+        checkScript(r.script, where);
+        if (r.verdict.exType != ExType::Hanging) dump(r.script);
+        CHECK_EQ(r.verdict.exType, ExType::Hanging);
+        CHECK(r.verdict.voiced);
+        if (level <= 2) CHECK(r.offersTakeback);
+    }
+}
+
+TEST(coach_review_guessed_reply_never_contradicts_the_engine) {
+    // 1.a3?? allows 1...Nxd2, uncovering the bishop on a8 against the queen on h1. A0's line stops
+    // after 1...Nxd2: the guessed recapture 2.Kxd2 would let 2...Bxh1 take the queen, but White
+    // moves the queen instead (the engine says -3, a bishop): the coach never claims the queen falls.
+    const char* fen = "b2r2k1/5ppp/3p4/8/4n3/8/PPPB1P1P/4K2Q w - - 0 1";
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf(fen, {"a3"});
+        Reviewer rv;
+        rv.reset(level, White);
+        Review r = reviewOf(rv, g, analysisOf({pvl(0, "f2f3 e4c5"), pvl(-20, "d2e3 g8f8"), pvl(-300, "a2a3 e4d2")}));
+        char where[48];
+        std::snprintf(where, sizeof where, "guessed reply b%d", level);
+        checkScript(r.script, where);
+        CHECK(r.verdict.exType != ExType::Discovered);
+        CHECK(!hasKeyPrefix(r.script, "ex.discovered"));
+        for (const Beat& b : r.script) CHECK(b.uci != "e1d2" && b.uci != "a8h1");
+    }
+    // The guesses themselves: dropped against a score of -3, kept when the engine sees the queen lost.
+    Position p1;
+    CHECK(p1.setFEN("b2r2k1/5ppp/3p4/8/4n3/P7/1PPB1P1P/4K2Q b - - 0 1"));
+    for (int cp : {-300, -900}) {
+        std::vector<LineStep> r = replayLine(p1, {"e4d2"}, White);
+        ai::Score best, played;
+        played.cp = cp;
+        detail::extendRefutation(r, p1, White, 4, materialBalance(p1, White), detail::guessLossBound(best, played));
+        CHECK_EQ(r.size(), size_t(cp == -300 ? 1 : 3));
+        if (r.size() == 3) CHECK(r[1].guessed && r[2].guessed && r[2].uci == "a8h1");
+    }
+}
+
 TEST(coach_review_mate_lines_only_when_the_engine_shows_them) {
     // 1.a3?? allows 1...Rd1+ 2.Rxd1 Rxd1#. A0 stopped after 1...Rd1+: levels 3, 4 and 6 would say
     // "this allows mate in 2: Rd1+" (or "after a3, Rd1+ is mate"), so they say the mate without moves.
@@ -957,6 +1033,34 @@ TEST(coach_review_score_bound_is_rescored) {
     in.played = &a1;
     Review r = rv.review(in);
     CHECK(r.verdict.cls != MoveClass::Blunder && r.verdict.cls != MoveClass::Mistake);
+}
+
+TEST(coach_review_best_line_bound_is_not_rescored) {
+    // The player finds 1.Rd8+ (mate in 2), A0's best line, stopped with a bound. It is judged against
+    // that same line: no re-score is asked, and another search's score (a cp one here) never turns
+    // the engine's own move into "you missed mate in 2, starting with Rd8+".
+    const char* fen = "2r3k1/p4ppp/8/8/8/8/3R1PPP/3R2K1 w - - 0 1";
+    ai::Analysis a0 = analysisOf({pvl(0, "d2d8 c8d8 d1d8", 2), pvl(300, "h2h3 a7a5")});
+    a0.lines[0].score.bound = ai::Score::Bound::Lower;
+    CHECK(!Reviewer::needsPlayedRequest(a0, "d2d8"));
+    const ai::Analysis a1 = analysisOf({pvl(600, "d2d8 c8d8 d1d8")});
+    for (int level = 1; level <= 6; ++level) {
+        Game g = gameOf(fen, {"Rd8+"});
+        Reviewer rv;
+        rv.reset(level, White);
+        ReviewInput in;
+        in.game = &g;
+        in.before = &a0;
+        in.played = &a1;
+        Review r = rv.review(in);
+        char where[48];
+        std::snprintf(where, sizeof where, "best bound b%d", level);
+        checkScript(r.script, where);
+        CHECK_EQ(r.verdict.cls, MoveClass::Best);
+        CHECK(!r.verdict.mateMissed);
+        CHECK(std::fabs(r.verdict.accuracy - 100.0) < 1e-9);
+        CHECK(!hasKeyPrefix(r.script, "ex."));
+    }
 }
 
 TEST(coach_review_praise_capture_only_for_a_free_piece) {

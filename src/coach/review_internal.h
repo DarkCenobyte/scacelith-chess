@@ -50,8 +50,16 @@ chess::Position lineEnd(const chess::Position& start, const std::vector<LineStep
 // Where the engine's refutation stops early (a search cut short reports short lines), the natural
 // replies the board shows, marked guessed, until 'r' holds 'want' plies: the human's recapture on
 // the square the coach just took on (the least valuable piece whose recapture does not lose), and
-// the coach's capture that wins the most by exchange (2 points at least). Never past a mate.
-void extendRefutation(std::vector<LineStep>& r, const chess::Position& p1, chess::Color human, size_t want);
+// the coach's capture that wins the most by exchange (2 points at least). Never past a mate, and
+// never a capture that leaves the human more than 'maxLoss' points down for good from 'base' (the
+// engine's score says less is lost: guessLossBound); the human's guessed recapture before such a
+// capture goes too.
+void extendRefutation(std::vector<LineStep>& r, const chess::Position& p1, chess::Color human, size_t want, int base,
+                      int maxLoss);
+// The most points a guessed reply may leave the human down, from the engine's scores of the best
+// and the played move (the side to move's view, before the move): what the move costs or what the
+// position after it is worth, a pawn being about 100 centipawns, with 2 points to spare.
+int guessLossBound(const ai::Score& best, const ai::Score& played);
 
 // A chosen explanation: the lines that say why (with pointing), the demonstration, the policy bits.
 struct Explanation {

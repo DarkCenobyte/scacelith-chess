@@ -256,7 +256,13 @@ Position lineEnd(const Position& start, const std::vector<LineStep>& line) {
     return q;
 }
 
-void extendRefutation(std::vector<LineStep>& r, const Position& p1, Color human, size_t want) {
+int guessLossBound(const ai::Score& best, const ai::Score& played) {
+    // whiteCp(s, true): the side to move's centipawns, mates as +-1000, clamped.
+    const int b = whiteCp(best, true), p = whiteCp(played, true);
+    return (std::max({0, b - p, -p}) + 50) / 100 + 2;
+}
+
+void extendRefutation(std::vector<LineStep>& r, const Position& p1, Color human, size_t want, int base, int maxLoss) {
     Position q = lineEnd(p1, r);
     for (int added = 0; added < 3 && r.size() < want; ++added) {
         if (!r.empty() && (r.back().mate || r.back().stalemate)) return;
@@ -285,9 +291,18 @@ void extendRefutation(std::vector<LineStep>& r, const Position& p1, Color human,
         if (!pick.valid()) return;
         std::vector<LineStep> step = replayLine(q, {q.toUCI(pick)}, human, 1);
         if (step.empty()) return;
+        Position next = q;
+        next.makeMove(pick);
+        // A capture that leaves the human more down than the engine's score allows is not what the
+        // engine sees: the human had better than the recapture guessed before it (a bigger piece to
+        // save, a counter-attack), or the capture does not work. Neither is guessed.
+        if (step[0].mover != human && base - step[0].balance - bestCapturePoints(next, human) > maxLoss) {
+            if (!r.empty() && r.back().guessed && r.back().mover == human) r.pop_back();
+            return;
+        }
         step[0].guessed = true;
         r.push_back(step[0]);
-        q.makeMove(pick);
+        q = next;
     }
 }
 
@@ -458,7 +473,8 @@ ai::AnalysisRequest Reviewer::beforeRequest(const Game& g) const {
 bool Reviewer::needsPlayedRequest(const ai::Analysis& before, const std::string& playedUci) {
     if (!before.ok || before.noLegalMove) return false;
     const ai::PvLine* l = before.line(playedUci);
-    return l == nullptr || l->score.bound != ai::Score::Bound::Exact;
+    // The best line is judged against itself whatever its bound (review()): no re-score for it.
+    return l == nullptr || (l->score.bound != ai::Score::Bound::Exact && l != &before.lines.front());
 }
 
 ai::AnalysisRequest Reviewer::playedRequest(const Game& g, const ai::Analysis& before) const {
@@ -574,8 +590,10 @@ Review Reviewer::review(const ReviewInput& in) {
         if (a0->lines.size() > 1) c.l2 = &a0->lines[1];
         c.lp = a0->line(c.playedUci);
         // A1 when A0 lacks the move, or holds only a bound for it (a stopped search): the move's
-        // class must not come from a score the engine did not finish.
-        if ((!c.lp || c.lp->score.bound != ai::Score::Bound::Exact) && in.played && in.played->ok &&
+        // class must not come from a score the engine did not finish. Not for the best line itself:
+        // the move is judged against the very score it is compared with (another search's score
+        // would make the engine's own move a mate missed, or less than accurate).
+        if ((!c.lp || (c.lp->score.bound != ai::Score::Bound::Exact && c.lp != c.l1)) && in.played && in.played->ok &&
             !in.played->lines.empty() && !in.played->lines[0].pv.empty() && in.played->lines[0].pv[0] == c.playedUci)
             c.lp = &in.played->lines[0];
         if (!c.lp && !c.p1.hasLegalMove()) {
@@ -622,7 +640,7 @@ Review Reviewer::review(const ReviewInput& in) {
         if (pv.size() > refutation.size() && (refutation.empty() || pv[0] == refutation[0])) refutation = pv;
     }
     c.r = replayLine(c.p1, refutation, human_, 16);
-    extendRefutation(c.r, c.p1, human_, size_t(bd.lookahead + 1));
+    extendRefutation(c.r, c.p1, human_, size_t(bd.lookahead + 1), c.base, guessLossBound(c.l1->score, c.lp->score));
     c.best = replayLine(c.p0, c.l1->pv, human_, 16);
     c.playedLine = replayLine(c.p0, c.lp->pv, human_, 16);
     c.rEnd = lineEnd(c.p1, c.r);
