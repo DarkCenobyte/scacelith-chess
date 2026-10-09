@@ -17,7 +17,9 @@ x64 and Linux x86-64; both need a GPU with OpenGL 4.6, and Stockfish 19 is built
   `./install.sh --uninstall` removes it. It needs glibc 2.34 and OpenSSL 3 (Ubuntu 22.04,
   Debian 12, Fedora 36, RHEL 9 and later), X11 or Wayland with XWayland, and plays its sound
   through ALSA (`libasound2`; PulseAudio and PipeWire through their ALSA plugins). Without
-  `libasound2` or a sound device the game runs silent, the coach in subtitles.
+  `libasound2` or a sound device the game runs silent, the coach in subtitles. Saved logins go to
+  the desktop's keyring through libsecret (`libsecret-1-0`) when it is installed and unlocked,
+  otherwise to a file only you can read.
 
 ## Playing
 
@@ -260,7 +262,10 @@ Nayuki's [QR Code generator](https://www.nayuki.io/page/qr-code-generator-librar
 
 Settings are stored in `Scacelith.ini` in `%APPDATA%\scacelith\` (on Linux
 `$XDG_CONFIG_HOME/scacelith/`, by default `~/.config/scacelith/`), with the saved logins
-(`Scacelith.credentials`) and the log (`scacelith.log`). A `Scacelith.ini` next to the executable
+(`Scacelith.credentials`) and the log (`scacelith.log`). Their session tokens are encrypted for the
+Windows account; on Linux the desktop's keyring keeps them (GNOME Keyring, KWallet or another
+Secret Service, through libsecret when it is installed), or, without an unlocked one, the file
+itself in the clear, readable by its owner only ([docs/ONLINE_CLIENT.md](docs/ONLINE_CLIENT.md)). A `Scacelith.ini` next to the executable
 makes a portable install (versions up to 1.0.0-beta.1 put it there): the game then keeps all three
 in the executable's folder, as it also does when the user folder cannot be written. A file given with `--ini <file>` is read and written there only, with the
 logins beside it (the log warns when it cannot be written). All of them are
@@ -301,8 +306,9 @@ MinGW-w64 GCC with POSIX threads; Clang cannot build the embedded Stockfish vari
 Python 3 for the instruction-set audits and the Windows exception table check that run at every
 build (a Windows Release build, the shipped exe, does not configure without it; other builds skip
 them with a warning). The Linux build also needs the OpenSSL 3, X11 and OpenGL development files
-(for example `libssl-dev`, `libx11-dev` and `libgl-dev`); ALSA is loaded at run time
-(`libasound.so.2`), not linked, and a Linux Release build links libstdc++ and libgcc in, so that
+(for example `libssl-dev`, `libx11-dev` and `libgl-dev`); ALSA (`libasound.so.2`) and libsecret
+(`libsecret-1.so.0`, the keyring of the saved logins) are loaded at run time when present, not
+linked, and a Linux Release build links libstdc++ and libgcc in, so that
 the executable runs on other distributions than the build machine's. The Windows build is produced with
 MinGW-w64 (native or cross-compiled from Linux) and is a single self-contained executable
 (Stockfish 19 and its neural network are embedded). Stockfish is compiled once per x86-64
@@ -496,8 +502,9 @@ These parts of the game's own code follow published code closely:
 ### Used from the system, not shipped
 
 On Linux the game uses the system's GNU C Library (LGPL-2.1-or-later), OpenSSL 3 (Apache-2.0),
-libX11 (MIT/X11), OpenGL library (libglvnd, MIT) and graphics driver, and ALSA (libasound,
-LGPL-2.1-or-later, loaded at run time); on Windows, the system's DLLs.
+libX11 (MIT/X11), OpenGL library (libglvnd, MIT) and graphics driver, ALSA (libasound,
+LGPL-2.1-or-later, loaded at run time) and libsecret (LGPL-2.1-or-later, loaded at run time when
+present, with GLib); on Windows, the system's DLLs.
 
 ### Downloaded at the player's request
 

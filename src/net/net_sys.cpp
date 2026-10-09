@@ -10,6 +10,7 @@
 #else
 #include <cerrno>
 #include <climits>
+#include <csignal>
 #include <filesystem>
 #include <system_error>
 #include <fcntl.h>
@@ -274,7 +275,18 @@ bool openBrowser(const std::string& url) {
     if (url.compare(0, 8, "https://") != 0 && url.compare(0, 7, "http://") != 0) return false;
     pid_t pid;
     char* argv[] = {const_cast<char*>("xdg-open"), const_cast<char*>(url.c_str()), nullptr};
-    if (posix_spawnp(&pid, "xdg-open", nullptr, nullptr, argv, environ) != 0) return false;
+    // SIGPIPE back to its default action in the child: an ignored signal stays ignored across exec,
+    // and the game ignores it (main.cpp), which xdg-open's pipelines and the browser do not expect.
+    posix_spawnattr_t attr;
+    if (posix_spawnattr_init(&attr) != 0) return false;
+    sigset_t dfl;
+    sigemptyset(&dfl);
+    sigaddset(&dfl, SIGPIPE);
+    posix_spawnattr_setsigdefault(&attr, &dfl);
+    posix_spawnattr_setflags(&attr, POSIX_SPAWN_SETSIGDEF);
+    const int spawned = posix_spawnp(&pid, "xdg-open", nullptr, &attr, argv, environ);
+    posix_spawnattr_destroy(&attr);
+    if (spawned != 0) return false;
     // xdg-open returns quickly (it detaches the browser); reap it so no zombie stays behind.
     int status = 0;
     waitpid(pid, &status, 0);

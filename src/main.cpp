@@ -33,6 +33,7 @@
 #include "scacelith_version.h"
 
 #include <chrono>
+#include <csignal>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
@@ -214,6 +215,11 @@ int main(int argc, char** argv) {
 }
 #else
 int main(int argc, char** argv) {
+    // A write to a pipe or socket whose other end is gone fails with EPIPE instead of ending the
+    // game: the log on a standard error read by a launcher that quit, the X server's socket, a
+    // library's own socket. The game's sockets never rely on this (MSG_NOSIGNAL, src/net), and the
+    // programs it starts get the default action back (net::sys::openBrowser).
+    std::signal(SIGPIPE, SIG_IGN);
     std::vector<std::string> args(argv + 1, argv + argc);
     return runApp(args);
 }

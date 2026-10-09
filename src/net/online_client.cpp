@@ -491,6 +491,7 @@ struct OnlineClient::Impl {
         httpCancel.cancel();
         rtCancel.cancel();
         gifCancel.cancel();
+        creds.interrupt();   // a keyring call in progress (the files stay as they are)
         httpCv.notify_all();
         rtCv.notify_all();
         gifCv.notify_all();

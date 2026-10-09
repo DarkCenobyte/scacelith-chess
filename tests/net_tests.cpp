@@ -1393,6 +1393,435 @@ TEST(net_credentials_clear_that_token) {
     net::sys::removeFile(path);
 }
 
+// ---- The system keyring (Linux: the Secret Service; credential_store.h, Keyring) ----
+
+namespace {
+
+// A keyring in memory, whose items are found by (origin, id) as the Secret Service's are. It can be
+// made unavailable (a locked or missing keyring), or hold its lookups until released.
+class FakeKeyring final : public net::Keyring {
+public:
+    std::atomic<bool> available{true};
+    std::atomic<int> stores{0}, lookups{0}, removes{0};
+    std::atomic<bool> holdLookups{false};   // a lookup waits until released or cancelled
+    std::atomic<bool> holding{false};       // a lookup is waiting
+
+    Result store(const std::string& origin, const std::string& id, const std::string& secret, net::CancelToken* cancel,
+                 std::string& why) override {
+        if (cancel && cancel->cancelled()) return Result::Cancelled;
+        ++stores;
+        if (!available) { why = "fake keyring locked"; return Result::Unavailable; }
+        std::lock_guard<std::mutex> lk(m_);
+        items_[{origin, id}] = secret;
+        return Result::Ok;
+    }
+    Result lookup(const std::string& origin, const std::string& id, std::string& secret, net::CancelToken* cancel,
+                  std::string& why) override {
+        ++lookups;
+        if (holdLookups) {
+            net::AbortGuard guard(cancel, [this] { release(); });   // as the Secret Service's call does
+            std::unique_lock<std::mutex> lk(m_);
+            holding = true;
+            cv_.wait_for(lk, std::chrono::seconds(10), [this] { return released_; });
+            holding = false;
+            released_ = false;
+        }
+        if (cancel && cancel->cancelled()) return Result::Cancelled;
+        if (!available) { why = "fake keyring locked"; return Result::Unavailable; }
+        std::lock_guard<std::mutex> lk(m_);
+        auto it = items_.find({origin, id});
+        if (it == items_.end()) return Result::Missing;
+        secret = it->second;
+        return Result::Ok;
+    }
+    Result remove(const std::string& origin, const std::string& id, net::CancelToken* cancel, std::string& why) override {
+        if (cancel && cancel->cancelled()) return Result::Cancelled;
+        ++removes;
+        if (!available) { why = "fake keyring locked"; return Result::Unavailable; }
+        std::lock_guard<std::mutex> lk(m_);
+        items_.erase({origin, id});
+        return Result::Ok;
+    }
+    void release() {
+        std::lock_guard<std::mutex> lk(m_);
+        released_ = true;
+        cv_.notify_all();
+    }
+    size_t size() {
+        std::lock_guard<std::mutex> lk(m_);
+        return items_.size();
+    }
+    bool holds(const std::string& secret, const std::string& origin = std::string()) {
+        std::lock_guard<std::mutex> lk(m_);
+        for (auto& i : items_)
+            if (i.second == secret && (origin.empty() || i.first.first == origin)) return true;
+        return false;
+    }
+
+private:
+    std::mutex m_;
+    std::condition_variable cv_;
+    bool released_ = false;
+    std::map<std::pair<std::string, std::string>, std::string> items_;
+};
+
+// The token field of origin's record in the file, "" when there is none.
+std::string fileToken(const std::string& path, const std::string& origin) {
+    std::string text;
+    Value doc;
+    if (!net::sys::readFile(path, text, 1 << 20) || !net::json::parse(text, doc)) return std::string();
+    for (const Value& r : doc["records"].items())
+        if (r["origin"].asString() == origin) return r["token"].asString();
+    return std::string();
+}
+
+bool hasPrefix(const std::string& s, const char* prefix) { return s.compare(0, std::strlen(prefix), prefix) == 0; }
+
+}  // namespace
+
+// With a keyring the file holds only a reference to the token's item: a new item for every token,
+// the previous one removed once the file no longer points to it, the item removed at logout and
+// when the origin is forgotten. A reference copied into another origin's record finds nothing.
+TEST(net_credentials_keyring) {
+    std::string path = tempCredentialPath("keyring");
+    RemovedAtEnd removed{path};
+    const std::string A = "a.example.org:443", B = "b.example.org:443";
+    const std::string tokenA = "sct_" + std::string(43, 'A'), tokenA2 = "sct_" + std::string(43, 'C');
+    FakeKeyring k;
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential c;
+        c.origin = A;
+        c.username = "alice";
+        c.token = tokenA;
+        c.pinnedSha256 = std::string(64, 'a');
+        bool stored = false;
+        CHECK(s.put(c, &stored));
+        CHECK(stored);
+        CHECK(s.hasToken(A));
+        net::Credential out;
+        CHECK(s.get(A, out));
+        CHECK_EQ(out.token, tokenA);
+        CHECK_EQ(out.username, std::string("alice"));
+        CHECK_EQ(k.size(), size_t(1));
+    }
+    std::string text;
+    CHECK(net::sys::readFile(path, text, 1 << 20));
+    CHECK(text.find(tokenA) == std::string::npos);
+    const std::string ref = fileToken(path, A);
+    CHECK(hasPrefix(ref, "keyring:"));
+    CHECK_EQ(ref.size(), size_t(8 + 32));
+    {
+        // Another store on the same file and keyring (the next run).
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        CHECK(s.hasToken(A));
+        net::Credential out;
+        CHECK(s.get(A, out));
+        CHECK_EQ(out.token, tokenA);
+        // A new sign-in: a new item, the old one removed.
+        out.token = tokenA2;
+        CHECK(s.put(out));
+        CHECK_EQ(k.size(), size_t(1));
+        CHECK(k.holds(tokenA2));
+        CHECK(!k.holds(tokenA));
+        CHECK(fileToken(path, A) != ref);
+        // The reference copied into B's record finds nothing there (items are found by origin too).
+        net::Credential forged;
+        forged.origin = B;
+        forged.username = "mallory";
+        CHECK(s.put(forged));
+    }
+    Value doc;
+    CHECK(net::sys::readFile(path, text, 1 << 20) && net::json::parse(text, doc));
+    Value records = Value::array();
+    for (const Value& r : doc["records"].items()) {
+        Value copy = r;
+        if (r["origin"].asString() == B) copy.set("token", fileToken(path, A));
+        records.push(copy);
+    }
+    doc.set("records", records);
+    CHECK(net::sys::writeFileAtomic(path, doc.dump(), true));
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential out;
+        CHECK(s.hasToken(B));                       // not known before a read (no keyring call here)
+        CHECK(s.get(B, out));
+        CHECK(out.token.empty());
+        CHECK(!s.hasToken(B));                      // from now on: no saved session there
+        CHECK(s.get(A, out) && out.token == tokenA2);
+        // Logout: the item goes with the reference.
+        CHECK(s.clearToken(A));
+        CHECK(!s.hasToken(A));
+        CHECK_EQ(s.username(A), std::string("alice"));
+        CHECK_EQ(k.size(), size_t(0));
+        out = net::Credential();
+        out.origin = A;
+        out.token = tokenA;
+        CHECK(s.put(out));
+        CHECK_EQ(k.size(), size_t(1));
+        CHECK(s.erase(A));                          // forgotten: its item too
+        CHECK_EQ(k.size(), size_t(0));
+        // clearToken(origin, token): only while that token is the saved one.
+        CHECK(s.put(out));
+        CHECK(s.clearToken(A, tokenA2));
+        CHECK(s.get(A, out) && out.token == tokenA);
+        CHECK(s.clearToken(A, tokenA));
+        CHECK(!s.hasToken(A));
+        CHECK_EQ(k.size(), size_t(0));
+    }
+}
+
+// A token the file holds (an earlier version's, or one saved while the keyring was missing or
+// locked) moves to the keyring the first time it is read while the keyring works, and only then.
+TEST(net_credentials_keyring_migration) {
+    std::string path = tempCredentialPath("keyring-migrate");
+    RemovedAtEnd removed{path};
+    const std::string A = "a.example.org:443", B = "b.example.org:443";
+    const std::string tokenA = "sct_" + std::string(43, 'A'), tokenB = "sct_" + std::string(43, 'B');
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);                      // the format of the file alone
+        net::Credential c;
+        c.origin = A;
+        c.username = "alice";
+        c.token = tokenA;
+        CHECK(s.put(c));
+        c.origin = B;
+        c.username = "bob";
+        c.token = tokenB;
+        CHECK(s.put(c));
+    }
+    const std::string blobA = fileToken(path, A);
+    CHECK(!blobA.empty() && !hasPrefix(blobA, "keyring:"));
+    FakeKeyring k;
+    k.available = false;
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential out;
+        CHECK(s.hasToken(A));
+        CHECK(s.get(A, out) && out.token == tokenA);   // read from the file
+        CHECK_EQ(fileToken(path, A), blobA);           // the keyring did not take it: left as it is
+        k.available = true;
+        CHECK(s.get(A, out) && out.token == tokenA);
+        CHECK(hasPrefix(fileToken(path, A), "keyring:"));
+        CHECK(k.holds(tokenA));
+        CHECK(s.hasToken(A));
+        CHECK_EQ(fileToken(path, B).substr(0, 6), blobA.substr(0, 6));   // B not read yet: not moved
+        // A sign-in while the keyring is unavailable: kept in the file (said once in the log).
+        k.available = false;
+        net::Credential c;
+        c.origin = B;
+        c.username = "bob";
+        c.token = tokenB;
+        bool stored = false;
+        CHECK(s.put(c, &stored));
+        CHECK(stored);
+        CHECK(!hasPrefix(fileToken(path, B), "keyring:"));
+        CHECK(s.get(B, out) && out.token == tokenB);
+    }
+    std::string text;
+    CHECK(net::sys::readFile(path, text, 1 << 20));
+    CHECK(text.find(tokenA) == std::string::npos);
+    k.available = true;
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential out;
+        CHECK(s.get(B, out) && out.token == tokenB);
+        CHECK(hasPrefix(fileToken(path, B), "keyring:"));
+        CHECK(s.get(A, out) && out.token == tokenA);
+        CHECK_EQ(k.size(), size_t(2));
+    }
+    // A keyring locked at the next start: the token cannot be read, the reference stays, and the
+    // session comes back once the keyring is unlocked.
+    k.available = false;
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential out;
+        CHECK(s.get(A, out));
+        CHECK(out.token.empty());
+        CHECK(!s.hasToken(A));
+        CHECK(hasPrefix(fileToken(path, A), "keyring:"));
+        k.available = true;
+        CHECK(s.get(A, out) && out.token == tokenA);
+        CHECK(s.hasToken(A));
+    }
+}
+
+// An origin move (the official server's former port) with the token in the keyring: the record
+// moves at once, its item on its first read (found under the former origin meanwhile, and only
+// through the move rule); a logout before that read removes it too.
+TEST(net_credentials_keyring_origin_move) {
+    std::string path = tempCredentialPath("keyring-move");
+    RemovedAtEnd removed{path};
+    const std::string oldO = "play.example.org:44664", newO = "play.example.org:443";
+    const std::string token = "sct_" + std::string(43, 'M');
+    FakeKeyring k;
+    auto saveOld = [&] {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential c;
+        c.origin = oldO;
+        c.username = "alice";
+        c.token = token;
+        CHECK(s.put(c));
+    };
+    saveOld();
+    const std::string ref = fileToken(path, oldO);
+    CHECK(hasPrefix(ref, "keyring:"));
+    CHECK(k.holds(token, oldO));
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        s.addOriginMove(oldO, newO);
+        CHECK(s.hasToken(newO));
+        CHECK_EQ(fileToken(path, newO), ref);       // moved without a keyring call
+        CHECK(fileToken(path, oldO).empty());
+        net::Credential out;
+        CHECK(s.get(newO, out));
+        CHECK_EQ(out.token, token);
+        CHECK_EQ(out.username, std::string("alice"));
+        CHECK(hasPrefix(fileToken(path, newO), "keyring:") && fileToken(path, newO) != ref);
+        CHECK(k.holds(token, newO));
+        CHECK(!k.holds(token, oldO));
+        CHECK_EQ(k.size(), size_t(1));
+    }
+    {
+        net::CredentialStore s(path);               // the item is the new origin's: no rule needed
+        s.setKeyring(&k);
+        net::Credential out;
+        CHECK(s.get(newO, out) && out.token == token);
+        CHECK(s.erase(newO));
+        CHECK_EQ(k.size(), size_t(0));
+    }
+    // Moved, then the next run without the rule cannot find the item, and the run with it can.
+    saveOld();
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        s.addOriginMove(oldO, newO);
+        CHECK(s.hasToken(newO));                    // loads the file: the record moves
+    }
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        net::Credential out;
+        CHECK(s.get(newO, out));
+        CHECK(out.token.empty());
+        CHECK(k.holds(token, oldO));
+    }
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(&k);
+        s.addOriginMove(oldO, newO);
+        CHECK(s.hasToken(newO));
+        // Logout before any read: the item under the former origin goes too.
+        CHECK(s.clearToken(newO));
+        CHECK_EQ(k.size(), size_t(0));
+    }
+}
+
+// The game thread's questions (hasToken, username, pin) never wait for the keyring, and
+// interrupt() (the client shutting down) ends a keyring call in progress: nothing is then written
+// in the clear instead.
+TEST(net_credentials_keyring_does_not_block) {
+    std::string path = tempCredentialPath("keyring-block");
+    RemovedAtEnd removed{path};
+    const std::string A = "a.example.org:443", token = "sct_" + std::string(43, 'A');
+    FakeKeyring k;
+    net::CredentialStore s(path);
+    s.setKeyring(&k);
+    net::Credential c;
+    c.origin = A;
+    c.username = "alice";
+    c.token = token;
+    c.pinnedSha256 = std::string(64, 'd');
+    CHECK(s.put(c));
+    k.holdLookups = true;
+    net::Credential out;
+    std::thread reader([&] { s.get(A, out); });
+    auto t0 = std::chrono::steady_clock::now();
+    while (!k.holding && std::chrono::steady_clock::now() - t0 < std::chrono::seconds(5))
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    REQUIRE(k.holding.load());
+    t0 = std::chrono::steady_clock::now();
+    CHECK(s.hasToken(A));
+    CHECK_EQ(s.username(A), std::string("alice"));
+    CHECK_EQ(s.pin(A), std::string(64, 'd'));
+    CHECK_EQ(s.origins().size(), size_t(1));
+    CHECK(std::chrono::steady_clock::now() - t0 < std::chrono::milliseconds(200));
+    s.interrupt();
+    reader.join();
+    CHECK(std::chrono::steady_clock::now() - t0 < std::chrono::milliseconds(500));
+    CHECK(out.token.empty());
+    // Interrupted: a new token is not kept at all (never in the file instead).
+    c.token = "sct_" + std::string(43, 'Z');
+    bool stored = true;
+    CHECK(!s.put(c, &stored));
+    CHECK(!stored);
+    CHECK(hasPrefix(fileToken(path, A), "keyring:"));
+}
+
+#ifndef _WIN32
+// The real Secret Service, when this machine has one unlocked (a desktop session; for a headless
+// run: dbus-run-session with gnome-keyring-daemon --unlock). Skipped elsewhere (CI). Its items
+// carry an origin of their own and are removed at the end.
+TEST(net_credentials_secret_service) {
+    net::Keyring* k = net::secretServiceKeyring();
+    if (!k) SKIP("libsecret-1.so.0 cannot be loaded");
+    const std::string A = "keyring-test.invalid:" + std::to_string(int(getpid())), B = "other-" + A;
+    const std::string token = "sct_" + std::string(43, 'S');
+    std::string why, back;
+    const net::Keyring::Result probe = k->store(A, "probe", "x", nullptr, why);
+    if (probe != net::Keyring::Result::Ok) SKIP("no usable Secret Service: " + why);
+    CHECK(k->lookup(A, "probe", back, nullptr, why) == net::Keyring::Result::Ok);
+    CHECK_EQ(back, std::string("x"));
+    CHECK(k->lookup(B, "probe", back, nullptr, why) == net::Keyring::Result::Missing);
+    CHECK(k->remove(A, "probe", nullptr, why) == net::Keyring::Result::Ok);
+    CHECK(k->lookup(A, "probe", back, nullptr, why) == net::Keyring::Result::Missing);
+    CHECK(k->remove(A, "probe", nullptr, why) == net::Keyring::Result::Ok);   // nothing there: fine
+
+    std::string path = tempCredentialPath("secret-service");
+    RemovedAtEnd removed{path};
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(nullptr);
+        net::Credential c;
+        c.origin = A;
+        c.username = "alice";
+        c.token = token;
+        CHECK(s.put(c));                            // the file's format, as an earlier version saved it
+    }
+    CHECK(hasPrefix(fileToken(path, A), "bound:"));
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(k);
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == token);   // moved to the keyring
+    }
+    const std::string ref = fileToken(path, A);
+    CHECK(hasPrefix(ref, "keyring:"));
+    std::string text;
+    CHECK(net::sys::readFile(path, text, 1 << 20));
+    CHECK(text.find(token) == std::string::npos);
+    CHECK(k->lookup(A, ref.substr(8), back, nullptr, why) == net::Keyring::Result::Ok);
+    CHECK_EQ(back, token);
+    {
+        net::CredentialStore s(path);
+        s.setKeyring(k);
+        net::Credential out;
+        CHECK(s.get(A, out) && out.token == token);
+        CHECK(s.clearToken(A));                     // logout: the item goes
+    }
+    CHECK(k->lookup(A, ref.substr(8), back, nullptr, why) == net::Keyring::Result::Missing);
+}
+#endif
+
 // =============================================================================================
 // Endpoints and transport rules
 // =============================================================================================
@@ -5881,7 +6310,8 @@ TEST(net_credentials_origin_move) {
     }
     {
         net::CredentialStore s(path);
-        net::Credential out;
+        s.addOriginMove(legacy.origin(), off.origin());   // as every client has it (a keyring item
+        net::Credential out;                               // moves on its first read)
         CHECK(!s.get(legacy.origin(), out));
         CHECK(s.get(off.origin(), out));
         CHECK_EQ(out.token, token);

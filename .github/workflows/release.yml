@@ -162,7 +162,7 @@ jobs:
   # Built on the oldest supported Ubuntu (22.04), so that the game runs on the distributions of 2021
   # onwards: libstdc++ and libgcc are linked in (CMakeLists.txt); glibc, OpenSSL 3, X11 and OpenGL
   # are the system's (OpenSSL then finds the system's certificates where its distribution put
-  # them), and ALSA is loaded at run time when present.
+  # them), and ALSA and libsecret are loaded at run time when present.
   linux:
     name: Linux x86-64 release build
     needs: version
@@ -197,8 +197,8 @@ jobs:
         run: ./build/scacelith_tests
 
       # The version, and what the executable needs from the system: only libraries every desktop
-      # distribution has (no libstdc++, libgcc_s or libasound), and no glibc newer than 2.34 (the
-      # README's requirement).
+      # distribution has (no libstdc++, libgcc_s, libasound or libsecret), and no glibc newer than
+      # 2.34 (the README's requirement).
       - name: Check the executable
         run: |
           grep -q "#define SCACELITH_VERSION \"$VERSION\"" build/generated/scacelith_version.h
@@ -254,7 +254,9 @@ jobs:
           Run ./scacelith. ./install.sh adds the game to the applications menu (in ~/.local);
           ./install.sh --uninstall removes it. The settings, saved logins and log are kept in
           \$XDG_CONFIG_HOME/scacelith/, by default ~/.config/scacelith/ (next to the executable
-          instead when a Scacelith.ini stands there).
+          instead when a Scacelith.ini stands there); the logins' session tokens go to the desktop's
+          keyring through libsecret (libsecret-1-0) when one is unlocked, otherwise they stay in that
+          folder, readable by their owner only.
 
           Source: $REPOSITORY ($REF_NAME, commit $COMMIT).
           Scacelith is free software under the GNU General Public License v3.0 (LICENSE). The licence

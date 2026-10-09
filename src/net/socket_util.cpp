@@ -25,8 +25,10 @@
 
 #include <algorithm>
 #include <chrono>
+#include <condition_variable>
 #include <cstring>
 #include <mutex>
+#include <system_error>
 #include <thread>
 
 namespace net {
@@ -204,27 +206,113 @@ Endpoint Endpoint::anyV6(uint16_t port) {
     return e;
 }
 
-bool resolve(const std::string& host, uint16_t port, bool tcp, std::vector<Endpoint>& out) {
-    startup();
-    out.clear();
+// ---- name resolution ----------------------------------------------------------------------------
+
+namespace {
+
+std::atomic<Lookup::Fn> g_lookupForTests{nullptr};
+
+bool systemLookup(const std::string& host, uint16_t port, bool tcp, std::vector<Endpoint>& out, std::string& error) {
     addrinfo hints{};
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = tcp ? SOCK_STREAM : SOCK_DGRAM;
     addrinfo* res = nullptr;
-    if (getaddrinfo(host.c_str(), nullptr, &hints, &res) != 0) return false;
+    int e = getaddrinfo(host.c_str(), nullptr, &hints, &res);
+    if (e != 0) {
+#ifdef _WIN32
+        error = "getaddrinfo " + std::to_string(e);   // gai_strerror is not thread-safe there
+#else
+        error = gai_strerror(e);
+#endif
+        return false;
+    }
     for (addrinfo* r = res; r; r = r->ai_next) {
         if ((r->ai_family != AF_INET && r->ai_family != AF_INET6) || r->ai_addrlen > sizeof(Endpoint::storage)) continue;
-        Endpoint e;
-        std::memcpy(e.storage, r->ai_addr, r->ai_addrlen);
-        e.len = int(r->ai_addrlen);
-        e.setPort(port);
+        Endpoint ep;
+        std::memcpy(ep.storage, r->ai_addr, r->ai_addrlen);
+        ep.len = int(r->ai_addrlen);
+        ep.setPort(port);
         bool dup = false;
-        for (auto& o : out) dup = dup || (o.len == e.len && std::memcmp(o.storage, e.storage, e.len) == 0);
-        if (!dup) out.push_back(e);
+        for (auto& o : out) dup = dup || (o.len == ep.len && std::memcmp(o.storage, ep.storage, size_t(ep.len)) == 0);
+        if (!dup) out.push_back(ep);
     }
     freeaddrinfo(res);
+    if (out.empty()) error = "no IPv4 or IPv6 address";
     return !out.empty();
 }
+
+}  // namespace
+
+// What the caller and the lookup's thread share (each holds a reference).
+struct Lookup::State {
+    std::mutex m;
+    std::condition_variable cv;
+    bool done = false, found = false, stopped = false;
+    std::vector<Endpoint> endpoints;
+    std::string error;
+};
+
+Lookup::Lookup(const std::string& host, uint16_t port, bool tcp) : s_(std::make_shared<State>()) {
+    startup();
+    Endpoint numeric;
+    if (Endpoint::parse(host, port, numeric)) {
+        s_->endpoints.push_back(numeric);
+        s_->done = s_->found = true;
+        return;
+    }
+    Fn fn = g_lookupForTests.load();
+    if (!fn) fn = systemLookup;
+    std::shared_ptr<State> s = s_;
+    try {
+        std::thread([s, fn, host, port, tcp] {
+            std::vector<Endpoint> out;
+            std::string error;
+            const bool found = fn(host, port, tcp, out, error);
+            {
+                std::lock_guard<std::mutex> lk(s->m);
+                s->found = found;
+                s->endpoints = std::move(out);
+                s->error = std::move(error);
+                s->done = true;
+            }
+            s->cv.notify_all();
+        }).detach();
+    } catch (const std::system_error&) {
+        s_->error = "no thread for the lookup";
+        s_->done = true;
+    }
+}
+
+Lookup::~Lookup() = default;
+
+Lookup::Result Lookup::wait(int timeoutMs, const std::function<bool()>& stopped) {
+    const auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(timeoutMs > 0 ? timeoutMs : 0);
+    std::unique_lock<std::mutex> lk(s_->m);
+    for (;;) {
+        if (s_->done) return s_->found ? Result::Found : Result::NotFound;
+        if (s_->stopped || (stopped && stopped())) return Result::Stopped;
+        const auto now = std::chrono::steady_clock::now();
+        if (now >= end) return Result::TimedOut;
+        s_->cv.wait_until(lk, stopped ? std::min(end, now + std::chrono::milliseconds(20)) : end);
+    }
+}
+
+void Lookup::stop() {
+    {
+        std::lock_guard<std::mutex> lk(s_->m);
+        s_->stopped = true;
+    }
+    s_->cv.notify_all();
+}
+
+const std::vector<Endpoint>& Lookup::endpoints() const { return s_->endpoints; }
+
+std::string Lookup::error() const {
+    std::lock_guard<std::mutex> lk(s_->m);
+    return s_->error;
+}
+
+void Lookup::setForTests(Fn fn) { g_lookupForTests.store(fn); }
 
 // ---- sockets ------------------------------------------------------------------------------------
 
@@ -366,7 +454,7 @@ int connectResult(Handle h) {
     return e;
 }
 
-Handle connectWithTimeout(const Endpoint& ep, int timeoutMs, std::string& err) {
+Handle connectWithTimeout(const Endpoint& ep, int timeoutMs, std::string& err, const std::atomic<bool>* cancel) {
     err.clear();
     Handle h = openTcp(ep.family());
     if (h == kInvalid) { err = errorName(lastError()); return kInvalid; }
@@ -376,11 +464,12 @@ Handle connectWithTimeout(const Endpoint& ep, int timeoutMs, std::string& err) {
     if (r == 0) {
         int64_t deadline = steadyMs() + timeoutMs;
         for (;;) {
+            if (cancel && cancel->load()) { err = "cancelled"; closeSocket(h); return kInvalid; }
             int64_t left = deadline - steadyMs();
             if (left <= 0) { err = "timeout"; closeSocket(h); return kInvalid; }
             PollSet ps;
             ps.add(h, false, true);
-            int n = ps.wait(int(left));
+            int n = ps.wait(int(cancel ? std::min<int64_t>(left, 100) : left));
             if (n < 0) { err = "network"; closeSocket(h); return kInvalid; }
             if (n > 0 && ps.writable(h)) break;
         }

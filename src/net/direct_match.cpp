@@ -27,6 +27,7 @@ using direct::SecureChannel;
 
 namespace {
 
+constexpr int kResolveMs = 10000;          // the host's name (guest)
 constexpr int kConnectMs = 5000;           // per address tried
 constexpr int kHandshakeMs = 10000;        // handshake, then Hello -> Welcome
 constexpr int kPingEveryMs = 2000;         // both sides measure the round trip
@@ -1102,7 +1103,15 @@ private:
         sock::startup();
         if (!waker.valid()) { fail("network"); return; }
         connectionEvent(ConnState::Connecting);
-        if (!sock::resolve(address_, port_, true, endpoints_)) { fail("not_found"); return; }
+        // The host's name: given up when the player leaves (close(), the game quitting: their
+        // join waits for this thread) or after kResolveMs (a DNS server that does not answer).
+        sock::Lookup lookup(address_, port_, true);
+        switch (lookup.wait(kResolveMs, [this] { return stopFlag.load(); })) {
+        case sock::Lookup::Result::Found: endpoints_ = lookup.endpoints(); break;
+        case sock::Lookup::Result::Stopped: return;
+        case sock::Lookup::Result::NotFound:
+        case sock::Lookup::Result::TimedOut: fail("not_found"); return;
+        }
         epIndex_ = 0;
         connectNext(sock::steadyMs());
         while (!stopFlag && phase_ != Phase::Done) {

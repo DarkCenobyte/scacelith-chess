@@ -6,27 +6,69 @@
 //
 // The file (Scacelith.credentials, JSON) lives with Scacelith.ini (net::sys::settingsDirectory():
 // the user data directory %APPDATA%\scacelith\ or $XDG_CONFIG_HOME/scacelith/, or the executable's folder
-// of a portable install), or next to an explicit --ini file. Tokens are
-// never stored in clear on Windows: DPAPI (CryptProtectData, current user,
-// CRYPTPROTECT_UI_FORBIDDEN) with the origin as additional entropy, so a token blob moved to
-// another origin's record cannot be decrypted there. Linux builds write the file with mode 0600
-// and bind each token to its origin in the clear. Either way get(origin) only ever returns a token
-// that was saved for that origin.
+// of a portable install), or next to an explicit --ini file. Where the tokens are kept:
+//   - Windows: in the file, never in clear: DPAPI (CryptProtectData, current user,
+//     CRYPTPROTECT_UI_FORBIDDEN) with the origin as additional entropy, so a token blob moved to
+//     another origin's record cannot be decrypted there ("dpapi:").
+//   - Linux: in the system keyring when there is one (Keyring below: the Secret Service, GNOME
+//     Keyring, KWallet, KeePassXC...), one item per token found by its origin and a random id; the
+//     file holds only "keyring:" and that id. A token the file still holds in the format below
+//     moves to the keyring the first time it is read while the keyring works.
+//   - Linux without a usable keyring (none installed or running, no D-Bus session, the keyring
+//     locked: the game never asks to unlock it, SCACELITH_KEYRING=off): in the file, bound to its
+//     origin but in the clear ("bound:", base64url of origin + '\n' + token), protected only by the
+//     file's permissions (0600, in a 0700 folder). Said once in the log.
+// Either way get(origin) only ever returns a token that was saved for that origin.
 //
-// Thread-safe (one mutex); the file is read on first use and rewritten atomically on changes.
+// Thread-safe. The file is read on first use and rewritten atomically on changes. The calls the
+// game thread makes (hasToken, username, pin, origins) never wait for the keyring: its calls
+// (get, put, clearToken, erase, on the network threads) run outside the lock of the records, one
+// at a time.
 //
 // Origin moves (addOriginMove): a server that changed its port keeps its players signed in. The
 // online client registers one for the official server of the build, which moved from port 44664
 // to 443: on load, a file with a record for "host:44664" and none for "host:443" has that record
 // moved (user name, token re-protected for the new origin, server id, pin) and is saved again, so
-// it happens once. Never for a community server: the client registers no other move.
+// it happens once (a token the keyring keeps moves to an item of the new origin on its first
+// read). Never for a community server: the client registers no other move.
 #pragma once
+#include "transport.h"   // CancelToken
 #include <mutex>
 #include <string>
 #include <utility>
 #include <vector>
 
 namespace net {
+
+// The system's secret store, where a Linux build keeps the session tokens. Each item is found by
+// its origin and an id the store makes for it (new for every token). The tests give a store a
+// fake one (CredentialStore::setKeyring).
+class Keyring {
+public:
+    enum class Result {
+        Ok,
+        Missing,       // lookup: no such item
+        Unavailable,   // no keyring, a locked one, or an error: why says which
+        Cancelled,     // the store was interrupted (CredentialStore::interrupt)
+    };
+    virtual ~Keyring() = default;
+    // Keeps secret under (origin, id), replacing an item with the same two.
+    virtual Result store(const std::string& origin, const std::string& id, const std::string& secret, CancelToken* cancel,
+                         std::string& why) = 0;
+    virtual Result lookup(const std::string& origin, const std::string& id, std::string& secret, CancelToken* cancel,
+                          std::string& why) = 0;
+    // Ok also when there was no such item.
+    virtual Result remove(const std::string& origin, const std::string& id, CancelToken* cancel, std::string& why) = 0;
+};
+
+// The Secret Service (org.freedesktop.secrets over the D-Bus session bus) through libsecret,
+// loaded at run time: the game is not linked with it (libsecret-1.so.0, secret_service.cpp).
+// nullptr on Windows and when the library cannot be loaded. It never prompts: a locked keyring,
+// or one without a default collection, is Unavailable.
+Keyring* secretServiceKeyring();
+// The keyring new stores use: secretServiceKeyring(), or none with SCACELITH_KEYRING=off in the
+// environment (the unit tests run so: tests/test_main.cpp).
+Keyring* defaultKeyring();
 
 struct Credential {
     std::string origin;
@@ -65,26 +107,50 @@ public:
     bool erase(const std::string& origin);       // forgets the origin entirely
     std::vector<std::string> origins() const;
     // When the file has no record for `to` and has one for `from`, that record becomes `to`'s
-    // (applied at every load of a file, at once when one is loaded; see the note above).
+    // (applied at every load of a file, at once when one is loaded; see the note above). A token
+    // the keyring keeps is found under `from` while the rule is registered, and moves to an item
+    // of `to` on its first read (get).
     void addOriginMove(const std::string& from, const std::string& to);
+
+    // The keyring of the tokens; nullptr: the file only. defaultKeyring() until set.
+    void setKeyring(Keyring* keyring);
+    // Ends a keyring call in progress and makes the next ones fail at once, without falling back
+    // to the file (the client is shutting down: OnlineClient's destructor).
+    void interrupt();
 
 private:
     struct Record {
         std::string origin, username, serverId, pin, tokenBlob;
         bool checked = false;      // whether tokenBlob decrypts here is known (get, hasToken, put)
-        bool unreadable = false;   // tokenBlob could not be decrypted here
+        bool unreadable = false;   // tokenBlob could not be decrypted (or found in the keyring) here
     };
-    mutable std::mutex mu_;
+    mutable std::mutex mu_;        // the records, the path and the file
+    mutable std::mutex ioMu_;      // one keyring call sequence at a time (taken before mu_)
     mutable std::string path_;
     mutable bool loaded_ = false;
     mutable std::vector<Record> records_;
     std::vector<std::pair<std::string, std::string>> moves_;   // from, to
+    mutable bool keyringSet_ = false;
+    mutable Keyring* keyring_ = nullptr;
+    mutable CancelToken cancel_;   // interrupt()
 
     void loadLocked() const;
     void applyMovesLocked() const;
     bool saveLocked() const;
     Record* findLocked(const std::string& origin) const;
-    bool readLocked(Record& r, std::string& token) const;   // decrypts r's token, notes the outcome
+    bool readLocked(Record& r, std::string& token) const;   // decrypts r's file-held token, notes the outcome
+    std::vector<std::string> movedFrom(const std::string& origin) const;   // the moves' sources for origin
+    // Under ioMu_, not mu_ (they may call the keyring):
+    Keyring* keyring() const;
+    std::string protect(const std::string& origin, const std::string& token) const;
+    // *itemOrigin: the origin the keyring item was found under (a moved record's is its former one).
+    bool read(const std::string& origin, const std::string& blob, std::string& token, std::string& why,
+              std::string* itemOrigin = nullptr) const;
+    // Stores token in a new keyring item of origin and points the record to it, while it still
+    // holds blob; then removes blob's item, if it is one (found under itemOrigin).
+    void migrate(const std::string& origin, const std::string& blob, const std::string& token,
+                 const std::string& itemOrigin = std::string()) const;
+    void forget(const std::string& origin, const std::string& blob) const;   // removes a keyring item
 };
 
 // Token protection used by the store (exposed for the unit tests).
