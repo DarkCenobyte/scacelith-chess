@@ -174,7 +174,13 @@ file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS
     ${ROOT}/src/character/*.cpp ${ROOT}/src/anim/*.cpp ${ROOT}/src/ui/*.cpp ${ROOT}/src/game/*.cpp
     ${ROOT}/src/app/*.cpp)
 list(REMOVE_ITEM GAME_SOURCES ${GAME_CORE_SOURCES})
-set(GAME_EXTRA)
+# The vendored libraries compiled into the game, each in a unit of its own (not #included by the
+# game's code) so that code scanning leaves them out with the rest of third_party/
+# (.github/workflows/codeql.yml): Nayuki's QR Code generator for src/ui/ui_qr.cpp
+# (third_party/qrcodegen/README.scacelith.md), whose file-scope using-declarations then stay out of
+# the game's code too, and stb_truetype's implementation, the font rasteriser of src/ui/ui_font.cpp
+# (third_party/stb/README.scacelith.md).
+set(GAME_EXTRA ${ROOT}/third_party/qrcodegen/qrcodegen.cpp ${ROOT}/third_party/stb/stb_truetype.cpp)
 if(WIN32)
     # The icon, the version resource and the manifest, with the version of cmake/version.cmake.
     set(SCACELITH_ICON_ICO ${ROOT}/res/icons/scacelith.ico)
