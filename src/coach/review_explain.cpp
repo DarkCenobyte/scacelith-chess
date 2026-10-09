@@ -31,15 +31,17 @@ size_t refutationLength(const Ctx& c) {
 }
 
 // A line with the arguments every explanation may use: the move, the better move, the reply, the
-// refutation line, the points lost, the evaluation after the move.
+// refutation line, the points lost after exactly that line (for good; a detector whose lines say
+// "{pts}" makes sure it is at least 1), the evaluation after the move.
 Beat line(const Ctx& c, const std::string& key, Look look = Look::Target) {
     Beat b = sayBeat(key, look, c.ply);
     Line& l = b.line;
+    const size_t shown = refutationLength(c);
     l.with("move", Arg::ofMove(c.playedSan, c.playedUci));
     if (!c.best.empty()) l.with("best", moveArg(c.best[0]));
     if (!c.r.empty()) l.with("reply", moveArg(c.r[0]));
-    l.with("line", Arg::ofMoves(sanLine(c.r, 0, refutationLength(c))));
-    l.with("pts", Arg::ofNumber(std::max(1, c.loss)));
+    l.with("line", Arg::ofMoves(sanLine(c.r, 0, shown)));
+    l.with("pts", Arg::ofNumber(c.lossAfter(int(shown))));
     l.with("eval", evalArg(c.lp->score));
     return b;
 }
@@ -77,11 +79,37 @@ std::vector<Square> kingNeighbours(const Position& p, Square k) {
     return out;
 }
 
-// The coach captures (on an even ply of r, up to 'maxPly') the piece standing on 'sq'.
-bool coachTakesOn(const Ctx& c, Square sq, int maxPly) {
+// The ply of r (an even one from 2, up to 'maxPly') where the coach captures the piece standing on
+// 'sq'; -1 when it does not.
+int coachTakesAt(const Ctx& c, Square sq, int maxPly) {
     for (int i = 2; i < int(c.r.size()) && i <= maxPly; i += 2)
-        if (c.r[size_t(i)].mover == c.coach && c.r[size_t(i)].move.to == sq && c.r[size_t(i)].captured != NoPiece) return true;
-    return false;
+        if (c.r[size_t(i)].mover == c.coach && c.r[size_t(i)].move.to == sq && c.r[size_t(i)].captured != NoPiece) return i;
+    return -1;
+}
+bool coachTakesOn(const Ctx& c, Square sq, int maxPly) { return coachTakesAt(c, sq, maxPly) >= 0; }
+
+// A loss a line says with "after {line}, you've lost {pts}": the plies of r to show for the capture
+// at ply k (with the next ply when it takes something back), and what the human has lost after
+// exactly those plies (relative to p0). Not proven when r stops right there and the human can
+// still win material back on the board.
+struct LossShown {
+    int plies = 0, lost = 0;
+    bool proven = false;
+};
+LossShown lossShown(const Ctx& c, int k) {
+    LossShown out;
+    const int n = int(c.r.size());
+    if (k < 0 || k >= n) return out;
+    auto lostAfter = [&](int plies) { return c.base - c.r[size_t(plies - 1)].balance; };
+    out.plies = k + 1;
+    out.lost = lostAfter(out.plies);
+    out.proven = true;
+    if (out.plies < n) {
+        if (lostAfter(out.plies + 1) < out.lost) out.lost = lostAfter(++out.plies);
+    } else if (c.rEnd.sideToMove() == c.human && bestCapturePoints(c.rEnd, c.human) > 0) {
+        out.proven = false;
+    }
+    return out;
 }
 
 std::vector<Square> byValue(const Position& p, uint64_t set) {
@@ -109,7 +137,9 @@ bool mateAllowed(const Ctx& c, Explanation& out) {
     static const int kMateLimit[6] = {1, 2, 2, 3, 3, 4};
     ex.offer = n <= kMateLimit[c.level - 1];
     const Square k = c.p1.kingSquare(c.human);
-    Beat b = bandLine(c, "ex.mate_allowed");
+    // Levels 3, 4 and 6 show the mate ("{line} is mate"): when the engine's line stops before it, the
+    // line of level 5 says it without moves.
+    Beat b = lineKnown ? bandLine(c, "ex.mate_allowed") : line(c, "ex.mate_allowed.b5");
     put(b.line, "m", Arg::ofNumber(n));
     put(b.line, "your", pieceArg(c.p1, k, c.human));
     if (lineKnown) put(b.line, "line", Arg::ofMoves(sanLine(c.r, 0, size_t(plies))));
@@ -172,9 +202,15 @@ bool mateMissed(const Ctx& c, Explanation& out) {
     ex.concrete = true;
     ex.includesBest = true;
     ex.offer = lost;
-    Beat b = bandLine(c, delayed ? "ex.mate_delayed" : "ex.mate_missed");
+    // Most lines from level 3 show the mate: when the engine's best line stops before it, the lines
+    // of level 2 say it with the first move only.
+    const size_t plies = size_t(2 * n - 1);
+    const bool lineKnown = c.best.size() >= plies && c.best[plies - 1].mate;
+    Beat b = delayed     ? bandLine(c, "ex.mate_delayed")
+             : lineKnown ? bandLine(c, "ex.mate_missed")
+                         : line(c, c.level == 1 ? "ex.mate_missed.b1" : "ex.mate_missed.b2");
     put(b.line, "m", Arg::ofNumber(n));
-    put(b.line, "line", Arg::ofMoves(sanLine(c.best, 0, size_t(2 * n - 1))));
+    if (lineKnown) put(b.line, "line", Arg::ofMoves(sanLine(c.best, 0, plies)));
     const Square ck = c.p1.kingSquare(c.coach);
     put(b.line, "my", pieceArg(c.p1, ck, c.human));
     const LineStep& m = c.best[0];
@@ -204,8 +240,12 @@ bool stalemate(const Ctx& c, Explanation& out) {
         return true;
     }
     if (c.j.wBest >= 85.0 && std::abs(c.j.wPlayed - 50.0) < 5.0) {
+        // The lines say the coach's king is stalemated after the human takes what the coach gives.
+        bool given = false;
         for (int i = 0; i < int(c.r.size()) && i < c.b.lookahead + 2; ++i) {
-            if (!c.r[size_t(i)].stalemate) continue;
+            const LineStep& st = c.r[size_t(i)];
+            if (st.mover == c.human && st.captured != NoPiece) given = true;
+            if (!st.stalemate || st.mover != c.human || !given) continue;
             Beat b = bandLine(c, "ex.stalemate_trick");
             put(b.line, "my", pieceArg(c.p1, ck, c.human));
             put(b.line, "line", Arg::ofMoves(sanLine(c.r, 0, size_t(i + 1))));
@@ -232,6 +272,13 @@ bool fork(const Ctx& c, Explanation& out) {
         if (coachTakesOn(c, t, motifReach(c))) taken = true;
     if (!taken) return false;
     const std::vector<Square> ts = byValue(p2, targets);
+    // The first target the line takes, and what the human has lost once the capture is answered.
+    int takenAt = -1;
+    for (Square t : squaresOf(targets)) {
+        const int at = coachTakesAt(c, t, motifReach(c));
+        if (at >= 0 && (takenAt < 0 || at < takenAt)) takenAt = at;
+    }
+    const LossShown shown = lossShown(c, takenAt);
     Explanation ex;
     ex.type = ExType::Fork;
     ex.concrete = true;
@@ -242,7 +289,12 @@ bool fork(const Ctx& c, Explanation& out) {
             ex.hintSquare = squareOnP0(c, t);
             break;
         }
-    Beat b = bandLine(c, "ex.fork");
+    // Level 4 says "after {line}, you've lost {pts}": when the capture leaves the human no material
+    // down (the fork leads to mate, or the line stops before the human takes back), the lines of
+    // level 5 say the fork alone.
+    Beat b = c.level == 4 && (!shown.proven || shown.lost < 1) ? line(c, "ex.fork.b5") : bandLine(c, "ex.fork");
+    put(b.line, "line", Arg::ofMoves(sanLine(c.r, 0, size_t(shown.plies))));
+    put(b.line, "pts", Arg::ofNumber(shown.lost));
     put(b.line, "my", pieceArg(c.p1, r0.move.from, c.human));
     put(b.line, "sq", Arg::ofSquare(r0.move.to));
     put(b.line, "t1", pieceArg(c.p1, ts[0], c.human));
@@ -278,8 +330,15 @@ bool fork(const Ctx& c, Explanation& out) {
 bool discovered(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
     const LineStep& r0 = c.r[0];
-    for (const Discovery& d : discoveredAttacks(c.p1, r0.move)) {
-        if (!d.check && !coachTakesOn(c, d.target, motifReach(c))) continue;
+    // A target the line takes first; then a discovered check, when the line wins material (levels 1-3
+    // and 5: the lines of levels 4 and 6 say the target itself falls).
+    std::vector<Discovery> found;
+    for (const Discovery& d : discoveredAttacks(c.p1, r0.move))
+        if (!d.check && coachTakesOn(c, d.target, motifReach(c))) found.push_back(d);
+    if (found.empty() && c.level != 4 && c.level != 6 && c.gain > 0 && c.gain <= motifReach(c) + 1)
+        for (const Discovery& d : discoveredAttacks(c.p1, r0.move))
+            if (d.check) found.push_back(d);
+    for (const Discovery& d : found) {
         Explanation ex;
         ex.type = ExType::Discovered;
         ex.concrete = true;
@@ -349,6 +408,9 @@ bool pin(const Ctx& c, Explanation& out) {
                            std::none_of(before.begin(), before.end(), [&](const Pin& o) { return o.pinned == pn.pinned; });
         const bool walkedIn = pn.pinned == c.played.to;
         if (!fresh && !walkedIn) continue;
+        // A pin the move walked into, the pinner already in place: the lines of levels 1 and 4-6
+        // say the reply pins ("{my} can go to {sq}", "{reply} pins").
+        if (!fresh && pn.pinner != r0.move.to && (c.level == 1 || c.level >= 4)) continue;
         if (!coachTakesOn(c, pn.pinned, reach)) continue;
         Explanation ex;
         ex.type = ExType::Pin;
@@ -434,7 +496,7 @@ bool trapped(const Ctx& c, Explanation& out) {
         bool boxed = !p2.inCheck();
         if (boxed)
             for (const Move& m : p2.legalMovesFrom(c.played.to))
-                if (see(p2, m) >= 0) boxed = false;
+                if (seePoints(p2, m) >= 0) boxed = false;
         if (boxed) x = c.played.to;
     }
     if (x == NoSquare) return false;
@@ -456,7 +518,15 @@ bool trapped(const Ctx& c, Explanation& out) {
 // ---- 9. Back rank, material won through it ----
 bool backRank(const Ctx& c, Explanation& out) {
     if (!backRankWeak(c.p1, c.human)) return false;
+    // The lines say the check wins material: the line must win some, for good.
+    if (c.gain < 0 || c.gain > motifReach(c) + 1) return false;
     const int home = c.human == White ? 0 : 7;
+    // Level 1 says the king is locked in by its pawns (and the tip, to move one of them).
+    if (c.level == 1) {
+        const Square k = c.p1.kingSquare(c.human);
+        const uint64_t front = attacksOf(King, c.human, k, 0) & ~(0xFFULL << (8 * home));
+        if ((front & c.p1.pieces(c.human, Pawn)) != front) return false;
+    }
     for (int i = 0; i < int(c.r.size()) && i < c.b.lookahead; i += 2) {
         const LineStep& st = c.r[size_t(i)];
         if (st.mover != c.coach || !(st.piece == Rook || st.piece == Queen) || rankOf(st.move.to) != home || !st.check)
@@ -482,6 +552,8 @@ bool backRank(const Ctx& c, Explanation& out) {
 }
 
 // ---- 10. Hanging piece, removal of the guard, a threat not seen ----
+// Every level's lines say the piece has no protector ("loose", "for free", "nothing recaptures"):
+// a piece defended, even badly, is lost in an exchange (section 11).
 bool hanging(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach || c.r[0].captured == NoPiece) return false;
     const LineStep& r0 = c.r[0];
@@ -489,13 +561,15 @@ bool hanging(const Ctx& c, Explanation& out) {
     const PieceType x = r0.captured;
     if (x == Pawn && c.level <= 2) return false;
     if (c.lossWithin(c.b.lookahead) < (c.level <= 2 ? 2 : 1)) return false;
-    if (see(c.p1, r0.move) < kPieceValueCp[x] - 50) return false;
-    if (c.level <= 2 ? !isUndefended(c.p1, s) : seeSquare(c.p1, s, c.coach) <= 0) return false;
+    if (!isUndefended(c.p1, s) || seePoints(c.p1, r0.move) < points(x)) return false;
     const bool guard = hasBit(c.f.undefended, s) && c.level <= 4;
+    // A threat not seen: the coach's last move made the capturing piece attack this one ("my last
+    // move attacked it", "it was already attacking it"), and the move under review left it there.
     bool threat = false;
-    if (!guard && s != c.played.to && c.level <= 3 && c.ply > 0 && seeSquare(c.p0, s, c.coach) > 0) {
+    if (!guard && s != c.played.to && c.level <= 3 && c.ply > 0 && seeSquarePoints(c.p0, s, c.coach) > 0 &&
+        hasBit(c.p0.attackersTo(s, c.coach), r0.move.from)) {
         const Position& before = c.g->positionAt(size_t(c.ply - 1));   // before the coach's last move
-        threat = !hasBit(hangingPieces(before, c.human, false), s);
+        threat = !hasBit(hangingPieces(before, c.human, false), s) && !hasBit(before.attackersTo(s, c.coach), r0.move.from);
     }
     Explanation ex;
     ex.type = ExType::Hanging;
@@ -526,45 +600,67 @@ bool hanging(const Ctx& c, Explanation& out) {
 }
 
 // ---- 11. Lost in an exchange ----
+// Each family names why the exchange on the square loses (a bad capture, more attackers than
+// defenders, a cheaper attacker), so the claim is checked on the board and along the line: the
+// captures there leave the human 2+ points down, in the points the lines speak, after exactly the
+// moves they show; a line that stops where the human can still take back proves nothing.
 bool exchange(const Ctx& c, Explanation& out) {
     if (c.r.empty() || c.r[0].mover != c.coach) return false;
-    if (c.lossWithin(c.b.lookahead) < 2) return false;
     const LineStep& r0 = c.r[0];
-    const bool badCapture = c.f.captured != NoPiece && c.f.seeCp <= -150 && r0.move.to == c.played.to;
-    if (!badCapture && r0.captured == NoPiece) return false;
+    if (r0.captured == NoPiece || (r0.move.flags & MoveEnPassant)) return false;
     const Square s = r0.move.to;
+    const PieceType victim = c.p1.at(s).type;
+    // The human's capture on s loses by exchange: the coach takes back.
+    const bool badCapture = c.f.captured != NoPiece && c.f.seePts <= -2 && s == c.played.to;
     int run = 0;   // consecutive captures on s from the reply on
     while (run < int(c.r.size()) && c.r[size_t(run)].move.to == s && c.r[size_t(run)].captured != NoPiece) ++run;
+    const LossShown shown = lossShown(c, run - 1);
+    // The cost of the exchange: from before the move for a bad capture (it is part of it), else from
+    // the position the move left.
+    if (!shown.proven) return false;
+    const int lost = shown.lost + (badCapture ? 0 : materialBalance(c.p1, c.human) - c.base);
+    if (lost < 2) return false;
+    const uint64_t seen = exchangeParticipants(c.p1, s, true), all = exchangeParticipants(c.p1, s, false);
+    const uint64_t att = seen & c.p1.pieces(c.coach), def = seen & c.p1.pieces(c.human);
+    std::string family;
+    int n = 0, n2 = 0;
+    if (badCapture) {
+        // "{your} is worth {n}, you only got {n2}".
+        if (points(c.f.captured) >= points(victim)) return false;
+        family = "ex.exchange_capture";
+        n = points(victim);
+        n2 = points(c.f.captured);
+    } else if (squareCount(att) > squareCount(def) && def != 0 && all == seen) {
+        // "I attack it {n} times, you defend it {n2} times": no x-ray or pinned piece changes the count.
+        family = "ex.exchange_count";
+        n = squareCount(att);
+        n2 = squareCount(def);
+    } else if (points(r0.piece) < points(victim)) {
+        // "{your} is worth {n}, {my} only {n2}": cheaper in points, not only in centipawns.
+        family = "ex.exchange_cheap";
+        n = points(victim);
+        n2 = points(r0.piece);
+    } else {
+        return false;
+    }
     Explanation ex;
     ex.type = ExType::Exchange;
     ex.concrete = true;
     ex.demoPlies = std::max(1, std::min(run, c.b.demoPlies));
     ex.hintSquare = squareOnP0(c, s);
-    const uint64_t att = c.p1.attackersTo(s, c.coach), def = c.p1.attackersTo(s, c.human);
-    const PieceType victim = c.p1.at(s).type;
-    std::string family;
-    if (badCapture) family = "ex.exchange_capture";
-    else if (squareCount(att) > squareCount(def)) family = "ex.exchange_count";
-    else if (kPieceValueCp[r0.piece] < kPieceValueCp[victim]) family = "ex.exchange_cheap";
-    else return false;
     Beat b = bandLine(c, family);
     put(b.line, "sq", Arg::ofSquare(s));
     put(b.line, "your", pieceArg(c.p1, s, c.human));
     put(b.line, "my", pieceArg(c.p1, r0.move.from, c.human));
-    if (badCapture) {
-        put(b.line, "n", Arg::ofNumber(points(victim)));
-        put(b.line, "n2", Arg::ofNumber(points(c.f.captured)));
-        pointPiece(b, s, "your", true);
-        traceMove(b, r0.piece, r0.move.from, s, c.level <= 2 ? "my" : "sq");
-    } else if (family == "ex.exchange_count") {
-        put(b.line, "n", Arg::ofNumber(squareCount(att)));
-        put(b.line, "n2", Arg::ofNumber(squareCount(def)));
+    put(b.line, "n", Arg::ofNumber(n));
+    put(b.line, "n2", Arg::ofNumber(n2));
+    put(b.line, "line", Arg::ofMoves(sanLine(c.r, 0, size_t(shown.plies))));
+    put(b.line, "pts", Arg::ofNumber(lost));
+    if (family == "ex.exchange_count") {
         pointSquare(b, s, "sq");
         for (Square a : squaresOf(att)) markPiece(b, a, "sq");
         for (Square d : squaresOf(def)) markPiece(b, d, "sq");
     } else {
-        put(b.line, "n", Arg::ofNumber(points(victim)));
-        put(b.line, "n2", Arg::ofNumber(points(r0.piece)));
         pointPiece(b, s, "your", true);
         traceMove(b, r0.piece, r0.move.from, s, c.level <= 2 ? "my" : "sq");
     }
@@ -580,13 +676,14 @@ bool missedCapture(const Ctx& c, Explanation& out) {
     if (b0.captured == NoPiece || b0.mover != c.human) return false;
     const Square y = b0.move.to;
     const PieceType yt = b0.captured;
-    if (see(c.p0, b0.move) < kPieceValueCp[yt] - 50) return false;
+    // Every line says the piece was free ("loose", "unprotected", "for nothing"): no protector, and
+    // the capture wins all of it, x-rays included.
+    if (!isUndefended(c.p0, y) || seePoints(c.p0, b0.move) < points(yt)) return false;
     if (c.p1.at(y).empty() || c.p1.at(y).color != c.coach) return false;   // taken after all, or moved
-    if (c.f.captured != NoPiece && c.f.seeCp >= kPieceValueCp[yt] - 150) return false;   // took as much elsewhere
+    if (c.f.captured != NoPiece && c.f.seePts >= points(yt) - 1) return false;   // took as much elsewhere
     const bool bigPiece = points(yt) >= 3;
     const bool fault = c.j.delta >= 5.0;
     if (!fault && !(c.level <= 2 && bigPiece)) return false;
-    if (c.level <= 2 && !isUndefended(c.p0, y)) return false;   // "free": the lines say it had no protector
     Explanation ex;
     ex.type = ExType::MissedCapture;
     ex.missed = true;
@@ -611,12 +708,15 @@ bool missedFork(const Ctx& c, Explanation& out) {
     q.makeMove(b0.move);
     const uint64_t targets = forkTargets(q, b0.move.to);
     if (squareCount(targets) < 2) return false;
-    int gainPts = 0;   // what the fork wins along the best line, for good
-    for (size_t i = 0; i < c.best.size() && i < 5; ++i) {
-        int gnow = c.best[i].balance - c.base;
-        if (i + 1 < c.best.size()) gnow = std::min(gnow, c.best[i + 1].balance - c.base);
-        gainPts = std::max(gainPts, gnow);
-    }
+    // The best line takes one of the targets, and what the fork wins along it is kept for good
+    // (where the line stops, the coach may still take back on the board).
+    bool takes = false;
+    for (size_t i = 2; i < c.best.size() && i < 5; i += 2)
+        if (c.best[i].mover == c.human && c.best[i].captured != NoPiece && hasBit(targets, c.best[i].move.to)) takes = true;
+    if (!takes) return false;
+    int gainPts = 0;
+    for (size_t i = 1; i <= c.best.size() && i <= 5; ++i)
+        gainPts = std::max(gainPts, heldGain(c.best, i, c.base, c.human, c.bestEnd));
     if (gainPts < 2) return false;
     const std::vector<Square> ts = byValue(q, targets);
     Explanation ex;
@@ -736,6 +836,7 @@ bool kingSafety(const Ctx& c, Explanation& out) {
     const bool centre = c.ply >= 20 && fileOf(k) == 4 && rankOf(k) == home &&
                         (c.p0.castling() & castlingOf(c.human));
     if (!shield && !walk && !centre && !zone) return false;
+    if (!shield && (c.level == 2 || c.level == 3) && checks < 2) return false;   // "I can give many checks"
     Explanation ex;
     ex.type = ExType::KingSafety;
     ex.concrete = true;
@@ -913,7 +1014,7 @@ bool findTip(const Ctx& c, uint32_t tipsSaid, Explanation& out) {
     // Opening principles (levels 1-3; level 4 only the costly pawn grab), before move 12.
     if (c.ply >= 24 || !worth) return false;
     if (c.level <= 3 && fresh(EarlyQueen) && c.f.piece == Queen && full < 6 && undeveloped >= 2 &&
-        !(c.f.captured != NoPiece && c.f.seeCp >= 100) && !mateThreat(c.p1, H)) {
+        !(c.f.captured != NoPiece && c.f.seePts >= 1) && !mateThreat(c.p1, H)) {
         Beat b = tipBeat(c, "early_queen");
         put(b.line, "your", pieceArg(c.p1, c.played.to, H));
         pointPiece(b, c.played.to, "your");

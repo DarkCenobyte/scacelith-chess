@@ -29,12 +29,29 @@ struct Ctx {
     std::vector<LineStep> r;                 // refutation from p1 (the coach moves first)
     std::vector<LineStep> best;              // L1 from p0
     std::vector<LineStep> playedLine;        // Lp from p0 (the played move first)
+    chess::Position rEnd, bestEnd, playedEnd;   // the positions where those lines stop
     int base = 0;                            // the human's material lead at p0 (points)
     int gain = -1;                           // plies of r after which the human is 2+ points down for good (-1: never)
     int loss = 0;                            // points the human is down for good within the lookahead
-    // Points down for good after the first 'plies' plies of r (a recapture on the next ply undoes a loss).
+    // Points the human is down for good after the first 'plies' plies of r (relative to p0): a
+    // recapture on the next ply undoes a loss, and where r stops, so does the exchange the human can
+    // still win on the board (a line cut short right after a capture proves nothing).
+    int lossAfter(int plies) const;
+    // The most the human is down for good after any of the first 'plies' plies of r.
     int lossWithin(int plies) const;
 };
+
+// pov's material change, for good, after the first 'plies' plies of 'line' (relative to 'base'; 'end'
+// is the position where the line stops): a gain the next ply takes back is none, and where the
+// line stops, the side to move still takes back what an exchange on the board wins it.
+int heldGain(const std::vector<LineStep>& line, size_t plies, int base, chess::Color pov, const chess::Position& end);
+// The position after the whole of 'line', played from 'start'.
+chess::Position lineEnd(const chess::Position& start, const std::vector<LineStep>& line);
+// Where the engine's refutation stops early (a search cut short reports short lines), the natural
+// replies the board shows, marked guessed, until 'r' holds 'want' plies: the human's recapture on
+// the square the coach just took on (the least valuable piece whose recapture does not lose), and
+// the coach's capture that wins the most by exchange (2 points at least). Never past a mate.
+void extendRefutation(std::vector<LineStep>& r, const chess::Position& p1, chess::Color human, size_t want);
 
 // A chosen explanation: the lines that say why (with pointing), the demonstration, the policy bits.
 struct Explanation {

@@ -379,7 +379,8 @@ TEST(coach_appraisal_won_game) {
         CHECK(s.front().look == Look::Player);
         CHECK(hasPrefix(s, "appraisal.improve."));
         if (level == 1) CHECK(hasKey(s, "appraisal.improve.clean.b1"));   // level 1: blunders only
-        if (level >= 2) CHECK(hasPrefix(s, "appraisal.improve.was_winning") || hasPrefix(s, "appraisal.improve.critical"));
+        // The mistake (900 -> 300) left the game winning: "you were winning until move 5" would be false.
+        if (level >= 2) CHECK(hasKey(s, "appraisal.improve.critical" + lv));
         if (level <= 4) CHECK(hasKey(s, "appraisal.best.streak" + lv));
         if (level == 3) CHECK(hasKey(s, "appraisal.num.acc.b3"));
         if (level <= 2) CHECK(!hasPrefix(s, "appraisal.num.acc"));   // no accuracy at levels 1-2
@@ -570,6 +571,49 @@ TEST(coach_appraisal_highlight_points_at_the_piece) {
         CHECK_EQ(stays.gestures[0].square, parseSquare("e8"));
     }
     CHECK(stays.look == Look::Target);
+}
+
+TEST(coach_appraisal_improvement_claims) {
+    // 1.a3 Bg4 2.a4: the coach's bishop hung on g4 after Black's first move; the student missed it
+    // with his second move. The lines say "at move {n}, my bishop was hanging": the student's move.
+    Game g = playSans("2b3k1/5ppp/8/8/8/7P/P4PP1/6K1 w - - 0 1", {"a3", "Bg4", "a4"});
+    g.resign(Black);
+    for (int level = 1; level <= 3; ++level) {
+        Appraisal a;
+        a.reset(level, White);
+        a.add(reviewAt(g, 0, MoveClass::Best, 100, 100));
+        Review miss = reviewAt(g, 2, MoveClass::Inaccuracy, 100, 50, ExType::MissedCapture);
+        miss.verdict.bestUci = "h3g4";
+        miss.verdict.bestSan = "hxg4";
+        a.add(miss);
+        Script s = a.script(g, AppraisalContext{});
+        char where[32];
+        std::snprintf(where, sizeof where, "coach hung b%d", level);
+        checkAppraisal(s, level, where);
+        const Beat* hung = nullptr;
+        for (const Beat& b : s)
+            if (b.line.key == "appraisal.improve.coach_hung.b" + std::to_string(level)) hung = &b;
+        CHECK(hung != nullptr);
+        if (!hung) {
+            dump(s);
+            continue;
+        }
+        CHECK(hung->line.arg("n") && hung->line.arg("n")->number == 2);
+    }
+    // "You were winning until move {n}" only when the move gave the win away.
+    Game r = rookGame();
+    for (int cpAfter : {300, -200}) {
+        Appraisal a;
+        a.reset(3, White);
+        for (int ply = 0; ply < int(r.moves().size()); ply += 2) {
+            if (ply == 8) a.add(reviewAt(r, ply, MoveClass::Blunder, 900, cpAfter, ExType::Hanging));
+            else a.add(reviewAt(r, ply, MoveClass::Best, ply < 8 ? 900 : cpAfter, ply < 8 ? 900 : cpAfter));
+        }
+        Script s = a.script(r, AppraisalContext{});
+        checkAppraisal(s, 3, "was winning");
+        CHECK_EQ(hasKey(s, "appraisal.improve.was_winning.b3"), cpAfter < 0);
+        CHECK_EQ(hasKey(s, "appraisal.improve.critical.b3"), cpAfter > 0);
+    }
 }
 
 TEST(coach_appraisal_every_key_exists) {
