@@ -486,14 +486,14 @@ ex.exchange_capture.b6 = {move} drops {your} on {sq} after {line}.
 ex.exchange_capture.b6.2 = {line} on {sq}, and {your} is gone.
 # Counting attackers and defenders ({sq} pointed at); {n} = my attackers, {n2} = your defenders.
 ex.exchange_count.b1 = Count them: I attack {sq} {n:time}, you defend it {n2:time}.
-ex.exchange_count.b1.2 = On {sq} I have {n:attacker} and you have {n2:defender}. I win that.
+ex.exchange_count.b1.2 = On {sq} I have {n} attackers and you have {n2:piece} defending it. I win that.
 ex.exchange_count.b2 = {sq} is attacked {n:time} and defended {n2:time}. You'll lose material there.
-ex.exchange_count.b2.2 = Count on {sq}: {n:attacker} against {n2:defender}.
+ex.exchange_count.b2.2 = Count on {sq}: {n} attackers against {n2:piece} defending.
 ex.exchange_count.b3 = Count attackers and defenders on {sq}: I have more.
 ex.exchange_count.b3.2 = The exchange on {sq} doesn't work: after {line}, you've lost {pts:point}.
 ex.exchange_count.b4 = {move} miscounts on {sq}: {line}, and you've lost {pts:point}.
 ex.exchange_count.b4.2 = {sq} is attacked more often than it is defended: {line}.
-ex.exchange_count.b5 = On {sq}, {n:attacker} beat {n2:defender}: {line}.
+ex.exchange_count.b5 = On {sq}, {n} attackers beat {n2:piece} defending: {line}.
 ex.exchange_count.b5.2 = {move} loses the count on {sq}.
 ex.exchange_count.b6 = {line} on {sq}, and I've won {pts:point}.
 ex.exchange_count.b6.2 = {sq}: {n} against {n2}.
