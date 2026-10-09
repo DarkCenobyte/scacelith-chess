@@ -67,8 +67,9 @@ int main(int argc, char** argv) {
     // run asks for another (SCACELITH_AUDIO=alsa ./scacelith_tests audio_live, to listen).
     setenv("SCACELITH_AUDIO", "null", 0);
     // The saved sessions of the tests stay in their temporary files, never in the keyring of the
-    // desktop running them (the keyring tests give their stores a keyring themselves).
-    setenv("SCACELITH_KEYRING", "off", 0);
+    // desktop running them (the keyring tests give their stores a keyring themselves), whatever the
+    // environment of the run says.
+    setenv("SCACELITH_KEYRING", "off", 1);
 #endif
     int run = 0, failedCases = 0, skipped = 0;
     for (auto& c : testing::registry()) {

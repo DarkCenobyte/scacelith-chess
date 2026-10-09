@@ -41,7 +41,7 @@ Dashes, spaces and letter case in the code do not matter; the code only uses
 | `timeout` / `unreachable` | the port is not forwarded, a firewall drops it, or the address is wrong |
 | `wrong_code` | the host refused the code (or someone in the middle tried to impersonate it) |
 | `incompatible` | the other game speaks another version of the channel or of the realtime protocol: update both |
-| `not_found` | the DNS name does not resolve |
+| `not_found` | the DNS name does not resolve (within 10 s) |
 | `invalid_code` | the code is not 12 characters of the alphabet above |
 
 ## Ports, routers and firewalls
@@ -215,6 +215,7 @@ Limits, accepted for a friendly unrated game:
 
 | what | value |
 |---|---|
+| resolving the host's name (guest) | 10 s |
 | connect (per resolved address) | 5 s |
 | handshake, then Hello -> Welcome | 10 s each (guest); 10 s for both (host) |
 | ping (both directions, measures the round trip and the host clock) | every 2 s |

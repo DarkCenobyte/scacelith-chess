@@ -23,6 +23,7 @@
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
+#include <dlfcn.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #endif
@@ -1574,6 +1575,40 @@ TEST(net_credentials_keyring) {
     }
 }
 
+// clearToken(origin, token) (a token a server refused) while the keyring cannot show the saved one
+// (locked, failing, interrupted): the reference stays, since it may name a token saved since (a
+// new sign-in on another thread), which is then still there once the keyring answers again.
+TEST(net_credentials_keyring_clear_refused_unanswered) {
+    std::string path = tempCredentialPath("keyring-refused");
+    RemovedAtEnd removed{path};
+    const std::string A = "a.example.org:443";
+    const std::string refused = "sct_" + std::string(43, 'R'), fresh = "sct_" + std::string(43, 'F');
+    FakeKeyring k;
+    net::CredentialStore s(path);
+    s.setKeyring(&k);
+    net::Credential c;
+    c.origin = A;
+    c.username = "alice";
+    c.token = refused;
+    CHECK(s.put(c));
+    c.token = fresh;                                // the new sign-in, saved before the refusal
+    CHECK(s.put(c));
+    const std::string ref = fileToken(path, A);
+    CHECK(hasPrefix(ref, "keyring:"));
+    k.available = false;
+    CHECK(!s.clearToken(A, refused));
+    CHECK_EQ(fileToken(path, A), ref);
+    k.available = true;
+    net::Credential out;
+    CHECK(s.get(A, out) && out.token == fresh);
+    CHECK(s.clearToken(A, refused));                // known now: another one, kept
+    CHECK(s.get(A, out) && out.token == fresh);
+    s.interrupt();                                  // the client shutting down
+    CHECK(!s.clearToken(A, refused));
+    CHECK_EQ(fileToken(path, A), ref);
+    CHECK(k.holds(fresh, A));
+}
+
 // A token the file holds (an earlier version's, or one saved while the keyring was missing or
 // locked) moves to the keyring the first time it is read while the keyring works, and only then.
 TEST(net_credentials_keyring_migration) {
@@ -1769,8 +1804,10 @@ TEST(net_credentials_keyring_does_not_block) {
 
 #ifndef _WIN32
 // The real Secret Service, when this machine has one unlocked (a desktop session; for a headless
-// run: dbus-run-session with gnome-keyring-daemon --unlock). Skipped elsewhere (CI). Its items
-// carry an origin of their own and are removed at the end.
+// run: dbus-run-session with gnome-keyring-daemon --unlock given a non-empty password on its
+// standard input: with an empty one it makes no login keyring, so no default collection, and the
+// test is skipped). Skipped elsewhere (CI). Its items carry an origin of their own and are removed
+// at the end.
 TEST(net_credentials_secret_service) {
     net::Keyring* k = net::secretServiceKeyring();
     if (!k) SKIP("libsecret-1.so.0 cannot be loaded");
@@ -1819,6 +1856,94 @@ TEST(net_credentials_secret_service) {
         CHECK(s.clearToken(A));                     // logout: the item goes
     }
     CHECK(k->lookup(A, ref.substr(8), back, nullptr, why) == net::Keyring::Result::Missing);
+}
+
+// The real Secret Service once its default collection is locked: nothing is read, stored or
+// removed there, without a prompt, and each call says so (secret_service_clear itself is silent
+// about a locked item); the store keeps a new token in its file instead. It locks the default
+// collection of the session it runs in, which only an unlock prompt opens again: it runs only when
+// SCACELITH_KEYRING_LOCK_TEST=1 says that keyring is a throwaway one, as in
+//   dbus-run-session -- sh -c 'printf pw | gnome-keyring-daemon --unlock --components=secrets >/dev/null;
+//       SCACELITH_KEYRING_LOCK_TEST=1 ./build/scacelith_tests net_credentials_secret_service'
+TEST(net_credentials_secret_service_locked) {
+    const char* optIn = std::getenv("SCACELITH_KEYRING_LOCK_TEST");
+    if (!optIn || std::strcmp(optIn, "1") != 0) SKIP("SCACELITH_KEYRING_LOCK_TEST not set (it locks the session's keyring)");
+    net::Keyring* k = net::secretServiceKeyring();
+    if (!k) SKIP("libsecret-1.so.0 cannot be loaded");
+    const std::string A = "keyring-lock-test.invalid:" + std::to_string(int(getpid()));
+    const std::string token = "sct_" + std::string(43, 'L');
+    std::string why, back;
+    if (k->store(A, "kept", "x", nullptr, why) != net::Keyring::Result::Ok) SKIP("no usable Secret Service: " + why);
+
+    // Locked with libsecret's own call (the game never locks nor unlocks a keyring).
+    void* lib = dlopen("libsecret-1.so.0", RTLD_NOW | RTLD_LOCAL);
+    REQUIRE(lib != nullptr);
+    using GetService = void* (*)(int flags, void* cancellable, void** error);
+    using ForAlias = void* (*)(void* service, const char* alias, int flags, void* cancellable, void** error);
+    using Append = void* (*)(void* list, void* data);
+    using Lock = int (*)(void* service, void* objects, void* cancellable, void** locked, void** error);
+    using Release = void (*)(void*);
+    auto getService = reinterpret_cast<GetService>(dlsym(lib, "secret_service_get_sync"));
+    auto forAlias = reinterpret_cast<ForAlias>(dlsym(lib, "secret_collection_for_alias_sync"));
+    auto append = reinterpret_cast<Append>(dlsym(lib, "g_list_append"));
+    auto lock = reinterpret_cast<Lock>(dlsym(lib, "secret_service_lock_sync"));
+    auto listFree = reinterpret_cast<Release>(dlsym(lib, "g_list_free"));
+    auto unref = reinterpret_cast<Release>(dlsym(lib, "g_object_unref"));
+    REQUIRE(getService && forAlias && append && lock && listFree && unref);
+    void* service = getService(0, nullptr, nullptr);
+    REQUIRE(service != nullptr);
+    void* collection = forAlias(service, "default", 0, nullptr, nullptr);
+    REQUIRE(collection != nullptr);
+    void* objects = append(nullptr, collection);
+    const int locked = lock(service, objects, nullptr, nullptr, nullptr);
+    listFree(objects);
+    unref(collection);
+    unref(service);
+    REQUIRE(locked > 0);
+
+    CHECK(k->lookup(A, "kept", back, nullptr, why) == net::Keyring::Result::Unavailable);
+    CHECK(back.empty());
+    CHECK_EQ(why, std::string("the keyring is locked"));
+    CHECK(k->store(A, "new", "y", nullptr, why) == net::Keyring::Result::Unavailable);
+    CHECK(k->remove(A, "kept", nullptr, why) == net::Keyring::Result::Unavailable);   // still there
+    CHECK_EQ(why, std::string("the keyring is locked"));
+    CHECK(k->lookup(A, "kept", back, nullptr, why) == net::Keyring::Result::Unavailable);
+    CHECK(k->remove(A, "none", nullptr, why) == net::Keyring::Result::Ok);            // nothing there
+
+    std::string path = tempCredentialPath("secret-service-locked");
+    RemovedAtEnd removed{path};
+    {
+        // A reference to the locked item: no token this run, and a logout drops the reference
+        // (the item stays, and the log says so).
+        Value rec = Value::object();
+        rec.set("origin", A);
+        rec.set("username", "alice");
+        rec.set("serverId", "");
+        rec.set("pin", "");
+        rec.set("token", "keyring:kept");
+        Value doc = Value::object();
+        doc.set("version", 1);
+        doc.set("records", Value::array()).push(rec);
+        CHECK(net::sys::writeFileAtomic(path, doc.dump(), true));
+        net::CredentialStore s(path);
+        s.setKeyring(k);
+        net::Credential out;
+        CHECK(s.get(A, out));
+        CHECK(out.token.empty());
+        CHECK(!s.hasToken(A));
+        CHECK(s.clearToken(A));
+        CHECK(fileToken(path, A).empty());
+        // A new sign-in while it is locked: in the file, as without a keyring.
+        net::Credential c;
+        c.origin = A;
+        c.username = "alice";
+        c.token = token;
+        bool stored = false;
+        CHECK(s.put(c, &stored));
+        CHECK(stored);
+        CHECK(hasPrefix(fileToken(path, A), "bound:"));
+        CHECK(s.get(A, out) && out.token == token);
+    }
 }
 #endif
 

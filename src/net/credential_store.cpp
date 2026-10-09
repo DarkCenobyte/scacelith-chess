@@ -335,13 +335,15 @@ std::vector<std::string> CredentialStore::movedFrom(const std::string& origin) c
 }
 
 bool CredentialStore::read(const std::string& origin, const std::string& blob, std::string& token, std::string& why,
-                           std::string* itemOrigin) const {
+                           std::string* itemOrigin, bool* unanswered) const {
     token.clear();
     if (itemOrigin) *itemOrigin = origin;
+    if (unanswered) *unanswered = false;
     if (!inKeyring(blob)) return unprotectToken(origin, blob, token);
     Keyring* k = keyring();
     if (!k) {
         why = "no keyring";
+        if (unanswered) *unanswered = true;
         return false;
     }
     const std::string id = itemId(blob);
@@ -358,6 +360,7 @@ bool CredentialStore::read(const std::string& origin, const std::string& blob, s
     }
     if (res == Keyring::Result::Missing) why = "no such item";
     if (res == Keyring::Result::Cancelled) why = "interrupted";
+    if (unanswered) *unanswered = res == Keyring::Result::Unavailable || res == Keyring::Result::Cancelled;
     if (res == Keyring::Result::Ok && !token.empty()) return true;
     wipe(token);
     return false;
@@ -384,9 +387,11 @@ void CredentialStore::migrate(const std::string& origin, const std::string& blob
         }
     }
     if (!saved) {
-        k->remove(origin, id, &cancel_, why);
+        if (k->remove(origin, id, &cancel_, why) == Keyring::Result::Unavailable)
+            LOGW("net: a copy of the saved session of %s could not be removed from the system keyring (%s)", origin.c_str(), why.c_str());
     } else if (inKeyring(blob)) {
-        k->remove(itemOrigin, itemId(blob), &cancel_, why);
+        if (k->remove(itemOrigin, itemId(blob), &cancel_, why) == Keyring::Result::Unavailable)
+            LOGW("net: the saved session of %s could not be removed from the system keyring (%s)", itemOrigin.c_str(), why.c_str());
     } else {
         LOGI("net: the saved session of %s moved to the system keyring", origin.c_str());
     }
@@ -401,7 +406,9 @@ void CredentialStore::forget(const std::string& origin, const std::string& blob)
         LOGW("net: the saved session of %s could not be removed from the system keyring (%s)", origin.c_str(), why.c_str());
     // A moved record not read since: its item names the former origin (its id is random: it can
     // only be this one).
-    for (const std::string& from : movedFrom(origin)) k->remove(from, itemId(blob), &cancel_, why);
+    for (const std::string& from : movedFrom(origin))
+        if (k->remove(from, itemId(blob), &cancel_, why) == Keyring::Result::Unavailable)
+            LOGW("net: the saved session of %s could not be removed from the system keyring (%s)", from.c_str(), why.c_str());
 }
 
 std::string CredentialStore::username(const std::string& origin) const {
@@ -481,10 +488,14 @@ bool CredentialStore::clearToken(const std::string& origin, const std::string& t
         blob = r->tokenBlob;
     }
     std::string saved, why;
-    const bool readable = read(origin, blob, saved, why);
+    bool unanswered = false;
+    const bool readable = read(origin, blob, saved, why, nullptr, &unanswered);
     const bool another = readable && saved != token;
     wipe(saved);
     if (another) return true;   // another one since
+    // The keyring cannot say which token it keeps (locked, failing, interrupted): the reference
+    // stays, since it may name one saved since. A refused token is cleared at its next refusal.
+    if (unanswered) return false;
     bool ok;
     {
         std::lock_guard<std::mutex> lk(mu_);

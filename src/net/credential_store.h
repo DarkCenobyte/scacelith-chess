@@ -57,7 +57,8 @@ public:
                          std::string& why) = 0;
     virtual Result lookup(const std::string& origin, const std::string& id, std::string& secret, CancelToken* cancel,
                           std::string& why) = 0;
-    // Ok also when there was no such item.
+    // Ok also when there was no such item; Unavailable while it is still there (a locked keyring
+    // keeps its items).
     virtual Result remove(const std::string& origin, const std::string& id, CancelToken* cancel, std::string& why) = 0;
 };
 
@@ -101,7 +102,8 @@ public:
     bool put(const Credential& c, bool* stored = nullptr);
     bool clearToken(const std::string& origin);  // logout: keeps user name, server id and pin
     // The same, only while the saved token is 'token' (the one a server refused): a token saved
-    // since (a new sign-in on another thread) is kept.
+    // since (a new sign-in on another thread) is kept, and so is one the keyring cannot show now
+    // (locked, failing, interrupted: false).
     bool clearToken(const std::string& origin, const std::string& token);
     bool clearPin(const std::string& origin);    // forgets the pin only (keeps the session)
     bool erase(const std::string& origin);       // forgets the origin entirely
@@ -144,8 +146,10 @@ private:
     Keyring* keyring() const;
     std::string protect(const std::string& origin, const std::string& token) const;
     // *itemOrigin: the origin the keyring item was found under (a moved record's is its former one).
+    // *unanswered: false unless the keyring could not say what it keeps (unavailable, locked,
+    // interrupted), as opposed to a token that is not there or cannot be read at all.
     bool read(const std::string& origin, const std::string& blob, std::string& token, std::string& why,
-              std::string* itemOrigin = nullptr) const;
+              std::string* itemOrigin = nullptr, bool* unanswered = nullptr) const;
     // Stores token in a new keyring item of origin and points the record to it, while it still
     // holds blob; then removes blob's item, if it is one (found under itemOrigin).
     void migrate(const std::string& origin, const std::string& blob, const std::string& token,
