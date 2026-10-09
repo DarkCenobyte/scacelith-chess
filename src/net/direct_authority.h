@@ -71,6 +71,11 @@ uint32_t positionHash(const chess::Position& pos);
 // UTF-8 the protocol accepts (no overlong forms, surrogates or code points above U+10FFFF),
 // 'fallback' when empty. Also cleans the router's name before the hosting page shows it.
 std::string sanitizeName(const std::string& name, const char* fallback, size_t maxBytes = 24);
+// What the host sends in place of 'p' (a message to the guest) to a guest of protocol minor
+// 'minor', in 'out'; false when the message suits that minor as it is. Minor 1 added
+// EndReason::ResignationVsInsufficient: a guest of minor 0 gets Resignation, with the Draw status,
+// in its GameEnd and GameSnapshot (as from the server, PROTOCOL.md "Minors").
+bool frameForMinor(const uint8_t* p, size_t n, uint16_t minor, std::vector<uint8_t>& out);
 
 class Authority {
 public:

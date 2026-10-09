@@ -450,7 +450,8 @@ const char* reasonKey(GameEndReason r) {
     case GameEndReason::Stalemate: return "appraisal.reason.stalemate";
     case GameEndReason::InsufficientMaterial:
     case GameEndReason::TimeoutVsInsufficient:
-    case GameEndReason::IllegalMovesVsInsufficient: return "appraisal.reason.material";
+    case GameEndReason::IllegalMovesVsInsufficient:
+    case GameEndReason::ResignationVsInsufficient: return "appraisal.reason.material";
     case GameEndReason::FivefoldRepetition:
     case GameEndReason::ThreefoldClaim: return "appraisal.reason.repetition";
     case GameEndReason::SeventyFiveMoves:

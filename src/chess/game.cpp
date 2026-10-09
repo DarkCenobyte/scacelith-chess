@@ -23,6 +23,7 @@ const char* endReasonKey(GameEndReason r) {
     case GameEndReason::FiftyMoveClaim: return "reason.50_moves_claim";
     case GameEndReason::Agreement: return "reason.agreement";
     case GameEndReason::IllegalMovesVsInsufficient: return "reason.illegal_vs_insufficient";
+    case GameEndReason::ResignationVsInsufficient: return "reason.resignation_vs_insufficient";
     }
     return "";
 }
@@ -138,7 +139,9 @@ void Game::claimDraw() {
 }
 
 void Game::resign(Color loser) {
-    finish(loser == White ? GameStatus::BlackWins : GameStatus::WhiteWins, GameEndReason::Resignation);
+    const Color winner = opposite(loser);
+    if (!position().canColorMate(winner)) finish(GameStatus::Draw, GameEndReason::ResignationVsInsufficient);
+    else finish(winner == White ? GameStatus::WhiteWins : GameStatus::BlackWins, GameEndReason::Resignation);
 }
 
 void Game::agreeDraw() { finish(GameStatus::Draw, GameEndReason::Agreement); }

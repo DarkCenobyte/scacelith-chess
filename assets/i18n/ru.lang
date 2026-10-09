@@ -268,6 +268,7 @@ reason.threefold_claim = Троекратное повторение (по тр�
 reason.50_moves_claim = Правило 50 ходов (по требованию)
 reason.agreement = Ничья по соглашению
 reason.illegal_vs_insufficient = Второй невозможный ход, но соперник не может поставить мат
+reason.resignation_vs_insufficient = Сдача, но соперник не может поставить мат
 
 # ---- Move list ---------------------------------------------------------------------------------
 movelist.title = ХОДЫ

@@ -84,6 +84,7 @@ bool isValid(EndReason v) {
     case EndReason::FiftyMoveClaim:
     case EndReason::Agreement:
     case EndReason::IllegalMovesVsInsufficient:
+    case EndReason::ResignationVsInsufficient:
     case EndReason::Abandonment:
     case EndReason::AbandonmentVsInsufficient:
     case EndReason::Aborted:
@@ -111,6 +112,7 @@ const char* enumName(EndReason v) {
     case EndReason::FiftyMoveClaim: return "FiftyMoveClaim";
     case EndReason::Agreement: return "Agreement";
     case EndReason::IllegalMovesVsInsufficient: return "IllegalMovesVsInsufficient";
+    case EndReason::ResignationVsInsufficient: return "ResignationVsInsufficient";
     case EndReason::Abandonment: return "Abandonment";
     case EndReason::AbandonmentVsInsufficient: return "AbandonmentVsInsufficient";
     case EndReason::Aborted: return "Aborted";

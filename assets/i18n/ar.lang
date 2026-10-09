@@ -270,6 +270,7 @@ reason.threefold_claim = التكرار الثلاثي (بمطالبة)
 reason.50_moves_claim = قاعدة الخمسين نقلة (بمطالبة)
 reason.agreement = تعادل بالاتفاق
 reason.illegal_vs_insufficient = نقلة غير قانونية ثانية، لكن الخصم لا يستطيع الإماتة
+reason.resignation_vs_insufficient = استسلام، لكن الخصم لا يستطيع الإماتة
 
 # ---- Move list ---------------------------------------------------------------------------------
 movelist.title = النقلات

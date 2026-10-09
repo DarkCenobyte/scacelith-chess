@@ -98,9 +98,16 @@ public:
     Square kingSquare(Color c) const;
     void makeMove(const Move& m);                 // m must be legal (use findLegal); flags are re-derived
     bool hasInsufficientMaterial() const;         // dead position: K v K, K+B v K, K+N v K, only same-coloured bishops
-    // FIDE 6.9 / 7.5.5 approximation: false when c has a bare king or when the position is dead
-    // (hasInsufficientMaterial(), which covers a single minor piece against a bare king); true
-    // otherwise.
+    // Whether c could still checkmate by some series of legal moves (FIDE 5.1.2, 6.9, 7.5.5: a
+    // resignation, a flag fall or a second illegal move against a side that cannot is a draw),
+    // judged by the material alone, as python-chess (has_insufficient_material) and lichess judge
+    // it. A pawn, a rook or a queen can always mate; c cannot mate with a bare king; with a king
+    // and one knight when the opponent has nothing but its king and queens (a knight mates only
+    // past a blocker of the mated side next to its king, which a queen would take); with bishops
+    // alone (no knight) when every bishop on the board stands on one square colour and no pawn or
+    // knight is left (a rook or a queen blocking a flight square would take or block the checking
+    // bishop). Never false while a mate is possible; false for both colours exactly when
+    // hasInsufficientMaterial().
     bool canColorMate(Color c) const;
 
     bool hasLegalMove() const;                    // false = checkmate or stalemate
@@ -167,7 +174,8 @@ enum class GameEndReason : uint8_t {
     None, Checkmate, Resignation, Timeout, IllegalMoves,          // decisive
     Stalemate, InsufficientMaterial, TimeoutVsInsufficient,       // draws
     FivefoldRepetition, SeventyFiveMoves, ThreefoldClaim, FiftyMoveClaim, Agreement,
-    IllegalMovesVsInsufficient                                    // draw: 2nd illegal move but the opponent cannot mate (7.5.5)
+    IllegalMovesVsInsufficient,                                   // draw: 2nd illegal move but the opponent cannot mate (7.5.5)
+    ResignationVsInsufficient                                     // draw: resigned but the opponent cannot mate (5.1.2)
 };
 // Translation key of a reason in assets/i18n/*.lang ("reason.checkmate"; "" for None).
 const char* endReasonKey(GameEndReason r);
@@ -218,7 +226,7 @@ public:
     bool canClaimThreefold() const;               // current position occurred >= 3 times
     bool canClaimFiftyMove() const;               // halfmove clock >= 100
     void claimDraw();                             // applies the first valid claim, if any
-    void resign(Color loser);
+    void resign(Color loser);                     // loss, or draw if the opponent cannot mate
     void agreeDraw();
     void flagFall(Color flagged);                 // Timeout, or draw if the opponent cannot mate
     void forfeitIllegal(Color offender);          // second completed illegal move (draw if the opponent cannot mate)

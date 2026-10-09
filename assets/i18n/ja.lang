@@ -267,6 +267,7 @@ reason.threefold_claim = 3回同一局面（申告）
 reason.50_moves_claim = 50手ルール（申告）
 reason.agreement = 合意による引き分け
 reason.illegal_vs_insufficient = 2回目の反則手、ただし相手はメイトできない
+reason.resignation_vs_insufficient = 投了、ただし相手はメイトできない
 
 # ---- Move list ---------------------------------------------------------------------------------
 movelist.title = 棋譜

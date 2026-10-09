@@ -579,9 +579,9 @@ struct Session::Impl {
                 ++it;
             }
         }
-        if (humanResigned) {
+        if (humanResigned && game.status() != chess::GameStatus::Draw) {
             g.end = GameEnd::Resigned;
-        } else {
+        } else {   // a resignation against a coach that cannot mate is a draw (FIDE 5.1.2)
             switch (game.status()) {
             case chess::GameStatus::WhiteWins: g.end = g.human == chess::White ? GameEnd::Win : GameEnd::Loss; break;
             case chess::GameStatus::BlackWins: g.end = g.human == chess::Black ? GameEnd::Win : GameEnd::Loss; break;

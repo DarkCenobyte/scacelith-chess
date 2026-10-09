@@ -524,6 +524,7 @@ private:
     std::vector<std::unique_ptr<Conn>> pending_;
     std::vector<std::unique_ptr<Conn>> closing_;   // refused or flooding links (closeLater)
     std::unique_ptr<Conn> guest_;
+    uint16_t guestMinor_ = 0;       // the protocol minor of guest_'s Welcome
     std::unique_ptr<direct::Authority> auth_;
     ClientView view_;
     int failedHandshakes_ = 0;
@@ -640,8 +641,9 @@ private:
             Event ev;
             if (view_.apply(msg.data(), msg.size(), ev)) pushEvent(std::move(ev));
         }
+        std::vector<uint8_t> older;
         if (guest_)
-            for (auto& msg : out.toGuest) guest_->send(msg);
+            for (auto& msg : out.toGuest) guest_->send(direct::frameForMinor(msg.data(), msg.size(), guestMinor_, older) ? older : msg);
         out.clear();
     }
 
@@ -830,6 +832,7 @@ private:
         P::Welcome w;
         w.proto = P::kProtocolVersion;
         w.minor = std::min(h.minor, P::kMinor);
+        guestMinor_ = w.minor;   // what dispatch() may send this connection
         w.caps = h.caps & P::kCaps;
         w.serverTime = enow;
         w.userId = 2;

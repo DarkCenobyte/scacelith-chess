@@ -267,6 +267,7 @@ reason.threefold_claim = Triple repetición (reclamada)
 reason.50_moves_claim = Regla de los 50 movimientos (reclamada)
 reason.agreement = Tablas de mutuo acuerdo
 reason.illegal_vs_insufficient = Segunda jugada ilegal, pero el rival no puede dar mate
+reason.resignation_vs_insufficient = Abandono, pero el rival no puede dar mate
 
 # ---- Move list ---------------------------------------------------------------------------------
 movelist.title = JUGADAS
