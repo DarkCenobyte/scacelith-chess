@@ -132,6 +132,23 @@ Prebuilt binaries: the game for Windows in `windows/`, the dedicated server for 
 - SHA-256 of the exe: `282ad6719ec8aedf081ffc2b2d070119bd019f23c1809b5984f0eb1780ac0d00`
 - SHA-256 of the zip: `2e9622146c1e91251bce195bd5be5ab371e6ad2de4139ad0ab688cec79f036fc`
 
+## windows/Scacelith-2026-10-09-poignee.zip
+
+- Holds `Scacelith-2026-10-09-poignee.exe` (132 MB, zipped to 95 MB).
+- Source: branch `claude/handshake-finish-iaf0m1` at commit `6d28df0` (pull request #17, not merged
+  yet), based on `master` at `f2ff8ca` (1.0.0-beta.2 and the CodeQL fixes of pull request #16).
+- Contents: version 1.0.0-beta.2 with the handshake's second pass: a handshake cut short by an
+  online opponent's move lets go at a human pace (back at rest 0.70 s after the cut, at most
+  2.2 - 2.5 m/s, no elbow jump or lunge whatever the instant), and a refitted clasp (fit g7: at
+  most 0.66 mm of interpenetration over the whole motion, palms and fingers closer to the other
+  hand). Details in `docs/handshake/README.md` on that branch.
+- Windows x64, self-contained otherwise (Stockfish 19 in five builds and its NNUE network are
+  embedded; the coach's voice is downloaded by the game). Needs a GPU with OpenGL 4.6.
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (734 tests, 12
+  skipped); it has not been run on real Windows hardware by the build.
+- SHA-256 of the exe: `e0af731147ea3a22a7ea7bc55b28d7776a245ab79c50651c29001a7d2aeed2c0`
+- SHA-256 of the zip: `19efc5587911a826c6ceb71b72c6f35fefca76ef47b661b94da953e93927ac8d`
+
 ## linux-server/scacelith-server-2026-10-03
 
 - The dedicated server, rewritten in Rust (`scacelith-server` 1.0.0, 13.5 MB): a static x86-64
