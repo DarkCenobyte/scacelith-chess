@@ -45,7 +45,7 @@ an.mistake = {move} is a mistake.
 an.mistake.2 = {move} is not the right move here.
 an.mistake.3 = A mistake: {move}.
 # The other side had just made a mistake, and this move does not punish it.
-an.missed_chance = {move} misses the chance to punish it.
+an.missed_chance = {move} misses the chance to punish that error.
 an.missed_chance.2 = With {move}, the chance slips away.
 
 # What it allows ({reply} is the other side's answer).
