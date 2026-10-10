@@ -46,6 +46,7 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 | `src/i18n` + `assets/i18n` | Translations (`tr`, `trf`, `trn` with CLDR plurals), language choice, Unicode helpers (`unicode.h`: joining, bidi, line breaks) |
 | `src/game` | Game state machine, settings, world layout (`layout.h`); seats and game modes (play / watch / hot-seat / online / coach), Elo (`elo.h`), camera flights and the viewer's observer camera (engine-free, in the core library and unit-tested); `game_scene_coach.cpp`: the coach's stage in the scene |
 | `src/coach` | Coach mode's brain, engine-free and GL-free: session, director, scripts, the spoken line catalogue (`assets/coach`), review and appraisal of the player's moves, openings and the teaching repertoire, the rules lesson, rewinds by hand (`rewind.h`) |
+| `src/analysis` | Analysis mode's brain, engine-free and GL-free: the review of a whole game (`review.h`: two passes over its positions, the annotation symbols, accuracy), the commentary on its key moments (`commentary.h`, lines in `assets/coach/speech/<lang>/analysis.lang`) and the cache of reviews (`cache.h`) |
 | `src/tts` | Text-to-speech for the coach's voice (Supertonic 3, ONNX graphs run by an in-house int8 runtime with per-ISA kernels), a worker thread; `model_store.h`: the model's nine files (manifest with sizes and SHA-256), its folder (`<application data>/coach/`, `--coach-dir` overrides it) and the download job (Hugging Face file by file, else the sherpa-onnx release archive on GitHub, extracted) |
 | `src/net` | Online play, engine-free (in the core library, unit-tested): the client of the dedicated server (`online_client.h`: HTTPS API and secure WebSocket, WinHTTP on Windows, OpenSSL in Linux builds), the realtime protocol v1 codec generated from `protocol/scacelith-v1.json` (`protocol_gen.h`), per-server credentials, the Google sign-in's loopback redirect, direct matches (secure channel, the host's authority, UPnP) and file downloads; see [ONLINE_CLIENT.md](ONLINE_CLIENT.md) and [DIRECT_MATCH.md](DIRECT_MATCH.md) |
 | `src/app` | Scene registry (`--scene`), test scenes |
@@ -243,3 +244,26 @@ director's marks (`World::submitCoachMarks`, piece highlights through `submitPie
   `[tts]` are read and written by `src/game/settings_coach.cpp` (core library, unit-tested).
   The command line (`--start --coach`, `--coach-level`, `--coach-colour`, `--coach-dir`,
   `--coach-stage-test`, `--coach-auto-answer`) is parsed by `src/game/coach_args.h`.
+
+## Analysis mode
+
+`GameMode::Analysis` is a replay (`replaying()` is true) of a finished game with Stockfish's review
+on top. The pieces of it:
+
+* **`analysis::GameReview`** (`src/analysis/review.h`) decides which positions to analyse next (a
+  quick pass, then a deep one, around the position on the board first), takes the results and
+  makes the verdicts (symbols, the better move, the bar, each side's accuracy). The scene sends its
+  requests to `ai::Engine` at a lower priority than any game's search.
+* **`analysis::Commentator`** (`commentary.h`) picks the key moments once their positions are final
+  and writes each as a `coach::Script` of `Say` beats (with marks), named by side
+  (`coach::Arg::ofSidePiece`: "White's knight", nobody is "you").
+* **`src/game/game_scene_analysis.cpp`** holds the mode's part of the scene (`AnalysisRuntime`):
+  it loads the game, pumps the review, saves it through `analysis::saveCache` when the player
+  leaves, steps through the game (one move: the robots' hands, `playRobotMove` forward and the
+  coach's `planRewind` trips back; further away: `setReplayPosition`, the only place where the
+  board is set without hands), plays the comments with a `coach::Director` on an `AnalysisStage`
+  (the coach's TTS worker, a narrator's non-spatial voice, subtitles, no body), and draws the
+  overlay (`ui::analysisHud`) and the board's marks (`World::submitAnalysisMarks`: the symbols'
+  discs and the better move's arrow).
+* **Settings.** `[analysis]` (comments, voice, arrows) and `coach.voice_offered` (the voice model
+  was offered once) are read and written by `src/game/settings_coach.cpp`.

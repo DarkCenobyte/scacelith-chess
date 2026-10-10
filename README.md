@@ -198,7 +198,34 @@ equal position late in the game), and the game over card offers to watch another
 (the page says where; **Open folder** shows it), and **Paste a PGN** analyses a game copied as
 PGN text (the first one when the clipboard holds several). When you are signed in, **My online
 games** opens your history on the server, where each game's page has **Analyse** too, as does
-**Saved games** next to Replay and the game over card (**Analyse the game**).
+**Saved games** next to Replay and the game over card (**Analyse the game**: after a game against
+Stockfish, the coach, a friend on the same PC or online; it declines a rematch).
+
+The game is set on the table and Stockfish reviews it in the background, first quickly (the bar
+and the symbols appear within seconds), then in depth; a game opened again shows its review at once
+(the evaluations are kept for the 200 games last analysed, in the game's folder of application
+data, `analysis\`).
+
+- **The evaluation bar** on the left shows who stands better in the position on the board, with the
+  score (or the mate) at the leading side's end.
+- **The move panel** on the right lists the moves with their symbols: **!!** brilliant, **!** the
+  only good move, **!?** interesting, **?!** inaccuracy, **?** mistake, **??** blunder. Behind each
+  move, a faint band shows where the bar stood after it. Under the moves, each side's accuracy and
+  count of each symbol. Click a move to go to the position after it: the next or the previous move
+  is played (or taken back) by the robots' hands; further away, the board is set at once.
+- **On the board**, the square a move landed on carries its symbol on a coloured disc, and after an
+  inaccuracy, a mistake or a blunder a green arrow shows the better move.
+- **Comments** on the key moments (the opening, the mistakes and what they allowed or missed, the
+  brilliant and only moves, the end and each side's accuracy) are spoken by the coach's voice when
+  its model is installed, and shown as subtitles. Opening an analysis with the voice on but its
+  model missing offers the download once, unless the Coach page or the options offered it before.
+- **K** (or the play button): play the game on, move by move, pausing for the comments. **J / L**:
+  one move back / forward. **Home / End**: the start / the end. **N**: comments on or off. **M**:
+  voice on or off (subtitles only). **B**: arrows on or off. These choices are remembered
+  (`[analysis]` in the settings file).
+- The camera is free as when watching a game (**W A S D**, the mouse, **0 – 9** for the
+  viewpoints, **H** hides the controls and the panels). **Esc**: menu; the main menu goes back to
+  the page the analysis was chosen on.
 
 ## Online play
 
@@ -409,7 +436,12 @@ clipboard), `gameover-analyse|gameover-analyse-coach|gameover-analyse-online|gam
 the game over card with Analyse the game, and `online-game-analysing` a history game fetching its
 PGN for the analysis.
 
-The Analysis mode's overlay has its UI viewer screens: `--scene ui --ui-screen analysis-hud` (a game
+Analysis mode: `--analyse <file.pgn>` opens that file's first game (`--game N`: its Nth, from 1) in
+the Analysis mode at once, on the final position unless `--analysis-at N` names another (the
+position after N plies); `--replay-keys` drives it (`J,L,K,Home,End,N,M,B`, `Goto:N` clicks the
+panel's position N, `Wait:S` waits S seconds, `Leave` goes back to the menu), and with `--shot`
+the review uses shallow depths so that a screenshot shows a finished review. The Analysis mode's
+overlay has its UI viewer screens: `--scene ui --ui-screen analysis-hud` (a game
 halfway, its review done, a commentary subtitle that `--ui-text <text>` replaces), `analysis-hud-review`
 (early on, the review at work), `analysis-hud-fen` (set up from a FEN, Black's move first) and
 `analysis-hud-noengine`.
