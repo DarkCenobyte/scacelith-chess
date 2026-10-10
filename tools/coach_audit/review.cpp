@@ -7,6 +7,7 @@
 #include "coach/openings.h"
 #include "coach/review_internal.h"
 #include "coach/tactics.h"
+#include "core/files.h"
 
 #include <algorithm>
 #include <cstdio>
@@ -392,7 +393,7 @@ int reviewMain(const Options& o) {
         return 1;
     }
     Catalog::shared().load();
-    FILE* out = o.out.empty() ? stdout : std::fopen(o.out.c_str(), "w");
+    FILE* out = o.out.empty() ? stdout : files::create(o.out.c_str());   // mode 0644, whatever the umask
     if (!out) return 1;
     Stats st;
     for (size_t ri = 0; ri < recs.size(); ++ri) {
