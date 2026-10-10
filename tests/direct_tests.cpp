@@ -354,6 +354,12 @@ TEST(sock_poll_set_high_descriptor) {
     CHECK(!ps.readable(high));
     const uint8_t one[1] = {7};
     CHECK_EQ(sock::sendTo(b, one, 1, at), 1);
+    // Readable once the datagram is there (macOS delivers on the loopback asynchronously: a socket
+    // that is always writable would end the wait before it arrives), then readable and writable.
+    ps.clear();
+    ps.add(high, true, false);
+    CHECK_EQ(ps.wait(2000), 1);
+    CHECK(ps.readable(high));
     ps.clear();
     ps.add(high, true, true);
     CHECK_EQ(ps.wait(2000), 1);
@@ -1185,7 +1191,7 @@ TEST(direct_authority_snapshot_and_names) {
     CHECK_EQ(direct::sanitizeName("abcdefghijklmnopqrstuvw\xC3\xA9", "X"), std::string("abcdefghijklmnopqrstuvw"));
     // Sequences the protocol's decoder refuses are dropped too: an overlong form, a surrogate,
     // code points above U+10FFFF. Such a name used to make hosting and joining fail.
-    const char* refused[] = {"Ann\xC0\x80" "e", "Bob\xED\xA0\x80", "Cy\xF5\x80\x80\x80", "Di\xF4\x90\x80\x80", "Ed\xE0\x80\xAF"};
+    const char* refused[] = {"Ann\xC0\x80\x65", "Bob\xED\xA0\x80", "Cy\xF5\x80\x80\x80", "Di\xF4\x90\x80\x80", "Ed\xE0\x80\xAF"};
     const char* kept[] = {"Anne", "Bob", "Cy", "Di", "Ed"};
     for (int i = 0; i < 5; ++i) {
         CHECK_EQ(direct::sanitizeName(refused[i], "X"), std::string(kept[i]));

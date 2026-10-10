@@ -41,6 +41,7 @@
 #include "net/net_sys.h"
 #include "net/online_client.h"
 #include "net/protocol_gen.h"
+#include "net/stance.h"
 #include "net/transport.h"
 
 #include <algorithm>
@@ -3127,7 +3128,7 @@ public:
     // What the next upgrades get, in order, before upgradeStatus applies again: an HTTP status
     // that refuses the upgrade, kUpgradeOk, or kShutdownAtHello (101, then Error{ShuttingDown} +
     // close 4008 in answer to Hello, like a draining server).
-    static constexpr int kUpgradeOk = 0, kShutdownAtHello = -1;
+    [[maybe_unused]] static constexpr int kUpgradeOk = 0, kShutdownAtHello = -1;
     void scriptUpgrades(std::initializer_list<int> steps) {
         std::lock_guard<std::mutex> lk(scriptMu_);
         script_.assign(steps.begin(), steps.end());
@@ -4565,6 +4566,7 @@ void stanceScenario(PacingRig& r) {
         r.sleepMs(20);
     }
     r.c->sendStance(77, 3);
+    const double tapMs = msBetween(tTap, std::chrono::steady_clock::now());
     r.expect(r.until([&] {
                  auto x = stancesFrom(r, mark);
                  return !x.empty() && x.back().m.stance == pr::Stance::SideRight && msBetween(tTap, x.back().at) > 600.0;
@@ -4574,7 +4576,11 @@ void stanceScenario(PacingRig& r) {
     bool paced = true;
     for (size_t i = 1; i < taps.size(); ++i) paced = paced && msBetween(taps[i - 1].at, taps[i].at) > 200.0;
     r.expect(paced, "a quarter of a second apart (" + std::to_string(taps.size()) + " messages)");
-    r.expect(taps.size() <= 5, "no burst (" + std::to_string(taps.size()) + ")");
+    // At most one message per quarter of a second of tapping, plus the first and the last: 5 for
+    // the 0.6 s planned (a loaded machine's sleeps can stretch the tapping, as on macOS runners).
+    const size_t most = size_t(tapMs / double(net::kStanceMinIntervalMs)) + 3;
+    r.expect(taps.size() <= most, "no burst (" + std::to_string(taps.size()) + " in " +
+                                      std::to_string(int(tapMs)) + " ms of tapping)");
 
     // Another game: nothing (not even the current game's stance meanwhile).
     r.sleepMs(300);

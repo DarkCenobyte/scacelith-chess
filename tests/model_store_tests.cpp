@@ -844,11 +844,10 @@ TEST(model_store_removes_the_old_model_first) {
         CHECK(!s.legacyLeft);
         CHECK(s.file != kFiles - 1);
     }
-    // The removal is the job's first phase: once the job was seen fetching, never again.
-    auto removing = std::find(r.order.begin(), r.order.end(), int(Phase::Removing));
+    // The removal is the job's first phase: once the job was seen fetching, never again (a fast
+    // job can pass the fetching unseen, as on Apple Silicon: the requests above prove the order).
     auto fetching = std::find(r.order.begin(), r.order.end(), int(Phase::Fetching));
-    CHECK(fetching != r.order.end());
-    CHECK(removing == r.order.end() || removing < fetching);
+    CHECK(std::find(fetching, r.order.end(), int(Phase::Removing)) == r.order.end());
     CHECK(!tts::legacyFilesPresent(t.dir));
     for (const tts::ManifestFile& f : tts::legacyManifest().files)
         if (f.name != "tts.json") CHECK(!t.has(f.name));
