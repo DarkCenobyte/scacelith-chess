@@ -1185,6 +1185,31 @@ replay.tip.resume = 再開（K）
 replay.tip.forward = 1手進む（L）
 replay.tip.end = 対局の最後へ（End）
 
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = 解説
+analysis.hud.accuracy = 精度
+analysis.hud.reviewing = Stockfish が対局を解析しています… {0}
+analysis.hud.no_engine = チェスエンジンがありません。指し手は解析なしで表示されます。
+analysis.hud.no_moves = この対局には指し手がありません。
+analysis.hud.tip.play = 指し手を再生（K）
+analysis.hud.tip.comments_off = 重要な局面の解説を隠す（N）
+analysis.hud.tip.comments_on = 重要な局面の解説を表示（N）
+analysis.hud.tip.voice_off = 解説者の音声をミュート（M）
+analysis.hud.tip.voice_on = 解説を音声で聞く（M）
+analysis.hud.tip.voice_missing = 音声を再生できません。音声ファイルがインストールされていないか、設定 > サウンド > コーチの音声 がオフです。解説は画面に表示されます。
+analysis.hud.tip.arrows_off = より良い手の矢印を隠す（B）
+analysis.hud.tip.arrows_on = より良い手の矢印を表示（B）
+analysis.hud.controls.play = 再生 / 一時停止
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = 解説の表示 / 非表示
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = 解説者の音声 オン / オフ
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = 矢印の表示 / 非表示
+
 # ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
 #      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
 gif.save = GIFとして保存

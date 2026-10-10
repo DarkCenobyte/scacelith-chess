@@ -1184,6 +1184,31 @@ replay.tip.resume = 繼續（K）
 replay.tip.forward = 前進一步（L）
 replay.tip.end = 對局結束（End）
 
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = 解說
+analysis.hud.accuracy = 準確率
+analysis.hud.reviewing = Stockfish 正在分析對局…{0}
+analysis.hud.no_engine = 沒有西洋棋引擎：著法將不經分析顯示。
+analysis.hud.no_moves = 這盤對局沒有著法。
+analysis.hud.tip.play = 播放著法（K）
+analysis.hud.tip.comments_off = 隱藏關鍵時刻的解說（N）
+analysis.hud.tip.comments_on = 顯示關鍵時刻的解說（N）
+analysis.hud.tip.voice_off = 關閉解說員的語音（M）
+analysis.hud.tip.voice_on = 朗讀解說（M）
+analysis.hud.tip.voice_missing = 無法播放語音：語音檔案尚未安裝，或「選項 > 聲音 > 教練語音」已關閉。解說以文字顯示在畫面上。
+analysis.hud.tip.arrows_off = 隱藏更佳著法的箭頭（B）
+analysis.hud.tip.arrows_on = 顯示更佳著法的箭頭（B）
+analysis.hud.controls.play = 播放 / 暫停
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = 顯示 / 隱藏解說
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = 解說員語音 開 / 關
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = 顯示 / 隱藏箭頭
+
 # ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
 #      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
 gif.save = 儲存為 GIF

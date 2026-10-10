@@ -1196,6 +1196,31 @@ replay.tip.resume = Resume (K)
 replay.tip.forward = One move forward (L)
 replay.tip.end = End of the game (End)
 
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = COMMENTARY
+analysis.hud.accuracy = ACCURACY
+analysis.hud.reviewing = Stockfish is reviewing the game… {0}
+analysis.hud.no_engine = No chess engine: the moves are shown without analysis.
+analysis.hud.no_moves = This game has no moves.
+analysis.hud.tip.play = Play the moves (K)
+analysis.hud.tip.comments_off = Hide the comments on the key moments (N)
+analysis.hud.tip.comments_on = Show the comments on the key moments (N)
+analysis.hud.tip.voice_off = Silence the commentator's voice (M)
+analysis.hud.tip.voice_on = Hear the comments spoken (M)
+analysis.hud.tip.voice_missing = The voice cannot be heard: its files are not installed, or Options > Audio > Coach voice is off. The comments are only written on screen.
+analysis.hud.tip.arrows_off = Hide the arrows of the better moves (B)
+analysis.hud.tip.arrows_on = Show the arrows of the better moves (B)
+analysis.hud.controls.play = Play / pause
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Show / hide the comments
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Commentator's voice on / off
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Show / hide the arrows
+
 # ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
 #      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
 gif.save = Save as GIF

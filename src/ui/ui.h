@@ -170,6 +170,9 @@ struct ViewerHud {
     float speedAge = 1e9f;       // seconds since the speed changed
     bool replay = false;         // a saved game replayed: its keys head the controls hint, and the
                                  // labels above leave room for its bar (replayBar)
+    bool analysis = false;       // a game analysed (analysisHud): no players' labels (its panel
+                                 // names them), the controls hint right of its evaluation bar and
+                                 // headed by the analysis keys
 };
 void viewerHud(const ViewerHud& hud);
 
@@ -242,6 +245,11 @@ struct Subtitle {
     float bottom = 0.0f;         // lowest y the plate may use (reference px); 0 = 96 above the bottom
                                  // edge. Pass v.y - 110 while the folded game over bar is shown.
     bool speaker = true;         // "COACH" tag above the text
+    std::string tag;             // replaces the "COACH" tag ("" = coach.speaker); the analysis
+                                 // passes analysis.hud.speaker
+    // The horizontal span the plate centres in (reference px), and keeps within: the analysis
+    // passes AnalysisHudResult::freeLeft / freeRight. Both 0 = the window.
+    float spanLeft = 0.0f, spanRight = 0.0f;
 };
 void subtitles(const Subtitle& s);
 // How long a subtitle should stay: the audio length or the time needed to read the text,
@@ -401,6 +409,10 @@ struct AnalysisHudResult {
     AnalysisAction action = AnalysisAction::None;
     int position = -1;           // GoTo: the position wanted (plies on the board: a click on ply i
                                  // gives i + 1)
+    // The span between the bar (or the viewer's controls hint, when viewerHud drew it this frame)
+    // and the panel (reference px, left < right), for the subtitles (Subtitle::spanLeft /
+    // spanRight); both 0 while the HUD is hidden (the window is free).
+    float freeLeft = 0.0f, freeRight = 0.0f;
 };
 AnalysisHudResult analysisHud(const AnalysisHud& hud);
 

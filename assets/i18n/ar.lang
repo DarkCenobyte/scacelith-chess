@@ -1189,6 +1189,31 @@ replay.tip.resume = استئناف (K)
 replay.tip.forward = نقلة إلى الأمام (L)
 replay.tip.end = نهاية المباراة (End)
 
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = المعلّق
+analysis.hud.accuracy = الدقة
+analysis.hud.reviewing = يحلّل Stockfish المباراة… {0}
+analysis.hud.no_engine = لا يتوفر محرّك شطرنج: تُعرض النقلات دون تحليل.
+analysis.hud.no_moves = لا تحتوي هذه المباراة على أي نقلة.
+analysis.hud.tip.play = تشغيل النقلات (K)
+analysis.hud.tip.comments_off = إخفاء التعليقات على اللحظات الحاسمة (N)
+analysis.hud.tip.comments_on = إظهار التعليقات على اللحظات الحاسمة (N)
+analysis.hud.tip.voice_off = كتم صوت المعلّق (M)
+analysis.hud.tip.voice_on = سماع التعليقات بصوت مسموع (M)
+analysis.hud.tip.voice_missing = لا يمكن سماع الصوت: ملفاته غير مثبّتة، أو أن خيار «الخيارات > الصوت > صوت المدرّب» متوقف. تظهر التعليقات مكتوبةً على الشاشة.
+analysis.hud.tip.arrows_off = إخفاء أسهم النقلات الأفضل (B)
+analysis.hud.tip.arrows_on = إظهار أسهم النقلات الأفضل (B)
+analysis.hud.controls.play = تشغيل / إيقاف مؤقت
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = إظهار التعليقات / إخفاؤها
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = تشغيل صوت المعلّق / إيقافه
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = إظهار الأسهم / إخفاؤها
+
 # ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
 #      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
 gif.save = حفظ بصيغة GIF

@@ -404,6 +404,12 @@ MenuAction viewerPauseMenu() {
 }
 
 // ==== Viewer overlay ===================================================================================
+namespace detail {
+// The viewer's controls hint as drawn by the last viewerHud() (empty when hidden): the analysis
+// HUD (ui_analysis.cpp) keeps the commentary's subtitles clear of it.
+Rect viewerControlsRect() { return g_viewerControls; }
+}  // namespace detail
+
 void viewerHud(const ViewerHud& hud) {
     g_viewerControls = Rect();
     if (!hud.visible) return;
@@ -413,9 +419,13 @@ void viewerHud(const ViewerHud& hud) {
     float x = 56.0f;
     // Laid out from the left edge, mirrored to the right edge for a right-to-left language.
     const Rect screen(0.0f, 0.0f, v.x, v.y);
+    // A game analysed: its evaluation bar holds the left edge (analysisHud, ui_analysis.cpp: 26
+    // wide from x = 22, its overlay starts 24 right of it) and its panel the right edge, in every
+    // language. The controls hint starts right of the bar and is mirrored inside itself only.
+    if (hud.analysis) x += 32.0f;
 
-    // Players, top left (a diamond marks the player to move).
-    {
+    // Players, top left (a diamond marks the player to move); the analysis panel names them.
+    if (!hud.analysis) {
         TextStyle side = style(font::FACE_TITLE, 17.0f, gold, im::startAlign(), 0.22f);
         TextStyle name = style(font::FACE_TEXT, 24.0f, ivory, im::startAlign());
         const std::string* names[2] = {&hud.white, &hud.black};
@@ -436,12 +446,17 @@ void viewerHud(const ViewerHud& hud) {
         }
     }
 
-    // Controls, bottom left (a replay's own keys first).
+    // Controls, bottom left (a replay's or an analysis' own keys first).
     {
         struct Line { const char* keys; const char* action; };
         static const Line replayLines[] = {
             {"viewer.keys.replay_pause", "viewer.controls.replay_pause"}, {"viewer.keys.replay_step", "viewer.controls.replay_step"},
             {"viewer.keys.replay_speed", "viewer.controls.replay_speed"}, {"viewer.keys.replay_ends", "viewer.controls.replay_ends"},
+        };
+        static const Line analysisLines[] = {
+            {"viewer.keys.replay_pause", "analysis.hud.controls.play"},   {"viewer.keys.replay_step", "viewer.controls.replay_step"},
+            {"viewer.keys.replay_ends", "viewer.controls.replay_ends"},   {"analysis.hud.keys.comments", "analysis.hud.controls.comments"},
+            {"analysis.hud.keys.voice", "analysis.hud.controls.voice"},   {"analysis.hud.keys.arrows", "analysis.hud.controls.arrows"},
         };
         static const Line viewerLines[] = {
             {"viewer.keys.move", "viewer.controls.move"},     {"viewer.keys.updown", "viewer.controls.updown"},
@@ -451,8 +466,12 @@ void viewerHud(const ViewerHud& hud) {
             {"viewer.keys.menu", "viewer.controls.menu"},     {"viewer.keys.hide", "viewer.controls.hide"},
         };
         std::vector<Line> lines;
-        if (hud.replay) lines.assign(std::begin(replayLines), std::end(replayLines));
-        lines.insert(lines.end(), std::begin(viewerLines), std::end(viewerLines));
+        if (hud.analysis)
+            for (const Line& l : analysisLines) lines.push_back(l);
+        else if (hud.replay)
+            for (const Line& l : replayLines) lines.push_back(l);
+        for (const Line& l : viewerLines)   // Tab's small move list: the analysis panel has the moves
+            if (!hud.analysis || std::string(l.keys) != "viewer.keys.moves") lines.push_back(l);
         const int count = int(lines.size());
         TextStyle ks = style(font::FACE_TEXT, 20.0f, goldBright, im::endAlign());
         TextStyle as = style(font::FACE_ITALIC, 20.0f, ivoryDim, im::startAlign());
@@ -464,22 +483,24 @@ void viewerHud(const ViewerHud& hud) {
         float lineH = 29.0f;
         float w = kw + aw + 110.0f, h = 76.0f + lineH * float(count);
         Rect p(x - 16.0f, v.y - h - 44.0f, w, h);
-        g_viewerControls = im::flip(screen, p);
+        const Rect& mirror = hud.analysis ? p : screen;   // what the layout is mirrored in
+        g_viewerControls = im::flip(mirror, p);
         im::panel(g_viewerControls, 0.82f);
         TextStyle ts = style(font::FACE_TITLE, 17.0f, gold, im::startAlign(), 0.24f);
-        gfx::text(tr("viewer.controls.title"), im::flipX(screen, p.x + 30.0f), p.y + 40.0f, ts);
+        gfx::text(tr("viewer.controls.title"), im::flipX(mirror, p.x + 30.0f), p.y + 40.0f, ts);
         float mid = p.x + 30.0f + kw + 20.0f;
         for (int i = 0; i < count; ++i) {
             float y = p.y + 76.0f + float(i) * lineH;
-            gfx::text(tr(lines[size_t(i)].keys), im::flipX(screen, mid - 12.0f), y, ks);
-            gfx::diamond(vec2(im::flipX(screen, mid), y - 6.0f), 2.5f, withAlpha(gold, 0.55f));
-            gfx::text(tr(lines[size_t(i)].action), im::flipX(screen, mid + 12.0f), y, as);
+            gfx::text(tr(lines[size_t(i)].keys), im::flipX(mirror, mid - 12.0f), y, ks);
+            gfx::diamond(vec2(im::flipX(mirror, mid), y - 6.0f), 2.5f, withAlpha(gold, 0.55f));
+            gfx::text(tr(lines[size_t(i)].action), im::flipX(mirror, mid + 12.0f), y, as);
         }
     }
 
     // Viewpoint just selected / speed just changed: centred low, fading out.
     auto fading = [](float age, float hold) { return m::saturate(age / 0.2f) * m::saturate((hold + 0.6f - age) / 0.6f); };
-    float cy = v.y - (hud.replay ? kReplayBarClear : 120.0f);   // above the replay's bar
+    // Above the replay's bar, or the commentary's subtitles.
+    float cy = v.y - (hud.replay ? kReplayBarClear : hud.analysis ? 270.0f : 120.0f);
     if (!hud.viewpoint.empty()) {
         float a = fading(hud.viewpointAge, 1.8f);
         if (a > 0.001f) {
