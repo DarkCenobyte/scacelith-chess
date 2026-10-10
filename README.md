@@ -394,6 +394,11 @@ taken back by hand, then the takeback card (`--coach-stage-test lesson`: on the 
 position); its log gives the time of each step, for `--warp`. `--coach-auto-answer yes|no` answers
 the takeback card by itself after 1.5 s, for runs with `--play`.
 
+The Analysis mode's overlay has its UI viewer screens: `--scene ui --ui-screen analysis-hud` (a game
+halfway, its review done, a commentary subtitle that `--ui-text <text>` replaces), `analysis-hud-review`
+(early on, the review at work), `analysis-hud-fen` (set up from a FEN, Black's move first) and
+`analysis-hud-noengine`.
+
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised.
 
 ### Continuous integration and releases
