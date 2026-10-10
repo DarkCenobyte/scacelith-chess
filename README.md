@@ -1,7 +1,9 @@
 # Scacelith builds
 
-Prebuilt binaries: the game for Windows in `windows/`, the dedicated server for Linux in
-`linux-server/`. This branch only holds binaries; the source code is on `master`.
+Prebuilt binaries: the game for Windows in `windows/` and for Linux on 64-bit Arm in
+`linux-aarch64/`, the dedicated server for Linux in `linux-server/`. This branch only holds
+binaries; the source code is on `master`. The experimental macOS disk image is built by GitHub
+Actions only (the artifact of the CI's macOS job, or a release).
 
 ## windows/Scacelith-2026-09-28-offline.exe
 
@@ -221,6 +223,41 @@ Prebuilt binaries: the game for Windows in `windows/`, the dedicated server for 
   It has not been run on real Windows hardware by the build.
 - SHA-256 of the exe: `2912c089f8bfab2d43ef0475c28f12d7a782656dfe02c5103b6d870e1054d1f5`
 - SHA-256 of the zip: `d0e7d73994fe59caf6be1fdbcec81fa8ffb62033f6553dbaa6ad72c2a4a771e4`
+
+## windows/Scacelith-2026-10-10-macos-arm.zip
+
+- Holds `Scacelith-2026-10-10-macos-arm.exe` (133 MB, zipped to 96 MB).
+- Source: branch `claude/project-thread-s7odk6` at commit `e7bb260` (pull request #29, not merged
+  yet), based on `master` at `c8f96e7` (pull request #28 merged).
+- Contents: the Windows side of the experimental macOS (Apple Silicon) and Linux aarch64 port. The
+  engine now reads optional OpenGL features from the driver's extension list: without
+  tessellation, tessellation is off whatever the preset and greyed out in Options > Graphics;
+  without depth clamping, the sun shadows widen their near plane instead. A conforming OpenGL 4.6
+  driver, as on any Windows PC that ran the earlier builds, has both, so nothing changes there.
+- Windows x64, self-contained otherwise (Stockfish 19 in five builds and its NNUE network are
+  embedded; the coach's voice is downloaded by the game). Needs a GPU with OpenGL 4.6.
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine in the pull
+  request's CI on the same source. It has not been run on real Windows hardware by the build.
+- SHA-256 of the exe: `a2331cc169d06256cb801cfa62594040a4495af1170fb969c46e6d3a12ad8d6f`
+- SHA-256 of the zip: `6f80dbcb3c56cb8481ebea85ce148805c2ccfa5a8e93822daf13e11462f63a45`
+
+## linux-aarch64/Scacelith-2026-10-10-linux-aarch64.tar.gz
+
+- The game for Linux on 64-bit Arm: the executable `scacelith` (130 MB), `install.sh` (adds it to
+  the applications menu), its icons, the licences and a README (archive of 95 MB).
+- Source: the same commit `e7bb260` of pull request #29.
+- Needs a GPU with OpenGL 4.6 (an NVIDIA Jetson Orin or discrete card, an AMD discrete card, or
+  Asahi Linux on Apple M1/M2; not a Raspberry Pi), X11 or XWayland, glibc 2.38 and OpenSSL 3
+  (Ubuntu 24.04, Debian 13, Fedora 39 or later). The release workflow builds the same game on
+  Ubuntu 22.04, for glibc 2.34.
+- Stockfish 19 in two builds (Armv8, and Armv8 with the dot-product instructions; the game runs
+  the faster one the CPU supports) and its NNUE network are embedded; the coach's voice runs on
+  NEON and is downloaded by the game.
+- Cross-compiled with GCC for aarch64-linux-gnu (Release) on Ubuntu 24.04. Its test program
+  passes natively on GitHub's Arm runner in the pull request's CI on the same source. It has not
+  been run on an Arm GPU by the build.
+- SHA-256 of the archive: `856a2092f8327b420c0bfa33b255445fe6846ba25554a0b35718a6baf961bf68`
+- SHA-256 of the executable: `4f5ec585c36baf3a42c3e1f68cb79d607beece97af4f8d205e187ff8c3f880e1`
 
 ## linux-server/scacelith-server-2026-10-03
 
