@@ -2,6 +2,12 @@
 #include <charconv>
 #include <cmath>
 #include <cstdio>
+#ifdef __APPLE__
+#include <locale.h>
+#include <stdlib.h>   // before xlocale.h, which declares strtod_l only after it
+#include <string>
+#include <xlocale.h>
+#endif
 #include <unordered_map>
 
 namespace net {
@@ -362,6 +368,16 @@ private:
             if (p_ >= n_ || s_[p_] < '0' || s_[p_] > '9') return fail("invalid number");
             while (p_ < n_ && s_[p_] >= '0' && s_[p_] <= '9') ++p_;
         }
+#ifdef __APPLE__
+        // Apple's C++ library has had no from_chars for double (libc++ before LLVM 20): strtod in the
+        // C locale, as exact, on a copy of the token (checked above). Beyond double it gives
+        // +-HUGE_VAL (infinite), as from_chars's result below.
+        static const locale_t cLocale = newlocale(LC_ALL_MASK, "C", (locale_t)0);
+        const std::string token(s_ + start, p_ - start);
+        char* end = nullptr;
+        const double v = strtod_l(token.c_str(), &end, cLocale);
+        if (end != token.c_str() + token.size()) return fail("invalid number");
+#else
         // from_chars is locale-independent and exact; a magnitude beyond double becomes +-inf.
         double v = 0;
         auto r = std::from_chars(s_ + start, s_ + p_, v);
@@ -375,6 +391,7 @@ private:
                     break;
                 }
         }
+#endif
         out = Value(v);
         return true;
     }
