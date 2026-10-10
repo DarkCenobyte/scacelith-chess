@@ -2,11 +2,16 @@
 // format (parse, write, the errors it reports), the mirror of a position, the hint steps, the moves
 // a line accepts; a run on the fake Stage and Analyst (tests/coach_fakes.h): positions one after
 // the other with the coach's move into them, a wrong move answered with the move on the board and
-// taken back, no hint unless asked (the offer after three wrong moves, its card, H at any time:
-// the piece, the square, the move shown), a play-out judged by the engine and by the board
-// (stalemate, mate); the embedded book: it parses with no error, every set has its texts, every
-// line ends with the player's move (in checkmate for the mate sets); a whole set solved through
-// the session: completed, the handshake wanted, nothing recorded.
+// taken back, no hint unless asked (the offer after three wrong moves, its card, H at any time: the
+// piece, the square, the move shown), a play-out judged by the engine and by the board (stalemate,
+// mate), the coach's answer that ends a play-out on the board (a hold solved once, nothing left
+// waiting; a mate said as one), a play-out's hint never given late (asked for, then a move made
+// before its analysis came back) nor offered without a move to show; Space never removing a
+// position's set-up, its lead or a coach's answer (in Prepare or Running, at every frame); the
+// embedded book: it parses with no error, every set has its texts, every line ends with the
+// player's move (in checkmate for the mate sets); a whole set solved through the session, with and
+// without Space at every frame: each move awaited on its board, completed, the handshake wanted,
+// nothing recorded.
 #include "test.h"
 #include "coach_fakes.h"
 
@@ -50,6 +55,13 @@ ai::Analysis mateAnalysis(int mate, const char* best) {
     return a;
 }
 
+// A level line (no mate, cp 0): the draw holds, whoever is to move; 'best' is the coach's answer.
+ai::Analysis levelAnalysis(const char* best) {
+    ai::Analysis a = mateAnalysis(0, best);
+    a.depth = a.lines.front().depth = 22;
+    return a;
+}
+
 std::string fenAfter(const char* fen, const char* uci) {
     chess::Position p;
     p.setFEN(fen);
@@ -65,6 +77,7 @@ struct Run {
     ChallengeRun run;
     chess::Game game;
     float dt = 1.0f / 60.0f;
+    bool space = false;   // Space at every frame (the session's skip: the running beat only)
     std::vector<Line> lines;
 
     Run() {
@@ -79,6 +92,7 @@ struct Run {
     }
     void start(const Challenge& ch, int from = 0) { run.start(ch, director, stage, analyst, from); }
     void step() {
+        if (space) director.skipCurrent();
         stage.advance(dt);
         if (stage.lessonMoves > 0) {
             stage.lessonMoves = 0;
@@ -113,6 +127,26 @@ struct Run {
         return until([&] { return game.moves().size() == plies && run.playerMayMove(game); }, 60.0f);
     }
 };
+
+bool boardIs(const chess::Game& game, const std::string& fen) {
+    chess::Position p;
+    p.setFEN(fen);
+    return game.position().samePosition(p);
+}
+
+// The player's move k of a line is awaited on the board the line expects (the set-up, the lead
+// and the coach's answers all on it), White to move, the solution legal there.
+void checkLineBoard(const chess::Game& game, const ChallengePosition& p, int k) {
+    chess::Position want;
+    CHECK(p.beforeMove(k, want));
+    const chess::Position& have = game.position();
+    if (!have.samePosition(want))
+        std::fprintf(stderr, "  %s, move %d: %s, not %s\n", p.source.c_str(), k + 1, have.fen().c_str(),
+                     want.fen().c_str());
+    CHECK(have.samePosition(want));
+    CHECK(have.sideToMove() == chess::White);
+    CHECK(have.parseUCI(p.line[size_t(2 * k)]).valid());
+}
 
 // Every line renders, written and spoken, every variant, in every language that has the key,
 // without a placeholder left.
@@ -185,9 +219,10 @@ TEST(challenge_book_reports_bad_lines) {
         "line b 0 | 6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1 | - | a1a8 g8f8\n"            // ends with the coach's move
         "line c 0 | 6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1 | - | a1a9\n"                 // not a move
         "play d | 7k/8/6K1/8/8/8/8/5Q2 w - - 0 1 | hold\n"                             // hold without moves
+        "play f | 7k/8/6K1/8/8/8/8/5B2 w - - 0 1 | mate\n"                             // no mate possible
         "line e 0 | 6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1 | - | a1a8\n",
         &errors);
-    CHECK_EQ(errors.size(), size_t(4));
+    CHECK_EQ(errors.size(), size_t(5));
     CHECK_EQ(b.challenges().size(), size_t(1));
     CHECK_EQ(b.challenges()[0].positions.size(), size_t(1));
     CHECK_EQ(b.challenges()[0].positions[0].source, std::string("e"));
@@ -388,6 +423,262 @@ TEST(challenge_run_play_out) {
     checkRenders(t.lines);
 }
 
+// N03: a hold whose last position the coach's answer stalemates (the board has no move left for
+// the player): solved once, with no wait on that position, and the challenge completed.
+TEST(challenge_run_hold_coach_stalemates_last_position) {
+    const char* fen = "8/8/8/8/4k3/8/4p3/5K2 w - - 0 1";
+    const ChallengeBook b = ChallengeBook::parse(std::string("challenge kp_hold endgames 3\nplay t:hold | ") + fen + " | hold 10\n");
+    Run t;
+    t.analyst.results[fenAfter(fen, "f1e1") + "|A0"] = levelAnalysis("e4e3");
+    t.start(bookChallenge(b, "kp_hold"));
+    CHECK(t.ready());
+    t.move("f1e1");
+    CHECK(t.until([&] { return t.run.finished(); }, 120.0f));
+    CHECK(t.run.completed());
+    CHECK_EQ(t.stage.all("playLessonMove").back().text, std::string("e4e3"));
+    CHECK(t.game.position().isStalemate());
+    // Nothing waits any more, and nothing is said twice.
+    t.until([] { return false; }, 10.0f);
+    CHECK(!t.run.playerMayMove(t.game));
+    CHECK(!t.director.waitingMove());
+    CHECK(t.director.idle());
+    CHECK_EQ(t.queued("ch.solved"), 1);
+    CHECK_EQ(t.queued("ch.solved.draw"), 1);
+    CHECK_EQ(t.queued("ch.complete"), 1);
+    CHECK_EQ(t.queued("ch.wrong"), 0);
+    CHECK_EQ(t.run.position(), 0);
+    checkRenders(t.lines);
+}
+
+// N03: the same stalemate with a position after it: solved once, then the next position waits for
+// the player's move, on its own board.
+TEST(challenge_run_hold_coach_stalemates_next_position) {
+    const char* fen = "8/8/8/8/4k3/8/4p3/5K2 w - - 0 1";
+    const char* second = "8/8/8/4p3/4k3/8/8/3K4 w - - 0 1";
+    const ChallengeBook b = ChallengeBook::parse(std::string("challenge kp_hold endgames 3\nplay t:hold | ") + fen +
+                                                 " | hold 10\nplay t:hold2 | " + second + " | hold 10\n");
+    Run t;
+    t.analyst.results[fenAfter(fen, "f1e1") + "|A0"] = levelAnalysis("e4e3");
+    t.start(bookChallenge(b, "kp_hold"));
+    CHECK(t.ready());
+    t.move("f1e1");
+    CHECK(t.until([&] { return t.run.position() == 1 && t.run.playerMayMove(t.game); }, 120.0f));
+    CHECK(!t.run.completed());
+    chess::Position start;
+    start.setFEN(second);
+    CHECK(t.game.position().samePosition(start));
+    CHECK(t.game.position().hasLegalMove());
+    CHECK_EQ(t.queued("ch.solved"), 1);
+    CHECK_EQ(t.queued("ch.solved.draw"), 1);
+    CHECK_EQ(t.queued("ch.last"), 1);
+    CHECK_EQ(t.queued("ch.task.play.hold"), 2);
+    CHECK_EQ(t.queued("ch.complete"), 0);
+    checkRenders(t.lines);
+}
+
+// N03: the coach's answer leaves no mating material (K+B v K): a draw on the board, the hold
+// solved once, with no wait after it.
+TEST(challenge_run_hold_coach_leaves_no_mating_material) {
+    const char* fen = "4k3/8/8/1b6/8/8/P7/4K3 w - - 0 1";
+    const ChallengeBook b = ChallengeBook::parse(std::string("challenge kp_hold endgames 3\nplay t:hold | ") + fen + " | hold 10\n");
+    Run t;
+    t.analyst.results[fenAfter(fen, "a2a4") + "|A0"] = levelAnalysis("b5a4");
+    t.start(bookChallenge(b, "kp_hold"));
+    CHECK(t.ready());
+    t.move("a2a4");
+    CHECK(t.until([&] { return t.run.finished(); }, 120.0f));
+    CHECK(t.game.position().hasInsufficientMaterial());
+    CHECK(t.game.position().hasLegalMove());
+    t.until([] { return false; }, 10.0f);
+    CHECK(!t.run.playerMayMove(t.game));
+    CHECK(!t.director.waitingMove());
+    CHECK_EQ(t.queued("ch.solved"), 1);
+    CHECK_EQ(t.queued("ch.solved.draw"), 1);
+    CHECK_EQ(t.queued("ch.complete"), 1);
+    checkRenders(t.lines);
+}
+
+// A mate play-out whose kept move the coach answers into a dead draw (the engine said the win was
+// kept): the win is gone on the board, so the move is wrong: answer shown, taken back, waiting
+// again, never a wait on the drawn board.
+TEST(challenge_run_play_out_answer_draws_on_the_board) {
+    const char* fen = "7k/8/8/8/8/8/8/K5Q1 w - - 0 1";
+    const ChallengeBook b = ChallengeBook::parse(std::string("challenge kq endgames 1\nplay t:kq | ") + fen + " | mate\n");
+    Run t;
+    t.analyst.results[fenAfter(fen, "g1g8") + "|A0"] = mateAnalysis(-5, "h8g8");
+    t.start(bookChallenge(b, "kq"));
+    CHECK(t.ready());
+    t.move("g1g8");
+    CHECK(t.backAndWaiting(0));
+    CHECK_EQ(t.queued("ch.wrong.draw"), 1);
+    CHECK_EQ(t.stage.all("demoMove").back().text, std::string("h8g8"));
+    CHECK_EQ(t.stage.count("playLessonMove"), 0);
+    CHECK_EQ(t.queued("ch.solved"), 0);
+    CHECK(!t.run.completed());
+    checkRenders(t.lines);
+}
+
+// A play-out move the coach answers with checkmate (a back-rank mate): said as a mate, proved by
+// the board ("would be checkmate"), whatever the goal; the move taken back, waiting again.
+TEST(challenge_run_play_out_answer_mates_on_the_board) {
+    const char* fen = "r5k1/5ppp/8/7N/8/8/5PPP/6K1 w - - 0 1";
+    for (const char* goal : {"mate", "hold 10"}) {
+        const char* id = std::string(goal) == "mate" ? "kq" : "kp_hold";
+        const ChallengeBook b =
+            ChallengeBook::parse(std::string("challenge ") + id + " endgames 2\nplay t:m | " + fen + " | " + goal + "\n");
+        Run t;
+        t.analyst.results[fenAfter(fen, "h5f4") + "|A0"] = mateAnalysis(1, "a8a1");   // the coach mates in 1
+        t.start(bookChallenge(b, id));
+        CHECK(t.ready());
+        t.move("h5f4");
+        CHECK(t.backAndWaiting(0));
+        CHECK_EQ(t.queued("ch.wrong.mate"), 1);
+        CHECK_EQ(t.queued("ch.wrong.loses"), 0);
+        CHECK_EQ(t.stage.all("demoMove").back().text, std::string("a8a1"));
+        CHECK_EQ(t.stage.count("playLessonMove"), 0);
+        CHECK(!t.run.completed());
+        checkRenders(t.lines);
+    }
+}
+
+// A hint asked for while the play-out's analysis runs, then a move made before it came back: the
+// hint was about the position left, so it is dropped (never said while the move is judged, nor
+// after the coach's answer, on another board); H gives one at the next wait.
+TEST(challenge_run_play_out_hint_asked_then_moved) {
+    const ChallengeBook b = ChallengeBook::parse(kBook);
+    const char* fen = "7k/8/6K1/8/8/8/8/5Q2 w - - 0 1";
+    Run t;
+    t.analyst.results[fenAfter(fen, "f1e2") + "|A0"] = mateAnalysis(-1, "h8g8");
+    t.analyst.delay = 1 << 20;   // the hint's analysis of the start position does not come back
+    t.start(bookChallenge(b, "kq"));
+    CHECK(t.ready());
+    CHECK(t.run.hintAvailable(t.game));
+    t.run.requestHint(t.game);
+    CHECK(!t.run.hintAvailable(t.game));   // asked for, on its way
+    t.analyst.delay = 3;
+    t.move("f1e2");   // the move stops the hint's analysis: its move comes back at once
+    CHECK(t.ready());
+    CHECK_EQ(t.game.moves().size(), size_t(2));
+    t.until([] { return false; }, 5.0f);
+    CHECK_EQ(t.queued("ch.hint"), 0);
+    CHECK_EQ(t.stage.count("demoMove"), 0);
+    // At the next wait, H gives the hint of the new position.
+    CHECK(t.until([&] { return t.run.hintAvailable(t.game); }, 60.0f));
+    t.run.requestHint(t.game);
+    CHECK(t.until([&] { return t.queued("ch.hint") == 1; }, 30.0f));
+    checkRenders(t.lines);
+}
+
+// A play-out whose hint analysis came back without a move (twice): no hint can be given, so none
+// is offered after the wrong moves (the offer would get no hint after a yes).
+TEST(challenge_run_play_out_no_hint_offer_without_a_move) {
+    const ChallengeBook b = ChallengeBook::parse(kBook);
+    const char* fen = "7k/8/6K1/8/8/8/8/5Q2 w - - 0 1";
+    chess::Position start;
+    start.setFEN(fen);
+    Run t;
+    ai::Analysis failed;
+    failed.ok = false;
+    t.analyst.results[start.fen() + "|A0"] = failed;
+    t.start(bookChallenge(b, "kq"));
+    CHECK(t.ready());
+    CHECK(t.until([&] { return t.analyst.count("A0", start.fen()) == 2 && t.analyst.idle(); }, 30.0f));
+    CHECK(!t.run.hintAvailable(t.game));
+    for (int i = 0; i < kHintOfferAfter; ++i) {
+        t.move("f1a1");   // the win goes (the fake engine's level line)
+        CHECK(t.backAndWaiting(0));
+    }
+    t.until([] { return false; }, 5.0f);
+    CHECK_EQ(t.queued("ch.wrong.draw"), kHintOfferAfter);
+    CHECK_EQ(t.queued("ch.offer"), 0);
+    CHECK_EQ(t.queued("ch.try_again"), kHintOfferAfter);
+    CHECK(!t.run.offerOpen());
+    CHECK(t.run.playerMayMove(t.game));
+    checkRenders(t.lines);
+}
+
+// Audit N04: Space while a position was being set up (the intro's hand still going back) dropped
+// the SetPosition: the wait came on the board left before, where the solution is not legal. The
+// audit's probe (the first position of the embedded mate1, no voice), then the whole set with
+// Space at every frame: each position set up, its lead played, the set completed.
+TEST(challenge_run_space_keeps_the_set_up) {
+    const Challenge& ch = bookChallenge(ChallengeBook::shared(), "mate1");
+    CHECK(!ch.positions.empty());
+    if (ch.positions.empty()) return;
+    {
+        const ChallengePosition& p = ch.positions.front();
+        Run t;
+        t.stage.voice = false;
+        t.start(ch);
+        CHECK(t.until([&] { return t.stage.count("endGestures") > 0; }, 30.0f));
+        CHECK_EQ(t.stage.count("setPosition"), 0);
+        CHECK(t.stage.bodyBusy());
+        CHECK(!t.director.skippable());   // the set-up waits for the hand: nothing to skip
+        t.director.skipCurrent();
+        CHECK(t.ready());
+        CHECK_EQ(t.stage.count("setPosition"), 1);
+        CHECK_EQ(t.stage.count("playLessonMove"), p.lead.empty() ? 0 : 1);
+        checkLineBoard(t.game, p, 0);
+    }
+    Run t;
+    t.stage.voice = false;
+    t.space = true;
+    t.start(ch);
+    int leads = 0;
+    for (const ChallengePosition& p : ch.positions) {
+        leads += p.lead.empty() ? 0 : 1;
+        for (int k = 0; k < p.playerMoves(); ++k) {
+            CHECK(t.ready());
+            checkLineBoard(t.game, p, k);
+            t.move(p.line[size_t(2 * k)].c_str());
+        }
+    }
+    CHECK(t.run.completed());
+    CHECK_EQ(t.stage.count("setPosition"), int(ch.positions.size()));
+    CHECK_EQ(t.stage.count("playLessonMove"), leads);
+}
+
+// Space at every frame, through a lead, an answer of the line, the coach's answer in a play-out
+// and the moves to the next position: every board action stands (audit N04).
+TEST(challenge_run_space_at_every_frame) {
+    const ChallengeBook b = ChallengeBook::parse(kBook);
+    {
+        const Challenge& ch = bookChallenge(b, "mate1");
+        Run t;
+        t.space = true;
+        t.start(ch);
+        for (const ChallengePosition& p : ch.positions) {
+            for (int k = 0; k < p.playerMoves(); ++k) {
+                CHECK(t.ready());
+                checkLineBoard(t.game, p, k);
+                t.move(p.line[size_t(2 * k)].c_str());
+            }
+        }
+        CHECK(t.run.completed());
+        CHECK_EQ(t.stage.count("setPosition"), 2);
+        const auto played = t.stage.all("playLessonMove");   // the lead, the line's answer
+        CHECK(played.size() == 2 && played[0].text == "a2c3" && played[1].text == "g8f8");
+    }
+    {
+        const char* fen = "7k/8/6K1/8/8/8/8/5Q2 w - - 0 1";
+        Run t;
+        t.space = true;
+        t.analyst.results[fenAfter(fen, "f1e2") + "|A0"] = mateAnalysis(-1, "h8g8");
+        t.start(bookChallenge(b, "kq"));
+        CHECK(t.ready());
+        CHECK(boardIs(t.game, fen));
+        t.move("f1e2");
+        CHECK(t.ready());
+        CHECK(boardIs(t.game, fenAfter(fenAfter(fen, "f1e2").c_str(), "h8g8")));
+        t.move("e2e8");
+        CHECK(t.until([&] { return t.run.position() == 1; }, 30.0f));
+        CHECK(t.ready());
+        CHECK(boardIs(t.game, "8/8/8/4k3/4p3/8/8/4K3 w - - 0 1"));
+        CHECK_EQ(t.stage.count("setPosition"), 2);
+        CHECK_EQ(t.stage.count("playLessonMove"), 1);
+    }
+}
+
 TEST(challenge_book_embedded) {
     const ChallengeBook& b = ChallengeBook::shared();
     std::vector<std::string> errors;
@@ -420,7 +711,8 @@ TEST(challenge_book_embedded) {
 }
 
 TEST(challenge_session_whole_set) {
-    // The first set of the embedded book made of lines only, solved through the session.
+    // The first set of the embedded book made of lines only, solved through the session; again with
+    // Space (the session's skip) at every frame.
     const ChallengeBook& b = ChallengeBook::shared();
     const Challenge* pick = nullptr;
     for (const Challenge& c : b.challenges()) {
@@ -433,62 +725,66 @@ TEST(challenge_session_whole_set) {
     }
     CHECK(pick != nullptr);
     if (!pick) return;
-    fake::Stage stage;
-    fake::Analyst analyst;
-    Session session;
-    chess::Game game;
-    game.setEndDetection(false);
-    stage.game = &game;
-    std::vector<Line> lines;
-    session.director().setObserver([&](const Beat& bt) {
-        if (!bt.line.key.empty()) lines.push_back(bt.line);
-    });
-    SessionConfig cfg;
-    cfg.level = 3;
-    cfg.human = chess::Black;   // ignored: the challenges are played with White
-    cfg.challenge = pick->id;
-    session.start(stage, analyst, game, cfg);
-    CHECK(session.challengeMode());
-    CHECK_EQ(session.challengePositions(), int(pick->positions.size()));
-    CHECK(session.offerIsHint());
-    const float dt = 1.0f / 60.0f;
-    auto step = [&] {
-        stage.advance(dt);
-        if (stage.lessonMoves > 0) {
-            stage.lessonMoves = 0;
-            session.onMove(game);
+    for (bool space : {false, true}) {
+        fake::Stage stage;
+        fake::Analyst analyst;
+        Session session;
+        chess::Game game;
+        game.setEndDetection(false);
+        stage.game = &game;
+        std::vector<Line> lines;
+        session.director().setObserver([&](const Beat& bt) {
+            if (!bt.line.key.empty()) lines.push_back(bt.line);
+        });
+        SessionConfig cfg;
+        cfg.level = 3;
+        cfg.human = chess::Black;   // ignored: the challenges are played with White
+        cfg.challenge = pick->id;
+        session.start(stage, analyst, game, cfg);
+        CHECK(session.challengeMode());
+        CHECK_EQ(session.challengePositions(), int(pick->positions.size()));
+        CHECK(session.offerIsHint());
+        const float dt = 1.0f / 60.0f;
+        auto step = [&] {
+            if (space) session.skip();
+            stage.advance(dt);
+            if (stage.lessonMoves > 0) {
+                stage.lessonMoves = 0;
+                session.onMove(game);
+            }
+            session.update(game, dt);
+        };
+        auto until = [&](const std::function<bool()>& cond, float seconds) {
+            for (float t = 0.0f; t < seconds; t += dt) {
+                if (cond()) return true;
+                step();
+            }
+            return cond();
+        };
+        for (size_t i = 0; i < pick->positions.size(); ++i) {
+            const ChallengePosition& p = pick->positions[i];
+            for (int k = 0; k < p.playerMoves(); ++k) {
+                CHECK(until([&] { return session.playerMayMove(game); }, 120.0f));
+                CHECK_EQ(session.challengePosition(), int(i));
+                CHECK(session.hintAvailable(game));
+                CHECK(!session.canTakeBack(game));
+                CHECK(session.coachMayMove());
+                checkLineBoard(game, p, k);
+                const chess::Move m = game.position().parseUCI(p.line[size_t(2 * k)]);
+                CHECK(m.valid());
+                if (!m.valid()) return;
+                game.play(m);
+                session.onMove(game);
+            }
         }
-        session.update(game, dt);
-    };
-    auto until = [&](const std::function<bool()>& cond, float seconds) {
-        for (float t = 0.0f; t < seconds; t += dt) {
-            if (cond()) return true;
-            step();
-        }
-        return cond();
-    };
-    for (size_t i = 0; i < pick->positions.size(); ++i) {
-        const ChallengePosition& p = pick->positions[i];
-        for (int k = 0; k < p.playerMoves(); ++k) {
-            CHECK(until([&] { return session.playerMayMove(game); }, 120.0f));
-            CHECK_EQ(session.challengePosition(), int(i));
-            CHECK(session.hintAvailable(game));
-            CHECK(!session.canTakeBack(game));
-            CHECK(session.coachMayMove());
-            const chess::Move m = game.position().parseUCI(p.line[size_t(2 * k)]);
-            CHECK(m.valid());
-            if (!m.valid()) return;
-            game.play(m);
-            session.onMove(game);
-        }
+        CHECK(session.challengeCompleted());
+        CHECK(until([&] { return session.handshakeWanted(); }, 120.0f));
+        session.onHandshakeDone(game);
+        CHECK(session.finished());
+        CHECK(session.history().empty());
+        CHECK_EQ(analyst.asked.size(), size_t(0));   // right moves need no engine
+        checkRenders(lines);
     }
-    CHECK(session.challengeCompleted());
-    CHECK(until([&] { return session.handshakeWanted(); }, 120.0f));
-    session.onHandshakeDone(game);
-    CHECK(session.finished());
-    CHECK(session.history().empty());
-    CHECK_EQ(analyst.asked.size(), size_t(0));   // right moves need no engine
-    checkRenders(lines);
 }
 
 TEST(challenge_speech_renders_everywhere) {

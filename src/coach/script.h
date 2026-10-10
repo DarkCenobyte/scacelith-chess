@@ -139,7 +139,8 @@ struct Beat {
     float seconds = 0.0f;      // Pause
     std::string fen;           // SetPosition
     int expect = -1;           // WaitMove: index into the lesson's expectations
-    bool skippable = true;     // Space skips it (a Rewind is never skipped, it only goes faster)
+    bool skippable = true;     // Space skips it (a Rewind is never skipped, it only goes faster;
+                               // a SetPosition or PlayMove never, the board needs it)
     Priority priority = Priority::Normal;
     int ply = -1;              // game ply the beat is about (-1: none); stale Low beats are dropped
 };

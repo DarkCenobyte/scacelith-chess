@@ -38,6 +38,12 @@ bool tableBeat(BeatKind k) {
     return k == BeatKind::DemoMove || k == BeatKind::Rewind || k == BeatKind::SetPosition || k == BeatKind::PlayMove;
 }
 
+// Space never removes a beat that sets the board or plays a move on it for good: what comes after
+// (a wait for the player's move above all) stands on it, whatever the script's flag says.
+bool removable(const Beat& b) {
+    return b.skippable && b.kind != BeatKind::SetPosition && b.kind != BeatKind::PlayMove;
+}
+
 bool speaksLine(const Beat& b) {
     switch (b.kind) {
     case BeatKind::Say:
@@ -729,7 +735,7 @@ struct Director::Impl {
         const Beat& b = run.item.beat;
         if (b.kind == BeatKind::Rewind) return !run.fast;
         if (run.phase == Phase::Offer) return false;
-        return b.skippable;
+        return removable(b);
     }
 
     // Space: the running beat, and with 'rest' the skippable beats of its script queued after it.
@@ -744,7 +750,7 @@ struct Director::Impl {
             }
             return;
         }
-        if (!b.skippable || run.phase == Phase::Offer) return;
+        if (!removable(b) || run.phase == Phase::Offer) return;
         // The rest of the script: skippable beats go; an offer stays (its card only); a rewind
         // stays and goes briskly.
         for (auto it = queue.begin(); rest && it != queue.end();) {
@@ -759,7 +765,7 @@ struct Director::Impl {
             } else if (it->beat.kind == BeatKind::Rewind) {
                 it->fast = true;
                 ++it;
-            } else if (it->beat.skippable) {
+            } else if (removable(it->beat)) {
                 drop(*it);
                 it = queue.erase(it);
             } else {
