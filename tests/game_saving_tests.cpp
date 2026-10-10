@@ -63,6 +63,7 @@ TEST(saving_mode_table) {
     CHECK(!saved(GameMode::Online, false, -1));    // a server game: the server keeps it
     CHECK(!saved(GameMode::Watch, false, -1));     // the viewer mode
     CHECK(!saved(GameMode::Replay, false, -1));    // a replay is never saved again
+    CHECK(!saved(GameMode::Analysis, false, -1));  // nor a game being analysed
     // Left before any move: only when it has a result (a resignation).
     CHECK(!archive::shouldSave(saving::archiveMode(GameMode::HotSeat, false), -1, 0, false, true));
     CHECK(archive::shouldSave(saving::archiveMode(GameMode::Play, false), -1, 0, true, true));

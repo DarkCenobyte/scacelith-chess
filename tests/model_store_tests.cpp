@@ -751,6 +751,27 @@ TEST(coach_voice_setting_round_trip) {
     CHECK(!back.coachVoice);
 }
 
+// [coach] voice_offered and the [analysis] toggles: off / on by default, kept.
+TEST(analysis_settings_round_trip) {
+    game::Settings fresh;
+    IniFile empty;
+    game::readCoachSettings(empty, fresh);
+    CHECK(!fresh.coachVoiceOffered);
+    CHECK(fresh.analysisComments && fresh.analysisVoice && fresh.analysisArrows);
+    game::Settings s;
+    s.coachVoiceOffered = true;
+    s.analysisComments = false;
+    s.analysisArrows = false;
+    IniFile out;
+    game::writeCoachSettings(out, s);
+    game::Settings back;
+    game::readCoachSettings(out, back);
+    CHECK(back.coachVoiceOffered);
+    CHECK(!back.analysisComments);
+    CHECK(back.analysisVoice);
+    CHECK(!back.analysisArrows);
+}
+
 // The real thing, once, by hand (needs the network, not run by default):
 //   SCACELITH_NET_TESTS=1 ./scacelith_tests model_store_real_github
 // downloads the release archive from GitHub into a temporary folder (no hub: the fallback path),

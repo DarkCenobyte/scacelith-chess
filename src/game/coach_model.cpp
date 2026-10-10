@@ -140,6 +140,12 @@ bool coachModelNeedsPrompt() {
 
 void openModelPrompt() { state().promptOpen = true; }
 
+bool offerVoiceForAnalysis() {
+    if (settings().coachVoiceOffered || !coachModelNeedsPrompt()) return false;
+    openModelPrompt();
+    return true;
+}
+
 bool coachModelInstalled(int* fetched) {
     ModelUi& u = state();
     bool r = u.installed;
@@ -193,6 +199,11 @@ void drawModelDownload() {
         case ui::ModelPanelAction::None: break;
     }
 
+    if (u.promptOpen && !settings().coachVoiceOffered) {
+        // Remembered: the Analysis mode offers the voice only to a player who never saw this.
+        settings().coachVoiceOffered = true;
+        settings().save();
+    }
     if (u.promptOpen) {
         ui::ModelPrompt mp;
         mp.bytes = double(tts::supertonicManifest().totalBytes());

@@ -165,6 +165,16 @@ struct Settings {
     // option needs it. Off = the coach's words as subtitles only; declining the download prompt
     // switches it off (remembered), switching it back on offers the download again.
     bool coachVoice = true;
+    // [coach] voice_offered: the download prompt was shown once (from the Coach page, the option,
+    // or the Analysis mode). The Analysis mode offers the voice only when it never was: a player
+    // who already saw the offer elsewhere is not asked again there.
+    bool coachVoiceOffered = false;
+    // [analysis] the Analysis mode's toggles (its overlay's buttons, kept from game to game): the
+    // commentator's comments on the key moments (written and, with the voice, said), its voice,
+    // and the arrows of the better moves.
+    bool analysisComments = true;
+    bool analysisVoice = true;
+    bool analysisArrows = true;
     // [archive] saved games (game_archive.h): the games played on this PC and the direct matches
     // are saved as PGN files in the pgn folder of the user data directory when they end.
     bool saveGames = true;
@@ -195,7 +205,7 @@ struct Settings {
 
 Settings& settings();
 
-// The [coach] and [tts] sections of Settings::load / save, apart so that the unit tests can check
+// The [coach], [tts] and [analysis] sections of Settings::load / save, apart so that the unit tests can check
 // their round trip without the game target (settings_coach.cpp is in the core library). The
 // history is one line of "level:result:accuracy" entries, oldest first ("3:1:81.4 3:-1:-").
 std::string encodeCoachHistory(const std::vector<Settings::CoachGame>& games);

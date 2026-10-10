@@ -8,7 +8,9 @@
 //   - the player opens the Coach page (title page) while [coach] voice is on and the model is
 //     not all there: the prompt shows over the Coach page (hooked through ui::setCoachEntryHook);
 //   - the player switches Options > Audio > Coach voice on (applied) and the model is missing;
-//   - the voice failed to load files that looked complete (coachModelLoadFailed), once.
+//   - the voice failed to load files that looked complete (coachModelLoadFailed), once;
+//   - the player opens a game in the Analysis mode, the voice is on, the model missing, and the
+//     prompt was never shown before (Settings::coachVoiceOffered; offerVoiceForAnalysis).
 // "Not now" (or Esc) switches [coach] voice off and saves: the coach speaks through subtitles,
 // and is not offered the download again until the player switches the voice back on.
 //
@@ -49,6 +51,10 @@ void coachModelInit();
 bool coachModelNeedsPrompt();
 // Opens the prompt (drawn by drawModelDownload from this frame on).
 void openModelPrompt();
+// The Analysis mode starts: opens the prompt when the voice is wanted, its model is missing, and
+// the player was never offered it (from the Coach page, the option, or an earlier analysis).
+// Returns whether it opened.
+bool offerVoiceForAnalysis();
 // The prompt (modal), the progress panel (top end corner) and the notices; also notices that the
 // Coach voice option was switched on. Every frame, after the menus / HUD, before ui::endFrame().
 void drawModelDownload();
