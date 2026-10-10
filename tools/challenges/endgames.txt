@@ -1,0 +1,51 @@
+# Hand-written play-outs of the coach's challenges, White to move, in the format of
+# assets/coach/challenges/challenges.txt (its header documents the "play" lines). The challenge
+# lines name sets of tools/challenges/candidates.txt (select.py's table, which also says how many
+# positions each set needs: "# want <n>"). tools/challenge_audit checks every position with the
+# embedded Stockfish and keeps the first ones that pass, in this order: write spares.
+
+# Queen and king against king: the lone king in the middle, no stalemate in one, the queen safe.
+challenge kq endgames 1
+play scacelith:kq1 | 8/8/8/3k4/8/8/8/Q3K3 w - - 0 1 | mate
+play scacelith:kq2 | 8/8/4k3/8/8/8/8/3QK3 w - - 0 1 | mate
+play scacelith:kq3 | 8/8/3k4/8/8/8/1Q6/6K1 w - - 0 1 | mate
+play scacelith:kq4 | 8/8/8/4k3/8/8/8/K6Q w - - 0 1 | mate
+play scacelith:kq5 | 8/8/8/8/3k4/8/8/4K2Q w - - 0 1 | mate
+
+# Rook and king against king.
+challenge kr endgames 2
+play scacelith:kr1 | 8/8/8/3k4/8/8/8/R3K3 w - - 0 1 | mate
+play scacelith:kr2 | 8/8/4k3/8/8/8/8/4K2R w - - 0 1 | mate
+play scacelith:kr3 | 8/8/8/3k4/8/2K5/8/7R w - - 0 1 | mate
+play scacelith:kr4 | 8/8/8/4k3/8/8/8/R5K1 w - - 0 1 | mate
+play scacelith:kr5 | 8/8/3k4/8/8/8/8/1R2K3 w - - 0 1 | mate
+
+# King and pawn against king, won: the king on the sixth rank in front of its pawn, the king in
+# front of the pawn with a spare pawn move or a king move that takes the opposition.
+challenge kp endgames 2
+play scacelith:kp1 | 4k3/8/4K3/8/4P3/8/8/8 w - - 0 1 | promote
+play scacelith:kp2 | 3k4/8/3K4/3P4/8/8/8/8 w - - 0 1 | promote
+play scacelith:kp3 | 8/8/4k3/8/4K3/8/4P3/8 w - - 0 1 | promote
+play scacelith:kp4 | 8/4k3/8/5K2/4P3/8/8/8 w - - 0 1 | promote
+play scacelith:kp5 | 8/4k3/8/4K3/8/4P3/8/8 w - - 0 1 | promote
+play scacelith:kp6 | 8/8/2k5/8/2K5/8/2P5/8 w - - 0 1 | promote
+
+# Stop the pawn: the lone king takes the opposition in front of the pawn (one move does, the
+# others let the coach's king through).
+challenge kp_hold endgames 3
+play scacelith:kph1 | 8/8/8/4p3/4k3/8/8/3K4 w - - 0 1 | hold 10
+play scacelith:kph2 | 8/8/4p3/4k3/8/8/3K4/8 w - - 0 1 | hold 10
+play scacelith:kph3 | 8/8/8/4p3/5k2/8/4K3/8 w - - 0 1 | hold 10
+play scacelith:kph4 | 8/8/8/8/4p3/3k4/8/4K3 w - - 0 1 | hold 10
+play scacelith:kph5 | 8/8/8/3p4/3k4/8/8/2K5 w - - 0 1 | hold 10
+
+# Rook endings: the Lucena position (build the bridge and promote) and the Philidor defence
+# (the rook on the third rank until the pawn advances, then checks from behind).
+challenge rook endgames 4
+play scacelith:lucena1 | 1K6/1P1k4/8/8/8/8/r7/2R5 w - - 0 1 | promote
+play scacelith:philidor1 | 8/8/8/8/3kp3/1R6/r7/4K3 w - - 0 1 | hold 12
+play scacelith:lucena2 | 3K4/3P1k2/8/8/8/8/2r5/4R3 w - - 0 1 | promote
+play scacelith:philidor2 | 8/8/8/8/4pk2/7R/1r6/4K3 w - - 0 1 | hold 12
+play scacelith:lucena3 | 2K5/2P1k3/8/8/8/8/1r6/3R4 w - - 0 1 | promote
+play scacelith:philidor3 | 8/8/8/8/2kp4/6R1/7r/3K4 w - - 0 1 | hold 12
+play scacelith:lucena4 | 4K3/4P1k1/8/8/8/8/3r4/5R2 w - - 0 1 | promote

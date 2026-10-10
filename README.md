@@ -422,6 +422,13 @@ through the Analysis comments, each flagging a claim the board does not bear out
 that stops before its point, a piece named that was traded back, a loss the best move suffers too).
 See `tools/coach_audit/audit.h`.
 
+The positions of the coach's challenges are picked from Lichess puzzle rows by
+`tools/challenges/select.py` (`python3 -I tools/challenges/select.py puzzles.tsv...`), then the
+challenge audit (`ninja -C build challenge_audit`, Linux only; run `./build/challenge_audit` from
+the repository root) checks each one with the embedded Stockfish, together with the hand-written
+endgames of `tools/challenges/endgames.txt`, and writes `assets/coach/challenges/challenges.txt`
+with the positions it proves. See `tools/challenge_audit/audit.h`.
+
 Wine names the Linux files in the character set of the host locale: in the POSIX locale (`LANG`
 unset, common in containers) that is ASCII, a file named after "Élodie" cannot be created and the
 saved games' tests fail although Windows takes the name. `tools/test_win.sh` and
@@ -556,6 +563,9 @@ fonts, of Stockfish's authors, of the QR code generator and of the opening names
   `khrplatform.h`; only their declarations are used): MIT, © The Khronos Group Inc.
 - **Opening names** from lichess's [chess-openings](https://github.com/lichess-org/chess-openings)
   (`assets/coach/openings_data/`): CC0-1.0 (`assets/licences/lichess-chess-openings-CC0.txt`).
+- **Puzzles** of the [Lichess puzzle database](https://database.lichess.org/#puzzles), the
+  positions of the coach's challenges (`assets/coach/challenges/challenges.txt`, some mirrored so
+  that White is to play): CC0-1.0.
 - **Unicode Character Database** 14.0, from which the NFKD table of the coach's voice
   (`src/tts/nfkd_table.cpp`) is generated: Unicode licence (Unicode-DFS-2016), © Unicode, Inc.
 - **Fonts.** The Cinzel, EB Garamond and Amiri (Khaled Hosny) interface fonts and the handwriting

@@ -1,0 +1,656 @@
+# Candidates of the coach's challenges, written by tools/challenges/select.py from sampled rows of
+# the Lichess puzzle database (CC0). Do not edit: run select.py again. tools/challenge_audit checks
+# them with the embedded Stockfish, keeps the first <want> valid ones of each set (here in
+# preference order: round-robin over rating bands, the most popular first), sorts them by rating
+# and writes assets/coach/challenges/challenges.txt (whose header documents the format).
+# Two additions to that format, read by the audit only:
+#   # want <n>                               (after a challenge line) the positions the set needs
+#   line <src> <rating> | <fen> | - | ?      an escape candidate: the set-up of a mate puzzle, the
+#                                            defender (White) to move; the audit finds the move
+#                                            that holds. <rating> is the mate puzzle's.
+# Sets without candidates here are hand-written: tools/challenges/endgames.txt.
+
+challenge mate1 mates 1
+# want 8
+line lichess:NXcFq 430 | r5Rk/7P/6RK/8/8/8/p7/8 b - - 1 62 | a8g8 | h7g8q
+line lichess:T5hdD 601 | r1b1r1k1/pp3pp1/7p/1N1pb3/3p3q/3B2P1/PPP1Q2P/R4R1K b - - 0 16 | e5g3 | e2e8
+line lichess:Lcsmb 653 | 5rk1/2R3pp/p3q3/1p1pPp2/1P6/6Q1/P5PP/6K1 b - - 1 35 | f5f4 | g3g7
+line lichess:fOkNP 775 | 4r1r1/3k4/6p1/ppNpP3/P2P2Q1/8/5PK1/2q5 b - - 1 32 | d7d8 | g4d7
+line lichess:PWS6p/m 883 | 8/8/4r2p/2p1q1p1/3p4/1Q1k2P1/6KP/8 b - - 19 53 | d3e4 | b3f3
+line lichess:CgArU/m 1025 | r2qkb1r/ppp2ppp/2n2n2/5bN1/4p3/1QN3P1/PP1PPPBP/R1B1K2R b KQkq - 7 9 | c6d4 | b3f7
+line lichess:AyVMF 1171 | r3r2k/pppnq1p1/1b1p3p/3P2N1/2P5/5PPB/PPQ4P/4RR1K b - - 0 21 | e7e1 | c2h7
+line lichess:T5i5E 1287 | 4R1k1/6p1/7p/1q1pPB1P/2nP4/5NP1/5P2/4b1K1 b - - 2 42 | g8f7 | f5g6
+line lichess:pbqfU 466 | 4r2k/8/p1B2p2/1p2p3/8/4Q1qp/P1P5/4R2K b - - 3 42 | e8g8 | e3h6
+line lichess:wIKQc 607 | r1b1r1k1/5ppp/p1Q5/1p6/8/P1P5/PB2qPPP/R4RK1 b - - 0 17 | e2b2 | c6e8
+line lichess:QUluH/m 670 | 2r2r1k/p4qpp/2p5/5R2/3Bp3/1P2P1Q1/P4P2/5R1K b - - 0 24 | f7f5 | g3g7
+line lichess:TuINk 791 | 4rrk1/p5pp/1p1q4/2Pp1p2/7P/2Q4B/PP3P2/5KR1 b - - 0 23 | d6c5 | c3g7
+line lichess:Lcsx2 933 | 4q2k/2Q4p/2b5/5pN1/2Pb4/1P5P/8/5K2 b - - 5 54 | d4f6 | c7h7
+line lichess:N76G2 984 | r1b2Rk1/pp2q3/2n1p2Q/3np1N1/2BP4/2P5/P5PP/R5K1 b - - 0 18 | e7f8 | h6h7
+line lichess:TuH1w 1176 | 6R1/8/8/4ppkP/5R2/6P1/3rrPK1/8 b - - 1 41 | g5h5 | f4h4
+line lichess:QUmpA/m 1272 | 8/8/3K1pp1/5k2/5P1p/3nPP2/6B1/8 b - - 1 48 | d3e1 | g2h3
+line lichess:FOHn8/m 417 | r1b2rk1/ppp2ppp/2n5/8/2P1Q3/3q2PP/PP1N1P2/RN2K2R b KQ - 0 14 | f8e8 | e4e8
+line lichess:PzYkX/m 610 | r1bq1rk1/p3nppp/2nbp3/1p1p4/3P4/2P2N2/PPQN1PPP/RBB1K2R b KQ - 1 10 | b5b4 | c2h7
+line lichess:T5ik6 665 | r2q1k1r/5ppp/2nN1b2/3Qp3/4P3/P1N5/2P2PPP/R4K2 b - - 2 17 | c6d4 | d5f7
+line lichess:iReFW 746 | 4r1k1/2p2RPp/p3b3/2p1q1BQ/3p4/2P5/PrP3PP/5RK1 b - - 0 22 | e6f7 | h5f7
+line lichess:2mgBQ 940 | 1R6/p2p1Qp1/b3p2p/2q1P2k/2p2P1N/2P4P/P1P3PK/3r4 b - - 0 31 | h5h4 | g2g3
+line lichess:mRtSR 1001 | rn1qkb1r/ppp1pppp/5n2/4N3/2BP2b1/8/PPP3PP/RNBQK2R b KQkq - 2 6 | g4d1 | c4f7
+line lichess:HZinW/m 1172 | r2N2k1/bpp1q1pp/p4r1N/8/1PQ5/P3P3/5PPP/4K2R b K - 8 26 | g8f8 | c4g8
+line lichess:wILaZ 1190 | 2r1r3/1p3pbp/p5p1/2nB4/2k5/4P3/PP1Q1PPP/3bB1K1 b - - 3 29 | c4b5 | d2b4
+line lichess:Cg9pz 461 | r4k1r/p1p2p2/b4p2/1pp2N1p/4PbP1/3R1P1P/PPP3B1/1K1R4 b - - 3 20 | a6c8 | d3d8
+line lichess:wCv5b 583 | r1bq1rk1/pp3ppp/2nb1n2/3B2N1/8/2PQ2PP/PP3P2/RNB1K2R b KQ - 0 11 | f6d5 | d3h7
+line lichess:LaN3A/m 664 | rn1qkb1r/ppp1pppp/5n2/8/2B3b1/1Q2P3/PP1P1PPP/RNB1K1NR b KQkq - 0 5 | b8d7 | c4f7
+line lichess:Pv8lV 772 | r2q1r2/1pp1p2k/p1n1B1p1/3p2P1/5b2/2P1P3/PP1NKPP1/R6Q b - - 1 19 | h7g7 | h1h6
+line lichess:LkBAA 885 | r2q1rk1/pppb1ppp/2nb1n2/3Np1N1/2BP4/P3P3/1PQB1PPP/3RK2R b K - 3 13 | f6d5 | c2h7
+line lichess:0AW67 977 | 5r1k/p3p2p/4P3/3p2Q1/7P/2P5/PP2q1RK/8 b - - 4 37 | e2e6 | g5g7
+line lichess:oSW32/m 1111 | rnbq2nr/1Bp3p1/3b2kp/pQ6/4P2P/8/PPPP1PP1/RNB1K2R b KQ - 2 11 | c8b7 | b5f5
+line lichess:pbtWT 1224 | 8/1p5p/5pp1/p2p3k/N1P5/1P4QK/1P1q4/8 b - - 3 37 | d5d4 | g3h4
+
+challenge mate2 mates 2
+# want 6
+line lichess:GkACG/m 993 | 6k1/1p3b2/2p4Q/2q3N1/8/p5P1/6PK/8 b - - 0 36 | a3a2 | h6h7 g8f8 h7f7
+line lichess:3rv4o/m 1130 | r4r2/pbpp1B1k/1p1b1Q2/8/4q3/2P2PP1/PPP4P/R4RK1 b - - 0 18 | e4e5 | f6g6 h7h8 g6h6
+line lichess:fOkjn/m 1162 | 1r6/2p3pp/1r1bPk2/3Bp2P/3P4/8/PP2PP1P/n1BK2R1 b - - 0 20 | b6b2 | c1g5 f6f5 e2e4
+line lichess:Jjopf 1352 | 2kr3r/2np2p1/2pBp2q/p1P5/3PP1p1/P1pB2P1/4Q2P/1R4K1 b - - 6 29 | h6d2 | d3a6 c7a6 e2a6
+line lichess:dw1PC/m 1444 | 4r2k/1b3qR1/5p1P/p1p5/1p6/8/PPP5/1K4Q1 b - - 2 38 | f7e6 | g7h7 h8h7 g1g7
+line lichess:dvzel/m 1567 | 5r1k/pq3pBp/3n4/3p4/5R2/3P1Q2/P1r3PP/R4K2 b - - 0 23 | h8g7 | f4g4 g7h8 f3f6
+line lichess:3rwkB 977 | 7k/R6p/8/8/7P/p7/r5RK/5r2 b - - 3 36 | f1f2 | a7a8 f2f8 a8f8
+line lichess:iRe0A 1106 | 3rr3/ppp2ppk/8/5Q2/2P4N/1P4P1/P3qP1P/R5K1 b - - 1 21 | g7g6 | f5f7 h7h6 f7g6
+line lichess:irq4b 1204 | r3k2r/pb3ppp/1p2P3/2b5/8/3Q2P1/Pq2PPBP/RN3RK1 b kq - 0 13 | b7g2 | d3d7 e8f8 d7f7
+line lichess:HZjTN 1292 | r1bq1r1k/pppp1ppp/2nn4/4N3/3P1Q2/1BP5/PP3PPP/RN3RK1 b - - 0 11 | f7f6 | e5g6 h7g6 f4h4
+line lichess:mRsma 1440 | rn6/7p/8/p5pk/4nQN1/7P/2P1KPq1/8 b - - 5 28 | b8c6 | f4f7 h5h4 f7h7
+line lichess:5cLu3/m 1561 | 5Q2/7p/6p1/p6k/6P1/P3q2P/7K/3q4 b - - 0 46 | h5h4 | f8f6 e3g5 f6f2
+line lichess:HZhtF 910 | 3rr1k1/1pR2pp1/p1n4p/8/1P1Nq2P/P3PQPK/5P2/5R2 b - - 10 31 | c6d4 | f3f7 g8h8 f7g7
+line lichess:0AXS1/m 1100 | R7/2q2kp1/1p2prr1/2p4p/2Pp1pPb/3P1P1P/1P2B1K1/R7 b - - 1 32 | c7c6 | a1a7 c6d7 a7d7
+line lichess:pbtOF 1186 | 2bbk2r/Q4p2/2Np4/2pPp1qp/1pN1PR2/3B2P1/1PP3K1/8 b k - 0 35 | e5f4 | c4d6 e8f8 a7f7
+line lichess:PzZE8/m 1344 | 1r3r2/2p1q1pk/3p3p/1P1B2PQ/P7/8/1B3b2/R2K2R1 b - - 1 29 | f2g1 | g5g6 h7h8 h5h6
+line lichess:pbqmW 1437 | 2rq1rk1/1b3p1p/p3pb2/5R2/3P4/P1PQ4/2B2PPP/R5K1 b - - 0 20 | c8c3 | f5g5 f6g5 d3h7
+line lichess:JBz7F/m 1573 | 1r3rk1/p5p1/3bqp1P/8/2pP3P/4P2R/P1Q1KP2/6R1 b - - 0 35 | g7g5 | c2g6 g8h8 g6g7
+line lichess:JjqkA 928 | r2q1r2/pp1n1pk1/2pp1bN1/6p1/2PP4/6PQ/PP3PP1/2R1RBK1 b - - 0 20 | g7g6 | f1d3 g6g7 h3h7
+line lichess:bGOOt/m 1089 | 6R1/3k4/2pp1p2/1p2p3/pP1nP3/6p1/P2r4/1K5R b - - 0 46 | g3g2 | h1h7 d7e6 g8e8
+line lichess:qsulC 1154 | r2q1b1r/p5pp/3k4/1QpBpb2/8/3P4/PP2NPPP/n1B2K1R b - - 0 15 | a8b8 | b5c6 d6e7 c1g5
+line lichess:LkByJ 1341 | k7/1pR1pp1p/p5pb/N3P3/5P2/P5rr/5K2/3R4 b - - 1 32 | h6f4 | d1d8 a8a7 c7b7
+line lichess:N747L/m 1375 | 5rk1/5ppp/8/1p1Qp3/1q1b4/1B4P1/5PKP/2R5 b - - 5 30 | b4d2 | d5f7 f8f7 c1c8
+line lichess:Cg7sI/m 1530 | r4r1k/1pp3p1/3p3p/p7/2P1P1b1/PP1P4/1B2NqBQ/1K4R1 b - - 0 28 | g4e2 | h2h6 h8g8 h6g7
+
+challenge mate3 mates 4
+# want 5
+line lichess:st22n/m 1397 | 1Rkr2br/1p6/1P1q4/3BQp2/2Pp3p/3P4/5Pp1/4R1K1 b - - 0 29 | c8b8 | e5d6 d8d6 e1e8 d6d8 e8d8
+line lichess:qsv5S 1473 | 2br1qrk/p4p1Q/1p1p1Pp1/2pPn3/2P1NR2/7P/PP2B1P1/R5K1 b - - 0 24 | h8h7 | f4h4 f8h6 e4g5 h7h8 h4h6
+line lichess:L2J3j/m 1692 | 8/pp1R4/5p2/2p1q1p1/Pk6/1P6/3R4/1K6 b - - 4 41 | e5c3 | d7b7 b4a5 b7b5 a5a6 d2d6
+line lichess:T5jWZ 1848 | r5kr/pp1n2p1/2p3Np/2b2p2/4p1P1/2P3q1/PP2Q3/R1BK3R b - - 3 25 | a8d8 | e2c4 g8h7 h1h6 g7h6 c4f7
+line lichess:2mire 2002 | 2r2rk1/pp3ppp/1q1bp3/3p4/b5N1/2BQ3P/1P3PP1/2R1R1K1 b - - 1 22 | d6c5 | g4f6 g7f6 d3g3 g8h8 c3f6
+line lichess:HZk5o 1400 | 5rk1/p4ppp/8/3Q4/1r2PR2/7P/Pq4P1/3R3K b - - 1 25 | b2c2 | d5f7 f8f7 d1d8 f7f8 f4f8
+line lichess:iRemh/m 1482 | 3r1rk1/pp3ppp/8/3p4/1P2B3/5Q2/1qP3PP/3R1RK1 b - - 0 20 | d5e4 | f3f7 f8f7 d1d8 f7f8 d8f8
+line lichess:0AXpn 1718 | r1bq1bkr/ppp3pp/2n2n2/8/4NB2/5Q2/PPP2PPP/R3R1K1 b - - 7 14 | c8d7 | f3b3 f6d5 b3d5 d7e6 d5e6
+line lichess:GkAVn 1815 | 2k3nr/1pp3p1/5p1p/nNP1p3/P7/4r2P/4BKP1/R2R4 b - - 1 23 | e3b3 | e2g4 f6f5 g4f5 c8b8 d1d8
+line lichess:oSYPO/m 1977 | r4r2/2q2p1k/p3pQp1/3bP2p/3p1N2/7R/PP4PP/R5K1 b - - 1 27 | c7d8 | f4h5 d8f6 h5f6 h7g7 h3h7
+line lichess:FOGgg 1407 | 3rk1r1/pQ2ppbp/6p1/1b6/5B2/q7/5PPP/3R2K1 b - - 1 27 | a3a4 | d1d8 e8d8 b7c7 d8e8 c7c8
+line lichess:oSXwV/m 1480 | 5rk1/ppQ2ppp/8/8/1P6/P3q3/3r2PP/4RR1K b - - 4 24 | e3g5 | c7f7 f8f7 e1e8 f7f8 e8f8
+line lichess:0AToS 1716 | 8/p1Q5/3p4/kp6/3P1K2/2P2Rr1/PP4r1/4q3 b - - 3 39 | a5a6 | c7c6 a6a5 b2b4 a5a4 c6a6
+line lichess:5cOxx/m 1903 | 1k1r3r/1p4pp/pB6/5p2/1P2n3/P7/2Q1KPPq/2RR4 b - - 0 23 | d8c8 | c2c8 h8c8 c1c8 b8c8 d1d8
+line lichess:prfj8 2049 | 1r2n2R/1b2qrk1/p4npB/2p5/2ppP1P1/5P2/PPPQN3/2K4R b - - 3 25 | g7h8 | h6g7 h8g7 d2h6 g7g8 h6h8
+line lichess:hiN2a/m 1429 | 8/2R4k/2p2K2/2r3p1/6p1/8/8/8 b - - 3 45 | h7h8 | f6g6 c5d5 c7c8 d5d8 c8d8
+line lichess:mRqnB 1586 | 8/1b1nk1p1/pb2p3/1p1pP3/7Q/8/5P1K/1Bq5 b - - 0 36 | e7e8 | b1g6 e8f8 h4h8 f8e7 h8e8
+line lichess:fOiKq 1673 | 6k1/1p3r2/4Q2K/4p1r1/8/P4n2/8/8 b - - 7 44 | g5f5 | e6e8 f7f8 e8g6 g8h8 g6g7
+line lichess:JRgaT 1870 | 7R/4rppp/k1bN4/2Q1n1P1/1p2P2P/8/1PPK4/q6R b - - 5 29 | a1h1 | h8a8 c6a8 c5b5 a6a7 d6c8
+line lichess:JBxss/m 1956 | 7k/4rpp1/8/3p2Pp/3P1R1P/p1PBnQ2/KP6/4q3 b - - 1 46 | a3b2 | f3h5 h8g8 h5h7 g8f8 h7h8
+
+challenge backrank mates 2
+# want 6
+line lichess:NXbEE/m 496 | 1k4r1/ppp5/2n4p/8/4P3/2P2RB1/4q2P/5RK1 b - - 1 29 | c6e5 | f3f8 g8f8 f1f8
+line lichess:3ryBd 688 | 1k2r2r/ppp2p2/3q4/4R2R/3P2B1/2P5/PPKN2P1/8 b - - 0 24 | h8h5 | e5e8 d6d8 e8d8
+line lichess:Lk8o9/m 1228 | 2R3k1/1p4pp/8/8/4prPq/3n4/6P1/Q5K1 b - - 1 29 | f4f8 | a1a2 g8h8 c8f8
+line lichess:NXbWR 1305 | 1R1r2k1/4nppp/B2r1q2/3p4/Q3pP2/P1P5/6PP/1R4K1 b - - 2 25 | f6c3 | a4e8 d8e8 b8e8
+line lichess:PWPey/m 1519 | 1r5k/p1Q3pp/2n2q2/5Np1/8/6PP/PP3P2/3R2K1 b - - 0 24 | f6f5 | c7b8 c6b8 d1d8 f5f8 d8f8
+line lichess:5cLuy/m 2053 | 1r4k1/3R2pp/3Q1pq1/8/pr6/7P/1p3P1K/1R6 b - - 3 37 | g6b1 | d6d5 g8h8 d7d8 b8d8 d5d8
+line lichess:5cMiF/m 575 | R3b2k/6pp/8/2B5/7q/7P/6PK/4rQ2 b - - 4 38 | e1f1 | a8e8 f1f8 e8f8
+line lichess:JVmf4 790 | 6k1/p2q1ppb/4p2p/1NQ1P3/3P4/nr3NP1/3K1P1P/2R5 b - - 1 26 | a3b5 | c5c8 d7c8 c1c8
+line lichess:L2KCR 980 | 2r3k1/2P2ppp/6q1/7r/5P2/5N2/P1R2P1P/3R1K2 b - - 2 38 | g6c2 | d1d8 c8d8 c7d8q
+line lichess:QUndx/m 1327 | 2r2k2/3R1ppp/1p2p3/p1q5/5Q2/4P2P/P4PP1/6K1 b - - 3 22 | c5h5 | f4d6 f8g8 d7d8 c8d8 d6d8
+line lichess:CgArS/m 1792 | R2r2k1/5ppp/1pQ5/3n2q1/1P6/1B2p1Pn/1NP2P1K/8 b - - 1 32 | e3f2 | c6e8 d8e8 a8e8
+line lichess:Lcref/m 574 | r4rk1/1p3Bpp/p2p4/6q1/1P2P3/P1PnP2b/5QPP/R4RK1 b - - 0 24 | f8f7 | f2f7 g8h8 f7f8 a8f8 f1f8
+line lichess:bGRkd/m 951 | 3r2k1/pQ3Rpp/6b1/8/4r3/4q3/P5PP/5R1K b - - 0 33 | g6f7 | b7f7 g8h8 f7f8 d8f8 f1f8
+line lichess:TzEy7/m 961 | 6k1/3bbppp/p1n5/7Q/2pPp3/2P1q1P1/6NP/1r2NR1K b - - 3 25 | e3c3 | h5f7 g8h8 f7f8 e7f8 f1f8
+line lichess:Pv720/m 1254 | r3r1k1/p1Q2ppp/6q1/4R3/8/8/P4PPP/4R1K1 b - - 2 26 | e8c8 | c7c8 a8c8 e5e8 c8e8 e1e8
+line lichess:JVlkM/m 629 | 1r5k/pRR3pp/4p3/8/3r1P2/5P2/P5PP/6K1 b - - 0 26 | b8b7 | c7c8 d4d8 c8d8
+line lichess:wIMZ8/m 767 | 6kr/1r3ppp/8/1Bn5/2NqnP1b/Q2p3P/PP4P1/R2KR3 b - - 4 27 | h4e1 | a3a8 b7b8 a8b8 d4d8 b8d8
+line lichess:PzYS1 968 | 1k5r/pp2bQp1/4p2p/3qP3/6P1/4PN2/4KPP1/2R5 b - - 2 31 | e7a3 | f7c7 b8a8 c7c8 h8c8 c1c8
+line lichess:hiNMl 427 | 6k1/5ppp/2b1p3/8/2P5/5PP1/1q3NKP/3R4 b - - 1 30 | b2e2 | d1d8 c6e8 d8e8
+line lichess:3ojV7 739 | 6k1/2p2ppp/8/p2q4/8/5NPQ/5PKP/2r5 b - - 1 27 | c1c3 | h3c8 d5d8 c8d8
+line lichess:3oiuQ 1123 | r3Q2k/ppp3pp/2n3nN/7q/8/2N5/PP1R1PPP/4R1K1 b - - 0 22 | a8e8 | e1e8 g6f8 e8f8
+line lichess:T5k0H/m 422 | 3r2k1/pp1R1ppp/8/8/4p3/4P3/PP3PPP/2R3K1 b - - 0 21 | d8d7 | c1c8 d7d8 c8d8
+line lichess:iRdK5 914 | 2r3k1/p5pp/bp2Q3/4Pp2/2P2P2/1q6/5BPP/3R2K1 b - - 0 27 | g8h8 | e6c8 a6c8 d1d8
+line lichess:dw0AC/m 1134 | rn4k1/ppp3pp/8/4p3/2PpP3/1P1P1Q1P/q5P1/4KR2 b - - 1 24 | b8c6 | f3f7 g8h8 f7f8 a8f8 f1f8
+
+challenge patterns mates 3
+# want 6
+line lichess:BSDcU/m 1468 | 1r3r1k/pp3Npp/2p5/8/3P4/PQPKP1P1/5p1q/8 b - - 1 29 | h8g8 | f7h6 g8h8 b3g8 f8g8 h6f7
+line lichess:qsuv1 1222 | r3r2k/p3Nppp/3p4/8/4Q3/8/PPPn4/2K3RR b - - 2 23 | d2e4 | h1h7 h8h7 g1h1
+line lichess:prfqg 1190 | 3r3k/4qpp1/2p1bN1p/p3P2Q/8/6R1/P4PPP/6K1 b - - 2 31 | d8d4 | h5h6 g7h6 g3g8
+line lichess:Lcsn2/m 1730 | 8/1R6/3R1bkp/5P1r/1P2P1p1/r5P1/6KP/8 b - - 0 36 | g6g5 | b7g7 f6g7 d6g6
+line lichess:L2ImE 1627 | r6k/ppp2r1p/3p3B/6QP/6P1/P1Pq4/1P3PK1/4R3 b - - 6 33 | a8g8 | g5g8 h8g8 e1e8 f7f8 e8f8
+line lichess:2mhwS 993 | 2nr1r1k/pb4pp/1pn2p2/4pP2/2BpP3/PN1R3R/1PP2P1P/2K1B3 b - - 6 21 | c8d6 | h3h7 h8h7 d3h3
+line lichess:iRg3S 1051 | 2kr1b1r/pp1npppp/1qp2n2/8/3P1B2/1PNB1Q1P/P1P2PP1/R4RK1 b - - 0 12 | b6d4 | f3c6 b7c6 d3a6
+line lichess:5cMWB/m 913 | 1br3k1/1p5b/p6p/2BB2p1/4p1P1/2P4P/Pr6/3RR2K b - - 3 38 | g8h8 | c5d4 b8e5 d4e5
+line lichess:uvCjg 1192 | 1R6/p5kR/4b1r1/3p1pN1/3p1P2/4nK2/PP4r1/8 b - - 3 31 | g7f6 | b8f8 e6f7 h7f7
+line lichess:mRtgv/m 1152 | 4r1k1/5p1p/1p6/p3rq2/4pQ2/6R1/1P3PPP/3R2K1 b - - 6 31 | g8f8 | f4h6 f8e7 h6d6
+line lichess:iRdgC/m 1576 | r6r/3qnp1p/p1k3p1/1p1p1P2/3Q4/7P/P1P2BPK/5R2 b - - 6 29 | e7f5 | d4b6
+line lichess:wIJ1d 1784 | 3r1k2/2p4N/p2qp1Q1/8/8/2P3nP/Pr3P1K/R7 b - - 1 35 | f8e7 | g6g7 e7e8 h7f6
+line lichess:qswc8 1701 | r4b1r/ppk2ppp/8/1Q2p3/5PP1/q7/P5PK/3R4 b - - 3 22 | a3c5 | d1d7 c7c8 b5b7
+line lichess:hiLe3 842 | 1r6/4bp2/2p3p1/2pbPk2/5PPp/P1B4P/1P2RK2/8 b - - 0 37 | f5f4 | c3d2
+line lichess:LaNRA 787 | r1b3k1/p4r1p/1pp3Q1/3pP3/8/P1P5/5P1R/3K3R b - - 0 25 | h7g6 | h2h8 g8g7 h1h7
+line lichess:PzYQO/m 2097 | 8/7k/2R2N2/5Kp1/7b/1p6/1r6/8 b - - 5 48 | h7g7 | c6c7 g7f8 f5g6 g5g4 c7f7
+line lichess:wCy9v 1670 | 4r1rk/2p2Rqp/1p1p4/p2Pb3/2P5/4p2P/PP2Q1P1/5RK1 b - - 1 27 | g7g3 | f7h7 h8h7 e2h5 h7g7 f1f7
+line lichess:mRtYQ/m 1294 | 7R/pp2p1k1/2p2n2/3p1B2/3P4/2P5/PP1Q1Pq1/1K6 b - - 0 29 | g7h8 | d2h6 h8g8 f5e6
+line lichess:3rvLc/m 971 | kr3r2/npp3q1/p2R1bp1/3P3p/PQN2RpP/1P2P1P1/4N1P1/6K1 b - - 0 37 | c7d6 | c4b6
+line lichess:QUlS8 1395 | r4rk1/2p2ppp/2N1b3/8/3R4/p1PQ4/5PPP/qR4K1 b - - 3 26 | a1a2 | c6e7 g8h8 d3h7 h8h7 d4h4
+line lichess:BF0wr 1123 | 3b2rk/pp3p1n/2q2N1Q/8/4P2R/6P1/1P3PKP/8 b - - 0 40 | g8g7 | h6h7 g7h7 h4h7
+line lichess:st2QR 1487 | 3R4/1r2rknp/6p1/ppp1P1P1/5P2/2P3N1/2P5/3R2K1 b - - 5 32 | f7e6 | d1d6 e6f7 d6f6
+line lichess:o0LfS 1873 | r1b2r1k/p3R2p/2p2ppB/8/2B5/8/PPP3PP/1K4b1 b - - 3 21 | f8g8 | h6g7 g8g7 e7e8 g7g8 e8g8
+line lichess:iRfdG 1123 | 3r3k/5p2/4pq1p/p6P/1p2B1Q1/2b2PR1/P2r4/6RK b - - 14 37 | d2d1 | g4g8 d8g8 g3g8
+
+challenge hanging tactics 1
+# want 6
+line lichess:JVlkI 774 | 2r1k2b/7R/5p2/P3p1p1/4P3/1b4B1/1K3PP1/8 b - - 13 35 | b3c2 | h7h8 e8d7 h8c8
+line lichess:st2Q6 886 | 1r3rk1/6b1/2p1pPpp/3p4/2pP2Pq/P1N1P2P/2P3K1/1RQ1R3 b - - 0 22 | f8f6 | b1b8 f6f8 b8f8
+line lichess:wCvob 1278 | r3k2r/pbq4p/1p1pB1p1/1Pn3B1/4P3/P1Q4N/6PP/4K2R b Kkq - 0 19 | c5e6 | c3h8 e8d7 h8h7
+line lichess:JRj9k 969 | 8/5B2/1p2R3/2p2p2/2P2kp1/p7/1r3PK1/8 b - - 1 59 | b2f2 | g2f2 a3a2 e6e1 a2a1q e1a1
+line lichess:PvAmO/m 1131 | 8/4k2B/1p3p2/4p3/pbPpP3/3P4/2bBK1PP/8 b - - 1 34 | a4a3 | d2b4 e7f7 b4a3
+line lichess:JVkZz 883 | 2r1k3/1p2pp2/p2p4/q2R1bP1/8/2N5/PPP1Q3/2K5 b - - 1 22 | a5d5 | c3d5 c8c2 e2c2 f5c2 c1c2
+line lichess:JjsNs/m 1254 | 4k2r/1p3p1p/1p2b1p1/2pp2B1/1n6/3P1NP1/rb1RPPBP/1R4K1 b k - 5 16 | a2a1 | d2b2 a1b1 b2b1
+line lichess:Lk97M/m 1184 | 8/8/KP6/P2n4/1k2p3/8/8/8 b - - 0 54 | d5b6 | a5b6 e4e3 b6b7 e3e2 b7b8q
+line lichess:Lk8or/m 1107 | 5r1k/6rp/b1p4p/p2pN3/2P5/1P2R1Pq/P2QKP2/2R5 b - - 0 27 | f8f2 | e2f2 h3h2 f2e1
+line lichess:3ojZw 1096 | 2kr1r2/1pp5/p7/6q1/3PR3/1Qb2Pp1/P5P1/1R3KB1 b - - 1 30 | f8f3 | g2f3 g3g2 f1f2
+line lichess:LaN8o/m 1214 | r5k1/5p1p/1q2p1p1/n7/2QP4/4P3/RR3PPP/6K1 b - - 0 26 | a5c4 | a2a8 g8g7 b2b6
+line lichess:CgAcx/m 1299 | 2kr3r/pp2qppp/5n2/2b5/3nNP2/3QB2P/PPP3B1/R3K2R b KQ - 4 15 | d4c2 | d3c2 f6e4 g2e4
+line lichess:TzF62 1195 | r2r2k1/p5pn/qp1R1n1p/2p5/2P2P2/1PB2QP1/P2R2KP/8 b - - 2 26 | d8d6 | f3a8 g8f7 d2d6
+line lichess:TzGXj/m 1250 | 6k1/6p1/4pnnB/6Q1/3qp3/6PK/1r5P/5R2 b - - 4 31 | g7h6 | g5g6 g8f8 f1f6 d4f6 g6f6
+line lichess:TuIhy 1183 | 1Q2b1k1/2p2r1p/1p5B/5p1q/2B1p3/4P1P1/5P1P/6K1 b - - 15 31 | h5h6 | b8e8 h6f8 c4f7
+line lichess:HZhib/m 1295 | 8/4k2p/3B4/1p3R2/1rb1p3/p5P1/5P1P/4K3 b - - 1 42 | e7d7 | d6b4 a3a2 b4c3
+line lichess:3okCA 1245 | r5rk/R5Rp/8/7K/p7/4P3/5PP1/8 b - - 0 37 | g8g7 | a7a8 g7g8 a8a4
+line lichess:o0Mxs 1120 | r3k1r1/p1qb3p/2n5/3Q2bP/4N3/4PP2/PP2K3/2R2B2 b q - 4 28 | g5e7 | d5g8 e7f8 e4f6
+
+challenge fork tactics 2
+# want 6
+line lichess:iroHC/m 941 | 2r3rk/pp5p/3qn1p1/P1pbNp2/1n1p1P2/1P1P3P/2P2QBK/R1B3R1 b - - 1 27 | d5g2 | e5f7 h8g7 f7d6
+line lichess:iRdCJ/m 1002 | 1rb1nrk1/5ppp/2q1p3/1p1N2P1/1bpP4/4PP2/2PBB2P/R2Q1RK1 b - - 0 18 | b4d2 | d5e7 g8h8 e7c6
+line lichess:T5iHV/m 1169 | r1bq1r2/pp1n1pkp/4p1p1/2P5/8/1P1QPN2/P1P2PPP/1R2KB1R b K - 0 14 | d7c5 | d3c3 d8f6 c3c5
+line lichess:st1DB/m 1375 | 2kr4/1pp2Q2/p5p1/5pK1/1r6/1P5P/8/8 b - - 4 39 | d8d3 | f7f8 d3d8 f8b4
+line lichess:oSWZb/m 1504 | rnbqk2r/ppp2ppp/8/3pN3/4P3/3P4/PPPQ2PP/RN2KR2 b Qkq - 0 9 | d5e4 | e5f7 d8h4 g2g3 h4e7 f7h8
+line lichess:3ojo6 1700 | r2qk2r/pp1n1ppb/1b2p2p/2PpP3/5P2/1N3NP1/PPP1Q1KP/R1B1R3 b kq - 0 18 | d7c5 | b3c5 b6c5 e2b5 d8d7 b5c5
+line lichess:L2JPo/m 801 | 8/1p4pk/p1p1r3/7n/4P3/5NP1/PP1R2K1/8 b - - 4 45 | e6e4 | f3g5 h7g6 g5e4
+line lichess:AyTvX 1070 | 8/5pk1/4p1p1/7p/2q1bP1P/p3P1P1/P1pQ3K/2R5 b - - 2 55 | c4a2 | d2d4 g7h7 d4e4
+line lichess:FOIro/m 1187 | 2k1rb1r/ppp2pp1/4q1n1/3pp1B1/1n2P1bp/P1NP2P1/1PP2PBP/R1Q1NRK1 b - - 0 15 | b4c6 | e4d5 e6d7 d5c6
+line lichess:prfbq 1316 | q1r3k1/1b2bpp1/pp2p2p/3nN3/3PB3/1P3P1P/P2B2P1/1QR3K1 b - - 3 23 | a8b8 | e4h7 g8f8 e5d7 f8e8 d7b8
+line lichess:N73AY/m 1441 | r7/2q4p/4k1p1/p1p1np2/1pN5/1P1PP2P/2Q3P1/R5K1 b - - 1 38 | c7d7 | c4b6 d7d3 c2d3 e5d3 b6a8
+line lichess:QUnN0 1583 | 1R4k1/2qn1ppp/4p3/3pP3/2pN1B2/b3P2P/2Q2PP1/6K1 b - - 0 25 | c7b8 | c2a4 a3c5 a4d7 c5d4 e3d4
+line lichess:AyUIq 882 | r1b1k2r/pp3ppp/2n2b2/qBp5/3pN3/3P1N2/PPPQ1PPP/R3K2R b KQkq - 3 11 | a5b5 | e4d6 e8d7 d6b5
+line lichess:2mjJI 1037 | 6k1/6p1/7p/1pBb4/1P2p1P1/2P3KP/5Q2/7q b - - 8 42 | g8h7 | f2f5 h7h8 f5d5 h1f3 g3h4
+line lichess:pbsq6 1244 | 4r3/7p/p6R/Pb4p1/2pN1pk1/2P5/3K2PP/8 b - - 3 44 | e8e7 | h2h3 g4g3 d4f5 g3g2 f5e7
+line lichess:AyTqG 1388 | 6r1/1p1k3Q/p7/3q1p2/1B1Pb3/6p1/PP6/5RK1 b - - 9 42 | d7c6 | f1c1 c6b5 c1c5 b5b4 c5d5
+line lichess:wII9e/m 1515 | r4rk1/ppp2ppp/2b5/3p3n/3PpP1q/2P1B3/PP3PPP/RN1Q1RK1 b - - 6 13 | h5f4 | g2g3 f4h3 g1g2
+line lichess:TzG5Q/m 1557 | 3q1rk1/1p3ppp/8/r7/2pNb3/2P1P1Q1/3P1RPP/5RK1 b - - 7 24 | e4d3 | d4e6 f7e6 f2f8 d8f8 f1f8
+line lichess:bGP1B/m 902 | r7/p5kp/1bp2r2/5pP1/3p3q/6N1/PPP2PP1/R1BQ1bK1 b - - 0 18 | f6e6 | g3f5 g7g8 f5h4
+line lichess:2mgx9 978 | 5rk1/1p4pp/1p3b2/p4p2/1Pq5/P3B1P1/4nPBP/3Q1R1K b - - 1 24 | f5f4 | g2d5 c4d5 d1d5
+line lichess:0AXOd 1235 | r7/3N1p1p/2p5/4pp2/Pbk5/5P2/2P1R1PP/6K1 b - - 1 30 | a8a4 | d7b6 c4b5 b6a4
+line lichess:5cO2U 1367 | 8/pp3pk1/2p1q1pp/3r4/4PR2/5Q1P/PP3PP1/6K1 b - - 0 25 | d5d2 | f3c3 g7g8 c3d2
+line lichess:fOjbI/m 1476 | 5k2/pp3r2/3qpNp1/3p1np1/8/2Q4P/PP3PP1/6K1 b - - 3 35 | d5d4 | c3c8 f8g7 f6e8 g7h7 e8d6
+line lichess:N76ED 1662 | 2r1b1k1/5p2/3R2n1/Np1Np1p1/4P2p/P3BP1P/1Pr3P1/6K1 b - - 1 31 | c2b2 | d6g6 f7g6 d5e7 g8h7 e7c8
+
+challenge pin tactics 2
+# want 6
+line lichess:dw2I1 987 | 8/4p3/p6p/4p2P/P1R1pk2/5b1K/1r6/2N5 b - - 10 40 | a6a5 | c1d3 f4e3 d3b2
+line lichess:o0Kxc 1181 | 2kr2nr/1ppq4/p4p2/P1Q1p1p1/2NpP3/2bP1bP1/2P3BP/1R3RK1 b - - 1 18 | f3g2 | c4b6 c8b8 b6d7
+line lichess:Pv7wm 1227 | 8/p4k2/p3r1p1/R4p2/3PnK2/1P5P/4B3/8 b - - 5 36 | e4c3 | e2c4 f7f6 c4e6
+line lichess:o0KNk 1452 | 3r4/5pp1/p3b2p/2kp4/8/2R1N3/PrP2PPP/3R2K1 b - - 6 29 | c5d6 | e3c4 d6d7 c4b2
+line lichess:wILYX/m 1587 | r1b2rk1/pp3p1p/2p2R2/6q1/8/2Q2R1P/PPP3P1/7K b - - 8 24 | f8e8 | f3g3 c8g4 g3g4 g5g4 h3g4
+line lichess:0AXlD/m 1670 | 4r3/1pp2pkp/p1n1rn1N/6q1/P2P2pR/Q3P1P1/1P1B3P/R5K1 b - - 0 24 | f6h5 | h4g4 g5g4 h6g4
+line lichess:pbrBu/m 1002 | 4k3/pp1q2p1/2P1p3/b1B1p3/P1B1Pn1p/2P2P1P/2Q3PK/8 b - - 0 30 | d7c6 | c4b5 a7a6 b5c6
+line lichess:0AUSe 1124 | 1b3rk1/pp3ppp/8/6r1/2R3N1/1P3P2/P4P1P/6RK b - - 12 24 | g5f5 | g4h6 g8h8 h6f5
+line lichess:wIJ2v 1277 | rnb1k2r/1pqpbppp/p3p3/5N2/4N3/5B2/PPP2PPP/R2QR1K1 b kq - 3 15 | e6f5 | e4d6 c7d6 d1d6
+line lichess:bGR26 1447 | r1bk3r/pp1n2bp/2p1Q1p1/q5N1/3P4/3pP3/PP3PPP/2R2RK1 b - - 2 17 | a5d5 | g5f7 d8c7 e6d5
+line lichess:QUlXM 1609 | 1r3rk1/1p4qp/p2p2pR/2pPb3/2P1Nn2/5P2/PPK5/3B1Q1R b - - 0 28 | f4h5 | h6h5 g6h5 h1g1 g7g1 f1g1
+line lichess:MmHJE 1800 | r1bq1rk1/ppp1bp1n/2np3Q/4p3/2B1P2P/2NP1N2/PPP2PP1/R4RK1 b - - 0 11 | c8g4 | h6g6 g8h8 g6g4
+line lichess:TuGrJ 996 | 2Rr2k1/p2r2pp/Qp3p2/3qp3/8/6PP/PPR2P1K/8 b - - 10 32 | d7f7 | c8d8 d5d8 c2c8 d8c8 a6c8
+line lichess:mRqOh 1072 | 3q3k/6p1/5p1p/p3p3/P5Q1/5P1P/3r2PK/2R5 b - - 1 31 | d2d4 | c1c8 d8g8 c8g8
+line lichess:3okK9 1240 | 5r1k/2q2r1p/2b3p1/p3R3/p7/2PP4/QB3PPP/3R2K1 b - - 0 26 | c7e5 | c3c4 e5b2 a2b2
+line lichess:XsohM 1397 | 3Rbrk1/2p2p1p/p3p3/5rq1/2PQ4/8/NP5P/K2R4 b - - 3 39 | f5f4 | d1g1 f4d4 g1g5 g8h8 d8d4
+line lichess:irq82 1650 | 2Q5/ppRr2kp/q4pp1/4p3/8/1R5P/PP4PK/3r4 b - - 3 33 | a6d6 | c7d7 d6d7 b3b7
+line lichess:Xsqgf 1684 | 7k/pp4r1/6p1/3Q1n2/7q/PP5P/3N2R1/7K b - - 0 37 | h4h3 | g2h2 h3h2 h1h2 g7h7 h2g1
+line lichess:iReLI/m 1020 | r4rk1/pp3ppp/3bp3/2p1q3/3nNPQP/3P4/PPP3P1/R1B2RK1 b - - 0 15 | e5d5 | e4f6 g8h8 f6d5
+line lichess:o0Mge 1125 | r1b1kb1r/pp2pp1p/2n2p2/2pq4/4N3/1P6/P1PPQPPP/RN2KB1R b KQkq - 0 9 | c8f5 | e4f6 e8d8 f6d5
+line lichess:iRdU2 1306 | r4rk1/1p4bp/p5p1/2pqpb1n/4NP2/3B2P1/PP2Q2P/1K1R2NR b - - 1 19 | e5f4 | d3c4 d5c4 e2c4
+line lichess:pbsnQ/m 1476 | 1r6/1P1k4/2q3n1/4p3/1Q1pP3/2rP2PB/7P/1R4K1 b - - 2 35 | d7c7 | b4a5 c7d6 b1b6
+line lichess:pbtZk/m 1612 | 4k1r1/8/1p5p/p4p2/P2b1P2/BP1R3K/2R4P/4r3 b - - 4 43 | e1e3 | d3e3 d4e3 c2e2 e8d7 e2e3
+line lichess:dw14e 1663 | r4rk1/p1p2ppp/2q1pn2/1p6/3RP3/2N3Q1/PPP3PP/2K2R2 b - - 1 26 | a8d8 | d4d8 f8d8 f1f6
+
+challenge skewer tactics 3
+# want 6
+line lichess:0AXKk/m 958 | 2r2k2/4b3/7R/1p2np1p/4p2P/1P2B1P1/1P3PK1/8 b - - 1 38 | e5g4 | h6h8 f8f7 h8c8 g4e3 f2e3
+line lichess:dw05V 1195 | 2k1r3/3r2p1/1pN4p/1Pbp4/4p3/2P4P/5PP1/R4RK1 b - - 3 26 | c8b7 | a1a7 b7c8 a7a8 c8c7 a8e8
+line lichess:BF0I2/m 1342 | r1q2k2/1p3p2/p3bQ2/5p2/8/8/PP4PP/3R3K b - - 1 33 | c8c6 | f6h8 f8e7 h8a8
+line lichess:781ka/m 1553 | 8/8/1p6/4bP2/2k5/5Kp1/1p6/4R3 b - - 5 57 | c4b3 | e1e5 b2b1q e5b5 b3c2 b5b1
+line lichess:T5jig/m 1594 | r2q1rk1/6p1/p1p1b1PP/2ppp3/8/2P5/P1PQ2P1/R3K2R b KQ - 0 18 | f8f6 | h6g7 f6g6 h1h8 g8g7 h8d8
+line lichess:JBy1T 1900 | 8/3Q2kp/pb2p1p1/1p2N3/2p5/5P1P/1q4P1/5K2 b - - 2 38 | g7f6 | d7f7 f6e5 f7g7 e5d6 g7b2
+line lichess:oSXtq/m 959 | rn2k2r/pp4pp/2p3p1/1B1p4/n2P1B2/P3P3/5PPP/2R1K2R b Kkq - 3 16 | c6b5 | c1c8 e8d7 c8h8
+line lichess:QUkLj 1113 | 8/8/5p2/3rb1p1/Q1pk2P1/5K2/8/8 b - - 1 95 | d4d3 | a4d1 d3c3 d1d5
+line lichess:dw18Z/m 1364 | 5Q2/3q4/4kp1p/1p2p1pP/p3P1P1/P4P1K/8/8 b - - 8 47 | d7d1 | f8e8 e6d6 e8d8 d6c6 d8d1
+line lichess:JVm0m/m 1558 | 8/5b2/2p5/p1p1nkp1/P1PpN3/1P1P2K1/4B3/8 b - - 2 50 | e5d7 | e2g4 f5e5 g4d7
+line lichess:mRro3 1620 | 8/1pb2rk1/2p3p1/p6p/P3P3/3R3K/1P2R3/8 b - - 3 37 | g7f6 | e2f2 f6e5 f2f7
+line lichess:XsqYT/m 1808 | 2kr1b1r/2pp2p1/1pn3pp/1P6/3B4/2P3P1/4PPKP/RN1R4 b - - 0 19 | c6d4 | a1a8 c8b7 a8d8
+line lichess:LkB3g 967 | 8/4b3/3p1kRp/1p4pP/8/1BP1q1P1/1P4K1/8 b - - 5 42 | f6e5 | g6e6 e5f5 e6e3
+line lichess:QUmsM/m 1100 | 1R6/6p1/4pk1p/3pp3/6Pn/3PP3/r2NK2P/8 b - - 4 29 | h4f3 | b8f8 f6g5 f8f3
+line lichess:uvBF1/m 1392 | 4r3/pp2P3/4k2P/6r1/1p3NP1/8/5K2/3R4 b - - 4 53 | e6e7 | d1e1 e7d6 e1e8
+line lichess:GkAJi 1551 | r1bq1rk1/4ppbp/p4np1/1p2R3/3P4/P1PB4/1B1N1PPP/1R1Q2K1 b - - 0 15 | f6d5 | e5d5 d8d5 d3e4 d5d8 e4a8
+line lichess:Gxrye/m 1646 | 5r2/1p6/4Q1k1/p1p2p2/2Pp4/Pq1P2Pp/7P/2B3K1 b - - 2 32 | g6g7 | c1h6 g7h7 h6f8 b3d1 g1f2
+line lichess:L2IQt 1815 | Q7/4kp2/2B2p2/4b3/pq6/4P1P1/5PK1/8 b - - 3 43 | a4a3 | a8e8 e7d6 e8f8 d6c6 f8b4
+line lichess:66DZB 956 | r3k3/q5p1/1n2p3/3p2BP/2p5/8/P1p2R2/Q5K1 b q - 1 31 | e8d7 | f2f7 d7c6 f7a7
+line lichess:LkAfv 1143 | 2kr4/2pr2pp/1P3p2/p1B5/P7/3pPP2/3K1P1P/1R6 b - - 1 29 | c8b7 | b6c7 b7c7 c5b6 c7d6 b6d8
+line lichess:BF29n/m 1330 | 8/8/5pBp/3k2pP/5PP1/r3P3/4K3/8 b - - 0 44 | a3b3 | g6f7 d5c5 f7b3
+line lichess:T5ixn/m 1404 | 4R3/b1r5/p5p1/1p4B1/1P1p3P/r2k2P1/8/1K1R4 b - - 1 47 | d3c3 | d1c1 c3b4 c1c7
+line lichess:BSDlB/m 1693 | 2r2rk1/p5pp/3qbp2/3Bp3/Q2p4/P2P2P1/2RBPP1P/5RK1 b - - 0 18 | e6d5 | d2b4 d6e6 b4f8
+line lichess:NXbZj 1739 | 3r2k1/pp5p/6p1/8/3qp3/1Q5P/PP4P1/5R1K b - - 1 29 | d4d5 | f1d1 d5b3 d1d8 g8f7 a2b3
+
+challenge discovered tactics 3
+# want 6
+line lichess:QUmPm 957 | r1b2rk1/pp3ppp/3q1n2/2pB4/P7/2P2Q1P/2P1NPP1/R2R2K1 b - - 0 21 | f8e8 | d5f7 g8f7 d1d6
+line lichess:LkBMX/m 1217 | 2kr1b1r/1pp3pp/p1q2p2/3pn3/P5b1/1QP1PNP1/1P1NBPP1/3RK2R b K - 5 16 | h7h5 | f3e5 f6e5 e2g4 h5g4 h1h8
+line lichess:QUkvN 1269 | rnb1k2r/pp2qpbp/3p1np1/2pP2B1/4N3/4Q3/PP2PPPP/R3KBNR b KQkq - 5 9 | e8g8 | e4f6 g7f6 e3e7 f6e7 g5e7
+line lichess:uvB4Z/m 1466 | 8/2p5/pkpr4/3r1p1p/PPRP1PpP/2BKp1P1/4P3/8 b - - 10 44 | c6c5 | b4c5 b6c6 c5d6
+line lichess:0AWEW 1688 | 1rB4k/pPp3p1/5p1p/8/8/4qP2/PP5P/4RR1K b - - 1 25 | e3b6 | e1e8 h8h7 c8f5 g7g6 e8b8
+line lichess:qsucI 1894 | 6r1/5rbk/pB1QR2p/8/5p2/5P2/5PKP/1q1R4 b - - 7 30 | b1b6 | d6d3 h7h8 e6b6
+line lichess:bGQO8/m 912 | 4r1k1/4bp1p/2p2np1/q1PpB3/3P4/2N3P1/4RP1P/1Q4K1 b - - 0 26 | a5c3 | e5f6 e7f6 e2e8
+line lichess:LaOGx/m 1196 | 4r2k/pqR3p1/3R3p/1b6/5BP1/Pn2P1QP/4r3/6K1 b - - 10 35 | e2e1 | g3e1 b7c7 d6h6 g7h6 f4c7
+line lichess:bGSAY 1395 | 6B1/3R3p/6p1/6k1/2n2P2/4P3/5PK1/1q6 b - - 0 46 | g5f6 | d7f7 f6e6 f7b7 e6d6 b7b1
+line lichess:T5hFK 1500 | rnbq1b1r/3ppkpp/p1p2n2/4P3/1p6/2N2N2/PPPP1PPP/R1BQ1RK1 b - - 0 7 | f6h5 | f3g5 f7g8 d1h5 g7g6 h5f3
+line lichess:T5l4i 1599 | 2rqr1k1/p4ppp/1p6/3p4/3Qn3/2PR1N2/P1P2PPP/4R1K1 b - - 1 19 | c8c4 | d4c4 d5c4 d3d8 e8d8 e1e4
+line lichess:783BJ 1797 | 8/5pk1/8/5r1p/5N1P/5RP1/2r2PK1/8 b - - 11 47 | g7f6 | f4d5 f6e6 f3f5
+line lichess:PWQhv 968 | r4rk1/1p1b1ppp/p3pn2/3p4/7P/1P1B2Q1/q4PP1/1N2RK1R b - - 0 19 | a2b3 | d3h7 g8h7 g3b3
+line lichess:JVlWq 1150 | 4r3/n4pkp/p2p2p1/1ppP4/2P5/1P2N2P/P4PP1/4R1K1 b - - 2 24 | b5b4 | e3f5 g7f8 e1e8 f8e8 f5d6
+line lichess:LaNoO 1235 | 8/p2p1pp1/1p4k1/2p5/5PQ1/P3q3/6KP/8 b - - 5 41 | g6f6 | g4g5 f6e6 f4f5 e6e5 g5e3
+line lichess:o0Kv4/m 1464 | 8/8/8/1pR1Npkp/1n1p2p1/r2P2P1/5P1P/5K2 b - - 1 38 | f5f4 | e5c4 g5f6 c4a3
+line lichess:Pv8td 1577 | 4R1k1/pp3p2/2p3r1/6rp/1PPP4/P3P1P1/1B3K2/8 b - - 1 35 | g8g7 | d4d5 f7f6 d5d6
+line lichess:uvBPj/m 1779 | 8/7p/6k1/1p1p1p2/3Pp3/1K2P1BP/1P3P2/4b3 b - - 1 37 | g6g5 | f2f4 e4f3 g3e1
+line lichess:dw070 995 | 3q1rk1/p4p1p/P1R3p1/4b2r/Q7/4P1P1/5P1P/5RK1 b - - 8 27 | d8d7 | c6g6 h7g6 a4d7
+line lichess:oSWTW 1153 | r1b2k1r/pp1n2pp/2p1Bb2/8/8/2P1B3/PPP2PPP/R3R1K1 b - - 7 17 | d7b6 | e3c5 f6e7 c5e7 f8e7 e6c8
+line lichess:T5jZf 1241 | 3r4/1pqr2kp/p2RQ1p1/2p3N1/8/5R1P/1P4P1/6K1 b - - 0 32 | d7d6 | f3f7 g7g8 f7c7 d6e6 g5e6
+line lichess:QUmvn 1414 | 2kr4/ppp5/2n2N2/4pp2/8/1Q1P1KP1/PP5q/3R4 b - - 3 26 | h2h6 | b3e6 c8b8 f6d7 d8d7 e6h6
+line lichess:BSD0F 1660 | 4k1r1/pb3p1p/1p6/2p1pNq1/2P1Pn2/5Q2/PPPR2PP/6K1 b - - 0 22 | f4e6 | f5d6 e8d8 d6f7 d8e7 f7g5
+line lichess:dvzX5 1809 | 2kr1b1r/Npp2ppp/p3pn2/4q3/8/4B3/PPP1QPPP/R4RK1 b - - 1 13 | c8b8 | a7c6 b7c6 e3a7 b8a7 e2e5
+
+challenge deflection tactics 4
+# want 6
+line lichess:mRt5k 1154 | 8/p1prb1R1/1pk5/8/3PPp2/2P5/1P4K1/8 b - - 0 48 | e7d6 | d4d5 c6c5 g7d7
+line lichess:GkA4g/m 1356 | r2q2kr/p2pb1pp/1p1B2n1/2p2Q2/8/PP6/R1P2PPP/3R2K1 b - - 10 21 | d8f8 | f5d5 f8f7 d5a8
+line lichess:781ur 1434 | rr6/4bkpp/2n1bp2/1p6/2pPN1P1/P4N1P/1P2B3/R4RK1 b - - 0 23 | h7h5 | f3g5 f7g8 g5e6
+line lichess:3rv9d/m 1667 | r2qr1k1/pp1n1p2/2p2n2/2P1p1B1/4P3/1P6/P1R2PPP/3Q1RK1 b - - 0 20 | d7f8 | d1d8 a8d8 g5f6
+line lichess:66EdK 1845 | 5r2/R4P1p/8/1p4P1/2k4P/P1p5/2Kp4/8 b - - 0 54 | f8d8 | a7c7 c4d5 c7d7 d8d7 f7f8q
+line lichess:BF0r4 1898 | 2kr3r/1p3ppp/p1n2n2/8/2q5/1N3BB1/P1P3PP/Q4RK1 b - - 2 20 | c6d4 | f3b7 c8b7 b3a5 b7a8 a5c4
+line lichess:BSCYk/m 1168 | 3r4/5pkp/3qpn2/pB1p4/P1P4Q/6P1/5PK1/4R3 b - - 0 35 | d5c4 | h4g5 g7f8 g5f6
+line lichess:st2zt 1386 | 8/8/1p5p/1Pkr4/4KPp1/8/8/1R6 b - - 1 42 | h6h5 | b1c1 c5d6 c1c6 d6e7 e4d5
+line lichess:GxpLk 1500 | 8/2R2p1p/1p1nrkp1/3p4/1P1N2P1/5P2/5K1P/8 b - - 2 36 | e6e7 | g4g5 f6g5 c7e7
+line lichess:Xsqr7/m 1598 | rn3rk1/pp3pp1/1b6/3pN1q1/3P2n1/1NP4R/PP2Q1P1/R3K3 b Q - 0 18 | f8e8 | h3h8 g8h8 e5f7 h8h7 f7g5
+line lichess:0AWv5 1701 | rn4k1/3q1p2/2p2Qpr/pp2P3/3P2RP/5P2/PP1K4/6R1 b - - 0 27 | d7e6 | g4g6 f7g6 f6e6
+line lichess:st4ZU/m 1999 | 3r4/p5kp/1p2p3/7P/2Pr4/1P3Q2/P4P1K/8 b - - 0 27 | d8f8 | h5h6 g7h6 f3f8
+line lichess:66DhB/m 1195 | 2r3k1/pp3pp1/1b3q1p/8/1P6/P1P2B2/2Q2PPP/4R1K1 b - - 0 21 | f6c3 | e1e8 c8e8 c2c3
+line lichess:irqP1 1358 | 2k4r/1pp2ppp/p3pn2/8/1P6/2Q2B1P/qP3PP1/3R2K1 b - - 1 19 | h8d8 | f3b7 c8b7 d1d8 a2b1 g1h2
+line lichess:3oiGq/m 1404 | 7R/p1pkr2P/P2p4/3P4/6p1/1p4P1/7K/8 b - - 0 49 | b3b2 | h8d8 d7d8 h7h8q d8d7 h8b2
+line lichess:66D9l/m 1672 | 1q3rk1/6p1/2p2n1p/4P3/1p1Q2b1/1P1P1N2/2P3PP/5R1K b - - 0 26 | f8d8 | d4c4 f6d5 c4g4 d5e3 g4e6
+line lichess:mRroo 1850 | 4brk1/p1q1b1p1/5p1p/2prPQ2/4N1P1/2BP1R1K/P6P/2R5 b - - 1 30 | f6e5 | f5e6 g8h7 f3f8
+line lichess:JBxrq/m 1854 | 5rk1/2p2ppb/P6p/7P/4PQP1/P1pq1RK1/2r5/1R6 b - - 1 33 | d3a6 | f4f7 g8h8 f7f8 h7g8 b1b8
+line lichess:st2PA 1230 | 2k3nr/1ppr1pp1/p2b1q2/3P3p/3N4/5Q1P/PPP2PP1/R1B1R1K1 b - - 1 19 | f6d4 | e1e8 d7d8 f3f5 c8b8 e8d8
+line lichess:Lk9j2/m 1351 | 3r2k1/5p2/1pq3p1/p1p3Q1/8/P5P1/1P3P2/4R1K1 b - - 1 33 | c6d5 | e1e8 d8e8 g5d5
+line lichess:Gk7vb 1530 | 8/1p6/1R4pk/4P3/2pP1rp1/2P3K1/P7/8 b - - 1 47 | h6g5 | b6g6 g5g6 g3f4
+line lichess:GkBEF 1560 | 8/ppp5/8/6kp/1P3b2/2PR1K2/P2pr2P/3R4 b - - 10 30 | e2h2 | d3d5 g5f6 f3f4
+line lichess:PzYhW/m 1714 | r2q1r2/ppp1bp1k/2n2BpN/8/3P4/2NQ3P/PP3P2/R5RK b - - 0 20 | e7f6 | h6f7 f8f7 d3g6 h7h8 g6f7
+line lichess:uvERT 1919 | 4r1k1/1Pn3p1/5bNp/8/2Q4P/6PK/5q2/7R b - - 2 35 | c7e6 | c4e6 e8e6 b7b8q g8h7 g6f8
+
+challenge intermezzo tactics 4
+# want 5
+line lichess:PWRCN/m 1266 | 3rr1k1/1pq1npp1/7p/pQ2pb2/P7/2P1B1P1/1P3PB1/3RR1K1 b - - 5 23 | d8d1 | b5e8 g8h7 e1d1
+line lichess:fOk5K 1382 | 2r4k/pp3p1p/6q1/8/3pN3/1P1P2PQ/6KP/2r2R2 b - - 2 27 | c1f1 | h3c8 h8g7 g2f1
+line lichess:781n2 1601 | r2q1rk1/ppp2pp1/1b1p3B/3P1N2/1Pn5/P6P/5PP1/R2Q1RK1 b - - 0 17 | g7h6 | d1g4 d8g5 f5h6 g8h7 g4g5
+line lichess:Gk8wm 1809 | 7r/1r4k1/5p2/p3p1pq/P4P2/6P1/1P4Q1/3RR1K1 b - - 0 35 | b7b2 | d1d7 g7h6 g2b2
+line lichess:fOkLg 2031 | 5k2/2pb1ppp/4p3/3nP1N1/3q4/5QP1/1r3PBP/R5K1 b - - 1 27 | b2f2 | a1a8 f8e7 f3f2 d4f2 g1f2
+line lichess:JjprE/m 1346 | 3Rr1k1/2p2ppb/p4n1p/1p2bP2/1P2pBP1/7P/P5B1/5R1K b - - 0 24 | e5f4 | d8e8 f6e8 f1f4
+line lichess:prewn/m 1421 | 1q2r1k1/pQ2Rppb/2B2n1p/8/3p3N/3P2PP/PPr2P2/R1B3K1 b - - 0 22 | b8b7 | e7e8 f6e8 c6b7
+line lichess:oSXcs 1672 | r1bq1rk1/1p3ppp/p1n1p3/4N3/2PPpB2/P7/1P1Q1PPP/R4RK1 b - - 1 13 | d8d4 | e5c6 d4d2 c6e7 g8h8 f4d2
+line lichess:Jjqqb 1811 | r3k2r/3pnppp/1Qp5/p1b1q3/P3PP2/2NP4/1P4PP/R1B2R1K b kq - 2 15 | e5c3 | b6b7 e8g8 b2c3
+line lichess:781ad/m 2037 | r2qr1k1/p1pp1ppp/1p4n1/2b5/4nB2/2PBPN2/PPQ2PPP/2KR3R b - - 1 14 | e4f2 | d3g6 h7g6 c2f2
+line lichess:T5jGY 1372 | r2qr1k1/ppp2ppp/2np1n2/b7/2BPP3/3Q1R2/PBN2PPP/R5K1 b - - 0 15 | e8e4 | f3f6 d8f6 d3e4
+line lichess:FOInq 1460 | r3k2r/pp2bppp/2p1pn2/4n3/2PPN3/P7/1P2BPPP/R1B2RK1 b kq - 0 16 | e5c4 | e4f6 e7f6 e2c4
+line lichess:LaN2w 1645 | r1n2b1r/2k3pp/b1p2p2/p3p3/P3P3/NpP1BN2/1P1R1PPP/3R2K1 b - - 6 18 | f8a3 | d2d7 c7b8 b2a3
+line lichess:7846B/m 1858 | r4rk1/pp2qppp/5nb1/2b1p3/4P1PN/2N4P/PP1PQP2/R1B2RK1 b - - 2 14 | g6e4 | c3e4 f6e4 h4f5 e7e6 e2e4
+line lichess:JByvk/m 2066 | r4k2/2RP4/8/3N3p/2P2p2/p4P1K/3r3P/8 b - - 2 37 | d2d5 | c7c8 f8e7 c4d5 e7d7 c8a8
+line lichess:NXaAB/m 1330 | r2q1rk1/pppBb1pp/5n2/3p1p2/3np3/1P1PPP2/PBP3PP/RN1Q1RK1 b - - 0 12 | d4c2 | d7e6 g8h8 d1c2
+line lichess:st3ca 1501 | r4rk1/pp2bppp/2n1pn2/2pN4/2q1PN2/8/PP1B2PP/2R1QR1K b - - 7 19 | c4e4 | d5f6 e7f6 e1e4
+line lichess:Cg8C3 1637 | r2qk2r/3bbpp1/p2p1n1p/1p2p3/3pPP1B/P2P4/BPPQN1PP/2KR3R b kq - 0 14 | f6e4 | h4e7 d8e7 d3e4
+line lichess:Pv6lJ 1839 | 3rr1k1/4bppp/p2p2P1/qp1P1B1P/2n2Q2/5P2/PPP5/1K2R2R b - - 0 25 | f7g6 | f5e6 g8h8 h5g6 a5e1 h1e1
+line lichess:JRiCI 2080 | 1k1rr3/ppp2p1p/1P4p1/P4b2/2q5/2N3Q1/2P2PPP/R3R1K1 b - - 0 25 | a7b6 | e1e8 d8e8 a5b6
+
+challenge trapped tactics 3
+# want 5
+line lichess:GxoFv 1284 | r2r2k1/pq1bbpp1/B1n1p2p/8/R2P4/3Q1N2/1P2NPPP/5RK1 b - - 5 19 | b7b2 | f1b1 b2b1 d3b1
+line lichess:TuHUT 1347 | r3k2r/pbpp1ppp/1p1P2q1/n3P1N1/P4P2/8/2P3PP/R1BQ1RK1 b kq - 0 16 | h7h6 | f4f5 g6g5 c1g5
+line lichess:BF1Ij/m 1822 | r1bq1rk1/ppp3pp/3b4/4pn2/1P2N1B1/P2PB3/5PPP/R2Q1RK1 b - - 1 16 | d8h4 | e3g5 h4g4 d1g4
+line lichess:o0MLf/m 2128 | 3r1k1r/p1Q2pb1/3p2p1/3Np2q/2P5/3PPPp1/P2BK3/5R2 b - - 0 30 | h5h4 | f1h1 h4g5 e3e4 h8h1 d2g5
+line lichess:FOGza 2583 | r1b2rk1/5ppp/4p3/p1q1N1P1/1p2pP2/1P2P1NP/P1P2K2/R2Q4 b - - 1 24 | c5c3 | e5c4 c8b7 g3e2 c3a1 d1a1
+line lichess:JVjgC/m 1249 | r1b2rk1/pp4pp/2p1p3/3pPp2/8/q1PBP3/P1PKQPPP/3R3R b - - 2 14 | a3a2 | d1a1 a2b2 h1b1 b2b1 a1b1
+line lichess:pbqBo 1603 | 1rbn1rk1/4bpp1/p2p1qnp/1p6/2PBP3/PB1Q1N1P/1P3PP1/1R2R1K1 b - - 0 18 | f6f4 | g2g3 f4f3 d3f3
+line lichess:JVlCD/m 1639 | rn4k1/ppp3p1/8/3N4/6p1/P2P4/1PPK1b2/R1B1r1NR b - - 2 18 | e1g1 | h1g1 f2g1 d5c7 b8c6 c7a8
+line lichess:AyTdy 2122 | 3rr1k1/p1p1np1p/1pn1q1pB/8/2P1B3/5QP1/P4P1P/R3R1K1 b - - 6 19 | e6h3 | e4c6 e7c6 e1e8 d8e8 f3c6
+line lichess:L2Jgm 2520 | r4rk1/ppbn2pp/6n1/2p1p1N1/3p4/1P1P2PP/P1P2qB1/1RBQR2K b - - 1 20 | f2g3 | g5e4 g3h4 c1g5 h4e1 d1e1
+line lichess:2mhcu/m 1077 | 3r3k/q5p1/2p2p1p/1pp1p3/4P3/2PP3P/1Q3PP1/3R2K1 b - - 8 35 | a7a4 | d1a1 a4a1 b2a1
+line lichess:781Te/m 1544 | rnb1k2r/pp3ppp/5n2/8/q2N4/4P3/PP1Q1PPP/R3KB1R b KQkq - 0 12 | e8g8 | f1b5 f6e4 b5a4 e4d2 e1d2
+line lichess:HZigj 1843 | 6k1/1p1q1pp1/2p1p2p/8/3PP3/1Q4P1/r4PKP/3R4 b - - 3 28 | a2e2 | g2f3 e2e4 f3e4
+line lichess:HZkS5 2059 | 3r1rk1/pp2bppp/2p3q1/3p1P2/4P3/2N2Q1R/PPP3PP/R5K1 b - - 0 17 | d5e4 | c3e4 g6f6 e4f6
+line lichess:Cg8I8 981 | rnb1k2r/pp1p1ppp/4p3/8/2P5/2R1P3/qP3PPP/2Q1KBNR b Kkq - 1 10 | b8c6 | c3a3 a2a3 b2a3
+line lichess:o0L48 1589 | r3k2r/p4ppp/1qp1pb2/3p4/3P4/3Q3P/PPP1NPP1/R4RK1 b kq - 3 15 | b6b2 | f1b1 b2b6 b1b6
+line lichess:Gxnh6/m 1679 | r7/1p3p1p/1P1k2p1/p2R1b2/P1P5/4PB2/6PP/n5K1 b - - 3 25 | d6e6 | e3e4 f5e4 f3e4 f7f5 e4f3
+line lichess:3okHm/m 2085 | rn2k2r/pp3ppp/2p2qb1/2b1p1P1/4B3/5N1P/PPPP1P2/R1BQK2R b KQkq - 0 11 | f6f4 | d2d3 f4e4 d3e4
+line lichess:MmIRf/m 1096 | r4rk1/pp4pp/3bb3/P1p1p3/1qPpPp2/1P1P1Q1P/3NNPP1/R2R2K1 b - - 1 21 | f8f6 | a1a4 b4a4 b3a4
+line lichess:QUlOB/m 1447 | r2q1rk1/ppp2pp1/2nb1n1p/1B1p4/2PP2b1/4BN2/PP1N1PPP/R2Q1RK1 b - - 4 10 | c6e7 | c4c5 d6h2 g1h2
+
+challenge promotion tactics 2
+# want 6
+line lichess:XsqmV/m 866 | 6k1/6p1/4P1pp/1pPB4/8/P5P1/r4r2/1R4K1 b - - 1 36 | a2d2 | e6e7 d2d5 e7e8q
+line lichess:Pv9qL 1083 | 4r3/p5Pk/1p3b1P/5p2/4q3/1Q2P1R1/P4P2/3K4 b - - 0 31 | e8g8 | b3g8 h7g8 h6h7 g8f7 g7g8q
+line lichess:N73UO 1281 | 6k1/p2P1p1p/1q2r3/5p2/8/b1P3B1/P5PP/3R1R1K b - - 1 29 | b6d8 | g3c7 d8c7 d7d8q c7d8 d1d8
+line lichess:PzWzA/m 1330 | 8/Np1b1ppp/P7/1P2p3/1k6/7P/5PP1/5K2 b - - 0 39 | b7a6 | b5b6 b4c5 b6b7
+line lichess:TzFnv/m 1534 | 1k1r4/1P2b3/p1P5/3bp1pp/4p2q/P3B3/6B1/1R1R2K1 b - - 0 29 | d5c6 | d1d8 e7d8 e3a7 b8c7 b7b8q
+line lichess:TzHje/m 1710 | 8/rp5p/1R2P1p1/p7/2ppkPP1/7P/P2K4/8 b - - 0 39 | e4f4 | e6e7 a7a8 b6f6 f4e5 f6f8
+line lichess:NXafG 827 | 8/3k1rr1/2p4p/3pPp1P/6P1/p1PK1P2/R7/4R3 b - - 0 42 | f5g4 | e5e6 d7d6 e6f7
+line lichess:PvAZc/m 1105 | 6k1/pp4pp/2n2p2/3P4/8/5N1P/PP4r1/2KR4 b - - 0 26 | c6e5 | f3e5 f6e5 d5d6 g2f2 d6d7
+line lichess:3ohIi/m 1184 | 1q5k/6p1/p3P2p/P1p3b1/r2pQ1P1/1p5P/1R4K1/5R2 b - - 0 44 | a4a5 | e6e7 g5e7 e4e7
+line lichess:mRrHn 1341 | r5k1/6p1/pP5p/2Rn4/P1b5/4B2P/5PP1/6K1 b - - 2 35 | d5e3 | b6b7 a8b8 c5c8 g8h7 c8b8
+line lichess:fOjY4 1624 | r7/1bqn1rk1/p3Q1pp/1p1pP3/8/3B4/PPP2PPP/R3R1K1 b - - 0 20 | c7c6 | e6c6 b7c6 e5e6 f7f6 e6d7
+line lichess:NXbDV 1795 | 6k1/1q4p1/pP2p1p1/2pr1p2/5Q2/6PP/5P1K/1R6 b - - 0 39 | a6a5 | f4c7 d5d7 c7d7 b7d7 b6b7
+line lichess:N74Oc/m 924 | 1r6/2Rk1pp1/1P2p2p/8/5P2/7P/5KP1/8 b - - 4 32 | d7e8 | b6b7 b8b7 c7b7
+line lichess:5cLeC 999 | 8/p7/2P3R1/P3k3/2r1p3/5pK1/5P2/8 b - - 0 47 | c4c5 | g6g5 e5d4 g5c5 d4c5 c6c7
+line lichess:BF1SS/m 1206 | 4rr1k/pp1q2p1/2pp1P1p/7P/2B2P2/1P6/PB2R3/1K5R b - - 0 29 | e8e2 | f6g7 d7g7 b2g7
+line lichess:LaOjB/m 1311 | 8/8/P7/1K2pkpp/3b4/8/3R4/8 b - - 3 50 | g5g4 | d2d4 e5d4 a6a7 d4d3 a7a8q
+line lichess:3rvt2 1468 | 8/8/5K2/6P1/pR6/5Pk1/rp6/8 b - - 0 50 | a4a3 | g5g6 g3f3 g6g7 b2b1q b4b1
+line lichess:BF25I/m 1709 | 1k6/pp3R2/2p1P3/8/P2p3p/3P2rP/1P5K/8 b - - 0 36 | b8c8 | f7f8 c8c7 e6e7
+line lichess:iReub 929 | 8/6p1/p5P1/Pp2kp1P/3p4/1P1K4/8/8 b - - 0 42 | f5f4 | h5h6 g7h6 g6g7
+line lichess:JBw50 1010 | 8/8/2p1p3/4P2p/3P1P1P/2k5/1p6/1K6 b - - 1 55 | c3b3 | f4f5 e6f5 e5e6 f5f4 e6e7
+line lichess:TzFVn/m 1207 | 4Rrk1/pp3r1p/2pP4/3p1qp1/3Q4/6P1/PP5P/4R1K1 b - - 4 27 | f5d7 | e8f8 f7f8 e1e7 d7e7 d6e7
+line lichess:5cNvq/m 1363 | 4k3/5ppp/6b1/P1Np4/8/3P2P1/2PK1P1n/8 b - - 0 29 | e8d8 | a5a6 d8c7 a6a7 c7b6 a7a8q
+line lichess:o0K9d/m 1624 | 5k2/p1q2br1/1p6/1P3P2/2P2Rp1/Pn1PQ1P1/6B1/6K1 b - - 2 29 | c7e7 | e3e7 f8e7 f5f6 e7f8 f6g7
+line lichess:Lct2T/m 1734 | 8/5p2/8/3kPP2/n6p/2p2N1P/8/2K5 b - - 1 44 | d5e4 | e5e6 f7e6 f5e6 a4c5 e6e7
+
+challenge quiet tactics 5
+# want 5
+line lichess:wCwAp/m 1419 | 8/8/8/3k4/4p3/2p3P1/5P2/3K4 b - - 5 47 | d5e5 | d1c2 e5d4 g3g4 e4e3 f2e3
+line lichess:PWShJ/m 1618 | 3r2k1/1p3p1p/2p2Qp1/8/1P2P3/3p1P1P/2q3P1/4R1K1 b - - 5 33 | d8d7 | e1a1 d7d8 f6d8
+line lichess:LcpMe 1909 | 2r3k1/4ppb1/2r3p1/p3Pn2/Pp3PP1/5Q2/2P2B1K/R1R1Nq2 b - - 2 28 | b4b3 | e1d3 f5d4 f3c6 d4c6 c1f1
+line lichess:LcsMN/m 2041 | r7/4P3/8/pK1p1pN1/1p3Pkp/3P4/PP6/8 b - - 0 54 | g4f4 | g5e6 f4g3 e6d8 h4h3 e7e8q
+line lichess:L2HDh/m 2291 | 8/8/8/5pkp/1p2p3/1P2P1P1/6KP/8 b - - 1 48 | g5g4 | h2h4 f5f4 e3f4
+line lichess:hiMdF/m 1464 | 7k/pp1q3n/2p5/2Pp2pR/1P1Pp1P1/4P3/P2B1K2/R7 b - - 0 32 | d7g4 | a1h1 g4f3 f2e1
+line lichess:HZit6 1582 | 8/2p2k2/1p2p3/p3Pp1p/P1K2Pp1/2P3P1/7P/8 b - - 0 40 | f7e7 | c4b5 e7d7 c3c4 d7c8 b5c6
+line lichess:QUnit 1828 | 7Q/5r2/2p3pk/3p1p2/3P4/2q1P3/4BKP1/8 b - - 7 44 | h6g5 | g2g3 f7h7 h8h7
+line lichess:FOFUa 1972 | 8/1pp5/4K3/p2P4/P1P5/1k6/8/8 b - - 1 57 | b3a4 | c4c5 c7c6 d5d6
+line lichess:JVnJj 2165 | 4r1k1/ppp3p1/2n1qnN1/8/2B3P1/1P2rN2/P1P3P1/2KR3R b - - 2 22 | e6c4 | f3g5 e3h3 h1h3 c4f4 g6f4
+line lichess:o0Nks 1526 | 8/8/p7/8/1P3kp1/p1P5/2K4P/8 b - - 1 45 | a3a2 | c2b2 f4f3 c3c4 a2a1q b2a1
+line lichess:BF3Io/m 1667 | 8/8/4k1pp/2p5/p1p1K1PP/P1P5/1P6/8 b - - 0 32 | g6g5 | h4h5 e6f6 e4d5
+line lichess:2mgqz 1789 | 1R6/8/8/4ppkp/8/5P2/r1r2PK1/5R2 b - - 1 34 | g5h4 | b8g8 c2f2 f1f2
+line lichess:Lk9sy/m 1941 | 4Q3/3R1pk1/5q1p/5Pp1/6P1/2r2PK1/8/8 b - - 7 57 | c3c6 | d7d8 f6d8 e8d8
+line lichess:NXaOO/m 2149 | 8/5pk1/1p2q1pN/4P1Pp/3p2n1/3P1QP1/r4P2/2R3K1 b - - 4 42 | a2f2 | f3a8 g4h6 g5h6
+line lichess:BSCYd 1557 | 8/2r2p1k/2p2Qp1/1qPb3p/7P/6P1/5P1K/4R3 b - - 1 42 | b5c5 | e1e8 c5f2 f6f2
+line lichess:uvDh3 1876 | 6k1/p2r1pp1/2P4p/3p4/1P6/6P1/1B3PKP/8 b - - 0 42 | d7c7 | b4b5 a7a6 b2e5 c7c8 b5b6
+line lichess:66E1Z/m 2111 | 8/5k1p/2p2p2/1pBp2p1/P7/1P2P3/b4KPP/8 b - - 0 38 | a2b3 | a4a5 d5d4 a5a6
+line lichess:66Ddl 2186 | 6k1/p5p1/7p/2P2p2/4pP2/1P5K/r6P/2R5 b - - 0 33 | a2a3 | c1c3 a3a6 c5c6 a6c6 c3c6
+line lichess:Cg8ie/m 1578 | 8/8/7p/1p2p1pP/p1k1p1P1/P1P1P3/1P1K4/8 b - - 5 41 | c4b3 | d2c1 b3c4 c1c2 c4d5 b2b3
+
+challenge opening tactics 2
+# want 6
+line lichess:pbreK 879 | r1bqk2r/ppp2p2/2n5/3Bp3/3bN3/3P4/PPP2PPP/RN1QK2R b KQkq - 0 11 | d8d5 | e4f6 e8d8 f6d5
+line lichess:LaMhk 947 | r3kb1r/pppq1p1p/2n3p1/3pP3/6b1/2PBPNP1/PP1N1PP1/R2QK2R b KQkq - 0 10 | c6e5 | f3e5 g4d1 e5d7
+line lichess:781Uh/m 1161 | r1bqkb1r/ppp2ppp/5n2/8/5B2/2NP4/PP4PP/R2QK1NR b KQkq - 0 9 | f8b4 | d1a4 c7c6 a4b4
+line lichess:3oiyv 1304 | rn2kb1r/pp1b1pp1/2pP1n1p/qN2p1B1/2B5/6Q1/PPP3PP/2KR2NR b kq - 3 13 | c6b5 | g3e5 e8d8 g5f6
+line lichess:N74hv/m 1420 | r1bq1rk1/ppppn1b1/5p2/4p2P/4P3/1PNP4/1PPB1PP1/R2QK2R b KQ - 1 13 | d7d5 | h5h6 g7h8 h6h7
+line lichess:JRgog/m 1599 | r1bqk2r/pppn1ppp/4pn2/1N6/1b3B2/8/PPQ1KPPP/3R1BNR b kq - 5 9 | b4a5 | f4c7 a5c7 b5c7
+line lichess:oSZ5l 856 | r2q1k1r/pp1nb1pp/2p1Bn2/5bN1/3P4/8/PPP2PPP/R1BQ1RK1 b - - 0 11 | f5e6 | g5e6 f8f7 e6d8
+line lichess:CgBgP 981 | rnb1kbnr/ppp2ppp/3p4/8/3qP3/3B4/PPP2PPP/RNBQ1RK1 b kq - 1 6 | g8f6 | d3b5 c7c6 d1d4
+line lichess:LaOpB 1177 | r1b1kb1r/p2p1ppp/1ppq1n2/4P3/5Q2/3B4/PPP2PPP/RNB1K2R b KQkq - 0 10 | f6d5 | e5d6 d5f4 c1f4
+line lichess:NXbAM 1293 | r1bqk2r/pp3ppp/5n2/3p4/1b1P1B2/8/PP1NBPPP/R2QK2R b KQkq - 0 10 | f6e4 | d1a4 c8d7 a4b4
+line lichess:GxpWL/m 1415 | r2qkb1r/1p2pp2/p1n3Np/3p3Q/2pPn3/4P3/PPPN1PPP/R1B1R1K1 b kq - 0 12 | f7g6 | h5g6 e8d7 d2e4
+line lichess:LaP2U/m 1493 | r1bqk2r/pp3ppp/4pn2/8/1bBP4/2N5/PP3PPP/R1BQ1RK1 b kq - 2 10 | d8c7 | d1a4 c8d7 a4b4
+line lichess:TzHj8 843 | r1bqkbnr/ppp2ppp/8/3p4/3Pp3/6P1/PP1PPPBP/RNBQK2R b KQkq - 0 6 | f8b4 | d1a4 c7c6 a4b4
+line lichess:wCxLF/m 964 | r1bqk2r/ppp2ppp/5n2/2bp2B1/3Pp3/3P4/PP1NPPPP/R2QKB1R b KQkq - 0 8 | c5d4 | d1a4 c8d7 a4d4
+line lichess:66DHq 1093 | r1bqk1nr/pp2ppbp/3p2p1/2p1n3/2P5/P1N1P3/1P1PNPPP/RBBQK2R b KQkq - 5 7 | e5c4 | d1a4 d8d7 a4c4
+line lichess:prhCJ 1297 | r2qkb1r/1bpp2pp/p4p2/1p1Np3/3nP2N/P2P4/1PP2PPP/R1BQ1RK1 b kq - 3 10 | c7c6 | d1h5 g7g6 h4g6
+line lichess:oSYIT/m 1469 | r3kb1r/pp1n1ppp/1qn1p3/1B1p4/3P4/2N5/PPP2PPP/R1BQ1RK1 b kq - 0 10 | b6d4 | b5c6 d4d1 c6d7
+line lichess:NXcxA/m 922 | rnbqr2k/ppp2p2/5n2/2bp2N1/4P3/2QP4/PPP2PPP/RN2KB1R b KQ - 2 12 | d8d6 | g5f7 h8g7 f7d6
+line lichess:L2Jnx/m 1031 | rnb2rk1/ppp3pp/5n2/3q1p2/3Np3/PPP1P3/5PPP/R1BQKB1R b KQ - 0 10 | f8d8 | f1c4 d5c4 b3c4
+line lichess:L2Jsu 1074 | r1bqk1nr/ppp2ppp/6n1/3p4/1bPP4/2N2N2/PP2P1PP/R1BQKB1R b KQkq - 2 7 | d5c4 | d1a4 c7c6 a4b4
+line lichess:JjsHa 1267 | r1bqk2r/ppp2ppp/5n2/3Pp3/1b2P3/2N2P2/PP4PP/R1BQKB1R b KQkq - 2 9 | f6h5 | d1a4 c8d7 a4b4
+line lichess:LcqOJ/m 1507 | r2qk2r/pp2b1pp/n1pnB3/8/8/2N5/PPP2PPP/R2QR1K1 b kq - 0 15 | a6c5 | d1h5 e8f8 h5c5
+line lichess:JRhEZ/m 887 | r1bq1rk1/ppp3pp/2np1n2/2b1p3/4NP2/3P1Q2/PPPB2PP/2KR1BNR b - - 0 9 | c8g4 | e4f6 d8f6 f3g4
+line lichess:pbtCF 994 | r1bqk1nr/pppp1ppp/2n1P3/2b5/8/4P3/PPP2PPP/RNBQKBNR b KQkq - 0 4 | f7e6 | d1h5 g7g6 h5c5
+
+challenge escape defence 3
+# want 6
+line lichess:PzZTQ 525 | 5rk1/1Q3pp1/7p/B7/8/4q3/P4RPP/4r2K w - - 1 32 | - | ?
+line lichess:iRcco/m 1054 | Q1B2R2/5p1k/3rnqp1/4p2p/2P1P3/PP5P/5PP1/6K1 w - - 2 35 | - | ?
+line lichess:NXcUF 1394 | 4r1k1/p4p1p/1p1p3Q/2pP1P2/2P3n1/5NR1/P5PP/q6K w - - 5 31 | - | ?
+line lichess:T5kQE/m 1717 | r4k2/1p1Q1pr1/p3p3/2b4p/2P3q1/2N3P1/PP3P2/3R1RK1 w - - 0 24 | - | ?
+line lichess:BF1Yb 1908 | 2r3k1/p5p1/3bR1Np/3P1Q2/2q5/5p1P/P4PP1/6K1 w - - 0 33 | - | ?
+line lichess:FOIOD/m 2424 | 1r4k1/p5pp/2b5/4p3/8/qNNP1P2/1rPQ2PP/2KR3R w - - 0 21 | - | ?
+line lichess:0AX1p 725 | 4Q3/pp4pk/1q1Bpp1p/3pP3/8/P6P/2r2PP1/3R2K1 w - - 4 26 | - | ?
+line lichess:pbrWT/m 788 | 1b1r2k1/r1q2ppp/p3p3/1p6/8/4BB2/PP3PPP/R2QR1K1 w - - 3 20 | - | ?
+line lichess:irq5t 1371 | r4rk1/pp2q1B1/3p2Bp/3P4/1P6/P4p2/5P1P/2RQ1RK1 w - - 0 24 | - | ?
+line lichess:hiKko 1612 | 7k/p5b1/4Q1pp/8/8/6N1/PP3q1P/7K w - - 0 31 | - | ?
+line lichess:MmJMf 1960 | 8/8/5Q1p/6r1/4r3/3k4/5P1P/5K2 w - - 1 80 | - | ?
+line lichess:5cLRP/m 2138 | 2kr3r/p1pp4/1p3q2/4N3/6P1/2P5/PP3Pb1/RN1QR1K1 w - - 0 21 | - | ?
+line lichess:irnjy/m 653 | 8/2r1k1p1/1N1b4/p2P4/P7/1R2P2P/2r2PP1/R5K1 w - - 7 38 | - | ?
+line lichess:NXaKX/m 757 | rbb1r1k1/1p3ppp/p2qpn2/3p2B1/2PP4/1PN5/P3BPPP/R2QR1K1 w - - 3 13 | - | ?
+line lichess:AyTmn 1414 | 8/5ppk/3Q3p/8/Pp6/1r5P/1Bq2r2/KR2R3 w - - 1 37 | - | ?
+line lichess:o0LFE 1452 | r2k4/ppp2p2/2nb3p/8/3p2N1/3P3q/PPP1BPrN/R2QR2K w - - 3 20 | - | ?
+line lichess:PWQuI 1851 | 2k3nB/p1p4p/b1Qb4/5p2/P3r3/3PKN2/3N2qP/1R6 w - - 0 23 | - | ?
+line lichess:3oiUV/m 2291 | 3r1rk1/pQ3ppn/2nb2b1/2q4p/5B1P/2P1PPNB/PP1N4/2KR3R w - - 3 18 | - | ?
+line lichess:hiM8h 561 | 8/2N5/1p6/4Pk1p/P2Pn1p1/8/r5PP/1R4K1 w - - 4 36 | - | ?
+line lichess:Pv8wz 992 | 4Q3/p4ppk/2pb3p/2p5/2P2q2/1P3N1P/P4PP1/6K1 w - - 0 26 | - | ?
+line lichess:BSDEs/m 1281 | rnbB3k/p1pp3P/1p6/7B/4n3/5r2/PPP2bPP/RN3KNR w - - 0 13 | - | ?
+line lichess:irqZJ/m 1589 | 2k3rr/pp4q1/2p2p2/1P1p2np/3P4/4PN2/P5PP/2RQ1RK1 w - - 2 25 | - | ?
+line lichess:wCxNy/m 2053 | 5k2/1p5p/p5pP/3B3r/4p2n/6RK/PP6/3R4 w - - 1 36 | - | ?
+line lichess:CgAar 2421 | 5rk1/6bp/1R2N1p1/3P3q/2P2p2/3Q1N2/r4nB1/4R1K1 w - - 0 35 | - | ?
+line lichess:st3bL/m 708 | 2k4r/p6q/1ppp4/P3p3/2P1P2r/3P2p1/1P1B2Q1/R5KR w - - 0 32 | - | ?
+line lichess:66DLB/m 968 | 2k3rr/pbp2Q1p/1p1p4/1N6/3PP3/3Bq2P/PPP3P1/5RKR w - - 3 19 | - | ?
+line lichess:GkA71 1277 | 3Rb1k1/p1p2pp1/4r3/7p/2N2B1P/1P4P1/P2Q3K/1q6 w - - 7 34 | - | ?
+line lichess:3okRY/m 1617 | 2k3r1/p1pb4/2p1pPq1/4P3/8/P1NRQ2p/1P4r1/3R3K w - - 0 31 | - | ?
+line lichess:Lcp1P 1881 | 2k1r3/1pp2pPp/p7/8/2nr1K2/BPN5/P6P/2R4R w - - 3 27 | - | ?
+line lichess:JBxy8 2232 | 2k3rr/pppqB3/3p1Q2/4p3/4P3/8/PPP2PPP/R4RK1 w - - 0 21 | - | ?
+line lichess:7820a 671 | 3k1r2/ppRb4/6q1/4B1p1/2PP3p/1P6/P2Q1PPP/6K1 w - - 3 26 | - | ?
+line lichess:5cM40/m 958 | 6k1/pp1b3p/2p1p3/4P3/2P1pq2/1P3p2/P1Q2P1P/1B5K w - - 0 28 | - | ?
+line lichess:BSBKz 1163 | 5rk1/5ppp/3N4/r3P3/3Q1P2/Pp6/1P4qP/1K1R3R w - - 0 25 | - | ?
+line lichess:3ojjT 1660 | 6k1/8/6r1/4p2p/3Nn3/B5PK/PP3r2/2RR4 w - - 2 28 | - | ?
+line lichess:prgjg 1868 | 8/4Q3/5pk1/4p3/1pP1KP2/r7/5P2/3r4 w - - 5 38 | - | ?
+line lichess:JRiiU 2180 | 5n1r/pp3pk1/2pq2p1/3p3n/3P2P1/2B1PP1r/PP4KP/R2Q3R w - - 0 25 | - | ?
+line lichess:dvzO9 674 | rbb1k2r/3p1p2/4pn1p/p3q1p1/Pp2P3/2PBB2P/NP2QPP1/R2R2K1 w kq - 0 19 | - | ?
+line lichess:pbs6V 790 | 3rk3/pp5p/2p5/3r1p2/4pBP1/P3Kb1P/1PP2P2/2R1R3 w - - 0 21 | - | ?
+line lichess:fOi55 1148 | 2r1kr2/1p3p2/p3bB1Q/P7/1P5P/q7/2P2P2/2KRR3 w - - 9 34 | - | ?
+line lichess:mRtMM 1486 | 5rk1/1b3q2/6r1/6R1/3Qp2p/2P1P2P/5PPB/2R3K1 w - - 1 29 | - | ?
+line lichess:JjpOp 1873 | 1rk2b2/p1p4r/2B3RP/5p2/3B1p2/2PP4/pP1K1P2/7R w - - 1 33 | - | ?
+line lichess:0AXza 2091 | 8/5k2/p7/3N1bp1/1P1B1P1p/P3K1bP/3R2P1/4r3 w - - 1 53 | - | ?
+line lichess:783eM 414 | 3r4/p5kp/1p4p1/4pp2/2P1P3/1R1r1NPb/P4P1P/1R4K1 w - - 0 28 | - | ?
+line lichess:irpvq/m 1005 | 8/8/1R5R/3p3p/3kn1pP/8/6P1/4r1K1 w - - 3 44 | - | ?
+line lichess:783JN/m 1192 | 6r1/p1pR4/1pP1pk2/5p2/5Bq1/2P1P2r/PPQ3B1/4RK2 w - - 8 26 | - | ?
+line lichess:qstYx/m 1562 | 1k6/pp3p1p/2p2B2/3p4/Q7/2PP2qP/PP2r1B1/R5K1 w - - 2 22 | - | ?
+line lichess:LcpgY/m 1790 | r4rk1/pb1q1ppn/1p5p/2b1n3/3pNP2/P6P/BPP1N1P1/R1BQ1R1K w - - 0 16 | - | ?
+line lichess:prgsX 2217 | rnb3k1/ppp3pp/5r2/2P3Nq/4p3/6Q1/PPP3KP/R1B2B1R w - - 2 19 | - | ?
+line lichess:uvDwy/m 599 | r4rk1/ppp1qp1p/2n5/3Q1bp1/3P4/P1n1PNB1/2P3PP/R3KB1R w KQ - 0 13 | - | ?
+line lichess:BF2RZ/m 975 | 4r1k1/5pp1/7p/8/3Q1P1q/4P3/P1r3PP/3RR1K1 w - - 3 24 | - | ?
+line lichess:782Tj/m 1253 | 7r/R1p1bp2/1pk2n2/1q1p1P1p/3Pp2r/1N2P1p1/Q2B2P1/1N3RK1 w - - 0 27 | - | ?
+line lichess:iRd9N 1483 | 1Q6/5Rpk/4p2p/2q1P3/2n5/5N1P/r4PP1/6K1 w - - 0 31 | - | ?
+line lichess:N75Cu 1953 | rn2k2r/pp3p1p/8/1n6/2Kq4/5B2/P1QB2PP/5R1R w kq - 0 23 | - | ?
+line lichess:Gxq4e 2281 | r1bqr1k1/pp1p1p1p/2n3p1/7Q/8/2N1b1B1/PPPN1PPP/R3KB1R w KQ - 0 11 | - | ?
+line lichess:hiM3C 541 | r1bq1rk1/1p5p/2p1pppQ/p3P3/Pn6/3BR3/1PP2PPP/R1B3K1 w - - 0 19 | - | ?
+line lichess:L2I9d/m 977 | 2N5/R7/1P3k2/4b1pp/P3P3/6PK/5r1P/8 w - - 1 46 | - | ?
+line lichess:TzHHN 1412 | 4r1k1/2R2p1p/3Bpqp1/p7/8/P2R3P/1rQ2PP1/6K1 w - - 5 31 | - | ?
+line lichess:LaMBe/m 1517 | rn2k2r/pbp2ppp/1p6/8/3P2q1/4PNb1/PP1B2PP/R2QKB1R w KQkq - 3 14 | - | ?
+line lichess:preUr 1855 | 4r1k1/5p1p/p2p1qpQ/3P4/1r2B3/2p5/P4P1P/4RRK1 w - - 0 26 | - | ?
+line lichess:wIL6g 551 | 8/5R2/p3p1kr/2Np4/2nP4/P3P3/1PP5/2K5 w - - 6 34 | - | ?
+line lichess:JRhID 854 | 3r3k/6pp/4B3/pR2b3/4P1Q1/8/P1p3PP/7K w - - 0 35 | - | ?
+line lichess:TuJ8H 1299 | 3r4/4k3/1pQ2R1p/p1p1p1p1/P1P1P2n/2P1P1KP/8/2B3r1 w - - 14 46 | - | ?
+line lichess:qsvcO/m 1433 | r7/pp4pk/2p2r2/4N3/1P3npq/1QPP4/P5PP/R5RK w - - 3 24 | - | ?
+line lichess:781eI 1768 | 2rn1bk1/pp4r1/5Q2/2p1N1p1/P2pPn2/3P2Pq/1PPN1P1P/R1B2R1K w - - 1 27 | - | ?
+line lichess:0AXHd 668 | 4R3/2b2k2/Q1P2p2/8/1p6/1P6/P1r2PP1/6K1 w - - 2 39 | - | ?
+line lichess:HZhjE/m 1040 | 2kr4/ppp2pp1/2n5/3pp2n/1P3P2/P2P4/2P2qBP/R1BQ3K w - - 1 16 | - | ?
+line lichess:PWSdk/m 1140 | r5k1/7p/pp2p3/3bP1pr/8/1P1RpP1P/P1Q1BqPK/R7 w - - 0 25 | - | ?
+line lichess:qstFh/m 1528 | 2kr2r1/1pp2p2/p1qb3p/1P1p4/P2P4/2NQPNpb/5P1P/RR4K1 w - - 0 18 | - | ?
+line lichess:wCxNG/m 1792 | 7r/p1pk2pp/Q1prbn2/N1b5/4pq2/4N3/PPP2PPP/R1B2RK1 w - - 4 17 | - | ?
+line lichess:LcrCM 545 | 8/5p2/3N2kP/P5Pr/1n6/8/1P6/1K4R1 w - - 1 48 | - | ?
+line lichess:MmIKz 992 | r1b2qk1/1p5p/p2p2p1/2p3P1/3n3Q/3P4/PPPN2PP/R1B3K1 w - - 0 17 | - | ?
+line lichess:Jjsb9/m 1282 | 2r3k1/p4p2/b5qp/6p1/3N4/1P2P1QP/P2K1PP1/R6R w - - 3 29 | - | ?
+line lichess:wCwJq/m 1694 | r4k1r/1p2bp1p/p2q2p1/2p1n3/4P1n1/8/PPQNBPPP/R1B2RK1 w - - 1 17 | - | ?
+line lichess:3oi7K/m 1995 | r1q1k1r1/5p2/pQp2p2/3p4/4b3/2N1PBP1/PPP5/R4R1K w q - 1 24 | - | ?
+line lichess:LaM16/m 655 | Q7/2r2ppk/7p/3p4/3Nn3/R2bPB2/6PP/6K1 w - - 1 36 | - | ?
+line lichess:MmItd 1080 | r3kbnr/ppq3p1/4p3/2ppn1p1/5N2/1NP1B3/PP3PPP/R2Q1RK1 w kq - 0 14 | - | ?
+line lichess:bGOmF 1168 | 7k/p5p1/2q3p1/8/Pp2NQ2/1B2P2P/1b6/1K1r4 w - - 0 32 | - | ?
+line lichess:3rv0s 1726 | 6r1/p3q2k/Bnp1p2p/3pNp2/3P4/2P5/PP1Q1PrP/R3R2K w - - 2 26 | - | ?
+line lichess:TzGcV/m 1828 | r5k1/6rq/p1P1pp2/3P3B/2P2NP1/4P3/5p2/R2Q1RbK w - - 1 31 | - | ?
+line lichess:wCuqa 517 | 5rk1/pp3ppp/2p1pn2/q1P2b2/2Nr4/1Bb2Q1P/P1P1RPPB/3R2K1 w - - 0 23 | - | ?
+line lichess:AyV3a 915 | 4n2k/6bp/3p2p1/pN2p3/P3P2q/1P1QB3/4rrPP/2RR2K1 w - - 5 23 | - | ?
+line lichess:5cNpS/m 1196 | rn2r1k1/pp3ppp/5b2/5N2/8/1P5P/P2P1R2/1RBQKBq1 w - - 3 19 | - | ?
+line lichess:N73KF/m 1635 | 5rk1/p5pp/4p3/3p4/Q1p5/P1P1p3/BPPq4/RKR5 w - - 0 26 | - | ?
+line lichess:st1ZR 1946 | rn2k1r1/pp3p1p/2p1pp2/7b/3P4/4BNqP/PPP1B3/R2Q1R1K w q - 2 14 | - | ?
+line lichess:prfYA/m 667 | 6k1/p1b2pp1/2N4p/8/1P6/P2R3P/r5P1/7K w - - 3 31 | - | ?
+line lichess:78276 920 | r4k2/pp2pp1p/7b/4pp2/6r1/1QNR2P1/PPP2q1P/1K3B1R w - - 2 18 | - | ?
+line lichess:JVmJC/m 1225 | 5rk1/pQp2Npp/8/3B1bq1/P2P4/2P4n/5PPP/2R1R1K1 w - - 1 22 | - | ?
+line lichess:FOH8l/m 1626 | 8/pp3p1k/2p2npp/3P1Q2/2P5/P5qP/1r2r1B1/5RRK w - - 0 32 | - | ?
+line lichess:wIICl/m 1830 | r4rk1/ppp2p2/2n5/3p3p/3PP1pq/2N1P2P/PPPB3K/RQ2NR2 w - - 0 16 | - | ?
+line lichess:L2JoY/m 429 | 4r2k/ppp4p/5q2/2b1r3/3pN3/3P4/PP3PPP/R3R1K1 w - - 0 23 | - | ?
+line lichess:3rwo0/m 942 | 4rr1k/p5pp/1pRP4/4Q3/1P3p1q/P4P2/6PP/3R2K1 w - - 1 31 | - | ?
+line lichess:dw2Ia 1172 | r4rk1/ppp2ppp/4bn2/8/1n6/q1NP1N2/2PB1PPP/1K1RQB1R w - - 4 15 | - | ?
+line lichess:FOH3Y/m 1431 | 8/ppQ4p/6pk/5p2/2P5/4rqPK/PP5P/4R3 w - - 1 31 | - | ?
+line lichess:TuJ6i 1829 | 7r/ppp1k1p1/3p1n2/4p1Bq/5Q2/2NP1P2/PP4Pr/R4RK1 w - - 0 20 | - | ?
+line lichess:dw04w 651 | 3r4/1p1k4/2ppp2p/2q1p3/2P1P2Q/1P5P/r4PB1/1R1R2K1 w - - 0 32 | - | ?
+line lichess:5cMDl/m 1014 | 3rr1k1/pp5p/5qp1/2Q2p2/1R1N4/P2P1B2/5PPb/4R1K1 w - - 0 25 | - | ?
+line lichess:st2b8/m 1167 | 3r2k1/1b4pp/p3p3/2p1R3/2N5/2P3qP/PP2Q1P1/R2r2K1 w - - 9 26 | - | ?
+line lichess:hiKyh/m 1492 | 7k/b1p3p1/p6p/1p2Q3/6p1/2RP4/P2qPrBP/5RK1 w - - 0 28 | - | ?
+line lichess:iroKU 1763 | 2k3rr/1b6/p3R3/2p5/3P1Q2/2P2P2/PPq3PP/5RK1 w - - 1 25 | - | ?
+line lichess:oSWtW/m 649 | rb3rk1/1pq4p/p5p1/3R1p2/2P5/1P2P2P/PB2QPP1/R5K1 w - - 3 23 | - | ?
+line lichess:PzYKN 783 | 4Q3/5ppk/5q1p/1r6/1P6/1R5P/2r2PP1/1R4K1 w - - 5 33 | - | ?
+line lichess:TzFzR 1224 | r3kbnr/pbpp1ppp/1p2pq2/4n3/8/1PP1P1P1/P2PNPBP/RNBQK2R w KQkq - 1 7 | - | ?
+line lichess:BF14R 1606 | 6r1/pp3k1p/2p1b3/6q1/4Pb2/2PQB1p1/P4P1P/3R1RK1 w - - 0 31 | - | ?
+line lichess:MmHgX/m 1814 | b4rk1/3r4/PR1pp2q/2p2p2/2P5/4P1PB/4QP1K/3R4 w - - 3 34 | - | ?
+line lichess:QUmJp 563 | 3rk2r/p1p2ppp/2p5/4Nb2/4n3/2P1b3/PP3PPP/RN2R1K1 w k - 0 13 | - | ?
+line lichess:Lcsxn/m 933 | 8/8/R7/5kpp/8/6PK/1r3P2/8 w - - 12 44 | - | ?
+line lichess:oSWnQ/m 1322 | 4rrk1/4R2p/1p3pp1/pP6/2Pq4/3P2Q1/5PPP/R5K1 w - - 1 22 | - | ?
+line lichess:JjqJJ/m 1573 | 2kr4/3q4/4Q3/5p1p/1p4p1/1P2P1P1/PBP2n1P/1NK1R3 w - - 3 31 | - | ?
+line lichess:N743c/m 2065 | 3r2k1/1RR2p2/4p1pp/8/1PQ2P2/r5KP/6P1/6b1 w - - 13 46 | - | ?
+line lichess:JBxta 710 | k2r2r1/pp1Q4/2n1P3/8/5b2/2B4P/PP3PP1/6K1 w - - 3 30 | - | ?
+line lichess:irp4b 904 | 2r3k1/1q2ppbp/6p1/Q7/4b3/1P3P2/P5PP/1K1R3R w - - 0 26 | - | ?
+line lichess:LcrTK/m 1274 | r1b3k1/pp1n2pp/2pbp1q1/3p1p2/2PP4/1P2P1P1/PB1NBnNK/R2Q1R2 w - - 0 15 | - | ?
+line lichess:L2JlC 1707 | r5k1/1p1R1ppp/4pq2/1Q6/2P1P3/5N2/rPP2PPP/2K4R w - - 1 17 | - | ?
+line lichess:GxoBP 1913 | 4k3/1pp1p3/8/8/1QK1q3/pP6/P1P2P2/8 w - - 20 41 | - | ?
+line lichess:bGRZB 617 | 3rrb1k/1p2q2p/2b2pp1/1pP5/P2p4/1Q4B1/2BR1PPP/3R2K1 w - - 0 31 | - | ?
+line lichess:o0KTs/m 857 | 7r/ppp2pk1/6p1/3q4/4NQ2/6P1/PP3P2/2R3K1 w - - 8 29 | - | ?
+line lichess:LaORy 1315 | 2r1k3/3b1p1p/3B2p1/4P1P1/1P3P2/2r1K3/7P/R6R w - - 1 39 | - | ?
+line lichess:dvzYS 1424 | 7k/p6p/P6P/2Q5/3Pp3/4P1P1/P2n1P2/3q2K1 w - - 5 49 | - | ?
+line lichess:Gk7yx 1847 | r5k1/6pp/3b2q1/6P1/1p2N2Q/3pP3/Pr6/3K1R1R w - - 0 35 | - | ?
+line lichess:irqeP 687 | 6rk/p1p3rp/1p2p3/2b1Rp1p/2B5/2P2P2/PPQ4P/3R3K w - - 3 34 | - | ?
+line lichess:Cg8Z7/m 979 | 4r1k1/pp3pp1/7P/2pp2Q1/8/2Pq1NR1/PP6/K3rR2 w - - 1 31 | - | ?
+line lichess:o0NQJ 1196 | 1kr5/1pq3b1/4p2p/3p4/R4RP1/PB2P3/KP1Q4/2r5 w - - 8 41 | - | ?
+line lichess:JVlWE 1495 | 5rk1/Q4p1p/3p3q/3P4/6n1/4n1P1/PPP1R2P/4R1K1 w - - 1 25 | - | ?
+line lichess:3rwPO 1999 | 2r3k1/pp5p/4bQp1/5n2/P1p2P2/1P5q/BBP1r1P1/R5RK w - - 0 26 | - | ?
+line lichess:JBxPg 695 | 4r1k1/p1p2pp1/1p3n1p/4B3/1N1Pq3/2Pb2Q1/P4PPP/R5K1 w - - 9 25 | - | ?
+line lichess:prf9S/m 990 | r5k1/2p2qp1/p2np3/1p1p4/3Pn2R/PPN1P1N1/B1PB1K2/R2Q4 w - - 1 26 | - | ?
+line lichess:0ATrI/m 1194 | 1b3rk1/r4pp1/p1pq3p/8/1P3P2/P3P2P/1B1P1nB1/RQ4RK w - - 3 24 | - | ?
+line lichess:TuHQh/m 1678 | 4r3/1p3N1k/1n3qpp/2b2B2/p5Q1/2N5/PP3PPP/5RK1 w - - 0 23 | - | ?
+line lichess:JVkLm 1977 | 2QR1bk1/5ppp/8/p4p2/1q2r2P/1P6/P4PP1/2B3K1 w - - 9 29 | - | ?
+line lichess:GxqRY 571 | 2rk3r/3b2p1/p2Qp1Bp/8/8/5N2/PP3PPP/6K1 w - - 1 23 | - | ?
+line lichess:oSYR7 884 | rn3rk1/ppp1bpp1/3p3p/5q2/3Pn1P1/2P1BP2/PP1NP2P/R2QKB1R w KQ - 1 12 | - | ?
+line lichess:2miON/m 1198 | 1b4rk/p4p1p/2pqp3/3p1p2/8/PP2P1PP/2P1QPK1/2R2R2 w - - 0 21 | - | ?
+line lichess:PzXVc 1528 | 8/pp4pk/1q1BQ2p/4Pp2/P3pP2/2r1P2R/6PP/Rr4K1 w - - 1 28 | - | ?
+line lichess:oSZjx/m 2062 | r3k2r/ppq2pp1/2p5/7p/3Q4/P5nP/1PP1BRPb/R1B4K w kq - 1 17 | - | ?
+line lichess:JVlNa 734 | 5rk1/p5p1/2p1pq1p/8/3P4/P5Q1/1P3PPP/2R3K1 w - - 0 28 | - | ?
+line lichess:NXc9c 787 | r4rk1/pp3qpp/8/4Q3/4P3/1P3N1b/P4PP1/2R1R1K1 w - - 0 21 | - | ?
+line lichess:GxoV6/m 1188 | 2r3k1/pQ4pp/1p4r1/8/1P1B1p1q/P1P1pP1b/2R3P1/5R1K w - - 0 28 | - | ?
+line lichess:irnOK 1440 | 3rr1k1/ppb2ppp/3q1n2/PB1pn1B1/1PP5/3Q1N2/5PPP/3R1RK1 w - - 1 19 | - | ?
+line lichess:mRqWF 1790 | r4rk1/pp3p2/2p5/6p1/3qN1n1/P2B2P1/1PQ3P1/3R1R1K w - - 3 28 | - | ?
+line lichess:mRrqH/m 450 | 5rk1/6pp/1pQ5/2p1p3/2P2p2/r2P4/1q3PPP/RR4K1 w - - 0 21 | - | ?
+line lichess:LcpRr/m 960 | 2kr3r/ppp3pp/2n2b2/5p2/1P4b1/P2Pn2P/2QNpPP1/2R1K2R w K - 0 15 | - | ?
+line lichess:wIIgu/m 1225 | 2Q5/pP3p1p/5p2/P2k4/3b1P2/6P1/K1R4P/1r2r3 w - - 7 36 | - | ?
+line lichess:PWQIW 1469 | 6k1/1Q2R2p/p5p1/4q3/2P5/1P4PP/P4r1K/8 w - - 0 37 | - | ?
+line lichess:dw0UO/m 1779 | 5rk1/p7/4prbQ/6B1/1PpPP2b/P1P3q1/4R3/2R2BK1 w - - 1 30 | - | ?
+line lichess:Pv7rk 724 | r2kr3/p5p1/2p2p2/5Q1p/2Pq1B2/8/PP3nPP/3R1R1K w - - 6 25 | - | ?
+line lichess:T5hs0/m 949 | 4r1k1/ppp4N/2n5/bNPb4/5Q2/P5P1/1P3P2/R3r1KR w - - 3 26 | - | ?
+line lichess:JBxtt 1098 | Q1b2bnr/p3kppp/4n3/4q1N1/8/8/PP3PPP/RNB1K2R w KQ - 1 13 | - | ?
+line lichess:oSYbt 1742 | 4r3/p2rN3/5k2/3p4/2nP4/2P5/PP3P2/1R2R1K1 w - - 0 33 | - | ?
+line lichess:JVltl/m 1978 | 8/6pp/8/7K/6P1/6kP/8/8 w - - 7 52 | - | ?
+line lichess:hiKpJ 665 | 2R2bk1/6pp/4p1n1/4Pp2/P2P1P2/3B4/3qNBPP/6K1 w - - 1 45 | - | ?
+
+challenge defend defence 4
+# want 6
+line lichess:dw1T8/m 1128 | 8/p7/1p1KP1k1/8/1P3P2/8/P3nN1p/8 b - - 3 41 | e2f4 | e6e7 g6f7 d6d7
+line lichess:irpAB 1345 | 8/6p1/Pk2K2p/1P5P/n7/8/8/8 b - - 8 60 | a4c5 | e6f7 c5e4 f7g7 e4c3 g7h6
+line lichess:fOihT/m 1395 | 8/8/6p1/4p1Pp/kb1pPp1P/3P1P2/2rB4/3RK3 b - - 43 72 | a4b3 | d1b1 b3a3 d2b4 a3a2 b1d1
+line lichess:781J6/m 1631 | 8/3k4/PKp2ppp/2Pp4/3N1PPP/4r3/8/8 b - - 0 41 | e3e4 | a6a7 e4d4 a7a8q d4b4 b6a5
+line lichess:o0Kq5/m 1917 | 7k/p5p1/2p5/2P5/3P3p/P5r1/1P1R3K/8 b - - 0 35 | h8g8 | d4d5 c6d5 c5c6 g3g6 d2c2
+line lichess:st4dV 1937 | 2Q3k1/pp5p/6p1/n7/8/7P/q2r2P1/3R3K b - - 1 27 | g8g7 | c8c3 g7f7 d1d2 a2b1 h1h2
+line lichess:AyTvO/m 1172 | 7r/1p1k1pR1/2pp4/3b1P2/2BK1R2/8/PP5r/8 b - - 0 34 | c6c5 | d4d5 h2d2 d5e4
+line lichess:pbrI9/m 1238 | 8/8/8/1p1k1pp1/1P1n4/3K4/5P1P/3B4 b - - 0 48 | d4c6 | d1f3 d5d6 f3c6 d6c6 d3d4
+line lichess:mRt5C/m 1419 | rnbq1rk1/1pN2ppp/p2b1B2/2p5/2Pp1Q2/8/PP2PPPP/3RKBNR b K - 0 12 | d8c7 | f4g5 c7a5 d1d2
+line lichess:oSYPc 1721 | r3k2r/pp1n1ppp/2p5/3p1Q2/3P4/2N1PN2/PP3PqP/3RK2R b Kkq - 0 13 | g2h1 | e1e2 h1g2 d1g1 g7g6 f5d7
+line lichess:Gk8vq 1777 | 8/pp5P/2k3R1/6K1/2n1p3/8/P7/7r b - - 1 41 | c6c5 | g6h6 h1h6 g5h6 c4e5 h6g7
+line lichess:TuIEZ 1973 | r3r1k1/5q2/p2p2pQ/3n4/2p5/2Pb1B1P/1P3PP1/R3R1K1 b - - 2 23 | e8e1 | a1e1 a8b8 f3d5 f7d5 e1e7
+line lichess:0AVN5/m 1164 | 5Q2/6p1/7p/5k2/1P2p3/5q2/5P2/5K2 b - - 6 50 | f5g6 | f8f3 e4f3 b4b5
+line lichess:wIKI6/m 1301 | 3k4/p5R1/1p1KB2r/8/2p1P3/Pb6/8/8 b - - 6 40 | h6e6 | d6e6 c4c3 e6d6
+line lichess:5cLPK/m 1438 | 4r1k1/p4pp1/b6p/2p1q3/3rN1P1/PP2QP1P/2P5/2K1R2R b - - 0 25 | d4e4 | e3e4 e5a1 c1d2 e8d8 d2e3
+line lichess:HZkDe/m 1671 | 2k4r/1p6/2PPP3/3K4/8/p7/7p/7R b - - 0 58 | b7c6 | d5c6 c8d8 e6e7 d8e8 c6c7
+line lichess:fOkoe 1777 | 6k1/1p1q1pbp/4p1p1/pP1p4/P2P4/B3P3/5PPP/2Q3K1 b - - 0 26 | b7b6 | c1c6 d7d8 a3d6
+line lichess:BF27I 2048 | r3k3/3q1nQ1/2n1p3/p2pP1P1/PppP2P1/2P1r3/1P6/R4RK1 b q - 0 24 | e3g3 | g1h2 e8c8 f1f7
+line lichess:TuHjm 1063 | 8/4k3/5p2/5P2/1bK5/3nB3/8/8 b - - 1 49 | b4c5 | e3c5 d3c5 c4c5 e7d7 c5d5
+line lichess:PWRNS 1321 | 8/8/8/pK3k2/P7/8/8/8 b - - 3 81 | f5e5 | b5a5 e5d6 a5b6 d6d7 b6b7
+line lichess:uvDEK/m 1535 | r1b2rk1/ppp2ppp/5n2/4P3/4p3/2P2P2/P1P3PP/R1BK1B1R b - - 0 11 | e4f3 | e5f6 f3g2 f1g2 c8g4 d1e1
+line lichess:N72xs 1586 | 8/4kp2/8/4PpR1/5P2/3p2rP/5K2/8 b - - 1 42 | g3g5 | f4g5 f5f4 h3h4
+line lichess:BF25T 1845 | 4r1k1/1p6/5ppQ/7p/P4RqP/8/6P1/6K1 b - - 4 32 | e8e1 | g1h2 g4d7 h6g6
+line lichess:qsuav 2100 | 6k1/5pp1/7p/2pP4/2r5/7P/5PP1/3R2K1 b - - 1 33 | c4d4 | d1d4 c5d4 g1f1 d4d3 f1e1
+
+challenge kq endgames 1
+# want 3
+# hand-written: tools/challenges/endgames.txt
+
+challenge kr endgames 2
+# want 3
+# hand-written: tools/challenges/endgames.txt
+
+challenge kp endgames 2
+# want 4
+# hand-written: tools/challenges/endgames.txt
+
+challenge kp_hold endgames 3
+# want 3
+# hand-written: tools/challenges/endgames.txt
+
+challenge rook endgames 4
+# want 3
+# hand-written: tools/challenges/endgames.txt
+
+challenge endgame endgames 3
+# want 6
+line lichess:PWRtQ/m 983 | 8/2r2pp1/7p/pk6/1p1K1PP1/1P5P/R7/8 b - - 2 38 | c7c5 | a2a5 b5a5 d4c5
+line lichess:MmJCl/m 1163 | 8/8/8/3p1pk1/3P4/5KP1/8/8 b - - 2 55 | g5h5 | f3f4 h5g6 f4e5
+line lichess:2mgs1 1319 | 8/4pp2/p7/P2P2p1/2k1P1Pp/2p2P1P/8/2K5 b - - 3 43 | c4b3 | e4e5 b3c4 d5d6 e7d6 e5d6
+line lichess:BF3Lk/m 1432 | 8/8/3k2p1/p4pP1/P6P/5K2/8/8 b - - 0 45 | d6c5 | h4h5 g6h5 g5g6
+line lichess:bGRwV/m 1642 | 8/8/4K2p/Pk3Rr1/1P6/8/8/8 b - - 7 51 | b5b4 | f5g5 h6g5 a5a6 g5g4 a6a7
+line lichess:BF03b 1761 | 4r3/5k2/5p1P/1p3K2/p1pP1P2/6R1/P7/8 b - - 2 50 | e8h8 | g3g7 f7f8 f5g6
+line lichess:oSYFZ 994 | 8/2r2pp1/pk1Kp2p/1P1p4/P4P2/6P1/1R5P/8 b - - 5 38 | a6b5 | b2b5 b6a6 d6c7
+line lichess:prfBQ/m 1084 | 8/p7/1pp1k3/4p1P1/1P4Pp/P2K3P/8/8 b - - 2 41 | e6f7 | d3e4 f7e6 g5g6
+line lichess:AyTKf/m 1283 | 8/7p/4k3/p4pPK/P7/6P1/8/8 b - - 3 51 | e6f7 | h5h6 f7g8 g5g6 h7g6 h6g6
+line lichess:2mikf/m 1506 | 8/6P1/5K2/p1R5/kp6/8/1P6/6r1 b - - 1 53 | a4b3 | c5g5 g1g5 f6g5
+line lichess:MmGlR 1632 | 8/1pp5/p3k1p1/4p2p/P3P2P/2PK2P1/2P5/8 b - - 0 30 | a6a5 | d3c4 c7c6 c4c5 b7b5 a4b5
+line lichess:3oi8G 1895 | 8/1p3k2/p2p4/2P5/PP1K4/8/8/8 b - - 0 42 | f7e7 | d4d5 d6c5 d5c5 e7e6 c5b6
+line lichess:NXd1X 967 | 8/8/1k6/2p5/p6P/1p6/1K3PP1/8 b - - 0 44 | c5c4 | h4h5 b6c5 h5h6 a4a3 b2a3
+line lichess:Gxohq/m 1148 | 8/8/pK6/8/P7/2k5/8/8 b - - 2 54 | c3b4 | a4a5 b4c4 b6a6 c4c5 a6b7
+line lichess:dvzUO/m 1286 | 7k/6p1/5p1p/7P/4Pp2/5P2/6PK/8 b - - 0 51 | h8g8 | h2h3 g8f7 h3g4
+line lichess:Pv833 1435 | 8/1p1k4/p4ppp/2PK4/1P3PPP/8/8/8 b - - 0 37 | d7e7 | c5c6 b7c6 d5c6
+line lichess:iRdT4 1658 | 8/1p5p/4k2P/p2p2p1/P1PP1pK1/1P1R4/6P1/4r3 b - - 6 39 | e1e3 | d3e3 f4e3 g4f3 d5c4 b3c4
+line lichess:LkA1p 1766 | 8/8/1p1k4/p5p1/P1P3P1/3K4/8/8 b - - 1 44 | d6e6 | d3e4 e6d6 e4f5 d6c5 f5g5
+line lichess:wIIqc 920 | 8/p4p2/2p2kB1/1p1p3p/PR3p1P/2P3r1/1P3K2/8 b - - 3 37 | f7g6 | b4f4 f6e6 f2g3
+line lichess:JBxOo 1182 | 8/8/5p2/4r1kp/3R2p1/5P2/6K1/8 b - - 0 46 | f6f5 | f3f4 g5f6 f4e5
+line lichess:wCuf7 1359 | 4R3/6p1/2r1p1kp/3pP3/3P2PP/2B5/6K1/8 b - - 0 39 | c6c3 | e8e6 g6f7 e6d6
+line lichess:PzXiD/m 1509 | 8/8/p5pp/1p1k4/1P1P1p1P/P1K2P2/8/8 b - - 1 38 | g6g5 | h4g5 h6g5 c3d3 d5d6 d3e4
+line lichess:Cg8wL 1576 | r6r/pp1k4/3p1Rbp/2P5/8/1P4P1/P6P/4R1K1 b - - 1 31 | g6d3 | f6d6 d7c8 d6d3
+line lichess:GxqiL/m 1791 | 8/8/Rp6/P7/1PP2p2/8/3rk3/2K5 b - - 2 60 | b6a5 | a6e6 e2d3 e6d6 d3c3 d6d2
