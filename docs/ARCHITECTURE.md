@@ -101,8 +101,8 @@ roughness), b = Charlie sheen directional albedo. Units 16..23 (`TEXUNIT_SKY`, `
 `TEXUNIT_NOISE`, `TEXUNIT_GLOBAL0`..) are reserved and not bound.
 
 **Sun shadows.** `RenderSettings::shadowCascades` (2 or 3) cascades fitted to fixed receiver
-regions (`Renderer::setShadowRegions`, finest first; default: table + seated players, the area
-around the table, the whole hall incl. walls) — not to the view frustum. The depth range of every
+regions (`Renderer::setShadowRegions`, finest first; default: table + players seated or standing
+up (|x| 1.20, 1.85 m high), the area around the table, the whole hall incl. walls) — not to the view frustum. The depth range of every
 cascade covers `Renderer::setSceneBounds` (default: hall + thick walls) and depth clamp is on, so
 casters between the sun and the table (window walls) are never lost. `DRAW_STATIC` casters are
 cached per cascade (`staticShadowCache`, re-rendered on `invalidateStatic()` / sun move), dynamic
@@ -119,6 +119,9 @@ that submits draw items (empty loading frames are skipped), on `invalidateStatic
 moves by more than 1° or the sky changes (≈ 1.3 s for 16 probes
 × 2 bounces at 128², the High preset, on llvmpipe). Shading blends priority probes first, then the grid with
 normalised radial kernels (continuous everywhere), box-projected specular from the two strongest.
+Something that only sometimes moves (the chairs, pushed back by a player standing up) is drawn as a
+dynamic item and once more at its usual place as `DRAW_STATIC | DRAW_HIDDEN_MAIN` without
+`DRAW_CAST_SHADOW`: a copy only the probes see, so moving it never re-bakes them.
 
 **Planar reflections.** `PlanarReflector` gains `bounds` (skip when off screen + scissor to its
 screen rectangle) and `minObjectSize` (skip objects whose radius / distance is smaller in the

@@ -315,6 +315,8 @@ void World::setupRenderer(render::Renderer& r) {
     r.warmProgram(w.analysisMarkMat, render::PassId::Main);
 }
 
+void World::setChairSlide(int seat, float metres) { chairSlide_[seat & 1] = std::max(0.0f, metres); }
+
 void World::setClockSide(bool positiveX) {
     clockPosX_ = positiveX;
     hasPrevLever_ = false;
@@ -370,8 +372,33 @@ void World::submitStatic(render::Renderer& r) {
     Impl& w = *impl_;
     submitModel(r, w.hall, mat4(), OBJ_HALL, render::DRAW_STATIC);
     submitModel(r, w.table, mat4(), OBJ_TABLE, render::DRAW_STATIC);
-    submitModel(r, w.chair, translate(vec3(0, 0, layout::CHAIR_Z)) * rotateY(PI), OBJ_CHAIR, render::DRAW_STATIC);
-    submitModel(r, w.chair, translate(vec3(0, 0, -layout::CHAIR_Z)), OBJ_CHAIR + 1, render::DRAW_STATIC);
+    for (int seat = 0; seat < 2; ++seat) {
+        // White's chair at +Z faces -Z; a chair pushed back slides away from the table (+Z for
+        // White's). Drawn moving every frame (not in the cached static shadows: it may slide at any
+        // time), its copy at home for the probes only (hidden in the main and reflection views, no
+        // shadow), whose capture stays valid since a chair spends nearly all its time there.
+        float zs = seat == 0 ? 1.0f : -1.0f;
+        mat4 home = translate(vec3(0, 0, zs * layout::CHAIR_Z)) * (seat == 0 ? rotateY(PI) : mat4());
+        mat4 model = translate(vec3(0, 0, zs * chairSlide_[seat])) * home;
+        mat4 prev = translate(vec3(0, 0, zs * prevChairSlide_[seat])) * home;
+        prevChairSlide_[seat] = chairSlide_[seat];
+        for (auto& p : w.chair.parts) {
+            render::DrawItem d;
+            d.mesh = &p.mesh;
+            d.material = &materials::get(p.material);
+            for (int k = 0; k < 4; ++k) d.inst[k] = p.inst[k];
+            d.objectId = OBJ_CHAIR + uint32_t(seat);
+            d.model = model;
+            d.prevModel = prev;
+            d.hasPrevModel = true;
+            d.flags = p.flags & ~render::DRAW_STATIC;
+            r.submit(d);
+            d.model = home;
+            d.hasPrevModel = false;
+            d.flags = (p.flags & ~render::DRAW_CAST_SHADOW) | render::DRAW_STATIC | render::DRAW_HIDDEN_MAIN;
+            r.submit(d);
+        }
+    }
     if (!w.boardCoords || !w.coordTex) {
         submitModel(r, w.board, mat4(), OBJ_BOARD, render::DRAW_STATIC);
         return;
