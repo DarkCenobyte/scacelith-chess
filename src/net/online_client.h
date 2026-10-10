@@ -397,6 +397,10 @@ struct Event {
     // is signed out. The error is then "unauthorized", or none when a public read was asked again
     // without the token and answered (fetchGame, downloadPgn).
     bool sessionLost = false;
+    // LoginResult ok (Linux): where the session was kept when no system keyring could keep it, the
+    // first time this run for each (CredentialStore::firstNotice): "file" (the credentials file,
+    // only the player's account can read it) or "memory" (until the game quits); "" otherwise.
+    std::string sessionNotice;
     // HTTPS results: the origin (ServerEndpoint::origin()) of the server the command went to, the
     // one in use when it was given; "" for the realtime events. An answer that arrives after
     // setServer() chose another server names the previous one.

@@ -494,6 +494,8 @@ options.online.test = Verbindung testen
 options.online.test_ok = {0}: verbunden, mit dieser Version kompatibel.
 options.online.test_incompatible = {0}: verbunden, benötigt aber eine andere Version von Scacelith.
 options.online.in_game = Während einer Online-Partie kann der Server nicht gewechselt werden.
+options.online.remember_session = Anmeldung merken, wenn kein Systemschlüsselbund verfügbar ist
+options.online.remember_session.help = Wenn kein Systemschlüsselbund (GNOME Keyring, KWallet…) Ihre Sitzung aufbewahren kann, wird sie in einer Datei gespeichert, die nur Ihr Benutzerkonto lesen kann. Wer Ihre Dateien oder eine Kopie davon (etwa eine Sicherung) lesen kann, könnte diese Sitzung verwenden. Aus: Sie bleiben angemeldet, bis das Spiel geschlossen wird. Unter „Angemeldete Geräte“ in Ihrem Konto können Sie jedes Gerät abmelden.
 
 # Sign in, create an account
 online.signin.lead = Melden Sie sich bei {0} an, um online gegen andere zu spielen.
@@ -616,6 +618,8 @@ online.account.delete = Konto löschen
 
 # Play
 online.play.signed_in = Angemeldet als {0}
+online.session.file = Kein Systemschlüsselbund konnte Ihre Anmeldung aufbewahren: Sie wird in einer Datei gespeichert, die nur Ihr Benutzerkonto lesen kann (Optionen > Online-Server).
+online.session.memory = Kein Systemschlüsselbund konnte Ihre Anmeldung aufbewahren, und sie wird in keiner Datei gespeichert: Sie bleiben angemeldet, bis das Spiel geschlossen wird (Optionen > Online-Server).
 online.play.find_section = GEGNER FINDEN
 online.play.friend_section = GEGEN FREUNDE SPIELEN
 online.play.mode = Partie

@@ -504,6 +504,8 @@ options.online.test = Test connection
 options.online.test_ok = {0}: connected, compatible with this version.
 options.online.test_incompatible = {0}: connected, but it needs another version of Scacelith.
 options.online.in_game = The server cannot be changed during an online game.
+options.online.remember_session = Remember my sign-in when the system keyring is unavailable
+options.online.remember_session.help = When no system keyring (GNOME Keyring, KWallet…) can keep your session, it is saved in a file that only your user account can read. Anyone who can read your files, or a copy of them such as a backup, could use that session. Off: you stay signed in until the game closes. You can sign out any device from Signed-in devices, in your account.
 
 # Sign in, create an account
 online.signin.lead = Sign in to {0} to play people online.
@@ -628,6 +630,8 @@ online.account.delete = Delete account
 
 # Play
 online.play.signed_in = Signed in as {0}
+online.session.file = No system keyring could keep your sign-in: it is remembered in a file that only your user account can read (Options > Online server).
+online.session.memory = No system keyring could keep your sign-in, and it is not saved in a file: you stay signed in until the game closes (Options > Online server).
 online.play.find_section = FIND AN OPPONENT
 online.play.friend_section = PLAY A FRIEND
 online.play.mode = Game

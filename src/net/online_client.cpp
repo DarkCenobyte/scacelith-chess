@@ -861,7 +861,8 @@ struct OnlineClient::Impl {
         ServerInfo info;
         if (fetchInfo(e, info, httpCancel).ok() && !info.serverId.empty()) c.serverId = info.serverId;
         bool stored = false;
-        if (!creds.put(c, &stored)) LOGW("net: the session could not be saved (%s)", creds.path().c_str());
+        CredentialStore::Kept kept = CredentialStore::Kept::None;
+        if (!creds.put(c, &stored, &kept)) LOGW("net: the session could not be saved (%s)", creds.path().c_str());
         mfaToken.clear();
         if (!stored) {
             // The token could not be protected (DPAPI): kept nowhere, the session would end at the
@@ -872,6 +873,8 @@ struct OnlineClient::Impl {
         }
         ev.ok = true;
         ev.error.clear();
+        // Kept outside the system keyring (Linux): the player is told, once per run.
+        if (creds.firstNotice(kept)) ev.sessionNotice = kept == CredentialStore::Kept::Memory ? "memory" : "file";
     }
 
     // Ends the Google sign-in under way: its listener stops (net-sso joined) and a redirect of it

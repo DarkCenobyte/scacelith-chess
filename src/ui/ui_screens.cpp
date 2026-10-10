@@ -18,6 +18,7 @@
 #include "../game/scoresheet_layout.h"
 #include "../game/settings.h"
 #include "../i18n/i18n.h"
+#include "../net/credential_store.h"
 #include "../i18n/unicode.h"
 #include "../platform/platform.h"
 #include "../render/post/display_transform.h"
@@ -682,6 +683,8 @@ bool optionsPage(MenuAction& act) {
         game::settings().save();
         // Another server: its own sign-in (credentials are kept per server by the network layer).
         if (detail::onlineServerChanged(before, game::settings())) game::onlineSession().applyServer();
+        // Linux: a session no keyring keeps, in the file or in memory (applied at once to the saved ones).
+        net::setFileSessionsAllowed(game::settings().onlineRememberWithoutKeyring);
         act = MenuAction::OptionsChanged;
         o.work = game::settings();
         im::sound(Sound::Confirm);

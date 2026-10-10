@@ -495,6 +495,8 @@ options.online.test = Tester la connexion
 options.online.test_ok = {0} : connecté, compatible avec cette version.
 options.online.test_incompatible = {0} : connecté, mais il faut une autre version de Scacelith.
 options.online.in_game = Le serveur ne peut pas être changé pendant une partie en ligne.
+options.online.remember_session = Mémoriser ma connexion si le trousseau système est indisponible
+options.online.remember_session.help = Quand aucun trousseau système (GNOME Keyring, KWallet…) ne peut conserver votre session, elle est enregistrée dans un fichier que seul votre compte utilisateur peut lire. Quiconque peut lire vos fichiers, ou une copie de ceux-ci comme une sauvegarde, pourrait utiliser cette session. Désactivé : vous restez connecté jusqu’à la fermeture du jeu. Vous pouvez déconnecter chaque appareil depuis Appareils connectés, dans votre compte.
 
 # Sign in, create an account
 online.signin.lead = Connectez-vous à {0} pour jouer en ligne contre d’autres joueurs.
@@ -617,6 +619,8 @@ online.account.delete = Supprimer le compte
 
 # Play
 online.play.signed_in = Connecté en tant que {0}
+online.session.file = Aucun trousseau système n’a pu conserver votre connexion : elle est mémorisée dans un fichier que seul votre compte utilisateur peut lire (Options > Serveur en ligne).
+online.session.memory = Aucun trousseau système n’a pu conserver votre connexion, et elle n’est enregistrée dans aucun fichier : vous restez connecté jusqu’à la fermeture du jeu (Options > Serveur en ligne).
 online.play.find_section = TROUVER UN ADVERSAIRE
 online.play.friend_section = JOUER CONTRE UN AMI
 online.play.mode = Partie

@@ -449,6 +449,9 @@ void pumpResults() {
             O.resendEmail.clear();
             if (signedOutForm) setSub(Sub::Play);
             else notify(i18n::trf("online.play.signed_in", {s.account().username}), 4.0f);
+            // Linux without a usable system keyring: where the session is kept (once per run).
+            if (e.sessionNotice == "file") notify(T("online.session.file"), 10.0f);
+            else if (e.sessionNotice == "memory") notify(T("online.session.memory"), 10.0f);
         } else if (refused == detail::RefusedSignIn::Code) {
             if (signedOutForm) {
                 O.code.clear();
@@ -2247,6 +2250,13 @@ void onlineOptionsRows(game::Settings& s, float rx, float rw, float& y) {
         gs.size = gfx::fitSize(T("options.online.in_game"), gs, tw, 0.7f);
         gfx::text(T("options.online.in_game"), im::flipX(tcolF, tcolF.x), tr.y + 34.0f, gs);
     }
+#ifndef _WIN32
+    // Linux: a session no system keyring can keep (net/credential_store.h), in a file only the
+    // player's account can read, or in memory until the game quits. Windows keeps it with DPAPI.
+    y += 10.0f;
+    im::toggleRow(L("options.online.remember_session"), s.onlineRememberWithoutKeyring, row(rh));
+    im::tooltip(T("options.online.remember_session.help"));
+#endif
     im::popId();
 }
 
@@ -2256,14 +2266,18 @@ void copyOnlineOptions(game::Settings& dst, const game::Settings& src) {
     dst.onlineApiPort = src.onlineApiPort > 0 ? src.onlineApiPort : 443;
     dst.onlineWsPort = src.onlineWsPort;
     dst.onlinePin = trim(src.onlinePin);
+    dst.onlineRememberWithoutKeyring = src.onlineRememberWithoutKeyring;
+}
+
+bool onlineServerChanged(const game::Settings& before, const game::Settings& after) {
+    return before.onlineCustomServer != after.onlineCustomServer || trim(before.onlineHost) != trim(after.onlineHost) ||
+           before.onlineApiPort != after.onlineApiPort || before.onlineWsPort != after.onlineWsPort ||
+           trim(before.onlinePin) != trim(after.onlinePin);
 }
 
 bool sameOnlineOptions(const game::Settings& a, const game::Settings& b) {
-    return a.onlineCustomServer == b.onlineCustomServer && trim(a.onlineHost) == trim(b.onlineHost) &&
-           a.onlineApiPort == b.onlineApiPort && a.onlineWsPort == b.onlineWsPort && trim(a.onlinePin) == trim(b.onlinePin);
+    return !onlineServerChanged(a, b) && a.onlineRememberWithoutKeyring == b.onlineRememberWithoutKeyring;
 }
-
-bool onlineServerChanged(const game::Settings& before, const game::Settings& after) { return !sameOnlineOptions(before, after); }
 
 }  // namespace detail
 
