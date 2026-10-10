@@ -1040,6 +1040,8 @@ bool GameScene::update(AppContext& ctx, float dt) {
                 mode_ = GameMode::Analysis;
                 state_ = State::FadeToGame;
                 stateTime_ = 0.0f;
+            } else {
+                ui::openSavedGames();   // back to the page it was chosen on
             }
         } else if (a == ui::MenuAction::StartCoach) {
             // The Coach page saved its choice in the .ini ([coach]): the level and the colour come
@@ -1300,6 +1302,7 @@ void GameScene::simulate(float dt) {
         break;
     case State::Playing:
         if (!paused_ || online()) updatePlaying(dt);  // an online game goes on behind the menu
+        else if (analysing()) holdAnalysis();
         break;
     case State::GameOver:
         // A replay: a step back or a jump from its end card (J, Home, "Replay again") sets the
@@ -2528,7 +2531,9 @@ ClockDisplay GameScene::clockDisplay() const {
         return d;
     }
     if (online() && link_) return onlineClockDisplay();
-    if (analysing() && state_ != State::Menu && state_ != State::Loading) return analysisClockDisplay();
+    // (Not while the game it follows fades out: its clock stays on the table until the analysis is set.)
+    if (analysing() && analysisLoaded() && state_ != State::Menu && state_ != State::Loading)
+        return analysisClockDisplay();
     if (replaying() && state_ != State::Menu && state_ != State::Loading) return replayClockDisplay();
     ClockDisplay d;
     int hw = world_.clockHalfForSeat(1.0f), hb = 1 - hw;
@@ -2724,7 +2729,10 @@ void GameScene::updateWatchInput() {
             state_ = State::FadeToMenu;
             stateTime_ = 0.0f;
             break;
-        case ui::MenuAction::OptionsChanged: applySettings(true); break;
+        case ui::MenuAction::OptionsChanged:
+            applySettings(true);
+            if (analysing()) analysisOptionsChanged();
+            break;
         default: break;
         }
         return;
@@ -2875,6 +2883,8 @@ int GameScene::headBeforeBoard(vec3 p) const {
     for (int seat = 0; seat < 2; ++seat) {
         mat4 e = anim_[seat].eyeCameraTransform();
         vec3 centre = e.c[3].xyz() + normalize(e.c[2].xyz()) * 0.06f;  // +Z: behind the eyes
+        // Close to the camera only: from further back the whole robot is in the picture.
+        if (length(centre - p) > 0.6f) continue;
         float t = dot(centre - p, d) / len2;
         if (t <= 0.0f || t >= 1.0f) continue;
         if (length(centre - (p + d * t)) < 0.24f) return seat;

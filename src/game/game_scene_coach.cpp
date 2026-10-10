@@ -597,6 +597,10 @@ void GameScene::refreshCoachVoice() {
     // speech only once the voice is available).
     if (coachVoiceFiles_ && coach() && coach_ && coach_->sessionRunning && !coach_->workerStarted)
         coach_->stage->ensureWorker();
+    // Likewise in an analysis (its commentator speaks through the coach's worker): the voice is
+    // heard from the next comment on.
+    if (coachVoiceFiles_ && analysing() && settings().analysisVoice && !(coach_ && coach_->workerStarted))
+        ensureCoachVoiceWorker();
 }
 
 void GameScene::coachModelDownloaded(int fetched) {

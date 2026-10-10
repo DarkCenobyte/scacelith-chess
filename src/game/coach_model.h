@@ -9,8 +9,9 @@
 //     not all there: the prompt shows over the Coach page (hooked through ui::setCoachEntryHook);
 //   - the player switches Options > Audio > Coach voice on (applied) and the model is missing;
 //   - the voice failed to load files that looked complete (coachModelLoadFailed), once;
-//   - the player opens a game in the Analysis mode, the voice is on, the model missing, and the
-//     prompt was never shown before (Settings::coachVoiceOffered; offerVoiceForAnalysis).
+//   - the player opens a game in the Analysis mode, the voice is on ([coach] voice and the
+//     analysis's own, M), the model missing, and the prompt was never shown before
+//     (Settings::coachVoiceOffered; offerVoiceForAnalysis).
 // "Not now" (or Esc) switches [coach] voice off and saves: the coach speaks through subtitles,
 // and is not offered the download again until the player switches the voice back on.
 //

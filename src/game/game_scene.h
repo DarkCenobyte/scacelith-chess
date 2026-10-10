@@ -477,6 +477,9 @@ private:
     bool playedRecord(chess::pgn::Record& out, bool& finished, archive::Mode& mode) const;
     void setupAnalysis();                     // part of setupNewGame(): the review, the cache, the voice offer
     void updateAnalysis(float dt);            // updatePlaying() while analysing: steps, review, comments
+    void holdAnalysis();                      // in its place while the pause menu is open: the voice waits
+    bool analysisLoaded() const;              // the analysed game is set (its clocks, its marks)
+    void analysisOptionsChanged();            // the options' language and subtitles for the commentator
     void updateAnalysisInput();               // J K L, Home End, N M B (besides the viewer's keys)
     bool analysisKey(const std::string& key); // a key, or a --replay-keys entry ("Goto:12")
     void analysisGoTo(int position);          // the board to that position: animated when adjacent, else set at once

@@ -141,7 +141,7 @@ bool coachModelNeedsPrompt() {
 void openModelPrompt() { state().promptOpen = true; }
 
 bool offerVoiceForAnalysis() {
-    if (settings().coachVoiceOffered || !coachModelNeedsPrompt()) return false;
+    if (!settings().analysisVoice || settings().coachVoiceOffered || !coachModelNeedsPrompt()) return false;
     openModelPrompt();
     return true;
 }

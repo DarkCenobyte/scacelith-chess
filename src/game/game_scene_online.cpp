@@ -925,7 +925,11 @@ ui::GameOverExtras GameScene::onlineGameOverExtras() const {
     if (link_ && link_->canReport() && !reported_ && !reportQueued_ && !reportSending_)
         x.reportLabel = i18n::tr("online.report.button");
     // A game with moves (an aborted one may have none) can be analysed: that declines the rematch.
-    x.analyse = !game_.moves().empty();
+    // (a direct match analyses the authority's record: none, the button neither).
+    chess::pgn::Record rec;
+    bool finished = false;
+    archive::Mode mode = archive::Mode::Play;
+    x.analyse = !game_.moves().empty() && (!directMatch_ || playedRecord(rec, finished, mode));
     return x;
 }
 

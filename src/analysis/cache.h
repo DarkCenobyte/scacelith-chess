@@ -14,9 +14,13 @@ namespace analysis {
 // "<folder><key>.txt"
 std::string cachePath(const std::string& folder, const std::string& key);
 // The evaluations saved for 'key', or false (no file, unreadable, another game, another number of
-// positions).
-bool loadCache(const std::string& folder, const std::string& key, int positions, std::vector<PositionEval>& out);
+// positions). 'deepDepth' (optional) receives the deep pass's depth of the review that saved them
+// (0 when the file does not say), for GameReview::restore().
+bool loadCache(const std::string& folder, const std::string& key, int positions, std::vector<PositionEval>& out,
+               int* deepDepth = nullptr);
 // Writes them (atomically: a temporary file renamed) and trims the folder to the newest 200 files.
-bool saveCache(const std::string& folder, const std::string& key, const std::vector<PositionEval>& evals);
+// 'deepDepth': the review's Settings::deepDepth (0: not written).
+bool saveCache(const std::string& folder, const std::string& key, const std::vector<PositionEval>& evals,
+               int deepDepth = 0);
 
 }  // namespace analysis

@@ -3,6 +3,7 @@
 //   scacelith-analysis 1
 //   key 0123456789abcdef
 //   positions 41
+//   deep 18                    (optional: the deep pass's depth of the review that wrote it)
 //   e <i> <depth> <final> <cp> <mate> <best> <second: 0 | 1 <cp> <mate> <uci>> <pv length> <pv...>
 //
 // one "e" line per analysed position (a position without legal moves needs none: the review knows
@@ -94,7 +95,8 @@ bool parseEntry(const std::string& line, int positions, int& index, PositionEval
     return !(in >> extra);
 }
 
-bool parse(const std::string& text, const std::string& key, int positions, std::vector<PositionEval>& out) {
+bool parse(const std::string& text, const std::string& key, int positions, std::vector<PositionEval>& out,
+           int& deepDepth) {
     std::istringstream in(text);
     std::string line;
     auto next = [&](std::string& l) {
@@ -107,8 +109,18 @@ bool parse(const std::string& text, const std::string& key, int positions, std::
     if (!next(line) || line != "positions " + std::to_string(positions)) return false;
     std::vector<PositionEval> evals(static_cast<size_t>(positions));
     std::vector<bool> seen(static_cast<size_t>(positions), false);
+    int deep = 0;
+    bool first = true;
     while (next(line)) {
         if (line.empty()) continue;
+        if (first && line.compare(0, 5, "deep ") == 0) {
+            first = false;
+            std::istringstream d(line.substr(5));
+            std::string rest;
+            if (!readInt(d, 1, 245, deep) || (d >> rest)) return false;
+            continue;
+        }
+        first = false;
         int index = -1;
         PositionEval e;
         if (!parseEntry(line, positions, index, e) || seen[size_t(index)]) return false;
@@ -116,12 +128,14 @@ bool parse(const std::string& text, const std::string& key, int positions, std::
         evals[size_t(index)] = e;
     }
     out.swap(evals);
+    deepDepth = deep;
     return true;
 }
 
-std::string format(const std::string& key, const std::vector<PositionEval>& evals) {
+std::string format(const std::string& key, const std::vector<PositionEval>& evals, int deepDepth) {
     std::ostringstream o;
     o << kMagic << "\nkey " << key << "\npositions " << evals.size() << "\n";
+    if (deepDepth >= 1 && deepDepth <= 245) o << "deep " << deepDepth << "\n";
     for (size_t i = 0; i < evals.size(); ++i) {
         const PositionEval& e = evals[i];
         if (e.failed || e.terminal || e.depth < 1 || !uciShape(e.bestUci)) continue;
@@ -173,7 +187,8 @@ std::vector<fs::path> cacheFiles(const std::string& folder) {
 
 std::string cachePath(const std::string& folder, const std::string& key) { return folder + key + ".txt"; }
 
-bool loadCache(const std::string& folder, const std::string& key, int positions, std::vector<PositionEval>& out) {
+bool loadCache(const std::string& folder, const std::string& key, int positions, std::vector<PositionEval>& out,
+               int* deepDepth) {
     if (!validKey(key) || positions < 1 || positions > kMaxPositions) return false;
     const std::string path = cachePath(folder, key);
     uint64_t size = 0;
@@ -181,7 +196,8 @@ bool loadCache(const std::string& folder, const std::string& key, int positions,
     std::string text;
     if (!net::sys::readFile(path, text, kMaxBytes)) return false;
     std::vector<PositionEval> evals;
-    if (!parse(text, key, positions, evals)) {
+    int deep = 0;
+    if (!parse(text, key, positions, evals, deep)) {
         LOGW("analysis cache: ignoring %s (damaged, or another game)", path.c_str());
         return false;
     }
@@ -189,15 +205,17 @@ bool loadCache(const std::string& folder, const std::string& key, int positions,
     std::error_code ec;
     fs::last_write_time(fs::u8path(path), fs::file_time_type::clock::now(), ec);
     out.swap(evals);
+    if (deepDepth) *deepDepth = deep;
     return true;
 }
 
-bool saveCache(const std::string& folder, const std::string& key, const std::vector<PositionEval>& evals) {
+bool saveCache(const std::string& folder, const std::string& key, const std::vector<PositionEval>& evals,
+               int deepDepth) {
     if (!validKey(key) || evals.empty() || evals.size() > size_t(kMaxPositions) || folder.empty()) return false;
     if (!net::sys::makeDirectories(folder)) return false;
     const std::string path = cachePath(folder, key);
     // Written whole under a temporary name, then renamed over the old file (net::sys).
-    if (!net::sys::writeFileAtomic(path, format(key, evals), false)) {
+    if (!net::sys::writeFileAtomic(path, format(key, evals, deepDepth), false)) {
         LOGW("analysis cache: cannot write %s", path.c_str());
         return false;
     }

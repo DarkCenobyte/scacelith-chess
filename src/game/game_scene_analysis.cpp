@@ -385,6 +385,36 @@ void GameScene::analyseGameJustPlayed() {
     stateTime_ = 0.0f;
 }
 
+namespace {
+
+// The opening's name for the overlay: the last named position of the book the game went through,
+// in the interface language (else its English name, else the record's tag).
+std::string openingName(const analysis::GameReview& review, const pgn::Record& record) {
+    std::string name;
+    const coach::OpeningBook& book = coach::OpeningBook::instance();
+    int named = -1;
+    for (int i = 1; i < review.positions(); ++i) {
+        coach::OpeningBook::Hit hit;
+        if (!book.lookup(review.positionAt(i).hash(), &hit)) break;
+        if (hit.name >= 0) named = hit.name;
+    }
+    if (named >= 0) {
+        int v = book.variationOfName(named), f = book.familyOfName(named);
+        std::string ref = v >= 0 ? "variation:" + book.variations()[size_t(v)].id
+                          : f >= 0 ? "family:" + book.families()[size_t(f)].id
+                                   : std::string();
+        if (!ref.empty()) name = coach::OpeningTexts::instance().arg(ref, "nom", i18n::language(), false);
+        if (name.empty()) name = book.name(named);
+    }
+    if (name.empty()) {
+        const std::string tag = record.tag("Opening");
+        if (!tag.empty() && tag != "?") name = tag;
+    }
+    return name;
+}
+
+}  // namespace
+
 void GameScene::setupAnalysis() {
     AnalysisRuntime& a = analysisRuntime();
     const Settings& s = settings();
@@ -414,8 +444,9 @@ void GameScene::setupAnalysis() {
     a.cacheFolder = plat::appDataDirectory() + "analysis/";
     a.cacheDirty = false;
     std::vector<analysis::PositionEval> saved;
-    if (!ctx_->screenshotMode && analysis::loadCache(a.cacheFolder, a.review.key(), a.review.positions(), saved)) {
-        a.review.restore(saved);
+    int savedDeep = 0;
+    if (!ctx_->screenshotMode && analysis::loadCache(a.cacheFolder, a.review.key(), a.review.positions(), saved, &savedDeep)) {
+        a.review.restore(saved, savedDeep);
         LOGI("analysis: evaluations of an earlier review restored (%.0f%% final)", double(a.review.progress()) * 100.0);
     }
     analysis::GameInfo gi;
@@ -426,30 +457,7 @@ void GameScene::setupAnalysis() {
     a.requestPos = -1;
     ++a.version;
 
-    // The opening's name for the overlay: the last named position of the book the game went
-    // through, in the interface language (else its English name, else the record's tag).
-    a.opening.clear();
-    {
-        const coach::OpeningBook& book = coach::OpeningBook::instance();
-        int named = -1;
-        for (int i = 1; i < a.review.positions(); ++i) {
-            coach::OpeningBook::Hit hit;
-            if (!book.lookup(a.review.positionAt(i).hash(), &hit)) break;
-            if (hit.name >= 0) named = hit.name;
-        }
-        if (named >= 0) {
-            int v = book.variationOfName(named), f = book.familyOfName(named);
-            std::string ref = v >= 0 ? "variation:" + book.variations()[size_t(v)].id
-                              : f >= 0 ? "family:" + book.families()[size_t(f)].id
-                                       : std::string();
-            if (!ref.empty()) a.opening = coach::OpeningTexts::instance().arg(ref, "nom", i18n::language(), false);
-            if (a.opening.empty()) a.opening = book.name(named);
-        }
-        if (a.opening.empty()) {
-            const std::string tag = replayRecord_.tag("Opening");
-            if (!tag.empty() && tag != "?") a.opening = tag;
-        }
-    }
+    a.opening = openingName(a.review, replayRecord_);
 
     // The scoresheets: the whole game, as the players wrote it.
     std::vector<std::string> sheet(size_t(replaySheetOffset()), std::string("..."));
@@ -465,14 +473,7 @@ void GameScene::setupAnalysis() {
     dc.uiLanguage = i18n::language();
     dc.subtitles = s.subtitles;
     a.director.reset(a.stage.get(), dc);
-    coach::Catalog::shared();
-    std::string ui = i18n::language();
-    if (!a.prewarmedLanguages.count(ui)) {
-        a.prewarmedLanguages.insert(ui);
-        std::vector<std::pair<int, uint32_t>> glyphs;
-        for (uint32_t cp : coach::Catalog::shared().codepoints(ui)) glyphs.push_back({ui::font::FACE_TEXT, cp});
-        ui::font::prewarm(glyphs);
-    }
+    analysisOptionsChanged();
     if (s.analysisVoice) ensureCoachVoiceWorker();
     // The voice was never offered (the Coach page, the option): offered here.
     offerVoiceForAnalysis();
@@ -519,7 +520,7 @@ void GameScene::leaveAnalysis() {
     a.request = 0;
     a.requestPos = -1;
     if (a.loaded && a.cacheDirty && !ctx_->screenshotMode) {
-        if (analysis::saveCache(a.cacheFolder, a.review.key(), a.review.evaluations())) a.cacheDirty = false;
+        if (analysis::saveCache(a.cacheFolder, a.review.key(), a.review.evaluations(), a.review.settings().deepDepth)) a.cacheDirty = false;
         else LOGW("analysis: the evaluations could not be saved in %s", a.cacheFolder.c_str());
     }
     a.director.clear();
@@ -554,6 +555,7 @@ coach::Script scriptOf(const analysis::Comment& c) {
         s.push_back(b);
     }
     for (const coach::Mark& m : c.marks) {
+        if (s.empty()) break;
         size_t at = 0;
         for (size_t i = 0; i < s.size(); ++i)
             if (!m.anchor.empty() && s[i].line.arg(m.anchor)) {
@@ -562,7 +564,7 @@ coach::Script scriptOf(const analysis::Comment& c) {
             }
         coach::Mark mk = m;
         if (!s[at].line.arg(mk.anchor)) mk.anchor.clear();
-        if (!s.empty()) s[at].marks.push_back(mk);
+        s[at].marks.push_back(mk);
     }
     return s;
 }
@@ -610,7 +612,7 @@ void GameScene::updateAnalysis(float dt) {
                 ++a.version;
                 // A review completed: saved now (the window may be closed without leaving).
                 if (a.review.complete() && !ctx_->screenshotMode &&
-                    analysis::saveCache(a.cacheFolder, a.review.key(), a.review.evaluations()))
+                    analysis::saveCache(a.cacheFolder, a.review.key(), a.review.evaluations(), a.review.settings().deepDepth))
                     a.cacheDirty = false;
             }
         }
@@ -639,6 +641,9 @@ void GameScene::updateAnalysis(float dt) {
             a.trips.clear();
             a.step = AnalysisRuntime::Step::None;
             beginTurn();
+            // Through the eyes of the player to move: back into the eyes of the side to move again.
+            const int toMove = seatOf(game_.position().sideToMove());
+            if (followEyes_ && eyesSeat_ != toMove) followEyesAfterMove(1 - toMove);
             analysisStepDone(false);
         } else {
             int seat = handForTrip(a.trips[a.tripNext], a.backSeat);
@@ -783,6 +788,37 @@ void GameScene::analysisGoTo(int position) {
     a.markPieces.clear();
 }
 
+void GameScene::analysisOptionsChanged() {
+    // The language and the subtitles of the options (set up, or changed in the pause menu): the
+    // commentator's lines, their glyphs, the opening's name.
+    if (!analysis_) return;
+    AnalysisRuntime& a = *analysis_;
+    coach::DirectorConfig dc = a.director.config();
+    dc.uiLanguage = i18n::language();
+    dc.subtitles = settings().subtitles;
+    a.director.setConfig(dc);
+    const std::string ui = i18n::language();
+    if (!a.prewarmedLanguages.count(ui)) {
+        a.prewarmedLanguages.insert(ui);
+        std::vector<std::pair<int, uint32_t>> glyphs;
+        for (uint32_t cp : coach::Catalog::shared().codepoints(ui)) glyphs.push_back({ui::font::FACE_TEXT, cp});
+        ui::font::prewarm(glyphs);
+    }
+    if (a.loaded) a.opening = openingName(a.review, replayRecord_);
+    if (settings().analysisVoice) refreshCoachVoice();
+}
+
+bool GameScene::analysisLoaded() const { return analysis_ && analysis_->loaded; }
+
+void GameScene::holdAnalysis() {
+    // updateAnalysis does not run behind the pause menu: the commentator's line waits there.
+    if (!analysis_ || !analysis_->loaded) return;
+    AnalysisRuntime& a = *analysis_;
+    a.director.setPaused(true);
+    a.voicePausedByScene = true;
+    a.stage->applyPause();
+}
+
 void GameScene::analysisStepDone(bool forward) {
     AnalysisRuntime& a = analysisRuntime();
     const int cur = int(game_.moves().size());
@@ -792,7 +828,7 @@ void GameScene::analysisStepDone(bool forward) {
     a.still = 0.0f;
     a.commented = false;
     // A move played forward: its comment, once its review allows (never on a step back).
-    if (forward && cur > 0 && settings().analysisComments) {
+    if (forward && cur > 0 && settings().analysisComments && engineOk_) {
         a.commentPos = cur;
         a.commentWait = a.playing ? kCommentWaitPlay : kCommentWaitStep;
     }
@@ -836,6 +872,11 @@ bool GameScene::analysisKey(const std::string& key) {
     AnalysisRuntime& a = analysisRuntime();
     Settings& s = settings();
     const int plies = int(a.moves.size());
+    // The board's keys wait for the table (the intro, the fade): a move started before the game
+    // plays would never be completed.
+    const bool boardKey = key == "K" || key == "J" || key == "L" || key == "Home" || key == "End" ||
+                          key.compare(0, 5, "Goto:") == 0;
+    if (boardKey && state_ != State::Playing) return false;
     if (key == "K") {
         a.playing = !a.playing && a.target < plies;
         a.still = kPlayPause;   // the first move at once

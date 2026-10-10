@@ -493,18 +493,21 @@ std::string GameReview::key() const {
     return buf;
 }
 
-void GameReview::restore(const std::vector<PositionEval>& evals) {
+void GameReview::restore(const std::vector<PositionEval>& evals, int savedDeepDepth) {
     if (evals.size() != evals_.size()) return;
+    const bool sameTarget = savedDeepDepth >= settings_.deepDepth;
     for (size_t i = 0; i < evals.size(); ++i) {
         PositionEval& e = evals_[i];
         // A position without moves is known already; one handed out waits for its own answer.
         if (e.terminal || e.final || pending_[i]) continue;
         const PositionEval& saved = evals[i];
-        if (saved.failed || saved.terminal || saved.depth < settings_.quickDepth || saved.depth < e.depth) continue;
+        const bool keptFinal = sameTarget && saved.final;
+        if (saved.failed || saved.terminal || (saved.depth < settings_.quickDepth && !keptFinal) || saved.depth < e.depth)
+            continue;
         PositionEval got;
         if (!sanitized(positions_[i], saved, got)) continue;
         got.legalMoves = e.legalMoves;
-        got.final = got.depth >= settings_.deepDepth;
+        got.final = got.depth >= settings_.deepDepth || keptFinal;
         e = got;
     }
 }

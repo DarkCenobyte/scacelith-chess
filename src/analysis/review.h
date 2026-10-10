@@ -153,10 +153,13 @@ public:
 
     // Cache: what an earlier review of the same game found (analysis/cache.h). The key names the
     // start position and the moves; restore() takes the evaluations of a saved review (those at
-    // least as deep as this review's passes become quick or final at once).
+    // least as deep as this review's passes become quick or final at once). 'savedDeepDepth' is the
+    // deep pass's depth of the review that saved them (0: unknown): when it is at least this one's,
+    // a position saved final stays final whatever its depth (a deep search its time limit cut short
+    // is not run again); a deeper review searches again what is not deep enough for it.
     std::string key() const;
     std::vector<PositionEval> evaluations() const { return evals_; }
-    void restore(const std::vector<PositionEval>& evals);
+    void restore(const std::vector<PositionEval>& evals, int savedDeepDepth = 0);
 
 private:
     Settings settings_;

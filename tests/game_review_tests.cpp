@@ -789,6 +789,28 @@ TEST(game_review_restore) {
     CHECK(d.nextRequest(2, q, pos));
     CHECK_EQ(q.depth, 22);
     CHECK_EQ(pos, 2);
+    // A deep search its time limit cut short (final below the deep depth): final again when the
+    // review that saved it went as deep as this one, searched again by a deeper one.
+    {
+        GameReview cut = reviewOf(rec, s);
+        for (int i = 0; i < cut.positions(); ++i) {
+            const Position& p = cut.positionAt(i);
+            const std::string m = p.toUCI(p.legalMoves()[0]);
+            cut.accept(i, an(cut, i, {{10 * i, m.c_str()}}, 12));   // the quick pass
+            cut.accept(i, an(cut, i, {{10 * i, m.c_str()}}, 7));    // the deep pass, cut at depth 7
+        }
+        CHECK(cut.complete());
+        CHECK(cut.position(1).final);
+        GameReview same = reviewOf(rec, s);
+        same.restore(cut.evaluations(), 18);
+        CHECK(same.complete());
+        GameReview unknown = reviewOf(rec, s);
+        unknown.restore(cut.evaluations(), 0);
+        CHECK(!unknown.complete());
+        GameReview deeperOne = reviewOf(rec, deeper);
+        deeperOne.restore(cut.evaluations(), 18);
+        CHECK(!deeperOne.complete());
+    }
     // Shallower than the quick pass: ignored. Another game's moves, another size: ignored.
     analysis::Settings high = s;
     high.quickDepth = 19;
@@ -851,6 +873,16 @@ TEST(game_review_cache_round_trip_and_bad_files) {
     for (int i = 0; i < r.positions(); ++i) CHECK_EQ(again.bar(i).text, r.bar(i).text);
     CHECK_EQ(again.position(3).final, false);   // the quick result stays quick
 
+    // The deep pass's depth goes with the file (a file without it reads as 0).
+    int savedDeep = -1;
+    CHECK(analysis::loadCache(folder, key, r.positions(), back, &savedDeep));
+    CHECK_EQ(savedDeep, 0);
+    CHECK(analysis::saveCache(folder, key, r.evaluations(), 18));
+    CHECK(analysis::loadCache(folder, key, r.positions(), back, &savedDeep));
+    CHECK_EQ(savedDeep, 18);
+    REQUIRE(int(back.size()) == r.positions());
+    CHECK_EQ(back[0].depth, r.position(0).depth);
+
     // Missing, another number of positions, another key inside the file.
     CHECK(!analysis::loadCache(folder, "0000000000000000", r.positions(), back));
     CHECK(!analysis::loadCache(folder, key, r.positions() + 1, back));
@@ -876,6 +908,11 @@ TEST(game_review_cache_round_trip_and_bad_files) {
     CHECK(rejects(head + "e 0 999 1 20 0 e2e4 0 0\n"));
     CHECK(rejects(head + "e 0 18 1 20x 0 e2e4 0 0\n"));
     CHECK(rejects(head + "e 0 18 1 20 0 e2e4 0 0 extra\n"));
+    CHECK(!rejects(head + "deep 18\ne 0 18 1 20 0 e2e4 0 1 e2e4\n"));
+    CHECK(rejects(head + "deep x\ne 0 18 1 20 0 e2e4 0 0\n"));
+    CHECK(rejects(head + "deep 0\n"));
+    CHECK(rejects(head + "deep 18 2\n"));
+    CHECK(rejects(head + "e 0 18 1 20 0 e2e4 0 0\ndeep 18\n"));   // only before the entries
     // Oversized: refused before it is read.
     std::string big = head;
     while (big.size() < (size_t(2) << 20) + 10) big += "# padding padding padding padding padding padding padding\n";
