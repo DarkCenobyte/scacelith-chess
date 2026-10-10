@@ -169,6 +169,21 @@ Prebuilt binaries: the game for Windows in `windows/`, the dedicated server for 
 - SHA-256 of the exe: `69fc1e647e543bcd148acdaed0c25de2bad4533d6209db4538736f5525faad49`
 - SHA-256 of the zip: `321f36956ec3a93fc94c3505b19d2d936640ce1761504de454b8fbc6fbc5f72f`
 
+## windows/Scacelith-2026-10-10-qualite-voix.zip
+
+- Holds `Scacelith-2026-10-10-qualite-voix.exe` (132 MB, zipped to 96 MB).
+- Source: branch `claude/supertonic3-official-yjzrfn` at commit `5cfac12` (pull request #23, not
+  merged yet), based on `master` at `dcee8b6` (pull request #22 merged).
+- Contents: everything in the build above, with Options > Audio > Voice quality named by level
+  (Low, Medium, High, Very high, Ultra, Maximum for 4 to 9 synthesis steps; Medium by default) and
+  greyed out until a voice model is installed (the official one or the old 8-bit one).
+- Windows x64, self-contained otherwise (Stockfish 19 in five builds and its NNUE network are
+  embedded; the coach's voice is downloaded by the game). Needs a GPU with OpenGL 4.6.
+- Cross-compiled with MinGW-w64 (Release). Its test program passes under Wine (793 tests, 12
+  skipped); it has not been run on real Windows hardware by the build.
+- SHA-256 of the exe: `7164d799652427d15262851adc861d764b14f0212418081e2ca1b0035adaca87`
+- SHA-256 of the zip: `dfe6de8a7cdc6355d3a6c271ca1606d91e6c666c39a67a95283dbe6f8684049d`
+
 ## linux-server/scacelith-server-2026-10-03
 
 - The dedicated server, rewritten in Rust (`scacelith-server` 1.0.0, 13.5 MB): a static x86-64
