@@ -428,7 +428,8 @@ challenge audit (`ninja -C build challenge_audit`, Linux only; run `./build/chal
 the repository root) checks each one with the embedded Stockfish, together with the hand-written
 endgames of `tools/challenges/endgames.txt`, and writes `assets/coach/challenges/challenges.txt`
 with the positions it proves. A full run takes a few hours: `--cache build/challenge_audit.cache`
-keeps its verdicts, so that an interrupted run continues where it stopped. See
+keeps its verdicts, so that an interrupted run continues where it stopped, and `--max-seconds 180`
+drops a candidate too long to settle (the next one of its set is checked instead). See
 `tools/challenge_audit/audit.h`.
 
 Wine names the Linux files in the character set of the host locale: in the POSIX locale (`LANG`
