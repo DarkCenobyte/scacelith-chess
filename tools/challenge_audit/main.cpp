@@ -57,6 +57,59 @@ std::string keyOf(const coach::ChallengePosition& p) {
     return key + "|" + p.lead;
 }
 
+// ---- The verdict cache: "<key>\t<verdict, or ok>\t<note>\t<the kept position, as in the file>" ----
+struct Cached {
+    std::string why, note;
+    coach::ChallengePosition pos;
+};
+
+std::string cacheKey(const Options& o, const Set& set, const Candidate& c) {
+    const coach::ChallengePosition& p = c.pos;
+    std::string k = std::string("rules ") + kRulesVersion + " depth " + std::to_string(o.depth) + "/" +
+                    std::to_string(o.playDepth) + "+" + std::to_string(o.confirm) + " " + set.group +
+                    (c.escape ? " escape " : " ") + p.source + " " + std::to_string(p.rating) + " | " + p.fen + " | " +
+                    p.lead + " |";
+    for (const std::string& m : p.line) k += " " + m;
+    return k + " | " + coach::challengeGoalName(p.goal) + " " + std::to_string(p.moves);
+}
+
+// The position's line in the file's format.
+std::string positionText(const coach::ChallengePosition& p) {
+    coach::ChallengeBook b;
+    coach::Challenge c;
+    c.id = "x";
+    c.group = "x";
+    c.positions = {p};
+    b.challenges().push_back(c);
+    std::string s = b.write();
+    s = s.substr(s.find('\n', 1) + 1);
+    while (!s.empty() && s.back() == '\n') s.pop_back();
+    return s;
+}
+
+std::map<std::string, Cached> readCache(const std::string& path) {
+    std::map<std::string, Cached> out;
+    std::ifstream in(path, std::ios::binary);
+    std::string line;
+    while (std::getline(in, line)) {
+        std::vector<std::string> f;
+        std::stringstream ss(line);
+        std::string x;
+        while (std::getline(ss, x, '\t')) f.push_back(x);
+        if (f.size() != 4) continue;
+        Cached c;
+        c.why = f[1] == "ok" ? std::string() : f[1];
+        c.note = f[2];
+        if (c.why.empty()) {
+            const coach::ChallengeBook b = coach::ChallengeBook::parse("challenge x x 1\n" + f[3] + "\n");
+            if (b.challenges().size() != 1 || b.challenges()[0].positions.size() != 1) continue;
+            c.pos = b.challenges()[0].positions[0];
+        }
+        out[f[0]] = c;
+    }
+    return out;
+}
+
 struct Outcome {
     std::vector<coach::ChallengePosition> kept;
     std::vector<std::pair<const Candidate*, std::string>> rejected;
@@ -68,7 +121,7 @@ int usage() {
     std::fprintf(stderr,
                  "usage: challenge_audit [--candidates FILE] [--endgames FILE] [--out FILE] [--report FILE]\n"
                  "                       [--depth D] [--play-depth D] [--confirm N] [--threads T] [--hash MB]\n"
-                 "                       [--only ID] [--all] [--dry-run]   (see tools/challenge_audit/audit.h)\n");
+                 "                       [--cache FILE] [--only ID] [--all] [--dry-run]   (see audit.h)\n");
     return 2;
 }
 
@@ -84,6 +137,7 @@ int main(int argc, char** argv) {
         else if (a == "--out") o.out = next();
         else if (a == "--report") o.report = next();
         else if (a == "--only") o.only = next();
+        else if (a == "--cache") o.cache = next();
         else if (a == "--depth") o.depth = std::atoi(next().c_str());
         else if (a == "--play-depth") o.playDepth = std::atoi(next().c_str());
         else if (a == "--confirm") o.confirm = std::atoi(next().c_str());
@@ -121,6 +175,18 @@ int main(int argc, char** argv) {
     say("challenge_audit: depth %d, play-outs %d, confirmed %d deeper, %d thread(s), hash %d MB\n", o.depth,
         o.playDepth, o.confirm, o.threads, o.hashMB);
 
+    std::map<std::string, Cached> cache;
+    std::ofstream cacheOut;
+    if (!o.cache.empty()) {
+        cache = readCache(o.cache);
+        cacheOut.open(o.cache, std::ios::binary | std::ios::app);
+        if (!cacheOut) {
+            std::fprintf(stderr, "cannot write %s\n", o.cache.c_str());
+            return 2;
+        }
+        say("verdict cache: %s (%d verdicts)\n", o.cache.c_str(), int(cache.size()));
+    }
+
     const auto t0 = std::chrono::steady_clock::now();
     std::map<std::string, std::string> seen;   // keyOf -> set id
     std::vector<Outcome> outcomes(sets.size());
@@ -136,8 +202,14 @@ int main(int argc, char** argv) {
             coach::ChallengePosition pos;
             std::string why, note;
             const auto it = seen.find(keyOf(c.pos));
+            const std::string key = cacheKey(o, set, c);
+            const auto hit = cache.find(key);
             if (c.error.empty() && it != seen.end()) {
                 why = "duplicate: also in " + it->second;
+            } else if (hit != cache.end()) {
+                why = hit->second.why;
+                note = hit->second.note;
+                pos = hit->second.pos;
             } else {
                 oracle.newCandidate();
                 why = checkCandidate(oracle, set, c, pos, note);
@@ -157,6 +229,11 @@ int main(int argc, char** argv) {
                               note + ")";
                     else
                         note = deeper;
+                }
+                if (cacheOut.is_open()) {
+                    cacheOut << key << '\t' << (why.empty() ? std::string("ok") : why) << '\t' << note << '\t'
+                             << (why.empty() ? positionText(pos) : std::string()) << '\n';
+                    cacheOut.flush();
                 }
             }
             std::fprintf(stderr, "  %s %s %s (%.0f s): %s\n", set.id.c_str(), c.where.c_str(), c.pos.source.c_str(),

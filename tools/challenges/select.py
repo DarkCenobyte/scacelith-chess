@@ -202,12 +202,9 @@ def eligible(row, s):
 
 
 def preference(row, s):
-    bonus = 10 if themes_preferred(row, s) else 0
+    """Higher first: popular, often played, with one of the set's preferred themes."""
+    bonus = 10 if row["themes"].intersection(s.get("prefer", [])) else 0
     return row["popularity"] + 8 * math.log10(row["plays"] + 1) + bonus
-
-
-def themes_preferred(row, s):
-    return bool(row["themes"].intersection(s.get("prefer", [])))
 
 
 def round_robin(buckets, count):

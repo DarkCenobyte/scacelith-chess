@@ -427,7 +427,9 @@ The positions of the coach's challenges are picked from Lichess puzzle rows by
 challenge audit (`ninja -C build challenge_audit`, Linux only; run `./build/challenge_audit` from
 the repository root) checks each one with the embedded Stockfish, together with the hand-written
 endgames of `tools/challenges/endgames.txt`, and writes `assets/coach/challenges/challenges.txt`
-with the positions it proves. See `tools/challenge_audit/audit.h`.
+with the positions it proves. A full run takes a few hours: `--cache build/challenge_audit.cache`
+keeps its verdicts, so that an interrupted run continues where it stopped. See
+`tools/challenge_audit/audit.h`.
 
 Wine names the Linux files in the character set of the host locale: in the POSIX locale (`LANG`
 unset, common in containers) that is ASCII, a file named after "Élodie" cannot be created and the

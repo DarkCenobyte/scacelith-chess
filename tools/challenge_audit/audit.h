@@ -3,7 +3,7 @@
 //
 //   challenge_audit [--candidates FILE] [--endgames FILE] [--out FILE] [--report FILE]
 //                   [--depth D] [--play-depth D] [--confirm N] [--threads T] [--hash MB]
-//                   [--only ID] [--all] [--dry-run]
+//                   [--cache FILE] [--only ID] [--all] [--dry-run]
 //
 // Inputs: tools/challenges/candidates.txt (tools/challenges/select.py: the Lichess puzzles, every
 // set's header and the number of positions it needs, "# want <n>") and tools/challenges/
@@ -35,6 +35,11 @@
 // With more than one thread Stockfish is not fully deterministic, so a borderline candidate may
 // still change between runs (--threads 1 for exact reproducibility).
 //
+// A full run takes hours (a few minutes for some middlegame positions). --cache FILE keeps every
+// verdict as it is reached (one line per candidate) and reuses those made with the same rules and
+// depths: an interrupted run continues where it stopped, and a run after editing the candidates
+// only checks the new ones. Bump kRulesVersion when a rule changes.
+//
 // Output: the header of the existing output file (its comment block), then the book written by
 // coach::ChallengeBook::write(), read back with ChallengeBook::parse (no error allowed). A report
 // (stdout, and --report FILE) lists each set's count and ratings, what the engine proved for each
@@ -50,12 +55,16 @@
 
 namespace challenges {
 
+// The rules' version, part of the verdict cache's keys: change it with any rule of check.cpp.
+constexpr const char* kRulesVersion = "1";
+
 struct Options {
     std::string candidates = "tools/challenges/candidates.txt";
     std::string endgames = "tools/challenges/endgames.txt";
     std::string out = "assets/coach/challenges/challenges.txt";
     std::string report;      // "" = stdout only
     std::string only;        // check this set only (implies --dry-run)
+    std::string cache;       // the verdict cache ("" = none)
     int depth = 20;          // lines and escapes
     int playDepth = 30;      // play-outs
     int confirm = 4;         // a candidate that passes is checked again this much deeper (0 = not)
