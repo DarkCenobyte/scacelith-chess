@@ -14,6 +14,7 @@
 #include <sys/stat.h>
 
 #include <cstdint>
+#include <cstdio>
 #include <cstring>
 #include <string>
 
@@ -287,8 +288,10 @@ bool create(int width, int height, bool debug, std::string& why) {
 
     g_display = openDisplay();
     if (g_display == EGL_NO_DISPLAY) {
-        why = "no EGL display (eglGetPlatformDisplay, error 0x" + std::to_string(eglError()) + ")";
-        LOGE("gl: no surfaceless EGL display (EGL error 0x%x)", eglError());
+        char code[16];
+        std::snprintf(code, sizeof code, "0x%x", unsigned(eglError()));
+        why = std::string("no EGL display (eglGetPlatformDisplay, error ") + code + ")";
+        LOGE("gl: no surfaceless EGL display (EGL error %s)", code);
         return false;
     }
     EGLint major = 0, minor = 0;
