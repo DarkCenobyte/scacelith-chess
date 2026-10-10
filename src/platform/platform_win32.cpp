@@ -1,6 +1,7 @@
 #ifdef _WIN32
 #include "platform.h"
 #include "absolute_mouse.h"
+#include "borderless_layout.h"
 #include "../gl/gl46.h"
 #include "../gl/gl_context.h"
 #include "../core/log.h"
@@ -12,6 +13,7 @@
 #include <algorithm>
 #include <cstring>
 #include <cwchar>
+#include <vector>
 
 // WGL_ARB_create_context / WGL_ARB_pixel_format / WGL_EXT_swap_control tokens.
 #define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
@@ -50,6 +52,9 @@ bool g_cursorVisible = true;
 bool g_captured = false;
 DisplayMode g_mode = DisplayMode::Windowed;
 int g_windowedW = 1600, g_windowedH = 900;
+// Borderless: the window reaches beyond its monitor, the client area holds the picture at
+// (viewX, viewY) and is spillX/Y pixels larger (borderless_layout.h). All zero in a window.
+BorderlessLayout g_layout;
 Input g_input;
 wchar_t g_highSurrogate = 0;  // first half of a UTF-16 pair waiting for its second WM_CHAR
 LARGE_INTEGER g_freq, g_t0;
@@ -119,16 +124,28 @@ bool inClientArea(int x, int y) { return x >= 0 && y >= 0 && x < g_width && y < 
 bool pointerOverClient() {
     POINT p;
     if (!GetCursorPos(&p) || WindowFromPoint(p) != g_hwnd || !ScreenToClient(g_hwnd, &p)) return false;
-    return inClientArea(p.x, p.y);
+    return inClientArea(p.x - g_layout.viewX, p.y - g_layout.viewY);
 }
 
 LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
     switch (msg) {
         case WM_CLOSE: g_quit = true; return 0;
         case WM_SIZE:
-            g_width = LOWORD(lp);
-            g_height = HIWORD(lp);
+            // The picture's size: a borderless window's client area has the strip beyond its
+            // monitor too.
+            g_width = std::max(0, int(LOWORD(lp)) - g_layout.spillX);
+            g_height = std::max(0, int(HIWORD(lp)) - g_layout.spillY);
             return 0;
+        case WM_GETMINMAXINFO:
+            // The default largest window is the desktop and a little more: never less than the
+            // borderless window, strip included.
+            if (g_layout.spillX || g_layout.spillY) {
+                MINMAXINFO* mm = reinterpret_cast<MINMAXINFO*>(lp);
+                mm->ptMaxTrackSize.x = std::max<LONG>(mm->ptMaxTrackSize.x, g_layout.window.width());
+                mm->ptMaxTrackSize.y = std::max<LONG>(mm->ptMaxTrackSize.y, g_layout.window.height());
+                return 0;
+            }
+            break;
         case WM_SETFOCUS: g_focus = true; return 0;
         case WM_KILLFOCUS:
             g_focus = false;
@@ -159,7 +176,7 @@ LRESULT CALLBACK wndProc(HWND h, UINT msg, WPARAM wp, LPARAM lp) {
             return 0;
         }
         case WM_MOUSEMOVE: {
-            int x = short(LOWORD(lp)), y = short(HIWORD(lp));
+            int x = short(LOWORD(lp)) - g_layout.viewX, y = short(HIWORD(lp)) - g_layout.viewY;
             g_input.mouseX = float(x);
             g_input.mouseY = float(y);
             // With a button down the window keeps the pointer (SetCapture): moves go on outside.
@@ -227,14 +244,36 @@ void* getProc(const char* name) {
     return p;
 }
 
-RECT windowRectFor(DisplayMode mode, int w, int h, DWORD& style) {
+ScreenRect toScreenRect(const RECT& r) { return {r.left, r.top, r.right, r.bottom}; }
+
+BOOL CALLBACK addMonitor(HMONITOR mon, HDC, LPRECT, LPARAM out) {
+    MONITORINFOEXW mi{};
+    mi.cbSize = sizeof(mi);
+    if (!GetMonitorInfoW(mon, &mi)) return TRUE;
+    DEVMODEW dm{};
+    dm.dmSize = sizeof(dm);
+    int hz = EnumDisplaySettingsW(mi.szDevice, ENUM_CURRENT_SETTINGS, &dm) ? int(dm.dmDisplayFrequency) : 0;
+    reinterpret_cast<std::vector<MonitorArea>*>(out)->push_back({toScreenRect(mi.rcMonitor), hz});
+    return TRUE;
+}
+
+// The window's rectangle and style for a mode; 'layout' gets where the picture is in a borderless
+// window (all zero in a window).
+RECT windowRectFor(DisplayMode mode, int w, int h, DWORD& style, BorderlessLayout& layout) {
     RECT r;
+    layout = BorderlessLayout();
     if (mode == DisplayMode::Borderless) {
         HMONITOR mon = MonitorFromWindow(g_hwnd ? g_hwnd : GetDesktopWindow(), MONITOR_DEFAULTTOPRIMARY);
         MONITORINFO mi{sizeof(mi)};
         GetMonitorInfo(mon, &mi);
         style = WS_POPUP | WS_VISIBLE;
-        r = mi.rcMonitor;
+        std::vector<MonitorArea> monitors;
+        EnumDisplayMonitors(nullptr, nullptr, addMonitor, reinterpret_cast<LPARAM>(&monitors));
+        MonitorArea screen{toScreenRect(mi.rcMonitor), 0};
+        for (const MonitorArea& m : monitors)
+            if (m.rect == screen.rect) screen.hz = m.hz;
+        layout = borderlessLayout(screen, monitors);
+        r = {layout.window.left, layout.window.top, layout.window.right, layout.window.bottom};
     } else {
         style = WS_OVERLAPPEDWINDOW | WS_VISIBLE;
         int sw = GetSystemMetrics(SM_CXSCREEN), sh = GetSystemMetrics(SM_CYSCREEN);
@@ -245,6 +284,19 @@ RECT windowRectFor(DisplayMode mode, int w, int h, DWORD& style) {
         r = {x, y, x + ww, y + wh};
     }
     return r;
+}
+
+// A borderless window shows its monitor's part of the client area only: the strip beyond is cut
+// off (it shows nowhere and the pointer goes through it). A window shows all of itself.
+void applyRegion() {
+    if (!g_layout.spillX && !g_layout.spillY) {
+        SetWindowRgn(g_hwnd, nullptr, TRUE);
+        return;
+    }
+    int w = g_layout.window.width() - g_layout.spillX, h = g_layout.window.height() - g_layout.spillY;
+    HRGN rgn = CreateRectRgn(g_layout.viewX, g_layout.viewY, g_layout.viewX + w, g_layout.viewY + h);
+    // The system owns the region once it is set.
+    if (rgn && !SetWindowRgn(g_hwnd, rgn, TRUE)) DeleteObject(rgn);
 }
 }  // namespace
 
@@ -302,13 +354,14 @@ bool init(const WindowDesc& desc) {
     g_windowedW = desc.width;
     g_windowedH = desc.height;
     DWORD style;
-    RECT r = windowRectFor(desc.mode, desc.width, desc.height, style);
+    RECT r = windowRectFor(desc.mode, desc.width, desc.height, style, g_layout);
     if (desc.hidden) style &= ~WS_VISIBLE;
     wchar_t wtitle[256];
     MultiByteToWideChar(CP_UTF8, 0, desc.title, -1, wtitle, 256);
     g_hwnd = CreateWindowExW(WS_EX_APPWINDOW, wc.lpszClassName, wtitle, style, r.left, r.top, r.right - r.left, r.bottom - r.top,
                              nullptr, nullptr, g_inst, nullptr);
     g_hdc = GetDC(g_hwnd);
+    applyRegion();
 
     const int pfAttribs[] = {WGL_DRAW_TO_WINDOW_ARB, 1, WGL_SUPPORT_OPENGL_ARB, 1, WGL_DOUBLE_BUFFER_ARB, 1,
                              WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB, WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
@@ -345,8 +398,8 @@ bool init(const WindowDesc& desc) {
 
     RECT cr;
     GetClientRect(g_hwnd, &cr);
-    g_width = cr.right - cr.left;
-    g_height = cr.bottom - cr.top;
+    g_width = std::max(0, int(cr.right - cr.left) - g_layout.spillX);
+    g_height = std::max(0, int(cr.bottom - cr.top) - g_layout.spillY);
     if (!desc.hidden) {
         ShowWindow(g_hwnd, SW_SHOW);
         SetForegroundWindow(g_hwnd);
@@ -391,9 +444,10 @@ void setDisplayMode(DisplayMode mode, int w, int h) {
     g_mode = mode;
     if (mode == DisplayMode::Windowed) { g_windowedW = w; g_windowedH = h; }
     DWORD style;
-    RECT r = windowRectFor(mode, g_windowedW, g_windowedH, style);
+    RECT r = windowRectFor(mode, g_windowedW, g_windowedH, style, g_layout);
     SetWindowLongPtrW(g_hwnd, GWL_STYLE, style);
     SetWindowPos(g_hwnd, HWND_TOP, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_FRAMECHANGED | SWP_SHOWWINDOW);
+    applyRegion();
 }
 
 int width() { return g_width; }
@@ -415,9 +469,8 @@ void setMouseCaptured(bool c) {
     if (c) {
         g_absMouse.reset();
         GetCursorPos(&g_captureCenter);
-        RECT r;
-        GetClientRect(g_hwnd, &r);
-        POINT tl{r.left, r.top}, br{r.right, r.bottom};
+        // The picture's part of the client area (a borderless window's strip is off the monitor).
+        POINT tl{g_layout.viewX, g_layout.viewY}, br{g_layout.viewX + g_width, g_layout.viewY + g_height};
         ClientToScreen(g_hwnd, &tl);
         ClientToScreen(g_hwnd, &br);
         RECT clip{tl.x, tl.y, br.x, br.y};
