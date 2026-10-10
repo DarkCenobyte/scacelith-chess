@@ -735,7 +735,8 @@ TEST(game_review_key_is_stable) {
     GameReview r1 = reviewOf(a), r2 = reviewOf(a);
     CHECK_EQ(r1.key(), r2.key());
     CHECK_EQ(r1.key().size(), size_t(16));
-    CHECK(std::all_of(r1.key().begin(), r1.key().end(), [](char c) { return std::isxdigit((unsigned char)c) && !std::isupper((unsigned char)c); }));
+    const std::string k1 = r1.key();   // key() returns a copy: both iterators from one string
+    CHECK(std::all_of(k1.begin(), k1.end(), [](char c) { return std::isxdigit((unsigned char)c) && !std::isupper((unsigned char)c); }));
     // The key does not depend on the analysis or the settings.
     analysis::Settings s;
     s.deepDepth = 22;
