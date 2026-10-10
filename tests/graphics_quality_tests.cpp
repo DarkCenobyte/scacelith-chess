@@ -202,6 +202,26 @@ TEST(graphics_settings_round_trip) {
     }
 }
 
+// A driver without tessellation (macOS on some Mesa versions): off whatever the preset or the
+// player's own level, which are kept as they are (High still reads as High).
+TEST(graphics_unavailable_option_forced_off) {
+    CHECK(graphicsOptionAvailable(GfxTessellation));
+    setGraphicsOptionAvailable(GfxTessellation, false);
+    CHECK(!graphicsOptionAvailable(GfxTessellation));
+    for (int p = 0; p < PresetCustom; ++p) {
+        const render::RenderSettings r = renderSettingsFor(presetLevels(p), 1.0f);
+        CHECK(!r.tessellation);
+        CHECK_EQ(r.bloom, presetLevels(p)[GfxBloom] > 0);
+    }
+    GraphicsLevels custom = presetLevels(PresetLow);
+    custom[GfxTessellation] = 1;
+    CHECK(!renderSettingsFor(custom, 1.0f).tessellation);
+    CHECK_EQ(matchingPreset(presetLevels(PresetHigh)), int(PresetHigh));
+    setGraphicsOptionAvailable(GfxTessellation, true);
+    CHECK(renderSettingsFor(presetLevels(PresetHigh), 1.0f).tessellation);
+    CHECK(graphicsOptionAvailable(-1) && graphicsOptionAvailable(GfxOptionCount));
+}
+
 // Every option and level shown in Options > Graphics has its English text (the other languages
 // are checked against English by i18n_lang_files_match_english), and the keys are distinct.
 TEST(graphics_options_translated) {
@@ -216,6 +236,7 @@ TEST(graphics_options_translated) {
         CHECK(keys.insert(key).second);
         CHECK(have.count("options." + key) == 1);
         CHECK(have.count("options." + key + ".help") == 1);
+        if (o == GfxTessellation) CHECK(have.count("options." + key + ".unavailable") == 1);
         for (int l = 0; l < graphicsLevelCount(o); ++l) CHECK(have.count(graphicsLevelLabel(o, l)) == 1);
     }
     for (const char* k : {"options.quality", "options.quality.help", "options.quality.very_low", "options.quality.custom"})

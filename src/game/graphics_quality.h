@@ -50,6 +50,13 @@ int matchingPreset(const GraphicsLevels& levels);
 // Every level clamped to its option's range.
 GraphicsLevels clampLevels(const GraphicsLevels& levels);
 
+// Options the graphics driver cannot do (main.cpp sets them from gl46::caps() once the OpenGL
+// context exists; all available until then): whatever level a preset or the player gives them,
+// they are off in the render settings, and Options > Graphics shows them greyed out at Off. The
+// levels themselves are kept, so the presets still match and the file is the same on every PC.
+void setGraphicsOptionAvailable(int option, bool available);
+bool graphicsOptionAvailable(int option);
+
 // Render settings for these levels (renderScale: Options > Display, clamped to 0.5..2).
 render::RenderSettings renderSettingsFor(const GraphicsLevels& levels, float renderScale);
 

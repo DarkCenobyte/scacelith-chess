@@ -517,19 +517,24 @@ bool optionsPage(MenuAction& act) {
                 const std::string key = std::string("options.") + game::graphicsOptionKey(i);
                 int& level = s.graphicsLevels[size_t(i)];
                 const int count = game::graphicsLevelCount(i);
+                // An option the graphics driver cannot do shows Off, greyed out (its stored level
+                // stays, so the preset above still reads as it was chosen).
+                const bool available = game::graphicsOptionAvailable(i);
                 bool changed = false;
                 if (count == 2) {
-                    bool on = level > 0;
-                    if (im::toggleRow(L(key.c_str()), on, r)) {
+                    bool on = available && level > 0;
+                    if (im::toggleRow(L(key.c_str()), on, r, available)) {
                         level = on ? 1 : 0;
                         changed = true;
                     }
                 } else {
                     std::vector<std::string> names;
                     for (int l = 0; l < count; ++l) names.push_back(T(game::graphicsLevelLabel(i, l)));
-                    changed = im::selectorRow(L(key.c_str()), level, names, r, true, 170.0f);
+                    int shown = available ? level : 0;
+                    changed = im::selectorRow(L(key.c_str()), shown, names, r, available, 170.0f);
+                    if (changed) level = shown;
                 }
-                im::tooltip(T((key + ".help").c_str()));
+                im::tooltip(T((key + (available ? ".help" : ".unavailable")).c_str()));
                 if (changed) s.graphicsPreset = game::matchingPreset(s.graphicsLevels);
             }
             y = top + float(perColumn) * rh + 8.0f;

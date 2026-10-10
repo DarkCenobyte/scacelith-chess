@@ -70,6 +70,7 @@ options.volumetric_light = الضوء الحجمي
 options.volumetric_light.help = حزم من ضوء الشمس تخترق هواء القاعة المغبرّ، وذرات الغبار المتلألئة فيها.
 options.tessellation = التبليط
 options.tessellation.help = حواف ملساء لمنحنيات القطع حين تُرى عن قرب.
+options.tessellation.unavailable = غير متاح: برنامج تشغيل الرسوميات هذا لا يدعم التبليط.
 options.antialiasing = تنعيم الحواف
 options.antialiasing.help = ينعّم الحواف المسنّنة واللمعات المتراقصة. إيقاف: صورة أحدّ لكنها مسنّنة، وتبدو بعض التأثيرات محبّبة.
 options.depth_of_field = عمق الميدان

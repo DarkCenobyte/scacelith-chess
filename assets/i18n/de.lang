@@ -67,6 +67,7 @@ options.volumetric_light = Lichtstrahlen
 options.volumetric_light.help = Sonnenstrahlen in der staubigen Luft des Saals und die Staubkörnchen, die darin glitzern.
 options.tessellation = Tessellation
 options.tessellation.help = Glatte Konturen an den Rundungen der Figuren aus der Nähe.
+options.tessellation.unavailable = Nicht verfügbar: Dieser Grafiktreiber unterstützt keine Tessellation.
 options.antialiasing = Kantenglättung
 options.antialiasing.help = Glättet gezackte Kanten und flimmernde Glanzlichter. Aus: schärfer, aber gezackt, und manche Effekte wirken körnig.
 options.depth_of_field = Tiefenschärfe

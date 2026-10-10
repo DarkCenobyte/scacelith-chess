@@ -169,7 +169,7 @@ struct RenderSettings {
     bool motionBlur = true;
     bool dof = true;
     bool bloom = true;
-    bool tessellation = true;
+    bool tessellation = true;      // the renderer keeps it off when the driver has none (gl46::caps())
     // --- render-lighting additions ---
     int shadowCascades = 3;        // 2 (table + hall) or 3 (table + mid + hall)
     bool staticShadowCache = true; // cache DRAW_STATIC casters per cascade

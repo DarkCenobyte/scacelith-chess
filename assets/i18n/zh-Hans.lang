@@ -67,6 +67,7 @@ options.volumetric_light = 体积光
 options.volumetric_light.help = 阳光穿过大厅里满是尘埃的空气形成的光柱，以及在光中闪烁的微尘。
 options.tessellation = 曲面细分
 options.tessellation.help = 近看棋子时，其曲线的轮廓更加平滑。
+options.tessellation.unavailable = 不可用：此图形驱动程序不支持曲面细分。
 options.antialiasing = 抗锯齿
 options.antialiasing.help = 平滑锯齿状的边缘和闪烁的高光。关闭：画面更锐利但有锯齿，部分效果会显得有颗粒感。
 options.depth_of_field = 景深

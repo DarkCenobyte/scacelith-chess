@@ -68,6 +68,7 @@ options.volumetric_light = Rayons de lumière
 options.volumetric_light.help = Des rayons de soleil dans l’air poussiéreux de la salle, et les grains de poussière qui y scintillent.
 options.tessellation = Tessellation
 options.tessellation.help = Des contours lisses sur les courbes des pièces vues de près.
+options.tessellation.unavailable = Indisponible : ce pilote graphique ne gère pas la tessellation.
 options.antialiasing = Anticrénelage
 options.antialiasing.help = Lisse les bords en escalier et le scintillement des reflets. Désactivé : plus net mais crénelé, et certains effets paraissent granuleux.
 options.depth_of_field = Profondeur de champ

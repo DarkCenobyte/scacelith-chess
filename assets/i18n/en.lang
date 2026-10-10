@@ -75,6 +75,7 @@ options.volumetric_light = Light shafts
 options.volumetric_light.help = Beams of sunlight through the dusty air of the hall, and the motes glinting in them.
 options.tessellation = Tessellation
 options.tessellation.help = Smooth outlines on the curves of the pieces seen up close.
+options.tessellation.unavailable = Not available: this graphics driver has no tessellation.
 options.antialiasing = Anti-aliasing
 options.antialiasing.help = Smooths jagged edges and shimmering highlights. Off: sharper but jagged, and some effects look grainy.
 options.depth_of_field = Depth of field

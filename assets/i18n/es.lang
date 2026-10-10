@@ -67,6 +67,7 @@ options.volumetric_light = Luz volumétrica
 options.volumetric_light.help = Haces de sol a través del aire polvoriento de la sala, y las motas que brillan en ellos.
 options.tessellation = Teselación
 options.tessellation.help = Contornos suaves en las curvas de las piezas vistas de cerca.
+options.tessellation.unavailable = No disponible: este controlador gráfico no admite la teselación.
 options.antialiasing = Antialiasing
 options.antialiasing.help = Suaviza los bordes dentados y los brillos que parpadean. Desactivado: más nítido pero dentado, y algunos efectos se ven granulados.
 options.depth_of_field = Profundidad de campo

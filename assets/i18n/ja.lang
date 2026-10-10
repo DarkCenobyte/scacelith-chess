@@ -67,6 +67,7 @@ options.volumetric_light = ボリュームライト
 options.volumetric_light.help = 広間のほこりっぽい空気に差し込む日差しの筋と、その中できらめくちり。
 options.tessellation = テッセレーション
 options.tessellation.help = 近くで見た駒の曲線を、滑らかな輪郭で描きます。
+options.tessellation.unavailable = 使用できません：このグラフィックドライバーはテッセレーションに対応していません。
 options.antialiasing = アンチエイリアス
 options.antialiasing.help = ギザギザの輪郭やちらつくハイライトを滑らかにします。オフ：くっきりしますがギザギザが目立ち、一部の効果が粗く見えます。
 options.depth_of_field = 被写界深度

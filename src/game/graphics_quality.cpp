@@ -45,7 +45,15 @@ const GraphicsLevels kPresets[PresetCustom] = {
 // Sample-count row of PostFX (0 Low .. 3 Ultra) of an Off/Low..Ultra level (1..4).
 int postLevel(int level) { return std::clamp(level - 1, 0, 3); }
 
+bool g_unavailable[GfxOptionCount] = {};
+
 }  // namespace
+
+void setGraphicsOptionAvailable(int option, bool available) {
+    if (option >= 0 && option < GfxOptionCount) g_unavailable[option] = !available;
+}
+
+bool graphicsOptionAvailable(int option) { return option < 0 || option >= GfxOptionCount || !g_unavailable[option]; }
 
 int graphicsLevelCount(int option) { return option >= 0 && option < GfxOptionCount ? kOptions[option].count : 1; }
 
@@ -74,7 +82,9 @@ GraphicsLevels clampLevels(const GraphicsLevels& levels) {
 }
 
 render::RenderSettings renderSettingsFor(const GraphicsLevels& in, float renderScale) {
-    const GraphicsLevels g = clampLevels(in);
+    GraphicsLevels g = clampLevels(in);
+    for (int i = 0; i < GfxOptionCount; ++i)
+        if (!graphicsOptionAvailable(i)) g[size_t(i)] = 0;
     auto at = [&g](GraphicsOption o) { return g[size_t(o)]; };
     render::RenderSettings r;
     r.quality = render::Quality::High;

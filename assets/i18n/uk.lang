@@ -68,6 +68,7 @@ options.volumetric_light = Об’ємне світло
 options.volumetric_light.help = Сонячні промені в запиленому повітрі зали та порошинки, що виблискують у них.
 options.tessellation = Тесселяція
 options.tessellation.help = Гладкі контури на вигинах фігур, які видно зблизька.
+options.tessellation.unavailable = Недоступно: цей графічний драйвер не підтримує тесселяцію.
 options.antialiasing = Згладжування
 options.antialiasing.help = Згладжує зубчасті краї та мерехтливі відблиски. Вимк.: чіткіше, але з «драбинкою», і деякі ефекти виглядають зернистими.
 options.depth_of_field = Глибина різкості
