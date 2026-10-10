@@ -392,7 +392,9 @@ stage without the session: a line spoken and subtitled, the coach pointing at g1
 tracing the knight's jump to f3 on their words, a mark and a highlight, two demonstration moves
 taken back by hand, then the takeback card (`--coach-stage-test lesson`: on the lesson's first
 position); its log gives the time of each step, for `--warp`. `--coach-auto-answer yes|no` answers
-the takeback card by itself after 1.5 s, for runs with `--play`.
+the takeback card by itself after 1.5 s, for runs with `--play`. `--analysis-marks-test` puts a
+fixed set of the Analysis mode's marks on the board once the pieces stand (tints, the six symbols'
+badges, the better move's arrows, straight and a knight's), arriving one after another.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised.
 

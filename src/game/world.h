@@ -76,6 +76,11 @@ struct AnalysisMark {
     float age = 0.0f;             // seconds since the mark appeared (its arrival)
 };
 
+// --analysis-marks-test (game_scene.h): a fixed set of the review's marks (a ?? tint and badge on
+// e5, the five other badges on f3, c4, d4, g1 and b8, the better move's arrows d2-d4 and b1-c3
+// through b3), 'seconds' after the first appeared; the others follow it 0.15 s apart.
+std::vector<AnalysisMark> analysisMarksTestSet(float seconds);
+
 class World {
 public:
     World();

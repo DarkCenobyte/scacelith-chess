@@ -125,6 +125,7 @@ bool GameScene::init(AppContext& ctx) {
     skipIntro_ = ctx.hasArg("--no-intro");
     handoverPreview_ = ctx.hasArg("--handover-preview");
     debugCamera_ = ctx.hasArg("--cam");
+    analysisMarksTest_ = ctx.hasArg("--analysis-marks-test");
     if (ctx.hasArg("--mouse")) {
         std::vector<std::string> c = split(ctx.argValue("--mouse"), ',');
         if (c.size() == 2) {
@@ -2598,6 +2599,8 @@ void GameScene::render(AppContext& ctx, float dt) {
         }
         world_.submitMarkers(r, markers());
         if (!coachMarkList.empty()) world_.submitCoachMarks(r, coachMarkList);
+        if (analysisMarksTest_ && state_ == State::Playing)
+            world_.submitAnalysisMarks(r, analysisMarksTestSet(stateTime_), cam.position);
         scorekeeper_.submit(r);
     }
     r.endFrame();
