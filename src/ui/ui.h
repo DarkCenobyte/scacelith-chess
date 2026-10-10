@@ -288,12 +288,17 @@ MenuAction coachPauseMenu(const CoachPause& p);
 
 // ---- Coach voice download (ui_model_download.cpp) ---------------------------------------------
 // The prompt that offers to download the coach's voice model (Supertonic 3, not shipped with the
-// game) and the progress panel of the download. The game owns the job and the decisions
-// (game/coach_model.h: call that, not these, from a scene); these draw and report the choice.
-// Texts: coach.download.* in assets/i18n.
+// game) or to replace the old INT8 version with the official one, and the progress panel of the
+// download. The game owns the job and the decisions (game/coach_model.h: call that, not these,
+// from a scene); these draw and report the choice. Texts: coach.download.* and coach.update.* in
+// assets/i18n.
 struct ModelPrompt {
-    double bytes = 145316356.0;  // download size, shown in the text and on the Download button
+    double bytes = 398651400.0;  // download size, shown in the text and on the Download button
     std::string folder;          // where the files go (shown in small print)
+    // The update of the old INT8 model: says that a new version replaces it, and that its files
+    // (oldBytes) are deleted before the new ones are downloaded.
+    bool update = false;
+    double oldBytes = 145316356.0;
 };
 enum class ModelPromptAction { None, Download, NotNow };
 // Modal card over whatever is on screen (menus or the table; what was drawn before it this frame
@@ -303,11 +308,11 @@ enum class ModelPromptAction { None, Download, NotNow };
 ModelPromptAction modelPrompt(const ModelPrompt& p);
 
 struct ModelProgressView {
-    enum class State { Hidden, Checking, Downloading, Extracting, Failed };
+    enum class State { Hidden, Removing, Checking, Downloading, Failed };
     State state = State::Hidden;   // Hidden: fades out
     double done = 0.0, total = 0.0;   // the bar and, while downloading, the megabytes
-    bool github = false;           // the source: the GitHub release archive, else Hugging Face
-    std::string sourceLabel;       // "huggingface.co/csukuangfj2/...", "k2-fsa/sherpa-onnx release"
+    bool archiveCopy = false;      // the source: Supertone's archive copy of the repository
+    std::string sourceLabel;       // "huggingface.co/Supertone/supertonic-3"
     std::string file;              // the file in progress (small print), "" = none
     std::string error;             // Failed: the reason, translated
 };
@@ -319,6 +324,15 @@ ModelPanelAction modelProgressPanel(const ModelProgressView& v);
 // Called when the player picks "Coach" on the title page, as the Coach page opens (the game's
 // voice download prompt hooks in here: game::coachModelInit). nullptr = none.
 void setCoachEntryHook(std::function<void()> hook);
+// Options > Audio, under Coach voice: the row that updates the old INT8 voice model to the
+// official one. 'query' says whether it shows (the old model is installed) and with which size;
+// 'open' is called by its button (the game opens the update prompt). Set by game::coachModelInit.
+struct VoiceUpdateRow {
+    bool show = false;
+    bool running = false;          // a download is under way: the button is off
+    double bytes = 0.0;            // the size on the button
+};
+void setVoiceUpdateHooks(std::function<VoiceUpdateRow()> query, std::function<void()> open);
 
 // ---- Saved games (ui_library.cpp) ----------------------------------------------------------------
 // The "Saved games" page (title entry after "Watch a Game"): the games of the pgn folder

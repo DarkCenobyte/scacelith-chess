@@ -190,6 +190,8 @@ public:
     void ensureWorker() {
         CoachRuntime& r = rt();
         if (!s_.coachVoiceFiles_) return;
+        // Options > Audio > Voice quality applies from the next line, the model staying loaded.
+        if (r.workerStarted) r.worker.setSteps(settings().ttsSteps);
         // A worker that failed to load is tried again (the model files may have arrived since),
         // between lines (nothing queued would be lost). One whose warm-up failed is not: files that
         // load but cannot speak would be loaded again for every line. One such failure, then
@@ -583,6 +585,17 @@ void GameScene::initCoachArgs() {
     for (const std::string& p : coachArgs_.problems) LOGW("command line: %s", p.c_str());
     if (!coachArgs_.dir.empty()) tts::setModelDirectory(coachArgs_.dir);
     coachModelInit();   // the voice model download: the Coach entry's prompt (coach_model.h)
+    // A download that replaces the old INT8 model deletes its files: the worker that maps them stops
+    // first, and none starts until the download ends (coachModelDownloaded, refreshCoachVoice).
+    setVoiceReleaseHook([this] {
+        coachVoiceFiles_ = false;
+        if (coach_ && coach_->workerStarted) {
+            coach_->stage->cancelSpeech(0);
+            coach_->worker.stop();
+            coach_->workerStarted = false;
+            LOGI("coach: voice worker stopped (its model files are being replaced)");
+        }
+    });
     coachVoiceFiles_ = coachVoiceWanted();
     LOGI("coach: voice files %s in %s", coachVoiceFiles_ ? "found" : "missing (subtitles only)", tts::modelDirectory().c_str());
 }

@@ -52,12 +52,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends ninja-build ccache libssl-dev libx11-dev libgl-dev
 
-      # The coach's voice model archive (129 MB) that the first configure downloads for the TTS tests
-      # (third_party/supertonic3/supertonic3.cmake checks its SHA-256).
-      - name: Restore the voice model archive
+      # The coach's voice model (399 MB, seven files from Hugging Face) that the first configure
+      # downloads for the TTS tests (third_party/supertonic3/supertonic3.cmake checks their SHA-256).
+      - name: Restore the voice model files
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: build/_deps/*.tar.bz2
+          path: build/_deps/supertonic-3/
           key: supertonic3-linux-${{ hashFiles('third_party/supertonic3/supertonic3.cmake') }}
 
       - name: Restore the compiler cache
@@ -109,10 +109,10 @@ jobs:
           sudo apt-get install -y --no-install-recommends ninja-build ccache libssl-dev libx11-dev libgl-dev
 
       # The voice model too, so that the coach's voice runs under the sanitizers.
-      - name: Restore the voice model archive
+      - name: Restore the voice model files
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: build-san/_deps/*.tar.bz2
+          path: build-san/_deps/supertonic-3/
           key: supertonic3-linux-${{ hashFiles('third_party/supertonic3/supertonic3.cmake') }}
 
       - name: Restore the compiler cache
@@ -170,10 +170,10 @@ jobs:
           sudo apt-get install -y --no-install-recommends ninja-build ccache \
             g++-mingw-w64-x86-64-posix gcc-mingw-w64-x86-64-posix binutils-mingw-w64-x86-64 wine wine64
 
-      - name: Restore the voice model archive
+      - name: Restore the voice model files
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
-          path: build-win/_deps/*.tar.bz2
+          path: build-win/_deps/supertonic-3/
           key: supertonic3-windows-${{ hashFiles('third_party/supertonic3/supertonic3.cmake') }}
 
       - name: Restore the compiler cache

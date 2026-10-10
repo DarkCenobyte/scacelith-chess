@@ -1,8 +1,6 @@
 #include "model_store.h"
-#include "core/bzip2.h"
 #include "core/embedded.h"
 #include "core/log.h"
-#include "core/tar.h"
 #include "net/crypto.h"
 #include "net/download.h"
 #include "net/net_sys.h"
@@ -40,8 +38,6 @@ std::string mb(uint64_t b) {
 
 // ---- Manifest --------------------------------------------------------------------------------------
 
-std::string ModelManifest::archiveName() const { return archiveFolder + ".tar.bz2"; }
-
 uint64_t ModelManifest::totalBytes() const {
     uint64_t t = 0;
     for (const ManifestFile& f : files) t += f.size;
@@ -57,8 +53,36 @@ const ManifestFile* ModelManifest::find(const std::string& name) const {
 const ModelManifest& supertonicManifest() {
     static const ModelManifest m = [] {
         ModelManifest r;
-        const std::string release = "sherpa-onnx-supertonic-3-tts-int8-2026-05-11";
-        // The Hugging Face listing of the repository; same sizes and digests as in the archive.
+        // The files the runtime reads (Engine::kOfficial), as listed on Hugging Face; the same sizes and
+        // digests at both revisions below. The folder is flat: the repository's onnx/ and
+        // voice_styles/ prefixes are dropped.
+        r.files = {
+            {"tts.json", 8253, "42078d3aef1cd43ab43021f3c54f47d2d75ceb4e75f627f118890128b06a0d09", "onnx/tts.json"},
+            {"unicode_indexer.json", 277676, "9bf7346e43883a81f8645c81224f786d43c5b57f3641f6e7671a7d6c493cb24f", "onnx/unicode_indexer.json"},
+            {"M3.json", 290198, "ea1ac35ccb91b0d7ecad533a2fbd0eec10c91513d8951e3b25fbba99954e159b", "voice_styles/M3.json"},
+            {"duration_predictor.onnx", 3700147, "c3eb91414d5ff8a7a239b7fe9e34e7e2bf8a8140d8375ffb14718b1c639325db",
+             "onnx/duration_predictor.onnx"},
+            {"text_encoder.onnx", 36416150, "c7befd5ea8c3119769e8a6c1486c4edc6a3bc8365c67621c881bbb774b9902ff",
+             "onnx/text_encoder.onnx"},
+            {"vector_estimator.onnx", 256534781, "883ac868ea0275ef0e991524dc64f16b3c0376efd7c320af6b53f5b780d7c61c", "onnx/vector_estimator.onnx"},
+            {"vocoder.onnx", 101424195, "085de76dd8e8d5836d6ca66826601f615939218f90e519f70ee8a36ed2a4c4ba", "onnx/vocoder.onnx"},
+        };
+        // Supertone's repository at the revision its Python SDK pins (supertonic 1.3.1, config.py),
+        // then Supertone's archive copy at the revision its GitHub README pins.
+        r.sources = {
+            {"https://huggingface.co/Supertone/supertonic-3/resolve/724fb5abbf5502583fb520898d45929e62f02c0b/",
+             "huggingface.co/Supertone/supertonic-3"},
+            {"https://huggingface.co/supertone-oss-archive/supertonic-3/resolve/aafc6e32416a594460b32413efc49d7fe4ce6d46/",
+             "huggingface.co/supertone-oss-archive/supertonic-3"},
+        };
+        return r;
+    }();
+    return m;
+}
+
+const ModelManifest& legacyManifest() {
+    static const ModelManifest m = [] {
+        ModelManifest r;
         r.files = {
             {"LICENSE", 1070, "0dfe0d0ba84416fe3879d9a34f4909d8d0137c78d1e95834177b0414ac096fa2"},
             {"README.md", 19518, "a96c347945f7c8bc1673bea3525b1ac8d36fdde556e1e0a6a186052429caf863"},
@@ -70,13 +94,6 @@ const ModelManifest& supertonicManifest() {
             {"vocoder.int8.onnx", 25991073, "e923d60f53f95eb1ce235f1dc33ec56d9c057823c96fa6f8acf98f32b0da6152"},
             {"voice.bin", 517168, "67d5209b0ee8ce6c74105ffbe12fe6a7628aea3b4ba2fcb308a4a67938a93ce8"},
         };
-        r.hubBase = "https://huggingface.co/csukuangfj2/" + release + "/resolve/main/";
-        r.hubLabel = "huggingface.co/csukuangfj2/" + release;
-        r.archiveUrl = "https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/" + release + ".tar.bz2";
-        r.archiveLabel = "github.com/k2-fsa/sherpa-onnx";   // its release "tts-models"
-        r.archiveSize = 128774318;
-        r.archiveSha256 = "82fa96f91c4ef8abaae3a14a3f4153facf88bed821d1f7331cec2700f432c427";
-        r.archiveFolder = release;
         return r;
     }();
     return m;
@@ -169,93 +186,68 @@ ModelStatus verifyModel(const ModelManifest& m, const std::string& folder, std::
     return present == 0 ? ModelStatus::Missing : ModelStatus::Incomplete;
 }
 
-// ---- Archive extraction ----------------------------------------------------------------------------
+// ---- Which model, and the old one -----------------------------------------------------------------
 
-bool extractModelArchive(const ModelManifest& m, const std::string& archive, const std::string& folder,
-                         const std::vector<std::string>& names, std::string& error, const std::atomic<bool>* cancel,
-                         const std::function<void(uint64_t, uint64_t, const std::string&)>& progress) {
-    error.clear();
-    uint64_t archiveSize = 0;
-    net::sys::fileSize(archive, archiveSize);
-    std::FILE* in = net::sys::openFile(archive, "rb");
-    if (!in) {
-        error = "cannot open " + archive;
-        return false;
+ModelKind installedModel(const std::string& folder) {
+    if (modelStatus(supertonicManifest(), folder) == ModelStatus::Ready) return ModelKind::Official;
+    if (modelStatus(legacyManifest(), folder) == ModelStatus::Ready) return ModelKind::Legacy;
+    return ModelKind::None;
+}
+
+const char* kindName(ModelKind k) {
+    switch (k) {
+        case ModelKind::Official: return "official";
+        case ModelKind::Legacy: return "legacy INT8";
+        case ModelKind::None: return "none";
     }
-    bz2::Decoder bz([in](uint8_t* buf, size_t n) -> long {
-        size_t r = std::fread(buf, 1, n, in);
-        return r == 0 && std::ferror(in) ? -1 : long(r);
-    });
-    std::string bzError;
-    tar::Reader tr([&](uint8_t* buf, size_t n) -> long {
-        long r = bz.read(buf, n);
-        if (r < 0) bzError = bz.error();
-        return r;
-    });
-    std::vector<std::string> wanted = names;
-    std::vector<uint8_t> buf(256 * 1024);
-    std::string writing;   // the .part being written, removed on failure
-    auto failWith = [&](const std::string& why) {
-        error = why;
-        return false;
-    };
-    bool ok = [&]() {
-        tar::Entry e;
-        while (!wanted.empty()) {
-            if (cancel && cancel->load()) return failWith("cancelled");
-            if (progress) progress(bz.consumed(), archiveSize, std::string());
-            if (!tr.next(e)) {
-                if (!tr.error().empty()) return failWith("damaged archive: " + (bzError.empty() ? tr.error() : bzError));
-                std::string list;
-                for (const std::string& w : wanted) list += (list.empty() ? "" : ", ") + w;
-                return failWith("not in the archive: " + list);
-            }
-            std::string path = e.path;
-            while (path.compare(0, 2, "./") == 0) path.erase(0, 2);
-            if (path.empty()) continue;   // "./" itself
-            if (!tar::safePath(path)) return failWith("unsafe path in the archive: " + e.path);
-            std::string prefix = m.archiveFolder + "/";
-            if (path.compare(0, prefix.size(), prefix) != 0) continue;
-            std::string name = path.substr(prefix.size());
-            auto it = std::find(wanted.begin(), wanted.end(), name);
-            if (it == wanted.end()) continue;
-            const ManifestFile* mf = m.find(name);
-            if (!mf) continue;
-            if (!e.regular()) return failWith(name + " is not a regular file in the archive");
-            if (e.size != mf->size)
-                return failWith(name + " has " + std::to_string(e.size) + " bytes in the archive, expected " + std::to_string(mf->size));
-            writing = folder + name + ".part";
-            std::FILE* out = net::sys::openFile(writing, "wb");
-            if (!out) return failWith("cannot write " + writing);
-            net::crypto::Sha256Stream h;
-            bool written = true;
-            for (;;) {
-                if (cancel && cancel->load()) {
-                    std::fclose(out);
-                    return failWith("cancelled");
-                }
-                long n = tr.read(buf.data(), buf.size());
-                if (n < 0) {
-                    std::fclose(out);
-                    return failWith("damaged archive: " + (bzError.empty() ? tr.error() : bzError));
-                }
-                if (n == 0) break;
-                h.update(buf.data(), size_t(n));
-                written = written && std::fwrite(buf.data(), 1, size_t(n), out) == size_t(n);
-                if (progress) progress(bz.consumed(), archiveSize, name);
-            }
-            written = std::fclose(out) == 0 && written;
-            if (!written) return failWith("cannot write " + writing);
-            std::string digest = net::crypto::hex(h.finish());
-            if (digest != mf->sha256) return failWith(name + " from the archive does not match its SHA-256");
-            if (!net::sys::renameFile(writing, folder + name)) return failWith("cannot rename " + writing);
-            writing.clear();
-            wanted.erase(it);
+    return "?";
+}
+
+namespace {
+
+// The release archive the old download fell back to (left behind when an extraction was cancelled).
+const char* const kLegacyArchive = "sherpa-onnx-supertonic-3-tts-int8-2026-05-11.tar.bz2";
+
+// Every name the old model put in the folder; 'shared' adds those the official model uses too.
+std::vector<std::string> legacyNames(bool shared) {
+    std::vector<std::string> names;
+    for (const ManifestFile& f : legacyManifest().files) {
+        if (!shared && supertonicManifest().find(f.name)) continue;
+        names.push_back(f.name);
+        names.push_back(f.name + ".part");
+    }
+    names.push_back(kLegacyArchive);
+    names.push_back(std::string(kLegacyArchive) + ".part");
+    return names;
+}
+
+}  // namespace
+
+bool legacyFilesPresent(const std::string& folder) {
+    for (const std::string& n : legacyNames(false))
+        if (net::sys::fileExists(folder + n)) return true;
+    return false;
+}
+
+bool removeLegacyModel(const std::string& folder, uint64_t* removed, std::string* error) {
+    std::vector<std::string> names = legacyNames(true);
+    // Its notices: written again for the official files once they are all there.
+    names.push_back("README.txt");
+    names.push_back("Supertonic-3-OpenRAIL-M.txt");
+    uint64_t freed = 0;
+    bool ok = true;
+    for (const std::string& n : names) {
+        uint64_t size = 0;
+        if (!net::sys::fileSize(folder + n, size)) continue;
+        if (net::sys::removeFile(folder + n)) {
+            freed += size;
+        } else {
+            LOGW("tts: cannot delete %s%s", folder.c_str(), n.c_str());
+            if (ok && error) *error = "cannot delete " + folder + n;
+            ok = false;
         }
-        return true;
-    }();
-    std::fclose(in);
-    if (!writing.empty()) net::sys::removeFile(writing);
+    }
+    if (removed) *removed = freed;
     return ok;
 }
 
@@ -347,7 +339,19 @@ void ModelDownloader::run(Options o) {
     if (!net::sys::makeDirectories(folder_)) return finish(Phase::Failed, "io", "cannot create " + folder_);
     LOGI("tts: downloading the voice model into %s", folder_.c_str());
 
-    // 1. Files already here: kept when they hash right (an earlier download, a copy), else removed.
+    // 1. The old INT8 model goes first: its files are not used once the new ones are there, and
+    // the disk space they free counts for the new ones.
+    if (legacyFilesPresent(folder_)) {
+        update([&](DownloadProgress& p) { p.phase = Phase::Removing; });
+        uint64_t freed = 0;
+        std::string error;
+        if (!removeLegacyModel(folder_, &freed, &error)) return finish(Phase::Failed, "io", error);
+        update([&](DownloadProgress& p) { p.removedLegacy = true; });
+        LOGI("tts: the old INT8 model was deleted (%s freed)", mb(freed).c_str());
+    }
+
+    // 2. Files already here: kept when they hash right (an earlier download, a copy), else removed.
+    update([&](DownloadProgress& p) { p.phase = Phase::Checking; });
     std::vector<const ManifestFile*> missing;
     {
         uint64_t toHash = 0, hashed = 0;
@@ -378,128 +382,73 @@ void ModelDownloader::run(Options o) {
             }
         }
     }
+    // In the manifest's order (the small files first), whatever the check found.
+    std::sort(missing.begin(), missing.end());
     const int fetched = int(missing.size());
-    std::vector<std::string> sources;
 
-    // 2. The hub, file by file.
-    std::string hubError, hubDetail;
-    if (!missing.empty() && o.useHub && !manifest_.hubBase.empty()) {
+    // 3. The missing files, one after the other, from the first source; once it fails, from the
+    // next one (for that file and the rest).
+    std::vector<size_t> used;   // the sources that sent files
+    std::string firstError, lastError, lastDetail;
+    if (!missing.empty()) {
+        size_t src = size_t(std::max(0, o.firstSource));
+        if (src >= manifest_.sources.size()) return finish(Phase::Failed, "unavailable", "no source to download from");
         uint64_t present = manifest_.totalBytes();
         for (const ManifestFile* f : missing) present -= f->size;
         update([&](DownloadProgress& p) {
-            p.phase = Phase::Hub;
-            p.sourceLabel = manifest_.hubLabel;
+            p.phase = Phase::Fetching;
+            p.sourceLabel = manifest_.sources[src].label;
+            p.sourceIndex = int(src);
             p.done = present;
             p.total = manifest_.totalBytes();
+            p.file.clear();
             p.fileCount = int(missing.size());
         });
-        LOGI("tts: fetching %d file(s) from %s", int(missing.size()), manifest_.hubLabel.c_str());
-        std::vector<const ManifestFile*> still;
+        LOGI("tts: fetching %d file(s) from %s", int(missing.size()), manifest_.sources[src].label.c_str());
         for (size_t i = 0; i < missing.size(); ++i) {
             const ManifestFile* f = missing[i];
-            if (!hubError.empty()) {   // given up: the archive brings the rest
-                still.push_back(f);
-                continue;
-            }
             update([&](DownloadProgress& p) {
                 p.file = f->name;
                 p.fileIndex = int(i) + 1;
             });
-            net::DownloadRequest rq;
-            rq.url = manifest_.hubBase + f->name;
-            rq.path = folder_ + f->name;
-            rq.userAgent = agent;
-            rq.expectedSize = f->size;
-            rq.sha256 = f->sha256;
-            rq.timeoutMs = o.timeoutMs;
-            rq.retryDelayMs = o.retryDelayMs;
-            uint64_t base = present;
-            rq.onProgress = [&](uint64_t done, uint64_t) { update([&](DownloadProgress& p) { p.done = base + done; }); };
-            auto ts = std::chrono::steady_clock::now();
-            net::DownloadResult r = net::download(rq, &cancel_);
-            if (r.ok) {
-                present += f->size;
-                LOGI("tts: %s from %s (%s, %.1f s%s)", f->name.c_str(), r.host.c_str(), mb(f->size).c_str(),
-                     std::chrono::duration<double>(std::chrono::steady_clock::now() - ts).count(), r.resumed ? ", continued" : "");
-                continue;
+            for (;;) {
+                const ModelSource& source = manifest_.sources[src];
+                net::DownloadRequest rq;
+                rq.url = manifest_.url(source, *f);
+                rq.path = folder_ + f->name;
+                rq.userAgent = agent;
+                rq.expectedSize = f->size;
+                rq.sha256 = f->sha256;
+                rq.timeoutMs = o.timeoutMs;
+                rq.retryDelayMs = o.retryDelayMs;
+                uint64_t base = present;
+                rq.onProgress = [&](uint64_t done, uint64_t) { update([&](DownloadProgress& p) { p.done = base + done; }); };
+                auto ts = std::chrono::steady_clock::now();
+                net::DownloadResult r = net::download(rq, &cancel_);
+                if (r.ok) {
+                    present += f->size;
+                    if (std::find(used.begin(), used.end(), src) == used.end()) used.push_back(src);
+                    LOGI("tts: %s from %s (%s, %.1f s%s)", f->name.c_str(), r.host.c_str(), mb(f->size).c_str(),
+                         std::chrono::duration<double>(std::chrono::steady_clock::now() - ts).count(), r.resumed ? ", continued" : "");
+                    break;
+                }
+                if (r.error == "cancelled" || cancelled()) return finish(Phase::Cancelled, "cancelled", std::string());
+                lastError = r.error == "http" ? "http " + std::to_string(r.status) : r.error;
+                lastDetail = f->name + " from " + source.label + ": " + (r.detail.empty() ? r.error : r.detail);
+                // A disk that cannot take the file fares no better with another source.
+                if (r.error == "io") return finish(Phase::Failed, "io", r.detail);
+                if (!o.fallback || src + 1 >= manifest_.sources.size()) return finish(Phase::Failed, lastError, lastDetail);
+                if (firstError.empty()) firstError = lastError;
+                LOGW("tts: %s failed (%s), switching to %s", source.label.c_str(), lastDetail.c_str(),
+                     manifest_.sources[src + 1].label.c_str());
+                ++src;
+                update([&](DownloadProgress& p) {
+                    p.sourceLabel = manifest_.sources[src].label;
+                    p.sourceIndex = int(src);
+                    p.firstSourceError = firstError;
+                });
             }
-            if (r.error == "cancelled" || cancelled()) return finish(Phase::Cancelled, "cancelled", std::string());
-            if (r.error == "io") return finish(Phase::Failed, "io", r.detail);   // the archive would not fare better
-            hubError = r.error == "http" ? "http " + std::to_string(r.status) : r.error;
-            hubDetail = f->name + ": " + (r.detail.empty() ? r.error : r.detail);
-            LOGW("tts: the hub failed (%s), switching to the release archive", hubDetail.c_str());
-            still.push_back(f);
         }
-        if (still.size() < missing.size()) sources.push_back("hub");
-        missing = still;
-    }
-
-    // 3. The release archive: downloaded, checked, extracted, deleted.
-    if (!missing.empty()) {
-        if (!o.useArchive || manifest_.archiveUrl.empty())
-            return finish(Phase::Failed, hubError.empty() ? "unavailable" : hubError, hubDetail);
-        const std::string archive = folder_ + manifest_.archiveName();
-        update([&](DownloadProgress& p) {
-            p.phase = Phase::Archive;
-            p.sourceLabel = manifest_.archiveLabel;
-            p.fromArchive = true;
-            p.hubError = hubError;
-            p.file = manifest_.archiveName();
-            p.fileIndex = p.fileCount = 0;
-            p.done = 0;
-            p.total = manifest_.archiveSize;
-        });
-        LOGI("tts: fetching the release archive %s", manifest_.archiveUrl.c_str());
-        // A complete archive left by a cancelled extraction is used as it is once its size and SHA-256
-        // match (checked just below; download() itself only continues a .part).
-        net::DownloadRequest rq;
-        rq.url = manifest_.archiveUrl;
-        rq.path = archive;
-        rq.userAgent = agent;
-        rq.expectedSize = manifest_.archiveSize;
-        rq.sha256 = manifest_.archiveSha256;
-        rq.timeoutMs = o.timeoutMs;
-        rq.retryDelayMs = o.retryDelayMs;
-        rq.onProgress = [&](uint64_t done, uint64_t) { update([&](DownloadProgress& p) { p.done = done; }); };
-        uint64_t existing = 0;
-        net::DownloadResult r;
-        if (net::sys::fileSize(archive, existing) && existing == manifest_.archiveSize &&
-            net::fileSha256(archive, &cancelFlag_) == manifest_.archiveSha256) {
-            r.ok = true;
-        } else {
-            auto ts = std::chrono::steady_clock::now();
-            r = net::download(rq, &cancel_);
-            if (r.ok)
-                LOGI("tts: archive from %s (%s, %.1f s)", r.host.c_str(), mb(r.bytes).c_str(),
-                     std::chrono::duration<double>(std::chrono::steady_clock::now() - ts).count());
-        }
-        if (!r.ok) {
-            if (r.error == "cancelled" || cancelled()) return finish(Phase::Cancelled, "cancelled", std::string());
-            return finish(Phase::Failed, r.error == "http" ? "http " + std::to_string(r.status) : r.error, r.detail);
-        }
-        update([&](DownloadProgress& p) {
-            p.phase = Phase::Extracting;
-            p.done = 0;
-            p.total = manifest_.archiveSize;
-        });
-        std::vector<std::string> names;
-        for (const ManifestFile* f : missing) names.push_back(f->name);
-        std::string error;
-        auto ts = std::chrono::steady_clock::now();
-        bool ok = extractModelArchive(manifest_, archive, folder_, names, error, &cancelFlag_,
-                                      [&](uint64_t read, uint64_t total, const std::string& file) {
-                                          update([&](DownloadProgress& p) {
-                                              p.done = read;
-                                              p.total = total;
-                                              p.file = file;
-                                          });
-                                      });
-        if (!ok && cancelled()) return finish(Phase::Cancelled, "cancelled", std::string());   // the archive stays for next time
-        net::sys::removeFile(archive);
-        if (!ok) return finish(Phase::Failed, error.compare(0, 6, "cannot") == 0 ? "io" : "archive", error);
-        LOGI("tts: %d file(s) extracted (%.1f s)", int(names.size()),
-             std::chrono::duration<double>(std::chrono::steady_clock::now() - ts).count());
-        sources.push_back("archive");
     }
 
     // 4. Every file once more, then the notices.
@@ -518,20 +467,17 @@ void ModelDownloader::run(Options o) {
         return finish(Phase::Failed, "verify", std::string(statusName(st)) + " after the download");
     }
     std::string source;
-    bool hub = std::find(sources.begin(), sources.end(), "hub") != sources.end();
-    bool arc = std::find(sources.begin(), sources.end(), "archive") != sources.end();
-    const std::string hubUrl = "https://" + manifest_.hubLabel;
-    if (hub && arc)
-        source = "Scacelith downloaded them from Hugging Face (" + hubUrl + ") and from the sherpa-onnx release archive on GitHub (" +
-                 manifest_.archiveUrl + ").";
-    else if (hub)
-        source = "Scacelith downloaded them from Hugging Face, " + hubUrl + ", file by file.";
-    else if (arc)
-        source = "Scacelith downloaded them from the sherpa-onnx release archive on GitHub, " + manifest_.archiveUrl +
-                 ", and extracted them from it.";
+    auto address = [this](size_t i) { return "https://" + manifest_.sources[i].label; };
+    if (used.size() > 1)
+        source = "Scacelith downloaded them from Hugging Face, file by file, from " + address(used[0]) + " and " +
+                 address(used[1]) + " (the same files).";
+    else if (used.size() == 1)
+        source = "Scacelith downloaded them from Hugging Face, " + address(used[0]) + ", file by file.";
+    else if (!manifest_.sources.empty())
+        source = "They were already in this folder when Scacelith checked it; they are published on Hugging Face (" +
+                 address(0) + ").";
     else
-        source = "They were already in this folder when Scacelith checked it; they are published on Hugging Face (" + hubUrl +
-                 ") and in the sherpa-onnx release archive on GitHub (" + manifest_.archiveUrl + ").";
+        source = "They were already in this folder when Scacelith checked it.";
     if (!writeFolderNotices(folder_, source)) LOGW("tts: cannot write the notices in %s", folder_.c_str());
     update([&](DownloadProgress& p) { p.fetched = fetched; });
     finish(Phase::Done, std::string(), std::string());

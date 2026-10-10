@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """How Supertonic 3 reads chess notation, per speech language (input for the coach's speech catalog).
 
-    tools/tts_pronunciation.py --model DIR [--voice N] [--seeds 4] [--wav OUTDIR] [--lang xx ...]
+    tools/tts_pronunciation.py --model DIR [--voice NAME] [--seeds 4] [--wav OUTDIR] [--lang xx ...]
                                [--probe "lang:form=candidate|candidate|..." ...]
 
 No speech recogniser is available offline, so the reading of each written form ("e4", "Nf3",
@@ -152,7 +152,7 @@ def dtw(a, b):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
-    ap.add_argument("--voice", type=int, default=7)  # M3, the game's default voice
+    ap.add_argument("--voice", default="M3")  # the game's voice
     ap.add_argument("--steps", type=int, default=5)
     ap.add_argument("--seeds", type=int, default=4)
     ap.add_argument("--wav", default="")

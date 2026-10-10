@@ -1065,11 +1065,23 @@ coach.lesson.done.line = You now know the rules of chess.
 coach.lesson.next = First game
 
 # ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
-# Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
+# Supertonic 3, Supertone, Hugging Face and OpenRAIL-M are names: never translated.
 # Options > Audio
 options.coach_voice = Coach voice
-options.coach_voice.help = The coach speaks aloud in Coach mode. Its voice model is downloaded the first time it is needed (about 145 MB). Off: the coach's words are only written on screen.
-# The prompt. {0} = the size in megabytes ("145.3")
+options.coach_voice.help = The coach speaks aloud in Coach mode. Its voice model is downloaded the first time it is needed (about 399 MB). Off: the coach's words are only written on screen.
+# The row under it while the old 8-bit voice model is installed: its update to the official one.
+# {0} = the size in megabytes ("398.7")
+options.voice_update = Voice model
+options.voice_update.help = The coach still speaks with the old 8-bit version of its voice model. The update downloads the official version of Supertonic 3, published by Supertone, and deletes the old files first.
+options.voice_update.button = Update ({0} MB)
+options.voice_update.running = The download is under way.
+# Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 10.
+# .steps = the value ("5 steps", plural forms); .default marks the default value ({0} = .steps).
+options.voice_quality = Voice quality
+options.voice_quality.help = How many refinement steps the coach's speech synthesis takes for each line (4 to 10; 5 by default). More steps give a slightly cleaner voice but take longer to compute, so the coach starts speaking a little later; fewer are quicker.
+options.voice_quality.steps = {0} step|{0} steps
+options.voice_quality.default = {0} (default)
+# The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = The Coach's Voice
 coach.download.text = The coach speaks with Supertonic 3, a speech synthesis model by Supertone. It is not included with Scacelith: the game can download it now from Hugging Face ({0} MB, once). Without it, the coach writes its words on screen.
 coach.download.licence = The model is published under the OpenRAIL-M licence, which forbids certain uses of the voice it produces, such as presenting it as a human voice or imitating a real person.
@@ -1082,16 +1094,22 @@ coach.download.not_now = Not now
 coach.download.download = Download ({0} MB)
 coach.download.licence_title = OPENRAIL-M LICENCE
 coach.download.back = Back
+# The prompt in its update form (the old 8-bit model is installed). {0} = the new size in megabytes,
+# {1} = the size of the old files (deleted first)
+coach.update.title = A New Voice for the Coach
+coach.update.text = The coach's voice now uses the official version of Supertonic 3, published by Supertone, in place of the 8-bit conversion installed until now. The game can download it now from Hugging Face ({0} MB, once); the old files ({1} MB) are deleted first. If you decline, the coach keeps its current voice, and the update stays available in Options > Audio.
+coach.update.download = Update ({0} MB)
+coach.update.accept = By choosing Update, you accept the terms of this licence.
 # Progress panel (top corner, over the menus and the game)
 coach.download.caption = THE COACH'S VOICE
+coach.download.removing = Removing the old version…
 coach.download.checking = Checking the files…
 coach.download.downloading = Downloading…
-coach.download.extracting = Extracting the files…
 # {0} = megabytes received, {1} = megabytes in all
 coach.download.megabytes = {0} / {1} MB
 # Where the files come from (the repository's address is shown under it)
 coach.download.from_hub = From Hugging Face
-coach.download.from_github = From GitHub (release archive)
+coach.download.from_archive = From Hugging Face (archive copy)
 coach.download.cancel = Cancel
 coach.download.failed = The download failed.
 coach.download.error.network = The servers could not be reached. Please check your Internet connection and try again.

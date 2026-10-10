@@ -1,6 +1,7 @@
 # Dependabot version updates. The game has no package manager: Stockfish, the fonts and the other
 # third-party code are vendored in third_party/ and assets/, and the coach's voice model is pinned
-# by SHA-256 in third_party/supertonic3/supertonic3.cmake (both updated by hand, see their
+# by Hugging Face revision and SHA-256 in third_party/supertonic3/supertonic3.cmake and
+# src/tts/model_store.cpp (the code and the model are updated by hand, see their
 # README.scacelith.md). What Dependabot keeps up to date is the GitHub Actions of .github/workflows,
 # pinned by commit SHA with the version in a comment, which it updates together.
 version: 2

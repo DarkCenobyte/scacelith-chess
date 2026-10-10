@@ -7,17 +7,22 @@
 // $XDG_DATA_HOME/scacelith/coach/, by default ~/.local/share/scacelith/coach/), or the folder given
 // with setModelFolder() (the --coach-dir command-line option).
 //
-// Sources, in this order:
-//   1. Hugging Face, file by file, no extraction:
-//      https://huggingface.co/csukuangfj2/sherpa-onnx-supertonic-3-tts-int8-2026-05-11/resolve/main/<file>
-//      (the resolve endpoint answers small files itself and redirects the large ones to its CDN);
-//   2. when anything goes wrong there (network, an error status, a file that does not hash right,
-//      a redirect to a non-HTTPS host), the sherpa-onnx release archive on GitHub
-//      (.tar.bz2, 129 MB), checked against its SHA-256, extracted here (bzip2 and tar readers of
-//      src/core, only the manifest's files), then deleted.
+// The model is the official Supertonic 3 release by Supertone (fp32 ONNX graphs, the character
+// indexer and the voice style as JSON). Sources, file by file, one after the other, no archive and
+// no extraction:
+//   1. https://huggingface.co/Supertone/supertonic-3/resolve/<revision>/<path>
+//   2. when anything goes wrong there (network, an error status, a file that does not hash right, a
+//      redirect to a non-HTTPS host), the same revision of Supertone's archive copy:
+//      https://huggingface.co/supertone-oss-archive/supertonic-3/resolve/<revision>/<path>
+// (the resolve endpoint answers small files itself and redirects the large ones to its CDN).
 // Every file streams in as "<name>.part", is checked against the manifest (size and SHA-256) as it
 // arrives, and is renamed only then. The job also writes README.txt (where the files came from,
 // their licences, that Scacelith does not redistribute them) and the OpenRAIL-M text beside them.
+//
+// Earlier versions of the game downloaded sherpa-onnx's INT8 conversion of the same model
+// (legacyManifest()). The runtime still speaks with it while the player keeps it (src/tts/model.h),
+// and the game offers the official files in its place (game/coach_model.h): the download job first
+// deletes every file of the old version, then fetches the new ones.
 #pragma once
 #include "net/transport.h"
 #include <atomic>
@@ -32,28 +37,34 @@
 namespace tts {
 
 struct ManifestFile {
-    std::string name;
+    std::string name;             // in the model folder
     uint64_t size = 0;
     std::string sha256;           // hex, lower-case
+    std::string remote;           // path in the repository ("onnx/vocoder.onnx"); "" = name
+    const std::string& remotePath() const { return remote.empty() ? name : remote; }
+};
+
+struct ModelSource {
+    std::string base;             // URL prefix of a file ("https://huggingface.co/<repo>/resolve/<revision>/")
+    std::string label;            // shown in the progress panel and the folder's README ("huggingface.co/<repo>")
 };
 
 struct ModelManifest {
     std::vector<ManifestFile> files;
-    std::string hubBase;          // URL prefix of a file on the hub ("https://huggingface.co/<repo>/resolve/main/")
-    std::string hubLabel;         // shown in the progress panel ("huggingface.co/csukuangfj2/...")
-    std::string archiveUrl;       // the release archive (.tar.bz2)
-    std::string archiveLabel;     // shown in the progress panel ("github.com/k2-fsa/sherpa-onnx")
-    uint64_t archiveSize = 0;
-    std::string archiveSha256;
-    std::string archiveFolder;    // the folder of the files inside the archive
-    std::string archiveName() const;   // file name of the archive while it is on disk
-    uint64_t totalBytes() const;       // of all the files
+    std::vector<ModelSource> sources;   // tried in this order; empty = cannot be downloaded
+    uint64_t totalBytes() const;        // of all the files
     const ManifestFile* find(const std::string& name) const;
+    std::string url(const ModelSource& s, const ManifestFile& f) const { return s.base + f.remotePath(); }
 };
 
-// Supertonic 3 INT8, release sherpa-onnx-supertonic-3-tts-int8-2026-05-11: the nine files of the
-// Hugging Face repository (identical to the archive's), 145,316,356 bytes.
+// The official Supertonic 3 (Supertone/supertonic-3, the revision pinned by Supertone's own Python
+// SDK, and the same files in supertone-oss-archive/supertonic-3): the four ONNX graphs, tts.json,
+// unicode_indexer.json and the voice style M3.json, 398,651,400 bytes.
 const ModelManifest& supertonicManifest();
+// The previous model: sherpa-onnx's INT8 conversion (release
+// sherpa-onnx-supertonic-3-tts-int8-2026-05-11, 145,316,356 bytes, nine files), recognised by its
+// sizes and SHA-256. No source: it is not downloaded any more.
+const ModelManifest& legacyManifest();
 
 // The model folder, with a trailing separator (not created here).
 std::string modelFolder();
@@ -72,22 +83,26 @@ const char* statusName(ModelStatus s);
 
 // The quick check: sizes only (a stat per file). Used before showing the coach page.
 ModelStatus modelStatus(const ModelManifest& m = supertonicManifest(), const std::string& folder = modelFolder());
-// The full check: hashes every present file (about a second for the real model). 'bad' receives
+// The full check: hashes every present file (a few seconds for the real model). 'bad' receives
 // the files missing, of another size or with another digest. Run after a download and when
 // loading the model failed. 'progress' receives the bytes hashed so far and the bytes to hash.
 ModelStatus verifyModel(const ModelManifest& m, const std::string& folder, std::vector<std::string>* bad = nullptr,
                         const std::atomic<bool>* cancel = nullptr,
                         const std::function<void(uint64_t done, uint64_t total)>& progress = nullptr);
 
-// Extracts from a .tar.bz2 release archive the manifest's files named in 'names' (the base names
-// inside m.archiveFolder; anything else in the archive is skipped) into 'folder'. Each file lands
-// as <name>.part, is checked (size, SHA-256) as it streams out and is renamed once it matches.
-// The archive is refused at the first entry whose path could leave its folder, or when a wanted
-// file is not a regular file. 'progress' receives the archive bytes read so far, the archive size
-// and the file being written ("" between files).
-bool extractModelArchive(const ModelManifest& m, const std::string& archive, const std::string& folder,
-                         const std::vector<std::string>& names, std::string& error, const std::atomic<bool>* cancel = nullptr,
-                         const std::function<void(uint64_t read, uint64_t total, const std::string& file)>& progress = nullptr);
+// Which model the folder holds, by the quick check: the official one when all its files are
+// there, else the old INT8 one when all of its are, else none.
+enum class ModelKind { None, Official, Legacy };
+ModelKind installedModel(const std::string& folder = modelFolder());
+const char* kindName(ModelKind k);
+
+// Anything of the old INT8 model in the folder: one of its files that the official model does not
+// share, a .part of one, or the release archive its fallback downloaded (.tar.bz2 or its .part).
+bool legacyFilesPresent(const std::string& folder = modelFolder());
+// Deletes all of that, the files shared by name with the official model (tts.json) and the
+// notices written for it (README.txt, Supertonic-3-OpenRAIL-M.txt). 'removed' receives the bytes
+// freed. False when a file stays (in use, read-only); 'error' then names it.
+bool removeLegacyModel(const std::string& folder, uint64_t* removed = nullptr, std::string* error = nullptr);
 
 // Writes README.txt (where the files came from, their licences, that Scacelith does not
 // redistribute them) and Supertonic-3-OpenRAIL-M.txt into 'folder'. 'source' is the sentence that
@@ -98,28 +113,27 @@ bool writeFolderNotices(const std::string& folder, const std::string& source);
 struct DownloadProgress {
     enum class Phase {
         Idle,
+        Removing,     // deleting the files of the old INT8 model
         Checking,     // hashing files already in the folder (kept when they match)
-        Hub,          // fetching files from the hub
-        Archive,      // fetching the release archive (the hub failed)
-        Extracting,   // taking the files out of the archive
+        Fetching,     // downloading the missing files, one after the other
         Verifying,    // the final check of every file
         Done,
         Failed,
         Cancelled
     };
     Phase phase = Phase::Idle;
-    // Bytes of the phase: Checking/Verifying = hashed / to hash; Hub = model bytes present /
-    // model size; Archive = archive bytes / archive size; Extracting = archive bytes read /
-    // archive size.
+    // Bytes of the phase: Checking/Verifying = hashed / to hash; Fetching = model bytes present /
+    // model size.
     uint64_t done = 0, total = 0;
     std::string file;             // the file in progress ("" = none)
-    int fileIndex = 0, fileCount = 0;   // Hub: 1-based index of the file among those to fetch
-    std::string sourceLabel;      // the host / repository in use (ModelManifest::hubLabel or archiveLabel)
-    bool fromArchive = false;     // the release archive is in use (the hub failed or was skipped)
+    int fileIndex = 0, fileCount = 0;   // Fetching: 1-based index of the file among those to fetch
+    std::string sourceLabel;      // the repository in use (ModelSource::label)
+    int sourceIndex = 0;          // its index in ModelManifest::sources (1 = the archive copy)
     int fetched = 0;              // Done: the files the job wrote (0 = every file was already there and right)
-    std::string hubError;         // why the hub was given up ("" = it was not)
-    // Failed: a short code ("network", "timeout", "http", "hash", "size", "io", "archive",
-    // "verify", "unavailable", ...) and a detail for the log.
+    bool removedLegacy = false;   // the job deleted the old INT8 model first
+    std::string firstSourceError; // why the first source was given up ("" = it was not)
+    // Failed: a short code ("network", "timeout", "http", "hash", "size", "io", "verify",
+    // "unavailable", ...) and a detail for the log.
     std::string error, detail;
     bool finished() const { return phase == Phase::Done || phase == Phase::Failed || phase == Phase::Cancelled; }
 };
@@ -129,8 +143,8 @@ struct DownloadProgress {
 class ModelDownloader {
 public:
     struct Options {
-        bool useHub = true;           // false: straight to the archive (tests)
-        bool useArchive = true;       // false: no fallback (tests)
+        int firstSource = 0;          // index of the first source tried (tests: 1 = the archive copy only)
+        bool fallback = true;         // false: no later source (tests)
         int timeoutMs = 30000;        // connect and each wait for data
         int retryDelayMs = 1000;
         std::string userAgent;        // "" = downloadUserAgent()
@@ -140,8 +154,8 @@ public:
     ModelDownloader(const ModelDownloader&) = delete;
     ModelDownloader& operator=(const ModelDownloader&) = delete;
 
-    // Starts the job on its own thread (below normal priority is not needed: it mostly waits).
-    // False while a job is running.
+    // Starts the job on its own thread. False while a job is running. Whoever maps the old model's
+    // files (a TTS worker) must have let them go first: the job deletes them.
     bool start(const Options& o);
     bool start() { return start(Options()); }
     void cancel();                    // returns at once; the job ends within a moment (Cancelled)

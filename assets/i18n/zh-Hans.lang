@@ -1056,8 +1056,16 @@ coach.lesson.next = 第一盘对局
 # Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
 # Options > Audio
 options.coach_voice = 教练语音
-options.coach_voice.help = 在教练模式中，教练会出声讲解。其语音模型在首次需要时下载（约 145 MB）。关闭：教练的话只以文字显示在屏幕上。
-# The prompt. {0} = the size in megabytes ("145.3")
+options.coach_voice.help = 在教练模式中，教练会出声讲解。其语音模型在首次需要时下载（约 399 MB）。关闭：教练的话只以文字显示在屏幕上。
+options.voice_update = 语音模型
+options.voice_update.help = 教练仍在使用旧的 8 位版本语音模型说话。更新会下载 Supertone 公司发布的 Supertonic 3 官方版本，并先删除旧文件。
+options.voice_update.button = 更新（{0} MB）
+options.voice_update.running = 正在下载。
+options.voice_quality = 语音质量
+options.voice_quality.help = 教练的语音合成为每句话进行的细化步数（4 到 10，默认 5）。步数越多，声音略微更清晰，但计算时间更长，教练开口会稍晚一些；步数越少则越快。
+options.voice_quality.steps = {0} 步
+options.voice_quality.default = {0}（默认）
+# The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = 教练语音
 coach.download.text = 教练使用 Supertone 公司的语音合成模型 Supertonic 3 说话。Scacelith 未附带该模型：游戏现在可以从 Hugging Face 下载它（{0} MB，仅需一次）。没有它，教练会把要说的话以文字显示在屏幕上。
 coach.download.licence = 该模型依据 OpenRAIL-M 许可证发布，该许可证禁止以某些方式使用其生成的语音，例如将其冒充为真人声音或模仿真实人物。
@@ -1070,16 +1078,20 @@ coach.download.not_now = 以后再说
 coach.download.download = 下载（{0} MB）
 coach.download.licence_title = OpenRAIL-M 许可证
 coach.download.back = 返回
+coach.update.title = 教练的新声音
+coach.update.text = 教练的语音现在改用 Supertone 公司发布的 Supertonic 3 官方版本，取代此前安装的 8 位转换版本。游戏现在可以从 Hugging Face 下载它（{0} MB，仅需一次），并会先删除旧文件（{1} MB）。如果您拒绝，教练会保留当前的声音，更新仍可在“选项 > 声音”中进行。
+coach.update.download = 更新（{0} MB）
+coach.update.accept = 选择“更新”即表示您接受此许可证的条款。
 # Progress panel (top corner, over the menus and the game)
 coach.download.caption = 教练语音
+coach.download.removing = 正在删除旧版本…
 coach.download.checking = 正在检查文件…
 coach.download.downloading = 正在下载…
-coach.download.extracting = 正在解压文件…
 # {0} = megabytes received, {1} = megabytes in all
 coach.download.megabytes = {0} / {1} MB
 # Where the files come from (the repository's address is shown under it)
 coach.download.from_hub = 来自 Hugging Face
-coach.download.from_github = 来自 GitHub（发布归档）
+coach.download.from_archive = 来自 Hugging Face（归档副本）
 coach.download.cancel = 取消
 coach.download.failed = 下载失败。
 coach.download.error.network = 无法连接服务器。请检查您的网络连接，然后重试。

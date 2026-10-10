@@ -6,18 +6,35 @@
 #include "../tts/model_store.h"
 #include "../tts/tts.h"
 #include "../ui/ui.h"
+#include <atomic>
 #include <cstdlib>
 #include <cstring>
 #include <memory>
+#include <thread>
 
 namespace game {
 namespace {
 
 using Phase = tts::DownloadProgress::Phase;
 
+// The start-up check of the old INT8 model: every file hashed on its own thread (a second or so),
+// so that the update is offered only for the genuine old files.
+struct LegacyCheck {
+    std::thread thread;
+    std::atomic<bool> done{false}, verified{false}, cancel{false};
+    ~LegacyCheck() {
+        cancel = true;
+        if (thread.joinable()) thread.join();
+    }
+};
+
 struct ModelUi {
     bool inited = false;
     bool promptOpen = false;
+    bool promptUpdate = false;     // the prompt shows in its update form
+    bool legacyInstalled = false;  // the old INT8 model is there and the official one is not (sizes)
+    std::unique_ptr<LegacyCheck> legacyCheck;
+    std::function<void()> releaseHook;
     bool lastVoice = true;         // [coach] voice as last seen (switched on: offer the download)
     bool installed = false;        // coachModelInstalled() not yet read
     int fetched = 0;               // the files the last finished download wrote
@@ -34,18 +51,49 @@ ModelUi& state() {
     return u;
 }
 
+// What the folder holds, again (start-up, the end of a job).
+void refreshInstalled() {
+    ModelUi& u = state();
+    u.legacyInstalled = tts::installedModel() == tts::ModelKind::Legacy;
+}
+
+void startLegacyCheck() {
+    ModelUi& u = state();
+    if (!u.legacyInstalled || u.legacyCheck) return;
+    u.legacyCheck.reset(new LegacyCheck());
+    LegacyCheck* c = u.legacyCheck.get();
+    const std::string folder = tts::modelFolder();
+    c->thread = std::thread([c, folder] {
+        tts::ModelStatus st = tts::verifyModel(tts::legacyManifest(), folder, nullptr, &c->cancel);
+        c->verified = st == tts::ModelStatus::Ready;
+        c->done = true;
+        if (!c->cancel) LOGI("coach: old INT8 voice model in %s: %s", folder.c_str(), tts::statusName(st));
+    });
+}
+
+void openPrompt(bool update) {
+    ModelUi& u = state();
+    u.promptOpen = true;
+    u.promptUpdate = update;
+}
+
 void startDownload() {
     ModelUi& u = state();
     if (u.job && u.job->running()) return;
+    // The job deletes the old model's files first: whatever maps them lets them go now.
+    if (tts::legacyFilesPresent()) {
+        u.legacyCheck.reset();   // it reads them too
+        if (u.releaseHook) u.releaseHook();
+    }
     u.job.reset(new tts::ModelDownloader());   // the folder as it is now (--coach-dir)
     u.failed = false;
     u.failure.clear();
-    // Testing aid: SCACELITH_COACH_SOURCE=github skips Hugging Face (the fallback path),
-    // =hub never falls back to the release archive.
+    // Testing aid: SCACELITH_COACH_SOURCE=archive starts with Supertone's archive copy (the
+    // fallback path), =official never falls back to it.
     tts::ModelDownloader::Options o;
     if (const char* src = std::getenv("SCACELITH_COACH_SOURCE")) {
-        if (std::strcmp(src, "github") == 0) o.useHub = false;
-        if (std::strcmp(src, "hub") == 0) o.useArchive = false;
+        if (std::strcmp(src, "archive") == 0) o.firstSource = 1;
+        if (std::strcmp(src, "official") == 0) o.fallback = false;
     }
     if (u.job->start(o)) {
         u.watching = true;
@@ -65,6 +113,7 @@ std::string failureText(const tts::DownloadProgress& p, const std::string& folde
 void finishJob(const tts::DownloadProgress& p) {
     ModelUi& u = state();
     u.watching = false;
+    refreshInstalled();
     switch (p.phase) {
         case Phase::Done:
             u.installed = true;
@@ -72,7 +121,8 @@ void finishJob(const tts::DownloadProgress& p) {
             u.checked = true;
             u.suspect = false;
             ui::notify(i18n::tr("coach.download.done"), 5.0f);
-            LOGI("coach: the voice model is ready (%s)", p.fromArchive ? "from the release archive" : "from the hub");
+            LOGI("coach: the voice model is ready (%s%s)", p.sourceLabel.empty() ? "checked in place" : p.sourceLabel.c_str(),
+                 p.removedLegacy ? ", the old INT8 model deleted" : "");
             break;
         case Phase::Cancelled:
             ui::notify(i18n::tr("coach.download.cancelled"), 4.0f);
@@ -96,19 +146,17 @@ ui::ModelProgressView progressView() {
     tts::DownloadProgress p = u.job->progress();
     v.done = double(p.done);
     v.total = double(p.total);
-    v.github = p.fromArchive;
-    v.sourceLabel = p.sourceLabel.empty() ? tts::supertonicManifest().hubLabel : p.sourceLabel;
+    v.archiveCopy = p.sourceIndex > 0;
+    v.sourceLabel = p.sourceLabel.empty() ? tts::supertonicManifest().sources.front().label : p.sourceLabel;
     v.file = p.file;
     switch (p.phase) {
-        case Phase::Hub:
-        case Phase::Archive: v.state = ui::ModelProgressView::State::Downloading; break;
-        case Phase::Extracting: v.state = ui::ModelProgressView::State::Extracting; break;
+        case Phase::Fetching: v.state = ui::ModelProgressView::State::Downloading; break;
+        case Phase::Removing: v.state = ui::ModelProgressView::State::Removing; break;
         case Phase::Idle:
         case Phase::Checking:
         case Phase::Verifying: v.state = ui::ModelProgressView::State::Checking; break;
         default: break;   // finished: handled by drawModelDownload, hidden meanwhile
     }
-    if (v.state == ui::ModelProgressView::State::Extracting) v.file.clear();
     return v;
 }
 
@@ -122,9 +170,27 @@ void coachModelInit() {
     ui::setCoachEntryHook([] {
         if (coachModelNeedsPrompt()) openModelPrompt();
     });
+    ui::setVoiceUpdateHooks(
+        [] {
+            ui::VoiceUpdateRow r;
+            r.show = coachModelUpdateAvailable() || (coachModelDownloading() && state().promptUpdate);
+            r.running = coachModelDownloading();
+            r.bytes = double(tts::supertonicManifest().totalBytes());
+            return r;
+        },
+        [] { openModelUpdatePrompt(); });
+    refreshInstalled();
     LOGI("coach: voice %s, model %s in %s", settings().coachVoice ? "on" : "off (subtitles only)",
-         tts::statusName(tts::modelStatus()), tts::modelFolder().c_str());
+         tts::kindName(tts::installedModel()), tts::modelFolder().c_str());
+    // The old model: the update is offered once, after its files checked out.
+    if (!settings().coachVoiceUpdateOffered) startLegacyCheck();
 }
+
+void setVoiceReleaseHook(std::function<void()> hook) { state().releaseHook = std::move(hook); }
+
+bool coachModelUpdateAvailable() { return state().legacyInstalled && !coachModelDownloading(); }
+
+void openModelUpdatePrompt() { openPrompt(true); }
 
 bool coachModelDownloading() {
     ModelUi& u = state();
@@ -135,10 +201,11 @@ bool coachModelNeedsPrompt() {
     ModelUi& u = state();
     if (!settings().coachVoice || coachModelDownloading()) return false;
     if (u.suspect) return true;
-    return tts::modelStatus() != tts::ModelStatus::Ready;
+    return !tts::modelFilesPresent();
 }
 
-void openModelPrompt() { state().promptOpen = true; }
+// Old files in the folder (an old model that failed to load, a part of one): the update form.
+void openModelPrompt() { openPrompt(tts::legacyFilesPresent()); }
 
 bool offerVoiceForAnalysis() {
     if (!settings().analysisVoice || settings().coachVoiceOffered || !coachModelNeedsPrompt()) return false;
@@ -172,6 +239,8 @@ void coachModelShutdown() {
     }
     u.job.reset();
     u.watching = false;
+    u.legacyCheck.reset();
+    u.releaseHook = nullptr;   // its owner is going
 }
 
 void drawModelDownload() {
@@ -181,7 +250,7 @@ void drawModelDownload() {
     bool voice = settings().coachVoice;
     if (voice && !u.lastVoice && coachModelNeedsPrompt()) u.promptOpen = true;
     u.lastVoice = voice;
-    if (!voice) u.promptOpen = false;
+    if (!voice && !u.promptUpdate) u.promptOpen = false;   // the update is offered with the voice off too
 
     if (u.job && u.watching) {
         tts::DownloadProgress p = u.job->progress();
@@ -199,6 +268,19 @@ void drawModelDownload() {
         case ui::ModelPanelAction::None: break;
     }
 
+    // The old model checked out at start-up: the update is offered, once.
+    if (u.legacyCheck && u.legacyCheck->done) {
+        bool offer = u.legacyCheck->verified && u.legacyInstalled && !coachModelDownloading() && !u.promptOpen &&
+                     !settings().coachVoiceUpdateOffered;
+        u.legacyCheck.reset();
+        if (offer) {
+            settings().coachVoiceUpdateOffered = true;
+            settings().save();
+            openPrompt(true);
+            LOGI("coach: the update of the old INT8 voice model is offered");
+        }
+    }
+
     if (u.promptOpen && !settings().coachVoiceOffered) {
         // Remembered: the Analysis mode offers the voice only to a player who never saw this.
         settings().coachVoiceOffered = true;
@@ -208,14 +290,21 @@ void drawModelDownload() {
         ui::ModelPrompt mp;
         mp.bytes = double(tts::supertonicManifest().totalBytes());
         mp.folder = tts::modelFolder();
+        mp.update = u.promptUpdate;
+        mp.oldBytes = double(tts::legacyManifest().totalBytes());
         switch (ui::modelPrompt(mp)) {
             case ui::ModelPromptAction::Download:
                 u.promptOpen = false;
                 startDownload();
                 break;
             case ui::ModelPromptAction::NotNow:
-                // Remembered: the coach speaks through subtitles until the voice is switched on again.
                 u.promptOpen = false;
+                // The old model still speaks: nothing changes, the update stays in Options > Audio.
+                if (u.promptUpdate && u.legacyInstalled && !u.suspect) {
+                    LOGI("coach: voice model update declined; the old INT8 model stays");
+                    break;
+                }
+                // Remembered: the coach speaks through subtitles until the voice is switched on again.
                 settings().coachVoice = false;
                 u.lastVoice = false;
                 settings().save();

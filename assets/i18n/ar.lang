@@ -1061,8 +1061,16 @@ coach.lesson.next = المباراة الأولى
 # Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
 # Options > Audio
 options.coach_voice = صوت المدرّب
-options.coach_voice.help = يتحدث المدرّب بصوت مسموع في وضع المدرّب. يُنزَّل نموذج صوته عند الحاجة إليه أول مرة (نحو 145 ميغابايت). إيقاف: تظهر كلمات المدرّب مكتوبةً على الشاشة فقط.
-# The prompt. {0} = the size in megabytes ("145.3")
+options.coach_voice.help = يتحدث المدرّب بصوت مسموع في وضع المدرّب. يُنزَّل نموذج صوته عند الحاجة إليه أول مرة (نحو 399 ميغابايت). إيقاف: تظهر كلمات المدرّب مكتوبةً على الشاشة فقط.
+options.voice_update = نموذج الصوت
+options.voice_update.help = ما زال المدرّب يتحدث بالإصدار القديم ذي 8 بتات من نموذج صوته. يُنزِّل التحديث الإصدار الرسمي من Supertonic 3 الذي تنشره شركة Supertone، ويحذف الملفات القديمة أولًا.
+options.voice_update.button = تحديث ({0} ميغابايت)
+options.voice_update.running = التنزيل جارٍ.
+options.voice_quality = جودة الصوت
+options.voice_quality.help = عدد خطوات التحسين في توليد كلام المدرّب لكل جملة (من 4 إلى 10، والقيمة الافتراضية 5). تمنح الخطوات الأكثر صوتًا أنقى قليلًا لكنها تتطلب حسابًا أطول، فيبدأ المدرّب الكلام متأخرًا قليلًا؛ والخطوات الأقل أسرع.
+options.voice_quality.steps = {0} خطوة|خطوة واحدة|خطوتان|{0} خطوات|{0} خطوة|{0} خطوة
+options.voice_quality.default = {0} (افتراضي)
+# The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = صوت المدرّب
 coach.download.text = يتحدث المدرّب بواسطة Supertonic 3، وهو نموذج لتوليد الكلام من شركة Supertone. هذا النموذج غير مضمَّن في Scacelith: يمكن للعبة تنزيله الآن من Hugging Face ({0} ميغابايت، مرة واحدة). ومن دونه يكتب المدرّب كلماته على الشاشة.
 coach.download.licence = النموذج منشور بموجب ترخيص OpenRAIL-M، الذي يحظر بعض استخدامات الصوت الذي يولّده، مثل تقديمه على أنه صوت بشري أو انتحال شخصية شخص حقيقي.
@@ -1075,16 +1083,20 @@ coach.download.not_now = ليس الآن
 coach.download.download = تنزيل ({0} ميغابايت)
 coach.download.licence_title = ترخيص OpenRAIL-M
 coach.download.back = رجوع
+coach.update.title = صوت جديد للمدرّب
+coach.update.text = أصبح صوت المدرّب يستخدم الآن الإصدار الرسمي من Supertonic 3 الذي تنشره شركة Supertone، بدلًا من النسخة المحوَّلة ذات 8 بتات المثبَّتة حتى الآن. يمكن للعبة تنزيله الآن من Hugging Face ({0} ميغابايت، مرة واحدة)، وتُحذف الملفات القديمة ({1} ميغابايت) أولًا. إن رفضت، يحتفظ المدرّب بصوته الحالي، ويبقى التحديث متاحًا في «الخيارات > الصوت».
+coach.update.download = تحديث ({0} ميغابايت)
+coach.update.accept = باختيارك «تحديث»، فإنك توافق على شروط هذا الترخيص.
 # Progress panel (top corner, over the menus and the game)
 coach.download.caption = صوت المدرّب
+coach.download.removing = جارٍ حذف الإصدار القديم…
 coach.download.checking = جارٍ التحقق من الملفات…
 coach.download.downloading = جارٍ التنزيل…
-coach.download.extracting = جارٍ استخراج الملفات…
 # {0} = megabytes received, {1} = megabytes in all
 coach.download.megabytes = {0} / {1} ميغابايت
 # Where the files come from (the repository's address is shown under it)
 coach.download.from_hub = من Hugging Face
-coach.download.from_github = من GitHub (أرشيف الإصدار)
+coach.download.from_archive = من Hugging Face (نسخة الأرشيف)
 coach.download.cancel = إلغاء
 coach.download.failed = تعذّر التنزيل.
 coach.download.error.network = تعذّر الوصول إلى الخوادم. يُرجى التحقق من اتصالك بالإنترنت والمحاولة مرة أخرى.

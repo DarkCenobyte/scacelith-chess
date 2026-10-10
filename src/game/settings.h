@@ -154,11 +154,13 @@ struct Settings {
     int coachLessonChapter = 0;
     // [tts] the coach's voice (src/tts): threads of one synthesis (0 = automatic: 2), the voice
     // (-1 = the default teacher voice, else an index into the model's voices), flow-matching steps
-    // (5; 3 is faster and slightly rougher) and the kernels' instruction set ("auto", or a cap for
-    // troubleshooting: avx512, avxvnni, avx2, sse2, scalar; tts::setArchCap).
+    // (Options > Audio > Voice quality: kTtsStepsMin..kTtsStepsMax; each step costs about a fifth
+    // of a line's synthesis time at the default) and the kernels' instruction set ("auto", or a cap
+    // for troubleshooting: avx512, avxvnni, avx2, sse2, scalar; tts::setArchCap).
+    static constexpr int kTtsStepsMin = 4, kTtsStepsMax = 10, kTtsStepsDefault = 5;
     int ttsThreads = 0;
     int ttsVoice = -1;
-    int ttsSteps = 5;
+    int ttsSteps = kTtsStepsDefault;
     std::string ttsArch = "auto";
     // [coach] voice: the coach speaks (Options > Audio > Coach voice). Its model is not shipped:
     // the game offers to download it (game/coach_model.h) the first time Coach mode or this
@@ -169,6 +171,10 @@ struct Settings {
     // or the Analysis mode). The Analysis mode offers the voice only when it never was: a player
     // who already saw the offer elsewhere is not asked again there.
     bool coachVoiceOffered = false;
+    // [coach] voice_update_offered: the update of the old INT8 voice model to the official
+    // Supertonic 3 was offered once at start-up (game/coach_model.h). Declined, it stays in
+    // Options > Audio.
+    bool coachVoiceUpdateOffered = false;
     // [analysis] the Analysis mode's toggles (its overlay's buttons, kept from game to game): the
     // commentator's comments on the key moments (written and, with the voice, said), its voice,
     // and the arrows of the better moves.

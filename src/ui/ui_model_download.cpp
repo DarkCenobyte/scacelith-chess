@@ -1,9 +1,11 @@
 // The coach's voice model download: the prompt that offers it (what it is, its size, its licence
-// with the OpenRAIL-M text one click away, the acceptance line, Download / Not now) and the
-// progress panel of the download (bar, megabytes, the host in use, Cancel; the reason and Retry /
-// Close when it failed). The game owns the job and the decisions (game/coach_model.h); this file
-// only draws and reports the player's choice. Same look as ui_screens.cpp and ui_coach.cpp;
-// mirrored with im::flip / im::flipX in a right-to-left language.
+// with the OpenRAIL-M text one click away, the acceptance line, Download / Not now; or, in its
+// update form, that the official version replaces the old one and the old files go first), the
+// progress panel of the download (bar, megabytes, the repository in use, Cancel; the reason and
+// Retry / Close when it failed), and the hooks of the update row of Options > Audio. The game owns
+// the job and the decisions (game/coach_model.h); this file only draws and reports the player's
+// choice. Same look as ui_screens.cpp and ui_coach.cpp; mirrored with im::flip / im::flipX in a
+// right-to-left language.
 #include "ui.h"
 #include "ui_draw.h"
 #include "ui_internal.h"
@@ -46,6 +48,8 @@ struct PromptState {
     uint64_t lastFrame = 0;           // last frame the prompt was drawn
     bool blockPushed = false;         // modelDownloadBeginFrame() blocked the input below it
     std::function<void()> coachEntryHook;
+    std::function<VoiceUpdateRow()> updateQuery;
+    std::function<void()> updateOpen;
 };
 PromptState g_prompt;
 
@@ -152,6 +156,18 @@ void showModelLicence() { g_prompt.forceLicence = true; }
 
 void setCoachEntryHook(std::function<void()> hook) { g_prompt.coachEntryHook = std::move(hook); }
 
+void setVoiceUpdateHooks(std::function<VoiceUpdateRow()> query, std::function<void()> open) {
+    g_prompt.updateQuery = std::move(query);
+    g_prompt.updateOpen = std::move(open);
+}
+
+namespace detail {
+VoiceUpdateRow voiceUpdateRow() { return g_prompt.updateQuery ? g_prompt.updateQuery() : VoiceUpdateRow(); }
+void openVoiceUpdate() {
+    if (g_prompt.updateOpen) g_prompt.updateOpen();
+}
+}  // namespace detail
+
 // ==== The prompt ==========================================================================================
 ModelPromptAction modelPrompt(const ModelPrompt& p) {
     if (g_prompt.blockPushed) {
@@ -203,7 +219,8 @@ ModelPromptAction modelPrompt(const ModelPrompt& p) {
             a.v[1] = 0.0f;
         }
     } else {
-        // What it is, its size, where it goes; the licence and the acceptance line; the choice.
+        // What it is (or that it replaces the old version), its size, where it goes; the licence and
+        // the acceptance line; the choice.
         float w = std::min(1000.0f, v.x - 80.0f);
         const float textW = w - 140.0f;
         TextStyle bs = style(font::FACE_TEXT, 25.0f, ivoryDim, im::startAlign());
@@ -211,9 +228,9 @@ ModelPromptAction modelPrompt(const ModelPrompt& p) {
         TextStyle as = style(font::FACE_ITALIC, 23.0f, goldBright, im::startAlign());
         TextStyle fs = style(font::FACE_ITALIC, 19.0f, muted, im::startAlign());
         const std::string mb = megabytes(p.bytes);
-        std::string body = i18n::trf("coach.download.text", {mb});
+        std::string body = p.update ? i18n::trf("coach.update.text", {mb, megabytes(p.oldBytes)}) : i18n::trf("coach.download.text", {mb});
         std::string licence = T("coach.download.licence");
-        std::string accept = T("coach.download.accept");
+        std::string accept = T(p.update ? "coach.update.accept" : "coach.download.accept");
         std::string folder = i18n::trf("coach.download.folder", {i18n::ltr(p.folder)});
         const float bodyH = 34.0f, smallH = 31.0f;
         int bodyLines = gfx::wrapLineCount(body, textW, bs);
@@ -226,7 +243,8 @@ ModelPromptAction modelPrompt(const ModelPrompt& p) {
         Rect r(v.x * 0.5f - w * 0.5f, v.y * 0.5f - h * 0.5f + (1.0f - t) * 12.0f, w, h);
         gfx::fill(r, vec4(0.035f, 0.03f, 0.027f, 1.0f), 3.0f);   // opaque: hide the page below
         im::panel(r);
-        im::pageTitle(T("coach.download.title"), r.cx(), r.y + 76.0f);
+        // A long title shrinks so that its rule (70 units past each end) stays inside the panel.
+        im::pageTitle(T(p.update ? "coach.update.title" : "coach.download.title"), r.cx(), r.y + 76.0f, r.w - 160.0f);
         const float x = im::flipX(r, r.x + 70.0f);
         float y = r.y + 150.0f;
         gfx::textWrapped(body, x, y, textW, bs, bodyH);
@@ -246,10 +264,10 @@ ModelPromptAction modelPrompt(const ModelPrompt& p) {
         y += smallH * float(accLines) + 14.0f;
         fs.size = gfx::fitSize(folder, fs, textW * float(folderLines), 0.8f);
         gfx::textWrapped(folder, x, y, textW, fs, 26.0f);
-        // Buttons: Not now first in the reading direction, Download (the size on it) after.
+        // Buttons: Not now first in the reading direction, Download / Update (the size on it) after.
         float bw = 300.0f, bh = 58.0f, gap = 30.0f, by = r.b() - 44.0f - bh;
         gfx::hlineFade(r.x + 40.0f, r.r() - 40.0f, by - 24.0f, withAlpha(gold, 0.25f), 0.3f);
-        std::string dl = i18n::trf("coach.download.download", {mb}) + "##coach.download.download";
+        std::string dl = i18n::trf(p.update ? "coach.update.download" : "coach.download.download", {mb}) + "##coach.download.download";
         im::Id dlId = im::makeId("##coach.download.download");
         if (first) im::setFocus(dlId);
         im::setDefaultFocus(dlId);
@@ -319,8 +337,8 @@ ModelPanelAction modelProgressPanel(const ModelProgressView& pv) {
         // What is happening, and the megabytes when something is being downloaded.
         std::string what, amount;
         switch (last.state) {
+            case State::Removing: what = T("coach.download.removing"); break;
             case State::Checking: what = T("coach.download.checking"); break;
-            case State::Extracting: what = T("coach.download.extracting"); break;
             default:
                 what = T("coach.download.downloading");
                 amount = i18n::trf("coach.download.megabytes", {megabytes(last.done), megabytes(last.total)});
@@ -341,9 +359,10 @@ ModelPanelAction modelProgressPanel(const ModelProgressView& pv) {
         vec4 deep = withAlpha(goldDeep, 0.95f), bright = withAlpha(goldBright, 0.95f);
         if (im::rtl()) gfx::fillH(fill, bright, deep, 5.0f);
         else gfx::fillH(fill, deep, bright, 5.0f);
-        // Where from: "From Hugging Face" / "From GitHub (release archive)", then the repository
-        // ("huggingface.co/csukuangfj2/...", "github.com/k2-fsa/sherpa-onnx") as it is written.
-        std::string from = T(last.github ? "coach.download.from_github" : "coach.download.from_hub");
+        // Where from: "From Hugging Face" / "From Hugging Face (archive copy)", then the repository
+        // ("huggingface.co/Supertone/supertonic-3", "huggingface.co/supertone-oss-archive/...") as
+        // it is written.
+        std::string from = T(last.archiveCopy ? "coach.download.from_archive" : "coach.download.from_hub");
         TextStyle fs = style(font::FACE_ITALIC, 20.0f, ivoryDim, im::startAlign());
         fs.size = gfx::fitSize(from, fs, innerW);
         gfx::text(from, x, r.y + 150.0f, fs);
@@ -358,7 +377,7 @@ ModelPanelAction modelProgressPanel(const ModelProgressView& pv) {
         if (im::button(L("coach.download.cancel"), im::flip(r, Rect(r.r() - 24.0f - bw, r.b() - 18.0f - bh, bw, bh)), im::ButtonKind::Quiet,
                        true, im::ITEM_MOUSE_ONLY))
             act = ModelPanelAction::Cancel;
-        if (!last.file.empty() && !last.github) {   // a file of the hub (the archive is named above)
+        if (!last.file.empty()) {
             TextStyle ns = style(font::FACE_TEXT, 17.0f, faint, im::startAlign());
             ns.dir = 0;
             ns.size = gfx::fitSize(last.file, ns, innerW - bw - 20.0f, 0.8f);
