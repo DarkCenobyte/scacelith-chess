@@ -8,6 +8,7 @@
 #include "test.h"
 #include "../src/anim/animator.cpp"
 #include "../src/anim/animator_gesture.cpp"
+#include "../src/anim/animator_stance.cpp"
 #include "../src/anim/animator_writing.cpp"
 #include "../src/character/skeleton.cpp"
 #include "audio/mixer.h"
