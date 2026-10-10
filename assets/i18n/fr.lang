@@ -138,6 +138,8 @@ controls.coach_skip.keys = Espace
 controls.coach_skip = Coach : passer ce que dit le coach
 controls.coach_takeback.keys = Retour arrière
 controls.coach_takeback = Coach : reprendre le coup quand il le propose
+controls.coach_hint.keys = H
+controls.coach_hint = Défis du coach : demander un indice
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = LUMINOSITÉ
@@ -1070,6 +1072,111 @@ coach.gameover.unrated = Cette partie avec le coach n’est pas classée.
 coach.lesson.done = BRAVO
 coach.lesson.done.line = Vous connaissez maintenant les règles des échecs.
 coach.lesson.next = Première partie
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Entraînement
+coach.tab.challenges = Défis
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATS
+challenge.group.tactics = TACTIQUE
+challenge.group.defence = DÉFENSE
+challenge.group.endgames = FINALES
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Mat en un coup
+challenge.mate1.desc = Un seul coup, et c’est échec et mat.
+challenge.mate1.detail = Regardez d’abord tous les échecs : l’un d’eux ne laisse au roi ni case de fuite, ni interposition, ni prise.
+challenge.mate2.name = Mat en deux coups
+challenge.mate2.desc = Un coup qui ne laisse aucune défense, puis le mat.
+challenge.mate2.detail = Le premier coup est souvent un échec ou un sacrifice qui enlève une case au roi. Le coach se défend de son mieux.
+challenge.mate3.name = Mat en trois coups
+challenge.mate3.desc = Des variantes forcées plus longues.
+challenge.mate3.detail = Échecs, prises et menaces, trois coups en profondeur. Calculez la meilleure réponse du coach à chaque étape avant de toucher une pièce.
+challenge.backrank.name = Mats du couloir
+challenge.backrank.desc = Un roi enfermé derrière ses propres pions.
+challenge.backrank.detail = Quand les pions devant un roi roqué n’ont pas bougé, une tour ou une dame sur la dernière rangée peut faire mat. Éliminez ou détournez d’abord les défenseurs.
+challenge.patterns.name = Figures de mat
+challenge.patterns.desc = Mat à l’étouffée, mat d’Anastasia, mat arabe et autres classiques.
+challenge.patterns.detail = Des filets de mat célèbres qui reviennent sans cesse. Apprenez à reconnaître la disposition des pièces et le coup final.
+challenge.hanging.name = Pièces en prise
+challenge.hanging.desc = Repérez ce qui est laissé sans protection.
+challenge.hanging.detail = Une pièce ou un pion que personne ne défend peut tout simplement être pris. Vérifiez ce qui protège chacune des pièces du coach.
+challenge.fork.name = Fourchettes
+challenge.fork.desc = Une pièce en attaque deux à la fois.
+challenge.fork.detail = Les cavaliers, les pions, les dames et même les rois peuvent faire fourchette. L’adversaire ne peut sauver qu’une des deux cibles.
+challenge.pin.name = Clouages
+challenge.pin.desc = Une pièce qui ne peut bouger sans perdre ce qui se trouve derrière elle.
+challenge.pin.detail = Clouez une pièce sur son roi ou sur une pièce de plus grande valeur, puis attaquez-la encore, ou profitez de ce qu’elle ne peut pas bouger.
+challenge.skewer.name = Enfilades
+challenge.skewer.desc = Attaquez une pièce de valeur et gagnez celle qui est derrière.
+challenge.skewer.detail = L’inverse du clouage : la pièce la plus précieuse est devant, doit s’écarter, et découvre la pièce qui se trouve derrière elle.
+challenge.discovered.name = Attaques à la découverte
+challenge.discovered.desc = Déplacez une pièce pour en libérer une autre.
+challenge.discovered.detail = Quand une pièce quitte une ligne, la pièce qui se trouve derrière elle attaque. Avec un échec, ou un échec double, l’adversaire n’a pas le temps de parer les deux menaces.
+challenge.deflection.name = Déviation et attraction
+challenge.deflection.desc = Détournez un défenseur, ou attirez-le sur une case fatale.
+challenge.deflection.detail = Un défenseur qui a deux tâches ne peut pas remplir les deux. Attaquez-le, offrez-lui quelque chose, ou forcez une pièce à venir sur la case où elle sera perdue.
+challenge.intermezzo.name = Coups intermédiaires
+challenge.intermezzo.desc = Ne reprenez pas tout de suite : il y a plus fort.
+challenge.intermezzo.detail = Avant le coup attendu, un échec ou une menace plus forte, glissés entre les deux, changent tout.
+challenge.trapped.name = Pièces piégées
+challenge.trapped.desc = Une pièce qui n’a plus aucune case sûre.
+challenge.trapped.detail = Enlevez à une pièce ses dernières cases de fuite, puis gagnez-la.
+challenge.promotion.name = Promotion
+challenge.promotion.desc = Menez un pion jusqu’à la dernière rangée.
+challenge.promotion.detail = Les pions avancés valent cher. Dégagez le chemin, détournez les bloqueurs, et faites une nouvelle dame.
+challenge.quiet.name = Coups tranquilles
+challenge.quiet.desc = Le coup gagnant n’est ni un échec ni une prise.
+challenge.quiet.detail = Parfois, le coup le plus fort prépare simplement une menace imparable. Le genre de coup le plus difficile à voir.
+challenge.opening.name = Pièges d’ouverture
+challenge.opening.desc = Punissez les erreurs précoces.
+challenge.opening.detail = Des positions tirées des premiers coups de vraies parties, où un coup négligent peut être exploité aussitôt.
+challenge.escape.name = Sauver le roi
+challenge.escape.desc = Votre roi est en danger : un seul coup le sauve.
+challenge.escape.detail = Tous les autres coups perdent. Regardez tous les échecs et toutes les menaces contre votre roi, puis trouvez la seule issue.
+challenge.defend.name = Coups de défense
+challenge.defend.desc = Parez la menace sans perdre de matériel.
+challenge.defend.detail = Le coach menace quelque chose. Trouvez le coup précis qui tient tout ensemble.
+challenge.kq.name = Dame et roi contre roi
+challenge.kq.desc = Le mat avec la dame.
+challenge.kq.detail = Repoussez le roi seul vers le bord avec votre dame, rapprochez votre propre roi, et méfiez-vous du pat. Le coach se défend avec ses meilleurs coups.
+challenge.kr.name = Tour et roi contre roi
+challenge.kr.desc = Le mat avec la tour.
+challenge.kr.detail = La tour coupe le roi, rangée après rangée ; votre roi prend l’opposition. Le coach se défend avec ses meilleurs coups.
+challenge.kp.name = Roi et pion contre roi
+challenge.kp.desc = Prenez l’opposition et allez à dame.
+challenge.kp.detail = Avancez avec votre roi, pas avec le pion. Prenez l’opposition et faites une dame que le coach ne pourra pas rattraper.
+challenge.kp_hold.name = Arrêter le pion
+challenge.kp_hold.desc = Un roi seul contre roi et pion : tenez la nulle.
+challenge.kp_hold.detail = Placez-vous devant le pion et gardez l’opposition. Tenez dix coups.
+challenge.rook.name = Finales de tours
+challenge.rook.desc = Le pont de Lucena et la défense Philidor.
+challenge.rook.detail = Les deux positions que tout joueur devrait connaître : comment gagner avec un pion sur la septième rangée, et comment défendre avec la tour sur la troisième.
+challenge.endgame.name = Tactique en finale
+challenge.endgame.desc = Peu de pièces, des idées tranchantes.
+challenge.endgame.detail = Courses de pions, percées et finales de tours tirées de vraies parties.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} position|{0} positions
+coach.challenge.done = Terminé
+coach.challenge.start = Commencer
+coach.challenge.note.white = Vous jouez les Blancs ; le coach installe chaque position sur l’échiquier.
+coach.challenge.note.hint = Besoin d’aide ? Appuyez sur H pour obtenir un indice. Après quelques essais, le coach vous en proposera un.
+coach.challenge.note.unsaved = Les défis ne sont ni classés ni enregistrés ; une coche indique ceux que vous avez terminés.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = DÉFI RÉUSSI
+coach.challenge.complete.line = Vous avez résolu toutes les positions.
+coach.challenge.next = Défi suivant
+coach.challenge.again = Recommencer
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = UN INDICE ?
+coach.hint.text = Le coach vous propose un indice.
+coach.hint.hint = H pour l’indice. Toucher une pièce, c’est continuer à chercher.
+coach.hint.accept = Indice
+coach.hint.decline = Non merci
+coach.hint.key = Indice
 
 # ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
 # Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.

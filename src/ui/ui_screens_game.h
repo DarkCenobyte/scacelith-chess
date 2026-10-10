@@ -16,8 +16,12 @@ namespace detail {
 // "Watch a Game" page. t = page appearance (0..1), opened = first frame on the page. Sets 'back'
 // when the player leaves the page; returns StartWatching on Start.
 MenuAction watchPage(WatchSetup& setup, float t, bool opened, bool& back);
-// Coach page (ui_coach.cpp), same contract as watchPage: returns StartCoach on Start.
+// Coach page (ui_coach.cpp), same contract as watchPage: returns StartCoach on Start, or
+// StartChallenge on the Start of its Challenges tab.
 MenuAction coachPage(CoachSetup& setup, float t, bool opened, bool& back);
+// The tab the Coach page opens on the next time it opens (ui::openCoachPage), in place of the one
+// saved in the settings.
+void openCoachTab(int tab);
 // "Saved games" page (ui_library.cpp), same contract as watchPage: returns StartReplay on Replay,
 // StartAnalysis on Analyse (setup.replay names the game).
 MenuAction libraryPage(LibrarySetup& setup, float t, bool opened, bool& back);

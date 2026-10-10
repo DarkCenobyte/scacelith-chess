@@ -275,8 +275,9 @@ number.99.mv.spoken = تسع وتسعين نقلة
 # "{n:f}" for feminine nouns: ثلاث نقلات، ثلاثة أخطاء); many: number + singular accusative
 # (إحدى عشرة نقلة، خمسة عشر بيدقًا); other: number + singular genitive (مئة نقلة); zero: as the UI.
 # Nouns: نقلة (f), نقطة (f), بيدق (m), قطعة (f), خطأ (m), خطأ فادح (m, the UI's blunder), نقلة غير
-# دقيقة (f, inaccuracy), مباراة (f), مرة (f), مربع (m).
+# دقيقة (f, inaccuracy), مباراة (f), مرة (f), مربع (m), وضعية (f, a position to solve).
 count.move = {n} نقلة|نقلة واحدة|نقلتين|{n:f} نقلات|{n:f} نقلة|{n:f} نقلة
+count.position = {n} وضعية|وضعية واحدة|وضعيتين|{n:f} وضعيات|{n:f} وضعية|{n:f} وضعية
 count.point = {n} نقطة|نقطة واحدة|نقطتين|{n:f} نقاط|{n:f} نقطة|{n:f} نقطة
 count.pawn = {n} بيدق|بيدق واحد|بيدقين|{n} بيادق|{n} بيدقًا|{n} بيدق
 count.piece = {n} قطعة|قطعة واحدة|قطعتين|{n:f} قطع|{n:f} قطعة|{n:f} قطعة

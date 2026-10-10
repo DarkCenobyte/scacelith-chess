@@ -206,6 +206,9 @@ count.time = {n}回
 count.time.spoken = {n:q}かい
 count.square = {n}マス
 count.square.spoken = {n:m}マス
+# The positions of a challenge, counted as problems (問, no sound change: いちもん, ろくもん, じゅうもん).
+count.position = {n}問
+count.position.spoken = {n}もん
 # Japanese-only counters of the review and the appraisal (pass 2):
 #   ko       a plain count of things with 個 ("{sq}を攻める私の駒は{n:ko}" = 3個, さんこ)
 #   moveno   a move NUMBER, "the 11th move" ("{n:moveno}の{move}" = 11手目, じゅういってめ)

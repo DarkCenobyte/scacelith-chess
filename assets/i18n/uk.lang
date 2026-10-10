@@ -138,6 +138,8 @@ controls.coach_skip.keys = Пробіл
 controls.coach_skip = Тренер: пропустити пояснення
 controls.coach_takeback.keys = Backspace
 controls.coach_takeback = Тренер: повернути хід, коли він пропонує
+controls.coach_hint.keys = H
+controls.coach_hint = Випробування тренера: попросити підказку
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = ЯСКРАВІСТЬ
@@ -1070,6 +1072,111 @@ coach.gameover.unrated = Ця партія з тренером не рейтин
 coach.lesson.done = ЧУДОВО
 coach.lesson.done.line = Тепер ви знаєте правила шахів.
 coach.lesson.next = Перша партія
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Тренування
+coach.tab.challenges = Випробування
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = МАТИ
+challenge.group.tactics = ТАКТИКА
+challenge.group.defence = ЗАХИСТ
+challenge.group.endgames = ЕНДШПІЛЬ
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Мат в один хід
+challenge.mate1.desc = Один хід — і мат.
+challenge.mate1.detail = Спершу перевірте всі шахи: після одного з них королю нікуди відступити, нічим закритися й нікого взяти.
+challenge.mate2.name = Мат у два ходи
+challenge.mate2.desc = Хід, після якого захисту немає, а потім мат.
+challenge.mate2.detail = Перший хід — часто шах або жертва, що відбирає в короля поле. Тренер захищається якнайкраще.
+challenge.mate3.name = Мат у три ходи
+challenge.mate3.desc = Довші форсовані варіанти.
+challenge.mate3.detail = Шахи, взяття й загрози на три ходи вглиб. Перш ніж торкнутися фігури, прорахуйте найкращу відповідь тренера на кожному кроці.
+challenge.backrank.name = Мати на останній горизонталі
+challenge.backrank.desc = Король замкнений за власними пішаками.
+challenge.backrank.detail = Якщо пішаки перед рокірованим королем не зрушили з місця, тура чи ферзь на останній горизонталі можуть поставити мат. Спершу приберіть або відволічіть захисників.
+challenge.patterns.name = Типові мати
+challenge.patterns.desc = Спертий мат, мат Анастасії, арабський мат та інша класика.
+challenge.patterns.detail = Відомі матові сітки, що трапляються знову й знову. Навчіться впізнавати розташування фігур і завершальний удар.
+challenge.hanging.name = Незахищені фігури
+challenge.hanging.desc = Помітьте те, що залишилося без захисту.
+challenge.hanging.detail = Фігуру чи пішака, яких ніхто не захищає, можна просто взяти. Перевірте, що захищає кожну фігуру тренера.
+challenge.fork.name = Вилки
+challenge.fork.desc = Одна фігура атакує дві одночасно.
+challenge.fork.detail = Вилку можуть зробити коні, пішаки, ферзі й навіть королі. Суперник зможе врятувати лише одну з двох цілей.
+challenge.pin.name = Зв’язки
+challenge.pin.desc = Фігура не може піти, не втративши того, що стоїть за нею.
+challenge.pin.detail = Зв’яжіть фігуру з її королем або з ціннішою фігурою, а потім атакуйте її ще раз або скористайтеся тим, що вона не може ходити.
+challenge.skewer.name = Лінійні удари
+challenge.skewer.desc = Атакуйте цінну фігуру й виграйте ту, що стоїть за нею.
+challenge.skewer.detail = Зв’язка навпаки: цінніша фігура стоїть попереду, мусить відійти й відкриває фігуру позаду себе.
+challenge.discovered.name = Відкриті напади
+challenge.discovered.desc = Хід однією фігурою відкриває шлях іншій.
+challenge.discovered.detail = Коли фігура сходить із лінії, фігура позаду неї атакує. Якщо це шах, а тим паче подвійний шах, суперник не встигає відповісти на обидві загрози.
+challenge.deflection.name = Відволікання й заманювання
+challenge.deflection.desc = Відволічіть захисника або заманіть фігуру на фатальне поле.
+challenge.deflection.detail = Захисник із двома завданнями не впорається з обома. Атакуйте його, запропонуйте йому щось або змусьте фігуру стати на поле, де вона загине.
+challenge.intermezzo.name = Проміжні ходи
+challenge.intermezzo.desc = Не поспішайте бити у відповідь: є дещо сильніше.
+challenge.intermezzo.detail = Шах або серйозніша загроза перед очікуваним ходом змінює все.
+challenge.trapped.name = Фігури в пастці
+challenge.trapped.desc = Фігура, якій не залишилося безпечного поля.
+challenge.trapped.detail = Відберіть у фігури останні поля для відступу, а потім виграйте її.
+challenge.promotion.name = Перетворення пішака
+challenge.promotion.desc = Проведіть пішака на останню горизонталь.
+challenge.promotion.detail = Просунуті пішаки дуже цінні. Розчистіть шлях, відволічіть фігури, що блокують, і отримайте нового ферзя.
+challenge.quiet.name = Тихі ходи
+challenge.quiet.desc = Виграшний хід — не шах і не взяття.
+challenge.quiet.detail = Іноді найсильніший хід лише готує загрозу, від якої немає захисту. Такі ходи помітити найважче.
+challenge.opening.name = Дебютні пастки
+challenge.opening.desc = Карайте за ранні помилки.
+challenge.opening.detail = Позиції з перших ходів справжніх партій, де необережним ходом можна скористатися одразу.
+challenge.escape.name = Порятунок короля
+challenge.escape.desc = Ваш король у небезпеці: його рятує один хід.
+challenge.escape.detail = Будь-який інший хід програє. Перегляньте всі шахи й загрози вашому королю, а тоді знайдіть єдиний вихід.
+challenge.defend.name = Захисні ходи
+challenge.defend.desc = Відбийте загрозу без втрати матеріалу.
+challenge.defend.detail = Тренер чимось загрожує. Знайдіть точний хід, який утримує всю позицію.
+challenge.kq.name = Ферзь і король проти короля
+challenge.kq.desc = Мат ферзем.
+challenge.kq.detail = Відтісніть самотнього короля ферзем до краю дошки, підведіть свого короля й остерігайтеся пату. Тренер захищається найкращими ходами.
+challenge.kr.name = Тура й король проти короля
+challenge.kr.desc = Мат турою.
+challenge.kr.detail = Тура відрізає короля, горизонталь за горизонталлю; ваш король займає опозицію. Тренер захищається найкращими ходами.
+challenge.kp.name = Король і пішак проти короля
+challenge.kp.desc = Займіть опозицію й проведіть пішака у ферзі.
+challenge.kp.detail = Попереду йде король, а не пішак. Займіть опозицію й проведіть пішака у ферзі так, щоб тренер не встиг його перехопити.
+challenge.kp_hold.name = Зупинити пішака
+challenge.kp_hold.desc = Самотній король проти короля й пішака: утримайте нічию.
+challenge.kp_hold.detail = Станьте перед пішаком і зберігайте опозицію. Протримайтеся десять ходів.
+challenge.rook.name = Турові ендшпілі
+challenge.rook.desc = Позиція Лусени та захист Філідора.
+challenge.rook.detail = Дві позиції, які має знати кожен шахіст: як виграти з пішаком на сьомій горизонталі і як захищатися турою на третій.
+challenge.endgame.name = Тактика в ендшпілі
+challenge.endgame.desc = Мало фігур, гострі ідеї.
+challenge.endgame.detail = Пішакові перегони, прориви й турові ендшпілі зі справжніх партій.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} позиція|{0} позиції|{0} позицій
+coach.challenge.done = Пройдено
+coach.challenge.start = Почати
+coach.challenge.note.white = Ви граєте білими; тренер розставляє кожну позицію на дошці.
+coach.challenge.note.hint = Не виходить? Натисніть H, щоб отримати підказку. Після кількох спроб тренер сам її запропонує.
+coach.challenge.note.unsaved = Випробування не впливають на рейтинг і не зберігаються; пройдені позначено галочкою.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = ВИПРОБУВАННЯ ПРОЙДЕНО
+coach.challenge.complete.line = Ви розв’язали всі позиції.
+coach.challenge.next = Наступне випробування
+coach.challenge.again = Ще раз
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = ПІДКАЗКА?
+coach.hint.text = Тренер пропонує вам підказку.
+coach.hint.hint = H — підказка. Торкнутися фігури — шукати далі.
+coach.hint.accept = Підказка
+coach.hint.decline = Ні, дякую
+coach.hint.key = Підказка
 
 # ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
 # Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.

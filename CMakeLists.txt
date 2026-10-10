@@ -257,6 +257,16 @@ if(TARGET stockfish_embedded AND NOT WIN32)
     target_link_libraries(coach_audit PRIVATE scacelith_core)
 endif()
 
+# The challenges' audit (tools/challenge_audit/audit.h): checks the candidate positions of the
+# coach's challenges with the embedded Stockfish and writes assets/coach/challenges/challenges.txt.
+# A development tool, built on request: ninja challenge_audit.
+if(TARGET stockfish_embedded AND NOT WIN32)
+    file(GLOB CHALLENGE_AUDIT_SOURCES CONFIGURE_DEPENDS ${ROOT}/tools/challenge_audit/*.cpp)
+    add_executable(challenge_audit EXCLUDE_FROM_ALL ${CHALLENGE_AUDIT_SOURCES})
+    target_compile_options(challenge_audit PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
+    target_link_libraries(challenge_audit PRIVATE scacelith_core)
+endif()
+
 # Windows: the exception table (.pdata) of each exe is checked after its link when Python is
 # available (tools/check_pdata.py). Windows and Wine binary-search it to unwind every C++ throw:
 # the build fails if its entries are unsorted, overlap or point at bad unwind data, or if libgcc's

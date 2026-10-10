@@ -1,0 +1,136 @@
+# Coach speech (Arabic, Modern Standard Arabic): the challenges (src/coach/challenge_run.cpp). Same
+# keys and variants as assets/coach/speech/en/challenge.lang.
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 وضعيات", count.position in
+#            common.lang), "{n:move}" likewise; "{n:mv}" (the mate distance, count.mv) is said with
+#            نقلة ("كش مات في نقلتين") while the subtitles write the digit ("كش مات في 2")
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "كش مات" (the line says it)
+#   {your}   one of the player's pieces ("حصانك"); the coach points at it on that word
+#   {sq}     a square; the coach points at it on that word
+# The player always has the white pieces. The coach is male and addresses the player in the
+# masculine singular, as in the other Arabic files; no past-tense verb of the player (it would also
+# read as the coach's "I"). The one and two forms of count.position are oblique (وضعيتين), so
+# {n:position} always follows a preposition here ("في {n:position}").
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = كش مات في نقلة واحدة. في {n:position}، تكفي نقلة واحدة كل مرة للإماتة. تفحّص كل كش ممكن.
+ch.intro.mate2 = كش مات في نقلتين. في {n:position}، يجب ألّا تترك لي نقلتك الأولى أي دفاع، ثم تعطي كش مات.
+ch.intro.mate3 = كش مات في ثلاث نقلات. في {n:position}، فكّر في الكش والأخذ والتهديد، واحسب أفضل ردّ لي في كل مرة.
+ch.intro.backrank = كش مات الصف الأخير. في {n:position}، الملك محبوس خلف بيادقه.
+ch.intro.patterns = أنماط الإماتة. في {n:position}، تنتظرك شباك إماتة كلاسيكية. تعرّف على النمط، ثم وجّه الضربة.
+ch.intro.hanging = قطع بلا حماية. في {n:position}، شيء من قطعي بلا حماية. ابحث عنه وخذه.
+ch.intro.fork = الشوكة. في {n:position}، ابحث عن النقلة التي تهاجم هدفين معًا.
+ch.intro.pin = التثبيت. في {n:position}، ثبّت قطعة، أو استفد من تثبيت قائم.
+ch.intro.skewer = هجوم السيخ. في {n:position}، هاجم قطعة ثمينة واربح ما يقف خلفها.
+ch.intro.discovered = الهجوم المكشوف. في {n:position}، حرّك قطعة لتطلق هجوم قطعة أخرى.
+ch.intro.deflection = الإبعاد والاستدراج. في {n:position}، أبعِد مدافعًا عن مكانه، أو استدرجه إلى مربع قاتل.
+ch.intro.intermezzo = النقلات الوسيطة. في {n:position}، ابحث قبل النقلة البديهية عن نقلة أقوى.
+ch.intro.trapped = القطع المحاصرة. في {n:position}، إحدى قطعي لا تجد مربعًا آمنًا. اربحها.
+ch.intro.promotion = الترقية. في {n:position}، بيدق متقدّم يحسم المباراة.
+ch.intro.quiet = النقلات الهادئة. في {n:position}، النقلة الرابحة ليست كشًّا ولا أخذًا.
+ch.intro.opening = فخاخ الافتتاح. في {n:position} من النقلات الأولى لمباريات حقيقية، عاقبني على خطئي.
+ch.intro.escape = إنقاذ الملك. في {n:position}، ملِكك في خطر، ونقلة واحدة فقط تنقذه.
+ch.intro.defend = النقلات الدفاعية. في {n:position}، ابحث عن النقلة الوحيدة التي تحفظ تماسك موقفك.
+ch.intro.kq = الوزير والملك ضد الملك. في {n:position}، أعطِ كش مات لملِكي. واحذر الجمود.
+ch.intro.kr = الرخ والملك ضد الملك. في {n:position}، أعطِ كش مات لملِكي، خطوة بعد خطوة.
+ch.intro.kp = الملك والبيدق ضد الملك. في {n:position}، اصنع وزيرًا جديدًا، وليتقدّم ملِكك أمام البيدق.
+ch.intro.kp_hold = أوقف البيدق. في {n:position}، لا تملك إلا ملِكك. حافظ على التعادل.
+ch.intro.rook = نهايات الرخ. في {n:position}، ابنِ الجسر لترقية البيدق، وحافظ على التعادل بدفاع فيليدور.
+ch.intro.endgame = تكتيكات النهايات. في {n:position}، قطع قليلة وأفكار حادة.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = كش مات في {n:mv}.
+ch.task.mate.2 = ابحث عن كش مات في {n:mv}.
+ch.task.hanging = هناك شيء بلا حماية.
+ch.task.hanging.2 = ما الذي يمكنك أخذه مجانًا؟
+ch.task.fork = ابحث عن الشوكة.
+ch.task.fork.2 = فتّش عن شوكة.
+ch.task.pin = التثبيت هو المفتاح هنا.
+ch.task.skewer = هجوم السيخ يربح هنا.
+ch.task.discovered = الهجوم المكشوف يربح هنا.
+ch.task.deflection = أرهِق أحد المدافعين بالمهام، أو استدرجه.
+ch.task.intermezzo = ابحث عن نقلة وسيطة.
+ch.task.trapped = إحدى قطعي لا تستطيع الهرب. اربحها.
+ch.task.promotion = استفد من بيدقك المتقدّم.
+ch.task.quiet = النقلة الرابحة نقلة هادئة.
+ch.task.opening = عاقبني على نقلتي الأخيرة.
+ch.task.escape = أنقذ ملِكك: نقلة واحدة فقط تنجح.
+ch.task.defend = ابحث عن النقلة الجيدة الوحيدة.
+ch.task.endgame = ابحث عن أفضل نقلة.
+ch.task.default = ابحث عن أفضل نقلة.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = أعطِ كش مات لملِكي. سأدافع بأفضل ما أستطيع.
+ch.task.play.promote = قُد بيدقك إلى الترقية، واحتفظ بالفوز. سأحاول إيقافك.
+ch.task.play.hold = حافظ على التعادل لمدة {n:move}. سأحاول الفوز.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = هذه الوضعيات مأخوذة من مباريات حقيقية. ألعب النقلة الأخيرة، ثم يأتي دورك.
+ch.lead.first.2 = كل وضعية مأخوذة من مباراة حقيقية: ألعب النقلة التي أدّت إليها، ثم تلعب أنت.
+ch.next = الوضعية التالية.
+ch.next.2 = وهذه هي التالية.
+ch.next.3 = ننتقل إلى التالية.
+ch.last = الوضعية الأخيرة.
+ch.last.2 = والآن، الأخيرة.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = جيد.
+ch.good.2 = نعم.
+ch.good.3 = صحيح.
+ch.good.4 = بالضبط.
+# The position is solved.
+ch.solved = هذا هو! أحسنت.
+ch.solved.2 = صحيح تمامًا.
+ch.solved.3 = جيد جدًا.
+ch.solved.mate = كش مات! أحسنت.
+ch.solved.mate.2 = وهذا كش مات. جيد جدًا.
+ch.solved.mate.3 = كش مات. عمل رائع.
+ch.solved.promote = وزير جديد، والفوز مضمون. أحسنت.
+ch.solved.hold = التعادل محفوظ. دفاع رائع!
+ch.solved.draw = تعادل على الرقعة. دفاع رائع!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = ليست هذه: سيكون ردّي {move}.
+ch.wrong.reply.2 = ليس تمامًا: عندها ألعب {move}.
+ch.wrong.reply.3 = ثم ألعب {move}.
+ch.wrong.mate = انتبه: {move:nomate}، وهذا كش مات.
+ch.wrong.mate.2 = حذارِ: سيكون ردّي {move:nomate}، وهذا كش مات.
+ch.wrong.mated = انتبه: بعد {move}، أفرض كش مات في {m:move}.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = هذه النقلة تؤدي إلى كش مات أيضًا، لكن بعد نقلات أكثر. هناك طريق أسرع.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = هذه النقلة تؤدي إلى كش مات أيضًا، لكنني أفكر في نقلة أخرى. انظر مجددًا.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = ليست سيئة، لكن هناك ما هو أقوى. انظر مجددًا.
+ch.wrong.weaker.2 = يمكن لعبها، لكن بإمكانك أن تجد أفضل منها.
+ch.wrong.stalemate = جمود! ملِكي لا يستطيع التحرك، وهذا مجرد تعادل.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = ليست هذه: بعد {move}، أستطيع الحفاظ على التعادل.
+ch.wrong.loses = انتبه: بعد {move}، يصبح الفوز في متناولي.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = ليست هذه هي النقلة.
+ch.try_again = حاول مرة أخرى.
+ch.try_again.2 = ألقِ نظرة أخرى.
+ch.try_again.3 = انظر مجددًا.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = هل تريد تلميحًا؟
+ch.offer.2 = هل أعطيك تلميحًا؟
+ch.no_hint = حسنًا. واصل البحث.
+ch.no_hint.2 = لا بأس، خذ وقتك.
+ch.hint.piece = انظر إلى {your}.
+ch.hint.piece.2 = فكّر في {your}.
+ch.hint.square = انظر إلى {sq}.
+ch.hint.square.2 = المربع الحاسم هو {sq}.
+ch.hint.square.3 = راقب المربع {sq}.
+ch.hint.show = هذه هي النقلة. انظر.
+ch.hint.show.2 = دعني أُريك. انظر جيدًا.
+ch.hint.now = والآن العبها أنت.
+ch.hint.now.2 = دورك: العب هذه النقلة.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = اكتمل التحدي كله. أحسنت!
+ch.complete.2 = حُلّت كل الوضعيات. أحسنت!

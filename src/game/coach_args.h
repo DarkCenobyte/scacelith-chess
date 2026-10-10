@@ -16,6 +16,10 @@ struct CoachArgs {
     bool stageTest = false;   // --coach-stage-test: the scene's Stage performs a fixed sequence
     int autoAnswer = -1;      // --coach-auto-answer yes|no: the takeback card answers itself (1 / 0)
                               // after 1.5 s, for scripted runs (--play) and screenshots; -1 = no
+                              // (in a challenge, the hint offer: yes = a hint)
+    std::string challenge;    // --coach-challenge <id>: a challenge instead of a game (coach/challenge.h)
+    int challengePosition = 0;   // --coach-challenge-position N: begin at its position N (1-based on
+                                 // the command line, 0-based here)
     std::vector<std::string> problems;   // values that were ignored, for the log
 };
 
@@ -56,6 +60,23 @@ inline CoachArgs parseCoachArgs(const std::vector<std::string>& args) {
                 ++i;
             } else {
                 c.problems.push_back("--coach-auto-answer expects yes or no, got '" + value + "'");
+                if (hasValue && value.compare(0, 2, "--") != 0) ++i;
+            }
+        } else if (a == "--coach-challenge") {
+            if (hasValue && !value.empty() && value.compare(0, 2, "--") != 0) {
+                c.challenge = value;
+                ++i;
+            } else {
+                c.problems.push_back("--coach-challenge expects a challenge id");
+            }
+        } else if (a == "--coach-challenge-position") {
+            char* end = nullptr;
+            long n = hasValue ? std::strtol(value.c_str(), &end, 10) : -1;
+            if (hasValue && end && *end == '\0' && !value.empty() && n >= 1 && n <= 99) {
+                c.challengePosition = int(n) - 1;
+                ++i;
+            } else {
+                c.problems.push_back("--coach-challenge-position expects 1..99, got '" + value + "'");
                 if (hasValue && value.compare(0, 2, "--") != 0) ++i;
             }
         } else if (a == "--coach-dir") {

@@ -436,10 +436,10 @@ bool optionsPage(MenuAction& act) {
     im::tabBar(tabs, o.tab, Rect(p.x + 60.0f, p.y + 124.0f, p.w - 120.0f, 50.0f));
 
     game::Settings& s = o.work;
-    // Rows from under the tabs to above the buttons: the nine rows of Gameplay are closer, and the
-    // eight of Audio (nine when it shows the voice model's update).
+    // Rows from under the tabs to above the buttons: the nine rows of Gameplay and of Controls are
+    // closer, and the eight of Audio (nine when it shows the voice model's update).
     const VoiceUpdateRow voiceUpdate = o.tab == 2 ? detail::voiceUpdateRow() : VoiceUpdateRow();
-    float rx = p.x + 70.0f, rw = p.w - 140.0f, rh = o.tab == 3 || voiceUpdate.show ? 52.0f : o.tab == 2 ? 56.0f : 60.0f;
+    float rx = p.x + 70.0f, rw = p.w - 140.0f, rh = o.tab == 3 || o.tab == 6 || voiceUpdate.show ? 52.0f : o.tab == 2 ? 56.0f : 60.0f;
     float y = p.y + 200.0f;
     auto row = [&]() {
         Rect r(rx, y, rw, rh - 4.0f);
@@ -652,6 +652,7 @@ bool optionsPage(MenuAction& act) {
                 {"controls.menu.keys", "controls.menu"},
                 {"controls.coach_skip.keys", "controls.coach_skip"},
                 {"controls.coach_takeback.keys", "controls.coach_takeback"},
+                {"controls.coach_hint.keys", "controls.coach_hint"},
             };
             TextStyle ks = style(font::FACE_TITLE, 19.0f, gold, im::endAlign(), 0.14f);
             TextStyle as = style(font::FACE_TEXT, kBody, ivory, im::startAlign());
@@ -1617,6 +1618,11 @@ void openSavedGames() {
     S.forcedPage = int(S.replayFrom);
     S.replayFrom = Page::Library;
 }
+// Back from a challenge: the Coach page, on its Challenges tab.
+void openCoachPage(int tab) {
+    S.forcedPage = int(Page::Coach);
+    detail::openCoachTab(tab);
+}
 
 MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, LibrarySetup& library) {
     const bool hasLibrary = !library.folder.empty();
@@ -1702,7 +1708,7 @@ MenuAction mainMenu(NewGameSetup& setup, WatchSetup& watch, CoachSetup& coach, L
     if (S.page != Page::Calibration) detail::onlineMenuOverlay(S.page == Page::Online);
     if (detail::onlineGameStarting()) S.resumeOnline = S.page == Page::Online;
     if (act == MenuAction::StartGame || act == MenuAction::Quit) setPage(Page::Title);
-    if (act == MenuAction::StartWatching || act == MenuAction::StartCoach) setPage(Page::Title);
+    if (act == MenuAction::StartWatching || act == MenuAction::StartCoach || act == MenuAction::StartChallenge) setPage(Page::Title);
     if (act == MenuAction::StartReplay || act == MenuAction::StartAnalysis) {
         // After the replay or the analysis, openSavedGames() comes back to the page it started from.
         S.replayFrom = S.page;
