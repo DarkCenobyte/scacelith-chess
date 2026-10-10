@@ -364,6 +364,13 @@ void GameScene::onlineEvent(const net::Event& e) {
     case Kind::ServerError:
         ui::notify(eventErrorText(e), 4.0f);
         if (e.code == kErrDrawOfferLimit) myDrawOffer_ = false;
+        // A move the authority could not take in (RateLimited: the connection's message bucket,
+        // or a game host far behind that bounds its inbox): a snapshot shows what it has, and the
+        // pending move goes again from there (onlineSnapshot, live::resendPendingMove).
+        if (e.code == int(net::proto::ErrorCode::RateLimited) && pendingPly_ >= 0 && link_) {
+            LOGI("online: move %d not taken in (rate limited): asking for the game's state", pendingPly_ + 1);
+            link_->requestResync();
+        }
         break;
     default: break;
     }
