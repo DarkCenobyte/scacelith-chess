@@ -209,6 +209,8 @@ const Expect kExpect[] = {
     {audio::Sfx::PenTap, 0.8f, 500.0f, 6000.0f, 0.02f, 0.13f},
     {audio::Sfx::PageTurn, 2.0f, 900.0f, 6000.0f, 0.8f, 1.35f},
     {audio::Sfx::PageFlap, 1.2f, 200.0f, 3500.0f, 0.08f, 0.45f},
+    {audio::Sfx::Footstep, 1.2f, 150.0f, 3000.0f, 0.08f, 0.45f},
+    {audio::Sfx::ChairSlide, 2.0f, 250.0f, 3000.0f, 0.4f, 1.1f},
 };
 static_assert(sizeof(kExpect) / sizeof(kExpect[0]) == size_t(audio::Sfx::Count), "every sound has expectations");
 
