@@ -140,7 +140,7 @@ private:
     std::string renderPiece(Ctx& c, const Arg& a, const std::string& form) const;
     std::string renderSquare(Ctx& c, chess::Square sq) const;
     std::string renderMove(Ctx& c, const std::string& san, const std::string& form, chess::Square* prevTo) const;
-    std::string renderMoves(Ctx& c, const std::string& line) const;
+    std::string renderMoves(Ctx& c, const std::string& line, const std::string& form) const;
     std::string renderNumber(Ctx& c, int n, const std::string& form) const;
     std::string numberWords(Ctx& c, int n, const std::string& form) const;
     std::string renderEval(Ctx& c, const Arg& a) const;

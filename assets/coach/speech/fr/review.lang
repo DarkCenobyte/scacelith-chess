@@ -51,13 +51,13 @@ ann.mate.coach.3 = Échec et mat, j’en ai bien peur.
 
 # ---- Verdicts (the first sentence about a bad move) --------------------------------------------
 ex.verdict.blunder.b1 = Oups ! Avec ce coup, tu me fais un cadeau.
-ex.verdict.blunder.b1.2 = Attention ! Je vais te montrer ce qui peut arriver maintenant.
+ex.verdict.blunder.b1.2 = Attention ! Ce coup peut te coûter cher.
 ex.verdict.blunder.b1.3 = Oh, attends. Ce coup pose un problème.
-ex.verdict.blunder.b2 = Hum, ce coup pose un problème. Regarde.
-ex.verdict.blunder.b2.2 = C’est une erreur. Regarde bien.
-ex.verdict.blunder.b2.3 = Attention, ce coup te coûte quelque chose. Regarde.
+ex.verdict.blunder.b2 = Hum, ce coup pose un problème.
+ex.verdict.blunder.b2.2 = C’est une grosse erreur.
+ex.verdict.blunder.b2.3 = Attention, ce coup te coûte quelque chose.
 ex.verdict.blunder.b3 = C’est une gaffe.
-ex.verdict.blunder.b3.2 = {move}, c’est une erreur. Voici pourquoi.
+ex.verdict.blunder.b3.2 = {move}, c’est une vraie erreur.
 ex.verdict.blunder.b3.3 = Aïe, {move}, c’est une grosse erreur.
 ex.verdict.blunder.b4 = {move} est une gaffe.
 ex.verdict.blunder.b4.2 = {move} est une grave erreur.
@@ -68,11 +68,11 @@ ex.verdict.blunder.b5.3 = {move} est une faute coûteuse.
 ex.verdict.blunder.b6 = {move} est une grave erreur.
 ex.verdict.blunder.b6.2 = {move} est une gaffe.
 ex.verdict.blunder.b6.3 = {move} ? Une gaffe.
-ex.verdict.mistake.b3 = Ce n’est pas le meilleur coup. Voici pourquoi.
+ex.verdict.mistake.b3 = Ce n’est pas un bon coup.
 ex.verdict.mistake.b3.2 = Hum, {move} pose un problème.
-ex.verdict.mistake.b3.3 = C’est une erreur. Je vais te montrer.
+ex.verdict.mistake.b3.3 = C’est une erreur.
 ex.verdict.mistake.b4 = {move} est une erreur.
-ex.verdict.mistake.b4.2 = {move} n’est pas bon. Voici pourquoi.
+ex.verdict.mistake.b4.2 = {move} n’est pas bon.
 ex.verdict.mistake.b4.3 = C’est une erreur.
 ex.verdict.mistake.b5 = {move} est une nette erreur.
 ex.verdict.mistake.b5.2 = {move} est une erreur.
@@ -80,7 +80,11 @@ ex.verdict.mistake.b5.3 = {move} n’est pas bon.
 ex.verdict.mistake.b6 = {move} est une erreur.
 ex.verdict.mistake.b6.2 = {move} ? Une erreur.
 ex.verdict.mistake.b6.3 = Pas {move}.
-# An inaccuracy with no concrete cause: the line names the better move ({best} is pointed at).
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = Pas mal, mais {best} était un peu meilleur.
+ex.verdict.inaccuracy.b3.2 = {best} était un peu plus précis.
+ex.verdict.inaccuracy.b3.3 = Petite imprécision : {best} était meilleur ici.
 ex.verdict.inaccuracy.b4 = Une imprécision : {best} était plus précis.
 ex.verdict.inaccuracy.b4.2 = Une petite imprécision. {best} était un peu meilleur.
 ex.verdict.inaccuracy.b4.3 = Pas tout à fait le meilleur coup : {best} était plus juste.
@@ -90,12 +94,6 @@ ex.verdict.inaccuracy.b5.3 = {best} était plus précis que {move}.
 ex.verdict.inaccuracy.b6 = {move} est imprécis ; {best}.
 ex.verdict.inaccuracy.b6.2 = Imprécis. {best}.
 ex.verdict.inaccuracy.b6.3 = {best} était meilleur.
-ex.verdict.imprecise.b4 = {move} est imprécis. Voici pourquoi.
-ex.verdict.imprecise.b4.2 = {move} n’est pas tout à fait juste.
-ex.verdict.imprecise.b5 = {move} est imprécis.
-ex.verdict.imprecise.b5.2 = {move} manque de précision.
-ex.verdict.imprecise.b6 = {move} est imprécis.
-ex.verdict.imprecise.b6.2 = {move} ? Imprécis.
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = Oh, attends ! Tu as raté quelque chose de bien.
 ex.verdict.missed.b1.2 = Regarde encore ! Il y avait mieux.
@@ -183,6 +181,31 @@ demo.your.back.3 = Et tu reprends la pièce.
 demo.your.king = Ton roi doit bouger.
 demo.your.king.2 = Le roi doit s’écarter, en {sq}.
 demo.your.king.3 = Ton roi s’enfuit en {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = Maintenant, plus rien ne peut sauver {t1}.
+ex.point.piece.2 = Et {t1} est perdu{t1:e}.
+ex.point.piece.3 = Ensuite, {t1} tombe.
+ex.point.two = J’attaque à la fois {t1} et {t2} : l’une des deux pièces va tomber.
+ex.point.two.2 = Maintenant, j’attaque {t1} et {t2}. Tu ne peux pas sauver les deux.
+ex.point.mate = Et maintenant, {reply:nomate}, c’est échec et mat.
+ex.point.mate.2 = Ensuite vient {reply:nomate}, et c’est échec et mat.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = Tu vois ? Maintenant, tu as perdu {pts:point}.
+ex.result.b1.2 = C’est comme ça que tu perds {pts:point}.
+ex.result.b2 = Au final, tu as perdu {pts:point}.
+ex.result.b2.2 = Maintenant, tu as {pts:point} de moins.
+ex.result.b3 = Ça te coûte {pts:point}.
+ex.result.b3.2 = Tu te retrouves avec {pts:point} de moins.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = Tu peux reprendre quelque chose, mais tu as toujours {pts:point} de moins.
+ex.result_back.b1.2 = Tu peux regagner un peu, mais tu as quand même perdu {pts:point}.
+ex.result_back.b2 = Tu peux reprendre un peu, mais tu as toujours {pts:point} de moins.
+ex.result_back.b2.2 = Même si tu reprends, tu as perdu {pts:point}.
+ex.result_back.b3 = Même après ta reprise, tu as {pts:point} de moins.
+ex.result_back.b3.2 = Tu regagnes quelque chose, mais ça te coûte quand même {pts:point}.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = Et ici, en {sq}, tu aurais une nouvelle dame.
 demo.promote.2 = Puis {your} arrive en {sq} et devient une dame.
@@ -197,18 +220,18 @@ ex.mate_allowed.b2 = Ce coup me permet de mater {your} en {m:move}.
 ex.mate_allowed.b2.2 = Maintenant, je peux mater {your} en {m:move}. Regarde.
 ex.mate_allowed.b2.3 = Attention ! {your} est en danger : mat en {m:move}.
 # b3 b4 b6 ({line} is pointed at).
-ex.mate_allowed.b3 = Ce coup permet un mat en {m:move} : {line}.
-ex.mate_allowed.b3.2 = Après ça, j’ai un mat en {m:move} : {line}.
-ex.mate_allowed.b3.3 = Ton roi se fait mater : {line}.
-ex.mate_allowed.b4 = {move} permet un mat forcé : {line}.
-ex.mate_allowed.b4.2 = Ce coup mène droit à un mat en {m:move} : {line}.
-ex.mate_allowed.b4.3 = Après {move}, {line}, et c’est mat.
+ex.mate_allowed.b3 = Ce coup permet un mat en {m:move} : {line:nomate}.
+ex.mate_allowed.b3.2 = Après ça, j’ai un mat en {m:move} : {line:nomate}.
+ex.mate_allowed.b3.3 = Ton roi se fait mater : {line:nomate}.
+ex.mate_allowed.b4 = {move} permet un mat forcé : {line:nomate}.
+ex.mate_allowed.b4.2 = Ce coup mène droit à un mat en {m:move} : {line:nomate}.
+ex.mate_allowed.b4.3 = Après {move}, {line:nomate}, et c’est mat.
 ex.mate_allowed.b5 = {move} permet un mat forcé en {m:move}.
 ex.mate_allowed.b5.2 = Ça mène droit à un mat en {m:move}.
 ex.mate_allowed.b5.3 = Il y a maintenant un mat forcé en {m:move}.
-ex.mate_allowed.b6 = Mat en {m} : {line}.
-ex.mate_allowed.b6.2 = {line}, mat.
-ex.mate_allowed.b6.3 = C’est mat après {line}.
+ex.mate_allowed.b6 = Mat en {m} : {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}, mat.
+ex.mate_allowed.b6.3 = C’est mat après {line:nomate}.
 # After the one-move demonstration ({your} = the king).
 ex.mate_allowed.tail.b1 = Regarde : {your} n’a plus aucune case pour s’échapper.
 ex.mate_allowed.tail.b1.2 = Tu vois ? J’attaque {your}, et {your:il} ne peut pas s’enfuir.
@@ -227,29 +250,29 @@ name.pattern.ladder = le mat de l’escalier
 name.pattern.epaulette = le mat de l’épaulette
 
 # ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
-ex.mate_missed.b1 = Avec {best}, tu pouvais mater {my} !
-ex.mate_missed.b1.2 = {best} était échec et mat ! {my} ne pouvait pas s’échapper.
-ex.mate_missed.b1.3 = Regarde ! {best} aurait maté {my}.
-ex.mate_missed.b2 = Tu avais un mat en {m:move}, en commençant par {best}.
-ex.mate_missed.b2.2 = {best} donnait le mat en {m:move} !
-ex.mate_missed.b2.3 = Tu pouvais me mater avec {best}.
-ex.mate_missed.b3 = Tu as raté un mat en {m:move} : {best}.
-ex.mate_missed.b3.2 = {best} mate en {m:move} : {line}.
-ex.mate_missed.b3.3 = Il y avait un mat en {m:move}, qui commençait par {best}.
-ex.mate_missed.b4 = Mat manqué : {line}, en commençant par {best}.
-ex.mate_missed.b4.2 = {best} forçait le mat en {m:move}.
-ex.mate_missed.b4.3 = Tu avais un mat en {m:move} avec {best}.
-ex.mate_missed.b5 = {best} mate en {m:move} : {line}.
-ex.mate_missed.b5.2 = Mat en {m:move} manqué ; il commençait par {best}.
-ex.mate_missed.b5.3 = Il y avait un mat forcé : {best}.
-ex.mate_missed.b6 = {best} mate : {line}.
-ex.mate_missed.b6.2 = Mat en {m} avec {best}.
-ex.mate_missed.b6.3 = {best}, mat en {m}.
+ex.mate_missed.b1 = Avec {best:nomate}, tu pouvais mater {my} !
+ex.mate_missed.b1.2 = {best:nomate} était échec et mat ! {my} ne pouvait pas s’échapper.
+ex.mate_missed.b1.3 = Regarde ! {best:nomate} aurait maté {my}.
+ex.mate_missed.b2 = Tu avais un mat en {m:move}, en commençant par {best:nomate}.
+ex.mate_missed.b2.2 = {best:nomate} donnait le mat en {m:move} !
+ex.mate_missed.b2.3 = Tu pouvais me mater avec {best:nomate}.
+ex.mate_missed.b3 = Tu as raté un mat en {m:move} : {best:nomate}.
+ex.mate_missed.b3.2 = {best:nomate} mate en {m:move} : {line:nomate}.
+ex.mate_missed.b3.3 = Il y avait un mat en {m:move}, qui commençait par {best:nomate}.
+ex.mate_missed.b4 = Mat manqué : {line:nomate}, en commençant par {best:nomate}.
+ex.mate_missed.b4.2 = {best:nomate} forçait le mat en {m:move}.
+ex.mate_missed.b4.3 = Tu avais un mat en {m:move} avec {best:nomate}.
+ex.mate_missed.b5 = {best:nomate} mate en {m:move} : {line:nomate}.
+ex.mate_missed.b5.2 = Mat en {m:move} manqué ; il commençait par {best:nomate}.
+ex.mate_missed.b5.3 = Il y avait un mat forcé : {best:nomate}.
+ex.mate_missed.b6 = {best:nomate} mate : {line:nomate}.
+ex.mate_missed.b6.2 = Mat en {m} avec {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}, mat en {m}.
 # Both moves mate, the played one much later (levels 5-6).
-ex.mate_delayed.b5 = {best} était plus rapide : mat en {m:move}.
-ex.mate_delayed.b5.2 = {best} matait plus vite, en {m:move}.
-ex.mate_delayed.b6 = {best} mate en {m}.
-ex.mate_delayed.b6.2 = Plus rapide : {best}, mat en {m}.
+ex.mate_delayed.b5 = {best:nomate} était plus rapide : mat en {m:move}.
+ex.mate_delayed.b5.2 = {best:nomate} matait plus vite, en {m:move}.
+ex.mate_delayed.b6 = {best:nomate} mate en {m}.
+ex.mate_delayed.b6.2 = Plus rapide : {best:nomate}, mat en {m}.
 
 # ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
 ex.stalemate.b1 = Oh non ! {my} est bloqué{my:e}, sans être en échec. C’est pat : partie nulle.
@@ -305,10 +328,13 @@ ex.fork.b5.3 = Après {reply}, j’attaque à la fois {t1} et {t2}.
 ex.fork.b6 = {reply} fait fourchette.
 ex.fork.b6.2 = {move} permet {reply}, une fourchette.
 ex.fork.b6.3 = {reply}, fourchette.
-# After the one-move demonstration (level 1).
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
 ex.fork.tail.b1 = Tu ne peux sauver qu’une des deux pièces : {t1} ou {t2}.
 ex.fork.tail.b1.2 = Maintenant, j’attaque deux pièces : {t1} et {t2}. C’est une fourchette !
 ex.fork.tail.b1.3 = Tu vois ? J’attaque {t1} et {t2}. Une des deux pièces va tomber.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your} doit sortir de l’échec, alors je prends {t1}.
+ex.fork.tail_king.2 = Échec ! {your} doit bouger, et {t1} tombe.
 ex.fork.more.b3 = Avant de jouer, surveille la case {sq} : {my} peut y faire une fourchette.
 ex.fork.more.b3.2 = Garde un œil sur {sq}. De là, {my} fait fourchette.
 ex.fork.tip.knight = Attention aux sauts de cavalier près de ton roi et de ta dame !
@@ -357,7 +383,7 @@ ex.skewer.b6.2 = {reply} : enfilade.
 ex.pin.b1 = {my} peut aller en {sq}. Alors {your} est coincé{your:e} devant {t1}.
 ex.pin.b1.2 = Regarde {my} en {sq} : {your} se retrouve coincé{your:e} devant {t1}.
 ex.pin.b1.3 = {my} peut clouer {your} sur {t1}. Ensuite, je {your:le} gagne.
-ex.pin.b2 = Un clouage : {your} ne peut pas bouger, car {t1} est derrière.
+ex.pin.b2 = Un clouage : {your} est coincé{your:e} devant {t1}.
 ex.pin.b2.2 = {your} est cloué{your:e} sur {t1}. Je peux {your:le} gagner.
 ex.pin.b2.3 = Maintenant, {your} est coincé{your:e} devant {t1}. C’est un clouage.
 ex.pin.b3 = {your} se fait clouer sur {t1}, et je {your:le} gagne.
@@ -372,7 +398,7 @@ ex.pin.b6 = {reply} cloue.
 ex.pin.b6.2 = {reply}, clouage.
 # The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
 ex.pin_defender.b1 = {your} est cloué{your:e} : {your:il} ne peut pas garder {sq}. {t1} est derrière.
-ex.pin_defender.b1.2 = Regarde : {your} ne peut pas défendre la case {sq}, sinon {t1} tombe.
+ex.pin_defender.b1.2 = Regarde : {your} ne peut pas vraiment défendre {sq}, car {t1} est derrière.
 ex.pin_defender.b2 = {your} est cloué{your:e} sur {t1}, donc personne ne défend vraiment {sq}.
 ex.pin_defender.b2.2 = Une pièce clouée défend mal. {your} ne garde plus {sq} : {t1} est derrière.
 ex.pin_defender.b3 = {your} est cloué{your:e} sur {t1} ; {your:il} ne défend pas vraiment {sq}.
@@ -505,6 +531,22 @@ ex.exchange_cheap.b5 = {your} en {sq} est exposé{your:e} à un attaquant moins 
 ex.exchange_cheap.b5.2 = {reply} gagne du matériel en {sq} contre {your}.
 ex.exchange_cheap.b6 = {reply} gagne {your} en {sq}.
 ex.exchange_cheap.b6.2 = {line} : {your} en {sq} est perdu{your:e}.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = Attention : maintenant, je peux gagner {t1}.
+ex.material.b1.2 = Ce coup met {t1} en danger. Je peux {t1:le} gagner.
+ex.material.b2 = Ce coup me permet de gagner {t1}.
+ex.material.b2.2 = Maintenant, {t1} est en danger, et je {t1:le} gagne.
+ex.material.b3 = {move} perd du matériel : après {line}, tu as perdu {pts:point}.
+ex.material.b3.2 = Après {line}, tu as {pts:point} de moins.
+ex.material.b4 = {move} perd du matériel : {line}, et tu as perdu {pts:point}.
+ex.material.b4.2 = Après {line}, tu as {pts:point} de moins.
+ex.material.b5 = {move} lâche du matériel : {line}.
+ex.material.b5.2 = {line} me rapporte {pts:point}.
+ex.material.b6 = {line}, et j’ai gagné {pts:point}.
+ex.material.b6.2 = {move} perd {pts:point} : {line}.
 
 # ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
 ex.missed_capture.b1 = Tu as vu ? Rien ne défendait {my} en {sq}. {your} pouvait {my:le} prendre.

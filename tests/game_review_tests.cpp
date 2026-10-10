@@ -1200,6 +1200,21 @@ TEST(game_review_comment_fork_allowed) {
     CHECK_EQ(lineOf(k, "an.better")->arg("best")->san, std::string("Nxd4"));
 }
 
+TEST(game_review_comment_fork_needs_a_real_loss) {
+    // The same fork, but the knight steps back and only g2 falls: the pawn Nxe5 took makes up for it.
+    // No fork, material or hanging claim (the move is still a mistake by the numbers).
+    GameReview r = reviewOf(recordOf(nullptr, {"e4", "e5", "Nf3", "Nc6", "Bc4", "Nd4", "Nxe5", "Qg5"}));
+    r.accept(6, an(r, 6, {{40, "f3d4 e5d4 e1g1 g8f6"}, {20, "e1g1 d7d6"}}));
+    r.accept(7, an(r, 7, {{80, "d8g5 e5f3 g5g2 h1g1 g2h3 g1g3"}, {-20, "d7d6"}}));
+    Commentator c;
+    c.reset(GameInfo());
+    const Comment k = c.commentAt(r, 7);
+    checkComment(k, "fork without a loss");
+    CHECK(!hasLine(k, "an.fork"));
+    CHECK(!hasLine(k, "an.material"));
+    CHECK(!hasLine(k, "an.hanging"));
+}
+
 TEST(game_review_comment_ready_and_deterministic) {
     const Record rec = recordOf(kHangFen, {"Nd5", "exd5", "Kf1", "Kf8"});
     GameReview r = reviewOf(rec);

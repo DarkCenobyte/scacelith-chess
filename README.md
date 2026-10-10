@@ -150,9 +150,14 @@ your colour (White, Black, or alternating from one game to the next); the choice
   option apply as in a normal game.
 - After your move the coach may say what it saw: a threat, a good move, a mistake. It points at
   the pieces and squares it talks about, which light up in blue on the board, and it can show a
-  line by playing it with its own hand, then put the pieces back. After a blunder it offers to take
-  your move back: **Take back** or **Backspace** accepts, **Play on** or touching one of your
-  pieces declines.
+  line by playing it with its own hand, then put the pieces back. At levels 1 to 3 it plays the
+  whole sequence, down to the piece lost or the mate, and says what it cost; from level 4 it plays
+  up to where the problem stands and points at what falls next. A reason is given only when the
+  board proves it (the material really lost for good, beyond what the best move loses, and enough
+  to explain the mistake), else the coach only names the better move. A move that costs a little
+  is called a small slip, never a mistake with a made-up line. After a blunder it has shown, it
+  offers to take your move back: **Take back** or **Backspace** accepts, **Play on** or touching
+  one of your pieces declines.
 - **Space** skips what the coach is saying. **Esc** opens the menu: take back my move (your last
   move and the coach's reply, as long as neither scoresheet has written them), offer or claim a
   draw, resign, options, main menu (abandons the game).
@@ -224,8 +229,10 @@ the 200 games last analysed, in the game's folder of application data, `analysis
   inaccuracy, a mistake or a blunder a green arrow shows the better move.
 - **Comments** on the key moments (the opening, the mistakes and what they allowed or missed, the
   brilliant and only moves, the end and each side's accuracy) are spoken by the coach's voice when
-  its model is installed, and shown as subtitles. Opening an analysis with the voice on but its
-  model missing offers the download once, unless the Coach page or the options offered it before.
+  its model is installed, and shown as subtitles. A comment names a fork, an unprotected piece or
+  the material a line wins only when that material is lost for good (not traded back) and the best
+  move would not have lost it too. Opening an analysis with the voice on but its model missing
+  offers the download once, unless the Coach page or the options offered it before.
 - **K** (or the play button): play the game on, move by move, pausing for the comments. **J / L**:
   one move back / forward. **Home / End**: the start / the end. **N**: comments on or off. **M**:
   voice on or off (subtitles only). **B**: arrows on or off. These choices are remembered
@@ -390,6 +397,14 @@ cmake -B build-san -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSCACELITH_STOCKF
       -DSCACELITH_SANITIZE=address,undefined
 ninja -C build-san scacelith_tests && ./build-san/scacelith_tests
 ```
+
+The coach's audit (`ninja -C build coach_audit`, Linux only) checks what the coach and the Analysis
+comments say against the board: `coach_audit record --out games.rec --pgn games.pgn` (or
+`--selfplay N`) stores the engine's analyses of every move, then `coach_audit review --in games.rec`
+replays each move through the coach at every level and `coach_audit commentary --in games.rec`
+through the Analysis comments, each flagging a claim the board does not bear out (a demonstration
+that stops before its point, a piece named that was traded back, a loss the best move suffers too).
+See `tools/coach_audit/audit.h`.
 
 Wine names the Linux files in the character set of the host locale: in the POSIX locale (`LANG`
 unset, common in containers) that is ASCII, a file named after "Élodie" cannot be created and the

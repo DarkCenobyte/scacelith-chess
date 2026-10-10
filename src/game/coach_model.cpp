@@ -247,7 +247,7 @@ void coachModelShutdown() {
     u.releaseHook = nullptr;   // its owner is going
 }
 
-void drawModelDownload() {
+void drawModelDownload(bool startupOffer) {
     ModelUi& u = state();
     if (!u.inited) coachModelInit();
     // Options > Audio > Coach voice switched on (and applied): offer the model when it is missing.
@@ -272,8 +272,8 @@ void drawModelDownload() {
         case ui::ModelPanelAction::None: break;
     }
 
-    // The old model checked out at start-up: the update is offered, once.
-    if (u.legacyCheck && u.legacyCheck->done) {
+    // The old model checked out at start-up: the update is offered, once, on the title page.
+    if (startupOffer && u.legacyCheck && u.legacyCheck->done) {
         bool offer = u.legacyCheck->verified && u.legacyInstalled && !coachModelDownloading() && !u.promptOpen &&
                      !settings().coachVoiceUpdateOffered;
         u.legacyCheck.reset();

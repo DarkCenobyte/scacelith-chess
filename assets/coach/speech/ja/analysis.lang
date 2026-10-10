@@ -43,10 +43,10 @@ an.missed_chance = {move}では、そのミスをとがめるチャンスを逃�
 an.missed_chance.2 = {move}で、チャンスが消えてしまいます。
 
 # What it allows ({reply} is the other side's answer).
-an.mate_allowed.one = これで{reply}がチェックメイトです。
-an.mate_allowed.one.2 = この手だと{reply}があり、それでチェックメイトです。
-an.mate_allowed = この手だと、{reply}から{m:move}の強制メイトがあります。
-an.mate_allowed.2 = これで、{reply}から始まる{m:move}の強制メイトが生じました。
+an.mate_allowed.one = これで{reply:nomate}がチェックメイトです。
+an.mate_allowed.one.2 = この手だと{reply:nomate}があり、それでチェックメイトです。
+an.mate_allowed = この手だと、{reply:nomate}から{m:move}の強制メイトがあります。
+an.mate_allowed.2 = これで、{reply:nomate}から始まる{m:move}の強制メイトが生じました。
 an.fork = これで{reply}が{t1}と{t2:bare}をフォークします。
 an.fork.2 = この手だと{reply}があり、{t1}と{t2:bare}が同時に攻められます。
 an.fork.3 = {reply}が{t1}と{t2:bare}を同時に攻めます。
@@ -58,10 +58,10 @@ an.material.spoken = 続く{line}で、{pts:point}のこまどくになります
 an.material.2 = そして{line}で{pts:point}を稼ぎます。
 
 # What it misses ({best} is the better move).
-an.mate_missed.one = {best}でチェックメイトでした。
-an.mate_missed.one.2 = {best}ならチェックメイトでした。
-an.mate_missed = {best}なら、{m:move}の強制メイトでした。
-an.mate_missed.2 = {best}から始まる、{m:move}の強制メイトがありました。
+an.mate_missed.one = {best:nomate}でチェックメイトでした。
+an.mate_missed.one.2 = {best:nomate}ならチェックメイトでした。
+an.mate_missed = {best:nomate}なら、{m:move}の強制メイトでした。
+an.mate_missed.2 = {best:nomate}から始まる、{m:move}の強制メイトがありました。
 an.missed_capture = {best}なら、{piece}をただで取れました。
 an.missed_capture.2 = {piece}には守りがありませんでした：{best}で取れました。
 an.missed_fork = {best}なら、{t1}と{t2:bare}をフォークできました。

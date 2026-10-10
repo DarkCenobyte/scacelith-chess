@@ -55,6 +55,7 @@ theme.bad_trade = elegir bien qué piezas cambiar
 theme.opening = desarrollar tus piezas y enrocar pronto
 theme.endgame = usar tu rey y avanzar los peones pasados
 theme.positional = mejorar tu peor pieza
+theme.material = comprobar qué pueden ganar mis próximas jugadas antes de mover
 
 # ---- 1. Opener (always positive) ---------------------------------------------------------------------
 appraisal.open.win.b1 = ¡Jaque mate! Has ganado. ¡Bien jugado!
