@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.21)
 # The version: cmake/version.cmake (SCACELITH_VERSION_CORE for project(), SCACELITH_VERSION in full).
 include(cmake/version.cmake)
+# macOS: Apple silicon only, macOS 26 or later (Metal 4, which OpenGL runs on there: see
+# src/platform/macos_gl.h). Set before project(), which reads them.
+if(CMAKE_HOST_APPLE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "26.0" CACHE STRING "Minimum macOS version (26.0 or later)")
+    set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "macOS architecture (arm64 only)")
+endif()
 project(Scacelith VERSION ${SCACELITH_VERSION_CORE} LANGUAGES C CXX)
 
 # ---------------------------------------------------------------------------------------------
@@ -28,6 +34,23 @@ set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 if(WIN32)
     enable_language(RC)
     add_compile_definitions(NOMINMAX WIN32_LEAN_AND_MEAN UNICODE _UNICODE)
+endif()
+if(APPLE)
+    # The Cocoa platform layer is Objective-C++ (src/platform/platform_cocoa.mm). OpenSSL 3 is linked
+    # statically: macOS has none (-DOPENSSL_ROOT_DIR=<an arm64 build of it>).
+    if(CMAKE_OSX_ARCHITECTURES)
+        set(mac_archs "${CMAKE_OSX_ARCHITECTURES}")
+    else()
+        set(mac_archs "${CMAKE_SYSTEM_PROCESSOR}")
+    endif()
+    if(NOT mac_archs STREQUAL "arm64")
+        message(FATAL_ERROR "macOS builds are for Apple silicon only: arm64, not '${mac_archs}' (-DCMAKE_OSX_ARCHITECTURES=arm64)")
+    endif()
+    if(NOT CMAKE_OSX_DEPLOYMENT_TARGET OR CMAKE_OSX_DEPLOYMENT_TARGET VERSION_LESS 26.0)
+        message(FATAL_ERROR "macOS builds need macOS 26 or later, not '${CMAKE_OSX_DEPLOYMENT_TARGET}' (-DCMAKE_OSX_DEPLOYMENT_TARGET=26.0)")
+    endif()
+    enable_language(OBJCXX)
+    set(OPENSSL_USE_STATIC_LIBS ON)
 endif()
 if(SCACELITH_SANITIZE)
     if(WIN32)
@@ -111,6 +134,12 @@ else()
     # dl: libasound.so.2 and libsecret-1.so.0 are loaded at run time (src/audio/backend_alsa.cpp,
     # src/net/secret_service.cpp; in libc from glibc 2.34)
     target_link_libraries(scacelith_core PUBLIC Threads::Threads ${CMAKE_DL_LIBS})
+endif()
+if(APPLE)
+    # The CoreAudio output (src/audio/backend_coreaudio.cpp), the Keychain (src/net/keychain.cpp) and
+    # the system's trust anchors (src/net/transport_openssl.cpp).
+    target_link_libraries(scacelith_core PUBLIC "-framework AudioToolbox" "-framework AudioUnit" "-framework CoreAudio"
+                          "-framework CoreFoundation" "-framework Security")
 endif()
 # Text-to-speech (src/tts): the compute kernels are compiled once per instruction set and chosen at
 # run time (src/tts/kernels.h); everything else is baseline x86-64. MinGW does not align the stack
@@ -205,6 +234,12 @@ if(WIN32)
         OBJECT_DEPENDS "${SCACELITH_ICON_ICO};${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.manifest")
     list(APPEND GAME_EXTRA ${CMAKE_CURRENT_BINARY_DIR}/generated/scacelith.rc)
 endif()
+if(APPLE)
+    # The Cocoa layer instead of the X11 one, with automatic reference counting.
+    list(REMOVE_ITEM GAME_SOURCES ${ROOT}/src/platform/platform_x11.cpp ${ROOT}/src/platform/platform_win32.cpp)
+    set_source_files_properties(${ROOT}/src/platform/platform_cocoa.mm PROPERTIES COMPILE_OPTIONS "-fobjc-arc")
+    list(APPEND GAME_EXTRA ${ROOT}/src/platform/platform_cocoa.mm)
+endif()
 add_executable(scacelith ${ROOT}/src/main.cpp ${GAME_SOURCES} ${GAME_EXTRA})
 target_compile_options(scacelith PRIVATE ${COMMON_WARNINGS} ${OPT_FLAGS})
 target_link_libraries(scacelith PRIVATE scacelith_core)
@@ -217,6 +252,13 @@ if(WIN32)
         target_link_options(scacelith PRIVATE -mwindows)
     endif()
     set_target_properties(scacelith PROPERTIES OUTPUT_NAME "Scacelith")
+elseif(APPLE)
+    # No OpenGL library is linked: Mesa's libEGL (Zink over KosmicKrisp) is loaded at run time from
+    # the bundle's Contents/Frameworks (src/platform/macos_gl.cpp), which the rpath names for the
+    # libraries it loads in turn.
+    target_link_libraries(scacelith PRIVATE "-framework Cocoa" "-framework CoreGraphics" "-framework Metal"
+                          "-framework QuartzCore")
+    target_link_options(scacelith PRIVATE "LINKER:-rpath,@executable_path/../Frameworks")
 else()
     find_package(X11 REQUIRED)
     target_link_libraries(scacelith PRIVATE X11 GL dl)
