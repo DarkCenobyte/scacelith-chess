@@ -1,0 +1,135 @@
+# Coach speech (Russian): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang.
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 позиций", count.position in
+#            common.lang), "{n:move}" likewise; "{n:mv}" (the mate distance, count.mv) is said with
+#            "ход" ("мат в два хода") while the subtitles write the digit ("Мат в 2")
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "мат" (the line says it)
+#   {your}   one of the player's pieces; the coach points at it on that word. The player is the
+#            subject of these lines, so they use the reflexive "свой": {your:refl_acc} = "свою
+#            ладью", {your:refl_pre} = "своём коне"
+#   {sq}     a square; the coach points at it on that word
+# The player always has the white pieces. The coach says "ты" to the player and is male ("я бы
+# ответил"); the player's gender is unknown: no past tense, short adjective or "сам" about the player.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Мат в один ход. {n:position}, и в каждой хватает одного хода, чтобы поставить мат. Проверь каждый шах.
+ch.intro.mate2 = Мат в два хода. {n:position}: первым ходом лиши меня защиты, а вторым поставь мат.
+ch.intro.mate3 = Мат в три хода. {n:position}. Шахи, взятия и угрозы: каждый раз просчитывай мой лучший ответ.
+ch.intro.backrank = Маты по последней горизонтали. {n:position}, где король заперт за своими пешками.
+ch.intro.patterns = Типовые маты. {n:position} с классическими матовыми сетями. Узнай знакомую картину и нанеси удар.
+ch.intro.hanging = Незащищённые фигуры. {n:position}: у меня что-то осталось без защиты. Найди и забери.
+ch.intro.fork = Вилки. {n:position}: найди ход, который нападает сразу на две цели.
+ch.intro.pin = Связки. {n:position}: свяжи фигуру или воспользуйся связкой.
+ch.intro.skewer = Сквозные удары. {n:position}: напади на ценную фигуру и выиграй то, что стоит за ней.
+ch.intro.discovered = Вскрытые нападения. {n:position}: сыграй одной фигурой, чтобы открыть путь другой.
+ch.intro.deflection = Отвлечение и завлечение. {n:position}: отвлеки защитника или замани его на роковое поле.
+ch.intro.intermezzo = Промежуточные ходы. {n:position}: прежде чем сыграть очевидный ход, найди более сильный.
+ch.intro.trapped = Фигуры в ловушке. {n:position}: одной из моих фигур некуда безопасно уйти. Выиграй её.
+ch.intro.promotion = Превращение пешки. {n:position}, где всё решает далеко продвинутая пешка.
+ch.intro.quiet = Тихие ходы. {n:position}: выигрывающий ход — не шах и не взятие.
+ch.intro.opening = Дебютные ловушки. {n:position} из первых ходов настоящих партий. Накажи меня за ошибку.
+ch.intro.escape = Спасение короля. {n:position}: твой король в опасности, и спасает его только один ход.
+ch.intro.defend = Защитные ходы. {n:position}: найди единственный ход, который удерживает твою позицию.
+ch.intro.kq = Ферзь и король против короля. {n:position}: поставь мат моему королю. Остерегайся пата.
+ch.intro.kr = Ладья и король против короля. {n:position}: поставь мат моему королю, шаг за шагом.
+ch.intro.kp = Король и пешка против короля. {n:position}: проведи пешку в ферзи. Король идёт впереди.
+ch.intro.kp_hold = Останови пешку. {n:position}: у тебя только король. Удержи ничью.
+ch.intro.rook = Ладейные эндшпили. {n:position}: построй мост, чтобы провести пешку в ферзи, и удержи ничью защитой Филидора.
+ch.intro.endgame = Тактика в эндшпиле. {n:position}: фигур на доске мало, зато идеи острые.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = Мат в {n:mv}.
+ch.task.mate.2 = Найди мат в {n:mv}.
+ch.task.hanging = Что-то осталось без защиты.
+ch.task.hanging.2 = Что можно взять даром?
+ch.task.fork = Найди вилку.
+ch.task.fork.2 = Поищи вилку.
+ch.task.pin = Здесь всё решает связка.
+ch.task.skewer = Здесь выигрывает сквозной удар.
+ch.task.discovered = Здесь выигрывает вскрытое нападение.
+ch.task.deflection = Перегрузи защитника или замани его.
+ch.task.intermezzo = Поищи промежуточный ход.
+ch.task.trapped = Одной из моих фигур некуда бежать. Выиграй её.
+ch.task.promotion = Воспользуйся своей далеко продвинутой пешкой.
+ch.task.quiet = Выигрывает тихий ход.
+ch.task.opening = Накажи меня за последний ход.
+ch.task.escape = Спаси своего короля: помогает только один ход.
+ch.task.defend = Найди единственный хороший ход.
+ch.task.endgame = Найди лучший ход.
+ch.task.default = Найди лучший ход.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Поставь мат моему королю. Я буду защищаться как можно лучше.
+ch.task.play.promote = Проведи пешку в ферзи и не упусти победу. Я постараюсь тебе помешать.
+ch.task.play.hold = Удерживай ничью {n:move}. Я попробую выиграть.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Эти позиции взяты из настоящих партий. Я делаю последний ход, а потом твоя очередь.
+ch.lead.first.2 = Каждая позиция взята из настоящей партии: я делаю ход, который к ней привёл, а потом играешь ты.
+ch.next = Следующая позиция.
+ch.next.2 = Вот следующая.
+ch.next.3 = Переходим к следующей.
+ch.last = Последняя позиция.
+ch.last.2 = А теперь последняя.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Хорошо.
+ch.good.2 = Да.
+ch.good.3 = Верно.
+ch.good.4 = Именно.
+# The position is solved.
+ch.solved = Вот оно! Молодец.
+ch.solved.2 = Совершенно верно.
+ch.solved.3 = Очень хорошо.
+ch.solved.mate = Мат! Молодец.
+ch.solved.mate.2 = А это мат. Очень хорошо.
+ch.solved.mate.3 = Мат. Отличная работа.
+ch.solved.promote = Новый ферзь, и победа в кармане. Молодец.
+ch.solved.hold = Ничья удержана. Отличная защита!
+ch.solved.draw = На доске ничья. Отличная защита!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Не этот ход: я бы ответил {move}.
+ch.wrong.reply.2 = Не совсем: я отвечу {move}.
+ch.wrong.reply.3 = Тогда я сыграю {move}.
+ch.wrong.mate = Осторожно: {move:nomate} — и это мат.
+ch.wrong.mate.2 = Внимание: я отвечу {move:nomate}, и это мат.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Так тоже будет мат, но дольше. Есть путь быстрее.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Так тоже будет мат, но я задумал другой ход. Посмотри ещё раз.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Неплохо, но есть кое-что сильнее. Посмотри ещё раз.
+ch.wrong.weaker.2 = Так играть можно, но можно и лучше.
+ch.wrong.stalemate = Пат! Моему королю некуда ходить, а это всего лишь ничья.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Не этот ход: после {move} я удержу ничью.
+ch.wrong.loses = Осторожно: после {move} выигрываю уже я.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Это не то.
+ch.try_again = Попробуй ещё раз.
+ch.try_again.2 = Поищи ещё.
+ch.try_again.3 = Взгляни ещё раз.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Хочешь подсказку?
+ch.offer.2 = Подсказать?
+ch.no_hint = Хорошо. Ищи дальше.
+ch.no_hint.2 = Ладно, не торопись.
+ch.hint.piece = Посмотри на {your:refl_acc}.
+ch.hint.piece.2 = Подумай о {your:refl_pre}.
+ch.hint.square = Посмотри на поле {sq}.
+ch.hint.square.2 = Ключевое поле — {sq}.
+ch.hint.square.3 = Следи за полем {sq}.
+ch.hint.show = Вот этот ход. Смотри.
+ch.hint.show.2 = Давай покажу. Смотри.
+ch.hint.now = Теперь сыграй этот ход.
+ch.hint.now.2 = Твой ход: повтори его.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Испытание пройдено до конца. Молодец!
+ch.complete.2 = Все позиции решены. Молодец!

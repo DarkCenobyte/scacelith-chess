@@ -666,11 +666,11 @@ void GameScene::setupCoachGame() {
                  : s.coachColour == 0 || s.coachColour == 1 ? s.coachColour
                                                              : (s.coachNextColour == 1 ? 1 : 0);
     rt.test = coachArgs_.stageTest;
-    // The challenges are unknown to this version (a newer .ini, a typo on the command line): a game.
+    // A challenge this version does not know (a newer .ini, a typo on the command line): the
+    // Training tab's game instead.
     if (!coachChallenge_.empty() && !coach::ChallengeBook::shared().find(coachChallenge_)) {
         LOGW("coach: no challenge '%s', a coach game instead", coachChallenge_.c_str());
         coachChallenge_.clear();
-        if (coachLevel_ == 0) coachLevel_ = 1;   // the rules lesson is chosen on the Training tab
     }
     // The rules lesson and the challenges are played with White; so is the stage test unless told
     // otherwise (its line points at White's g1 knight).

@@ -1,0 +1,137 @@
+# Coach speech (Ukrainian): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang.
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 позицій", count.position in
+#            common.lang), "{n:move}" likewise; "{n:in_move}" (the mate distance, count.in_move)
+#            adds the preposition: "мат у два ходи", "мат в один хід"
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "мат" (the line says it)
+#   {your}   one of the player's pieces; the coach points at it on that word. The player is the
+#            subject of these lines, so they use the reflexive "свій": {your:refl_acc} = "свою туру",
+#            "свого коня"
+#   {sq}     a square; the coach points at it on that word ("поле {sq}": the bare file letter "де"
+#            would sound like the word "where")
+# The player always has the white pieces. The coach says "ти" to the player and is male ("я
+# відповів би"); the player's gender is unknown: no past tense or short adjective about the player.
+# The apostrophe is ’ (U+2019), as in the other Ukrainian files.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Мат в один хід. {n:position}, і в кожній вистачає одного ходу, щоб поставити мат. Перевір кожен шах.
+ch.intro.mate2 = Мат у два ходи. {n:position}: першим ходом залиш мене без захисту, а другим постав мат.
+ch.intro.mate3 = Мат у три ходи. {n:position}. Шахи, взяття й загрози: щоразу прораховуй мою найкращу відповідь.
+ch.intro.backrank = Мати на останній горизонталі. {n:position}, де король замкнений за власними пішаками.
+ch.intro.patterns = Типові мати. {n:position} із класичними матовими сітками. Упізнай знайому картину й завдай удару.
+ch.intro.hanging = Незахищені фігури. {n:position}: у мене щось залишилося без захисту. Знайди й забери.
+ch.intro.fork = Вилки. {n:position}: знайди хід, який атакує одразу дві цілі.
+ch.intro.pin = Зв’язки. {n:position}: зв’яжи фігуру або скористайся зв’язкою.
+ch.intro.skewer = Лінійні удари. {n:position}: напади на цінну фігуру й виграй те, що стоїть за нею.
+ch.intro.discovered = Відкриті напади. {n:position}: зроби хід однією фігурою, щоб відкрити шлях іншій.
+ch.intro.deflection = Відволікання й заманювання. {n:position}: відволічи захисника або замани його на фатальне поле.
+ch.intro.intermezzo = Проміжні ходи. {n:position}: перш ніж зіграти очевидний хід, знайди сильніший.
+ch.intro.trapped = Фігури в пастці. {n:position}: одній із моїх фігур нікуди безпечно відступити. Виграй її.
+ch.intro.promotion = Перетворення пішака. {n:position}, де все вирішує далеко просунутий пішак.
+ch.intro.quiet = Тихі ходи. {n:position}: виграшний хід — не шах і не взяття.
+ch.intro.opening = Дебютні пастки. {n:position} із перших ходів справжніх партій. Покарай мене за помилку.
+ch.intro.escape = Порятунок короля. {n:position}: твій король у небезпеці, і врятувати його може лише один хід.
+ch.intro.defend = Захисні ходи. {n:position}: знайди єдиний хід, що втримує твою позицію.
+ch.intro.kq = Ферзь і король проти короля. {n:position}: постав мат моєму королю. Остерігайся пату.
+ch.intro.kr = Тура й король проти короля. {n:position}: постав мат моєму королю, крок за кроком.
+ch.intro.kp = Король і пішак проти короля. {n:position}: проведи пішака у ферзі. Король іде попереду.
+ch.intro.kp_hold = Зупини пішака. {n:position}: у тебе тільки король. Утримай нічию.
+ch.intro.rook = Турові ендшпілі. {n:position}: побудуй міст, щоб провести пішака у ферзі, і втримай нічию захистом Філідора.
+ch.intro.endgame = Тактика в ендшпілі. {n:position}: фігур на дошці мало, зате ідеї гострі.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = Мат {n:in_move}.
+ch.task.mate.2 = Знайди мат {n:in_move}.
+ch.task.hanging = Щось залишилося без захисту.
+ch.task.hanging.2 = Що можна взяти задарма?
+ch.task.fork = Знайди вилку.
+ch.task.fork.2 = Пошукай вилку.
+ch.task.pin = Тут усе вирішує зв’язка.
+ch.task.skewer = Тут виграє лінійний удар.
+ch.task.discovered = Тут виграє відкритий напад.
+ch.task.deflection = Перевантаж захисника або замани його.
+ch.task.intermezzo = Пошукай проміжний хід.
+ch.task.trapped = Одній із моїх фігур нікуди втекти. Виграй її.
+ch.task.promotion = Скористайся своїм далеко просунутим пішаком.
+ch.task.quiet = Виграє тихий хід.
+ch.task.opening = Покарай мене за останній хід.
+ch.task.escape = Врятуй свого короля: допоможе лише один хід.
+ch.task.defend = Знайди єдиний добрий хід.
+ch.task.endgame = Знайди найкращий хід.
+ch.task.default = Знайди найкращий хід.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Постав мат моєму королю. Я захищатимусь якнайкраще.
+ch.task.play.promote = Проведи пішака у ферзі й не впусти перемогу. Я спробую тобі завадити.
+ch.task.play.hold = Утримуй нічию {n:move}. Я спробую виграти.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Ці позиції взято зі справжніх партій. Я роблю останній хід, а потім твоя черга.
+ch.lead.first.2 = Кожну позицію взято зі справжньої партії: я роблю хід, який до неї привів, а потім граєш ти.
+ch.next = Наступна позиція.
+ch.next.2 = Ось наступна.
+ch.next.3 = Переходимо до наступної.
+ch.last = Остання позиція.
+ch.last.2 = А тепер остання.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Добре.
+ch.good.2 = Так.
+ch.good.3 = Правильно.
+ch.good.4 = Саме так.
+# The position is solved.
+ch.solved = Ось воно! Молодець.
+ch.solved.2 = Абсолютно правильно.
+ch.solved.3 = Дуже добре.
+ch.solved.mate = Мат! Молодець.
+ch.solved.mate.2 = І це мат. Дуже добре.
+ch.solved.mate.3 = Мат. Чудова робота.
+ch.solved.promote = Новий ферзь, і перемога в кишені. Молодець.
+ch.solved.hold = Нічию втримано. Чудовий захист!
+ch.solved.draw = На дошці нічия. Чудовий захист!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Не цей хід: я відповів би {move}.
+ch.wrong.reply.2 = Не зовсім: я відповім {move}.
+ch.wrong.reply.3 = Тоді я зіграю {move}.
+ch.wrong.mate = Обережно: {move:nomate} — і це мат.
+ch.wrong.mate.2 = Стережися: я відповім {move:nomate}, і це мат.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Так теж буде мат, але довше. Є швидший шлях.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Так теж буде мат, але я маю на увазі інший хід. Подивись ще раз.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Непогано, але є дещо сильніше. Подивись ще раз.
+ch.wrong.weaker.2 = Так грати можна, але можна й краще.
+ch.wrong.stalemate = Пат! Моєму королю нікуди ходити, а це лише нічия.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Не цей хід: після {move} я втримаю нічию.
+ch.wrong.loses = Обережно: після {move} виграю вже я.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Це не те.
+ch.try_again = Спробуй ще раз.
+ch.try_again.2 = Пошукай ще.
+ch.try_again.3 = Глянь ще раз.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Хочеш підказку?
+ch.offer.2 = Підказати?
+ch.no_hint = Гаразд. Шукай далі.
+ch.no_hint.2 = Добре, не поспішай.
+ch.hint.piece = Подивись на {your:refl_acc}.
+ch.hint.piece.2 = Подумай про {your:refl_acc}.
+ch.hint.square = Подивись на поле {sq}.
+ch.hint.square.2 = Ключове поле — {sq}.
+ch.hint.square.3 = Стеж за полем {sq}.
+ch.hint.show = Ось цей хід. Дивись.
+ch.hint.show.2 = Давай покажу. Дивись.
+ch.hint.now = Тепер зіграй цей хід.
+ch.hint.now.2 = Твій хід: повтори його.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Випробування пройдено до кінця. Молодець!
+ch.complete.2 = Усі позиції розв’язано. Молодець!

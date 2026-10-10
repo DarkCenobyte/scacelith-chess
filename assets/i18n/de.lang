@@ -119,6 +119,8 @@ controls.coach_skip.keys = Leertaste
 controls.coach_skip = Trainer: seine Erklärung überspringen
 controls.coach_takeback.keys = Rücktaste
 controls.coach_takeback = Trainer: Zug zurücknehmen, wenn er es anbietet
+controls.coach_hint.keys = H
+controls.coach_hint = Trainer-Aufgaben: um einen Tipp bitten
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = HELLIGKEIT
@@ -1051,6 +1053,111 @@ coach.gameover.unrated = Diese Partie mit dem Trainer wird nicht gewertet.
 coach.lesson.done = GUT GEMACHT
 coach.lesson.done.line = Jetzt kennen Sie die Schachregeln.
 coach.lesson.next = Erste Partie
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Training
+coach.tab.challenges = Aufgaben
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATT
+challenge.group.tactics = TAKTIK
+challenge.group.defence = VERTEIDIGUNG
+challenge.group.endgames = ENDSPIELE
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Matt in einem Zug
+challenge.mate1.desc = Ein Zug, und es ist Schachmatt.
+challenge.mate1.detail = Prüfen Sie zuerst jedes Schachgebot: Bei einem davon hat der König kein Fluchtfeld, und nichts kann dazwischenziehen oder schlagen.
+challenge.mate2.name = Matt in zwei Zügen
+challenge.mate2.desc = Ein Zug, der keine Verteidigung lässt, dann Matt.
+challenge.mate2.detail = Der erste Zug ist oft ein Schach oder ein Opfer, das dem König ein Feld nimmt. Der Trainer verteidigt sich, so gut er kann.
+challenge.mate3.name = Matt in drei Zügen
+challenge.mate3.desc = Längere forcierte Varianten.
+challenge.mate3.detail = Schachgebote, Schlagzüge und Drohungen, drei Züge tief. Berechnen Sie bei jedem Schritt die beste Antwort des Trainers, bevor Sie eine Figur berühren.
+challenge.backrank.name = Grundreihenmatt
+challenge.backrank.desc = Ein König, eingesperrt hinter den eigenen Bauern.
+challenge.backrank.detail = Wenn die Bauern vor einem rochierten König nicht gezogen haben, kann ein Turm oder eine Dame auf der Grundreihe mattsetzen. Beseitigen Sie zuerst die Verteidiger oder lenken Sie sie ab.
+challenge.patterns.name = Mattbilder
+challenge.patterns.desc = Ersticktes Matt, Anastasias Matt, arabisches Matt und mehr.
+challenge.patterns.detail = Berühmte Mattnetze, die immer wiederkehren. Lernen Sie, die Aufstellung der Figuren und den letzten Schlag zu erkennen.
+challenge.hanging.name = Hängende Figuren
+challenge.hanging.desc = Erkennen Sie, was ungedeckt steht.
+challenge.hanging.detail = Eine Figur oder ein Bauer ohne Deckung kann einfach geschlagen werden. Prüfen Sie, wodurch jede Figur des Trainers gedeckt ist.
+challenge.fork.name = Gabeln
+challenge.fork.desc = Eine Figur greift zwei auf einmal an.
+challenge.fork.detail = Springer, Bauern, Damen und sogar Könige können gabeln. Der Gegner kann nur eines der beiden Ziele retten.
+challenge.pin.name = Fesselungen
+challenge.pin.desc = Eine Figur, die nicht ziehen kann, ohne zu verlieren, was hinter ihr steht.
+challenge.pin.detail = Fesseln Sie eine Figur an ihren König oder an eine wertvollere Figur und greifen Sie sie dann erneut an, oder nutzen Sie aus, dass sie nicht ziehen kann.
+challenge.skewer.name = Spieße
+challenge.skewer.desc = Greifen Sie eine wertvolle Figur an und gewinnen Sie die dahinter.
+challenge.skewer.detail = Die Umkehrung der Fesselung: Die wertvollere Figur steht vorn, muss ausweichen und gibt die Figur dahinter preis.
+challenge.discovered.name = Abzugsangriffe
+challenge.discovered.desc = Ziehen Sie eine Figur, um einer anderen die Linie zu öffnen.
+challenge.discovered.detail = Wenn eine Figur eine Linie verlässt, greift die Figur dahinter an. Mit Schach oder gar Doppelschach hat der Gegner keine Zeit, beide Drohungen abzuwehren.
+challenge.deflection.name = Ablenkung und Hinlenkung
+challenge.deflection.desc = Locken Sie einen Verteidiger weg oder auf ein fatales Feld.
+challenge.deflection.detail = Ein Verteidiger mit zwei Aufgaben kann nicht beide erfüllen. Greifen Sie ihn an, bieten Sie ihm etwas an, oder zwingen Sie eine Figur auf das Feld, auf dem sie verloren geht.
+challenge.intermezzo.name = Zwischenzüge
+challenge.intermezzo.desc = Nicht sofort zurückschlagen: Es gibt etwas Stärkeres.
+challenge.intermezzo.detail = Vor dem erwarteten Zug ändert ein eingeschobenes Schach oder eine größere Drohung alles.
+challenge.trapped.name = Gefangene Figuren
+challenge.trapped.desc = Eine Figur ohne sicheres Feld.
+challenge.trapped.detail = Nehmen Sie einer Figur die letzten Fluchtfelder und gewinnen Sie sie dann.
+challenge.promotion.name = Umwandlung
+challenge.promotion.desc = Bringen Sie einen Bauern bis auf die letzte Reihe.
+challenge.promotion.detail = Vorgerückte Bauern sind viel wert. Machen Sie den Weg frei, lenken Sie die Blockeure ab und holen Sie sich eine neue Dame.
+challenge.quiet.name = Stille Züge
+challenge.quiet.desc = Der Gewinnzug ist weder ein Schach noch ein Schlagzug.
+challenge.quiet.detail = Manchmal bereitet der stärkste Zug nur eine Drohung vor, die sich nicht abwehren lässt. Solche Züge sind am schwersten zu sehen.
+challenge.opening.name = Eröffnungsfallen
+challenge.opening.desc = Bestrafen Sie frühe Fehler.
+challenge.opening.detail = Stellungen aus den ersten Zügen echter Partien, in denen sich ein unachtsamer Zug sofort ausnutzen lässt.
+challenge.escape.name = Den Ausweg finden
+challenge.escape.desc = Ihr König ist in Gefahr: Ein Zug rettet ihn.
+challenge.escape.detail = Jeder andere Zug verliert. Prüfen Sie alle Schachgebote und Drohungen gegen Ihren König und finden Sie dann den einzigen Ausweg.
+challenge.defend.name = Verteidigungszüge
+challenge.defend.desc = Wehren Sie die Drohung ab, ohne Material zu verlieren.
+challenge.defend.detail = Der Trainer droht etwas. Finden Sie den genauen Zug, der alles zusammenhält.
+challenge.kq.name = Dame und König gegen König
+challenge.kq.desc = Mattsetzen mit der Dame.
+challenge.kq.detail = Drängen Sie den einsamen König mit Ihrer Dame an den Rand, bringen Sie Ihren eigenen König heran und hüten Sie sich vor dem Patt. Der Trainer verteidigt sich mit seinen besten Zügen.
+challenge.kr.name = Turm und König gegen König
+challenge.kr.desc = Mattsetzen mit dem Turm.
+challenge.kr.detail = Der Turm schneidet den König Reihe für Reihe ab; Ihr König nimmt die Opposition. Der Trainer verteidigt sich mit seinen besten Zügen.
+challenge.kp.name = König und Bauer gegen König
+challenge.kp.desc = Gewinnen Sie die Opposition und wandeln Sie um.
+challenge.kp.detail = Gehen Sie mit dem König voran, nicht mit dem Bauern. Nehmen Sie die Opposition und machen Sie eine Dame, die der Trainer nicht mehr einholen kann.
+challenge.kp_hold.name = Den Bauern aufhalten
+challenge.kp_hold.desc = Ein einsamer König gegen König und Bauer: Halten Sie remis.
+challenge.kp_hold.detail = Stellen Sie sich vor den Bauern und halten Sie die Opposition. Halten Sie zehn Züge lang durch.
+challenge.rook.name = Turmendspiele
+challenge.rook.desc = Die Lucena-Brücke und die Philidor-Verteidigung.
+challenge.rook.detail = Die beiden Stellungen, die jeder Spieler kennen sollte: wie man mit einem Bauern auf der siebten Reihe gewinnt und wie man mit dem Turm auf der dritten verteidigt.
+challenge.endgame.name = Endspieltaktik
+challenge.endgame.desc = Wenige Figuren, scharfe Ideen.
+challenge.endgame.detail = Bauernrennen, Durchbrüche und Turmendspiele aus echten Partien.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} Stellung|{0} Stellungen
+coach.challenge.done = Abgeschlossen
+coach.challenge.start = Starten
+coach.challenge.note.white = Sie spielen Weiß; der Trainer baut jede Stellung auf dem Brett auf.
+coach.challenge.note.hint = Kommen Sie nicht weiter? Drücken Sie H für einen Tipp. Nach einigen Versuchen bietet der Trainer Ihnen einen an.
+coach.challenge.note.unsaved = Die Aufgaben werden weder gewertet noch gespeichert; ein Häkchen markiert jede abgeschlossene Serie.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = SERIE GESCHAFFT
+coach.challenge.complete.line = Sie haben jede Stellung gelöst.
+coach.challenge.next = Nächste Serie
+coach.challenge.again = Noch einmal
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = EIN TIPP?
+coach.hint.text = Der Trainer bietet Ihnen einen Tipp an.
+coach.hint.hint = H zeigt den Tipp. Wer eine Figur berührt, sucht weiter.
+coach.hint.accept = Tipp
+coach.hint.decline = Nein, danke
+coach.hint.key = Tipp
 
 # ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
 # Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.

@@ -207,6 +207,7 @@ number.decimal.spoken = {int} virgule {frac}
 # French plural rule (assets/i18n): one (0 and 1) | other. Feminine nouns say their number with the
 # form "f": "une erreur", "vingt et une parties".
 count.move = {n} coup|{n} coups
+count.position = {n:f} position|{n:f} positions
 count.point = {n} point|{n} points
 count.pawn = {n} pion|{n} pions
 count.piece = {n:f} pièce|{n:f} pièces

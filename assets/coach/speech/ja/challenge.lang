@@ -1,0 +1,145 @@
+# Coach speech (Japanese): the challenges (src/coach/challenge_run.cpp). Same keys and variants as
+# assets/coach/speech/en/challenge.lang.
+#
+# Register: polite です/ます style with a warm teacher's ね/よ, as the other ja files; the coach is 私.
+# Placeholders (see the English header):
+#   {n:position}  the number of positions with its counter: "6問" (count.position in common.lang,
+#                 spoken "ろくもん"); {n:move} "2手" (count.move, spoken "にて"): "Mate in {n}"
+#                 says the count with its counter ("{n:move}でメイト", like eval.mate_win)
+#   {move}        one of the coach's moves, a noun phrase in speech: "{move}と応じます";
+#                 "{move:nomate}" says a mating move without "チェックメイト" (the line says it)
+#   {your}        one of the player's pieces: "あなたのナイト"
+#   {sq}          a square: "{sq}のマス", "{sq}です", never "{sq}に" (rank 2 is spoken "に")
+# A ".spoken" key respells for the voice what it may misread: digits and chess kanji in kana
+# (1手 いって, 中間手 ちゅうかんしゅ, 浮き駒 うきごま).
+# Chess words as in review.lang and assets/i18n/ja.lang: フォーク, ピン, スキュア,
+# ディスカバードアタック, バックランク, オポジション, ステイルメイト, プロモーション; the set's
+# positions are 問 / 問題 (as the lesson's 練習問題), a board position is 局面.
+# The player always has the white pieces.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = 1手メイトです。全部で{n:position}、どれも1手でチェックメイトになります。チェックを全部調べましょう。
+ch.intro.mate1.spoken = いってメイトです。全部で{n:position}、どれもいってでチェックメイトになります。チェックを全部調べましょう。
+ch.intro.mate2 = 2手メイトです。全部で{n:position}。最初の手で私が防げないようにして、それからメイトしましょう。
+ch.intro.mate2.spoken = にてメイトです。全部で{n:position}。最初の手で私が防げないようにして、それからメイトしましょう。
+ch.intro.mate3 = 3手メイトです。全部で{n:position}。チェック、駒取り、狙いのある手。そのたびに、私の一番いい応じ方を読みましょう。
+ch.intro.mate3.spoken = さんてメイトです。全部で{n:position}。チェック、駒取り、狙いのある手。そのたびに、私の一番いい応じ方を読みましょう。
+ch.intro.backrank = バックランクメイトです。全部で{n:position}、どれもキングが自分のポーンの後ろに閉じ込められています。
+ch.intro.patterns = メイトのパターンです。全部で{n:position}、どれも有名なメイトの形です。形を見抜いて、一気に決めましょう。
+ch.intro.hanging = 浮き駒です。全部で{n:position}。私の駒のどれかに、守りがありません。見つけて取りましょう。
+ch.intro.hanging.spoken = うきごまです。全部で{n:position}。私の駒のどれかに、守りがありません。見つけて取りましょう。
+ch.intro.fork = フォークです。全部で{n:position}。一度に2つを攻める手を見つけましょう。
+ch.intro.fork.spoken = フォークです。全部で{n:position}。一度にふたつを攻める手を見つけましょう。
+ch.intro.pin = ピンです。全部で{n:position}。駒をピンするか、ピンを利用しましょう。
+ch.intro.skewer = スキュアです。全部で{n:position}。価値の高い駒を攻めて、その後ろの駒を取りましょう。
+ch.intro.discovered = ディスカバードアタックです。全部で{n:position}。ある駒を動かして、別の駒の攻撃を解き放ちましょう。
+ch.intro.deflection = ディフレクションとデコイです。全部で{n:position}。守りの駒を引きはがすか、命取りのマスへおびき寄せましょう。
+ch.intro.intermezzo = 中間手です。全部で{n:position}。当然の手を指す前に、もっと強い手を探しましょう。
+ch.intro.intermezzo.spoken = ちゅうかんしゅです。全部で{n:position}。当然の手を指す前に、もっと強い手を探しましょう。
+ch.intro.trapped = 閉じ込められた駒です。全部で{n:position}。私の駒の一つに、安全な逃げ場がありません。取りましょう。
+ch.intro.promotion = プロモーションです。全部で{n:position}、どれも進んだポーンが勝負を決めます。
+ch.intro.quiet = 静かな手です。全部で{n:position}。勝つ手は、チェックでも駒取りでもありません。
+ch.intro.opening = オープニングの罠です。実戦の出だしから{n:position}。私のミスをとがめましょう。
+ch.intro.escape = 逃げ道を探しましょう。全部で{n:position}。あなたのキングが危なく、助かる手は一つだけです。
+ch.intro.defend = 守りの手です。全部で{n:position}。局面を崩さずに保てる、ただ一つの手を見つけましょう。
+ch.intro.kq = クイーンとキング対キングです。全部で{n:position}。私のキングをチェックメイトしましょう。ステイルメイトに注意です。
+ch.intro.kr = ルークとキング対キングです。全部で{n:position}。一歩ずつ、私のキングをチェックメイトしましょう。
+ch.intro.kp = キングとポーン対キングです。全部で{n:position}。クイーンを作りましょう。キングを先に進めるのがコツです。
+ch.intro.kp_hold = ポーンを止めましょう。全部で{n:position}。あなたにはキングしかありません。引き分けを守り抜きましょう。
+ch.intro.rook = ルークエンディングです。全部で{n:position}。ブリッジを架けてプロモーションし、フィリドール・ディフェンスで引き分けを守りましょう。
+ch.intro.endgame = エンドゲームの戦術です。全部で{n:position}。駒は少なくても、鋭いアイデアが光ります。
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate.
+ch.task.mate = {n:move}でメイトです。
+ch.task.mate.2 = {n:move}のメイトを見つけましょう。
+ch.task.hanging = 守られていない駒があります。
+ch.task.hanging.2 = ただで取れるものは何でしょう？
+ch.task.fork = フォークを見つけましょう。
+ch.task.fork.2 = フォークを探しましょう。
+ch.task.pin = ここはピンが鍵です。
+ch.task.skewer = ここはスキュアが決め手です。
+ch.task.discovered = ここはディスカバードアタックが決め手です。
+ch.task.deflection = 守っている駒に負担をかけるか、おびき寄せましょう。
+ch.task.intermezzo = 中間手を探しましょう。
+ch.task.intermezzo.spoken = ちゅうかんしゅを探しましょう。
+ch.task.trapped = 私の駒の一つが逃げられません。取りましょう。
+ch.task.promotion = 進んだポーンを活かしましょう。
+ch.task.quiet = 勝つ手は、静かな手です。
+ch.task.opening = 私の直前の手をとがめましょう。
+ch.task.escape = キングを救いましょう。助かる手は一つだけです。
+ch.task.defend = 唯一の良い手を見つけましょう。
+ch.task.endgame = 一番いい手を見つけましょう。
+ch.task.default = 一番いい手を見つけましょう。
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = 私のキングをチェックメイトしましょう。私は精一杯守ります。
+ch.task.play.promote = ポーンをプロモーションして、勝ちを守りましょう。私は止めにいきます。
+ch.task.play.hold = {n:move}のあいだ、引き分けを守りましょう。私は勝ちを狙います。
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = これらの局面は、実戦から選びました。最後の手を私が指したら、あなたの番です。
+ch.lead.first.2 = どの局面も実戦からとったものです。その局面になった手を私が指してから、あなたが指します。
+ch.next = 次の問題です。
+ch.next.2 = 次はこちらです。
+ch.next.3 = 次へ進みましょう。
+ch.last = 最後の問題です。
+ch.last.2 = そして、これが最後です。
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = いいですね。
+ch.good.2 = そうです。
+ch.good.3 = 合っています。
+ch.good.4 = その通りです。
+# The position is solved.
+ch.solved = それです！よくできました。
+ch.solved.2 = まさに正解です。
+ch.solved.3 = とてもいいですね。
+ch.solved.mate = チェックメイト！よくできました。
+ch.solved.mate.2 = これでメイトです。お見事です。
+ch.solved.mate.3 = チェックメイト。うまく決めましたね。
+ch.solved.promote = 新しいクイーンの誕生です。これで勝ちは確実。よくできました。
+ch.solved.hold = 引き分けを守り抜きました。見事な守りです！
+ch.solved.draw = 盤上は引き分けです。見事な守りです！
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = その手ではありません。私なら{move}と応じます。
+ch.wrong.reply.2 = 少し違います。私は{move}と返します。
+ch.wrong.reply.3 = それなら、私は{move}と指します。
+ch.wrong.mate = 気をつけて。{move:nomate}でチェックメイトです。
+ch.wrong.mate.2 = 注意！私が{move:nomate}と指せば、メイトです。
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = それでもメイトできますが、遠回りです。もっと早い道があります。
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = それでもメイトできますが、私が考えている手は別です。もう一度見てみましょう。
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = 悪くありませんが、もっと強い手があります。もう一度見てみましょう。
+ch.wrong.weaker.2 = 指せる手ですが、もっと良い手があります。
+ch.wrong.stalemate = ステイルメイト！私のキングは動けず、引き分けにしかなりません。
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = その手ではありません。{move}で、私は引き分けに持ち込めます。
+ch.wrong.loses = 気をつけて。{move}で、私が勝てる局面になります。
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = その手ではありません。
+ch.try_again = もう一度やってみましょう。
+ch.try_again.2 = もう一度よく見てください。
+ch.try_again.3 = もう一度見てみましょう。
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = ヒントはいりますか？
+ch.offer.2 = ヒントを出しましょうか？
+ch.no_hint = わかりました。探し続けてください。
+ch.no_hint.2 = いいですよ、ゆっくり考えてください。
+ch.hint.piece = {your}を見てください。
+ch.hint.piece.2 = {your}の使い方を考えてみましょう。
+ch.hint.square = {sq}のマスを見てください。
+ch.hint.square.2 = 鍵になるマスは{sq}です。
+ch.hint.square.3 = {sq}のマスに注目しましょう。
+ch.hint.show = これが正解の手です。見ていてください。
+ch.hint.show.2 = お見せしましょう。見ていてください。
+ch.hint.now = では、指してみてください。
+ch.hint.now.2 = あなたの番です。指してみましょう。
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = これでチャレンジはすべて終わりです。よくできました！
+ch.complete.2 = 全問正解です。お見事！

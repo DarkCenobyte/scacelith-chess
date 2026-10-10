@@ -119,6 +119,8 @@ controls.coach_skip.keys = スペース
 controls.coach_skip = コーチ：説明をスキップ
 controls.coach_takeback.keys = Backspace
 controls.coach_takeback = コーチ：提案されたら手を戻す
+controls.coach_hint.keys = H
+controls.coach_hint = コーチのチャレンジ：ヒントを見る
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = 明るさ
@@ -1052,6 +1054,111 @@ coach.gameover.unrated = コーチとのこの対局はレーティング対象�
 coach.lesson.done = よくできました
 coach.lesson.done.line = これでチェスのルールを覚えました。
 coach.lesson.next = 最初の対局
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = トレーニング
+coach.tab.challenges = チャレンジ
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = チェックメイト
+challenge.group.tactics = 戦術
+challenge.group.defence = 守り
+challenge.group.endgames = エンドゲーム
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = 1手メイト
+challenge.mate1.desc = 1手でチェックメイト。
+challenge.mate1.detail = まずはすべてのチェックを調べましょう。その中の一つが、キングに逃げ場も、間に入る駒も、取る手も残しません。
+challenge.mate2.name = 2手メイト
+challenge.mate2.desc = 守りのなくなる手を指し、次にメイト。
+challenge.mate2.detail = 最初の手は、キングのマスを奪うチェックやサクリファイスであることがよくあります。コーチはできる限り守ります。
+challenge.mate3.name = 3手メイト
+challenge.mate3.desc = より長い、強制的な手順。
+challenge.mate3.detail = 3手先までのチェック、駒取り、狙い。駒に触れる前に、各段階でのコーチの最善の応手を読みましょう。
+challenge.backrank.name = バックランクメイト
+challenge.backrank.desc = 自分のポーンの後ろに閉じ込められたキング。
+challenge.backrank.detail = キャスリングしたキングの前のポーンが動いていないと、最終ランクのルークやクイーンでチェックメイトになることがあります。まず守りの駒を取り除くか、そらしましょう。
+challenge.patterns.name = メイトのパターン
+challenge.patterns.desc = スマザードメイト、アナスタシアメイト、アラビアンメイトなどの定番。
+challenge.patterns.detail = 何度も現れる有名なメイトの形です。駒の配置と、とどめの一手を見抜けるようになりましょう。
+challenge.hanging.name = 浮き駒
+challenge.hanging.desc = 守られていない駒を見つける。
+challenge.hanging.detail = 誰も守っていない駒やポーンは、そのまま取れます。コーチの駒がそれぞれ何に守られているか確かめましょう。
+challenge.fork.name = フォーク
+challenge.fork.desc = 1つの駒で、2つを同時に攻める。
+challenge.fork.detail = ナイト、ポーン、クイーン、そしてキングでさえフォークできます。相手は2つの目標のうち、1つしか救えません。
+challenge.pin.name = ピン
+challenge.pin.desc = 動くと後ろの駒を失うので、動けない駒。
+challenge.pin.detail = 駒をキングや、より価値の高い駒にピンしてから、さらに攻めるか、その駒が動けないことを利用しましょう。
+challenge.skewer.name = スキュア
+challenge.skewer.desc = 価値の高い駒を攻めて、後ろの駒を取る。
+challenge.skewer.detail = ピンの逆です。価値の高い駒が前にいて、逃げるしかなく、後ろの駒がむき出しになります。
+challenge.discovered.name = ディスカバードアタック
+challenge.discovered.desc = ある駒を動かして、別の駒の攻撃を開く。
+challenge.discovered.detail = 駒が線上からどくと、その後ろの駒が攻撃します。チェックやダブルチェックを伴えば、相手は2つの狙いの両方には対応できません。
+challenge.deflection.name = ディフレクションとデコイ
+challenge.deflection.desc = 守りの駒を引きはがすか、命取りのマスへおびき寄せる。
+challenge.deflection.detail = 2つの役目を持つ守りの駒は、両方はこなせません。攻撃するか、何かを差し出すか、駒を失うマスへ無理やり来させましょう。
+challenge.intermezzo.name = 中間手
+challenge.intermezzo.desc = すぐに取り返さない。もっと強い手がある。
+challenge.intermezzo.detail = 予想される手の前に、チェックやより大きな狙いを挟むと、すべてが変わります。
+challenge.trapped.name = 閉じ込められた駒
+challenge.trapped.desc = 安全なマスが残っていない駒。
+challenge.trapped.detail = 駒の最後の逃げ場を奪ってから、その駒を取りましょう。
+challenge.promotion.name = プロモーション
+challenge.promotion.desc = ポーンを最終ランクまで進める。
+challenge.promotion.detail = 進んだポーンには大きな価値があります。道を開け、ブロックしている駒をそらし、新しいクイーンを作りましょう。
+challenge.quiet.name = 静かな手
+challenge.quiet.desc = 勝つ手は、チェックでも駒取りでもない。
+challenge.quiet.detail = 最強の手が、防げない狙いを準備するだけ、ということもあります。最も見つけにくい種類の手です。
+challenge.opening.name = オープニングの罠
+challenge.opening.desc = 序盤のミスをとがめる。
+challenge.opening.detail = 実戦の最初の数手から選んだ局面です。不用意な手を、すぐに突くことができます。
+challenge.escape.name = 逃げ道を探す
+challenge.escape.desc = キングが危険。助かる手は一つだけ。
+challenge.escape.detail = ほかの手はすべて負けます。キングへのチェックと狙いをすべて確かめてから、唯一の逃げ道を見つけましょう。
+challenge.defend.name = 守りの手
+challenge.defend.desc = 駒を失わずに狙いを防ぐ。
+challenge.defend.detail = コーチが何かを狙っています。すべてを保つ正確な手を見つけましょう。
+challenge.kq.name = クイーンとキング対キング
+challenge.kq.desc = クイーンでチェックメイト。
+challenge.kq.detail = クイーンで相手のキングを盤の端へ追い込み、自分のキングを近づけ、ステイルメイトに気をつけましょう。コーチは最善の手で守ります。
+challenge.kr.name = ルークとキング対キング
+challenge.kr.desc = ルークでチェックメイト。
+challenge.kr.detail = ルークがキングの行く手を1ランクずつ断ち、あなたのキングがオポジションを取ります。コーチは最善の手で守ります。
+challenge.kp.name = キングとポーン対キング
+challenge.kp.desc = オポジションを取って、プロモーション。
+challenge.kp.detail = ポーンではなく、キングを先に進めましょう。オポジションを取り、コーチが追いつけないクイーンを作りましょう。
+challenge.kp_hold.name = ポーンを止める
+challenge.kp_hold.desc = キングだけで、キングとポーンを相手に引き分けを守る。
+challenge.kp_hold.detail = ポーンの前に立ち、オポジションを保ちましょう。10手のあいだ守り抜きます。
+challenge.rook.name = ルークエンディング
+challenge.rook.desc = ルセナのブリッジと、フィリドール・ディフェンス。
+challenge.rook.detail = すべてのプレイヤーが知っておくべき2つの局面。第7ランクのポーンで勝つ方法と、第3ランクのルークで守る方法です。
+challenge.endgame.name = エンドゲームの戦術
+challenge.endgame.desc = 少ない駒、鋭いアイデア。
+challenge.endgame.detail = 実戦から選んだ、ポーンの競走、ブレイクスルー、ルークエンディング。
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = 全{0}問
+coach.challenge.done = 達成
+coach.challenge.start = 開始
+coach.challenge.note.white = あなたは白番で、コーチが各問題を盤上に並べます。
+coach.challenge.note.hint = 行き詰まったら H でヒントを。何度か間違えると、コーチのほうからヒントを提案します。
+coach.challenge.note.unsaved = チャレンジはレーティング対象外で、保存もされません。達成したチャレンジにはチェックマークがつきます。
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = チャレンジ達成
+coach.challenge.complete.line = すべての問題を解きました。
+coach.challenge.next = 次のチャレンジ
+coach.challenge.again = もう一度
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = ヒントを見ますか？
+coach.hint.text = コーチがヒントを提案しています。
+coach.hint.hint = H でヒントを表示します。駒に触れると、そのまま考え続けます。
+coach.hint.accept = ヒント
+coach.hint.decline = 結構です
+coach.hint.key = ヒント
 
 # ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
 # Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.

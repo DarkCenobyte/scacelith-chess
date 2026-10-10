@@ -1,0 +1,136 @@
+# Coach speech: the challenges (src/coach/challenge_run.cpp). German.
+# Every language has exactly the English keys (and the same variants); read the header of
+# en/challenge.lang for the placeholders.
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 Stellungen", count.position in
+#            common.lang), "{n:move_dat}" / "{n:move_acc}" likewise ("in zwei Zügen", "zehn Züge lang")
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "Schachmatt" (the line says it)
+#   {your}   one of the player's pieces ({your:acc} = "deinen Springer"); the coach points at it on that word
+#   {sq}     a square; the coach points at it on that word
+# The player always has the white pieces. The coach says "du" to the player.
+# German notes (as in review.lang): no pronoun refers back to a {your} piece, and no piece
+# placeholder follows a colon (the program capitalises a piece only after . ! ?).
+# A challenge is a "Serie" of positions (the menus: assets/i18n/de.lang, coach.challenge.*).
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Matt in einem Zug. {n:position}, und jedes Mal setzt ein einziger Zug matt. Prüf jedes Schachgebot.
+ch.intro.mate2 = Matt in zwei Zügen. {n:position}: Dein erster Zug darf mir keine Verteidigung lassen, dann setzt du matt.
+ch.intro.mate3 = Matt in drei Zügen. {n:position}. Schachgebote, Schlagzüge und Drohungen: Berechne jedes Mal meine beste Antwort.
+ch.intro.backrank = Grundreihenmatt. {n:position} mit einem König, der hinter den eigenen Bauern feststeckt.
+ch.intro.patterns = Mattbilder. {n:position} mit klassischen Mattnetzen. Erkenne das Muster, dann schlag zu.
+ch.intro.hanging = Hängende Figuren. {n:position}: Bei mir steht etwas ungedeckt. Finde es und nimm es dir.
+ch.intro.fork = Gabeln. {n:position}: Finde den Zug, der zwei Ziele zugleich angreift.
+ch.intro.pin = Fesselungen. {n:position}: Fessle eine Figur, oder nutze eine Fesselung aus.
+ch.intro.skewer = Spieße. {n:position}: Greif eine wertvolle Figur an und gewinne, was dahinter steht.
+ch.intro.discovered = Abzugsangriffe. {n:position}: Zieh eine Figur weg, um einer anderen die Linie zu öffnen.
+ch.intro.deflection = Ablenkung und Hinlenkung. {n:position}: Lock einen Verteidiger weg, oder auf ein verhängnisvolles Feld.
+ch.intro.intermezzo = Zwischenzüge. {n:position}: Finde vor dem naheliegenden Zug einen stärkeren.
+ch.intro.trapped = Gefangene Figuren. {n:position}: Eine meiner Figuren hat kein sicheres Feld mehr. Gewinne sie.
+ch.intro.promotion = Umwandlung. {n:position} mit einem vorgerückten Bauern, der die Partie entscheidet.
+ch.intro.quiet = Stille Züge. {n:position}: Der Gewinnzug ist weder ein Schach noch ein Schlagzug.
+ch.intro.opening = Eröffnungsfallen. {n:position} aus den ersten Zügen echter Partien. Bestraf meinen Fehler.
+ch.intro.escape = Finde den Ausweg. {n:position}: Dein König ist in Gefahr, und nur ein Zug rettet ihn.
+ch.intro.defend = Verteidigungszüge. {n:position}: Finde den einen Zug, der deine Stellung zusammenhält.
+ch.intro.kq = Dame und König gegen König. {n:position}: Setz meinen König matt. Pass auf das Patt auf.
+ch.intro.kr = Turm und König gegen König. {n:position}: Setz meinen König matt, Schritt für Schritt.
+ch.intro.kp = König und Bauer gegen König. {n:position}: Mach eine Dame. Dein König geht voran.
+ch.intro.kp_hold = Halte den Bauern auf. {n:position}: Du hast nur deinen König. Halte das Remis.
+ch.intro.rook = Turmendspiele. {n:position}: Bau die Brücke, um umzuwandeln, und halte das Remis mit der Philidor-Verteidigung.
+ch.intro.endgame = Endspieltaktik. {n:position} mit wenigen Figuren und scharfen Ideen.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ({n:move_dat}: "in zwei Zügen").
+ch.task.mate = Matt in {n:move_dat}.
+ch.task.mate.2 = Finde das Matt in {n:move_dat}.
+ch.task.hanging = Hier steht etwas ungedeckt.
+ch.task.hanging.2 = Was kannst du umsonst schlagen?
+ch.task.fork = Finde die Gabel.
+ch.task.fork.2 = Such nach einer Gabel.
+ch.task.pin = Eine Fesselung ist hier der Schlüssel.
+ch.task.skewer = Hier gewinnt ein Spieß.
+ch.task.discovered = Hier gewinnt ein Abzugsangriff.
+ch.task.deflection = Überlaste einen Verteidiger, oder lock ihn auf ein falsches Feld.
+ch.task.intermezzo = Such nach einem Zwischenzug.
+ch.task.trapped = Eine meiner Figuren kann nicht entkommen. Gewinne sie.
+ch.task.promotion = Nutze deinen vorgerückten Bauern.
+ch.task.quiet = Der Gewinnzug ist ein stiller Zug.
+ch.task.opening = Bestraf meinen letzten Zug.
+ch.task.escape = Rette deinen König: Nur ein Zug hilft.
+ch.task.defend = Finde den einzigen guten Zug.
+ch.task.endgame = Finde den besten Zug.
+ch.task.default = Finde den besten Zug.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Setz meinen König matt. Ich verteidige mich, so gut ich kann.
+ch.task.play.promote = Wandle deinen Bauern um und halte den Gewinn fest. Ich versuche, dich aufzuhalten.
+# {n:move_acc}: "zehn Züge lang", "einen Zug lang".
+ch.task.play.hold = Halte das Remis {n:move_acc} lang. Ich versuche zu gewinnen.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Diese Stellungen stammen aus echten Partien. Ich spiele den letzten Zug, dann bist du dran.
+ch.lead.first.2 = Jede Stellung stammt aus einer echten Partie. Ich spiele den Zug, der dorthin geführt hat, dann ziehst du.
+ch.next = Nächste Stellung.
+ch.next.2 = Hier kommt die nächste.
+ch.next.3 = Weiter zur nächsten.
+ch.last = Die letzte Stellung.
+ch.last.2 = Und jetzt die letzte.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Gut.
+ch.good.2 = Ja.
+ch.good.3 = Richtig.
+ch.good.4 = Genau.
+# The position is solved.
+ch.solved = Das ist es! Gut gemacht.
+ch.solved.2 = Genau richtig.
+ch.solved.3 = Sehr gut.
+ch.solved.mate = Schachmatt! Gut gemacht.
+ch.solved.mate.2 = Und das ist matt. Sehr gut.
+ch.solved.mate.3 = Schachmatt. Schön gemacht.
+ch.solved.promote = Eine neue Dame, und der Sieg ist sicher. Gut gemacht.
+ch.solved.hold = Das Remis hält. Gut verteidigt!
+ch.solved.draw = Remis auf dem Brett. Gut verteidigt!
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Der nicht: Ich würde mit {move} antworten.
+ch.wrong.reply.2 = Nicht ganz: Darauf käme {move}.
+ch.wrong.reply.3 = Dann würde ich {move} spielen.
+ch.wrong.mate = Vorsicht: {move:nomate} wäre Schachmatt.
+ch.wrong.mate.2 = Pass auf: Ich würde mit {move:nomate} antworten, und das ist matt.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Das setzt auch matt, dauert aber länger. Es geht schneller.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Das setzt auch matt, aber ich denke an einen anderen Zug. Schau noch einmal.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Nicht schlecht, aber es gibt etwas Stärkeres. Schau noch einmal.
+ch.wrong.weaker.2 = Das ist spielbar, aber es geht besser.
+ch.wrong.stalemate = Patt! Mein König kann nicht ziehen, und das ist nur remis.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Der nicht: Nach {move} halte ich das Remis.
+ch.wrong.loses = Vorsicht: Nach {move} stünde ich auf Gewinn.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Das ist es nicht.
+ch.try_again = Versuch es noch einmal.
+ch.try_again.2 = Schau es dir noch einmal an.
+ch.try_again.3 = Schau noch einmal hin.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Möchtest du einen Tipp?
+ch.offer.2 = Soll ich dir einen Tipp geben?
+ch.no_hint = In Ordnung. Such weiter.
+ch.no_hint.2 = Gut, lass dir Zeit.
+ch.hint.piece = Schau dir {your:acc} an.
+ch.hint.piece.2 = Denk an {your:acc}.
+ch.hint.square = Schau dir das Feld {sq} an.
+ch.hint.square.2 = Das Schlüsselfeld ist {sq}.
+ch.hint.square.3 = Behalte das Feld {sq} im Auge.
+ch.hint.show = Hier ist der Zug. Schau zu.
+ch.hint.show.2 = Ich zeige es dir. Schau zu.
+ch.hint.now = Jetzt spielst du ihn.
+ch.hint.now.2 = Du bist dran. Spiel ihn.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Das war die ganze Serie. Gut gemacht!
+ch.complete.2 = Alle Stellungen gelöst. Gut gemacht!

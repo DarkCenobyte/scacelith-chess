@@ -114,6 +114,31 @@ struct Run {
     }
 };
 
+// Every line renders, written and spoken, every variant, in every language that has the key,
+// without a placeholder left.
+void checkRenders(const std::vector<Line>& lines) {
+    const Catalog& cat = Catalog::shared();
+    int rendered = 0;
+    for (const Line& l : lines) {
+        CHECK(cat.has(l.key));
+        for (const std::string& lang : cat.languages()) {
+            if (lang != "en" && !cat.has(lang, l.key)) continue;
+            for (int v = 1; v <= std::max(1, cat.variants(l.key)); ++v) {
+                for (bool spoken : {false, true}) {
+                    const std::string text = cat.renderVariant(l, lang, spoken, v).text;
+                    ++rendered;
+                    if (text.empty() || text.find('{') != std::string::npos) {
+                        std::fprintf(stderr, "  %s [%s, %s, v%d]: \"%s\"\n", l.key.c_str(), lang.c_str(),
+                                     spoken ? "spoken" : "written", v, text.c_str());
+                        CHECK(false);
+                    }
+                }
+            }
+        }
+    }
+    CHECK(rendered > 0);
+}
+
 const Challenge& bookChallenge(const ChallengeBook& b, const char* id) {
     const Challenge* c = b.find(id);
     CHECK(c != nullptr);
@@ -307,6 +332,7 @@ TEST(challenge_run_line_wrong_moves_and_hints) {
     CHECK(t.queued("ch.complete") == 1);
     CHECK(!t.run.hintAvailable(t.game));
     CHECK(!t.run.playerMayMove(t.game));
+    checkRenders(t.lines);
 }
 
 TEST(challenge_run_play_out) {
@@ -339,6 +365,7 @@ TEST(challenge_run_play_out) {
     CHECK(t.ready());
     CHECK(t.queued("ch.task.play.hold") == 1);
     CHECK(!t.run.completed());
+    checkRenders(t.lines);
 }
 
 TEST(challenge_book_embedded) {
@@ -441,18 +468,29 @@ TEST(challenge_session_whole_set) {
     CHECK(session.finished());
     CHECK(session.history().empty());
     CHECK_EQ(analyst.asked.size(), size_t(0));   // right moves need no engine
-    // Every line it said renders in English without a placeholder left.
+    checkRenders(lines);
+}
+
+TEST(challenge_speech_renders_everywhere) {
+    // Every line of the challenges' speech, with the arguments the run gives (a count of 1, 2 and
+    // 5, a mating move and a quiet one, one of the player's pieces, a square).
     const Catalog& cat = Catalog::shared();
-    for (const Line& l : lines) {
-        CHECK(cat.has(l.key));
-        for (int v = 1; v <= std::max(1, cat.variants(l.key)); ++v) {
-            for (bool spoken : {false, true}) {
-                const std::string text = cat.renderVariant(l, "en", spoken, v).text;
-                if (text.empty() || text.find('{') != std::string::npos) {
-                    std::fprintf(stderr, "  %s: \"%s\"\n", l.key.c_str(), text.c_str());
-                    CHECK(false);
-                }
+    const std::vector<std::string> keys = cat.keys("en", "challenge");
+    CHECK(keys.size() > 40);
+    std::vector<Line> lines;
+    for (const std::string& k : keys) {
+        if (k.find(".spoken") != std::string::npos) continue;
+        for (int n : {1, 2, 5}) {
+            for (const char* san : {"Qxh2#", "Nf3"}) {
+                Line l;
+                l.key = k;
+                l.with("n", Arg::ofNumber(n));
+                l.with("move", Arg::ofMove(san, "h4h2"));
+                l.with("your", Arg::ofPiece(chess::Knight, chess::White, true, parseSquare("g1")));
+                l.with("sq", Arg::ofSquare(parseSquare("e4")));
+                lines.push_back(l);
             }
         }
     }
+    checkRenders(lines);
 }

@@ -119,6 +119,8 @@ controls.coach_skip.keys = 空白鍵
 controls.coach_skip = 教練：跳過講解
 controls.coach_takeback.keys = 退格鍵
 controls.coach_takeback = 教練：在提議時悔棋
+controls.coach_hint.keys = H
+controls.coach_hint = 教練挑戰：請求提示
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = 亮度
@@ -1051,6 +1053,111 @@ coach.gameover.unrated = 與教練的這盤對局不計等級分。
 coach.lesson.done = 做得好
 coach.lesson.done.line = 你已經掌握了西洋棋的規則。
 coach.lesson.next = 第一盤對局
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = 訓練
+coach.tab.challenges = 挑戰
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = 將死
+challenge.group.tactics = 戰術
+challenge.group.defence = 防守
+challenge.group.endgames = 殘局
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = 一步殺
+challenge.mate1.desc = 走一步，就將死。
+challenge.mate1.detail = 先看所有的將軍：其中有一步能讓王無路可逃，對方既擋不住，也吃不掉將軍的子。
+challenge.mate2.name = 兩步殺
+challenge.mate2.desc = 先走一步讓對方無法防守，再將死。
+challenge.mate2.detail = 第一步往往是將軍或棄子，奪走王的一個格子。教練會盡全力防守。
+challenge.mate3.name = 三步殺
+challenge.mate3.desc = 更長的強制變化。
+challenge.mate3.detail = 將軍、吃子和威脅，深算三步。動子之前，先算出教練每一步的最佳應著。
+challenge.backrank.name = 底線殺
+challenge.backrank.desc = 王被自己的兵困在後面。
+challenge.backrank.detail = 王車易位之後，如果王前面的兵都沒動過，底線上的一個車或后就可能將死它。先除掉或引開防守的子。
+challenge.patterns.name = 將殺模式
+challenge.patterns.desc = 悶殺、安娜斯塔西亞殺、阿拉伯殺等經典殺法。
+challenge.patterns.detail = 一再出現的著名殺網。學會認出棋子的佈局和最後一擊。
+challenge.hanging.name = 白吃的子
+challenge.hanging.desc = 找出沒有保護的子。
+challenge.hanging.detail = 沒有任何子保護的棋子或兵，可以直接吃掉。看清教練的每個子分別由誰保護。
+challenge.fork.name = 捉雙
+challenge.fork.desc = 一個子同時攻擊兩個子。
+challenge.fork.detail = 馬、兵、后，甚至王都能捉雙。對手只能救下兩個目標中的一個。
+challenge.pin.name = 牽制
+challenge.pin.desc = 一個子一動，後面的子就會丟掉。
+challenge.pin.detail = 把一個子牽制在它的王或價值更高的子前面，然後再攻擊它，或者利用它不能動這一點。
+challenge.skewer.name = 串擊
+challenge.skewer.desc = 攻擊一個價值高的子，贏得它後面的子。
+challenge.skewer.detail = 與牽制相反：價值更高的子在前面，必須走開，於是暴露出後面的子。
+challenge.discovered.name = 閃擊
+challenge.discovered.desc = 走開一個子，放出另一個子的攻擊。
+challenge.discovered.detail = 一個子從線上走開，它後面的子就發起攻擊。如果帶將軍，或是雙將，對手來不及同時應付兩個威脅。
+challenge.deflection.name = 引離與引入
+challenge.deflection.desc = 把防守的子引開，或引到致命的格子上。
+challenge.deflection.detail = 身兼兩職的防守子無法兩頭兼顧。攻擊它，送它點東西，或者逼一個子走到會被吃掉的格子上。
+challenge.intermezzo.name = 中間著
+challenge.intermezzo.desc = 先別急著吃回：還有更強的棋。
+challenge.intermezzo.detail = 在意料之中的那步棋之前，插入一步將軍或更大的威脅，局面就完全不同了。
+challenge.trapped.name = 被困的子
+challenge.trapped.desc = 一個沒有安全格子可去的子。
+challenge.trapped.detail = 先奪走一個子最後的逃生格，然後把它吃掉。
+challenge.promotion.name = 升變
+challenge.promotion.desc = 把兵一路推到底線。
+challenge.promotion.detail = 衝在前面的兵價值很高。清除障礙，引開攔截的子，升出一個新的后。
+challenge.quiet.name = 靜著
+challenge.quiet.desc = 制勝的一著既不是將軍，也不是吃子。
+challenge.quiet.detail = 有時最強的一著只是在準備一個無法化解的威脅。這是最難發現的一類棋。
+challenge.opening.name = 開局陷阱
+challenge.opening.desc = 懲罰開局階段的錯誤。
+challenge.opening.detail = 來自真實對局開頭幾步的局面，一步疏忽的棋立刻就能被抓住。
+challenge.escape.name = 尋找生路
+challenge.escape.desc = 你的王有危險：只有一步能救它。
+challenge.escape.detail = 其他每一步都會輸。看清針對你的王的所有將軍和威脅，然後找出唯一的出路。
+challenge.defend.name = 防守著法
+challenge.defend.desc = 化解威脅，又不丟子。
+challenge.defend.detail = 教練在威脅著什麼。找出那一步能保全一切的精確著法。
+challenge.kq.name = 王和后對王
+challenge.kq.desc = 用后將死。
+challenge.kq.detail = 用你的后把孤王逼到棋盤邊緣，讓你的王靠近，並當心逼和。教練會用最佳著法防守。
+challenge.kr.name = 王和車對王
+challenge.kr.desc = 用車將死。
+challenge.kr.detail = 車一條橫線一條橫線地截住對方的王；你的王取得對王。教練會用最佳著法防守。
+challenge.kp.name = 王和兵對王
+challenge.kp.desc = 取得對王，然後升變。
+challenge.kp.detail = 讓王走在前面，而不是兵。取得對王，升出一個教練追不上的后。
+challenge.kp_hold.name = 攔住兵
+challenge.kp_hold.desc = 單王對王和兵：守住和棋。
+challenge.kp_hold.detail = 站在兵的前面，保持對王。堅持十步。
+challenge.rook.name = 車殘局
+challenge.rook.desc = 盧塞納搭橋與菲利多爾防禦。
+challenge.rook.detail = 每位棋手都應該掌握的兩個局面：兵在第七橫線時怎樣取勝，以及車在第三橫線時怎樣防守。
+challenge.endgame.name = 殘局戰術
+challenge.endgame.desc = 子力不多，招法犀利。
+challenge.endgame.detail = 來自真實對局的兵的賽跑、突破和車殘局。
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} 個局面
+coach.challenge.done = 已完成
+coach.challenge.start = 開始
+coach.challenge.note.white = 你執白，教練會在棋盤上擺好每個局面。
+coach.challenge.note.hint = 卡住了？按 H 取得提示。試過幾次之後，教練會主動提出給你提示。
+coach.challenge.note.unsaved = 挑戰不計等級分，也不儲存；完成的挑戰會打勾。
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = 挑戰完成
+coach.challenge.complete.line = 你解出了每一個局面。
+coach.challenge.next = 下一個挑戰
+coach.challenge.again = 再來一次
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = 要提示嗎？
+coach.hint.text = 教練提議給你一個提示。
+coach.hint.hint = 按 H 取得提示。觸碰任何棋子即繼續思考。
+coach.hint.accept = 提示
+coach.hint.decline = 不用了，謝謝
+coach.hint.key = 提示
 
 # ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
 # Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.

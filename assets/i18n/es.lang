@@ -119,6 +119,8 @@ controls.coach_skip.keys = Espacio
 controls.coach_skip = Entrenador: saltar lo que dice
 controls.coach_takeback.keys = Retroceso
 controls.coach_takeback = Entrenador: deshacer la jugada cuando lo ofrece
+controls.coach_hint.keys = H
+controls.coach_hint = Desafíos del entrenador: pedir una pista
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = BRILLO
@@ -1051,6 +1053,111 @@ coach.gameover.unrated = Esta partida con el entrenador no puntúa.
 coach.lesson.done = ¡BIEN HECHO!
 coach.lesson.done.line = Ya conoce las reglas del ajedrez.
 coach.lesson.next = Primera partida
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = Entrenamiento
+coach.tab.challenges = Desafíos
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = MATES
+challenge.group.tactics = TÁCTICA
+challenge.group.defence = DEFENSA
+challenge.group.endgames = FINALES
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = Mate en una jugada
+challenge.mate1.desc = Una jugada, y es jaque mate.
+challenge.mate1.detail = Mire primero todos los jaques: uno de ellos no le deja al rey ninguna casilla, ninguna interposición y ninguna captura.
+challenge.mate2.name = Mate en dos jugadas
+challenge.mate2.desc = Una jugada que no deja defensa, y luego mate.
+challenge.mate2.detail = La primera jugada suele ser un jaque o un sacrificio que le quita una casilla al rey. El entrenador se defiende lo mejor que puede.
+challenge.mate3.name = Mate en tres jugadas
+challenge.mate3.desc = Variantes forzadas más largas.
+challenge.mate3.detail = Jaques, capturas y amenazas, a tres jugadas vista. Calcule la mejor respuesta del entrenador en cada paso antes de tocar una pieza.
+challenge.backrank.name = Mates del pasillo
+challenge.backrank.desc = Un rey encerrado detrás de sus propios peones.
+challenge.backrank.detail = Cuando los peones delante de un rey enrocado no se han movido, una torre o una dama en la última fila puede dar mate. Elimine o distraiga primero a los defensores.
+challenge.patterns.name = Patrones de mate
+challenge.patterns.desc = Mate de la coz, de Anastasia, árabe y otros clásicos.
+challenge.patterns.detail = Redes de mate famosas que aparecen una y otra vez. Aprenda a reconocer la disposición de las piezas y el golpe final.
+challenge.hanging.name = Piezas sueltas
+challenge.hanging.desc = Detecte lo que ha quedado sin protección.
+challenge.hanging.detail = Una pieza o un peón que nadie defiende se puede capturar sin más. Compruebe qué protege a cada pieza del entrenador.
+challenge.fork.name = Horquillas
+challenge.fork.desc = Una pieza ataca a dos a la vez.
+challenge.fork.detail = Los caballos, los peones, las damas e incluso los reyes pueden hacer horquilla. El rival solo puede salvar uno de los dos objetivos.
+challenge.pin.name = Clavadas
+challenge.pin.desc = Una pieza que no puede moverse sin perder lo que tiene detrás.
+challenge.pin.detail = Clave una pieza contra su rey o contra una pieza más valiosa, y luego atáquela de nuevo, o aproveche que no puede moverse.
+challenge.skewer.name = Enfiladas
+challenge.skewer.desc = Ataque una pieza valiosa y gane la que está detrás.
+challenge.skewer.detail = Lo contrario de una clavada: la pieza más valiosa está delante, tiene que apartarse y deja al descubierto la que tiene detrás.
+challenge.discovered.name = Ataques a la descubierta
+challenge.discovered.desc = Mueva una pieza para desatar otra.
+challenge.discovered.detail = Cuando una pieza sale de una línea, la pieza que tenía detrás ataca. Con un jaque, o con un jaque doble, el rival no tiene tiempo de responder a las dos amenazas.
+challenge.deflection.name = Desviación y atracción
+challenge.deflection.desc = Aleje a un defensor, o atráigalo a una casilla fatal.
+challenge.deflection.detail = Un defensor con dos tareas no puede cumplir ambas. Atáquelo, ofrézcale algo, u obligue a una pieza a ir a la casilla donde se perderá.
+challenge.intermezzo.name = Jugadas intermedias
+challenge.intermezzo.desc = No recapture enseguida: hay algo más fuerte.
+challenge.intermezzo.detail = Antes de la jugada esperada, un jaque o una amenaza mayor intercalados lo cambian todo.
+challenge.trapped.name = Piezas atrapadas
+challenge.trapped.desc = Una pieza sin ninguna casilla segura.
+challenge.trapped.detail = Quítele a una pieza sus últimas casillas de escape y luego gánela.
+challenge.promotion.name = Promoción
+challenge.promotion.desc = Lleve un peón hasta la última fila.
+challenge.promotion.detail = Los peones avanzados valen mucho. Despeje el camino, desvíe a los bloqueadores y consiga una nueva dama.
+challenge.quiet.name = Jugadas tranquilas
+challenge.quiet.desc = La jugada ganadora no es ni un jaque ni una captura.
+challenge.quiet.detail = A veces la jugada más fuerte solo prepara una amenaza imparable. Es lo más difícil de ver.
+challenge.opening.name = Trampas de apertura
+challenge.opening.desc = Castigue los errores tempranos.
+challenge.opening.detail = Posiciones de las primeras jugadas de partidas reales, en las que una jugada descuidada se puede aprovechar de inmediato.
+challenge.escape.name = Encontrar la salida
+challenge.escape.desc = Su rey está en peligro: una jugada lo salva.
+challenge.escape.detail = Cualquier otra jugada pierde. Mire todos los jaques y amenazas contra su rey, y encuentre la única salida.
+challenge.defend.name = Jugadas defensivas
+challenge.defend.desc = Pare la amenaza sin perder material.
+challenge.defend.detail = El entrenador amenaza algo. Encuentre la jugada precisa que lo mantiene todo en pie.
+challenge.kq.name = Dama y rey contra rey
+challenge.kq.desc = Jaque mate con la dama.
+challenge.kq.detail = Empuje al rey solitario hacia el borde con su dama, acerque su propio rey y cuidado con el rey ahogado. El entrenador se defiende con sus mejores jugadas.
+challenge.kr.name = Torre y rey contra rey
+challenge.kr.desc = Jaque mate con la torre.
+challenge.kr.detail = La torre corta al rey, fila a fila; su rey toma la oposición. El entrenador se defiende con sus mejores jugadas.
+challenge.kp.name = Rey y peón contra rey
+challenge.kp.desc = Gane la oposición y corone.
+challenge.kp.detail = Avance con el rey, no con el peón. Tome la oposición y consiga una dama que el entrenador no pueda alcanzar.
+challenge.kp_hold.name = Detener el peón
+challenge.kp_hold.desc = Un rey solo contra rey y peón: aguante las tablas.
+challenge.kp_hold.detail = Colóquese delante del peón y mantenga la oposición. Aguante diez jugadas.
+challenge.rook.name = Finales de torre
+challenge.rook.desc = El puente de Lucena y la defensa Philidor.
+challenge.rook.detail = Las dos posiciones que todo jugador debería conocer: cómo ganar con un peón en la séptima fila y cómo defender con la torre en la tercera.
+challenge.endgame.name = Táctica en el final
+challenge.endgame.desc = Pocas piezas, ideas afiladas.
+challenge.endgame.detail = Carreras de peones, rupturas y finales de torre de partidas reales.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} posición|{0} posiciones
+coach.challenge.done = Completado
+coach.challenge.start = Empezar
+coach.challenge.note.white = Usted juega con blancas; el entrenador prepara cada posición en el tablero.
+coach.challenge.note.hint = ¿No encuentra la jugada? Pulse H para obtener una pista. Tras unos cuantos intentos, el entrenador le ofrecerá una.
+coach.challenge.note.unsaved = Los desafíos no puntúan ni se guardan; una marca indica los que ha completado.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = DESAFÍO SUPERADO
+coach.challenge.complete.line = Ha resuelto todas las posiciones.
+coach.challenge.next = Siguiente desafío
+coach.challenge.again = Otra vez
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = ¿UNA PISTA?
+coach.hint.text = El entrenador le ofrece una pista.
+coach.hint.hint = H da la pista. Tocar una pieza es seguir buscando.
+coach.hint.accept = Pista
+coach.hint.decline = No, gracias
+coach.hint.key = Pista
 
 # ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
 # Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.

@@ -122,6 +122,8 @@ controls.coach_skip.keys = المسافة
 controls.coach_skip = المدرّب: تخطّي ما يقوله
 controls.coach_takeback.keys = Backspace
 controls.coach_takeback = المدرّب: استرجاع النقلة حين يعرض ذلك
+controls.coach_hint.keys = H
+controls.coach_hint = تحديات المدرّب: طلب تلميح
 
 # ---- Brightness calibration (first start, src/ui/ui_screens.cpp) -------------------------------
 calibration.title = السطوع
@@ -1056,6 +1058,111 @@ coach.gameover.unrated = هذه المباراة مع المدرّب غير مح
 coach.lesson.done = أحسنت
 coach.lesson.done.line = أصبحت تعرف قواعد الشطرنج.
 coach.lesson.next = المباراة الأولى
+
+# ---- Coach challenges (src/ui/ui_coach.cpp; the coach's spoken lines are in assets/coach/speech/<lang>/challenge.lang)
+# The tabs of the Coach page: games with the coach, and short sets of positions to solve
+coach.tab.training = التدريب
+coach.tab.challenges = التحديات
+# Group headings of the list (capitals: section headings)
+challenge.group.mates = الإماتة
+challenge.group.tactics = التكتيك
+challenge.group.defence = الدفاع
+challenge.group.endgames = النهايات
+# Each challenge (assets/coach/challenges/challenges.txt): a name, a one-line description (about 60
+# characters) and a paragraph for the column of the selected challenge
+challenge.mate1.name = كش مات في نقلة واحدة
+challenge.mate1.desc = نقلة واحدة، وتنتهي المباراة بكش مات.
+challenge.mate1.detail = افحص كل كش أولًا: أحدها لا يترك للملك مربعًا يهرب إليه، ولا قطعة تعترض، ولا أخذًا ينقذه.
+challenge.mate2.name = كش مات في نقلتين
+challenge.mate2.desc = نقلة لا تترك أي دفاع، ثم كش مات.
+challenge.mate2.detail = غالبًا ما تكون النقلة الأولى كشًّا أو تضحية تسلب الملك مربعًا. ويدافع المدرّب بأفضل ما يستطيع.
+challenge.mate3.name = كش مات في ثلاث نقلات
+challenge.mate3.desc = تفريعات إجبارية أطول.
+challenge.mate3.detail = كش وأخذ وتهديد، على عمق ثلاث نقلات. احسب أفضل ردّ للمدرّب في كل خطوة قبل أن تلمس أي قطعة.
+challenge.backrank.name = كش مات الصف الأخير
+challenge.backrank.desc = ملك محبوس خلف بيادقه.
+challenge.backrank.detail = حين لا تتحرك البيادق التي أمام ملك مبيَّت، قد يعطي رخّ أو وزير على الصف الأخير كش مات. أبعِد المدافعين أو اشغلهم أولًا.
+challenge.patterns.name = أنماط الإماتة
+challenge.patterns.desc = كش مات بالخنق، وكش مات أناستازيا، والكش مات العربي، وغيرها من الكلاسيكيات.
+challenge.patterns.detail = شباك إماتة شهيرة تتكرر مرة بعد مرة. تعلّم التعرّف على تمركز القطع وعلى الضربة الأخيرة.
+challenge.hanging.name = قطع بلا حماية
+challenge.hanging.desc = اكتشف ما بقي بلا حماية.
+challenge.hanging.detail = القطعة أو البيدق الذي لا يحميه أحد يمكن أخذه ببساطة. تحقّق مما يحمي كل قطعة من قطع المدرّب.
+challenge.fork.name = الشوكة
+challenge.fork.desc = قطعة واحدة تهاجم قطعتين معًا.
+challenge.fork.detail = الأحصنة والبيادق والوزراء، بل والملوك أيضًا، يمكنها صنع شوكة. ولا يستطيع الخصم إنقاذ إلا أحد الهدفين.
+challenge.pin.name = التثبيت
+challenge.pin.desc = قطعة لا تستطيع التحرك دون أن تخسر ما يقف خلفها.
+challenge.pin.detail = ثبّت قطعة أمام ملكها أو أمام قطعة أثمن، ثم هاجمها مجددًا، أو استفد من عجزها عن الحركة.
+challenge.skewer.name = هجوم السيخ
+challenge.skewer.desc = هاجم قطعة ثمينة واربح القطعة التي خلفها.
+challenge.skewer.detail = عكس التثبيت: القطعة الأثمن تقف في الأمام، فتضطر إلى الابتعاد، وتكشف القطعة التي خلفها.
+challenge.discovered.name = الهجوم المكشوف
+challenge.discovered.desc = حرّك قطعة لتطلق هجوم قطعة أخرى.
+challenge.discovered.detail = حين تتنحّى قطعة عن خط ما، تهاجم القطعة التي خلفها. ومع الكش، وخاصة الكش المزدوج، لا يجد الخصم وقتًا للرد على التهديدين معًا.
+challenge.deflection.name = الإبعاد والاستدراج
+challenge.deflection.desc = أبعِد مدافعًا، أو استدرجه إلى مربع قاتل.
+challenge.deflection.detail = المدافع المكلَّف بمهمتين لا يستطيع القيام بهما معًا. هاجمه، أو اعرض عليه شيئًا، أو أجبر قطعة على الانتقال إلى مربع تضيع فيه.
+challenge.intermezzo.name = النقلات الوسيطة
+challenge.intermezzo.desc = لا تستردّ فورًا: هناك ما هو أقوى.
+challenge.intermezzo.detail = قبل النقلة المتوقعة، يغيّر كشٌّ أو تهديد أكبر كل شيء.
+challenge.trapped.name = القطع المحاصرة
+challenge.trapped.desc = قطعة لم يبقَ لها مربع آمن.
+challenge.trapped.detail = اسلب القطعة آخر مربعات هروبها، ثم اربحها.
+challenge.promotion.name = الترقية
+challenge.promotion.desc = ادفع بيدقًا حتى الصف الأخير.
+challenge.promotion.detail = البيادق المتقدمة ثمينة جدًا. افتح الطريق، وأبعِد القطع التي تعترضها، واصنع وزيرًا جديدًا.
+challenge.quiet.name = النقلات الهادئة
+challenge.quiet.desc = النقلة الرابحة ليست كشًّا ولا أخذًا.
+challenge.quiet.detail = أحيانًا تكتفي أقوى نقلة بتحضير تهديد لا يمكن صدّه. وهذا أصعب أنواع النقلات رؤيةً.
+challenge.opening.name = فخاخ الافتتاح
+challenge.opening.desc = عاقب الأخطاء المبكرة.
+challenge.opening.detail = وضعيات من النقلات الأولى لمباريات حقيقية، يمكن فيها استغلال نقلة متهوّرة على الفور.
+challenge.escape.name = إنقاذ الملك
+challenge.escape.desc = ملِكك في خطر: نقلة واحدة تنقذه.
+challenge.escape.detail = كل نقلة أخرى تخسر. انظر في كل كش وكل تهديد ضد ملِكك، ثم جد المخرج الوحيد.
+challenge.defend.name = النقلات الدفاعية
+challenge.defend.desc = صُدّ التهديد دون أن تخسر مادة.
+challenge.defend.detail = المدرّب يهدد بشيء ما. جد النقلة الدقيقة التي تحفظ تماسك موقفك كله.
+challenge.kq.name = الوزير والملك ضد الملك
+challenge.kq.desc = كش مات بالوزير.
+challenge.kq.detail = ادفع الملك الوحيد إلى الحافة بوزيرك، وقرّب ملِكك، واحذر الجمود. يدافع المدرّب بأفضل نقلاته.
+challenge.kr.name = الرخ والملك ضد الملك
+challenge.kr.desc = كش مات بالرخ.
+challenge.kr.detail = الرخ يحاصر الملك صفًّا بعد صف، وملِكك يأخذ المعارضة. يدافع المدرّب بأفضل نقلاته.
+challenge.kp.name = الملك والبيدق ضد الملك
+challenge.kp.desc = اكسب المعارضة ورقِّ البيدق.
+challenge.kp.detail = قدّم ملِكك أمام البيدق لا خلفه. خذ المعارضة ورقِّ البيدق إلى وزير لا يستطيع المدرّب إيقافه.
+challenge.kp_hold.name = إيقاف البيدق
+challenge.kp_hold.desc = ملك وحيد ضد ملك وبيدق: حافظ على التعادل.
+challenge.kp_hold.detail = قف أمام البيدق واحتفظ بالمعارضة. اصمد عشر نقلات.
+challenge.rook.name = نهايات الرخ
+challenge.rook.desc = جسر لوسينا ودفاع فيليدور.
+challenge.rook.detail = الوضعيتان اللتان يجب أن يعرفهما كل لاعب: كيف تفوز ببيدق على الصف السابع، وكيف تدافع بالرخ على الصف الثالث.
+challenge.endgame.name = تكتيكات النهايات
+challenge.endgame.desc = قطع قليلة، أفكار حادة.
+challenge.endgame.detail = سباقات البيادق، والاختراقات، ونهايات الرخ من مباريات حقيقية.
+# The column of the selected challenge. {0} = the number of positions in the set
+coach.challenge.positions = {0} وضعية|وضعية واحدة|وضعيتان|{0} وضعيات|{0} وضعية|{0} وضعية
+coach.challenge.done = مكتمل
+coach.challenge.start = ابدأ
+coach.challenge.note.white = تلعب بالقطع البيضاء، ويرتّب المدرّب كل وضعية على الرقعة.
+coach.challenge.note.hint = هل استعصى عليك الحل؟ اضغط H لتحصل على تلميح. وبعد بضع محاولات، يعرض عليك المدرّب تلميحًا.
+coach.challenge.note.unsaved = التحديات غير محتسبة في التصنيف ولا تُحفظ؛ وتظهر علامة صح بجانب التحديات المكتملة.
+# At the table: the band at the top, after the challenge's name. {0} = the position being solved, {1} = the number of positions
+coach.challenge.progress = {0} / {1}
+# The card at the end of a challenge
+coach.challenge.complete = اكتمل التحدي
+coach.challenge.complete.line = حللت كل الوضعيات.
+coach.challenge.next = التحدي التالي
+coach.challenge.again = مرة أخرى
+# The coach's offer of a hint (a card like the takeback offer), and the key cap of the hint at the bottom of the screen
+coach.hint.title = تلميح؟
+coach.hint.text = يعرض عليك المدرّب تلميحًا.
+coach.hint.hint = مفتاح H يعطيك التلميح. لمس أي قطعة يعني مواصلة البحث.
+coach.hint.accept = تلميح
+coach.hint.decline = لا، شكرًا
+coach.hint.key = تلميح
 
 # ---- Coach voice download (src/ui/ui_model_download.cpp, src/game/coach_model.cpp) --------------------
 # Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.

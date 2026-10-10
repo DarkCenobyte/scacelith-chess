@@ -1,0 +1,135 @@
+# Coach speech (French): the challenges (src/coach/challenge_run.cpp).
+# Same keys and variants as assets/coach/speech/en/challenge.lang (its header documents every
+# placeholder).
+#
+# Placeholders:
+#   {n}      a number; "{n:position}" says it with its noun ("6 positions", count.position in
+#            common.lang), "{n:move}" likewise ("2 coups")
+#   {move}   one of the coach's moves, played on the board while the line is said;
+#            "{move:nomate}" says a mating move without "échec et mat" (the line says it)
+#   {your}   one of the player's pieces ("ton cavalier", "ta tour"); the coach points at it on that word
+#   {sq}     a square ("la case {sq}"; never "de {sq}" or "à {sq}"); the coach points at it on that word
+# The player always has the white pieces. The coach says "tu" to the player; the coach is male.
+# The player's gender is unknown: no adjective or participle agrees with the player.
+# Speech says "le mat" in the singular ("mat" is respelled for the voice, "mats" is not).
+# Typography as in the other French files: a no-break space before : ; ? ! and typographic apostrophes.
+
+# ---- The start of a challenge: what it trains ({n:position}: how many positions) ------------------
+ch.intro.mate1 = Mat en un coup. {n:position}, et à chaque fois, un seul coup fait mat. Regarde tous les échecs.
+ch.intro.mate2 = Mat en deux coups. {n:position} : ton premier coup doit me laisser sans défense, puis tu mates.
+ch.intro.mate3 = Mat en trois coups. {n:position}. Échecs, prises et menaces : calcule ma meilleure réponse à chaque fois.
+ch.intro.backrank = Le mat du couloir. {n:position} où un roi est enfermé derrière ses propres pions.
+ch.intro.patterns = Les figures de mat. {n:position} avec des filets de mat classiques. Reconnais le motif, puis frappe.
+ch.intro.hanging = Les pièces en prise. {n:position} : j’ai laissé quelque chose sans protection. Trouve-le et prends-le.
+ch.intro.fork = Les fourchettes. {n:position} : trouve le coup qui attaque deux choses à la fois.
+ch.intro.pin = Les clouages. {n:position} : cloue une pièce, ou profite d’un clouage.
+ch.intro.skewer = Les enfilades. {n:position} : attaque une pièce de valeur et gagne ce qui se trouve derrière.
+ch.intro.discovered = Les attaques à la découverte. {n:position} : déplace une pièce pour en libérer une autre.
+ch.intro.deflection = La déviation et l’attraction. {n:position} : détourne un défenseur, ou attire-le sur une case fatale.
+ch.intro.intermezzo = Les coups intermédiaires. {n:position} : avant le coup évident, trouve plus fort.
+ch.intro.trapped = Les pièces piégées. {n:position} : une de mes pièces n’a aucune case sûre. Gagne-la.
+ch.intro.promotion = La promotion. {n:position} où un pion avancé décide de la partie.
+ch.intro.quiet = Les coups tranquilles. {n:position} : le coup gagnant n’est ni un échec ni une prise.
+ch.intro.opening = Les pièges d’ouverture. {n:position}, dans les premiers coups de vraies parties. Punis mon erreur.
+ch.intro.escape = Sauve ton roi. {n:position} : ton roi est en danger, et un seul coup le sauve.
+ch.intro.defend = Les coups de défense. {n:position} : trouve le seul coup qui tient ta position.
+ch.intro.kq = Dame et roi contre roi. {n:position} : mate mon roi. Attention au pat.
+ch.intro.kr = Tour et roi contre roi. {n:position} : mate mon roi, pas à pas.
+ch.intro.kp = Roi et pion contre roi. {n:position} : va à dame. C’est ton roi qui ouvre la voie.
+ch.intro.kp_hold = Arrête le pion. {n:position} : tu n’as que ton roi. Tiens la nulle.
+ch.intro.rook = Les finales de tours. {n:position} : construis le pont pour aller à dame, et tiens la nulle avec la défense Philidor.
+ch.intro.endgame = La tactique en finale. {n:position} avec peu de pièces et des idées tranchantes.
+
+# ---- At each position: the task --------------------------------------------------------------------
+# A line that ends in checkmate: {n} = the player's moves to the mate ({n:move}: "2 coups").
+ch.task.mate = Mat en {n:move}.
+ch.task.mate.2 = Trouve le mat en {n:move}.
+ch.task.hanging = Quelque chose est sans protection.
+ch.task.hanging.2 = Qu’est-ce que tu peux prendre gratuitement ?
+ch.task.fork = Trouve la fourchette.
+ch.task.fork.2 = Cherche une fourchette.
+ch.task.pin = Ici, la clé, c’est un clouage.
+ch.task.skewer = Ici, une enfilade gagne.
+ch.task.discovered = Ici, une attaque à la découverte gagne.
+ch.task.deflection = Surcharge un défenseur, ou attire-le.
+ch.task.intermezzo = Cherche un coup intermédiaire.
+ch.task.trapped = Une de mes pièces ne peut pas s’échapper. Gagne-la.
+ch.task.promotion = Utilise ton pion avancé.
+ch.task.quiet = Le coup gagnant est un coup tranquille.
+ch.task.opening = Punis mon dernier coup.
+ch.task.escape = Sauve ton roi : un seul coup marche.
+ch.task.defend = Trouve le seul bon coup.
+ch.task.endgame = Trouve le meilleur coup.
+ch.task.default = Trouve le meilleur coup.
+# The endgames played out: the coach defends, or tries to win, with its best moves.
+ch.task.play.mate = Mate mon roi. Je vais me défendre de mon mieux.
+ch.task.play.promote = Mène ton pion à dame, et garde la victoire. Je vais essayer de t’en empêcher.
+ch.task.play.hold = Tiens la nulle pendant {n:move}. Je vais essayer de gagner.
+
+# ---- Setting up ----------------------------------------------------------------------------------
+# Before the coach plays the first move into a position (once per challenge).
+ch.lead.first = Ces positions viennent de vraies parties. Je joue le dernier coup, puis c’est à toi.
+ch.lead.first.2 = Chaque position vient d’une vraie partie : je joue le coup qui y a mené, puis tu joues.
+ch.next = Position suivante.
+ch.next.2 = Voici la suivante.
+ch.next.3 = Passons à la suivante.
+ch.last = La dernière position.
+ch.last.2 = Et maintenant, la dernière.
+
+# ---- The player's move -----------------------------------------------------------------------------
+# A right move in the middle of a line (the coach then answers it).
+ch.good = Bien.
+ch.good.2 = Oui.
+ch.good.3 = C’est ça.
+ch.good.4 = Exactement.
+# The position is solved.
+ch.solved = Voilà ! Bien joué.
+ch.solved.2 = C’est exactement ça.
+ch.solved.3 = Très bien.
+ch.solved.mate = Échec et mat ! Bien joué.
+ch.solved.mate.2 = Et c’est mat. Très bien.
+ch.solved.mate.3 = Échec et mat. Joliment joué.
+ch.solved.promote = Une nouvelle dame, et la victoire est assurée. Bien joué.
+ch.solved.hold = La nulle tient. Bien défendu !
+ch.solved.draw = La partie est nulle. Bien défendu !
+# A wrong move: the coach plays its answer {move} while saying the line, then takes both back.
+ch.wrong.reply = Pas celui-ci : je répondrais {move}.
+ch.wrong.reply.2 = Pas tout à fait : je jouerais {move}.
+ch.wrong.reply.3 = Je jouerais alors {move}.
+ch.wrong.mate = Attention : {move:nomate} serait échec et mat.
+ch.wrong.mate.2 = Prudence : je répondrais {move:nomate}, et c’est mat.
+# A move that still mates, but in more moves than the position asks.
+ch.wrong.slower = Ça mate aussi, mais c’est plus long. Il y a plus rapide.
+# A move that mates just as fast, but is not the solution the coach answers.
+ch.wrong.other = Ça mate aussi, mais j’ai un autre coup en tête. Regarde encore.
+# A move that keeps an advantage, but less than the solution.
+ch.wrong.weaker = Pas mal, mais il y a plus fort. Regarde encore.
+ch.wrong.weaker.2 = C’est jouable, mais tu peux faire mieux.
+ch.wrong.stalemate = Pat ! Mon roi ne peut pas bouger, et ce n’est qu’une partie nulle.
+# Play-outs: the win slips away (the coach would hold), or the draw is lost (the coach would win).
+ch.wrong.draw = Pas celui-ci : après {move}, je tiens la nulle.
+ch.wrong.loses = Attention : après {move}, je gagnerais.
+# No answer from the engine: the move is simply not the one.
+ch.wrong.plain = Ce n’est pas ça.
+ch.try_again = Essaie encore.
+ch.try_again.2 = Regarde encore une fois.
+ch.try_again.3 = Cherche encore.
+
+# ---- Hints (only when the player asks for one, or accepts the coach's offer) ------------------------
+ch.offer = Tu veux un indice ?
+ch.offer.2 = Je te donne un indice ?
+ch.no_hint = D’accord. Continue à chercher.
+ch.no_hint.2 = Très bien, prends ton temps.
+ch.hint.piece = Regarde {your}.
+ch.hint.piece.2 = Pense à {your}.
+ch.hint.square = Regarde la case {sq}.
+ch.hint.square.2 = La case clé, c’est {sq}.
+ch.hint.square.3 = Garde un œil sur la case {sq}.
+ch.hint.show = Voici le coup. Regarde.
+ch.hint.show.2 = Je te montre. Regarde.
+ch.hint.now = À toi de le jouer.
+ch.hint.now.2 = À ton tour : joue-le.
+
+# ---- The end -----------------------------------------------------------------------------------------
+ch.complete = Le défi est terminé. Bravo !
+ch.complete.2 = Toutes les positions sont résolues. Bravo !

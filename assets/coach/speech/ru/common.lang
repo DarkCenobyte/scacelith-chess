@@ -281,6 +281,7 @@ number.decimal.spoken = {int} {frac}
 # case ("после трёх ходов", "одну ошибку") will need its own count key (count.<noun>_gen ...), with
 # number words in that case. Feminine nouns say their number with the form "f", neuter ones with "neut".
 count.move = {n} ход|{n} хода|{n} ходов
+count.position = {n:f} позиция|{n:f} позиции|{n:f} позиций
 count.point = {n:neut} очко|{n:neut} очка|{n:neut} очков
 count.pawn = {n:f} пешка|{n:f} пешки|{n:f} пешек
 count.piece = {n:f} фигура|{n:f} фигуры|{n:f} фигур
