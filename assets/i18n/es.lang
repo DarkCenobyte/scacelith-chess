@@ -1064,7 +1064,6 @@ options.voice_update.running = La descarga está en curso.
 options.voice_quality = Calidad de la voz
 options.voice_quality.help = Número de pasos de refinado de la síntesis de voz del entrenador para cada frase (de 4 a 10; 5 por defecto). Más pasos dan una voz algo más limpia, pero requieren más cálculo: el entrenador empieza a hablar un poco más tarde. Menos pasos son más rápidos.
 options.voice_quality.steps = {0} paso|{0} pasos
-options.voice_quality.default = {0} (por defecto)
 # The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = La voz del entrenador
 coach.download.text = El entrenador habla con Supertonic 3, un modelo de síntesis de voz de Supertone. No se incluye con Scacelith: el juego puede descargarlo ahora desde Hugging Face ({0} MB, una sola vez). Sin él, el entrenador escribe sus palabras en pantalla.

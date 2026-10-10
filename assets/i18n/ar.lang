@@ -1069,7 +1069,6 @@ options.voice_update.running = التنزيل جارٍ.
 options.voice_quality = جودة الصوت
 options.voice_quality.help = عدد خطوات التحسين في توليد كلام المدرّب لكل جملة (من 4 إلى 10، والقيمة الافتراضية 5). تمنح الخطوات الأكثر صوتًا أنقى قليلًا لكنها تتطلب حسابًا أطول، فيبدأ المدرّب الكلام متأخرًا قليلًا؛ والخطوات الأقل أسرع.
 options.voice_quality.steps = {0} خطوة|خطوة واحدة|خطوتان|{0} خطوات|{0} خطوة|{0} خطوة
-options.voice_quality.default = {0} (افتراضي)
 # The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = صوت المدرّب
 coach.download.text = يتحدث المدرّب بواسطة Supertonic 3، وهو نموذج لتوليد الكلام من شركة Supertone. هذا النموذج غير مضمَّن في Scacelith: يمكن للعبة تنزيله الآن من Hugging Face ({0} ميغابايت، مرة واحدة). ومن دونه يكتب المدرّب كلماته على الشاشة.

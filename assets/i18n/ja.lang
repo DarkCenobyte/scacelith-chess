@@ -1065,7 +1065,6 @@ options.voice_update.running = ダウンロード中です。
 options.voice_quality = 音声の品質
 options.voice_quality.help = コーチの音声合成で一文ごとに行う精緻化のステップ数です（4～10、既定は5）。ステップを増やすと声が少しきれいになりますが、計算に時間がかかるため、コーチが話し始めるのが少し遅くなります。減らすと速くなります。
 options.voice_quality.steps = {0}ステップ
-options.voice_quality.default = {0}（既定）
 # The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = コーチの音声
 coach.download.text = コーチは Supertone 社の音声合成モデル Supertonic 3 で話します。このモデルは Scacelith に含まれていませんが、今すぐ Hugging Face からダウンロードできます（{0} MB、1 回のみ）。モデルがない場合、コーチは言葉を画面に表示します。

@@ -1064,7 +1064,6 @@ options.voice_update.running = 正在下载。
 options.voice_quality = 语音质量
 options.voice_quality.help = 教练的语音合成为每句话进行的细化步数（4 到 10，默认 5）。步数越多，声音略微更清晰，但计算时间更长，教练开口会稍晚一些；步数越少则越快。
 options.voice_quality.steps = {0} 步
-options.voice_quality.default = {0}（默认）
 # The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = 教练语音
 coach.download.text = 教练使用 Supertone 公司的语音合成模型 Supertonic 3 说话。Scacelith 未附带该模型：游戏现在可以从 Hugging Face 下载它（{0} MB，仅需一次）。没有它，教练会把要说的话以文字显示在屏幕上。

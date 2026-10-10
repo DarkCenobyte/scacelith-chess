@@ -1065,7 +1065,6 @@ options.voice_update.running = Идёт скачивание.
 options.voice_quality = Качество голоса
 options.voice_quality.help = Число шагов уточнения при синтезе речи тренера для каждой фразы (от 4 до 10; по умолчанию 5). Больше шагов дают чуть более чистый голос, но требуют больше вычислений: тренер начинает говорить немного позже. Меньше шагов работают быстрее.
 options.voice_quality.steps = {0} шаг|{0} шага|{0} шагов
-options.voice_quality.default = {0} (по умолчанию)
 # The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = Голос тренера
 coach.download.text = Тренер говорит с помощью Supertonic 3 — модели синтеза речи от Supertone. Она не входит в состав Scacelith: игра может скачать её сейчас с Hugging Face ({0} МБ, один раз). Без неё тренер пишет свои слова на экране.

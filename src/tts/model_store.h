@@ -132,7 +132,7 @@ struct DownloadProgress {
     int fetched = 0;              // Done: the files the job wrote (0 = every file was already there and right)
     bool removedLegacy = false;   // the job deleted the old INT8 model first
     std::string firstSourceError; // why the first source was given up ("" = it was not)
-    // Failed: a short code ("network", "timeout", "http", "hash", "size", "io", "verify",
+    // Failed: a short code ("network", "timeout", "http <status>", "hash", "size", "io", "verify",
     // "unavailable", ...) and a detail for the log.
     std::string error, detail;
     bool finished() const { return phase == Phase::Done || phase == Phase::Failed || phase == Phase::Cancelled; }

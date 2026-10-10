@@ -535,18 +535,18 @@ bool optionsPage(MenuAction& act) {
                 else if (im::button(label + "##options.voice_update", b, im::ButtonKind::Secondary))
                     detail::openVoiceUpdate();
             }
-            // Voice quality: the flow-matching steps of each line (more: a cleaner voice, later). A
-            // selector, as its values ("5 steps (default)") are wider than a stepper's.
+            // Voice quality: the flow-matching steps of each line (more: a cleaner voice, later), on
+            // a slider of whole steps; its help gives the default.
             {
                 using game::Settings;
-                std::vector<std::string> steps;
-                for (int n = Settings::kTtsStepsMin; n <= Settings::kTtsStepsMax; ++n) {
-                    std::string t = i18n::trn("options.voice_quality.steps", n, {std::to_string(n)});
-                    steps.push_back(n == Settings::kTtsStepsDefault ? i18n::trf("options.voice_quality.default", {t}) : t);
-                }
-                int si = std::clamp(s.ttsSteps, Settings::kTtsStepsMin, Settings::kTtsStepsMax) - Settings::kTtsStepsMin;
-                if (im::selectorRow(L("options.voice_quality"), si, steps, row(), s.coachVoice))
-                    s.ttsSteps = Settings::kTtsStepsMin + si;
+                float steps = float(std::clamp(s.ttsSteps, Settings::kTtsStepsMin, Settings::kTtsStepsMax));
+                auto stepsText = [](float v) {
+                    const int n = int(std::lround(v));
+                    return i18n::trn("options.voice_quality.steps", n, {std::to_string(n)});
+                };
+                if (im::sliderRow(L("options.voice_quality"), steps, float(Settings::kTtsStepsMin), float(Settings::kTtsStepsMax),
+                                  1.0f, stepsText, row(), s.coachVoice))
+                    s.ttsSteps = int(std::lround(steps));
                 im::tooltip(T("options.voice_quality.help"));
             }
             im::sliderRow(L("options.voice_volume"), s.voiceVolume, 0.0f, 1.0f, 0.05f, pct, row(), s.coachVoice);
