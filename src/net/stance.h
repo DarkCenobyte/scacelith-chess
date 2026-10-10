@@ -32,14 +32,10 @@ constexpr int kStanceMinIntervalMs = 250;   // between two Stance messages of a 
 class StanceSender {
 public:
     // The player's stance in game 'game' (net::proto::Stance values, those of anim::Stance; a
-    // value this codec cannot send counts as Seated). Another game starts again from Seated, as
-    // its receiver does.
+    // value this codec cannot send counts as Seated). The receiver of a game nothing was sent for
+    // yet shows the player seated, as at the start of every game.
     void set(uint64_t game, int stance) {
-        if (game != game_) {
-            game_ = game;
-            heard_ = kSeated;
-            sentAt_ = -HUGE_VAL;
-        }
+        game_ = game;
         stance_ = stance >= 0 && stance <= 255 && proto::isValid(proto::Stance(stance)) ? uint8_t(stance) : kSeated;
     }
     // A new link: its receiver shows the player seated.
@@ -53,12 +49,13 @@ public:
     // When due() becomes true if nothing changes (HUGE_VAL: never; earlier than now: now).
     double nextAtMs(int keepaliveMs) const {
         if (game_ == 0) return HUGE_VAL;
-        if (stance_ != heard_) return sentAt_ + kStanceMinIntervalMs;
+        if (stance_ != heard()) return sentAt_ + kStanceMinIntervalMs;
         if (stance_ != kSeated) return sentAt_ + gestureKeepaliveMs(keepaliveMs);
         return HUGE_VAL;
     }
     // The current stance went at 'nowMs'.
     void sent(double nowMs) {
+        heardGame_ = game_;
         heard_ = stance_;
         sentAt_ = nowMs;
     }
@@ -69,8 +66,12 @@ private:
     static constexpr uint8_t kSeated = uint8_t(proto::Stance::Seated);
     uint64_t game_ = 0;
     uint8_t stance_ = kSeated;
-    uint8_t heard_ = kSeated;         // what the receiver shows (the last sent, Seated on a new link)
-    double sentAt_ = -HUGE_VAL;       // when the last one went
+    // What the receiver shows: the last stance sent (in heardGame_; Seated on a new link), and
+    // Seated for any other game.
+    uint64_t heardGame_ = 0;
+    uint8_t heard_ = kSeated;
+    double sentAt_ = -HUGE_VAL;       // when the last one went (whatever its game)
+    uint8_t heard() const { return game_ == heardGame_ ? heard_ : kSeated; }
 };
 
 }  // namespace net

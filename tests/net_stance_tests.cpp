@@ -164,18 +164,26 @@ TEST(net_stance_sender_new_link_and_new_game) {
     CHECK(!s.due(600.0, kKeepalive));
     CHECK(s.nextAtMs(kKeepalive) == HUGE_VAL);
 
-    // Another game starts from Seated on both sides: a standing stance goes at once; one sent
-    // in the previous game never counts for the new one.
+    // Another game starts from Seated on both sides: a standing stance goes as a change (paced
+    // like any); one sent in the previous game never counts for the new one.
     s.set(5, 1);
     s.sent(1000.0);
     s.set(6, 1);
     CHECK_EQ(s.game(), uint64_t(6));
-    CHECK(s.due(1001.0, kKeepalive));
-    s.sent(1001.0);
+    CHECK(!s.due(1100.0, kKeepalive));
+    CHECK(s.due(1250.0, kKeepalive));
+    s.sent(1250.0);
     s.set(7, 0);
     CHECK(!s.due(5000.0, kKeepalive));
     // Game 0 (no game shown): never.
     s.set(0, 1);
     CHECK(!s.due(9000.0, kKeepalive));
     CHECK(s.nextAtMs(kKeepalive) == HUGE_VAL);
+    // Back to a game the receiver heard last: what it shows still counts (nothing went for the
+    // other game meanwhile), so Seated goes and Standing again would be no news.
+    s.set(6, 1);
+    CHECK(!s.due(1500.0, kKeepalive));
+    CHECK(s.due(2250.0, kKeepalive));   // the refresh
+    s.set(6, 0);
+    CHECK(s.due(1500.0, kKeepalive));
 }
