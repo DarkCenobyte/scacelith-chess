@@ -162,18 +162,24 @@ your colour (White, Black, or alternating from one game to the next); the choice
 
 The coach speaks with a voice synthesised on your computer (Supertonic 3). Its model is not part of
 the game: the first time you open the Coach page (or switch Options > Audio > Coach voice on), the
-game offers to download it, about 145 MB, from Hugging Face (or, if that fails, from the sherpa-onnx
-release on GitHub), into the game's folder of application data: `%APPDATA%\scacelith\coach\` on
-Windows, `$XDG_DATA_HOME/scacelith/coach/` (by default `~/.local/share/scacelith/coach/`) on Linux.
+game offers to download it (Supertone's official release, about 399 MB) from Supertone's repository
+on Hugging Face (or, if that fails, from Supertone's archive copy there) into the game's folder of
+application data: `%APPDATA%\scacelith\coach\` on Windows, `$XDG_DATA_HOME/scacelith/coach/` (by
+default `~/.local/share/scacelith/coach/`) on Linux.
 The prompt shows the model's licence (OpenRAIL-M) and its use restrictions; "Not now" switches the
 coach's voice off. A small panel in the corner shows the download while you keep playing, and an
-interrupted download continues where it stopped. Without the model, with Coach voice off, or
-without a sound device, the coach speaks through subtitles only. Options > Audio > Subtitles shows
+interrupted download continues where it stopped. If you have the 8-bit version of the model that
+earlier versions of the game downloaded, the coach keeps speaking with it: the game offers the
+official version once at start-up, and later from the Voice model row of Options > Audio (the old
+files are deleted first). Without the model, with Coach voice off, or without a sound device, the
+coach speaks through subtitles only. Options > Audio > Subtitles shows
 its words at the bottom of the screen (Automatic: when it does not speak the language of the menus,
 as with Chinese menus where it speaks English), and Options > Audio > Voice volume sets its volume.
-`[tts]` in the settings file tunes the synthesis: `threads` (0 = 2), `voice` (-1 = the default
-voice), `steps` (5) and `arch` (`auto`, or `avx512`, `avxvnni`, `avx2`, `sse2`, `scalar` when
-troubleshooting).
+Options > Audio > Voice quality sets how many refinement steps each line takes, from 4 to 9 (5 by
+default): more steps give a slightly cleaner voice and take longer to compute, so the coach starts
+each line a little later. `[tts]` in the settings file tunes the synthesis: `threads` (0 = 2),
+`voice` (-1 = the default voice), `steps` (the voice quality) and `arch` (`auto`, or `avx512`,
+`avxvnni`, `avx2`, `sse2`, `scalar` when troubleshooting).
 
 ## Watch a Game
 
@@ -358,11 +364,12 @@ MinGW-w64 (native or cross-compiled from Linux) and is a single self-contained e
 instruction set, from plain x86-64 to AVX-512, and the game runs the best one the CPU supports;
 `-DSCACELITH_SF_VARIANTS=x86-64-avx2` (or another variant the CPU runs) builds a single one, for
 quicker local builds (see `third_party/stockfish/README.scacelith.md`). The first configure also
-downloads the coach's voice model archive (129 MB, from the sherpa-onnx release on GitHub) into
-the build folder, for the unit tests and `--coach-dir build/coach`:
-`-DSCACELITH_SUPERTONIC_DIR=<extracted folder>` or `-DSCACELITH_SUPERTONIC_ARCHIVE=<.tar.bz2>`
-take a local copy instead, and `-DSCACELITH_SUPERTONIC_DOWNLOAD=OFF` does without it (the tests
-that need the model are then skipped; see `third_party/supertonic3/README.scacelith.md`).
+downloads the coach's voice model (seven files, 399 MB, from Supertone's repository on Hugging
+Face) into the build folder, for the unit tests and `--coach-dir build/coach`:
+`-DSCACELITH_SUPERTONIC_DIR=<folder>` takes a local copy instead (a copy of the repository, with
+`onnx/` and `voice_styles/`, or a folder holding the seven files), and
+`-DSCACELITH_SUPERTONIC_DOWNLOAD=OFF` does without it (the tests that need the model are then
+skipped; see `third_party/supertonic3/README.scacelith.md`).
 
 ```sh
 # Windows x64 (cross-compiled from Linux)
@@ -419,9 +426,11 @@ Coach mode: `--start --coach` starts a coach game at once, at the level and colo
 page unless `--coach-level 0..6` (0 = the rules lesson) or `--coach-colour white|black` say
 otherwise; `--coach-dir <folder>` reads (and downloads) the voice model files in that folder instead
 of the default one (`--coach-dir build/coach`: the copy a development build prepares).
-`SCACELITH_COACH_SOURCE=github` in the environment skips Hugging Face (to try the fallback), and
-`--scene ui --ui-screen coach-flow [--coach-dir <folder>]` runs the download flow over the title
-page (`coach-download*` screens: the prompt and the panel with sample figures).
+`SCACELITH_COACH_SOURCE=archive` in the environment skips Supertone's repository (Supertone's
+archive copy only, to try the fallback), `SCACELITH_COACH_SOURCE=official` never falls back to the
+archive copy, and `--scene ui --ui-screen coach-flow [--coach-dir <folder>]` runs the download flow
+over the title page (`coach-download*` screens: the prompt, its update form and the panel with
+sample figures; `options-voice-update`: the update row of Options > Audio).
 `--coach-stage-test` (alone, or with `--start`) runs a fixed sequence through the scene's coach
 stage without the session: a line spoken and subtitled, the coach pointing at g1 and
 tracing the knight's jump to f3 on their words, a mark and a highlight, two demonstration moves
@@ -558,8 +567,6 @@ These parts of the game's own code follow published code closely:
 - Audio queue (`src/audio/queue.h`): Dmitry Vyukov's bounded MPMC queue
   ([1024cores.net](https://www.1024cores.net/home/lock-free-algorithms/queues/bounded-mpmc-queue)),
   simplified BSD licence, © 2010-2011 Dmitry Vyukov.
-- Huffman decoding tables of the bzip2 reader (`src/core/bzip2.cpp`):
-  [bzip2](https://sourceware.org/bzip2/), bzip2 licence, © 1996-2019 Julian Seward.
 
 ### Used from the system, not shipped
 
@@ -571,6 +578,7 @@ present, with GLib); on Windows, the system's DLLs.
 ### Downloaded at the player's request
 
 The coach's voice model (Supertonic 3) is not part of the program nor of its release package: the
-game downloads it from its publishers at the player's request. It has its own licence (BigScience
-Open RAIL-M), whose use restrictions the download prompt shows; see
+game downloads Supertone's official, unmodified files from Supertone's repositories on Hugging Face
+at the player's request. It has its own licence (BigScience Open RAIL-M), whose use restrictions
+the download prompt shows; see
 `third_party/supertonic3/README.scacelith.md`.

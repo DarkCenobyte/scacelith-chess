@@ -27,6 +27,9 @@ void screensReset();
 // ui::beginFrame, and the title page's Coach entry (setCoachEntryHook).
 void modelDownloadBeginFrame();
 void coachEntryOpened();
+// Options > Audio: the voice model's update row (setVoiceUpdateHooks).
+VoiceUpdateRow voiceUpdateRow();
+void openVoiceUpdate();
 
 // Small helpers of the table and menu files (ui_coach, ui_hotseat, ui_model_download,
 // ui_online_hud, ui_screens_game), which take them with 'using namespace detail::helpers'. A

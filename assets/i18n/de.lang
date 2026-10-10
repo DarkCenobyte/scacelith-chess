@@ -1056,8 +1056,15 @@ coach.lesson.next = Erste Partie
 # Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
 # Options > Audio
 options.coach_voice = Stimme des Trainers
-options.coach_voice.help = Der Trainer spricht im Trainer-Modus laut. Sein Stimmmodell wird heruntergeladen, wenn es zum ersten Mal gebraucht wird (etwa 145 MB). Aus: Die Worte des Trainers werden nur auf dem Bildschirm angezeigt.
-# The prompt. {0} = the size in megabytes ("145.3")
+options.coach_voice.help = Der Trainer spricht im Trainer-Modus laut. Sein Stimmmodell wird heruntergeladen, wenn es zum ersten Mal gebraucht wird (etwa 399 MB). Aus: Die Worte des Trainers werden nur auf dem Bildschirm angezeigt.
+options.voice_update = Stimmmodell
+options.voice_update.help = Der Trainer spricht noch mit der alten 8-Bit-Version seines Stimmmodells. Die Aktualisierung lädt die offizielle Version von Supertonic 3 herunter, veröffentlicht von Supertone, und löscht zuerst die alten Dateien.
+options.voice_update.button = Aktualisieren ({0} MB)
+options.voice_update.running = Der Download läuft.
+options.voice_quality = Stimmqualität
+options.voice_quality.help = Anzahl der Verfeinerungsschritte der Sprachsynthese des Trainers für jeden Satz (4 bis 9; standardmäßig 5). Mehr Schritte ergeben eine etwas sauberere Stimme, brauchen aber mehr Rechenzeit: Der Trainer beginnt etwas später zu sprechen. Weniger Schritte sind schneller.
+options.voice_quality.steps = {0} Schritt|{0} Schritte
+# The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = Die Stimme des Trainers
 coach.download.text = Der Trainer spricht mit Supertonic 3, einem Sprachsynthesemodell von Supertone. Es ist nicht in Scacelith enthalten: Das Spiel kann es jetzt von Hugging Face herunterladen ({0} MB, einmalig). Ohne das Modell schreibt der Trainer seine Worte auf den Bildschirm.
 coach.download.licence = Das Modell ist unter der Lizenz OpenRAIL-M veröffentlicht, die bestimmte Verwendungen der erzeugten Stimme verbietet, etwa sie als menschliche Stimme auszugeben oder eine reale Person nachzuahmen.
@@ -1070,16 +1077,20 @@ coach.download.not_now = Nicht jetzt
 coach.download.download = Herunterladen ({0} MB)
 coach.download.licence_title = LIZENZ OPENRAIL-M
 coach.download.back = Zurück
+coach.update.title = Eine neue Stimme für den Trainer
+coach.update.text = Die Stimme des Trainers verwendet jetzt die offizielle Version von Supertonic 3, veröffentlicht von Supertone, anstelle der bisher installierten 8-Bit-Umwandlung. Das Spiel kann sie jetzt von Hugging Face herunterladen ({0} MB, einmalig); die alten Dateien ({1} MB) werden zuerst gelöscht. Wenn Sie ablehnen, behält der Trainer seine bisherige Stimme, und die Aktualisierung bleibt unter Optionen > Ton verfügbar.
+coach.update.download = Aktualisieren ({0} MB)
+coach.update.accept = Wenn Sie „Aktualisieren“ wählen, akzeptieren Sie die Bedingungen dieser Lizenz.
 # Progress panel (top corner, over the menus and the game)
 coach.download.caption = DIE STIMME DES TRAINERS
+coach.download.removing = Alte Version wird gelöscht…
 coach.download.checking = Dateien werden geprüft…
 coach.download.downloading = Wird heruntergeladen…
-coach.download.extracting = Dateien werden entpackt…
 # {0} = megabytes received, {1} = megabytes in all
 coach.download.megabytes = {0} / {1} MB
 # Where the files come from (the repository's address is shown under it)
 coach.download.from_hub = Von Hugging Face
-coach.download.from_github = Von GitHub (Release-Archiv)
+coach.download.from_archive = Von Hugging Face (Archivkopie)
 coach.download.cancel = Abbrechen
 coach.download.failed = Der Download ist fehlgeschlagen.
 coach.download.error.network = Die Server sind nicht erreichbar. Bitte prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.

@@ -15,6 +15,17 @@
 // "Not now" (or Esc) switches [coach] voice off and saves: the coach speaks through subtitles,
 // and is not offered the download again until the player switches the voice back on.
 //
+// The old INT8 model (tts::legacyManifest(), downloaded by earlier versions) still speaks, and its
+// update to the official Supertonic 3 is offered:
+//   - once at start-up (Settings::coachVoiceUpdateOffered), after a background check that its
+//     files are there and hash right; the prompt then says that the new version replaces it, its
+//     size, and that the old files are deleted first;
+//   - from then on by a row of Options > Audio, under Coach voice, which opens the same prompt.
+// "Not now" there keeps the old voice. Any download into a folder that holds old files (the
+// update, or a plain download after the old files failed to load) shows the update form of the
+// prompt; the job deletes the old files before it fetches the new ones, once the scene has let
+// them go (setVoiceReleaseHook: a TTS worker maps them).
+//
 // Integration, for a scene that shows the menus and Coach mode (GameScene):
 //   1. Once, after the Settings are loaded and --coach-dir applied (tts::setModelDirectory):
 //          game::coachModelInit();
@@ -35,14 +46,19 @@
 //          game::coachModelLoadFailed();
 //      The download it offers checks every file; when it replaced some, the worker gets one more
 //      try (step 2).
-//   5. On exit (GameScene::shutdown; the ui viewer's coach-flow screen likewise):
+//   5. Once, where the scene owns the TTS worker: a hook that stops it (and lets its model files
+//      go) before a download deletes the old model's files:
+//          game::setVoiceReleaseHook([this] { stop the worker; });
+//      The next coach line starts a new worker, with the new files.
+//   6. On exit (GameScene::shutdown; the ui viewer's coach-flow screen likewise):
 //          game::coachModelShutdown();
 //      The download stops; its .part files stay and the next download continues them.
-// Testing aid: the environment variable SCACELITH_COACH_SOURCE=github skips Hugging Face (the
-// fallback path), =hub never falls back to the GitHub archive. The ui viewer's "coach-flow"
-// screen runs all this over the title page (scacelith --scene ui --ui-screen coach-flow
-// [--coach-dir <folder>]).
+// Testing aid: the environment variable SCACELITH_COACH_SOURCE=archive skips Supertone's
+// repository (Supertone's archive copy only, the fallback path), =official never falls back to the
+// archive copy. The ui viewer's "coach-flow" screen runs all this over the title page
+// (scacelith --scene ui --ui-screen coach-flow [--coach-dir <folder>]).
 #pragma once
+#include <functional>
 
 namespace game {
 
@@ -77,5 +93,13 @@ bool coachVoiceWanted();
 void coachModelLoadFailed();
 // Cancels and joins a running download.
 void coachModelShutdown();
+// Stops whatever maps the voice model's files (the scene's TTS worker), synchronously; called before
+// a download deletes the old model's files. nullptr = nothing to stop.
+void setVoiceReleaseHook(std::function<void()> hook);
+// The old INT8 model is installed (every file with its size) and the official one is not: the
+// update can be offered (the Options row shows).
+bool coachModelUpdateAvailable();
+// Opens the prompt in its update form (the Options row's button).
+void openModelUpdatePrompt();
 
 }  // namespace game

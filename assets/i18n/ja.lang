@@ -1057,8 +1057,15 @@ coach.lesson.next = 最初の対局
 # Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
 # Options > Audio
 options.coach_voice = コーチの音声
-options.coach_voice.help = コーチモードでコーチが声に出して話します。音声モデルは初めて必要になったときにダウンロードされます（約 145 MB）。オフ：コーチの言葉は画面に表示されるだけです。
-# The prompt. {0} = the size in megabytes ("145.3")
+options.coach_voice.help = コーチモードでコーチが声に出して話します。音声モデルは初めて必要になったときにダウンロードされます（約 399 MB）。オフ：コーチの言葉は画面に表示されるだけです。
+options.voice_update = 音声モデル
+options.voice_update.help = コーチはまだ古い 8 ビット版の音声モデルで話しています。更新すると、Supertone 社が公開している Supertonic 3 の公式版をダウンロードし、先に古いファイルを削除します。
+options.voice_update.button = 更新（{0} MB）
+options.voice_update.running = ダウンロード中です。
+options.voice_quality = 音声の品質
+options.voice_quality.help = コーチの音声合成で一文ごとに行う精緻化のステップ数です（4～9、既定は5）。ステップを増やすと声が少しきれいになりますが、計算に時間がかかるため、コーチが話し始めるのが少し遅くなります。減らすと速くなります。
+options.voice_quality.steps = {0}ステップ
+# The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = コーチの音声
 coach.download.text = コーチは Supertone 社の音声合成モデル Supertonic 3 で話します。このモデルは Scacelith に含まれていませんが、今すぐ Hugging Face からダウンロードできます（{0} MB、1 回のみ）。モデルがない場合、コーチは言葉を画面に表示します。
 coach.download.licence = このモデルは OpenRAIL-M ライセンスで公開されており、生成した音声を人間の声として示すことや、実在の人物をまねることなど、一部の使い方が禁止されています。
@@ -1071,16 +1078,20 @@ coach.download.not_now = 今はしない
 coach.download.download = ダウンロード（{0} MB）
 coach.download.licence_title = OpenRAIL-M ライセンス
 coach.download.back = 戻る
+coach.update.title = コーチの新しい声
+coach.update.text = コーチの音声は、これまでインストールされていた 8 ビット変換版に代わり、Supertone 社が公開している Supertonic 3 の公式版を使うようになりました。今すぐ Hugging Face からダウンロードできます（{0} MB、1 回のみ）。古いファイル（{1} MB）は先に削除されます。断った場合、コーチは今の声のままで、更新は「設定 > サウンド」からいつでも行えます。
+coach.update.download = 更新（{0} MB）
+coach.update.accept = 「更新」を選ぶと、このライセンスの条件に同意したことになります。
 # Progress panel (top corner, over the menus and the game)
 coach.download.caption = コーチの音声
+coach.download.removing = 古いバージョンを削除しています…
 coach.download.checking = ファイルを確認しています…
 coach.download.downloading = ダウンロードしています…
-coach.download.extracting = ファイルを展開しています…
 # {0} = megabytes received, {1} = megabytes in all
 coach.download.megabytes = {0} / {1} MB
 # Where the files come from (the repository's address is shown under it)
 coach.download.from_hub = Hugging Face から
-coach.download.from_github = GitHub から（リリースのアーカイブ）
+coach.download.from_archive = Hugging Face から（アーカイブのコピー）
 coach.download.cancel = キャンセル
 coach.download.failed = ダウンロードに失敗しました。
 coach.download.error.network = サーバーに接続できません。インターネット接続を確認して、もう一度お試しください。

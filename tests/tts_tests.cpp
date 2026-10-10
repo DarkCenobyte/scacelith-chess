@@ -1788,9 +1788,13 @@ TEST(tts_language_support) {
 // ------------------------------------------------------------------------------------------------
 namespace {
 
-// Vocoder against onnxruntime's optimised run from the same latent. For scale: onnxruntime without
-// its graph optimisations is 26.3 dB from it (8-bit activations: one rounding flip propagates).
-constexpr double VOCODER_MIN_SNR = 20.0;
+// The stages against onnxruntime's run of the official fp32 graphs (tests/data/tts/ref_en.bin,
+// tools/tts_reference.py). Only the order of the sums differs (the kernels' blocking, FMA): every
+// kernel set is above 100 dB on the vocoder and above 115 dB on an Euler step; the margins below
+// leave room for other compilers and CPUs. (The old INT8 model was far looser: its 8-bit
+// activations made one rounding flip propagate, 26 dB between onnxruntime's own two modes.)
+constexpr double VOCODER_MIN_SNR = 70.0;
+constexpr double STEP_MIN_SNR = 80.0;
 
 struct StageFixture {
     tts::Synthesizer* s = nullptr;
@@ -1804,7 +1808,10 @@ struct StageFixture {
         if (!s) return "no model files in " + modelDir();
         if (!loadDump("tests/data/tts/ref_en.bin", ref)) return "tests/data/tts/ref_en.bin not found";
         ids = ref["text_ids"].toInts();
-        voice = int(ref["voice"].toInts()[0]);
+        std::string name;   // the reference's voice, by name (the official model holds M3 only)
+        for (int64_t c : ref["voice"].toInts()) name += char(c);
+        voice = s->engine()->voiceIndex(name);
+        if (voice < 0) return "the reference voice " + name + " is not in the model";
         steps = int(ref["steps"].toInts()[0]);
         ctx.k = &K();
         return std::string();
@@ -1813,40 +1820,174 @@ struct StageFixture {
 
 }  // namespace
 
-// voice.bin: the voice count must be the one its size gives. A crafted count whose product with
-// the per-voice size only matches modulo 2^64 is refused before any style is read.
-TEST(tts_voice_file_header) {
-    std::string dir = net::sys::exeDirectory() + "ttstest-voices/";
-    CHECK(net::sys::makeDirectories(dir));
-    auto write = [&](const char* name, const std::string& data) {
-        std::FILE* f = net::sys::openFile(dir + name, "wb");
-        bool ok = f && std::fwrite(data.data(), 1, data.size(), f) == data.size();
-        if (f) std::fclose(f);
-        return ok;
-    };
-    for (int i = 0; i < tts::kFileCount; ++i) CHECK(write(tts::Engine::kFiles[i], "x"));   // not a model
-    CHECK(write(tts::Engine::kFiles[tts::kFileIndexer], std::string(65536 * 4, '\0')));
-    // 101 * inv == 1 (mod 2^55), so inv * 4 * (50 * 256 + 8 * 16) == 512 (mod 2^64): 48 + 512 bytes.
+namespace {
+
+// A voice style document in the official layout: style_ttl [1, 50, 256] as one nested row per
+// leading index (as the release writes it), style_dp [1, 8, 16], value i = base + i / 1024.
+std::string voiceJson(float base, int ttlValues = 50 * 256, const char* ttlDims = "[1, 50, 256]") {
+    std::string s = "{\"style_ttl\": {\"data\": [[";
+    for (int r = 0; r * 256 < ttlValues; ++r) {
+        s += r ? ", [" : "[";
+        for (int c = 0; c < 256 && r * 256 + c < ttlValues; ++c)
+            s += (c ? ", " : "") + std::to_string(base + float(r * 256 + c) / 1024.0f);
+        s += "]";
+    }
+    s += std::string("]], \"dims\": ") + ttlDims + ", \"type\": \"float32\"}, \"style_dp\": {\"data\": [[";
+    for (int r = 0; r < 8; ++r) {
+        s += r ? ", [" : "[";
+        for (int c = 0; c < 16; ++c) s += (c ? ", " : "") + std::to_string(-base - float(r * 16 + c) / 1024.0f);
+        s += "]";
+    }
+    return s + "]], \"dims\": [1, 8, 16], \"type\": \"float32\"}, \"metadata\": {\"source_file\": \"M3.wav\"}}";
+}
+
+// unicode_indexer.json: 65,536 ids, 'last' as the final one.
+std::string indexerJson(size_t count = 65536, const std::string& last = "7") {
+    std::string s = "[";
+    for (size_t i = 0; i + 1 < count; ++i) s += i % 3 ? "-1, " : std::to_string(i % 400) + ", ";
+    return s + last + "]";
+}
+
+const char kConfigJson[] =
+    "{\"tts_version\": \"v1.6.0\", \"ae\": {\"sample_rate\": 44100, \"base_chunk_size\": 512}, "
+    "\"ttl\": {\"latent_dim\": 24, \"chunk_compress_factor\": 6}}";
+
+bool writeTestFile(const std::string& path, const std::string& data) {
+    std::FILE* f = net::sys::openFile(path, "wb");
+    bool ok = f && std::fwrite(data.data(), 1, data.size(), f) == data.size();
+    if (f) std::fclose(f);
+    return ok;
+}
+
+}  // namespace
+
+// The assets of both layouts: tts.json, the character indexer and the voice styles, which a
+// damaged or foreign download must not get past.
+TEST(tts_model_assets) {
+    std::string err;
+    // tts.json: the constants this runtime was written for.
+    CHECK(tts::Engine::parseConfig(kConfigJson, &err));
+    std::string other = kConfigJson;
+    other.replace(other.find("44100"), 5, "24000");
+    CHECK(!tts::Engine::parseConfig(other, &err) && err.find("tts.json") != std::string::npos);
+    CHECK(!tts::Engine::parseConfig("{\"ae\": ", &err));
+    // unicode_indexer.json: exactly 65,536 whole ids from -1 (unknown) up.
+    std::vector<int32_t> ix;
+    CHECK(tts::Engine::parseIndexerJson(indexerJson(), ix, &err));
+    CHECK(ix.size() == 65536 && ix[0] == 0 && ix[1] == -1 && ix[3] == 3 && ix[65535] == 7);
+    for (const std::string& bad : {indexerJson(65535), indexerJson(65537), indexerJson(65536, "1.5"),
+                                   indexerJson(65536, "-2"), indexerJson(65536, "\"7\""), indexerJson(65536, "16777216"),
+                                   std::string("{\"a\": 1}")}) {
+        err.clear();
+        CHECK(!tts::Engine::parseIndexerJson(bad, ix, &err) && err.find("unicode_indexer.json") != std::string::npos);
+    }
+    // unicode_indexer.bin (the old model): 65,536 int32.
+    std::string bin(65536 * 4, '\0');
+    CHECK(tts::Engine::parseIndexerBin(reinterpret_cast<const uint8_t*>(bin.data()), bin.size(), ix, &err));
+    CHECK(!tts::Engine::parseIndexerBin(reinterpret_cast<const uint8_t*>(bin.data()), bin.size() - 4, ix, &err));
+    // A voice style (M3.json): the nested arrays flatten in order; other keys are ignored.
+    std::vector<float> ttl, dp;
+    CHECK(tts::Engine::parseVoiceJson(voiceJson(0.5f), ttl, dp, &err));
+    CHECK(ttl.size() == 50 * 256 && dp.size() == 8 * 16);
+    CHECK(near(ttl[0], 0.5f) && near(ttl[257], 0.5f + 257.0f / 1024.0f) && near(ttl.back(), 0.5f + 12799.0f / 1024.0f));
+    CHECK(near(dp[0], -0.5f) && near(dp.back(), -0.5f - 127.0f / 1024.0f));
+    // A second style appends.
+    CHECK(tts::Engine::parseVoiceJson(voiceJson(2.0f), ttl, dp, &err));
+    CHECK(ttl.size() == 2 * 50 * 256 && near(ttl[50 * 256], 2.0f) && dp.size() == 2 * 8 * 16);
+    // Refused, leaving what was read before untouched: other dimensions, too few or too many
+    // values, a value that is not a number, another element type, no style at all.
+    std::string wrongType = voiceJson(1.0f);
+    wrongType.replace(wrongType.find("float32"), 7, "float16");
+    std::string text = voiceJson(1.0f);
+    text.replace(text.find("1.000000"), 8, "\"x\"");
+    for (const std::string& bad : {voiceJson(1.0f, 50 * 256, "[1, 256, 50]"), voiceJson(1.0f, 50 * 256 - 1),
+                                   voiceJson(1.0f, 50 * 256 + 1), wrongType, text, std::string("{\"style_dp\": {}}"),
+                                   std::string("[1, 2")}) {
+        err.clear();
+        CHECK(!tts::Engine::parseVoiceJson(bad, ttl, dp, &err) && err.find("voice style") != std::string::npos);
+        CHECK(ttl.size() == 2 * 50 * 256 && dp.size() == 2 * 8 * 16);
+    }
+    // voice.bin (the old model): the voice count must be the one its size gives. A crafted count
+    // whose product with the per-voice size only matches modulo 2^64 is refused before any style
+    // is read. 101 * inv == 1 (mod 2^55), so inv * 4 * (50 * 256 + 8 * 16) == 512 (mod 2^64).
     uint64_t inv = 101;
     for (int i = 0; i < 6; ++i) inv *= 2 - 101 * inv;
     auto voices = [](int64_t count, size_t payload) {
         int64_t h[6] = {count, 50, 256, count, 8, 16};
         return std::string(reinterpret_cast<const char*>(h), 48) + std::string(payload, '\0');
     };
+    int count = 0;
+    std::string crafted = voices(int64_t(inv & ((uint64_t(1) << 55) - 1)), 512);
+    CHECK(!tts::Engine::parseVoiceBin(reinterpret_cast<const uint8_t*>(crafted.data()), crafted.size(), ttl, dp, &count,
+                                      &err) &&
+          err.find("voice.bin") != std::string::npos);
+    std::string one = voices(1, 4 * (50 * 256 + 8 * 16));
+    CHECK(tts::Engine::parseVoiceBin(reinterpret_cast<const uint8_t*>(one.data()), one.size(), ttl, dp, &count, &err));
+    CHECK(count == 1 && ttl.size() == 50 * 256 && dp.size() == 8 * 16);
+}
+
+// Which layout a folder loads: the official files when they are all there (even beside the old
+// ones), else the old ones, else the official ones (the error names what is missing).
+TEST(tts_model_layout_choice) {
+    const std::string dir = net::sys::exeDirectory() + "ttstest-layout/";
+    CHECK(net::sys::makeDirectories(dir));
+    const tts::Engine::Layout& off = tts::Engine::kOfficial;
+    const tts::Engine::Layout& old = tts::Engine::kLegacy;
+    auto clear = [&] {
+        for (const tts::Engine::Layout* l : {&off, &old}) {
+            for (const char* g : l->graphs) net::sys::removeFile(dir + g);
+            net::sys::removeFile(dir + l->indexer);
+            net::sys::removeFile(dir + l->voices);
+            if (*l->config) net::sys::removeFile(dir + l->config);
+        }
+    };
+    clear();
     std::string err;
     // Each engine goes before the files change: Windows neither rewrites nor deletes a mapped file.
-    CHECK(write(tts::Engine::kFiles[tts::kFileVoices], voices(int64_t(inv & ((uint64_t(1) << 55) - 1)), 512)));
     {
-        tts::Engine crafted;
-        CHECK(!crafted.loadDirectory(dir, K(), &err) && err.find("voice.bin") != std::string::npos);
+        tts::Engine e;
+        CHECK(!e.loadDirectory(dir, K(), &err) && e.kind() == tts::ModelKind::Official);
+        CHECK(err.find("tts.json") != std::string::npos);
     }
-    // One consistent voice passes this check (and then stops at the fake duration model).
-    CHECK(write(tts::Engine::kFiles[tts::kFileVoices], voices(1, 4 * (50 * 256 + 8 * 16))));
+    // The old layout, with valid assets and graphs that are not models: chosen, stops at the first graph.
+    for (const char* g : old.graphs) CHECK(writeTestFile(dir + g, "x"));
+    CHECK(writeTestFile(dir + old.indexer, std::string(65536 * 4, '\0')));
     {
-        tts::Engine one;
-        CHECK(!one.loadDirectory(dir, K(), &err) && err.find("voice.bin") == std::string::npos);
+        int64_t h[6] = {10, 50, 256, 10, 8, 16};
+        CHECK(writeTestFile(dir + old.voices, std::string(reinterpret_cast<const char*>(h), 48) +
+                                                  std::string(size_t(10) * 4 * (50 * 256 + 8 * 16), '\0')));
     }
-    for (int i = 0; i < tts::kFileCount; ++i) net::sys::removeFile(dir + tts::Engine::kFiles[i]);
+    {
+        tts::Engine e;
+        CHECK(!e.loadDirectory(dir, K(), &err) && e.kind() == tts::ModelKind::Legacy);
+        CHECK(err.find("duration predictor") != std::string::npos);
+        CHECK_EQ(e.voiceCount(), 10);
+        CHECK_EQ(e.voiceIndex("M3"), 7);
+        CHECK_EQ(e.voiceIndex("M9"), -1);
+    }
+    // The official layout beside it: the official one wins.
+    for (const char* g : off.graphs) CHECK(writeTestFile(dir + g, "x"));
+    CHECK(writeTestFile(dir + off.config, kConfigJson));
+    CHECK(writeTestFile(dir + off.indexer, indexerJson()));
+    CHECK(writeTestFile(dir + off.voices, voiceJson(0.25f)));
+    {
+        tts::Engine e;
+        CHECK(!e.loadDirectory(dir, K(), &err) && e.kind() == tts::ModelKind::Official);
+        CHECK(err.find("duration predictor") != std::string::npos);
+        CHECK_EQ(e.voiceCount(), 1);
+        CHECK_EQ(e.voiceIndex("M3"), 0);
+        // Asked for explicitly, the old one still loads (as far as its fake graphs let it).
+        tts::Engine l;
+        CHECK(!l.loadDirectory(dir, K(), &err, tts::ModelKind::Legacy) && l.kind() == tts::ModelKind::Legacy);
+    }
+    // A damaged official asset is reported by name, even with the old files complete.
+    CHECK(writeTestFile(dir + off.indexer, indexerJson(100)));
+    {
+        tts::Engine e;
+        CHECK(!e.loadDirectory(dir, K(), &err) && e.kind() == tts::ModelKind::Official);
+        CHECK(err.find("unicode_indexer.json") != std::string::npos);
+    }
+    clear();
 #ifdef _WIN32
     _rmdir(dir.c_str());
 #else
@@ -1909,13 +2050,13 @@ TEST(tts_stage_vector_estimator) {
     if (std::string missing = f.init(); !missing.empty()) SKIP(missing);
     const tts::Engine& e = *f.s->engine();
     // Every step from the reference's previous latent (isolates the error of one step).
-    double worst = 1.0;
+    double worst = 1e9;
     for (int step = 0; step < f.steps; ++step) {
         Diff d = diff(veStep(f, f.ctx, step), f.ref["latent" + std::to_string(step + 1)]);
         report(("vector estimator step " + std::to_string(step + 1)).c_str(), d);
-        worst = std::min(worst, d.cosine);
+        worst = std::min(worst, d.snrDb);
     }
-    CHECK(worst > 0.9999);
+    CHECK(worst > STEP_MIN_SNR);
     // The chained loop from the same noise and text embedding.
     Tensor latent;
     std::string err;
@@ -1924,7 +2065,7 @@ TEST(tts_stage_vector_estimator) {
     CHECK_EQ(each.size(), size_t(f.steps));
     Diff d = diff(latent, f.ref["latent" + std::to_string(f.steps)]);
     report("vector estimator, 5 chained steps", d);
-    CHECK(d.cosine > 0.9995);
+    CHECK(d.snrDb > STEP_MIN_SNR - 10.0);
 }
 
 TEST(tts_stage_vocoder_and_end_to_end) {
@@ -1939,7 +2080,7 @@ TEST(tts_stage_vocoder_and_end_to_end) {
     double lsdV = logSpectralDistance(wav.as<float>(), f.ref["wav"].as<float>(), size_t(wav.count()));
     std::fprintf(stderr, "  vocoder log-spectral distance %.2f dB\n", lsdV);
     CHECK(d.snrDb > VOCODER_MIN_SNR);
-    CHECK(lsdV < 1.5);
+    CHECK(lsdV < 0.1);
     // Whole chain from the ids and the reference noise.
     float seconds = 0;
     Tensor emb, latent, out;
@@ -1952,11 +2093,10 @@ TEST(tts_stage_vocoder_and_end_to_end) {
     double lsdE = out.count() == f.ref["wav"].count()
                       ? logSpectralDistance(out.as<float>(), f.ref["wav"].as<float>(), size_t(out.count()))
                       : 99.0;
-    // onnxruntime itself, without its graph optimisations (plain QDQ arithmetic), is at 10.4 dB SNR
-    // and 2.55 dB log-spectral distance from its optimised run; another noise seed is at 14.5 dB.
+    // Five chained steps and the vocoder: about 80 dB here (another noise seed is a few dB, for scale).
     std::fprintf(stderr, "  end to end log-spectral distance %.2f dB\n", lsdE);
-    CHECK(de.snrDb > 5.0);
-    CHECK(lsdE < 4.0);
+    CHECK(de.snrDb > 50.0);
+    CHECK(lsdE < 0.5);
     // Every stage stops on the cancel flag (Worker::stop() and cancel() do not wait for it).
     std::atomic<bool> cancel{true};
     CHECK(!e.duration(f.ids, f.voice, f.ctx, &seconds, &err, &cancel) && err == "cancelled");
@@ -1979,9 +2119,9 @@ TEST(tts_stage_every_level) {
         Tensor wav;
         CHECK_RUN(e.vocode(f.ref["latent" + std::to_string(f.steps)], ctx, &wav, &err), err);
         Diff dv = diff(wav, f.ref["wav"]);
-        std::fprintf(stderr, "  %-8s vector estimator step 1 cosine %.8f, vocoder SNR %.1f dB\n", ctx.k->name, d.cosine,
+        std::fprintf(stderr, "  %-8s vector estimator step 1 SNR %.1f dB, vocoder SNR %.1f dB\n", ctx.k->name, d.snrDb,
                      dv.snrDb);
-        CHECK(d.cosine > 0.9999);
+        CHECK(d.snrDb > STEP_MIN_SNR);
         CHECK(dv.snrDb > VOCODER_MIN_SNR);
     }
 }
@@ -1993,8 +2133,9 @@ TEST(tts_synthesizer_output) {
     tts::Synthesizer* s = model();
     if (!s) SKIP("no model files in " + modelDir());
     CHECK_EQ(s->sampleRate(), 44100);
-    CHECK_EQ(s->voiceCount(), 10);
-    CHECK_EQ(s->voiceName(tts::defaultVoice()), std::string("M3"));
+    // The official model brings the game's voice alone, the old one all ten.
+    CHECK_EQ(s->voiceCount(), s->engine()->kind() == tts::ModelKind::Legacy ? 10 : 1);
+    CHECK(s->engine()->voiceIndex(tts::defaultVoiceName()) >= 0);
     tts::Options o;
     o.seed = 1234;
     std::vector<float> a = s->synthesize("Good move. Now the knight goes to f3.", "en", o);
@@ -2045,6 +2186,29 @@ TEST(tts_synthesizer_output) {
     CHECK_EQ(s->lastStats().droppedCharacters, 0);
     CHECK(!s->synthesize("Hello \xEE\x80\x80.", "zz", o).empty());
     CHECK_EQ(s->lastStats().droppedCharacters, 1);
+}
+
+// The old INT8 model (sherpa-onnx's conversion, which a player who declined the update keeps):
+// it still loads and speaks with the game's voice. Optional, as nothing downloads that model any
+// more: SCACELITH_TTS_LEGACY_DIR=<the extracted sherpa-onnx-supertonic-3-tts-int8-2026-05-11>.
+TEST(tts_legacy_model) {
+    const char* dir = std::getenv("SCACELITH_TTS_LEGACY_DIR");
+    if (!dir) SKIP("SCACELITH_TTS_LEGACY_DIR not set");
+    tts::Synthesizer s;
+    std::string err;
+    CHECK_RUN(s.loadFrom(dir, &err), err);
+    CHECK(s.engine()->kind() == tts::ModelKind::Legacy);
+    CHECK_EQ(s.voiceCount(), 10);
+    CHECK_EQ(s.engine()->voiceIndex(tts::defaultVoiceName()), 7);
+    tts::Options o;
+    o.seed = 1234;
+    std::vector<float> a = s.synthesize("Good move. Now the knight goes to f3.", "en", o);
+    // About as long as with the official model: the duration predictor is the same graph.
+    std::fprintf(stderr, "  %.2f s with the old model\n", a.size() / 44100.0);
+    CHECK(a.size() > 2 * 44100 && a.size() < 4 * 44100);
+    bool finite = true;
+    for (float v : a) finite = finite && std::isfinite(v);
+    CHECK(finite);
 }
 
 // Non-finite samples (a damaged model) become silence instead of skipping the loudness and peak
@@ -2130,6 +2294,17 @@ TEST(tts_worker) {
         std::vector<float> slowWant = s->synthesize("Low priority.", "en", direct), slowGot;
         CHECK(w.take(slow, slowGot));
         CHECK(slowGot == slowWant && slowGot.size() > got.size());
+        // Voice quality changed in Options: the next request takes the new step count, the model
+        // staying loaded (the direct synthesis with those steps, bit for bit).
+        w.setSteps(8);
+        uint32_t fine = w.request("Low priority.", "en", 0, 2);
+        CHECK(fine && waitFor([&] { return w.done(fine); }, 120.0));
+        direct.speed = o.speed;
+        direct.steps = 8;
+        std::vector<float> fineWant = s->synthesize("Low priority.", "en", direct), fineGot;
+        CHECK(w.take(fine, fineGot));
+        CHECK(fineGot == fineWant && fineGot != got);
+        w.setSteps(o.steps);
     }
     // Cancel everything, including the request in progress, then stop while busy.
     uint32_t busy = w.request(std::string(250, 'x') + ".", "en");
@@ -2153,12 +2328,15 @@ TEST(tts_worker_warm_up_failure) {
     if (!model()) SKIP("no model files in " + modelDir());
     const std::string dir = net::sys::exeDirectory() + "ttstest-warmup/";
     CHECK(net::sys::makeDirectories(dir));
-    // The big files are links to the build's copy (copies where links are refused); the indexer is
-    // a file of its own.
-    for (int i = 0; i < tts::kFileCount; ++i) {
-        if (i == tts::kFileIndexer) continue;
-        const std::filesystem::path from = std::filesystem::u8path(modelDir() + tts::Engine::kFiles[i]);
-        const std::filesystem::path to = std::filesystem::u8path(dir + tts::Engine::kFiles[i]);
+    // The files of the layout the build's copy holds. The big ones are links to it (copies where
+    // links are refused); the indexer is a file of its own.
+    const tts::Engine::Layout& l = tts::Engine::layout(model()->engine()->kind());
+    std::vector<std::string> files(std::begin(l.graphs), std::end(l.graphs));
+    files.push_back(l.voices);
+    if (*l.config) files.push_back(l.config);
+    for (const std::string& name : files) {
+        const std::filesystem::path from = std::filesystem::u8path(modelDir() + name);
+        const std::filesystem::path to = std::filesystem::u8path(dir + name);
         std::error_code ec;
         // A link left by an earlier run is kept: Wine refuses to delete it while the shared model
         // maps the same file, so the cleanup at the end of this test cannot remove it there.
@@ -2170,15 +2348,26 @@ TEST(tts_worker_warm_up_failure) {
         CHECK(!ec);
     }
     std::string ix;
-    CHECK(net::sys::readFile(modelDir() + tts::Engine::kFiles[tts::kFileIndexer], ix, size_t(1) << 20));
+    CHECK(net::sys::readFile(modelDir() + l.indexer, ix, size_t(4) << 20));
     const std::string intact = ix;
-    for (size_t i = 0; i + 4 <= ix.size(); i += 4) {
-        int32_t id;
-        std::memcpy(&id, ix.data() + i, 4);
-        if (id >= 0) id = 1 << 20;   // far past the table: Gather "index out of range"
-        std::memcpy(&ix[i], &id, 4);
+    // Every known character mapped far past the table: Gather "index out of range".
+    if (model()->engine()->kind() == tts::ModelKind::Legacy) {
+        for (size_t i = 0; i + 4 <= ix.size(); i += 4) {
+            int32_t id;
+            std::memcpy(&id, ix.data() + i, 4);
+            if (id >= 0) id = 1 << 20;
+            std::memcpy(&ix[i], &id, 4);
+        }
+    } else {
+        std::vector<int32_t> ids;
+        std::string err;
+        CHECK(tts::Engine::parseIndexerJson(ix, ids, &err));
+        ix = "[";
+        for (size_t i = 0; i < ids.size(); ++i) ix += std::string(i ? ", " : "") + (ids[i] >= 0 ? "1048576" : "-1");
+        ix += "]";
     }
-    CHECK(net::sys::writeFileAtomic(dir + tts::Engine::kFiles[tts::kFileIndexer], ix, false));
+    CHECK(net::sys::writeFileAtomic(dir + l.indexer, ix, false));
+    files.push_back(l.indexer);
     struct Restore {
         ~Restore() { tts::setModelFolder(std::string()); }
     } restore;
@@ -2196,7 +2385,7 @@ TEST(tts_worker_warm_up_failure) {
         // (GameScene::coachModelDownloaded gives it that one more try). Stopped first, as in the
         // game, so its thread has unmapped the files before the replacement.
         w.stop();
-        CHECK(net::sys::writeFileAtomic(dir + tts::Engine::kFiles[tts::kFileIndexer], intact, false));
+        CHECK(net::sys::writeFileAtomic(dir + l.indexer, intact, false));
         CHECK(w.start(tts::Options()));
         settle(w);
         CHECK(w.ready() && !w.failed() && !w.warmUpFailed());
@@ -2208,7 +2397,7 @@ TEST(tts_worker_warm_up_failure) {
         settle(w);
         CHECK(w.failed() && !w.warmUpFailed());
     }
-    for (int i = 0; i < tts::kFileCount; ++i) net::sys::removeFile(dir + tts::Engine::kFiles[i]);
+    for (const std::string& name : files) net::sys::removeFile(dir + name);
 #ifdef _WIN32
     _rmdir(dir.c_str());
 #else
@@ -2398,7 +2587,9 @@ TEST(tts_samples) {
                "chercher autre chose ?"},
         {"ja", "気をつけてください。この手のあと、クイーンがビショップに狙われます。もう一度考えてみましょうか。"},
     };
-    for (int voice : {6, 7, 9})
+    for (const char* name : {"M2", "M3", "M5"}) {
+        const int voice = s->engine()->voiceIndex(name);   // the official model holds M3 only
+        if (voice < 0) continue;
         for (size_t i = 0; i < sizeof voiceLines / sizeof voiceLines[0]; ++i) {
             const Line& l = voiceLines[i];
             tts::Options o;
@@ -2409,6 +2600,7 @@ TEST(tts_samples) {
                                std::to_string(i / 3 + 1) + ".wav";
             CHECK(audio::writeWav16(path.c_str(), pcm.data(), pcm.size(), 1, 44100));
         }
+    }
     // Chess notation probes: each written form, one file per language and form.
     const char* langs[] = {"en", "fr", "de", "es", "ru", "uk", "ar", "ja"};
     const char* probes[] = {"e4", "Nf3", "O-O", "h7", "1-0", "+1.5"};

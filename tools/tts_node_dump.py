@@ -11,6 +11,7 @@ STAGE is dp, te, ve (first Euler step) or voc; REFERENCE.bin is a dump of tools/
 those of the graph as exported.
 """
 import argparse
+import os
 import struct
 import sys
 
@@ -19,8 +20,7 @@ import numpy as np
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from tts_reference import write_container  # noqa: E402
 
-FILES = {"dp": "duration_predictor.int8.onnx", "te": "text_encoder.int8.onnx",
-         "ve": "vector_estimator.int8.onnx", "voc": "vocoder.int8.onnx"}
+FILES = {"dp": "duration_predictor", "te": "text_encoder", "ve": "vector_estimator", "voc": "vocoder"}
 CODES = {1: np.float32, 2: np.uint8, 3: np.int8, 6: np.int32, 7: np.int64, 9: np.bool_}
 
 
@@ -46,6 +46,15 @@ def read_container(path):
     return out
 
 
+def graph_path(model_dir, stage):
+    """The stage's graph in either layout (tools/tts_reference.py): official flat or under onnx/,
+    else the old INT8 file."""
+    for p in (model_dir + "/" + FILES[stage] + ".onnx", model_dir + "/onnx/" + FILES[stage] + ".onnx"):
+        if os.path.isfile(p):
+            return p
+    return model_dir + "/" + FILES[stage] + ".int8.onnx"
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
@@ -56,7 +65,7 @@ def main():
     import onnx
     import onnxruntime as ort
     ref = read_container(a.reference)
-    m = onnx.load(a.model + "/" + FILES[a.stage])
+    m = onnx.load(graph_path(a.model, a.stage))
     known = {o.name for o in m.graph.output}
     for node in m.graph.node:
         for o in node.output:

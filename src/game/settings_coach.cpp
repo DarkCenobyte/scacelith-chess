@@ -57,11 +57,12 @@ void readCoachSettings(const IniFile& ini, Settings& s) {
     s.coachLessonChapter = std::max(0, ini.getInt("coach.lesson_chapter", s.coachLessonChapter));
     s.ttsThreads = std::clamp(ini.getInt("tts.threads", s.ttsThreads), 0, 16);
     s.ttsVoice = std::max(-1, ini.getInt("tts.voice", s.ttsVoice));
-    s.ttsSteps = std::clamp(ini.getInt("tts.steps", s.ttsSteps), 1, 16);
+    s.ttsSteps = std::clamp(ini.getInt("tts.steps", s.ttsSteps), Settings::kTtsStepsMin, Settings::kTtsStepsMax);
     s.ttsArch = ini.getString("tts.arch", s.ttsArch);
     if (s.ttsArch.empty()) s.ttsArch = "auto";
     s.coachVoice = ini.getBool("coach.voice", s.coachVoice);  // the voice model download (W12)
     s.coachVoiceOffered = ini.getBool("coach.voice_offered", s.coachVoiceOffered);
+    s.coachVoiceUpdateOffered = ini.getBool("coach.voice_update_offered", s.coachVoiceUpdateOffered);
     s.analysisComments = ini.getBool("analysis.comments", s.analysisComments);
     s.analysisVoice = ini.getBool("analysis.voice", s.analysisVoice);
     s.analysisArrows = ini.getBool("analysis.arrows", s.analysisArrows);
@@ -81,6 +82,7 @@ void writeCoachSettings(IniFile& ini, const Settings& s) {
     ini.set("tts.arch", s.ttsArch);
     ini.setBool("coach.voice", s.coachVoice);  // the voice model download (W12)
     ini.setBool("coach.voice_offered", s.coachVoiceOffered);
+    ini.setBool("coach.voice_update_offered", s.coachVoiceUpdateOffered);
     ini.setBool("analysis.comments", s.analysisComments);
     ini.setBool("analysis.voice", s.analysisVoice);
     ini.setBool("analysis.arrows", s.analysisArrows);

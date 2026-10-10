@@ -1056,8 +1056,15 @@ coach.lesson.next = 第一盤對局
 # Supertonic 3, Supertone, Hugging Face, GitHub and OpenRAIL-M are names: never translated.
 # Options > Audio
 options.coach_voice = 教練語音
-options.coach_voice.help = 在教練模式中，教練會出聲講解。其語音模型會在首次需要時下載（約 145 MB）。關閉：教練的話只以文字顯示在畫面上。
-# The prompt. {0} = the size in megabytes ("145.3")
+options.coach_voice.help = 在教練模式中，教練會出聲講解。其語音模型會在首次需要時下載（約 399 MB）。關閉：教練的話只以文字顯示在畫面上。
+options.voice_update = 語音模型
+options.voice_update.help = 教練仍在使用舊的 8 位元版本語音模型說話。更新會下載 Supertone 公司發布的 Supertonic 3 官方版本，並先刪除舊檔案。
+options.voice_update.button = 更新（{0} MB）
+options.voice_update.running = 正在下載。
+options.voice_quality = 語音品質
+options.voice_quality.help = 教練的語音合成為每句話進行的細化步數（4 到 9，預設 5）。步數越多，聲音略微更清晰，但計算時間更長，教練開口會稍晚一些；步數越少則越快。
+options.voice_quality.steps = {0} 步
+# The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = 教練語音
 coach.download.text = 教練使用 Supertone 公司的語音合成模型 Supertonic 3 說話。Scacelith 並未附帶此模型：遊戲現在可以從 Hugging Face 下載（{0} MB，只需一次）。沒有它，教練會把要說的話以文字顯示在畫面上。
 coach.download.licence = 此模型依 OpenRAIL-M 授權條款發布，該條款禁止以某些方式使用其產生的語音，例如將其冒充為真人聲音或模仿真實人物。
@@ -1070,16 +1077,20 @@ coach.download.not_now = 稍後再說
 coach.download.download = 下載（{0} MB）
 coach.download.licence_title = OpenRAIL-M 授權條款
 coach.download.back = 返回
+coach.update.title = 教練的新聲音
+coach.update.text = 教練的語音現在改用 Supertone 公司發布的 Supertonic 3 官方版本，取代先前安裝的 8 位元轉換版本。遊戲現在可以從 Hugging Face 下載（{0} MB，只需一次），並會先刪除舊檔案（{1} MB）。如果您拒絕，教練會保留目前的聲音，更新仍可在「選項 > 聲音」中進行。
+coach.update.download = 更新（{0} MB）
+coach.update.accept = 選擇「更新」即表示您接受此授權條款。
 # Progress panel (top corner, over the menus and the game)
 coach.download.caption = 教練語音
+coach.download.removing = 正在刪除舊版本…
 coach.download.checking = 正在檢查檔案…
 coach.download.downloading = 正在下載…
-coach.download.extracting = 正在解壓縮檔案…
 # {0} = megabytes received, {1} = megabytes in all
 coach.download.megabytes = {0} / {1} MB
 # Where the files come from (the repository's address is shown under it)
 coach.download.from_hub = 來自 Hugging Face
-coach.download.from_github = 來自 GitHub（發行版封存檔）
+coach.download.from_archive = 來自 Hugging Face（封存副本）
 coach.download.cancel = 取消
 coach.download.failed = 下載失敗。
 coach.download.error.network = 無法連線到伺服器。請檢查您的網路連線，然後再試一次。

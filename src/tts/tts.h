@@ -1,9 +1,10 @@
-// The coach's voice: in-process text-to-speech with the Supertonic 3 INT8 model (sherpa-onnx
-// release of Supertone's OpenRAIL-M weights), run by our own small ONNX interpreter (src/tts/graph.*,
-// no onnxruntime). The model files are never shipped with the game: they live in the folder of the
-// model store (src/tts/model_store.h: <application data>/coach/, or --coach-dir), which the game
-// fills by downloading them at the player's request. Without them load() fails and the coach runs
-// with subtitles only.
+// The coach's voice: in-process text-to-speech with Supertone's Supertonic 3 model (OpenRAIL-M
+// weights, the official fp32 ONNX release; the old INT8 conversion by sherpa-onnx still loads, see
+// src/tts/model.h), run by our own small ONNX interpreter (src/tts/graph.*, no onnxruntime). The
+// model files are never shipped with the game: they live in the folder of the model store
+// (src/tts/model_store.h: <application data>/coach/, or --coach-dir), which the game fills by
+// downloading them at the player's request. Without them load() fails and the coach runs with
+// subtitles only.
 //
 // Pipeline per chunk of text (sentence-aligned, at most 300 characters, 120 for Japanese): the
 // official text normalisation, duration predictor, text encoder, 'steps' Euler steps of the flow
@@ -27,7 +28,7 @@ struct Options {
     int threads = 2;            // threads of one synthesis (the caller plus helpers)
     int steps = 5;              // flow-matching steps (quality/speed: 3 is usable, 5 the default)
     float speed = 1.0f;         // speaking rate (the duration is divided by it)
-    int voice = -1;             // -1 = the default teacher voice (M3); see Synthesizer::voiceName
+    int voice = -1;             // -1 = the default teacher voice (M3); else an index of Synthesizer::voiceName
     uint32_t seed = 0;          // noise seed; 0 = derived from the text, language and voice, so the
                                 // same line always sounds the same
 };
@@ -36,9 +37,9 @@ struct Options {
 // anything else the coach does not speak). The one list: coach::speechSupported asks it.
 bool languageSupported(const std::string& uiCode);
 
-// Voice used when Options::voice is -1 (M3, the male "teacher" voice chosen by listening; M2, deeper, is
-// the alternative).
-int defaultVoice();
+// Voice used when Options::voice is -1: "M3", the male "teacher" voice chosen by listening (the only
+// voice style the game downloads; the old INT8 model has ten, F1..F5 and M1..M5).
+const char* defaultVoiceName();
 
 // Caps the instruction set of the compute kernels ("auto", "avx512", "avxvnni", "avx2", "sse2",
 // "scalar"), for troubleshooting (a settings entry or a command-line switch). Applies from the
@@ -53,9 +54,9 @@ const char* activeArch();
 // loads. Same as tts::setModelFolder() / tts::modelFolder() (model_store.h).
 void setModelDirectory(const std::string& dir);
 std::string modelDirectory();
-// Whether load() can find the model files without loading them: every file of the manifest in
-// modelDirectory() with its size (tts::modelStatus() == Ready). False means the coach speaks
-// through subtitles only until the files are downloaded (model_store.h).
+// Whether load() can find the model files without loading them: every file of the official model,
+// or of the old INT8 one, in modelDirectory() with its size (tts::installedModel() != None). False
+// means the coach speaks through subtitles only until the files are downloaded (model_store.h).
 bool modelFilesPresent();
 
 class Engine;
@@ -139,6 +140,9 @@ public:
     void cancel(uint32_t id);
     // Requests queued or in progress.
     size_t pending() const;
+    // The flow-matching steps of the requests started from now on (Options::steps; Options >
+    // Audio > Voice quality), without loading the model again.
+    void setSteps(int steps);
 
 private:
     struct Job {

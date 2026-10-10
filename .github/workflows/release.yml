@@ -140,7 +140,8 @@ jobs:
           texts of the fonts, of Stockfish's authors and of the other parts it embeds are in licences/.
 
           The coach's voice model (Supertonic 3, BigScience Open RAIL-M licence) is not included: the
-          game offers to download it from its publishers the first time Coach mode needs it.
+          game offers to download it from Supertone's repository on Hugging Face the first time
+          Coach mode needs it.
 
           To check this download with the GitHub CLI:
             gh attestation verify $name.zip --repo $GITHUB_REPOSITORY
@@ -264,7 +265,8 @@ jobs:
           texts of the fonts, of Stockfish's authors and of the other parts it embeds are in licences/.
 
           The coach's voice model (Supertonic 3, BigScience Open RAIL-M licence) is not included: the
-          game offers to download it from its publishers the first time Coach mode needs it.
+          game offers to download it from Supertone's repository on Hugging Face the first time
+          Coach mode needs it.
 
           To check this download with the GitHub CLI:
             gh attestation verify $name.tar.gz --repo $GITHUB_REPOSITORY

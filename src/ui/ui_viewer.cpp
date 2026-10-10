@@ -9,9 +9,11 @@
 //     coach-subtitle (a subtitle alone; --ui-text <text> replaces the sample line), coach-pause,
 //     coach-gameover, coach-lesson-done
 //   coach voice download (sample figures): coach-download (the prompt over the Coach page),
-//     coach-download-licence (its licence view), coach-download-hub / coach-download-github /
-//     coach-download-extracting / coach-download-failed (the progress panel; github over the
-//     title page); coach-flow: the real thing over the title page (game/coach_model.h: the
+//     coach-download-licence (its licence view), coach-download-update (its update form, over the
+//     title page), coach-download-hub / coach-download-archive / coach-download-removing /
+//     coach-download-failed (the progress panel; archive and removing over the
+//     title page); options-voice-update: Options > Audio with the update row of the old model;
+//     coach-flow: the real thing over the title page (game/coach_model.h: the
 //     Coach entry's prompt, a real download into --coach-dir <folder>, the panel, the notices)
 //   saved games: library (the page; --ui-library <folder> lists that folder, default the pgn folder
 //     of the user data directory), library-empty (the same, its folder replaced by an empty one
@@ -308,6 +310,19 @@ public:
             ui::debug::openMenuPage(ui::debug::MenuPage::Options);
             ui::debug::setOptionsTab(tab_);
         }
+        if (screen == "options-voice-update") {
+            // Options > Audio with the row that updates the old INT8 voice model (sample hooks).
+            ui::setVoiceUpdateHooks(
+                [] {
+                    ui::VoiceUpdateRow r;
+                    r.show = true;
+                    r.bytes = double(tts::supertonicManifest().totalBytes());
+                    return r;
+                },
+                [] { LOGI("ui viewer: voice model update requested"); });
+            ui::debug::openMenuPage(ui::debug::MenuPage::Options);
+            ui::debug::setOptionsTab(2);
+        }
         if (screen == "credits") ui::debug::openMenuPage(ui::debug::MenuPage::Credits);
         if (screen == "licences") ui::debug::openMenuPage(ui::debug::MenuPage::Licences);
         if (screen == "coach" || screen == "coach-novoice") {
@@ -320,7 +335,8 @@ public:
             coach_.voiceAvailable = game::coachVoiceWanted();
         }
         if (screen.compare(0, 14, "coach-download") == 0) {
-            ui::debug::openMenuPage(screen == "coach-download-github" ? ui::debug::MenuPage::Title : ui::debug::MenuPage::Coach);
+            bool title = screen == "coach-download-archive" || screen == "coach-download-removing" || screen == "coach-download-update";
+            ui::debug::openMenuPage(title ? ui::debug::MenuPage::Title : ui::debug::MenuPage::Coach);
             coach_.voiceAvailable = false;
             if (screen == "coach-download-licence") ui::debug::showModelLicence();
         }
@@ -583,7 +599,7 @@ public:
         ui::MenuAction a = ui::MenuAction::None;
         const std::string& s = screen_;
         if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
-        if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "credits" ||
+        if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "options-voice-update" || s == "credits" ||
             s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || s == "library" ||
             s == "library-empty" || s == "library-analyse" || menu_ || s.compare(0, 14, "coach-download") == 0 || s == "coach-flow") {
             a = ui::mainMenu(setup_, watch_, coach_, library_);
@@ -766,10 +782,12 @@ public:
     // downloaded here).
     void modelDownloadSample(const std::string& s) {
         const tts::ModelManifest& m = tts::supertonicManifest();
-        if (s == "coach-download" || s == "coach-download-licence") {
+        if (s == "coach-download" || s == "coach-download-licence" || s == "coach-download-update") {
             ui::ModelPrompt p;
             p.bytes = double(m.totalBytes());
             p.folder = tts::modelFolder();
+            p.update = s == "coach-download-update";
+            p.oldBytes = double(tts::legacyManifest().totalBytes());
             ui::ModelPromptAction pa = ui::modelPrompt(p);
             if (pa != ui::ModelPromptAction::None) LOGI("ui viewer: model prompt -> %d", int(pa));
             return;
@@ -777,23 +795,20 @@ public:
         ui::ModelProgressView v;
         if (s == "coach-download-hub") {
             v.state = ui::ModelProgressView::State::Downloading;
-            v.done = 63.2e6;
+            v.done = 163.2e6;
             v.total = double(m.totalBytes());
-            v.sourceLabel = m.hubLabel;
-            v.file = "vector_estimator.int8.onnx";
-        } else if (s == "coach-download-github") {
+            v.sourceLabel = m.sources[0].label;
+            v.file = "vector_estimator.onnx";
+        } else if (s == "coach-download-archive") {
             v.state = ui::ModelProgressView::State::Downloading;
-            v.done = 41.0e6;
-            v.total = double(m.archiveSize);
-            v.github = true;
-            v.sourceLabel = m.archiveLabel;
-            v.file = m.archiveName();
-        } else if (s == "coach-download-extracting") {
-            v.state = ui::ModelProgressView::State::Extracting;
-            v.done = 88.0e6;
-            v.total = double(m.archiveSize);
-            v.github = true;
-            v.sourceLabel = m.archiveLabel;
+            v.done = 341.0e6;
+            v.total = double(m.totalBytes());
+            v.archiveCopy = true;
+            v.sourceLabel = m.sources[1].label;
+            v.file = "vocoder.onnx";
+        } else if (s == "coach-download-removing") {
+            v.state = ui::ModelProgressView::State::Removing;
+            v.sourceLabel = m.sources[0].label;
         } else if (s == "coach-download-failed") {
             v.state = ui::ModelProgressView::State::Failed;
             v.error = i18n::tr("coach.download.error.network");

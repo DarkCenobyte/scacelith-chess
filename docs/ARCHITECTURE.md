@@ -31,7 +31,7 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 | `src/platform` | Win32 (+X11 for tests) window, GL 4.6 context, input, timing |
 | `src/gl` | Generated GL 4.6 loader (`tools/gen_gl_loader.py`) |
 | `src/math` | vec/mat/quat, reverse-Z projections, rays (conventions in `math.h`) |
-| `src/core` | log, ini, embedded files, PNG writer, streaming bzip2 decoder and tar reader (`bzip2.h`, `tar.h`: the voice model's release archive) |
+| `src/core` | log, ini, embedded files, PNG writer |
 | `src/render` | Renderer (forward PBR, frame orchestration), shader builder, meshes |
 | `src/render/lighting` + `shaders/lighting` | Atmosphere/sky, sun cascades (PCSS), light probes (GI), planar reflections |
 | `src/render/post` | Post chain (GTAO, SSR, volumetrics, TAA, motion blur, DOF, bloom, tonemap) |
@@ -47,7 +47,7 @@ Windows exe under wine). `scacelith --list-scenes` lists viewer scenes. Set
 | `src/game` | Game state machine, settings, world layout (`layout.h`); seats and game modes (play / watch / hot-seat / online / coach), Elo (`elo.h`), camera flights and the viewer's observer camera (engine-free, in the core library and unit-tested); `game_scene_coach.cpp`: the coach's stage in the scene |
 | `src/coach` | Coach mode's brain, engine-free and GL-free: session, director, scripts, the spoken line catalogue (`assets/coach`), review and appraisal of the player's moves, openings and the teaching repertoire, the rules lesson, rewinds by hand (`rewind.h`) |
 | `src/analysis` | Analysis mode's brain, engine-free and GL-free: the review of a whole game (`review.h`: two passes over its positions, the annotation symbols, accuracy), the commentary on its key moments (`commentary.h`, lines in `assets/coach/speech/<lang>/analysis.lang`) and the cache of reviews (`cache.h`) |
-| `src/tts` | Text-to-speech for the coach's voice (Supertonic 3, ONNX graphs run by an in-house int8 runtime with per-ISA kernels), a worker thread; `model_store.h`: the model's nine files (manifest with sizes and SHA-256), its folder (`<application data>/coach/`, `--coach-dir` overrides it) and the download job (Hugging Face file by file, else the sherpa-onnx release archive on GitHub, extracted) |
+| `src/tts` | Text-to-speech for the coach's voice (Supertonic 3: Supertone's official fp32 ONNX graphs, run by an in-house ONNX interpreter with per-ISA kernels, no onnxruntime; the old INT8 conversion by sherpa-onnx that earlier versions downloaded still loads, `model.h`), a worker thread; `model_store.h`: the model's seven files (manifest with sizes, SHA-256 and repository paths; the old model's manifest too), its folder (`<application data>/coach/`, `--coach-dir` overrides it) and the download job (file by file from Supertone's repository on Hugging Face, else from Supertone's archive copy there, both at pinned revisions; it deletes the old model's files first) |
 | `src/net` | Online play, engine-free (in the core library, unit-tested): the client of the dedicated server (`online_client.h`: HTTPS API and secure WebSocket, WinHTTP on Windows, OpenSSL in Linux builds), the realtime protocol v1 codec generated from `protocol/scacelith-v1.json` (`protocol_gen.h`), per-server credentials, the Google sign-in's loopback redirect, direct matches (secure channel, the host's authority, UPnP) and file downloads; see [ONLINE_CLIENT.md](ONLINE_CLIENT.md) and [DIRECT_MATCH.md](DIRECT_MATCH.md) |
 | `src/app` | Scene registry (`--scene`), test scenes |
 | `protocol/` | The realtime protocol v1 shared with the online server: copies of its schema, frozen manifests, specification (`PROTOCOL.md`) and golden vectors, written by the server's `protogen` (the server itself is [DarkCenobyte/scacelith-chess-server](https://github.com/DarkCenobyte/scacelith-chess-server)) |
@@ -210,7 +210,11 @@ director's marks (`World::submitCoachMarks`, piece highlights through `submitPie
   on; files that did not load or could not speak), runs the `tts::ModelDownloader` and draws the
   prompt and the progress panel (`src/ui/ui_model_download.cpp`); `net::download`
   (`src/net/download.h`) streams each file, follows the hosts' redirects (the online client never
-  does) and resumes with `Range`.
+  does) and resumes with `Range`. While the old INT8 model is installed, it also offers its update
+  to the official files: once at start-up, after a background thread has hashed the old files
+  (`[coach] voice_update_offered`), then from a row of Options > Audio. Before a download deletes
+  the old files, the hook the scene sets with `setVoiceReleaseHook` stops the TTS worker that maps
+  them.
   The scene calls `drawModelDownload()` every frame and re-reads `coachVoiceWanted()`
   (`refreshCoachVoice`) after an options change. After a download it calls
   `coachModelDownloaded(fetched)`, which stops a failed worker when the download wrote at least one

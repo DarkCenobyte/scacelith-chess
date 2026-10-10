@@ -4,6 +4,7 @@
 #include "core/ini.h"
 #include "game/coach_args.h"
 #include "game/settings.h"
+#include <algorithm>
 
 using game::CoachArgs;
 using game::parseCoachArgs;
@@ -107,7 +108,7 @@ TEST(coach_settings_round_trip) {
     a.coachLessonChapter = 7;
     a.ttsThreads = 3;
     a.ttsVoice = 6;
-    a.ttsSteps = 3;
+    a.ttsSteps = 8;
     a.ttsArch = "avx2";
     IniFile out;
     game::writeCoachSettings(out, a);
@@ -129,9 +130,18 @@ TEST(coach_settings_round_trip) {
     CHECK_EQ(b.coachLessonChapter, 7);
     CHECK_EQ(b.ttsThreads, 3);
     CHECK_EQ(b.ttsVoice, 6);
-    CHECK_EQ(b.ttsSteps, 3);
+    CHECK_EQ(b.ttsSteps, 8);
     CHECK_EQ(b.ttsArch, std::string("avx2"));
     std::remove(path);
+    // Voice quality: a hand-edited step count outside Options' range is brought back into it.
+    for (int steps : {1, 3, 4, 9, 10, 99}) {
+        IniFile e;
+        e.setInt("tts.steps", steps);
+        game::Settings d;
+        game::readCoachSettings(e, d);
+        CHECK_EQ(d.ttsSteps, std::clamp(steps, game::Settings::kTtsStepsMin, game::Settings::kTtsStepsMax));
+    }
+    CHECK(game::Settings::kTtsStepsMin == 4 && game::Settings::kTtsStepsMax == 9 && game::Settings().ttsSteps == 5);
 
     // A file from before these keys: the defaults stay.
     IniFile old;

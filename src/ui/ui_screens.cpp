@@ -239,6 +239,7 @@ void copyOptions(game::Settings& dst, const game::Settings& src) {
     dst.voiceVolume = src.voiceVolume;
     dst.subtitles = src.subtitles;
     dst.coachVoice = src.coachVoice;  // the voice model download (W12)
+    dst.ttsSteps = src.ttsSteps;
     dst.showLegalMoves = src.showLegalMoves;
     dst.showCoordinates = src.showCoordinates;
     dst.mouseSensitivity = src.mouseSensitivity;
@@ -261,7 +262,7 @@ bool sameOptions(const game::Settings& a, const game::Settings& b) {
            a.depthOfField == b.depthOfField && feq(a.brightness, b.brightness) && feq(a.masterVolume, b.masterVolume) &&
            feq(a.effectsVolume, b.effectsVolume) && feq(a.ambienceVolume, b.ambienceVolume) && a.ambience == b.ambience &&
            feq(a.voiceVolume, b.voiceVolume) && a.subtitles == b.subtitles && a.coachVoice == b.coachVoice &&
-           a.showLegalMoves == b.showLegalMoves && a.showCoordinates == b.showCoordinates &&
+           a.ttsSteps == b.ttsSteps && a.showLegalMoves == b.showLegalMoves && a.showCoordinates == b.showCoordinates &&
            feq(a.mouseSensitivity, b.mouseSensitivity) && a.invertLook == b.invertLook && a.gameCursor == b.gameCursor &&
            a.autoPressClock == b.autoPressClock && a.ignoreOpponentHead == b.ignoreOpponentHead &&
            a.humanizeThinking == b.humanizeThinking && feq(a.handoverSeconds, b.handoverSeconds) &&
@@ -435,8 +436,10 @@ bool optionsPage(MenuAction& act) {
     im::tabBar(tabs, o.tab, Rect(p.x + 60.0f, p.y + 124.0f, p.w - 120.0f, 50.0f));
 
     game::Settings& s = o.work;
-    // Rows from under the tabs to above the buttons: the nine rows of Gameplay are closer.
-    float rx = p.x + 70.0f, rw = p.w - 140.0f, rh = o.tab == 3 ? 52.0f : 60.0f;
+    // Rows from under the tabs to above the buttons: the nine rows of Gameplay are closer, and the
+    // eight of Audio (nine when it shows the voice model's update).
+    const VoiceUpdateRow voiceUpdate = o.tab == 2 ? detail::voiceUpdateRow() : VoiceUpdateRow();
+    float rx = p.x + 70.0f, rw = p.w - 140.0f, rh = o.tab == 3 || voiceUpdate.show ? 52.0f : o.tab == 2 ? 56.0f : 60.0f;
     float y = p.y + 200.0f;
     auto row = [&]() {
         Rect r(rx, y, rw, rh - 4.0f);
@@ -514,6 +517,38 @@ bool optionsPage(MenuAction& act) {
             // offers the download once the options are applied (game/coach_model.h).
             im::toggleRow(L("options.coach_voice"), s.coachVoice, row());
             im::tooltip(T("options.coach_voice.help"));
+            // The old INT8 voice model is installed: its update to the official one, at once (the
+            // button opens the update prompt, game/coach_model.h; nothing waits for Apply).
+            if (voiceUpdate.show) {
+                Rect r = row();
+                char mb[32];
+                std::snprintf(mb, sizeof mb, "%.1f", voiceUpdate.bytes / 1e6);
+                std::string size = mb;
+                size.replace(size.find('.'), 1, T("number.decimal"));
+                std::string label = i18n::trf("options.voice_update.button", {size});
+                float bw = std::min(r.w * 0.5f, std::max(260.0f, im::buttonWidthFor(label)));
+                im::formLabel(L("options.voice_update"), r, bw + 20.0f);
+                im::tooltip(T("options.voice_update.help"));
+                Rect b = im::flip(r, Rect(r.r() - bw, r.y + 2.0f, bw, r.h - 4.0f));
+                if (voiceUpdate.running)
+                    im::disabledButton(label + "##options.voice_update", b, im::ButtonKind::Secondary, T("options.voice_update.running"), p);
+                else if (im::button(label + "##options.voice_update", b, im::ButtonKind::Secondary))
+                    detail::openVoiceUpdate();
+            }
+            // Voice quality: the flow-matching steps of each line (more: a cleaner voice, later), on
+            // a slider of whole steps; its help gives the default.
+            {
+                using game::Settings;
+                float steps = float(std::clamp(s.ttsSteps, Settings::kTtsStepsMin, Settings::kTtsStepsMax));
+                auto stepsText = [](float v) {
+                    const int n = int(std::lround(v));
+                    return i18n::trn("options.voice_quality.steps", n, {std::to_string(n)});
+                };
+                if (im::sliderRow(L("options.voice_quality"), steps, float(Settings::kTtsStepsMin), float(Settings::kTtsStepsMax),
+                                  1.0f, stepsText, row(), s.coachVoice))
+                    s.ttsSteps = int(std::lround(steps));
+                im::tooltip(T("options.voice_quality.help"));
+            }
             im::sliderRow(L("options.voice_volume"), s.voiceVolume, 0.0f, 1.0f, 0.05f, pct, row(), s.coachVoice);
             im::tooltip(T("options.voice_volume.help"));
             int sub = std::clamp(s.subtitles, 0, 2);

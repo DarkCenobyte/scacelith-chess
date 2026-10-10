@@ -1,14 +1,19 @@
 #!/usr/bin/env python3
-"""Reference runs of the Supertonic 3 INT8 model with ONNX Runtime, for the C++ runtime in src/tts.
+"""Reference runs of the Supertonic 3 model with ONNX Runtime, for the C++ runtime in src/tts.
 
-    tools/tts_reference.py --model DIR dump OUT.bin [--text T] [--lang L] [--voice N] [--steps S]
+    tools/tts_reference.py --model DIR dump OUT.bin [--text T] [--lang L] [--voice NAME] [--steps S]
                            [--speed X] [--seed N]
-    tools/tts_reference.py --model DIR wav OUT.wav --text T [--lang L] [--voice N] [--steps S] ...
+    tools/tts_reference.py --model DIR wav OUT.wav --text T [--lang L] [--voice NAME] [--steps S] ...
     tools/tts_reference.py --model DIR ids OUT.bin            (front-end cases, no inference)
 
-DIR is the sherpa-onnx release folder (or build/coach): duration_predictor.int8.onnx,
-text_encoder.int8.onnx, vector_estimator.int8.onnx, vocoder.int8.onnx, unicode_indexer.bin,
-voice.bin. Needs numpy and onnxruntime (1.30 was used for the committed dumps).
+DIR holds one of the layouts the game loads (src/tts/model.h):
+  - the official release (Supertone/supertonic-3): a copy of the repository (onnx/, voice_styles/)
+    or the game's flat model folder (build/coach): duration_predictor.onnx, text_encoder.onnx,
+    vector_estimator.onnx, vocoder.onnx, unicode_indexer.json and the voice styles (M3.json, ...);
+  - the old INT8 conversion by sherpa-onnx: duration_predictor.int8.onnx, text_encoder.int8.onnx,
+    vector_estimator.int8.onnx, vocoder.int8.onnx, unicode_indexer.bin, voice.bin (ten voices).
+Voices are named (F1..F5, M1..M5; the game's is M3). Needs numpy and onnxruntime (1.29 was used for
+the committed dumps).
 
 The pipeline follows the official py/helper.py of Supertonic 3 (supertone-inc/supertonic v3.0.0):
 NFKD front end, <lang>...</lang> wrapping, duration predictor, text encoder, the Euler loop of the
@@ -21,6 +26,9 @@ with numpy's seeded generator and stored in the dump, so the C++ tests feed the 
     rank x i64 dims, raw little-endian data.
 """
 import argparse
+import glob
+import json
+import os
 import re
 import struct
 import sys
@@ -74,20 +82,53 @@ class Model:
         if not optimise:
             opts.graph_optimization_level = ort.GraphOptimizationLevel.ORT_DISABLE_ALL
 
-        def load(name):
-            return ort.InferenceSession(model_dir + "/" + name, sess_options=opts,
-                                        providers=["CPUExecutionProvider"])
-        self.dp = load("duration_predictor.int8.onnx")
-        self.te = load("text_encoder.int8.onnx")
-        self.ve = load("vector_estimator.int8.onnx")
-        self.voc = load("vocoder.int8.onnx")
-        self.indexer = np.fromfile(model_dir + "/unicode_indexer.bin", dtype=np.int32)
-        raw = open(model_dir + "/voice.bin", "rb").read()
-        dims = np.frombuffer(raw[:48], dtype=np.int64)
-        n, a, b, _, c, d = (int(x) for x in dims)
-        floats = np.frombuffer(raw[48:], dtype=np.float32)
-        self.ttl = floats[:n * a * b].reshape(n, a, b)
-        self.dpstyle = floats[n * a * b:].reshape(n, c, d)
+        def load(path):
+            return ort.InferenceSession(path, sess_options=opts, providers=["CPUExecutionProvider"])
+
+        def first(*paths):
+            return next((p for p in paths if os.path.isfile(p)), None)
+
+        onnx = first(model_dir + "/duration_predictor.onnx", model_dir + "/onnx/duration_predictor.onnx")
+        if onnx:
+            # The official release, flat or as the repository lays it out.
+            base = os.path.dirname(onnx) + "/"
+            self.kind = "official"
+            self.dp = load(base + "duration_predictor.onnx")
+            self.te = load(base + "text_encoder.onnx")
+            self.ve = load(base + "vector_estimator.onnx")
+            self.voc = load(base + "vocoder.onnx")
+            self.indexer = np.array(json.load(open(base + "unicode_indexer.json")), dtype=np.int32)
+            styles = sorted(glob.glob(model_dir + "/voice_styles/*.json")) or sorted(
+                p for p in glob.glob(model_dir + "/*.json")
+                if os.path.basename(p) not in ("tts.json", "unicode_indexer.json", "config.json"))
+            self.voices, ttl, dps = [], [], []
+            for p in styles:
+                v = json.load(open(p))
+                ttl.append(np.array(v["style_ttl"]["data"], dtype=np.float32).reshape(v["style_ttl"]["dims"])[0])
+                dps.append(np.array(v["style_dp"]["data"], dtype=np.float32).reshape(v["style_dp"]["dims"])[0])
+                self.voices.append(os.path.splitext(os.path.basename(p))[0])
+            self.ttl, self.dpstyle = np.stack(ttl), np.stack(dps)
+        else:
+            self.kind = "legacy"
+            self.dp = load(model_dir + "/duration_predictor.int8.onnx")
+            self.te = load(model_dir + "/text_encoder.int8.onnx")
+            self.ve = load(model_dir + "/vector_estimator.int8.onnx")
+            self.voc = load(model_dir + "/vocoder.int8.onnx")
+            self.indexer = np.fromfile(model_dir + "/unicode_indexer.bin", dtype=np.int32)
+            raw = open(model_dir + "/voice.bin", "rb").read()
+            dims = np.frombuffer(raw[:48], dtype=np.int64)
+            n, a, b, _, c, d = (int(x) for x in dims)
+            floats = np.frombuffer(raw[48:], dtype=np.float32)
+            self.ttl = floats[:n * a * b].reshape(n, a, b)
+            self.dpstyle = floats[n * a * b:].reshape(n, c, d)
+            self.voices = ["F1", "F2", "F3", "F4", "F5", "M1", "M2", "M3", "M4", "M5"][:n]
+        assert self.indexer.shape == (65536,), "unicode indexer: 65,536 entries expected"
+
+    def voice(self, name):
+        """Index of a voice by name (F1..F5, M1..M5)."""
+        if name not in self.voices:
+            raise ValueError("voice %s not in the model (%s)" % (name, ", ".join(self.voices)))
+        return self.voices.index(name)
 
     def ids(self, text, lang):
         s = preprocess(text, lang)
@@ -97,6 +138,9 @@ class Model:
         return s, np.array([[i for i in ids if i >= 0]], dtype=np.int64)
 
     def run(self, text, lang, voice, steps, speed, seed, out=None):
+        """'voice' is a name (M3) or an index into self.voices."""
+        name = voice if isinstance(voice, str) else self.voices[voice]
+        voice = self.voice(name)
         s, text_ids = self.ids(text, lang)
         mask = np.ones((1, 1, text_ids.shape[1]), dtype=np.float32)
         style_ttl = self.ttl[voice:voice + 1].copy()
@@ -121,7 +165,8 @@ class Model:
             out.update({"text_ids": text_ids, "text_mask": mask, "style_ttl": style_ttl, "style_dp": style_dp,
                         "duration": dur, "text_emb": emb, "noise": noise, "latent_mask": lmask,
                         "wav": wav, "speed": np.array([speed], dtype=np.float32),
-                        "voice": np.array([voice], dtype=np.int64), "steps": np.array([steps], dtype=np.int64)})
+                        "voice": np.frombuffer(name.encode(), dtype=np.uint8).astype(np.int64),
+                        "steps": np.array([steps], dtype=np.int64)})
             for i, xi in enumerate(xs):
                 out["latent%d" % (i + 1)] = xi
         return wav[0, :wav_len], s
@@ -173,7 +218,7 @@ def main():
     ap.add_argument("out")
     ap.add_argument("--text", default="Good move, well played.")
     ap.add_argument("--lang", default="en")
-    ap.add_argument("--voice", type=int, default=6)
+    ap.add_argument("--voice", default="M3")
     ap.add_argument("--steps", type=int, default=5)
     ap.add_argument("--speed", type=float, default=1.0)
     ap.add_argument("--seed", type=int, default=7)

@@ -13,7 +13,7 @@
 namespace tts {
 namespace {
 
-constexpr int kDefaultVoice = 7;              // M3 in voice.bin (F1..F5, M1..M5), chosen by listening
+const char* const kDefaultVoice = "M3";       // the male "teacher" voice, chosen by listening
 constexpr int kSilenceSamples = kSampleRate * 3 / 10;   // 0.3 s between chunks (official helper)
 constexpr float kMinChunkSeconds = 0.1f;      // shortest chunk (sherpa-onnx kMinDuration)
 constexpr int64_t kMaxLatentFrames = 10000;   // longest chunk (sherpa-onnx kMaxLatentLen)
@@ -128,7 +128,7 @@ bool languageSupported(const std::string& uiCode) {
     return false;
 }
 
-int defaultVoice() { return kDefaultVoice; }
+const char* defaultVoiceName() { return kDefaultVoice; }
 
 bool setArchCap(const char* arch) { return kern::setArchCap(arch); }
 
@@ -137,7 +137,7 @@ const char* activeArch() { return kern::active().name; }
 // The model folder and its quick check belong to the model store (model_store.h).
 void setModelDirectory(const std::string& dir) { setModelFolder(dir); }
 std::string modelDirectory() { return modelFolder(); }
-bool modelFilesPresent() { return modelStatus() == ModelStatus::Ready; }
+bool modelFilesPresent() { return installedModel() != ModelKind::None; }
 
 // ------------------------------------------------------------------------------------------------
 // Synthesizer
@@ -159,7 +159,7 @@ bool Synthesizer::loadFrom(const std::string& dir, std::string* error) {
         return false;
     }
     engine_ = std::move(e);
-    LOGI("tts: models loaded from %s (%.0f MB, %s kernels at load, %.0f ms)", dir.c_str(),
+    LOGI("tts: %s model loaded from %s (%.0f MB, %s kernels at load, %.0f ms)", kindName(engine_->kind()), dir.c_str(),
          engine_->modelBytes() / 1048576.0, kern::active().name, since(t0) * 1000.0);
     return true;
 }
@@ -195,8 +195,7 @@ std::vector<float> Synthesizer::synthesize(const std::string& textIn, const std:
     if (!loaded()) return out;
     const Engine& eng = *engine_;
     std::string tag = modelTag(lang);
-    int voice = o.voice >= 0 && o.voice < eng.voiceCount() ? o.voice
-                                                            : (kDefaultVoice < eng.voiceCount() ? kDefaultVoice : 0);
+    int voice = o.voice >= 0 && o.voice < eng.voiceCount() ? o.voice : std::max(0, eng.voiceIndex(kDefaultVoice));
     int steps = std::max(1, std::min(o.steps, 32));
     float speed = std::max(0.5f, std::min(o.speed, 2.0f));
     Gaussian rng(o.seed ? o.seed : textSeed(textIn, tag, voice));
@@ -297,6 +296,11 @@ void Worker::stop() {
     ready_ = false;
 }
 
+void Worker::setSteps(int steps) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    opts_.steps = std::max(1, steps);
+}
+
 uint32_t Worker::request(const std::string& text, const std::string& lang, int priority, uint32_t seed, float speed) {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!started_ || quit_ || failed_) return 0;
@@ -352,7 +356,11 @@ void Worker::run() {
             // Warm-up: pages the weights in and starts the thread pool before the first real line
             // (the buffer cache is trimmed after every line). Intact files always give it samples:
             // none (unless stop() cancelled it) means damaged files that still load.
-            Options w = opts_;
+            Options w;
+            {
+                std::lock_guard<std::mutex> lock(mutex_);   // setSteps() writes it
+                w = opts_;
+            }
             w.seed = 1;
             if (synth.synthesize("Hello.", "en", w, &cancelRunning_).empty() && !cancelRunning_.load()) {
                 LOGE("tts: speech unavailable (the warm-up synthesis failed)");
@@ -385,8 +393,8 @@ void Worker::run() {
         queue_.erase(best);
         running_ = job.id;
         cancelRunning_ = false;
+        Options o = opts_;   // under the lock: setSteps() writes it
         lock.unlock();
-        Options o = opts_;
         o.seed = job.seed;
         if (job.speed > 0.0f) o.speed = job.speed;
         std::vector<float> pcm;

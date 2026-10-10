@@ -1,9 +1,18 @@
 // The four Supertonic 3 graphs and their assets (character indexer, voice styles), and the
 // stages of one synthesis at batch 1. Internal to src/tts (tts.h is the public API); the unit
 // tests drive the stages directly to compare them with onnxruntime.
+//
+// Two layouts of the model folder load (model_store.h):
+//   - the official release (Supertone/supertonic-3): duration_predictor.onnx, text_encoder.onnx,
+//     vector_estimator.onnx, vocoder.onnx (fp32), tts.json (checked against the constants below),
+//     unicode_indexer.json and the voice style M3.json;
+//   - the old INT8 conversion by sherpa-onnx (*.int8.onnx, unicode_indexer.bin, voice.bin with the
+//     ten voices), which a player who declined the update still speaks with.
+// The graphs are mapped and used in place; the indexer and the styles are read into memory.
 #pragma once
 #include "graph.h"
 #include "mapped_file.h"
+#include "model_store.h"
 #include <atomic>
 #include <string>
 #include <vector>
@@ -14,9 +23,8 @@ constexpr int kSampleRate = 44100;
 constexpr int kLatentChannels = 144;    // 24 x chunk_compress_factor 6
 constexpr int kFrameSamples = 3072;     // 512 (vocoder hop) x 6 per latent frame
 
-// Model files, in the order of Engine::kFiles.
-enum ModelFile { kFileDuration, kFileTextEncoder, kFileVectorEstimator, kFileVocoder, kFileIndexer, kFileVoices,
-                 kFileCount };
+// The graphs, in the order of Engine::Layout::graphs.
+enum ModelFile { kFileDuration, kFileTextEncoder, kFileVectorEstimator, kFileVocoder, kGraphCount };
 
 struct Blob {
     const uint8_t* data = nullptr;
@@ -28,16 +36,28 @@ void finishPcm(std::vector<float>& pcm);
 
 class Engine {
 public:
-    static const char* const kFiles[kFileCount];
+    // The file names of a layout ("" = none).
+    struct Layout {
+        const char* graphs[kGraphCount];
+        const char* indexer;     // unicode_indexer.json / unicode_indexer.bin
+        const char* voices;      // M3.json / voice.bin
+        const char* config;      // tts.json (official layout only)
+    };
+    static const Layout kOfficial, kLegacy;
+    static const Layout& layout(ModelKind k) { return k == ModelKind::Legacy ? kLegacy : kOfficial; }
 
-    // From a folder holding the release files (mapped, used in place).
-    bool loadDirectory(const std::string& dir, const kern::Table& k, std::string* error);
+    // From a folder holding one of the layouts. ModelKind::None: the official files when they are
+    // all there, else the old ones when they are all there, else the official ones (the error
+    // names the first one missing).
+    bool loadDirectory(const std::string& dir, const kern::Table& k, std::string* error, ModelKind kind = ModelKind::None);
     bool loaded() const { return loaded_; }
+    ModelKind kind() const { return kind_; }
 
-    int voiceCount() const { return voices_; }
+    int voiceCount() const { return int(voiceNames_.size()); }
     std::string voiceName(int i) const;
-    const int32_t* indexer() const { return indexer_; }
-    size_t modelBytes() const;   // bytes of the six model files (mapped)
+    int voiceIndex(const std::string& name) const;   // -1 when absent
+    const int32_t* indexer() const { return indexer_.data(); }
+    size_t modelBytes() const;   // bytes of the model files
 
     // Stages. 'ids' are model ids (text::indices), 'voice' in [0, voiceCount()). A stage stops
     // with the error "cancelled" once 'cancel' (optional) is set.
@@ -57,17 +77,27 @@ public:
     Tensor styleTtl(int voice) const;   // [1, 50, 256]
     Tensor styleDp(int voice) const;    // [1, 8, 16]
 
-private:
-    bool build(const Blob blobs[kFileCount], const kern::Table& k, std::string* error);
+    // The asset parsers, exposed for the tests. Each fails with a message naming the file.
+    static bool parseConfig(const std::string& json, std::string* error);
+    static bool parseIndexerJson(const std::string& json, std::vector<int32_t>& out, std::string* error);
+    static bool parseIndexerBin(const uint8_t* data, size_t size, std::vector<int32_t>& out, std::string* error);
+    // One voice style ({"style_ttl": {"dims": [1, 50, 256], "data": ...}, "style_dp": {"dims": [1, 8, 16], ...}}),
+    // appended to 'ttl' and 'dp'.
+    static bool parseVoiceJson(const std::string& json, std::vector<float>& ttl, std::vector<float>& dp, std::string* error);
+    // voice.bin: int64 header [n, 50, 256, n, 8, 16], then every ttl style, then every dp style.
+    static bool parseVoiceBin(const uint8_t* data, size_t size, std::vector<float>& ttl, std::vector<float>& dp, int* count,
+                              std::string* error);
 
-    MappedFile files_[kFileCount];
-    Blob blobs_[kFileCount];
+private:
+    bool buildGraphs(const kern::Table& k, std::string* error);
+
+    MappedFile files_[kGraphCount];
     Graph dp_, te_, ve_, voc_;
-    const int32_t* indexer_ = nullptr;
-    const float* ttl_ = nullptr;
-    const float* dpStyle_ = nullptr;
-    int64_t ttlDims_[2] = {0, 0}, dpDims_[2] = {0, 0};
-    int voices_ = 0;
+    std::vector<int32_t> indexer_;       // 65,536 entries: code point -> model id, -1 unknown
+    std::vector<float> ttl_, dpStyle_;   // every voice's [50 x 256] and [8 x 16] styles
+    std::vector<std::string> voiceNames_;
+    size_t assetBytes_ = 0;
+    ModelKind kind_ = ModelKind::None;
     bool loaded_ = false;
 };
 
