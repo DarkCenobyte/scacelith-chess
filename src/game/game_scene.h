@@ -388,8 +388,13 @@ private:
     friend class CoachStage;
     friend class CoachAnalyst;
     bool coach() const { return mode_ == GameMode::Coach; }
-    bool lesson() const { return coach() && coachLevel_ == 0; }   // the rules lesson
-    // Legal-move hints: the option, forced on in the rules lesson.
+    bool lesson() const { return coach() && coachLevel_ == 0 && coachChallenge_.empty(); }   // the rules lesson
+    bool challenge() const { return coach() && !coachChallenge_.empty(); }   // a challenge (coach/challenge.h)
+    // The rules lesson or a challenge: no game but exercises (no scoresheet, clock, rating, draw or
+    // resignation; the game never ends by itself; the coach's moves come from its script; a piece
+    // touched may be put back; illegal placements are refused and explained).
+    bool drill() const { return lesson() || challenge(); }
+    // Legal-move hints: the option, forced on in the rules lesson and the challenges.
     bool legalHints() const;
     void initCoachArgs();                     // command line: --coach and its options
     void refreshCoachVoice();                 // are the voice's model files there (tts::modelFilesPresent)
@@ -412,6 +417,9 @@ private:
     void coachMoveCompleted();                // completeMove(): after the move is recorded
     void coachGameOver();                     // endGame()
     void endLesson();                         // the rules lesson is over: its own ending
+    void endChallenge();                      // a challenge is over (every position solved)
+    void saveChallengeDone();                 // its completion, once (Settings::coachChallengesDone)
+    void nextChallenge();                     // "Next challenge" on its end card: the one to play next
     bool coachEndCardReady() const;           // GameOver: the coach has said everything
     bool coachHandshakeWanted() const;        // GameOver: the closing words are said
     bool coachHoldsMove() const;              // updateAi: the coach's move waits (review, hands, draw offer)
@@ -751,6 +759,7 @@ private:
     CoachArgs coachArgs_;               // --start --coach and its options
     ui::CoachSetup coachSetup_;         // the coach page's choice
     int coachLevel_ = 1;                // the coach game being played: 0 = the rules lesson, 1..6
+    std::string coachChallenge_;        // the challenge being played (coach::Challenge::id), "" = none
     float coachFaceLift_ = 0.0f;        // 0..1: the view rises gently to the coach's face as it talks to the player
     float coachFade_ = 0.0f;            // a lesson position being set up behind a fade
     bool coachVoiceFiles_ = false;      // tts::modelFilesPresent() at start-up

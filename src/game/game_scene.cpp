@@ -517,7 +517,7 @@ void GameScene::setupNewGame() {
     // The rules lesson's positions may be over on load (two kings alone) and its exercises go on
     // after a mate: its game never ends by itself. Nor does a replay: the record says when and how
     // it ended (moves after a dead position are played as recorded).
-    game_.setEndDetection(!lesson() && !replaying());
+    game_.setEndDetection(!drill() && !replaying());
     // A replay starts from the record's position (a FEN game), set up before the board is.
     if (replaying() && !replayRecord_.fen.empty() && !game_.resetFromFEN(replayRecord_.fen))
         LOGW("replay: the start position '%s' cannot be set up", replayRecord_.fen.c_str());
@@ -565,11 +565,11 @@ void GameScene::setupNewGame() {
     }
     if (replaying()) scorekeeper_.setDetails(replaySheetDetails());  // the record's event and round
     // The players filled in their header before sitting down at the board, as in a tournament
-    // round: the pens only record the moves. The rules lesson records nothing.
-    if (!lesson()) scorekeeper_.writeHeaderInstantly();
+    // round: the pens only record the moves. The rules lesson and the challenges record nothing.
+    if (!drill()) scorekeeper_.writeHeaderInstantly();
     // The coach's seat wears its marking (W3); the others none.
     world_.setCoachSeat(coach() ? aiSeat() : -1);
-    world_.setBoardCoordinates(settings().showCoordinates || (coach() && coachLevel_ <= 2));
+    world_.setBoardCoordinates(settings().showCoordinates || (coach() && (coachLevel_ <= 2 || challenge())));
     if (engineOk_ && !online() && !hotSeat() && !replaying()) {  // a replay's robots never search
         engine_.newGame();
         engine_.configure(seats_[seats_[0].human() ? 1 : 0].engine);
@@ -739,7 +739,7 @@ void GameScene::startPlaying() {
     audio::playUI(audio::Sfx::GameStart, 0.6f);
     // Both players take their pen while White thinks (the rules lesson has no scoresheet; an
     // analysis has its sheets written already).
-    if (!lesson() && !analysing()) scorekeeper_.startRecording();
+    if (!drill() && !analysing()) scorekeeper_.startRecording();
     if (coach()) startCoachGame();
     beginTurn();
 }
@@ -762,8 +762,8 @@ void GameScene::beginTurn() {
         turn_ = Turn::None;  // the replay clock says when the next move begins (updateReplay)
     } else if (isHumanSeat(seatOf(stm))) {
         turn_ = Turn::HumanIdle;
-    } else if (lesson()) {
-        turn_ = Turn::LessonWait;  // the lesson's moves for Black come from its script (playLessonMove)
+    } else if (drill()) {
+        turn_ = Turn::LessonWait;  // the coach's moves come from its script (playLessonMove)
     } else if (online()) {
         turn_ = Turn::RemoteWaiting;
         // The opponent may already hold a piece (their gestures, while my robot was pressing).
@@ -887,6 +887,7 @@ void GameScene::archiveGame(bool finished) {
     // Screenshot runs leave the player's saved games alone.
     if (archived_ || ctx_->screenshotMode) return;
     archived_ = true;
+    if (challenge()) return;   // a challenge leaves no game behind
     // The record: a direct match's from its authority (the local game may lag behind).
     chess::pgn::Record rec;
     archive::Mode mode;
@@ -910,7 +911,10 @@ ui::GameOverExtras GameScene::gameOverExtras() const {
     if (hotSeat()) return hotSeatGameOverExtras();
     ui::GameOverExtras x;
     if (coach()) {
-        if (lesson()) {
+        if (challenge()) {
+            x.line = i18n::tr("coach.challenge.complete.line");
+            x.primaryLabel = i18n::tr("coach.challenge.next");
+        } else if (lesson()) {
             x.line = i18n::tr("coach.lesson.done.line");
             x.primaryLabel = i18n::tr("coach.lesson.next");
         } else {
@@ -958,8 +962,9 @@ void GameScene::applySettings(bool displayToo) {
     audio::setAmbienceVolume(s.ambienceVolume);
     audio::setAmbienceEnabled(s.ambience);
     audio::setVoiceVolume(s.voiceVolume);
-    // Board coordinates: the option, and always for the rules lesson and the first coach levels.
-    world_.setBoardCoordinates(s.showCoordinates || (coach() && coachLevel_ <= 2 && state_ != State::Menu));
+    // Board coordinates: the option, and always for the rules lesson, the first coach levels and
+    // the challenges (the hints name squares).
+    world_.setBoardCoordinates(s.showCoordinates || (coach() && (coachLevel_ <= 2 || challenge()) && state_ != State::Menu));
     if (displayToo) {
         plat::setDisplayMode(s.fullscreen ? plat::DisplayMode::Borderless : plat::DisplayMode::Windowed, s.displayWidth,
                              s.displayHeight);
@@ -1048,6 +1053,15 @@ bool GameScene::update(AppContext& ctx, float dt) {
             // from there (the command line's forced ones no longer apply).
             mode_ = GameMode::Coach;
             coachArgs_.level = coachArgs_.colour = -1;
+            coachChallenge_.clear();
+            state_ = State::FadeToGame;
+            stateTime_ = 0.0f;
+        } else if (a == ui::MenuAction::StartChallenge) {
+            // The Coach page's Challenges tab: the set it names (also saved in the .ini).
+            mode_ = GameMode::Coach;
+            coachArgs_.level = coachArgs_.colour = -1;
+            coachArgs_.challengePosition = 0;
+            coachChallenge_ = coachSetup_.challenge;
             state_ = State::FadeToGame;
             stateTime_ = 0.0f;
         } else if (a == ui::MenuAction::StartWatching) {
@@ -1182,13 +1196,15 @@ bool GameScene::update(AppContext& ctx, float dt) {
                 if (hotSeat()) swapHotSeatColours();  // the rematch swaps colours
                 if (coach()) {
                     // "Play again": the same level (the Coach page offers the one the coach
-                    // suggested); "First game" after the lesson: level 1.
-                    if (!lesson()) coachArgs_.level = coachLevel_;
+                    // suggested); "First game" after the lesson: level 1; "Next challenge".
+                    if (challenge()) nextChallenge();
+                    else if (!lesson()) coachArgs_.level = coachLevel_;
                     leaveCoachGame();
                 }
                 state_ = State::FadeToGame;
                 stateTime_ = 0.0f;
             } else if (a == ui::MenuAction::BackToMainMenu) {
+                if (challenge()) ui::openCoachPage(1);   // back to the list of challenges
                 if (coach()) leaveCoachGame();
                 state_ = State::FadeToMenu;
                 stateTime_ = 0.0f;
@@ -1513,9 +1529,9 @@ void GameScene::updateHumanInput() {
     aimLegal_ = aimSq_ != NoSquare && legalDestination(aimSq_);
     // A touched piece without a legal move may be let go: pointing at another of your pieces then
     // offers it instead of a square.
-    // The rules lesson relaxes touch-move: any piece may be put back.
+    // The rules lesson and the challenges relax touch-move: any piece may be put back.
     bool canSwitch = turn_ == Turn::HumanTouched && ownPiece && pid != touchedId_ && !castling &&
-                     (lesson() || !arbiter_.touchedHasLegalMove(game_));
+                     (drill() || !arbiter_.touchedHasLegalMove(game_));
     if (canSwitch) {
         aimSq_ = NoSquare;
         hoverId_ = pid;
@@ -1569,7 +1585,7 @@ void GameScene::updateHumanInput() {
         const PieceObject* occupant = aimSq_ != NoSquare ? board_.at(aimSq_) : nullptr;
         bool ownSquare = occupant && occupant->color == me && occupant->id != touchedId_;
         if (aimSq_ == touchedSq_) {
-            if (lesson() || !arbiter_.touchedHasLegalMove(game_)) {
+            if (drill() || !arbiter_.touchedHasLegalMove(game_)) {
                 humanRelease();
             } else if (touched) {
                 ui::notify(i18n::tr(std::string("notify.touched.") + pieceName(touched->type)), 3.0f);
@@ -1653,8 +1669,9 @@ void GameScene::humanRelease() {
     vec3 pos = board_.squareBase(touchedSq_);
     dest_[p->id].push_back({touchedSq_, pos, false});
     anim_[inputSeat()].enqueue({task(anim::TaskType::Place, p->id, pos), task(anim::TaskType::Retract)});
-    // The rules lesson relaxes touch-move (lesson.cpp): a piece put back is released for real.
-    if (lesson()) arbiter_.reset(game_);
+    // The rules lesson and the challenges relax touch-move (lesson.cpp): a piece put back is
+    // released for real.
+    if (drill()) arbiter_.reset(game_);
     else arbiter_.cancelTouch();
     touchedId_ = -1;
     touchedSq_ = NoSquare;
@@ -1671,8 +1688,9 @@ void GameScene::humanPlace(Square to) {
     Move mv = pos.findLegal(touchedSq_, to, promo ? Queen : NoPiece);
     if (!mv.valid() && (settings().showLegalMoves || online() || coach())) {
         // Online there is no arbiter penalty: the piece cannot be released on an illegal square.
-        // Nor with the coach, who explains instead (the rules lesson says why, it has no notice).
-        if (!lesson()) ui::notify(i18n::tr("notify.illegal"), 2.0f);
+        // Nor with the coach, who explains instead (the rules lesson and the challenges say why,
+        // they have no notice).
+        if (!drill()) ui::notify(i18n::tr("notify.illegal"), 2.0f);
         if (coach()) coachIllegalAttempt(touchedSq_, to);
         return;
     }
@@ -2101,11 +2119,11 @@ void GameScene::completeMove(int seat) {
         }
         // Both players record the move on their scoresheet (their writing hands, off the clock).
         // Coach mode: the player's move and the coach's reply stay off the sheets until the
-        // player's next move, while the coach may still take them back; the rules lesson records
-        // nothing.
+        // player's next move, while the coach may still take them back; the rules lesson and the
+        // challenges record nothing.
         int ply = int(game_.moves().size()) - 1;
-        if (coach() && !lesson() && mover == humanColor_) scorekeeper_.setWriteLimit(ply);
-        if (!lesson()) scorekeeper_.recordMove(ply, game_.sanMoves().back());
+        if (coach() && !drill() && mover == humanColor_) scorekeeper_.setWriteLimit(ply);
+        if (!drill()) scorekeeper_.recordMove(ply, game_.sanMoves().back());
         LOGI("move %d: %s (%s, clocks %lld / %lld ms)", int(game_.moves().size()), game_.sanMoves().back().c_str(),
              mover == White ? "White" : "Black", (long long)clock_.remainingMs(White), (long long)clock_.remainingMs(Black));
         if (v.moveStands) board_.syncTo(game_.position());

@@ -165,6 +165,22 @@ your colour (White, Black, or alternating from one game to the next); the choice
   card offers to play again at the same level. When the coach suggests another level, the Coach
   page proposes it next time.
 
+The Coach page has two tabs: **Training** (the games above) and **Challenges**, short sets of
+positions that each train one skill without a whole game: mates in one, two and three, back-rank
+mates and mating patterns; free pieces, forks, pins, skewers, discovered attacks, deflection,
+in-between moves, trapped pieces, promotion, quiet moves and opening traps; finding the escape of
+your king and the only defensive move; and the basic endgames, played out against the coach
+(queen or rook and king against king, king and pawn, stopping a pawn with your king alone, the
+Lucena and Philidor rook endings, endgame tactics). You always play White; the coach sets each
+position up, plays the move that leads to it when it comes from a real game, and says what to
+find. A wrong move stays on the board while the coach shows its answer, then both go back and you
+try again. The coach never gives a hint you did not ask for: press **H** at any time for one (the
+piece to play, then the square to look at, then the move itself, shown by hand), and after a few
+wrong tries it asks whether you would like one (**Hint** or **H** accepts, **No, thanks** or
+touching a piece keeps looking). Nothing of a challenge is saved, no game, no rating: a green
+check on the Coach page marks the sets you have completed. The line positions come from the
+Lichess puzzle database, each checked with the game's Stockfish.
+
 The coach speaks with a voice synthesised on your computer (Supertonic 3). Its model is not part of
 the game: the first time you open the Coach page (or switch Options > Audio > Coach voice on), the
 game offers to download it (Supertone's official release, about 399 MB) from Supertone's repository
@@ -452,7 +468,10 @@ stage without the session: a line spoken and subtitled, the coach pointing at g1
 tracing the knight's jump to f3 on their words, a mark and a highlight, two demonstration moves
 taken back by hand, then the takeback card (`--coach-stage-test lesson`: on the lesson's first
 position); its log gives the time of each step, for `--warp`. `--coach-auto-answer yes|no` answers
-the takeback card by itself after 1.5 s, for runs with `--play`. `--analysis-marks-test` puts a
+the takeback card (in a challenge, the hint offer) by itself after 1.5 s, for runs with `--play`.
+`--start --coach --coach-challenge <id>` starts a challenge of the Coach page at once (its ids are
+the `challenge` lines of `assets/coach/challenges/challenges.txt`), `--coach-challenge-position N`
+at its position N (from 1). `--analysis-marks-test` puts a
 fixed set of the Analysis mode's marks on the board once the pieces stand (tints, the six symbols'
 badges, the better move's arrows, straight and a knight's), arriving one after another.
 
