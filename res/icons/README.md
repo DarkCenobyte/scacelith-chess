@@ -8,7 +8,7 @@ rest of the repository (same licence).
 |---|---|
 | `scacelith.ico` (16, 20, 24, 32, 40, 48, 64, 96, 128 and 256 px; 32-bit with alpha, the 256 px entry a PNG) | the Windows executable's icon resource (`res/scacelith.rc.in`, id 1, which the window class loads); embedded in the Linux build, whose window icon (`_NET_WM_ICON`) is read from its uncompressed entries (16 to 128 px) |
 | `png/scacelith-<N>.png` (N = 16, 24, 32, 48, 64, 96, 128, 256, 512) | the Linux archive's `share/icons/hicolor/<N>x<N>/apps/scacelith.png` (the sizes the hicolor theme has) |
-| `png/scacelith-1024.png` | kept for a macOS `.icns` (see `docs/PORTS.md`) |
+| `png/scacelith-<N>.png` (N = 16, 32, 64, 128, 256, 512, 1024) | the macOS app's `Scacelith.icns`, made by `tools/macos/make-app.sh` with `iconutil` |
 
 The launcher that goes with them is `res/linux/scacelith.desktop` (`Icon=scacelith`,
 `StartupWMClass=Scacelith`, the window's WM_CLASS).

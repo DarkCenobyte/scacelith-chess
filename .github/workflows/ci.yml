@@ -1,6 +1,7 @@
 # Continuous integration: the game built and tested on Linux (also with AddressSanitizer and UBSan)
 # and, cross-compiled with MinGW-w64, for Windows (its tests run under Wine), as the README's
-# "Building" section describes; the contract with the dedicated server pinned in
+# "Building" section describes; on Linux aarch64; on macOS (Apple Silicon, experimental) with its
+# app and disk image; the contract with the dedicated server pinned in
 # tools/interop/server-revision and the live online tests against it; plus the workflows' own lint.
 # The release workflow runs it again on the tagged commit (workflow_call). A weekly run checks the
 # contract against the server's master, to see changes on its side early.
@@ -110,6 +111,78 @@ jobs:
         with:
           path: .ccache
           key: ccache-linux-${{ github.sha }}
+
+  # The same build and tests on Linux aarch64 (GitHub's Arm runner), Stockfish built for the Arm
+  # instruction sets and the coach's voice on its NEON kernels; the voice model is required here
+  # too.
+  linux-aarch64:
+    name: Linux aarch64 build and tests
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install the build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ninja-build ccache libssl-dev libx11-dev libgl-dev
+
+      - name: Restore the voice model files
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build/_deps/supertonic-3/
+          key: supertonic3-linux-aarch64-${{ hashFiles('third_party/supertonic3/supertonic3.cmake') }}
+
+      - name: Restore the compiler cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .ccache
+          key: ccache-linux-aarch64-${{ github.sha }}
+          restore-keys: ccache-linux-aarch64-
+
+      - name: Configure
+        run: >-
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DSCACELITH_SUPERTONIC_REQUIRED=ON
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Build
+        run: ninja -C build
+
+      - name: Unit tests
+        shell: bash
+        run: ./build/scacelith_tests --require=tts-model 2>&1 | tee build/unit-tests.log
+
+      - name: Check that the voice model's reference tests ran
+        shell: bash
+        run: |
+          missing=0
+          for t in model_store_real_files tts_text_frontend_matches_reference tts_stage_duration_and_text_encoder \
+                   tts_stage_vector_estimator tts_stage_vocoder_and_end_to_end tts_stage_every_level \
+                   tts_synthesizer_output tts_worker; do
+            if ! grep -q "^\[ OK \] $t (" build/unit-tests.log; then
+              echo "::error::$t did not run and pass with the voice model"
+              missing=1
+            fi
+          done
+          exit "$missing"
+
+      - name: Compiler cache statistics
+        if: always()
+        run: ccache --show-stats
+
+      - name: Save the compiler cache
+        if: always() && env.SAVE_CACHE == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .ccache
+          key: ccache-linux-aarch64-${{ github.sha }}
 
   sanitizers:
     name: Linux tests under AddressSanitizer and UBSan
@@ -239,6 +312,146 @@ jobs:
           path: build-win/Scacelith.exe
           if-no-files-found: error
           retention-days: 14
+
+  # The experimental macOS port (Apple Silicon, macOS 26 or later): OpenGL 4.6 through Mesa's Zink
+  # on KosmicKrisp (Vulkan on Metal 4), shipped inside the app. The dependencies (Mesa, the Vulkan
+  # loader, OpenSSL; tools/macos/build-deps.sh, about an hour) are built from their pinned sources
+  # when the cache has no prefix for the current script and patches, then the game is built and
+  # tested, and Scacelith.app and its disk image are made (tools/macos/). Experimental: a failure
+  # shows on the job without failing the run (continue-on-error), so it holds back neither the
+  # other platforms' checks nor, through the release workflow's CI, a release.
+  macos:
+    name: macOS (Apple Silicon) build, tests and app
+    if: github.event_name != 'schedule'
+    runs-on: macos-26
+    timeout-minutes: 150
+    continue-on-error: true
+    permissions:
+      contents: read
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+      HOMEBREW_NO_ENV_HINTS: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      # Keyed on what decides their content (the build script, the Mesa patches, the Python
+      # packages of Mesa's build); written by any run that had to build them, so that the hour
+      # is spent once per change of those files (a pull request's entry is visible to that pull
+      # request only).
+      - name: Restore the macOS dependencies
+        id: deps
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build-macos-deps/prefix
+          key: macos-deps-arm64-${{ hashFiles('tools/macos/build-deps.sh', 'tools/macos/lib.sh', 'tools/macos/mesa-patches/*.patch', 'tools/macos/requirements-mesa.txt') }}
+
+      - name: Build the macOS dependencies (Mesa, the Vulkan loader, OpenSSL)
+        if: steps.deps.outputs.cache-hit != 'true'
+        run: tools/macos/build-deps.sh build-macos-deps/prefix
+
+      - name: Save the macOS dependencies
+        if: steps.deps.outputs.cache-hit != 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build-macos-deps/prefix
+          key: ${{ steps.deps.outputs.cache-primary-key }}
+
+      # Also after a restore: the prefix is whole, and its libraries pass the checks of a build.
+      - name: Check the macOS dependencies
+        run: tools/macos/build-deps.sh --verify build-macos-deps/prefix
+
+      - name: Install the build tools
+        run: brew install --formula --quiet cmake ninja ccache
+
+      # Not required on macOS: the Linux jobs (x86-64 and aarch64) are those that require the
+      # voice model's reference tests to run; here they run when the download succeeded.
+      - name: Restore the voice model files
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build/_deps/supertonic-3/
+          key: supertonic3-macos-${{ hashFiles('third_party/supertonic3/supertonic3.cmake') }}
+
+      - name: Restore the compiler cache
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .ccache
+          key: ccache-macos-${{ github.sha }}
+          restore-keys: ccache-macos-
+
+      - name: Configure
+        run: >-
+          cmake -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+          -DOPENSSL_ROOT_DIR="$GITHUB_WORKSPACE/build-macos-deps/prefix/openssl"
+          -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+
+      - name: Build
+        run: ninja -C build
+
+      - name: Unit tests
+        run: ./build/scacelith_tests
+
+      - name: Make the app and its disk image
+        run: |
+          version=$(cmake -P cmake/version.cmake)
+          tools/macos/make-app.sh build build-macos-deps/prefix dist/Scacelith.app
+          tools/macos/make-dmg.sh dist/Scacelith.app "dist/Scacelith-$version-macos-arm64-experimental.dmg"
+
+      # A first frame from the bundled app, on the runner's virtual GPU (Apple's paravirtualized
+      # graphics): unproven, as Metal 4 there may not be what KosmicKrisp needs; for now its
+      # failure is only reported (continue-on-error) and its log printed.
+      - name: Smoke run of the app (headless screenshot)
+        continue-on-error: true
+        timeout-minutes: 10
+        env:
+          SCACELITH_AUDIO: "null"
+          VK_LOADER_DEBUG: error,warn
+        run: |
+          system_profiler SPDisplaysDataType || true
+          status=0
+          dist/Scacelith.app/Contents/MacOS/Scacelith --scene game --shot "$RUNNER_TEMP/smoke.png" \
+            --frames 4 --size 640x360 --start --no-intro --human white > "$RUNNER_TEMP/smoke.log" 2>&1 || status=$?
+          cat "$RUNNER_TEMP/smoke.log"
+          mkdir -p smoke
+          cp "$RUNNER_TEMP/smoke.log" smoke/
+          [[ -f "$RUNNER_TEMP/smoke.png" ]] && cp "$RUNNER_TEMP/smoke.png" smoke/
+          if [[ $status -ne 0 || ! -f smoke/smoke.png ]]; then
+            echo "::warning::the smoke run failed (exit code $status): see its log above"
+            exit 1
+          fi
+
+      - name: Upload the smoke run's screenshot and log
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: Scacelith-macos-smoke-${{ github.sha }}
+          path: smoke/
+          if-no-files-found: ignore
+          retention-days: 14
+
+      # A test build of the disk image for this commit, as for Windows (the official one comes
+      # from the release workflow).
+      - name: Upload the disk image
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: Scacelith-macos-arm64-${{ github.sha }}
+          path: dist/*.dmg
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Compiler cache statistics
+        if: always()
+        run: ccache --show-stats || true
+
+      - name: Save the compiler cache
+        if: always() && env.SAVE_CACHE == 'true'
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .ccache
+          key: ccache-macos-${{ github.sha }}
 
   interop:
     name: Contract and live tests with the server
