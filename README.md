@@ -337,12 +337,22 @@ itself in the clear, readable by its owner only ([docs/ONLINE_CLIENT.md](docs/ON
 makes a portable install (versions up to 1.0.0-beta.1 put it there): the game then keeps all three
 in the executable's folder, as it also does when the user folder cannot be written. A file given with `--ini <file>` is read and written there only, with the
 logins beside it (the log warns when it cannot be written). All of them are
-editable from the Options page: display mode and resolution, V-sync, render scale, quality
-preset, motion blur, depth of field, brightness, volumes, ambience, legal-move hints, auto-press
-clock, the opponent's head movements, mouse sensitivity, the game pointer, and the hand-over
-between the two players of a game on one PC (a camera flight, or an instant cut). An option
-marked with a small circled **i** after its name has a definition: rest the pointer on the name
-or on the mark, or keep the keyboard focus on the row for a moment, to read it.
+editable from the Options page: display mode and resolution, V-sync, render scale, graphics
+quality (a preset, or each effect on its own), brightness, volumes, ambience, legal-move hints,
+auto-press clock, the opponent's head movements, mouse sensitivity, the game pointer, and the
+hand-over between the two players of a game on one PC (a camera flight, or an instant cut). An
+option marked with a small circled **i** after its name has a definition: rest the pointer on the
+name or on the mark, or keep the keyboard focus on the row for a moment, to read it.
+
+- **Graphics quality** (Options > Graphics): **Quality** picks a preset, from **Very low** (every
+  effect off, for modest graphics cards) through Low, Medium and High (the default) to **Ultra**
+  (every option at its maximum). Below it, shadows, reflections, ambient occlusion, indirect
+  light, light shafts, tessellation, anti-aliasing, depth of field, motion blur and bloom are set
+  one by one: changing one shows the preset that matches, or **Custom**, the player's own mix.
+  The render scale (Options > Display) lowers the cost of everything at once. A settings file of
+  an older version keeps its quality, as Custom when it had turned the motion blur or the depth
+  of field off. To see what each rendering pass costs on a graphics card, start the game with
+  `SCACELITH_GPU_PROFILE=60` in the environment: the log gives each pass's time every 60 frames.
 
 - **Auto-press clock** (Options > Gameplay, off by default): your robot presses the clock by
   itself once your move is on the board. In online games the server decides, and in a direct

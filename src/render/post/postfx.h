@@ -50,6 +50,8 @@ struct PostSettings {
 
     // ---- Extensions (render-post) -------------------------------------------------------
     int quality = 2;                    // 0 Low .. 3 Ultra (sample counts); renderer copies RenderSettings::quality via PostInputs
+    // Sample counts of each effect, 0 Low .. 3 Ultra, or -1 for 'quality' (RenderSettings::*Quality).
+    int aoQuality = -1, ssrQuality = -1, volumetricQuality = -1, dofQuality = -1, motionBlurQuality = -1;
     bool resetHistory = false;          // one-shot: drop every temporal history (camera cut). Cleared when consumed.
     int debugView = 0;                  // 0 final, 1 AO, 2 SSR, 3 volumetrics, 4 DOF CoC, 5 motion vectors, 6 bloom, 7 HiZ
     // GTAO

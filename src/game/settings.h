@@ -3,6 +3,7 @@
 #include "../render/renderer.h"
 #include "../ui/ui_font.h"
 #include "elo.h"
+#include "graphics_quality.h"
 #include "../core/ini.h"
 #include "../coach/subtitles.h"
 #include <string>
@@ -25,10 +26,10 @@ struct Settings {
     bool fullscreen = true;       // borderless fullscreen
     bool vsync = true;
     float renderScale = 1.0f;
-    // [graphics]
-    int quality = 2;              // 0 Low, 1 Medium, 2 High, 3 Ultra
-    bool motionBlur = true;
-    bool depthOfField = true;
+    // [graphics] Options > Graphics: a preset (Very low .. Ultra, graphics_quality.h) sets every
+    // level; Custom keeps the player's own ([graphics_custom]).
+    int graphicsPreset = PresetHigh;
+    GraphicsLevels graphicsLevels = presetLevels(PresetHigh);
     float brightness = 0.0f;      // exposure compensation (EV)
     // The brightness calibration was completed (Continue or Esc on its page). Until then every
     // start opens on it (screenshot runs excepted), however the previous runs ended. A settings

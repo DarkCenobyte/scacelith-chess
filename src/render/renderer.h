@@ -154,11 +154,14 @@ struct LightProbeDesc {
 
 enum class Quality { Low, Medium, High, Ultra };
 
+// What the renderer draws and how finely. The game fills it from Options > Graphics
+// (game/graphics_quality.h); applyPreset() gives the four levels of the test scenes (--quality).
 struct RenderSettings {
-    Quality quality = Quality::High;
+    Quality quality = Quality::High;  // default sample counts of the post effects (the *Quality below at -1)
     float renderScale = 1.0f;
     int shadowMapSize = 4096;
     bool planarReflections = true;
+    int planarDivisor = 2;         // planar reflections at the render resolution / this (2 half, 4 quarter)
     bool ssao = true;
     bool ssr = true;
     bool volumetrics = true;
@@ -174,6 +177,12 @@ struct RenderSettings {
     int probeResolution = 128;     // capture / prefiltered cube size
     int probeBounces = 2;
     float specularAA = 1.0f;
+    // Sun shadow filter in the main view: 0 bilinear 4-tap PCF (hard edges), 1 PCSS soft shadows
+    // with fewer taps, 2 PCSS, 3 PCSS with more taps (lighting.glsl, sunShadow).
+    int shadowFilter = 2;
+    // Sample counts of each post effect: a row of PostFX's quality table (0 Low .. 3 Ultra), or -1
+    // for the row of 'quality'.
+    int aoQuality = -1, ssrQuality = -1, volumetricQuality = -1, dofQuality = -1, motionBlurQuality = -1;
     void applyPreset(Quality q);
 };
 
