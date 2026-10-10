@@ -175,9 +175,10 @@ files are deleted first). Without the model, with Coach voice off, or without a 
 coach speaks through subtitles only. Options > Audio > Subtitles shows
 its words at the bottom of the screen (Automatic: when it does not speak the language of the menus,
 as with Chinese menus where it speaks English), and Options > Audio > Voice volume sets its volume.
-Options > Audio > Voice quality sets how many refinement steps each line takes, from 4 to 9 (5 by
-default): more steps give a slightly cleaner voice and take longer to compute, so the coach starts
-each line a little later. `[tts]` in the settings file tunes the synthesis: `threads` (0 = 2),
+Options > Audio > Voice quality sets how many refinement steps each line takes, from Low (4) to
+Maximum (9), Medium (5) by default: a higher level gives a slightly cleaner voice and takes longer
+to compute, so the coach starts each line a little later. It is greyed out until a voice model is
+installed. `[tts]` in the settings file tunes the synthesis: `threads` (0 = 2),
 `voice` (-1 = the default voice), `steps` (the voice quality) and `arch` (`auto`, or `avx512`,
 `avxvnni`, `avx2`, `sse2`, `scalar` when troubleshooting).
 

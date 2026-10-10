@@ -33,6 +33,7 @@ struct ModelUi {
     bool promptOpen = false;
     bool promptUpdate = false;     // the prompt shows in its update form
     bool legacyInstalled = false;  // the old INT8 model is there and the official one is not (sizes)
+    bool anyInstalled = false;     // either model is there (sizes): the voice quality applies
     std::unique_ptr<LegacyCheck> legacyCheck;
     std::function<void()> releaseHook;
     bool lastVoice = true;         // [coach] voice as last seen (switched on: offer the download)
@@ -54,7 +55,9 @@ ModelUi& state() {
 // What the folder holds, again (start-up, the end of a job).
 void refreshInstalled() {
     ModelUi& u = state();
-    u.legacyInstalled = tts::installedModel() == tts::ModelKind::Legacy;
+    const tts::ModelKind kind = tts::installedModel();
+    u.legacyInstalled = kind == tts::ModelKind::Legacy;
+    u.anyInstalled = kind != tts::ModelKind::None;
 }
 
 void startLegacyCheck() {
@@ -176,6 +179,7 @@ void coachModelInit() {
             r.show = coachModelUpdateAvailable() || (coachModelDownloading() && state().promptUpdate);
             r.running = coachModelDownloading();
             r.bytes = double(tts::supertonicManifest().totalBytes());
+            r.modelInstalled = state().anyInstalled && !coachModelDownloading();
             return r;
         },
         [] { openModelUpdatePrompt(); });

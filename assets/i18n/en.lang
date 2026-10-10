@@ -1076,10 +1076,16 @@ options.voice_update.help = The coach still speaks with the old 8-bit version of
 options.voice_update.button = Update ({0} MB)
 options.voice_update.running = The download is under way.
 # Options > Audio: the flow-matching steps of each synthesis (tts::Options::steps, [tts] steps), 4 to 9.
-# .steps = the value shown by its slider ("5 steps", plural forms).
+# .low to .max = the value shown by its slider for 4, 5 (the default) ... 9 steps. The row is greyed
+# out until a voice model is installed.
 options.voice_quality = Voice quality
-options.voice_quality.help = How many refinement steps the coach's speech synthesis takes for each line (4 to 9; 5 by default). More steps give a slightly cleaner voice but take longer to compute, so the coach starts speaking a little later; fewer are quicker.
-options.voice_quality.steps = {0} step|{0} steps
+options.voice_quality.help = How many refinement steps the coach's speech synthesis takes for each line, from Low (4) to Maximum (9); Medium (5) by default. A higher level gives a slightly cleaner voice but takes longer to compute, so the coach starts speaking a little later. It can be set once the voice model is installed, with Coach voice on.
+options.voice_quality.low = Low
+options.voice_quality.medium = Medium
+options.voice_quality.high = High
+options.voice_quality.very_high = Very high
+options.voice_quality.ultra = Ultra
+options.voice_quality.max = Maximum
 # The prompt. {0} = the size in megabytes ("398.7")
 coach.download.title = The Coach's Voice
 coach.download.text = The coach speaks with Supertonic 3, a speech synthesis model by Supertone. It is not included with Scacelith: the game can download it now from Hugging Face ({0} MB, once). Without it, the coach writes its words on screen.
