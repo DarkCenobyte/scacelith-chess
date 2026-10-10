@@ -54,7 +54,10 @@ ls -la "$MOUNT"
 [[ "$(readlink "$MOUNT/Applications")" == /Applications ]] || die "the Applications link is missing"
 compgen -G "$MOUNT/.background.*" > /dev/null || die "the background is not in the image"
 [[ -f "$MOUNT/.DS_Store" ]] || die "the window layout (.DS_Store) is not in the image"
-codesign --verify --deep --strict "$MOUNT/Scacelith.app" || die "the app in the image does not verify"
+if ! codesign --verify --deep --strict "$MOUNT/Scacelith.app"; then
+    xattr -l "$MOUNT/Scacelith.app" "$MOUNT/Scacelith.app/Contents" || true
+    die "the app in the image does not verify"
+fi
 hdiutil detach -quiet "$MOUNT" || die "could not detach $MOUNT"
 MOUNT=
 step_end

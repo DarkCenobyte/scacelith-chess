@@ -20,7 +20,10 @@ filesystem = "HFS+"
 
 files = [application]
 symlinks = {"Applications": "/Applications"}
-hide_extensions = [appname]  # "Scacelith" under the icon, not "Scacelith.app"
+# No hide_extensions: dmgbuild would set the extension-hidden flag in the bundle's Finder info, an
+# extended attribute on Scacelith.app that the copy to /Applications keeps and that strict
+# signature checks reject ("resource fork, Finder information, or similar detritus"). Finder
+# shows "Scacelith" under the icon anyway: it hides the .app extension of applications.
 icon = defines["icon"]  # the mounted volume's icon: the game's
 background = defines["background"]
 
