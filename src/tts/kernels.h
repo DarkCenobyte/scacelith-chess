@@ -6,6 +6,9 @@
 // the program (see kernels_impl.h). Everything else, including the blocking and threading of the
 // GEMMs (gemm.cpp) and the choice of the table (cpu.cpp), is compiled for the baseline (SSE2).
 //
+// aarch64 (Linux, macOS) has two levels only, both baseline code: the scalar reference and NEON
+// (kernels_neon.cpp; Advanced SIMD is part of every ARMv8-A CPU, so nothing is checked at run time).
+//
 // Micro-kernel contract (f32): C[rows x cols] (+)= A[rows x kc] * B[kc x cols] with A packed
 // row-major (row stride kc, 'mr' rows, rows beyond 'rows' padded) and B packed as one column panel
 // ('kc' groups of 'nr' floats, zero padded). Integer contract: the same with k grouped by 'ik'
@@ -18,7 +21,11 @@
 namespace tts {
 namespace kern {
 
+#if defined(__aarch64__)
+enum Level : int { kScalar = 0, kNeon = 1, kLevelCount = 2 };
+#else
 enum Level : int { kScalar = 0, kSse2 = 1, kAvx2 = 2, kAvxVnni = 3, kAvx512 = 4, kLevelCount = 5 };
+#endif
 
 struct Table {
     const char* name;
@@ -72,10 +79,14 @@ struct Table {
 
 // Tables compiled into this build, by level (nullptr when the level is not built).
 const Table* tableScalar();
+#if defined(__aarch64__)
+const Table* tableNeon();
+#else
 const Table* tableSse2();
 const Table* tableAvx2();
 const Table* tableAvxVnni();
 const Table* tableAvx512();
+#endif
 
 // Whether this CPU (and OS) runs a level.
 bool cpuRuns(int level);
@@ -84,7 +95,8 @@ bool cpuRuns(int level);
 const Table& active();
 // Table of a given level when the CPU runs it (tests), else nullptr.
 const Table* tableFor(int level);
-// Caps the level for troubleshooting ("auto", "scalar", "sse2", "avx2", "avxvnni", "avx512").
+// Caps the level for troubleshooting ("auto", "scalar", "sse2", "avx2", "avxvnni", "avx512"; on
+// aarch64 "auto", "scalar", "neon").
 // Takes effect from the next synthesis (and the constant folding of later loads). Returns false
 // for an unknown name.
 bool setArchCap(const char* arch);

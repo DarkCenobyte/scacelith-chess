@@ -1,8 +1,13 @@
 #include "threads.h"
 #include <algorithm>
+#if !defined(__aarch64__)
 #include <xmmintrin.h>
+#endif
 #ifdef _WIN32
 #include <windows.h>
+#elif defined(__APPLE__)
+#include <pthread.h>
+#include <pthread/qos.h>
 #else
 #include <cerrno>
 #include <sys/resource.h>
@@ -12,9 +17,30 @@
 
 namespace tts {
 
+#if defined(__aarch64__)
+namespace {
+// FPCR.FZ (bit 24): denormal inputs and results of single and double precision flushed to zero,
+// what MXCSR's FTZ (0x8000) and DAZ (0x40) do together on x86.
+constexpr uint64_t kFpcrFz = uint64_t(1) << 24;
+uint64_t readFpcr() {
+    uint64_t v;
+    __asm__ __volatile__("mrs %0, fpcr" : "=r"(v) : : "memory");
+    return v;
+}
+void writeFpcr(uint64_t v) { __asm__ __volatile__("msr fpcr, %0" : : "r"(v) : "memory"); }
+}  // namespace
+#endif
+
 void lowerThreadPriority() {
 #ifdef _WIN32
     SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
+#elif defined(__APPLE__)
+    // macOS: setpriority() acts on the whole process. The thread keeps its quality-of-service class
+    // (which also steers it between the performance and efficiency cores) at the relative
+    // priority -5 within it (QOS_MIN_RELATIVE_PRIORITY is -15), like nice +5; a thread without a
+    // class takes the default one. A helper started by a lowered thread gets the same.
+    qos_class_t qos = qos_class_self();
+    pthread_set_qos_class_self_np(qos == QOS_CLASS_UNSPECIFIED ? QOS_CLASS_DEFAULT : qos, -5);
 #else
     // Linux: the nice value of a thread id applies to that thread only. +5 from the process's
     // (its main thread's) value, so helpers started by an already lowered thread get the same.
@@ -24,8 +50,13 @@ void lowerThreadPriority() {
 #endif
 }
 
+#if defined(__aarch64__)
+FpGuard::FpGuard() : csr(readFpcr()) { writeFpcr(csr | kFpcrFz); }
+FpGuard::~FpGuard() { writeFpcr(csr); }
+#else
 FpGuard::FpGuard() : csr(_mm_getcsr()) { _mm_setcsr(csr | 0x8040u); }
 FpGuard::~FpGuard() { _mm_setcsr(csr); }
+#endif
 
 ThreadPool::ThreadPool(int threads) {
     threads = std::clamp(threads, 1, 16);
@@ -47,7 +78,11 @@ ThreadPool::~ThreadPool() {
 
 void ThreadPool::workerMain() {
     lowerThreadPriority();
+#if defined(__aarch64__)
+    writeFpcr(readFpcr() | kFpcrFz);
+#else
     _mm_setcsr(_mm_getcsr() | 0x8040u);
+#endif
     uint64_t seen = 0;
     for (;;) {
         const std::function<void(int)>* fn;
