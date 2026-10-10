@@ -54,10 +54,12 @@
 //   --left w|b|wb   that robot plays with its left hand (its pose mirrored)
 //   --head p        White's head driven as a first-person player's: pitch p degrees (yaw 0)
 //   --pen           both robots pick up their pens first (a stance change lays it down again)
+//   --cam ex,ey,ez,tx,ty,tz[,fov]  a camera of its own: eye, target (world) and vertical fov (degrees)
 // Views for the stances: opp | oppb (White / Black seen from the other seat's eyes; the robot whose
 // eyes they are is not drawn), q3 | q3b (front three-quarter view of White / Black), q3r (rear
 // three-quarter view of White), end (the table's -X end, from beyond it), topw (the whole floor
-// round the table from above).
+// round the table from above), stand | standb (White standing at its chair, from its left / from
+// behind), hips (White's hips and thighs from over the table).
 // Keys: Space pause, R restart, V next view, S slow motion, Escape quit (White's head follows the
 // action by itself).
 #include "../app/orbit_camera.h"
@@ -72,6 +74,7 @@
 #include "../scene/model.h"
 #include "animator.h"
 #include <algorithm>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <deque>
@@ -536,7 +539,7 @@ vec3 pageCorner(int a, float s) {   // the outer corner of the bottom edge (the 
 const char* kViews[] = {"side", "sidel", "front", "back", "top", "white", "black", "hand", "handb", "handl", "shake", "orbit",
                         "pinch", "pinchs", "pinchb", "pinchbs", "pen", "pens", "penb", "penbs", "page", "pageb", "lhand", "pad", "padb", "clock",
                         "coachhand", "coachhands", "coachhandt", "shakex", "shakexl", "shakeu", "shaked", "shakew", "shakeb",
-                        "shakeq", "opp", "oppb", "q3", "q3b", "end", "q3r", "topw"};
+                        "shakeq", "opp", "oppb", "q3", "q3b", "end", "q3r", "topw", "stand", "standb", "hips"};
 constexpr int kViewCount = int(sizeof(kViews) / sizeof(kViews[0]));
 constexpr int kOrbitView = 11;
 
@@ -558,6 +561,15 @@ public:
         if (ctx.hasArg("--head")) {
             headDriven_ = true;
             headDrivenPitch_ = float(std::atof(ctx.argValue("--head", "0").c_str())) * DEG;
+        }
+        if (ctx.hasArg("--cam")) {
+            float v[7] = {0, 0, 0, 0, 0, 0, 40};
+            if (std::sscanf(ctx.argValue("--cam", "").c_str(), "%f,%f,%f,%f,%f,%f,%f", &v[0], &v[1], &v[2], &v[3], &v[4], &v[5], &v[6]) >= 6) {
+                customCam_ = true;
+                camPos_ = vec3(v[0], v[1], v[2]);
+                camTarget_ = vec3(v[3], v[4], v[5]);
+                camFov_ = v[6];
+            }
         }
         if (!stanceScript_.empty()) demo_ = "stance";
         if (demo_ != "lefty" && demo_ != "lcastle" && demo_ != "lpromo" && demo_ != "coach" && demo_ != "stance") demo_ = "default";
@@ -1602,6 +1614,10 @@ private:
             c.lookAt(target, up);
             focus_ = length(target - pos);
         };
+        if (customCam_) {
+            look(camPos_, camTarget_, camFov_);
+            return c;
+        }
         switch (view_) {
             case 0: look({1.50f, 1.18f, 0.0f}, {0, 0.93f, 0}, 44); break;
             case 1: look({-1.50f, 1.18f, 0.0f}, {0, 0.93f, 0}, 44); break;
@@ -1745,6 +1761,9 @@ private:
             case 40: look({-2.70f, 1.40f, -0.55f}, {-0.50f, 0.85f, 0.25f}, 50); break;
             case 41: look({-1.55f, 1.45f, 2.10f}, {-0.15f, 0.92f, 0.45f}, 46); break;
             case 42: look({0.0f, 4.20f, 0.30f}, {0.0f, 0.0f, 0.30f}, 44, vec3(0, 0, -1)); break;
+            case 43: look({-2.30f, 1.10f, 1.00f}, {0.0f, 0.92f, 0.72f}, 46); break;   // White standing, from its left
+            case 44: look({0.55f, 1.25f, 2.60f}, {0.0f, 0.95f, 0.72f}, 46); break;    // White standing, from behind
+            case 45: look({-0.55f, 0.95f, 0.05f}, {0.0f, 0.80f, 0.70f}, 40); break;   // White's hips, from over the table
             default: {
                 render::Camera oc = orbit_.camera();
                 focus_ = orbit_.distance;
@@ -1780,6 +1799,9 @@ private:
     std::string stanceScript_, lefties_;           // the 'stance' timeline's options
     bool headDriven_ = false, penStart_ = false;
     float headDrivenPitch_ = 0.0f;
+    bool customCam_ = false;                       // --cam
+    vec3 camPos_{0, 0, 0}, camTarget_{0, 0, 0};
+    float camFov_ = 40.0f;
     Mesh padMesh_, lineMesh_, penMesh_, inkMesh_[2], pageMesh_[2], pageFlat_[2];
     Material paperMat_, lineMat_, inkMat_, penMat_;
 

@@ -520,3 +520,68 @@ TEST(anim_stance_retarget) {
         CHECK(m::length(p - vec3(0, layout::PLAYER_PELVIS_Y, -layout::PLAYER_PELVIS_Z)) < 1e-4f);
     }
 }
+
+// Standing, the first person head goes further down than seated (the back bends: the eyes come
+// forward over the board), setLean bends further than seated, and lookAt still finds its target.
+TEST(anim_stance_head_and_lean) {
+    auto settle = [](anim::Animator& a, float secs) {
+        std::vector<Event> ev;
+        for (int k = 0; k < int(secs / kDt); ++k) a.update(kDt, ev);
+    };
+    auto pitchOf = [](const mat4& eye) {
+        const vec3 f = m::transformDir(eye, vec3(0, 0, -1));
+        return std::atan2(f.y, std::sqrt(f.x * f.x + f.z * f.z));
+    };
+    for (float seat : kSeats) {
+        anim::Animator a;
+        init(a, seat);
+        a.setStance(Stance::Standing);
+        settle(a, 3.0f);
+        REQUIRE(a.stance() == Stance::Standing && !a.stanceMoving());
+        // The head override: -20 degrees, then -75 (seated, the range ends at -45).
+        a.setHeadOverride(true, 0.0f, -20.0f * m::DEG);
+        settle(a, 1.0f);
+        const mat4 e20 = a.eyeCameraTransform();
+        a.setHeadOverride(true, 0.0f, -75.0f * m::DEG);
+        settle(a, 1.5f);
+        const mat4 e75 = a.eyeCameraTransform();
+        float yaw, pitch;
+        a.headAngles(yaw, pitch);
+        std::printf("    standing seat %+.0f: eye pitch %.1f / %.1f deg, head %.1f deg, eye forward by %.0f mm, down by %.0f mm\n", seat, pitchOf(e20) / m::DEG,
+                    pitchOf(e75) / m::DEG, pitch / m::DEG, (e20.translation().z - e75.translation().z) * seat * 1000.0f,
+                    (e20.translation().y - e75.translation().y) * 1000.0f);
+        CHECK(std::fabs(pitchOf(e20) - (-20.0f * m::DEG)) < 3.0f * m::DEG);
+        CHECK(std::fabs(pitchOf(e75) - (-75.0f * m::DEG)) < 3.0f * m::DEG);
+        CHECK(std::fabs(pitch - (-75.0f * m::DEG)) < 0.5f * m::DEG);
+        CHECK((e20.translation().z - e75.translation().z) * seat > 0.10f);   // the back bends over the board
+        // setLean: standing bends further than seated (whose full lean is ~11 degrees).
+        a.setHeadOverride(true, 0.0f, -30.0f * m::DEG);
+        settle(a, 1.0f);
+        const vec3 up = a.eyeCameraTransform().translation();
+        a.setLean(1.0f);
+        settle(a, 1.5f);
+        const float standLean = (up.z - a.eyeCameraTransform().translation().z) * seat;
+        anim::Animator s;
+        init(s, seat);
+        s.setHeadOverride(true, 0.0f, -30.0f * m::DEG);
+        settle(s, 1.0f);
+        const vec3 sUp = s.eyeCameraTransform().translation();
+        s.setLean(1.0f);
+        settle(s, 1.5f);
+        const float seatLean = (sUp.z - s.eyeCameraTransform().translation().z) * seat;
+        std::printf("    lean: standing %.0f mm, seated %.0f mm\n", standLean * 1000.0f, seatLean * 1000.0f);
+        CHECK(standLean > seatLean + 0.03f);
+        // lookAt from a standing robot: the head turns to a corner of the board.
+        a.setLean(0.0f);
+        a.setHeadOverride(false);
+        const vec3 target(0.15f, layout::BOARD_TOP_Y, -seat * 0.15f);
+        a.lookAt(target, 1.0f);
+        settle(a, 2.0f);
+        const mat4 eye = a.eyeCameraTransform();
+        const vec3 want = m::normalize(target - eye.translation());
+        // (The eyes take the rest of a look the head does not: the head points within ~25 degrees.)
+        const vec3 headFwd = m::transformDir(a.globals()[B::Head], vec3(0, 0, 1));
+        std::printf("    lookAt: head %.1f deg off\n", std::acos(m::clamp(m::dot(headFwd, want), -1.0f, 1.0f)) / m::DEG);
+        CHECK(m::dot(headFwd, want) > std::cos(25.0f * m::DEG));
+    }
+}
