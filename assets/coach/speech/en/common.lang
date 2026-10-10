@@ -23,6 +23,9 @@
 # language needs (French: nom, and the gender "piece.rook.gender = f" with
 # "owner.your.nom.f = ta {piece}"; German: nom acc dat; Russian: nom acc gen dat ins pre) and
 # define each form you use for all six pieces. English needs only "nom".
+# The Analysis mode names pieces by their side instead, nobody being "you" or "me" there: <owner> =
+# white | black, "White's knight" (owner.white.<form> and owner.black.<form>, every form the
+# analysis lines use, with the same gender variants and phrase.white.* / phrase.black.* phrases).
 piece.pawn.nom = pawn
 piece.knight.nom = knight
 piece.bishop.nom = bishop
@@ -31,6 +34,8 @@ piece.queen.nom = queen
 piece.king.nom = king
 owner.your.nom = your {piece}
 owner.my.nom = my {piece}
+owner.white.nom = White's {piece}
+owner.black.nom = Black's {piece}
 
 # ---- Squares, files and ranks (spoken) -----------------------------------------------------------
 # Written squares are always "e4". The voice says {file} then {rank}. Spell the file letters the way

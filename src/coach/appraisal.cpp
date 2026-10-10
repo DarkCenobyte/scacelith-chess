@@ -30,16 +30,12 @@ double populationStdDev(const std::vector<double>& xs) {
 
 }  // namespace
 
-SideAccuracy gameAccuracy(const std::vector<int>& cps, Color firstMover, int startCp) {
-    SideAccuracy out;
-    if (cps.empty()) return out;
-    // lila AccuracyPercent.gameAccuracy: W% series with the start position first.
-    std::vector<double> w;
-    w.reserve(cps.size() + 1);
-    w.push_back(winPercent(startCp));
-    for (int cp : cps) w.push_back(winPercent(cp));
+std::vector<double> accuracyWeights(const std::vector<double>& w) {
+    std::vector<double> weights;
     const int n = int(w.size());
-    const int window = std::clamp(int(cps.size()) / 10, 2, 8);
+    if (n < 2) return weights;
+    // lila AccuracyPercent.gameAccuracy: the window grows with the game (a tenth of its moves).
+    const int window = std::clamp((n - 1) / 10, 2, 8);
     // (window - 2) copies of the first window, then every sliding window (a list shorter than the
     // window slides once, as a whole).
     std::vector<std::vector<double>> windows;
@@ -48,13 +44,24 @@ SideAccuracy gameAccuracy(const std::vector<int>& cps, Color firstMover, int sta
     if (n <= window) windows.push_back(w);
     else
         for (int i = 0; i + window <= n; ++i) windows.emplace_back(w.begin() + i, w.begin() + i + window);
-    std::vector<double> weights;
     for (const auto& xs : windows) weights.push_back(std::clamp(populationStdDev(xs), 0.5, 12.0));
+    weights.resize(std::min(weights.size(), size_t(n - 1)));
+    return weights;
+}
+
+SideAccuracy gameAccuracy(const std::vector<int>& cps, Color firstMover, int startCp) {
+    SideAccuracy out;
+    if (cps.empty()) return out;
+    // lila AccuracyPercent.gameAccuracy: W% series with the start position first.
+    std::vector<double> w;
+    w.reserve(cps.size() + 1);
+    w.push_back(winPercent(startCp));
+    for (int cp : cps) w.push_back(winPercent(cp));
+    const std::vector<double> weights = accuracyWeights(w);
 
     double wSum[2] = {0, 0}, wAcc[2] = {0, 0}, inv[2] = {0, 0};
     int count[2] = {0, 0};
-    const size_t moves = std::min(size_t(n - 1), weights.size());
-    for (size_t i = 0; i < moves; ++i) {
+    for (size_t i = 0; i < weights.size(); ++i) {
         const Color c = i % 2 == 0 ? firstMover : opposite(firstMover);
         const double before = c == White ? w[i] : 100.0 - w[i];
         const double after = c == White ? w[i + 1] : 100.0 - w[i + 1];
