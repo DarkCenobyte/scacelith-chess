@@ -6,6 +6,7 @@
 #include "direct_crypto.h"
 #include "protocol_gen.h"
 #include "socket_util.h"
+#include "stance.h"
 #include "upnp.h"
 #include "core/log.h"
 
@@ -391,6 +392,18 @@ public:
         }
         if (wake) waker.wake();
     }
+    // The game thread's latest stance in 'game': the worker sends it when the rules of
+    // net/stance.h say so. Kept while the link is down (it goes again once the link is back).
+    void postStance(uint64_t game, uint8_t stance) {
+        bool wake;
+        {
+            std::lock_guard<std::mutex> lk(m);
+            wake = stanceIn.game != game || stanceIn.stance != stance;
+            stanceIn.game = game;
+            stanceIn.stance = stance;
+        }
+        if (wake) waker.wake();
+    }
 
     // Shared with the game thread (under m).
     mutable std::mutex m;
@@ -401,6 +414,7 @@ public:
     std::deque<Event> events;
     std::deque<Command> commands;
     struct GestureOut { bool pending = false; uint64_t game = 0; Gesture g; } gestureOut;
+    struct StanceIn { uint64_t game = 0; uint8_t stance = 0; } stanceIn;   // postStance
     bool gestureLink = false;   // the other player is connected (the worker sets it)
     int gestureKeepalive = kGestureKeepaliveMinMs;   // ms, gestureKeepaliveMs of the host's Welcome (the worker sets it)
     int pingMs = -1;
@@ -477,6 +491,41 @@ protected:
         if (!gestureOut.pending) return now + 1000;
         return int64_t(std::ceil(gestureBucket_.readyAtMs(double(now))));
     }
+    // The other player's stance in their game, in order with the game events (never replaced).
+    void pushStance(uint64_t game, int stance) {
+        Event ev;
+        ev.kind = Event::Kind::OpponentStance;
+        ev.ok = true;
+        ev.gameId = game;
+        ev.stance = stance;
+        pushEvent(std::move(ev));
+    }
+    // The player's stance (net/stance.h): the game thread's latest, the keepalive of the link.
+    int syncStance() {
+        std::lock_guard<std::mutex> lk(m);
+        stance_.set(stanceIn.game, stanceIn.stance);
+        return gestureKeepalive;
+    }
+    // The stance to send now, when the link carries it ('usable' tells for its game: the other
+    // side speaks minor 2, the game is the one in progress) and its rules say so; the caller
+    // sends it.
+    template <class Usable> bool nextStance(int64_t now, Usable usable, uint64_t& game, uint8_t& stance) {
+        const int keepalive = syncStance();
+        if (!usable(stance_.game()) || !stance_.due(double(now), keepalive)) return false;
+        stance_.sent(double(now));
+        game = stance_.game();
+        stance = stance_.stance();
+        return true;
+    }
+    // When the stance should go next (now + 1 s when nothing waits).
+    template <class Usable> int64_t stanceDeadline(int64_t now, Usable usable) {
+        const int keepalive = syncStance();
+        if (!usable(stance_.game())) return now + 1000;
+        const double at = stance_.nextAtMs(keepalive);
+        return at <= double(now) ? now : at >= double(now + 1000) ? now + 1000 : int64_t(std::ceil(at));
+    }
+    // A new link to the other player: they show us seated, a stance other than Seated goes again.
+    void stanceLinkUp() { stance_.linkUp(); }
     void connectionEvent(ConnState st, const std::string& err = std::string()) {
         Event ev;
         ev.kind = Event::Kind::ConnectionChanged;
@@ -506,6 +555,7 @@ protected:
 
 private:
     GestureBucket gestureBucket_;   // pacing of the Gestures sent (under m)
+    StanceSender stance_;           // when the player's stance goes (the worker's)
 };
 
 // ---- host ---------------------------------------------------------------------------------------
@@ -664,6 +714,7 @@ private:
                 until(nextPing_);
                 until(guest_->lastRecv + kSilenceMs + 1);
                 until(gestureDeadline(now));
+                until(stanceDeadline(now, [this](uint64_t g) { return stanceUsable(g); }));
             }
             if (mapped_ && mapping_.leaseSec) until(lease_.renewAt());
             sock::PollSet ps;
@@ -699,6 +750,7 @@ private:
             }
             if (guest_ && now >= nextPing_) sendPing(now);
             sendGesture(now);
+            sendStance(now);
             if (mapped_ && mapping_.leaseSec) renewed(now);
             if (mapped_ && mapping_.leaseSec && now >= lease_.renewAt()) renew(now);
             if (guest_ && !guest_->write()) dropGuest(out, "write failed");
@@ -850,8 +902,10 @@ private:
         std::vector<uint8_t> buf;
         P::encode(w, buf);
         guest_->send(buf);   // before the snapshot in 'out'
-        // The host's Gestures still go after the snapshot.
+        // The host's Gestures still go after the snapshot, and so does its stance, again on this
+        // new link (net/stance.h; to a guest of minor 2 or later).
         gestureLinkUp(kGestureRate, kGestureBurst, gestureKeepaliveMs(kGestureIdleMs));
+        stanceLinkUp();
         dispatch(out);
         LOGI("direct: guest \"%s\" %s", auth_->guestName().c_str(), first ? "joined" : "reconnected");
         if (first) {
@@ -930,6 +984,16 @@ private:
             setPing(rtt_);
             return;
         }
+        case P::MsgType::C_Stance: {
+            // The guest's stance (minor 2), counted like any message but never given to the
+            // authority: nothing answers it, nothing keeps it. It becomes an OpponentStance of the
+            // game in progress. From a guest of an earlier minor (which has no such message) it is
+            // ignored, as is a malformed one or one for another game.
+            P::C_Stance s;
+            if (guestMinor_ < kStanceMinMinor || !P::decode(msg.data(), msg.size(), s) || !auth_ || s.game != auth_->gameId()) return;
+            pushStance(s.game, int(s.stance));
+            return;
+        }
         case P::MsgType::Hello: {
             P::Error e;
             e.ref = seq;
@@ -967,6 +1031,27 @@ private:
         P::S_Gesture m;
         m.game = game;
         gestureToWire(g, m);
+        std::vector<uint8_t> buf;
+        P::encode(m, buf);
+        guest_->send(buf);
+    }
+
+    // Whether the host's stance in 'game' may go to the guest: one of minor 2 or later is
+    // connected, and 'game' is the game in progress.
+    bool stanceUsable(uint64_t game) const {
+        return guest_ && guestMinor_ >= kStanceMinMinor && view_.have && game != 0 && game == view_.game.id &&
+               view_.game.status == int(P::GameStatus::Ongoing);
+    }
+
+    // The host's own stance, straight to the guest like its Gestures (never through dispatch:
+    // the authority never sees it).
+    void sendStance(int64_t now) {
+        uint64_t game = 0;
+        uint8_t stance = 0;
+        if (!nextStance(now, [this](uint64_t g) { return stanceUsable(g); }, game, stance)) return;
+        P::S_Stance m;
+        m.game = game;
+        m.stance = P::Stance(stance);
         std::vector<uint8_t> buf;
         P::encode(m, buf);
         guest_->send(buf);
@@ -1091,6 +1176,7 @@ private:
     int64_t nextPing_ = 0;
     double rtt_ = -1, offset_ = 0;
     bool haveRttOffset_ = false;
+    uint16_t hostMinor_ = 0;        // the protocol minor of the host's last Welcome
 
     template <class T> void sendMsg(T& msg) {
         msg.seq = ++seq_;
@@ -1124,6 +1210,7 @@ private:
                 until(nextPing_);
                 until(conn_->lastRecv + kSilenceMs + 1);
                 until(gestureDeadline(now));
+                until(stanceDeadline(now, [this](uint64_t g) { return stanceUsable(g); }));
             }
             sock::PollSet ps;
             ps.add(waker.handle(), true, false);
@@ -1249,6 +1336,7 @@ private:
             if (now - conn_->lastRecv > kSilenceMs) { lost(now); return; }
             if (now >= nextPing_) sendPing(now);
             sendGesture(now);
+            sendStance(now);
             if (view_.needResync && view_.have) {
                 P::Resync r;
                 r.game = view_.game.id;
@@ -1309,6 +1397,18 @@ private:
             pushGesture(g.game, gestureFromWire(g));
             return;
         }
+        case P::MsgType::S_Stance: {
+            // The host's stance (minor 2), its raw value (one a later minor adds is kept).
+            P::S_Stance s;
+            if (!P::decode(msg.data(), msg.size(), s) || !view_.have || s.game != view_.game.id) return;
+            if (queuedEvents() >= kMaxQueuedEvents) {
+                LOGW("direct: the host floods events");
+                lost(now);
+                return;
+            }
+            pushStance(s.game, int(s.stance));
+            return;
+        }
         default: {
             // A host that sends faster than the game thread polls cannot grow the queue without
             // limit: the link is dropped instead (the reconnection brings a snapshot).
@@ -1337,6 +1437,10 @@ private:
         }
         nextPing_ = now;
         gestureLinkUp(w.gestureRate, w.gestureBurst, gestureKeepaliveMs(w.gestureIdleMs));
+        // The minor both sides speak (the host answers the lower of the two): a host of minor 2
+        // or later takes our stance, again on this new link.
+        hostMinor_ = std::min(w.minor, P::kMinor);
+        stanceLinkUp();
         if (first) setState(DirectMatch::State::Playing);
         connectionEvent(ConnState::Online);
         LOGI("direct: %s the match of \"%s\"", first ? "joined" : "rejoined", w.serverName.c_str());
@@ -1359,6 +1463,24 @@ private:
         P::C_Gesture m;
         m.game = game;
         gestureToWire(g, m);
+        sendMsg(m);
+    }
+
+    // Whether the guest's stance in 'game' may go: online with a host of minor 2 or later (an
+    // earlier one would answer the unknown message with an Error), 'game' the game in progress.
+    bool stanceUsable(uint64_t game) const {
+        return phase_ == Phase::Online && conn_ && hostMinor_ >= kStanceMinMinor && view_.have && game != 0 &&
+               game == view_.game.id && view_.game.status == int(P::GameStatus::Ongoing);
+    }
+
+    // The guest's own stance (numbered with its other messages).
+    void sendStance(int64_t now) {
+        uint64_t game = 0;
+        uint8_t stance = 0;
+        if (!nextStance(now, [this](uint64_t g) { return stanceUsable(g); }, game, stance)) return;
+        P::C_Stance m;
+        m.game = game;
+        m.stance = P::Stance(stance);
         sendMsg(m);
     }
 
@@ -1588,7 +1710,10 @@ void DirectMatch::abortGame() { postSimple(*impl_, Command::Kind::Abort, false);
 void DirectMatch::requestResync() { postSimple(*impl_, Command::Kind::Resync, false); }
 void DirectMatch::rematch(bool accept) { postSimple(*impl_, Command::Kind::Rematch, accept); }
 
-void DirectMatch::sendStance(uint8_t) {}   // placeholder: the Stance relay lands next
+void DirectMatch::sendStance(uint8_t stance) {
+    std::lock_guard<std::mutex> lk(impl_->m);
+    if (impl_->cur) impl_->cur->postStance(impl_->haveView ? impl_->view.id : 0, stance);
+}
 
 void DirectMatch::sendGesture(const Gesture& g) {
     std::lock_guard<std::mutex> lk(impl_->m);

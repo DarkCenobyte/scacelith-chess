@@ -40,10 +40,10 @@ an.missed_chance = {move} упускает шанс наказать за эту
 an.missed_chance.2 = После хода {move} шанс упущен.
 
 # What it allows ({reply} is the other side's answer).
-an.mate_allowed.one = Теперь {reply} — мат.
-an.mate_allowed.one.2 = Этот ход допускает {reply}, и это мат.
-an.mate_allowed = Это допускает форсированный мат в {m:move}, начиная с хода {reply}.
-an.mate_allowed.2 = Теперь есть форсированный мат в {m:move}, первый ход — {reply}.
+an.mate_allowed.one = Теперь {reply:nomate} — мат.
+an.mate_allowed.one.2 = Этот ход допускает {reply:nomate}, и это мат.
+an.mate_allowed = Это допускает форсированный мат в {m:move}, начиная с хода {reply:nomate}.
+an.mate_allowed.2 = Теперь есть форсированный мат в {m:move}, первый ход — {reply:nomate}.
 an.fork = Теперь {reply} — вилка {t1:dat} и {t2:dat}.
 an.fork.2 = Это допускает {reply} с нападением сразу на {t1:acc} и {t2:acc}.
 an.fork.3 = {reply} нападает одновременно на {t1:acc} и {t2:acc}.
@@ -54,10 +54,10 @@ an.material = Ответ {line} выигрывает материал: {pts:poin
 an.material.2 = Затем {line} выигрывает {pts:point}.
 
 # What it misses ({best} is the better move).
-an.mate_missed.one = Ход {best} давал мат.
-an.mate_missed.one.2 = Ход {best} поставил бы мат.
-an.mate_missed = Ход {best} форсировал бы мат в {m:move}.
-an.mate_missed.2 = Был форсированный мат в {m:move}, начиная с хода {best}.
+an.mate_missed.one = Ход {best:nomate} давал мат.
+an.mate_missed.one.2 = Ход {best:nomate} поставил бы мат.
+an.mate_missed = Ход {best:nomate} форсировал бы мат в {m:move}.
+an.mate_missed.2 = Был форсированный мат в {m:move}, начиная с хода {best:nomate}.
 an.missed_capture = Ход {best} выиграл бы {piece:acc} даром.
 an.missed_capture.2 = У {piece:gen} не было защиты: ход {best} забрал бы {piece:pron_acc}.
 an.missed_fork = Ход {best} дал бы вилку {t1:dat} и {t2:dat}.

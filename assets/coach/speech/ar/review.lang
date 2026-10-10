@@ -50,13 +50,13 @@ ann.mate.coach.3 = كش مات، للأسف.
 
 # ---- Verdicts (the first sentence about a bad move) --------------------------------------------
 ex.verdict.blunder.b1 = أوه! هذه النقلة تُفقدك شيئًا.
-ex.verdict.blunder.b1.2 = حذارِ! سأُريك ما قد يحدث الآن.
+ex.verdict.blunder.b1.2 = حذارِ! هذه النقلة قد تكلّفك غاليًا.
 ex.verdict.blunder.b1.3 = مهلًا. في هذه النقلة مشكلة.
-ex.verdict.blunder.b2 = لحظة، هذه النقلة فيها مشكلة. انظر.
-ex.verdict.blunder.b2.2 = هذا خطأ. انظر جيدًا.
-ex.verdict.blunder.b2.3 = انتبه، هذه النقلة تكلّفك شيئًا. انظر.
+ex.verdict.blunder.b2 = لحظة، هذه النقلة فيها مشكلة.
+ex.verdict.blunder.b2.2 = هذا خطأ كبير.
+ex.verdict.blunder.b2.3 = انتبه، هذه النقلة تكلّفك شيئًا.
 ex.verdict.blunder.b3 = هذا خطأ فادح.
-ex.verdict.blunder.b3.2 = {move} خطأ. وإليك السبب.
+ex.verdict.blunder.b3.2 = {move} خطأ حقيقي.
 ex.verdict.blunder.b3.3 = آه، {move} خطأ كبير.
 ex.verdict.blunder.b4 = {move} خطأ فادح.
 ex.verdict.blunder.b4.2 = {move} خطأ جسيم.
@@ -67,11 +67,11 @@ ex.verdict.blunder.b5.3 = {move} خطأ مكلف.
 ex.verdict.blunder.b6 = {move} خطأ جسيم.
 ex.verdict.blunder.b6.2 = {move} خطأ فادح.
 ex.verdict.blunder.b6.3 = {move}؟ خطأ فادح.
-ex.verdict.mistake.b3 = ليست أفضل نقلة. وإليك السبب.
+ex.verdict.mistake.b3 = هذه ليست نقلة جيدة.
 ex.verdict.mistake.b3.2 = آه، في نقلة {move} مشكلة.
-ex.verdict.mistake.b3.3 = هذا خطأ. سأُريك.
+ex.verdict.mistake.b3.3 = هذا خطأ.
 ex.verdict.mistake.b4 = {move} خطأ.
-ex.verdict.mistake.b4.2 = نقلة {move} ليست جيدة. وإليك السبب.
+ex.verdict.mistake.b4.2 = نقلة {move} ليست جيدة.
 ex.verdict.mistake.b4.3 = هذه نقلة خاطئة.
 ex.verdict.mistake.b5 = {move}: خطأ واضح.
 ex.verdict.mistake.b5.2 = {move}: خطأ.
@@ -79,7 +79,11 @@ ex.verdict.mistake.b5.3 = {move} ليست نقلة جيدة.
 ex.verdict.mistake.b6 = {move} خطأ.
 ex.verdict.mistake.b6.2 = {move}؟ خطأ.
 ex.verdict.mistake.b6.3 = ليس {move}.
-# An inaccuracy with no concrete cause: the line names the better move ({best} is pointed at).
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = ليست سيئة، لكن نقلة {best} كانت أفضل قليلًا.
+ex.verdict.inaccuracy.b3.2 = نقلة {best} كانت أدقّ قليلًا.
+ex.verdict.inaccuracy.b3.3 = هفوة صغيرة: نقلة {best} كانت أفضل هنا.
 ex.verdict.inaccuracy.b4 = نقلة غير دقيقة: نقلة {best} كانت أدقّ.
 ex.verdict.inaccuracy.b4.2 = عدم دقة طفيف. نقلة {best} كانت أفضل قليلًا.
 ex.verdict.inaccuracy.b4.3 = ليست الأفضل تمامًا: الأدقّ كان {best}.
@@ -89,12 +93,6 @@ ex.verdict.inaccuracy.b5.3 = {best} أدقّ من {move}.
 ex.verdict.inaccuracy.b6 = {move}: عدم دقة؛ {best}.
 ex.verdict.inaccuracy.b6.2 = غير دقيقة. {best}.
 ex.verdict.inaccuracy.b6.3 = الأفضل كان {best}.
-ex.verdict.imprecise.b4 = {move}: نقلة غير دقيقة. وإليك السبب.
-ex.verdict.imprecise.b4.2 = {move} ليست النقلة الأدق.
-ex.verdict.imprecise.b5 = {move}: نقلة غير دقيقة.
-ex.verdict.imprecise.b5.2 = {move}: عدم دقة.
-ex.verdict.imprecise.b6 = {move}: عدم دقة.
-ex.verdict.imprecise.b6.2 = {move}؟ غير دقيقة.
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = مهلًا! فاتك شيء جيد.
 ex.verdict.missed.b1.2 = انظر مرة أخرى! كان هناك ما هو أفضل.
@@ -182,6 +180,31 @@ demo.your.back.3 = وتستردّ القطعة.
 demo.your.king = على ملِكك أن يتحرك.
 demo.your.king.2 = على الملك أن يبتعد، إلى {sq}.
 demo.your.king.3 = يهرب ملِكك إلى {sq}.
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = الآن لا يمكن إنقاذ {t1}.
+ex.point.piece.2 = ويضيع {t1}.
+ex.point.piece.3 = وبعدها يسقط {t1}.
+ex.point.two = {t1} و{t2} مهاجَمان معًا: سيسقط أحدهما.
+ex.point.two.2 = الآن أهاجم {t1} و{t2}. لا يمكنك إنقاذهما معًا.
+ex.point.mate = والآن {reply:nomate}، وهذا كش مات.
+ex.point.mate.2 = وبعدها {reply:nomate}: كش مات.
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = أترى؟ الآن تخسر {pts:point}.
+ex.result.b1.2 = هكذا تخسر {pts:point}.
+ex.result.b2 = في النهاية، تخسر {pts:point}.
+ex.result.b2.2 = الآن أتقدّم عليك ب{pts:point}.
+ex.result.b3 = هذا يكلّفك {pts:point}.
+ex.result.b3.2 = وفي النهاية أتقدّم عليك ب{pts:point}.
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = تستطيع استرداد شيء، لكنني أبقى متقدمًا عليك ب{pts:point}.
+ex.result_back.b1.2 = يمكنك أن تستردّ قليلًا، لكنك تخسر {pts:point} مع ذلك.
+ex.result_back.b2 = تستطيع أن تستردّ بعض الشيء، لكنني أبقى متقدمًا ب{pts:point}.
+ex.result_back.b2.2 = حتى بعد الاسترداد، تخسر {pts:point}.
+ex.result_back.b3 = حتى بعد استردادك، أتقدّم عليك ب{pts:point}.
+ex.result_back.b3.2 = تستردّ شيئًا، لكن هذا يكلّفك {pts:point} مع ذلك.
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = وهنا، في {sq}، تحصل على وزير جديد.
 demo.promote.2 = ثم يبلغ {your} المربع {sq} ويصبح وزيرًا.
@@ -196,18 +219,18 @@ ex.mate_allowed.b2 = بهذه النقلة، أستطيع أن أعطي {your} �
 ex.mate_allowed.b2.2 = الآن أستطيع إماتة {your} في {m:move}. انظر.
 ex.mate_allowed.b2.3 = انتبه! {your} في خطر: كش مات في {m:move}.
 # b3 b4 b6 ({line} is pointed at).
-ex.mate_allowed.b3 = هذا يسمح بكش مات في {m:move}: {line}.
-ex.mate_allowed.b3.2 = بعد هذا لديّ كش مات في {m:move}: {line}.
-ex.mate_allowed.b3.3 = ملِكك يتلقى كش مات: {line}.
-ex.mate_allowed.b4 = بعد {move} هناك كش مات إجباري: {line}.
-ex.mate_allowed.b4.2 = هذه النقلة تقود إلى كش مات في {m:move}: {line}.
-ex.mate_allowed.b4.3 = بعد {move}: {line}، وكش مات.
+ex.mate_allowed.b3 = هذا يسمح بكش مات في {m:move}: {line:nomate}.
+ex.mate_allowed.b3.2 = بعد هذا لديّ كش مات في {m:move}: {line:nomate}.
+ex.mate_allowed.b3.3 = ملِكك يتلقى كش مات: {line:nomate}.
+ex.mate_allowed.b4 = بعد {move} هناك كش مات إجباري: {line:nomate}.
+ex.mate_allowed.b4.2 = هذه النقلة تقود إلى كش مات في {m:move}: {line:nomate}.
+ex.mate_allowed.b4.3 = بعد {move}: {line:nomate}، وكش مات.
 ex.mate_allowed.b5 = بعد {move} يوجد كش مات إجباري في {m:move}.
 ex.mate_allowed.b5.2 = هذا يقود إلى كش مات في {m:move}.
 ex.mate_allowed.b5.3 = الآن هناك كش مات إجباري في {m:move}.
-ex.mate_allowed.b6 = كش مات في {m:mv}: {line}.
-ex.mate_allowed.b6.2 = {line}، كش مات.
-ex.mate_allowed.b6.3 = كش مات بعد {line}.
+ex.mate_allowed.b6 = كش مات في {m:mv}: {line:nomate}.
+ex.mate_allowed.b6.2 = {line:nomate}، كش مات.
+ex.mate_allowed.b6.3 = كش مات بعد {line:nomate}.
 # After the one-move demonstration ({your} = the king).
 ex.mate_allowed.tail.b1 = انظر: لم يبقَ ل{your} أي مربع يهرب إليه.
 ex.mate_allowed.tail.b1.2 = أترى؟ {your} مهاجَم ولا يستطيع الهرب.
@@ -227,29 +250,29 @@ name.pattern.ladder = «كش مات السلّم»
 name.pattern.epaulette = «كش مات الإيبوليت»
 
 # ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
-ex.mate_missed.b1 = بنقلة {best} كان بإمكانك إماتة {my}!
-ex.mate_missed.b1.2 = نقلة {best} كانت كش مات! {my} لم يكن ليهرب.
-ex.mate_missed.b1.3 = انظر! مع {best} كان {my} سيتلقى كش مات.
-ex.mate_missed.b2 = كان لديك كش مات في {m:move}، بدءًا من {best}.
-ex.mate_missed.b2.2 = نقلة {best} كانت كش مات في {m:move}!
-ex.mate_missed.b2.3 = كان بإمكانك إماتة ملِكي بنقلة {best}.
-ex.mate_missed.b3 = فاتك كش مات في {m:move}: {best}.
-ex.mate_missed.b3.2 = مع {best}، كش مات في {m:move}: {line}.
-ex.mate_missed.b3.3 = كان هناك كش مات في {m:move}، بدءًا من {best}.
-ex.mate_missed.b4 = فرصة كش مات ضائعة: {line}، بدءًا من {best}.
-ex.mate_missed.b4.2 = نقلة {best} كانت تفرض كش مات في {m:move}.
-ex.mate_missed.b4.3 = كان لديك كش مات في {m:move} بنقلة {best}.
-ex.mate_missed.b5 = مع {best} كش مات في {m:move}: {line}.
-ex.mate_missed.b5.2 = فاتك كش مات في {m:move}، بدءًا من {best}.
-ex.mate_missed.b5.3 = كان هناك كش مات إجباري: {best}.
-ex.mate_missed.b6 = {best}، كش مات: {line}.
-ex.mate_missed.b6.2 = كش مات في {m:mv} مع {best}.
-ex.mate_missed.b6.3 = {best}، كش مات في {m:mv}.
+ex.mate_missed.b1 = بنقلة {best:nomate} كان بإمكانك إماتة {my}!
+ex.mate_missed.b1.2 = نقلة {best:nomate} كانت كش مات! {my} لم يكن ليهرب.
+ex.mate_missed.b1.3 = انظر! مع {best:nomate} كان {my} سيتلقى كش مات.
+ex.mate_missed.b2 = كان لديك كش مات في {m:move}، بدءًا من {best:nomate}.
+ex.mate_missed.b2.2 = نقلة {best:nomate} كانت كش مات في {m:move}!
+ex.mate_missed.b2.3 = كان بإمكانك إماتة ملِكي بنقلة {best:nomate}.
+ex.mate_missed.b3 = فاتك كش مات في {m:move}: {best:nomate}.
+ex.mate_missed.b3.2 = مع {best:nomate}، كش مات في {m:move}: {line:nomate}.
+ex.mate_missed.b3.3 = كان هناك كش مات في {m:move}، بدءًا من {best:nomate}.
+ex.mate_missed.b4 = فرصة كش مات ضائعة: {line:nomate}، بدءًا من {best:nomate}.
+ex.mate_missed.b4.2 = نقلة {best:nomate} كانت تفرض كش مات في {m:move}.
+ex.mate_missed.b4.3 = كان لديك كش مات في {m:move} بنقلة {best:nomate}.
+ex.mate_missed.b5 = مع {best:nomate} كش مات في {m:move}: {line:nomate}.
+ex.mate_missed.b5.2 = فاتك كش مات في {m:move}، بدءًا من {best:nomate}.
+ex.mate_missed.b5.3 = كان هناك كش مات إجباري: {best:nomate}.
+ex.mate_missed.b6 = {best:nomate}، كش مات: {line:nomate}.
+ex.mate_missed.b6.2 = كش مات في {m:mv} مع {best:nomate}.
+ex.mate_missed.b6.3 = {best:nomate}، كش مات في {m:mv}.
 # Both moves mate, the played one much later (levels 5-6).
-ex.mate_delayed.b5 = الأسرع كان {best}: كش مات في {m:move}.
-ex.mate_delayed.b5.2 = مع {best} يأتي الكش مات أسرع، في {m:move}.
-ex.mate_delayed.b6 = {best}: كش مات في {m:mv}.
-ex.mate_delayed.b6.2 = أسرع: {best}، كش مات في {m:mv}.
+ex.mate_delayed.b5 = الأسرع كان {best:nomate}: كش مات في {m:move}.
+ex.mate_delayed.b5.2 = مع {best:nomate} يأتي الكش مات أسرع، في {m:move}.
+ex.mate_delayed.b6 = {best:nomate}: كش مات في {m:mv}.
+ex.mate_delayed.b6.2 = أسرع: {best:nomate}، كش مات في {m:mv}.
 
 # ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
 ex.stalemate.b1 = أوه لا! {my} لا يستطيع التحرك وليس في كش. هذا جمود: تعادل.
@@ -305,10 +328,13 @@ ex.fork.b5.3 = بعد {reply}، يصبح {t1} و{t2} كلاهما في خطر.
 ex.fork.b6 = {reply}، شوكة.
 ex.fork.b6.2 = بعد {move}: {reply}، شوكة.
 ex.fork.b6.3 = {reply} بشوكة.
-# After the one-move demonstration (level 1).
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
 ex.fork.tail.b1 = لا يمكنك إلا إنقاذ واحد منهما: {t1} أو {t2}.
 ex.fork.tail.b1.2 = الآن أهاجم هدفين معًا: {t1} و{t2}. هذه شوكة!
 ex.fork.tail.b1.3 = أترى؟ {t1} و{t2} مهاجَمان معًا. سيسقط أحدهما.
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = على {your} أن يخرج من الكش، فآخذ {t1}.
+ex.fork.tail_king.2 = كش! على {your} أن يتحرك، فيسقط {t1}.
 ex.fork.more.b3 = قبل نقلتك، تفقّد {sq}: إنه مربع شوكة ل{my}.
 ex.fork.more.b3.2 = راقب {sq}. من هناك يهاجم {my} قطعتين معًا.
 ex.fork.tip.knight = احذر قفزات الحصان قرب ملِكك ووزيرك!
@@ -358,7 +384,7 @@ ex.skewer.b6.2 = سيخ: {reply}.
 ex.pin.b1 = يستطيع {my} الذهاب إلى {sq}. عندها يعلق {your} أمام {t1}.
 ex.pin.b1.2 = راقب {my} في {sq}: يعلق {your} أمام {t1}.
 ex.pin.b1.3 = يستطيع {my} تثبيت {your} أمام {t1}. ثم أربحه.
-ex.pin.b2 = تثبيت: {your} لا يستطيع التحرك، لأن {t1} خلفه.
+ex.pin.b2 = تثبيت: {your} عالق أمام {t1}.
 ex.pin.b2.2 = {your} مثبَّت أمام {t1}. وبعدها أستطيع أن أربحه.
 ex.pin.b2.3 = الآن {your} عالق أمام {t1}. هذا تثبيت.
 ex.pin.b3 = يُثبَّت {your} أمام {t1}، فأربحه.
@@ -373,7 +399,7 @@ ex.pin.b6 = {reply}، تثبيت.
 ex.pin.b6.2 = تثبيت: {reply}.
 # The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
 ex.pin_defender.b1 = {your} مثبَّت، فلا يستطيع حماية {sq}. {t1} خلفه.
-ex.pin_defender.b1.2 = انظر: {your} لا يستطيع الدفاع عن {sq}، وإلا ضاع {t1}.
+ex.pin_defender.b1.2 = انظر: {your} لا يدافع فعلًا عن {sq}، لأن {t1} خلفه.
 ex.pin_defender.b2 = {your} مثبَّت أمام {t1}، فالمربع {sq} بلا حماية حقيقية.
 ex.pin_defender.b2.2 = القطعة المثبَّتة مدافع سيئ. {your} لا يستطيع حراسة {sq}: {t1} خلفه.
 ex.pin_defender.b3 = {your} مثبَّت أمام {t1}؛ فهو لا يحمي {sq} فعلًا.
@@ -508,6 +534,22 @@ ex.exchange_cheap.b5 = {your} في {sq} عرضة لمهاجم أقل قيمة: {
 ex.exchange_cheap.b5.2 = مع {reply} أربح مادة في {sq} على حساب {your}.
 ex.exchange_cheap.b6 = {reply} ويسقط {your} في {sq}.
 ex.exchange_cheap.b6.2 = {line}: يضيع {your} في {sq}.
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = انتبه: الآن أستطيع أن أربح {t1}.
+ex.material.b1.2 = هذه النقلة تضع {t1} في خطر. أستطيع أن أربحه.
+ex.material.b2 = هذه النقلة تسمح لي بربح {t1}.
+ex.material.b2.2 = الآن يقع {t1} في ورطة، وأربحه.
+ex.material.b3 = مع {move} تفقد مادة: بعد {line}، تخسر {pts:point}.
+ex.material.b3.2 = بعد {line}، أتقدّم عليك ب{pts:point}.
+ex.material.b4 = مع {move} تخسر مادة: {line}، وتفقد {pts:point}.
+ex.material.b4.2 = بعد {line}، أتقدّم عليك ب{pts:point}.
+ex.material.b5 = مع {move} تضيع مادة: {line}.
+ex.material.b5.2 = مع {line} أربح {pts:point}.
+ex.material.b6 = {line}، وأربح {pts:point}.
+ex.material.b6.2 = مع {move} تخسر {pts:point}: {line}.
 
 # ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
 ex.missed_capture.b1 = انظر! {my} في {sq} كان بلا حماية. كان بإمكان {your} أخذه.

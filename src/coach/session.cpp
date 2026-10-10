@@ -4,7 +4,8 @@
 //
 // Analyses (all through the Analyst, full strength):
 //   A0  when the human's turn begins: MultiPV 3 of the position (cached by FEN, so the retry after a
-//       takeback reuses it); A3 with it at levels 3-4. Stopped (finished early) when the human moves.
+//       takeback reuses it); A3 with it at levels 3-4. Left to finish when the human moves (the
+//       review waits for it: a search stopped early judges and explains from too shallow a line).
 //   A1  after the human's move, when A0 does not hold the played move or holds only a bound for it
 //       (Reviewer::needsPlayedRequest); A2 at levels 4-6.
 //   evaluations of the positions the appraisal still lacks, in the background when the Analyst is
@@ -26,7 +27,7 @@
 namespace coach {
 namespace {
 
-constexpr float kA0Wait = 3.0f;           // the review waits this long for a stopped A0
+constexpr float kA0Wait = 4.0f;           // the review waits this long for A0 (2.5 s of search at most)
 constexpr float kA12Wait = 4.0f;          // ... and for A1 / A2
 constexpr float kCoachRemarkWait = 1.5f;  // the coach's remarks wait this long for A0
 constexpr float kTakeYourTime = 60.0f;    // "Take your time." after this long without a move (levels 1-3)
@@ -304,7 +305,7 @@ struct Session::Impl {
         play(reviewer.announce(game));
         const chess::Color mover = game.positionAt(n - 1).sideToMove();
         if (mover == g.human) {
-            // The review of this move: A0 of its root (stopped now if still searching), then A1/A2.
+            // The review of this move: A0 of its root (left to finish its search), then A1/A2.
             g.review = ReviewState::WaitA0;
             g.reviewPly = int(n) - 1;
             g.reviewRoot = game.positionAt(n - 1).fen();
@@ -312,7 +313,6 @@ struct Session::Impl {
             g.reviewWait = 0.0f;
             g.a1Asked = g.a2Asked = g.a1Done = g.a2Done = false;
             g.a1 = g.a2 = ai::Analysis();
-            stopJobs(JobKind::A0, g.reviewRoot);
             stopJobs(JobKind::A3, g.reviewRoot);
             g.turnPly = -1;
             g.engineHold = 0.0f;
@@ -568,7 +568,7 @@ struct Session::Impl {
         g.coachMovedPly = -1;
         g.announcerWaiting = false;
         // No human turn follows: its analyses go, except the review's own input (the A0 / A3 of the
-        // last move's root, stopped when it was played). A resignation abandons the review: A1 / A2 too.
+        // last move's root, still searching when it was played). A resignation abandons the review: A1 / A2 too.
         const bool reviewing = g.review == ReviewState::WaitA0 || g.review == ReviewState::WaitA12;
         for (auto it = g.jobs.begin(); it != g.jobs.end();) {
             const bool turn = it->kind == JobKind::A0 || it->kind == JobKind::A3;

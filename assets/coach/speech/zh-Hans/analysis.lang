@@ -40,10 +40,10 @@ an.missed_chance = {move}错过了惩罚那步错着的机会。
 an.missed_chance.2 = 走了{move}，机会就溜走了。
 
 # What it allows ({reply} is the other side's answer).
-an.mate_allowed.one = 现在{reply}就是将死。
-an.mate_allowed.one.2 = 这步让对方可以走{reply}，直接将死。
-an.mate_allowed = 这步让对方有{m:move}强制将死，从{reply}开始。
-an.mate_allowed.2 = 现在出现了{m:move}强制将死，第一步是{reply}。
+an.mate_allowed.one = 现在{reply:nomate}就是将死。
+an.mate_allowed.one.2 = 这步让对方可以走{reply:nomate}，直接将死。
+an.mate_allowed = 这步让对方有{m:move}强制将死，从{reply:nomate}开始。
+an.mate_allowed.2 = 现在出现了{m:move}强制将死，第一步是{reply:nomate}。
 an.fork = 现在{reply}捉双{t1}和{t2:bare}。
 an.fork.2 = 这步让对方走{reply}，同时攻击{t1}和{t2:bare}。
 an.fork.3 = {reply}同时打到{t1}和{t2:bare}。
@@ -54,10 +54,10 @@ an.material = 应着{line}赢得{pts:point}的子力。
 an.material.2 = 接着{line}赢得{pts:point}。
 
 # What it misses ({best} is the better move).
-an.mate_missed.one = {best}就是将死。
-an.mate_missed.one.2 = {best}本可以直接将死。
-an.mate_missed = {best}本可以{m:move}强制将死。
-an.mate_missed.2 = 本来有{m:move}强制将死，从{best}开始。
+an.mate_missed.one = {best:nomate}就是将死。
+an.mate_missed.one.2 = {best:nomate}本可以直接将死。
+an.mate_missed = {best:nomate}本可以{m:move}强制将死。
+an.mate_missed.2 = 本来有{m:move}强制将死，从{best:nomate}开始。
 an.missed_capture = {best}本可以白吃{piece}。
 an.missed_capture.2 = {piece}没有保护：{best}本可以吃掉它。
 an.missed_fork = {best}本可以捉双{t1}和{t2:bare}。

@@ -145,6 +145,22 @@ gesture (at the latest the keepalive, a second later) brings it back. A gesture 
 an `OpponentGesture` event of that game (the latest one replaces one still waiting to be polled);
 neither side ever echoes its own.
 
+**Stances** (protocol minor 2: a player standing up to look at the board, in front of their chair
+or from an end of the table; `src/net/gesture.h`, `src/net/stance.h`). Like gestures they go
+straight to the other player: the host sends `S_Stance`, the guest `C_Stance` (numbered with its
+other messages), which the host takes before the authority (never journaled, never answered) and
+which counts towards the flood limit like any message. `DirectMatch::sendStance()` follows the
+rules of a server game (`docs/ONLINE_CLIENT.md`, "Stances"): a change at once, two messages at
+least 250 ms apart, a stance other than Seated again every keepalive (1 s) and once more after the
+link is back (the guest's `Welcome`; for the host, the guest's `Hello`), a return to Seated once,
+nothing for another game than the current one or once it is over. Only between sides of minor 2:
+the host never sends `S_Stance` to a guest of an earlier minor (its codec has no such message) and
+ignores, without an `Error`, a `C_Stance` from one; a guest sends none to a host whose `Welcome`
+says minor 0 or 1 (that host would answer the unknown message with an `Error`). The host also
+drops a `C_Stance` that does not decode or names another game. A stance received becomes an
+`OpponentStance` event of that game with the value as it came; unlike gestures, they are all
+kept, in order with the other events.
+
 ## Security design
 
 The code is the only secret: it authenticates both players to each other and keys the channel.
@@ -177,7 +193,8 @@ refusal is a fatal `Error`, then the host closes. Otherwise it answers `Welcome`
 negotiated minor (the lower of the two) and capabilities (the bits both sides know), then the
 `GameSnapshot`. The host never sends a guest a value its minor does not define: a guest of minor 0
 gets a resignation drawn for want of mating material (`ResignationVsInsufficient`, minor 1) as
-`Resignation` with the `Draw` status (`direct::frameForMinor`), as the server does. Windows uses BCrypt (ECDH P-256, AES-GCM, SHA-256/HMAC, system RNG); the Linux
+`Resignation` with the `Draw` status (`direct::frameForMinor`), as the server does, and a guest
+below minor 2 gets no `S_Stance` (message type of minor 2). Windows uses BCrypt (ECDH P-256, AES-GCM, SHA-256/HMAC, system RNG); the Linux
 test build uses OpenSSL.
 
 What this gives:
@@ -220,6 +237,7 @@ Limits, accepted for a friendly unrated game:
 | handshake, then Hello -> Welcome | 10 s each (guest); 10 s for both (host) |
 | ping (both directions, measures the round trip and the host clock) | every 2 s |
 | gestures, each way | 10 per second, bursts of 20 (the sender paces for 19) |
+| stances, each way | on a change (250 ms apart at least), every 1 s while not Seated |
 | link considered dead without any data | 10 s |
 | first move of each player | 60 s |
 | guest disconnection grace | 60 s |
@@ -251,11 +269,16 @@ grace, rematch, `autoPress` in every snapshot, the 1200-ply cap), and full match
 (castling, en passant, promotion, a draw offer declined by a move, resignation, rematch, wrong
 code, reconnection through a relay that cuts the connection, the host vanishing, a flag with a
 1 s clock, leaving; `autoPress` off through a rematch, gestures both ways and their pacing, none
-replayed after a reconnection; the "connection from" log paced under 50 junk connections), a
+replayed after a reconnection; stances both ways, refreshed, sent again after a reconnection and
+silent once the game is over; the "connection from" log paced under 50 junk connections), a
 guest written by hand (`Welcome`'s gesture values and keepalive, 100 gestures at once without
 tripping the flood limit, the host keeping its bucket's worth, a refused connection and a flood
 closed without stalling the host, messages out of sequence logged once, a message of an unknown
-type answered `Malformed`) and a host written by hand (a guest's gesture sent the moment it is
-back online after a reconnection arrives, the guest's keepalive taken from the host's `Welcome`
-and clamped, a host flooding the guest with events dropped, one more attempt after a close before
-the host's confirmation, and giving up after a second one).
+type answered `Malformed`; guests of minors 0, 1 and 2 and the host's stances: none to the
+first two, whose `C_Stance` is ignored, those of the third relayed both ways, a malformed one or
+one for another game dropped, fifty at once closed by the flood limit) and a host written by hand
+(a guest's gesture sent the moment it is back online after a reconnection arrives, the guest's
+keepalive taken from the host's `Welcome` and clamped, no stance to a host of minor 1 and a
+standing one at once to the same host back with minor 2, a host flooding the guest with events
+dropped, one more attempt after a close before the host's confirmation, and giving up after a
+second one).

@@ -18,7 +18,8 @@
 // The old INT8 model (tts::legacyManifest(), downloaded by earlier versions) still speaks, and its
 // update to the official Supertonic 3 is offered:
 //   - once at start-up (Settings::coachVoiceUpdateOffered), after a background check that its
-//     files are there and hash right; the prompt then says that the new version replaces it, its
+//     files are there and hash right, when the title page first shows (after the loading screen
+//     and the brightness calibration); the prompt then says that the new version replaces it, its
 //     size, and that the old files are deleted first;
 //   - from then on by a row of Options > Audio, under Coach voice, which opens the same prompt.
 // "Not now" there keeps the old voice. Any download into a folder that holds old files (the
@@ -30,7 +31,7 @@
 //   1. Once, after the Settings are loaded and --coach-dir applied (tts::setModelDirectory):
 //          game::coachModelInit();
 //   2. Every frame, menus and table alike, after the menus and the HUD, before ui::endFrame():
-//          game::drawModelDownload();
+//          game::drawModelDownload(on the title page);
 //          int fetched = 0;
 //          if (game::coachModelInstalled(&fetched)) coachModelDownloaded(fetched);   // the voice is there now
 //      where coachModelDownloaded stops a TTS worker that failed when coachVoiceRetry() says so,
@@ -74,7 +75,10 @@ void openModelPrompt();
 bool offerVoiceForAnalysis();
 // The prompt (modal), the progress panel (top end corner) and the notices; also notices that the
 // Coach voice option was switched on. Every frame, after the menus / HUD, before ui::endFrame().
-void drawModelDownload();
+// 'startupOffer': the start-up offer of the old model's update may open now (GameScene: on the
+// title page, never over the loading screen nor the brightness calibration); until then the
+// result of the background check waits.
+void drawModelDownload(bool startupOffer = true);
 // True once after a download that ended with every file checked. 'fetched' (optional) receives
 // how many files it wrote (0: they were all there and right).
 bool coachModelInstalled(int* fetched = nullptr);

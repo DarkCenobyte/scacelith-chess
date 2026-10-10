@@ -54,13 +54,13 @@ ann.mate.coach.3 = 恐怕是將死了。
 
 # ---- Verdicts (the first sentence about a bad move) --------------------------------------------
 ex.verdict.blunder.b1 = 哎呀！這步棋會讓你吃虧。
-ex.verdict.blunder.b1.2 = 小心！我讓你看看現在會發生什麼。
+ex.verdict.blunder.b1.2 = 小心！這步棋可能讓你付出代價。
 ex.verdict.blunder.b1.3 = 喔，等一下。這步棋有問題。
-ex.verdict.blunder.b2 = 嗯，這步棋有問題。你看。
-ex.verdict.blunder.b2.2 = 這步走錯了。仔細看。
-ex.verdict.blunder.b2.3 = 小心，這步棋要付出代價。你看。
+ex.verdict.blunder.b2 = 嗯，這步棋有問題。
+ex.verdict.blunder.b2.2 = 這是個大錯。
+ex.verdict.blunder.b2.3 = 小心，這步棋要付出代價。
 ex.verdict.blunder.b3 = 這是一步漏著。
-ex.verdict.blunder.b3.2 = {move}走錯了。原因是這樣的。
+ex.verdict.blunder.b3.2 = {move}真的走錯了。
 ex.verdict.blunder.b3.3 = 哎喲，{move}是個大錯。
 ex.verdict.blunder.b4 = {move}是漏著。
 ex.verdict.blunder.b4.2 = {move}是嚴重的錯誤。
@@ -71,11 +71,11 @@ ex.verdict.blunder.b5.3 = {move}是代價很大的錯誤。
 ex.verdict.blunder.b6 = {move}是嚴重失誤。
 ex.verdict.blunder.b6.2 = {move}是漏著。
 ex.verdict.blunder.b6.3 = {move}？漏著。
-ex.verdict.mistake.b3 = 這步不是最好的。我來說明原因。
+ex.verdict.mistake.b3 = 這步不是好棋。
 ex.verdict.mistake.b3.2 = 嗯，{move}有問題。
-ex.verdict.mistake.b3.3 = 這步走錯了。我示範給你看。
+ex.verdict.mistake.b3.3 = 這步走錯了。
 ex.verdict.mistake.b4 = {move}是錯著。
-ex.verdict.mistake.b4.2 = {move}不好。原因如下。
+ex.verdict.mistake.b4.2 = {move}不好。
 ex.verdict.mistake.b4.3 = 這是一步錯著。
 ex.verdict.mistake.b5 = {move}是明顯的錯著。
 ex.verdict.mistake.b5.2 = {move}是錯著。
@@ -83,7 +83,11 @@ ex.verdict.mistake.b5.3 = {move}不是好棋。
 ex.verdict.mistake.b6 = {move}是錯著。
 ex.verdict.mistake.b6.2 = {move}？錯著。
 ex.verdict.mistake.b6.3 = 不該走{move}。
-# An inaccuracy with no concrete cause: the line names the better move ({best} is pointed at).
+# A dubious move (an inaccuracy; a costly move with nothing concrete to show while still better):
+# only the better move is named ({best} is pointed at), never a scenario.
+ex.verdict.inaccuracy.b3 = 不算差，但{best}稍微好一點。
+ex.verdict.inaccuracy.b3.2 = {best}稍微精確一點。
+ex.verdict.inaccuracy.b3.3 = 小小的失誤：這裡{best}更好。
 ex.verdict.inaccuracy.b4 = 不夠精確：{best}更精確。
 ex.verdict.inaccuracy.b4.2 = 小小的不精確。{best}稍微好一點。
 ex.verdict.inaccuracy.b4.3 = 不是最好的：{best}更準確。
@@ -93,12 +97,6 @@ ex.verdict.inaccuracy.b5.3 = {best}比{move}更精確。
 ex.verdict.inaccuracy.b6 = {move}不精確，應走{best}。
 ex.verdict.inaccuracy.b6.2 = 不精確。{best}。
 ex.verdict.inaccuracy.b6.3 = {best}更好。
-ex.verdict.imprecise.b4 = {move}不夠精確。原因如下。
-ex.verdict.imprecise.b4.2 = {move}不太準確。
-ex.verdict.imprecise.b5 = {move}不夠精確。
-ex.verdict.imprecise.b5.2 = {move}有些不準。
-ex.verdict.imprecise.b6 = {move}不精確。
-ex.verdict.imprecise.b6.2 = {move}？不精確。
 # Something good was missed (levels 1-2).
 ex.verdict.missed.b1 = 喔，等一下！你錯過了一步好棋。
 ex.verdict.missed.b1.2 = 再看看！剛才有更好的走法。
@@ -186,6 +184,31 @@ demo.your.back.3 = 你再吃回來。
 demo.your.king = 你的王必須移動。
 demo.your.king.2 = 王必須躲開，走到{sq}。
 demo.your.king.3 = 你的王逃到{sq}。
+# Levels 4-6 (and 1-3 when the whole line is too long): the demonstration stops where the problem
+# stands, and the coach points at what comes next ({t1} {t2} = the pieces that fall, pointed at;
+# {reply} = the mating move, traced; the pieces where they stand at that moment).
+ex.point.piece = 現在{t1}保不住了。
+ex.point.piece.2 = 然後{t1}就丟了。
+ex.point.piece.3 = 接下來{t1}會被吃掉。
+ex.point.two = {t1}和{t2}都被攻擊：其中一個會被吃掉。
+ex.point.two.2 = 現在我攻擊{t1}和{t2}。你沒辦法兩個都救。
+ex.point.mate = 現在{reply:nomate}就是將死。
+ex.point.mate.2 = 下一步是{reply:nomate}，那就將死了。
+# Levels 1-3, at the end of a whole sequence shown on the board: what it cost ({pts} from before the
+# move, every capture of the sequence counted).
+ex.result.b1 = 看到了嗎？現在你少了{pts:point}。
+ex.result.b1.2 = 你就是這樣丟掉{pts:point}的。
+ex.result.b2 = 最後，你少了{pts:point}。
+ex.result.b2.2 = 現在你落後{pts:point}。
+ex.result.b3 = 這樣你要損失{pts:point}。
+ex.result.b3.2 = 結果你落後{pts:point}。
+# The same when the player, to move, can still take something back ({pts} counts that capture).
+ex.result_back.b1 = 你可以吃回一些，但還是少了{pts:point}。
+ex.result_back.b1.2 = 你能扳回一點，但還是丟了{pts:point}。
+ex.result_back.b2 = 你可以吃回一些，但仍然落後{pts:point}。
+ex.result_back.b2.2 = 就算吃回來，你還是少了{pts:point}。
+ex.result_back.b3 = 即使你吃回來，也還落後{pts:point}。
+ex.result_back.b3.2 = 你能贏回一些，但還是要付出{pts:point}的代價。
 # The player would promote: the coach points at the square instead of moving ({sq} is pointed at).
 demo.promote = 到了{sq}這裡，你就會得到一個新的后。
 demo.promote.2 = 然後{your}走到{sq}，變成一個后。
@@ -200,18 +223,18 @@ ex.mate_allowed.b2 = 這步棋讓我能用{m:move}將死{your}。
 ex.mate_allowed.b2.2 = 現在我可以用{m:move}將死{your}。你看。
 ex.mate_allowed.b2.3 = 小心！{your}有危險：{m:move}就會被將死。
 # b3 b4 b6 ({line} is pointed at).
-ex.mate_allowed.b3 = 這步棋讓我能{m:move}將死你：{line}。
-ex.mate_allowed.b3.2 = 這步之後，我有{m:move}將死：{line}。
-ex.mate_allowed.b3.3 = 你的王會被將死：{line}。
-ex.mate_allowed.b4 = {move}之後我能強制將死：{line}。
-ex.mate_allowed.b4.2 = 走了這步，我{m:move}就能將死你：{line}。
-ex.mate_allowed.b4.3 = {move}之後，{line}將死。
+ex.mate_allowed.b3 = 這步棋讓我能{m:move}將死你：{line:nomate}。
+ex.mate_allowed.b3.2 = 這步之後，我有{m:move}將死：{line:nomate}。
+ex.mate_allowed.b3.3 = 你的王會被將死：{line:nomate}。
+ex.mate_allowed.b4 = {move}之後我能強制將死：{line:nomate}。
+ex.mate_allowed.b4.2 = 走了這步，我{m:move}就能將死你：{line:nomate}。
+ex.mate_allowed.b4.3 = {move}之後，{line:nomate}將死。
 ex.mate_allowed.b5 = {move}之後，我有{m:move}強制將死。
 ex.mate_allowed.b5.2 = 這步之後，你{m:move}就會被將死。
 ex.mate_allowed.b5.3 = 現在我有{m:move}強制將死。
-ex.mate_allowed.b6 = {m}步將死：{line}。
-ex.mate_allowed.b6.2 = {line}，將死。
-ex.mate_allowed.b6.3 = {line}之後將死。
+ex.mate_allowed.b6 = {m}步將死：{line:nomate}。
+ex.mate_allowed.b6.2 = {line:nomate}，將死。
+ex.mate_allowed.b6.3 = {line:nomate}之後將死。
 # After the one-move demonstration ({your} = the king).
 ex.mate_allowed.tail.b1 = 你看：{your}沒有格子可以逃了。
 ex.mate_allowed.tail.b1.2 = 看到了嗎？{your}被攻擊，而且逃不掉。
@@ -230,29 +253,29 @@ name.pattern.ladder = 梯子殺
 name.pattern.epaulette = 肩章殺
 
 # ---- 2. Mate missed ({best} is pointed at; b1 also points at {my}, the coach's king) ------------
-ex.mate_missed.b1 = 走{best}本來就能將死{my}！
-ex.mate_missed.b1.2 = {best}就是將死！{my}根本逃不掉。
-ex.mate_missed.b1.3 = 你看！{best}本來可以將死{my}。
-ex.mate_missed.b2 = 你本來可以{m:move}將死我，第一步是{best}。
-ex.mate_missed.b2.2 = {best}可以{m:move}將死！
-ex.mate_missed.b2.3 = 你本來可以用{best}將死我。
-ex.mate_missed.b3 = 你錯過了{m:move}將死：{best}。
-ex.mate_missed.b3.2 = {best}可以{m:move}將死：{line}。
-ex.mate_missed.b3.3 = 剛才有{m:move}將死，從{best}開始。
-ex.mate_missed.b4 = 錯過了將死：{line}，第一步是{best}。
-ex.mate_missed.b4.2 = {best}可以強制{m:move}將死。
-ex.mate_missed.b4.3 = 你本來可以走{best}，{m:move}將死。
-ex.mate_missed.b5 = {best}可{m:move}將死：{line}。
-ex.mate_missed.b5.2 = 錯過了{m:move}將死，從{best}開始。
-ex.mate_missed.b5.3 = 剛才有強制將死：{best}。
-ex.mate_missed.b6 = {best}將死：{line}。
-ex.mate_missed.b6.2 = {m}步將死：{best}。
-ex.mate_missed.b6.3 = {best}，{m}步將死。
+ex.mate_missed.b1 = 走{best:nomate}本來就能將死{my}！
+ex.mate_missed.b1.2 = {best:nomate}就是將死！{my}根本逃不掉。
+ex.mate_missed.b1.3 = 你看！{best:nomate}本來可以將死{my}。
+ex.mate_missed.b2 = 你本來可以{m:move}將死我，第一步是{best:nomate}。
+ex.mate_missed.b2.2 = {best:nomate}可以{m:move}將死！
+ex.mate_missed.b2.3 = 你本來可以用{best:nomate}將死我。
+ex.mate_missed.b3 = 你錯過了{m:move}將死：{best:nomate}。
+ex.mate_missed.b3.2 = {best:nomate}可以{m:move}將死：{line:nomate}。
+ex.mate_missed.b3.3 = 剛才有{m:move}將死，從{best:nomate}開始。
+ex.mate_missed.b4 = 錯過了將死：{line:nomate}，第一步是{best:nomate}。
+ex.mate_missed.b4.2 = {best:nomate}可以強制{m:move}將死。
+ex.mate_missed.b4.3 = 你本來可以走{best:nomate}，{m:move}將死。
+ex.mate_missed.b5 = {best:nomate}可{m:move}將死：{line:nomate}。
+ex.mate_missed.b5.2 = 錯過了{m:move}將死，從{best:nomate}開始。
+ex.mate_missed.b5.3 = 剛才有強制將死：{best:nomate}。
+ex.mate_missed.b6 = {best:nomate}將死：{line:nomate}。
+ex.mate_missed.b6.2 = {m}步將死：{best:nomate}。
+ex.mate_missed.b6.3 = {best:nomate}，{m}步將死。
 # Both moves mate, the played one much later (levels 5-6).
-ex.mate_delayed.b5 = 更快的是{best}：{m:move}將死。
-ex.mate_delayed.b5.2 = {best}將死得更快，只要{m:move}。
-ex.mate_delayed.b6 = {best}可{m}步將死。
-ex.mate_delayed.b6.2 = 更快：{best}，{m}步將死。
+ex.mate_delayed.b5 = 更快的是{best:nomate}：{m:move}將死。
+ex.mate_delayed.b5.2 = {best:nomate}將死得更快，只要{m:move}。
+ex.mate_delayed.b6 = {best:nomate}可{m}步將死。
+ex.mate_delayed.b6.2 = 更快：{best:nomate}，{m}步將死。
 
 # ---- 3. Stalemate ({my} = the coach's king, pointed at) ----------------------------------------
 ex.stalemate.b1 = 糟糕！{my}不能動，又沒有被將軍。這是逼和：和棋。
@@ -309,10 +332,13 @@ ex.fork.b5.3 = {reply}之後，{t1}和{t2}同時受到威脅。
 ex.fork.b6 = {reply}捉雙。
 ex.fork.b6.2 = {move}之後，{reply}捉雙。
 ex.fork.b6.3 = {reply}，捉雙。
-# After the one-move demonstration (level 1).
+# Once the fork stands (level 1; in the middle of the demonstration, or where it stops).
 ex.fork.tail.b1 = 你只能救其中一個：{t1}或{t2}。
 ex.fork.tail.b1.2 = 現在我同時攻擊兩個子：{t1}和{t2}。這叫捉雙！
 ex.fork.tail.b1.3 = 看到了嗎？{t1}和{t2}都被攻擊，其中一個會被吃掉。
+# The fork gives check ({your} = the king, {t1} = the piece that falls; both pointed at).
+ex.fork.tail_king = {your}必須解除將軍，所以我吃掉{t1}。
+ex.fork.tail_king.2 = 將軍！{your}必須移動，{t1}就丟了。
 ex.fork.more.b3 = 走棋前先看看{sq}：{my}可以在那裡捉雙。
 ex.fork.more.b3.2 = 留意{sq}。{my}會從那裡捉雙。
 ex.fork.tip.knight = 小心馬跳到你的王和后附近！
@@ -361,7 +387,7 @@ ex.skewer.b6.2 = {reply}，串擊。
 ex.pin.b1 = {my}可以走到{sq}。那樣{your}就被卡在{t1}前面。
 ex.pin.b1.2 = 注意{my}走到{sq}：{your}會被卡在{t1}前面。
 ex.pin.b1.3 = {my}可以把{your}牽制在{t1}前面。然後我就能吃掉它。
-ex.pin.b2 = 牽制：{your}不能動，因為{t1}在它後面。
+ex.pin.b2 = 牽制：{your}被卡在{t1}前面。
 ex.pin.b2.2 = {your}被牽制了，後面是{t1}。這樣我就能吃掉它。
 ex.pin.b2.3 = 現在{your}被卡在{t1}前面。這就是牽制。
 ex.pin.b3 = {your}被牽制，後面是{t1}，我能吃掉它。
@@ -376,7 +402,7 @@ ex.pin.b6 = {reply}牽制。
 ex.pin.b6.2 = {reply}，牽制。
 # The only defender is pinned ({your} = the pinned defender, {sq} = the square it cannot guard).
 ex.pin_defender.b1 = {your}被牽制了，所以不能保護{sq}。{t1}在它後面。
-ex.pin_defender.b1.2 = 你看：{your}不能保護{sq}，否則{t1}會丟掉。
+ex.pin_defender.b1.2 = 你看：{your}其實保護不了{sq}，因為{t1}在它後面。
 ex.pin_defender.b2 = {your}被牽制，後面是{t1}，所以{sq}其實沒有保護。
 ex.pin_defender.b2.2 = 被牽制的子不能好好防守。{your}守不住{sq}：{t1}在它後面。
 ex.pin_defender.b3 = {your}被牽制，後面是{t1}；它其實保護不了{sq}。
@@ -509,6 +535,22 @@ ex.exchange_cheap.b5 = {your}在{sq}被更便宜的子攻擊：{line}。
 ex.exchange_cheap.b5.2 = {reply}攻擊{your}，在{sq}得子。
 ex.exchange_cheap.b6 = {reply}之後，{sq}上{your}保不住。
 ex.exchange_cheap.b6.2 = {line}：{sq}上{your}丟了。
+
+# ---- 11b. Material lost along the line, no motif to name -----------------------------------------
+# b1 b2: {t1} = the piece that falls (pointed at); b3-b6: {line} = the moves until it is lost,
+# {pts} = what it costs.
+ex.material.b1 = 小心：現在我可以吃掉{t1}。
+ex.material.b1.2 = 這步棋讓{t1}陷入麻煩。我可以吃掉它。
+ex.material.b2 = 這步棋讓我可以吃掉{t1}。
+ex.material.b2.2 = 現在{t1}有麻煩了，我會吃掉它。
+ex.material.b3 = {move}會丟子：{line}之後，你少了{pts:point}。
+ex.material.b3.2 = {line}之後，你落後{pts:point}。
+ex.material.b4 = {move}丟子：{line}，你少了{pts:point}。
+ex.material.b4.2 = {line}之後，你落後{pts:point}。
+ex.material.b5 = {move}丟子：{line}。
+ex.material.b5.2 = {line}，我贏得{pts:point}。
+ex.material.b6 = {line}，我淨賺{pts:point}。
+ex.material.b6.2 = {move}損失{pts:point}：{line}。
 
 # ---- 12. Missed capture ({my} pointed at; b1 also {your}; b2-b6 also {best}) --------------------
 ex.missed_capture.b1 = 看到了嗎？{my}在{sq}可以白吃。{your}本來能吃掉它。

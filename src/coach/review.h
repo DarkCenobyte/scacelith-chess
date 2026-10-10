@@ -72,7 +72,8 @@ enum class ExType : uint8_t {
     BadTrade,
     Opening,
     Endgame,
-    Positional
+    Positional,
+    Material        // material lost along the line, no named motif (after Positional: stored values stay)
 };
 const char* exTypeName(ExType t);   // "fork", "hanging", ...: key part of ex.<name>.b<n> and theme.<name>
 
@@ -113,8 +114,14 @@ struct TakebackRecord {
 // ---- Level parameters ---------------------------------------------------------------------------
 struct Band {
     int level = 1;
-    int demoPlies = 1;          // deepest demonstration moved on the table
-    int mateLinePlies = 1;      // longest mating line shown (M1 = 1 ply, M2 = 3, M3 = 5, M4 = 7)
+    // Levels 1-3 (beginners): a demonstration plays the whole sequence, until the material is lost
+    // for good or the king is mated. Levels 4-6: it plays up to the position where the problem
+    // stands on the board (the fork, the pin, the move before the mate) and the coach points at
+    // what falls next, without playing the last capture.
+    bool fullDemo = true;
+    int demoPlies = 1;          // longest demonstration moved on the table (either kind)
+    int linePlies = 1;          // longest line said in words ({line}, the better move's idea)
+    int mateLinePlies = 1;      // longest mating line shown in full (M1 = 1 ply, M2 = 3, M3 = 5)
     int missedMateMax = 1;      // missed mates voiced up to this many moves
     int lookahead = 2;          // plies of the refutation searched for a concrete cause
     int sentences = 3;          // Say lines per explanation (demo narration, rewind and offer excluded)
@@ -191,6 +198,7 @@ private:
     bool offersEnabled_ = true;
     int humanMoves_ = 0;              // human moves reviewed (retries excluded)
     int lastPraise_ = -1000;          // humanMoves_ at the last praise
+    int lastSlip_ = -1000;            // humanMoves_ at the last inaccuracy remarked on
     std::deque<int> remarks_;         // humanMoves_ of each unsolicited remark (sliding window of 10)
     int offers_ = 0;
     bool brilliantDone_ = false;

@@ -301,7 +301,8 @@ bool splitUci(const std::string& uci, int& from, int& to, int& promo) {
 
 TEST(net_protocol_constants) {
     CHECK_EQ(pr::kProtocolVersion, 1);
-    CHECK_EQ(pr::kMinor, 1);   // minor 1: EndReason::ResignationVsInsufficient
+    CHECK_EQ(pr::kMinor, 2);   // minor 1: EndReason::ResignationVsInsufficient; minor 2: Stance
+    CHECK_EQ(int(net::kStanceMinMinor), 2);
     CHECK_EQ(pr::kCaps, uint64_t(0));
     CHECK_EQ(std::string(pr::kWsSubprotocol), std::string("scacelith.rt1"));
     CHECK_EQ(pr::kHelloPrefixSize, size_t(17));
@@ -313,6 +314,15 @@ TEST(net_protocol_constants) {
     CHECK_EQ(int(pr::MsgType::S_Ping), 0x82);
     CHECK_EQ(int(pr::MsgType::C_Gesture), 0x28);
     CHECK_EQ(int(pr::MsgType::S_Gesture), 0xA6);
+    CHECK_EQ(int(pr::MsgType::C_Stance), 0x29);
+    CHECK_EQ(int(pr::MsgType::S_Stance), 0xA7);
+    CHECK(pr::isClientType(uint8_t(pr::MsgType::C_Stance)) && !pr::isClientType(uint8_t(pr::MsgType::S_Stance)));
+    CHECK_EQ(int(pr::Stance::Seated), 0);
+    CHECK_EQ(int(pr::Stance::Standing), 1);
+    CHECK_EQ(int(pr::Stance::SideLeft), 2);
+    CHECK_EQ(int(pr::Stance::SideRight), 3);
+    CHECK(!pr::isValid(pr::Stance(4)));
+    CHECK_EQ(std::string(pr::messageName(pr::MsgType::C_Stance)), std::string("C_Stance"));
     CHECK_EQ(int(pr::GestureFlag::Glance), 1);
     CHECK_EQ(int(pr::GestureFlag::Promoting), 2);
     CHECK_EQ(int(pr::GestureFlag::Side), 4);
@@ -2644,6 +2654,17 @@ public:
     std::atomic<bool> seqOk{true};                            // every client message came numbered in order
     std::atomic<bool> loginToken2{false};                     // sign-ins answer token2 (another session)
     std::atomic<int> resyncs{0};                              // Resync requests (each answered with a snapshot)
+    std::atomic<uint16_t> serverMinor{pr::kMinor};            // the server's minor (Welcome: the lower of the two)
+
+    // The C_Stance frames received, with their arrival time.
+    struct StanceIn {
+        pr::C_Stance m;
+        std::chrono::steady_clock::time_point at;
+    };
+    std::vector<StanceIn> stances() {
+        std::lock_guard<std::mutex> lk(gestureMu_);
+        return stances_;
+    }
 
     // The C_Gesture frames received, with their arrival time.
     struct GestureIn {
@@ -2790,6 +2811,7 @@ private:
     std::mutex gameMu_;
     std::mutex gestureMu_;
     std::vector<GestureIn> gestures_;
+    std::vector<StanceIn> stances_;
     std::mutex scriptMu_;
     std::deque<int> script_;
     std::atomic<uint32_t> gseq_{1};
@@ -3036,7 +3058,7 @@ private:
                 }
                 pr::Welcome w;
                 w.proto = pr::kProtocolVersion;
-                w.minor = std::min(m.minor, pr::kMinor);
+                w.minor = std::min(m.minor, serverMinor.load());
                 w.caps = m.caps & pr::kCaps;
                 w.serverTime = epochMs() + kSkewMs;
                 w.userId = 7;
@@ -3126,6 +3148,11 @@ private:
                 if (!pr::decode(p, n, m)) return;
                 std::lock_guard<std::mutex> lk(gestureMu_);
                 gestures_.push_back({m, std::chrono::steady_clock::now()});
+            } else if (t == pr::MsgType::C_Stance) {
+                pr::C_Stance m;
+                if (!pr::decode(p, n, m)) return;
+                std::lock_guard<std::mutex> lk(gestureMu_);
+                stances_.push_back({m, std::chrono::steady_clock::now()});
             } else if (t == pr::MsgType::Resync) {
                 pr::Resync m;
                 if (!pr::decode(p, n, m)) return;
@@ -4027,6 +4054,178 @@ void gestureDownScenario(PacingRig& r) {
              "online again: the next one goes");
 }
 
+// The C_Stance frames the server got, from index 'from' on.
+std::vector<FakeServer::StanceIn> stancesFrom(PacingRig& r, size_t from) {
+    auto v = r.srv.stances();
+    return std::vector<FakeServer::StanceIn>(v.begin() + long(std::min(from, v.size())), v.end());
+}
+double msBetween(std::chrono::steady_clock::time_point a, std::chrono::steady_clock::time_point b) {
+    return std::chrono::duration<double, std::milli>(b - a).count();
+}
+
+// A server of minor 2 that relays no gestures (Welcome.gestureRate 0, gestureIdleMs 0: the
+// keepalive is 1 s). The player's stance goes when it changes and, while not Seated, every
+// keepalive all the same; numbered with the other messages; changes a quarter of a second apart at
+// least, the latest last; a return to Seated once; nothing for another game, nor once the game is
+// over. The opponent's S_Stance becomes OpponentStance events, in order, its value as it came.
+void stanceScenario(PacingRig& r) {
+    using K = net::Event::Kind;
+    net::Event ev;
+    if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    r.c->sendStance(77, 0);
+    r.sleepMs(400);
+    r.expect(r.srv.stances().empty(), "Seated at first: nothing to say");
+
+    // Standing: at once, then every keepalive (the gestures' rate is 0).
+    auto t0 = std::chrono::steady_clock::now();
+    r.c->sendStance(77, 1);
+    r.expect(r.until([&] { return r.srv.stances().size() == 1; }, 1000), "Standing goes");
+    auto first = r.srv.stances();
+    r.expect(!first.empty() && msBetween(t0, first[0].at) < 300.0, "at once");
+    for (int i = 0; i < 100; ++i) {   // every frame: no more for that
+        r.c->sendStance(77, 1);
+        r.sleepMs(10);
+    }
+    r.expect(r.until([&] { return r.srv.stances().size() >= 4; }, 3000), "refreshed while standing");
+    auto v = r.srv.stances();
+    bool everySecond = true, standing = true;
+    for (size_t i = 0; i < v.size(); ++i) {
+        standing = standing && v[i].m.game == 77 && v[i].m.stance == pr::Stance::Standing;
+        if (i > 0) {
+            const double gap = msBetween(v[i - 1].at, v[i].at);
+            everySecond = everySecond && gap > 850.0 && gap < 1400.0;
+        }
+    }
+    r.expect(standing, "Standing, game 77, every time");
+    r.expect(everySecond, "every keepalive (1 s)");
+
+    // Keys tapped every 20 ms for 0.6 s: messages a quarter of a second apart at least, the latest
+    // one (SideRight) last.
+    size_t mark = r.srv.stances().size();
+    auto tTap = std::chrono::steady_clock::now();
+    for (int i = 0; i < 30; ++i) {
+        r.c->sendStance(77, uint8_t(1 + i % 3));
+        r.sleepMs(20);
+    }
+    r.c->sendStance(77, 3);
+    r.expect(r.until([&] {
+                 auto x = stancesFrom(r, mark);
+                 return !x.empty() && x.back().m.stance == pr::Stance::SideRight && msBetween(tTap, x.back().at) > 600.0;
+             }, 1500),
+             "the latest stance last");
+    auto taps = stancesFrom(r, mark);
+    bool paced = true;
+    for (size_t i = 1; i < taps.size(); ++i) paced = paced && msBetween(taps[i - 1].at, taps[i].at) > 200.0;
+    r.expect(paced, "a quarter of a second apart (" + std::to_string(taps.size()) + " messages)");
+    r.expect(taps.size() <= 5, "no burst (" + std::to_string(taps.size()) + ")");
+
+    // Another game: nothing (not even the current game's stance meanwhile).
+    r.sleepMs(300);
+    mark = r.srv.stances().size();
+    r.c->sendStance(78, 2);
+    r.sleepMs(1300);
+    r.expect(stancesFrom(r, mark).empty(), "nothing for another game");
+
+    // Back to Seated in game 77: once.
+    mark = r.srv.stances().size();
+    r.c->sendStance(77, 0);
+    r.expect(r.until([&] { return stancesFrom(r, mark).size() == 1; }, 1000), "Seated goes");
+    r.sleepMs(1500);
+    auto seated = stancesFrom(r, mark);
+    r.expect(seated.size() == 1 && seated[0].m.stance == pr::Stance::Seated, "Seated once, never refreshed");
+    r.expect(r.srv.seqOk.load(), "one numbering for every message");
+
+    // The opponent's: in order, each value as it came (6: a later minor's), this game's only.
+    while (r.c->poll(ev)) {
+    }
+    pr::S_Stance s;
+    s.game = 77;
+    for (int code : {1, 2, 6, 0}) {
+        s.stance = pr::Stance(code);
+        r.srv.sendToClients(s);
+    }
+    s.game = 99;
+    s.stance = pr::Stance::Standing;
+    r.srv.sendToClients(s);
+    r.sleepMs(600);
+    std::vector<int> got;
+    bool shape = true;
+    while (r.c->poll(ev)) {
+        if (ev.kind != K::OpponentStance) continue;
+        got.push_back(ev.stance);
+        shape = shape && ev.gameId == 77 && ev.game.id == 0 && ev.ok;
+    }
+    r.expect(got == std::vector<int>({1, 2, 6, 0}), "OpponentStance in order, as they came (" + std::to_string(got.size()) + ")");
+    r.expect(shape, "for game 77, without a copy of the game");
+
+    // Once the game is over, nothing goes.
+    r.c->resign(77);
+    r.expect(waitEvent(*r.c, K::GameEnd, ev, 5000), "the game ends");
+    mark = r.srv.stances().size();
+    r.c->sendStance(77, 1);
+    r.sleepMs(1300);
+    r.expect(stancesFrom(r, mark).empty(), "nothing once the game is over");
+}
+
+// A server of minor 1 (Welcome.minor 1): no Stance ever goes, the connection and the numbering
+// stay as they are.
+void stanceOldServerScenario(PacingRig& r) {
+    net::Event ev;
+    if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    for (uint8_t s : {1, 2, 3, 1}) {
+        r.c->sendStance(77, s);
+        r.sleepMs(400);
+    }
+    r.sleepMs(1200);
+    r.expect(r.srv.stances().empty(), "no Stance to a server of minor 1");
+    r.expect(r.c->state() == net::ConnState::Online, "still online");
+    r.c->sendGesture(77, net::Gesture());
+    r.expect(r.until([&] { return r.srv.gestures().size() == 1; }, 1000), "the gestures still go");
+    r.expect(r.srv.seqOk.load(), "the numbering has no gap");
+}
+
+// A stance other than Seated goes again at once after a reconnection (the keepalive is 10 s
+// here: no refresh would come so soon), the one of the moment (changed while the connection was
+// down); Seated does not. Nothing goes while the connection is down.
+void stanceReconnectScenario(PacingRig& r) {
+    using K = net::Event::Kind;
+    net::Event ev;
+    if (!enterGame(r, ev)) return r.expect(false, "in game: snapshot");
+    r.expect(r.c->gestureKeepaliveMs() == 10000, "a keepalive of 10 s");
+    r.c->sendStance(77, 2);
+    r.expect(r.until([&] { return r.srv.stances().size() == 1; }, 1000), "SideLeft goes");
+
+    r.srv.upgradeStatus.store(502);
+    r.srv.dropWebSockets();
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "reconnecting");
+    r.c->sendStance(77, 1);   // changed meanwhile
+    r.sleepMs(300);
+    r.expect(r.srv.stances().size() == 1, "nothing while the connection is down");
+    r.srv.upgradeStatus.store(0);
+    r.expect(waitEvent(*r.c, K::Welcome, ev, 15000), "back: Welcome");
+    auto back = std::chrono::steady_clock::now();
+    r.expect(r.until([&] { return r.srv.stances().size() == 2; }, 1500), "the stance goes again");
+    auto v = r.srv.stances();
+    r.expect(v.size() == 2 && v[1].m.stance == pr::Stance::Standing && v[1].m.game == 77, "the one of the moment");
+    r.expect(v.size() == 2 && msBetween(back, v[1].at) < 1000.0, "at once, not at the keepalive");
+
+    // The same stance, unchanged across a second outage: again at once.
+    r.srv.dropWebSockets();
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "reconnecting again");
+    r.expect(waitEvent(*r.c, K::Welcome, ev, 15000), "back again");
+    r.expect(r.until([&] { return r.srv.stances().size() == 3; }, 1500), "Standing again after the second Welcome");
+
+    // Seated: sent once, and not after the next reconnection.
+    r.c->sendStance(77, 0);
+    r.expect(r.until([&] { return r.srv.stances().size() == 4; }, 1000), "Seated goes");
+    r.srv.dropWebSockets();
+    r.expect(r.stateIs(net::ConnState::Reconnecting, 3000), "reconnecting a third time");
+    r.expect(waitEvent(*r.c, K::Welcome, ev, 15000), "back a third time");
+    r.sleepMs(1200);
+    r.expect(r.srv.stances().size() == 4, "Seated: nothing after the Welcome");
+    r.expect(r.srv.seqOk.load(), "one numbering for every message");
+}
+
 // Game events apply in gseq order (PROTOCOL.md, "Ordering: gseq"): the next one applies and its
 // gseq becomes the state's; one the state already holds (an event of the snapshot, a MoveMade sent
 // again) is ignored, without a Resync; one beyond the next is not applied, and the client asks for
@@ -4167,6 +4366,22 @@ TEST(net_online_client_gestures) {
     rigs[2].srv.gestureIdleMs.store(30000);
     const char* tags[kRigs] = {"gesture", "gesture-off", "gesture-down"};
     void (*scenarios[kRigs])(PacingRig&) = {gestureScenario, gestureOffScenario, gestureDownScenario};
+    runRigs(rigs, tags, scenarios, kRigs);
+}
+
+// The player's stance through OnlineClient (protocol minor 2): on change and, while not Seated,
+// every keepalive whatever the gesture rate, paced, for the current game while it goes on, again
+// after a reconnection; none to a server of minor 1; the opponent's as OpponentStance events.
+TEST(net_online_client_stances) {
+    if (!net::transportAvailable()) SKIP("transport unavailable");
+    constexpr int kRigs = 3;
+    PacingRig rigs[kRigs];
+    rigs[1].srv.serverMinor.store(1);
+    rigs[1].srv.gestureRate.store(10);
+    rigs[1].srv.gestureBurst.store(20);
+    rigs[2].srv.gestureIdleMs.store(10000);
+    const char* tags[kRigs] = {"stance", "stance-minor1", "stance-reconnect"};
+    void (*scenarios[kRigs])(PacingRig&) = {stanceScenario, stanceOldServerScenario, stanceReconnectScenario};
     runRigs(rigs, tags, scenarios, kRigs);
 }
 

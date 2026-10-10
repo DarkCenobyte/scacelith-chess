@@ -142,6 +142,8 @@ MenuAction gameOver(const std::string& result, const std::string& reason, bool p
 bool gameOverFolded();  // the card is folded away ("View the board")
 // Options page is reachable from both menus; changes go to game::settings() when applied.
 bool optionsOpen();
+// mainMenu() drew the title page in this frame (not the brightness calibration, nor another page).
+bool titlePageShown();
 // Brightness calibration (every start until it is completed, --calibrate): the next mainMenu()
 // call opens on it instead of the title page. Three squares (black, mid grey, white, each with a
 // black knight) show what the 3D frame would show at the brightness of the slider. Continue
