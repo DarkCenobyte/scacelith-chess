@@ -1183,6 +1183,21 @@ library.tag.UTCTime = Time (UTC)
 library.tag.WhiteRatingDiff = White rating change
 library.tag.BlackRatingDiff = Black rating change
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = Analysis
+analysis.menu.title = ANALYSIS
+analysis.menu.analyse = Analyse
+analysis.menu.paste = Paste a PGN
+analysis.menu.online = My online games
+analysis.menu.folder = Put PGN files in this folder to analyse them: {0}
+analysis.menu.empty.title = No saved games yet
+analysis.menu.empty.text = Your games appear here once they are over, and so do the PGN files put in the folder below. You can also paste a game copied as PGN text.
+analysis.menu.empty.no_folder = Paste a game copied as PGN text to analyse it.
+analysis.menu.paste.empty = The clipboard is empty: copy a game as PGN text first.
+analysis.menu.paste.none = No chess game was found in the clipboard.
+analysis.menu.paste.several = The clipboard holds several games: the first one is analysed.
+analysis.menu.gameover = Analyse the game
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = Move {0} of {1}
 replay.speed.factor = ×{0}

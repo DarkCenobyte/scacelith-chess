@@ -74,7 +74,8 @@ enum class AccountNav {
 
 // One frame of an account page. t = appearance, fresh = first frame on it. 'library' is the saved
 // games folder of the menu (nullptr / empty folder: no Save nor Replay); Replay fills
-// library->replay and sets 'act' to StartReplay. note: a line for the page navigated to.
+// library->replay and sets 'act' to StartReplay, Analyse fills library->replay.pgn (nullptr: no
+// Analyse) and sets it to StartAnalysis. note: a line for the page navigated to.
 AccountNav accountPage(AccountPage page, float t, bool fresh, LibrarySetup* library, MenuAction& act, std::string& note);
 // Every frame of the online page, before its sub-page: takes the answers the account pages wait
 // for (they arrive on any page). current: the account page shown, nullptr on the others. SignIn
@@ -83,9 +84,9 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
 // Entering the account pages from the account page (forms and messages emptied).
 void accountReset(AccountPage page);
 // Viewer: the page in a given state ("history", "game", "game-gif" (its GIF saved), "game-gif-making",
-// "game-saving" (its PGN on the way), "game-saved" (its PGN written to the saved games), "devices",
-// "email", "email-sent", "export", "export-done", "delete"), its data fetched from the in-process
-// fake server.
+// "game-saving" (its PGN on the way), "game-saved" (its PGN written to the saved games),
+// "game-analysing" (Analyse pressed: its PGN on the way), "devices", "email", "email-sent",
+// "export", "export-done", "delete"), its data fetched from the in-process fake server.
 bool accountDebugOpen(const std::string& sub, AccountPage& page);
 
 }  // namespace onl

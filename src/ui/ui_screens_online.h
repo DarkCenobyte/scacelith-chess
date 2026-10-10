@@ -13,9 +13,14 @@ namespace detail {
 // "Play Online" page of the title menu: sign-in and account pages (game history, devices, e-mail,
 // data export, deletion), matchmaking, challenges, private games and the direct match. t = page
 // appearance (0..1), opened = first frame on the page. Sets 'back' when the player leaves it.
-// library: the saved games folder of the menu (nullptr: a game of the history can be neither saved
-// nor replayed); StartReplay when a game of the history is replayed (library->replay names it).
+// library: the saved games folder of the menu (nullptr or an empty folder: a game of the history
+// can be neither saved nor replayed); StartReplay when a game of the history is replayed
+// (library->replay names it), StartAnalysis when one is analysed (library->replay.pgn holds it).
 MenuAction onlinePage(LibrarySetup* library, float t, bool opened, bool& back);
+// The Analysis page's "My online games": the next opening of the online page shows the game
+// history (resuming a saved session; the sign-in page when there is none), and the history's Back
+// leaves the online page (back to the Analysis page) rather than going to the account page.
+void openOnlineHistory();
 // Every frame of the main menu, after the page: challenge cards (any page, once signed in) and
 // the ping indicator (on the online page).
 void onlineMenuOverlay(bool onOnlinePage);
@@ -52,7 +57,7 @@ namespace debug {
 // "challenge", "private", "direct", "direct-host", "direct-wait", "direct-join", "noserver";
 // Google sign-in: "sso-wait", "sso-name", "sso-link" (the password step), "sso-mfa" (its code step);
 // the account API's pages: "history", "game", "game-gif", "game-gif-making", "game-saving",
-// "game-saved", "devices", "email", "email-sent", "export", "export-done", "delete").
+// "game-saved", "game-analysing", "devices", "email", "email-sent", "export", "export-done", "delete").
 void openOnlinePage(const std::string& sub);
 }  // namespace debug
 

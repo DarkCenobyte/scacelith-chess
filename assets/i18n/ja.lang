@@ -1172,6 +1172,21 @@ library.tag.UTCTime = 時刻（UTC）
 library.tag.WhiteRatingDiff = 白のレーティング変動
 library.tag.BlackRatingDiff = 黒のレーティング変動
 
+# ---- Analysis mode: menus (src/ui/ui_screens.cpp, ui_library.cpp, ui_screens_account.cpp, ui_screens_game.cpp) ----
+analysis.menu.entry = 分析
+analysis.menu.title = 分析
+analysis.menu.analyse = 分析する
+analysis.menu.paste = PGNを貼り付け
+analysis.menu.online = 自分のオンライン対局
+analysis.menu.folder = 分析するPGNファイルはこのフォルダーに置いてください：{0}
+analysis.menu.empty.title = 保存した対局はまだありません
+analysis.menu.empty.text = 対局は終了するとここに表示されます。下のフォルダーに置いたPGNファイルも表示されます。PGN形式でコピーした対局を貼り付けることもできます。
+analysis.menu.empty.no_folder = PGN形式でコピーした対局を貼り付けると分析できます。
+analysis.menu.paste.empty = クリップボードが空です。先に対局をPGN形式でコピーしてください。
+analysis.menu.paste.none = クリップボードにチェスの対局が見つかりませんでした。
+analysis.menu.paste.several = クリップボードに複数の対局があります。最初の対局を分析します。
+analysis.menu.gameover = 対局を分析
+
 # ---- Replay of a saved game (src/game/game_scene_replay.cpp, src/ui/ui_screens_game.cpp: replayBar) ----
 replay.move = {1}手中 {0}手目
 replay.speed.factor = ×{0}

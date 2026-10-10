@@ -8,6 +8,10 @@
 //     (scrollable); Save to saved games (the server's PGN read as untrusted input and saved once
 //     per game and server: game::archive::saveServerGame, off the UI thread), Replay (saves it
 //     first when needed, then replays the file like the Saved games page: MenuAction::StartReplay),
+//     Analyse (the server's PGN downloaded the same way, read as untrusted input off the UI thread
+//     and written again as a saved game of the server would be, then MenuAction::StartAnalysis with
+//     that text in LibrarySetup::replay.pgn: no saved games folder needed; a spinner meanwhile,
+//     the error under the buttons),
 //     Save as GIF (the server's animated GIF of the game, GET /games/:id/gif, seen from the
 //     player's side, written to <app data>/gif/ under the name of its date, players and game id,
 //     never over a file: game::OnlineSession::saveGameGif; a spinner while the server draws it,
@@ -217,6 +221,16 @@ struct State : game::GameSaveState {
     int reportCategory = 0;
     std::string reportComment;
     std::vector<uint64_t> reported;
+    // Analyse: the game whose PGN is on its way (0 = none; cleared when it arrives, so that an
+    // answer for a game left meanwhile is still known and dropped), whether its analysis is still
+    // wanted (the page of that game not left since), the check of the text off the UI thread, and
+    // the PGN ready for the Analysis mode.
+    uint64_t analyseAwait = 0;
+    bool analyseWanted = false;
+    archive::ServerGame analyseGame;
+    std::future<std::string> analyseJob;
+    std::string analysePgn;
+    bool debugAnalyse = false;       // the viewer's "game-analysing": Analyse pressed on the first frame
     float movesScroll = 0.0f, movesTarget = 0.0f;
     // the moves as listed: replayed again only for another game, or more of it (movesN: none yet)
     std::vector<game::MoveLine> moveLines;
@@ -252,6 +266,9 @@ bool ready(const std::future<archive::ServerSaveResult>& f) {
 bool ready(const std::future<archive::SaveResult>& f) {
     return f.valid() && f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
 }
+bool ready(const std::future<std::string>& f) {
+    return f.valid() && f.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+}
 
 archive::ServerGame serverGameOf(const net::GameDetails& g) {
     archive::ServerGame sg;
@@ -274,6 +291,25 @@ void startSave(const std::string& folder, const archive::ServerGame& sg, const s
             r.error = ex.what();
             return r;
         }
+    });
+}
+
+// Analyse: the server's PGN read as untrusted input (archive::serverRecord: one game, read without
+// error) and written again with the tags of a saved game of that server, off the UI thread; ""
+// when it cannot be used.
+void startAnalyseCheck(const std::string& pgnText) {
+    State& s = st();
+    const archive::ServerGame sg = s.analyseGame;
+    s.analyseJob = std::async(std::launch::async, [sg, pgnText]() {
+        try {
+            chess::pgn::Record rec;
+            std::string error;
+            if (archive::serverRecord(pgnText, sg, rec, error) && !rec.plies.empty()) return chess::pgn::write(rec);
+            LOGW("online: the server's PGN cannot be analysed: %s", error.empty() ? "no move" : error.c_str());
+        } catch (const std::exception& ex) {
+            LOGW("online: the server's PGN cannot be analysed: %s", ex.what());
+        }
+        return std::string();
     });
 }
 
@@ -556,6 +592,9 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         s.reportOpen = false;
         if (!loaded && data.gameWanted && !se.busy(Kind::GameDetailsResult)) se.openGame(data.gameWanted);
         s.opened(s.saveJob.valid());
+        // An Analyse of an earlier visit is given up (its answer, still awaited, is dropped).
+        s.analyseWanted = false;
+        s.analysePgn.clear();
     }
     // Another game shown, or the page opened again after leaving it: the line under the buttons
     // tells of the game's GIF only while one is being made (one saved before is not shown again).
@@ -576,6 +615,17 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         act = MenuAction::StartReplay;
         s.gifGame = 0;   // the page is left (back to it after the replay: a later visit)
     }
+    // The PGN of Analyse checked: the Analysis mode, for the game shown.
+    if (loaded && library && s.analyseWanted && !s.analysePgn.empty() && s.analyseGame.gameId == g.id && act == MenuAction::None) {
+        library->replay.path.clear();
+        library->replay.game = 0;
+        library->replay.pgn = std::move(s.analysePgn);
+        s.analysePgn.clear();
+        s.analyseWanted = false;
+        LOGI("online: analysis of server game %llu", (unsigned long long)g.id);
+        act = MenuAction::StartAnalysis;
+        s.gifGame = 0;   // the page is left (back to it after the analysis: a later visit)
+    }
 
     AccountNav nav = AccountNav::Stay;
     if (s.reportOpen) im::pushBlock();
@@ -587,7 +637,7 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
     const float lx = im::flip(p, Rect(p.x + pad, 0, leftW, 0)).x, rx = im::flip(p, Rect(p.x + pad + leftW + gap, 0, rightW, 0)).x;
     const Rect lcol(lx, 0, leftW, 0), rcol(rx, 0, rightW, 0);
     const float top = p.y + 150.0f, bottom = footerY(p) - 40.0f;
-    bool save = false, replay = false, report = false, gifPressed = false;
+    bool save = false, replay = false, report = false, gifPressed = false, analyse = false;
 
     if (!loaded) {
         Rect area(p.x + pad, top, p.w - 2.0f * pad, bottom - top);
@@ -636,11 +686,15 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         }
         y += 82.0f;
         // Actions: Save game and Save as GIF side by side (the GIF alone without saved games), Replay,
-        // Report opponent. A spinner follows the button whose work it shows, on its end side: in the
-        // gap after a button with another on its row, else after the button.
+        // Analyse, Report opponent. A spinner follows the button whose work it shows, on its end
+        // side: in the gap after a button with another on its row, else after the button.
         const float bh = 52.0f, bstep = 62.0f, bgap = 40.0f, spinAfter = 22.0f;
         const bool hasMoves = !g.moves.empty();
         const bool working = s.save == Save::Checking || s.save == Save::Downloading || s.save == Save::Writing;
+        // One PGN on its way at a time (the session keeps one answer of a kind): Save game and Replay
+        // wait for Analyse's, Analyse for theirs.
+        const bool fetching = s.analyseAwait != 0 || s.analyseJob.valid();
+        const bool analysing = s.analyseWanted && s.analyseGame.gameId == g.id;
         const game::GifSaver& gif = se.gif();
         const std::string owner = gifOwner(g);
         const bool gifMine = gif.owner() == owner;
@@ -667,7 +721,7 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
             const bool paired = rows == Rows::SaveAndGif;
             const Rect b = paired ? startHalf(y) : Rect(lx, y, leftW, bh);
             save = im::button(L(saved ? "online.game.saved_button" : "online.game.save"), b, im::ButtonKind::Secondary,
-                              hasMoves && !saved && !working);
+                              hasMoves && !saved && !working && !fetching);
             if (working && !s.replayWanted) spinner(vec2(im::flipX(lcol, paired ? inGap : afterRow), b.cy()), 10.0f);
             if (!paired) y += bstep;
         }
@@ -681,10 +735,25 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         if (gif.busy() && gifMine && !gifBelow)
             spinner(vec2(im::flipX(lcol, rows == Rows::GifAndReplay ? inGap : afterRow), gb.cy()), 10.0f);
         if (rows != Rows::GifAndReplay) y += bstep;
+        // Analyse: before Replay on its row when Replay has a row of its own and both labels fit
+        // their halves, else on a row of its own under it.
+        const bool analyseWithReplay = canSave && rows != Rows::GifAndReplay && im::buttonLabelFits(L("analysis.menu.analyse"), halfW) &&
+                                       im::buttonLabelFits(L("online.game.replay"), endW);
+        if (library && analyseWithReplay) {
+            const Rect ab = startHalf(y);
+            analyse = im::button(L("analysis.menu.analyse"), ab, im::ButtonKind::Secondary, hasMoves && !working && !fetching);
+            if (analysing) spinner(vec2(im::flipX(lcol, inGap), ab.cy()), 10.0f);
+        }
         if (canSave) {
-            const Rect rb = rows == Rows::GifAndReplay ? endHalf(y) : Rect(lx, y, leftW, bh);
-            replay = im::button(L("online.game.replay"), rb, im::ButtonKind::Primary, hasMoves && !working);
+            const Rect rb = rows == Rows::GifAndReplay || analyseWithReplay ? endHalf(y) : Rect(lx, y, leftW, bh);
+            replay = im::button(L("online.game.replay"), rb, im::ButtonKind::Primary, hasMoves && !working && !fetching);
             if (working && s.replayWanted) spinner(vec2(im::flipX(lcol, afterRow), rb.cy()), 10.0f);
+            y += bstep;
+        }
+        if (library && !analyseWithReplay) {
+            const Rect ab(lx, y, leftW, bh);
+            analyse = im::button(L("analysis.menu.analyse"), ab, im::ButtonKind::Secondary, hasMoves && !working && !fetching);
+            if (analysing) spinner(vec2(im::flipX(lcol, afterRow), ab.cy()), 10.0f);
             y += bstep;
         }
         const bool reported = std::find(s.reported.begin(), s.reported.end(), g.id) != s.reported.end();
@@ -771,6 +840,22 @@ AccountNav pageGame(float t, bool fresh, LibrarySetup* library, MenuAction& act)
         const std::string name = game::gifFileName(std::time_t(g.startedAtMs / 1000), g.white.name, g.black.name, g.id);
         if (se.saveGameGif(gifOwner(g), g.id, options, gifFolder(), name))
             LOGI("online: GIF of server game %llu asked for", (unsigned long long)g.id);
+    }
+    if (s.debugAnalyse && loaded) {
+        s.debugAnalyse = false;
+        analyse = true;
+    }
+    if (loaded && analyse && library && s.analyseAwait == 0 && !s.analyseJob.valid()) {
+        // Its PGN, the way Save game asks for it; the Analysis mode once it is checked (above).
+        s.gifLast = false;
+        s.error.clear();
+        s.note.clear();
+        s.analyseAwait = g.id;
+        s.analyseWanted = true;
+        s.analyseGame = serverGameOf(g);
+        s.analysePgn.clear();
+        se.api().downloadPgn(g.id);
+        se.expect(Kind::PgnResult);
     }
     if (loaded && (save || replay) && canSave) {
         s.gifLast = false;
@@ -1144,15 +1229,28 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
         }
     }
     if (se.take(Kind::PreferencesResult, e) && !e.ok && e.error != "unauthorized") notify(errorText(e), 4.0f);
-    // (The PGN is asked for from the game page, which names the saved games' folder first.)
-    if (!s.saveFolder.empty() && se.take(Kind::PgnResult, e) && s.save == Save::Downloading) {
-        // Saved as the game it was asked for, whatever game the page shows now.
-        if (s.pgnArrived(e)) {
-            startSave(s.saveFolder, s.saveGame, e.text);
-        } else {
-            s.save = Save::Failed;
-            s.replayWanted = false;
-            s.error = e.ok ? T("online.game.save_failed") : errorText(e);
+    // The PGN asked for by Analyse (the answer for its game), else by Save game or Replay (the game
+    // page names the saved games' folder first).
+    if ((s.analyseAwait != 0 || !s.saveFolder.empty()) && se.take(Kind::PgnResult, e)) {
+        if (s.analyseAwait != 0 && e.gameId == s.analyseAwait) {
+            s.analyseAwait = 0;
+            if (!s.analyseWanted) {
+                // The page of that game was left meanwhile: dropped.
+            } else if (e.ok) {
+                startAnalyseCheck(e.text);
+            } else {
+                s.analyseWanted = false;
+                fail(AccountPage::Game, errorText(e));
+            }
+        } else if (!s.saveFolder.empty() && s.save == Save::Downloading) {
+            // Saved as the game it was asked for, whatever game the page shows now.
+            if (s.pgnArrived(e)) {
+                startSave(s.saveFolder, s.saveGame, e.text);
+            } else {
+                s.save = Save::Failed;
+                s.replayWanted = false;
+                s.error = e.ok ? T("online.game.save_failed") : errorText(e);
+            }
         }
     }
     if (se.take(Kind::EmailChangeResult, e)) {
@@ -1201,6 +1299,17 @@ AccountNav accountPump(const AccountPage* current, std::string& note, std::strin
         }
     }
     // Work done off the UI thread.
+    if (ready(s.analyseJob)) {
+        std::string pgn = s.analyseJob.get();
+        if (!s.analyseWanted) {
+            // given up meanwhile
+        } else if (pgn.empty()) {
+            s.analyseWanted = false;
+            fail(AccountPage::Game, T("online.game.invalid"));
+        } else {
+            s.analysePgn = std::move(pgn);   // the game page starts the analysis
+        }
+    }
     if (ready(s.saveJob)) {
         const archive::ServerSaveResult r = s.saveJob.get();
         const bool looking = s.save == Save::Checking;
@@ -1263,6 +1372,7 @@ bool accountDebugOpen(const std::string& sub, AccountPage& page) {
     static const struct { const char* name; AccountPage page; } names[] = {
         {"history", AccountPage::History}, {"game", AccountPage::Game},     {"game-gif", AccountPage::Game},
         {"game-gif-making", AccountPage::Game}, {"game-saving", AccountPage::Game}, {"game-saved", AccountPage::Game},
+        {"game-analysing", AccountPage::Game},
         {"devices", AccountPage::Devices},
         {"email", AccountPage::Email},     {"email-sent", AccountPage::Email}, {"export", AccountPage::Export},
         {"export-done", AccountPage::Export}, {"delete", AccountPage::Delete},
@@ -1312,6 +1422,8 @@ bool accountDebugOpen(const std::string& sub, AccountPage& page) {
                 se.expect(Kind::PgnResult);
                 if (sub == "game-saved") se.runMock(1000.0);
             }
+            // Analyse pressed on the page's first frame: its PGN on the way (the clock stays frozen).
+            if (sub == "game-analysing") s.debugAnalyse = true;
         }
         if (page == AccountPage::Devices) {
             se.loadSessions();
