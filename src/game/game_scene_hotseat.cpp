@@ -402,6 +402,7 @@ ui::GameOverExtras GameScene::hotSeatGameOverExtras() const {
     } else {
         x.detail = i18n::trf("hotseat.gameover.friendly", {seats_[0].name, seats_[1].name});
     }
+    x.analyse = !game_.moves().empty();
     return x;
 }
 

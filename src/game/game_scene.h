@@ -95,6 +95,7 @@
 #include "../ui/ui.h"
 #include "camera_flight.h"
 #include "clock_rules.h"
+#include "game_archive.h"
 #include "coach_args.h"
 #include "game_mode.h"
 #include "hotseat.h"
@@ -112,11 +113,17 @@
 #include <string>
 #include <vector>
 
+namespace coach {
+class Stage;
+}
+
 namespace game {
 
 struct CoachRuntime;   // game_scene_coach.cpp
 class CoachStage;
 class CoachAnalyst;
+struct AnalysisRuntime;   // game_scene_analysis.cpp
+class AnalysisStage;
 
 enum class Controller {
     Human,
@@ -235,10 +242,13 @@ private:
     int humanSeat() const { return seatOf(humanColor_); }
     int aiSeat() const { return 1 - humanSeat(); }
     bool isHumanSeat(int seat) const { return seats_[seat & 1].human(); }
-    // The viewer mode, and a replay: both are watched from the free observer camera, with the
-    // viewpoints, the overlay and the Esc menu of the viewer (replaying() tells them apart).
-    bool watching() const { return mode_ == GameMode::Watch || mode_ == GameMode::Replay; }
-    bool replaying() const { return mode_ == GameMode::Replay; }
+    // The viewer mode, a replay and an analysis: all are watched from the free observer camera,
+    // with the viewpoints, the overlay and the Esc menu of the viewer (replaying() tells them
+    // apart). An analysis is a replay (the record's game, its players, no clock running) that the
+    // player steps through (analysing() tells it apart).
+    bool watching() const { return mode_ == GameMode::Watch || replaying(); }
+    bool replaying() const { return mode_ == GameMode::Replay || mode_ == GameMode::Analysis; }
+    bool analysing() const { return mode_ == GameMode::Analysis; }
     bool online() const { return mode_ == GameMode::Online; }
     bool hotSeat() const { return mode_ == GameMode::HotSeat; }
     // No time control: no clock press, the move is completed as its last piece is released
@@ -373,6 +383,11 @@ private:
     void refreshCoachVoice();                 // are the voice's model files there (tts::modelFilesPresent)
     void coachModelDownloaded(int fetched);   // a download ended: a failed voice may get one more try
     CoachRuntime& coachRuntime();             // created on first use: the voice starts loading
+    // The coach's TTS worker, as a stage's voice requests (requestSpeech, takeSpeech, speechFailed,
+    // cancelSpeech, voiceAvailable): shared with the Analysis mode's commentator, so that one model
+    // is ever loaded. ensureCoachVoiceWorker() starts it when the voice files are there.
+    coach::Stage& coachVoice();
+    void ensureCoachVoiceWorker();
     bool coachVoiceExpected() const;          // the voice files are there (the coach page's notice)
     void setupCoachGame();                    // part of setupNewGame() for a coach game
     void configureCoachSeats();
@@ -434,6 +449,36 @@ private:
     bool replayKey(const std::string& key);   // "K", "J", "L", "Shift+J", "Shift+L", "Home", "End"
     void drawReplayBar();                     // the replay's buttons, speed and move counter
     ClockDisplay replayClockDisplay() const;  // the record's clocks (replayClock_), dashes without them
+
+    // ---- Analysis mode (GameMode::Analysis, game_scene_analysis.cpp) ----
+    friend class AnalysisStage;
+    AnalysisRuntime& analysisRuntime();       // created on first use
+    // replayRecord_ from the Analysis page's choice (a file and its game, or the PGN text itself),
+    // false (noticed) when it cannot be read.
+    bool loadAnalysis(const ui::ReplaySetup& choice);
+    // The game just played (its game over card's "Analyse the game"): declines the rematch, leaves
+    // the game (an online one, the coach's), and fades over to its analysis, at its last position.
+    void analyseGameJustPlayed();
+    // The game being played as a record of the saved games: names, ratings, times, the ending
+    // ('finished': it has a result; a direct match: its authority's moves and ending). False for a
+    // direct match its authority aborted.
+    bool playedRecord(chess::pgn::Record& out, bool& finished, archive::Mode& mode) const;
+    void setupAnalysis();                     // part of setupNewGame(): the review, the cache, the voice offer
+    void updateAnalysis(float dt);            // updatePlaying() while analysing: steps, review, comments
+    void updateAnalysisInput();               // J K L, Home End, N M B (besides the viewer's keys)
+    bool analysisKey(const std::string& key); // a key, or a --replay-keys entry ("Goto:12")
+    void analysisGoTo(int position);          // the board to that position: animated when adjacent, else set at once
+    // A step's move (forward) or takeback is over: the marks of the new position, its comment.
+    void analysisStepDone(bool forward);
+    void completeAnalysisMove(int seat, const chess::Arbiter::Verdict& v);   // completeMove() of an analysis
+    void drawAnalysisOverlay();               // renderOverlay(): the bar, the move list, the subtitles
+    // render(): the review's symbols, tint and better-move arrow on the board, and the
+    // commentator's marks (in the coach's colours).
+    void analysisMarks(std::vector<AnalysisMark>& marks, std::vector<PieceHighlight>& highlights,
+                       std::vector<CoachMark>& coachMarks);
+    void leaveAnalysis();                     // the menu, a new game, shutdown: the cache saved, silence
+    ClockDisplay analysisClockDisplay() const;   // the record's clocks at the position (nothing runs)
+    const std::vector<std::string>& analysedMoves() const;   // the whole game's SAN (the sheets)
 
     // ---- viewer mode ----
     bool observerView() const;                // the observer camera is the view
@@ -691,6 +736,16 @@ private:
     float coachFade_ = 0.0f;            // a lesson position being set up behind a fade
     bool coachVoiceFiles_ = false;      // tts::modelFilesPresent() at start-up
     std::unique_ptr<CoachRuntime> coach_;
+
+    // Analysis mode
+    struct AnalysisRuntimeDelete {
+        void operator()(AnalysisRuntime* r) const;   // game_scene_analysis.cpp (a type complete there only)
+    };
+    std::unique_ptr<AnalysisRuntime, AnalysisRuntimeDelete> analysis_;
+    bool analysisAtEnd_ = false;        // the analysis opens at the last position (a game just played)
+    int analysisAtArg_ = -1;            // --analysis-at N: it opens at position N
+    bool analysisWhiteBottom_ = true;   // the bar and the camera from White's side (false: the
+                                        // player had Black in the game just played)
 };
 
 }  // namespace game

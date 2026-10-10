@@ -184,10 +184,20 @@ float ReplayClock::thinkProgress() const {
     }
 }
 
-int64_t ReplayClock::clockOf(chess::Color c, int ply) const {
-    if (ply <= 0 || plies() == 0) return timeline_.startClock(c);
-    return timeline_.ply(std::min(ply, plies()) - 1).clockAfter[c];
+int64_t Timeline::clockAfter(chess::Color c, int ply) const {
+    if (ply <= 0 || plies() == 0) return startClock(c);
+    return this->ply(std::min(ply, plies()) - 1).clockAfter[c];
 }
+
+ClockView clocksAt(const Timeline& timeline, int ply) {
+    ClockView v;
+    if (!timeline.clocksKnown()) return v;
+    v.known = true;
+    for (int c = 0; c < 2; ++c) v.ms[c] = std::max<int64_t>(0, timeline.clockAfter(chess::Color(c), ply));
+    return v;
+}
+
+int64_t ReplayClock::clockOf(chess::Color c, int ply) const { return timeline_.clockAfter(c, ply); }
 
 ClockView ReplayClock::clocks() const {
     ClockView v;

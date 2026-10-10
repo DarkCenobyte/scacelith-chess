@@ -290,6 +290,30 @@ TEST(replay_clock_display) {
     CHECK(!u.clocks().known);
 }
 
+// The Analysis mode's clocks: both as they stood at a position, nothing running.
+TEST(replay_clocks_at_a_position) {
+    pgn::Record r = record({"e4", "e5", "Nf3"}, "300+5");
+    const int64_t clk[] = {303000, 298000, 280000};
+    for (int i = 0; i < 3; ++i) r.plies[size_t(i)].clockMs = clk[i];
+    replay::Timeline t;
+    t.build(r);
+    replay::ClockView v = replay::clocksAt(t, 0);
+    CHECK(v.known);
+    CHECK_EQ(v.ms[0], int64_t(300000));
+    CHECK_EQ(v.ms[1], int64_t(300000));
+    CHECK_EQ(v.running, -1);
+    v = replay::clocksAt(t, 2);
+    CHECK_EQ(v.ms[0], int64_t(303000));
+    CHECK_EQ(v.ms[1], int64_t(298000));
+    v = replay::clocksAt(t, 3);
+    CHECK_EQ(v.ms[0], int64_t(280000));
+    CHECK_EQ(v.ms[1], int64_t(298000));
+    CHECK_EQ(replay::clocksAt(t, 9).ms[0], int64_t(280000));   // past the end: the last values
+    replay::Timeline u;
+    u.build(record({"e4"}));
+    CHECK(!replay::clocksAt(u, 1).known);
+}
+
 TEST(replay_end_reasons) {
     pgn::Record mate = record({"f3", "e5", "g4", "Qh4#"});
     mate.result = "0-1";

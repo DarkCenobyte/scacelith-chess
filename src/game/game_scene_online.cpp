@@ -924,6 +924,8 @@ ui::GameOverExtras GameScene::onlineGameOverExtras() const {
     }
     if (link_ && link_->canReport() && !reported_ && !reportQueued_ && !reportSending_)
         x.reportLabel = i18n::tr("online.report.button");
+    // A game with moves (an aborted one may have none) can be analysed: that declines the rematch.
+    x.analyse = !game_.moves().empty();
     return x;
 }
 
@@ -1070,6 +1072,9 @@ void GameScene::updateOnlineGameOver() {
         } else if (a == ui::MenuAction::BackToMainMenu) {
             if (rematchOffered_ && link_) link_->rematch(false);
             leaveOnlineGame();
+            return;
+        } else if (a == ui::MenuAction::StartAnalysis) {
+            analyseGameJustPlayed();   // declines a rematch offered, leaves the game
             return;
         } else if (a == ui::MenuAction::Report) {
             reportOpen_ = true;
