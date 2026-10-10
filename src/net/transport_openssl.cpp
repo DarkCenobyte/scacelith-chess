@@ -1,9 +1,11 @@
-// Linux transport: TCP + OpenSSL, a minimal HTTP/1.1 client (Connection: close, Content-Length or
-// chunked bodies) and an RFC 6455 WebSocket client (masked binary frames, fragmentation,
-// ping/pong, closing handshake) whose socket lives on one I/O thread per connection. Sockets are
-// non-blocking; every wait is a poll() with a deadline and a wake-up pipe, so cancel() and close()
-// never hang. Nothing written to a socket raises SIGPIPE (send with MSG_NOSIGNAL, and the same for
-// OpenSSL's writes: noSignalWriteBio), whatever the process does with that signal.
+// Linux and macOS transport: TCP + OpenSSL, a minimal HTTP/1.1 client (Connection: close,
+// Content-Length or chunked bodies) and an RFC 6455 WebSocket client (masked binary frames,
+// fragmentation, ping/pong, closing handshake) whose socket lives on one I/O thread per connection.
+// Sockets are non-blocking; every wait is a poll() with a deadline and a wake-up pipe, so cancel()
+// and close() never hang. Nothing written to a socket raises SIGPIPE (send with MSG_NOSIGNAL, and
+// the same for OpenSSL's writes: noSignalWriteBio; on macOS, sockets made with SO_NOSIGPIPE),
+// whatever the process does with that signal. macOS trusts the system's root certificates
+// (Security.framework: systemAnchors), the static OpenSSL there having no store of its own.
 #if !defined(_WIN32) && defined(SCACELITH_HAS_OPENSSL)
 #include "transport.h"
 #include "crypto.h"
@@ -29,6 +31,12 @@
 #include <sys/socket.h>
 #include <thread>
 #include <unistd.h>
+
+#ifdef __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#include <Security/Security.h>
+#include <atomic>
+#endif
 
 namespace net {
 
@@ -70,6 +78,14 @@ bool unknownIssuerError(int err) {
 
 int verifyCallback(int ok, X509_STORE_CTX* st);
 
+#ifdef __APPLE__
+// macOS has no MSG_NOSIGNAL: the sockets get SO_NOSIGPIPE when they are made (connectTcp), and
+// send() takes no flag.
+constexpr int kSendNoSignal = 0;
+#else
+constexpr int kSendNoSignal = MSG_NOSIGNAL;
+#endif
+
 // OpenSSL's socket BIO writes with write(2): on a socket that can no longer send (reset by the
 // peer, or shut down by abortSocket()) the kernel raises SIGPIPE, whose default action ends the
 // process. Every byte OpenSSL writes (the handshake, SSL_write, the close_notify of SSL_shutdown,
@@ -80,7 +96,7 @@ int noSignalWrite(BIO* b, const char* data, int n) {
     BIO_clear_retry_flags(b);
     const int fd = int(reinterpret_cast<intptr_t>(BIO_get_data(b)));
     ssize_t r;
-    do { r = ::send(fd, data, size_t(n), MSG_NOSIGNAL); } while (r < 0 && errno == EINTR);
+    do { r = ::send(fd, data, size_t(n), kSendNoSignal); } while (r < 0 && errno == EINTR);
     if (r < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) BIO_set_retry_write(b);
     return int(r);
 }
@@ -119,13 +135,60 @@ BIO* noSignalWriteBio(int fd) {
 // main(), the process ends without it.
 [[maybe_unused]] const bool g_openSslNoAtexit = OPENSSL_init_ssl(OPENSSL_INIT_NO_ATEXIT, nullptr) == 1;
 
+#ifdef __APPLE__
+// The root certificates macOS trusts (SecTrustCopyAnchorCertificates: the system's anchors, as the
+// Keychain Access app lists them under System Roots) added to store: the OpenSSL linked into the
+// game is static, and the default paths of its build do not exist on the player's Mac. The bundle
+// macOS keeps for its own command line tools, /etc/ssl/cert.pem, when Security gives none. The
+// number of certificates added.
+int systemAnchors(X509_STORE* store) {
+    int added = 0;
+    CFArrayRef anchors = nullptr;
+    if (SecTrustCopyAnchorCertificates(&anchors) == errSecSuccess && anchors) {
+        for (CFIndex i = 0, n = CFArrayGetCount(anchors); i < n; ++i) {
+            SecCertificateRef cert = (SecCertificateRef)CFArrayGetValueAtIndex(anchors, i);
+            CFDataRef der = cert ? SecCertificateCopyData(cert) : nullptr;
+            if (!der) continue;
+            const unsigned char* p = CFDataGetBytePtr(der);
+            X509* x = d2i_X509(nullptr, &p, long(CFDataGetLength(der)));
+            if (x && X509_STORE_add_cert(store, x) == 1) ++added;
+            X509_free(x);
+            CFRelease(der);
+        }
+        CFRelease(anchors);
+    }
+    ERR_clear_error();   // a certificate already there, or one OpenSSL cannot parse: skipped
+    if (added == 0 && X509_STORE_load_file(store, "/etc/ssl/cert.pem") == 1) added = -1;
+    return added;
+}
+#endif
+
+#ifdef __APPLE__
+std::atomic<int> g_anchors{0};   // what systemAnchors() gave the client context
+
+// Said once, at the first handshake (the context may be made before the log is open).
+void logAnchors() {
+    static std::once_flag once;
+    std::call_once(once, [] {
+        const int n = g_anchors.load();
+        if (n > 0) LOGI("net: %d root certificates of the system trusted", n);
+        else if (n < 0) LOGW("net: no root certificate from the Security framework: /etc/ssl/cert.pem trusted instead");
+        else LOGE("net: no root certificate of the system found: secure connections without a pin will fail");
+    });
+}
+#endif
+
 // One client context for the process: system trust store, TLS 1.2+.
 SSL_CTX* clientContext() {
     static SSL_CTX* ctx = [] {
         SSL_CTX* c = SSL_CTX_new(TLS_client_method());
         if (!c) return c;
         SSL_CTX_set_min_proto_version(c, TLS1_2_VERSION);
+#ifdef __APPLE__
+        g_anchors.store(systemAnchors(SSL_CTX_get_cert_store(c)));
+#else
         SSL_CTX_set_default_verify_paths(c);
+#endif
         SSL_CTX_set_verify(c, SSL_VERIFY_PEER, verifyCallback);
 #ifdef SSL_OP_IGNORE_UNEXPECTED_EOF
         SSL_CTX_set_options(c, SSL_OP_IGNORE_UNEXPECTED_EOF);
@@ -134,6 +197,12 @@ SSL_CTX* clientContext() {
     }();
     return ctx;
 }
+
+#ifdef __APPLE__
+// Made before main(): the Security framework is then never first called in a child forked by a
+// program that links this module (the unit tests fork their TLS clients), where macOS forbids it.
+[[maybe_unused]] SSL_CTX* const g_clientContextEarly = clientContext();
+#endif
 
 // A TCP connection, optionally with TLS. Non-blocking socket.
 class Stream {
@@ -191,7 +260,7 @@ public:
             detail = sslErrors();
             return -1;
         }
-        ssize_t r = ::send(fd(), buf, n, MSG_NOSIGNAL);
+        ssize_t r = ::send(fd(), buf, n, kSendNoSignal);
         if (r >= 0) return int(r);
         if (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR) return -2;
         detail = std::strerror(errno);
@@ -291,8 +360,20 @@ private:
         }
         bool ok = false;
         for (const sock::Endpoint& a : lookup.endpoints()) {
+#ifdef __APPLE__
+            // No SOCK_NONBLOCK nor SOCK_CLOEXEC there: set right after, with SO_NOSIGPIPE.
+            int f = ::socket(a.family(), SOCK_STREAM, IPPROTO_TCP);
+            if (f < 0) continue;
+            int on = 1;
+            if (fcntl(f, F_SETFD, FD_CLOEXEC) != 0 || fcntl(f, F_SETFL, fcntl(f, F_GETFL, 0) | O_NONBLOCK) != 0 ||
+                setsockopt(f, SOL_SOCKET, SO_NOSIGPIPE, &on, sizeof(on)) != 0) {
+                ::close(f);
+                continue;
+            }
+#else
             int f = ::socket(a.family(), SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
             if (f < 0) continue;
+#endif
             fd_.store(f);
             int one = 1;
             setsockopt(f, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
@@ -320,6 +401,9 @@ private:
 
     bool handshake(const std::string& host, const std::string& pin, const Deadline& dl) {
         SSL_CTX* ctx = clientContext();
+#ifdef __APPLE__
+        logAnchors();
+#endif
         if (!ctx || !(ssl_ = SSL_new(ctx))) { error = "tls"; detail = sslErrors(); return false; }
         pinned = !pin.empty();
         SSL_set_app_data(ssl_, this);
@@ -461,7 +545,19 @@ public:
     OpenSslWebSocket(std::unique_ptr<Stream> s, const WsParams& p, std::string initial, std::string serverId)
         : s_(std::move(s)), maxBytes_(p.maxMessageBytes), onActivity_(p.onActivity), in_(std::move(initial)) {
         serverId_ = std::move(serverId);
+#ifdef __APPLE__
+        // No pipe2 there: the same flags set right after.
+        if (::pipe(wake_) != 0) {
+            wake_[0] = wake_[1] = -1;
+        } else {
+            for (int f : wake_) {
+                fcntl(f, F_SETFD, FD_CLOEXEC);
+                fcntl(f, F_SETFL, fcntl(f, F_GETFL, 0) | O_NONBLOCK);
+            }
+        }
+#else
         if (::pipe2(wake_, O_NONBLOCK | O_CLOEXEC) != 0) wake_[0] = wake_[1] = -1;
+#endif
         io_ = std::thread([this] { run(); });
     }
     ~OpenSslWebSocket() override {
