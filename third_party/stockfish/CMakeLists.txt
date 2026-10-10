@@ -103,6 +103,10 @@ set(SF_AUDIT_x86-64-sse41-popcnt 1)
 set(SF_AUDIT_x86-64-avx2 2)
 set(SF_AUDIT_x86-64-avxvnni 2)
 set(SF_AUDIT_x86-64-avx512icl 3)
+# aarch64 (isa_audit.py --arch aarch64): 0 ARMv8.0-A with NEON, 1 the ARMv8.1 / 8.2 additions
+# (LSE atomics, RDM, CRC32, dot product).
+set(SF_AUDIT_armv8 0)
+set(SF_AUDIT_armv8-dotprod 1)
 
 # One variant: its objects (namespace Stockfish renamed to Stockfish_<tag>, the network only
 # declared: UNIVERSAL_BINARY), then one isolated object sf_<tag>.iso.o exporting
@@ -186,9 +190,15 @@ endif()
 # it too) next to ordinary code that uses the same standard library templates, and the build fails
 # if its disassembly shows an instruction above baseline outside the variants, one above a
 # variant's own level inside it, or any reference into a variant's code other than the
-# dispatcher's. It reads x86-64 code: the ARM builds go without.
+# dispatcher's. It reads x86-64 and aarch64 code; macOS has a single variant of the game's own
+# instruction set, not isolated: nothing to audit there.
 find_package(Python3 COMPONENTS Interpreter)
 if(SCACELITH_ARM64)
+    set(SF_AUDIT_ARCH --arch aarch64)
+else()
+    set(SF_AUDIT_ARCH "")
+endif()
+if(NOT SF_ISOLATE)
     # (no instruction-set audit)
 elseif(Python3_Interpreter_FOUND)
     add_executable(stockfish_isa_probe ${CMAKE_CURRENT_SOURCE_DIR}/tools/isa_probe.cpp)
@@ -202,7 +212,7 @@ elseif(Python3_Interpreter_FOUND)
         COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/isa_audit.py
                 $<TARGET_FILE:stockfish_isa_probe> ${CMAKE_CURRENT_BINARY_DIR}/stockfish_isa_probe.map
                 ${CMAKE_OBJDUMP} ${SF_AUDIT_LEVELS} --allow "\\(cpu\\.cpp\\.o(bj)?\\)"
-                --report ${CMAKE_CURRENT_BINARY_DIR}/stockfish_isa_audit.txt
+                --report ${CMAKE_CURRENT_BINARY_DIR}/stockfish_isa_audit.txt ${SF_AUDIT_ARCH}
         COMMAND ${CMAKE_COMMAND} -E touch ${stamp}
         DEPENDS stockfish_isa_probe ${CMAKE_CURRENT_SOURCE_DIR}/tools/isa_audit.py
         COMMENT "Auditing the instruction sets of the Stockfish variants" VERBATIM)

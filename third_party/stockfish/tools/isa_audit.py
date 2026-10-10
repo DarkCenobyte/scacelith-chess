@@ -3,6 +3,7 @@
 not part of upstream Stockfish). Run by the build (CMakeLists.txt, target stockfish_isa_audit).
 
 usage: isa_audit.py EXE MAP OBJDUMP VARIANT_REGEX=LEVEL... [--allow OBJECT_REGEX]... [--report FILE]
+                    [--arch x86-64|aarch64]
 
 EXE is an x86-64 ELF (position-independent) or PE executable linked with -Wl,-Map,MAP; OBJDUMP
 is the binutils objdump for its format. Each VARIANT_REGEX matches, in the link map, the object
@@ -11,10 +12,17 @@ file of one variant, and LEVEL is the highest instruction class that variant may
     1  SSE3 / SSSE3 / SSE4 / POPCNT / LZCNT
     2  VEX encoding (AVX, AVX2, FMA, BMI1, BMI2, AVX-VNNI)
     3  EVEX encoding (AVX-512)
+With --arch aarch64, EXE is a position-independent aarch64 ELF executable and the classes are
+    0  baseline ARMv8.0-A, Advanced SIMD (NEON) included
+    1  the ARMv8.1 / ARMv8.2 additions -march=armv8.2-a+dotprod enables: LSE atomics, RDM, CRC32
+       and the dot product (SDOT / UDOT)
+except libgcc's outline atomics (__aarch64_cas4_acq ...), which take LSE only when the CPU has it
+and count as baseline.
 Every function of the disassembly is attributed to the object it came from (link map) and given
 the highest class among its instructions. Every reference to code is collected: direct calls and
-jumps, RIP-relative operands, and pointers stored in data (ELF: relative dynamic relocations; PE:
-64-bit base relocations). The audit fails (exit status 1) when
+jumps, RIP-relative operands (aarch64: ADRP + ADD pairs, and the GOT entries ADRP + LDR pairs
+read), and pointers stored in data (ELF: relative dynamic relocations; PE: 64-bit base
+relocations). The audit fails (exit status 1) when
   * a variant's object is missing from the map, or holds a function above its level;
   * a function outside the variants is above level 0: code shared with the rest of the program
     (inline functions, templates) compiled with a variant's flags would crash other CPUs;
@@ -43,6 +51,15 @@ roundsd blendps blendpd pblendw dpps dppd mpsadbw insertps pinsrb pinsrd pinsrq 
 pextrd pextrq pcmpgtq crc32 pcmpestri pcmpestrm pcmpistri pcmpistrm popcnt lzcnt'''.split())
 MNEMONIC_PREFIXES = {'rex', 'rex.w', 'data16', 'addr32', 'cs', 'ds', 'es', 'ss', 'fs', 'gs', 'lock',
                      'rep', 'repz', 'repnz', 'repe', 'repne', 'notrack', 'bnd'}
+# aarch64 class 1: LSE atomics (CAS, CASP, SWP, LD<op> and their ST<op> aliases, with the
+# acquire / release and byte / halfword forms), RDM (SQRDMLAH, SQRDMLSH), CRC32 and the dot product.
+A64_LEVEL1 = re.compile(r'^(?:casp?|swp|ld(?:add|clr|eor|set|smax|smin|umax|umin)|'
+                        r'st(?:add|clr|eor|set|smax|smin|umax|umin))(?:a|al|l)?[bh]?$|'
+                        r'^sqrdml[as]h$|^crc32c?[bhwx]$|^[su]dot$')
+# libgcc's outline atomics (-moutline-atomics, the default of GCC on aarch64 Linux): each one runs
+# its LSE instruction only when __aarch64_have_lse_atomics (HWCAP_ATOMICS) says the CPU has it.
+# They count as baseline when libgcc.a is their object in the link map.
+A64_OUTLINE_ATOMIC = re.compile(r'^__aarch64_(?:cas|casp|swp|ldadd|ldclr|ldeor|ldset)\d+_(?:relax|acq|rel|acq_rel|sync)$')
 
 
 def fail_usage(message):
@@ -54,15 +71,19 @@ def parse_args(argv):
     if len(argv) < 5:
         fail_usage(__doc__.split('\n\n')[1])
     exe, mapfile, objdump = argv[1:4]
-    variants, allow, report = [], [], None
+    variants, allow, report, arch = [], [], None, 'x86-64'
     rest = argv[4:]
     i = 0
     while i < len(rest):
-        if rest[i] in ('--allow', '--report'):
+        if rest[i] in ('--allow', '--report', '--arch'):
             if i + 1 == len(rest):
                 fail_usage('%s needs a value' % rest[i])
             if rest[i] == '--allow':
                 allow.append(re.compile(rest[i + 1]))
+            elif rest[i] == '--arch':
+                arch = rest[i + 1]
+                if arch not in ('x86-64', 'aarch64'):
+                    fail_usage('unknown --arch %r (x86-64 or aarch64)' % arch)
             else:
                 report = rest[i + 1]
             i += 2
@@ -74,7 +95,9 @@ def parse_args(argv):
         i += 1
     if not variants:
         fail_usage('no variant given')
-    return exe, mapfile, objdump, variants, allow, report
+    if arch == 'aarch64' and any(level > 1 for _, level in variants):
+        fail_usage('aarch64 has the levels 0 and 1 only')
+    return exe, mapfile, objdump, variants, allow, report, arch
 
 
 def read_map(mapfile):
@@ -174,6 +197,97 @@ def disassemble(exe, objdump):
     return functions, refs
 
 
+def a64_operands(text):
+    """The operands of an aarch64 instruction, without objdump's trailing comment."""
+    return [o.strip() for o in text.split('//')[0].split(',')] if text else []
+
+
+def disassemble_aarch64(exe, objdump, got):
+    """aarch64: functions [start, name, level] and code references (from, to, kind). An ADRP gives
+    a register a 4 KB page; the ADD that follows it makes an address ('adrp'), the 64-bit LDR one
+    a GOT entry whose pointer (`got`: entry address -> target) is the reference ('got'). The scan
+    follows the code in address order, so a page is forgotten wherever another path may join or
+    the register may have changed: at every branch target, after an unconditional branch or a
+    return, after a call for the registers it clobbers (x0 to x18, x30), and at any other write of
+    the register."""
+    header = re.compile(r'^([0-9a-f]+) <(.+)>:$')
+    instruction = re.compile(r'^\s*([0-9a-f]+):\t([0-9a-f]{8})\s+\t?(\S+)\s*(.*)$')
+    target = re.compile(r'\b([0-9a-f]+) <')
+    xreg = re.compile(r'^x([0-9]|[12][0-9]|30)$')
+    branches = {'b', 'bl', 'cbz', 'cbnz', 'tbz', 'tbnz'}
+    clobbered = {'x%d' % k for k in range(19)} | {'x30'}
+    functions, code = [], []
+    current = None
+    proc = subprocess.Popen([objdump, '-d', '-w', exe], stdout=subprocess.PIPE, text=True, errors='replace')
+    for line in proc.stdout:
+        m = header.match(line)
+        if m:
+            current = [int(m.group(1), 16), m.group(2), 0]
+            functions.append(current)
+            code.append(None)  # a new function: nothing is known
+            continue
+        m = instruction.match(line)
+        if not m or current is None:
+            continue
+        mnemonic = m.group(3)
+        if A64_LEVEL1.match(mnemonic):
+            current[2] = 1
+        code.append((int(m.group(1), 16), mnemonic, m.group(4)))
+    if proc.wait() != 0:
+        raise SystemExit('isa_audit: %s -d failed' % objdump)
+    refs, targets = [], set()
+    for c in code:
+        if c and (c[1] in branches or c[1].startswith('b.')):
+            t = target.search(c[2])
+            if t:
+                refs.append((c[0], int(t.group(1), 16), 'branch'))
+                targets.add(int(t.group(1), 16))
+    pages = {}
+    for c in code:
+        if c is None or c[0] in targets:
+            pages = {}
+            if c is None:
+                continue
+        address, mnemonic, text = c
+        operands = a64_operands(text)
+        if mnemonic in ('b', 'br', 'ret') or mnemonic.startswith(('bra', 'reta')):
+            pages = {}
+        elif mnemonic in ('bl', 'blr') or mnemonic.startswith('blra'):
+            for r in clobbered:
+                pages.pop(r, None)
+        elif mnemonic == 'adrp' and len(operands) == 2:
+            t = target.search(text)
+            if t:
+                pages[operands[0]] = int(t.group(1), 16)
+        elif mnemonic in branches or mnemonic.startswith('b.'):
+            pass
+        else:
+            if mnemonic == 'add' and len(operands) == 3 and operands[1] in pages and operands[2].startswith('#'):
+                refs.append((address, pages[operands[1]] + int(operands[2][1:], 0), 'adrp'))
+            elif mnemonic == 'ldr' and len(operands) == 3 and xreg.match(operands[0]) and \
+                    operands[1].startswith('[') and operands[1][1:] in pages and operands[2].endswith(']'):
+                entry = pages[operands[1][1:]] + int(operands[2][1:-1], 0)
+                if entry in got:
+                    refs.append((address, got[entry], 'got'))
+            # The registers the instruction writes (stores, compares and prefetches write none).
+            if operands and not mnemonic.startswith(('st', 'cmp', 'cmn', 'tst', 'prfm', 'ccmp', 'ccmn', 'fcmp')):
+                pages.pop(operands[0], None)
+                if mnemonic.startswith('ldp') and len(operands) > 1:
+                    pages.pop(operands[1], None)
+    functions.sort()
+    return functions, refs
+
+
+def got_range(exe, objdump):
+    """aarch64: the address range of the .got section (start, end), or None."""
+    out = subprocess.run([objdump, '-h', exe], capture_output=True, text=True, check=True).stdout
+    for line in out.splitlines():
+        p = line.split()
+        if len(p) > 4 and p[1] == '.got':
+            return int(p[3], 16), int(p[3], 16) + int(p[2], 16)
+    return None
+
+
 def data_pointers(exe, objdump):
     """Pointers stored in data (from, to, 'data'); None when the executable does not show them."""
     info = subprocess.run([objdump, '-f', exe], capture_output=True, text=True, check=True).stdout
@@ -184,7 +298,8 @@ def data_pointers(exe, objdump):
         out = subprocess.run([objdump, '-R', exe], capture_output=True, text=True, check=True).stdout
         for line in out.splitlines():
             p = line.split()
-            if len(p) == 3 and p[1] in ('R_X86_64_RELATIVE', 'R_X86_64_IRELATIVE') and p[2].startswith('*ABS*+0x'):
+            if len(p) == 3 and p[1] in ('R_X86_64_RELATIVE', 'R_X86_64_IRELATIVE', 'R_AARCH64_RELATIVE',
+                                        'R_AARCH64_IRELATIVE') and p[2].startswith('*ABS*+0x'):
                 refs.append((int(p[0], 16), int(p[2][len('*ABS*+'):], 16), 'data'))
         return refs
     data = open(exe, 'rb').read()
@@ -226,7 +341,7 @@ def data_pointers(exe, objdump):
 
 
 def main():
-    exe, mapfile, objdump, variants, allow, report_file = parse_args(sys.argv)
+    exe, mapfile, objdump, variants, allow, report_file, arch = parse_args(sys.argv)
     ranges = read_map(mapfile)
     if not ranges:
         fail_usage('no memory map in %s' % mapfile)
@@ -247,7 +362,17 @@ def main():
         return None
 
     declared = {regex.pattern: level for regex, level in variants}
-    functions, refs = disassemble(exe, objdump)
+    pointers = data_pointers(exe, objdump)
+    if arch == 'aarch64':
+        # The GOT entries are read by the code that loads them (ADRP + LDR): each one counts as a
+        # reference from that code, not as a data pointer of no object.
+        got, got_bounds = {}, got_range(exe, objdump)
+        if pointers is not None and got_bounds is not None:
+            got = {source: target for source, target, _ in pointers if got_bounds[0] <= source < got_bounds[1]}
+            pointers = [p for p in pointers if p[0] not in got]
+        functions, refs = disassemble_aarch64(exe, objdump, got)
+    else:
+        functions, refs = disassemble(exe, objdump)
     # MinGW links the constructor and destructor lists (pointers to static initialisers) into
     # .text, so objdump decodes them as code; a pointer byte 0x62 then reads as an EVEX prefix.
     # They are data: no instruction level.
@@ -255,7 +380,13 @@ def main():
         r = range_at(f[0])
         if r is not None and r[3].startswith(('.ctors', '.dtors')):
             f[2] = 0
-    pointers = data_pointers(exe, objdump)
+    # aarch64: libgcc's outline atomics take LSE only on a CPU that has it.
+    outline_atomics = 0
+    if arch == 'aarch64':
+        for f in functions:
+            if f[2] and A64_OUTLINE_ATOMIC.match(f[1]) and re.search(r'(^|/)libgcc\.a\(', owner(f[0])):
+                f[2] = 0
+                outline_atomics += 1
     problems = []
     if pointers is None:
         problems.append('the executable hides its data pointers (ELF: not position-independent; '
@@ -269,6 +400,8 @@ def main():
         return functions[k] if k >= 0 else None
 
     lines = []
+    if arch == 'aarch64':
+        lines.append('== libgcc outline atomics counted as baseline (LSE chosen at run time): %d' % outline_atomics)
     per_object = collections.defaultdict(lambda: [0, 0, 0, 0])
     for f in functions:
         per_object[owner(f[0])][f[2]] += 1
