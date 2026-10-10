@@ -3,7 +3,7 @@
 //
 //   challenge_audit [--candidates FILE] [--endgames FILE] [--out FILE] [--report FILE]
 //                   [--depth D] [--play-depth D] [--confirm N] [--threads T] [--hash MB]
-//                   [--cache FILE] [--only ID] [--all] [--dry-run]
+//                   [--max-seconds N] [--cache FILE] [--only ID] [--all] [--dry-run]
 //
 // Inputs: tools/challenges/candidates.txt (tools/challenges/select.py: the Lichess puzzles, every
 // set's header and the number of positions it needs, "# want <n>") and tools/challenges/
@@ -35,10 +35,17 @@
 // With more than one thread Stockfish is not fully deterministic, so a borderline candidate may
 // still change between runs (--threads 1 for exact reproducibility).
 //
+// --max-seconds N caps the time of one candidate (both passes): a slower one is dropped ("slow"),
+// the next one tried. Dropping is always safe; it skips the positions too complex to settle
+// quickly, which are also those the game's own judge is least sure about.
+//
 // A full run takes hours (a few minutes for some middlegame positions). --cache FILE keeps every
 // verdict as it is reached (one line per candidate) and reuses those made with the same rules and
 // depths: an interrupted run continues where it stopped, and a run after editing the candidates
-// only checks the new ones. Bump kRulesVersion when a rule changes.
+// only checks the new ones (a "slow" verdict only under the same --max-seconds; the thread count
+// is not part of the key). Bump kRulesVersion when a rule changes. The sets can be checked in
+// parallel: one process per set (--only ID, its own cache file), then the cache files merged and
+// one full run that finds every verdict in the cache.
 //
 // Output: the header of the existing output file (its comment block), then the book written by
 // coach::ChallengeBook::write(), read back with ChallengeBook::parse (no error allowed). A report
@@ -50,6 +57,7 @@
 #include "chess/chess.h"
 #include "coach/challenge.h"
 
+#include <chrono>
 #include <string>
 #include <vector>
 
@@ -68,6 +76,7 @@ struct Options {
     int depth = 20;          // lines and escapes
     int playDepth = 30;      // play-outs
     int confirm = 4;         // a candidate that passes is checked again this much deeper (0 = not)
+    int maxSeconds = 0;      // per candidate, both passes (0 = no cap): a slower one is dropped
     int threads = 3;
     int hashMB = 256;
     bool all = false;        // check every candidate, not only until the set is full
@@ -107,6 +116,10 @@ public:
     ~Oracle();
     bool ok() const { return ok_; }
     void newCandidate();                                  // clears the hash table
+    // Starts a candidate's clock (seconds, 0 = none): once it runs out, every search fails at once
+    // and timedOut() is true until the next startClock().
+    void startClock(int seconds);
+    bool timedOut() const { return timedOut_; }
     void setExtraDepth(int plies) { extra_ = plies; }     // added to the depths below (confirmation)
     int depth() const { return opt_.depth + extra_; }     // lines and escapes
     int playDepth() const { return opt_.playDepth + extra_; }
@@ -122,6 +135,9 @@ private:
     Impl* impl_;
     bool ok_ = false;
     int extra_ = 0;
+    bool timedOut_ = false;
+    std::chrono::steady_clock::time_point deadline_ = std::chrono::steady_clock::time_point::max();
+    ai::Analysis run(const ai::AnalysisRequest& r);
 };
 
 }  // namespace challenges

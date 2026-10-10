@@ -108,13 +108,23 @@ Oracle::~Oracle() {
 
 void Oracle::newCandidate() { impl_->engine.newGame(); }
 
-namespace {
-ai::Analysis run(ai::Engine& e, const ai::AnalysisRequest& r) {
+void Oracle::startClock(int seconds) {
+    timedOut_ = false;
+    deadline_ = seconds > 0 ? std::chrono::steady_clock::now() + std::chrono::seconds(seconds)
+                            : std::chrono::steady_clock::time_point::max();
+}
+
+// One search (ok false on failure, or once the candidate's time has run out).
+ai::Analysis Oracle::run(const ai::AnalysisRequest& r) {
     ai::Analysis a;
+    if (timedOut_) return a;
+    ai::Engine& e = impl_->engine;
     const uint32_t id = e.requestAnalysis(r);
     const auto t0 = std::chrono::steady_clock::now();
     while (!e.analysisReady(id)) {
-        if (std::chrono::steady_clock::now() - t0 > std::chrono::minutes(20)) {
+        const auto now = std::chrono::steady_clock::now();
+        if (now > deadline_) timedOut_ = true;
+        if (timedOut_ || now - t0 > std::chrono::minutes(20)) {
             e.cancelAnalysis(id);
             return a;
         }
@@ -123,7 +133,6 @@ ai::Analysis run(ai::Engine& e, const ai::AnalysisRequest& r) {
     if (!e.takeAnalysis(id, a)) a.ok = false;
     return a;
 }
-}  // namespace
 
 ai::Analysis Oracle::top(const Position& pos, int lines, int depth) {
     ai::AnalysisRequest r;
@@ -131,7 +140,7 @@ ai::Analysis Oracle::top(const Position& pos, int lines, int depth) {
     r.multiPV = std::max(1, std::min(lines, legalCount(pos)));
     r.depth = depth;
     r.moveTimeMs = 0;   // depth only: reproducible
-    return run(impl_->engine, r);
+    return run(r);
 }
 
 ai::Analysis Oracle::only(const Position& pos, const std::string& uci, int depth) {
@@ -141,7 +150,7 @@ ai::Analysis Oracle::only(const Position& pos, const std::string& uci, int depth
     r.depth = depth;
     r.moveTimeMs = 0;
     r.searchMoves = {uci};
-    return run(impl_->engine, r);
+    return run(r);
 }
 
 // ==== Lines =======================================================================================

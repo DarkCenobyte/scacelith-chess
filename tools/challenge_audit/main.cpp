@@ -96,6 +96,7 @@ std::map<std::string, Cached> readCache(const std::string& path) {
         std::stringstream ss(line);
         std::string x;
         while (std::getline(ss, x, '\t')) f.push_back(x);
+        if (f.size() == 3) f.push_back(std::string());   // a rejection: no position (getline drops the empty end)
         if (f.size() != 4) continue;
         Cached c;
         c.why = f[1] == "ok" ? std::string() : f[1];
@@ -121,7 +122,8 @@ int usage() {
     std::fprintf(stderr,
                  "usage: challenge_audit [--candidates FILE] [--endgames FILE] [--out FILE] [--report FILE]\n"
                  "                       [--depth D] [--play-depth D] [--confirm N] [--threads T] [--hash MB]\n"
-                 "                       [--cache FILE] [--only ID] [--all] [--dry-run]   (see audit.h)\n");
+                 "                       [--max-seconds N] [--cache FILE] [--only ID] [--all] [--dry-run]\n"
+                 "                       (see tools/challenge_audit/audit.h)\n");
     return 2;
 }
 
@@ -138,6 +140,7 @@ int main(int argc, char** argv) {
         else if (a == "--report") o.report = next();
         else if (a == "--only") o.only = next();
         else if (a == "--cache") o.cache = next();
+        else if (a == "--max-seconds") o.maxSeconds = std::atoi(next().c_str());
         else if (a == "--depth") o.depth = std::atoi(next().c_str());
         else if (a == "--play-depth") o.playDepth = std::atoi(next().c_str());
         else if (a == "--confirm") o.confirm = std::atoi(next().c_str());
@@ -147,7 +150,8 @@ int main(int argc, char** argv) {
         else if (a == "--dry-run") o.dryRun = true;
         else return usage();
     }
-    if (o.depth < 1 || o.playDepth < 1 || o.confirm < 0) return usage();
+    if (o.depth < 1 || o.playDepth < 1 || o.confirm < 0 || o.maxSeconds < 0) return usage();
+    const std::string slow = "slow: over " + std::to_string(o.maxSeconds) + " s";
     if (!o.only.empty()) o.dryRun = true;
 
     std::vector<Set> sets;
@@ -172,8 +176,8 @@ int main(int argc, char** argv) {
         std::fprintf(stderr, "engine unavailable\n");
         return 2;
     }
-    say("challenge_audit: depth %d, play-outs %d, confirmed %d deeper, %d thread(s), hash %d MB\n", o.depth,
-        o.playDepth, o.confirm, o.threads, o.hashMB);
+    say("challenge_audit: depth %d, play-outs %d, confirmed %d deeper, %d s per candidate at most, %d thread(s), "
+        "hash %d MB\n", o.depth, o.playDepth, o.confirm, o.maxSeconds, o.threads, o.hashMB);
 
     std::map<std::string, Cached> cache;
     std::ofstream cacheOut;
@@ -203,7 +207,10 @@ int main(int argc, char** argv) {
             std::string why, note;
             const auto it = seen.find(keyOf(c.pos));
             const std::string key = cacheKey(o, set, c);
-            const auto hit = cache.find(key);
+            auto hit = cache.find(key);
+            // A slow drop holds for the same time cap only.
+            if (hit != cache.end() && hit->second.why.compare(0, 5, "slow:") == 0 && hit->second.why != slow)
+                hit = cache.end();
             if (c.error.empty() && it != seen.end()) {
                 why = "duplicate: also in " + it->second;
             } else if (hit != cache.end()) {
@@ -211,6 +218,7 @@ int main(int argc, char** argv) {
                 note = hit->second.note;
                 pos = hit->second.pos;
             } else {
+                oracle.startClock(o.maxSeconds);
                 oracle.newCandidate();
                 why = checkCandidate(oracle, set, c, pos, note);
                 if (why.empty() && o.confirm > 0) {
@@ -229,6 +237,10 @@ int main(int argc, char** argv) {
                               note + ")";
                     else
                         note = deeper;
+                }
+                if (oracle.timedOut()) {
+                    why = slow;
+                    note.clear();
                 }
                 if (cacheOut.is_open()) {
                     cacheOut << key << '\t' << (why.empty() ? std::string("ok") : why) << '\t' << note << '\t'
