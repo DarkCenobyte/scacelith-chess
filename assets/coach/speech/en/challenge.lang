@@ -94,6 +94,7 @@ ch.wrong.reply.2 = Not quite: I'd reply {move}.
 ch.wrong.reply.3 = Then I'd play {move}.
 ch.wrong.mate = Careful: {move:nomate} would be checkmate.
 ch.wrong.mate.2 = Watch out: I'd answer {move:nomate}, and that's mate.
+ch.wrong.mated = Careful: after {move}, I can force mate in {m}.
 # A move that still mates, but in more moves than the position asks.
 ch.wrong.slower = That mates too, but it takes longer. There's a faster way.
 # A move that mates just as fast, but is not the solution the coach answers.

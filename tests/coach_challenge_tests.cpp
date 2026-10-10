@@ -335,6 +335,26 @@ TEST(challenge_run_line_wrong_moves_and_hints) {
     checkRenders(t.lines);
 }
 
+TEST(challenge_run_line_mated) {
+    // A wrong move that lets the coach mate by force: how soon, its first move shown, taken back.
+    const ChallengeBook b = ChallengeBook::parse(kBook);
+    const std::string led = fenAfter("6k1/5ppp/8/8/8/8/n4PPP/R5K1 b - - 0 1", "a2c3");
+    Run t;
+    t.analyst.results[fenAfter(led.c_str(), "a1b1") + "|A0"] = mateAnalysis(2, "c3e2");
+    t.start(bookChallenge(b, "mate1"));
+    CHECK(t.ready());
+    t.move("a1b1");
+    CHECK(t.backAndWaiting(1));   // the coach's lead move stays
+    CHECK(t.queued("ch.wrong.mated") == 1);
+    CHECK(t.queued("ch.wrong.reply") == 0);
+    CHECK_EQ(t.stage.all("demoMove").back().text, std::string("c3e2"));
+    bool counted = false;
+    for (const Line& l : t.lines)
+        if (l.key == "ch.wrong.mated" && l.arg("m") && l.arg("m")->number == 2) counted = true;
+    CHECK(counted);
+    checkRenders(t.lines);
+}
+
 TEST(challenge_run_play_out) {
     const ChallengeBook b = ChallengeBook::parse(kBook);
     const char* fen = "7k/8/6K1/8/8/8/8/5Q2 w - - 0 1";
@@ -485,6 +505,7 @@ TEST(challenge_speech_renders_everywhere) {
                 Line l;
                 l.key = k;
                 l.with("n", Arg::ofNumber(n));
+                l.with("m", Arg::ofNumber(n));
                 l.with("move", Arg::ofMove(san, "h4h2"));
                 l.with("your", Arg::ofPiece(chess::Knight, chess::White, true, parseSquare("g1")));
                 l.with("sq", Arg::ofSquare(parseSquare("e4")));

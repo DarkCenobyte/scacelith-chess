@@ -108,6 +108,7 @@ ch.wrong.reply.2 = 少し違います。私は{move}と返します。
 ch.wrong.reply.3 = それなら、私は{move}と指します。
 ch.wrong.mate = 気をつけて。{move:nomate}でチェックメイトです。
 ch.wrong.mate.2 = 注意！私が{move:nomate}と指せば、メイトです。
+ch.wrong.mated = 気をつけて。{move}から、私に{m:move}の強制メイトがあります。
 # A move that still mates, but in more moves than the position asks.
 ch.wrong.slower = それでもメイトできますが、遠回りです。もっと早い道があります。
 # A move that mates just as fast, but is not the solution the coach answers.

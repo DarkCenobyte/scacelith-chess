@@ -98,6 +98,7 @@ ch.wrong.reply.2 = ليس تمامًا: عندها ألعب {move}.
 ch.wrong.reply.3 = ثم ألعب {move}.
 ch.wrong.mate = انتبه: {move:nomate}، وهذا كش مات.
 ch.wrong.mate.2 = حذارِ: سيكون ردّي {move:nomate}، وهذا كش مات.
+ch.wrong.mated = انتبه: بعد {move}، أفرض كش مات في {m:move}.
 # A move that still mates, but in more moves than the position asks.
 ch.wrong.slower = هذه النقلة تؤدي إلى كش مات أيضًا، لكن بعد نقلات أكثر. هناك طريق أسرع.
 # A move that mates just as fast, but is not the solution the coach answers.

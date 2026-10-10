@@ -336,6 +336,13 @@ struct ChallengeRun::Impl {
                 wrong(Script{say(line(longer ? "ch.wrong.slower" : "ch.wrong.other"), Look::Player)});
                 return;
             }
+            if (w.mate < 0) {
+                // The coach mates by force (its first move not yet mate): say how soon.
+                Script s = answerScript("ch.wrong.mated", a.bestMove);
+                s.front().line.with("m", Arg::ofNumber(-w.mate));
+                wrong(s);
+                return;
+            }
             if (w.expected() >= kStillWinning) {
                 wrong(Script{say(line("ch.wrong.weaker"), Look::Player)});
                 return;

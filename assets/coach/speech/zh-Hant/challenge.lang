@@ -100,6 +100,7 @@ ch.wrong.reply.2 = 不太對：我會走{move}回應。
 ch.wrong.reply.3 = 那樣我就走{move}。
 ch.wrong.mate = 小心：{move:nomate}就是將死。
 ch.wrong.mate.2 = 當心：我會走{move:nomate}，那就將死了。
+ch.wrong.mated = 小心：{move}之後，我可以{m:move}強制將死。
 # A move that still mates, but in more moves than the position asks.
 ch.wrong.slower = 這樣也能將死，但要多走幾步。還有更快的走法。
 # A move that mates just as fast, but is not the solution the coach answers.

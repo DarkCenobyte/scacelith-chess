@@ -98,6 +98,7 @@ ch.wrong.reply.2 = Не совсем: я отвечу {move}.
 ch.wrong.reply.3 = Тогда я сыграю {move}.
 ch.wrong.mate = Осторожно: {move:nomate} — и это мат.
 ch.wrong.mate.2 = Внимание: я отвечу {move:nomate}, и это мат.
+ch.wrong.mated = Осторожно: после {move} у меня форсированный мат в {m:move}.
 # A move that still mates, but in more moves than the position asks.
 ch.wrong.slower = Так тоже будет мат, но дольше. Есть путь быстрее.
 # A move that mates just as fast, but is not the solution the coach answers.

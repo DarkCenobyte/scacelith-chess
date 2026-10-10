@@ -98,6 +98,7 @@ ch.wrong.reply.2 = Pas tout à fait : je jouerais {move}.
 ch.wrong.reply.3 = Je jouerais alors {move}.
 ch.wrong.mate = Attention : {move:nomate} serait échec et mat.
 ch.wrong.mate.2 = Prudence : je répondrais {move:nomate}, et c’est mat.
+ch.wrong.mated = Attention : après {move}, je force le mat en {m:move}.
 # A move that still mates, but in more moves than the position asks.
 ch.wrong.slower = Ça mate aussi, mais c’est plus long. Il y a plus rapide.
 # A move that mates just as fast, but is not the solution the coach answers.

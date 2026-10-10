@@ -99,6 +99,7 @@ ch.wrong.reply.2 = No exactamente: respondería {move}.
 ch.wrong.reply.3 = Entonces yo jugaría {move}.
 ch.wrong.mate = Cuidado: {move:nomate} sería jaque mate.
 ch.wrong.mate.2 = Ojo: respondería {move:nomate}, y es mate.
+ch.wrong.mated = Cuidado: después de {move}, fuerzo el mate en {m:move}.
 # A move that still mates, but in more moves than the position asks.
 ch.wrong.slower = Eso también da mate, pero tarda más. Hay un camino más rápido.
 # A move that mates just as fast, but is not the solution the coach answers.

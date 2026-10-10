@@ -99,6 +99,7 @@ ch.wrong.reply.2 = Nicht ganz: Darauf käme {move}.
 ch.wrong.reply.3 = Dann würde ich {move} spielen.
 ch.wrong.mate = Vorsicht: {move:nomate} wäre Schachmatt.
 ch.wrong.mate.2 = Pass auf: Ich würde mit {move:nomate} antworten, und das ist matt.
+ch.wrong.mated = Vorsicht: Nach {move} setze ich forciert matt in {m:move_dat}.
 # A move that still mates, but in more moves than the position asks.
 ch.wrong.slower = Das setzt auch matt, dauert aber länger. Es geht schneller.
 # A move that mates just as fast, but is not the solution the coach answers.
