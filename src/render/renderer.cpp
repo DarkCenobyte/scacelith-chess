@@ -41,6 +41,9 @@ void Camera::lookAt(vec3 target, vec3 upHint) {
 
 void RenderSettings::applyPreset(Quality q) {
     quality = q;
+    planarDivisor = 2;
+    shadowFilter = q == Quality::Ultra ? 3 : 2;
+    aoQuality = ssrQuality = volumetricQuality = dofQuality = motionBlurQuality = -1;
     switch (q) {
         case Quality::Low:
             shadowMapSize = 2048; planarReflections = false; ssao = true; ssr = false; volumetrics = false;
@@ -221,7 +224,7 @@ void Renderer::setSettings(const RenderSettings& s) {
                           s.staticShadowCache != settings_.staticShadowCache;
     bool probesChanged = s.probeResolution != settings_.probeResolution || s.probeBounces != settings_.probeBounces ||
                          s.lightProbes != settings_.lightProbes;
-    bool planarChanged = s.planarReflections != settings_.planarReflections;
+    bool planarChanged = s.planarReflections != settings_.planarReflections || s.planarDivisor != settings_.planarDivisor;
     settings_ = s;
     if (shadowsChanged && frameUbo_.id) shadows_->init(settings_.shadowMapSize, settings_.shadowCascades, settings_.staticShadowCache);
     if (probesChanged && frameUbo_.id) {
@@ -267,11 +270,12 @@ void Renderer::resize(int w, int h) {
     post_->resize(rw, rh);
 }
 
-// Planar reflections: half resolution, one array layer per reflector (up to 4), no targets
-// while they are off (Low preset).
+// Planar reflections: half or quarter resolution (planarDivisor), one array layer per reflector
+// (up to 4), no targets while they are off.
 void Renderer::allocatePlanar() {
     int layers = settings_.planarReflections ? std::max(1, int(planar_.size())) : 0;
-    planarRefl_->resize(std::max(1, rt_.w / 2), std::max(1, rt_.h / 2), layers);
+    int div = std::clamp(settings_.planarDivisor, 1, 8);
+    planarRefl_->resize(std::max(1, rt_.w / div), std::max(1, rt_.h / div), layers);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -484,7 +488,7 @@ void Renderer::updateLightingUBO() {
     l.sunParams = vec4(frame_.sunDirection.w, std::tan(frame_.sunDirection.w * softness), softness, toaLum * exposure);
     l.sunTOA = vec4(toa * exposure, env_.altitudeKm);
     l.skyParams2 = vec4(clamp(env_.cloudCoverage, 0.0f, 1.0f), env_.time, mieScaleOf(env_), env_.skyIntensity);
-    l.lightingMisc = vec4(settings_.specularAA, 0.06f, env_.ambientIntensity, 0.0f);
+    l.lightingMisc = vec4(settings_.specularAA, 0.06f, env_.ambientIntensity, float(std::clamp(settings_.shadowFilter, 0, 3)));
     glNamedBufferSubData(lightingUbo_.id, 0, GLsizeiptr(LIGHTING_UBO_CPU_SIZE), lub_.get());
     glBindBufferBase(GL_UNIFORM_BUFFER, UBO_LIGHTING, lightingUbo_.id);
 }
@@ -592,6 +596,11 @@ void Renderer::endFrame() {
     post_->settings.motionBlur = settings_.motionBlur;
     post_->settings.dof = settings_.dof;
     post_->settings.bloom = settings_.bloom;
+    post_->settings.aoQuality = settings_.aoQuality;
+    post_->settings.ssrQuality = settings_.ssrQuality;
+    post_->settings.volumetricQuality = settings_.volumetricQuality;
+    post_->settings.dofQuality = settings_.dofQuality;
+    post_->settings.motionBlurQuality = settings_.motionBlurQuality;
     post_->settings.fade = fade;
     {
         gpu::ProfileScope prof("post.ao");

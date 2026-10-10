@@ -109,7 +109,9 @@ cached per cascade (`staticShadowCache`, re-rendered on `invalidateStatic()` / s
 casters are drawn on top every frame; small dynamic items (pieces) are skipped in the coarse
 cascades inside the first region. Filtering: PCSS (physical sun radius × `sunSoftness`, blocker
 search with textureGather) with normal-offset + receiver-plane depth bias; cascade borders are
-dithered (TAA resolves them). `evalSunShadow()` also returns the matter thickness towards the sun.
+dithered (TAA resolves them). `RenderSettings::shadowFilter` (Options > Graphics > Shadows, in
+`LightingUBO.lightingMisc.w`) picks the taps: 0 a bilinear 4-tap PCF without blocker search, 1-3
+PCSS with 8/12/16 blocker gathers and 8-16/16-32/24-48 filter taps. `evalSunShadow()` also returns the matter thickness towards the sun.
 
 **Light probes.** `Renderer::setLightProbes` (≤ 16 `LightProbeDesc`; default: a priority probe
 above the table + a 3×4 grid at 1.8 m + 3 high probes). Probes capture **`DRAW_STATIC` geometry
@@ -162,7 +164,9 @@ shadows.
 sphere in every pass), `DrawFilter` + `Renderer::drawScene(pass, transparents, filter)`,
 `Renderer::renderSky()` (public), `specularProbes()`, `lightingUBO()`, `brdfLut()`,
 `environment()`, `RenderSettings::{shadowCascades, staticShadowCache, lightProbes,
-probeResolution, probeBounces, specularAA}` (set by the quality presets). GLSL: `sq(vec2/vec3)`,
+probeResolution, probeBounces, specularAA, shadowFilter, planarDivisor}` and the post effects'
+sample rows `{ao,ssr,volumetric,dof,motionBlur}Quality` (the game sets them from Options >
+Graphics, `src/game/graphics_quality.h`: ten options, the Very low..Ultra presets and Custom). GLSL: `sq(vec2/vec3)`,
 `F_Schlick(vec3 f0, vec3 f90, float)`, `gtaoMultiBounce()`, `specularOcclusion()`.
 `SCACELITH_GPU_PROFILE=1` logs per-pass CPU+glFinish timings each frame (opt-in, stalls the GPU).
 Test scenes: `lightbox` (hall of boxes per layout.h: `--view 0..4`, `--sun az,el`, `--ev`) and
