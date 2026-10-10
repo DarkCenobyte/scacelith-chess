@@ -201,10 +201,10 @@ games** opens your history on the server, where each game's page has **Analyse**
 **Saved games** next to Replay and the game over card (**Analyse the game**: after a game against
 Stockfish, the coach, a friend on the same PC or online; it declines a rematch).
 
-The game is set on the table and Stockfish reviews it in the background, first quickly (the bar
-and the symbols appear within seconds), then in depth; a game opened again shows its review at once
-(the evaluations are kept for the 200 games last analysed, in the game's folder of application
-data, `analysis\`).
+The game is set on the table (its starting position; its final one after **Analyse the game**) and
+Stockfish reviews it in the background, first quickly (the bar and the symbols appear within
+seconds), then in depth; a game opened again shows its review at once (the evaluations are kept for
+the 200 games last analysed, in the game's folder of application data, `analysis\`).
 
 - **The evaluation bar** on the left shows who stands better in the position on the board, with the
   score (or the mate) at the leading side's end.
@@ -439,7 +439,7 @@ the game over card with Analyse the game, and `online-game-analysing` a history 
 PGN for the analysis.
 
 Analysis mode: `--analyse <file.pgn>` opens that file's first game (`--game N`: its Nth, from 1) in
-the Analysis mode at once, on the final position unless `--analysis-at N` names another (the
+the Analysis mode at once, on the starting position unless `--analysis-at N` names another (the
 position after N plies); `--replay-keys` drives it (`J,L,K,Home,End,N,M,B`, `Goto:N` clicks the
 panel's position N, `Wait:S` waits S seconds, `Leave` goes back to the menu), and with `--shot`
 the review uses shallow depths so that a screenshot shows a finished review. The Analysis mode's
