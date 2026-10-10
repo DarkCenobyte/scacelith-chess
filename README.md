@@ -192,6 +192,14 @@ remembered (`[viewer]` in the settings file).
 The players claim and offer draws like the opponent of a normal game (repetition, fifty moves, an
 equal position late in the game), and the game over card offers to watch another game.
 
+## Analysis
+
+**Analysis** on the title page lists your saved games with the PGN files put in their folder
+(the page says where; **Open folder** shows it), and **Paste a PGN** analyses a game copied as
+PGN text (the first one when the clipboard holds several). When you are signed in, **My online
+games** opens your history on the server, where each game's page has **Analyse** too, as does
+**Saved games** next to Replay and the game over card (**Analyse the game**).
+
 ## Online play
 
 **Play Online** on the title page plays people through a Scacelith server, still in the first
@@ -393,6 +401,13 @@ tracing the knight's jump to f3 on their words, a mark and a highlight, two demo
 taken back by hand, then the takeback card (`--coach-stage-test lesson`: on the lesson's first
 position); its log gives the time of each step, for `--warp`. `--coach-auto-answer yes|no` answers
 the takeback card by itself after 1.5 s, for runs with `--play`.
+
+Analysis menus: `--scene ui --ui-screen analysis-page|analysis-page-online|library-analyse` shows
+the Analysis page and the Saved games page (on sample games written to `pgn-viewer-sample/` in the
+user data folder unless `--ui-library <folder>` is given; `--ui-clipboard <file>` stands in for the
+clipboard), `gameover-analyse|gameover-analyse-coach|gameover-analyse-online|gameover-analyse-folded`
+the game over card with Analyse the game, and `online-game-analysing` a history game fetching its
+PGN for the analysis.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised.
 
