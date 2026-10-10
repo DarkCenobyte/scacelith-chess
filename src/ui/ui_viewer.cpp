@@ -16,6 +16,13 @@
 //   saved games: library (the page; --ui-library <folder> lists that folder, default the pgn folder
 //     of the user data directory), library-empty (the same, its folder replaced by an empty one
 //     when --ui-library is not given); the title page ("main") shows the "Saved games" entry
+//   analysis menus (sample saved games written to <user data>/pgn-viewer-sample/ unless
+//     --ui-library is given): analysis-page (the Analysis page), analysis-page-online (the same
+//     signed in to the fake server: My online games), library-analyse (Saved games with Analyse),
+//     gameover-analyse (the card of a game against Stockfish with "Analyse the game"),
+//     gameover-analyse-coach, gameover-analyse-online (rematch offered, report),
+//     gameover-analyse-folded, online-game-analysing (a game of the history, Analyse pressed: its
+//     PGN on the way); --ui-clipboard <file>: the text Paste a PGN reads instead of the clipboard
 //   hot-seat (two players on one PC): newgame-hotseat (New Game with "Human, same PC"),
 //     hotseat-hud (players, caption, draw offer card), hotseat-confirm (named resignation),
 //     hotseat-gameover (both names and ratings)
@@ -25,7 +32,8 @@
 //     direct-wait, direct-join; the account API's pages: online-history, online-game (a game of
 //     the history), online-game-gif (its GIF saved: a file written to the GIF folder),
 //     online-game-gif-making (the GIF being made), online-game-saving (Save game pressed: the
-//     PGN on its way), online-game-saved (the PGN written to the saved games), online-devices,
+//     PGN on its way), online-game-saved (the PGN written to the saved games),
+//     online-game-analysing (Analyse pressed: the PGN on its way), online-devices,
 //     online-email, online-email-sent, online-export, online-export-done, online-delete; at the table:
 //     online-hud, online-pause, online-report, online-gameover; Saved games signed in:
 //     library-gif (Save as GIF enabled), library-gif-done (the selected game's GIF saved)
@@ -38,6 +46,7 @@
 //   --ui-keys a,b,.. scripted input, one token per frame: up down left right enter space esc tab
 //                   pgup pgdn home end bksp del wait <letter> click@X:Y (reference px, press +
 //                   release) type:<text> (typed characters) wheel:<notches> (negative: down)
+//                   mock:<ms> (the online screens' fake server: its clock moves on, its answers come)
 // Interactive: keys 1..9 / 0 switch screens.
 #include "ui.h"
 #include "ui_internal.h"
@@ -56,15 +65,120 @@
 #include "../render/gpu.h"
 #include "../render/shader.h"
 #include "../game/coach_model.h"
+#include "../game/game_archive.h"
 #include "../tts/model_store.h"
 #include "../tts/tts.h"
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
+#include <ctime>
+#include <fstream>
+#include <sstream>
 
 namespace {
 
 const char* kScreens[] = {"main", "newgame", "custom", "options", "pause", "promotion", "gameover", "loading", "movelist", "notify"};
+
+// Sample saved games for the analysis menus' screens, written (again) to <user data>/pgn-viewer-sample/
+// the way the game saves its own (archive::makeRecord), with one game from elsewhere; returns the
+// folder.
+std::string sampleLibrary() {
+    namespace archive = game::archive;
+    const std::string folder = plat::userDataDirectory() + "pgn-viewer-sample/";
+    if (!archive::makeFolder(folder)) LOGW("ui viewer: cannot create %s", folder.c_str());
+    // end: 0 as played, 1 White resigns, 2 Black resigns, 3 a draw agreed.
+    struct Sample {
+        archive::Mode mode;
+        const char* white;
+        const char* black;
+        int whiteElo, blackElo;
+        int coachLevel, end;
+        const char* timeControl;
+        int day, hour;   // in October 2026
+        const char* moves;
+    };
+    static const Sample samples[] = {
+        {archive::Mode::Play, "Olivier", "Stockfish", 1524, 2100, -1, 0, "600+5", 9, 21,
+         "e4 e5 Nf3 d6 d4 Bg4 dxe5 Bxf3 Qxf3 dxe5 Bc4 Nf6 Qb3 Qe7 Nc3 c6 Bg5 b5 Nxb5 cxb5 Bxb5+ Nbd7 O-O-O Rd8 Rxd7 Rxd7 Rd1 "
+         "Qe6 Bxd7+ Nxd7 Qb8+ Nxb8 Rd8#"},
+        {archive::Mode::Coach, "Coach", "Olivier", 0, 0, 3, 1, "-", 8, 18,
+         "e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be2 e5 Nb3 Be7 O-O O-O Be3 Be6 f4 exf4 Rxf4 Nc6 Kh1 d5 exd5 Nxd5 Nxd5 Bxd5 "
+         "Rd4 Be6 Rxd8 Raxd8 Qe1 Bf6"},
+        {archive::Mode::HotSeat, "Alice", "Bob", 1512, 1488, -1, 3, "300+3", 7, 20,
+         "d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Rc1 c6 Bd3 dxc4 Bxc4 Nd5 Bxe7 Qxe7 O-O Nxc3 Rxc3 e5"},
+        {archive::Mode::Server, "Magnus_T", "Eleonora_V", 1605, 1638, -1, 1, "180+2", 6, 22,
+         "e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Nb8 d4 Nbd7 Nbd2 Bb7 Bc2 Re8 Nf1 Bf8 Ng3 g6 a4 c5 "
+         "d5 c4 Bg5 h6 Be3 Nc5 Qd2 h5 Bg5 Be7"},
+        {archive::Mode::Direct, "Olivier", "Julien", 0, 0, -1, 2, "900+10", 4, 19,
+         "e4 e6 d4 d5 Nc3 Bb4 e5 c5 a3 Bxc3+ bxc3 Ne7 Qg4 Qc7 Qxg7 Rg8 Qxh7 cxd4 Ne2 Nbc6 f4 Bd7 Qd3 dxc3 Nxc3 a6"},
+    };
+    std::tm base{};
+    base.tm_year = 2026 - 1900;
+    base.tm_mon = 9;
+    base.tm_isdst = -1;
+    auto write = [&](const chess::pgn::Record& r, std::time_t when) {
+        const std::string path = archive::joinPath(folder, archive::fileName(r, when));
+        std::ofstream out(path, std::ios::binary | std::ios::trunc);
+        out << chess::pgn::write(r);
+        if (!out) LOGW("ui viewer: cannot write %s", path.c_str());
+    };
+    for (const Sample& sm : samples) {
+        chess::Game g;
+        std::istringstream moves(sm.moves);
+        for (std::string san; moves >> san;) {
+            const chess::Move m = g.position().parseSAN(san);
+            if (!g.play(m)) {
+                LOGW("ui viewer: sample game %s - %s: '%s' does not play", sm.white, sm.black, san.c_str());
+                break;
+            }
+        }
+        if (sm.end == 1) g.resign(chess::White);
+        if (sm.end == 2) g.resign(chess::Black);
+        if (sm.end == 3) g.agreeDraw();
+        std::tm tm = base;
+        tm.tm_mday = sm.day;
+        tm.tm_hour = sm.hour;
+        tm.tm_min = 12;
+        archive::GameInfo info;
+        info.mode = sm.mode;
+        info.white = sm.white;
+        info.black = sm.black;
+        info.whiteElo = sm.whiteElo;
+        info.blackElo = sm.blackElo;
+        info.coachLevel = sm.coachLevel;
+        info.timeControl = sm.timeControl;
+        info.started = std::mktime(&tm);
+        if (sm.mode == archive::Mode::Server) {
+            info.event = "Rated blitz game";
+            info.site = "caissa.scacelith.com";
+        }
+        chess::pgn::Record r = archive::makeRecord(g, info);
+        if (sm.mode == archive::Mode::Server) {
+            r.setTag("ScacelithServer", "caissa.scacelith.com:443");
+            r.setTag("ScacelithGameId", "48213");
+        }
+        write(r, info.started);
+    }
+    // A game from elsewhere (no ScacelithMode tag): the Immortal Game.
+    {
+        chess::Game g;
+        std::istringstream moves("e4 e5 f4 exf4 Bc4 Qh4+ Kf1 b5 Bxb5 Nf6 Nf3 Qh6 d3 Nh5 Nh4 Qg5 Nf5 c6 g4 Nf6 Rg1 cxb5 h4 Qg6 h5 "
+                                 "Qg5 Qf3 Ng8 Bxf4 Qf6 Nc3 Bc5 Nd5 Qxb2 Bd6 Bxg1 e5 Qxa1+ Ke2 Na6 Nxg7+ Kd8 Qf6+ Nxf6 Be7#");
+        for (std::string san; moves >> san;)
+            if (!g.play(g.position().parseSAN(san))) break;
+        chess::pgn::Record r = chess::pgn::Record::fromGame(g);
+        for (const auto& t : {std::make_pair("Event", "London casual game"), std::make_pair("Site", "London ENG"),
+                              std::make_pair("Date", "1851.06.21"), std::make_pair("Round", "-"),
+                              std::make_pair("White", "Adolf Anderssen"), std::make_pair("Black", "Lionel Kieseritzky"),
+                              std::make_pair("Result", "1-0"), std::make_pair("ECO", "C33"),
+                              std::make_pair("Opening", "King's Gambit Accepted: Bishop's Gambit")})
+            r.setTag(t.first, t.second);
+        std::tm tm = base;
+        tm.tm_mday = 1;
+        write(r, std::mktime(&tm));
+    }
+    return folder;
+}
 
 class UiViewerScene : public Scene {
 public:
@@ -90,8 +204,18 @@ public:
         if (!mouse.empty() && std::sscanf(mouse.c_str(), "%f,%f", &mx, &my) == 2) ui::im::setMouseOverride(true, m::vec2(mx, my));
         // Saved games: the folder the library page lists.
         library_.folder = ctx.argValue("--ui-library", plat::userDataDirectory() + "pgn/");
-        if (ctx.argValue("--ui-screen", "main") == "library-empty" && !ctx.hasArg("--ui-library"))
+        const std::string first = ctx.argValue("--ui-screen", "main");
+        if (first == "library-empty" && !ctx.hasArg("--ui-library"))
             library_.folder = plat::userDataDirectory() + "pgn-viewer-empty/";
+        if ((first.compare(0, 13, "analysis-page") == 0 || first == "library-analyse") && !ctx.hasArg("--ui-library"))
+            library_.folder = sampleLibrary();
+        // The text Paste a PGN reads (the X11 layer has no clipboard).
+        if (ctx.hasArg("--ui-clipboard")) {
+            std::ifstream in(ctx.argValue("--ui-clipboard"), std::ios::binary);
+            std::ostringstream text;
+            text << in.rdbuf();
+            ui::debug::setClipboard(text.str());
+        }
         open(ctx.argValue("--ui-screen", "main"));
         std::string keys = ctx.argValue("--ui-keys");
         size_t p = 0;
@@ -120,6 +244,11 @@ public:
         const std::string tok = script_[step_++];
         if (tok.compare(0, 6, "wheel:") == 0) {  // mouse wheel notches (negative: down), at the mouse
             fake_.wheel = float(std::atof(tok.c_str() + 6));
+            LOGI("ui viewer: script frame %d '%s'", int(step_), tok.c_str());
+            return;
+        }
+        if (tok.compare(0, 5, "mock:") == 0) {  // the fake server's clock moves on (online screens)
+            if (online_) game::onlineSession().runMock(std::atof(tok.c_str() + 5));
             LOGI("ui viewer: script frame %d '%s'", int(step_), tok.c_str());
             return;
         }
@@ -191,7 +320,13 @@ public:
         }
         if (screen == "calibration") ui::debug::openMenuPage(ui::debug::MenuPage::Calibration);
         if (screen == "watch") ui::debug::openMenuPage(ui::debug::MenuPage::Watch);
-        if (screen == "library" || screen == "library-empty") ui::debug::openMenuPage(ui::debug::MenuPage::Library);
+        if (screen == "library" || screen == "library-empty" || screen == "library-analyse")
+            ui::debug::openMenuPage(ui::debug::MenuPage::Library);
+        if (screen == "analysis-page" || screen == "analysis-page-online") {
+            ui::debug::openMenuPage(ui::debug::MenuPage::Analysis);
+            menu_ = true;
+            if (screen == "analysis-page-online") openOnline(screen);  // signed in to the fake server
+        }
         if (screen == "library-gif" || screen == "library-gif-done") {
             ui::debug::openMenuPage(ui::debug::MenuPage::Library);
             openOnline(screen);  // signed in to the fake server
@@ -199,7 +334,7 @@ public:
             if (screen == "library-gif-done") ui::debug::libraryGif();
         }
         if (screen == "confirm") ui::debug::openPauseConfirm(1);
-        if (screen == "gameover-folded") ui::debug::foldGameOver(true);
+        if (screen == "gameover-folded" || screen == "gameover-analyse-folded") ui::debug::foldGameOver(true);
         if (screen.compare(0, 6, "online") == 0 || screen.compare(0, 6, "direct") == 0) openOnline(screen);
         if (screen == "movelist") ui::notify(i18n::trf("notify.touched_square", {"g1"}), 30.0f);
         if (screen == "notify") {
@@ -235,7 +370,7 @@ public:
             {"online-noserver", "noserver"}, {"direct", "direct"}, {"direct-host", "direct-host"}, {"direct-wait", "direct-wait"},
             {"direct-join", "direct-join"}, {"online-history", "history"}, {"online-game", "game"},
             {"online-game-gif", "game-gif"}, {"online-game-gif-making", "game-gif-making"},
-            {"online-game-saving", "game-saving"}, {"online-game-saved", "game-saved"},
+            {"online-game-saving", "game-saving"}, {"online-game-saved", "game-saved"}, {"online-game-analysing", "game-analysing"},
             {"online-devices", "devices"}, {"online-email", "email"}, {"online-email-sent", "email-sent"},
             {"online-export", "export"}, {"online-export-done", "export-done"}, {"online-delete", "delete"},
             {"online-sso-wait", "sso-wait"}, {"online-sso-name", "sso-name"}, {"online-sso-link", "sso-link"},
@@ -334,10 +469,14 @@ public:
         if (online_) game::onlineSession().update(0.0f);  // events only: the mock's clock stays still
         if (s == "main" || s == "newgame" || s == "newgame-hotseat" || s == "custom" || s == "options" || s == "credits" ||
             s == "watch" || s == "calibration" || s == "coach" || s == "coach-novoice" || s == "licences" || s == "library" ||
-            s == "library-empty" || menu_ || s.compare(0, 14, "coach-download") == 0 || s == "coach-flow") {
+            s == "library-empty" || s == "library-analyse" || menu_ || s.compare(0, 14, "coach-download") == 0 || s == "coach-flow") {
             a = ui::mainMenu(setup_, watch_, coach_, library_);
             if (a == ui::MenuAction::StartReplay)
                 LOGI("ui viewer: replay %s, game %d", library_.replay.path.c_str(), library_.replay.game);
+            if (a == ui::MenuAction::StartAnalysis)
+                LOGI("ui viewer: analysis of %s, game %d, %d bytes of PGN text",
+                     library_.replay.path.empty() ? "a PGN text" : library_.replay.path.c_str(), library_.replay.game,
+                     int(library_.replay.pgn.size()));
         } else if (s == "coach-hud" || s == "coach-subtitle") {
             ui::Subtitle sub;
             sub.text = text_.empty() ? i18n::tr("coach.offer.text") : text_;
@@ -404,6 +543,25 @@ public:
             static std::string comment = "Moves at a steady 2 s all game";
             ui::pingIndicator(41, false);
             if (ui::reportDialog(cat, comment) >= 0) LOGI("ui viewer: report closed");
+        } else if (s.compare(0, 16, "gameover-analyse") == 0) {
+            // "Analyse the game" with each mode's other buttons: against Stockfish (and folded), the
+            // coach, online (a rematch offered, Report opponent).
+            ui::GameOverExtras x;
+            x.analyse = true;
+            if (s == "gameover-analyse-coach") {
+                x.detail = i18n::tr("coach.gameover.unrated");
+                x.primaryLabel = i18n::tr("coach.gameover.again");
+                a = ui::gameOver("0-1", chess::endReasonText(chess::GameEndReason::Checkmate), false, false, 38, x);
+            } else if (s == "gameover-analyse-online") {
+                x.primaryLabel = i18n::tr("online.rematch.accept");
+                x.detail = i18n::tr("online.rematch.offered");
+                x.reportLabel = i18n::tr("online.report.button");
+                ui::pingIndicator(33, false);
+                a = ui::gameOver("\xC2\xBD-\xC2\xBD", chess::endReasonText(chess::GameEndReason::Agreement), false, true, 41, x);
+            } else {
+                x.detail = i18n::trf("elo.change", {"1500", "1524", i18n::ltr("+24")});
+                a = ui::gameOver("1-0", chess::endReasonText(chess::GameEndReason::Checkmate), true, false, 34, x);
+            }
         } else if (s == "online-gameover") {
             ui::GameOverExtras x;
             x.detail = i18n::trf("online.rating.change", {"1500", "1512", i18n::ltr("+12")});
