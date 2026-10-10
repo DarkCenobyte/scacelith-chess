@@ -81,6 +81,12 @@ struct Ctx {
     float caretTime = 0.0f;        // blink phase
     std::string editOriginal;      // restored by Esc
     bool editSeen = false;         // the edited field was drawn this frame
+    // Text fields that could take the keyboard (enabled, not under a dialog), in drawing order, this
+    // frame and the previous one: Tab and Enter go from one to the next.
+    std::vector<Id> fields, prevFields;
+    Id tabTo = 0;                  // the field Tab or Enter went to: its edit starts as it is drawn
+    uint64_t tabFrame = 0;         // the frame tabTo was set (it lasts until the end of the next one)
+    uint64_t submitFrame = 0;      // Enter in the page's last field asked it to submit (ITEM_SUBMIT)
 };
 Ctx c;
 
@@ -137,6 +143,32 @@ uint32_t fnv(const void* data, size_t n, uint32_t h) {
 
 Id seed() { return c.idStack.empty() ? 2166136261u : c.idStack.back(); }
 
+// Index of field 'id' among the previous frame's fields, -1 when it is not one.
+int fieldIndex(Id id) {
+    for (size_t i = 0; i < c.prevFields.size(); ++i)
+        if (c.prevFields[i] == id) return int(i);
+    return -1;
+}
+
+// The field 'dir' steps after 'from' among the previous frame's fields (wrapping around), or the
+// first one (dir < 0: the last) when 'from' is not a field. 0 when the page has no field.
+Id neighbourField(Id from, int dir) {
+    const int n = int(c.prevFields.size());
+    if (n == 0) return 0;
+    const int i = fieldIndex(from);
+    if (i < 0) return dir < 0 ? c.prevFields.back() : c.prevFields.front();
+    return c.prevFields[size_t(((i + dir) % n + n) % n)];
+}
+
+// The keyboard goes to field 'id': it takes the focus and starts its edit as it is drawn (this
+// frame when it comes later in the page, else the next one).
+void moveToField(Id id) {
+    c.tabTo = id;
+    c.tabFrame = c.frame;
+    c.focus = id;
+    c.kbMode = true;
+}
+
 }  // namespace
 
 // ---- Frame ----------------------------------------------------------------------------------------
@@ -191,6 +223,12 @@ void beginFrame(float dt) {
         }
     }
     if (c.kActivate) c.kbMode = true;
+    // Tab with no field being edited: to the field after the focused one (Shift+Tab: before it), or
+    // to the page's first field (Shift: its last) when the focus is not on a field.
+    if (in.keyPressed[plat::KEY_TAB] && !c.editId) {
+        const bool shift = in.keyDown[plat::KEY_LSHIFT] || in.keyDown[plat::KEY_RSHIFT];
+        if (Id to = neighbourField(c.focus, shift ? -1 : 1)) moveToField(to);
+    }
 }
 
 void endFrame() {
@@ -202,6 +240,10 @@ void endFrame() {
     c.defaultFocus = 0;
     if (c.editId && !c.editSeen) c.editId = 0;  // the field left the screen
     c.editSeen = false;
+    c.prevFields.swap(c.fields);
+    c.fields.clear();
+    if (c.tabTo && c.tabFrame != c.frame) c.tabTo = 0;  // its field was not drawn again
+    if (c.submitFrame && c.submitFrame != c.frame) c.submitFrame = 0;  // no submit button took it
     c.hoveredPrev = c.hoveredNow;
     c.hoveredNow = 0;
     if (!c.mDown) c.active = 0;
@@ -336,6 +378,11 @@ Item item(Id id, const Rect& r, uint32_t flags) {
         if (it.focused && c.kActivate && !c.activateConsumed) {
             it.activated = true;
             c.activateConsumed = true;
+        }
+        // Enter in the page's last text field submits it: its submit button activates.
+        if ((flags & ITEM_SUBMIT) && c.submitFrame) {
+            it.activated = true;
+            c.submitFrame = 0;
         }
         for (const auto& mk : c.prevMarks)
             if (it.clicked && mk.first == id && mk.second.contains(c.mouse)) it.clicked = false;
@@ -845,9 +892,13 @@ bool editField(const std::string& label, std::string& text, const Rect& r, int m
         return ts.dir == 1 ? box.r() - 15.0f - gfx::textWidth(s, ts) : box.x + 15.0f;
     };
 
+    const bool live = enabled && !blocked();
+    if (live) c.fields.push_back(id);
     bool editing = c.editId == id;
     bool started = false;
-    if (!editing && enabled && it.activated) {
+    const bool tabbedHere = !editing && live && c.tabTo == id;   // Tab or Enter came from another field
+    if (tabbedHere) c.tabTo = 0;
+    if (!editing && enabled && (it.activated || tabbedHere)) {
         c.editId = id;
         c.editOriginal = text;
         c.caret = int(uni::decode(text).size());
@@ -861,8 +912,24 @@ bool editField(const std::string& label, std::string& text, const Rect& r, int m
     }
     if (editing && !started) {
         bool end = false;
-        if (!it.focused || (c.mPressed && !r.contains(mouse())) || in.keyPressed[plat::KEY_TAB]) end = true;
-        if (it.activated && !it.clicked) end = true;  // Enter
+        if (!it.focused || (c.mPressed && !r.contains(mouse()))) end = true;
+        if (in.keyPressed[plat::KEY_TAB]) {
+            // On to the next field (Shift+Tab: the previous one); alone on its page, the edit goes on.
+            const bool shift = in.keyDown[plat::KEY_LSHIFT] || in.keyDown[plat::KEY_RSHIFT];
+            const Id to = neighbourField(id, shift ? -1 : 1);
+            if (to && to != id) {
+                moveToField(to);
+                end = true;
+            }
+        }
+        if (it.activated && !it.clicked) {
+            // Enter: on to the next field, or from the page's last one its submit button (the
+            // password typed, Enter confirms it).
+            end = true;
+            const int i = fieldIndex(id);
+            if (i >= 0 && i + 1 < int(c.prevFields.size())) moveToField(c.prevFields[size_t(i + 1)]);
+            else c.submitFrame = c.frame;
+        }
         if (c.kBack && !c.backConsumed && c.blockDepth == 0) {  // Esc: restore, keep the page open
             c.backConsumed = true;
             text = c.editOriginal;

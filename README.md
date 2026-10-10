@@ -286,6 +286,11 @@ or on the mark, or keep the keyboard focus on the row for a moment, to read it.
   direct matches the opponent's robot looks where its player looks; with this option it moves
   its head by itself, as against Stockfish.
 
+In the forms of the menus (signing in, creating an account, the account's changes, names, server
+settings), **Tab** goes to the next field and starts typing there (**Shift+Tab** the previous one),
+and **Enter** goes on to the next field too, or in the last one sends the form, as its main button
+would: type the password, press Enter, and you are signed in.
+
 The first start opens on a brightness calibration: three squares, black on the left, mid grey and
 white on the right, each with a black knight, drawn exactly as the 3D hall would show them at the
 brightness of the slider. Move the slider until the knight on the black square is barely visible,

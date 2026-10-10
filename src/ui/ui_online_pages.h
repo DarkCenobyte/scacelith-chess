@@ -34,10 +34,13 @@ void serverLine(const gfx::Rect& p, bool showConnection);
 // A form row of the panel at y (advanced to the next row), 'inset' from both sides.
 gfx::Rect formRow(const gfx::Rect& p, float& y, float inset = 90.0f);
 // The footer: Back on the start side, the primary action on the end side, a rule above them.
+// The primary action is the page's submit button (Enter in its last text field, im::ITEM_SUBMIT)
+// unless 'submit' is false (another button of the page sends what its field holds).
 constexpr float kBtnW = 260.0f, kBtnH = 56.0f;
 float footerY(const gfx::Rect& p);
 bool backButton(const gfx::Rect& p, const char* key = "common.back", bool enabled = true);
-bool primaryButton(const gfx::Rect& p, const char* key, bool enabled, bool busy = false, float width = kBtnW);
+bool primaryButton(const gfx::Rect& p, const char* key, bool enabled, bool busy = false, float width = kBtnW,
+                   bool submit = true);
 void footerRule(const gfx::Rect& p);
 // A quiet link-like button centered at cx.
 bool linkButton(const char* key, float cx, float y, bool enabled = true);

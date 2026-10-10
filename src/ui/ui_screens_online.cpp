@@ -143,10 +143,10 @@ float footerY(const Rect& p) { return p.b() - 48.0f - kBtnH; }
 bool backButton(const Rect& p, const char* key, bool enabled) {
     return im::button(L(key), im::flip(p, Rect(p.x + 60.0f, footerY(p), kBtnW, kBtnH)), im::ButtonKind::Secondary, enabled);
 }
-bool primaryButton(const Rect& p, const char* key, bool enabled, bool busy, float width) {
+bool primaryButton(const Rect& p, const char* key, bool enabled, bool busy, float width, bool submit) {
     Rect r = im::flip(p, Rect(p.r() - 60.0f - width, footerY(p), width, kBtnH));
     im::Id id = im::makeId(std::string("##") + key);
-    bool hit = im::button(L(key), r, im::ButtonKind::Primary, enabled && !busy);
+    bool hit = im::button(L(key), r, im::ButtonKind::Primary, enabled && !busy, submit ? im::ITEM_SUBMIT : 0u);
     if (busy) spinner(vec2(im::flipX(p, r.x - 34.0f), r.cy()));
     im::setDefaultFocus(id);
     return hit && enabled && !busy;
@@ -752,8 +752,9 @@ void pageCheckEmail(float t) {
     }
     bool busy = s.busy(Kind::VerificationResent);
     float bw = 330.0f;
+    // The address typed in, Enter sends the link again (the primary button only goes to Sign in).
     if (im::button(L("online.check_email.resend"), Rect(p.cx() - bw * 0.5f, y, bw, 52.0f), im::ButtonKind::Secondary,
-                   !busy && (!mail.empty() || O.email.find('@') != std::string::npos))) {
+                   !busy && (!mail.empty() || O.email.find('@') != std::string::npos), im::ITEM_SUBMIT)) {
         s.api().resendVerification(mail.empty() ? trim(O.email) : mail);
         s.expect(Kind::VerificationResent);
     }
@@ -761,7 +762,7 @@ void pageCheckEmail(float t) {
     messageLine(p, y);
     footerRule(p);
     bool back = backButton(p);
-    if (primaryButton(p, "online.signin.button", true)) {
+    if (primaryButton(p, "online.signin.button", true, false, kBtnW, false)) {
         if (O.user.empty()) O.user = mail;
         setSub(Sub::SignIn);
     }
@@ -1557,7 +1558,8 @@ void pageChallenge(float t, bool privateGame) {
         y += 70.0f;
         // A code has 4 to 12 letters and digits (the dashes do not count).
         const auto chars = std::count_if(O.joinCode.begin(), O.joinCode.end(), [](char c) { return c != '-'; });
-        if (im::button(L("online.private.join"), Rect(rx, y, colW, 56.0f), im::ButtonKind::Secondary, online && !s.joining() && chars >= 4))
+        if (im::button(L("online.private.join"), Rect(rx, y, colW, 56.0f), im::ButtonKind::Secondary, online && !s.joining() && chars >= 4,
+                       im::ITEM_SUBMIT))
             join = true;
         if (s.joining()) {
             const std::string note = T("online.private.joining");
@@ -1714,7 +1716,8 @@ void pageDirectHost(float t) {
     im::endInfoMarks();
     footerRule(p);
     bool back = backButton(p);
-    bool host = primaryButton(p, "online.direct.host_button", portOk);
+    // A settings page: Enter keeps the port typed in, it does not host yet.
+    bool host = primaryButton(p, "online.direct.host_button", portOk, false, kBtnW, false);
     im::popId();
     endPage();
     if (host) {
