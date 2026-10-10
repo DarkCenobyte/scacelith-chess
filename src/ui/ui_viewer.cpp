@@ -37,6 +37,10 @@
 //     online-email, online-email-sent, online-export, online-export-done, online-delete; at the table:
 //     online-hud, online-pause, online-report, online-gameover; Saved games signed in:
 //     library-gif (Save as GIF enabled), library-gif-done (the selected game's GIF saved)
+//   analysis mode (the overlay over the viewer's, a commentary subtitle): analysis-hud (Kasparov -
+//     Topalov 1999 halfway, its review done; --ui-text <text> replaces the subtitle), analysis-hud-review
+//     (early on, the review at work, the moves playing, no voice), analysis-hud-fen (an endgame set up
+//     from a FEN, Black's move first, seen by the player who had Black), analysis-hud-noengine
 //   --ui-tab <0..6|display|graphics|audio|gameplay|player|online|controls>   options tab
 //   --lang <code>   interface language (en fr de es uk ar ru ja zh-Hant zh-Hans; read by game::Settings)
 //   --ui-name <name>, --ui-hand <0..2>   player name / handwriting shown by Options > Player
@@ -69,10 +73,12 @@
 #include "../tts/model_store.h"
 #include "../tts/tts.h"
 #include <cctype>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
+#include <iterator>
 #include <sstream>
 
 namespace {
@@ -336,6 +342,7 @@ public:
         if (screen == "confirm") ui::debug::openPauseConfirm(1);
         if (screen == "gameover-folded" || screen == "gameover-analyse-folded") ui::debug::foldGameOver(true);
         if (screen.compare(0, 6, "online") == 0 || screen.compare(0, 6, "direct") == 0) openOnline(screen);
+        if (screen.compare(0, 12, "analysis-hud") == 0) analysis_ = analysisSample(screen);
         if (screen == "movelist") ui::notify(i18n::trf("notify.touched_square", {"g1"}), 30.0f);
         if (screen == "notify") {
             ui::notify(i18n::tr("notify.draw_declined"), 30.0f);
@@ -381,6 +388,115 @@ public:
                 ui::debug::openOnlineMenu(p.sub);
                 menu_ = true;
             }
+    }
+
+    // The Analysis mode's overlay (ui_analysis.cpp) as the scene fills it, with made-up evaluations
+    // and symbols: a real game halfway (Kasparov - Topalov, Wijk aan Zee 1999), the same early on
+    // (the review at work) or without an engine, and an endgame set up from a FEN that starts with
+    // Black's move, seen from Black's side.
+    static ui::AnalysisHud analysisSample(const std::string& screen) {
+        static const char* const kasparov[] = {
+            "e4", "d6", "d4", "Nf6", "Nc3", "g6", "Be3", "Bg7", "Qd2", "c6", "f3", "b5", "Nge2", "Nbd7", "Bh6", "Bxh6",
+            "Qxh6", "Bb7", "a3", "e5", "O-O-O", "Qe7", "Kb1", "a6", "Nc1", "O-O-O", "Nb3", "exd4", "Rxd4", "c5", "Rd1",
+            "Nb6", "g3", "Kb8", "Na5", "Ba8", "Bh3", "d5", "Qf4+", "Ka7", "Rhe1", "d4", "Nd5", "Nbxd5", "exd5", "Qd6",
+            "Rxd4", "cxd4", "Re7+", "Kb6", "Qxd4+", "Kxa5", "b4+", "Ka4", "Qc3", "Qxd5", "Ra7", "Bb7", "Rxb7", "Qc4",
+            "Qxf6", "Kxa3", "Qxa6+", "Kxb4", "c3+", "Kxc3", "Qa1+", "Kd2", "Qb2+", "Kd1", "Bf1", "Rd2", "Rd7", "Rxd7",
+            "Bxc4", "bxc4", "Qxh8", "Rd3", "Qa8", "c3", "Qa4+", "Ke1", "f4", "f5", "Kc1", "Rd2", "Qa7"};
+        // White's view after each ply, in centipawns, and the symbols (PGN NAGs) by ply.
+        static const int kasparovCp[] = {
+            30,  45,  50,  45,  40,  55,  50,  55,  50,  60,  55,  70,  60,  65,  55,  60,  55,  60,  50,  55,  45,  95,
+            85,  90,  80,  95,  90,  100, 95,  160, 150, 165, 150, 170, 160, 175, 170, 230, 220, 225, 215, 190, 200, 205,
+            200, 280, 270, 650, 640, 660, 650, 655, 640, 660, 620, 640, 630, 650, 640, 660, 650, 820, 800, 820, 790, 810,
+            800, 790, 800, 810, 780, 800, 790, 880, 870, 880, 890, 910, 900, 920, 930, 950, 940, 960, 950, 980, 990};
+        static const int kasparovNags[][2] = {{21, 6}, {29, 2}, {37, 6}, {41, 5}, {42, 1}, {45, 2}, {46, 3},
+                                              {47, 4}, {48, 1}, {61, 2}, {64, 5}, {70, 6}, {72, 1}, {73, 6}};
+        static const char* const endgame[] = {"Kd7", "Rb7+", "Kc6", "Rg7", "Rxa5", "Rxg6+", "Kd5", "Rg5+", "Ke6", "Rxh5",
+                                              "Ra3+", "Kf4", "Ra4+", "Kg5", "Kf7", "Rh7+", "Kg8", "Rb7", "Ra1", "h5"};
+        static const int endgameCp[] = {140, 150, 155, 150, 260, 250, 255, 250, 260, 255, 250, 245, 250, 240, 420, 430, 440, 430, 450, 470};
+        static const int endgameNags[][2] = {{0, 6}, {1, 1}, {4, 2}, {14, 4}, {15, 1}};
+
+        const bool fen = screen == "analysis-hud-fen";
+        ui::AnalysisHud hud;
+        chess::Position pos;
+        if (fen) pos.setFEN("8/8/4k1p1/P6p/7P/5KP1/r7/1R6 b - - 0 40");
+        const int plies = fen ? int(std::size(endgame)) : int(std::size(kasparov));
+        // The moves as the scene gives them: SAN written by the rules (a slip in the lists above
+        // shows in the log and ends the game there).
+        for (int i = 0; i < plies; ++i) {
+            const char* san = fen ? endgame[i] : kasparov[i];
+            chess::Move m = pos.parseSAN(san);
+            m = m.valid() ? pos.findLegal(m.from, m.to, m.promotion) : m;
+            if (!m.valid()) {
+                LOGW("ui viewer: sample move %d '%s' is not legal", i + 1, san);
+                break;
+            }
+            ui::AnalysisMove mv;
+            mv.san = pos.toSAN(m);
+            pos.makeMove(m);
+            const int cp = fen ? endgameCp[i] : kasparovCp[i];
+            mv.white = 0.5f + 0.5f * (2.0f / (1.0f + std::exp(-0.00368208f * float(cp))) - 1.0f);   // lichess
+            mv.known = true;
+            hud.moves.push_back(mv);
+        }
+        auto annotate = [&hud](const auto& nags) {
+            for (const auto& n : nags)
+                if (n[0] < int(hud.moves.size())) hud.moves[size_t(n[0])].nag = n[1];
+        };
+        if (fen) annotate(endgameNags);
+        else annotate(kasparovNags);
+        if (fen) {
+            hud.white = "Alice \xC2\xB7 1512";
+            hud.black = "Bob \xC2\xB7 1488";
+            hud.result = "1-0";
+            hud.firstMoveNumber = 40;
+            hud.blackFirst = true;
+            hud.whiteBottom = false;
+            hud.current = 16;
+        } else {
+            hud.white = "Garry Kasparov \xC2\xB7 2812";
+            hud.black = "Veselin Topalov \xC2\xB7 2700";
+            hud.result = "1-0";
+            hud.opening = "Pirc Defence: 150 Attack";
+            hud.current = 47;   // 24. Rxd4!!
+        }
+        for (size_t i = 0; i < hud.moves.size(); ++i) {
+            const int side = (int(i) + (hud.blackFirst ? 1 : 0)) % 2;
+            hud.counts[side][hud.moves[i].nag]++;
+        }
+        hud.summaryKnown = true;
+        hud.accuracy[0] = fen ? 88.4 : 92.6;
+        hud.accuracy[1] = fen ? 61.9 : 71.3;
+        hud.voiceAvailable = true;
+        hud.arrowsOn = false;
+        if (screen == "analysis-hud-review") {  // the quick pass has reached ply 14
+            for (size_t i = 14; i < hud.moves.size(); ++i) hud.moves[i].known = false;
+            hud.current = 10;
+            hud.summaryKnown = false;
+            hud.progress = 0.16f;
+            hud.playing = true;
+            hud.voiceAvailable = false;
+            hud.arrowsOn = true;
+        }
+        if (screen == "analysis-hud-noengine") {
+            for (ui::AnalysisMove& m : hud.moves) {
+                m.known = false;
+                m.nag = 0;
+            }
+            hud.summaryKnown = false;
+            hud.engineMissing = true;
+            hud.commentsOn = false;
+        }
+        hud.atStart = hud.current == 0;
+        hud.atEnd = hud.current >= int(hud.moves.size());
+        if (hud.current > 0 && hud.moves[size_t(hud.current - 1)].known) {
+            const int cp = fen ? endgameCp[hud.current - 1] : kasparovCp[hud.current - 1];
+            char text[16];
+            std::snprintf(text, sizeof(text), "%+.1f", double(cp) / 100.0);
+            hud.evalKnown = true;
+            hud.evalWhite = hud.moves[size_t(hud.current - 1)].white;
+            hud.evalText = text;
+        }
+        return hud;
     }
 
     // Names in every script the game supports, each written in the three handwriting styles: the
@@ -568,6 +684,25 @@ public:
             x.reportLabel = i18n::tr("online.report.button");
             ui::pingIndicator(33, false);
             a = ui::gameOver("1-0", i18n::tr("reason.online.abandonment"), true, false, 31, x);
+        } else if (s.compare(0, 12, "analysis-hud") == 0) {
+            ui::ViewerHud vh;
+            vh.analysis = true;
+            vh.sideToMove = -1;
+            ui::viewerHud(vh);
+            ui::AnalysisHudResult r = ui::analysisHud(analysis_);
+            if (r.action != ui::AnalysisAction::None) LOGI("ui viewer: analysis hud -> %d (%d)", int(r.action), r.position);
+            if (s == "analysis-hud") {  // the commentary on the move on the board, between the bar and the panel
+                ui::Subtitle sub;
+                sub.text = text_.empty() ? std::string("Kasparov gives up a whole rook: if Black takes it, the king is hunted "
+                                                       "across the board to its death.")
+                                         : text_;
+                sub.age = 1.0f;
+                sub.duration = ui::subtitleDuration(sub.text, 4.0f);
+                sub.tag = i18n::tr("analysis.hud.speaker");
+                sub.spanLeft = r.freeLeft;
+                sub.spanRight = r.freeRight;
+                ui::subtitles(sub);
+            }
         } else if (s == "viewer-pause") {
             a = ui::viewerPauseMenu();
         } else if (s == "viewer-hud") {
@@ -680,6 +815,7 @@ private:
     ui::WatchSetup watch_;
     ui::CoachSetup coach_;
     ui::LibrarySetup library_;
+    ui::AnalysisHud analysis_;
     std::string text_;
     std::string coachDir_;
     std::string screen_;

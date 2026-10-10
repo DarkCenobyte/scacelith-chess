@@ -1199,6 +1199,31 @@ replay.tip.resume = Fortsetzen (K)
 replay.tip.forward = Einen Zug vor (L)
 replay.tip.end = Ende der Partie (Ende)
 
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = KOMMENTAR
+analysis.hud.accuracy = GENAUIGKEIT
+analysis.hud.reviewing = Stockfish analysiert die Partie… {0}
+analysis.hud.no_engine = Keine Schach-Engine: Die Züge werden ohne Analyse gezeigt.
+analysis.hud.no_moves = Diese Partie enthält keine Züge.
+analysis.hud.tip.play = Züge abspielen (K)
+analysis.hud.tip.comments_off = Kommentare zu den Schlüsselmomenten ausblenden (N)
+analysis.hud.tip.comments_on = Kommentare zu den Schlüsselmomenten einblenden (N)
+analysis.hud.tip.voice_off = Stimme des Kommentators stummschalten (M)
+analysis.hud.tip.voice_on = Kommentare vorlesen lassen (M)
+analysis.hud.tip.voice_missing = Die Stimme ist nicht zu hören: Die Sprachdateien sind nicht installiert, oder „Optionen > Ton > Stimme des Trainers“ ist aus. Die Kommentare erscheinen als Text auf dem Bildschirm.
+analysis.hud.tip.arrows_off = Pfeile der besseren Züge ausblenden (B)
+analysis.hud.tip.arrows_on = Pfeile der besseren Züge einblenden (B)
+analysis.hud.controls.play = Abspielen / Pause
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Kommentare ein- / ausblenden
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Stimme des Kommentators an / aus
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Pfeile ein- / ausblenden
+
 # ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
 #      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
 gif.save = Als GIF speichern

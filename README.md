@@ -409,6 +409,11 @@ clipboard), `gameover-analyse|gameover-analyse-coach|gameover-analyse-online|gam
 the game over card with Analyse the game, and `online-game-analysing` a history game fetching its
 PGN for the analysis.
 
+The Analysis mode's overlay has its UI viewer screens: `--scene ui --ui-screen analysis-hud` (a game
+halfway, its review done, a commentary subtitle that `--ui-text <text>` replaces), `analysis-hud-review`
+(early on, the review at work), `analysis-hud-fen` (set up from a FEN, Black's move first) and
+`analysis-hud-noengine`.
+
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for how the engine is organised.
 
 ### Continuous integration and releases

@@ -1200,6 +1200,31 @@ replay.tip.resume = Reprendre (K)
 replay.tip.forward = Un coup en avant (L)
 replay.tip.end = Fin de la partie (Fin)
 
+# ---- Analysis mode: overlay (src/ui/ui_analysis.cpp) ----------------------------------------
+# Also the analysis keys of the viewer's controls hint (src/ui/ui_screens_game.cpp: viewerHud) and
+# the tag of the commentator's subtitles (analysis.hud.speaker, as coach.speaker). {0} of
+# analysis.hud.reviewing = the share of the game reviewed, as number.percent writes it.
+analysis.hud.speaker = COMMENTAIRE
+analysis.hud.accuracy = PRÉCISION
+analysis.hud.reviewing = Stockfish analyse la partie… {0}
+analysis.hud.no_engine = Aucun moteur d’échecs : les coups sont présentés sans analyse.
+analysis.hud.no_moves = Cette partie ne compte aucun coup.
+analysis.hud.tip.play = Jouer les coups (K)
+analysis.hud.tip.comments_off = Masquer les commentaires des moments clés (N)
+analysis.hud.tip.comments_on = Afficher les commentaires des moments clés (N)
+analysis.hud.tip.voice_off = Couper la voix du commentateur (M)
+analysis.hud.tip.voice_on = Entendre les commentaires à voix haute (M)
+analysis.hud.tip.voice_missing = La voix ne peut pas être entendue : ses fichiers ne sont pas installés, ou l’option « Options > Son > Voix du coach » est désactivée. Les commentaires sont écrits à l’écran.
+analysis.hud.tip.arrows_off = Masquer les flèches des meilleurs coups (B)
+analysis.hud.tip.arrows_on = Afficher les flèches des meilleurs coups (B)
+analysis.hud.controls.play = Lecture / pause
+analysis.hud.keys.comments = N
+analysis.hud.controls.comments = Afficher / masquer les commentaires
+analysis.hud.keys.voice = M
+analysis.hud.controls.voice = Voix du commentateur oui / non
+analysis.hud.keys.arrows = B
+analysis.hud.controls.arrows = Afficher / masquer les flèches
+
 # ---- Animated GIFs of games (src/game/online_session.cpp gifErrorText, src/game/online_account.cpp
 #      waitText, src/ui/ui_screens_account.cpp, src/ui/ui_library.cpp) ----
 gif.save = Enregistrer en GIF
