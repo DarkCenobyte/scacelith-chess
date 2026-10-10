@@ -65,6 +65,8 @@
 //                           moves and their rewind, the takeback card), without the session;
 //                           --coach-stage-test lesson: on the rules lesson's first position
 //   --coach-auto-answer yes|no   the takeback card answers itself after 1.5 s (with --play)
+//   --analysis-marks-test   once the pieces stand, the review's marks (a fixed set: tint, badges,
+//                           arrows; World::submitAnalysisMarks) arrive on the board
 //   --start --hotseat       skip the menu: a hot-seat game (--white-name N --black-name N,
 //                           --clock-right white|black, --rated, --handover <s> with 0 = a cut)
 //   --play e2e4,e7e5,...    the human player(s) make these moves by hand, one per turn (touch,
@@ -536,6 +538,7 @@ private:
     ui::NewGameSetup setup_;
     ui::WatchSetup watch_;
     bool debugCamera_ = false;    // --cam in a human game
+    bool analysisMarksTest_ = false;   // --analysis-marks-test
 
     // Touch / move state
     int touchedId_ = -1;
