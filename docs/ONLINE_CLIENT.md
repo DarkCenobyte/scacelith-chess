@@ -459,7 +459,10 @@ the page) closes the match, which removes the port mapping.
   `--play e2e4,d2d3,...` makes my moves by hand (touch, carry, clock press), so that the fake's
   gestures show on its robot in screenshots (with `--warp <s>`: its moves come at the same times
   from run to run).
-- In a mock game, F9 makes the opponent disconnect for 20 s, F10 drops our connection for 8 s.
+- In a mock game, F9 makes the opponent disconnect for 20 s, F10 drops our connection for 8 s,
+  F11 holds the opponent's stance in turn (standing, at its left end, at its right end, seated,
+  then its own outings again). `--mock-stance standing|side-left|side-right` holds one from the
+  start (screenshots of the opponent's robot standing).
 - `--scene ui --ui-screen <name>`: the pages on the fakes with a frozen clock: `online`,
   `online-register`, `online-mfa`, `online-play`, `online-search`, `online-account`,
   `online-mfa-setup`, `online-recovery`, `online-challenge`, `online-private`, `online-noserver`,

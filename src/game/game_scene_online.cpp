@@ -116,6 +116,16 @@ void GameScene::initOnline() {
         if (startOnline_.empty() || startOnline_[0] == '-') startOnline_ = "5+3";
         startTouch_ = ctx_->argValue("--touch");
     }
+    // --mock-stance standing|side-left|side-right: the fake opponent stands there (screenshots).
+    if (ctx_->hasArg("--mock-stance")) {
+        anim::Stance st = anim::Stance::Seated;
+        if (onlineSession().mock() && stance::parseStanceArg(ctx_->argValue("--mock-stance"), st)) {
+            mockStance_ = int(st);
+            net::mock::forceOpponentStance(mockStance_);
+        } else {
+            LOGW("--mock-stance: standing, side-left or side-right, with --online-mock");
+        }
+    }
 }
 
 bool GameScene::takeOnlineGame() {
@@ -164,6 +174,7 @@ void GameScene::setupOnlineGame() {
     remoteHeadOn_ = remoteGlancing_ = false;
     remoteGlanceBlend_ = 0.0f;
     stanceTracker_.reset();   // everyone starts seated
+    remoteShown_ = anim::Stance::Seated;
     LOGI("New online game %llu: you play %s against %s, %s%s", (unsigned long long)og_.id, humanColor_ == White ? "White" : "Black",
          (humanColor_ == White ? og_.black : og_.white).name.c_str(), og_.category.c_str(), og_.rated ? " rated" : "");
 }
@@ -216,11 +227,17 @@ Scorekeeper::Details GameScene::onlineSheetDetails() const {
 
 void GameScene::updateOnline(float dt) {
     OnlineSession& s = onlineSession();
-    // Developer switches of the fakes: F9 the opponent leaves for 20 s, F10 our connection drops.
+    // Developer switches of the fakes: F9 the opponent leaves for 20 s, F10 our connection drops,
+    // F11 the opponent's stance (its own outings, then held: standing, left, right, seated).
     if (s.mock() && online() && state_ == State::Playing && !ui::wantsKeyboard()) {
         const plat::Input& in = plat::input();
         if (in.keyPressed[plat::KEY_F9]) net::mock::opponentDrop(20);
         if (in.keyPressed[plat::KEY_F10]) net::mock::connectionDrop(8);
+        if (in.keyPressed[plat::KEY_F11]) {
+            mockStance_ = mockStance_ < 0 ? 1 : mockStance_ == 0 ? -1 : mockStance_ == 3 ? 0 : mockStance_ + 1;
+            net::mock::forceOpponentStance(mockStance_);
+            LOGI("online mock: the opponent's stance %s %d", mockStance_ < 0 ? "is its own again" : "held at", mockStance_);
+        }
     }
     // Notices that must not interrupt a game wait until none is being played (any mode but the
     // viewer's; the game over card is fine).
@@ -715,10 +732,10 @@ bool GameScene::remoteMoveQueued(int ply) const {
 void GameScene::updateRemoteLive(float dt) {
     RemoteLive& L = remoteLive_;
     if (L.takeBack) return;
-    // The hand part of their gestures applies only while their robot sits at the board (a stand
-    // let go of the piece held live first, updateStances; a move put down stays on the board).
-    const anim::Animator& them = anim_[aiSeat()];
-    if (!them.seated() || them.stanceTarget() != anim::Stance::Seated) return;
+    // The hand part of their gestures applies only while their robot sits at the board and they
+    // are shown seated (a stand let go of the piece held live first, updateStances; a move put
+    // down stays on the board).
+    if (!live::remoteHandApplies(remoteShown_, anim_[aiSeat()].seated())) return;
     // Their gestures stopped coming (five keepalives without one): the piece goes back (a move put
     // down is taken back), and their next gesture takes it again.
     const int keepaliveMs = link_->gestureKeepaliveMs();
@@ -861,9 +878,11 @@ bool GameScene::driveRemoteHead(float dt) {
     // Their clock stands at their right on their screen, not here: the robot's own look follows its
     // hand to this clock. Their robot out of its chair (stance_control.h): their head when it comes
     // (its angles relative to the body, which faces the board), else a look at the board.
+    // Glance and Side count only while they are shown seated (live::remoteHeadFlags).
     const bool standing = !anim_[r].seated();
+    const uint8_t flags = live::remoteHeadFlags(g.flags, remoteShown_);
     const stance::RemoteHead mode = stance::remoteHeadMode(standing, following, anim_[r].runningTask(anim::TaskType::PressClock));
-    remoteGlancing_ = following && !standing && (g.flags & net::proto::GestureFlag::Glance) != 0;
+    remoteGlancing_ = following && !standing && (flags & net::proto::GestureFlag::Glance) != 0;
     remoteGlanceBlend_ = clamp(remoteGlanceBlend_ + (remoteGlancing_ ? dt : -dt) / kGlanceTime, 0.0f, 1.0f);
     anim_[r].setLean(following ? g.lean : 0.0f);
     if (mode != stance::RemoteHead::Relayed) {
@@ -881,7 +900,7 @@ bool GameScene::driveRemoteHead(float dt) {
     }
     // What lies beside the board is mirrored between the two clients: a look there turns the
     // other way here (seated only: standing, nothing is mirrored).
-    float yaw = (!standing && (g.flags & net::proto::GestureFlag::Side)) ? -g.yaw : g.yaw;
+    float yaw = (flags & net::proto::GestureFlag::Side) ? -g.yaw : g.yaw;
     float pitch = g.pitch;
     if (remoteGlanceBlend_ > 0.0f) {
         // Their scoresheet: this robot looks at its own pad here, as the local glance does.
@@ -903,26 +922,30 @@ bool GameScene::driveRemoteHead(float dt) {
 // =============================================================================================
 
 void GameScene::updateStances(float dt) {
-    // Mine: the network layer sends it when it changes and refreshes it while not Seated (nothing
-    // goes to an authority or a peer of an older minor), so every frame is fine.
-    link_->sendStance(uint8_t(anim_[humanSeat()].stanceTarget()));
-    // Theirs: the latest heard, Seated once it is stale, while the link is lost and whenever the
-    // game is not being played (the end sits everyone down, simulate()).
+    const bool playing = state_ == State::Playing && og_.status == StOngoing && !endPending_;
+    // Mine: the stance my robot is going to while the game is played, Seated once it is over. The
+    // network layer sends only changes (250 ms apart), refreshes a stance other than Seated every
+    // keepalive and after a reconnection, and nothing to a peer of an older minor: every frame is
+    // fine.
+    link_->sendStance(uint8_t(playing ? anim_[humanSeat()].stanceTarget() : anim::Stance::Seated));
+    // Theirs: the latest heard, Seated once it is stale, while our link is lost and whenever the
+    // game is not being played (the end sits everyone down, simulate()); given to their robot when
+    // it changes.
     if (link_->reconnecting()) stanceTracker_.reset();
     stanceTracker_.advance(dt);
-    const bool playing = state_ == State::Playing && og_.status == StOngoing && !endPending_;
-    const anim::Stance theirs = playing ? stanceTracker_.current(link_->gestureKeepaliveMs()) : anim::Stance::Seated;
-    const int r = aiSeat();
-    if (anim_[r].stanceTarget() == theirs) return;
+    const anim::Stance shown = playing ? stanceTracker_.current(link_->gestureKeepaliveMs()) : anim::Stance::Seated;
+    if (shown == remoteShown_) return;
+    remoteShown_ = shown;
     // Getting up, their robot first puts down a piece it holds live (the animator starts the stance
     // once the hands are idle); a move put down stays on the board until their MoveMade.
-    if (theirs != anim::Stance::Seated && remoteLive_.pieceId >= 0 && remoteLive_.placed == 0) cancelRemoteLive();
-    setSeatStance(r, theirs);
-    LOGI("online: the opponent's stance is %d", int(theirs));
+    if (shown != anim::Stance::Seated && remoteLive_.pieceId >= 0 && remoteLive_.placed == 0) cancelRemoteLive();
+    setSeatStance(aiSeat(), shown);
+    LOGI("online: the opponent's stance is %d", int(shown));
 }
 
 void GameScene::opponentSeated() {
     stanceTracker_.heard(int(anim::Stance::Seated));
+    remoteShown_ = anim::Stance::Seated;
     setSeatStance(aiSeat(), anim::Stance::Seated);
 }
 

@@ -308,8 +308,10 @@ Development: `--online-mock` replaces the network with an in-process fake server
 direct-match friend (any password works; see `src/game/online_mock.h` for the inputs that try
 error paths), and `--start-online [category]` goes straight to a game (with `--online-mock` the
 opponent is a random mover whose hands and head move like a player's; `--online-manual-clock`
-leaves the clock press to the players, and `--play e2e4,...` makes your moves). In a mock game F9
-makes the opponent disconnect for a while and F10 drops your own connection. `--scene ui
+leaves the clock press to the players, `--mock-stance standing|side-left|side-right` keeps the
+opponent standing, and `--play e2e4,...` makes your moves). In a mock game F9 makes the opponent
+disconnect for a while, F10 drops your own connection and F11 makes the opponent stand, go to an
+end of the table or sit (in turn). `--scene ui
 --ui-screen online-play` (and the other `online-*` and `direct-*` screens listed in
 `src/ui/ui_viewer.cpp`) shows the pages on the fake server.
 [docs/ONLINE_CLIENT.md](docs/ONLINE_CLIENT.md) describes the client side. QR codes are drawn with

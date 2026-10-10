@@ -96,6 +96,9 @@
 //                           "cat" (default 5+3; with --online-mock the game starts at once);
 //                           --touch <square> touches that piece once the handshake is over
 //   --start-online direct   with --online-mock: a direct match against the fakes' friend
+//   --mock-stance standing|side-left|side-right   with --online-mock: the fake opponent stands
+//                           there (net::mock::forceOpponentStance; F11 in a mock game cycles it:
+//                           its own outings, standing, left, right, seated)
 //   --play-then a,b,...     once the --play moves are made, the player picks these in the Esc menu,
 //                           one per turn: resign, leave (Main menu), takeback (coach games)
 //   --replay <file.pgn>     skip the menu: replay a saved game (--game N: the Nth game of the file,
@@ -768,6 +771,8 @@ private:
     bool remoteGlancing_ = false;       // they look at their scoresheet: their writing hand waits aside
     float remoteGlanceBlend_ = 0.0f;
     live::StanceTracker stanceTracker_; // the opponent's stance (OpponentStance events)
+    anim::Stance remoteShown_ = anim::Stance::Seated;   // the stance their robot is given (updateStances)
+    int mockStance_ = -1;               // --mock-stance / F11: the fake opponent's held stance (-1: its own)
     bool resync_ = false;               // rebuild once the robots are idle
     bool rebuildFade_ = false;
     bool endPending_ = false;           // GameEnd received, shown once the moves are played
